@@ -265,7 +265,7 @@ TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
                         const SoilHeat& soil_heat, const double dt, 
                         SoilWater& soil_water, Surface& surface, Treelog& msg)
 {
-  Treelog::Open nest (msg, component + std::string (":") + name);
+  Treelog::Open nest (msg, component + std::string (": ") + name);
 
   // Flux.
   const size_t edge_size = geo.edge_size ();
@@ -354,7 +354,7 @@ TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
         continue;
       
       // Scale down ddt so our loss does not exceed the allowed.
-      const double factor = Theta_loss / allowed_loss;
+      const double factor = allowed_loss / Theta_loss;
       ddt *= factor;
     }
 

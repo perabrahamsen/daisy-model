@@ -975,6 +975,8 @@ ui_Qt_run${OBJ}: ui_Qt_run.C ui_Qt_run.h ui_Qt.h ui.h model.h symbol.h \
 ui_Qt${OBJ}: ui_Qt.C ui_Qt.h ui.h model.h symbol.h alist.h toplevel.h \
   librarian.h block.h syntax.h treelog.h plf.h assertion.h
 main_Qt${OBJ}: main_Qt.C ui_Qt.h ui.h model.h symbol.h alist.h toplevel.h
+stomatacon${OBJ}: stomatacon.C stomatacon.h model.h symbol.h alist.h \
+  mathlib.h assertion.h block.h syntax.h treelog.h plf.h librarian.h
 tertiary${OBJ}: tertiary.C tertiary.h model.h symbol.h alist.h geometry.h \
   syntax.h treelog.h mathlib.h assertion.h soil_water.h block.h plf.h \
   librarian.h anystate.h
@@ -1090,8 +1092,7 @@ log${OBJ}: log.C log.h time.h border.h model.h symbol.h alist.h library.h \
   metalib.h block.h syntax.h treelog.h plf.h daisy.h program.h run.h \
   timestep.h vcheck.h memutils.h assertion.h librarian.h
 weather${OBJ}: weather.C weather.h model.h symbol.h alist.h im.h syntax.h \
-  treelog.h block.h plf.h fao.h time.h log.h border.h units.h mathlib.h \
-  assertion.h librarian.h
+  treelog.h block.h plf.h librarian.h
 column${OBJ}: column.C column.h model.h symbol.h alist.h block.h syntax.h \
   treelog.h plf.h log.h time.h border.h librarian.h submodeler.h \
   assertion.h
@@ -1226,6 +1227,9 @@ bioincorporation${OBJ}: bioincorporation.C bioincorporation.h alist.h \
   symbol.h syntax.h treelog.h log.h time.h border.h model.h geometry.h \
   mathlib.h assertion.h soil.h am.h im.h submodel.h plf.h aom.h om.h \
   check.h vcheck.h
+weather_base${OBJ}: weather_base.C weather_base.h weather.h model.h symbol.h \
+  alist.h im.h syntax.h treelog.h fao.h assertion.h time.h units.h log.h \
+  border.h mathlib.h librarian.h
 volume_box${OBJ}: volume_box.C volume_box.h volume.h model.h symbol.h alist.h \
   syntax.h treelog.h bound.h border.h mathlib.h assertion.h librarian.h
 movement_solute${OBJ}: movement_solute.C movement_solute.h movement.h model.h \
@@ -1237,8 +1241,9 @@ scope_exchange${OBJ}: scope_exchange.C scope_exchange.h model.h symbol.h \
   librarian.h
 photo_Farquhar${OBJ}: photo_Farquhar.C photo_Farquhar.h photo.h model.h \
   symbol.h alist.h block.h syntax.h treelog.h plf.h rubiscoNdist.h \
-  ABAeffect.h bioclimate.h canopy_std.h canopy_simple.h phenology.h log.h \
-  time.h border.h submodel.h mathlib.h assertion.h check.h librarian.h
+  ABAeffect.h stomatacon.h bioclimate.h canopy_std.h canopy_simple.h \
+  phenology.h log.h time.h border.h submodel.h mathlib.h assertion.h \
+  check.h librarian.h
 scope_multi${OBJ}: scope_multi.C scope_multi.h scope.h symbol.h model.h \
   alist.h syntax.h treelog.h assertion.h librarian.h
 scope_id${OBJ}: scope_id.C scope_id.h scope.h symbol.h model.h alist.h \
@@ -1262,8 +1267,9 @@ om${OBJ}: om.C om.h plf.h som.h smb.h dom.h syntax.h treelog.h symbol.h \
 select_value${OBJ}: select_value.C select_value.h select.h destination.h \
   symbol.h model.h alist.h units.h volume.h block.h syntax.h treelog.h \
   plf.h mathlib.h assertion.h
-weather_old${OBJ}: weather_old.C weather_old.h weather.h model.h symbol.h \
-  alist.h im.h syntax.h treelog.h block.h plf.h fao.h time.h units.h
+weather_old${OBJ}: weather_old.C weather_old.h weather_base.h weather.h \
+  model.h symbol.h alist.h im.h syntax.h treelog.h block.h plf.h fao.h \
+  time.h units.h
 log_extern${OBJ}: log_extern.C log_extern.h log_select.h log.h time.h \
   border.h model.h symbol.h alist.h memutils.h destination.h scope.h \
   select.h units.h volume.h scope_block.h block.h syntax.h treelog.h \
@@ -1382,6 +1388,15 @@ nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
 version${OBJ}: version.C
+stomatacon_BB${OBJ}: stomatacon_BB.C stomatacon.h model.h symbol.h alist.h \
+  mathlib.h assertion.h check.h block.h syntax.h treelog.h plf.h \
+  librarian.h
+stomatacon_SHA${OBJ}: stomatacon_SHA.C stomatacon.h model.h symbol.h alist.h \
+  mathlib.h assertion.h check.h block.h syntax.h treelog.h plf.h \
+  librarian.h
+stomatacon_Leuning${OBJ}: stomatacon_Leuning.C stomatacon.h model.h symbol.h \
+  alist.h mathlib.h assertion.h check.h block.h syntax.h treelog.h plf.h \
+  librarian.h
 uzrect_r3${OBJ}: uzrect_r3.C uzrect.h model.h symbol.h alist.h \
   geometry_rect.h geometry_vert.h geometry.h syntax.h treelog.h mathlib.h \
   assertion.h soil.h soil_water.h soil_heat.h groundwater.h surface.h \
@@ -1775,10 +1790,10 @@ groundwater_lysimeter${OBJ}: groundwater_lysimeter.C groundwater.h model.h \
 action_message${OBJ}: action_message.C action.h model.h symbol.h alist.h \
   block.h syntax.h treelog.h plf.h condition.h log.h time.h border.h \
   daisy.h program.h run.h timestep.h vcheck.h memutils.h librarian.h
-weather_std${OBJ}: weather_std.C weather.h model.h symbol.h alist.h im.h \
-  syntax.h treelog.h chemical.h fao.h lexer_data.h lexer.h time.h plf.h \
-  mathlib.h assertion.h units.h submodeler.h block.h check.h vcheck.h \
-  memutils.h librarian.h path.h
+weather_std${OBJ}: weather_std.C weather_base.h weather.h model.h symbol.h \
+  alist.h im.h syntax.h treelog.h chemical.h fao.h lexer_data.h lexer.h \
+  time.h plf.h mathlib.h assertion.h units.h submodeler.h block.h check.h \
+  vcheck.h memutils.h librarian.h path.h
 groundwater_pipe${OBJ}: groundwater_pipe.C groundwater.h model.h symbol.h \
   alist.h block.h syntax.h treelog.h plf.h log.h time.h border.h \
   geometry.h mathlib.h assertion.h soil.h soil_heat.h soil_water.h \
@@ -1827,9 +1842,9 @@ column_std${OBJ}: column_std.C column.h model.h symbol.h alist.h library.h \
   organic_matter.h am.h dom.h plf.h time.h units.h log.h border.h \
   submodeler.h block.h memutils.h librarian.h scope_multi.h scope.h \
   scopesel.h
-weather_simple${OBJ}: weather_simple.C weather_old.h weather.h model.h \
-  symbol.h alist.h im.h syntax.h treelog.h block.h plf.h time.h log.h \
-  border.h mathlib.h assertion.h librarian.h
+weather_simple${OBJ}: weather_simple.C weather_old.h weather_base.h weather.h \
+  model.h symbol.h alist.h im.h syntax.h treelog.h block.h plf.h time.h \
+  log.h border.h mathlib.h assertion.h librarian.h
 uzrichard${OBJ}: uzrichard.C uzmodel.h model.h symbol.h alist.h block.h \
   syntax.h treelog.h plf.h groundwater.h surface.h geometry_vert.h \
   geometry.h mathlib.h assertion.h soil.h soil_heat.h log.h time.h \
@@ -1883,8 +1898,9 @@ action_lisp${OBJ}: action_lisp.C action.h model.h symbol.h alist.h daisy.h \
   program.h run.h time.h timestep.h vcheck.h memutils.h log.h border.h \
   submodeler.h block.h syntax.h treelog.h plf.h assertion.h librarian.h \
   condition.h
-weather_none${OBJ}: weather_none.C weather_old.h weather.h model.h symbol.h \
-  alist.h im.h syntax.h treelog.h block.h plf.h librarian.h
+weather_none${OBJ}: weather_none.C weather_old.h weather_base.h weather.h \
+  model.h symbol.h alist.h im.h syntax.h treelog.h block.h plf.h \
+  librarian.h
 action_tillage${OBJ}: action_tillage.C action.h model.h symbol.h alist.h \
   block.h syntax.h treelog.h plf.h daisy.h program.h run.h time.h \
   timestep.h vcheck.h memutils.h field.h border.h check.h librarian.h
