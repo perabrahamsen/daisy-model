@@ -214,8 +214,11 @@ TertiaryBiopores::infiltrate (const Geometry& geo, const size_t e,
       Biopore& biopore = *(*i);
       const double density = biopore.density (cell);
       if (!std::isnormal (density))
-        // No macropores here.
-        continue;
+        {
+          // No macropores here.
+          i++;
+          continue;
+        }
 
       daisy_assert (total_density > 0.0);
       const double share = amount * density / total_density;
