@@ -211,7 +211,7 @@ upperboundary (const GeometryRect& geo,
   //upper cells to the given value This is maybe not the most precise
   //method, but it is stable...  First we tried to implement the upper
   //boundary similar to the lower boundary but it is unstable -
-  //probalbly because the large temperature fluctuations. It should
+  //probably because the large temperature fluctuations. It should
   //also be possible to do it similar as in the solute movement
   //calculations, but it divides the timestep into smaller
   //timesteps. In it should in heat calculations probalbly be done
@@ -386,7 +386,7 @@ HeatrectMollerup::solve (const GeometryRect& geo,
 {
   // mmo
   // Note S_h should be calculated correctly the value imported 
-  // here is most probalbly only from heatsource like wires and 
+  // here is most probably only from heatsource like wires and 
   // not added/removed water
   //
   // S_h_water = S_water * water_heat_capacity * T 
@@ -445,7 +445,8 @@ HeatrectMollerup::solve (const GeometryRect& geo,
 
   const bool isflux_lower = false;      //true;    //lower BC 
   const bool isflux_upper = false; //true;   //upper BC
-  const bool enable_boundary_conduction = true; //mmo should be changed....
+  //const bool enable_boundary_conduction = true; //mmo should be changed....
+  const bool enable_boundary_conduction = false; //mmo 20080707
 
   lowerboundary (geo, isflux_lower, T_bottom,
                  q_edge, cond_edge, T_old,
