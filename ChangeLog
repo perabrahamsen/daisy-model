@@ -1,3 +1,17 @@
+2008-07-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* surface.C, surface.h (q_top): Take dt argument.
+	* uzlr.C (tick): Update caller.
+	* uzrichard.C (richard): 
+	* uzrect_Mollerup.C (upperboundary): 
+	* macro_std.C, movement_rect.C, tertiary_biopores.C (tick): 
+
+	* macro_std.C, movement_rect.C, tertiary_biopores.C (tick):
+	Multiply q with dt before calling 'Surface::accept_top'.  
+
+	* surface.C, surface.h (evap_pond, exfiltration): Use dt.
+	* bioclimate_std.C (WaterDistribution): Update caller.
+
 2008-07-04  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 

@@ -141,7 +141,7 @@ MacroStandard::tick (const Geometry1D& geo,
   if (height_start >= 0.0
       && surface.top_type (geo, 0U) == Surface::limited_water)
     {
-      const double surface_q = surface.q_top (geo, 0U);
+      const double surface_q = surface.q_top (geo, 0U, dt);
       // Empty it.
       if (-surface_q * 10.0 * dt > pond_max)
 	{
@@ -150,7 +150,7 @@ MacroStandard::tick (const Geometry1D& geo,
 	  daisy_assert (iszero (q_p[0]));
 	  daisy_assert (from == 0);
 	  q_p[0] = q_top;
-	  surface.accept_top (q_p[0], geo, 0U, dt, msg);
+	  surface.accept_top (q_p[0] * dt, geo, 0U, dt, msg);
           surface.update_pond_average (geo);
 	}
     }
@@ -274,7 +274,7 @@ MacroStandard::tick (const Geometry1D& geo,
 	}
 
       // Move the extra water back up, through the macropore.
-      q_p[i] += extra_water;
+      q_p[i] += extra_water / dt;
     }
   // Update matrix sink.
   for (unsigned int i = from; i <= to; i++)
@@ -283,12 +283,12 @@ MacroStandard::tick (const Geometry1D& geo,
   // Check that we got all the extra water stored somewhere.
   if (std::isnormal (extra_water))
     {
-      surface.accept_top (extra_water, geo, 0U, dt, msg);
+      surface.accept_top (extra_water * dt, geo, 0U, dt, msg);
       surface.update_pond_average (geo);
     }
 
   // Check that the sink terms add up.
-  if (fabs (geo.total_surface (S_p) - q_top - extra_water) > 1.0e-11)
+  if (fabs (geo.total_surface (S_p) - q_top - extra_water * dt) > 1.0e-11)
     {
       std::ostringstream tmp;
       tmp << __FILE__ << ":" <<  __LINE__

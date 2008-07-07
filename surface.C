@@ -61,7 +61,7 @@ struct Surface::Implementation
 
   // UZ top.
   Surface::top_t top_type (const Geometry& geo, size_t edge) const;
-  double q_top (const Geometry& geo, size_t edge) const;
+  double q_top (const Geometry& geo, size_t edge, const double dt) const;
 
   // Functions.
   void ridge (const Geometry1D& geo,
@@ -75,7 +75,7 @@ struct Surface::Implementation
              double T, double dt);
   double albedo (const Geometry&, const Soil&, const SoilWater&) const;
   void output (Log& log) const;
-  double exfiltration () const; // [mm/h]
+  double exfiltration (double dt) const; // [mm/h]
   
 
   // Create and Destroy.
@@ -111,11 +111,13 @@ Surface::Implementation::top_type (const Geometry& geo, size_t edge) const
 }
 
 double 
-Surface::q_top (const Geometry& geo, const size_t edge) const
-{ return impl->q_top (geo, edge); }
+Surface::q_top (const Geometry& geo, const size_t edge,
+                const double dt) const
+{ return impl->q_top (geo, edge, dt); }
   
 double 
-Surface::Implementation::q_top (const Geometry& geo, const size_t edge) const
+Surface::Implementation::q_top (const Geometry& geo, const size_t edge,
+                                const double dt) const
 {
   daisy_assert (geo.edge_to (edge) == Geometry::cell_above);
   pond_map::const_iterator i = pond_edge.find (edge);
@@ -130,13 +132,14 @@ Surface::Implementation::q_top (const Geometry& geo, const size_t edge) const
   if (ridge_.get ())
     return -ridge_->h () / 1.0 /* [h] */;
   else
-    return -(*i).second * 0.1 / 1.0 /* [h] */; // mm -> cm/h.
+    return -(*i).second * 0.1 / dt /* [h] */; // mm -> cm/h.
 }
   
 double
 Surface::h_top (const Geometry& geo, size_t edge) const
 { 
-  return -q_top (geo, edge) * 1.0 /* h */; 
+  const double dt = 1.0;       // [h]
+  return -q_top (geo, edge, dt) * dt; 
 }
 
 void
@@ -208,30 +211,25 @@ Surface::Implementation::exfiltrate (const Geometry& geo, const size_t edge,
   if (use_forced_pressure)
     return;
 
-  if (fabs (water) < 1e-99)
-    return;
-
-  // Exfiltration.
-  if (water >= 0)
+  if (pond_edge[edge] + water < 0.0)
+    // - std::max (fabs (pond_edge[edge]), fabs (water)) / 100.0)
     {
-      pond_edge[edge] += water;
+      if (!approximate (fabs (pond_edge[edge]), fabs (water)))
+      {
+        Treelog::Open nest (msg, 
+                            "Surface exfiltration for edge " 
+                            + geo.edge_name (edge));
+        
+        std::ostringstream tmp;
+        tmp << "edge " << geo.edge_name (edge) << ": pond (" << pond_edge[edge]
+            << ") + exfiltration (" << water << ") in dt (" << dt << ") = " 
+            << pond_edge[edge] + water << ", should be non-negative";
+        msg.warning (tmp.str ());
+      }
+      pond_edge[edge] = 0.0;
       return;
     }
 
-  Treelog::Open nest (msg, 
-                      "Surface exfiltration for edge " + geo.edge_name (edge));
-
-  // Infiltration.
-  if (pond_edge[edge] + water
-      < - std::max (fabs (pond_edge[edge]), fabs (water)) / 100.0)
-    {
-      std::ostringstream tmp;
-      tmp << "edge " << geo.edge_name (edge) << ": pond (" << pond_edge[edge]
-          << ") + exfiltration (" << water << ") in dt (" << dt << ") = " 
-          << pond_edge[edge] + water << ", should be non-negative";
-      msg.warning (tmp.str ());
-      return;
-    }
   pond_edge[edge] += water;
 }
 
@@ -328,10 +326,16 @@ Surface::Implementation::tick (Treelog& msg,
       const double area = geo.edge_area (edge); // [cm^2]
 
       // Exfiltration.
-      const double MaxExfiltration // [mm]
+      const double MaxExfiltration // [mm/h]
         = soil_water.MaxExfiltration (geo, edge, soil, soil_T) * 10.0; 
 
       const double epond = pond_edge[edge]; // [mm]
+      if (epond < 0.0)
+        {
+          std::ostringstream tmp;
+          tmp << "pond_edge[" << edge << "] = "<< pond_edge[edge];
+          msg.warning (tmp.str ());
+        }
 
       double evap;              // [mm/h]
       if (epond + flux_in * dt + MaxExfiltration * dt < Eps * dt)
@@ -435,15 +439,15 @@ Surface::Implementation::output (Log& log) const
 }
 
 double
-Surface::exfiltration () const // [mm/h]
-{ return impl->exfiltration (); }
+Surface::exfiltration (const double dt) const // [mm/h]
+{ return impl->exfiltration (dt); }
 
 double
-Surface::Implementation::exfiltration () const // [mm/h]
+Surface::Implementation::exfiltration (const double dt) const // [mm/h]
 {
   // Negative pond == amount extracted from soil.
   if (pond_average < 0.0)
-    return -pond_average;
+    return -pond_average / dt;
   else
     return 0.0;
 }
@@ -453,16 +457,16 @@ Surface::evap_soil_surface () const // [mm/h]
 { return impl->EvapSoilSurface; }
 
 double 
-Surface::evap_pond (Treelog& msg) const	// [mm/h]
+Surface::evap_pond (const double dt, Treelog& msg) const	// [mm/h]
 { 
-  const double ep = evap_soil_surface () - exfiltration (); 
+  const double ep = evap_soil_surface () - exfiltration (dt); 
   if (ep >= 0.0)
     return ep;
   if (ep < -1e-13)
     {
       Treelog::Open nest (msg, "Surface evap pond");
       std::ostringstream tmp;
-      tmp << "evap_pond = " << ep << ", evap_soil_surface = " << evap_soil_surface () << ", exfiltration = " << exfiltration ();
+      tmp << "evap_pond = " << ep << ", evap_soil_surface = " << evap_soil_surface () << ", exfiltration = " << exfiltration (dt);
       msg.warning (tmp.str ());
       static int wcount = 10;
       if (--wcount < 0)

@@ -815,7 +815,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   surface.tick (msg, pond_ep, 
 		litter_water_out, litter_water_temperature, 
 		geo, soil, soil_water, soil_T, dt);
-  pond_ea = surface.evap_pond (msg);
+  pond_ea = surface.evap_pond (dt, msg);
   daisy_assert (pond_ea >= 0.0);
   total_ea += pond_ea;
   daisy_assert (total_ea >= 0.0);
@@ -835,7 +835,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
         }
       soil_ep = 0.0;
     }
-  soil_ea = surface.exfiltration ();
+  soil_ea = surface.exfiltration (dt);
   daisy_assert (soil_ea >= 0.0);
   total_ea += soil_ea;
   daisy_assert (total_ea >= 0.0);

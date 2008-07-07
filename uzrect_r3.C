@@ -119,7 +119,7 @@ struct UZRectr3 : public UZRect
 			     ublas::vector<double>& B,
 			     const double dt,
 			     const int debug,
-                             Treelog& msg);
+                             Treelog& msg, const double BIG_DT);
   static void drain (const GeometryRect& geo,
 		     const std::vector<size_t>& drain_cell,
 		     const ublas::vector<double>& h,
@@ -333,7 +333,7 @@ UZRectr3::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	  lowerboundary (geo, groundwater, active_lysimeter, h,
 			 K, dq, Dm_mat, Dm_vec, Gm, B, msg);
 	  upperboundary (geo, soil, T, surface, state, remaining_water, h,
-			 K, dq, Dm_mat, Dm_vec, Gm, B, ddt, debug, msg);
+			 K, dq, Dm_mat, Dm_vec, Gm, B, ddt, debug, msg, dt);
 
 	  //Initialize water capacity  matrix
 	  ublas::banded_matrix<double> Cw (cell_size, cell_size, 0, 0);
@@ -435,7 +435,7 @@ UZRectr3::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	  lowerboundary (geo, groundwater, active_lysimeter, h,
 			 K, dq, Dm_mat, Dm_vec, Gm, B, msg);
 	  upperboundary (geo, soil, T, surface, state, remaining_water, h,
-			 K, dq, Dm_mat, Dm_vec, Gm, B, ddt, debug, msg);
+			 K, dq, Dm_mat, Dm_vec, Gm, B, ddt, debug, msg, dt);
           Darcy (geo, Kedge, h, dq);
 
           // update macropore flow components 
@@ -755,7 +755,7 @@ UZRectr3::upperboundary (const GeometryRect& geo,
 			       ublas::vector<double>& B,
 			       const double ddt,
 			       const int debug,
-                               Treelog& msg)
+                               Treelog& msg, const double BIG_DT)
 {
   const std::vector<size_t>& edge_above = geo.cell_edges (Geometry::cell_above);
   const size_t edge_above_size = edge_above.size ();
@@ -775,7 +775,7 @@ UZRectr3::upperboundary (const GeometryRect& geo,
 	{
 	case Surface::forced_flux: 
           {
-            const double flux = -surface.q_top (geo, edge);
+            const double flux = -surface.q_top (geo, edge, BIG_DT);
             Neumann (edge, cell, area, in_sign, flux, dq, B);
           }
 	  break;

@@ -285,7 +285,7 @@ TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
       const double in_sign 
         = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
       
-      const double max_surface = in_sign * surface.q_top (geo, edge);
+      const double max_surface = in_sign * surface.q_top (geo, edge, dt);
       const double flux_in = std::min (capacity (geo, edge, dt), max_surface);
       q_tertiary[edge] = in_sign * flux_in;
     }
@@ -297,7 +297,7 @@ TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
       const double in_sign 
         = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
       const double flux_in = q_tertiary[edge] * in_sign;
-      surface.accept_top (in_sign * flux_in, geo, edge, dt, msg);
+      surface.accept_top (in_sign * flux_in * dt, geo, edge, dt, msg);
       infiltrate (geo, edge, flux_in * dt, dt);
     }
   update_water ();

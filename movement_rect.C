@@ -257,7 +257,7 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
                                  + soil_water.q_tertiary (edge)) * dt, 
                                 *geo, edge, dt, msg);
 	  else
-	    surface.accept_top (surface.q_top (*geo, edge),
+	    surface.accept_top (surface.q_top (*geo, edge, dt) * dt,
                                 *geo, edge, dt, msg);
           surface.update_pond_average (*geo);
 	}

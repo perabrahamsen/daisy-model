@@ -130,7 +130,8 @@ UZRichard::richard (Treelog& msg,
   const unsigned int size = last - first + 1;
   const Surface::top_t top_type = top.top_type (geo, top_edge);
   const double h_top = top.h_top (geo, top_edge);
-  const double q_top = top.q_top (geo, top_edge);
+  const double q_top = top.q_top (geo, top_edge, dt);
+  daisy_approximate (h_top, -q_top * dt);
   const Groundwater::bottom_t bottom_type = bottom.bottom_type ();
   const double q_bottom_forced = (bottom_type == Groundwater::forced_flux)
     ? bottom.q_bottom (bottom_edge) : -42.42e42;
