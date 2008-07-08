@@ -51,7 +51,10 @@ private:
 double
 ABAEffect_exp::ABA_effect (const double ABA_xylem /* [g/cm^3] */, Treelog&)
 {
+  // daisy_assert (ABA_xylem >= 0.0);
+  daisy_assert (k == 0.0);
   const double ABAeffect = exp(-k * ABA_xylem); //[]
+  daisy_assert (ABAeffect == 1.0);
   return ABAeffect;
 }
 

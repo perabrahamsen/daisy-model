@@ -51,14 +51,28 @@ private:
 };
 
 double
-StomataCon_Leuning::stomata_con (const double wsf /*[]*/, const double m /*[]*/,
+StomataCon_Leuning::stomata_con (double wsf /*[]*/, const double m /*[]*/,
                             const double , const double pz /*[mol/m²leaf/s]*/,
                             const double Ptot /*[Pa]*/, const double cs /*[Pa]*/,
                             const double Gamma /*[Pa]*/, 
                             const double intercept /*[mol/m²leaf/s]*/, const double,
-                            const double Ds /*[Pa]*/, Treelog&)
+                            const double Ds /*[Pa]*/, Treelog& msg)
 {
   daisy_assert (cs > Gamma);
+  daisy_assert (cs > 0.0);
+  daisy_assert (Gamma >= 0.0);
+  daisy_assert (pz > 0.0);
+  daisy_assert (Ds > 0.0);
+  daisy_assert (Do > 0.0);
+ 
+  if (!(wsf > 0.0))
+    {
+      std::ostringstream tmp;
+      tmp << "wsf = " << wsf << ", should be positive";
+      msg.warning (tmp.str ());
+      wsf = 1.0;
+    }
+  daisy_assert (((cs - Gamma)*(1 + Ds/Do)) > 0.0);
   const double gsw = (wsf * m * pz * Ptot)/((cs - Gamma)*(1 + Ds/Do)) + intercept;
   daisy_assert (gsw >= 0.0);
 

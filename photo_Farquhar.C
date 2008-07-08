@@ -115,6 +115,8 @@ PhotoFarquhar:: GSTModel(const double CO2_atm, double ABA_effect, double pn, dou
 {
 
   const double wsf = ABA_effect; //water stress function []
+  daisy_assert (ABA_effect == 1.0);
+
   const double intercept = b * LA * fraction; //min conductance 
   daisy_assert (gbw >0.0);
   const double rbw = 1./gbw;   //[s*m2 leaf/mol]
@@ -142,12 +144,14 @@ PhotoFarquhar:: GSTModel(const double CO2_atm, double ABA_effect, double pn, dou
   const double bb = intercept + (1./rbw)-(wsf * m * pz * Ptot/(cs-Gamma));//[mol/m2/s]
   const double cc = (- wa /(wi * rbw)) - intercept;//[mol/m2/s]
   daisy_assert (aa > 0.0);
-  // Relative humidity at leaf surface?
+  // Relative humidity at leaf surface
   double hs = second_root_of_square_equation(aa, bb, cc); //[]
-  if(hs > 1.)
-    hs = 1.0;
+  if(hs >= 1.)
+    hs = 0.9;
 
-  const double Ds = wi * (1 - hs) * Ptot; 
+  const double Ds = wi * (1.0 - hs) * Ptot; 
+
+  daisy_assert (wsf == 1.0);
 
   //stomatal conductance
   double gsw; 
@@ -275,7 +279,7 @@ PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum,
 
 	  // Photosynthetic effect of Xylem ABA.
 	  ABA_effect = ABAeffect->ABA_effect(ABA_xylem, msg);//[unitless]
-
+          daisy_assert (ABA_effect == 1.0);
 
 	  // leaf respiration
 	  const double rd = respiration_rate(vmax25, Tl);
