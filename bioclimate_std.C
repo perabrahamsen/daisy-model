@@ -123,8 +123,9 @@ struct BioclimateStandard : public Bioclimate
   double production_stress;	// Stress calculated by SVAT module.
 
   // Bioclimate canopy
-  double CanopyTemperature;       // Canopy temperature
-
+  double CanopyTemperature;     // Canopy temperature
+  double wind_speed_field;      // wind speed at screen height above the canopy [m/s]
+  double wind_speed_weather;    // measured wind speed [m/s]
 
   void WaterDistribution (const Time&,
                           Surface& surface, const Weather& weather, 
@@ -418,6 +419,10 @@ As a last resort,  Makkink (makkink) will be used.");
   alist.add ("r_ae", 53.);
   syntax.add ("CanopyTemperature", "dg C", Syntax::LogOnly,
               "Actual canopy temperature.");
+  syntax.add ("wind_speed_field", "m/s", Syntax::LogOnly,
+              "Wind speed in the field at reference height.");
+  syntax.add ("wind_speed_weather", "m/s", Syntax::LogOnly,
+              "Measured wind speed.");
 
   //Radiation
   syntax.add_object ("raddist", Raddist::component, 
@@ -946,10 +951,30 @@ BioclimateStandard::tick (const Time& time,
     = gamma * epsilon * LatentHeatVapor / AirPressure;//[J/kg/dg C]
   
   const double ScreenHeight = weather.screen_height (); //[m]
-  const double wind_speed =  weather.wind ();//[m/s] 
+
+  wind_speed_weather =  weather.wind ();//[m/s]
+
+  const double h = Height[0]/100.0; // [m]
+  const double h0 = 0.12; // reference height [m]
+  if (weather.surface () == Weather::field || h < h0)
+    wind_speed_field = wind_speed_weather;
+  else
+    {
+      const double u = wind_speed_weather; // wind speed at reference height [m/s]
+      const double k = 0.41;  // von Karman constant
+      const double d0 = 0.64 * h0; // displacement height (reference) [m]
+      const double z0 = 0.13 * h0; // roughness length [m]
+      const double u_star = u * k /(log((ScreenHeight - d0)/z0));
+      daisy_assert (u_star >= 0.0);
+      const double d = 0.64 * h;
+      const double z = 0.13 * h;
+      wind_speed_field = (u_star / k) * log((ScreenHeight - d)/z);
+    }
+  daisy_assert (wind_speed_field >= 0.0);
+
   const double ra_e 
     =  FAO::AerodynamicResistance (Height[0], 
-                                   ScreenHeight, wind_speed); // [s m-1]
+                                   ScreenHeight, wind_speed_field); // [s m-1]
 
   CanopyTemperature = SensibleHeatFlux * ra_e / (rho_a * c_p) 
     + AirTemperature;//[dg C]
@@ -1006,6 +1031,8 @@ BioclimateStandard::output (Log& log) const
   output_variable (crop_ea, log);
   output_variable (production_stress, log);
   output_variable (CanopyTemperature, log);
+  output_variable (wind_speed_field, log);  
+  output_variable (wind_speed_weather, log);
 
   //radiation
   output_derived (raddist, "raddist", log);
