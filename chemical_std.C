@@ -707,7 +707,14 @@ ChemicalStandard::tick_soil (const Geometry& geo,
       // The exchange rate based on concentration gradient.
       const double C_prim = C_primary (c);
       const double C_sec = C_secondary (c);
-      daisy_approximate (C_sec * Theta_sec_old, M_sec);
+      if (!approximate (C_sec * Theta_sec_old, M_sec))
+        {
+          std::ostringstream tmp;
+          tmp << "C_sec (" << C_sec << ") * Theta_sec_old (" << Theta_sec_old
+              << ") != M_sec (" << M_sec << "), error = " 
+              << M_sec - C_sec * Theta_sec_old;
+          msg.warning (tmp.str ());
+        }
       double S_x = alpha * (C_prim - C_sec);
 
       // But don't exchange more than what would result in equilibrium.

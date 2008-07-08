@@ -209,6 +209,7 @@ RootSystem::water_uptake (double Ept_,
     ABAConc = geo.total_surface (ABAExtraction) * mm_per_cm / H2OUpt;
   else
     /* Use old value */;
+  daisy_assert (std::isfinite (ABAConc));
 
   // Result.
   return H2OUpt;

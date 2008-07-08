@@ -1,3 +1,7 @@
+2008-07-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.34 released.
+
 2008-07-07  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* surface.C, surface.h (q_top): Take dt argument.

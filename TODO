@@ -1,12 +1,25 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* tertiary solute transport
+
+For alle biopore klasser
+
+  For alle celler med vand der trænger ind i bioporen
+   
+    Flyt stof til biopore fra matrix med matrix concentration fra begyndelsen af tidsskridtet.
+
+  For alle celler med vand der kommer fra bioporen
+
+    Tilføj stof til matrix med biopore concentration fra slutningen af tidsskridtet.
+    
+
+
+
 * tertiary vand
 
 ** stort tidsskridt, dræn?
 
 * edge baseret kode til rect solute og vand
-
-* tertiary solute transport
 
 * Frame
 

@@ -448,6 +448,8 @@ CropStandard::tick (const Time& time, const double relative_humidity,
       daisy_assert (rubiscoN >= 0.0);
       
       const double ABA_xylem = root_system->ABAConc;
+      daisy_assert (std::isfinite (ABA_xylem));
+      daisy_assert (ABA_xylem >= 0.0);
 
       if (bioclimate.shared_light_fraction () > 1e-10)
         {

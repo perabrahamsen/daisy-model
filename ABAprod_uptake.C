@@ -30,6 +30,7 @@
 #include "librarian.h"
 #include "syntax.h"
 #include "alist.h"
+#include <sstream>
 
 struct ABAProdUptake : public ABAProd
 {
@@ -85,10 +86,20 @@ ABAProdUptake::production (const Geometry& geo, const SoilWater& soil_water,
       double value = 0.0;
       if (!expr->tick_value (value, ABA_unit, scope, msg))
 	msg.error ("No ABA production value found");
+      if (!std::isfinite (value) || value < 0.0)
+        {
+          std::ostringstream tmp;
+          tmp << "ABA in cell " << c << " with h = " << soil_water.h (c)
+              << " was " << value << " [" << ABA_unit << "], using 0 instead";
+          msg.warning (tmp.str ());
+          value = 0.0;
+        }
+      daisy_assert (std::isfinite (S[c]));
 
       // Find ABA uptake.
       ABA[c] = value * S[c];
       // [g/cm^3 S/h] = [g/cm^3 W] * [cm^3 W/cm^3 S/h]
+      daisy_assert (std::isfinite (ABA[c]));
     }
 }
 
