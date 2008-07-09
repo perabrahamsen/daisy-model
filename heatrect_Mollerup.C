@@ -46,6 +46,7 @@ static const double rho_water = 1.0;             // [g/cm^3]
 
 static void 
 convection (const GeometryRect& geo,
+            const double upstream_weight,
             const ublas::vector<double>& q_edge,
             Solver::Matrix& convec)
 {
@@ -61,10 +62,6 @@ convection (const GeometryRect& geo,
 	  const double value = geo.edge_area (e) *
             water_heat_capacity * rho_water * q_edge[e];
           
-	  //Equal weight: upstream_weight = 0.5
-	  //Upstr weight: upstream_weight = 1.0
-	  const double upstream_weight = 0.5;
-          //const double upstream_weight = 1.0;
           const double alpha = (q_edge[e] >= 0) 
 	    ? upstream_weight 
 	    : 1.0 - upstream_weight;
@@ -82,7 +79,6 @@ cond_cell2edge (const GeometryRect& geo,
                 ublas::vector<double>& cond_edge)
 {
   const size_t edge_size = geo.edge_size ();
-  //cond_edge = ublas::zero_vector<double> (edge_size);
   
   for (int e = 0; e < edge_size; e++)
     {
@@ -123,79 +119,43 @@ conduction (const GeometryRect& geo,
     }
 }
 
-static void
-Dirichlet_expl(const size_t cell,
-               const double area,
-               const double area_per_length, 
-               const double in_sign,
-               const double conductivity_cell,
-               const double T_border,
-               const double T_cell,
-               const double q,
-               const bool enable_boundary_conduction,
-               ublas::vector<double>& B_dir_vec)
-{
-  //Estimate flux 
-  double Q_convec_out;      //convection
-  double Q_conduc_out;      //conduction
-  double Q_out;
-  
-
-  // Boundary convection
-  if (q*in_sign >= 0)     //Inflow
-    Q_convec_out = - in_sign * area * 
-      water_heat_capacity * rho_water * T_border * q;
-  else                    //Outflow 
-    Q_convec_out = - in_sign * area * 
-      water_heat_capacity * rho_water * T_cell * q;
-  //Q_convec_out = - in_sign * q * area * T_cell;
-  
-  if (enable_boundary_conduction)
-    {
-      const double gradient =  area_per_length * (T_border - T_cell);
-      Q_conduc_out = -conductivity_cell * gradient;
-    }
-  else 
-    Q_conduc_out = 0.0; 
-    
-  // Boundary flux by advection and diffusion
-  Q_out = Q_convec_out + Q_conduc_out;
-  
-  // Write to Neumann-type vector 
-  B_dir_vec (cell) = Q_out;
-}
 
 static void
 lowerboundary (const GeometryRect& geo,
                const bool isflux,
                const double T_border,
-               const ublas::vector<double>& q_edge,
-               const ublas::vector<double>& cond_edge,
-               const ublas::vector<double>& T,
-               const bool enable_boundary_conduction,
-               ublas::vector<double>& B_dir_vec)
+               Solver::Matrix& A,
+               ublas::vector<double>& b)
 {
-  // change to isflux_lower?????
-  if (!isflux)   //Nothing to do for (no) flux bc 
+  //The lower boundary is made by forcing the temperatures in the
+  //lower cells to the given value This is maybe not the most precise
+  //method, but it is stable...  First we tried to implement the lower
+  //precise on boundary - but sometimes this is unstable!
+
+  
+  if (isflux)   //Nothing to do for (no)flux bc 
+    return;
+  
+  const std::vector<size_t>& edge_below = geo.cell_edges (Geometry::cell_below);
+  const size_t edge_below_size = edge_below.size ();
+  
+  for (size_t i = 0; i < edge_below_size; i++)
     {
-      const std::vector<size_t>& edge_below 
-        = geo.cell_edges (Geometry::cell_below);
-      const size_t edge_below_size = edge_below.size ();
+      const size_t edge = edge_below[i];
+      const int cell = geo.edge_other (edge, Geometry::cell_below);
+      daisy_assert (geo.cell_is_internal (cell));
+      const std::vector<size_t>& edge_around = geo.cell_edges (cell);
+      const size_t edge_around_size = edge_around.size ();
       
-      for (size_t i = 0; i < edge_below_size; i++)
+      for (size_t j= 0; j < edge_around_size; j++)
         {
-          const size_t edge = edge_below[i];
-          const int cell = geo.edge_other (edge, Geometry::cell_below);
-          daisy_assert (geo.cell_is_internal (cell));
-          const double area = geo.edge_area (edge);
-          const double area_per_length = geo.edge_area_per_length (edge);
-          const double in_sign 
-            = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;         
-          double T_cell = T (cell);
-	  Dirichlet_expl (cell, area, area_per_length, in_sign, 
-                          cond_edge (edge), T_border, T_cell, 
-                          q_edge (edge), enable_boundary_conduction, B_dir_vec);
+          const size_t edge_next = edge_around[j];
+          const int cell_next = geo.edge_other (edge_next, cell);
+          if (geo.cell_is_internal (cell_next))
+            A (cell, cell_next) = 0;
         }
+      A (cell, cell) = 1.0;
+      b (cell) = T_border;
     }
 }
 
@@ -243,17 +203,18 @@ upperboundary (const GeometryRect& geo,
     }
 }
 
+
+//-----------------------new mmo 20080708 ------------------------
 static void 
 fluxes (const GeometryRect& geo,
         const bool isflux_lower,
         const bool isflux_upper,
+        const double upstream_weight,
         const ublas::vector<double>& q_edge,
         const ublas::vector<double>& cond_edge,
         const ublas::vector<double>& T,
-        const double T_bottom, 
+        const Solver::Matrix& A_before,                      
         const ublas::vector<double>& b_before,
-        const ublas::vector<double>& b_after,
-        const ublas::vector<double>& B_dir_vec,
         ublas::vector<double>& dQ) 
 {
   const size_t edge_size = geo.edge_size (); // number of edges  
@@ -276,76 +237,84 @@ fluxes (const GeometryRect& geo,
           daisy_assert (to < T.size ());
           
           //--- Convective part ---
-          const double upstream_weight = 0.5;  //Should be taken from  outside
           const double alpha = (q_edge[e] >= 0) 
             ? upstream_weight 
             : 1.0 - upstream_weight;
           dQ[e] = water_heat_capacity * rho_water * 
             (alpha * T[from] + (1.0-alpha) * T[to]) * q_edge[e];
-          //dQ[e] = alpha * q_edge[e] * T[from] + (1.0-alpha) * T[to];    //mmo old and wrong!!!
-          
+              
           //--- Conductive part - xx_zz --- 
-          const double gradient = geo.edge_area_per_length (e) *
-            (T[to] - T[from]);
+          const double gradient = geo.edge_area_per_length (e) /
+            geo.edge_area (e) * (T[to] - T[from]);    //mmo 20080708
           dQ[e] -= cond_edge[e]*gradient;  //xx_zz convection
         }
     } 
-    
-  //Lower boundary 
-  if (!isflux_lower)   //Do nothing for no-flux boundaries
+ 
+  //Then we take the boundaries (only if there are Dirichlet boundaries)...
+  if (!isflux_lower | !isflux_upper)
     {
-      const std::vector<size_t>& edge_below 
-        = geo.cell_edges (Geometry::cell_below);
-      const size_t edge_below_size = edge_below.size ();
-      for (size_t i = 0; i < edge_below_size; i++)
-        {
-          const size_t edge = edge_below[i];
-          const int cell = geo.edge_other (edge, Geometry::cell_below);
-          daisy_assert (geo.cell_is_internal (cell));
-          daisy_assert (cell >= 0);
-          daisy_assert (cell < T.size ());
-          const double in_sign 
-            = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;         
-          dQ[edge] = -in_sign * B_dir_vec (cell) / geo.edge_area (edge); 
-        }
-    }
-
-  //Upper boundary  
-  if (!isflux_upper) 
-    {
+      //Calculate B_dir
       const size_t cell_size = geo.cell_size ();
-      ublas::vector<double> B_dir_vec_new (cell_size);
-      B_dir_vec_new = b_before + B_dir_vec - b_after; 
-
-#if 0
-      std::cout << "B_dir_vec: " << B_dir_vec << '\n';
-      std::cout << "B_dir_vec_new: " << B_dir_vec_new << '\n';
-#endif
-        
-      const std::vector<size_t>& edge_above
-        = geo.cell_edges (Geometry::cell_above);
-      const size_t edge_above_size = edge_above.size ();
+      ublas::vector<double> B_dir (cell_size);
+      B_dir = prod (A_before, T) - b_before;
       
-      for (size_t i = 0; i < edge_above_size; i++)
+      //Lower boundaries 
+      if (!isflux_lower)   
+        {           
+          const std::vector<size_t>& edge_below
+            = geo.cell_edges (Geometry::cell_below);
+          const size_t edge_below_size = edge_below.size ();
+          
+          for (size_t i = 0; i < edge_below_size; i++)
+            {
+              const size_t edge = edge_below[i];
+              const int cell = geo.edge_other (edge, Geometry::cell_below);
+              daisy_assert (geo.cell_is_internal (cell));
+              daisy_assert (cell >= 0);
+              daisy_assert (cell < T.size ());
+              const double in_sign 
+                = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
+              dQ[edge] = in_sign * B_dir (cell) / geo.edge_area (edge);
+              //std::cout << "------  Lower boundary -----\n";
+              //std::cout << "in_sign" << in_sign << '\n';
+              //std::cout << "edge: " << edge << "dQ[edge]: " << dQ[edge] << '\n';
+            }
+        }    
+      
+      //Upper boundaries 
+      if (!isflux_upper) 
         {
-          const size_t edge = edge_above[i];
-          const int cell = geo.edge_other (edge, Geometry::cell_above);
-          daisy_assert (geo.cell_is_internal (cell));
-          daisy_assert (cell >= 0);
-          daisy_assert (cell < T.size ());
-          const double in_sign 
-            = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
-          dQ[edge] = -in_sign * B_dir_vec_new (cell) / geo.edge_area (edge); 
+          const std::vector<size_t>& edge_above
+            = geo.cell_edges (Geometry::cell_above);
+          const size_t edge_above_size = edge_above.size ();
+          
+          for (size_t i = 0; i < edge_above_size; i++)
+            {
+              const size_t edge = edge_above[i];
+              const int cell = geo.edge_other (edge, Geometry::cell_above);
+              daisy_assert (geo.cell_is_internal (cell));
+              daisy_assert (cell >= 0);
+              daisy_assert (cell < T.size ());
+              const double in_sign 
+                = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
+              dQ[edge] = in_sign * B_dir (cell) / geo.edge_area (edge);
+              //std::cout << "------  Upper boundary -----\n";
+              //std::cout << "in_sign" << in_sign << '\n';
+              //std::cout << "edge: " << edge << "dQ[edge]: " << dQ[edge] << '\n';
+            }
         }
     }
+  //std::cout << "dQ-vector: " << dQ << '\n'; 
 }
+//-----------------------------------------------------------
+
 
 struct HeatrectMollerup : public Heatrect
 {
   // Content.
   const std::auto_ptr<Solver> solver;
   const int debug;
-
+  
   // Use.
   void solve (const GeometryRect& geo,
               const std::vector<double>& q_water,
@@ -393,13 +362,7 @@ HeatrectMollerup::solve (const GeometryRect& geo,
 
   const size_t cell_size = geo.cell_size ();
   const size_t edge_size = geo.edge_size ();  
-
-  //mmo testing 
-  //T_top_old = 3.188;
-  //T_top_new = 3.188;
-  //T_bottom = 10;
-
-
+  
   // Solution old
   ublas::vector<double> T_old (cell_size);
   for (int c = 0; c < cell_size; c++)
@@ -424,8 +387,13 @@ HeatrectMollerup::solve (const GeometryRect& geo,
     q_edge (e) = q_water[e];
   
   //Convection
+  //Equal weight: upstream_weight = 0.5
+  //Upstr weight: upstream_weight = 1.0
+  const double upstream_weight = 0.5;
+  //const double upstream_weight = 1.0;
+
   Solver::Matrix convec (cell_size);
-  convection (geo, q_edge, convec);  
+  convection (geo, upstream_weight, q_edge, convec);  
 
   //Conduction
   ublas::vector<double> cond_edge (edge_size); 
@@ -445,22 +413,11 @@ HeatrectMollerup::solve (const GeometryRect& geo,
 
   const bool isflux_lower = false;      //true;    //lower BC 
   const bool isflux_upper = false; //true;   //upper BC
-  //const bool enable_boundary_conduction = true; //mmo should be changed....
-  const bool enable_boundary_conduction = false; //mmo 20080707
-
-  lowerboundary (geo, isflux_lower, T_bottom,
-                 q_edge, cond_edge, T_old,
-                 enable_boundary_conduction, B_dir_vec);
-  //upperboundary (geo, isflux_upper, T_bottom,  //T_top_mean,
-  //               q_edge, cond_edge, T_old,
-  //               enable_boundary_conduction, B_dir_vec);
-
-
+  
   // Solver parameter , gamma
   // gamma = 0      : Backward Euler 
   // gamma = 0.5    : Crank - Nicholson
   const double gamma = 0.5;
-
 
   //Initialize A-matrix (left hand side)
   Solver::Matrix A (cell_size);  
@@ -479,9 +436,9 @@ HeatrectMollerup::solve (const GeometryRect& geo,
     - (1 - gamma) * convec;                 // convection
    
   b = prod (b_mat, T_n)
-    - B_dir_vec                             // Dirichlet BC as Neumann
     - S_vol;                                // Sink term        
-
+  
+  
   if (debug > 0)
     {
       std::ostringstream tmp;
@@ -490,56 +447,49 @@ HeatrectMollerup::solve (const GeometryRect& geo,
       //  << "b \n" << b << '\n';
       
       tmp << "T \n" << T_n << '\n';
-
+      
       tmp << "T_top_new: \n" << T_top_new << '\n'
           << "T_top_old: \n" << T_top_old << '\n'
           << "T_top_mean: \n" << T_top_mean << '\n'
           << "T_bottom: \n" << T_bottom << '\n';
-     
+      
       msg.message (tmp.str ());
     }
   
   
   //Forced temperature in upper cell
-
+  
+  Solver::Matrix A_before = A;
   b_before = b;  //for computing 
   upperboundary (geo, isflux_upper, T_top_mean, A, b);
-
+  lowerboundary (geo, isflux_lower, T_bottom, A, b);
 
   if (debug > 0)
     {
       std::ostringstream tmp;
-      //tmp << "A: \n" << A << '\n'
-      //	  << "b_mat \n" << b_mat << '\n'
-      //  << "b \n" << b << '\n';
-      
       tmp << "T \n" << T_n << '\n';
-      
       tmp << "T_top_new: \n" << T_top_new << '\n'
           << "T_top_old: \n" << T_top_old << '\n'
           << "T_top_mean: \n" << T_top_mean << '\n'
           << "T_bottom: \n" << T_bottom << '\n'
           << "A: \n" << A << '\n'
           << "b: \n" << b << '\n';
-      
       msg.message (tmp.str ());
     }
   
   solver->solve (A, b, T_n); // Solve A T_n = b with regard to T_n.
   
-
+  
   //New solution into T
   for (size_t c = 0; c < cell_size; c++)
     T[c] = T_n (c);
-
+  
   //Calculate fluxes 
   ublas::vector<double> dQ = ublas::zero_vector<double> (edge_size);
-
-
-  fluxes (geo, isflux_lower, isflux_upper, q_edge, cond_edge,
-          T_n, T_bottom, b_before, b, B_dir_vec, dQ); 
-
-
+  fluxes (geo, isflux_lower, isflux_upper, upstream_weight, q_edge, 
+          cond_edge, T_n, A_before, b_before, dQ); 
+  
+  
 }
 
 void 
