@@ -22,6 +22,8 @@
 #ifndef MODEL_H
 #define MODEL_H
 
+#include <boost/noncopyable.hpp>
+
 #include "symbol.h"
 #include "alist.h"
 
@@ -30,13 +32,11 @@ class Syntax;
 
 // 'Model' is the base class for all models.
 // Inheriting from model is needed in order to be put in libraries.
-class Model
+class Model : private boost::noncopyable
 {
   // Create and Destroy.
 public:
   static void load_model (Syntax&, AttributeList&);
-private:
-  Model (const Model&);
 protected:
   Model ();
 public:
@@ -59,7 +59,6 @@ public:
 
   // Create and Destroy.
 private:
-  ModelLogable (const ModelLogable&);
   ModelLogable ();
 protected:
   ModelLogable (symbol);
@@ -82,9 +81,6 @@ public:
   void output_as_entry (Log&) const;
   
   // Create and Destroy.
-private:
-  ModelAListed (const ModelAListed&);
-  ModelAListed ();
 protected:
   ModelAListed (const AttributeList&);
   ModelAListed (symbol);

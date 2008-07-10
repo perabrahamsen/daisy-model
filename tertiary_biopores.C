@@ -21,6 +21,7 @@
 #define BUILD_DLL
 
 #include "tertiary.h"
+#include "tertsmall.h"
 #include "biopore.h"
 #include "memutils.h"
 #include "librarian.h"
@@ -35,7 +36,7 @@
 #include "surface.h"
 #include <sstream>
 
-struct TertiaryBiopores : public Tertiary
+struct TertiaryBiopores : public Tertiary, public Tertsmall
 {
   // Parameters.
   const auto_vector<Biopore*> classes; // List of biopore classes.
@@ -80,6 +81,7 @@ struct TertiaryBiopores : public Tertiary
              SoilWater& soil_water, Surface& surface, Treelog& msg);
 
   // - For use in Richard's Equation.
+  Tertsmall& implicit ();
   double matrix_biopores_matrix (size_t c, const Geometry& geo, // Matrix 
                                  const Soil& soil,              // sink term.
                                  double K_xx, double h) const;
@@ -394,6 +396,15 @@ TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
   soil_water.add_tertiary_sink (S_matrix);
   soil_water.add_tertiary_sink (S_drain);
   soil_water.drain (S_drain);
+}
+
+Tertsmall& 
+TertiaryBiopores::implicit ()
+{
+  if (use_small_timesteps ())
+    return *this;
+
+  return Tertsmall::none ();
 }
 
 double 

@@ -41,9 +41,6 @@ public:
   virtual void set_progress (double value) = 0; // -1 (unknown) or [0:1].
 
   // Create and Destroy.
-private:
-  explicit Run (const Run&);      // Disable.
-  Run& operator= (const Run&);    // Disable.
 protected:
   Run ();
   ~Run ();

@@ -68,9 +68,6 @@ private:
   static void load_syntax (Syntax&, AttributeList&);
 protected:
   explicit SourceFile (Block&);
-private:
-  SourceFile (const SourceFile&);
-  SourceFile& operator= (const SourceFile&);
 public:
   ~SourceFile ();
 };

@@ -26,6 +26,7 @@
 #include "symbol.h"
 #include "plf.h"
 #include <string>
+#include <boost/noncopyable.hpp>
 
 class Treelog;
 class Metalib;
@@ -41,7 +42,7 @@ class Path;
 #define EXPORT __declspec(dllimport)
 #endif
 
-class EXPORT Block
+class EXPORT Block : private boost::noncopyable
 {
   struct Implementation;
   std::auto_ptr<Implementation> impl;
@@ -94,8 +95,6 @@ public:
 private:
   static std::string sequence_id (std::string key, size_t index);
   Block ();
-  Block (const Block&);
-  Block& operator= (const Block&);
 public:
   // Toplevel.
   explicit Block (Metalib&, Treelog& msg, const Syntax&, const AttributeList&,

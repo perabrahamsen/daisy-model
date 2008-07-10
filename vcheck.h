@@ -26,13 +26,14 @@
 #include <string>
 #include <vector>
 #include <set>
+#include <boost/noncopyable.hpp>
 
 class Metalib;
 class AttributeList;
 class Syntax;
 class PLF;
 
-class VCheck
+class VCheck : private boost::noncopyable
 { 
   // Use.
 public:
@@ -87,9 +88,6 @@ public:
   class All;
   
   // Create and Destroy.
-private:
-  VCheck (VCheck&);
-  VCheck& operator= (VCheck&);
 protected:
   VCheck ();
 public:

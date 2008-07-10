@@ -56,9 +56,6 @@ public:
   void no_more_clients ();
 
   // Create and Destroy.
-private:
-  TreelogStore& operator= (const TreelogStore&); // Disable.
-  explicit TreelogStore (const TreelogStore&); // Disable.
 public:
   TreelogStore ();
   ~TreelogStore ();

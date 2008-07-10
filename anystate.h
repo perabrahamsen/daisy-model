@@ -26,16 +26,14 @@
 #define ANYSTATE_H
 
 #include <memory>
+#include <boost/noncopyable.hpp>
 
 class Anystate
 {
   // Content.
 public:
-  class Content
+  class Content : private boost::noncopyable
   {
-  private:                      // Disable
-    Content& operator= (const Content&);
-    Content (const Content&);
   public:
     virtual std::auto_ptr<Content> clone () const = 0;
     Content ();

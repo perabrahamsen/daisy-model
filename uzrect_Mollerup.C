@@ -73,7 +73,7 @@ struct UZRectMollerup : public UZRect
   // Interface.
   void tick (const GeometryRect&, std::vector<size_t>& drain_cell,
 	     const Soil&, SoilWater&, const SoilHeat&, 
-             const Surface&, const Groundwater&, Tertiary& tertiary, 
+             const Surface&, const Groundwater&, Tertsmall& tertiary, 
              double dt, Treelog&);
   void output (Log&) const;
   
@@ -159,7 +159,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 		      const Soil& soil, 
                       SoilWater& soil_water, const SoilHeat& soil_heat,
                       const Surface& surface, const Groundwater& groundwater,
-                      Tertiary&,
+                      Tertsmall&,
                       const double dt, Treelog& msg)
 
 {

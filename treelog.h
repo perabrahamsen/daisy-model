@@ -25,6 +25,7 @@
 
 #include "symbol.h"
 #include <string>
+#include <boost/noncopyable.hpp>
 
 #ifdef __unix
 #define EXPORT /* Nothing */
@@ -36,7 +37,7 @@
 #define EXPORT __declspec(dllimport)
 #endif
 
-class EXPORT Treelog
+class EXPORT Treelog : private boost::noncopyable
 {
   // Nesting.
 public:

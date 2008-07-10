@@ -7,6 +7,7 @@
 #include <string>
 #include <iosfwd>
 #include <memory>
+#include <boost/noncopyable.hpp>
 
 #ifdef __unix
 #define EXPORT /* Nothing */
@@ -18,7 +19,7 @@
 #define EXPORT __declspec(dllimport)
 #endif
 
-class Path
+class Path : private boost::noncopyable
 {
   // Shared content.
 private:
@@ -56,9 +57,6 @@ public:
   };
 
   // Create and Destroy.
-private:
-  Path (const Path&);
-  Path& operator= (const Path&);
 public:
   void reset ();
   Path ();

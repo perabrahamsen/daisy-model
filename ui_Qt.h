@@ -40,9 +40,6 @@ protected:
   QString application_name () const;
 
   // Create.
-private:
-  UIQt& operator= (const UIQt&); // Disable.
-  UIQt (const UIQt&); // Disable.
 protected:
   explicit UIQt (Block&);
   ~UIQt ();

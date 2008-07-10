@@ -23,6 +23,7 @@
 #define SOIL_HEAT_H
 
 #include <vector>
+#include <boost/noncopyable.hpp>
 
 class Time;
 class Weather;
@@ -40,7 +41,7 @@ class Treelog;
 static const double latent_heat_of_fussion = 3.35e9; // [erg/g]
 static const double water_heat_capacity = 4.2e7; // [erg/cm^3/dg C]
 
-class SoilHeat
+class SoilHeat : private boost::noncopyable
 {
   // Parameters
 private:
@@ -137,7 +138,6 @@ public:
   ~SoilHeat ();
 private:                        // Disable.
   SoilHeat ();
-  SoilHeat (const SoilHeat&);
 };
 
 #endif // SOIL_HEAT_H

@@ -48,8 +48,6 @@ public:
   // Create and Destroy.
 private:
   UI ();                        // Disable.
-  explicit UI (const UI&);      // Disable.
-  UI& operator= (const UI&);    // Disable.
 protected:
   explicit UI (Block&);
 public:
@@ -70,9 +68,6 @@ private:
   bool running () const;
 
   // Create.
-private:
-  UIProgress& operator= (const UIProgress&); // Disable.
-  UIProgress (const UIProgress&); // Disable.
 public:
   explicit UIProgress ();
   explicit UIProgress (Block&);
@@ -92,9 +87,6 @@ private:
   bool running () const;
 
   // Create.
-private:
-  UINone& operator= (const UINone&); // Disable.
-  UINone (const UINone&); // Disable.
 public:
   explicit UINone ();
   explicit UINone (Block&);

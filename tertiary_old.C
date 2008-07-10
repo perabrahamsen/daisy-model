@@ -21,6 +21,7 @@
 #define BUILD_DLL
 
 #include "tertiary.h"
+#include "tertsmall.h"
 #include "geometry1d.h"
 #include "soil.h"
 #include "soil_water.h"
@@ -45,6 +46,8 @@ struct TertiaryOld : public Tertiary
   void tick (const Geometry& geo, const Soil& soil, 
              const SoilHeat& soil_heat, const double dt, 
              SoilWater& soil_water, Surface& surface, Treelog& msg);
+  Tertsmall& implicit ()
+  { return Tertsmall::none (); }
   void tick_water (const Geometry&, const Soil&, const SoilWater&, 
                    const SoilHeat&, 
                    const double dt,
@@ -64,7 +67,6 @@ public:
                    const double pipe_position, Treelog& msg);
   bool check (const Geometry&, Treelog& msg) const;
   TertiaryOld (Block& al);
-  TertiaryOld (symbol name);
   static void load_syntax (Syntax&, AttributeList&);
 };
 
@@ -233,12 +235,6 @@ TertiaryOld::TertiaryOld (Block& al)
 	   ? Librarian::build_item<Macro> (al, "macro")
 	   : NULL), 
     mactrans  (Librarian::build_item<Mactrans> (al, "mactrans"))
-{ }
-
-TertiaryOld::TertiaryOld (const symbol name)
-  : Tertiary (name),
-    macro (NULL), 
-    mactrans (Mactrans::create_default ())
 { }
 
 void 

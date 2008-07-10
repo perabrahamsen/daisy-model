@@ -25,6 +25,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <boost/noncopyable.hpp>
 
 class Metalib;
 class Program;
@@ -50,7 +51,7 @@ class Treelog;
 #define EXPORT __declspec(dllimport)
 #endif
 
-class EXPORT Toplevel
+class EXPORT Toplevel : private boost::noncopyable
 {
   //Content.
 private:
@@ -112,7 +113,6 @@ public:
   Toplevel (const std::string& preferred_ui);
   ~Toplevel ();
 private:                        // Disable defaults.
-  Toplevel(const Toplevel&);
   Toplevel ();
 };
 

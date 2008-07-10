@@ -22,6 +22,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <boost/noncopyable.hpp>
 
 class AttributeList;
 class PLF;
@@ -29,7 +30,7 @@ class PLF;
 #ifndef FRAME_H
 #define FRAME_H
 
-class Frame
+class Frame : private boost::noncopyable
 {
   struct Implementation;
   std::auto_ptr<Implementation> impl;
@@ -257,9 +258,6 @@ public:
   void add (const std::string&, const std::vector<const PLF*>&);
 
   // Create and Destroy.
-private:
-  Frame (const Frame&);         // Disable.
-  Frame& operator= (const Frame&); // Disable.
 public:
   enum parent_relationship_t { parent_inherit };
   Frame (const Frame&, parent_relationship_t);

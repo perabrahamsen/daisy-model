@@ -120,8 +120,6 @@ public:
   static const AttributeList& none_model ();
 private:
   UZ1D ();
-  UZ1D (const UZ1D&);
-  UZ1D& operator= (const UZ1D&);
 protected:
   explicit UZ1D (Block&);
 public:

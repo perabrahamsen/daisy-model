@@ -80,8 +80,6 @@ public:
   void set_number (const double val);
 
   // Create and Destroy.
-private:
-  explicit ExchangeNumber (const ExchangeNumber&); // Disable
 public:
   explicit ExchangeNumber (Block& al);
   explicit ExchangeNumber (symbol name, const std::string dimension, 

@@ -23,8 +23,9 @@
 #define CHECK_H
 
 #include <string>
+#include <boost/noncopyable.hpp>
 
-class Check
+class Check : private boost::noncopyable
 { 
   // Use.
 public:
@@ -42,9 +43,6 @@ public:
   static const Check& fraction ();
 
   // Create and Destroy.
-private:
-  Check (Check&);
-  Check& operator= (Check&);
 protected:
   Check ();
 public:

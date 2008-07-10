@@ -49,9 +49,6 @@ public:
 public: 
   virtual void initialize (const Daisy&, const Scope&, Treelog&) = 0;
   virtual bool check (const Daisy&, const Scope&, Treelog&) const = 0;
-private:
-  Action (const Action&);
-  Action& operator= (const Action&);
 protected:
   explicit Action (Block&, const AttributeList& al);
   explicit Action (Block& al);

@@ -21,12 +21,12 @@
 #define BUILD_DLL
 
 #include "tertiary.h"
+#include "tertsmall.h"
 #include "geometry.h"
 #include "soil_water.h"
 #include "block.h"
 #include "alist.h"
 #include "librarian.h"
-#include "anystate.h"
 
 // The 'tertiary' component.
 
@@ -39,49 +39,8 @@ Tertiary::library_id () const
   return id;
 }
 
-Anystate
-Tertiary::get_state () const
-{ return Anystate::none (); }
-
-void
-Tertiary::set_state (const Anystate&)
-{ }
-
-bool 
-Tertiary::converge (const Anystate&)
-{ return true; }
-
-bool
-Tertiary::use_small_timesteps ()
-{ return false; }
-
-void 
-Tertiary::matrix_sink (const Geometry& geo, const Soil& soil,  
-                       const SoilHeat& soil_heat, 
-                       const std::vector<double>& h,
-                       std::vector<double>& S_matrix,
-                       std::vector<double>& S_drain) const
-{ }
-
-bool 
-Tertiary::find_implicit_water (const Anystate& old_state, 
-                               const Geometry& geo, 
-                               const Soil& soil,  
-                               const SoilHeat& soil_heat, 
-                               const std::vector<double>& h,
-                               const double dt)
-{ throw "Implicit tertiary water solution not supported"; }
-
-void
-Tertiary::update_active (const std::vector<double>& h_matrix)
-{ }
-
 Tertiary::Tertiary (Block& al)
   : ModelAListed (al.alist ())
-{ }
-
-Tertiary::Tertiary (const symbol n)
-  : ModelAListed (n)
 { }
 
 Tertiary::~Tertiary ()
@@ -102,6 +61,8 @@ class TertiaryNone : public Tertiary
   void tick (const Geometry&, const Soil&, const SoilHeat&,
              const double dt, SoilWater&, Surface&, Treelog&)
   { }
+  Tertsmall& implicit ()
+  { return Tertsmall::none (); }
   void solute (const Geometry&, const SoilWater&, 
                const std::map<size_t, double>& J_tertiary,
                const double /* dt */,
@@ -120,9 +81,6 @@ public:
   TertiaryNone (Block& al)
     : Tertiary (al)
   { }
-  TertiaryNone (const symbol n)
-    : Tertiary (n)
-  { }
 };
 
 static struct TertiaryNoneSyntax
@@ -137,13 +95,6 @@ static struct TertiaryNoneSyntax
     Librarian::add_type (Tertiary::component, "none", alist, syntax, &make);
   }
 } TertiaryNone_syntax;
-
-Tertiary&
-Tertiary::none ()
-{
-  static TertiaryNone none (symbol ("none"));
-  return none;
-}
 
 const AttributeList&
 Tertiary::none_model ()

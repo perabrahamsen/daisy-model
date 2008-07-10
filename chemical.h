@@ -144,8 +144,6 @@ public:
 			   Treelog&) = 0;
 private:
   Chemical ();
-  explicit Chemical (const Chemical&);
-  Chemical& operator= (const Chemical&);
 protected:
   explicit Chemical (Block&);
 public:

@@ -57,9 +57,6 @@ public:
   void entry (const std::string&);
 
   // Create and Destroy.
-private:
-  TreelogText& operator= (const TreelogText&); // Disable.
-  explicit TreelogText (const TreelogText&); // Disable.
 protected:
   TreelogText ();
   ~TreelogText ();
@@ -75,9 +72,6 @@ private:
   void flush ();
 
   // Create and Destroy.
-private:
-  TreelogProgress& operator= (const TreelogProgress&); // Disable.
-  explicit TreelogProgress (const TreelogProgress&); // Disable.
 public:
   TreelogProgress ();
   ~TreelogProgress ();
@@ -100,9 +94,6 @@ public:
   const std::string str () const;
 
   // Create and Destroy.
-private:
-  TreelogString& operator= (const TreelogString&); // Disable.
-  explicit TreelogString (const TreelogString&); // Disable.
 public:
   TreelogString ();
   ~TreelogString ();
@@ -120,9 +111,6 @@ private:
   void flush ();
 
   // Create and Destroy.
-private:
-  TreelogFile& operator= (const TreelogFile&); // Disable.
-  explicit TreelogFile (const TreelogFile&); // Disable.
 public:
   TreelogFile (const std::string& filename );
   ~TreelogFile ();

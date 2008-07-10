@@ -227,10 +227,7 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
       try
         {
           matrix_water[i]->tick (*geo, drain_cell, soil, soil_water, soil_heat,
-                                 surface, groundwater, 
-                                 (tertiary->use_small_timesteps () 
-                                  ? *tertiary
-                                  : Tertiary::none ()),
+                                 surface, groundwater, tertiary->implicit (),
                                  dt, msg);
 	  obey_surface = matrix_water[i]->obey_surface ();
           goto update_borders;

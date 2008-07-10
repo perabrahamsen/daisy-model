@@ -93,8 +93,6 @@ public:
   static const AttributeList& default_model ();
 private:
   OrganicMatter ();
-  OrganicMatter (const OrganicMatter&);
-  OrganicMatter& operator= (const OrganicMatter&);
 public:
   explicit OrganicMatter (Block&);
   ~OrganicMatter ();

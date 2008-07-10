@@ -63,8 +63,6 @@ public:
   static const AttributeList& default_model ();
 private:
   Solver ();			// Disable
-  Solver (const Solver&);	// Disable
-  const Solver& operator= (const Solver&); // Disable.
 public:
   Solver (Block& al);
   ~Solver ();

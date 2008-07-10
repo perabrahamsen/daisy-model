@@ -34,7 +34,7 @@ class Chemical;
 class Scope;
 class Treelog;
 class Log;
-class Anystate;
+class Tertsmall;
 
 class Tertiary : public ModelAListed
 {
@@ -44,14 +44,7 @@ public:
   symbol library_id () const;
   virtual bool has_macropores () = 0;
 
-  virtual Anystate get_state () const;
-  virtual void set_state (const Anystate&);
-  virtual bool converge (const Anystate& old); // Are current, old state close?
-
   // Simulation.
-public:
-  virtual bool use_small_timesteps ();
-
 public:
   // - For use by Column.
   virtual void tick (const Geometry&, const Soil&, const SoilHeat&,
@@ -59,18 +52,7 @@ public:
 
 public:
   // - For use inside Richard's Equation.
-  virtual void matrix_sink (const Geometry& geo, const Soil& soil,  
-                            const SoilHeat& soil_heat, 
-                            const std::vector<double>& h,
-                            std::vector<double>& S_matrix,
-                            std::vector<double>& S_drain) const;
-  virtual bool find_implicit_water (const Anystate& old_state, 
-                                    const Geometry& geo, 
-                                    const Soil& soil,  
-                                    const SoilHeat& soil_heat, 
-                                    const std::vector<double>& h,
-                                    const double dt);
-  virtual void update_active (const std::vector<double>& h_matrix);
+  virtual Tertsmall& implicit () = 0;
 
   // - For use in Movement::solute
   virtual void solute (const Geometry&, const SoilWater&, 
@@ -83,7 +65,6 @@ public:
 
   // Create and Destroy.
 public:
-  static Tertiary& none ();
   static const AttributeList& none_model ();
   static const AttributeList& old_model ();
   virtual bool initialize (const Geometry&, const Soil&, const Scope&, 
@@ -91,7 +72,6 @@ public:
   virtual bool check (const Geometry&, Treelog&) const = 0;
 protected:
   explicit Tertiary (Block& al);
-  explicit Tertiary (const symbol name);
 public:
   virtual ~Tertiary ();
 };

@@ -26,10 +26,11 @@
 #include <string>
 #include <memory>
 #include <iosfwd>
+#include <boost/noncopyable.hpp>
 
 class Treelog;
 
-class Lexer
+class Lexer : private boost::noncopyable
 {
   // Content.
 private:

@@ -86,8 +86,6 @@ private slots:
 
   // Create.
 private:
-  UIRun& operator= (const UIRun&); // Disable.
-  UIRun (const UIRun&);         // Disable.
   explicit UIRun ();            // Disable.
 public:
   explicit UIRun (Block& al);

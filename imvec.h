@@ -28,11 +28,12 @@
 #include "syntax.h"
 #include <map>
 #include <vector>
+#include <boost/noncopyable.hpp>
 
 class Log;
 class Block;
 
-class IMvec                     // [g/cm^3]
+class IMvec : private boost::noncopyable // [g/cm^3]
 {
   // Content.
 private:
@@ -80,9 +81,6 @@ public:
 			  const char *const description);
   explicit IMvec (Block&, const char*);
   ~IMvec ();
-private:
-  IMvec& operator=(const IMvec&);
-  explicit IMvec (const IMvec& im);
   explicit IMvec ();
 };
 
