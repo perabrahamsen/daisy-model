@@ -272,7 +272,7 @@ based on minimum requirements is shown in box~\ref{box:column}.
            (horizons (  -30 [cm] "Ap F.S.L.")
                      (  -80 [cm] "B F.S.L.")
                      ( -400 [cm] "C F.S.L.")))
-     (OrganicMatter (init (input 3000 [kg C/ha/y])))
+     (OrganicMatter original (init (input 3000 [kg C/ha/y])))
      (Groundwater deep))
 \end{verbatim}
   \end{boxedminipage}
@@ -832,7 +832,8 @@ often give a reasonable initializatin and hence a reasonable
 N-mineralization.  However this can be fine tuned by introducing the
 \texttt{background\_mineralization} init parameter, like this:
 \begin{verbatim}
-       (OrganicMatter (init (input 3000 [kg C/ha/y])
+       (OrganicMatter original 
+                      (init (input 3000 [kg C/ha/y])
                             (background_mineralization 30 [kg N/ha/y])))
 \end{verbatim}
 Daisy will then attempt to initialize the organic matter pools so the

@@ -282,12 +282,20 @@ TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
   for (size_t i = 0; i < edge_above_size; i++)
     {
       const size_t edge = edge_above[i];
-      const double in_sign 
-        = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
       
-      const double max_surface = in_sign * surface.q_top (geo, edge, dt);
-      const double flux_in = std::min (capacity (geo, edge, dt), max_surface);
-      q_tertiary[edge] = in_sign * flux_in;
+      if (surface.h_top (geo, edge) * 10 < pond_max)
+        q_tertiary[edge] = 0.0;
+      else
+        {
+          const double in_sign 
+            = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
+      
+          const double max_surface 
+            = in_sign * surface.q_top (geo, edge, dt) * dt;
+          const double flux_in = std::min (capacity (geo, edge, dt), 
+                                           max_surface) / dt;
+          q_tertiary[edge] = in_sign * flux_in;
+        }
     }
   
   // Apply flux. 
