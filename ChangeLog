@@ -1,5 +1,9 @@
 2008-07-10  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 4.35 released.
+
+2008-07-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
 	* tertiary_biopores.C (tick): Obey 'max_pond'.  Fix 'dt' bug.
 
 2008-07-08  Per Abrahamsen  <abraham@dina.kvl.dk>
