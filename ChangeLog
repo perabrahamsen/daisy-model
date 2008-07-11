@@ -1,3 +1,8 @@
+2008-07-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_water.C, soil_water.h (max_exfiltration_gradient): New
+	parameter.
+
 2008-07-10  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.35 released.

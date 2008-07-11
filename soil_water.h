@@ -40,6 +40,10 @@ class SoilWater
 {
   friend class UZRect2x1;
 
+  // Parameters.
+private:
+  const double max_exfiltration_gradient; // [cm/cm]
+
   // Content.
 private:
   std::vector<double> h_;
@@ -150,7 +154,6 @@ public:
 public:
   double MaxExfiltration (const Geometry&, size_t edge, 
                           const Soil&, double T) const;
-  double MaxExfiltration (const Geometry&, const Soil&, double T) const;
   double infiltration (const Geometry&) const; // [mm/h]
 
   // Creation.

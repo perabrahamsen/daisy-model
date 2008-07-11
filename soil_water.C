@@ -30,6 +30,7 @@
 #include "submodel.h"
 #include "block.h"
 #include "secondary.h"
+#include "check.h"
 #include <sstream>
 
 void
@@ -411,35 +412,21 @@ SoilWater::output (Log& log) const
 }
 
 double
-SoilWater::MaxExfiltration (const Geometry& geo,
-                            const Soil& soil, const double T) const
-{
-  const size_t edge_size = geo.edge_size ();
-  
-  double total_area = 0.0;
-  double sum = 0.0;
-
-  for (size_t e = 0; e < edge_size; e++)
-    if (geo.edge_to (e) == Geometry::cell_above)
-      {
-        const size_t n = geo.edge_from (e);
-        const double area = geo.edge_area (e);
-        total_area += area;
-        sum += (soil.K (n, h (n), h_ice (n), T) / soil.Cw2 (n, h (n))) 
-          * ((Theta (n) - soil.Theta_res (n)) / geo.cell_z (n))
-          * area;
-      }
-  daisy_assert (approximate (total_area, geo.surface_area ()));
-  return - sum / total_area;
-}
-
-double
 SoilWater::MaxExfiltration (const Geometry& geo, const size_t edge,
                             const Soil& soil, const double T) const
 {
   const size_t n = geo.edge_other (edge, Geometry::cell_above);
-  return - (soil.K (n, h (n), h_ice (n), T) / soil.Cw2 (n, h (n))) 
-    * ((Theta (n) - soil.Theta_res (n)) / geo.cell_z (n));
+  const double h0 = h (n);
+  const double K0 = soil.K (n, h0, h_ice (n), T);
+  if (max_exfiltration_gradient > 0.0)
+    return  K0 * max_exfiltration_gradient;
+  const double Cw2 = soil.Cw2 (n, h0);
+  const double Theta0 = Theta (n);
+  const double Theta_surf = soil.Theta_res (n);
+  const double delta_Theta = Theta0 - Theta_surf;
+  const double z0 = geo.cell_z (n);
+  // Darcy formulated for Theta bwteeen middle of node and soil surface.
+  return - (K0 / Cw2) * (delta_Theta / z0);
 }
 
 double
@@ -503,15 +490,21 @@ SoilWater::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   alist.add ("submodel", "SoilWater");
 
+  syntax.add ("max_exfiltration_gradient", "cm/cm", Check::positive (), 
+              Syntax::OptionalConst,
+              "Maximal pressure gradient for calculating exfiltration.\n\
+The gradient is assumed from center of top node to surface of top node.\n\
+By default, there is no maximum.");
   Geometry::add_layer (syntax, Syntax::OptionalState, 
                        "h", "cm", "Soil water pressure.");
   Geometry::add_layer (syntax, Syntax::OptionalState,
                        "Theta", Syntax::Fraction (),
                        "Soil water content.");
-  syntax.add ("Theta_primary", "cm^3/cm^3", Syntax::LogOnly, 
+  syntax.add ("Theta_primary", "cm^3/cm^3", Syntax::LogOnly, Syntax::Sequence,
               "Water content in primary matrix system.\n\
 Conventionally, this is the intra-aggregate pores.");
   syntax.add ("Theta_secondary", "cm^3/cm^3", Syntax::LogOnly, 
+              Syntax::Sequence,
               "Water content in secondary matrix system.\n\
 Conventionally, this is the inter-aggregate pores.");
   syntax.add ("S_sum", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
@@ -677,7 +670,8 @@ SoilWater::initialize (const AttributeList& al, const Geometry& geo,
 }
 
 SoilWater::SoilWater (Block& al)
-  : S_permanent_ (al.number_sequence ("S_permanent"))
+  : max_exfiltration_gradient (al.number ("max_exfiltration_gradient", -1.0)),
+    S_permanent_ (al.number_sequence ("S_permanent"))
 { }
 
 SoilWater::~SoilWater ()

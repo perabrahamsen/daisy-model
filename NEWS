@@ -6,7 +6,15 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
-* 4.44
+* 4.35 
+
+** Now 'SoilWater' parameter 'max_exfiltration_gradient'.
+
+This allows you to limit exfiltration.  It will be multiplied to the
+hydraulic conductivity in the top node, to find the maximal
+exfiltration.
+
+* 4.34
 
 ** Bug fixes.
 
