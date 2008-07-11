@@ -47,6 +47,7 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include "memutils.h"
+#include "check.h"
 #include <sstream>
 #include <numeric>
 
@@ -740,6 +741,8 @@ CropStandardSyntax::CropStandardSyntax ()
 	      "Description of this parameterization."); 
   alist.add ("description", "Standard Daisy crop model.  Hansen, 1999.");
 
+  syntax.add ("Seed", "kg DM/ha", Check::positive (), Syntax::OptionalConst,
+              "Amount of seeds applied when sowing.");
   syntax.add_submodule ("Root", alist, Syntax::State, 
 			"Root system.", RootSystem::load_syntax);
   syntax.add_submodule ("Canopy", alist, Syntax::State,
