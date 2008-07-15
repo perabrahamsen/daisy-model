@@ -1,3 +1,18 @@
+2008-07-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* canopy_std.C, canopy_std.h (CanopyStd::specific_LAI): New function.
+	(InitialCAI): Moved to seed_LAI.C as 'forced_CAI'.
+	(SpLAIfac, DSLAI05, InitCAI): Moved away from here.
+	* seed_LAI.C: To here.
+	* lib/all: Moved parameters in crop definition files.
+	
+	* crpn.h, crpn.C: Removed obsolete 'SeedN' parameter.
+	* lib/pea.dai ("Pea"): Move 'SeedN' to 'NCrop'.
+	* lib/potato.dai ("Potato; Koege"): Ditto.
+	* lib/rye.dai ("Rye"): Ditto.
+	* lib/srape.dai ("Spring Rape"): Ditto.
+	* lib/sugarbeet.dai ("Sugar Beet"): Ditto.
+
 2008-07-14  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* seed.C, seed.h: New component.

@@ -203,12 +203,6 @@ CrpN::output (Log& log) const
 bool 
 CrpN::check_alist (const AttributeList& al, Treelog& err)
 {
-  static bool warned = false;
-  if (al.check ("SeedN") && !warned)
-    {
-      err.entry ("OBSOLETE: Use 'Prod NCrop' instead of 'CrpN SeedN'");
-      warned = true;
-    }
   return true;
 }
 
@@ -218,11 +212,6 @@ CrpN::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("submodel", "CrpN");
   alist.add ("description", "\
 Default crop nitrogen parameters.");
-
-  // Obsolete.
-  syntax.add ("SeedN", "g N/m^2", Syntax::OptionalConst,
-	      "N-content in seed.\n\
-Obsolete: Use 'Prod NCrop' instead.");
 
   // Content.
   syntax.add ("PtLeafCnc", "DS", " g N/g DM", Check::non_negative (),
@@ -323,8 +312,7 @@ action of the radition of that day that was received that hour.");
 }
 
 CrpN::CrpN (const AttributeList& al)
-  : SeedN (al.number ("SeedN", -42.42e42)),
-    PtLeafCnc (al.plf ("PtLeafCnc")),
+  : PtLeafCnc (al.plf ("PtLeafCnc")),
     CrLeafCnc (al.plf ("CrLeafCnc")),
     NfLeafCnc (al.plf ("NfLeafCnc")),
     PtStemCnc (al.plf ("PtStemCnc")),

@@ -249,7 +249,7 @@ CropStandard::initialize_shared (const Geometry& geo,
   if (!last_time.get ())
     last_time.reset (new Time (now));
   seed->initialize (initial_weight);
-  production.initialize (nitrogen.SeedN);
+  production.initialize (seed->initial_N (initial_weight));
 
   const double DS = development->DS;
   if (DS >= 0)
@@ -259,11 +259,13 @@ CropStandard::initialize_shared (const Geometry& geo,
                              geo, organic_matter);
       
       // Update derived state content.
-      canopy.tick (production.WLeaf, production.WSOrg, 
-		   production.WStem, DS, 
+      const double WLeaf = production.WLeaf;
+      const double SpLAI = canopy.specific_LAI (DS);
+      const double seed_CAI = seed->forced_CAI (WLeaf, SpLAI, DS);
+      canopy.tick (WLeaf, production.WSOrg, production.WStem, DS, 
 		   // We don't save the forced CAI, use simulated CAI
 		   //  until midnight (small error).
-		   -1.0);
+		   seed_CAI);
       root_system->set_density (geo, SoilLimit, production.WRoot, DS, msg);
       nitrogen.content (DS, production, msg);
     }
@@ -272,11 +274,20 @@ CropStandard::initialize_shared (const Geometry& geo,
 bool
 CropStandard::check (Treelog& msg) const
 {
+  Treelog::Open nest (msg, library_id () + ": " + name);
+
   bool ok = true;
   if (!seed->check (msg))
     ok = false;
   if (!root_system->check (msg))
     ok = false;
+  if (seed->initial_N (initial_weight) <= 0.0
+      && production.NCrop <= 0.0)
+    {
+      ok = false;
+      msg.error ("\
+You must specify initial N content in either 'Prod' or 'Seed'");
+    }
   return ok;
 }
 
@@ -342,8 +353,11 @@ CropStandard::tick (const Time& time, const double relative_humidity,
       if (DS >= 0)
 	{
 	  msg.message ("Emerging");
+          const double WLeaf = production.WLeaf;
+          const double SpLAI = canopy.specific_LAI (DS);
+          const double seed_CAI = seed->forced_CAI (WLeaf, SpLAI, DS);
 	  canopy.tick (production.WLeaf, production.WSOrg,
-		       production.WStem, DS, -1.0);
+		       production.WStem, DS, seed_CAI);
 	  nitrogen.content (DS, production, msg);
 	  root_system->tick_daily (geo, soil, production.WRoot, 0.0,
                                    DS, msg);
@@ -517,8 +531,11 @@ CropStandard::tick (const Time& time, const double relative_humidity,
   if (!new_day)
     return;
 
-  canopy.tick (production.WLeaf, production.WSOrg,
-	       production.WStem, DS, ForcedCAI);
+  const double WLeaf = production.WLeaf;
+  const double SpLAI = canopy.specific_LAI (DS);
+  const double seed_CAI = seed->forced_CAI (WLeaf, SpLAI, DS);
+  canopy.tick (WLeaf, production.WSOrg, production.WStem, 
+               DS, ForcedCAI < 0.0 ? seed_CAI : ForcedCAI);
 
   development->tick_daily (bioclimate.daily_air_temperature (), 
                            production.leaf_growth (), production, 

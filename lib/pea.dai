@@ -19,8 +19,8 @@
             (35.00  0.800)    (40.00  0.500)    (45.00  0.000)      )
   )
 
+  (Seed LAI (DSLAI05   0.15))
   (Canopy 
-      (DSLAI05   0.15)
       (SpLAI     0.033)
       ;; LeafAIMod may never be 0.0 -pa
       ;; (LeafAIMod (0.0 1.0) (1.1 1.0) (1.50 0.90) (1.8 0.0))
@@ -63,6 +63,7 @@
  )
  
  (Prod
+      (NCrop     0.40)
       (E_Root     0.69)
       (E_Leaf     0.68)
       (E_Stem     0.66)
@@ -81,7 +82,6 @@
     )
 
   (CrpN 
-      (SeedN     0.40)
       (DS_fixate 0.2)
       (fixate_factor 0.8)
       (TLLeafEff  (1.09 1.00) (2.00 1.00))

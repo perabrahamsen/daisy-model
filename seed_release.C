@@ -30,17 +30,20 @@
 struct SeedRelease : public Seed
 {
   // Parameters.
-  const double C_fraction; // Carbon content in seeds. []
-  const double N_fraction; // Nitrogen content in seeds. []
+  const double C_fraction;      // Carbon content in seeds. [g C/g DM]
+  const double N_fraction;    // Nitrogen content in seeds. [g N/g DM]
   const double rate;            // Seed carbon release rate. [h^-1]
 
   // State.
   double C;                     // Unreleased carbon in seeds. [g C/m^2]
 
   // Simulation.
+  double forced_CAI (const double WLeaf, const double SpLAI, const double DS)
+  { return -1.0; }
   void output (Log& log) const;
   
   // Create and Destroy.
+  double initial_N (double weight) const; // [g N/m^2]
   void initialize (double weight);
   bool check (Treelog& msg) const;
   static void load_syntax (Syntax& syntax, AttributeList&);
@@ -50,21 +53,22 @@ struct SeedRelease : public Seed
 
 void 
 SeedRelease::output (Log& log) const
-{ 
-  output_variable (C, log);
-}
+{ output_variable (C, log); }
+
+double 
+SeedRelease::initial_N (const double weight) const
+{ return weight * N_fraction; }
 
 void 
 SeedRelease::initialize (double weight)
-{
-  C = weight * C_fraction;
-}
+{ C = weight * C_fraction; }
 
 bool 
 SeedRelease::check (Treelog& msg) const
 {
-  bool ok = true;
   Treelog::Open nest (msg, library_id () + ": " + name);
+
+  bool ok = true;
   if (C < 0.0)
     {
       ok = false;

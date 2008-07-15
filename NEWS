@@ -6,6 +6,30 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.36
+
+** New 'Seed' parameter in the 'default' crop model.
+
+The value can be one of two models, 'LAI' or 'release'.  The first
+implements the forced LAI function as before.  The second simulates a
+first order release of carbon from the seeds.
+
+Before:
+
+ (Canopy (SpLAI  0.020 [(m^2/m^2)/(g DM/m^2)])
+         (SpLAIfac (0.0 100) (1.0 100))
+         (DSLAI05 0.5)
+         (LeafAIMod (1.5 1.1)(2.0 0.3))))
+
+Now:
+
+ (Seed LAI
+       (DSLAI05 0.5)
+       (SpLAIfac (0.0 100) (1.0 100)))
+ (Canopy (SpLAI  0.020 [(m^2/m^2)/(g DM/m^2)])
+         (LeafAIMod (1.5 1.1)(2.0 0.3)))
+
+
 * 4.35 
 
 ** Now 'SoilWater' parameter 'max_exfiltration_gradient'.

@@ -28,6 +28,10 @@
 #include "mathlib.h"
 
 double
+CanopyStandard::specific_LAI (const double DS)
+{ return SpLAI * LeafAIMod (DS); }
+
+double
 CanopyStandard::CropHeight (double WStem, double DS) const
 {
   const double H1 = HvsDS (DS) + Offset;
@@ -44,50 +48,6 @@ CanopyStandard::DS_at_height (double height) const
   daisy_assert (DS >= 0.0);
   daisy_assert (DS <= 2.0);
   return DS;
-}
-
-void
-CanopyStandard::InitialCAI (double WLeaf, double DS)
-{
-  // This is the fixed curve for used right after emergence, when
-  // there is not yet any significant leaf dry matter.
-  const double CAI_fixed = 1.0/(1.0+exp(-15.0*(DS-DSLAI05)));
-
-  // The is the maximal CAI we will allow in the initialization phase.
-  double CAI_max;
-  if (DS<0.07)
-    {
-      // At the very start (when we have no leaf dry matter), we put
-      // no limit on the CAI.  I.e. we use the fixed function as it.
-      CAI_max = 10.;
-    }
-  else
-    {
-      // After that, we use SpLAIfac, which tell how much thiner the
-      // early leafs may be.  We always allow a LAI of 0.01.
-      CAI_max = std::max( 0.01, SpLAIfac (DS) * SpLAI * WLeaf);
-    }
-
-  // This is then our initial CAI esstimate.
-  const double CAI_init = std::min (CAI_max, CAI_fixed);
-
-  // If CAI_init is below CAI_exit, we exit will initialization phase.
-  // The idea is that enough leaf DM has been generated to account for
-  // the LAI using the ordinary mechanism, so we no longer need the
-  // fixed initialization curve.
-  const double CAI_exit = SpLAI * WLeaf;
-  if (CAI_exit >= CAI_init)
-    {
-      CAI = CAI_exit;
-      InitCAI = false;
-    }
-  else
-    CAI = CAI_init;
-
-  // At the beginning, only the leafs contribute to CAI.
-  LeafAI = CAI;
-  StemAI = 0.0;
-  SOrgAI = 0.0;
 }
 
 void
@@ -219,14 +179,12 @@ CanopyStandard::cut (double WStem, double DS, double stub_length)
 }
 
 void
-CanopyStandard::tick (double WLeaf, double WSOrg, double WStem, double DS,
-		      double force_CAI)
+CanopyStandard::tick (const double WLeaf, const double WSOrg,
+                      const double WStem, const double DS,
+		      const double force_CAI)
 {
   Height = CropHeight (WStem, DS);
-  if (InitCAI)
-    InitialCAI (WLeaf, DS);
-  else
-    CropCAI (WLeaf, WSOrg, WStem, DS);
+  CropCAI (WLeaf, WSOrg, WStem, DS);
 
   // Forced CAI.
   ForcedCAI = force_CAI;
@@ -240,7 +198,6 @@ CanopyStandard::output (Log& log) const
 {
   CanopySimple::output (log);
   
-  output_variable (InitCAI, log);
   output_variable (Offset, log);
   output_variable (LeafAI, log);
   output_variable (StemAI, log);
@@ -261,9 +218,6 @@ CanopyStandard::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("description", "Standard canopy model.");
 
   // Parameters.
-  syntax.add ("DSLAI05", Syntax::None (), Syntax::Const,
-	      "DS at CAI=0.5; initial phase.");
-  alist.add ("DSLAI05", 0.15);
   syntax.add ("SpLAI", "(m^2/m^2)/(g DM/m^2)", Syntax::Const,
 	      " Specific leaf weight.");
   syntax.add ("LeafAIMod", "DS", Syntax::None (), Syntax::Const,
@@ -273,15 +227,6 @@ Used only after the intital phase.");
   AIDef.add (0.00, 1.00);
   AIDef.add (2.00, 1.00);
   alist.add ("LeafAIMod", AIDef);
-  syntax.add ("SpLAIfac", "DS",Syntax::None (), Syntax::Const, "\
-Factor defining maximum specific leaf weight.\n\
-Only used during the initial phase.");
-  PLF SpLf;
-  SpLf.add (0.00, 3.00);
-  SpLf.add (0.20, 1.50);
-  SpLf.add (0.40, 1.25);
-  SpLf.add (0.60, 1.00);
-  alist.add ("SpLAIfac", SpLf);
   syntax.add ("SpSOrgAI", "(m^2/m^2)/(g DM/m^2)", Syntax::Const,
 	      "Specific storage organ weight.\n\
 Used only after the intital phase.");
@@ -325,9 +270,6 @@ If the relative PAR get below this, the bottom leaves will start dying.");
   alist.add ("PARrel", 0.05);
 
   // Variables.
-  syntax.add ("InitCAI", Syntax::Boolean, Syntax::State,
-	      "Initial CAI development phase.");
-  alist.add ("InitCAI", true);
   syntax.add ("Offset", "cm", Syntax::State, "Extra height after harvest.");
   alist.add ("Offset", 0.0);
   syntax.add ("LeafAI", "m^2/m^2", Syntax::State, "Leaf Area Index.");
@@ -351,10 +293,8 @@ If the relative PAR get below this, the bottom leaves will start dying.");
 
 CanopyStandard::CanopyStandard (const AttributeList& vl)
   : CanopySimple (vl),
-    DSLAI05 (vl.number ("DSLAI05")),
     SpLAI (vl.number ("SpLAI")),
     LeafAIMod (vl.plf ("LeafAIMod")),
-    SpLAIfac (vl.plf ("SpLAIfac")),
     SpSOrgAI (vl.number ("SpSOrgAI")),
     SOrgAIMod (vl.plf ("SOrgAIMod")),
     SOrgPhotEff (vl.number ("SOrgPhotEff")),
@@ -366,7 +306,6 @@ CanopyStandard::CanopyStandard (const AttributeList& vl)
     LAIDist0 (vl.number_sequence ("LAIDist0")),
     LAIDist1 (vl.number_sequence ("LAIDist1")),
     PARrel (vl.number ("PARrel")),
-    InitCAI (vl.flag ("InitCAI")),
     Offset (vl.number ("Offset")),
     LeafAI (vl.number ("LeafAI")),
     StemAI (vl.number ("StemAI")),

@@ -18,8 +18,9 @@
                (45.0  0.0))
   )
 
+  (Seed LAI (DSLAI05  0.15))
   (Canopy
-      (DSLAI05  0.15)
+      
       (SpLAI    0.031)
       (LAIDist0 0.00 0.00 1.00)
       (LAIDist1 0.00 0.20 0.90)

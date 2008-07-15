@@ -35,10 +35,12 @@ public:
 
   // Simulation.
 public:
+  virtual double forced_CAI (double WLeaf, double SpLAI, double DS) = 0;
   virtual void output (Log&) const = 0;
 
   // Create and Destroy.
 public:
+  virtual double initial_N (double weight) const = 0;
   virtual void initialize (double weight) = 0;
   virtual bool check (Treelog& msg) const = 0;
   static const AttributeList& default_model ();

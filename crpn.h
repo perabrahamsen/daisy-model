@@ -36,11 +36,8 @@ class Treelog;
 
 class CrpN 
 {
-  // Obsolete.
-public:
-  const double SeedN;		// N-content in seed [ g N/m^2 ]
-
   // Content.
+public:
   const PLF& PtLeafCnc;		// Upper limit for N-conc in leaves
   const PLF& CrLeafCnc;		// Critical lim f. N-conc in leaves
   const PLF& NfLeafCnc;		// Non-func lim f. N-conc in leaves

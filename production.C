@@ -713,7 +713,7 @@ Crop production in the default crop model.");
   alist.add ("NDead", 0.000);
   syntax.add ("NCrop", "g N/m^2", Syntax::OptionalState,
 	      "Total crop nitrogen content.\n\
-For initialization, set this to the amount of N in the seed.");
+By default, this will start as the amount of N in the seed.");
   syntax.add ("C_AM", "g C/m^2", Syntax::State,
 	      "Added C in plant material.");
   alist.add ("C_AM", 0.000);
@@ -790,6 +790,7 @@ Production::initialize (const double SeedN)
 {
   if (NCrop <= 0.0)
     NCrop = SeedN;
+  daisy_assert (NCrop >= 0.0);
 }
 
 void
