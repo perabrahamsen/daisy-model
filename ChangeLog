@@ -1,5 +1,9 @@
 2008-07-15  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 4.36 released.
+
+2008-07-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
 	* production.C, production.h (Production::tick): Accept seed C
 	parameter. 
 	* crop_std.C (CropStandard::tick): Update caller.
