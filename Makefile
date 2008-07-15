@@ -977,6 +977,8 @@ ui_Qt_run${OBJ}: ui_Qt_run.C ui_Qt_run.h ui_Qt.h ui.h model.h symbol.h \
 ui_Qt${OBJ}: ui_Qt.C ui_Qt.h ui.h model.h symbol.h alist.h toplevel.h \
   librarian.h block.h syntax.h treelog.h plf.h assertion.h
 main_Qt${OBJ}: main_Qt.C ui_Qt.h ui.h model.h symbol.h alist.h toplevel.h
+seed${OBJ}: seed.C seed.h model.h symbol.h alist.h block.h syntax.h treelog.h \
+  plf.h librarian.h
 stomatacon${OBJ}: stomatacon.C stomatacon.h model.h symbol.h alist.h \
   mathlib.h assertion.h block.h syntax.h treelog.h plf.h librarian.h
 tertiary${OBJ}: tertiary.C tertiary.h model.h symbol.h alist.h tertsmall.h \
@@ -1212,7 +1214,8 @@ surface${OBJ}: surface.C surface.h uzmodel.h model.h symbol.h alist.h \
   ridge.h check.h
 soil_water${OBJ}: soil_water.C soil_water.h geometry.h syntax.h treelog.h \
   symbol.h mathlib.h assertion.h soil.h soil_heat.h groundwater.h model.h \
-  alist.h log.h time.h border.h submodel.h block.h plf.h secondary.h
+  alist.h log.h time.h border.h submodel.h block.h plf.h secondary.h \
+  check.h
 soil_heat${OBJ}: soil_heat.C soil_heat.h block.h syntax.h treelog.h symbol.h \
   plf.h alist.h geometry.h mathlib.h assertion.h soil.h soil_water.h \
   surface.h uzmodel.h model.h movement.h weather.h im.h log.h time.h \
@@ -1391,6 +1394,10 @@ nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
 version${OBJ}: version.C
+seed_LAI${OBJ}: seed_LAI.C seed.h model.h symbol.h alist.h block.h syntax.h \
+  treelog.h plf.h librarian.h log.h time.h border.h
+seed_release${OBJ}: seed_release.C seed.h model.h symbol.h alist.h block.h \
+  syntax.h treelog.h plf.h librarian.h log.h time.h border.h check.h
 stomatacon_BB${OBJ}: stomatacon_BB.C stomatacon.h model.h symbol.h alist.h \
   mathlib.h assertion.h check.h block.h syntax.h treelog.h plf.h \
   librarian.h
@@ -1875,12 +1882,12 @@ horizon_std${OBJ}: horizon_std.C horizon.h model.h symbol.h alist.h block.h \
   syntax.h treelog.h plf.h texture.h hydraulic.h check.h mathlib.h \
   assertion.h librarian.h
 crop_std${OBJ}: crop_std.C crop.h model.h symbol.h alist.h time.h chemistry.h \
-  root_system.h rootdens.h ABAprod.h plf.h canopy_std.h canopy_simple.h \
-  harvesting.h production.h phenology.h partition.h vernalization.h \
-  photo.h crpn.h wse.h log.h border.h timestep.h vcheck.h bioclimate.h \
-  soil_water.h geometry.h syntax.h treelog.h mathlib.h assertion.h soil.h \
-  organic_matter.h soil_heat.h am.h im.h submodeler.h block.h librarian.h \
-  memutils.h
+  seed.h root_system.h rootdens.h ABAprod.h plf.h canopy_std.h \
+  canopy_simple.h harvesting.h production.h phenology.h partition.h \
+  vernalization.h photo.h crpn.h wse.h log.h border.h timestep.h vcheck.h \
+  bioclimate.h soil_water.h geometry.h syntax.h treelog.h mathlib.h \
+  assertion.h soil.h organic_matter.h soil_heat.h am.h im.h submodeler.h \
+  block.h librarian.h memutils.h check.h
 action_sow${OBJ}: action_sow.C action.h model.h symbol.h alist.h block.h \
   syntax.h treelog.h plf.h daisy.h program.h run.h time.h timestep.h \
   vcheck.h memutils.h field.h border.h crop.h librarian.h check.h

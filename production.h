@@ -150,6 +150,7 @@ public:
 	     double DS, double CAImRat,
 	     const CrpN& nitrogen,
              double nitrogen_stress,
+             double seed_C,
 	     const Partition& partition,
 	     double& residuals_DM, 
 	     double& residuals_N_top, double& residuals_C_top,

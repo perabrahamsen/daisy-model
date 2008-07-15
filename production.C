@@ -34,17 +34,20 @@
 #include <sstream>
 #include "mathlib.h"
 
+// Chemical constants affecting the crop.
+const double molWeightCH2O = 30.0; // [gCH2O/mol]
+const double molWeightCO2 = 44.0; // [gCO2/mol]
+const double molWeightC = 12.0; // [gC/mol]
+
 // Dimensional conversion.
 static const double m2_per_cm2 = 0.0001;
 // Based on Penning de Vries et al. 1989, page 63
 // E is the assimilate conversion effiency
 static double DM_to_C_factor (double E)
 {
-   return 12.0/30.0 * (1.0 - (0.5673 - 0.5327 * E)) / E;
+   return molWeightC/molWeightCH2O * (1.0 - (0.5673 - 0.5327 * E)) / E;
+   // return 12.0/30.0 * (1.0 - (0.5673 - 0.5327 * E)) / E;
 }
-// Chemical constants affecting the crop.
-const double molWeightCH2O = 30.0; // [gCH2O/mol]
-const double molWeightCO2 = 44.0; // [gCO2/mol]
 
 double
 Production::remobilization (const double DS, const double dt)
@@ -133,6 +136,7 @@ Production::tick (const double AirT, const double SoilT,
 		  const double DS, const double CAImRat,
 		  const CrpN& nitrogen,
                   const double nitrogen_stress,
+                  const double seed_C,
 		  const Partition& partition,
 		  double& residuals_DM,
 		  double& residuals_N_top, double& residuals_C_top,
@@ -147,6 +151,10 @@ Production::tick (const double AirT, const double SoilT,
   const double SOrgGrowthRespCoef = GrowthRespCoef (E_SOrg);
   const double RootGrowthRespCoef = GrowthRespCoef (E_Root);
   const double DS1 = fmod (DS, 2.0);
+
+  // Seed.
+  const double seed_CH2O = seed_C * molWeightCH2O / molWeightC;
+  CH2OPool += seed_CH2O;
 
   // Remobilization
   const double ReMobil = remobilization (DS, dt);
