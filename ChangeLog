@@ -1,3 +1,11 @@
+2008-07-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* seed.C, seed.h: New component.
+	* Makefile (COMPONENTS): Added it.
+	* seed_release.C, seed_LAI.C: New models.
+	* Makefile (MODELS): Added them.
+	* crop_std.C: Use it.
+
 2008-07-11  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* soil_water.C, soil_water.h (max_exfiltration_gradient): New

@@ -425,7 +425,7 @@ SoilWater::MaxExfiltration (const Geometry& geo, const size_t edge,
   const double Theta_surf = soil.Theta_res (n);
   const double delta_Theta = Theta0 - Theta_surf;
   const double z0 = geo.cell_z (n);
-  // Darcy formulated for Theta bwteeen middle of node and soil surface.
+  // Darcy formulated for Theta between middle of node and soil surface.
   return - (K0 / Cw2) * (delta_Theta / z0);
 }
 

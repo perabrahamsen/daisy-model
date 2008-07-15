@@ -1,4 +1,4 @@
-// seed.h -- Initial crop growth.
+// seed.C - Initial growth.
 // 
 // Copyright 2008 Per Abrahamsen and KU.
 //
@@ -18,32 +18,32 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef SEED_H
-#define SEED_H
+#define BUILD_DLL
 
-#include "model.h"
+#include "seed.h"
+#include "block.h"
+#include "librarian.h"
 
-class Block;
-class Treelog;
+const char *const Seed::component = "seed";
 
-class Seed : public ModelLogable
+symbol
+Seed::library_id () const
 {
-  // Content.
-public:
-  static const char *const component;
-  symbol library_id () const;
+  static const symbol id (component);
+  return id;
+}
 
-  // Simulation.
-public:
-  virtual void output (Log&) const = 0;
+Seed::Seed (Block& al)
+  : ModelLogable (al.identifier ("type"))
+{ }
 
-  // Create and Destroy.
-public:
-  virtual void initialize (double weight) = 0;
-  virtual bool check (Treelog& msg) const = 0;
-  static const AttributeList& default_model ();
-  Seed (Block&);
-  ~Seed ();
-};
+Seed::~Seed ()
+{ }
 
-#endif // SEED_H
+static Librarian Seed_init (Seed::component, "\
+Initial growth after emergence.\n\
+\n\
+The initial growth process governs the growth of the crop until the\n\
+point where there is enough leaf area for photosynthesis to take over.");
+
+// seed.C ends here.

@@ -22,6 +22,7 @@
 #define BUILD_DLL
 #include "crop.h"
 #include "chemistry.h"
+#include "seed.h"
 #include "root_system.h"
 #include "canopy_std.h"
 #include "harvesting.h"
@@ -51,10 +52,11 @@
 #include <sstream>
 #include <numeric>
 
-class CropStandard : public Crop
+struct CropStandard : public Crop
 {
   // Content.
-public:
+  const double initial_weight;  // [g DM/m^2]
+  const std::auto_ptr<Seed> seed;
   const std::auto_ptr<RootSystem> root_system;
   CanopyStandard canopy;
   std::auto_ptr<Harvesting> harvesting;
@@ -70,7 +72,6 @@ public:
   const double min_light_fraction;
 
   // Communication with Bioclimate.
-public:
   double minimum_light_fraction () const
   { return min_light_fraction; }
 
@@ -118,7 +119,6 @@ public:
   { root_system->production_stress = pstress; }
 
   // Simulation.
-public:
   void tick (const Time& time, double relative_humidity,
 	     const double CO2_atm,
 	     const Bioclimate&, const Geometry& geo,
@@ -179,7 +179,6 @@ public:
   { return root_system->Density; }
 
   // Create and Destroy.
-public:
   void initialize (const Geometry& geometry, double row_width, OrganicMatter&, 
                    double SoilLimit,
                    const Time&, Treelog&);
@@ -249,6 +248,7 @@ CropStandard::initialize_shared (const Geometry& geo,
 {
   if (!last_time.get ())
     last_time.reset (new Time (now));
+  seed->initialize (initial_weight);
   production.initialize (nitrogen.SeedN);
 
   const double DS = development->DS;
@@ -273,6 +273,8 @@ bool
 CropStandard::check (Treelog& msg) const
 {
   bool ok = true;
+  if (!seed->check (msg))
+    ok = false;
   if (!root_system->check (msg))
     ok = false;
   return ok;
@@ -679,6 +681,7 @@ CropStandard::pluck (const symbol column_name,
 void
 CropStandard::output (Log& log) const
 {
+  output_derived (seed, "Seed", log);
   output_submodule (*root_system, "Root", log);
   output_submodule (canopy, "Canopy", log);
   output_submodule (*harvesting, "Harvest", log);
@@ -703,6 +706,8 @@ CropStandard::output (Log& log) const
 
 CropStandard::CropStandard (Block& al)
   : Crop (al),
+    initial_weight (al.number ("weight", -42.42e42)),
+    seed (Librarian::build_item<Seed> (al, "Seed")),
     root_system (submodel<RootSystem> (al, "Root")),
     canopy (al.alist ("Canopy")),
     harvesting (submodel<Harvesting> (al, "Harvest")),
@@ -741,8 +746,11 @@ CropStandardSyntax::CropStandardSyntax ()
 	      "Description of this parameterization."); 
   alist.add ("description", "Standard Daisy crop model.  Hansen, 1999.");
 
-  syntax.add ("Seed", "kg DM/ha", Check::positive (), Syntax::OptionalConst,
+  syntax.add ("weight", "g DM/m^2", Check::positive (), Syntax::OptionalConst,
               "Amount of seeds applied when sowing.");
+  syntax.add_object ("Seed", Seed::component, 
+                     "Initial crop growth.");
+  alist.add ("Seed", Seed::default_model ());
   syntax.add_submodule ("Root", alist, Syntax::State, 
 			"Root system.", RootSystem::load_syntax);
   syntax.add_submodule ("Canopy", alist, Syntax::State,

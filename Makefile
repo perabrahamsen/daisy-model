@@ -374,7 +374,8 @@ NOLINK = -c
 # 
 
 LATER = tertiary_instant.C 
-MODELS = stomatacon_BB.C stomatacon_SHA.C stomatacon_Leuning.C \
+MODELS = seed_LAI.C seed_release.C \
+	stomatacon_BB.C stomatacon_SHA.C stomatacon_Leuning.C \
 	uzrect_r3.C tertiary_old.C \
 	biopore_drain.C tertiary_biopores.C \
 	biopore_matrix.C transport_Mollerup.C transport_Hansen.C \
@@ -447,7 +448,8 @@ DISABLED = log_clone.C action_merge.C action_divide.C \
 	weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C 
 # A component is a common interface to a number of models.
 #
-COMPONENTS = stomatacon.C tertiary.C biopore.C secondary.C heatrect.C unit.C \
+COMPONENTS = seed.C \
+	stomatacon.C tertiary.C biopore.C secondary.C heatrect.C unit.C \
 	ABAprod.C solver.C element.C ui.C reaction.C scopesel.C scope.C \
 	ABAeffect.C transport.C uzrect.C bound.C volume.C uz1d.C \
 	rubiscoNdist.C raddist.C difrad.C organic_matter.C movement.C integer.C\
