@@ -55,7 +55,7 @@
 struct CropStandard : public Crop
 {
   // Content.
-  const double initial_weight;  // [g DM/m^2]
+  const double initial_weight;  // [g w.w./m^2]
   const std::auto_ptr<Seed> seed;
   const std::auto_ptr<RootSystem> root_system;
   CanopyStandard canopy;
@@ -522,9 +522,11 @@ CropStandard::tick (const Time& time, const double relative_humidity,
   const double T_soil_3 = geo.content_at (soil_heat, &SoilHeat::T,
                                           -root_system->Depth/3.0);
   daisy_assert (std::isfinite (T_soil_3));
+  const double seed_C = seed->release_C (dt);
   production.tick (bioclimate.daily_air_temperature (), T_soil_3,
 		   root_system->Density, geo, DS, 
-		   canopy.CAImRat, nitrogen, nitrogen_stress, partition, 
+		   canopy.CAImRat, nitrogen, nitrogen_stress, seed_C, 
+                   partition, 
 		   residuals_DM, residuals_N_top, residuals_C_top,
 		   residuals_N_soil, residuals_C_soil, dt, msg);
   nitrogen.content (DS, production, msg);
@@ -763,7 +765,7 @@ CropStandardSyntax::CropStandardSyntax ()
 	      "Description of this parameterization."); 
   alist.add ("description", "Standard Daisy crop model.  Hansen, 1999.");
 
-  syntax.add ("weight", "g DM/m^2", Check::positive (), Syntax::OptionalConst,
+  syntax.add ("weight", "g w.w./m^2", Check::positive (), Syntax::OptionalConst,
               "Amount of seeds applied when sowing.");
   syntax.add_object ("Seed", Seed::component, 
                      "Initial crop growth.");

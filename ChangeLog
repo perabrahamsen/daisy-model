@@ -1,5 +1,9 @@
 2008-07-15  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* production.C, production.h (Production::tick): Accept seed C
+	parameter. 
+	* crop_std.C (CropStandard::tick): Update caller.
+
 	* canopy_std.C, canopy_std.h (CanopyStd::specific_LAI): New function.
 	(InitialCAI): Moved to seed_LAI.C as 'forced_CAI'.
 	(SpLAIfac, DSLAI05, InitCAI): Moved away from here.

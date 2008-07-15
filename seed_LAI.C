@@ -39,6 +39,8 @@ struct SeedLAI : public Seed
 
   // Simulation.
   double forced_CAI (double WLeaf, double SpLAI, double DS);
+  double release_C (double dt)
+  { return 0.0; }
   void output (Log& log) const
   { output_variable (InitCAI, log); }
   

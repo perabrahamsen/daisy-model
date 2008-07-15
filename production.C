@@ -485,23 +485,30 @@ Production::tick (const double AirT, const double SoilT,
   update_carbon ();
   CCrop = CLeaf + CStem + CSOrg + CRoot + CDead + CH2OPool * 12./30.;
   const double error 
-    = (old_CCrop + dt * (NetPhotosynthesis *  12./44. - C_Loss) - CCrop) * 10;
+    = (old_CCrop 
+       + (dt * (NetPhotosynthesis *  12./44. - C_Loss)
+          + seed_C)
+       - CCrop) * 10;
   static double accum = 0.0;
   accum += error;
   daisy_assert (std::isfinite (NetPhotosynthesis));
-  if (!approximate (old_CCrop + dt * (NetPhotosynthesis *  12./44 - C_Loss),
+  if (!approximate (old_CCrop 
+                    + dt * (NetPhotosynthesis *  12./44 - C_Loss)
+                    + seed_C,
                     CCrop)
       || error > 0.00001 /* 0.001 g/ha */)
     {
       std::ostringstream tmp;
       tmp << "C balance error\n"
-             << "Old C = " << old_CCrop * 10 << " kg/ha\n"
-             << "NetPhotosynthesis = " << NetPhotosynthesis *  12./30. * 10 * dt
-             << " kg/ha\n"
-             << "Loss " << C_Loss * dt << " kg/ha\n"
-             << "New C = " << CCrop * 10 << " kg/ha\n"
-             << "Error = " << error * 1000 << " g/ha\n"
-             << "Accumulated = " << accum << " kg/ha"; 
+          << "Old C = " << old_CCrop * 10 << " kg/ha\n"
+          << "NetPhotosynthesis = "
+          << NetPhotosynthesis *  12./30. * 10 * dt
+          << " kg/ha\n"
+          << "Loss " << C_Loss * dt * 10 << " kg/ha\n"
+          << "Seed " << seed_C * 10 << " kg/ha\n"
+          << "New C = " << CCrop * 10 << " kg/ha\n"
+          << "Error = " << error * 1000 << " g/ha\n"
+          << "Accumulated = " << accum << " kg/ha"; 
       msg.error (tmp.str ());
     }
 }

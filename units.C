@@ -488,6 +488,7 @@ Units::standard_conversions ()
   add ("mm/h", "cm/h", 0.1);
   add ("mm/d", "cm/h", 0.1/24.0);
   add ("T w.w./ha", "Mg w.w./ha", 1.0);
+  add ("kg w.w./ha", "g w.w./m^2", 0.1);
   add ("ppm", "mg N/l", 1.0);
   add ("ppm", "g/cm^2/mm", 1.0e-7);
   add ("L/kg", "cm^3/g", 1.0);

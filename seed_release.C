@@ -30,6 +30,7 @@
 struct SeedRelease : public Seed
 {
   // Parameters.
+  const double DM_fraction;      // Dry matter content in seeds. [g DM/g w.w.]
   const double C_fraction;      // Carbon content in seeds. [g C/g DM]
   const double N_fraction;    // Nitrogen content in seeds. [g N/g DM]
   const double rate;            // Seed carbon release rate. [h^-1]
@@ -40,6 +41,7 @@ struct SeedRelease : public Seed
   // Simulation.
   double forced_CAI (const double WLeaf, const double SpLAI, const double DS)
   { return -1.0; }
+  double release_C (double dt);
   void output (Log& log) const;
   
   // Create and Destroy.
@@ -51,17 +53,25 @@ struct SeedRelease : public Seed
   ~SeedRelease ();
 };
 
+double 
+SeedRelease::release_C (const double dt)
+{ 
+  const double released = std::min (C * rate * dt, C);
+  C -= released;
+  return released;
+}
+
 void 
 SeedRelease::output (Log& log) const
 { output_variable (C, log); }
 
 double 
 SeedRelease::initial_N (const double weight) const
-{ return weight * N_fraction; }
+{ return weight * DM_fraction * N_fraction; }
 
 void 
 SeedRelease::initialize (double weight)
-{ C = weight * C_fraction; }
+{ C = weight * DM_fraction * C_fraction; }
 
 bool 
 SeedRelease::check (Treelog& msg) const
@@ -80,6 +90,8 @@ SeedRelease::check (Treelog& msg) const
 void
 SeedRelease::load_syntax (Syntax& syntax, AttributeList& alist)
 {
+  syntax.add ("DM_fraction", Syntax::Fraction (), Syntax::Const, "\
+Dry matter content in seeds.");
   syntax.add ("C_fraction", Syntax::Fraction (), Syntax::Const, "\
 Carbon content in seeds.");
   syntax.add ("N_fraction", Syntax::Fraction (), Syntax::Const, "\
@@ -92,6 +104,7 @@ Unreleased carbon left in seeds.");
 
 SeedRelease::SeedRelease (Block& al)
   : Seed (al),
+    DM_fraction (al.number ("DM_fraction")),
     C_fraction (al.number ("C_fraction")),
     N_fraction (al.number ("N_fraction")),
     rate (al.number ("rate")),
