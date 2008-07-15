@@ -1,0 +1,46 @@
+;;; pedo-soil.dai --- JB1 soil with pedotransfer functions.
+;;
+
+(defhorizon Ap_JB1_Cosby default
+  "Average Ap horizont for a JB1 soil.
+This uses Cosby et al for estimating hydraulic properties."
+  (clay 3.9) (silt 6.4) (fine_sand 20.4) (coarse_sand 66.6)
+  (humus 2.8) (C_per_N 14.2)
+  (hydraulic Cosby_et_al))
+
+(defhorizon C_JB1_Cosby default
+  "Average C horizont for a JB1 soil.
+This uses Cosby et al for estimating hydraulic properties."
+  (clay 2.9) (silt 2.0) (fine_sand 17.3) (coarse_sand 77.6)
+  (humus 0.2)
+  (hydraulic Cosby_et_al))
+
+(defcolumn JB1_Cosby default
+  "A typical JB1 soil.
+This uses Cosby et al for estimating hydraulic properties."
+  (Soil (horizons (-30 [cm] Ap_JB1_Cosby)
+                  (-1.5 [m] C_JB1_Cosby))
+        (MaxRootingDepth 50))
+  (Groundwater deep))
+
+(defhorizon Ap_JB1_hypres Ap_JB1_Cosby
+  "Average Ap horizont for a JB1 soil.
+This uses HYPRES for estimating hydraulic properties."
+  (dry_bulk_density 1.45)
+  (hydraulic hypres))
+
+(defhorizon C_JB1_hypres Ap_JB1_Cosby
+  "Average C horizont for a JB1 soil.
+This uses HYPRES for estimating hydraulic properties."
+  (dry_bulk_density 1.56)
+  (hydraulic hypres))
+
+(defcolumn JB1_hypres default
+  "A typical JB1 soil.
+This uses HYPRES for estimating hydraulic properties."
+  (Soil (horizons (-30 [cm] Ap_JB1_hypres)
+                  (-1.5 [m] C_JB1_hypres))
+        (MaxRootingDepth 50))
+  (Groundwater deep))
+
+;;; pedo-soil.dai ends here.

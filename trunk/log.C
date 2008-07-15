@@ -1,0 +1,203 @@
+// log.C
+// 
+// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
+// Copyright 2000-2001 KVL.
+//
+// This file is part of Daisy.
+// 
+// Daisy is free software; you can redistribute it and/or modify
+// it under the terms of the GNU Lesser Public License as published by
+// the Free Software Foundation; either version 2.1 of the License, or
+// (at your option) any later version.
+// 
+// Daisy is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser Public License
+// along with Daisy; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+#define BUILD_DLL
+
+#include "log.h"
+#include "library.h"
+#include "metalib.h"
+#include "block.h"
+#include "daisy.h"
+#include "assertion.h"
+#include "librarian.h"
+#include <sstream>
+
+const char *const Log::component = "log";
+
+symbol 
+Log::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
+struct Log::Implementation
+{
+  std::list<const Soil*> soils;
+  std::list<const Geometry*> geometries;
+  std::list<const Vegetation*> vegetations;
+  const Metalib* metalib;
+  Implementation ()
+    : metalib (NULL)
+  { }
+};
+
+const Metalib&
+Log::metalib () const
+{
+  daisy_assert (impl->metalib);
+  return *impl->metalib;
+}
+
+bool
+Log::check_entry (symbol name, const char *const component) const
+{
+  bool looking = true;
+  const Library& library = metalib ().library (symbol (component));
+
+  // TODO: We should have check_interior use Library::ancestors for speed.
+  while (looking && !check_interior (name))
+    {
+      if (library.check (name))
+	{
+	  const AttributeList& alist = library.lookup (name);
+	  if (alist.check ("type"))
+	    name = alist.identifier ("type");
+	  else
+	    looking = false;
+	}
+      else
+	looking = false;
+   }
+  return looking;
+}
+
+
+void 
+Log::open_named (symbol)
+{ open_unnamed (); }
+
+void 
+Log::close_named ()
+{ close_unnamed (); }
+
+void 
+Log::open_ordered (int)
+{ open_unnamed (); }
+
+void 
+Log::close_ordered ()
+{ close_unnamed (); }
+
+void 
+Log::open_alist (symbol name, const AttributeList&)
+{ open (name); }
+
+void 
+Log::close_alist ()
+{ close (); }
+
+void 
+Log::open_soil (const Geometry& g, const Soil& s, const Vegetation& v)
+{ 
+  impl->geometries.push_back (&g);
+  impl->soils.push_back (&s);
+  impl->vegetations.push_back (&v);
+}
+
+void 
+Log::close_soil ()
+{
+  impl->geometries.pop_back ();
+  impl->soils.pop_back ();
+  impl->vegetations.pop_back ();
+}
+
+const Geometry*
+Log::geometry () const
+{
+  daisy_assert (!impl->geometries.empty ());
+  return impl->geometries.back ();
+}
+
+const Soil*
+Log::soil () const
+{
+  daisy_assert (!impl->soils.empty ());
+  return impl->soils.back ();
+}
+
+const Vegetation*
+Log::vegetation () const
+{
+  daisy_assert (!impl->vegetations.empty ());
+  return impl->vegetations.back ();
+}
+
+
+void
+Log::print_dlf_header (std::ostream& out, const AttributeList& al)
+{
+  if (al.check ("parser_files"))
+  {
+    const std::vector<symbol>& files = al.identifier_sequence ("parser_files");
+    for (unsigned int i = 0; i < files.size (); i++)
+      out << "SIMFILE: " << files[i] << "\n";
+  }
+
+  const std::string sim_description = al.name ("description");
+  if (sim_description != Daisy::default_description)
+    {
+      out << "SIM: ";
+      for (unsigned int i = 0; i < sim_description.size (); i++)
+	if (sim_description[i] != '\n')
+	  out << sim_description[i];
+	else
+	  out << "\nSIM: ";
+      out << "\n";
+    }
+  out << "\n--------------------\n";
+}
+
+void
+Log::output (Log&) const
+{ }
+
+void
+Log::initialize_common (const Metalib& metalib, Treelog& msg)
+{
+  daisy_assert (!impl->metalib);
+  impl->metalib = &metalib;
+  initialize (msg);
+}
+
+Log::Log (Block& al)
+  : ModelAListed (al.alist ()),
+    impl (new Implementation ())
+{ }
+
+Log::Log (const char *const id)
+  : ModelAListed (symbol (id)),
+    impl (new Implementation ())
+{ }
+
+void
+Log::summarize (Treelog&)
+{ }
+
+Log::~Log ()
+{ }
+
+static Librarian Log_init (Log::component, "\
+Running a simulation is uninteresting, unless you can get access to\n\
+the results in one way or another.  The purpose of the 'log' component\n\
+is to provide this access.  Most 'log' models does this by writing a\n\
+summary of the state to a log file.");

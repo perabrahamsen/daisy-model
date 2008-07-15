@@ -1,0 +1,55 @@
+// difrad.C  -- Diffuse radiation
+// 
+// Copyright 2006 Birgitte Gjettermann and KVL.
+//
+// This file is part of Daisy.
+// 
+// Daisy is free software; you can redistribute it and/or modify
+// it under the terms of the GNU Lesser Public License as published by
+// the Free Software Foundation; either version 2.1 of the License, or
+// (at your option) any later version.
+// 
+// Daisy is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser Public License
+// along with Daisy; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+#define BUILD_DLL
+
+#include "difrad.h"
+#include "block.h"
+#include "librarian.h"
+
+const char *const Difrad::component = "difrad";
+
+symbol 
+Difrad::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
+
+void
+Difrad::output (Log&) const
+{ }
+
+void 
+Difrad::load_syntax (Syntax&, AttributeList&)
+{ }
+
+Difrad::Difrad (Block& al)
+  : ModelAListed (al.alist ())
+{ }
+
+Difrad::~Difrad ()
+{ }
+
+static Librarian Difrad_init (Difrad::component, "\
+The 'difrad' component should calculate the diffuse radiation from\n\
+meterological data.");
+
+// difrad.C ends here.

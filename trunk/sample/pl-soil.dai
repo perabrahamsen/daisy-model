@@ -1,0 +1,73 @@
+;; pl-soil.dai -- Sample soil from Poland, from FertOrgaNic project.
+
+;; Contacts: Plant Breeding and Acclimatisation Institute, Department
+;; of Agronomy, Jadwisin, 05-140 Serock, Poland; e-mail:
+;; w.mazurczyk@ihar.edu.pl.
+
+(defhorizon "Jadorna 2004" USDA3
+  (dry_bulk_density 1.50 [g/cm^3]) 
+  (clay 0.03 [])
+  (silt 0.30 [])
+  (sand 0.67 [])
+  ;(humus 0.0069 []) ;cto;Mean value span [0.0047;0.0105] of measurements spring and harvest
+  (humus 0.028 []) ;cto Calib 14: 4*opr
+  (C_per_N 11.65 [g C/g N]);cto;Mean value spring autumn without N=0.1
+  (SOM_fractions 0.49 0.51 0.00) ; This forces the SOM pools to start at equilibrium
+  (hydraulic M_vG			;Hypres
+	     (l 0.5);-0.240806
+	     (n 1.36188)
+	     (alpha 0.0308718)
+	     (K_sat 0.6 [cm/h]) ; Was: 1.27615
+	     (Theta_sat 0.397147)
+   )
+)
+
+(defhorizon "Jaddeep 2004" USDA3
+  (dry_bulk_density 1.48 [g/cm^3]) 
+  (clay 0.03 [])
+  (silt 0.36 [])
+  (sand 0.61 [])
+  (humus 0.0047 []) ;cto;Mean value span [0.0022;0.0067] of measurements spring and harvest
+  (C_per_N 8.87 [g C/g N]);cto;Mean value spring autumn without N=0.1
+  (hydraulic M_vG
+	     (l 1.1338) ; 1.1338
+	     (n 1.43343)
+	     (alpha 0.0319665)
+	     (K_sat 0.19 [cm/h]) ; 1.94238
+	     (Theta_sat 0.41415))
+ )
+
+(defhorizon "Jaddeeper 2004" USDA3
+  (hydraulic Cosby_et_al)
+  (clay 0.06 [])
+  (silt 0.17 [])
+  (sand 0.77 [])
+  (humus 0.003 [])			; not measured
+  )   
+
+(defhorizon "Jaddeepest 2004" USDA3
+  (hydraulic Cosby_et_al)
+  (clay 0.06 [])
+  (silt 0.06 [])
+  (sand 0.88 [])
+  (humus 0.001 [])			; not measured
+  )
+
+;;  Parameterisation of column (Fine sandy loam)
+(defcolumn "WP1 PL IHAR 2004" default
+   (Soil      (border -30 -50 -60 -150 [cm])
+              (MaxRootingDepth 70 [cm])
+	(horizons (  -30 [cm] "Jadorna 2004")
+		  (  -60 [cm] "Jaddeep 2004")
+		  (  -90 [cm] "Jaddeeper 2004")
+		  (  -120 [cm] "Jaddeepest 2004")
+		  (  -250 [cm] "Jaddeepest 2004")))  ;Pa 17/1-06
+   (OrganicMatter original 
+                  (init (input 2600 [kg C/ha/y])
+;		       ;(background_mineralization 80 [kg N/ha/y]) ;Original
+;		       (background_mineralization 100 [kg N/ha/y]);Calib 13
+;		       (end -30 [cm])
+   ))
+  (Groundwater deep))
+
+;; pl-soil.dai ends here

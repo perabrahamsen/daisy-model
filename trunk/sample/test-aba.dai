@@ -1,0 +1,162 @@
+;;; test-aba.dai -- Sample file demonstrating ABA support in Daisy.
+
+(description "Simulation demonstrating ABA in Daisy.")
+
+;; Use standard parameterizations.
+(input file "tillage.dai")
+(input file "crop.dai")
+(input file "log.dai")
+
+;; We start by defining two different ways to calculate ABA
+;; production, both based on the same data set.
+(defABAproduction "Fulai Liu root" root
+  "ABA production per root as function of water potential.
+Based on data collected by Fulai Liu, 2007."
+  (expr (plf h
+	     (range "ng/mm/h")
+	     (domain "MPa")
+	     (points (-1.00 6.00)
+		     (-0.35 1.25)
+		     (-0.00 0.15)))))
+
+(defABAproduction "Fulai Liu uptake" uptake
+  "ABA concentration in water uptake as function of water potential.
+Based on data collected by Fulai Liu, 2007."
+  (expr (* 26.625 [ng/cm^3] (exp (* -4.2816 [MPa^-1] (convert h [MPa]))))))
+
+;; We make a modified sow action rather than a modified crop so that
+;; we won't have to call the crop something different.
+(defaction sow_Spring_Barley 
+  (sow ("Spring Barley"
+	(enable_N_stress false)
+	;; ABA production in roots is affected by soil water potential.
+	(Root (ABAprod "Fulai Liu uptake"))
+	;; Stomata conductivity is affected by ABA.
+	;; Doesn't work right now.
+	(LeafPhot FC_C3 
+	   	  (Xn 6e-3 [mol/mol/s])
+	    	  (ABAeffect ABA-exp (k 0.0152 [cm^3/ng]))
+	    	  (TempEff (0 1) (100 1)))
+	)))
+
+;; The rest is just a standard simulation from the tutorial.
+
+;; Weather data.
+(weather default "taastrup.dwf")
+
+;; We have some very sandy soil.
+(defhorizon Ap FAO3
+  "Andeby top soil."
+  (clay 8.0 [%])
+  (silt 10.5 [%])
+  (sand 81.5 [%])
+  (humus 1.12 [%])
+  (C_per_N 11.0 [g C/g N])
+  (dry_bulk_density 1.5 [g/cm^3]))
+
+(defhorizon C Ap
+  "Andeby C horizon."
+  (humus 0.12 [%]))
+
+;; We build the column from the horizons.
+(defcolumn Andeby default
+  "The B.And farm, Andeby, 2002."
+  (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
+        (MaxRootingDepth 60.0 [cm]))
+  (Groundwater deep)
+  ;; Disable N & C.
+  (OrganicMatter none)
+  (Chemistry multi (combine) (ignore NO3 NH4)))
+
+;; Use it.
+(column Andeby)
+
+;; Simulation start date.
+(time 1996 12 1 1)
+(stop 1998 4 1 1)
+
+(manager activity
+  (wait (at 1997 3 20 1))
+  (plowing)
+  (wait (at 1997 4 4 1))
+  (fertilize (mineral (weight 100.0 [kg N/ha])
+                      (NH4_fraction 0.5 [])))
+  (wait (at 1997 4 5 1))
+  (progn
+    (sow ("Grass"))
+    (sow_Spring_Barley))
+  (wait (or (crop_ds_after "Spring Barley" 2.0)
+            (at 1997 9 5 1)))
+  (harvest "Spring Barley")
+  (wait (at 1997 9 8 1))
+  (fertilize (mineral (weight 80.0 [kg N/ha])
+                      (NH4_fraction 0.5 [])))
+  (wait (at 1997 10 10 1))
+  (harvest "Grass"
+           (stub 8.0 [cm])              ;Leave 8 cm stub.
+           (stem 1.00 []))             ;Harvest everything above stub.
+  (wait (at 1998 4 1 1))
+  (stop))
+
+(deflog "ABAExtraction" crop
+  "ABA extraction in all soil intervals."
+  (where "ABAExtraction.dlf")
+  (when hourly)
+  (entries ;;Year Month MDay Hour
+           (array (tag "ABA")
+		  (dimension "ng/cm^3/h")
+		  (path column "${column}" 
+			Vegetation crops crops "${crop}" Root ABAExtraction)
+		  (spec fixed RootSystem ABAExtraction))))
+
+(deflog "H2OExtraction" crop
+  "H2O extraction in all soil intervals."
+  (where "H2OExtraction.dlf")
+  (when hourly)
+  (entries ;;Year Month MDay Hour
+           (array (tag "H2O")
+		  (dimension "cm^3/cm^3/h")
+		  (path column "${column}" 
+			Vegetation crops crops "${crop}" Root H2OExtraction)
+		  (spec fixed RootSystem H2OExtraction))))
+
+(deflog "ABACrop" crop
+  "ABA relevant information from crop."
+  (where "ABACrop.dlf")
+  (when hourly)
+  (entries ;;Year Month MDay Hour
+           (number (tag "ABAConc")
+		   (dimension "ng/cm^3")
+		   (path column "${column}" 
+			 Vegetation crops crops "${crop}" Root ABAConc)
+		   (spec fixed RootSystem ABAConc))
+	   (number (tag "H2OUpt")
+		   (dimension "mm/h")
+		   (path column "${column}" 
+			 Vegetation crops crops "${crop}" Root H2OUpt)
+		   (spec fixed RootSystem H2OUpt)
+		   (handle sum))
+	   (number (tag "Stress")
+		   (path column "${column}" Vegetation crops crops "${crop}"
+                         Root water_stress)
+		   (spec fixed RootSystem water_stress)
+		   (handle max))))
+
+;; Create these log files.
+(output harvest
+        (ABACrop (crop "Spring Barley") 
+		 (when (crop_ds_after "Spring Barley" 0.0)))
+	(ABAExtraction (crop "Spring Barley")
+		       (when (crop_ds_after "Spring Barley" 0.0)))
+	(H2OExtraction (crop "Spring Barley") 
+		       (when (crop_ds_after "Spring Barley" 0.0)))
+	("Root Density" (crop "Spring Barley") 
+	                (when (crop_ds_after "Spring Barley" 0.0)))
+	("Soil Water Potential" (when (crop_ds_after "Spring Barley" 0.0)))
+	("Field water")
+        ("Crop Production" 
+	 (crop "Spring Barley")
+         (where "sbarley.dlf"))
+        (checkpoint (when (at 1997 8 7 6))))
+
+;;; test-aba.dai ends here.
