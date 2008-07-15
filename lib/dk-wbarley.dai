@@ -28,9 +28,8 @@ Skabt af Christian Thirup for Daisy standardiseringsprojektet."
       (TempEff (-20.00  0.00) (2.00  0.00) (10.0  1.00) (25.0  1.00) (35.0  0.01) (50.0  0.00))
    )
 
+  (Seed LAI (DSLAI05 0.15))      ; originalt: 0.022
   (Canopy
-      (DSLAI05 0.15)
-      (SpLAI     0.025); originalt: 0.022
       (LAIDist0 0.00 0.00 1.00)
       (LAIDist1 0.00 0.20 0.90)
       (PARref   0.06)

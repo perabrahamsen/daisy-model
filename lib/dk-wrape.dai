@@ -23,8 +23,8 @@ Skabt af Christian Thirup for Daisy standardiseringsprojektet"
         (Qeff   0.0500)
         (TempEff (-20. 0.00) (2. 0.00) (10. 1.00) (25. 1.00) (35. 0.01) (50. 0.0)))
 
+  (Seed LAI (DSLAI05  0.25))
   (Canopy 
-        (DSLAI05  0.25)
         (SpLAI     0.020)
         (LeafAIMod (0.0 1.) (2.0 1.0))
         (SpStemAI 0.005)

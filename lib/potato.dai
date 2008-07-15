@@ -266,7 +266,7 @@ based on experimental results from DJF."
                   (DSRate1 0.055)
                   (DSRate2 0.011)) 
   (LeafPhot original (Fm 4.8 [g CO2/m^2/h]))                      
-  (Seed LAI
+  (Seed LAI 
         (DSLAI05 0.5)
         (SpLAIfac (0.0 100) (1.0 100)))
   (Canopy (SpLAI  0.020 [(m^2/m^2)/(g DM/m^2)])

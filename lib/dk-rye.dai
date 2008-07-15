@@ -25,9 +25,8 @@ Skabt af Christian Thirup for Daisy standardiseringsprojektet."
       (Qeff   0.0500)
       (TempEff (-20.0  0.00) (4.0  0.00) (10.0  1.00) (25.0  1.00) (35.0  0.01) (50.0  0.00))
    )
-
+  (Seed LAI (DSLAI05  0.15))
   (Canopy 
-      (DSLAI05  0.15)
       (SpLAI     0.025) ;original:SpLAI     0.022
       (LAIDist0 0.00 0.00 1.00)
       (LAIDist1 0.10 0.80 1.00)
@@ -62,6 +61,7 @@ Skabt af Christian Thirup for Daisy standardiseringsprojektet."
     )
 
   (Prod 
+      (NCrop     0.4)
       (E_Root     0.69)
       (E_Leaf     0.68)
       (E_Stem     0.66)
@@ -81,8 +81,6 @@ Skabt af Christian Thirup for Daisy standardiseringsprojektet."
  
 
   (CrpN
-      (SeedN     0.4)
-
       (PtRootCnc (0.00 0.0110)    (1.00 0.0110)    (2.00 0.0100))
       (CrRootCnc (0.00 0.0090)    (1.00 0.0090)    (2.00 0.0080))
       (NfRootCnc (0.00 0.0060)    (1.00 0.0060)    (2.00 0.0060))

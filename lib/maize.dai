@@ -14,8 +14,7 @@
       (Qeff   0.0400)
     (TempEff (-20.0 0.001) (6.0 0.10) (10.0 1.00) (15.0 1.00) (20.0 1.00)))
 
-  (Seed LAI
-        (DSLAI05   0.25))
+  (Seed LAI (DSLAI05   0.25))
   (Canopy
       (SpLAI     0.010)
       (LeafAIMod (0.0 1.0) (2.0 1.0))
