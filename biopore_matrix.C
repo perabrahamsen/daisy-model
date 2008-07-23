@@ -211,7 +211,7 @@ BioporeMatrix::update_water ()
   for (size_t i = 0; i < column_size; i++)
     {
       const double water_volume = added_water[i];  // [cm^3]
-      if (water_volume < 1e-100)
+      if (std::fabs (water_volume) < 1e-100)
         continue;
       const double density = density_column[i]; // [cm^-2]
       const double radius = diameter * 0.5;     // [cm]

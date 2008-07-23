@@ -325,7 +325,7 @@ TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
   std::vector<double> S_matrix (cell_size, 0.0);
 
   // Keep original state.
-  Anystate old_state = get_state ();
+  const Anystate old_state = get_state ();
 
   // Find matrix state.
   std::vector<double> h;
@@ -482,6 +482,13 @@ TertiaryBiopores::update_biopores (const Geometry& geo,
                                             active[c], K_xx, h[c])
             + biopore.matrix_biopore_drain(c, geo, soil,
                                            active[c], K_xx, h[c]);
+          if (std::isnormal (S))
+            {
+              std::ostringstream tmp;
+              tmp << "Adding " << S << " [] to cell" << c ;
+              Assertion::message (tmp.str ());
+
+            }
           biopore.add_water (c, S * dt * vol);
         }
     }
@@ -490,6 +497,8 @@ TertiaryBiopores::update_biopores (const Geometry& geo,
 void
 TertiaryBiopores::update_water ()
 {
+  Assertion::message ("Update water");
+
   for (size_t b = 0; b < classes.size (); b++)
     classes[b]->update_water ();
 }
@@ -511,6 +520,9 @@ TertiaryBiopores::find_implicit_water (const Anystate& old_state,
       // Reset water content to begining of timestep.
       set_state (old_state);
       // Add water to get new state.
+      std::ostringstream tmp;
+      tmp << "Iteration " << iter;
+      Assertion::message (tmp.str ());
       update_water ();
       // Check if they converge.
       if (converge (new_state))
