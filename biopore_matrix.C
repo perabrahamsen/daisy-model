@@ -129,14 +129,24 @@ BioporeMatrix::converge (const Anystate& state,
   const MyContent& content = static_cast<const MyContent&> (state.inspect ());
   const size_t h_size = h_bottom.size ();
   daisy_assert (h_size == content.h_bottom.size ());
+  const double max_h = height_start - height_end;
+  daisy_assert (max_h > 0.0);
   for (size_t i = 0; i < h_size; i++)
-    if (   fabs (h_bottom[i] - content.h_bottom[i]) > max_abs
-        && (   iszero (content.h_bottom[i])
-            || iszero (h_bottom[i])
-            || (  fabs ((h_bottom[i] - content.h_bottom[i]) 
-                        / content.h_bottom[i])
-                > max_rel)))
-      return false;
+    {
+      // Check capacity.
+      if (h_bottom[i] < 0.0 || content.h_bottom[i] < 0.0)
+        return false;
+      if (h_bottom[i] > max_h || content.h_bottom[i] > max_h)
+        return false;
+      // Check difference.
+      if (   fabs (h_bottom[i] - content.h_bottom[i]) > max_abs
+          && (   iszero (content.h_bottom[i])
+              || iszero (h_bottom[i])
+              || (  fabs ((h_bottom[i] - content.h_bottom[i]) 
+                          / content.h_bottom[i])
+                  > max_rel)))
+        return false;
+    }
 
   return true; 
 }

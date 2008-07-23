@@ -157,8 +157,8 @@ TertiaryBiopores::set_state (const Anystate& state)
 bool 
 TertiaryBiopores::converge (const Anystate& state)
 {  
-  const double max_abs = 0.02;
-  const double max_rel = 0.001;
+  const double max_abs = 0.0002;
+  const double max_rel = 0.00001;
 
   const MyContent& content = static_cast<const MyContent&> (state.inspect ());
   const size_t classes_size = classes.size ();
@@ -485,7 +485,7 @@ TertiaryBiopores::update_biopores (const Geometry& geo,
           if (std::isnormal (S))
             {
               std::ostringstream tmp;
-              tmp << "Adding " << S << " [] to cell" << c ;
+              tmp << "Adding " << -S << " [] to cell" << c ;
               Assertion::message (tmp.str ());
 
             }
