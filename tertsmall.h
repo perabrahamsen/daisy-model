@@ -34,7 +34,6 @@ class Tertsmall : private boost::noncopyable
 public:
   virtual Anystate get_state () const = 0;
   virtual void set_state (const Anystate&) = 0;
-  virtual bool converge (const Anystate& old) = 0; // Are current, old state close?
   virtual void matrix_sink (const Geometry& geo, const Soil& soil,  
                             const SoilHeat& soil_heat, 
                             const std::vector<double>& h,

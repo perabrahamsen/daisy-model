@@ -511,6 +511,8 @@ TertiaryBiopores::find_implicit_water (const Anystate& old_state,
                                        const std::vector<double>& h,
                                        const double dt)
 {
+  // Reset water content to begining of timestep.
+  set_state (old_state);
   const int max_iter = 12;
   for (int iter = 0; iter < max_iter; iter++)
     {
@@ -527,9 +529,9 @@ TertiaryBiopores::find_implicit_water (const Anystate& old_state,
       // Check if they converge.
       if (converge (new_state))
         // If so, we are finished.
+        // Leave state as "end of timestep" to allow us to calculate sink.
         return true;
     }
-  set_state (old_state);
   return false;
 }
 
