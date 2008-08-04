@@ -26,6 +26,9 @@
 #include "submodeler.h"
 #include "check.h"
 #include "geometry.h"
+#include "soil.h"
+#include "soil_heat.h"
+#include "anystate.h"
 #include <sstream>
 
 // The 'drain' model.
@@ -34,6 +37,14 @@ struct BioporeDrain : public Biopore
 {
   // Parameters.
   /* const */ double pipe_position;   // [cm]
+
+  // State
+  Anystate get_state () const
+  { return Anystate::none (); }
+  void set_state (const Anystate&)
+  { }
+  bool converge (const Anystate&, const double, const double) const
+  { return true; }
 
   // Simulation.
   double air_bottom (size_t) const    // Lowest point with air [cm]
@@ -52,13 +63,26 @@ struct BioporeDrain : public Biopore
                                 const Soil& soil, bool active, 
                                 double K_xx, double h) const
   {return 0.0;}
-    
+  void update_matrix_sink (const Geometry& geo,    
+                           const Soil& soil,  
+                           const SoilHeat& soil_heat, 
+                           const std::vector<bool>& active,
+                           const double pressure_initiate,
+                           const std::vector<double>& h);
   void add_water (size_t c, double amount /* [cm^3] */)
   { }
   void update_water ()
   { }
-  void output (Log&) const
-  { }
+  void add_to_sink (std::vector<double>&,
+                    std::vector<double>& S_drain)
+  {
+    const size_t cell_size = S.size ();
+    daisy_assert (S_drain.size () == cell_size);
+    for (size_t c = 0; c < cell_size; c++)
+      S_drain[c] += S[c];
+  }
+  void output (Log& log) const
+  { output_base (log); }
 
   // Create and Destroy.
   bool initialize (const Geometry& geo, const Scope& scope, const double pipe,
@@ -98,6 +122,26 @@ BioporeDrain::matrix_biopore_drain (size_t c, const Geometry& geo,
   else 
     S = 0.0;
   return S;
+}
+
+void
+BioporeDrain::update_matrix_sink (const Geometry& geo,    
+                                  const Soil& soil,  
+                                  const SoilHeat& soil_heat, 
+                                  const std::vector<bool>& active,
+                                  const double pressure_initiate,
+                                  const std::vector<double>& h)
+{
+  const size_t cell_size = geo.cell_size ();
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      const double h_cond = std::min(pressure_initiate, h[c]);
+      const double T = soil_heat.T (c);
+      const double h_ice = 0.0;    //ice ignored 
+      const double K_zz = soil.K (c, h_cond, h_ice, T);
+      const double K_xx = K_zz * soil.anisotropy (c);
+      S[c] = matrix_biopore_drain (c, geo, soil, active[c], K_xx, h[c]);
+    }
 }
 
 BioporeDrain::BioporeDrain (Block& al)

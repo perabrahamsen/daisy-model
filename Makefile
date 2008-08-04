@@ -986,7 +986,7 @@ tertiary${OBJ}: tertiary.C tertiary.h model.h symbol.h alist.h tertsmall.h \
   block.h plf.h librarian.h
 biopore${OBJ}: biopore.C biopore.h model.h symbol.h alist.h number.h block.h \
   syntax.h treelog.h plf.h librarian.h scope_multi.h scope.h scope_id.h \
-  units.h check.h geometry.h mathlib.h assertion.h anystate.h
+  units.h check.h geometry.h mathlib.h assertion.h log.h time.h border.h
 secondary${OBJ}: secondary.C secondary.h model.h symbol.h alist.h block.h \
   syntax.h treelog.h plf.h librarian.h assertion.h
 heatrect${OBJ}: heatrect.C heatrect.h model.h symbol.h alist.h block.h \
@@ -1418,7 +1418,8 @@ tertiary_old${OBJ}: tertiary_old.C tertiary.h model.h symbol.h alist.h \
   librarian.h block.h plf.h surface.h uzmodel.h
 biopore_drain${OBJ}: biopore_drain.C biopore.h model.h symbol.h alist.h \
   number.h block.h syntax.h treelog.h plf.h vcheck.h librarian.h \
-  submodeler.h assertion.h check.h geometry.h mathlib.h
+  submodeler.h assertion.h check.h geometry.h mathlib.h soil.h \
+  soil_heat.h anystate.h
 tertiary_biopores${OBJ}: tertiary_biopores.C tertiary.h model.h symbol.h \
   alist.h tertsmall.h biopore.h number.h memutils.h librarian.h block.h \
   syntax.h treelog.h plf.h check.h geometry.h mathlib.h assertion.h \
@@ -1426,7 +1427,7 @@ tertiary_biopores${OBJ}: tertiary_biopores.C tertiary.h model.h symbol.h \
   surface.h uzmodel.h
 biopore_matrix${OBJ}: biopore_matrix.C biopore.h model.h symbol.h alist.h \
   number.h imvec.h syntax.h treelog.h block.h plf.h vcheck.h librarian.h \
-  submodeler.h assertion.h geometry.h mathlib.h soil.h soil_water.h \
+  submodeler.h assertion.h geometry.h mathlib.h soil.h soil_heat.h \
   secondary.h volume_box.h volume.h log.h time.h border.h check.h \
   anystate.h
 transport_Mollerup${OBJ}: transport_Mollerup.C transport.h model.h symbol.h \

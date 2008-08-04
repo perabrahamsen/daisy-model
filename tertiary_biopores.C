@@ -82,13 +82,6 @@ struct TertiaryBiopores : public Tertiary, public Tertsmall
 
   // - For use in Richard's Equation.
   Tertsmall& implicit ();
-  double matrix_biopores_matrix (size_t c, const Geometry& geo, // Matrix 
-                                 const Soil& soil,              // sink term.
-                                 double K_xx, double h) const;
-  double matrix_biopores_drain (size_t c, const Geometry& geo, // Matrix
-                                const Soil& soil,              // sink term.
-                                double K_xx, double h) const;
-  
   void matrix_sink (const Geometry& geo, const Soil& soil,  
                     const SoilHeat& soil_heat, 
                     const std::vector<double>& h,
@@ -407,35 +400,6 @@ TertiaryBiopores::implicit ()
   return Tertsmall::none ();
 }
 
-double 
-TertiaryBiopores::matrix_biopores_matrix (size_t c, const Geometry& geo, 
-                                          const Soil& soil, 
-                                          double K_xx, double h) const
-{
-  double sum = 0.0;
-  for (size_t b = 0; b < classes.size (); b++)
-    {
-      const Biopore& biopore = *classes[b];
-      sum += biopore.matrix_biopore_matrix(c, geo, soil, active[c], K_xx, h);
-    }
-  return sum;
-}
-
-double 
-TertiaryBiopores::matrix_biopores_drain (size_t c, const Geometry& geo, 
-                                         const Soil& soil,  
-                                         double K_xx, double h) const
-{
-  double sum = 0.0;
-  for (size_t b = 0; b < classes.size (); b++)
-    {
-      const Biopore& biopore = *classes[b];
-      sum += biopore.matrix_biopore_drain(c, geo, soil, active[c], K_xx, h);
-    }
-  return sum;
-}
-
-
 void 
 TertiaryBiopores::matrix_sink (const Geometry& geo, 
                                const Soil& soil,  
@@ -444,19 +408,17 @@ TertiaryBiopores::matrix_sink (const Geometry& geo,
                                std::vector<double>& S_matrix,
                                std::vector<double>& S_drain) const
 {
-  const size_t cell_size = geo.cell_size ();
-  for (size_t c = 0; c < cell_size; c++)
+  std::fill (S_matrix.begin (), S_matrix.end (), 0.0);
+  std::fill (S_drain.begin (), S_drain.end (), 0.0);
+  for (size_t b = 0; b < classes.size (); b++)
     {
-      const double h_cond = std::min(pressure_initiate, h[c]);
-      const double T = soil_heat.T (c);
-      const double h_ice = 0.0;    //ice ignored 
-      const double K_zz = soil.K (c, h_cond, h_ice, T);
-      const double K_xx = K_zz * soil.anisotropy (c);
-      S_matrix[c] =  matrix_biopores_matrix (c, geo, soil, K_xx, h[c]);
-      S_drain[c] =  matrix_biopores_drain (c, geo, soil, K_xx, h[c]); 
+      Biopore& biopore = *classes[b];
+      biopore.update_matrix_sink (geo, soil, soil_heat,
+                                  active, pressure_initiate, h);
+      biopore.add_to_sink (S_matrix, S_drain);
     }
 }
- 
+
 void 
 TertiaryBiopores::update_biopores (const Geometry& geo, 
                                    const Soil& soil,  
@@ -464,41 +426,18 @@ TertiaryBiopores::update_biopores (const Geometry& geo,
                                    const std::vector<double>& h,
                                    const double dt) 
 {
-  const size_t cell_size = geo.cell_size ();
-  for (size_t c = 0; c < cell_size; c++)
+  for (size_t b = 0; b < classes.size (); b++)
     {
-      const double vol = geo.cell_volume (c);
-      const double h_cond = std::min(pressure_initiate, h[c]);
-      const double T = soil_heat.T (c);
-      const double h_ice = 0.0;    //ice ignored 
-      const double K_zz = soil.K (c, h_cond, h_ice, T);
-      const double K_xx = K_zz * soil.anisotropy (c);
-     
-      for (size_t b = 0; b < classes.size (); b++)
-        {
-          Biopore& biopore = *classes[b];
-          const double S 
-            = biopore.matrix_biopore_matrix(c, geo, soil, 
-                                            active[c], K_xx, h[c])
-            + biopore.matrix_biopore_drain(c, geo, soil,
-                                           active[c], K_xx, h[c]);
-          if (std::isnormal (S))
-            {
-              std::ostringstream tmp;
-              tmp << "Adding " << -S << " [] to cell" << c ;
-              Assertion::message (tmp.str ());
-
-            }
-          biopore.add_water (c, S * dt * vol);
-        }
+      Biopore& biopore = *classes[b];
+      biopore.update_matrix_sink (geo, soil, soil_heat,
+                                  active, pressure_initiate, h);
+      biopore.add_matrix_water (geo, dt);
     }
 }
 
 void
 TertiaryBiopores::update_water ()
 {
-  Assertion::message ("Update water");
-
   for (size_t b = 0; b < classes.size (); b++)
     classes[b]->update_water ();
 }
@@ -522,9 +461,6 @@ TertiaryBiopores::find_implicit_water (const Anystate& old_state,
       // Reset water content to begining of timestep.
       set_state (old_state);
       // Add water to get new state.
-      std::ostringstream tmp;
-      tmp << "Iteration " << iter;
-      Assertion::message (tmp.str ());
       update_water ();
       // Check if they converge.
       if (converge (new_state))

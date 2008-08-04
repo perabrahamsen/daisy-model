@@ -29,7 +29,7 @@
 #include "units.h"
 #include "check.h"
 #include "geometry.h"
-#include "anystate.h"
+#include "log.h"
 #include <sstream>
 
 // biopore component.
@@ -42,19 +42,6 @@ Biopore::library_id () const
   static const symbol id (component);
   return id;
 }
-
-Anystate 
-Biopore::get_state () const
-{ return Anystate::none (); }
-
-void
-Biopore::set_state (const Anystate&)
-{ }
-
-bool 
-Biopore::converge (const Anystate&, const double, const double) const
-{ return true; }
-
 
 symbol
 Biopore::x_symbol ()
@@ -122,6 +109,20 @@ Biopore::biopore_to_matrix (double R_wall, double M_c, double r_c,
   return S;
 }
 
+void 
+Biopore::add_matrix_water (const Geometry& geo, const double dt)
+{
+  const size_t cell_size = geo.cell_size ();
+  for (size_t c = 0; c < cell_size; c++)
+    add_water (c, S[c] * dt * geo.cell_volume (c));
+}
+
+void 
+Biopore::output_base (Log& log) const
+{
+  output_variable (S, log);
+}
+
 bool
 Biopore::initialize_base (const Geometry& geo, const Scope& parent_scope, 
                           Treelog& msg)
@@ -156,6 +157,9 @@ Biopore::initialize_base (const Geometry& geo, const Scope& parent_scope,
         }
     }
   daisy_assert (density_cell.size () == cell_size);
+
+  // Sink term.
+  S.insert (S.begin (), cell_size, 0.0);
 
   return ok;
 }
@@ -201,6 +205,8 @@ Root density [cm^-2] as a function of 'x' [cm].");
 	      "Biopores ends at this depth (a negative number).");
   syntax.add ("diameter", "cm", Check::positive (),
               Syntax::Const, "Biopore diameter.");
+  syntax.add ("S", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Sink from matrix domain to biopore.");
 }
 
 Biopore::Biopore (Block& al)

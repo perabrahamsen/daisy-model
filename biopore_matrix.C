@@ -28,7 +28,7 @@
 #include "submodeler.h"
 #include "geometry.h"
 #include "soil.h"
-#include "soil_water.h"
+#include "soil_heat.h"
 #include "secondary.h"
 #include "volume_box.h"
 #include "log.h"
@@ -90,6 +90,12 @@ struct BioporeMatrix : public Biopore
                                const Soil& soil, bool active, 
                                double K_xx, double h) const
   {return 0.0;}
+  void update_matrix_sink (const Geometry& geo,    
+                           const Soil& soil,  
+                           const SoilHeat& soil_heat, 
+                           const std::vector<bool>& active,
+                           const double pressure_initiate,
+                           const std::vector<double>& h);
   void add_water (size_t c, double amount /* [cm^3] */)
   {
     daisy_assert (c < column.size ());
@@ -98,6 +104,14 @@ struct BioporeMatrix : public Biopore
     added_water[col] += amount; 
   }
   void update_water ();
+  void add_to_sink (std::vector<double>& S_matrix,
+                    std::vector<double>&)
+  {
+    const size_t cell_size = S.size ();
+    daisy_assert (S_matrix.size () == cell_size);
+    for (size_t c = 0; c < cell_size; c++)
+      S_matrix[c] += S[c];
+  }
   void output (Log&) const;
 
   // Create and Destroy.
@@ -213,6 +227,26 @@ BioporeMatrix::matrix_biopore_matrix (size_t c, const Geometry& geo,
 }
 
 void
+BioporeMatrix::update_matrix_sink (const Geometry& geo,    
+                                   const Soil& soil,  
+                                   const SoilHeat& soil_heat, 
+                                   const std::vector<bool>& active,
+                                   const double pressure_initiate,
+                                   const std::vector<double>& h)
+{
+  const size_t cell_size = geo.cell_size ();
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      const double h_cond = std::min(pressure_initiate, h[c]);
+      const double T = soil_heat.T (c);
+      const double h_ice = 0.0;    //ice ignored 
+      const double K_zz = soil.K (c, h_cond, h_ice, T);
+      const double K_xx = K_zz * soil.anisotropy (c);
+      S[c] = matrix_biopore_matrix (c, geo, soil, active[c], K_xx, h[c]);
+    }
+}
+
+void
 BioporeMatrix::update_water ()
 { 
   const size_t column_size = xplus.size ();
@@ -233,17 +267,13 @@ BioporeMatrix::update_water ()
       h_bottom[i] += dz;                                       // [cm]
       added_water[i] = 0.0;                                    // [cm^3]
       xminus = xplus[i];                                       // [cm]
-      std::ostringstream tmp;
-      tmp << "Adding " << dz << " [cm] to column " << i 
-          << " which contain " << soil_fraction * 100 << "% biopores and "
-          << water_volume << " [cm^3] water";
-      Assertion::message (tmp.str ());
     }
 }
 
 void
 BioporeMatrix::output (Log& log) const
 {
+  output_base (log);
   output_variable (h_bottom, log);
   output_submodule (*solute, "solute", log);
 }

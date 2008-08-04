@@ -32,7 +32,7 @@ class Block;
 class AttributeList;
 class Geometry;
 class Soil;
-class SoilWater;
+class SoilHeat;
 class Log;
 class Anystate;
 
@@ -43,9 +43,10 @@ public:
   static const char *const component;
   symbol library_id () const;
 
-  virtual Anystate get_state () const;
-  virtual void set_state (const Anystate&);
-  virtual bool converge (const Anystate&, double max_abs, double max_rel) const;
+  virtual Anystate get_state () const = 0;
+  virtual void set_state (const Anystate&) = 0;
+  virtual bool converge (const Anystate&, 
+                         double max_abs, double max_rel) const = 0;
 
   // Parameters.
 protected:
@@ -53,6 +54,10 @@ protected:
   const double height_start;          // Height biopores start [cm]
   const double height_end;            // Height biopores end [cm]
   const double diameter;              // [cm]
+
+  // Log variables.
+protected:
+  std::vector<double> S;        // // Matrix sink term [].
 
   // Utilities.
 protected:
@@ -74,16 +79,20 @@ public:
     /* [cm] */ const = 0;
   virtual void infiltrate (const Geometry&, size_t e,
                            double amount /* [cm] */) = 0;
-  virtual double matrix_biopore_matrix (size_t c, // Matrix sink.
-                                        const Geometry& geo, 
-                                        const Soil& soil, bool active, 
-                                        double K_xx, double h) const=0;
-  virtual double matrix_biopore_drain (size_t c, // Matrix sink.
-                                       const Geometry& geo, 
-                                       const Soil& soil, bool active, 
-                                       double K_xx, double h) const=0;
+  virtual void update_matrix_sink (const Geometry& geo,    
+                                   const Soil& soil,  
+                                   const SoilHeat& soil_heat, 
+                                   const std::vector<bool>& active,
+                                   const double pressure_initiate,
+                                   const std::vector<double>& h) = 0;
   virtual void add_water (size_t c, double amount /* [cm^3] */) = 0;
   virtual void update_water () = 0;
+  virtual void add_to_sink (std::vector<double>& S_matrix,
+                            std::vector<double>& S_drain) = 0;
+  void add_matrix_water (const Geometry& geo, const double dt);
+protected:
+  void output_base (Log&) const;
+public:
   virtual void output (Log&) const = 0;
 
   // Create and Destroy.
