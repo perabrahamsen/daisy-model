@@ -1419,17 +1419,17 @@ tertiary_old${OBJ}: tertiary_old.C tertiary.h model.h symbol.h alist.h \
 biopore_drain${OBJ}: biopore_drain.C biopore.h model.h symbol.h alist.h \
   number.h block.h syntax.h treelog.h plf.h vcheck.h librarian.h \
   submodeler.h assertion.h check.h geometry.h mathlib.h soil.h \
-  soil_heat.h anystate.h
+  soil_heat.h anystate.h chemical.h
 tertiary_biopores${OBJ}: tertiary_biopores.C tertiary.h model.h symbol.h \
   alist.h tertsmall.h biopore.h number.h memutils.h librarian.h block.h \
   syntax.h treelog.h plf.h check.h geometry.h mathlib.h assertion.h \
   soil.h soil_water.h soil_heat.h log.h time.h border.h anystate.h \
-  surface.h uzmodel.h
+  surface.h uzmodel.h chemical.h
 biopore_matrix${OBJ}: biopore_matrix.C biopore.h model.h symbol.h alist.h \
   number.h imvec.h syntax.h treelog.h block.h plf.h vcheck.h librarian.h \
   submodeler.h assertion.h geometry.h mathlib.h soil.h soil_heat.h \
   secondary.h volume_box.h volume.h log.h time.h border.h check.h \
-  anystate.h
+  anystate.h chemical.h
 transport_Mollerup${OBJ}: transport_Mollerup.C transport.h model.h symbol.h \
   alist.h geometry_rect.h geometry_vert.h geometry.h syntax.h treelog.h \
   mathlib.h assertion.h soil.h solver.h log.h time.h border.h \

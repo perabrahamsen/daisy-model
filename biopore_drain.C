@@ -165,7 +165,7 @@ BioporeDrain::matrix_solute (const Geometry& geo, const double dt,
       const double water_sink = S[c]; // [cm^3 W/cm^3 S/h]
       daisy_assert (water_sink >= 0.0);
       const double C = chemical.C_secondary (c); // [g/cm^3 W]
-      S_chem[c] = water_sink * C; // [g/cm^3 S/h]
+      S_chem[c] += water_sink * C; // [g/cm^3 S/h]
     }
 }
 
