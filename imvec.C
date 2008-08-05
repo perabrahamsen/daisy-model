@@ -30,7 +30,7 @@
 #include "block.h"
 
 const std::vector<double>& 
-IMvec::get_value (symbol chem) const
+IMvec::get_array (symbol chem) const
 { 
   map_type::const_iterator i = content.find (chem);
   daisy_assert (i != content.end ());
@@ -38,8 +38,42 @@ IMvec::get_value (symbol chem) const
 }
 
 void
-IMvec::set_value (symbol chem, const std::vector<double>& value)
-{ content[chem] = value; }
+IMvec::set_array (symbol chem, const std::vector<double>& array)
+{ content[chem] = array; }
+
+
+double 
+IMvec::get_value (symbol chem, size_t index) const
+{
+  map_type::const_iterator i = content.find (chem);
+  if  (i == content.end ())
+    return 0.0;
+  
+  const std::vector<double>& array = (*i).second; 
+  if (array.size () > index)
+    return array[index];
+  
+  return 0.0;
+}
+
+void 
+IMvec::add_value (symbol chem, size_t index, double value)
+{
+  const map_type::iterator i = content.find (chem);
+  if (i == content.end ())
+    {
+      std::vector<double> array (index + 1, 0.0);
+      array[index] = value;
+      set_array (chem, array);
+    }
+  else
+    {
+      std::vector<double>& array = (*i).second;
+      while (array.size () < index + 1)
+        array.push_back (0.0);
+      array[index] = value;
+    }
+}
 
 void
 IMvec::output (Log& log) const

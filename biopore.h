@@ -35,6 +35,7 @@ class Soil;
 class SoilHeat;
 class Log;
 class Anystate;
+class Chemical;
 
 class Biopore : public ModelAListed
 {
@@ -84,12 +85,18 @@ public:
                                    const SoilHeat& soil_heat, 
                                    const std::vector<bool>& active,
                                    const double pressure_initiate,
-                                   const std::vector<double>& h) = 0;
-  virtual void add_water (size_t c, double amount /* [cm^3] */) = 0;
-  virtual void update_water () = 0;
+                                   const std::vector<double>& h, 
+                                   const double dt) = 0;
   virtual void add_to_sink (std::vector<double>& S_matrix,
                             std::vector<double>& S_drain) = 0;
-  void add_matrix_water (const Geometry& geo, const double dt);
+  virtual void update_water () = 0;
+  virtual void add_solute (symbol chem, 
+                           size_t cell, double amount /* [g] */) = 0;
+  virtual void matrix_solute (const Geometry& geo, double dt, 
+                              const Chemical& chemical, 
+                              std::vector<double>& S_chem,
+                              Treelog& msg) = 0;
+
 protected:
   void output_base (Log&) const;
 public:

@@ -2,22 +2,15 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Tertiary vand
 
-** Hvorfor bliver små tidsskridt ikke aktiveret
+** solute
 
-** Hvorfor bliver Sigma S ikke 0?
+** en log variable for "al vand" [cm^3].
 
-* tertiary solute transport
+** nedsæt tidskridt
 
-For alle biopore klasser
+** log?
 
-  For alle celler med vand der trænger ind i bioporen
-   
-    Flyt stof til biopore fra matrix med matrix concentration fra begyndelsen af tidsskridtet.
-
-  For alle celler med vand der kommer fra bioporen
-
-    Tilføj stof til matrix med biopore concentration fra slutningen af tidsskridtet.
-    
+** test?
 
 * tertiary vand
 

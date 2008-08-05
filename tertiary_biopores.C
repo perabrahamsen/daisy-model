@@ -34,11 +34,16 @@
 #include "log.h"
 #include "anystate.h"
 #include "surface.h"
+#include "chemical.h"
 #include <sstream>
 
 struct TertiaryBiopores : public Tertiary, public Tertsmall
 {
   // Parameters.
+  const bool enable_solute;
+  const int max_iterations;     // Convergence.
+  const double max_absolute_difference; // [cm]
+  const double max_relative_difference; // []
   const auto_vector<Biopore*> classes; // List of biopore classes.
   const double pressure_initiate;// Pressure needed to init pref.flow [cm]
   const double pressure_end;	 // Pressure after pref.flow has been init [cm]
@@ -47,7 +52,7 @@ struct TertiaryBiopores : public Tertiary, public Tertsmall
 
   // Identity.
   bool has_macropores ()
-  { return true; }
+  { return classes.size () > 0; }
 
   // State.
   std::vector<bool> active;      // Biopore activity 
@@ -82,10 +87,7 @@ struct TertiaryBiopores : public Tertiary, public Tertsmall
 
   // - For use in Richard's Equation.
   Tertsmall& implicit ();
-  void matrix_sink (const Geometry& geo, const Soil& soil,  
-                    const SoilHeat& soil_heat, 
-                    const std::vector<double>& h,
-                    std::vector<double>& S_matrix,
+  void matrix_sink (std::vector<double>& S_matrix,
                     std::vector<double>& S_drain) const;
   
   void update_biopores (const Geometry& geo, 
@@ -106,8 +108,7 @@ struct TertiaryBiopores : public Tertiary, public Tertsmall
   void solute (const Geometry&, const SoilWater&,
                const std::map<size_t, double>& J_tertiary,
                const double /* dt */,
-               Chemical&, Treelog&)
-  { /* TODO */ }
+               Chemical&, Treelog&);
 
   // - Output.
   void output (Log&) const;
@@ -126,10 +127,8 @@ TertiaryBiopores::get_state () const
   const size_t classes_size = classes.size ();
   std::vector<Anystate> biopore_state;
   for (size_t b = 0; b < classes_size; b++)
-    {
-      const Biopore& biopore = *classes[b];
-      biopore_state.push_back (biopore.get_state ());
-    }
+    biopore_state.push_back (classes[b]->get_state ());
+
   std::auto_ptr<Anystate::Content> copy (new MyContent (biopore_state));
   return Anystate (copy);
 }
@@ -141,25 +140,21 @@ TertiaryBiopores::set_state (const Anystate& state)
   const size_t classes_size = classes.size ();
   daisy_assert (classes_size == content.states.size ());
   for (size_t b = 0; b < classes_size; b++)
-    {
-      Biopore& biopore = *classes[b];
-      biopore.set_state (content.states[b]);
-    }
+    classes[b]->set_state (content.states[b]);
 }
 
 bool 
 TertiaryBiopores::converge (const Anystate& state)
 {  
-  const double max_abs = 0.0002;
-  const double max_rel = 0.00001;
-
   const MyContent& content = static_cast<const MyContent&> (state.inspect ());
   const size_t classes_size = classes.size ();
   daisy_assert (classes_size == content.states.size ());
   for (size_t b = 0; b < classes_size; b++)
     {
       Biopore& biopore = *classes[b];
-      if (!biopore.converge (content.states[b], max_abs, max_rel))
+      if (!biopore.converge (content.states[b], 
+                             max_absolute_difference, 
+                             max_relative_difference))
         return false;
     }
   return true;
@@ -343,12 +338,12 @@ TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
     }
   
   // Limit sink.
-  matrix_sink (geo, soil, soil_heat, h, S_matrix, S_drain);
+  matrix_sink (S_matrix, S_drain);
   for (size_t c = 0; c < cell_size; c++)
     {
       const double Theta_loss = (S_drain[c] + S_matrix[c]) * ddt;
       if (Theta_loss <= 0.01)
-        // Less than one percent, deal with it.
+        // Less than one percent, ignore it.
         continue;
       const double Theta = soil_water.Theta (c);
       const double h_ice = soil_water.h_ice (c);
@@ -369,7 +364,7 @@ TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
   if (!find_implicit_water (old_state, geo, soil, soil_heat, h, ddt))
     // Making timestep shorter should not prevent us from finding a solution.
     daisy_notreached ();
-  matrix_sink (geo, soil, soil_heat, h, S_matrix, S_drain);
+  matrix_sink (S_matrix, S_drain);
 
   // Scale sink with timestep.
   const double scale = ddt / dt;
@@ -401,22 +396,13 @@ TertiaryBiopores::implicit ()
 }
 
 void 
-TertiaryBiopores::matrix_sink (const Geometry& geo, 
-                               const Soil& soil,  
-                               const SoilHeat& soil_heat, 
-                               const std::vector<double>& h,
-                               std::vector<double>& S_matrix,
+TertiaryBiopores::matrix_sink (std::vector<double>& S_matrix,
                                std::vector<double>& S_drain) const
 {
   std::fill (S_matrix.begin (), S_matrix.end (), 0.0);
   std::fill (S_drain.begin (), S_drain.end (), 0.0);
   for (size_t b = 0; b < classes.size (); b++)
-    {
-      Biopore& biopore = *classes[b];
-      biopore.update_matrix_sink (geo, soil, soil_heat,
-                                  active, pressure_initiate, h);
-      biopore.add_to_sink (S_matrix, S_drain);
-    }
+    classes[b]->add_to_sink (S_matrix, S_drain);
 }
 
 void 
@@ -427,12 +413,8 @@ TertiaryBiopores::update_biopores (const Geometry& geo,
                                    const double dt) 
 {
   for (size_t b = 0; b < classes.size (); b++)
-    {
-      Biopore& biopore = *classes[b];
-      biopore.update_matrix_sink (geo, soil, soil_heat,
-                                  active, pressure_initiate, h);
-      biopore.add_matrix_water (geo, dt);
-    }
+    classes[b]->update_matrix_sink (geo, soil, soil_heat,
+                                    active, pressure_initiate, h, dt);
 }
 
 void
@@ -452,8 +434,7 @@ TertiaryBiopores::find_implicit_water (const Anystate& old_state,
 {
   // Reset water content to begining of timestep.
   set_state (old_state);
-  const int max_iter = 12;
-  for (int iter = 0; iter < max_iter; iter++)
+  for (int iter = 0; iter < max_iterations; iter++)
     {
       const Anystate new_state = get_state ();
       // Find added water with "new water content".
@@ -492,6 +473,69 @@ TertiaryBiopores::update_active (const std::vector<double>& h)
             }
         }
     }
+}
+
+void 
+TertiaryBiopores::solute (const Geometry& geo, const SoilWater& soil_water,
+                          const std::map<size_t, double>& J_tertiary,
+                          const double dt,
+                          Chemical& chemical, Treelog& msg)
+{
+  if (!enable_solute)
+    return;
+  const symbol chem = chemical.name;
+  // Surface infiltration.
+  const size_t edge_size = geo.edge_size ();
+  std::vector<double> J_chem (edge_size, 0.0);
+  const std::vector<size_t>& edge_above = geo.cell_edges (Geometry::cell_above);
+  const size_t edge_above_size = edge_above.size ();
+
+  for (size_t i = 0; i < edge_above_size; i++)
+    {
+      const size_t edge = edge_above[i];
+      const size_t cell = geo.edge_other (edge, Geometry::cell_above);
+      std::map<size_t, double>::const_iterator p = J_tertiary.find (edge);
+      if (p == J_tertiary.end ())
+        continue;               // Nothing to do.
+
+      // Store it.
+      J_chem[edge] = p->second;
+
+      // Find total amount.
+      const double in_sign 
+        = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
+      const double J_in = p->second * in_sign; // [g/cm^2/h]
+      const double area = geo.edge_area (edge); // [cm^2]
+      const double total_in = J_in * area * dt; // [g]
+      daisy_assert (total_in >= 0.0); // No mass flux out.
+      if (total_in < 1e-100)
+        continue;               // Nothing to see here, move along.
+
+      // Find total macropore density.
+      double total_density = 0.0;
+      const size_t classes_size = classes.size ();
+      for (size_t b = 0; b < classes_size; b++)
+        total_density += classes[b]->density (cell);
+      daisy_assert (total_density > 0.0);
+
+      // Give each class its share.
+      for (size_t b = 0; b < classes.size (); b++)
+        {
+          Biopore& biopore = *classes[b];
+          const double density = biopore.density (cell);
+          const double share = total_in * density / total_density;
+          biopore.add_solute (chem, cell, share);
+        }
+    }
+
+  // Matrix exchange.
+  const size_t cell_size = geo.cell_size ();
+  std::vector<double> S_chem (cell_size, 0.0); // [g/cm^3 S/h]
+  for (size_t b = 0; b < classes.size (); b++)
+    classes[b]->matrix_solute (geo, dt, chemical, S_chem, msg);
+
+  // Make it official.
+  chemical.set_tertiary (S_chem, J_chem);
 }
 
 void 
@@ -536,6 +580,10 @@ TertiaryBiopores::check (const Geometry& geo, Treelog& msg) const
 
 TertiaryBiopores::TertiaryBiopores (Block& al)
   : Tertiary (al),
+    enable_solute (al.flag ("enable_solute")),
+    max_iterations (al.integer ("max_iterations")),
+    max_absolute_difference (al.number ("max_absolute_difference")),
+    max_relative_difference (al.number ("max_relative_difference")),
     classes (Librarian::build_vector<Biopore> (al, "classes")),
     pressure_initiate (al.number ("pressure_initiate")),
     pressure_end (al.number ("pressure_end")),
@@ -557,6 +605,19 @@ static struct TertiaryBioporesSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Tertiary domain divided into biopore classes.");
 
+    syntax.add ("enable_solute", Syntax::Boolean, Syntax::Const, "\
+fTrue iff solutes should be transport with the water through the biopores.");
+    alist.add ("enable_solute", true);
+    syntax.add ("max_iterations", Syntax::Integer, Syntax::Const, "\
+Maximum number of iterations when seeking convergence before reducing\n\
+the time step.");
+    alist.add ("max_iterations", 25);
+    syntax.add ("max_absolute_difference", "cm", Syntax::Const, "\
+Maximum absolute difference in biopore content for convergence.");
+    alist.add ("max_absolute_difference", 0.02);
+    syntax.add ("max_relative_difference", Syntax::None (), Syntax::Const, "\
+Maximum relative difference in biopore content for convergence.");
+    alist.add ("max_relative_difference", 0.001);
     syntax.add_object ("classes", Biopore::component, 
                        Syntax::State, Syntax::Sequence,
                        "List of biopore classes.");

@@ -29,6 +29,7 @@
 #include "soil.h"
 #include "soil_heat.h"
 #include "anystate.h"
+#include "chemical.h"
 #include <sstream>
 
 // The 'drain' model.
@@ -68,9 +69,7 @@ struct BioporeDrain : public Biopore
                            const SoilHeat& soil_heat, 
                            const std::vector<bool>& active,
                            const double pressure_initiate,
-                           const std::vector<double>& h);
-  void add_water (size_t c, double amount /* [cm^3] */)
-  { }
+                           const std::vector<double>& h, const double dt);
   void update_water ()
   { }
   void add_to_sink (std::vector<double>&,
@@ -81,6 +80,11 @@ struct BioporeDrain : public Biopore
     for (size_t c = 0; c < cell_size; c++)
       S_drain[c] += S[c];
   }
+  void add_solute (symbol, size_t, const double)
+  { }
+  void matrix_solute (const Geometry& geo, const double dt, 
+                      const Chemical& chemical, std::vector<double>& S_chem,
+                      Treelog& msg);
   void output (Log& log) const
   { output_base (log); }
 
@@ -130,7 +134,8 @@ BioporeDrain::update_matrix_sink (const Geometry& geo,
                                   const SoilHeat& soil_heat, 
                                   const std::vector<bool>& active,
                                   const double pressure_initiate,
-                                  const std::vector<double>& h)
+                                  const std::vector<double>& h, 
+                                  const double /* dt */)
 {
   const size_t cell_size = geo.cell_size ();
   for (size_t c = 0; c < cell_size; c++)
@@ -141,6 +146,26 @@ BioporeDrain::update_matrix_sink (const Geometry& geo,
       const double K_zz = soil.K (c, h_cond, h_ice, T);
       const double K_xx = K_zz * soil.anisotropy (c);
       S[c] = matrix_biopore_drain (c, geo, soil, active[c], K_xx, h[c]);
+    }
+}
+
+void 
+BioporeDrain::matrix_solute (const Geometry& geo, const double dt, 
+                             const Chemical& chemical, 
+                             std::vector<double>& S_chem,
+                             Treelog& msg)
+{
+  const symbol chem = chemical.name;
+  const size_t cell_size = geo.cell_size ();
+  daisy_assert (S_chem.size () == cell_size);
+  
+  // From matrix to biopore.
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      const double water_sink = S[c]; // [cm^3 W/cm^3 S/h]
+      daisy_assert (water_sink >= 0.0);
+      const double C = chemical.C_secondary (c); // [g/cm^3 W]
+      S_chem[c] = water_sink * C; // [g/cm^3 S/h]
     }
 }
 

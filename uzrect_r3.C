@@ -351,8 +351,7 @@ UZRectr3::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
               break;
             }
                           
-          tertiary.matrix_sink (geo, soil, soil_heat, h_std, 
-                                S_matrix, S_drain);
+          tertiary.matrix_sink (S_matrix, S_drain);
       
 
           for (size_t cell = 0; cell != cell_size ; ++cell) 

@@ -110,14 +110,6 @@ Biopore::biopore_to_matrix (double R_wall, double M_c, double r_c,
 }
 
 void 
-Biopore::add_matrix_water (const Geometry& geo, const double dt)
-{
-  const size_t cell_size = geo.cell_size ();
-  for (size_t c = 0; c < cell_size; c++)
-    add_water (c, S[c] * dt * geo.cell_volume (c));
-}
-
-void 
 Biopore::output_base (Log& log) const
 {
   output_variable (S, log);

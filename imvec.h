@@ -42,8 +42,10 @@ private:
 
   // Accessors.
 public:
-  const std::vector<double>& get_value (symbol chem) const;
-  void set_value (symbol chem, const std::vector<double>& value);
+  const std::vector<double>& get_array (symbol chem) const;
+  void set_array (symbol chem, const std::vector<double>& value);
+  double get_value (symbol chem, size_t index) const;
+  void add_value (symbol chem, size_t index, double value);
 
   // Iterate.
 public:

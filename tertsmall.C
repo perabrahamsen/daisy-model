@@ -35,10 +35,7 @@ Tertsmall::none ()
     { }
     bool converge (const Anystate&)
     { return true; }
-    void matrix_sink (const Geometry& geo, const Soil& soil,  
-                      const SoilHeat& soil_heat, 
-                      const std::vector<double>& h,
-                      std::vector<double>& S_matrix,
+    void matrix_sink (std::vector<double>& S_matrix,
                       std::vector<double>& S_drain) const
     { }
     bool find_implicit_water (const Anystate& old_state, 
