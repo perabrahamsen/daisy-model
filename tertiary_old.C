@@ -84,7 +84,6 @@ TertiaryOld::tick (const Geometry& geo, const Soil& soil,
   this->tick_water (geo, soil, soil_water, soil_heat, dt, surface,
                     S_drain, S_matrix, q_tertiary, msg);
   soil_water.drain (S_drain);
-  soil_water.add_tertiary_sink (S_drain);
   soil_water.add_tertiary_sink (S_matrix);
   soil_water.set_tertiary_flux (q_tertiary);
 }

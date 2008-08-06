@@ -382,7 +382,6 @@ TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
 
   // Make it official.
   soil_water.add_tertiary_sink (S_matrix);
-  soil_water.add_tertiary_sink (S_drain);
   soil_water.drain (S_drain);
 }
 
