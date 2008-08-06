@@ -57,7 +57,7 @@
   (require_top true)
   (input "Precipitation" "Irrigation")
   (output "Actual evapotranspiration"
-          "Matrix percolation" "Biopore percolation"
+          "Matrix percolation" "Tertiary"
           "Drain flow" "Runoff")
   (content "Soil water" "Surface water"))
 
@@ -111,11 +111,9 @@ It can be negative if there are cabilary raise.")
                         (handle sum)
                         (negate true)
                         (dimension "mm/&"))
-           (interval (tag "Biopore percolation")
+           (interval (tag "Tertiary")
                      (description "\
-Net amount of water leaving the soil matrix to the biopores.
-
-This may be zero if the same amount of water enters and leaves the interval.")
+Net amount of water leaving the system through the biopores.")
                      (path column "${column}" SoilWater S_p)
                      (spec fixed SoilWater S_p)
                      (handle sum)
