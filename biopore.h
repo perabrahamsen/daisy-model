@@ -87,14 +87,15 @@ public:
                                    const double pressure_initiate,
                                    const std::vector<double>& h, 
                                    const double dt) = 0;
+  void scale_sink (double scale);
   virtual void add_to_sink (std::vector<double>& S_matrix,
-                            std::vector<double>& S_drain) = 0;
+                            std::vector<double>& S_drain) const = 0;
   virtual void update_water () = 0;
   virtual void add_solute (symbol chem, 
                            size_t cell, double amount /* [g] */) = 0;
   virtual void matrix_solute (const Geometry& geo, double dt, 
                               const Chemical& chemical, 
-                              std::vector<double>& S_chem,
+                              std::vector<double>& source_chem,
                               Treelog& msg) = 0;
 
 protected:

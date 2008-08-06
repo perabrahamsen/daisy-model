@@ -100,11 +100,11 @@ struct BioporeMatrix : public Biopore
                            const double dt);
   void add_water (size_t c, double amount /* [cm^3] */);
   void update_water ();
-  double column_water (const size_t col);
-  void add_to_sink (std::vector<double>& S_matrix, std::vector<double>&);
+  double column_water (const size_t col) const;
+  void add_to_sink (std::vector<double>& S_matrix, std::vector<double>&) const;
   void add_solute (symbol chem, size_t cell, const double amount /* [g] */);
   void matrix_solute (const Geometry& geo, const double dt, 
-                      const Chemical& chemical, std::vector<double>& S_chem,
+                      const Chemical& chemical, std::vector<double>& source_chem,
                       Treelog& msg);
   void output (Log&) const;
 
@@ -276,7 +276,7 @@ BioporeMatrix::update_water ()
 }
 
 double
-BioporeMatrix::column_water (const size_t col)
+BioporeMatrix::column_water (const size_t col) const
 {
   daisy_assert (col < xplus.size ());
   const double xminus = (col == 0) ? 0.0 : xplus[col-1]; // [cm]
@@ -293,7 +293,7 @@ BioporeMatrix::column_water (const size_t col)
 
 void 
 BioporeMatrix::add_to_sink (std::vector<double>& S_matrix,
-                            std::vector<double>&)
+                            std::vector<double>&) const
 {
   const size_t cell_size = S.size ();
   daisy_assert (S_matrix.size () == cell_size);
@@ -313,13 +313,14 @@ BioporeMatrix::add_solute (const symbol chem,
 void 
 BioporeMatrix::matrix_solute (const Geometry& geo, const double dt, 
                               const Chemical& chemical,
-                              std::vector<double>& S_chem_total,
+                              std::vector<double>& source_chem,
                               Treelog& msg)
 {
+  TREELOG_MODEL (msg);
   const symbol chem = chemical.name;
   const size_t cell_size = geo.cell_size ();
-  daisy_assert (S_chem_total.size () == cell_size);
-  std::vector<double> S_chem (cell_size, 0.0);
+  daisy_assert (source_chem.size () == cell_size);
+  std::vector<double> sink_chem (cell_size, 0.0);
 
   // Water that left each column.
   const size_t column_size = xplus.size ();
@@ -345,7 +346,7 @@ BioporeMatrix::matrix_solute (const Geometry& geo, const double dt,
       const double C = chemical.C_secondary (c); // [g/cm^3 W]
 
       // Add to solute sink.
-      S_chem[c] = water_sink * C; // [g/cm^3 S/h]
+      sink_chem[c] = water_sink * C; // [g/cm^3 S/h]
 
       // Add to biopore.
       const double M = C * water; // [g]
@@ -366,23 +367,23 @@ BioporeMatrix::matrix_solute (const Geometry& geo, const double dt,
         = column_water (col) + water_left[col];
       const double M = solute->get_value (chem, col);
       const double C = M / total_water; // [g/cm^3 W]
-      S_chem[c] = water_sink * C;
+      sink_chem[c] = water_sink * C;
     }
 
   // Remove from biopores.
   for (size_t c = 0; c < cell_size; c++)
     {
-      if (S_chem[c] >= 0.0)
+      if (sink_chem[c] >= 0.0)
         continue;
 
       const double cell_volume = geo.cell_volume (c); // [cm^3 S]
-      const double M = S_chem[c] * cell_volume * dt;  // [g]
+      const double M = sink_chem[c] * cell_volume * dt;  // [g]
       add_solute (chem, c, M);
     }
 
   // Export.
   for (size_t c = 0; c < cell_size; c++)
-    S_chem_total[c] += S_chem[c];
+    source_chem[c] -= sink_chem[c];
 }
 
 void

@@ -1023,3 +1023,5 @@ This includes dry matter incorporated directly in the soil.");
     Librarian::add_type (Column::component, "default", alist, syntax, &make);
   }
 } column_syntax;
+
+// column_std.C ends here.

@@ -364,21 +364,15 @@ TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
   if (!find_implicit_water (old_state, geo, soil, soil_heat, h, ddt))
     // Making timestep shorter should not prevent us from finding a solution.
     daisy_notreached ();
-  matrix_sink (S_matrix, S_drain);
 
   // Scale sink with timestep.
   const double scale = ddt / dt;
   if (!approximate (scale, 1.0))
     {
-      for (size_t c = 0; c < cell_size; c++)
-        {
-          S_drain[c] *= scale;
-          S_matrix[c] *= scale;
-        }
-      std::ostringstream tmp;
-      tmp << "Using timestep " << ddt << " for tertiary transport";
-      msg.message (tmp.str ());
+      for (size_t b = 0; b < classes.size (); b++)
+        classes[b]->scale_sink (scale);
     }
+  matrix_sink (S_matrix, S_drain);
 
   // Make it official.
   soil_water.add_tertiary_sink (S_matrix);
@@ -459,7 +453,12 @@ TertiaryBiopores::update_active (const std::vector<double>& h)
       if (active[c])    // Biopore is active 
         {
           if (h[c] < pressure_end)
-            active[c] = false;
+            {
+              active[c] = false;
+              std::ostringstream tmp;
+              tmp << "h[" << c << "] = " << h[c] << ", deactivated";
+              Assertion::message (tmp.str ());
+            }
         }
       else              // Biopore is not active 
         {
@@ -467,7 +466,7 @@ TertiaryBiopores::update_active (const std::vector<double>& h)
             {
               active[c] = true;
               std::ostringstream tmp;
-              tmp << "h[" << c << "] > " << pressure_initiate;
+              tmp << "h[" << c << "] = " << h[c] << ", activated";
               Assertion::message (tmp.str ());
             }
         }
@@ -529,12 +528,12 @@ TertiaryBiopores::solute (const Geometry& geo, const SoilWater& soil_water,
 
   // Matrix exchange.
   const size_t cell_size = geo.cell_size ();
-  std::vector<double> S_chem (cell_size, 0.0); // [g/cm^3 S/h]
+  std::vector<double> source_chem (cell_size, 0.0); // [g/cm^3 S/h]
   for (size_t b = 0; b < classes.size (); b++)
-    classes[b]->matrix_solute (geo, dt, chemical, S_chem, msg);
+    classes[b]->matrix_solute (geo, dt, chemical, source_chem, msg);
 
   // Make it official.
-  chemical.set_tertiary (S_chem, J_chem);
+  chemical.set_tertiary (source_chem, J_chem);
 }
 
 void 

@@ -1,7 +1,12 @@
 2008-08-06  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* lib/log-std.dai: Update solute logs to refer to work with
+	tertiary biopores.
+
 	* Version 4.37 released.
 
+	* all: Work on tertiary biopores.
+	
 2008-07-15  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.36 released.

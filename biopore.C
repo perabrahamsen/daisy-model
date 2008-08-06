@@ -110,6 +110,14 @@ Biopore::biopore_to_matrix (double R_wall, double M_c, double r_c,
 }
 
 void 
+Biopore::scale_sink (const double scale)
+{
+  const size_t cell_size = S.size ();
+  for (size_t c = 0; c < cell_size; c++)
+    S[c] *= scale;
+}
+
+void 
 Biopore::output_base (Log& log) const
 {
   output_variable (S, log);

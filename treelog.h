@@ -73,4 +73,8 @@ public:
   virtual ~Treelog ();
 };
 
+#define TREELOG_MODEL(msg) \
+  Treelog::Open nest (msg, this->library_id () + ": " + this->name \
+                      + " " + __FUNCTION__)
+
 #endif // TREELOG_H

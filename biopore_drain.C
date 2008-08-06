@@ -73,7 +73,7 @@ struct BioporeDrain : public Biopore
   void update_water ()
   { }
   void add_to_sink (std::vector<double>&,
-                    std::vector<double>& S_drain)
+                    std::vector<double>& S_drain) const
   {
     const size_t cell_size = S.size ();
     daisy_assert (S_drain.size () == cell_size);
@@ -82,9 +82,10 @@ struct BioporeDrain : public Biopore
   }
   void add_solute (symbol, size_t, const double)
   { }
-  void matrix_solute (const Geometry& geo, const double dt, 
-                      const Chemical& chemical, std::vector<double>& S_chem,
-                      Treelog& msg);
+  void matrix_solute (const Geometry&, const double, 
+                      const Chemical&, std::vector<double>&,
+                      Treelog&)
+  { /* Handled by S_drain. */ }
   void output (Log& log) const
   { output_base (log); }
 
@@ -149,25 +150,52 @@ BioporeDrain::update_matrix_sink (const Geometry& geo,
     }
 }
 
+template <class T>
+std::string stringify (const T& x)
+{
+  std::ostringstream tmp;
+  tmp << x;
+  return tmp.str ();
+}
+
+#define TREELOG_INDEX(msg, key, index) \
+  Treelog::Open nest (msg, stringify (key) + " = " + stringify (index))
+
+#define TREELOG_MODEL1(msg) \
+  Treelog::Open nest (msg, this->library_id () + ": " + this->name \
+                      + " " + __FUNCTION__)
+
+#if 0
 void 
 BioporeDrain::matrix_solute (const Geometry& geo, const double dt, 
                              const Chemical& chemical, 
-                             std::vector<double>& S_chem,
+                             std::vector<double>& source_chem,
                              Treelog& msg)
 {
+  TREELOG_MODEL1 (msg);
   const symbol chem = chemical.name;
   const size_t cell_size = geo.cell_size ();
-  daisy_assert (S_chem.size () == cell_size);
+  daisy_assert (source_chem.size () == cell_size);
   
   // From matrix to biopore.
   for (size_t c = 0; c < cell_size; c++)
     {
+      TREELOG_INDEX (msg, "cell", c);
       const double water_sink = S[c]; // [cm^3 W/cm^3 S/h]
       daisy_assert (water_sink >= 0.0);
       const double C = chemical.C_secondary (c); // [g/cm^3 W]
-      S_chem[c] += water_sink * C; // [g/cm^3 S/h]
+      source_chem[c] -= water_sink * C; // [g/cm^3 S/h]
+      if (!iszero (source_chem[c]))
+        {
+          std::stringstream tmp;
+          tmp << "soruce_chem = " << source_chem[c] << ", S = " << S[c] 
+              << ", C = " << C;
+          msg.message (tmp.str ());
+        }
     }
+
 }
+#endif
 
 BioporeDrain::BioporeDrain (Block& al)
   : Biopore (al),
