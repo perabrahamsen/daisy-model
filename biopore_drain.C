@@ -48,6 +48,8 @@ struct BioporeDrain : public Biopore
   { return true; }
 
   // Simulation.
+  double total_water () const
+  { return 0.0; }
   double air_bottom (size_t) const    // Lowest point with air [cm]
   { return pipe_position; }
   

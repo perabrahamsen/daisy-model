@@ -78,6 +78,7 @@ struct BioporeMatrix : public Biopore
     daisy_assert (col < h_bottom.size ());
     return height_end + h_bottom[col]; 
   }
+  double total_water () const;
 
   // Simulation.
   double capacity (const Geometry& geo, size_t e, const double dt /* [h] */)
@@ -157,6 +158,28 @@ BioporeMatrix::converge (const Anystate& state,
     }
 
   return true; 
+}
+
+double 
+BioporeMatrix::total_water () const
+{
+  const size_t col_size = xplus.size ();
+  double xminus = 0.0;
+  double total = 0.0;
+  for (size_t col = 0; col < col_size; col++)
+    {
+      const double density = density_column[col]; // [cm^-2]
+      const double radius = diameter / 2.0;       // [cm]
+      const double area = radius * radius * M_PI; // [cm^2]
+      const double soil_fraction = density * area; // []
+      const double dz = h_bottom[col]; // [cm]
+      const double dx = xplus[col] - xminus; // [cm]
+      const double soil_volume = dz * dx * dy; // [cm^3]
+      const double water_volume = soil_volume * soil_fraction; // [cm^3]
+      total += water_volume;
+      xminus = xplus[col];
+    }
+  return total;
 }
 
 double 
@@ -392,6 +415,7 @@ BioporeMatrix::output (Log& log) const
   output_base (log);
   output_variable (h_bottom, log);
   output_submodule (*solute, "solute", log);
+  output_lazy (total_water (), "water", log);
 }
 
 bool 
@@ -512,10 +536,10 @@ Resistance for water moving from biopore through wall to secondary domain.\n\
 If not specified, this will be identical to 'R_primary'.");
     syntax.add ("h_bottom", "cm", Syntax::OptionalState, Syntax::Sequence,
                 "Pressure at the bottom of the biopores in each interval.");
-
     static const symbol C_unit ("g");
     IMvec::add_syntax (syntax, alist, Syntax::OptionalState, "solute", C_unit,
                        "Chemical concentration in biopore intervals.");
+    syntax.add ("water", "cm^3", Syntax::LogOnly, "Water content.");    
 
     Librarian::add_type (Biopore::component, "matrix", alist, syntax, &make);
   }

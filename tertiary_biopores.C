@@ -111,6 +111,7 @@ struct TertiaryBiopores : public Tertiary, public Tertsmall
                Chemical&, Treelog&);
 
   // - Output.
+  double total_water () const;  // [cm^3]
   void output (Log&) const;
   
   // Create and Destroy.
@@ -536,11 +537,21 @@ TertiaryBiopores::solute (const Geometry& geo, const SoilWater& soil_water,
   chemical.set_tertiary (source_chem, J_chem);
 }
 
+double
+TertiaryBiopores::total_water () const
+{
+  double total = 0.0;
+  for (size_t b = 0; b < classes.size (); b++)
+    total += classes[b]->total_water ();
+  return total;
+}
+  
 void 
 TertiaryBiopores::output (Log& log) const
 {
   output_list (classes, "classes", log, Biopore::component); 
   // TODO: output_variable (active, log);
+  output_lazy (total_water (), "water", log);
 }
 
 
@@ -634,6 +645,8 @@ After macropores are activated pond will have this height.");
     alist.add ("use_small_timesteps", true);
     syntax.add ("active", Syntax::Boolean, Syntax::OptionalState,
                 Syntax::Sequence, "Active biopores in cells.");
+    syntax.add ("water", "cm^3", Syntax::LogOnly, "Water content.");    
+
     Librarian::add_type (Tertiary::component, "biopores", alist, syntax, &make);
   }
 } TertiaryBiopores_syntax;

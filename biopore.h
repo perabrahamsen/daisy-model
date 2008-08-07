@@ -74,6 +74,7 @@ protected:
 
   // Interface.
 public:
+  virtual double total_water () const = 0;
   double density (const size_t c) const
   { return density_cell[c]; }
   virtual double capacity (const Geometry&, size_t e, double dt) 
