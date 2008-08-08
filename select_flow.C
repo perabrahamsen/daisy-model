@@ -122,9 +122,9 @@ SelectFlow::output_array (const std::vector<double>& array,
       for (size_t e = 0; e < size; e++)
         {
           const int from = geo->edge_from (e);
-          const bool from_inside = geo->node_center_in_volume (from, *volume);
+          const bool from_inside = geo->cell_center_in_volume (from, *volume);
           const int to = geo->edge_to (e);
-          const bool to_inside = geo->node_center_in_volume (to, *volume);
+          const bool to_inside = geo->cell_center_in_volume (to, *volume);
           if (from_inside)
             {
               if (to_inside)
