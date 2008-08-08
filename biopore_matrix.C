@@ -232,14 +232,23 @@ BioporeMatrix::matrix_biopore_matrix (size_t c, const Geometry& geo,
   const double M_c = density_column[col]; // [cm^-2]
   const double r_c = diameter / 2.0; // [cm]
   const double cell_z = geo.cell_z (c); // [cm]
-  const double h_3 = air_bottom (c) - geo.cell_z (c); // [cm]
+  const double z_air = air_bottom (c);
+  const double h_3 = z_air - cell_z; // [cm]
   const double low_point = geo.cell_bottom (c); // [cm]
-  const double h3_min = low_point - geo.cell_z (c); // [cm]
+  const double h3_min = low_point - cell_z; // [cm]
   daisy_assert (h3_min < 0.0);
 
   double S; 
   if (h_bottom[col] > 0.0 && h_3>h3_min && h_3>h)
-    S = -biopore_to_matrix (R_wall, M_c, r_c, h, h_3);
+    {
+      const double high_point = geo.cell_top (c);
+      double wall_fraction;
+      if (z_air < high_point)
+        wall_fraction = (z_air - low_point) /(high_point - low_point);
+      else 
+        wall_fraction = 1.0;      
+      S = - wall_fraction * biopore_to_matrix (R_wall, M_c, r_c, h, h_3);
+    }
   else if (active && h>h_3)
     S = matrix_to_biopore (K_xx, M_c, r_c, h, h_3);
   else 

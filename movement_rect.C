@@ -38,6 +38,8 @@
 #include "submodeler.h"
 #include "tertiary.h"
 #include "librarian.h"
+#include "anystate.h"
+#include "tertsmall.h"
 
 struct MovementRect : public MovementSolute
 {
@@ -224,6 +226,7 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
   for (size_t i = 0; i < matrix_water.size (); i++)
     {
       Treelog::Open nest (msg, matrix_water[i]->name);
+      Anystate old_tertiary = tertiary->implicit ().get_state ();
       try
         {
           matrix_water[i]->tick (*geo, drain_cell, soil, soil_water, soil_heat,
@@ -240,6 +243,7 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
         {
           msg.warning (std::string ("UZ trouble: ") + error);
         }
+      tertiary->implicit ().set_state (old_tertiary);
     }
   throw "Matrix water transport failed";
 

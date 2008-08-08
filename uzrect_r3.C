@@ -348,13 +348,13 @@ UZRectr3::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
           if (!tertiary.find_implicit_water (h3_previous, 
                                              geo, soil, soil_heat, h_std, ddt))
             {  //We need smaller timesteps
+              
               iterations_used = max_iterations + 1;
               break;
             }
-                          
+                                    
           tertiary.matrix_sink (S_matrix, S_drain);
-      
-
+          
           for (size_t cell = 0; cell != cell_size ; ++cell) 
             {				
               S_macro (cell) = (S_matrix[cell] + S_drain[cell]) 
@@ -407,11 +407,12 @@ UZRectr3::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	}
       while (!converges (h_conv, h)
 	     && iterations_used <= max_iterations);
+      
 
       if (iterations_used > max_iterations)
 	{
-	  number_of_time_step_reductions++;
-
+          number_of_time_step_reductions++;
+          
 	  if (number_of_time_step_reductions > max_time_step_reductions)
 	    throw "Could not find solution";
 
@@ -422,7 +423,7 @@ UZRectr3::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	}
       else
 	{
-	  // Update dq for new h.
+          // Update dq for new h.
 	  ublas::banded_matrix<double>  Dm_mat (cell_size, cell_size, 
                                                 0, 0); // Dir bc
 	  Dm_mat = ublas::zero_matrix<double> (cell_size, cell_size);
