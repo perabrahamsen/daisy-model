@@ -176,7 +176,7 @@ Geometry::edge_cross_z (const size_t e, const double zd) const
 }
 
 bool 
-Geometry::node_center_in_volume (int c, const Volume& volume) const
+Geometry::cell_center_in_volume (int c, const Volume& volume) const
 {
   if (!cell_is_internal (c))
     return false;

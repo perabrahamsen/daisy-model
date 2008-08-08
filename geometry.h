@@ -70,6 +70,8 @@ public:
   virtual double cell_y (size_t) const 
   { return 0.5; }
   double y_safe (int) const;    // Same, handles cell_front and cell_back.
+  virtual double cell_bottom (size_t) const = 0; // Lowest point in cell [cm]
+  virtual double cell_top (size_t) const = 0; // Highest point in cell [cm]
   virtual double cell_volume (size_t) const = 0; // Cell volume [cm^3]
   virtual size_t cell_at (double z, double x, double y) const = 0;
   virtual double fraction_in_z_interval (// The fraction of a cell
@@ -88,7 +90,7 @@ public:
                                                          // includes width z
   virtual bool contain_y (size_t n, double y) const = 0; // True iff cell n
                                                          // includes length y
-  bool node_center_in_volume (int c, const Volume& volume) const;
+  bool cell_center_in_volume (int c, const Volume& volume) const;
 protected:
   size_t cell_pseudo_size () const // Add top, bottom, left, right, front, back
   { return cell_size () + 6U; }

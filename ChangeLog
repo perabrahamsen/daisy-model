@@ -1,3 +1,9 @@
+2008-08-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* geometry.h (cell_bottom, cell_top): New pure virtual members.
+	* geometry_vert.h: Implement them.
+	* biopore_matrix.C (matrix_biopore_matrix): Use them.
+
 2008-08-06  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* lib/log-std.dai: Update solute logs to refer to work with

@@ -229,22 +229,12 @@ BioporeMatrix::matrix_biopore_matrix (size_t c, const Geometry& geo,
   const bool use_primary = secondary.none ();
   const double R_wall = use_primary ? R_primary : R_secondary; // [h]  
   const size_t col = column[c];
-  const double M_c = density_column[col];
-  const double r_c = diameter / 2.0;
-  const double h_3 = air_bottom (c) - geo.cell_z (c);
-  
-  // Find lowest edge in cell.
-  double low_edge = geo.cell_z (c);
-  const std::vector<size_t> cell_edges = geo.cell_edges (c);
-  const size_t cell_edges_size = cell_edges.size ();
-  for (size_t i = 0; i < cell_edges_size; i++)
-    {
-      const size_t edge = cell_edges[i];
-      const double z_edge = geo.edge_center_z (edge);
-      if (z_edge < low_edge)
-        low_edge = z_edge;
-    }
-  const double h3_min = low_edge - geo.cell_z (c);
+  const double M_c = density_column[col]; // [cm^-2]
+  const double r_c = diameter / 2.0; // [cm]
+  const double cell_z = geo.cell_z (c); // [cm]
+  const double h_3 = air_bottom (c) - geo.cell_z (c); // [cm]
+  const double low_point = geo.cell_bottom (c); // [cm]
+  const double h3_min = low_point - geo.cell_z (c); // [cm]
   daisy_assert (h3_min < 0.0);
 
   double S; 

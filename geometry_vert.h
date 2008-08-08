@@ -44,6 +44,11 @@ public:
   inline double dz (size_t n) const
   { return dz_[n]; }
   virtual double zminus (size_t n) const = 0;
+  double cell_bottom (size_t n) const // Lowest point in cell [cm]
+  { return zplus (n); }
+  double cell_top (size_t n) const // Highest point in cell [cm]
+  { return zminus (n); }
+
   bool contain_z (size_t i, double z) const;
 
   // Creation.
