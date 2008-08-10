@@ -1,3 +1,7 @@
+2008-08-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.38 released.
+
 2008-08-08  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* geometry.h (cell_bottom, cell_top): New pure virtual members.
