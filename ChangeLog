@@ -1,3 +1,8 @@
+2008-08-12  Birgitte Gjettermann  <bgj@kvl.dk>
+
+	* colloids.h, colloids.C: New components. 
+	* colloids_MACRO.C: New model. 
+
 2008-08-10  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.38 released.
