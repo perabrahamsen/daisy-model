@@ -32,6 +32,7 @@ class AttributeList;
 class Library;
 class Model;
 class Treelog;
+class Unit;
 
 #ifdef __unix
 #define EXPORT /* Nothing */
@@ -49,6 +50,10 @@ class EXPORT Metalib
   class Implementation;
   std::auto_ptr<Implementation> impl;
 
+  // Units.
+public:
+  const Unit* unit (symbol name, Treelog&);
+
   // Use.
 public:
   Path& path () const;
@@ -63,13 +68,13 @@ public:
   void refile_parsed (const std::string& from, const std::string& to);
 
   // Create and Destroy.
- public:
+public:
   void reset ();
 private:
   Metalib (const Metalib&);
 public:
   explicit Metalib ();
- ~Metalib ();
+  ~Metalib ();
 };
 
 #endif // METALIB_H

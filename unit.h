@@ -36,12 +36,13 @@ public:
   static const char *const component;
   symbol library_id () const;
 
-  // Use:
+  // Use.
 public:
   virtual double to_base (double) const = 0;
-  virtual double from_base (double) const = 0;
-  virtual bool in_domain (double) const = 0;
-  virtual bool in_range (double) const = 0;
+  virtual double to_native (double) const = 0;
+  virtual bool in_native (double) const = 0;
+  virtual bool in_base (double) const = 0;
+  virtual bool compatible (const Unit& to, Treelog& msg) const = 0;
 
   // Utilities.
 public:

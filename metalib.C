@@ -31,6 +31,7 @@
 #include "memutils.h"
 #include "librarian.h"
 #include "path.h"
+#include "unit.h"
 #include <map>
 #include <sstream>
 
@@ -45,13 +46,40 @@ struct Metalib::Implementation
 
   int sequence;
 
+  typedef std::map<symbol, const Unit*> unit_map;
+  unit_map units;
+
   Implementation ()
     : all (Librarian::intrinsics ().clone ()),
       sequence (0)
   { }
   ~Implementation ()
-  { map_delete (all.begin (), all.end ()); }
+  { 
+    map_delete (all.begin (), all.end ()); 
+    map_delete (units.begin (), units.end ()); 
+  }
 };
+
+const Unit*
+Metalib::unit (const symbol name, Treelog& msg)
+{
+  // Do we already have it?
+  Implementation::unit_map::const_iterator i = impl->units.find (name); 
+  if (i != impl->units.end ())
+    return (*i).second;
+
+  // Is it defined?
+  Library& library = this->library (Unit::component);
+  if (!library.complete (*this, name))
+    return NULL;
+
+  // Build it.
+  const AttributeList& alist = library.lookup (name);
+  impl->units[name] = Librarian::build_free<Unit> (*this, msg, alist, "unit");
+  
+  // Return it.
+  return impl->units[name];
+}
 
 Path& 
 Metalib::path () const

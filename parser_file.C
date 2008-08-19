@@ -35,7 +35,7 @@
 #include "time.h"
 #include "treelog_text.h"
 #include "path.h"
-#include "units.h"
+#include "unit.h"
 #include "mathlib.h"
 #include "memutils.h"
 #include "librarian.h"
@@ -387,7 +387,7 @@ ParserFile::Implementation::check_dimension (const std::string& syntax,
 	  if (read.length () == 0 || read[0] != '?')
 	    warning ("you must use [?<dim>] for entries with unknown syntax");
 	}
-      else if (!Units::can_convert (read, syntax))
+      else if (!Unit::can_convert (metalib, symbol (read), symbol (syntax)))
 	{
 	  error (std::string ("expected [") 
                  + ((syntax == Syntax::Fraction ()
@@ -418,8 +418,8 @@ ParserFile::Implementation::convert (double value,
 	if (read == "")
 	  return value;
 	else
-	  return Units::convert (read, "", value);
-      return Units::convert (read, syntax, value);
+	  return Unit::convert (metalib, symbol (read), symbol (""), value);
+      return Unit::convert (metalib, symbol (read), symbol (syntax), value);
     }
   catch (const std::string& message)
     { 

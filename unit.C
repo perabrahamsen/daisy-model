@@ -29,6 +29,8 @@
 #include "alist.h"
 #include "syntax.h"
 #include "block.h"
+#include "units.h"
+#include <sstream>
 
 // Component 'unit'.
 
@@ -65,6 +67,40 @@ public:
   const int amount_of_substance;
   const int luminous_intensity;
 
+  // Interface.
+private:
+  bool check (const char *const name,
+              int me, int other, bool& ok, Treelog& msg) const
+  {
+    if (me == other)
+      return true;
+    std::ostringstream tmp;
+    tmp << "Cannot convert length dimension from " << me << " to " << other;
+    msg.message (tmp.str ());
+    return false;
+  }
+public:
+  bool compatible (const Unit& other, Treelog& msg) const
+  {
+    const UnitSI *const to = dynamic_cast<const UnitSI*> (&other);
+    if (!to)
+      {
+        msg.message ("[" + other.name + "] is not defined as an SI unit, can't convert [" + name + "] to it");
+        return false;
+      }
+    bool ok = true;
+    check ("length", length, to->length, ok, msg);
+    check ("mass", mass, to->mass, ok, msg);
+    check ("time", time, to->time, ok, msg);
+    check ("electric current", electric_current, to->electric_current, ok, msg);
+    check ("thermodynamic temperature", 
+           thermodynamic_temperature, to->thermodynamic_temperature, ok, msg);
+    check ("amount of substance",
+           amount_of_substance, to->amount_of_substance, ok, msg);
+    check ("luminous intensity",
+           luminous_intensity, to->luminous_intensity, ok, msg);
+    return ok;
+  }
   // Create and destroy
 public:
   static void load_syntax (Syntax& syntax, AttributeList& alist);
@@ -117,11 +153,11 @@ struct UnitSIFactor : public UnitSI
   
   double to_base (double value) const
   { return value * factor; }
-  double from_base (double value) const
+  double to_native (double value) const
   { return value / factor; }
-  bool in_domain (double) const
+  bool in_native (double) const
   { return true; }
-  bool in_range (double) const
+  bool in_base (double) const
   { return true; }
 
   UnitSIFactor (Block& al)
@@ -150,32 +186,68 @@ Fcator to multiply with to get base unit.");
 // Utilities.
 
 bool
-Unit::can_convert (Metalib& metalib, symbol from, symbol to, 
+Unit::can_convert (Metalib& metalib, const symbol from, const symbol to, 
                    Treelog& msg)
 {
-  bool ok = true;
-  Library& library = metalib.library (Unit::component);
-  if (!library.complete (metalib, from))
+  const Unit *const from_unit = metalib.unit (from, msg);
+  const Unit *const to_unit = metalib.unit (to, msg);
+
+  // Defined?
+  if (!from_unit || !to_unit)
     {
-      msg.error ("Unknown source dimension [" + from.name () + "]");
-      ok = false;
+      msg.message ("Trying old conversion.");
+      return Units::can_convert (from, to);
     }
-  if (!library.complete (metalib, from))
+
+  return from_unit->compatible (*to_unit, msg);
+}
+
+bool 
+Unit::can_convert (Metalib& metalib, const symbol from, const symbol to)
+{ return Unit::can_convert (metalib, from, to, Treelog::null ()); }
+
+bool 
+Unit::can_convert (Metalib& metalib, const symbol from, const symbol to, 
+                   const double value)
+{ 
+  Treelog& msg = Treelog::null ();
+
+  const Unit *const from_unit = metalib.unit (from, msg);
+  const Unit *const to_unit = metalib.unit (to, msg);
+
+  // Defined?
+  if (!from_unit || !to_unit)
     {
-      msg.error ("Unknown target dimension [" + to.name () + "]");
-      ok = false;
+      msg.message ("Trying old conversion.");
+      return Units::can_convert (from, to, value);
     }
-  if (!ok) 
+
+  if (!from_unit->compatible (*to_unit, msg))
     return false;
+  if (!from_unit->in_native  (value))
+    return false;
+  const double base = from_unit->to_base (value);
+  return to_unit->in_base (base);
+}
 
-  const AttributeList& from_alist = library.lookup (from);
-  const std::auto_ptr<Unit> from_unit 
-    (Librarian::build_free<Unit> (metalib, msg, from_alist, "unit"));
-  const AttributeList& to_alist = library.lookup (to);
-  std::auto_ptr<Unit> to_unit 
-    (Librarian::build_free<Unit> (metalib, msg, to_alist, "unit"));
+double 
+Unit::convert (Metalib& metalib, const symbol from, const symbol to, 
+               const double value)
+{ 
+  Treelog& msg = Treelog::null ();
 
-  return ok;
+  const Unit *const from_unit = metalib.unit (from, msg);
+  const Unit *const to_unit = metalib.unit (to, msg);
+
+  // Defined?
+  if (!from_unit || !to_unit)
+    {
+      msg.message ("Trying old conversion.");
+      return Units::convert (from, to, value);
+    }
+
+  const double base = from_unit->to_base (value);
+  return to_unit->to_native (base);
 }
 
 // unit.C ends here.
