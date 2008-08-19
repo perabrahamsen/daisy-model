@@ -49,7 +49,26 @@ Based on data collected by Fulai Liu, 2007."
   ;; ABA production in roots is affected by soil water potential.
   (Root (ABAprod "Fulai Liu uptake"))
   ;; Stomata conductivity is affected by ABA.
-  (LeafPhot Potato))
+  (LeafPhot Potato)
+  ;; Initial growth governed by seeds:
+  ;; NCrop will force Daisy to calculate a new number based on seed    
+  ;; amount and N concentration.    
+  (Prod (NCrop -1.0))    
+  ;; Here we select the     
+  (Seed release       
+        ;; We release 30% of the carbon per day.  It is first order,          
+        ;; so the total amount will be decreasing over time.         
+        (rate 0.3 [d^-1])          
+        ;; 15% of the seeds are water.        
+        (DM_fraction 0.85 [])      
+        ;; Almost half of the seeds is available as carbon assimilate.         
+        (C_fraction 0.4676 [])          
+        ;; The seeds also contain some nitrogen to get the crop started.          
+        (N_fraction 1.8 [%]))    
+  ;; The initial leaves are very thin. Note that LeafAIMod is often   
+  ;; used for modifying old leaves, if so, you need to append the    
+  ;; original value for LeafAIMod here.     
+  (Canopy (LeafAIMod (0.0 2.0) (0.4 1.0))))
 
 ;; Weather data.
 (weather default "dk-jyndevad.dwf")
@@ -129,11 +148,12 @@ Based on data collected by Fulai Liu, 2007."
 ;; We rereadjust our Folva ABA for this geometry
 (defcrop "Potato; Folva; PRD" "Potato; Folva; ABA" 
   "The Folva Potato calibrated for FertOrgaNic adjusted for PRD"
-  (Root (rootdens GP2D                  ;Gerwitz&Page extended to 2D.
+  (Root (rootdens GP2D                   ;Gerwitz&Page extended to 2D.
                   (row_position 50 [cm]) ;Center of row.
                   (row_distance 1 [m]))  ;Distance between rows.
         ;; Max horizontal root distance from plant.
         (MaxWidth 1.5 [m])))
+
 ;; Use it.
 (defcrop "Potato; Exp" "Potato; Folva; PRD")
 
@@ -184,7 +204,7 @@ Based on data collected by Fulai Liu, 2007."
   (wait (mm_dd 4  8))
   (seed_bed_preparation)
   (wait (mm_dd 4 11))
-  (sow "Potato; Exp" (row_width 1 [m]))
+  (sow ("Potato; Exp" (weight 180 [kg w.w./ha]))(row_width 1 [m]))
   ;; Watering left side.
   (wait (mm_dd  5 28))
   (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
