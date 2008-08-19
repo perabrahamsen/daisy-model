@@ -43,6 +43,6 @@ Colloids::~Colloids ()
 { }
 
 static Librarian Colloids_init (Colloids::component, "\
-The 'Colloids' component calculates the amount of colloids or particles in the flowing soil water.");
+The 'Colloids' component calculates the amount of colloids or particles that are mobilised and captured in the soil.");
 
 // colloids.C ends here.

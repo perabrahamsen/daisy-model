@@ -30,10 +30,20 @@
 struct Colloids_MACRO : public Colloids
 {
   // Parameters.
-  const double Do;
+  const double Mmax;
+  const double kd;
+  const double kr;
+  const double alpha;
+  double Ms;
+  double As;
+
 private:
   // Simulation.
-  double colloids_ (const double D, Treelog&);
+  void initialize (const double Rain_intensity, Treelog&);
+  double colloid_generation (const double dt, const double zi, 
+                             const double bulk_density, 
+                             const double Rain_intensity /*[mm/h]*/, Treelog& msg);
+  double colloid_filtration (const double Rain_intensity, Treelog& msg);
 
   void output (Log&) const { }
 
@@ -43,13 +53,68 @@ private:
   public:
   Colloids_MACRO (Block& al)
     : Colloids (al),
-      Do (al.number ("Do"))
-  { }
+      Mmax (al.number ("Mmax")),
+      kd (al.number ("kd")),
+      kr (al.number ("kr")),
+      alpha (al.number ("alpha")),
+      Ms (al.number ("Ms")),
+      As (al.number ("As"))
+  {}
 };
+void
+Colloids_MACRO::initialize (const double Rain_intensity/*[]*/, Treelog& msg)
+{
+  //Readily available dispersible particles
+  //Initially 10% of Mmax is readily avilable
+  Ms = Mmax / 100 * alpha; //[g g¯¹ soil]
+
+  //Kinetic energy of rain
+  const double E = 29.0 * (1 - 0.72 * exp(-0.05 * Rain_intensity));  //[J m¯² mm¯¹]
+
+  //Detachment of colloids at the surface
+  const double D = kd * E * Rain_intensity * Ms; //[g colloids m¯² h¯¹]
+  
+  //rates of water infiltrating in macropores and micropores
+  const double i_ma = 1.0; // [m h¯¹]
+  const double i_mi = 1.0; // [m h¯¹]
+
+  //Initial boundary at the surface of concentration of particles in soil water 
+  //(in both macropores and micropores)
+  const double cs = D / (i_ma + i_mi); //[g colloids m¯³]
+
+
+}
 
 double
-Colloids_MACRO::colloids_ (const double /*[]*/, Treelog& msg)
+Colloids_MACRO::colloid_generation (const double dt, const double zi, 
+                                    const double bulk_density, 
+                                    const double Rain_intensity /*[mm/h]*/, Treelog& msg)
 {
+  //Amount of available dispersible particles at the soil surface
+  As = Ms * bulk_density /*[g soil m¯³]*/ * zi /*[m]*/; //[g colloids m¯²]
+
+  //Kinetic energy of rain
+  const double E = 29.0 * (1 - 0.72 * exp(-0.05 * Rain_intensity));  //[J m¯² mm¯¹]
+
+  //Detachment of colloids at the surface
+  const double D = kd * E * Rain_intensity * Ms; //[g m¯² h¯¹]
+
+  //Replenishment of colloids in the surface layer
+  const double P = kr * (1-Ms/Mmax); //[g m¯² h¯¹]
+
+  //Mass balance
+  const double dAs = (-D + P) * dt/*[h]*/;  //[g m¯²]
+  As = As + dAs;
+
+  return dAs;//[g m¯²]
+}
+
+double
+Colloids_MACRO::colloid_filtration (const double /*[]*/, Treelog& msg)
+{
+  //
+
+
   return 1.0;
 }
 
@@ -59,9 +124,18 @@ static struct ColloidsMACROSyntax
   { return *new Colloids_MACRO (al); }
   static void load_syntax (Syntax& syntax, AttributeList& alist)
   {
-    syntax.add ("Do", "[]", Check::non_negative (), Syntax::Const,
-                "Coefficient, value after MACRO (1995)");
-    alist.add ("Do", 1500.);
+    syntax.add ("Mmax", "[g/g]", Check::non_negative (), Syntax::Const,
+                "Maximum amount of detachable particles");
+    alist.add ("Mmax", 0.165);
+    syntax.add ("kd", "[g/J]", Check::non_negative (), Syntax::Const,
+                "Detachment rate coefficient");
+    alist.add ("kd", 15.0);
+    syntax.add ("kr", "[g/m²/h]", Check::non_negative (), Syntax::Const,
+                "Replenishment rate coefficient");
+    alist.add ("kr", 0.1);
+    syntax.add ("alpha", "[%]", Check::non_negative (), Syntax::Const,
+                "Percent of Mmax initially readily available, Ms");
+    alist.add ("alpha", 10.);
 
   }  
   ColloidsMACROSyntax ()

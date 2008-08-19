@@ -38,7 +38,10 @@ public:
   // Simulation.
 public:
   virtual void output (Log&) const = 0;
-  virtual double colloids_ (const double D /*[]*/, Treelog&) = 0; //[]
+  virtual void initialize (const double Rain_intensity /*[]*/, Treelog&) = 0;
+  double colloid_generation (const double zi, const double bulk_density, 
+                             const double Rain_intensity /*[]*/, Treelog&);
+  double colloid_filtration (const double Rain_intensity /*[]*/, Treelog&);
 
   // Create and Destroy.
 protected:

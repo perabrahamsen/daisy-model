@@ -279,7 +279,7 @@ PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum,
 
 	  // Photosynthetic effect of Xylem ABA.
 	  ABA_effect = ABAeffect->ABA_effect(ABA_xylem, msg);//[unitless]
-          daisy_assert (ABA_effect == 1.0);
+          //daisy_assert (ABA_effect == 1.0);
 
 	  // leaf respiration
 	  const double rd = respiration_rate(vmax25, Tl);
