@@ -693,7 +693,11 @@ attributes.");
   syntax.add_object ("ui", UI::component, 
                      Syntax::OptionalState, Syntax::Singleton, 
                      "Top level user interface.");
-  
+
+  syntax.add ("allow_old_units", Syntax::Boolean, Syntax::Const, "\
+OBSOLETE: Set this to true to enable the old system of build-in\n\
+unit conversation.");
+  alist.add ("allow_old_units", true);
 }
 
 void

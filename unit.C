@@ -30,6 +30,7 @@
 #include "syntax.h"
 #include "block.h"
 #include "units.h"
+#include "assertion.h"
 #include <sstream>
 
 // Component 'unit'.
@@ -185,6 +186,14 @@ Fcator to multiply with to get base unit.");
 
 // Utilities.
 
+static bool allow_old (const Metalib& metalib)
+{
+  const AttributeList& alist = metalib.alist ();
+  daisy_assert (alist.check ("allow_old_units"));
+  const bool allow_old_units = alist.flag ("allow_old_units");
+  return allow_old_units;
+}
+
 bool
 Unit::can_convert (Metalib& metalib, const symbol from, const symbol to, 
                    Treelog& msg)
@@ -195,6 +204,8 @@ Unit::can_convert (Metalib& metalib, const symbol from, const symbol to,
   // Defined?
   if (!from_unit || !to_unit)
     {
+      if (!allow_old (metalib))
+        return false;
       msg.message ("Trying old conversion.");
       return Units::can_convert (from, to);
     }
@@ -218,7 +229,8 @@ Unit::can_convert (Metalib& metalib, const symbol from, const symbol to,
   // Defined?
   if (!from_unit || !to_unit)
     {
-      msg.message ("Trying old conversion.");
+      if (!allow_old (metalib))
+        return false;
       return Units::can_convert (from, to, value);
     }
 
@@ -242,7 +254,8 @@ Unit::convert (Metalib& metalib, const symbol from, const symbol to,
   // Defined?
   if (!from_unit || !to_unit)
     {
-      msg.message ("Trying old conversion.");
+      if (!allow_old (metalib))
+        return false;
       return Units::convert (from, to, value);
     }
 

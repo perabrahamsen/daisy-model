@@ -1,3 +1,7 @@
+2008-08-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.39 released.
+
 2008-08-12  Birgitte Gjettermann  <bgj@kvl.dk>
 
 	* colloids.h, colloids.C: New components. 
