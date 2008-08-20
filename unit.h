@@ -35,16 +35,33 @@ public:
   const symbol name;
   static const char *const component;
   symbol library_id () const;
-
+private:
+  /* const */ symbol base_name_;
+public:
+  symbol base_name () const
+  { return base_name_; }
+  
   // Use.
 public:
   virtual double to_base (double) const = 0;
   virtual double to_native (double) const = 0;
   virtual bool in_native (double) const = 0;
   virtual bool in_base (double) const = 0;
-  virtual bool compatible (const Unit& to, Treelog& msg) const = 0;
 
+  // Examine.
+public:
+  virtual int length () const;
+  virtual int mass () const;
+  virtual int time () const;
+  virtual int electric_current () const;
+  virtual int thermodynamic_temperature () const;
+  virtual int amount_of_substance () const;
+  virtual int luminous_intensity () const;
   // Utilities.
+private:
+  static bool allow_old (const Metalib& metalib);
+  static bool compatible (const Unit& from, const Unit& to);
+  static double base_convert (symbol from, symbol to, const double value);
 public:
   static bool can_convert (Metalib&, symbol from, symbol to, Treelog&);
   static bool can_convert (Metalib&, symbol from, symbol to);
@@ -53,6 +70,7 @@ public:
 
   // Create and Destroy.
 protected:
+  void find_base_name ();
   Unit (Block& al);
 public:
   virtual ~Unit ();

@@ -977,6 +977,8 @@ ui_Qt_run${OBJ}: ui_Qt_run.C ui_Qt_run.h ui_Qt.h ui.h model.h symbol.h \
 ui_Qt${OBJ}: ui_Qt.C ui_Qt.h ui.h model.h symbol.h alist.h toplevel.h \
   librarian.h block.h syntax.h treelog.h plf.h assertion.h
 main_Qt${OBJ}: main_Qt.C ui_Qt.h ui.h model.h symbol.h alist.h toplevel.h
+colloids${OBJ}: colloids.C colloids.h model.h symbol.h alist.h mathlib.h \
+  assertion.h block.h syntax.h treelog.h plf.h librarian.h
 seed${OBJ}: seed.C seed.h model.h symbol.h alist.h block.h syntax.h treelog.h \
   plf.h librarian.h
 stomatacon${OBJ}: stomatacon.C stomatacon.h model.h symbol.h alist.h \
@@ -992,7 +994,8 @@ secondary${OBJ}: secondary.C secondary.h model.h symbol.h alist.h block.h \
 heatrect${OBJ}: heatrect.C heatrect.h model.h symbol.h alist.h block.h \
   syntax.h treelog.h plf.h librarian.h
 unit${OBJ}: unit.C unit.h model.h symbol.h alist.h check.h treelog.h \
-  metalib.h library.h librarian.h syntax.h block.h plf.h
+  metalib.h library.h librarian.h syntax.h block.h plf.h units.h \
+  assertion.h mathlib.h
 ABAprod${OBJ}: ABAprod.C ABAprod.h model.h symbol.h alist.h block.h syntax.h \
   treelog.h plf.h librarian.h
 solver${OBJ}: solver.C solver.h model.h symbol.h alist.h block.h syntax.h \
@@ -1286,7 +1289,7 @@ log_select${OBJ}: log_select.C log_select.h log.h time.h border.h model.h \
 parser_file${OBJ}: parser_file.C parser_file.h parser.h model.h symbol.h \
   alist.h metalib.h library.h block.h syntax.h treelog.h plf.h lexer.h \
   submodel.h scope.h number.h integer.h time.h treelog_text.h path.h \
-  units.h mathlib.h assertion.h memutils.h librarian.h
+  unit.h mathlib.h assertion.h memutils.h librarian.h
 geometry${OBJ}: geometry.C geometry.h syntax.h treelog.h symbol.h mathlib.h \
   assertion.h volume.h model.h alist.h check.h vcheck.h
 printer_file${OBJ}: printer_file.C printer_file.h printer.h model.h symbol.h \
@@ -1316,7 +1319,7 @@ intrinsics${OBJ}: intrinsics.C intrinsics.h symbol.h assertion.h library.h \
   memutils.h
 metalib${OBJ}: metalib.C metalib.h symbol.h intrinsics.h librarian.h model.h \
   alist.h library.h block.h syntax.h treelog.h plf.h assertion.h \
-  memutils.h path.h
+  memutils.h path.h unit.h
 model${OBJ}: model.C model.h symbol.h alist.h log.h time.h border.h syntax.h \
   treelog.h
 output${OBJ}: output.C output.h condition.h model.h symbol.h alist.h \
@@ -1394,6 +1397,9 @@ nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
 version${OBJ}: version.C
+colloids_MACRO${OBJ}: colloids_MACRO.C colloids.h model.h symbol.h alist.h \
+  mathlib.h assertion.h check.h block.h syntax.h treelog.h plf.h \
+  librarian.h
 seed_LAI${OBJ}: seed_LAI.C seed.h model.h symbol.h alist.h block.h syntax.h \
   treelog.h plf.h librarian.h log.h time.h border.h
 seed_release${OBJ}: seed_release.C seed.h model.h symbol.h alist.h block.h \
@@ -1480,7 +1486,8 @@ movement_rect${OBJ}: movement_rect.C movement_solute.h movement.h model.h \
   syntax.h treelog.h mathlib.h assertion.h heatrect.h soil.h soil_water.h \
   soil_heat.h transport.h chemical.h groundwater.h surface.h uzmodel.h \
   weather.h im.h uzrect.h adsorption.h log.h time.h border.h check.h \
-  submodeler.h block.h plf.h tertiary.h librarian.h
+  submodeler.h block.h plf.h tertiary.h librarian.h anystate.h \
+  tertsmall.h
 chemistry_multi${OBJ}: chemistry_multi.C chemistry.h model.h symbol.h alist.h \
   chemical.h log.h time.h border.h block.h syntax.h treelog.h plf.h \
   assertion.h memutils.h librarian.h vcheck.h

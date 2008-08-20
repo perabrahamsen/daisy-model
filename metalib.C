@@ -74,7 +74,8 @@ Metalib::unit (const symbol name, Treelog& msg)
     return NULL;
 
   // Build it.
-  const AttributeList& alist = library.lookup (name);
+  AttributeList alist (library.lookup (name));
+  alist.add ("type", name);
   impl->units[name] = Librarian::build_free<Unit> (*this, msg, alist, "unit");
   
   // Return it.

@@ -31,6 +31,7 @@
 #include "block.h"
 #include "units.h"
 #include "assertion.h"
+#include "mathlib.h"
 #include <sstream>
 
 // Component 'unit'.
@@ -42,6 +43,240 @@ Unit::library_id () const
 {
   static const symbol id (component);
   return id;
+}
+
+int
+Unit::length () const
+{ return 0; }
+
+int
+Unit::mass () const
+{ return 0; }
+
+int
+Unit::time () const
+{ return 0; }
+
+int
+Unit::electric_current () const
+{ return 0; }
+
+int
+Unit::thermodynamic_temperature () const
+{ return 0; }
+
+int
+Unit::amount_of_substance () const
+{ return 0; }
+
+int
+Unit::luminous_intensity () const
+{ return 0; }
+
+bool 
+Unit::allow_old (const Metalib& metalib)
+{
+  const AttributeList& alist = metalib.alist ();
+  daisy_assert (alist.check ("allow_old_units"));
+  const bool allow_old_units = alist.flag ("allow_old_units");
+  return allow_old_units;
+}
+
+static struct special_convert_type
+{
+  const symbol from;
+  const symbol to;
+  const double factor;
+} special_convert[] = {
+  { symbol ("m"), symbol ("m^-1 kg s^-2") /* Pa */, 10000.0 },
+};
+
+static const size_t special_convert_size 
+/**/ = sizeof (special_convert) / sizeof (special_convert_type);
+
+bool 
+Unit::compatible (const Unit& from_unit, const Unit& to_unit)
+{
+  const symbol from = from_unit.base_name ();
+  const symbol to = to_unit.base_name ();
+  if (from == to)
+    return true;
+  
+  // Special convertion betweeen [cm] and [hPa].
+  for (size_t i = 0; i < special_convert_size; i++)
+    if (from == special_convert[i].from && to == special_convert[i].to)
+      return true; 
+    else if (from == special_convert[i].to && to == special_convert[i].from)
+      return true;
+  
+  return false;
+}
+
+double
+Unit::base_convert (const symbol from, const symbol to, const double value)
+{
+  if (from == to)
+    return value;
+  
+  for (size_t i = 0; i < special_convert_size; i++)
+    if (from == special_convert[i].from && to == special_convert[i].to)
+      return value * special_convert[i].factor;
+    else if (from == special_convert[i].to && to == special_convert[i].from)
+      return value / special_convert[i].factor;
+  
+  throw "Cannot convert base [" + from + "] to [" + to + "]";
+}
+
+bool
+Unit::can_convert (Metalib& metalib, const symbol from, const symbol to, 
+                   Treelog& msg)
+{
+  if (from == to)
+    return true;
+
+  const Unit *const from_unit = metalib.unit (from, msg);
+  const Unit *const to_unit = metalib.unit (to, msg);
+
+  // Defined?
+  if (!from_unit || !to_unit)
+    {
+      if (!allow_old (metalib))
+        {
+          if (!from_unit)
+            msg.message ("Original dimension [" + from + "] not known.");
+          if (!to_unit)
+            msg.message ("Target dimension [" + to + "] not known.");
+          return false;
+        }
+      msg.message ("Trying old conversion.");
+      return Units::can_convert (from, to);
+    }
+
+  if (Unit::compatible (*from_unit, *to_unit))
+    return true;
+
+  // Not compatible.
+  std::ostringstream tmp;
+  tmp << "Cannot convert [" << from 
+      << "] with base [" << from_unit->base_name () << "] to [" << to
+      << "] with base [" << to_unit->base_name () << "]";
+  msg.message (tmp.str ());
+  if (!allow_old (metalib))
+    return false;
+
+  msg.message ("Trying old conversion.");
+  return Units::can_convert (from, to);
+}
+
+bool 
+Unit::can_convert (Metalib& metalib, const symbol from, const symbol to)
+{ return Unit::can_convert (metalib, from, to, Treelog::null ()); }
+
+bool 
+Unit::can_convert (Metalib& metalib, const symbol from, const symbol to, 
+                   const double value)
+{ 
+  Treelog& msg = Treelog::null ();
+
+  const Unit *const from_unit = metalib.unit (from, msg);
+  const Unit *const to_unit = metalib.unit (to, msg);
+
+  // Defined?
+  if (!from_unit || !to_unit)
+    {
+      if (!allow_old (metalib))
+        return false;
+      return Units::can_convert (from, to, value);
+    }
+
+  if (!Unit::compatible (*from_unit, *to_unit))
+    return false;
+  if (!from_unit->in_native  (value))
+    return false;
+  const double base = from_unit->to_base (value);
+  // We don't have to worry about [cm] and [hPa] as all values are valid.
+  return to_unit->in_base (base);
+}
+
+double 
+Unit::convert (Metalib& metalib, const symbol from, const symbol to, 
+               const double value)
+{ 
+  if (from == to)
+    return value;
+
+  Treelog& msg = Treelog::null ();
+
+  const Unit *const from_unit = metalib.unit (from, msg);
+  const Unit *const to_unit = metalib.unit (to, msg);
+
+  // Defined?
+  if (!from_unit || !to_unit)
+    {
+      if (allow_old (metalib))
+        return Units::convert (from, to, value);
+      if (!from_unit)
+        throw "Cannot convert from unknown dimension [" + from 
+          + "] to [" + to + "]";
+      throw "Cannot convert from [" + from 
+        + "] to unknown dimension [" + to + "]";
+    }
+
+  if (!Unit::compatible (*from_unit, *to_unit))
+    throw std::string ("Cannot convert [") + from 
+      + "] with base [" + from_unit->base_name () + "] to [" + to
+      + "] with base [" + to_unit->base_name () + "]";
+
+  const double from_base = from_unit->to_base (value);
+  const double to_base = Unit::base_convert (from_unit->base_name (),
+                                             to_unit->base_name (), 
+                                             from_base);
+  const double native = to_unit->to_native (to_base);
+  
+#if 0
+  std::ostringstream tmp;
+  tmp << "Converting " << value << " [" << from << "] to " << native 
+      << " [" << to << "] through " << to_base << " [" 
+      << to_unit->base_name () << "]";
+  Assertion::message (tmp.str ());
+#endif
+  return native;
+}
+
+void
+Unit::find_base_name ()
+{
+
+  typedef int (Unit::*unit_fun) () const;
+  static const struct base_unit
+  { 
+    std::string name; 
+    unit_fun base;
+  } base_units[] = {
+    { "m", &Unit::length },
+    { "kg", &Unit::mass },
+    { "s", &Unit::time },
+    { "A", &Unit::electric_current },
+    { "K", &Unit::thermodynamic_temperature },
+    { "mol", &Unit::amount_of_substance },
+    { "cd", &Unit::luminous_intensity }
+  };
+  const size_t base_unit_size = sizeof (base_units) / sizeof (base_unit);
+  
+  std::ostringstream tmp;
+  for (size_t i = 0; i < base_unit_size; i++)
+    {
+      int dim = (this->*(base_units[i].base))();
+      if (dim == 0)
+        continue;
+      if (tmp.str () != "")
+        tmp << " ";;
+      tmp << base_units[i].name;
+      if (dim == 1)
+        continue;
+      tmp << "^" << dim;
+    }
+  base_name_ = symbol (tmp.str ());
 }
 
 Unit::Unit (Block& al)
@@ -56,66 +291,45 @@ The 'unit' allows you to define convertion to and from SI base units .");
 
 // Base model 'SI'.
 
-class UnitSI : public Unit
+struct UnitSI : public Unit
 {
   // Content.
-public:
-  const int length;
-  const int mass;
-  const int time;
-  const int electric_current;
-  const int thermodynamic_temperature;
-  const int amount_of_substance;
-  const int luminous_intensity;
+  const int length_;
+  const int mass_;
+  const int time_;
+  const int electric_current_;
+  const int thermodynamic_temperature_;
+  const int amount_of_substance_;
+  const int luminous_intensity_;
 
-  // Interface.
-private:
-  bool check (const char *const name,
-              int me, int other, bool& ok, Treelog& msg) const
-  {
-    if (me == other)
-      return true;
-    std::ostringstream tmp;
-    tmp << "Cannot convert length dimension from " << me << " to " << other;
-    msg.message (tmp.str ());
-    return false;
-  }
-public:
-  bool compatible (const Unit& other, Treelog& msg) const
-  {
-    const UnitSI *const to = dynamic_cast<const UnitSI*> (&other);
-    if (!to)
-      {
-        msg.message ("[" + other.name + "] is not defined as an SI unit, can't convert [" + name + "] to it");
-        return false;
-      }
-    bool ok = true;
-    check ("length", length, to->length, ok, msg);
-    check ("mass", mass, to->mass, ok, msg);
-    check ("time", time, to->time, ok, msg);
-    check ("electric current", electric_current, to->electric_current, ok, msg);
-    check ("thermodynamic temperature", 
-           thermodynamic_temperature, to->thermodynamic_temperature, ok, msg);
-    check ("amount of substance",
-           amount_of_substance, to->amount_of_substance, ok, msg);
-    check ("luminous intensity",
-           luminous_intensity, to->luminous_intensity, ok, msg);
-    return ok;
-  }
-  // Create and destroy
-public:
+  // Examine.
+  int length () const
+  { return length_; }
+  int mass () const
+  { return mass_; }
+  int time () const
+  { return time_; }
+  int electric_current () const
+  { return electric_current_; }
+  int thermodynamic_temperature () const
+  { return thermodynamic_temperature_; }
+  int amount_of_substance () const
+  { return amount_of_substance_; }
+  int luminous_intensity () const
+  { return luminous_intensity_; }
+
+  // Create and destroy.
   static void load_syntax (Syntax& syntax, AttributeList& alist);
-protected:
   UnitSI (Block& al)
     : Unit (al),
-      length (al.integer ("length")),
-      mass (al.integer ("mass")),
-      time (al.integer ("time")),
-      electric_current (al.integer ("electric_current")),
-      thermodynamic_temperature (al.integer ("thermodynamic_temperature")),
-      amount_of_substance (al.integer ("amount_of_substance")),
-      luminous_intensity (al.integer ("luminous_intensity"))
-  { }
+      length_ (al.integer ("length")),
+      mass_ (al.integer ("mass")),
+      time_ (al.integer ("time")),
+      electric_current_ (al.integer ("electric_current")),
+      thermodynamic_temperature_ (al.integer ("thermodynamic_temperature")),
+      amount_of_substance_ (al.integer ("amount_of_substance")),
+      luminous_intensity_ (al.integer ("luminous_intensity"))
+  { find_base_name (); }
   ~UnitSI ()
   { }
 };
@@ -171,8 +385,36 @@ static struct UnitSIFactorSyntax
 {
   static Model& make (Block& al)
   { return *new UnitSIFactor (al); }
+
+  static void add (const std::string& name_string, const double factor,
+                   const symbol super,
+                   const Syntax& super_syntax, const AttributeList& super_alist,
+                   const int length, const int mass, const int time,
+                   const int electric_current,
+                   const int thermodynamic_temperature,
+                   const int amount_of_substance, const int luminous_intensity,
+                   const std::string& description)
+  {
+    const symbol name (name_string);
+
+    AttributeList& alist = *new AttributeList (super_alist);
+    alist.add ("type", super);
+    alist.add ("length", length);
+    alist.add ("mass", mass);
+    alist.add ("time", time);
+    alist.add ("electric_current", electric_current);
+    alist.add ("thermodynamic_temperature", thermodynamic_temperature);
+    alist.add ("amount_of_substance", amount_of_substance);
+    alist.add ("luminous_intensity", luminous_intensity);
+    alist.add ("factor", factor);
+    alist.add ("description", description);
+    Librarian::add_type (Unit::component, name, alist, super_syntax, &make);
+  }
   UnitSIFactorSyntax ()
   {
+    static const symbol name ("SIfactor");
+    
+    // Add the "SIfactor" base model..
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "\
@@ -180,87 +422,131 @@ Connvert to SI base units by multiplying with a factor.");
     UnitSI::load_syntax (syntax, alist);
     syntax.add ("factor", Syntax::None (), Check::non_zero (), Syntax::Const, "\
 Fcator to multiply with to get base unit.");
-    Librarian::add_type (Unit::component, "SIfactor", alist, syntax, &make);
+    Librarian::add_type (Unit::component, name, alist, syntax, &make);
+
+    // Unitless.
+    add (Syntax::None (), 1.0, name, syntax, alist, 0, 0, 0, 0, 0, 0, 0,
+         "Unitless.");
+    add (Syntax::Fraction (), 1.0, name, syntax, alist, 0, 0, 0, 0, 0, 0, 0,
+         "Unitless.");
+    add ("", 1.0, name, syntax, alist, 0, 0, 0, 0, 0, 0, 0,
+         "Unitless.");
+    add ("%", 0.01, name, syntax, alist, 0, 0, 0, 0, 0, 0, 0,
+         "Percent.");
+
+    // Length.
+    add ("m", 1.0, name, syntax, alist, 1, 0, 0, 0, 0, 0, 0,
+         "Meter.");
+    add ("cm", 0.01, name, syntax, alist, 1, 0, 0, 0, 0, 0, 0,
+         "Centimeter.");
+
+    add ("m^2", 1.0, name, syntax, alist, 2, 0, 0, 0, 0, 0, 0,
+         "Square meter.");
+    add ("cm^2", 0.01 * 0.01, name, syntax, alist, 2, 0, 0, 0, 0, 0, 0,
+         "Square centimeter.");
+    add ("ha", 100.0 * 100.0, name, syntax, alist, 2, 0, 0, 0, 0, 0, 0,
+         "Hectare.");
+
+    add ("m^3", 1.0, name, syntax, alist, 3, 0, 0, 0, 0, 0, 0,
+         "Cube meter.");
+    add ("cm^3", 0.01 * 0.01 * 0.01, name, syntax, alist, 3, 0, 0, 0, 0, 0, 0,
+         "Cube centimeter.");
+
+    // Mass.
+    add ("kg", 1.0, name, syntax, alist, 0, 1, 0, 0, 0, 0, 0,
+         "Kilogram.");
+    add ("g", 0.001, name, syntax, alist, 0, 1, 0, 0, 0, 0, 0,
+         "Gram.");
+
+    // Time.
+    add ("s", 1.0, name, syntax, alist, 0, 0, 1, 0, 0, 0, 0,
+         "Second.");
+    add ("h", 3600.0, name, syntax, alist, 0, 0, 1, 0, 0, 0, 0,
+         "Hour.");
+    add ("d", 24 * 3600.0, name, syntax, alist, 0, 0, 1, 0, 0, 0, 0,
+         "Day.");
+
+    add ("s^-1", 1.0, name, syntax, alist, 0, 0, -1, 0, 0, 0, 0,
+         "Second.");
+    add ("h^-1", 1.0 / 3600.0, name, syntax, alist, 0, 0, -1, 0, 0, 0, 0,
+         "Hour.");
+    add ("d^-1", 1.0 / (24 * 3600.0), name, syntax, alist, 0, 0, -1, 0, 0, 0, 0,
+         "Day.");
+
+    // Electric currect.
+    add ("A", 1.0, name, syntax, alist, 0, 0, 0, 1, 0, 0, 0,
+         "Ampere.");
+
+    // Thermodynamic temperature.
+    add ("K", 1.0, name, syntax, alist, 0, 0, 0, 0, 1, 0, 0,
+         "Kelvin.");
+
+    // Amount of substance.
+    add ("mol", 1.0, name, syntax, alist, 0, 0, 0, 0, 0, 1, 0,
+         "Mole.");
+    
+    // Luminous intensity.
+    add ("cd", 1.0, name, syntax, alist, 0, 0, 0, 0, 0, 0, 1,
+         "Candela.");
+    
+    // Mass per area.
+    add ("kg/m^2", 1.0, name, syntax, alist, -2, 1, 0, 0, 0, 0, 0,
+         "Base mass per area.");
+    add ("g w.w./m^2", 0.001, name, syntax, alist, -2, 1, 0, 0, 0, 0, 0,
+         "Wet weight per area.");
+    add ("kg w.w./ha", 0.01 * 0.01, name, syntax, alist, -2, 1, 0, 0, 0, 0, 0,
+         "Wet weight per area.");
+
+    // Pressure.
+    add ("Pa", 1.0, name, syntax, alist, -1, 1, -2, 0, 0, 0, 0,
+         "Pascal.");
+    add ("hPa", 100.0, name, syntax, alist, -1, 1, -2, 0, 0, 0, 0,
+         "Hectopascal.");
+    add ("kPa", 1000.0, name, syntax, alist, -1, 1, -2, 0, 0, 0, 0,
+         "Kilopascal.");
+    add ("MPa", 1000000.0, name, syntax, alist, -1, 1, -2, 0, 0, 0, 0,
+         "Megapascal.");
   }
 } UnitSIFactor_syntax;
 
-// Utilities.
+// Model 'pF'.
 
-static bool allow_old (const Metalib& metalib)
+struct UnitpF : public Unit
 {
-  const AttributeList& alist = metalib.alist ();
-  daisy_assert (alist.check ("allow_old_units"));
-  const bool allow_old_units = alist.flag ("allow_old_units");
-  return allow_old_units;
-}
+  double to_base (double value) const
+  { return pF2h (value) * 100.0 /* Pa/cm */; }
+  double to_native (double value) const
+  { return h2pF (value * 100.0) /* cm/pa */; }
+  bool in_native (double value) const
+  { return value >= 0.0; }
+  bool in_base (double value) const
+  { return value < 0.0; }
 
-bool
-Unit::can_convert (Metalib& metalib, const symbol from, const symbol to, 
-                   Treelog& msg)
+  int length () const
+  { return -1; }
+  int mass () const
+  { return 1; }
+  int time () const
+  { return -2; }
+
+  UnitpF (Block& al)
+    : Unit (al)
+  { find_base_name (); }
+};
+
+static struct UnitpFSyntax
 {
-  const Unit *const from_unit = metalib.unit (from, msg);
-  const Unit *const to_unit = metalib.unit (to, msg);
+  static Model& make (Block& al)
+  { return *new UnitpF (al); }
 
-  // Defined?
-  if (!from_unit || !to_unit)
-    {
-      if (!allow_old (metalib))
-        return false;
-      msg.message ("Trying old conversion.");
-      return Units::can_convert (from, to);
-    }
-
-  return from_unit->compatible (*to_unit, msg);
-}
-
-bool 
-Unit::can_convert (Metalib& metalib, const symbol from, const symbol to)
-{ return Unit::can_convert (metalib, from, to, Treelog::null ()); }
-
-bool 
-Unit::can_convert (Metalib& metalib, const symbol from, const symbol to, 
-                   const double value)
-{ 
-  Treelog& msg = Treelog::null ();
-
-  const Unit *const from_unit = metalib.unit (from, msg);
-  const Unit *const to_unit = metalib.unit (to, msg);
-
-  // Defined?
-  if (!from_unit || !to_unit)
-    {
-      if (!allow_old (metalib))
-        return false;
-      return Units::can_convert (from, to, value);
-    }
-
-  if (!from_unit->compatible (*to_unit, msg))
-    return false;
-  if (!from_unit->in_native  (value))
-    return false;
-  const double base = from_unit->to_base (value);
-  return to_unit->in_base (base);
-}
-
-double 
-Unit::convert (Metalib& metalib, const symbol from, const symbol to, 
-               const double value)
-{ 
-  Treelog& msg = Treelog::null ();
-
-  const Unit *const from_unit = metalib.unit (from, msg);
-  const Unit *const to_unit = metalib.unit (to, msg);
-
-  // Defined?
-  if (!from_unit || !to_unit)
-    {
-      if (!allow_old (metalib))
-        return false;
-      return Units::convert (from, to, value);
-    }
-
-  const double base = from_unit->to_base (value);
-  return to_unit->to_native (base);
-}
+  UnitpFSyntax ()
+  {
+    // Add the "SIfactor" base model..
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "log10 (- cmH2O).");
+    Librarian::add_type (Unit::component, "pF", alist, syntax, &make);
+  }
+} UnitpF_syntax;
 
 // unit.C ends here.

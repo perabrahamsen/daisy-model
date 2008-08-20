@@ -387,7 +387,7 @@ ParserFile::Implementation::check_dimension (const std::string& syntax,
 	  if (read.length () == 0 || read[0] != '?')
 	    warning ("you must use [?<dim>] for entries with unknown syntax");
 	}
-      else if (!Unit::can_convert (metalib, symbol (read), symbol (syntax)))
+      else if (!Unit::can_convert (metalib, symbol (read), symbol (syntax), msg))
 	{
 	  error (std::string ("expected [") 
                  + ((syntax == Syntax::Fraction ()
