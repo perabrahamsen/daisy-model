@@ -1,0 +1,142 @@
+// doe.C --- A single element in a compund solute.
+// 
+// Copyright 2002, 2006 Per Abrahamsen and KVL.
+//
+// This file is part of Daisy.
+// 
+// Daisy is free software; you can redistribute it and/or modify
+// it under the terms of the GNU Lesser Public License as published by
+// the Free Software Foundation; either version 2.1 of the License, or
+// (at your option) any later version.
+// 
+// Daisy is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser Public License
+// along with Daisy; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+#define BUILD_DLL
+
+
+#include "doe.h"
+#include "log.h"
+#include "geometry.h"
+#include "submodel.h"
+#include "alist.h"
+#include "syntax.h"
+#include "soil.h"
+#include "soil_water.h"
+#include <string>
+
+void 
+DOE::output (Log& log) const
+{
+  output_variable (M, log);
+  output_variable (C, log);
+  output_variable (S, log);
+  output_variable (S_p, log);
+  output_variable (S_drain, log);
+  output_variable (J_matrix, log);
+  output_variable (J_tertiary, log);
+}
+
+void 
+DOE::mix (const Geometry& geo, 
+              const Soil& soil, const SoilWater& soil_water, 
+              double from, double to)
+{
+  geo.mix (M, from, to);
+  for (size_t i = 0; i < C.size (); i++)
+    C[i] = M[i] / soil_water.Theta (i);
+}
+
+void 
+DOE::swap (const Geometry& geo, 
+	   const Soil& soil, const SoilWater& soil_water,
+	   double from, double middle, double to)
+{
+  geo.swap (M, from, middle, to);
+  for (size_t i = 0; i < C.size (); i++)
+    C[i] = M[i] / soil_water.Theta (i);
+}
+
+void 
+DOE::tick (const size_t cell_size, const SoilWater& soil_water, const double dt)
+{
+  // Initialize.
+  fill (S_p.begin (), S_p.end (), 0.0);
+  fill (J_tertiary.begin (), J_tertiary.end (), 0.0);
+
+  daisy_assert (S_drain.size () >= cell_size);
+  daisy_assert (S.size () >= cell_size);
+
+  // Drainage.
+  for (size_t i = 0; i < cell_size; i++)
+    {
+      S_drain[i] = -soil_water.S_drain (i) * dt * C[i];
+      S[i] += S_drain[i];
+    }
+}
+
+void 
+DOE::load_syntax (Syntax& syntax, AttributeList& alist)
+{
+  // Submodel.
+  alist.add ("submodel", "DOM-Element");
+  alist.add ("description", "\
+A single element in a Dissolved Organic Matter pool.");
+
+  // Content.
+  syntax.add ("M", "g/cm^3", Syntax::State, Syntax::Sequence,
+	      "Mass in water and soil.");
+  syntax.add ("C", "g/cm^3", Syntax::LogOnly, Syntax::Sequence,
+	      "Concentration in water.");
+  syntax.add ("S", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Combined source term.");
+  syntax.add ("S_p", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Source term (macropore transport only).");
+  syntax.add ("S_drain", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Source term (soil drainage only).");
+  syntax.add ("J_matrix", "g/cm^2/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Transportation in matrix (positive up).");
+  syntax.add ("J_tertiary", "g/cm^2/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Transportation outside matrix (positive up).");
+}
+
+void 
+DOE::initialize (const Geometry& geo, 
+		 const Soil& soil, const SoilWater& soil_water,
+		 Treelog& msg)
+{
+  const size_t cell_size = geo.cell_size ();
+  const size_t edge_size = geo.edge_size ();
+  
+  if (cell_size >= M.size ())
+    M.insert (M.end (), cell_size - M.size (), 0.0);
+  else
+    msg.warning ("Too many elements of M in DOM pool");
+
+  for (size_t i = C.size (); i < M.size (); i++)
+    C.push_back (M[i] / soil_water.Theta (i));
+
+  S.insert (S.begin (), cell_size, 0.0);
+  S_p.insert (S_p.begin (), cell_size, 0.0);
+  S_drain.insert (S_drain.begin (), cell_size, 0.0);
+  J_matrix.insert (J_matrix.begin (), edge_size, 0.0);
+  J_tertiary.insert (J_tertiary.begin (), edge_size, 0.0);
+}
+
+DOE::DOE (const AttributeList& al)
+  : M (al.number_sequence ("M"))
+{ }
+
+DOE::~DOE ()
+{ }
+
+static Submodel::Register 
+dom_element_submodel ("DOM-Element", DOE::load_syntax);
+
+// doe.C ends here

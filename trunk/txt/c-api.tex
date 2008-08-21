@@ -1,0 +1,124 @@
+\documentclass[a4paper,10pt,titlepage]{article}
+
+\usepackage{verbatim}
+\input{macro}
+\usepackage[latin1]{inputenc}
+
+\begin{document}
+\title{The \Daisy{} C \Api{}}
+\author{Per Abrahamsen\\
+The Royal Veterinary and Agricultural University\\
+Department of Agricultural Sciences\\
+Laboratory for Bioclimatology and Agrohydrology}
+\date{1998-5-15}
+\maketitle
+
+\section*{The \Daisy{} C \Api{}}
+
+The C~\Api{} allows the \daisy{}~\cite{daisy-def} crop/soil
+simulation model to be used as a component in other programs.  It
+provides a subset of the functionality of the \cplusplus{}~\api{}
+described in~\cite{daisy-guide}.
+
+The \api{} can roughly be divided in three parts, 1) running the daisy
+simulation, 2) testing and setting the state during the run, and 3)
+reading and writing \daisy{} setup files.  You will have to understand
+the \daisy{} model itself to use the C~\api{}, and the section on
+reading and writing setup files will also require knowledge of the
+\cplusplus{} data structures described in ~\cite{daisy-guide}.
+
+To use the functions in C~\api{} from your code, you will have to
+include the file \texttt{cdaisy.h}.  This file is well commented, and
+will always be up to date.  To link \daisy{} into your code, you can
+use the \texttt{daisy.dll} file under \wintel{}.  On \unix{}, you will
+usually have to link directly with the relevant object files.  The C
+interface itself is implemented in the \texttt{daisy.C} file, which is
+included as part of \texttt{daisy.dll}.
+
+\section{Types}
+
+The following opaque types are used when running the simulation.  You
+can declare pointers to these types, and use them as arguments to the
+\api{} functions.  However, you not use them for other purposes,
+i.e. don't attempt to dereference them.
+
+\begin{itemize}
+\item \texttt{daisy\_syntax}: The syntax for a component in a \daisy{}
+  setup file.  This is used by the parser.
+\item \texttt{daisy\_alist}: Parsed representation of a daisy component.
+\item \texttt{daisy\_library}: A collection of different parsed
+  representations of a daisy component.
+\item \texttt{daisy\_parser}: The runtime representation of the
+  parser. 
+\item \texttt{daisy\_printer}: The runtime representation of the
+  pretty printer.
+\item \texttt{daisy\_daisy}: The runtime representation of the
+  \daisy{} simulation as a whole.
+\item \texttt{daisy\_time}: The runtime representation of time.
+\item \texttt{daisy\_column}: The runtime representation of a single
+  column in the \daisy{} simulation.
+\item \texttt{daisy\_weather}: The runtime representation of the
+  \daisy{} weather module.
+\end{itemize}
+
+There is also a special boolean type in \daisy{}.  Its purpose is to
+make the prototypes more self documenting.
+
+\begin{verbatim}
+  typedef int daisy_bool;
+\end{verbatim}
+
+\section{Running \Daisy{}}
+
+Running the daisy simulation involves parsing the setup file, checking
+that it is consistent, and running the simulation.  This is best
+described by showing an example; section~\ref{cmain} contains a main
+program using the C \api{} and offering the same functionality as the
+standard \texttt{daisy} executable.  The individual functions are
+documented in the \texttt{cdaisy.h} file, described in
+appendix~\ref{cdaisy}. 
+
+\section{Manipulating the State}
+
+The `daisy' object created by `daisy\_daisy\_create' (see
+appendix~\ref{cmain}) can be used to extract the runtime
+representation of the `time', `weather', `column' components.  For
+each of these, there are a number of functions to get and sometimes to
+set specific simulation variables.  These functions only represent a
+small fraction of the total state.  The example in
+appendix~\ref{cmain} demonstrates how to query the `time' object.
+All the functions for manipulating the state are listed in
+appendix~\ref{cdaisy}. 
+
+\section{Manipulating Setup Files}
+
+As demonstrated in appendix~\ref{cmain}, you need a `syntax' and an
+`alist' object to create the simulation.  However, these types are
+used to describe all the \daisy{} components.  You can parse them from
+files with the `parser' object, and pretty-print them with the
+`printer' object.  The can also be stored in a number of predefined
+`library' objects.  All of these concepts are described
+in~\cite{daisy-guide}.  In appendix~\ref{cdaisy} is listed all the C
+bindings. 
+
+\appendix{}
+
+\section{\texttt{cmain.C}}
+\label{cmain}
+
+\verbatiminput{../cmain.c}
+
+\section{\texttt{cdaisy.h}}
+\label{cdaisy}
+
+\verbatiminput{../cdaisy.h}
+
+\bibliographystyle{plain}
+\bibliography{daisy}
+
+\end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

@@ -1,0 +1,142 @@
+%%% dwf.tex --- The Daisy Weather File Format.
+
+\chapter{Daisy Weather File Format}
+\label{cha:dwf}
+
+The Daisy Weather File format (\emph{dwf} for short) is a flexible
+format for specifying weather data.  The easiest way to create a dwf
+file is to edit an existing file.  Here, we will describe the format
+for reference purposes.
+
+First some general syntax.  Empty lines and lines beginning with
+`\texttt{\#}' are ignored, and can occur anywhere except at the very
+first line.  Line starting with `\texttt{\#}' are called \emph{comment
+  lines}.  All words are case-sensitive, and must be written exactly
+as specified.
+
+The first line \emph{must} begin with the string `\texttt{dwf-0.0}',
+followed by whitespace.  The rest of the line is ignored.
+
+After the first line, the keyword section follows.  Each line (except
+blank lines and comment lines) in the keyword section have the general
+format:\\
+\begin{tt}
+  \emph{keyword}: \emph{value}
+\end{tt}\\
+or\\ 
+\begin{tt}
+  \emph{keyword}: \emph{value} \emph{dimension}
+\end{tt}\\
+All keywords, with the exception of `\texttt{Note}' and
+`\texttt{Timestep}', must occur exactly once.  The sequence doesn't
+matter. 
+
+Here is a list of the recognized keywords, and the dimensions allowed
+for them:
+\begin{description}
+\item[Station] The rest of the line (after the colon) contains the
+  name of the weather station.
+\item[Elevation] Height above sea level of station, given in
+  \texttt{[m]}. 
+\item[Longitude] Longitude of station, given in either \texttt{[dgEast]} or
+  \texttt{[dgWest]}. 
+\item[Latitude] Latitude of station, given in either \texttt{[dgNorth]} or
+  \texttt{[dgSouth]}.
+\item[TimeZone] Time zone used for the data, given in either
+  \texttt{[dgEast]} or \texttt{[dgWest]}.
+\item[Surface] Measurement conditions at surface, the value should
+  either be `\texttt{reference}' (short grass) or `\texttt{field}' if
+  the data have been measured at the simulated field.  
+\item[ScreenHeight] Measurement height above surface, given in
+  \texttt{[m]}. 
+\item[PrecipCorrect] Factors to multiply to the precipitation for each
+  month.  Should have the form of twelve numbers, seperated by spaces,
+  the first number representing the factor for Janurary, and the last
+  for December.  So if the first number is 1.20 and the weather data
+  for a given day in Janurary specifies 10 mm precipitation, Daisy
+  will calculate with 12 mm precipitation for that day.
+\item[Begin] First data point, given in the format
+  \texttt{yyyy-mm-dd} or \texttt{yyyy-mm-dd:hh}.
+\item[End] Last data point, given in the format \texttt{yyyy-mm-dd} or
+  \texttt{yyyy-mm-dd:hh}.  Note that the date specified by
+  \texttt{End} should be a few days before the actual end of the
+  weather data, to prevent \daisy{} from reading past the end of the
+  file.  Also, make sure the simulation ends before the weather data,
+  or the results may be lost.
+\item[Timestep] Time between data points, given in \texttt{[hours]}.
+  You can leave out this keyword, in that case the time for each data
+  point must be specified.  Leaving it out allows for varying
+  timesteps. 
+\item[Note] You can have any number of these, but they must come in
+  sequence.  That is, no other keywords between two notes.  You can
+  have any text after the keyword. 
+\item[TAverage] Average temperature for the location, given in
+  \texttt{[dgC]}. 
+\item[TAmplitude] Amplitude of yearly temperature variation, given in
+  \texttt{[dgC]}. 
+\item[MaxTDay] The Julian day with the highest temperature (on
+  average), given in \texttt{[yday]}.
+\end{description}
+There are two wayes of specifying deposition.  Directly
+\begin{description}
+\item[NH4WetDep] NH$_4$ deposition in precipitation, given in
+  \texttt{[ppm]}.
+\item[NH4DryDep] NH$_4$ deposition from air, given in
+  \texttt{[kgN/ha/year]}.
+\item[NO3WetDep] NO$_3$ deposition in precipitation, given in
+  \texttt{[ppm]}.
+\item[NO3DryDep] NO$_3$ deposition from air, given in
+  \texttt{[kgN/ha/year]}.
+\end{description}
+Or alternatively, indirectly
+\begin{description}
+\item[Deposition] Mean yearly deposition, given in \texttt{[kgN/ha/year]}.
+\item[PAverage] Total yearly precipitation, given in \texttt{[mm]}.
+\item[DepDry] Dry fraction of total deposition (from air).  By
+  default 40\%.  The remainder will fall with the precipitation.
+\item[DepDryNH4] Fraction of NH$_4$ in deposition from air.  By
+  default 60\%.  The remainder will fall in the form of NO$_3$.
+\item[DepWetNH4] Fraction of NH$_4$ in deposition from rain and
+  snow.  By default 50\%.  The remainder will fall in the form of
+  NO$_3$.
+\end{description}
+You cannot specify both.  If you use the indirect specification,
+these numbers will be used for calculating the equivalents of the
+direct specification of deposition.
+
+After the keywords there should be a line consisting solely of
+hyphens.  It marks the beginning of the data section.  The lines in
+the data section are divided into columns by whitespace.  All lines
+must have the same number of columns.  The first line contains the
+name of the data type specified in each column, the second line the
+dimension of that data, and the following lines the actual measurement
+data in chronological order.  The following is a list of the possible
+data type names, as well as the recognized dimensions.
+\begin{description}
+\item[Year] Given in \texttt{[year]}.
+\item[Month] Given in \texttt{[month]}.
+\item[Day] Given in \texttt{[mday]}.
+\item[Hour] Given in \texttt{[hour]}.
+\item[GlobRad] Global radiation, given in \verb|[W/m^2]|.
+\item[AirTemp] Air temperature, given in \texttt{[dgC]}.
+\item[T\_min] Daily minimum air temperature, given in \texttt{[dgC]}.
+\item[T\_max] Daily maximum air temperature, given in \texttt{[dgC]}.
+\item[Precip] Precipitation, given in \texttt{[mm/h]} or \texttt{[mm/d]}.
+\item[RefEvap] Reference evapotranspiration, given in \texttt{[mm/h]}
+  or \texttt{[mm/d]}.
+\item[VapPres] Vapor pressure, given in \texttt{[Pa]}.
+\item[RelHum] Relative humidity, given in \texttt{[fraction]} or
+  \texttt{[\%]}. 
+\item[Wind] Wind speed, given in \texttt{[m/s]}
+\end{description}
+The columns can be arranged in any sequence.  GlobRad is mandatory,
+Year, Month, and Day are mandatory if no timestep have been
+specified.  You cannot specify both VapPres and relHum.  All other
+columns are optional. 
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "reference"
+%%% End: 
+
+%%% dwf.tex ends here

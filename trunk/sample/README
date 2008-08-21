@@ -1,0 +1,12 @@
+This directory contains files with sample parameterizations for
+creating a Daisy setup.  None of the parameterizations are intended to
+be used "as is", unlike those found in the "lib" directory.  The
+parameterizations are intended as inspiration when writing your own
+setups.
+
+dk-management.dai: 
+
+  This file contain some "typical" managements for Denmark in the
+  season 2003/2004.  They mostly follow fertilization norms for that
+  season, but do not take into account rules regarding previous crops.
+

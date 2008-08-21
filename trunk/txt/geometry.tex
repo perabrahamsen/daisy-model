@@ -1,0 +1,330 @@
+\documentclass[a4paper,11pt,twoside]{article}
+\usepackage{a4}
+\usepackage[T1]{fontenc}
+\usepackage[latin1]{inputenc}
+\usepackage{hyperref}
+\input{macro}
+
+\documentclass{article}
+
+\begin{document}
+
+\section*{The Geometry  of Daisy}
+
+Many procesess in Daisy occur below the soil surface.  Now ``below
+the soil surface'' is a rather large volume, which we can describe in
+various levels of detail.  The \emph{geometry} concept covers how we
+describe this volume.  In general, we divide the soil volume into a
+finite number of smaller volumes (called \emph{cells}).  This process
+is called \emph{discretization}.  We then pretent that the properties
+of the soil volume, such as the water content, can be represented by a
+single number for each cell.  This is unlike the physical models Daisy
+is build on, which generally describe such properties as continuous
+dstribution over the volume.  However, a continious distribution
+would, in the general case, require infinite storage, and our
+computers are only finite.  So the basic assumption behind a discrete
+model like Daisy is that we can get close enough on the continious
+distribution by using enough cells in our begin.
+
+\section{Limiting factors}
+
+There are several factors limiting the number of cells we can have in
+our system description, the first we already mentioned: We need enough
+storage for all the cells.  However, this is rarely the limiting
+factor on modern computers, with plenty of memory.  Another more
+philosophical problem is that of scale, physical models are usually
+only applicable as a certain range, making the cells smaller than that
+can make interpretation tricky.  For example, talking about water
+potential makes little sense for cells smaller than the soil
+particles.  However, the mathematical description often continues to
+work fine even if after the physical interpretation break down, so
+this is not really the limiting factor either.
+
+\subsection{Big-O}
+
+The real limiting factor tend to be computational complexity.
+Computational complexity is traditionally described as a function of
+the input size, using the Big-O notation.  For example, the turnover
+processes is $O(n)$, where $n$ is the number of cells.  This means
+that if you double the number of cells, the simulation will, at worst
+(Big-O always describe the worst case), take twice as long to finish.
+Note that we don't say anything about absolute simulation times, those
+depend on the actual hardware you run the program on.
+
+\subsection{Turnover}
+
+Turnover is $O(n)$ because we treat each cell indvidually, without
+regard to the other cells.  For transport we can obviously not ignore
+the neighboring cells, as these are either the source or destination
+for water or solute movement.  Or rather, we can with the simplest
+models based on the concept of \emph{field capacity}.  Water move
+downwards if the water content in the cell exceeds field capacity, and
+stay put otherwise.  These models are $O(n)$ and very popular due to
+their simplicity.  In Daisy we support one such model (with a bit
+heuristics to add limited support for cabilary rise and avoid
+oversaturated soil= for the situations where presice estimates of
+water movement are not necessary.
+
+\subsection{Transport}
+
+The heuristic approach to transport described above gives poor
+approximation when looking at relative short timesteps, or fine
+grained spatial discretization.  A much better approach involves
+noticing that the output from each cell to its neighbors depend on the
+input it receives from its neighbors.  This kind of interdependence
+can be written as a system of linear equations, which can be solved
+using well known methods.  The problem is that, in the most general
+case, the space need to store the equation system is the square of the
+number of cells ($O(n^2)$, abusing the Big-O notation to express
+memory requirements) , and the time complexity of the solution is
+$O(n^4)$.  This means that if we double the number of cells, we need
+four times as much memory, and we will have to wait eight times as
+long for the answer.
+
+\subsubsection{Iterations and time steps}
+
+To make matters worse, the inputs and outputs of each cell also depend
+on the hydraulic conductivity of the cell, which depends (in a
+non-linear way) on the water content of the cell, which we only know
+after we have solved the equation system.  Which means we need to
+iterate over the system until we found a solution.  If the system is
+very dynamic (water content changes fast), this iteration process
+might not be enough, and we need to use smaller time steps in order to
+find a solution.  None of these factors have a simple dependency on
+the number of cells, so they don't affect the Big-O numbers, but they
+affect the real time used, further 
+
+\subsubsection{Our salvation}
+
+Luckily, we can usually do better than the worst case.  Each cell
+really only depend on the cells in its neighborhood, which mean that
+we can ignore dependencies on distant cells.  Using this fact we can
+reduce both the memory requirement and the time complexity.  How much
+we can reduce them depend on the specific geometry we use, but if we
+for example allow us self to ignore all lateral movement, both can be
+reduced to $O(n)$.  Due to the need for iterations and time step
+reductions, the solution is still much slower than with the the simple
+heuristic models, but at least the problem does no longer grow with
+the cube of the number of cells.  This leads us to a discussion of the
+number of spatial dimensions we have to take into account in our
+geometry.
+
+\section{Dimensions}
+
+One way to reduce the number of cells needed is to assume the system
+is homogeneous along some spatial dimensions.  Reducing the number of
+dimensions drastically reduce the number of cells.  If we assume the
+same spatial resolution ans size along each dimension the number of
+cells needed is $s^d$, where $s$ is the resulution (number of
+intervals) along one dimension, and $d$ is the number of dimensions.
+For example, imagine a 1m $\times$ 1m box, with a resolution of 1cm.
+This gives us 100 intervals per dimension, and the cells needed is
+$100^1 = 100$ in a one dimension geometry, $100^2 = 10,000$ in a two
+dimensional geometry, and $100^3 = 1,000,000$ in a three dimensional
+geometry.  In a zero dimensional geometry the cells needed is just
+$100^0 = 1$, so we will look at that case first.
+
+\subsection{Zero dimensions}
+
+In the simplest case, we assume the soil is fully homogenious.  This
+asumption makes sense for a field with a dense root network, that is
+able to catch all the water added to system from above, and with deep
+groundwater so no water is added from below (cabilary rise).  For many
+purposes, such as e.g. irrigation control, or modelling of growth of
+non-stresses crops, such a zero dimensional model is a good match.  It
+is, however, not supported by Daisy, as the original focus of that
+model was leaching, for which at least one dimension is needed.
+
+\subsection{One dimension}
+
+Water and solutes take some time moving down the soil profile, during
+which it may be affected by root zone processes such as crop uptake.
+This means that if we want to model percolation or leaching, we need
+at least one dimension to describe vertical movement.
+
+A one dimensional model is a good fit for a densily distributed crop
+(such as wheat) on flat field, and can also be used on such a field
+before the root system is fully devloped, as it can model the physical
+differences in the soil quality that always exist between the plowing
+layer, the rest of the root zone, and the soil below the root zone.
+The soil below the root zone is important to take into account if
+there is capilary rise.
+
+\subsection{Two dimensions}
+
+If we want to model the system on a scale smaller than the distance
+between the crops, we need additional dimensions.  For row crops,
+including ridged soil, we can sometimes get away with assuming the
+field is homogeneous along the rows, so we only use one additional
+dimension to model the heterogeneity across the rows.  Other
+situations we might want to model in two dimensions is a field with
+drain pipes, where we will asuume the field is homegenious along the
+drain pipes, and a field with a height gradient.
+
+\subsection{Three dimensions}
+
+We need to go to a full three dimension model for a field where more
+than one of the above mentioned factors must be modelled, and they are
+not parallel.  We might also need three dimensions for a heterogenious
+soil, if the soil physics is so we cannot ignore lateral movement.  
+
+If we want to model water distribution from a drip point with subsoil
+irrigation, we will need three dimension using Caretesian coordinates,
+but only two dimensions if we let the second dimension be the
+lateral distance from the drip point.
+
+At this point, Daisy is structurally prepared for three coordinates,
+but does not support it yet.  There are no plans to support Polar
+coordinates.
+
+\subsection{Axes}
+
+By convention, we let \emph{z} denote the vertical axis, and put the
+\emph{x} and \emph{y} axes on the horizontal plane.  The axes are
+always ortogonal to each other.  The vertical axes is shared between
+all geometries, and always (unlike common practice) written first,
+followed by \emph{x} (for two and three dimensional geomentries) and
+\emph{y} (for three dimensional geometries).  On the z axis, we by
+convention use zero for the soil surface, and negative numbers to
+denote subsoil depths.  We talk about \texttt{top} and \texttt{bottom}
+for higher and lower number of the z axes.  For the x axis, the \emph{left}
+side is be convention zero, and it grows positive towards the
+\emph{right} side of the volume.  For the y axis, the \emph{front} is
+by convention zero, and it grows positive towards the \emph{back} of
+the volume.
+
+\section{Cell shapes }
+
+We want to cover the relevant subsoil volume with non-overlapping
+cells, which makes some limitations on what shapes we can use for the
+cells.  
+
+\subsection{Concerns}
+
+Some more concerns are listed here.
+
+\paragraph{User interface}
+Most users of Daisy will prefer not having to deal with the
+discretization of the volume, and rely on whatever heuritics Daisy can
+provide for the job.  However, for those who do care, including the
+authors of the program, we would like cell shapes that makes it easy
+to specify the grid.
+
+\paragraph{Flexibility}
+We would like small cells near ``interesing'' places in the soil,
+where we can expect high pressure gradients.  This would typically be
+the top of the soil, and cells near drain pipes.  In the more mundane
+parts of the soil, where things happens more slowly, we would like
+larger cells to keep the total number of cells down.
+
+\paragraph{Flow concerns}
+For a good numeric solution to the flow between cells, we would like
+them shaped so the content of the cell is a good indicator of the flow
+through the faces connecting the cell and each of its neighbors.  That
+means we would like all parts of the faces to be approximately the
+same distance to the cell center, or in other words, we would like the
+cells to be approximately spherical.  Of course we can't use spheres,
+as we can't in general divide a volume into non-overlapping spheres.
+
+\paragraph{Gravity}
+If the cells have two vertical faces, we can calculate on a purely
+gravity based flux, ignoring horizontal movement.  Such a transport
+model can be good to have a reserve, if the more general models fail
+to provide a solution.
+
+\subsection{Boxes}
+
+In the primary discretization used in Daisy, the cells are organized
+in rectangular grid, with the grid planes parallel to two axes.  This
+means the cells will be rectangular boxes, each with four vertical
+faces, and two horizontal faces.  This is easy to specify, just a list
+of numbers for each axis representing where the grid planes cross it.
+\begin{verbatim}
+  (zplus -1 -2 -5 -10 -20 -30 -50 -70 -90 -100 [cm])
+  (xplus 10 20 30 40 50 60 70 80 90 100 [cm])
+  (yplus 10 20 30 40 50 60 70 80 90 100 [cm])
+\end{verbatim}
+Here we divided one cubic meter of volume into 1000 cells.  The left
+and right faces of the cells are in the particular discretiation
+always 10 cm apart, and so are the front and back faces of the cells.
+We do make use of the flexibility in the z axis, by making the top and
+bottom face of the cells closer to each other for the top cells, and
+farther apart for the cells near the bottom.
+
+\subsection{Other shapes}
+
+The transport algorithms are written so this can easily be extended to
+trapez shaped cells, where four of the walls in the cells are still
+vertical, but the floor and ceiling may have a slope.  The primary
+transport algorithm is actuelly written so it will work with any
+polygons (3D?), with the already named restrictions that it works
+better the closer the cells are to spheres.  However, the simpler
+reserve algorithms does require vertical columns of cells for
+gravitational flow.
+
+\section{Beyond cells}
+
+Thenumber and volume of the cells are the basis of the
+discretizations, but various models needs more detailed information
+about geometry, which we will describe here.
+
+\paragraph{Turnover and depth}
+In general, the turnover functions don't need any geometry information
+beyond the number of cells, not even the size of the cells as Daisy
+will store concentratiuons rather than absolute content.  A few
+turnover functions are affected by depth, so they will be able to ask
+the geometry for the depth of the center of the node.
+
+\paragraph{Projection on z-axes for 1D surface interaction}
+Daisy allows you to combine one dimensional models for ``surface''
+processes, such as crops and management, with a two or three
+dimensional description of the soil.  For this to work, the geometry
+module will be able to project values into one dimensional intervals
+on the z axis.
+
+\paragraph{Faces and face vectors}
+For transport, we need an additional abstraction, namely the
+\emph{face} that connects two neighbor cells.  To calculate diffusion
+flow between two cells, we need the area of the face, and the length
+of the \emph{face vector} connecting the two cell centers.  For
+gravitational flow, we additionally need the difference in height of
+the two cell centers.  That happens to be the length of the face
+vector, multiplied with sinus to the angle of the vector cmpared to
+the horizontal plane.  Daisy will keep information about flow through
+each face, positive numbers indicate that the flow follow the
+direction of the face vector, and vice versa.
+
+\paragraph{Logging user specified volume}
+Daisy allows logging content in, and flow in and out of, a user
+specified volume.  To support this, the geometry module has functions
+to find the toal content of the cells that overlap such a volume (for
+partical overlaps, only the fraction overlapping the volume is
+counted), as well as the total flow for each face vector that cross
+the surface of the volume.  Currently only box volumes are supported,
+with box edges that must be parallel to the axes.  With these, you can
+log flow through each of the six faces of the box seperately.
+
+\paragraph{Plotting}
+
+For visualizing the geometry, information about \emph{edge} and
+\emph{corners} may be useful.  An edge is the line connecting two or
+more faces, and corners are the points connecting edges.
+
+\section{API}
+
+\section{Transport solution}
+
+The water, solute, and heat transport models all relies on solving
+linear equation systems which can be rewritten to the form $A x = b$,
+where $x$ is a vector of size $n$ (the number of cells) and represents
+our solution in the form of water pressure $h$, solute concentration
+$C$, or temperature $T$.  $A$ is a $n\cross{}n$ matrix, where each row
+represents the solution for a specific cell, and each column
+represents the influence from a specific cell on the other cells.  So
+the value of row 3, column six represents the influence of the state
+of cell 6 of the solution for cell 3.  $b$ is a vector of size $n$,
+which represents solution independent influences on the solution for
+each sell.  That is, the old value for the cell, and source/sink terms
+that are independent of the solution.
+
+\end{document}
