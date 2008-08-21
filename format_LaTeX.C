@@ -142,7 +142,9 @@ FormatLaTeX::section_open (const std::string& type, const std::string& title,
   out () << "\\" << type;
   out () << "{";
   text (title);
-  out () << "}\n\\label{" << scope << ":" << label << "}\n";
+  out () << "}\n";
+  this->label (scope, label);
+  out () << "\n";
 }
 
 void 
@@ -217,7 +219,7 @@ FormatLaTeX::text (const std::string& text)
 	break;
       case '[':
       case ']':
-      case '+':
+        // case '+':
       case '=':
       case '<':
       case '>':
