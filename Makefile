@@ -851,7 +851,7 @@ svnci: $(TEXT)
 	rm -f $(REMOVE) 
 	-svn remove $(REMOVE) 
 	svn commit -m "Version $(TAG)"
-	svn copy $(SVNROOT)/trunk \
+	-svn copy $(SVNROOT)/trunk \
 	  $(SVNROOT)/tags/release_`echo $(TAG) | sed -e 's/[.]/_/g'` -m "New release"
 
 .IGNORE: add
