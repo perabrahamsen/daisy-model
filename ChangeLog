@@ -2,6 +2,19 @@
 
 	* Version 4.40 released.
 
+2008-08-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* format_LaTeX.C, format_LaTeX.h (FormatLaTeX::quote_id): New function.
+	* format_LaTeX.C: (FormatLaTeX::label, FormatLaTeX::pageref)	
+	(FormatLaTeX::ref): Use it.
+	(FormatLaTeX::see): Call 'ref'.
+
+	* soil_water.C (SoilWater::tick): Disable 'X_ice_buffer'.
+
+	* metalib.C, metalib.h (Metalib::unit): New member.
+	* unit.C, unit.h: Lots of work.
+	* parser_file.C: Use it.
+
 2008-08-19  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.39 released.

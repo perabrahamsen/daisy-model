@@ -63,6 +63,7 @@ struct FormatLaTeX : public Format
   void hard_linebreak ();
   void new_paragraph ();
   void index (const std::string& name);
+  void quote_id (const std::string& name);
   void label (const std::string& scope, const std::string& id);
   void pageref (const std::string& scope, const std::string& id);
   void ref (const std::string& scope, const std::string& id);

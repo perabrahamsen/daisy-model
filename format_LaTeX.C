@@ -302,21 +302,60 @@ FormatLaTeX::index (const std::string& name)
 }
 
 void
+FormatLaTeX::quote_id (const std::string& text)
+{
+  for (size_t i = 0; i < text.length (); i++)
+    switch (text[i])
+      {
+      case 'Q':
+	  out () << "QQ";
+	break;
+      case '%':
+	out () << "QPERCENT";
+	break;
+      default:
+	out () << text[i];
+      }
+}
+
+void
 FormatLaTeX::label (const std::string& scope, const std::string& id)
-{ out () << "\\label{" << scope << ":" << id << "}"; }
+{ 
+  out () << "\\label{";
+  quote_id (scope);
+  out () << ":";
+  quote_id (id);
+  out () << "}"; 
+}
 
 void
 FormatLaTeX::pageref (const std::string& scope, const std::string& id)
-{ out () << "\\pageref{" << scope << ":" << id << "}"; }
+{ 
+  out () << "\\pageref{";
+  quote_id (scope);
+  out () << ":";
+  quote_id (id);
+  out () << "}"; 
+}
 
 void
 FormatLaTeX::ref (const std::string& scope, const std::string& id)
-{ out () << "\\ref{" << scope << ":" << id << "}"; }
+{ 
+  out () << "\\ref{";
+  quote_id (scope);
+  out () << ":";
+  quote_id (id);
+  out () << "}"; 
+}
 
 void
 FormatLaTeX::see (const std::string& type,
 		  const std::string& scope, const std::string& id)
-{ out () << "(see " << type << "~\\ref{" << scope << ":" << id << "})"; }
+{
+  out () << "(see " << type << "~";
+  ref (scope, id);
+  out () << ")"; 
+}
 
 void
 FormatLaTeX::see_page (const std::string& scope, const std::string& id)
