@@ -88,7 +88,10 @@ static struct special_convert_type
   const symbol to;
   const double factor;
 } special_convert[] = {
-  { symbol ("m"), symbol ("m^-1 kg s^-2") /* Pa */, 10000.0 },
+  // We assume length is cm H2O, and convert to hPa.
+  { symbol ("m") /* cm H2O */, symbol ("m^-1 kg s^-2") /* hPa */, 10000.0 },
+  // We assume mass per volume is mg solute in l H2O, and convert to ppm.
+  { symbol ("m^-3 kg") /* mg/l */, symbol ("") /* ppm */, 0.001 },
 };
 
 static const size_t special_convert_size 
@@ -102,7 +105,7 @@ Unit::compatible (const Unit& from_unit, const Unit& to_unit)
   if (from == to)
     return true;
   
-  // Special convertion betweeen [cm] and [hPa].
+  // Special convertions.
   for (size_t i = 0; i < special_convert_size; i++)
     if (from == special_convert[i].from && to == special_convert[i].to)
       return true; 
@@ -433,7 +436,9 @@ Fcator to multiply with to get base unit.");
          "Unitless.");
     add ("%", 0.01, name, syntax, alist, 0, 0, 0, 0, 0, 0, 0,
          "Percent.");
-
+    add ("ppm", 1.0 / 1000000.0, name, syntax, alist, 0, 0, 0, 0, 0, 0, 0,
+         "Part per million.");
+    
     // Length.
     add ("m", 1.0, name, syntax, alist, 1, 0, 0, 0, 0, 0, 0,
          "Meter.");
@@ -489,13 +494,51 @@ Fcator to multiply with to get base unit.");
     add ("cd", 1.0, name, syntax, alist, 0, 0, 0, 0, 0, 0, 1,
          "Candela.");
     
+    // Speed.
+    add ("m/s", 1.0, name, syntax, alist, 1, 0, -1, 0, 0, 0, 0,
+         "Base speed.");
+    add ("mm/h", 0.001 / 3600.0, name, syntax, alist, 1, 0, -1, 0, 0, 0, 0,
+         "Percolation intensity.");
+    add ("mm/d", 0.001 / (24 * 3600.0), name, syntax, alist, 
+         1, 0, -1, 0, 0, 0, 0,
+         "Percolation intensity.");
+    add ("cm/h", 0.01 / 3600.0, name, syntax, alist, 1, 0, -1, 0, 0, 0, 0,
+         "Soil water movement.");
+    add ("cm/d", 0.01 / (24 * 3600.0), name, syntax, alist, 
+         1, 0, -1, 0, 0, 0, 0,
+         "Soil water movement.");
+    
     // Mass per area.
-    add ("kg/m^2", 1.0, name, syntax, alist, -2, 1, 0, 0, 0, 0, 0,
+    add ("kg/m^2", 1e0, name, syntax, alist, -2, 1, 0, 0, 0, 0, 0,
          "Base mass per area.");
-    add ("g w.w./m^2", 0.001, name, syntax, alist, -2, 1, 0, 0, 0, 0, 0,
+    add ("g w.w./m^2", 1e-3 / 1.0, name, syntax, alist, -2, 1, 0, 0, 0, 0, 0,
          "Wet weight per area.");
-    add ("kg w.w./ha", 0.01 * 0.01, name, syntax, alist, -2, 1, 0, 0, 0, 0, 0,
+    add ("kg w.w./ha", 1e0 / 1e4, name, syntax, alist, -2, 1, 0, 0, 0, 0, 0,
          "Wet weight per area.");
+    add ("Mg w.w./ha", 1e3 / 1e4, name, syntax, alist, 
+         -2, 1, 0, 0, 0, 0, 0,
+         "Wet weight per area.");
+    add ("T w.w./ha", 1e3 / 1e4, name, syntax, alist, 
+         -2, 1, 0, 0, 0, 0, 0,
+         "Wet weight per area.");
+
+    // Mass per volume.
+    add ("kg/m^3", 1e0, name, syntax, alist, -3, 1, 0, 0, 0, 0, 0,
+         "Base mass per volume.");
+    add ("mg N/l", 1e-6 / 1e-3, name, syntax, alist, -3, 1, 0, 0, 0, 0, 0,
+         "Nitrogen concentration.");
+    add ("g/cm^2/mm", 1e-3 / 1e-7, name, syntax, alist, -3, 1, 0, 0, 0, 0, 0,
+         "Irrigation and percolation concentration.");
+
+    // Volume per mass.
+    add ("m^3/kg", 1e0, name, syntax, alist, 3, -1, 0, 0, 0, 0, 0,
+         "Base volume per mass.");
+    add ("l/kg", 1e-3 / 1e0, name, syntax, alist, 3, -1, 0, 0, 0, 0, 0,
+         "Volume per mass.");
+    add ("L/kg", 1e-3 / 1e0, name, syntax, alist, 3, -1, 0, 0, 0, 0, 0,
+         "Volume per mass.");
+    add ("cm^3/g", 1e-6 / 1e-3, name, syntax, alist, 3, -1, 0, 0, 0, 0, 0,
+         "Volume per mass.");
 
     // Pressure.
     add ("Pa", 1.0, name, syntax, alist, -1, 1, -2, 0, 0, 0, 0,
