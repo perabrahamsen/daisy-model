@@ -876,7 +876,7 @@ setup:	svnci
 	$(MAKE) setupnosvn
 	$(MAKE) upload
 
-setupdocs:
+setupdocs: txt/components.tex
 	(cd txt && $(MAKE) PATH="$(PATH):$(Q4HOME)/bin" \
 		           DAISYEXE=$(SRCDIR)/$(OBJHOME)/$(DAISYEXE) \
 			   SETUPDIR=$(SETUPDIR) \
