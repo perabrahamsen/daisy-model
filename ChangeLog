@@ -8,6 +8,10 @@
 
 2008-08-21  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 4.40 released.
+
+2008-08-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
 	* format_LaTeX.C, format_LaTeX.h (FormatLaTeX::quote_id): New function.
 	* format_LaTeX.C: (FormatLaTeX::label, FormatLaTeX::pageref)	
 	(FormatLaTeX::ref): Use it.
