@@ -115,7 +115,6 @@ PhotoFarquhar:: GSTModel(const double CO2_atm, double ABA_effect, double pn, dou
 {
 
   const double wsf = ABA_effect; //water stress function []
-  daisy_assert (ABA_effect == 1.0);
 
   const double intercept = b * LA * fraction; //min conductance 
   daisy_assert (gbw >0.0);
@@ -150,8 +149,6 @@ PhotoFarquhar:: GSTModel(const double CO2_atm, double ABA_effect, double pn, dou
     hs = 0.9;
 
   const double Ds = wi * (1.0 - hs) * Ptot; 
-
-  daisy_assert (wsf == 1.0);
 
   //stomatal conductance
   double gsw; 
