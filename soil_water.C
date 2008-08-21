@@ -165,8 +165,11 @@ SoilWater::tick (const size_t cell_size, const Soil& soil,
   for (size_t i = 0; i < cell_size; i++)
     {
       X_ice_[i] -= S_ice_[i];
+
+
       const double Theta_sat = soil.Theta (i, 0.0, 0.0);
 
+#if 0
       // Move extra ice to buffer.
       const double available_space
 	= Theta_sat - Theta_[i] - X_ice_[i] + S_sum_[i] * dt;
@@ -201,6 +204,7 @@ SoilWater::tick (const size_t cell_size, const Soil& soil,
           X_ice_buffer_[i] += X_ice_[i];
 	  X_ice_[i] = 0.0;
 	}
+#endif 
 
       // Update ice pressure.
       h_ice_[i] = soil.h (i, Theta_sat - X_ice_[i]);
