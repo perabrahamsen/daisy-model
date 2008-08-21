@@ -66,7 +66,7 @@ Colloids_MACRO::initialize (const double Rain_intensity/*[]*/, Treelog& msg)
 {
   //Readily available dispersible particles
   //Initially 10% of Mmax is readily avilable
-  Ms = Mmax / 100 * alpha; //[g g¯¹ soil]
+  Ms = Mmax / 100 * alpha; //[g colloids g¯¹ soil]
 
   //Kinetic energy of rain
   const double E = 29.0 * (1 - 0.72 * exp(-0.05 * Rain_intensity));  //[J m¯² mm¯¹]
@@ -88,7 +88,8 @@ Colloids_MACRO::initialize (const double Rain_intensity/*[]*/, Treelog& msg)
 double
 Colloids_MACRO::colloid_generation (const double dt, const double zi, 
                                     const double bulk_density, 
-                                    const double Rain_intensity /*[mm/h]*/, Treelog& msg)
+                                    const double Rain_intensity /*[mm/h]*/, 
+                                    Treelog& msg)
 {
   //Amount of available dispersible particles at the soil surface
   As = Ms * bulk_density /*[g soil m¯³]*/ * zi /*[m]*/; //[g colloids m¯²]
@@ -124,16 +125,16 @@ static struct ColloidsMACROSyntax
   { return *new Colloids_MACRO (al); }
   static void load_syntax (Syntax& syntax, AttributeList& alist)
   {
-    syntax.add ("Mmax", "[g/g]", Check::non_negative (), Syntax::Const,
+    syntax.add ("Mmax", "g/g", Check::non_negative (), Syntax::Const,
                 "Maximum amount of detachable particles");
     alist.add ("Mmax", 0.165);
-    syntax.add ("kd", "[g/J]", Check::non_negative (), Syntax::Const,
+    syntax.add ("kd", "g/J", Check::non_negative (), Syntax::Const,
                 "Detachment rate coefficient");
     alist.add ("kd", 15.0);
-    syntax.add ("kr", "[g/m²/h]", Check::non_negative (), Syntax::Const,
+    syntax.add ("kr", "g/m²/h", Check::non_negative (), Syntax::Const,
                 "Replenishment rate coefficient");
     alist.add ("kr", 0.1);
-    syntax.add ("alpha", "[%]", Check::non_negative (), Syntax::Const,
+    syntax.add ("alpha", "%", Check::non_negative (), Syntax::Const,
                 "Percent of Mmax initially readily available, Ms");
     alist.add ("alpha", 10.);
 

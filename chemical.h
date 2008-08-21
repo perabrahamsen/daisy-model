@@ -92,6 +92,11 @@ public:
   virtual void add_to_root_sink (const std::vector<double>&) = 0;
   virtual void add_to_transform_source (const std::vector<double>&) = 0;
   virtual void add_to_transform_sink (const std::vector<double>&) = 0;
+  virtual void add_to_source_secondary (const std::vector<double>&) = 0;
+  virtual void add_to_source_primary (const std::vector<double>&) = 0;
+  virtual void add_to_sink_secondary (const std::vector<double>&) = 0;
+  virtual void add_to_sink_primary (const std::vector<double>&) = 0;
+
 
   // Management.
 public:

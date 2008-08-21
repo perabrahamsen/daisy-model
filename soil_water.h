@@ -119,7 +119,9 @@ public:
   double q_secondary (size_t i) const
   { return q_secondary_[i]; }
   double q_tertiary (size_t i) const
-  { return q_tertiary_[i]; }
+  { return q_tertiary_[i]; } 
+  double velocity_cell_primary (const Geometry& geo, size_t i) const;
+  double velocity_cell_secondary (const Geometry& geo, size_t i) const;
   double Theta_ice (const Soil&, size_t i, double h) const;
   double K (size_t i) const
   { return K_[i]; }
