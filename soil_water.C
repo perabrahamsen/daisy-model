@@ -87,11 +87,75 @@ SoilWater::content_surface (const Geometry& geo,
                             const double from, const double to) const
 { return geo.total_surface (Theta_, from, to); }
 
-double SoilWater::velocity_cell_primary (const Geometry& geo, size_t i) const
-{ return 1.0; }
+double 
+SoilWater::velocity_cell_primary (const Geometry& geo, const size_t c) const
+{ 
+  const double Theta = this->Theta_primary (c);
+  if (Theta < 1e-100)
+    return 0.0;
 
-double SoilWater::velocity_cell_secondary (const Geometry& geo, size_t i)const
-{ return 1.0; }
+  double t_q_z = 0.0;
+  double t_q_x = 0.0;
+  double t_area_z = 0.0;
+  double t_area_x = 0.0;
+
+  const std::vector<size_t>& cell_edges = geo.cell_edges (c);
+  for (size_t e = 0; e < cell_edges.size (); e++)
+    {
+      const size_t edge = cell_edges[e];
+      const double q = this->q_primary (edge);
+      const double area = geo.edge_area (edge);
+      const double sin_angle = geo.edge_sin_angle (edge);
+      const double cos_angle = cos (asin (sin_angle));
+      const double area_z = sin_angle * area;
+      const double area_x = cos_angle * area;
+      t_q_z += area_z * q;
+      t_q_x += area_x * q;
+      t_area_z = area_z;
+      t_area_x = area_x;
+    }
+
+  const double q_z = t_q_z / t_area_z;
+  const double q_x = t_q_x / t_area_x;
+  const double q = sqrt (sqr (q_z) + sqr (q_x));
+  const double v = q / Theta;
+  return v;
+}
+
+double 
+SoilWater::velocity_cell_secondary (const Geometry& geo, const size_t c)const
+{ 
+  const double Theta = this->Theta_secondary (c);
+  if (Theta < 1e-100)
+    return 0.0;
+
+  double t_q_z = 0.0;
+  double t_q_x = 0.0;
+  double t_area_z = 0.0;
+  double t_area_x = 0.0;
+
+  const std::vector<size_t>& cell_edges = geo.cell_edges (c);
+  for (size_t e = 0; e < cell_edges.size (); e++)
+    {
+      const size_t edge = cell_edges[e];
+      const double q = this->q_secondary (edge);
+      const double area = geo.edge_area (edge);
+      const double sin_angle = geo.edge_sin_angle (edge);
+      const double cos_angle = cos (asin (sin_angle));
+      const double area_z = sin_angle * area;
+      const double area_x = cos_angle * area;
+      t_q_z += area_z * q;
+      t_q_x += area_x * q;
+      t_area_z = area_z;
+      t_area_x = area_x;
+    }
+
+  const double q_z = t_q_z / t_area_z;
+  const double q_x = t_q_x / t_area_x;
+  const double q = sqrt (sqr (q_z) + sqr (q_x));
+  const double v = q / Theta;
+  return v;
+}
 
 double
 SoilWater::Theta_ice (const Soil& soil, const size_t i, const double h) const
