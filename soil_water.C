@@ -87,7 +87,7 @@ SoilWater::content_surface (const Geometry& geo,
                             const double from, const double to) const
 { return geo.total_surface (Theta_, from, to); }
 
-double SoilWater:: velocity_cell_primary (const Geometry& geo, size_t i) const
+double SoilWater::velocity_cell_primary (const Geometry& geo, size_t i) const
 { return 1.0; }
 
 double SoilWater::velocity_cell_secondary (const Geometry& geo, size_t i)const

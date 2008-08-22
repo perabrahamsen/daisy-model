@@ -448,7 +448,11 @@ static class Convert_cm_pF_ : public Units::Convert
   double operator() (double value) const
   {
     if (value >= 0.0)
-      throw "Cannot represent non-negative pressure of pF";
+#if 0
+      throw "Cannot represent non-negative pressure as pF";
+#else 
+      return -1.0;
+#endif
     return h2pF (value); 
   }
 } Convert_cm_pF;
@@ -460,7 +464,11 @@ static class Convert_kPa_pF_ : public Units::Convert
   double operator() (double value) const
   { 
     if (value >= 0.0)
-      throw "Cannot represent non-negative pressure of pF";
+#if 0
+      throw "Cannot represent non-negative pressure as pF";
+#else 
+      return -1.0;
+#endif
     return h2pF (value * 10.0); 
   }
 } Convert_kPa_pF;

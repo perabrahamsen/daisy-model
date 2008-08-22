@@ -208,10 +208,8 @@ Unit::convert (Metalib& metalib, const symbol from, const symbol to,
   if (from == to)
     return value;
 
-  Treelog& msg = Treelog::null ();
-
-  const Unit *const from_unit = metalib.unit (from, msg);
-  const Unit *const to_unit = metalib.unit (to, msg);
+  const Unit *const from_unit = metalib.unit (from, Treelog::null ());
+  const Unit *const to_unit = metalib.unit (to, Treelog::null ());
 
   // Defined?
   if (!from_unit || !to_unit)
@@ -239,8 +237,12 @@ Unit::convert (Metalib& metalib, const symbol from, const symbol to,
 #if 0
   std::ostringstream tmp;
   tmp << "Converting " << value << " [" << from << "] to " << native 
-      << " [" << to << "] through " << to_base << " [" 
-      << to_unit->base_name () << "]";
+      << " [" << to << "] through " << from_base << " [" 
+      << from_unit->base_name () << "]";
+  if (from_unit->base_name () == to_unit->base_name ())
+    daisy_approximate (from_base, to_base);
+  else
+    tmp << " and " << to_base << " [" << to_unit->base_name () << "]";
   Assertion::message (tmp.str ());
 #endif
   return native;
