@@ -26,7 +26,7 @@
 #include "alist.h"
 #include "fao.h"
 #include "time.h"
-#include "units.h"
+#include "unit.h"
 #include <sstream>
 
 struct WeatherOld::Implementation
@@ -196,7 +196,7 @@ WeatherOld::load_syntax (Syntax& syntax, AttributeList& alist)
 
   IM::add_syntax (syntax, alist, Syntax::Const, "DryDeposit", dry_deposit_unit,
 		  "Atmospheric deposition.");
-  IM::add_syntax (syntax, alist, Syntax::Const, "WetDeposit", Units::ppm (), 
+  IM::add_syntax (syntax, alist, Syntax::Const, "WetDeposit", Unit::ppm (), 
 		  "Deposition of solutes with precipitation.");
 
   // Division between Rain and Snow.

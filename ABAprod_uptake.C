@@ -25,7 +25,7 @@
 #include "scope_id.h"
 #include "geometry.h"
 #include "soil_water.h"
-#include "units.h"
+#include "unit.h"
 #include "assertion.h"
 #include "librarian.h"
 #include "syntax.h"
@@ -120,7 +120,7 @@ ABAProdUptake::check (Treelog& msg) const
 
 ABAProdUptake::ABAProdUptake (Block& al)
   : ABAProd (al),
-    scope (h_name, Units::cm ()),
+    scope (h_name, Unit::cm ()),
     expr (Librarian::build_item<Number> (al, "expr"))
 { }
 

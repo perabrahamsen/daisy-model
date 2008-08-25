@@ -27,7 +27,7 @@
 #include "daisy.h"
 #include "chemical.h"
 #include "number.h"
-#include "units.h"
+#include "unit.h"
 #include "field.h"
 #include "im.h"
 #include "check.h"
@@ -162,7 +162,7 @@ Setting this overrides the 'days' and 'hours' parameters.");
     syntax.add ("temperature", "dg C", 
 		Check::positive (), Syntax::OptionalConst,
 		"Temperature of irrigation (default: air temperature).");
-    IM::add_syntax (syntax, alist, Syntax::Const, "solute", Units::ppm (), 
+    IM::add_syntax (syntax, alist, Syntax::Const, "solute", Unit::ppm (), 
 		    "Solutes in irrigation water.");
   }
 

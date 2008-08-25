@@ -25,7 +25,6 @@
 #include "scope_exchange.h"
 #include "geometry.h"
 #include "soil_water.h"
-#include "units.h"
 #include "assertion.h"
 #include "librarian.h"
 #include "syntax.h"

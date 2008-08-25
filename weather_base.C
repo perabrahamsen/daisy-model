@@ -24,7 +24,7 @@
 #include "fao.h"
 #include "assertion.h"
 #include "time.h"
-#include "units.h"
+#include "unit.h"
 #include "log.h"
 #include "mathlib.h"
 #include "librarian.h"
@@ -95,7 +95,7 @@ WeatherBase::tick_after (const Time& time, Treelog&)
   
   const IM dry (IM::flux_unit (), DryDeposit);
   const IM solute (IM::solute_unit (), WetDeposit);
-  const IM wet = solute * Scalar (Precipitation, Units::mm_per_h ());
+  const IM wet = solute * Scalar (Precipitation, Unit::mm_per_h ());
   deposit_ = dry + wet;
 }
 
@@ -345,7 +345,7 @@ WeatherBase::WeatherBase (Block& al)
     surface_ (reference),
     screen_height_ (2.0),
     DryDeposit (dry_deposit_unit),
-    WetDeposit (Units::ppm ()),
+    WetDeposit (Unit::ppm ()),
     T_average (-42.42e42),           // May be used before Weather::check.
     T_amplitude (-42.42e42),
     max_Ta_yday (-42.42e42),

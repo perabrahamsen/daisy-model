@@ -36,10 +36,30 @@ public:
   static const char *const component;
   symbol library_id () const;
 private:
-  /* const */ symbol base_name_;
+  const symbol base_name_;
 public:
   symbol base_name () const
   { return base_name_; }
+
+  // Base units.
+public:
+  static symbol pressure ();
+  static symbol mass_per_volume ();
+  static symbol amount_of_substance_per_area_per_time ();
+  static symbol energy_per_area_per_time ();
+
+  // Symbols.
+public:
+  static symbol h ();
+  static symbol mm ();
+  static symbol per_mm ();
+  static symbol mm_per_h ();
+  static symbol cm ();
+  static symbol cm_per_h ();
+  static symbol cm2 ();
+  static symbol cm3 ();
+  static symbol per_h ();
+  static symbol ppm ();
   
   // Use.
 public:
@@ -48,15 +68,6 @@ public:
   virtual bool in_native (double) const = 0;
   virtual bool in_base (double) const = 0;
 
-  // Examine.
-public:
-  virtual int length () const;
-  virtual int mass () const;
-  virtual int time () const;
-  virtual int electric_current () const;
-  virtual int thermodynamic_temperature () const;
-  virtual int amount_of_substance () const;
-  virtual int luminous_intensity () const;
   // Utilities.
 private:
   static bool allow_old (const Metalib& metalib);
@@ -70,8 +81,7 @@ public:
 
   // Create and Destroy.
 protected:
-  void find_base_name ();
-  Unit (Block& al);
+  Unit (Block& al, symbol base);
 public:
   virtual ~Unit ();
 };

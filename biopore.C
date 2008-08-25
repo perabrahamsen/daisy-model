@@ -26,7 +26,7 @@
 #include "librarian.h"
 #include "scope_multi.h"
 #include "scope_id.h"
-#include "units.h"
+#include "unit.h"
 #include "check.h"
 #include "geometry.h"
 #include "log.h"
@@ -132,7 +132,7 @@ Biopore::initialize_base (const Geometry& geo, const Scope& parent_scope,
 
   static const symbol per_square_centimeter ("cm^-2");
 
-  ScopeID own_scope (x_symbol (), Units::cm ());
+  ScopeID own_scope (x_symbol (), Unit::cm ());
   ScopeMulti scope (own_scope, parent_scope);
   
   if (!density_expr->check_dim (scope, per_square_centimeter, msg))

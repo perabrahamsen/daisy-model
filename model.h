@@ -44,7 +44,6 @@ public:
 };
 
 // 'ModelLogable' is the base class for all logable models.
-// It has a 'name' parameter for idnetifying it, and 
 class ModelLogable : public Model
 {
   // Content.

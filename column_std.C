@@ -41,13 +41,13 @@
 #include "am.h"
 #include "dom.h"
 #include "time.h"
-#include "units.h"
 #include "log.h"
 #include "submodeler.h"
 #include "memutils.h"
 #include "librarian.h"
 #include "scope_multi.h"
 #include "scopesel.h"
+#include "unit.h"
 
 struct ColumnStandard : public Column
 {
@@ -198,7 +198,7 @@ ColumnStandard::irrigate_overhead (const double flux, const double temp,
   daisy_assert (flux >= 0.0);
   bioclimate->irrigate_overhead (flux, temp);
   IM im (solute_per_mm_unit, sm);
-  im *= Scalar (flux * dt, Units::mm ());
+  im *= Scalar (flux * dt, Unit::mm ());
   fertilize (im, dt, msg);
 }
 
@@ -209,7 +209,7 @@ ColumnStandard::irrigate_surface (const double flux, const double temp,
   daisy_assert (flux >= 0.0);
   bioclimate->irrigate_surface (flux, temp);
   IM im (solute_per_mm_unit, sm);
-  im *= Scalar (flux * dt, Units::mm ());
+  im *= Scalar (flux * dt, Unit::mm ());
   fertilize (im, dt, msg);
 }
 
@@ -220,7 +220,7 @@ ColumnStandard::irrigate_overhead (const double flux,
   daisy_assert (flux >= 0.0);
   bioclimate->irrigate_overhead (flux);
   IM im (solute_per_mm_unit, sm);
-  im *= Scalar (flux * dt, Units::mm ());
+  im *= Scalar (flux * dt, Unit::mm ());
   fertilize (im, dt, msg);
 }
 
@@ -231,7 +231,7 @@ ColumnStandard::irrigate_surface (const double flux,
   daisy_assert (flux >= 0.0);
   bioclimate->irrigate_surface (flux);
   IM im (solute_per_mm_unit, sm);
-  im *= Scalar (flux * dt, Units::mm ());
+  im *= Scalar (flux * dt, Unit::mm ());
   fertilize (im, dt, msg);
 }
 
@@ -243,7 +243,7 @@ ColumnStandard::irrigate_subsoil (const double flux, const IM& sm,
   soil_water->incorporate (geometry, flux / 10.0 /* mm -> cm */, from, to);
   bioclimate->irrigate_subsoil (flux);
   IM im (solute_per_mm_unit, sm);
-  im *= Scalar (flux * dt, Units::mm ());
+  im *= Scalar (flux * dt, Unit::mm ());
   chemistry->incorporate (geometry, im, from, to, dt, msg);
 }
 
@@ -255,7 +255,7 @@ ColumnStandard::irrigate_subsoil (const double flux, const IM& sm,
   soil_water->incorporate (geometry, flux / 10.0 /* mm -> cm */, volume);
   bioclimate->irrigate_subsoil (flux);
   IM im (solute_per_mm_unit, sm);
-  im *= Scalar (flux * dt, Units::mm ());
+  im *= Scalar (flux * dt, Unit::mm ());
   chemistry->incorporate (geometry, im, volume, dt, msg);
 }
 

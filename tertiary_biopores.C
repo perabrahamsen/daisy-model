@@ -357,6 +357,8 @@ TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
       
       // Scale down ddt so our loss does not exceed the allowed.
       const double factor = allowed_loss / Theta_loss;
+      daisy_assert (factor > 0.0);
+      daisy_assert (factor <= 1.0);
       ddt *= factor;
     }
 

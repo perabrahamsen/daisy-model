@@ -45,7 +45,7 @@
 #include "svat.h"
 #include "vegetation.h"
 #include "time.h"
-#include "units.h"
+#include "unit.h"
 #include "check.h"
 #include "fao.h"
 #include "librarian.h"
@@ -908,7 +908,7 @@ BioclimateStandard::tick (const Time& time,
   day_length_ = weather.day_length ();
   
   // Add deposition. 
-  const IM im = weather.deposit () * Scalar (dt, Units::h ());
+  const IM im = weather.deposit () * Scalar (dt, Unit::h ());
   chemistry.deposit (im, dt, msg);
 
   // Update canopy structure.

@@ -36,7 +36,7 @@
 #include "block.h"
 #include "check.h"
 #include "assertion.h"
-#include "units.h"
+#include "unit.h"
 #include <memory>
 
 struct ActionExtern : public Action
@@ -182,7 +182,7 @@ struct ActionExternFertigation : public Action
 	IM im (mg_per_square_m);
 	im.set_value (Chemical::NH4 (), kg_per_ha, NH4_value * dt);
 	im.set_value (Chemical::NO3 (), kg_per_ha, NO3_value * dt);
-	im *= Scalar (total_flux * dt, Units::per_mm ());
+	im *= Scalar (total_flux * dt, Unit::per_mm ());
 
 	if (surface_value > 0)
 	  field.irrigate_surface (surface_value, im, dt, msg); 
