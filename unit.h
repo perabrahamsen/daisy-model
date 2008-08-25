@@ -77,13 +77,44 @@ public:
   static symbol per_h ();
   static symbol ppm ();
   
+  // Special conversion rules.
+private:
+  static struct special_convert_type
+  {
+    const symbol from;
+    const symbol to;
+    const double factor;
+  } special_convert[];
+  static const size_t special_convert_size;
+  static double base_convert (symbol from, symbol to, double value);
+
   // Utilities.
+protected:
+  static bool compatible (const Unit& from, const Unit& to);
+  static double unit_convert (const Unit& from, const Unit& to, double value);
 public:
   virtual bool can_convert (symbol from, symbol to,
                             Treelog&) const = 0;
   virtual bool can_convert (symbol from, symbol to) const = 0;
   virtual bool can_convert (symbol from, symbol to, double) const = 0;
   virtual double convert (symbol from, symbol to, double) const = 0;
+
+  // Conversion.
+public:
+  struct Convert : public boost::noncopyable
+  {
+    // Use.
+    virtual double operator()(double value) const = 0;
+    virtual bool valid (double value) const = 0;
+
+    // Create and destroy.
+    Convert ();
+    virtual ~Convert ();
+  };
+protected:
+  static const Convert* create_convertion (const Unit& from, const Unit& to);
+public:
+  virtual const Convert& get_convertion (symbol from, symbol to) const = 0;
 
   // Create and destroy.
 protected:

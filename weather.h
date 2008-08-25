@@ -29,6 +29,7 @@
 class Time;
 class Treelog;
 class Block;
+class Unitc;
 
 class Weather : public ModelLogable
 {

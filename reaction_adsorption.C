@@ -30,7 +30,7 @@
 #include "soil.h"
 #include "soil_water.h"
 #include "scope_soil.h"
-#include "units.h"
+#include "unit.h"
 #include "log.h"
 #include "assertion.h"
 #include "librarian.h"
@@ -81,7 +81,7 @@ struct ReactionAdsorption : public Reaction
 	if (has_solute > want_solute)
 	  {
 	    if (!adsorption_rate->tick_value (convert,
-					      Units::per_h (), scope, msg))
+					      Unitc::per_h (), scope, msg))
 	      msg.error ("Could not evaluate 'adsorption_rate'");
 	    
 	    if (convert * dt >= 1.0)
@@ -92,7 +92,7 @@ struct ReactionAdsorption : public Reaction
 	else
 	  {
 	    if (!desorption_rate->tick_value (convert,
-					      Units::per_h (), scope, msg))
+					      Unitc::per_h (), scope, msg))
 	      msg.error ("Could not evaluate 'desorption_rate'");
 	    
 	    if (convert * dt >= 1.0)
@@ -127,9 +127,9 @@ struct ReactionAdsorption : public Reaction
         ok = false;
       }
     ScopeSoil scope (soil, soil_water, soil_heat);
-    if (!adsorption_rate->check_dim (scope, Units::per_h (), msg))
+    if (!adsorption_rate->check_dim (scope, Unitc::per_h (), msg))
       ok = false;
-    if (!desorption_rate->check_dim (scope, Units::per_h (), msg))
+    if (!desorption_rate->check_dim (scope, Unitc::per_h (), msg))
       ok = false;
 
     return ok;

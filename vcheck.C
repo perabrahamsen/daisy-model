@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "vcheck.h"
-#include "units.h"
+#include "unit.h"
 #include "metalib.h"
 #include "library.h"
 #include "syntax.h"
@@ -552,13 +552,32 @@ VCheck::String::check (const Metalib&, const Syntax& syntax, const AttributeList
 }
 
 void 
-VCheck::Compatible::validate (const std::string& value) const throw (std::string)
+VCheck::Compatible::validate (const Unitc& unitc, symbol value)
+  const throw (std::string)
 {
-  if (!Units::can_convert (dimension, value))
+  if (!unitc.can_convert (dimension, value))
     {
       std::ostringstream tmp;
       tmp << "Cannot convert [" << dimension << "] to [" << value << "]";
       throw std::string (tmp.str ());
+    }
+}
+
+void
+VCheck::Compatible::check (const Metalib& metalib,
+                           const Syntax& syntax, const AttributeList& alist, 
+                           const std::string& key) const throw (std::string)
+{
+  daisy_assert (alist.check (key));
+  daisy_assert (!syntax.is_log (key));
+  const Unitc& unitc = metalib.unitc ();
+  if (syntax.size (key) == Syntax::Singleton)
+    validate (unitc, alist.identifier (key));
+  else
+    {
+      const std::vector<symbol> names = alist.identifier_sequence (key);
+      for (size_t i = 0; i < names.size (); i++)
+        validate (unitc, names[i]);
     }
 }
 

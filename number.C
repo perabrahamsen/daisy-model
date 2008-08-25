@@ -93,3 +93,5 @@ Number::~Number ()
 
 static Librarian Number_init (Number::component, "\
 Generic representation of numbers.");
+
+// number.C ends here.

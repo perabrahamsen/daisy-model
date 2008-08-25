@@ -1307,7 +1307,7 @@ bdconv${OBJ}: bdconv.C bdconv.h units.h symbol.h geometry.h syntax.h \
   treelog.h mathlib.h assertion.h soil.h volume.h model.h alist.h
 abiotic${OBJ}: abiotic.C abiotic.h mathlib.h assertion.h
 scope_soil${OBJ}: scope_soil.C scope_soil.h scope.h symbol.h model.h alist.h \
-  soil.h soil_water.h soil_heat.h units.h syntax.h treelog.h assertion.h \
+  soil.h soil_water.h soil_heat.h unit.h syntax.h treelog.h assertion.h \
   librarian.h
 run${OBJ}: run.C run.h model.h symbol.h alist.h
 treelog_text${OBJ}: treelog_text.C treelog_text.h treelog.h symbol.h \
@@ -1352,8 +1352,8 @@ symbol${OBJ}: symbol.C symbol.h assertion.h
 fao${OBJ}: fao.C fao.h alist.h symbol.h syntax.h treelog.h net_radiation.h \
   model.h assertion.h mathlib.h librarian.h
 gaussj${OBJ}: gaussj.C gaussj.h mathlib.h assertion.h
-vcheck${OBJ}: vcheck.C vcheck.h symbol.h units.h metalib.h library.h syntax.h \
-  treelog.h alist.h time.h plf.h assertion.h mathlib.h
+vcheck${OBJ}: vcheck.C vcheck.h symbol.h unit.h model.h alist.h metalib.h \
+  library.h syntax.h treelog.h time.h plf.h assertion.h mathlib.h
 assertion${OBJ}: assertion.C assertion.h treelog.h symbol.h mathlib.h
 xref${OBJ}: xref.C xref.h symbol.h traverse.h metalib.h library.h syntax.h \
   treelog.h alist.h submodel.h assertion.h
@@ -1505,7 +1505,7 @@ equil_langmuir${OBJ}: equil_langmuir.C equil.h model.h symbol.h alist.h \
   assertion.h librarian.h
 transform_equil${OBJ}: transform_equil.C transform.h model.h symbol.h alist.h \
   block.h syntax.h treelog.h plf.h soil.h soil_water.h equil.h \
-  scope_soil.h scope.h number.h units.h check.h mathlib.h assertion.h \
+  scope_soil.h scope.h number.h unit.h check.h mathlib.h assertion.h \
   librarian.h
 reaction_nit${OBJ}: reaction_nit.C reaction.h model.h symbol.h alist.h \
   geometry.h syntax.h treelog.h mathlib.h assertion.h soil.h soil_water.h \
@@ -1518,7 +1518,7 @@ reaction_denit${OBJ}: reaction_denit.C reaction.h model.h symbol.h alist.h \
 reaction_adsorption${OBJ}: reaction_adsorption.C reaction.h model.h symbol.h \
   alist.h block.h syntax.h treelog.h plf.h number.h adsorption.h \
   chemistry.h chemical.h geometry.h mathlib.h assertion.h soil.h \
-  soil_water.h scope_soil.h scope.h units.h log.h time.h border.h \
+  soil_water.h scope_soil.h scope.h unit.h log.h time.h border.h \
   librarian.h
 reaction_equil${OBJ}: reaction_equil.C reaction.h model.h symbol.h alist.h \
   block.h syntax.h treelog.h plf.h number.h equil.h chemistry.h \
@@ -1642,7 +1642,7 @@ organic_std${OBJ}: organic_std.C organic_matter.h model.h symbol.h alist.h \
 integer_arit${OBJ}: integer_arit.C integer.h model.h symbol.h alist.h \
   syntax.h treelog.h vcheck.h assertion.h memutils.h librarian.h
 source_merge${OBJ}: source_merge.C source.h model.h symbol.h alist.h time.h \
-  block.h syntax.h treelog.h plf.h gnuplot_utils.h units.h vcheck.h \
+  block.h syntax.h treelog.h plf.h gnuplot_utils.h unit.h vcheck.h \
   mathlib.h assertion.h memutils.h librarian.h
 number_source${OBJ}: number_source.C number.h symbol.h model.h alist.h \
   block.h syntax.h treelog.h plf.h source.h time.h assertion.h \
@@ -1655,7 +1655,7 @@ action_table${OBJ}: action_table.C action.h model.h symbol.h alist.h \
   lexer_table.h block.h plf.h mathlib.h assertion.h librarian.h
 xysource_merge${OBJ}: xysource_merge.C xysource.h model.h symbol.h alist.h \
   block.h syntax.h treelog.h plf.h gnuplot_utils.h number.h \
-  scope_sources.h scope.h time.h units.h vcheck.h memutils.h librarian.h
+  scope_sources.h scope.h time.h unit.h vcheck.h memutils.h librarian.h
 xysource_inline${OBJ}: xysource_inline.C xysource.h model.h symbol.h alist.h \
   block.h syntax.h treelog.h plf.h gnuplot_utils.h number.h vcheck.h \
   assertion.h librarian.h
@@ -1686,7 +1686,7 @@ source_expr${OBJ}: source_expr.C source_file.h source.h model.h symbol.h \
   alist.h time.h lexer_table.h block.h syntax.h treelog.h plf.h \
   scope_table.h scope.h number.h librarian.h
 source_std${OBJ}: source_std.C source_file.h source.h model.h symbol.h \
-  alist.h time.h lexer_table.h block.h syntax.h treelog.h plf.h units.h \
+  alist.h time.h lexer_table.h block.h syntax.h treelog.h plf.h unit.h \
   librarian.h
 action_markvand${OBJ}: action_markvand.C action.h model.h symbol.h alist.h \
   block.h syntax.h treelog.h plf.h daisy.h program.h run.h time.h \
@@ -1813,7 +1813,7 @@ action_message${OBJ}: action_message.C action.h model.h symbol.h alist.h \
   daisy.h program.h run.h timestep.h vcheck.h memutils.h librarian.h
 weather_std${OBJ}: weather_std.C weather_base.h weather.h model.h symbol.h \
   alist.h im.h syntax.h treelog.h chemical.h fao.h lexer_data.h lexer.h \
-  time.h plf.h mathlib.h assertion.h units.h submodeler.h block.h check.h \
+  time.h plf.h mathlib.h assertion.h unit.h submodeler.h block.h check.h \
   vcheck.h memutils.h librarian.h path.h
 groundwater_pipe${OBJ}: groundwater_pipe.C groundwater.h model.h symbol.h \
   alist.h block.h syntax.h treelog.h plf.h log.h time.h border.h \

@@ -24,7 +24,7 @@
 #include "soil.h"
 #include "soil_water.h"
 #include "soil_heat.h"
-#include "units.h"
+#include "unit.h"
 #include "syntax.h"
 #include "alist.h"
 #include "assertion.h"
@@ -92,7 +92,7 @@ ScopeSoil::dimension (const symbol tag) const
   if (tag == humus)
     return Syntax::fraction ();
   if (tag == h)
-    return Units::cm ();
+    return Unitc::cm ();
   if (tag == Theta)
     return Syntax::none ();
 

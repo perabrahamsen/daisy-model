@@ -20,7 +20,7 @@
 
 #define BUILD_DLL
 #include "source_file.h"
-#include "units.h"
+#include "unit.h"
 #include "lexer_table.h"
 #include "alist.h"
 #include "librarian.h"
@@ -29,6 +29,7 @@
 struct SourceStandard : public SourceFile
 {
   // Content.
+  const Unitc& unitc;
   const symbol tag;
   const symbol title_;
   symbol dimension_;
@@ -70,7 +71,7 @@ SourceStandard::load (Treelog& msg)
   const symbol original (lex.dimension (tag_c));
   if (original != Syntax::unknown () && dimension_ == Syntax::unknown ())
     dimension_ = original;
-  else if (!has_factor && !Units::can_convert (original, dimension_))
+  else if (!has_factor && !unitc.can_convert (original, dimension_))
     {
       std::ostringstream tmp;
       tmp << "Cannot convert from [" << original << "] to [" << dimension_ 
@@ -102,8 +103,8 @@ SourceStandard::load (Treelog& msg)
       double val = lex.convert_to_double (value);
       if (has_factor)
         val *= factor;
-      else if (Units::can_convert (original, dimension_, val))
-        val = Units::convert (original, dimension_, val);
+      else if (unitc.can_convert (original, dimension_, val))
+        val = unitc.convert (original, dimension_, val);
       else 
         {
           static bool has_warned = false;
@@ -137,6 +138,7 @@ SourceStandard::load (Treelog& msg)
 
 SourceStandard::SourceStandard (Block& al)
   : SourceFile (al),
+    unitc (al.unitc ()),
     tag (al.identifier ("tag")),
     title_ (al.identifier ("title", tag)),
     dimension_ (al.identifier ("dimension", Syntax::unknown ())),

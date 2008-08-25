@@ -31,6 +31,7 @@
 class Treelog;
 class Metalib;
 class Path;
+class Unitc;
 
 #ifdef __unix
 #define EXPORT /* Nothing */
@@ -48,6 +49,7 @@ class EXPORT Block : private boost::noncopyable
   std::auto_ptr<Implementation> impl;
 public:
   Metalib& metalib ();
+  const Unitc& unitc ();
   Path& path ();
   const AttributeList& alist () const;
   const Syntax& syntax () const;

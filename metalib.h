@@ -33,6 +33,7 @@ class Library;
 class Model;
 class Treelog;
 class Unitc;
+class Unit;
 
 #ifdef __unix
 #define EXPORT /* Nothing */
@@ -53,6 +54,7 @@ class EXPORT Metalib
   // Interface.
 public:
   const Unitc& unitc () const;
+  const Unit& get_unit (symbol name) const;
   Path& path () const;
   Syntax& syntax () const;
   AttributeList& alist () const;

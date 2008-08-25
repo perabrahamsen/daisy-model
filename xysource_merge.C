@@ -26,7 +26,7 @@
 #include "gnuplot_utils.h"
 #include "number.h"
 #include "scope_sources.h"
-#include "units.h"
+#include "unit.h"
 #include "vcheck.h"
 #include "memutils.h"
 #include "librarian.h"
@@ -35,6 +35,8 @@
 struct XYSourceMerge : public XYSource
 {
   // Content.
+  const Unitc& unitc;
+
   // Source.
   const std::vector<XYSource*> source;
   const std::string title_;
@@ -91,14 +93,14 @@ XYSourceMerge::load (Treelog& msg)
         }
 
       // Check convertions.
-      if (!Units::can_convert (source[i]->x_dimension (), x_dimension ()))
+      if (!unitc.can_convert (source[i]->x_dimension (), x_dimension ()))
         {
           msg.error ("Cannot convert x dimension from [" 
                      + source[i]->x_dimension () + "] to ["
                      + x_dimension () + "]");
           ok = false;
         }
-      if (!Units::can_convert (source[i]->y_dimension (), y_dimension ()))
+      if (!unitc.can_convert (source[i]->y_dimension (), y_dimension ()))
         {
           msg.error ("Cannot convert y dimension from [" 
                      + source[i]->y_dimension () + "] to ["
@@ -121,7 +123,7 @@ XYSourceMerge::load (Treelog& msg)
           static bool has_warned = true;
 
           const double x = source[i]->x ()[j];
-          if (!Units::can_convert (source[i]->x_dimension (), x_dimension (),
+          if (!unitc.can_convert (source[i]->x_dimension (), x_dimension (),
                                    x))
             {
               if (has_warned)
@@ -136,7 +138,7 @@ XYSourceMerge::load (Treelog& msg)
             }
 
           const double y = source[i]->y ()[j];
-          if (!Units::can_convert (source[i]->y_dimension (), y_dimension (),
+          if (!unitc.can_convert (source[i]->y_dimension (), y_dimension (),
                                    y))
             {
               if (has_warned)
@@ -150,12 +152,12 @@ XYSourceMerge::load (Treelog& msg)
               continue;
             }
 
-          xs.push_back (Units::convert (source[i]->x_dimension (), 
-                                        x_dimension (),
-                                        x));
-          ys.push_back (Units::convert (source[i]->y_dimension (), 
-                                        y_dimension (),
-                                        y));
+          xs.push_back (unitc.convert (source[i]->x_dimension (), 
+                                       x_dimension (),
+                                       x));
+          ys.push_back (unitc.convert (source[i]->y_dimension (), 
+                                       y_dimension (),
+                                       y));
         }
     }
 
@@ -165,6 +167,7 @@ XYSourceMerge::load (Treelog& msg)
 
 XYSourceMerge::XYSourceMerge (Block& al)
   : XYSource (al),
+    unitc (al.unitc ()),
     source (Librarian::build_vector<XYSource> (al, "source")),
     title_ (al.name ("title")),
     x_dimension_ (al.name ("x_dimension")),

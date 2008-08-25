@@ -31,7 +31,7 @@
 #include "equil.h"
 #include "scope_soil.h"
 #include "number.h"
-#include "units.h"
+#include "unit.h"
 #include "check.h"
 #include "mathlib.h"
 #include "librarian.h"
@@ -90,14 +90,14 @@ TransformEquilibrium::tick (const Soil& soil, const SoilWater& soil_water,
       double convert = 0.0;
       if (has_A > want_A)
 	{
-	  if (!k_AB_expr->tick_value (convert, Units::per_h (), scope, msg))
+	  if (!k_AB_expr->tick_value (convert, Unitc::per_h (), scope, msg))
 	    msg.error ("Could not evaluate 'k_AB'");
 
 	  convert *= (has_A - want_A);
 	}
       else
 	{
-	  if (!k_BA_expr->tick_value (convert, Units::per_h (), scope, msg))
+	  if (!k_BA_expr->tick_value (convert, Unitc::per_h (), scope, msg))
 	    msg.error ("Could not evaluate 'k_BA'");
 
 	  convert *= -(has_B - want_B);
@@ -122,9 +122,9 @@ TransformEquilibrium::check (const Soil& soil, const SoilWater& soil_water,
       scope.set_cell (c);
       if (!equilibrium->check (scope, msg))
 	ok = false;
-      if (!k_AB_expr->check_dim (scope, Units::per_h (), msg))
+      if (!k_AB_expr->check_dim (scope, Unitc::per_h (), msg))
 	ok = false;
-      if (!k_BA_expr->check_dim (scope, Units::per_h (), msg))
+      if (!k_BA_expr->check_dim (scope, Unitc::per_h (), msg))
 	ok = false;
     }
   return ok;

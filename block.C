@@ -264,6 +264,10 @@ Metalib&
 Block::metalib ()
 { return impl->metalib; }
 
+const Unitc& 
+Block::unitc ()
+{ return impl->metalib.unitc (); }
+
 Path& 
 Block::path ()
 { return impl->metalib.path (); }

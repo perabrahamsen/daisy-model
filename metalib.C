@@ -57,21 +57,17 @@ struct Metalib::Implementation : public Unitc
   void add_unit (const symbol name);
   void add_all_units ();
   bool allow_old () const;
-  static struct special_convert_type
-  {
-    const symbol from;
-    const symbol to;
-    const double factor;
-  } special_convert[];
-  static const size_t special_convert_size;
-  static bool compatible (const Unit& from, const Unit& to);
-  static double base_convert (symbol from, symbol to, const double value);
 
   // Units public interface.
   bool can_convert (symbol from, symbol to, Treelog&) const;
   bool can_convert (symbol from, symbol to) const;
   bool can_convert (symbol from, symbol to, double) const;
   double convert (symbol from, symbol to, double) const;
+
+  // Conversions.
+  typedef std::map<symbol, const Convert*> convert_map;
+  mutable convert_map conversions;
+  const Convert& get_convertion (symbol from, symbol to) const;
 
   // Create and destroy.
   Implementation (Metalib& m)
@@ -83,6 +79,7 @@ struct Metalib::Implementation : public Unitc
   { 
     map_delete (all.begin (), all.end ()); 
     map_delete (units.begin (), units.end ()); 
+    map_delete (conversions.begin (), conversions.end ()); 
   }
 };
 
@@ -142,57 +139,6 @@ Metalib::Implementation::allow_old () const
   return allow_old_units;
 }
 
-Metalib::Implementation::special_convert_type
-Metalib::Implementation::special_convert[] = {
-  // We assume length is cm H2O, and convert to hPa.
-  { symbol ("m") /* cm H2O */, Unit::pressure () /* hPa */, 10000.0 },
-  // We assume mass per volume is mg solute in l H2O, and convert to ppm.
-  { Unit::mass_per_volume () /* mg/l */, symbol ("") /* ppm */, 0.001 },
-  // We assume amount of substance is mol photons in PAR and convert to Watt.
-  { Unit::amount_of_substance_per_area_per_time () /* mol/m^2/s */,
-    Unit::energy_per_area_per_time () /* W/m^2 */,
-    1.0 / 0.0000046 }
-};
-
-const size_t 
-Metalib::Implementation::special_convert_size 
-/**/ = sizeof (Metalib::Implementation::special_convert) 
-  / sizeof (Metalib::Implementation::special_convert_type);
-
-bool 
-Metalib::Implementation::compatible (const Unit& from_unit, const Unit& to_unit)
-{
-  const symbol from = from_unit.base_name ();
-  const symbol to = to_unit.base_name ();
-  if (from == to)
-    return true;
-  
-  // Special convertions.
-  for (size_t i = 0; i < special_convert_size; i++)
-    if (from == special_convert[i].from && to == special_convert[i].to)
-      return true; 
-    else if (from == special_convert[i].to && to == special_convert[i].from)
-      return true;
-  
-  return false;
-}
-
-double
-Metalib::Implementation::base_convert (const symbol from, const symbol to,
-                                       const double value)
-{
-  if (from == to)
-    return value;
-  
-  for (size_t i = 0; i < special_convert_size; i++)
-    if (from == special_convert[i].from && to == special_convert[i].to)
-      return value * special_convert[i].factor;
-    else if (from == special_convert[i].to && to == special_convert[i].from)
-      return value / special_convert[i].factor;
-  
-  throw "Cannot convert base [" + from + "] to [" + to + "]";
-}
-
 bool
 Metalib::Implementation::can_convert (const symbol from, const symbol to, 
                                       Treelog& msg) const
@@ -205,9 +151,13 @@ Metalib::Implementation::can_convert (const symbol from, const symbol to,
     {
       if (!allow_old ())
         {
-          if (!has_unit (from))
+          if (has_unit (from))
+            msg.message ("Original dimension [" + from + "] known.");
+          else
             msg.message ("Original dimension [" + from + "] not known.");
-          if (!has_unit (to))
+          if (has_unit (to))
+            msg.message ("Target dimension [" + to + "] known.");
+          else
             msg.message ("Target dimension [" + to + "] not known.");
           return false;
         }
@@ -278,7 +228,7 @@ Metalib::Implementation::can_convert (const symbol from, const symbol to,
   const Unit& from_unit = get_unit (from);
   const Unit& to_unit = get_unit (to);
 
-  if (!Metalib::Implementation::compatible (from_unit, to_unit))
+  if (!compatible (from_unit, to_unit))
     return false;
   if (!from_unit.in_native  (value))
     return false;
@@ -306,38 +256,48 @@ Metalib::Implementation::convert (const symbol from, const symbol to,
         + "] to unknown dimension [" + to + "]";
     }
   
+  return Unitc::unit_convert (get_unit (from), get_unit (to), value);
+}
+
+const Unitc::Convert& 
+Metalib::Implementation::get_convertion (const symbol from, 
+                                         const symbol to) const
+{
+  const symbol key (from.name () + " -> " + to.name ());
+
+  // Already known.
+  Implementation::convert_map::const_iterator i
+    = this->conversions.find (key); 
+  if (i != this->conversions.end ())
+    return *(*i).second;
+
+  // Defined?
+  if (!has_unit (from))
+    throw "Cannot get conversion from unknown dimension [" + from 
+      + "] to [" + to + "]";
+  if (!has_unit (to))
+    throw "Cannot get conversion from [" + from 
+      + "] to unknown dimension [" + to + "]";
+  
   const Unit& from_unit = get_unit (from);
   const Unit& to_unit = get_unit (to);
-
   if (!compatible (from_unit, to_unit))
-    throw std::string ("Cannot convert [") + from 
-      + "] with base [" + from_unit.base_name () + "] to [" + to
-      + "] with base [" + to_unit.base_name () + "]";
+    throw "Cannot get conversion from [" + from 
+      + "] to dimension [" + to + "]";
 
-  const double from_base = from_unit.to_base (value);
-  const double to_base = base_convert (from_unit.base_name (),
-                                       to_unit.base_name (), 
-                                       from_base);
-  const double native = to_unit.to_native (to_base);
-  
-#if 0
-  std::ostringstream tmp;
-  tmp << "Converting " << value << " [" << from << "] to " << native 
-      << " [" << to << "] through " << from_base << " [" 
-      << from_unit.base_name () << "]";
-  if (from_unit.base_name () == to_unit.base_name ())
-    daisy_approximate (from_base, to_base);
-  else
-    tmp << " and " << to_base << " [" << to_unit.base_name () << "]";
-  Assertion::message (tmp.str ());
-#endif
-
-  return native;
+  const Convert* convert = create_convertion (from_unit, to_unit);
+  daisy_assert (convert);
+  conversions[key] = convert;
+  return *convert;
 }
 
 const Unitc& 
 Metalib::unitc () const
 { return *impl; }
+
+const Unit& 
+Metalib::get_unit (const symbol name) const
+{ return impl->get_unit (name); }
 
 Path& 
 Metalib::path () const

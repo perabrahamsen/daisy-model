@@ -32,6 +32,7 @@ class Metalib;
 class AttributeList;
 class Syntax;
 class PLF;
+class Unitc;
 
 class VCheck : private boost::noncopyable
 { 
@@ -210,15 +211,17 @@ private:
               const std::string& key) const throw (std::string);
 };
 
-class VCheck::Compatible : public VCheck::String
+class VCheck::Compatible : public VCheck
 {
   // Parameters.
 private:
-  const std::string dimension;
+  const symbol dimension;
 
   // Use.
 private:
-  void validate (const std::string& value) const throw (std::string);
+  void validate (const Unitc&, symbol value) const throw (std::string);
+  void check (const Metalib&, const Syntax&, const AttributeList&,
+              const std::string& key) const throw (std::string);
 
   // Create and Destroy.
 public:

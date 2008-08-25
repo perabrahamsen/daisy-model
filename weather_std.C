@@ -30,7 +30,7 @@
 #include "plf.h"
 #include <sstream>
 #include "mathlib.h"
-#include "units.h"
+#include "unit.h"
 #include "submodeler.h"
 #include "check.h"
 #include "vcheck.h"
@@ -44,7 +44,13 @@
 
 struct WeatherStandard : public WeatherBase
 {
+  const Unitc& unitc;
   Path& path;
+
+  // Units.
+  static symbol N_deposit_unit ();
+  static symbol fraction_unit ();
+  static symbol hours_unit ();
 
   // Snow Model.
   const double T_rain;
@@ -115,7 +121,7 @@ struct WeatherStandard : public WeatherBase
     const char* name;
     const char* dim;
     double WeatherStandard::* value;
-    std::string WeatherStandard::* read;
+    symbol WeatherStandard::* read;
     double min;
     double max;
     bool required;
@@ -136,16 +142,16 @@ struct WeatherStandard : public WeatherBase
   bool has_reference_evapotranspiration_;
 
   // Convertion.
-  std::string air_temperature_read;
-  std::string min_air_temperature_read;
-  std::string max_air_temperature_read;
-  std::string global_radiation_read;
-  std::string precipitation_read;
-  std::string vapor_pressure_read;
-  std::string diffuse_radiation_read;
-  std::string relative_humidity_read;
-  std::string wind_speed_read;
-  std::string reference_evapotranspiration_read;
+  symbol air_temperature_read;
+  symbol min_air_temperature_read;
+  symbol max_air_temperature_read;
+  symbol global_radiation_read;
+  symbol precipitation_read;
+  symbol vapor_pressure_read;
+  symbol diffuse_radiation_read;
+  symbol relative_humidity_read;
+  symbol wind_speed_read;
+  symbol reference_evapotranspiration_read;
 
   // Parsing.
   const std::string where;
@@ -329,6 +335,27 @@ WeatherStandard::YearMap::YearInterval::check_alist (const AttributeList& al,
       ok = false;
     }
   return ok;
+}
+
+symbol 
+WeatherStandard::N_deposit_unit ()
+{
+  static const symbol unit ("kgN/ha/year");
+  return unit;
+}
+
+symbol 
+WeatherStandard::fraction_unit ()
+{
+  static const symbol unit ("fraction");
+  return unit;
+}
+
+symbol 
+WeatherStandard::hours_unit ()
+{
+  static const symbol unit ("hours");
+  return unit;
 }
 
 void 
@@ -552,10 +579,11 @@ WeatherStandard::read_line ()
 	  const int index = data_index[i];
 	  if (index < 0)
 	    continue;
-	  const std::string dim = data_description[index].dim;
-	  const std::string read = data_description[index].read
-	    ? this->*(data_description[index].read) : dim;
-	  const double value =  Units::convert (read, dim, lex->get_number ());
+	  const symbol dim (data_description[index].dim);
+	  const symbol read = data_description[index].read
+            ? this->*(data_description[index].read)
+            : dim;
+	  const double value =  unitc.convert (read, dim, lex->get_number ());
 	  this->*(data_description[index].value) = value;
 	  if (value < data_description[index].min)
 	    lex->error (std::string ("Column ") 
@@ -970,23 +998,23 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 	  lex->skip_space ();
 	  double val = lex->get_number ();
 	  lex->skip_space ();
-	  const std::string dim = lex->get_word ();
+	  const symbol dim (lex->get_word ());
 	      
 	  if (key == "NH4WetDep")
 	    {
-	      if (Units::can_convert (dim, "ppm"))
-		val = Units::convert (dim, "ppm", val);
+	      if (unitc.can_convert (dim, Unitc::ppm (), msg))
+		val = unitc.convert (dim, Unitc::ppm (), val);
 	      else
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 100.0)
 		lex->error ("Unreasonable value");
 	      WetDeposit.set_value (Chemical::NH4 (),
-				    Units::ppm (), val);
+				    Unitc::ppm (), val);
 	    }
 	  else if (key == "NH4DryDep")
 	    {
-	      if (Units::can_convert (dim, "kgN/ha/year"))
-		val = Units::convert (dim, "kgN/ha/year", val);
+	      if (unitc.can_convert (dim, N_deposit_unit (), msg))
+		val = unitc.convert (dim, N_deposit_unit (), val);
 	      else
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 100.0)
@@ -996,18 +1024,18 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 	    }
 	  else if (key == "NO3WetDep")
 	    {
-	      if (Units::can_convert (dim, "ppm"))
-		val = Units::convert (dim, "ppm", val);
+	      if (unitc.can_convert (dim, Unitc::ppm (), msg))
+		val = unitc.convert (dim, Unitc::ppm (), val);
 	      else
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 100.0)
 		lex->error ("Unreasonable value");
-	      WetDeposit.set_value (Chemical::NO3 (), Units::ppm (), val);
+	      WetDeposit.set_value (Chemical::NO3 (), Unitc::ppm (), val);
 	    }
 	  else if (key == "NO3DryDep")
 	    {
-	      if (Units::can_convert (dim, "kgN/ha/year"))
-		val = Units::convert (dim, "kgN/ha/year", val);
+	      if (unitc.can_convert (dim, N_deposit_unit (), msg))
+		val = unitc.convert (dim, N_deposit_unit (), val);
 	      else
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 100.0)
@@ -1018,8 +1046,8 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
           // Alternative way of specifying deposition.
 	  else if (key == "Deposition")
 	    {
-	      if (Units::can_convert (dim, "kgN/ha/year"))
-		val = Units::convert (dim, "kgN/ha/year", val);
+	      if (unitc.can_convert (dim, N_deposit_unit (), msg))
+		val = unitc.convert (dim, N_deposit_unit (), val);
 	      else
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 100.0)
@@ -1028,8 +1056,8 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 	    }
 	  else if (key == "DepDry")
 	    {
-	      if (Units::can_convert (dim, "fraction"))
-		val = Units::convert (dim, "fraction", val);
+	      if (unitc.can_convert (dim, fraction_unit (), msg))
+		val = unitc.convert (dim, fraction_unit (), val);
 	      else
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 1.0)
@@ -1038,8 +1066,8 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 	    }
 	  else if (key == "DepDryNH4")
 	    {
-	      if (Units::can_convert (dim, "fraction"))
-		val = Units::convert (dim, "fraction", val);
+	      if (unitc.can_convert (dim, fraction_unit (), msg))
+		val = unitc.convert (dim, fraction_unit (), val);
 	      else
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 1.0)
@@ -1048,8 +1076,8 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 	    }
 	  else if (key == "DepWetNH4")
 	    {
-	      if (Units::can_convert (dim, "fraction"))
-		val = Units::convert (dim, "fraction", val);
+	      if (unitc.can_convert (dim, fraction_unit (), msg))
+		val = unitc.convert (dim, fraction_unit (), val);
 	      else
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 1.0)
@@ -1058,8 +1086,8 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 	    }
 	  else if (key == "PAverage")
 	    {
-	      if (Units::can_convert (dim, "mm"))
-		val = Units::convert (dim, "mm", val);
+	      if (unitc.can_convert (dim, Unitc::mm (), msg))
+		val = unitc.convert (dim, Unitc::mm (), val);
 	      else
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 3000.0)
@@ -1068,8 +1096,8 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 	    }
 	  else if (key == "Timestep")
 	    {
-	      if (Units::can_convert (dim, "hours"))
-		val = Units::convert (dim, "hours", val);
+	      if (unitc.can_convert (dim, hours_unit (), msg))
+		val = unitc.convert (dim, hours_unit (), val);
 	      else
 		lex->error ("Unknown dimension");
 	      timestep = double2int (val);
@@ -1083,9 +1111,9 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 		{
 		  if (key == keyword_description[i].name)
 		    {
-		      if (Units::can_convert (dim, keyword_description[i].dim))
-			val = Units::convert (dim, keyword_description[i].dim,
-					      val);
+		      if (unitc.can_convert (dim, symbol (keyword_description[i].dim), msg))
+			val = unitc.convert (dim, symbol (keyword_description[i].dim),
+                                             val);
 		      else
 			lex->error ("Unknown dimension");
 		      if (val < keyword_description[i].min)
@@ -1164,21 +1192,21 @@ but not both");
 			    dry * deposition.dry_NH4);
       DryDeposit.set_value (Chemical::NO3 (), Weather::dry_deposit_unit,
 			    dry * (1.0 - deposition.dry_NH4));
-      WetDeposit.set_value (Chemical::NH4 (), Units::ppm (),
+      WetDeposit.set_value (Chemical::NH4 (), Unitc::ppm (),
 			    wet * 100.0 * deposition.wet_NH4 
 			    / deposition.precipitation);
-      WetDeposit.set_value (Chemical::NO3 (), Units::ppm (),
+      WetDeposit.set_value (Chemical::NO3 (), Unitc::ppm (),
 			    wet * 100.0 * (1.0 - deposition.wet_NH4)
 			    / deposition.precipitation);
       std::ostringstream tmp;
       tmp << "NH4WetDep: " 
 	  << WetDeposit.get_value (Chemical::NH4 (),
-				   Units::ppm ()) << " ppm\n\
+				   Unitc::ppm ()) << " ppm\n\
 NH4DryDep: " 
 	  << DryDeposit.get_value (Chemical::NH4 (), 
 				   Weather::dry_deposit_unit) 
 	  << " kgN/ha/year\n\
-NO3WetDep: " << WetDeposit.get_value (Chemical::NO3 (), Units::ppm ()) 
+NO3WetDep: " << WetDeposit.get_value (Chemical::NO3 (), Unitc::ppm ()) 
 	  << " ppm\n\
 NO3DryDep: " << DryDeposit.get_value (Chemical::NO3 (),
 				      Weather::dry_deposit_unit)
@@ -1240,9 +1268,9 @@ NO3DryDep: " << DryDeposit.get_value (Chemical::NO3 (),
   // Dimensions.
   for (unsigned int i = 0; i < data_index.size (); i++)
     {
-      const std::string dimension = lex->get_word ();
+      const symbol dimension (lex->get_word ());
       const int index = data_index[i];
-      if (Units::can_convert (dimension, data_description[index].dim))
+      if (unitc.can_convert (dimension, symbol (data_description[index].dim)))
 	{
 	  if (data_description[index].read)
 	    this->*(data_description[index].read) = dimension;
@@ -1266,6 +1294,7 @@ NO3DryDep: " << DryDeposit.get_value (Chemical::NO3 (),
 
 WeatherStandard::WeatherStandard (Block& al)
   : WeatherBase (al),
+    unitc (al.unitc ()),
     path (al.path ()),
     T_rain (al.number ("T_rain")),
     T_snow (al.number ("T_snow")),

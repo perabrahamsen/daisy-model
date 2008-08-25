@@ -344,8 +344,7 @@ WeatherBase::WeatherBase (Block& al)
     timezone_ (-42.42e42),
     surface_ (reference),
     screen_height_ (2.0),
-    
-DryDeposit (dry_deposit_unit),
+    DryDeposit (dry_deposit_unit),
     WetDeposit (Unitc::ppm ()),
     T_average (-42.42e42),           // May be used before Weather::check.
     T_amplitude (-42.42e42),
