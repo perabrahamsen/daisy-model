@@ -363,10 +363,18 @@ TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
     }
 
   // Update tertiary state with new ddt.
-  set_state (old_state);
-  if (!find_implicit_water (old_state, geo, soil, soil_heat, h, ddt))
-    // Making timestep shorter should not prevent us from finding a solution.
-    daisy_notreached ();
+  for (;;)
+    {
+      if (find_implicit_water (old_state, geo, soil, soil_heat, h, ddt))
+        // Succes!
+        break;
+      ddt *= 0.5;
+      if (dt < min_dt)
+        {
+          msg.warning ("Can't find solution for tertiary transport.");
+          return;
+        }
+    }
 
   // Scale sink with timestep.
   const double scale = ddt / dt;
