@@ -48,6 +48,22 @@ public:
   static symbol amount_of_substance_per_area_per_time ();
   static symbol energy_per_area_per_time ();
 
+  // Use.
+public:
+  virtual double to_base (double) const = 0;
+  virtual double to_native (double) const = 0;
+  virtual bool in_native (double) const = 0;
+  virtual bool in_base (double) const = 0;
+
+  // Create and Destroy.
+protected:
+  Unit (Block& al, symbol base);
+public:
+  virtual ~Unit ();
+};
+
+class Unitc : private boost::noncopyable
+{
   // Symbols.
 public:
   static symbol h ();
@@ -61,29 +77,18 @@ public:
   static symbol per_h ();
   static symbol ppm ();
   
-  // Use.
-public:
-  virtual double to_base (double) const = 0;
-  virtual double to_native (double) const = 0;
-  virtual bool in_native (double) const = 0;
-  virtual bool in_base (double) const = 0;
-
   // Utilities.
-private:
-  static bool allow_old (const Metalib& metalib);
-  static bool compatible (const Unit& from, const Unit& to);
-  static double base_convert (symbol from, symbol to, const double value);
 public:
-  static bool can_convert (Metalib&, symbol from, symbol to, Treelog&);
-  static bool can_convert (Metalib&, symbol from, symbol to);
-  static bool can_convert (Metalib&, symbol from, symbol to, double);
-  static double convert (Metalib&, symbol from, symbol to, double);
+  virtual bool can_convert (symbol from, symbol to,
+                            Treelog&) const = 0;
+  virtual bool can_convert (symbol from, symbol to) const = 0;
+  virtual bool can_convert (symbol from, symbol to, double) const = 0;
+  virtual double convert (symbol from, symbol to, double) const = 0;
 
-  // Create and Destroy.
+  // Create and destroy.
 protected:
-  Unit (Block& al, symbol base);
-public:
-  virtual ~Unit ();
+  Unitc ();
+  virtual ~Unitc ();
 };
 
 #endif // UNIT_H

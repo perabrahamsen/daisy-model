@@ -32,7 +32,7 @@ class AttributeList;
 class Library;
 class Model;
 class Treelog;
-class Unit;
+class Unitc;
 
 #ifdef __unix
 #define EXPORT /* Nothing */
@@ -50,12 +50,9 @@ class EXPORT Metalib
   class Implementation;
   std::auto_ptr<Implementation> impl;
 
-  // Units.
+  // Interface.
 public:
-  const Unit* unit (symbol name, Treelog&);
-
-  // Use.
-public:
+  const Unitc& unitc () const;
   Path& path () const;
   Syntax& syntax () const;
   AttributeList& alist () const;
@@ -66,6 +63,7 @@ public:
   int get_sequence ();
   void clear_all_parsed ();
   void refile_parsed (const std::string& from, const std::string& to);
+  void added_object (symbol library, symbol object);
 
   // Create and Destroy.
 public:

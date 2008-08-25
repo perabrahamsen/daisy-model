@@ -165,14 +165,14 @@ ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
           IM im = AM::get_IM (fert);
 	  im.rebase ("mg/m^2");
 	  daisy_assert (std::isnormal (value));
-	  im *= Scalar (1.0 / value, Unit::per_mm ());
+	  im *= Scalar (1.0 / value, Unitc::per_mm ());
           daisy.field->irrigate_subsoil (value, im, -5.0, -25.0, daisy.dt,
 					 msg); 
           tmp << "Fertigating " << value << " mm, with";
 	  for (IM::const_iterator i = im.begin (); i != im.end (); i++)
 	    {
 	      const symbol chem = *i;
-	      const double value = im.get_value (chem, Unit::ppm ());
+	      const double value = im.get_value (chem, Unitc::ppm ());
 	      if (std::isnormal (value))
 		tmp << " " << value << " ppm " << chem;
 	    }

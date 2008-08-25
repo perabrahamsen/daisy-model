@@ -95,7 +95,7 @@ WeatherBase::tick_after (const Time& time, Treelog&)
   
   const IM dry (IM::flux_unit (), DryDeposit);
   const IM solute (IM::solute_unit (), WetDeposit);
-  const IM wet = solute * Scalar (Precipitation, Unit::mm_per_h ());
+  const IM wet = solute * Scalar (Precipitation, Unitc::mm_per_h ());
   deposit_ = dry + wet;
 }
 
@@ -344,8 +344,9 @@ WeatherBase::WeatherBase (Block& al)
     timezone_ (-42.42e42),
     surface_ (reference),
     screen_height_ (2.0),
-    DryDeposit (dry_deposit_unit),
-    WetDeposit (Unit::ppm ()),
+    
+DryDeposit (dry_deposit_unit),
+    WetDeposit (Unitc::ppm ()),
     T_average (-42.42e42),           // May be used before Weather::check.
     T_amplitude (-42.42e42),
     max_Ta_yday (-42.42e42),

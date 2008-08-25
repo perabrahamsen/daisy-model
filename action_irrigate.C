@@ -162,7 +162,7 @@ Setting this overrides the 'days' and 'hours' parameters.");
     syntax.add ("temperature", "dg C", 
 		Check::positive (), Syntax::OptionalConst,
 		"Temperature of irrigation (default: air temperature).");
-    IM::add_syntax (syntax, alist, Syntax::Const, "solute", Unit::ppm (), 
+    IM::add_syntax (syntax, alist, Syntax::Const, "solute", Unitc::ppm (), 
 		    "Solutes in irrigation water.");
   }
 

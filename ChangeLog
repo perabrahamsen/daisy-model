@@ -1,7 +1,12 @@
 2008-08-25  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* tertiary_biopores.C (TertiaryBiopores::tick): Don't assume
+	downscaled ddt will give a solution. 
+
 	* Version 4.42 released.
 
+	* all: More works on units.
+	
 2008-08-22  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.41 released.

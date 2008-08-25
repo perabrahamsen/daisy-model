@@ -908,7 +908,7 @@ BioclimateStandard::tick (const Time& time,
   day_length_ = weather.day_length ();
   
   // Add deposition. 
-  const IM im = weather.deposit () * Scalar (dt, Unit::h ());
+  const IM im = weather.deposit () * Scalar (dt, Unitc::h ());
   chemistry.deposit (im, dt, msg);
 
   // Update canopy structure.

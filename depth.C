@@ -118,7 +118,7 @@ struct DepthExtern : public Depth
 
   void tick (const Time&, const Scope& scope, Treelog& msg)
   { 
-    if (!expr->tick_value (value, Unit::cm (), scope, msg))
+    if (!expr->tick_value (value, Unitc::cm (), scope, msg))
       if (!approximate (value, 42.0))
 	{
 	  msg.error ("External depth not found");
@@ -134,8 +134,9 @@ struct DepthExtern : public Depth
 
   virtual bool check (const Scope& scope, Treelog& msg) const
   { 
-    bool ok = true;
-    if (!expr->check_dim (scope, Unit::cm (), msg))
+    
+bool ok = true;
+    if (!expr->check_dim (scope, Unitc::cm (), msg))
       ok = false;
     return ok;
   }

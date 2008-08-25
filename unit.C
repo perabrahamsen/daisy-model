@@ -22,15 +22,10 @@
 
 #include "unit.h"
 #include "check.h"
-#include "treelog.h"
-#include "metalib.h"
-#include "library.h"
 #include "librarian.h"
 #include "alist.h"
 #include "syntax.h"
 #include "block.h"
-#include "units.h"
-#include "assertion.h"
 #include "mathlib.h"
 #include <sstream>
 
@@ -46,7 +41,7 @@ Unit::library_id () const
 }
 
 symbol
-Unit:: pressure ()
+Unit::pressure ()
 {
   static const symbol unit ("m^-1 kg s^-2");
   return unit;
@@ -71,257 +66,6 @@ Unit::energy_per_area_per_time ()
 {
   static const symbol unit ("kg s^-3");
   return unit;
-}
-
-symbol
-Unit::h ()
-{
-  static const symbol unit ("h");
-  return unit;
-}
-
-symbol
-Unit::mm ()
-{
-  static const symbol unit ("mm");
-  return unit;
-}
-
-symbol
-Unit::per_mm ()
-{
-  static const symbol unit ("mm^-1");
-  return unit;
-}
-
-symbol
-Unit::mm_per_h ()
-{
-  static const symbol unit ("mm/h");
-  return unit;
-}
-
-symbol
-Unit::cm ()
-{
-  static const symbol unit ("cm");
-  return unit;
-}
-
-symbol
-Unit::cm_per_h ()
-{
-  static const symbol unit ("cm/h");
-  return unit;
-}
-
-symbol
-Unit::cm2 ()
-{
-  static const symbol unit ("cm^2");
-  return unit;
-}
-
-symbol
-Unit::cm3 ()
-{
-  static const symbol unit ("cm^3");
-  return unit;
-}
-
-symbol
-Unit::per_h ()
-{
-  static const symbol unit ("h^-1");
-  return unit;
-}
-
-symbol
-Unit::ppm ()
-{
-  static const symbol unit ("ppm");
-  return unit;
-}
-
-bool 
-Unit::allow_old (const Metalib& metalib)
-{
-  const AttributeList& alist = metalib.alist ();
-  daisy_assert (alist.check ("allow_old_units"));
-  const bool allow_old_units = alist.flag ("allow_old_units");
-  return allow_old_units;
-}
-
-static struct special_convert_type
-{
-  const symbol from;
-  const symbol to;
-  const double factor;
-} special_convert[] = {
-  // We assume length is cm H2O, and convert to hPa.
-  { symbol ("m") /* cm H2O */, Unit::pressure () /* hPa */, 10000.0 },
-  // We assume mass per volume is mg solute in l H2O, and convert to ppm.
-  { Unit::mass_per_volume () /* mg/l */, symbol ("") /* ppm */, 0.001 },
-  // We assume amount of substance is mol ??? and convert to Watt.
-  { Unit::amount_of_substance_per_area_per_time () /* mol/m^2/s */,
-    Unit::energy_per_area_per_time () /* W/m^2 */,
-    1.0 / 0.0000046 }
-};
-
-static const size_t special_convert_size 
-/**/ = sizeof (special_convert) / sizeof (special_convert_type);
-
-bool 
-Unit::compatible (const Unit& from_unit, const Unit& to_unit)
-{
-  const symbol from = from_unit.base_name ();
-  const symbol to = to_unit.base_name ();
-  if (from == to)
-    return true;
-  
-  // Special convertions.
-  for (size_t i = 0; i < special_convert_size; i++)
-    if (from == special_convert[i].from && to == special_convert[i].to)
-      return true; 
-    else if (from == special_convert[i].to && to == special_convert[i].from)
-      return true;
-  
-  return false;
-}
-
-double
-Unit::base_convert (const symbol from, const symbol to, const double value)
-{
-  if (from == to)
-    return value;
-  
-  for (size_t i = 0; i < special_convert_size; i++)
-    if (from == special_convert[i].from && to == special_convert[i].to)
-      return value * special_convert[i].factor;
-    else if (from == special_convert[i].to && to == special_convert[i].from)
-      return value / special_convert[i].factor;
-  
-  throw "Cannot convert base [" + from + "] to [" + to + "]";
-}
-
-bool
-Unit::can_convert (Metalib& metalib, const symbol from, const symbol to, 
-                   Treelog& msg)
-{
-  if (from == to)
-    return true;
-
-  const Unit *const from_unit = metalib.unit (from, msg);
-  const Unit *const to_unit = metalib.unit (to, msg);
-
-  // Defined?
-  if (!from_unit || !to_unit)
-    {
-      if (!allow_old (metalib))
-        {
-          if (!from_unit)
-            msg.message ("Original dimension [" + from + "] not known.");
-          if (!to_unit)
-            msg.message ("Target dimension [" + to + "] not known.");
-          return false;
-        }
-      msg.message (std::string ("Trying old conversion of ") 
-                   + (from_unit ? "" : "unknown ") + "[" + from + "] to " 
-                   + (to_unit ? "" : "unknown ") + "[" + to + "]." );
-      return Units::can_convert (from, to);
-    }
-
-  if (Unit::compatible (*from_unit, *to_unit))
-    return true;
-
-  // Not compatible.
-  std::ostringstream tmp;
-  tmp << "Cannot convert [" << from 
-      << "] with base [" << from_unit->base_name () << "] to [" << to
-      << "] with base [" << to_unit->base_name () << "]";
-  msg.message (tmp.str ());
-  if (!allow_old (metalib))
-    return false;
-
-  msg.message ("Trying old conversion.");
-  return Units::can_convert (from, to);
-}
-
-bool 
-Unit::can_convert (Metalib& metalib, const symbol from, const symbol to)
-{ return Unit::can_convert (metalib, from, to, Treelog::null ()); }
-
-bool 
-Unit::can_convert (Metalib& metalib, const symbol from, const symbol to, 
-                   const double value)
-{ 
-  Treelog& msg = Treelog::null ();
-
-  const Unit *const from_unit = metalib.unit (from, msg);
-  const Unit *const to_unit = metalib.unit (to, msg);
-
-  // Defined?
-  if (!from_unit || !to_unit)
-    {
-      if (!allow_old (metalib))
-        return false;
-      return Units::can_convert (from, to, value);
-    }
-
-  if (!Unit::compatible (*from_unit, *to_unit))
-    return false;
-  if (!from_unit->in_native  (value))
-    return false;
-  const double base = from_unit->to_base (value);
-  // We don't have to worry about [cm] and [hPa] as all values are valid.
-  return to_unit->in_base (base);
-}
-
-double 
-Unit::convert (Metalib& metalib, const symbol from, const symbol to, 
-               const double value)
-{ 
-  if (from == to)
-    return value;
-
-  const Unit *const from_unit = metalib.unit (from, Treelog::null ());
-  const Unit *const to_unit = metalib.unit (to, Treelog::null ());
-
-  // Defined?
-  if (!from_unit || !to_unit)
-    {
-      if (allow_old (metalib))
-        return Units::convert (from, to, value);
-      if (!from_unit)
-        throw "Cannot convert from unknown dimension [" + from 
-          + "] to [" + to + "]";
-      throw "Cannot convert from [" + from 
-        + "] to unknown dimension [" + to + "]";
-    }
-
-  if (!Unit::compatible (*from_unit, *to_unit))
-    throw std::string ("Cannot convert [") + from 
-      + "] with base [" + from_unit->base_name () + "] to [" + to
-      + "] with base [" + to_unit->base_name () + "]";
-
-  const double from_base = from_unit->to_base (value);
-  const double to_base = Unit::base_convert (from_unit->base_name (),
-                                             to_unit->base_name (), 
-                                             from_base);
-  const double native = to_unit->to_native (to_base);
-  
-#if 0
-  std::ostringstream tmp;
-  tmp << "Converting " << value << " [" << from << "] to " << native 
-      << " [" << to << "] through " << from_base << " [" 
-      << from_unit->base_name () << "]";
-  if (from_unit->base_name () == to_unit->base_name ())
-    daisy_approximate (from_base, to_base);
-  else
-    tmp << " and " << to_base << " [" << to_unit->base_name () << "]";
-  Assertion::message (tmp.str ());
-#endif
-  return native;
 }
 
 Unit::Unit (Block& al, const symbol base)
@@ -928,5 +672,83 @@ Fcator to multiply with to get base unit.");
          "Degrees North of Equator.");
   }
 } UnitFactor_syntax;
+
+// The 'Unitc' Interface.
+
+symbol
+Unitc::h ()
+{
+  static const symbol unit ("h");
+  return unit;
+}
+
+symbol
+Unitc::mm ()
+{
+  static const symbol unit ("mm");
+  return unit;
+}
+
+symbol
+Unitc::per_mm ()
+{
+  static const symbol unit ("mm^-1");
+  return unit;
+}
+
+symbol
+Unitc::mm_per_h ()
+{
+  static const symbol unit ("mm/h");
+  return unit;
+}
+
+symbol
+Unitc::cm ()
+{
+  static const symbol unit ("cm");
+  return unit;
+}
+
+symbol
+Unitc::cm_per_h ()
+{
+  static const symbol unit ("cm/h");
+  return unit;
+}
+
+symbol
+Unitc::cm2 ()
+{
+  static const symbol unit ("cm^2");
+  return unit;
+}
+
+symbol
+Unitc::cm3 ()
+{
+  static const symbol unit ("cm^3");
+  return unit;
+}
+
+symbol
+Unitc::per_h ()
+{
+  static const symbol unit ("h^-1");
+  return unit;
+}
+
+symbol
+Unitc::ppm ()
+{
+  static const symbol unit ("ppm");
+  return unit;
+}
+
+Unitc::Unitc ()
+{ }
+
+Unitc::~Unitc ()
+{ }
 
 // unit.C ends here.

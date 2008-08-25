@@ -120,7 +120,7 @@ ABAProdUptake::check (Treelog& msg) const
 
 ABAProdUptake::ABAProdUptake (Block& al)
   : ABAProd (al),
-    scope (h_name, Unit::cm ()),
+    scope (h_name, Unitc::cm ()),
     expr (Librarian::build_item<Number> (al, "expr"))
 { }
 

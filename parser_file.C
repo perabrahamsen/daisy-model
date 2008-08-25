@@ -387,7 +387,8 @@ ParserFile::Implementation::check_dimension (const std::string& syntax,
 	  if (read.length () == 0 || read[0] != '?')
 	    warning ("you must use [?<dim>] for entries with unknown syntax");
 	}
-      else if (!Unit::can_convert (metalib, symbol (read), symbol (syntax), msg))
+      else if (!metalib.unitc ().can_convert (symbol (read), symbol (syntax),
+                                              msg))
 	{
 	  error (std::string ("expected [") 
                  + ((syntax == Syntax::Fraction ()
@@ -418,8 +419,8 @@ ParserFile::Implementation::convert (double value,
 	if (read == "")
 	  return value;
 	else
-	  return Unit::convert (metalib, symbol (read), symbol (""), value);
-      return Unit::convert (metalib, symbol (read), symbol (syntax), value);
+	  return metalib.unitc ().convert (symbol (read), symbol (""), value);
+      return metalib.unitc ().convert (symbol (read), symbol (syntax), value);
     }
   catch (const std::string& message)
     { 
@@ -561,6 +562,9 @@ ParserFile::Implementation::add_derived (Library& lib)
   load_list (syntax, atts);
   // Add new object to library.
   lib.add_derived (name, syntax, atts, super);
+  // Inform metalib.
+  metalib.added_object (lib.name (), name);
+  
 }
 
 AttributeList&

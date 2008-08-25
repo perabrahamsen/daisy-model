@@ -108,7 +108,7 @@ ABAProdRoot::check (Treelog& msg) const
 
 ABAProdRoot::ABAProdRoot (Block& al)
   : ABAProd (al),
-    scope (h_name, Unit::cm ()),
+    scope (h_name, Unitc::cm ()),
     expr (Librarian::build_item<Number> (al, "expr"))
 { }
 
