@@ -1,0 +1,62 @@
+;;; irrigation.dai -- Sample irrigation strategies.
+;; 
+;; If you have no constraints on your irrigation permission, use it like
+;; this
+;; 
+;;     (while sbarley (repeat irrigate_30_tensiometer_overhead))
+;; 
+;; to get a fully irrigated spring barley.  If you have a water limit on
+;; 90 mm, use it like this
+;; 
+;;     (while sbarley (activity irrigate_30_tensiometer_overhead
+;;                              irrigate_30_tensiometer_overhead
+;;                              irrigate_30_tensiometer_overhead))"
+;;
+;; The irrigate_30_content_overhead strategy is use the same way.
+
+(defaction irrigate_30_tensiometer_overhead activity
+  "An irrigation strategy based on a tensiometer.
+If the soil water pressure at 20 cm depth gets below -300 cm in the
+period between the first of May and the first of September, apply 10
+mm/h overhead irrigation for 3 hours, for a total of 30 mm.  Then wait
+two days to give the irrigated water a chance to reach the
+tensiometer."
+  ;; We wait until all these conditions are true:
+  (wait (and (after_mm_dd 5 1)          ;After May the first.
+             (before_mm_dd 8 1)         ;Before August the first.
+             ;; Potential below -300 cm at 20 cm depth.
+             (not (soil_water_pressure_above (height -20.0 [cm])
+                                             (potential -300 [cm])))))
+  ;; Overhead irrigation of 10 mm/h for 3 hours.
+  (irrigate_overhead 10 [mm/h] (hours 3))
+  ;; Wait two days to allow water to reach the tensiometer.
+  (wait_days 2))
+
+;; Hint:  Using a moderate irrigation flux makes it easier for Daisy
+;; to solve the water flux equation.  This means that if you irrigate
+;; with 100 mm/h for one hour, Daisy may print some error messages
+;; during the simulation.  If so, it is better to cheat, and specify
+;; 10 mm/h for 10 hours.
+
+;; Hint:  If you omit the "waiting period", you will irrigate
+;; contuniously until the irrigation water reach the specified depth.
+
+(defaction irrigate_30_content_overhead activity
+  "An irrigation strategy based on a soil water content.
+If the soil contain less than 60 mm water from the surface down to 50
+cm deprn, in the period between the first of May and the first of
+September, apply 10 mm/h overhead irrigation for 3 hours, for a total
+of 30 mm.  Then wait one day to give the irrigated water a chance to
+enter the soil."
+  ;; We wait until all these conditions are true:
+  (wait (and (after_mm_dd 5 1)          ;After May the first.
+             (before_mm_dd 8 1)         ;Before August the first.
+             ;; Less than 60 mm water in the top half meter of the soil.
+             (not (soil_water_content_above 60 [mm]
+                                            (from 0 [cm]) (to -50 [cm])))))
+  ;; Overhead irrigation of 10 mm/h for 3 hours.
+  (irrigate_overhead 10 [mm/h] (hours 3))
+  ;; Wait one day to allow water to reach the tensiometer.
+  (wait_days 1))
+
+;;; irrigation.dai ends here.

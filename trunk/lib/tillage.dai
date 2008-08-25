@@ -1,0 +1,21 @@
+;; tillage.dai -*- lisp -*-
+
+(defcondition trafficable and
+  (not (soil_water_pressure_above (height -10.0) (potential -50.0)))
+  (soil_temperature_above (height -10.0) (temperature 0.0)))
+
+(defaction plowing swap 
+  (middle -9.0)
+  (depth -18.0))
+
+(defaction rotavation mix -15.0)
+
+(defaction disk_harrowing mix -10.0
+  (penetration 0.8))
+
+(defaction stubble_cultivation mix -8.0
+  (penetration 0.6))
+
+(defaction seed_bed_preparation mix -8.0)
+
+;; tillage.dai ends here.

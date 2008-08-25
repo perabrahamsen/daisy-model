@@ -1,0 +1,58 @@
+;;; init-soil.dai --- How to initialize the content of the soil.
+
+;; We use the pre-defined soils
+
+(input file "pedo-soil.dai")
+
+(defcolumn JB1_init_hypres JB1_hypres 
+  "Arbitrary initial values for soil water, nitrogen and heat for JB1 soil."
+  ;; Here we initialise the water content. 
+  ;; 20% in the top meter, 10% the 50 cm below that. 
+  (SoilWater (initial_Theta (-100 [cm] 20 [%])
+                            (-150 [cm] 0.1 [])))
+  ;; Here we initialise total NO3-N content relative to dry soil mass.
+  (SoilNO3 (initial_Ms (-30 [cm] 10 [ppm])
+                       (-70 [cm] 5  [ppm])))
+  ;; Here we initialise NH4-N content in water. 
+  (SoilNH4 (initial_C (-100 [cm] 1 [ppm]))))
+
+;; Note that Ms specifies the total content in both water and soil,
+;; while C only specifies the content in the liquid phase.  The
+;; adsorbed content is calculated from the build in adsorption
+;; model, assuming an equilibrium.
+
+;; Also note than only the nitrogen weight is counted, not the oxygen
+;; or hydrogen. 
+
+(defcolumn JB1_init_Cosby JB1_Cosby
+  "Arbitrary initial values for soil water, nitrogen and heat for JB1 soil."
+  ;; Here we initialise the water pressure.  The corresponding water
+  ;; content is calculated by the hydraulic functions, in this case
+  ;; HYPRES.  Here we specify field capacity in three different units.
+  (SoilWater (initial_h ( -50 [cm]  -10 [kPa])
+                        (-100 [cm] -100 [cm])
+                        (-1.5 [m]     2 [pF])))
+  ;; A third way to initialize NO3-N and NH4-N is "M", which is mass per
+  ;; volume.  The volumen include soil, water and air.  This is most
+  ;; useful if you know the total content, as neither the dry bulk
+  ;; density or soil water content affect it.
+  (SoilNO3 (initial_M (-100 [cm] 50 [g/cm^3])))
+  ;; Finally we initialize the soil heat.  This is rarely used.
+  (SoilHeat (initial_T (-100 [cm] 1 [dg C]))))
+
+;; The default value of NH4 is 5 [ppm], which is appromiately 5% of
+;; the legal limit in drinking water.  The default value for NO3 is 50
+;; [ppm], which corresponds to 50% of the legal limit in drinking
+;; water. 
+
+;; The default value for soil water depend on the selected groundwater
+;; model.  Near groundwater the soil water is assumed to be in
+;; equilibrium with the groundwater.  Above the bottom meter, field
+;; capacity (pF 2) is assumed.
+
+;; The default value for soil heat is calculated from the average
+;; temperature properties specified by the weather module, and the
+;; termic properties of the soil, which is usually calcluaed from the
+;; texture information.
+
+;;; init-soil.dai ends here.

@@ -1,0 +1,158 @@
+;; This Daisy file has been made to examine a soils ability to drain water
+;; and to dry. It consists of two setups:
+;; A setup to simulate water transport for a soil without vegetation
+;; and without evaporation. This makes it possible to examine the Ks-value.
+;; The other setup examines how much water a crop can withdraw from the soil.
+;; The crop is defined not to respond to water or nitrogen stress but to continue to grow.
+;; When the crop is unable to withdraw water down to wilting point it can be due to
+;; a very steep conductivity function. This can be changed by decreasing the l-value. 
+
+
+(directory "C:/KVL/DrainDrying")
+
+(path "C:/Programmer/Daisy/Lib" "C:/Programmer/Daisy/Sample"
+      "C:/Programmer/Daisy/Weather")
+
+;; Ekstern  files from Daisy/Lib
+(input file "dk-management.dai")
+(input file "log.dai")
+
+
+;;Description of the soil horizons
+(defhorizon Ap default
+   (clay 7.9)
+   (silt 21.5)
+   (sand 68.0)
+   (humus 2.7)
+   (C_per_N 11.6)
+   (dry_bulk_density 1.41)
+   (hydraulic M_vG
+      (alpha 0.048)
+      (n 1.304)
+      (Theta_sat 0.420)
+      (Theta_res 0.0)
+      (K_sat 2.469)
+      (l -1.492)))
+
+      
+(defhorizon B default
+   (clay 7.1)
+   (silt 19.4)
+   (sand 72.7)
+   (humus 0.84)
+   (C_per_N 12.2)
+   (dry_bulk_density 1.51)
+   (hydraulic M_vG
+      (alpha 0.058)
+      (n 1.349)
+      (Theta_sat 0.395)
+      (Theta_res 0.0)
+      (K_sat 1.737)
+      (l -0.717)))
+
+
+(defhorizon C default
+   (clay 8.0)
+   (silt 18.6)
+   (sand 73.1)
+   (humus 0.3)
+   (dry_bulk_density 1.65)
+   (hydraulic M_vG
+      (alpha 0.056)
+      (n 1.325)
+      (K_sat 1.0773)
+      (Theta_sat 0.354)
+      (Theta_res 0.0)
+      (l -0.191)))
+
+
+;;Description of the soilprofile
+(defcolumn "SoilProfile" default
+     (Soil
+          (MaxRootingDepth 100.00)
+          (horizons (  -30.00 Ap)
+                    (  -80.00 B)
+                    ( -300.00 C)))
+     (Groundwater deep)) 
+
+
+;;Program containing common parts
+(defprogram "Common" Daisy
+  (column "SoilProfile")
+    ;; Selecting outputfiles
+  (output
+  ;;      Water balance 0-100 cm  
+          ("Root Zone Water Balance" (to -100 [cm])(when daily)
+            (where "Daily_WB.dlf"))  
+  ;;      Soil profile data
+          ("Groundwater" (when daily))       
+          ("Soil Water Content" (when daily))
+          ("Soil Water Potential (pF)"(when daily))))
+
+
+;;Program for drainage
+(defprogram "Drainage test" "Common"
+  ;; Weather data
+  (weather none)
+  ;; Description that will occur in all output files
+  (description "Vanding: 10 mm/dag i 5 dage")
+  ;; Setting the starting point 
+  (time 2004 1 1 )
+  ;; Selecting management
+  (manager activity
+    (irrigate_surface 0.416667 [mm/h] (hours 120))
+    (wait_mm_dd 2 1) stop))
+
+
+;;Crop for drying test
+;;The crop is a spring barley from "dk-management.dai" modified
+;;to grow despite lack of nitrogen and water. Thereby a minor drying of the
+;;soil is not due to a crop that doesn't grow.
+(defcrop "no stress Barley" "Spring Barley"
+     (enable_N_stress false)
+     (water_stress_effect none))
+
+
+(defaction "Barley no stress" activity
+  (wait_mm_dd 4 02)
+  (plowing)
+  (wait_mm_dd 4 05)
+  (seed_bed_preparation)(sow "no stress Barley")
+  (wait_mm_dd 08 25)
+  (harvest "no stress Barley" (stub 8 [cm])(stem 0.70)))
+
+
+;;Program for drying test
+(defprogram "Drying test" "Common"
+   (weather default "weather.dwf"
+         (PrecipScale 0 0 0 0 0 0 0 0 0 0 0 0))
+   (description "Drying test")
+   ;; Start
+   (time 1995 4 1 )
+   (stop 1995 9 1 )
+   ;; Selecting management
+   (manager activity
+     (activity "Barley no stress")
+   )
+   ;; Selecting output files
+   (output &old Harvest
+                "Crop Production"))
+
+
+;; Definition of main program,
+;; Output files will be located in 
+;; "..\log\Drain_1" and "..\log\Drying_1"
+;; Can be changed.
+(defprogram main batch 
+  (directory "log")
+  (run 
+       (batch (directory "Drain_1")
+              (run "Drainage test"))
+       (batch (directory "Drying_1")
+              (run "Drying test"))
+       ))
+
+(run main)
+
+;;; DrainDrying.dai ends here.
+
