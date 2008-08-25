@@ -27,6 +27,7 @@
 class Block;
 class Metalib;
 class Treelog;
+class Convert;
 
 class Unit : public Model
 {
@@ -55,11 +56,26 @@ public:
   virtual bool in_native (double) const = 0;
   virtual bool in_base (double) const = 0;
 
+  // Convert.
+public:
+  virtual const Convert* create_convertion (const Unit& to) const;
+
   // Create and Destroy.
 protected:
   Unit (Block& al, symbol base);
 public:
   virtual ~Unit ();
+};
+
+struct Convert : public boost::noncopyable
+{
+  // Use.
+  virtual double operator()(double value) const = 0;
+  virtual bool valid (double value) const = 0;
+
+  // Create and destroy.
+  Convert ();
+  virtual ~Convert ();
 };
 
 class Unitc : private boost::noncopyable
@@ -100,17 +116,6 @@ public:
   virtual double convert (symbol from, symbol to, double) const = 0;
 
   // Conversion.
-public:
-  struct Convert : public boost::noncopyable
-  {
-    // Use.
-    virtual double operator()(double value) const = 0;
-    virtual bool valid (double value) const = 0;
-
-    // Create and destroy.
-    Convert ();
-    virtual ~Convert ();
-  };
 protected:
   static const Convert* create_convertion (const Unit& from, const Unit& to);
 public:

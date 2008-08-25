@@ -259,7 +259,7 @@ Metalib::Implementation::convert (const symbol from, const symbol to,
   return Unitc::unit_convert (get_unit (from), get_unit (to), value);
 }
 
-const Unitc::Convert& 
+const Convert& 
 Metalib::Implementation::get_convertion (const symbol from, 
                                          const symbol to) const
 {

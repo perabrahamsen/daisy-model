@@ -68,6 +68,10 @@ Unit::energy_per_area_per_time ()
   return unit;
 }
 
+const Convert*
+Unit::create_convertion (const Unit&) const
+{ return NULL; }
+
 Unit::Unit (Block& al, const symbol base)
   : name (al.identifier ("type")),
     base_name_ (base)
@@ -168,6 +172,27 @@ struct UnitSIFactor : public UnitSI
   { return true; }
   bool in_base (double) const
   { return true; }
+
+  const Convert* create_convertion (const Unit& to) const
+  { 
+    const UnitSIFactor* to_si_factor = dynamic_cast<const UnitSIFactor*> (&to);
+    if (!to_si_factor)
+      return NULL;
+    
+    struct ConvertFactor : public Convert
+    {
+      const double factor;
+      double operator()(const double value) const
+      { return factor * value; }
+      bool valid (const double value) const
+      { return true; }
+      ConvertFactor (const double f)
+        : factor (f)
+      { }
+    };
+
+    return new ConvertFactor (this->factor / to_si_factor->factor);
+  }
 
   UnitSIFactor (Block& al)
     : UnitSI (al),
@@ -673,6 +698,14 @@ Fcator to multiply with to get base unit.");
   }
 } UnitFactor_syntax;
 
+// The 'Convert' Interface.
+
+Convert::Convert ()
+{ }
+
+Convert::~Convert ()
+{ }
+
 // The 'Unitc' Interface.
 
 symbol
@@ -825,15 +858,15 @@ Unitc::unit_convert (const Unit& from, const Unit& to,
   return native;
 }
 
-Unitc::Convert::Convert ()
-{ }
-
-Unitc::Convert::~Convert ()
-{ }
-
-const Unitc::Convert*
+const Convert*
 Unitc::create_convertion (const Unit& from, const Unit& to)
 {
+  // Maybe 'from' knows a smart way.
+  const Convert* from_convert = from.create_convertion (to);
+  if (from_convert)
+    return from_convert;
+
+  // It doesn't seem that way.  Try a generic solution.
   struct ConvertGeneric : public Convert
   {
     const Unit& from;
