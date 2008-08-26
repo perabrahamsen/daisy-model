@@ -26,7 +26,7 @@
 #include "destination.h"
 #include "model.h"
 #include "symbol.h"
-#include "units.h"
+#include "unit.h"
 #include "volume.h"
 #include <vector>
 #include <set>
@@ -161,10 +161,10 @@ public:
 protected:
   virtual symbol
   /**/ default_dimension (symbol spec_dim) const;
-  virtual const Units::Convert* 
-  /**/ special_convert (symbol has, symbol want);
+  virtual const Convert* 
+  /**/ special_convert (const Unitc&, symbol has, symbol want);
 public:
-  virtual bool initialize (const Volume&,
+  virtual bool initialize (const Unitc&, const Volume&,
                            const std::string& timestep, Treelog&);
   void add_dest (Destination* dest);
   virtual bool check (Treelog& err) const;

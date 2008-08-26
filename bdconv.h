@@ -22,7 +22,7 @@
 #ifndef BDCONV_H
 #define BDCONV_H
 
-#include "units.h"
+#include "unit.h"
 #include "symbol.h"
 #include <memory>
 
@@ -30,10 +30,10 @@ class Geometry;
 class Soil;
 class Volume;
 
-struct BD_convert : public Units::Convert
+struct BD_convert : public Convert
 {
-  const Units::Convert& in;
-  const Units::Convert& out;
+  const Convert& in;
+  const Convert& out;
   double bulk;
 
   // Use.
@@ -47,7 +47,8 @@ struct BD_convert : public Units::Convert
   { bulk = new_bulk; }
 
   // Create and destroy.
-  BD_convert (const symbol has, const symbol want, const symbol bulk_unit);
+  BD_convert (const Unitc&, 
+              const symbol has, const symbol want, const symbol bulk_unit);
 };
 
 #endif // BDCONV_H

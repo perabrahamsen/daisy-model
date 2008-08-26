@@ -37,6 +37,7 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include "vegetation.h"
+#include "unit.h"
 #include <sstream>
 
 struct ActionCrop : public Action
@@ -721,7 +722,9 @@ ActionCrop::Irrigation::doIt (Daisy& daisy, const Scope&, Treelog& msg) const
   std::ostringstream tmp;
   tmp << "Irrigating " << amount << " mm";
   msg.message (tmp.str ());
-  daisy.field->irrigate_overhead (amount, IM (IM::solute_unit ()),
+  const Unitc& unitc = daisy.unitc ();
+  daisy.field->irrigate_overhead (amount,
+                                  IM (unitc.get_unit (IM::solute_unit ())),
                                   daisy.dt, msg);
   return true;
 }

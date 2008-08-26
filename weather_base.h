@@ -26,6 +26,10 @@
 
 class WeatherBase : public Weather
 {
+  // Units.
+protected:
+  const Unitc& unitc;
+
   // Location.
 protected:
   /* const */ double latitude_;

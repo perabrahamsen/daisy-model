@@ -179,11 +179,16 @@ struct ActionExternFertigation : public Action
       {
 	static const symbol mg_per_square_m ("mg/m^2");
 	static const symbol kg_per_ha ("kg/ha");
-	IM im (mg_per_square_m);
-	im.set_value (Chemical::NH4 (), kg_per_ha, NH4_value * dt);
-	im.set_value (Chemical::NO3 (), kg_per_ha, NO3_value * dt);
-	im *= Scalar (total_flux * dt, Unitc::per_mm ());
-
+        const Unitc& unitc = daisy.unitc ();
+        const Unit& u_kg_per_ha = unitc.get_unit (kg_per_ha);
+        const Unit& u_mg_per_square_m = unitc.get_unit (mg_per_square_m);
+        const Unit& u_ppm = unitc.get_unit (Unitc::ppm ());
+        const Unit& u_per_mm = unitc.get_unit (Unitc::per_mm ());
+	IM im (u_mg_per_square_m);
+	im.set_value (Chemical::NH4 (), u_kg_per_ha, NH4_value * dt);
+	im.set_value (Chemical::NO3 (), u_kg_per_ha, NO3_value * dt);
+	im.multiply_assign (Scalar (total_flux * dt, u_per_mm), u_ppm);
+        
 	if (surface_value > 0)
 	  field.irrigate_surface (surface_value, im, dt, msg); 
 	if (overhead_value > 0)

@@ -62,10 +62,10 @@ BD_convert::set_bulk (const Geometry& geo,
     bulk /= volume.depth (geo.front (), geo.back ()); 
 }
 
-BD_convert::BD_convert (const symbol has, const symbol want,
+BD_convert::BD_convert (const Unitc& unitc, const symbol has, const symbol want,
                         const symbol bulk_unit)
-  : in (Units::get_convertion (has, bulk_unit)),
-    out (Units::get_convertion (Syntax::fraction (), want)),
+  : in (unitc.get_convertion (has, bulk_unit)),
+    out (unitc.get_convertion (Syntax::fraction (), want)),
     bulk (-42.42e42)
 { }
 

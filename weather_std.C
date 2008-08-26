@@ -44,7 +44,6 @@
 
 struct WeatherStandard : public WeatherBase
 {
-  const Unitc& unitc;
   Path& path;
 
   // Units.
@@ -895,6 +894,10 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
   if (!lex->good ())
     return false;
 
+  // Units.
+  const Unit& u_ppm = unitc.get_unit (Unitc::ppm ());
+  const Unit& u_dpu = unitc.get_unit (Weather::dry_deposit_unit);
+
   // Read first line.
   const std::string type = lex->get_word ();
   if (type != "dwf-0.0")
@@ -1009,7 +1012,7 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 	      if (val < 0.0 || val > 100.0)
 		lex->error ("Unreasonable value");
 	      WetDeposit.set_value (Chemical::NH4 (),
-				    Unitc::ppm (), val);
+				    u_ppm, val);
 	    }
 	  else if (key == "NH4DryDep")
 	    {
@@ -1019,8 +1022,7 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 100.0)
 		lex->error ("Unreasonable value");
-	      DryDeposit.set_value (Chemical::NH4 (),
-				    Weather::dry_deposit_unit, val);
+	      DryDeposit.set_value (Chemical::NH4 (), u_dpu, val);
 	    }
 	  else if (key == "NO3WetDep")
 	    {
@@ -1030,7 +1032,7 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 100.0)
 		lex->error ("Unreasonable value");
-	      WetDeposit.set_value (Chemical::NO3 (), Unitc::ppm (), val);
+	      WetDeposit.set_value (Chemical::NO3 (), u_ppm, val);
 	    }
 	  else if (key == "NO3DryDep")
 	    {
@@ -1040,8 +1042,7 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 100.0)
 		lex->error ("Unreasonable value");
-	      DryDeposit.set_value (Chemical::NO3 (), 
-				    Weather::dry_deposit_unit, val);
+	      DryDeposit.set_value (Chemical::NO3 (), u_dpu, val);
 	    }
           // Alternative way of specifying deposition.
 	  else if (key == "Deposition")
@@ -1188,29 +1189,23 @@ but not both");
       const double dry = deposition.total * deposition.dry;
       const double wet = deposition.total * (1.0 - deposition.dry);
       daisy_assert (approximate (dry + wet, deposition.total));
-      DryDeposit.set_value (Chemical::NH4 (), Weather::dry_deposit_unit,
-			    dry * deposition.dry_NH4);
-      DryDeposit.set_value (Chemical::NO3 (), Weather::dry_deposit_unit,
+      DryDeposit.set_value (Chemical::NH4 (), u_dpu, dry * deposition.dry_NH4);
+      DryDeposit.set_value (Chemical::NO3 (), u_dpu,
 			    dry * (1.0 - deposition.dry_NH4));
-      WetDeposit.set_value (Chemical::NH4 (), Unitc::ppm (),
-			    wet * 100.0 * deposition.wet_NH4 
+      WetDeposit.set_value (Chemical::NH4 (), u_ppm, 
+                            wet * 100.0 * deposition.wet_NH4 
 			    / deposition.precipitation);
-      WetDeposit.set_value (Chemical::NO3 (), Unitc::ppm (),
+      WetDeposit.set_value (Chemical::NO3 (), u_ppm, 
 			    wet * 100.0 * (1.0 - deposition.wet_NH4)
 			    / deposition.precipitation);
       std::ostringstream tmp;
       tmp << "NH4WetDep: " 
-	  << WetDeposit.get_value (Chemical::NH4 (),
-				   Unitc::ppm ()) << " ppm\n\
+	  << WetDeposit.get_value (Chemical::NH4 (), u_ppm) << " ppm\n\
 NH4DryDep: " 
-	  << DryDeposit.get_value (Chemical::NH4 (), 
-				   Weather::dry_deposit_unit) 
-	  << " kgN/ha/year\n\
-NO3WetDep: " << WetDeposit.get_value (Chemical::NO3 (), Unitc::ppm ()) 
-	  << " ppm\n\
-NO3DryDep: " << DryDeposit.get_value (Chemical::NO3 (),
-				      Weather::dry_deposit_unit)
-	  << " kgN/ha/year";
+	  << DryDeposit.get_value (Chemical::NH4 (), u_dpu) << " kgN/ha/year\n\
+NO3WetDep: " << WetDeposit.get_value (Chemical::NO3 (), u_ppm) << " ppm\n\
+NO3DryDep: " << DryDeposit.get_value (Chemical::NO3 (), u_dpu) 
+          << " kgN/ha/year";
       msg.debug (tmp.str ());
     }
 
@@ -1294,7 +1289,6 @@ NO3DryDep: " << DryDeposit.get_value (Chemical::NO3 (),
 
 WeatherStandard::WeatherStandard (Block& al)
   : WeatherBase (al),
-    unitc (al.unitc ()),
     path (al.path ()),
     T_rain (al.number ("T_rain")),
     T_snow (al.number ("T_snow")),

@@ -27,6 +27,7 @@
 #include "syntax.h"
 #include "block.h"
 #include "mathlib.h"
+#include "units.h"
 #include <sstream>
 
 // Component 'unit'.
@@ -123,7 +124,7 @@ UnitSI::base_unit[] = {
 
 const size_t 
 UnitSI::base_unit_size
-/**/ = sizeof (UnitSI::base_unit) / sizeof (UnitSI::base_unit);
+/**/ = sizeof (UnitSI::base_unit) / sizeof (UnitSI::base_unit_type);
   
 
 void
@@ -143,13 +144,16 @@ symbol
 UnitSI::find_base (Block& al)
 {
   std::ostringstream tmp;
+  bool found = false;
   for (size_t i = 0; i < base_unit_size; i++)
     {
       const int dim = al.integer (base_unit[i].dimension, 0);
       if (dim == 0)
         continue;
-      if (tmp.str () != "")
-        tmp << " ";;
+      if (found)
+        tmp << " ";
+      else
+        found = true;
       tmp << base_unit[i].unit;
       if (dim == 1)
         continue;
@@ -394,6 +398,10 @@ Factor to multiply with to get base unit.");
          "Soil scale nitrogen per area.");
     add ("g C/cm^2", u_g / p_c_2, name, syntax, alist, -2, 1, 0, 0, 0, 0, 0,
          "Soil scale carbon per area.");
+    add ("g N/m^2", u_g, name, syntax, alist, -2, 1, 0, 0, 0, 0, 0,
+         "Crop scale nitrogen per area.");
+    add ("g C/m^2", u_g, name, syntax, alist, -2, 1, 0, 0, 0, 0, 0,
+         "Crop scale carbon per area.");
     add ("g/ha", u_g / u_ha, name, syntax, alist, -2, 1, 0, 0, 0, 0, 0,
          "Field scale pesticide mass per area.");
     add ("g w.w./m^2", u_g, name, syntax, alist, -2, 1, 0, 0, 0, 0, 0,
@@ -432,6 +440,9 @@ Factor to multiply with to get base unit.");
     add ("g/cm^2/h", u_g / p_c_2 / u_h, name, syntax, alist, 
          -2, 1, -1, 0, 0, 0, 0,
          "Mass per area flux.");
+    add ("g N/m^2/h", u_g /  u_h, name, syntax, alist, 
+         -2, 1, -1, 0, 0, 0, 0,
+         "Nitrogen per aquare meter per hour.");
     add ("g N/cm^2/h", u_g / p_c_2 / u_h, name, syntax, alist, 
          -2, 1, -1, 0, 0, 0, 0,
          "Nitrogen per aquare centimeter per hour.");
@@ -447,6 +458,15 @@ Factor to multiply with to get base unit.");
     add ("kg/ha/h", p_k * u_g / u_ha / u_h, name, syntax, alist,
          -2, 1, -1, 0, 0, 0, 0,
          "Harvest and fertilizing.");
+    add ("kg N/ha/d", p_k * u_g / u_ha / u_d, name, syntax, alist,
+         -2, 1, -1, 0, 0, 0, 0,
+         "Field scale nitrogen.");
+    add ("kg C/ha/d", p_k * u_g / u_ha / u_d, name, syntax, alist,
+         -2, 1, -1, 0, 0, 0, 0,
+         "Field scale carbon.");
+    add ("kg/ha/y", p_k * u_g / u_ha / u_y, name, syntax, alist,
+         -2, 1, -1, 0, 0, 0, 0,
+         "Deposition.");
     add ("kgN/ha/year", p_k * u_g / u_ha / u_y, name, syntax, alist,
          -2, 1, -1, 0, 0, 0, 0,
          "Deposition.");
@@ -856,6 +876,19 @@ Unitc::unit_convert (const Unit& from, const Unit& to,
 #endif
 
   return native;
+}
+
+double 
+Unitc::multiply (const Unit& a, const Unit& b, double value, const Unit& result)
+{
+  const symbol ab = multiply (a.name, b.name);
+  return Units::convert (ab, result.name, value);
+}
+
+symbol
+Unitc::multiply (const symbol a, const symbol b)
+{
+  return Units::multiply (a, b);
 }
 
 const Convert*

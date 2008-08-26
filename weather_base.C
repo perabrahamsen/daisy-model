@@ -28,6 +28,7 @@
 #include "log.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "block.h"
 
 // WeatherBase
 
@@ -93,9 +94,12 @@ WeatherBase::tick_after (const Time& time, Treelog&)
   const double Precipitation = rain () + snow (); // [mm]
   daisy_assert (Precipitation >= 0.0);
   
-  const IM dry (IM::flux_unit (), DryDeposit);
-  const IM solute (IM::solute_unit (), WetDeposit);
-  const IM wet = solute * Scalar (Precipitation, Unitc::mm_per_h ());
+  const Unit& u_flux = unitc.get_unit (IM::flux_unit ());
+  const Unit& u_solute = unitc.get_unit (IM::solute_unit ());
+  const Unit& u_precip = unitc.get_unit (Unitc::mm_per_h ());
+  const IM dry (u_flux, DryDeposit);
+  const IM solute (u_solute, WetDeposit);
+  const IM wet = solute.multiply (Scalar (Precipitation, u_precip), u_flux);
   deposit_ = dry + wet;
 }
 
@@ -338,14 +342,15 @@ This is not a model, but a list of parameters shared by all weather models.");
 
 WeatherBase::WeatherBase (Block& al)
   : Weather (al),
+    unitc (al.unitc ()),
     latitude_ (-42.42e42),
     longitude_ (-42.42e42),
     elevation_ (-42.42e42),
     timezone_ (-42.42e42),
     surface_ (reference),
     screen_height_ (2.0),
-    DryDeposit (dry_deposit_unit),
-    WetDeposit (Unitc::ppm ()),
+    DryDeposit (unitc.get_unit (dry_deposit_unit)),
+    WetDeposit (unitc.get_unit (Unitc::ppm ())),
     T_average (-42.42e42),           // May be used before Weather::check.
     T_amplitude (-42.42e42),
     max_Ta_yday (-42.42e42),

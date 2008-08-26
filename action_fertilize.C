@@ -32,6 +32,7 @@
 #include "assertion.h"
 #include "librarian.h"
 #include "volume.h"
+#include "unit.h"
 #include <sstream>
 
 // Base class for fertilize actions.
@@ -321,6 +322,7 @@ struct ActionFertilizeSurface : public ActionFertilize
 void 
 ActionFertilizeSurface::doIt (Daisy& daisy, const Scope&, Treelog& msg)
 {
+  const Unitc& unitc = daisy.unitc ();
   double water = 0.0;
   common_doIt (daisy, water, msg);
 
@@ -328,14 +330,16 @@ ActionFertilizeSurface::doIt (Daisy& daisy, const Scope&, Treelog& msg)
     {
       daisy.field->fertilize (am, from, to, daisy.dt, msg);
       if (water > 0.0)
-        daisy.field->irrigate_subsoil (water, IM (IM::solute_unit ()),
+        daisy.field->irrigate_subsoil (water,
+                                       IM (unitc.get_unit (IM::solute_unit ())),
                                        from, to, daisy.dt, msg);
     }
   else
     {
       daisy.field->fertilize (am, daisy.dt, msg);
       if (water > 0.0)
-        daisy.field->irrigate_surface (water, IM (IM::solute_unit ()),
+        daisy.field->irrigate_surface (water, 
+                                       IM (unitc.get_unit (IM::solute_unit ())),
                                        daisy.dt, msg);
     }
 }
@@ -412,7 +416,9 @@ ActionFertilizeIncorporate::doIt (Daisy& daisy, const Scope&, Treelog& msg)
 
   daisy.field->fertilize (am, *volume, daisy.dt, msg);
   if (water > 0.0)
-    daisy.field->irrigate_subsoil (water, IM (IM::solute_unit ()),
+    daisy.field->irrigate_subsoil (water,
+                                   IM (daisy.unitc ()
+                                       .get_unit (IM::solute_unit ())),
                                    *volume, daisy.dt, msg);
 }
 

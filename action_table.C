@@ -138,6 +138,14 @@ ActionTable::read_date (const LexerTable& lex,
 void 
 ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
 { 
+  // Units.
+  const Unitc& unitc = daisy.unitc ();
+  static const symbol mg_per_square_m ("mg/m^2");
+  const Unit& u_mg_per_square_m = unitc.get_unit (mg_per_square_m);
+  const Unit& u_ppm = unitc.get_unit (Unitc::ppm ());
+  const Unit& u_per_mm = unitc.get_unit (Unitc::per_mm ());
+  const Unit& u_solute = unitc.get_unit (IM::solute_unit ());
+
   if (sow.get () && sow_dates.find (daisy.time) != sow_dates.end ())
     sow->doIt (daisy, scope, msg);
   if (emerge.get () && emerge_dates.find (daisy.time) != emerge_dates.end ())
@@ -162,17 +170,15 @@ ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
               tmp << "Applying minimum of 0.1 mm\n";
               value = 0.1;
             }
-          IM im = AM::get_IM (fert);
-	  im.rebase ("mg/m^2");
+          IM im = AM::get_IM (u_mg_per_square_m, fert);
 	  daisy_assert (std::isnormal (value));
-	  im *= Scalar (1.0 / value, Unitc::per_mm ());
-          daisy.field->irrigate_subsoil (value, im, -5.0, -25.0, daisy.dt,
-					 msg); 
+	  im.multiply_assign (Scalar (1.0 / value, u_per_mm), u_ppm);
+          daisy.field->irrigate_subsoil (value, im, -5.0, -25.0, daisy.dt, msg);
           tmp << "Fertigating " << value << " mm, with";
 	  for (IM::const_iterator i = im.begin (); i != im.end (); i++)
 	    {
 	      const symbol chem = *i;
-	      const double value = im.get_value (chem, Unitc::ppm ());
+	      const double value = im.get_value (chem, u_ppm);
 	      if (std::isnormal (value))
 		tmp << " " << value << " ppm " << chem;
 	    }
@@ -208,8 +214,7 @@ ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
             }
           daisy.field->fertilize (fert, daisy.dt, msg);
           if (water > 0.0)
-            daisy.field->irrigate_surface (water, IM (IM::solute_unit ()),
-                                           daisy.dt, msg);
+            daisy.field->irrigate_surface (water, IM (u_solute), daisy.dt, msg);
         }
     }
   else if (irrigate_events.find (daisy.time) != irrigate_events.end ())

@@ -26,42 +26,39 @@
 #include "symbol.h"
 #include "syntax.h"
 #include <map>
+#include <boost/noncopyable.hpp>
 
 class Log;
 class Syntax;
 class AttributeList;
 class Block;
+class Unit;
 
-class Scalar 
+class Scalar : public boost::noncopyable
 {
   // Content.
 private:
-  const symbol dim;
+  const Unit& unit_;
   const double val;
 
   // Use.
 public:
-  symbol dimension () const
-  { return dim; }
+  const Unit& unit () const
+  { return unit_; }
+  symbol dimension () const;
   double value () const
   { return val; }
 
   // Create and Destroy.
 public:
-  Scalar (const double v, const symbol d)
-    : dim (d),
-      val (v)
-  { }
-  Scalar (const double v, const char *const d)
-    : dim (d),
+  Scalar (const double v, const Unit& u)
+    : unit_ (u),
       val (v)
   { }
   Scalar (const Scalar& s)
-    : dim (s.dim),
+    : unit_ (s.unit_),
       val (s.val)
   { }
-private:
-  Scalar& operator= (const Scalar&); // Disable
 };
 
 class IM
@@ -74,14 +71,14 @@ public:
 
   // Content.
 private:
-  symbol dimension;
+  const Unit* unit;
   std::map<symbol, double> content;
 
   // Accessors.
 public:
-  double get_value (symbol chem, symbol dim) const;
-  void set_value (symbol chem, symbol dim, double value);
-  void add_value (symbol chem, symbol dim, double value);
+  double get_value (symbol chem, const Unit&) const;
+  void set_value (symbol chem, const Unit&, double value);
+  void add_value (symbol chem, const Unit&, double value);
 private:
   double get_value_raw (symbol chem) const;
   void set_value_raw (symbol chem, double value);
@@ -112,12 +109,12 @@ public:
   // Operations.
 public:
   void output (Log&) const;
-  void rebase (const symbol dim);
-  void rebase (const char* dim);
+  void rebase (const Unit& unit);
+  
   void operator+= (const IM&);
   IM operator+ (const IM&) const;
-  void operator*= (const Scalar&);
-  IM operator* (const Scalar&) const;
+  void multiply_assign (const Scalar&, const Unit& result);
+  IM multiply (const Scalar&, const Unit& result) const;
   IM& operator= (const IM&);
   void clear ();
 
@@ -131,8 +128,8 @@ public:
   explicit IM (Block&, const char* key);
   explicit IM ();
   IM (const IM& im);
-  explicit IM (symbol dim);
-  explicit IM (symbol dim, const IM&);
+  explicit IM (const Unit&);
+  explicit IM (const Unit&, const IM&);
   ~IM ();
 };
 

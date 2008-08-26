@@ -36,6 +36,7 @@ class Time;
 class AOM;
 class Treelog;
 class VCheck;
+class Unitc;
 
 class AM : public Model
 {
@@ -103,7 +104,7 @@ public:
   static const AttributeList& default_root ();
   static double get_NO3 (const AttributeList&);	// [g N/cm^2]
   static double get_NH4 (const AttributeList&);	// [g N/cm^2]
-  static IM get_IM (const AttributeList&);
+  static IM get_IM (const Unit&, const AttributeList&);
   static double get_volatilization (const AttributeList&);	// [g N/m^2]
   static double get_DM (const AttributeList&);	// [Mg DM/ha]
   static double get_water (const AttributeList&);	// [mm]

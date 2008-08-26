@@ -86,8 +86,9 @@ struct ActionIrrigate : public Action
         if (!approximate (remaining_time, 1.0))
           tmp << "s";
 	static const symbol conc_flux_unit ("kg/ha/mm");
-        const double N = (sm.get_value (Chemical::NO3 (), conc_flux_unit)
-			  + sm.get_value (Chemical::NH4 (), conc_flux_unit))
+        const Unit& u_cf = daisy.unitc ().get_unit (conc_flux_unit);
+        const double N = (sm.get_value (Chemical::NO3 (), u_cf)
+			  + sm.get_value (Chemical::NH4 (), u_cf))
 	  * flux * (days * 24 + hours);
         if (N > 1e-10)
           tmp << "; " << N << " kg N/ha";
@@ -96,7 +97,7 @@ struct ActionIrrigate : public Action
 	    const symbol chem = *i;
 	    if (chem == Chemical::NO3 () || chem == Chemical::NH4 ())
 	      continue;
-	    const double value = sm.get_value (chem, conc_flux_unit)
+	    const double value = sm.get_value (chem, u_cf)
 	      * flux * (days * 24 + hours) * 1000.0 /* [g/kg] */;
 	    if (!std::isnormal (value))
 	      continue;

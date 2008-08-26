@@ -38,6 +38,7 @@
 #include "program.h"
 #include "memutils.h"
 #include "librarian.h"
+#include "unit.h"
 #include <numeric>
 #include <sstream>
 
@@ -831,11 +832,11 @@ AM::get_NH4 (const AttributeList& al)
 }
 
 IM
-AM::get_IM (const AttributeList& al)
+AM::get_IM (const Unit& unit, const AttributeList& al)
 {
-  IM result (IM::storage_unit ());
-  result.set_value (Chemical::NH4 (), IM::storage_unit (), get_NH4 (al));
-  result.set_value (Chemical::NO3 (), IM::storage_unit (), get_NO3 (al));
+  IM result (unit);
+  result.set_value (Chemical::NH4 (), unit, get_NH4 (al));
+  result.set_value (Chemical::NO3 (), unit, get_NO3 (al));
   return result;
 }
 

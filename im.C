@@ -24,7 +24,7 @@
 
 #include "im.h"
 #include "chemical.h"
-#include "units.h"
+#include "unit.h"
 #include "am.h"
 #include "log.h"
 #include "block.h"
@@ -33,6 +33,10 @@
 #include "check.h"
 #include "assertion.h"
 #include <cmath>
+
+symbol 
+Scalar::dimension () const
+{ return unit_.name; }
 
 symbol
 IM::storage_unit ()
@@ -56,21 +60,23 @@ IM::solute_unit ()
 }
 
 double 
-IM::get_value (const symbol chem, const symbol dim) const
+IM::get_value (const symbol chem, const Unit& other) const
 {
-  return Units::convert (dimension, dim, get_value_raw (chem)); 
+  daisy_assert (unit);
+  return Unitc::unit_convert (*unit, other, get_value_raw (chem)); 
 }
 
 void 
-IM::set_value (const symbol chem, const symbol dim, const double value)
+IM::set_value (const symbol chem, const Unit& other, const double value)
 {
-  set_value_raw (chem, Units::convert (dim, dimension, value)); 
+  daisy_assert (unit);
+  set_value_raw (chem, Unitc::unit_convert (other, *unit, value)); 
 }
 
 void 
-IM::add_value (const symbol chem, const symbol dim, const double value)
+IM::add_value (const symbol chem, const Unit& other, const double value)
 {
-  set_value (chem, dim, value + get_value (chem, dim)); 
+  set_value (chem, other, value + get_value (chem, other)); 
 }
 
 double 
@@ -107,28 +113,26 @@ IM::output (Log& log) const
 }
 
 void 
-IM::rebase (const symbol dim)
+IM::rebase (const Unit& other)
 {
+  daisy_assert (unit);
   for (std::map<symbol, double>::iterator i = content.begin (); 
        i != content.end ();
        i++)
-    (*i).second = Units::convert (dimension, dim, (*i).second);
-  dimension = dim;
+    (*i).second = Unitc::unit_convert (*unit, other, (*i).second);
+  unit = &other;
 }
-
-void 
-IM::rebase (const char *const dim)
-{ rebase (symbol (dim)); }
 
 void
 IM::operator += (const IM& n)
 { 
-  daisy_assert (dimension != Syntax::unknown ());
+  daisy_assert (unit);
+  daisy_assert (n.unit);
 
   for (std::map<symbol, double>::const_iterator i = n.content.begin (); 
        i != n.content.end ();
        i++)
-    content[(*i).first] += Units::convert (n.dimension, dimension, (*i).second);
+    content[(*i).first] += Unitc::unit_convert (*n.unit, *unit, (*i).second);
 }
 
 IM
@@ -140,27 +144,29 @@ IM::operator+ (const IM& im) const
 }
 
 void
-IM::operator*= (const Scalar& s)
+IM::multiply_assign (const Scalar& s, const Unit& u)
 {
-  dimension = Units::multiply (dimension, s.dimension ());
+  daisy_assert (unit);
   for (std::map<symbol, double>::iterator i = content.begin (); 
        i != content.end ();
        i++)
-    (*i).second *= s.value ();
+    (*i).second = Unitc::multiply (*unit, s.unit (),
+                                   (*i).second * s.value (), u);
+  unit = &u;
 }
 
 IM
-IM::operator* (const Scalar& s) const
+IM::multiply (const Scalar& s, const Unit& u) const
 {
   IM result (*this);
-  result *= s;
+  result.multiply_assign (s, u);
   return result;
 }
 
 IM& 
 IM::operator= (const IM& im)
 {
-  dimension = im.dimension;
+  unit = im.unit;
   content = im.content;
   return *this;
 }
@@ -179,7 +185,7 @@ IM::IM (Block& parent, const char *const key)
   // Find dimension.
   const Syntax& parent_syntax = parent.find_syntax (key);
   const Syntax& syntax = parent_syntax.syntax (key);
-  dimension = symbol (syntax.dimension ("value"));
+  unit = &(parent.unitc ().get_unit (symbol (syntax.dimension ("value"))));
   
   // Find content.
   const std::vector<const AttributeList*>& alists = parent.alist_sequence (key);
@@ -191,27 +197,27 @@ IM::IM (Block& parent, const char *const key)
 }
 
 IM::IM ()
-  : dimension (Syntax::unknown ())
+  : unit (NULL)
 { }
 
 IM::IM (const IM& im)
-  : dimension (im.dimension),
+  : unit (im.unit),
     content (im.content)
-{ daisy_assert (dimension != Syntax::unknown ()); }
+{ }
 
-IM::IM (const symbol dim)
-  : dimension (dim)
-{ daisy_assert (dimension != Syntax::unknown ()); }
+IM::IM (const Unit& u)
+  : unit (&u)
+{ }
 
-IM::IM (const symbol dim, const IM& im)
-  : dimension (dim)
+IM::IM (const Unit& u, const IM& im)
+  : unit (&u)
 {
   for (const_iterator i = im.begin (); i != im.end (); i++)
-    content[*i] = im.get_value (*i, dimension);
+    content[*i] = im.get_value (*i, u);
 }
 
 IM::~IM ()
-{ daisy_assert (dimension != Syntax::unknown ());  }
+{ daisy_assert (unit);  }
 
 void
 IM::add_syntax (Syntax& parent_syntax, AttributeList& parent_alist,

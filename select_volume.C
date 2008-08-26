@@ -30,7 +30,6 @@
 #include "geometry.h"
 #include "soil.h"
 #include "vegetation.h"
-#include "units.h"
 #include "check.h"
 #include "librarian.h"
 #include <memory>
@@ -52,7 +51,8 @@ struct SelectVolume : public SelectValue
 
   // Bulk density convertions.
   std::auto_ptr<BD_convert> bd_convert;
-  const Units::Convert* special_convert (const symbol has, const symbol want);
+  const Convert* special_convert (const Unitc&, 
+                                  const symbol has, const symbol want);
 
   // Output routines.
   void output_array (const std::vector<double>& array, 
@@ -64,7 +64,7 @@ struct SelectVolume : public SelectValue
 
   // Create and Destroy.
   symbol default_dimension (const symbol spec_dim) const;
-  bool initialize (const Volume& default_volume, 
+  bool initialize (const Unitc&, const Volume& default_volume, 
 		   const std::string& timestep, Treelog& msg);
   bool check_border (const Border& border, 
                      const Volume& default_volume,
@@ -77,15 +77,16 @@ int
 SelectVolume::dimensions () const
 { return (density_z ? 1 : 0) + (density_x ? 1 : 0) + (density_y ? 1 : 0); }
 
-const Units::Convert* 
-SelectVolume::special_convert (const symbol has, const symbol want)
+const Convert* 
+SelectVolume::special_convert (const Unitc& unitc, 
+                               const symbol has, const symbol want)
 {
   daisy_assert (!bd_convert.get ());
   static const symbol bulk_density ("g/cm^3");
   const symbol bulk_dim = default_dimension (bulk_density);
-  if (Units::can_convert (has, bulk_dim)
-      && Units::can_convert (Syntax::fraction (), want))
-    bd_convert.reset (new BD_convert (has, want, bulk_dim));
+  if (unitc.can_convert (has, bulk_dim)
+      && unitc.can_convert (Syntax::fraction (), want))
+    bd_convert.reset (new BD_convert (unitc, has, want, bulk_dim));
   return bd_convert.get ();
 }
 
@@ -218,11 +219,11 @@ SelectVolume::default_dimension (const symbol spec_dim) const
   switch (dimensions ())
     {
     case 0:
-      return Units::multiply (spec_dim, Units::cm3 ());
+      return Unitc::multiply (spec_dim, Unitc::cm3 ());
     case 1:
-      return Units::multiply (spec_dim, Units::cm2 ());
+      return Unitc::multiply (spec_dim, Unitc::cm2 ());
     case 2:
-      return Units::multiply (spec_dim, Units::cm ());
+      return Unitc::multiply (spec_dim, Unitc::cm ());
     case 3:
       return spec_dim;
     default:
@@ -231,12 +232,12 @@ SelectVolume::default_dimension (const symbol spec_dim) const
 }
 
 bool 
-SelectVolume::initialize (const Volume& default_volume, 
+SelectVolume::initialize (const Unitc& unitc, const Volume& default_volume, 
                           const std::string& timestep, Treelog& msg)
 {
   bool ok = true;
 
-  if (!Select::initialize (default_volume, timestep, msg))
+  if (!Select::initialize (unitc, default_volume, timestep, msg))
     ok = false;
 
   if (!volume->limit (default_volume, msg))

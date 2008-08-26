@@ -45,14 +45,15 @@ struct SelectArray : public Select
 
   // Bulk density convertions.
   std::auto_ptr<BD_convert> bd_convert;
-  const Units::Convert* special_convert (const symbol has, const symbol want)
+  const Convert* special_convert (const Unitc& unitc, 
+                                  const symbol has, const symbol want)
   {
     daisy_assert (!bd_convert.get ());
     static const symbol bulk_density ("g/cm^3");
     const symbol bulk_dim = default_dimension (bulk_density);
-    if (Units::can_convert (has, bulk_dim)
-        && Units::can_convert (Syntax::fraction (), want))
-      bd_convert.reset (new BD_convert (has, want, bulk_dim));
+    if (unitc.can_convert (has, bulk_dim)
+        && unitc.can_convert (Syntax::fraction (), want))
+      bd_convert.reset (new BD_convert (unitc, has, want, bulk_dim));
     return bd_convert.get ();
   }
 

@@ -105,16 +105,18 @@ private:
   static double base_convert (symbol from, symbol to, double value);
 
   // Utilities.
-protected:
+public:
   static bool compatible (const Unit& from, const Unit& to);
   static double unit_convert (const Unit& from, const Unit& to, double value);
-public:
+  static double multiply (const Unit&, const Unit&, double, const Unit& result);
+  static symbol multiply (symbol, symbol);
   virtual bool can_convert (symbol from, symbol to,
                             Treelog&) const = 0;
   virtual bool can_convert (symbol from, symbol to) const = 0;
   virtual bool can_convert (symbol from, symbol to, double) const = 0;
   virtual double convert (symbol from, symbol to, double) const = 0;
-
+  virtual const Unit& get_unit (symbol name) const = 0;
+  
   // Conversion.
 protected:
   static const Convert* create_convertion (const Unit& from, const Unit& to);

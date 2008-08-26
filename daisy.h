@@ -51,6 +51,7 @@ class Daisy : public Program
 public:
   static const char *const default_description;
   Metalib& metalib;
+  const Unitc& unitc () const;
 
   // Content.
   const std::string directory;  // Initialize, check and run here.

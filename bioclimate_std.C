@@ -150,7 +150,7 @@ struct BioclimateStandard : public Bioclimate
   double hourly_global_radiation_; // From weather [W/m2].
 
   // Simulation
-  void tick (const Time&, Surface&, const Weather&, 
+  void tick (const Unitc&, const Time&, Surface&, const Weather&, 
 	     Vegetation&, const Movement&, const Geometry&,
              const Soil&, SoilWater&, const SoilHeat&, Chemistry&, 
 	     double dt, Treelog&);
@@ -891,7 +891,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
 }  
 
 void 
-BioclimateStandard::tick (const Time& time, 
+BioclimateStandard::tick (const Unitc& unitc, const Time& time, 
                           Surface& surface, const Weather& weather,  
 			  Vegetation& vegetation, const Movement& movement,
                           const Geometry& geo, const Soil& soil, 
@@ -908,7 +908,9 @@ BioclimateStandard::tick (const Time& time,
   day_length_ = weather.day_length ();
   
   // Add deposition. 
-  const IM im = weather.deposit () * Scalar (dt, Unitc::h ());
+  const Unit& u_h = unitc.get_unit (Unitc::h ());
+  const Unit& u_storage = unitc.get_unit (IM::storage_unit ());
+  const IM im = weather.deposit ().multiply (Scalar (dt, u_h), u_storage);
   chemistry.deposit (im, dt, msg);
 
   // Update canopy structure.

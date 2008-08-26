@@ -41,6 +41,7 @@ class Syntax;
 class Block;
 class Scope;
 class IM;
+class Unitc;
 
 class Chemistry : public ModelAListed
 {
@@ -48,6 +49,8 @@ class Chemistry : public ModelAListed
 public:
   static const char *const component;
   symbol library_id () const;
+protected:
+  const Unitc& unitc;
 
   // Query.
 public:

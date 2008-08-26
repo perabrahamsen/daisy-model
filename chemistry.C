@@ -28,6 +28,7 @@
 #include "librarian.h"
 #include "vcheck.h"
 #include "alist.h"
+#include "unit.h"
 
 const char *const Chemistry::component = "chemistry";
 
@@ -54,7 +55,8 @@ Chemistry::deposit (const IM& im, double dt, Treelog& msg)
   for (IM::const_iterator i = im.begin (); i != im.end (); i++)
     {
       const symbol chem = *i;
-      const double amount = im.get_value (chem, Chemical::spray_unit ());
+      const double amount 
+        = im.get_value (chem, unitc.get_unit (Chemical::spray_unit ()));
       deposit (chem, amount, dt, msg);
     }
 }
@@ -65,7 +67,8 @@ Chemistry::spray (const IM& im, double dt, Treelog& msg)
   for (IM::const_iterator i = im.begin (); i != im.end (); i++)
     {
       const symbol chem = *i;
-      const double amount = im.get_value (chem, Chemical::spray_unit ());
+      const double amount 
+        = im.get_value (chem, unitc.get_unit (Chemical::spray_unit ()));
       spray (chem, amount, dt, msg);
     }
 }
@@ -78,7 +81,8 @@ Chemistry::incorporate (const Geometry& geo, const IM& im,
   for (IM::const_iterator i = im.begin (); i != im.end (); i++)
     {
       const symbol chem = *i;
-      const double amount = im.get_value (chem, Chemical::spray_unit ());
+      const double amount 
+        = im.get_value (chem, unitc.get_unit (Chemical::spray_unit ()));
       incorporate (geo, chem, amount, from, to, dt, msg);
     }
 }
@@ -91,7 +95,8 @@ Chemistry::incorporate (const Geometry& geo, const IM& im,
   for (IM::const_iterator i = im.begin (); i != im.end (); i++)
     {
       const symbol chem = *i;
-      const double amount = im.get_value (chem, Chemical::spray_unit ());
+      const double amount 
+        = im.get_value (chem, unitc.get_unit (Chemical::spray_unit ()));
       incorporate (geo, chem, amount, volume, dt, msg);
     }
 }
@@ -105,7 +110,8 @@ Chemistry::load_syntax (Syntax& syntax, AttributeList& alist)
 { }
 
 Chemistry::Chemistry (Block& al)
-  : ModelAListed (al.alist ())
+  : ModelAListed (al.alist ()),
+    unitc (al.unitc ())
 { }
 
 Chemistry::~Chemistry ()

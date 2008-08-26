@@ -32,7 +32,6 @@
 #include "alist.h"
 #include "check.h"
 #include "vcheck.h"
-#include "units.h"
 #include "symbol.h"
 #include "format.h"
 #include "submodel.h"
@@ -114,7 +113,7 @@ struct Select::Implementation
   mutable ScopeID scope;
     
   // Content.
-  const Units::Convert* spec_conv; // Convert value.
+  const Convert* spec_conv; // Convert value.
   std::auto_ptr<Number> expr;   // - || -
   const bool negate;            // - || -
   double convert (double) const; // - || -
@@ -739,8 +738,8 @@ symbol
 Select::default_dimension (const symbol spec_dim) const
 { return spec_dim; }
 
-const Units::Convert*
-Select::special_convert (const symbol, const symbol)
+const Convert*
+Select::special_convert (const Unitc&, const symbol, const symbol)
 { return NULL; }
 
 void 
@@ -748,7 +747,7 @@ Select::add_dest (Destination* d)
 { dest.add_dest (d); }
 
 bool
-Select::initialize (const Volume&, 
+Select::initialize (const Unitc& unitc, const Volume&, 
 		    const std::string& timestep, Treelog& msg)
 { 
   symbol spec_dim;
@@ -776,10 +775,10 @@ Select::initialize (const Volume&,
 
   // Attempt to find convertion with original dimension.
   if (impl->spec.get ())
-    if (Units::can_convert (spec_dim, impl->dimension))
-      impl->spec_conv = &Units::get_convertion (spec_dim, impl->dimension);
+    if (unitc.can_convert (spec_dim, impl->dimension))
+      impl->spec_conv = &unitc.get_convertion (spec_dim, impl->dimension);
     else
-      impl->spec_conv = special_convert (spec_dim, impl->dimension);
+      impl->spec_conv = special_convert (unitc, spec_dim, impl->dimension);
 
   // Replace '&' with timestep.
   std::string new_dim;
@@ -800,8 +799,8 @@ Select::initialize (const Volume&,
   // Attempt to find convertion with new dimension.
   if (impl->spec.get () && !impl->spec_conv)
     {
-      if (Units::can_convert (spec_dim, symbol (hour_dim)))
-	impl->spec_conv = &Units::get_convertion (spec_dim, symbol (hour_dim));
+      if (unitc.can_convert (spec_dim, symbol (hour_dim)))
+	impl->spec_conv = &unitc.get_convertion (spec_dim, symbol (hour_dim));
     }
 
   // Use new dimension.

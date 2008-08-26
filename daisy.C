@@ -46,10 +46,15 @@
 #include "mathlib.h"
 #include "memutils.h"
 #include "librarian.h"
+#include "metalib.h"
 #include <sstream>
 
 const char *const Daisy::default_description = "\
 The Daisy crop/soil/atmosphere model.";
+
+const Unitc& 
+Daisy::unitc () const
+{ return metalib.unitc (); }
 
 void 
 Daisy::attach_ui (Run* run, const std::vector<Log*>& logs)

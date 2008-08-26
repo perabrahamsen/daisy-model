@@ -53,8 +53,8 @@ struct ColumnStandard : public Column
 {
   static const symbol solute_per_mm_unit;
   static const symbol field_flux_unit;
-
-
+  
+  const Unitc& unitc;
   const std::auto_ptr<Scopesel> scopesel;
   const Scope* extern_scope;
   std::auto_ptr<Movement> movement;
@@ -197,8 +197,11 @@ ColumnStandard::irrigate_overhead (const double flux, const double temp,
 {
   daisy_assert (flux >= 0.0);
   bioclimate->irrigate_overhead (flux, temp);
-  IM im (solute_per_mm_unit, sm);
-  im *= Scalar (flux * dt, Unitc::mm ());
+  const Unit& u_solute_per_mm = unitc.get_unit (solute_per_mm_unit);
+  const Unit& u_mm = unitc.get_unit (Unitc::mm ());
+  const Unit& u_storage = unitc.get_unit (IM::storage_unit ());
+  IM im (u_solute_per_mm, sm);
+  im.multiply_assign (Scalar (flux * dt, u_mm), u_storage);
   fertilize (im, dt, msg);
 }
 
@@ -208,9 +211,11 @@ ColumnStandard::irrigate_surface (const double flux, const double temp,
 {
   daisy_assert (flux >= 0.0);
   bioclimate->irrigate_surface (flux, temp);
-  
-IM im (solute_per_mm_unit, sm);
-  im *= Scalar (flux * dt, Unitc::mm ());
+  const Unit& u_solute_per_mm = unitc.get_unit (solute_per_mm_unit);
+  const Unit& u_mm = unitc.get_unit (Unitc::mm ());
+  const Unit& u_storage = unitc.get_unit (IM::storage_unit ());
+  IM im (u_solute_per_mm, sm);
+  im.multiply_assign (Scalar (flux * dt, u_mm ), u_storage);
   fertilize (im, dt, msg);
 }
 
@@ -220,9 +225,11 @@ ColumnStandard::irrigate_overhead (const double flux,
 {
   daisy_assert (flux >= 0.0);
   bioclimate->irrigate_overhead (flux);
-  
-IM im (solute_per_mm_unit, sm);
-  im *= Scalar (flux * dt, Unitc::mm ());
+  const Unit& u_solute_per_mm = unitc.get_unit (solute_per_mm_unit);
+  const Unit& u_mm = unitc.get_unit (Unitc::mm ());
+  const Unit& u_storage = unitc.get_unit (IM::storage_unit ());
+  IM im (u_solute_per_mm, sm);
+  im.multiply_assign (Scalar (flux * dt, u_mm), u_storage);
   fertilize (im, dt, msg);
 }
 
@@ -232,9 +239,11 @@ ColumnStandard::irrigate_surface (const double flux,
 {
   daisy_assert (flux >= 0.0);
   bioclimate->irrigate_surface (flux);
-  
-IM im (solute_per_mm_unit, sm);
-  im *= Scalar (flux * dt, Unitc::mm ());
+  const Unit& u_solute_per_mm = unitc.get_unit (solute_per_mm_unit);
+  const Unit& u_mm = unitc.get_unit (Unitc::mm ());
+  const Unit& u_storage = unitc.get_unit (IM::storage_unit ());
+  IM im (u_solute_per_mm, sm);
+  im.multiply_assign (Scalar (flux * dt, u_mm), u_storage);
   fertilize (im, dt, msg);
 }
 
@@ -245,9 +254,11 @@ ColumnStandard::irrigate_subsoil (const double flux, const IM& sm,
 {
   soil_water->incorporate (geometry, flux / 10.0 /* mm -> cm */, from, to);
   bioclimate->irrigate_subsoil (flux);
-  
-IM im (solute_per_mm_unit, sm);
-  im *= Scalar (flux * dt, Unitc::mm ());
+  const Unit& u_solute_per_mm = unitc.get_unit (solute_per_mm_unit);
+  const Unit& u_mm = unitc.get_unit (Unitc::mm ());
+  const Unit& u_storage = unitc.get_unit (IM::storage_unit ());
+  IM im (u_solute_per_mm, sm);
+  im.multiply_assign (Scalar (flux * dt, u_mm), u_storage);
   chemistry->incorporate (geometry, im, from, to, dt, msg);
 }
 
@@ -258,9 +269,11 @@ ColumnStandard::irrigate_subsoil (const double flux, const IM& sm,
 {
   soil_water->incorporate (geometry, flux / 10.0 /* mm -> cm */, volume);
   bioclimate->irrigate_subsoil (flux);
-  
-IM im (solute_per_mm_unit, sm);
-  im *= Scalar (flux * dt, Unitc::mm ());
+  const Unit& u_solute_per_mm = unitc.get_unit (solute_per_mm_unit);
+  const Unit& u_mm = unitc.get_unit (Unitc::mm ());
+  const Unit& u_storage = unitc.get_unit (IM::storage_unit ());
+  IM im (u_solute_per_mm, sm);
+  im.multiply_assign (Scalar (flux * dt, u_mm), u_storage);
   chemistry->incorporate (geometry, im, volume, dt, msg);
 }
 
@@ -281,7 +294,7 @@ ColumnStandard::fertilize (const AttributeList& al, const double dt,
   chemistry->dissipate (Chemical::NH4 (), lost_NH4, dt, msg);
 
   // Add inorganic matter.
-  fertilize (AM::get_IM (al), dt, msg);
+  fertilize (AM::get_IM (unitc.get_unit (IM::storage_unit ()), al), dt, msg);
 
   // Add organic matter, if any.
   if (al.name ("syntax") != "mineral")
@@ -305,7 +318,7 @@ ColumnStandard::fertilize (const AttributeList& al,
   chemistry->dissipate (Chemical::NH4 (), lost_NH4, dt, msg);
 
   // Add inorganic matter.
-  const IM im = AM::get_IM (al);
+  const IM im = AM::get_IM (unitc.get_unit (IM::storage_unit ()), al);
   chemistry->incorporate (geometry, im, from, to, dt, msg);
   applied_DM += AM::get_DM (al) / dt;
 
@@ -328,7 +341,7 @@ ColumnStandard::fertilize (const AttributeList& al,
   chemistry->dissipate (Chemical::NH4 (), lost_NH4, dt, msg);
 
   // Add inorganic matter.
-  const IM im = AM::get_IM (al);
+  const IM im = AM::get_IM (unitc.get_unit (IM::storage_unit ()), al);
   chemistry->incorporate (geometry, im, volume, dt, msg);
   applied_DM += AM::get_DM (al) / dt;
 
@@ -603,7 +616,7 @@ ColumnStandard::tick (const Time& time, const double dt,
                            *soil_water, surface, msg);
 
   // Early calculation.
-  bioclimate->tick (time, surface, my_weather, 
+  bioclimate->tick (unitc, time, surface, my_weather, 
                     *vegetation, *movement,
                     geometry, *soil, *soil_water, *soil_heat, *chemistry,
                     dt, msg);
@@ -816,6 +829,7 @@ ColumnStandard::output (Log& log) const
 
 ColumnStandard::ColumnStandard (Block& al)
   : Column (al),
+    unitc (al.unitc ()),
     scopesel (Librarian::build_item<Scopesel> (al, "scope")),
     extern_scope (NULL),
     movement (Librarian::build_item<Movement> (al, "Movement")),
