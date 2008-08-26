@@ -263,6 +263,17 @@ const Convert&
 Metalib::Implementation::get_convertion (const symbol from, 
                                          const symbol to) const
 {
+  if (from == to)
+    {
+      static struct ConvertIdentity : public Convert
+      {
+        double operator()(const double value) const
+        { return value; }
+        bool valid (const double) const
+        { return true; }
+      } identity;
+      return identity;
+    }
   const symbol key (from.name () + " -> " + to.name ());
 
   // Already known.
@@ -272,12 +283,36 @@ Metalib::Implementation::get_convertion (const symbol from,
     return *(*i).second;
 
   // Defined?
-  if (!has_unit (from))
-    throw "Cannot get conversion from unknown dimension [" + from 
-      + "] to [" + to + "]";
-  if (!has_unit (to))
-    throw "Cannot get conversion from [" + from 
-      + "] to unknown dimension [" + to + "]";
+  if (!has_unit (from) || !has_unit (to))
+    {
+      if (allow_old ())
+        {
+          struct ConvertOld : Convert
+          {
+            const Units::Convert& old;
+            double operator()(const double value) const
+            { return old (value); }
+            bool valid (const double value) const
+            { return old.valid (value); }
+            ConvertOld (const Units::Convert& o)
+              : old (o)
+            { }
+          };
+          const Units::Convert& old
+            = Units::get_convertion (from.name (), to.name ());
+          
+          const Convert* convert = new ConvertOld (old);
+          daisy_assert (convert);
+          conversions[key] = convert;
+          return *convert;
+        }
+      if (!has_unit (from))
+        throw "Cannot get conversion from unknown dimension [" + from 
+          + "] to [" + to + "]";
+      if (!has_unit (to))
+        throw "Cannot get conversion from [" + from 
+          + "] to unknown dimension [" + to + "]";
+    }
   
   const Unit& from_unit = get_unit (from);
   const Unit& to_unit = get_unit (to);
