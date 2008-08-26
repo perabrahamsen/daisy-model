@@ -82,6 +82,8 @@ setup: reference.pdf reference.ps tutorial.pdf exercises.pdf
 	cp -f reference.ps $(SETUPDIR)/doc
 	cp -f tutorial.pdf $(SETUPDIR)/doc
 	cp -f exercises.pdf $(SETUPDIR)/doc
+	mkdir $(SETUPDIR)/src/txt
+	cp $(TEXT) $(SETUPDIR)/src/txt
 
 svnci: $(TEXT)
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi

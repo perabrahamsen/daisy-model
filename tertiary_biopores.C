@@ -261,6 +261,11 @@ TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
 {
   Treelog::Open nest (msg, component + std::string (": ") + name);
 
+#ifdef TRACK_TIME
+  msg.message ("Find tertiary sink.");
+  msg.flush ();
+#endif
+
   // Flux.
   const size_t edge_size = geo.edge_size ();
   std::vector<double> q_tertiary (edge_size, 0.0);
@@ -322,6 +327,11 @@ TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
     h.push_back (soil_water.h (c));
   update_active (h);
       
+#ifdef TRACK_TIME
+  msg.message ("First try:");
+  msg.flush ();
+#endif
+
   // Find an implicit solution.
   const double min_dt = 0.00001;
   double ddt = dt;
@@ -331,13 +341,23 @@ TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
         // Succes!
         break;
       ddt *= 0.5;
-      if (dt < min_dt)
+      if (ddt < min_dt)
         {
+          set_state (old_state);
           msg.warning ("Can't find solution for tertiary transport.");
           return;
         }
     }
   
+#ifdef TRACK_TIME
+  {
+    std::ostringstream tmp;
+    tmp << "Found primary solution with timestep " << ddt << " of " << dt << ".";
+    msg.message (tmp.str ());
+    msg.flush ();
+  }
+#endif
+
   // Limit sink.
   matrix_sink (S_matrix, S_drain);
   for (size_t c = 0; c < cell_size; c++)
@@ -362,6 +382,15 @@ TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
       ddt *= factor;
     }
 
+#ifdef TRACK_TIME
+  {
+    std::ostringstream tmp;
+    tmp << "Found sink with timestep " << ddt << " of " << dt << ".";
+    msg.message (tmp.str ());
+    msg.flush ();
+  }
+#endif
+
   // Update tertiary state with new ddt.
   for (;;)
     {
@@ -369,13 +398,22 @@ TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
         // Succes!
         break;
       ddt *= 0.5;
-      if (dt < min_dt)
+      if (ddt < min_dt)
         {
+          set_state (old_state);
           msg.warning ("Can't find solution for tertiary transport.");
           return;
         }
     }
 
+#ifdef TRACK_TIME
+  {
+    std::ostringstream tmp;
+    tmp << "Found final solution with timestep " << ddt << " of " << dt << ".";
+    msg.message (tmp.str ());
+    msg.flush ();
+  }
+#endif
   // Scale sink with timestep.
   const double scale = ddt / dt;
   if (!approximate (scale, 1.0))
@@ -388,6 +426,11 @@ TertiaryBiopores::tick (const Geometry& geo, const Soil& soil,
   // Make it official.
   soil_water.add_tertiary_sink (S_matrix);
   soil_water.drain (S_drain);
+
+#ifdef TRACK_TIME
+  msg.message ("Done.");
+  msg.flush ();
+#endif
 }
 
 Tertsmall& 

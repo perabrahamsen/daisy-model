@@ -16,6 +16,8 @@ all:	$(TARGETS)
 
 setup: $(TARGETS)
 	cp $(TARGETS) $(SETUPDIR)/bin
+	mkdir $(SETUPDIR)/src/OpenMI
+	cp $(TEXT) $(SETUPDIR)/src/OpenMI
 
 .IGNORE: svnci
 

@@ -229,9 +229,17 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
       Anystate old_tertiary = tertiary->implicit ().get_state ();
       try
         {
+#ifdef TRACK_TIME
+          msg.message ("Trying " + matrix_water[i]->name + ".");
+          msg.flush ();
+#endif
           matrix_water[i]->tick (*geo, drain_cell, soil, soil_water, soil_heat,
                                  surface, groundwater, tertiary->implicit (),
                                  dt, msg);
+#ifdef TRACK_TIME
+          msg.message ("Done.");
+          msg.flush ();
+#endif
 	  obey_surface = matrix_water[i]->obey_surface ();
           goto update_borders;
         }
