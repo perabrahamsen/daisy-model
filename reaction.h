@@ -33,6 +33,7 @@ class OrganicMatter;
 class Chemistry;
 class Treelog;
 class Block;
+class Unitc;
 
 class Reaction : public ModelAListed
 {
@@ -43,7 +44,8 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Geometry&, const Soil&, const SoilWater&,
+  virtual void tick (const Unitc& unitc, 
+                     const Geometry&, const Soil&, const SoilWater&,
 		     const SoilHeat&, const OrganicMatter&, Chemistry&,
 		     const double dt, Treelog&) = 0;
   virtual void output (Log&) const = 0;
@@ -54,7 +56,8 @@ public:
   static const AttributeList& NH4_sorption_model ();
 public:
   virtual void initialize (const Soil&, Treelog&) = 0;
-  virtual bool check (const Soil&, const SoilWater&, const SoilHeat&,
+  virtual bool check (const Unitc& unitc, 
+                      const Soil&, const SoilWater&, const SoilHeat&,
 		      const Chemistry&, Treelog&) const = 0;
 protected:
   Reaction (Block& al);

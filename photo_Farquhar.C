@@ -165,7 +165,8 @@ PhotoFarquhar:: GSTModel(const double CO2_atm, double ABA_effect, double pn, dou
 }
 
 double
-PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum, 
+PhotoFarquhar::assimilate (const Unitc& unitc,
+                           const double ABA_xylem, const double rel_hum, 
 			   const double CO2_atm,
 			   const double Ta, const double Tl, const double cropN,
 			   const std::vector<double>& PAR, 
@@ -233,7 +234,9 @@ PhotoFarquhar::assimilate (const double ABA_xylem, const double rel_hum,
   while (sun_LAI_vector.size () < No)
     sun_LAI_vector.push_back (0.0);
 
-  rubiscoNdist->rubiscoN_distribution (PAR_height, prevLA, DS, rubisco_Ndist/*[mol/m²leaf]*/, 
+  rubiscoNdist->rubiscoN_distribution (unitc,
+                                       PAR_height, prevLA, DS,
+                                       rubisco_Ndist/*[mol/m²leaf]*/, 
 				       cropN /*[g/m²area]*/, msg);
   crop_Vmax_total (rubisco_Ndist, crop_Vm_total);  
 

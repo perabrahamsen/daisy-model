@@ -27,6 +27,8 @@
 
 struct SourceExpr : public SourceFile
 {
+  const Unitc& unitc;
+
   // Content.
   const std::auto_ptr<Number> expr;
   const symbol title_;
@@ -58,12 +60,12 @@ SourceExpr::load (Treelog& msg)
 
   // Scope
   ScopeTable scope (lex);
-  if (!expr->initialize (msg) || !expr->check (scope, msg))
+  if (!expr->initialize (msg) || !expr->check (unitc, scope, msg))
     {
       lex.error ("Bad expression");
       return false;
     }
-  expr->tick (scope, msg);
+  expr->tick (unitc, scope, msg);
   dimension_ = expr->dimension (scope);
 
   // Read data.
@@ -102,6 +104,7 @@ SourceExpr::load (Treelog& msg)
 
 SourceExpr::SourceExpr (Block& al)
   : SourceFile (al),
+    unitc (al.unitc ()),
     expr (Librarian::build_item<Number> (al, "expr")),
     title_ (al.identifier ("title", expr->title ())),
     dimension_ ("UNINITIALIZED")

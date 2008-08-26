@@ -34,10 +34,10 @@ struct BooleanNumbers : public Boolean
   const std::vector<Number*> operand;
 
   // Simulation.
-  void tick (const Scope& scope, Treelog& msg)
+  void tick (const Unitc& unitc, const Scope& scope, Treelog& msg)
   { 
     for (size_t i = 0; i < operand.size (); i++)
-      operand[i]->tick (scope, msg);
+      operand[i]->tick (unitc, scope, msg);
   }
   bool missing (const Scope& scope) const
   { 
@@ -63,14 +63,14 @@ struct BooleanNumbers : public Boolean
         }
     return ok;
   }
-  bool check (const Scope& scope, Treelog& msg) const
+  bool check (const Unitc& unitc, const Scope& scope, Treelog& msg) const
   { 
     Treelog::Open nest (msg, name);
     bool ok = true;
 
     symbol dim = Syntax::unknown ();
     for (size_t i = 0; i < operand.size (); i++)
-      if (!operand[i]->check (scope, msg))
+      if (!operand[i]->check (unitc, scope, msg))
         ok = false;
       else 
         {

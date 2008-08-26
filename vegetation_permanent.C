@@ -132,7 +132,8 @@ struct VegetationPermanent : public Vegetation
 
   // Simulation.
   void reset_canopy_structure (const Time& time);
-  void tick (const Time& time, const double relative_humidity, const double CO2_atm,
+  void tick (const Unitc&, const Time&,
+             const double relative_humidity, const double CO2_atm,
              const Bioclimate& bioclimate,
              const Geometry& geo,
 	     const Soil& soil,
@@ -145,7 +146,7 @@ struct VegetationPermanent : public Vegetation
 	     std::vector<double>& residuals_N_soil,
 	     std::vector<double>& residuals_C_soil,
 	     double dt, Treelog&);
-  double transpiration (double potential_transpiration,
+  double transpiration (const Unitc&, double potential_transpiration,
 			double canopy_evaporation,
                         const Geometry& geo,
 			const Soil& soil, SoilWater& soil_water, 
@@ -197,7 +198,7 @@ struct VegetationPermanent : public Vegetation
   void initialize (const Time& time, const Geometry& geo,
                    const Soil& soil, OrganicMatter&, 
                    Treelog&);
-  bool check (Treelog&) const;
+  bool check (const Unitc&, Treelog&) const;
   VegetationPermanent (Block&);
   ~VegetationPermanent ();
 };
@@ -259,7 +260,8 @@ VegetationPermanent::reset_canopy_structure (const Time& time)
   HvsLAI_ = canopy.LAIvsH.inverse ();
 }
 void
-VegetationPermanent::tick (const Time& time, const double, const double,
+VegetationPermanent::tick (const Unitc&,
+                           const Time& time, const double, const double,
 			   const Bioclimate&, 
                            const Geometry& geo,
 			   const Soil& soil,
@@ -326,7 +328,8 @@ VegetationPermanent::tick (const Time& time, const double, const double,
 }
 
 double
-VegetationPermanent::transpiration (double potential_transpiration,
+VegetationPermanent::transpiration (const Unitc& unitc,
+                                    double potential_transpiration,
 				    double canopy_evaporation,
                                     const Geometry& geo,
 				    const Soil& soil, 
@@ -335,7 +338,7 @@ VegetationPermanent::transpiration (double potential_transpiration,
                                     Treelog& msg)
 {
   if (canopy.CAI > 0.0)
-    return  root_system->water_uptake (potential_transpiration, 
+    return  root_system->water_uptake (unitc, potential_transpiration, 
                                        geo, soil, soil_water, 
                                        canopy_evaporation, day_fraction, 
                                        dt, msg);
@@ -371,10 +374,10 @@ VegetationPermanent::initialize (const Time& time,
 }
 
 bool 
-VegetationPermanent::check (Treelog& msg) const 
+VegetationPermanent::check (const Unitc& unitc, Treelog& msg) const 
 { 
   bool ok = true;
-  if (!root_system->check (msg))
+  if (!root_system->check (unitc, msg))
     ok = false;
   return ok;
 }

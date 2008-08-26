@@ -80,7 +80,7 @@ public:
 
   // Simulation.
 public:
-  void tick (const Geometry& geo,
+  void tick (const Unitc&, const Geometry& geo,
              const Soil&, SoilWater&, double,
 	     const SoilHeat&, const Time&, const Scope&, Treelog&);
   void output (Log& log) const;
@@ -104,15 +104,16 @@ private:
 
   // Create and Destroy.
 public:
-  void initialize (const Geometry&, const Time&, const Scope&, Treelog&);
-  bool check (const Geometry&, const Scope&, Treelog&) const;
+  void initialize (const Unitc&,
+                   const Geometry&, const Time&, const Scope&, Treelog&);
+  bool check (const Unitc&, const Geometry&, const Scope&, Treelog&) const;
   GroundwaterPipe (Block&);
   ~GroundwaterPipe ()
   { }
 };
 
 void 
-GroundwaterPipe::tick (const Geometry& geo,
+GroundwaterPipe::tick (const Unitc& unitc, const Geometry& geo,
                        const Soil& soil, SoilWater& soil_water, 
 		       const double h_surface,
 		       const SoilHeat& soil_heat, const Time& time,
@@ -124,7 +125,7 @@ GroundwaterPipe::tick (const Geometry& geo,
   fill (S.begin (), S.end (), 0.0);
   
   // Virtual pressure table.
-  pressure_table->tick (time, scope, msg);
+  pressure_table->tick (unitc, time, scope, msg);
   set_h_aquifer (geo);
 
   // Find groundwater height.
@@ -291,7 +292,8 @@ GroundwaterPipe::output (Log& log) const
 }
 
 void
-GroundwaterPipe::initialize (const Geometry& geo, const Time& time,
+GroundwaterPipe::initialize (const Unitc& unitc,
+                             const Geometry& geo, const Time& time,
 			     const Scope& scope, Treelog& msg)
 {
   const int size = geo.cell_size ();
@@ -319,14 +321,15 @@ GroundwaterPipe::initialize (const Geometry& geo, const Time& time,
     }
   pressure_table->initialize (msg);
   // Pressure below aquitard.
-  if (pressure_table->check (scope, msg))
+  if (pressure_table->check (unitc, scope, msg))
     set_h_aquifer (geo);
   else
     pressure_table.reset (NULL);
 }
 
 bool 
-GroundwaterPipe::check (const Geometry& geo, const Scope& scope,
+GroundwaterPipe::check (const Unitc& unitc,
+                        const Geometry& geo, const Scope& scope,
 			Treelog& msg) const
 {
   bool ok = true;
@@ -335,7 +338,7 @@ GroundwaterPipe::check (const Geometry& geo, const Scope& scope,
       ok = false;
       msg.error ("No pressure table");
     }
-  else if (!pressure_table->check (scope, msg))
+  else if (!pressure_table->check (unitc, scope, msg))
     ok = false;
   
   // Check that we have a volume below the pipes.

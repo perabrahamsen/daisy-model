@@ -29,6 +29,7 @@
 class Log;
 class Treelog;
 class Block;
+class Unitc;
 
 class RubiscoNdist : public ModelLogable
 {
@@ -39,11 +40,9 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (std::vector <double>& cropNdist, 
-		     std::vector <double>& cropVmax, 
-		     const double CropN, Treelog&) = 0;
   virtual void output (Log&) const = 0;
-  virtual void rubiscoN_distribution (const std::vector <double>& PAR_height, 
+  virtual void rubiscoN_distribution (const Unitc& unitc,
+                                      const std::vector <double>& PAR_height, 
 				      const double LAI, const double DS,
 				      std::vector <double>& rubiscoNdist, 
 				      const double cropN, Treelog& msg)=0;

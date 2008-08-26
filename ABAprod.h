@@ -30,6 +30,7 @@ class Log;
 class AttributeList;
 class Geometry;
 class SoilWater;
+class Unitc;
 
 class ABAProd : public ModelLogable
 {
@@ -40,7 +41,7 @@ public:
 
   // Simulation.
 public:
-  virtual void production (const Geometry&, const SoilWater&,
+  virtual void production (const Unitc&, const Geometry&, const SoilWater&,
 			   const std::vector<double>& S /* [cm^3/cm^3/h] */,
 			   const std::vector<double>& l /* [cm/cm^3] */,
 			   std::vector<double>& ABA /* [g/cm^3/h] */,
@@ -50,7 +51,7 @@ public:
   // Create and Destroy.
 public:
   virtual void initialize (Treelog&) = 0;
-  virtual bool check (Treelog&) const = 0;
+  virtual bool check (const Unitc&, Treelog&) const = 0;
 protected:
   ABAProd (Block&);
 

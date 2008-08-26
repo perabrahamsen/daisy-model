@@ -501,6 +501,9 @@ Factor to multiply with to get base unit.");
     add ("kg/ha/mm", p_k * u_g / u_ha / p_m, name, syntax, alist,
          -3, 1, 0, 0, 0, 0, 0,
          "Irrigation and percolation concentration.");
+    add ("kg N/ha/mm", p_k * u_g / u_ha / p_m, name, syntax, alist,
+         -3, 1, 0, 0, 0, 0, 0,
+         "Irrigation and percolation concentration.");
     
     // Volume per mass.
     add ("m^3/kg", 1e0, name, syntax, alist, 3, -1, 0, 0, 0, 0, 0,

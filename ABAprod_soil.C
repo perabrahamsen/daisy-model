@@ -43,7 +43,7 @@ struct ABAProdSoil : public ABAProd
   const std::auto_ptr<Number> expr;
   
   // Solve.
-  void production (const Geometry&, const SoilWater&,
+  void production (const Unitc&, const Geometry&, const SoilWater&,
 		   const std::vector<double>& S /* [cm^3/cm^3/h] */,
 		   const std::vector<double>& L /* [cm/cm^3] */,
 		   std::vector<double>& ABA /* [g/cm^3/h] */,
@@ -53,7 +53,7 @@ struct ABAProdSoil : public ABAProd
 
   // Create and Destroy.
   void initialize (Treelog&);
-  bool check (Treelog&) const;
+  bool check (const Unitc&, Treelog&) const;
   ABAProdSoil (Block& al);
   ~ABAProdSoil ();
 };
@@ -71,7 +71,8 @@ const symbol
 ABAProdSoil::ABA_unit ("g/cm^3/h");
 
 void
-ABAProdSoil::production (const Geometry& geo, const SoilWater& soil_water,
+ABAProdSoil::production (const Unitc& unitc, 
+                         const Geometry& geo, const SoilWater& soil_water,
 			 const std::vector<double>& S /* [cm^3/cm^3/h] */,
 			 const std::vector<double>& L /* [cm/cm^3] */,
 			 std::vector<double>& ABA    /* [g/cm^3/h] */,
@@ -93,7 +94,7 @@ ABAProdSoil::production (const Geometry& geo, const SoilWater& soil_water,
 
       // Find expr value.
       double value = 0.0;
-      if (!expr->tick_value (value, ABA_unit, scope, msg))
+      if (!expr->tick_value (unitc, value, ABA_unit, scope, msg))
 	msg.error ("No ABA production value found");
 
       // Find ABA uptake.
@@ -106,11 +107,11 @@ ABAProdSoil::initialize (Treelog& msg)
 { expr->initialize (msg); }
 
 bool 
-ABAProdSoil::check (Treelog& msg) const
+ABAProdSoil::check (const Unitc& unitc, Treelog& msg) const
 {
   bool ok = true;
   
-  if (!expr->check_dim (scope, ABA_unit, msg))
+  if (!expr->check_dim (unitc, scope, ABA_unit, msg))
     ok = false;
 
   return ok;

@@ -127,7 +127,7 @@ struct BioclimateStandard : public Bioclimate
   double wind_speed_field;      // wind speed at screen height above the canopy [m/s]
   double wind_speed_weather;    // measured wind speed [m/s]
 
-  void WaterDistribution (const Time&,
+  void WaterDistribution (const Unitc&, const Time&,
                           Surface& surface, const Weather& weather, 
 			  Vegetation& vegetation, const Movement&,
                           const Geometry&, const Soil& soil,
@@ -607,7 +607,8 @@ BioclimateStandard::RadiationDistribution (const Vegetation& vegetation,
 }
 
 void
-BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
+BioclimateStandard::WaterDistribution (const Unitc& unitc,
+                                       const Time& time, Surface& surface,
 				       const Weather& weather, 
 				       Vegetation& vegetation,
                                        const Movement& movement,
@@ -861,7 +862,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
     ? (weather.hourly_global_radiation () * dt 
        / (24.0 * daily_global_radiation_))
     : 0.0;
-  crop_ea = vegetation.transpiration (crop_ep, canopy_ea, geo, soil,
+  crop_ea = vegetation.transpiration (unitc, crop_ep, canopy_ea, geo, soil,
                                       soil_water, day_fraction, dt, msg);
   daisy_assert (crop_ea >= 0.0);
   total_ea += crop_ea;
@@ -926,7 +927,7 @@ BioclimateStandard::tick (const Unitc& unitc, const Time& time,
   RadiationDistribution (vegetation, sin_beta, msg);
 
   // Distribute water among canopy, snow, and soil.
-  WaterDistribution (time, surface, weather, vegetation, 
+  WaterDistribution (unitc, time, surface, weather, vegetation, 
 		     movement, geo, soil, soil_water, soil_heat, dt, msg);
 
   // Calculate temperature of canopy

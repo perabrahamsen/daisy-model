@@ -49,7 +49,7 @@ private:
 
   // Simulation.
 public:
-  double assimilate (const double, const double, const double,
+  double assimilate (const Unitc&, const double, const double, const double,
 		     double Ta, double Tl, const double cropN,
                      const std::vector<double>& PAR,
                      const std::vector<double>& PAR_Height,
@@ -76,7 +76,7 @@ public:
 };
 
 double
-PhotoGL::assimilate (const double,  const double, const double,
+PhotoGL::assimilate (const Unitc&, const double,  const double, const double,
 		     const double Ta, const double, const double,
                      const std::vector<double>& PAR,
                      const std::vector<double>& PAR_height,

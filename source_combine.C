@@ -31,6 +31,8 @@
 
 struct SourceCombine : public Source
 {
+  const Unitc& unitc;
+
   // Content.
   ScopeSources scope;
   const std::auto_ptr<Number> expr;
@@ -76,9 +78,9 @@ SourceCombine::load (Treelog& msg)
   scope.load (msg);
 
   // Scope
-  if (!expr->initialize (msg) || !expr->check (scope, msg))
+  if (!expr->initialize (msg) || !expr->check (unitc, scope, msg))
     return false;
-  expr->tick (scope, msg);
+  expr->tick (unitc, scope, msg);
 
   // Extract.
   dimension_ = expr->dimension (scope);
@@ -108,6 +110,7 @@ SourceCombine::load (Treelog& msg)
 
 SourceCombine::SourceCombine (Block& al)
   : Source (al),
+    unitc (al.unitc ()),
     scope (Librarian::build_vector<Source> (al, "source")),
     expr (Librarian::build_item<Number> (al, "expr")),
     title_ (al.identifier ("title", expr->title ())),

@@ -150,17 +150,19 @@ struct ActionExternFertigation : public Action
 
   void tick (const Daisy& daisy, const Scope& parent_scope, Treelog& msg)
   {
-    daisy_assert (extern_scope);
+    daisy_assert (extern_scope)       ;
     ScopeMulti multi (*extern_scope, parent_scope);
-    if (!surface_expr->tick_value (surface_value, mm_per_h, multi, msg))
+    const Unitc& unitc = daisy.unitc ();
+    if (!surface_expr->tick_value (unitc, surface_value, mm_per_h, multi, msg))
       surface_value = 0.0;
-    if (!subsoil_expr->tick_value (subsoil_value, mm_per_h, multi, msg))
+    if (!subsoil_expr->tick_value (unitc, subsoil_value, mm_per_h, multi, msg))
       subsoil_value = 0.0;
-    if (!overhead_expr->tick_value (overhead_value, mm_per_h, multi, msg))
+    if (!overhead_expr->tick_value (unitc, overhead_value,
+                                    mm_per_h, multi, msg))
       overhead_value = 0.0;
-    if (!NO3_expr->tick_value (NO3_value, kg_N_per_ha_per_h, multi, msg))
+    if (!NO3_expr->tick_value (unitc, NO3_value, kg_N_per_ha_per_h, multi, msg))
       NO3_value = 0.0;
-    if (!NH4_expr->tick_value (NH4_value, kg_N_per_ha_per_h, multi, msg))
+    if (!NH4_expr->tick_value (unitc, NH4_value, kg_N_per_ha_per_h, multi, msg))
       NH4_value = 0.0;
   }
 
@@ -236,15 +238,16 @@ struct ActionExternFertigation : public Action
     else
       {
         ScopeMulti multi (*extern_scope, parent_scope);
-	if (!surface_expr->check_dim (multi, mm_per_h, msg))
+        const Unitc& unitc = daisy.unitc ();
+	if (!surface_expr->check_dim (unitc, multi, mm_per_h, msg))
 	  ok = false;
-	if (!subsoil_expr->check_dim (multi, mm_per_h, msg))
+	if (!subsoil_expr->check_dim (unitc, multi, mm_per_h, msg))
 	  ok = false;
-	if (!overhead_expr->check_dim (multi, mm_per_h, msg))
+	if (!overhead_expr->check_dim (unitc, multi, mm_per_h, msg))
 	  ok = false;
-	if (!NH4_expr->check_dim (multi, kg_N_per_ha_per_h, msg))
+	if (!NH4_expr->check_dim (unitc, multi, kg_N_per_ha_per_h, msg))
 	  ok = false;
-	if (!NO3_expr->check_dim (multi, kg_N_per_ha_per_h, msg))
+	if (!NO3_expr->check_dim (unitc, multi, kg_N_per_ha_per_h, msg))
 	  ok = false;
       }
     return ok;

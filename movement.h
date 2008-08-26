@@ -44,6 +44,7 @@ class AttributeList;
 class Log;
 class Scope;
 class Tertiary;
+class Unitc;
 
 class Movement : public ModelLogable
 {
@@ -58,7 +59,8 @@ public:
 protected:
   std::auto_ptr<Tertiary> tertiary;
 public:
-  void tick_tertiary (const Geometry&, const Soil&, const SoilHeat&,
+  void tick_tertiary (const Unitc&,
+                      const Geometry&, const Soil&, const SoilHeat&,
                       const double dt, SoilWater&, Surface&, Treelog&);
 
   // Simulation.
@@ -101,7 +103,8 @@ private:
                                    bool has_macropores, Treelog& msg) = 0;
 public:
   bool check (Treelog& err) const;
-  bool initialize (const Soil&, const Groundwater&, const Scope& scope,
+  bool initialize (const Unitc&,
+                   const Soil&, const Groundwater&, const Scope& scope,
                    Treelog& msg);
   static const AttributeList& default_model ();
   static void load_base (Syntax& syntax, AttributeList&);

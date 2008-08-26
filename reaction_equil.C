@@ -52,7 +52,7 @@ struct ReactionEquilibrium : public Reaction
   { output_variable (S_AB, log); }
 
   // Simulation.
-  void tick (const Geometry& geo, 
+  void tick (const Unitc& unitc, const Geometry& geo, 
 	     const Soil& soil, const SoilWater& soil_water, 
 	     const SoilHeat& soil_heat, const OrganicMatter&,
              Chemistry& chemistry, const double dt, Treelog& msg)
@@ -69,7 +69,7 @@ struct ReactionEquilibrium : public Reaction
 	const double has_B = B.M_primary (c);
 	double want_A;
 	double want_B;
-	equilibrium->find (scope, has_A, has_B, want_A, want_B,
+	equilibrium->find (unitc, scope, has_A, has_B, want_A, want_B,
 			   msg);
 	daisy_assert (approximate (has_A + has_B, want_A + want_B));
 	
@@ -77,14 +77,14 @@ struct ReactionEquilibrium : public Reaction
 
 	if (has_A > want_A)
 	  {
-	    if (!k_AB->tick_value (convert, k_unit, scope, msg))
+	    if (!k_AB->tick_value (unitc, convert, k_unit, scope, msg))
 	      msg.error ("Could not evaluate k_AB");
 	    
 	    convert *= (has_A - want_A);
           }
 	else
 	  {
-	    if (!k_BA->tick_value (convert, k_unit, scope, msg))
+	    if (!k_BA->tick_value (unitc, convert, k_unit, scope, msg))
 	      msg.error ("Could not evaluate k_BA");
 	    
 	    convert *= (has_B - want_B);
@@ -99,7 +99,8 @@ struct ReactionEquilibrium : public Reaction
   }
 
   // Create.
-  bool check (const Soil& soil, const SoilWater& soil_water, 
+  bool check (const Unitc& unitc,
+              const Soil& soil, const SoilWater& soil_water, 
 	      const SoilHeat& soil_heat,
 	      const Chemistry& chemistry, Treelog& msg) const
   { 
@@ -115,11 +116,11 @@ struct ReactionEquilibrium : public Reaction
         ok = false;
       }
     ScopeSoil scope (soil, soil_water, soil_heat);
-    if (!equilibrium->check (scope, msg))
+    if (!equilibrium->check (unitc, scope, msg))
       ok = false;
-    if (!k_AB->check_dim (scope, k_unit, msg))
+    if (!k_AB->check_dim (unitc, scope, k_unit, msg))
       ok = false;
-    if (!k_BA->check_dim (scope, k_unit, msg))
+    if (!k_BA->check_dim (unitc, scope, k_unit, msg))
       ok = false;
 
     return ok;

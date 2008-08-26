@@ -29,6 +29,7 @@ class Time;
 class Treelog;
 class Block;
 class Scope;
+class Unitc;
 
 class Depth : public Model
 {
@@ -40,13 +41,14 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Time&, const Scope& scope, Treelog&) = 0;
+  virtual void tick (const Unitc&, const Time&,
+                     const Scope& scope, Treelog&) = 0;
   virtual double operator()() const = 0;
 
   // Create and Destroy.
 public:
   virtual void initialize (Treelog&) = 0;
-  virtual bool check (const Scope&, Treelog&) const = 0;
+  virtual bool check (const Unitc&, const Scope&, Treelog&) const = 0;
   static Depth* create (double height);
 protected:
   Depth (symbol name);

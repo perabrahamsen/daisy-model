@@ -37,10 +37,11 @@ Movement::library_id () const
 }
 
 void 
-Movement::tick_tertiary (const Geometry& geo, const Soil& soil, 
+Movement::tick_tertiary (const Unitc& unitc,
+                         const Geometry& geo, const Soil& soil, 
                          const SoilHeat& soil_heat, const double dt, 
                          SoilWater& soil_water, Surface& surface, Treelog& msg)
-{  tertiary->tick (geo, soil, soil_heat, dt, soil_water, surface, msg); }
+{  tertiary->tick (unitc, geo, soil, soil_heat, dt, soil_water, surface, msg); }
 
 void 
 Movement::output (Log& log) const
@@ -66,7 +67,8 @@ Movement::check (Treelog& msg) const
 }
 
 bool
-Movement::initialize (const Soil& soil, const Groundwater& groundwater,
+Movement::initialize (const Unitc& unitc,
+                      const Soil& soil, const Groundwater& groundwater,
                       const Scope& scope, Treelog& msg)
 {
   bool ok = true;
@@ -75,7 +77,8 @@ Movement::initialize (const Soil& soil, const Groundwater& groundwater,
   const double pipe_position = groundwater.is_pipe ()
     ? groundwater.pipe_height ()
     : 42.42e42;
-  if (!tertiary->initialize (geometry (), soil, scope, pipe_position, msg))
+  if (!tertiary->initialize (unitc, geometry (),
+                             soil, scope, pipe_position, msg))
     ok = false;
   
   initialize_derived (soil, groundwater, tertiary->has_macropores (), msg);

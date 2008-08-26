@@ -41,6 +41,7 @@ class Time;
 class Volume;
 class Treelog;
 class Block;
+class Unitc;
 
 class OrganicMatter : public ModelLogable
 {
@@ -57,7 +58,8 @@ public:
   virtual void tick (const Geometry& geo,
 		     const SoilWater&, const SoilHeat&, 
 		     Chemistry&, double dt, Treelog& msg) = 0;
-  virtual void transport (const Soil&, const SoilWater&, const SoilHeat&,
+  virtual void transport (const Unitc&,
+                          const Soil&, const SoilWater&, const SoilHeat&,
 			  Treelog&) = 0;
   virtual const std::vector<DOM*>& fetch_dom () const = 0;
   virtual void output (Log&) const = 0;
@@ -75,7 +77,8 @@ public:
 
   // Create and Destroy.
   virtual int som_pools () const = 0;
-  virtual bool check (const Soil&, const SoilWater&, const SoilHeat&,
+  virtual bool check (const Unitc&,
+                      const Soil&, const SoilWater&, const SoilHeat&,
 		      const Chemistry&, Treelog&) const = 0;
   virtual bool check_am (const AttributeList& am, Treelog& err) const = 0;
   virtual void add (AM&) = 0;

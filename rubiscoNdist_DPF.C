@@ -40,7 +40,8 @@ private:
   void tick (std::vector <double>& , std::vector <double>& , 
 	     const double , Treelog&)
   { }
-  void rubiscoN_distribution (const std::vector <double>& PAR_height, 
+  void rubiscoN_distribution (const Unitc&, 
+                              const std::vector <double>& PAR_height, 
 			      const double LAI, const double DS,
 			      std::vector <double>& rubiscoNdist/*[mol/m²]*/,  
 			      const double cropN /*[g/m²area]*/, Treelog&);
@@ -58,7 +59,8 @@ private:
 };
 
 void
-rubiscoNdistDPF::rubiscoN_distribution (const std::vector <double>& PAR_height, 
+rubiscoNdistDPF::rubiscoN_distribution (const Unitc&,
+                                        const std::vector <double>& PAR_height, 
 					const double LAI, const double DS, 
 					std::vector <double>& rubiscoNdist, 
 					const double cropN/*[g]*/, Treelog& msg)

@@ -354,13 +354,13 @@ ParserFile::Implementation::get_number (const std::string& syntax_dim)
     (Librarian::build_alist<Number> (block, *al, "number"));
   if (!block.ok ()
       || !number->initialize (treelog)
-      || !number->check (Scope::null (), treelog))
+      || !number->check (metalib.unitc (), Scope::null (), treelog))
     {
       error ("Bad number '" + obj + "'\n--- details:\n"
              + treelog.str () + "---");
       return -42.42e42;
     }
-  number->tick (Scope::null (), treelog);
+  number->tick (metalib.unitc (), Scope::null (), treelog);
   if (treelog.str ().length () > 0)
     warning ("Warning for number '" + obj + "'\n--- details:\n"
              + treelog.str () + "---");

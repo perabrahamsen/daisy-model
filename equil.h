@@ -30,6 +30,7 @@ class Syntax;
 class AttributeList;
 class Treelog;
 class Scope;
+class Unitc;
 
 class Equilibrium : public Model
 {
@@ -40,14 +41,14 @@ public:
   
   // Simulation.
 public:
-  virtual void find (const Scope&,
+  virtual void find (const Unitc& unitc, const Scope&,
 		     double has_A, double has_B, 
 		     double& want_A, double& want_B, Treelog&) const = 0;
 
   // Create and Destroy.
 public:
   virtual void initialize (Treelog&) = 0;
-  virtual bool check (const Scope&, Treelog&) const = 0;
+  virtual bool check (const Unitc& unitc, const Scope&, Treelog&) const = 0;
   static void load_syntax (Syntax&, AttributeList&);
 private:
   Equilibrium ();

@@ -48,7 +48,7 @@ struct DomsorpStandard : public Domsorp
   }
 
   // Simulation.
-  void tick (const Soil& soil, 
+  void tick (const Unitc& unitc, const Soil& soil, 
 	     const SoilWater& soil_water, const SoilHeat& soil_heat,
              const std::vector<DOM*>& dom, const std::vector<SOM*>& som, 
 	     Treelog& msg)
@@ -61,7 +61,7 @@ struct DomsorpStandard : public Domsorp
     for (size_t i = 0; i < soil.size (); i++)
       dC.push_back (d.C_at (i));
     daisy_assert (s.C.size () == soil.size ());
-    transform->tick (soil, soil_water, soil_heat, dC, s.C, S_C, msg);
+    transform->tick (unitc, soil, soil_water, soil_heat, dC, s.C, S_C, msg);
 
     for (size_t i = 0; i < soil.size (); i++)
       {
@@ -85,7 +85,7 @@ struct DomsorpStandard : public Domsorp
   }
 
   // Create.
-  bool check (const Soil& soil, 
+  bool check (const Unitc& unitc, const Soil& soil, 
 	      const SoilWater& soil_water, const SoilHeat& soil_heat,
 	      const size_t dom_size, const size_t som_size,
               Treelog& msg) const
@@ -94,7 +94,7 @@ struct DomsorpStandard : public Domsorp
     bool ok = true;
     {
       Treelog::Open nest (msg, "transform");
-      if (!transform->check (soil, soil_water, soil_heat, msg))
+      if (!transform->check (unitc, soil, soil_water, soil_heat, msg))
         ok = false; 
     }
     if (dom_pool >= dom_size)

@@ -30,6 +30,7 @@
 #include "harvest.h"
 #include "log.h"
 #include "librarian.h"
+#include "metalib.h"
 #include <sstream>
 #include <deque>
 
@@ -123,7 +124,8 @@ struct VegetationCrops : public Vegetation
   const std::vector<double>& root_density (symbol crop) const;
 
   // Simulation.
-  void tick (const Time& time, double relative_humidity, const double CO2_atm,
+  void tick (const Unitc&,
+             const Time& time, double relative_humidity, const double CO2_atm,
 	     const Bioclimate& bioclimate, 
              const Geometry& geo,
 	     const Soil& soil,
@@ -137,7 +139,7 @@ struct VegetationCrops : public Vegetation
 	     std::vector<double>& residuals_C_soil,
 	     double dt, Treelog&);
   void reset_canopy_structure (Treelog&);
-  double transpiration (double potential_transpiration,
+  double transpiration (const Unitc& unitc, double potential_transpiration,
 			double canopy_evaporation,
                         const Geometry& geo,
 			const Soil& soil, SoilWater& soil_water, 
@@ -200,7 +202,7 @@ struct VegetationCrops : public Vegetation
   void initialize (const Time&, const Geometry& geo,
                    const Soil& soil, OrganicMatter&,
                    Treelog& msg);
-  bool check (Treelog& msg) const;
+  bool check (const Unitc& unitc, Treelog& msg) const;
   static CropList build_crops (Block& block, const std::string& key);
   VegetationCrops (Block&);
   ~VegetationCrops ();
@@ -359,7 +361,8 @@ VegetationCrops::root_density (symbol name) const
 }
 
 void 
-VegetationCrops::tick (const Time& time, const double relative_humidity, 
+VegetationCrops::tick (const Unitc& unitc,
+                       const Time& time, const double relative_humidity, 
 		       const double CO2_atm,
 		       const Bioclimate& bioclimate, 
                        const Geometry& geo,
@@ -403,7 +406,7 @@ VegetationCrops::tick (const Time& time, const double relative_humidity,
       const double my_force = use_force ? (MyLAI / SimLAI) * ForcedLAI : -1.0;
       
       // Tick.
-      (*crop)->tick (time, relative_humidity, CO2_atm, 
+      (*crop)->tick (unitc, time, relative_humidity, CO2_atm, 
                      bioclimate, geo, soil, organic_matter, 
 		     soil_heat, soil_water, chemistry, 
 		     residuals_DM, residuals_N_top, residuals_C_top,
@@ -522,7 +525,8 @@ VegetationCrops::reset_canopy_structure (Treelog& msg)
 }
 
 double
-VegetationCrops::transpiration (const double potential_transpiration,
+VegetationCrops::transpiration (const Unitc& unitc,
+                                const double potential_transpiration,
 				const double canopy_evaporation,
                                 const Geometry& geo,
 				const Soil& soil, 
@@ -545,7 +549,8 @@ VegetationCrops::transpiration (const double potential_transpiration,
 	   crop != crops.end();
 	   crop++)
 	{
-	  value += (*crop)->ActualWaterUptake (pt_per_LAI * (*crop)->LAI (), 
+	  value += (*crop)->ActualWaterUptake (unitc,
+                                               pt_per_LAI * (*crop)->LAI (), 
 					       geo, soil, soil_water, 
 					       canopy_evaporation, 
 					       day_fraction, dt, msg);
@@ -798,7 +803,7 @@ VegetationCrops::sow (Metalib& metalib, const AttributeList& al,
       msg.error ("There is already an " + name + " on the field.\n\
 If you want two " + name + " you should rename one of them");
   crop->initialize (geo, row_width, organic_matter, SoilLimit, time, msg);
-  if (!crop->check (msg))
+  if (!crop->check (metalib.unitc (), msg))
     {
       msg.error ("Sow failed");
       return;
@@ -830,13 +835,13 @@ VegetationCrops::initialize (const Time& time, const Geometry& geo,
 }
 
 bool 
-VegetationCrops::check (Treelog& msg) const
+VegetationCrops::check (const Unitc& unitc, Treelog& msg) const
 {
   bool ok = true;
   for (size_t i = 0; i < crops.size (); i++)
     {
       Treelog::Open nest (msg, "crop:' " + crops[i]->name + "'");
-      crops[i]->check (msg);
+      crops[i]->check (unitc, msg);
     }
   return ok;
 }

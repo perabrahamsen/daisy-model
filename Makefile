@@ -1062,7 +1062,7 @@ wse${OBJ}: wse.C wse.h model.h symbol.h alist.h block.h syntax.h treelog.h \
 program${OBJ}: program.C program.h model.h symbol.h alist.h run.h block.h \
   syntax.h treelog.h plf.h librarian.h
 number${OBJ}: number.C number.h symbol.h model.h alist.h block.h syntax.h \
-  treelog.h plf.h librarian.h units.h
+  treelog.h plf.h librarian.h unit.h
 domsorp${OBJ}: domsorp.C domsorp.h model.h symbol.h alist.h block.h syntax.h \
   treelog.h plf.h librarian.h
 chemistry${OBJ}: chemistry.C chemistry.h model.h symbol.h alist.h im.h \
@@ -1622,7 +1622,8 @@ condition_extern${OBJ}: condition_extern.C condition.h model.h symbol.h \
   block.h syntax.h treelog.h plf.h boolean.h output.h scope_multi.h \
   scope.h scopesel.h librarian.h assertion.h
 condition_boolean${OBJ}: condition_boolean.C condition.h model.h symbol.h \
-  alist.h syntax.h treelog.h boolean.h scope.h librarian.h assertion.h
+  alist.h syntax.h treelog.h boolean.h scope.h librarian.h assertion.h \
+  daisy.h program.h run.h time.h timestep.h vcheck.h memutils.h
 boolean_number${OBJ}: boolean_number.C boolean.h model.h symbol.h alist.h \
   syntax.h treelog.h number.h memutils.h librarian.h
 boolean_string${OBJ}: boolean_string.C boolean.h model.h symbol.h alist.h \
@@ -1630,7 +1631,7 @@ boolean_string${OBJ}: boolean_string.C boolean.h model.h symbol.h alist.h \
 number_soil${OBJ}: number_soil.C number.h symbol.h model.h alist.h metalib.h \
   library.h block.h syntax.h treelog.h plf.h column.h horizon.h \
   hydraulic.h weather.h im.h output.h condition.h memutils.h time.h \
-  units.h librarian.h scope.h
+  librarian.h scope.h unit.h
 organic_none${OBJ}: organic_none.C organic_matter.h model.h symbol.h alist.h \
   geometry.h syntax.h treelog.h mathlib.h assertion.h librarian.h
 organic_std${OBJ}: organic_std.C organic_matter.h model.h symbol.h alist.h \
@@ -1711,7 +1712,7 @@ rootdens_AP${OBJ}: rootdens_AP.C rootdens.h model.h symbol.h alist.h block.h \
   syntax.h treelog.h plf.h geometry.h mathlib.h assertion.h log.h time.h \
   border.h check.h librarian.h
 number_const${OBJ}: number_const.C number.h symbol.h model.h alist.h block.h \
-  syntax.h treelog.h plf.h scope.h units.h assertion.h librarian.h
+  syntax.h treelog.h plf.h scope.h unit.h assertion.h librarian.h
 domsorp_std${OBJ}: domsorp_std.C domsorp.h model.h symbol.h alist.h block.h \
   syntax.h treelog.h plf.h transform.h dom.h som.h om.h soil.h log.h \
   time.h border.h assertion.h librarian.h
@@ -1780,7 +1781,7 @@ vegetation_permanent${OBJ}: vegetation_permanent.C vegetation.h model.h \
 vegetation_crops${OBJ}: vegetation_crops.C vegetation.h model.h symbol.h \
   alist.h crop.h time.h organic_matter.h geometry.h syntax.h treelog.h \
   mathlib.h assertion.h soil.h plf.h harvest.h block.h log.h border.h \
-  librarian.h
+  librarian.h metalib.h
 crop_simple${OBJ}: crop_simple.C crop.h model.h symbol.h alist.h time.h \
   root_system.h rootdens.h ABAprod.h plf.h canopy_simple.h log.h border.h \
   bioclimate.h soil_water.h geometry.h syntax.h treelog.h mathlib.h \

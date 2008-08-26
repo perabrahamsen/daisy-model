@@ -390,7 +390,7 @@ Select::Implementation::get_expr (Block& al)
   struct NumberFactor : public Number
   {
     const double factor;
-    void tick (const Scope&, Treelog&)
+    void tick (const Unitc&, const Scope&, Treelog&)
     { }
     bool missing (const Scope&) const
     { return false; }
@@ -400,7 +400,7 @@ Select::Implementation::get_expr (Block& al)
     { return scope.dimension (x_symbol); }
     bool initialize (Treelog&)
     { return true; }
-    bool check (const Scope&, Treelog&) const
+    bool check (const Unitc&, const Scope&, Treelog&) const
     { return true; }
     explicit NumberFactor (Block& al, const double f)
       : Number (al),
@@ -412,7 +412,7 @@ Select::Implementation::get_expr (Block& al)
   {
     const double factor;
     const double offset;
-    void tick (const Scope&, Treelog&)
+    void tick (const Unitc&, const Scope&, Treelog&)
     { }
     bool missing (const Scope&) const
     { return false; }
@@ -422,7 +422,7 @@ Select::Implementation::get_expr (Block& al)
     { return scope.dimension (x_symbol); }
     bool initialize (Treelog&)
     { return true; }
-    bool check (const Scope&, Treelog&) const
+    bool check (const Unitc&, const Scope&, Treelog&) const
     { return true; }
     explicit NumberLinear (Block& al, const double f, const double o)
       : Number (al),
@@ -442,7 +442,7 @@ Select::Implementation::get_expr (Block& al)
   // No change.
   struct NumberX : public Number
   {
-    void tick (const Scope&, Treelog&)
+    void tick (const Unitc&, const Scope&, Treelog&)
     { }
     bool missing (const Scope&) const
     { return false; }
@@ -452,7 +452,7 @@ Select::Implementation::get_expr (Block& al)
     { return scope.dimension (x_symbol); }
     bool initialize (Treelog&)
     { return true; }
-    bool check (const Scope&, Treelog&) const
+    bool check (const Unitc&, const Scope&, Treelog&) const
     { return true; }
     explicit NumberX (Block& al)
       : Number (al)
@@ -761,12 +761,12 @@ Select::initialize (const Unitc& unitc, const Volume&,
   if (impl->expr.get ())
     { 
       if (!impl->expr->initialize (msg) 
-          || !impl->expr->check (impl->scope, msg))
+          || !impl->expr->check (unitc, impl->scope, msg))
         {
           msg.error ("Bad expression");
           return false;
         }
-      impl->expr->tick  (impl->scope, msg);
+      impl->expr->tick  (unitc, impl->scope, msg);
       spec_dim = impl->expr->dimension (impl->scope);
     }
 

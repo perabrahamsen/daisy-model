@@ -40,11 +40,11 @@ struct ConditionExtern : public Condition
   mutable const Scope* extern_scope;
   std::auto_ptr<Boolean> expr;
   
-  void tick (const Daisy&, const Scope& parent_scope, Treelog& msg)
+  void tick (const Daisy& daisy, const Scope& parent_scope, Treelog& msg)
   {
     daisy_assert (extern_scope);
     ScopeMulti multi (*extern_scope, parent_scope);
-    expr->tick (multi, msg);  
+    expr->tick (daisy.unitc (), multi, msg);  
   }
 
   bool match (const Daisy&, const Scope& parent_scope, Treelog& msg) const
@@ -81,7 +81,7 @@ struct ConditionExtern : public Condition
       }
 
     ScopeMulti multi (*extern_scope, parent_scope);
-    return expr->check (multi, msg);
+    return expr->check (daisy.unitc (), multi, msg);
   }
 
   ConditionExtern (Block& al)

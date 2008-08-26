@@ -34,7 +34,7 @@ Transform::library_id () const
 }
 
 bool
-Transform::check (const Soil&, const SoilWater&, const SoilHeat&, 
+Transform::check (const Unitc&, const Soil&, const SoilWater&, const SoilHeat&, 
 		  Treelog&) const
 { return true; }
 

@@ -52,7 +52,7 @@ struct ReactionAdsorption : public Reaction
   { output_variable (adsorption_source, log); }
 
   // Simulation.
-  void tick (const Geometry& geo, const Soil& soil,
+  void tick (const Unitc& unitc, const Geometry& geo, const Soil& soil,
 	     const SoilWater& soil_water, const SoilHeat& soil_heat, 
 	     const OrganicMatter&, Chemistry& chemistry,
 	     const double dt, Treelog& msg)
@@ -80,7 +80,7 @@ struct ReactionAdsorption : public Reaction
 
 	if (has_solute > want_solute)
 	  {
-	    if (!adsorption_rate->tick_value (convert,
+	    if (!adsorption_rate->tick_value (unitc, convert,
 					      Unitc::per_h (), scope, msg))
 	      msg.error ("Could not evaluate 'adsorption_rate'");
 	    
@@ -91,7 +91,7 @@ struct ReactionAdsorption : public Reaction
 	  }
 	else
 	  {
-	    if (!desorption_rate->tick_value (convert,
+	    if (!desorption_rate->tick_value (unitc, convert,
 					      Unitc::per_h (), scope, msg))
 	      msg.error ("Could not evaluate 'desorption_rate'");
 	    
@@ -111,7 +111,8 @@ struct ReactionAdsorption : public Reaction
   }
 
   // Create.
-  bool check (const Soil& soil, const SoilWater& soil_water, 
+  bool check (const Unitc& unitc, 
+              const Soil& soil, const SoilWater& soil_water, 
 	      const SoilHeat& soil_heat,
 	      const Chemistry& chemistry, Treelog& msg) const
   { 
@@ -127,9 +128,9 @@ struct ReactionAdsorption : public Reaction
         ok = false;
       }
     ScopeSoil scope (soil, soil_water, soil_heat);
-    if (!adsorption_rate->check_dim (scope, Unitc::per_h (), msg))
+    if (!adsorption_rate->check_dim (unitc, scope, Unitc::per_h (), msg))
       ok = false;
-    if (!desorption_rate->check_dim (scope, Unitc::per_h (), msg))
+    if (!desorption_rate->check_dim (unitc, scope, Unitc::per_h (), msg))
       ok = false;
 
     return ok;

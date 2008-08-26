@@ -44,12 +44,12 @@ struct EquilibriumGoal_A : public Equilibrium
   const int debug_cell;
 
   // Simulation.
-  void find (const Scope&, double has_A, double has_B, 
+  void find (const Unitc& unitc, const Scope&, double has_A, double has_B, 
 	     double& want_A, double& want_B, Treelog&) const;
 
   // Create and Destroy.
   void initialize (Treelog&);
-  bool check (const Scope&, Treelog&) const;
+  bool check (const Unitc& unitc, const Scope&, Treelog&) const;
   EquilibriumGoal_A (Block& al)
     : Equilibrium (al),
       goal_A_expr (Librarian::build_item<Number> (al, "goal_A")),
@@ -66,7 +66,7 @@ const symbol
 EquilibriumGoal_A::goal_unit ("g/cm^3");
 
 void
-EquilibriumGoal_A::find (const Scope& scope,
+EquilibriumGoal_A::find (const Unitc& unitc, const Scope& scope,
                          const double has_A, const double has_B, 
                          double& want_A, double& want_B, Treelog& msg) const
 {
@@ -75,11 +75,11 @@ EquilibriumGoal_A::find (const Scope& scope,
   const double M = has_A + has_B;
 
   double goal_A = 1.0;
-  if (!goal_A_expr->tick_value (goal_A, goal_unit, scope, msg))
+  if (!goal_A_expr->tick_value (unitc, goal_A, goal_unit, scope, msg))
     msg.error ("Could not evaluate 'goal_A'");
   daisy_assert (goal_A >= 0.0);
   double min_B = 1.0;
-  if (!min_B_expr->tick_value (min_B, goal_unit, scope, msg))
+  if (!min_B_expr->tick_value (unitc, min_B, goal_unit, scope, msg))
     msg.error ("Could not evaluate 'min_B'");
   daisy_assert (min_B >= 0.0);
 
@@ -135,13 +135,14 @@ EquilibriumGoal_A::initialize (Treelog& msg)
 }
 
 bool 
-EquilibriumGoal_A::check (const Scope& scope, Treelog& msg) const
+EquilibriumGoal_A::check (const Unitc& unitc, 
+                          const Scope& scope, Treelog& msg) const
 {
   Treelog::Open nest (msg, "Equilibrium: 'Goal_A'");
   bool ok = true;
-  if (!goal_A_expr->check_dim (scope, goal_unit, msg))
+  if (!goal_A_expr->check_dim (unitc, scope, goal_unit, msg))
     ok = false;
-  if (!min_B_expr->check_dim (scope, goal_unit, msg))
+  if (!min_B_expr->check_dim (unitc, scope, goal_unit, msg))
     ok = false;
   return ok;
 }

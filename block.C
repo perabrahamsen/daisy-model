@@ -171,7 +171,7 @@ Block::Implementation::expand_string (Block& block,
                                                                  obj, key));
                             if (!block.ok () 
                                 || !stringer->initialize (msg)
-                                || !stringer->check (scope, msg)
+                                || !stringer->check (block.unitc (), scope, msg)
                                 || stringer->missing (scope))
                               throw "Bad string: '" + type + "'";
                             result << stringer->value (scope);
@@ -183,9 +183,9 @@ Block::Implementation::expand_string (Block& block,
                                                                obj, key));
                             if (!block.ok () 
                                 || !number->initialize (msg)
-                                || !number->check (scope, msg))
+                                || !number->check (block.unitc (), scope, msg))
                               throw "Bad number: '"+ type + "'";
-                            number->tick (scope, msg);
+                            number->tick (block.unitc (), scope, msg);
                             if (number->missing (scope))
                               throw "Bad number: '"+ type + "'";
                             result << number->value (scope);

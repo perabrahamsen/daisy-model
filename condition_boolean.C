@@ -29,6 +29,7 @@
 #include "scope.h"
 #include "librarian.h"
 #include "assertion.h"
+#include "daisy.h"
 #include <memory>
 
 struct ConditionBoolean : public Condition
@@ -38,16 +39,16 @@ struct ConditionBoolean : public Condition
   // State.
   mutable enum { isfalse, istrue, missing, uninitialized, error } state;
 
-  void tick (const Daisy&, const Scope& scope, Treelog& msg)
-  { expr->tick (scope, msg); }
+  void tick (const Daisy& daisy, const Scope& scope, Treelog& msg)
+  { expr->tick (daisy.unitc (), scope, msg); }
 
-  bool match (const Daisy&, const Scope& scope, Treelog& msg) const
+  bool match (const Daisy& daisy, const Scope& scope, Treelog& msg) const
   { 
     Treelog::Open nest (msg, name);
 
     if (state != error)
       {
-        expr->tick (scope, msg);
+        expr->tick (daisy.unitc (), scope, msg);
         if (expr->missing (scope))
           state = missing;
         else
@@ -70,14 +71,14 @@ struct ConditionBoolean : public Condition
       state = missing;
   }
 
-  bool check (const Daisy&, const Scope& scope, Treelog& msg) const
+  bool check (const Daisy& daisy, const Scope& scope, Treelog& msg) const
   { 
     if (state == error)
       return false;
   
     daisy_assert (state == missing);
 
-    if (expr->check (scope, msg))
+    if (expr->check (daisy.unitc (), scope, msg))
       return true;
 
     state = error;

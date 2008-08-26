@@ -24,7 +24,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "plf.h"
-#include "units.h"
+#include "unit.h"
 #include "memutils.h"
 #include "block.h"
 #include "librarian.h"
@@ -68,8 +68,9 @@ struct NumberPLF : public Number
   bool operand_missing;
 
   // Simulation.
-  void tick (const Scope& scope, Treelog& msg)
-  { operand_missing = !operand->tick_value (operand_value, domain, scope, msg); }
+  void tick (const Unitc& unitc, const Scope& scope, Treelog& msg)
+  { operand_missing = !operand->tick_value (unitc, operand_value,
+                                            domain, scope, msg); }
   bool missing (const Scope& scope) const 
   { return operand_missing; }
   double value (const Scope& scope) const
@@ -83,10 +84,10 @@ struct NumberPLF : public Number
     Treelog::Open nest (err, name);
     return operand->initialize (err); 
   }
-  bool check (const Scope& scope, Treelog& err) const
+  bool check (const Unitc& unitc, const Scope& scope, Treelog& err) const
   { 
     Treelog::Open nest (err, name);
-    return operand->check_dim (scope, domain, err); 
+    return operand->check_dim (unitc, scope, domain, err); 
   }
   static bool check_alist (const AttributeList& al, Treelog& msg) 
   {
@@ -108,16 +109,18 @@ struct NumberPLF : public Number
 	const Point& point = *points[i];
 
 	double x = point.x_value;
+#ifdef HAS_METALIB
 	const symbol x_dim = point.x_dimension;
 
 	if (domain != Syntax::unknown () && x_dim != Syntax::unknown ())
 	  try
-	    { x = Units::convert (x_dim, domain, x); }
+	    { x = unitc.convert (x_dim, domain, x); }
 	  catch (const std::string& err)
 	    { 
 	      msg.error (err);
 	      ok = false;
 	    }
+#endif // HAS_METALIB
 	if (ok && i > 0 && x <= last_x)
 	  {
 	    std::ostringstream tmp;
@@ -127,21 +130,24 @@ struct NumberPLF : public Number
 	  }
 	last_x = x;
 
+#ifdef HAS_METALIB
 	const symbol y_dim = point.y_dimension;
 	if (domain != Syntax::unknown () && y_dim != Syntax::unknown ())
 	  try
-	    { (void) Units::convert (x_dim, domain, x); }
+	    { (void) unitc.convert (x_dim, domain, x); }
 	  catch (const std::string& err)
 	    { 
 	      msg.error (err);
 	      ok = false;
 	    }
+#endif // HAS_METALIB
       }
     return ok;
   }
 
   static const PLF build_plf (Block& al) 
   {
+    const Unitc& unitc = al.unitc ();
     const symbol domain (al.identifier ("domain"));
     const symbol range (al.identifier ("range"));
     const auto_vector<const Point*> points 
@@ -156,11 +162,11 @@ struct NumberPLF : public Number
 	double x = point.x_value;
 	const symbol x_dim = point.x_dimension;
 	if (domain != Syntax::unknown () && x_dim != Syntax::unknown ())
-	  x = Units::convert (x_dim, domain, x);
+	  x = unitc.convert (x_dim, domain, x);
 	double y = point.y_value;
 	const symbol y_dim = point.y_dimension;
 	if (range != Syntax::unknown () && y_dim != Syntax::unknown ())
-	  y = Units::convert (y_dim, range, y);
+	  y = unitc.convert (y_dim, range, y);
 	
 	plf.add (x, y);
       }

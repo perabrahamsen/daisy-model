@@ -110,7 +110,8 @@ struct BioporeMatrix : public Biopore
   void output (Log&) const;
 
   // Create and Destroy.
-  bool initialize (const Geometry& geo, const Scope& scope, double,
+  bool initialize (const Unitc&, 
+                   const Geometry& geo, const Scope& scope, double,
                    Treelog& msg);
   bool check (const Geometry& geo, Treelog& msg) const
   { return check_base (geo, msg); }
@@ -432,13 +433,14 @@ BioporeMatrix::output (Log& log) const
 }
 
 bool 
-BioporeMatrix::initialize (const Geometry& geo, const Scope& scope, double,
+BioporeMatrix::initialize (const Unitc& unitc,
+                           const Geometry& geo, const Scope& scope, double,
                            Treelog& msg)
 { 
   bool ok = true;
 
   // base.
-  if (!initialize_base (geo, scope, msg))
+  if (!initialize_base (unitc, geo, scope, msg))
     ok = false;
 
   // xplus.

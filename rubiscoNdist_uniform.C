@@ -35,10 +35,8 @@ private:
   const double f_photo; //Fraction of photosynthetically active N in canopy
   
   // Simulation.
-  void tick (std::vector <double>& , std::vector <double>& , 
-	     const double , Treelog&)
-  { }
-  void rubiscoN_distribution (const std::vector <double>& PAR_height,
+  void rubiscoN_distribution (const Unitc&,
+                              const std::vector <double>& PAR_height,
 			      const double LAI, const double DS,
 			      std::vector <double>& rubiscoNdist, 
 			      const double cropN/*[g]*/, Treelog& msg);
@@ -55,7 +53,8 @@ private:
 };
 
 void
-rubiscoNdistUniform::rubiscoN_distribution (const std::vector <double>& PAR_height,
+rubiscoNdistUniform::rubiscoN_distribution (const Unitc&,
+                                            const std::vector <double>& PAR_height,
 					    const double LAI, const double DS,
 					    std::vector <double>& rubiscoNdist, 
 					    const double cropN/*[g]*/, Treelog& msg)

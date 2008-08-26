@@ -33,6 +33,7 @@ class Treelog;
 class Syntax;
 class AttributeList;
 class Block;
+class Unitc;
 
 class Transform : public Model
 {
@@ -43,20 +44,19 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Soil&, const SoilWater&, const SoilHeat&,
+  virtual void tick (const Unitc&,
+                     const Soil&, const SoilWater&, const SoilHeat&,
                      const std::vector<double>& A,
                      const std::vector<double>& B, 
                      std::vector<double>& S_AB, Treelog&) const = 0;
-  virtual bool check (const Soil&, const SoilWater&, const SoilHeat&,
+  virtual bool check (const Unitc&,
+                      const Soil&, const SoilWater&, const SoilHeat&,
 		      Treelog&) const;
 
   // Create and Destroy.
 public:
   virtual void initialize (const Soil&, Treelog&);
   static void load_syntax (Syntax&, AttributeList&);
-private:
-  Transform ();
-  Transform (const Transform&);
 protected:
   explicit Transform (Block&);
 public:

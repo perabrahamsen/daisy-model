@@ -31,6 +31,8 @@
 
 class XYSourceExpr : public XYSource
 {
+  const Unitc& unitc;
+
   // Content.
   LexerTable lex;
   std::string with_;
@@ -110,19 +112,19 @@ XYSourceExpr::load (Treelog& msg)
   ScopeTable scope (lex);
   {
     bool ok = true;
-    if (!x_expr->initialize (msg) || !x_expr->check (scope, msg))
+    if (!x_expr->initialize (msg) || !x_expr->check (unitc, scope, msg))
       {
         lex.error ("Bad x expression");
         ok = false;
       }
-    x_expr->tick (scope, msg);
+    x_expr->tick (unitc, scope, msg);
     x_dimension_ = x_expr->dimension (scope);
-    if (!y_expr->initialize (msg) || !y_expr->check (scope, msg))
+    if (!y_expr->initialize (msg) || !y_expr->check (unitc, scope, msg))
       {
         lex.error ("Bad y expression");
         ok = false;
       }
-    y_expr->tick (scope, msg);
+    y_expr->tick (unitc, scope, msg);
     y_dimension_ = y_expr->dimension (scope);
     if (!ok)
       return false;
@@ -156,6 +158,7 @@ XYSourceExpr::load (Treelog& msg)
 
 XYSourceExpr::XYSourceExpr (Block& al)
   : XYSource (al),
+    unitc (al.unitc ()),
     lex (al),
     with_ (al.name ("with", "")),
     explicit_with (al.check ("with")),

@@ -30,11 +30,11 @@
 #include "scope_exchange.h"
 
 static const double Mw = 14.0; //The molecular weight for N [g mol¯1]
-static const symbol LAI_symbol = symbol("LAI");
-static const symbol distance_from_top_symbol = symbol("distance_from_top"); // [cm]
-static const symbol relative_LAI_symbol = symbol("relative_LAI");
-static const symbol relative_distance_from_top_symbol = symbol("relative_distance_from_top");
-static const symbol DS_symbol = symbol("DS");
+static const symbol LAI_symbol ("LAI");
+static const symbol distance_from_top_symbol ("distance_from_top"); // [cm]
+static const symbol relative_LAI_symbol ("relative_LAI");
+static const symbol relative_distance_from_top_symbol ("relative_distance_from_top");
+static const symbol DS_symbol ("DS");
 
 struct rubiscoNdist_expr : public RubiscoNdist
 {
@@ -45,18 +45,16 @@ private:
   ScopeExchange scope;
   
   // Simulation.
-  void tick (std::vector <double>& , std::vector <double>& , 
-	     const double , Treelog& msg)
-  { 
-    expr->tick (scope, msg);
-  }
-
-  double function (const double distance_from_top, const double LAI, 
-		       const double relative_LAI, const double relative_distance_from_top, 
-		       const double DS);
-  double integral (const double total_LAI, const std::vector <double>& PAR_height, 
+  double function (const Unitc&, 
+                   const double distance_from_top, const double LAI, 
+                   const double relative_LAI,
+                   const double relative_distance_from_top, 
+                   const double DS);
+  double integral (const Unitc&, const double total_LAI,
+                   const std::vector <double>& PAR_height, 
 		   const double DS, const int No);
-  void rubiscoN_distribution (const std::vector <double>& PAR_height,
+  void rubiscoN_distribution (const Unitc&,
+                              const std::vector <double>& PAR_height,
 			      const double LAI, const double DS, 
 			      std::vector <double>& rubiscoNdist, 
 			      const double cropN/*[g]*/, Treelog& msg);
@@ -83,29 +81,33 @@ private:
 					"Development stage"));
     scope.done ();
     expr->initialize (al.msg());
-    if (!expr->check_dim (scope, Syntax::fraction (), al.msg()))
+    if (!expr->check_dim (al.unitc (), scope, Syntax::fraction (), al.msg()))
       al.error("Invalid expression of rubisco expr");
   }
 };
 
 double
-rubiscoNdist_expr::function (const double distance_from_top, const double LAI, 
+rubiscoNdist_expr::function (const Unitc& unitc,
+                             const double distance_from_top, const double LAI, 
 			     const double relative_LAI, 
-			     const double relative_distance_from_top, const double DS)
+			     const double relative_distance_from_top,
+                             const double DS)
 {
   scope.set_number (distance_from_top_symbol, distance_from_top);
-  scope.set_number (relative_distance_from_top_symbol, relative_distance_from_top);
+  scope.set_number (relative_distance_from_top_symbol,
+                    relative_distance_from_top);
   scope.set_number (LAI_symbol, LAI);
   scope.set_number (relative_LAI_symbol, relative_LAI);
   scope.set_number (DS_symbol, DS);
   double value = -1.0;
-  if (!expr->tick_value (value, Syntax::fraction (), scope, Treelog::null ()))
+  if (!expr->tick_value (unitc, value, Syntax::fraction (), scope,
+                         Treelog::null ()))
     throw "Missing value in rubisco expr";
   return value; 
 }
 
 double
-rubiscoNdist_expr::integral (const double total_LAI, 
+rubiscoNdist_expr::integral (const Unitc& unitc, const double total_LAI, 
 			     const std::vector <double>& PAR_height, 
 			     const double DS, const int No)
 {
@@ -120,24 +122,26 @@ rubiscoNdist_expr::integral (const double total_LAI,
 	total_height-((PAR_height [i]+ PAR_height[i+1])/2.0);
       const double relative_distance_from_top = distance_from_top_i/total_height;
       const double LAI_i = total_LAI * (i + 0.5)/(No + 0.0);
-      sum+= function(distance_from_top_i, LAI_i, relative_LAI, 
-		     relative_distance_from_top, DS) * dLAI; //[Unitless]
+      sum+= function (unitc, distance_from_top_i, LAI_i, relative_LAI, 
+		      relative_distance_from_top, DS) * dLAI; //[Unitless]
     }
   return sum; 
 }
 
 void
-rubiscoNdist_expr::rubiscoN_distribution (const std::vector <double>& PAR_height, 
-					  const double LAI, const double DS,
-					  std::vector <double>& rubiscoNdist /*[mol/m²]*/,  
-					  const double cropN /*[g/m²area]*/, Treelog&)
+rubiscoNdist_expr
+/**/ ::rubiscoN_distribution (const Unitc& unitc,
+                              const std::vector <double>& PAR_height, 
+                              const double LAI, const double DS,
+                              std::vector <double>& rubiscoNdist /*[mol/m²]*/,  
+                              const double cropN /*[g/m²area]*/, Treelog&)
 {
   daisy_assert (std::isfinite (cropN));
   daisy_assert (cropN >= 0.0);
 
   // Rubisco N in top of the canopy:
   const int No = rubiscoNdist.size ();
-  const double divisor = integral(LAI, PAR_height, DS, No);
+  const double divisor = integral(unitc, LAI, PAR_height, DS, No);
 
   daisy_assert(divisor > 0.0);
   daisy_assert (std::isnormal(divisor));
@@ -147,17 +151,21 @@ rubiscoNdist_expr::rubiscoN_distribution (const std::vector <double>& PAR_height
   cropN0 = cropN0 / Mw;  // [mol/m² leaf]
   daisy_assert (cropN0 >= 0.0);
 
-  // Fill photosynthetically active rubisco N (cummulative) for each canopy layer in vector
+  // Fill photosynthetically active rubisco N (cummulative) for each
+  // canopy layer in vector
 
   for (int i = 0; i < No; i++)
     {
       const double relative_LAI = (i + 0.5)/(No + 0.0);  
       // height from top of canopy:
-      const double distance_from_top_i = total_height -((PAR_height [i]+ PAR_height[i+1])/2.0);
-      const double relative_distance_from_top = distance_from_top_i/total_height;
+      const double distance_from_top_i
+        = total_height -((PAR_height [i]+ PAR_height[i+1])/2.0);
+      const double relative_distance_from_top
+        = distance_from_top_i/total_height;
       const double LAI_i = LAI * (i + 0.5)/(No + 0.0);
       rubiscoNdist[i] = f_photo * cropN0 * 
-	function(distance_from_top_i, LAI_i, relative_LAI, relative_distance_from_top, DS); //[mol/m² leaf]
+	function (unitc, distance_from_top_i, LAI_i, relative_LAI,
+                  relative_distance_from_top, DS); //[mol/m² leaf]
     }
 }
 

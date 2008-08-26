@@ -63,7 +63,7 @@ struct NumberLet : public Number
     symbol_map dimensions;
 
     // Scope.
-    void tick (const Scope& scope, Treelog& msg)
+    void tick (const Unitc& unitc, const Scope& scope, Treelog& msg)
     {
       numbers.clear ();
       dimensions.clear ();
@@ -74,7 +74,7 @@ struct NumberLet : public Number
           tmp << "clause[" << i << "]: " << id;
           // Treelog::Open nest (msg, tmp.str ());
           Number& expr = *(clause[i]->expr);
-          expr.tick (scope, msg);
+          expr.tick (unitc, scope, msg);
           if (!expr.missing (scope))
             {
               numbers[id] = expr.value (scope);
@@ -120,7 +120,7 @@ struct NumberLet : public Number
         }
       return ok;
     }
-    bool check (const Scope& scope, Treelog& msg) const
+    bool check (const Unitc& unitc, const Scope& scope, Treelog& msg) const
     {
       bool ok = true;
       for (size_t i = 0; i < clause.size (); i++)
@@ -128,7 +128,7 @@ struct NumberLet : public Number
           std::ostringstream tmp;
           tmp << "clauses[" << i << "]";
           Treelog::Open nest (msg, tmp.str ());
-          if (!clause[i]->expr->check (scope, msg))
+          if (!clause[i]->expr->check (unitc, scope, msg))
             ok = false;
         }
       return ok;
@@ -164,10 +164,10 @@ List of identifiers and values to bind in this scope.", Clause::load_syntax);
   }
 
   // Create.
-  void tick (const Scope& inherit_scope, Treelog& msg)
+  void tick (const Unitc& unitc, const Scope& inherit_scope, Treelog& msg)
   { 
-    scope_clause.tick (inherit_scope, msg);
-    expr->tick (inherit_scope, msg);
+    scope_clause.tick (unitc, inherit_scope, msg);
+    expr->tick (unitc, inherit_scope, msg);
   }
   bool initialize (Treelog& msg)
   {
@@ -175,14 +175,15 @@ List of identifiers and values to bind in this scope.", Clause::load_syntax);
     scope_clause.initialize (msg);
     return expr->initialize (msg);
   }
-  bool check (const Scope& inherit_scope, Treelog& msg) const
+  bool check (const Unitc& unitc,
+              const Scope& inherit_scope, Treelog& msg) const
   { 
     Treelog::Open nest (msg, name);
-    if (!scope_clause.check (inherit_scope, msg))
+    if (!scope_clause.check (unitc, inherit_scope, msg))
       return false;
-    scope_clause.tick (inherit_scope, msg);
+    scope_clause.tick (unitc, inherit_scope, msg);
     ScopeMulti scope (scope_clause, inherit_scope);
-    return expr->check (scope, msg);
+    return expr->check (unitc, scope, msg);
   }
   NumberLet (Block& al)
     : Number (al),

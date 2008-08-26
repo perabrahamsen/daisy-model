@@ -43,7 +43,7 @@ struct ABAProdUptake : public ABAProd
   const std::auto_ptr<Number> expr;
   
   // Solve.
-  void production (const Geometry&, const SoilWater&,
+  void production (const Unitc&, const Geometry&, const SoilWater&,
 		   const std::vector<double>& S /* [cm^3/cm^3/h] */,
 		   const std::vector<double>& l /* [cm/cm^3] */,
 		   std::vector<double>& ABA /* [g/cm^3/h] */,
@@ -53,7 +53,7 @@ struct ABAProdUptake : public ABAProd
 
   // Create and Destroy.
   void initialize (Treelog&);
-  bool check (Treelog&) const;
+  bool check (const Unitc&, Treelog&) const;
   ABAProdUptake (Block& al);
   ~ABAProdUptake ();
 };
@@ -65,11 +65,12 @@ const symbol
 ABAProdUptake::ABA_unit ("g/cm^3");
 
 void
-ABAProdUptake::production (const Geometry& geo, const SoilWater& soil_water,
-			 const std::vector<double>& S /* [cm^3/cm^3/h] */,
-			 const std::vector<double>& /* l [cm/cm^3] */,
-			 std::vector<double>& ABA    /* [g/cm^3/h] */,
-			 Treelog& msg) const
+ABAProdUptake::production (const Unitc& unitc,
+                           const Geometry& geo, const SoilWater& soil_water,
+                           const std::vector<double>& S /* [cm^3/cm^3/h] */,
+                           const std::vector<double>& /* l [cm/cm^3] */,
+                           std::vector<double>& ABA    /* [g/cm^3/h] */,
+                           Treelog& msg) const
 {
   // Check input.
   const size_t cell_size = geo.cell_size ();
@@ -84,7 +85,7 @@ ABAProdUptake::production (const Geometry& geo, const SoilWater& soil_water,
 
       // Find soil value.
       double value = 0.0;
-      if (!expr->tick_value (value, ABA_unit, scope, msg))
+      if (!expr->tick_value (unitc, value, ABA_unit, scope, msg))
 	msg.error ("No ABA production value found");
       if (!std::isfinite (value) || value < 0.0)
         {
@@ -108,11 +109,11 @@ ABAProdUptake::initialize (Treelog& msg)
 { expr->initialize (msg); }
 
 bool 
-ABAProdUptake::check (Treelog& msg) const
+ABAProdUptake::check (const Unitc& unitc, Treelog& msg) const
 {
   bool ok = true;
 
-  if (!expr->check_dim (scope, ABA_unit, msg))
+  if (!expr->check_dim (unitc, scope, ABA_unit, msg))
     ok = false;
 
   return ok;

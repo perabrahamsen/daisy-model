@@ -37,12 +37,12 @@ struct EquilibriumLinear : public Equilibrium
   std::auto_ptr<Number> K_expr;
 
   // Simulation.
-  void find (const Scope&, double has_A, double has_B, 
+  void find (const Unitc& unitc, const Scope&, double has_A, double has_B, 
 	     double& want_A, double& want_B, Treelog&) const;
 
   // Create and Destroy.
   void initialize (Treelog&);
-  bool check (const Scope&, Treelog&) const;
+  bool check (const Unitc& unitc, const Scope&, Treelog&) const;
   EquilibriumLinear (Block& al)
     : Equilibrium (al),
       K_expr (Librarian::build_item<Number> (al, "K"))
@@ -52,7 +52,7 @@ struct EquilibriumLinear : public Equilibrium
 };
 
 void
-EquilibriumLinear::find (const Scope& scope,
+EquilibriumLinear::find (const Unitc& unitc, const Scope& scope,
                          const double has_A, const double has_B, 
                          double& want_A, double& want_B, Treelog& msg) const
 {
@@ -61,7 +61,7 @@ EquilibriumLinear::find (const Scope& scope,
   const double M = has_A + has_B;
 
   double K = 1.0;
-  if (!K_expr->tick_value (K, Syntax::none (), scope, msg))
+  if (!K_expr->tick_value (unitc, K, Syntax::none (), scope, msg))
     msg.error ("Could not evaluate 'K'");
 
   // We need to solve the following equation w.r.t. B
@@ -86,11 +86,11 @@ EquilibriumLinear::initialize (Treelog& msg)
 }
 
 bool 
-EquilibriumLinear::check (const Scope& scope, Treelog& msg) const
+EquilibriumLinear::check (const Unitc& unitc, const Scope& scope, Treelog& msg) const
 {
   Treelog::Open nest (msg, "linear");
   bool ok = true;
-  if (!K_expr->check_dim (scope, Syntax::none (), msg))
+  if (!K_expr->check_dim (unitc, scope, Syntax::none (), msg))
     ok = false;
   return ok;
 }

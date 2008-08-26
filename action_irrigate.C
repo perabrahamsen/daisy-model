@@ -60,17 +60,17 @@ struct ActionIrrigate : public Action
     expr_flux->initialize (msg);
   }
 
-  bool check (const Daisy&, const Scope& scope, Treelog& msg) const
+  bool check (const Daisy& daisy, const Scope& scope, Treelog& msg) const
   {
     bool ok = true;
-    if (!expr_flux->check_dim (scope, mm_per_h, msg))
+    if (!expr_flux->check_dim (daisy.unitc (), scope, mm_per_h, msg))
       ok = false;
     return ok;
   }
 
-  void tick (const Daisy&, const Scope& scope, Treelog& msg)
+  void tick (const Daisy& daisy, const Scope& scope, Treelog& msg)
   { 
-    if (!expr_flux->tick_value (flux, mm_per_h, scope, msg))
+    if (!expr_flux->tick_value (daisy.unitc (), flux, mm_per_h, scope, msg))
       flux = 0.0;
   }
   
@@ -118,7 +118,8 @@ struct ActionIrrigate : public Action
       }
     else 
       remaining_time -= dt;
-    daisy_assert (std::isnormal (this_flux));
+    daisy_assert (std::isfinite (this_flux));
+    daisy_assert (this_flux >= 0.0);
     irrigate (*daisy.field, this_flux, temp, sm, daisy.dt, msg);
   }
 

@@ -42,7 +42,8 @@ struct OrganicNone : public OrganicMatter
              const SoilWater&, const SoilHeat&, 
 	     Chemistry&, double, Treelog&)
   { }
-  void transport (const Soil&, const SoilWater&, const SoilHeat&, Treelog&)
+  void transport (const Unitc&,
+                  const Soil&, const SoilWater&, const SoilHeat&, Treelog&)
   { }
   const std::vector<DOM*>& fetch_dom () const
   { 
@@ -69,7 +70,7 @@ struct OrganicNone : public OrganicMatter
   // Create and Destroy.
   int som_pools () const
   { return 3; }
-  bool check (const Soil&, const SoilWater&, const SoilHeat&,
+  bool check (const Unitc&, const Soil&, const SoilWater&, const SoilHeat&,
 	      const Chemistry&, Treelog&) const
   { return true; }
   bool check_am (const AttributeList&, Treelog&) const

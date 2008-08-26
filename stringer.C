@@ -76,10 +76,10 @@ Value to return.");
   std::vector<const Clause*> clauses;
 
   // Simulation.
-  void tick (const Scope& scope, Treelog& msg)
+  void tick (const Unitc& unitc, const Scope& scope, Treelog& msg)
   { 
     for (size_t i = 0; i < clauses.size (); i++)
-      clauses[i]->condition->tick (scope, msg);
+      clauses[i]->condition->tick (unitc, scope, msg);
   }
   bool missing (const Scope&) const
   { return false; }
@@ -105,7 +105,7 @@ Value to return.");
       }
     return ok;
   }
-  bool check (const Scope& scope, Treelog& msg) const
+  bool check (const Unitc&, const Scope& scope, Treelog& msg) const
   { 
     for (size_t i = 0; i < clauses.size (); i++)
       if (clauses[i]->condition->value (scope))
@@ -146,8 +146,8 @@ struct StringerNumber : public Stringer
   std::auto_ptr<Number> number;
 
   // Simulation.
-  void tick (const Scope& scope, Treelog& msg)
-  { number->tick (scope, msg); }
+  void tick (const Unitc& unitc, const Scope& scope, Treelog& msg)
+  { number->tick (unitc, scope, msg); }
   bool missing (const Scope& scope) const
   { return number->missing (scope); }
 
@@ -162,10 +162,10 @@ Number to manipulate.");
     Treelog::Open nest (msg, name);
     return number->initialize (msg); 
   }
-  bool check (const Scope& scope, Treelog& msg) const
+  bool check (const Unitc& unitc, const Scope& scope, Treelog& msg) const
   { 
     Treelog::Open nest (msg, name);
-    return number->check (scope, msg); 
+    return number->check (unitc, scope, msg); 
   }
   StringerNumber (Block& al)
     : Stringer (al),
@@ -244,7 +244,7 @@ struct StringerIdentity : public Stringer
   const std::string val;
 
   // Simulation.
-  void tick (const Scope&, Treelog&)
+  void tick (const Unitc&, const Scope&, Treelog&)
   { }
   bool missing (const Scope&) const
   { return false; }
@@ -255,7 +255,7 @@ struct StringerIdentity : public Stringer
   bool initialize (Treelog&)
   { return true; }
 
-  bool check (const Scope&, Treelog&) const
+  bool check (const Unitc&, const Scope&, Treelog&) const
   { return true; }
   StringerIdentity (Block& al)
     : Stringer (al),

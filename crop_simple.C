@@ -111,7 +111,7 @@ public:
   { return canopy.EpFactor (DS ()); }
   void CanopyStructure ();
   void CropCAI ();
-  double ActualWaterUptake (double Ept, const Geometry& geo,
+  double ActualWaterUptake (const Unitc&, double Ept, const Geometry& geo,
                             const Soil&, SoilWater&,
 			    double EvapInterception, double day_fraction, 
                             double dt, Treelog&);
@@ -119,7 +119,8 @@ public:
 
   // Simulation.
 public:
-  void tick (const Time& time, const double relative_humidity, const double CO2_atm,
+  void tick (const Unitc&, const Time& time,
+             const double relative_humidity, const double CO2_atm,
 	     const Bioclimate&, const Geometry& geo,
              const Soil&, OrganicMatter&,
 	     const SoilHeat&, const SoilWater&, 
@@ -165,7 +166,7 @@ public:
   void initialize (const Geometry& geo, double row_width,
                    OrganicMatter&, double SoilLimit, const Time&, Treelog&);
   void initialize (const Geometry& geo, OrganicMatter&, double SoilLimit, const Time&, Treelog&);
-  bool check (Treelog&) const;
+  bool check (const Unitc& unitc, Treelog&) const;
   CropSimple (Block& vl);
   ~CropSimple ();
 };
@@ -197,14 +198,14 @@ CropSimple::CropCAI ()
 }
 
 double
-CropSimple::ActualWaterUptake (double Ept,
+CropSimple::ActualWaterUptake (const Unitc& unitc, double Ept,
                                const Geometry& geo,
 			       const Soil& soil, SoilWater& soil_water,
 			       const double EvapInterception, 
 			       const double day_fraction, 
                                const double dt, Treelog& msg)
 {
-  return root_system->water_uptake (Ept, geo, 
+  return root_system->water_uptake (unitc, Ept, geo, 
                                     soil, soil_water, EvapInterception,
                                     day_fraction, dt, msg);
 }
@@ -214,7 +215,7 @@ CropSimple::force_production_stress  (double pstress)
 { root_system->production_stress = pstress; }
 
 void
-CropSimple::tick (const Time& time, const double, const double,
+CropSimple::tick (const Unitc&, const Time& time, const double, const double,
 		  const Bioclimate& bioclimate,
                   const Geometry& geo,
 		  const Soil& soil,
@@ -420,10 +421,10 @@ CropSimple::initialize (const Geometry& geo,
 }
 
 bool
-CropSimple::check (Treelog& msg) const
+CropSimple::check (const Unitc& unitc, Treelog& msg) const
 {
   bool ok = true;
-  if (!root_system->check (msg))
+  if (!root_system->check (unitc, msg))
     ok = false;
   return ok;
 }

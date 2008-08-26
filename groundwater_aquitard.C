@@ -64,13 +64,13 @@ struct GroundwaterAquitard : public Groundwater
   }
     
   // Simulation.
-  void tick (const Geometry& geo,
+  void tick (const Unitc& unitc, const Geometry& geo,
              const Soil&, SoilWater& soil_water, double, 
 	     const SoilHeat&, const Time& time, 
              const Scope& scope, Treelog& msg)
   { 
     // Virtual pressure table.
-    pressure_table->tick (time, scope, msg);
+    pressure_table->tick (unitc, time, scope, msg);
     set_h_aquifer (geo);
 
     // Deep percolation.
@@ -129,7 +129,7 @@ struct GroundwaterAquitard : public Groundwater
   { return pressure_table->operator()(); }
 
   // Create and Destroy.
-  void initialize (const Geometry& geo, const Time&,
+  void initialize (const Unitc& unitc, const Geometry& geo, const Time&,
                    const Scope& scope, Treelog& msg)
   {
     if (!pressure_table.get ())
@@ -137,12 +137,12 @@ struct GroundwaterAquitard : public Groundwater
                                            + h_aquifer));
     pressure_table->initialize (msg);
     // Pressure below aquitard.
-    if (pressure_table->check (scope, msg))
+    if (pressure_table->check (unitc, scope, msg))
       set_h_aquifer (geo);
     else
       pressure_table.reset (NULL);
   }
-  bool check (const Geometry& geo, const Scope& scope,
+  bool check (const Unitc& unitc, const Geometry& geo, const Scope& scope,
               Treelog& msg) const
   {
     bool ok = true;
@@ -151,7 +151,7 @@ struct GroundwaterAquitard : public Groundwater
         ok = false;
         msg.error ("No pressure table");
       }
-    else if (!pressure_table->check (scope, msg))
+    else if (!pressure_table->check (unitc, scope, msg))
       ok = false;
     return ok;
   }

@@ -32,6 +32,8 @@
 
 class XYSourceLoop : public XYSource
 {
+  const Unitc& unitc;
+
   // Content.
   const std::string with_;
   const int style_;
@@ -84,19 +86,19 @@ bool
 XYSourceLoop::load (Treelog& msg)
 {
   bool ok = true;
-  if (!x_expr->initialize (msg) || !x_expr->check (scope, msg))
+  if (!x_expr->initialize (msg) || !x_expr->check (unitc, scope, msg))
     {
       msg.error ("Bad x expression");
       ok = false;
     }
-  x_expr->tick (scope, msg);
+  x_expr->tick (unitc, scope, msg);
   x_dimension_ = x_expr->dimension (scope);
-  if (!y_expr->initialize (msg) || !y_expr->check (scope, msg))
+  if (!y_expr->initialize (msg) || !y_expr->check (unitc, scope, msg))
     {
       msg.error ("Bad y expression");
       ok = false;
     }
-  y_expr->tick (scope, msg);
+  y_expr->tick (unitc, scope, msg);
   y_dimension_ = y_expr->dimension (scope);
   if (!ok)
     return false;
@@ -123,6 +125,7 @@ XYSourceLoop::load (Treelog& msg)
 
 XYSourceLoop::XYSourceLoop (Block& al)
   : XYSource (al),
+    unitc (al.unitc ()),
     with_ (al.name ("with")),
     style_ (al.integer ("style", -1)),
     x_expr (Librarian::build_item<Number> (al, "x")),

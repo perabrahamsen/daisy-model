@@ -612,7 +612,7 @@ ColumnStandard::tick (const Time& time, const double dt,
   const Weather& my_weather = weather.get () ? *weather : *global_weather;
 
   // Macropores before everything else.
-  movement->tick_tertiary (geometry, *soil, *soil_heat, dt,
+  movement->tick_tertiary (unitc, geometry, *soil, *soil_heat, dt,
                            *soil_water, surface, msg);
 
   // Early calculation.
@@ -620,7 +620,8 @@ ColumnStandard::tick (const Time& time, const double dt,
                     *vegetation, *movement,
                     geometry, *soil, *soil_water, *soil_heat, *chemistry,
                     dt, msg);
-  vegetation->tick (time, my_weather.relative_humidity (), my_weather.CO2 (),
+  vegetation->tick (unitc,
+                    time, my_weather.relative_humidity (), my_weather.CO2 (),
                     *bioclimate, geometry, *soil, 
 		    *organic_matter,
                     *soil_heat, *soil_water, *chemistry,
@@ -635,7 +636,7 @@ ColumnStandard::tick (const Time& time, const double dt,
                         *chemistry, dt, msg);
   
   // Transport.
-  groundwater->tick (geometry, *soil, *soil_water, 
+  groundwater->tick (unitc, geometry, *soil, *soil_water, 
                      surface.ponding () * 0.1, 
                      *soil_heat, time, scope, msg);
   movement->tick (*soil, *soil_water, *soil_heat,
@@ -649,7 +650,7 @@ ColumnStandard::tick (const Time& time, const double dt,
                         surface.ponding (), surface.mixing_resistance (),
                         *soil, *soil_water, *soil_heat, 
                         *movement, *organic_matter, *chemistry, dt, scope, msg);
-  organic_matter->transport (*soil, *soil_water, *soil_heat, msg);
+  organic_matter->transport (unitc, *soil, *soil_water, *soil_heat, msg);
   const std::vector<DOM*>& dom = organic_matter->fetch_dom ();
   for (size_t i = 0; i < dom.size (); i++)
     {
@@ -698,7 +699,7 @@ ColumnStandard::check (bool require_weather,
   }
   {
     Treelog::Open nest (msg, "Groundwater: " + groundwater->name);
-    if (!groundwater->check (geometry, scope, msg))
+    if (!groundwater->check (unitc, geometry, scope, msg))
       ok = false;
   }
   {
@@ -724,7 +725,7 @@ ColumnStandard::check (bool require_weather,
   }
   {
     Treelog::Open nest (msg, "Vegetation");
-    if (!vegetation->check (msg))
+    if (!vegetation->check (unitc, msg))
       ok = false;
   }
   {
@@ -732,7 +733,8 @@ ColumnStandard::check (bool require_weather,
     if (!soil->check (organic_matter->som_pools (), geometry, msg))
       ok = false;
   }
-  if (!organic_matter->check (*soil, *soil_water, *soil_heat, *chemistry, msg))
+  if (!organic_matter->check (unitc,
+                              *soil, *soil_water, *soil_heat, *chemistry, msg))
     ok = false;
   return ok;
 }
@@ -880,10 +882,10 @@ ColumnStandard::initialize (Block& block,
   residuals_C_soil.insert (residuals_C_soil.begin (), soil->size (), 0.0);
   daisy_assert (residuals_C_soil.size () == soil->size ());
 
-  groundwater->initialize (geometry, time, scope, msg);
+  groundwater->initialize (unitc, geometry, time, scope, msg);
 
   // Movement depends on soil and groundwater
-  movement->initialize (*soil, *groundwater,  scope, msg);
+  movement->initialize (unitc, *soil, *groundwater,  scope, msg);
 
   surface.initialize (geometry);
 

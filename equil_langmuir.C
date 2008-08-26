@@ -41,12 +41,12 @@ struct EquilibriumLangmuir : public Equilibrium
   std::auto_ptr<Number> my_max_expr;
 
   // Simulation.
-  void find (const Scope&, double has_A, double has_B, 
+  void find (const Unitc& unitc, const Scope&, double has_A, double has_B, 
 	     double& want_A, double& want_B, Treelog&) const;
 
   // Create and Destroy.
   void initialize (Treelog&);
-  bool check (const Scope&, Treelog&) const;
+  bool check (const Unitc& unitc, const Scope&, Treelog&) const;
   EquilibriumLangmuir (Block& al)
     : Equilibrium (al),
       K_expr (Librarian::build_item<Number> (al, "K")),
@@ -60,7 +60,7 @@ const symbol
 EquilibriumLangmuir::base_unit ("g/cm^3");
 
 void
-EquilibriumLangmuir::find (const Scope& scope,
+EquilibriumLangmuir::find (const Unitc& unitc, const Scope& scope,
 			   const double has_A, const double has_B, 
 			   double& want_A, double& want_B, Treelog& msg) const
 {
@@ -69,10 +69,10 @@ EquilibriumLangmuir::find (const Scope& scope,
   const double M = has_A + has_B;
 
   double K = 1.0;
-  if (!K_expr->tick_value (K, base_unit, scope, msg))
+  if (!K_expr->tick_value (unitc, K, base_unit, scope, msg))
     msg.error ("Could not evaluate 'K'");
   double my_max = 1.0;
-  if (!my_max_expr->tick_value (my_max, base_unit, scope, msg))
+  if (!my_max_expr->tick_value (unitc, my_max, base_unit, scope, msg))
     msg.error ("Could not evaluate 'my_max'");
 
   // We need to solve the following equation w.r.t. B
@@ -106,13 +106,14 @@ EquilibriumLangmuir::initialize (Treelog& msg)
 }
 
 bool 
-EquilibriumLangmuir::check (const Scope& scope, Treelog& msg) const
+EquilibriumLangmuir::check (const Unitc& unitc, 
+                            const Scope& scope, Treelog& msg) const
 {
   Treelog::Open nest (msg, "Langmuir");
   bool ok = true;
-  if (!K_expr->check_dim (scope, base_unit, msg))
+  if (!K_expr->check_dim (unitc, scope, base_unit, msg))
     ok = false;
-  if (!my_max_expr->check_dim (scope, base_unit, msg))
+  if (!my_max_expr->check_dim (unitc, scope, base_unit, msg))
     ok = false;
   return ok;
 }

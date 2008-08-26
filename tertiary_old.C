@@ -43,7 +43,7 @@ struct TertiaryOld : public Tertiary
   { return macro.get () && !macro->none (); }
 
   // Simulation.
-  void tick (const Geometry& geo, const Soil& soil, 
+  void tick (const Unitc&, const Geometry& geo, const Soil& soil, 
              const SoilHeat& soil_heat, const double dt, 
              SoilWater& soil_water, Surface& surface, Treelog& msg);
   Tertsmall& implicit ()
@@ -63,7 +63,8 @@ struct TertiaryOld : public Tertiary
   
   // Create and Destroy.
 public:
-  bool initialize (const Geometry&, const Soil&, const Scope& parent_scope, 
+  bool initialize (const Unitc&, 
+                   const Geometry&, const Soil&, const Scope& parent_scope, 
                    const double pipe_position, Treelog& msg);
   bool check (const Geometry&, Treelog& msg) const;
   TertiaryOld (Block& al);
@@ -71,7 +72,7 @@ public:
 };
 
 void
-TertiaryOld::tick (const Geometry& geo, const Soil& soil, 
+TertiaryOld::tick (const Unitc&, const Geometry& geo, const Soil& soil, 
                    const SoilHeat& soil_heat, const double dt, 
                    SoilWater& soil_water, Surface& surface, Treelog& msg)
 {
@@ -168,7 +169,8 @@ TertiaryOld::output (Log&) const
 { }
 
 bool 
-TertiaryOld::initialize (const Geometry& geometry, const Soil& soil,
+TertiaryOld::initialize (const Unitc&,
+                         const Geometry& geometry, const Soil& soil,
                          const Scope& scope, const double pipe_position, 
                          Treelog& msg)
 { 

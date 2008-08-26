@@ -23,7 +23,7 @@
 #include "number.h"
 #include "syntax.h"
 #include "alist.h"
-#include "units.h"
+#include "unit.h"
 #include "vcheck.h"
 #include "mathlib.h"
 #include "memutils.h"
@@ -39,8 +39,8 @@ struct NumberOperand : public Number
   const std::auto_ptr<Number> operand;
 
   // Simulation.
-  void tick (const Scope& scope, Treelog& msg)
-  { operand->tick (scope, msg); }
+  void tick (const Unitc& unitc, const Scope& scope, Treelog& msg)
+  { operand->tick (unitc, scope, msg); }
   bool missing (const Scope& scope) const 
   { return operand->missing (scope); }
   symbol dimension (const Scope& scope) const
@@ -57,10 +57,10 @@ struct NumberOperand : public Number
     Treelog::Open nest (err, name);
     return operand->initialize (err); 
   }
-  bool check (const Scope& scope, Treelog& err) const
+  bool check (const Unitc& unitc, const Scope& scope, Treelog& err) const
   { 
     Treelog::Open nest (err, name);
-    return operand->check (scope, err); 
+    return operand->check (unitc, scope, err); 
   }
   NumberOperand (Block& al)
     : Number (al),
@@ -214,7 +214,7 @@ struct NumberSqr : public NumberOperand
   symbol dimension (const Scope& scope) const
   { 
     const symbol opdim = operand->dimension (scope);
-    return Units::multiply (opdim, opdim);
+    return Unitc::multiply (opdim, opdim);
   }
 
   // Create.
@@ -248,10 +248,10 @@ struct NumberPow : public Number
   const std::auto_ptr<Number> exponent;
 
   // Simulation.
-  void tick (const Scope& scope, Treelog& msg)
+  void tick (const Unitc& unitc, const Scope& scope, Treelog& msg)
   { 
-    base->tick (scope, msg);
-    exponent->tick (scope, msg);
+    base->tick (unitc, scope, msg);
+    exponent->tick (unitc, scope, msg);
   }
   bool missing (const Scope& scope) const 
   { return base->missing (scope) || exponent->missing (scope); }
@@ -276,13 +276,13 @@ struct NumberPow : public Number
       ok = false;
     return ok;
   }
-  bool check (const Scope& scope, Treelog& err) const
+  bool check (const Unitc& unitc, const Scope& scope, Treelog& err) const
   {
     Treelog::Open nest (err, name);
     bool ok = true;
-    if (!base->check (scope, err))
+    if (!base->check (unitc, scope, err))
       ok = false;
-    if (!exponent->check (scope, err))
+    if (!exponent->check (unitc, scope, err))
       ok = false;
     return ok;
   }
@@ -337,10 +337,10 @@ struct NumberOperands : public Number
   }
 
   // Use.
-  void tick (const Scope& scope, Treelog& msg)
+  void tick (const Unitc& unitc, const Scope& scope, Treelog& msg)
   { 
     for (size_t i = 0; i < operands.size (); i++)
-      operands[i]->tick (scope, msg);
+      operands[i]->tick (unitc, scope, msg);
   }
   bool missing (const Scope& scope) const 
   { 
@@ -402,7 +402,7 @@ struct NumberOperands : public Number
   } unique;
 #endif // CHECK_OPERANDS_DIM
 
-  bool check (const Scope& scope, Treelog& err) const
+  bool check (const Unitc& unitc, const Scope& scope, Treelog& err) const
   { 
     bool ok = true;
     for (size_t i = 0; i < operands.size (); i++)
@@ -411,7 +411,7 @@ struct NumberOperands : public Number
         tmp << name << "[" << i << "]";
         Treelog::Open nest (err, tmp.str ());
         
-        if (!operands[i]->check (scope, err))
+        if (!operands[i]->check (unitc, scope, err))
           ok = false;
       }
     return ok;
@@ -540,7 +540,7 @@ struct NumberProduct : public NumberOperands
   { 
     symbol dim = Syntax::none ();
     for (size_t i = 0; i < operands.size (); i++)
-      dim = Units::multiply (dim, operands[i]->dimension (scope));
+      dim = Unitc::multiply (dim, operands[i]->dimension (scope));
     return dim;
   }
 

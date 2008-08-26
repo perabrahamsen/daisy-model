@@ -30,6 +30,7 @@
 class Scope;
 class Treelog;
 class Block;
+class Unitc;
 
 class Number : public Model
 {
@@ -44,8 +45,9 @@ public:
 protected:
   static bool known (const symbol);
 public:
-  bool tick_value (double& value, symbol dim, const Scope& , Treelog&);
-  virtual void tick (const Scope& scope, Treelog& msg) = 0;
+  bool tick_value (const Unitc&, 
+                   double& value, symbol dim, const Scope& , Treelog&);
+  virtual void tick (const Unitc&, const Scope& scope, Treelog& msg) = 0;
   virtual bool missing (const Scope& scope) const = 0;
   virtual double value (const Scope&) const = 0; 
   virtual symbol dimension (const Scope&) const = 0;
@@ -54,8 +56,8 @@ public:
   // Create and Destroy.
 public:
   virtual bool initialize (Treelog& msg) = 0;
-  virtual bool check (const Scope&, Treelog&) const = 0;
-  bool check_dim (const Scope&, symbol dim, Treelog&) const;
+  virtual bool check (const Unitc&, const Scope&, Treelog&) const = 0;
+  bool check_dim (const Unitc&, const Scope&, symbol dim, Treelog&) const;
 protected:
   explicit Number (Block&);
 public:

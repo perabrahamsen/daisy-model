@@ -99,8 +99,8 @@ ScopeBlock::number (const symbol tag_symbol) const
                                 (block, alist.alist (tag), tag));
   daisy_assert (number.get ());
   daisy_assert (number->initialize (block.msg ()));
-  daisy_assert (number->check (*this, block.msg ()));
-  number->tick (*this, block.msg ());
+  daisy_assert (number->check (block.unitc (), *this, block.msg ()));
+  number->tick (block.unitc (), *this, block.msg ());
   daisy_assert (!number->missing (*this));
   return number->value (*this);
 }
@@ -215,8 +215,8 @@ ScopeBlock::identifier (const symbol tag_symbol) const
                                 (block, alist.alist (tag), tag));
   daisy_assert (stringer.get ());
   daisy_assert (stringer->initialize (block.msg ()));
-  daisy_assert (stringer->check (*this, block.msg ()));
-  stringer->tick (*this, block.msg ());
+  daisy_assert (stringer->check (block.unitc (), *this, block.msg ()));
+  stringer->tick (block.unitc (), *this, block.msg ());
   daisy_assert (!stringer->missing (*this));
   return symbol (stringer->value (*this));
 }

@@ -23,7 +23,7 @@
 #include "number.h"
 #include "block.h"
 #include "librarian.h"
-#include "units.h"
+#include "unit.h"
 #include <sstream>
 
 const char *const Number::component = "number";
@@ -44,10 +44,11 @@ Number::known (symbol dim)
 { return dim != Syntax::unknown (); }
 
 bool 
-Number::tick_value (double& value, symbol want, const Scope& scope, 
+Number::tick_value (const Unitc& unitc,
+                    double& value, symbol want, const Scope& scope, 
 		    Treelog& msg)
 { 
-  this->tick (scope, msg);
+  this->tick (unitc, scope, msg);
   if (this->missing (scope))
     {
       // msg.warning ("Expression '" + name + "' is missing in scope");
@@ -57,7 +58,7 @@ Number::tick_value (double& value, symbol want, const Scope& scope,
   value = this->value (scope);
   const symbol has = this->dimension (scope);
       
-  if (!Units::can_convert (has, want, value))
+  if (!unitc.can_convert (has, want, value))
     {
       std::ostringstream tmp;
       tmp << "Cannot convert " << value << " [" << has
@@ -65,19 +66,20 @@ Number::tick_value (double& value, symbol want, const Scope& scope,
       msg.warning (tmp.str ());
     }
   else
-    value = Units::convert (has, want, value);
+    value = unitc.convert (has, want, value);
   
   return true;
 }
 
 bool 
-Number::check_dim (const Scope& scope, const symbol want, Treelog& msg) const
+Number::check_dim (const Unitc& unitc, 
+                   const Scope& scope, const symbol want, Treelog& msg) const
 {
-  if (!this->check (scope, msg))
+  if (!this->check (unitc, scope, msg))
     return false;
 
   const symbol has = this->dimension (scope);
-  if (Units::can_convert (has, want))
+  if (unitc.can_convert (has, want))
     return true;
 
   msg.error ("Cannot convert [" + has + "] to [" + want + "]");

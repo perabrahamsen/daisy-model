@@ -1,5 +1,11 @@
 2008-08-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 4.43 released.
+
+2008-08-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* all: Use 'unit.h' instead of 'units.h'.
+	
 	* OpenMI/Makefile, txt/Makefile (setup): Added source to setup.
 
 2008-08-25  Per Abrahamsen  <abraham@dina.kvl.dk>
