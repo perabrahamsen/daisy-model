@@ -1,13 +1,5 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Unit oprydnign
-
-Move units.[Ch] oldunit.[Ch]
-
-Copy unit -> convert
-
-Copy unit -> units
-
 * Unit
 
 ** Vi skal have en "rigtig" multiply.

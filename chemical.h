@@ -39,7 +39,7 @@ class Treelog;
 class Log;
 class Block;
 class Scope;
-class Unitc;
+class Units;
 
 class Chemical : public ModelAListed
 {
@@ -122,7 +122,7 @@ public:
                          double surface_runoff_rate /* [h^-1] */,
                          double dt /* [h] */,
 			 Treelog&) = 0;
-  virtual void tick_soil (const Unitc&,
+  virtual void tick_soil (const Units&,
                           const Geometry&, const Soil&, const SoilWater&,
                           double dt, const Scope&, Treelog&) = 0;
   virtual void mixture (const Geometry& geo,
@@ -143,10 +143,10 @@ public:
   static const AttributeList& NO3_model ();
   static const AttributeList& NH4_model ();
   static const VCheck& check_library ();
-  virtual bool check (const Unitc&,
+  virtual bool check (const Units&,
                       const Geometry&, const Soil&, const SoilWater&,
 		      const Chemistry&, const Scope&, Treelog&) const = 0;
-  virtual void initialize (const Unitc&, const AttributeList&,
+  virtual void initialize (const Units&, const AttributeList&,
 			   const Geometry& geo,
                            const Soil&, const SoilWater&, const SoilHeat&,
 			   Treelog&) = 0;

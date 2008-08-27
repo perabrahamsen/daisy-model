@@ -45,7 +45,7 @@ class Treelog;
 class Block;
 class AttributeList;
 class Syntax;
-class Unitc;
+class Units;
 
 class Vegetation : public ModelLogable
 { 
@@ -86,7 +86,7 @@ public:
 
   // Simulation
 public:
-  virtual void tick (const Unitc&,
+  virtual void tick (const Units&,
                      const Time&, double relative_humidity, double CO2_atm,
                      const Bioclimate&, const Geometry&, const Soil&,
 		     OrganicMatter&, const SoilHeat&, const SoilWater&,
@@ -98,7 +98,7 @@ public:
 		     std::vector<double>& residuals_C_soil,
                      double dt, Treelog&) = 0;
   virtual double transpiration (// Actual trans. [mm/h]
-				const Unitc&, double potential_transpiration,	
+				const Units&, double potential_transpiration,	
 				double canopy_evaporation,
                                 const Geometry& geo,
 				const Soil& soil, SoilWater& soil_water,
@@ -164,7 +164,7 @@ public:
   virtual void initialize (const Time&, const Geometry& geo,
                            const Soil& soil, OrganicMatter&,
                            Treelog&) = 0;
-  virtual bool check (const Unitc&, Treelog& msg) const = 0;
+  virtual bool check (const Units&, Treelog& msg) const = 0;
   static void load_syntax (Syntax&, AttributeList&);
   explicit Vegetation (Block&);
   ~Vegetation ();

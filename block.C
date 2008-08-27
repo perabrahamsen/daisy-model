@@ -171,7 +171,7 @@ Block::Implementation::expand_string (Block& block,
                                                                  obj, key));
                             if (!block.ok () 
                                 || !stringer->initialize (msg)
-                                || !stringer->check (block.unitc (), scope, msg)
+                                || !stringer->check (block.units (), scope, msg)
                                 || stringer->missing (scope))
                               throw "Bad string: '" + type + "'";
                             result << stringer->value (scope);
@@ -183,9 +183,9 @@ Block::Implementation::expand_string (Block& block,
                                                                obj, key));
                             if (!block.ok () 
                                 || !number->initialize (msg)
-                                || !number->check (block.unitc (), scope, msg))
+                                || !number->check (block.units (), scope, msg))
                               throw "Bad number: '"+ type + "'";
-                            number->tick (block.unitc (), scope, msg);
+                            number->tick (block.units (), scope, msg);
                             if (number->missing (scope))
                               throw "Bad number: '"+ type + "'";
                             result << number->value (scope);
@@ -264,9 +264,9 @@ Metalib&
 Block::metalib ()
 { return impl->metalib; }
 
-const Unitc& 
-Block::unitc ()
-{ return impl->metalib.unitc (); }
+const Units& 
+Block::units ()
+{ return impl->metalib.units (); }
 
 Path& 
 Block::path ()

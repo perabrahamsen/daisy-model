@@ -190,7 +190,7 @@ struct ChemicalStandard : public Chemical
                  const double surface_runoff_rate, // [h^-1]
                  const double dt, // [h]
 		 Treelog& msg);
-  void tick_soil (const Unitc&,
+  void tick_soil (const Units&,
                   const Geometry&, const Soil&, const SoilWater&, double dt,
 		  const Scope&, Treelog&);
   void mixture (const Geometry& geo,
@@ -206,10 +206,10 @@ struct ChemicalStandard : public Chemical
   void output (Log&) const;
 
   // Create.
-  bool check (const Unitc&, const Geometry&, const Soil&, const SoilWater&, 
+  bool check (const Units&, const Geometry&, const Soil&, const SoilWater&, 
 	      const Chemistry&, const Scope&, Treelog&) const;
   static void fillup(std::vector<double>& v, const size_t size);
-  void initialize (const Unitc&, const AttributeList&, const Geometry&,
+  void initialize (const Units&, const AttributeList&, const Geometry&,
                    const Soil&, const SoilWater&, const SoilHeat&, Treelog&);
   static double find_surface_decompose_rate (Block& al);
   ChemicalStandard (Block&);
@@ -650,7 +650,7 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
 }
 
 void                            // Called just before solute movement.
-ChemicalStandard::tick_soil (const Unitc& unitc, const Geometry& geo,
+ChemicalStandard::tick_soil (const Units& units, const Geometry& geo,
                              const Soil& soil,
 			     const SoilWater& soil_water,
 			     const double dt,
@@ -661,7 +661,7 @@ ChemicalStandard::tick_soil (const Unitc& unitc, const Geometry& geo,
   const size_t cell_size = geo.cell_size ();
 
   // Find C below.
-  if (!C_below_expr->tick_value (unitc, C_below_value, g_per_cm3, scope, msg))
+  if (!C_below_expr->tick_value (units, C_below_value, g_per_cm3, scope, msg))
     C_below_value = -1.0;
 
   // Initialize.
@@ -934,7 +934,7 @@ ChemicalStandard::output (Log& log) const
 }
 
 bool 
-ChemicalStandard::check (const Unitc& unitc, const Geometry& geo, 
+ChemicalStandard::check (const Units& units, const Geometry& geo, 
 			 const Soil& soil, const SoilWater& soil_water,
 			 const Chemistry& chemistry,
 			 const Scope& scope, Treelog& msg) const
@@ -955,7 +955,7 @@ ChemicalStandard::check (const Unitc& unitc, const Geometry& geo,
 
   bool ok = true;
 
-  if (!C_below_expr->check_dim (unitc, scope, g_per_cm3, msg))
+  if (!C_below_expr->check_dim (units, scope, g_per_cm3, msg))
     ok = false;
 
   const bool solid = adsorption_->full ();
@@ -1031,7 +1031,7 @@ ChemicalStandard::fillup (std::vector<double>& v, const size_t size)
 }
 
 void
-ChemicalStandard::initialize (const Unitc& unitc, const AttributeList& al,
+ChemicalStandard::initialize (const Units& units, const AttributeList& al,
                               const Geometry& geo,
                               const Soil& soil, const SoilWater& soil_water, 
 			      const SoilHeat& soil_heat,
@@ -1070,7 +1070,7 @@ ChemicalStandard::initialize (const Unitc& unitc, const AttributeList& al,
 	    { 
 	      scope.set_cell (c);
 	      double value = 0.0;
-	      if (!initial_expr->tick_value (unitc,
+	      if (!initial_expr->tick_value (units,
                                              value, g_per_cm3, scope, msg))
 		msg.error ("Could not evaluate 'inital_expr'");
 	      M_total_.push_back (value);

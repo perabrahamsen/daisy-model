@@ -582,7 +582,7 @@ WeatherStandard::read_line ()
 	  const symbol read = data_description[index].read
             ? this->*(data_description[index].read)
             : dim;
-	  const double value =  unitc.convert (read, dim, lex->get_number ());
+	  const double value =  units.convert (read, dim, lex->get_number ());
 	  this->*(data_description[index].value) = value;
 	  if (value < data_description[index].min)
 	    lex->error (std::string ("Column ") 
@@ -895,8 +895,8 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
     return false;
 
   // Units.
-  const Unit& u_ppm = unitc.get_unit (Unitc::ppm ());
-  const Unit& u_dpu = unitc.get_unit (Weather::dry_deposit_unit);
+  const Unit& u_ppm = units.get_unit (Units::ppm ());
+  const Unit& u_dpu = units.get_unit (Weather::dry_deposit_unit);
 
   // Read first line.
   const std::string type = lex->get_word ();
@@ -1005,8 +1005,8 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 	      
 	  if (key == "NH4WetDep")
 	    {
-	      if (unitc.can_convert (dim, Unitc::ppm (), msg))
-		val = unitc.convert (dim, Unitc::ppm (), val);
+	      if (units.can_convert (dim, Units::ppm (), msg))
+		val = units.convert (dim, Units::ppm (), val);
 	      else
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 100.0)
@@ -1016,8 +1016,8 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 	    }
 	  else if (key == "NH4DryDep")
 	    {
-	      if (unitc.can_convert (dim, N_deposit_unit (), msg))
-		val = unitc.convert (dim, N_deposit_unit (), val);
+	      if (units.can_convert (dim, N_deposit_unit (), msg))
+		val = units.convert (dim, N_deposit_unit (), val);
 	      else
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 100.0)
@@ -1026,8 +1026,8 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 	    }
 	  else if (key == "NO3WetDep")
 	    {
-	      if (unitc.can_convert (dim, Unitc::ppm (), msg))
-		val = unitc.convert (dim, Unitc::ppm (), val);
+	      if (units.can_convert (dim, Units::ppm (), msg))
+		val = units.convert (dim, Units::ppm (), val);
 	      else
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 100.0)
@@ -1036,8 +1036,8 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 	    }
 	  else if (key == "NO3DryDep")
 	    {
-	      if (unitc.can_convert (dim, N_deposit_unit (), msg))
-		val = unitc.convert (dim, N_deposit_unit (), val);
+	      if (units.can_convert (dim, N_deposit_unit (), msg))
+		val = units.convert (dim, N_deposit_unit (), val);
 	      else
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 100.0)
@@ -1047,8 +1047,8 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
           // Alternative way of specifying deposition.
 	  else if (key == "Deposition")
 	    {
-	      if (unitc.can_convert (dim, N_deposit_unit (), msg))
-		val = unitc.convert (dim, N_deposit_unit (), val);
+	      if (units.can_convert (dim, N_deposit_unit (), msg))
+		val = units.convert (dim, N_deposit_unit (), val);
 	      else
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 100.0)
@@ -1057,8 +1057,8 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 	    }
 	  else if (key == "DepDry")
 	    {
-	      if (unitc.can_convert (dim, fraction_unit (), msg))
-		val = unitc.convert (dim, fraction_unit (), val);
+	      if (units.can_convert (dim, fraction_unit (), msg))
+		val = units.convert (dim, fraction_unit (), val);
 	      else
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 1.0)
@@ -1067,8 +1067,8 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 	    }
 	  else if (key == "DepDryNH4")
 	    {
-	      if (unitc.can_convert (dim, fraction_unit (), msg))
-		val = unitc.convert (dim, fraction_unit (), val);
+	      if (units.can_convert (dim, fraction_unit (), msg))
+		val = units.convert (dim, fraction_unit (), val);
 	      else
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 1.0)
@@ -1077,8 +1077,8 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 	    }
 	  else if (key == "DepWetNH4")
 	    {
-	      if (unitc.can_convert (dim, fraction_unit (), msg))
-		val = unitc.convert (dim, fraction_unit (), val);
+	      if (units.can_convert (dim, fraction_unit (), msg))
+		val = units.convert (dim, fraction_unit (), val);
 	      else
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 1.0)
@@ -1087,8 +1087,8 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 	    }
 	  else if (key == "PAverage")
 	    {
-	      if (unitc.can_convert (dim, Unitc::mm (), msg))
-		val = unitc.convert (dim, Unitc::mm (), val);
+	      if (units.can_convert (dim, Units::mm (), msg))
+		val = units.convert (dim, Units::mm (), val);
 	      else
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 3000.0)
@@ -1097,8 +1097,8 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 	    }
 	  else if (key == "Timestep")
 	    {
-	      if (unitc.can_convert (dim, hours_unit (), msg))
-		val = unitc.convert (dim, hours_unit (), val);
+	      if (units.can_convert (dim, hours_unit (), msg))
+		val = units.convert (dim, hours_unit (), val);
 	      else
 		lex->error ("Unknown dimension");
 	      timestep = double2int (val);
@@ -1112,8 +1112,8 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 		{
 		  if (key == keyword_description[i].name)
 		    {
-		      if (unitc.can_convert (dim, symbol (keyword_description[i].dim), msg))
-			val = unitc.convert (dim, symbol (keyword_description[i].dim),
+		      if (units.can_convert (dim, symbol (keyword_description[i].dim), msg))
+			val = units.convert (dim, symbol (keyword_description[i].dim),
                                              val);
 		      else
 			lex->error ("Unknown dimension");
@@ -1265,7 +1265,7 @@ NO3DryDep: " << DryDeposit.get_value (Chemical::NO3 (), u_dpu)
     {
       const symbol dimension (lex->get_word ());
       const int index = data_index[i];
-      if (unitc.can_convert (dimension, symbol (data_description[index].dim)))
+      if (units.can_convert (dimension, symbol (data_description[index].dim)))
 	{
 	  if (data_description[index].read)
 	    this->*(data_description[index].read) = dimension;

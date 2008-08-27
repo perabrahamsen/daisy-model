@@ -46,13 +46,13 @@ struct TransformEquilibrium : public Transform
   std::auto_ptr<Number> k_BA_expr;
 
   // Simulation.
-  void tick (const Unitc&, const Soil&, const SoilWater&, const SoilHeat&,
+  void tick (const Units&, const Soil&, const SoilWater&, const SoilHeat&,
              const std::vector<double>& A, const std::vector<double>& B,
              std::vector<double>& S_AB, Treelog&) const;
 
   // Create.
   void initialize (const Soil&, Treelog&);
-  bool check (const Unitc&,
+  bool check (const Units&,
               const Soil&, const SoilWater&, const SoilHeat&, Treelog&) const;
   TransformEquilibrium (Block& al)
     : Transform (al),
@@ -65,7 +65,7 @@ struct TransformEquilibrium : public Transform
 };
 
 void 
-TransformEquilibrium::tick (const Unitc& unitc,
+TransformEquilibrium::tick (const Units& units,
                             const Soil& soil, const SoilWater& soil_water,
 			    const SoilHeat& soil_heat,
 			    const std::vector<double>& A, 
@@ -85,23 +85,23 @@ TransformEquilibrium::tick (const Unitc& unitc,
       const double has_B = B[c];
       double want_A;
       double want_B;
-      equilibrium->find (unitc, scope, has_A, has_B, want_A, want_B, msg);
+      equilibrium->find (units, scope, has_A, has_B, want_A, want_B, msg);
 
       daisy_assert (approximate (has_A + has_B, want_A + want_B));
 
       double convert = 0.0;
       if (has_A > want_A)
 	{
-	  if (!k_AB_expr->tick_value (unitc,
-                                      convert, Unitc::per_h (), scope, msg))
+	  if (!k_AB_expr->tick_value (units,
+                                      convert, Units::per_h (), scope, msg))
 	    msg.error ("Could not evaluate 'k_AB'");
 
 	  convert *= (has_A - want_A);
 	}
       else
 	{
-	  if (!k_BA_expr->tick_value (unitc, 
-                                      convert, Unitc::per_h (), scope, msg))
+	  if (!k_BA_expr->tick_value (units, 
+                                      convert, Units::per_h (), scope, msg))
 	    msg.error ("Could not evaluate 'k_BA'");
 
 	  convert *= -(has_B - want_B);
@@ -111,7 +111,7 @@ TransformEquilibrium::tick (const Unitc& unitc,
 }
 
 bool
-TransformEquilibrium::check (const Unitc& unitc,
+TransformEquilibrium::check (const Units& units,
                              const Soil& soil, const SoilWater& soil_water,
 			     const SoilHeat& soil_heat, Treelog& msg) const
 { 
@@ -125,11 +125,11 @@ TransformEquilibrium::check (const Unitc& unitc,
       tmp << "Transform 'equil' cell " << c;
       Treelog::Open nest (msg, tmp.str ());
       scope.set_cell (c);
-      if (!equilibrium->check (unitc, scope, msg))
+      if (!equilibrium->check (units, scope, msg))
 	ok = false;
-      if (!k_AB_expr->check_dim (unitc, scope, Unitc::per_h (), msg))
+      if (!k_AB_expr->check_dim (units, scope, Units::per_h (), msg))
 	ok = false;
-      if (!k_BA_expr->check_dim (unitc, scope, Unitc::per_h (), msg))
+      if (!k_BA_expr->check_dim (units, scope, Units::per_h (), msg))
 	ok = false;
     }
   return ok;

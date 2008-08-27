@@ -35,7 +35,7 @@ class AttributeList;
 class Block;
 class Treelog;
 class Syntax;
-class Unitc;
+class Units;
 
 class Domsorp : public ModelAListed
 {
@@ -46,7 +46,7 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Unitc&,
+  virtual void tick (const Units&,
                      const Soil&, const SoilWater&, const SoilHeat&,
                      const std::vector<DOM*>&, const std::vector<SOM*>&,
                      Treelog&) = 0;
@@ -55,7 +55,7 @@ public:
   // Create and Destroy.
 public:
   virtual void initialize (const Soil&, Treelog&);
-  virtual bool check (const Unitc& unitc,
+  virtual bool check (const Units& units,
                       const Soil&, const SoilWater&, const SoilHeat&,
 		      size_t dom_size, size_t som_size, 
                       Treelog&) const = 0;

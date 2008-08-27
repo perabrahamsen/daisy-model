@@ -55,7 +55,7 @@ public:
 
   // Simulation.
 public:
-  void tick (const Unitc&, const Geometry&,
+  void tick (const Units&, const Geometry&,
              const Soil&, SoilWater&, double, const SoilHeat&,
 	     const Time& time, const Scope&, Treelog& msg)
   { tick (time, msg); }
@@ -64,9 +64,9 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Unitc& unitc,
+  void initialize (const Units& units,
                    const Geometry&, const Time& time, const Scope&, Treelog&);
-  bool check (const Unitc&, const Geometry&, const Scope&, Treelog&) const
+  bool check (const Units&, const Geometry&, const Scope&, Treelog&) const
   { return true; }
   GroundwaterFile (Block&);
   ~GroundwaterFile ();
@@ -148,7 +148,7 @@ GroundwaterFile::table () const
 }
 
 void
-GroundwaterFile::initialize (const Unitc&,
+GroundwaterFile::initialize (const Units&,
                              const Geometry&, const Time& time, const Scope&, 
 			     Treelog& msg)
 {

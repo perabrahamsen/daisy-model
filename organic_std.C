@@ -226,7 +226,7 @@ struct OrganicStandard : public OrganicMatter
   void tick (const Geometry& geo,
              const SoilWater&, const SoilHeat&, 
 	     Chemistry&, double dt, Treelog& msg);
-  void transport (const Unitc&,
+  void transport (const Units&,
                   const Soil&, const SoilWater&, const SoilHeat&, Treelog&);
   const std::vector<DOM*>& fetch_dom () const;
   void output (Log&) const;
@@ -244,7 +244,7 @@ struct OrganicStandard : public OrganicMatter
 
   // Create and Destroy.
   int som_pools () const;
-  bool check (const Unitc&, const Soil&, const SoilWater&, const SoilHeat&,
+  bool check (const Units&, const Soil&, const SoilWater&, const SoilHeat&,
 	      const Chemistry&, Treelog& err) const;
   bool check_am (const AttributeList& am, Treelog& err) const;
   void add (AM&);
@@ -835,7 +835,7 @@ OrganicStandard::output (Log& log) const
 }
 
 bool
-OrganicStandard::check (const Unitc& unitc, const Soil& soil, 
+OrganicStandard::check (const Units& units, const Soil& soil, 
 			const SoilWater& soil_water, const SoilHeat& soil_heat, 
 			const Chemistry& chemistry, Treelog& msg) const
 {
@@ -851,7 +851,7 @@ OrganicStandard::check (const Unitc& unitc, const Soil& soil,
     if (!am[i]->check (msg))
       ok = false;
   for (size_t i = 0; i < domsorp.size (); i++)
-    if (!domsorp[i]->check (unitc, soil, soil_water, soil_heat, 
+    if (!domsorp[i]->check (units, soil, soil_water, soil_heat, 
 			    dom.size (), som.size (), msg))
       ok = false;
   if (!clayom->check (smb, msg))
@@ -1264,13 +1264,13 @@ OrganicStandard::tick (const Geometry& geo,
 }
       
 void 
-OrganicStandard::transport (const Unitc& unitc, const Soil& soil, 
+OrganicStandard::transport (const Units& units, const Soil& soil, 
                             const SoilWater& soil_water, 
 			    const SoilHeat& soil_heat,
                             Treelog& msg)
 {
   for (size_t j = 0; j < domsorp.size (); j++)
-    domsorp[j]->tick (unitc, soil, soil_water, soil_heat, dom, som, msg);
+    domsorp[j]->tick (units, soil, soil_water, soil_heat, dom, som, msg);
 }
 
 void 

@@ -63,14 +63,14 @@ struct ReactionDenit : public Reaction
   void output (Log& log) const;
 
   // Simulation.
-  void tick (const Unitc&, const Geometry& geo,
+  void tick (const Units&, const Geometry& geo,
 	     const Soil& soil, const SoilWater& soil_water, 
 	     const SoilHeat& soil_heat,
 	     const OrganicMatter& organic_matter, 
              Chemistry& chemistry, const double dt, Treelog& msg);
 
   // Create.
-  bool check (const Unitc&, const Soil& soil, const SoilWater& soil_water, 
+  bool check (const Units&, const Soil& soil, const SoilWater& soil_water, 
 	      const SoilHeat& soil_heat,
 	      const Chemistry& chemistry, Treelog& msg) const;
   void initialize (const Soil& soil, Treelog&);
@@ -88,7 +88,7 @@ ReactionDenit::output (Log& log) const
 }
 
 void 
-ReactionDenit::tick (const Unitc&, const Geometry& geo,
+ReactionDenit::tick (const Units&, const Geometry& geo,
 		     const Soil& soil, const SoilWater& soil_water,
 		     const SoilHeat& soil_heat,
 		     const OrganicMatter& organic_matter, 
@@ -146,7 +146,7 @@ ReactionDenit::tick (const Unitc&, const Geometry& geo,
 }
 
 bool 
-ReactionDenit::check (const Unitc&,
+ReactionDenit::check (const Units&,
                       const Soil&, const SoilWater&, const SoilHeat&,
 		      const Chemistry& chemistry, Treelog& msg) const
 { 

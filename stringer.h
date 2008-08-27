@@ -29,7 +29,7 @@
 class Scope;
 class Block;
 class Treelog;
-class Unitc;
+class Units;
 
 class Stringer : public Model
 {
@@ -42,14 +42,14 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Unitc&, const Scope& scope, Treelog& msg) = 0;
+  virtual void tick (const Units&, const Scope& scope, Treelog& msg) = 0;
   virtual bool missing (const Scope& scope) const = 0;
   virtual std::string value (const Scope&) const = 0; 
 
   // Create and Destroy.
 public:
   virtual bool initialize (Treelog& msg) = 0;
-  virtual bool check (const Unitc&, const Scope&, Treelog&) const = 0;
+  virtual bool check (const Units&, const Scope&, Treelog&) const = 0;
 protected:
   explicit Stringer (Block&);
 public:

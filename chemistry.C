@@ -56,7 +56,7 @@ Chemistry::deposit (const IM& im, double dt, Treelog& msg)
     {
       const symbol chem = *i;
       const double amount 
-        = im.get_value (chem, unitc.get_unit (Chemical::spray_unit ()));
+        = im.get_value (chem, units.get_unit (Chemical::spray_unit ()));
       deposit (chem, amount, dt, msg);
     }
 }
@@ -68,7 +68,7 @@ Chemistry::spray (const IM& im, double dt, Treelog& msg)
     {
       const symbol chem = *i;
       const double amount 
-        = im.get_value (chem, unitc.get_unit (Chemical::spray_unit ()));
+        = im.get_value (chem, units.get_unit (Chemical::spray_unit ()));
       spray (chem, amount, dt, msg);
     }
 }
@@ -82,7 +82,7 @@ Chemistry::incorporate (const Geometry& geo, const IM& im,
     {
       const symbol chem = *i;
       const double amount 
-        = im.get_value (chem, unitc.get_unit (Chemical::spray_unit ()));
+        = im.get_value (chem, units.get_unit (Chemical::spray_unit ()));
       incorporate (geo, chem, amount, from, to, dt, msg);
     }
 }
@@ -96,7 +96,7 @@ Chemistry::incorporate (const Geometry& geo, const IM& im,
     {
       const symbol chem = *i;
       const double amount 
-        = im.get_value (chem, unitc.get_unit (Chemical::spray_unit ()));
+        = im.get_value (chem, units.get_unit (Chemical::spray_unit ()));
       incorporate (geo, chem, amount, volume, dt, msg);
     }
 }
@@ -111,7 +111,7 @@ Chemistry::load_syntax (Syntax& syntax, AttributeList& alist)
 
 Chemistry::Chemistry (Block& al)
   : ModelAListed (al.alist ()),
-    unitc (al.unitc ())
+    units (al.units ())
 { }
 
 Chemistry::~Chemistry ()

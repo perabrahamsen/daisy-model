@@ -162,9 +162,9 @@ protected:
   virtual symbol
   /**/ default_dimension (symbol spec_dim) const;
   virtual const Convert* 
-  /**/ special_convert (const Unitc&, symbol has, symbol want);
+  /**/ special_convert (const Units&, symbol has, symbol want);
 public:
-  virtual bool initialize (const Unitc&, const Volume&,
+  virtual bool initialize (const Units&, const Volume&,
                            const std::string& timestep, Treelog&);
   void add_dest (Destination* dest);
   virtual bool check (Treelog& err) const;

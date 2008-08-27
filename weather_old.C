@@ -196,7 +196,7 @@ WeatherOld::load_syntax (Syntax& syntax, AttributeList& alist)
 
   IM::add_syntax (syntax, alist, Syntax::Const, "DryDeposit", dry_deposit_unit,
 		  "Atmospheric deposition.");
-  IM::add_syntax (syntax, alist, Syntax::Const, "WetDeposit", Unitc::ppm (), 
+  IM::add_syntax (syntax, alist, Syntax::Const, "WetDeposit", Units::ppm (), 
 		  "Deposition of solutes with precipitation.");
 
   // Division between Rain and Snow.

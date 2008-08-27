@@ -36,7 +36,7 @@ class SoilHeat;
 class Log;
 class Anystate;
 class Chemical;
-class Unitc;
+class Units;
 
 class Biopore : public ModelAListed
 {
@@ -107,10 +107,10 @@ public:
 
   // Create and Destroy.
 protected:
-  bool initialize_base (const Unitc&, const Geometry&, const Scope&, Treelog&);
+  bool initialize_base (const Units&, const Geometry&, const Scope&, Treelog&);
   bool check_base (const Geometry&, Treelog& msg) const;
 public:
-  virtual bool initialize (const Unitc&, 
+  virtual bool initialize (const Units&, 
                            const Geometry&, const Scope&, double pipe_height,
                            Treelog&) = 0;
   virtual bool check (const Geometry&, Treelog& msg) const = 0;

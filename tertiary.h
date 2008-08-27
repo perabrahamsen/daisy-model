@@ -37,7 +37,7 @@ class Scope;
 class Treelog;
 class Log;
 class Tertsmall;
-class Unitc;
+class Units;
 
 class Tertiary : public ModelAListed
 {
@@ -50,7 +50,7 @@ public:
   // Simulation.
 public:
   // - For use by Column.
-  virtual void tick (const Unitc&, 
+  virtual void tick (const Units&, 
                      const Geometry&, const Soil&, const SoilHeat&,
                      const double dt, SoilWater&, Surface&, Treelog&) = 0;
 
@@ -71,7 +71,7 @@ public:
 public:
   static const AttributeList& none_model ();
   static const AttributeList& old_model ();
-  virtual bool initialize (const Unitc&,
+  virtual bool initialize (const Units&,
                            const Geometry&, const Soil&, const Scope&, 
                            const double pipe_position, Treelog&) = 0;
   virtual bool check (const Geometry&, Treelog&) const = 0;

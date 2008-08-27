@@ -52,7 +52,7 @@ struct ReactionFilter : public Reaction
   }
 
   // Simulation.
-  void tick (const Unitc&, const Geometry& geo, const Soil& soil,
+  void tick (const Units&, const Geometry& geo, const Soil& soil,
              const SoilWater& soil_water, 
 	     const SoilHeat&, const OrganicMatter&,
              Chemistry& chemistry, const double dt, Treelog& msg)
@@ -89,7 +89,7 @@ struct ReactionFilter : public Reaction
   }
 
   // Create.
-  bool check (const Unitc&, const Soil& soil, const SoilWater& soil_water,
+  bool check (const Units&, const Soil& soil, const SoilWater& soil_water,
 	      const SoilHeat&,
 	      const Chemistry& chemistry, Treelog& msg) const
   { 

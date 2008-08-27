@@ -92,10 +92,10 @@ struct BioporeDrain : public Biopore
   { output_base (log); }
 
   // Create and Destroy.
-  bool initialize (const Unitc& unitc, const Geometry& geo, const Scope& scope,
+  bool initialize (const Units& units, const Geometry& geo, const Scope& scope,
                    const double pipe, Treelog& msg)
   {
-    bool ok = initialize_base (unitc, geo, scope, msg); 
+    bool ok = initialize_base (units, geo, scope, msg); 
     if (pipe_position > 0)
       // Pipe height not specified here, use value from column.
       pipe_position = pipe;

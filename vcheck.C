@@ -552,10 +552,10 @@ VCheck::String::check (const Metalib&, const Syntax& syntax, const AttributeList
 }
 
 void 
-VCheck::Compatible::validate (const Unitc& unitc, symbol value)
+VCheck::Compatible::validate (const Units& units, symbol value)
   const throw (std::string)
 {
-  if (!unitc.can_convert (dimension, value))
+  if (!units.can_convert (dimension, value))
     {
       std::ostringstream tmp;
       tmp << "Cannot convert [" << dimension << "] to [" << value << "]";
@@ -570,14 +570,14 @@ VCheck::Compatible::check (const Metalib& metalib,
 {
   daisy_assert (alist.check (key));
   daisy_assert (!syntax.is_log (key));
-  const Unitc& unitc = metalib.unitc ();
+  const Units& units = metalib.units ();
   if (syntax.size (key) == Syntax::Singleton)
-    validate (unitc, alist.identifier (key));
+    validate (units, alist.identifier (key));
   else
     {
       const std::vector<symbol> names = alist.identifier_sequence (key);
       for (size_t i = 0; i < names.size (); i++)
-        validate (unitc, names[i]);
+        validate (units, names[i]);
     }
 }
 

@@ -40,7 +40,7 @@ class Log;
 class Time;
 class Treelog;
 class Block;
-class Unitc;
+class Units;
 
 class Bioclimate : public ModelAListed
 { 
@@ -51,7 +51,7 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Unitc&, 
+  virtual void tick (const Units&, 
                      const Time&, Surface&, const Weather&, Vegetation&, 
                      const Movement&, const Geometry&,
 		     const Soil&, SoilWater&, const SoilHeat&, 

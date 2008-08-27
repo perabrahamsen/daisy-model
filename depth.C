@@ -68,13 +68,13 @@ struct DepthConst : public Depth
 {
   const double value;
   
-  void tick (const Unitc&, const Time&, const Scope&, Treelog&)
+  void tick (const Units&, const Time&, const Scope&, Treelog&)
   { }
   double operator()() const
   { return value; }
   void initialize (Treelog&)
   { }
-  virtual bool check (const Unitc&, const Scope&, Treelog&) const
+  virtual bool check (const Units&, const Scope&, Treelog&) const
   { return true; }
   DepthConst (Block& al)
     : Depth (al),
@@ -116,9 +116,9 @@ struct DepthExtern : public Depth
   const std::auto_ptr<Number> expr;
   double value;
 
-  void tick (const Unitc& unitc, const Time&, const Scope& scope, Treelog& msg)
+  void tick (const Units& units, const Time&, const Scope& scope, Treelog& msg)
   { 
-    if (!expr->tick_value (unitc, value, Unitc::cm (), scope, msg))
+    if (!expr->tick_value (units, value, Units::cm (), scope, msg))
       if (!approximate (value, 42.0))
 	{
 	  msg.error ("External depth not found");
@@ -132,12 +132,12 @@ struct DepthExtern : public Depth
   void initialize (Treelog& msg)
   { expr->initialize (msg); }
 
-  virtual bool check (const Unitc& unitc, const Scope& scope,
+  virtual bool check (const Units& units, const Scope& scope,
                       Treelog& msg) const
   { 
     
     bool ok = true;
-    if (!expr->check_dim (unitc, scope, Unitc::cm (), msg))
+    if (!expr->check_dim (units, scope, Units::cm (), msg))
       ok = false;
     return ok;
   }
@@ -178,7 +178,7 @@ struct DepthPLF : public Depth
   PLF value;
   double current_value;
 
-  void  tick (const Unitc&, const Time& time, const Scope&, Treelog&)
+  void  tick (const Units&, const Time& time, const Scope&, Treelog&)
   { current_value = value (Time::hours_between (start, time)); }
 
   double operator()() const
@@ -187,7 +187,7 @@ struct DepthPLF : public Depth
   
   void initialize (Treelog&)
   { }
-  virtual bool check (const Unitc&, const Scope&, Treelog&) const
+  virtual bool check (const Units&, const Scope&, Treelog&) const
   { return true; }
   static PLF convert_to_plf (const std::vector<const AttributeList*>& table)
   {
@@ -281,7 +281,7 @@ struct DepthFile : public Depth
   PLF value;
   double current_value;
 
-  void tick (const Unitc&, const Time& time, const Scope&, Treelog&)
+  void tick (const Units&, const Time& time, const Scope&, Treelog&)
   { 
     daisy_assert (state == State::ok);
     current_value = value (Time::hours_between (start, time)); 
@@ -369,7 +369,7 @@ struct DepthFile : public Depth
     else 
       state = State::ok;
   }
-  virtual bool check (const Unitc&, const Scope&, Treelog&) const
+  virtual bool check (const Units&, const Scope&, Treelog&) const
   { return state == State::ok; }
   DepthFile (Block& al)
     : Depth (al),

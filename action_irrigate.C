@@ -63,14 +63,14 @@ struct ActionIrrigate : public Action
   bool check (const Daisy& daisy, const Scope& scope, Treelog& msg) const
   {
     bool ok = true;
-    if (!expr_flux->check_dim (daisy.unitc (), scope, mm_per_h, msg))
+    if (!expr_flux->check_dim (daisy.units (), scope, mm_per_h, msg))
       ok = false;
     return ok;
   }
 
   void tick (const Daisy& daisy, const Scope& scope, Treelog& msg)
   { 
-    if (!expr_flux->tick_value (daisy.unitc (), flux, mm_per_h, scope, msg))
+    if (!expr_flux->tick_value (daisy.units (), flux, mm_per_h, scope, msg))
       flux = 0.0;
   }
   
@@ -86,7 +86,7 @@ struct ActionIrrigate : public Action
         if (!approximate (remaining_time, 1.0))
           tmp << "s";
 	static const symbol conc_flux_unit ("kg/ha/mm");
-        const Unit& u_cf = daisy.unitc ().get_unit (conc_flux_unit);
+        const Unit& u_cf = daisy.units ().get_unit (conc_flux_unit);
         const double N = (sm.get_value (Chemical::NO3 (), u_cf)
 			  + sm.get_value (Chemical::NH4 (), u_cf))
 	  * flux * (days * 24 + hours);
@@ -164,7 +164,7 @@ Setting this overrides the 'days' and 'hours' parameters.");
     syntax.add ("temperature", "dg C", 
 		Check::positive (), Syntax::OptionalConst,
 		"Temperature of irrigation (default: air temperature).");
-    IM::add_syntax (syntax, alist, Syntax::Const, "solute", Unitc::ppm (), 
+    IM::add_syntax (syntax, alist, Syntax::Const, "solute", Units::ppm (), 
 		    "Solutes in irrigation water.");
   }
 

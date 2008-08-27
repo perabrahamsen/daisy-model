@@ -35,7 +35,7 @@ class Block;
 class Syntax;
 class AttributeList;
 class Scope;
-class Unitc;
+class Units;
 
 class Groundwater : public ModelLogable
 {
@@ -59,7 +59,7 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Unitc&, const Geometry& geo,
+  virtual void tick (const Units&, const Geometry& geo,
                      const Soil&, SoilWater&, double h_surface /* [cm] */,
 		     const SoilHeat&, const Time&, const Scope&, Treelog&) = 0;
   virtual void output (Log&) const;
@@ -71,9 +71,9 @@ public:
     // Create and Destroy.
 public:
   static void load_syntax (Syntax&, AttributeList&);
-  virtual void initialize (const Unitc&, const Geometry&, const Time&, 
+  virtual void initialize (const Units&, const Geometry&, const Time&, 
 			   const Scope&, Treelog&) = 0;
-  virtual bool check (const Unitc&, 
+  virtual bool check (const Units&, 
                       const Geometry&, const Scope&, Treelog&) const = 0;
 protected:
   Groundwater (Block& al);

@@ -124,7 +124,7 @@ Biopore::output_base (Log& log) const
 }
 
 bool
-Biopore::initialize_base (const Unitc& unitc, 
+Biopore::initialize_base (const Units& units, 
                           const Geometry& geo, const Scope& parent_scope, 
                           Treelog& msg)
 { 
@@ -133,10 +133,10 @@ Biopore::initialize_base (const Unitc& unitc,
 
   static const symbol per_square_centimeter ("cm^-2");
 
-  ScopeID own_scope (x_symbol (), Unitc::cm ());
+  ScopeID own_scope (x_symbol (), Units::cm ());
   ScopeMulti scope (own_scope, parent_scope);
   
-  if (!density_expr->check_dim (unitc, scope, per_square_centimeter, msg))
+  if (!density_expr->check_dim (units, scope, per_square_centimeter, msg))
     return false;
 
   const size_t cell_size = geo.cell_size ();
@@ -152,7 +152,7 @@ Biopore::initialize_base (const Unitc& unitc,
       else
         {
           own_scope.set_number (x_symbol (), geo.cell_x (c));
-          if (!density_expr->tick_value (unitc, value,
+          if (!density_expr->tick_value (units, value,
                                          per_square_centimeter, scope, msg))
             ok = false;
           density_cell.push_back (value);

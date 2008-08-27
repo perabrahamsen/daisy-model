@@ -47,7 +47,7 @@ class Harvest;
 class AM;
 class Treelog;
 class Block;
-class Unitc;
+class Units;
 
 class Crop : public ModelAListed
 {
@@ -76,7 +76,7 @@ public:
   virtual double EpFac () const = 0; // Convertion to potential evapotransp.
   virtual double albedo () const;
   virtual void CanopyStructure () = 0;
-  virtual double ActualWaterUptake (const Unitc&,
+  virtual double ActualWaterUptake (const Units&,
                                     double Ept, const Geometry& geo,
                                     const Soil&, SoilWater&, 
 				    double EvapInterception, 
@@ -87,7 +87,7 @@ public:
   // Simulation.
 public:
 
-  virtual void tick (const Unitc&, const Time& time, double relative_humidity,
+  virtual void tick (const Units&, const Time& time, double relative_humidity,
 		     const double CO2_atm,
                      const Bioclimate&, 
 		     const Geometry& geo, const Soil&, OrganicMatter&, 
@@ -155,7 +155,7 @@ public:
                            double SoilLimit, const Time& now, Treelog&) = 0;
   virtual void initialize (const Geometry&, double row_width, OrganicMatter&, 
                            double SoilLimit, const Time& now, Treelog&) = 0;
-  virtual bool check (const Unitc&, Treelog& msg) const = 0;
+  virtual bool check (const Units&, Treelog& msg) const = 0;
 protected:
   Crop (Block&);
 public:

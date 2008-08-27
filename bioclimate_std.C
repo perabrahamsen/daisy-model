@@ -127,7 +127,7 @@ struct BioclimateStandard : public Bioclimate
   double wind_speed_field;      // wind speed at screen height above the canopy [m/s]
   double wind_speed_weather;    // measured wind speed [m/s]
 
-  void WaterDistribution (const Unitc&, const Time&,
+  void WaterDistribution (const Units&, const Time&,
                           Surface& surface, const Weather& weather, 
 			  Vegetation& vegetation, const Movement&,
                           const Geometry&, const Soil& soil,
@@ -150,7 +150,7 @@ struct BioclimateStandard : public Bioclimate
   double hourly_global_radiation_; // From weather [W/m2].
 
   // Simulation
-  void tick (const Unitc&, const Time&, Surface&, const Weather&, 
+  void tick (const Units&, const Time&, Surface&, const Weather&, 
 	     Vegetation&, const Movement&, const Geometry&,
              const Soil&, SoilWater&, const SoilHeat&, Chemistry&, 
 	     double dt, Treelog&);
@@ -607,7 +607,7 @@ BioclimateStandard::RadiationDistribution (const Vegetation& vegetation,
 }
 
 void
-BioclimateStandard::WaterDistribution (const Unitc& unitc,
+BioclimateStandard::WaterDistribution (const Units& units,
                                        const Time& time, Surface& surface,
 				       const Weather& weather, 
 				       Vegetation& vegetation,
@@ -862,7 +862,7 @@ BioclimateStandard::WaterDistribution (const Unitc& unitc,
     ? (weather.hourly_global_radiation () * dt 
        / (24.0 * daily_global_radiation_))
     : 0.0;
-  crop_ea = vegetation.transpiration (unitc, crop_ep, canopy_ea, geo, soil,
+  crop_ea = vegetation.transpiration (units, crop_ep, canopy_ea, geo, soil,
                                       soil_water, day_fraction, dt, msg);
   daisy_assert (crop_ea >= 0.0);
   total_ea += crop_ea;
@@ -892,7 +892,7 @@ BioclimateStandard::WaterDistribution (const Unitc& unitc,
 }  
 
 void 
-BioclimateStandard::tick (const Unitc& unitc, const Time& time, 
+BioclimateStandard::tick (const Units& units, const Time& time, 
                           Surface& surface, const Weather& weather,  
 			  Vegetation& vegetation, const Movement& movement,
                           const Geometry& geo, const Soil& soil, 
@@ -909,8 +909,8 @@ BioclimateStandard::tick (const Unitc& unitc, const Time& time,
   day_length_ = weather.day_length ();
   
   // Add deposition. 
-  const Unit& u_h = unitc.get_unit (Unitc::h ());
-  const Unit& u_storage = unitc.get_unit (IM::storage_unit ());
+  const Unit& u_h = units.get_unit (Units::h ());
+  const Unit& u_storage = units.get_unit (IM::storage_unit ());
   const IM im = weather.deposit ().multiply (Scalar (dt, u_h), u_storage);
   chemistry.deposit (im, dt, msg);
 
@@ -927,7 +927,7 @@ BioclimateStandard::tick (const Unitc& unitc, const Time& time,
   RadiationDistribution (vegetation, sin_beta, msg);
 
   // Distribute water among canopy, snow, and soil.
-  WaterDistribution (unitc, time, surface, weather, vegetation, 
+  WaterDistribution (units, time, surface, weather, vegetation, 
 		     movement, geo, soil, soil_water, soil_heat, dt, msg);
 
   // Calculate temperature of canopy

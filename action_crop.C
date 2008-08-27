@@ -722,9 +722,9 @@ ActionCrop::Irrigation::doIt (Daisy& daisy, const Scope&, Treelog& msg) const
   std::ostringstream tmp;
   tmp << "Irrigating " << amount << " mm";
   msg.message (tmp.str ());
-  const Unitc& unitc = daisy.unitc ();
+  const Units& units = daisy.units ();
   daisy.field->irrigate_overhead (amount,
-                                  IM (unitc.get_unit (IM::solute_unit ())),
+                                  IM (units.get_unit (IM::solute_unit ())),
                                   daisy.dt, msg);
   return true;
 }

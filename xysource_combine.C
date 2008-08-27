@@ -31,7 +31,7 @@
 
 struct XYSourceCombine : public XYSource
 {
-  const Unitc& unitc;
+  const Units& units;
 
   // Content.
   ScopeSources scope;
@@ -82,12 +82,12 @@ XYSourceCombine::load (Treelog& msg)
   // Scope
   {
     bool ok = true;
-    if (!x_expr->initialize (msg) || !x_expr->check (unitc, scope, msg))
+    if (!x_expr->initialize (msg) || !x_expr->check (units, scope, msg))
       ok = false;
-    x_expr->tick (unitc, scope, msg);
-    if (!y_expr->initialize (msg) || !y_expr->check (unitc, scope, msg))
+    x_expr->tick (units, scope, msg);
+    if (!y_expr->initialize (msg) || !y_expr->check (units, scope, msg))
       ok = false;
-    y_expr->tick (unitc, scope, msg);
+    y_expr->tick (units, scope, msg);
     if (!ok)
       return false;
   }
@@ -117,7 +117,7 @@ XYSourceCombine::load (Treelog& msg)
 
 XYSourceCombine::XYSourceCombine (Block& al)
   : XYSource (al),
-    unitc (al.unitc ()),
+    units (al.units ()),
     scope (Librarian::build_vector<Source> (al, "source")),
     x_expr (Librarian::build_item<Number> (al, "x")),
     y_expr (Librarian::build_item<Number> (al, "y")),

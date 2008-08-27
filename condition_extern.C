@@ -44,7 +44,7 @@ struct ConditionExtern : public Condition
   {
     daisy_assert (extern_scope);
     ScopeMulti multi (*extern_scope, parent_scope);
-    expr->tick (daisy.unitc (), multi, msg);  
+    expr->tick (daisy.units (), multi, msg);  
   }
 
   bool match (const Daisy&, const Scope& parent_scope, Treelog& msg) const
@@ -81,7 +81,7 @@ struct ConditionExtern : public Condition
       }
 
     ScopeMulti multi (*extern_scope, parent_scope);
-    return expr->check (daisy.unitc (), multi, msg);
+    return expr->check (daisy.units (), multi, msg);
   }
 
   ConditionExtern (Block& al)

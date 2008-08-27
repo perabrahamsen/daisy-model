@@ -48,25 +48,25 @@ public:
 
   // Simulation.
 public:
-  void tick (const Unitc& unitc,
+  void tick (const Units& units,
              const Geometry&,
              const Soil&, SoilWater&, double, 
 	     const SoilHeat&, const Time&, const Scope& scope, Treelog& msg)
-  { has_table = expr->tick_value (unitc, depth, Unitc::cm (), scope, msg); }
+  { has_table = expr->tick_value (units, depth, Units::cm (), scope, msg); }
   double table () const
   { return depth; }
 
   // Create and Destroy.
 public:
-  void initialize (const Unitc&,
+  void initialize (const Units&,
                    const Geometry&, const Time&, const Scope&, Treelog& msg)
   { expr->initialize (msg); }
 
-  bool check (const Unitc& unitc,
+  bool check (const Units& units,
               const Geometry&, const Scope& scope, Treelog& msg) const
   {
     bool ok = true;
-    if (!expr->check_dim (unitc, scope, Unitc::cm (), msg))
+    if (!expr->check_dim (units, scope, Units::cm (), msg))
       ok = false;
     return ok;
   }

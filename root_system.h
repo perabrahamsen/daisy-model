@@ -36,7 +36,7 @@ struct Chemistry;
 struct Log;
 struct AttributeList;
 struct Syntax;
-struct Unitc;
+struct Units;
 
 class RootSystem
 {
@@ -98,7 +98,7 @@ private:
 				 const SoilWater& soil_water,
                                  double dt);
 public:
-  double water_uptake (const Unitc&, double Ept,
+  double water_uptake (const Units&, double Ept,
                        const Geometry&,
 		       const Soil& soil, SoilWater& soil_water,
                        double EvapInterception, double day_fraction, double dt,
@@ -135,7 +135,7 @@ public:
 public:
   void initialize (const Geometry& geo, double row_width, Treelog& msg);
   void initialize (const Geometry& geo, Treelog& msg);
-  bool check (const Unitc&, Treelog& msg) const;
+  bool check (const Units&, Treelog& msg) const;
   static void load_syntax (Syntax& syntax, AttributeList& alist);
   RootSystem (Block& al);
   ~RootSystem ();

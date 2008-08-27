@@ -47,7 +47,7 @@ The 'ABAproduction' component calculates the prod of ABA in soil.");
 struct ABAProdNone : public ABAProd
 {
   // Solve.
-  void production (const Unitc&, const Geometry&, const SoilWater&,
+  void production (const Units&, const Geometry&, const SoilWater&,
 		   const std::vector<double>& /* [cm^3/cm^3] */,
 		   const std::vector<double>& /* [cm/cm^3] */,
 		   std::vector<double>& ABA /* [g/cm/h] */,
@@ -59,7 +59,7 @@ struct ABAProdNone : public ABAProd
   // Create and Destroy.
   void initialize (Treelog&)
   { }
-  bool check (const Unitc&, Treelog&) const
+  bool check (const Units&, Treelog&) const
   { return true; }
   ABAProdNone (Block& al)
     : ABAProd (al)

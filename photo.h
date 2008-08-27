@@ -30,7 +30,7 @@ class Log;
 class Treelog;
 class Block;
 class AttributeList;
-class Unitc;
+class Units;
 
 class Photo : public ModelLogable
 {
@@ -41,7 +41,7 @@ public:
 
   // Simulation.
 public:
-  virtual double assimilate (const Unitc& unitc,
+  virtual double assimilate (const Units& units,
                              const double ABA_xylem, const double rel_hum, 
 			     const double CO2_atm, double Ta, double Tl, 
 			     const double cropN,

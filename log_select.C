@@ -223,7 +223,7 @@ LogSelect::LogSelect (Block& al)
 
   // Initialize entries.
   for (unsigned int i = 0; i < entries.size (); i++)
-    if (!entries[i]->initialize (al.unitc (), *volume, condition->timestep (),
+    if (!entries[i]->initialize (al.units (), *volume, condition->timestep (),
                                  al.msg ()))
       al.set_error ();
 }

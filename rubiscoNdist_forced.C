@@ -46,11 +46,11 @@ private:
   ScopeExchange scope;
   
   // Simulation.
-  double function (const Unitc&, const double distance_from_top, 
+  double function (const Units&, const double distance_from_top, 
 		   const double LAI, const double relative_LAI, 
 		   const double relative_distance_from_top, const double DS,
 		   Treelog& msg);
-  void rubiscoN_distribution (const Unitc& unitc,
+  void rubiscoN_distribution (const Units& units,
                               const std::vector <double>& PAR_height,
 			      const double LAI, const double DS, 
 			      std::vector <double>& rubiscoNdist, 
@@ -77,7 +77,7 @@ public:
 					"Development stage"));
     scope.done ();
     expr->initialize (al.msg());
-    if (!expr->check_dim (al.unitc (), scope, mol_per_area, al.msg ()))
+    if (!expr->check_dim (al.units (), scope, mol_per_area, al.msg ()))
       al.error("Invalid expression of rubisco expr");
   }
 };
@@ -85,7 +85,7 @@ public:
 const symbol rubiscoNdist_forced::mol_per_area ("mol/m^2");
 
 double
-rubiscoNdist_forced::function (const Unitc& unitc,
+rubiscoNdist_forced::function (const Units& units,
                                const double distance_from_top,
 			       const double LAI, const double relative_LAI, 
 			       const double relative_distance_from_top,
@@ -97,14 +97,14 @@ rubiscoNdist_forced::function (const Unitc& unitc,
   scope.set_number (relative_LAI_symbol, relative_LAI);
   scope.set_number (DS_symbol, DS);
   double value = -1.0;
-  if (!expr->tick_value (unitc, value, mol_per_area, scope, msg))
+  if (!expr->tick_value (units, value, mol_per_area, scope, msg))
     throw "Missing value in rubisco forced expr";
   return  value; 
 }
 
 void
 rubiscoNdist_forced
-/**/ ::rubiscoN_distribution (const Unitc& unitc,
+/**/ ::rubiscoN_distribution (const Units& units,
                               const std::vector <double>& PAR_height, 
                               const double LAI, const double DS,
                               std::vector <double>& rubiscoNdist/*[mol/m²]*/,  
@@ -126,7 +126,7 @@ rubiscoNdist_forced
 	total_height-((PAR_height [i]+ PAR_height[i+1])/2.0);
       const double relative_distance_from_top = distance_from_top_i/total_height;
       const double LAI_i = LAI * (i + 0.5)/(No + 0.0);
-      rubiscoNdist[i] = function(unitc,
+      rubiscoNdist[i] = function(units,
                                  distance_from_top_i, LAI_i, relative_LAI,
 				 relative_distance_from_top, DS, msg); //[mol/m² leaf]
     }

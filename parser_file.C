@@ -354,13 +354,13 @@ ParserFile::Implementation::get_number (const std::string& syntax_dim)
     (Librarian::build_alist<Number> (block, *al, "number"));
   if (!block.ok ()
       || !number->initialize (treelog)
-      || !number->check (metalib.unitc (), Scope::null (), treelog))
+      || !number->check (metalib.units (), Scope::null (), treelog))
     {
       error ("Bad number '" + obj + "'\n--- details:\n"
              + treelog.str () + "---");
       return -42.42e42;
     }
-  number->tick (metalib.unitc (), Scope::null (), treelog);
+  number->tick (metalib.units (), Scope::null (), treelog);
   if (treelog.str ().length () > 0)
     warning ("Warning for number '" + obj + "'\n--- details:\n"
              + treelog.str () + "---");
@@ -387,7 +387,7 @@ ParserFile::Implementation::check_dimension (const std::string& syntax,
 	  if (read.length () == 0 || read[0] != '?')
 	    warning ("you must use [?<dim>] for entries with unknown syntax");
 	}
-      else if (!metalib.unitc ().can_convert (symbol (read), symbol (syntax),
+      else if (!metalib.units ().can_convert (symbol (read), symbol (syntax),
                                               msg))
 	{
 	  error (std::string ("expected [") 
@@ -419,8 +419,8 @@ ParserFile::Implementation::convert (double value,
 	if (read == "")
 	  return value;
 	else
-	  return metalib.unitc ().convert (symbol (read), symbol (""), value);
-      return metalib.unitc ().convert (symbol (read), symbol (syntax), value);
+	  return metalib.units ().convert (symbol (read), symbol (""), value);
+      return metalib.units ().convert (symbol (read), symbol (syntax), value);
     }
   catch (const std::string& message)
     { 

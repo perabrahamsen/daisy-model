@@ -61,7 +61,7 @@ public:
   double IntcpCap () const; // Interception Capacity.
   double EpFac () const; // Convertion to potential evapotransp.
   void CanopyStructure ();
-  double ActualWaterUptake (const Unitc&, double Ept, const Geometry& geo,
+  double ActualWaterUptake (const Units&, double Ept, const Geometry& geo,
                             const Soil&, SoilWater&,
 			    double EvapInterception, double day_fraction, 
                             double dt,
@@ -106,7 +106,7 @@ protected:
 
   // Simulation.
 public:
-  void tick (const Unitc&,
+  void tick (const Units&,
              const Time& time,  double relative_humidity, const double CO2_atm,
 	     const Bioclimate&, const Geometry& geo, const Soil&,
 	     OrganicMatter&, const SoilHeat&, const SoilWater&, 
@@ -144,7 +144,7 @@ public:
                    OrganicMatter&, double, const Time&, Treelog&);
   void initialize (const Geometry& geo, OrganicMatter&, double, 
                    const Time&, Treelog&);
-  bool check (const Unitc&, Treelog&) const
+  bool check (const Units&, Treelog&) const
   { return true; }
   CropOld (Block& vl);
   ~CropOld ();
@@ -1332,7 +1332,7 @@ CropOld::CanopyStructure ()
 }
 
 double
-CropOld::ActualWaterUptake (const Unitc&, double Ept,
+CropOld::ActualWaterUptake (const Units&, double Ept,
                             const Geometry& geo,
 			    const Soil& soil, SoilWater& soil_water,
 			    const double EvapInterception, 
@@ -1748,7 +1748,7 @@ void CropOld::emerge ()
 { var.Phenology.DS = -0.1; }
 
 void 
-CropOld::tick (const Unitc&, const Time& time, const double, const double,
+CropOld::tick (const Units&, const Time& time, const double, const double,
 	       const Bioclimate& bioclimate,
                const Geometry& geo,
 	       const Soil& soil,

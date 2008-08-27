@@ -54,7 +54,7 @@ struct ColumnStandard : public Column
   static const symbol solute_per_mm_unit;
   static const symbol field_flux_unit;
   
-  const Unitc& unitc;
+  const Units& units;
   const std::auto_ptr<Scopesel> scopesel;
   const Scope* extern_scope;
   std::auto_ptr<Movement> movement;
@@ -197,9 +197,9 @@ ColumnStandard::irrigate_overhead (const double flux, const double temp,
 {
   daisy_assert (flux >= 0.0);
   bioclimate->irrigate_overhead (flux, temp);
-  const Unit& u_solute_per_mm = unitc.get_unit (solute_per_mm_unit);
-  const Unit& u_mm = unitc.get_unit (Unitc::mm ());
-  const Unit& u_storage = unitc.get_unit (IM::storage_unit ());
+  const Unit& u_solute_per_mm = units.get_unit (solute_per_mm_unit);
+  const Unit& u_mm = units.get_unit (Units::mm ());
+  const Unit& u_storage = units.get_unit (IM::storage_unit ());
   IM im (u_solute_per_mm, sm);
   im.multiply_assign (Scalar (flux * dt, u_mm), u_storage);
   fertilize (im, dt, msg);
@@ -211,9 +211,9 @@ ColumnStandard::irrigate_surface (const double flux, const double temp,
 {
   daisy_assert (flux >= 0.0);
   bioclimate->irrigate_surface (flux, temp);
-  const Unit& u_solute_per_mm = unitc.get_unit (solute_per_mm_unit);
-  const Unit& u_mm = unitc.get_unit (Unitc::mm ());
-  const Unit& u_storage = unitc.get_unit (IM::storage_unit ());
+  const Unit& u_solute_per_mm = units.get_unit (solute_per_mm_unit);
+  const Unit& u_mm = units.get_unit (Units::mm ());
+  const Unit& u_storage = units.get_unit (IM::storage_unit ());
   IM im (u_solute_per_mm, sm);
   im.multiply_assign (Scalar (flux * dt, u_mm ), u_storage);
   fertilize (im, dt, msg);
@@ -225,9 +225,9 @@ ColumnStandard::irrigate_overhead (const double flux,
 {
   daisy_assert (flux >= 0.0);
   bioclimate->irrigate_overhead (flux);
-  const Unit& u_solute_per_mm = unitc.get_unit (solute_per_mm_unit);
-  const Unit& u_mm = unitc.get_unit (Unitc::mm ());
-  const Unit& u_storage = unitc.get_unit (IM::storage_unit ());
+  const Unit& u_solute_per_mm = units.get_unit (solute_per_mm_unit);
+  const Unit& u_mm = units.get_unit (Units::mm ());
+  const Unit& u_storage = units.get_unit (IM::storage_unit ());
   IM im (u_solute_per_mm, sm);
   im.multiply_assign (Scalar (flux * dt, u_mm), u_storage);
   fertilize (im, dt, msg);
@@ -239,9 +239,9 @@ ColumnStandard::irrigate_surface (const double flux,
 {
   daisy_assert (flux >= 0.0);
   bioclimate->irrigate_surface (flux);
-  const Unit& u_solute_per_mm = unitc.get_unit (solute_per_mm_unit);
-  const Unit& u_mm = unitc.get_unit (Unitc::mm ());
-  const Unit& u_storage = unitc.get_unit (IM::storage_unit ());
+  const Unit& u_solute_per_mm = units.get_unit (solute_per_mm_unit);
+  const Unit& u_mm = units.get_unit (Units::mm ());
+  const Unit& u_storage = units.get_unit (IM::storage_unit ());
   IM im (u_solute_per_mm, sm);
   im.multiply_assign (Scalar (flux * dt, u_mm), u_storage);
   fertilize (im, dt, msg);
@@ -254,9 +254,9 @@ ColumnStandard::irrigate_subsoil (const double flux, const IM& sm,
 {
   soil_water->incorporate (geometry, flux / 10.0 /* mm -> cm */, from, to);
   bioclimate->irrigate_subsoil (flux);
-  const Unit& u_solute_per_mm = unitc.get_unit (solute_per_mm_unit);
-  const Unit& u_mm = unitc.get_unit (Unitc::mm ());
-  const Unit& u_storage = unitc.get_unit (IM::storage_unit ());
+  const Unit& u_solute_per_mm = units.get_unit (solute_per_mm_unit);
+  const Unit& u_mm = units.get_unit (Units::mm ());
+  const Unit& u_storage = units.get_unit (IM::storage_unit ());
   IM im (u_solute_per_mm, sm);
   im.multiply_assign (Scalar (flux * dt, u_mm), u_storage);
   chemistry->incorporate (geometry, im, from, to, dt, msg);
@@ -269,9 +269,9 @@ ColumnStandard::irrigate_subsoil (const double flux, const IM& sm,
 {
   soil_water->incorporate (geometry, flux / 10.0 /* mm -> cm */, volume);
   bioclimate->irrigate_subsoil (flux);
-  const Unit& u_solute_per_mm = unitc.get_unit (solute_per_mm_unit);
-  const Unit& u_mm = unitc.get_unit (Unitc::mm ());
-  const Unit& u_storage = unitc.get_unit (IM::storage_unit ());
+  const Unit& u_solute_per_mm = units.get_unit (solute_per_mm_unit);
+  const Unit& u_mm = units.get_unit (Units::mm ());
+  const Unit& u_storage = units.get_unit (IM::storage_unit ());
   IM im (u_solute_per_mm, sm);
   im.multiply_assign (Scalar (flux * dt, u_mm), u_storage);
   chemistry->incorporate (geometry, im, volume, dt, msg);
@@ -294,7 +294,7 @@ ColumnStandard::fertilize (const AttributeList& al, const double dt,
   chemistry->dissipate (Chemical::NH4 (), lost_NH4, dt, msg);
 
   // Add inorganic matter.
-  fertilize (AM::get_IM (unitc.get_unit (IM::storage_unit ()), al), dt, msg);
+  fertilize (AM::get_IM (units.get_unit (IM::storage_unit ()), al), dt, msg);
 
   // Add organic matter, if any.
   if (al.name ("syntax") != "mineral")
@@ -318,7 +318,7 @@ ColumnStandard::fertilize (const AttributeList& al,
   chemistry->dissipate (Chemical::NH4 (), lost_NH4, dt, msg);
 
   // Add inorganic matter.
-  const IM im = AM::get_IM (unitc.get_unit (IM::storage_unit ()), al);
+  const IM im = AM::get_IM (units.get_unit (IM::storage_unit ()), al);
   chemistry->incorporate (geometry, im, from, to, dt, msg);
   applied_DM += AM::get_DM (al) / dt;
 
@@ -341,7 +341,7 @@ ColumnStandard::fertilize (const AttributeList& al,
   chemistry->dissipate (Chemical::NH4 (), lost_NH4, dt, msg);
 
   // Add inorganic matter.
-  const IM im = AM::get_IM (unitc.get_unit (IM::storage_unit ()), al);
+  const IM im = AM::get_IM (units.get_unit (IM::storage_unit ()), al);
   chemistry->incorporate (geometry, im, volume, dt, msg);
   applied_DM += AM::get_DM (al) / dt;
 
@@ -612,15 +612,15 @@ ColumnStandard::tick (const Time& time, const double dt,
   const Weather& my_weather = weather.get () ? *weather : *global_weather;
 
   // Macropores before everything else.
-  movement->tick_tertiary (unitc, geometry, *soil, *soil_heat, dt,
+  movement->tick_tertiary (units, geometry, *soil, *soil_heat, dt,
                            *soil_water, surface, msg);
 
   // Early calculation.
-  bioclimate->tick (unitc, time, surface, my_weather, 
+  bioclimate->tick (units, time, surface, my_weather, 
                     *vegetation, *movement,
                     geometry, *soil, *soil_water, *soil_heat, *chemistry,
                     dt, msg);
-  vegetation->tick (unitc,
+  vegetation->tick (units,
                     time, my_weather.relative_humidity (), my_weather.CO2 (),
                     *bioclimate, geometry, *soil, 
 		    *organic_matter,
@@ -636,7 +636,7 @@ ColumnStandard::tick (const Time& time, const double dt,
                         *chemistry, dt, msg);
   
   // Transport.
-  groundwater->tick (unitc, geometry, *soil, *soil_water, 
+  groundwater->tick (units, geometry, *soil, *soil_water, 
                      surface.ponding () * 0.1, 
                      *soil_heat, time, scope, msg);
   movement->tick (*soil, *soil_water, *soil_heat,
@@ -650,7 +650,7 @@ ColumnStandard::tick (const Time& time, const double dt,
                         surface.ponding (), surface.mixing_resistance (),
                         *soil, *soil_water, *soil_heat, 
                         *movement, *organic_matter, *chemistry, dt, scope, msg);
-  organic_matter->transport (unitc, *soil, *soil_water, *soil_heat, msg);
+  organic_matter->transport (units, *soil, *soil_water, *soil_heat, msg);
   const std::vector<DOM*>& dom = organic_matter->fetch_dom ();
   for (size_t i = 0; i < dom.size (); i++)
     {
@@ -699,7 +699,7 @@ ColumnStandard::check (bool require_weather,
   }
   {
     Treelog::Open nest (msg, "Groundwater: " + groundwater->name);
-    if (!groundwater->check (unitc, geometry, scope, msg))
+    if (!groundwater->check (units, geometry, scope, msg))
       ok = false;
   }
   {
@@ -725,7 +725,7 @@ ColumnStandard::check (bool require_weather,
   }
   {
     Treelog::Open nest (msg, "Vegetation");
-    if (!vegetation->check (unitc, msg))
+    if (!vegetation->check (units, msg))
       ok = false;
   }
   {
@@ -733,7 +733,7 @@ ColumnStandard::check (bool require_weather,
     if (!soil->check (organic_matter->som_pools (), geometry, msg))
       ok = false;
   }
-  if (!organic_matter->check (unitc,
+  if (!organic_matter->check (units,
                               *soil, *soil_water, *soil_heat, *chemistry, msg))
     ok = false;
   return ok;
@@ -831,7 +831,7 @@ ColumnStandard::output (Log& log) const
 
 ColumnStandard::ColumnStandard (Block& al)
   : Column (al),
-    unitc (al.unitc ()),
+    units (al.units ()),
     scopesel (Librarian::build_item<Scopesel> (al, "scope")),
     extern_scope (NULL),
     movement (Librarian::build_item<Movement> (al, "Movement")),
@@ -882,10 +882,10 @@ ColumnStandard::initialize (Block& block,
   residuals_C_soil.insert (residuals_C_soil.begin (), soil->size (), 0.0);
   daisy_assert (residuals_C_soil.size () == soil->size ());
 
-  groundwater->initialize (unitc, geometry, time, scope, msg);
+  groundwater->initialize (units, geometry, time, scope, msg);
 
   // Movement depends on soil and groundwater
-  movement->initialize (unitc, *soil, *groundwater,  scope, msg);
+  movement->initialize (units, *soil, *groundwater,  scope, msg);
 
   surface.initialize (geometry);
 

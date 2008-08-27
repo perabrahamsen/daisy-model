@@ -21,91 +21,92 @@
 #define BUILD_DLL
 
 #include "units.h"
-#include "oldunits.h"
 #include "unit.h"
+#include "convert.h"
+#include "oldunits.h"
+#include "memutils.h"
+#include "treelog.h"
+#include "assertion.h"
+#include "librarian.h"
+#include "metalib.h"
+#include "library.h"
+#include "syntax.h"
+#include <sstream>
 
-// The 'Convert' Interface.
-
-Convert::Convert ()
-{ }
-
-Convert::~Convert ()
-{ }
-
-// The 'Unitc' Interface.
+// The 'Units' Interface.
 
 symbol
-Unitc::h ()
+Units::h ()
 {
   static const symbol unit ("h");
   return unit;
 }
 
 symbol
-Unitc::mm ()
+Units::mm ()
 {
   static const symbol unit ("mm");
   return unit;
 }
 
 symbol
-Unitc::per_mm ()
+Units::per_mm ()
 {
   static const symbol unit ("mm^-1");
   return unit;
 }
 
 symbol
-Unitc::mm_per_h ()
+Units::mm_per_h ()
 {
   static const symbol unit ("mm/h");
   return unit;
 }
 
 symbol
-Unitc::cm ()
+Units::cm ()
 {
   static const symbol unit ("cm");
   return unit;
 }
 
 symbol
-Unitc::cm_per_h ()
+Units::cm_per_h ()
 {
   static const symbol unit ("cm/h");
   return unit;
 }
 
 symbol
-Unitc::cm2 ()
+Units::cm2 ()
 {
   static const symbol unit ("cm^2");
   return unit;
 }
 
 symbol
-Unitc::cm3 ()
+Units::cm3 ()
 {
   static const symbol unit ("cm^3");
   return unit;
 }
 
 symbol
-Unitc::per_h ()
+Units::per_h ()
 {
   static const symbol unit ("h^-1");
   return unit;
 }
 
 symbol
-Unitc::ppm ()
+Units::ppm ()
 {
   static const symbol unit ("ppm");
   return unit;
 }
 
-Unitc::special_convert_type
-Unitc::special_convert[] = {
+Units::special_convert_type
+Units::special_convert[] = {
   // We assume length is cm H2O, and convert to hPa.
   { symbol ("m") /* cm H2O */, Unit::pressure () /* hPa */, 10000.0 },
   // We assume mass per volume is mg solute in l H2O, and convert to ppm.
@@ -117,11 +118,11 @@ Unitc::special_convert[] = {
 };
 
 const size_t 
-Unitc::special_convert_size 
-/**/ = sizeof (Unitc::special_convert) / sizeof (Unitc::special_convert_type);
+Units::special_convert_size 
+/**/ = sizeof (Units::special_convert) / sizeof (Units::special_convert_type);
 
 double
-Unitc::base_convert (const symbol from, const symbol to,
+Units::base_convert (const symbol from, const symbol to,
                      const double value)
 {
   if (from == to)
@@ -137,7 +138,7 @@ Unitc::base_convert (const symbol from, const symbol to,
 }
 
 bool 
-Unitc::compatible (const Unit& from_unit, const Unit& to_unit)
+Units::compatible (const Unit& from_unit, const Unit& to_unit)
 {
   const symbol from = from_unit.base_name ();
   const symbol to = to_unit.base_name ();
@@ -155,7 +156,7 @@ Unitc::compatible (const Unit& from_unit, const Unit& to_unit)
 }
 
 double
-Unitc::unit_convert (const Unit& from, const Unit& to,
+Units::unit_convert (const Unit& from, const Unit& to,
                      const double value)
 {
   if (!compatible (from, to))
@@ -185,20 +186,156 @@ Unitc::unit_convert (const Unit& from, const Unit& to,
 }
 
 double 
-Unitc::multiply (const Unit& a, const Unit& b, double value, const Unit& result)
+Units::multiply (const Unit& a, const Unit& b, double value, const Unit& result)
 {
   const symbol ab = multiply (a.name, b.name);
   return Oldunits::convert (ab, result.name, value);
 }
 
 symbol
-Unitc::multiply (const symbol a, const symbol b)
+Units::multiply (const symbol a, const symbol b)
 {
   return Oldunits::multiply (a, b);
 }
 
+bool 
+Units::allow_old () const
+{ return allow_old_; }
+
+bool
+Units::has_unit (symbol name) const
+{ return units.find (name) != units.end (); }
+
+const Unit&
+Units::get_unit (symbol name) const
+{ 
+  unit_map::const_iterator i = units.find (name); 
+  if (i != units.end () && (*i).second)
+    return *(*i).second;
+  
+  throw "No unit [" + name + "]";
+}
+
+bool
+Units::can_convert (const symbol from, const symbol to, Treelog& msg) const
+{
+  if (from == to)
+    return true;
+
+  // Defined?
+  if (!has_unit(from) || !has_unit (to))
+    {
+      if (!allow_old ())
+        {
+          if (has_unit (from))
+            msg.message ("Original dimension [" + from + "] known.");
+          else
+            msg.message ("Original dimension [" + from + "] not known.");
+          if (has_unit (to))
+            msg.message ("Target dimension [" + to + "] known.");
+          else
+            msg.message ("Target dimension [" + to + "] not known.");
+          return false;
+        }
+      msg.message (std::string ("Trying old conversion of ") 
+                   + (has_unit (from) ? "" : "unknown ") + "[" + from + "] to " 
+                   + (has_unit (to) ? "" : "unknown ") + "[" + to + "]." );
+      return Oldunits::can_convert (from, to);
+    }
+
+  const Unit& from_unit = get_unit (from);
+  const Unit& to_unit = get_unit (to);
+
+  if (compatible (from_unit, to_unit))
+    return true;
+
+  // Not compatible.
+  std::ostringstream tmp;
+  tmp << "Cannot convert [" << from 
+      << "] with base [" << from_unit.base_name () << "] to [" << to
+      << "] with base [" << to_unit.base_name () << "]";
+  msg.message (tmp.str ());
+  if (!allow_old ())
+    return false;
+
+  msg.message ("Trying old conversion.");
+  return Oldunits::can_convert (from, to);
+}
+
+bool 
+Units::can_convert (const symbol from, const symbol to) const
+{
+  if (from == to)
+    return true;
+
+  // Defined?
+  if (!has_unit(from) || !has_unit (to))
+    if (!allow_old ())
+      return false;
+    else
+      return Oldunits::can_convert (from, to);
+  
+  const Unit& from_unit = get_unit (from);
+  const Unit& to_unit = get_unit (to);
+
+  if (compatible (from_unit, to_unit))
+    return true;
+
+  if (!allow_old ())
+    return false;
+
+  return Oldunits::can_convert (from, to);
+}
+
+bool 
+Units::can_convert (const symbol from, const symbol to,
+                    const double value) const
+{ 
+  if (from == to)
+    return true;
+
+  // Defined?
+  if (!has_unit(from) || !has_unit (to))
+    if (!allow_old ())
+      return false;
+    else
+      return Oldunits::can_convert (from, to, value);
+  
+  const Unit& from_unit = get_unit (from);
+  const Unit& to_unit = get_unit (to);
+
+  if (!compatible (from_unit, to_unit))
+    return false;
+  if (!from_unit.in_native  (value))
+    return false;
+  const double base = from_unit.to_base (value);
+  // We don't have to worry about [cm] and [hPa] as all values are valid.
+  return to_unit.in_base (base);
+}
+
+double 
+Units::convert (const symbol from, const symbol to, const double value) const
+{ 
+  if (from == to)
+    return value;
+
+  // Defined?
+  if (!has_unit(from) || !has_unit (to))
+    {
+      if (allow_old ())
+        return Oldunits::convert (from, to, value);
+      if (!has_unit (from))
+        throw "Cannot convert from unknown dimension [" + from 
+          + "] to [" + to + "]";
+      throw "Cannot convert from [" + from 
+        + "] to unknown dimension [" + to + "]";
+    }
+  
+  return Units::unit_convert (get_unit (from), get_unit (to), value);
+}
+
 const Convert*
-Unitc::create_convertion (const Unit& from, const Unit& to)
+Units::create_convertion (const Unit& from, const Unit& to)
 {
   // Maybe 'from' knows a smart way.
   const Convert* from_convert = from.create_convertion (to);
@@ -232,10 +369,131 @@ Unitc::create_convertion (const Unit& from, const Unit& to)
   return new ConvertGeneric (from, to);
 }
 
-Unitc::Unitc ()
-{ }
+const Convert& 
+Units::get_convertion (const symbol from, const symbol to) const
+{
+  if (from == to)
+    {
+      static struct ConvertIdentity : public Convert
+      {
+        double operator()(const double value) const
+        { return value; }
+        bool valid (const double) const
+        { return true; }
+      } identity;
+      return identity;
+    }
+  const symbol key (from.name () + " -> " + to.name ());
 
-Unitc::~Unitc ()
-{ }
+  // Already known.
+  convert_map::const_iterator i
+    = this->conversions.find (key); 
+  if (i != this->conversions.end ())
+    return *(*i).second;
+
+  // Defined?
+  if (!has_unit (from) || !has_unit (to))
+    {
+      if (allow_old ())
+        {
+          struct ConvertOld : Convert
+          {
+            const Oldunits::Convert& old;
+            double operator()(const double value) const
+            { return old (value); }
+            bool valid (const double value) const
+            { return old.valid (value); }
+            ConvertOld (const Oldunits::Convert& o)
+              : old (o)
+            { }
+          };
+          const Oldunits::Convert& old
+            = Oldunits::get_convertion (from.name (), to.name ());
+          
+          const Convert* convert = new ConvertOld (old);
+          daisy_assert (convert);
+          conversions[key] = convert;
+          return *convert;
+        }
+      if (!has_unit (from))
+        throw "Cannot get conversion from unknown dimension [" + from 
+          + "] to [" + to + "]";
+      if (!has_unit (to))
+        throw "Cannot get conversion from [" + from 
+          + "] to unknown dimension [" + to + "]";
+    }
+  
+  const Unit& from_unit = get_unit (from);
+  const Unit& to_unit = get_unit (to);
+  if (!compatible (from_unit, to_unit))
+    throw "Cannot get conversion from [" + from 
+      + "] to dimension [" + to + "]";
+
+  const Convert* convert = create_convertion (from_unit, to_unit);
+  daisy_assert (convert);
+  conversions[key] = convert;
+  return *convert;
+}
+
+void
+Units::add_unit (Metalib& metalib, const symbol name)
+{
+  // Do we already have it?
+  unit_map::iterator i = this->units.find (name); 
+  if (i != this->units.end ())
+    {
+      // Delete old copy.
+      delete (*i).second;
+      (*i).second = NULL;
+    }
+  
+  // Is it defined?
+  const Library& library = metalib.library (Unit::component);
+  if (!library.complete (metalib, name))
+    return;
+
+  // Build it.
+  AttributeList alist (library.lookup (name));
+  alist.add ("type", name);
+  this->units[name] = Librarian::build_free<Unit> (metalib, Treelog::null (),
+                                                   alist, "unit");
+}
+
+void
+Units::load_syntax (Syntax& syntax, AttributeList& alist)
+{
+  syntax.add ("allow_old_units", Syntax::Boolean, Syntax::Const, "\
+OBSOLETE: Set this to true to enable the old system of build-in\n\
+unit conversation.");
+  alist.add ("allow_old_units", true);
+}
+
+#if 0
+Units::Units (Metalib& metalib)
+  : allow_old_ (metalib.alist ().flag ("allow_old_units"))
+{ 
+  const Library& library = metalib.library (Unit::component);
+  std::vector<symbol> entries;
+  library.entries (entries);
+  for (size_t i = 0; i < entries.size (); i++)
+    add_unit (metalib, entries[i]);
+}
+#else
+Units::Units (Metalib& metalib)
+  : allow_old_ (true)
+{ 
+  const Library& library = metalib.library (Unit::component);
+  std::vector<symbol> entries;
+  library.entries (entries);
+  for (size_t i = 0; i < entries.size (); i++)
+    add_unit (metalib, entries[i]);
+}
+#endif
+
+Units::~Units ()
+{
+  map_delete (units.begin (), units.end ()); 
+  map_delete (conversions.begin (), conversions.end ()); 
+}
 
 // unit.C ends here.

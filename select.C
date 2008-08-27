@@ -38,6 +38,7 @@
 #include "submodeler.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "convert.h"
 #include <numeric>
 #include <map>
 
@@ -390,7 +391,7 @@ Select::Implementation::get_expr (Block& al)
   struct NumberFactor : public Number
   {
     const double factor;
-    void tick (const Unitc&, const Scope&, Treelog&)
+    void tick (const Units&, const Scope&, Treelog&)
     { }
     bool missing (const Scope&) const
     { return false; }
@@ -400,7 +401,7 @@ Select::Implementation::get_expr (Block& al)
     { return scope.dimension (x_symbol); }
     bool initialize (Treelog&)
     { return true; }
-    bool check (const Unitc&, const Scope&, Treelog&) const
+    bool check (const Units&, const Scope&, Treelog&) const
     { return true; }
     explicit NumberFactor (Block& al, const double f)
       : Number (al),
@@ -412,7 +413,7 @@ Select::Implementation::get_expr (Block& al)
   {
     const double factor;
     const double offset;
-    void tick (const Unitc&, const Scope&, Treelog&)
+    void tick (const Units&, const Scope&, Treelog&)
     { }
     bool missing (const Scope&) const
     { return false; }
@@ -422,7 +423,7 @@ Select::Implementation::get_expr (Block& al)
     { return scope.dimension (x_symbol); }
     bool initialize (Treelog&)
     { return true; }
-    bool check (const Unitc&, const Scope&, Treelog&) const
+    bool check (const Units&, const Scope&, Treelog&) const
     { return true; }
     explicit NumberLinear (Block& al, const double f, const double o)
       : Number (al),
@@ -442,7 +443,7 @@ Select::Implementation::get_expr (Block& al)
   // No change.
   struct NumberX : public Number
   {
-    void tick (const Unitc&, const Scope&, Treelog&)
+    void tick (const Units&, const Scope&, Treelog&)
     { }
     bool missing (const Scope&) const
     { return false; }
@@ -452,7 +453,7 @@ Select::Implementation::get_expr (Block& al)
     { return scope.dimension (x_symbol); }
     bool initialize (Treelog&)
     { return true; }
-    bool check (const Unitc&, const Scope&, Treelog&) const
+    bool check (const Units&, const Scope&, Treelog&) const
     { return true; }
     explicit NumberX (Block& al)
       : Number (al)
@@ -739,7 +740,7 @@ Select::default_dimension (const symbol spec_dim) const
 { return spec_dim; }
 
 const Convert*
-Select::special_convert (const Unitc&, const symbol, const symbol)
+Select::special_convert (const Units&, const symbol, const symbol)
 { return NULL; }
 
 void 
@@ -747,7 +748,7 @@ Select::add_dest (Destination* d)
 { dest.add_dest (d); }
 
 bool
-Select::initialize (const Unitc& unitc, const Volume&, 
+Select::initialize (const Units& units, const Volume&, 
 		    const std::string& timestep, Treelog& msg)
 { 
   symbol spec_dim;
@@ -761,12 +762,12 @@ Select::initialize (const Unitc& unitc, const Volume&,
   if (impl->expr.get ())
     { 
       if (!impl->expr->initialize (msg) 
-          || !impl->expr->check (unitc, impl->scope, msg))
+          || !impl->expr->check (units, impl->scope, msg))
         {
           msg.error ("Bad expression");
           return false;
         }
-      impl->expr->tick  (unitc, impl->scope, msg);
+      impl->expr->tick  (units, impl->scope, msg);
       spec_dim = impl->expr->dimension (impl->scope);
     }
 
@@ -775,10 +776,10 @@ Select::initialize (const Unitc& unitc, const Volume&,
 
   // Attempt to find convertion with original dimension.
   if (impl->spec.get ())
-    if (unitc.can_convert (spec_dim, impl->dimension))
-      impl->spec_conv = &unitc.get_convertion (spec_dim, impl->dimension);
+    if (units.can_convert (spec_dim, impl->dimension))
+      impl->spec_conv = &units.get_convertion (spec_dim, impl->dimension);
     else
-      impl->spec_conv = special_convert (unitc, spec_dim, impl->dimension);
+      impl->spec_conv = special_convert (units, spec_dim, impl->dimension);
 
   // Replace '&' with timestep.
   std::string new_dim;
@@ -799,8 +800,8 @@ Select::initialize (const Unitc& unitc, const Volume&,
   // Attempt to find convertion with new dimension.
   if (impl->spec.get () && !impl->spec_conv)
     {
-      if (unitc.can_convert (spec_dim, symbol (hour_dim)))
-	impl->spec_conv = &unitc.get_convertion (spec_dim, symbol (hour_dim));
+      if (units.can_convert (spec_dim, symbol (hour_dim)))
+	impl->spec_conv = &units.get_convertion (spec_dim, symbol (hour_dim));
     }
 
   // Use new dimension.

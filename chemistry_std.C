@@ -265,12 +265,12 @@ ChemistryStandard::tick_soil (const Geometry& geo, const double ponding,
                              chemistry, dt, msg); 
 
   for (size_t r = 0; r < reactions.size (); r++)
-    reactions[r]->tick (unitc,
+    reactions[r]->tick (units,
                         geo, soil, soil_water, soil_heat, organic_matter, 
 			chemistry, dt, msg);
 
   for (size_t c = 0; c < chemicals.size (); c++)
-    chemicals[c]->tick_soil (unitc, geo, soil, soil_water, dt, scope, msg);
+    chemicals[c]->tick_soil (units, geo, soil, soil_water, dt, scope, msg);
 
   for (size_t c = 0; c < chemicals.size (); c++)
     {
@@ -310,7 +310,7 @@ ChemistryStandard::initialize (const AttributeList& al,
   daisy_assert (alists.size () == chemicals.size ());
   
   for (size_t c = 0; c < chemicals.size (); c++)
-    chemicals[c]->initialize (unitc, *alists[c],
+    chemicals[c]->initialize (units, *alists[c],
                               geo, soil, soil_water, soil_heat, 
 			      msg);
 
@@ -328,7 +328,7 @@ ChemistryStandard::check (const Geometry& geo,
   for (size_t c = 0; c < chemicals.size (); c++)
     {
       Treelog::Open nest (msg, "Chemical: '" + chemicals[c]->name  + "'");
-      if (!chemicals[c]->check (unitc,
+      if (!chemicals[c]->check (units,
                                 geo, soil, soil_water, chemistry, scope, msg))
 	ok = false;
     }
@@ -336,7 +336,7 @@ ChemistryStandard::check (const Geometry& geo,
   for (size_t r = 0; r < reactions.size (); r++)
     {
       Treelog::Open nest (msg, "Reaction: '" + reactions[r]->name  + "'");
-      if (!reactions[r]->check (unitc, soil, soil_water, soil_heat,
+      if (!reactions[r]->check (units, soil, soil_water, soil_heat,
                                 chemistry, msg))
 	ok = false;
     }

@@ -1,7 +1,11 @@
 2008-08-27  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* oldunits.C, oldunits.h: Renamed from units.C, units.h.
-
+	* units.h, units.C, convert.h, convert.C: Split from unit.h, unit.C.
+	* Makefile (OTHER): Update.
+	* metalib.h, metalib.C: Move functionality to units.C, units.h.
+	* all: Renamed unitc to units.
+	
 2008-08-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.43 released.

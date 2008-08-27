@@ -81,7 +81,7 @@ struct TertiaryBiopores : public Tertiary, public Tertsmall
   { return use_small_timesteps_; }
 
   // - For use by column.
-  void tick (const Unitc&, const Geometry& geo, const Soil& soil, 
+  void tick (const Units&, const Geometry& geo, const Soil& soil, 
              const SoilHeat& soil_heat, const double dt, 
              SoilWater& soil_water, Surface& surface, Treelog& msg);
 
@@ -116,7 +116,7 @@ struct TertiaryBiopores : public Tertiary, public Tertsmall
   
   // Create and Destroy.
 public:
-  bool initialize (const Unitc&, 
+  bool initialize (const Units&, 
                    const Geometry&, const Soil&, const Scope& parent_scope, 
                    const double pipe_position, Treelog& msg);
   bool check (const Geometry&, Treelog& msg) const;
@@ -256,7 +256,7 @@ TertiaryBiopores::infiltrate (const Geometry& geo, const size_t e,
 }
 
 void
-TertiaryBiopores::tick (const Unitc&, const Geometry& geo, const Soil& soil, 
+TertiaryBiopores::tick (const Units&, const Geometry& geo, const Soil& soil, 
                         const SoilHeat& soil_heat, const double dt, 
                         SoilWater& soil_water, Surface& surface, Treelog& msg)
 {
@@ -610,7 +610,7 @@ TertiaryBiopores::output (Log& log) const
 
 
 bool 
-TertiaryBiopores::initialize (const Unitc& unitc,
+TertiaryBiopores::initialize (const Units& units,
                               const Geometry& geo, const Soil&, 
                               const Scope& scope, const double pipe_position, 
                               Treelog& msg)
@@ -620,7 +620,7 @@ TertiaryBiopores::initialize (const Unitc& unitc,
   for (size_t b = 0; b < classes.size (); b++)
     {
       Treelog::Open nest2 (msg, "classes", b, classes[b]->name);
-      if (!classes[b]->initialize (unitc, geo, scope, pipe_position, msg))
+      if (!classes[b]->initialize (units, geo, scope, pipe_position, msg))
         ok = false;
     }
   const size_t cell_size = geo.cell_size ();

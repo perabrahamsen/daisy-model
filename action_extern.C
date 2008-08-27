@@ -152,17 +152,17 @@ struct ActionExternFertigation : public Action
   {
     daisy_assert (extern_scope)       ;
     ScopeMulti multi (*extern_scope, parent_scope);
-    const Unitc& unitc = daisy.unitc ();
-    if (!surface_expr->tick_value (unitc, surface_value, mm_per_h, multi, msg))
+    const Units& units = daisy.units ();
+    if (!surface_expr->tick_value (units, surface_value, mm_per_h, multi, msg))
       surface_value = 0.0;
-    if (!subsoil_expr->tick_value (unitc, subsoil_value, mm_per_h, multi, msg))
+    if (!subsoil_expr->tick_value (units, subsoil_value, mm_per_h, multi, msg))
       subsoil_value = 0.0;
-    if (!overhead_expr->tick_value (unitc, overhead_value,
+    if (!overhead_expr->tick_value (units, overhead_value,
                                     mm_per_h, multi, msg))
       overhead_value = 0.0;
-    if (!NO3_expr->tick_value (unitc, NO3_value, kg_N_per_ha_per_h, multi, msg))
+    if (!NO3_expr->tick_value (units, NO3_value, kg_N_per_ha_per_h, multi, msg))
       NO3_value = 0.0;
-    if (!NH4_expr->tick_value (unitc, NH4_value, kg_N_per_ha_per_h, multi, msg))
+    if (!NH4_expr->tick_value (units, NH4_value, kg_N_per_ha_per_h, multi, msg))
       NH4_value = 0.0;
   }
 
@@ -181,11 +181,11 @@ struct ActionExternFertigation : public Action
       {
 	static const symbol mg_per_square_m ("mg/m^2");
 	static const symbol kg_per_ha ("kg/ha");
-        const Unitc& unitc = daisy.unitc ();
-        const Unit& u_kg_per_ha = unitc.get_unit (kg_per_ha);
-        const Unit& u_mg_per_square_m = unitc.get_unit (mg_per_square_m);
-        const Unit& u_ppm = unitc.get_unit (Unitc::ppm ());
-        const Unit& u_per_mm = unitc.get_unit (Unitc::per_mm ());
+        const Units& units = daisy.units ();
+        const Unit& u_kg_per_ha = units.get_unit (kg_per_ha);
+        const Unit& u_mg_per_square_m = units.get_unit (mg_per_square_m);
+        const Unit& u_ppm = units.get_unit (Units::ppm ());
+        const Unit& u_per_mm = units.get_unit (Units::per_mm ());
 	IM im (u_mg_per_square_m);
 	im.set_value (Chemical::NH4 (), u_kg_per_ha, NH4_value * dt);
 	im.set_value (Chemical::NO3 (), u_kg_per_ha, NO3_value * dt);
@@ -238,16 +238,16 @@ struct ActionExternFertigation : public Action
     else
       {
         ScopeMulti multi (*extern_scope, parent_scope);
-        const Unitc& unitc = daisy.unitc ();
-	if (!surface_expr->check_dim (unitc, multi, mm_per_h, msg))
+        const Units& units = daisy.units ();
+	if (!surface_expr->check_dim (units, multi, mm_per_h, msg))
 	  ok = false;
-	if (!subsoil_expr->check_dim (unitc, multi, mm_per_h, msg))
+	if (!subsoil_expr->check_dim (units, multi, mm_per_h, msg))
 	  ok = false;
-	if (!overhead_expr->check_dim (unitc, multi, mm_per_h, msg))
+	if (!overhead_expr->check_dim (units, multi, mm_per_h, msg))
 	  ok = false;
-	if (!NH4_expr->check_dim (unitc, multi, kg_N_per_ha_per_h, msg))
+	if (!NH4_expr->check_dim (units, multi, kg_N_per_ha_per_h, msg))
 	  ok = false;
-	if (!NO3_expr->check_dim (unitc, multi, kg_N_per_ha_per_h, msg))
+	if (!NO3_expr->check_dim (units, multi, kg_N_per_ha_per_h, msg))
 	  ok = false;
       }
     return ok;

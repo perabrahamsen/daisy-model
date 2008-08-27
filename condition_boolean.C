@@ -40,7 +40,7 @@ struct ConditionBoolean : public Condition
   mutable enum { isfalse, istrue, missing, uninitialized, error } state;
 
   void tick (const Daisy& daisy, const Scope& scope, Treelog& msg)
-  { expr->tick (daisy.unitc (), scope, msg); }
+  { expr->tick (daisy.units (), scope, msg); }
 
   bool match (const Daisy& daisy, const Scope& scope, Treelog& msg) const
   { 
@@ -48,7 +48,7 @@ struct ConditionBoolean : public Condition
 
     if (state != error)
       {
-        expr->tick (daisy.unitc (), scope, msg);
+        expr->tick (daisy.units (), scope, msg);
         if (expr->missing (scope))
           state = missing;
         else
@@ -78,7 +78,7 @@ struct ConditionBoolean : public Condition
   
     daisy_assert (state == missing);
 
-    if (expr->check (daisy.unitc (), scope, msg))
+    if (expr->check (daisy.units (), scope, msg))
       return true;
 
     state = error;

@@ -1,6 +1,6 @@
 // units.h -- Unit conversions.
 // 
-// Copyright 2007 Per Abrahamsen and KVL.
+// Copyright 2007, 2008 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -21,26 +21,18 @@
 #ifndef UNITS_H
 #define UNITS_H
 
-#include "model.h"
 #include "symbol.h"
+#include <map>
+#include <boost/noncopyable.hpp>
 
-class Block;
 class Metalib;
 class Treelog;
 class Unit;
+class Convert;
+class Syntax;
+class AttributeList;
 
-struct Convert : public boost::noncopyable
-{
-  // Use.
-  virtual double operator()(double value) const = 0;
-  virtual bool valid (double value) const = 0;
-
-  // Create and destroy.
-  Convert ();
-  virtual ~Convert ();
-};
-
-class Unitc : private boost::noncopyable
+class Units : private boost::noncopyable
 {
   // Symbols.
 public:
@@ -72,23 +64,36 @@ public:
   static double unit_convert (const Unit& from, const Unit& to, double value);
   static double multiply (const Unit&, const Unit&, double, const Unit& result);
   static symbol multiply (symbol, symbol);
-  virtual bool can_convert (symbol from, symbol to,
-                            Treelog&) const = 0;
-  virtual bool can_convert (symbol from, symbol to) const = 0;
-  virtual bool can_convert (symbol from, symbol to, double) const = 0;
-  virtual double convert (symbol from, symbol to, double) const = 0;
-  virtual const Unit& get_unit (symbol name) const = 0;
-  
-  // Conversion.
-protected:
+
+  // Content.
+private:
+  typedef std::map<symbol, const Unit*> unit_map;
+  unit_map units;
+  typedef std::map<symbol, const Convert*> convert_map;
+  mutable convert_map conversions;
+  const bool allow_old_;
+
+  // Interface.
+private:
+  bool allow_old () const;
+public:
+  bool has_unit (symbol name) const;
+  const Unit& get_unit (symbol name) const;
+  bool can_convert (symbol from, symbol to, Treelog&) const;
+  bool can_convert (symbol from, symbol to) const;
+  bool can_convert (symbol from, symbol to, double) const;
+  double convert (symbol from, symbol to, double) const;
+private:
   static const Convert* create_convertion (const Unit& from, const Unit& to);
 public:
-  virtual const Convert& get_convertion (symbol from, symbol to) const = 0;
+  const Convert& get_convertion (symbol from, symbol to) const;
 
   // Create and destroy.
-protected:
-  Unitc ();
-  virtual ~Unitc ();
+public:
+  void add_unit (Metalib&, const symbol name);
+  static void load_syntax (Syntax&, AttributeList&);
+  Units (Metalib&);
+  ~Units ();
 };
 
 #endif // UNITS_H

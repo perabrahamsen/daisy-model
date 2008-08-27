@@ -106,20 +106,20 @@ struct CropStandard : public Crop
   { return canopy.EpFactor (DS ()); }
   void CanopyStructure ()
   { canopy.CanopyStructure (development->DS); }
-  double ActualWaterUptake (const Unitc& unitc, double Ept, 
+  double ActualWaterUptake (const Units& units, double Ept, 
                             const Geometry& geo,
 			    const Soil& soil, SoilWater& soil_water,
 			    double EvapInterception, double day_fraction, 
                             const double dt, 
 			    Treelog& msg)
-  { return root_system->water_uptake (unitc, Ept, geo, soil, soil_water, 
+  { return root_system->water_uptake (units, Ept, geo, soil, soil_water, 
                                       EvapInterception, day_fraction,
                                       dt, msg); }
   void force_production_stress  (double pstress)
   { root_system->production_stress = pstress; }
 
   // Simulation.
-  void tick (const Unitc&, const Time& time, double relative_humidity,
+  void tick (const Units&, const Time& time, double relative_humidity,
 	     const double CO2_atm,
 	     const Bioclimate&, const Geometry& geo,
              const Soil&,
@@ -186,7 +186,7 @@ struct CropStandard : public Crop
                    double SoilLimit, const Time&, Treelog&);
   void initialize_shared (const Geometry&, OrganicMatter&, 
                           double SoilLimit, const Time&, Treelog&);
-  bool check (const Unitc&, Treelog&) const;
+  bool check (const Units&, Treelog&) const;
   CropStandard (Block& vl);
   ~CropStandard ();
 };
@@ -272,14 +272,14 @@ CropStandard::initialize_shared (const Geometry& geo,
 }
 
 bool
-CropStandard::check (const Unitc& unitc, Treelog& msg) const
+CropStandard::check (const Units& units, Treelog& msg) const
 {
   Treelog::Open nest (msg, library_id () + ": " + name);
 
   bool ok = true;
   if (!seed->check (msg))
     ok = false;
-  if (!root_system->check (unitc, msg))
+  if (!root_system->check (units, msg))
     ok = false;
   if (seed->initial_N (initial_weight) <= 0.0
       && production.NCrop <= 0.0)
@@ -292,7 +292,7 @@ You must specify initial N content in either 'Prod' or 'Seed'");
 }
 
 void
-CropStandard::tick (const Unitc& unitc,
+CropStandard::tick (const Units& units,
                     const Time& time, const double relative_humidity, 
 		    const double CO2_atm,
 		    const Bioclimate& bioclimate,
@@ -472,7 +472,7 @@ CropStandard::tick (const Unitc& unitc,
       if (bioclimate.shared_light_fraction () > 1e-10)
         {
           // Shared light.
-	  Ass += photo->assimilate (unitc,
+	  Ass += photo->assimilate (units,
                                     ABA_xylem, relative_humidity, CO2_atm,
 				    bioclimate.daily_air_temperature (), 
 				    bioclimate.hourly_canopy_temperature(),
@@ -481,7 +481,7 @@ CropStandard::tick (const Unitc& unitc,
                                     canopy, *development, msg)
             * bioclimate.shared_light_fraction ();
 
-          Ass += photo->assimilate (unitc,
+          Ass += photo->assimilate (units,
                                     ABA_xylem, relative_humidity, CO2_atm,
 				    bioclimate.daily_air_temperature (),
 				    bioclimate.hourly_canopy_temperature(),
@@ -499,7 +499,7 @@ CropStandard::tick (const Unitc& unitc,
           Bioclimate::radiation_distribution 
             (No, LAI (), PARref (), bioclimate.hourly_global_radiation (),
              PARext (), PAR); 
-          Ass += photo->assimilate (unitc,
+          Ass += photo->assimilate (units,
                                     ABA_xylem, relative_humidity, CO2_atm,
 				    bioclimate.daily_air_temperature (), 
 				    bioclimate.hourly_canopy_temperature(),

@@ -44,11 +44,11 @@ Number::known (symbol dim)
 { return dim != Syntax::unknown (); }
 
 bool 
-Number::tick_value (const Unitc& unitc,
+Number::tick_value (const Units& units,
                     double& value, symbol want, const Scope& scope, 
 		    Treelog& msg)
 { 
-  this->tick (unitc, scope, msg);
+  this->tick (units, scope, msg);
   if (this->missing (scope))
     {
       // msg.warning ("Expression '" + name + "' is missing in scope");
@@ -58,7 +58,7 @@ Number::tick_value (const Unitc& unitc,
   value = this->value (scope);
   const symbol has = this->dimension (scope);
       
-  if (!unitc.can_convert (has, want, value))
+  if (!units.can_convert (has, want, value))
     {
       std::ostringstream tmp;
       tmp << "Cannot convert " << value << " [" << has
@@ -66,20 +66,20 @@ Number::tick_value (const Unitc& unitc,
       msg.warning (tmp.str ());
     }
   else
-    value = unitc.convert (has, want, value);
+    value = units.convert (has, want, value);
   
   return true;
 }
 
 bool 
-Number::check_dim (const Unitc& unitc, 
+Number::check_dim (const Units& units, 
                    const Scope& scope, const symbol want, Treelog& msg) const
 {
-  if (!this->check (unitc, scope, msg))
+  if (!this->check (units, scope, msg))
     return false;
 
   const symbol has = this->dimension (scope);
-  if (unitc.can_convert (has, want))
+  if (units.can_convert (has, want))
     return true;
 
   msg.error ("Cannot convert [" + has + "] to [" + want + "]");

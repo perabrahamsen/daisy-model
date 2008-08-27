@@ -42,7 +42,7 @@ struct NumberSource : public Number
     daisy_assert (state != uninitialized);
     return source->title ();
   }
-  void tick (const Unitc&, const Scope&, Treelog&)
+  void tick (const Units&, const Scope&, Treelog&)
   { }
   bool missing (const Scope&) const 
   { 
@@ -74,7 +74,7 @@ struct NumberSource : public Number
       initialize_derived (msg);
     return state != error;
   }
-  bool check (const Unitc&, const Scope&, Treelog&) const
+  bool check (const Units&, const Scope&, Treelog&) const
   { 
     daisy_assert (state != uninitialized);
     return state != error; 

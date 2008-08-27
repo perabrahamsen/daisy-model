@@ -41,7 +41,7 @@ public:
 
   // Simulation.
 public:
-  void tick (const Unitc&,
+  void tick (const Units&,
              const Geometry&,
              const Soil&, SoilWater&, double, 
 	     const SoilHeat&, const Time&, const Scope&, Treelog&)
@@ -51,10 +51,10 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Unitc&,
+  void initialize (const Units&,
                    const Geometry&, const Time&, const Scope&, Treelog&)
   { }
-  bool check (const Unitc&, const Geometry&, const Scope&, Treelog&) const
+  bool check (const Units&, const Geometry&, const Scope&, Treelog&) const
   { return true; }
   GroundwaterFlux (Block& al)
     : Groundwater (al),

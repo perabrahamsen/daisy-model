@@ -86,7 +86,7 @@ RootSystem::potential_water_uptake (const double h_x,
 }
 
 double
-RootSystem::water_uptake (const Unitc& unitc, double Ept_,
+RootSystem::water_uptake (const Units& units, double Ept_,
                           const Geometry& geo,
 			  const Soil& soil,
 			  SoilWater& soil_water,
@@ -201,7 +201,7 @@ RootSystem::water_uptake (const Unitc& unitc, double Ept_,
   water_stress_days += water_stress * day_fraction;
 
   // ABA production.
-  ABAprod->production (unitc, geo, soil_water, H2OExtraction, Density,
+  ABAprod->production (units, geo, soil_water, H2OExtraction, Density,
                        ABAExtraction, msg);
   const double mm_per_cm = 10.0; // [mm/cm]
   if (H2OUpt > 0.0)
@@ -468,10 +468,10 @@ RootSystem::initialize (const Geometry& geo, Treelog& msg)
 }
 
 bool
-RootSystem::check (const Unitc& unitc, Treelog& msg) const
+RootSystem::check (const Units& units, Treelog& msg) const
 {
   bool ok = true;
-  if (!ABAprod->check (unitc, msg))
+  if (!ABAprod->check (units, msg))
     ok = false;
   return ok;
 }

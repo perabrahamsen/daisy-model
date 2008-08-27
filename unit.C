@@ -27,7 +27,7 @@
 #include "syntax.h"
 #include "block.h"
 #include "mathlib.h"
-#include "units.h"
+#include "convert.h"
 #include <sstream>
 
 // Component 'unit'.

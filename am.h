@@ -36,7 +36,7 @@ class Time;
 class AOM;
 class Treelog;
 class VCheck;
-class Unitc;
+class Units;
 
 class AM : public Model
 {

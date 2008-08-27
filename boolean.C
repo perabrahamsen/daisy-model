@@ -54,7 +54,7 @@ Boolean::~Boolean ()
 struct BooleanTrue : public Boolean
 {
   // Simulation.
-  void tick (const Unitc&, const Scope&, Treelog&)
+  void tick (const Units&, const Scope&, Treelog&)
   { }
   bool missing (const Scope&) const
   { return false; }
@@ -64,7 +64,7 @@ struct BooleanTrue : public Boolean
   // Create.
   bool initialize (Treelog&)
   { return true; }
-  bool check (const Unitc&, const Scope&, Treelog&) const
+  bool check (const Units&, const Scope&, Treelog&) const
   { return true; }
   BooleanTrue (Block& al)
     : Boolean (al)
@@ -90,7 +90,7 @@ static struct BooleanTrueSyntax
 struct BooleanFalse : public Boolean
 {
   // Simulation.
-  void tick (const Unitc&, const Scope&, Treelog&)
+  void tick (const Units&, const Scope&, Treelog&)
   { }
   bool missing (const Scope&) const
   { return false; }
@@ -100,7 +100,7 @@ struct BooleanFalse : public Boolean
   // Create.
   bool initialize (Treelog&)
   { return true; }
-  bool check (const Unitc&, const Scope&, Treelog&) const
+  bool check (const Units&, const Scope&, Treelog&) const
   { return true; }
   BooleanFalse (Block& al)
     : Boolean (al)
@@ -127,10 +127,10 @@ struct BooleanOperands : public Boolean
   const std::vector<Boolean*> operand;
 
   // Simulation.
-  void tick (const Unitc& unitc, const Scope& scope, Treelog& msg)
+  void tick (const Units& units, const Scope& scope, Treelog& msg)
   { 
     for (size_t i = 0; i < operand.size (); i++)
-      operand[i]->tick (unitc, scope, msg);
+      operand[i]->tick (units, scope, msg);
   }
   bool missing (const Scope& scope) const
   { 
@@ -156,13 +156,13 @@ struct BooleanOperands : public Boolean
         }
     return ok;
   }
-  bool check (const Unitc& unitc, const Scope& scope, Treelog& msg) const
+  bool check (const Units& units, const Scope& scope, Treelog& msg) const
   { 
     Treelog::Open nest (msg, name);
     bool ok = true;
 
     for (size_t i = 0; i < operand.size (); i++)
-      if (!operand[i]->check (unitc, scope, msg))
+      if (!operand[i]->check (units, scope, msg))
         ok = false;
 
     return ok;

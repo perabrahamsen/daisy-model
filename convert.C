@@ -1,6 +1,6 @@
-// transform.C --- Transformation between two soil components.
+// convert.C -- Unit conversions.
 // 
-// Copyright 2002 Per Abrahamsen and KVL.
+// Copyright 2007, 2008 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -20,37 +20,14 @@
 
 #define BUILD_DLL
 
-#include "transform.h"
-#include "block.h"
-#include "librarian.h"
+#include "convert.h"
 
-const char *const Transform::component = "transform";
+// The 'Convert' Interface.
 
-symbol
-Transform::library_id () const
-{
-  static const symbol id (component);
-  return id;
-}
-
-bool
-Transform::check (const Units&, const Soil&, const SoilWater&, const SoilHeat&, 
-		  Treelog&) const
-{ return true; }
-
-void
-Transform::initialize (const Soil&, Treelog&)
+Convert::Convert ()
 { }
 
-void
-Transform::load_syntax (Syntax&, AttributeList&)
+Convert::~Convert ()
 { }
 
-Transform::Transform (Block&)
-{ }
-
-Transform::~Transform ()
-{ }
-
-static Librarian Transform_init (Transform::component, "\
-Generic transformations between soil components.");
+// unit.C ends here.

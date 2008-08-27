@@ -32,7 +32,7 @@ struct BooleanStringEqual : public Boolean
   const std::vector<std::string> values;
 
   // Simulation.
-  void tick (const Unitc&, const Scope&, Treelog&)
+  void tick (const Units&, const Scope&, Treelog&)
   { }
   bool missing (const Scope&) const
   { return false; }
@@ -50,7 +50,7 @@ struct BooleanStringEqual : public Boolean
   // Create.
   bool initialize (Treelog&)
   { return true; }
-  bool check (const Unitc&, const Scope&, Treelog&) const
+  bool check (const Units&, const Scope&, Treelog&) const
   { return true; }
   BooleanStringEqual (Block& al)
     : Boolean (al),

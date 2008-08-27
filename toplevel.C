@@ -37,11 +37,14 @@
 #include "treelog_text.h"
 #include "treelog_store.h"
 #include "librarian.h"
+#include "units.h"
 
 #include <sstream>
 #include <ctime>
 
-struct Toplevel::Implementation
+#include <boost/noncopyable.hpp>
+
+struct Toplevel::Implementation : boost::noncopyable
 {
   const symbol preferred_ui;
   const std::string program_name;
@@ -63,9 +66,10 @@ struct Toplevel::Implementation
   bool has_daisy_log;
   void add_daisy_log ();
 
-  void reset ();
+  void reset (Metalib::load_syntax_fun load_syntax);
 
-  Implementation (const std::string& preferred_ui);
+  Implementation (Metalib::load_syntax_fun load_syntax, 
+                  const std::string& preferred_ui);
   ~Implementation ();
 };
 
@@ -162,20 +166,22 @@ Toplevel::Implementation::add_daisy_log ()
 }
 
 void
-Toplevel::Implementation::reset ()
+Toplevel::Implementation::reset (const Metalib::load_syntax_fun load_syntax)
 {
   program.reset (NULL);
   start_time = std::time (NULL);
-  metalib.reset ();
+  metalib.reset (load_syntax);
   state = is_unloaded;
   files_found.clear ();
 }
 
-Toplevel::Implementation::Implementation (const std::string& pref_ui)
+Toplevel::Implementation::Implementation (Metalib::load_syntax_fun load_syntax,
+                                          const std::string& pref_ui)
   : preferred_ui (pref_ui),
     program_name ("daisy"),
     program (NULL),
     reg (msg),
+    metalib (load_syntax),
     start_time (std::time (NULL)),
     has_printed_copyright (false),
     state (is_unloaded),
@@ -471,10 +477,7 @@ Toplevel::initialize ()
 
 void
 Toplevel::reset ()
-{ 
-  impl->reset (); 
-  load_syntax (impl->metalib.syntax (), impl->metalib.alist ()); 
-}
+{ impl->reset (load_syntax); }
 
 std::string
 Toplevel::get_arg (int& argc, char**& argv)
@@ -644,6 +647,8 @@ Toplevel::load_run (Syntax& syntax, AttributeList& alist)
   alist.add ("submodel", "Toplevel");
   alist.add ("description", Toplevel::default_description);
 
+  Units::load_syntax (syntax, alist);
+
   syntax.add ("install_directory", Syntax::String, Syntax::Const,
               "Directory where Daisy has been installed.\n\
 \n\
@@ -693,11 +698,6 @@ attributes.");
   syntax.add_object ("ui", UI::component, 
                      Syntax::OptionalState, Syntax::Singleton, 
                      "Top level user interface.");
-
-  syntax.add ("allow_old_units", Syntax::Boolean, Syntax::Const, "\
-OBSOLETE: Set this to true to enable the old system of build-in\n\
-unit conversation.");
-  alist.add ("allow_old_units", true);
 }
 
 void
@@ -711,10 +711,8 @@ Toplevel::load_syntax (Syntax& syntax, AttributeList& alist)
 }
 
 Toplevel::Toplevel (const std::string& preferred_ui)
-  : impl (new Implementation (preferred_ui))
+  : impl (new Implementation (load_syntax, preferred_ui))
 { 
-  load_syntax (impl->metalib.syntax (), impl->metalib.alist ()); 
-
   // We don't use stdio.
   std::ios::sync_with_stdio (false);
 }

@@ -92,7 +92,7 @@ ScopeSoil::dimension (const symbol tag) const
   if (tag == humus)
     return Syntax::fraction ();
   if (tag == h)
-    return Unitc::cm ();
+    return Units::cm ();
   if (tag == Theta)
     return Syntax::none ();
 

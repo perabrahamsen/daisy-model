@@ -99,7 +99,7 @@ private:
 		       const double gsw, const double Tl, const double Vm_25, 
 		       const double rd, Treelog& msg) const = 0;
 public:
-  double assimilate (const Unitc&, 
+  double assimilate (const Units&, 
                      const double ABA_xylem, const double rel_hum, 
 		     const double CO2_atm, double Ta, double Tl,
                      const double cropN,

@@ -44,7 +44,7 @@ struct ReactionStandard : public Reaction
   { output_variable (S_AB, log); }
 
   // Simulation.
-  void tick (const Unitc& unitc,
+  void tick (const Units& units,
              const Geometry&,
 	     const Soil& soil, const SoilWater& soil_water, 
 	     const SoilHeat& soil_heat, const OrganicMatter&,
@@ -60,13 +60,13 @@ struct ReactionStandard : public Reaction
 	AM[i] = A.M_primary (i);
 	BM[i] = B.M_primary (i);
       }
-    transform->tick (unitc, soil, soil_water, soil_heat, AM, BM, S_AB, msg);
+    transform->tick (units, soil, soil_water, soil_heat, AM, BM, S_AB, msg);
     A.add_to_transform_sink (S_AB);
     B.add_to_transform_source (S_AB);
   }
 
   // Create.
-  bool check (const Unitc& unitc,
+  bool check (const Units& units,
               const Soil& soil, const SoilWater& soil_water,
 	      const SoilHeat& soil_heat,
 	      const Chemistry& chemistry, Treelog& msg) const
@@ -82,7 +82,7 @@ struct ReactionStandard : public Reaction
         msg.error ("'" + name_B.name () + "' not traced");
         ok = false;
       }
-    if (!transform->check (unitc, soil, soil_water, soil_heat, msg))
+    if (!transform->check (units, soil, soil_water, soil_heat, msg))
       ok = false;
 
     return ok;

@@ -37,11 +37,11 @@ Movement::library_id () const
 }
 
 void 
-Movement::tick_tertiary (const Unitc& unitc,
+Movement::tick_tertiary (const Units& units,
                          const Geometry& geo, const Soil& soil, 
                          const SoilHeat& soil_heat, const double dt, 
                          SoilWater& soil_water, Surface& surface, Treelog& msg)
-{  tertiary->tick (unitc, geo, soil, soil_heat, dt, soil_water, surface, msg); }
+{  tertiary->tick (units, geo, soil, soil_heat, dt, soil_water, surface, msg); }
 
 void 
 Movement::output (Log& log) const
@@ -67,7 +67,7 @@ Movement::check (Treelog& msg) const
 }
 
 bool
-Movement::initialize (const Unitc& unitc,
+Movement::initialize (const Units& units,
                       const Soil& soil, const Groundwater& groundwater,
                       const Scope& scope, Treelog& msg)
 {
@@ -77,7 +77,7 @@ Movement::initialize (const Unitc& unitc,
   const double pipe_position = groundwater.is_pipe ()
     ? groundwater.pipe_height ()
     : 42.42e42;
-  if (!tertiary->initialize (unitc, geometry (),
+  if (!tertiary->initialize (units, geometry (),
                              soil, scope, pipe_position, msg))
     ok = false;
   

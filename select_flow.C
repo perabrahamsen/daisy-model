@@ -54,7 +54,7 @@ private:
   // Create and Destroy.
 private:
   symbol default_dimension (const symbol spec_dim) const;
-  bool initialize (const Unitc&, const Volume& volume,
+  bool initialize (const Units&, const Volume& volume,
 		   const std::string& timestep, Treelog& msg);
   bool check_border (const Border& border, 
                      const Volume& default_volume,
@@ -83,16 +83,16 @@ SelectFlow::default_dimension (const symbol spec_dim) const
   if (density)
     return spec_dim;
   
-  return Unitc::multiply (spec_dim, Unitc::cm2 ());
+  return Units::multiply (spec_dim, Units::cm2 ());
 }
 
 bool 
-SelectFlow::initialize (const Unitc& unitc, const Volume& default_volume,
+SelectFlow::initialize (const Units& units, const Volume& default_volume,
                         const std::string& timestep, Treelog& msg)
 {
   bool ok = true;
 
-  if (!Select::initialize (unitc, default_volume, timestep, msg))
+  if (!Select::initialize (units, default_volume, timestep, msg))
     ok = false;
 
   if (!volume->limit (default_volume, msg))

@@ -52,9 +52,9 @@
 const char *const Daisy::default_description = "\
 The Daisy crop/soil/atmosphere model.";
 
-const Unitc& 
-Daisy::unitc () const
-{ return metalib.unitc (); }
+const Units& 
+Daisy::units () const
+{ return metalib.units (); }
 
 void 
 Daisy::attach_ui (Run* run, const std::vector<Log*>& logs)

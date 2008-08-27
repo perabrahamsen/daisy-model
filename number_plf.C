@@ -68,8 +68,8 @@ struct NumberPLF : public Number
   bool operand_missing;
 
   // Simulation.
-  void tick (const Unitc& unitc, const Scope& scope, Treelog& msg)
-  { operand_missing = !operand->tick_value (unitc, operand_value,
+  void tick (const Units& units, const Scope& scope, Treelog& msg)
+  { operand_missing = !operand->tick_value (units, operand_value,
                                             domain, scope, msg); }
   bool missing (const Scope& scope) const 
   { return operand_missing; }
@@ -84,10 +84,10 @@ struct NumberPLF : public Number
     Treelog::Open nest (err, name);
     return operand->initialize (err); 
   }
-  bool check (const Unitc& unitc, const Scope& scope, Treelog& err) const
+  bool check (const Units& units, const Scope& scope, Treelog& err) const
   { 
     Treelog::Open nest (err, name);
-    return operand->check_dim (unitc, scope, domain, err); 
+    return operand->check_dim (units, scope, domain, err); 
   }
   static bool check_alist (const AttributeList& al, Treelog& msg) 
   {
@@ -114,7 +114,7 @@ struct NumberPLF : public Number
 
 	if (domain != Syntax::unknown () && x_dim != Syntax::unknown ())
 	  try
-	    { x = unitc.convert (x_dim, domain, x); }
+	    { x = units.convert (x_dim, domain, x); }
 	  catch (const std::string& err)
 	    { 
 	      msg.error (err);
@@ -134,7 +134,7 @@ struct NumberPLF : public Number
 	const symbol y_dim = point.y_dimension;
 	if (domain != Syntax::unknown () && y_dim != Syntax::unknown ())
 	  try
-	    { (void) unitc.convert (x_dim, domain, x); }
+	    { (void) units.convert (x_dim, domain, x); }
 	  catch (const std::string& err)
 	    { 
 	      msg.error (err);
@@ -147,7 +147,7 @@ struct NumberPLF : public Number
 
   static const PLF build_plf (Block& al) 
   {
-    const Unitc& unitc = al.unitc ();
+    const Units& units = al.units ();
     const symbol domain (al.identifier ("domain"));
     const symbol range (al.identifier ("range"));
     const auto_vector<const Point*> points 
@@ -162,11 +162,11 @@ struct NumberPLF : public Number
 	double x = point.x_value;
 	const symbol x_dim = point.x_dimension;
 	if (domain != Syntax::unknown () && x_dim != Syntax::unknown ())
-	  x = unitc.convert (x_dim, domain, x);
+	  x = units.convert (x_dim, domain, x);
 	double y = point.y_value;
 	const symbol y_dim = point.y_dimension;
 	if (range != Syntax::unknown () && y_dim != Syntax::unknown ())
-	  y = unitc.convert (y_dim, range, y);
+	  y = units.convert (y_dim, range, y);
 	
 	plf.add (x, y);
       }

@@ -34,7 +34,7 @@
 struct SourceMerge : public Source
 {
   // Content.
-  const Unitc& unitc;
+  const Units& units;
   const std::vector<Source*> source;
   const symbol title_;
   symbol dimension_;
@@ -116,7 +116,7 @@ SourceMerge::load (Treelog& msg)
       // Set or check dimension.
       if (dimension_ == Syntax::unknown ())
         dimension_ = source[i]->dimension ();
-      else if (!unitc.can_convert (source[i]->dimension (), dimension_))
+      else if (!units.can_convert (source[i]->dimension (), dimension_))
         {
           msg.error ("Cannot convert dimension from [" 
                      + source[i]->dimension () + "] to ["
@@ -191,7 +191,7 @@ SourceMerge::load (Treelog& msg)
 
 SourceMerge::SourceMerge (Block& al)
   : Source (al),
-    unitc (al.unitc ()),
+    units (al.units ()),
     source (Librarian::build_vector<Source> (al, "source")),
     title_ (al.name ("title")),
     dimension_ (al.name ("dimension", Syntax::Unknown ())),

@@ -139,12 +139,12 @@ void
 ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
 { 
   // Units.
-  const Unitc& unitc = daisy.unitc ();
+  const Units& units = daisy.units ();
   static const symbol mg_per_square_m ("mg/m^2");
-  const Unit& u_mg_per_square_m = unitc.get_unit (mg_per_square_m);
-  const Unit& u_ppm = unitc.get_unit (Unitc::ppm ());
-  const Unit& u_per_mm = unitc.get_unit (Unitc::per_mm ());
-  const Unit& u_solute = unitc.get_unit (IM::solute_unit ());
+  const Unit& u_mg_per_square_m = units.get_unit (mg_per_square_m);
+  const Unit& u_ppm = units.get_unit (Units::ppm ());
+  const Unit& u_per_mm = units.get_unit (Units::per_mm ());
+  const Unit& u_solute = units.get_unit (IM::solute_unit ());
 
   if (sow.get () && sow_dates.find (daisy.time) != sow_dates.end ())
     sow->doIt (daisy, scope, msg);

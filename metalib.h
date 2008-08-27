@@ -25,6 +25,7 @@
 #include "symbol.h"
 #include <memory>
 #include <vector>
+#include <boost/noncopyable.hpp>
 
 class Path;
 class Syntax;
@@ -32,7 +33,7 @@ class AttributeList;
 class Library;
 class Model;
 class Treelog;
-class Unitc;
+class Units;
 class Unit;
 
 #ifdef __unix
@@ -45,7 +46,7 @@ class Unit;
 #define EXPORT __declspec(dllimport)
 #endif
 
-class EXPORT Metalib
+class EXPORT Metalib : boost::noncopyable
 {
   // Content.
   class Implementation;
@@ -53,7 +54,7 @@ class EXPORT Metalib
 
   // Interface.
 public:
-  const Unitc& unitc () const;
+  const Units& units () const;
   const Unit& get_unit (symbol name) const;
   Path& path () const;
   Syntax& syntax () const;
@@ -69,11 +70,9 @@ public:
 
   // Create and Destroy.
 public:
-  void reset ();
-private:
-  Metalib (const Metalib&);
-public:
-  explicit Metalib ();
+  typedef void load_syntax_fun (Syntax& syntax, AttributeList&);
+  void reset (load_syntax_fun);
+  explicit Metalib (load_syntax_fun);
   ~Metalib ();
 };
 

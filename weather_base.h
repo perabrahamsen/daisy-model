@@ -28,7 +28,7 @@ class WeatherBase : public Weather
 {
   // Units.
 protected:
-  const Unitc& unitc;
+  const Units& units;
 
   // Location.
 protected:

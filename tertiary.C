@@ -58,7 +58,7 @@ class TertiaryNone : public Tertiary
   { return false; }
 
   // Simulation.
-  void tick (const Unitc&, const Geometry&, const Soil&, const SoilHeat&,
+  void tick (const Units&, const Geometry&, const Soil&, const SoilHeat&,
              const double dt, SoilWater&, Surface&, Treelog&)
   { }
   Tertsmall& implicit ()
@@ -72,7 +72,7 @@ class TertiaryNone : public Tertiary
   { }
 
   // Create and Destroy.
-  bool initialize (const Unitc&, const Geometry&, const Soil&, const Scope&,  
+  bool initialize (const Units&, const Geometry&, const Soil&, const Scope&,  
                    const double /* pipe_position */, Treelog&)
   { return true; }
   bool check (const Geometry&, Treelog&) const

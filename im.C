@@ -64,14 +64,14 @@ double
 IM::get_value (const symbol chem, const Unit& other) const
 {
   daisy_assert (unit);
-  return Unitc::unit_convert (*unit, other, get_value_raw (chem)); 
+  return Units::unit_convert (*unit, other, get_value_raw (chem)); 
 }
 
 void 
 IM::set_value (const symbol chem, const Unit& other, const double value)
 {
   daisy_assert (unit);
-  set_value_raw (chem, Unitc::unit_convert (other, *unit, value)); 
+  set_value_raw (chem, Units::unit_convert (other, *unit, value)); 
 }
 
 void 
@@ -120,7 +120,7 @@ IM::rebase (const Unit& other)
   for (std::map<symbol, double>::iterator i = content.begin (); 
        i != content.end ();
        i++)
-    (*i).second = Unitc::unit_convert (*unit, other, (*i).second);
+    (*i).second = Units::unit_convert (*unit, other, (*i).second);
   unit = &other;
 }
 
@@ -133,7 +133,7 @@ IM::operator += (const IM& n)
   for (std::map<symbol, double>::const_iterator i = n.content.begin (); 
        i != n.content.end ();
        i++)
-    content[(*i).first] += Unitc::unit_convert (*n.unit, *unit, (*i).second);
+    content[(*i).first] += Units::unit_convert (*n.unit, *unit, (*i).second);
 }
 
 IM
@@ -151,7 +151,7 @@ IM::multiply_assign (const Scalar& s, const Unit& u)
   for (std::map<symbol, double>::iterator i = content.begin (); 
        i != content.end ();
        i++)
-    (*i).second = Unitc::multiply (*unit, s.unit (),
+    (*i).second = Units::multiply (*unit, s.unit (),
                                    (*i).second * s.value (), u);
   unit = &u;
 }
@@ -186,7 +186,7 @@ IM::IM (Block& parent, const char *const key)
   // Find dimension.
   const Syntax& parent_syntax = parent.find_syntax (key);
   const Syntax& syntax = parent_syntax.syntax (key);
-  unit = &(parent.unitc ().get_unit (symbol (syntax.dimension ("value"))));
+  unit = &(parent.units ().get_unit (symbol (syntax.dimension ("value"))));
   
   // Find content.
   const std::vector<const AttributeList*>& alists = parent.alist_sequence (key);
