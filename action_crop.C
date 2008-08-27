@@ -37,7 +37,7 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include "vegetation.h"
-#include "unit.h"
+#include "units.h"
 #include <sstream>
 
 struct ActionCrop : public Action

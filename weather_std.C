@@ -30,7 +30,7 @@
 #include "plf.h"
 #include <sstream>
 #include "mathlib.h"
-#include "unit.h"
+#include "units.h"
 #include "submodeler.h"
 #include "check.h"
 #include "vcheck.h"

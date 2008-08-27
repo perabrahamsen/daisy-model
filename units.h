@@ -1,6 +1,6 @@
-// units.h -- conversion between different dimensions.
+// units.h -- Unit conversions.
 // 
-// Copyright 2002 Per Abrahamsen and KVL.
+// Copyright 2007 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -18,21 +18,30 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-
 #ifndef UNITS_H
 #define UNITS_H
 
+#include "model.h"
 #include "symbol.h"
-#include <string>
 
-static class Units
+class Block;
+class Metalib;
+class Treelog;
+class Unit;
+
+struct Convert : public boost::noncopyable
 {
-  // Content.
-private:
-  struct Content;
-  static Content* content;
-  static int count;
+  // Use.
+  virtual double operator()(double value) const = 0;
+  virtual bool valid (double value) const = 0;
 
+  // Create and destroy.
+  Convert ();
+  virtual ~Convert ();
+};
+
+class Unitc : private boost::noncopyable
+{
   // Symbols.
 public:
   static symbol h ();
@@ -45,51 +54,41 @@ public:
   static symbol cm3 ();
   static symbol per_h ();
   static symbol ppm ();
-
-  // Conversion.
-public:
-  struct Convert
+  
+  // Special conversion rules.
+private:
+  static struct special_convert_type
   {
-    // Use.
-    virtual double operator()(double value) const = 0;
-    virtual bool valid (double value) const;
-
-    // Create and destroy.
-    Convert ();
-    virtual ~Convert ();
-  };
+    const symbol from;
+    const symbol to;
+    const double factor;
+  } special_convert[];
+  static const size_t special_convert_size;
+  static double base_convert (symbol from, symbol to, double value);
 
   // Utilities.
 public:
-  static void add (const std::string& from, const std::string& to,
-		   double factor, double offset = 0.0);
-  static void add (const std::string& from, const std::string& to, Convert&);
-  static double convert (const std::string& from, const std::string& to,
-                         double value);
-  static bool can_convert (const std::string& from, const std::string& to);
-  static bool can_convert (const std::string& from, const std::string& to,
-                           double value);
-  static const Convert& get_convertion (const std::string& from,
-                                        const std::string& to);
-  static std::string multiply (const std::string&, const std::string&);
-
-public:
-  // Variants using symbol instead of std::string.
-  static void add (symbol from, symbol to, double factor, double offset = 0.0);
-  static void add (symbol from, symbol to, Convert&);
-  static double convert (symbol from, symbol to, double value);
-  static bool can_convert (symbol from, symbol to);
-  static bool can_convert (symbol from, symbol to, double value);
-  static const Convert& get_convertion (symbol from, symbol to);
+  static bool compatible (const Unit& from, const Unit& to);
+  static double unit_convert (const Unit& from, const Unit& to, double value);
+  static double multiply (const Unit&, const Unit&, double, const Unit& result);
   static symbol multiply (symbol, symbol);
+  virtual bool can_convert (symbol from, symbol to,
+                            Treelog&) const = 0;
+  virtual bool can_convert (symbol from, symbol to) const = 0;
+  virtual bool can_convert (symbol from, symbol to, double) const = 0;
+  virtual double convert (symbol from, symbol to, double) const = 0;
+  virtual const Unit& get_unit (symbol name) const = 0;
+  
+  // Conversion.
+protected:
+  static const Convert* create_convertion (const Unit& from, const Unit& to);
+public:
+  virtual const Convert& get_convertion (symbol from, symbol to) const = 0;
 
   // Create and destroy.
-private:
-  Units (const Units&);
-  static void standard_conversions ();
-public:
-  Units ();
-  ~Units ();
-} units;
+protected:
+  Unitc ();
+  virtual ~Unitc ();
+};
 
 #endif // UNITS_H

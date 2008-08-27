@@ -27,7 +27,7 @@
 #include "daisy.h"
 #include "chemical.h"
 #include "number.h"
-#include "unit.h"
+#include "units.h"
 #include "field.h"
 #include "im.h"
 #include "check.h"

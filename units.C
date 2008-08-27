@@ -1,6 +1,6 @@
-// units.C -- conversion between different dimensions.
+// units.C -- Unit conversions.
 // 
-// Copyright 2002 Per Abrahamsen and KVL.
+// Copyright 2007, 2008 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -21,593 +21,221 @@
 #define BUILD_DLL
 
 #include "units.h"
-#include "syntax.h"
-#include "mathlib.h"
-#include "memutils.h"
-#include <map>
+#include "oldunits.h"
+#include "unit.h"
 
-struct Units::Content
-{
-  typedef std::map<std::string, Convert*> to_type;
-  typedef std::map<std::string, to_type> table_type;
-  table_type table;
+// The 'Convert' Interface.
 
-  static bool time_match (const std::string& from, const std::string& to);
-  static const std::string crop_time (const std::string&);
-  
-  double convert (const std::string& from, const std::string& to,
-		  double value) const;
-  bool can_convert (const std::string& from, const std::string& to) const;
-  bool can_convert (const std::string& from, const std::string& to,
-		    double value) const;
-  const Convert& get_convertion (const std::string& from,
-				 const std::string& to) const;
-
-  Content ();
-  ~Content ();
-};  
-
-bool				// True iff FROM and TO have same time unit.
-Units::Content::time_match (const std::string& from, const std::string& to)
-{
-  const size_t from_size = from.size ();
-  const size_t to_size = to.size ();
-
-  for (int i = 1; true; i++)
-    {
-      if (i > from_size || i > to_size)
-	return false;
-
-      const char from_c = from[from_size - i];
-      const char to_c = to[to_size - i];
-      
-      if (from_c != to_c)
-	return false;
-      
-      if (from_c == '/')
-	return true;
-    }
-}
-
-const std::string			// Return DIM without time.
-Units::Content::crop_time (const std::string& dim)
-{
-  daisy_assert (dim.size () > 0);
-  size_t end;
-  for (end = dim.size () - 1; dim[end] != '/'; end--)
-    daisy_assert (end > 0);
-  std::string result;
-  for (int i = 0; i < end; i++)
-    result += dim[i];
-  return result;
-}
-
-double 
-Units::Content::convert (const std::string& from, const std::string& to, 
-			 double value) const
-{ 
-  if (from == to)
-    return value;
-
-  const Units::Convert& conv = get_convertion (from, to);
-
-  if (!conv.valid (value))
-    throw std::string ("invalid value");
-
-  return conv (value);
-}
-
-bool 
-Units::Content::can_convert (const std::string& from,
-			     const std::string& to) const
-{ 
-  if (from == to)
-    return true;
-
-  try 
-    {
-      get_convertion (from, to);
-    }
-  catch (...)
-    {
-      return false;
-    }
-  return true;
-}
-
-bool 
-Units::Content::can_convert (const std::string& from, const std::string& to, 
-			     double value) const
-{ 
-  if (from == to)
-    return true;
-
-  try 
-    {
-      const Units::Convert& conv = get_convertion (from, to);
-      if (!conv.valid (value))
-	return false;
-    }
-  catch (...)
-    {
-      return false;
-    }
-  return true;
-}
-
-static const class ConvertIdentity : public Units::Convert
-{
-  double operator() (double value) const
-  { return value; }
-public:
-  ConvertIdentity ()
-  { }
-} convert_identity;
-
-const Units::Convert&
-Units::Content::get_convertion (const std::string& from,
-				const std::string& to) const
-{ 
-  if (from == to)
-    return convert_identity;
-
-  table_type::const_iterator i = table.find (from);
-  if (i == table.end ())
-    {
-      // We check if we can convert without time.
-      if (time_match (from, to))
-	{
-	  const std::string from_c = crop_time (from);
-	  table_type::const_iterator i_c = table.find (from_c);
-	  if (i_c != table.end ())
-	    {
-	      const std::string to_c = crop_time (to);
-	      to_type::const_iterator j_c = (*i_c).second.find (to_c);
-	      if (j_c != (*i_c).second.end ())
-		return *(*j_c).second;
-	    }
-	}
-      throw std::string ("Convert [") + from 
-	+ "] unknown dimension, expected [" + to + "]";
-    }
-  to_type::const_iterator j = (*i).second.find (to);
-  if (j == (*i).second.end ())
-    throw std::string ("Cannot convert [") + from + "] to [" + to + "]";
-
-  return *(*j).second;
-}
-
-Units::Content::Content ()
+Convert::Convert ()
 { }
-  
-Units::Content::~Content ()
-{
-  for (table_type::iterator i = table.begin ();
-       i != table.end ();
-       i++)
-    for (to_type::iterator j = (*i).second.begin ();
-	 j != (*i).second.end ();
-	 j++)
-      map_delete ((*i).second.begin (), (*i).second.begin ());
-}
 
-Units::Content* Units::content = NULL;
-int Units::count = 0;
+Convert::~Convert ()
+{ }
+
+// The 'Unitc' Interface.
 
 symbol
-Units::h ()
+Unitc::h ()
 {
   static const symbol unit ("h");
   return unit;
 }
 
 symbol
-Units::mm ()
+Unitc::mm ()
 {
   static const symbol unit ("mm");
   return unit;
 }
 
 symbol
-Units::per_mm ()
+Unitc::per_mm ()
 {
   static const symbol unit ("mm^-1");
   return unit;
 }
 
 symbol
-Units::mm_per_h ()
+Unitc::mm_per_h ()
 {
   static const symbol unit ("mm/h");
   return unit;
 }
 
 symbol
-Units::cm ()
+Unitc::cm ()
 {
   static const symbol unit ("cm");
   return unit;
 }
 
 symbol
-Units::cm_per_h ()
+Unitc::cm_per_h ()
 {
   static const symbol unit ("cm/h");
   return unit;
 }
 
 symbol
-Units::cm2 ()
+Unitc::cm2 ()
 {
   static const symbol unit ("cm^2");
   return unit;
 }
 
 symbol
-Units::cm3 ()
+Unitc::cm3 ()
 {
   static const symbol unit ("cm^3");
   return unit;
 }
 
 symbol
-Units::per_h ()
+Unitc::per_h ()
 {
   static const symbol unit ("h^-1");
   return unit;
 }
 
 symbol
-Units::ppm ()
+Unitc::ppm ()
 {
   static const symbol unit ("ppm");
   return unit;
 }
 
-bool
-Units::Convert::valid (double) const
-{ return true; }
-
-Units::Convert::Convert ()
-{ }
-
-Units::Convert::~Convert ()
-{ }
-
-struct ConvertLinear : public Units::Convert
-{
-  const double factor;
-  const double offset;
-    
-  double operator() (double value) const
-  { return value * factor + offset; }
-
-  ConvertLinear (double f, double o)
-    : factor (f),
-      offset (o)
-  { }
+Unitc::special_convert_type
+Unitc::special_convert[] = {
+  // We assume length is cm H2O, and convert to hPa.
+  { symbol ("m") /* cm H2O */, Unit::pressure () /* hPa */, 10000.0 },
+  // We assume mass per volume is mg solute in l H2O, and convert to ppm.
+  { Unit::mass_per_volume () /* mg/l */, symbol ("") /* ppm */, 0.001 },
+  // We assume amount of substance is mol photons in PAR and convert to Watt.
+  { Unit::amount_of_substance_per_area_per_time () /* mol/m^2/s */,
+    Unit::energy_per_area_per_time () /* W/m^2 */,
+    1.0 / 0.0000046 }
 };
 
-void 
-Units::add (const std::string& from, const std::string& to,
-	    double factor, double offset)
-{ 
-  daisy_assert (content);
-  if (!(content->table[from].find (to) == content->table[from].end ()))
-    daisy_warning ("convert from [" + from + "] to [" + to + "] duplicate\n");
-  else
-    content->table[from][to] = new ConvertLinear (factor, offset);
-  // Reverse conversion.
-  daisy_assert (std::isnormal (factor));
-  if (!(content->table[to].find (from) == content->table[to].end ()))
-    daisy_warning ("convert from [" + from + "] to [" + to + "] reverse\n");
-  else
-    content->table[to][from] = new ConvertLinear (1.0 / factor, 
-                                                  -offset / factor);
+const size_t 
+Unitc::special_convert_size 
+/**/ = sizeof (Unitc::special_convert) / sizeof (Unitc::special_convert_type);
+
+double
+Unitc::base_convert (const symbol from, const symbol to,
+                     const double value)
+{
+  if (from == to)
+    return value;
+  
+  for (size_t i = 0; i < special_convert_size; i++)
+    if (from == special_convert[i].from && to == special_convert[i].to)
+      return value * special_convert[i].factor;
+    else if (from == special_convert[i].to && to == special_convert[i].from)
+      return value / special_convert[i].factor;
+  
+  throw "Cannot convert base [" + from + "] to [" + to + "]";
 }
 
-void 
-Units::add (const std::string& from, const std::string& to, Convert& convert)
+bool 
+Unitc::compatible (const Unit& from_unit, const Unit& to_unit)
 {
-  daisy_assert (content);
-  daisy_assert (content->table[from].find (to) == content->table[from].end ());
-  content->table[from][to] = &convert;
+  const symbol from = from_unit.base_name ();
+  const symbol to = to_unit.base_name ();
+  if (from == to)
+    return true;
   
+  // Special convertions.
+  for (size_t i = 0; i < special_convert_size; i++)
+    if (from == special_convert[i].from && to == special_convert[i].to)
+      return true; 
+    else if (from == special_convert[i].to && to == special_convert[i].from)
+      return true;
+  
+  return false;
+}
+
+double
+Unitc::unit_convert (const Unit& from, const Unit& to,
+                     const double value)
+{
+  if (!compatible (from, to))
+    throw std::string ("Cannot convert [") + from.name 
+      + "] with base [" + from.base_name () + "] to [" + to.name
+      + "] with base [" + to.base_name () + "]";
+
+  const double from_base = from.to_base (value);
+  const double to_base = base_convert (from.base_name (),
+                                       to.base_name (), 
+                                       from_base);
+  const double native = to.to_native (to_base);
+  
+#if 0
+  std::ostringstream tmp;
+  tmp << "Converting " << value << " [" << from.name << "] to " << native 
+      << " [" << to.name << "] through " << from_base << " [" 
+      << from.base_name () << "]";
+  if (from.base_name () == to.base_name ())
+    daisy_approximate (from_base, to_base);
+  else
+    tmp << " and " << to_base << " [" << to.base_name () << "]";
+  Assertion::message (tmp.str ());
+#endif
+
+  return native;
 }
 
 double 
-Units::convert (const std::string& from, const std::string& to, double value)
-{ 
-  daisy_assert (content);
-  return content->convert (from, to, value);
-}
-
-bool
-Units::can_convert (const std::string& from, const std::string& to)
-{ 
-  daisy_assert (content);
-  return content->can_convert (from, to);
-}
-
-bool
-Units::can_convert (const std::string& from, const std::string& to, 
-		    double value)
-{ 
-  daisy_assert (content);
-  return content->can_convert (from, to, value);
-}
-
-const Units::Convert&
-Units::get_convertion (const std::string& from, const std::string& to)
+Unitc::multiply (const Unit& a, const Unit& b, double value, const Unit& result)
 {
-  daisy_assert (content);
-  return content->get_convertion (from, to);
+  const symbol ab = multiply (a.name, b.name);
+  return Oldunits::convert (ab, result.name, value);
 }
-
-std::string
-Units::multiply (const std::string& one, const std::string& two)
-{ 
-  if (one == Syntax::None () || one == Syntax::Fraction ())
-    return two;
-  if (two == Syntax::None () || two == Syntax::Fraction ())
-    return one;
-  if (one == Syntax::Unknown () || two == Syntax::Unknown ())
-    return Syntax::Unknown ();
-
-  static const struct multiply_table
-  { 
-    const char* one;
-    const char* two;
-    const char* result;
-  } table[] = { 
-    // select_interval.C
-    { "h^-1", "cm", "cm/h" },
-    { "cm^3/cm^3", "cm", "cm" },
-    { "cm^3/cm^3/h", "cm", "cm/h" },
-    { "g/cm^3", "cm", "g/cm^2" },
-    { "g C/cm^3", "cm", "g C/cm^2" },
-    { "g N/cm^3", "cm", "g N/cm^2" },
-    { "g/cm^3/h", "cm", "g/cm^2/h" },
-    { "g C/cm^3/h", "cm", "g C/cm^2/h" },
-    { "g N/cm^3/h", "cm", "g N/cm^2/h" }, 
-    { "g CO_2-C/cm^3/h", "cm", "g CO_2-C/cm^2/h"},
-    // select_flow.C
-    { "cm/h", "cm^2", "cm^3/h" },
-    { "g/cm^2/h", "cm^2", "g/h" },   
-    // select_volume.C
-    { "h^-1", "cm^3", "cm^3/h" },
-    { "cm^3/cm^3", "cm^3", "cm^3" },
-    { "cm^3/cm^3/h", "cm^3", "cm^3/h" },
-    { "g/cm^3", "cm^3", "g" },
-    { "g C/cm^3", "cm^3", "g C" },
-    { "g N/cm^3", "cm^3", "g N" },
-    { "g/cm^3/h", "cm^3", "g/h" },
-    { "g C/cm^3/h", "cm^3", "g C/h" },
-    { "g N/cm^3/h", "cm^3", "g N/h" }, 
-    { "g CO_2-C/cm^3/h", "cm^3", "g CO_2-C/h"},
-    // im.C
-    { "g/cm^2/mm", "mm/h", "g/cm^2/h"},
-    { "g/cm^2/mm", "mm", "g/cm^2"},
-    { "g/cm^2/h", "h", "g/cm^2"},
-    { "mg/m^2", "mm^-1", "ppm"},
-    { "g/cm^2", "h^-1", "g/cm^2/h"},    
-  };
-  
-  for (unsigned int i = 0; i < sizeof (table) / sizeof (multiply_table); i++)
-    if ((one == table[i].one && two == table[i].two)
-	|| (two == table[i].one && one == table[i].two))
-      return table[i].result;
-
-  if (one == two + "^-1" || one + "^-1" == two)
-    return Syntax::None ();
-
-  return Syntax::Unknown ();
-}
-
-void 
-Units::add (symbol from, symbol to, double factor, double offset)
-{ add (from.name (), to.name (), factor, offset); }
-
-void 
-Units::add (symbol from, symbol to, Convert& conv)
-{ add (from.name (), to.name (), conv); }
-
-double 
-Units::convert (symbol from, symbol to, double value)
-{ return convert (from.name (), to.name (), value); }
-
-bool 
-Units::can_convert (symbol from, symbol to)
-{ return can_convert (from.name (), to.name ()); }
-
-bool 
-Units::can_convert (symbol from, symbol to, double value)
-{ return can_convert (from.name (), to.name (), value); }
-
-const Units::Convert& 
-Units::get_convertion (const symbol from, const symbol to)
-{ return get_convertion (from.name (), to.name ()); }
 
 symbol
-Units::multiply (const symbol a, const symbol b)
-{ return symbol (multiply (a.name (), b.name ())); }
-
-// GCC 2.95 requires these to be defined outside a function.
-static class Convert_pF_cm_ : public Units::Convert
+Unitc::multiply (const symbol a, const symbol b)
 {
-  bool valid (double value) const
-  { return value >= 0.0; }
-  double operator() (double value) const
-  { return pF2h (value); }
-} Convert_pF_cm;
+  return Oldunits::multiply (a, b);
+}
 
-static class Convert_cm_pF_ : public Units::Convert
+const Convert*
+Unitc::create_convertion (const Unit& from, const Unit& to)
 {
-  bool valid (double value) const
-  { return value < 0.0; }
-  double operator() (double value) const
+  // Maybe 'from' knows a smart way.
+  const Convert* from_convert = from.create_convertion (to);
+  if (from_convert)
+    return from_convert;
+
+  // It doesn't seem that way.  Try a generic solution.
+  struct ConvertGeneric : public Convert
   {
-    if (value >= 0.0)
-#if 0
-      throw "Cannot represent non-negative pressure as pF";
-#else 
-      return -1.0;
-#endif
-    return h2pF (value); 
-  }
-} Convert_cm_pF;
-
-static class Convert_kPa_pF_ : public Units::Convert
-{
-  bool valid (double value) const
-  { return value < 0.0; }
-  double operator() (double value) const
-  { 
-    if (value >= 0.0)
-#if 0
-      throw "Cannot represent non-negative pressure as pF";
-#else 
-      return -1.0;
-#endif
-    return h2pF (value * 10.0); 
-  }
-} Convert_kPa_pF;
-
-void
-Units::standard_conversions ()
-{
-  // Parameters.
-  add ("m", "cm", 100.0);
-  add ("pF", "cm", Convert_pF_cm);
-  add ("cm", "pF", Convert_cm_pF);
-  add ("kPa", "pF", Convert_kPa_pF);
-  add ("cm", "hPa", 1.0);
-  add ("cm", "kPa", 0.1);
-  add ("hPa", "kPa", 0.1);
-  add ("cm", "Pa", 100.0);
-  add ("s^-1", "h^-1", 60.0 * 60.0);
-  add ("d^-1", "h^-1", 1.0/24.0);
-  add ("d", "h", 24.0);
-  add ("mm/d", "mm/h", 1.0/24.0);
-  add ("m/s", "cm/h", 100.0 * 60.0 * 60.0);
-  add ("m/s", "cm/d", 100.0 * 60.0 * 60.0 * 24.0);
-  add ("m/d", "cm/h", 100.0 / 24.0);
-  add ("cm/d", "cm/h", 1.0/24.0);
-  add ("mm/h", "cm/h", 0.1);
-  add ("mm/d", "cm/h", 0.1/24.0);
-  add ("T w.w./ha", "Mg w.w./ha", 1.0);
-  add ("kg w.w./ha", "g w.w./m^2", 0.1);
-  add ("ppm", "mg N/l", 1.0);
-  add ("ppm", "g/cm^2/mm", 1.0e-7);
-  add ("L/kg", "cm^3/g", 1.0);
-  add ("l/kg", "cm^3/g", 1.0);
+    const Unit& from;
+    const Unit& to;
+    double operator()(const double value) const
+    { return unit_convert (from, to, value); }
+    bool valid (const double value) const
+    {
+      if (!from.in_native (value))
+        return false;
+      const double from_base = from.to_base (value);
+      const double to_base = base_convert (from.base_name (), to.base_name (),
+                                           from_base);
+      return to.in_base (to_base);
+    }
+    ConvertGeneric (const Unit& f, const Unit& t)
+      : from (f),
+        to (t)
+    { }
+    ~ConvertGeneric ()
+    { }
+  };
   
-  add ("g/cm^3", "kg/m^3", (100.0 * 100.0 * 100.0) / 1000.0);
-  add ("g/cm^3", "mg/l", 1e6);
-  add ("mol/m^2", "mmol/m^2", 1e3);
-  add (Syntax::Fraction (), "mg N/kg dry soil", 1000000.0);
-  add (Syntax::Fraction (), "ppm", 1000000.0);
-  add (Syntax::Fraction (), "%", 100.0);
-  add (Syntax::Fraction (), "", 1.0);
-  add ("", "ppm", 1000000.0);
-  add ("", "%", 100.0);
-  add ("none", "", 1.0);
-  add (Syntax::None (), "", 1.0);
-  add ("cm^3/cm^3", Syntax::Fraction (), 1.0);
-  add ("cm^3/cm^3", "", 1.0);
-  add ("cm^3 H2O/cm^3", Syntax::Fraction (), 1.0);
-  add ("cm^3 H2O/cm^3", "", 1.0);
-  add ("g/cm^3", Syntax::Fraction (), 1.0);
-  add ("kg/ha/y", "g/cm^2/h",
-       (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0))) / (365.2425 * 24.0));
-  add ("g/cm^2/h", "g/ha/h", ((100.0 * 100.0) * (100.0 * 100.0)));
-  add ("g/cm^2/h", "kg N/ha/h",
-       ((100.0 * 100.0) * (100.0 * 100.0)) / 1000.0);
-  add ("g/cm^2", "g/m^2", 100.0 * 100.0);
-  add ("g/cm^2", "mg/m^2", 100.0 * 100.0 * 1000.0);
-  add ("kg/ha", "mg/m^2", (1000.0 * 1000.0) / (100.0 * 100.0));
-  add ("ppm", "kg/ha/mm", (100.0 * 100.0) / (1000.0 * 1000.0));
-  add ("kg/ha/h", "kg N/ha/h", 1.0);
-  add ("g/cm^2/h", "kg/ha/h", ((100.0 * 100.0) * (100.0 * 100.0)) / 1000.0);
-  add ("g/cm^2/h", "kg C/ha/h", ((100.0 * 100.0) * (100.0 * 100.0)) / 1000.0);
-  add ("g/ha", "kg/ha", 1.0 / 1000.0);
-  add ("kg/ha/h", "g/ha/h", 1000.0);
-  add ("cm^3/g", "cm^3/ng", 1e9);
-  add ("MPa", "cm", 1e4);
-  add ("MPa^-1", "cm^-1", 1e-4);
-  add ("ng/mm/h", "g/cm/h", 1e-8);
-  add ("ng/cm^3", "g/cm^3", 1e-9);
-  add ("m^-2", "cm^-2", 1e-4);
-
-  // Weather.
-  add ("dgWest", "dgEast", -1.0);
-  add ("dgSouth", "dgNorth", -1.0);
-  add ("%", "fraction", 0.01);
-  add ("MJ/d/m^2", "W/m^2", 1e6 / (24.0 * 60.0 * 60.0));
-  add ("MJ/m^2/d", "W/m^2", 1e6 / (24.0 * 60.0 * 60.0));
-  add ("mol/m^2/s", "W/m^2", 1.0 / 0.0000046); 
-  add ("mmol/m^2/s", "W/m^2", 1000.0 / 0.0000046); 
-  add ("kgN/year", "kgN/ha/year", 1.0); // Bug compatibility.
-
-  // Log.
-  add ("cm", "mm", 10.0);
-  add ("g/cm^2", "kg/ha", 1e5);	// Pesticides.
-  add ("g/cm^2", "g/ha", 1e5 * 1000);
-  add ("g/m^2", "g/ha", 10000.0);
-  add ("g/m^2/h", "g/ha/h", 10000.0);
-  add ("g/cm^3", "ug/m^3", 1e12); 
-  add ("g/cm^3", "ng/l", 1e12); 
-
-  add ("g/cm^2", "kg N/ha", 1e5); // Inorganic N.
-  add ("g N/cm^2/h", "kg N/ha/h", 1e5); 
-  add ("g N/m^2", "kg N/ha", 10.0); // Crop N.
-  add ("g/m^2", "kg/ha", 10.0);
-  add ("g/m^2", "kg N/ha", 10.0);
-  add ("g/m^2/h", "kg N/ha/h", 10.0);
-  add ("g/cm^2", "kg C/ha", 1e5); // DOM.
-  add ("g N/cm^2", "kg N/ha", 1e5); // Organic N.
-  add ("g C/cm^2", "kg C/ha", 1e5);
-  add (Syntax::Fraction (), "mg/l", 1e6);
-  add ("g C/cm^2", "g/cm^2", 1.0);	// For "per dry matter" logging.
-  add ("g N/cm^2", "g/cm^2", 1.0);	// For "per dry matter" logging.
-  add ("g C/cm^3", "g/cm^3", 1.0);	// For "per dry matter" logging.
-  add ("g N/cm^3", "g/cm^3", 1.0);	// For "per dry matter" logging.
-  add ("g DM/m^2", "Mg DM/ha", 1.0e-2); // Crop production.
-  add ("kg DM/ha", "Mg DM/ha", 0.001);
-  add ("g/m^2", "Mg DM/ha", 1.0e-2); // harvest DM.
-  add ("g/m^2/h", "Mg DM/ha/h", 1.0e-2); // harvest DM.
-  add ("g CO_2-C/cm^2/h", "g CO2/m^2/h", 1.7272e4); // OM CO2
-  add ("t/ha", "Mg DM/ha", 1.0); // harvest.dlf
-  add ("erg/cm^3/dg C/h", "W/m/K", 2.7778e-9); // SoilHeat.
-  add ("erg/cm^3/dg C", "kJ/m^3/K", 1e-4); // SoilHeat.
+  return new ConvertGeneric (from, to);
 }
 
-Units::Units ()
-{ 
-  if (content)
-    {
-      daisy_assert (count > 0);
-      count++;
-    }
-  else
-    {
-      daisy_assert (count == 0);
-      count = 1;
-      content = new Content;
-      standard_conversions ();
-    }
-}
+Unitc::Unitc ()
+{ }
 
-Units::~Units ()
-{
-  daisy_assert (content);
-  daisy_assert (count > 0);
-  count--;
-  if (count < 1)
-    {
-      delete content;
-      content = NULL;
-    }
-}
+Unitc::~Unitc ()
+{ }
 
-// units.C ends here.
+// unit.C ends here.

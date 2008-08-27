@@ -25,7 +25,7 @@
 #include "number.h"
 #include "block.h"
 #include "alist.h"
-#include "unit.h"
+#include "units.h"
 #include "check.h"
 #include "assertion.h"
 #include "librarian.h"

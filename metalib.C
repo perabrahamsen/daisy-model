@@ -31,15 +31,15 @@
 #include "memutils.h"
 #include "librarian.h"
 #include "path.h"
-#include "unit.h"
 #include "units.h"
+#include "unit.h"
+#include "oldunits.h"
 #include <map>
 #include <sstream>
 
 struct Metalib::Implementation : public Unitc
 {
   // Content.
-  Metalib& metalib;
   Path path;
   Syntax syntax;
   AttributeList alist;
@@ -54,8 +54,8 @@ struct Metalib::Implementation : public Unitc
   unit_map units;
   bool has_unit (symbol name) const;
   const Unit& get_unit (symbol name) const;
-  void add_unit (const symbol name);
-  void add_all_units ();
+  void add_unit (Metalib&, const symbol name);
+  void add_all_units (Metalib&);
   bool allow_old () const;
 
   // Units public interface.
@@ -70,9 +70,8 @@ struct Metalib::Implementation : public Unitc
   const Convert& get_convertion (symbol from, symbol to) const;
 
   // Create and destroy.
-  Implementation (Metalib& m)
-    : metalib (m),
-      all (Librarian::intrinsics ().clone ()),
+  Implementation ()
+    : all (Librarian::intrinsics ().clone ()),
       sequence (0)
   { }
   ~Implementation ()
@@ -98,7 +97,7 @@ Metalib::Implementation::get_unit (symbol name) const
 }
 
 void
-Metalib::Implementation::add_unit (const symbol name)
+Metalib::Implementation::add_unit (Metalib& metalib, const symbol name)
 {
   // Do we already have it?
   Implementation::unit_map::iterator i = this->units.find (name); 
@@ -122,13 +121,13 @@ Metalib::Implementation::add_unit (const symbol name)
 }
 
 void
-Metalib::Implementation::add_all_units ()
+Metalib::Implementation::add_all_units (Metalib& metalib)
 {
   const Library& library = metalib.library (Unit::component);
   std::vector<symbol> entries;
   library.entries (entries);
   for (size_t i = 0; i < entries.size (); i++)
-    add_unit (entries[i]);
+    add_unit (metalib, entries[i]);
 }
 
 bool 
@@ -164,7 +163,7 @@ Metalib::Implementation::can_convert (const symbol from, const symbol to,
       msg.message (std::string ("Trying old conversion of ") 
                    + (has_unit (from) ? "" : "unknown ") + "[" + from + "] to " 
                    + (has_unit (to) ? "" : "unknown ") + "[" + to + "]." );
-      return Units::can_convert (from, to);
+      return Oldunits::can_convert (from, to);
     }
 
   const Unit& from_unit = get_unit (from);
@@ -183,7 +182,7 @@ Metalib::Implementation::can_convert (const symbol from, const symbol to,
     return false;
 
   msg.message ("Trying old conversion.");
-  return Units::can_convert (from, to);
+  return Oldunits::can_convert (from, to);
 }
 
 bool 
@@ -197,7 +196,7 @@ Metalib::Implementation::can_convert (const symbol from, const symbol to) const
     if (!allow_old ())
       return false;
     else
-      return Units::can_convert (from, to);
+      return Oldunits::can_convert (from, to);
   
   const Unit& from_unit = get_unit (from);
   const Unit& to_unit = get_unit (to);
@@ -208,7 +207,7 @@ Metalib::Implementation::can_convert (const symbol from, const symbol to) const
   if (!allow_old ())
     return false;
 
-  return Units::can_convert (from, to);
+  return Oldunits::can_convert (from, to);
 }
 
 bool 
@@ -223,7 +222,7 @@ Metalib::Implementation::can_convert (const symbol from, const symbol to,
     if (!allow_old ())
       return false;
     else
-      return Units::can_convert (from, to, value);
+      return Oldunits::can_convert (from, to, value);
   
   const Unit& from_unit = get_unit (from);
   const Unit& to_unit = get_unit (to);
@@ -248,7 +247,7 @@ Metalib::Implementation::convert (const symbol from, const symbol to,
   if (!has_unit(from) || !has_unit (to))
     {
       if (allow_old ())
-        return Units::convert (from, to, value);
+        return Oldunits::convert (from, to, value);
       if (!has_unit (from))
         throw "Cannot convert from unknown dimension [" + from 
           + "] to [" + to + "]";
@@ -289,17 +288,17 @@ Metalib::Implementation::get_convertion (const symbol from,
         {
           struct ConvertOld : Convert
           {
-            const Units::Convert& old;
+            const Oldunits::Convert& old;
             double operator()(const double value) const
             { return old (value); }
             bool valid (const double value) const
             { return old.valid (value); }
-            ConvertOld (const Units::Convert& o)
+            ConvertOld (const Oldunits::Convert& o)
               : old (o)
             { }
           };
-          const Units::Convert& old
-            = Units::get_convertion (from.name (), to.name ());
+          const Oldunits::Convert& old
+            = Oldunits::get_convertion (from.name (), to.name ());
           
           const Convert* convert = new ConvertOld (old);
           daisy_assert (convert);
@@ -390,7 +389,7 @@ Metalib::added_object (const symbol library, const symbol object)
 {
   // Make sur ewe can use units right after we defined them.
   if (library == symbol (Unit::component))
-    impl->add_unit (object);
+    impl->add_unit (*this, object);
 }
 
 int 
@@ -405,14 +404,14 @@ Metalib::get_sequence ()
 void
 Metalib::reset ()
 { 
-  impl.reset (new Implementation (*this)); 
-  impl->add_all_units ();
+  impl.reset (new Implementation ()); 
+  impl->add_all_units (*this);
 }
 
 Metalib::Metalib ()
-  : impl (new Implementation (*this))
+  : impl (new Implementation ())
 {
-  impl->add_all_units ();
+  impl->add_all_units (*this);
 }
 
 Metalib::~Metalib ()

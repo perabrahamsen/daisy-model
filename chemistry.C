@@ -28,7 +28,7 @@
 #include "librarian.h"
 #include "vcheck.h"
 #include "alist.h"
-#include "unit.h"
+#include "units.h"
 
 const char *const Chemistry::component = "chemistry";
 

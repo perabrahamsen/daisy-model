@@ -23,7 +23,7 @@
 #include "number.h"
 #include "syntax.h"
 #include "alist.h"
-#include "unit.h"
+#include "units.h"
 #include "vcheck.h"
 #include "mathlib.h"
 #include "memutils.h"

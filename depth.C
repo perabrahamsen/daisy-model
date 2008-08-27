@@ -30,7 +30,7 @@
 #include "output.h"
 #include "number.h"
 #include "treelog.h"
-#include "unit.h"
+#include "units.h"
 #include "check.h"
 #include "vcheck.h"
 #include "assertion.h"

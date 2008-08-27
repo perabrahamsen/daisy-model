@@ -23,7 +23,7 @@
 #include "block.h"
 #include "alist.h"
 #include "gnuplot_utils.h"
-#include "unit.h"
+#include "units.h"
 #include "vcheck.h"
 #include "mathlib.h"
 #include "memutils.h"

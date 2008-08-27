@@ -1,16 +1,47 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Nanna opsætning
+* Unit oprydnign
 
-* en "Crop Production" log kaldet crop give ruendelig løkke.
+Move units.[Ch] oldunit.[Ch]
+
+Copy unit -> convert
+
+Copy unit -> units
 
 * Unit
 
-** Overfør flere
+** Vi skal have en "rigtig" multiply.
 
-** Brug flere stedet
+** Det kræver en GenUnit klasse til at gemme mellemregninger.
 
-** Multiply
+GenUnit *= Unit
+
+const Unit& GenUnit::find_named (Unitc&),
+
+** Og vi skal nok have en Number::unit () til spørge efter den.
+
+Den skal på sigt erstatte Number::dimension ()
+
+** Fjern "units.h"
+
+** Substance component
+
+*** SubstanceCompound:  (Element count)*
+
+Et kemisk stof defineret ud fra atom-antal.
+
+*** SubstanceName: identifier
+
+Et stof defineret alene ud fra et navn
+
+** UnitSI::substances
+
+(substance dimension [subsubstance])*
+
+subsubstance er hvis vi kun tæller en del af substance med
+
+Vi kan konvertere fra enheder med substance til enheder uden, og
+tilbage igen.  Men hvis begge enheder har substance, skal de matche.
 
 * Tertiary vand
 

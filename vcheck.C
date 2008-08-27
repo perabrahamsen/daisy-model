@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "vcheck.h"
-#include "unit.h"
+#include "units.h"
 #include "metalib.h"
 #include "library.h"
 #include "syntax.h"

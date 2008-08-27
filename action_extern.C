@@ -36,7 +36,7 @@
 #include "block.h"
 #include "check.h"
 #include "assertion.h"
-#include "unit.h"
+#include "units.h"
 #include <memory>
 
 struct ActionExtern : public Action

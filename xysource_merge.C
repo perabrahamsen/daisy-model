@@ -26,7 +26,7 @@
 #include "gnuplot_utils.h"
 #include "number.h"
 #include "scope_sources.h"
-#include "unit.h"
+#include "units.h"
 #include "vcheck.h"
 #include "memutils.h"
 #include "librarian.h"

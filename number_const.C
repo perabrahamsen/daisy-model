@@ -24,7 +24,7 @@
 #include "block.h"
 #include "alist.h"
 #include "scope.h"
-#include "unit.h"
+#include "units.h"
 #include "assertion.h"
 #include "librarian.h"
 

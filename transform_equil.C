@@ -31,7 +31,7 @@
 #include "equil.h"
 #include "scope_soil.h"
 #include "number.h"
-#include "unit.h"
+#include "units.h"
 #include "check.h"
 #include "mathlib.h"
 #include "librarian.h"

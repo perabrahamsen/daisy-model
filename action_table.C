@@ -27,7 +27,7 @@
 #include "field.h"
 #include "am.h"
 #include "im.h"
-#include "unit.h"
+#include "units.h"
 #include "lexer_table.h"
 #include "mathlib.h"
 #include "librarian.h"

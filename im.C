@@ -24,6 +24,7 @@
 
 #include "im.h"
 #include "chemical.h"
+#include "units.h"
 #include "unit.h"
 #include "am.h"
 #include "log.h"

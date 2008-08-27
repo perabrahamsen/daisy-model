@@ -23,7 +23,7 @@
 #include "number.h"
 #include "block.h"
 #include "librarian.h"
-#include "unit.h"
+#include "units.h"
 #include <sstream>
 
 const char *const Number::component = "number";

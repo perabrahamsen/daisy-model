@@ -1,3 +1,7 @@
+2008-08-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* oldunits.C, oldunits.h: Renamed from units.C, units.h.
+
 2008-08-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.43 released.
