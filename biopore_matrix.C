@@ -266,6 +266,7 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
                                    const std::vector<double>& h, 
                                    const double dt)
 {
+#if 1
   const size_t cell_size = geo.cell_size ();
   for (size_t c = 0; c < cell_size; c++)
     {
@@ -277,6 +278,57 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
       S[c] = matrix_biopore_matrix (c, geo, soil, active[c], K_xx, h[c]);
       add_water (c, S[c] * dt * geo.cell_volume (c));
     }
+
+#else
+  // Find initial guess of sink terms per cell, plus the coresponding added
+  // removed water volume per column.
+  const size_t col_size = xplus.size ();
+  std::vector<double> vol_added (col_size, 0.0);
+  std::vector<double> vol_removed (col_size, 0.0);
+
+  const size_t cell_size = geo.cell_size ();
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      const double h_cond = std::min(pressure_initiate, h[c]);
+      const double T = soil_heat.T (c);
+      const double h_ice = 0.0;    //ice ignored 
+      const double K_zz = soil.K (c, h_cond, h_ice, T);
+      const double K_xx = K_zz * soil.anisotropy (c);
+      S[c] = matrix_biopore_matrix (c, geo, soil, active[c], K_xx, h[c]);
+      const double vol = S[c] * dt * geo.cell_volume (c);
+      const size_t col = column[c];
+      if (S[c] > 0.0)
+        vol_added[col] += vol;
+      else
+        vol_removed[col] -= vol;
+    }
+
+  // Find number to multiply sink and sources with, in order to avoid
+  // that the macropores underflow or overflow.
+  const double h_capacity = height_start - height_end;
+  std::vector<double> scale_added (col_size, 1.0);
+  std::vector<double> scale_removed (col_size, 1.0);
+
+  for (size_t col = 0; col < col_size; col++)
+    {
+      const double h_added = volume_to_height (col, vol_added[col]);
+      const double h_removed = volume_to_height (col, vol_removed[col]);
+
+      // Too little?
+      if (h_bottom[col] + h_added - h_removed < 0.0)
+        {
+          // Solve h_bottom + h_added - scale * h_removed = 0.0
+          scale_removed[col] = (h_bottom + h_added) / h_removed;
+
+      
+      double h_added;
+      double h_removed;
+
+        {
+          
+        }
+    }
+#endif
 }
 
 void 
