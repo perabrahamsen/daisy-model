@@ -47,7 +47,9 @@ struct TertiaryBiopores : public Tertiary, public Tertsmall
   const auto_vector<Biopore*> classes; // List of biopore classes.
   const double pressure_initiate;// Pressure needed to init pref.flow [cm]
   const double pressure_end;	 // Pressure after pref.flow has been init [cm]
+  const double pressure_barrier; // Pressure difference requires for S [cm]
   const double pond_max;	 // Pond height before activating pref.flow [mm]
+  const double min_dt;           // Smallest timestep [h]
   const bool use_small_timesteps_; // True, iff we want to calculate S in R.E.
 
   // Identity.
@@ -334,7 +336,6 @@ TertiaryBiopores::tick (const Units&, const Geometry& geo, const Soil& soil,
 #endif
 
   // Find an implicit solution.
-  const double min_dt = 0.00001;
   double ddt = dt;
   for (;;)
     {
@@ -461,8 +462,8 @@ TertiaryBiopores::update_biopores (const Geometry& geo,
                                    const double dt) 
 {
   for (size_t b = 0; b < classes.size (); b++)
-    classes[b]->update_matrix_sink (geo, soil, soil_heat,
-                                    active, pressure_initiate, h, dt);
+    classes[b]->update_matrix_sink (geo, soil, soil_heat, active, 
+                                    pressure_barrier, pressure_initiate, h, dt);
 }
 
 void
@@ -651,7 +652,9 @@ TertiaryBiopores::TertiaryBiopores (Block& al)
     classes (Librarian::build_vector<Biopore> (al, "classes")),
     pressure_initiate (al.number ("pressure_initiate")),
     pressure_end (al.number ("pressure_end")),
+    pressure_barrier (al.number ("pressure_barrier")),
     pond_max (al.number ("pond_max")),
+    min_dt (al.number ("min_dt")),
     use_small_timesteps_ (al.flag ("use_small_timesteps")),
     active (al.check ("active")
             ? al.flag_sequence ("active")
@@ -691,10 +694,19 @@ Maximum relative difference in biopore content for convergence.");
     syntax.add ("pressure_end", "cm", Syntax::Const, 
                 "Pressure after biopore flow has been initiated.");
     alist.add ("pressure_end", -30.0);
+    syntax.add ("pressure_barrier", "cm", Check::non_negative (), Syntax::Const,
+                "Pressure barrier between matrix and biopore domain.\n\
+If the pressure difference between the matrix and biopores is below\n\
+this value, no water will tranfer between the domains.  If you specify\n\
+a too small value for this parameter, the solution may be unstable.");
+    alist.add ("pressure_barrier", 5.0);
     syntax.add ("pond_max", "mm", Check::non_negative (), Syntax::Const, "\
 Maximum height of ponding before spilling into biopores.\n\
 After macropores are activated pond will have this height.");
     alist.add ("pond_max", 0.5);
+    syntax.add ("min_dt", "h", Check::non_negative (), Syntax::Const, "\
+Smallest allowable timestep for finding a solution.");
+    alist.add ("min_dt", 0.00001);
     syntax.add ("use_small_timesteps", Syntax::Boolean, Syntax::Const,
                 "True iff the sink is allowed to change within a timestep.");
     alist.add ("use_small_timesteps", true);

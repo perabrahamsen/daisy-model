@@ -982,12 +982,14 @@ ChemicalStandard::check (const Units& units, const Geometry& geo,
             throw "M_primary > M";
 
           if (iszero (soil_water.Theta_secondary (i)))
-            if (!approximate (C_secondary, C))
-              throw "C_secondary should be C when there is no secondary water";
-          if (!approximate (C_primary, C))
-            throw "C_primary should be C for when there is no secondary water";
-          if (!approximate (M_primary, M))
-            throw "M_primary should be M for when there is no secondary water";
+            {
+              if (!approximate (C_secondary, C))
+                throw "C_secondary should be C when there is no secondary water";
+              if (!approximate (C_primary, C))
+                throw "C_primary should be C for when there is no secondary water";
+              if (!approximate (M_primary, M))
+                throw "M_primary should be M for when there is no secondary water";
+            }
           
           if (iszero (M))
 	    {

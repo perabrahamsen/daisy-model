@@ -1,5 +1,14 @@
+2008-08-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.44 released.
+
 2008-08-27  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* biopore_matrix.C: Scale down sink terms to keep h_bottom within
+	limit, instead of relying on converge to fail. 
+	* tertiary_biopores.C (pressure_barrier): New parameter.
+	* biopore.h, biopore_matrix.C, biopore_drain.C: Use it.
+	
 	* oldunits.C, oldunits.h: Renamed from units.C, units.h.
 	* units.h, units.C, convert.h, convert.C: Split from unit.h, unit.C.
 	* Makefile (OTHER): Update.

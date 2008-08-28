@@ -6,6 +6,12 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.44
+
+** Code cleanups.
+
+** More work on the tertiary domain.
+
 * 4.43
 
 ** User definable units.

@@ -162,12 +162,14 @@ UZRichard::richard (Treelog& msg,
   std::vector<double> Kplus (size);
 
   // For h bottom.
+#ifdef NO_FLUX_WITH_PRESSURE_BOTTOM
   if (bottom_type == Groundwater::pressure)
     {
       daisy_assert (last + 1 < geo.cell_size ());
       K[size] = soil.K (last + 1, 0.0, h_ice[last + 1], 
 			soil_heat.T (last + 1));
     }
+#endif // NO_FLUX_WITH_PRESSURE_BOTTOM
   
   // For lysimeter bottom.
   const double h_lim = geo.zplus (last) - geo.cell_z (last);
@@ -261,9 +263,12 @@ UZRichard::richard (Treelog& msg,
 				 soil_heat.T (first + i));
 	      K[i] = (Ksum[i] / iterations_used + Kold[i]) / 2.0;
 	    }
+#ifdef NO_FLUX_WITH_PRESSURE_BOTTOM
 	  if (bottom_type != Groundwater::pressure)
 	    K[size] = K[size - 1];
-
+#else // !NO_FLUX_WITH_PRESSURE_BOTTOM
+          K[size] = K[size - 1];
+#endif // !NO_FLUX_WITH_PRESSURE_BOTTOM
 	  internode (soil, soil_heat, first, last, h_ice, K, Kplus);
 
 	  // Calculate cells.
@@ -329,9 +334,14 @@ UZRichard::richard (Treelog& msg,
 
 		  if (bottom_type == Groundwater::pressure)
 		    {
+#ifdef NO_FLUX_WITH_PRESSURE_BOTTOM
 		      const double dz_plus = z - geo.cell_z (first + i + 1);
-		      //const double bottom_pressure = h[i + 1];
 		      const double bottom_pressure = h_old[first + i + 1];
+#else // !NO_FLUX_WITH_PRESSURE_BOTTOM
+                      const double z_bottom = geo.zplus (first + i);
+		      const double dz_plus = z - z_bottom;
+		      const double bottom_pressure = bottom.table () - z_bottom;
+#endif // !NO_FLUX_WITH_PRESSURE_BOTTOM
 		      b[i] = Cw2 + (ddt / dz) * (  Kplus[i - 1] / dz_minus
 						+ Kplus[i] / dz_plus);
 		      d[i] = Theta[i] - Cw1 - ddt * S[first + i]

@@ -71,6 +71,8 @@ struct BioporeMatrix : public Biopore
   std::vector<double> added_water; // [cm^3]
   std::vector<double> density_column; // [cm^-2]
 
+  double height_to_water (const size_t col, const double dz /* [h] */) const;
+  double volume_to_height (size_t col, double volume /* [cm^3] */) const;
   double air_bottom (const size_t c) const // Lowest point with air [cm]
   { 
     daisy_assert (c < column.size ());
@@ -87,6 +89,7 @@ struct BioporeMatrix : public Biopore
 
   double matrix_biopore_matrix (size_t c, const Geometry& geo, 
                                 const Soil& soil, bool active, 
+                                const double h_barrier,
                                 double K_xx, double h) const;
   double matrix_biopore_drain (size_t c, const Geometry& geo, 
                                const Soil& soil, bool active, 
@@ -96,6 +99,7 @@ struct BioporeMatrix : public Biopore
                            const Soil& soil,  
                            const SoilHeat& soil_heat, 
                            const std::vector<bool>& active,
+                           const double h_barrier,
                            const double pressure_initiate,
                            const std::vector<double>& h,
                            const double dt);
@@ -143,11 +147,6 @@ BioporeMatrix::converge (const Anystate& state,
   daisy_assert (max_h > 0.0);
   for (size_t i = 0; i < h_size; i++)
     {
-      // Check capacity.
-      if (h_bottom[i] < 0.0 || content.h_bottom[i] < 0.0)
-        return false;
-      if (h_bottom[i] > max_h || content.h_bottom[i] > max_h)
-        return false;
       // Check difference.
       if (   fabs (h_bottom[i] - content.h_bottom[i]) > max_abs
           && (   iszero (content.h_bottom[i])
@@ -161,25 +160,52 @@ BioporeMatrix::converge (const Anystate& state,
   return true; 
 }
 
+double
+BioporeMatrix::height_to_water (const size_t col,
+                                const double dz /* [h] */) const
+{
+  daisy_assert (col < xplus.size ());
+  const double xminus = (col == 0) ? 0.0 : xplus[col-1]; // [cm]
+  const double dx = xplus[col] - xminus;      // [cm]
+  const double soil_volume = dz * dx * dy;    // [cm^3]
+  const double density = density_column[col]; // [cm^-2]
+  const double radius = diameter * 0.5;     // [cm]
+  const double area = M_PI * radius * radius;  // [cm^2]
+  const double soil_fraction = density * area; // []
+  const double water_volume = soil_volume * soil_fraction; // [cm^3]
+  return water_volume;
+}
+
+double 
+BioporeMatrix::volume_to_height (const size_t col,
+                                 const double water_volume /* [cm^3] */) const
+{
+  daisy_assert (col < xplus.size ());
+  const double density = density_column[col]; // [cm^-2]
+  if (!std::isnormal (density))
+    {
+      // No biopores here.
+      daisy_assert (iszero (water_volume));
+      return 0.0;
+    }
+
+  const double xminus = col == 0 ? 0.0 : xplus[col-1];
+  const double radius = diameter * 0.5;       // [cm]
+  const double area = M_PI * radius * radius; // [cm^2]
+  const double soil_fraction = density * area;             // []
+  const double soil_volume = water_volume / soil_fraction; // [cm^3]
+  const double dx = xplus[col] - xminus;                   // [cm]
+  const double dz = soil_volume / (dx * dy);               // [cm]
+  return dz;
+}
+
 double 
 BioporeMatrix::total_water () const
 {
   const size_t col_size = xplus.size ();
-  double xminus = 0.0;
   double total = 0.0;
   for (size_t col = 0; col < col_size; col++)
-    {
-      const double density = density_column[col]; // [cm^-2]
-      const double radius = diameter / 2.0;       // [cm]
-      const double area = radius * radius * M_PI; // [cm^2]
-      const double soil_fraction = density * area; // []
-      const double dz = h_bottom[col]; // [cm]
-      const double dx = xplus[col] - xminus; // [cm]
-      const double soil_volume = dz * dx * dy; // [cm^3]
-      const double water_volume = soil_volume * soil_fraction; // [cm^3]
-      total += water_volume;
-      xminus = xplus[col];
-    }
+    total += height_to_water (col, h_bottom[col]);
   return total;
 }
 
@@ -220,6 +246,7 @@ BioporeMatrix::infiltrate (const Geometry& geo, const size_t e,
 double 
 BioporeMatrix::matrix_biopore_matrix (size_t c, const Geometry& geo, 
                                       const Soil& soil, const bool active, 
+                                      const double h_barrier,
                                       const double K_xx, const double h) const
 {
   if (!std::isnormal (density (c)))
@@ -240,7 +267,7 @@ BioporeMatrix::matrix_biopore_matrix (size_t c, const Geometry& geo,
   daisy_assert (h3_min < 0.0);
 
   double S; 
-  if (h_bottom[col] > 0.0 && h_3>h3_min && h_3>h)
+  if (h_bottom[col] > 0.0 && h_3>h3_min && h_3>h + h_barrier)
     {
       const double high_point = geo.cell_top (c);
       double wall_fraction;
@@ -250,7 +277,7 @@ BioporeMatrix::matrix_biopore_matrix (size_t c, const Geometry& geo,
         wall_fraction = 1.0;      
       S = - wall_fraction * biopore_to_matrix (R_wall, M_c, r_c, h, h_3);
     }
-  else if (active && h>h_3)
+  else if (active && h>h_3 + h_barrier)
     S = matrix_to_biopore (K_xx, M_c, r_c, h, h_3);
   else 
     S = 0.0;
@@ -262,24 +289,11 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
                                    const Soil& soil,  
                                    const SoilHeat& soil_heat, 
                                    const std::vector<bool>& active,
+                                   const double h_barrier,
                                    const double pressure_initiate,
                                    const std::vector<double>& h, 
                                    const double dt)
 {
-#if 1
-  const size_t cell_size = geo.cell_size ();
-  for (size_t c = 0; c < cell_size; c++)
-    {
-      const double h_cond = std::min(pressure_initiate, h[c]);
-      const double T = soil_heat.T (c);
-      const double h_ice = 0.0;    //ice ignored 
-      const double K_zz = soil.K (c, h_cond, h_ice, T);
-      const double K_xx = K_zz * soil.anisotropy (c);
-      S[c] = matrix_biopore_matrix (c, geo, soil, active[c], K_xx, h[c]);
-      add_water (c, S[c] * dt * geo.cell_volume (c));
-    }
-
-#else
   // Find initial guess of sink terms per cell, plus the coresponding added
   // removed water volume per column.
   const size_t col_size = xplus.size ();
@@ -294,7 +308,8 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
       const double h_ice = 0.0;    //ice ignored 
       const double K_zz = soil.K (c, h_cond, h_ice, T);
       const double K_xx = K_zz * soil.anisotropy (c);
-      S[c] = matrix_biopore_matrix (c, geo, soil, active[c], K_xx, h[c]);
+      S[c] = matrix_biopore_matrix (c, geo, soil, active[c], h_barrier, 
+                                    K_xx, h[c]);
       const double vol = S[c] * dt * geo.cell_volume (c);
       const size_t col = column[c];
       if (S[c] > 0.0)
@@ -312,27 +327,58 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
   for (size_t col = 0; col < col_size; col++)
     {
       const double h_added = volume_to_height (col, vol_added[col]);
+      daisy_assert (h_added >= 0.0);
       const double h_removed = volume_to_height (col, vol_removed[col]);
+      daisy_assert (h_removed >= 0.0);
+      const double h_new = h_bottom[col] + h_added - h_removed;
 
       // Too little?
-      if (h_bottom[col] + h_added - h_removed < 0.0)
+      if (h_new < 0.0 && h_removed > 1e-10)
         {
           // Solve h_bottom + h_added - scale * h_removed = 0.0
-          scale_removed[col] = (h_bottom + h_added) / h_removed;
-
-      
-      double h_added;
-      double h_removed;
-
-        {
-          
+          scale_removed[col] = (h_bottom[col] + h_added) / h_removed;
+          daisy_assert (scale_removed[col] <= 1.0);
+          daisy_assert (scale_removed[col] >= 0.0);
         }
+      else if (h_new > h_capacity && h_added > 1e-10)
+        {
+          // Solve h_bottom + scale * h_added - h_removed = h_capacity
+          scale_added[col] = (h_capacity + h_removed - h_bottom[col]) / h_added;
+          daisy_assert (scale_added[col] <= 1.0);
+          daisy_assert (scale_added[col] >= 0.0);
+        }
+            
+      // Update added water.
+      daisy_assert (iszero (added_water[col]));
+      added_water[col] = vol_added[col] * scale_added[col]
+        - vol_removed[col] * scale_removed[col];
     }
-#endif
+
+  // Now scale the sink terms.
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      const size_t col = column[c];
+      if (S[c] > 0.0)
+        S[c] *= scale_added[col];
+      else
+        S[c] *= scale_removed[col];
+    }
+
+  // Test results.
+  const double total_S = geo.total_soil (S) * dt;
+  double total_water = 0.0;
+  for (size_t col = 0; col < col_size; col++)
+    total_water += added_water[col];
+  if (!approximate (total_S, total_water))
+    {
+      std::ostringstream tmp;
+      tmp << "S = " << total_S << ", added = " << total_water;
+      daisy_bug (tmp.str ());
+    }
 }
 
 void 
-BioporeMatrix::add_water (size_t c, double amount /* [cm^3] */)
+BioporeMatrix::add_water (const size_t c, const double amount /* [cm^3] */)
 {
   daisy_assert (c < column.size ());
   const size_t col = column[c];
@@ -343,24 +389,13 @@ BioporeMatrix::add_water (size_t c, double amount /* [cm^3] */)
 void
 BioporeMatrix::update_water ()
 { 
-  const size_t column_size = xplus.size ();
-  daisy_assert (added_water.size () == xplus.size ());
-  double xminus = 0.0;
-  for (size_t i = 0; i < column_size; i++)
+  const size_t col_size = xplus.size ();
+  daisy_assert (added_water.size () == col_size);
+  daisy_assert (h_bottom.size () == col_size);
+  for (size_t col = 0; col < col_size; col++)
     {
-      const double water_volume = added_water[i];  // [cm^3]
-      if (std::fabs (water_volume) < 1e-100)
-        continue;
-      const double density = density_column[i]; // [cm^-2]
-      const double radius = diameter * 0.5;     // [cm]
-      const double area = M_PI * radius * radius;  // [cm^2]
-      const double soil_fraction = density * area; // []
-      const double soil_volume = water_volume / soil_fraction; // [cm^3]
-      const double dx = xplus[i] - xminus;                     // [cm]
-      const double dz = soil_volume / (dx * dy);               // [cm]
-      h_bottom[i] += dz;                                       // [cm]
-      added_water[i] = 0.0;                                    // [cm^3]
-      xminus = xplus[i];                                       // [cm]
+      h_bottom[col] += volume_to_height (col, added_water[col]);
+      added_water[col] = 0.0;
     }
 }
 

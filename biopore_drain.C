@@ -60,6 +60,7 @@ struct BioporeDrain : public Biopore
 
   double matrix_biopore_drain (size_t c, const Geometry& geo, 
                                const Soil& soil, bool active, 
+                               const double h_barrier,
                                double K_xx, double h) const;
   
   double matrix_biopore_matrix (size_t c, const Geometry& geo, 
@@ -70,6 +71,7 @@ struct BioporeDrain : public Biopore
                            const Soil& soil,  
                            const SoilHeat& soil_heat, 
                            const std::vector<bool>& active,
+                           const double h_barrier,
                            const double pressure_initiate,
                            const std::vector<double>& h, const double dt);
   void update_water ()
@@ -114,6 +116,7 @@ struct BioporeDrain : public Biopore
 double 
 BioporeDrain::matrix_biopore_drain (size_t c, const Geometry& geo, 
                                     const Soil& soil, bool active, 
+                                    const double h_barrier,
                                     double K_xx, double h) const
 {
   const double M_c = density_cell[c];
@@ -124,7 +127,7 @@ BioporeDrain::matrix_biopore_drain (size_t c, const Geometry& geo,
   const double h_3 = air_bottom (c) - geo.cell_z (c);
 
   double S;
-  if (active && h>h_3)
+  if (active && h>h_3 + h_barrier)
     S = matrix_to_biopore (K_xx, M_c, r_c, h, h_3);
   else 
     S = 0.0;
@@ -136,6 +139,7 @@ BioporeDrain::update_matrix_sink (const Geometry& geo,
                                   const Soil& soil,  
                                   const SoilHeat& soil_heat, 
                                   const std::vector<bool>& active,
+                                  const double h_barrier,
                                   const double pressure_initiate,
                                   const std::vector<double>& h, 
                                   const double /* dt */)
@@ -148,7 +152,8 @@ BioporeDrain::update_matrix_sink (const Geometry& geo,
       const double h_ice = 0.0;    //ice ignored 
       const double K_zz = soil.K (c, h_cond, h_ice, T);
       const double K_xx = K_zz * soil.anisotropy (c);
-      S[c] = matrix_biopore_drain (c, geo, soil, active[c], K_xx, h[c]);
+      S[c] = matrix_biopore_drain (c, geo, soil, active[c], h_barrier, 
+                                   K_xx, h[c]);
     }
 }
 

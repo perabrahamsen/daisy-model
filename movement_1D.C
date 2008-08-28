@@ -140,6 +140,7 @@ Movement1D::tick_water (const Geometry1D& geo,
   const size_t bottom_edge = geo.edge_size () - 1U;
   // Limit for groundwater table.
   size_t last  = soil.size () - 1;
+#if 0
   if (groundwater.bottom_type () == Groundwater::pressure)
     {
       daisy_assert (soil.size () > 1);
@@ -155,6 +156,7 @@ Movement1D::tick_water (const Geometry1D& geo,
           h[i] = groundwater.table () - geo.cell_z (i);
         }
     }
+#endif
 
   // Limit for ridging.
   const size_t first = (surface.top_type (geo, 0U) == Surface::soil)

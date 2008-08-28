@@ -86,6 +86,7 @@ public:
                                    const Soil& soil,  
                                    const SoilHeat& soil_heat, 
                                    const std::vector<bool>& active,
+                                   const double h_barrier,
                                    const double pressure_initiate,
                                    const std::vector<double>& h, 
                                    const double dt) = 0;

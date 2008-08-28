@@ -1,41 +1,20 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Unit
-
-** Vi skal have en "rigtig" multiply.
-
-** Det kræver en GenUnit klasse til at gemme mellemregninger.
-
-GenUnit *= Unit
-
-const Unit& GenUnit::find_named (Unitc&),
-
-** Og vi skal nok have en Number::unit () til spørge efter den.
-
-Den skal på sigt erstatte Number::dimension ()
-
-** Fjern "units.h"
-
-** Substance component
-
-*** SubstanceCompound:  (Element count)*
-
-Et kemisk stof defineret ud fra atom-antal.
-
-*** SubstanceName: identifier
-
-Et stof defineret alene ud fra et navn
-
-** UnitSI::substances
-
-(substance dimension [subsubstance])*
-
-subsubstance er hvis vi kun tæller en del af substance med
-
-Vi kan konvertere fra enheder med substance til enheder uden, og
-tilbage igen.  Men hvis begge enheder har substance, skal de matche.
-
 * Tertiary vand
+
+** Skriv SH MMO
+
+- scale sink
+
+- pressure_barrier 5 cm
+
+Stadig problemer, reserve?
+
+Kan h_barrier giver konvergensproblemer?
+
+** Gør min_dt til parameter
+
+** få små tidsksridt til at virke.
 
 ** nedsæt tidskridt
 
@@ -269,6 +248,47 @@ ELLER
 ** Indsæt mmo grøntsager i lib (og sample?).
 
 * Programmering
+
+** Unit
+
+*** Vi skal have en "rigtig" multiply.
+
+*** Det kræver en GenUnit klasse til at gemme mellemregninger.
+
+GenUnit *= Unit
+
+const Unit& GenUnit::find_named (Unitc&),
+
+*** Og vi skal nok have en Number::unit () til spørge efter den.
+
+Den skal på sigt erstatte Number::dimension ()
+
+*** Fjern "units.h"
+
+*** Substance component
+
+**** SubstanceCompound:  (Element count)*
+
+Et kemisk stof defineret ud fra atom-antal.
+
+**** SubstanceName: identifier
+
+Et stof defineret alene ud fra et navn
+
+*** UnitSI::substances
+
+(substance dimension [subsubstance])*
+
+subsubstance er hvis vi kun tæller en del af substance med
+
+Vi kan konvertere fra enheder med substance til enheder uden, og
+tilbage igen.  Men hvis begge enheder har substance, skal de matche.
+
+*** units doc
+
+*** kapitel med konverteringer til ref.manual
+
+*** Foreslå aternativer ved fejl? (højde i pF?)
 
 ** Q4
 
@@ -594,12 +614,6 @@ Move cvs, dll, cdaisy, api, programmers guide, header, source.
 Explain about different compilers, and making me update.
 
 * saml check.? og check_range.?
-
-* units doc
-
-** kapitel med konverteringer til ref.manual
-
-** Foreslå aternativer ved fejl? (højde i pF?)
 
 * Check af PLF'er.
 
