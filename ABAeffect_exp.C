@@ -32,6 +32,7 @@ struct ABAEffect_exp : public ABAEffect
   // Parameters.
 private:
   const double k;  //Coefficient
+  const double alpha;  //Coefficient
   
   // Simulation.
   double ABA_effect (const double ABA_xylem /* [g/cm^3] */,
@@ -44,7 +45,9 @@ private:
   public:
   ABAEffect_exp (Block& al)
     : ABAEffect (al),
-       k (al.number ("k"))
+      k (al.number ("k")),
+      alpha (al.number ("alpha"))
+
   { }
 };
 
@@ -52,7 +55,7 @@ double
 ABAEffect_exp::ABA_effect (const double ABA_xylem /* [g/cm^3] */, Treelog&)
 {
   daisy_assert (ABA_xylem >= 0.0);
-  const double ABAeffect = exp(-k * ABA_xylem); //[]
+  const double ABAeffect = alpha * exp(-k * ABA_xylem); //[]
   return ABAeffect;
 }
 
@@ -65,6 +68,9 @@ static struct ABAEffectexpSyntax
     syntax.add ("k", "cm^3/g", Check::non_negative (), Syntax::Const,
                 "Coefficient");
     alist.add ("k", 0.0);
+    syntax.add ("alpha", Syntax::None (), Check::non_negative (), Syntax::Const,
+                "Coefficient");
+    alist.add ("alpha", 1.0);
   }  
   ABAEffectexpSyntax ()
   {

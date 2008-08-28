@@ -119,7 +119,7 @@ struct ReactionFilter : public Reaction
       immobile (al.identifier ("immobile")),
       mobile (al.identifier ("mobile")),
       fc_primary (al.number ("fc_primary")),
-      fc_secondary (al.number ("fc_seondary"))
+      fc_secondary (al.number ("fc_secondary"))
   { }
 };
 

@@ -33,9 +33,19 @@ Based on data collected by Fulai Liu, 2007."
 (defphotosynthesis Potato FC_C3 
   "Farquhar parameters for potatoes."
   ;; This is the main calibration effect for unlimited production.
-  (Xn 6e-3 [mol/mol/s])
-  ;; This is yhe main calibration parameter for water stress effect.
-  (ABAeffect ABA-exp (k 0.0152 [cm^3/ng]))
+  (Xn 1.0e-3 [mol/mol/s])
+  ;;Farquhar parameters for potatos, calibrated by Fuilai
+  (Kc25 27.24 [Pa])
+  (Ko25 16580 [Pa])
+  (Gamma25 3.74 [Pa])
+  ;; ABA effect on stomata conductance according to Fulai et al., 2005:
+  (ABAeffect ABA-exp 
+             (k 0.0062 [cm^3/ng])
+             (alpha 0.7368)) 
+  ;; Minimal stomatal conductance for potatos (Fuilai et al., 2005)
+  (b 0.1074)
+  ;; Slope coefficient in Ball model for potatoes (Fuilai, personal comm.)
+  (m 15) 
   ;; Intended for avoiding excessive growth for early crops in cold climate.
   (TempEff (0 1) (100 1)))
 
@@ -52,23 +62,22 @@ Based on data collected by Fulai Liu, 2007."
   (LeafPhot Potato)
   ;; Initial growth governed by seeds:
   ;; NCrop will force Daisy to calculate a new number based on seed    
-  ;; amount and N concentration.    
+  ;; amount and N concentration as specified below.    
   (Prod (NCrop -1.0))    
   ;; Here we select the     
   (Seed release       
-        ;; We release 30% of the carbon per day.  It is first order,          
+        ;; We release 30% of the carbon per day. It is first order,          
         ;; so the total amount will be decreasing over time.         
-        (rate 0.3 [d^-1])          
-        ;; 15% of the seeds are water.        
-        (DM_fraction 0.85 [])      
+        (rate 0.3 [d^-1]) 
+        ;; 80% of the potatoes are water.        
+        (DM_fraction 0.20 [])    ;Based on Serbia 2006 yield  
         ;; Almost half of the seeds is available as carbon assimilate.         
         (C_fraction 0.4676 [])          
-        ;; The seeds also contain some nitrogen to get the crop started.          
-        (N_fraction 1.8 [%]))    
-  ;; The initial leaves are very thin. Note that LeafAIMod is often   
-  ;; used for modifying old leaves, if so, you need to append the    
-  ;; original value for LeafAIMod here.     
-  (Canopy (LeafAIMod (0.0 2.0) (0.4 1.0))))
+        ;; The potatoes also contain some nitrogen to get the crop started.          
+        (N_fraction 2.0 [%]))    ;Based on Serbia 2006 yield
+  ;; The initial leaves are very thin. LeafAIMod for Potato Folva 
+  ;; is included in this data.     
+  (Canopy (LeafAIMod (0.0 2.2) (0.4 1.1)(1.5 1.1)(2.0 0.3))))
 
 ;; Weather data.
 (weather default "dk-jyndevad.dwf")
@@ -204,7 +213,7 @@ Based on data collected by Fulai Liu, 2007."
   (wait (mm_dd 4  8))
   (seed_bed_preparation)
   (wait (mm_dd 4 11))
-  (sow ("Potato; Exp" (weight 180 [kg w.w./ha]))(row_width 1 [m]))
+  (sow ("Potato; Exp" (weight 2765 [kg w.w./ha]))(row_width 1 [m]))
   ;; Watering left side.
   (wait (mm_dd  5 28))
   (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
