@@ -1,12 +1,12 @@
 using System;
 using System.Collections;
-using org.OpenMI.Standard;
-using org.OpenMI.Backbone;
-using org.OpenMI.Utilities.Wrapper;
+using global::OpenMI.Standard;
+using Oatc.OpenMI.Sdk.Backbone;
+using Oatc.OpenMI.Sdk.Wrapper;
 
 namespace dk.ku.life.Daisy.OpenMI
 {
-    public class DaisyWrapper : org.OpenMI.Utilities.Wrapper.IEngine
+    public class DaisyWrapper : Oatc.OpenMI.Sdk.Wrapper.IEngine
     {
         
         /* Declarations. */
@@ -59,8 +59,8 @@ namespace dk.ku.life.Daisy.OpenMI
             Console.WriteLine("Starting simulation.");
             _daisyEngine.Start();
         }  
-        // Input and output exchange items (part of org.OpenMI.Backbone.InputExchangeItem and 
-        // org.OpenMI.Backbone.OutputExchangeItem:
+        // Input and output exchange items (part of Oatc.OpenMI.Sdk.Backbone.InputExchangeItem and 
+        // Oatc.OpenMI.Sdk.Backbone.OutputExchangeItem:
         ArrayList _inputExchangeItems;
         ArrayList _outputExchangeItems;
         string FilePath;
@@ -138,9 +138,9 @@ namespace dk.ku.life.Daisy.OpenMI
                 double offset = dimtab[i].offset;
                 string dimDescription = dimtab[i].description;
                 Unit unit = new Unit(dimension, factor, offset, dimDescription);
-                return new Quantity(unit, description, name, org.OpenMI.Standard.ValueType.Scalar, unit_dimension);
+                return new Quantity(unit, description, name, global::OpenMI.Standard.ValueType.Scalar, unit_dimension);
             }
-            return new Quantity(new Unit(dimension, 1.0, 0, "Unrecognized dimension"), description, name, org.OpenMI.Standard.ValueType.Scalar, new Dimension());
+            return new Quantity(new Unit(dimension, 1.0, 0, "Unrecognized dimension"), description, name, global::OpenMI.Standard.ValueType.Scalar, new Dimension());
         }
         public void Initialize(Hashtable properties) //part of System.Collections
         {
@@ -246,37 +246,37 @@ namespace dk.ku.life.Daisy.OpenMI
         {
             return "Daisy version " + DLL.daisy_version();
         }
-        public org.OpenMI.Standard.ITime GetCurrentTime()
+        public global::OpenMI.Standard.ITime GetCurrentTime()
         {
-            org.OpenMI.Backbone.TimeStamp current_time = new TimeStamp();
-            current_time.ModifiedJulianDay = org.OpenMI.DevelopmentSupport.CalendarConverter.Gregorian2ModifiedJulian(_daisyEngine.GetTime());
-            return (org.OpenMI.Standard.ITime)(current_time);
+            Oatc.OpenMI.Sdk.Backbone.TimeStamp current_time = new TimeStamp();
+            current_time.ModifiedJulianDay = Oatc.OpenMI.Sdk.DevelopmentSupport.CalendarConverter.Gregorian2ModifiedJulian(_daisyEngine.GetTime());
+            return (global::OpenMI.Standard.ITime)(current_time);
         }
-        public org.OpenMI.Standard.ITime GetInputTime(string QuantityID, string ElementSetID)
+        public global::OpenMI.Standard.ITime GetInputTime(string QuantityID, string ElementSetID)
         {
             // TID MAN ØNSKER INPUT TIL (FORSKUDT TIDSKRIDT)
-            org.OpenMI.Backbone.TimeStamp current_time = new TimeStamp();
-            current_time.ModifiedJulianDay = org.OpenMI.DevelopmentSupport.CalendarConverter.Gregorian2ModifiedJulian(_daisyEngine.GetTime());
-            return (org.OpenMI.Standard.ITime)(current_time);
+            Oatc.OpenMI.Sdk.Backbone.TimeStamp current_time = new TimeStamp();
+            current_time.ModifiedJulianDay = Oatc.OpenMI.Sdk.DevelopmentSupport.CalendarConverter.Gregorian2ModifiedJulian(_daisyEngine.GetTime());
+            return (global::OpenMI.Standard.ITime)(current_time);
         }
-        public org.OpenMI.Standard.ITimeSpan GetTimeHorizon()
+        public global::OpenMI.Standard.ITimeSpan GetTimeHorizon()
         {
             DateTime daisy_start_time = StartTime;
             DateTime daisy_end_time = EndTime;
 
-            org.OpenMI.Backbone.TimeStamp start = new org.OpenMI.Backbone.TimeStamp();
-            start.ModifiedJulianDay = org.OpenMI.DevelopmentSupport.CalendarConverter.Gregorian2ModifiedJulian(daisy_start_time);
+            Oatc.OpenMI.Sdk.Backbone.TimeStamp start = new Oatc.OpenMI.Sdk.Backbone.TimeStamp();
+            start.ModifiedJulianDay = Oatc.OpenMI.Sdk.DevelopmentSupport.CalendarConverter.Gregorian2ModifiedJulian(daisy_start_time);
 
-            org.OpenMI.Backbone.TimeStamp end = new org.OpenMI.Backbone.TimeStamp();
-            end.ModifiedJulianDay = org.OpenMI.DevelopmentSupport.CalendarConverter.Gregorian2ModifiedJulian(daisy_end_time);
+            Oatc.OpenMI.Sdk.Backbone.TimeStamp end = new Oatc.OpenMI.Sdk.Backbone.TimeStamp();
+            end.ModifiedJulianDay = Oatc.OpenMI.Sdk.DevelopmentSupport.CalendarConverter.Gregorian2ModifiedJulian(daisy_end_time);
 
-            return (org.OpenMI.Standard.ITimeSpan)(new org.OpenMI.Backbone.TimeSpan(start, end));
+            return (global::OpenMI.Standard.ITimeSpan)(new Oatc.OpenMI.Sdk.Backbone.TimeSpan(start, end));
         }
-        public org.OpenMI.Standard.ITimeStamp GetEarliestNeededTime()
+        public global::OpenMI.Standard.ITimeStamp GetEarliestNeededTime()
         {
-            return (org.OpenMI.Standard.ITimeStamp)this.GetCurrentTime();
+            return (global::OpenMI.Standard.ITimeStamp)this.GetCurrentTime();
         }
-        public org.OpenMI.Standard.IValueSet GetValues(string QuantityID, string ElementSetID)
+        public global::OpenMI.Standard.IValueSet GetValues(string QuantityID, string ElementSetID)
         {
             double[] returnValues = new double[1];
             bool found = false;
@@ -310,20 +310,20 @@ namespace dk.ku.life.Daisy.OpenMI
             if (!found)
                 throw new Exception("No QuantityID: '" + QuantityID + "' defined in DaisyEngine");
 
-            org.OpenMI.Backbone.ScalarSet values = new org.OpenMI.Backbone.ScalarSet(returnValues);
+            Oatc.OpenMI.Sdk.Backbone.ScalarSet values = new Oatc.OpenMI.Sdk.Backbone.ScalarSet(returnValues);
             return values;
         }
         public double GetMissingValueDefinition()
         {
             return -999999.99;
         }
-        public org.OpenMI.Backbone.InputExchangeItem GetInputExchangeItem(int exchangeItemindex)
+        public Oatc.OpenMI.Sdk.Backbone.InputExchangeItem GetInputExchangeItem(int exchangeItemindex)
         {
-            return (org.OpenMI.Backbone.InputExchangeItem)this._inputExchangeItems[exchangeItemindex];
+            return (Oatc.OpenMI.Sdk.Backbone.InputExchangeItem)this._inputExchangeItems[exchangeItemindex];
         }
-        public org.OpenMI.Backbone.OutputExchangeItem GetOutputExchangeItem(int exchangeItemindex)
+        public Oatc.OpenMI.Sdk.Backbone.OutputExchangeItem GetOutputExchangeItem(int exchangeItemindex)
         {
-            return (org.OpenMI.Backbone.OutputExchangeItem)this._outputExchangeItems[exchangeItemindex];
+            return (Oatc.OpenMI.Sdk.Backbone.OutputExchangeItem)this._outputExchangeItems[exchangeItemindex];
         }
         public int GetOutputExchangeItemCount()
         {
@@ -333,7 +333,7 @@ namespace dk.ku.life.Daisy.OpenMI
         {
             return this._inputExchangeItems.Count;
         }
-        public void SetValues(string QuantityID, string ElementSetID, org.OpenMI.Standard.IValueSet value)
+        public void SetValues(string QuantityID, string ElementSetID, global::OpenMI.Standard.IValueSet value)
         {
             bool found = false;
 
@@ -355,7 +355,7 @@ namespace dk.ku.life.Daisy.OpenMI
                     {
                         if (found)
                             throw new Exception("Duplicate QuantityID: '" + QuantityID + "' used as argument in Daisy SetValues method");
-                        org.OpenMI.Standard.IScalarSet val = (org.OpenMI.Standard.IScalarSet)value;
+                        global::OpenMI.Standard.IScalarSet val = (global::OpenMI.Standard.IScalarSet)value;
                         if (scope.IsNumber(QuantityID))
                             scope.SetNumber(QuantityID, val.GetScalar(0));
                         found = true;

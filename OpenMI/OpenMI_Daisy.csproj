@@ -28,10 +28,22 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="org.OpenMI.Backbone, Version=1.1.0.0, Culture=neutral, PublicKeyToken=d4fe0bd3160b18a7, processorArchitecture=MSIL" />
-    <Reference Include="org.OpenMI.DevelopmentSupport, Version=1.1.0.0, Culture=neutral, PublicKeyToken=d4fe0bd3160b18a7, processorArchitecture=MSIL" />
-    <Reference Include="org.OpenMI.Standard, Version=1.1.0.0, Culture=neutral, PublicKeyToken=d4fe0bd3160b18a7, processorArchitecture=MSIL" />
-    <Reference Include="org.OpenMI.Utilities.Wrapper, Version=1.1.0.0, Culture=neutral, PublicKeyToken=d4fe0bd3160b18a7, processorArchitecture=MSIL" />
+    <Reference Include="Oatc.OpenMI.Sdk.Backbone, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\libdeps\OpenMi\Oatc\src\csharp\Sdk\Backbone\bin\Release\Oatc.OpenMI.Sdk.Backbone.dll</HintPath>
+    </Reference>
+    <Reference Include="Oatc.OpenMI.Sdk.DevelopmentSupport, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\libdeps\OpenMi\Oatc\src\csharp\Sdk\DevelopmentSupport\bin\Release\Oatc.OpenMI.Sdk.DevelopmentSupport.dll</HintPath>
+    </Reference>
+    <Reference Include="Oatc.OpenMI.Sdk.Wrapper, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\libdeps\OpenMi\Oatc\src\csharp\Sdk\Wrapper\bin\Release\Oatc.OpenMI.Sdk.Wrapper.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenMI.Standard, Version=1.4.0.0, Culture=neutral, PublicKeyToken=82bbb00ca5ab39e4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\libdeps\OpenMi\OpenMI.Standard\src\csharp\bin\OpenMI.Standard.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -40,7 +52,9 @@
     <Compile Include="daisyAccess.cs" />
     <Compile Include="daisyOpenMIcomponent.cs" />
     <Compile Include="daisywrapper.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

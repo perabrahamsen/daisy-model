@@ -39,13 +39,16 @@ commit: $(TEXT)
 daisy_dotnet.dll: $(DOTNETSRC)
 	$(CSHARP) /target:library /out:$@ $<
 
-OPENMIASS = C:\Program Files\OpenMI 1.2.0\OpenMIAssemblyFolder
+# OPENMIASS = C:\Program Files\OpenMI 1.2.0\OpenMIAssemblyFolder
+
+OPENMIASS = ..\..\libdeps
+
 daisy_OpenMI.dll: $(OPENMISRC)
 	$(CSHARP) /target:library /out:$@ /reference:daisy_dotnet.dll \
-	"/reference:$(OPENMIASS)\org.OpenMI.Standard.dll" \
-	"/reference:$(OPENMIASS)\org.OpenMI.Backbone.dll" \
-	"/reference:$(OPENMIASS)\org.OpenMI.Utilities.Wrapper.dll" \
-	"/reference:$(OPENMIASS)\org.OpenMI.DevelopmentSupport.dll" \
+	"/reference:$(OPENMIASS)\OpenMI.Standard.dll" \
+	"/reference:$(OPENMIASS)\Oatc.OpenMI.Sdk.Backbone.dll" \
+	"/reference:$(OPENMIASS)\Oatc.OpenMI.Sdk.Wrapper.dll" \
+	"/reference:$(OPENMIASS)\Oatc.OpenMI.Sdk.DevelopmentSupport.dll" \
 	daisywrapper.cs daisyOpenMIcomponent.cs 
 
 .cs.netmodule:

@@ -70,31 +70,31 @@ namespace Unit_test
         public void TimeHorizon()
         {
             DaisyWrapper Daisy = GetInitDaisy();
-            DateTime time = org.OpenMI.DevelopmentSupport.CalendarConverter.ModifiedJulian2Gregorian(Daisy.GetTimeHorizon().Start.ModifiedJulianDay);
+            DateTime time = Oatc.OpenMI.Sdk.DevelopmentSupport.CalendarConverter.ModifiedJulian2Gregorian(Daisy.GetTimeHorizon().Start.ModifiedJulianDay);
             Assert.AreEqual(new DateTime(1986, 12, 1, 1, 0, 0), time);
         }
         [Test]
         public void GetInputTime()
         {
             DaisyWrapper Daisy = GetInitDaisy();
-            org.OpenMI.Backbone.TimeStamp time = new org.OpenMI.Backbone.TimeStamp();
-            time.ModifiedJulianDay = org.OpenMI.DevelopmentSupport.CalendarConverter.Gregorian2ModifiedJulian(new DateTime(1986, 12, 1, 1, 0, 0));
+            Oatc.OpenMI.Sdk.Backbone.TimeStamp time = new Oatc.OpenMI.Sdk.Backbone.TimeStamp();
+            time.ModifiedJulianDay = Oatc.OpenMI.Sdk.DevelopmentSupport.CalendarConverter.Gregorian2ModifiedJulian(new DateTime(1986, 12, 1, 1, 0, 0));
             Assert.AreEqual(time, Daisy.GetInputTime("crop_height", "elementset"));
         }
         [Test]
         public void GetCurrentTime()
         {
             DaisyWrapper Daisy = GetInitDaisy();
-            org.OpenMI.Backbone.TimeStamp time = new org.OpenMI.Backbone.TimeStamp();
-            time.ModifiedJulianDay = org.OpenMI.DevelopmentSupport.CalendarConverter.Gregorian2ModifiedJulian(new DateTime(1986, 12, 1, 1, 0, 0));
+            Oatc.OpenMI.Sdk.Backbone.TimeStamp time = new Oatc.OpenMI.Sdk.Backbone.TimeStamp();
+            time.ModifiedJulianDay = Oatc.OpenMI.Sdk.DevelopmentSupport.CalendarConverter.Gregorian2ModifiedJulian(new DateTime(1986, 12, 1, 1, 0, 0));
             Assert.AreEqual(time, Daisy.GetCurrentTime());
         }
         [Test]
         public void GetEarliestNeededTime()
         {
             DaisyWrapper Daisy = GetInitDaisy();
-            org.OpenMI.Backbone.TimeStamp time = new org.OpenMI.Backbone.TimeStamp();
-            time.ModifiedJulianDay = org.OpenMI.DevelopmentSupport.CalendarConverter.Gregorian2ModifiedJulian(new DateTime(1986, 12, 1, 1, 0, 0));
+            Oatc.OpenMI.Sdk.Backbone.TimeStamp time = new Oatc.OpenMI.Sdk.Backbone.TimeStamp();
+            time.ModifiedJulianDay = Oatc.OpenMI.Sdk.DevelopmentSupport.CalendarConverter.Gregorian2ModifiedJulian(new DateTime(1986, 12, 1, 1, 0, 0));
             Assert.AreEqual(time, Daisy.GetEarliestNeededTime());
         }
         [Test]
@@ -114,7 +114,7 @@ namespace Unit_test
         {
             DaisyWrapper Daisy = GetInitDaisy();
             Assert.AreEqual("Simulation for use in tutorial.", Daisy.GetModelDescription());
-            Assert.AreEqual("Daisy version 4.18", Daisy.GetComponentDescription());
+            Assert.AreEqual("Daisy version 4.44", Daisy.GetComponentDescription());
             Assert.AreEqual("Simulation for use in tutorial.", Daisy.GetDescription());
         }
         [Test]
@@ -127,22 +127,22 @@ namespace Unit_test
        public void GetValues()
        {
            DaisyWrapper Daisy = GetInitDaisy();
-           org.OpenMI.Standard.IValueSet value = Daisy.GetValues("Water", "Andeby");
-           org.OpenMI.Backbone.ScalarSet test = (org.OpenMI.Backbone.ScalarSet)value;
+           global::OpenMI.Standard.IValueSet value = Daisy.GetValues("Water", "Andeby");
+           Oatc.OpenMI.Sdk.Backbone.ScalarSet test = (Oatc.OpenMI.Sdk.Backbone.ScalarSet)value;
            Assert.AreEqual(1, value.Count);
            Assert.AreEqual(Daisy.GetMissingValueDefinition(), test.data[0]);
 
            Daisy.PerformTimeStep();
            value = Daisy.GetValues("Water", "Andeby");
            Assert.AreEqual(1, value.Count);
-           test = (org.OpenMI.Backbone.ScalarSet)value;
+           test = (Oatc.OpenMI.Sdk.Backbone.ScalarSet)value;
            Assert.Greater(test.data[0],400);
        }
        [Test]
        public void SetValues()
        {
            DaisyWrapper Daisy = GetInitDaisy();
-           org.OpenMI.Backbone.ScalarSet val = new org.OpenMI.Backbone.ScalarSet();
+           Oatc.OpenMI.Sdk.Backbone.ScalarSet val = new Oatc.OpenMI.Sdk.Backbone.ScalarSet();
            val.data = new double[1];
            val.data[0] = 100.100;
            Daisy.SetValues("GroundWaterTable", "Andeby", val);
@@ -155,7 +155,7 @@ namespace Unit_test
            Assert.AreEqual("GroundWaterTable", Daisy.GetInputExchangeItem(item).Quantity.ID);
            Assert.AreEqual("cm", Daisy.GetInputExchangeItem(item).Quantity.Unit.ID);
            Assert.AreEqual("Ground water table.", Daisy.GetInputExchangeItem(item).Quantity.Description);
-           Assert.AreEqual(org.OpenMI.Standard.ElementType.XYPoint, Daisy.GetInputExchangeItem(item).ElementSet.ElementType);
+           Assert.AreEqual(global::OpenMI.Standard.ElementType.XYPoint, Daisy.GetInputExchangeItem(item).ElementSet.ElementType);
            Assert.AreEqual(1, Daisy.GetInputExchangeItem(item).ElementSet.GetVertexCount(0));
            Assert.AreEqual(-10, Daisy.GetInputExchangeItem(item).ElementSet.GetXCoordinate(0, 0));
            Assert.AreEqual(100, Daisy.GetInputExchangeItem(item).ElementSet.GetYCoordinate(0, 0));

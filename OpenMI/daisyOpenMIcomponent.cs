@@ -2,7 +2,7 @@ using System;
 namespace dk.ku.life.Daisy.OpenMI
 {
 
-  public class DaisyOpenMIComponent : org.OpenMI.Utilities.Wrapper.LinkableEngine
+  public class DaisyOpenMIComponent : Oatc.OpenMI.Sdk.Wrapper.LinkableEngine
   {
 
 protected override void SetEngineApiAccess ()
