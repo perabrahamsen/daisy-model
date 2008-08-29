@@ -896,7 +896,7 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 
   // Units.
   const Unit& u_ppm = units.get_unit (Units::ppm ());
-  const Unit& u_dpu = units.get_unit (Weather::dry_deposit_unit);
+  const Unit& u_dpu = units.get_unit (Weather::dry_deposit_unit ());
 
   // Read first line.
   const std::string type = lex->get_word ();

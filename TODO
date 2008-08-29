@@ -2,6 +2,8 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Oprydning
 
+** Check WeatherNone i opsætning.
+
 ** Test 1D med lr og højt grundvand
 
 ** Ryd op i løkker og stopbetingelser
@@ -10,86 +12,9 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Tertiary vand
 
+** Hvis vi har brugt mere end x one-step iterationer, skift til bisction.
+
 ** Prøv "1D" udgave af Nanna setup.
-
-** Alternativ løsning
-
-h3_min = 0.0;
-h3_max = h3_capacity
-
-h3 = h3_old
-
-slope = d (h3)
-new_h3 = h3 -
-
-0 = S (new) * dt + old - new
-
-f (new) = S (new) * dt + old - new
-
-d (new) = dS (new) * dt + 1
-
-source (soil) = 0
-sink (0) = 0
-
-new_min = 0.0
-new_max = max (soil, old)
-
-Ud fra alle de aktive celler der overlapper bioporen, find et bud på
-et nyt vandniveau i bioporen.  Hvis en aktiv celle er ligger i -30
-[cm] har et matrix tryk -10 [cm], så er dens forslag at bioporen skal
-være vandfyldt op til -40 [cm] fra jordoverfladen.  Den celle der
-foreslår mest vand i bioporen vinder.
-
-Kald det niveau for 'h3_new'.
-
-Hvis der ikke er nogen aktive celler, siger vi at budet er at bioporen
-er tømt, altså h3_new = 0 [cm] hvis vi måler fra bunden af bioporen.
-Vi vælger også h3_new = 0 [cm] hvis højeste bud fra de aktive celler
-er negativt.  Vi kan tilsvarende begrænse h3_new så den aldrig bliver
-højjerede end jordoverfladen (hvilket ellers kunne ske hvis vi har
-underjodisk vanding, eller en anden kilde til et stort overtryk i
-jorden).
-
-På baggrund af h3_new, udregn en source/sink, S_new for hver celle.
-Generelt vil der kun være sinks, eftersom vi har sat h3_new så højt at
-der ikke skulle være nogen sources.
-
-På baggrund af det gamle vandindhold i bioporen, h3_old, udregn en
-source/sink, S_old for hver celle.  Hvis h3_old er mindre end h3_new
-vil der være mindst en source, da mindst en aktiv celle vil prøve at
-øge vandindholdet.
-
-Find en "gennemsnitlig" source/sink S_avg = (S_new + S_old) / 2 for
-hver celle.
-
-Udregn et nyt vandindhold (h_s) i bioporen baseret på S_avg.
-
-Hvis h_S > h_new, skaler alle positive S 
-
-
-
-
-
-
-
-
-
-
-
-
-1. Ud fra alle aktive celler, find h_bottom_target
-
-2. [Stort tidsskridt] 
-
-   Hvis abs (h_bottom - h_bottom_target) < dz så er vi færdige
-
-3. Find S termer svarende til h_bottom_target
-
-4. Udregn h_bottom_ny ud fra S
-
-5. hvis h_bottom_ny > h_bottom_target så skaler source termer ned
-
-6. hvis h_bottom_ny < 0.0 så skaler sink termer ned
 
 ** få små tidsksridt til at virke.
 

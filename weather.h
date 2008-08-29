@@ -40,7 +40,7 @@ public:
   
   // Units.
 public:
-  static const symbol dry_deposit_unit;
+  static const symbol dry_deposit_unit ();
 
   // Location.
 public:

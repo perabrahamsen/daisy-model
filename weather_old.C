@@ -194,8 +194,8 @@ WeatherOld::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("UTM_y", Syntax::Unknown (), Syntax::OptionalConst,
 	      "Y position of weather station."); // Unused.
 
-  IM::add_syntax (syntax, alist, Syntax::Const, "DryDeposit", dry_deposit_unit,
-		  "Atmospheric deposition.");
+  IM::add_syntax (syntax, alist, Syntax::Const, "DryDeposit", 
+                  dry_deposit_unit (), "Atmospheric deposition.");
   IM::add_syntax (syntax, alist, Syntax::Const, "WetDeposit", Units::ppm (), 
 		  "Deposition of solutes with precipitation.");
 

@@ -24,11 +24,11 @@
 #include "fao.h"
 #include "assertion.h"
 #include "time.h"
-#include "units.h"
 #include "log.h"
 #include "mathlib.h"
 #include "librarian.h"
 #include "block.h"
+#include "units.h"
 
 // WeatherBase
 
@@ -349,7 +349,7 @@ WeatherBase::WeatherBase (Block& al)
     timezone_ (-42.42e42),
     surface_ (reference),
     screen_height_ (2.0),
-    DryDeposit (units.get_unit (dry_deposit_unit)),
+    DryDeposit (units.get_unit (dry_deposit_unit ())),
     WetDeposit (units.get_unit (Units::ppm ())),
     T_average (-42.42e42),           // May be used before Weather::check.
     T_amplitude (-42.42e42),

@@ -25,8 +25,6 @@
 #include "block.h"
 #include "librarian.h"
 
-const symbol Weather::dry_deposit_unit ("kg/ha/y");
-
 const char *const Weather::component = "weather";
 
 symbol
@@ -34,6 +32,13 @@ Weather::library_id () const
 {
   static const symbol id (component);
   return id;
+}
+
+const symbol 
+Weather::dry_deposit_unit ()
+{
+  static const symbol unit ("kg/ha/y");
+  return unit;
 }
 
 Weather::Weather (Block& al)

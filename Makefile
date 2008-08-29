@@ -1237,8 +1237,8 @@ bioincorporation${OBJ}: bioincorporation.C bioincorporation.h alist.h \
   mathlib.h assertion.h soil.h am.h im.h submodel.h plf.h aom.h om.h \
   check.h vcheck.h
 weather_base${OBJ}: weather_base.C weather_base.h weather.h model.h symbol.h \
-  alist.h im.h syntax.h treelog.h fao.h assertion.h time.h units.h log.h \
-  border.h mathlib.h librarian.h block.h plf.h
+  alist.h im.h syntax.h treelog.h fao.h assertion.h time.h log.h border.h \
+  mathlib.h librarian.h block.h plf.h units.h
 volume_box${OBJ}: volume_box.C volume_box.h volume.h model.h symbol.h alist.h \
   syntax.h treelog.h bound.h border.h mathlib.h assertion.h librarian.h
 movement_solute${OBJ}: movement_solute.C movement_solute.h movement.h model.h \
