@@ -21,7 +21,7 @@ all:	$(TARGETS)
 
 setup: $(TARGETS)
 	cp $(TARGETS) $(SETUPDIR)/bin
-	( $(OPENMIASS) && cp $(OPENMIDLL) $(SETUPDIR)/bin )
+	( cd "$(OPENMIASS)" && cp $(OPENMIDLL) $(SETUPDIR)/bin )
 	mkdir $(SETUPDIR)/src/OpenMI
 	cp $(TEXT) $(SETUPDIR)/src/OpenMI
 
