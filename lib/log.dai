@@ -3081,6 +3081,43 @@ submodel.  The amount printed under 'Total C Input' corresponds to the
                      (dimension "kg C/ha/&"))
            ))
 
+(deflog "Tertiary biopores water" biopore
+  "State of water in the tertiary biopores model."
+  (where "${colfid}tertiary-water-${bioporefid}.dlf")
+  (when hourly)
+  (entries (number (path column "${column}" Movement "*" 
+                         Tertiary biopores water)
+                   (handle current)
+                   (spec tertiary biopores water ))
+           (number (path column "${column}" Movement "*" 
+                         Tertiary biopores ddt)
+                   (handle min)
+                   (spec tertiary biopores ddt ))
+           (number (path column "${column}" Movement "*" 
+                         Tertiary biopores ddt_scaled)
+                   (handle min)
+                   (spec tertiary biopores ddt_scaled))
+           (number (path column "${column}" Movement "*" 
+                         Tertiary biopores ddt_solution)
+                   (handle min)
+                   (spec tertiary biopores ddt_solution))
+           (number (path column "${column}" Movement "*" 
+                         Tertiary biopores classes "${biopore}" iterations)
+                   (handle max)
+                   (spec biopore matrix iterations))
+           (array (path column "${column}" Movement "*" 
+                        Tertiary biopores classes "${biopore}" h_bottom)
+                  (handle max)
+                  (spec biopore matrix h_bottom))))
+
+(deflog "Tertiary water sink" column
+  "Tertiary water sink term."
+  (where "${colfid}tertiary-water-sink.dlf")
+  (when hourly)
+  (entries (array (path column "${column}" SoilWater S_p)
+                  (spec fixed SoilWater S_p)
+                  (handle sum))))
+
 (deflog "Harvest" harvest)
 
 ;;; log.dai ends here
