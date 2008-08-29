@@ -437,8 +437,8 @@ PhotoFarquhar::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("b", "mol/m^2/s", Check::positive (), Syntax::Const,
 	      "Stomatal intercept factor, Ball and Berry (1982) & Wang and Leuning(1998): (0.01 mol/m2/s)");
 
-    syntax.add ("gbw", "s/m^2/mol", Check::positive (), Syntax::Const,
-                "Leaf boundary conductance of water. gbw = 2 s/m2/mol (Collatz et al., 1991");
+    syntax.add ("gbw", "mol/m^2/s", Check::positive (), Syntax::Const,
+                "Leaf boundary conductance of water. gbw = 2 mol/m²/s (Collatz et al., 1991");
     alist.add ("gbw", 2.00);
 
   //log variables
