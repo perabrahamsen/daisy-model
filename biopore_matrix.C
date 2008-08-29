@@ -65,13 +65,16 @@ struct BioporeMatrix : public Biopore
   void set_state (const Anystate&);
   bool converge (const Anystate&, double max_abs, double max_rel) const;
   
+  // Log variable.
+  int iterations;
+
   // Utilities.
   /* const */ double dy;                    // [cm]
   std::vector<size_t> column;
   std::vector<double> added_water; // [cm^3]
   std::vector<double> density_column; // [cm^-2]
 
-  double height_to_water (const size_t col, const double dz /* [h] */) const;
+  double height_to_volume (const size_t col, const double dz /* [h] */) const;
   double volume_to_height (size_t col, double volume /* [cm^3] */) const;
   double air_bottom (const size_t c) const // Lowest point with air [cm]
   { 
@@ -170,7 +173,7 @@ BioporeMatrix::converge (const Anystate& state,
 }
 
 double
-BioporeMatrix::height_to_water (const size_t col,
+BioporeMatrix::height_to_volume (const size_t col,
                                 const double dz /* [h] */) const
 {
   daisy_assert (col < xplus.size ());
@@ -214,7 +217,7 @@ BioporeMatrix::total_water () const
   const size_t col_size = xplus.size ();
   double total = 0.0;
   for (size_t col = 0; col < col_size; col++)
-    total += height_to_water (col, h_bottom[col]);
+    total += height_to_volume (col, h_bottom[col]);
   return total;
 }
 
@@ -337,74 +340,103 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
   const size_t col_size = xplus.size ();
   const size_t cell_size = geo.cell_size ();
 
-#if 0
-  const double max_absolute_difference = 0.02; 
-  const double max_relative_difference = 0.001;
-
   std::vector<double> h3_min (col_size, 0.0);
   std::vector<double> h3_max (col_size, h_capacity);
 
-  for (;;)
-    {
-      std::vector<double> S3_min (col_size);
-      std::vector<double> S3_max (col_size);
-      find_matrix_sink (geo, soil, soil_heat, active,
-                        h_barrier, pressure_initiate, h3_min, h, dt, S3_min);
-      find_matrix_sink (geo, soil, soil_heat, active,
-                        h_barrier, pressure_initiate, h3_max, h, dt, S3_max);
-      
-      std::vector<double> guess_min = h_bottom;
-      std::vector<double> guess_max = h_bottom;
-      for (size_t c = 0; c < cell_size; c++)
-        {
-          const double vol = dt * geo.cell_volume (c);
-          const size_t col = column[c];
-          guess_min[col] += S3_min[c] * vol;
-          guess_max[col] += S3_max[c] * vol;
-        }
-
-      std::vector<double> guess (col_size);
-      for (size_t col = 0; col < col_size; col++)
-        {
-          if (guess_min[col] <= h3_min[col])
-            guess[col] = h3_max[col] = h3_min[col];
-          else if (guess_max[col] >= h3_max[col])
-            guess[col] = h3_min[col] = h3_max[col];
-          else if (h3_min[col] < h3_max[col])
-            {
-              // We need to solve
-              //     x = f (x)
-              // Which can be done by finding the roots of 
-              //     g (x) = f (x) - x = 0
-              // We use the "primitive" Newton method that requires
-              // two starting points, g (min) < 0 and g (max) > 0.  
-
-              const double x1 = h3_min[col];
-              const double y1 = guess_min[col] - x1;
-              const double x2 = h3_max[col];
-              const double y2 = guess_max[col] - x2;
-              daisy_assert (x2 > x1);
-              const double slope = (y2 - y1) / (x2 - x1);
-
-              // x1 + slope * dx = 0
-              // dx = -x1 / slop;
-              
-                
-              
-
-            }
-        }
-
-      double absolute_difference = 0.0;
-      double relative_difference = 0.0;
-    }
-  while (absolute_difference > max_absolute_difference
-         && relative_difference > max_relative_difference);
-
-#else
+#ifdef NO_ITERATIONS
   find_matrix_sink (geo, soil, soil_heat, active, h_barrier, pressure_initiate, 
                     h_bottom, h, dt, S);
+#else
+  const size_t max_iterations = 50;
+  const double max_absolute_difference = 0.02; 
+  const double max_relative_difference = 0.001;
+
+  std::vector<double> guess = h_bottom;
+  
+  for (iterations = 0; iterations < max_iterations; iterations++)
+    {
+      find_matrix_sink (geo, soil, soil_heat, active,
+                        h_barrier, pressure_initiate, guess, h, dt, S);
+      
+      // Added water volume.
+      std::vector<double> water (col_size, 0.0);
+      for (size_t c = 0; c < cell_size; c++)
+        {
+          const size_t col = column[c];
+          water[col] += S[c] * dt * geo.cell_volume (c);
+        }
+
+      double max_abs = 0.0;
+      double max_rel = 0.0;
+
+      // New value.
+      std::vector<double> value = h_bottom;
+
+      for (size_t col = 0; col < col_size; col++)
+        {
+          // Add S term.
+          value[col] += volume_to_height (col, water[col]);
+
+#if 0
+          std::ostringstream tmp;
+          tmp << iterations << ":" << col << " min = " << h3_min[col] 
+              << ", max = " << h3_max[col] << ", guess = " << guess[col] 
+              << ", value = " << value[col] << ", bottom = " << h_bottom[col]
+              << ", abs = " << max_abs << ", rel = " << max_rel;
+          Assertion::message (tmp.str ());
 #endif
+
+          // Adjust interval and find new guess.
+          if (value[col] > guess[col])
+            {
+              h3_min[col] = guess[col];
+              
+              if (value[col] > h3_max[col])
+                guess[col] = (h3_min[col] + h3_max[col] * 3) / 4.0;
+              else
+                guess[col] = value[col];
+            }
+          else if (value[col] < guess[col])
+            {
+              h3_max[col] = guess[col];
+
+              if (value[col] < h3_min[col])
+                guess[col] = (h3_min[col] * 3 + h3_max[col]) / 4.0;
+              else
+                guess[col] = value[col];
+            }
+          else 
+            // We found it! 
+            h3_min[col] = h3_max[col] = guess[col];
+
+          // We check old differences, so that S will be no worse that that.
+          const double h3_diff = h3_max[col] - h3_min[col];
+          daisy_assert (h3_diff >= 0.0);
+          max_abs = std::max (max_abs, h3_diff);
+          if (h3_max[col] > max_absolute_difference)
+            max_rel = std::max (max_rel, h3_diff / h3_max[col]);
+        }
+      
+      // Did we find a solution?
+      if (max_rel < max_relative_difference 
+          || max_abs < max_absolute_difference)
+        break;
+    }
+  
+  // Try to make sure we have something to scale.
+  for (size_t col = 0; col < col_size; col++)
+    {
+      if (guess[col] < h_bottom[col])
+        guess[col] = h3_max[col];
+      else if (guess[col] > h_bottom[col])
+        guess[col] = h3_min[col];
+      
+      find_matrix_sink (geo, soil, soil_heat, active,
+                        h_barrier, pressure_initiate, guess, h, dt, S);
+    }
+
+#endif
+
   // Find added and removed water.
   std::vector<double> vol_added (col_size, 0.0);
   std::vector<double> vol_removed (col_size, 0.0);
@@ -432,17 +464,19 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
       const double h_new = h_bottom[col] + h_added - h_removed;
 
       // Too little?
-      if (h_new < 0.0 && h_removed > 1e-10)
+      if (h_new < h3_min[col] && h_removed > 1e-10)
         {
-          // Solve h_bottom + h_added - scale * h_removed = 0.0
-          scale_removed[col] = (h_bottom[col] + h_added) / h_removed;
+          // Solve h_bottom + h_added - scale * h_removed = h3_min
+          scale_removed[col]
+            = (h_bottom[col] + h_added - h3_min[col]) / h_removed;
           daisy_assert (scale_removed[col] <= 1.0);
           daisy_assert (scale_removed[col] >= 0.0);
         }
-      else if (h_new > h_capacity && h_added > 1e-10)
+      else if (h_new > h3_max[col] && h_added > 1e-10)
         {
-          // Solve h_bottom + scale * h_added - h_removed = h_capacity
-          scale_added[col] = (h_capacity + h_removed - h_bottom[col]) / h_added;
+          // Solve h_bottom + scale * h_added - h_removed = h3_max
+          scale_added[col]
+            = (h3_max[col] + h_removed - h_bottom[col]) / h_added;
           daisy_assert (scale_added[col] <= 1.0);
           daisy_assert (scale_added[col] >= 0.0);
         }
@@ -467,11 +501,22 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
   const double total_S = geo.total_soil (S) * dt;
   double total_water = 0.0;
   for (size_t col = 0; col < col_size; col++)
-    total_water += added_water[col];
+    {
+      total_water += added_water[col];
+#if 0
+      std::ostringstream tmp;
+      tmp << "out: " << col << " min = " << h3_min[col] 
+          << ", max = " << h3_max[col] << ", guess = " << guess[col] 
+          << ", added " << volume_to_height (col, added_water[col]) 
+          << " [cm], dt = " << dt << " [h]";
+      Assertion::message (tmp.str ());
+#endif
+    }
   if (!approximate (total_S, total_water))
     {
       std::ostringstream tmp;
-      tmp << "S = " << total_S << ", added = " << total_water;
+      tmp << "S " << total_S << " [cm^3] != added " << total_water
+          << " [cm^3]";
       daisy_bug (tmp.str ());
     }
 }
@@ -500,7 +545,7 @@ BioporeMatrix::update_water ()
 
 double
 BioporeMatrix::column_water (const size_t col) const
-{ return height_to_water (col, h_bottom[col]); }
+{ return height_to_volume (col, h_bottom[col]); }
 
 void 
 BioporeMatrix::add_to_sink (std::vector<double>& S_matrix,
@@ -604,6 +649,7 @@ BioporeMatrix::output (Log& log) const
   output_variable (h_bottom, log);
   output_submodule (*solute, "solute", log);
   output_lazy (total_water (), "water", log);
+  output_variable (iterations, log);
 }
 
 bool 
@@ -729,6 +775,8 @@ If not specified, this will be identical to 'R_primary'.");
     IMvec::add_syntax (syntax, alist, Syntax::OptionalState, "solute", C_unit,
                        "Chemical concentration in biopore intervals.");
     syntax.add ("water", "cm^3", Syntax::LogOnly, "Water content.");    
+    syntax.add ("iterations", Syntax::Integer, Syntax::LogOnly, 
+                "Number of iterations used for finding a solution.");
 
     Librarian::add_type (Biopore::component, "matrix", alist, syntax, &make);
   }

@@ -1,8 +1,14 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Tertiary vand
+* Oprydning
+
+** Test 1D med lr og højt grundvand
+
+** Ryd op i løkker og stopbetingelser
 
 ** Should initialize "active" and "h_bottom" after groundwater.table ()
+
+* Tertiary vand
 
 ** Prøv "1D" udgave af Nanna setup.
 

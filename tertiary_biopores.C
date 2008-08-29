@@ -525,6 +525,7 @@ TertiaryBiopores::find_implicit_water_1 (const Anystate& old_state,
       set_state (old_state);
       // Add water to get new state.
       update_water ();
+      return true;
       // Check if they converge.
       if (converge (new_state))
         // If so, we are finished.

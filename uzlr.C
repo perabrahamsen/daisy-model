@@ -137,8 +137,16 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
       const double dz = geo.dz (i);
       const double Theta_sat = soil.Theta (i, 0.0, h_ice[i]);
       const double Theta_res = soil.Theta_res (i);
-      const double Theta_new = Theta_old[i] - q[i] * dt / dz - S[i] * dt;
-      daisy_assert (Theta_new >= Theta_res);
+      double Theta_new = Theta_old[i] - q[i] * dt / dz - S[i] * dt;
+      if (Theta_new < Theta_res)
+        {
+          std::ostringstream tmp;
+          tmp << i << ": Theta_new = " << Theta_new 
+              << ", Theta_old = " << Theta_old[i]
+              << ", q = " << q[i] << ", dt = " << dt << ", dz = " << dz 
+              << ", S " << S[i];
+          msg.error (tmp.str ());
+        }
       // daisy_assert (Theta_new <= Theta_sat);
       const double h_new = soil.h (i, Theta_new);
       double K_new = soil.K (i, h_new, h_ice[i], soil_heat.T (i));
@@ -151,11 +159,20 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
       // cell), and wrong for forced flux (= pipe drained soil) where
       // the groundwater is usually much higher.  Still, it is better
       // than using h_fc.
-      const double h_lim = (bottom.bottom_type ()
-                            == Groundwater::free_drainage) 
-        ? h_fc
-        : std::max (geo.zplus (last) - z, h_fc);
-      daisy_assert (h_lim < 0.0);
+      double h_lim;
+      switch (bottom.bottom_type ())
+        {
+        case Groundwater::free_drainage:
+          h_lim = h_fc;
+          break;
+        case Groundwater::pressure:
+          h_lim = std::max (bottom.table () - z, h_fc);
+          break;
+        default:
+          h_lim = std::max (geo.zplus (last) - z, h_fc);
+          break;
+        }
+      // daisy_assert (h_lim < 0.0);
 
       if (use_darcy && i < first + 5 && z > z_top)
 	// Dry earth, near top.  Use darcy to move water up.
@@ -178,7 +195,7 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
       else if (h_new <= h_lim)
 	// Dry earth, no water movement.
 	{
-	  daisy_assert (Theta_new <= Theta_sat);
+	  // daisy_assert (Theta_new <= Theta_sat);
 	  q[i+1] = 0.0;
 	  Theta[i] = Theta_new;
 	  h[i] = h_new;
@@ -233,24 +250,27 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
       daisy_assert (std::isfinite (h[i]));
       daisy_assert (std::isfinite (Theta[i]));
       daisy_assert (std::isfinite (q[i+1]));
-      daisy_assert (Theta[i] <= Theta_sat);
+      // daisy_assert (Theta[i] <= Theta_sat);
       daisy_assert (Theta[i] >= Theta_res);
     }
 
   // Lower border.
   q_down = q[last + 1];
 
-  if (bottom.bottom_type () == Groundwater::forced_flux
-      && !approximate (q_down, bottom.q_bottom (bottom_edge)))
-    {
+  {
       // Ensure forced bottom.
-      double extra_water = (bottom.q_bottom (bottom_edge) - q_down) * dt;
-      for (int i = last; std::isnormal (extra_water); i--)
+      double extra_water = 0.0;
+
+      if (bottom.bottom_type () == Groundwater::forced_flux
+          && !approximate (q_down, bottom.q_bottom (bottom_edge)))
+        extra_water += (bottom.q_bottom (bottom_edge) - q_down) * dt;
+
+      for (int i = last; true; i--)
 	{
 	  q[i+1] += extra_water / dt;
 	  if (i < static_cast<int> (first))
             {
-              if (overflow_warn)
+              if (extra_water > 0.0 && overflow_warn)
                 {
                   msg.warning ("Soil profile saturated, water flow to surface");
                   overflow_warn = false;

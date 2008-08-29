@@ -214,7 +214,7 @@ Surface::Implementation::exfiltrate (const Geometry& geo, const size_t edge,
   if (pond_edge[edge] + water < 0.0)
     // - std::max (fabs (pond_edge[edge]), fabs (water)) / 100.0)
     {
-      if (!approximate (fabs (pond_edge[edge]), fabs (water)))
+      if (!approximate (fabs (pond_edge[edge]), fabs (water), 0.001))
       {
         Treelog::Open nest (msg, 
                             "Surface exfiltration for edge " 

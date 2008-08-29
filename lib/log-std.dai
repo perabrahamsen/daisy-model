@@ -51,6 +51,22 @@
                  (true
                   "${chemical}"))))
 
+(deflog biopore column
+  "A log table for a specific biopore class."
+  ;; Let the user choose a biopore.
+  (declare biopore String
+	   "Name of biopore to log.  Use \"*\" to log all biopore classes.")
+  (biopore "*")
+  ;; Add it to the log files.
+  (parameter_names &old biopore)
+  ;; Use biopore name as part of file name.
+  (declare bioporefid string
+           "File component name indicating biopore logged.")
+  (bioporefid (cond ((string-equal "${biopore}" "*")
+                     "biopores")
+                    (true
+                     "${biopore}"))))
+
 (defsummary "Field water balance" balance
   "Water balance for the complete system."
   (precision 1)
