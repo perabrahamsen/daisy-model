@@ -9,6 +9,11 @@ TEXT = $(SOURCES) Makefile
 
 REMOVE = daisyDotNetAccess.cs
 
+OPENMIDLL = OpenMI.Standard.dll Oatc.OpenMI.Sdk.Backbone.dll \
+	Oatc.OpenMI.Sdk.Wrapper.dll Oatc.OpenMI.Sdk.DevelopmentSupport.dll
+
+OPENMIASS = ..\libdeps
+
 help:
 	$(CSHARP) /help
 
@@ -16,6 +21,7 @@ all:	$(TARGETS)
 
 setup: $(TARGETS)
 	cp $(TARGETS) $(SETUPDIR)/bin
+	( $(OPENMIASS) && cp $(OPENMIDLL) $(SETUPDIR)/bin )
 	mkdir $(SETUPDIR)/src/OpenMI
 	cp $(TEXT) $(SETUPDIR)/src/OpenMI
 
@@ -38,10 +44,6 @@ commit: $(TEXT)
 
 daisy_dotnet.dll: $(DOTNETSRC)
 	$(CSHARP) /target:library /out:$@ $<
-
-# OPENMIASS = C:\Program Files\OpenMI 1.2.0\OpenMIAssemblyFolder
-
-OPENMIASS = ..\libdeps
 
 daisy_OpenMI.dll: $(OPENMISRC)
 	$(CSHARP) /target:library /out:$@ /reference:daisy_dotnet.dll \
