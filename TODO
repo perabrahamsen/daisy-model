@@ -2,8 +2,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Oprydning
 
-** Check WeatherNone i opsætning.
-
 ** Test 1D med lr og højt grundvand
 
 ** Ryd op i løkker og stopbetingelser
@@ -12,7 +10,7 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Tertiary vand
 
-** Hvis vi har brugt mere end x one-step iterationer, skift til bisction.
+** Hvis vi har brugt mere end x one-step iterationer, skift til bisection.
 
 ** Prøv "1D" udgave af Nanna setup.
 

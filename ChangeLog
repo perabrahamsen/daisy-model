@@ -1,3 +1,17 @@
+2008-08-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.45 released.
+
+2008-08-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* OpenMI/Makefile (OPENMIDLL): New macro.
+	(OPENMIASS): Changed to libdeps.
+	(setup): cp $(OPENMIDLL) to setup/bin.
+	(daisy_OpenMI.dll): Update for OpenMI 1.4.
+
+	* weather.h, weather.C (Weather::dry_deposit_unit): Made it a function.
+	* weather_base.C, weather_old.C, weather_std.C: update users.
+
 2008-08-28  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.44 released.
