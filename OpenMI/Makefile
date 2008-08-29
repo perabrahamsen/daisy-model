@@ -41,7 +41,7 @@ daisy_dotnet.dll: $(DOTNETSRC)
 
 # OPENMIASS = C:\Program Files\OpenMI 1.2.0\OpenMIAssemblyFolder
 
-OPENMIASS = ..\..\libdeps
+OPENMIASS = ..\libdeps
 
 daisy_OpenMI.dll: $(OPENMISRC)
 	$(CSHARP) /target:library /out:$@ /reference:daisy_dotnet.dll \
