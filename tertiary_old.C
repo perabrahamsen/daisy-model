@@ -31,6 +31,7 @@
 #include "librarian.h"
 #include "block.h"
 #include "surface.h"
+#include "groundwater.h"
 
 struct TertiaryOld : public Tertiary
 {
@@ -65,7 +66,7 @@ struct TertiaryOld : public Tertiary
 public:
   bool initialize (const Units&, 
                    const Geometry&, const Soil&, const Scope& parent_scope, 
-                   const double pipe_position, Treelog& msg);
+                   const Groundwater&, Treelog& msg);
   bool check (const Geometry&, Treelog& msg) const;
   TertiaryOld (Block& al);
   static void load_syntax (Syntax&, AttributeList&);
@@ -171,7 +172,7 @@ TertiaryOld::output (Log&) const
 bool 
 TertiaryOld::initialize (const Units&,
                          const Geometry& geometry, const Soil& soil,
-                         const Scope& scope, const double pipe_position, 
+                         const Scope& scope, const Groundwater& groundwater, 
                          Treelog& msg)
 { 
   Treelog::Open nest (msg, component + std::string (": ") + name);
@@ -201,8 +202,8 @@ This tertiary water transport model only works with the 'vertical' movement mode
       double height = std::max (geo.zplus (lay-1), -150.0);
 
       // Don't go below drain pipes.
-      if (pipe_position < 0.0)
-        height = std::max (height, pipe_position);
+      if (groundwater.is_pipe ())
+        height = std::max (height, groundwater.pipe_height ());
 
       // Add them.
       macro = Macro::create (height);

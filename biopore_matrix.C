@@ -35,6 +35,7 @@
 #include "check.h"
 #include "anystate.h"
 #include "chemical.h"
+#include "groundwater.h"
 #include <sstream>
 
 // The 'matrix' model.
@@ -63,7 +64,6 @@ struct BioporeMatrix : public Biopore
   };
   Anystate get_state () const;
   void set_state (const Anystate&);
-  bool converge (const Anystate&, double max_abs, double max_rel) const;
   
   // Log variable.
   int iterations;
@@ -130,7 +130,8 @@ struct BioporeMatrix : public Biopore
 
   // Create and Destroy.
   bool initialize (const Units&, 
-                   const Geometry& geo, const Scope& scope, double,
+                   const Geometry& geo, const Scope& scope, 
+                   const Groundwater& groundwater,
                    Treelog& msg);
   bool check (const Geometry& geo, Treelog& msg) const
   { return check_base (geo, msg); }
@@ -149,30 +150,6 @@ BioporeMatrix::set_state (const Anystate& state)
 {
   const MyContent& content = static_cast<const MyContent&> (state.inspect ());
   h_bottom = content.h_bottom;
-}
-
-bool 
-BioporeMatrix::converge (const Anystate& state, 
-                         const double max_abs, const double max_rel) const
-{ 
-  const MyContent& content = static_cast<const MyContent&> (state.inspect ());
-  const size_t h_size = h_bottom.size ();
-  daisy_assert (h_size == content.h_bottom.size ());
-  const double max_h = height_start - height_end;
-  daisy_assert (max_h > 0.0);
-  for (size_t i = 0; i < h_size; i++)
-    {
-      // Check difference.
-      if (   fabs (h_bottom[i] - content.h_bottom[i]) > max_abs
-          && (   iszero (content.h_bottom[i])
-              || iszero (h_bottom[i])
-              || (  fabs ((h_bottom[i] - content.h_bottom[i]) 
-                          / content.h_bottom[i])
-                  > max_rel)))
-        return false;
-    }
-
-  return true; 
 }
 
 double
@@ -670,8 +647,8 @@ BioporeMatrix::output (Log& log) const
 
 bool 
 BioporeMatrix::initialize (const Units& units,
-                           const Geometry& geo, const Scope& scope, double,
-                           Treelog& msg)
+                           const Geometry& geo, const Scope& scope, 
+                           const Groundwater& groundwater, Treelog& msg)
 { 
   bool ok = true;
 
@@ -687,7 +664,29 @@ BioporeMatrix::initialize (const Units& units,
 
   // h_bottom.
   if (h_bottom.size () == 0)
-    h_bottom.insert (h_bottom.end (), column_size, 0.0);
+    {
+      double z_bottom = height_end;
+      switch (groundwater.bottom_type ())
+        {
+        case Groundwater::pressure:
+        case Groundwater::lysimeter:
+          z_bottom = groundwater.table ();
+          break;
+        case Groundwater::forced_flux:
+          if (groundwater.is_pipe ())
+            z_bottom = groundwater.pipe_height ();
+          break;
+        case Groundwater::free_drainage:
+          break;
+        default:
+          msg.error ("Unsupported groundwater model '" 
+                     + groundwater.name + "'");
+          ok = false;
+        }
+      const double h_bottom_start 
+        = bound (0.0, z_bottom - height_end, height_start - height_end);
+      h_bottom.insert (h_bottom.end (), column_size, h_bottom_start);
+    }
 
   if (h_bottom.size () != column_size)
     {

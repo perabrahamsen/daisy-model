@@ -33,8 +33,6 @@ Tertsmall::none ()
     { return Anystate::none (); }
     void set_state (const Anystate&)
     { }
-    bool converge (const Anystate&)
-    { return true; }
     void matrix_sink (std::vector<double>& S_matrix,
                       std::vector<double>& S_drain) const
     { }

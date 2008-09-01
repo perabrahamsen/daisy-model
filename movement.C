@@ -24,7 +24,6 @@
 #include "block.h"
 #include "librarian.h"
 #include "tertiary.h"
-#include "groundwater.h"
 #include "log.h"
 
 const char *const Movement::component = "movement";
@@ -74,11 +73,8 @@ Movement::initialize (const Units& units,
   bool ok = true;
   
   // Tertiary transport depends on groundwater and soil.
-  const double pipe_position = groundwater.is_pipe ()
-    ? groundwater.pipe_height ()
-    : 42.42e42;
   if (!tertiary->initialize (units, geometry (),
-                             soil, scope, pipe_position, msg))
+                             soil, scope, groundwater, msg))
     ok = false;
   
   initialize_derived (soil, groundwater, tertiary->has_macropores (), msg);

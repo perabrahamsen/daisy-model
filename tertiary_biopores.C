@@ -72,7 +72,6 @@ struct TertiaryBiopores : public Tertiary, public Tertsmall
   };
   Anystate get_state () const;
   void set_state (const Anystate&);
-  bool converge (const Anystate&);
 
   // Log variables.
   double ddt;
@@ -123,7 +122,7 @@ struct TertiaryBiopores : public Tertiary, public Tertsmall
 public:
   bool initialize (const Units&, 
                    const Geometry&, const Soil&, const Scope& parent_scope, 
-                   const double pipe_position, Treelog& msg);
+                   const Groundwater&, Treelog& msg);
   bool check (const Geometry&, Treelog& msg) const;
   explicit TertiaryBiopores (Block& al);
 };
@@ -148,23 +147,6 @@ TertiaryBiopores::set_state (const Anystate& state)
   daisy_assert (classes_size == content.states.size ());
   for (size_t b = 0; b < classes_size; b++)
     classes[b]->set_state (content.states[b]);
-}
-
-bool 
-TertiaryBiopores::converge (const Anystate& state)
-{  
-  const MyContent& content = static_cast<const MyContent&> (state.inspect ());
-  const size_t classes_size = classes.size ();
-  daisy_assert (classes_size == content.states.size ());
-  for (size_t b = 0; b < classes_size; b++)
-    {
-      Biopore& biopore = *classes[b];
-      if (!biopore.converge (content.states[b], 
-                             max_absolute_difference, 
-                             max_relative_difference))
-        return false;
-    }
-  return true;
 }
 
 double
@@ -547,7 +529,8 @@ TertiaryBiopores::output (Log& log) const
 bool 
 TertiaryBiopores::initialize (const Units& units,
                               const Geometry& geo, const Soil&, 
-                              const Scope& scope, const double pipe_position, 
+                              const Scope& scope,
+                              const Groundwater& groundwater, 
                               Treelog& msg)
 { 
   Treelog::Open nest (msg, component + std::string (": ") + name);
@@ -555,7 +538,7 @@ TertiaryBiopores::initialize (const Units& units,
   for (size_t b = 0; b < classes.size (); b++)
     {
       Treelog::Open nest2 (msg, "classes", b, classes[b]->name);
-      if (!classes[b]->initialize (units, geo, scope, pipe_position, msg))
+      if (!classes[b]->initialize (units, geo, scope, groundwater, msg))
         ok = false;
     }
   const size_t cell_size = geo.cell_size ();
@@ -611,9 +594,8 @@ static struct TertiaryBioporesSyntax
 fTrue iff solutes should be transport with the water through the biopores.");
     alist.add ("enable_solute", true);
     syntax.add ("max_iterations", Syntax::Integer, Syntax::Const, "\
-Maximum number of iterations when seeking convergence before reducing\n\
-the time step.");
-    alist.add ("max_iterations", 25);
+Maximum number of iterations when seeking convergence.");
+    alist.add ("max_iterations", 50);
     syntax.add ("max_absolute_difference", "cm", Syntax::Const, "\
 Maximum absolute difference in biopore content for convergence.");
     alist.add ("max_absolute_difference", 0.02);

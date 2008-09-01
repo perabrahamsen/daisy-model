@@ -50,7 +50,8 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Units&, const Geometry& geo, const Time&, const Scope&, Treelog&)
+  void initialize (const Units&, const Geometry& geo, const Time&,
+                   const Scope&, Treelog&)
   { location = geo.bottom (); }
   bool check (const Units&, const Geometry&, const Scope&, Treelog&) const
   { return true; }

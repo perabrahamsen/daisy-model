@@ -73,7 +73,7 @@ class TertiaryNone : public Tertiary
 
   // Create and Destroy.
   bool initialize (const Units&, const Geometry&, const Soil&, const Scope&,  
-                   const double /* pipe_position */, Treelog&)
+                   const Groundwater&, Treelog&)
   { return true; }
   bool check (const Geometry&, Treelog&) const
   { return true; }

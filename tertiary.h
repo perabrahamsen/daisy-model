@@ -38,6 +38,7 @@ class Treelog;
 class Log;
 class Tertsmall;
 class Units;
+class Groundwater;
 
 class Tertiary : public ModelAListed
 {
@@ -73,7 +74,7 @@ public:
   static const AttributeList& old_model ();
   virtual bool initialize (const Units&,
                            const Geometry&, const Soil&, const Scope&, 
-                           const double pipe_position, Treelog&) = 0;
+                           const Groundwater&, Treelog&) = 0;
   virtual bool check (const Geometry&, Treelog&) const = 0;
 protected:
   explicit Tertiary (Block& al);

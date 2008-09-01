@@ -30,6 +30,7 @@
 #include "soil_heat.h"
 #include "anystate.h"
 #include "chemical.h"
+#include "groundwater.h"
 #include <sstream>
 
 // The 'drain' model.
@@ -44,8 +45,6 @@ struct BioporeDrain : public Biopore
   { return Anystate::none (); }
   void set_state (const Anystate&)
   { }
-  bool converge (const Anystate&, const double, const double) const
-  { return true; }
 
   // Simulation.
   double total_water () const
@@ -98,16 +97,19 @@ struct BioporeDrain : public Biopore
 
   // Create and Destroy.
   bool initialize (const Units& units, const Geometry& geo, const Scope& scope,
-                   const double pipe, Treelog& msg)
+                   const Groundwater& groundwater, Treelog& msg)
   {
     bool ok = initialize_base (units, geo, scope, msg); 
     if (pipe_position > 0)
-      // Pipe height not specified here, use value from column.
-      pipe_position = pipe;
-    if (pipe_position > 0)
       {
-        msg.error ("Unknown pipe position");
-        ok = false;
+        if (groundwater.is_pipe ())
+          // Pipe height not specified here, use value from column.
+          pipe_position = groundwater.pipe_height ();
+        else
+          {
+            msg.error ("Unknown pipe position");
+            ok = false;
+          }
       }
     return ok;
   }

@@ -37,6 +37,7 @@ class Log;
 class Anystate;
 class Chemical;
 class Units;
+class Groundwater;
 
 class Biopore : public ModelAListed
 {
@@ -47,8 +48,6 @@ public:
 
   virtual Anystate get_state () const = 0;
   virtual void set_state (const Anystate&) = 0;
-  virtual bool converge (const Anystate&, 
-                         double max_abs, double max_rel) const = 0;
 
   // Parameters.
 protected:
@@ -115,7 +114,7 @@ protected:
   bool check_base (const Geometry&, Treelog& msg) const;
 public:
   virtual bool initialize (const Units&, 
-                           const Geometry&, const Scope&, double pipe_height,
+                           const Geometry&, const Scope&, const Groundwater&,
                            Treelog&) = 0;
   virtual bool check (const Geometry&, Treelog& msg) const = 0;
   static void load_base (Syntax& syntax, AttributeList& alist);
