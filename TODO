@@ -8,6 +8,10 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Tertiary vand
 
+** Brug "soil pressure" to at bregrænse interval.  Drop evt. h_barrier.
+
+** Iterate indtil old/next guess opfylder convergens.
+
 ** Hvis vi har brugt mere end x one-step iterationer, skift til bisection.
 
 ** Prøv "1D" udgave af Nanna setup.
