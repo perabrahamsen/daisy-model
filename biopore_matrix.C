@@ -112,6 +112,9 @@ struct BioporeMatrix : public Biopore
                            const SoilHeat& soil_heat, 
                            const std::vector<bool>& active,
                            const double h_barrier,
+                           const size_t max_iterations,
+                           const double max_absolute_difference,
+                           const double max_relative_difference,
                            const double pressure_initiate,
                            const std::vector<double>& h,
                            const double dt);
@@ -330,6 +333,9 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
                                    const SoilHeat& soil_heat, 
                                    const std::vector<bool>& active,
                                    const double h_barrier,
+                                   const size_t max_iterations,
+                                   const double max_absolute_difference,
+                                   const double max_relative_difference,
                                    const double pressure_initiate,
                                    const std::vector<double>& h, 
                                    const double dt)
@@ -342,14 +348,6 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
 
   std::vector<double> h3_min (col_size, 0.0);
   std::vector<double> h3_max (col_size, h_capacity);
-
-#ifdef NO_ITERATIONS
-  find_matrix_sink (geo, soil, soil_heat, active, h_barrier, pressure_initiate, 
-                    h_bottom, h, dt, S);
-#else
-  const size_t max_iterations = 50;
-  const double max_absolute_difference = 0.02; 
-  const double max_relative_difference = 0.001;
 
   std::vector<double> guess = h_bottom;
   
@@ -435,8 +433,6 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
                         h_barrier, pressure_initiate, guess, h, dt, S);
     }
 
-#endif
-
   // Find added and removed water.
   std::vector<double> vol_added (col_size, 0.0);
   std::vector<double> vol_removed (col_size, 0.0);
@@ -469,7 +465,17 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
           // Solve h_bottom + h_added - scale * h_removed = h3_min
           scale_removed[col]
             = (h_bottom[col] + h_added - h3_min[col]) / h_removed;
-          daisy_assert (scale_removed[col] <= 1.0);
+          daisy_assert (std::isfinite (scale_added[col]));
+          if (scale_removed[col] > 1.0)
+            {
+              std::ostringstream tmp;
+              tmp << "scale[" << col << "] removed = " << scale_removed[col] 
+                  << "; max = " << h3_max[col] << "; min = " << h3_min[col]
+                  << "; added = " << h_added << "; removed = " << h_removed
+                  << "; old = " << h_bottom[col] << "; new = " << h_new;
+              daisy_bug (tmp.str ());
+              scale_removed[col] = 1.0;
+            }
           daisy_assert (scale_removed[col] >= 0.0);
         }
       else if (h_new > h3_max[col] && h_added > 1e-10)
@@ -477,7 +483,17 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
           // Solve h_bottom + scale * h_added - h_removed = h3_max
           scale_added[col]
             = (h3_max[col] + h_removed - h_bottom[col]) / h_added;
-          daisy_assert (scale_added[col] <= 1.0);
+          daisy_assert (std::isfinite (scale_added[col]));
+          if (scale_added[col] > 1.0)
+            {
+              std::ostringstream tmp;
+              tmp << "scale[" << col << "] added = " << scale_added[col] 
+                  << "; max = " << h3_max[col] << "; min = " << h3_min[col]
+                  << "; added = " << h_added << "; removed = " << h_removed
+                  << "; old = " << h_bottom[col] << "; new = " << h_new;
+              daisy_bug (tmp.str ());
+              scale_added[col] = 1.0;
+            }
           daisy_assert (scale_added[col] >= 0.0);
         }
             

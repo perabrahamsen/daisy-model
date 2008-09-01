@@ -2,9 +2,11 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Oprydning
 
-** Test 1D med lr og højt grundvand
+** Opdater wiki:Tertsmall find_implicit_solution
 
 ** Ryd op i løkker og stopbetingelser
+
+** Test 1D med lr og højt grundvand
 
 ** Should initialize "active" and "h_bottom" after groundwater.table ()
 

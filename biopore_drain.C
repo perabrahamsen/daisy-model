@@ -72,6 +72,9 @@ struct BioporeDrain : public Biopore
                            const SoilHeat& soil_heat, 
                            const std::vector<bool>& active,
                            const double h_barrier,
+                           const size_t max_iterations,
+                           const double max_absolute_difference,
+                           const double max_relative_difference,
                            const double pressure_initiate,
                            const std::vector<double>& h, const double dt);
   void update_water ()
@@ -140,6 +143,9 @@ BioporeDrain::update_matrix_sink (const Geometry& geo,
                                   const SoilHeat& soil_heat, 
                                   const std::vector<bool>& active,
                                   const double h_barrier,
+                                  const size_t max_iterations,
+                                  const double max_absolute_difference,
+                                  const double max_relative_difference,
                                   const double pressure_initiate,
                                   const std::vector<double>& h, 
                                   const double /* dt */)

@@ -1,4 +1,4 @@
-// uzrect_r3.C --- A 2D solution to Richard's equation in a rect. grid.
+// uzrect_Mollerup.C --- A 2D solution to Richard's equation in a rect. grid.
 // 
 // Copyright 2006, 2007 Mikkel Mollerup, Per Abrahamsen and KVL.
 //
@@ -51,7 +51,7 @@
 
 namespace ublas = boost::numeric::ublas;
 
-struct UZRectr3 : public UZRect
+struct UZRectMollerup : public UZRect
 {
   // Types.
   enum top_state { top_undecided, top_flux, top_pressure };
@@ -141,8 +141,8 @@ struct UZRectr3 : public UZRect
   // Create and Destroy.
   void has_macropores (bool);
   static void load_syntax (Syntax& syntax, AttributeList& alist);
-  UZRectr3 (Block& al);
-  ~UZRectr3 ();
+  UZRectMollerup (Block& al);
+  ~UZRectMollerup ();
 };
 
 static double anisotropy_factor (const Geometry& geo, size_t edge, 
@@ -156,7 +156,7 @@ static double anisotropy_factor (const Geometry& geo, size_t edge,
 }
 
 void 
-UZRectr3::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
+UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
                 const Soil& soil, 
                 SoilWater& soil_water, const SoilHeat& soil_heat,
                 const Surface& surface, const Groundwater& groundwater,
@@ -345,14 +345,8 @@ UZRectr3::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
           std::copy(h.begin (), h.end (), h_std.begin ());
 
 
-          if (!tertiary.find_implicit_water (h3_previous, 
-                                             geo, soil, soil_heat, h_std, ddt))
-            {  //We need smaller timesteps
-              
-              iterations_used = max_iterations + 1;
-              break;
-            }
-                                    
+          tertiary.find_implicit_water (h3_previous, 
+                                        geo, soil, soil_heat, h_std, ddt);
           tertiary.matrix_sink (S_matrix, S_drain);
           
           for (size_t cell = 0; cell != cell_size ; ++cell) 
@@ -460,6 +454,7 @@ UZRectr3::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	      const double out_sign = (cell == geo.edge_from (edge))
 		? 1.0 : -1.0;
 	      remaining_water[i] += out_sign * dq (edge) * ddt;
+              daisy_assert (std::isfinite (dq (edge)));
 	    }
 
 	  if (debug == 5)
@@ -470,11 +465,19 @@ UZRectr3::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	    }
 
 	  // Contribution to large time step.
+          daisy_assert (std::isnormal (dt));
+          daisy_assert (std::isnormal (ddt));
 	  q += dq * ddt / dt;
-
-
-          
-
+          for (size_t e = 0; e < edge_size; e++)
+            {
+              daisy_assert (std::isfinite (dq (e)));
+              daisy_assert (std::isfinite (q (e)));
+            }
+          for (size_t e = 0; e < edge_size; e++)
+            {
+              daisy_assert (std::isfinite (dq (e)));
+              daisy_assert (std::isfinite (q (e)));
+            }
 
 	  time_left -= ddt;
 	  iterations_with_this_time_step++;
@@ -548,20 +551,23 @@ UZRectr3::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 
 
   for (size_t edge = 0; edge != edge_size; ++edge) 
-    soil_water.set_flux (edge, q[edge]);
+    {
+      daisy_assert (std::isfinite (q[edge]));
+      soil_water.set_flux (edge, q[edge]);
+    }
   soil_water.drain (S_drain);
 
   // End of large time step.
 }
 
 void
-UZRectr3::output (Log& log) const
+UZRectMollerup::output (Log& log) const
 {
   output_variable ("Theta_error", log);
 }
 
 bool
-UZRectr3::converges (const ublas::vector<double>& previous,
+UZRectMollerup::converges (const ublas::vector<double>& previous,
 			   const ublas::vector<double>& current) const
 {
   size_t size = previous.size ();
@@ -580,17 +586,18 @@ UZRectr3::converges (const ublas::vector<double>& previous,
 }
 
 void 
-UZRectr3::Neumann (const size_t edge, const size_t cell,
+UZRectMollerup::Neumann (const size_t edge, const size_t cell,
                          const double area, const double in_sign,
                          const double flux, 
                          ublas::vector<double>& dq, ublas::vector<double>& B)
 {
   B (cell) = flux * area;
   dq (edge) = in_sign * flux;
+  daisy_assert (std::isfinite (dq (edge)));
 }
 
 void 
-UZRectr3::Dirichlet (const size_t edge, const size_t cell,
+UZRectMollerup::Dirichlet (const size_t edge, const size_t cell,
                            const double area, const double in_sign,
                            const double sin_angle,
                            const double K_cell,
@@ -618,10 +625,11 @@ UZRectr3::Dirichlet (const size_t edge, const size_t cell,
   dq (edge) = in_sign * (K_area_per_length * h_old 
                       + Dm_vec_val + Gm_val) / area;
 
+  daisy_assert (std::isfinite (dq (edge)));
 }
 
 void 
-UZRectr3::lowerboundary (const GeometryRect& geo,
+UZRectMollerup::lowerboundary (const GeometryRect& geo,
 			       const Groundwater& groundwater,
 			       const std::vector<bool>& active_lysimeter,
 			       const ublas::vector<double>& h,
@@ -746,7 +754,7 @@ UZRectr3::lowerboundary (const GeometryRect& geo,
 }
 
 void 
-UZRectr3::upperboundary (const GeometryRect& geo,
+UZRectMollerup::upperboundary (const GeometryRect& geo,
                                const Soil& soil,
                                const ublas::vector<double>& T,
 			       const Surface& surface,
@@ -854,7 +862,7 @@ UZRectr3::upperboundary (const GeometryRect& geo,
 }
 
 void 
-UZRectr3::drain (const GeometryRect& geo,
+UZRectMollerup::drain (const GeometryRect& geo,
 		       const std::vector<size_t>& drain_cell,
 		       const ublas::vector<double>& h,
 		       Solver::Matrix& A,
@@ -917,7 +925,7 @@ UZRectr3::drain (const GeometryRect& geo,
 }
 
 void 
-UZRectr3::diffusion (const GeometryRect& geo,
+UZRectMollerup::diffusion (const GeometryRect& geo,
 			   const ublas::vector<double>& Kedge,
 			   Solver::Matrix& diff)
 {
@@ -939,7 +947,7 @@ UZRectr3::diffusion (const GeometryRect& geo,
 }
 
 void 
-UZRectr3::gravitation (const GeometryRect& geo,
+UZRectMollerup::gravitation (const GeometryRect& geo,
 			     const ublas::vector<double>& Kedge,
 			     ublas::vector<double>& grav)
 {
@@ -961,7 +969,7 @@ UZRectr3::gravitation (const GeometryRect& geo,
 }
 
 void 
-UZRectr3::Darcy (const GeometryRect& geo,
+UZRectMollerup::Darcy (const GeometryRect& geo,
                        const ublas::vector<double>& Kedge,
                        const ublas::vector<double>& h,
                        ublas::vector<double>& dq)
@@ -980,17 +988,19 @@ UZRectr3::Darcy (const GeometryRect& geo,
           const double dh = h (to) - h (from);
           const double dq_diff = -(K / length) * dh;   
           const double dq_grav = -K * sin_angle; 
+          daisy_assert (std::isfinite (dq_diff));
+          daisy_assert (std::isfinite (dq_grav));
           dq (e) = dq_diff + dq_grav;
 	} 
     }
 }
 
 void 
-UZRectr3::has_macropores (const bool)
+UZRectMollerup::has_macropores (const bool)
 { /* Ignore for now. */ }
 
 void 
-UZRectr3::load_syntax (Syntax& syntax, AttributeList& alist)
+UZRectMollerup::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   syntax.add_object ("solver", Solver::component, 
 		     Syntax::Const, Syntax::Singleton, "\
@@ -1039,7 +1049,7 @@ Level of debug messages:\n\
 Water mass balance error per cell.");
 }
 
-UZRectr3::UZRectr3 (Block& al)
+UZRectMollerup::UZRectMollerup (Block& al)
   : UZRect (al),
     solver (Librarian::build_item<Solver> (al, "solver")),
     edge_arithmetic_height (al.number ("edge_arithmetic_height")),
@@ -1053,10 +1063,9 @@ UZRectr3::UZRectr3 (Block& al)
     debug (al.integer ("debug"))
 { }
 
-UZRectr3::~UZRectr3 ()
+UZRectMollerup::~UZRectMollerup ()
 { }
 
-#if 0
 const AttributeList& 
 UZRect::default_model ()
 {
@@ -1065,26 +1074,26 @@ UZRect::default_model ()
   if (!alist.check ("type"))
     {
       Syntax dummy;
-      UZRectr3::load_syntax (dummy, alist);
-      alist.add ("type", "r3");
+      UZRectMollerup::load_syntax (dummy, alist);
+      alist.add ("type", "Mollerup");
     }
   return alist;
 }
-#endif 
-static struct UZRectr3Syntax
+
+static struct UZRectMollerupSyntax
 {
   static Model& make (Block& al)
-  { return *new UZRectr3 (al); }
-  UZRectr3Syntax ()
+  { return *new UZRectMollerup (al); }
+  UZRectMollerupSyntax ()
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "\
 A finite volume solution to matrix water transport.\n\
 See Mollerup 2007 for details.");
-    UZRectr3::load_syntax (syntax, alist);
-    Librarian::add_type (UZRect::component, "r3", alist, syntax, &make);
+    UZRectMollerup::load_syntax (syntax, alist);
+    Librarian::add_type (UZRect::component, "Mollerup", alist, syntax, &make);
   }
-} UZRectr3_syntax;
+} UZRectMollerup_syntax;
 
-// uzrect_r3.C ends here.
+// uzrect_Mollerup.C ends here.

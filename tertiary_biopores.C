@@ -75,8 +75,6 @@ struct TertiaryBiopores : public Tertiary, public Tertsmall
   bool converge (const Anystate&);
 
   // Log variables.
-  double ddt_solution;
-  double ddt_scaled;
   double ddt;
 
   // Infiltration.
@@ -84,7 +82,7 @@ struct TertiaryBiopores : public Tertiary, public Tertsmall
   void infiltrate (const Geometry&, size_t e, double amount, double dt);
 
   // Simulation.
-  bool use_small_timesteps ()
+  bool use_small_timesteps () const
   { return use_small_timesteps_; }
 
   // - For use by column.
@@ -100,23 +98,15 @@ struct TertiaryBiopores : public Tertiary, public Tertsmall
   void update_biopores (const Geometry& geo, 
                         const Soil& soil,  
                         const SoilHeat& soil_heat, 
-                        const double h_barrier,
                         const std::vector<double>& h,
                         const double dt);
   void update_water ();
-  bool find_implicit_water (const Anystate& old_state, 
+  void find_implicit_water (const Anystate& old_state, 
                             const Geometry& geo, 
                             const Soil& soil,  
                             const SoilHeat& soil_heat, 
                             const std::vector<double>& h,
                             const double dt);
-  bool find_implicit_water_1 (const Anystate& old_state, 
-                              const Geometry& geo, 
-                              const Soil& soil,  
-                              const SoilHeat& soil_heat, 
-                              const double h_barrier,
-                              const std::vector<double>& h,
-                              const double dt);
   void update_active (const std::vector<double>& h);
 
   // - For use in Movement::solute.
@@ -135,7 +125,7 @@ public:
                    const Geometry&, const Soil&, const Scope& parent_scope, 
                    const double pipe_position, Treelog& msg);
   bool check (const Geometry&, Treelog& msg) const;
-  TertiaryBiopores (Block& al);
+  explicit TertiaryBiopores (Block& al);
 };
 
 Anystate
@@ -277,11 +267,6 @@ TertiaryBiopores::tick (const Units&, const Geometry& geo, const Soil& soil,
 {
   Treelog::Open nest (msg, component + std::string (": ") + name);
 
-#ifdef TRACK_TIME
-  msg.message ("Find tertiary sink.");
-  msg.flush ();
-#endif
-
   // Flux.
   const size_t edge_size = geo.edge_size ();
   std::vector<double> q_tertiary (edge_size, 0.0);
@@ -342,37 +327,11 @@ TertiaryBiopores::tick (const Units&, const Geometry& geo, const Soil& soil,
   for (size_t c = 0; c < cell_size; c++)
     h.push_back (soil_water.h (c));
   update_active (h);
-      
-#ifdef TRACK_TIME
-  msg.message ("First try:");
-  msg.flush ();
-#endif
-
+  
   // Find an implicit solution.
   ddt = dt;
-  for (;;)
-    {
-      if (find_implicit_water (old_state, geo, soil, soil_heat, h, ddt))
-        // Succes!
-        break;
-      ddt *= 0.5;
-      if (ddt < min_dt)
-        {
-          set_state (old_state);
-          msg.warning ("Can't find solution for tertiary transport.");
-          return;
-        }
-    }
-  ddt_solution = ddt;
-#ifdef TRACK_TIME
-  {
-    std::ostringstream tmp;
-    tmp << "Found primary solution with timestep " << ddt << " of " << dt << ".";
-    msg.message (tmp.str ());
-    msg.flush ();
-  }
-#endif
-
+  find_implicit_water (old_state, geo, soil, soil_heat, h, ddt);
+  
   // Limit sink.
   matrix_sink (S_matrix, S_drain);
   for (size_t c = 0; c < cell_size; c++)
@@ -396,40 +355,10 @@ TertiaryBiopores::tick (const Units&, const Geometry& geo, const Soil& soil,
       daisy_assert (factor <= 1.0);
       ddt *= factor;
     }
-  ddt_scaled = ddt;
-
-#ifdef TRACK_TIME
-  {
-    std::ostringstream tmp;
-    tmp << "Found sink with timestep " << ddt << " of " << dt << ".";
-    msg.message (tmp.str ());
-    msg.flush ();
-  }
-#endif
 
   // Update tertiary state with new ddt.
-  for (;;)
-    {
-      if (find_implicit_water (old_state, geo, soil, soil_heat, h, ddt))
-        // Succes!
-        break;
-      ddt *= 0.5;
-      if (ddt < min_dt)
-        {
-          set_state (old_state);
-          msg.warning ("Can't find solution for tertiary transport.");
-          return;
-        }
-    }
+  find_implicit_water (old_state, geo, soil, soil_heat, h, ddt);
 
-#ifdef TRACK_TIME
-  {
-    std::ostringstream tmp;
-    tmp << "Found final solution with timestep " << ddt << " of " << dt << ".";
-    msg.message (tmp.str ());
-    msg.flush ();
-  }
-#endif
   // Scale sink with timestep.
   const double scale = ddt / dt;
   if (!approximate (scale, 1.0))
@@ -442,11 +371,6 @@ TertiaryBiopores::tick (const Units&, const Geometry& geo, const Soil& soil,
   // Make it official.
   soil_water.add_tertiary_sink (S_matrix);
   soil_water.drain (S_drain);
-
-#ifdef TRACK_TIME
-  msg.message ("Done.");
-  msg.flush ();
-#endif
 }
 
 Tertsmall& 
@@ -472,13 +396,15 @@ void
 TertiaryBiopores::update_biopores (const Geometry& geo, 
                                    const Soil& soil,  
                                    const SoilHeat& soil_heat, 
-                                   const double h_barrier, 
                                    const std::vector<double>& h,
                                    const double dt) 
 {
   for (size_t b = 0; b < classes.size (); b++)
     classes[b]->update_matrix_sink (geo, soil, soil_heat, active, 
-                                    pressure_barrier, h_barrier, h, dt);
+                                    pressure_barrier, max_iterations,
+                                    max_absolute_difference, 
+                                    max_relative_difference,
+                                    pressure_initiate, h, dt);
 }
 
 void
@@ -488,7 +414,7 @@ TertiaryBiopores::update_water ()
     classes[b]->update_water ();
 }
 
-bool
+void
 TertiaryBiopores::find_implicit_water (const Anystate& old_state, 
                                        const Geometry& geo, 
                                        const Soil& soil,  
@@ -496,43 +422,15 @@ TertiaryBiopores::find_implicit_water (const Anystate& old_state,
                                        const std::vector<double>& h,
                                        const double dt)
 {
-  // First try with pressure barrier.
-  if (find_implicit_water_1 (old_state, geo, soil, soil_heat,
-                             pressure_barrier, h, dt))
-    return true;
-
-  // Then without.
-  return find_implicit_water_1 (old_state, geo, soil, soil_heat, 0.0, h, dt);
-}
-
-bool
-TertiaryBiopores::find_implicit_water_1 (const Anystate& old_state, 
-                                         const Geometry& geo, 
-                                         const Soil& soil,  
-                                         const SoilHeat& soil_heat, 
-                                         const double h_barrier, 
-                                         const std::vector<double>& h,
-                                         const double dt)
-{
   // Reset water content to begining of timestep.
   set_state (old_state);
-  for (int iter = 0; iter < max_iterations; iter++)
-    {
-      const Anystate new_state = get_state ();
-      // Find added water with "new water content".
-      update_biopores (geo, soil, soil_heat, h_barrier, h, dt);
-      // Reset water content to begining of timestep.
-      set_state (old_state);
-      // Add water to get new state.
-      update_water ();
-      return true;
-      // Check if they converge.
-      if (converge (new_state))
-        // If so, we are finished.
-        // Leave state as "end of timestep" to allow us to calculate sink.
-        return true;
-    }
-  return false;
+  const Anystate new_state = get_state ();
+  // Find added water with "new water content".
+  update_biopores (geo, soil, soil_heat, h, dt);
+  // Reset water content to begining of timestep.
+  set_state (old_state);
+  // Add water to get new state.
+  update_water ();
 }
 
 void
@@ -641,9 +539,8 @@ TertiaryBiopores::output (Log& log) const
   output_list (classes, "classes", log, Biopore::component); 
   // TODO: output_variable (active, log);
   output_lazy (total_water (), "water", log);
-  output_variable (ddt_solution, log);
-  output_variable (ddt_scaled, log);
-  output_variable (ddt, log);
+  if (!use_small_timesteps ())
+    output_variable (ddt, log);
 }
 
 
@@ -696,9 +593,7 @@ TertiaryBiopores::TertiaryBiopores (Block& al)
     active (al.check ("active")
             ? al.flag_sequence ("active")
             : std::vector<bool> ()),
-    ddt_solution (0.0),
-    ddt_scaled (0.0),
-    ddt (0.0)
+    ddt (-42.42e42)
 { }
 
 static struct TertiaryBioporesSyntax
@@ -753,14 +648,8 @@ Smallest allowable timestep for finding a solution.");
     syntax.add ("active", Syntax::Boolean, Syntax::OptionalState,
                 Syntax::Sequence, "Active biopores in cells.");
     syntax.add ("water", "cm^3", Syntax::LogOnly, "Water content.");    
-    syntax.add ("ddt_solution", "h", Syntax::LogOnly, 
-                "Timestep where we can find a solution to biopore pressure.\n\
-Only relevant if 'use_small_timesteps' is false.");
-    syntax.add ("ddt_scaled", "h", Syntax::LogOnly, 
-                "Timestep where sinks are scaled after available water.\n\
-Only relevant if 'use_small_timesteps' is false.");    
-    syntax.add ("ddt", "h", Syntax::LogOnly, "Final suggested timestep.\n\
-Timestep where we can find a solution, after scaling for available water.\n\
+    syntax.add ("ddt", "h", Syntax::LogOnly, "Emulated timestep.\n\
+Timestep scaled for available water.\n\
 Only relevant if 'use_small_timesteps' is false.");    
 
     Librarian::add_type (Tertiary::component, "biopores", alist, syntax, &make);

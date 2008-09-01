@@ -376,7 +376,7 @@ NOLINK = -c
 LATER = tertiary_instant.C 
 MODELS = reaction_filter.C colloids_MACRO.C seed_LAI.C seed_release.C \
 	stomatacon_BB.C stomatacon_SHA.C stomatacon_Leuning.C \
-	uzrect_r3.C tertiary_old.C \
+	tertiary_old.C \
 	biopore_drain.C tertiary_biopores.C \
 	biopore_matrix.C transport_Mollerup.C transport_Hansen.C \
 	movement_1D.C groundwater_aquitard.C \
@@ -571,7 +571,7 @@ EXECUTABLES = daisy${EXE} tkdaisy${EXE} cdaisy${EXE} gdaisy${EXE}
 
 # Select files to be removed by the next svn update.
 #
-REMOVE = 
+REMOVE = uzrect_r3.C 
 
 REMOVED = msoltranrect_2x1.C msoltranrect_forward.C\
 	select_soil.C adsorption_none.C adsorption_full.C ABAprod_expr.C \

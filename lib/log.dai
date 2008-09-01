@@ -3094,14 +3094,6 @@ submodel.  The amount printed under 'Total C Input' corresponds to the
                    (handle min)
                    (spec tertiary biopores ddt ))
            (number (path column "${column}" Movement "*" 
-                         Tertiary biopores ddt_scaled)
-                   (handle min)
-                   (spec tertiary biopores ddt_scaled))
-           (number (path column "${column}" Movement "*" 
-                         Tertiary biopores ddt_solution)
-                   (handle min)
-                   (spec tertiary biopores ddt_solution))
-           (number (path column "${column}" Movement "*" 
                          Tertiary biopores classes "${biopore}" iterations)
                    (handle max)
                    (spec biopore matrix iterations))

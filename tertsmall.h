@@ -38,7 +38,7 @@ public:
   virtual void set_state (const Anystate&) = 0;
   virtual void matrix_sink (std::vector<double>& S_matrix,
                             std::vector<double>& S_drain) const = 0;
-  virtual bool find_implicit_water (const Anystate& old_state, 
+  virtual void find_implicit_water (const Anystate& old_state, 
                                     const Geometry& geo, 
                                     const Soil& soil,  
                                     const SoilHeat& soil_heat, 

@@ -38,13 +38,13 @@ Tertsmall::none ()
     void matrix_sink (std::vector<double>& S_matrix,
                       std::vector<double>& S_drain) const
     { }
-    bool find_implicit_water (const Anystate& old_state, 
+    void find_implicit_water (const Anystate& old_state, 
                               const Geometry& geo, 
                               const Soil& soil,  
                               const SoilHeat& soil_heat, 
                               const std::vector<double>& h,
                               const double dt)
-    { return true; }
+    { return; }
     void update_active (const std::vector<double>& h_matrix)
     { }
   };
