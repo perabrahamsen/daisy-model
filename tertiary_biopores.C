@@ -386,7 +386,8 @@ TertiaryBiopores::update_biopores (const Geometry& geo,
                                     pressure_barrier, max_iterations,
                                     max_absolute_difference, 
                                     max_relative_difference,
-                                    pressure_initiate, h, dt);
+                                    pressure_initiate, 
+                                    pressure_end, h, dt);
 }
 
 void

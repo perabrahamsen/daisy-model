@@ -59,13 +59,8 @@ struct BioporeDrain : public Biopore
 
   double matrix_biopore_drain (size_t c, const Geometry& geo, 
                                const Soil& soil, bool active, 
-                               const double h_barrier,
+                               const double h_barrier, double pressure_end,
                                double K_xx, double h) const;
-  
-  double matrix_biopore_matrix (size_t c, const Geometry& geo, 
-                                const Soil& soil, bool active, 
-                                double K_xx, double h) const
-  {return 0.0;}
   void update_matrix_sink (const Geometry& geo,    
                            const Soil& soil,  
                            const SoilHeat& soil_heat, 
@@ -75,6 +70,7 @@ struct BioporeDrain : public Biopore
                            const double max_absolute_difference,
                            const double max_relative_difference,
                            const double pressure_initiate,
+                           const double pressure_end,
                            const std::vector<double>& h, const double dt);
   void update_water ()
   { }
@@ -121,7 +117,8 @@ struct BioporeDrain : public Biopore
 double 
 BioporeDrain::matrix_biopore_drain (size_t c, const Geometry& geo, 
                                     const Soil& soil, bool active, 
-                                    const double h_barrier,
+                                    const double h_barrier, 
+                                    const double pressure_end,
                                     double K_xx, double h) const
 {
   const double M_c = density_cell[c];
@@ -129,7 +126,7 @@ BioporeDrain::matrix_biopore_drain (size_t c, const Geometry& geo,
     // No biopores here.
     return 0.0;
   const double r_c = diameter / 2.0;
-  const double h_3 = air_bottom (c) - geo.cell_z (c);
+  const double h_3 = std::max (pressure_end, air_bottom (c) - geo.cell_z (c));
 
   double S;
   if (active && h>h_3 + h_barrier)
@@ -149,6 +146,7 @@ BioporeDrain::update_matrix_sink (const Geometry& geo,
                                   const double max_absolute_difference,
                                   const double max_relative_difference,
                                   const double pressure_initiate,
+                                  const double pressure_end,
                                   const std::vector<double>& h, 
                                   const double /* dt */)
 {
@@ -161,7 +159,7 @@ BioporeDrain::update_matrix_sink (const Geometry& geo,
       const double K_zz = soil.K (c, h_cond, h_ice, T);
       const double K_xx = K_zz * soil.anisotropy (c);
       S[c] = matrix_biopore_drain (c, geo, soil, active[c], h_barrier, 
-                                   K_xx, h[c]);
+                                   pressure_end, K_xx, h[c]);
     }
 }
 

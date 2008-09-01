@@ -2,13 +2,11 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Oprydning
 
-** Skal "suget" være max pressure_end - pressure_initiate?
-
-** Test 1D med lr og højt grundvand
+** Test 1D med richards/lr og højt grundvand
 
 * Tertiary vand
 
-** Brug "soil pressure" to at bregrænse interval.  Drop evt. h_barrier.
+** Drop evt. h_barrier.
 
 ** Iterate indtil old/next guess opfylder convergens.
 

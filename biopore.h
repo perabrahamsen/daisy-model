@@ -90,6 +90,7 @@ public:
                                    const double max_absolute_difference,
                                    const double max_relative_difference,
                                    const double pressure_initiate,
+                                   const double pressure_end,
                                    const std::vector<double>& h, 
                                    const double dt) = 0;
   void scale_sink (double scale);
