@@ -58,6 +58,8 @@ class TertiaryNone : public Tertiary
   { return false; }
 
   // Simulation.
+  void deactivate (const int)
+  { }
   void tick (const Units&, const Geometry&, const Soil&, const SoilHeat&,
              const double dt, SoilWater&, Surface&, Treelog&)
   { }

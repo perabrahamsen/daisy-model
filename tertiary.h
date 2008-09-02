@@ -51,9 +51,11 @@ public:
   // Simulation.
 public:
   // - For use by Column.
+  virtual void deactivate (int steps) = 0;
   virtual void tick (const Units&, 
                      const Geometry&, const Soil&, const SoilHeat&,
-                     const double dt, SoilWater&, Surface&, Treelog&) = 0;
+                     const double dt, SoilWater&,
+                     Surface&, Treelog&) = 0;
 
 public:
   // - For use inside Richard's Equation.

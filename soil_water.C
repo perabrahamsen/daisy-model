@@ -433,7 +433,11 @@ SoilWater::mix (const Geometry& geo, const Soil& soil,
 {
   geo.mix (Theta_, from, to, tillage_, dt);
   for (size_t i = 0; i < soil.size(); i++)
-    h_[i] = soil.h (i, Theta_[i]);
+    {
+      const double new_h = soil.h (i, Theta_[i]);
+      if (h_[i] < 0.0 || new_h < 0)
+        h_[i] = new_h;
+    }
   
   tick_after (geo, soil,  soil_heat, false, msg);
 }
@@ -457,7 +461,9 @@ SoilWater::swap (const Geometry& geo, const Soil& soil,
 	  msg.error (tmp.str ());
 	  Theta_[i] = Theta_sat;
 	}
-      h_[i] = soil.h (i, Theta_[i]);
+      const double new_h = soil.h (i, Theta_[i]);
+      if (h_[i] < 0.0 || new_h < 0)
+        h_[i] = new_h;
     }
   tick_after (geo, soil,  soil_heat, false, msg);
 }

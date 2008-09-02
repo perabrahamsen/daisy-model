@@ -68,6 +68,7 @@ struct BioporeMatrix : public Biopore
   
   // Log variable.
   int iterations;
+  std::vector<double> h3_soil;
 
   // Utilities.
   /* const */ double dy;                    // [cm]
@@ -202,6 +203,7 @@ BioporeMatrix::total_water () const
   double total = 0.0;
   for (size_t col = 0; col < col_size; col++)
     total += height_to_volume (col, h_bottom[col]);
+
   return total;
 }
 
@@ -331,7 +333,8 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
   const size_t cell_size = geo.cell_size ();
 
   // Find estimate based on highest pressured active cell.
-  std::vector<double> h3_soil (col_size, 0.0);
+  daisy_assert (h3_soil.size () == col_size);
+  std::fill (h3_soil.begin (), h3_soil.end (), 0.0);
   for (size_t c = 0; c < cell_size; c++)
     {
       if (!active[c])
@@ -344,19 +347,20 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
     }
   
   // Initial guess and interval.
-  std::vector<double> h3_min (col_size);
+  std::vector<double> h3_min (col_size, 0.0);
   std::vector<double> h3_max (col_size);
   std::vector<double> guess (col_size);
   const double soil_weight = 0.5;      // Relative weight of soil and history.
   const double history_weight = 1.0 - soil_weight;
   for (size_t col = 0; col < col_size; col++)
     {
-      h3_min[col] = std::min (h_bottom[col], h3_soil[col]);
+      // h3_min[col] = std::min (h_bottom[col], h3_soil[col]);
       h3_max[col] = std::max (h_bottom[col], h3_soil[col]);
       guess[col] = soil_weight * h3_soil[col] + history_weight * h_bottom[col];
     }
 
   // Main iteration loop.
+  std::vector<double> old_guess = h_bottom;
   for (iterations = 0; iterations < max_iterations; iterations++)
     {
       find_matrix_sink (geo, soil, soil_heat, active,
@@ -374,7 +378,7 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
       double max_abs = 0.0;
       double max_rel = 0.0;
 
-      // New value.
+      // New guess.
       std::vector<double> value = h_bottom;
 
       for (size_t col = 0; col < col_size; col++)
@@ -393,12 +397,16 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
               Assertion::message (tmp.str ());
             }
 
+          // Maximum number of iterations with one step before
+          // switching to pure bisection.
+          const int max_one_step = 5;
+
           // Adjust interval and find new guess.
           if (value[col] > guess[col])
             {
               h3_min[col] = guess[col];
               
-              if (value[col] > h3_max[col])
+              if (iterations > max_one_step || value[col] > h3_max[col])
                 guess[col] = (h3_min[col] + h3_max[col] * 3) / 4.0;
               else
                 guess[col] = value[col];
@@ -407,7 +415,7 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
             {
               h3_max[col] = guess[col];
 
-              if (value[col] < h3_min[col])
+              if (iterations > max_one_step || value[col] < h3_min[col])
                 guess[col] = (h3_min[col] * 3 + h3_max[col]) / 4.0;
               else
                 guess[col] = value[col];
@@ -418,17 +426,43 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
 
           // We check old differences, so that S will be no worse that that.
           const double h3_diff = h3_max[col] - h3_min[col];
-          daisy_assert (h3_diff >= 0.0);
-          max_abs = std::max (max_abs, h3_diff);
-          if (h3_max[col] > max_absolute_difference)
-            max_rel = std::max (max_rel, h3_diff / h3_max[col]);
+          daisy_assert (std::isfinite (h3_diff));
+          if (h3_diff < -max_absolute_difference)
+            {
+              std::ostringstream tmp;
+              tmp << iterations << ":" << col << " min = " << h3_min[col] 
+                  << ", max = " << h3_max[col] << ", guess = " << guess[col] 
+                  << ", value = " << value[col]
+                  << ", bottom = " << h_bottom[col]
+                  << ", abs = " << max_abs << ", rel = " << max_rel;
+              daisy_bug (tmp.str ());
+            }
+          
+          // Set to true if we want our convergence criteria based on
+          // bisection interval, rather than old and new value for one step.  
+          const bool converge_interval = false;
+          if (converge_interval)
+            {
+              max_abs = std::max (max_abs, h3_diff);
+              if (h3_max[col] > max_absolute_difference)
+                max_rel = std::max (max_rel, h3_diff / h3_max[col]);
+            }
+          else
+            {
+              const double guess_diff = std::fabs (guess[col] - old_guess[col]);
+              max_abs = std::max (max_abs, guess_diff);
+              if (guess[col] > max_absolute_difference)
+                max_rel = std::max (max_rel, old_guess[col] / guess[col]);
+            }
+
         }
-      
       // Did we find a solution?
       if (max_rel < max_relative_difference 
           || max_abs < max_absolute_difference)
         break;
-    }
+
+      old_guess = guess;
+   }
   
   // Try to make sure we have something to scale.
   for (size_t col = 0; col < col_size; col++)
@@ -683,6 +717,7 @@ BioporeMatrix::output (Log& log) const
   output_submodule (*solute, "solute", log);
   output_lazy (total_water (), "water", log);
   output_variable (iterations, log);
+  output_variable (h3_soil, log);
 }
 
 bool 
@@ -733,6 +768,10 @@ BioporeMatrix::initialize (const Units& units,
       msg.error ("Number of elements in 'h_bottom' does not match 'xplus'");
       ok = false;
     }
+
+  // h3_soil.
+  h3_soil.insert (h3_soil.end (), column_size, -42.42e42);
+  daisy_assert (h3_soil.size () == column_size);
 
   // dy.
   dy = geo.back () - geo.front ();
@@ -836,6 +875,8 @@ Increase value to get more debug message.");
     syntax.add ("water", "cm^3", Syntax::LogOnly, "Water content.");    
     syntax.add ("iterations", Syntax::Integer, Syntax::LogOnly, 
                 "Number of iterations used for finding a solution.");
+    syntax.add ("h3_soil", "cm", Syntax::LogOnly, Syntax::Sequence,
+                "Pressure suggested by the soil for each interval.");
       
     Librarian::add_type (Biopore::component, "matrix", alist, syntax, &make);
   }

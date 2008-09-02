@@ -3085,14 +3085,15 @@ submodel.  The amount printed under 'Total C Input' corresponds to the
   "State of water in the tertiary biopores model."
   (where "${colfid}tertiary-water-${bioporefid}.dlf")
   (when hourly)
+  (biopore matrix)
   (entries (number (path column "${column}" Movement "*" 
                          Tertiary biopores water)
                    (handle current)
-                   (spec tertiary biopores water ))
+                   (spec tertiary biopores water))
            (number (path column "${column}" Movement "*" 
                          Tertiary biopores ddt)
                    (handle min)
-                   (spec tertiary biopores ddt ))
+                   (spec tertiary biopores ddt))
            (number (path column "${column}" Movement "*" 
                          Tertiary biopores classes "${biopore}" iterations)
                    (handle max)
@@ -3100,7 +3101,11 @@ submodel.  The amount printed under 'Total C Input' corresponds to the
            (array (path column "${column}" Movement "*" 
                         Tertiary biopores classes "${biopore}" h_bottom)
                   (handle max)
-                  (spec biopore matrix h_bottom))))
+                  (spec biopore matrix h_bottom))
+           (array (path column "${column}" Movement "*" 
+                        Tertiary biopores classes "${biopore}" h3_soil)
+                  (handle max)
+                  (spec biopore matrix h3_soil))))
 
 (deflog "Tertiary water sink" column
   "Tertiary water sink term."

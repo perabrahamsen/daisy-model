@@ -251,7 +251,8 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
         {
           msg.warning (std::string ("UZ trouble: ") + error);
         }
-      tertiary->implicit ().set_state (old_tertiary);
+      tertiary->implicit ().set_state (old_tertiary); // For small timesteps.
+      tertiary->deactivate (3); // Don't try tertiary right after reserve.
     }
   throw "Matrix water transport failed";
 

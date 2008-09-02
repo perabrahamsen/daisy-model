@@ -36,11 +36,15 @@ Movement::library_id () const
 }
 
 void 
+Movement::deactivate_tertiary (const int steps)
+{ tertiary->deactivate (steps); }
+
+void 
 Movement::tick_tertiary (const Units& units,
                          const Geometry& geo, const Soil& soil, 
                          const SoilHeat& soil_heat, const double dt, 
                          SoilWater& soil_water, Surface& surface, Treelog& msg)
-{  tertiary->tick (units, geo, soil, soil_heat, dt, soil_water, surface, msg); }
+{ tertiary->tick (units, geo, soil, soil_heat, dt, soil_water, surface, msg); }
 
 void 
 Movement::output (Log& log) const

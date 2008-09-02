@@ -291,17 +291,18 @@ LogTable::initial_done (const std::vector<Time::component_t>& time_columns,
 { 
   LogSelect::initial_done (time_columns, time, dt);
 
-  if (!print_initial)
+  bool prevent_printing = !print_initial;
+  for (unsigned int i = 0; i < entries.size (); i++)
+    if (entries[i]->prevent_printing ())
+      prevent_printing = true;
+
+  if (prevent_printing)
     {
       for (unsigned int i = 0; i < entries.size (); i++)
         entries[i]->done (dt);
       return;
     }
-
-  for (unsigned int i = 0; i < entries.size (); i++)
-    if (entries[i]->prevent_printing ())
-      return;
-
+      
   common_done (time_columns, time, dt);
   begin = time;
 }

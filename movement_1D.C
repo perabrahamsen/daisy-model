@@ -138,9 +138,10 @@ Movement1D::tick_water (const Geometry1D& geo,
 {
   const size_t top_edge = 0U;
   const size_t bottom_edge = geo.edge_size () - 1U;
+
   // Limit for groundwater table.
   size_t last  = soil.size () - 1;
-#if 0
+#ifdef INERT_GROUNDWATER
   if (groundwater.bottom_type () == Groundwater::pressure)
     {
       daisy_assert (soil.size () > 1);
@@ -156,7 +157,7 @@ Movement1D::tick_water (const Geometry1D& geo,
           h[i] = groundwater.table () - geo.cell_z (i);
         }
     }
-#endif
+#endif // INERT_GROUNDWATER
 
   // Limit for ridging.
   const size_t first = (surface.top_type (geo, 0U) == Surface::soil)
@@ -181,12 +182,14 @@ Movement1D::tick_water (const Geometry1D& geo,
               q_p[i] = q_p[i-1];
             }
 
+#ifdef INERT_GROUNDWATER
           // Update Theta below groundwater table.
           if (groundwater.bottom_type () == Groundwater::pressure)
             {
               for(size_t i = last + 1; i < soil.size (); i++)
                 Theta[i] = soil.Theta (i, h[i], h_ice[i]);
             }
+#endif // INERT_GROUNDWATER
 
           // Update surface and groundwater reservoirs.
           surface.accept_top (q[0] * dt, geo, 0U, dt, msg);
@@ -206,6 +209,9 @@ Movement1D::tick_water (const Geometry1D& geo,
         {
           msg.warning (std::string ("UZ trouble: ") + error);
         }
+      
+      // Make sure we don't call tertiary transport right after reserve model.
+      tertiary->deactivate (3); 
     }
   throw "Water matrix transport failed"; 
 }

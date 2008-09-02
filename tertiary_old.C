@@ -44,6 +44,8 @@ struct TertiaryOld : public Tertiary
   { return macro.get () && !macro->none (); }
 
   // Simulation.
+  void deactivate (const int)
+  { }
   void tick (const Units&, const Geometry& geo, const Soil& soil, 
              const SoilHeat& soil_heat, const double dt, 
              SoilWater& soil_water, Surface& surface, Treelog& msg);

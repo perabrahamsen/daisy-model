@@ -1,30 +1,22 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Oprydning
-
-** Test 1D med richards/lr og højt grundvand
-
 * Tertiary vand
 
-** Drop evt. h_barrier.
+** make done
 
-** Iterate indtil old/next guess opfylder convergens.
+** enable solute
 
-** Hvis vi har brugt mere end x one-step iterationer, skift til bisection.
+add logs
 
-** Prøv "1D" udgave af Nanna setup.
+** enable små tidsskridt
 
-** få små tidsksridt til at virke.
+h_barrier = 0
+max_total_iterations 
+nedsæt sinks
 
-** nedsæt tidskridt
+* Next?
 
-** log?
-
-** test?
-
-* tertiary vand
-
-** stort tidsskridt, dræn?
+SAFIR workshop, plantefys, kolloider
 
 * edge baseret kode til rect solute og vand
 

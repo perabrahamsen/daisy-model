@@ -49,7 +49,6 @@ struct TertiaryBiopores : public Tertiary, public Tertsmall
   const double pressure_end;	 // Pressure after pref.flow has been init [cm]
   const double pressure_barrier; // Pressure difference requires for S [cm]
   const double pond_max;	 // Pond height before activating pref.flow [mm]
-  const double min_dt;           // Smallest timestep [h]
   const bool use_small_timesteps_; // True, iff we want to calculate S in R.E.
 
   // Identity.
@@ -74,7 +73,9 @@ struct TertiaryBiopores : public Tertiary, public Tertsmall
   void set_state (const Anystate&);
 
   // Log variables.
+  bool log_ddt;                 // True if ddt was calculated this timestep.
   double ddt;
+  int deactivate_steps;         // Number of timesteps tertiary is deactivated.
 
   // Infiltration.
   double capacity (const Geometry&, size_t e, double dt); // Max flux.
@@ -85,6 +86,8 @@ struct TertiaryBiopores : public Tertiary, public Tertsmall
   { return use_small_timesteps_; }
 
   // - For use by column.
+  void deactivate (const int steps)
+  { deactivate_steps += steps; }
   void tick (const Units&, const Geometry& geo, const Soil& soil, 
              const SoilHeat& soil_heat, const double dt, 
              SoilWater& soil_water, Surface& surface, Treelog& msg);
@@ -293,8 +296,15 @@ TertiaryBiopores::tick (const Units&, const Geometry& geo, const Soil& soil,
   soil_water.set_tertiary_flux (q_tertiary);
 
   // We might want to handle matrix interaction is small timesteps.
+  log_ddt = false;
+  if (deactivate_steps > 0)
+    {
+      deactivate_steps--;
+      return;
+    }
   if (use_small_timesteps ())
     return;
+  log_ddt = true;
   
   // Soil matrix exchange.
   const size_t cell_size = geo.cell_size ();
@@ -522,8 +532,9 @@ TertiaryBiopores::output (Log& log) const
   output_list (classes, "classes", log, Biopore::component); 
   // TODO: output_variable (active, log);
   output_lazy (total_water (), "water", log);
-  if (!use_small_timesteps ())
+  if (log_ddt)
     output_variable (ddt, log);
+  output_variable (deactivate_steps, log);
 }
 
 
@@ -572,12 +583,13 @@ TertiaryBiopores::TertiaryBiopores (Block& al)
     pressure_end (al.number ("pressure_end")),
     pressure_barrier (al.number ("pressure_barrier")),
     pond_max (al.number ("pond_max")),
-    min_dt (al.number ("min_dt")),
     use_small_timesteps_ (al.flag ("use_small_timesteps")),
     active (al.check ("active")
             ? al.flag_sequence ("active")
             : std::vector<bool> ()),
-    ddt (-42.42e42)
+    log_ddt (false),
+    ddt (-42.42e42),
+    deactivate_steps (al.integer ("deactivate_steps"))
 { }
 
 static struct TertiaryBioporesSyntax
@@ -622,9 +634,6 @@ a too small value for this parameter, the solution may be unstable.");
 Maximum height of ponding before spilling into biopores.\n\
 After macropores are activated pond will have this height.");
     alist.add ("pond_max", 0.5);
-    syntax.add ("min_dt", "h", Check::non_negative (), Syntax::Const, "\
-Smallest allowable timestep for finding a solution.");
-    alist.add ("min_dt", 0.00001);
     syntax.add ("use_small_timesteps", Syntax::Boolean, Syntax::Const,
                 "True iff the sink is allowed to change within a timestep.");
     alist.add ("use_small_timesteps", true);
@@ -634,6 +643,11 @@ Smallest allowable timestep for finding a solution.");
     syntax.add ("ddt", "h", Syntax::LogOnly, "Emulated timestep.\n\
 Timestep scaled for available water.\n\
 Only relevant if 'use_small_timesteps' is false.");    
+    syntax.add ("deactivate_steps", Syntax::Integer, Syntax::State, 
+                "No matrix exchange for this number of timesteps.\n\
+Set when matrix pressure is in a disarray, such as after tillage operations,\n\
+or calls to reserve models.");
+    alist.add ("deactivate_steps", 3);
 
     Librarian::add_type (Tertiary::component, "biopores", alist, syntax, &make);
   }

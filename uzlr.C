@@ -146,6 +146,7 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
               << ", q = " << q[i] << ", dt = " << dt << ", dz = " << dz 
               << ", S " << S[i];
           msg.error (tmp.str ());
+          Theta_new = Theta_res;
         }
       // daisy_assert (Theta_new <= Theta_sat);
       const double h_new = soil.h (i, Theta_new);
@@ -257,13 +258,38 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
   // Lower border.
   q_down = q[last + 1];
 
-  {
+  if (true)
+    {
       // Ensure forced bottom.
       double extra_water = 0.0;
 
-      if (bottom.bottom_type () == Groundwater::forced_flux
-          && !approximate (q_down, bottom.q_bottom (bottom_edge)))
-        extra_water += (bottom.q_bottom (bottom_edge) - q_down) * dt;
+      switch (bottom.bottom_type ())
+        {
+        case Groundwater::forced_flux:
+          extra_water += (bottom.q_bottom (bottom_edge) - q_down) * dt;
+          break;
+        case Groundwater::pressure:
+#if 0
+          {
+            double table = geo.cell_z (last) + h[last];
+            for (int i = last; i > first; i--)
+              if (h[i] < 0.0)
+                {
+                  table = geo.cell_z (i) + h[i];
+                  break;
+                }
+            const double K_bottom 
+              = soil.K (last, h_old[last], h_ice[last], soil_heat.T (last));
+            const double dh = bottom.table () - geo.zplus (last);
+            const double dz = table - geo.zplus (last);
+            const double q_bottom = K_bottom * (dh / dz - 1.0);
+            extra_water += (q_bottom - q_down) * dt;
+          }
+#endif
+          break;
+        default:
+          break;
+        }
 
       for (int i = last; true; i--)
 	{
@@ -284,6 +310,7 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
 	    {
 	      extra_water = 0;
 	      h[i] = soil.h (i, Theta[i]);
+              break;
 	    }
 	  else
 	    {
@@ -295,6 +322,24 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
       q_up = q[first];
       q_down = q[last + 1];
     }
+
+  // Saturated pressure.
+  double table = geo.cell_z (last) + h[last];
+  for (int i = last; i > first; i--)
+    if (h[i] < 0.0)
+      {
+        table = geo.cell_z (i) + h[i];
+        break;
+      }
+  for (int i = last; i > first; i--)
+    if (geo.cell_z (i) < table)
+      {
+        daisy_assert (h[i] >= 0.0);
+        h[i] = table - geo.cell_z (i);
+        daisy_assert (h[i] >= 0.0);
+      }
+    else
+      break;
 
   // Check mass conservation.
   double total_old = 0.0;
@@ -364,4 +409,4 @@ to z_top, where there can be Darcy movement.");
   }
 } UZlr_syntax;
 
-
+// uzlr.C ends here.
