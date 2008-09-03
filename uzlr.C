@@ -148,8 +148,9 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
           msg.error (tmp.str ());
           Theta_new = Theta_res;
         }
-      // daisy_assert (Theta_new <= Theta_sat);
-      const double h_new = soil.h (i, Theta_new);
+      const double h_new = Theta_new >= Theta_sat 
+        ? std::max (h_old[i], soil.h (i, Theta_new))
+        : soil.h (i, Theta_new);
       double K_new = soil.K (i, h_new, h_ice[i], soil_heat.T (i));
 
       // If we have free drainage bottom, we go for field capacity all
@@ -175,36 +176,44 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
         }
       // daisy_assert (h_lim < 0.0);
 
-      if (use_darcy && i < first + 5 && z > z_top)
-	// Dry earth, near top.  Use darcy to move water up.
-	{
+      if (use_darcy && z > z_top && i < last)
+        // Dry earth, near top.  Use darcy to move water up.
+        {
 	  const double dist = z - geo.cell_z (i+1);
 	  q[i+1] = std::max (K_new * ((h_old[i+1] - h_new) / dist - 1.0), 0.0);
-
-	  if (Theta_new + q[i+1] * dt / dz > Theta_sat)
+          const double Theta_next = Theta_new + q[i+1] * dt / dz;
+	  if (Theta_next > Theta_sat)
 	    {
-	      q[i+1] = (Theta_sat -  Theta_new) * dz / dt;
+	      q[i+1] = (Theta_sat - Theta_new) * dz / dt;
 	      Theta[i] = Theta_sat;
-	      h[i] = 0.0;
+	      h[i] = std::max (0.0, h_new);
 	    }
 	  else
 	    {
-	      Theta[i] = Theta_new + q[i+1] * dt / dz;
+	      Theta[i] = Theta_next;
 	      h[i] = soil.h (i, Theta[i]);
 	    }
 	}
       else if (h_new <= h_lim)
 	// Dry earth, no water movement.
 	{
-	  // daisy_assert (Theta_new <= Theta_sat);
-	  q[i+1] = 0.0;
-	  Theta[i] = Theta_new;
-	  h[i] = h_new;
+	  if (Theta_new <= Theta_sat)
+            {
+              q[i+1] = 0.0;
+              Theta[i] = Theta_new;
+              h[i] = h_new;
+            }
+          else 
+            {
+              q[i+1] = (Theta_sat - Theta_new) * dz / dt;
+              Theta[i] = Theta_sat;
+              h[i] = std::max (0.0, h_new);
+            }
 	}
       else
 	// Gravitational water movement.
 	{
-	  if (i + 1 < soil.size ())
+	  if (i < last)
 	    {
 	      // Geometric average K.
 	      if (h_ice[i+1] < h_fc) // Blocked by ice.
@@ -229,7 +238,6 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
                 }
               else
                 {
-                  daisy_approximate (h_lim, h_new);
                   q[i+1] = 0.0;
                   Theta[i] = Theta_new;
                   h[i] = h_new;
@@ -258,38 +266,10 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
   // Lower border.
   q_down = q[last + 1];
 
-  if (true)
+  if (bottom.bottom_type () == Groundwater::forced_flux)
+    // Ensure forced bottom.
     {
-      // Ensure forced bottom.
-      double extra_water = 0.0;
-
-      switch (bottom.bottom_type ())
-        {
-        case Groundwater::forced_flux:
-          extra_water += (bottom.q_bottom (bottom_edge) - q_down) * dt;
-          break;
-        case Groundwater::pressure:
-#if 0
-          {
-            double table = geo.cell_z (last) + h[last];
-            for (int i = last; i > first; i--)
-              if (h[i] < 0.0)
-                {
-                  table = geo.cell_z (i) + h[i];
-                  break;
-                }
-            const double K_bottom 
-              = soil.K (last, h_old[last], h_ice[last], soil_heat.T (last));
-            const double dh = bottom.table () - geo.zplus (last);
-            const double dz = table - geo.zplus (last);
-            const double q_bottom = K_bottom * (dh / dz - 1.0);
-            extra_water += (q_bottom - q_down) * dt;
-          }
-#endif
-          break;
-        default:
-          break;
-        }
+      double extra_water = (bottom.q_bottom (bottom_edge) - q_down) * dt;
 
       for (int i = last; true; i--)
 	{
@@ -347,6 +327,8 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
   double total_S = 0.0;
   for (unsigned int i = first; i <= last; i++)
     {
+      const double Theta_sat = soil.Theta (i, 0.0, 0.0);
+      daisy_assert (Theta[i] <= Theta_sat + 1e-10);
       total_old += geo.dz (i) * Theta_old[i];
       total_new += geo.dz (i) * Theta[i];
       total_S += geo.dz (i) * S[i] * dt;

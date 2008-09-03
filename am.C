@@ -38,7 +38,7 @@
 #include "program.h"
 #include "memutils.h"
 #include "librarian.h"
-#include "units.h"
+#include "unit.h"
 #include <numeric>
 #include <sstream>
 
@@ -806,6 +806,8 @@ AM::get_NO3 (const AttributeList& al)
 double
 AM::get_NH4 (const AttributeList& al)
 {
+  daisy_assert (IM::storage_unit () == symbol ("g/cm^2"));
+
   if (al.check ("weight"))
     {
       const double volatilization = al.number ("volatilization");
@@ -834,6 +836,7 @@ AM::get_NH4 (const AttributeList& al)
 IM
 AM::get_IM (const Unit& unit, const AttributeList& al)
 {
+  daisy_assert (unit.name == IM::storage_unit ());
   IM result (unit);
   result.set_value (Chemical::NH4 (), unit, get_NH4 (al));
   result.set_value (Chemical::NO3 (), unit, get_NO3 (al));

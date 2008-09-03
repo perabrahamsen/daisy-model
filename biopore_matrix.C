@@ -359,8 +359,12 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
       guess[col] = soil_weight * h3_soil[col] + history_weight * h_bottom[col];
     }
 
+  // Set to true if we want our convergence criteria based on
+  // bisection interval, rather than old and new value for one step.  
+  const bool converge_interval = true;
+  std::vector<double> old_value = h_bottom;
+
   // Main iteration loop.
-  std::vector<double> old_guess = h_bottom;
   for (iterations = 0; iterations < max_iterations; iterations++)
     {
       find_matrix_sink (geo, soil, soil_heat, active,
@@ -438,9 +442,6 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
               daisy_bug (tmp.str ());
             }
           
-          // Set to true if we want our convergence criteria based on
-          // bisection interval, rather than old and new value for one step.  
-          const bool converge_interval = false;
           if (converge_interval)
             {
               max_abs = std::max (max_abs, h3_diff);
@@ -449,10 +450,10 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
             }
           else
             {
-              const double guess_diff = std::fabs (guess[col] - old_guess[col]);
+              const double guess_diff = std::fabs (value[col] - old_value[col]);
               max_abs = std::max (max_abs, guess_diff);
-              if (guess[col] > max_absolute_difference)
-                max_rel = std::max (max_rel, old_guess[col] / guess[col]);
+              if (value[col] > max_absolute_difference)
+                max_rel = std::max (max_rel, old_value[col] / value[col]);
             }
 
         }
@@ -461,7 +462,8 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
           || max_abs < max_absolute_difference)
         break;
 
-      old_guess = guess;
+      if (converge_interval) 
+        old_value = value;
    }
   
   // Try to make sure we have something to scale.
@@ -688,9 +690,9 @@ BioporeMatrix::matrix_solute (const Geometry& geo, const double dt,
       const size_t col = column[c];
       const double total_water  // [cm^3 W]
         = column_water (col) + water_left[col];
-      const double M = solute->get_value (chem, col);
+      const double M = solute->get_value (chem, col); // [g]
       const double C = M / total_water; // [g/cm^3 W]
-      sink_chem[c] = water_sink * C;
+      sink_chem[c] = water_sink * C; // [g/cm^3 S/h]
     }
 
   // Remove from biopores.

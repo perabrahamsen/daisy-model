@@ -221,27 +221,38 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
 
   soil_water.tick (cell_size, soil, dt, msg); 
 
-  bool obey_surface;
- 
   for (size_t i = 0; i < matrix_water.size (); i++)
     {
       Treelog::Open nest (msg, matrix_water[i]->name);
       Anystate old_tertiary = tertiary->implicit ().get_state ();
       try
         {
-#ifdef TRACK_TIME
-          msg.message ("Trying " + matrix_water[i]->name + ".");
-          msg.flush ();
-#endif
           matrix_water[i]->tick (*geo, drain_cell, soil, soil_water, soil_heat,
                                  surface, groundwater, tertiary->implicit (),
                                  dt, msg);
-#ifdef TRACK_TIME
-          msg.message ("Done.");
-          msg.flush ();
-#endif
-	  obey_surface = matrix_water[i]->obey_surface ();
-          goto update_borders;
+	  const bool obey_surface = matrix_water[i]->obey_surface ();
+
+          for (size_t edge = 0; edge < edge_size; edge++)
+            {
+              if (geo->edge_to (edge) == Geometry::cell_above)
+                {
+                  const double q_up = obey_surface
+                    ? soil_water.q_matrix (edge)
+                    : surface.q_top (*geo, edge, dt);
+
+                  surface.accept_top (q_up * dt, *geo, edge, dt, msg);
+                  surface.update_pond_average (*geo);
+                }
+              if (geo->edge_from (edge) == Geometry::cell_below)
+                {
+                  const double q_down = soil_water.q_matrix (edge) 
+                    + soil_water.q_tertiary (edge);
+                  groundwater.accept_bottom (q_down * dt, *geo, edge);
+                }
+            }
+          if (i > 0)
+            msg.message ("Reserve model succeeded");
+          return;
         }
       catch (const char* error)
         {
@@ -255,27 +266,6 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
       tertiary->deactivate (3); // Don't try tertiary right after reserve.
     }
   throw "Matrix water transport failed";
-
-  // Update surface and groundwater reservoirs.
- update_borders:
-  for (size_t edge = 0; edge < edge_size; edge++)
-    {
-      if (geo->edge_to (edge) == Geometry::cell_above)
-	{
-	  if (obey_surface)
-	    surface.accept_top ((soil_water.q_matrix (edge) 
-                                 + soil_water.q_tertiary (edge)) * dt, 
-                                *geo, edge, dt, msg);
-	  else
-	    surface.accept_top (surface.q_top (*geo, edge, dt) * dt,
-                                *geo, edge, dt, msg);
-          surface.update_pond_average (*geo);
-	}
-      if (geo->edge_from (edge) == Geometry::cell_below)
-        groundwater.accept_bottom ((soil_water.q_matrix (edge)
-                                    + soil_water.q_tertiary (edge)) * dt,
-                                   *geo, edge);
-    }
 }
 
 void 

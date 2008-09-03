@@ -3115,6 +3115,122 @@ submodel.  The amount printed under 'Total C Input' corresponds to the
                   (spec fixed SoilWater S_p)
                   (handle sum))))
 
+(defsummary "Surface water balance" balance
+  "Above ground water balance."
+  (precision 1)
+  (require_top true)
+  (input "Precipitation" "Overhead irrigation" "Surface irrigation")
+  (output "Snow evaporation" "Canopy evaporation" "Litter evaporation" 
+          "Surface evaporation" "Matrix infiltration" "Tertiary infiltration"
+          "Runoff")
+  (content Snow Canopy Litter Pond))
+
+(deflog "Surface water" column
+  "Information about above ground water."
+  (where "${colfid}surface_water.dlf")
+  (when hourly)
+  (summary "Surface water balance")
+  (entries (number (tag "Precipitation")
+		   (description "\
+Amount of water entering the system as rain and snow.")
+                   (path weather "*" precipitation)
+                   (spec weather common precipitation)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (tag "Overhead irrigation")
+		   (description "\
+Amount of water added to the system from overhead irrigation.")
+                   (path column "${column}" Bioclimate "*" irrigation_overhead)
+                   (spec bioclimate default irrigation_surface)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (tag "Surface irrigation")
+		   (description "\
+Amount of water added to the system from overhead irrigation.")
+                   (path column "${column}" Bioclimate "*" irrigation_surface)
+                   (spec bioclimate default irrigation_surface)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (tag "Snow evaporation")
+		   (description "\
+Amount of water removed from snowpack by evaporation.")
+                   (path column "${column}" Bioclimate "*" snow_ea)
+                   (spec bioclimate default snow_ea)            
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (tag "Canopy evaporation")
+		   (description "\
+Amount of intercepted water removed by evaporation.")
+                   (path column "${column}" Bioclimate "*" canopy_ea)
+                   (spec bioclimate default canopy_ea)            
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (tag "Litter evaporation")
+		   (description "\
+Amount of water removed from the litter by evaporation.")
+                   (path column "${column}" Bioclimate "*" litter_ea)
+                   (spec bioclimate default litter_ea)            
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (tag "Surface evaporation")
+		   (description "\
+Amount of water removed from the pond and soil surface by evaporation.")
+                   (path column "${column}" Surface EvapSoilSurface)
+                   (spec fixed Surface EvapSoilSurface)            
+                   (handle sum)
+                   (dimension "mm/&"))
+           (flux_top (tag "Matrix infiltration")
+                     (description "\
+Amount of water entering the soil through the matrix system.
+
+This is the normal infiltration channel.")
+                     (path column "${column}" SoilWater q)
+                     (spec fixed SoilWater q)
+                     (handle sum)
+                     (negate true)
+                     (dimension "mm/&"))
+           (flux_top (tag "Tertiary infiltration")
+                     (description "\
+Amount of water leaving the surface through the biopores.")
+                     (path column "${column}" SoilWater q_p)
+                     (spec fixed SoilWater q_p)
+                     (handle sum)
+                     (negate true)
+                     (dimension "mm/&"))
+           (number (tag "Runoff")
+		   (description "\
+Amount of water running of the surface.
+
+This is intended to simulate water runoff from a surface with a slop.
+However, since Daisy is a one dimensional model, the water have
+nowhere go to.  For typical setups, this value will be zero.")
+                   (path column "${column}" Surface runoff)
+                   (spec fixed Surface runoff)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (tag "Snow")
+		   (description "Total water stored in the snowpack.")
+                   (path column "${column}" Bioclimate "*"  Snow Ssnow)
+                   (spec fixed Snow Ssnow)
+                   (dimension "mm"))
+           (number (tag "Canopy")
+		   (description "Intercepted water stored on the canopy.")
+                   (path column "${column}"
+                         Bioclimate "*" canopy_water_storage) 
+                   (spec bioclimate default canopy_water_storage)
+                   (dimension "mm"))
+           (number (tag "Litter")
+		   (description "Water stored in the litter.")
+                   (path column "${column}"
+                         Bioclimate "*" litter_water_storage) 
+                   (spec bioclimate default litter_water_storage)
+                   (dimension "mm"))
+           (number (tag "Pond")
+		   (description "Total amount of ponded water.")
+                   (path column "${column}" Surface pond) 
+                   (spec fixed Surface pond)
+                   (dimension "mm"))))
+
 (deflog "Harvest" harvest)
 
 ;;; log.dai ends here

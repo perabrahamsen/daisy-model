@@ -73,7 +73,7 @@
   (require_top true)
   (input "Precipitation" "Irrigation")
   (output "Actual evapotranspiration"
-          "Matrix percolation" "Tertiary"
+          "Matrix percolation" "Tertiary soil" "Tertiary surface"
           "Drain flow" "Runoff")
   (content "Soil water" "Surface water"))
 
@@ -127,9 +127,17 @@ It can be negative if there are cabilary raise.")
                         (handle sum)
                         (negate true)
                         (dimension "mm/&"))
-           (interval (tag "Tertiary")
+           (flux_top (tag "Tertiary surface")
                      (description "\
-Net amount of water leaving the system through the biopores.")
+Amount of water leaving the surface through the biopores.")
+                        (path column "${column}" SoilWater q_p)
+                        (spec fixed SoilWater q_p)
+                        (handle sum)
+                        (negate true)
+                        (dimension "mm/&"))
+           (interval (tag "Tertiary soil")
+                     (description "\
+Net amount of water leaving the soil through the biopores.")
                      (path column "${column}" SoilWater S_p)
                      (spec fixed SoilWater S_p)
                      (handle sum)
@@ -289,8 +297,10 @@ The total amount of water in the soil interval")
 	 "Org_N-Fertilizer"
          "NH4-Deposit" "NO3-Deposit" Fixated "Seed_N")
   (output "N2O-Nitrification" "Denitrification"
-          "NH4-Leak-Matrix" "NH4-Tertiary" "NO3-Leak-Matrix"
-          "NO3-Tertiary" "NH4-Drain" "NO3-Drain" "NH4-Surface-Loss"
+          "NH4-Leak-Matrix" "NO3-Leak-Matrix"
+          "NH4-Surface-Tertiary" "NO3-Surface-Tertiary" 
+          "NH4-Soil-Tertiary" "NO3-Soil-Tertiary"
+          "NH4-Drain" "NO3-Drain" "NH4-Surface-Loss"
           "NO3-Surface-Loss" "Harvest_N")
   (content "NH4-Surface"  "NO3-Surface" "NH4-Soil" "NO3-Soil" 
 	   "Org_N-Surface" "Org_N-Soil" "Crop" "Dead leaves"
@@ -302,9 +312,9 @@ The total amount of water in the soil interval")
   (require_top true)
   (input "NH4-Surface-Fertilizer" "NH4-Soil-Fertilizer"
 	 "NH4-Deposit" "NH4-Mineralization")
-  (output "NH4-Nitrification"
-          "NH4-Leak-Matrix" "NH4-Tertiary" "NH4-Drain" "NH4-Surface-Loss"
-          "NH4-Crop")
+  (output "NH4-Nitrification" "NH4-Leak-Matrix"
+          "NH4-Surface-Tertiary" "NH4-Soil-Tertiary"
+          "NH4-Drain" "NH4-Surface-Loss" "NH4-Crop")
   (content "NH4-Surface" "NH4-Soil" "NH4-Error"))
 
 (defsummary "Field NO3 balance" balance
@@ -313,9 +323,9 @@ The total amount of water in the soil interval")
   (require_top true)
   (input "NO3-Surface-Fertilizer" "NO3-Soil-Fertilizer" 
 	 "NO3-Deposit" "NO3-Nitrification")
-  (output "NO3-Immobilization" Denitrification
-          "NO3-Leak-Matrix" "NO3-Tertiary" "NO3-Drain" "NO3-Surface-Loss"
-          "NO3-Crop")
+  (output "NO3-Immobilization" "Denitrification"
+          "NO3-Leak-Matrix" "NO3-Surface-Tertiary" "NO3-Soil-Tertiary"
+          "NO3-Drain" "NO3-Surface-Loss" "NO3-Crop")
   (content "NO3-Surface" "NO3-Soil" "NO3-Error"))
 
 (defsummary "Field crop nitrogen balance" balance
@@ -384,12 +394,19 @@ The total amount of water in the soil interval")
                         (negate true)
                         (tag "NH4-Leak-Matrix")
                         (dimension "kg N/ha/&"))
+           (flux_top (path column "${column}"
+                           Chemistry "*" trace NH4 J_tertiary)
+                     (spec chemical default J_tertiary)
+                     (handle sum)
+                     (negate true)
+                     (tag "NH4-Surface-Tertiary")
+                     (dimension "kg N/ha/&"))
            (interval (path column "${column}"
                            Chemistry "*" trace NH4 S_tertiary)
                      (spec chemical default S_tertiary)
                      (handle sum)
                      (negate true)
-                     (tag "NH4-Tertiary")
+                     (tag "NH4-Soil-Tertiary")
                      (dimension "kg N/ha/&"))
            (interval (path column "${column}"
 			   Chemistry "*" trace NH4 S_drain)
@@ -472,10 +489,17 @@ The total amount of water in the soil interval")
                         (handle sum)
                         (negate true)
                         (dimension "kg N/ha/&"))
+           (flux_top (path column "${column}"
+                           Chemistry "*" trace NO3 J_tertiary)
+                     (spec chemical default J_tertiary)
+                     (handle sum)
+                     (negate true)
+                     (tag "NO3-Surface-Tertiary")
+                     (dimension "kg N/ha/&"))
            (interval (path column "${column}" Chemistry "*"
                            trace NO3 S_tertiary)
                      (spec chemical default S_tertiary)
-                     (tag "NO3-Tertiary")
+                     (tag "NO3-Soil-Tertiary")
                      (handle sum)
                      (negate true)
                      (dimension "kg N/ha/&"))

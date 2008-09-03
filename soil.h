@@ -64,7 +64,7 @@ public:
   const Secondary& secondary_domain (size_t cell) const;
   
   // Texture.
-  double tortuosity_factor (size_t i, double Theta) const;
+  double tortuosity_factor (size_t i, double Theta) const; // [cm^3/cm^3]
   double anisotropy (size_t i) const;
   double dry_bulk_density (size_t i) const;
   double clay (size_t i) const;

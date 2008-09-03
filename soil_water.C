@@ -456,7 +456,7 @@ SoilWater::swap (const Geometry& geo, const Soil& soil,
       if (Theta_[i] > Theta_sat)
 	{
 	  std::ostringstream tmp;
-	  tmp << "BUG: Theta[ " << i << "] (" << Theta_[i]
+	  tmp << "BUG: Theta[" << i << "] (" << Theta_[i]
               << ") > Theta_sat (" << Theta_sat << ")";
 	  msg.error (tmp.str ());
 	  Theta_[i] = Theta_sat;

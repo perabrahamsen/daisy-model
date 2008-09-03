@@ -1,3 +1,10 @@
+2008-09-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* root_system.C (RootSystem::solute_uptake): Did not take surface
+	area into account.
+
+	* uzrect_2x1.C (UZRect2x1::water_column): Calculate in groundwater.
+
 2008-08-29  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.45 released.

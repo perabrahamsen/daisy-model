@@ -48,7 +48,7 @@ RootSystem::potential_water_uptake (const double h_x,
   std::vector<double>& S = H2OExtraction;
   const size_t size = std::min (S.size (), soil.size ());
   daisy_assert (L.size () >= size);
-  const double area = M_PI * Rad * Rad;
+  const double area = M_PI * Rad * Rad; // [cm^2 R]
 
   for (size_t i = 0; i < size; i++)
     {
@@ -221,8 +221,8 @@ RootSystem::solute_uptake (const Geometry& geo, const Soil& soil,
 			   Chemical& solute,
 			   double PotNUpt,
 			   std::vector<double>& uptake,
-			   const double I_max,
-			   const double C_root_min,
+			   const double I_max,      // [g/cm R/h]
+			   const double C_root_min, // [g/cm^3 W]
                            const double dt)
 {
   if (PotNUpt <= 0.0)
@@ -232,74 +232,93 @@ RootSystem::solute_uptake (const Geometry& geo, const Soil& soil,
     }
 
   daisy_assert (PotNUpt > 0.0);
-  PotNUpt /= 1.0e4;		// gN/m²/h -> gN/cm²/h
+  PotNUpt /= 1.0e4;		// g/m^2/h -> g/cm^2/h
+  PotNUpt *= geo.surface_area (); // [g/h]
   const int size = soil.size ();
   // I: Uptake per root length.
   // I = I_zero - B_zero * C_root
-  std::vector<double> I_zero (size, 0.0);
-  std::vector<double> B_zero (size, 0.0);
-  double U_zero = 0.0;		// Total uptake a C_root_min
-  double B = 0.0;
+  std::vector<double> I_zero (size, 0.0); // [g/cm R/h]
+  std::vector<double> B_zero (size, 0.0); // [cm^3 W/cm R/h] 
+
+  double U_zero = 0.0;		// [g/h] Total uptake a C_root_min
+  double B = 0.0;               // [cm^3 W/h]
 
   for (int i = 0; i < size; i++)
     {
-      const double C_l = solute.C_secondary (i);
-      const double Theta = soil_water.Theta_old (i);
-      const double L = Density[i];
+      const double C_l = solute.C_secondary (i);     // [g/cm^3 W]
+      const double Theta = soil_water.Theta_old (i); // [cm^3 W/cm^3 S]
+      const double L = Density[i];                   // [cm R/cm^3 S]
       if (L > 0 && soil_water.h (i) <= 0.0)
 	{
+          // [cm^3 W/cm R/h] = [cm^3 W/cm^3 S/h] / [cm R/cm^3 S]
 	  const double q_r = H2OExtraction[i] / L;
+          // [cm^2/h] = [cm^2/h] * [cm^3/cm^3] * [cm^3 W/cm^3 S]
 	  const double D = solute.diffusion_coefficient ()
 	    * soil.tortuosity_factor (i, Theta)
 	    * Theta;
+          // [] = [cm^3 W/cm R/h] / [cm^2/h]
 	  const double alpha = q_r / ( 2 * M_PI * D);
+          // [] = [] / ([cm] * sqrt ([cm^-2]))
 	  const double beta = 1.0 / (Rad * sqrt (M_PI * L));
+          // [] = [] * []
 	  const double beta_squared = beta * beta;
 	  if (alpha < 1e-10)
 	    {
+              // [cm^3 W/cm R/h] = [cm^2/h] / ([] * log ([]/[]) - [])
 	      B_zero[i] = 4.0 * M_PI * D
 		/ (beta_squared * log (beta_squared) / (beta_squared - 1.0)
                    - 1.0);
+              // [g/cm R/h] = [cm^3 W/cm R/h] * [g/cm^3 W]
 	      I_zero[i] = B_zero[i] * C_l;
 	    }
 	  else
             { 
-              const double divisor 
+              const double divisor // []
                 = ((beta_squared - 1.0) * (1.0 - 0.5 * alpha)
                    - (pow (beta, 2.0 - alpha) - 1.0));
               
               if (std::isnormal (divisor))
                 {
+                  // [cm^3 W/cm R/h] = [cm^3 W/cm R/h]
                   B_zero[i] = q_r * (pow (beta, 2.0 - alpha) - 1.0)
                     / divisor;
+                  // [g/cm R/h] = [cm^3 W/cm R/h] * [g/cm^3 W]
                   I_zero[i] = q_r * (beta_squared - 1.0) * (1.0 - 0.5 * alpha)
                     * C_l / divisor;
                 }
               else              
                 {
                   daisy_assert (approximate (alpha, 2.0));
-                  const double div2 
+                  const double div2 // []
                     = ((beta_squared - 1.0) - log (beta_squared));
                   daisy_assert (std::isnormal (div2));
+                  // [cm^3 W/cm R/h] = [cm^3 W/cm R/h]
                   B_zero[i] = q_r * log (beta_squared) / div2;
+                  // [g/cm R/h] = [cm^3 W/cm R/h] * [g/cm^3 W]
                   I_zero[i] = q_r * (beta_squared - 1.0) * C_l / div2;
                 }
             }
 	  daisy_assert (std::isfinite (I_zero[i]));
 	  daisy_assert (std::isfinite (B_zero[i]));
+          // [cm^3 W/h] = [cm R/cm^3 S] * [cm^3 S] * [cm^3 W/cm R/h]
 	  B += L * geo.cell_volume (i) * B_zero[i];
+          // [g/h] = [cm R/cm^3 S] * [cm^3 S]
+          //       * ([g/cm R/h] - [cm^3 W/cm R/h] * [g/cm^3 W], [g/cm R/h])
 	  U_zero += L * geo.cell_volume (i) 
 	    * bound (0.0, I_zero[i] - B_zero[i] * C_root_min, I_max);
 	}
     }
-  double C_root = C_root_min;
+  double C_root = C_root_min;   // [g/cm^3 W]
   if (U_zero > PotNUpt)
+    // [g/cm^3 W] = max (([g/h] - [g/h]) / [cm^3 W/h], [g/cm^3 W])
     C_root = std::max ((U_zero - PotNUpt) / B, C_root_min);
 
   for (int i = 0; i < size; i++)
     {
-      const double L = Density[i];
+      const double L = Density[i]; // [cm R/cm^3 S]
       if (L > 0 && soil_water.h (i) <= 0.0)
+        // [g/cm^3 S/h]
+        //  = [cm R/cm^3 S] * ([g/cm R/h] - [cm^3 W/cm R/h] * [g/cm^3 W])
 	uptake[i] = std::max (0.0, L * (std::min (I_zero[i], I_max)
                                         - B_zero[i] * C_root));
       else

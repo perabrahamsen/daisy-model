@@ -60,7 +60,7 @@ public:
   // Soil.
 public:
   virtual const Adsorption& adsorption () const = 0;
-  virtual double diffusion_coefficient () const = 0; // in free solute. 
+  virtual double diffusion_coefficient () const = 0; // [cm^2/h] in free solute
 
   // Soil content.
 public:

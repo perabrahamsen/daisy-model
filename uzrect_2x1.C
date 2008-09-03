@@ -150,6 +150,8 @@ UZRect2x1::tick (const GeometryRect& geo, std::vector<size_t>&,
           try 
             {
               horizontal[i]->tick (smm, 0.0, dt, msg);
+              if (i > 0)
+                msg.message ("Reserve model succeeded");
               goto success;
             }
           catch (const char* error)
@@ -198,6 +200,7 @@ UZRect2x1::water_column (const GeometryRect& geo, const Soil& soil,
   // Limit for groundwater table.
   const size_t bottom_edge = bottom_cell + q_offset + 1U;
   size_t last = bottom_cell;
+#ifdef INERT_GROUNDWATER
   if (groundwater.bottom_type () == Groundwater::pressure)
     {
       if (groundwater.table () <= geo.zminus (bottom_cell))
@@ -210,14 +213,15 @@ UZRect2x1::water_column (const GeometryRect& geo, const Soil& soil,
       for (size_t i = last + 1; i <= bottom_cell; i++)
         h_old[i] = h[i] = groundwater.table () - geo.cell_z (i);
     }
+#endif // INERT_GROUNDWATER
 
   // Calculate matrix flow next.
-  for (size_t i = 0; i < vertical.size (); i++)
+  for (size_t m = 0; m < vertical.size (); m++)
     {
-      Treelog::Open nest (msg, vertical[i]->name);
+      Treelog::Open nest (msg, vertical[m]->name);
       try
         {
-          vertical[i]->tick (msg, geo, soil, soil_heat,
+          vertical[m]->tick (msg, geo, soil, soil_heat,
                              first, surface, top_edge, 
                              last, groundwater, bottom_edge, 
                              S, h_old, Theta_old, h_ice, h, Theta, 
@@ -228,12 +232,16 @@ UZRect2x1::water_column (const GeometryRect& geo, const Soil& soil,
               q[i + q_offset] = q[i-1 + q_offset];
               q_p[i + q_offset] = q_p[i-1 + q_offset];
             }
+#ifdef INERT_GROUNDWATER
           // Update Theta below groundwater table.
           if (groundwater.bottom_type () == Groundwater::pressure)
             {
               for(size_t i = last + 1; i < soil.size (); i++)
                 Theta[i] = soil.Theta (i, h[i], h_ice[i]);
             }
+#endif // INERT_GROUNDWATER
+          if (m > 0)
+            msg.message ("Reserve model succeeded");
           return;
         }
       catch (const char* error)

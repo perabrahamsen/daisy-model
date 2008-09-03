@@ -346,7 +346,7 @@ MovementSolute::primary_transport (const Geometry& geo, const Soil& soil,
 void
 MovementSolute::divide_top_incomming (const Geometry& geo, 
                                       const SoilWater& soil_water, 
-                                      const double J_above,
+                                      const double J_above, // [g/cm^2/h]
                                       std::map<size_t, double>& J_primary,
                                       std::map<size_t, double>& J_secondary,
                                       std::map<size_t, double>& J_tertiary)
@@ -354,8 +354,8 @@ MovementSolute::divide_top_incomming (const Geometry& geo,
   const std::vector<size_t>& edge_above 
     = geo.cell_edges (Geometry::cell_above);
   const size_t edge_above_size = edge_above.size ();
-  double total_water_in = 0.0;
-  double total_area = 0.0;
+  double total_water_in = 0.0;  // [cm^3/h]
+  double total_area = 0.0;      // [cm^2]
 
   // Find incomming water in all domain.
   for (size_t i = 0; i < edge_above_size; i++)
@@ -363,7 +363,7 @@ MovementSolute::divide_top_incomming (const Geometry& geo,
       const size_t edge = edge_above[i];
       const int cell = geo.edge_other (edge, Geometry::cell_above);
       daisy_assert (geo.cell_is_internal (cell));
-      const double area = geo.edge_area (edge);
+      const double area = geo.edge_area (edge); // [cm^2]
       total_area += area;
       const double in_sign 
         = geo.cell_is_internal (geo.edge_to (edge)) 
@@ -372,12 +372,13 @@ MovementSolute::divide_top_incomming (const Geometry& geo,
       daisy_assert (in_sign < 0);
 
       // Tertiary domain.
-      const double tertiary_in = soil_water.q_tertiary (edge) * in_sign;
+      const double tertiary_in  // [cm/h]
+        = soil_water.q_tertiary (edge) * in_sign;
       if (tertiary_in > 0)
         {
-          const double flow = tertiary_in * area;
+          const double flow = tertiary_in * area; // [cm^3/h]
           total_water_in += flow;
-          J_tertiary[edge] = flow * in_sign;
+          J_tertiary[edge] = flow * in_sign; // [cm^3/h]
         }
       else
         J_tertiary[edge] = 0.0;
@@ -386,9 +387,9 @@ MovementSolute::divide_top_incomming (const Geometry& geo,
       const double secondary_in = soil_water.q_secondary (edge) * in_sign;
       if (secondary_in > 0)
         {
-          const double flow = secondary_in * area;
+          const double flow = secondary_in * area; // [cm^3/h]
           total_water_in += flow;
-          J_secondary[edge] = flow * in_sign;
+          J_secondary[edge] = flow * in_sign; // [cm^3/h]
           
         }
       else
@@ -398,9 +399,9 @@ MovementSolute::divide_top_incomming (const Geometry& geo,
       const double primary_in = soil_water.q_primary (edge) * in_sign;
       if (primary_in > 0)
         {
-          const double flow = primary_in * area;
+          const double flow = primary_in * area; // [cm^3/h]
           total_water_in += flow;
-          J_primary[edge] = flow  * in_sign;
+          J_primary[edge] = flow  * in_sign; // [cm^3/h]
           
         }
       else
@@ -411,11 +412,12 @@ MovementSolute::divide_top_incomming (const Geometry& geo,
   if (std::isnormal (total_water_in))
     // Scale with incomming solute.
     {
-      double scale = -J_above / total_water_in;
+      // [g/cm^5] = [g/cm^2/h] / [cm^3/h]
+      double scale = -J_above / total_water_in; // [g/cm^5]
       for (size_t i = 0; i < edge_above_size; i++)
         {
           const size_t edge = edge_above[i];
-          
+          // [g/cm^2/h] = [cm^3/h] * [g/cm^5]
           J_tertiary[edge] *= scale;
           J_secondary[edge] *= scale;
           J_primary[edge] *= scale;
@@ -427,10 +429,10 @@ MovementSolute::divide_top_incomming (const Geometry& geo,
       for (size_t i = 0; i < edge_above_size; i++)
         {
           const size_t edge = edge_above[i];
-          const double area = geo.edge_area (edge);
+          const double area = geo.edge_area (edge); // [cm^2]
           const double in_sign 
             = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
-          
+          // [g/cm^2/h] = [g/cm^2/h] * [cm^2] / [cm^2]
           J_tertiary[edge] = 0.0;
           J_secondary[edge] = 0.0;
           J_primary[edge] = J_above * in_sign * area / total_area;
@@ -482,7 +484,7 @@ MovementSolute::divide_top_outgoing (const Geometry& geo,
       for (size_t i = 0; i < edge_above_size; i++)
         {
           const size_t edge = edge_above[i];
-          // [g/cm^3/h] = [g/cm] * [cm^-1 h^-1]
+          // [g/cm^2/h] = [g/cm] * [cm^-1 h^-1]
           J_primary[edge] *= scale;
         }
     }
