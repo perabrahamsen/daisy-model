@@ -1,5 +1,11 @@
 2008-09-03  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 4.46 released.
+
+2008-09-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* movement_rect.C (MovementRect::tick): Don't use q_tertiary here.
+
 	* root_system.C (RootSystem::solute_uptake): Did not take surface
 	area into account.
 
