@@ -1033,8 +1033,7 @@ difrad${OBJ}: difrad.C difrad.h model.h symbol.h alist.h block.h syntax.h \
 organic_matter${OBJ}: organic_matter.C organic_matter.h model.h symbol.h \
   alist.h block.h syntax.h treelog.h plf.h librarian.h
 movement${OBJ}: movement.C movement.h model.h symbol.h alist.h block.h \
-  syntax.h treelog.h plf.h librarian.h tertiary.h groundwater.h log.h \
-  time.h border.h
+  syntax.h treelog.h plf.h librarian.h tertiary.h log.h time.h border.h
 integer${OBJ}: integer.C integer.h model.h symbol.h alist.h boolean.h \
   submodeler.h block.h syntax.h treelog.h plf.h assertion.h memutils.h \
   librarian.h
@@ -1128,7 +1127,7 @@ groundwater${OBJ}: groundwater.C groundwater.h model.h symbol.h alist.h \
 am${OBJ}: am.C am.h model.h symbol.h alist.h im.h syntax.h treelog.h aom.h \
   om.h plf.h chemical.h metalib.h library.h submodeler.h block.h \
   assertion.h time.h log.h border.h geometry.h mathlib.h check.h vcheck.h \
-  program.h run.h memutils.h librarian.h units.h
+  program.h run.h memutils.h librarian.h unit.h
 adsorption${OBJ}: adsorption.C adsorption.h model.h symbol.h alist.h block.h \
   syntax.h treelog.h plf.h librarian.h mathlib.h assertion.h
 tortuosity${OBJ}: tortuosity.C tortuosity.h model.h symbol.h alist.h block.h \
@@ -1423,19 +1422,14 @@ stomatacon_SHA${OBJ}: stomatacon_SHA.C stomatacon.h model.h symbol.h alist.h \
 stomatacon_Leuning${OBJ}: stomatacon_Leuning.C stomatacon.h model.h symbol.h \
   alist.h mathlib.h assertion.h check.h block.h syntax.h treelog.h plf.h \
   librarian.h
-uzrect_r3${OBJ}: uzrect_r3.C uzrect.h model.h symbol.h alist.h \
-  geometry_rect.h geometry_vert.h geometry.h syntax.h treelog.h mathlib.h \
-  assertion.h soil.h soil_water.h soil_heat.h groundwater.h surface.h \
-  uzmodel.h solver.h log.h time.h border.h block.h plf.h librarian.h \
-  tertsmall.h anystate.h
 tertiary_old${OBJ}: tertiary_old.C tertiary.h model.h symbol.h alist.h \
   tertsmall.h geometry1d.h geometry_vert.h geometry.h syntax.h treelog.h \
   mathlib.h assertion.h soil.h soil_water.h chemical.h macro.h mactrans.h \
-  librarian.h block.h plf.h surface.h uzmodel.h
+  librarian.h block.h plf.h surface.h uzmodel.h groundwater.h
 biopore_drain${OBJ}: biopore_drain.C biopore.h model.h symbol.h alist.h \
   number.h block.h syntax.h treelog.h plf.h vcheck.h librarian.h \
   submodeler.h assertion.h check.h geometry.h mathlib.h soil.h \
-  soil_heat.h anystate.h chemical.h
+  soil_heat.h anystate.h chemical.h groundwater.h
 tertiary_biopores${OBJ}: tertiary_biopores.C tertiary.h model.h symbol.h \
   alist.h tertsmall.h biopore.h number.h memutils.h librarian.h block.h \
   syntax.h treelog.h plf.h check.h geometry.h mathlib.h assertion.h \
@@ -1445,7 +1439,7 @@ biopore_matrix${OBJ}: biopore_matrix.C biopore.h model.h symbol.h alist.h \
   number.h imvec.h syntax.h treelog.h block.h plf.h vcheck.h librarian.h \
   submodeler.h assertion.h geometry.h mathlib.h soil.h soil_heat.h \
   secondary.h volume_box.h volume.h log.h time.h border.h check.h \
-  anystate.h chemical.h
+  anystate.h chemical.h groundwater.h
 transport_Mollerup${OBJ}: transport_Mollerup.C transport.h model.h symbol.h \
   alist.h geometry_rect.h geometry_vert.h geometry.h syntax.h treelog.h \
   mathlib.h assertion.h soil.h solver.h log.h time.h border.h \
@@ -1579,7 +1573,7 @@ uzrect_Mollerup${OBJ}: uzrect_Mollerup.C uzrect.h model.h symbol.h alist.h \
   geometry_rect.h geometry_vert.h geometry.h syntax.h treelog.h mathlib.h \
   assertion.h soil.h soil_water.h soil_heat.h groundwater.h surface.h \
   uzmodel.h solver.h log.h time.h border.h block.h plf.h librarian.h \
-  tertiary.h
+  tertsmall.h anystate.h
 groundwater_flux${OBJ}: groundwater_flux.C groundwater.h model.h symbol.h \
   alist.h syntax.h treelog.h block.h plf.h check.h librarian.h
 ABAeffect_exp${OBJ}: ABAeffect_exp.C ABAeffect.h model.h symbol.h alist.h \

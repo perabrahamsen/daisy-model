@@ -351,11 +351,12 @@ MovementSolute::divide_top_incomming (const Geometry& geo,
                                       std::map<size_t, double>& J_secondary,
                                       std::map<size_t, double>& J_tertiary)
 {
+  daisy_assert (J_above < 0.0); // Negative upward flux.
   const std::vector<size_t>& edge_above 
     = geo.cell_edges (Geometry::cell_above);
   const size_t edge_above_size = edge_above.size ();
-  double total_water_in = 0.0;  // [cm^3/h]
-  double total_area = 0.0;      // [cm^2]
+  double total_water_in = 0.0;  // [cm^3 W/h]
+  double total_area = 0.0;      // [cm^2 S]
 
   // Find incomming water in all domain.
   for (size_t i = 0; i < edge_above_size; i++)
@@ -363,7 +364,7 @@ MovementSolute::divide_top_incomming (const Geometry& geo,
       const size_t edge = edge_above[i];
       const int cell = geo.edge_other (edge, Geometry::cell_above);
       daisy_assert (geo.cell_is_internal (cell));
-      const double area = geo.edge_area (edge); // [cm^2]
+      const double area = geo.edge_area (edge); // [cm^2 S]
       total_area += area;
       const double in_sign 
         = geo.cell_is_internal (geo.edge_to (edge)) 
@@ -372,70 +373,66 @@ MovementSolute::divide_top_incomming (const Geometry& geo,
       daisy_assert (in_sign < 0);
 
       // Tertiary domain.
-      const double tertiary_in  // [cm/h]
-        = soil_water.q_tertiary (edge) * in_sign;
+      const double q_tertiary = soil_water.q_tertiary (edge);
+      const double tertiary_in = q_tertiary * in_sign; // [cm^3 W/cm^2 S/h]
       if (tertiary_in > 0)
         {
-          const double flow = tertiary_in * area; // [cm^3/h]
-          total_water_in += flow;
-          J_tertiary[edge] = flow * in_sign; // [cm^3/h]
+          total_water_in += tertiary_in * area;
+          J_tertiary[edge] = q_tertiary; // [cm^3 W/cm^2 S/h]
         }
       else
         J_tertiary[edge] = 0.0;
 
       // Secondary domain.
-      const double secondary_in = soil_water.q_secondary (edge) * in_sign;
+      const double q_secondary = soil_water.q_secondary (edge);
+      const double secondary_in = q_secondary * in_sign; // [cm^3 W/cm^2 S/h]
       if (secondary_in > 0)
         {
-          const double flow = secondary_in * area; // [cm^3/h]
-          total_water_in += flow;
-          J_secondary[edge] = flow * in_sign; // [cm^3/h]
+          total_water_in += secondary_in * area;
+          J_secondary[edge] = q_secondary; // [cm^3 W/cm^2 S/h]
           
         }
       else
         J_secondary[edge] = 0.0;
 
       // Primary domain.
-      const double primary_in = soil_water.q_primary (edge) * in_sign;
+      const double q_primary = soil_water.q_primary (edge);
+      const double primary_in = q_primary * in_sign; // [cm^3 W/cm^2 S/h]
       if (primary_in > 0)
         {
-          const double flow = primary_in * area; // [cm^3/h]
-          total_water_in += flow;
-          J_primary[edge] = flow  * in_sign; // [cm^3/h]
-          
+          total_water_in += primary_in * area;
+          J_primary[edge] = q_primary; // [cm^3 W/cm^2 S/h]
         }
       else
         J_primary[edge] = 0.0;
     }
   daisy_approximate (total_area, geo.surface_area ());
 
-  if (std::isnormal (total_water_in))
+  if (total_water_in > 0.0)
     // Scale with incomming solute.
     {
-      // [g/cm^5] = [g/cm^2/h] / [cm^3/h]
-      double scale = -J_above / total_water_in; // [g/cm^5]
+      // [g/cm^3 W] = [g/cm^2 S/h] * [cm^2 S] / [cm^3 W/h] 
+      const double C_above = -J_above * total_area / total_water_in;
       for (size_t i = 0; i < edge_above_size; i++)
         {
           const size_t edge = edge_above[i];
-          // [g/cm^2/h] = [cm^3/h] * [g/cm^5]
-          J_tertiary[edge] *= scale;
-          J_secondary[edge] *= scale;
-          J_primary[edge] *= scale;
+          // [g/cm^2 S/h] = [cm^3 W/cm^2 S/h] * [g/cm^3 W]
+          J_tertiary[edge] *= C_above;
+          J_secondary[edge] *= C_above;
+          J_primary[edge] *= C_above;
         }
     }
   else
-    // Scale with incomming solute.
     {
+      daisy_assert (iszero (total_water_in));
       for (size_t i = 0; i < edge_above_size; i++)
         {
           const size_t edge = edge_above[i];
-          const double area = geo.edge_area (edge); // [cm^2]
           const double in_sign 
             = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
-          // [g/cm^2/h] = [g/cm^2/h] * [cm^2] / [cm^2]
           J_tertiary[edge] = 0.0;
           J_secondary[edge] = 0.0;
-          J_primary[edge] = J_above * in_sign * area / total_area;
+          J_primary[edge] = -J_above * in_sign;
         }
     }
 }
@@ -448,10 +445,12 @@ MovementSolute::divide_top_outgoing (const Geometry& geo,
                                      std::map<size_t, double>& J_secondary,
                                      std::map<size_t, double>& J_tertiary)
 {
+  daisy_assert (J_above > 0.0); // Positive upward flux.
   const std::vector<size_t>& edge_above 
     = geo.cell_edges (Geometry::cell_above);
   const size_t edge_above_size = edge_above.size ();
   double total_amount = 0.0;    // [g/cm]
+  double total_area = 0.0;      // [cm^2]
 
   // Find total content in primary domain in cells connected to border.
   for (size_t i = 0; i < edge_above_size; i++)
@@ -460,32 +459,46 @@ MovementSolute::divide_top_outgoing (const Geometry& geo,
       const int cell = geo.edge_other (edge, Geometry::cell_above);
       daisy_assert (geo.cell_is_internal (cell));
       const double area = geo.edge_area (edge);
-      const double in_sign 
-        = geo.cell_is_internal (geo.edge_to (edge)) 
-        ? 1.0
-        : -1.0;
-      daisy_assert (in_sign < 0);
 
       // No flux out of tertiary or secondary domains.
       J_tertiary[edge] = 0.0;
       J_secondary[edge] = 0.0;
 
       // Find content 
-      const double amount = chemical.M_primary (cell) * area;
-      total_amount += amount;              // [g/cm]
-      J_primary[edge] = amount  * in_sign; // [g/cm]
+      const double M = chemical.M_primary (cell); // [g/cm^3]
+      const double amount =  M * area;            // [g/cm]
+      total_amount += amount;                     // [g/cm]
+      total_area += area;
+      J_primary[edge] = M;                        // [g/cm^3]
     }
 
-  // Scale with incomming solute.
-  if (std::isnormal (total_amount))
+  // Scale with content
+  if (total_amount > 0.0)
     {
-      // [cm^-1 h^-1] = [g/cm^2/h] / [g/cm]
-      const double scale = -J_above / total_amount;
+      // [cm/h] = [g/cm^2/h] * [cm^2] / [g/cm]
+      const double scale = -J_above * total_area / total_amount;
       for (size_t i = 0; i < edge_above_size; i++)
         {
           const size_t edge = edge_above[i];
-          // [g/cm^2/h] = [g/cm] * [cm^-1 h^-1]
-          J_primary[edge] *= scale;
+          const double in_sign 
+            = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
+          // [g/cm^2/h] = [g/cm^3] * [cm/h]
+          J_tertiary[edge] = 0.0;
+          J_secondary[edge] = 0.0;
+          J_primary[edge] *= in_sign * scale;
+        }
+    }
+  else
+    {
+      daisy_assert (iszero (total_amount));
+      for (size_t i = 0; i < edge_above_size; i++)
+        {
+          const size_t edge = edge_above[i];
+          const double in_sign 
+            = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
+          J_tertiary[edge] = 0.0;
+          J_secondary[edge] = 0.0;
+          J_primary[edge] = -J_above * in_sign;
         }
     }
 }
@@ -539,6 +552,30 @@ MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
   else
     // No flux.
     zero_top (geometry (), J_primary, J_secondary, J_tertiary);
+
+  // Check result.
+  {
+    const std::vector<size_t>& edge_above 
+      = geometry ().cell_edges (Geometry::cell_above);
+    const size_t edge_above_size = edge_above.size ();
+    double J_sum = 0.0;
+    for (size_t i = 0; i < edge_above_size; i++)
+      {
+        const size_t edge = edge_above[i];
+        const double in_sign 
+          = geometry ().cell_is_internal (geometry ().edge_to (edge)) 
+          ? 1.0 : -1.0;
+        const double area = geometry ().edge_area (edge); // [cm^2 S]
+        const double J_edge       // [g/cm^2 S/h]
+          = J_tertiary[edge] + J_secondary[edge] + J_primary[edge];
+        J_sum += in_sign * J_edge * area; // [g/h]
+        daisy_assert (in_sign * J_tertiary[edge] >= 0.0);
+        daisy_assert (in_sign * J_secondary[edge] >= 0.0);
+        daisy_assert (in_sign * J_primary[edge] >= 0.0);
+      }
+    J_sum /= geometry ().surface_area (); // [g/cm^2 S/h]
+    daisy_approximate (-J_above, J_sum);
+  }
 
   // We set a fixed concentration below lower boundary, if specified.
   std::map<size_t, double> C_border;
