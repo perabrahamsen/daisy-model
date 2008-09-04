@@ -142,6 +142,7 @@ struct BioclimateStandard : public Bioclimate
   void RadiationDistribution (const Vegetation&, double sin_beta, Treelog&);
   std::auto_ptr<Difrad> difrad;  // Diffuse radiation model.
   double difrad0;                // Diffuse radiation above canopy [W/m2]
+
   double absorbed_total_PAR_canopy; // Canopy absorbed PAR (sun+shade) [W/m2]
   double absorbed_total_NIR_canopy; // Canopy absorbed NIR (sun+shade) [W/m2]
   double absorbed_total_Long_canopy;// Canopy absorbed Long wave radiation (sun+shade)[W/m2]
@@ -639,12 +640,26 @@ BioclimateStandard::RadiationDistribution (const Vegetation& vegetation,
   absorbed_sun_PAR_canopy = sun_PAR_[0] - sun_PAR_[No];           // [W/m2]
   absorbed_shadow_PAR_canopy = absorbed_total_PAR_canopy - absorbed_sun_PAR_canopy; // [W/m2]
 
-
    //Absorbed NIR in the canopy and the soil:
   absorbed_total_NIR_canopy = total_NIR_[0] - total_NIR_[No];
   absorbed_total_NIR_soil = total_NIR_[0] - absorbed_total_NIR_canopy;
   absorbed_sun_NIR_canopy = sun_NIR_[0] - sun_NIR_[No];
   absorbed_shadow_NIR_canopy = absorbed_total_NIR_canopy - absorbed_sun_NIR_canopy;
+
+   //Absorbed Long wave radiation in the canopy and the soil:
+  const double net_longwave_radiation = net_radiation->net_longwave_radiation();
+  const double cover = vegetation.cover();
+
+  double sun_LAI_fraction_total = 0.0;
+  for (int i = 0; i <= No - 1; i++)
+    {
+      sun_LAI_fraction_total += sun_LAI_fraction_[i] / No;
+    }
+  
+  absorbed_total_Long_soil = net_longwave_radiation * (1-cover);
+  absorbed_total_Long_canopy = net_longwave_radiation * (cover);
+  absorbed_sun_Long_canopy = absorbed_total_Long_canopy * sun_LAI_fraction_total;
+  absorbed_shadow_Long_canopy = absorbed_total_Long_canopy - absorbed_sun_Long_canopy;
 
 }
 

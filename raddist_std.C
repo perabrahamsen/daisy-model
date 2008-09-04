@@ -60,13 +60,6 @@ void RaddistStandard::tick (std::vector <double>& sun_LAI_fraction,
 
   const double LAI = vegetation.LAI ();
 
-  // No LAI
-  if (iszero (LAI))
-  {
-    std::fill (&total_PAR[0], &total_PAR[No+1], 0.0);
-    std::fill (&total_NIR[0], &total_NIR[No+1], 0.0);
-    return;
-  }
   //Fill empty vectors
   std::fill (&sun_PAR[0], &sun_PAR[No+1], 0.0); 
   std::fill (&sun_NIR[0], &sun_NIR[No+1], 0.0); 

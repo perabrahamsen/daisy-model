@@ -44,6 +44,7 @@ void
 NetRadiation::output (Log& log) const
 {
   output_value (net_radiation (), "net_radiation", log);
+  output_value (net_longwave_radiation (), "net_longwave_radiation", log);
 }
 
 NetRadiation::NetRadiation (Block& al)
@@ -62,6 +63,7 @@ struct NetRadiationParent : public NetRadiation
 
   // State
   double net_radiation_;
+  double net_longwave_radiation_;
 
   // Utilities
   virtual double NetLongwaveRadiation (double Cloudiness, // [W/m2]
@@ -70,29 +72,23 @@ struct NetRadiationParent : public NetRadiation
   // Simulation.
   double net_radiation () const
     { return net_radiation_; }
+  double net_longwave_radiation () const
+    { return net_longwave_radiation_; }
   void tick (double Cloudiness, double Temp,
 	     double VapourPressure, double Si,
 	     double Albedo, Treelog&)
     {
       VapourPressure *= 0.001;	// Pa -> kPa
-      const double Ln
-	= NetLongwaveRadiation (Cloudiness, Temp, VapourPressure);
-      net_radiation_ = (1.0 - Albedo) * Si - Ln;
-#if 0
-      if (net_radiation_>750)
-      {
-        cout << "Albedo     " << Albedo << "\n";
-        cout << "Si         " << Si     << "\n";
-        cout << "Ln         " << Ln     << "\n";
-        cout << "Rn         " << net_radiation_ << "\n";
-      }
-#endif
+      net_longwave_radiation_
+	= - NetLongwaveRadiation (Cloudiness, Temp, VapourPressure);
+      net_radiation_ = (1.0 - Albedo) * Si + net_longwave_radiation_;
     }
 
   // Create & Destroy.
   NetRadiationParent (Block& al)
     : NetRadiation (al),
-      net_radiation_ (0.0)
+      net_radiation_ (0.0),
+      net_longwave_radiation_ (0.0)
     { }
 };
 
@@ -210,7 +206,9 @@ static struct NetRadiationSyntax
       // Brunt.
       Syntax& syntax_brunt = *new Syntax ();
       syntax_brunt.add ("net_radiation", "W/m^2", Syntax::LogOnly,
-			"The calculated net radiation.");
+			"The calculated net radiation (positive downwards).");
+      syntax_brunt.add ("net_longwave_radiation", "W/m^2", Syntax::LogOnly,
+			"The calculated net longwave radiation (positive downwards).");
       // We make them optional, so other code doesn't have to set them.
       syntax_brunt.add ("a", Syntax::None (), Syntax::OptionalConst,
 			"Brunt 'a' parameter (offset).");
@@ -229,7 +227,9 @@ FAO recommendation.");
       // Others.
       Syntax& syntax = *new Syntax ();
       syntax.add ("net_radiation", "W/m^2", Syntax::LogOnly,
-		  "The calculated net radiation.");
+		  "The calculated net radiation (positive downwards).");
+      syntax.add ("net_longwave_radiation", "W/m^2", Syntax::LogOnly,
+		  "The calculated net longwave radiation (positive downwards).");
       AttributeList& alist_idso_jackson = *new AttributeList ();
       alist_idso_jackson.add ("description", "Idso and Jackson, 1969");
       AttributeList& alist_brutsaert = *new AttributeList ();

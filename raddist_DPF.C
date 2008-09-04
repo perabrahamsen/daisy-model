@@ -76,16 +76,6 @@ void RaddistDPF::tick (std::vector <double>& fraction_sun_LAI,
 
   const double LAI = vegetation.LAI ();
 
-  // No LAI
-  if (iszero (LAI))
-  {
-    std::fill (&total_PAR[0], &total_PAR[No+1], 0.0);
-    std::fill (&sun_PAR[0], &sun_PAR[No+1], 0.0); 
-    std::fill (&total_NIR[0], &total_NIR[No+1], 0.0);
-    std::fill (&sun_NIR[0], &sun_NIR[No+1], 0.0); 
-    std::fill (&fraction_sun_LAI[0], &fraction_sun_LAI[No], 0.0);
-    return;
-  }
   // Vectors for calculation
   std::vector<double> beam_PAR (No+1, 0.0);
   std::vector<double> dif_PAR (No+1, 0.0);
@@ -127,7 +117,9 @@ void RaddistDPF::tick (std::vector <double>& fraction_sun_LAI,
       Tau_d += 2.* exp(-kb_gamma * LAI) * sin(gamma) * cos(gamma) * dgamma;
     }
   // Extinction coefficient for black leaves in diffuse radiation 
-  const double kd = -log(Tau_d)/LAI; //note: log == ln i C++
+  const double kd = LAI > 1e-10 
+    ? -log(Tau_d)/LAI //note: log == ln i C++
+    : 1.0;                      // Extinction coefficient is irrelevant without LAI.
   daisy_assert (kd >= 0.0);
 
   // ------------------------------------------------

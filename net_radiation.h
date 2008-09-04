@@ -39,7 +39,8 @@ public:
   // Simulation.
 public:
   virtual void output (Log&) const;
-  virtual double net_radiation () const = 0; // [W/m2]
+  virtual double net_radiation () const = 0; // [W/m2] (positive downwards)
+  virtual double net_longwave_radiation () const = 0; // [W/m2] (positive downwards)
   virtual void tick (double Cloudiness /* [0-1] */,
 		     double Temp /* [dg C] */, 
 		     double VapourPressure /* [kPa] */,
