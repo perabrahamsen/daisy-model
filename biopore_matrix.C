@@ -47,6 +47,9 @@ struct BioporeMatrix : public Biopore
   const double R_primary;       // [h/cm]
   const double R_secondary;     // [h/cm]
   const int debug;
+  const int max_iterations;     // Convergence.
+  const double max_absolute_difference; // [cm]
+  const double max_relative_difference; // []
 
   // State.
   std::vector<double> h_bottom; // [cm]
@@ -116,9 +119,6 @@ struct BioporeMatrix : public Biopore
                            const SoilHeat& soil_heat, 
                            const std::vector<bool>& active,
                            const double h_barrier,
-                           const size_t max_iterations,
-                           const double max_absolute_difference,
-                           const double max_relative_difference,
                            const double pressure_initiate,
                            const double pressure_end,
                            const std::vector<double>& h,
@@ -318,9 +318,6 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
                                    const SoilHeat& soil_heat, 
                                    const std::vector<bool>& active,
                                    const double h_barrier,
-                                   const size_t max_iterations,
-                                   const double max_absolute_difference,
-                                   const double max_relative_difference,
                                    const double pressure_initiate,
                                    const double pressure_end,
                                    const std::vector<double>& h, 
@@ -834,6 +831,9 @@ BioporeMatrix::BioporeMatrix (Block& al)
     R_primary (al.number ("R_primary")),
     R_secondary (al.number ("R_secondary", R_primary)),
     debug (al.integer ("debug")),
+    max_iterations (al.integer ("max_iterations")),
+    max_absolute_difference (al.number ("max_absolute_difference")),
+    max_relative_difference (al.number ("max_relative_difference")),
     h_bottom (al.check ("h_bottom") 
               ? al.number_sequence ("h_bottom") 
               : std::vector<double> ()),
@@ -879,6 +879,15 @@ Increase value to get more debug message.");
                 "Number of iterations used for finding a solution.");
     syntax.add ("h3_soil", "cm", Syntax::LogOnly, Syntax::Sequence,
                 "Pressure suggested by the soil for each interval.");
+    syntax.add ("max_iterations", Syntax::Integer, Syntax::Const, "\
+Maximum number of iterations when seeking convergence.");
+    alist.add ("max_iterations", 50);
+    syntax.add ("max_absolute_difference", "cm", Syntax::Const, "\
+Maximum absolute difference in biopore content for convergence.");
+    alist.add ("max_absolute_difference", 0.02);
+    syntax.add ("max_relative_difference", Syntax::None (), Syntax::Const, "\
+Maximum relative difference in biopore content for convergence.");
+    alist.add ("max_relative_difference", 0.001);
       
     Librarian::add_type (Biopore::component, "matrix", alist, syntax, &make);
   }

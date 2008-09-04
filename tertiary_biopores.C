@@ -41,9 +41,6 @@ struct TertiaryBiopores : public Tertiary, public Tertsmall
 {
   // Parameters.
   const bool enable_solute;
-  const int max_iterations;     // Convergence.
-  const double max_absolute_difference; // [cm]
-  const double max_relative_difference; // []
   const auto_vector<Biopore*> classes; // List of biopore classes.
   const double pressure_initiate;// Pressure needed to init pref.flow [cm]
   const double pressure_end;	 // Pressure after pref.flow has been init [cm]
@@ -393,9 +390,7 @@ TertiaryBiopores::update_biopores (const Geometry& geo,
 {
   for (size_t b = 0; b < classes.size (); b++)
     classes[b]->update_matrix_sink (geo, soil, soil_heat, active, 
-                                    pressure_barrier, max_iterations,
-                                    max_absolute_difference, 
-                                    max_relative_difference,
+                                    pressure_barrier, 
                                     pressure_initiate, 
                                     pressure_end, h, dt);
 }
@@ -575,9 +570,6 @@ TertiaryBiopores::check (const Geometry& geo, Treelog& msg) const
 TertiaryBiopores::TertiaryBiopores (Block& al)
   : Tertiary (al),
     enable_solute (al.flag ("enable_solute")),
-    max_iterations (al.integer ("max_iterations")),
-    max_absolute_difference (al.number ("max_absolute_difference")),
-    max_relative_difference (al.number ("max_relative_difference")),
     classes (Librarian::build_vector<Biopore> (al, "classes")),
     pressure_initiate (al.number ("pressure_initiate")),
     pressure_end (al.number ("pressure_end")),
@@ -606,15 +598,6 @@ static struct TertiaryBioporesSyntax
     syntax.add ("enable_solute", Syntax::Boolean, Syntax::Const, "\
 fTrue iff solutes should be transport with the water through the biopores.");
     alist.add ("enable_solute", true);
-    syntax.add ("max_iterations", Syntax::Integer, Syntax::Const, "\
-Maximum number of iterations when seeking convergence.");
-    alist.add ("max_iterations", 50);
-    syntax.add ("max_absolute_difference", "cm", Syntax::Const, "\
-Maximum absolute difference in biopore content for convergence.");
-    alist.add ("max_absolute_difference", 0.02);
-    syntax.add ("max_relative_difference", Syntax::None (), Syntax::Const, "\
-Maximum relative difference in biopore content for convergence.");
-    alist.add ("max_relative_difference", 0.001);
     syntax.add_object ("classes", Biopore::component, 
                        Syntax::State, Syntax::Sequence,
                        "List of biopore classes.");
@@ -645,8 +628,8 @@ Timestep scaled for available water.\n\
 Only relevant if 'use_small_timesteps' is false.");    
     syntax.add ("deactivate_steps", Syntax::Integer, Syntax::State, 
                 "No matrix exchange for this number of timesteps.\n\
-Set when matrix pressure is in a disarray, such as after tillage operations,\n\
-or calls to reserve models.");
+Automatically set when matrix pressure is in a disarray, such as after\n\
+tillage operations, or calls to reserve models.");
     alist.add ("deactivate_steps", 3);
 
     Librarian::add_type (Tertiary::component, "biopores", alist, syntax, &make);

@@ -1,5 +1,9 @@
 2008-09-04  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* biopore_matrix.C, biopore_drain.C, biopore.h, tertiary_biopores.C:
+	Move convergence parameters to biopore_matrix.C from
+	tertiary_biopores.C.  
+
 	* Version 4.47 released.
 
 2008-09-04  Per Abrahamsen  <abraham@dina.kvl.dk>
