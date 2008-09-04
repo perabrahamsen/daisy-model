@@ -1,5 +1,9 @@
 2008-09-04  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 4.47 released.
+
+2008-09-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
 	* movement_solute.C (MovementSolute::divide_top_incomming): Don't
 	scale with area / total_area, as fluxes are already per area.
 
