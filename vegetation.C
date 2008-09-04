@@ -59,8 +59,10 @@ Vegetation::output (Log& log) const
   output_value (cover (), "cover", log);
   output_value (LAIvsH (), "LAIvsH", log);
   output_value (HvsLAI (), "HvsLAI", log);
-  output_value (ACExt (), "ACExt", log);
-  output_value (ACRef (), "ACRef", log);
+  output_value (ACExt_PAR (), "ACExt_PAR", log);
+  output_value (ACRef_PAR (), "ACRef_PAR", log);
+  output_value (ACExt_NIR (), "ACExt_NIR", log);
+  output_value (ACRef_NIR (), "ACRef_NIR", log);
   output_value (ARExt (), "ARExt", log);
   output_value (ARExt (), "ARExt", log);
   output_value (EpFactor (), "EpFactor", log);
@@ -83,11 +85,16 @@ Vegetation::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "Total canopy LAI below given height");
   syntax.add ("HvsLAI", "cm", "m^2/m^2", Syntax::LogOnly, "\
 Height in which there is a given LAI below in total canopy");
-  syntax.add ("ACExt", Syntax::None (), Syntax::LogOnly,
-	      "Canopy extinction coefficient\
+  syntax.add ("ACExt_PAR", Syntax::None (), Syntax::LogOnly,
+	      "Canopy extinction coefficient of PAR\
 \n(how fast the light dim as a function of LAI passed)");
-   syntax.add ("ACRef", Syntax::None (), Syntax::LogOnly,
-	      "Canopy reflection coefficient");
+   syntax.add ("ACRef_PAR", Syntax::None (), Syntax::LogOnly,
+	      "Canopy reflection coefficient of PAR");
+  syntax.add ("ACExt_NIR", Syntax::None (), Syntax::LogOnly,
+	      "Canopy extinction coefficient of NIR\
+\n(how fast the light dim as a function of LAI passed)");
+   syntax.add ("ACRef_NIR", Syntax::None (), Syntax::LogOnly,
+	      "Canopy reflection coefficient of NIR");
   syntax.add ("ARExt", Syntax::None (), Syntax::LogOnly,
 	      "Radiation Extinction coefficient\
 \n(like ACExt, but for all radiation, not just light)");

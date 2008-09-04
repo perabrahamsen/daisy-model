@@ -32,6 +32,8 @@ class CanopySimple
 public:
   const double PARref;		// PAR reflectance
   const double PARext;		// PAR extinction coefficient
+  const double NIRref;		// NIR reflectance
+  const double NIRext;		// NIR extinction coefficient
   const double EPext;		// EP extinction coefficient
   const double IntcpCap;	// Interception capacity [mm]
 private:

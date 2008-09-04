@@ -30,13 +30,11 @@
 struct RaddistStandard : public Raddist
 {
   // Simulation.
-  void tick (std::vector <double>& sun_LAI, std::vector <double>& sun_PAR, 
-	     std::vector <double>& total_PAR, double global_radiation, 
-	     double diffuse_radiation, double sin_beta, const Vegetation&, Treelog&);
-  void output (Log& log) const
-  {
-    Raddist::output (log);
-  }
+  void tick (std::vector <double>& sun_LAI, 
+             std::vector <double>& sun_PAR, std::vector <double>& total_PAR, 
+             std::vector <double>& sun_NIR, std::vector <double>& total_NIR, 
+             double global_radiation, double diffuse_radiation, 
+             double sin_beta, const Vegetation&, Treelog&) const;
 
   // Create.
   RaddistStandard (Block& al)
@@ -46,14 +44,19 @@ struct RaddistStandard : public Raddist
 
 void RaddistStandard::tick (std::vector <double>& sun_LAI_fraction,
 			    std::vector <double>& sun_PAR, 
-			    std::vector <double>& total_PAR, double global_radiation, 
+			    std::vector <double>& total_PAR, 
+                            std::vector <double>& sun_NIR, 
+                            std::vector <double>& total_NIR, 
+                            double global_radiation, 
 			    double /*diffuse_radiation*/, double /*sin_beta*/, 
 			    const Vegetation& vegetation,
-			    Treelog&)
+			    Treelog&) const
 {
   const size_t No = sun_LAI_fraction.size ();
   daisy_assert (No + 1 == total_PAR.size());
   daisy_assert (No + 1 == sun_PAR.size());
+  daisy_assert (No + 1 == total_NIR.size());
+  daisy_assert (No + 1 == sun_NIR.size());
 
   const double LAI = vegetation.LAI ();
 
@@ -61,21 +64,38 @@ void RaddistStandard::tick (std::vector <double>& sun_LAI_fraction,
   if (iszero (LAI))
   {
     std::fill (&total_PAR[0], &total_PAR[No+1], 0.0);
+    std::fill (&total_NIR[0], &total_NIR[No+1], 0.0);
     return;
   }
   //Fill empty vectors
   std::fill (&sun_PAR[0], &sun_PAR[No+1], 0.0); 
+  std::fill (&sun_NIR[0], &sun_NIR[No+1], 0.0); 
   std::fill (&sun_LAI_fraction[0], &sun_LAI_fraction[No], 0.0);
 
-  // Average Canopy Extinction coefficient
+  // PAR:
+  // Average Canopy Extinction coefficient of PAR
   // (how fast the light dim as a  function of LAI passed).
-  const double ACExt = vegetation.ACExt ();
+  const double ACExt_PAR = vegetation.ACExt_PAR ();
 
-  // Average Canopy Reflection coefficient
-  const double ACRef =  vegetation.ACRef ();
+  // Average Canopy Reflection coefficient of PAR
+  const double ACRef_PAR =  vegetation.ACRef_PAR ();
+  daisy_assert (ACRef_PAR < 1.0);
 
-  radiation_distribution (No, LAI, ACRef, global_radiation,
-			  ACExt, total_PAR);
+  //Distribution of PAR in the canopy layers
+  radiation_distribution (No, LAI, ACRef_PAR, global_radiation,	
+                          ACExt_PAR, total_PAR, PARinSi);
+
+  // NIR:
+  // Average Canopy Extinction coefficient (of NIR)
+  // (how fast the light dim as a  function of LAI passed).
+  const double ACExt_NIR = vegetation.ACExt_NIR ();
+
+  // Average Canopy Reflection coefficient (of NIR)
+  const double ACRef_NIR =  vegetation.ACRef_NIR ();
+
+  //Distribution of NIR in the canopy layers
+  radiation_distribution (No, LAI, ACRef_NIR, global_radiation,
+			  ACExt_NIR, total_NIR, NIRinSi);
 
 }
 

@@ -25,28 +25,35 @@
 #include "model.h"
 #include <vector>
 
-class Log;
 class Vegetation;
 class Treelog;
 class Block;
 
-class Raddist : public ModelLogable
+class Raddist : public Model
 {
   // Content.
 public:
   static const char *const component;
   symbol library_id () const;
 
+  // Fraction of Photosynthetically Active Radiation (PAR) in Shortware
+  // incoming radiation. 
+  static const double PARinSi;  // []
+
+  // Fraction of NIR in Shortware incoming radiation. 
+  static const double NIRinSi;  // []
+
   // Simulation.
 public:
   virtual void tick (std::vector <double>& fraction_sun_LAI, 
                      std::vector <double>& sun_PAR, 
-		     std::vector <double>& total_PAR,
+		     std::vector <double>& total_PAR, 
+                     std::vector <double>& sun_NIR, 
+		     std::vector <double>& total_NIR,
                      double global_radiation, 
                      double diffuse_radiation, double sin_beta,
                      const Vegetation&, 
-		     Treelog&) = 0;
-  virtual void output (Log&) const;
+		     Treelog&) const = 0;
 
 
   // Utilities.
@@ -54,11 +61,12 @@ protected:
   static void radiation_distribution (const int No, const double LAI,
                                       const double Ref,
                                       const double Si,
-                                      const double Ext,
-                                      std::vector <double>& Rad);
+                                      const double Ext_PAR,
+                                      std::vector <double>& Rad,
+                                      const double RadinSi);
 private:
   static void intensity_distribution (int No, double LAI,
-                                      double Rad0, double Ext, 
+                                      double Rad0, double Ext_PAR, 
                                       std::vector <double>& Rad);
 
   // Create and Destroy.

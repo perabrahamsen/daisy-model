@@ -57,10 +57,11 @@ struct BioclimateStandard : public Bioclimate
   const long No;		// No of intervals in canopy discretization.
   double LAI_;			// Total LAI of all crops on this column. [0-]
   std::vector<double> Height;	// Height in cm of each endpoint in c.d.
-  std::vector<double> total_PAR_;// Total PAR of each interval of c.d.
-  std::vector<double> sun_PAR_;  // Sunlit fraction of PAR of each interval of c.d.
-  std::vector<double> sun_LAI_fraction_;  // Fraction of sunlit LAI of each interval of c.d.
-
+  std::vector<double> total_PAR_;// Total PAR of each interval of c.d. [W/m2]
+  std::vector<double> sun_PAR_; //Sunlit fraction of PAR of each interval of c.d.[W/m2]
+  std::vector<double> total_NIR_;// Total NIR of each interval of c.d. [W/m2]
+  std::vector<double> sun_NIR_; //Sunlit fraction of NIR of each interval of c.d[W/m2].
+  std::vector<double> sun_LAI_fraction_;//Fraction of sunlit LAI of each interval of cd
   double shared_light_fraction_; // Fraction of field with light competition.
 
   // Canopy Tick.
@@ -141,6 +142,18 @@ struct BioclimateStandard : public Bioclimate
   void RadiationDistribution (const Vegetation&, double sin_beta, Treelog&);
   std::auto_ptr<Difrad> difrad;  // Diffuse radiation model.
   double difrad0;                // Diffuse radiation above canopy [W/m2]
+  double absorbed_total_PAR_canopy; // Canopy absorbed PAR (sun+shade) [W/m2]
+  double absorbed_total_NIR_canopy; // Canopy absorbed NIR (sun+shade) [W/m2]
+  double absorbed_total_Long_canopy;// Canopy absorbed Long wave radiation (sun+shade)[W/m2]
+  double absorbed_total_PAR_soil;   // Soil absorbed PAR (sun+shade)[W/m2]
+  double absorbed_total_NIR_soil;   // Soil absorbed NIR (sun+shade)[W/m2]
+  double absorbed_total_Long_soil;  // Soil absorbed Long wave radiation (sun+shade) [W/m2]
+  double absorbed_sun_PAR_canopy;   // Canopy absorbed PAR on sunlit leaves [W/m2]
+  double absorbed_sun_NIR_canopy;   // Canopy absorbed NIR on sunlit leaves [W/m2]
+  double absorbed_sun_Long_canopy;  // Canopy absorbed Long wave radiatio on sunlit leaves [W/m2]
+  double absorbed_shadow_PAR_canopy;// Canopy absorbed PAR on shadow leaves [W/m2]
+  double absorbed_shadow_NIR_canopy;// Canopy absorbed NIR on shadow leaves [W/m2]
+  double absorbed_shadow_Long_canopy;// Canopy absorbed Long wave radiation on shadow leaves [W/m2]
 
   // Weather.
   double daily_air_temperature_; // Air temperature in canopy. [dg C]
@@ -163,6 +176,10 @@ struct BioclimateStandard : public Bioclimate
   { return total_PAR_; }
   const std::vector<double>& sun_PAR () const
   { return sun_PAR_; }
+  const std::vector<double>& NIR () const
+  { return total_NIR_; }
+  const std::vector<double>& sun_NIR () const
+  { return sun_NIR_; }
   const std::vector<double>& sun_LAI_fraction () const
   { return sun_LAI_fraction_; }
   double LAI () const
@@ -417,6 +434,8 @@ As a last resort,  Makkink (makkink) will be used.");
   syntax.add ("r_ae", "s/m", Check::positive (), Syntax::Const,
               "Atmospheric resistance.");
   alist.add ("r_ae", 53.);
+
+  // Bioclimate in canopy
   syntax.add ("CanopyTemperature", "dg C", Syntax::LogOnly,
               "Actual canopy temperature.");
   syntax.add ("wind_speed_field", "m/s", Syntax::LogOnly,
@@ -442,8 +461,38 @@ use these (the weather difrad model). Otherwise Daisy wil use the DPF model.");
               "Total PAR between canopy layers.");
   syntax.add ("Sun_PAR", "W/m^2", Syntax::LogOnly, Syntax::Sequence,
               "Sun PAR between canopy layers.");
+  syntax.add ("Total_NIR", "W/m^2", Syntax::LogOnly, Syntax::Sequence,
+              "Total NIR between canopy layers.");
+  syntax.add ("Sun_NIR", "W/m^2", Syntax::LogOnly, Syntax::Sequence,
+              "Sun NIR between canopy layers.");
   syntax.add ("Sun_LAI_fraction", Syntax::Fraction (), Syntax::LogOnly, 
 	      Syntax::Sequence, "Sunlit LAI in canopy layers.");
+
+  syntax.add ("absorbed_total_PAR_canopy","W/m2", Syntax::LogOnly,
+              "Canopy absorbed PAR (sun+shade)");
+  syntax.add ("absorbed_total_NIR_canopy","W/m2", Syntax::LogOnly,
+              "Canopy absorbed NIR (sun+shade)");
+  syntax.add ("absorbed_total_Long_canopy","W/m2", Syntax::LogOnly,
+              "Canopy absorbed long wave radiation (sun+shade)");
+  syntax.add ("absorbed_total_PAR_soil","W/m2", Syntax::LogOnly,
+              "Soil absorbed PAR (sun+shade)");
+  syntax.add ("absorbed_total_NIR_soil","W/m2", Syntax::LogOnly,
+              "Soil absorbed NIR (sun+shade)");
+  syntax.add ("absorbed_total_Long_soil","W/m2", Syntax::LogOnly,
+              "Soil absorbed long wave radiation (sun+shade)");
+  syntax.add ("absorbed_sun_PAR_canopy","W/m2", Syntax::LogOnly,
+              "Canopy absorbed PAR on sunlit leaves");
+  syntax.add ("absorbed_sun_NIR_canopy","W/m2", Syntax::LogOnly,
+              "Canopy absorbed NIR on sunlit leaves");
+  syntax.add ("absorbed_sun_Long_canopy","W/m2", Syntax::LogOnly,
+              "Canopy absorbed long wave radiatio on sunlit leaves");
+  syntax.add ("absorbed_shadow_PAR_canopy","W/m2", Syntax::LogOnly,
+              "Canopy absorbed PAR on shadow leaves");
+  syntax.add ("absorbed_shadow_NIR_canopy","W/m2", Syntax::LogOnly,
+              "Canopy absorbed NIR on shadow leaves");
+  syntax.add ("absorbed_shadow_Long_canopy","W/m2", Syntax::LogOnly,
+              "Canopy absorbed long wave radiation on shadow leaves");
+
 }
 
 const AttributeList& 
@@ -467,6 +516,8 @@ BioclimateStandard::BioclimateStandard (Block& al)
     Height (No + 1),
     total_PAR_ (No + 1),
     sun_PAR_ (No + 1),
+    total_NIR_ (No + 1),
+    sun_NIR_ (No + 1),
     sun_LAI_fraction_ (No),
     shared_light_fraction_ (1.0),
     net_radiation (Librarian::build_item<NetRadiation> (al, "net_radiation")),
@@ -579,31 +630,22 @@ void
 BioclimateStandard::RadiationDistribution (const Vegetation& vegetation, 
 					   const double sin_beta, Treelog& msg)
 {
-#if 0
-  if (iszero (LAI ()))
-    {
-      std::fill (&total_PAR_[0], &total_PAR_[No+1], 0.0);
-      return;
-    }
+  raddist->tick(sun_LAI_fraction_, sun_PAR_, total_PAR_, sun_NIR_, total_NIR_,
+                hourly_global_radiation (), difrad0, sin_beta, vegetation, msg);
 
-  // Average Canopy Extinction coefficient
-  // (how fast the light dim as a  function of LAI passed).
-  const double ACExt = vegetation.ACExt ();
+  //Absorbed PAR in the canopy and the soil:
+  absorbed_total_PAR_canopy = total_PAR_[0] - total_PAR_[No];     // [W/m2]
+  absorbed_total_PAR_soil = total_PAR_[0] - absorbed_total_PAR_canopy; // [W/m2]
+  absorbed_sun_PAR_canopy = sun_PAR_[0] - sun_PAR_[No];           // [W/m2]
+  absorbed_shadow_PAR_canopy = absorbed_total_PAR_canopy - absorbed_sun_PAR_canopy; // [W/m2]
 
-  // Average Canopy Reflection coefficient
-  const double ACRef =  vegetation.ACRef ();
 
-#if 0
-  // Average Radiation Extinction coefficient
-  // (like ACExt, but for all radiation, not just light).
-  const double ARExt = vegetation.EPext ();
-#endif 
+   //Absorbed NIR in the canopy and the soil:
+  absorbed_total_NIR_canopy = total_NIR_[0] - total_NIR_[No];
+  absorbed_total_NIR_soil = total_NIR_[0] - absorbed_total_NIR_canopy;
+  absorbed_sun_NIR_canopy = sun_NIR_[0] - sun_NIR_[No];
+  absorbed_shadow_NIR_canopy = absorbed_total_NIR_canopy - absorbed_sun_NIR_canopy;
 
-  radiation_distribution (No, LAI_, ACRef, hourly_global_radiation (),
-                          ACExt, total_PAR_);
-#endif
-  raddist->tick(sun_LAI_fraction_, sun_PAR_, total_PAR_, hourly_global_radiation (), 
-		difrad0, sin_beta, vegetation, msg);
 }
 
 void
@@ -1033,18 +1075,32 @@ BioclimateStandard::output (Log& log) const
   output_variable (crop_ep, log);
   output_variable (crop_ea, log);
   output_variable (production_stress, log);
+
   output_variable (CanopyTemperature, log);
   output_variable (wind_speed_field, log);  
   output_variable (wind_speed_weather, log);
 
   //radiation
-  output_derived (raddist, "raddist", log);
   daisy_assert (difrad.get () != NULL);
   output_object (difrad.get (), "difrad", log);
   output_variable (difrad0, log);
   output_value (total_PAR_, "total_PAR", log);
   output_value (sun_PAR_, "sun_PAR", log);
+  output_value (total_NIR_, "total_NIR", log);
+  output_value (sun_NIR_, "sun_NIR", log);
   output_value (sun_LAI_fraction_, "sun_LAI_fraction", log);
+  output_variable (absorbed_total_PAR_canopy, log);
+  output_variable (absorbed_total_NIR_canopy, log);
+  output_variable (absorbed_total_Long_canopy, log);
+  output_variable (absorbed_total_PAR_soil, log);
+  output_variable (absorbed_total_NIR_soil, log);
+  output_variable (absorbed_total_Long_soil, log);
+  output_variable (absorbed_sun_PAR_canopy, log);
+  output_variable (absorbed_sun_NIR_canopy, log);
+  output_variable (absorbed_sun_Long_canopy, log);
+  output_variable (absorbed_shadow_PAR_canopy, log);
+  output_variable (absorbed_shadow_NIR_canopy, log);
+  output_variable (absorbed_shadow_Long_canopy, log);
 }
 
 void

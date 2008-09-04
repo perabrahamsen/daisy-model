@@ -34,32 +34,32 @@ Raddist::library_id () const
   return id;
 }
 
-void
-Raddist::output (Log&) const
-{ }
+const double
+Raddist::PARinSi = 0.50; //(Ross, 1975)	
+
+const double
+Raddist::NIRinSi = 0.47; //(Ross, 1975)	
 
 void
 Raddist::radiation_distribution (const int No, const double LAI,
-				 const double Ref,
+                                 const double Ref,
 				 const double Si,
 				 const double Ext,
-				 std::vector <double>& Rad)
+				 std::vector <double>& Rad, const double RadinSi)
 {
   daisy_assert (std::isfinite (Si));
-  if (Si <= 0.0)
+  if (Si <= 0.0)  //Global radiation <= 0
     {
       for (int i = 0; i <= No; i++)
 	Rad[i] = 0.0;
       return;
     }
-  daisy_assert (Ref < 1.0);
   daisy_assert (Ext >= 0.0);
-  // Fraction of Photosynthetically Active Radiation in Shortware
-  // incoming radiation. 
-  static const double PARinSi = 0.50;	
+  daisy_assert (Ref >= 0.0);
 
-  const double PAR0 = (1 - Ref) * PARinSi * Si;
-  intensity_distribution (No, LAI, PAR0, Ext, Rad);
+  const double Rad0 = (1 - Ref) * RadinSi * Si;
+
+  intensity_distribution (No, LAI, Rad0, Ext, Rad);
 }
 
 void
@@ -80,7 +80,7 @@ Raddist::load_syntax (Syntax&, AttributeList&)
 { }
 
 Raddist::Raddist (Block& al)
-  : ModelLogable (al.identifier ("type"))
+  : Model ()
 { }
 
 Raddist::~Raddist ()

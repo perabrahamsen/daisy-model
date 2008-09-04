@@ -57,6 +57,8 @@ public:
   const PLF& LAIvsH () const;
   double PARext () const;
   double PARref () const;
+  double NIRext () const;
+  double NIRref () const;
   double EPext () const;
   double IntcpCap () const; // Interception Capacity.
   double EpFac () const; // Convertion to potential evapotransp.
@@ -200,6 +202,8 @@ struct CropOld::Parameters
     const std::vector<double>& LAIDist1; // Relative LAI distribution at DS=1
     double PARref;		// PAR reflectance
     double PARext;		// PAR extinction coefficient
+    double NIRref;		// NIR reflectance
+    double NIRext;		// NIR extinction coefficient
     double EPext;		// EP extinction coefficient
   private:
     friend struct CropOld::Parameters;
@@ -420,6 +424,8 @@ CropOld::Parameters::CanopyPar::CanopyPar (const AttributeList& vl)
     LAIDist1 (vl.number_sequence ("LAIDist1")),
     PARref (vl.number ("PARref")),
     PARext (vl.number ("PARext")),
+    NIRref (vl.number ("NIRref")),
+    NIRext (vl.number ("NIRext")),
     EPext (vl.number ("EPext"))
 { }
 
@@ -759,6 +765,10 @@ CropOldSyntax::CropOldSyntax ()
 	      "PAR reflectance.");
   Canopy.add ("PARext", Syntax::None (), Syntax::Const,
 	      "PAR extinction coefficient.");
+  Canopy.add ("NIRref", Syntax::None (), Syntax::Const,
+	      "NIR reflectance.");
+  Canopy.add ("NIRext", Syntax::None (), Syntax::Const,
+	      "NIR extinction coefficient.");
   Canopy.add ("EPext", Syntax::None (), Syntax::Const,
 	      "EP extinction coefficient.");
 
@@ -1019,6 +1029,17 @@ double
 CropOld::PARref () const
 {
   return par.Canopy.PARref;
+}
+double
+CropOld::NIRext () const
+{
+  return par.Canopy.NIRext;
+}
+
+double
+CropOld::NIRref () const
+{
+  return par.Canopy.NIRref;
 }
 
 double

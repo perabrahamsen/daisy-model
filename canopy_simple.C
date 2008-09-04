@@ -51,6 +51,12 @@ CanopySimple::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("PARext", Syntax::None (), Syntax::Const,
 	      "PAR extinction coefficient.");
   alist.add ("PARext", 0.60);
+  syntax.add ("NIRref", Syntax::None (), Syntax::Const,
+	      "NIR reflectance. NIRref = 0.51 (Ross, 1975)");
+  alist.add ("NIRref", 0.51);
+  syntax.add ("NIRext", Syntax::None (), Syntax::Const,
+	      "NIR extinction coefficient. NIRext = 0.18 (Jones, 1983)");
+  alist.add ("NIRext", 0.18);
   syntax.add ("EPext", Syntax::None (), Syntax::Const,
 	      "EP extinction coefficient.");
   alist.add ("EPext", 0.5);
@@ -83,6 +89,8 @@ CanopySimple::load_syntax (Syntax& syntax, AttributeList& alist)
 CanopySimple::CanopySimple (const AttributeList& vl)
   : PARref (vl.number ("PARref")),
     PARext (vl.number ("PARext")),
+    NIRref (vl.number ("NIRref")),
+    NIRext (vl.number ("NIRext")),
     EPext (vl.number ("EPext")),
     IntcpCap (vl.number ("IntcpCap")),
     EpFac (vl.number ("EpFac")),

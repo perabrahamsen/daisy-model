@@ -66,12 +66,14 @@ public:
   virtual double cover () const = 0; // Fraction of soil covered by crops [0-1]
   virtual const PLF& LAIvsH () const = 0; // LAI below height [f: cm -> R]
   virtual const PLF& HvsLAI () const = 0; // Height with LAI below [f: R -> cm]
-  virtual double ACExt () const = 0;	// Canopy extinction coefficient
-  virtual double ACRef () const = 0;	// Canopy reflection coefficient 
-  virtual double ARExt () const = 0;	// Radiation Extinction coefficient
-  virtual double EpFactor () const = 0;	// Reference to pot. evapotransp
-  double EpInterchange () const; // Soil to canopy exchange rate.
-  virtual double albedo () const = 0;	// Another reflection factor
+  virtual double ACExt_PAR () const = 0;  // Canopy extinction coefficient of PAR
+  virtual double ACRef_PAR () const = 0;  // Canopy reflection coefficient of PAR
+  virtual double ACExt_NIR () const = 0;  // Canopy extinction coefficient of NIR
+  virtual double ACRef_NIR () const = 0;  // Canopy reflection coefficient of NIR
+  virtual double ARExt () const = 0;	  // Radiation Extinction coefficient
+  virtual double EpFactor () const = 0;   // Reference to pot. evapotransp
+  double EpInterchange () const;          // Soil to canopy exchange rate.
+  virtual double albedo () const = 0;	  // Another reflection factor
   virtual double interception_capacity () const = 0;// Canopy water cap. [mm]
 
   // Individual crop queries.

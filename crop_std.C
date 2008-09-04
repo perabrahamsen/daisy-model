@@ -98,6 +98,10 @@ struct CropStandard : public Crop
   { return canopy.PARext; }
   double PARref () const
   { return canopy.PARref; }
+  double NIRext () const
+  { return canopy.PARext; }
+  double NIRref () const
+  { return canopy.PARref; }
   double EPext () const
   { return canopy.EPext; }
   double IntcpCap () const	// Interception Capacity.

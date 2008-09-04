@@ -98,9 +98,13 @@ struct VegetationPermanent : public Vegetation
   { return canopy.LAIvsH; }
   const PLF& HvsLAI () const
   { return HvsLAI_; }
-  double ACExt () const
+  double ACExt_PAR () const
   { return canopy.PARext; }
-  double ACRef () const
+  double ACRef_PAR () const
+  { return canopy.PARref; }
+  double ACExt_NIR () const
+  { return canopy.PARext; }
+  double ACRef_NIR () const
   { return canopy.PARref; }
   double ARExt () const
   { return canopy.EPext; }

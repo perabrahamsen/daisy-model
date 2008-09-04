@@ -71,6 +71,8 @@ public:
   virtual const PLF& LAIvsH () const = 0;
   virtual double PARext () const = 0;
   virtual double PARref () const = 0;
+  virtual double NIRext () const = 0;
+  virtual double NIRref () const = 0;
   virtual double EPext () const = 0;
   virtual double IntcpCap () const = 0; // Interception Capacity.
   virtual double EpFac () const = 0; // Convertion to potential evapotransp.

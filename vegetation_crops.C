@@ -67,9 +67,12 @@ struct VegetationCrops : public Vegetation
   PLF HvsLAI_;			// Height with LAI below [f: R -> cm]
 
   // Radiation.
-  double ACExt_;		// Canopy extinction coefficient
+  double ACExt_PAR_;		// Canopy extinction coefficient of PAR
   // (how fast the light dim as a function of LAI passed).  
-  double ACRef_;		// Canopy reflection coefficient 
+  double ACRef_PAR_;		// Canopy reflection coefficient of PAR
+  double ACExt_NIR_;		// Canopy extinction coefficient of NIR
+  // (how fast the light dim as a function of LAI passed).  
+  double ACRef_NIR_;		// Canopy reflection coefficient of NIR
   double ARExt_;		// Radiation Extinction coefficient
   // (like ACExt, but for all radiation, not just light).
   double EpFactor_;		// Reference to potential evapotranspiration.
@@ -95,10 +98,14 @@ struct VegetationCrops : public Vegetation
   { return LAIvsH_; }
   const PLF& HvsLAI () const
   { return HvsLAI_; }
-  double ACExt () const
-  { return ACExt_; }
-  double ACRef () const
-  { return ACRef_; }
+  double ACExt_PAR () const
+  { return ACExt_PAR_; }
+  double ACRef_PAR () const
+  { return ACRef_PAR_; }
+  double ACExt_NIR () const
+  { return ACExt_NIR_; }
+  double ACRef_NIR () const
+  { return ACRef_NIR_; }
   double ARExt () const
   { return ARExt_; }
   double EpFactor () const
@@ -504,8 +511,10 @@ VegetationCrops::reset_canopy_structure (Treelog& msg)
 	  cover_ =  1.0 - exp (-CanopySum (&Crop::EPext));
           daisy_assert (cover_ <= 1.0);
           daisy_assert (cover_ >= 0.0);
-	  ACExt_ = CanopyAverage (&Crop::PARext);
-	  ACRef_ =  CanopyAverage (&Crop::PARref);
+	  ACExt_PAR_ = CanopyAverage (&Crop::PARext);
+	  ACRef_PAR_ =  CanopyAverage (&Crop::PARref);
+          ACExt_NIR_ = CanopyAverage (&Crop::NIRext);
+	  ACRef_NIR_ =  CanopyAverage (&Crop::NIRref);
 	  ARExt_ = CanopyAverage (&Crop::EPext);
 	  EpFactor_ = CanopyAverage (&Crop::EpFac);
 	  albedo_ = CanopyAverage (&Crop::albedo);
@@ -516,8 +525,10 @@ VegetationCrops::reset_canopy_structure (Treelog& msg)
   // No vegetation.
   HvsLAI_.clear ();
   cover_ = 0.0;
-  ACExt_ = 0.0;
-  ACRef_ = 0.0;
+  ACExt_PAR_ = 0.0;
+  ACRef_PAR_ = 0.0;
+  ACExt_NIR_ = 0.0;
+  ACRef_NIR_ = 0.0;
   ARExt_ = 0.0;
   EpFactor_ = 0.0;
   albedo_ = 0.0;
@@ -864,8 +875,10 @@ VegetationCrops::VegetationCrops (Block& al)
     cover_ (0.0),
     LAIvsH_ (),
     HvsLAI_ (),
-    ACExt_ (0.0),
-    ACRef_ (0.0),
+    ACExt_PAR_ (0.0),
+    ACRef_PAR_ (0.0),
+    ACExt_NIR_ (0.0),
+    ACRef_NIR_ (0.0),
     ARExt_ (0.0),
     EpFactor_ (0.0),
     albedo_ (0.0),
