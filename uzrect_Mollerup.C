@@ -655,7 +655,7 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
       const double sin_angle = geo.edge_sin_angle (edge);
       //-------------------- Old -----------------------------
 
-      #if 0
+#ifdef HARDCODED_BOTTOM
       //-----------------New, hardcoded-----------------------
       // Multiplied with 2 because it is a boundary cell...
       const double Z_aquitard = 200;    //thickness 
@@ -694,10 +694,8 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
       const double flux =  in_sign * q_up;
       
       Neumann (edge, cell, area, in_sign, flux, dq, B); 
-      #endif      //--------------End, hardcoded -----------------------
-
-        
-      //#if 0
+      // --------------End, hardcoded -----------------------
+#else // !HARDCODED_BOTTOM
       switch (groundwater.bottom_type ())
         {
         case Groundwater::free_drainage:
@@ -749,7 +747,7 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
         default:
           daisy_panic ("Unknown groundwater type");
         }
-      //#endif
+#endif
     }
 }
 
