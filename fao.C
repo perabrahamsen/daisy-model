@@ -138,11 +138,8 @@ FAO::RefNetRadiation (double Si, double rad,
   static std::auto_ptr<NetRadiation> net_radiation;
   if (!net_radiation.get ())
     {
-      Syntax syntax;
-      AttributeList alist;
-      alist.add ("type", "brunt");
       net_radiation.reset (Librarian::build_free<NetRadiation>
-                            (out, alist, "net_radiation"));
+                           (out, NetRadiation::default_model (), "net_radiation"));
     }
 
   const double albedo = 0.23;

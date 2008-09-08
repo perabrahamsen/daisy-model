@@ -318,12 +318,9 @@ Number of vertical intervals in which we partition the canopy.");
   syntax.add ("Height", "cm", Syntax::LogOnly, Syntax::Sequence, "\
 End points of canopy layers, first entry is top of canopy, last is soil surface.");
   // External water sources and sinks.
-  Syntax Rn_syntax;
-  AttributeList Rn_alist;
-  Rn_alist.add ("type", "brunt");
   syntax.add_object ("net_radiation", NetRadiation::component,
                      "Net radiation.");
-  alist.add ("net_radiation", Rn_alist);
+  alist.add ("net_radiation", NetRadiation::default_model ());
   syntax.add_object ("pet", Pet::component, 
                      Syntax::OptionalState, Syntax::Singleton, 
                      "Potential Evapotranspiration component.\n\
@@ -647,7 +644,8 @@ BioclimateStandard::RadiationDistribution (const Vegetation& vegetation,
   absorbed_shadow_NIR_canopy = absorbed_total_NIR_canopy - absorbed_sun_NIR_canopy;
 
    //Absorbed Long wave radiation in the canopy and the soil:
-  const double net_longwave_radiation = net_radiation->net_longwave_radiation();
+  const double incoming_longwave_radiation
+    = net_radiation->incoming_longwave_radiation();
   const double cover = vegetation.cover();
 
   double sun_LAI_fraction_total = 0.0;
@@ -656,8 +654,8 @@ BioclimateStandard::RadiationDistribution (const Vegetation& vegetation,
       sun_LAI_fraction_total += sun_LAI_fraction_[i] / No;
     }
   
-  absorbed_total_Long_soil = net_longwave_radiation * (1-cover);
-  absorbed_total_Long_canopy = net_longwave_radiation * (cover);
+  absorbed_total_Long_soil = incoming_longwave_radiation * (1-cover);
+  absorbed_total_Long_canopy = incoming_longwave_radiation * (cover);
   absorbed_sun_Long_canopy = absorbed_total_Long_canopy * sun_LAI_fraction_total;
   absorbed_shadow_Long_canopy = absorbed_total_Long_canopy - absorbed_sun_Long_canopy;
 

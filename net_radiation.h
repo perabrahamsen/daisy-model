@@ -38,9 +38,9 @@ public:
 
   // Simulation.
 public:
-  virtual void output (Log&) const;
+  virtual void output (Log&) const = 0;
   virtual double net_radiation () const = 0; // [W/m2] (positive downwards)
-  virtual double net_longwave_radiation () const = 0; // [W/m2] (positive downwards)
+  virtual double incoming_longwave_radiation () const = 0; // [W/m2] 
   virtual void tick (double Cloudiness /* [0-1] */,
 		     double Temp /* [dg C] */, 
 		     double VapourPressure /* [kPa] */,
@@ -49,6 +49,8 @@ public:
 		     Treelog&) = 0;
 
   // Create and Destroy.
+public:
+  static const AttributeList& default_model ();
 protected:
   NetRadiation (Block&);
 public:
