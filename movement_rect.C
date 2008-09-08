@@ -1,3 +1,4 @@
+
 // movement_rect.C --- Movement in a rectangular 2D grid.
 // 
 // Copyright 2006, 2008 Per Abrahamsen and KVL.
