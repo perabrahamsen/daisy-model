@@ -227,7 +227,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
   double ddt = dt;		// We start with small == large time step.
   int number_of_time_step_reductions = 0;
   int iterations_with_this_time_step = 0;
-  std::ostringstream tmp_timesteps;
+  
 
   int n_small_time_steps = 0;
   
@@ -239,9 +239,11 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
       
       if (n_small_time_steps%msg_number_of_small_time_steps == 0)
         {
+          std::ostringstream tmp_timesteps;
           tmp_timesteps << "Used " << n_small_time_steps 
                         << " out of max " << max_number_of_small_time_steps
-                        << " small timesteps. Time left: " << time_left << '\n';
+                        << " small timesteps. Time left: " << time_left 
+                        << " [h]";
           msg.message (tmp_timesteps.str ());
         }
 
