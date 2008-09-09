@@ -125,13 +125,16 @@ struct ReactionEquilibrium : public Reaction
 
     return ok;
   }
-  void initialize (const Soil& soil, Treelog& msg)
+  void initialize (const Units& units, const Soil& soil, 
+                   const SoilWater& soil_water, const SoilHeat& soil_heat,
+                   Treelog& msg)
   { 
-    equilibrium->initialize (msg); 
+    ScopeSoil scope (soil, soil_water, soil_heat);
+    equilibrium->initialize (units, scope, msg); 
     S_AB.insert (S_AB.begin (), soil.size (), 0.0);
     daisy_assert (S_AB.size () == soil.size ());
-    k_AB->initialize (msg); 
-    k_BA->initialize (msg); 
+    k_AB->initialize (units, scope, msg); 
+    k_BA->initialize (units, scope, msg); 
   }
   explicit ReactionEquilibrium (Block& al)
     : Reaction (al),

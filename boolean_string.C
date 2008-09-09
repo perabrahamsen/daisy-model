@@ -48,7 +48,7 @@ struct BooleanStringEqual : public Boolean
   }
 
   // Create.
-  bool initialize (Treelog&)
+  bool initialize (const Units& units, const Scope& scope, Treelog&)
   { return true; }
   bool check (const Units&, const Scope&, Treelog&) const
   { return true; }

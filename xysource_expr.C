@@ -31,8 +31,6 @@
 
 class XYSourceExpr : public XYSource
 {
-  const Units& units;
-
   // Content.
   LexerTable lex;
   std::string with_;
@@ -67,7 +65,7 @@ public:
 private:
   bool read_header (Treelog&);
 public:
- bool load (Treelog& msg);
+ bool load (const Units&, Treelog& msg);
 
   // Create.
 public:
@@ -102,7 +100,7 @@ XYSourceExpr::read_header (Treelog& msg)
 }
 
 bool
-XYSourceExpr::load (Treelog& msg)
+XYSourceExpr::load (const Units& units, Treelog& msg)
 {
   // Lex it.
   if (!read_header (msg))
@@ -112,14 +110,16 @@ XYSourceExpr::load (Treelog& msg)
   ScopeTable scope (lex);
   {
     bool ok = true;
-    if (!x_expr->initialize (msg) || !x_expr->check (units, scope, msg))
+    if (!x_expr->initialize (units, scope, msg)
+        || !x_expr->check (units, scope, msg))
       {
         lex.error ("Bad x expression");
         ok = false;
       }
     x_expr->tick (units, scope, msg);
     x_dimension_ = x_expr->dimension (scope);
-    if (!y_expr->initialize (msg) || !y_expr->check (units, scope, msg))
+    if (!y_expr->initialize (units, scope, msg)
+        || !y_expr->check (units, scope, msg))
       {
         lex.error ("Bad y expression");
         ok = false;
@@ -158,7 +158,6 @@ XYSourceExpr::load (Treelog& msg)
 
 XYSourceExpr::XYSourceExpr (Block& al)
   : XYSource (al),
-    units (al.units ()),
     lex (al),
     with_ (al.name ("with", "")),
     explicit_with (al.check ("with")),

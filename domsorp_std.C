@@ -109,9 +109,11 @@ struct DomsorpStandard : public Domsorp
       }
     return ok;
   }
-  void initialize (const Soil& soil, Treelog& msg)
+  void initialize (const Units& units,
+                   const Soil& soil,  const SoilWater& soil_water, 
+                   const SoilHeat& soil_heat, Treelog& msg)
   { 
-    transform->initialize (soil, msg); 
+    transform->initialize (units, soil, soil_water, soil_heat, msg); 
     S_C.insert (S_C.begin (), soil.size (), 0.0);
     daisy_assert (S_C.size () == soil.size ());
     S_N.insert (S_N.begin (), soil.size (), 0.0);

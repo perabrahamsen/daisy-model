@@ -135,7 +135,7 @@ struct GroundwaterAquitard : public Groundwater
     if (!pressure_table.get ())
       pressure_table.reset (Depth::create ((geo.bottom () - Z_aquitard)
                                            + h_aquifer));
-    pressure_table->initialize (msg);
+    pressure_table->initialize (units, scope, msg);
     // Pressure below aquitard.
     if (pressure_table->check (units, scope, msg))
       set_h_aquifer (geo);

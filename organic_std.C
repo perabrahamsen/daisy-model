@@ -254,8 +254,8 @@ struct OrganicStandard : public OrganicMatter
   void fertilize (const AttributeList&, const Geometry&, 
                   const Volume&, double dt);
   AM* find_am (symbol sort, symbol part) const;
-  void initialize (const AttributeList&, const Geometry& geo,
-                   const Soil&, const SoilWater&, 
+  void initialize (const Units&, const AttributeList&, const Geometry& geo,
+                   const Soil&, const SoilWater&, const SoilHeat&,
 		   double T_avg, Treelog&);
   static void load_syntax (Syntax&, AttributeList&);
   OrganicStandard ();
@@ -2321,10 +2321,11 @@ OrganicStandard::update_pools
 }
 
 void
-OrganicStandard::initialize (const AttributeList& al,
+OrganicStandard::initialize (const Units& units, const AttributeList& al,
                              const Geometry& geo,
                              const Soil& soil, 
                              const SoilWater& soil_water,
+                             const SoilHeat& soil_heat,
                              double T_avg, Treelog& msg)
 { 
   Treelog::Open nest (msg, "OrganicStandard");
@@ -2523,7 +2524,7 @@ An 'initial_SOM' layer in OrganicStandard ends below the last cell");
 
   // Initialize domsorp
   for (size_t i = 0; i < domsorp.size (); i++)
-    domsorp[i]->initialize (soil, msg);
+    domsorp[i]->initialize (units, soil, soil_water, soil_heat, msg);
 
   // Summary.
   {

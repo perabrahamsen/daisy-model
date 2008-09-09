@@ -45,7 +45,7 @@ struct EquilibriumLangmuir : public Equilibrium
 	     double& want_A, double& want_B, Treelog&) const;
 
   // Create and Destroy.
-  void initialize (Treelog&);
+  void initialize (const Units& units, const Scope&, Treelog&);
   bool check (const Units& units, const Scope&, Treelog&) const;
   EquilibriumLangmuir (Block& al)
     : Equilibrium (al),
@@ -99,10 +99,11 @@ EquilibriumLangmuir::find (const Units& units, const Scope& scope,
 }
 
 void
-EquilibriumLangmuir::initialize (Treelog& msg)
+EquilibriumLangmuir::initialize (const Units& units, const Scope& scope,
+                                 Treelog& msg)
 { 
-  K_expr->initialize (msg);
-  my_max_expr->initialize (msg);
+  K_expr->initialize (units, scope, msg);
+  my_max_expr->initialize (units, scope, msg);
 }
 
 bool 

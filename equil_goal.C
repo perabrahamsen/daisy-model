@@ -48,7 +48,7 @@ struct EquilibriumGoal_A : public Equilibrium
 	     double& want_A, double& want_B, Treelog&) const;
 
   // Create and Destroy.
-  void initialize (Treelog&);
+  void initialize (const Units&, const Scope&, Treelog&);
   bool check (const Units& units, const Scope&, Treelog&) const;
   EquilibriumGoal_A (Block& al)
     : Equilibrium (al),
@@ -128,10 +128,11 @@ EquilibriumGoal_A::find (const Units& units, const Scope& scope,
 }
 
 void
-EquilibriumGoal_A::initialize (Treelog& msg)
+EquilibriumGoal_A::initialize (const Units& units, const Scope& scope, 
+                               Treelog& msg)
 { 
-  goal_A_expr->initialize (msg);
-  min_B_expr->initialize (msg);
+  goal_A_expr->initialize (units, scope, msg);
+  min_B_expr->initialize (units, scope, msg);
 }
 
 bool 

@@ -72,7 +72,7 @@ struct DepthConst : public Depth
   { }
   double operator()() const
   { return value; }
-  void initialize (Treelog&)
+  void initialize (const Units&, const Scope&, Treelog&)
   { }
   virtual bool check (const Units&, const Scope&, Treelog&) const
   { return true; }
@@ -129,8 +129,8 @@ struct DepthExtern : public Depth
   double operator()() const
   { return value; }
     
-  void initialize (Treelog& msg)
-  { expr->initialize (msg); }
+  void initialize (const Units& units, const Scope& scope, Treelog& msg)
+  { expr->initialize (units, scope, msg); }
 
   virtual bool check (const Units& units, const Scope& scope,
                       Treelog& msg) const
@@ -185,7 +185,7 @@ struct DepthPLF : public Depth
   { return current_value; }
 
   
-  void initialize (Treelog&)
+  void initialize (const Units&, const Scope&, Treelog&)
   { }
   virtual bool check (const Units&, const Scope&, Treelog&) const
   { return true; }
@@ -316,7 +316,7 @@ struct DepthFile : public Depth
       time = Time (year, month, day, 23);
       return true;
   }
-  void initialize (Treelog& msg)
+  void initialize (const Units&, const Scope&, Treelog& msg)
   { 
     daisy_assert (state == State::uninitialized);
     std::auto_ptr<std::istream> input_stream = path.open_file (file);

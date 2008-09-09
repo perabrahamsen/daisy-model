@@ -87,9 +87,11 @@ struct ReactionStandard : public Reaction
 
     return ok;
   }
-  void initialize (const Soil& soil, Treelog& msg)
+  void initialize (const Units& units, 
+                   const Soil& soil, const SoilWater& soil_water,
+                   const SoilHeat& soil_heat, Treelog& msg)
   { 
-    transform->initialize (soil, msg); 
+    transform->initialize (units, soil, soil_water, soil_heat, msg); 
     S_AB.insert (S_AB.begin (), soil.size (), 0.0);
     daisy_assert (S_AB.size () == soil.size ());
   }

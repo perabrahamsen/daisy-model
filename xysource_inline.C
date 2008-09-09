@@ -60,7 +60,7 @@ public:
 
   // Read.
 public:
- bool load (Treelog& msg);
+  bool load (const Units&, Treelog& msg);
 
   // Create.
 public:
@@ -73,7 +73,7 @@ public:
 };
 
 bool
-XYSourceInline::load (Treelog&)
+XYSourceInline::load (const Units&, Treelog&)
 {
   // Read data.
   daisy_assert (xs.size () == ys.size ());

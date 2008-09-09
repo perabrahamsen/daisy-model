@@ -106,7 +106,7 @@ struct NumberLet : public Number
     { return symbol ("Descriptions not implemented yet"); }
 
     // Create and Destroy.
-    bool initialize (Treelog& msg)
+    bool initialize (const Units& units, const Scope& scope, Treelog& msg)
     {
       bool ok = true;
       for (size_t i = 0; i < clause.size (); i++)
@@ -114,7 +114,7 @@ struct NumberLet : public Number
           std::ostringstream tmp;
           tmp << "clauses[" << i << "]";
           Treelog::Open nest (msg, tmp.str ());
-          if (!clause[i]->expr->initialize (msg))
+          if (!clause[i]->expr->initialize (units, scope, msg))
             ok = false;
           all_numbers_.push_back (clause[i]->id);
         }
@@ -169,11 +169,13 @@ List of identifiers and values to bind in this scope.", Clause::load_syntax);
     scope_clause.tick (units, inherit_scope, msg);
     expr->tick (units, inherit_scope, msg);
   }
-  bool initialize (Treelog& msg)
+  bool initialize (const Units& units,
+                   const Scope& inherit_scope, Treelog& msg)
   {
     Treelog::Open nest (msg, name);
-    scope_clause.initialize (msg);
-    return expr->initialize (msg);
+    scope_clause.initialize (units, inherit_scope, msg);
+    ScopeMulti scope (scope_clause, inherit_scope);
+    return expr->initialize (units, scope, msg);
   }
   bool check (const Units& units,
               const Scope& inherit_scope, Treelog& msg) const

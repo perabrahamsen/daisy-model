@@ -55,9 +55,9 @@ struct ActionIrrigate : public Action
   virtual void irrigate (Field&, double flux, double temp, const IM&, 
                          double dt, Treelog& msg) const = 0;
 
-  void initialize (const Daisy&, const Scope&, Treelog& msg)
+  void initialize (const Daisy& daisy, const Scope& scope, Treelog& msg)
   { 
-    expr_flux->initialize (msg);
+    expr_flux->initialize (daisy.units (), scope, msg);
   }
 
   bool check (const Daisy& daisy, const Scope& scope, Treelog& msg) const

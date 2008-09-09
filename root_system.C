@@ -454,7 +454,8 @@ RootSystem::output (Log& log) const
 }
 
 void
-RootSystem::initialize (const Geometry& geo, const double row_width, 
+RootSystem::initialize (const Units& units, 
+                        const Geometry& geo, const double row_width, 
                         Treelog& msg)
 {
   const bool is_row_crop = row_width > 0.0;
@@ -466,14 +467,14 @@ RootSystem::initialize (const Geometry& geo, const double row_width,
     rootdens = Rootdens::create_uniform ();
 
   rootdens->initialize (geo, row_width, msg);
-  initialize (geo, msg);
+  initialize (units, geo, msg);
 }
 
 void
-RootSystem::initialize (const Geometry& geo, Treelog& msg)
+RootSystem::initialize (const Units& units, const Geometry& geo, Treelog& msg)
 {
   const size_t cell_size = geo.cell_size ();
-  ABAprod->initialize (msg);
+  ABAprod->initialize (units, msg);
   while (Density.size () < cell_size)
     Density.push_back (0.0);
   while (H2OExtraction.size () < cell_size)

@@ -52,7 +52,7 @@ struct ABAProdSoil : public ABAProd
   { }
 
   // Create and Destroy.
-  void initialize (Treelog&);
+  void initialize (const Units&, Treelog&);
   bool check (const Units&, Treelog&) const;
   ABAProdSoil (Block& al);
   ~ABAProdSoil ();
@@ -103,8 +103,8 @@ ABAProdSoil::production (const Units& units,
 }
 
 void 
-ABAProdSoil::initialize (Treelog& msg)
-{ expr->initialize (msg); }
+ABAProdSoil::initialize (const Units& units, Treelog& msg)
+{ expr->initialize (units, scope, msg); }
 
 bool 
 ABAProdSoil::check (const Units& units, Treelog& msg) const

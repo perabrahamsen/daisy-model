@@ -80,7 +80,7 @@ private:
     scope.add_item (new ExchangeNumber (DS_symbol, Syntax::None(),
 					"Development stage"));
     scope.done ();
-    expr->initialize (al.msg());
+    expr->initialize (al.units (), scope, al.msg());
     if (!expr->check_dim (al.units (), scope, Syntax::fraction (), al.msg()))
       al.error("Invalid expression of rubisco expr");
   }

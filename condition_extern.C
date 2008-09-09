@@ -67,8 +67,10 @@ struct ConditionExtern : public Condition
   { 
     daisy_assert (!extern_scope);
     extern_scope = scopesel->lookup (*daisy.output_log, msg); 
-    if (extern_scope)
-      expr->initialize (msg);
+    if (!extern_scope)
+      return;
+    ScopeMulti multi (*extern_scope, parent_scope);
+    expr->initialize (daisy.units (), multi, msg);    
   }
 
   bool check (const Daisy& daisy, const Scope& parent_scope, 

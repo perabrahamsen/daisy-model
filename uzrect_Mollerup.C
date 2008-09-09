@@ -1,6 +1,6 @@
 // uzrect_Mollerup.C --- A 2D solution to Richard's equation in a rect. grid.
 // 
-// Copyright 2006, 2007 Mikkel Mollerup, Per Abrahamsen and KVL.
+// Copyright 2006, 2007, 2008 Mikkel Mollerup, Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -39,7 +39,8 @@
 #include "mathlib.h"
 #include "assertion.h"
 #include "librarian.h"
-#include "tertiary.h"
+#include "tertsmall.h"
+#include "anystate.h"
 
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
@@ -158,11 +159,11 @@ static double anisotropy_factor (const Geometry& geo, size_t edge,
 
 void 
 UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
-		      const Soil& soil, 
-                      SoilWater& soil_water, const SoilHeat& soil_heat,
-                      const Surface& surface, const Groundwater& groundwater,
-                      Tertsmall&,
-                      const double dt, Treelog& msg)
+                const Soil& soil, 
+                SoilWater& soil_water, const SoilHeat& soil_heat,
+                const Surface& surface, const Groundwater& groundwater,
+                Tertsmall& tertiary, 
+                const double dt, Treelog& msg)
 
 {
   const size_t edge_size = geo.edge_size (); // number of edges 
@@ -177,7 +178,11 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
   ublas::vector<double> h_ice (cell_size); // 
   ublas::vector<double> S (cell_size); // sink term
   ublas::vector<double> S_vol (cell_size); // sink term
-  std::vector<double> S_drain (cell_size, 0.0); // drain flow
+  ublas::vector<double> S_macro (cell_size);  // sink term
+  std::vector<double> S_drain (cell_size, 0.0); // matrix-> macro -> drain flow 
+  std::vector<double> S_drain_sum (cell_size, 0.0); // For large timestep
+  std::vector<double> S_matrix (cell_size, 0.0);  // matrix -> macro 
+  std::vector<double> S_matrix_sum (cell_size, 0.0); // for large timestep
   ublas::vector<double> T (cell_size); // temperature 
   ublas::vector<double> K (cell_size); // hydraulic conductivity
   ublas::vector<double> Kold (cell_size); // old hydraulic conductivity
@@ -265,6 +270,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 
       h_previous = h;
       Theta_previous = Theta;
+      const Anystate h3_previous = tertiary.get_state ();
 
       if (debug == 5)
 	{
@@ -354,13 +360,28 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	  for (size_t c = 0; c < cell_size; c++)
 	    Cw (c, c) = soil.Cw2 (c, h[c]);
 	  
+          std::vector<double> h_std (cell_size);
+          //ublas vector -> std vector 
+          std::copy(h.begin (), h.end (), h_std.begin ());
+
+
+          tertiary.find_implicit_water (h3_previous, 
+                                        geo, soil, soil_heat, h_std, ddt);
+          tertiary.matrix_sink (S_matrix, S_drain);
+          
+          for (size_t cell = 0; cell != cell_size ; ++cell) 
+            {				
+              S_macro (cell) = (S_matrix[cell] + S_drain[cell]) 
+                * geo.cell_volume (cell);
+            }
+                              
 	  //Initialize sum matrix
 	  Solver::Matrix summat (cell_size);  
 	  summat = diff + Dm_mat;
 
 	  //Initialize sum vector
 	  ublas::vector<double> sumvec (cell_size);  
-	  sumvec = grav + B + Gm + Dm_vec - S_vol; 
+	  sumvec = grav + B + Gm + Dm_vec - S_vol - S_macro; 
 
 	  // QCw is shorthand for Qmatrix * Cw
 	  Solver::Matrix Q_Cw (cell_size);
@@ -400,21 +421,23 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	}
       while (!converges (h_conv, h)
 	     && iterations_used <= max_iterations);
+      
 
       if (iterations_used > max_iterations)
 	{
-	  number_of_time_step_reductions++;
-
+          number_of_time_step_reductions++;
+          
 	  if (number_of_time_step_reductions > max_time_step_reductions)
 	    throw "Could not find solution";
 
 	  ddt /= time_step_reduction;
 	  h = h_previous;
 	  Theta = Theta_previous;
+          tertiary.set_state (h3_previous);
 	}
       else
 	{
-	  // Update dq for new h.
+          // Update dq for new h.
 	  ublas::banded_matrix<double>  Dm_mat (cell_size, cell_size, 
                                                 0, 0); // Dir bc
 	  Dm_mat = ublas::zero_matrix<double> (cell_size, cell_size);
@@ -429,6 +452,19 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	  upperboundary (geo, soil, T, surface, state, remaining_water, h,
 			 K, dq, Dm_mat, Dm_vec, Gm, B, ddt, debug, msg, dt);
           Darcy (geo, Kedge, h, dq);
+
+          // update macropore flow components 
+          for (int c = 0; c < cell_size; c++)
+            {
+              S_drain_sum[c] += S_drain[c] * ddt/dt;
+              S_matrix_sum[c] += S_matrix[c] * ddt/dt;
+            }
+          
+          //---------new stuff mmo ------------------
+          std::vector<double> h_std_new (cell_size);
+          std::copy(h.begin (), h.end (), h_std_new.begin ());
+          tertiary.update_active (h_std_new); 
+          //-----------------------------------------
 
 	  // Update remaining_water.
 	  for (size_t i = 0; i < edge_above.size (); i++)
@@ -452,6 +488,11 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
           daisy_assert (std::isnormal (dt));
           daisy_assert (std::isnormal (ddt));
 	  q += dq * ddt / dt;
+          for (size_t e = 0; e < edge_size; e++)
+            {
+              daisy_assert (std::isfinite (dq (e)));
+              daisy_assert (std::isfinite (q (e)));
+            }
           for (size_t e = 0; e < edge_size; e++)
             {
               daisy_assert (std::isfinite (dq (e)));
@@ -523,6 +564,12 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
   // Make it official.
   for (size_t cell = 0; cell != cell_size; ++cell) 
     soil_water.set_content (cell, h (cell), Theta (cell));
+  
+  soil_water.add_tertiary_sink (S_matrix_sum);
+  // what is qp?
+  // what about mp fluxes to drains?
+
+
   for (size_t edge = 0; edge != edge_size; ++edge) 
     {
       daisy_assert (std::isfinite (q[edge]));
@@ -628,7 +675,7 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
       const double sin_angle = geo.edge_sin_angle (edge);
       //-------------------- Old -----------------------------
 
-      #if 0
+#ifdef HARDCODED_BOTTOM
       //-----------------New, hardcoded-----------------------
       // Multiplied with 2 because it is a boundary cell...
       const double Z_aquitard = 200;    //thickness 
@@ -667,10 +714,8 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
       const double flux =  in_sign * q_up;
       
       Neumann (edge, cell, area, in_sign, flux, dq, B); 
-      #endif      //--------------End, hardcoded -----------------------
-
-        
-      //#if 0
+      // --------------End, hardcoded -----------------------
+#else // !HARDCODED_BOTTOM
       switch (groundwater.bottom_type ())
         {
         case Groundwater::free_drainage:
@@ -722,7 +767,7 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
         default:
           daisy_panic ("Unknown groundwater type");
         }
-      //#endif
+#endif
     }
 }
 

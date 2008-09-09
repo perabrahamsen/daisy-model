@@ -1061,7 +1061,7 @@ wse${OBJ}: wse.C wse.h model.h symbol.h alist.h block.h syntax.h treelog.h \
 program${OBJ}: program.C program.h model.h symbol.h alist.h run.h block.h \
   syntax.h treelog.h plf.h librarian.h
 number${OBJ}: number.C number.h symbol.h model.h alist.h block.h syntax.h \
-  treelog.h plf.h librarian.h units.h
+  treelog.h plf.h librarian.h units.h assertion.h
 domsorp${OBJ}: domsorp.C domsorp.h model.h symbol.h alist.h block.h syntax.h \
   treelog.h plf.h librarian.h
 chemistry${OBJ}: chemistry.C chemistry.h model.h symbol.h alist.h im.h \
@@ -1993,7 +1993,8 @@ chemical_std${OBJ}: chemical_std.C chemical.h model.h symbol.h alist.h \
   organic_matter.h soil_heat.h soil_water.h soil.h geometry.h syntax.h \
   treelog.h mathlib.h assertion.h abiotic.h adsorption.h chemistry.h \
   log.h time.h border.h block.h plf.h check.h librarian.h number.h \
-  scope_soil.h scope.h vcheck.h memutils.h submodeler.h secondary.h
+  scope_soil.h scope.h scope_multi.h vcheck.h memutils.h submodeler.h \
+  secondary.h
 hydraulic_M_BaC_Bimodal${OBJ}: hydraulic_M_BaC_Bimodal.C hydraulic.h model.h \
   symbol.h alist.h syntax.h treelog.h block.h plf.h check.h mathlib.h \
   assertion.h librarian.h

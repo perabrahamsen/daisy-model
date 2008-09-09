@@ -170,7 +170,8 @@ Block::Implementation::expand_string (Block& block,
                               (Librarian::build_alist<Stringer> (block,
                                                                  obj, key));
                             if (!block.ok () 
-                                || !stringer->initialize (msg)
+                                || !stringer->initialize (block.units (),
+                                                          scope, msg)
                                 || !stringer->check (block.units (), scope, msg)
                                 || stringer->missing (scope))
                               throw "Bad string: '" + type + "'";
@@ -182,7 +183,8 @@ Block::Implementation::expand_string (Block& block,
                               (Librarian::build_alist<Number> (block, 
                                                                obj, key));
                             if (!block.ok () 
-                                || !number->initialize (msg)
+                                || !number->initialize (block.units (), scope, 
+                                                        msg)
                                 || !number->check (block.units (), scope, msg))
                               throw "Bad number: '"+ type + "'";
                             number->tick (block.units (), scope, msg);

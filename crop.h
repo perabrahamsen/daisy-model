@@ -153,9 +153,10 @@ public:
 
   // Create and Destroy.
 public:
-  virtual void initialize (const Geometry&, OrganicMatter&, 
+  virtual void initialize (const Units&, const Geometry&, OrganicMatter&, 
                            double SoilLimit, const Time& now, Treelog&) = 0;
-  virtual void initialize (const Geometry&, double row_width, OrganicMatter&, 
+  virtual void initialize (const Units&, const Geometry&, double row_width, 
+                           OrganicMatter&, 
                            double SoilLimit, const Time& now, Treelog&) = 0;
   virtual bool check (const Units&, Treelog& msg) const = 0;
 protected:

@@ -49,12 +49,12 @@ struct BooleanNumbers : public Boolean
   }
 
   // Create.
-  bool initialize (Treelog& msg)
+  bool initialize (const Units& units, const Scope& scope, Treelog& msg)
   { 
     bool ok = true;
 
     for (size_t i = 0; i < operand.size (); i++)
-      if (!operand[i]->initialize (msg))
+      if (!operand[i]->initialize (units, scope, msg))
         {
           std::ostringstream tmp;
           tmp << name << "[" << i << "]";

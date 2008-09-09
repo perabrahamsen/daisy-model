@@ -35,7 +35,7 @@ struct GnuplotMulti : public Gnuplot
   const std::vector<Gnuplot*> graph;
 
   // Use.
-  bool initialize (Treelog& msg);
+  bool initialize (const Units& units, Treelog& msg);
   bool plot (std::ostream& out, Treelog& msg);
   
   // Create and Destroy.
@@ -44,14 +44,14 @@ struct GnuplotMulti : public Gnuplot
 };
 
 bool
-GnuplotMulti::initialize (Treelog& msg)
+GnuplotMulti::initialize (const Units& units, Treelog& msg)
 { 
   bool ok = true;
   for (size_t i = 0; i < graph.size(); i++)
     {
       Treelog::Open nest (msg, name.name (), i, graph[i]->name);
       msg.touch ();
-      if (!graph[i]->initialize (msg))
+      if (!graph[i]->initialize (units, msg))
         ok = false;
     }
   return ok;

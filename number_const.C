@@ -45,7 +45,7 @@ struct NumberConst : public Number
   { return dim; }
 
   // Create.
-  bool initialize (Treelog&)
+  bool initialize (const Units&, const Scope&, Treelog&)
   { return true; }
   bool check (const Units&, const Scope&, Treelog&) const
   { return true; }
@@ -113,7 +113,7 @@ struct NumberGet : public NumberLeaf
   }
 
   // Create.
-  bool initialize (Treelog&)
+  bool initialize (const Units&, const Scope&, Treelog&)
   { return true; }
   bool check (const Units&, const Scope& scope, Treelog& err) const
   {
@@ -217,7 +217,7 @@ struct NumberFetch : public Number
   }
 
   // Create.
-  bool initialize (Treelog&)
+  bool initialize (const Units&, const Scope&, Treelog&)
   { return true; }
   bool check (const Units&, const Scope& scope, Treelog& err) const
   {
@@ -269,8 +269,8 @@ struct NumberChild : public Number
   { child->tick (units, scope, msg); }
 
   // Create.
-  bool initialize (Treelog& msg)
-  { return child->initialize (msg); }
+  bool initialize (const Units& units, const Scope& scope, Treelog& msg)
+  { return child->initialize (units, scope, msg); }
   static void load_syntax (Syntax& syntax, AttributeList&)
   {
     syntax.add_object ("value", Number::component,

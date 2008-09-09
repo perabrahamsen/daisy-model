@@ -41,7 +41,7 @@ struct EquilibriumLinear : public Equilibrium
 	     double& want_A, double& want_B, Treelog&) const;
 
   // Create and Destroy.
-  void initialize (Treelog&);
+  void initialize (const Units& units, const Scope&, Treelog&);
   bool check (const Units& units, const Scope&, Treelog&) const;
   EquilibriumLinear (Block& al)
     : Equilibrium (al),
@@ -80,9 +80,9 @@ EquilibriumLinear::find (const Units& units, const Scope& scope,
 }
 
 void
-EquilibriumLinear::initialize (Treelog& msg)
+EquilibriumLinear::initialize (const Units& units, const Scope& scope, Treelog& msg)
 { 
-  K_expr->initialize (msg);
+  K_expr->initialize (units, scope, msg);
 }
 
 bool 

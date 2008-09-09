@@ -34,6 +34,7 @@
 struct ProgramGnuplot : public Program
 {
   // Content.
+  const Units& units;
   Path& path;
   const std::string command_file;
   const bool do_cd;
@@ -65,7 +66,7 @@ ProgramGnuplot::run (Treelog& msg)
       {
         Treelog::Open nest (msg, name.name (), i, graph[i]->name);
         msg.touch ();
-        if (!graph[i]->initialize (msg))
+        if (!graph[i]->initialize (units, msg))
           ok = false;
       }
     if (!ok)
@@ -109,6 +110,7 @@ ProgramGnuplot::run (Treelog& msg)
 
 ProgramGnuplot::ProgramGnuplot (Block& al)
   : Program (al),
+    units (al.units ()),
     path (al.path ()),
     command_file (al.name ("command_file")),
     do_cd (al.flag ("cd")),

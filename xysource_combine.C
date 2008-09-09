@@ -31,8 +31,6 @@
 
 struct XYSourceCombine : public XYSource
 {
-  const Units& units;
-
   // Content.
   ScopeSources scope;
   const std::auto_ptr<Number> x_expr;
@@ -64,7 +62,7 @@ public:
 
   // Read. 
 public:
- bool load (Treelog& msg);
+ bool load (const Units&, Treelog& msg);
 
   // Create and Destroy.
 public:
@@ -74,7 +72,7 @@ public:
 };
 
 bool
-XYSourceCombine::load (Treelog& msg)
+XYSourceCombine::load (const Units& units, Treelog& msg)
 {
   // Propagate.
   scope.load (msg);
@@ -82,10 +80,12 @@ XYSourceCombine::load (Treelog& msg)
   // Scope
   {
     bool ok = true;
-    if (!x_expr->initialize (msg) || !x_expr->check (units, scope, msg))
+    if (!x_expr->initialize (units, scope, msg) 
+        || !x_expr->check (units, scope, msg))
       ok = false;
     x_expr->tick (units, scope, msg);
-    if (!y_expr->initialize (msg) || !y_expr->check (units, scope, msg))
+    if (!y_expr->initialize (units, scope, msg) 
+        || !y_expr->check (units, scope, msg))
       ok = false;
     y_expr->tick (units, scope, msg);
     if (!ok)
@@ -117,7 +117,6 @@ XYSourceCombine::load (Treelog& msg)
 
 XYSourceCombine::XYSourceCombine (Block& al)
   : XYSource (al),
-    units (al.units ()),
     scope (Librarian::build_vector<Source> (al, "source")),
     x_expr (Librarian::build_item<Number> (al, "x")),
     y_expr (Librarian::build_item<Number> (al, "y")),

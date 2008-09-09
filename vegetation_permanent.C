@@ -199,7 +199,7 @@ struct VegetationPermanent : public Vegetation
   { return litter.albedo; }
 
   // Create and destroy.
-  void initialize (const Time& time, const Geometry& geo,
+  void initialize (const Units&, const Time& time, const Geometry& geo,
                    const Soil& soil, OrganicMatter&, 
                    Treelog&);
   bool check (const Units&, Treelog&) const;
@@ -362,14 +362,14 @@ VegetationPermanent::output (Log& log) const
 }
 
 void
-VegetationPermanent::initialize (const Time& time, 
+VegetationPermanent::initialize (const Units& units, const Time& time, 
                                  const Geometry& geo,
                                  const Soil& soil, 
 				 OrganicMatter& organic_matter,
                                  Treelog& msg)
 {
   reset_canopy_structure (time);
-  root_system->initialize (geo, 0.0, msg);
+  root_system->initialize (units, geo, 0.0, msg);
   root_system->full_grown (geo, soil.MaxRootingHeight (), WRoot, msg);
 
   static const symbol vegetation_symbol ("vegetation");

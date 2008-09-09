@@ -52,7 +52,7 @@ struct ABAProdUptake : public ABAProd
   { }
 
   // Create and Destroy.
-  void initialize (Treelog&);
+  void initialize (const Units&, Treelog&);
   bool check (const Units&, Treelog&) const;
   ABAProdUptake (Block& al);
   ~ABAProdUptake ();
@@ -105,8 +105,8 @@ ABAProdUptake::production (const Units& units,
 }
 
 void 
-ABAProdUptake::initialize (Treelog& msg)
-{ expr->initialize (msg); }
+ABAProdUptake::initialize (const Units& units, Treelog& msg)
+{ expr->initialize (units, scope, msg); }
 
 bool 
 ABAProdUptake::check (const Units& units, Treelog& msg) const

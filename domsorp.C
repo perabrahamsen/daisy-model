@@ -35,10 +35,6 @@ Domsorp::library_id () const
 }
 
 void
-Domsorp::initialize (const Soil&, Treelog&)
-{ }
-
-void
 Domsorp::load_syntax (Syntax&, AttributeList&)
 { }
 
@@ -51,3 +47,5 @@ Domsorp::~Domsorp ()
 
 static Librarian Domsorp_init (Domsorp::component, "\
 Sorption and desorption of DOM to SOM.");
+
+// domsorp.C ends here.

@@ -71,13 +71,13 @@ struct NumberByDepth : public Number
   }
 
   // Create.
-  bool initialize (Treelog& msg)
+  bool initialize (const Units& units, const Scope& scope, Treelog& msg)
   { 
     bool ok = true;
     Treelog::Open nest (msg, name);
-    if (!h->initialize (msg))
+    if (!h->initialize (units, scope, msg))
       ok = false;
-    if (!z->initialize (msg))
+    if (!z->initialize (units, scope, msg))
       ok = false;
     return ok;
   }
@@ -228,11 +228,11 @@ struct NumberByTension : public Number
                               h->value (scope)); }
 
   // Create.
-  bool initialize (Treelog& msg)
+  bool initialize (const Units& units, const Scope& scope, Treelog& msg)
   { 
     bool ok = true;
     Treelog::Open nest (msg, name);
-    if (!h->initialize (msg))
+    if (!h->initialize (units, scope, msg))
       ok = false;
     return ok;
   }
@@ -439,10 +439,10 @@ struct NumberTensionByTheta : public Number
   { return Units::cm (); }
 
   // Create.
-  bool initialize (Treelog& msg)
+  bool initialize (const Units& units, const Scope& scope, Treelog& msg)
   {
     Treelog::Open nest (msg, name);
-    return Theta->initialize (msg);
+    return Theta->initialize (units, scope, msg);
   }
   bool check (const Units& units, const Scope& scope, Treelog& msg) const
   { 

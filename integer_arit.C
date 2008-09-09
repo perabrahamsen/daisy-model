@@ -40,10 +40,10 @@ struct IntegerOperand : public Integer
   { return operand->missing (scope); }
 
   // Create.
-  bool initialize (Treelog& err)
+  bool initialize (const Units& units, const Scope& scope, Treelog& err)
   { 
     Treelog::Open nest (err, name);
-    return operand->initialize (err); 
+    return operand->initialize (units, scope, err); 
   }
   bool check (const Scope& scope, Treelog& err) const
   { 
@@ -104,7 +104,7 @@ struct IntegerOperands : public Integer
   }
 
   // Create.
-  bool initialize (Treelog& err)
+  bool initialize (const Units& units, const Scope& scope, Treelog& err)
   { 
     bool ok = true;
     for (size_t i = 0; i < operands.size (); i++)
@@ -113,7 +113,7 @@ struct IntegerOperands : public Integer
         tmp << name << "[" << i << "]";
         Treelog::Open nest (err, tmp.str ());
         
-        if (!operands[i]->initialize (err))
+        if (!operands[i]->initialize (units, scope, err))
           ok = false;
       }
     return ok;

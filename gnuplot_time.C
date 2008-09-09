@@ -48,7 +48,7 @@ struct GnuplotTime : public GnuplotBase
 
   // Use.
   static std::string timeform (const Time& time);
-  bool initialize (Treelog& msg);
+  bool initialize (const Units& units, Treelog& msg);
   bool plot (std::ostream& out, Treelog& msg);
   
   // Create and Destroy.
@@ -66,7 +66,7 @@ GnuplotTime::timeform (const Time& time)
 }
 
 bool
-GnuplotTime::initialize (Treelog& msg)
+GnuplotTime::initialize (const Units& units, Treelog& msg)
 { 
   bool ok = true;
   for (size_t i = 0; i < source.size(); i++)

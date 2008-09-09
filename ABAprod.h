@@ -50,7 +50,7 @@ public:
 
   // Create and Destroy.
 public:
-  virtual void initialize (Treelog&) = 0;
+  virtual void initialize (const Units&, Treelog&) = 0;
   virtual bool check (const Units&, Treelog&) const = 0;
 protected:
   ABAProd (Block&);

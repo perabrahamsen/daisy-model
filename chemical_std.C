@@ -38,6 +38,7 @@
 #include "librarian.h"
 #include "number.h"
 #include "scope_soil.h"
+#include "scope_multi.h"
 #include "vcheck.h"
 #include "memutils.h"
 #include "submodeler.h"
@@ -206,10 +207,12 @@ struct ChemicalStandard : public Chemical
   void output (Log&) const;
 
   // Create.
-  bool check (const Units&, const Geometry&, const Soil&, const SoilWater&, 
-	      const Chemistry&, const Scope&, Treelog&) const;
+  bool check (const Units&, const Scope&, 
+              const Geometry&, const Soil&, const SoilWater&, 
+	      const Chemistry&, Treelog&) const;
   static void fillup(std::vector<double>& v, const size_t size);
-  void initialize (const Units&, const AttributeList&, const Geometry&,
+  void initialize (const Units&, const Scope&, 
+                   const AttributeList&, const Geometry&,
                    const Soil&, const SoilWater&, const SoilHeat&, Treelog&);
   static double find_surface_decompose_rate (Block& al);
   ChemicalStandard (Block&);
@@ -934,10 +937,11 @@ ChemicalStandard::output (Log& log) const
 }
 
 bool 
-ChemicalStandard::check (const Units& units, const Geometry& geo, 
+ChemicalStandard::check (const Units& units, const Scope& scope, 
+                         const Geometry& geo, 
 			 const Soil& soil, const SoilWater& soil_water,
 			 const Chemistry& chemistry,
-			 const Scope& scope, Treelog& msg) const
+			 Treelog& msg) const
 {
   const size_t cell_size = geo.cell_size ();
 
@@ -1033,7 +1037,8 @@ ChemicalStandard::fillup (std::vector<double>& v, const size_t size)
 }
 
 void
-ChemicalStandard::initialize (const Units& units, const AttributeList& al,
+ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
+                              const AttributeList& al,
                               const Geometry& geo,
                               const Soil& soil, const SoilWater& soil_water, 
 			      const SoilHeat& soil_heat,
@@ -1042,7 +1047,7 @@ ChemicalStandard::initialize (const Units& units, const AttributeList& al,
   const size_t cell_size = geo.cell_size ();
   const size_t edge_size = geo.edge_size ();
 
-  C_below_expr->initialize (msg);
+  C_below_expr->initialize (units, parent_scope, msg);
 
   std::vector<double> Ms;
   geo.initialize_layer (C_avg_, al, "C", msg);
@@ -1066,14 +1071,15 @@ ChemicalStandard::initialize (const Units& units, const AttributeList& al,
 	}
       if (M_total_.size () == 0 && C_avg_.size () == 0)
 	{
-	  initial_expr->initialize (msg);
-	  ScopeSoil scope (soil, soil_water, soil_heat);
+	  ScopeSoil scope_soil (soil, soil_water, soil_heat);
+          ScopeMulti multi (parent_scope, scope_soil);
+	  initial_expr->initialize (units, multi, msg);
 	  for (size_t c = 0; c < soil.size (); c++)
 	    { 
-	      scope.set_cell (c);
+	      scope_soil.set_cell (c);
 	      double value = 0.0;
 	      if (!initial_expr->tick_value (units,
-                                             value, g_per_cm3, scope, msg))
+                                             value, g_per_cm3, multi, msg))
 		msg.error ("Could not evaluate 'inital_expr'");
 	      M_total_.push_back (value);
 	    }

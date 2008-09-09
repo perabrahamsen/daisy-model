@@ -34,9 +34,6 @@
 
 struct XYSourceMerge : public XYSource
 {
-  // Content.
-  const Units& units;
-
   // Source.
   const std::vector<XYSource*> source;
   const std::string title_;
@@ -66,7 +63,7 @@ public:
 
   // Read. 
 public:
- bool load (Treelog& msg);
+ bool load (const Units&, Treelog& msg);
 
   // Create and Destroy.
 public:
@@ -76,7 +73,7 @@ public:
 };
 
 bool
-XYSourceMerge::load (Treelog& msg)
+XYSourceMerge::load (const Units& units, Treelog& msg)
 {
   // Propagate.
   bool ok = true;
@@ -86,7 +83,7 @@ XYSourceMerge::load (Treelog& msg)
       std::ostringstream tmp;
       tmp << "[" << i << "] " << source[i]->title ();
       Treelog::Open nest (msg, tmp.str ());
-      if (!source[i]->load (msg))
+      if (!source[i]->load (units, msg))
         {
           ok = false;
           continue;
@@ -167,7 +164,6 @@ XYSourceMerge::load (Treelog& msg)
 
 XYSourceMerge::XYSourceMerge (Block& al)
   : XYSource (al),
-    units (al.units ()),
     source (Librarian::build_vector<XYSource> (al, "source")),
     title_ (al.name ("title")),
     x_dimension_ (al.name ("x_dimension")),

@@ -65,7 +65,7 @@ ScopeBlock::has_number (const symbol tag_symbol) const
                                 (block, alist.alist (tag), tag));
   if (!number.get ())
     return false;
-  if (!number->initialize (block.msg ()))
+  if (!number->initialize (block.units (), *this, block.msg ()))
     return false;
   if (number->missing (*this))
     return false;
@@ -98,7 +98,7 @@ ScopeBlock::number (const symbol tag_symbol) const
   std::auto_ptr<Number> number (Librarian::build_alist<Number> 
                                 (block, alist.alist (tag), tag));
   daisy_assert (number.get ());
-  daisy_assert (number->initialize (block.msg ()));
+  daisy_assert (number->initialize (block.units (), *this, block.msg ()));
   daisy_assert (number->check (block.units (), *this, block.msg ()));
   number->tick (block.units (), *this, block.msg ());
   daisy_assert (!number->missing (*this));
@@ -142,7 +142,7 @@ ScopeBlock::dimension (symbol tag_symbol) const
                                 (block, alist.alist (tag), tag));
   if (!number.get ())
     return Syntax::unknown ();
-  if (!number->initialize (block.msg ()))
+  if (!number->initialize (block.units (), *this, block.msg ()))
     return Syntax::unknown ();
   
   return number->dimension (*this);
@@ -181,7 +181,7 @@ ScopeBlock::has_identifier (const symbol tag_symbol) const
                                     (block, alist.alist (tag), tag));
   if (!stringer.get ())
     return false;
-  if (!stringer->initialize (block.msg ()))
+  if (!stringer->initialize (block.units (), *this, block.msg ()))
     return false;
   if (stringer->missing (*this))
     return false;
@@ -214,7 +214,7 @@ ScopeBlock::identifier (const symbol tag_symbol) const
   std::auto_ptr<Stringer> stringer (Librarian::build_alist<Stringer> 
                                 (block, alist.alist (tag), tag));
   daisy_assert (stringer.get ());
-  daisy_assert (stringer->initialize (block.msg ()));
+  daisy_assert (stringer->initialize (block.units (), *this, block.msg ()));
   daisy_assert (stringer->check (block.units (), *this, block.msg ()));
   stringer->tick (block.units (), *this, block.msg ());
   daisy_assert (!stringer->missing (*this));

@@ -57,7 +57,7 @@ struct ABAProdNone : public ABAProd
   { }
 
   // Create and Destroy.
-  void initialize (Treelog&)
+  void initialize (const Units&, Treelog&)
   { }
   bool check (const Units&, Treelog&) const
   { return true; }

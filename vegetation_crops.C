@@ -206,7 +206,7 @@ struct VegetationCrops : public Vegetation
   { return -1.0; }
 
   // Create and destroy.
-  void initialize (const Time&, const Geometry& geo,
+  void initialize (const Units&, const Time&, const Geometry& geo,
                    const Soil& soil, OrganicMatter&,
                    Treelog& msg);
   bool check (const Units& units, Treelog& msg) const;
@@ -813,8 +813,10 @@ VegetationCrops::sow (Metalib& metalib, const AttributeList& al,
     if ((*i)->name == name)
       msg.error ("There is already an " + name + " on the field.\n\
 If you want two " + name + " you should rename one of them");
-  crop->initialize (geo, row_width, organic_matter, SoilLimit, time, msg);
-  if (!crop->check (metalib.units (), msg))
+  const Units& units = metalib.units ();
+  crop->initialize (units, geo, row_width, organic_matter,
+                    SoilLimit, time, msg);
+  if (!crop->check (units, msg))
     {
       msg.error ("Sow failed");
       return;
@@ -833,14 +835,15 @@ VegetationCrops::output (Log& log) const
 }
 
 void
-VegetationCrops::initialize (const Time& time, const Geometry& geo,
+VegetationCrops::initialize (const Units& units, 
+                             const Time& time, const Geometry& geo,
                              const Soil& soil, 
 			     OrganicMatter& organic_matter,
                              Treelog& msg)
 {
   const double SoilLimit = -soil.MaxRootingHeight ();
   for (unsigned int i = 0; i < crops.size (); i++)
-    crops[i]->initialize (geo, organic_matter, SoilLimit, time, msg);
+    crops[i]->initialize (units, geo, organic_matter, SoilLimit, time, msg);
 
   reset_canopy_structure (msg);
 }

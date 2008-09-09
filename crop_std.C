@@ -183,10 +183,11 @@ struct CropStandard : public Crop
   { return root_system->Density; }
 
   // Create and Destroy.
-  void initialize (const Geometry& geometry, double row_width, OrganicMatter&, 
+  void initialize (const Units&, 
+                   const Geometry& geometry, double row_width, OrganicMatter&, 
                    double SoilLimit,
                    const Time&, Treelog&);
-  void initialize (const Geometry&, OrganicMatter&, 
+  void initialize (const Units&, const Geometry&, OrganicMatter&, 
                    double SoilLimit, const Time&, Treelog&);
   void initialize_shared (const Geometry&, OrganicMatter&, 
                           double SoilLimit, const Time&, Treelog&);
@@ -225,22 +226,23 @@ CropStandard::SOrg_DM () const
 { return production.WSOrg * 10.0 /* [g/m^2 -> kg/ha] */;}
 
 void
-CropStandard::initialize (const Geometry& geo, const double row_width,
+CropStandard::initialize (const Units& units,
+                          const Geometry& geo, const double row_width,
                           OrganicMatter& organic_matter,
                           const double SoilLimit,
                           const Time& now, Treelog& msg)
 {
-  root_system->initialize (geo, row_width, msg);
+  root_system->initialize (units, geo, row_width, msg);
   initialize_shared (geo, organic_matter, SoilLimit, now, msg);
 }
 
 void
-CropStandard::initialize (const Geometry& geo, 
+CropStandard::initialize (const Units& units, const Geometry& geo, 
                           OrganicMatter& organic_matter,
                           const double SoilLimit,
                           const Time& now, Treelog& msg)
 {
-  root_system->initialize (geo, msg);
+  root_system->initialize (units, geo, msg);
   initialize_shared (geo, organic_matter, SoilLimit, now, msg);
 }
 

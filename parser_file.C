@@ -247,7 +247,7 @@ ParserFile::Implementation::get_integer ()
   std::auto_ptr<Integer> integer 
     (Librarian::build_alist<Integer> (block, *al, "integer"));
   if (!block.ok ()
-      || !integer->initialize (treelog)
+      || !integer->initialize (metalib.units (), Scope::null (), treelog)
       || !integer->check (Scope::null (), treelog))
     {
       error ("Bad integer '" + obj + "'\n--- details:\n"
@@ -353,7 +353,7 @@ ParserFile::Implementation::get_number (const std::string& syntax_dim)
   std::auto_ptr<Number> number 
     (Librarian::build_alist<Number> (block, *al, "number"));
   if (!block.ok ()
-      || !number->initialize (treelog)
+      || !number->initialize (metalib.units (), Scope::null (), treelog)
       || !number->check (metalib.units (), Scope::null (), treelog))
     {
       error ("Bad number '" + obj + "'\n--- details:\n"

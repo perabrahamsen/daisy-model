@@ -319,7 +319,7 @@ GroundwaterPipe::initialize (const Units& units,
 						 + h_aquifer));
       pressure_table = depth;
     }
-  pressure_table->initialize (msg);
+  pressure_table->initialize (units, scope, msg);
   // Pressure below aquitard.
   if (pressure_table->check (units, scope, msg))
     set_h_aquifer (geo);

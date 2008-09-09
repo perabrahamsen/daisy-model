@@ -27,6 +27,7 @@
 
 class Treelog;
 class Block;
+class Units;
 
 class Gnuplot : public Model
 {
@@ -43,7 +44,7 @@ public:
 
   // Simulation.
 public:
-  virtual bool initialize (Treelog& err) = 0;
+  virtual bool initialize (const Units& units, Treelog& err) = 0;
   virtual bool plot (std::ostream& out, Treelog&) = 0;
 
   // Create and Destroy.

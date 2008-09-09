@@ -95,11 +95,12 @@ public:
                          double surface_runoff_rate /* [h^-1] */,
                          double dt /* [h] */,
 			 Treelog&) = 0;
-  virtual void tick_soil (const Geometry& geo, double ponding /* [mm] */,
+  virtual void tick_soil (const Scope&, 
+                          const Geometry& geo, double ponding /* [mm] */,
                           double R_mixing /* [h/mm] */,
                           const Soil&, const SoilWater&, const SoilHeat&, 
 			  Movement&, const OrganicMatter&, Chemistry&, 
-			  double dt, const Scope&, Treelog&) = 0;
+			  double dt, Treelog&) = 0;
   virtual void clear () = 0;
   virtual void output (Log&) const;
 
@@ -107,12 +108,13 @@ public:
 public:
   static const AttributeList& default_model ();
   static const AttributeList& N_model ();
-  virtual void initialize (const AttributeList&, const Geometry& geo,
+  virtual void initialize (const Scope&,
+                           const AttributeList&, const Geometry& geo,
                            const Soil&, const SoilWater&, const SoilHeat&,
 			   Treelog&) = 0;
-  virtual bool check (const Geometry&,
+  virtual bool check (const Scope&, const Geometry&,
 		      const Soil&, const SoilWater&, const SoilHeat&,
-		      const Chemistry&, const Scope&, Treelog&) const = 0;
+		      const Chemistry&, Treelog&) const = 0;
   static void load_syntax (Syntax&, AttributeList&);
 protected:
   explicit Chemistry (Block& al);

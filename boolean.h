@@ -47,7 +47,8 @@ public:
 
   // Create and Destroy.
 public:
-  virtual bool initialize (Treelog& msg) = 0;
+  virtual bool initialize (const Units& units, const Scope& scope, 
+                           Treelog& msg) = 0;
   virtual bool check (const Units&, const Scope&, Treelog&) const = 0;
 protected:
   explicit Boolean (Block&);

@@ -90,8 +90,9 @@ public:
                           const Volume&, double dt) = 0;
   virtual AM* find_am (symbol sort, symbol part) const = 0;
 public:
-  virtual void initialize (const AttributeList&, const Geometry& geo,
-                           const Soil&, const SoilWater&, 
+  virtual void initialize (const Units&, 
+                           const AttributeList&, const Geometry& geo,
+                           const Soil&, const SoilWater&, const SoilHeat&,
                            double T_avg, Treelog&) = 0;
   static const AttributeList& default_model ();
 private:

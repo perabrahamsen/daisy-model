@@ -47,7 +47,7 @@ public:
 
   // Create and Destroy.
 public:
-  virtual void initialize (Treelog&) = 0;
+  virtual void initialize (const Units&, const Scope&, Treelog&) = 0;
   virtual bool check (const Units&, const Scope&, Treelog&) const = 0;
   static Depth* create (double height);
 protected:

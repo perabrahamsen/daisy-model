@@ -163,7 +163,7 @@ public:
 
   // Create and Destroy.
 public:
-  virtual void initialize (const Time&, const Geometry& geo,
+  virtual void initialize (const Units&, const Time&, const Geometry& geo,
                            const Soil& soil, OrganicMatter&,
                            Treelog&) = 0;
   virtual bool check (const Units&, Treelog& msg) const = 0;

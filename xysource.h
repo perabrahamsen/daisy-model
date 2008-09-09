@@ -29,6 +29,7 @@ class Block;
 class Treelog;
 class Syntax;
 class AttributeList;
+class Units;
 
 class XYSource : public Model
 {
@@ -47,7 +48,7 @@ public:
   virtual int style () const = 0;
   virtual const std::vector<double>& x () const = 0;
   virtual const std::vector<double>& y () const = 0;
-  virtual bool load (Treelog& msg) = 0;
+  virtual bool load (const Units& units, Treelog& msg) = 0;
 
   // Utilities.
 public:

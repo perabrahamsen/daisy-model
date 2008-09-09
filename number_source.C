@@ -62,7 +62,7 @@ struct NumberSource : public Number
 
   // Create.
   virtual void initialize_derived (Treelog& msg) = 0;
-  bool initialize (Treelog& msg)
+  bool initialize (const Units& units, const Scope& scope, Treelog& msg)
   {
     Treelog::Open nest (msg, name);
     msg.touch ();

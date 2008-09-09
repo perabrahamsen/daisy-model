@@ -647,10 +647,10 @@ ColumnStandard::tick (const Time& time, const double dt,
 		   surface, dt, msg);
   soil_water->tick_after (geometry, *soil, *soil_heat, false, msg);
   soil_heat->tick_after (geometry.cell_size (), *soil, *soil_water, msg);
-  chemistry->tick_soil (geometry, 
+  chemistry->tick_soil (scope, geometry, 
                         surface.ponding (), surface.mixing_resistance (),
                         *soil, *soil_water, *soil_heat, 
-                        *movement, *organic_matter, *chemistry, dt, scope, msg);
+                        *movement, *organic_matter, *chemistry, dt, msg);
   organic_matter->transport (units, *soil, *soil_water, *soil_heat, msg);
   const std::vector<DOM*>& dom = organic_matter->fetch_dom ();
   for (size_t i = 0; i < dom.size (); i++)
@@ -720,8 +720,8 @@ ColumnStandard::check (bool require_weather,
   }
   {
     Treelog::Open nest (msg, "Chemistry");
-    if (!chemistry->check (geometry, *soil, *soil_water, *soil_heat, *chemistry,
-			   scope, msg))
+    if (!chemistry->check (scope, geometry, *soil, *soil_water, *soil_heat,
+                           *chemistry, msg))
       ok = false;
   }
   {
@@ -908,14 +908,15 @@ ColumnStandard::initialize (Block& block,
                           geometry, *soil, *soil_heat, *groundwater, msg);
   
   // Solutes depends on water and heat.
-  chemistry->initialize (alist.alist ("Chemistry"),
+  chemistry->initialize (scope, alist.alist ("Chemistry"),
                          geometry, *soil, *soil_water, *soil_heat, msg);
   
   // Organic matter and vegetation.
   const double T_avg = my_weather.average_temperature ();
-  organic_matter->initialize (alist.alist ("OrganicMatter"), 
-                              geometry, *soil, *soil_water, T_avg, msg);
-  vegetation->initialize (time, geometry, *soil, *organic_matter, msg);
+  organic_matter->initialize (units, alist.alist ("OrganicMatter"), 
+                              geometry, *soil, *soil_water, *soil_heat, 
+                              T_avg, msg);
+  vegetation->initialize (units, time, geometry, *soil, *organic_matter, msg);
   
   // Soil conductivity and capacity logs.
   soil_heat->tick_after (geometry.cell_size (), *soil, *soil_water, msg);

@@ -135,12 +135,15 @@ struct ReactionAdsorption : public Reaction
 
     return ok;
   }
-  void initialize (const Soil& soil, Treelog& msg)
+  void initialize (const Units& units, 
+                   const Soil& soil, const SoilWater& soil_water, 
+                   const SoilHeat& soil_heat, Treelog& msg)
   { 
     adsorption_source.insert (adsorption_source.begin (), soil.size (), 0.0);
     daisy_assert (adsorption_source.size () == soil.size ());
-    adsorption_rate->initialize (msg); 
-    desorption_rate->initialize (msg); 
+    ScopeSoil scope (soil, soil_water, soil_heat);
+    adsorption_rate->initialize (units, scope, msg); 
+    desorption_rate->initialize (units, scope, msg); 
   }
   explicit ReactionAdsorption (Block& al)
     : Reaction (al),

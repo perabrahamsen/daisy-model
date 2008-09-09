@@ -54,7 +54,8 @@ public:
 
   // Create and Destroy.
 public:
-  virtual void initialize (const Soil&, Treelog&);
+  virtual void initialize (const Units&, const Soil&,  const SoilWater&, 
+                           const SoilHeat& soil_heat, Treelog& msg) = 0;
   virtual bool check (const Units& units,
                       const Soil&, const SoilWater&, const SoilHeat&,
 		      size_t dom_size, size_t som_size, 

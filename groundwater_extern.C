@@ -58,9 +58,10 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Units&,
-                   const Geometry&, const Time&, const Scope&, Treelog& msg)
-  { expr->initialize (msg); }
+  void initialize (const Units& units,
+                   const Geometry&, const Time&, const Scope& scope,
+                   Treelog& msg)
+  { expr->initialize (units, scope, msg); }
 
   bool check (const Units& units,
               const Geometry&, const Scope& scope, Treelog& msg) const

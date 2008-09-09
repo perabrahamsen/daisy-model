@@ -39,7 +39,9 @@ Transform::check (const Units&, const Soil&, const SoilWater&, const SoilHeat&,
 { return true; }
 
 void
-Transform::initialize (const Soil&, Treelog&)
+Transform::initialize (const Units&,
+                       const Soil&, const SoilWater&, const SoilHeat&, 
+                       Treelog&)
 { }
 
 void

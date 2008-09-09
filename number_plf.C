@@ -79,15 +79,15 @@ struct NumberPLF : public Number
   { return range; }
 
   // Create.
-  bool initialize (Treelog& err)
+  bool initialize (const Units& units, const Scope& scope, Treelog& msg)
   { 
-    Treelog::Open nest (err, name);
-    return operand->initialize (err); 
+    Treelog::Open nest (msg, name);
+    return operand->initialize (units, scope, msg); 
   }
-  bool check (const Units& units, const Scope& scope, Treelog& err) const
+  bool check (const Units& units, const Scope& scope, Treelog& msg) const
   { 
-    Treelog::Open nest (err, name);
-    return operand->check_dim (units, scope, domain, err); 
+    Treelog::Open nest (msg, name);
+    return operand->check_dim (units, scope, domain, msg); 
   }
   static bool check_alist (const AttributeList& al, Treelog& msg) 
   {

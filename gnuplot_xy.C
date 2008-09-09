@@ -53,7 +53,7 @@ struct GnuplotXY : public GnuplotBase
   const std::vector<XYSource*> source;
 
   // Use.
-  bool initialize (Treelog& msg);
+  bool initialize (const Units& units, Treelog& msg);
   bool plot (std::ostream& out, Treelog& msg);
   
   // Create and Destroy.
@@ -62,7 +62,7 @@ struct GnuplotXY : public GnuplotBase
 };
 
 bool
-GnuplotXY::initialize (Treelog& msg)
+GnuplotXY::initialize (const Units& units, Treelog& msg)
 { 
   bool ok = true;
   for (size_t i = 0; i < source.size(); i++)
@@ -71,7 +71,7 @@ GnuplotXY::initialize (Treelog& msg)
       tmp << name << "[" << i << "]: " << source[i]->name 
           << " '" << source[i]->title () << "'";
       Treelog::Open nest (msg, tmp.str ());
-      if (!source[i]->load (msg))
+      if (!source[i]->load (units, msg))
         ok = false;
       else if (source[i]->x ().size () < 1)
         msg.error ("No data in plot, ignoring");

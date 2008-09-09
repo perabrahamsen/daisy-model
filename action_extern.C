@@ -218,11 +218,13 @@ struct ActionExternFertigation : public Action
     if (!extern_scope)
       return;
 
-    surface_expr->initialize (msg);
-    subsoil_expr->initialize (msg);
-    overhead_expr->initialize (msg);
-    NH4_expr->initialize (msg);
-    NO3_expr->initialize (msg);
+    ScopeMulti multi (*extern_scope, parent_scope);
+    const Units& units = daisy.units ();
+    surface_expr->initialize (units, multi, msg);
+    subsoil_expr->initialize (units, multi, msg);
+    overhead_expr->initialize (units, multi, msg);
+    NH4_expr->initialize (units, multi, msg);
+    NO3_expr->initialize (units, multi, msg);
   }
 
   bool check (const Daisy& daisy, const Scope& parent_scope, 
@@ -233,23 +235,22 @@ struct ActionExternFertigation : public Action
     if (!extern_scope)
       {
         msg.error ("Extern scope not found");
-        ok = false;
+        return false;
       }
-    else
-      {
-        ScopeMulti multi (*extern_scope, parent_scope);
-        const Units& units = daisy.units ();
-	if (!surface_expr->check_dim (units, multi, mm_per_h, msg))
-	  ok = false;
-	if (!subsoil_expr->check_dim (units, multi, mm_per_h, msg))
-	  ok = false;
-	if (!overhead_expr->check_dim (units, multi, mm_per_h, msg))
-	  ok = false;
-	if (!NH4_expr->check_dim (units, multi, kg_N_per_ha_per_h, msg))
-	  ok = false;
-	if (!NO3_expr->check_dim (units, multi, kg_N_per_ha_per_h, msg))
-	  ok = false;
-      }
+
+    ScopeMulti multi (*extern_scope, parent_scope);
+    const Units& units = daisy.units ();
+    if (!surface_expr->check_dim (units, multi, mm_per_h, msg))
+      ok = false;
+    if (!subsoil_expr->check_dim (units, multi, mm_per_h, msg))
+      ok = false;
+    if (!overhead_expr->check_dim (units, multi, mm_per_h, msg))
+      ok = false;
+    if (!NH4_expr->check_dim (units, multi, kg_N_per_ha_per_h, msg))
+      ok = false;
+    if (!NO3_expr->check_dim (units, multi, kg_N_per_ha_per_h, msg))
+      ok = false;
+
     return ok;
   }
 

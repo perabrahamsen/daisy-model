@@ -76,20 +76,20 @@ struct ChemistryMulti : public Chemistry
   void infiltrate (const Geometry&, 
                    double infiltration /* [mm/h] */, double ponding /* [mm] */,
                    double R_mixing /* [h/mm] */, const double dt /* [h] */);
-  void tick_soil (const Geometry& geo, double ponding /* [mm] */,
+  void tick_soil (const Scope&, const Geometry& geo, double ponding /* [mm] */,
                   double R_mixing /* [h/mm] */, 
                   const Soil&, const SoilWater&, const SoilHeat&, Movement&,
                   const OrganicMatter&, Chemistry&, 
-		  double dt, const Scope&, Treelog&);
+		  double dt, Treelog&);
   void clear ();
   void output (Log&) const;
 
   // Create & Destroy.
-  void initialize (const AttributeList&, const Geometry& geo,
+  void initialize (const Scope&, const AttributeList&, const Geometry& geo,
                    const Soil&, const SoilWater&, const SoilHeat&, Treelog&);
-  bool check (const Geometry&, 
+  bool check (const Scope&, const Geometry&, 
 	      const Soil&, const SoilWater&, const SoilHeat&, const Chemistry&,
-	      const Scope& scope, Treelog&) const;
+	      Treelog&) const;
   static const std::vector<Chemical*> 
   /**/ find_chemicals (const std::vector<Chemistry*>& combine);
   explicit ChemistryMulti (Block& al);
@@ -302,20 +302,21 @@ ChemistryMulti::tick_top (const double snow_leak_rate, // [h^-1]
 }
 
 void 
-ChemistryMulti::tick_soil (const Geometry& geo, const double ponding,
+ChemistryMulti::tick_soil (const Scope& scope, 
+                           const Geometry& geo, const double ponding,
 			   const double R_mixing,
 			   const Soil& soil, const SoilWater& soil_water,
 			   const SoilHeat& soil_heat, Movement& movement,
 			   const OrganicMatter& organic_matter,
 			   Chemistry& chemistry, 
-			   const double dt, const Scope& scope, Treelog& msg)
+			   const double dt, Treelog& msg)
 { 
   Treelog::Open nest (msg, "Chemistry: " + name + ": tick soil");
 
   for (size_t c = 0; c < combine.size (); c++)
-    combine[c]->tick_soil (geo, ponding, R_mixing, 
+    combine[c]->tick_soil (scope, geo, ponding, R_mixing, 
 			   soil, soil_water, soil_heat, movement, 
-			   organic_matter, chemistry, dt, scope, msg);
+			   organic_matter, chemistry, dt, msg);
 }
 
 void
@@ -339,7 +340,7 @@ ChemistryMulti::output (Log& log) const
 }
 
 void 
-ChemistryMulti::initialize (const AttributeList& al,
+ChemistryMulti::initialize (const Scope& scope, const AttributeList& al,
 			    const Geometry& geo,
 			    const Soil& soil, 
 			    const SoilWater& soil_water,
@@ -351,21 +352,22 @@ ChemistryMulti::initialize (const AttributeList& al,
   daisy_assert (alists.size () == combine.size ());
   
   for (size_t c = 0; c < combine.size (); c++)
-    combine[c]->initialize (*alists[c], geo, soil, soil_water, soil_heat, msg);
+    combine[c]->initialize (scope, 
+                            *alists[c], geo, soil, soil_water, soil_heat, msg);
 }
 
 bool 
-ChemistryMulti::check (const Geometry& geo,
+ChemistryMulti::check (const Scope& scope, const Geometry& geo,
 		       const Soil& soil, const SoilWater& soil_water,
 		       const SoilHeat& soil_heat, const Chemistry& chemistry,
-		       const Scope& scope, Treelog& msg) const
+		       Treelog& msg) const
 { 
   bool ok = true; 
   for (size_t c = 0; c < combine.size (); c++)
     {
       Treelog::Open nest (msg, "Chemistry: '" + combine[c]->name  + "'");
-      if (!combine[c]->check (geo, soil, soil_water, soil_heat, chemistry, 
-			      scope, msg))
+      if (!combine[c]->check (scope, geo, soil, soil_water, soil_heat,
+                              chemistry, msg))
 	ok = false;
     }
 

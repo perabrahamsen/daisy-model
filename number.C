@@ -24,6 +24,7 @@
 #include "block.h"
 #include "librarian.h"
 #include "units.h"
+#include "assertion.h"
 #include <sstream>
 
 const char *const Number::component = "number";
@@ -70,6 +71,10 @@ Number::tick_value (const Units& units,
   
   return true;
 }
+
+const Unit& 
+Number::unit () const
+{ daisy_notreached (); }
 
 bool 
 Number::check_dim (const Units& units, 

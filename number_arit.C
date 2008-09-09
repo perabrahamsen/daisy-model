@@ -52,10 +52,10 @@ struct NumberOperand : public Number
   }
 
   // Create.
-  bool initialize (Treelog& err)
+  bool initialize (const Units& units, const Scope& scope, Treelog& err)
   { 
     Treelog::Open nest (err, name);
-    return operand->initialize (err); 
+    return operand->initialize (units, scope, err); 
   }
   bool check (const Units& units, const Scope& scope, Treelog& err) const
   { 
@@ -266,13 +266,13 @@ struct NumberPow : public Number
   { return Syntax::unknown (); }
 
   // Create.
-  bool initialize (Treelog& err)
+  bool initialize (const Units& units, const Scope& scope, Treelog& err)
   { 
     Treelog::Open nest (err, name);
     bool ok = true;
-    if (!base->initialize (err))
+    if (!base->initialize (units, scope, err))
       ok = false;
-    if (!exponent->initialize (err))
+    if (!exponent->initialize (units, scope, err))
       ok = false;
     return ok;
   }
@@ -351,7 +351,7 @@ struct NumberOperands : public Number
   }
 
   // Create.
-  bool initialize (Treelog& err)
+  bool initialize (const Units& units, const Scope& scope, Treelog& err)
   { 
     bool ok = true;
     for (size_t i = 0; i < operands.size (); i++)
@@ -360,7 +360,7 @@ struct NumberOperands : public Number
         tmp << name << "[" << i << "]";
         Treelog::Open nest (err, tmp.str ());
         
-        if (!operands[i]->initialize (err))
+        if (!operands[i]->initialize (units, scope, err))
           ok = false;
       }
     return ok;

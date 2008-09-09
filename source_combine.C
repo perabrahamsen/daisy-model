@@ -78,7 +78,7 @@ SourceCombine::load (Treelog& msg)
   scope.load (msg);
 
   // Scope
-  if (!expr->initialize (msg) || !expr->check (units, scope, msg))
+  if (!expr->initialize (units, scope, msg) || !expr->check (units, scope, msg))
     return false;
   expr->tick (units, scope, msg);
 

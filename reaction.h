@@ -55,7 +55,9 @@ public:
   static const AttributeList& denitrification_model ();
   static const AttributeList& NH4_sorption_model ();
 public:
-  virtual void initialize (const Soil&, Treelog&) = 0;
+  virtual void initialize (const Units& units, 
+                           const Soil&, const SoilWater&, const SoilHeat&, 
+                           Treelog&) = 0;
   virtual bool check (const Units& units, 
                       const Soil&, const SoilWater&, const SoilHeat&,
 		      const Chemistry&, Treelog&) const = 0;

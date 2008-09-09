@@ -51,7 +51,7 @@ struct ABAProdRoot : public ABAProd
   { }
 
   // Create and Destroy.
-  void initialize (Treelog&);
+  void initialize (const Units&, Treelog&);
   bool check (const Units&, Treelog&) const;
   ABAProdRoot (Block& al);
   ~ABAProdRoot ();
@@ -93,8 +93,8 @@ ABAProdRoot::production (const Units& units,
 }
 
 void 
-ABAProdRoot::initialize (Treelog& msg)
-{ expr->initialize (msg); }
+ABAProdRoot::initialize (const Units& units, Treelog& msg)
+{ expr->initialize (units, scope, msg); }
 
 bool 
 ABAProdRoot::check (const Units& units, Treelog& msg) const

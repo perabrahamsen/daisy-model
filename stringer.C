@@ -92,7 +92,7 @@ Value to return.");
   }
 
   // Create.
-  bool initialize (Treelog& msg)
+  bool initialize (const Units& units, const Scope& scope, Treelog& msg)
   {
     bool ok = true;
     for (size_t i = 0; i < clauses.size (); i++)
@@ -100,7 +100,7 @@ Value to return.");
         std::ostringstream tmp;
         tmp << name << "[" << i << "]";
         Treelog::Open nest (msg, tmp.str ());
-        if (!clauses[i]->condition->initialize (msg))
+        if (!clauses[i]->condition->initialize (units, scope, msg))
           ok = false;
       }
     return ok;
@@ -157,10 +157,10 @@ struct StringerNumber : public Stringer
     syntax.add_object ("number", Number::component, "\
 Number to manipulate."); 
   }
-  bool initialize (Treelog& msg)
+  bool initialize (const Units& units, const Scope& scope, Treelog& msg)
   { 
     Treelog::Open nest (msg, name);
-    return number->initialize (msg); 
+    return number->initialize (units, scope, msg); 
   }
   bool check (const Units& units, const Scope& scope, Treelog& msg) const
   { 
@@ -252,7 +252,7 @@ struct StringerIdentity : public Stringer
   { return val; }
 
   // Create.
-  bool initialize (Treelog&)
+  bool initialize (const Units&, const Scope&, Treelog&)
   { return true; }
 
   bool check (const Units&, const Scope&, Treelog&) const

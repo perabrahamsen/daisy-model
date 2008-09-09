@@ -24,13 +24,13 @@
 
 #include "symbol.h"
 #include "model.h"
-#include "symbol.h"
 #include <vector>
 
 class Scope;
 class Treelog;
 class Block;
 class Units;
+class Unit;
 
 class Number : public Model
 {
@@ -51,11 +51,11 @@ public:
   virtual bool missing (const Scope& scope) const = 0;
   virtual double value (const Scope&) const = 0; 
   virtual symbol dimension (const Scope&) const = 0;
-
+  virtual const Unit& unit () const;
 
   // Create and Destroy.
 public:
-  virtual bool initialize (Treelog& msg) = 0;
+  virtual bool initialize (const Units&, const Scope&, Treelog& msg) = 0;
   virtual bool check (const Units&, const Scope&, Treelog&) const = 0;
   bool check_dim (const Units&, const Scope&, symbol dim, Treelog&) const;
 protected:

@@ -399,7 +399,7 @@ Select::Implementation::get_expr (Block& al)
     { return scope.number (x_symbol) * factor; }
     symbol dimension (const Scope& scope) const
     { return scope.dimension (x_symbol); }
-    bool initialize (Treelog&)
+    bool initialize (const Units&, const Scope&, Treelog&)
     { return true; }
     bool check (const Units&, const Scope&, Treelog&) const
     { return true; }
@@ -421,7 +421,7 @@ Select::Implementation::get_expr (Block& al)
     { return scope.number (x_symbol) * factor + offset; }
     symbol dimension (const Scope& scope) const
     { return scope.dimension (x_symbol); }
-    bool initialize (Treelog&)
+    bool initialize (const Units&, const Scope&, Treelog&)
     { return true; }
     bool check (const Units&, const Scope&, Treelog&) const
     { return true; }
@@ -451,7 +451,7 @@ Select::Implementation::get_expr (Block& al)
     { return scope.number (x_symbol); }
     symbol dimension (const Scope& scope) const
     { return scope.dimension (x_symbol); }
-    bool initialize (Treelog&)
+    bool initialize (const Units&, const Scope&, Treelog&)
     { return true; }
     bool check (const Units&, const Scope&, Treelog&) const
     { return true; }
@@ -761,7 +761,7 @@ Select::initialize (const Units& units, const Volume&,
   impl->scope.set_dimension (Implementation::x_symbol, spec_dim);
   if (impl->expr.get ())
     { 
-      if (!impl->expr->initialize (msg) 
+      if (!impl->expr->initialize (units, impl->scope, msg) 
           || !impl->expr->check (units, impl->scope, msg))
         {
           msg.error ("Bad expression");

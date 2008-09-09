@@ -61,11 +61,11 @@ struct ConditionBoolean : public Condition
   void output (Log&) const
   { }
 
-  void initialize (const Daisy&, const Scope&, Treelog& msg)
+  void initialize (const Daisy& daisy, const Scope& scope, Treelog& msg)
   {
     daisy_assert (state == uninitialized);
     
-    if (!expr->initialize (msg))
+    if (!expr->initialize (daisy.units (), scope, msg))
       state = error;
     else
       state = missing;

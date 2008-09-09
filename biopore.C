@@ -128,14 +128,14 @@ Biopore::initialize_base (const Units& units,
                           const Geometry& geo, const Scope& parent_scope, 
                           Treelog& msg)
 { 
-  if (!density_expr->initialize (msg))
-    return false;
-
   static const symbol per_square_centimeter ("cm^-2");
 
   ScopeID own_scope (x_symbol (), Units::cm ());
   ScopeMulti scope (own_scope, parent_scope);
   
+  if (!density_expr->initialize (units, scope, msg))
+    return false;
+
   if (!density_expr->check_dim (units, scope, per_square_centimeter, msg))
     return false;
 
