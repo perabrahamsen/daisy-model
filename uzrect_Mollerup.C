@@ -1001,7 +1001,7 @@ Maximum number of small time steps in a large time step.");
   alist.add ("max_number_of_small_time_steps", 1000);  
   syntax.add ("msg_number_of_small_time_steps", Syntax::Integer, Syntax::Const, "\
 Number of small time steps in a large time step between message.");
-  alist.add ("msg_number_of_small_time_steps", 10);  
+  alist.add ("msg_number_of_small_time_steps", 100);  
   syntax.add ("max_absolute_difference", "cm", Syntax::Const, "\
 Maximum absolute difference in 'h' values for convergence.");
   alist.add ("max_absolute_difference", 0.02);
