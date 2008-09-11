@@ -69,8 +69,8 @@ Biopore::max_infiltration_rate (const Geometry& geo, size_t e) const // [cm/h]
 
   const double rho = 1.0;   // [g/cm^3]
   const double g = 9.81;      // [m/s^2]
-  const double g1 = g * 100.0 / (3600.0 * 3600.0);      // [cm/h^2]
-  const double mu = 1.0020 / (100.0 * 3600.0);          // [g/cm/h] At 20 dg C. 
+  const double g1 = g * 100.0 * 3600.0 * 3600.0;        // [cm/h^2]
+  const double mu = (1.0020 / 100.0) * 3600.0;          // [g/cm/h] At 20 dg C. 
   const double M = density (cell);                      // [cm^-2]
   const double r = diameter * 0.5;                      // [cm]
   const double r4 = r * r * r * r;                      // [cm^4]
