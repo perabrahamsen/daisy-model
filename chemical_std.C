@@ -1073,8 +1073,11 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
 	{
 	  ScopeSoil scope_soil (soil, soil_water, soil_heat);
           ScopeMulti multi (parent_scope, scope_soil);
-	  initial_expr->initialize (units, multi, msg);
-	  for (size_t c = 0; c < soil.size (); c++)
+          daisy_assert (cell_size > 0);
+          scope_soil.set_cell (0);
+	  if (!initial_expr->initialize (units, multi, msg))
+            msg.error ("Could not initialize 'inital_expr'");
+	  for (size_t c = 0; c < cell_size; c++)
 	    { 
 	      scope_soil.set_cell (c);
 	      double value = 0.0;

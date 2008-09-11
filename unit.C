@@ -652,6 +652,9 @@ static struct UnitBaseSyntax
     add ("dgNorth", name, syntax, alist, 
          "Degrees North of Equator.");
 
+    // Unknown unit.
+    add (Syntax::Unknown (), name, syntax, alist, 
+         "Nothing is known about the dimension of this unit.");
   }
 } UnitBase_syntax;
 

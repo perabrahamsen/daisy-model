@@ -36,6 +36,7 @@ class Units : private boost::noncopyable
 {
   // Symbols.
 public:
+  static symbol error_symbol ();
   static symbol h ();
   static symbol mm ();
   static symbol per_mm ();
@@ -46,7 +47,7 @@ public:
   static symbol cm3 ();
   static symbol per_h ();
   static symbol ppm ();
-  
+
   // Special conversion rules.
 private:
   static struct special_convert_type
@@ -60,6 +61,7 @@ private:
 
   // Utilities.
 public:
+  static symbol get_name (const Unit&);
   static bool compatible (const Unit& from, const Unit& to);
   static double unit_convert (const Unit& from, const Unit& to, double value);
   static double multiply (const Unit&, const Unit&, double, const Unit& result);
@@ -72,6 +74,13 @@ private:
   typedef std::map<symbol, const Convert*> convert_map;
   mutable convert_map conversions;
   const bool allow_old_;
+
+  // Special units.
+public:
+  const Unit& unknown () const;
+  bool is_known (const Unit&) const;
+  const Unit& error () const;
+  bool is_error (const Unit&) const;
 
   // Interface.
 private:

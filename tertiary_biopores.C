@@ -45,7 +45,7 @@ struct TertiaryBiopores : public Tertiary, public Tertsmall
   const double pressure_initiate;// Pressure needed to init pref.flow [cm]
   const double pressure_end;	 // Pressure after pref.flow has been init [cm]
   const double pressure_barrier; // Pressure difference requires for S [cm]
-  const double pond_max;	 // Pond height before activating pref.flow [mm]
+  const double pond_max;	 // Pond height before activating pref.flow [cm]
   const bool use_small_timesteps_; // True, iff we want to calculate S in R.E.
 
   // Identity.
@@ -262,13 +262,12 @@ TertiaryBiopores::tick (const Units&, const Geometry& geo, const Soil& soil,
     {
       const size_t edge = edge_above[i];
       
-      if (surface.h_top (geo, edge) * 10 < pond_max)
+      if (surface.h_top (geo, edge) < pond_max)
         q_tertiary[edge] = 0.0;
       else
         {
           const double in_sign 
             = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
-      
           const double max_surface 
             = in_sign * surface.q_top (geo, edge, dt) * dt;
           const double flux_in = std::min (capacity (geo, edge, dt), 
@@ -613,10 +612,10 @@ If the pressure difference between the matrix and biopores is below\n\
 this value, no water will tranfer between the domains.  If you specify\n\
 a too small value for this parameter, the solution may be unstable.");
     alist.add ("pressure_barrier", 5.0);
-    syntax.add ("pond_max", "mm", Check::non_negative (), Syntax::Const, "\
+    syntax.add ("pond_max", "cm", Check::non_negative (), Syntax::Const, "\
 Maximum height of ponding before spilling into biopores.\n\
 After macropores are activated pond will have this height.");
-    alist.add ("pond_max", 0.5);
+    alist.add ("pond_max", 0.05);
     syntax.add ("use_small_timesteps", Syntax::Boolean, Syntax::Const,
                 "True iff the sink is allowed to change within a timestep.");
     alist.add ("use_small_timesteps", true);

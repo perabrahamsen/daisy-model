@@ -36,6 +36,13 @@
 // The 'Units' Interface.
 
 symbol
+Units::error_symbol ()
+{
+  static const symbol unit ("<error>");
+  return unit;
+}
+
+symbol
 Units::h ()
 {
   static const symbol unit ("h");
@@ -137,6 +144,10 @@ Units::base_convert (const symbol from, const symbol to,
   throw "Cannot convert base [" + from + "] to [" + to + "]";
 }
 
+symbol 
+Units::get_name (const Unit& unit)
+{ return unit.name; }
+
 bool 
 Units::compatible (const Unit& from_unit, const Unit& to_unit)
 {
@@ -198,6 +209,30 @@ Units::multiply (const symbol a, const symbol b)
   return Oldunits::multiply (a, b);
 }
 
+const Unit&
+Units::unknown () const
+{ 
+  const unit_map::const_iterator i = units.find (Syntax::unknown ()); 
+  daisy_assert (i != units.end () && (*i).second);
+  return *(*i).second;
+}
+
+bool
+Units::is_known (const Unit& unit) const
+{ return unit.name != Syntax::unknown (); }
+
+const Unit&
+Units::error () const
+{ 
+  const unit_map::const_iterator i = units.find (Units::error_symbol ()); 
+  daisy_assert (i != units.end () && (*i).second);
+  return *(*i).second;
+}
+
+bool
+Units::is_error (const Unit& unit) const
+{ return unit.name == Units::error_symbol (); }
+
 bool 
 Units::allow_old () const
 { return allow_old_; }
@@ -209,11 +244,11 @@ Units::has_unit (symbol name) const
 const Unit&
 Units::get_unit (symbol name) const
 { 
-  unit_map::const_iterator i = units.find (name); 
+  const unit_map::const_iterator i = units.find (name); 
   if (i != units.end () && (*i).second)
     return *(*i).second;
   
-  throw "No unit [" + name + "]";
+  return error ();
 }
 
 bool

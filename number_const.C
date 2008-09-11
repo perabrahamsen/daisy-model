@@ -32,7 +32,7 @@ struct NumberConst : public Number
 {
   // Parameters.
   const double val;
-  const symbol dim;
+  const Unit& unit_;
 
   // Simulation.
   void tick (const Units&, const Scope&, Treelog&)
@@ -42,18 +42,31 @@ struct NumberConst : public Number
   double value (const Scope&) const
   { return val; }
   symbol dimension (const Scope&) const
-  { return dim; }
+  { return Units::get_name (unit_); }
+  const Unit& unit () const
+  { return unit_; }
 
   // Create.
   bool initialize (const Units&, const Scope&, Treelog&)
   { return true; }
-  bool check (const Units&, const Scope&, Treelog&) const
-  { return true; }
+  bool check (const Units& units, const Scope&, Treelog& msg) const
+  { 
+    bool ok = true;
+    if (units.is_error (unit_))
+      {
+        msg.error ("Bad unit");
+        ok = false;
+      }
+    return ok;
+  }
   NumberConst (Block& al)
     : Number (al),
       val (al.number ("value")),
-      dim (al.identifier ("value"))
-  { }
+      unit_ (al.units ().get_unit (al.identifier ("value")))
+  { 
+    if (al.units ().is_error (unit_))
+      al.msg ().warning ("Unknown unit '" + al.identifier ("value") + "'");
+  }
 };
 
 static struct NumberConstSyntax
@@ -77,24 +90,40 @@ static struct NumberConstSyntax
 struct NumberLeaf : public Number
 {
   // Parameters.
-  const symbol dim;
+  const Unit& unit_;
 
   // Simulation.
   void tick (const Units&, const Scope&, Treelog&)
   { }
   symbol dimension (const Scope&) const
-  { return dim; }
+  { return Units::get_name (unit_); }
+  const Unit& unit () const
+  { return unit_; }
 
   // Create.
+  bool check (const Units& units, const Scope&, Treelog& msg) const
+  { 
+    bool ok = true;
+    if (units.is_error (unit_))
+      {
+        msg.error ("Bad unit");
+        ok = false;
+      }
+    return ok;
+  }
   NumberLeaf (Block& al)
     : Number (al),
-      dim (al.name ("dimension"))
-  { }
+      unit_ (al.units ().get_unit (al.identifier ("dimension")))
+  { 
+    if (al.units ().is_error (unit_))
+      al.msg ().warning ("Unknown unit '" + al.identifier ("dimension") + "'");
+  }
 };
 
 struct NumberGet : public NumberLeaf
 {
-  const Units& units;
+  // Data.
+  const Unit* scope_unit;
 
   // Parameters.
   const symbol name;
@@ -107,22 +136,38 @@ struct NumberGet : public NumberLeaf
   double value (const Scope& scope) const
   { 
     daisy_assert (scope.has_number (name));
+    daisy_assert (scope_unit);
     const double value = scope.number ( name);
-    const symbol got_dim = scope.dimension ( name);
-    return units.convert (got_dim, dim, value);
+    return Units::unit_convert (*scope_unit, unit (), value);
   }
 
   // Create.
-  bool initialize (const Units&, const Scope&, Treelog&)
-  { return true; }
-  bool check (const Units&, const Scope& scope, Treelog& err) const
-  {
-    Treelog::Open nest (err, name);
-
-    bool ok = true;
+  bool initialize (const Units& units, const Scope& scope, Treelog& msg)
+  { 
     if (!scope.is_number (name))
       {
-        err.error ("'" + name + "' not found in scope");
+        msg.error ("'" + name + "' is not a number");
+        return false;
+      }
+    const symbol got_dim = scope.dimension (name);
+    scope_unit = &units.get_unit (got_dim);
+    return true;
+  }
+  bool check (const Units& units, const Scope& scope, Treelog& msg) const
+  {
+    Treelog::Open nest (msg, name);
+
+    bool ok = NumberLeaf::check (units, scope, msg);
+    if (!scope_unit)
+      {
+        msg.error ("'" + name + "' is not a number");
+        ok = false;
+      }
+    else if (units.is_error (*scope_unit))
+      {
+        daisy_assert (scope.is_number (name));
+        const symbol got_dim = scope.dimension (name);
+        msg.error ("'" + name + "' has unknown dimension [" + got_dim + "]");
         ok = false;
       }
     return ok;
@@ -130,7 +175,7 @@ struct NumberGet : public NumberLeaf
 
   NumberGet (Block& al)
     : NumberLeaf (al),
-      units (al.units ()),
+      scope_unit (NULL),
       name (al.name ("name"))
   { }
 };
@@ -219,14 +264,14 @@ struct NumberFetch : public Number
   // Create.
   bool initialize (const Units&, const Scope&, Treelog&)
   { return true; }
-  bool check (const Units&, const Scope& scope, Treelog& err) const
+  bool check (const Units&, const Scope& scope, Treelog& msg) const
   {
-    Treelog::Open nest (err, "Fetch: " + name);
+    Treelog::Open nest (msg, "Fetch: " + name);
 
     bool ok = true;
     if (!default_value && !scope.is_number (name))
       {
-        err.error ("'" + name + "' not in scope");
+        msg.error ("'" + name + "' not in scope");
         ok = false;
       }
     return ok;
@@ -310,18 +355,18 @@ struct NumberIdentity : public NumberChild
   }
 
   // Create.
-  bool check (const Units& units, const Scope& scope, Treelog& err) const
+  bool check (const Units& units, const Scope& scope, Treelog& msg) const
   { 
-    Treelog::Open nest (err, name);
+    Treelog::Open nest (msg, name);
     bool ok = true;
 
-    if (!child->check (units, scope, err))
+    if (!child->check (units, scope, msg))
       ok = false;
     
     if (known (dim) && known (child->dimension (scope))
         && !units.can_convert (child->dimension (scope), dim))
       {
-        err.error ("Cannot convert [" + child->dimension (scope) 
+        msg.error ("Cannot convert [" + child->dimension (scope) 
                    + "] to [" + dim + "]");
         ok = false;
       }
@@ -371,17 +416,17 @@ struct NumberConvert : public NumberChild
   { return dim; }
 
   // Create.
-  bool check (const Units& units, const Scope& scope, Treelog& err) const
+  bool check (const Units& units, const Scope& scope, Treelog& msg) const
   { 
-    Treelog::Open nest (err, name);
+    Treelog::Open nest (msg, name);
     bool ok = true;
 
-    if (!child->check (units, scope, err))
+    if (!child->check (units, scope, msg))
       ok = false;
     
     if (!units.can_convert (child->dimension (scope), dim))
       {
-        err.error ("Cannot convert [" + child->dimension (scope) 
+        msg.error ("Cannot convert [" + child->dimension (scope) 
                    + "] to [" + dim + "]");
         ok = false;
       }
@@ -427,17 +472,17 @@ struct NumberDim : public NumberChild
   { return dim; }
 
   // Create.
-  bool check (const Units& units, const Scope& scope, Treelog& err) const
+  bool check (const Units& units, const Scope& scope, Treelog& msg) const
   { 
-    Treelog::Open nest (err, name);
+    Treelog::Open nest (msg, name);
     bool ok = true;
 
-    if (!child->check (units, scope, err))
+    if (!child->check (units, scope, msg))
       ok = false;
     
     if (warn_known && known (child->dimension (scope))
         && child->dimension (scope) != dim)
-      err.warning ("Dimension for child [" + child->dimension (scope)
+      msg.warning ("Dimension for child [" + child->dimension (scope)
                    + "] already known, now asserting it is [" + dim + "]");
 
     return ok;

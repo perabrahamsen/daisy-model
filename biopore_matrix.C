@@ -224,7 +224,15 @@ BioporeMatrix::capacity (const Geometry& geo, size_t e, const double dt) const
   const double radius = diameter / 2.0;       // [cm]
   const double area = radius * radius * M_PI; // [cm^2]
   const double height = -air_bottom (cell);   // [cm];
-  const double max_capacity = height * area / density; // [cm]
+  const double max_capacity = height * area * density; // [cm]
+
+  if (debug > 0)
+    {
+      std::ostringstream tmp;
+      tmp << "max_inf = " << max_infiltration 
+          << " [cm], max_cap = " << max_capacity << " [cm]";
+      Assertion::message (tmp.str ());
+    }
 
   // Choose the lower limit;
   return std::min (max_infiltration, max_capacity);

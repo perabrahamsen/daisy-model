@@ -60,7 +60,7 @@ Biopore::max_infiltration_rate (const Geometry& geo, size_t e) const // [cm/h]
   // Q = pi r^4 rho g L / ( 8 L mu)
   //
   //        Q [cm^3/h]    Infiltration rate
-  // delta P [cm]        Pressure drop.
+  //  delta P [cm]        Pressure drop.
   //        L [cm]        Length op cylinder.
   //       mu [cm^3/cm/h] Dynamic viscosity.
   //        r [cm]        Biopore radius.
@@ -90,7 +90,8 @@ Biopore::matrix_to_biopore (double K_xx, double M_c, double r_c,
     {
       std::ostringstream tmp;
       tmp << "Bug: S = " << S << " (should be positive), M_c = " << M_c
-          << ", r_c = " << r_c << ", K_xx = " << K_xx << ", h = " << h << ", h_3 = " << h_3 << ", pi M_c r_c^2 = " << M_PI*M_c*r_c*r_c;
+          << ", r_c = " << r_c << ", K_xx = " << K_xx << ", h = " << h
+          << ", h_3 = " << h_3 << ", pi M_c r_c^2 = " << M_PI*M_c*r_c*r_c;
       Assertion::error (tmp.str ());
       return 0.0;
     }
@@ -200,7 +201,7 @@ Biopore::load_base (Syntax& syntax, AttributeList&)
 {
   syntax.add_object ("density", Number::component, 
                        Syntax::Const, Syntax::Singleton, "\
-Root density [cm^-2] as a function of 'x' [cm].");
+Biopore density [cm^-2] as a function of 'x' [cm].");
   syntax.add ("height_start", "cm", Check::non_positive (), Syntax::Const, 
 	      "Biopores starts at this depth (a negative number).");
   syntax.add ("height_end", "cm", Check::non_positive (), Syntax::Const, 

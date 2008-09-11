@@ -51,8 +51,9 @@ struct TransformEquilibrium : public Transform
              std::vector<double>& S_AB, Treelog&) const;
 
   // Create.
-  void initialize (const Units& units, const Scope& scope,
-                   const Soil&, Treelog& msg);
+  void initialize (const Units& units, 
+                   const Soil&, const SoilWater&, const SoilHeat&,
+                   Treelog& msg);
   bool check (const Units&,
               const Soil&, const SoilWater&, const SoilHeat&, Treelog&) const;
   TransformEquilibrium (Block& al)
@@ -137,10 +138,15 @@ TransformEquilibrium::check (const Units& units,
 }
 
 void
-TransformEquilibrium::initialize (const Units& units, const Scope& scope,
-                                  const Soil&, Treelog& msg)
+TransformEquilibrium::initialize (const Units& units, const Soil& soil,
+                                  const SoilWater& soil_water,
+                                  const SoilHeat& soil_heat, Treelog& msg)
 { 
   Treelog::Open nest (msg, "equil");
+  ScopeSoil scope (soil, soil_water, soil_heat);
+  const size_t cell_size = soil.size ();
+  daisy_assert (cell_size > 0);
+  scope.set_cell (0);
   equilibrium->initialize (units, scope, msg);
   k_AB_expr->initialize (units, scope, msg); 
   k_BA_expr->initialize (units, scope, msg); 
