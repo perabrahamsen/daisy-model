@@ -65,15 +65,14 @@ struct NetRadiationParent : public NetRadiation
   virtual double NetLongwaveRadiation (double Cloudiness, // [W/m^2]
 				       double Temp,
 				       double VapourPressure) const 
-  { return black_body_radiation - L_ia; } //tjek med søren!!!!!
+  { return SurEmiss * black_body_radiation - L_ia; } 
 
   virtual double find_epsilon_0 (double Ta, double ea) const = 0;
 
   static double cloudiness_function (double Cloudiness, double black_body_radiation, 
                                      double epsilon_0)
   {
-    const double s = Cloudiness; // fraction of cloud sky
-    //SPØRG SØREN VEDR. CLOUDINES == fao::KLAR HIMMEL FRAKTION?? !!!!!
+    const double s = 1 - Cloudiness; // fraction of cloud sky
     return (s + (1 - s) * epsilon_0) * black_body_radiation;   
   }
 
@@ -182,7 +181,7 @@ struct NetRadiationBrunt : public NetRadiationParent
   
   double find_epsilon_0 (double Ta, double ea) const
   {
-    const double A = 1.0 - a;   // []
+    const double A = SurEmiss - a;   // []
     const double B = b / sqrt (10); // [hPa^-½]
     return A + B * sqrt (ea); 
   }
