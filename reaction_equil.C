@@ -99,7 +99,7 @@ struct ReactionEquilibrium : public Reaction
   }
 
   // Create.
-  bool check (const Units& units,
+  bool check (const Units& units, const Geometry&, 
               const Soil& soil, const SoilWater& soil_water, 
 	      const SoilHeat& soil_heat,
 	      const Chemistry& chemistry, Treelog& msg) const
@@ -125,7 +125,7 @@ struct ReactionEquilibrium : public Reaction
 
     return ok;
   }
-  void initialize (const Units& units, const Soil& soil, 
+  void initialize (const Units& units, const Geometry&, const Soil& soil, 
                    const SoilWater& soil_water, const SoilHeat& soil_heat,
                    Treelog& msg)
   { 

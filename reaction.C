@@ -33,6 +33,18 @@ Reaction::library_id () const
   return id;
 }
 
+void
+Reaction::tick_top (const double direct_rain, 
+                    Chemistry&, const double dt, Treelog&)
+{ }
+
+void 
+Reaction::tick (const Units&, 
+                const Geometry&, const Soil&, const SoilWater&,
+                const SoilHeat&, const OrganicMatter&, Chemistry&,
+                const double, Treelog&)
+{ }
+
 Reaction::Reaction (Block& al)
   : ModelAListed (al.alist ())
 { }

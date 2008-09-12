@@ -49,10 +49,12 @@ struct ReactionNitrification : public Reaction
              Chemistry& chemistry, const double dt, Treelog& msg);
 
   // Create.
-  bool check (const Units&, const Soil& soil, const SoilWater& soil_water, 
+  bool check (const Units&, const Geometry&, 
+              const Soil& soil, const SoilWater& soil_water, 
 	      const SoilHeat& soil_heat,
 	      const Chemistry& chemistry, Treelog& msg) const;
-  void initialize (const Units&, const Soil&, const SoilWater&, const SoilHeat&,
+  void initialize (const Units&, const Geometry&, 
+                   const Soil&, const SoilWater&, const SoilHeat&,
                    Treelog&);
   explicit ReactionNitrification (Block& al);
 };
@@ -100,7 +102,7 @@ ReactionNitrification::tick (const Units&, const Geometry& geo,
 }
 
 bool 
-ReactionNitrification::check (const Units&,
+ReactionNitrification::check (const Units&, const Geometry&,
                               const Soil&, const SoilWater&, const SoilHeat&,
 			      const Chemistry& chemistry, Treelog& msg) const
 { 
@@ -114,7 +116,8 @@ ReactionNitrification::check (const Units&,
 }
 
 void
-ReactionNitrification::initialize (const Units&, const Soil& soil,
+ReactionNitrification::initialize (const Units&, const Geometry&,
+                                   const Soil& soil, 
                                    const SoilWater&, const SoilHeat&,
                                    Treelog&)
 {

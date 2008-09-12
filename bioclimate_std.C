@@ -72,7 +72,7 @@ struct BioclimateStandard : public Bioclimate
   std::auto_ptr<Pet> pet;       // Potential Evapotranspiration model.
   double total_ep;		// Potential evapotranspiration [mm/h]
   double total_ea;		// Actual evapotranspiration [mm/h]
-
+  double direct_rain_;          // Rain hitting soil directly [mm/h]
   double irrigation_overhead;	// Irrigation above canopy [mm/h]
   double irrigation_overhead_old;	// Old value for logging.
   double irrigation_overhead_temperature; // Water temperature [dg C]
@@ -201,6 +201,8 @@ struct BioclimateStandard : public Bioclimate
   { return daily_global_radiation_; }
   double hourly_global_radiation () const
   { return hourly_global_radiation_; }
+  double direct_rain () const
+  { return direct_rain_; }
 
   // Manager.
   void irrigate_overhead (double flux, double temp);
@@ -340,6 +342,11 @@ As a last resort,  Makkink (makkink) will be used.");
               "Potential evapotranspiration.");
   syntax.add ("total_ea", "mm/h", Syntax::LogOnly,
               "Actual evapotranspiration.");
+  syntax.add ("direct_rain", "mm/h", Syntax::LogOnly,
+              "Rain hitting surface directly.\n\
+This includes rain hitting ponded water or litter, but excludes rain\n\
+hitting canopy or snow, as well as snow and all forms for irrigation.\n\
+The intended use is colloid generation."); 
   syntax.add ("irrigation_overhead", "mm/h", Syntax::LogOnly,
               "Irrigation above canopy.");
   syntax.add ("irrigation_overhead_temperature", "dg C", Syntax::LogOnly,
@@ -524,6 +531,7 @@ BioclimateStandard::BioclimateStandard (Block& al)
          : NULL),
     total_ep (0.0),
     total_ea (0.0),
+    direct_rain_ (0.0),
     irrigation_overhead (0.0),
     irrigation_overhead_old (0.0),
     irrigation_overhead_temperature (0.0),
@@ -930,7 +938,16 @@ BioclimateStandard::WaterDistribution (const Units& units,
   production_stress = svat->production_stress ();
   vegetation.force_production_stress (production_stress);
 
-  // 8 Reset irrigation
+  // Direct rain, used for colloid generation
+  if (snow.storage () < 0.1)
+    // Snow dampens rain.
+    direct_rain_ = 0.0;
+  else if (snow_water_out < 0.01)
+    direct_rain_ = 0.0;
+  else
+    direct_rain_ = canopy_water_bypass * (rain / snow_water_out);
+
+  // Reset irrigation
   irrigation_overhead_old = irrigation_overhead;
   irrigation_overhead = 0.0;
   irrigation_surface_old = irrigation_surface;
@@ -938,7 +955,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
   irrigation_subsoil_old = irrigation_subsoil;
   irrigation_subsoil = 0.0;
   
-  // 9 Check
+  // Check
   // Note: total_ea can be larger than total_ep, as PMSW uses a
   // different method for calculating PET.
   daisy_assert (approximate (total_ea,
@@ -1047,6 +1064,7 @@ BioclimateStandard::output (Log& log) const
   output_object (pet.get (), "pet", log);
   output_variable (total_ep, log);
   output_variable (total_ea, log);
+  output_value (direct_rain_, "direct_rain", log);
   output_value (irrigation_overhead_old, "irrigation_overhead", log);
   output_value (irrigation_overhead_temperature, 
                 "irrigation_overhead_temperature", log);

@@ -93,6 +93,7 @@ public:
                          double cover /* [] */,
                          double canopy_leak_rate /* [h^-1] */,
                          double surface_runoff_rate /* [h^-1] */,
+                         double direct_rain /* [mm/h] */,
                          double dt /* [h] */,
 			 Treelog&) = 0;
   virtual void tick_soil (const Scope&, 

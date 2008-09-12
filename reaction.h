@@ -44,10 +44,12 @@ public:
 
   // Simulation.
 public:
+  virtual void tick_top (const double direct_rain, 
+                         Chemistry&, const double dt, Treelog&);
   virtual void tick (const Units& units, 
                      const Geometry&, const Soil&, const SoilWater&,
 		     const SoilHeat&, const OrganicMatter&, Chemistry&,
-		     const double dt, Treelog&) = 0;
+		     const double dt, Treelog&);
   virtual void output (Log&) const = 0;
 
   // Create and Destroy.
@@ -55,10 +57,10 @@ public:
   static const AttributeList& denitrification_model ();
   static const AttributeList& NH4_sorption_model ();
 public:
-  virtual void initialize (const Units& units, 
+  virtual void initialize (const Units& units, const Geometry& geo,
                            const Soil&, const SoilWater&, const SoilHeat&, 
                            Treelog&) = 0;
-  virtual bool check (const Units& units, 
+  virtual bool check (const Units& units, const Geometry& geo,
                       const Soil&, const SoilWater&, const SoilHeat&,
 		      const Chemistry&, Treelog&) const = 0;
 protected:

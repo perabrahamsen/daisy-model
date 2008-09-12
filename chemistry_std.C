@@ -67,7 +67,8 @@ struct ChemistryStandard : public Chemistry
   void tick_top (const double snow_leak_rate, // [h^-1]
                  const double cover, // [],
                  const double canopy_leak_rate, // [h^-1]
-                 double surface_runoff_rate /* [h^-1] */,
+                 const double surface_runoff_rate, // [h^-1]
+                 const double direct_rain, // [mm/h]
                  const double dt, // [h]
 		 Treelog&);
   void infiltrate (const Geometry&, 
@@ -220,10 +221,14 @@ void
 ChemistryStandard::tick_top (const double snow_leak_rate, // [h^-1]
                              const double cover, // [],
                              const double canopy_leak_rate, // [h^-1]
-                             double surface_runoff_rate /* [h^-1] */,
+                             const double surface_runoff_rate, // [h^-1]
+                             const double direct_rain, // [mm/h]
                              const double dt, // [h]
 			     Treelog& msg) 
 {
+  for (size_t r = 0; r < reactions.size (); r++)
+    reactions[r]->tick_top  (direct_rain, *this, dt, msg);
+
   for (size_t c = 0; c < chemicals.size (); c++)
     chemicals[c]->tick_top (snow_leak_rate, cover, canopy_leak_rate, 
                             surface_runoff_rate, dt, msg);
@@ -318,7 +323,7 @@ ChemistryStandard::initialize (const Scope& scope,
 			      msg);
 
   for (size_t r = 0; r < reactions.size (); r++)
-    reactions[r]->initialize (units, soil, soil_water, soil_heat, msg);
+    reactions[r]->initialize (units, geo, soil, soil_water, soil_heat, msg);
 }
 
 bool 
@@ -340,7 +345,7 @@ ChemistryStandard::check (const Scope& scope,
   for (size_t r = 0; r < reactions.size (); r++)
     {
       Treelog::Open nest (msg, "Reaction: '" + reactions[r]->name  + "'");
-      if (!reactions[r]->check (units, soil, soil_water, soil_heat,
+      if (!reactions[r]->check (units, geo, soil, soil_water, soil_heat,
                                 chemistry, msg))
 	ok = false;
     }

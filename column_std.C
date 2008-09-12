@@ -630,7 +630,8 @@ ColumnStandard::tick (const Time& time, const double dt,
                     residuals_N_soil, residuals_C_soil, dt, msg);
   chemistry->tick_top (bioclimate->snow_leak_rate (dt), vegetation->cover (),
                        bioclimate->canopy_leak_rate (dt), 
-                       surface.runoff_rate (dt), dt, msg);
+                       surface.runoff_rate (dt),
+                       bioclimate->direct_rain (), dt, msg);
 
   // Turnover.
   organic_matter->tick (geometry, *soil_water, *soil_heat, 

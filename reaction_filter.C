@@ -82,15 +82,15 @@ struct ReactionFilter : public Reaction
                                   * C_secondary,
                                   M_secondary / dt);   //[g cm^-3 soil h^-1]
       }
-    mob.add_to_sink_primary (F_primary);
-    mob.add_to_sink_secondary (F_secondary);
-    immob.add_to_source_primary (F_primary);
-    immob.add_to_source_secondary (F_secondary);
+    mob.add_to_transform_sink (F_primary);
+    mob.add_to_transform_sink_secondary (F_secondary);
+    immob.add_to_transform_source (F_primary);
+    immob.add_to_transform_source_secondary (F_secondary);
   }
 
   // Create.
-  bool check (const Units&, const Soil& soil, const SoilWater& soil_water,
-	      const SoilHeat&,
+  bool check (const Units&, const Geometry&, 
+              const Soil& soil, const SoilWater& soil_water, const SoilHeat&,
 	      const Chemistry& chemistry, Treelog& msg) const
   { 
     bool ok = true;
@@ -106,7 +106,7 @@ struct ReactionFilter : public Reaction
       }
     return ok;
   }
-  void initialize (const Units&, const Soil& soil, 
+  void initialize (const Units&, const Geometry&, const Soil& soil, 
                    const SoilWater&, const SoilHeat&, Treelog&)
   { 
     F_primary.insert (F_primary.begin (), soil.size (), 0.0);

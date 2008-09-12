@@ -78,6 +78,7 @@ public:
   virtual double daily_global_radiation () const = 0;
   virtual double hourly_global_radiation () const = 0;
   double day_fraction () const;   
+  virtual double direct_rain () const = 0;
 
   // Manager.
 public:

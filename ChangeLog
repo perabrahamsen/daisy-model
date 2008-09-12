@@ -1,3 +1,17 @@
+2008-09-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* colloids.h, colloids.C: Removed
+	* colloids_MACRO.C: Renamed to 'recation_MACRO.C'
+	* Makefile: Updated.
+
+	* chemical.h (add_to_source_primary, add_to_source_secondary)
+	(add_to_sink_primary, add_to_sink_secondary): Removed them.
+	* chemical.h, chemical_std.C (add_to_transform_sink_secondary)
+	(add_to_transform_source_secondary): New virtual members.
+	* chemica.h: 
+	* reaction_filter.C (tick): Update caller.
+
+
 2008-09-11  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* biopore_matrix.C (BioporeMatrix::capacity): Bug fix.

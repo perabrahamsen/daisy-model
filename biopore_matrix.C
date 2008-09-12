@@ -777,7 +777,7 @@ BioporeMatrix::initialize (const Units& units,
     }
 
   // h3_soil.
-  h3_soil.insert (h3_soil.end (), column_size, -42.42e42);
+  h3_soil.insert (h3_soil.end (), column_size, 0.0);
   daisy_assert (h3_soil.size () == column_size);
 
   // dy.

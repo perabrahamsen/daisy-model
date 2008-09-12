@@ -102,6 +102,7 @@ struct ChemicalStandard : public Chemical
   double surface_mixture;
   double surface_runoff;
   double surface_decompose;
+  double surface_transform;
 
   // Soil state and log.
   std::vector<double> C_avg_;   // Concentration in soil solution [g/cm^3]
@@ -168,6 +169,9 @@ struct ChemicalStandard : public Chemical
   void add_to_decompose_sink (const std::vector<double>&);
   void add_to_transform_source (const std::vector<double>&);
   void add_to_transform_sink (const std::vector<double>&);
+  void add_to_transform_source_secondary (const std::vector<double>&);
+  void add_to_transform_sink_secondary (const std::vector<double>&);
+  void add_to_surface_transform_source (double amount  /* [g/cm^2/h] */);
 
   // Management.
   void update_C (const Soil& soil, const SoilWater& soil);
@@ -210,7 +214,7 @@ struct ChemicalStandard : public Chemical
   bool check (const Units&, const Scope&, 
               const Geometry&, const Soil&, const SoilWater&, 
 	      const Chemistry&, Treelog&) const;
-  static void fillup(std::vector<double>& v, const size_t size);
+  static void fillup (std::vector<double>& v, const size_t size);
   void initialize (const Units&, const Scope&, 
                    const AttributeList&, const Geometry&,
                    const Soil&, const SoilWater&, const SoilHeat&, Treelog&);
@@ -397,6 +401,7 @@ ChemicalStandard::clear ()
   harvest_ = 0.0;
   residuals = 0.0;
   surface_tillage = 0.0;
+  surface_transform = 0.0;
   std::fill (S_secondary_.begin (), S_secondary_.end (), 0.0);
   std::fill (S_primary_.begin (), S_primary_.end (), 0.0);
   std::fill (S_external.begin (), S_external.end (), 0.0);
@@ -490,6 +495,31 @@ ChemicalStandard::add_to_transform_source (const std::vector<double>& v)
   for (unsigned i = 0; i < v.size (); i++)
     S_transform[i] += v[i];
   add_to_source_primary (v);
+}
+
+void
+ChemicalStandard::add_to_transform_sink_secondary (const std::vector<double>& v)
+{
+  daisy_assert (S_transform.size () >= v.size ());
+  for (unsigned i = 0; i < v.size (); i++)
+    S_transform[i] -= v[i];
+  add_to_sink_secondary (v);
+}
+
+void
+ChemicalStandard::add_to_transform_source_secondary (const std::vector<double>& v)
+{
+  daisy_assert (S_transform.size () >= v.size ());
+  for (unsigned i = 0; i < v.size (); i++)
+    S_transform[i] += v[i];
+  add_to_source_secondary (v);
+}
+
+void 
+ChemicalStandard::add_to_surface_transform_source (const double amount /* [g/cm^2/h] */)
+{
+  const double m2_per_cm2 = 0.01 * 0.01;
+  surface_transform += amount / m2_per_cm2;
 }
 
 void
@@ -632,7 +662,8 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
   surface_in = canopy_out + (snow_out - canopy_in);
   surface_runoff = surface_storage * surface_runoff_rate; 
   surface_decompose = surface_storage * surface_decompose_rate; 
-  surface_storage += (surface_in - surface_runoff - surface_decompose) * dt;
+  surface_storage += (surface_in + surface_transform 
+                      - surface_runoff - surface_decompose) * dt;
 
   // Mass balance.
   const double new_storage = snow_storage + canopy_storage;
@@ -905,12 +936,13 @@ ChemicalStandard::output (Log& log) const
   output_variable (surface_in, log);
   output_variable (surface_runoff, log);
   output_variable (surface_decompose, log);
+  output_variable (surface_transform, log);
   output_variable (surface_mixture, log);
   output_variable (surface_out, log);
   output_value (snow_storage + canopy_storage + surface_storage,
 		"top_storage", log);
   output_value (canopy_dissipate + canopy_harvest + surface_runoff 
-                + surface_decompose,
+                + surface_decompose - surface_transform,
 		"top_loss", log);
   output_value (C_avg_, "C", log);
   output_value (C_secondary_, "C_secondary", log);
@@ -1242,6 +1274,7 @@ ChemicalStandard::ChemicalStandard (Block& al)
     surface_mixture (0.0),
     surface_runoff (0.0),
     surface_decompose (0.0),
+    surface_transform (0.0),
     S_permanent (al.number_sequence ("S_permanent")),
     lag (al.check ("lag")
 	 ? al.number_sequence ("lag")
@@ -1478,6 +1511,8 @@ with 'none' adsorption and one with 'full' adsorption, and an\n\
 	      "Removed through lateral movement on the soil.");
   syntax.add ("surface_decompose", "g/m^2/h", Syntax::LogOnly, 
 	      "Decomposed from the surface.");
+  syntax.add ("surface_transform", "g/m^2/h", Syntax::LogOnly, 
+	      "Added through transformation to surface.");
   syntax.add ("surface_mixture", "g/m^2/h", Syntax::LogOnly, 
 	      "Entering the soil through mixture with ponded water.");
   syntax.add ("surface_out", "g/m^2/h", Syntax::LogOnly, 
@@ -1488,7 +1523,8 @@ with 'none' adsorption and one with 'full' adsorption, and an\n\
   syntax.add ("top_loss", "g/m^2/h", Syntax::LogOnly, "\
 Amount lost from the system from the surface.\n\
 This includes runoff, canopy dissipation and harvest, but not soil\n\
-infiltration..");
+infiltration.  It also includes the net loss through transformation,\n\
+which can be negative.");
 
   // Soil variables.
   Geometry::add_layer (syntax, Syntax::OptionalState, "C", "g/cm^3",

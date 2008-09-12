@@ -374,7 +374,8 @@ NOLINK = -c
 # 
 
 LATER = tertiary_instant.C 
-MODELS = svat_ssoc.C reaction_filter.C colloids_MACRO.C seed_LAI.C seed_release.C \
+MODELS = reaction_MACRO.C \
+	reaction_filter.C seed_LAI.C seed_release.C \
 	stomatacon_BB.C stomatacon_SHA.C stomatacon_Leuning.C \
 	tertiary_old.C \
 	biopore_drain.C tertiary_biopores.C \
@@ -448,7 +449,7 @@ DISABLED = log_clone.C action_merge.C action_divide.C \
 	weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C 
 # A component is a common interface to a number of models.
 #
-COMPONENTS = colloids.C seed.C \
+COMPONENTS = seed.C \
 	stomatacon.C tertiary.C biopore.C secondary.C heatrect.C unit.C \
 	ABAprod.C solver.C element.C ui.C reaction.C scopesel.C scope.C \
 	ABAeffect.C transport.C uzrect.C bound.C volume.C uz1d.C \
@@ -571,7 +572,7 @@ EXECUTABLES = daisy${EXE} tkdaisy${EXE} cdaisy${EXE} gdaisy${EXE}
 
 # Select files to be removed by the next svn update.
 #
-REMOVE = uzrect_r3.C 
+REMOVE = uzrect_r3.C colloids_MACRO.C colloids.C colloids.h
 
 REMOVED = msoltranrect_2x1.C msoltranrect_forward.C\
 	select_soil.C adsorption_none.C adsorption_full.C ABAprod_expr.C \
@@ -977,8 +978,6 @@ ui_Qt_run${OBJ}: ui_Qt_run.C ui_Qt_run.h ui_Qt.h ui.h model.h symbol.h \
 ui_Qt${OBJ}: ui_Qt.C ui_Qt.h ui.h model.h symbol.h alist.h toplevel.h \
   librarian.h block.h syntax.h treelog.h plf.h assertion.h
 main_Qt${OBJ}: main_Qt.C ui_Qt.h ui.h model.h symbol.h alist.h toplevel.h
-colloids${OBJ}: colloids.C colloids.h model.h symbol.h alist.h mathlib.h \
-  assertion.h block.h syntax.h treelog.h plf.h librarian.h
 seed${OBJ}: seed.C seed.h model.h symbol.h alist.h block.h syntax.h treelog.h \
   plf.h librarian.h
 stomatacon${OBJ}: stomatacon.C stomatacon.h model.h symbol.h alist.h \
@@ -1297,6 +1296,8 @@ printer_file${OBJ}: printer_file.C printer_file.h printer.h model.h symbol.h \
   parser.h path.h assertion.h librarian.h
 log_alist${OBJ}: log_alist.C log_alist.h log.h time.h border.h model.h \
   symbol.h alist.h library.h syntax.h treelog.h assertion.h
+resistance${OBJ}: resistance.C resistance.h alist.h symbol.h syntax.h \
+  treelog.h net_radiation.h model.h assertion.h mathlib.h librarian.h
 convert${OBJ}: convert.C convert.h
 units${OBJ}: units.C units.h symbol.h unit.h model.h alist.h convert.h \
   oldunits.h memutils.h treelog.h assertion.h librarian.h metalib.h \
@@ -1402,13 +1403,14 @@ nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
 version${OBJ}: version.C
+reaction_MACRO${OBJ}: reaction_MACRO.C reaction.h model.h symbol.h alist.h \
+  mathlib.h assertion.h check.h block.h syntax.h treelog.h plf.h \
+  librarian.h chemistry.h chemical.h log.h time.h border.h geometry.h \
+  soil.h
 reaction_filter${OBJ}: reaction_filter.C reaction.h model.h symbol.h alist.h \
   block.h syntax.h treelog.h plf.h transform.h chemistry.h chemical.h \
   soil.h soil_water.h log.h time.h border.h assertion.h librarian.h \
   check.h
-colloids_MACRO${OBJ}: colloids_MACRO.C colloids.h model.h symbol.h alist.h \
-  mathlib.h assertion.h check.h block.h syntax.h treelog.h plf.h \
-  librarian.h
 seed_LAI${OBJ}: seed_LAI.C seed.h model.h symbol.h alist.h block.h syntax.h \
   treelog.h plf.h librarian.h log.h time.h border.h
 seed_release${OBJ}: seed_release.C seed.h model.h symbol.h alist.h block.h \
