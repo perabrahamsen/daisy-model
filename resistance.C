@@ -37,17 +37,19 @@ namespace Resistance
   //             Using Terra and Agua MODIS and Weather Prediction Data.
   //             Institute of Geography, University of Copenhagen.
   
-  const double P_surf = 101300; //Surface atmospheric pressure [Pa]
-  const double TK = 273.15;  //Constant to convert celcius to Kelvin []
-  const double v = 0.00001327; // Molecular viscosity [m^2 s^-1]
+  const double P_surf = 101300;  //Surface atmospheric pressure [Pa]
+  const double TK = 273.15;      //Constant to convert celcius to Kelvin []
+  const double v = 0.00001327;   // Molecular viscosity [m^2 s^-1]
   const double d_heat = 0.00001869; // Diffusivity of heat [m^2 s^-1]
   const double d_CO2  = 0.00001381; // Diffusivity of CO2 [m^2 s^-1]
   const double d_H2O  = 0.00002178; // Diffusivity of H2O [m^2 s^-1]
-  const double g = 9.82; // Gravitational acceleration [m s^-2]
-  const double ku = 0.5; // Parameter that describes the vertical variation 
-                         // of wind speed within the canopy
-  const double z_0b = 0.0006; // Bare soil roughness height for momentum [m]
-  const double k = 0.41; // Von Karman's constant
+  const double g = 9.82;         // Gravitational acceleration [m s^-2]
+  const double ku = 0.5;         // Parameter that describes the vertical variation 
+                                 // of wind speed within the canopy
+  const double z_0b = 0.0006;    // Bare soil roughness height for momentum [m]
+  const double k = 0.41;         // Von Karman's constant []
+  const double h_soil = 0.08;    // Height above the soil surface where the effect
+                                 // of soil roughness is minimal [m]
 }
 //----------------------------------------------------
 // Boundary layer conductance
@@ -64,10 +66,11 @@ Resistance::Cl (const double T_a)
 // Boundary conductance for a leaf due to free convection for heat (G2)
 double 
 Resistance::gbf_heat (const double Cl/*[]*/, const double T_a /*[dg C]*/, 
-                      const double T_l_sun /*[dg C]*/, const double wl /*[m]*/) 
+                      const double T_l_sun /*[dg C]*/, 
+                      const double w_l /* leaf width [m]*/) 
 {
-  const double gbf_heat = d_heat * Cl / wl
-    * pow((g * pow(wl,3)/sqr(v * Cl) * (T_l_sun - T_a))/(T_a + TK),0.25);
+  const double gbf_heat = d_heat * Cl / w_l
+    * pow((g * pow(w_l,3)/sqr(v * Cl) * (T_l_sun - T_a))/(T_a + TK),0.25);
   return gbf_heat;// [m s¯1]
 }
 
@@ -98,9 +101,10 @@ Resistance::gbf_H2O_hypo(const double gbf_heat /*[m s¯1]*/, const double Cl /*[]
 // Boundary conductance for a leaf due to forced convection for heat (G5)
 double 
 Resistance::gbu_heat (const double U_z /*surface wind speed [m s^-1]*/, 
-                      const double wl /*[m]*/, const double LAI /*[]*/) 
+                      const double w_l /* leaf width [m]*/, 
+                      const double LAI /*[m^2 m^-2]*/) 
 {
-  const double gbu_heat = 2 * 0.003 * pow((U_z * exp(-ku * LAI)/wl), 0.5); 
+  const double gbu_heat = 2 * 0.003 * pow((U_z * exp(-ku * LAI)/w_l), 0.5); 
   return gbu_heat; // [m s¯1]
 }
 
@@ -153,7 +157,7 @@ Resistance::gbu_sun (const double gbu_j /*[m s¯1]*/, const double LAI /*[]*/,
 // convection for heat, H2O, and CO2 (j = heat, H2O, and CO2) (G9)
 double 
 Resistance::gbu_shadow (const double kb, const double gbu_j /*[m s¯1]*/, 
-                        const double LAI /*[]*/)
+                        const double LAI /*[m^2 m^-2]*/)
 {
   const double gbu_shadow = gbu_j 
     * (1 - exp(-(0.5 * ku * LAI))/(0.5 * ku) 
@@ -195,7 +199,7 @@ Resistance::z_0h (const double z_0 /*roughness lenght [m]*/)
 
 // Roughness lenght for momentum transport (F2)
 double 
-Resistance::z_0 (const double h_veg /* vegetation heighr [m]*/, 
+Resistance::z_0 (const double h_veg /* vegetation height [m]*/, 
                  const double c_drag /* drag force [m^2 m^-2]*/,
                  const double d /* zero-plane displacement height [m]*/,
                  const double LAI /*[m^2 m^-2]*/)
@@ -231,7 +235,8 @@ Resistance::N (const double z /* reference height above canopy [m]*/,
 }
 
 // Aerodynamic resistance between canopy source height and reference 
-// height above the canopy (F5)
+// height above the canopy (F5). 
+// Also described in Choudhury et al., 1986. Agricult. & Forest Met. 37:75-88
 double 
 Resistance::r_a (const double z /* reference height above canopy [m]*/, 
                  const double z_0 /* Roughness lenght for momentum transport [m]*/, 
@@ -240,10 +245,12 @@ Resistance::r_a (const double z /* reference height above canopy [m]*/,
                  const double N /* atm stability indicator []*/, 
                  const double U_z /* surface wind speed [m s^-1]*/)
 {
-  const double A = 1.0; //????????????????????????????
+  const double A = 1.0 + N; //[]
   const double B = log((z - d)/z_0h) + 2. * N * log((z - d)/z_0); 
   const double C = N * sqr(log ((z - d)/z_0));
-  const double S = (B - sqrt(sqr (B) - 4 * A * C))/(2 * A);
+
+  double S = (B - sqrt(sqr (B) - 4 * A * C))/(2 * A);
+  if(S < -5.0) S = -5.0; 
 
   double r_a;
   if (N <= 0)
@@ -255,7 +262,7 @@ Resistance::r_a (const double z /* reference height above canopy [m]*/,
 }
 
 //----------------------------------------------------
-// Soil aerodynamic resistance (Norman et al., 1995 cf. Rasmus Houborg)
+// Soil aerodynamic resistance (Norman et al., 1995? cf. Rasmus Houborg)
 //----------------------------------------------------
 
 // Wind speed at the top of the canopy (L1)
@@ -284,7 +291,74 @@ Resistance::U_c (const double z_r /* reference height above canopy [m]*/,
     U_c = U_z * (log(h_veg - d)/z_0)/(log((z_r - d)/z_0) + 4.7 * (z_r - d)/L_mo);
   else
     U_c = U_z * (log(h_veg - d)/z_0)/(log((z_r - d)/z_0) - psi);
-  return U_c;
+  return U_c; // [m s^-1]
+}
+
+// Mean leaf size (L2)
+double 
+Resistance::l_m (const double w_l /* leaf width [m]*/)
+{
+  const double a1 = w_l;       // leaf radius along the major axis (ellipse) [m]
+  const double b1 = w_l * 0.5; // leaf radius along the minor axis (ellipse) [m]
+
+  const double l_m = (4 * M_PI * a1 * b1)
+    / (2 * M_PI * sqrt(0.5 *(sqr (a1) + sqr (b1)))) ;
+
+    return l_m; // [m]
+}
+
+// Wind speed above the soil surface (L3)
+double 
+Resistance::U_s (const double l_m /* mean leaf size [m]*/,
+                 const double h_veg /* vegetation height [m]*/, 
+                 const double LAI /*[m^2 m^-2]*/,
+                 const double U_c /* Wind speed at the top of the canopy [m s^-1]*/)
+{
+  const double a_0 = 0.28 * pow(LAI, 2./3.) * pow(h_veg, 1./3.) * pow(l_m, -1./3.);
+  const double U_s = U_c * exp(- a_0 * (1 - h_soil/h_veg));
+  return U_s; //[m s^-1]
+}
+
+// The aerodynamic resistance of the boundary layer at the soil 
+// surface beneath the canopy (L4)
+double 
+Resistance::r_a_soil (const double U_s /* Wind speed above the soil surface [m s^-1]*/)
+{
+  const double r_a_soil = 1/(0.004 + 0.012 * U_s);
+  return r_a_soil; // [s m^-1]
+}
+
+//----------------------------------------------------
+// Temperature 
+//----------------------------------------------------
+
+// Land surface temperature (O1)
+// Normann et al., 1995 cf. Rasmus Houborg 2006
+double 
+Resistance::T_0 (const double T_c /* canopy temperature [dg C]*/, 
+                 const double T_soil /* soil temperature [dg C]*/,
+                 const double kb /* extinction coefficient []*/,
+                 const double LAI /*[m^2 m^-2]*/) 
+{
+  const double f_veg = 1 - exp(-kb * LAI);
+
+  const double T_0 = pow ((f_veg * pow(T_c + TK, 4) 
+                           + (1 - f_veg) * pow(T_soil + TK, 4)), 0.25) - TK;
+  return T_0; // [dg C]
+}
+
+// Canopy temperature (K1)
+// Ball (1988) & Collatz et al (1991) cf. Rasmus Houborg 2006
+double 
+Resistance::T_c (const double T_l_sun /* leaf sun temperature [dg C]*/, 
+                 const double T_l_sha /* leaf shadow temperature [dg C]*/,
+                 const double kb /* extinction coefficient []*/,
+                 const double LAI /*[m^2 m^-2]*/) 
+{
+  const double f_sun = (1 - exp(-kb * LAI)/kb)/LAI;
+
+  const double T_c = f_sun * T_l_sun + (1 - f_sun) * T_l_sha; 
+  return T_c; // [dg C]
 }
 
 

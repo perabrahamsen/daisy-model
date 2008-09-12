@@ -99,11 +99,10 @@ double r_a (const double z /* reference height above canopy [m]*/,
               const double N /* atm stability indicator []*/, 
               const double U_z /* surface wind speed [m s^-1]*/); //[s m^-1]
 
-
 //----------------------------------------------------
 // Soil aerodynamic resistance (Norman et al., 1995 cf. Rasmus Houborg)
 //----------------------------------------------------
-// Wind speed at the top of the canopy (L1)
+  // Wind speed at the top of the canopy (L1)
   double U_c (const double z_r /* reference height above canopy [m]*/, 
               const double z_0 /* Roughness lenght for momentum transport [m]*/, 
               const double d /* displacement height [m]*/,
@@ -112,8 +111,42 @@ double r_a (const double z /* reference height above canopy [m]*/,
               const double T_a /* air temp [dg C]*/,       
               const double h_veg /* vegetation heighr [m]*/,      
               const double r_a /* Aerodynamic resistance [s m^-1]*/, 
-              const double rho_a /* air density [kg m^-3]*/);
+              const double rho_a /* air density [kg m^-3]*/); // [m s^-1]
+
+  // Mean leaf size (L2)
+  double l_m (const double w_l /* leaf width [m]*/); // [m]
+  
+  // Wind speed above the soil surface [m s^-1] (L3)
+  double U_s (const double l_m /* mean leaf size [m]*/,
+              const double h_veg /* vegetation height [m]*/, 
+              const double LAI /*[m^2 m^-2]*/,
+              const double U_c /* Wind speed at the top of the canopy [m s^-1]*/);
+  
+  // The aerodynamic resistance of the boundary layer at the soil 
+  // surface beneath the canopy [s m^-1](L4)
+  double r_a_soil (const double U_s /* Wind speed above the soil surface [m s^-1]*/);
+
+//----------------------------------------------------
+// Temperatures
+//----------------------------------------------------
+ 
+  // Land surface temperature (O1)
+  // Normann et al., 1995 cf. Rasmus Houborg 2006
+  double T_0 (const double T_c /* canopy temperature [dg C]*/, 
+              const double T_soil /* soil temperature [dg C]*/,
+              const double kb /* extinction coefficient []*/,
+              const double LAI /*[m^2 m^-2]*/); // [dg C]
+  
+  // Canopy temperature (K1)
+  // Ball (1988) & Collatz et al (1991) cf. Rasmus Houborg 2006
+  double T_c (const double T_l_sun /* leaf sun temperature [dg C]*/, 
+              const double T_l_sha /* leaf shadow temperature [dg C]*/,
+              const double kb /* extinction coefficient []*/,
+              const double LAI /*[m^2 m^-2]*/); // [dg C]
+
 
 }
+
+
 
 #endif // RESISTANCE_H
