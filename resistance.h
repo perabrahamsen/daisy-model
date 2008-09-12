@@ -25,7 +25,7 @@
 struct Treelog;
 
 namespace Resistance
-{ 
+{
   // Reference : Rasmus Houborg thesis, 2006
 
   // Function to correct diffusivities for temperature and pressure
@@ -66,8 +66,53 @@ namespace Resistance
 
 // Total conductance (leaf boundary + atmospheric) of the sunlit and shadow 
 // canopy fraction 
-    double gc_fraction (const double gb_j /*[m s¯1]*/, 
+double gc_fraction (const double gb_j /*[m s¯1]*/, 
                         const double ra /* aerodynamic resistance [s m¯1]*/); //[m s¯1]
+
+//----------------------------------------------------
+// Atmospheric aerodynamic resistance
+//----------------------------------------------------
+// Roughness lenght 
+double z_0h (const double z_0 /*roughness lenght [m]*/); //[m]
+double z_0 (const double h_veg /* vegetation heighr [m]*/, 
+              const double c_drag /* drag force [m^2 m^-2]*/,
+              const double d /* zero-plane displacement height [m]*/,
+              const double LAI /*[m^2 m^-2]*/); //[m]
+// Zero-plane displacement height
+double d (const double h_veg /* vegetation heighr [m]*/, 
+            const double c_drag /* drag force [m^2 m^-2]*/,
+            const double LAI /*[m^2 m^-2]*/); //[m]
+  
+// Atmospheric stability indicator
+double N (const double z /* reference height above canopy [m]*/, 
+            const double d /* displacement height [m]*/,
+            const double T_0 /* land surface temp [dg C]*/, 
+            const double T_a /* air temp [dg C]*/, 
+            const double U_z /* surface wind speed [m s^-1]*/); //[]
+
+// Aerodynamic resistance between canopy source height and reference 
+// height above the canopy (F5)
+double r_a (const double z /* reference height above canopy [m]*/, 
+              const double z_0 /* Roughness lenght for momentum transport [m]*/, 
+              const double z_0h /* Roughness lenght for sensible heat transfer[m]*/,
+              const double d /* displacement height [m]*/,
+              const double N /* atm stability indicator []*/, 
+              const double U_z /* surface wind speed [m s^-1]*/); //[s m^-1]
+
+
+//----------------------------------------------------
+// Soil aerodynamic resistance (Norman et al., 1995 cf. Rasmus Houborg)
+//----------------------------------------------------
+// Wind speed at the top of the canopy (L1)
+  double U_c (const double z_r /* reference height above canopy [m]*/, 
+              const double z_0 /* Roughness lenght for momentum transport [m]*/, 
+              const double d /* displacement height [m]*/,
+              const double U_z /* surface wind speed [m s^-1]*/, 
+              const double T_0 /* land surface temp [dg C]*/, 
+              const double T_a /* air temp [dg C]*/,       
+              const double h_veg /* vegetation heighr [m]*/,      
+              const double r_a /* Aerodynamic resistance [s m^-1]*/, 
+              const double rho_a /* air density [kg m^-3]*/);
 
 }
 

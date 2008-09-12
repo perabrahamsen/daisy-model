@@ -31,7 +31,11 @@
 
 namespace Resistance
 { 
-  // Reference : Rasmus Houborg thesis, 2006
+  // Reference : Rasmus Houborg thesis, 2006: 
+  //             Inferences of key Environmental and Vegetation Biophysical 
+  //             Controls for use in Regional-scale SVAT Modelling
+  //             Using Terra and Agua MODIS and Weather Prediction Data.
+  //             Institute of Geography, University of Copenhagen.
   
   const double P_surf = 101300; //Surface atmospheric pressure [Pa]
   const double TK = 273.15;  //Constant to convert celcius to Kelvin []
@@ -42,25 +46,28 @@ namespace Resistance
   const double g = 9.82; // Gravitational acceleration [m s^-2]
   const double ku = 0.5; // Parameter that describes the vertical variation 
                          // of wind speed within the canopy
-
+  const double z_0b = 0.0006; // Bare soil roughness height for momentum [m]
+  const double k = 0.41; // Von Karman's constant
 }
-
+//----------------------------------------------------
+// Boundary layer conductance
+//----------------------------------------------------
 // Function to correct diffusivities for temperature and pressure (G1)
 double 
-Resistance::Cl (const double T_air)
+Resistance::Cl (const double T_a)
 { 
   const double Cl = (1013.0 /(0.01 * P_surf)) 
-    * pow(((T_air + TK)/(TK + 0.01)), 1.81); 
+    * pow(((T_a + TK)/(TK + 0.01)), 1.81); 
   return Cl; // []
 }
 
 // Boundary conductance for a leaf due to free convection for heat (G2)
 double 
-Resistance::gbf_heat (const double Cl/*[]*/, const double T_air /*[dg C]*/, 
+Resistance::gbf_heat (const double Cl/*[]*/, const double T_a /*[dg C]*/, 
                       const double T_l_sun /*[dg C]*/, const double wl /*[m]*/) 
 {
   const double gbf_heat = d_heat * Cl / wl
-    * pow((g * pow(wl,3)/sqr(v * Cl) * (T_l_sun - T_air))/(T_air + TK),0.25);
+    * pow((g * pow(wl,3)/sqr(v * Cl) * (T_l_sun - T_a))/(T_a + TK),0.25);
   return gbf_heat;// [m s¯1]
 }
 
@@ -90,10 +97,10 @@ Resistance::gbf_H2O_hypo(const double gbf_heat /*[m s¯1]*/, const double Cl /*[]
 
 // Boundary conductance for a leaf due to forced convection for heat (G5)
 double 
-Resistance::gbu_heat (const double Uz /*surface wind speed [m s^-1]*/, 
+Resistance::gbu_heat (const double U_z /*surface wind speed [m s^-1]*/, 
                       const double wl /*[m]*/, const double LAI /*[]*/) 
 {
-  const double gbu_heat = 2 * 0.003 * pow((Uz * exp(-ku * LAI)/wl), 0.5); 
+  const double gbu_heat = 2 * 0.003 * pow((U_z * exp(-ku * LAI)/wl), 0.5); 
   return gbu_heat; // [m s¯1]
 }
 
@@ -173,5 +180,113 @@ Resistance::gc_fraction (const double gb_j /*[m s¯1]*/,
   const double gb_fraction = 1/((1/gb_j) + ra);
   return gb_fraction; // [m s¯1]
 }
+
+//----------------------------------------------------
+// Atmospheric aerodynamic resistance
+//----------------------------------------------------
+
+// Roughness lenght for sensible heat transfer (F1)
+double 
+Resistance::z_0h (const double z_0 /*roughness lenght [m]*/)
+{
+  const double z_0h = z_0 / 7.0;
+  return z_0h; // [m]
+}
+
+// Roughness lenght for momentum transport (F2)
+double 
+Resistance::z_0 (const double h_veg /* vegetation heighr [m]*/, 
+                 const double c_drag /* drag force [m^2 m^-2]*/,
+                 const double d /* zero-plane displacement height [m]*/,
+                 const double LAI /*[m^2 m^-2]*/)
+{
+  double z_0;
+  if (LAI < 3)
+    z_0 = z_0b + 0.3 * h_veg * sqrt(c_drag * LAI);
+  else 
+    z_0 = 0.3 * h_veg * (1 - d/h_veg);
+  return z_0; // [m]
+}
+
+// Zero-plane displacement height [m] (F3)
+double 
+Resistance::d (const double h_veg /* vegetation heighr [m]*/, 
+               const double c_drag /* drag force [m^2 m^-2]*/,
+               const double LAI /*[m^2 m^-2]*/)
+{
+  const double d = 1.1 * h_veg * log(1. + pow(c_drag * LAI, 0.25));
+  return d; // [m]
+}
+
+// Atmospheric stability indicator (F4)
+double 
+Resistance::N (const double z /* reference height above canopy [m]*/, 
+               const double d /* displacement height [m]*/,
+               const double T_0 /* land surface temp [dg C]*/, 
+               const double T_a /* air temp [dg C]*/, 
+               const double U_z /* surface wind speed [m s^-1]*/)
+{
+  const double N = 5. * (z - d) * g * (T_0 - T_a)/((T_a + TK) * sqr(U_z));
+  return N; // []
+}
+
+// Aerodynamic resistance between canopy source height and reference 
+// height above the canopy (F5)
+double 
+Resistance::r_a (const double z /* reference height above canopy [m]*/, 
+                 const double z_0 /* Roughness lenght for momentum transport [m]*/, 
+                 const double z_0h /* Roughness lenght for sensible heat transfer[m]*/,
+                 const double d /* displacement height [m]*/,
+                 const double N /* atm stability indicator []*/, 
+                 const double U_z /* surface wind speed [m s^-1]*/)
+{
+  const double A = 1.0; //????????????????????????????
+  const double B = log((z - d)/z_0h) + 2. * N * log((z - d)/z_0); 
+  const double C = N * sqr(log ((z - d)/z_0));
+  const double S = (B - sqrt(sqr (B) - 4 * A * C))/(2 * A);
+
+  double r_a;
+  if (N <= 0)
+    r_a = (log((z - d)/z_0) - S) * (log((z - d)/z_0h) - S) * 1/(sqr (k) * U_z);
+  else
+    r_a = (log((z - d)/z_0) * log((1 - d)/z_0h))
+      / (exp (log(sqrt(k)) + log(U_z) + 0.75 * log(1 + N)));
+  return r_a; // [s m^-1]
+}
+
+//----------------------------------------------------
+// Soil aerodynamic resistance (Norman et al., 1995 cf. Rasmus Houborg)
+//----------------------------------------------------
+
+// Wind speed at the top of the canopy (L1)
+double 
+Resistance::U_c (const double z_r /* reference height above canopy [m]*/, 
+                 const double z_0 /* Roughness lenght for momentum transport [m]*/, 
+                 const double d /* displacement height [m]*/,
+                 const double U_z /* surface wind speed [m s^-1]*/, 
+                 const double T_0 /* land surface temp [dg C]*/, 
+                 const double T_a /* air temp [dg C]*/, 
+                 const double h_veg /* vegetation heighr [m]*/,            
+                 const double r_a /* Aerodynamic resistance [s m^-1]*/, 
+                 const double rho_a /* air density [kg m^-3]*/)
+{
+
+  const double u = (U_z * k) / (log((z_r - d)/z_0));
+  const double L_mo = - (r_a * rho_a * pow(u,3) * (T_a + TK))
+                         / (g * k * (T_0 - T_a));
+
+  const double y = 1 - 15 * pow((z_r - d)/L_mo,-0.25);
+  const double psi = 2 * log((1 + y)/ 2) + log((1 + sqr(y))/2) 
+    - 2/(tan(y)) + M_PI/2.;
+
+  double U_c;
+  if (z_r/L_mo >= 0)
+    U_c = U_z * (log(h_veg - d)/z_0)/(log((z_r - d)/z_0) + 4.7 * (z_r - d)/L_mo);
+  else
+    U_c = U_z * (log(h_veg - d)/z_0)/(log((z_r - d)/z_0) - psi);
+  return U_c;
+}
+
+
 
 // resistance.C ends here.
