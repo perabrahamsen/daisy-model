@@ -50,7 +50,11 @@ namespace Resistance
   const double k = 0.41;         // Von Karman's constant []
   const double h_soil = 0.08;    // Height above the soil surface where the effect
                                  // of soil roughness is minimal [m]
+  const double m_a = 29.0;       // Molecular weight of air [g mol^-1]
+  const double R = 8.3143;       // Universal molecular gass constant [J mol^-1 K^-1]
+
 }
+
 //----------------------------------------------------
 // Boundary layer conductance
 //----------------------------------------------------
@@ -362,5 +366,15 @@ Resistance::T_c (const double T_l_sun /* leaf sun temperature [dg C]*/,
 }
 
 
+//--------------------------------------
+// and left overs - miscelaneours 
+//--------------------------------------
+// air density 
+double
+Resistance:: rho_a (const double T_a)
+{
+  const double rho_a = (P_surf * 1E-3 * m_a)/(R * (T_a + TK));
+  return rho_a; // [kg m^-3]
+}
 
 // resistance.C ends here.

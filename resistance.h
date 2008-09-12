@@ -145,8 +145,13 @@ double r_a (const double z /* reference height above canopy [m]*/,
               const double LAI /*[m^2 m^-2]*/); // [dg C]
 
 
+
+//--------------------------------------
+// and left overs - miscelaneours 
+//--------------------------------------
+
+// air density 
+  double rho_a (const double T_a); // [kg m^-3]
+
 }
-
-
-
 #endif // RESISTANCE_H
