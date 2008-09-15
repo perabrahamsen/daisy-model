@@ -72,4 +72,16 @@
   (trace DDT
 	 Heptachlor "2,4-D" Ioxynil Pendimethalin MCPP IPU Bentazon Atrazine))
 
+(defchemical colloid common
+  "Mobile colloids."
+  (decompose_rate 0 [h^-1]))
+
+(defchemical colloid-filtered solid
+  "Once mobile colloids, filtered by the soil.")
+
+(defchemistry colloids default
+  (trace colloid colloid-filtered)
+  (reaction (filter (mobile colloid) (immobile colloid-filtered))
+            (MACRO (colloid colloid))))
+
 ;;; chemestry.dai ends here.

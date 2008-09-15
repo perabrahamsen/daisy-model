@@ -841,7 +841,8 @@ The total amount of water in the soil interval")
   "Content, transport and transformation of chemicals in the field."
   (where "${colfid}field_${chemfid}.dlf")
   (summary (balance (precision 3)
-                    (input "Spray" "Deposit" "External" "Transform")
+                    (input "Spray" "Deposit" "External" "Surface Transform" 
+                           "Soil Transform")
                     (output "Harvest" "Dissipate" "Surface Decompose" "Runoff"
                             "Soil Decompose" "Leak-Matrix" "Tertiary" 
                             "Drain" "Uptake")
@@ -878,6 +879,12 @@ The total amount of water in the soil interval")
                    (handle sum)
                    (dimension "g/ha/&")
                    (spec chemical default surface_decompose))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         surface_transform)
+                   (tag "Surface Transform")
+                   (handle sum)
+                   (dimension "g/ha/&")
+                   (spec chemical default surface_transform))
            (number (path column "${column}" Chemistry "*" trace "${chemical}"
                          surface_runoff)
                    (tag Runoff)
@@ -927,7 +934,7 @@ The total amount of water in the soil interval")
                      (spec chemical default S_decompose))
            (interval (path column "${column}" Chemistry "*" 
                            trace "${chemical}" S_transform)
-                     (tag "Transform")
+                     (tag "Soil Transform")
                      (handle sum)
                      (dimension "g/ha/&")
                      (spec chemical default S_transform))

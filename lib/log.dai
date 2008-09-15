@@ -1281,7 +1281,7 @@ content of 'Atrazine' on the soil.  If you don't specify chemical, the
 sum of all chemicals will be logged."
   (where "${colfid}surface_chemicals.dlf")
   (summary (balance (precision 3)
-                    (input spray deposit)
+                    (input spray deposit surface_transform)
                     (output canopy_harvest canopy_dissipate
 			    surface_decompose 
                             surface_runoff surface_out surface_tillage)
@@ -1363,6 +1363,11 @@ sum of all chemicals will be logged."
                    (handle sum)
                    (dimension "g/ha/&")
                    (spec chemical default surface_runoff))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         surface_transform)
+                   (handle sum)
+                   (dimension "g/ha/&")
+                   (spec chemical default surface_transform))
            (number (path column "${column}" Chemistry "*" trace "${chemical}"
                          surface_decompose)
                    (handle sum)

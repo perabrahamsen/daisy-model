@@ -1,14 +1,22 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* test-mibsol.dai
+
 * Colloids
 
 ** test setup
+
+*** tilføj sekundært og tertiært domæne.
+
+*** skriv specialiseret log fil.
 
 * Tertiary 
 
 ** Små tidsskridt
 
 ** Option to disable in top nodes.
+
+Kun matrix -> biopore ?
 
 * Next?
 
