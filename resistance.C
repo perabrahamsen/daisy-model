@@ -29,32 +29,6 @@
 #include "mathlib.h"
 #include "librarian.h"
 
-namespace Resistance
-{ 
-  // Reference : Rasmus Houborg thesis, 2006: 
-  //             Inferences of key Environmental and Vegetation Biophysical 
-  //             Controls for use in Regional-scale SVAT Modelling
-  //             Using Terra and Agua MODIS and Weather Prediction Data.
-  //             Institute of Geography, University of Copenhagen.
-  
-  const double P_surf = 101300;  //Surface atmospheric pressure [Pa]
-  const double TK = 273.15;      //Constant to convert celcius to Kelvin []
-  const double v = 0.00001327;   // Molecular viscosity [m^2 s^-1]
-  const double d_heat = 0.00001869; // Diffusivity of heat [m^2 s^-1]
-  const double d_CO2  = 0.00001381; // Diffusivity of CO2 [m^2 s^-1]
-  const double d_H2O  = 0.00002178; // Diffusivity of H2O [m^2 s^-1]
-  const double g = 9.82;         // Gravitational acceleration [m s^-2]
-  const double ku = 0.5;         // Parameter that describes the vertical variation 
-                                 // of wind speed within the canopy
-  const double z_0b = 0.0006;    // Bare soil roughness height for momentum [m]
-  const double k = 0.41;         // Von Karman's constant []
-  const double h_soil = 0.08;    // Height above the soil surface where the effect
-                                 // of soil roughness is minimal [m]
-  const double m_a = 29.0;       // Molecular weight of air [g mol^-1]
-  const double R = 8.3143;       // Universal molecular gass constant [J mol^-1 K^-1]
-
-}
-
 //----------------------------------------------------
 // Boundary layer conductance
 //----------------------------------------------------
@@ -121,7 +95,7 @@ Resistance::gbu_CO2 (const double gbu_H2O /*[m s¯1]*/, const double Cl /*[]*/)
 }
 
 // Boundary conductance for a leaf due to forced convection for H2O (G6)
-// For amphistomatous leaves
+// For amphistomatous leaves (possesing stomata on both surfaces)
 double 
 Resistance::gbu_H2O_amph (const double gbu_heat /*[m s¯1]*/, const double Cl /*[]*/)
 {
@@ -160,7 +134,7 @@ Resistance::gbu_sun (const double gbu_j /*[m s¯1]*/, const double LAI /*[]*/,
 // Boundary conductance of the shadow canopy fraction due to forced
 // convection for heat, H2O, and CO2 (j = heat, H2O, and CO2) (G9)
 double 
-Resistance::gbu_shadow (const double kb, const double gbu_j /*[m s¯1]*/, 
+Resistance::gbu_shadow (const double gbu_j /*[m s¯1]*/, const double kb,  
                         const double LAI /*[m^2 m^-2]*/)
 {
   const double gbu_shadow = gbu_j 
@@ -168,7 +142,24 @@ Resistance::gbu_shadow (const double kb, const double gbu_j /*[m s¯1]*/,
        - (1 - exp(-(0.5 * ku + kb) * LAI))/(0.5 * ku + kb)) ;
   return gbu_shadow; // [m s¯1]
 }
+// Boundary conductance of the sunlit canopy fraction due to free
+// convection for heat, H2O, and CO2 (j = heat, H2O, and CO2) (G9)
+double 
+Resistance::gbf_sun (const double gbf_j /*[m s¯1]*/, const double LAI_sun /*[]*/)
+{
+  const double gbf_sun = gbf_j * LAI_sun; 
+  return gbf_sun; // [m s¯1]
+}
 
+// Boundary conductance of the shadow canopy fraction due to free
+// convection for heat, H2O, and CO2 (j = heat, H2O, and CO2) (G9)
+double 
+Resistance::gbf_shadow (const double gbf_j /*[m s¯1]*/, 
+                        const double LAI_shadow /*[m^2 m^-2]*/)
+{
+  const double gbf_shadow = gbf_j * LAI_shadow;
+  return gbf_shadow; // [m s¯1]
+}
 // Boundary conductance of the sunlit and shadow canopy fraction for 
 // heat, H2O, and CO2 (j = heat, H2O, and CO2) (G10)
 double 
@@ -311,7 +302,6 @@ Resistance::l_m (const double w_l /* leaf width [m]*/)
     return l_m; // [m]
 }
 
-// Wind speed above the soil surface (L3)
 double 
 Resistance::U_s (const double l_m /* mean leaf size [m]*/,
                  const double h_veg /* vegetation height [m]*/, 
@@ -371,7 +361,7 @@ Resistance::T_c (const double T_l_sun /* leaf sun temperature [dg C]*/,
 //--------------------------------------
 // air density 
 double
-Resistance:: rho_a (const double T_a)
+Resistance:: rho_a (const double T_a /*[dg C]*/)
 {
   const double rho_a = (P_surf * 1E-3 * m_a)/(R * (T_a + TK));
   return rho_a; // [kg m^-3]

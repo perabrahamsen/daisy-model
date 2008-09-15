@@ -26,7 +26,28 @@ struct Treelog;
 
 namespace Resistance
 {
-  // Reference : Rasmus Houborg thesis, 2006
+  // Reference : Rasmus Houborg thesis, 2006: 
+  //             Inferences of key Environmental and Vegetation Biophysical 
+  //             Controls for use in Regional-scale SVAT Modelling
+  //             Using Terra and Agua MODIS and Weather Prediction Data.
+  //             Institute of Geography, University of Copenhagen.
+  
+  const double P_surf = 101300;  //Surface atmospheric pressure [Pa]
+  const double TK = 273.15;      //Constant to convert celcius to Kelvin []
+  const double v = 0.00001327;   // Molecular viscosity [m^2 s^-1]
+  const double d_heat = 0.00001869; // Diffusivity of heat [m^2 s^-1]
+  const double d_CO2  = 0.00001381; // Diffusivity of CO2 [m^2 s^-1]
+  const double d_H2O  = 0.00002178; // Diffusivity of H2O [m^2 s^-1]
+  const double g = 9.82;         // Gravitational acceleration [m s^-2]
+  const double ku = 0.5;         // Parameter that describes the vertical variation 
+                                 // of wind speed within the canopy
+  const double z_0b = 0.0006;    // Bare soil roughness height for momentum [m]
+  const double k = 0.41;         // Von Karman's constant []
+  const double h_soil = 0.08;    // Height above the soil surface where the effect
+                                 // of soil roughness is minimal [m]
+  const double m_a = 29.0;       // Molecular weight of air [g mol^-1]
+  const double R = 8.3143;       // Universal molecular gass constant [J mol^-1 K^-1]
+
 
   // Function to correct diffusivities for temperature and pressure
   double Cl(double T_air /*[dg C]*/);// []  
@@ -50,21 +71,28 @@ namespace Resistance
 
 // Boundary conductance of the sunlit and shaded canopy fraction due to free convection
   double gbf_fraction (const double gbf_j /*[m s¯1]*/, 
-                       const double LAI_fraction /*[]*/); // [m s¯1
+                       const double LAI_fraction /*[]*/); // [m s¯1]
 
 // Boundary conductance of the sunlit canopy fraction due to forced convection
-  double gbu_sun (const double gbu_j /*[m s¯1]*/, const double LAI /*[]*/,
-                  const double kb /*extinction coefficient []*/); // [m s¯1]
+  double gbu_sun (const double gbu_j /*[m s¯1]*/, const double kb /*[]*/, 
+                  const double LAI /*[]*/); // [m s¯1]
 
 // Boundary conductance of the shadow canopy fraction due to forced convection
-  double gbu_shadow (const double kb, const double gbu_j /*[m s¯1]*/, 
-                     const double LAI /*[]*/); // [m s¯1
+  double gbu_shadow (const double gbu_j /*[m s¯1]*/, const double kb /*[]*/,
+                     const double LAI /*[]*/); // [m s¯1]
 
-// Boundary conductance of the sunlit and shadow canopy fraction 
+// Boundary conductance of the sunlit canopy fraction due to free convection
+  double gbf_sun (const double gbf_j /*[m s¯1]*/, const double LAI_sun /*[]*/);
+  
+// Boundary conductance of the shadow canopy fraction due to free convection
+  double gbf_shadow (const double gbf_j /*[m s¯1]*/, 
+                     const double LAI_shadow /*[m^2 m^-2]*/);
+  
+  // Boundary conductance of the sunlit and shadow canopy fraction 
   double gb_fraction (const double gbu_j /*[m s¯1]*/, 
                       const double gbf_j /*[m s¯1]*/); // [m s¯19
-
-// Total conductance (leaf boundary + atmospheric) of the sunlit and shadow 
+  
+  // Total conductance (leaf boundary + atmospheric) of the sunlit and shadow 
 // canopy fraction 
 double gc_fraction (const double gb_j /*[m s¯1]*/, 
                         const double ra /* aerodynamic resistance [s m¯1]*/); //[m s¯1]
@@ -93,12 +121,12 @@ double N (const double z /* reference height above canopy [m]*/,
 // Aerodynamic resistance between canopy source height and reference 
 // height above the canopy (F5)
 double r_a (const double z /* reference height above canopy [m]*/, 
-              const double z_0 /* Roughness lenght for momentum transport [m]*/, 
-              const double z_0h /* Roughness lenght for sensible heat transfer[m]*/,
-              const double d /* displacement height [m]*/,
-              const double N /* atm stability indicator []*/, 
-              const double U_z /* surface wind speed [m s^-1]*/); //[s m^-1]
-
+            const double z_0 /* Roughness lenght for momentum transport [m]*/, 
+            const double z_0h /* Roughness lenght for sensible heat transfer[m]*/,
+            const double d /* displacement height [m]*/,
+            const double N /* atm stability indicator []*/, 
+            const double U_z /* surface wind speed [m s^-1]*/); //[s m^-1]
+  
 //----------------------------------------------------
 // Soil aerodynamic resistance (Norman et al., 1995 cf. Rasmus Houborg)
 //----------------------------------------------------
