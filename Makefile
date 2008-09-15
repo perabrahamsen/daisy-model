@@ -1403,6 +1403,9 @@ nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
 version${OBJ}: version.C
+svat_ssoc${OBJ}: svat_ssoc.C svat.h model.h symbol.h alist.h syntax.h \
+  treelog.h block.h plf.h librarian.h resistance.h net_radiation.h \
+  assertion.h mathlib.h
 reaction_MACRO${OBJ}: reaction_MACRO.C reaction.h model.h symbol.h alist.h \
   mathlib.h assertion.h check.h block.h syntax.h treelog.h plf.h \
   librarian.h chemistry.h chemical.h log.h time.h border.h geometry.h \
