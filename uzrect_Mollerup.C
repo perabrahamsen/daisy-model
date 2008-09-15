@@ -65,7 +65,9 @@ struct UZRectMollerup : public UZRect
   const int max_number_of_small_time_steps;
   const int msg_number_of_small_time_steps;
   const double max_absolute_difference;
-  const double max_relative_difference;  
+  const double max_relative_difference;
+  const double max_pressure_potential;
+  const double min_pressure_potential;
   const bool use_forced_T;
   const double forced_T;
   const int debug;
@@ -250,9 +252,9 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
                         << " small timesteps. Time left: " << time_left 
                         << " [h]";
           msg.message (tmp_timesteps.str ());
-        }
+        } 
 
-
+      
       // Initialization for each small time step.
       int iterations_used = 0;
       if (ddt > time_left)
@@ -418,7 +420,21 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	      tmp << "Theta = " << Theta << "\n";
 	      msg.message (tmp.str ());
 	    }
-	}
+          
+          for (int c=0; c < cell_size; c++)
+            {
+              if (h (c) < min_pressure_potential || h (c) > max_pressure_potential)
+                {
+                  std::ostringstream tmp;
+                  tmp << "Pressure potential out of realistic range, h[" 
+                      << c << "] = " << h (c) << "\n";
+                  msg.message (tmp.str ());
+                  iterations_used = max_iterations + 100;
+                  break;
+                } 
+            }
+        }
+
       while (!converges (h_conv, h)
 	     && iterations_used <= max_iterations);
       
@@ -1055,15 +1071,21 @@ Maximum absolute difference in 'h' values for convergence.");
   syntax.add ("max_relative_difference", Syntax::None (), Syntax::Const, "\
 Maximum relative difference in 'h' values for convergence.");
   alist.add ("max_relative_difference", 0.001); 
+  syntax.add ("max_pressure_potential", Syntax::None (), Syntax::Const, "\
+Maximum pressure potential for convergence.");
+  alist.add ("max_pressure_potential", 1000.0); 
+  syntax.add ("min_pressure_potential", Syntax::None (), Syntax::Const, "\
+minimum pressure potential for convergence.");
+  alist.add ("min_pressure_potential", -1.0e9); 
   syntax.add ("forced_T", "dg C", Syntax::OptionalConst, "\
 Force transport equations to use this water temperature.");
   syntax.add ("debug", Syntax::Integer, Syntax::Const, "\
-Level of debug messages:\n\
- \n\
-= 0: no debug messages.\n\
+Level of debug messages:\n                              \
+ \n                                                     \
+= 0: no debug messages.\n                               \
 > 0: Initial h and Theta per time step.\n\
-> 1: Same, per iteration.\n\
-= 3: Upper boundary extra info.\n\
+> 1: Same, per iteration.\n              \
+= 3: Upper boundary extra info.\n        \
 = 4: Drain extra info.\n\
 = 5: Remaining water.");
   alist.add ("debug", 0);
@@ -1083,6 +1105,8 @@ UZRectMollerup::UZRectMollerup (Block& al)
     msg_number_of_small_time_steps (al.integer ("msg_number_of_small_time_steps")),
     max_absolute_difference (al.number ("max_absolute_difference")),
     max_relative_difference (al.number ("max_relative_difference")),
+    max_pressure_potential (al.number ("max_pressure_potential")),
+    min_pressure_potential (al.number ("min_pressure_potential")),
     use_forced_T (al.check ("forced_T")),
     forced_T (al.number ("forced_T", -42.42e42)),
     debug (al.integer ("debug"))
