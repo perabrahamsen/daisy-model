@@ -666,6 +666,14 @@ BioclimateStandard::RadiationDistribution (const Vegetation& vegetation,
   absorbed_total_Long_canopy = incoming_longwave_radiation * (cover);
   absorbed_sun_Long_canopy = absorbed_total_Long_canopy * sun_LAI_fraction_total;
   absorbed_shadow_Long_canopy = absorbed_total_Long_canopy - absorbed_sun_Long_canopy;
+  
+  // Variables for SVAT
+  const double Rad_abs_soil = absorbed_total_Long_soil + absorbed_total_NIR_soil
+    + absorbed_total_PAR_soil;
+  const double Rad_abs_sun_canopy = absorbed_sun_Long_canopy + absorbed_sun_NIR_canopy
+    + absorbed_sun_PAR_canopy;
+  const double Rad_abs_shadow_canopy =  absorbed_shadow_Long_canopy 
+    + absorbed_shadow_NIR_canopy + absorbed_shadow_PAR_canopy;
 
 }
 
