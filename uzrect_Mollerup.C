@@ -41,6 +41,7 @@
 #include "librarian.h"
 #include "tertsmall.h"
 #include "anystate.h"
+#include "average.h"
 
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
@@ -58,7 +59,7 @@ struct UZRectMollerup : public UZRect
 
   // Parameters.  
   const std::auto_ptr<Solver> solver;
-  const double edge_arithmetic_height;
+  std::auto_ptr<const Average> K_average;  
   const int max_time_step_reductions;
   const int time_step_reduction;
   const int max_iterations; 
@@ -168,6 +169,8 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
                 const double dt, Treelog& msg)
 
 {
+  daisy_assert (K_average.get ());
+
   const size_t edge_size = geo.edge_size (); // number of edges 
   const size_t cell_size = geo.cell_size (); // number of cells 
 
@@ -291,7 +294,8 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
         }
 
       std::vector<top_state> state (edge_above.size (), top_undecided);
-
+      
+      
       do // Start iteration loop
 	{
 	  h_conv = h;
@@ -315,20 +319,8 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 		    = K[from] * anisotropy_factor (geo, e, soil, from);
 		  const double K_to
 		    = K[to] * anisotropy_factor (geo, e, soil, to);
-
-                  // We have to use arithmetic average near the top of
-                  // the soil, otherwise we risk development an water
-                  // resistent crust to appear dut to soil
-                  // evaporation.  In Danish soil heterogeneity will
-                  // allow water to wet up the soil anyway.
-                  const bool top_edge 
-                    = geo.edge_center_z (e) > edge_arithmetic_height;
-
-                  if (top_edge)
-                    Kedge[e] = (K_from + K_to) / 2.0; 
-                  else
-                    // Harmonic average is more correct.
-                    Kedge[e] = 2.0/(1.0/K_from + 1.0/K_to);
+                    
+                  Kedge[e] = (*K_average)(K_from, K_to); //use right average method 
 		} 
 	    }
 
@@ -1040,14 +1032,10 @@ UZRectMollerup::load_syntax (Syntax& syntax, AttributeList& alist)
 		     Syntax::Const, Syntax::Singleton, "\
 Model used for solving matrix equation system.");
   alist.add ("solver", Solver::default_model ());
-
-  syntax.add ("edge_arithmetic_height", "cm", Syntax::Const, "\
-\n\
-We have to use arithmetic average near the top of the soil, otherwise\n\
-we risk development an water resistent crust to appear dut to soil\n\
-evaporation.  In Danish soil heterogeneity will allow water to wet up\n\
-the soil anyway.");
-  alist.add ("edge_arithmetic_height", -15.0);
+  syntax.add_object ("K_average", Average::component,
+                     Syntax::Const, Syntax::Singleton,
+                     "Model for calculating average K between cells.");
+  alist.add ("K_average", Average::arithmetic_model ());
   syntax.add ("max_time_step_reductions",
               Syntax::Integer, Syntax::Const, "\
 Number of times we may reduce the time step before giving up");
@@ -1097,7 +1085,7 @@ Water mass balance error per cell.");
 UZRectMollerup::UZRectMollerup (Block& al)
   : UZRect (al),
     solver (Librarian::build_item<Solver> (al, "solver")),
-    edge_arithmetic_height (al.number ("edge_arithmetic_height")),
+    K_average (Librarian::build_item<Average> (al, "K_average")),
     max_time_step_reductions (al.integer ("max_time_step_reductions")),
     time_step_reduction (al.integer ("time_step_reduction")),
     max_iterations (al.integer ("max_iterations")),

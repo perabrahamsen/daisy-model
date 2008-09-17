@@ -176,8 +176,8 @@ SVAT_SSOC::tick (const Weather& weather, const Vegetation& vegetation,
   z_r = weather.screen_height (); //reference height
   U_z = wind_speed_field;   // wind speed at reference height [m s^-1]
   h_veg = vegetation.height () / 100.; // vegetation height [m]  
-  w_l = vegetation.leaf_width () / 100.; // leaf width [m] 
-
+  //w_l = vegetation.leaf_width () / 100.; // leaf width [m] 
+  w_l = 0.03;
 
 }
 
