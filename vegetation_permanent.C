@@ -89,6 +89,8 @@ struct VegetationPermanent : public Vegetation
   { return canopy.CAI; }
   double height () const
   { return canopy.Height; }
+  double leaf_width () const
+  { return canopy.leaf_width; }
   double cover () const
   { 
     daisy_assert (cover_ >= 0.0);
@@ -437,6 +439,9 @@ Yearly LAI measurements.", VegetationPermanent::YearlyLAI::load_syntax);
     syntax.add ("Height", "cm", Check::positive (), Syntax::Const, 
 		"permanent height of vegetation.");
     alist.add ("Height", 80.0);
+    syntax.add ("leaf_width", "cm", Check::positive (), Syntax::Const, 
+		"Leaf_width of vegetation.");
+    alist.add ("Leaf_width", 3.0);
     syntax.add ("N_per_LAI", "kg N/ha/LAI", Check::positive (), Syntax::Const,
 		"N content as function of LAI.");
     alist.add ("N_per_LAI", 10.0);

@@ -34,6 +34,7 @@ void
 CanopySimple::output (Log& log) const
 {
   output_variable (Height, log);
+  output_variable (leaf_width, log);
   output_variable (CAI, log);
   output_variable (LAIvsH, log);
 }
@@ -81,6 +82,8 @@ CanopySimple::load_syntax (Syntax& syntax, AttributeList& alist)
   // Variables.
   syntax.add ("Height", "cm", Syntax::State, "Crop height.");
   alist.add ("Height", 0.0);
+  syntax.add ("leaf_width", "cm", Syntax::State, "Leaf width.");
+  alist.add ("leaf_width", 3.0);
   syntax.add ("CAI", "m^2/m^2", Syntax::LogOnly, "Crop Area Index.");
   syntax.add ("LAIvsH", "cm", "m^2/m^2", Syntax::LogOnly,
 	      "Accumulated Leaf Area Index at Height.");
@@ -98,6 +101,7 @@ CanopySimple::CanopySimple (const AttributeList& vl)
     rs_max (vl.number ("rs_max")),
     rs_min (vl.number ("rs_min")),
     Height (vl.number ("Height")),
+    leaf_width (vl.number ("leaf_width")),
     CAI    (0.0)
 { }
 

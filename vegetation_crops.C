@@ -62,6 +62,7 @@ struct VegetationCrops : public Vegetation
   double shared_light_fraction_; // Light not reserved a specific crop.
   double LAI_;			// Total LAI of all crops on this column [0-]
   double height_;		// Max crop height in canopy [cm]
+  double leaf_width_;           // Leaf width in canopy [cm]
   double cover_;		// Fraction of soil covered by crops [0-1]
   PLF LAIvsH_;			// LAI below given height [f: cm -> R]
   PLF HvsLAI_;			// Height with LAI below [f: R -> cm]
@@ -92,6 +93,8 @@ struct VegetationCrops : public Vegetation
   { return LAI_; }
   double height () const
   { return height_; }
+  double leaf_widtht () const
+  { return leaf_width_; }
   double cover () const
   { return cover_; }
   const PLF& LAIvsH () const
@@ -875,6 +878,7 @@ VegetationCrops::VegetationCrops (Block& al)
     shared_light_fraction_ (1.0),
     LAI_ (0.0),
     height_ (0.0),
+    leaf_width_ (0.0),
     cover_ (0.0),
     LAIvsH_ (),
     HvsLAI_ (),

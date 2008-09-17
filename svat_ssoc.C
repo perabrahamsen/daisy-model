@@ -30,6 +30,7 @@
 #include "fao.h"
 #include "net_radiation.h"
 #include "weather.h"
+#include "vegetation.h"
 #include "assertion.h"
 #include "log.h"
 #include "treelog.h"
@@ -46,10 +47,14 @@ struct SVAT_SSOC : public SVAT
 
   // Driving variables.
   // - Upper boundary
-
+  double z_r;            // Referebce height above canopy == screen height [m]
   double RH;             // Relative humidity []
+  double U_z;            // Surface wind speed [m s^-1]
+
   // - Lower boundary 
   // - Canopy
+  double h_veg;          // Vegetation height [m] 
+  double w_l;            // leaf width [m] 
   bool hypostomatous;    // True for hypostomatous leaves;
   // Intermediate variables.
   double rho_a;          // Air density [kg m^-3]
@@ -57,18 +62,19 @@ struct SVAT_SSOC : public SVAT
   double e_sat;          // Saturatet water vapour pressure [Pa]
 
   // - Temperatures * 4
-  double T_s;            // Soil surface temperature [dg C]
-  double T_c;            // Canopy-point temperature [dg C]
-  double T_sun;          // Temperature of sunlit leaves [dg C]
-  double T_shadow;       // Temperature of shadow leaves [dg C]
+  double T_a;          // Air surface temperature [dg C]
+  double T_s;          // Soil surface temperature [dg C]
+  double T_c;          // Canopy-point temperature [dg C]
+  double T_sun;        // Temperature of sunlit leaves [dg C]
+  double T_shadow;     // Temperature of shadow leaves [dg C]
   // - Conductivities * 4
-  double g_a;            // Heat conductance of atmosphere [ ]
-  double g_s;            // Stomatal conductance
-  double g_H_s_c;        // Heat conductance from soil surface to canopy point
-  double g_H_sun_c;      // Heat conductance from sunlit leaves to canopy point
-  double g_W_sun_c;      // Water conductance from sunlit leaves to canopy point
-  double g_H_shadow_c;   // Heat conductance from shadow leaves to canopy point
-  double g_W_shadow_c;   // Water conductance from shadow leaves to canopy point
+  double g_a;          // Heat conductance of atmosphere [m s^-1]
+  double g_s;          // Stomatal conductance [m s^-1]
+  double g_H_s_c;      // Heat conductance from soil surface to canopy point [m s^-1]
+  double g_H_sun_c;    // Heat conductance from sunlit leaves to canopy point [m s^-1]
+  double g_W_sun_c;    // Water conductance from sunlit leaves to canopy point [m s^-1]
+  double g_H_shadow_c; // Heat conductance from shadow leaves to canopy point [m s^-1]
+  double g_W_shadow_c; // Water conductance from shadow leaves to canopy point [m s^-1]
 
   // - Inter-intermediates variables
   double G_R;       // Radiation "conductivity" [W m^-2 K^-1]
@@ -105,15 +111,10 @@ struct SVAT_SSOC : public SVAT
 	     double /* pond_ea */, double /* soil_ea */,
              double /* crop_ea */, double /* crop_ep */); 
 
-  void calculate_conductances(const double z_r /* ref height above canopy [m]*/, 
-                              const double c_drag /*drag force [m^2 m^-2]*/,
-                              const double U_z /* surface wind speed [m s^-1]*/,
-                              const double w_l /* leaf width [m]*/, 
-                              const double h_veg /* vegetation height [m]*/, 
+  void calculate_conductances(const double c_drag /*drag force [m^2 m^-2]*/,
                               const double LAI /*[m^2 m^-2]*/,
                               const double sun_LAI_fraction_total /*[]*/,
                               const double gs_mol /* stomata cond. [mol/m^2/s]*/,
-                              const double T_a /* air temperature [dg C]*/, 
                               const double T_c /* canopy temperature [dg C]*/, 
                               const double T_soil /* soil temperature [dg C]*/, 
                               const double T_sun_last /*leaf sun temperature [dg C]*/,
@@ -163,31 +164,29 @@ const double SVAT_SSOC::c_p = 1010.;     //Specific heat of air.[J/kg/K^1]
 
 // Simulation.
 void
-SVAT_SSOC::tick (const Weather& weather, const Vegetation&,
+SVAT_SSOC::tick (const Weather& weather, const Vegetation& vegetation,
 	     const Surface&, const Soil&, const SoilHeat&,
 	     const SoilWater&, const Pet&,
-	     double /* canopy_ea */, double /* snow_ea */,
+	     double wind_speed_field /*[m s^-1]*/, double /* snow_ea */,
 	     double /* pond_ea */, double /* soil_ea */,
              double /* crop_ea */, double /* crop_ep */)
 {
-  // Relative humidity
-  RH = weather.relative_humidity ();// []
+  RH = weather.relative_humidity (); // Relative humidity []
+  T_a = weather.hourly_air_temperature (); // air temp [dg C]
+  z_r = weather.screen_height (); //reference height
+  U_z = wind_speed_field;   // wind speed at reference height [m s^-1]
+  h_veg = vegetation.height () / 100.; // vegetation height [m]  
+  w_l = vegetation.leaf_width () / 100.; // leaf width [m] 
 
-  // indlæse driving variabler
+
 }
 
 void 
-SVAT_SSOC:: calculate_conductances(const double z_r /* ref height above canopy [m]*/, 
-                                   const double c_drag /*drag force [m^2 m^-2]*/,
-                                   const double U_z /* surface wind speed [m s^-1]*/,
-                                   const double w_l /* leaf width [m]*/, 
-                                   const double h_veg /* vegetation height [m]*/, 
+SVAT_SSOC:: calculate_conductances(const double c_drag /*drag force [m^2 m^-2]*/,
                                    const double LAI /*[m^2 m^-2]*/,
                                    const double sun_LAI_fraction_total /*[]*/,
                                    const double gs_mol /* stomata cond. [mol/m^2/s]*/,
-                                   const double T_a /* air temperature [dg C]*/, 
-                                   const double T_c /* canopy temperature [dg C]*/, 
-                                   const double T_soil /* soil temperature [dg C]*/, 
+                                   const double T_c_last /* canopy temperature [dg C]*/,                                   const double T_soil /* soil temperature [dg C]*/, 
                                    const double T_sun_last /*leaf sun temp [dg C]*/,
                                    const double kb /* extinction coefficient []*/) 
 {
