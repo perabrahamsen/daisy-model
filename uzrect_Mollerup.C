@@ -327,7 +327,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
                   if (top_edge)
                     Kedge[e] = (K_from + K_to) / 2.0; 
                   else
-                    // Hormonic average is more correct.
+                    // Harmonic average is more correct.
                     Kedge[e] = 2.0/(1.0/K_from + 1.0/K_to);
 		} 
 	    }
