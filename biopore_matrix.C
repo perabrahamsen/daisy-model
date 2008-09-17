@@ -269,23 +269,24 @@ BioporeMatrix::matrix_biopore_matrix (size_t c, const Geometry& geo,
   const double cell_z = geo.cell_z (c); // [cm]
   const double z_air = height_end + h3_bottom;
   const double h3_cell = std::max (z_air - cell_z, pressure_end); // [cm]
-  const double low_point = geo.cell_bottom (c); // [cm]
+  const double cell_bottom = geo.cell_bottom (c);
+  const double low_point = std::max (height_end, cell_bottom); // [cm]
   const double h3_min = low_point - cell_z; // [cm]
   daisy_assert (h3_min < 0.0);
 
   double S; 
   if (h3_bottom > 0.0 && h3_cell>h3_min && h3_cell>h + h_barrier)
     {
-      const double high_point = geo.cell_top (c);
-      double wall_fraction;
-      if (z_air < high_point)
-        wall_fraction = (z_air - low_point) /(high_point - low_point);
-      else 
-        wall_fraction = 1.0;      
+      const double cell_top = geo.cell_top (c);
+      const double high_point = std::min (height_start, cell_top);
+      const double wall_top = std::min (z_air, high_point);
+      const double wall_fraction
+        = (wall_top - low_point) / (cell_top - cell_bottom);
       S = - wall_fraction * biopore_to_matrix (R_wall, M_c, r_c, h, h3_cell);
     }
   else if (active && h>h3_cell + h_barrier)
-    S = matrix_to_biopore (K_xx, M_c, r_c, h, h3_cell);
+    S = matrix_to_biopore (K_xx, M_c, r_c, h, h3_cell)
+      * geo.fraction_in_z_interval (c, height_start, height_end);
   else 
     S = 0.0;
   return S;

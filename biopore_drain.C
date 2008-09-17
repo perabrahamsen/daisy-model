@@ -127,7 +127,8 @@ BioporeDrain::matrix_biopore_drain (size_t c, const Geometry& geo,
 
   double S;
   if (active && h>h_3 + h_barrier)
-    S = matrix_to_biopore (K_xx, M_c, r_c, h, h_3);
+    S = matrix_to_biopore (K_xx, M_c, r_c, h, h_3)
+      * geo.fraction_in_z_interval (c, height_start, height_end);
   else 
     S = 0.0;
   return S;

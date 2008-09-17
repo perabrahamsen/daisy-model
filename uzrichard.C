@@ -476,17 +476,24 @@ UZRichard::richard (Treelog& msg,
 	  if (!flux)
 	    {
 	      // Find flux.
-	      if (bottom_type == Groundwater::forced_flux)
-		{
-		  q[last + 1] = bottom.q_bottom (bottom_edge);
+	      switch (bottom_type)
+                {
+                case Groundwater::forced_flux:
+                case Groundwater::free_drainage:
+		  q[last + 1] = q_bottom;
 		  for (int i = last; i >= first; i--)
 		    q[i] = - (((Theta[i - first] 
 				- Theta_previous[i-first]) / ddt) + S[i])
 		      * geo.dz (i) + q[i + 1];
+                  break;
+                case Groundwater::pressure:
+                case Groundwater::lysimeter:
+                  q_darcy (geo, first, last, h_previous, h, 
+                           Theta_previous, Theta, Kplus, S, ddt, q);
+                  break;
+                default:
+                  daisy_panic ("Unknown bottom type");
 		}
-	      else
-		q_darcy (geo, first, last, h_previous, h, 
-			 Theta_previous, Theta, Kplus, S, ddt, q);
 
 	      // We take water from flux pond first.
 	      delta_top_water = q[first] * ddt;

@@ -35,6 +35,7 @@
 #include "anystate.h"
 #include "surface.h"
 #include "chemical.h"
+#include "groundwater.h"
 #include <sstream>
 
 struct TertiaryBiopores : public Tertiary, public Tertsmall
@@ -548,8 +549,14 @@ TertiaryBiopores::initialize (const Units& units,
         ok = false;
     }
   const size_t cell_size = geo.cell_size ();
+
+  const double table = groundwater.table () > 0.0
+    ? geo.bottom () - 1000.0
+    : groundwater.table ();
+
   while (active.size () < cell_size)
-    active.push_back (false);
+    active.push_back (geo.cell_z (active.size ()) < table);
+
   return ok;
 }
 

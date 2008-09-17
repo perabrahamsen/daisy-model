@@ -3236,6 +3236,113 @@ nowhere go to.  For typical setups, this value will be zero.")
                    (spec fixed Surface pond)
                    (dimension "mm"))))
 
+(defsummary "Colloids balance" balance
+  "Balance for colloids released from the soil surface by rain."
+  (precision 0)
+  (require_top true)
+  (input Generate)
+  (output Filter Drain Leak)
+  (content Surface Soil Biopores Error))
+
+(defsummary "Colloids pool balance" balance
+  "Balance for pool of readily available colloids."
+  (precision 0)
+  (input Avail-Gain)
+  (output Avail-Loss)
+  (content Avail-Surface))
+
+(deflog "Colloids" column
+  "Colloid generation and trace."
+  (where "${colfid}colloids.dlf")
+  (summary "Colloids pool balance" "Colloids balance")
+  (declare unit String "Base unit.")
+  (unit "g/m^2")
+  (when hourly)
+  (entries (number (tag "Generate")
+                   (path column "${column}" Chemistry "*" trace colloid
+                         surface_transform)
+                   (spec chemical default surface_transform)
+                   (dimension "${unit}/&")
+                   (handle sum))
+           (number (tag "Surface")
+                   (path column "${column}" Chemistry "*" trace colloid
+                         surface_storage)
+                   (spec chemical default surface_storage)
+                   (dimension "${unit}")
+                   (handle current))
+           (interval (tag "Soil-Intra")
+                     (path column "${column}" Chemistry "*" trace colloid 
+                           M_primary)
+                     (dimension "${unit}")
+                     (spec chemical default M_primary))
+           (interval (tag "Soil")
+                     (path column "${column}" Chemistry "*" trace colloid M)
+                     (dimension "${unit}")
+                     (spec chemical default M))
+           (number (tag "Biopores")
+                   (path column "${column}" Movement "*" 
+                         Tertiary biopores classes matrix solute colloid value)
+                   (spec biopore matrix solute value)
+                   ;; (dimension "${unit}")
+                   (handle current))
+           (interval (tag "Filter")
+                     (path column "${column}" Chemistry "*" trace 
+                           colloid-filtered M)
+                     (spec chemical default M)
+                     (dimension "${unit}")
+                     (handle current))
+           (interval (tag "Drain")
+                     (path column "${column}" Chemistry "*" trace colloid
+                           S_drain)
+                     (spec chemical default S_drain)
+                     (dimension "${unit}/&")
+                     (handle sum)
+                     (negate true))
+           (flux_bottom (tag "Leak")
+                        (path column "${column}" Chemistry "*" trace collodid
+                              J_matrix)
+                        (spec chemical default J_matrix)
+                        (dimension "${unit}/&")
+                        (handle sum)
+                        (negate true))
+           (interval (path column "${column}" Chemistry "*" trace colloid
+                           M_error)
+                     (tag "Error")
+                     (dimension "${unit}")
+                     (spec chemical default M_error))
+           (number (tag "R")
+                   (path column "${column}" Bioclimate default direct_rain)
+                   (spec bioclimate default direct_rain)
+                   (handle sum))
+           (number (tag "Energy")
+                   (path column "${column}" Chemistry multi
+                         combine colloids reaction MACRO E)
+                   (spec reaction MACRO E)
+                   (handle current))
+           (number (tag "Avail-Soil")
+                   (path column "${column}" Chemistry multi
+                         combine colloids reaction MACRO Ms)
+                   (spec reaction MACRO Ms)
+                   (handle current))
+	   (number (tag "Avail-Surface")
+                   (path column "${column}" Chemistry multi
+                         combine colloids reaction MACRO As)
+                   (spec reaction MACRO As)
+                   (dimension "${unit}")
+                   (handle current))
+	   (number (tag "Avail-Loss")
+                   (path column "${column}" Chemistry multi
+                         combine colloids reaction MACRO D)
+                   (spec reaction MACRO D)
+                   (dimension "${unit}/&")
+                   (handle sum))
+	   (number (tag "Avail-Gain")
+                   (path column "${column}" Chemistry multi
+                         combine colloids reaction MACRO P)
+                   (spec reaction MACRO P)
+                   (dimension "${unit}/&")
+                   (handle sum))))
+
 (deflog "Harvest" harvest)
 
 ;;; log.dai ends here

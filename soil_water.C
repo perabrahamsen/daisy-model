@@ -111,8 +111,8 @@ SoilWater::velocity_cell_primary (const Geometry& geo, const size_t c) const
       const double area_x = cos_angle * area;
       t_q_z += area_z * q;
       t_q_x += area_x * q;
-      t_area_z = area_z;
-      t_area_x = area_x;
+      t_area_z += area_z;
+      t_area_x += area_x;
     }
 
   const double q_z = t_q_z / t_area_z;
@@ -146,8 +146,8 @@ SoilWater::velocity_cell_secondary (const Geometry& geo, const size_t c)const
       const double area_x = cos_angle * area;
       t_q_z += area_z * q;
       t_q_x += area_x * q;
-      t_area_z = area_z;
-      t_area_x = area_x;
+      t_area_z += area_z;
+      t_area_x += area_x;
     }
 
   const double q_z = t_q_z / t_area_z;

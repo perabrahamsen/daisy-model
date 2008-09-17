@@ -1,5 +1,9 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* mmo 
+
+skriv wall fraction
+
 * test-mibsol.dai
 
 * Colloids
@@ -10,9 +14,15 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 *** skriv specialiseret log fil.
 
+Tertiart biopores log mm water samt solute per area
+
 * Tertiary 
 
 ** Små tidsskridt
+
+Er stoftransport i klasser korrekt med små tidsskridt?
+
+Eller bruger den S termen fra sidste lille tidsskridt?
 
 ** Option to disable in top nodes.
 

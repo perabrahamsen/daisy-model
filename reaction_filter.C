@@ -31,8 +31,8 @@
 #include "assertion.h"
 #include "librarian.h"
 #include "check.h"
+#include "mathlib.h"
 #include <memory>
-
 
 struct ReactionFilter : public Reaction
 {
@@ -65,22 +65,38 @@ struct ReactionFilter : public Reaction
 
     for (size_t i = 0; i < cell_size; i++)
       {
+        // Extract soil and water.
 	const double C_primary = mob.C_primary (i);//[g cm^-3 water]
 	const double C_secondary = mob.C_secondary (i);//[g cm^-3 water]
-        const double Theta_primary = soil_water.Theta_primary (i); //[cm^3 cm^-3]
-        const double Theta_secondary = soil_water.Theta_secondary (i); //[cm^3 cm^-3]
+        const double Theta_primary 
+          = soil_water.Theta_primary (i); //[cm^3 cm^-3]
+        const double Theta_secondary
+          = soil_water.Theta_secondary (i); //[cm^3 cm^-3]
 	const double M_primary = C_primary * Theta_primary;//[g cm^-3 soil]
-	const double M_secondary = C_secondary * Theta_secondary;//[g cm^-3 soil]
+	const double M_secondary
+          = C_secondary * Theta_secondary;//[g cm^-3 soil]
 
-        //pore water velocity:
-        const double v_primary = soil_water.velocity_cell_primary (geo, i); // [cm/h]
-        const double v_secondary = soil_water.velocity_cell_secondary (geo, i); // [cm/h]
+        // Extract pore water velocity.
+        const double v_primary
+          = soil_water.velocity_cell_primary (geo, i); // [cm/h]
+        daisy_assert (std::isfinite (v_primary));
+        daisy_assert (v_primary >= 0.0);
+        const double v_secondary
+          = soil_water.velocity_cell_secondary (geo, i); // [cm/h]
+        daisy_assert (std::isfinite (v_secondary));
+        daisy_assert (v_secondary >= 0.0);
 
-        F_primary[i] = std::min(fc_primary *  Theta_primary * v_primary * C_primary,
-                                M_primary / dt);   //[g cm^-3 soil h^-1]
-        F_secondary[i] = std::min(fc_secondary *  Theta_secondary * v_secondary 
-                                  * C_secondary,
+        // Calculate filter.
+        F_primary[i] = std::min (fc_primary *  Theta_primary 
+                                 * v_primary * C_primary,
+                                 M_primary / dt);   //[g cm^-3 soil h^-1]
+        daisy_assert (std::isfinite (F_primary[i]));
+        daisy_assert (F_primary[i] >= 0.0);
+        F_secondary[i] = std::min(fc_secondary *  Theta_secondary 
+                                  * v_secondary * C_secondary,
                                   M_secondary / dt);   //[g cm^-3 soil h^-1]
+        daisy_assert (std::isfinite (F_secondary[i]));
+        daisy_assert (F_secondary[i] >= 0.0);
       }
     mob.add_to_transform_sink (F_primary);
     mob.add_to_transform_sink_secondary (F_secondary);

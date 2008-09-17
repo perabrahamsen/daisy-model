@@ -33,6 +33,13 @@ struct SelectNumber : public SelectValue
   { add_result (number); }
   void output_integer (int integer)
   { output_number (integer); }
+  void output_array (const std::vector<double>& array,
+                     const Geometry*, const Soil*, const Vegetation*, Treelog&)
+  { 
+    const size_t size = array.size ();
+    for (size_t i = 0; i < size; i++)
+      add_result (array[i]); 
+  }
 
   // Create and Destroy.
   SelectNumber (Block& al)
@@ -50,7 +57,9 @@ static struct SelectNumberSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     SelectValue::load_syntax (syntax, alist);
-    alist.add ("description", "Extract specified number.");
+    alist.add ("description", "Extract specified number.\n\
+If used on an array, it will treat them as individual numbers as\n\
+specified by the 'handle' parameter.");
 
     Librarian::add_type (Select::component, "number", alist, syntax, &make);
   }

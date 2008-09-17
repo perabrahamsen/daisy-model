@@ -84,4 +84,7 @@
   (reaction (filter (mobile colloid) (immobile colloid-filtered))
             (MACRO (colloid colloid))))
 
+(defchemistry none multi
+  (combine))
+
 ;;; chemestry.dai ends here.

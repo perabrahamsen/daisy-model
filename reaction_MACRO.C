@@ -54,6 +54,7 @@ struct ReactionMACRO : public Reaction
   double E;                     // Energy in rain [J/cm^2 S/mm W]
 
   // Simulation.
+  static const double R_to_E (const double R /* [mm W/h] */); // [J/cm^2/mm]
   void colloid_generation (const double Rain_intensity /* [mm W/h] */,
                            const double dt /* [h] */);
   void tick_top (const double direct_rain, 
@@ -71,15 +72,19 @@ struct ReactionMACRO : public Reaction
   ReactionMACRO (Block& al);
 };
 
+const double 
+ReactionMACRO::R_to_E (const double R)
+{ 
+  const double cm2_per_m2 = (100.0 * 100.0);
+  return  29.0 * (1 - 0.72 * exp (-0.05 * R)) / cm2_per_m2; 
+}
+
 void
 ReactionMACRO::colloid_generation (const double Rain_intensity, // [mm/h] 
                                    const double dt) // [h]
 {
-  // Convert.
-  const double cm2_per_m2 = (100.0 * 100.0);
-  
   // Kinetic energy of rain. [J cm^-2 mm^-1]
-  E = 29.0 * (1 - 0.72 * exp (-0.05 * Rain_intensity)) / cm2_per_m2;
+  E = R_to_E (Rain_intensity);
   
   // Detachment of colloids at the surface. [g cm^-2 h^-1]
   D = kd * E * Rain_intensity * Ms; 
@@ -176,7 +181,7 @@ ReactionMACRO::ReactionMACRO (Block& al)
     As (-42.42e42),
     D (-42.42e42),
     P (-42.42e42),
-    E (-42.42e42)
+    E (R_to_E (0.0))
 { }
 
 static struct ReactionMACROSyntax
@@ -206,7 +211,7 @@ By default, 10% of Mmax.");
                 "Current amount of detachable particles in top soil.");
     syntax.add ("D", "g/cm^2/h", Syntax::LogOnly, 
                 "Depletion of detachable particles from top soil.");
-    syntax.add ("R", "g/cm^2/h", Syntax::LogOnly, 
+    syntax.add ("P", "g/cm^2/h", Syntax::LogOnly, 
                 "Replenishment of detachable particles to top soil.");
     syntax.add ("E", "J/cm^2/mm", Syntax::LogOnly, 
                 "Kinetic energy in rain.");

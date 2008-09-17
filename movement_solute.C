@@ -571,7 +571,6 @@ MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
         J_sum += in_sign * J_edge * area; // [g/h]
         daisy_assert (in_sign * J_tertiary[edge] >= 0.0);
         daisy_assert (in_sign * J_secondary[edge] >= 0.0);
-        daisy_assert (in_sign * J_primary[edge] >= 0.0);
       }
     J_sum /= geometry ().surface_area (); // [g/cm^2 S/h]
     daisy_approximate (-J_above, J_sum);

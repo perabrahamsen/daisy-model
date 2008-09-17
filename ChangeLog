@@ -1,3 +1,27 @@
+2008-09-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* biopore_drain.C (BioporeDrain::matrix_biopore_drain): Scale S
+	with fraction of cell in interval.
+	* biopore_matrix.C (BioporeMatrix::matrix_biopore_matrix): Ditto.
+
+	* biopore.C (Biopore::initialize_base): Include all all cells that
+	overlap interval, not just those whose center is within the
+	interval.
+
+	* select_number.C (output_array): Added.
+
+2008-09-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* tertiary_biopores.C (TertiaryBiopores::initialize): User
+	groundwater table for default state of active cells.
+
+	* sample/test-colloids.dai: New setup.
+	* sample/Makefile (SETUPS): Added.
+	* lib/log.dai ("Colloids"): New log model.
+	("Colloids balance", "Colloids pool balance"): New summaries.
+	* lib/chemistry.dai (colloid, colloid-filtered): New chemicals.
+	(colloids, none): New chemistries.
+
 2008-09-13  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* lib/log.dai ("Surface Chemicals"): Added 'surface_transform'.

@@ -146,8 +146,7 @@ Biopore::initialize_base (const Units& units,
   bool ok = true;
   for (size_t c = 0; c < cell_size; c++)
     {
-      const double cell_z = geo.cell_z (c);
-      if (cell_z > height_start || cell_z < height_end)
+      if (geo.cell_bottom (c) >= height_start || geo.cell_top (c) <= height_end)
         // Outside z interval.
         density_cell.push_back (0.0);
       else

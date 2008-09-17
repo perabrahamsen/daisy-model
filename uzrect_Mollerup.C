@@ -269,7 +269,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	  tmp << "Time left = " << time_left << ", ddt = " << ddt 
 	      << ", iteration = " << iterations_used << "\n";
 	  tmp << "h = " << h << "\n";
-	  tmp << "Theta = " << Theta << "\n";
+	  tmp << "Theta = " << Theta;
 	  msg.message (tmp.str ());
 	}
 
