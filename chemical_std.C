@@ -691,8 +691,11 @@ ChemicalStandard::tick_soil (const Units& units, const Geometry& geo,
 			     const Scope& scope,
 			     Treelog& msg)
 {
+  TREELOG_MODEL(msg);
+
   // Constants.
   const size_t cell_size = geo.cell_size ();
+  const bool solid = adsorption_->full ();
 
   // Find C below.
   if (!C_below_expr->tick_value (units, C_below_value, g_per_cm3, scope, msg))
@@ -714,6 +717,7 @@ ChemicalStandard::tick_soil (const Units& units, const Geometry& geo,
 
   // Exchange between primary and secondary domains.
   std::fill (S_exchange.begin (), S_exchange.end (), 0.0);
+  
   for (size_t c = 0; c < cell_size; c++)
     {
       // Old water.
