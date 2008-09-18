@@ -1,3 +1,16 @@
+2008-09-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* geometry.C, geometry.h (Geometry::access_content_height)
+	(Geometry::access_content_hood): New member functions.
+	* geometry.h (Geometry::content_at): Renamed to 'content_height'.
+	(Geometry::content_hood): New member template function.
+	(Access): New memeber interface class.
+	(Accessor): New memeber template class.
+	* all: Update callers.
+
+	* canopy_simple.h (leaf_width): New parameter.
+	* crop, vegetation: Make accessible.
+
 2008-09-17  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* biopore_drain.C (BioporeDrain::matrix_biopore_drain): Scale S

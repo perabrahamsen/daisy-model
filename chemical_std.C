@@ -810,9 +810,9 @@ ChemicalStandard::mixture (const Geometry& geo,
     }
 
   // Mix them.
+  const Chemical& chemical = *this;
   const double soil_conc
-    = geo.content_at (static_cast<const Chemical&> (*this),
-                      &Chemical::C_secondary, 0.0)
+    = geo.content_hood (chemical, &Chemical::C_secondary, Geometry::cell_above)
     * (100.0 * 100.0) / 10.0; // [g/cm^3/] -> [g/m^2/mm]
   const double storage_conc = surface_storage / pond;// [g/m^2/mm]
   

@@ -106,7 +106,7 @@ public:
   virtual int edge_index (int from, int to) const; // Find edge between cells.
   virtual int edge_from (size_t) const = 0; // Cell where edge originates.
   virtual int edge_to (size_t) const = 0; // Cell where edge leads.
-  inline int edge_other (size_t e, size_t n) const // Other cell at edge.
+  inline int edge_other (size_t e, int n) const // Other cell at edge.
   { return edge_from (e) == n ? edge_to (e) : edge_from (e); }
   inline bool edge_is_internal (size_t e) const // Edge does not lead out of volume.
   { return cell_is_internal (edge_from (e))
@@ -142,26 +142,48 @@ public:
   inline double back () const // Back of farthest cell. [cm]
   { return 1.0; }
 
-  template<class T> // Here we we calculate a volume weighted average
-                    // value at a specific depth.
-  double content_at (T& obj, double (T::*content) (size_t),
+  // Generic access.
+public:
+  // The 'Access' class is simply a function object interface.
+  struct Access
+  { virtual double operator()(size_t c) const = 0; };
+  // The 'Accessor' template class will implement the 'Access'
+  // interface for a given soil container and member function.
+  template<class T>
+  class Accessor : public Access
+  { 
+    const T& object;
+    double (T::*member_function) (size_t) const;
+  public:
+    double operator()(const size_t c) const
+    { return (object.*member_function) (c); }
+    Accessor (const T& obj, double (T::*content) (size_t) const)
+      : object (obj),
+        member_function (content)
+    { }
+  };
+  // The 'content_height' template function will calculate an average
+  // content at a specific height, where the content of all the cells
+  // that contain the height is weighted by their volume.
+  template<class T> 
+  double content_height (const T& obj, double (T::*content) (size_t) const,
                      const double z) const
-  {
-    double total_volume = 0.0;
-    double total_content = 0.0;
-  
-    for (size_t i = 0; i < this->cell_size (); i++)
-      if (this->contain_z (i, z))
-        {
-          const double volume = cell_volume (i);
-          total_volume += volume;
-          total_content += volume * (obj.*content) (i);
-        }
-    if (iszero (total_volume))
-      return 0.0;
-    
-    return total_content / total_volume;
-  }
+  { return access_content_height (Accessor<T> (obj, content), z); }
+  // The 'access_content_height' function does the same, using the
+  // 'Access' class instead of a soil container template.
+  double access_content_height (const Access& access, double z) const;
+  // The 'content_hood' template function will calculate an average
+  // content for the neighbors of a specific cell, weighted by the
+  // area of the edges connecting the neighbors to the cell.  This is
+  // particularily useful for the pseudo-cells, such as
+  // Geometry::cell_above.
+  template<class T> 
+  double content_hood (const T& obj, double (T::*content) (size_t) const,
+                       const int c) const
+  { return access_content_hood (Accessor<T> (obj, content), c); }
+  // The 'access_content_hood' function does the same, using the
+  // 'Access' class instead of a soil container template.
+  double access_content_hood (const Access& access, int c) const;
 
   // Vector operations.
 private:

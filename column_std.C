@@ -519,13 +519,11 @@ ColumnStandard::daily_global_radiation () const
 
 double 
 ColumnStandard::soil_temperature (double height) const
-{ return geometry.content_at (static_cast<const SoilHeat&> (*soil_heat),
-                               &SoilHeat::T, height); }
+{ return geometry.content_height (*soil_heat, &SoilHeat::T, height); }
 
 double 
 ColumnStandard::soil_water_potential (double height) const
-{ return geometry.content_at (static_cast<const SoilWater&> (*soil_water), 
-                               &SoilWater::h, height); }
+{ return geometry.content_height (*soil_water, &SoilWater::h, height); }
 
 double 
 ColumnStandard::soil_water_content (double from, double to) const

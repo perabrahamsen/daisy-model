@@ -1162,7 +1162,7 @@ CropSold::Emergence (const Geometry& geo, const SoilHeat& soil_heat)
   const double EmrDpt = par.Root.DptEmr;
   double& DS = var.Phenology.DS;
 
-  const double T_soil = geo.content_at (soil_heat, &SoilHeat::T, -EmrDpt);
+  const double T_soil = geo.content_height (soil_heat, &SoilHeat::T, -EmrDpt);
   DS += T_soil / Devel.EmrTSum;
   if (DS > 0)
     DS = Devel.DS_Emr;
@@ -1520,7 +1520,7 @@ CropSold::RootPenetration (const Geometry& geo,
   if (IncWRoot <= 0)
     return;
 
-  const double Ts = geo.content_at (soil_heat, &SoilHeat::T, -Depth);
+  const double Ts = geo.content_height (soil_heat, &SoilHeat::T, -Depth);
   const double dp = Root.PenPar1 * std::max (0.0, Ts - Root.PenPar2);
   PotRtDpt = std::min (PotRtDpt + dp, Root.MaxPen);
   /*max depth determined by crop*/
@@ -1740,7 +1740,7 @@ CropSold::NetProduction (const Bioclimate& bioclimate,
   const double RMSOrg
     = MaintenanceRespiration (Resp.r_SOrg (DS), Prod.WSOrg, 
 			      bioclimate.daily_air_temperature ());
-  const double T_soil = geo.content_at (soil_heat, &SoilHeat::T, -Depth/3.0);
+  const double T_soil = geo.content_height (soil_heat, &SoilHeat::T, -Depth/3.0);
   const double RMRoot
     = MaintenanceRespiration (Resp.r_Root (DS), Prod.WRoot, T_soil);
 

@@ -145,6 +145,51 @@ Geometry::y_safe (int n) const
     }
 }
 
+double 
+Geometry::access_content_height (const Access& access, const double z) const
+{
+  double total_volume = 0.0;
+  double total_content = 0.0;
+
+  for (size_t i = 0; i < this->cell_size (); i++)
+    if (this->contain_z (i, z))
+      {
+        const double volume = cell_volume (i);
+        total_volume += volume;
+        total_content += volume * access (i);
+      }
+  if (iszero (total_volume))
+    return 0.0;
+
+  return total_content / total_volume;
+}
+
+double 
+Geometry::access_content_hood (const Access& access, const int center) const
+{
+  double total_area = 0.0;
+  double total_content = 0.0;
+
+  const std::vector<size_t>& hood = this->cell_edges (center);
+  const size_t hood_size = hood.size ();
+  
+  for (size_t i = 0; i < hood_size; i++)
+    {
+      const int edge = hood[i];
+      const int neighbor = this->edge_other (edge, center);
+      if (this->cell_is_internal (neighbor))
+        {
+          const double area = this->edge_area (edge);
+          total_area += area;
+          total_content += access (neighbor) * area;
+        }
+    }
+  if (iszero (total_area))
+    return 0.0;
+
+  return total_content / total_area;
+}
+
 double
 Geometry::volume_in_z_interval (const double from, const double to, 
                                 std::vector<double>& frac) const

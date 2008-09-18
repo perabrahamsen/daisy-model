@@ -397,7 +397,7 @@ RootSystem::tick_daily (const Geometry& geo, const Soil& soil,
   // Penetration.
   if (root_growth)
     {
-      const double clay = geo.content_at (soil, &Soil::clay, -Depth);
+      const double clay = geo.content_height (soil, &Soil::clay, -Depth);
       double clay_fac = PenClayFac (clay);
       double dp = PenPar1 * clay_fac * std::max (0.0, soil_temperature - PenPar2);
       PotRtDpt = std::min (PotRtDpt + dp, MaxPen);

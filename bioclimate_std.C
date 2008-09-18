@@ -888,7 +888,8 @@ BioclimateStandard::WaterDistribution (const Units& units,
       pond_ep = 0.0;
     }
 
-  const double soil_T = geo.content_at (soil_heat, &SoilHeat::T, 0.0);
+  const double soil_T 
+    = geo.content_hood (soil_heat, &SoilHeat::T, Geometry::cell_above);
   surface.tick (msg, pond_ep, 
 		litter_water_out, litter_water_temperature, 
 		geo, soil, soil_water, soil_T, dt);

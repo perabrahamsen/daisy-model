@@ -322,8 +322,8 @@ CropStandard::tick (const Units& units,
   harvesting->tick (time);
 
   // Update average soil temperature.
-  const double T_soil = geo.content_at (soil_heat, &SoilHeat::T,
-                                        -root_system->Depth);
+  const double T_soil 
+    = geo.content_height (soil_heat, &SoilHeat::T, -root_system->Depth);
   root_system->tick (T_soil, dt);
 
   // Clear nitrogen.
@@ -349,8 +349,9 @@ CropStandard::tick (const Units& units,
 
       daisy_assert (ForcedCAI < 0.0);
 
-      const double h_middle = geo.content_at (soil_water, &SoilWater::h,
-                                              -root_system->Depth/2.);
+      const double h_middle 
+        = geo.content_height (soil_water, &SoilWater::h,
+                              -root_system->Depth/2.);
       development->emergence (h_middle, root_system->soil_temperature, 
                               daystep.total_hours ());
       if (DS >= 0)
@@ -525,8 +526,8 @@ CropStandard::tick (const Units& units,
   else
     production.PotCanopyAss = production.CanopyAss = 0.0;
 
-  const double T_soil_3 = geo.content_at (soil_heat, &SoilHeat::T,
-                                          -root_system->Depth/3.0);
+  const double T_soil_3 
+    = geo.content_height (soil_heat, &SoilHeat::T, -root_system->Depth/3.0);
   daisy_assert (std::isfinite (T_soil_3));
   const double seed_C = seed->release_C (dt);
   production.tick (bioclimate.daily_air_temperature (), T_soil_3,

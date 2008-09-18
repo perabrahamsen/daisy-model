@@ -67,6 +67,8 @@ public:
   double freezing_rate (const size_t c) const;
   double T (size_t c) const	// [dg C]
   { return T_[c]; }
+  double conductivity (size_t c) const
+  { return conductivity_[c]; }
   double top_flux (const Geometry& geo,
                    const Soil&, const SoilWater&) const;
   double energy (const Geometry& geo, const Soil& soil,
