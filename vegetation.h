@@ -61,6 +61,7 @@ public:
   virtual double shared_light_fraction () const;
   virtual double rs_min () const = 0; // Minimum transpiration resistance.
   virtual double rs_max () const = 0; // Maximum transpiration resistance.
+  virtual double leaf_width () const = 0; // Leaf width [cm].
   virtual double LAI () const = 0; // Total LAI of all crops [0-]
   virtual double height () const = 0; // Max crop height in canopy [cm]
   virtual double cover () const = 0; // Fraction of soil covered by crops [0-1]

@@ -34,7 +34,6 @@ void
 CanopySimple::output (Log& log) const
 {
   output_variable (Height, log);
-  output_variable (leaf_width, log);
   output_variable (CAI, log);
   output_variable (LAIvsH, log);
 }
@@ -82,8 +81,11 @@ CanopySimple::load_syntax (Syntax& syntax, AttributeList& alist)
   // Variables.
   syntax.add ("Height", "cm", Syntax::State, "Crop height.");
   alist.add ("Height", 0.0);
-  syntax.add ("leaf_width", "cm", Syntax::State, "Leaf width.");
-  alist.add ("leaf_width", 3.0);
+  PLF leaf_width;
+  leaf_width.add (0.0, 3.0);
+  leaf_width.add (2.0, 3.0);
+  syntax.add ("leaf_width", "DS", "cm", Syntax::Const, "Leaf width.");
+  alist.add ("leaf_width", leaf_width);
   syntax.add ("CAI", "m^2/m^2", Syntax::LogOnly, "Crop Area Index.");
   syntax.add ("LAIvsH", "cm", "m^2/m^2", Syntax::LogOnly,
 	      "Accumulated Leaf Area Index at Height.");
@@ -100,8 +102,8 @@ CanopySimple::CanopySimple (const AttributeList& vl)
     EpFacDS (vl.plf ("EpFacDS")),
     rs_max (vl.number ("rs_max")),
     rs_min (vl.number ("rs_min")),
+    leaf_width (vl.plf ("leaf_width")),
     Height (vl.number ("Height")),
-    leaf_width (vl.number ("leaf_width")),
     CAI    (0.0)
 { }
 
@@ -110,3 +112,5 @@ CanopySimple::~CanopySimple ()
 
 static Submodel::Register 
 canopy_simple_submodel ("CanopySimple", CanopySimple::load_syntax);
+
+// canopy_simple.C ends here.

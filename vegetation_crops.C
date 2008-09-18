@@ -93,7 +93,7 @@ struct VegetationCrops : public Vegetation
   { return LAI_; }
   double height () const
   { return height_; }
-  double leaf_widtht () const
+  double leaf_width () const
   { return leaf_width_; }
   double cover () const
   { return cover_; }
@@ -511,6 +511,7 @@ VegetationCrops::reset_canopy_structure (Treelog& msg)
 	  daisy_assert (iszero (HvsLAI_ (0.0)));
 	  
 	  // Other stuff
+          leaf_width_ = CanopyAverage (&Crop::leaf_width);
 	  cover_ =  1.0 - exp (-CanopySum (&Crop::EPext));
           daisy_assert (cover_ <= 1.0);
           daisy_assert (cover_ >= 0.0);
@@ -527,6 +528,7 @@ VegetationCrops::reset_canopy_structure (Treelog& msg)
     }
   // No vegetation.
   HvsLAI_.clear ();
+  leaf_width_ = 0.0;
   cover_ = 0.0;
   ACExt_PAR_ = 0.0;
   ACRef_PAR_ = 0.0;

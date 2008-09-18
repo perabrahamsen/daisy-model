@@ -41,23 +41,17 @@ double
 Crop::minimum_light_fraction () const
 { return 0.0; }
 
-#if 0
-double 
-Crop::water_stress () const
-{ daisy_notreached (); }
-
-double 
-Crop::nitrogen_stress () const
-{ daisy_notreached (); }
-#endif
-
 double 
 Crop::rs_min () const
-{ daisy_notreached (); }
+{ return 100.0; }
 
 double 
 Crop::rs_max () const
-{ daisy_notreached (); }
+{ return 1.0e5; }
+
+double 
+Crop::leaf_width () const
+{ return 3.0; }
 
 double 
 Crop::SimLAI () const

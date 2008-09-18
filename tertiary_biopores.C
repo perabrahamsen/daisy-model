@@ -71,10 +71,12 @@ struct TertiaryBiopores : public Tertiary, public Tertsmall
   void set_state (const Anystate&);
 
   // Log variables.
+  double water_volume;          // Volume of water stored in biopores.
+  double water_height;          // -||- converted to height.
   bool log_ddt;                 // True if ddt was calculated this timestep.
   double ddt;
   int deactivate_steps;         // Number of timesteps tertiary is deactivated.
-
+  
   // Infiltration.
   double capacity (const Geometry&, size_t e, double dt); // Max flux.
   void infiltrate (const Geometry&, size_t e, double amount, double dt);
@@ -419,6 +421,10 @@ TertiaryBiopores::find_implicit_water (const Anystate& old_state,
   set_state (old_state);
   // Add water to get new state.
   update_water ();
+
+  // Update logs.
+  water_volume = total_water ();
+  water_height = water_volume / geo.surface_area ();
 }
 
 void
@@ -526,7 +532,8 @@ TertiaryBiopores::output (Log& log) const
 {
   output_list (classes, "classes", log, Biopore::component); 
   // TODO: output_variable (active, log);
-  output_lazy (total_water (), "water", log);
+  output_variable (water_volume, log);
+  output_variable (water_height, log);
   if (log_ddt)
     output_variable (ddt, log);
   output_variable (deactivate_steps, log);
@@ -557,6 +564,9 @@ TertiaryBiopores::initialize (const Units& units,
   while (active.size () < cell_size)
     active.push_back (geo.cell_z (active.size ()) < table);
 
+  water_volume = total_water ();
+  water_height = water_volume / geo.surface_area ();
+
   return ok;
 }
 
@@ -585,6 +595,8 @@ TertiaryBiopores::TertiaryBiopores (Block& al)
     active (al.check ("active")
             ? al.flag_sequence ("active")
             : std::vector<bool> ()),
+    water_volume (-42.42e42),
+    water_height (-42.42e42),
     log_ddt (false),
     ddt (-42.42e42),
     deactivate_steps (al.integer ("deactivate_steps"))
@@ -628,7 +640,9 @@ After macropores are activated pond will have this height.");
     alist.add ("use_small_timesteps", true);
     syntax.add ("active", Syntax::Boolean, Syntax::OptionalState,
                 Syntax::Sequence, "Active biopores in cells.");
-    syntax.add ("water", "cm^3", Syntax::LogOnly, "Water content.");    
+    syntax.add ("water_volume", "cm^3", Syntax::LogOnly, "Water volume.");    
+    syntax.add ("water_height", "cm", Syntax::LogOnly,
+                "Water volume multiplied with surface area.");
     syntax.add ("ddt", "h", Syntax::LogOnly, "Emulated timestep.\n\
 Timestep scaled for available water.\n\
 Only relevant if 'use_small_timesteps' is false.");    

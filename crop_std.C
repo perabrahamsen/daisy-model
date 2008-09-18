@@ -75,16 +75,12 @@ struct CropStandard : public Crop
   double minimum_light_fraction () const
   { return min_light_fraction; }
 
-#if 0
-  double water_stress () const // [0-1] (0 = full production)
-  { return root_system->water_stress; }
-  double nitrogen_stress () const // [0-1] (1 = no production)
-  { return root_system->nitrogen_stress; }
-#endif
   double rs_min () const	// Minimum transpiration resistance.
   { return canopy.rs_min; }
   double rs_max () const	// Maximum transpiration resistance.
   { return canopy.rs_max; }
+  double leaf_width () const
+  { return canopy.leaf_width (DS ()); }
 
   double height () const	// Crop height [cm]
   { return canopy.Height; }

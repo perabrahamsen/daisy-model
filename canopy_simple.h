@@ -42,11 +42,11 @@ private:
 public:
   const double rs_max;		// max transpiration resistance
   const double rs_min;		// min transpiration resistance
+  const PLF leaf_width;		// Leaf width [cm]
 
   // Variables.
 public:
   double Height;		// Crop height [cm]
-  double leaf_width;		// Leaf width [cm]
   double CAI;	        	// Crop Area Index
   PLF LAIvsH;			// Accumulated Crop Area Index at Height
 

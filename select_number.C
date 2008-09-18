@@ -64,3 +64,5 @@ specified by the 'handle' parameter.");
     Librarian::add_type (Select::component, "number", alist, syntax, &make);
   }
 } Select_syntax;
+
+// select_number.C ends here.

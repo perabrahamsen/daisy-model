@@ -3087,14 +3087,20 @@ submodel.  The amount printed under 'Total C Input' corresponds to the
            ))
 
 (deflog "Tertiary biopores water" biopore
-  "State of water in the tertiary biopores model."
+  "State of water in the tertiary biopores model.
+The log is only valid if you have any 'matrix' biopores, as the 'drain' 
+contains no water."
   (where "${colfid}tertiary-water-${bioporefid}.dlf")
   (when hourly)
   (biopore matrix)
   (entries (number (path column "${column}" Movement "*" 
-                         Tertiary biopores water)
+                         Tertiary biopores water_volume)
                    (handle current)
-                   (spec tertiary biopores water))
+                   (spec tertiary biopores water_volume))
+           (number (path column "${column}" Movement "*" 
+                         Tertiary biopores water_height)
+                   (handle current)
+                   (spec tertiary biopores water_height))
            (number (path column "${column}" Movement "*" 
                          Tertiary biopores ddt)
                    (handle min)
