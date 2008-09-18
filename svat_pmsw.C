@@ -39,6 +39,7 @@
 # include "soil.h"
 # include "soil_water.h"
 # include "soil_heat.h"
+#include "bioclimate.h"
 # include "vegetation.h"
 # include "pet.h"
 # include "log.h"
@@ -1334,10 +1335,9 @@ public:
   // Simulation.
   double production_stress () const;
   void tick (const Weather& weather, const Vegetation& crops,
-             const Surface& surface, const Soil& soil,
+             const Surface& surface, const Geometry&, const Soil& soil,
              const SoilHeat& soil_heat, const SoilWater& soil_water,
-             const Pet& pet, double canopy_ea, double snow_ea, double pond_ea,
-             double soil_ea, double crop_ea, double crop_ep);
+             const Pet& pet, const Bioclimate& bio);
   void output (Log& log) const;
 
   // Create and Destroy.
@@ -1353,12 +1353,12 @@ SVAT_PMSW::production_stress () const
 
 void
 SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
-                 const Surface& , const Soil& soil, const SoilHeat& soil_heat,
-                 const SoilWater& soil_water, const Pet& pet, double canopy_ea ,
-                 double snow_ea, double pond_ea, double soil_ea, double crop_ea,
-                 double crop_ep)
+                 const Surface& , const Geometry&,  const Soil& soil, 
+                 const SoilHeat& soil_heat,
+                 const SoilWater& soil_water, const Pet& pet, 
+                 const Bioclimate& bio)
 {
-  const double divide_ep = pet.wet () - snow_ea;
+  const double divide_ep = pet.wet () - bio.snow_ea();
   const double canopy_ep = divide_ep * crops.cover ();
   const double pond_ep = divide_ep - canopy_ep;
 
@@ -1410,23 +1410,24 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
   // pot evaporation from surface [cm/hr]
   epots=0.1*pond_ep;
   // surface evaporation
-  evaps=0.1*(pond_ea + soil_ea); // soil evaporation  ???? CHECK
+  evaps=0.1*(bio.pond_ea() + bio.soil_ea()); // soil evaporation  ???? CHECK
 
   // actual evapotranspiration, from soil and canopy, from tick()
-  eact=0.1*soil_ea;
+  eact=0.1*bio.soil_ea();
 
   // convert epotc, epots and eact etc. from cm/hr to W/m^2
   epotc_w=6800.0*epotc;
   epots_w=6800.0*epots;
   eact_w =6800.0*eact;
   evaps_w=6800.0*evaps;
-  pond_ea_w=680.0*pond_ea; // 0.1*6800 mm/hr -> cm/hr
-  soil_ea_w=680.0*soil_ea;
+  pond_ea_w=680.0*bio.pond_ea(); // 0.1*6800 mm/hr -> cm/hr
+  soil_ea_w=680.0*bio.soil_ea();
   pond_ep_w=680.0*pond_ep;
   canopy_ep_w=680.0*canopy_ep;
+  const double canopy_ea = bio.get_evap_interception (); // [mm/h]
   canopy_ea_w=680.0*canopy_ea;
-  crop_ep_w=680.0*crop_ep;
-  crop_ea_w=680.0*crop_ea;
+  crop_ep_w=680.0*bio.crop_ep();
+  crop_ea_w=680.0*bio.crop_ea();
 
   // no division by 0 in fprintf (fp_etep,..) and in RSC()
   if (crop_ea_w==0.0) crop_ea_w=crop_ea_w+1.0;

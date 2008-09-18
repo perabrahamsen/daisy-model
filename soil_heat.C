@@ -665,7 +665,7 @@ SoilHeat::load_syntax (Syntax& syntax, AttributeList& alist)
                        "Soil temperature.");
   syntax.add ("S", "erg/cm^3/h", Syntax::OptionalState, 
               "External heat source, by default zero.");
-  syntax.add ("conductivity", "erg/cm^3/dg C/h", Syntax::LogOnly, 
+  syntax.add ("conductivity", "erg/cm/dg C/h", Syntax::LogOnly, 
               "Heat conductivity.");
   syntax.add ("capacity", "erg/cm^3/dg C", Syntax::LogOnly, 
               "Heat capacity.");

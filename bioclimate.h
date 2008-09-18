@@ -68,6 +68,11 @@ public:
   virtual const std::vector<double>& sun_PAR () const = 0;
   virtual const std::vector<double>& sun_LAI_fraction () const = 0;
   virtual double LAI () const = 0;
+  virtual double wind_speed_field () const = 0;
+  virtual double rad_abs_soil() const = 0;
+  virtual double rad_abs_sun_canopy() const = 0;
+  virtual double rad_abs_shadow_canopy() const = 0;
+  virtual double sin_beta() const = 0;
   virtual double shared_light_fraction () const = 0;
 
   // Weather.
@@ -90,6 +95,12 @@ public:
   virtual void set_subsoil_irrigation (double flux) = 0;
 		       
   // Communication with external model.
+  virtual double snow_ea () const = 0; // [mm/h]
+  virtual double pond_ea () const = 0; // [mm/h]
+  virtual double soil_ea () const = 0; // [mm/h]
+  virtual double crop_ep () const = 0; // [mm/h]
+  virtual double crop_ea () const = 0; // [mm/h]
+
   virtual double get_evap_interception () const = 0; // [mm/h]
   virtual double get_net_throughfall () const = 0; // [mm/h]
 

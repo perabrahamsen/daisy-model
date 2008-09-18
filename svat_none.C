@@ -30,11 +30,8 @@ struct SVAT_none : public SVAT
 {
   // Simulation.
   void tick (const Weather&, const Vegetation&,
-	     const Surface&, const Soil&, const SoilHeat&,
-	     const SoilWater&, const Pet&,
-	     double /* canopy_ea */, double /* snow_ea */,
-	     double /* pond_ea */, double /* soil_ea */,
-             double /* crop_ea */, double /* crop_ep */)
+	     const Surface&, const Geometry&, const Soil&, const SoilHeat&,
+	     const SoilWater&, const Pet&, const Bioclimate&)
   { }
   double production_stress () const
   { return -1; }

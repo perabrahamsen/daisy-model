@@ -962,22 +962,6 @@ pmain${OBJ}: pmain.C
 
 ############################################################
 # AUTOMATIC -- DO NOT CHANGE THIS LINE OR ANYTHING BELOW IT!
-run_Qt${OBJ}: run_Qt.C run_Qt.h run.h model.h symbol.h alist.h toplevel.h \
-  treelog_text.h treelog.h vis_Qt.h time.h program.h
-vis_Qt${OBJ}: vis_Qt.C vis_Qt.h toplevel.h time.h log_Qt.h log_extern.h \
-  log_select.h log.h border.h model.h symbol.h alist.h memutils.h \
-  destination.h scope.h mathlib.h assertion.h
-log_Qt${OBJ}: log_Qt.C log_Qt.h log_extern.h log_select.h log.h time.h \
-  border.h model.h symbol.h alist.h memutils.h destination.h scope.h \
-  librarian.h syntax.h treelog.h
-ui_Qt_run${OBJ}: ui_Qt_run.C ui_Qt_run.h ui_Qt.h ui.h model.h symbol.h \
-  alist.h vis_Qt.h toplevel.h time.h memutils.h log_Qt.h log_extern.h \
-  log_select.h log.h border.h destination.h scope.h run_Qt.h run.h \
-  treelog_text.h treelog.h program.h metalib.h library.h librarian.h \
-  block.h syntax.h plf.h assertion.h path.h
-ui_Qt${OBJ}: ui_Qt.C ui_Qt.h ui.h model.h symbol.h alist.h toplevel.h \
-  librarian.h block.h syntax.h treelog.h plf.h assertion.h
-main_Qt${OBJ}: main_Qt.C ui_Qt.h ui.h model.h symbol.h alist.h toplevel.h
 seed${OBJ}: seed.C seed.h model.h symbol.h alist.h block.h syntax.h treelog.h \
   plf.h librarian.h
 stomatacon${OBJ}: stomatacon.C stomatacon.h model.h symbol.h alist.h \
@@ -1404,8 +1388,9 @@ submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
   assertion.h
 version${OBJ}: version.C
 svat_ssoc${OBJ}: svat_ssoc.C svat.h model.h symbol.h alist.h syntax.h \
-  treelog.h block.h plf.h librarian.h resistance.h fao.h net_radiation.h \
-  weather.h im.h vegetation.h assertion.h log.h time.h border.h mathlib.h
+  treelog.h block.h plf.h librarian.h resistance.h fao.h soil_heat.h \
+  bioclimate.h soil.h surface.h uzmodel.h geometry.h mathlib.h \
+  assertion.h weather.h im.h vegetation.h log.h time.h border.h
 reaction_MACRO${OBJ}: reaction_MACRO.C reaction.h model.h symbol.h alist.h \
   mathlib.h assertion.h check.h block.h syntax.h treelog.h plf.h \
   librarian.h chemistry.h chemical.h log.h time.h border.h geometry.h \
@@ -2021,8 +2006,8 @@ pet_PM${OBJ}: pet_PM.C pet.h model.h symbol.h alist.h syntax.h treelog.h \
   vegetation.h log.h time.h border.h librarian.h
 svat_pmsw${OBJ}: svat_pmsw.C svat.h model.h symbol.h alist.h mathlib.h \
   assertion.h block.h syntax.h treelog.h plf.h surface.h uzmodel.h \
-  weather.h im.h time.h soil.h soil_water.h soil_heat.h vegetation.h \
-  pet.h log.h border.h fao.h gaussj.h librarian.h nrutil.h
+  weather.h im.h time.h soil.h soil_water.h soil_heat.h bioclimate.h \
+  vegetation.h pet.h log.h border.h fao.h gaussj.h librarian.h nrutil.h
 action_surface${OBJ}: action_surface.C action.h model.h symbol.h alist.h \
   block.h syntax.h treelog.h plf.h daisy.h program.h run.h time.h \
   timestep.h vcheck.h memutils.h field.h border.h check.h librarian.h

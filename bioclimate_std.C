@@ -86,7 +86,7 @@ struct BioclimateStandard : public Bioclimate
   // Water in snowpack.
   Snow snow;
   double snow_ep;		// Potential snow evaporation [mm/h]
-  double snow_ea;		// Actual snow evaporation [mm/h]
+  double snow_ea_;		// Actual snow evaporation [mm/h]
   double snow_water_in;		// Water entering snow pack [mm/h]
   double snow_water_in_temperature; // Incoming water temperature [dg C]
   double snow_water_out;	// Water leaving snow pack [mm/h]
@@ -111,21 +111,21 @@ struct BioclimateStandard : public Bioclimate
 
   // Water in pond.
   double pond_ep;		// Potential evaporation from pond [mm/h]
-  double pond_ea;		// Actual evaporation from pond [mm/h]
+  double pond_ea_;		// Actual evaporation from pond [mm/h]
 
   // Water going through soil surface.
   double soil_ep;		// Potential exfiltration. [mm/h]
-  double soil_ea;		// Actual exfiltration. [mm/h]
+  double soil_ea_;		// Actual exfiltration. [mm/h]
 
   // Water transpirated through plant roots.
   std::auto_ptr<SVAT> svat;     // Soil Vegetation Atmosphere model.
-  double crop_ep;		// Potential transpiration. [mm/h]
-  double crop_ea;		// Actual transpiration. [mm/h]
+  double crop_ep_;		// Potential transpiration. [mm/h]
+  double crop_ea_;		// Actual transpiration. [mm/h]
   double production_stress;	// Stress calculated by SVAT module.
 
   // Bioclimate canopy
   double CanopyTemperature;     // Canopy temperature
-  double wind_speed_field;      // wind speed at screen height above the canopy [m/s]
+  double wind_speed_field_;      // wind speed at screen height above the canopy [m/s]
   double wind_speed_weather;    // measured wind speed [m/s]
 
   void WaterDistribution (const Units&, const Time&,
@@ -146,15 +146,19 @@ struct BioclimateStandard : public Bioclimate
   double absorbed_total_PAR_canopy; // Canopy absorbed PAR (sun+shade) [W/m2]
   double absorbed_total_NIR_canopy; // Canopy absorbed NIR (sun+shade) [W/m2]
   double absorbed_total_Long_canopy;// Canopy absorbed Long wave radiation (sun+shade)[W/m2]
-  double absorbed_total_PAR_soil;   // Soil absorbed PAR (sun+shade)[W/m2]
-  double absorbed_total_NIR_soil;   // Soil absorbed NIR (sun+shade)[W/m2]
-  double absorbed_total_Long_soil;  // Soil absorbed Long wave radiation (sun+shade) [W/m2]
+  double absorbed_total_PAR_soil;   // Soil absorbed PAR [W/m2]
+  double absorbed_total_NIR_soil;   // Soil absorbed NIR [W/m2]
+  double absorbed_total_Long_soil;  // Soil absorbed Long wave radiation [W/m2]
   double absorbed_sun_PAR_canopy;   // Canopy absorbed PAR on sunlit leaves [W/m2]
   double absorbed_sun_NIR_canopy;   // Canopy absorbed NIR on sunlit leaves [W/m2]
   double absorbed_sun_Long_canopy;  // Canopy absorbed Long wave radiatio on sunlit leaves [W/m2]
   double absorbed_shadow_PAR_canopy;// Canopy absorbed PAR on shadow leaves [W/m2]
   double absorbed_shadow_NIR_canopy;// Canopy absorbed NIR on shadow leaves [W/m2]
   double absorbed_shadow_Long_canopy;// Canopy absorbed Long wave radiation on shadow leaves [W/m2]
+  double rad_abs_soil_;             // Soil absorbed radiation [W/m2]
+  double rad_abs_sun_canopy_;      // Canopy absorbed radiatio on sunlit leaves [W/m2]
+  double rad_abs_shadow_canopy_;    // Canopy absorbed radiation on shadow leaves [W/m2]
+  double sin_beta_;
 
   // Weather.
   double daily_air_temperature_; // Air temperature in canopy. [dg C]
@@ -185,6 +189,16 @@ struct BioclimateStandard : public Bioclimate
   { return sun_LAI_fraction_; }
   double LAI () const
   { return LAI_; }
+  double wind_speed_field () const 
+  { return wind_speed_field_; }
+  double rad_abs_soil() const 
+  { return rad_abs_soil_; }
+  double rad_abs_sun_canopy() const
+  { return rad_abs_sun_canopy_; }
+  double rad_abs_shadow_canopy() const 
+  { return rad_abs_shadow_canopy_; }
+  double sin_beta() const 
+  { return sin_beta_; }
   double shared_light_fraction () const
  { return shared_light_fraction_; }
 
@@ -213,6 +227,16 @@ struct BioclimateStandard : public Bioclimate
   void set_subsoil_irrigation (double flux);
 
   // Communication with external model.
+  double snow_ea () const // [mm/h]
+  { return snow_ea_; }
+  double pond_ea () const // [mm/h]
+  { return pond_ea_; }
+  double soil_ea () const // [mm/h]
+  { return soil_ea_; }
+  double crop_ep () const // [mm/h]
+  { return crop_ep_; }
+  double crop_ea () const // [mm/h]
+  { return crop_ea_; }
   double get_evap_interception () const // [mm/h]
   { return canopy_ea; }
   double get_intercepted_water () const // [mm]
@@ -443,9 +467,9 @@ The intended use is colloid generation.");
   // Bioclimate in canopy
   syntax.add ("CanopyTemperature", "dg C", Syntax::LogOnly,
               "Actual canopy temperature.");
-  syntax.add ("wind_speed_field", "m/s", Syntax::LogOnly,
+  syntax.add ("wind_speed_field_", "m/s", Syntax::LogOnly,
               "Wind speed in the field at reference height.");
-  syntax.add ("wind_speed_weather", "m/s", Syntax::LogOnly,
+  syntax.add ("wind_speed_weather_", "m/s", Syntax::LogOnly,
               "Measured wind speed.");
 
   //Radiation
@@ -543,7 +567,7 @@ BioclimateStandard::BioclimateStandard (Block& al)
     irrigation_subsoil_permanent (al.number ("irrigation_subsoil_permanent")),
     snow (al.alist ("Snow")),
     snow_ep (0.0),
-    snow_ea (0.0),
+    snow_ea_ (0.0),
     snow_water_in (0.0),
     snow_water_in_temperature (0.0),
     snow_water_out (0.0),
@@ -562,18 +586,22 @@ BioclimateStandard::BioclimateStandard (Block& al)
     litter_water_in (0.0),
     litter_water_out (0.0),
     pond_ep (0.0),
-    pond_ea (0.0),
+    pond_ea_ (0.0),
     soil_ep (0.0),
-    soil_ea (0.0),
+    soil_ea_ (0.0),
     svat (Librarian::build_item<SVAT> (al, "svat")),
-    crop_ep (0.0),
-    crop_ea (0.0),
+    crop_ep_ (0.0),
+    crop_ea_ (0.0),
     production_stress (-1.0),
     raddist (Librarian::build_item<Raddist> (al, "raddist")),
     difrad (al.check ("difrad") 
          ? Librarian::build_item<Difrad> (al, "difrad")
          : NULL),
     difrad0 (0.0),
+    rad_abs_soil_ (0.0),
+    rad_abs_sun_canopy_ (0.0),
+    rad_abs_shadow_canopy_ (0.0),
+    sin_beta_ (0.0),
 
     // BUG: These should really be part of the state, for checkpoints.
     daily_air_temperature_ (0.0),
@@ -634,10 +662,10 @@ BioclimateStandard::albedo (const Vegetation& crops, const Surface& surface,
 
 void 
 BioclimateStandard::RadiationDistribution (const Vegetation& vegetation, 
-					   const double sin_beta, Treelog& msg)
+					   const double sin_beta_, Treelog& msg)
 {
   raddist->tick(sun_LAI_fraction_, sun_PAR_, total_PAR_, sun_NIR_, total_NIR_,
-                hourly_global_radiation (), difrad0, sin_beta, vegetation, msg);
+                hourly_global_radiation (), difrad0, sin_beta_, vegetation, msg);
 
   //Absorbed PAR in the canopy and the soil:
   absorbed_total_PAR_canopy = total_PAR_[0] - total_PAR_[No];     // [W/m2]
@@ -666,13 +694,13 @@ BioclimateStandard::RadiationDistribution (const Vegetation& vegetation,
   absorbed_total_Long_canopy = incoming_longwave_radiation * (cover);
   absorbed_sun_Long_canopy = absorbed_total_Long_canopy * sun_LAI_fraction_total;
   absorbed_shadow_Long_canopy = absorbed_total_Long_canopy - absorbed_sun_Long_canopy;
-  
-  // Variables for SVAT
-  const double Rad_abs_soil = absorbed_total_Long_soil + absorbed_total_NIR_soil
+
+    // Variables for SVAT
+  rad_abs_soil_ = absorbed_total_Long_soil + absorbed_total_NIR_soil
     + absorbed_total_PAR_soil;
-  const double Rad_abs_sun_canopy = absorbed_sun_Long_canopy + absorbed_sun_NIR_canopy
+  rad_abs_sun_canopy_ = absorbed_sun_Long_canopy + absorbed_sun_NIR_canopy
     + absorbed_sun_PAR_canopy;
-  const double Rad_abs_shadow_canopy =  absorbed_shadow_Long_canopy 
+  rad_abs_shadow_canopy_ =  absorbed_shadow_Long_canopy 
     + absorbed_shadow_NIR_canopy + absorbed_shadow_PAR_canopy;
 
 }
@@ -748,9 +776,9 @@ BioclimateStandard::WaterDistribution (const Units& units,
 	     snow_water_in, weather.snow (),
 	     surface.ponding (),
 	     snow_water_in_temperature, snow_ep, dt);
-  snow_ea = snow.evaporation ();
-  daisy_assert (snow_ea >= 0.0);
-  total_ea += snow_ea;
+  snow_ea_ = snow.evaporation ();
+  daisy_assert (snow_ea_ >= 0.0);
+  total_ea += snow_ea_;
   daisy_assert (total_ea >= 0.0);
   snow_water_out = snow.percolation ();
   if (snow_water_out < 0.0)
@@ -766,8 +794,8 @@ BioclimateStandard::WaterDistribution (const Units& units,
   const double canopy_water_capacity = vegetation.interception_capacity ();
   daisy_assert (canopy_water_capacity >= 0.0);
   
-  daisy_assert (snow_ea <= total_ep);
-  canopy_ep = (total_ep - snow_ea) * vegetation.cover ();
+  daisy_assert (snow_ea_ <= total_ep);
+  canopy_ep = (total_ep - snow_ea_) * vegetation.cover ();
   daisy_assert (canopy_ep >= 0.0);
   if (snow_water_out < 0.0)
     {
@@ -814,14 +842,14 @@ BioclimateStandard::WaterDistribution (const Units& units,
 
   // 4 Water intercepted by litter
 
-  litter_ep = (total_ep - snow_ea) * (1.0 - vegetation.cover ());
-  daisy_assert (snow_ea <= total_ep);
+  litter_ep = (total_ep - snow_ea_) * (1.0 - vegetation.cover ());
+  daisy_assert (snow_ea_ <= total_ep);
   if (litter_ep < 0.0)
     {
       std::ostringstream tmp;
       tmp << "BUG:\nlitter_ep = " << litter_ep << "\n"
           << "total_ep = " << total_ep << "\n"
-          << "snow_ea = " << snow_ea << "\n"
+          << "snow_ea_ = " << snow_ea_ << "\n"
           << "cover  = " << vegetation.cover ();
       msg.error (tmp.str ());
       litter_ep = 0.0;
@@ -893,29 +921,29 @@ BioclimateStandard::WaterDistribution (const Units& units,
   surface.tick (msg, pond_ep, 
 		litter_water_out, litter_water_temperature, 
 		geo, soil, soil_water, soil_T, dt);
-  pond_ea = surface.evap_pond (dt, msg);
-  daisy_assert (pond_ea >= 0.0);
-  total_ea += pond_ea;
+  pond_ea_ = surface.evap_pond (dt, msg);
+  daisy_assert (pond_ea_ >= 0.0);
+  total_ea += pond_ea_;
   daisy_assert (total_ea >= 0.0);
 
   // 6 Soil
 
-  soil_ep = pond_ep - pond_ea;
+  soil_ep = pond_ep - pond_ea_;
   if (soil_ep < 0.0)
     {
-      if (!approximate (pond_ep, pond_ea))
+      if (!approximate (pond_ep, pond_ea_))
         {
           std::ostringstream tmp;
           tmp << "BUG:\nsoil_ep = " << soil_ep << "\n"
               << "pond_ep = " << pond_ep << "\n"
-              << "pond_ea = " << pond_ea;
+              << "pond_ea = " << pond_ea_;
           msg.error (tmp.str ());
         }
       soil_ep = 0.0;
     }
-  soil_ea = surface.exfiltration (dt);
-  daisy_assert (soil_ea >= 0.0);
-  total_ea += soil_ea;
+  soil_ea_ = surface.exfiltration (dt);
+  daisy_assert (soil_ea_ >= 0.0);
+  total_ea += soil_ea_;
   daisy_assert (total_ea >= 0.0);
 
   // 7 Transpiration
@@ -923,8 +951,8 @@ BioclimateStandard::WaterDistribution (const Units& units,
   // Potential transpiration
   const double potential_crop_transpiration = canopy_ep - canopy_ea;
   const double potential_soil_transpiration 
-    = (pond_ep - pond_ea - soil_ea) * vegetation.EpInterchange ();
-  crop_ep = bound (0.0, 
+    = (pond_ep - pond_ea_ - soil_ea_) * vegetation.EpInterchange ();
+  crop_ep_ = bound (0.0, 
 		   potential_crop_transpiration + potential_soil_transpiration,
 		   std::max (0.0, pet->dry ()));
 
@@ -934,16 +962,15 @@ BioclimateStandard::WaterDistribution (const Units& units,
     ? (weather.hourly_global_radiation () * dt 
        / (24.0 * daily_global_radiation_))
     : 0.0;
-  crop_ea = vegetation.transpiration (units, crop_ep, canopy_ea, geo, soil,
+  crop_ea_ = vegetation.transpiration (units, crop_ep_, canopy_ea, geo, soil,
                                       soil_water, day_fraction, dt, msg);
-  daisy_assert (crop_ea >= 0.0);
-  total_ea += crop_ea;
+  daisy_assert (crop_ea_ >= 0.0);
+  total_ea += crop_ea_;
   daisy_assert (total_ea >= 0.0);
 
   // Production stress
-  svat->tick (weather, vegetation, surface, soil, soil_heat, soil_water, *pet,
-              canopy_ea, snow_ea, pond_ea + litter_ea,
-              soil_ea, crop_ea, crop_ep);
+  svat->tick (weather, vegetation, surface, geo, soil, soil_heat, soil_water, 
+              *pet, *this);
   production_stress = svat->production_stress ();
   vegetation.force_production_stress (production_stress);
 
@@ -968,8 +995,8 @@ BioclimateStandard::WaterDistribution (const Units& units,
   // Note: total_ea can be larger than total_ep, as PMSW uses a
   // different method for calculating PET.
   daisy_assert (approximate (total_ea,
-                             snow_ea + canopy_ea + litter_ea
-                             + pond_ea + soil_ea + crop_ea));
+                             snow_ea_ + canopy_ea + litter_ea
+                             + pond_ea_ + soil_ea_ + crop_ea_));
 }  
 
 void 
@@ -1003,9 +1030,9 @@ BioclimateStandard::tick (const Units& units, const Time& time,
   difrad0 = difrad->value (time, weather, msg) * hourly_global_radiation_;
   //daisy_assert (difrad0 >= 0.0);
 
-  const double sin_beta = weather.sin_solar_elevation_angle (time);
+  sin_beta_ = weather.sin_solar_elevation_angle (time);
   // Calculate total canopy, divide it into intervals, and distribute PAR.
-  RadiationDistribution (vegetation, sin_beta, msg);
+  RadiationDistribution (vegetation, sin_beta_, msg);
 
   // Distribute water among canopy, snow, and soil.
   WaterDistribution (units, time, surface, weather, vegetation, 
@@ -1017,7 +1044,7 @@ BioclimateStandard::tick (const Units& units, const Time& time,
   const double LatentHeatVapor 
     = FAO::LatentHeatVaporization (AirTemperature); //[J/kg]
   const double CanopyTranspirationRate = 
-    crop_ea /*[mm/h]*/* rho_water * LatentHeatVapor / 3600. /*[s/h]*/; //[W/m^2] 
+    crop_ea_ /*[mm/h]*/* rho_water * LatentHeatVapor / 3600. /*[s/h]*/; //[W/m^2] 
 
   const double CanopyNetRadiation = net_radiation->net_radiation () 
     * vegetation.cover ();
@@ -1041,7 +1068,7 @@ BioclimateStandard::tick (const Units& units, const Time& time,
   const double h = Height[0]/100.0; // [m]
   const double h0 = 0.12; // reference height [m]
   if (weather.surface () == Weather::field || h < h0)
-    wind_speed_field = wind_speed_weather;
+    wind_speed_field_ = wind_speed_weather;
   else
     {
       const double u = wind_speed_weather; // wind speed at reference height [m/s]
@@ -1052,13 +1079,13 @@ BioclimateStandard::tick (const Units& units, const Time& time,
       daisy_assert (u_star >= 0.0);
       const double d = 0.64 * h;
       const double z = 0.13 * h;
-      wind_speed_field = (u_star / k) * log((ScreenHeight - d)/z);
+      wind_speed_field_ = (u_star / k) * log((ScreenHeight - d)/z);
     }
-  daisy_assert (wind_speed_field >= 0.0);
+  daisy_assert (wind_speed_field_ >= 0.0);
 
   const double ra_e 
     =  FAO::AerodynamicResistance (Height[0], 
-                                   ScreenHeight, wind_speed_field); // [s m-1]
+                                   ScreenHeight, wind_speed_field_); // [s m-1]
 
   CanopyTemperature = SensibleHeatFlux * ra_e / (rho_a * c_p) 
     + AirTemperature;//[dg C]
@@ -1088,7 +1115,7 @@ BioclimateStandard::output (Log& log) const
                 "irrigation_total", log);
   output_submodule (snow, "Snow", log);
   output_variable (snow_ep, log);
-  output_variable (snow_ea, log);
+  output_variable (snow_ea_, log);
   output_variable (snow_water_in, log);
   output_variable (snow_water_in_temperature, log);
   output_variable (snow_water_out, log);
@@ -1108,16 +1135,16 @@ BioclimateStandard::output (Log& log) const
   output_variable (litter_water_in, log);
   output_variable (litter_water_out, log);
   output_variable (pond_ep, log);
-  output_variable (pond_ea, log);
+  output_variable (pond_ea_, log);
   output_variable (soil_ep, log);
-  output_variable (soil_ea, log);
+  output_variable (soil_ea_, log);
   output_derived (svat, "svat", log);
-  output_variable (crop_ep, log);
-  output_variable (crop_ea, log);
+  output_variable (crop_ep_, log);
+  output_variable (crop_ea_, log);
   output_variable (production_stress, log);
 
   output_variable (CanopyTemperature, log);
-  output_variable (wind_speed_field, log);  
+  output_variable (wind_speed_field_, log);  
   output_variable (wind_speed_weather, log);
 
   //radiation

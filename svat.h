@@ -27,6 +27,7 @@
 #include "symbol.h"
 
 class Log;
+class Geometry;
 class Soil;
 class SoilHeat;
 class SoilWater;
@@ -34,6 +35,7 @@ class Weather;
 class Vegetation;
 class Surface;
 class Pet;
+class Bioclimate;
 class Block;
 class Syntax;
 class AttributeList;
@@ -48,11 +50,8 @@ public:
   // Simulation.
 public:
   virtual void tick (const Weather&, const Vegetation&,
-		     const Surface&, const Soil&, const SoilHeat&, 
-		     const SoilWater&, const Pet&,
-		     double canopy_ea, double snow_ea,
-		     double pond_ea, double soil_ea, double crop_ea,
-                     double crop_ep) = 0;
+		     const Surface&, const Geometry&, const Soil&, const SoilHeat&, 
+		     const SoilWater&, const Pet&, const Bioclimate&) = 0;
   virtual void output (Log&) const;
   virtual double production_stress () const = 0; // []
 
