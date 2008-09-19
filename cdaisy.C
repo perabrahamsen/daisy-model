@@ -49,6 +49,7 @@
 
 #ifdef MINGW
 #ifdef __unix
+#error "Unix?"
 #define EXPORT /* Nothing */
 #elif defined (BUILD_DLL)
 /* DLL export */
