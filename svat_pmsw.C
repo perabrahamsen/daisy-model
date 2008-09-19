@@ -1302,6 +1302,7 @@ public:
   double eact; // actual evapotranspiration from tick()
   double epotc_w,epots_w,eact_w; // fluxes from cm/hr to W/m^2
   double pond_ea_w,soil_ea_w,pond_ep_w,canopy_ep_w,canopy_ea_w;// in tick
+  double crop_ea; 
   double crop_ea_w,crop_ep_w; // actual & potential transpiration (f_etep)
   double lat_s; // latent heat at soil surface , e.g. Nichols eq.7
   double temp_0; // soil temperature T(0) from soil_heat.h
@@ -1334,6 +1335,9 @@ public:
 
   // Simulation.
   double production_stress () const;
+  double transpiration() const;
+  void solve (const double /* stomata cond. [mol/m^2/s]*/, Treelog&);
+
   void tick (const Weather& weather, const Vegetation& crops,
              const Surface& surface, const Geometry&, const Soil& soil,
              const SoilHeat& soil_heat, const SoilWater& soil_water,
@@ -1350,6 +1354,15 @@ public:
 double
 SVAT_PMSW::production_stress () const
 { return pstress; }
+
+double
+SVAT_PMSW::transpiration() const 
+{ return crop_ea; }  // [mm/h]
+
+
+void 
+SVAT_PMSW::solve (const double /* stomata cond. [mol/m^2/s]*/, Treelog&) 
+{ }
 
 void
 SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
@@ -1428,6 +1441,7 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
   canopy_ea_w=680.0*canopy_ea;
   crop_ep_w=680.0*bio.crop_ep();
   crop_ea_w=680.0*bio.crop_ea();
+  crop_ea = bio.crop_ea(); // [mm/h]
 
   // no division by 0 in fprintf (fp_etep,..) and in RSC()
   if (crop_ea_w==0.0) crop_ea_w=crop_ea_w+1.0;

@@ -22,19 +22,29 @@
 #define BUILD_DLL
 
 #include "svat.h"
+#include "bioclimate.h"
 #include "syntax.h"
 #include "alist.h"
 #include "librarian.h"
 
 struct SVAT_none : public SVAT
 {
+  double crop_ea;
   // Simulation.
   void tick (const Weather&, const Vegetation&,
 	     const Surface&, const Geometry&, const Soil&, const SoilHeat&,
-	     const SoilWater&, const Pet&, const Bioclimate&)
-  { }
+	     const SoilWater&, const Pet&, const Bioclimate& bio)
+  { 
+    crop_ea = bio.crop_ea();
+  }
   double production_stress () const
   { return -1; }
+  
+  void solve(const double, Treelog&)  
+  { }
+
+  double transpiration() const 
+  { return crop_ea; }
 
   // Create.
   SVAT_none (Block& al)

@@ -80,7 +80,7 @@ struct SVAT_SSOC : public SVAT
   double lambda;         // Latent heat of vaporization in atmosphere [J/kg]
   double rho_a;          // Air density [kg m^-3]
   double gamma;          // Psychrometric constant [Pa/K]
-  double e_sat;          // Saturated water vapour pressure [Pa]
+  double e_sat_atm;      // Saturated water vapour pressure at air temp [Pa]
   double e_a;            // Actual vapour pressure of water in the atmosphere [Pa]
   double s;              // Slope of water vapour pressure curve [Pa/K]
 
@@ -105,13 +105,22 @@ struct SVAT_SSOC : public SVAT
   double e_c;          // Actual vapour pressure of water in the atmosphere [Pa]
 
   // - Fluxes
-  double H_soil;     // Sensible heat flux from the soil [W m^-2] 
-  double H_sun;      // Sensible heat flux from the sunlit leaves to the canopy point
-                     // [W m^-2] 
-  double H_shadow;   // Sensible heat flux from the shadow leaves to canopy point
-                     // [W m^-2] 
-  double H_c_a;      // Sensible heat flux from the canopy point to free atmosphere
-                     //[W m^-2] 
+  double H_soil;   // Sensible heat flux from the soil [W m^-2] 
+  double H_sun;    // Sensible heat flux from the sunlit leaves to the canopy point
+                   // [W m^-2] 
+  double H_shadow; // Sensible heat flux from the shadow leaves to canopy point
+                   // [W m^-2] 
+  double H_c_a;    // Sensible heat flux from the canopy point to free atmosphere
+                   // [W m^-2] 
+  double LE_sun;   // Latent heat flux from the sunlit leaves to the canopy point
+                   // [W m^-2] 
+  double LE_shadow;// Latent heat flux from the shadow leaves to the canopy point
+                   // [W m^-2] 
+  double  LE_atm;  // Latent heat flux from the canopy point to the free atmosphere
+                   // [W m^-2]   
+
+  // - Transpiration
+  double  E_trans; // Leaf transpiration [kg m^-2 s^-1]
 
   // Inter-intermediates variables
   double G_R;       // Radiation "conductivity" [W m^-2 K^-1]
@@ -148,6 +157,9 @@ struct SVAT_SSOC : public SVAT
   double production_stress () const
   { return -1; }
 
+  double transpiration () const
+  { return E_trans * 3600.; } // [kg m^-2 s^-1]->[mm h^-1]
+
   void output(Log& log) const;
 
   // Create.
@@ -178,8 +190,8 @@ SVAT_SSOC::tick (const Weather& weather, const Vegetation& vegetation,
   w_l = vegetation.leaf_width () / 100.; // [m] 
   rho_a = Resistance:: rho_a(T_a); //[kg m^-3]
   gamma = FAO::PsychrometricConstant (Resistance::P_surf, T_a); // [Pa/K]
-  e_sat = FAO::SaturationVapourPressure (T_a); // [Pa]
-  e_a = e_sat * RH;             // [Pa]; 
+  e_sat_atm = FAO::SaturationVapourPressure (T_a); // [Pa]
+  e_a = e_sat_atm * RH;             // [Pa]; 
   s = FAO::SlopeVapourPressureCurve (T_a); // [Pa/K]
   lambda = FAO::LatentHeatVaporization (T_a); // [J/kg]
   T_z0 = soil_heat.T_top();     // [dg C]
@@ -360,8 +372,8 @@ SVAT_SSOC:: calculate_temperatures()
                                                   + G_H_sun_c + G_H_shadow_c);
       
       const double b_can = ((G_W_a * e_a + lambda * E_soil 
-                             + G_W_sun_c * (e_sat * (T_a + TK) - s * (T_a + TK))
-                             + G_W_shadow_c * (e_sat * (T_a + TK) - s * (T_a + TK)))
+                             + G_W_sun_c * (e_sat_atm - s * (T_a + TK))
+                             + G_W_shadow_c * (e_sat_atm - s * (T_a + TK)))
                             /(G_W_a + G_W_sun_c + G_W_shadow_c));
       
       const double b_can_sun = (G_W_sun_c * s)/(G_W_a + G_W_sun_c + G_W_shadow_c);
@@ -371,7 +383,7 @@ SVAT_SSOC:: calculate_temperatures()
       
       const double c_sun = ((R_eq_abs_sun + G_R *  (T_a + TK) + G_H_sun_c * a_can 
                              + G_W_sun_c * (s * (T_a + TK) 
-                                            - e_sat * (T_a + TK) + b_can))
+                                            - e_sat_atm + b_can))
                             / (G_R + G_H_sun_c * (1 - a_can_sun)
                                + G_W_sun_c * (s - b_can_sun)));
       
@@ -383,7 +395,7 @@ SVAT_SSOC:: calculate_temperatures()
       const double c_shadow = ((R_eq_abs_shadow + G_R *  (T_a + TK) 
                                 + G_H_shadow_c * a_can 
                                 + G_W_shadow_c * (s * (T_a + TK)
-                                                  - e_sat * (T_a + TK) + b_can)) 
+                                                  - e_sat_atm + b_can)) 
                                / (G_R + G_H_shadow_c * (1 - a_can_shadow)
                                   + G_W_shadow_c * (s - b_can_shadow)));
       
@@ -435,7 +447,24 @@ SVAT_SSOC:: calculate_fluxes()
       H_soil = G_H_shadow_c * (T_shadow - T_c) ; //[W m^-2] 
       // Sensible heat flux from the canopy point to free atmosphere
       H_c_a = G_H_a * (T_c - T_a);      //[W m^-2] 
+      
+      const double e_sat_sun = FAO::SaturationVapourPressure (T_sun); // [Pa]
+      const double e_sat_shadow = FAO::SaturationVapourPressure (T_shadow); // [Pa]
+
+      // Latent heat flux from the sunlit leaves to the canopy point
+      LE_sun = G_W_sun_c * (e_sat_sun - e_c);         // [W m^-2]
+      // Latent heat flux from the shadow leaves to the canopy point
+      LE_shadow = G_W_shadow_c * (e_sat_shadow - e_c); // [W m^-2]
+      // Latent heat flux from the canopy point to the free atmosphere
+      LE_atm = G_W_a * (e_c - e_a);                   // [W m^-2]
+      
+      // Transpiration
+      E_trans = (LE_sun + LE_shadow) / lambda;        //[kg m^-2 s^-1]
+
+
     }
+
+  
 }
 
 
@@ -495,6 +524,10 @@ SVAT_SSOC::output(Log& log) const
   output_variable (H_sun, log);
   output_variable (H_shadow, log);
   output_variable (H_c_a, log);
+  output_variable (LE_sun, log);
+  output_variable (LE_shadow, log);
+  output_variable (LE_atm, log);
+  output_variable (E_trans, log);
 }
 
 void 
@@ -544,6 +577,13 @@ to reference height (screen height).");
               "Sensible heat flux from the shadow leaves to canopy point.");
   syntax.add ("H_c_a", "W m^-2", Syntax::LogOnly, 
               "Sensible heat flux from the canopy point to free atmosphere.");
+  syntax.add ("LE_sun", "W m^-2", Syntax::LogOnly, 
+              "Latent heat flux from the sunlit leaves to the canopy point.");
+  syntax.add ("LE_shadow", "W m^-2", Syntax::LogOnly, 
+              "Latent heat flux from the shadow leaves to the canopy point.");
+  syntax.add ("LE_atm", "W m^-2", Syntax::LogOnly, 
+              "Latent heat flux from the canopy point to the free atmosphere.");
+  syntax.add ("E_trans", "kg m^-2 s^-1", Syntax::LogOnly, "Leaf transpiration.");
 
   //  syntax.add ("", "", Syntax::LogOnly, ".");
 }
@@ -571,7 +611,7 @@ SVAT_SSOC::SVAT_SSOC (Block& al)
     lambda (-42.42e42),
     rho_a (-42.42e42),
     gamma (-42.42e42),
-    e_sat (-42.42e42),
+    e_sat_atm (-42.42e42),
     e_a (-42.42e42),
     s (-42.42e42),
     T_s (-42.42e42),
@@ -587,6 +627,14 @@ SVAT_SSOC::SVAT_SSOC (Block& al)
     g_H_shadow_c (-42.42e42),
     g_W_shadow_c (-42.42e42),
     e_c (-42.42e42),
+    H_soil (-42.42e42),
+    H_sun (-42.42e42),
+    H_shadow (-42.42e42),
+    H_c_a (-42.42e42),
+    LE_sun (-42.42e42),
+    LE_shadow (-42.42e42),
+    LE_atm (-42.42e42),
+    E_trans (-42.42e42),
     G_R (-42.42e42),
     G_H_a (-42.42e42),
     G_W_a (-42.42e42),
