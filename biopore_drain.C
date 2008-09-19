@@ -133,6 +133,7 @@ BioporeDrain::matrix_biopore_drain (size_t c, const Geometry& geo,
       // The largest pressure gradient between the domains are
       // pressure_end, above that we claim air will disrupt the suction.
       const double h_3_suck = std::max (h_3, h + pressure_end);
+      
       S = matrix_to_biopore (K_xx, M_c, r_c, h, h_3_suck)
         * geo.fraction_in_z_interval (c, height_start, height_end);
     }
