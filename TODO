@@ -2,23 +2,25 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Mandag
 
-** 1. FAO_PM: giver dry og wet meget forskellige resultater?
+** FAO_PM: giver dry og wet meget forskellige resultater?
 
 I så fald, brug "dry"
 
-** 2. 
+** Finn opsætning
 
-crop assimilate (split tick -> assimilate & other)
+** crop assimilate (split tick -> assimilate & other)
 
-colloids error
+*** Check hvor mange ting der skal nulstilles i svat (photo)
 
-biopores MMO
+*** vegetation.transpiration er måske stedet det skal kaldes.
 
-daisy.dll find entry point
+Diskuter med Søren.  (Enkelt planter vs gennemsnit).
 
+*** Tænk stress faktorer igennem, kan nogle få default?
 
+** colloids error
 
-
+** biopores MMO
 
 * test-mibsol.dai
 

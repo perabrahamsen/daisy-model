@@ -119,6 +119,22 @@ struct CropStandard : public Crop
   { root_system->production_stress = pstress; }
 
   // Simulation.
+  void svat (const Units&, const Time& time, double relative_humidity,
+             const double CO2_atm, const Bioclimate&, double dt, Treelog&);
+  void tick_after (const Time& time, 
+                   const Bioclimate&, const Geometry& geo,
+                   const Soil&,
+                   OrganicMatter&,
+                   const SoilHeat&,
+                   const SoilWater&,
+                   Chemistry&,
+                   double& residuals_DM,
+                   double& residuals_N_top, double& residuals_C_top,
+                   std::vector<double>& residuals_N_soil,
+                   std::vector<double>& residuals_C_soil,
+                   double ForcedCAI,
+                   double dt,
+                   Treelog&);
   void tick (const Units&, const Time& time, double relative_humidity,
 	     const double CO2_atm,
 	     const Bioclimate&, const Geometry& geo,
@@ -294,29 +310,138 @@ You must specify initial N content in either 'Prod' or 'Seed'");
 }
 
 void
-CropStandard::tick (const Units& units,
-                    const Time& time, const double relative_humidity, 
-		    const double CO2_atm,
-		    const Bioclimate& bioclimate,
-                    const Geometry& geo,
-		    const Soil& soil,
-		    OrganicMatter& organic_matter,
-		    const SoilHeat& soil_heat,
-		    const SoilWater& soil_water,
-		    Chemistry& chemistry,
-		    double& residuals_DM,
-		    double& residuals_N_top, double& residuals_C_top,
-		    std::vector<double>& residuals_N_soil,
-		    std::vector<double>& residuals_C_soil,
-		    const double ForcedCAI,
+CropStandard::svat (const Units& units, const Time& time,
+                    const double relative_humidity, const double CO2_atm,
+                    const Bioclimate& bioclimate,
                     const double dt,
-		    Treelog& msg)
+                    Treelog& msg)
 {
-  daisy_assert (last_time.get ());
+  TREELOG_MODEL (msg);
 
-  Treelog::Open nest (msg, name);
+  const double DS = development->DS;
 
-  const double& DS = development->DS;
+  if (DS <= 0.0 || development->mature ())
+    return;
+
+  double Ass = 0.0;
+  const std::vector<double>& total_PAR = bioclimate.PAR (); 
+  const std::vector<double>& sun_PAR = bioclimate.sun_PAR ();
+  daisy_assert (sun_PAR.size () > 1);
+  daisy_assert (total_PAR.size () == sun_PAR.size ());
+  std::vector<double> shadow_PAR;
+      
+  for(int i = 0; i < total_PAR.size (); i++) 
+    shadow_PAR.push_back(total_PAR[i] - sun_PAR[i]);
+      
+  const double total_LAI = bioclimate.LAI ();
+  const std::vector<double>& fraction_sun_LAI = bioclimate.sun_LAI_fraction ();
+  const std::vector<double>& PAR_height = bioclimate.height ();
+      
+  std::vector<double> fraction_shadow_LAI;
+  std::vector<double> fraction_total_LAI;
+  const int No = fraction_sun_LAI.size ();
+
+  // True, if we haven't reached the top of the crop yet.
+  bool top_crop = true;
+
+  for(int i = 0; i < No; i++) 
+    {
+      const double f_sun = fraction_sun_LAI[i]; 
+      fraction_shadow_LAI.push_back(1.0-f_sun);
+      fraction_total_LAI.push_back(1.0);
+      daisy_assert (f_sun <= 1.0);
+      daisy_assert (f_sun >= 0.0);
+
+      const double height = PAR_height[i+1];
+      daisy_assert (height < PAR_height[i]);
+
+      if (top_crop && height <= canopy.Height)
+        {
+          // We count day hours at the top of the crop.
+          top_crop = false;
+          if (total_PAR[i] > 0.5 * 25.0)      //W/m2
+            development->light_time (dt);
+        }
+    }
+
+  // We use non-functional (Nf) and critical limits (Cr) to
+  // estimate how much N is used in photosynthesis.  The
+  // non-functional is considered structural N, and not used in
+  // photosynthesis.  N content above critical is considered
+  // luxury, and also not used in photosynthesis.
+  const double N_at_Nf 
+    = canopy.corresponding_WLeaf (DS) * nitrogen.NfLeafCnc (DS);
+  const double N_at_Cr
+    = canopy.corresponding_WLeaf (DS) * nitrogen.CrLeafCnc (DS);
+  const double N_above_Nf = production.NLeaf - N_at_Nf;
+  const double rubiscoN = bound (0.0, N_above_Nf, N_at_Cr - N_at_Nf);
+  daisy_assert (rubiscoN >= 0.0);
+      
+  const double ABA_xylem = root_system->ABAConc;
+  daisy_assert (std::isfinite (ABA_xylem));
+  daisy_assert (ABA_xylem >= 0.0);
+
+  if (bioclimate.shared_light_fraction () > 1e-10)
+    {
+      // Shared light.
+      Ass += photo->assimilate (units,
+                                ABA_xylem, relative_humidity, CO2_atm,
+                                bioclimate.daily_air_temperature (), 
+                                bioclimate.hourly_canopy_temperature(),
+                                rubiscoN, shadow_PAR, PAR_height,
+                                total_LAI, fraction_shadow_LAI, dt,
+                                canopy, *development, msg)
+        * bioclimate.shared_light_fraction ();
+
+      Ass += photo->assimilate (units,
+                                ABA_xylem, relative_humidity, CO2_atm,
+                                bioclimate.daily_air_temperature (),
+                                bioclimate.hourly_canopy_temperature(),
+                                rubiscoN, sun_PAR,  PAR_height,
+                                total_LAI, fraction_sun_LAI, dt,
+                                canopy, *development, msg)
+        * bioclimate.shared_light_fraction ();
+    }
+
+  if (min_light_fraction > 1e-10)// Only total PAR, not sun shadow
+    {
+      // Private light.
+      const int No = 30;
+      std::vector<double> PAR (No + 1, 0.0);
+      Bioclimate::radiation_distribution 
+        (No, LAI (), PARref (), bioclimate.hourly_global_radiation (),
+         PARext (), PAR); 
+      Ass += photo->assimilate (units,
+                                ABA_xylem, relative_humidity, CO2_atm,
+                                bioclimate.daily_air_temperature (), 
+                                bioclimate.hourly_canopy_temperature(),
+                                rubiscoN, PAR, PAR_height,
+                                bioclimate.LAI (), fraction_total_LAI, dt,
+                                canopy, *development, msg)
+        * min_light_fraction;
+    }
+  daisy_assert (std::isfinite (Ass));
+  production.PotCanopyAss = Ass;
+}
+
+void
+CropStandard::tick_after (const Time& time, 
+                          const Bioclimate& bioclimate,
+                          const Geometry& geo,
+                          const Soil& soil,
+                          OrganicMatter& organic_matter,
+                          const SoilHeat& soil_heat,
+                          const SoilWater& soil_water,
+                          Chemistry& chemistry,
+                          double& residuals_DM,
+                          double& residuals_N_top, double& residuals_C_top,
+                          std::vector<double>& residuals_N_soil,
+                          std::vector<double>& residuals_C_soil,
+                          const double ForcedCAI,
+                          const double dt,
+                          Treelog& msg)
+{
+  TREELOG_MODEL (msg);
 
   // Update cut stress.
   harvesting->tick (time);
@@ -335,6 +460,7 @@ CropStandard::tick (const Units& units,
   development->DAP += dt/24.0;
 
   // New day?
+  daisy_assert (last_time.get ());
   const Timestep daystep = time - *last_time;
   const bool new_day = (time.yday () != last_time->yday ()
                         || time.year () != last_time->year ());
@@ -342,6 +468,7 @@ CropStandard::tick (const Units& units,
     *last_time = time;
 
   // Emergence.
+  const double& DS = development->DS;
   if (DS <= 0)
     {
       if (!new_day)
@@ -411,120 +538,16 @@ CropStandard::tick (const Units& units,
   const double nitrogen_stress = nitrogen.nitrogen_stress;
   const double water_stress = root_system->water_stress;
 
-  if (true //bioclimate.hourly_global_radiation () > 1e-10  
-      && canopy.CAI > 0)
-    {
-      double Ass = 0.0;
-      const std::vector<double>& total_PAR = bioclimate.PAR (); 
-      const std::vector<double>& sun_PAR = bioclimate.sun_PAR ();
-      daisy_assert (sun_PAR.size () > 1);
-      daisy_assert (total_PAR.size () == sun_PAR.size ());
-      std::vector<double> shadow_PAR;
-      
-      for(int i = 0; i < total_PAR.size (); i++) 
-	shadow_PAR.push_back(total_PAR[i] - sun_PAR[i]);
-      
-      const double total_LAI = bioclimate.LAI ();
-      const std::vector<double>& fraction_sun_LAI = bioclimate.sun_LAI_fraction ();
-      const std::vector<double>& PAR_height = bioclimate.height ();
-      
-      std::vector<double> fraction_shadow_LAI;
-      std::vector<double> fraction_total_LAI;
-      const int No = fraction_sun_LAI.size ();
-
-      // True, if we haven't reached the top of the crop yet.
-      bool top_crop = true;
-
-      for(int i = 0; i < No; i++) 
-	{
-	  const double f_sun = fraction_sun_LAI[i]; 
-	  fraction_shadow_LAI.push_back(1.0-f_sun);
-	  fraction_total_LAI.push_back(1.0);
-	  daisy_assert (f_sun <= 1.0);
-	  daisy_assert (f_sun >= 0.0);
-
-	  const double height = PAR_height[i+1];
-	  daisy_assert (height < PAR_height[i]);
-
-	  if (top_crop && height <= canopy.Height)
-	    {
-	      // We count day hours at the top of the crop.
-	      top_crop = false;
-	      if (total_PAR[i] > 0.5 * 25.0)      //W/m2
-		development->light_time (dt);
-	    }
- 	}
-
-      // We use non-functional (Nf) and critical limits (Cr) to
-      // estimate how much N is used in photosynthesis.  The
-      // non-functional is considered structural N, and not used in
-      // photosynthesis.  N content above critical is considered
-      // luxury, and also not used in photosynthesis.
-      const double N_at_Nf 
-        = canopy.corresponding_WLeaf (DS) * nitrogen.NfLeafCnc (DS);
-      const double N_at_Cr
-        = canopy.corresponding_WLeaf (DS) * nitrogen.CrLeafCnc (DS);
-      const double N_above_Nf = production.NLeaf - N_at_Nf;
-      const double rubiscoN = bound (0.0, N_above_Nf, N_at_Cr - N_at_Nf);
-      daisy_assert (rubiscoN >= 0.0);
-      
-      const double ABA_xylem = root_system->ABAConc;
-      daisy_assert (std::isfinite (ABA_xylem));
-      daisy_assert (ABA_xylem >= 0.0);
-
-      if (bioclimate.shared_light_fraction () > 1e-10)
-        {
-          // Shared light.
-	  Ass += photo->assimilate (units,
-                                    ABA_xylem, relative_humidity, CO2_atm,
-				    bioclimate.daily_air_temperature (), 
-				    bioclimate.hourly_canopy_temperature(),
-				    rubiscoN, shadow_PAR, PAR_height,
-                                    total_LAI, fraction_shadow_LAI, dt,
-                                    canopy, *development, msg)
-            * bioclimate.shared_light_fraction ();
-
-          Ass += photo->assimilate (units,
-                                    ABA_xylem, relative_humidity, CO2_atm,
-				    bioclimate.daily_air_temperature (),
-				    bioclimate.hourly_canopy_temperature(),
-				    rubiscoN, sun_PAR,  PAR_height,
-                                    total_LAI, fraction_sun_LAI, dt,
-                                    canopy, *development, msg)
-            * bioclimate.shared_light_fraction ();
-        }
-
-      if (min_light_fraction > 1e-10)// Only total PAR, not sun shadow
-        {
-          // Private light.
-          const int No = 30;
-          std::vector<double> PAR (No + 1, 0.0);
-          Bioclimate::radiation_distribution 
-            (No, LAI (), PARref (), bioclimate.hourly_global_radiation (),
-             PARext (), PAR); 
-          Ass += photo->assimilate (units,
-                                    ABA_xylem, relative_humidity, CO2_atm,
-				    bioclimate.daily_air_temperature (), 
-				    bioclimate.hourly_canopy_temperature(),
-				    rubiscoN, PAR, PAR_height,
-				    bioclimate.LAI (), fraction_total_LAI, dt,
-				    canopy, *development, msg)
-            * min_light_fraction;
-        }
-      daisy_assert (std::isfinite (Ass));
-      production.PotCanopyAss = Ass;
-      if (root_system->production_stress >= 0.0)
-	Ass *= (1.0 - root_system->production_stress);
-      else 
-	Ass *= water_stress_effect->factor (water_stress);
-      if (enable_N_stress)
-	Ass *= (1.0 - nitrogen_stress);
-      Ass *= (1.0 - harvesting->cut_stress);
-      production.CanopyAss = Ass;
-      daisy_assert (Ass >= 0.0);
-    }
-  else
-    production.PotCanopyAss = production.CanopyAss = 0.0;
+  double Ass = production.PotCanopyAss;
+  if (root_system->production_stress >= 0.0)
+    Ass *= (1.0 - root_system->production_stress);
+  else 
+    Ass *= water_stress_effect->factor (water_stress);
+  if (enable_N_stress)
+    Ass *= (1.0 - nitrogen_stress);
+  Ass *= (1.0 - harvesting->cut_stress);
+  production.CanopyAss = Ass;
+  daisy_assert (Ass >= 0.0);
 
   const double T_soil_3 
     = geo.content_height (soil_heat, &SoilHeat::T, -root_system->Depth/3.0);
@@ -553,6 +576,33 @@ CropStandard::tick (const Units& units,
                            production.WRoot, production.root_growth (),
                            DS, msg);
   production.tick_daily ();
+}
+
+void
+CropStandard::tick (const Units& units,
+                    const Time& time, const double relative_humidity, 
+		    const double CO2_atm,
+		    const Bioclimate& bioclimate,
+                    const Geometry& geo,
+		    const Soil& soil,
+		    OrganicMatter& organic_matter,
+		    const SoilHeat& soil_heat,
+		    const SoilWater& soil_water,
+		    Chemistry& chemistry,
+		    double& residuals_DM,
+		    double& residuals_N_top, double& residuals_C_top,
+		    std::vector<double>& residuals_N_soil,
+		    std::vector<double>& residuals_C_soil,
+		    const double ForcedCAI,
+                    const double dt,
+		    Treelog& msg)
+{
+  TREELOG_MODEL (msg);
+  svat (units, time, relative_humidity, CO2_atm, bioclimate, dt, msg);
+  tick_after (time, bioclimate,
+              geo, soil, organic_matter, soil_heat, soil_water, chemistry,
+              residuals_DM, residuals_N_top, residuals_C_top, 
+              residuals_N_soil, residuals_C_soil, ForcedCAI, dt, msg);
 }
 
 const Harvest&
