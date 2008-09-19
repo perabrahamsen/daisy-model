@@ -59,7 +59,12 @@ public:
   }
 
   double wet () const
-  { return potential_evapotranspiration_wet; }
+  { 
+    // BUG!!!!! should be DRY.
+    // But FAO::RefPenmanMonteithWet might be wrong!
+    // return potential_evapotranspiration_wet; 
+    return dry ();
+}
 
   double dry () const
   { return potential_evapotranspiration_dry; }

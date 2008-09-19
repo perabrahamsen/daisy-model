@@ -6,6 +6,15 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.48
+
+** Workaround for bug in FAO_PM.
+
+Simulations results produced with any version of Daisy since 4.34
+using FAO_PM for potential evopotranspiration are wrong.
+
+** Ongoing work on tertiary domain, colloids. and SVAT.
+
 * 4.47
 
 ** Fixed bug affecting 'rectangle' movement.

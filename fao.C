@@ -225,6 +225,7 @@ double
 FAO::RefPenmanMonteithWet (double Rn, double G, double Temp, double ea,
 			   double U2, double AtmPressure)
 {
+  // BUG!!! Results seeem very wrong (50% off)
   const double ra = RefAerodynamicResistance (U2);
   const double rc = 0.0;
   const double E1 = ETrad (AtmPressure, Temp, Rn, G, ra, rc);
