@@ -32,16 +32,20 @@
 
 class Log;
 class Block;
+class Unit;
 
-class IMvec : private boost::noncopyable // [g/cm^3]
+class IMvec : private boost::noncopyable
 {
   // Content.
 private:
   typedef std::map<symbol, std::vector<double>/**/> map_type;
   map_type content;
+  const Unit& unit_;
 
   // Accessors.
 public:
+  const Unit& unit () const
+  { return unit_; }
   const std::vector<double>& get_array (symbol chem) const;
   void set_array (symbol chem, const std::vector<double>& value);
   double get_value (symbol chem, size_t index) const;
@@ -83,7 +87,6 @@ public:
 			  const char *const description);
   explicit IMvec (Block&, const char*);
   ~IMvec ();
-  explicit IMvec ();
 };
 
 #endif // IMVEC_H

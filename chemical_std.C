@@ -695,7 +695,6 @@ ChemicalStandard::tick_soil (const Units& units, const Geometry& geo,
 
   // Constants.
   const size_t cell_size = geo.cell_size ();
-  const bool solid = adsorption_->full ();
 
   // Find C below.
   if (!C_below_expr->tick_value (units, C_below_value, g_per_cm3, scope, msg))

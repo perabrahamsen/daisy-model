@@ -99,7 +99,6 @@ Biopore::matrix_to_biopore (double K_xx, double M_c, double r_c,
   return S;
 }
 
-
 double 
 Biopore::biopore_to_matrix (double R_wall, double M_c, double r_c,
                             double h, double h_3)

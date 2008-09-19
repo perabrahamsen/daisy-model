@@ -22,6 +22,7 @@
 
 #include "biopore.h"
 #include "imvec.h"
+#include "im.h"
 #include "block.h"
 #include "vcheck.h"
 #include "librarian.h"
@@ -37,6 +38,7 @@
 #include "chemical.h"
 #include "groundwater.h"
 #include <sstream>
+#include <numeric>
 
 // The 'matrix' model.
 
@@ -89,6 +91,7 @@ struct BioporeMatrix : public Biopore
     return height_end + h_bottom[col]; 
   }
   double total_water () const;
+  void get_solute (IM&) const;
 
   // Simulation.
   double capacity (const Geometry& geo, size_t e, const double dt /* [h] */)
@@ -207,6 +210,21 @@ BioporeMatrix::total_water () const
   return total;
 }
 
+void
+BioporeMatrix::get_solute (IM& im) const
+{
+  const Unit& my_unit = solute->unit ();
+  const size_t col_size = xplus.size ();
+  for (IMvec::const_iterator i = solute->begin (); i != solute->end (); ++i)
+    {
+      const symbol chem = *i;
+      const std::vector<double>& array = solute->get_array (chem);
+      daisy_assert (array.size () == col_size);
+      const double sum = std::accumulate (array.begin (), array.end (), 0.0);
+      im.add_value (chem, my_unit, sum);
+    }
+}
+
 double 
 BioporeMatrix::capacity (const Geometry& geo, size_t e, const double dt) const 
 {
@@ -268,7 +286,7 @@ BioporeMatrix::matrix_biopore_matrix (size_t c, const Geometry& geo,
   const double r_c = diameter / 2.0; // [cm]
   const double cell_z = geo.cell_z (c); // [cm]
   const double z_air = height_end + h3_bottom;
-  const double h3_cell = std::max (z_air - cell_z, pressure_end); // [cm]
+  const double h3_cell = z_air - cell_z; // [cm]
   const double cell_bottom = geo.cell_bottom (c);
   const double low_point = std::max (height_end, cell_bottom); // [cm]
   const double h3_min = low_point - cell_z; // [cm]
@@ -285,8 +303,13 @@ BioporeMatrix::matrix_biopore_matrix (size_t c, const Geometry& geo,
       S = - wall_fraction * biopore_to_matrix (R_wall, M_c, r_c, h, h3_cell);
     }
   else if (active && h>h3_cell + h_barrier)
-    S = matrix_to_biopore (K_xx, M_c, r_c, h, h3_cell)
-      * geo.fraction_in_z_interval (c, height_start, height_end);
+    {
+      // The largest pressure gradient between the domains are
+      // pressure_end, above that we claim air will disrupt the suction.
+      const double h3_suck = std::max (h3_cell, h + pressure_end);
+      S = matrix_to_biopore (K_xx, M_c, r_c, h, h3_suck)
+        * geo.fraction_in_z_interval (c, height_start, height_end);
+    }
   else 
     S = 0.0;
   return S;
@@ -880,8 +903,8 @@ Increase value to get more debug message.");
     alist.add ("debug", 0);
     syntax.add ("h_bottom", "cm", Syntax::OptionalState, Syntax::Sequence,
                 "Pressure at the bottom of the biopores in each interval.");
-    static const symbol C_unit ("g");
-    IMvec::add_syntax (syntax, alist, Syntax::OptionalState, "solute", C_unit,
+    IMvec::add_syntax (syntax, alist, Syntax::OptionalState, "solute",
+                       IM::mass_unit (),
                        "Chemical concentration in biopore intervals.");
     syntax.add ("water", "cm^3", Syntax::LogOnly, "Water content.");    
     syntax.add ("iterations", Syntax::Integer, Syntax::LogOnly, 

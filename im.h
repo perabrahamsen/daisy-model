@@ -65,17 +65,19 @@ class IM
 {
   // Utility.
 public:
+  static symbol mass_unit (); // [g]
   static symbol storage_unit (); // [g/cm^2]
   static symbol flux_unit ();    // [g/cm^2/h]
   static symbol solute_unit ();  // [g/cm^2/mm]
 
   // Content.
 private:
-  const Unit* unit;
+  const Unit* unit_;
   std::map<symbol, double> content;
 
   // Accessors.
 public:
+  const Unit& unit () const;
   double get_value (symbol chem, const Unit&) const;
   void set_value (symbol chem, const Unit&, double value);
   void add_value (symbol chem, const Unit&, double value);

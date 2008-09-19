@@ -962,6 +962,22 @@ pmain${OBJ}: pmain.C
 
 ############################################################
 # AUTOMATIC -- DO NOT CHANGE THIS LINE OR ANYTHING BELOW IT!
+run_Qt${OBJ}: run_Qt.C run_Qt.h run.h model.h symbol.h alist.h toplevel.h \
+  treelog_text.h treelog.h vis_Qt.h time.h program.h
+vis_Qt${OBJ}: vis_Qt.C vis_Qt.h toplevel.h time.h log_Qt.h log_extern.h \
+  log_select.h log.h border.h model.h symbol.h alist.h memutils.h \
+  destination.h scope.h mathlib.h assertion.h
+log_Qt${OBJ}: log_Qt.C log_Qt.h log_extern.h log_select.h log.h time.h \
+  border.h model.h symbol.h alist.h memutils.h destination.h scope.h \
+  librarian.h syntax.h treelog.h
+ui_Qt_run${OBJ}: ui_Qt_run.C ui_Qt_run.h ui_Qt.h ui.h model.h symbol.h \
+  alist.h vis_Qt.h toplevel.h time.h memutils.h log_Qt.h log_extern.h \
+  log_select.h log.h border.h destination.h scope.h run_Qt.h run.h \
+  treelog_text.h treelog.h program.h metalib.h library.h librarian.h \
+  block.h syntax.h plf.h assertion.h path.h
+ui_Qt${OBJ}: ui_Qt.C ui_Qt.h ui.h model.h symbol.h alist.h toplevel.h \
+  librarian.h block.h syntax.h treelog.h plf.h assertion.h
+main_Qt${OBJ}: main_Qt.C ui_Qt.h ui.h model.h symbol.h alist.h toplevel.h
 seed${OBJ}: seed.C seed.h model.h symbol.h alist.h block.h syntax.h treelog.h \
   plf.h librarian.h
 stomatacon${OBJ}: stomatacon.C stomatacon.h model.h symbol.h alist.h \
@@ -1289,7 +1305,8 @@ units${OBJ}: units.C units.h symbol.h unit.h model.h alist.h convert.h \
 tertsmall${OBJ}: tertsmall.C tertsmall.h anystate.h
 anystate${OBJ}: anystate.C anystate.h assertion.h
 imvec${OBJ}: imvec.C imvec.h symbol.h syntax.h treelog.h assertion.h log.h \
-  time.h border.h model.h alist.h chemical.h check.h block.h plf.h
+  time.h border.h model.h alist.h chemical.h check.h block.h plf.h \
+  units.h
 im${OBJ}: im.C im.h symbol.h syntax.h treelog.h chemical.h model.h alist.h \
   units.h unit.h am.h log.h time.h border.h block.h plf.h check.h \
   assertion.h
@@ -1424,12 +1441,12 @@ tertiary_biopores${OBJ}: tertiary_biopores.C tertiary.h model.h symbol.h \
   alist.h tertsmall.h biopore.h number.h memutils.h librarian.h block.h \
   syntax.h treelog.h plf.h check.h geometry.h mathlib.h assertion.h \
   soil.h soil_water.h soil_heat.h log.h time.h border.h anystate.h \
-  surface.h uzmodel.h chemical.h groundwater.h
+  surface.h uzmodel.h chemical.h groundwater.h im.h units.h
 biopore_matrix${OBJ}: biopore_matrix.C biopore.h model.h symbol.h alist.h \
-  number.h imvec.h syntax.h treelog.h block.h plf.h vcheck.h librarian.h \
-  submodeler.h assertion.h geometry.h mathlib.h soil.h soil_heat.h \
-  secondary.h volume_box.h volume.h log.h time.h border.h check.h \
-  anystate.h chemical.h groundwater.h
+  number.h imvec.h syntax.h treelog.h im.h block.h plf.h vcheck.h \
+  librarian.h submodeler.h assertion.h geometry.h mathlib.h soil.h \
+  soil_heat.h secondary.h volume_box.h volume.h log.h time.h border.h \
+  check.h anystate.h chemical.h groundwater.h
 transport_Mollerup${OBJ}: transport_Mollerup.C transport.h model.h symbol.h \
   alist.h geometry_rect.h geometry_vert.h geometry.h syntax.h treelog.h \
   mathlib.h assertion.h soil.h solver.h log.h time.h border.h \

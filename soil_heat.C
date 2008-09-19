@@ -604,7 +604,7 @@ SoilHeat::T_top () const	// [dg C]
 
 double 
 SoilHeat::top_flux (const Geometry& geo,
-                      const Soil& soil, const SoilWater& soil_water) const
+                    const Soil& soil, const SoilWater& soil_water) const
 {
   // BUG: Geometry1D only.
   const double k 

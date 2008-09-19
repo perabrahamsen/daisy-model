@@ -135,6 +135,7 @@
         ("Crop Production" (crop "Spring Barley") (where "sbarley.dlf"))
         ("Field chemical" (chemical colloid))
         ("Soil chemical" (chemical colloid-filtered))
+        ("Colloids")
         (checkpoint (when (at 1987 8 7 6))))
 
 ;;; test-mibsol.dai ends here.

@@ -963,7 +963,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
        / (24.0 * daily_global_radiation_))
     : 0.0;
   crop_ea_ = vegetation.transpiration (units, crop_ep_, canopy_ea, geo, soil,
-                                      soil_water, day_fraction, dt, msg);
+                                       soil_water, day_fraction, dt, msg);
   daisy_assert (crop_ea_ >= 0.0);
   total_ea += crop_ea_;
   daisy_assert (total_ea >= 0.0);

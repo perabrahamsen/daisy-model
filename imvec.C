@@ -28,6 +28,7 @@
 #include "chemical.h"
 #include "check.h"
 #include "block.h"
+#include "units.h"
 
 const std::vector<double>& 
 IMvec::get_array (symbol chem) const
@@ -111,7 +112,18 @@ IMvec::add_syntax (Syntax& parent_syntax, AttributeList& parent_alist,
   parent_alist.add (key, std::vector<const AttributeList*> ());
 }
 
+const Unit&
+find_unit (Block& parent, const char* key)
+{
+  const Units& units = parent.units ();
+  const Syntax& parent_syntax = parent.find_syntax (key);
+  const Syntax& syntax = parent_syntax.syntax (key);
+  const symbol dim (syntax.dimension ("value"));
+  return units.get_unit (dim);
+}
+
 IMvec::IMvec (Block& parent, const char* key)
+  : unit_ (find_unit (parent, key))
 {
   const std::vector<const AttributeList*>& alists = parent.alist_sequence (key);
   for (size_t i = 0; i < alists.size (); i++)

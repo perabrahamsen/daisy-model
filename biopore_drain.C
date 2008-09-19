@@ -49,6 +49,8 @@ struct BioporeDrain : public Biopore
   // Simulation.
   double total_water () const
   { return 0.0; }
+  void get_solute (IM&) const
+  { }
   double air_bottom (size_t) const    // Lowest point with air [cm]
   { return pipe_position; }
   
@@ -123,12 +125,17 @@ BioporeDrain::matrix_biopore_drain (size_t c, const Geometry& geo,
     // No biopores here.
     return 0.0;
   const double r_c = diameter / 2.0;
-  const double h_3 = std::max (pressure_end, air_bottom (c) - geo.cell_z (c));
+  const double h_3 = air_bottom (c) - geo.cell_z (c);
 
   double S;
   if (active && h>h_3 + h_barrier)
-    S = matrix_to_biopore (K_xx, M_c, r_c, h, h_3)
-      * geo.fraction_in_z_interval (c, height_start, height_end);
+    {
+      // The largest pressure gradient between the domains are
+      // pressure_end, above that we claim air will disrupt the suction.
+      const double h_3_suck = std::max (h_3, h + pressure_end);
+      S = matrix_to_biopore (K_xx, M_c, r_c, h, h_3_suck)
+        * geo.fraction_in_z_interval (c, height_start, height_end);
+    }
   else 
     S = 0.0;
   return S;

@@ -3287,9 +3287,9 @@ nowhere go to.  For typical setups, this value will be zero.")
                      (spec chemical default M))
            (number (tag "Biopores")
                    (path column "${column}" Movement "*" 
-                         Tertiary biopores classes matrix solute colloid value)
-                   (spec biopore matrix solute value)
-                   ;; (dimension "${unit}")
+                         Tertiary biopores solute_storage colloid value)
+                   (spec tertiary biopores solute_storage value)
+                   (dimension "${unit}")
                    (handle current))
            (interval (tag "Filter")
                      (path column "${column}" Chemistry "*" trace 

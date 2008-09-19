@@ -73,9 +73,9 @@
   (require_top true)
   (input "Precipitation" "Irrigation")
   (output "Actual evapotranspiration"
-          "Matrix percolation" "Tertiary soil" "Tertiary surface"
+          "Matrix percolation"
           "Drain flow" "Runoff")
-  (content "Soil water" "Surface water"))
+  (content "Soil water" "Surface water" "Tertiary water"))
 
 (deflog "Field water" column
   "Information about water input, output and content for the system."
@@ -127,21 +127,6 @@ It can be negative if there are cabilary raise.")
                         (handle sum)
                         (negate true)
                         (dimension "mm/&"))
-           (flux_top (tag "Tertiary surface")
-                     (description "\
-Amount of water leaving the surface through the biopores.")
-                        (path column "${column}" SoilWater q_p)
-                        (spec fixed SoilWater q_p)
-                        (handle sum)
-                        (negate true)
-                        (dimension "mm/&"))
-           (interval (tag "Tertiary soil")
-                     (description "\
-Net amount of water leaving the soil through the biopores.")
-                     (path column "${column}" SoilWater S_p)
-                     (spec fixed SoilWater S_p)
-                     (handle sum)
-                     (dimension "mm/&"))
            (interval (tag "Drain flow")
 		     (description "\
 Amount of water leaving the system to drain pipes.
@@ -165,6 +150,18 @@ nowhere go to.  For typical setups, this value will be zero.")
                    (spec fixed Surface runoff)
                    (handle sum)
                    (dimension "mm/&"))
+           (number (tag "Tertiary water")
+                   (description "\
+Total amount of water in the biopores.
+
+Note the the biopore system does not keep track of where the
+water is located within the soil, so you will always get the
+total amount, even if you otherwise only log part of the soil.")
+                   (path column "${column}" Movement "*" 
+                         Tertiary biopores water_height)
+                   (spec tertiary biopores water_height)
+                   (handle current)
+                   (dimension "mm"))
            (interval (tag "Soil water")
 		     (description "\
 Total water content of the soil.")

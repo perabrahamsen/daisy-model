@@ -36,6 +36,8 @@
 #include "surface.h"
 #include "chemical.h"
 #include "groundwater.h"
+#include "im.h"
+#include "units.h"
 #include <sstream>
 
 struct TertiaryBiopores : public Tertiary, public Tertsmall
@@ -48,6 +50,9 @@ struct TertiaryBiopores : public Tertiary, public Tertsmall
   const double pressure_barrier; // Pressure difference requires for S [cm]
   const double pond_max;	 // Pond height before activating pref.flow [cm]
   const bool use_small_timesteps_; // True, iff we want to calculate S in R.E.
+
+  // Helper.
+  std::auto_ptr<Scalar> per_surface_area;
 
   // Identity.
   bool has_macropores ()
@@ -73,6 +78,8 @@ struct TertiaryBiopores : public Tertiary, public Tertsmall
   // Log variables.
   double water_volume;          // Volume of water stored in biopores.
   double water_height;          // -||- converted to height.
+  IM solute_mass;               // Mass of solutes in biopores.
+  IM solute_storage;            // -||- per surface area.
   bool log_ddt;                 // True if ddt was calculated this timestep.
   double ddt;
   int deactivate_steps;         // Number of timesteps tertiary is deactivated.
@@ -119,6 +126,7 @@ struct TertiaryBiopores : public Tertiary, public Tertsmall
 
   // - Output.
   double total_water () const;  // [cm^3]
+  void get_solute (IM& im) const; // [g]
   void output (Log&) const;
   
   // Create and Destroy.
@@ -425,6 +433,9 @@ TertiaryBiopores::find_implicit_water (const Anystate& old_state,
   // Update logs.
   water_volume = total_water ();
   water_height = water_volume / geo.surface_area ();
+  get_solute (solute_mass);
+  solute_storage 
+    = solute_mass.multiply (*per_surface_area, solute_storage.unit ());
 }
 
 void
@@ -526,6 +537,14 @@ TertiaryBiopores::total_water () const
     total += classes[b]->total_water ();
   return total;
 }
+
+void
+TertiaryBiopores::get_solute (IM& im) const
+{
+  im.clear ();
+  for (size_t b = 0; b < classes.size (); b++)
+    classes[b]->get_solute (im);
+}
   
 void 
 TertiaryBiopores::output (Log& log) const
@@ -534,6 +553,8 @@ TertiaryBiopores::output (Log& log) const
   // TODO: output_variable (active, log);
   output_variable (water_volume, log);
   output_variable (water_height, log);
+  output_submodule (solute_mass, "solute_mass", log);
+  output_submodule (solute_storage, "solute_storage", log);
   if (log_ddt)
     output_variable (ddt, log);
   output_variable (deactivate_steps, log);
@@ -567,6 +588,10 @@ TertiaryBiopores::initialize (const Units& units,
   water_volume = total_water ();
   water_height = water_volume / geo.surface_area ();
 
+  static const symbol per_area ("cm^-2");
+  per_surface_area.reset (new Scalar (1.0 / geo.surface_area (),
+                                      units.get_unit (per_area)));
+
   return ok;
 }
 
@@ -597,6 +622,8 @@ TertiaryBiopores::TertiaryBiopores (Block& al)
             : std::vector<bool> ()),
     water_volume (-42.42e42),
     water_height (-42.42e42),
+    solute_mass (al.units ().get_unit (IM::mass_unit ())),
+    solute_storage (al.units ().get_unit (IM::storage_unit ())),
     log_ddt (false),
     ddt (-42.42e42),
     deactivate_steps (al.integer ("deactivate_steps"))
@@ -643,6 +670,12 @@ After macropores are activated pond will have this height.");
     syntax.add ("water_volume", "cm^3", Syntax::LogOnly, "Water volume.");    
     syntax.add ("water_height", "cm", Syntax::LogOnly,
                 "Water volume multiplied with surface area.");
+    IM::add_syntax (syntax, alist, Syntax::LogOnly, "solute_mass", 
+                    IM::mass_unit (),
+                    "Total amount of solutes in biopores.");
+    IM::add_syntax (syntax, alist, Syntax::LogOnly, "solute_storage", 
+                    IM::storage_unit (), "\
+Total amount of solutes in biopores divided by surface area.");
     syntax.add ("ddt", "h", Syntax::LogOnly, "Emulated timestep.\n\
 Timestep scaled for available water.\n\
 Only relevant if 'use_small_timesteps' is false.");    

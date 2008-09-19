@@ -1,5 +1,7 @@
 2008-09-18  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* lib/log-std.dai ("Field water"): Also log water in biopores.
+
 	* geometry.C, geometry.h (Geometry::access_content_height)
 	(Geometry::access_content_hood): New member functions.
 	* geometry.h (Geometry::content_at): Renamed to 'content_height'.
