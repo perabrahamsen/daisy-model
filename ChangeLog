@@ -1,3 +1,7 @@
+2008-09-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.48 released.
+
 2008-09-18  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* lib/log-std.dai ("Field water"): Also log water in biopores.
