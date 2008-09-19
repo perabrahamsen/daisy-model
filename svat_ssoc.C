@@ -104,10 +104,17 @@ struct SVAT_SSOC : public SVAT
   // - vapour pressure in canopy
   double e_c;          // Actual vapour pressure of water in the atmosphere [Pa]
 
+  // - Fluxes
+  double H_soil;     // Sensible heat flux from the soil [W m^-2] 
+  double H_sun;      // Sensible heat flux from the sunlit leaves to the canopy point
+                     // [W m^-2] 
+  double H_shadow;   // Sensible heat flux from the shadow leaves to canopy point
+                     // [W m^-2] 
+  double H_c_a;      // Sensible heat flux from the canopy point to free atmosphere
+                     //[W m^-2] 
+
   // Inter-intermediates variables
   double G_R;       // Radiation "conductivity" [W m^-2 K^-1]
-  double G_H_s_a;   // Heat "conductivity" from soil to atmosphere (screen height)
-                    // [W m^-2 K^-1]
   double G_H_a;     // Heat "conductivity" from soil to free atmosphere [W m^-2 K^-1]
   double G_W_a;     // Water "conductivity" from soil to free atmosphere [m s^-1]
   double G_H_s_c;   // Heat "conductance" from soil to canopy point [W m^-2 K^-1]
@@ -305,33 +312,32 @@ SVAT_SSOC:: calculate_temperatures()
 
   // Radiation "conductivity"
   G_R = 4. * epsilon * sigma * pow(T_a + TK, 3.); //[W m^-2 K^-1]
+
   // Sensible heat "conductance" from soil to atmosphere
-  G_H_s_a = c_p * rho_a * g_a;            //[W m^-2 K^-1] 
-  // Sensible heat "conductance" between soil and canopy point
-  G_H_s_c =  c_p * rho_a * g_H_s_c;       //[W m^-2 K^-1] 
-  // Sensible heat "conductance" between sunlit leaves and canopy point
-  G_H_sun_c =  c_p * rho_a * g_H_sun_c;   //[W m^-2 K^-1] 
-  // Sensible heat "conductance" from canopy point to atmosphere
-  G_H_a = G_H_s_a;                        //[W m^-2 K^-1] 
-  // Latent heat "conductance" between sunlit leaves and canopy point
-  G_W_sun_c =  c_p * rho_a * g_W_sun_c / gamma;  //[m s^-1] 
-  G_W_shadow_c =  c_p * rho_a * g_W_shadow_c / gamma;  //[m s^-1] 
+  G_H_a = c_p * rho_a * g_a;            //[W m^-2 K^-1] 
+  // Latent heat "conductance" from soil to atmosphere
   G_W_a =  c_p * rho_a * g_a / gamma;  //[m s^-1] 
+  
+  if (LAI > 0) // canopy and soil 
+    {
+      // Sensible heat "conductance" between soil and canopy point
+      G_H_s_c =  c_p * rho_a * g_H_s_c;       //[W m^-2 K^-1] 
+      // Sensible heat "conductance" between sunlit leaves and canopy point
+      G_H_sun_c =  c_p * rho_a * g_H_sun_c;   //[W m^-2 K^-1] 
+      // Latent heat "conductance" between sunlit leaves and canopy point
+      G_W_sun_c =  c_p * rho_a * g_W_sun_c / gamma;  //[m s^-1] 
+      G_W_shadow_c =  c_p * rho_a * g_W_shadow_c / gamma;  //[m s^-1] 
+    }
 
   // Black-body emmission:
   const double BB = epsilon * sigma * pow(T_a + TK, 4.); //[W m^-2]
-  // Loss of long-wave radiation
-  const double R_emi_soil = BB + G_R * (T_s - T_a); //[W m^-2]
-  const double R_emi_sun = BB + G_R * (T_sun - T_a); //[W m^-2]
-  const double R_emi_shadow = BB + G_R * (T_shadow - T_a); //[W m^-2]
-
-  // Equilibrium net-radiation absorbed by the soil
-  R_eq_abs_soil = R_abs_soil - R_emi_soil;           //[W m^-2]
+  
+  // "Temperature equilibrium" net-radiation absorbed by the soil
+  R_eq_abs_soil = R_abs_soil - BB;           //[W m^-2]
   // Equilibrium net-radiation absorbed by the sunlit leaves
-  R_eq_abs_sun = R_abs_sun - R_emi_sun;              //[W m^-2]
+  R_eq_abs_sun = R_abs_sun - BB;             //[W m^-2]
   // Equilibrium net-radiation absorbed by the shadow leaves
-  R_eq_abs_shadow = R_abs_shadow - R_emi_shadow;     //[W m^-2]
-
+  R_eq_abs_shadow = R_abs_shadow - BB;       //[W m^-2]
 
   if (LAI > 0) // canopy and soil 
     {
@@ -408,14 +414,28 @@ SVAT_SSOC:: calculate_temperatures()
     }
 
   else // bare soil
-    T_s =((R_eq_abs_soil + G_R * (T_a + TK) + G_H_s_a * (T_a + TK) 
+    T_s =((R_eq_abs_soil + G_R * (T_a + TK) + G_H_a * (T_a + TK) 
            + k_h / z0 * (T_z0 + TK) - (lambda * E_soil))
-          / (G_R + G_H_s_a +  k_h / z0)) - TK;  
+          / (G_R + G_H_a +  k_h / z0)) - TK;  
 } 
 
 void
 SVAT_SSOC:: calculate_fluxes()
 {
+  // Sensible heat flux from the bare soil
+  H_soil = G_H_a * (T_s - T_a) ;         //[W m^-2] 
+
+  if (LAI > 0)
+    { 
+      // Sensible heat flux from the soil (overwriting)
+      H_soil = G_H_s_c * (T_s - T_c);      //[W m^-2] 
+      // Sensible heat flux from the sunlit leaves to the canopy point
+      H_sun = G_H_sun_c * (T_sun - T_c);   //[W m^-2] 
+      // Sensible heat flux from the shadow leaves to the canopy point
+      H_soil = G_H_shadow_c * (T_shadow - T_c) ; //[W m^-2] 
+      // Sensible heat flux from the canopy point to free atmosphere
+      H_c_a = G_H_a * (T_c - T_a);      //[W m^-2] 
+    }
 }
 
 
@@ -455,6 +475,11 @@ void
 SVAT_SSOC::output(Log& log) const
 {
   output_variable (T_s, log);
+  output_variable (T_0, log);
+  output_variable (T_sun, log);
+  output_variable (T_shadow, log);
+  output_variable (T_c, log);
+  output_variable (T_a, log);
   output_variable (g_a, log);  
   output_variable (g_s, log); 
   output_variable (g_H_s_c, log); 
@@ -462,10 +487,14 @@ SVAT_SSOC::output(Log& log) const
   output_variable (g_W_sun_c, log);
   output_variable (g_H_shadow_c, log);
   output_variable (g_W_shadow_c, log);
-  output_variable (R_eq_abs_soil, log);
-  output_variable (R_eq_abs_sun, log);
-  output_variable (R_eq_abs_shadow, log);
   output_variable (e_a, log);
+  output_variable (R_abs_soil, log);
+  output_variable (R_abs_sun, log);
+  output_variable (R_abs_shadow, log);
+  output_variable (H_soil, log);
+  output_variable (H_sun, log);
+  output_variable (H_shadow, log);
+  output_variable (H_c_a, log);
 }
 
 void 
@@ -478,6 +507,10 @@ False for amphistomatous leaves (possesing stomata on both surfaces).");
   
   // For log.
   syntax.add ("T_s", "dg C", Syntax::LogOnly, "Soil surface temperature.");
+  syntax.add ("T_0", "dg C", Syntax::LogOnly, "Surface temperature (large scale).");
+  syntax.add ("T_c", "dg C", Syntax::LogOnly, "Canopy-point temperature.");
+  syntax.add ("T_sun", "dg C", Syntax::LogOnly, "Temperature of sunlit leaves.");
+  syntax.add ("T_shadow", "dg C", Syntax::LogOnly, "Temperature of shadow leaves.");
   syntax.add ("g_a", "m s^-1", Syntax::LogOnly, 
               "Heat conductance in the atmosphere - from canopy point \n\
 to reference height (screen height).");
@@ -493,17 +526,26 @@ to reference height (screen height).");
               "Heat conductance from shadow leaves to canopy point.");
   syntax.add ("g_W_shadow_c", "m s^-1", Syntax::LogOnly,
               "Water conductance from shadow leaves to canopy point.");
-  syntax.add ("R_eq_abs_soil", "W m^-2", Syntax::LogOnly, 
-              "Equilibrium net-radiation absorbed by the soil.");
-  syntax.add ("R_eq_abs_sun", "W m^-2", Syntax::LogOnly,
-              "Equilibrium net-radiation absorbed by the sunlit leaves.");
-  syntax.add ("R_eq_abs_shadow", "W m^-2", Syntax::LogOnly,
-              "Equilibrium net-radiation absorbed by the shadow leaves.");
   syntax.add ("e_a", "Pa", Syntax::LogOnly, 
-              "Vapour pressure of water in the atmosphere.");
-  
-  //  syntax.add ("", "", Syntax::LogOnly, ".");
+              "Vapour pressure of water in the atmosphere.");  
+  syntax.add ("e_c", "Pa", Syntax::LogOnly, 
+              "Vapour pressure of water in the canopy.");
+  syntax.add ("R_abs_soil", "W m^-2", Syntax::LogOnly, "Absorbed radiation in soil.");
 
+  syntax.add ("R_abs_sun", "W m^-2", Syntax::LogOnly, 
+              "Absorbed radiation in sunlit leaves.");
+  syntax.add ("R_abs_shadow", "W m^-2", Syntax::LogOnly, 
+            "Absorbed radiation in shadow leaves.");
+  syntax.add ("H_soil", "W m^-2", Syntax::LogOnly, 
+              "Sensible heat flux from the soil.");
+  syntax.add ("H_sun", "W m^-2", Syntax::LogOnly, 
+              "Sensible heat flux from the sunlit leaves to the canopy point.");
+  syntax.add ("H_shadow", "W m^-2", Syntax::LogOnly, 
+              "Sensible heat flux from the shadow leaves to canopy point.");
+  syntax.add ("H_c_a", "W m^-2", Syntax::LogOnly, 
+              "Sensible heat flux from the canopy point to free atmosphere.");
+
+  //  syntax.add ("", "", Syntax::LogOnly, ".");
 }
 
 SVAT_SSOC::SVAT_SSOC (Block& al)
@@ -546,7 +588,6 @@ SVAT_SSOC::SVAT_SSOC (Block& al)
     g_W_shadow_c (-42.42e42),
     e_c (-42.42e42),
     G_R (-42.42e42),
-    G_H_s_a (-42.42e42),
     G_H_a (-42.42e42),
     G_W_a (-42.42e42),
     G_H_s_c (-42.42e42),
