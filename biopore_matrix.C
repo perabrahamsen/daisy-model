@@ -280,18 +280,47 @@ BioporeMatrix::matrix_biopore_matrix (size_t c, const Geometry& geo,
     // No biopores here.
     return 0.0;
 
+  // The secondary domain consists of small continious cracks with a
+  // high condutivity compared to the rest of the matrix domain.  Not
+  // all soil types have such a domain.
   const Secondary& secondary = soil.secondary_domain (c);
   const bool use_primary = secondary.none ();
-  const double R_wall = use_primary ? R_primary : R_secondary; // [h]  
-  const double r_c = diameter / 2.0; // [cm]
-  const double cell_z = geo.cell_z (c); // [cm]
-  const double z_air = height_end + h3_bottom;
-  const double h3_cell = z_air - cell_z; // [cm]
-  const double cell_bottom = geo.cell_bottom (c);
-  const double low_point = std::max (height_end, cell_bottom); // [cm]
-  const double h3_min = low_point - cell_z; // [cm]
-  daisy_assert (h3_min < 0.0);
 
+  // The resistence to be overcome for water leaving the biopore is
+  // different in the primary and secondary domain, in general we
+  // assume the water will have a much easier time leaving the
+  // biopores if the soil has cracks.
+  const double R_wall = use_primary ? R_primary : R_secondary; // [h]  
+
+  // The radius of the biopores.
+  const double r_c = diameter / 2.0; // [cm]
+
+  // The height above ground of the center of the cell (negative).
+  const double cell_z = geo.cell_z (c); // [cm]
+
+  // The height above ground of the top of the water in the biopore (negative).
+  const double z_air = height_end + h3_bottom;
+
+  // The pressure in the biopore at the middle of the cell.
+  const double h3_cell = z_air - cell_z; // [cm]
+
+  // The height of the bottom of the cell, above ground (negative).
+  const double cell_bottom = geo.cell_bottom (c);
+
+  // The above ground height of the lowest point of the cell with macropores.
+  const double low_point = std::max (height_end, cell_bottom); // [cm]
+  
+  // To move water from the biopore to matrix, it is not enough that
+  // the pressure is higher in the biopore.  It also needs to be
+  // positive, at least in part of the cell.  The 'h3_min' value is
+  // the lowest value of 'h3_cell' that corresponds to a water level
+  // in the biopore that overlaps part of the cell.
+  const double h3_min = low_point - cell_z; // [cm]
+  // 'h3_min' will usually be negative, but if the macropore domain
+  // ends above the middle of the cell.
+
+  // Now we find the source/sink term S.  Positive S here denotes a
+  // sink in the matrix domain, but a source in th etertiary domain.
   double S; 
   if (h3_bottom > 0.0 && h3_cell>h3_min && h3_cell>h + h_barrier)
     {

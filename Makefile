@@ -859,6 +859,7 @@ svnci: $(TEXT)
 
 add:
 	svn add $(TEXT)
+	-svn remove $(REMOVE)
 
 update:
 	svn update

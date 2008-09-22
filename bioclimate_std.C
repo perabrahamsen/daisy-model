@@ -120,6 +120,8 @@ struct BioclimateStandard : public Bioclimate
   // Water transpirated through plant roots.
   std::auto_ptr<SVAT> svat;     // Soil Vegetation Atmosphere model.
   double crop_ep_;		// Potential transpiration. [mm/h]
+  double crop_ea_soil;		// Crop limited transpiration. [mm/h]
+  double crop_ea_svat;		// SVAT limited transpiration. [mm/h]
   double crop_ea_;		// Actual transpiration. [mm/h]
   double production_stress;	// Stress calculated by SVAT module.
 
@@ -455,7 +457,15 @@ The intended use is colloid generation.");
 
   // Water transpirated through plant roots.
   syntax.add ("crop_ep", "mm/h", Syntax::LogOnly,
-              "Potential transpiration.");
+              "Potential transpiration.\
+Transpiration under the assumption that the soil have an unlimited
+water supply.  For a fully irrigated crop, this will be equal to the
+actual transpiration.");
+  syntax.add ("crop_ea_soil", "mm/h", Syntax::LogOnly,
+              "Soil limited transpiration.\n\
+");
+  syntax.add ("crop_ea", "mm/h", Syntax::LogOnly,
+              "Actual transpiration.");
   syntax.add ("crop_ea", "mm/h", Syntax::LogOnly,
               "Actual transpiration.");
   syntax.add ("production_stress", Syntax::None (), Syntax::LogOnly,
@@ -956,23 +966,69 @@ BioclimateStandard::WaterDistribution (const Units& units,
 		   potential_crop_transpiration + potential_soil_transpiration,
 		   std::max (0.0, pet->dry ()));
 
-  // Actual transpiration
+  // Actual transpiration, based on remaining energy.
   const double day_fraction
     = (daily_global_radiation_ > 0.0)
     ? (weather.hourly_global_radiation () * dt 
        / (24.0 * daily_global_radiation_))
     : 0.0;
-  crop_ea_ = vegetation.transpiration (units, crop_ep_, canopy_ea, geo, soil,
-                                       soil_water, day_fraction, dt, msg);
-  daisy_assert (crop_ea_ >= 0.0);
-  total_ea += crop_ea_;
-  daisy_assert (total_ea >= 0.0);
 
-  // Production stress
+  crop_ea_
+    = vegetation.transpiration (units, crop_ep_, canopy_ea, geo, soil,
+                                soil_water, day_fraction, dt, msg);
+  daisy_assert (crop_ea_ >= 0.0);
+  const double crop_ea_soil = crop_ea_;       // Remember original value.
+  
+  // Actual transpiration, modified by the SVAT model.
+
+  // Let the SVAT model get the boundary conditions.
   svat->tick (weather, vegetation, surface, geo, soil, soil_heat, soil_water, 
               *pet, *this);
+
+#if 0
+  // Our initial guess for transpiration is based on remaining energy.
+  double crop_ea_svat_old = crop_ea_soil;
+  
+  const int max_svat_iterations = 100;
+  const double max_svat_absolute_difference = 0.01; // [mm/h]
+  for (int iteration = 0; i < max_svat_iterations; i++)
+    {
+      // Find stomata conductance based on ABA and crown potential
+      // from last attempt at crop transpiration.
+      vegetation.find_stomata_conductance ();
+      const double gs = vegetation.stomata_conductance ();
+
+      // Find expected transpiration from stomate conductance.
+      svat.solve (gs);
+      
+      const double crop_ea_svat = svat.transpiration ();
+      if (std::fabs (crop_ea_svat - crop_ea_svat_old) 
+          < max_svat_absolute_difference)
+        {
+          // Stomate may limit transpiration, not increase it.
+          daisy_assert (crop_ea_ < crop_ea_soil + 0.01);
+          goto success;
+        }
+      crop_ea_svat_old = crop_ea_svat;
+
+      // Calculate new crop transpiration based on latest SVAT guess.
+      crop_ea_
+        = vegetation.transpiration (units, crop_ea_svat, canopy_ea, geo, soil,
+                                    soil_water, day_fraction, dt, msg);
+      daisy_assert (crop_ea_ >= 0.0);
+    }
+  msg.error ("SVAT transpiration and stomata conductance"
+             " loop did not converge");
+ success:;
+#endif
+
+  // Stress calculated by the SVAT model.
   production_stress = svat->production_stress ();
   vegetation.force_production_stress (production_stress);
+
+  // Total evapotranspiration.
+  total_ea += crop_ea_;
+  daisy_assert (total_ea >= 0.0);
 
   // Direct rain, used for colloid generation
   if (snow.storage () < 0.1)

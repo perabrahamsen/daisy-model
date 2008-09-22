@@ -10,7 +10,9 @@ I så fald, brug "dry"
 
 ** crop assimilate (split tick -> assimilate & other)
 
-*** Check hvor mange ting der skal nulstilles i svat (photo)
+*** Check hvor mange ting der skal nulstilles
+
+water_stress_days are akkumuleret i RootSystem::water_update
 
 *** vegetation.transpiration er måske stedet det skal kaldes.
 
