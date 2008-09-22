@@ -323,6 +323,8 @@ CropStandard::svat (const Units& units, const Time& time,
   if (DS <= 0.0 || development->mature ())
     return;
 
+  photo->clear ();
+
   double Ass = 0.0;
   const std::vector<double>& total_PAR = bioclimate.PAR (); 
   const std::vector<double>& sun_PAR = bioclimate.sun_PAR ();
@@ -453,8 +455,6 @@ CropStandard::tick_after (const Time& time,
 
   // Clear nitrogen.
   nitrogen.clear ();
-  // Clear photo
-  photo->clear ();
 
   // Update age.
   development->DAP += dt/24.0;
