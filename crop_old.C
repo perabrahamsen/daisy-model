@@ -64,8 +64,8 @@ public:
   double EpFac () const; // Convertion to potential evapotransp.
   void CanopyStructure ();
   double ActualWaterUptake (const Units&, double Ept, const Geometry& geo,
-                            const Soil&, SoilWater&,
-			    double EvapInterception, double day_fraction, 
+                            const Soil&, const SoilWater&,
+			    double EvapInterception, 
                             double dt,
 			    Treelog&);
   
@@ -108,13 +108,12 @@ protected:
 
   // Simulation.
 public:
-  void tick (const Units&,
-             const Time& time,  double relative_humidity, const double CO2_atm,
-	     const Bioclimate&, const Geometry& geo, const Soil&,
-	     OrganicMatter&, const SoilHeat&, const SoilWater&, 
-	     Chemistry&, double&, double&, double&, 
+  void tick (const Time& time, const Bioclimate&, double ForcedCAI, 
+             const Geometry& geo, const Soil&, const SoilHeat&, 
+             SoilWater&, Chemistry&, 
+             OrganicMatter&, double&, double&, double&, 
              std::vector<double>&, std::vector<double>&,
-	     double ForcedCAI, double dt, Treelog&);
+	     double dt, Treelog&);
   void emerge ();
   const Harvest& harvest (symbol column_name,
 			  const Time&, const Geometry&,
@@ -1357,9 +1356,9 @@ CropOld::CanopyStructure ()
 double
 CropOld::ActualWaterUptake (const Units&, double Ept,
                             const Geometry& geo,
-			    const Soil& soil, SoilWater& soil_water,
+			    const Soil& soil, const SoilWater& soil_water,
 			    const double EvapInterception, 
-			    double /* day_fraction */, const double /* dt */, 
+			    const double /* dt */, 
                             Treelog& out)
 {
   if (Ept < 0)
@@ -1454,7 +1453,6 @@ CropOld::ActualWaterUptake (const Units&, double Ept,
       total = Ept;
     }
   // Update soil water sink term.
-  soil_water.root_uptake (H2OExtraction);
   var.CrpAux.H2OUpt = total;
 
   // Update water stress factor
@@ -1772,21 +1770,17 @@ void CropOld::emerge ()
 { var.Phenology.DS = -0.1; }
 
 void 
-CropOld::tick (const Units&, const Time& time, const double, const double,
-	       const Bioclimate& bioclimate,
-               const Geometry& geo,
-	       const Soil& soil,
-	       OrganicMatter&,
-	       const SoilHeat& soil_heat,
-	       const SoilWater& soil_water, 
-	       Chemistry& chemistry,
-	       double&, double&, double&,
+CropOld::tick (const Time& time, const Bioclimate& bioclimate, 
+               const double ForcedCAI,
+               const Geometry& geo, const Soil& soil, const SoilHeat& soil_heat,
+	       SoilWater& soil_water, Chemistry& chemistry,
+	       OrganicMatter&, double&, double&, double&,
                std::vector<double>&, std::vector<double>&,
-	       const double ForcedCAI,
-               const double dt,
-	       Treelog& msg)
+               const double dt, Treelog& msg)
 {
   Treelog::Open nest (msg, name);
+
+  soil_water.root_uptake (var.RootSys.H2OExtraction);
 
   static bool ForcedCAI_warned = false;
   if (!ForcedCAI_warned && ForcedCAI >= 0.0)

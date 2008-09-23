@@ -190,6 +190,52 @@ Geometry::access_content_hood (const Access& access, const int center) const
   return total_content / total_area;
 }
 
+double 
+Geometry::access_content_interval (const Access& access, 
+                                   const double from, const double to) const
+{
+  double total_volume = 0.0;
+  double total_content = 0.0;
+
+  for (size_t i = 0; i < this->cell_size (); i++)
+    {
+      const double volume = cell_volume (i)
+        * this->fraction_in_z_interval (i, from, to);
+      if (volume > 0.0)
+        {
+          total_volume += volume;
+          total_content += volume * access (i);
+        }
+    }
+  if (iszero (total_volume))
+    return 0.0;
+
+  return total_content / total_volume;
+}
+
+double 
+Geometry::access_content_volume (const Access& access, 
+                                 const Volume& vol) const
+{
+  double total_volume = 0.0;
+  double total_content = 0.0;
+
+  for (size_t i = 0; i < this->cell_size (); i++)
+    {
+      const double volume = cell_volume (i)
+        * this->fraction_in_volume (i, vol);
+      if (volume > 0.0)
+        {
+          total_volume += volume;
+          total_content += volume * access (i);
+        }
+    }
+  if (iszero (total_volume))
+    return 0.0;
+
+  return total_content / total_volume;
+}
+
 double
 Geometry::volume_in_z_interval (const double from, const double to, 
                                 std::vector<double>& frac) const

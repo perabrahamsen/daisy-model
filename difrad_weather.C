@@ -32,8 +32,8 @@ struct DifradWeather : public Difrad
   // Simulation.
   double value (const Time&, const Weather& weather, Treelog& msg)
   {
-    const double gb = weather.hourly_global_radiation ();
-    const double df = weather.hourly_diffuse_radiation ();
+    const double gb = weather.global_radiation ();
+    const double df = weather.diffuse_radiation ();
     if (df > gb)
       {
 	std::ostringstream tmp;

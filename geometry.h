@@ -183,7 +183,27 @@ public:
   { return access_content_hood (Accessor<T> (obj, content), c); }
   // The 'access_content_hood' function does the same, using the
   // 'Access' class instead of a soil container template.
-  double access_content_hood (const Access& access, int c) const;
+  double access_content_hood (const Access&, int c) const;
+  // The 'content_interval' template function will calculate an average
+  // content for the cells overlapping a specified interval, weighted
+  // by the overlapping volume.
+  template<class T> 
+  double content_interval (const T& obj, double (T::*content) (size_t) const,
+                           const double from, const double to) const
+  { return access_content_interval (Accessor<T> (obj, content), from, to); }
+  // The 'access_content_interval' function does the same, using the
+  // 'Access' class instead of a soil container template.
+  double access_content_interval (const Access&, double from, double to) const;
+  // The 'content_volume' template function will calculate an average
+  // content for the cells overlapping a specified volume, weighted
+  // by volume of the overlap.
+  template<class T> 
+  double content_volume (const T& obj, double (T::*content) (size_t) const,
+                         const Volume& vol) const
+  { return access_content_interval (Accessor<T> (obj, content), vol); }
+  // The 'access_content_volume' function does the same, using the
+  // 'Access' class instead of a soil container template.
+  double access_content_volume (const Access&, const Volume&) const;
 
   // Vector operations.
 private:

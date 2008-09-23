@@ -59,18 +59,19 @@ public:
   // Canopy queries.
 public:
   virtual double shared_light_fraction () const;
-  virtual double rs_min () const = 0; // Minimum transpiration resistance.
-  virtual double rs_max () const = 0; // Maximum transpiration resistance.
+  virtual double rs_min () const = 0; // Minimum transpiration resistance [s/m].
+  virtual double rs_max () const = 0; // Maximum transpiration resistance [s/m].
+  virtual double stomata_conductance () const = 0; // Actual conductance [m/s].
   virtual double leaf_width () const = 0; // Leaf width [cm].
   virtual double LAI () const = 0; // Total LAI of all crops [0-]
   virtual double height () const = 0; // Max crop height in canopy [cm]
   virtual double cover () const = 0; // Fraction of soil covered by crops [0-1]
   virtual const PLF& LAIvsH () const = 0; // LAI below height [f: cm -> R]
   virtual const PLF& HvsLAI () const = 0; // Height with LAI below [f: R -> cm]
-  virtual double ACExt_PAR () const = 0;  // Canopy extinction coefficient of PAR
-  virtual double ACRef_PAR () const = 0;  // Canopy reflection coefficient of PAR
-  virtual double ACExt_NIR () const = 0;  // Canopy extinction coefficient of NIR
-  virtual double ACRef_NIR () const = 0;  // Canopy reflection coefficient of NIR
+  virtual double ACExt_PAR () const = 0; // Canopy extinction coefficient of PAR
+  virtual double ACRef_PAR () const = 0; // Canopy reflection coefficient of PAR
+  virtual double ACExt_NIR () const = 0; // Canopy extinction coefficient of NIR
+  virtual double ACRef_NIR () const = 0; // Canopy reflection coefficient of NIR
   virtual double ARExt () const = 0;	  // Radiation Extinction coefficient
   virtual double EpFactor () const = 0;   // Reference to pot. evapotransp
   double EpInterchange () const;          // Soil to canopy exchange rate.
@@ -89,23 +90,23 @@ public:
 
   // Simulation
 public:
-  virtual void tick (const Units&,
-                     const Time&, double relative_humidity, double CO2_atm,
-                     const Bioclimate&, const Geometry&, const Soil&,
-		     OrganicMatter&, const SoilHeat&, const SoilWater&,
-		     // Allow plants to grow (hourly).
-		     Chemistry&, 
-		     double& residuals_DM,
-		     double& residuals_N_top, double& residuals_C_top,
-		     std::vector<double>& residuals_N_soil,
-		     std::vector<double>& residuals_C_soil,
-                     double dt, Treelog&) = 0;
   virtual double transpiration (// Actual trans. [mm/h]
 				const Units&, double potential_transpiration,	
 				double canopy_evaporation,
                                 const Geometry& geo,
-				const Soil& soil, SoilWater& soil_water,
-				double day_fraction, double dt, Treelog&) = 0;
+				const Soil& soil, const SoilWater& soil_water,
+				double dt, Treelog&) = 0;
+  virtual void find_stomata_conductance (const Units&, const Time& time, 
+                                         const Bioclimate&,
+                                         double dt, Treelog&) = 0;
+  virtual void tick (const Time&, const Bioclimate&, 
+                     const Geometry&, const Soil&, const SoilHeat&,
+                     SoilWater&, Chemistry&, OrganicMatter&,
+                     double& residuals_DM,
+                     double& residuals_N_top, double& residuals_C_top,
+                     std::vector<double>& residuals_N_soil,
+                     std::vector<double>& residuals_C_soil,
+                     double dt, Treelog&) = 0;
   virtual void force_production_stress  (double pstress) = 0;
   virtual void kill_all (symbol, const Time&, const Geometry&,
 			 std::vector<AM*>& residuals, 

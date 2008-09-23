@@ -89,9 +89,8 @@ double
 RootSystem::water_uptake (const Units& units, double Ept_,
                           const Geometry& geo,
 			  const Soil& soil,
-			  SoilWater& soil_water,
+			  const SoilWater& soil_water,
 			  const double EvapInterception,
-			  const double day_fraction,
                           const double dt,
 			  Treelog& msg)
 {
@@ -191,14 +190,11 @@ RootSystem::water_uptake (const Units& units, double Ept_,
     }
   H2OUpt = total;
 
-  // Update soil water sink term.
-  soil_water.root_uptake (H2OExtraction);
   // Update water stress factor
   if (Ept < 0.010)
     water_stress = 0.0;
   else
     water_stress = 1.0 - (total + EvapInterception) / (Ept + EvapInterception);
-  water_stress_days += water_stress * day_fraction;
 
   // ABA production.
   ABAprod->production (units, geo, soil_water, H2OExtraction, Density,
@@ -373,8 +369,16 @@ RootSystem::nitrogen_uptake (const Geometry& geo, const Soil& soil,
 }
 
 void
-RootSystem::tick (const double T, const double dt)
+RootSystem::tick (const double T, const double day_fraction,
+                  SoilWater& soil_water, const double dt)
 {
+  // Update soil water sink term.
+  soil_water.root_uptake (H2OExtraction);
+
+  // Accumulated water stress.
+  water_stress_days += water_stress * day_fraction;
+
+  // Keep track of daily soil temperature.
   partial_soil_temperature += T * dt;
   partial_day += dt;
   if (partial_day >= 24.0)

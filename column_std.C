@@ -619,11 +619,8 @@ ColumnStandard::tick (const Time& time, const double dt,
                     *vegetation, *movement,
                     geometry, *soil, *soil_water, *soil_heat, *chemistry,
                     dt, msg);
-  vegetation->tick (units,
-                    time, my_weather.relative_humidity (), my_weather.CO2 (),
-                    *bioclimate, geometry, *soil, 
-		    *organic_matter,
-                    *soil_heat, *soil_water, *chemistry,
+  vegetation->tick (time, *bioclimate, geometry, *soil, 
+		    *soil_heat, *soil_water, *chemistry, *organic_matter, 
                     residuals_DM, residuals_N_top, residuals_C_top, 
                     residuals_N_soil, residuals_C_soil, dt, msg);
   chemistry->tick_top (bioclimate->snow_leak_rate (dt), vegetation->cover (),

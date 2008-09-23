@@ -100,9 +100,8 @@ private:
 public:
   double water_uptake (const Units&, double Ept,
                        const Geometry&,
-		       const Soil& soil, SoilWater& soil_water,
-                       double EvapInterception, double day_fraction, double dt,
-		       Treelog&);
+		       const Soil& soil, const SoilWater& soil_water,
+                       double EvapInterception, double dt, Treelog&);
 private:
   double solute_uptake (const Geometry&, 
                         const Soil&, const SoilWater&, Chemical&,
@@ -122,7 +121,7 @@ public:
 private:
   static double density_distribution_parameter (double a);
 public:
-  void tick (double T, double dt);
+  void tick (double T, const double day_fraction, SoilWater&, double dt);
   void tick_daily (const Geometry&, const Soil&, 
 		   double WRoot, bool root_growth, double DS, Treelog&);
   void set_density (const Geometry& geometry, double SoilLimit, 

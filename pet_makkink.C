@@ -41,8 +41,8 @@ struct PetMakkink : public Pet
 	     const SoilWater&, Treelog&)
     {
       reference_evapotranspiration 
-	= FAO::Makkink (weather.hourly_air_temperature (),
-			weather.hourly_global_radiation ());
+	= FAO::Makkink (weather.air_temperature (),
+			weather.global_radiation ());
       potential_evapotranspiration 
 	= reference_to_potential (crops, surface, 
 				  reference_evapotranspiration);

@@ -64,7 +64,7 @@ WeatherOld::output (Log& log) const
 { WeatherBase::output (log); }
 
 double
-WeatherOld::hourly_global_radiation () const
+WeatherOld::global_radiation () const
 { return (day_cycle () * 24.0) * daily_global_radiation (); }
 
 double
@@ -72,7 +72,7 @@ WeatherOld::daily_global_radiation () const
 { return impl.daily_global_radiation; }
 
 double
-WeatherOld::hourly_diffuse_radiation () const
+WeatherOld::diffuse_radiation () const
 { return 0.0; }
 
 double
@@ -90,7 +90,7 @@ WeatherOld::snow () const
 void 
 WeatherOld::distribute (double precipitation)
 {
-  const double T = hourly_air_temperature ();
+  const double T = air_temperature ();
   if (T < impl.T_snow)
     impl.Psnow = precipitation;
   else if (impl.T_rain < T)
@@ -103,7 +103,7 @@ WeatherOld::distribute (double precipitation)
 }
 
 double
-WeatherOld::hourly_air_temperature () const
+WeatherOld::air_temperature () const
 {
   // BUG: Should add some kind of day cycle.  
   return daily_air_temperature (); 
@@ -112,7 +112,7 @@ WeatherOld::hourly_air_temperature () const
 double
 WeatherOld::reference_evapotranspiration () const
 {
-  return FAO::Makkink (hourly_air_temperature (), hourly_global_radiation ());
+  return FAO::Makkink (air_temperature (), global_radiation ());
 }
 
 double 

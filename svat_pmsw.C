@@ -31,11 +31,9 @@
 #include "mathlib.h"
 #include "block.h"
 # include "surface.h"
-# include <fstream>
-# include <stdio.h>
-# include <stdlib.h>
 # include "weather.h"
 # include "time.h"
+#include "geometry.h"
 # include "soil.h"
 # include "soil_water.h"
 # include "soil_heat.h"
@@ -50,6 +48,8 @@
 #include <sstream>
 #endif
 # include "assertion.h"
+
+
 # define NRANSI // from xgaussj
 #define vector _my_vector
 # include "nrutil.h"  // from Num Rec
@@ -1202,16 +1202,7 @@ class SVAT_PMSW : public SVAT
 public:
 
 // *******************TEMPORARY*********************
-#ifdef USE_FILES
-  FILE *fp_rcmin, *fp_rcminsb, *fp_rcminww;
-#endif
   double rcmin;
-#ifdef USE_FILES
-  double rcmin_sb_ndvi,rcmin_sb_savi;
-  double rcmin_ww_ndvi,rcmin_ww_savi;
-  double pgtime;
-  int teller;
-#endif
 
   // **************************************************
 
@@ -1289,12 +1280,8 @@ public:
   // variables retrieved from other parts of DAISY (by tick())
   int year,month,day,hour;
   double kh; // thermal conductivity from soil_heat.h
-  double theta_0; // soil water content at z(0) from soil_water.h
-  double theta_5,theta_10,theta_15,theta_20,theta_25,theta_30,theta_35;
-  double theta_40,theta_45;// smc
-  double theta_50,theta_60,theta_70,theta_80,theta_90,theta_110,theta_130;
-  double theta_0_20,theta_0_50,theta_0_100; // vertically averaged
-  double theta_0_20_mm,theta_0_50_mm,theta_0_100_mm;
+  double theta_0; // soil water content at near surface
+  double theta_0_20; // Average soil water content in top 20 cm.
   double les,les_q; // bare soil evaporation = water flow q upwards
   double les_tmp; // not in use
   double epotc,epots; // PotET from canopy / soil surface
@@ -1305,7 +1292,7 @@ public:
   double crop_ea; 
   double crop_ea_w,crop_ep_w; // actual & potential transpiration (f_etep)
   double lat_s; // latent heat at soil surface , e.g. Nichols eq.7
-  double temp_0; // soil temperature T(0) from soil_heat.h
+  double temp_0; // soil temperature T_top from soil_heat.h
   double LAI; // equals LAI_ in PM_bioclimate.C
   double h; //  MxH in PM_bioclimate.C Converted from cm to m
 
@@ -1366,7 +1353,7 @@ SVAT_PMSW::solve (const double /* stomata cond. [mol/m^2/s]*/, Treelog&)
 
 void
 SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
-                 const Surface& , const Geometry&,  const Soil& soil, 
+                 const Surface&, const Geometry& geo, const Soil& soil, 
                  const SoilHeat& soil_heat,
                  const SoilWater& soil_water, const Pet& pet, 
                  const Bioclimate& bio)
@@ -1390,33 +1377,9 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
 
   //cout << "LAI is\t" << LAI << "\n";
 
-  // READ FROM TEMPORARY RCMIN_WW.DAT OR RCMIN_SB.DAT FILE
-#ifdef USE_FILES
-  fscanf(fp_rcmin,"%lf%lf%lf%lf%lf\n",
-         &pgtime,&rcmin_ww_ndvi,&rcmin_ww_savi,&rcmin_sb_ndvi,&rcmin_sb_savi);
-  /*
-    // ............WHEAT..................
-    // test for missing value and for LAI > 0
-    if (LAI > 0.0)
-    {
-    if (rcmin_ww_ndvi==9999.0) rcmin=200.0/LAI;
-    else rcmin=rcmin_ww_ndvi; // for wheat
-    fprintf(fp_rcminww,"%lf%10.2lf%10.2lf\n",pgtime,200.0/LAI,rcmin_ww_ndvi);
-    } else rcmin=rcmin_ww_ndvi; // or another variable=9999
-
-  */
-  // ............BARLEY..................
-  // test for missing value and for LAI > 0
-  if (LAI > 0.0)
-    {
-      if (rcmin_sb_ndvi==9999.0) rcmin_star=200.0/LAI;
-      else rcmin_star=rcmin_sb_ndvi; // for barley
-      fprintf(fp_rcminsb,"%lf%10.2lf%10.2lf\n",pgtime,200.0/LAI,rcmin_sb_ndvi);
-    } else rcmin_star=rcmin_sb_ndvi; // or another variable=9999
-#else
   if (LAI > 0.0)
     rcmin_star=200.0/LAI;
-#endif
+
   // potential evapotranspiration from surface and canopy, from tick()
   // pot.evap.above crop canopy [cm/hr]
   epotc=0.1*canopy_ep;
@@ -1451,9 +1414,6 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
   // otherwise: calculate resistances and then energy balance
   if (LAI > 0.0)
     {
-#ifdef USE_FILES
-      teller++;
-#endif
       // communication with time.C
 #if 0
       year = time.year();
@@ -1463,12 +1423,12 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
 #endif
       // communication with weather_hourly.C
       e_pa = weather.vapor_pressure (); // [Pa]
-      tair = weather.hourly_air_temperature (); // [C]
-      srad = weather.hourly_global_radiation (); // [W/m^2]
+      tair = weather.air_temperature (); // [C]
+      srad = weather.global_radiation (); // [W/m^2]
       u_ref = weather.wind (); // u_ref from reference plane [m/s]
       daisy_assert (std::isfinite (u_ref));
       daisy_assert (u_ref >= 0.0);
-      relsun_day = weather.hourly_cloudiness ();  // [-]
+      relsun_day = weather.cloudiness ();  // [-]
       prec = 1.10*weather.rain(); // [mm] corrected by 10 %
 
       // cout << "past met variables\n";
@@ -1494,44 +1454,18 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
       // cout << "past VAPOR()\n";
 
       // communication with soil_water.h
-      // Access simulated soil water content and soil temperature for validation
-      theta_0 = soil_water.Theta(0); //  [0,-2.5]
-      theta_5 = soil_water.Theta(1); //  [-2.5,-7.5]
-      theta_10 = soil_water.Theta(2); //  [-7.5,-12.5]
-      theta_15 = soil_water.Theta(3); //  [-12.5,-17.5]
-      theta_20 = soil_water.Theta(4); //  [-17.5,-22.5]
-      theta_25 = soil_water.Theta(5); //  [-22.5,-27.5]
-      theta_30 = soil_water.Theta(6); //  [-27.5,-32.5]
-      theta_35 = soil_water.Theta(7); // [-32.5,-37.5]
-      theta_40 = soil_water.Theta(8); // [-37.5,-42.5]
-      theta_45 = soil_water.Theta(9); // [-42.5,-47.5]
-      theta_50 = soil_water.Theta(10); // [-47.5,-52.5]
-      theta_60 = soil_water.Theta(11); // [-52.5,-62.5]
-      theta_70 = soil_water.Theta(12); // [-62.5,-72.5]
-      theta_80 = soil_water.Theta(13); // [-72.5,-85.0]
-      theta_90 = soil_water.Theta(14); // [-85.0,-100.0]
-      theta_110 = soil_water.Theta(15); // [-100.0,-120.0]
-      theta_130 = soil_water.Theta(16); // [-120.0,-140.0]
-
-      // calculate averages for validation with TDR_0-20, TDR_0-50 and TDR_0-100
-      theta_0_20 = (theta_0+theta_5+theta_10+theta_15+theta_20)/5.0;
-      theta_0_50 = (theta_0+theta_5+theta_10+theta_15+theta_20+theta_25+
-                    theta_30+theta_35+theta_40+theta_45+theta_50)/11.0;
-      theta_0_100 = (theta_0+theta_5+theta_10+theta_15+theta_20+theta_25+
-                     theta_30+theta_35+theta_40+theta_45+theta_50+theta_60+theta_70+
-                     theta_80+theta_90)/15.0;
-
-      // convert to mm water
-      theta_0_20_mm=200.0*theta_0_20;
-      theta_0_50_mm=500.0*theta_0_50;
-      theta_0_50_mm=1000.0*theta_0_100;
+      theta_0 = geo.content_hood (soil_water, &SoilWater::Theta, 
+                                  Geometry::cell_above);
+      theta_0_20 = geo.content_interval (soil_water, &SoilWater::Theta,
+                                         0, -20);
 
       // communication with soil_heat.h
-      temp_0  =soil_heat.T(0); // at depth z(0) = -1.25 cm [degrees C]
+      temp_0  =soil_heat.T_top(); 
 
       // communication with soil_water.h
       // water flow positive to soil surface (LEs)
-      les_q=6800.0*soil_water.q_matrix(0); // in W/m^2
+      const double q_matrix = - soil_water.infiltration (geo) * 0.1; // [cm/h]
+      les_q=6800.0*q_matrix; // in W/m^2
       // cout << "past les_q\n";
 
       // soil evap. is min[abs(-q0),epots]
@@ -1542,7 +1476,8 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
       else les=evaps_w;  // [W/m^2]
 
       // communication with soil.h
-      kh=soil.heat_conductivity(0, theta_0, soil_water.X_ice (0))
+      kh=geo.content_hood (soil_heat, &SoilHeat::conductivity, 
+                           Geometry::cell_above)
         * 1e-7 * 3600.0 / 100.0; // [erg/cm/h/dg C] -> [W/m/dg C]
 
       // convert from e_pa to e_abs
@@ -1840,8 +1775,6 @@ SVAT_PMSW::output (Log& log) const
   output_variable (dtltc, log);                  // var 28
   output_variable (dtstc, log);                  // var 29
   output_variable (theta_0_20, log);        // var 30
-  output_variable (theta_0_50, log);        // var 31
-  output_variable (theta_0_100, log);      // var 32
   output_variable (f_1, log);                      // var 33
   output_variable (f1_dolman, log);          // var 34
   output_variable (f_2, log);                      // var 35
@@ -1930,52 +1863,11 @@ SVAT_PMSW::SVAT_PMSW (Block& al)
 // set relsun_cld for cloudy weather: relsun_cld=0.0
   relsun_cld=0.0;
 
-  // initialize pgtime and teller for rcmin_ww.dat and rcmin_sb.dat
-#ifdef USE_FILES
-  pgtime=0.0;
-  teller=0;
-#endif
-  // temporary input: rcmin_ww.dat or rcmin_sb.dat
-
-#ifdef USE_FILES
-  //.............WHEAT..............
-  if ((fp_rcmin=fopen("rcmin_ww.dat", "r"))==NULL)
-    {
-      printf("cannot open input file\n");
-      exit(1);
-    }
-  // Auxiliary output
-  if ((fp_rcminww=fopen("rcminww.dat", "w"))==NULL)
-    {
-      printf("cannot open output file\n");
-      exit(1);
-    }
-
-  //.............BARLEY...........
-  if ((fp_rcmin=fopen("rcmin_sb.dat", "r"))==NULL)
-    {
-      printf("cannot open input file\n");
-      exit(1);
-    }
-  // Auxiliary output
-  if ((fp_rcminsb=fopen("rcminsb.dat", "w"))==NULL)
-    {
-      printf("cannot open output file\n");
-      exit(1);
-    }
-#endif
-
-
 } // end PM_svat() implementation
 
 
 SVAT_PMSW::~SVAT_PMSW() // destructor
 {
-#ifdef USE_FILES
-  fclose(fp_rcmin);
-  fclose(fp_rcminsb);
-  fclose(fp_rcminww);
-#endif
   free_matrix(x,1,NP,1,MP);
   free_matrix(b,1,NP,1,MP);
   free_matrix(ai,1,NP,1,NP);
@@ -2054,10 +1946,6 @@ static struct SVAT_PMSWSyntax
                 "corrected temperature gradient between soil and mean source");
     syntax.add ("theta_0_20", "cm^3/cm^3", Syntax::LogOnly,
                 "Averaged soil water content in upper 20 cm");
-    syntax.add ("theta_0_50", "cm^3/cm^3", Syntax::LogOnly,
-                "Averaged soil water content in upper 50 cm");
-    syntax.add ("theta_0_100", "cm^3/cm^3", Syntax::LogOnly,
-                "Averaged soil water content in upper 100 cm");
     syntax.add ("f_1", Syntax::None (), Syntax::LogOnly,
                 "Constraint function (Noilhan) related to solar radiation");
     syntax.add ("f1_dolman", Syntax::None (), Syntax::LogOnly,
@@ -2199,3 +2087,5 @@ static struct SVAT_PMSWSyntax
     Librarian::add_type (SVAT::component, "PMSW", alist, syntax, &make);
   }
 } SVAT_PMSW_syntax;
+
+// svat_omsw.C ends here.

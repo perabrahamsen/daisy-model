@@ -146,13 +146,13 @@ struct SVAT_SSOC : public SVAT
 	     const Surface&, const Geometry&, const Soil&, const SoilHeat&,
 	     const SoilWater&, const Pet&, const Bioclimate&); 
 
-  void calculate_conductances(const double gs_mol /* stomata cond. [mol/m^2/s]*/);
+  void calculate_conductances (const double gs /* stomata cond. [m/s]*/);
   
-  void calculate_temperatures();
+  void calculate_temperatures ();
 
-  void calculate_fluxes();
+  void calculate_fluxes ();
 
-  void solve(const double gs_mol /* stomata cond. [mol/m^2/s]*/, Treelog& msg );
+  void solve(const double gs /* stomata cond. [m/s]*/, Treelog& msg );
 
   double production_stress () const
   { return -1; }
@@ -183,7 +183,7 @@ SVAT_SSOC::tick (const Weather& weather, const Vegetation& vegetation,
                  const Bioclimate& bio)
 {
   RH = weather.relative_humidity (); // []
-  T_a = weather.hourly_air_temperature (); // [dg C]
+  T_a = weather.air_temperature (); // [dg C]
   z_r = weather.screen_height (); // [m]
   U_z = bio.wind_speed_field();   // [m s^-1]
   h_veg = vegetation.height () / 100.; // [m]  
@@ -221,8 +221,11 @@ SVAT_SSOC::tick (const Weather& weather, const Vegetation& vegetation,
 }
 
 void 
-SVAT_SSOC:: calculate_conductances(const double gs_mol /* stomata cond. [mol/m^2/s]*/)
+SVAT_SSOC::calculate_conductances (const double gs /* stomata cond. [m/s]*/)
 {
+  // BGJ: Nogen af dem her giver ikke mening for LAI = 0.
+  // BGJ: gs vs g_s?
+
   // Function to correct diffusivities for temperature and pressure
   const double Cl = Resistance::Cl(T_a);
   // Mean leaf size
@@ -281,10 +284,14 @@ SVAT_SSOC:: calculate_conductances(const double gs_mol /* stomata cond. [mol/m^2
       gbf_H2O = Resistance::gbf_H2O_amph(gbf_heat, Cl); 
     }
 
+#if 0
   // Stomata conductance
   // Omregning af gs_mol(mol/(m2s)) til g_s (m/s) foretages ved 
   // g_s = gs_mol * (R * T)/P:
   g_s = gs_mol * (Resistance::R * T_a) / Resistance::P_surf;//[mol s^-1 m^-2]->[m s^-1]
+#else
+  g_s = gs;
+#endif
 
   //Sunlit fraction --------------------------------------------------
   const double LAI_sun = LAI * sun_LAI_fraction_total;
@@ -469,7 +476,7 @@ SVAT_SSOC:: calculate_fluxes()
 
 
 void
-SVAT_SSOC::solve(const double gs_mol /* stomata cond. [mol/m^2/s]*/, Treelog& msg )
+SVAT_SSOC::solve(const double gs /* stomata cond. [m/s]*/, Treelog& msg )
 {
   TREELOG_MODEL (msg);
 
@@ -485,7 +492,7 @@ SVAT_SSOC::solve(const double gs_mol /* stomata cond. [mol/m^2/s]*/, Treelog& ms
       const double old_T_shadow = T_shadow;
       const double old_e_c = e_c; 
 
-      calculate_conductances(gs_mol);
+      calculate_conductances(gs);
       calculate_temperatures();
 
       if(std::fabs(old_T_c - T_c) < maxTdiff 
@@ -503,6 +510,9 @@ SVAT_SSOC::solve(const double gs_mol /* stomata cond. [mol/m^2/s]*/, Treelog& ms
 void
 SVAT_SSOC::output(Log& log) const
 {
+  // BGJ: Vi skal nok have en "has_LAI" flag, så kun de variable der er
+  // meningsfyldte bliver skrevet ud her.
+
   output_variable (T_s, log);
   output_variable (T_0, log);
   output_variable (T_sun, log);

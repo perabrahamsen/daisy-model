@@ -59,8 +59,9 @@ public:
   // Communication with Bioclimate.
 public:
   virtual double minimum_light_fraction () const;
-  virtual double rs_min () const; // Minimum transpiration resistance.
-  virtual double rs_max () const; // Maximum transpiration resistance.
+  virtual double rs_min () const; // Minimum transpiration resistance [s/m].
+  virtual double rs_max () const; // Maximum transpiration resistance [s/m].
+  virtual double stomata_conductance () const; // Actual conductance [m/s].
   virtual double leaf_width () const; // Leaf width 
   virtual double height () const = 0;
   virtual double LAI () const = 0;
@@ -77,27 +78,24 @@ public:
   virtual void CanopyStructure () = 0;
   virtual double ActualWaterUptake (const Units&,
                                     double Ept, const Geometry& geo,
-                                    const Soil&, SoilWater&, 
+                                    const Soil&, const SoilWater&, 
 				    double EvapInterception, 
-				    double day_fraction, 
                                     double dt, Treelog&) = 0;
   virtual void force_production_stress  (double pstress);
 
   // Simulation.
 public:
-
-  virtual void tick (const Units&, const Time& time, double relative_humidity,
-		     const double CO2_atm,
-                     const Bioclimate&, 
-		     const Geometry& geo, const Soil&, OrganicMatter&, 
-		     const SoilHeat&, const SoilWater&,
-		     Chemistry&, 
-		     double& residuals_DM,
-		     double& residuals_N_top, double& residuals_C_top,
-		     std::vector<double>& residuals_N_soil, 
-		     std::vector<double>& residuals_C_soil,
-		     double ForcedCAI,
-		     double dt, Treelog&) = 0;
+  virtual void find_stomata_conductance (const Units&, const Time& time, 
+                                         const Bioclimate&,
+                                         double dt, Treelog&);
+  virtual void tick (const Time&, const Bioclimate&, double ForcedCAI, 
+                     const Geometry&, const Soil&, const SoilHeat&,
+                     SoilWater&, Chemistry&, OrganicMatter&,
+                     double& residuals_DM,
+                     double& residuals_N_top, double& residuals_C_top,
+                     std::vector<double>& residuals_N_soil,
+                     std::vector<double>& residuals_C_soil,
+                     double dt, Treelog&) = 0;
   virtual void emerge () = 0;
   virtual const Harvest& harvest (symbol column_name,
 				  const Time&, const Geometry&, 

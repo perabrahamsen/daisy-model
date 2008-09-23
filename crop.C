@@ -50,6 +50,10 @@ Crop::rs_max () const
 { return 1.0e5; }
 
 double 
+Crop::stomata_conductance () const
+{ return 1.0 / rs_min(); }
+
+double 
 Crop::leaf_width () const
 { return 3.0; }
 
@@ -92,6 +96,12 @@ Crop::kill (const symbol name, const Time& time, const Geometry& geo,
 
 void 
 Crop::force_production_stress  (double)
+{ }
+
+void 
+Crop::find_stomata_conductance (const Units&, const Time& time, 
+                                const Bioclimate&,
+                                double dt, Treelog&)
 { }
 
 bool

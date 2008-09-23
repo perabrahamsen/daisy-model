@@ -60,19 +60,19 @@ public:
 
   // Communication with Bioclimate.
 public:
-  virtual double hourly_air_temperature () const = 0; // [dg C]
+  virtual double air_temperature () const = 0; // [dg C]
   virtual double daily_air_temperature () const = 0; // [dg C]
   virtual double daily_max_air_temperature () const = 0; // [dg C]
   virtual double daily_min_air_temperature () const = 0; // [dg C]
-  virtual double hourly_global_radiation () const = 0; // [W/m2]
+  virtual double global_radiation () const = 0; // [W/m2]
   virtual double daily_global_radiation () const = 0; // [W/m2]
-  virtual double hourly_diffuse_radiation () const = 0; // [W/m2]
+  virtual double diffuse_radiation () const = 0; // [W/m2]
   virtual double reference_evapotranspiration () const = 0; // [mm/h]
   virtual double daily_precipitation () const = 0; // [mm/d]
   virtual double rain () const = 0;	// [mm/h]
   virtual double snow () const = 0;	// [mm/h]
   virtual IM deposit () const = 0; // [g [stuff] /cm²/h]
-  virtual double hourly_cloudiness () const = 0; // [0-1]
+  virtual double cloudiness () const = 0; // [0-1]
   virtual double daily_cloudiness () const = 0; // [0-1]
   virtual double vapor_pressure () const = 0; // [Pa]
   virtual double relative_humidity () const = 0; // []

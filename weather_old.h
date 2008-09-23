@@ -41,10 +41,10 @@ protected:
 
   // Communication with Bioclimate.
 public:
-  double hourly_air_temperature () const; // [dg C]
-  double hourly_global_radiation () const; // [W/m2]
+  double air_temperature () const; // [dg C]
+  double global_radiation () const; // [W/m2]
   double daily_global_radiation () const; // [W/m2]
-  double hourly_diffuse_radiation () const; // [W/m2]
+  double diffuse_radiation () const; // [W/m2]
   double reference_evapotranspiration () const; // [mm/h]
   double rain () const;	// [mm/h]
   double snow () const;	// [mm/h]

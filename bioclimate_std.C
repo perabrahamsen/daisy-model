@@ -134,7 +134,7 @@ struct BioclimateStandard : public Bioclimate
                           Surface& surface, const Weather& weather, 
 			  Vegetation& vegetation, const Movement&,
                           const Geometry&, const Soil& soil,
-			  SoilWater& soil_water, const SoilHeat&, 
+			  const SoilWater& soil_water, const SoilHeat&, 
                           double dt, Treelog&);
 
   // Radiation.
@@ -163,11 +163,13 @@ struct BioclimateStandard : public Bioclimate
   double sin_beta_;
 
   // Weather.
-  double daily_air_temperature_; // Air temperature in canopy. [dg C]
-  double daily_precipitation_; // From weather. [mm]
-  double day_length_;		// From weather (does not belong here) [h].
-  double daily_global_radiation_; // From weather [W/m2].
-  double hourly_global_radiation_; // From weather [W/m2].
+  double daily_air_temperature_; // Air temperature in canopy [dg C]
+  double daily_precipitation_; // From weather [mm]
+  double day_length_;		// From weather (does not belong here) [h]
+  double daily_global_radiation_; // From weather [W/m2]
+  double global_radiation_; // From weather [W/m2]
+  double atmospheric_CO2_;         // From weather [Pa]
+  double atmospheric_relative_humidity_; // From weather []
 
   // Simulation
   void tick (const Units&, const Time&, Surface&, const Weather&, 
@@ -207,7 +209,7 @@ struct BioclimateStandard : public Bioclimate
   // Weather.
   double daily_air_temperature () const
   { return daily_air_temperature_; }
-  double hourly_canopy_temperature () const
+  double canopy_temperature () const
   { return CanopyTemperature; }
   double daily_precipitation () const
   { return daily_precipitation_; }
@@ -215,10 +217,14 @@ struct BioclimateStandard : public Bioclimate
   { return day_length_; }
   double daily_global_radiation () const
   { return daily_global_radiation_; }
-  double hourly_global_radiation () const
-  { return hourly_global_radiation_; }
+  double global_radiation () const
+  { return global_radiation_; }
   double direct_rain () const
   { return direct_rain_; }
+  double atmospheric_CO2 () const
+  { return atmospheric_CO2_; }
+  double atmospheric_relative_humidity () const
+  { return atmospheric_relative_humidity_; }
 
   // Manager.
   void irrigate_overhead (double flux, double temp);
@@ -228,7 +234,7 @@ struct BioclimateStandard : public Bioclimate
   void irrigate_subsoil (double flux);
   void set_subsoil_irrigation (double flux);
 
-  // Communication with external model.
+  // Communication with svat and external model.
   double snow_ea () const // [mm/h]
   { return snow_ea_; }
   double pond_ea () const // [mm/h]
@@ -457,29 +463,36 @@ The intended use is colloid generation.");
 
   // Water transpirated through plant roots.
   syntax.add ("crop_ep", "mm/h", Syntax::LogOnly,
-              "Potential transpiration.\
-Transpiration under the assumption that the soil have an unlimited
-water supply.  For a fully irrigated crop, this will be equal to the
+              "Potential transpiration.\n\
+Transpiration under the assumption that the soil have an unlimited\n\
+water supply.  For a fully irrigated crop, this will be equal to the\n\
 actual transpiration.");
   syntax.add ("crop_ea_soil", "mm/h", Syntax::LogOnly,
               "Soil limited transpiration.\n\
-");
+The part of the potential transpiration that the soil can supply.");
+  syntax.add ("crop_ea_svat", "mm/h", Syntax::LogOnly,
+              "Transpiration suggested by the SVAT module.\n\
+Under stressed conditions, the soil, vegetation and atmosphere behave\n\
+different than what was assumed when calculating the poterntial\n\
+transpiration.");
   syntax.add ("crop_ea", "mm/h", Syntax::LogOnly,
-              "Actual transpiration.");
-  syntax.add ("crop_ea", "mm/h", Syntax::LogOnly,
-              "Actual transpiration.");
+              "Actual transpiration.\n\
+This is the transpiration limited either by what the soil can deliver, or\n\
+what the SVAT module requires.");
   syntax.add ("production_stress", Syntax::None (), Syntax::LogOnly,
               "SVAT module induced stress, -1 means use water stress.");
+#ifdef BGJ
   syntax.add ("r_ae", "s/m", Check::positive (), Syntax::Const,
               "Atmospheric resistance.");
   alist.add ("r_ae", 53.);
+#endif
 
   // Bioclimate in canopy
   syntax.add ("CanopyTemperature", "dg C", Syntax::LogOnly,
               "Actual canopy temperature.");
-  syntax.add ("wind_speed_field_", "m/s", Syntax::LogOnly,
+  syntax.add ("wind_speed_field", "m/s", Syntax::LogOnly,
               "Wind speed in the field at reference height.");
-  syntax.add ("wind_speed_weather_", "m/s", Syntax::LogOnly,
+  syntax.add ("wind_speed_weather", "m/s", Syntax::LogOnly,
               "Measured wind speed.");
 
   //Radiation
@@ -601,6 +614,8 @@ BioclimateStandard::BioclimateStandard (Block& al)
     soil_ea_ (0.0),
     svat (Librarian::build_item<SVAT> (al, "svat")),
     crop_ep_ (0.0),
+    crop_ea_soil (0.0),
+    crop_ea_svat (0.0),
     crop_ea_ (0.0),
     production_stress (-1.0),
     raddist (Librarian::build_item<Raddist> (al, "raddist")),
@@ -618,7 +633,9 @@ BioclimateStandard::BioclimateStandard (Block& al)
     daily_precipitation_ (0.0),
     day_length_ (0.0),
     daily_global_radiation_ (0.0),
-    hourly_global_radiation_ (0.0)
+    global_radiation_ (0.0),
+    atmospheric_CO2_ (-42.42e42),
+    atmospheric_relative_humidity_ (-42.42e42)
 { }
 
 BioclimateStandard::~BioclimateStandard ()
@@ -675,7 +692,7 @@ BioclimateStandard::RadiationDistribution (const Vegetation& vegetation,
 					   const double sin_beta_, Treelog& msg)
 {
   raddist->tick(sun_LAI_fraction_, sun_PAR_, total_PAR_, sun_NIR_, total_NIR_,
-                hourly_global_radiation (), difrad0, sin_beta_, vegetation, msg);
+                global_radiation (), difrad0, sin_beta_, vegetation, msg);
 
   //Absorbed PAR in the canopy and the soil:
   absorbed_total_PAR_canopy = total_PAR_[0] - total_PAR_[No];     // [W/m2]
@@ -723,7 +740,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
                                        const Movement& movement,
                                        const Geometry& geo,
 				       const Soil& soil, 
-				       SoilWater& soil_water,
+				       const SoilWater& soil_water,
 				       const SoilHeat& soil_heat, 
                                        const double dt, Treelog& msg)
 {
@@ -742,10 +759,10 @@ BioclimateStandard::WaterDistribution (const Units& units,
   // 1 External water sinks and sources. 
 
   // Net Radiation.
-  const double Cloudiness = weather.hourly_cloudiness ();
-  const double AirTemperature = weather.hourly_air_temperature ();//[dg C]
+  const double Cloudiness = weather.cloudiness ();
+  const double AirTemperature = weather.air_temperature ();//[dg C]
   const double VaporPressure = weather.vapor_pressure ();
-  const double Si = weather.hourly_global_radiation ();
+  const double Si = weather.global_radiation ();
   const double Albedo = albedo (vegetation, surface, geo, soil, soil_water);
   net_radiation->tick (Cloudiness, AirTemperature, VaporPressure, Si, Albedo,
 		       msg);
@@ -767,7 +784,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
 
   // 1.3 Weather.
   double rain = weather.rain ();
-  double air_temperature = weather.hourly_air_temperature ();
+  double air_temperature = weather.air_temperature ();
 
   // 2 Snow Pack
 
@@ -782,7 +799,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
   else
     snow_water_in_temperature = air_temperature;
   snow.tick (msg, movement, soil, soil_water, soil_heat, 
-	     weather.hourly_global_radiation (), 0.0,
+	     weather.global_radiation (), 0.0,
 	     snow_water_in, weather.snow (),
 	     surface.ponding (),
 	     snow_water_in_temperature, snow_ep, dt);
@@ -967,17 +984,11 @@ BioclimateStandard::WaterDistribution (const Units& units,
 		   std::max (0.0, pet->dry ()));
 
   // Actual transpiration, based on remaining energy.
-  const double day_fraction
-    = (daily_global_radiation_ > 0.0)
-    ? (weather.hourly_global_radiation () * dt 
-       / (24.0 * daily_global_radiation_))
-    : 0.0;
-
   crop_ea_
     = vegetation.transpiration (units, crop_ep_, canopy_ea, geo, soil,
-                                soil_water, day_fraction, dt, msg);
+                                soil_water, dt, msg);
   daisy_assert (crop_ea_ >= 0.0);
-  const double crop_ea_soil = crop_ea_;       // Remember original value.
+  crop_ea_soil = crop_ea_;       // Remember original value.
   
   // Actual transpiration, modified by the SVAT model.
 
@@ -985,23 +996,31 @@ BioclimateStandard::WaterDistribution (const Units& units,
   svat->tick (weather, vegetation, surface, geo, soil, soil_heat, soil_water, 
               *pet, *this);
 
-#if 0
   // Our initial guess for transpiration is based on remaining energy.
   double crop_ea_svat_old = crop_ea_soil;
   
+  std::ostringstream tmp;
+  tmp << "Svat: " << svat->name;
   const int max_svat_iterations = 100;
   const double max_svat_absolute_difference = 0.01; // [mm/h]
-  for (int iteration = 0; i < max_svat_iterations; i++)
+  int iteration;
+  for (iteration = 0; iteration < max_svat_iterations; iteration++)
     {
       // Find stomata conductance based on ABA and crown potential
       // from last attempt at crop transpiration.
-      vegetation.find_stomata_conductance ();
+      vegetation.find_stomata_conductance (units, time, *this, dt, msg);
       const double gs = vegetation.stomata_conductance ();
 
       // Find expected transpiration from stomate conductance.
-      svat.solve (gs);
+      svat->solve (gs, msg);
       
-      const double crop_ea_svat = svat.transpiration ();
+      const double crop_ea_svat = svat->transpiration ();
+
+      tmp << "\n" << iteration << ": new = " << crop_ea_svat
+          << ", old = " << crop_ea_svat_old
+          << ", crop = " << crop_ea_
+          << ", soil = " << crop_ea_soil
+          << ", potential = " << crop_ep_;
       if (std::fabs (crop_ea_svat - crop_ea_svat_old) 
           < max_svat_absolute_difference)
         {
@@ -1014,13 +1033,14 @@ BioclimateStandard::WaterDistribution (const Units& units,
       // Calculate new crop transpiration based on latest SVAT guess.
       crop_ea_
         = vegetation.transpiration (units, crop_ea_svat, canopy_ea, geo, soil,
-                                    soil_water, day_fraction, dt, msg);
+                                    soil_water, dt, msg);
       daisy_assert (crop_ea_ >= 0.0);
     }
   msg.error ("SVAT transpiration and stomata conductance"
              " loop did not converge");
  success:;
-#endif
+  if (iteration > 0.0)
+    msg.message (tmp.str ());
 
   // Stress calculated by the SVAT model.
   production_stress = svat->production_stress ();
@@ -1066,12 +1086,14 @@ BioclimateStandard::tick (const Units& units, const Time& time,
 {
   // Keep weather information during time step.
   // Remember this in case the crops should ask.
-  hourly_global_radiation_ = weather.hourly_global_radiation ();
+  global_radiation_ = weather.global_radiation ();
   daily_global_radiation_ = weather.daily_global_radiation ();
   daily_air_temperature_ = weather.daily_air_temperature ();
   daily_precipitation_ = weather.daily_precipitation ();
   day_length_ = weather.day_length ();
-  
+  atmospheric_CO2_ = weather.CO2 ();
+  atmospheric_relative_humidity_ = weather.relative_humidity ();
+
   // Add deposition. 
   const Unit& u_h = units.get_unit (Units::h ());
   const Unit& u_storage = units.get_unit (IM::storage_unit ());
@@ -1083,7 +1105,7 @@ BioclimateStandard::tick (const Units& units, const Time& time,
  
   // Radiation.
   daisy_assert (difrad.get () != NULL);
-  difrad0 = difrad->value (time, weather, msg) * hourly_global_radiation_;
+  difrad0 = difrad->value (time, weather, msg) * global_radiation_;
   //daisy_assert (difrad0 >= 0.0);
 
   sin_beta_ = weather.sin_solar_elevation_angle (time);
@@ -1096,7 +1118,7 @@ BioclimateStandard::tick (const Units& units, const Time& time,
 
   // Calculate temperature of canopy
   static const double rho_water = 1.0; // [kg/dm^3]
-  const double AirTemperature = weather.hourly_air_temperature ();//[dg C]
+  const double AirTemperature = weather.air_temperature ();//[dg C]
   const double LatentHeatVapor 
     = FAO::LatentHeatVaporization (AirTemperature); //[J/kg]
   const double CanopyTranspirationRate = 
@@ -1171,7 +1193,7 @@ BioclimateStandard::output (Log& log) const
                 "irrigation_total", log);
   output_submodule (snow, "Snow", log);
   output_variable (snow_ep, log);
-  output_variable (snow_ea_, log);
+  output_value (snow_ea_, "snow_ea", log);
   output_variable (snow_water_in, log);
   output_variable (snow_water_in_temperature, log);
   output_variable (snow_water_out, log);
@@ -1191,16 +1213,18 @@ BioclimateStandard::output (Log& log) const
   output_variable (litter_water_in, log);
   output_variable (litter_water_out, log);
   output_variable (pond_ep, log);
-  output_variable (pond_ea_, log);
+  output_value (pond_ea_, "pond_ea", log);
   output_variable (soil_ep, log);
-  output_variable (soil_ea_, log);
+  output_value (soil_ea_, "soil_ea", log);
   output_derived (svat, "svat", log);
-  output_variable (crop_ep_, log);
-  output_variable (crop_ea_, log);
+  output_value (crop_ep_, "crop_ep", log);
+  output_variable (crop_ea_soil, log);
+  output_variable (crop_ea_svat, log);
+  output_value (crop_ea_, "crop_ea", log);
   output_variable (production_stress, log);
 
   output_variable (CanopyTemperature, log);
-  output_variable (wind_speed_field_, log);  
+  output_value (wind_speed_field_, "wind_speed_field", log);  
   output_variable (wind_speed_weather, log);
 
   //radiation

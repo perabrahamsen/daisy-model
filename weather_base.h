@@ -60,11 +60,11 @@ protected:
 private:
   double day_length_;
   double day_cycle_;
-  double hourly_cloudiness_;
+  double cloudiness_;
   double daily_cloudiness_;
   IM deposit_;
-  double hourly_cloudiness () const // [0-1]
-  { return hourly_cloudiness_; }
+  double cloudiness () const // [0-1]
+  { return cloudiness_; }
   double daily_cloudiness () const // [0-1]
   { return daily_cloudiness_; }
   IM deposit () const; // [g [stuff] /cm²/h]

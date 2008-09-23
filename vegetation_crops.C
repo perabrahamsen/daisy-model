@@ -86,9 +86,22 @@ struct VegetationCrops : public Vegetation
   double shared_light_fraction () const
   { return shared_light_fraction_; }
   double rs_min () const	// Minimum transpiration resistance.
-  { return CanopyAverage (&Crop::rs_min) ; }
+  { 
+    // TODO: Should we use harmonic because it is parallel resitances?
+    return CanopyAverage (&Crop::rs_min); 
+  }
   double rs_max () const	// Maximum transpiration resistance.
-  { return CanopyAverage (&Crop::rs_max) ; }
+  { 
+    // TODO: Should we use harmonic because it is parallel resitances?
+    return CanopyAverage (&Crop::rs_max) ; 
+  }
+  double stomata_conductance () const	// Stomata conductance [m/s]
+  {
+    if (LAI () > 0.0)
+      return CanopyAverage (&Crop::stomata_conductance);
+    return -42.42e42;
+  }
+
   double LAI () const
   { return LAI_; }
   double height () const
@@ -134,26 +147,23 @@ struct VegetationCrops : public Vegetation
   const std::vector<double>& root_density (symbol crop) const;
 
   // Simulation.
-  void tick (const Units&,
-             const Time& time, double relative_humidity, const double CO2_atm,
-	     const Bioclimate& bioclimate, 
-             const Geometry& geo,
-	     const Soil& soil,
-	     OrganicMatter& organic_matter,
-	     const SoilHeat& soil_heat,
-	     const SoilWater& soil_water,
-	     Chemistry&, 
-	     double& residuals_DM,
-	     double& residuals_N_top, double& residuals_C_top,
-	     std::vector<double>& residuals_N_soil,
-	     std::vector<double>& residuals_C_soil,
-	     double dt, Treelog&);
   void reset_canopy_structure (Treelog&);
   double transpiration (const Units& units, double potential_transpiration,
 			double canopy_evaporation,
                         const Geometry& geo,
-			const Soil& soil, SoilWater& soil_water, 
-			double day_fraction, double dt, Treelog&);
+			const Soil& soil, const SoilWater& soil_water, 
+			double dt, Treelog&);
+  void find_stomata_conductance (const Units&, const Time& time, 
+                                 const Bioclimate&, double dt, Treelog&);
+  void tick (const Time& time, const Bioclimate&, 
+             const Geometry& geo, const Soil&, const SoilHeat&,
+             SoilWater&, Chemistry&, OrganicMatter&,
+             double& residuals_DM,
+             double& residuals_N_top, double& residuals_C_top,
+             std::vector<double>& residuals_N_soil,
+             std::vector<double>& residuals_C_soil,
+             double dt,
+             Treelog&);
   void force_production_stress  (double pstress);
   void kill_all (symbol, const Time&, const Geometry&,
                  std::vector<AM*>& residuals, 			 
@@ -371,16 +381,23 @@ VegetationCrops::root_density (symbol name) const
 }
 
 void 
-VegetationCrops::tick (const Units& units,
-                       const Time& time, const double relative_humidity, 
-		       const double CO2_atm,
-		       const Bioclimate& bioclimate, 
-                       const Geometry& geo,
-		       const Soil& soil,
-		       OrganicMatter& organic_matter,
+VegetationCrops::find_stomata_conductance (const Units& units, 
+                                           const Time& time, 
+                                           const Bioclimate& bioclimate,
+                                           double dt, Treelog& msg)
+{
+  for (CropList::const_iterator crop = crops.begin();
+       crop != crops.end();
+       crop++)
+    (*crop)->find_stomata_conductance (units, time, bioclimate, dt, msg);
+}
+
+void 
+VegetationCrops::tick (const Time& time, const Bioclimate& bioclimate, 
+                       const Geometry& geo, const Soil& soil,
 		       const SoilHeat& soil_heat,
-		       const SoilWater& soil_water,
-		       Chemistry& chemistry,
+		       SoilWater& soil_water, Chemistry& chemistry,
+		       OrganicMatter& organic_matter,
 		       double& residuals_DM,
 		       double& residuals_N_top, double& residuals_C_top,
 		       std::vector<double>& residuals_N_soil,
@@ -416,11 +433,10 @@ VegetationCrops::tick (const Units& units,
       const double my_force = use_force ? (MyLAI / SimLAI) * ForcedLAI : -1.0;
       
       // Tick.
-      (*crop)->tick (units, time, relative_humidity, CO2_atm, 
-                     bioclimate, geo, soil, organic_matter, 
-		     soil_heat, soil_water, chemistry, 
-		     residuals_DM, residuals_N_top, residuals_C_top,
-		     residuals_N_soil, residuals_C_soil, my_force, dt, msg);
+      (*crop)->tick (time, bioclimate, my_force, geo, soil, soil_heat, 
+                     soil_water, chemistry, organic_matter, 
+                     residuals_DM, residuals_N_top, residuals_C_top,
+		     residuals_N_soil, residuals_C_soil, dt, msg);
     }
 
   // Make sure the crop which took first this time will be last next.
@@ -546,9 +562,8 @@ VegetationCrops::transpiration (const Units& units,
 				const double canopy_evaporation,
                                 const Geometry& geo,
 				const Soil& soil, 
-				SoilWater& soil_water, 
-                                const double day_fraction, const double dt,
-                                Treelog& msg)
+				const SoilWater& soil_water, 
+                                const double dt, Treelog& msg)
 {
   double value = 0.0;
   
@@ -569,7 +584,7 @@ VegetationCrops::transpiration (const Units& units,
                                                pt_per_LAI * (*crop)->LAI (), 
 					       geo, soil, soil_water, 
 					       canopy_evaporation, 
-					       day_fraction, dt, msg);
+					       dt, msg);
 	}
     }
   return value;
@@ -934,3 +949,5 @@ emerged.  If no crops have emerged on the field, it will be ignored.",
     Librarian::add_type (Vegetation::component, "crops", alist, syntax, &make);
   }
 } VegetationCrops_syntax;
+
+// vegetation_crops.C ends here.

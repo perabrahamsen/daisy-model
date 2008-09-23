@@ -68,13 +68,13 @@ void
 WeatherBase::tick_after (const Time& time, Treelog&)
 {
   // Hourly claudiness.
-  const double Si = hourly_global_radiation (); 
+  const double Si = global_radiation (); 
   const double rad = HourlyExtraterrestrialRadiation (time);
   if (Si > 25.0 && rad > 25.0)
     {
-      hourly_cloudiness_ = FAO::CloudinessFactor_Humid (Si, rad);
-      daisy_assert (hourly_cloudiness_ >= 0.0);
-      daisy_assert (hourly_cloudiness_ <= 1.0);
+      cloudiness_ = FAO::CloudinessFactor_Humid (Si, rad);
+      daisy_assert (cloudiness_ >= 0.0);
+      daisy_assert (cloudiness_ <= 1.0);
     }
 
   // Daily claudiness.
@@ -106,13 +106,13 @@ WeatherBase::tick_after (const Time& time, Treelog&)
 void
 WeatherBase::output (Log& log) const
 {
-  output_value (hourly_air_temperature (), "hourly_air_temperature", log);
+  output_value (air_temperature (), "air_temperature", log);
   output_value (daily_air_temperature (), "daily_air_temperature", log);
   output_value (daily_min_air_temperature (),
                 "daily_min_air_temperature", log);
   output_value (daily_max_air_temperature (), 
                 "daily_max_air_temperature", log);
-  output_value (hourly_global_radiation (), "hourly_global_radiation", log);
+  output_value (global_radiation (), "global_radiation", log);
   output_value (daily_global_radiation (), "daily_global_radiation", log);
   if (has_reference_evapotranspiration ())
     output_value (reference_evapotranspiration (), 
@@ -120,10 +120,10 @@ WeatherBase::output (Log& log) const
   output_value (rain (), "rain", log);
   output_value (snow (), "snow", log);
   output_value (rain () + snow (), "precipitation", log);
-  output_value (hourly_cloudiness (), "hourly_cloudiness", log);
+  output_value (cloudiness (), "cloudiness", log);
   output_value (daily_cloudiness (), "daily_cloudiness", log);
   output_value (vapor_pressure (), "vapor_pressure", log);
-  output_value (hourly_diffuse_radiation (), "hourly_diffuse_radiation", log);
+  output_value (diffuse_radiation (), "diffuse_radiation", log);
   output_value (relative_humidity (), "relative_humidity", log);
   output_value (wind (), "wind", log);
   output_value (day_length (), "day_length", log);
@@ -302,19 +302,23 @@ WeatherBase::load_base (Syntax& syntax, AttributeList& alist)
   alist.add ("base_model", "common");
   alist.add ("description", "\
 This is not a model, but a list of parameters shared by all weather models.");
-  syntax.add ("hourly_air_temperature", "dg C", Syntax::LogOnly,
-	      "Temperature this hour.");
+  if (syntax.lookup ("air_temperature") == Syntax::Error)
+    // May be set by derived class (WeatherNone).
+    syntax.add ("air_temperature", "dg C", Syntax::LogOnly,
+                "Temperature this hour.");
   syntax.add ("daily_air_temperature", "dg C", Syntax::LogOnly,
 	      "Average temperature this day.");
   syntax.add ("daily_min_air_temperature", "dg C", Syntax::LogOnly,
 	      "Minumum temperature this day.");
   syntax.add ("daily_max_air_temperature", "dg C", Syntax::LogOnly,
 	      "Maximum temperature this day.");
-  syntax.add ("hourly_global_radiation", "W/m^2", Syntax::LogOnly,
-	      "Global radiation this hour.");
+  if (syntax.lookup ("air_temperature") == Syntax::Error)
+    // May be set by derived class (WeatherNone).
+    syntax.add ("global_radiation", "W/m^2", Syntax::LogOnly,
+                "Global radiation this hour.");
   syntax.add ("daily_global_radiation", "W/m^2", Syntax::LogOnly,
 	      "Average radiation this day.");
-  syntax.add ("hourly_diffuse__radiation", "W/m^2", Syntax::LogOnly,
+  syntax.add ("diffuse__radiation", "W/m^2", Syntax::LogOnly,
 	      "Diffuse radiation this hour.");
   syntax.add ("reference_evapotranspiration", "mm/h", Syntax::LogOnly,
 	      "Reference evapotranspiration this hour");
@@ -324,7 +328,7 @@ This is not a model, but a list of parameters shared by all weather models.");
   syntax.add ("snow", "mm/h", Syntax::LogOnly, "Snow this hour.");
   syntax.add ("precipitation", "mm/h", Syntax::LogOnly, 
 	      "Precipitation this hour.");
-  syntax.add_fraction ("hourly_cloudiness", Syntax::LogOnly,
+  syntax.add_fraction ("cloudiness", Syntax::LogOnly,
 	      "Fraction of sky covered by clouds [0-1].");
   syntax.add_fraction ("daily_cloudiness", Syntax::LogOnly,
 	      "Fraction of sky covered by clouds [0-1].");
@@ -356,7 +360,7 @@ WeatherBase::WeatherBase (Block& al)
     max_Ta_yday (-42.42e42),
     day_length_ (-42.42e42),
     day_cycle_ (-42.42e42),
-    hourly_cloudiness_ (0.0),	// It may be dark at the start.
+    cloudiness_ (0.0),	// It may be dark at the start.
     daily_cloudiness_ (0.0),
     deposit_ (al, "deposit")
 { }

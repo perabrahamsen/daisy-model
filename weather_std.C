@@ -222,7 +222,7 @@ struct WeatherStandard : public WeatherBase
   void read_new_day (const Time&, Treelog&);
 
   // Communication with Bioclimate.
-  double hourly_air_temperature () const // [dg C]
+  double air_temperature () const // [dg C]
   { 
     daisy_assert (initialized);
     return air_temperature_[hour]; 
@@ -242,7 +242,7 @@ struct WeatherStandard : public WeatherBase
     daisy_assert (initialized);
     return daily_min_air_temperature_; 
   }
-  double hourly_global_radiation () const // [W/m2]
+  double global_radiation () const // [W/m2]
   { 
     daisy_assert (initialized);
     return global_radiation_[hour]; 
@@ -277,7 +277,7 @@ struct WeatherStandard : public WeatherBase
     daisy_assert (initialized);
     return vapor_pressure_[hour]; 
   }
-  double hourly_diffuse_radiation () const // [W/m2]
+  double diffuse_radiation () const // [W/m2]
   { 
     daisy_assert (initialized);
     return diffuse_radiation_[hour]; 
@@ -522,7 +522,7 @@ WeatherStandard::tick (const Time& time, Treelog& msg)
     }
 
   // Snow and rain fractions.
-  const double T = hourly_air_temperature ();
+  const double T = air_temperature ();
   if (T < T_snow)
     {
       snow_fraction = 1.0;

@@ -51,11 +51,12 @@ public:
   // Simulation.
 public:
   virtual void tick (const Weather&, const Vegetation&,
-		     const Surface&, const Geometry&, const Soil&, const SoilHeat&, 
+		     const Surface&, const Geometry&, 
+                     const Soil&, const SoilHeat&, 
 		     const SoilWater&, const Pet&, const Bioclimate&) = 0;
   virtual void output (Log&) const;
   virtual double production_stress () const = 0; // []
-  virtual void solve (const double /* stomata cond. [mol/m^2/s]*/, Treelog&) = 0;
+  virtual void solve (const double /* stomata cond. [m/s]*/, Treelog&) = 0;
   virtual double transpiration () const = 0; // [mm/h]
 
   // Create and Destroy.

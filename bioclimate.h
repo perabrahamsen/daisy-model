@@ -77,13 +77,15 @@ public:
 
   // Weather.
   virtual double daily_air_temperature () const = 0;
-  virtual double hourly_canopy_temperature () const =0;
+  virtual double canopy_temperature () const =0;
   virtual double daily_precipitation () const = 0;
   virtual double day_length () const = 0;
   virtual double daily_global_radiation () const = 0;
-  virtual double hourly_global_radiation () const = 0;
-  double day_fraction () const;   
+  virtual double global_radiation () const = 0;
+  double day_fraction (double dt) const;   
   virtual double direct_rain () const = 0;
+  virtual double atmospheric_CO2 () const = 0;
+  virtual double atmospheric_relative_humidity () const = 0;
 
   // Manager.
 public:
@@ -94,13 +96,14 @@ public:
   virtual void irrigate_subsoil (double flux) = 0;
   virtual void set_subsoil_irrigation (double flux) = 0;
 		       
-  // Communication with external model.
+  // Communication with SVAT.
   virtual double snow_ea () const = 0; // [mm/h]
   virtual double pond_ea () const = 0; // [mm/h]
   virtual double soil_ea () const = 0; // [mm/h]
   virtual double crop_ep () const = 0; // [mm/h]
   virtual double crop_ea () const = 0; // [mm/h]
 
+  // Communication with external model.
   virtual double get_evap_interception () const = 0; // [mm/h]
   virtual double get_net_throughfall () const = 0; // [mm/h]
 

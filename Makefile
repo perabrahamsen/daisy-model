@@ -2013,8 +2013,8 @@ pet_makkink${OBJ}: pet_makkink.C pet.h model.h symbol.h alist.h syntax.h \
   treelog.h weather.h im.h fao.h log.h time.h border.h librarian.h
 pet_weather${OBJ}: pet_weather.C pet.h model.h symbol.h alist.h syntax.h \
   treelog.h weather.h im.h log.h time.h border.h librarian.h
-svat_none${OBJ}: svat_none.C svat.h model.h symbol.h alist.h syntax.h \
-  treelog.h librarian.h
+svat_none${OBJ}: svat_none.C svat.h model.h symbol.h alist.h bioclimate.h \
+  syntax.h treelog.h librarian.h
 action_spray${OBJ}: action_spray.C action.h model.h symbol.h alist.h \
   library.h block.h syntax.h treelog.h plf.h daisy.h program.h run.h \
   time.h timestep.h vcheck.h memutils.h field.h border.h chemical.h \

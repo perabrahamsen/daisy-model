@@ -47,7 +47,7 @@ public:
   { return daily_air_temperature (); }
   double daily_min_air_temperature () const
   { return daily_air_temperature (); }
-  double hourly_global_radiation () const;
+  double global_radiation () const;
   double daily_global_radiation () const;
   double reference_evapotranspiration () const;
   double daily_precipitation () const;
@@ -91,7 +91,7 @@ static const double B2[] =
 { 11.0, 25.0, 32.0, 29.0, 23.0, 0.0, 0.0, 29.0, 25.0, 15.0, 8.0, 7.0 };
 
 double
-WeatherSimple::hourly_global_radiation () const	// [W/m²]
+WeatherSimple::global_radiation () const	// [W/m²]
 {
   double t = 2 * M_PI / 24 * time.hour ();
   int m = time.month () - 1;

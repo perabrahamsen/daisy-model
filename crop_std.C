@@ -79,6 +79,11 @@ struct CropStandard : public Crop
   { return canopy.rs_min; }
   double rs_max () const	// Maximum transpiration resistance.
   { return canopy.rs_max; }
+#if 0
+  // BGJ: BUG: TODO
+  double stomata_conductance () const // Current stomata_conductance [m/s].
+  { return 1.0; }                     
+#endif
   double leaf_width () const
   { return canopy.leaf_width (DS ()); }
 
@@ -108,48 +113,26 @@ struct CropStandard : public Crop
   { canopy.CanopyStructure (development->DS); }
   double ActualWaterUptake (const Units& units, double Ept, 
                             const Geometry& geo,
-			    const Soil& soil, SoilWater& soil_water,
-			    double EvapInterception, double day_fraction, 
-                            const double dt, 
+			    const Soil& soil, const SoilWater& soil_water,
+			    const double EvapInterception, const double dt, 
 			    Treelog& msg)
   { return root_system->water_uptake (units, Ept, geo, soil, soil_water, 
-                                      EvapInterception, day_fraction,
+                                      EvapInterception, 
                                       dt, msg); }
   void force_production_stress  (double pstress)
   { root_system->production_stress = pstress; }
 
   // Simulation.
-  void svat (const Units&, const Time& time, double relative_humidity,
-             const double CO2_atm, const Bioclimate&, double dt, Treelog&);
-  void tick_after (const Time& time, 
-                   const Bioclimate&, const Geometry& geo,
-                   const Soil&,
-                   OrganicMatter&,
-                   const SoilHeat&,
-                   const SoilWater&,
-                   Chemistry&,
-                   double& residuals_DM,
-                   double& residuals_N_top, double& residuals_C_top,
-                   std::vector<double>& residuals_N_soil,
-                   std::vector<double>& residuals_C_soil,
-                   double ForcedCAI,
-                   double dt,
-                   Treelog&);
-  void tick (const Units&, const Time& time, double relative_humidity,
-	     const double CO2_atm,
-	     const Bioclimate&, const Geometry& geo,
-             const Soil&,
-	     OrganicMatter&,
-	     const SoilHeat&,
-	     const SoilWater&,
-	     Chemistry&,
-	     double& residuals_DM,
-	     double& residuals_N_top, double& residuals_C_top,
-	     std::vector<double>& residuals_N_soil,
-	     std::vector<double>& residuals_C_soil,
-	     double ForcedCAI,
-             double dt,
-	     Treelog&);
+  void find_stomata_conductance (const Units&, const Time& time, 
+                                 const Bioclimate&, double dt, Treelog&);
+  void tick (const Time& time, const Bioclimate&, double ForcedCAI,
+             const Geometry& geo, const Soil&, const SoilHeat&,
+             SoilWater&, Chemistry&, OrganicMatter&,
+             double& residuals_DM,
+             double& residuals_N_top, double& residuals_C_top,
+             std::vector<double>& residuals_N_soil,
+             std::vector<double>& residuals_C_soil,
+             double dt, Treelog&);
   void emerge ()
   { development->DS = -1e-10; }
   const Harvest& harvest (symbol column_name,
@@ -310,42 +293,44 @@ You must specify initial N content in either 'Prod' or 'Seed'");
 }
 
 void
-CropStandard::svat (const Units& units, const Time& time,
-                    const double relative_humidity, const double CO2_atm,
-                    const Bioclimate& bioclimate,
-                    const double dt,
-                    Treelog& msg)
+CropStandard::find_stomata_conductance (const Units& units, const Time& time,
+                                        const Bioclimate& bioclimate,
+                                        const double dt, Treelog& msg)
 {
   TREELOG_MODEL (msg);
 
+  // Check age.
   const double DS = development->DS;
-
   if (DS <= 0.0 || development->mature ())
     return;
-
+  
+  // Clear data from previous iteration.
   photo->clear ();
 
-  double Ass = 0.0;
+  // Boundary conditions.
+  const double relative_humidity = bioclimate.atmospheric_relative_humidity ();
+  const double CO2_atm = bioclimate.atmospheric_CO2 ();
   const std::vector<double>& total_PAR = bioclimate.PAR (); 
   const std::vector<double>& sun_PAR = bioclimate.sun_PAR ();
   daisy_assert (sun_PAR.size () > 1);
   daisy_assert (total_PAR.size () == sun_PAR.size ());
-  std::vector<double> shadow_PAR;
-      
-  for(int i = 0; i < total_PAR.size (); i++) 
-    shadow_PAR.push_back(total_PAR[i] - sun_PAR[i]);
-      
   const double total_LAI = bioclimate.LAI ();
   const std::vector<double>& fraction_sun_LAI = bioclimate.sun_LAI_fraction ();
   const std::vector<double>& PAR_height = bioclimate.height ();
+
+  // Calculate shadow PAR.
+  std::vector<double> shadow_PAR;
+  for(int i = 0; i < total_PAR.size (); i++) 
+    shadow_PAR.push_back(total_PAR[i] - sun_PAR[i]);
       
+  // Accumulate.
   std::vector<double> fraction_shadow_LAI;
   std::vector<double> fraction_total_LAI;
+  double Ass = 0.0;
+
+  // Loop.
+  bool top_crop = true;  // True, if we haven't reached the top of the crop yet.
   const int No = fraction_sun_LAI.size ();
-
-  // True, if we haven't reached the top of the crop yet.
-  bool top_crop = true;
-
   for(int i = 0; i < No; i++) 
     {
       const double f_sun = fraction_sun_LAI[i]; 
@@ -389,7 +374,7 @@ CropStandard::svat (const Units& units, const Time& time,
       Ass += photo->assimilate (units,
                                 ABA_xylem, relative_humidity, CO2_atm,
                                 bioclimate.daily_air_temperature (), 
-                                bioclimate.hourly_canopy_temperature(),
+                                bioclimate.canopy_temperature(),
                                 rubiscoN, shadow_PAR, PAR_height,
                                 total_LAI, fraction_shadow_LAI, dt,
                                 canopy, *development, msg)
@@ -398,7 +383,7 @@ CropStandard::svat (const Units& units, const Time& time,
       Ass += photo->assimilate (units,
                                 ABA_xylem, relative_humidity, CO2_atm,
                                 bioclimate.daily_air_temperature (),
-                                bioclimate.hourly_canopy_temperature(),
+                                bioclimate.canopy_temperature(),
                                 rubiscoN, sun_PAR,  PAR_height,
                                 total_LAI, fraction_sun_LAI, dt,
                                 canopy, *development, msg)
@@ -411,12 +396,12 @@ CropStandard::svat (const Units& units, const Time& time,
       const int No = 30;
       std::vector<double> PAR (No + 1, 0.0);
       Bioclimate::radiation_distribution 
-        (No, LAI (), PARref (), bioclimate.hourly_global_radiation (),
+        (No, LAI (), PARref (), bioclimate.global_radiation (),
          PARext (), PAR); 
       Ass += photo->assimilate (units,
                                 ABA_xylem, relative_humidity, CO2_atm,
                                 bioclimate.daily_air_temperature (), 
-                                bioclimate.hourly_canopy_temperature(),
+                                bioclimate.canopy_temperature(),
                                 rubiscoN, PAR, PAR_height,
                                 bioclimate.LAI (), fraction_total_LAI, dt,
                                 canopy, *development, msg)
@@ -427,21 +412,17 @@ CropStandard::svat (const Units& units, const Time& time,
 }
 
 void
-CropStandard::tick_after (const Time& time, 
-                          const Bioclimate& bioclimate,
-                          const Geometry& geo,
-                          const Soil& soil,
-                          OrganicMatter& organic_matter,
-                          const SoilHeat& soil_heat,
-                          const SoilWater& soil_water,
-                          Chemistry& chemistry,
-                          double& residuals_DM,
-                          double& residuals_N_top, double& residuals_C_top,
-                          std::vector<double>& residuals_N_soil,
-                          std::vector<double>& residuals_C_soil,
-                          const double ForcedCAI,
-                          const double dt,
-                          Treelog& msg)
+CropStandard::tick (const Time& time, const Bioclimate& bioclimate, 
+                    const double ForcedCAI,
+                    const Geometry& geo, const Soil& soil, 
+                    const SoilHeat& soil_heat,
+                    SoilWater& soil_water, Chemistry& chemistry,
+                    OrganicMatter& organic_matter,
+                    double& residuals_DM,
+                    double& residuals_N_top, double& residuals_C_top,
+                    std::vector<double>& residuals_N_soil,
+                    std::vector<double>& residuals_C_soil,
+                    const double dt, Treelog& msg)
 {
   TREELOG_MODEL (msg);
 
@@ -449,9 +430,10 @@ CropStandard::tick_after (const Time& time,
   harvesting->tick (time);
 
   // Update average soil temperature.
+  const double day_fraction = bioclimate.day_fraction (dt);
   const double T_soil 
     = geo.content_height (soil_heat, &SoilHeat::T, -root_system->Depth);
-  root_system->tick (T_soil, dt);
+  root_system->tick (T_soil, day_fraction, soil_water, dt);
 
   // Clear nitrogen.
   nitrogen.clear ();
@@ -532,7 +514,7 @@ CropStandard::tick_after (const Time& time,
   
   nitrogen.update (production.NCrop, DS, enable_N_stress,
                    geo, soil, soil_water, chemistry,
-                   bioclimate.day_fraction (),
+                   bioclimate.day_fraction (dt),
                    *root_system, dt);
 
   const double nitrogen_stress = nitrogen.nitrogen_stress;
@@ -576,33 +558,6 @@ CropStandard::tick_after (const Time& time,
                            production.WRoot, production.root_growth (),
                            DS, msg);
   production.tick_daily ();
-}
-
-void
-CropStandard::tick (const Units& units,
-                    const Time& time, const double relative_humidity, 
-		    const double CO2_atm,
-		    const Bioclimate& bioclimate,
-                    const Geometry& geo,
-		    const Soil& soil,
-		    OrganicMatter& organic_matter,
-		    const SoilHeat& soil_heat,
-		    const SoilWater& soil_water,
-		    Chemistry& chemistry,
-		    double& residuals_DM,
-		    double& residuals_N_top, double& residuals_C_top,
-		    std::vector<double>& residuals_N_soil,
-		    std::vector<double>& residuals_C_soil,
-		    const double ForcedCAI,
-                    const double dt,
-		    Treelog& msg)
-{
-  TREELOG_MODEL (msg);
-  svat (units, time, relative_humidity, CO2_atm, bioclimate, dt, msg);
-  tick_after (time, bioclimate,
-              geo, soil, organic_matter, soil_heat, soil_water, chemistry,
-              residuals_DM, residuals_N_top, residuals_C_top, 
-              residuals_N_soil, residuals_C_soil, ForcedCAI, dt, msg);
 }
 
 const Harvest&

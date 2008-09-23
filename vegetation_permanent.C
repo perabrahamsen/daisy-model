@@ -85,6 +85,8 @@ struct VegetationPermanent : public Vegetation
   { return canopy.rs_min; }
   double rs_max () const	// Maximum transpiration resistance.
   { return canopy.rs_max; }
+  double stomata_conductance () const
+  { return 1.0 / rs_min (); }
   double LAI () const
   { return canopy.CAI; }
   double height () const
@@ -138,25 +140,23 @@ struct VegetationPermanent : public Vegetation
 
   // Simulation.
   void reset_canopy_structure (const Time& time);
-  void tick (const Units&, const Time&,
-             const double relative_humidity, const double CO2_atm,
-             const Bioclimate& bioclimate,
-             const Geometry& geo,
-	     const Soil& soil,
-	     OrganicMatter& organic_matter,
-	     const SoilHeat& soil_heat,
-	     const SoilWater& soil_water,
-	     Chemistry&,
-	     double& residuals_DM,
-	     double& residuals_N_top, double& residuals_C_top,
-	     std::vector<double>& residuals_N_soil,
-	     std::vector<double>& residuals_C_soil,
-	     double dt, Treelog&);
   double transpiration (const Units&, double potential_transpiration,
 			double canopy_evaporation,
                         const Geometry& geo,
-			const Soil& soil, SoilWater& soil_water, 
-			double day_fraction, double dt, Treelog&);
+			const Soil& soil, const SoilWater& soil_water, 
+			double dt, Treelog&);
+  void find_stomata_conductance (const Units&, const Time&, 
+                                 const Bioclimate&, double, Treelog&)
+  { }
+  void tick (const Time& time, const Bioclimate&, 
+             const Geometry& geo, const Soil&, const SoilHeat&,
+             SoilWater&, Chemistry&, OrganicMatter&,
+             double& residuals_DM,
+             double& residuals_N_top, double& residuals_C_top,
+             std::vector<double>& residuals_N_soil,
+             std::vector<double>& residuals_C_soil,
+             double dt,
+             Treelog&);
   void force_production_stress  (double)
   { }
   void emerge (const symbol, Treelog&)
@@ -266,21 +266,16 @@ VegetationPermanent::reset_canopy_structure (const Time& time)
   HvsLAI_ = canopy.LAIvsH.inverse ();
 }
 void
-VegetationPermanent::tick (const Units&,
-                           const Time& time, const double, const double,
-			   const Bioclimate&, 
-                           const Geometry& geo,
-			   const Soil& soil,
+VegetationPermanent::tick (const Time& time, const Bioclimate&, 
+                           const Geometry& geo, const Soil& soil, 
+                           const SoilHeat&,
+			   SoilWater& soil_water, Chemistry& chemistry,
 			   OrganicMatter& organic_matter,
-			   const SoilHeat&,
-			   const SoilWater& soil_water,
-			   Chemistry& chemistry,
 			   double& residuals_DM,
 			   double& residuals_N_top, double& residuals_C_top,
 			   std::vector<double>& /* residuals_N_soil */,
 			   std::vector<double>& /* residuals_C_soil */,
-                           const double dt, 
-			   Treelog&)
+                           const double dt, Treelog&)
 {
   // Canopy.
   const double old_LAI = canopy.CAI;
@@ -335,18 +330,18 @@ VegetationPermanent::tick (const Units&,
 
 double
 VegetationPermanent::transpiration (const Units& units,
-                                    double potential_transpiration,
-				    double canopy_evaporation,
+                                    const double potential_transpiration,
+				    const double canopy_evaporation,
                                     const Geometry& geo,
 				    const Soil& soil, 
-				    SoilWater& soil_water,
-				    double day_fraction, double dt, 
+				    const SoilWater& soil_water,
+				    const double dt, 
                                     Treelog& msg)
 {
   if (canopy.CAI > 0.0)
     return  root_system->water_uptake (units, potential_transpiration, 
                                        geo, soil, soil_water, 
-                                       canopy_evaporation, day_fraction, 
+                                       canopy_evaporation, 
                                        dt, msg);
   return 0.0;
 }

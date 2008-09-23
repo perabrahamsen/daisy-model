@@ -85,7 +85,7 @@ PetFAO_PM::tick (const Time&, const Weather& weather, const double Rn,
                  Treelog&)
 {
   // Weather.
-  const double Temp = weather.hourly_air_temperature ();
+  const double Temp = weather.air_temperature ();
   const double VaporPressure = weather.vapor_pressure ();
   const double U2 = weather.wind ();
   const double elevation = weather.elevation ();

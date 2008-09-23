@@ -1,3 +1,18 @@
+2008-09-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* all: Got rid of the 'hourly_' prefix.
+
+	* geometry.C, geometry.h (Geometry::access_content_interval): New
+	function.
+	* geometry.h (Geometry::content_interval): New template.
+
+	* svat_pmsw.C: Removed USE_FILES code, cleaned up access to the
+	soil water and soil heat modules.
+
+	* root_system.C (RootSystem::tick): Move soil water root uptake
+	and water stress days here.
+	(RootSystem::water_uptake): From here.
+
 2008-09-19  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.48 released.

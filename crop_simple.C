@@ -112,23 +112,22 @@ public:
   void CanopyStructure ();
   void CropCAI ();
   double ActualWaterUptake (const Units&, double Ept, const Geometry& geo,
-                            const Soil&, SoilWater&,
-			    double EvapInterception, double day_fraction, 
+                            const Soil&, const SoilWater&,
+			    double EvapInterception,
                             double dt, Treelog&);
   void force_production_stress  (double pstress);
 
   // Simulation.
 public:
-  void tick (const Units&, const Time& time,
-             const double relative_humidity, const double CO2_atm,
-	     const Bioclimate&, const Geometry& geo,
-             const Soil&, OrganicMatter&,
-	     const SoilHeat&, const SoilWater&, 
-	     Chemistry&, 
-	     double&, double&, double&, 
-	     std::vector<double>&, std::vector<double>&,
-	     double ForcedCAI,
-	     double dt, Treelog&);
+  void tick (const Time& time, const Bioclimate&, double ForcedCAI,
+             const Geometry& geo, const Soil&, const SoilHeat&,
+             SoilWater&, Chemistry&, OrganicMatter&,
+             double& residuals_DM,
+             double& residuals_N_top, double& residuals_C_top,
+             std::vector<double>& residuals_N_soil,
+             std::vector<double>& residuals_C_soil,
+             double dt,
+             Treelog&);
   void emerge ()
   {
     if (use_T_sum)
@@ -201,14 +200,13 @@ CropSimple::CropCAI ()
 double
 CropSimple::ActualWaterUptake (const Units& units, double Ept,
                                const Geometry& geo,
-			       const Soil& soil, SoilWater& soil_water,
+			       const Soil& soil, const SoilWater& soil_water,
 			       const double EvapInterception, 
-			       const double day_fraction, 
                                const double dt, Treelog& msg)
 {
   return root_system->water_uptake (units, Ept, geo, 
                                     soil, soil_water, EvapInterception,
-                                    day_fraction, dt, msg);
+                                    dt, msg);
 }
 
 void 
@@ -216,18 +214,15 @@ CropSimple::force_production_stress  (double pstress)
 { root_system->production_stress = pstress; }
 
 void
-CropSimple::tick (const Units&, const Time& time, const double, const double,
-		  const Bioclimate& bioclimate,
-                  const Geometry& geo,
-		  const Soil& soil,
-		  OrganicMatter& /* organic_matter */,
+CropSimple::tick (const Time& time, const Bioclimate& bioclimate, 
+                  const double ForcedCAI,
+                  const Geometry& geo, const Soil& soil,
 		  const SoilHeat& soil_heat,
-		  const SoilWater& soil_water,
-		  Chemistry& chemistry,
-		  double&, double&, double&, std::vector<double>&, std::vector<double>&,
-		  const double ForcedCAI,
-                  const double dt,
-		  Treelog& msg)
+		  SoilWater& soil_water, Chemistry& chemistry,
+		  OrganicMatter& /* organic_matter */,
+		  double&, double&, double&,
+                  std::vector<double>&, std::vector<double>&,
+                  const double dt, Treelog& msg)
 {
   Treelog::Open nest (msg, name);
 
@@ -250,9 +245,10 @@ CropSimple::tick (const Units&, const Time& time, const double, const double,
     }
 
   // Update average soil temperature.
+  const double day_fraction = bioclimate.day_fraction (dt);
   const double T_soil 
     = geo.content_height (soil_heat, &SoilHeat::T, -root_system->Depth);
-  root_system->tick (T_soil, dt);
+  root_system->tick (T_soil, day_fraction, soil_water, dt);
   
   // Air temperature based growth.
   const double T_air = bioclimate.daily_air_temperature ();

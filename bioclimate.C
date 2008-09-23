@@ -37,10 +37,10 @@ Bioclimate::library_id () const
 }
 
 double 
-Bioclimate::day_fraction () const
+Bioclimate::day_fraction (const double dt) const
 {
   if (daily_global_radiation () > 0.0)
-    return hourly_global_radiation () / (24.0 * daily_global_radiation ());
+    return (dt * global_radiation ())/ (24.0 * daily_global_radiation ());
   return 0.0;
 }
 

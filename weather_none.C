@@ -28,8 +28,8 @@
 
 class WeatherNone : public WeatherOld
 {
-  double air_temperature;
-  double global_radiation;
+  double air_temperature_;
+  double global_radiation_;
   double reference_evapotranspiration_;
   double rain_;
   double snow_;
@@ -38,18 +38,18 @@ class WeatherNone : public WeatherOld
 public:
   void tick (const Time& t, Treelog& o)
   { WeatherOld::tick (t, o); WeatherBase::tick_after (t, o); }
-  double hourly_air_temperature () const
-  { return air_temperature; }
+  double air_temperature () const
+  { return air_temperature_; }
   double daily_air_temperature () const
-  { return air_temperature; }
+  { return air_temperature_; }
   double daily_max_air_temperature () const
-  { return air_temperature; }
+  { return air_temperature_; }
   double daily_min_air_temperature () const
-  { return air_temperature; }
-  double hourly_global_radiation () const
-  { return global_radiation; }
+  { return air_temperature_; }
+  double global_radiation () const
+  { return global_radiation_; }
   double daily_global_radiation () const
-  { return global_radiation; }
+  { return global_radiation_; }
   double reference_evapotranspiration () const
   { return reference_evapotranspiration_; }
   double daily_precipitation () const 
@@ -67,8 +67,8 @@ public:
 
 WeatherNone::WeatherNone (Block& al)
   : WeatherOld (al),
-    air_temperature (al.number ("air_temperature")),
-    global_radiation (al.number ("global_radiation")),
+    air_temperature_ (al.number ("air_temperature")),
+    global_radiation_ (al.number ("global_radiation")),
     reference_evapotranspiration_ (al.number ("reference_evapotranspiration_value")),
     rain_ (al.number ("rain_value")),
     snow_ (al.number ("snow_value"))
@@ -88,13 +88,19 @@ static struct WeatherNoneSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", 
 	       "Weather that does not change during the simulation.");
-    WeatherOld::load_syntax (syntax, alist);
-    syntax.add ("air_temperature", "dg C", Syntax::Const,
+
+    // We need to define 'air_temperature' and 'global_radiation'
+    // before calling WeatherOld::load_syntax, as the later will
+    // otherwise define log variables with the same name.  For the
+    // same reason, they need to be Syntax::State instead of
+    // Syntax::Const, as WeatherOld::output will try to log them.
+    syntax.add ("air_temperature", "dg C", Syntax::State,
 		"Constant air temperature");
     alist.add ("air_temperature", 0.0);
-    syntax.add ("global_radiation", "W/m^2", Syntax::Const,
+    syntax.add ("global_radiation", "W/m^2", Syntax::State,
 		"Constant global radiation.");
     alist.add ("global_radiation", 0.0);
+    WeatherOld::load_syntax (syntax, alist);
     // These must be Syntax::State because they are logged in
     // Weather::output.  Otherwise, we get an error at checkpoins.
     syntax.add ("reference_evapotranspiration_value", "mm/h", Syntax::Const,
