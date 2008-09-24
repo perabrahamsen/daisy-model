@@ -60,7 +60,7 @@ public:
 
   double wet () const
   { 
-    // BUG!!!!! should be DRY.
+    // BUG!!!!! should be WET.
     // But FAO::RefPenmanMonteithWet might be wrong!
     // return potential_evapotranspiration_wet; 
     return dry ();

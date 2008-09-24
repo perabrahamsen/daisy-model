@@ -2735,25 +2735,6 @@ Use \"*\" to log all added organic matter matter.")
                   (tag "C")
                   (spec fixed DOM-Element M))))
 
-(deflog "Groundwater" column
-  (where "${colfid}groundwater.dlf")
-  (when hourly)
-  (entries ;; Year Month MDay Hour
-           (number (path column "${column}" Groundwater "*" height)
-                   (tag "column")
-                   (dimension "cm"))
-           (number (path column "${column}" Groundwater "*" DeepPercolation)
-                   (handle sum)
-                   (dimension "cm/&"))
-           (number (path column "${column}" Groundwater "*" DrainFlow)
-                   (handle sum)
-                   (dimension "cm/&"))
-           (number (path column "${column}" Groundwater "*" EqDrnFlow)
-                   (handle sum)
-                   (dimension "cm/&"))
-           (interval (path column "${column}" SoilWater Theta)
-                     (dimension "cm"))))
-
 (deflog "Drain Sink" column
   (where "${colfid}drain_sink.dlf")
   (when hourly)

@@ -1,3 +1,9 @@
+2008-09-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crpn.C (CrpN::update): Disabling N stress should not cause magic
+	supply of N, as we may have disabled N stress here, in order to
+	calculate it as part of the photosynthesis module.
+
 2008-09-23  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* all: Got rid of the 'hourly_' prefix.

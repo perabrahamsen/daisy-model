@@ -2088,4 +2088,4 @@ static struct SVAT_PMSWSyntax
   }
 } SVAT_PMSW_syntax;
 
-// svat_omsw.C ends here.
+// svat_pmsw.C ends here.

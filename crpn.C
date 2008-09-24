@@ -182,9 +182,13 @@ CrpN::update (double& NCrop, const double DS,
     = 1.0 - bound (0.0, ((NCrop - NfNCnt) / (CrNCnt - NfNCnt)), 1.0);
   nitrogen_stress_days += nitrogen_stress * day_fraction;
   
+#if 1
+  // We need to lower nitrogen content for photosynthesis based stress to work.
+#else
   // Ensure we have enough N for all the crop parts.
   if (!enable_N_stress)
     NCrop = std::max (NCrop, CrNCnt);
+#endif
 }
 
 void

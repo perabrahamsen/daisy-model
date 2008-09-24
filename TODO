@@ -1,10 +1,6 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Mandag
-
-** FAO_PM: giver dry og wet meget forskellige resultater?
-
-I så fald, brug "dry"
+* SAFIR
 
 ** Finn opsætning
 
@@ -13,9 +9,11 @@ I så fald, brug "dry"
 *** Tænk stress faktorer igennem, kan nogle få default?
 
 rootsys water
-rootsys nitrogen
-svat production
+crpn nitrogen (
+svat production  (1 - rcmin/rc)
 harvest cut 
+
+* R2D2
 
 ** colloids error
 
@@ -23,9 +21,9 @@ harvest cut
 
 * test-mibsol.dai
 
-* Colloids
+** Colloids
 
-** test setup
+*** test setup
 
 *** tilføj sekundært og tertiært domæne.
 
@@ -269,6 +267,8 @@ ELLER
 ** Indsæt mmo grøntsager i lib (og sample?).
 
 * Programmering
+
+** FAO_PM: Fix "wet"
 
 ** Unit
 
