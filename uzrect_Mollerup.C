@@ -243,36 +243,39 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
   
   while (time_left > 0.0)
     {
-      n_small_time_steps++;
-      if (n_small_time_steps > max_number_of_small_time_steps) 
-        throw "Too many small timesteps";
-      
-      if (n_small_time_steps%msg_number_of_small_time_steps == 0)
-        {
-          std::ostringstream tmp_timesteps;
-          tmp_timesteps << "Used " << n_small_time_steps 
-                        << " out of max " << max_number_of_small_time_steps
-                        << " small timesteps. Time left: " << time_left 
-                        << " [h]";
-          msg.message (tmp_timesteps.str ());
-        } 
-
-      
-      // Initialization for each small time step.
-      int iterations_used = 0;
       if (ddt > time_left)
 	ddt = time_left;
+
+      std::ostringstream tmp_ddt;
+      tmp_ddt << "Time t = " << (dt - time_left) 
+              << "; ddt = " << ddt
+              << "; steps " << n_small_time_steps 
+              << "; time left = " << time_left;
+      Treelog::Open nest (msg, tmp_ddt.str ());
+      if (debug > 0)
+        msg.touch ();
+
+      if (n_small_time_steps%msg_number_of_small_time_steps == 0)
+        msg.touch ();
+      
+      n_small_time_steps++;
+      if (n_small_time_steps > max_number_of_small_time_steps) 
+        {
+          msg.touch ();
+          throw "Too many small timesteps";
+        }
+      
+      // Initialization for each small time step.
 
       if (debug > 0)
 	{
 	  std::ostringstream tmp;
-	  tmp << "Time left = " << time_left << ", ddt = " << ddt 
-	      << ", iteration = " << iterations_used << "\n";
 	  tmp << "h = " << h << "\n";
 	  tmp << "Theta = " << Theta;
 	  msg.message (tmp.str ());
 	}
 
+      int iterations_used = 0;
       h_previous = h;
       Theta_previous = Theta;
       const Anystate h3_previous = tertiary.get_state ();
@@ -300,6 +303,12 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	{
 	  h_conv = h;
 	  iterations_used++;
+          
+          std::ostringstream tmp_conv;
+          tmp_conv << "Convergence " << iterations_used; 
+          Treelog::Open nest (msg, tmp_conv.str ());
+          if (debug > 1)
+            msg.touch ();
 
 	  // Calculate conductivity - The Hansen method
 	  for (size_t cell = 0; cell !=cell_size ; ++cell)
@@ -397,7 +406,16 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	  // Force active drains to zero h.
 	  drain (geo, drain_cell, h, A, b, debug, msg);
 
-	  solver->solve (A, b, h); // Solve Ah=b with regard to h.
+          try {
+            solver->solve (A, b, h); // Solve Ah=b with regard to h.
+          } catch (const char *const error) {
+              std::ostringstream tmp;
+              tmp << "Could not solve equation sysmem: " << error;
+              msg.warning (tmp.str ());
+              // Try smaller timestep.
+              iterations_used = max_iterations + 100;
+              break;
+          }
 
 	  for (int c=0; c < cell_size; c++) // update Theta - not neccessary???
 	    Theta (c) = soil.Theta (c, h (c), h_ice (c)); 
@@ -409,7 +427,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 		  << ", iteration = " << iterations_used << "\n";
 	      tmp << "B = " << B << "\n";
 	      tmp << "h = " << h << "\n";
-	      tmp << "Theta = " << Theta << "\n";
+	      tmp << "Theta = " << Theta;
 	      msg.message (tmp.str ());
 	    }
           
@@ -419,8 +437,8 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
                 {
                   std::ostringstream tmp;
                   tmp << "Pressure potential out of realistic range, h[" 
-                      << c << "] = " << h (c) << "\n";
-                  msg.message (tmp.str ());
+                      << c << "] = " << h (c);
+                  msg.warning (tmp.str ());
                   iterations_used = max_iterations + 100;
                   break;
                 } 
@@ -436,8 +454,12 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
           number_of_time_step_reductions++;
           
 	  if (number_of_time_step_reductions > max_time_step_reductions)
-	    throw "Could not find solution";
+            {
+              msg.touch ();
+              throw "Could not find solution";
+            }
 
+          iterations_with_this_time_step = 0;
 	  ddt /= time_step_reduction;
 	  h = h_previous;
 	  Theta = Theta_previous;

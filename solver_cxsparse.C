@@ -30,7 +30,7 @@
 #include "librarian.h"
 #include "ublas_cxsparse.h"
 
-#define MEMCHECK(foo) if (!(foo)) throw "CSSparse: Bad matrix: " #foo ;
+#define MEMCHECK(foo) if (!(foo)) throw "CXSparse: Bad matrix: " #foo ;
 
 struct SolverCXSparse : public Solver
 { 
