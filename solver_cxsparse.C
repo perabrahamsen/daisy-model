@@ -29,7 +29,8 @@
 #include "alist.h"
 #include "librarian.h"
 #include "ublas_cxsparse.h"
-#include "assertion.h"
+
+#define MEMCHECK(foo) if (!(foo)) throw "CSSparse: Bad matrix: " #foo ;
 
 struct SolverCXSparse : public Solver
 { 
@@ -42,12 +43,12 @@ struct SolverCXSparse : public Solver
     cs_lu = CS::cs_ul_decompose (A, 1.0);
 
     // check
-    daisy_assert (cs_lu.first);
-    daisy_assert (cs_lu.first->q);
-    daisy_assert (cs_lu.second);
-    daisy_assert (cs_lu.second->U);
-    daisy_assert (cs_lu.second->L);
-    daisy_assert (cs_lu.second->pinv);
+    MEMCHECK (cs_lu.first);
+    MEMCHECK (cs_lu.first->q);
+    MEMCHECK (cs_lu.second)
+    MEMCHECK (cs_lu.second->U);
+    MEMCHECK (cs_lu.second->L);
+    MEMCHECK (cs_lu.second->pinv);
 
     // solve
     x = b;
