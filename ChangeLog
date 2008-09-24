@@ -1,5 +1,7 @@
 2008-09-24  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* solver_cxsparse.C (struct SolverCXSparse): Check arguments.
+
 	* crpn.C (CrpN::update): Disabling N stress should not cause magic
 	supply of N, as we may have disabled N stress here, in order to
 	calculate it as part of the photosynthesis module.
