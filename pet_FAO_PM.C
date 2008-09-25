@@ -63,8 +63,8 @@ public:
     // BUG!!!!! should be WET.
     // But FAO::RefPenmanMonteithWet might be wrong!
     // return potential_evapotranspiration_wet; 
-    // return dry ();
-    return wet ();
+    return dry ();
+    // return wet ();
     
 }
 
