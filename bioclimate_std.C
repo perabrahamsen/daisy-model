@@ -127,7 +127,9 @@ struct BioclimateStandard : public Bioclimate
 
   // Bioclimate canopy
   double CanopyTemperature;     // Canopy temperature
-  double wind_speed_field_;      // wind speed at screen height above the canopy [m/s]
+  double SunLeafTemperature;    // Sunlit leaf temperature
+  double ShadowLeafTemperature; // Shadow leaf temperature
+  double wind_speed_field_;     // wind speed at screen height above the canopy [m/s]
   double wind_speed_weather;    // measured wind speed [m/s]
 
   void WaterDistribution (const Units&, const Time&,
@@ -211,6 +213,10 @@ struct BioclimateStandard : public Bioclimate
   { return daily_air_temperature_; }
   double canopy_temperature () const
   { return CanopyTemperature; }
+  double sun_leaf_temperature () const
+  { return SunLeafTemperature; }
+  double shadow_leaf_temperature () const
+  { return ShadowLeafTemperature; }
   double daily_precipitation () const
   { return daily_precipitation_; }
   double day_length () const
@@ -481,15 +487,14 @@ This is the transpiration limited either by what the soil can deliver, or\n\
 what the SVAT module requires.");
   syntax.add ("production_stress", Syntax::None (), Syntax::LogOnly,
               "SVAT module induced stress, -1 means use water stress.");
-#ifdef BGJ
-  syntax.add ("r_ae", "s/m", Check::positive (), Syntax::Const,
-              "Atmospheric resistance.");
-  alist.add ("r_ae", 53.);
-#endif
 
   // Bioclimate in canopy
   syntax.add ("CanopyTemperature", "dg C", Syntax::LogOnly,
               "Actual canopy temperature.");
+  syntax.add ("SunLeafTemperature", "dg C", Syntax::LogOnly,
+              "Sunlit leaf temperature.");
+  syntax.add ("ShadowLeafTemperature", "dg C", Syntax::LogOnly,
+              "Shadow leaf temperature.");
   syntax.add ("wind_speed_field", "m/s", Syntax::LogOnly,
               "Wind speed in the field at reference height.");
   syntax.add ("wind_speed_weather", "m/s", Syntax::LogOnly,
@@ -1039,7 +1044,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
   msg.error ("SVAT transpiration and stomata conductance"
              " loop did not converge");
  success:;
-  if (iteration > 0.0)
+  if (iteration > 0)
     msg.message (tmp.str ());
 
   // Stress calculated by the SVAT model.
@@ -1161,12 +1166,9 @@ BioclimateStandard::tick (const Units& units, const Time& time,
     }
   daisy_assert (wind_speed_field_ >= 0.0);
 
-  const double ra_e 
-    =  FAO::AerodynamicResistance (Height[0], 
-                                   ScreenHeight, wind_speed_field_); // [s m-1]
-
-  CanopyTemperature = SensibleHeatFlux * ra_e / (rho_a * c_p) 
-    + AirTemperature;//[dg C]
+  CanopyTemperature = svat->CanopyTemperature();  //[dg C]
+  SunLeafTemperature = svat->SunLeafTemperature();  //[dg C]
+  ShadowLeafTemperature = svat->ShadowLeafTemperature();  //[dg C]
 }
 
 void 
@@ -1224,6 +1226,8 @@ BioclimateStandard::output (Log& log) const
   output_variable (production_stress, log);
 
   output_variable (CanopyTemperature, log);
+  output_variable (SunLeafTemperature, log);
+  output_variable (ShadowLeafTemperature, log);
   output_value (wind_speed_field_, "wind_speed_field", log);  
   output_variable (wind_speed_weather, log);
 

@@ -724,6 +724,9 @@ SoilHeat::initialize (const AttributeList& al, const Geometry& geo,
 
   // May be larger if user initialized it wrongly.  Checked in "check".
   daisy_assert (T_.size () >= cell_size);
+
+  if (T_top_ < -400)
+    T_top_ = geo.content_hood (*this, &SoilHeat::T, Geometry::cell_above);
 }
 
 SoilHeat::~SoilHeat ()

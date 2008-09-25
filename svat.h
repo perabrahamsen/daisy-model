@@ -58,6 +58,9 @@ public:
   virtual double production_stress () const = 0; // []
   virtual void solve (const double /* stomata cond. [m/s]*/, Treelog&) = 0;
   virtual double transpiration () const = 0; // [mm/h]
+  virtual double CanopyTemperature () const = 0; // [dg C]
+  virtual double SunLeafTemperature () const = 0; // [dg C]
+  virtual double ShadowLeafTemperature () const = 0; // [dg C]
 
   // Create and Destroy.
   static void load_syntax (Syntax&, AttributeList&);

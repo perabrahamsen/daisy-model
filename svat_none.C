@@ -30,12 +30,15 @@
 struct SVAT_none : public SVAT
 {
   double crop_ea;
+  double T_a;
+
   // Simulation.
   void tick (const Weather&, const Vegetation&,
 	     const Surface&, const Geometry&, const Soil&, const SoilHeat&,
 	     const SoilWater&, const Pet&, const Bioclimate& bio)
   { 
     crop_ea = bio.crop_ea();
+    T_a = bio.daily_air_temperature ();
   }
   double production_stress () const
   { return -1; }
@@ -45,6 +48,15 @@ struct SVAT_none : public SVAT
 
   double transpiration() const 
   { return crop_ea; }
+
+  double CanopyTemperature () const
+  { return T_a; }  // [dg C]
+
+  double SunLeafTemperature () const
+  { return T_a; }  // [dg C]
+
+  double ShadowLeafTemperature () const
+  { return T_a; }  // [dg C]
 
   // Create.
   SVAT_none (Block& al)

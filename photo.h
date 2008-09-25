@@ -52,6 +52,8 @@ public:
                              double dt,
                              CanopyStandard& canopy,
                              Phenology& development, Treelog&) = 0;
+
+  virtual double stomata_conductance() const = 0; // [mol m^-2 s^-1]
   virtual void clear ();
   virtual void output (Log&) const = 0;
 

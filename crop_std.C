@@ -79,11 +79,14 @@ struct CropStandard : public Crop
   { return canopy.rs_min; }
   double rs_max () const	// Maximum transpiration resistance.
   { return canopy.rs_max; }
-#if 0
-  // BGJ: BUG: TODO
   double stomata_conductance () const // Current stomata_conductance [m/s].
-  { return 1.0; }                     
-#endif
+  {
+    // Stomata conductance
+    const double gs = photo->stomata_conductance();//[m s^-1]
+    if(gs < 0)
+      return 1.0/rs_min(); // Photo_GL have no stomata conductance.
+    return gs; 
+  }                     
   double leaf_width () const
   { return canopy.leaf_width (DS ()); }
 
@@ -367,14 +370,18 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
   const double ABA_xylem = root_system->ABAConc;
   daisy_assert (std::isfinite (ABA_xylem));
   daisy_assert (ABA_xylem >= 0.0);
+  
+  const double T_canopy = bioclimate.canopy_temperature ();
+  const double T_leaf_sun = bioclimate.sun_leaf_temperature ();
+  const double T_leaf_shadow = bioclimate.shadow_leaf_temperature ();
 
   if (bioclimate.shared_light_fraction () > 1e-10)
     {
       // Shared light.
       Ass += photo->assimilate (units,
                                 ABA_xylem, relative_humidity, CO2_atm,
-                                bioclimate.daily_air_temperature (), 
-                                bioclimate.canopy_temperature(),
+                                bioclimate.daily_air_temperature(),
+                                T_leaf_shadow,
                                 rubiscoN, shadow_PAR, PAR_height,
                                 total_LAI, fraction_shadow_LAI, dt,
                                 canopy, *development, msg)
@@ -382,8 +389,8 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
 
       Ass += photo->assimilate (units,
                                 ABA_xylem, relative_humidity, CO2_atm,
-                                bioclimate.daily_air_temperature (),
-                                bioclimate.canopy_temperature(),
+                                bioclimate.daily_air_temperature(),
+                                T_leaf_sun,
                                 rubiscoN, sun_PAR,  PAR_height,
                                 total_LAI, fraction_sun_LAI, dt,
                                 canopy, *development, msg)

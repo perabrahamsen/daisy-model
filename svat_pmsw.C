@@ -1323,6 +1323,10 @@ public:
   // Simulation.
   double production_stress () const;
   double transpiration() const;
+  double CanopyTemperature () const; // [dg C]
+  double SunLeafTemperature () const; // [dg C]
+  double ShadowLeafTemperature () const; // [dg C]
+
   void solve (const double /* stomata cond. [mol/m^2/s]*/, Treelog&);
 
   void tick (const Weather& weather, const Vegetation& crops,
@@ -1346,6 +1350,16 @@ double
 SVAT_PMSW::transpiration() const 
 { return crop_ea; }  // [mm/h]
 
+double
+SVAT_PMSW::CanopyTemperature () const
+{ return tcan; }  // [dg C]
+double
+SVAT_PMSW::SunLeafTemperature () const
+{ return tleaf; }  // [dg C]
+
+double 
+SVAT_PMSW::ShadowLeafTemperature () const
+{ return tleaf; }  // [dg C]
 
 void 
 SVAT_PMSW::solve (const double /* stomata cond. [mol/m^2/s]*/, Treelog&) 

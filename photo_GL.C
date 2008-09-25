@@ -58,6 +58,9 @@ public:
                      double dt,
                      CanopyStandard& canopy,
                      Phenology& development, Treelog&);
+  double stomata_conductance() const
+  { return -1.; } // [mol m^-2 s^-1]
+
   void output (Log&) const
   { }
   

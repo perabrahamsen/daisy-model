@@ -25,6 +25,7 @@
 #include "photo_Farquhar.h"
 #include "block.h"
 #include "rubiscoNdist.h"
+#include "resistance.h"
 #include "ABAeffect.h"
 #include "stomatacon.h"
 #include "bioclimate.h"
@@ -116,7 +117,7 @@ PhotoFarquhar:: GSTModel(const double CO2_atm, double ABA_effect, double pn, dou
 
   const double wsf = ABA_effect; //water stress function []
 
-  const double intercept = b * LA * fraction; //min conductance 
+  const double intercept = b * LA * fraction; // min conductance 
   daisy_assert (gbw >0.0);
   const double rbw = 1./gbw;   //[s*m2 leaf/mol]
 
@@ -163,6 +164,10 @@ PhotoFarquhar:: GSTModel(const double CO2_atm, double ABA_effect, double pn, dou
 
   return gsw; //stomatal conductance [mol/m²leaf/s]
 }
+
+double 
+PhotoFarquhar::stomata_conductance() const
+{ return gs_ms; } // [m s^-1]
 
 double
 PhotoFarquhar::assimilate (const Units& units,
@@ -349,7 +354,11 @@ PhotoFarquhar::assimilate (const Units& units,
   daisy_assert (approximate (accCAI, canopy.CAI));
   daisy_assert (Ass_ >= 0.0);
 
-  return (molWeightCH2O / molWeightCO2)* Ass_;         //g CH2O /m2/h
+  // Omregning af gs(mol/(m2s)) til gs_ms (m/s) foretages ved 
+  // gs_ms = gs * (R * T)/P:
+  gs_ms = gs * (Resistance::R * Tl) / Resistance::P_surf; //[m s^-1] 
+
+  return (molWeightCH2O / molWeightCO2)* Ass_;    // Assimilate [g CH2O/m2/h]
 }
 
 void
@@ -365,6 +374,7 @@ PhotoFarquhar::clear ()
   std::fill(sun_LAI_vector.begin (), sun_LAI_vector.end (), 0.0);
   ci_middel = 0.0;
   gs = 0.0;
+  gs_ms = 0.0;
   Ass = 0.0;
   Res = 0.0;
   PAR_ = 0.0;
@@ -390,6 +400,7 @@ PhotoFarquhar::output(Log& log) const
   output_variable (Jm_vector, log);
   output_variable (ci_middel, log);
   output_variable (gs, log);
+  output_variable (gs_ms, log);
   output_variable (Ass, log);
   output_variable (Res, log);
   output_variable (LAI, log);
@@ -455,6 +466,7 @@ PhotoFarquhar::load_syntax (Syntax& syntax, AttributeList& alist)
 
   syntax.add ("ci_middel", "Pa", Syntax::LogOnly, "Stomata average CO2 pressure.");
   syntax.add ("gs", "mol/m^2/s", Syntax::LogOnly, "Stomata conductance.");
+  syntax.add ("gs_ms", "m/s", Syntax::LogOnly, "Stomata conductance.");
   syntax.add ("Ass", "g CH2O/m^2/h", Syntax::LogOnly, "'Net' leaf assimilate of CO2 (brutto photosynthesis).");
   syntax.add ("Res", "g CH2O/m^2/h", Syntax::LogOnly, "Farquhar leaf respiration.");
   syntax.add ("LAI", "", Syntax::LogOnly, "Leaf area index for the canopy used in photosynthesis.");

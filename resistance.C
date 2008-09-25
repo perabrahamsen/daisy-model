@@ -225,6 +225,7 @@ Resistance::N (const double z /* reference height above canopy [m]*/,
                const double T_a /* air temp [dg C]*/, 
                const double U_z /* surface wind speed [m s^-1]*/)
 {
+  daisy_assert (U_z > 0.0);
   const double N = 5. * (z - d) * g * (T_0 - T_a)/((T_a + TK) * sqr(U_z));
   return N; // []
 }
@@ -240,15 +241,19 @@ Resistance::r_a (const double z /* reference height above canopy [m]*/,
                  const double N /* atm stability indicator []*/, 
                  const double U_z /* surface wind speed [m s^-1]*/)
 {
+  daisy_assert (z_0 > 0.0);
+  daisy_assert (z_0h > 0.0);
+  daisy_assert ((sqr (k) * U_z) > 0.0);
+
   const double A = 1.0 + N; //[]
   const double B = log((z - d)/z_0h) + 2. * N * log((z - d)/z_0); 
   const double C = N * sqr(log ((z - d)/z_0));
 
-  double S = (B - sqrt(sqr (B) - 4 * A * C))/(2 * A);
+  double S = (B - sqrt(sqr (B) - 4. * A * C))/(2. * A);
   if(S < -5.0) S = -5.0; 
 
   double r_a;
-  if (N <= 0)
+  if (N <= 0.0)
     r_a = (log((z - d)/z_0) - S) * (log((z - d)/z_0h) - S) * 1/(sqr (k) * U_z);
   else
     r_a = (log((z - d)/z_0) * log((1 - d)/z_0h))
@@ -272,14 +277,22 @@ Resistance::U_c (const double z_r /* reference height above canopy [m]*/,
                  const double r_a /* Aerodynamic resistance [s m^-1]*/, 
                  const double rho_a /* air density [kg m^-3]*/)
 {
+  daisy_assert (z_0 > 0.0);
+  // daisy_assert ((T_0 - T_a) != 0.0);
+  daisy_assert (log((z_r - d)/z_0) != 0.0);
 
   const double u = (U_z * k) / (log((z_r - d)/z_0));
-  const double L_mo = - (r_a * rho_a * pow(u,3) * (T_a + TK))
-                         / (g * k * (T_0 - T_a));
-
-  const double y = 1 - 15 * pow((z_r - d)/L_mo,-0.25);
-  const double psi = 2 * log((1 + y)/ 2) + log((1 + sqr(y))/2) 
-    - 2/(tan(y)) + M_PI/2.;
+  double L_mo;
+  if ((T_0 - T_a)== 0.0) 
+    L_mo = - (r_a * rho_a * pow(u,3) * (T_a + TK))
+      /0.00001;
+  else  
+    L_mo = - (r_a * rho_a * pow(u,3) * (T_a + TK))
+      / (g * k * (T_0 - T_a));
+  
+  const double y = 1 - 15. * pow((z_r - d)/L_mo,-0.25);
+  const double psi = 2. * log((1. + y)/ 2.) + log((1. + sqr(y))/2.) 
+    - 2./(tan(y)) + M_PI/2.;
 
   double U_c;
   if (z_r/L_mo >= 0)
@@ -297,7 +310,7 @@ Resistance::l_m (const double w_l /* leaf width [m]*/)
   const double b1 = w_l * 0.5; // leaf radius along the minor axis (ellipse) [m]
 
   const double l_m = (4 * M_PI * a1 * b1)
-    / (2 * M_PI * sqrt(0.5 *(sqr (a1) + sqr (b1)))) ;
+    / (2. * M_PI * sqrt(0.5 *(sqr (a1) + sqr (b1)))) ;
 
     return l_m; // [m]
 }
@@ -309,7 +322,7 @@ Resistance::U_s (const double l_m /* mean leaf size [m]*/,
                  const double U_c /* Wind speed at the top of the canopy [m s^-1]*/)
 {
   const double a_0 = 0.28 * pow(LAI, 2./3.) * pow(h_veg, 1./3.) * pow(l_m, -1./3.);
-  const double U_s = U_c * exp(- a_0 * (1 - h_soil/h_veg));
+  const double U_s = U_c * exp(- a_0 * (1. - h_soil/h_veg));
   return U_s; //[m s^-1]
 }
 
@@ -318,7 +331,8 @@ Resistance::U_s (const double l_m /* mean leaf size [m]*/,
 double 
 Resistance::r_a_soil (const double U_s /* Wind speed above the soil surface [m s^-1]*/)
 {
-  const double r_a_soil = 1/(0.004 + 0.012 * U_s);
+  daisy_assert (U_s > 0.0);
+  const double r_a_soil = 1.0/(0.004 + 0.012 * U_s);
   return r_a_soil; // [s m^-1]
 }
 
@@ -334,10 +348,10 @@ Resistance::T_0 (const double T_c /* canopy temperature [dg C]*/,
                  const double kb /* extinction coefficient []*/,
                  const double LAI /*[m^2 m^-2]*/) 
 {
-  const double f_veg = 1 - exp(-kb * LAI);
+  const double f_veg = 1. - exp(-kb * LAI);
 
   const double T_0 = pow ((f_veg * pow(T_c + TK, 4) 
-                           + (1 - f_veg) * pow(T_soil + TK, 4)), 0.25) - TK;
+                           + (1. - f_veg) * pow(T_soil + TK, 4)), 0.25) - TK;
   return T_0; // [dg C]
 }
 
@@ -349,9 +363,9 @@ Resistance::T_c (const double T_l_sun /* leaf sun temperature [dg C]*/,
                  const double kb /* extinction coefficient []*/,
                  const double LAI /*[m^2 m^-2]*/) 
 {
-  const double f_sun = (1 - exp(-kb * LAI)/kb)/LAI;
+  const double f_sun = (1. - exp(-kb * LAI)/kb)/LAI;
 
-  const double T_c = f_sun * T_l_sun + (1 - f_sun) * T_l_sha; 
+  const double T_c = f_sun * T_l_sun + (1. - f_sun) * T_l_sha; 
   return T_c; // [dg C]
 }
 

@@ -74,7 +74,8 @@ protected:
   double LAI;                    // Leaf Area index for the canopy
   double sun_LAI;                // Leaf Area index for the sunlit fraction
   double PAR_;                   // Photosynthetic active radiation
-  double gs;                     // Stomata conductance
+  double gs;                     // Stomata conductance [mol m^-2 s^-1]
+  double gs_ms;                  // Stomata conductance [m s^-1]
   double Vmax;                   // Photosynthetic Rubisco capacity
   double jm;                     // Potential rate of electron transport 
   double leafPhotN;              // Content of photosynthetic active leaf N
@@ -92,6 +93,7 @@ public:
   double GSTModel(const double CO2_atm, double ABA, double pn, double vp_ref, 
 		  const double LA, const double fraction, const double Ta, 
 		  const double Tl, double gb, Treelog& msg);
+  double stomata_conductance() const; // [m s^-1]
 private:
   virtual double respiration_rate (const double Vm_25, const double Tl) const = 0;
   virtual double J_m(const double Vm_25, const double Tl) const = 0;
