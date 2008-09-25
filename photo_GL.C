@@ -66,6 +66,10 @@ public:
   
   // Create and Destroy.
 public:
+  bool handle_N_stress () const
+  { return false; }
+  bool handle_water_stress () const
+  { return false; }
   PhotoGL (Block& al)
     : Photo (al),
       Qeff (al.number ("Qeff")),

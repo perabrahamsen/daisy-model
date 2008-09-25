@@ -24,15 +24,14 @@
 
 #include "model.h"
 #include "symbol.h"
+#include <memory>
 
 class Block;
-class AttributeList;
 
 class WSE : public Model
 {
   // Content.
 public:
-  const symbol name;
   static const char *const component;
   symbol library_id () const;
 
@@ -42,8 +41,9 @@ public:
 
   // Create and Destroy.
 public:
-  static const AttributeList& default_model ();
-  WSE (Block& al);
+  static std::auto_ptr<WSE> create_none ();
+  static std::auto_ptr<WSE> create_full ();
+  WSE ();
   ~WSE ();
 };
 

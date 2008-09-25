@@ -145,7 +145,6 @@ CrpN::clear ()
 
 void
 CrpN::update (double& NCrop, const double DS,
-	      const bool enable_N_stress,
               const Geometry& geo,
 	      const Soil& soil, const SoilWater& soil_water,
 	      Chemistry& chemistry,
@@ -153,12 +152,7 @@ CrpN::update (double& NCrop, const double DS,
 	      RootSystem& root_system,
               const double dt)
 {
-#if 0
-  // I believe this is a leftover from daily production.
-  double PotNUpt = (PtNCnt - NCrop) / ((Hour == 0) ? 1.0 : (25.0 - Hour));
-#else
   double PotNUpt = (PtNCnt - NCrop);
-#endif
 
   const double NUpt = root_system.nitrogen_uptake (geo, soil, soil_water, 
 						   chemistry,
@@ -181,14 +175,6 @@ CrpN::update (double& NCrop, const double DS,
   nitrogen_stress 
     = 1.0 - bound (0.0, ((NCrop - NfNCnt) / (CrNCnt - NfNCnt)), 1.0);
   nitrogen_stress_days += nitrogen_stress * day_fraction;
-  
-#if 1
-  // We need to lower nitrogen content for photosynthesis based stress to work.
-#else
-  // Ensure we have enough N for all the crop parts.
-  if (!enable_N_stress)
-    NCrop = std::max (NCrop, CrNCnt);
-#endif
 }
 
 void

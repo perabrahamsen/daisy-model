@@ -48,7 +48,9 @@ public:
   static symbol mass_per_volume ();
   static symbol amount_of_substance_per_area_per_time ();
   static symbol energy_per_area_per_time ();
-
+  static symbol mass_per_area_per_time ();
+  static symbol length_per_time ();
+  
   // Use.
 public:
   virtual double to_base (double) const = 0;

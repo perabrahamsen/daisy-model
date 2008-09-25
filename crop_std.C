@@ -519,7 +519,7 @@ CropStandard::tick (const Time& time, const Bioclimate& bioclimate,
   daisy_assert (production.AM_root);
   daisy_assert (production.AM_leaf);
   
-  nitrogen.update (production.NCrop, DS, enable_N_stress,
+  nitrogen.update (production.NCrop, DS, 
                    geo, soil, soil_water, chemistry,
                    bioclimate.day_fraction (dt),
                    *root_system, dt);
@@ -760,9 +760,13 @@ CropStandard::CropStandard (Block& al)
                    : Vernalization::no_vernalization ()),
     photo (Librarian::build_item<Photo> (al, "LeafPhot")),
     nitrogen (al.alist ("CrpN")),
-    water_stress_effect (Librarian::build_item<WSE> (al, 
-                                                     "water_stress_effect")),
-    enable_N_stress (al.flag ("enable_N_stress")),
+    water_stress_effect (al.check ("water_stress_effect")
+                         ? std::auto_ptr<WSE> (Librarian::build_item<WSE> 
+                                               (al, "water_stress_effect"))
+                         : (photo->handle_water_stress ()
+                            ? WSE::create_none ()
+                            : WSE::create_full ())),
+    enable_N_stress (al.flag ("enable_N_stress", !photo->handle_N_stress ())),
     min_light_fraction (al.number ("min_light_fraction"))
 { }
 
@@ -814,12 +818,14 @@ CropStandardSyntax::CropStandardSyntax ()
 			"Nitrogen parameters.", CrpN::load_syntax);
 
   syntax.add_object ("water_stress_effect", WSE::component, 
-                     Syntax::Const, Syntax::Singleton,
-                     "Effect of water stress on production.");
-  alist.add ("water_stress_effect", WSE::default_model ());
-  syntax.add ("enable_N_stress", Syntax::Boolean, Syntax::Const,
-	      "Set this true to let nitrogen stress limit production.");
-  alist.add ("enable_N_stress", true);
+                     Syntax::OptionalConst, Syntax::Singleton,
+                     "Effect of water stress on production.\n\
+By default, this will be 'none' iff the selected photosynthesis model\n\
+does handle water stress implicitly, and 'full' otherwise.");
+  syntax.add ("enable_N_stress", Syntax::Boolean, Syntax::OptionalConst,
+	      "Set this true to let nitrogen stress limit production.\n\
+By default, it will be true iff the selected photosynthesis model does\n \
+handle nitrogen stress implicitly.");
   syntax.add_fraction ("min_light_fraction", Syntax::Const, "\n\
 When multiple crops are competing for light, this parameter specifies\n\
 a minumum amount of the light this crop will receive.  The idea is\n\

@@ -415,6 +415,14 @@ PhotoFarquhar::output(Log& log) const
   output_variable (ABA_effect, log);
 }
 
+bool 
+PhotoFarquhar::handle_N_stress () const
+{ return true; }
+
+bool 
+PhotoFarquhar::handle_water_stress () const
+{ return true; }
+
 void 
 PhotoFarquhar::load_syntax (Syntax& syntax, AttributeList& alist)
 {

@@ -69,6 +69,20 @@ Unit::energy_per_area_per_time ()
   return unit;
 }
 
+symbol 
+Unit::mass_per_area_per_time ()
+{
+  static const symbol unit ("m^-2 kg s^-1");
+  return unit;
+}
+
+symbol
+Unit::length_per_time ()
+{
+  static const symbol unit ("m s^-1");
+  return unit;
+}
+
 const Convert*
 Unit::create_convertion (const Unit&) const
 { return NULL; }

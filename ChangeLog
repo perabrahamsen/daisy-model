@@ -1,5 +1,11 @@
 2008-09-25  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* photo.h, photo_GL.C, photo_Farquhar.C, photo_Farquhar.h
+	(handle_N_stress, handle_water_stress): New virtual member function.
+
+	* crpn.C (CrpN::update): Don't take 'enable_N_stress' argument.
+	* crop_std.C (CropStandard::tick): Update caller.
+
 	* svat_ssoc.C: New model.
 	* vegetation, bioclimate, crop:  Use it.
 	* lib/log.dai ("SSOC"): New log file.

@@ -91,7 +91,7 @@ public:
   void cut (double DS);
   void content (double DS, Production&, Treelog&);
   void clear ();
-  void update (double& NCrop, double DS, bool enable_N_stress,
+  void update (double& NCrop, double DS, 
 	       const Geometry&, const Soil& soil, const SoilWater& soil_water,
 	       Chemistry& chemistry, double day_fraction,
 	       RootSystem& root_system, double dt);

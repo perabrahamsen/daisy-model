@@ -121,7 +121,12 @@ Units::special_convert[] = {
   // We assume amount of substance is mol photons in PAR and convert to Watt.
   { Unit::amount_of_substance_per_area_per_time () /* mol/m^2/s */,
     Unit::energy_per_area_per_time () /* W/m^2 */,
-    1.0 / 0.0000046 }
+    1.0 / 0.0000046 },
+  // We assume mass per area per time is water, and convert to length per time.
+  // [ one kg H20 is 1 l H2O, which is one mm H2O/m^2 ]
+  { Unit::mass_per_area_per_time () /* kg/m^2/s */,
+    Unit::length_per_time () /* m/s */,
+    0.001 }
 };
 
 const size_t 

@@ -114,6 +114,8 @@ public:
   void output (Log& log) const;
   
   // Create and Destroy.
+  bool handle_N_stress () const;
+  bool handle_water_stress () const;
 public:
   static void load_syntax (Syntax& syntax, AttributeList& alist);
   PhotoFarquhar (Block& al);

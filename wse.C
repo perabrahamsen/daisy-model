@@ -39,8 +39,7 @@ WSE::library_id () const
   return id;
 }
 
-WSE::WSE (Block& al)
-  : name (al.identifier ("type"))
+WSE::WSE ()
 { }
 
 WSE::~WSE ()
@@ -51,13 +50,20 @@ struct WSE_full : public WSE
   double factor (const double water_stress) const
   { return 1.0 - water_stress; }
 
-  WSE_full (Block& al)
-    : WSE (al)
+  WSE_full ()
+  { }
+  WSE_full (Block&)
   { }
   ~WSE_full ()
   { }
 };
 
+std::auto_ptr<WSE> 
+WSE::create_full ()
+{
+  std::auto_ptr<WSE> full (new WSE_full ());
+  return full;
+}
 
 static struct WSE_fullSyntax
 {
@@ -76,17 +82,6 @@ will be cut into half.");
   }
 } WSE_full_syntax;
 
-const AttributeList& 
-WSE::default_model ()
-{
-  static AttributeList alist;
-  
-  if (!alist.check ("type"))
-    alist.add ("type", "full");
-
-  return alist;
-}
-
 struct WSE_partial : public WSE
 {
   const double y_half;
@@ -104,8 +99,7 @@ struct WSE_partial : public WSE
   }
 
   WSE_partial (Block& al)
-    : WSE (al),
-      y_half (al.number ("y_half"))
+    : y_half (al.number ("y_half"))
   { }
   ~WSE_partial ()
   { }
@@ -142,12 +136,20 @@ struct WSE_none : public WSE
   double factor (const double) const
   { return 1.0; }
 
-  WSE_none (Block& al)
-    : WSE (al)
+  WSE_none ()
+  { }
+  WSE_none (Block&)
   { }
   ~WSE_none ()
   { }
 };
+
+std::auto_ptr<WSE> 
+WSE::create_none ()
+{
+  std::auto_ptr<WSE> none (new WSE_none ());
+  return none;
+}
 
 static struct WSE_noneSyntax
 {
@@ -220,3 +222,5 @@ Number of intervals in the table.");
 
 static Librarian WSE_init (WSE::component, "\
 The water stress effect on crop growth.");
+
+// wse.C ends here.
