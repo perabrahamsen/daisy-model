@@ -1,6 +1,10 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Check initialisering of soil_heat
+* SVAT
+
+** Check initialisering of soil_heat
+
+** log
 
 * SAFIR
 
@@ -8,10 +12,20 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 ** Tænk stress faktorer igennem, kan nogle få default?
 
-rootsys water
-crpn nitrogen (
-svat production  (1 - rcmin/rc)
-harvest cut 
+*** water 
+
+pmsw: rc_min / rc_act
+Farquhar: ?
+rootsys: ea / ep
+
+*** N
+
+crpn: (act - nf) / (cr - nf)
+Farquhar: ?
+
+*** cut stress
+
+harvesting: age
 
 * R2D2
 
