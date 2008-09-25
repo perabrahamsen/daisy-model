@@ -2180,6 +2180,10 @@ sum of all chemicals will be logged."
            (number (path column "${column}" Bioclimate "*" svat SSOC T_shadow)
                    (spec svat SSOC T_shadow)
                    (handle current))
+           (number (path column "${column}" Vegetation crops crops default
+                         LeafPhot Farquhar gs_ms)
+                   (spec photosynthesis Farquhar gs_ms)
+                   (handle current))
            (number (path column "${column}" Bioclimate "*" svat SSOC g_a)
                    (spec svat SSOC g_a)
                    (handle current))
