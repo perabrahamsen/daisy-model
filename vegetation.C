@@ -68,11 +68,13 @@ Vegetation::output (Log& log) const
   output_value (EpFactor (), "EpFactor", log);
   output_value (albedo (), "albedo", log);
   output_value (interception_capacity (), "interception_capacity", log);
+  output_value (stomata_conductance (), "stomata_conductance", log);
 }
 
 void
 Vegetation::load_syntax (Syntax& syntax, AttributeList& alist)
 {
+  alist.add ("base_model", "common");
   syntax.add ("description", Syntax::String, Syntax::OptionalConst,
 	      "Description of this vegetation.");
   syntax.add ("LAI", "m^2/m^2", Syntax::LogOnly,
@@ -107,6 +109,8 @@ Canopy adsorbtion fraction of unreached potential soil evaporation.");
 	      "Another reflection factor");
   syntax.add ("interception_capacity", "mm", Syntax::LogOnly,
 	      "Canopy water storage capacity");
+  syntax.add ("stomata_conductance", "m/s", Syntax::LogOnly,
+              "Stomata´conductance");
 }
 
 Vegetation::Vegetation (Block& al)
@@ -119,3 +123,17 @@ Vegetation::~Vegetation ()
 
 static Librarian Vegetation_init (Vegetation::component, "\
 That green stuff.");
+
+static struct VegetationSyntax
+{
+  VegetationSyntax ()
+  { 
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    Vegetation::load_syntax (syntax, alist);
+
+    Librarian::add_base (Vegetation::component, alist, syntax);
+  }
+} Vegetation_syntax;
+
+// vegetation.C ends here.

@@ -81,6 +81,7 @@ struct VegetationCrops : public Vegetation
 
   // Water.
   double interception_capacity_;// Canopy water storage capacity [mm]
+  double stomata_conductance_;  // Canopy stomata conductance. [m/s]
 
   // Queries.
   double shared_light_fraction () const
@@ -96,12 +97,7 @@ struct VegetationCrops : public Vegetation
     return CanopyAverage (&Crop::rs_max) ; 
   }
   double stomata_conductance () const	// Stomata conductance [m/s]
-  {
-    if (LAI () > 0.0)
-      return CanopyAverage (&Crop::stomata_conductance);
-    return -42.42e42;
-  }
-
+  { return stomata_conductance_; }
   double LAI () const
   { return LAI_; }
   double height () const
@@ -386,10 +382,15 @@ VegetationCrops::find_stomata_conductance (const Units& units,
                                            const Bioclimate& bioclimate,
                                            double dt, Treelog& msg)
 {
+  if (LAI () < 1e-9)
+    return;
+
   for (CropList::const_iterator crop = crops.begin();
        crop != crops.end();
        crop++)
     (*crop)->find_stomata_conductance (units, time, bioclimate, dt, msg);
+
+  stomata_conductance_ = CanopyAverage (&Crop::stomata_conductance);
 }
 
 void 
@@ -906,7 +907,8 @@ VegetationCrops::VegetationCrops (Block& al)
     ARExt_ (0.0),
     EpFactor_ (0.0),
     albedo_ (0.0),
-    interception_capacity_ (0.0)
+    interception_capacity_ (0.0),
+    stomata_conductance_ (0.0)
 { }
 
 VegetationCrops::~VegetationCrops ()

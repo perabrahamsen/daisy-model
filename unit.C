@@ -260,6 +260,7 @@ Factor to multiply with to get base unit.");
 
     // Units.
     static const double u_ha = p_h * p_h;        // Hectar.
+    static const double u_s = 1.0;               // Second.
     static const double u_h = 60.0 * 60.0;       // Hour.
     static const double u_d = u_h * 24.0;        // Day.
     static const double u_y = u_d * 365.2425;    // Year.
@@ -358,6 +359,10 @@ Factor to multiply with to get base unit.");
     // Speed.
     add ("m/s", 1.0, name, syntax, alist, 1, 0, -1, 0, 0, 0, 0,
          "Base speed.");
+    add ("m s^-1", 1.0, name, syntax, alist, 1, 0, -1, 0, 0, 0, 0,
+         "Base speed.");
+    add ("mm/s", p_m / u_s, name, syntax, alist, 1, 0, -1, 0, 0, 0, 0,
+         "Percolation intensity.");
     add ("mm/h", p_m / u_h, name, syntax, alist, 1, 0, -1, 0, 0, 0, 0,
          "Percolation intensity.");
     add ("mm/d", p_m / u_d, name, syntax, alist, 
@@ -433,6 +438,8 @@ Factor to multiply with to get base unit.");
 
     // Mass per area flux.
     add ("kg/m^2/s", p_k * u_g, name, syntax, alist, -2, 1, -1, 0, 0, 0, 0,
+         "Base mass per area flux.");
+    add ("kg m^-2 s^-1", p_k * u_g, name, syntax, alist, -2, 1, -1, 0, 0, 0, 0,
          "Base mass per area flux.");
     add ("g/m^2/h", u_g / u_h, name, syntax, alist, 
          -2, 1, -1, 0, 0, 0, 0,
@@ -556,6 +563,8 @@ Factor to multiply with to get base unit.");
 
     // Energy flux per area.
     add ("W/m^2", 1.0, name, syntax, alist, 0, 1, -3, 0, 0, 0, 0,
+         "Watt per square meter.");
+    add ("W m^-2", 1.0, name, syntax, alist, 0, 1, -3, 0, 0, 0, 0,
          "Watt per square meter.");
     add ("MJ/d/m^2", p_M / u_d, name, syntax, alist,
          0, 1, -3, 0, 0, 0, 0,

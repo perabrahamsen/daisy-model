@@ -1,3 +1,10 @@
+2008-09-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* svat_ssoc.C: New model.
+	* vegetation, bioclimate, crop:  Use it.
+	* lib/log.dai ("SSOC"): New log file.
+	* unit.C (UnitSIFactorSyntax): Added SSOC units.
+
 2008-09-24  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* solver_cxsparse.C (struct SolverCXSparse): Check arguments.
