@@ -86,6 +86,7 @@ Biopore::matrix_to_biopore (double K_xx, double M_c, double r_c,
   const double S = - 4*M_PI*M_c*K_xx*(h-h_3) / 
     (log(M_PI*M_c*r_c*r_c));
   daisy_assert (std::isfinite (S));
+  
   if (S < 0.0)
     {
       std::ostringstream tmp;
@@ -95,7 +96,6 @@ Biopore::matrix_to_biopore (double K_xx, double M_c, double r_c,
       Assertion::error (tmp.str ());
       return 0.0;
     }
-    
   return S;
 }
 
