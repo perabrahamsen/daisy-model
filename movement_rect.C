@@ -218,7 +218,6 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
 {
   T_bottom = bottom_heat (time, weather);
 
-  const size_t cell_size = geo->cell_size ();
   const size_t edge_size = geo->edge_size ();
 
   soil_water.tick_before (*geo, soil, dt, msg); 

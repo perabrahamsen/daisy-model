@@ -304,7 +304,7 @@ SoilWater::tick_before (const Geometry& geo, const Soil& soil,
 void
 SoilWater::tick_after (const Geometry& geo,
                        const Soil& soil, const SoilHeat& soil_heat, 
-                       const bool initial, double dt,
+                       const bool initial, 
                        Treelog& msg)
 {
   TREELOG_SUBMODEL (msg, "SoilWater");
@@ -427,11 +427,12 @@ SoilWater::tick_after (const Geometry& geo,
           q_secondary_[e] = q_matrix_[e] - q_primary_[e];
         }
     }
+}
 
-  if (initial)
-    return;
-
-  // Mass balance.
+void
+SoilWater::mass_balance (const Geometry& geo, double dt, Treelog& msg)
+{
+  const size_t edge_size = geo.edge_size ();
   const double total_sink = 10 * geo.total_surface (S_sum_) * dt;
   const double total_old = 10 * geo.total_surface (Theta_old_);
   const double total_new = 10 * geo.total_surface (Theta_);
@@ -488,7 +489,7 @@ SoilWater::mix (const Geometry& geo, const Soil& soil,
         h_[i] = new_h;
     }
   
-  tick_after (geo, soil,  soil_heat, false, dt, msg);
+  tick_after (geo, soil,  soil_heat, false, msg);
 }
 
 void
@@ -514,7 +515,7 @@ SoilWater::swap (const Geometry& geo, const Soil& soil,
       if (h_[i] < 0.0 || new_h < 0)
         h_[i] = new_h;
     }
-  tick_after (geo, soil,  soil_heat, false, dt, msg);
+  tick_after (geo, soil,  soil_heat, false, msg);
 }
 
 void 
@@ -791,7 +792,7 @@ SoilWater::initialize (const AttributeList& al, const Geometry& geo,
   Theta_primary_.insert (Theta_primary_.begin (), cell_size, -42.42e42);
   Theta_secondary_.insert (Theta_secondary_.begin (), cell_size, -42.42e42);
   K_.insert (K_.begin (), cell_size, 0.0);
-  tick_after (geo, soil,  soil_heat, true, 0.0, msg);
+  tick_after (geo, soil,  soil_heat, true, msg);
 
   // We just assume no changes.
   h_old_ = h_;

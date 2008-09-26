@@ -144,7 +144,8 @@ public:
   // After water movement.
   void tick_after (const Geometry&, 
                    const Soil& soil, const SoilHeat& soil_heat, 
-                   bool initial, double dt, Treelog& msg);
+                   bool initial, Treelog& msg);
+  void mass_balance (const Geometry& geo, double dt, Treelog& msg);
   void incorporate (const Geometry&, double amount, double from, double to);
   void incorporate (const Geometry&, double amount, const Volume&);
   void mix (const Geometry& geo, const Soil&, const SoilHeat&, double from, 

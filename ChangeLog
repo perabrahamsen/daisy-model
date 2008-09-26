@@ -1,9 +1,8 @@
 2008-09-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* soil_water.C (SoilWater::initialize): Clear fluxes.
-	
+	* soil_water.C (initialize): Clear fluxes.
 	* soil_water.C, soil_water.h (tick_before) Renamed from 'tick'.
-	(tick_after): Added 'dt' parameter.
+	(SoilWater::mass_balance): New function.
 	* column_std.C, movement_rect.C, movement_1D.C (tick): Update callers.
 
 2008-09-25  Per Abrahamsen  <abraham@dina.kvl.dk>
