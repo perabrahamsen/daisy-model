@@ -230,6 +230,7 @@ FAO::RefPenmanMonteithWet (double Rn, double G, double Temp, double ea,
   const double rc = 0.0;
   const double E1 = ETrad (AtmPressure, Temp, Rn, G, ra, rc);
   const double E2 = ETaero (AtmPressure, Temp, ea, ra, rc);
+  //const double E2 = RefETaero (AtmPressure, Temp, ea, U2);
   return (E1 + E2);
 }
 

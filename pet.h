@@ -57,7 +57,7 @@ public:
 		     const SoilWater&, Treelog&) = 0;
   virtual double wet () const = 0; // [mm/h]
   virtual double dry () const; // [mm/h]
-  void output (Log&) const;
+  virtual void output (Log&) const;
 
   // Create and Destroy.
   static void load_syntax (Syntax&, AttributeList&);

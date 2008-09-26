@@ -56,16 +56,15 @@ public:
     Pet::output (log);
     output_value (reference_evapotranspiration_dry,
                   "reference_evapotranspiration", log);
+    output_variable (reference_evapotranspiration_wet, log);
   }
 
   double wet () const
   { 
     // BUG!!!!! should be WET.
     // But FAO::RefPenmanMonteithWet might be wrong!
-    // return potential_evapotranspiration_wet; 
     return dry ();
-    // return wet ();
-    
+    // return potential_evapotranspiration_wet; 
 }
 
   double dry () const
@@ -126,6 +125,8 @@ static struct PetFAO_PMSyntax
     alist.add ("description",
 	       "Potential evopotranspiration using Penman-Monteith.");
     Pet::load_syntax (syntax, alist);
+    syntax.add ("reference_evapotranspiration_wet", "mm/h", Syntax::LogOnly, 
+                "Reference evapotranspiration for a dry system.");
     Librarian::add_type (Pet::component, "FAO_PM", alist, syntax, &make);
   }
 } PetFAO_PM_syntax;
