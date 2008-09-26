@@ -252,10 +252,9 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
               << "; steps " << n_small_time_steps 
               << "; time left = " << time_left;
       Treelog::Open nest (msg, tmp_ddt.str ());
-      if (debug > 0)
-        msg.touch ();
 
-      if (n_small_time_steps%msg_number_of_small_time_steps == 0)
+      if (n_small_time_steps > 0
+          && (n_small_time_steps%msg_number_of_small_time_steps) == 0)
         msg.touch ();
       
       n_small_time_steps++;
@@ -307,7 +306,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
           std::ostringstream tmp_conv;
           tmp_conv << "Convergence " << iterations_used; 
           Treelog::Open nest (msg, tmp_conv.str ());
-          if (debug > 1)
+          if (debug == 7)
             msg.touch ();
 
 	  // Calculate conductivity - The Hansen method
