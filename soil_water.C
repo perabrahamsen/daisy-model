@@ -65,7 +65,7 @@ SoilWater::drain (const std::vector<double>& v)
   daisy_assert (S_root_.size () == v.size ());
   for (unsigned i = 0; i < v.size (); i++)
     {
-      if (v[i] < 1e-9)
+      if (v[i] < -1e-9)
         {
           std::ostringstream tmp;
           tmp << "draining " << v[i] << " [h^-1] from cell " << i;
