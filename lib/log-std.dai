@@ -71,10 +71,10 @@
   "Water balance for the complete system."
   (precision 1)
   (require_top true)
-  (input "Precipitation" "Irrigation")
+  (input "Precipitation" "Irrigation" "Tertiary soil")
   (output "Actual evapotranspiration"
           "Matrix percolation"
-          "Drain flow" "Runoff")
+          "Drain flow" "Runoff" "Tertiary surface")
   (content "Soil water" "Surface water" "Tertiary water"))
 
 (deflog "Field water" column
@@ -96,6 +96,14 @@ Total amount of water added to the system from irrigation.")
                    (spec bioclimate default irrigation_total)
                    (handle sum)
                    (dimension "mm/&"))
+           (interval (tag "Tertiary soil")
+                     (description "\
+Net amount of water entering the soil matrix through the biopores.")
+                     (path column "${column}" SoilWater S_p)
+                     (spec fixed SoilWater S_p)
+                     (handle sum)
+                     (negate true)
+                     (dimension "mm/&"))
            (number (tag "Potential evapotranspiration")
 		   (description "\
 There is energy enough to evaporate this amount of water.")
@@ -150,6 +158,17 @@ nowhere go to.  For typical setups, this value will be zero.")
                    (spec fixed Surface runoff)
                    (handle sum)
                    (dimension "mm/&"))
+           (flux_top (tag "Tertiary surface")
+                     (description "\
+This is the amount of water leaving the surface through the biopores.
+The difference from this and 'Tertiary soil' is the water that eiher stay
+in the biopores, or leave the system through biopores that end in
+drain pipes.") 
+                     (path column "${column}" SoilWater q_p)
+                     (spec fixed SoilWater q_p)
+                     (handle sum)
+                     (negate true)
+                     (dimension "mm/&"))
            (number (tag "Tertiary water")
                    (description "\
 Total amount of water in the biopores.

@@ -1,5 +1,23 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* Unit tests
+
+** gtest?
+
+** Units
+
+*** mm/s = 0.001 kg/m^2/s
+
+* Biopores
+
+** Field balance fejl
+
+Det må være inde i Tertiary fejlen sker.
+
+** Check mmo ændringer
+
+** Nanna kan køre den endelige version.
+
 * SVAT
 
 ** Check initialisering of soil_heat
