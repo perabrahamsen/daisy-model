@@ -443,7 +443,7 @@ SoilWater::mass_balance (const Geometry& geo, double dt, Treelog& msg)
         continue;
       const double in_sign 
         = geo.cell_is_internal (geo.edge_to (e)) ? 1.0 : -1.0;
-      const double q = q_primary_[e] + q_secondary_[e] + q_tertiary_[e];
+      const double q = q_primary_[e] + q_secondary_[e];
       const double area = geo.edge_area (e);
       total_boundary_input += q * area * in_sign * dt;
     }
