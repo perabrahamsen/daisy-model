@@ -44,6 +44,11 @@ SoilWater::clear ()
   fill (S_p_.begin (), S_p_.end (), 0.0);
   fill (tillage_.begin (), tillage_.end (), 0.0);
   fill (S_ice_.begin (), S_ice_.end (), 0.0);
+
+  fill (q_primary_.begin (), q_primary_.end (), 0.0);
+  fill (q_secondary_.begin (), q_secondary_.end (), 0.0);
+  fill (q_matrix_.begin (), q_matrix_.end (), 0.0);
+  fill (q_tertiary_.begin (), q_tertiary_.end (), 0.0);
 }
 
 void 
@@ -229,7 +234,7 @@ void
 SoilWater::tick_before (const Geometry& geo, const Soil& soil, 
                         const double dt, Treelog& msg)
 {
-  TREELOG_SUBMODEL (msg);
+  TREELOG_SUBMODEL (msg, "SoilWater");
 
   const size_t cell_size = geo.cell_size ();
 
@@ -302,7 +307,7 @@ SoilWater::tick_after (const Geometry& geo,
                        const bool initial, double dt,
                        Treelog& msg)
 {
-  TREELOG_SUBMODEL (msg);
+  TREELOG_SUBMODEL (msg, "SoilWater");
 
   // We need old K for primary/secondary flux division.
   std::vector<double> K_old = K_;
