@@ -546,6 +546,8 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
   // 0 = Old - New - S * dt + q_in * dt - q_out * dt + Error
   Theta_error -= Theta;         // Old - New
   Theta_error -= S * dt;
+  Theta_error -= S_macro * dt;
+  
   for (size_t edge = 0; edge != edge_size; ++edge) 
     {
       const int from = geo.edge_from (edge);
@@ -558,6 +560,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
     }
 
   // Find drain sink from mass balance.
+  std::fill(S_drain.begin (), S_drain.end (), 0.0);
   for (size_t i = 0; i < drain_cell.size (); i++)
     {
       const size_t cell = drain_cell[i];
@@ -595,8 +598,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
     soil_water.set_content (cell, h (cell), Theta (cell));
   
   soil_water.add_tertiary_sink (S_matrix_sum);
-  // what is qp?
-  // what about mp fluxes to drains?
+  soil_water.drain (S_drain_sum);
 
 
   for (size_t edge = 0; edge != edge_size; ++edge) 
