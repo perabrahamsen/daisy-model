@@ -641,7 +641,7 @@ ColumnStandard::tick (const Time& time, const double dt,
                   dt, msg);
   soil_heat->tick (geometry, *soil, *soil_water, *movement, 
 		   surface, dt, msg);
-  soil_water->tick_after (geometry, *soil, *soil_heat, false, msg);
+  soil_water->tick_after (geometry, *soil, *soil_heat, false, dt, msg);
   soil_heat->tick_after (geometry.cell_size (), *soil, *soil_water, msg);
   chemistry->tick_soil (scope, geometry, 
                         surface.ponding (), surface.mixing_resistance (),

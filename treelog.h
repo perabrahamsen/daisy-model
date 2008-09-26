@@ -77,4 +77,7 @@ public:
   Treelog::Open nest (msg, this->library_id () + ": " + this->name \
                       + " " + __FUNCTION__)
 
+#define TREELOG_SUBMODEL(msg) \
+  Treelog::Open nest (msg, __FUNCTION__)
+
 #endif // TREELOG_H

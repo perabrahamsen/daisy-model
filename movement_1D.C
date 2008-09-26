@@ -397,7 +397,7 @@ Movement1D::tick (const Soil& soil, SoilWater& soil_water,
   Treelog::Open nest (msg, "Movement: " + name.name ());
 
   T_bottom = bottom_heat (time, weather);
-  soil_water.tick (cell_size, soil, dt, msg);
+  soil_water.tick_before (*geo, soil, dt, msg);
 
   // Cells.
   std::vector<double> S_sum (cell_size);

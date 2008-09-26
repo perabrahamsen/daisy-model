@@ -138,11 +138,13 @@ public:
 
   // Simulation.
 public:
-  void tick (const size_t cell_size, const Soil& soil, 
-             double dt, Treelog& msg);
+  // Before water movement.
+  void tick_before (const Geometry&, const Soil& soil, 
+                    double dt, Treelog& msg);
+  // After water movement.
   void tick_after (const Geometry&, 
                    const Soil& soil, const SoilHeat& soil_heat, 
-                   bool initial, Treelog& msg);
+                   bool initial, double dt, Treelog& msg);
   void incorporate (const Geometry&, double amount, double from, double to);
   void incorporate (const Geometry&, double amount, const Volume&);
   void mix (const Geometry& geo, const Soil&, const SoilHeat&, double from, 

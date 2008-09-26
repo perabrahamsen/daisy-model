@@ -220,10 +220,12 @@ SoilWater::set_tertiary_flux (const std::vector<double>& q_p)
 }
 
 void
-SoilWater::tick (const size_t cell_size, const Soil& soil, 
-                 const double dt, Treelog& msg)
+SoilWater::tick_before (const Geometry& geo, const Soil& soil, 
+                        const double dt, Treelog& msg)
 {
-  Treelog::Open nest (msg, "SoilWater");
+  TREELOG_SUBMODEL (msg);
+
+  const size_t cell_size = geo.cell_size ();
 
   // Ice first.
   for (size_t i = 0; i < cell_size; i++)
@@ -291,9 +293,11 @@ SoilWater::tick (const size_t cell_size, const Soil& soil,
 void
 SoilWater::tick_after (const Geometry& geo,
                        const Soil& soil, const SoilHeat& soil_heat, 
-                       const bool initial,
-                       Treelog&)
+                       const bool initial, double dt,
+                       Treelog& msg)
 {
+  TREELOG_SUBMODEL (msg);
+
   // We need old K for primary/secondary flux division.
   std::vector<double> K_old = K_;
 
@@ -412,6 +416,40 @@ SoilWater::tick_after (const Geometry& geo,
           q_secondary_[e] = q_matrix_[e] - q_primary_[e];
         }
     }
+
+  if (initial)
+    return;
+
+  // Mass balance.
+  const double total_sink = 10 * geo.total_surface (S_sum_) * dt;
+  const double total_old = 10 * geo.total_surface (Theta_old_);
+  const double total_new = 10 * geo.total_surface (Theta_);
+  double total_boundary_input = 0.0;
+  for (size_t e = 0; e < edge_size; e++)
+    {
+      if (geo.edge_is_internal (e))
+        continue;
+      const double in_sign 
+        = geo.cell_is_internal (geo.edge_to (e)) ? 1.0 : -1.0;
+      const double q = q_primary_[e] + q_secondary_[e] + q_tertiary_[e];
+      const double area = geo.edge_area (e);
+      total_boundary_input += q * area * in_sign * dt;
+    }
+  total_boundary_input /= geo.surface_area ();
+  total_boundary_input *= 10;
+  if (!balance (total_old, total_new, total_boundary_input - total_sink))
+    {
+      const double total_expected 
+        = total_old - total_sink + total_boundary_input;
+      const double total_diff = total_new - total_old;
+      std::ostringstream tmp;
+      tmp << "Water balance: old (" << total_old
+          << ") - sink (" << total_sink 
+          << ") + boundary input (" << total_boundary_input
+          << ") != " << total_expected << " mm, got " << total_new 
+          << " mm, difference is " << total_diff << " mm";
+      msg.error (tmp.str ());
+    }
 }
 
 void 
@@ -439,7 +477,7 @@ SoilWater::mix (const Geometry& geo, const Soil& soil,
         h_[i] = new_h;
     }
   
-  tick_after (geo, soil,  soil_heat, false, msg);
+  tick_after (geo, soil,  soil_heat, false, dt, msg);
 }
 
 void
@@ -465,7 +503,7 @@ SoilWater::swap (const Geometry& geo, const Soil& soil,
       if (h_[i] < 0.0 || new_h < 0)
         h_[i] = new_h;
     }
-  tick_after (geo, soil,  soil_heat, false, msg);
+  tick_after (geo, soil,  soil_heat, false, dt, msg);
 }
 
 void 
@@ -742,7 +780,7 @@ SoilWater::initialize (const AttributeList& al, const Geometry& geo,
   Theta_primary_.insert (Theta_primary_.begin (), cell_size, -42.42e42);
   Theta_secondary_.insert (Theta_secondary_.begin (), cell_size, -42.42e42);
   K_.insert (K_.begin (), cell_size, 0.0);
-  tick_after (geo, soil,  soil_heat, true, msg);
+  tick_after (geo, soil,  soil_heat, true, 0.0, msg);
 
   // We just assume no changes.
   h_old_ = h_;

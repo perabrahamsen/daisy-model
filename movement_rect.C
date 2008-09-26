@@ -221,7 +221,7 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
   const size_t cell_size = geo->cell_size ();
   const size_t edge_size = geo->edge_size ();
 
-  soil_water.tick (cell_size, soil, dt, msg); 
+  soil_water.tick_before (*geo, soil, dt, msg); 
 
   for (size_t i = 0; i < matrix_water.size (); i++)
     {
