@@ -43,7 +43,7 @@ namespace Resistance
                                  // of wind speed within the canopy
   const double z_0b = 0.0006;    // Bare soil roughness height for momentum [m]
   const double k = 0.41;         // Von Karman's constant []
-  const double h_soil = 0.08;    // Height above the soil surface where the effect
+  const double h_soil = 0.05;    // Height above the soil surface where the effect
                                  // of soil roughness is minimal [m]
   const double m_a = 29.0;       // Molecular weight of air [g mol^-1]
   const double R = 8.3143;       // Universal molecular gass constant [J mol^-1 K^-1]

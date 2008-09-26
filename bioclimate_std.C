@@ -6,7 +6,7 @@
 // This file is part of Daisy.
 // 
 // Daisy is free software; you can redistribute it and/or modify
-// it under the terms of the GNU Lesser Public License as published by
+// it under the terms of the GNU Lesser P   //ublic License as published by
 // the Free Software Foundation; either version 2.1 of the License, or
 // (at your option) any later version.
 // 
@@ -56,6 +56,7 @@ struct BioclimateStandard : public Bioclimate
   // Canopy State.
   const long No;		// No of intervals in canopy discretization.
   double LAI_;			// Total LAI of all crops on this column. [0-]
+  double sun_LAI_fraction_total_;// Total sun LAI fraction of all crops on this column.
   std::vector<double> Height;	// Height in cm of each endpoint in c.d.
   std::vector<double> total_PAR_;// Total PAR of each interval of c.d. [W/m2]
   std::vector<double> sun_PAR_; //Sunlit fraction of PAR of each interval of c.d.[W/m2]
@@ -195,6 +196,8 @@ struct BioclimateStandard : public Bioclimate
   { return sun_LAI_fraction_; }
   double LAI () const
   { return LAI_; }
+  double sun_LAI_fraction_total () const
+  { return sun_LAI_fraction_total_; }
   double wind_speed_field () const 
   { return wind_speed_field_; }
   double rad_abs_soil() const 
@@ -570,6 +573,7 @@ BioclimateStandard::BioclimateStandard (Block& al)
   : Bioclimate (al),
     No (al.integer ("NoOfIntervals")),
     LAI_ (0.0),
+    sun_LAI_fraction_total_ (0.0),
     Height (No + 1),
     total_PAR_ (No + 1),
     sun_PAR_ (No + 1),
@@ -716,15 +720,15 @@ BioclimateStandard::RadiationDistribution (const Vegetation& vegetation,
     = net_radiation->incoming_longwave_radiation();
   const double cover = vegetation.cover();
 
-  double sun_LAI_fraction_total = 0.0;
+  sun_LAI_fraction_total_ = 0.0;
   for (int i = 0; i <= No - 1; i++)
     {
-      sun_LAI_fraction_total += sun_LAI_fraction_[i] / No;
+      sun_LAI_fraction_total_ += sun_LAI_fraction_[i] / No;
     }
   
   absorbed_total_Long_soil = incoming_longwave_radiation * (1-cover);
   absorbed_total_Long_canopy = incoming_longwave_radiation * (cover);
-  absorbed_sun_Long_canopy = absorbed_total_Long_canopy * sun_LAI_fraction_total;
+  absorbed_sun_Long_canopy = absorbed_total_Long_canopy * sun_LAI_fraction_total_;
   absorbed_shadow_Long_canopy = absorbed_total_Long_canopy - absorbed_sun_Long_canopy;
 
     // Variables for SVAT
@@ -999,7 +1003,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
 
   // Let the SVAT model get the boundary conditions.
   svat->tick (weather, vegetation, surface, geo, soil, soil_heat, soil_water, 
-              *pet, *this);
+              *pet, *this, msg);
 
   // Our initial guess for transpiration is based on remaining energy.
   double crop_ea_svat_old = crop_ea_soil;
@@ -1030,7 +1034,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
           < max_svat_absolute_difference)
         {
           // Stomate may limit transpiration, not increase it.
-          daisy_assert (crop_ea_ < crop_ea_soil + 0.01);
+          //  daisy_assert (crop_ea_ < crop_ea_soil + 0.01);
           goto success;
         }
       crop_ea_svat_old = crop_ea_svat;
@@ -1126,23 +1130,23 @@ BioclimateStandard::tick (const Units& units, const Time& time,
   const double AirTemperature = weather.air_temperature ();//[dg C]
   const double LatentHeatVapor 
     = FAO::LatentHeatVaporization (AirTemperature); //[J/kg]
-  const double CanopyTranspirationRate = 
-    crop_ea_ /*[mm/h]*/* rho_water * LatentHeatVapor / 3600. /*[s/h]*/; //[W/m^2] 
+  //  const double CanopyTranspirationRate = 
+  //  crop_ea_ /*[mm/h]*/* rho_water * LatentHeatVapor / 3600. /*[s/h]*/; //[W/m^2] 
 
-  const double CanopyNetRadiation = net_radiation->net_radiation () 
-    * vegetation.cover ();
-  const double SensibleHeatFlux 
-    = CanopyNetRadiation - CanopyTranspirationRate;//[W/m^2] 
+  //  const double CanopyNetRadiation = net_radiation->net_radiation () 
+  //  * vegetation.cover ();
+  // const double SensibleHeatFlux 
+  //  = CanopyNetRadiation - CanopyTranspirationRate;//[W/m^2] 
   
   const double AirPressure 
     = FAO::AtmosphericPressure (weather.elevation ());//[Pa]
-  const double rho_a = FAO::AirDensity(AirPressure, AirTemperature);//[kg/m3]
-  const double gamma
-    = FAO::PsychrometricConstant (AirPressure, AirTemperature);//[Pa/dgC]
-  const double epsilon 
-    = 0.622; // Ration molecular weight of water vapor / dry air []
-  const double c_p 
-    = gamma * epsilon * LatentHeatVapor / AirPressure;//[J/kg/dg C]
+  // const double rho_a = FAO::AirDensity(AirPressure, AirTemperature);//[kg/m3]
+  // const double gamma
+  //  = FAO::PsychrometricConstant (AirPressure, AirTemperature);//[Pa/dgC]
+  // const double epsilon 
+  //    = 0.622; // Ration molecular weight of water vapor / dry air []
+  //  const double c_p 
+  //  = gamma * epsilon * LatentHeatVapor / AirPressure;//[J/kg/dg C]
   
   const double ScreenHeight = weather.screen_height (); //[m]
 

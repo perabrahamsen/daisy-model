@@ -1332,7 +1332,7 @@ public:
   void tick (const Weather& weather, const Vegetation& crops,
              const Surface& surface, const Geometry&, const Soil& soil,
              const SoilHeat& soil_heat, const SoilWater& soil_water,
-             const Pet& pet, const Bioclimate& bio);
+             const Pet& pet, const Bioclimate& bio, Treelog&);
   void output (Log& log) const;
 
   // Create and Destroy.
@@ -1370,7 +1370,7 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
                  const Surface&, const Geometry& geo, const Soil& soil, 
                  const SoilHeat& soil_heat,
                  const SoilWater& soil_water, const Pet& pet, 
-                 const Bioclimate& bio)
+                 const Bioclimate& bio, Treelog&)
 {
   const double divide_ep = pet.wet () - bio.snow_ea();
   const double canopy_ep = divide_ep * crops.cover ();

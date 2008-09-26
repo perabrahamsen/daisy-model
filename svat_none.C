@@ -35,7 +35,7 @@ struct SVAT_none : public SVAT
   // Simulation.
   void tick (const Weather&, const Vegetation&,
 	     const Surface&, const Geometry&, const Soil&, const SoilHeat&,
-	     const SoilWater&, const Pet&, const Bioclimate& bio)
+	     const SoilWater&, const Pet&, const Bioclimate& bio, Treelog&)
   { 
     crop_ea = bio.crop_ea();
     T_a = bio.daily_air_temperature ();

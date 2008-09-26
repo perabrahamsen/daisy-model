@@ -68,6 +68,7 @@ public:
   virtual const std::vector<double>& sun_PAR () const = 0;
   virtual const std::vector<double>& sun_LAI_fraction () const = 0;
   virtual double LAI () const = 0;
+  virtual double sun_LAI_fraction_total () const =0;
   virtual double wind_speed_field () const = 0;
   virtual double rad_abs_soil() const = 0;
   virtual double rad_abs_sun_canopy() const = 0;

@@ -47,9 +47,16 @@ Resistance::gbf_heat (const double Cl/*[]*/, const double T_a /*[dg C]*/,
                       const double T_l_sun /*[dg C]*/, 
                       const double w_l /* leaf width [m]*/) 
 {
-  const double gbf_heat = d_heat * Cl / w_l
-    * pow((g * pow(w_l,3)/sqr(v * Cl) * (T_l_sun - T_a))/(T_a + TK),0.25);
-  return gbf_heat;// [m s¯1]
+  daisy_assert (Cl != 0.0);
+  daisy_assert (w_l != 0.0);
+ double gbf_heat;
+ if (T_l_sun - T_a <= 0)
+   gbf_heat = 0.0;
+ else 
+   gbf_heat = d_heat * Cl / w_l
+     * pow((g * pow(w_l,3)/sqr(v * Cl) * (T_l_sun - T_a))/(T_a + TK),0.25);
+
+ return gbf_heat;// [m s¯1]
 }
 
 // Boundary conductance for a leaf due to free convection for CO2 (G3)
@@ -82,7 +89,7 @@ Resistance::gbu_heat (const double U_z /*surface wind speed [m s^-1]*/,
                       const double w_l /* leaf width [m]*/, 
                       const double LAI /*[m^2 m^-2]*/) 
 {
-  const double gbu_heat = 2 * 0.003 * pow((U_z * exp(-ku * LAI)/w_l), 0.5); 
+  const double gbu_heat = 2. * 0.003 * pow((U_z * exp(-ku * LAI)/w_l), 0.5); 
   return gbu_heat; // [m s¯1]
 }
 
@@ -127,7 +134,7 @@ Resistance::gbu_sun (const double gbu_j /*[m s¯1]*/, const double LAI /*[]*/,
                      const double kb /*extinction coefficient []*/)
 {
   const double gbu_sun = gbu_j 
-    * (1 - exp( - (0.5 * ku + kb) * LAI))/(0.5 * ku + kb);
+    * (1. - exp( - (0.5 * ku + kb) * LAI))/(0.5 * ku + kb);
   return gbu_sun; // [m s¯1]
 }
 
@@ -138,8 +145,8 @@ Resistance::gbu_shadow (const double gbu_j /*[m s¯1]*/, const double kb,
                         const double LAI /*[m^2 m^-2]*/)
 {
   const double gbu_shadow = gbu_j 
-    * (1 - exp(-(0.5 * ku * LAI))/(0.5 * ku) 
-       - (1 - exp(-(0.5 * ku + kb) * LAI))/(0.5 * ku + kb)) ;
+    * (1. - exp(-(0.5 * ku * LAI))/(0.5 * ku) 
+       - (1. - exp(-(0.5 * ku + kb) * LAI))/(0.5 * ku + kb)) ;
   return gbu_shadow; // [m s¯1]
 }
 // Boundary conductance of the sunlit canopy fraction due to free
@@ -242,6 +249,7 @@ Resistance::r_a (const double z /* reference height above canopy [m]*/,
                  const double U_z /* surface wind speed [m s^-1]*/)
 {
   daisy_assert (z_0 > 0.0);
+ daisy_assert (z > d);
   daisy_assert (z_0h > 0.0);
   daisy_assert ((sqr (k) * U_z) > 0.0);
 
@@ -256,8 +264,8 @@ Resistance::r_a (const double z /* reference height above canopy [m]*/,
   if (N <= 0.0)
     r_a = (log((z - d)/z_0) - S) * (log((z - d)/z_0h) - S) * 1/(sqr (k) * U_z);
   else
-    r_a = (log((z - d)/z_0) * log((1 - d)/z_0h))
-      / (exp (log(sqrt(k)) + log(U_z) + 0.75 * log(1 + N)));
+    r_a = (log((z - d)/z_0) * log((z - d)/z_0h))
+      / (sqr(k) * U_z * pow(1. + N, 3./4.));
   return r_a; // [s m^-1]
 }
 
@@ -278,27 +286,42 @@ Resistance::U_c (const double z_r /* reference height above canopy [m]*/,
                  const double rho_a /* air density [kg m^-3]*/)
 {
   daisy_assert (z_0 > 0.0);
-  // daisy_assert ((T_0 - T_a) != 0.0);
+  daisy_assert (U_z > 0.0);
+  daisy_assert (z_r > d);
+  daisy_assert (h_veg > d);
   daisy_assert (log((z_r - d)/z_0) != 0.0);
 
   const double u = (U_z * k) / (log((z_r - d)/z_0));
   double L_mo;
-  if ((T_0 - T_a)== 0.0) 
-    L_mo = - (r_a * rho_a * pow(u,3) * (T_a + TK))
-      /0.00001;
-  else  
-    L_mo = - (r_a * rho_a * pow(u,3) * (T_a + TK))
-      / (g * k * (T_0 - T_a));
-  
-  const double y = 1 - 15. * pow((z_r - d)/L_mo,-0.25);
-  const double psi = 2. * log((1. + y)/ 2.) + log((1. + sqr(y))/2.) 
-    - 2./(tan(y)) + M_PI/2.;
+  double U_c = -42.42e42;
 
-  double U_c;
-  if (z_r/L_mo >= 0)
-    U_c = U_z * (log(h_veg - d)/z_0)/(log((z_r - d)/z_0) + 4.7 * (z_r - d)/L_mo);
-  else
-    U_c = U_z * (log(h_veg - d)/z_0)/(log((z_r - d)/z_0) - psi);
+  if ((T_0 - T_a) < 0.1) 
+    {
+      if(log((h_veg - d)/z_0)/(log((z_r - d)/z_0)) < 0.0)
+        U_c = U_z; 
+      else
+        U_c = U_z * (log((h_veg - d)/z_0)/(log((z_r - d)/z_0)));
+      daisy_assert(U_c >= 0.0);
+    }
+  else  
+    {
+      L_mo = - (r_a * pow(u,3.) * (T_a + TK)) / (g * k * (T_0 - T_a));
+      daisy_assert (T_0 > T_a);
+      daisy_assert (L_mo != 0.0);
+
+      const double y = 1. - 15. * pow((z_r - d)/L_mo,-0.25); // []
+      const double psi = log(sqr((1. + y)/ 2.) * (1. + sqr(y))/2.) 
+        - 2./(tan(y)) + M_PI/2.;//[]
+
+      daisy_assert (psi > U_z * (log((h_veg - d)/z_0)/(log((z_r - d)/z_0))));
+      
+      if (L_mo >= 0.0)
+        U_c = U_z * (log((h_veg - d)/z_0)/(log((z_r - d)/z_0) + 4.7 * (z_r - d)/L_mo));
+      else
+        U_c = U_z * (log((h_veg - d)/z_0)/(log((z_r - d)/z_0) - psi));
+      daisy_assert (U_c > 0.0);
+    }
+  daisy_assert (U_c > 0.0);
   return U_c; // [m s^-1]
 }
 
@@ -323,6 +346,7 @@ Resistance::U_s (const double l_m /* mean leaf size [m]*/,
 {
   const double a_0 = 0.28 * pow(LAI, 2./3.) * pow(h_veg, 1./3.) * pow(l_m, -1./3.);
   const double U_s = U_c * exp(- a_0 * (1. - h_soil/h_veg));
+  daisy_assert (U_s >0.0);
   return U_s; //[m s^-1]
 }
 
