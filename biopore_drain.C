@@ -61,7 +61,7 @@ struct BioporeDrain : public Biopore
 
   double matrix_biopore_drain (size_t c, const Geometry& geo, 
                                const Soil& soil, bool active, 
-                               const double h_barrier, double pressure_end,
+                               const double h_barrier, double pressure_limit,
                                double K_xx, double h) const;
   void update_matrix_sink (const Geometry& geo,    
                            const Soil& soil,  
@@ -69,7 +69,7 @@ struct BioporeDrain : public Biopore
                            const std::vector<bool>& active,
                            const double h_barrier,
                            const double pressure_initiate,
-                           const double pressure_end,
+                           const double pressure_limit,
                            const std::vector<double>& h, const double dt);
   void update_water ()
   { }
@@ -117,7 +117,7 @@ double
 BioporeDrain::matrix_biopore_drain (size_t c, const Geometry& geo, 
                                     const Soil& soil, bool active, 
                                     const double h_barrier, 
-                                    const double pressure_end,
+                                    const double pressure_limit,
                                     double K_xx, double h) const
 {
   const double M_c = density_cell[c];
@@ -135,7 +135,7 @@ BioporeDrain::matrix_biopore_drain (size_t c, const Geometry& geo,
       << " cell_z = " <<  geo.cell_z (c)
       << " h = " << h
       << " h_3 = " << h_3 
-      << " h + p_end = " << h+pressure_end; 
+      << " h + p_end = " << h+pressure_limit; 
   Assertion::message (tmp.str ());  
   //--------------------------------------
 #endif
@@ -145,15 +145,8 @@ BioporeDrain::matrix_biopore_drain (size_t c, const Geometry& geo,
   if (active && h>h_3 + h_barrier)
     {
       // The largest pressure gradient between the domains are
-      // pressure_end, above that we claim air will disrupt the suction.
-      
-      //-------Pers model --------------------------------
-      //const double h_3_suck = std::max (h_3, h + pressure_end);
-      //--------End, Pers model-------------------------------
-
-      //------Mikkels testing area -----------------------
-      const double h_3_suck = h_3;
-      //------------End, Mikkels testing area-------------
+      // pressure_limit, above that we claim air will disrupt the suction.
+      const double h_3_suck = std::max (h_3, h + pressure_limit);
 
       S = matrix_to_biopore (K_xx, M_c, r_c, h, h_3_suck)
         * geo.fraction_in_z_interval (c, height_start, height_end);
@@ -170,7 +163,7 @@ BioporeDrain::update_matrix_sink (const Geometry& geo,
                                   const std::vector<bool>& active,
                                   const double h_barrier,
                                   const double pressure_initiate,
-                                  const double pressure_end,
+                                  const double pressure_limit,
                                   const std::vector<double>& h, 
                                   const double /* dt */)
 {
@@ -190,7 +183,7 @@ BioporeDrain::update_matrix_sink (const Geometry& geo,
       const double K_zz = soil.K (c, h_cond, h_ice, T);
       const double K_xx = K_zz * soil.anisotropy (c);
       S[c] = matrix_biopore_drain (c, geo, soil, active[c], h_barrier, 
-                                   pressure_end, K_xx, h[c]);
+                                   pressure_limit, K_xx, h[c]);
     }
 }
 

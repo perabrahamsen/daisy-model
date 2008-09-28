@@ -6,6 +6,10 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.49
+
+** More work on biopores and SVAT.
+
 * 4.48
 
 ** Workaround for bug in FAO_PM.

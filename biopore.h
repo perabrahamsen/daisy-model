@@ -89,7 +89,7 @@ public:
                                    const std::vector<bool>& active,
                                    const double h_barrier,
                                    const double pressure_initiate,
-                                   const double pressure_end,
+                                   const double pressure_limit,
                                    const std::vector<double>& h, 
                                    const double dt) = 0;
   void scale_sink (double scale);

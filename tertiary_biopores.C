@@ -47,6 +47,7 @@ struct TertiaryBiopores : public Tertiary, public Tertsmall
   const auto_vector<Biopore*> classes; // List of biopore classes.
   const double pressure_initiate;// Pressure needed to init pref.flow [cm]
   const double pressure_end;	 // Pressure after pref.flow has been init [cm]
+  const double pressure_limit;   // Limit to biopore sucktion [cm]
   const double pressure_barrier; // Pressure difference requires for S [cm]
   const double pond_max;	 // Pond height before activating pref.flow [cm]
   const bool use_small_timesteps_; // True, iff we want to calculate S in R.E.
@@ -402,7 +403,7 @@ TertiaryBiopores::update_biopores (const Geometry& geo,
     classes[b]->update_matrix_sink (geo, soil, soil_heat, active, 
                                     pressure_barrier, 
                                     pressure_initiate, 
-                                    pressure_end, h, dt);
+                                    pressure_limit, h, dt);
 }
 
 void
@@ -614,6 +615,7 @@ TertiaryBiopores::TertiaryBiopores (Block& al)
     classes (Librarian::build_vector<Biopore> (al, "classes")),
     pressure_initiate (al.number ("pressure_initiate")),
     pressure_end (al.number ("pressure_end")),
+    pressure_limit (al.number ("pressure_limit", pressure_end)),
     pressure_barrier (al.number ("pressure_barrier")),
     pond_max (al.number ("pond_max")),
     use_small_timesteps_ (al.flag ("use_small_timesteps")),
@@ -647,11 +649,21 @@ fTrue iff solutes should be transport with the water through the biopores.");
                        Syntax::State, Syntax::Sequence,
                        "List of biopore classes.");
     syntax.add ("pressure_initiate", "cm", Syntax::Const, 
-                "Pressure needed to initiate biopore flow.");
+                "Pressure needed to activate biopore flow.");
     alist.add ("pressure_initiate", -3.0);
     syntax.add ("pressure_end", "cm", Syntax::Const, 
-                "Pressure after biopore flow has been initiated.");
+                "Pressure below which biopore flow is deactivated.");
     alist.add ("pressure_end", -30.0);
+    syntax.add ("pressure_limit", "cm", Check::non_positive (),
+                Syntax::OptionalConst, "\
+Limit to pressure difference for moving matrix water gradient to biopores.\n\
+\n\
+The idea is that the water is extracted from the matrix by a\n\
+continious stream of water in the biopore, and that the suction is\n\
+equal to the length of this stream.  The maximum suction is then the\n\
+maximal length of the stream, or the point where the stream breaks.\n\
+\n\
+By default, this is equal to 'pressure_end'.");
     syntax.add ("pressure_barrier", "cm", Check::non_negative (), Syntax::Const,
                 "Pressure barrier between matrix and biopore domain.\n\
 If the pressure difference between the matrix and biopores is below\n\

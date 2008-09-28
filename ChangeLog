@@ -1,3 +1,7 @@
+2008-09-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.49 released.
+
 2008-09-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* soil_water.C (initialize): Clear fluxes.
