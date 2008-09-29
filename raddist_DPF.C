@@ -132,24 +132,24 @@ void RaddistDPF::tick (std::vector <double>& fraction_sun_LAI,
 
   // Canopy reflection coefficeint of direct PAR for 
   // horizontal leaves, Ph_PAR
-  const double Ph_PAR = (1 - sqrt(1.0-sigma_PAR))/(1 + sqrt(1.0-sigma_PAR));
+  const double Ph_PAR = (1. - sqrt(1.0-sigma_PAR))/(1. + sqrt(1.0-sigma_PAR));
 
   // Canopy reflection coefficeint of direct PAR for 
   // uniform leaf-angel distribution, Pcb_PAR
-  const double Pcb_PAR = 1 - exp((-2 * Ph_PAR * kb) / (1 + kb));
+  const double Pcb_PAR = 1. - exp((-2. * Ph_PAR * kb) / (1. + kb));
   daisy_assert (Pcb_PAR >= 0.0);
 
   // Canopy-soil reflection coefficeint of beam irradiance for 
   // uniform leaf-angel distribution, Pscb
-  const double aa_PAR = (Pcb_PAR - Ps_PAR)/(Pcb_PAR * Ps_PAR - 1);
-  const double bb_PAR = exp(-2 * sqrt(1.0-sigma_PAR) * kb * LAI);
-  const double Pscb_PAR = (Pcb_PAR + aa_PAR * bb_PAR)/(1 + Pcb_PAR * aa_PAR * bb_PAR);
+  const double aa_PAR = (Pcb_PAR - Ps_PAR)/(Pcb_PAR * Ps_PAR - 1.);
+  const double bb_PAR = exp(-2. * sqrt(1.0-sigma_PAR) * kb * LAI);
+  const double Pscb_PAR = (Pcb_PAR + aa_PAR * bb_PAR)/(1. + Pcb_PAR * aa_PAR * bb_PAR);
   daisy_assert (Pscb_PAR >= 0.0);
 
   // Canopy-soil reflection coefficeint of diffuse irradiance for 
   // uniform leaf-angel distribution, Pscd
-  const double cc_PAR = exp(-2 * sqrt(1.0-sigma_PAR) * kd * LAI);
-  const double Pscd_PAR = (Pcb_PAR + aa_PAR * cc_PAR)/(1 + Pcb_PAR * aa_PAR * cc_PAR);
+  const double cc_PAR = exp(-2. * sqrt(1.0-sigma_PAR) * kd * LAI);
+  const double Pscd_PAR = (Pcb_PAR + aa_PAR * cc_PAR)/(1. + Pcb_PAR * aa_PAR * cc_PAR);
   daisy_assert (Pscd_PAR >= 0.0);
 
   // Fraction of Photosynthetically Active Radiation (PAR) in Shortwave
@@ -171,7 +171,7 @@ void RaddistDPF::tick (std::vector <double>& fraction_sun_LAI,
   // Fill direct beam PAR with scattering 1 (cummulative)
   radiation_distribution (No, LAI, Pscb_PAR, IRb0, kbs_PAR + kb, beam_scat1_PAR, PARinSi);
   // Fill direct beam PAR with scattering 1 (cummulative)
-  radiation_distribution (No, LAI, sigma_PAR, IRb0, 2 * kb, beam_scat2_PAR, PARinSi);
+  radiation_distribution (No, LAI, sigma_PAR, IRb0, 2. * kb, beam_scat2_PAR, PARinSi);
   // Fill diffuse PAR sunlit (cummulative)
   radiation_distribution (No, LAI, Pscd_PAR, IRd0, kds_PAR + kb, dif_sun_PAR, PARinSi);
 
@@ -204,24 +204,24 @@ void RaddistDPF::tick (std::vector <double>& fraction_sun_LAI,
 
   // Canopy reflection coefficeint of direct NIR for 
   // horizontal leaves, Ph_NIR
-  const double Ph_NIR = (1 - sqrt(1.0-sigma_NIR))/(1 + sqrt(1.0-sigma_NIR));
+  const double Ph_NIR = (1. - sqrt(1.0-sigma_NIR))/(1. + sqrt(1.0-sigma_NIR));
 
   // Canopy reflection coefficeint of direct NIR for 
   // uniform leaf-angel distribution, Pcb_NIR
-  const double Pcb_NIR = 1 - exp((-2 * Ph_NIR * kb) / (1 + kb));
+  const double Pcb_NIR = 1. - exp((-2. * Ph_NIR * kb) / (1. + kb));
   daisy_assert (Pcb_NIR >= 0.0);
 
   // Canopy-soil reflection coefficeint of beam irradiance for 
   // uniform leaf-angel distribution, Pscb
-  const double aa_NIR = (Pcb_NIR - Ps_NIR)/(Pcb_NIR * Ps_NIR - 1);
-  const double bb_NIR = exp(-2 * sqrt(1.0-sigma_NIR) * kb * LAI);
-  const double Pscb_NIR = (Pcb_NIR + aa_NIR * bb_NIR)/(1 + Pcb_NIR * aa_NIR * bb_NIR);
+  const double aa_NIR = (Pcb_NIR - Ps_NIR)/(Pcb_NIR * Ps_NIR - 1.);
+  const double bb_NIR = exp(-2. * sqrt(1.0-sigma_NIR) * kb * LAI);
+  const double Pscb_NIR = (Pcb_NIR + aa_NIR * bb_NIR)/(1. + Pcb_NIR * aa_NIR * bb_NIR);
   daisy_assert (Pscb_NIR >= 0.0);
 
   // Canopy-soil reflection coefficeint of diffuse irradiance for 
   // uniform leaf-angel distribution, Pscd
-  const double cc_NIR = exp(-2 * sqrt(1.0-sigma_NIR) * kd * LAI);
-  const double Pscd_NIR = (Pcb_NIR + aa_NIR * cc_NIR)/(1 + Pcb_NIR * aa_NIR * cc_NIR);
+  const double cc_NIR = exp(-2. * sqrt(1.0-sigma_NIR) * kd * LAI);
+  const double Pscd_NIR = (Pcb_NIR + aa_NIR * cc_NIR)/(1. + Pcb_NIR * aa_NIR * cc_NIR);
   daisy_assert (Pscd_NIR >= 0.0);
 
 
@@ -244,7 +244,7 @@ void RaddistDPF::tick (std::vector <double>& fraction_sun_LAI,
   // Fill direct beam NIR with scattering 1 (cummulative)
   radiation_distribution (No, LAI, Pscb_NIR, IRb0, kbs_NIR + kb, beam_scat1_NIR, NIRinSi);
   // Fill direct beam NIR with scattering 1 (cummulative)
-  radiation_distribution (No, LAI, sigma_NIR, IRb0, 2 * kb, beam_scat2_NIR, NIRinSi);
+  radiation_distribution (No, LAI, sigma_NIR, IRb0, 2. * kb, beam_scat2_NIR, NIRinSi);
   // Fill diffuse NIR sunlit (cummulative)
   radiation_distribution (No, LAI, Pscd_NIR, IRd0, kds_NIR + kb, dif_sun_NIR, NIRinSi);
 

@@ -131,7 +131,7 @@ struct SVAT_SSOC : public SVAT
   double G_H_sun_c; // Heat "conductance" from sun leaves to canopy point [W m^-2 K^-1
   double G_W_sun_c; // Water "conductance" from sun leaves to canopy point [m s^-1]
   double G_H_shadow_c; // Heat "conductance" from shadow leaves to canopy point 
-                       // [W m^-2 K^-19 
+                       // [W m^-2 K^-1]
   double G_W_shadow_c; // Water "conductance" from shadow leaves to canopy point 
                        //[m s^-1]
   double R_eq_abs_soil;   // Equilibrium net-radiation absorbed by the soil [W m^-2]
@@ -259,7 +259,7 @@ SVAT_SSOC::calculate_conductances (const double g_s /* stomata cond. [m/s]*/, Tr
   // Zero-plane displacement height [m] (F3)
   const double d = Resistance::d (h_veg, c_drag, LAI);
   // Atmospheric stability indicator (F4)
-  if (U_z == 0.0) U_z = 0.1;
+  if (U_z <= 0.0) U_z = 0.1;
   //  const double N = Resistance::N (z_r, d, T_0 - TK, T_a - TK, U_z);
   const double N = Resistance::N (z_r, d, T_s - TK, T_a - TK, U_z);
   // Roughness lenght for momentum transport (F2)
@@ -336,13 +336,13 @@ SVAT_SSOC::calculate_conductances (const double g_s /* stomata cond. [m/s]*/, Tr
 
   //Shadow fraction --------------------------------------------------
   const double LAI_shadow = LAI * (1. - sun_LAI_fraction_total);
-  const double gbu_shadow_heat = Resistance::gbu_sun(gbu_heat, LAI, kb);
-  const double gbf_shadow_heat = Resistance::gbf_sun(gbf_heat, LAI_shadow);
+  const double gbu_shadow_heat = Resistance::gbu_shadow (gbu_heat, LAI, kb);
+  const double gbf_shadow_heat = Resistance::gbf_shadow (gbf_heat, LAI_shadow);
   // Heat conductance from shadow leaves to canopy point
   g_H_shadow_c = gbu_shadow_heat + gbf_shadow_heat;
 
-  const double gbu_shadow_H2O = Resistance::gbu_sun (gbu_H2O, LAI, kb);
-  const double gbf_shadow_H2O = Resistance::gbf_sun(gbf_H2O, LAI_shadow);
+  const double gbu_shadow_H2O = Resistance::gbu_shadow (gbu_H2O, LAI, kb);
+  const double gbf_shadow_H2O = Resistance::gbf_shadow (gbf_H2O, LAI_shadow);
   // Water conductance from shadow leaves to canopy point 
   // - sum of boundary and stomata
   const double r_W_shadow_c = 1./(gbu_shadow_H2O + gbf_shadow_H2O)
@@ -367,7 +367,6 @@ SVAT_SSOC:: calculate_temperatures(Treelog& msg)
 
   // Radiation "conductivity"
   G_R = 4. * epsilon * sigma * pow(T_a, 3.); //[W m^-2 K^-1]
-
   // Sensible heat "conductance" from soil to atmosphere
   G_H_a = c_p * rho_a * g_a;            //[W m^-2 K^-1] 
   // Latent heat "conductance" from soil to atmosphere
@@ -444,12 +443,12 @@ SVAT_SSOC:: calculate_temperatures(Treelog& msg)
       const double c_shadow = ((R_eq_abs_shadow + G_R * (T_a) + G_H_shadow_c * a_can 
                                 + G_W_shadow_c * (s * (T_a) - e_sat_atm + b_can)) 
                                / (G_R + G_H_shadow_c * (1. - a_can_shadow)
-                                  + G_W_shadow_c * (s - b_can_shadow)));
+                                  + G_W_shadow_c * (s - b_can_shadow))); //[K]
       
       const double c_shadow_sun = ((G_H_sun_c * a_can_shadow 
                                     + G_W_sun_c * b_can_shadow)
                                    /(G_R + G_H_shadow_c * (1. - a_can_shadow)
-                                     + G_W_shadow_c * (s - b_can_shadow)));
+                                     + G_W_shadow_c * (s - b_can_shadow)));//[]
       
       // -------------------------------------------
       // Temperature of sunlit leaves 
@@ -461,6 +460,7 @@ SVAT_SSOC:: calculate_temperatures(Treelog& msg)
       // Temperature of shadow leaves 
       // -------------------------------------------
       T_shadow = (c_shadow + c_shadow_sun * (T_sun)); //[K]
+      //T_shadow = (T_sun - c_sun)/c_sun_shadow; //[K]
 
       //daisy_assert (T_sun >= T_shadow);
       
@@ -508,25 +508,27 @@ SVAT_SSOC:: calculate_fluxes()
   if (has_LAI)
     { 
       // Sensible heat flux from the soil (overwriting)
-      H_soil = G_H_s_c * (T_s - T_c);      //[W m^-2] 
+      H_soil =  G_H_s_c * (T_s - T_c);      //[W m^-2] 
       // Sensible heat flux from the sunlit leaves to the canopy point
-      H_sun = G_H_sun_c * (T_sun - T_c);   //[W m^-2] 
+      H_sun =  G_H_sun_c * (T_sun - T_c);   //[W m^-2] 
       // Sensible heat flux from the shadow leaves to the canopy point
-      H_shadow = G_H_shadow_c * (T_shadow - T_c) ; //[W m^-2] 
+      H_shadow =  G_H_shadow_c * (T_shadow - T_c) ; //[W m^-2] 
       // Sensible heat flux from the canopy point to free atmosphere
       H_c_a = G_H_a * (T_c - T_a);      //[W m^-2] 
       
       const double e_sat_sun = FAO::SaturationVapourPressure (T_sun - TK); // [Pa]
       const double e_sat_shadow = FAO::SaturationVapourPressure (T_shadow - TK); // [Pa]
       // Latent heat flux from the sunlit leaves to the canopy point
-      LE_sun = G_W_sun_c * (e_sat_sun - e_c);         // [W m^-2]
+      //LE_sun =  G_W_sun_c * (e_sat_sun - e_c);         // [W m^-2]
+      LE_sun =  G_W_sun_c * ((s * (T_sun - T_a)) + (e_sat_atm - e_c));  // [W m^-2]
       // Latent heat flux from the shadow leaves to the canopy point
-      LE_shadow = G_W_shadow_c * (e_sat_shadow - e_c); // [W m^-2]
+      //LE_shadow = G_W_shadow_c * (e_sat_shadow - e_c); // [W m^-2]
+      LE_shadow = G_W_shadow_c * ((s * (T_shadow - T_a)) + (e_sat_atm - e_c));//[W m^-2]
       // Latent heat flux from the canopy point to the free atmosphere
       LE_atm = G_W_a * (e_c - e_a);                   // [W m^-2]
       
       // Transpiration
-      E_trans = (LE_sun + LE_shadow) / lambda;        //[kg m^-2 s^-1]
+      E_trans = (LE_sun + LE_shadow) / lambda;        //[kg m^-2 s^-1]==[mm/s]
     }
 }
 
@@ -538,7 +540,7 @@ SVAT_SSOC::solve(const double gs /* stomata cond. [m/s]*/, Treelog& msg )
   std::ostringstream tmp;
   const double maxTdiff = 0.1; //[K]
   const double maxEdiff = 1.; //[Pa]
-  const double max_iteration = 150;
+  const double max_iteration = 150.;
 
   for (int i = 0; i<max_iteration; i++)
     {    

@@ -54,7 +54,7 @@ Resistance::gbf_heat (const double Cl/*[]*/, const double T_a /*[dg C]*/,
    gbf_heat = 0.0;
  else 
    gbf_heat = d_heat * Cl / w_l
-     * pow((g * pow(w_l,3)/sqr(v * Cl) * (T_l_sun - T_a))/(T_a + TK),0.25);
+     * pow((g * pow(w_l, 3.)/sqr(v * Cl) * (T_l_sun - T_a))/(T_a + TK), 0.25);
 
  return gbf_heat;// [m s¯1]
 }
@@ -145,7 +145,7 @@ Resistance::gbu_shadow (const double gbu_j /*[m s¯1]*/, const double kb,
                         const double LAI /*[m^2 m^-2]*/)
 {
   const double gbu_shadow = gbu_j 
-    * (1. - exp(-(0.5 * ku * LAI))/(0.5 * ku) 
+    * ((1. - exp(-(0.5 * ku * LAI)))/(0.5 * ku) 
        - (1. - exp(-(0.5 * ku + kb) * LAI))/(0.5 * ku + kb)) ;
   return gbu_shadow; // [m s¯1]
 }
@@ -183,7 +183,7 @@ double
 Resistance::gc_fraction (const double gb_j /*[m s¯1]*/, 
                          const double ra /* aerodynamic resistance (F5) [s m¯1]*/)
 {
-  const double gb_fraction = 1/((1/gb_j) + ra);
+  const double gb_fraction = 1./((1./gb_j) + ra);
   return gb_fraction; // [m s¯1]
 }
 
