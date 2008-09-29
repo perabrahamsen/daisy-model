@@ -79,6 +79,22 @@ Biopore::max_infiltration_rate (const Geometry& geo, size_t e) const // [cm/h]
   
   return q;
 }
+
+void 
+Biopore::infiltrate (const Geometry& geo, size_t e,
+                     const double amount, const double dt)
+{
+  const double edge_area = geo.edge_area (e);
+  const double total_area = geo.surface_area ();
+  const double edge_flux = amount / dt;
+  const double total_flux = edge_flux * edge_area / total_area;
+  infiltration += total_flux;
+}
+
+void 
+Biopore::clear ()
+{ infiltration = 0.0; }
+
 double 
 Biopore::matrix_to_biopore (double K_xx, double M_c, double r_c, 
                             double h, double h_3)
@@ -121,6 +137,7 @@ void
 Biopore::output_base (Log& log) const
 {
   output_variable (S, log);
+  output_variable (infiltration, log);
 }
 
 bool
@@ -208,6 +225,8 @@ Biopore density [cm^-2] as a function of 'x' [cm].");
               Syntax::Const, "Biopore diameter.");
   syntax.add ("S", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Sink from matrix domain to biopore.");
+  syntax.add ("infiltration", "cm/h", Syntax::LogOnly, "\
+Surface infiltration.");
 }
 
 Biopore::Biopore (Block& al)

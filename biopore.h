@@ -59,7 +59,8 @@ protected:
 
   // Log variables.
 protected:
-  std::vector<double> S;        // // Matrix sink term [].
+  std::vector<double> S;         // Matrix sink term [].
+  double infiltration;           // Surface infiltration [cm/h]
 
   // Utilities.
 protected:
@@ -82,7 +83,8 @@ public:
   virtual double capacity (const Geometry&, size_t e, double dt) 
     /* [cm] */ const = 0;
   virtual void infiltrate (const Geometry&, size_t e,
-                           double amount /* [cm] */) = 0;
+                           double amount /* [cm] */, double dt /* [h] */);
+  void clear ();
   virtual void update_matrix_sink (const Geometry& geo,    
                                    const Soil& soil,  
                                    const SoilHeat& soil_heat, 

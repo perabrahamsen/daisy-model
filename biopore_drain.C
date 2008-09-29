@@ -56,8 +56,6 @@ struct BioporeDrain : public Biopore
   
   double capacity (const Geometry& geo, size_t e, const double dt) const
   { return max_infiltration_rate (geo, e) * dt; }
-  void infiltrate (const Geometry&, size_t, double /* [cm] */)
-  { }
 
   double matrix_biopore_drain (size_t c, const Geometry& geo, 
                                const Soil& soil, bool active, 
@@ -186,53 +184,6 @@ BioporeDrain::update_matrix_sink (const Geometry& geo,
                                    pressure_limit, K_xx, h[c]);
     }
 }
-
-template <class T>
-std::string stringify (const T& x)
-{
-  std::ostringstream tmp;
-  tmp << x;
-  return tmp.str ();
-}
-
-#define TREELOG_INDEX(msg, key, index) \
-  Treelog::Open nest (msg, stringify (key) + " = " + stringify (index))
-
-#define TREELOG_MODEL1(msg) \
-  Treelog::Open nest (msg, this->library_id () + ": " + this->name \
-                      + " " + __FUNCTION__)
-
-#if 0
-void 
-BioporeDrain::matrix_solute (const Geometry& geo, const double dt, 
-                             const Chemical& chemical, 
-                             std::vector<double>& source_chem,
-                             Treelog& msg)
-{
-  TREELOG_MODEL1 (msg);
-  const symbol chem = chemical.name;
-  const size_t cell_size = geo.cell_size ();
-  daisy_assert (source_chem.size () == cell_size);
-  
-  // From matrix to biopore.
-  for (size_t c = 0; c < cell_size; c++)
-    {
-      TREELOG_INDEX (msg, "cell", c);
-      const double water_sink = S[c]; // [cm^3 W/cm^3 S/h]
-      daisy_assert (water_sink >= 0.0);
-      const double C = chemical.C_secondary (c); // [g/cm^3 W]
-      source_chem[c] -= water_sink * C; // [g/cm^3 S/h]
-      if (!iszero (source_chem[c]))
-        {
-          std::stringstream tmp;
-          tmp << "soruce_chem = " << source_chem[c] << ", S = " << S[c] 
-              << ", C = " << C;
-          msg.message (tmp.str ());
-        }
-    }
-
-}
-#endif
 
 BioporeDrain::BioporeDrain (Block& al)
   : Biopore (al),

@@ -96,7 +96,8 @@ struct BioporeMatrix : public Biopore
   // Simulation.
   double capacity (const Geometry& geo, size_t e, const double dt /* [h] */)
     /* [cm] */ const;
-  void infiltrate (const Geometry&, size_t e, double amount /* [cm] */);
+  void infiltrate (const Geometry&, size_t e, double amount /* [cm] */,
+                   double dt /* [h] */);
 
   double matrix_biopore_matrix (size_t c, const Geometry& geo, 
                                 const Soil& soil, bool active, 
@@ -258,8 +259,9 @@ BioporeMatrix::capacity (const Geometry& geo, size_t e, const double dt) const
 
 void 
 BioporeMatrix::infiltrate (const Geometry& geo, const size_t e,
-                           const double amount /* [cm] */)
+                           const double amount /* [cm] */, const double dt)
 { 
+  Biopore::infiltrate (geo, e, amount, dt);
   const size_t cell = geo.edge_other (e, Geometry::cell_above);
   daisy_assert (cell < geo.cell_size ());
   daisy_assert (cell < column.size ());

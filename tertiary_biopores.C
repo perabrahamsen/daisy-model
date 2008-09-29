@@ -88,6 +88,7 @@ struct TertiaryBiopores : public Tertiary, public Tertsmall
   // Infiltration.
   double capacity (const Geometry&, size_t e, double dt); // Max flux.
   void infiltrate (const Geometry&, size_t e, double amount, double dt);
+  void clear ();
 
   // Simulation.
   bool use_small_timesteps () const
@@ -217,7 +218,7 @@ TertiaryBiopores::infiltrate (const Geometry& geo, const size_t e,
       if (capacity <= share)
         {
           // Insuffient space, fill it up.  
-          biopore.infiltrate (geo, e, capacity);
+          biopore.infiltrate (geo, e, capacity, dt);
 
           // Now remove the biopore class for consideration.
           amount -= capacity;
@@ -250,8 +251,16 @@ TertiaryBiopores::infiltrate (const Geometry& geo, const size_t e,
       // Infiltrate according to relative density.
       daisy_assert (total_density > 0.0);
       const double share = amount * density / total_density;
-      biopore.infiltrate (geo, e, share);
+      biopore.infiltrate (geo, e, share, dt);
     }
+}
+
+void
+TertiaryBiopores::clear ()
+{
+  const size_t classes_size = classes.size ();
+  for (size_t b = 0; b < classes_size; b++)
+    classes[b]->clear ();
 }
 
 void
@@ -265,11 +274,14 @@ TertiaryBiopores::tick (const Units&, const Geometry& geo, const Soil& soil,
   const size_t edge_size = geo.edge_size ();
   std::vector<double> q_tertiary (edge_size, 0.0);
 
+  // Clear old infiltration.
+  clear ();
+
   // Infiltration.
   const std::vector<size_t>& edge_above = geo.cell_edges (Geometry::cell_above);
   const size_t edge_above_size = edge_above.size ();
 
-  // Find flux.
+  // Find new flux.
   for (size_t i = 0; i < edge_above_size; i++)
     {
       const size_t edge = edge_above[i];
