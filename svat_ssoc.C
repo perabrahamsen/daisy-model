@@ -335,7 +335,7 @@ SVAT_SSOC::calculate_conductances (const double g_s /* stomata cond. [m/s]*/, Tr
   g_W_sun_c = 1./r_W_sun_c;
 
   //Shadow fraction --------------------------------------------------
-  const double LAI_shadow = LAI * (1 - sun_LAI_fraction_total);
+  const double LAI_shadow = LAI * (1. - sun_LAI_fraction_total);
   const double gbu_shadow_heat = Resistance::gbu_sun(gbu_heat, LAI, kb);
   const double gbf_shadow_heat = Resistance::gbf_sun(gbf_heat, LAI_shadow);
   // Heat conductance from shadow leaves to canopy point
@@ -346,7 +346,7 @@ SVAT_SSOC::calculate_conductances (const double g_s /* stomata cond. [m/s]*/, Tr
   // Water conductance from shadow leaves to canopy point 
   // - sum of boundary and stomata
   const double r_W_shadow_c = 1./(gbu_shadow_H2O + gbf_shadow_H2O)
-                            + 1./(g_s * (1-sun_LAI_fraction_total));
+                            + 1./(g_s * (1.-sun_LAI_fraction_total));
   g_W_shadow_c =1./r_W_shadow_c;
 
   /*
@@ -624,11 +624,11 @@ False for amphistomatous leaves (possesing stomata on both surfaces).");
   alist.add ("hypostomatous", true);
   
   // For log.
-  syntax.add ("T_s", "dg C", Syntax::LogOnly, "Soil surface temperature.");
-  syntax.add ("T_0", "dg C", Syntax::LogOnly, "Surface temperature (large scale).");
-  syntax.add ("T_c", "dg C", Syntax::LogOnly, "Canopy-point temperature.");
-  syntax.add ("T_sun", "dg C", Syntax::LogOnly, "Temperature of sunlit leaves.");
-  syntax.add ("T_shadow", "dg C", Syntax::LogOnly, "Temperature of shadow leaves.");
+  syntax.add ("T_s", "K", Syntax::LogOnly, "Soil surface temperature.");
+  syntax.add ("T_0", "K", Syntax::LogOnly, "Surface temperature (large scale).");
+  syntax.add ("T_c", "K", Syntax::LogOnly, "Canopy-point temperature.");
+  syntax.add ("T_sun", "K", Syntax::LogOnly, "Temperature of sunlit leaves.");
+  syntax.add ("T_shadow", "K", Syntax::LogOnly, "Temperature of shadow leaves.");
   syntax.add ("g_a", "m s^-1", Syntax::LogOnly, 
               "Heat conductance in the atmosphere - from canopy point \n\
 to reference height (screen height).");

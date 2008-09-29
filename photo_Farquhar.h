@@ -103,7 +103,7 @@ private:
 public:
   double assimilate (const Units&, 
                      const double ABA_xylem, const double rel_hum, 
-		     const double CO2_atm, double Ta, double Tl,
+		     const double CO2_atm, double Ta, double Tc, double Tl,
                      const double cropN,
 		     const std::vector<double>& PAR,
 		     const std::vector<double>& PAR_Height,

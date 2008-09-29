@@ -32,7 +32,7 @@ namespace Resistance
   //             Using Terra and Agua MODIS and Weather Prediction Data.
   //             Institute of Geography, University of Copenhagen.
   
-  const double P_surf = 101300;  //Surface atmospheric pressure [Pa]
+  const double P_surf = 101300.0;  //Surface atmospheric pressure [Pa]
   const double TK = 273.15;      //Constant to convert celcius to Kelvin []
   const double v = 0.00001327;   // Molecular viscosity [m^2 s^-1]
   const double d_heat = 0.00001869; // Diffusivity of heat [m^2 s^-1]
@@ -94,38 +94,38 @@ namespace Resistance
   
   // Total conductance (leaf boundary + atmospheric) of the sunlit and shadow 
 // canopy fraction 
-double gc_fraction (const double gb_j /*[m s¯1]*/, 
+  double gc_fraction (const double gb_j /*[m s¯1]*/, 
                         const double ra /* aerodynamic resistance [s m¯1]*/); //[m s¯1]
 
 //----------------------------------------------------
 // Atmospheric aerodynamic resistance
 //----------------------------------------------------
 // Roughness lenght 
-double z_0h (const double z_0 /*roughness lenght [m]*/); //[m]
-double z_0 (const double h_veg /* vegetation heighr [m]*/, 
+  double z_0h (const double z_0 /*roughness lenght [m]*/); //[m]
+  double z_0 (const double h_veg /* vegetation heighr [m]*/, 
               const double c_drag /* drag force [m^2 m^-2]*/,
               const double d /* zero-plane displacement height [m]*/,
               const double LAI /*[m^2 m^-2]*/); //[m]
-// Zero-plane displacement height
-double d (const double h_veg /* vegetation heighr [m]*/, 
+  // Zero-plane displacement height
+  double d (const double h_veg /* vegetation heighr [m]*/, 
             const double c_drag /* drag force [m^2 m^-2]*/,
             const double LAI /*[m^2 m^-2]*/); //[m]
   
-// Atmospheric stability indicator
-double N (const double z /* reference height above canopy [m]*/, 
+  // Atmospheric stability indicator
+  double N (const double z /* reference height above canopy [m]*/, 
             const double d /* displacement height [m]*/,
             const double T_0 /* land surface temp [dg C]*/, 
             const double T_a /* air temp [dg C]*/, 
             const double U_z /* surface wind speed [m s^-1]*/); //[]
-
-// Aerodynamic resistance between canopy source height and reference 
-// height above the canopy (F5)
-double r_a (const double z /* reference height above canopy [m]*/, 
-            const double z_0 /* Roughness lenght for momentum transport [m]*/, 
-            const double z_0h /* Roughness lenght for sensible heat transfer[m]*/,
-            const double d /* displacement height [m]*/,
-            const double N /* atm stability indicator []*/, 
-            const double U_z /* surface wind speed [m s^-1]*/); //[s m^-1]
+  
+  // Aerodynamic resistance between canopy source height and reference 
+  // height above the canopy (F5)
+  double r_a (const double z /* reference height above canopy [m]*/, 
+              const double z_0 /* Roughness lenght for momentum transport [m]*/, 
+              const double z_0h /* Roughness lenght for sensible heat transfer[m]*/,
+              const double d /* displacement height [m]*/,
+              const double N /* atm stability indicator []*/, 
+              const double U_z /* surface wind speed [m s^-1]*/); //[s m^-1]
   
 //----------------------------------------------------
 // Soil aerodynamic resistance (Norman et al., 1995 cf. Rasmus Houborg)
@@ -171,8 +171,6 @@ double r_a (const double z /* reference height above canopy [m]*/,
               const double T_l_sha /* leaf shadow temperature [dg C]*/,
               const double kb /* extinction coefficient []*/,
               const double LAI /*[m^2 m^-2]*/); // [dg C]
-
-
 
 //--------------------------------------
 // and left overs - miscelaneours 

@@ -112,7 +112,7 @@ PhotoFarquhar:: Sat_vapor_pressure (const double T /*[degree C]*/) const
 double
 PhotoFarquhar:: GSTModel(const double CO2_atm, double ABA_effect, double pn, double rel_hum /*[unitless]*/, 
 			 double LA, double fraction, double gbw/*[mol/m2 leaf/s]*/, 
-			 const double Ta, const double Tl, Treelog& msg) 
+			 const double Tc, const double Tl, Treelog& msg) 
 {
 
   const double wsf = ABA_effect; //water stress function []
@@ -133,7 +133,7 @@ PhotoFarquhar:: GSTModel(const double CO2_atm, double ABA_effect, double pn, dou
     pz = pn;
 
   // Saturated vapor pressure in the air
-  const double va = rel_hum * Sat_vapor_pressure (Ta);
+  const double va = rel_hum * Sat_vapor_pressure (Tc);
   const double wa = va / Ptot;    //[unitless] 
   // Relative saturated vapor pressure at the leaf surface
   const double wi = Sat_vapor_pressure (Tl) / Ptot;
@@ -173,7 +173,8 @@ double
 PhotoFarquhar::assimilate (const Units& units,
                            const double ABA_xylem, const double rel_hum, 
 			   const double CO2_atm,
-			   const double Ta, const double Tl, const double cropN,
+			   const double, const double Tc, const double Tl,
+                           const double cropN,
 			   const std::vector<double>& PAR, 
 			   const std::vector<double>& PAR_height,
 			   const double PAR_LAI,
@@ -305,7 +306,7 @@ PhotoFarquhar::assimilate (const Units& units,
 	      CxModel(CO2_atm, pn, ci, dPAR /*[mol/m²leaf/s]*/, 
                       gsw, Tl, vmax25, rd, msg);//[mol/m²leaf/s/fraction]
 	      gsw = GSTModel(CO2_atm, ABA_effect, pn, rel_hum, LA, 
-                    fraction[i], gbw, Ta, Tl, msg);//[mol/s/m²leaf/fraction]
+                    fraction[i], gbw, Tc, Tl, msg);//[mol/s/m²leaf/fraction]
 
 	      iter++;
 	      if(iter > maxiter)
