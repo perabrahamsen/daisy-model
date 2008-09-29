@@ -671,9 +671,9 @@ fTrue iff solutes should be transport with the water through the biopores.");
 Limit to pressure difference for moving matrix water gradient to biopores.\n\
 \n\
 The idea is that the water is extracted from the matrix by a\n\
-continious stream of water in the biopore, and that the suction is\n\
-equal to the length of this stream.  The maximum suction is then the\n\
-maximal length of the stream, or the point where the stream breaks.\n\
+hanging water column in the biopore, and that the suction is equal\n\
+to the height of this water column.  The pressure limit is then the\n\
+maximal length of the column, or the point where the column breaks.\n\
 \n\
 By default, this is equal to 'pressure_end'.");
     syntax.add ("pressure_barrier", "cm", Check::non_negative (), Syntax::Const,

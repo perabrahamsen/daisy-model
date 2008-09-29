@@ -1,3 +1,17 @@
+2008-09-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.50 released.
+
+2008-09-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* biopore.C, biopore.h (infiltration): New parameter.
+	* biopore.C, biopore.h (infiltrate): Set it.
+	* biopore.C, biopore.h (clear): New function.
+	* biopore_drain.C, biopore_matrix.C (infiltrate): Adjust derived.
+	* tertiary_biopores.C: Adjust callers.
+	* lib/log-std.dai ("Field water"): Log it.
+	("Field water balance"): Ditto.
+
 2008-09-28  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.49 released.
