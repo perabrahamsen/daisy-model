@@ -47,7 +47,7 @@ public:
 public:
   bool check () const;
   ParserFile (Block&);
-  ParserFile (Metalib&, const std::string& n, Treelog&);
+  ParserFile (Metalib&, const std::string& filename, Treelog&);
   ~ParserFile ();
 };
 

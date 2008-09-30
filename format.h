@@ -36,15 +36,15 @@ class Format : public Model
 public:
   static const char *const component;
   symbol library_id () const;
-  virtual std::string format_type () const;
+  virtual symbol format_type () const;
 private:
   std::ostream* output;
 protected:
   std::ostream& out ();
 private:
-  std::stack<std::string> nest;
-  void push (const std::string& name);
-  void pop (const std::string& name);
+  std::stack<symbol> nest;
+  void push (const symbol name);
+  void pop (const symbol name);
   
   // List.
 private:
@@ -64,7 +64,7 @@ public:
 
   // Item.
 private:
-  virtual void item_open (const std::string& name) = 0;
+  virtual void item_open (const symbol name) = 0;
   virtual void item_close () = 0;
 public:
   class Item
@@ -73,14 +73,14 @@ public:
     Format& format;
     Item (const Item&);
   public:
-    Item (Format&, const std::string& name);
+    Item (Format&, const symbol name);
     ~Item ();  
   };
   friend class Item;
 
   // Table.
 private:
-  virtual void table_open (const std::string& format) = 0;
+  virtual void table_open (const symbol format) = 0;
   virtual void table_close () = 0;
 public:
   class Table
@@ -89,7 +89,7 @@ public:
     Format& format;
     Table (const Table&);
   public:
-    Table (Format&, const std::string& format);
+    Table (Format&, const symbol format);
     ~Table ();  
   };
   friend class Table;
@@ -129,7 +129,7 @@ public:
   // MultiCell
 private:
   virtual void table_multi_cell_open (int cells, 
-				      const std::string& format) = 0;
+				      const symbol format) = 0;
   virtual void table_multi_cell_close () = 0;
 public:
   class TableMultiCell
@@ -138,7 +138,7 @@ public:
     Format& format;
     TableMultiCell (const TableMultiCell&);
   public:
-    TableMultiCell (Format&, int cells, const std::string& format);
+    TableMultiCell (Format&, int cells, const symbol format);
     ~TableMultiCell ();  
   };
   friend class TableMultiCell;
@@ -161,9 +161,9 @@ public:
 
   // Section.
 private:
-  virtual void section_open (const std::string& type, const std::string& title,
-			     const std::string& scope, 
-			     const std::string& label) = 0;
+  virtual void section_open (const symbol type, const symbol title,
+			     const symbol scope, 
+			     const symbol label) = 0;
   virtual void section_close () = 0;
 public:
   class Section
@@ -172,8 +172,8 @@ public:
     Format& format;
     Section (const Section&);
   public:
-    Section (Format&, const std::string& type, const std::string& title,
-	     const std::string& scope, const std::string& label);
+    Section (Format&, const symbol type, const symbol title,
+	     const symbol scope, const symbol label);
     ~Section ();  
   };
   friend class Section;
@@ -196,23 +196,23 @@ public:
 
   // Use.
 public:
-  virtual void text (const std::string& text) = 0;
-  virtual void bold (const std::string& text) = 0;
-  virtual void italic (const std::string& text) = 0;
-  virtual void verbatim (const std::string& text) = 0;
-  virtual void raw (const std::string& format, const std::string& text) = 0;
-  virtual bool formatp (const std::string& format) = 0;
-  virtual void special (const std::string& name) = 0;
+  virtual void text (const symbol text) = 0;
+  virtual void bold (const symbol text) = 0;
+  virtual void italic (const symbol text) = 0;
+  virtual void verbatim (const symbol text) = 0;
+  virtual void raw (const symbol format, const symbol text) = 0;
+  virtual bool formatp (const symbol format) = 0;
+  virtual void special (const symbol name) = 0;
   virtual void soft_linebreak () = 0;
   virtual void hard_linebreak () = 0;
   virtual void new_paragraph () = 0;
-  virtual void index (const std::string& name) = 0;
-  virtual void label (const std::string& scope, const std::string& id) = 0;
-  virtual void pageref (const std::string& scope, const std::string& id) = 0;
-  virtual void ref (const std::string& scope, const std::string& id) = 0;
-  virtual void see (const std::string& type,
-		    const std::string& scope, const std::string& id) = 0;
-  virtual void see_page (const std::string& scope, const std::string& id) = 0;
+  virtual void index (const symbol name) = 0;
+  virtual void label (const symbol scope, const symbol id) = 0;
+  virtual void pageref (const symbol scope, const symbol id) = 0;
+  virtual void ref (const symbol scope, const symbol id) = 0;
+  virtual void see (const symbol type,
+		    const symbol scope, const symbol id) = 0;
+  virtual void see_page (const symbol scope, const symbol id) = 0;
   virtual void alist_description (const AttributeList&);
 
   // Create and Destroy.

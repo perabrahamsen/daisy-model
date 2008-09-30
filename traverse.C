@@ -47,14 +47,14 @@ void
 Traverse::traverse_all_submodels ()
   // Traverse through all registered submodels.
 {
-  std::vector<std::string> submodels;
+  std::vector<symbol> submodels;
   Submodel::all (submodels);
 
   for (unsigned int i = 0; i < submodels.size (); i++)
     {
       Syntax syntax;
       AttributeList alist;
-      const std::string& submodel = submodels[i];
+      const symbol submodel = submodels[i];
       Submodel::load_syntax (submodel, syntax, alist);
       traverse_submodel_default (syntax, alist, submodel);
     }
@@ -110,7 +110,7 @@ Traverse::traverse_model (const symbol component, const symbol model)
 void
 Traverse::traverse_submodel (const Syntax& syntax, AttributeList& alist,
 			     const AttributeList& default_alist,
-			     const std::string& name)
+			     const symbol name)
   // Traverse through a submodel, typically a nested alist.
 {
   if (enter_submodel (syntax, alist, default_alist, name))
@@ -123,7 +123,7 @@ Traverse::traverse_submodel (const Syntax& syntax, AttributeList& alist,
 void
 Traverse::traverse_submodel_default (const Syntax& syntax, 
 				     const AttributeList& default_alist,
-				     const std::string& name)
+				     const symbol name)
   // Traverse through a submodel with no actual value, but a default
   // value.  This only happens in buildin models.
 {
@@ -140,7 +140,7 @@ void
 Traverse::traverse_submodel_sequence (const Syntax& syntax,
 				      const AttributeList& alist,
 				      const AttributeList& default_alist,
-				      const std::string& name, unsigned index)
+				      const symbol name, unsigned index)
   // Traverse through a submodel, typically a nested alist.
 {
   if (enter_submodel_sequence (syntax, alist, default_alist, name, index))
@@ -154,7 +154,7 @@ void
 Traverse::traverse_submodel_sequence_default (const Syntax& syntax, 
 					      const AttributeList&
 					      /**/ default_alist,
-					      const std::string& name)
+					      const symbol name)
   // Traverse through the common default value for members of a
   // submodel sequence.
 {
@@ -171,7 +171,7 @@ void
 Traverse::traverse_object (const Library& library, 
 			   const Syntax& syntax, AttributeList& alist,
 			   const AttributeList& default_alist,
-			   const std::string& name)
+			   const symbol name)
   // Traverse through a object parameter value.
 {
   if (enter_object (library, syntax, alist, default_alist, name))
@@ -186,7 +186,7 @@ Traverse::traverse_object_sequence (const Library& library,
 				    const Syntax& syntax, 
 				    const AttributeList& alist,
 				    const AttributeList& default_alist,
-				    const std::string& name, unsigned index)
+				    const symbol name, unsigned index)
   // Traverse through a object parameter value.
 {
   if (enter_object_sequence (library, syntax, alist, default_alist, 
@@ -200,20 +200,20 @@ Traverse::traverse_object_sequence (const Library& library,
 void
 Traverse::traverse_alist (const Syntax& syntax, const AttributeList& alist,
 			  const AttributeList& default_alist,
-			  const std::string& name)
+			  const symbol name)
   // Generic code to traverse through any kind of alist.
   // This is only a helper function for the more specific traversals,
   // such as 'traverse_model'.
 {
-  const std::vector<std::string>& order = syntax.order ();
+  const std::vector<symbol>& order = syntax.order ();
   for (unsigned int i = 0; i < order.size (); i++)
     traverse_parameter (syntax, alist, default_alist, name, order[i]);
 
-  std::vector<std::string> parameters;
+  std::vector<symbol> parameters;
   syntax.entries (parameters);
   for (unsigned int i = 0; i < parameters.size (); i++)
     {
-      const std::string& parameter = parameters[i];
+      const symbol parameter = parameters[i];
       if (syntax.order_index (parameter) < 0)
 	traverse_parameter (syntax, alist, default_alist, name, parameter);
   }
@@ -222,7 +222,7 @@ Traverse::traverse_alist (const Syntax& syntax, const AttributeList& alist,
 void
 Traverse::traverse_parameter (const Syntax& syntax, const AttributeList& alist,
 			      const AttributeList& default_alist,
-			      const std::string& name, const std::string& parameter)
+			      const symbol name, const symbol parameter)
   // Traverse through an alist member.  This is most interesting for
   // alist and object members, of course.
 {

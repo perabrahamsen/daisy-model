@@ -29,7 +29,7 @@
 
 struct TreelogText::Implementation
 {
-  std::deque<std::string> path;
+  std::deque<symbol> path;
   std::deque<bool> touched;
 
   Implementation ()
@@ -52,14 +52,14 @@ TreelogText::header ()
 	  for (unsigned int j = 0; j <= i; j++)
 	    write ("*");
 	  write (" ");
-          write (impl->path[i]);
+          write (impl->path[i].name ());
           write ("\n");
 	}
     }
 }
 
 void
-TreelogText::open (const std::string& name)
+TreelogText::open (const symbol name)
 { 
   impl->path.push_back (name); 
   impl->touched.push_back (false); 

@@ -121,8 +121,8 @@ ScopeBlock::dimension (symbol tag_symbol) const
   //Handle primitive numbers.
   if (type == Syntax::Number)
     {
-      const std::string& dim = syntax.dimension (tag); 
-      if (dim != Syntax::User ())
+      const symbol dim = syntax.dimension (tag); 
+      if (dim != Syntax::user ())
         return symbol (dim);
       if (!alist.check (tag))
         return Syntax::unknown ();

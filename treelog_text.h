@@ -49,7 +49,7 @@ protected:
 
   // Nesting.
 public:
-  void open (const std::string& name);
+  void open (const symbol name);
   void close ();
 
   // Use.

@@ -508,19 +508,12 @@ unit conversation.");
   alist.add ("allow_old_units", true);
 }
 
-#if 0
 Units::Units (Metalib& metalib)
+#if 1
   : allow_old_ (metalib.alist ().flag ("allow_old_units"))
-{ 
-  const Library& library = metalib.library (Unit::component);
-  std::vector<symbol> entries;
-  library.entries (entries);
-  for (size_t i = 0; i < entries.size (); i++)
-    add_unit (metalib, entries[i]);
-}
 #else
-Units::Units (Metalib& metalib)
   : allow_old_ (true)
+#endif
 { 
   const Library& library = metalib.library (Unit::component);
   std::vector<symbol> entries;
@@ -528,7 +521,6 @@ Units::Units (Metalib& metalib)
   for (size_t i = 0; i < entries.size (); i++)
     add_unit (metalib, entries[i]);
 }
-#endif
 
 Units::~Units ()
 {

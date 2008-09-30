@@ -81,7 +81,7 @@ public:
   static const char *const description;
   static const char *const component;
   symbol library_id () const;
-  std::string get_description () const;
+  symbol get_description () const;
   enum type_t { NumberSingleton, NumberSequence };
   virtual type_t type () const = 0;
   virtual symbol dimension () const;

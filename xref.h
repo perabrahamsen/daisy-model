@@ -23,7 +23,6 @@
 #define XREF_H
 
 #include "symbol.h"
-#include <string>
 #include <map>
 #include <vector>
 #include <set>
@@ -46,17 +45,17 @@ public:
   {
     symbol component;
     symbol model;
-    std::vector<std::string> path;
+    std::vector<symbol> path;
     bool operator< (const ModelUser&) const;
-    ModelUser (symbol com, symbol mod, const std::vector<std::string>& p);
+    ModelUser (symbol com, symbol mod, const std::vector<symbol>& p);
   };
 
   struct SubmodelUser
   {
-    std::string submodel;
-    std::vector<std::string> path;
+    symbol submodel;
+    std::vector<symbol> path;
     bool operator< (const SubmodelUser&) const;
-    SubmodelUser (const std::string& sub, const std::vector<std::string>& p);
+    SubmodelUser (const symbol sub, const std::vector<symbol>& p);
     SubmodelUser ();
   };
 
@@ -67,8 +66,8 @@ public:
     Users ();
   };
 
-  std::map<std::string, Users, std::less<std::string>/**/> submodels;
-  std::map<ModelUsed, Users, std::less<ModelUsed>/**/> models;
+  std::map<symbol, Users> submodels;
+  std::map<ModelUsed, Users> models;
   std::map<symbol, Users> components;
 
   // Create and Destroy.

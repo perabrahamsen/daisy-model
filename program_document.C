@@ -52,29 +52,29 @@ struct ProgramDocument : public Program
   symbol current_component;
 
   // LaTeX functions.
-  void print_description (const std::string& description);
+  void print_description (const symbol description);
 
   // Private functions.
-  void print_string (const std::string&);
+  void print_string (const symbol);
 
   // Document functions.
-  void print_entry_type (const std::string& name,
+  void print_entry_type (const symbol name,
 			 const Syntax& syntax,
 			 const AttributeList& alist);
-  void print_entry_submodel (const std::string& name, 
+  void print_entry_submodel (const symbol name, 
 			     int level,
 			     const Syntax& syntax,
 			     const AttributeList& alist,
-			     const std::string& aref);
-  void print_entry_category (const std::string& name, 
+			     const symbol aref);
+  void print_entry_category (const symbol name, 
 			     const Syntax& syntax,
 			     const AttributeList& alist);
-  void print_entry_value (const std::string& name, 
+  void print_entry_value (const symbol name, 
 			  const Syntax& syntax,
 			  const AttributeList& alist);
 
   void print_users (const XRef::Users&);
-  void print_sample_entry (const std::string& name, 
+  void print_sample_entry (const symbol name, 
 			   const Syntax& syntax,
 			   const AttributeList& alist,
 			   bool last);
@@ -82,40 +82,40 @@ struct ProgramDocument : public Program
   // Print parts of it.
   static void own_entries (const Metalib&,
                            const Library& library, const symbol name, 
-                           std::vector<std::string>& entries, 
+                           std::vector<symbol>& entries, 
                            bool new_only = false);
   static void inherited_entries (const Metalib&, const Library& library,
                                  const symbol name, 
-                                 std::vector<std::string>& entries);
-  void print_sample (const std::string& name,
+                                 std::vector<symbol>& entries);
+  void print_sample (const symbol name,
 		     const Syntax& syntax, const AttributeList& alist,
 		     bool top_level);
   void print_sample (const symbol name, const Library&);
-  void print_sample_name (const std::string& name, bool top_level);
+  void print_sample_name (const symbol name, bool top_level);
   void print_sample_end ();
-  void print_sample_entries (const std::string& name,
+  void print_sample_entries (const symbol name,
                              const Syntax& syntax,
                              const AttributeList& alist,
-                             const std::vector<std::string>& order,
-                             const std::vector<std::string>& own_entries,
-                             const std::string& lib_name,
-                             const std::vector<std::string>& base_entries,
+                             const std::vector<symbol>& order,
+                             const std::vector<symbol>& own_entries,
+                             const symbol lib_name,
+                             const std::vector<symbol>& base_entries,
 			     bool top_level);
-  void print_submodel (const std::string& name, int level,
+  void print_submodel (const symbol name, int level,
 		       const Syntax& syntax,
 		       const AttributeList& alist, 
-		       const std::string& aref);
-  void print_submodel_entries (const std::string& name, int level,
+		       const symbol aref);
+  void print_submodel_entries (const symbol name, int level,
                                const Syntax& syntax, 
                                const AttributeList& alist,
-                               const std::vector<std::string>& entries, 
-			       const std::string& aref);
-  void print_submodel_entry (const std::string&, int level,
+                               const std::vector<symbol>& entries, 
+			       const symbol aref);
+  void print_submodel_entry (const symbol, int level,
                              const Syntax& syntax,
                              const AttributeList& alist, bool& first, 
-			     const std::string& aref);
+			     const symbol aref);
   void print_model (symbol name, const Library& library, Treelog&);
-  void print_fixed (const std::string& name, 
+  void print_fixed (const symbol name, 
 		    const Syntax& syntax,
 		    const AttributeList& alist);
   void print_component (const Library& library, Treelog& msg);
@@ -149,15 +149,15 @@ struct ProgramDocument : public Program
 };
 
 void
-ProgramDocument::print_string (const std::string& name)
+ProgramDocument::print_string (const symbol name)
 {
   std::ostringstream tmp;
-  PrinterFile::print_string (tmp, name);
+  PrinterFile::print_string (tmp, name.name ());
   format->text (tmp.str ());
 }
 
 void
-ProgramDocument::print_description (const std::string& description)
+ProgramDocument::print_description (const symbol description)
 { 
   format->soft_linebreak ();
   format->text (description);
@@ -165,7 +165,7 @@ ProgramDocument::print_description (const std::string& description)
 }
 
 void 
-ProgramDocument::print_entry_type (const std::string& name,
+ProgramDocument::print_entry_type (const symbol name,
 				   const Syntax& syntax,
 				   const AttributeList& alist)
 {
@@ -176,7 +176,7 @@ ProgramDocument::print_entry_type (const std::string& name,
     case Syntax::Number:
       {
 	format->text ("number ");
-	const std::string& dimension = syntax.dimension (name);
+	const symbol dimension = syntax.dimension (name);
 	if (dimension == Syntax::None ())
 	  format->text ("(dimensionless)");
 	else if (dimension == Syntax::Unknown ())
@@ -204,8 +204,8 @@ ProgramDocument::print_entry_type (const std::string& name,
     case Syntax::PLF:
       {
 	format->text ("plf ");
-	const std::string& domain = syntax.domain (name);
-	const std::string& range = syntax.range (name);
+	const symbol domain = syntax.domain (name);
+	const symbol range = syntax.range (name);
 	format->bold ("[" + domain);
         format->text (" ");
 	// format->special("nbsp");
@@ -242,11 +242,11 @@ ProgramDocument::print_entry_type (const std::string& name,
 }
 
 void 
-ProgramDocument::print_entry_submodel (const std::string& name, 
+ProgramDocument::print_entry_submodel (const symbol name, 
 				       const int level,
 				       const Syntax& syntax,
 				       const AttributeList& alist,
-				       const std::string& aref)
+				       const symbol aref)
 {
   const Syntax::type type = syntax.lookup (name);
   const int size = syntax.size (name);
@@ -267,7 +267,7 @@ ProgramDocument::print_entry_submodel (const std::string& name,
 }
     
 void 
-ProgramDocument::print_entry_category (const std::string& name, 
+ProgramDocument::print_entry_category (const symbol name, 
 				       const Syntax& syntax,
 				       const AttributeList& alist)
 {
@@ -342,7 +342,7 @@ ProgramDocument::print_entry_category (const std::string& name,
 }
 
 void 
-ProgramDocument::print_entry_value (const std::string& name, 
+ProgramDocument::print_entry_value (const symbol name, 
 				    const Syntax& syntax,
 				    const AttributeList& alist)
 {
@@ -375,7 +375,7 @@ ProgramDocument::print_entry_value (const std::string& name,
 	      if (Submodel::is_submodel (syntax, alist, name))
 		{
 		  const AttributeList& nested = alist.alist (name);
-		  const std::string submodel
+		  const symbol submodel
 		    = Submodel::find_submodel (syntax, alist, name);
 		  Syntax nested_syntax;
 		  AttributeList default_alist;
@@ -409,7 +409,7 @@ ProgramDocument::print_entry_value (const std::string& name,
 	    break;
 	  case Syntax::String:
 	    {
-	      const std::string& value = alist.name (name);
+	      const std::string value = alist.name (name);
 	      if (value.length () < 30)
 		format->text (" (default `" + value + "')");
 	      else
@@ -509,7 +509,7 @@ ProgramDocument::print_users (const XRef::Users& users)
 	}
       const symbol component = (*i).component;
       const symbol model = (*i).model;
-      const std::vector<std::string>& path = (*i).path;
+      const std::vector<symbol>& path = (*i).path;
       format->text (component.name () + " " + model.name () + " ");
       for (unsigned int j = 0; j < path.size (); j++)
 	format->text (" " + path[j]);
@@ -536,8 +536,8 @@ ProgramDocument::print_users (const XRef::Users& users)
 	  format->text (",");
 	  format->soft_linebreak ();
 	}
-      const std::string submodel = (*i).submodel;
-      const std::vector<std::string>& path = (*i).path;
+      const symbol submodel = (*i).submodel;
+      const std::vector<symbol>& path = (*i).path;
       format->text (submodel + " @");
       for (unsigned int j = 0; j < path.size (); j++)
 	format->text (" " + path[j]);
@@ -549,7 +549,7 @@ ProgramDocument::print_users (const XRef::Users& users)
 }
 
 void
-ProgramDocument::print_sample_entry (const std::string& name, 
+ProgramDocument::print_sample_entry (const symbol name, 
 				     const Syntax& syntax,
 				     const AttributeList& alist,
 				     const bool last)
@@ -576,7 +576,7 @@ ProgramDocument::print_sample_entry (const std::string& name,
 		format->special ("nbsp");
 		std::ostringstream tmp;
 		tmp << alist.number (name);
-                const std::string& dimension = syntax.dimension (name);
+                const symbol dimension = syntax.dimension (name);
                 if (dimension == Syntax::None ())
                   tmp << " []";
                 else if (dimension == Syntax::Unknown ())
@@ -608,7 +608,7 @@ ProgramDocument::print_sample_entry (const std::string& name,
 	      break;
 	    case Syntax::String:
 	      {
-		const std::string& value = alist.name (name);
+		const std::string value = alist.name (name);
 		if (value.length () < 20)
 		  {
 		    format->special ("nbsp");
@@ -631,7 +631,7 @@ ProgramDocument::print_sample_entry (const std::string& name,
 	      {
 		const AttributeList& object = alist.alist (name);
 		daisy_assert (object.check ("type"));
-		const std::string& type = object.name ("type");
+		const symbol type = object.name ("type");
 		comment = "Default " + type + " value.";
 	      }
 	      break;
@@ -717,7 +717,7 @@ ProgramDocument::print_sample_entry (const std::string& name,
 void
 ProgramDocument::own_entries (const Metalib& metalib,
                               const Library& library, const symbol name, 
-			      std::vector<std::string>& entries,
+			      std::vector<symbol>& entries,
                               const bool new_only)
 {
   const Syntax& syntax = library.syntax (name);
@@ -736,11 +736,11 @@ ProgramDocument::own_entries (const Metalib& metalib,
         {
           const Syntax& base_syntax = library.syntax (base_model);
           const AttributeList& base_alist = library.lookup (base_model);
-          std::vector<std::string> base_entries;
+          std::vector<symbol> base_entries;
           base_syntax.entries (base_entries);
           for (size_t i = 0; i < base_entries.size (); i++)
             {
-              const std::string& key = base_entries[i];
+              const symbol key = base_entries[i];
               if (new_only
                   || key == "description"
                   || alist.subset (metalib, base_alist, base_syntax, key))
@@ -753,7 +753,7 @@ ProgramDocument::own_entries (const Metalib& metalib,
 void
 ProgramDocument::inherited_entries (const Metalib& metalib,
                                     const Library& library, const symbol name, 
-				    std::vector<std::string>& entries)
+				    std::vector<symbol>& entries)
 {
   const AttributeList& alist = library.lookup (name);
 
@@ -768,7 +768,7 @@ ProgramDocument::inherited_entries (const Metalib& metalib,
           base_syntax.entries (entries);
           for (size_t i = 0; i < entries.size (); i++)
             {
-              const std::string& key = entries[i];
+              const symbol key = entries[i];
               if (key != "description" 
                   && !alist.subset (metalib, base_alist, base_syntax, key))
                 entries.erase (find (entries.begin (), entries.end (), key));
@@ -778,15 +778,15 @@ ProgramDocument::inherited_entries (const Metalib& metalib,
 }
 
 void 
-ProgramDocument::print_sample (const std::string& name,
+ProgramDocument::print_sample (const symbol name,
 			       const Syntax& syntax,
 			       const AttributeList& alist,
 			       const bool top_level)
 {
-  const std::vector<std::string>& order = syntax.order ();
-  std::vector<std::string> own;
+  const std::vector<symbol>& order = syntax.order ();
+  std::vector<symbol> own;
   syntax.entries (own);
-  const std::vector<std::string> base;
+  const std::vector<symbol> base;
   print_sample_entries (name, syntax, alist, order, own, "dummy", base, 
 			top_level);
 }
@@ -797,10 +797,10 @@ ProgramDocument::print_sample (const symbol name, const Library& library)
   const Syntax& syntax = library.syntax (name);
   const AttributeList& alist = library.lookup (name);
 
-  const std::vector<std::string>& order = syntax.order ();
-  std::vector<std::string> own;
+  const std::vector<symbol>& order = syntax.order ();
+  std::vector<symbol> own;
   own_entries (metalib, library, name, own);
-  std::vector<std::string> base;
+  std::vector<symbol> base;
   inherited_entries (metalib, library, name, base);
 
   print_sample_entries (name.name (), syntax, alist, order, own, 
@@ -808,7 +808,7 @@ ProgramDocument::print_sample (const symbol name, const Library& library)
 }
 
 void 
-ProgramDocument::print_sample_name (const std::string& name, 
+ProgramDocument::print_sample_name (const symbol name, 
 				    const bool top_level)
 {
   Format::TableCell dummy (*format);
@@ -829,26 +829,26 @@ ProgramDocument::print_sample_end ()
 }
 
 void 
-ProgramDocument::print_sample_entries (const std::string& name,
+ProgramDocument::print_sample_entries (const symbol name,
                                        const Syntax& syntax,
                                        const AttributeList& alist,
-                                       const std::vector<std::string>& 
+                                       const std::vector<symbol>& 
                                        /**/ order,
-                                       const std::vector<std::string>&
+                                       const std::vector<symbol>&
                                        /**/ own_entries,
-                                       const std::string& lib_name,
-                                       const std::vector<std::string>& 
+                                       const symbol lib_name,
+                                       const std::vector<symbol>& 
                                        /**/ base_entries, 
 				       const bool top_level)
 {
   // Remove uninteresting entries
-  std::vector<std::string> own; 
+  std::vector<symbol> own; 
   for (size_t i = 0; i < own_entries.size (); i++)
     if (syntax.order_index (own_entries[i]) < 0
 	&& !syntax.is_log (own_entries[i])
 	&& syntax.lookup (own_entries[i]) != Syntax::Library)
       own.push_back (own_entries[i]);
-  std::vector<std::string> base;
+  std::vector<symbol> base;
   for (size_t i = 0; i < base_entries.size (); i++)
     if (syntax.order_index (base_entries[i]) < 0
 	&& !syntax.is_log (base_entries[i])
@@ -935,26 +935,26 @@ ProgramDocument::print_sample_entries (const std::string& name,
 }
 
 void 
-ProgramDocument::print_submodel (const std::string& name, int level,
+ProgramDocument::print_submodel (const symbol name, int level,
 				 const Syntax& syntax,
 				 const AttributeList& alist, 
-				 const std::string& aref)
+				 const symbol aref)
 {
-  std::vector<std::string> entries;
+  std::vector<symbol> entries;
   syntax.entries (entries);
   print_submodel_entries (name, level, syntax, alist, entries, aref);
 }
 
 void 
-ProgramDocument::print_submodel_entries (const std::string& name, int level,
+ProgramDocument::print_submodel_entries (const symbol name, int level,
 					 const Syntax& syntax,
 					 const AttributeList& alist,
-					 const std::vector<std::string>&
+					 const std::vector<symbol>&
 					 /**/ entries, 
-					 const std::string& aref)
+					 const symbol aref)
 {
   const std::string bref = aref + "-" + name;
-  const std::vector<std::string>& order = syntax.order ();
+  const std::vector<symbol>& order = syntax.order ();
   int log_count = 0;
   for (unsigned int i = 0; i < entries.size (); i++)
     if (syntax.is_log (entries[i]))
@@ -1009,10 +1009,10 @@ ProgramDocument::print_submodel_entries (const std::string& name, int level,
 }
 
 void 
-ProgramDocument::print_submodel_entry (const std::string& name, int level,
+ProgramDocument::print_submodel_entry (const symbol name, int level,
 				       const Syntax& syntax,
 				       const AttributeList& alist, bool& first,
-				       const std::string& aref)
+				       const symbol aref)
 {
   if (first)
     first = false;
@@ -1058,7 +1058,7 @@ ProgramDocument::print_submodel_entry (const std::string& name, int level,
     }
 
   // Print description line.
-  const std::string& description = syntax.description (name);
+  const symbol description = syntax.description (name);
   if (description != Syntax::Unknown ())
     {
       format->hard_linebreak ();
@@ -1103,7 +1103,7 @@ ProgramDocument::print_model (const symbol name, const Library& library,
         format->alist_description (alist);
 
       print_users (xref.models[used]);
-      std::vector<std::string> entries;
+      std::vector<symbol> entries;
       own_entries (metalib, library, name, entries, true);
       if (entries.size () > 0)
         print_submodel_entries (name.name (), 0, syntax, alist, entries, 
@@ -1139,7 +1139,7 @@ ProgramDocument::print_model (const symbol name, const Library& library,
       print_sample (name, library);
       
       // Print own entries.
-      std::vector<std::string> entries;
+      std::vector<symbol> entries;
       own_entries (metalib, library, name, entries);
       print_submodel_entries (name.name (), 0, syntax, alist, entries, 
 			      library.name ().name ());
@@ -1147,7 +1147,7 @@ ProgramDocument::print_model (const symbol name, const Library& library,
 }
 
 void
-ProgramDocument::print_fixed (const std::string& name, 
+ProgramDocument::print_fixed (const symbol name, 
 			      const Syntax& syntax,
 			      const AttributeList& alist)
 {
@@ -1261,11 +1261,11 @@ Fixed components are similar to ordinary component, with the exceptions\n\
 that there can only be one model, that is, only a single implementation\n\
 of the component, and that it is not possible to define libraries of\n\
 standard parameterizations for the model."); 
-  std::vector<std::string> fixed;
+  std::vector<symbol> fixed;
   Submodel::all (fixed);
   for (unsigned int i = 0; i < fixed.size (); i++)
     {
-      const std::string& name = fixed[i];
+      const symbol name = fixed[i];
       Syntax syntax;
       AttributeList alist;
       Submodel::load_syntax (name, syntax, alist);

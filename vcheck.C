@@ -49,7 +49,7 @@ struct ValidYear : public VCheck
   }
 
   void check (const Metalib&, const Syntax& syntax, const AttributeList& alist, 
-	      const std::string& key) const throw (std::string)
+	      const symbol key) const throw (std::string)
   { 
     daisy_assert (alist.check (key));
     daisy_assert (syntax.lookup (key) == Syntax::Integer);
@@ -84,7 +84,7 @@ VCheck::IRange::validate (const int value) const throw (std::string)
 
 void
 VCheck::IRange::check (const Metalib&, const Syntax& syntax, const AttributeList& alist, 
-		       const std::string& key) const throw (std::string)
+		       const symbol key) const throw (std::string)
 {
   daisy_assert (alist.check (key));
   daisy_assert (!syntax.is_log (key));
@@ -124,7 +124,7 @@ struct LocalOrder : public VCheck
   }
 
   void check (const Metalib&, const Syntax& syntax, const AttributeList& alist, 
-	      const std::string& key) const throw (std::string)
+	      const symbol key) const throw (std::string)
   { 
     daisy_assert (alist.check (key));
     daisy_assert (!syntax.is_log (key));
@@ -336,7 +336,7 @@ VCheck::SumEqual::validate (const PLF& plf) const throw (std::string)
 
 void
 VCheck::SumEqual::check (const Metalib&, const Syntax& syntax, const AttributeList& alist, 
-			 const std::string& key) const throw (std::string)
+			 const symbol key) const throw (std::string)
 {
   daisy_assert (alist.check (key));
   daisy_assert (!syntax.is_log (key));
@@ -386,7 +386,7 @@ VCheck::StartValue::validate (const PLF& plf) const throw (std::string)
 
 void
 VCheck::StartValue::check (const Metalib&, const Syntax& syntax, const AttributeList& alist, 
-			   const std::string& key) const throw (std::string)
+			   const symbol key) const throw (std::string)
 {
   daisy_assert (alist.check (key));
   daisy_assert (!syntax.is_log (key));
@@ -440,7 +440,7 @@ VCheck::EndValue::validate (const PLF& plf) const throw (std::string)
 
 void
 VCheck::EndValue::check (const Metalib&, const Syntax& syntax, const AttributeList& alist, 
-			   const std::string& key) const throw (std::string)
+			   const symbol key) const throw (std::string)
 {
   daisy_assert (alist.check (key));
   daisy_assert (!syntax.is_log (key));
@@ -488,7 +488,7 @@ VCheck::FixedPoint::validate (const PLF& plf) const throw (std::string)
 
 void
 VCheck::FixedPoint::check (const Metalib&, const Syntax& syntax, const AttributeList& alist, 
-			   const std::string& key) const throw (std::string)
+			   const symbol key) const throw (std::string)
 {
   daisy_assert (alist.check (key));
   daisy_assert (!syntax.is_log (key));
@@ -517,7 +517,7 @@ VCheck::FixedPoint::FixedPoint (double x, double y)
 
 void
 VCheck::MinSize::check (const Metalib&, const Syntax& syntax, const AttributeList& alist, 
-			const std::string& key) const throw (std::string)
+			const symbol key) const throw (std::string)
 {
   daisy_assert (alist.check (key));
   daisy_assert (!syntax.is_log (key));
@@ -537,7 +537,7 @@ VCheck::MinSize::MinSize (unsigned int size)
 
 void
 VCheck::String::check (const Metalib&, const Syntax& syntax, const AttributeList& alist, 
-                       const std::string& key) const throw (std::string)
+                       const symbol key) const throw (std::string)
 {
   daisy_assert (alist.check (key));
   daisy_assert (!syntax.is_log (key));
@@ -566,7 +566,7 @@ VCheck::Compatible::validate (const Units& units, symbol value)
 void
 VCheck::Compatible::check (const Metalib& metalib,
                            const Syntax& syntax, const AttributeList& alist, 
-                           const std::string& key) const throw (std::string)
+                           const symbol key) const throw (std::string)
 {
   daisy_assert (alist.check (key));
   daisy_assert (!syntax.is_log (key));
@@ -581,7 +581,7 @@ VCheck::Compatible::check (const Metalib& metalib,
     }
 }
 
-VCheck::Compatible::Compatible (const std::string& dim)
+VCheck::Compatible::Compatible (const symbol dim)
   : dimension (dim)
 { }
 
@@ -593,7 +593,7 @@ VCheck::fraction ()
 }
 
 void 
-VCheck::Enum::validate (const std::string& value) const throw (std::string)
+VCheck::Enum::validate (const symbol value) const throw (std::string)
 {
   if (ids.find (value) == ids.end ())
     throw std::string ("Invalid value '" + value + "'");
@@ -603,33 +603,33 @@ VCheck::Enum::Enum ()
 { }
 
 void 
-VCheck::Enum::add (const std::string& a)
+VCheck::Enum::add (const symbol a)
 { ids.insert (a); }
 
 size_t 
 VCheck::Enum::size () const
 { return ids.size (); }
 
-VCheck::Enum::Enum (const std::string& a)
+VCheck::Enum::Enum (const symbol a)
 {
   ids.insert (a);
 }
 
-VCheck::Enum::Enum (const std::string& a, const std::string& b)
+VCheck::Enum::Enum (const symbol a, const symbol b)
 {
   ids.insert (a);
   ids.insert (b);
 }
 
-VCheck::Enum::Enum (const std::string& a, const std::string& b, const std::string& c)
+VCheck::Enum::Enum (const symbol a, const symbol b, const symbol c)
 {
   ids.insert (a);
   ids.insert (b);
   ids.insert (c);
 }
 
-VCheck::Enum::Enum (const std::string& a, const std::string& b, const std::string& c, 
-		  const std::string& d)
+VCheck::Enum::Enum (const symbol a, const symbol b, const symbol c, 
+		  const symbol d)
 {
   ids.insert (a);
   ids.insert (b);
@@ -637,8 +637,8 @@ VCheck::Enum::Enum (const std::string& a, const std::string& b, const std::strin
   ids.insert (d);
 }
 
-VCheck::Enum::Enum (const std::string& a, const std::string& b, const std::string& c,
-		  const std::string& d, const std::string& e)
+VCheck::Enum::Enum (const symbol a, const symbol b, const symbol c,
+		  const symbol d, const symbol e)
 {
   ids.insert (a);
   ids.insert (b);
@@ -647,8 +647,8 @@ VCheck::Enum::Enum (const std::string& a, const std::string& b, const std::strin
   ids.insert (e);
 }
 
-VCheck::Enum::Enum (const std::string& a, const std::string& b, const std::string& c,
-		  const std::string& d, const std::string& e, const std::string& f)
+VCheck::Enum::Enum (const symbol a, const symbol b, const symbol c,
+		  const symbol d, const symbol e, const symbol f)
 {
   ids.insert (a);
   ids.insert (b);
@@ -661,7 +661,7 @@ VCheck::Enum::Enum (const std::string& a, const std::string& b, const std::strin
 void
 VCheck::InLibrary::check (const Metalib& metalib, 
 			  const Syntax& syntax, const AttributeList& alist, 
-			  const std::string& key) const throw (std::string)
+			  const symbol key) const throw (std::string)
 {
   daisy_assert (alist.check (key));
   daisy_assert (!syntax.is_log (key));
@@ -721,7 +721,7 @@ VCheck::unique ()
   {
     void check (const Metalib&,
 		const Syntax& syntax, const AttributeList& alist, 
-                const std::string& key) const throw (std::string)
+                const symbol key) const throw (std::string)
     { 
       daisy_assert (alist.check (key));
       daisy_assert (syntax.size (key) != Syntax::Singleton);
@@ -776,7 +776,7 @@ VCheck::unique ()
 void
 VCheck::All::check (const Metalib& metalib,
 		    const Syntax& syntax, const AttributeList& alist, 
-		    const std::string& key) const throw (std::string)
+		    const symbol key) const throw (std::string)
 {
   for (int i = 0; i < checks.size (); i++)
     checks[i]->check (metalib, syntax, alist, key);

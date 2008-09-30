@@ -62,55 +62,53 @@ public:
 
   // Nested scope handling.
 public:
-  Syntax::type lookup (const std::string&) const;
-  const Syntax& find_syntax (const std::string& key) const;
-  const AttributeList& find_alist (const std::string& key) const;
+  Syntax::type lookup (symbol) const;
+  const Syntax& find_syntax (const symbol key) const;
+  const AttributeList& find_alist (const symbol key) const;
 
   // AList emulation.
 public:
-  bool check (const std::string& key) const;
   bool check (const symbol key) const;
-  double number (const std::string&) const;
-  double number (const std::string&, double default_value) const;
-  const std::string name (const std::string&);
-  const std::string name (const std::string&, 
+  double number (symbol) const;
+  double number (symbol, double default_value) const;
+  const std::string name (symbol);
+  const std::string name (symbol, 
 			  const std::string& default_value);
-  symbol identifier (const std::string&);
   symbol identifier (const symbol);
-  symbol identifier (const std::string&, symbol default_value);
-  bool flag (const std::string&) const;
-  bool flag (const std::string&, bool default_value) const;
-  const PLF& plf (const std::string&) const;
-  AttributeList& alist (const std::string&) const;
-  int integer (const std::string&) const;
-  int integer (const std::string&, int default_value) const;
-  const std::vector<double>& number_sequence (const std::string&) const;
-  const std::vector<symbol> identifier_sequence (const std::string& key);
-  std::vector<std::string> name_sequence (const std::string& key);
-  const std::vector<bool>& flag_sequence (const std::string& key) const;
-  const std::vector<int>& integer_sequence (const std::string& key) const;
-  const std::vector<const PLF*>& plf_sequence (const std::string& key) const;
+  symbol identifier (symbol, symbol default_value);
+  bool flag (symbol) const;
+  bool flag (symbol, bool default_value) const;
+  const PLF& plf (symbol) const;
+  AttributeList& alist (symbol) const;
+  int integer (symbol) const;
+  int integer (symbol, int default_value) const;
+  const std::vector<double>& number_sequence (symbol) const;
+  const std::vector<symbol> identifier_sequence (symbol key);
+  std::vector<std::string> name_sequence (symbol key);
+  const std::vector<bool>& flag_sequence (symbol key) const;
+  const std::vector<int>& integer_sequence (symbol key) const;
+  const std::vector<const PLF*>& plf_sequence (symbol key) const;
   const std::vector<const AttributeList*>& 
-  /**/ alist_sequence (const std::string& key) const;
+  /**/ alist_sequence (symbol key) const;
 
   // Create and Destroy.
 private:
-  static std::string sequence_id (std::string key, size_t index);
+  static std::string sequence_id (symbol key, size_t index);
   Block ();
 public:
   // Toplevel.
   explicit Block (Metalib&, Treelog& msg, const Syntax&, const AttributeList&,
- 		  const std::string& scope_id);
+ 		  symbol scope_id);
   // build_free
-  explicit Block (Metalib&, Treelog& msg, const std::string& scope_id);
+  explicit Block (Metalib&, Treelog& msg, symbol scope_id);
   // build_item
   explicit Block (Block&, const Syntax&, const AttributeList&, 
-		  const std::string& scope_tag);
+		  symbol scope_tag);
   // build_vector
   explicit Block (Block&, const Syntax&, const AttributeList&, 
-		  const std::string& scope_tag, size_t index);
+		  symbol scope_tag, size_t index);
   // submodel
-  explicit Block (Block&, const std::string&);
+  explicit Block (Block&, symbol);
   ~Block ();
 };
 

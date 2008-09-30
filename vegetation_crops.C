@@ -286,7 +286,6 @@ VegetationCrops::CanopyAverage (CropFun fun) const
   return CanopySum (fun) / LAI_;
 }
 
-
 double 
 VegetationCrops::DS_by_name (symbol name) const
 {

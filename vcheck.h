@@ -39,7 +39,7 @@ class VCheck : private boost::noncopyable
   // Use.
 public:
   virtual void check (const Metalib&, const Syntax&, const AttributeList&,
-                      const std::string& key) const throw (std::string) = 0;
+                      const symbol key) const throw (std::string) = 0;
 
   // Integer or Integer sequence.
 public:
@@ -106,7 +106,7 @@ private:
 private:
   void validate (int value) const throw (std::string);
   void check (const Metalib&, const Syntax&, const AttributeList&,
-              const std::string& key) const throw (std::string);
+              const symbol key) const throw (std::string);
 
   // Create and Destroy.
 public:
@@ -124,7 +124,7 @@ private:
   void validate (double value) const throw (std::string);
   void validate (const PLF& value) const throw (std::string);
   void check (const Metalib&, const Syntax&, const AttributeList&,
-              const std::string& key) const throw (std::string);
+              const symbol key) const throw (std::string);
 
   // Create and Destroy.
 public:
@@ -142,7 +142,7 @@ private:
   void validate (double value) const throw (std::string);
   void validate (const PLF& value) const throw (std::string);
   void check (const Metalib&, const Syntax&, const AttributeList&,
-              const std::string& key) const throw (std::string);
+              const symbol key) const throw (std::string);
 
   // Create and Destroy.
 public:
@@ -160,7 +160,7 @@ private:
   void validate (double value) const throw (std::string);
   void validate (const PLF& value) const throw (std::string);
   void check (const Metalib&, const Syntax&, const AttributeList&,
-              const std::string& key) const throw (std::string);
+              const symbol key) const throw (std::string);
 
   // Create and Destroy.
 public:
@@ -178,7 +178,7 @@ private:
 private:
   void validate (const PLF& value) const throw (std::string);
   void check (const Metalib&, const Syntax&, const AttributeList&,
-              const std::string& key) const throw (std::string);
+              const symbol key) const throw (std::string);
 
   // Create and Destroy.
 public:
@@ -194,7 +194,7 @@ private:
   // Use.
 private:
   void check (const Metalib&, const Syntax&, const AttributeList&,
-              const std::string& key) const throw (std::string);
+              const symbol key) const throw (std::string);
 
   // Create and Destroy.
 public:
@@ -205,10 +205,9 @@ class VCheck::String : public VCheck
 {
   // Use.
 private:
-  virtual void validate (const std::string& value) 
-    const throw (std::string) = 0;
+  virtual void validate (const symbol value) const throw (std::string) = 0;
   void check (const Metalib&, const Syntax&, const AttributeList&,
-              const std::string& key) const throw (std::string);
+              const symbol key) const throw (std::string);
 };
 
 class VCheck::Compatible : public VCheck
@@ -221,37 +220,37 @@ private:
 private:
   void validate (const Units&, symbol value) const throw (std::string);
   void check (const Metalib&, const Syntax&, const AttributeList&,
-              const std::string& key) const throw (std::string);
+              const symbol key) const throw (std::string);
 
   // Create and Destroy.
 public:
-  Compatible (const std::string& dim);
+  Compatible (const symbol dim);
 };
 
 class VCheck::Enum : public VCheck::String
 {
   // Parameters.
 private:
-  /*const*/ std::set<std::string> ids;
+  /*const*/ std::set<symbol> ids;
 
   // Use.
 private:
-  void validate (const std::string& value) const throw (std::string);
+  void validate (const symbol value) const throw (std::string);
 
   // Create and Destroy.
 public:
   Enum ();
-  void add (const std::string& a);
+  void add (const symbol a);
   size_t size () const;
-  Enum (const std::string& a);
-  Enum (const std::string& a, const std::string& b);
-  Enum (const std::string& a, const std::string& b, const std::string& c);
-  Enum (const std::string& a, const std::string& b, const std::string& c,
-        const std::string& d);
-  Enum (const std::string& a, const std::string& b, const std::string& c,
-        const std::string& d, const std::string& e);
-  Enum (const std::string& a, const std::string& b, const std::string& c,
-        const std::string& d, const std::string& e, const std::string& f);
+  Enum (const symbol a);
+  Enum (const symbol a, const symbol b);
+  Enum (const symbol a, const symbol b, const symbol c);
+  Enum (const symbol a, const symbol b, const symbol c,
+        const symbol d);
+  Enum (const symbol a, const symbol b, const symbol c,
+        const symbol d, const symbol e);
+  Enum (const symbol a, const symbol b, const symbol c,
+        const symbol d, const symbol e, const symbol f);
 };
 
 class VCheck::InLibrary : public VCheck
@@ -263,7 +262,7 @@ private:
   // Use.
 private:
   void check (const Metalib&, const Syntax&, const AttributeList&,
-              const std::string& key) const throw (std::string);
+              const symbol key) const throw (std::string);
   void validate (const Metalib&, const symbol value) const throw (std::string);
 
   // Create and Destroy.
@@ -280,7 +279,7 @@ private:
   // Use.
 private:
   void check (const Metalib&, const Syntax&, const AttributeList&,
-              const std::string& key) const throw (std::string);
+              const symbol key) const throw (std::string);
 
   // Create and Destroy.
 public:

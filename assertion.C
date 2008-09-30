@@ -103,7 +103,12 @@ Assertion::failure (const char* file, int line, const char* fun,
     tmp << " in " << fun;
   
   error (tmp.str ());
-  throw 3;
+
+  if (logs.size () == 0)
+    // Windows dislike throw in static constructors.
+    exit (3);
+  else
+    throw 3;
 }
 
 void 
@@ -136,7 +141,11 @@ Assertion::panic (const char* file, int line, const char* fun,
 		  const std::string& msg)
 {
   bug (file, line, fun, msg);
-  throw 3;
+  if (logs.size () == 0)
+    // Windows dislike throw in static constructors.
+    exit (3);
+  else
+    throw 3;
 }
 
 void 

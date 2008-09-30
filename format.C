@@ -35,9 +35,12 @@ Format::library_id () const
   return id;
 }
 
-std::string 
+symbol
 Format::format_type () const
-{ return "unknown"; }
+{ 
+  static const symbol type ("unknown");
+  return type; 
+}
 
 std::ostream&
 Format::out ()
@@ -47,11 +50,11 @@ Format::out ()
 }
 
 void
-Format::push (const std::string& name)
+Format::push (const symbol name)
 { nest.push (name); }
 
 void
-Format::pop (const std::string& name)
+Format::pop (const symbol name)
 {
   daisy_assert (!nest.empty ());
   daisy_assert (nest.top () == name);
@@ -71,7 +74,7 @@ Format::List::~List ()
   format.list_close (); 
 }
 
-Format::Item::Item (Format& f, const std::string& name)
+Format::Item::Item (Format& f, const symbol name)
   : format (f)
 { 
   daisy_assert (!format.nest.empty ());
@@ -87,7 +90,7 @@ Format::Item::~Item ()
   format.item_close (); 
 }
 
-Format::Table::Table (Format& f, const std::string& name)
+Format::Table::Table (Format& f, const symbol name)
   : format (f)
 { 
   format.push ("table");
@@ -127,7 +130,7 @@ Format::TableCell::~TableCell ()
 }
 
 Format::TableMultiCell::TableMultiCell (Format& f,
-					int cells, const std::string& form)
+					int cells, const symbol form)
   : format (f)
 { 
   format.push ("table_cell");
@@ -154,8 +157,8 @@ Format::Typewriter::~Typewriter ()
 }
 
 Format::Section::Section (Format& f, 
-			  const std::string& type, const std::string& title,
-			  const std::string& scope, const std::string& label)
+			  const symbol type, const symbol title,
+			  const symbol scope, const symbol label)
   : format (f)
 { 
   daisy_assert (!format.nest.empty ());

@@ -67,35 +67,35 @@ private:
   void leave_model (symbol component, symbol name);
   bool enter_submodel (const Syntax& syntax, AttributeList& alist,
   		       const AttributeList& default_alist,
-  		       const std::string& name);
+  		       const symbol name);
   void leave_submodel ();
   bool enter_submodel_default (const Syntax& syntax, 
 			       const AttributeList& default_alist,
-			       const std::string& name);
+			       const symbol name);
   void leave_submodel_default ();
   bool enter_submodel_sequence (const Syntax& syntax,
   				const AttributeList& alist,
   				const AttributeList& default_alist,
-  				const std::string& name, unsigned index);
+  				const symbol name, unsigned index);
   void leave_submodel_sequence ();
   bool enter_submodel_sequence_default (const Syntax& syntax, 
   					const AttributeList& default_alist,
-  					const std::string& name);
+  					const symbol name);
   void leave_submodel_sequence_default ();
   bool enter_object (const Library&, 
 		     const Syntax& syntax, const AttributeList& alist,
   		     const AttributeList& default_alist,
-  		     const std::string& name);
+  		     const symbol name);
   void leave_object ();
   bool enter_object_sequence (const Library&, const Syntax& syntax,
   			      const AttributeList& alist,
   			      const AttributeList& default_alist,
-  			      const std::string& name, 
+  			      const symbol name, 
   			      unsigned index);
   void leave_object_sequence ();
   bool enter_parameter (const Syntax&, const AttributeList& alist, 
 			const AttributeList& default_alist, 
-			const std::string& name, const std::string& parameter);
+			const symbol name, const symbol parameter);
   void leave_parameter ();
 };
 
@@ -163,7 +163,7 @@ TraverseDepend::leave_model (const symbol component, const symbol name)
 bool
 TraverseDepend::enter_submodel (const Syntax&, AttributeList&,
 				const AttributeList&,
-				const std::string& name)
+				const symbol name)
 {
   treelog.open (name);
   return true; 
@@ -175,7 +175,7 @@ TraverseDepend::leave_submodel ()
 
 bool
 TraverseDepend::enter_submodel_default (const Syntax&, const AttributeList&, 
-					const std::string&)
+					const symbol)
 { return false; }
 
 void
@@ -186,7 +186,7 @@ bool
 TraverseDepend::enter_submodel_sequence (const Syntax&,
 					 const AttributeList&,
 					 const AttributeList&,
-					 const std::string& name, unsigned index)
+					 const symbol name, unsigned index)
 { 
   std::ostringstream str;
   str << name << "[" << index << "]";
@@ -201,7 +201,7 @@ TraverseDepend::leave_submodel_sequence ()
 bool
 TraverseDepend::enter_submodel_sequence_default (const Syntax&, 
 						 const AttributeList&,
-						 const std::string&)
+						 const symbol)
 { return false; }
 
 void
@@ -212,7 +212,7 @@ bool
 TraverseDepend::enter_object (const Library& library, 
 			      const Syntax&, const AttributeList& alist,
 			      const AttributeList&,
-			      const std::string& name)
+			      const symbol name)
 {
   daisy_assert (alist.check ("type"));
   const symbol super = alist.identifier ("type");
@@ -236,7 +236,7 @@ TraverseDepend::enter_object_sequence (const Library& library,
 				       const Syntax& syntax, 
 				       const AttributeList& alist,
 				       const AttributeList& default_alist,
-				       const std::string& name, unsigned index)
+				       const symbol name, unsigned index)
 { 
   std::ostringstream str;
   str << name << "[" << index << "]";
@@ -251,7 +251,7 @@ TraverseDepend::leave_object_sequence ()
 bool
 TraverseDepend::enter_parameter (const Syntax&, const AttributeList&, 
 				 const AttributeList&, 
-				 const std::string&, const std::string&)
+				 const symbol, const symbol)
 { return true; }
 
 void 
@@ -292,7 +292,7 @@ bool
 has_dependencies (const Metalib& metalib,
                   const symbol component, const symbol parameterization, 
 		  const Syntax& syntax, AttributeList& alist,
-		  const std::string& name)
+		  const symbol name)
 {
   dep_map dependencies;
   TraverseDepend depend (metalib, component, parameterization,
@@ -319,7 +319,7 @@ bool
 check_dependencies (const Metalib& metalib,
                     const symbol component, const symbol parameterization, 
 		    const Syntax& syntax, AttributeList& alist,
-		    const std::string& name, Treelog& treelog)
+		    const symbol name, Treelog& treelog)
 {
   dep_map dependencies;
   TraverseDepend depend (metalib, component, parameterization, 

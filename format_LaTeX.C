@@ -30,9 +30,12 @@
 #include <map>
 #include <time.h>
 
-std::string 
+symbol
 FormatLaTeX::format_type () const
-{ return "LaTeX"; }
+{
+  static const symbol type ("LaTeX");
+  return type; 
+}
 
 void
 FormatLaTeX::list_open ()
@@ -55,7 +58,7 @@ FormatLaTeX::list_close ()
 }
 
 void 
-FormatLaTeX::item_open (const std::string& name)
+FormatLaTeX::item_open (const symbol name)
 {
   out () << "\\item ";
   italic (name);
@@ -67,7 +70,7 @@ FormatLaTeX::item_close ()
 { }
 
 void 
-FormatLaTeX::table_open (const std::string& format)
+FormatLaTeX::table_open (const symbol format)
 {
   out () << "\\begin{tabular}{" << format << "}\n";
   table_first_row.push (true);
@@ -113,7 +116,7 @@ FormatLaTeX::table_cell_close ()
 { }
 
 void 
-FormatLaTeX::table_multi_cell_open (const int cells, const std::string& format)
+FormatLaTeX::table_multi_cell_open (const int cells, const symbol format)
 { 
   table_cell_open ();
   out () << "\\multicolumn{" << cells << "}{" << format <<"}{"; 
@@ -136,8 +139,8 @@ FormatLaTeX::typewriter_close ()
 }
 
 void 
-FormatLaTeX::section_open (const std::string& type, const std::string& title,
-			   const std::string& scope, const std::string& label)
+FormatLaTeX::section_open (const symbol type, const symbol title,
+			   const symbol scope, const symbol label)
 {
   out () << "\\" << type;
   out () << "{";
@@ -182,8 +185,9 @@ LaTeX manual generated: " << ctime (&now) << "\n\
 }
 
 void
-FormatLaTeX::text (const std::string& text)
+FormatLaTeX::text (const symbol text_s)
 {
+  const std::string text = text_s.name ();
   for (unsigned int i = 0; i < text.length (); i++)
     switch (text[i])
       {
@@ -231,7 +235,7 @@ FormatLaTeX::text (const std::string& text)
 }
 
 void
-FormatLaTeX::bold (const std::string& text)
+FormatLaTeX::bold (const symbol text)
 {
   out () << "\\textbf{";
   this->text (text);
@@ -239,7 +243,7 @@ FormatLaTeX::bold (const std::string& text)
 }
 
 void
-FormatLaTeX::italic (const std::string& text)
+FormatLaTeX::italic (const symbol text)
 {
   out () << "\\textit{";
   this->text (text);
@@ -247,7 +251,7 @@ FormatLaTeX::italic (const std::string& text)
 }
 
 void
-FormatLaTeX::verbatim (const std::string& text)
+FormatLaTeX::verbatim (const symbol text)
 {
   out () << "\\begin{verbatim}\n";
   out () << text;
@@ -255,24 +259,24 @@ FormatLaTeX::verbatim (const std::string& text)
 }
 
 bool
-FormatLaTeX::formatp (const std::string& format)
+FormatLaTeX::formatp (const symbol format)
 { return format == format_type (); }
 
 void
-FormatLaTeX::raw (const std::string& format, const std::string& text)
+FormatLaTeX::raw (const symbol format, const symbol text)
 {
   daisy_assert (format == format_type ());
   out () << text;
 }
 
 void
-FormatLaTeX::special (const std::string& name)
+FormatLaTeX::special (const symbol name)
 {
-  static struct SymTable : public std::map<std::string, std::string>
+  static struct SymTable : public std::map<symbol, symbol>
   {
     SymTable ()
     {
-      typedef std::pair<std::string,std::string> p;
+      typedef std::pair<symbol,symbol> p;
       insert (p ("...", "\\ldots{}"));
       insert (p ("->", "$\\rightarrow $"));
       insert (p ("nbsp", "~"));
@@ -296,7 +300,7 @@ FormatLaTeX::new_paragraph ()
 { out () << "\n\n"; }
 
 void
-FormatLaTeX::index (const std::string& name)
+FormatLaTeX::index (const symbol name)
 {
   out () << "\\index{";
   text (name);
@@ -304,8 +308,10 @@ FormatLaTeX::index (const std::string& name)
 }
 
 void
-FormatLaTeX::quote_id (const std::string& text)
+FormatLaTeX::quote_id (const symbol text_s)
 {
+  const std::string text = text_s.name ();
+
   for (size_t i = 0; i < text.length (); i++)
     switch (text[i])
       {
@@ -321,7 +327,7 @@ FormatLaTeX::quote_id (const std::string& text)
 }
 
 void
-FormatLaTeX::label (const std::string& scope, const std::string& id)
+FormatLaTeX::label (const symbol scope, const symbol id)
 { 
   out () << "\\label{";
   quote_id (scope);
@@ -331,7 +337,7 @@ FormatLaTeX::label (const std::string& scope, const std::string& id)
 }
 
 void
-FormatLaTeX::pageref (const std::string& scope, const std::string& id)
+FormatLaTeX::pageref (const symbol scope, const symbol id)
 { 
   out () << "\\pageref{";
   quote_id (scope);
@@ -341,7 +347,7 @@ FormatLaTeX::pageref (const std::string& scope, const std::string& id)
 }
 
 void
-FormatLaTeX::ref (const std::string& scope, const std::string& id)
+FormatLaTeX::ref (const symbol scope, const symbol id)
 { 
   out () << "\\ref{";
   quote_id (scope);
@@ -351,8 +357,8 @@ FormatLaTeX::ref (const std::string& scope, const std::string& id)
 }
 
 void
-FormatLaTeX::see (const std::string& type,
-		  const std::string& scope, const std::string& id)
+FormatLaTeX::see (const symbol type,
+		  const symbol scope, const symbol id)
 {
   out () << "(see " << type << "~";
   ref (scope, id);
@@ -360,7 +366,7 @@ FormatLaTeX::see (const std::string& type,
 }
 
 void
-FormatLaTeX::see_page (const std::string& scope, const std::string& id)
+FormatLaTeX::see_page (const symbol scope, const symbol id)
 {
   out () << "(see ";
   ref (scope, id);
@@ -375,7 +381,7 @@ FormatLaTeX::alist_description (const AttributeList& alist)
   Format::alist_description (alist);
   if (!alist.check ("cite"))
     return;
-  std::vector<std::string> cite = alist.name_sequence ("cite");
+  std::vector<symbol> cite = alist.identifier_sequence ("cite");
   if (cite.size () < 1)
     return;
   out () << "See also \\cite{" << cite[0];

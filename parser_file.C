@@ -82,9 +82,9 @@ struct ParserFile::Implementation
   int get_integer ();
   double get_number ();
   std::string get_dimension ();
-  double get_number (const std::string& dim);
-  bool check_dimension (const std::string& syntax, const std::string& read);
-  double convert (double value, const std::string& syntax, const std::string& read, 
+  double get_number (const symbol dim);
+  bool check_dimension (const symbol syntax, const symbol read);
+  double convert (double value, const symbol syntax, const symbol read, 
 		  const Lexer::Position&);
   void skip (const char*);
   void skip ();
@@ -111,7 +111,7 @@ struct ParserFile::Implementation
     }
   };
   // Parser.
-  void check_value (const Syntax& syntax, const std::string& name,  double value);
+  void check_value (const Syntax& syntax, const symbol name,  double value);
   void add_derived (Library&);
   AttributeList& load_derived (const Library& lib, bool in_sequence,
 			       const AttributeList* original);
@@ -315,7 +315,7 @@ ParserFile::Implementation::get_dimension ()
 }
 
 double
-ParserFile::Implementation::get_number (const std::string& syntax_dim)
+ParserFile::Implementation::get_number (const symbol syntax_dim)
 {
   skip ();
 
@@ -377,14 +377,14 @@ ParserFile::Implementation::get_number (const std::string& syntax_dim)
 }
 
 bool 
-ParserFile::Implementation::check_dimension (const std::string& syntax,
-					     const std::string& read)
+ParserFile::Implementation::check_dimension (const symbol syntax, 
+                                             const symbol read)
 {
   if (syntax != read)
     {
       if (syntax == Syntax::Unknown ())
 	{
-	  if (read.length () == 0 || read[0] != '?')
+	  if (read.name ().length () == 0 || read.name ()[0] != '?')
 	    warning ("you must use [?<dim>] for entries with unknown syntax");
 	}
       else if (!metalib.units ().can_convert (symbol (read), symbol (syntax),
@@ -402,8 +402,8 @@ ParserFile::Implementation::check_dimension (const std::string& syntax,
 
 double 
 ParserFile::Implementation::convert (double value,
-				     const std::string& syntax, 
-				     const std::string& read, 
+				     const symbol syntax, 
+				     const symbol read, 
 				     const Lexer::Position& pos)
 { 
   if (syntax == Syntax::Unknown ())
@@ -501,7 +501,7 @@ ParserFile::Implementation::looking_at (char c)
 
 void
 ParserFile::Implementation::check_value (const Syntax& syntax, 
-                                         const std::string& name,
+                                         const symbol name,
                                          const double value)
 {
   try
@@ -681,21 +681,21 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence,
 void
 ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 { 
-  std::vector<std::string>::const_iterator current = syntax.order ().begin ();
-  const std::vector<std::string>::const_iterator end = syntax.order ().end ();
-  std::set<std::string> found;
+  std::vector<symbol>::const_iterator current = syntax.order ().begin ();
+  const std::vector<symbol>::const_iterator end = syntax.order ().end ();
+  std::set<symbol> found;
 
   while ( good () && !looking_at (')'))
     {
       bool skipped = false;
       bool in_order = false;
-      std::string name = "";
+      symbol name = "";
       if (current == end)
 	// Unordered association list, get name.
 	{
 	  skip ("(");
 	  skipped = true;
-	  name = get_string ();
+	  name = get_symbol ();
 	}
       else
 	// Ordered tupple, name know.
@@ -889,8 +889,8 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	      PLF plf;
 	      double last_x = -42;
 	      int count = 0;
-	      const std::string domain = syntax.domain (name);
-	      const std::string range = syntax.range (name);
+	      const symbol domain = syntax.domain (name);
+	      const symbol range = syntax.range (name);
 	      bool ok = true;
 	      while (!looking_at (')') && good ())
 		{
@@ -1135,8 +1135,8 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		    PLF& plf = *new PLF ();
 		    double last_x = -42;
 		    int count = 0;
-		    const std::string domain = syntax.domain (name);
-		    const std::string range = syntax.range (name);
+		    const symbol domain = syntax.domain (name);
+		    const symbol range = syntax.range (name);
 		    while (!looking_at (')') && good ())
 		      {
                         if (looking_at ('&'))
@@ -1194,7 +1194,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		std::vector<Lexer::Position> positions;
 		int count = 0;
 		const int size = syntax.size (name);
-		const std::string syntax_dim = syntax.dimension (name);
+		const symbol syntax_dim = syntax.dimension (name);
 		unsigned int first_unchecked = 0;
 		while (good () && !looking_at (')'))
 		  {
@@ -1387,14 +1387,14 @@ ParserFile::Implementation::initialize ()
 }
 
 ParserFile::Implementation::Implementation (Metalib& mlib,
-                                            const std::string& name,
+                                            const std::string& filename,
                                             Treelog& treelog)
   : metalib (mlib),
     msg (treelog),
     inputs (std::vector<const AttributeList*> ()),
-    file (name),
-    owned_stream (mlib.path ().open_file (name)),
-    lexer (new Lexer (name, *owned_stream, msg))
+    file (filename),
+    owned_stream (mlib.path ().open_file (filename)),
+    lexer (new Lexer (filename, *owned_stream, msg))
 { }
 
 ParserFile::Implementation::~Implementation ()
@@ -1440,9 +1440,9 @@ ParserFile::check () const
 { return impl->lexer->good (); }
 
 ParserFile::ParserFile (Metalib& metalib, 
-                        const std::string& name, Treelog& msg)
+                        const std::string& filename, Treelog& msg)
   : Parser (symbol ("file")),
-    impl (new Implementation (metalib, name, msg))
+    impl (new Implementation (metalib, filename, msg))
 { }
 
 ParserFile::ParserFile (Block& al)

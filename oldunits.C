@@ -28,28 +28,30 @@
 
 struct Oldunits::Content
 {
-  typedef std::map<std::string, Convert*> to_type;
-  typedef std::map<std::string, to_type> table_type;
+  typedef std::map<symbol, Convert*> to_type;
+  typedef std::map<symbol, to_type> table_type;
   table_type table;
 
-  static bool time_match (const std::string& from, const std::string& to);
-  static const std::string crop_time (const std::string&);
+  static bool time_match (const symbol from, const symbol to);
+  static symbol crop_time (const symbol);
   
-  double convert (const std::string& from, const std::string& to,
+  double convert (const symbol from, const symbol to,
 		  double value) const;
-  bool can_convert (const std::string& from, const std::string& to) const;
-  bool can_convert (const std::string& from, const std::string& to,
+  bool can_convert (const symbol from, const symbol to) const;
+  bool can_convert (const symbol from, const symbol to,
 		    double value) const;
-  const Convert& get_convertion (const std::string& from,
-				 const std::string& to) const;
+  const Convert& get_convertion (const symbol from,
+				 const symbol to) const;
 
   Content ();
   ~Content ();
 };  
 
 bool				// True iff FROM and TO have same time unit.
-Oldunits::Content::time_match (const std::string& from, const std::string& to)
+Oldunits::Content::time_match (const symbol from_s, const symbol to_s)
 {
+  const std::string& from = from_s.name ();
+  const std::string& to = to_s.name ();
   const size_t from_size = from.size ();
   const size_t to_size = to.size ();
 
@@ -69,9 +71,10 @@ Oldunits::Content::time_match (const std::string& from, const std::string& to)
     }
 }
 
-const std::string			// Return DIM without time.
-Oldunits::Content::crop_time (const std::string& dim)
+symbol                          // Return DIM without time.
+Oldunits::Content::crop_time (const symbol dim_s)
 {
+  const std::string& dim = dim_s.name ();
   daisy_assert (dim.size () > 0);
   size_t end;
   for (end = dim.size () - 1; dim[end] != '/'; end--)
@@ -83,8 +86,8 @@ Oldunits::Content::crop_time (const std::string& dim)
 }
 
 double 
-Oldunits::Content::convert (const std::string& from, const std::string& to, 
-			 double value) const
+Oldunits::Content::convert (const symbol from, const symbol to, 
+                            double value) const
 { 
   if (from == to)
     return value;
@@ -98,8 +101,7 @@ Oldunits::Content::convert (const std::string& from, const std::string& to,
 }
 
 bool 
-Oldunits::Content::can_convert (const std::string& from,
-			     const std::string& to) const
+Oldunits::Content::can_convert (const symbol from, const symbol to) const
 { 
   if (from == to)
     return true;
@@ -116,8 +118,8 @@ Oldunits::Content::can_convert (const std::string& from,
 }
 
 bool 
-Oldunits::Content::can_convert (const std::string& from, const std::string& to, 
-			     double value) const
+Oldunits::Content::can_convert (const symbol from, const symbol to, 
+                                const double value) const
 { 
   if (from == to)
     return true;
@@ -145,8 +147,7 @@ public:
 } convert_identity;
 
 const Oldunits::Convert&
-Oldunits::Content::get_convertion (const std::string& from,
-				const std::string& to) const
+Oldunits::Content::get_convertion (const symbol from, const symbol to) const
 { 
   if (from == to)
     return convert_identity;
@@ -157,11 +158,11 @@ Oldunits::Content::get_convertion (const std::string& from,
       // We check if we can convert without time.
       if (time_match (from, to))
 	{
-	  const std::string from_c = crop_time (from);
+	  const symbol from_c = crop_time (from);
 	  table_type::const_iterator i_c = table.find (from_c);
 	  if (i_c != table.end ())
 	    {
-	      const std::string to_c = crop_time (to);
+	      const symbol to_c = crop_time (to);
 	      to_type::const_iterator j_c = (*i_c).second.find (to_c);
 	      if (j_c != (*i_c).second.end ())
 		return *(*j_c).second;
@@ -289,7 +290,7 @@ struct ConvertLinear : public Oldunits::Convert
 };
 
 void 
-Oldunits::add (const std::string& from, const std::string& to,
+Oldunits::add (const symbol from, const symbol to,
 	    double factor, double offset)
 { 
   daisy_assert (content);
@@ -307,7 +308,7 @@ Oldunits::add (const std::string& from, const std::string& to,
 }
 
 void 
-Oldunits::add (const std::string& from, const std::string& to, Convert& convert)
+Oldunits::add (const symbol from, const symbol to, Convert& convert)
 {
   daisy_assert (content);
   daisy_assert (content->table[from].find (to) == content->table[from].end ());
@@ -316,21 +317,21 @@ Oldunits::add (const std::string& from, const std::string& to, Convert& convert)
 }
 
 double 
-Oldunits::convert (const std::string& from, const std::string& to, double value)
+Oldunits::convert (const symbol from, const symbol to, double value)
 { 
   daisy_assert (content);
   return content->convert (from, to, value);
 }
 
 bool
-Oldunits::can_convert (const std::string& from, const std::string& to)
+Oldunits::can_convert (const symbol from, const symbol to)
 { 
   daisy_assert (content);
   return content->can_convert (from, to);
 }
 
 bool
-Oldunits::can_convert (const std::string& from, const std::string& to, 
+Oldunits::can_convert (const symbol from, const symbol to, 
 		    double value)
 { 
   daisy_assert (content);
@@ -338,14 +339,14 @@ Oldunits::can_convert (const std::string& from, const std::string& to,
 }
 
 const Oldunits::Convert&
-Oldunits::get_convertion (const std::string& from, const std::string& to)
+Oldunits::get_convertion (const symbol from, const symbol to)
 {
   daisy_assert (content);
   return content->get_convertion (from, to);
 }
 
-std::string
-Oldunits::multiply (const std::string& one, const std::string& two)
+symbol
+Oldunits::multiply (const symbol one, const symbol two)
 { 
   if (one == Syntax::None () || one == Syntax::Fraction ())
     return two;
@@ -399,39 +400,12 @@ Oldunits::multiply (const std::string& one, const std::string& two)
 	|| (two == table[i].one && one == table[i].two))
       return table[i].result;
 
-  if (one == two + "^-1" || one + "^-1" == two)
-    return Syntax::None ();
+  const std::string inv = "^-1";
+  if (one.name () == two + inv || one + inv == two.name ())
+    return Syntax::none ();
 
-  return Syntax::Unknown ();
+  return Syntax::unknown ();
 }
-
-void 
-Oldunits::add (symbol from, symbol to, double factor, double offset)
-{ add (from.name (), to.name (), factor, offset); }
-
-void 
-Oldunits::add (symbol from, symbol to, Convert& conv)
-{ add (from.name (), to.name (), conv); }
-
-double 
-Oldunits::convert (symbol from, symbol to, double value)
-{ return convert (from.name (), to.name (), value); }
-
-bool 
-Oldunits::can_convert (symbol from, symbol to)
-{ return can_convert (from.name (), to.name ()); }
-
-bool 
-Oldunits::can_convert (symbol from, symbol to, double value)
-{ return can_convert (from.name (), to.name (), value); }
-
-const Oldunits::Convert& 
-Oldunits::get_convertion (const symbol from, const symbol to)
-{ return get_convertion (from.name (), to.name ()); }
-
-symbol
-Oldunits::multiply (const symbol a, const symbol b)
-{ return symbol (multiply (a.name (), b.name ())); }
 
 // GCC 2.95 requires these to be defined outside a function.
 static class Convert_pF_cm_ : public Oldunits::Convert

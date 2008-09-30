@@ -223,7 +223,7 @@ ifeq ($(COMPILER),gcc)
 #  -Wuninitialized: triggered in 3.4 in initializations!
 #  -Wunreachable-code: triggered by header files
 #  -Wextra: Triggers dllexport/inline: -Wno-attributes is not in GCC 3
-	COMPILE = $(GCC) -ansi -pedantic $(WARNING) $(DEBUG) $(OSFLAGS) $(BOOSTINC)
+	COMPILE = $(GCC) -ansi -pedantic $(WARNING) $(DEBUG) $(OSFLAGS) $(BOOSTINC) $(GTESTINC) $(GUIINCLUDE) 
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 	CPPLIB = -lstdc++
 endif
@@ -734,13 +734,17 @@ dos2unix:
 # Various test targets.
 #
 
-UTESTSRC = ut_scope_exchange.C
+GTESTHOME = ../gtest
+GTESTINC = -isystem $(GTESTHOME)/include
+GTESTLIB = -L$(GTESTHOME)/lib -lgtest -lgtest_main
+
+UTESTSRC = ut_units.C ut_scope_exchange.C
 UTESTOBJ = $(UTESTSRC:.C=${OBJ})
 
-utest$(EXE): $(LIBOBJ) $(UTESTOBJ)
-	$(CC) -o $@ $^ $(CPPLIB) $(MATHLIB) 
+utest.exe: $(UTESTOBJ) $(LIBOBJ)
+	$(CC) -o $@ $^ $(GTESTLIB) $(CPPLIB) $(MATHLIB) $(CXSPARSELIB) 
 
-unittest:	
+unittest:
 	(mkdir -p $(NATIVEHOME) \
 	 && cd $(NATIVEHOME) \
          && $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile utest${EXE} \
@@ -786,7 +790,7 @@ depend: $(GUISOURCES) $(SOURCES)
 	rm -f Makefile.old
 	mv Makefile Makefile.old
 	sed -e '/^# AUTOMATIC/q' < Makefile.old > Makefile
-	$(CC) -I. $(GUIINCLUDE) -MM $^ | sed -e 's/\.o:/$${OBJ}:/' >> Makefile
+	$(CC) -I. -MM $^ | sed -e 's/\.o:/$${OBJ}:/' >> Makefile
 
 # Create a ZIP file with all the sources.
 #
@@ -929,7 +933,7 @@ set_exceptions${OBJ}: set_exceptions.S
 # How to compile a C++ file.
 #
 .C${OBJ}:
-	$(CC) $(GUIINCLUDE) $(NOLINK) $<
+	$(CC) $(NOLINK) $<
 
 # How to compile a C file.
 #
@@ -1167,14 +1171,14 @@ fetch${OBJ}: fetch.C fetch.h destination.h symbol.h select.h model.h alist.h \
 horheat${OBJ}: horheat.C horheat.h texture.h plf.h hydraulic.h model.h \
   symbol.h alist.h syntax.h treelog.h check.h mathlib.h assertion.h \
   submodel.h
-litter${OBJ}: litter.C litter.h submodel.h syntax.h treelog.h symbol.h \
+litter${OBJ}: litter.C litter.h submodel.h symbol.h syntax.h treelog.h \
   alist.h check.h
 time${OBJ}: time.C time.h assertion.h log.h border.h model.h symbol.h alist.h \
   syntax.h treelog.h vcheck.h submodel.h block.h plf.h
-som${OBJ}: som.C som.h om.h plf.h submodel.h alist.h symbol.h
-smb${OBJ}: smb.C smb.h om.h plf.h dom.h submodel.h syntax.h treelog.h \
-  symbol.h alist.h assertion.h check.h mathlib.h
-aom${OBJ}: aom.C aom.h om.h plf.h submodel.h alist.h symbol.h syntax.h \
+som${OBJ}: som.C som.h om.h plf.h submodel.h symbol.h alist.h
+smb${OBJ}: smb.C smb.h om.h plf.h dom.h submodel.h symbol.h syntax.h \
+  treelog.h alist.h assertion.h check.h mathlib.h
+aom${OBJ}: aom.C aom.h om.h plf.h submodel.h symbol.h alist.h syntax.h \
   treelog.h check.h assertion.h smb.h dom.h log.h time.h border.h model.h \
   geometry.h mathlib.h
 dom${OBJ}: dom.C dom.h plf.h doe.h smb.h om.h geometry.h syntax.h treelog.h \
@@ -1183,10 +1187,10 @@ dom${OBJ}: dom.C dom.h plf.h doe.h smb.h om.h geometry.h syntax.h treelog.h \
 crpn${OBJ}: crpn.C crpn.h production.h symbol.h root_system.h rootdens.h \
   model.h alist.h ABAprod.h plf.h syntax.h treelog.h log.h time.h \
   border.h mathlib.h assertion.h submodel.h check.h
-vernalization${OBJ}: vernalization.C vernalization.h submodel.h log.h time.h \
-  border.h model.h symbol.h alist.h syntax.h treelog.h
-partition${OBJ}: partition.C partition.h plf.h submodel.h syntax.h treelog.h \
-  symbol.h alist.h check.h mathlib.h assertion.h
+vernalization${OBJ}: vernalization.C vernalization.h submodel.h symbol.h \
+  log.h time.h border.h model.h alist.h syntax.h treelog.h
+partition${OBJ}: partition.C partition.h plf.h submodel.h symbol.h syntax.h \
+  treelog.h alist.h check.h mathlib.h assertion.h
 production${OBJ}: production.C production.h symbol.h crpn.h partition.h plf.h \
   organic_matter.h model.h alist.h geometry.h syntax.h treelog.h \
   mathlib.h assertion.h am.h im.h log.h time.h border.h submodel.h
@@ -1195,10 +1199,10 @@ harvesting${OBJ}: harvesting.C harvesting.h time.h plf.h symbol.h \
   crop.h harvest.h block.h geometry.h mathlib.h assertion.h log.h \
   border.h timestep.h vcheck.h submodel.h check_range.h check.h \
   submodeler.h
-canopy_simple${OBJ}: canopy_simple.C canopy_simple.h plf.h submodel.h log.h \
-  time.h border.h model.h symbol.h alist.h syntax.h treelog.h
+canopy_simple${OBJ}: canopy_simple.C canopy_simple.h plf.h submodel.h \
+  symbol.h log.h time.h border.h model.h alist.h syntax.h treelog.h
 canopy_std${OBJ}: canopy_std.C canopy_std.h canopy_simple.h plf.h submodel.h \
-  log.h time.h border.h model.h symbol.h alist.h syntax.h treelog.h \
+  symbol.h log.h time.h border.h model.h alist.h syntax.h treelog.h \
   mathlib.h assertion.h
 root_system${OBJ}: root_system.C root_system.h rootdens.h model.h symbol.h \
   alist.h ABAprod.h plf.h submodel.h geometry.h syntax.h treelog.h \
@@ -1249,9 +1253,9 @@ scope_exchange${OBJ}: scope_exchange.C scope_exchange.h model.h symbol.h \
   librarian.h
 photo_Farquhar${OBJ}: photo_Farquhar.C photo_Farquhar.h photo.h model.h \
   symbol.h alist.h block.h syntax.h treelog.h plf.h rubiscoNdist.h \
-  ABAeffect.h stomatacon.h bioclimate.h canopy_std.h canopy_simple.h \
-  phenology.h log.h time.h border.h submodel.h mathlib.h assertion.h \
-  check.h librarian.h
+  resistance.h ABAeffect.h stomatacon.h bioclimate.h canopy_std.h \
+  canopy_simple.h phenology.h log.h time.h border.h submodel.h mathlib.h \
+  assertion.h check.h librarian.h
 scope_multi${OBJ}: scope_multi.C scope_multi.h scope.h symbol.h model.h \
   alist.h syntax.h treelog.h assertion.h librarian.h
 scope_id${OBJ}: scope_id.C scope_id.h scope.h symbol.h model.h alist.h \
@@ -1402,7 +1406,7 @@ cdaisy${OBJ}: cdaisy.C scope.h symbol.h model.h alist.h block.h syntax.h \
   action.h horizon.h printer_file.h printer.h version.h chemical.h \
   assertion.h
 nrutil${OBJ}: nrutil.C
-submodel${OBJ}: submodel.C submodel.h syntax.h treelog.h symbol.h alist.h \
+submodel${OBJ}: submodel.C submodel.h symbol.h syntax.h treelog.h alist.h \
   assertion.h
 version${OBJ}: version.C
 svat_ssoc${OBJ}: svat_ssoc.C svat.h model.h symbol.h alist.h syntax.h \
@@ -2024,8 +2028,9 @@ pet_PM${OBJ}: pet_PM.C pet.h model.h symbol.h alist.h syntax.h treelog.h \
   vegetation.h log.h time.h border.h librarian.h
 svat_pmsw${OBJ}: svat_pmsw.C svat.h model.h symbol.h alist.h mathlib.h \
   assertion.h block.h syntax.h treelog.h plf.h surface.h uzmodel.h \
-  weather.h im.h time.h soil.h soil_water.h soil_heat.h bioclimate.h \
-  vegetation.h pet.h log.h border.h fao.h gaussj.h librarian.h nrutil.h
+  weather.h im.h time.h geometry.h soil.h soil_water.h soil_heat.h \
+  bioclimate.h vegetation.h pet.h log.h border.h fao.h gaussj.h \
+  librarian.h nrutil.h
 action_surface${OBJ}: action_surface.C action.h model.h symbol.h alist.h \
   block.h syntax.h treelog.h plf.h daisy.h program.h run.h time.h \
   timestep.h vcheck.h memutils.h field.h border.h check.h librarian.h

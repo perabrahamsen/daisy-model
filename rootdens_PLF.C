@@ -41,7 +41,7 @@ struct Rootdens_PLF : public Rootdens
     // Check that the indexes are monotonically increasing.
     void check (const Metalib&, 
 		const Syntax& syntax, const AttributeList& alist, 
-		const std::string& key) const throw (std::string);
+		const symbol key) const throw (std::string);
   };
 
   struct Entry
@@ -87,7 +87,7 @@ Relative root density as a function of root depth .");
 void
 Rootdens_PLF::Check_Indexes::check (const Metalib&, const Syntax& syntax, 
 				    const AttributeList& alist, 
-				    const std::string& key)
+				    const symbol key)
   const throw (std::string)
 { 
   daisy_assert (alist.check (key));

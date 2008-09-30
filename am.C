@@ -59,7 +59,7 @@ struct AM::Implementation
     // Check that the OM pools are correct for organic fertilizer.
     void check (const Metalib&, 
 		const Syntax& syntax, const AttributeList& alist, 
-		const std::string& key) const throw (std::string);
+		const symbol key) const throw (std::string);
   };
 
   // Content.
@@ -117,7 +117,7 @@ void
 AM::Implementation::Check_OM_Pools::check (const Metalib&, 
 					   const Syntax& syntax, 
 					   const AttributeList& alist, 
-					   const std::string& key) 
+					   const symbol key) 
   const throw (std::string)
 { 
   daisy_assert (alist.check (key));

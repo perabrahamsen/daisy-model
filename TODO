@@ -1,53 +1,28 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* OpenMI
+
+** ElementSet
+
 * Unit tests
 
-** gtest?
+** gtest
 
 ** Units
 
-*** mm/s = 0.001 kg/m^2/s
-
-* Biopores
-
-** Diskuter mmo ændringer
-
-** J_drain? 
-
-** Nanna kan køre den endelige version.
+*** K -> dg C
 
 * SVAT
 
 ** Check initialisering of soil_heat
 
-** log
-
 * SAFIR
 
 ** Finn opsætning
 
-** Tænk stress faktorer igennem, kan nogle få default?
-
-*** water 
-
-pmsw: rc_min / rc_act
-Farquhar: ?
-rootsys: ea / ep
-
-*** N
-
-crpn: (act - nf) / (cr - nf)
-Farquhar: ?
-
-*** cut stress
-
-harvesting: age
-
 * R2D2
 
 ** colloids error
-
-** biopores MMO
 
 * test-mibsol.dai
 

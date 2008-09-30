@@ -47,22 +47,20 @@ struct PrinterFile::Implementation
 
   // String utilities.
   static bool is_identifier (const std::string& name);
-  static bool is_identifier (const symbol name)
-  { return is_identifier (name.name ()); }
   static void print_quoted_string (std::ostream& out,
 				   const std::string& name);
 
   // Print entry 'key' in alist.
-  void print_dimension (const AttributeList&, const std::string& key, 
-                        const std::string& dim);
+  void print_dimension (const AttributeList&, const symbol key, 
+                        const symbol dim);
   void print_entry (const AttributeList& alist, const Syntax&,
 		    const AttributeList& super_alist, 
-                    const Syntax& super_syntax, const std::string& key,
+                    const Syntax& super_syntax, const symbol key,
 		    int indent, bool need_wrapper);
 
   // Check if entry 'key' need a line for itself.
   bool is_complex (const AttributeList& alist, const Syntax& syntax,
-		   const AttributeList& super, const std::string& key) const;
+		   const AttributeList& super, const symbol key) const;
   bool is_complex_object (const AttributeList&, const Library&) const;
 
   // Print support for specific types.
@@ -95,7 +93,7 @@ bool
 PrinterFile::Implementation::is_complex (const AttributeList& alist, 
 					 const Syntax& syntax,
 					 const AttributeList& super,
-					 const std::string& key) const
+					 const symbol key) const
 {
   // Subsets are never complex.
   if (alist.subset (metalib, super, syntax, key))
@@ -195,14 +193,14 @@ PrinterFile::Implementation::print_quoted_string (std::ostream& out,
 
 void 
 PrinterFile::Implementation::print_dimension (const AttributeList& alist,
-                                              const std::string& key,
-                                              const std::string& dim)
+                                              const symbol key,
+                                              const symbol dim)
 {
-  if (dim == Syntax::Unknown ())
+  if (dim == Syntax::unknown ())
     /* do nothing */;
-  else if (dim == Syntax::None () || dim == Syntax::Fraction ())
+  else if (dim == Syntax::none () || dim == Syntax::fraction ())
     out << " []";
-  else if (dim == Syntax::User ())
+  else if (dim == Syntax::user ())
     out << " [" << alist.name (key) << "]";
   else
     out << " [" << dim << "]";
@@ -213,7 +211,7 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 					  const Syntax& syntax,
 					  const AttributeList& super_alist, 
 					  const Syntax& super_syntax, 
-					  const std::string& key,
+					  const symbol key,
 					  int indent, bool need_wrapper)
 { 
   daisy_assert (alist.check (key));
@@ -439,11 +437,11 @@ PrinterFile::Implementation::print_alist (const AttributeList& alist,
 					  int indent, bool skip)
 {
   // Always print ordered items.
-  const std::vector<std::string>& order = syntax.order ();
+  const std::vector<symbol>& order = syntax.order ();
   bool complex_printing = false;
   for (unsigned int i = 0; i < order.size (); i++)
     {
-      const std::string& key = order[i];
+      const symbol key = order[i];
       if (!complex_printing && is_complex (alist, syntax, super_alist, key))
 	complex_printing = true;
 	
@@ -475,18 +473,18 @@ PrinterFile::Implementation::print_alist (const AttributeList& alist,
     }
 
   // Print unordered items.
-  std::vector<std::string> entries;
+  std::vector<symbol> entries;
   syntax.entries (entries);
 
   // Print new declarations.
-  std::vector<std::string> super_entries;
+  std::vector<symbol> super_entries;
   super_syntax.entries (super_entries);
-  std::set<std::string> super_set (super_entries.begin (),
-                                   super_entries.end ());
+  std::set<symbol> super_set (super_entries.begin (),
+                              super_entries.end ());
 
   for (unsigned int i = 0; i < entries.size (); i++)
     {
-      const std::string key = entries[i];
+      const symbol key = entries[i];
       
       // Skip already printed members.
       if (syntax.order_index (key) >= 0)
@@ -542,7 +540,7 @@ PrinterFile::Implementation::print_alist (const AttributeList& alist,
               out << "<Error>";
             }
           out << "\n " << std::string (indent, ' ');
-          print_string (syntax.description (key));
+          print_symbol (syntax.description (key));
           out << ")";
         }
 
@@ -558,7 +556,7 @@ PrinterFile::Implementation::print_alist (const AttributeList& alist,
       // Now print it.
       out << "(" << key << " ";
       print_entry (alist, syntax, super_alist, super_syntax, key, 
-		   indent + key.length () + 2, false);
+		   indent + key.name ().length () + 2, false);
       out << ")";
     }
 }
@@ -607,7 +605,7 @@ PrinterFile::Implementation::print_object (const AttributeList& value,
   print_alist (value, element_syntax, element_alist, element_syntax,
                indent + 1 + element.name ().length ()
                // Buglet: Wrong indentation for elements with strange chars.
-               + (is_identifier (element) ? 0 : 2),
+               + (is_identifier (element.name ()) ? 0 : 2),
                false);
 }
 
@@ -785,13 +783,13 @@ PrinterFile::print_alist (const AttributeList& alist, const Syntax& syntax,
 
 void 
 PrinterFile::print_entry (const AttributeList& alist, const Syntax& syntax,
-			  const std::string& key)
+			  const symbol key)
 { 
   if (alist.check (key))
     {
       const AttributeList empty_alist;
       impl->out << "(" << key << " ";
-      const int indent = 2 + key.length ();
+      const int indent = 2 + key.name ().length ();
       impl->print_entry (alist, syntax, empty_alist, syntax,
                          key, indent, false);
       impl->out << ")\n";

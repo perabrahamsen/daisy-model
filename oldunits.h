@@ -25,7 +25,6 @@
 #define OLDUNITS_H
 
 #include "symbol.h"
-#include <string>
 
 static class Oldunits
 {
@@ -63,27 +62,14 @@ public:
 
   // Utilities.
 public:
-  static void add (const std::string& from, const std::string& to,
+  static void add (const symbol from, const symbol to,
 		   double factor, double offset = 0.0);
-  static void add (const std::string& from, const std::string& to, Convert&);
-  static double convert (const std::string& from, const std::string& to,
-                         double value);
-  static bool can_convert (const std::string& from, const std::string& to);
-  static bool can_convert (const std::string& from, const std::string& to,
-                           double value);
-  static const Convert& get_convertion (const std::string& from,
-                                        const std::string& to);
-  static std::string multiply (const std::string&, const std::string&);
-
-public:
-  // Variants using symbol instead of std::string.
-  static void add (symbol from, symbol to, double factor, double offset = 0.0);
-  static void add (symbol from, symbol to, Convert&);
-  static double convert (symbol from, symbol to, double value);
-  static bool can_convert (symbol from, symbol to);
-  static bool can_convert (symbol from, symbol to, double value);
-  static const Convert& get_convertion (symbol from, symbol to);
-  static symbol multiply (symbol, symbol);
+  static void add (const symbol from, const symbol to, Convert&);
+  static double convert (const symbol from, const symbol to, double value);
+  static bool can_convert (const symbol from, const symbol to);
+  static bool can_convert (const symbol from, const symbol to, double value);
+  static const Convert& get_convertion (const symbol from, const symbol to);
+  static symbol multiply (const symbol, const symbol);
 
   // Create and destroy.
 private:

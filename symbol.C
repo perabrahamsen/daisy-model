@@ -181,3 +181,5 @@ std::string operator+ (const symbol s1, const symbol s2)
 std::ostream& 
 operator<< (std::ostream& out, const symbol sym)
 { out << sym.name (); return out; }
+
+// symbol.C ends here.

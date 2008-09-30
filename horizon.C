@@ -259,7 +259,7 @@ Horizon::output (Log& log) const
 static const class SOM_fractions_check_type : public VCheck
 {
   void check (const Metalib&, const Syntax& syntax, const AttributeList& alist, 
-              const std::string& key)
+              const symbol key)
     const throw (std::string)
   {
     daisy_assert (key == "SOM_fractions");

@@ -145,7 +145,7 @@ the screen instead of being stored in a file.");
   {
     void check (const Metalib&,
 		const Syntax& syntax, const AttributeList& alist, 
-                const std::string& key) const throw (std::string)
+                const symbol key) const throw (std::string)
     {
       daisy_assert (key == "where");
       daisy_assert (syntax.lookup (key) == Syntax::String);
@@ -189,7 +189,7 @@ cross the legend.");
   {
     void check (const Metalib&,
 		const Syntax& syntax, const AttributeList& alist, 
-                const std::string& key) const throw (std::string)
+                const symbol key) const throw (std::string)
     {
       daisy_assert (key == "legend");
       daisy_assert (syntax.lookup (key) == Syntax::String);

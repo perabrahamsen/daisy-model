@@ -48,7 +48,7 @@ public:
                     const Syntax& super_syntax);
   // Print entry in alist.
   void print_entry (const AttributeList&, const Syntax&,
-		    const std::string& key);
+		    const symbol key);
   // Print specific parameterization.
   void print_parameterization (symbol library_name, symbol name, 
                                bool print_description = true);

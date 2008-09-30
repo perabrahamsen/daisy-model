@@ -49,7 +49,7 @@ public:
                             const Syntax& super_syntax) = 0;
   // Print entry in alist.
   virtual void print_entry (const AttributeList&, const Syntax&,
-			    const std::string& key) = 0;
+			    const symbol key) = 0;
   // Print all elements in all libraries associated with 'filename'.
   virtual void print_library_file (const std::string& filename) = 0;
   // Print a parser input.

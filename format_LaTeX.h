@@ -24,15 +24,15 @@
 struct FormatLaTeX : public Format
 {
   // Content.
-  std::string format_type () const;
+  symbol format_type () const;
 
   // Nesting.
   int list_level;
   void list_open ();
   void list_close ();
-  void item_open (const std::string& name);
+  void item_open (const symbol name);
   void item_close ();
-  void table_open (const std::string& format);
+  void table_open (const symbol format);
   void table_close ();
   std::stack<bool> table_first_row;
   void table_row_open ();
@@ -40,36 +40,36 @@ struct FormatLaTeX : public Format
   std::stack<bool> table_first_column;
   void table_cell_open ();
   void table_cell_close ();
-  void table_multi_cell_open (const int cells, const std::string& format);
+  void table_multi_cell_open (const int cells, const symbol format);
   void table_multi_cell_close ();
   void typewriter_open ();
   void typewriter_close ();
-  void section_open (const std::string& type, const std::string& title,
-		     const std::string& scope, 
-		     const std::string& label);
+  void section_open (const symbol type, const symbol title,
+		     const symbol scope, 
+		     const symbol label);
   void section_close ();
   void document_open ();
   void document_close ();
 
   // Use.
-  void text (const std::string& text);
-  void bold (const std::string& text);
-  void italic (const std::string& text);
-  void verbatim (const std::string& text);
-  void raw (const std::string& format, const std::string& text);
-  bool formatp (const std::string& format);
-  void special (const std::string& name);
+  void text (const symbol text);
+  void bold (const symbol text);
+  void italic (const symbol text);
+  void verbatim (const symbol text);
+  void raw (const symbol format, const symbol text);
+  bool formatp (const symbol format);
+  void special (const symbol name);
   void soft_linebreak ();
   void hard_linebreak ();
   void new_paragraph ();
-  void index (const std::string& name);
-  void quote_id (const std::string& name);
-  void label (const std::string& scope, const std::string& id);
-  void pageref (const std::string& scope, const std::string& id);
-  void ref (const std::string& scope, const std::string& id);
-  void see (const std::string& type,
-	    const std::string& scope, const std::string& id);
-  void see_page (const std::string& scope, const std::string& id);
+  void index (const symbol name);
+  void quote_id (const symbol name);
+  void label (const symbol scope, const symbol id);
+  void pageref (const symbol scope, const symbol id);
+  void ref (const symbol scope, const symbol id);
+  void see (const symbol type,
+	    const symbol scope, const symbol id);
+  void see_page (const symbol scope, const symbol id);
   void alist_description (const AttributeList& alist);
 
   // Create and Destroy.

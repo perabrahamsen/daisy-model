@@ -216,7 +216,7 @@ struct DepthPLF : public Depth
 static const class CheckTable : public VCheck
 {
   void check (const Metalib&, const Syntax&, const AttributeList& alist,
-              const std::string& key) const throw (std::string)
+              const symbol key) const throw (std::string)
   {
     daisy_assert (alist.check (key));
         

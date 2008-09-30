@@ -23,7 +23,8 @@
 #ifndef SUBMODEL_H
 #define SUBMODEL_H
 
-#include <string>
+#include "symbol.h"
+
 #include <vector>
 
 class Syntax;
@@ -35,17 +36,17 @@ public:
   typedef void (*load_fun) (Syntax&, AttributeList&);
   
   static bool is_submodel (const Syntax&, const AttributeList&, 
-			   const std::string&);
-  static std::string find_submodel (const Syntax&, const AttributeList&, 
-				    const std::string&);
-  static void all (std::vector<std::string>& entries);
-  static void load_syntax (const std::string& model, Syntax&, AttributeList&);
-  static bool registered (const std::string& submodel);
+			   const symbol);
+  static symbol find_submodel (const Syntax&, const AttributeList&, 
+                               const symbol);
+  static void all (std::vector<symbol>& entries);
+  static void load_syntax (const symbol model, Syntax&, AttributeList&);
+  static bool registered (const symbol submodel);
 
   class Register
   {
   public:
-      Register (const std::string& name, load_fun fun);
+      Register (const symbol name, load_fun fun);
       ~Register ();
   };
 

@@ -48,7 +48,7 @@ Librarian::intrinsics ()
 Model* 
 Librarian::build_free (const char *const component, Metalib& metalib,
                        Treelog& msg, const AttributeList& alist, 
-                       const std::string& scope_id)
+                       symbol scope_id)
 {
   daisy_assert (alist.check ("type"));
   const symbol type = alist.identifier ("type");
@@ -88,7 +88,7 @@ Librarian::build_free (const char *const component, Metalib& metalib,
 Model* 
 Librarian::build_alist (const char *const component,
                         Block& parent, const AttributeList& alist, 
-                        const std::string& scope_id)
+                        symbol scope_id)
 {
   daisy_assert (alist.check ("type"));
   const symbol type = alist.identifier ("type");
@@ -115,7 +115,7 @@ Librarian::build_alist (const char *const component,
 Model* 
 Librarian::build_alist (const char *const component,
                         Block& parent, const AttributeList& alist, 
-                        const std::string& scope_id, size_t index)
+                        symbol scope_id, size_t index)
 {
   daisy_assert (alist.check ("type"));
   const symbol type = alist.identifier ("type");
@@ -141,12 +141,12 @@ Librarian::build_alist (const char *const component,
 
 Model* 
 Librarian::build_item (const char *const component,
-                       Block& parent, const std::string& key)
+                       Block& parent, symbol key)
 { return build_alist (component, parent, parent.alist (key), key); }
 
 std::vector<Model*> 
 Librarian::build_vector (const char *const component,
-                         Block& al, const std::string& key)
+                         Block& al, symbol key)
 { 
   std::vector<Model*> t;
   const std::vector<const AttributeList*>& f (al.alist_sequence (key));
@@ -157,7 +157,7 @@ Librarian::build_vector (const char *const component,
 
 std::vector<const Model*> 
 Librarian::build_vector_const (const char *const component,
-                               Block& al, const std::string& key)
+                               Block& al, symbol key)
 { 
   std::vector<const Model*> t;
   const std::vector<const AttributeList*>& f (al.alist_sequence (key));

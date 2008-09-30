@@ -453,6 +453,9 @@ Factor to multiply with to get base unit.");
     // Mass per area flux.
     add ("kg/m^2/s", p_k * u_g, name, syntax, alist, -2, 1, -1, 0, 0, 0, 0,
          "Base mass per area flux.");
+    add (Unit::mass_per_area_per_time ().name (),
+         p_k * u_g, name, syntax, alist, -2, 1, -1, 0, 0, 0, 0,
+         "Base mass per area flux.");
     add ("kg m^-2 s^-1", p_k * u_g, name, syntax, alist, -2, 1, -1, 0, 0, 0, 0,
          "Base mass per area flux.");
     add ("g/m^2/h", u_g / u_h, name, syntax, alist, 
@@ -727,7 +730,7 @@ static struct UnitFactorSyntax
   {
     static const symbol name ("factor");
 
-    // Add the 'SIfactor' factor model.
+    // Add the 'factor' factor model.
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "\
@@ -736,7 +739,7 @@ Connvert to base units by multiplying with a factor.");
 Base unit to convert to and from.");
     // TODO: Should add check that 'base' is indeed a base unit.
     syntax.add ("factor", Syntax::None (), Check::non_zero (), Syntax::Const, "\
-Fcator to multiply with to get base unit.");
+Factor to multiply with to get base unit.");
     Librarian::add_type (Unit::component, name, alist, syntax, &make);
 
     // Add geographical coordinates.
@@ -746,5 +749,80 @@ Fcator to multiply with to get base unit.");
          "Degrees North of Equator.");
   }
 } UnitFactor_syntax;
+
+// Model 'offset'.
+
+struct UnitOffset : public Unit
+{
+  const double factor;
+  const double offset;
+
+  double to_base (double value) const
+  { return value * factor + offset; }
+  double to_native (double value) const
+  { return (value - offset) / factor; }
+  bool in_native (double value) const
+  { return true; }
+  bool in_base (double value) const
+  { return true; }
+
+  UnitOffset (Block& al)
+    : Unit (al, al.identifier ("base")),
+      factor (al.number ("factor")),
+      offset (al.number ("offset"))
+  { }
+};
+
+static struct UnitOffsetSyntax
+{
+  static Model& make (Block& al)
+  { return *new UnitOffset (al); }
+  
+  static void add (const std::string& name_string, const double factor,
+                   const double offset,
+                   const std::string& base,
+                   const symbol super,
+                   const Syntax& super_syntax, const AttributeList& super_alist,
+                   const std::string& description)
+  {
+    const symbol name (name_string);
+
+    AttributeList& alist = *new AttributeList (super_alist);
+    alist.add ("type", super);
+    alist.add ("base", base);
+    alist.add ("factor", factor);
+    alist.add ("offset", offset);
+    alist.add ("description", description);
+    Librarian::add_type (Unit::component, name, alist, super_syntax, &make);
+  }
+
+  UnitOffsetSyntax ()
+  {
+    static const symbol name ("offset");
+
+    // Add the 'SIoffset' offset model.
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "\
+Connvert to base units by multiplying factor, then substracting offset.");
+    syntax.add ("base", Syntax::String, Syntax::Const, "\
+Base unit to convert to and from.");
+    // TODO: Should add check that 'base' is indeed a base unit.
+    syntax.add ("factor", Syntax::None (), Check::non_zero (), Syntax::Const, "\
+Factor to multiply with to get base unit.");
+    alist.add ("factor", 1.0);
+    syntax.add ("offset", Syntax::None (), Syntax::Const, "\
+Offset to add after multiplying with factor to get base unit.");
+    alist.add ("offset", 0.0);
+    Librarian::add_type (Unit::component, name, alist, syntax, &make);
+
+    // Add geographical coordinates.
+    add ("dg C", 1.0, 273.15, "K", name, syntax, alist,
+         "degree Celcius.");
+    // Absolute zero is -459.67 degree Fahrenheit.
+    add ("dg F", 5.0/9.0, 459.67 * 5.0 / 9.0, "K", name, syntax, alist,
+         "degree Fahrenheit.");
+  }
+} UnitOffset_syntax;
 
 // unit.C ends here.

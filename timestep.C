@@ -110,7 +110,7 @@ void
 Timestep::GenCheck::check (const Metalib&,
 			   const Syntax& syntax, 
                            const AttributeList& alist, 
-                           const std::string& key) const throw (std::string)
+                           const symbol key) const throw (std::string)
 { 
   daisy_assert (alist.check (key));
   daisy_assert (syntax.lookup (key) == Syntax::AList);

@@ -1,3 +1,11 @@
+2008-09-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* unit.C (offset): New model.
+	("dg C", "dg F"): New paramaterizations.
+	
+	* all: Use "symbol" many places.
+	* symbol.h: Allow implicit convertions from 'std::string' and 'char*'.
+
 2008-09-29  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.50 released.

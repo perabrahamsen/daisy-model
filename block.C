@@ -44,17 +44,17 @@ struct Block::Implementation
   bool is_ok;
 
   // Use.
-  Syntax::type lookup (const std::string&) const;
-  const Syntax& find_syntax (const std::string& key) const;
-  const AttributeList& find_alist (const std::string& key) const;
+  Syntax::type lookup (symbol) const;
+  const Syntax& find_syntax (const symbol key) const;
+  const AttributeList& find_alist (const symbol key) const;
   const std::string expand_string (Block&, const std::string&) const;
-  const std::string& expand_reference (const std::string& key);
+  symbol expand_reference (const symbol key);
   void error (const std::string& msg);
   void set_error ();
 
   Implementation (Metalib& lib, Block *const p, Treelog& m,
 		  const Syntax& s, const AttributeList& a,
-		  const std::string& scope_id)
+		  const symbol scope_id)
     : metalib (lib),
       parent (p),
       syntax (s),
@@ -68,7 +68,7 @@ struct Block::Implementation
 const Syntax Block::Implementation::empty_syntax;
 
 Syntax::type 
-Block::Implementation::lookup (const std::string& key) const
+Block::Implementation::lookup (const symbol key) const
 {
   Syntax::type type = syntax.lookup (key);
   if (type == Syntax::Error && parent)
@@ -77,7 +77,7 @@ Block::Implementation::lookup (const std::string& key) const
 }
 
 const Syntax& 
-Block::Implementation::find_syntax (const std::string& key) const
+Block::Implementation::find_syntax (const symbol key) const
 {
   Syntax::type type = syntax.lookup (key);
   if (type != Syntax::Error)
@@ -87,7 +87,7 @@ Block::Implementation::find_syntax (const std::string& key) const
 }
 
 const AttributeList& 
-Block::Implementation::find_alist (const std::string& key) const
+Block::Implementation::find_alist (const symbol key) const
 {
   Syntax::type type = syntax.lookup (key);
   if (type != Syntax::Error)
@@ -224,13 +224,13 @@ Block::Implementation::expand_string (Block& block,
   return result.str ();
 }
 
-const std::string&
-Block::Implementation::expand_reference (const std::string& key)
+symbol
+Block::Implementation::expand_reference (const symbol key)
 {
   if (!alist.is_reference (key))
     return key;
   
-  const std::string& var = alist.get_reference (key);
+  const symbol var = alist.get_reference (key);
   if (var == key)
     {
       error ("Value of '" + key + "' refers to itself");
@@ -299,132 +299,124 @@ Block::set_error ()
 { impl->set_error (); }
 
 Syntax::type 
-Block::lookup (const std::string& key) const
+Block::lookup (const symbol key) const
 { return impl->lookup (key); }
 
 const Syntax& 
-Block::find_syntax (const std::string& key) const
+Block::find_syntax (const symbol key) const
 { return impl->find_syntax (key); }
 
 const AttributeList& 
-Block::find_alist (const std::string& key) const
+Block::find_alist (const symbol key) const
 { return impl->find_alist (key); }
 
 bool 
-Block::check (const std::string& key) const
+Block::check (const symbol key) const
 {
   if (!impl->alist.is_reference (key))
     return impl->alist.check (key); 
 
-  const std::string& var = impl->expand_reference (key);
+  const symbol var = impl->expand_reference (key);
   return impl->find_alist (var).check (var); 
 }
 
-bool 
-Block::check (const symbol key) const
-{ return check (key.name ()); }
-
 double 
-Block::number (const std::string& key) const
+Block::number (const symbol key) const
 { 
   if (!impl->alist.is_reference (key))
     return impl->alist.number (key); 
 
-  const std::string& var = impl->expand_reference (key);
+  const symbol var = impl->expand_reference (key);
   return impl->find_alist (var).number (var); 
 }
 
 
 double 
-Block::number (const std::string& key, double default_value) const
+Block::number (const symbol key, double default_value) const
 { return check (key) ?  number (key) : default_value; }
 
 const std::string
-Block::name (const std::string& key)
+Block::name (const symbol key)
 { 
   if (!impl->alist.is_reference (key))
     return impl->expand_string (*this, impl->alist.name (key)); 
 
-  const std::string& var = impl->expand_reference (key);
+  const symbol var = impl->expand_reference (key);
   return impl->expand_string (*this, impl->find_alist (var).name (var)); 
 }
 
 const std::string 
-Block::name (const std::string& key, const std::string& default_value)
+Block::name (const symbol key, const std::string& default_value)
 { return check (key) ? name (key) : default_value; }
 
 symbol 
-Block::identifier (const std::string& key)
+Block::identifier (const symbol key)
 { return symbol (name (key)); }
 
-symbol 
-Block::identifier (const symbol key)
-{ return identifier (key.name ()); }
-
 symbol
-Block::identifier (const std::string& key, const symbol default_value)
+Block::identifier (const symbol key, const symbol default_value)
 { return check (key) ? identifier (key) : default_value; }
 
 bool 
-Block::flag (const std::string& key) const
+Block::flag (const symbol key) const
 { 
   if (!impl->alist.is_reference (key))
     return impl->alist.flag (key); 
 
-  const std::string& var = impl->expand_reference (key);
+  const symbol var = impl->expand_reference (key);
   return impl->find_alist (var).flag (var); 
 }
 
 bool 
-Block::flag (const std::string& key, bool default_value) const
+Block::flag (const symbol key, bool default_value) const
 { return check (key) ? flag (key) : default_value; }
 
 const PLF& 
-Block::plf (const std::string& key) const
+Block::plf (const symbol key) const
 { 
   if (!impl->alist.is_reference (key))
     return impl->alist.plf (key); 
 
-  const std::string& var = impl->expand_reference (key);
+  const symbol var = impl->expand_reference (key);
   return impl->find_alist (var).plf (var); 
 }
 
 AttributeList& 
-Block::alist (const std::string& key) const
+Block::alist (const symbol key) const
 { 
   if (!impl->alist.is_reference (key))
     return impl->alist.alist (key); 
 
-  const std::string& var = impl->expand_reference (key);
+  const symbol var = impl->expand_reference (key);
   return impl->find_alist (var).alist (var); 
 }
 
 int 
-Block::integer (const std::string& key) const
+Block::integer (const symbol key) const
 { 
   if (!impl->alist.is_reference (key))
     return impl->alist.integer (key); 
 
-  const std::string& var = impl->expand_reference (key);
+  const symbol var = impl->expand_reference (key);
   return impl->find_alist (var).integer (var); 
 }
 
 int 
-Block::integer (const std::string& key, int default_value) const
+Block::integer (const symbol key, int default_value) const
 { return check (key) ? integer (key) : default_value; }
 
 const std::vector<double>& 
-Block::number_sequence (const std::string& key) const
+Block::number_sequence (const symbol key) const
 { 
   if (!impl->alist.is_reference (key))
     return impl->alist.number_sequence (key); 
 
-  const std::string& var = impl->expand_reference (key);
+  const symbol var = impl->expand_reference (key);
   return impl->find_alist (var).number_sequence (var); 
 }
 
 const std::vector<symbol>
-Block::identifier_sequence (const std::string& key)
+Block::identifier_sequence (const symbol key)
 { 
   if (!impl->alist.is_reference (key))
     {
@@ -435,7 +427,7 @@ Block::identifier_sequence (const std::string& key)
         result.push_back (symbol (impl->expand_string (*this, value[i])));
       return result;
     }
-  const std::string& var = impl->expand_reference (key);
+  const symbol var = impl->expand_reference (key);
   const std::vector<std::string>& value
     = impl->find_alist (var).name_sequence (var); 
   std::vector<symbol> result;
@@ -446,7 +438,7 @@ Block::identifier_sequence (const std::string& key)
 
 
 std::vector<std::string>
-Block::name_sequence (const std::string& key)
+Block::name_sequence (const symbol key)
 { 
   if (!impl->alist.is_reference (key))
     {
@@ -457,7 +449,7 @@ Block::name_sequence (const std::string& key)
         result.push_back (impl->expand_string (*this, value[i]));
       return result;
     }
-  const std::string& var = impl->expand_reference (key);
+  const symbol var = impl->expand_reference (key);
   const std::vector<std::string>& value
     = impl->find_alist (var).name_sequence (var); 
   std::vector<std::string> result;
@@ -467,47 +459,47 @@ Block::name_sequence (const std::string& key)
 }
 
 const std::vector<bool>& 
-Block::flag_sequence (const std::string& key) const
+Block::flag_sequence (const symbol key) const
 { 
   if (!impl->alist.is_reference (key))
     return impl->alist.flag_sequence (key); 
 
-  const std::string& var = impl->expand_reference (key);
+  const symbol var = impl->expand_reference (key);
   return impl->find_alist (var).flag_sequence (var); 
 }
 
 const std::vector<int>& 
-Block::integer_sequence (const std::string& key) const
+Block::integer_sequence (const symbol key) const
 { 
   if (!impl->alist.is_reference (key))
     return impl->alist.integer_sequence (key); 
 
-  const std::string& var = impl->expand_reference (key);
+  const symbol var = impl->expand_reference (key);
   return impl->find_alist (var).integer_sequence (var); 
 }
 
 const std::vector<const PLF*>& 
-Block::plf_sequence (const std::string& key) const
+Block::plf_sequence (const symbol key) const
 { 
   if (!impl->alist.is_reference (key))
     return impl->alist.plf_sequence (key); 
 
-  const std::string& var = impl->expand_reference (key);
+  const symbol var = impl->expand_reference (key);
   return impl->find_alist (var).plf_sequence (var); 
 }
 
 const std::vector<const AttributeList*>& 
-Block::alist_sequence (const std::string& key) const
+Block::alist_sequence (const symbol key) const
 { 
   if (!impl->alist.is_reference (key))
     return impl->alist.alist_sequence (key); 
 
-  const std::string& var = impl->expand_reference (key);
+  const symbol var = impl->expand_reference (key);
   return impl->find_alist (var).alist_sequence (var); 
 }
 
 std::string 
-Block::sequence_id (std::string key, size_t index)
+Block::sequence_id (const symbol key, size_t index)
 {
   std::ostringstream tmp;
   tmp << key << "[" << index << "]";
@@ -516,24 +508,24 @@ Block::sequence_id (std::string key, size_t index)
 
 Block::Block (Metalib& metalib, Treelog& msg, 
               const Syntax& syntax, const AttributeList& alist,
- 	      const std::string& scope_id)
+ 	      const symbol scope_id)
   : impl (new Implementation (metalib, NULL, msg, syntax, alist, scope_id))
 { }
 
 Block::Block (Metalib& metalib, Treelog& msg, 
-              const std::string& scope_id)
+              const symbol scope_id)
   : impl (new Implementation (metalib, NULL, msg, 
                               metalib.syntax (), metalib.alist (), scope_id))
 { }
 
 Block::Block (Block& block,
 	      const Syntax& syntax, const AttributeList& alist, 
-	      const std::string& scope_id)
+	      const symbol scope_id)
   : impl (new Implementation (block.metalib (), &block, block.msg (),
                               syntax, alist, scope_id))
 { }
 
-Block::Block (Block& block, const std::string& key)
+Block::Block (Block& block, const symbol key)
   : impl (new Implementation (block.metalib (), &block, block.msg (), 
                               block.syntax ().syntax (key), 
                               block.alist ().alist (key),
@@ -542,7 +534,7 @@ Block::Block (Block& block, const std::string& key)
 
 Block::Block (Block& block,
 	      const Syntax& syntax, const AttributeList& alist, 
-	      const std::string& scope_id, size_t index)
+	      const symbol scope_id, size_t index)
   : impl (new Implementation (block.metalib (), &block, block.msg (),
 			      syntax, alist, 
 			      sequence_id (scope_id, index)))

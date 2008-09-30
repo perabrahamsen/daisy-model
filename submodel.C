@@ -27,13 +27,13 @@
 #include "assertion.h"
 #include <map>
 
-typedef std::map<std::string, Submodel::load_fun> submodel_map_type;
+typedef std::map<symbol, Submodel::load_fun> submodel_map_type;
 
 static submodel_map_type* submodel_map = NULL;
 
 bool 
 Submodel::is_submodel (const Syntax& syntax, const AttributeList& alist,
-		       const std::string& name)
+		       const symbol name)
 {
   if (syntax.size (name) != Syntax::Singleton || !alist.check (name))
     {
@@ -50,10 +50,10 @@ Submodel::is_submodel (const Syntax& syntax, const AttributeList& alist,
   return false;
 }
 
-std::string
+symbol
 Submodel::find_submodel (const Syntax& syntax, 
 			 const AttributeList& alist,
-			 const std::string& name)
+			 const symbol name)
 {
   if (syntax.size (name) != Syntax::Singleton || !alist.check (name))
     {
@@ -71,7 +71,7 @@ Submodel::find_submodel (const Syntax& syntax,
 }
 
 void
-Submodel::all (std::vector<std::string>& entries)
+Submodel::all (std::vector<symbol>& entries)
 {
   for (submodel_map_type::const_iterator i = submodel_map->begin ();
        i != submodel_map->end ();
@@ -82,7 +82,7 @@ Submodel::all (std::vector<std::string>& entries)
 }
 
 void
-Submodel::load_syntax (const std::string& model, 
+Submodel::load_syntax (const symbol model, 
 		       Syntax& syntax, AttributeList& alist)
 {
   submodel_map_type::const_iterator i = submodel_map->find (model);
@@ -91,10 +91,10 @@ Submodel::load_syntax (const std::string& model,
 }
 
 bool
-Submodel::registered (const std::string& submodel)
+Submodel::registered (const symbol submodel)
 { return submodel_map->find (submodel) != submodel_map->end (); }
 
-Submodel::Register::Register (const std::string& name, load_fun fun)
+Submodel::Register::Register (const symbol name, load_fun fun)
 {
   if (!submodel_map)
     submodel_map = new submodel_map_type;

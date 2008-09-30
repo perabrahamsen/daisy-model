@@ -26,13 +26,9 @@
 
 Treelog::Open::Open (Treelog& l, const symbol name)
   : log (l)
-{ log.open (name.name ()); }
-
-Treelog::Open::Open (Treelog& l, const std::string& name)
-  : log (l)
 { log.open (name); }
 
-Treelog::Open::Open (Treelog& l, const std::string& parameter, 
+Treelog::Open::Open (Treelog& l, const symbol parameter, 
                      const size_t index, const symbol model)
   : log (l)
 {
@@ -64,7 +60,7 @@ class TreelogNull : public Treelog
 {
   // Nesting.
 public:
-  void open (const std::string&)
+  void open (const symbol)
   { }
   void close ()
   { }

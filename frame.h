@@ -43,140 +43,140 @@ private:
   // Common access.
 public:
   // Get a list of all entries.
-  void entries (std::vector<std::string>&) const;
+  void entries (std::vector<symbol>&) const;
   unsigned int entries () const;
 
   // This function will check that the alist conform to the syntax.
   bool check (const Metalib&, Treelog& err) const;
   
   // Check that a numeric value is within the allowed range.
-  void check (const std::string& key, double value) const;
+  void check (const symbol key, double value) const;
 
   // Check than an arbitrary attribute is valid.
-  bool check (const Metalib&, const std::string& key, Treelog&) const;
+  bool check (const Metalib&, const symbol key, Treelog&) const;
 
   // Extract type information about a specific attribute.
-  bool is_const (const std::string&) const;
-  bool is_optional (const std::string&) const;
-  bool is_log (const std::string&) const;
-  bool is_state (const std::string&) const;
-  Syntax::type lookup (const std::string&) const;
-  const Syntax& syntax (const std::string&) const;
-  ::Library& library (const Metalib&, const std::string&) const;
-  int  size (const std::string&) const;
-  const std::string& dimension (const std::string&) const;
-  const std::string& domain (const std::string&) const;
-  const std::string& range (const std::string&) const;
-  const std::string& description (const std::string&) const;
-  const AttributeList& default_alist (const std::string&) const;
+  bool is_const (const symbol) const;
+  bool is_optional (const symbol) const;
+  bool is_log (const symbol) const;
+  bool is_state (const symbol) const;
+  Syntax::type lookup (const symbol) const;
+  const Syntax& syntax (const symbol) const;
+  ::Library& library (const Metalib&, const symbol) const;
+  int  size (const symbol) const;
+  const symbol dimension (const symbol) const;
+  const symbol domain (const symbol) const;
+  const symbol range (const symbol) const;
+  const symbol description (const symbol) const;
+  const AttributeList& default_alist (const symbol) const;
 
   // Add attribute types.
 public:
-  void add (const std::string& key,	// Generic.
+  void add (const symbol key,	// Generic.
 	    Syntax::type t, 
 	    Syntax::category cat,
 	    int size,
-	    const std::string& description);
-  void add (const std::string& key,
+	    const symbol description);
+  void add (const symbol key,
 	    Syntax::type t, 
 	    Syntax::category cat,
-	    const std::string& description)
+	    const symbol description)
   { add (key, t, cat, Syntax::Singleton, description); }
 
-  void add (const std::string& key, // Number.
-	    const std::string& dim,
+  void add (const symbol key, // Number.
+	    const symbol dim,
 	    Syntax::category cat,
 	    int size,
-	    const std::string& description);
-  void add (const std::string& key, 
-	    const std::string& dim,
+	    const symbol description);
+  void add (const symbol key, 
+	    const symbol dim,
 	    Syntax::category cat,
-	    const std::string& description)
+	    const symbol description)
   { add (key, dim, cat, Syntax::Singleton, description); } 
-  void add (const std::string& key,
-	    const std::string& dim,
+  void add (const symbol key,
+	    const symbol dim,
 	    const Check& check,
 	    Syntax::category cat,
 	    int size,
-	    const std::string& description);
-  void add (const std::string& key, 
-	    const std::string& dim,
+	    const symbol description);
+  void add (const symbol key, 
+	    const symbol dim,
 	    const Check& check,
 	    Syntax::category cat,
-	    const std::string& description)
+	    const symbol description)
   { add (key, dim, check, cat, Syntax::Singleton, description); } 
-  void add_fraction (const std::string& key, 
+  void add_fraction (const symbol key, 
 		     Syntax::category cat,
 		     int size,
-		     const std::string& description);
-  void add_fraction (const std::string& key, 
+		     const symbol description);
+  void add_fraction (const symbol key, 
 		     Syntax::category cat,
-		     const std::string& description);
+		     const symbol description);
 
-  void add (const std::string& key, // PLF.
-	    const std::string& domain,
-	    const std::string& range,
+  void add (const symbol key, // PLF.
+	    const symbol domain,
+	    const symbol range,
 	    Syntax::category cat,
 	    int size,
-	    const std::string& description);
-  void add (const std::string& key, 
-	    const std::string& domain,
-	    const std::string& range,
+	    const symbol description);
+  void add (const symbol key, 
+	    const symbol domain,
+	    const symbol range,
 	    Syntax::category cat,
-	    const std::string& description)
+	    const symbol description)
   { add (key, domain, range, cat, Syntax::Singleton, description); } 
-  void add (const std::string& key,
-	    const std::string& domain,
-	    const std::string& range,
+  void add (const symbol key,
+	    const symbol domain,
+	    const symbol range,
 	    const Check& check,
 	    Syntax::category cat,
 	    int size,
-	    const std::string& description);
-  void add (const std::string& key, 
-	    const std::string& domain,
-	    const std::string& range,
+	    const symbol description);
+  void add (const symbol key, 
+	    const symbol domain,
+	    const symbol range,
 	    const Check& check,
 	    Syntax::category cat,
-	    const std::string& description)
+	    const symbol description)
   { add (key, domain, range, check, cat, Syntax::Singleton, description); } 
 
-  void add (const std::string& key,  // AList
+  void add (const symbol key,  // AList
 	    const Syntax& syntax,
 	    int size,
-	    const std::string& description)
+	    const symbol description)
   { add (key, syntax, Syntax::State, size, description); }
-  void add (const std::string& key,  // AList
+  void add (const symbol key,  // AList
 	    const Syntax& syntax,
-	    const std::string& description)
+	    const symbol description)
   { add (key, syntax, Syntax::State, Syntax::Singleton, description); }
-  void add (const std::string&, const Syntax&,
+  void add (const symbol, const Syntax&,
 	    Syntax::category cat, int size, 
-	    const std::string& description);
-  void add (const std::string&, const Syntax&, const AttributeList&,	
+	    const symbol description);
+  void add (const symbol, const Syntax&, const AttributeList&,	
 	    // Alist sequence with default element.
-	    Syntax::category, int size, const std::string& description);
+	    Syntax::category, int size, const symbol description);
 
-  void add_object (const std::string& key,// Object
+  void add_object (const symbol key,// Object
                    const char *const lib, 
-                   const std::string& description)
+                   const symbol description)
   { add_object (key, lib, Syntax::State, Syntax::Singleton, description); }
-  void add_object (const std::string&, const char* lib,
-                   Syntax::category, int size, const std::string& description);
-  void add_object (const std::string&, symbol lib,
-                   Syntax::category, int size, const std::string& description);
+  void add_object (const symbol, const char* lib,
+                   Syntax::category, int size, const symbol description);
+  void add_object (const symbol, symbol lib,
+                   Syntax::category, int size, const symbol description);
 
-  void add_library (const std::string&, symbol lib);
+  void add_library (const symbol, symbol lib);
 
   typedef void (*load_syntax_fun) (Syntax& syntax, AttributeList& alist);
-  void add_submodule (const std::string& name, AttributeList& alist,
-		      Syntax::category cat, const std::string& description,
+  void add_submodule (const symbol name, AttributeList& alist,
+		      Syntax::category cat, const symbol description,
 		      load_syntax_fun load_syntax);
-  void add_submodule_sequence (const std::string& name, Syntax::category cat, 
-			       const std::string& description,
+  void add_submodule_sequence (const symbol name, Syntax::category cat, 
+			       const symbol description,
 			       load_syntax_fun load_syntax);
 
   // Additional type constraints for a single attribute value. 
-  void add_check (const std::string& name, const VCheck& vcheck);
+  void add_check (const symbol name, const VCheck& vcheck);
 
   // It is possible to impose an order on the syntax entries, which
   // will allow the input module to parse the entries without the user
@@ -184,20 +184,20 @@ public:
   // *not* to use this in general, as it makes it more difficult to
   // add new entries.
 public:
-  void order (const std::vector<std::string>&);
-  void order (const std::string&);
-  void order (const std::string&, const std::string&);
-  void order (const std::string&, const std::string&, const std::string&);
-  void order (const std::string&, const std::string&, const std::string&,
-	      const std::string&);
-  void order (const std::string&, const std::string&, const std::string&,
-	      const std::string&,
-	      const std::string&);
+  void order (const std::vector<symbol>&);
+  void order (const symbol);
+  void order (const symbol, const symbol);
+  void order (const symbol, const symbol, const symbol);
+  void order (const symbol, const symbol, const symbol,
+	      const symbol);
+  void order (const symbol, const symbol, const symbol,
+	      const symbol,
+	      const symbol);
 
   // Extract the imposed order.
   bool ordered () const;
-  const std::vector<std::string>& order () const;
-  int order_index (const std::string& name) const; // Return index in order, or -1
+  const std::vector<symbol>& order () const;
+  int order_index (const symbol name) const; // Return index in order, or -1
   bool total_order () const;	// True iff all members are ordered.
 
   // Additional constraints involving multiple attributes.
@@ -206,56 +206,52 @@ public:
   void add_object_check (Syntax::check_object);
 
   // Is 'key' an element of this alist?
-  bool check (const std::string& key) const;
   bool check (const symbol key) const;
 
   // Extract attribute values.
 public:
-  double number (const std::string&) const;
-  double number (const std::string&, double default_value) const;
-  const std::string name (const std::string&) const;
-  const std::string name (const std::string&, 
-			  const std::string& default_value) const;
-  symbol identifier (const std::string&) const;
+  double number (const symbol) const;
+  double number (const symbol, double default_value) const;
+  const std::string name (const symbol) const;
+  const std::string name (const symbol, const symbol default_value) const;
   symbol identifier (const symbol) const;
-  bool flag (const std::string&) const;
-  bool flag (const std::string&, bool default_value) const;
-  const PLF& plf (const std::string&) const;
-  AttributeList& alist (const std::string&) const;
-  int integer (const std::string&) const;
-  int integer (const std::string&, int default_value) const;
-  const std::vector<double>& number_sequence (const std::string&) const;
-  const std::vector<symbol> identifier_sequence (const std::string& key) const;
-  std::vector<std::string> name_sequence (const std::string& key) const;
-  const std::vector<bool>& flag_sequence (const std::string& key) const;
-  const std::vector<int>& integer_sequence (const std::string& key) const;
-  const std::vector<const PLF*>& plf_sequence (const std::string& key) const;
+  bool flag (const symbol) const;
+  bool flag (const symbol, bool default_value) const;
+  const PLF& plf (const symbol) const;
+  AttributeList& alist (const symbol) const;
+  int integer (const symbol) const;
+  int integer (const symbol, int default_value) const;
+  const std::vector<double>& number_sequence (const symbol) const;
+  const std::vector<symbol> identifier_sequence (const symbol key) const;
+  std::vector<std::string> name_sequence (const symbol key) const;
+  const std::vector<bool>& flag_sequence (const symbol key) const;
+  const std::vector<int>& integer_sequence (const symbol key) const;
+  const std::vector<const PLF*>& plf_sequence (const symbol key) const;
   const std::vector<const AttributeList*>& 
-  /**/ alist_sequence (const std::string& key) const;
+  /**/ alist_sequence (const symbol key) const;
 
   // Set attribute values.
 public:
-  void add (const std::string&, double);
-  void add (const std::string&, double, const std::string&);
-  void add (const std::string&, const char*);
-  void add (const std::string&, const std::string&);
-  void add (const std::string&, symbol);
-  void add (const std::string&, bool);
-  void add (const std::string&, int);
-  void add (const std::string&, const AttributeList&);
-  void add (const std::string&, const PLF&);
-  void add (const std::string&, const std::vector<double>&);
-  void add (const std::string&, const std::vector<symbol>&);
-  void add_strings (const std::string& key, const std::string& a);
-  void add_strings (const std::string& key,
-                    const std::string& a, const std::string& b);
-  void add_strings (const std::string& key,
-                    const std::string& a, const std::string& b,
-                    const std::string& c);
-  void add (const std::string&, const std::vector<bool>&);
-  void add (const std::string&, const std::vector<int>&);
-  void add (const std::string&, const std::vector<const AttributeList*>&);
-  void add (const std::string&, const std::vector<const PLF*>&);
+  void add (const symbol, double);
+  void add (const symbol, double, const symbol);
+  void add (const symbol, const char*);
+  void add (const symbol, const symbol);
+  void add (const symbol, bool);
+  void add (const symbol, int);
+  void add (const symbol, const AttributeList&);
+  void add (const symbol, const PLF&);
+  void add (const symbol, const std::vector<double>&);
+  void add (const symbol, const std::vector<symbol>&);
+  void add_strings (const symbol key, const symbol a);
+  void add_strings (const symbol key,
+                    const symbol a, const symbol b);
+  void add_strings (const symbol key,
+                    const symbol a, const symbol b,
+                    const symbol c);
+  void add (const symbol, const std::vector<bool>&);
+  void add (const symbol, const std::vector<int>&);
+  void add (const symbol, const std::vector<const AttributeList*>&);
+  void add (const symbol, const std::vector<const PLF*>&);
 
   // Create and Destroy.
 public:

@@ -92,9 +92,9 @@ struct Select::Implementation
     
     // Use.
     const Syntax& leaf_syntax (Syntax&) const;
-    const std::string& leaf_name () const;
+    symbol leaf_name () const;
     symbol dimension () const;
-    std::string description () const;
+    symbol description () const;
     void refer (Format&) const;
 
     // Create and Destroy.
@@ -120,7 +120,7 @@ struct Select::Implementation
   double convert (double) const; // - || -
   const symbol tag;		// Name of this entry.
   symbol dimension;		// Physical dimension of this entry.
-  const std::string description;
+  const symbol description;
 
   // Create and Destroy.
   bool check (symbol spec_dim, Treelog& err) const;
@@ -153,11 +153,11 @@ Select::Implementation::Spec::leaf_syntax (Syntax& buffer) const
   return *syntax;
 }
 
-const std::string&
+symbol
 Select::Implementation::Spec::leaf_name () const
 { 
   daisy_assert (submodels_and_attribute.size () > 0);
-  return submodels_and_attribute.back ().name (); 
+  return submodels_and_attribute.back (); 
 }
 
 symbol
@@ -171,7 +171,7 @@ Select::Implementation::Spec::dimension () const
     return Syntax::unknown ();
 }
 
-std::string /* can't return reference because buffer is automatic */
+symbol /* can't return reference because buffer is automatic */
 Select::Implementation::Spec::description () const
 { 
   Syntax buffer;
@@ -274,7 +274,7 @@ Select::Implementation::Spec::check_alist (const Metalib& metalib,
       err.entry ("You must specify an attribute");
       ok = false;
     }
-  if (library_name.name () == "fixed")
+  if (library_name == "fixed")
     {
       if (!Submodel::registered (model_name.name ()))
 	{
@@ -488,14 +488,14 @@ double
 Select::convert (double value) const
 { return impl->convert (value); }
 
-std::string
+symbol
 Select::get_description () const
 {
   if (impl->description != "")
     return impl->description;
   if (impl->spec.get ())
     {
-      std::string d = impl->spec->description ();
+      std::string d = impl->spec->description ().name ();
       if (impl->negate)
         d += " (reversed)";
       return d;
@@ -604,7 +604,7 @@ Select::document (Format& format) const
   if (impl->description != "")
     {
       format.hard_linebreak ();
-      format.text (impl->description);
+      format.text (impl->description.name ());
       format.soft_linebreak ();
     }
   else if (impl->spec.get ())
@@ -616,7 +616,7 @@ Select::document (Format& format) const
 	}
       impl->spec->refer (format);
       format.hard_linebreak ();
-      format.text (impl->spec->description ());
+      format.text (impl->spec->description ().name ());
       format.soft_linebreak ();
     }
 }

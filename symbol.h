@@ -74,8 +74,8 @@ public:
   explicit symbol ()
     : id (-1)
   { }
-  explicit symbol (const char*) EXPORT;
-  explicit symbol (const std::string&) EXPORT;
+  symbol (const char*) EXPORT;
+  symbol (const std::string&) EXPORT;
   explicit symbol (int) EXPORT;
   symbol (const symbol& other)
     : id (other.id)
