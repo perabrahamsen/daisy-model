@@ -161,8 +161,14 @@ struct BioclimateStandard : public Bioclimate
   double absorbed_shadow_NIR_canopy;// Canopy absorbed NIR on shadow leaves [W/m2]
   double absorbed_shadow_Long_canopy;// Canopy absorbed Long wave radiation on shadow leaves [W/m2]
   double rad_abs_soil_;             // Soil absorbed radiation [W/m2]
-  double rad_abs_sun_canopy_;      // Canopy absorbed radiatio on sunlit leaves [W/m2]
+  double rad_abs_sun_canopy_;       // Canopy absorbed radiatio on sunlit leaves [W/m2]
   double rad_abs_shadow_canopy_;    // Canopy absorbed radiation on shadow leaves [W/m2]
+  double incoming_Long_radiation;  // Incoming longwave radiation [W/m2] 
+  double incoming_PAR_radiation;   // Incoming PAR radiation [W/m2]
+  double incoming_NIR_radiation;   // Incoming NIR radiation [W/m2]
+  double incoming_Total_radiation; // Incoming radiation sum of shortwave and 
+                                   // longwave [W/m2]
+
   double sin_beta_;
 
   // Weather.
@@ -552,7 +558,14 @@ use these (the weather difrad model). Otherwise Daisy wil use the DPF model.");
               "Canopy absorbed NIR on shadow leaves");
   syntax.add ("absorbed_shadow_Long_canopy","W/m2", Syntax::LogOnly,
               "Canopy absorbed long wave radiation on shadow leaves");
-
+  syntax.add ("incoming_Long_radiation","W/m2", Syntax::LogOnly,
+              "Incoming longwave radiation");
+  syntax.add ("incoming_PAR_radiation","W/m2", Syntax::LogOnly,
+              "Incoming PAR radiation");
+  syntax.add ("incoming_NIR_radiation","W/m2", Syntax::LogOnly,
+              "Incoming NIR radiation");
+  syntax.add ("incoming_Total_radiation","W/m2", Syntax::LogOnly,
+              "Incoming radiation, sum of shortwave and longwave");
 }
 
 const AttributeList& 
@@ -704,20 +717,21 @@ BioclimateStandard::RadiationDistribution (const Vegetation& vegetation,
                 global_radiation (), difrad0, sin_beta_, vegetation, msg);
 
   //Absorbed PAR in the canopy and the soil:
-  absorbed_total_PAR_canopy = total_PAR_[0] - total_PAR_[No];     // [W/m2]
+  incoming_PAR_radiation = total_PAR_[0]; // [W/m2]
+  absorbed_total_PAR_canopy = incoming_PAR_radiation - total_PAR_[No];     // [W/m2]
   absorbed_total_PAR_soil = total_PAR_[0] - absorbed_total_PAR_canopy; // [W/m2]
   absorbed_sun_PAR_canopy = sun_PAR_[0] - sun_PAR_[No];           // [W/m2]
   absorbed_shadow_PAR_canopy = absorbed_total_PAR_canopy - absorbed_sun_PAR_canopy; // [W/m2]
 
    //Absorbed NIR in the canopy and the soil:
-  absorbed_total_NIR_canopy = total_NIR_[0] - total_NIR_[No];
-  absorbed_total_NIR_soil = total_NIR_[0] - absorbed_total_NIR_canopy;
+  incoming_NIR_radiation = total_NIR_[0]; // [W/m2]
+  absorbed_total_NIR_canopy = incoming_NIR_radiation - total_NIR_[No];
+  absorbed_total_NIR_soil = incoming_NIR_radiation - absorbed_total_NIR_canopy;
   absorbed_sun_NIR_canopy = sun_NIR_[0] - sun_NIR_[No];
   absorbed_shadow_NIR_canopy = absorbed_total_NIR_canopy - absorbed_sun_NIR_canopy;
 
    //Absorbed Long wave radiation in the canopy and the soil:
-  const double incoming_longwave_radiation
-    = net_radiation->incoming_longwave_radiation();
+  incoming_Long_radiation = net_radiation->incoming_longwave_radiation();
   const double cover = vegetation.cover();
 
   sun_LAI_fraction_total_ = 0.0;
@@ -726,12 +740,12 @@ BioclimateStandard::RadiationDistribution (const Vegetation& vegetation,
       sun_LAI_fraction_total_ += sun_LAI_fraction_[i] / No;
     }
   
-  absorbed_total_Long_soil = incoming_longwave_radiation * (1-cover);
-  absorbed_total_Long_canopy = incoming_longwave_radiation * (cover);
+  absorbed_total_Long_soil = incoming_Long_radiation * (1-cover);
+  absorbed_total_Long_canopy = incoming_Long_radiation * (cover);
   absorbed_sun_Long_canopy = absorbed_total_Long_canopy * sun_LAI_fraction_total_;
   absorbed_shadow_Long_canopy = absorbed_total_Long_canopy - absorbed_sun_Long_canopy;
 
-    // Variables for SVAT
+  // Variables for SVAT
   rad_abs_soil_ = absorbed_total_Long_soil + absorbed_total_NIR_soil
     + absorbed_total_PAR_soil;
   rad_abs_sun_canopy_ = absorbed_sun_Long_canopy + absorbed_sun_NIR_canopy
@@ -739,6 +753,9 @@ BioclimateStandard::RadiationDistribution (const Vegetation& vegetation,
   rad_abs_shadow_canopy_ =  absorbed_shadow_Long_canopy 
     + absorbed_shadow_NIR_canopy + absorbed_shadow_PAR_canopy;
 
+  // Variable for log
+ incoming_Total_radiation = incoming_Long_radiation + incoming_PAR_radiation 
+   + incoming_NIR_radiation;    // [W/m2]
 }
 
 void
@@ -1256,6 +1273,10 @@ BioclimateStandard::output (Log& log) const
   output_variable (absorbed_shadow_PAR_canopy, log);
   output_variable (absorbed_shadow_NIR_canopy, log);
   output_variable (absorbed_shadow_Long_canopy, log);
+  output_variable (incoming_Long_radiation, log);
+  output_variable (incoming_PAR_radiation, log);
+  output_variable (incoming_NIR_radiation, log);
+  output_variable (incoming_Total_radiation, log);
 }
 
 void
