@@ -1,3 +1,7 @@
+2008-10-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_sow.C ("plant_distance"):  New alias for "row_width".
+
 2008-09-30  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* unit.C (offset): New model.

@@ -1278,7 +1278,6 @@ public:
   float **astar,**aistar,**bstar,**xstar; // gausjj()
 
   // variables retrieved from other parts of DAISY (by tick())
-  int year,month,day,hour;
   double kh; // thermal conductivity from soil_heat.h
   double theta_0; // soil water content at near surface
   double theta_0_20; // Average soil water content in top 20 cm.
@@ -1286,7 +1285,6 @@ public:
   double les_tmp; // not in use
   double epotc,epots; // PotET from canopy / soil surface
   double evaps,evaps_w;
-  double eact; // actual evapotranspiration from tick()
   double epotc_w,epots_w,eact_w; // fluxes from cm/hr to W/m^2
   double pond_ea_w,soil_ea_w,pond_ep_w,canopy_ep_w,canopy_ea_w;// in tick
   double crop_ea; 
@@ -1402,13 +1400,9 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
   // surface evaporation
   evaps=0.1*(bio.pond_ea() + bio.soil_ea()); // soil evaporation  ???? CHECK
 
-  // actual evapotranspiration, from soil and canopy, from tick()
-  eact=0.1*bio.soil_ea();
-
   // convert epotc, epots and eact etc. from cm/hr to W/m^2
   epotc_w=6800.0*epotc;
   epots_w=6800.0*epots;
-  eact_w =6800.0*eact;
   evaps_w=6800.0*evaps;
   pond_ea_w=680.0*bio.pond_ea(); // 0.1*6800 mm/hr -> cm/hr
   soil_ea_w=680.0*bio.soil_ea();
@@ -1428,13 +1422,6 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
   // otherwise: calculate resistances and then energy balance
   if (LAI > 0.0)
     {
-      // communication with time.C
-#if 0
-      year = time.year();
-      month = time.month();
-      day = time.yday();
-      hour = time.hour();
-#endif
       // communication with weather_hourly.C
       e_pa = weather.vapor_pressure (); // [Pa]
       tair = weather.air_temperature (); // [C]

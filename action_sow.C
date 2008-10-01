@@ -51,7 +51,8 @@ struct ActionSow : public Action
   ActionSow (Block& al)
     : Action (al),
       crop (al.alist ("crop")),
-      row_width (al.number ("row_width"))
+      // Use 'plant_distance' if set, otherwise use 'row_width'.
+      row_width (al.number ("plant_distance", al.number ("row_width")))
   { }
 };
 
@@ -72,6 +73,14 @@ static struct ActionSowSyntax
                 Syntax::Const, "Distance between rows.\n\
 Specify zero to spread equally over the area (no rows).");
     alist.add ("row_width", 0.0);
+    syntax.add ("plant_distance", "cm", Check::non_negative (),
+                Syntax::OptionalConst, "Distance between plants.\n\
+\n\
+Setting this will overrule 'row_width'.  The only purpose of this\n\
+paramater is to provide the user with a more intuitive name for\n\
+'row_width' for the situation where you have a 2D simulation, where\n\
+the x axis is parallel with the actual rows in the field, rather than\n\
+ortogonal to the rows as is otherwise assumed by Daisy.");
     syntax.add ("seed", "kg DM/ha", Check::positive (), Syntax::OptionalConst,
                 "Amount of seed applied.  NOT YET IMPLEMENTED.\n\
 Currently, initial growth will be governed by 'typical' seed amounts.");

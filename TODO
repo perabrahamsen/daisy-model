@@ -4,17 +4,11 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 ** ElementSet
 
-* Unit tests
-
-** gtest
-
-** Units
-
-*** K -> dg C
-
 * SVAT
 
 ** Check initialisering of soil_heat
+
+** canopy_ea skal trækkes fra svat_ea
 
 * SAFIR
 
