@@ -51,9 +51,9 @@ public:
   // Simulation.
 public:
   virtual void tick (const Weather&, const Vegetation&,
-		     const Surface&, const Geometry&, 
+		     const Geometry&, 
                      const Soil&, const SoilHeat&, 
-		     const SoilWater&, const Pet&, 
+		     const SoilWater&, 
                      const Bioclimate&, Treelog&) = 0;
   virtual void output (Log&) const;
   virtual double production_stress () const = 0; // []

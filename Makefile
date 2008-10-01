@@ -1411,8 +1411,8 @@ submodel${OBJ}: submodel.C submodel.h symbol.h syntax.h treelog.h alist.h \
 version${OBJ}: version.C
 svat_ssoc${OBJ}: svat_ssoc.C svat.h model.h symbol.h alist.h syntax.h \
   treelog.h block.h plf.h librarian.h resistance.h fao.h soil_heat.h \
-  bioclimate.h soil.h surface.h uzmodel.h geometry.h mathlib.h \
-  assertion.h weather.h im.h vegetation.h log.h time.h border.h
+  bioclimate.h soil.h geometry.h mathlib.h assertion.h weather.h im.h \
+  vegetation.h log.h time.h border.h
 reaction_MACRO${OBJ}: reaction_MACRO.C reaction.h model.h symbol.h alist.h \
   mathlib.h assertion.h check.h block.h syntax.h treelog.h plf.h \
   librarian.h chemistry.h chemical.h log.h time.h border.h geometry.h \
@@ -2027,10 +2027,9 @@ pet_PM${OBJ}: pet_PM.C pet.h model.h symbol.h alist.h syntax.h treelog.h \
   fao.h weather.h im.h soil.h surface.h uzmodel.h soil_heat.h \
   vegetation.h log.h time.h border.h librarian.h
 svat_pmsw${OBJ}: svat_pmsw.C svat.h model.h symbol.h alist.h mathlib.h \
-  assertion.h block.h syntax.h treelog.h plf.h surface.h uzmodel.h \
-  weather.h im.h time.h geometry.h soil.h soil_water.h soil_heat.h \
-  bioclimate.h vegetation.h pet.h log.h border.h fao.h gaussj.h \
-  librarian.h nrutil.h
+  assertion.h block.h syntax.h treelog.h plf.h weather.h im.h geometry.h \
+  soil.h soil_water.h soil_heat.h bioclimate.h vegetation.h log.h time.h \
+  border.h fao.h gaussj.h librarian.h nrutil.h
 action_surface${OBJ}: action_surface.C action.h model.h symbol.h alist.h \
   block.h syntax.h treelog.h plf.h daisy.h program.h run.h time.h \
   timestep.h vcheck.h memutils.h field.h border.h check.h librarian.h

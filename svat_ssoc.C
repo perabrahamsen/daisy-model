@@ -31,7 +31,6 @@
 #include "soil_heat.h"
 #include "bioclimate.h"
 #include "soil.h"
-#include "surface.h"
 #include "geometry.h"
 #include "weather.h"
 #include "vegetation.h"
@@ -60,6 +59,7 @@ struct SVAT_SSOC : public SVAT
   double RH;             // Relative humidity []
   double U_z;            // Surface wind speed [m s^-1]
   double kb;             // Extinction coefficient []
+  double canopy_ea;      // Evaporation of intercepted water [mm/h]
 
   // - Lower boundary 
   double z0;             // Depth of top cell [m]
@@ -146,8 +146,8 @@ struct SVAT_SSOC : public SVAT
   
   // Simulation.
   void tick (const Weather&, const Vegetation&,
-	     const Surface&, const Geometry&, const Soil&, const SoilHeat&,
-	     const SoilWater&, const Pet&, const Bioclimate&, Treelog&); 
+	     const Geometry&, const Soil&, const SoilHeat&,
+	     const SoilWater&, const Bioclimate&, Treelog&); 
 
   void calculate_conductances (const double gs /* stomata cond. [m/s]*/, Treelog& msg);
   
@@ -161,7 +161,10 @@ struct SVAT_SSOC : public SVAT
   { return -1; }
 
   double transpiration () const
-  { return E_trans * 3600.; } // [kg m^-2 s^-1]->[mm h^-1]
+  {
+    const double svat_ea = E_trans * 3600.; // [kg m^-2 s^-1]->[mm h^-1]
+    return std::max (0.0, svat_ea - canopy_ea); 
+  } 
 
   double CanopyTemperature () const
   { return T_c - TK; }  // [dg C]
@@ -190,8 +193,8 @@ const double SVAT_SSOC::c_p = 1010.;     //Specific heat of air.[J/kg/K^1]
 // Simulation.
 void
 SVAT_SSOC::tick (const Weather& weather, const Vegetation& vegetation,
-                 const Surface& surface, const Geometry& geo, const Soil& soil, 
-                 const SoilHeat& soil_heat, const SoilWater&, const Pet&, 
+                 const Geometry& geo, const Soil& soil, 
+                 const SoilHeat& soil_heat, const SoilWater&, 
                  const Bioclimate& bio, Treelog& msg)
 {
   TREELOG_MODEL (msg);
@@ -200,6 +203,7 @@ SVAT_SSOC::tick (const Weather& weather, const Vegetation& vegetation,
   T_a = weather.air_temperature () + TK; // [K]
   z_r = weather.screen_height (); // [m]
   U_z = bio.wind_speed_field();   // [m s^-1]
+  canopy_ea = bio.canopy_ea ();
   LAI = bio.LAI();              // [m^2 m^-2]
   sun_LAI_fraction_total = bio.sun_LAI_fraction_total ();// []
   has_LAI = (LAI > 0.0);
@@ -212,7 +216,7 @@ SVAT_SSOC::tick (const Weather& weather, const Vegetation& vegetation,
   s = FAO::SlopeVapourPressureCurve (T_a - TK); // [Pa/K]
   lambda = FAO::LatentHeatVaporization (T_a - TK); // [J/kg]
   T_z0 = soil_heat.T_top() + TK;     // [K]
-  E_soil = surface.evap_soil_surface() / 3600.; // [mm/h]->[kg m^-2 s^-1]
+  E_soil =bio.soil_surface_ea () / 3600.; // [mm/h]->[kg m^-2 s^-1]
   k_h = geo.content_hood(soil_heat, &SoilHeat::conductivity, Geometry::cell_above)
     * 1e-7 * 3600.0 / 100.0; // [erg/cm/h/dg C] -> [W/m/K]
   z0 = - geo.content_hood(geo, &Geometry::cell_z, Geometry::cell_above)/100.; //[m]

@@ -30,16 +30,13 @@
 # include "svat.h"
 #include "mathlib.h"
 #include "block.h"
-# include "surface.h"
 # include "weather.h"
-# include "time.h"
 #include "geometry.h"
 # include "soil.h"
 # include "soil_water.h"
 # include "soil_heat.h"
 #include "bioclimate.h"
 # include "vegetation.h"
-# include "pet.h"
 # include "log.h"
 #include "fao.h"
 #ifndef NRGAUSS
@@ -1328,9 +1325,9 @@ public:
   void solve (const double /* stomata cond. [mol/m^2/s]*/, Treelog&);
 
   void tick (const Weather& weather, const Vegetation& crops,
-             const Surface& surface, const Geometry&, const Soil& soil,
+             const Geometry&, const Soil& soil,
              const SoilHeat& soil_heat, const SoilWater& soil_water,
-             const Pet& pet, const Bioclimate& bio, Treelog&);
+             const Bioclimate& bio, Treelog&);
   void output (Log& log) const;
 
   // Create and Destroy.
@@ -1365,12 +1362,12 @@ SVAT_PMSW::solve (const double /* stomata cond. [mol/m^2/s]*/, Treelog&)
 
 void
 SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
-                 const Surface&, const Geometry& geo, const Soil& soil, 
+                 const Geometry& geo, const Soil& soil, 
                  const SoilHeat& soil_heat,
-                 const SoilWater& soil_water, const Pet& pet, 
+                 const SoilWater& soil_water,
                  const Bioclimate& bio, Treelog&)
 {
-  const double divide_ep = pet.wet () - bio.snow_ea();
+  const double divide_ep = bio.total_ep () - bio.snow_ea();
   const double canopy_ep = divide_ep * crops.cover ();
   const double pond_ep = divide_ep - canopy_ep;
 
@@ -1408,7 +1405,7 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
   soil_ea_w=680.0*bio.soil_ea();
   pond_ep_w=680.0*pond_ep;
   canopy_ep_w=680.0*canopy_ep;
-  const double canopy_ea = bio.get_evap_interception (); // [mm/h]
+  const double canopy_ea = bio.canopy_ea (); // [mm/h]
   canopy_ea_w=680.0*canopy_ea;
   crop_ep_w=680.0*bio.crop_ep();
   crop_ea_w=680.0*bio.crop_ea();
