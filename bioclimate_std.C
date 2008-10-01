@@ -726,7 +726,7 @@ BioclimateStandard::RadiationDistribution (const Vegetation& vegetation,
   //Absorbed PAR in the canopy and the soil:
   incoming_PAR_radiation = total_PAR_[0]; // [W/m2]
   absorbed_total_PAR_canopy = incoming_PAR_radiation - total_PAR_[No];     // [W/m2]
-  absorbed_total_PAR_soil = total_PAR_[0] - absorbed_total_PAR_canopy; // [W/m2]
+  absorbed_total_PAR_soil = incoming_PAR_radiation - absorbed_total_PAR_canopy;//[W/m2]
   absorbed_sun_PAR_canopy = sun_PAR_[0] - sun_PAR_[No];           // [W/m2]
   absorbed_shadow_PAR_canopy = absorbed_total_PAR_canopy - absorbed_sun_PAR_canopy; // [W/m2]
 
@@ -1150,10 +1150,10 @@ BioclimateStandard::tick (const Units& units, const Time& time,
 
 #if 0
   // Calculate temperature of canopy
-  static const double rho_water = 1.0; // [kg/dm^3]
-  const double AirTemperature = weather.air_temperature ();//[dg C]
-  const double LatentHeatVapor 
-    = FAO::LatentHeatVaporization (AirTemperature); //[J/kg]
+  //  static const double rho_water = 1.0; // [kg/dm^3]
+  // const double AirTemperature = weather.air_temperature ();//[dg C]
+  // const double LatentHeatVapor 
+  //  = FAO::LatentHeatVaporization (AirTemperature); //[J/kg]
   const double CanopyTranspirationRate = 
     crop_ea_ /*[mm/h]*/* rho_water * LatentHeatVapor / 3600. /*[s/h]*/; //[W/m^2] 
 
@@ -1162,8 +1162,8 @@ BioclimateStandard::tick (const Units& units, const Time& time,
   const double SensibleHeatFlux 
     = CanopyNetRadiation - CanopyTranspirationRate;//[W/m^2] 
   
-  const double AirPressure 
-    = FAO::AtmosphericPressure (weather.elevation ());//[Pa]
+  // const double AirPressure 
+  //  = FAO::AtmosphericPressure (weather.elevation ());//[Pa]
   const double rho_a = FAO::AirDensity(AirPressure, AirTemperature);//[kg/m3]
   const double gamma
     = FAO::PsychrometricConstant (AirPressure, AirTemperature);//[Pa/dgC]
@@ -1206,6 +1206,7 @@ BioclimateStandard::output (Log& log) const
 {
   output_variable (Height, log);
   output_derived (net_radiation, "net_radiation", log);
+  output_derived (raddist, "raddist", log);
   daisy_assert (pet.get () != NULL);
   output_object (pet.get (), "pet", log);
   output_value (total_ep_, "total_ep", log);

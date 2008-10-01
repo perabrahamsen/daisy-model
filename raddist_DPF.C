@@ -27,6 +27,8 @@
 #include "mathlib.h"
 #include "check.h"
 #include "librarian.h"
+#include "log.h"
+
 #include <sstream>
 
 struct RaddistDPF : public Raddist
@@ -39,13 +41,33 @@ private:
   const double Ps_NIR;  // Soil reflection coefficient of NIR []
 
 public:
+  // Log variables
+  double IRb0; // Beam radiation above the canopy []
+  double IRd0; // Diffuse radiation above the canopy []
+  double Ph_PAR; // Canopy reflection coefficeint of beam PAR for horizontal leaves []
+  double Pcb_PAR;// Canopy reflection coefficeint of beam PAR for 
+                 // uniform leaf-angel distribution
+  double Pscb_PAR;  // Canopy-soil reflection coefficeint of beam PAR for 
+                    // uniform leaf-angel distribution []
+  double Pscd_PAR;  // Canopy-soil reflection coefficeint of diffuse PAR for 
+                    // uniform leaf-angel distribution []
+
+  double Ph_NIR;   // Canopy reflection coefficeint of beam NIR for horizontal leaves
+  double Pcb_NIR;  // Canopy reflection coefficeint of beam NIR for 
+                   // uniform leaf-angel distribution []
+  double Pscb_NIR; // Canopy-soil reflection coefficeint of beam NIR for 
+                   // uniform leaf-angel distribution []
+  double Pscd_NIR; // Canopy-soil reflection coefficeint of diffuse NIR for 
+                   // uniform leaf-angel distribution []
+
   // Simulation.
   void tick (std::vector <double>& fraction_sun_LAI,
              std::vector <double>& sun_PAR, std::vector <double>& total_PAR, 
              std::vector <double>& sun_NIR, std::vector <double>& total_NIR, 
              double global_radiation, double diffuse_radiation, 
-             double sin_beta, const Vegetation&, Treelog&) const;
+             double sin_beta, const Vegetation&, Treelog&);
 
+  void output(Log& log) const;
 
   // Create.
   RaddistDPF (Block& al)
@@ -53,7 +75,17 @@ public:
       sigma_PAR (al.number ("sigma_PAR")),
       sigma_NIR (al.number ("sigma_NIR")),
       Ps_PAR (al.number ("Ps_PAR")),
-      Ps_NIR (al.number ("Ps_NIR"))
+      Ps_NIR (al.number ("Ps_NIR")),
+      IRb0(-42.42e42),
+      IRd0(-42.42e42),
+      Ph_PAR(-42.42e42),
+      Pcb_PAR(-42.42e42),
+      Pscb_PAR(-42.42e42),
+      Pscd_PAR(-42.42e42),
+      Ph_NIR(-42.42e42),
+      Pcb_NIR(-42.42e42),
+      Pscb_NIR(-42.42e42),
+      Pscd_NIR(-42.42e42)
   { }
 };
 
@@ -66,7 +98,7 @@ void RaddistDPF::tick (std::vector <double>& fraction_sun_LAI,
 		       const double diffuse_radiation,
                        const double sin_beta,
 		       const Vegetation& vegetation,
-		       Treelog&) const
+		       Treelog&)
 {
   daisy_assert (std::isfinite (diffuse_radiation));
   daisy_assert (std::isfinite (global_radiation));
@@ -92,9 +124,9 @@ void RaddistDPF::tick (std::vector <double>& fraction_sun_LAI,
   std::vector<double> dif_sun_NIR (No+1, 0.0);
   
   // Beam radiation above the canopy:
-  const double IRb0 = global_radiation-diffuse_radiation;
+  IRb0 = global_radiation - diffuse_radiation;
   // Diffuse radiation above the canopy:
-  const double IRd0 = diffuse_radiation;
+  IRd0 = diffuse_radiation;
 
   // Extinction coefficient for black leaves in direct-beam irradiance 
   daisy_assert (std::isnormal (sin_beta)); //sin_beta er solhøjden
@@ -132,29 +164,29 @@ void RaddistDPF::tick (std::vector <double>& fraction_sun_LAI,
 
   // Canopy reflection coefficeint of direct PAR for 
   // horizontal leaves, Ph_PAR
-  const double Ph_PAR = (1. - sqrt(1.0-sigma_PAR))/(1. + sqrt(1.0-sigma_PAR));
+  Ph_PAR = (1. - sqrt(1.0-sigma_PAR))/(1. + sqrt(1.0-sigma_PAR));
 
   // Canopy reflection coefficeint of direct PAR for 
   // uniform leaf-angel distribution, Pcb_PAR
-  const double Pcb_PAR = 1. - exp((-2. * Ph_PAR * kb) / (1. + kb));
+  Pcb_PAR = 1. - exp((-2. * Ph_PAR * kb) / (1. + kb));
   daisy_assert (Pcb_PAR >= 0.0);
 
   // Canopy-soil reflection coefficeint of beam irradiance for 
   // uniform leaf-angel distribution, Pscb
   const double aa_PAR = (Pcb_PAR - Ps_PAR)/(Pcb_PAR * Ps_PAR - 1.);
   const double bb_PAR = exp(-2. * sqrt(1.0-sigma_PAR) * kb * LAI);
-  const double Pscb_PAR = (Pcb_PAR + aa_PAR * bb_PAR)/(1. + Pcb_PAR * aa_PAR * bb_PAR);
+  Pscb_PAR = (Pcb_PAR + aa_PAR * bb_PAR)/(1. + Pcb_PAR * aa_PAR * bb_PAR);
   daisy_assert (Pscb_PAR >= 0.0);
 
   // Canopy-soil reflection coefficeint of diffuse irradiance for 
   // uniform leaf-angel distribution, Pscd
   const double cc_PAR = exp(-2. * sqrt(1.0-sigma_PAR) * kd * LAI);
-  const double Pscd_PAR = (Pcb_PAR + aa_PAR * cc_PAR)/(1. + Pcb_PAR * aa_PAR * cc_PAR);
+  Pscd_PAR = (Pcb_PAR + aa_PAR * cc_PAR)/(1. + Pcb_PAR * aa_PAR * cc_PAR);
   daisy_assert (Pscd_PAR >= 0.0);
 
   // Fraction of Photosynthetically Active Radiation (PAR) in Shortwave
   // incoming radiation. 
-  static const double PARinSi = 0.50;	
+  //  static const double PARinSi = 0.50;	
 
   // Total PAR
   // Fill beam PAR (cummulative)
@@ -204,30 +236,30 @@ void RaddistDPF::tick (std::vector <double>& fraction_sun_LAI,
 
   // Canopy reflection coefficeint of direct NIR for 
   // horizontal leaves, Ph_NIR
-  const double Ph_NIR = (1. - sqrt(1.0-sigma_NIR))/(1. + sqrt(1.0-sigma_NIR));
+  Ph_NIR = (1. - sqrt(1.0-sigma_NIR))/(1. + sqrt(1.0-sigma_NIR));
 
   // Canopy reflection coefficeint of direct NIR for 
   // uniform leaf-angel distribution, Pcb_NIR
-  const double Pcb_NIR = 1. - exp((-2. * Ph_NIR * kb) / (1. + kb));
+  Pcb_NIR = 1. - exp((-2. * Ph_NIR * kb) / (1. + kb));
   daisy_assert (Pcb_NIR >= 0.0);
 
   // Canopy-soil reflection coefficeint of beam irradiance for 
   // uniform leaf-angel distribution, Pscb
   const double aa_NIR = (Pcb_NIR - Ps_NIR)/(Pcb_NIR * Ps_NIR - 1.);
   const double bb_NIR = exp(-2. * sqrt(1.0-sigma_NIR) * kb * LAI);
-  const double Pscb_NIR = (Pcb_NIR + aa_NIR * bb_NIR)/(1. + Pcb_NIR * aa_NIR * bb_NIR);
+  Pscb_NIR = (Pcb_NIR + aa_NIR * bb_NIR)/(1. + Pcb_NIR * aa_NIR * bb_NIR);
   daisy_assert (Pscb_NIR >= 0.0);
 
   // Canopy-soil reflection coefficeint of diffuse irradiance for 
   // uniform leaf-angel distribution, Pscd
   const double cc_NIR = exp(-2. * sqrt(1.0-sigma_NIR) * kd * LAI);
-  const double Pscd_NIR = (Pcb_NIR + aa_NIR * cc_NIR)/(1. + Pcb_NIR * aa_NIR * cc_NIR);
+  Pscd_NIR = (Pcb_NIR + aa_NIR * cc_NIR)/(1. + Pcb_NIR * aa_NIR * cc_NIR);
   daisy_assert (Pscd_NIR >= 0.0);
 
 
   // Fraction of Photosynthetically Active Radiation (NIR) in Shortwave
   // incoming radiation. 
-  static const double NIRinSi = 0.50;	
+  //static const double NIRinSi = 0.50;	
 
   // Total NIR
   // Fill beam NIR (cummulative)
@@ -279,6 +311,23 @@ void RaddistDPF::tick (std::vector <double>& fraction_sun_LAI,
     }
 }
 
+
+void
+RaddistDPF::output(Log& log) const
+{
+  output_variable (IRb0, log);
+  output_variable (IRd0, log);
+  output_variable (Ph_PAR, log);
+  output_variable (Pcb_PAR, log);
+  output_variable (Pscb_PAR, log);
+  output_variable (Pscd_PAR, log);
+  output_variable (Ph_NIR, log);
+  output_variable (Pcb_NIR, log);
+  output_variable (Pscb_NIR, log);
+  output_variable (Pscd_NIR, log);
+
+}
+
 static struct RaddistDPFSyntax
 {
   static Model& make (Block& al)
@@ -306,6 +355,20 @@ static struct RaddistDPFSyntax
                 "Soil reflection coefficient of NIR, Ps_NIR = 0.18 (Houborg, 2006)");
     alist.add ("Ps_NIR", 0.18);
  
+    syntax.add ("IRb0", "W m^-2", Syntax::LogOnly, "Beam radiation above the canopy");
+    syntax.add ("IRd0", "W m^-2", Syntax::LogOnly,
+                "Diffuse radiation above the canopy ");
+    syntax.add ("Ph_PAR", "", Syntax::LogOnly, 
+                "Canopy reflection coefficeint of beam PAR for horizontal leaves");
+    syntax.add ("Pcb_PAR", "", Syntax::LogOnly, "Canopy reflection coefficeint of beam PAR for uniform leaf-angel distribution");
+    syntax.add ("Pscb_PAR", "", Syntax::LogOnly, "Canopy-soil reflection coefficeint of beam PAR for uniform leaf-angel distribution");
+    syntax.add ("Pscd_PAR", "", Syntax::LogOnly, "Canopy-soil reflection coefficeint of diffuse PAR for uniform leaf-angel distribution");
+    syntax.add ("Ph_NIR", "", Syntax::LogOnly, 
+                "Canopy reflection coefficeint of beam NIR for horizontal leaves");
+    syntax.add ("Pcb_NIR", "", Syntax::LogOnly, "Canopy reflection coefficeint of beam NIR for uniform leaf-angel distribution");
+    syntax.add ("Pscb_NIR", "", Syntax::LogOnly, "Canopy-soil reflection coefficeint of beam NIR for uniform leaf-angel distribution");
+    syntax.add ("Pscd_NIR", "", Syntax::LogOnly, "Canopy-soil reflection coefficeint of diffuse NIR for uniform leaf-angel distribution");
+
     Raddist::load_syntax (syntax, alist);
     Librarian::add_type (Raddist::component, "sun-shade", alist, syntax, &make);
   }

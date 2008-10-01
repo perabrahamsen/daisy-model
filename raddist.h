@@ -29,7 +29,7 @@ class Vegetation;
 class Treelog;
 class Block;
 
-class Raddist : public Model
+class Raddist : public ModelLogable
 {
   // Content.
 public:
@@ -53,7 +53,7 @@ public:
                      double global_radiation, 
                      double diffuse_radiation, double sin_beta,
                      const Vegetation&, 
-		     Treelog&) const = 0;
+		     Treelog&) = 0;
 
 
   // Utilities.
