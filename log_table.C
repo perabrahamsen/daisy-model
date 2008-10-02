@@ -184,7 +184,7 @@ LogTable::common_done (const std::vector<Time::component_t>& time_columns,
 	    out << field_separator;
 
 	  const int size = entries[i]->size ();
-	  std::string dimension = entries[i]->dimension ().name ();
+	  symbol dimension = entries[i]->dimension ().name ();
 	  if (dimension == Syntax::None () 
 	      || dimension == Syntax::Unknown ()
 	      || dimension == Syntax::Fraction ())

@@ -149,7 +149,7 @@ struct NumberDepthTheta : public NumberByDepth
   }
 
   symbol dimension (const Scope&) const 
-  { return Syntax::fraction (); }
+  { return Syntax::Fraction (); }
 
   // Create.
   NumberDepthTheta (Block& al)
@@ -278,7 +278,7 @@ struct NumberSoilTheta : public NumberByTension
                                                       h->value (scope)));
   }
   symbol dimension (const Scope&) const 
-  { return Syntax::fraction (); }
+  { return Syntax::Fraction (); }
 
   // Create.
   NumberSoilTheta (Block& al)
@@ -427,12 +427,12 @@ struct NumberTensionByTheta : public Number
   { Theta->tick (units, scope, msg); }
   bool missing (const Scope& scope) const 
   { return Theta->missing (scope) 
-      || !units.can_convert (Theta->dimension (scope), Syntax::fraction (),
+      || !units.can_convert (Theta->dimension (scope), Syntax::Fraction (),
                              Theta->value (scope)); }
   double value (const Scope& scope) const
   { 
     return horizon->hydraulic->h (units.convert (Theta->dimension (scope), 
-                                                  Syntax::fraction (), 
+                                                  Syntax::Fraction (), 
                                                   Theta->value (scope)));
   }
   symbol dimension (const Scope&) const 
@@ -449,7 +449,7 @@ struct NumberTensionByTheta : public Number
     Treelog::Open nest (msg, name);
     if (!Theta->check (units, scope, msg))
       return false;
-    if (!units.can_convert (Theta->dimension (scope), Syntax::fraction ()))
+    if (!units.can_convert (Theta->dimension (scope), Syntax::Fraction ()))
       {
         msg.error ("Cannot convert [" + Theta->dimension (scope) 
                    + "] to fraction for soil hydraulics");

@@ -230,11 +230,11 @@ struct NumberFetch : public Number
   {
     const std::string& key = key_symbol.name ();
     if (al.lookup (key) != Syntax::Number)
-      return Syntax::unknown ();
+      return Syntax::Unknown ();
     const Syntax& syntax = al.find_syntax (key);
     daisy_assert (syntax.lookup (key) == Syntax::Number);
     const symbol dim (syntax.dimension (key));
-    if (dim == Syntax::user ())
+    if (dim == Syntax::User ())
       {
 	const AttributeList& alist = al.find_alist (key);
 	if (alist.check (key))

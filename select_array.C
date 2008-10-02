@@ -52,7 +52,7 @@ struct SelectArray : public Select
     static const symbol bulk_density ("g/cm^3");
     const symbol bulk_dim = default_dimension (bulk_density);
     if (units.can_convert (has, bulk_dim)
-        && units.can_convert (Syntax::fraction (), want))
+        && units.can_convert (Syntax::Fraction (), want))
       bd_convert.reset (new BD_convert (units, has, want, bulk_dim));
     return bd_convert.get ();
   }

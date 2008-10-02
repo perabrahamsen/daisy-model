@@ -223,7 +223,7 @@ static struct UnitSIFactorSyntax
   static Model& make (Block& al)
   { return *new UnitSIFactor (al); }
 
-  static void add (const std::string& name_string, const double factor,
+  static void add (const symbol name, const double factor,
                    const symbol super,
                    const Syntax& super_syntax, const AttributeList& super_alist,
                    const int length, const int mass, const int time,
@@ -232,8 +232,6 @@ static struct UnitSIFactorSyntax
                    const int amount_of_substance, const int luminous_intensity,
                    const std::string& description)
   {
-    const symbol name (name_string);
-
     AttributeList& alist = *new AttributeList (super_alist);
     alist.add ("type", super);
     alist.add ("length", length);
@@ -648,13 +646,11 @@ static struct UnitBaseSyntax
   static Model& make (Block& al)
   { return *new UnitBase (al); }
   
-  static void add (const std::string& name_string, 
+  static void add (const symbol name,
                    const symbol super,
                    const Syntax& super_syntax, const AttributeList& super_alist,
                    const std::string& description)
   {
-    const symbol name (name_string);
-
     // Add the 'base' 
     AttributeList& alist = *new AttributeList (super_alist);
     alist.add ("type", super);

@@ -114,7 +114,7 @@ SourceMerge::load (Treelog& msg)
         }
       
       // Set or check dimension.
-      if (dimension_ == Syntax::unknown ())
+      if (dimension_ == Syntax::Unknown ())
         dimension_ = source[i]->dimension ();
       else if (!units.can_convert (source[i]->dimension (), dimension_))
         {

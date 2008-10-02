@@ -69,7 +69,7 @@ SourceStandard::load (Treelog& msg)
 
   // Read dimensions.
   const symbol original (lex.dimension (tag_c));
-  if (original != Syntax::unknown () && dimension_ == Syntax::unknown ())
+  if (original != Syntax::Unknown () && dimension_ == Syntax::Unknown ())
     dimension_ = original;
   else if (!has_factor && !units.can_convert (original, dimension_))
     {
@@ -141,7 +141,7 @@ SourceStandard::SourceStandard (Block& al)
     units (al.units ()),
     tag (al.identifier ("tag")),
     title_ (al.identifier ("title", tag)),
-    dimension_ (al.identifier ("dimension", Syntax::unknown ())),
+    dimension_ (al.identifier ("dimension", Syntax::Unknown ())),
     has_factor (al.check ("factor")),
     factor (al.number ("factor", 1.0))
 { }

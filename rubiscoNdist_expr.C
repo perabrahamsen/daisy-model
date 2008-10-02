@@ -81,7 +81,7 @@ private:
 					"Development stage"));
     scope.done ();
     expr->initialize (al.units (), scope, al.msg());
-    if (!expr->check_dim (al.units (), scope, Syntax::fraction (), al.msg()))
+    if (!expr->check_dim (al.units (), scope, Syntax::Fraction (), al.msg()))
       al.error("Invalid expression of rubisco expr");
   }
 };
@@ -100,7 +100,7 @@ rubiscoNdist_expr::function (const Units& units,
   scope.set_number (relative_LAI_symbol, relative_LAI);
   scope.set_number (DS_symbol, DS);
   double value = -1.0;
-  if (!expr->tick_value (units, value, Syntax::fraction (), scope,
+  if (!expr->tick_value (units, value, Syntax::Fraction (), scope,
                          Treelog::null ()))
     throw "Missing value in rubisco expr";
   return value; 

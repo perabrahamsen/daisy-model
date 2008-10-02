@@ -111,29 +111,30 @@ Fetch::width (const double value)
     return absolute;
 }
 
-const std::string 
+symbol
 Fetch::dimension (const symbol period) const
 {
   if (type != Flux)
     return select_dimension;
 
-  const size_t size = select_dimension.size ();
+  const size_t size = select_dimension.name ().size ();
   if (size > 1)
     {
-      const char last = select_dimension[size - 1];
-      const char second_last = select_dimension[size - 2];
+      const char last = select_dimension.name ()[size - 1];
+      const char second_last = select_dimension.name ()[size - 2];
       if (second_last == '/'
           && (last == 'h' || last == 'd' || last == 'w' 
               || last == 'm' || last == 'y'))
         {
-          const std::string strip = select_dimension.substr (0, size - 2);
+          const std::string strip 
+            = select_dimension.name ().substr (0, size - 2);
           if (period.name () != "")
             return strip + "/" + period;
           else
             return strip;
         }
     }
-  if (period.name () == "h")
+  if (period == "h")
     return select_dimension;
   else if (period.name () == "")
     return select_dimension + "h";

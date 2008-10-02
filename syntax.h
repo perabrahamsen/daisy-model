@@ -60,14 +60,10 @@ public:
   static const int Unspecified;
 
   // A syntax may have a dimension associated.
-  static symbol unknown ();
-  static const std::string& Unknown ();
-  static symbol none ();
-  static const std::string& None ();
-  static symbol fraction ();
-  static const std::string& Fraction ();
-  static symbol user ();
-  static const std::string& User ();
+  static symbol Unknown ();
+  static symbol None ();
+  static symbol Fraction ();
+  static symbol User ();
 
   // Each syntax entry should have an associated type.
   enum type 

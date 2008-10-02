@@ -72,8 +72,7 @@ public:
   double number (symbol) const;
   double number (symbol, double default_value) const;
   const std::string name (symbol);
-  const std::string name (symbol, 
-			  const std::string& default_value);
+  const std::string name (symbol, symbol default_value);
   symbol identifier (const symbol);
   symbol identifier (symbol, symbol default_value);
   bool flag (symbol) const;

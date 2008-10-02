@@ -112,38 +112,38 @@ ScopeBlock::dimension (symbol tag_symbol) const
 
   Syntax::type type = block.lookup (tag);
   if (type == Syntax::Error)
-    return Syntax::unknown ();
+    return Syntax::Unknown ();
   const Syntax& syntax = block.find_syntax (tag);
   if (syntax.size (tag) != Syntax::Singleton)
-    return Syntax::unknown ();
+    return Syntax::Unknown ();
   const AttributeList& alist = block.find_alist (tag);
 
   //Handle primitive numbers.
   if (type == Syntax::Number)
     {
       const symbol dim = syntax.dimension (tag); 
-      if (dim != Syntax::user ())
+      if (dim != Syntax::User ())
         return symbol (dim);
       if (!alist.check (tag))
-        return Syntax::unknown ();
+        return Syntax::Unknown ();
       return alist.identifier (tag);
     }
 
   // Handle number objects.
   if (type != Syntax::Object)
-    return Syntax::unknown ();
+    return Syntax::Unknown ();
   if (syntax.library (block.metalib (), tag).name () 
       != symbol (Number::component))
-    return Syntax::unknown ();
+    return Syntax::Unknown ();
   if (!syntax.check (block.metalib (), alist, block.msg ()))
-    return Syntax::unknown ();
+    return Syntax::Unknown ();
     
   std::auto_ptr<Number> number (Librarian::build_alist<Number>
                                 (block, alist.alist (tag), tag));
   if (!number.get ())
-    return Syntax::unknown ();
+    return Syntax::Unknown ();
   if (!number->initialize (block.units (), *this, block.msg ()))
-    return Syntax::unknown ();
+    return Syntax::Unknown ();
   
   return number->dimension (*this);
 }

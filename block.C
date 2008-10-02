@@ -192,10 +192,10 @@ Block::Implementation::expand_string (Block& block,
                               throw "Bad number: '"+ type + "'";
                             result << number->value (scope);
                             const symbol dim = number->dimension (scope);
-                            if (dim == Syntax::fraction ()
-                                || dim == Syntax::none ())
+                            if (dim == Syntax::Fraction ()
+                                || dim == Syntax::None ())
                               result << " []";
-                            else if (dim != Syntax::unknown ())
+                            else if (dim != Syntax::Unknown ())
                               result << " [" << dim << "]";
                           }
                         else
@@ -346,8 +346,8 @@ Block::name (const symbol key)
 }
 
 const std::string 
-Block::name (const symbol key, const std::string& default_value)
-{ return check (key) ? name (key) : default_value; }
+Block::name (const symbol key, const symbol default_value)
+{ return check (key) ? name (key) : default_value.name (); }
 
 symbol 
 Block::identifier (const symbol key)

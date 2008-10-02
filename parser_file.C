@@ -81,7 +81,7 @@ struct ParserFile::Implementation
   { return symbol (get_string ()); }
   int get_integer ();
   double get_number ();
-  std::string get_dimension ();
+  symbol get_dimension ();
   double get_number (const symbol dim);
   bool check_dimension (const symbol syntax, const symbol read);
   double convert (double value, const symbol syntax, const symbol read, 
@@ -179,7 +179,7 @@ ParserFile::Implementation::get_string ()
       return str;
     }
   else if (c == '[')
-    return get_dimension ();
+    return get_dimension ().name ();
   else if (!id_extra (c) && !isalpha (c))
     {
       error ("Identifier or string expected");
@@ -297,7 +297,7 @@ ParserFile::Implementation::get_number ()
   return value;
 }
 
-std::string
+symbol
 ParserFile::Implementation::get_dimension ()
 {
   skip ("[");
@@ -327,7 +327,7 @@ ParserFile::Implementation::get_number (const symbol syntax_dim)
 
       if (looking_at ('['))
         {
-          const std::string read_dim = get_dimension ();
+          const symbol read_dim = get_dimension ();
           if (check_dimension (syntax_dim, read_dim))
             value = convert (value, syntax_dim, read_dim, pos);
         }
@@ -601,7 +601,7 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence,
         {
           alist->add ("type", "const");
           const double value = get_number ();
-          const std::string dim = get_dimension ();
+          const symbol dim = get_dimension ();
           alist->add ("value", value, dim);
         }
       else if (lib.name () == symbol (Integer::component))
@@ -745,7 +745,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
               skip ("]");
             }
 	  const std::string type_name = get_string ();
-	  std::string doc = "User defined " + type_name + ".";
+	  symbol doc = "User defined " + type_name + ".";
 	  const Syntax::type type = Syntax::type_number (type_name);
 	  switch (type)
 	    {
@@ -753,18 +753,18 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	    case Syntax::Integer:
 	      {
 		if (!looking_at ('('))
-		  doc = get_string ();
+		  doc = get_symbol ();
 		if (ok)
 		  syntax.add (var, type, Syntax::Const, size, doc);
 		break;
 	      }
 	    case Syntax::Number:
 	      {
-		std::string dim = Syntax::Unknown ();
+		symbol dim = Syntax::Unknown ();
 		if (looking_at ('['))
-		  dim = get_string ();
+		  dim = get_symbol ();
 		if (!looking_at ('('))
-		  doc = get_string ();
+		  doc = get_symbol ();
 		if (ok)
 		  syntax.add (var, dim, Syntax::Const, size, doc);
 		break;
@@ -846,7 +846,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
               if (syntax.dimension (name) == Syntax::User ())
                 {
                   const double value = get_number ();
-                  const std::string dim = 
+                  const symbol dim = 
 		    looking_at ('[') ? get_dimension () : Syntax::Unknown ();
                   check_value (syntax, name, value);
                   atts.add (name, value, dim);
@@ -1228,7 +1228,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		      }
                     else if (looking_at ('['))
                       {
-                        const std::string read_dim = get_dimension ();
+                        const symbol read_dim = get_dimension ();
                         if (check_dimension (syntax_dim, read_dim))
                           {
                             daisy_assert (positions.size () == array.size ());

@@ -24,7 +24,6 @@
 #include "memutils.h"
 #include <map>
 #include <vector>
-#include <string>
 
 class Block;
 class Syntax;
@@ -82,10 +81,9 @@ public:
   // Create and Destroy.
 public:
   explicit ExchangeNumber (Block& al);
-  explicit ExchangeNumber (symbol name, const std::string dimension, 
-                           const std::string description);
+  explicit ExchangeNumber (symbol name, symbol dimension, symbol description);
   explicit ExchangeNumber (symbol name, double value, 
-                           const std::string dimension, const std::string description);
+                           symbol dimension, symbol description);
   ~ExchangeNumber ();
 };
 

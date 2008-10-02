@@ -1608,7 +1608,7 @@ ChemicalStandardSyntax::initial_C (const double value, AttributeList& alist)
   AttributeList Theta;
   Theta.add ("type", "get");
   Theta.add ("name", "Theta");
-  Theta.add ("dimension", Syntax::none ());
+  Theta.add ("dimension", Syntax::None ());
   operands.push_back (&Theta);
   initial.add ("operands", operands);
   alist.add ("initial", initial);

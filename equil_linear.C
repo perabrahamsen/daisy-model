@@ -61,7 +61,7 @@ EquilibriumLinear::find (const Units& units, const Scope& scope,
   const double M = has_A + has_B;
 
   double K = 1.0;
-  if (!K_expr->tick_value (units, K, Syntax::none (), scope, msg))
+  if (!K_expr->tick_value (units, K, Syntax::None (), scope, msg))
     msg.error ("Could not evaluate 'K'");
 
   // We need to solve the following equation w.r.t. B
@@ -90,7 +90,7 @@ EquilibriumLinear::check (const Units& units, const Scope& scope, Treelog& msg) 
 {
   Treelog::Open nest (msg, "linear");
   bool ok = true;
-  if (!K_expr->check_dim (units, scope, Syntax::none (), msg))
+  if (!K_expr->check_dim (units, scope, Syntax::None (), msg))
     ok = false;
   return ok;
 }

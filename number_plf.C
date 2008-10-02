@@ -112,7 +112,7 @@ struct NumberPLF : public Number
 #ifdef HAS_METALIB
 	const symbol x_dim = point.x_dimension;
 
-	if (domain != Syntax::unknown () && x_dim != Syntax::unknown ())
+	if (domain != Syntax::Unknown () && x_dim != Syntax::Unknown ())
 	  try
 	    { x = units.convert (x_dim, domain, x); }
 	  catch (const std::string& err)
@@ -132,7 +132,7 @@ struct NumberPLF : public Number
 
 #ifdef HAS_METALIB
 	const symbol y_dim = point.y_dimension;
-	if (domain != Syntax::unknown () && y_dim != Syntax::unknown ())
+	if (domain != Syntax::Unknown () && y_dim != Syntax::Unknown ())
 	  try
 	    { (void) units.convert (x_dim, domain, x); }
 	  catch (const std::string& err)
@@ -161,11 +161,11 @@ struct NumberPLF : public Number
 
 	double x = point.x_value;
 	const symbol x_dim = point.x_dimension;
-	if (domain != Syntax::unknown () && x_dim != Syntax::unknown ())
+	if (domain != Syntax::Unknown () && x_dim != Syntax::Unknown ())
 	  x = units.convert (x_dim, domain, x);
 	double y = point.y_value;
 	const symbol y_dim = point.y_dimension;
-	if (range != Syntax::unknown () && y_dim != Syntax::unknown ())
+	if (range != Syntax::Unknown () && y_dim != Syntax::Unknown ())
 	  y = units.convert (y_dim, range, y);
 	
 	plf.add (x, y);

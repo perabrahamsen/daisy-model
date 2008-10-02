@@ -105,8 +105,9 @@ SummarySimple::summarize (const int hours, Treelog& msg) const
   const int width = max_digits + (precision > 0 ? 1 : 0) + precision;
   size_t dim_size = 0;
   for (unsigned int i = 0; i < fetch.size (); i++)
-    dim_size = std::max (dim_size, fetch[i]->dimension (period).size ());
-  std::string last_dim;
+    dim_size 
+      = std::max (dim_size, fetch[i]->dimension (period).name ().size ());
+  symbol last_dim;
   bool same_dim = true;
   for (unsigned int i = 0; i < fetch.size (); i++)
     {

@@ -402,9 +402,9 @@ Oldunits::multiply (const symbol one, const symbol two)
 
   const std::string inv = "^-1";
   if (one.name () == two + inv || one + inv == two.name ())
-    return Syntax::none ();
+    return Syntax::None ();
 
-  return Syntax::unknown ();
+  return Syntax::Unknown ();
 }
 
 // GCC 2.95 requires these to be defined outside a function.

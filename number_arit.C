@@ -45,10 +45,10 @@ struct NumberOperand : public Number
   { return operand->missing (scope); }
   symbol dimension (const Scope& scope) const
   {
-    if (operand->dimension (scope) == Syntax::none ())
-      return Syntax::none ();
+    if (operand->dimension (scope) == Syntax::None ())
+      return Syntax::None ();
 
-    return Syntax::unknown (); 
+    return Syntax::Unknown (); 
   }
 
   // Create.
@@ -263,7 +263,7 @@ struct NumberPow : public Number
     return pow (x, y); 
   }
   symbol dimension (const Scope&) const 
-  { return Syntax::unknown (); }
+  { return Syntax::Unknown (); }
 
   // Create.
   bool initialize (const Units& units, const Scope& scope, Treelog& err)
@@ -330,10 +330,10 @@ struct NumberOperands : public Number
         else
           {
             if (operands[i]->dimension (scope) != found)
-              return Syntax::unknown ();
+              return Syntax::Unknown ();
           }
     
-    return found != unspecified ? found : Syntax::unknown ();
+    return found != unspecified ? found : Syntax::Unknown ();
   }
 
   // Use.
@@ -538,7 +538,7 @@ struct NumberProduct : public NumberOperands
   }
   symbol dimension (const Scope& scope) const 
   { 
-    symbol dim = Syntax::none ();
+    symbol dim = Syntax::None ();
     for (size_t i = 0; i < operands.size (); i++)
       dim = Units::multiply (dim, operands[i]->dimension (scope));
     return dim;
@@ -670,7 +670,7 @@ struct NumberDivide : public NumberOperands
     return val;
   }
   symbol dimension (const Scope&) const 
-  { return Syntax::unknown (); }
+  { return Syntax::Unknown (); }
 
   // Create.
   NumberDivide (Block& al)

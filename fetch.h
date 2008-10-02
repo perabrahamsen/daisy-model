@@ -42,7 +42,7 @@ private:
   const symbol name;
   const bool add_delta;
 public:
-  std::string select_dimension;
+  symbol select_dimension;
 
   // State.
 public:
@@ -65,7 +65,7 @@ private:
   static double period_factor (symbol period, int hours);
 public:
   static int width (double value);
-  const std::string dimension (const symbol period) const;
+  symbol dimension (const symbol period) const;
   size_t name_size () const;
   int value_size (double& total, const symbol period, const int hours) const;
   void summarize (std::ostream& out, const int width, 

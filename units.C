@@ -217,14 +217,14 @@ Units::multiply (const symbol a, const symbol b)
 const Unit&
 Units::unknown () const
 { 
-  const unit_map::const_iterator i = units.find (Syntax::unknown ()); 
+  const unit_map::const_iterator i = units.find (Syntax::Unknown ()); 
   daisy_assert (i != units.end () && (*i).second);
   return *(*i).second;
 }
 
 bool
 Units::is_known (const Unit& unit) const
-{ return unit.name != Syntax::unknown (); }
+{ return unit.name != Syntax::Unknown (); }
 
 const Unit&
 Units::error () const

@@ -346,48 +346,32 @@ Syntax::type_number (const std::string& name)
 }
 
 symbol
-Syntax::unknown ()
+Syntax::Unknown ()
 {
   static const symbol unknown ("<unknown>");
   return unknown; 
 }
 
 symbol
-Syntax::none ()
-{
-  static const symbol none ("<none>");
-  return none;
-}
-
-symbol
-Syntax::fraction ()
-{
-  static const symbol fraction ("<fraction>");
-  return fraction; 
-}
-
-symbol
-Syntax::user ()
-{
-  static const symbol user ("<user>");
-  return user; 
-}
-
-const std::string& 
-Syntax::Unknown ()
-{ return unknown ().name (); }
-
-const std::string& 
 Syntax::None ()
-{ return none ().name (); }
+{
+  static const symbol unit ("<none>");
+  return unit;
+}
 
-const std::string& 
+symbol
 Syntax::Fraction ()
-{ return fraction ().name (); }
+{
+  static const symbol unit ("<fraction>");
+  return unit; 
+}
 
-const std::string& 
+symbol
 Syntax::User ()
-{ return user ().name (); }
+{
+  static const symbol unit ("<user>");
+  return unit; 
+}
 
 static const std::string category_names[] = 
 { "Const", "State", "OptionalState", "OptionalConst", "LogOnly"};

@@ -37,7 +37,7 @@ struct SummaryBalance : public Summary
 {
   static const char *const default_description;
   const symbol description;
-  const std::string file;
+  const symbol file;
   const symbol title;
   const symbol period;
 
@@ -71,10 +71,10 @@ struct SummaryBalance : public Summary
   bool in_list (size_t i, const std::vector<symbol>& names) const;
   double find_total (const std::vector<symbol>& names, 
                      int& max_digits, int hours) const;
-  std::string print_entries (std::ostream& out, const std::vector<symbol>& names, 
+  symbol print_entries (std::ostream& out, const std::vector<symbol>& names, 
                         int max_size, int width, int hours) const;
   void print_balance (std::ostream& out,
-                      const std::string& title, double total, const std::string& dim,
+                      const symbol title, double total, symbol dim,
                       int dim_size, int max_size,
                       int width) const;
   void summarize (int hours, Treelog&) const;
@@ -124,12 +124,12 @@ SummaryBalance::find_total (const std::vector<symbol>& names,
   return total;
 }
 
-std::string
+symbol
 SummaryBalance::print_entries (std::ostream& out, const std::vector<symbol>& names, 
                                const int max_size, const int width, 
                                const int hours) const
 {
-  std::string dim = Syntax::User ();
+  symbol dim = Syntax::User ();
   for (unsigned int i = 0; i < fetch.size (); i++)
     {
       if (!in_list (i, names))
@@ -148,13 +148,13 @@ SummaryBalance::print_entries (std::ostream& out, const std::vector<symbol>& nam
 
 void
 SummaryBalance::print_balance (std::ostream& out,
-                               const std::string& title, const double total, 
-                               const std::string& dim,
+                               const symbol title, const double total, 
+                               const symbol dim,
                                const int /* dim_size */, const int max_size,
                                const int width) const
 {
   out << std::string (max_size + 3, ' ') << std::string (width, '-') << "\n"
-      << std::string (max_size - title.size (), ' ') << title << " = ";
+      << std::string (max_size - title.name ().size (), ' ') << title << " = ";
   out.width (width);
   out << total;
   if (dim != Syntax::Unknown ())
@@ -198,13 +198,14 @@ SummaryBalance::summarize (const int hours, Treelog& msg) const
   // Find width of dimensions.
   size_t dim_size = 0;
   for (unsigned int i = 0; i < fetch.size (); i++)
-    dim_size = std::max (dim_size, fetch[i]->dimension (period).size ());
+    dim_size = std::max (dim_size, 
+                         fetch[i]->dimension (period).name ().size ());
 
   // Print all entries.
-  std::string shared_dim = Syntax::User ();
+  symbol shared_dim = Syntax::User ();
   if (input.size () > 0)
     {
-      const std::string dim = print_entries (tmp, input, max_size, width, hours);
+      const symbol dim = print_entries (tmp, input, max_size, width, hours);
       print_balance (tmp, "Total input", total_input, dim,
                      dim_size, max_size, width);
       shared_dim = dim;
@@ -213,8 +214,7 @@ SummaryBalance::summarize (const int hours, Treelog& msg) const
 
   if (output.size () > 0)
     {
-      const std::string dim = print_entries (tmp, output, 
-                                        max_size, width, hours);
+      const symbol dim = print_entries (tmp, output, max_size, width, hours);
       print_balance (tmp, "Total output", total_output, dim,
                      dim_size, max_size, width);
       if (shared_dim == Syntax::User ()) 
@@ -226,8 +226,7 @@ SummaryBalance::summarize (const int hours, Treelog& msg) const
 
   if (content.size () > 0)
     {
-      const std::string dim = print_entries (tmp, content, 
-                                        max_size, width, hours);
+      const symbol dim = print_entries (tmp, content, max_size, width, hours);
       print_balance (tmp, content_title, total_content, dim,
                      dim_size, max_size, width);
       if (shared_dim == Syntax::User ()) 
@@ -246,7 +245,7 @@ SummaryBalance::summarize (const int hours, Treelog& msg) const
     msg.message (tmp.str ());
   else
     { 
-      std::ofstream out (file.c_str ());
+      std::ofstream out (file.name ().c_str ());
       out << tmp.str ();
       if (! out.good ())
         msg.error ("Could not write to '" + file + "'");

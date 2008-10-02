@@ -196,11 +196,11 @@ PrinterFile::Implementation::print_dimension (const AttributeList& alist,
                                               const symbol key,
                                               const symbol dim)
 {
-  if (dim == Syntax::unknown ())
+  if (dim == Syntax::Unknown ())
     /* do nothing */;
-  else if (dim == Syntax::none () || dim == Syntax::fraction ())
+  else if (dim == Syntax::None () || dim == Syntax::Fraction ())
     out << " []";
-  else if (dim == Syntax::user ())
+  else if (dim == Syntax::User ())
     out << " [" << alist.name (key) << "]";
   else
     out << " [" << dim << "]";

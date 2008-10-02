@@ -174,7 +174,7 @@ LexerTable::read_header (Treelog& msg)
     {
     case 0:
       dim_names.insert (dim_names.end (), tag_names.size (), 
-                        Syntax::unknown ());
+                        Syntax::Unknown ());
       break;
     case 1:
       dim_names.insert (dim_names.end (), tag_names.size (),

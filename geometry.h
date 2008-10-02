@@ -258,12 +258,12 @@ public:
   // Layers -- Support initializing soil arrays layer by layer.
 public:
   static void add_layer (Syntax& syntax, Syntax::category, 
-                         const std::string& name,
-			 const std::string& dimension,
-                         const std::string& description);
+                         symbol name,
+			 symbol dimension,
+                         symbol description);
   void initialize_layer (std::vector<double>& value, 
 			 const AttributeList& al, 
-			 const std::string& name, Treelog&) const;
+			 symbol name, Treelog&) const;
   virtual void fill_xplus (std::vector<double>&) const = 0;
 
   // Creation.

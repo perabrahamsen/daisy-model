@@ -168,7 +168,7 @@ Select::Implementation::Spec::dimension () const
   if (syntax.lookup (leaf_name ()) == Syntax::Number)
     return symbol (syntax.dimension (leaf_name ()));
   else
-    return Syntax::unknown ();
+    return Syntax::Unknown ();
 }
 
 symbol /* can't return reference because buffer is automatic */
@@ -365,7 +365,7 @@ bool
 Select::Implementation::check (const symbol spec_dim, Treelog& err) const
 {
   bool ok = true;
-  if (spec.get () && !spec_conv && spec->dimension () != Syntax::unknown ())
+  if (spec.get () && !spec_conv && spec->dimension () != Syntax::Unknown ())
     err.warning ("Don't know how to convert [" + spec_dim
                  + "] to [" + dimension + "]");
   return ok;
@@ -468,7 +468,7 @@ Select::Implementation::Implementation (Block& al)
   : spec (al.check ("spec")
 	  ? submodel<Spec> (al, "spec")
 	  : NULL),
-    scope (x_symbol, Syntax::unknown ()),
+    scope (x_symbol, Syntax::Unknown ()),
     spec_conv (NULL),
     expr (get_expr (al)),
     negate (al.flag ("negate")
@@ -755,7 +755,7 @@ Select::initialize (const Units& units, const Volume&,
   if (impl->spec.get ())
     spec_dim = default_dimension (impl->spec->dimension ());
   else
-    spec_dim = Syntax::unknown ();
+    spec_dim = Syntax::Unknown ();
 
   // Let the expression modify the dimension.
   impl->scope.set_dimension (Implementation::x_symbol, spec_dim);
@@ -771,7 +771,7 @@ Select::initialize (const Units& units, const Volume&,
       spec_dim = impl->expr->dimension (impl->scope);
     }
 
-  if (impl->dimension == Syntax::unknown ())
+  if (impl->dimension == Syntax::Unknown ())
     impl->dimension = spec_dim;
 
   // Attempt to find convertion with original dimension.

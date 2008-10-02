@@ -119,16 +119,16 @@ ExchangeNumber::ExchangeNumber (Block& al)
     value (al.number ("value", -42.42e42))
 { }
   
-ExchangeNumber::ExchangeNumber (const symbol n, const std::string dim, 
-                                const std::string desc)
-  : Exchange (n, symbol (desc)),
+ExchangeNumber::ExchangeNumber (const symbol n, const symbol dim, 
+                                const symbol desc)
+  : Exchange (n, desc),
     dimension_ (dim),
     has_value (false),
     value (-42.42e42)
 { }
 
 ExchangeNumber::ExchangeNumber (const symbol n, const double val, 
-                                const std::string dim, const std::string desc)
+                                const symbol dim, const symbol desc)
   : Exchange (n, symbol (desc)),
     dimension_ (dim),
     has_value (true),

@@ -634,9 +634,9 @@ static struct CheckLayers : public VCheck
 
 void 
 Geometry::add_layer (Syntax& syntax, Syntax::category cat, 
-                     const std::string& name,
-		     const std::string& dimension,
-                     const std::string& description)
+                     symbol name,
+		     symbol dimension,
+                     symbol description)
 {
   Syntax& layer = *new Syntax ();
   layer.add ("end", "cm", Check::negative (), Syntax::Const, 
@@ -666,9 +666,9 @@ VALUE from the END of the previous layer, to the END of the current layer.");
 void 
 Geometry::initialize_layer (std::vector<double>& array, 
                             const AttributeList& al, 
-                            const std::string& name, Treelog& out) const
+                            symbol name, Treelog& out) const
 {
-  const std::string initial = std::string ("initial_") + name;
+  const std::string initial = std::string ("initial_") + name.name ();
   daisy_assert (array.size () == 0);
   if (al.check (name))
     // Specified by user.
