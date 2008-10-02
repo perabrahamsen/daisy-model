@@ -43,7 +43,6 @@ private:
                       const double CO2_atm, const double Ds, Treelog&);
   void output (Log&) const
   { }
-  const AttributeList& default_model ();
 
   // Create.
   public:

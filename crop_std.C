@@ -84,7 +84,7 @@ struct CropStandard : public Crop
     // Stomata conductance
     const double gs = photo->stomata_conductance();//[m s^-1]
     if(gs < 0)
-      return 1.0/rs_min(); // Photo_GL have no stomata conductance.
+      return 1.0/rs_max(); // Photo_GL have no stomata conductance.
     return gs; 
   }                     
   double leaf_width () const
@@ -320,6 +320,11 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
   const double total_LAI = bioclimate.LAI ();
   const std::vector<double>& fraction_sun_LAI = bioclimate.sun_LAI_fraction ();
   const std::vector<double>& PAR_height = bioclimate.height ();
+
+  // Anything do do?
+  const double min_PAR = 5.0;   // [W/m^2]
+  if (total_PAR[0] < min_PAR)
+    return;
 
   // Calculate shadow PAR.
   std::vector<double> shadow_PAR;

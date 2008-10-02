@@ -88,13 +88,11 @@ struct VegetationCrops : public Vegetation
   { return shared_light_fraction_; }
   double rs_min () const	// Minimum transpiration resistance.
   { 
-    // TODO: Should we use harmonic because it is parallel resitances?
-    return CanopyAverage (&Crop::rs_min); 
+    return CanopyHarmonic (&Crop::rs_min); 
   }
   double rs_max () const	// Maximum transpiration resistance.
   { 
-    // TODO: Should we use harmonic because it is parallel resitances?
-    return CanopyAverage (&Crop::rs_max) ; 
+    return CanopyHarmonic (&Crop::rs_max) ; 
   }
   double stomata_conductance () const	// Stomata conductance [m/s]
   { return stomata_conductance_; }
@@ -131,6 +129,7 @@ struct VegetationCrops : public Vegetation
   // Utilities.
   double CanopySum (CropFun fun) const;
   double CanopyAverage (CropFun fun) const;
+  double CanopyHarmonic (CropFun fun) const;
 
   // Individual crop queries.
   double DS_by_name (symbol name) const;
@@ -287,6 +286,20 @@ VegetationCrops::CanopyAverage (CropFun fun) const
 }
 
 double 
+VegetationCrops::CanopyHarmonic (CropFun fun) const
+{
+  double value = 0.0;
+
+  for (CropList::const_iterator crop = crops.begin();
+       crop != crops.end(); 
+       crop++)
+    {
+      value += 1.0 / (((*crop)->*fun) () * (*crop)->LAI ());
+    }
+  return 1.0 / (value * LAI_);
+}
+
+double 
 VegetationCrops::DS_by_name (symbol name) const
 {
   for (CropList::const_iterator crop = crops.begin();
@@ -381,15 +394,18 @@ VegetationCrops::find_stomata_conductance (const Units& units,
                                            const Bioclimate& bioclimate,
                                            double dt, Treelog& msg)
 {
+  stomata_conductance_ = 0.0;
+
   if (LAI () < 1e-9)
     return;
 
   for (CropList::const_iterator crop = crops.begin();
        crop != crops.end();
        crop++)
-    (*crop)->find_stomata_conductance (units, time, bioclimate, dt, msg);
-
-  stomata_conductance_ = CanopyAverage (&Crop::stomata_conductance);
+    {
+      (*crop)->find_stomata_conductance (units, time, bioclimate, dt, msg);
+      stomata_conductance_ += (*crop)->stomata_conductance ();
+    }
 }
 
 void 

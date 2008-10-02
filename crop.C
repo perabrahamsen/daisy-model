@@ -51,7 +51,7 @@ Crop::rs_max () const
 
 double 
 Crop::stomata_conductance () const
-{ return 1.0 / rs_min(); }
+{ return LAI () / rs_max(); }
 
 double 
 Crop::leaf_width () const

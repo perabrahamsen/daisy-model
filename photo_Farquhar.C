@@ -357,7 +357,7 @@ PhotoFarquhar::assimilate (const Units& units,
 
   // Omregning af gs(mol/(m2s)) til gs_ms (m/s) foretages ved 
   // gs_ms = gs * (R * T)/P:
-  gs_ms = gs * (Resistance::R * Tl) / Resistance::P_surf; //[m s^-1] 
+  gs_ms = gs * (Resistance::R * (Tl + Resistance::TK)) / Resistance::P_surf; //[m s^-1] 
 
   return (molWeightCH2O / molWeightCO2)* Ass_;    // Assimilate [g CH2O/m2/h]
 }

@@ -40,7 +40,6 @@ private:
 
   void output (Log&) const
   { }
-  const AttributeList& default_model ();
 
   // Create.
   public:

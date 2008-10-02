@@ -106,6 +106,21 @@ void RaddistDPF::tick (std::vector <double>& fraction_sun_LAI,
   daisy_assert (No + 1 == total_PAR.size());
   daisy_assert (No + 1 == sun_PAR.size());
 
+  const double min_dg = 10.0;
+  const double min_rad = min_dg * M_PI / 180.0;
+  const double min_sin_beta = std::sin (min_rad);
+
+  if (sin_beta < min_sin_beta)
+    // Ingen SUNLIT
+    {
+      std::fill(fraction_sun_LAI.begin (), fraction_sun_LAI.end (), 0.0);
+      std::fill( sun_PAR.begin (), sun_PAR.end (), 0.0);      
+      std::fill( total_PAR.begin (), total_PAR.end (), 0.0);
+      std::fill( sun_NIR.begin (), sun_NIR.end (), 0.0);
+      std::fill( total_NIR.begin (), total_NIR.end (), 0.0);
+      return;
+    }
+
   const double LAI = vegetation.LAI ();
 
   // Vectors for calculation
@@ -130,11 +145,9 @@ void RaddistDPF::tick (std::vector <double>& fraction_sun_LAI,
 
   // Extinction coefficient for black leaves in direct-beam irradiance 
   daisy_assert (std::isnormal (sin_beta)); //sin_beta er solhøjden
-  double kb  = 0.50 / sin_beta;
-  if(kb > 8.0) 
-    kb = 8.0;
-  if(kb < 0.0)
-    kb = 8.0;
+  double kb =  0.50 / sin_beta;
+  daisy_assert (kb > 0.0);
+
 
   // Diffuse transmission coefficeint, Tau_d.
   // Assuming homogen distributed in the hemisphere of diffuse radiation
