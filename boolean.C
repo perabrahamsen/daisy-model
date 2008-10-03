@@ -28,6 +28,7 @@
 #include "assertion.h"
 #include "memutils.h"
 #include "librarian.h"
+#include "treelog.h"
 #include <sstream>
 #include <vector>
 
@@ -45,7 +46,7 @@ Boolean::title () const
 { return name.name (); }
 
 Boolean::Boolean (Block& al)
-  : name (al.identifier ("type"))
+  : name (al.name ("type"))
 { }
 
 Boolean::~Boolean ()

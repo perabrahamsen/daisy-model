@@ -30,6 +30,7 @@
 #include "check.h"
 #include "log.h"
 #include "librarian.h"
+#include "treelog.h"
 #include <sstream>
 
 struct ConditionTSum : public Condition

@@ -39,7 +39,7 @@ Element::library_id () const
 }
 
 Element::Element (Block& al)
-  : name (al.identifier ("type"))
+  : name (al.name ("type"))
 { }
 
 Element::~Element ()

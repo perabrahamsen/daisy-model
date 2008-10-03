@@ -29,6 +29,7 @@
 #include "plf.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "treelog.h"
 
 class PhenologyTSum : public Phenology
 {

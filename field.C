@@ -710,7 +710,7 @@ Field::Implementation::check (bool require_weather,
 bool 
 Field::Implementation::check_am (const AttributeList& am, Treelog& err) const
 { 
-  Treelog::Open nest (err, am.identifier ("type"));
+  Treelog::Open nest (err, am.name ("type"));
 
   bool ok = true;
   for (ColumnList::const_iterator i = columns.begin ();

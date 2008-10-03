@@ -42,7 +42,7 @@ public:
   // Interface.
 public:
   // Print comment.
-  virtual void print_comment (const std::string& comment) = 0;
+  virtual void print_comment (symbol comment) = 0;
   // Print content of alist.
   virtual void print_alist (const AttributeList& alist, const Syntax& syntax,
 			    const AttributeList& super_alist,

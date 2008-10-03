@@ -84,7 +84,7 @@ struct PrinterFile::Implementation
   bool good ();
 
   // Creation.
-  Implementation (const Metalib&, const std::string& name);
+  Implementation (const Metalib&, const symbol name);
   Implementation (const Metalib&, std::ostream& stream);
   ~Implementation ();
 };
@@ -138,7 +138,7 @@ PrinterFile::Implementation::is_complex_object (const AttributeList& value,
 						const Library& library) const
 {
   daisy_assert (value.check ("type"));
-  const symbol element = value.identifier ("type");
+  const symbol element = value.name ("type");
   if (!library.check (element))
     return false;
 
@@ -250,7 +250,7 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 	  print_bool (alist.flag (key));
 	  break;
 	case Syntax::String:
-	  print_string (alist.name (key));
+	  print_symbol (alist.name (key));
 	  break;
 	case Syntax::Integer:
 	  out << alist.integer (key);
@@ -333,7 +333,7 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 	case Syntax::String:
 	  {
 	    const std::vector<symbol>& value 
-	      = alist.identifier_sequence (key);
+	      = alist.name_sequence (key);
 	    
 	    for (unsigned int i = 0; i < value.size (); i++)
 	      {
@@ -568,7 +568,7 @@ PrinterFile::Implementation::print_object (const AttributeList& value,
                                            int indent)
 {
   daisy_assert (value.check ("type"));
-  const symbol element = value.identifier ("type");
+  const symbol element = value.name ("type");
   if (!library.check (element))
     {
       out << "<unknown " << element << ">";
@@ -586,7 +586,7 @@ PrinterFile::Implementation::print_object (const AttributeList& value,
     }
 
   // Check original.
-  if (original.check ("type") && original.identifier ("type") == element)
+  if (original.check ("type") && original.name ("type") == element)
     {
       out << "original";
       // Check if we added something over the original.
@@ -626,7 +626,7 @@ PrinterFile::Implementation
   out << " ";
   if (alist.check ("type"))
     {
-      const symbol super = alist.identifier ("type");
+      const symbol super = alist.name ("type");
       print_symbol (super);
       if (!library.check (super))
 	{
@@ -726,9 +726,9 @@ PrinterFile::Implementation::good ()
 { return out.good (); }
 
 PrinterFile::Implementation::Implementation (const Metalib& mlib,
-                                             const std::string& name)
+                                             const symbol name)
   : metalib (mlib),
-    owned_stream (new std::ofstream (name.c_str ())),
+    owned_stream (new std::ofstream (name.name ().c_str ())),
     out (*owned_stream)
 { }
 
@@ -753,8 +753,10 @@ PrinterFile::print_string (std::ostream& out,
 }
 
 void
-PrinterFile::print_comment (const std::string& comment)
+PrinterFile::print_comment (const symbol comment_s)
 {
+  const std::string& comment = comment_s.name ();
+
   std::vector<std::string> text;
 
   int last = 0;
@@ -809,7 +811,7 @@ void
 PrinterFile::print_input (const AttributeList& alist)
 {
   daisy_assert (alist.check ("type"));
-  const symbol type = alist.identifier ("type");
+  const symbol type = alist.name ("type");
   const Syntax& syntax 
     = impl->metalib.library (Parser::component).syntax (type);
 
@@ -832,10 +834,9 @@ get_file_alist ()
 }
     
 PrinterFile::PrinterFile (const Metalib& mlib,
-                          const std::string& filename)
+                          const symbol filename)
   : Printer (get_file_alist ()),
-    impl (new Implementation (mlib,
-                              filename))
+    impl (new Implementation (mlib, filename))
 { }
     
 static const AttributeList& 

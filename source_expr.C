@@ -106,7 +106,7 @@ SourceExpr::SourceExpr (Block& al)
   : SourceFile (al),
     units (al.units ()),
     expr (Librarian::build_item<Number> (al, "expr")),
-    title_ (al.identifier ("title", expr->title ())),
+    title_ (al.name ("title", expr->title ())),
     dimension_ ("UNINITIALIZED")
 { }
 

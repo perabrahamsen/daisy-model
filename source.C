@@ -96,7 +96,7 @@ Source::load_syntax (Syntax&, AttributeList&)
 { }
 
 Source::Source (Block& al)
-  : name (al.identifier ("type"))
+  : name (al.name ("type"))
 { }
 
 Source::~Source ()

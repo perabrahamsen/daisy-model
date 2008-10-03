@@ -30,6 +30,7 @@
 #include "vcheck.h"
 #include "submodel.h"
 #include "block.h"
+#include "treelog.h"
 #include <sstream>
 #include <iomanip>
 

@@ -38,6 +38,7 @@
 #include "vcheck.h"
 #include "librarian.h"
 #include "secondary.h"
+#include "treelog.h"
 #include <vector>
 #include <map>
 
@@ -105,7 +106,7 @@ Horizon::Implementation::get_attributes (const std::vector<const AttributeList*>
 { 
   double_map result; 
   for (unsigned int i = 0; i < alists.size (); i++)
-    result[alists[i]->identifier ("key")] = alists[i]->number ("value");
+    result[alists[i]->name ("key")] = alists[i]->number ("value");
   return result;
 }
 
@@ -114,7 +115,7 @@ Horizon::Implementation::get_dimensions (const std::vector<const AttributeList*>
 { 
   symbol_map result; 
   for (unsigned int i = 0; i < alists.size (); i++)
-    result[alists[i]->identifier ("key")] = alists[i]->identifier ("value");
+    result[alists[i]->name ("key")] = alists[i]->name ("value");
   return result;
 }
 
@@ -378,7 +379,7 @@ Intended for use with pedotransfer functions.");
 }
 
 Horizon::Horizon (Block& al)
-  : ModelLogable (al.identifier ("type")),
+  : ModelLogable (al.name ("type")),
     impl (new Implementation (al)),
     fast_clay (-42.42e42),
     fast_humus (-42.42e42),

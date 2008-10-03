@@ -166,12 +166,12 @@ LogExtern::lookup (symbol tag) const
 }
 
 bool 
-LogExtern::has_identifier (symbol tag) const
+LogExtern::has_name (symbol tag) const
 { return lookup (tag) == Name; }
 
 
 symbol
-LogExtern::identifier (symbol tag) const
+LogExtern::name (symbol tag) const
 { 
   const name_map::const_iterator i = names.find (tag);
   daisy_assert (i != names.end ());
@@ -215,7 +215,7 @@ Numeric value.");
   }
 
   NumEntry (Block& al)
-    : name (al.identifier ("name")),
+    : name (al.name ("name")),
       value (al.number ("value"))
   { }
 };
@@ -244,16 +244,16 @@ LogExtern::LogExtern (Block& al)
   : LogSelect (al),
     Scope (al)
 { 
-  std::vector<symbol> par_names = al.identifier_sequence ("parameter_names");
+  std::vector<symbol> par_names = al.name_sequence ("parameter_names");
   ScopeBlock scope_block (al);
 
   for (size_t i = 0; i < par_names.size (); i++)
     {
       const symbol id = par_names[i];
-      if (scope_block.has_identifier (id))
+      if (scope_block.has_name (id))
         {
           types[id] = Name;
-          names[id] = scope_block.identifier (id);
+          names[id] = scope_block.name (id);
           descriptions[id] = scope_block.get_description (id);
         }
       else

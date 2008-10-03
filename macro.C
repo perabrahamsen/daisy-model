@@ -39,7 +39,7 @@ Macro::none () const
 { return false; }
 
 Macro::Macro (Block& al)
-  : name (al.identifier ("type"))
+  : name (al.name ("type"))
 { }
 
 Macro::Macro (const symbol id)

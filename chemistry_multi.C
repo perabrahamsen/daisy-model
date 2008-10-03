@@ -410,7 +410,7 @@ ChemistryMulti::find_chemicals (const std::vector<Chemistry*>& combine)
 ChemistryMulti::ChemistryMulti (Block& al)
   : Chemistry (al),
     combine (Librarian::build_vector<Chemistry> (al, "combine")),
-    ignore (al.identifier_sequence ("ignore")),
+    ignore (al.name_sequence ("ignore")),
     chemicals (find_chemicals (combine))
 { }
 

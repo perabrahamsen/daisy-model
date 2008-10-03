@@ -30,6 +30,7 @@
 #include "assertion.h"
 #include "scope_block.h"
 #include "librarian.h"
+#include "treelog.h"
 #include <sstream>
 
 struct Block::Implementation
@@ -47,7 +48,7 @@ struct Block::Implementation
   Syntax::type lookup (symbol) const;
   const Syntax& find_syntax (const symbol key) const;
   const AttributeList& find_alist (const symbol key) const;
-  const std::string expand_string (Block&, const std::string&) const;
+  symbol expand_string (Block&, symbol) const;
   symbol expand_reference (const symbol key);
   void error (const std::string& msg);
   void set_error ();
@@ -96,10 +97,11 @@ Block::Implementation::find_alist (const symbol key) const
   return parent->impl->find_alist (key);
 }
 
-const std::string 
+symbol
 Block::Implementation::expand_string (Block& block,
-				      const std::string& value) const
+				      const symbol value_s) const
 {
+  const std::string value = value_s.name ();
   std::ostringstream result;
   enum mode_t { normal, escaped, keyed } mode = normal;
   std::string key;
@@ -161,7 +163,7 @@ Block::Implementation::expand_string (Block& block,
                       {
                         Treelog::Open nest (msg, "${" + key + "}");
                         const AttributeList& obj = alist.alist (key);
-                        const std::string type = obj.name ("type");
+                        const symbol type = obj.name ("type");
                         const Library& library = syntax.library (metalib, key);
                         const ScopeBlock scope (block);
                         if (library.name () == symbol (Stringer::component))
@@ -335,7 +337,7 @@ double
 Block::number (const symbol key, double default_value) const
 { return check (key) ?  number (key) : default_value; }
 
-const std::string
+symbol
 Block::name (const symbol key)
 { 
   if (!impl->alist.is_reference (key))
@@ -345,17 +347,9 @@ Block::name (const symbol key)
   return impl->expand_string (*this, impl->find_alist (var).name (var)); 
 }
 
-const std::string 
-Block::name (const symbol key, const symbol default_value)
-{ return check (key) ? name (key) : default_value.name (); }
-
-symbol 
-Block::identifier (const symbol key)
-{ return symbol (name (key)); }
-
 symbol
-Block::identifier (const symbol key, const symbol default_value)
-{ return check (key) ? identifier (key) : default_value; }
+Block::name (const symbol key, const symbol default_value)
+{ return check (key) ? name (key) : default_value; }
 
 bool 
 Block::flag (const symbol key) const
@@ -416,43 +410,21 @@ Block::number_sequence (const symbol key) const
 }
 
 const std::vector<symbol>
-Block::identifier_sequence (const symbol key)
-{ 
-  if (!impl->alist.is_reference (key))
-    {
-      const std::vector<std::string>& value 
-        = impl->alist.name_sequence (impl->expand_reference (key));
-      std::vector<symbol> result;
-      for (size_t i = 0; i < value.size (); i++)
-        result.push_back (symbol (impl->expand_string (*this, value[i])));
-      return result;
-    }
-  const symbol var = impl->expand_reference (key);
-  const std::vector<std::string>& value
-    = impl->find_alist (var).name_sequence (var); 
-  std::vector<symbol> result;
-  for (size_t i = 0; i < value.size (); i++)
-    result.push_back (symbol (impl->expand_string (*this, value[i])));
-  return result;
-}
-
-
-std::vector<std::string>
 Block::name_sequence (const symbol key)
 { 
   if (!impl->alist.is_reference (key))
     {
-      const std::vector<std::string>& value 
+      const std::vector<symbol>& value 
         = impl->alist.name_sequence (impl->expand_reference (key));
-      std::vector<std::string> result;
+      std::vector<symbol> result;
       for (size_t i = 0; i < value.size (); i++)
         result.push_back (impl->expand_string (*this, value[i]));
       return result;
     }
   const symbol var = impl->expand_reference (key);
-  const std::vector<std::string>& value
+  const std::vector<symbol>& value
     = impl->find_alist (var).name_sequence (var); 
-  std::vector<std::string> result;
+  std::vector<symbol> result;
   for (size_t i = 0; i < value.size (); i++)
     result.push_back (impl->expand_string (*this, value[i]));
   return result;
@@ -498,7 +470,7 @@ Block::alist_sequence (const symbol key) const
   return impl->find_alist (var).alist_sequence (var); 
 }
 
-std::string 
+symbol
 Block::sequence_id (const symbol key, size_t index)
 {
   std::ostringstream tmp;

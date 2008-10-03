@@ -106,9 +106,9 @@ Assertion::failure (const char* file, int line, const char* fun,
 
   if (logs.size () == 0)
     // Windows dislike throw in static constructors.
-    exit (3);
+    exit (4);
   else
-    throw 3;
+    throw 5;
 }
 
 void 
@@ -143,9 +143,9 @@ Assertion::panic (const char* file, int line, const char* fun,
   bug (file, line, fun, msg);
   if (logs.size () == 0)
     // Windows dislike throw in static constructors.
-    exit (3);
+    exit (6);
   else
-    throw 3;
+    throw 7;
 }
 
 void 

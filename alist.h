@@ -23,10 +23,7 @@
 #define ALIST_H
 
 #include "symbol.h"
-#include <stdexcept>
-#include <string>
 #include <vector>
-#include <list>
 
 class PLF;
 class AttributeList;
@@ -69,9 +66,8 @@ public:
   // Extract values.
   double number (symbol) const;
   double number (symbol, double default_value) const;
-  const std::string& name (symbol) const;
-  const std::string& name (symbol, symbol default_value) const;
-  symbol identifier (symbol) const;
+  symbol name (symbol) const;
+  symbol name (symbol, symbol default_value) const;
   bool flag (symbol) const;
   bool flag (symbol, bool default_value) const;
   const PLF& plf (symbol) const;
@@ -79,9 +75,7 @@ public:
   int integer (symbol) const;
   int integer (symbol, int default_value) const;
   const std::vector<double>& number_sequence (symbol) const;
-  const std::vector<symbol>& 
-  /**/ identifier_sequence (symbol key) const;
-  std::vector<std::string> name_sequence (symbol key) const;
+  const std::vector<symbol>& name_sequence (symbol key) const;
   const std::vector<bool>& flag_sequence (symbol key) const;
   const std::vector<int>& integer_sequence (symbol key) const;
   const std::vector<const PLF*>& plf_sequence (symbol key) const;

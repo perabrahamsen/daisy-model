@@ -32,6 +32,7 @@
 #include "librarian.h"
 #include "check.h"
 #include "mathlib.h"
+#include "treelog.h"
 #include <memory>
 
 struct ReactionFilter : public Reaction
@@ -133,8 +134,8 @@ struct ReactionFilter : public Reaction
   }
   explicit ReactionFilter (Block& al)
     : Reaction (al),
-      immobile (al.identifier ("immobile")),
-      mobile (al.identifier ("mobile")),
+      immobile (al.name ("immobile")),
+      mobile (al.name ("mobile")),
       fc_primary (al.number ("fc_primary")),
       fc_secondary (al.number ("fc_secondary"))
   { }

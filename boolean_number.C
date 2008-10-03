@@ -26,6 +26,7 @@
 #include "number.h"
 #include "memutils.h"
 #include "librarian.h"
+#include "treelog.h"
 #include <sstream>
 #include <vector>
 

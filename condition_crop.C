@@ -60,7 +60,7 @@ struct ConditionDSAfter : public Condition
 
   ConditionDSAfter (Block& al)
     : Condition (al),
-      crop (al.identifier ("crop")),
+      crop (al.name ("crop")),
       ds (al.number ("ds"))
   { }
 };
@@ -113,7 +113,7 @@ struct ConditionDMOver : public Condition
 
   ConditionDMOver (Block& al)
     : Condition (al),
-      crop (al.identifier ("crop")),
+      crop (al.name ("crop")),
       weight (al.number ("weight")),
       height (al.number ("height"))
   { }
@@ -169,7 +169,7 @@ struct ConditionDMSOrgOver : public Condition
 
   ConditionDMSOrgOver (Block& al)
     : Condition (al),
-      crop (al.identifier ("crop")),
+      crop (al.name ("crop")),
       weight (al.number ("weight"))
   { }
 };

@@ -29,6 +29,7 @@
 #include "log.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "treelog.h"
 #include <memory>
 
 struct ReactionStandard : public Reaction
@@ -97,8 +98,8 @@ struct ReactionStandard : public Reaction
   }
   explicit ReactionStandard (Block& al)
     : Reaction (al),
-      name_A (al.identifier ("A")),
-      name_B (al.identifier ("B")),
+      name_A (al.name ("A")),
+      name_B (al.name ("B")),
       transform (Librarian::build_item<Transform> (al, "transform"))
   { }
 };

@@ -28,7 +28,6 @@
 #include "treelog.h"
 #include <sstream>
 #include "assertion.h"
-#include "symbol.h"
 #include "memutils.h"
 #include <map>
 #include <sstream>
@@ -109,9 +108,9 @@ Library::Implementation::add_ancestors (const symbol key)
       symbol next;
 
       if (alist.check ("type"))
-	next = alist.identifier ("type");
+	next = alist.name ("type");
       else if (alist.check ("base_model"))
-	next = alist.identifier ("base_model");
+	next = alist.name ("base_model");
       else
 	break;
 
@@ -128,7 +127,7 @@ Library::Implementation::add_base (AttributeList& value,
 				   const Syntax& syntax)
 {
   daisy_assert (value.check ("base_model"));
-  const symbol key = value.identifier ("base_model");
+  const symbol key = value.name ("base_model");
   alists[key] = &value;
   syntaxen[key] = &syntax;
   add_ancestors (key);
@@ -316,8 +315,8 @@ Library::is_derived_from (const symbol a, const symbol b) const
     return false;
 
   const symbol type = al.check ("type") 
-    ? al.identifier ("type") 
-    : al.identifier ("base_model");
+    ? al.name ("type") 
+    : al.name ("base_model");
 
   if (type == b)
     return true;
@@ -336,10 +335,10 @@ Library::base_model (const symbol parameterization) const
   const AttributeList& al = lookup (parameterization);
 
   if (al.check ("type"))
-    return base_model (al.identifier ("type"));
+    return base_model (al.name ("type"));
   if (al.check ("base_model")
-      && al.identifier ("base_model") != parameterization)
-    return  base_model (al.identifier ("base_model"));
+      && al.name ("base_model") != parameterization)
+    return  base_model (al.name ("base_model"));
 
   return parameterization;
 }
@@ -356,7 +355,7 @@ Library::has_interesting_description (const AttributeList& alist) const
     return true;
   
   // If the model has no description, this one is interesting.
-  const symbol type = alist.identifier ("type");
+  const symbol type = alist.name ("type");
   if (!check (type))
     {
       daisy_bug (name () + " does not have " + type.name ());

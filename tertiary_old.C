@@ -32,6 +32,7 @@
 #include "block.h"
 #include "surface.h"
 #include "groundwater.h"
+#include "treelog.h"
 
 struct TertiaryOld : public Tertiary
 {

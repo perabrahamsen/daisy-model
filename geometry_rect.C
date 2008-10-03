@@ -27,6 +27,7 @@
 #include "block.h"
 #include "alist.h"
 #include "submodel.h"
+#include "treelog.h"
 #include <sstream>
 
 size_t 

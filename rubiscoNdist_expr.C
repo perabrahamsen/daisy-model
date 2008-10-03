@@ -28,6 +28,7 @@
 #include "librarian.h"
 #include "number.h"
 #include "scope_exchange.h"
+#include "treelog.h"
 
 static const double Mw = 14.0; //The molecular weight for N [g mol¯1]
 static const symbol LAI_symbol ("LAI");

@@ -153,7 +153,7 @@ struct WeatherStandard : public WeatherBase
   symbol reference_evapotranspiration_read;
 
   // Parsing.
-  const std::string where;
+  const symbol where;
   std::auto_ptr<std::istream> owned_stream;
   std::auto_ptr<LexerData> lex;
   Lexer::Position end_of_header;

@@ -25,6 +25,7 @@
 #include "librarian.h"
 #include "units.h"
 #include "assertion.h"
+#include "treelog.h"
 #include <sstream>
 
 const char *const Number::component = "number";
@@ -92,7 +93,7 @@ Number::check_dim (const Units& units,
 }
 
 Number::Number (Block& al)
-  : name (al.identifier ("type"))
+  : name (al.name ("type"))
 { }
 
 Number::~Number ()

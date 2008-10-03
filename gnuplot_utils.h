@@ -21,7 +21,7 @@
 #ifndef GNUPLOT_UTILS_H
 #define GNUPLOT_UTILS_H
 
-#include <string>
+#include "symbol.h"
 
 class Syntax;
 class AttributeList;
@@ -29,8 +29,8 @@ class AttributeList;
 namespace GnuplotUtil
 {
   // Add gnuplot data series style information.
-  void load_style (Syntax&, AttributeList&, const std::string& default_with, 
-                   const std::string& default_title);
+  void load_style (Syntax&, AttributeList&, const symbol default_with, 
+                   const symbol default_title);
 }
 
 #endif // GNUPLOT_UTILS_H

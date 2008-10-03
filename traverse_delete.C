@@ -101,7 +101,7 @@ TraverseDelete::enter_model (const Syntax&, AttributeList& alist,
   // Check if this model is inherited from the model we are examining.
   if (dep_lib == component
       && alist.check ("type") 
-      && alist.identifier ("type") == dep_par)
+      && alist.name ("type") == dep_par)
     alist.add ("type", dep_super);
 
   return true;
@@ -158,7 +158,7 @@ TraverseDelete::enter_object (const Library& library,
 			      const symbol)
 {
   daisy_assert (alist.check ("type"));
-  const symbol super = alist.identifier ("type");
+  const symbol super = alist.name ("type");
   if (dep_lib == library.name () && super == dep_par)
     const_cast<AttributeList&> (alist).add ("type", dep_super);
 
@@ -199,7 +199,7 @@ find_super (const Metalib& metalib,
   daisy_assert (library.check (parameterization));
   const AttributeList& alist = library.lookup (parameterization);
   daisy_assert (alist.check ("type"));
-  const symbol super = alist.identifier ("type");
+  const symbol super = alist.name ("type");
   daisy_assert (parameterization != super);
   return super;
 }

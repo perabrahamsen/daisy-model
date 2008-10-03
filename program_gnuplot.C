@@ -36,7 +36,7 @@ struct ProgramGnuplot : public Program
   // Content.
   const Units& units;
   Path& path;
-  const std::string command_file;
+  const symbol command_file;
   const bool do_cd;
   const std::vector<symbol> extra;
 
@@ -74,8 +74,8 @@ ProgramGnuplot::run (Treelog& msg)
   }
 
   // Open file, and change directory.
-  const std::string dir = path.get_directory ();
-  std::ofstream out (command_file.c_str ());
+  const symbol dir = path.get_directory ();
+  std::ofstream out (command_file.name ().c_str ());
   if (do_cd)
     out << "cd " << Gnuplot::quote (dir) << "\n";
 
@@ -114,7 +114,7 @@ ProgramGnuplot::ProgramGnuplot (Block& al)
     path (al.path ()),
     command_file (al.name ("command_file")),
     do_cd (al.flag ("cd")),
-    extra (al.identifier_sequence ("extra")),
+    extra (al.name_sequence ("extra")),
     graph (Librarian::build_vector<Gnuplot> (al, "graph"))
 { }
 

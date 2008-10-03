@@ -36,7 +36,7 @@ ABAEffect::library_id () const
 }
 
 ABAEffect::ABAEffect (Block& al)
-  : ModelLogable (al.identifier ("type"))
+  : ModelLogable (al.name ("type"))
 { }
 
 ABAEffect::~ABAEffect ()

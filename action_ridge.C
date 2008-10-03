@@ -27,6 +27,7 @@
 #include "field.h"
 #include "ridge.h"
 #include "librarian.h"
+#include "treelog.h"
 
 struct ActionRidge : public Action
 {

@@ -29,6 +29,7 @@
 #include "librarian.h"
 #include "syntax.h"
 #include "alist.h"
+#include "treelog.h"
 
 struct ABAProdSoil : public ABAProd
 {

@@ -41,7 +41,7 @@ private:
   // Interface.
 public:
   // Print comment.
-  void print_comment (const std::string& comment);
+  void print_comment (symbol comment);
   // Print content of alist.
   void print_alist (const AttributeList& alist, const Syntax& syntax,
 		    const AttributeList& super_alist, 
@@ -66,7 +66,7 @@ public:
  // Create and Destroy.
 public:
   PrinterFile (Block& al);
-  PrinterFile (const Metalib&, const std::string& filename);
+  PrinterFile (const Metalib&, symbol filename);
   PrinterFile (const Metalib&, std::ostream& out);
   ~PrinterFile ();
 };

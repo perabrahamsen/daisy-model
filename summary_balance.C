@@ -96,15 +96,15 @@ SummaryBalance::initialize (std::vector<Select*>& select, Treelog& msg)
 
 SummaryBalance::SummaryBalance (Block& al)
   : Summary (al),
-    description (al.identifier ("description")),
+    description (al.name ("description")),
     file (al.name ("where", "")),
-    title (al.check ("title") ? al.identifier ("title") : name),
-    period (al.check ("period") ? al.identifier ("period") : symbol ("")),
+    title (al.check ("title") ? al.name ("title") : name),
+    period (al.check ("period") ? al.name ("period") : symbol ("")),
     precision (al.integer ("precision")),
     require_top (al.flag ("require_top")),
-    input (al.identifier_sequence ("input")),
-    output (al.identifier_sequence ("output")),
-    content (al.identifier_sequence ("content")),
+    input (al.name_sequence ("input")),
+    output (al.name_sequence ("output")),
+    content (al.name_sequence ("content")),
     fetch (input, output, content)
 { }
 

@@ -376,7 +376,7 @@ Frame::number (const symbol key, double default_value) const
     return impl->alist.number (key, default_value);
 }
 
-const std::string 
+symbol
 Frame::name (const symbol key) const
 { 
   if (impl->parent && !impl->alist.check (key))
@@ -385,7 +385,7 @@ Frame::name (const symbol key) const
     return impl->alist.name (key);
 }
 
-const std::string 
+symbol
 Frame::name (const symbol key, 
              const symbol default_value) const
 { 
@@ -393,15 +393,6 @@ Frame::name (const symbol key,
     return impl->parent->name (key, default_value);
   else
     return impl->alist.name (key, default_value);
-}
-
-symbol 
-Frame::identifier (const symbol key) const
-{ 
-  if (impl->parent && !impl->alist.check (key))
-    return impl->parent->identifier (key);
-  else
-    return impl->alist.identifier (key);
 }
 
 bool 
@@ -467,16 +458,7 @@ Frame::number_sequence (const symbol key) const
     return impl->alist.number_sequence (key);
 }
 
-const std::vector<symbol> 
-Frame::identifier_sequence (const symbol key) const
-{ 
-  if (impl->parent && !impl->alist.check (key))
-    return impl->parent->identifier_sequence (key);
-  else
-    return impl->alist.identifier_sequence (key);
-}
-
-std::vector<std::string> 
+const std::vector<symbol>&
 Frame::name_sequence (const symbol key) const
 { 
   if (impl->parent && !impl->alist.check (key))

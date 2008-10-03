@@ -30,6 +30,7 @@
 #include "librarian.h"
 #include "assertion.h"
 #include "daisy.h"
+#include "treelog.h"
 #include <memory>
 
 struct ConditionBoolean : public Condition

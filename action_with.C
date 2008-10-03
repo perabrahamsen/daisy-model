@@ -30,6 +30,7 @@
 #include "log.h"
 #include "memutils.h"
 #include "librarian.h"
+#include "treelog.h"
 
 struct ActionWithColumn : public Action
 {
@@ -111,7 +112,7 @@ public:
 
   ActionWithColumn (Block& al)
     : Action (al),
-      column (al.identifier ("column")),
+      column (al.name ("column")),
       actions (Librarian::build_vector<Action> (al, "actions"))
   { }
 public:

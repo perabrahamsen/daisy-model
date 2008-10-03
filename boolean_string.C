@@ -29,7 +29,7 @@
 struct BooleanStringEqual : public Boolean
 {
   // Parameters.
-  const std::vector<std::string> values;
+  const std::vector<symbol> values;
 
   // Simulation.
   void tick (const Units&, const Scope&, Treelog&)
@@ -40,7 +40,7 @@ struct BooleanStringEqual : public Boolean
   { 
     if (values.size () < 2)
       return true;
-    const std::string first = values[0];
+    const symbol first = values[0];
     for (size_t i = 1; i < values.size (); i++)
       if (first != values[i])
 	return false; 

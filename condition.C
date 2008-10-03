@@ -34,9 +34,12 @@ Condition::library_id () const
   return id;
 }
 
-const std::string
+symbol
 Condition::timestep ()
-{ return "dt"; } 
+{ 
+  static const symbol name ("dt");
+  return name; 
+} 
 
 Condition::Condition (Block& al)
   : ModelAListed (al.alist ())

@@ -20,7 +20,6 @@
 
 #include "syntax.h"
 #include <memory>
-#include <string>
 #include <vector>
 #include <boost/noncopyable.hpp>
 
@@ -212,9 +211,8 @@ public:
 public:
   double number (const symbol) const;
   double number (const symbol, double default_value) const;
-  const std::string name (const symbol) const;
-  const std::string name (const symbol, const symbol default_value) const;
-  symbol identifier (const symbol) const;
+  symbol name (const symbol) const;
+  symbol name (const symbol, const symbol default_value) const;
   bool flag (const symbol) const;
   bool flag (const symbol, bool default_value) const;
   const PLF& plf (const symbol) const;
@@ -222,8 +220,7 @@ public:
   int integer (const symbol) const;
   int integer (const symbol, int default_value) const;
   const std::vector<double>& number_sequence (const symbol) const;
-  const std::vector<symbol> identifier_sequence (const symbol key) const;
-  std::vector<std::string> name_sequence (const symbol key) const;
+  const std::vector<symbol>& name_sequence (const symbol key) const;
   const std::vector<bool>& flag_sequence (const symbol key) const;
   const std::vector<int>& integer_sequence (const symbol key) const;
   const std::vector<const PLF*>& plf_sequence (const symbol key) const;

@@ -33,6 +33,7 @@
 #include "librarian.h"
 #include "volume.h"
 #include "units.h"
+#include "treelog.h"
 #include <sstream>
 
 // Base class for fertilize actions.
@@ -165,7 +166,7 @@ ActionFertilize::common_doIt (Daisy& daisy, double& water, Treelog& msg)
       return;
     }
 
-  const std::string syntax = am.name ("syntax");
+  const symbol syntax = am.name ("syntax");
   std::ostringstream tmp;
   if (syntax == "mineral")
     tmp << "Fertilizing " << am.number ("weight") 
@@ -228,7 +229,7 @@ ActionFertilize::check_alist (const AttributeList& al, Treelog& err)
 
   if (equivalent_weight || precision || second_year_compensation)
     {
-      const std::string syntax = am.name ("syntax");
+      const symbol syntax = am.name ("syntax");
       if (syntax != "mineral")
         {
           if (!am.check ("first_year_utilization"))

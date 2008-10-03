@@ -44,12 +44,11 @@ public:
   // Use.
 public:
   virtual bool is_number () const;
-  symbol name () const;
   virtual double number () const;
   virtual bool has_number () const;
   virtual symbol dimension () const;
-  virtual bool has_identifier () const;
-  virtual symbol identifier () const;
+  virtual bool has_name () const;
+  virtual symbol name () const;
   symbol get_description () const;
   virtual void set_number (const double);
 
@@ -95,8 +94,8 @@ private:
 
   // Use
 public: 
-  bool has_identifier () const;
-  symbol identifier () const;
+  bool has_name () const;
+  symbol name () const;
 
   // Create and Destroy.
 public:
@@ -118,8 +117,8 @@ public:
   bool has_number (symbol tag) const;
   double number (symbol tag) const;
   symbol dimension (symbol tag) const;
-  bool has_identifier (symbol tag) const;
-  symbol identifier (symbol tag) const;
+  bool has_name (symbol tag) const;
+  symbol name (symbol tag) const;
   symbol get_description (symbol tag) const;
 
   // WScope.

@@ -98,7 +98,7 @@ XYSource::load_syntax (Syntax&, AttributeList&)
 { }
 
 XYSource::XYSource (Block& al)
-  : name (al.identifier ("type"))
+  : name (al.name ("type"))
 { }
 
 XYSource::~XYSource ()

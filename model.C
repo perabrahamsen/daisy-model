@@ -87,7 +87,7 @@ ModelAListed::output_as_entry (Log& log) const
 }
 
 ModelAListed::ModelAListed (const AttributeList& al)
-  : ModelLogable (al.identifier ("type")),
+  : ModelLogable (al.name ("type")),
     alist (al)
 { }
 

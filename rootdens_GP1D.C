@@ -30,6 +30,7 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include "iterative.h"
+#include "treelog.h"
 
 #include <sstream>
 

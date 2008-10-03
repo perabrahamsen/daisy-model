@@ -28,6 +28,7 @@
 #include "mathlib.h"
 #include "memutils.h"
 #include "librarian.h"
+#include "treelog.h"
 #include <numeric>
 #include <sstream>
 
@@ -38,7 +39,7 @@ struct SourceMerge : public Source
   const std::vector<Source*> source;
   const symbol title_;
   symbol dimension_;
-  std::string with_;
+  symbol with_;
   const int style_;
   void add_entry (const Time& time, const std::vector<double>& vals);
   std::vector<Time> times;
@@ -47,7 +48,7 @@ struct SourceMerge : public Source
 
   // Interface.
 public:
-  const std::string& with () const
+  symbol with () const
   { return with_; }
   int style () const 
   { return style_; }

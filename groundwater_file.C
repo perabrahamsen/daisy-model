@@ -43,7 +43,7 @@ private:
   double depth;
 
   // File.
-  const std::string file_name;
+  const symbol file_name;
   std::auto_ptr<std::istream> owned_stream;
   std::auto_ptr<LexerData> lex;
   
@@ -155,7 +155,7 @@ GroundwaterFile::initialize (const Units&,
   daisy_assert (!owned_stream.get ());
   owned_stream = path.open_file (file_name);
   daisy_assert (!lex.get ());
-  lex.reset (new LexerData (file_name, *owned_stream, msg));
+  lex.reset (new LexerData (file_name.name (), *owned_stream, msg));
   tick (time, msg); 
 }
 

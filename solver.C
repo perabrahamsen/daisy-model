@@ -42,7 +42,7 @@ Solver::Matrix::Matrix (const size_t size)
 }
 
 Solver::Solver (Block& al)
-  : name (al.identifier ("type"))
+  : name (al.name ("type"))
 { }
 
 Solver::~Solver ()

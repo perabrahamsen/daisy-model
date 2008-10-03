@@ -26,6 +26,7 @@
 #include "librarian.h"
 #include "log.h"
 #include "check.h"
+#include "treelog.h"
 
 struct SeedRelease : public Seed
 {

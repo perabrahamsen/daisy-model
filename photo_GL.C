@@ -32,6 +32,7 @@
 #include <sstream>
 #include "check.h"
 #include "librarian.h"
+#include "treelog.h"
 
 // Chemical constants affecting the crop.
 const double molWeightCH2O = 30.0; // [gCH2O/mol]

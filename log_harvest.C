@@ -28,6 +28,7 @@
 #include "version.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "treelog.h"
 #include <sstream>
 #include <fstream>
 #include <time.h>
@@ -44,7 +45,7 @@ struct LogHarvest : public Log
 
   // Content.
   unsigned int last_size;
-  const std::string file;            // Filename.
+  const symbol file;            // Filename.
   std::ofstream out;			// Output stream.
   DLF print_header;		// How much header should be printed?
   bool print_tags;		// Set if tags should be printed.
@@ -171,7 +172,7 @@ struct LogHarvest : public Log
   // Create and Destroy.
   void initialize (Treelog&)
   { 
-    out.open (file.c_str ()); 
+    out.open (file.name ().c_str ()); 
 
     // Header.
     print_header.start (out, name, file, "");

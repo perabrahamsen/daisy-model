@@ -42,7 +42,7 @@ Weather::dry_deposit_unit ()
 }
 
 Weather::Weather (Block& al)
-  : ModelLogable (al.identifier ("type"))
+  : ModelLogable (al.name ("type"))
 { }
 
 Weather::~Weather ()

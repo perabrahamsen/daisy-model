@@ -33,6 +33,7 @@
 #include "plf.h"
 #include "ridge.h"
 #include "check.h"
+#include "treelog.h"
 #include <sstream>
 #include <map>
 

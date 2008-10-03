@@ -34,6 +34,7 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include "volume.h"
+#include "treelog.h"
 #include <sstream>
 
 struct ActionIrrigate : public Action

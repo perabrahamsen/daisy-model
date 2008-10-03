@@ -29,6 +29,7 @@
 #include "check.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "treelog.h"
 
 struct SelectContent : public SelectValue
 {

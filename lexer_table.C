@@ -37,7 +37,7 @@ class LexerTable::Filter
 public:
   const symbol tag;
 private:
-  const std::vector<std::string> allowed;
+  const std::vector<symbol> allowed;
 public:
   bool match (const std::string& value) const
   {
@@ -46,10 +46,11 @@ public:
         if (allowed[i] == value)
           return true;
         // Try to pad out our allowed value with spaces...
-        if (value.size () <= allowed[i].size ())
+        if (value.size () <= allowed[i].name ().size ())
           continue;
         const std::string allow
-          = allowed[i] + std::string (value.size () - allowed[i].size (), ' ');
+          = allowed[i] + std::string (value.size () 
+                                      - allowed[i].name ().size (), ' ');
         daisy_assert (allow.size () == value.size ());
         if (allow == value)
           return true;
@@ -92,8 +93,8 @@ LexerTable::good ()
 bool
 LexerTable::read_header (Treelog& msg)
 {
-  owned_stream = path.open_file (filename);
-  lex.reset (new LexerData (filename, *owned_stream, msg));
+  owned_stream = path.open_file (filename.name ());
+  lex.reset (new LexerData (filename.name (), *owned_stream, msg));
 
   // Open errors?
   if (!lex->good ())
@@ -483,7 +484,7 @@ LexerTable::LexerTable (Block& al)
     hour_c (-42),
     time_c (-42),
     original (al.check ("original")
-	      ? al.identifier_sequence ("original")
+	      ? al.name_sequence ("original")
 	      : std::vector<symbol> ()),
     dim_line (al.flag ("dim_line", !al.check ("original")))
 { }

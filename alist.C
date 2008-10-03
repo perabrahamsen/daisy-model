@@ -235,8 +235,8 @@ Value::subset (const Metalib& metalib, const Value& v, const Syntax& syntax,
 	  daisy_assert (value.check ("type"));
 	  if (!other.check ("type"))
 	    return false;
-	  const symbol element = value.identifier ("type");
-	  if (element != other.identifier ("type"))
+	  const symbol element = value.name ("type");
+	  if (element != other.name ("type"))
 	    return false;
 	  if (!library.check (element))
 	    return false;
@@ -298,8 +298,8 @@ Value::subset (const Metalib& metalib, const Value& v, const Syntax& syntax,
 	      daisy_assert (value[i]->check ("type"));
 	      if (!other[i]->check ("type"))
 		return false;
-	      const symbol element = value[i]->identifier ("type");
-	      if (element != other[i]->identifier ("type"))
+	      const symbol element = value[i]->name ("type");
+	      if (element != other[i]->name ("type"))
 		return false;
 	      if (!library.check (element))
 		return false;
@@ -675,20 +675,8 @@ AttributeList::number (const symbol key, const double default_value) const
   return number (key);
 }
 
-const std::string&
-AttributeList::name (const symbol key) const
-{ return identifier (key).name (); }
-
-const std::string&
-AttributeList::name (const symbol key, const symbol default_value) const
-{
-  if (!check (key))
-    return default_value.name ();
-  return identifier (key).name (); 
-}
-
 symbol
-AttributeList::identifier (const symbol key) const
+AttributeList::name (const symbol key) const
 {
   const Value& value = impl.lookup (key);
   value.singleton (key);
@@ -696,6 +684,14 @@ AttributeList::identifier (const symbol key) const
     return value.scalar->name;
   value.expect (key, Syntax::String);
   return *value.name;
+}
+
+symbol
+AttributeList::name (const symbol key, const symbol default_value) const
+{
+  if (!check (key))
+    return default_value;
+  return name (key); 
 }
 
 bool 
@@ -760,22 +756,12 @@ AttributeList::number_sequence (const symbol key) const
 }
 
 const std::vector<symbol>&
-AttributeList::identifier_sequence (const symbol key) const
+AttributeList::name_sequence (const symbol key) const
 {
   const Value& value = impl.lookup (key);
   value.expect (key, Syntax::String);
   value.sequence (key);
   return *value.name_sequence;
-}
-
-std::vector<std::string>
-AttributeList::name_sequence (const symbol key) const
-{
-  const std::vector<symbol>& v = identifier_sequence (key);
-  std::vector<std::string> result;
-  for (size_t i = 0; i < v.size (); i++)
-    result.push_back (v[i].name ());
-  return result;
 }
 
 const std::vector<bool>& 
@@ -967,7 +953,7 @@ AttributeList::revert (const Metalib& metalib,
 	add (key, default_alist.plf_sequence (key));
         break;
       case Syntax::String:
-	add (key, default_alist.identifier_sequence (key));
+	add (key, default_alist.name_sequence (key));
         break;
       case Syntax::Library:
       case Syntax::Error:

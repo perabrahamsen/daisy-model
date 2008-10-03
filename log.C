@@ -29,6 +29,8 @@
 #include "assertion.h"
 #include "librarian.h"
 #include <sstream>
+#include <list>
+#include <string>
 
 const char *const Log::component = "log";
 
@@ -70,7 +72,7 @@ Log::check_entry (symbol name, const char *const component) const
 	{
 	  const AttributeList& alist = library.lookup (name);
 	  if (alist.check ("type"))
-	    name = alist.identifier ("type");
+	    name = alist.name ("type");
 	  else
 	    looking = false;
 	}
@@ -148,14 +150,15 @@ Log::print_dlf_header (std::ostream& out, const AttributeList& al)
 {
   if (al.check ("parser_files"))
   {
-    const std::vector<symbol>& files = al.identifier_sequence ("parser_files");
+    const std::vector<symbol>& files = al.name_sequence ("parser_files");
     for (unsigned int i = 0; i < files.size (); i++)
       out << "SIMFILE: " << files[i] << "\n";
   }
 
-  const std::string sim_description = al.name ("description");
-  if (sim_description != Daisy::default_description)
+  const symbol sim_description_s = al.name ("description");
+  if (sim_description_s != Daisy::default_description)
     {
+      const std::string sim_description = sim_description_s.name ();
       out << "SIM: ";
       for (unsigned int i = 0; i < sim_description.size (); i++)
 	if (sim_description[i] != '\n')

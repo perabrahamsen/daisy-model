@@ -49,7 +49,7 @@ public:
 
   // Propagate.
   bool load (Treelog& msg);
-  std::string with ();
+  symbol with ();
 
   // Loop.
   void first ();

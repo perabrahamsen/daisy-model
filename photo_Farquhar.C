@@ -37,9 +37,10 @@
 #include "syntax.h"
 #include "submodel.h"
 #include "mathlib.h"
-#include <sstream>
+#include "treelog.h"
 #include "check.h"
 #include "librarian.h"
+#include <sstream>
 
 PhotoFarquhar::PhotoFarquhar (Block& al)
   : Photo (al),

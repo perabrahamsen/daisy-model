@@ -272,9 +272,9 @@ Name to use for this line.  By default use the tag.");
 }
 
 Fetch::Fetch (const AttributeList& al)
-  : tag (al.identifier ("tag")),
+  : tag (al.name ("tag")),
     factor (al.number ("factor")),
-    name (al.check ("name") ? al.identifier ("name") : tag),
+    name (al.check ("name") ? al.name ("name") : tag),
     add_delta (true),
     type (Error),
     initial (-42.42e42),

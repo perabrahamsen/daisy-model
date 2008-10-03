@@ -24,6 +24,7 @@
 
 #include "block.h"
 #include "assertion.h"
+#include "treelog.h"
 #include <vector>
 
 // Old style (no block scope).

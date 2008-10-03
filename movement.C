@@ -25,6 +25,7 @@
 #include "librarian.h"
 #include "tertiary.h"
 #include "log.h"
+#include "treelog.h"
 
 const char *const Movement::component = "movement";
 
@@ -95,7 +96,7 @@ Tertiary (that is, non-matrix) transport method.");
 }
 
 Movement::Movement (Block& al)
-  : ModelLogable (al.identifier ("type")),
+  : ModelLogable (al.name ("type")),
     tertiary (Librarian::build_item<Tertiary> (al, "Tertiary"))
 { }
 

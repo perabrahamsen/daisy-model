@@ -93,7 +93,7 @@ Traverse::traverse_model (const symbol component, const symbol model)
       if (alist.check ("type"))
 	{
 	  // Derived parameterization, has default values.
-	  const symbol super = alist.identifier ("type");
+	  const symbol super = alist.name ("type");
 	  const AttributeList& default_alist = library.lookup (super);
 	  traverse_alist (syntax, alist, default_alist, model.name ());
 	}
@@ -287,7 +287,7 @@ Traverse::traverse_parameter (const Syntax& syntax, const AttributeList& alist,
 		  {
 		    AttributeList& entry_alist = alist.alist (parameter);
 		    daisy_assert (entry_alist.check ("type"));
-		    const symbol type = entry_alist.identifier ("type");
+		    const symbol type = entry_alist.name ("type");
 		    const Library& library = syntax.library (metalib,
                                                              parameter);
 		    const AttributeList& entry_default_alist 
@@ -306,7 +306,7 @@ Traverse::traverse_parameter (const Syntax& syntax, const AttributeList& alist,
 		      {
 			const AttributeList& entry_alist = *sequence[i];
 			daisy_assert (entry_alist.check ("type"));
-			const symbol type = entry_alist.identifier ("type");
+			const symbol type = entry_alist.name ("type");
 			const Library& library = syntax.library (metalib,
                                                                  parameter);
 			const AttributeList& entry_default_alist 

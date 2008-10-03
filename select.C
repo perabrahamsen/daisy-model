@@ -32,13 +32,13 @@
 #include "alist.h"
 #include "check.h"
 #include "vcheck.h"
-#include "symbol.h"
 #include "format.h"
 #include "submodel.h"
 #include "submodeler.h"
 #include "mathlib.h"
 #include "librarian.h"
 #include "convert.h"
+#include "treelog.h"
 #include <numeric>
 #include <map>
 
@@ -124,7 +124,7 @@ struct Select::Implementation
 
   // Create and Destroy.
   bool check (symbol spec_dim, Treelog& err) const;
-  static std::string find_description (const Metalib&, const AttributeList&);
+  static symbol find_description (const Metalib&, const AttributeList&);
   static Number* get_expr (Block& al);
   Implementation (Block&);
   ~Implementation ();
@@ -264,10 +264,10 @@ Select::Implementation::Spec::check_alist (const Metalib& metalib,
 {
   bool ok = true;
   
-  const symbol library_name = al.identifier ("library");
-  const symbol model_name = al.identifier ("model");
+  const symbol library_name = al.name ("library");
+  const symbol model_name = al.name ("model");
   const std::vector<symbol> submodels_and_attribute 
-    = al.identifier_sequence ("submodels_and_attribute");
+    = al.name_sequence ("submodels_and_attribute");
 
   if (submodels_and_attribute.size () < 1)
     {
@@ -332,9 +332,9 @@ Name of submodels and attribute.");
 
 Select::Implementation::Spec::Spec (Block& al)
   : metalib (al.metalib ()),
-    library_name (al.identifier ("library")),
-    model_name (al.identifier ("model")),
-    submodels_and_attribute (al.identifier_sequence
+    library_name (al.name ("library")),
+    model_name (al.name ("model")),
+    submodels_and_attribute (al.name_sequence
 			     ("submodels_and_attribute"))
 { }
 
@@ -371,7 +371,7 @@ Select::Implementation::check (const symbol spec_dim, Treelog& err) const
   return ok;
 }
   
-std::string 
+symbol
 Select::Implementation::find_description (const Metalib& metalib, 
                                           const AttributeList& al)
 {
@@ -474,7 +474,7 @@ Select::Implementation::Implementation (Block& al)
     negate (al.flag ("negate")
             // Kludge to negate the meaning of negate for "flux_top".
             != al.metalib ().library (Select::component)
-            /**/ .is_derived_from (al.identifier ("type"), flux_top_symbol)),
+            /**/ .is_derived_from (al.name ("type"), flux_top_symbol)),
     tag (Select::select_get_tag (al.alist ())),
     dimension (al.check ("dimension")
 	       ? al.name ("dimension") : Syntax::Unknown ()),
@@ -523,9 +523,9 @@ symbol
 Select::select_get_tag (const AttributeList& al)
 {
   if (al.check ("tag"))
-    return al.identifier ("tag");
+    return al.name ("tag");
 
-  std::vector<symbol> path  = al.identifier_sequence ("path");
+  std::vector<symbol> path  = al.name_sequence ("path");
   
   if (path.size () > 0)
     return path[path.size () - 1];
@@ -749,7 +749,7 @@ Select::add_dest (Destination* d)
 
 bool
 Select::initialize (const Units& units, const Volume&, 
-		    const std::string& timestep, Treelog& msg)
+		    const symbol timestep, Treelog& msg)
 { 
   symbol spec_dim;
   if (impl->spec.get ())
@@ -788,7 +788,7 @@ Select::initialize (const Units& units, const Volume&,
   for (unsigned int i = 0; i < impl_dim.length (); i++)
     if (impl_dim[i] == '&')
       {
-	new_dim += timestep;
+	new_dim += timestep.name ();
 	hour_dim += "h";
       }
     else
@@ -833,14 +833,14 @@ Select::Select (Block& al)
     impl (new Implementation (al)),
     accumulate (al.flag ("accumulate")),
     handle (al.check ("handle")
-            ? Handle (al.identifier ("handle"))
+            ? Handle (al.name ("handle"))
             : Handle ((al.check ("when") 
                        ||  (al.check ("flux")
 			    && al.flag ("flux")))
                       ? Handle::sum : Handle::current)),
     interesting_content (al.flag ("interesting_content")),
     count (al.integer ("count")),
-    path (al.identifier_sequence ("path")),
+    path (al.name_sequence ("path")),
     last_index (path.size () - 1),
     current_name (path[0]),
     is_active (false)

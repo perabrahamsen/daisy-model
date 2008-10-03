@@ -129,7 +129,7 @@ IMvec::IMvec (Block& parent, const char* key)
   for (size_t i = 0; i < alists.size (); i++)
     {
       const AttributeList& al = *alists[i];
-      content[al.identifier ("name")] = al.number_sequence ("value");
+      content[al.name ("name")] = al.number_sequence ("value");
     }
 }
 

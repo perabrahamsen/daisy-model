@@ -47,13 +47,14 @@ extern "C" int mkdir(const char *pathname, int mode);
 #define PATH_SEPARATOR ";"
 #endif
 
-std::string Path::daisy_home;
-std::vector<std::string> Path::daisy_path;
+std::vector<symbol> Path::daisy_path;
 
-const std::string&
+symbol
 Path::get_daisy_home ()
 {
-  if (daisy_home.size () == 0)
+  static symbol daisy_home;
+
+  if (daisy_home == symbol ())
     {
       // Check DAISYHOME
       const char* daisy_home_env = getenv ("DAISYHOME");
@@ -72,7 +73,7 @@ Path::get_daisy_home ()
 	  if (daisy_w32_reg)
 	    {
 	      Assertion::debug ("Has '" + key + "' registry entry.");
-	      std::string result = daisy_w32_reg;
+	      symbol result = daisy_w32_reg;
 	      free (daisy_w32_reg);
 	      daisy_home = result;
 	    }
@@ -90,7 +91,7 @@ Path::get_daisy_home ()
   return daisy_home;
 }
 
-const std::vector<std::string>&
+const std::vector<symbol>&
 Path::get_daisy_path ()
 {
   if (daisy_path.size () == 0)
@@ -113,7 +114,7 @@ Path::get_daisy_path ()
 	}
       else
 	{
-	  const std::string daisy_home = get_daisy_home ();
+	  const symbol daisy_home = get_daisy_home ();
 	  Assertion::debug ("Using '" + daisy_home + "' as daisy home.");
 	  daisy_path.push_back (".");
 	  daisy_path.push_back (daisy_home + "/lib");
@@ -124,9 +125,10 @@ Path::get_daisy_path ()
   return daisy_path;
 }
 
-const std::string 
-Path::nodir (const std::string& name)
+symbol 
+Path::nodir (symbol name_s)
 {
+  const std::string name = name_s.name ();
   size_t start = name.size ();
 
   for (;start > 0; start--)
@@ -151,8 +153,10 @@ Path::nodir (const std::string& name)
 }
 
 std::auto_ptr<std::istream> 
-Path::open_file (const std::string& name) const
+Path::open_file (symbol name_s) const
 {
+  const std::string& name = name_s.name ();
+
   struct Message : std::ostringstream 
   {
     ~Message ()
@@ -179,12 +183,12 @@ Path::open_file (const std::string& name) const
   // Look in path.
   for (unsigned int i = 0; i < path.size (); i++)
     {
-      const std::string dir = (path[i] == "." ? current_directory : path[i]);
-      const std::string file = dir + DIRECTORY_SEPARATOR + name;
+      const symbol dir = (path[i] == "." ? current_directory : path[i]);
+      const symbol file = dir + DIRECTORY_SEPARATOR + name;
       tmp << "\nTrying '" << file << "'";
       if (path[i] == ".")
 	tmp << " (cwd)";
-      in.reset (new std::ifstream (file.c_str ()));
+      in.reset (new std::ifstream (file.name ().c_str ()));
       if (in->good ())
 	{
 	  tmp << " success!";
@@ -197,9 +201,9 @@ Path::open_file (const std::string& name) const
 }
 
 bool 
-Path::set_directory (const std::string& directory)
+Path::set_directory (symbol directory)
 { 
-  const char *const dir = directory.c_str ();
+  const char *const dir = directory.name ().c_str ();
   const bool result 
     = chdir (dir) == 0 || (mkdir (dir, 0777) == 0 && chdir (dir) == 0); 
   
@@ -213,12 +217,12 @@ Path::set_directory (const std::string& directory)
   return result;
 }
 
-const std::string&
+symbol
 Path::get_directory () const
 { return current_directory; }
  
 void 
-Path::set_path (const std::vector<std::string>& value)
+Path::set_path (const std::vector<symbol>& value)
 { 
   path = value;
 
@@ -230,7 +234,7 @@ Path::set_path (const std::vector<std::string>& value)
   Assertion::debug (tmp.str ());
 }
 
-Path::InDirectory::InDirectory (Path& p, const std::string& to)
+Path::InDirectory::InDirectory (Path& p, const symbol to)
   : path (p),
     from (path.get_directory ()),
     ok (path.set_directory (to))

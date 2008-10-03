@@ -38,6 +38,7 @@
 #include "harvest.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "treelog.h"
 #include <sstream>
 
 class CropSold : public Crop

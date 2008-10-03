@@ -52,7 +52,7 @@ Depth::library_id () const
 }
 
 Depth::Depth (Block& al)
-  : name (al.identifier ("type"))
+  : name (al.name ("type"))
 { }
 
 Depth::Depth (const symbol n)
@@ -275,7 +275,7 @@ namespace State
 struct DepthFile : public Depth
 {
   Path& path;
-  const std::string file;
+  const symbol file;
   State::type state;
   Time start;
   PLF value;
@@ -319,8 +319,8 @@ struct DepthFile : public Depth
   void initialize (const Units&, const Scope&, Treelog& msg)
   { 
     daisy_assert (state == State::uninitialized);
-    std::auto_ptr<std::istream> input_stream = path.open_file (file);
-    LexerData lex (file, *input_stream, msg);
+    std::auto_ptr<std::istream> input_stream = path.open_file (file.name ());
+    LexerData lex (file.name (), *input_stream, msg);
     lex.skip_space ();
     if (lex.peek () == '#')
       {

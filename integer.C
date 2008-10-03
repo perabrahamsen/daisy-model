@@ -27,6 +27,7 @@
 #include "alist.h"
 #include "memutils.h"
 #include "librarian.h"
+#include "treelog.h"
 #include <sstream>
 
 const char *const Integer::component = "integer";
@@ -43,7 +44,7 @@ Integer::title () const
 { return name.name (); }
 
 Integer::Integer (Block& al)
-  : name (al.identifier ("type"))
+  : name (al.name ("type"))
 { }
 
 Integer::~Integer ()

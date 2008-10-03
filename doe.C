@@ -29,6 +29,7 @@
 #include "syntax.h"
 #include "soil.h"
 #include "soil_water.h"
+#include "treelog.h"
 #include <string>
 
 void 

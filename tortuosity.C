@@ -35,7 +35,7 @@ Tortuosity::library_id () const
 }
 
 Tortuosity::Tortuosity (Block& al)
-  : name (al.identifier ("type"))
+  : name (al.name ("type"))
 { }
 
 Tortuosity::~Tortuosity ()

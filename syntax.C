@@ -25,11 +25,11 @@
 #include "alist.h"
 #include "library.h"
 #include "metalib.h"
-#include "symbol.h"
 #include "check.h"
 #include "vcheck.h"
 #include "assertion.h"
 #include "memutils.h"
+#include "treelog.h"
 #include <sstream>
 #include <map>
 #include <algorithm>
@@ -187,7 +187,7 @@ Syntax::Implementation::check (const Metalib& metalib,
 		    msg.error (tmp.str ());
 		    error = true;
 		  }
-		else if (!lib.check (al.identifier ("type")))
+		else if (!lib.check (al.name ("type")))
 		  {
 		    tmp << "Unknown library member '"
 			   << al.name ("type") << "'";
@@ -198,7 +198,7 @@ Syntax::Implementation::check (const Metalib& metalib,
 		  {
 		    tmp << al.name ("type");
 		    Treelog::Open nest (msg, tmp.str ());
-                    const Syntax& ssyn = lib.syntax (al.identifier ("type"));
+                    const Syntax& ssyn = lib.syntax (al.name ("type"));
 		    if (!ssyn.impl->check (metalib, al, msg))
 		      error = true;
 		  }
@@ -216,7 +216,7 @@ Syntax::Implementation::check (const Metalib& metalib,
 	    else 
 	      {
 		Treelog::Open nest (msg, key + ": " + al.name ("type"));
-		if (!lib.syntax (al.identifier ("type")).check (metalib, 
+		if (!lib.syntax (al.name ("type")).check (metalib, 
                                                                 al, msg))
 		  error = true;
 	      }

@@ -33,6 +33,7 @@
 #include "check.h"
 #include "vcheck.h"
 #include "librarian.h"
+#include "treelog.h"
 #include <sstream>
 
 struct MacroStandard : public Macro

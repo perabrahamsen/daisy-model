@@ -693,7 +693,7 @@ ActionCrop::Spray::load_syntax (Syntax& syntax, AttributeList&)
 ActionCrop::Spray::Spray (const AttributeList& al)
   : month (al.integer ("month")),
     day (al.integer ("day")),
-    name (al.identifier ("name")),
+    name (al.name ("name")),
     amount (al.number ("amount"))
 { }
 
@@ -773,12 +773,12 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
 	  // If annual done, do perennial.
 	  if (secondary->done 
 	      && harvest_perennial->doIt (daisy, scope, msg,
-					  secondary->crop.identifier ("type")))
+					  secondary->crop.name ("type")))
 	    harvested = true;
 	}
       else if (primary->done 
 	       && harvest_annual->doIt (daisy, scope, msg, 
-					primary->crop.identifier ("type")))
+					primary->crop.name ("type")))
 	// else do annual.
 	harvested = true;
     }
@@ -787,7 +787,7 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
       // We have only annual crops.  Let 'primary' when they are harvested.
       if (primary->done 
 	  && harvest_annual->doIt (daisy, scope, 
-                                   msg, primary->crop.identifier ("type")))
+                                   msg, primary->crop.name ("type")))
 	harvested = true;
     }
   else
@@ -799,13 +799,13 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
 	  // If we have two, let them both control.
 	  if ((primary->done || secondary->done)
 	      && harvest_perennial->doIt (daisy, scope, msg,
-					  primary->crop.identifier ("type"),
-					  secondary->crop.identifier ("type")))
+					  primary->crop.name ("type"),
+					  secondary->crop.name ("type")))
 	    harvested = true;
 	}
       else if (primary->done 
 	       && harvest_perennial->doIt (daisy, scope, msg, 
-					   primary->crop.identifier ("type")))
+					   primary->crop.name ("type")))
 	// If we have only one, it is of course in control.
 	harvested = true;
     }

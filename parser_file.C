@@ -55,7 +55,7 @@ struct ParserFile::Implementation
   auto_vector<const AttributeList*> inputs;
 
   // Lexer.
-  std::string file;
+  const symbol file;
   std::auto_ptr<std::istream> owned_stream;
   std::auto_ptr<Lexer> lexer;
   std::auto_ptr<Treelog::Open> nest;
@@ -119,7 +119,7 @@ struct ParserFile::Implementation
 
   // Create and destroy.
   void initialize ();
-  Implementation (Metalib&, const std::string&, Treelog&);
+  Implementation (Metalib&, symbol, Treelog&);
   ~Implementation ();
 };
 
@@ -231,7 +231,7 @@ ParserFile::Implementation::get_integer ()
   // Then try an integer object.
   const Library& lib = metalib.library (Integer::component);
   std::auto_ptr<AttributeList> al (&load_derived (lib, true, NULL));
-  const symbol obj = al->identifier ("type");
+  const symbol obj = al->name ("type");
   if (obj == error_symbol)
     return -42;
   // Check for completness.
@@ -337,7 +337,7 @@ ParserFile::Implementation::get_number (const symbol syntax_dim)
   // Then try a number object.
   const Library& lib = metalib.library (Number::component);
   std::auto_ptr<AttributeList> al (&load_derived (lib, true, NULL));
-  const symbol obj = al->identifier ("type");
+  const symbol obj = al->name ("type");
   if (obj == error_symbol)
     return -42.42e42;
   // Check for completness.
@@ -525,7 +525,7 @@ ParserFile::Implementation::add_derived (Library& lib)
       const AttributeList& old = lib.lookup (name);
       if (old.check ("parsed_from_file"))
 	warning (name + " is already defined in " 
-		 + old.identifier ("parsed_from_file") + ", overwriting");
+		 + old.name ("parsed_from_file") + ", overwriting");
       else
 	warning (name + " is already defined, overwriting");
       lib.remove (name);
@@ -587,7 +587,7 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence,
       // models that used to be submodels.
       daisy_assert (original->flag (compatibility_symbol));
       daisy_assert (original->check ("type"));
-      const symbol original_type = original->identifier ("type");
+      const symbol original_type = original->name ("type");
       daisy_assert (lib.check (original_type));
 
       type = original_symbol;
@@ -634,7 +634,7 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence,
 	    throw (std::string ("No original value"));
 	  alist = new AttributeList (*original);
 	  daisy_assert (alist->check ("type"));
-	  type = alist->identifier ("type");
+	  type = alist->name ("type");
 	  daisy_assert (lib.check (type));
 	}
       else
@@ -931,7 +931,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	    atts.add (name, get_string ());
 	    // Handle "directory" immediately.
 	    if (&syntax == &metalib.syntax () && name == "directory")
-	      if (!metalib.path ().set_directory (atts.name (name)))
+	      if (!metalib.path ().set_directory (atts.name (name).name ()))
 		error ("Could not set directory '" + atts.name (name) + "'");
 	    break;
 	  case Syntax::Boolean:
@@ -982,7 +982,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		}
 	      else
 		{
-		  const symbol obj = al->identifier ("type");
+		  const symbol obj = al->name ("type");
 		  if (obj != error_symbol)
                     atts.add (name, *al);
 		}
@@ -1055,7 +1055,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		      = (old_sequence.size () > element
 			 ? load_derived (lib, true, old_sequence[element])
 			 : load_derived (lib, true, NULL));
-		    const symbol obj = al.identifier ("type");
+		    const symbol obj = al.name ("type");
 		    if (obj == error_symbol)
                       delete &al;
                     else
@@ -1292,7 +1292,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
                         if (!atts.check (name))
                           error ("No originals available");
                         const std::vector<symbol>& old_sequence
-                          = atts.identifier_sequence (name);
+                          = atts.name_sequence (name);
                         for (size_t i = 0; i < old_sequence.size (); i++)
                           array.push_back (old_sequence[i]);
                         continue;
@@ -1315,11 +1315,8 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		if (&syntax == &metalib.syntax () && name == "path")
 		  {
 		    const std::vector<symbol>& symbols 
-		      = atts.identifier_sequence (name);
-		    std::vector<std::string> names;
-		    for (unsigned int i = 0; i < symbols.size (); i++)
-		      names.push_back (symbols[i].name ());
-		    metalib.path ().set_path (names);
+		      = atts.name_sequence (name);
+		    metalib.path ().set_path (symbols);
 		  }
 		break;
 	      }
@@ -1387,14 +1384,14 @@ ParserFile::Implementation::initialize ()
 }
 
 ParserFile::Implementation::Implementation (Metalib& mlib,
-                                            const std::string& filename,
+                                            const symbol filename,
                                             Treelog& treelog)
   : metalib (mlib),
     msg (treelog),
     inputs (std::vector<const AttributeList*> ()),
     file (filename),
-    owned_stream (mlib.path ().open_file (filename)),
-    lexer (new Lexer (filename, *owned_stream, msg))
+    owned_stream (mlib.path ().open_file (filename.name ())),
+    lexer (new Lexer (filename.name (), *owned_stream, msg))
 { }
 
 ParserFile::Implementation::~Implementation ()
@@ -1424,7 +1421,7 @@ ParserFile::load (AttributeList& alist)
   // Remember filename.
   std::vector<symbol> files;
   if (alist.check ("parser_files"))
-    files = alist.identifier_sequence ("parser_files");
+    files = alist.name_sequence ("parser_files");
   files.push_back (symbol (impl->file));
   alist.add ("parser_files", files);
 }

@@ -88,8 +88,8 @@ public:
   bool has_number (symbol) const;
   double number (symbol) const;
   symbol dimension (symbol) const;
-  bool has_identifier (symbol tag) const;
-  symbol identifier (symbol tag) const;
+  bool has_name (symbol tag) const;
+  symbol name (symbol tag) const;
   symbol get_description (symbol) const;
 
   // Scope to be?

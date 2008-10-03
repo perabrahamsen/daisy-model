@@ -58,12 +58,8 @@ Exchange::dimension () const
 { daisy_notreached (); }
 
 bool 
-Exchange::has_identifier () const
+Exchange::has_name () const
 { return false; }
-
-symbol 
-Exchange::identifier () const
-{ daisy_notreached (); }
 
 symbol 
 Exchange::get_description () const
@@ -113,8 +109,8 @@ ExchangeNumber::set_number (const double val)
 { value = val; has_value = true; }
 
 ExchangeNumber::ExchangeNumber (Block& al)
-  : Exchange (al.identifier ("name"), al.identifier ("description")),
-    dimension_ (al.identifier ("dimension")),
+  : Exchange (al.name ("name"), al.name ("description")),
+    dimension_ (al.name ("dimension")),
     has_value (al.check ("value")),
     value (al.number ("value", -42.42e42))
 { }
@@ -159,16 +155,16 @@ Current value to exchange.");
 // Exchanging a name (or string).
 
 bool 
-ExchangeName::has_identifier () const
+ExchangeName::has_name () const
 { return true; }
 
 symbol 
-ExchangeName::identifier () const
+ExchangeName::name () const
 { return value; }
 
 ExchangeName::ExchangeName (Block& al)
-  : Exchange (al.identifier ("name"), al.identifier ("description")),
-    value (al.identifier ("value"))
+  : Exchange (al.name ("name"), al.name ("description")),
+    value (al.name ("value"))
 { }
 
 ExchangeName::~ExchangeName ()
@@ -222,21 +218,21 @@ ScopeExchange::dimension (symbol tag) const
 }
 
 bool 
-ScopeExchange::has_identifier (symbol tag) const
+ScopeExchange::has_name (symbol tag) const
 {
   const std::map<symbol, Exchange*>::const_iterator i = named.find (tag);
   if (i == named.end ())
     return false;
 
-  return (*i).second->has_identifier (); 
+  return (*i).second->has_name (); 
 }
 
 symbol 
-ScopeExchange::identifier (symbol tag) const
+ScopeExchange::name (symbol tag) const
 {
   const std::map<symbol, Exchange*>::const_iterator i = named.find (tag);
   daisy_assert (i != named.end ());
-  return (*i).second->identifier (); 
+  return (*i).second->name (); 
 }
 
 symbol 

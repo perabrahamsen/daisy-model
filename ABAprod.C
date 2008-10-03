@@ -35,7 +35,7 @@ ABAProd::library_id () const
 }
 
 ABAProd::ABAProd (Block& al)
-  : ModelLogable (al.identifier ("type"))
+  : ModelLogable (al.name ("type"))
 { }
 
 ABAProd::~ABAProd ()

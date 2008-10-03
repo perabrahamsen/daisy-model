@@ -195,8 +195,8 @@ AM::Implementation::Lock::Lock (symbol c, symbol p)
 { }
   
 AM::Implementation::Lock::Lock (const AttributeList& al)
-  : crop (al.identifier ("crop")),
-    part (al.identifier ("part"))
+  : crop (al.name ("crop")),
+    part (al.name ("part"))
 { }
 
 void 
@@ -685,7 +685,7 @@ AM::create (const AttributeList& al1 , const Geometry& geo,
   AttributeList al2 (al1);
   al2.add ("type", "state");
   if (!al2.check ("name"))
-    al2.add ("name", al1.identifier ("type"));
+    al2.add ("name", al1.name ("type"));
   AM& am = *new AM (al2); 
   am.initialize (geo, max_rooting_depth);
   return am;
@@ -893,7 +893,7 @@ AM::get_water (const AttributeList& al)	// [mm]
 void
 AM::set_utilized_weight (AttributeList& am, const double weight)
 {
-  const std::string syntax = am.name ("syntax");
+  const symbol syntax = am.name ("syntax");
     
   if (syntax == "mineral")
     am.add ("weight", weight);
@@ -964,7 +964,7 @@ AM::AM (const AttributeList& al)
 	  (al.check ("creation")
 	   ? Time (al.alist ("creation"))
 	   : Time (1, 1, 1, 1),
-	   al.identifier ("name"),
+	   al.name ("name"),
 	   map_construct<AOM> (al.alist_sequence ("om")))),
     alist (al),
     name ("state")
@@ -979,7 +979,7 @@ AM::initialize (const Geometry& geo, const double max_rooting_depth)
   for (size_t i = 0; i < impl->om.size (); i++)
     impl->om[i]->initialize (geo.cell_size ());
 
-  const std::string syntax = alist.name ("syntax");
+  const symbol syntax = alist.name ("syntax");
   
   if (syntax == "state")
     {
@@ -1095,7 +1095,7 @@ static struct AM_Syntax
     AttributeList al2 (al1.alist ());
     al2.add ("type", "state");
     if (!al2.check ("name"))
-      al2.add ("name", al1.identifier ("type"));
+      al2.add ("name", al1.name ("type"));
     return *new AM (al2); 
   }
 
@@ -1107,7 +1107,7 @@ static struct AM_Syntax
 	return false;
       }
 
-    const std::string syntax = al.name ("syntax");
+    const symbol syntax = al.name ("syntax");
     daisy_assert (syntax == "organic");
     return true;
   }
@@ -1328,14 +1328,14 @@ struct ProgramAM_table : public Program
         const AttributeList& alist = library.lookup (name);
         // const Syntax& syntax = library.syntax (name);
         daisy_assert (alist.check ("syntax"));
-        const symbol type = alist.identifier ("syntax");
+        const symbol type = alist.name ("syntax");
         static const symbol buildin ("build-in");
         const symbol super = alist.check ("type") 
-          ? alist.identifier ("type")
+          ? alist.name ("type")
           : buildin;
         tmp << name << "\t" << type << "\t" << super << "\t";
         if (alist.check ("parsed_from_file"))
-          tmp << alist.identifier ("parsed_from_file");
+          tmp << alist.name ("parsed_from_file");
         tmp << "\t";
         if (alist.check ("NH4_fraction"))
           tmp << alist.number ("NH4_fraction");

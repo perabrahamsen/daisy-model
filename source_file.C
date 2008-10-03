@@ -101,7 +101,7 @@ SourceFile::read_entry (std::vector<std::string>& entries, Time& time)
 
 void
 SourceFile::load_style (Syntax& syntax, AttributeList& alist, 
-                        const std::string& default_title)
+                        const symbol default_title)
 {
   Source::load_syntax (syntax, alist);
   LexerTable::load_syntax (syntax, alist);

@@ -34,7 +34,7 @@ Summary::library_id () const
 }
 
 Summary::Summary (Block& al)
-  : name (al.identifier ("type"))
+  : name (al.name ("type"))
 { }
 
 Summary::~Summary ()

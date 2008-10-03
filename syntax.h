@@ -23,15 +23,16 @@
 #ifndef SYNTAX_H
 #define SYNTAX_H
 
-#include "treelog.h"
 #include "symbol.h"
 #include <vector>
+#include <memory>
 
 class AttributeList;
 class Library;
 class Metalib;
 class Check;
 class VCheck;
+class Treelog;
 
 #ifdef __unix
 #define EXPORT /* Nothing */

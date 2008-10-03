@@ -27,6 +27,7 @@
 #include "fao.h"
 #include "time.h"
 #include "units.h"
+#include "treelog.h"
 #include <sstream>
 
 struct WeatherOld::Implementation

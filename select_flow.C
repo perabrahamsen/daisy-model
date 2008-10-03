@@ -55,7 +55,7 @@ private:
 private:
   symbol default_dimension (const symbol spec_dim) const;
   bool initialize (const Units&, const Volume& volume,
-		   const std::string& timestep, Treelog& msg);
+		   const symbol timestep, Treelog& msg);
   bool check_border (const Border& border, 
                      const Volume& default_volume,
                      Treelog& msg) const;
@@ -88,7 +88,7 @@ SelectFlow::default_dimension (const symbol spec_dim) const
 
 bool 
 SelectFlow::initialize (const Units& units, const Volume& default_volume,
-                        const std::string& timestep, Treelog& msg)
+                        const symbol timestep, Treelog& msg)
 {
   bool ok = true;
 

@@ -249,7 +249,7 @@ Toplevel::program_syntax () const
     {
       daisy_assert (program_alist ().check ("type"));
       const Library& library = impl->metalib.library (Program::component);
-      return library.syntax (program_alist ().identifier ("type"));
+      return library.syntax (program_alist ().name ("type"));
     }
   return impl->metalib.syntax ();
 }

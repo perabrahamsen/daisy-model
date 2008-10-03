@@ -29,7 +29,7 @@ class SourceFile : public Source
   // Content.
 protected:
   LexerTable lex;
-  std::string with_;
+  symbol with_;
   const bool explicit_with;
   const int style_;
 private:
@@ -44,7 +44,7 @@ private:
   
   // Interface.
 public:
-  const std::string& with () const
+  symbol with () const
   { return with_; }
   int style () const 
   { return style_; }
@@ -63,7 +63,7 @@ protected:
   // Create.
 public:
   static void load_style (Syntax&, AttributeList&, 
-                          const std::string& default_title);
+                          const symbol default_title);
 private:
   static void load_syntax (Syntax&, AttributeList&);
 protected:

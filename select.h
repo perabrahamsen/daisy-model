@@ -165,7 +165,7 @@ protected:
   /**/ special_convert (const Units&, symbol has, symbol want);
 public:
   virtual bool initialize (const Units&, const Volume&,
-                           const std::string& timestep, Treelog&);
+                           const symbol timestep, Treelog&);
   void add_dest (Destination* dest);
   virtual bool check (Treelog& err) const;
   virtual bool check_border (const Border&, const Volume& volume,

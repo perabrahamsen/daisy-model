@@ -71,10 +71,8 @@ public:
   bool check (const symbol key) const;
   double number (symbol) const;
   double number (symbol, double default_value) const;
-  const std::string name (symbol);
-  const std::string name (symbol, symbol default_value);
-  symbol identifier (const symbol);
-  symbol identifier (symbol, symbol default_value);
+  symbol name (symbol);
+  symbol name (symbol, symbol default_value);
   bool flag (symbol) const;
   bool flag (symbol, bool default_value) const;
   const PLF& plf (symbol) const;
@@ -82,8 +80,7 @@ public:
   int integer (symbol) const;
   int integer (symbol, int default_value) const;
   const std::vector<double>& number_sequence (symbol) const;
-  const std::vector<symbol> identifier_sequence (symbol key);
-  std::vector<std::string> name_sequence (symbol key);
+  const std::vector<symbol> name_sequence (symbol key);
   const std::vector<bool>& flag_sequence (symbol key) const;
   const std::vector<int>& integer_sequence (symbol key) const;
   const std::vector<const PLF*>& plf_sequence (symbol key) const;
@@ -92,7 +89,7 @@ public:
 
   // Create and Destroy.
 private:
-  static std::string sequence_id (symbol key, size_t index);
+  static symbol sequence_id (symbol key, size_t index);
   Block ();
 public:
   // Toplevel.

@@ -34,6 +34,7 @@
 #include "mathlib.h"
 #include <sstream>
 #include "assertion.h"
+#include "treelog.h"
 #include <numeric>
 
 void

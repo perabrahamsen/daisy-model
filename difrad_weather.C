@@ -25,6 +25,7 @@
 #include "weather.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "treelog.h"
 #include <sstream>
 
 struct DifradWeather : public Difrad

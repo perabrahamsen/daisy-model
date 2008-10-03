@@ -25,9 +25,7 @@
 
 #include "log.h"
 #include "memutils.h"
-#include <map>
 #include <vector>
-#include <stack>
 #include <memory>
 
 struct Select;
@@ -48,7 +46,7 @@ struct Volume;
 struct EXPORT LogSelect : public Log
 {
   // Parameters.
-  const std::string description;	// Description of log file.
+  const symbol description;	// Description of log file.
   std::auto_ptr<Condition> condition;	// Should we print a log now?
   auto_vector<Select*> entries;
   std::auto_ptr<const Volume> volume;

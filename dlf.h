@@ -43,20 +43,18 @@ private:
   // Simulation.
 public:
   void start (std::ostream& out, const symbol name,
-              const std::string& file,
-              const std::string& parsed_from_file) const;
+              const symbol file, const symbol parsed_from_file) const;
   void parameter (std::ostream& out,
                   const symbol name, const symbol value) const;
   void interval (std::ostream& out, const Volume&) const;
-  void log_description (std::ostream& out, 
-                        const std::string& description) const;
+  void log_description (std::ostream& out, symbol description) const;
   void finish (std::ostream& out, const Daisy& daisy);
 
   // Create and destroy.
 private:
-  static type string2type (const std::string& s);
+  static type string2type (const symbol s);
 public:
-  explicit DLF (const std::string& name)
+  explicit DLF (const symbol name)
     : value (string2type (name))
   { }
 }; 

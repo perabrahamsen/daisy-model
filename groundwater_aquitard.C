@@ -31,6 +31,7 @@
 #include "geometry.h"
 #include "soil_water.h"
 #include "log.h"
+#include "treelog.h"
 #include <map>
 #include <sstream>
 

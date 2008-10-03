@@ -35,6 +35,7 @@
 #include "assertion.h"
 #include "librarian.h"
 #include "mathlib.h"
+#include "treelog.h"
 #include <memory>
 
 struct ReactionAdsorption : public Reaction
@@ -147,8 +148,8 @@ struct ReactionAdsorption : public Reaction
   }
   explicit ReactionAdsorption (Block& al)
     : Reaction (al),
-      name_solute (al.identifier ("solute")),
-      name_sorbed (al.identifier ("sorbed")),
+      name_solute (al.name ("solute")),
+      name_sorbed (al.name ("sorbed")),
       equilibrium (Librarian::build_item<Adsorption> (al, "equilibrium")),
       adsorption_rate (Librarian::build_item<Number> (al, "adsorption_rate")),
       desorption_rate (al.check ("desorption_rate")

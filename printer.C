@@ -36,7 +36,7 @@ Printer::library_id () const
 }
 
 Printer::Printer (const AttributeList& al)
-  : name (al.identifier ("type"))
+  : name (al.name ("type"))
 { }
 
 Printer::~Printer ()

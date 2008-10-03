@@ -34,6 +34,7 @@
 #include "memutils.h"
 #include "librarian.h"
 #include "scope_block.h"
+#include "treelog.h"
 #include <sstream>
 #include <fstream>
 
@@ -42,15 +43,15 @@ struct LogTable : public LogSelect, public Destination
   static const char *const default_description;
 
   // File Content.
-  const std::string parsed_from_file; // Defined in...
-  const std::string file;       // Filename.
+  const symbol parsed_from_file; // Defined in...
+  const symbol file;       // Filename.
   std::ofstream out;            // Output stream.
   const bool flush;		// Flush after each time step.
-  const std::string record_separator; // String to print on records (time steps).
-  const std::string field_separator; // String to print between fields.
-  const std::string error_string; // String to print on errors.
-  const std::string missing_value; // String to print for missing values.
-  const std::string array_separator; // String to print between array entries.
+  const symbol record_separator; // String to print on records (time steps).
+  const symbol field_separator; // String to print between fields.
+  const symbol error_string; // String to print on errors.
+  const symbol missing_value; // String to print for missing values.
+  const symbol array_separator; // String to print between array entries.
   DLF print_header;             // How much header should be printed?
   std::vector<std::pair<symbol, symbol>/**/> parameters;      // Par vals.
   bool print_tags;		// Set if tags should be printed.
@@ -367,7 +368,7 @@ LogTable::contain_time_columns (const std::vector<Select*>& entries)
 void
 LogTable::initialize (Treelog& msg)
 {
-  out.open (file.c_str ());
+  out.open (file.name ().c_str ());
 
   print_header.start (out, name, file, parsed_from_file);
 
@@ -390,13 +391,13 @@ LogTable::build_parameters (Block& al)
 {
   std::vector<std::pair<symbol, symbol>/**/> result;
   ScopeBlock scope_block (al);
-  std::vector<symbol> pars = al.identifier_sequence ("parameter_names");
+  std::vector<symbol> pars = al.name_sequence ("parameter_names");
   for (size_t i = 0; i < pars.size (); i++)
     {
       const symbol key = pars[i];
-      if (scope_block.has_identifier (key))
+      if (scope_block.has_name (key))
         {
-          const symbol value = scope_block.identifier (key);
+          const symbol value = scope_block.name (key);
           std::string id = key.name ();
           std::transform (id.begin (), id.end (), id.begin (), ::toupper);
           result.push_back (std::pair<symbol, symbol> (symbol (id), value));

@@ -171,7 +171,7 @@ Output::find_extern_logs (const std::vector<Log*>& logs,
 }
 
 std::vector<Time::component_t>
-Output::find_time_columns (const std::vector<std::string>& names)
+Output::find_time_columns (const std::vector<symbol>& names)
 {
   std::vector<Time::component_t> result;
   

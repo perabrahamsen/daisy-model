@@ -26,8 +26,8 @@
 
 void 
 GnuplotUtil::load_style (Syntax& syntax, AttributeList&, 
-                         const std::string& default_with, 
-                         const std::string& default_title)
+                         const symbol default_with, 
+                         const symbol default_title)
 {
   Syntax::category with_cat = Syntax::Const;
   
@@ -36,7 +36,7 @@ GnuplotUtil::load_style (Syntax& syntax, AttributeList&,
 Specify style used for the data series on the graph.\n\
 use 'points' to plot each point individually, or 'lines' to draw\n\
 lines between them.";
-  if (default_with.size () > 1)
+  if (default_with.name ().size () > 1)
     {
       with_cat = Syntax::OptionalConst;
       with_doc += "\n\n" + default_with;
@@ -62,7 +62,7 @@ The 'style' parameter is only used if 'with' is either 'points' or 'lines'.");
   Syntax::category title_cat = Syntax::Const;
   std::string title_doc = "\
 Name of data series for the legend on the graph.";
-  if (default_title.size () > 1)
+  if (default_title.name ().size () > 1)
     {
       title_cat = Syntax::OptionalConst;
       title_doc += "\n\n" + default_title;

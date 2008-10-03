@@ -27,6 +27,7 @@
 #include "units.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "treelog.h"
 
 struct NumberConst : public Number
 {
@@ -62,10 +63,10 @@ struct NumberConst : public Number
   NumberConst (Block& al)
     : Number (al),
       val (al.number ("value")),
-      unit_ (al.units ().get_unit (al.identifier ("value")))
+      unit_ (al.units ().get_unit (al.name ("value")))
   { 
     if (al.units ().is_error (unit_))
-      al.msg ().warning ("Unknown unit '" + al.identifier ("value") + "'");
+      al.msg ().warning ("Unknown unit '" + al.name ("value") + "'");
   }
 };
 
@@ -113,10 +114,10 @@ struct NumberLeaf : public Number
   }
   NumberLeaf (Block& al)
     : Number (al),
-      unit_ (al.units ().get_unit (al.identifier ("dimension")))
+      unit_ (al.units ().get_unit (al.name ("dimension")))
   { 
     if (al.units ().is_error (unit_))
-      al.msg ().warning ("Unknown unit '" + al.identifier ("dimension") + "'");
+      al.msg ().warning ("Unknown unit '" + al.name ("dimension") + "'");
   }
 };
 
@@ -238,7 +239,7 @@ struct NumberFetch : public Number
       {
 	const AttributeList& alist = al.find_alist (key);
 	if (alist.check (key))
-	  return alist.identifier (key);
+	  return alist.name (key);
       }
     return dim;
   }

@@ -44,7 +44,7 @@ SVAT::load_syntax (Syntax&, AttributeList&)
 { }
 
 SVAT::SVAT (Block& al)
-  : ModelLogable (al.identifier ("type"))
+  : ModelLogable (al.name ("type"))
 { }
 
 SVAT::~SVAT ()

@@ -39,7 +39,7 @@ UZRect::obey_surface ()
 
 
 UZRect::UZRect (Block& al)
-  : name (al.identifier ("type"))
+  : name (al.name ("type"))
 { }
 
 UZRect::~UZRect ()

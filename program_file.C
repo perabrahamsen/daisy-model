@@ -33,12 +33,12 @@ struct ProgramCD : public Program
 {
   // Content.
   Path& path;
-  const std::string dir;
+  const symbol dir;
 
   // Use.
   bool run (Treelog& msg)
   { 
-    if (path.set_directory (dir))
+    if (path.set_directory (dir.name ()))
       return true;
     msg.error (std::string ("Could not change to directory '") + dir + "'");
     return false;
@@ -78,18 +78,18 @@ Name of directory to change into.");
 struct ProgramWrite : public Program
 {
   // Content.
-  const std::string what;
-  const std::string where;
+  const symbol what;
+  const symbol where;
 
   // Use.
   bool run (Treelog& msg)
   { 
     if (where == "screen")
       {
-        msg.message (what);
+        msg.message (what.name ());
         return true;
       }
-    std::ofstream out (where.c_str ());
+    std::ofstream out (where.name ().c_str ());
     out << what;
     if (out.good ())
       return true;

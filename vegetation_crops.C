@@ -31,6 +31,7 @@
 #include "log.h"
 #include "librarian.h"
 #include "metalib.h"
+#include "treelog.h"
 #include <sstream>
 #include <deque>
 
@@ -840,7 +841,7 @@ VegetationCrops::sow (Metalib& metalib, const AttributeList& al,
   if (!crop)
     {
       msg.error ("Sowing failed");
-      throw 3;
+      throw 8;
     }
   const symbol name = crop->name;
   for (CropList::iterator i = crops.begin();

@@ -33,6 +33,7 @@
 #include "assertion.h"
 #include "librarian.h"
 #include "mathlib.h"
+#include "treelog.h"
 #include <memory>
 
 struct ReactionEquilibrium : public Reaction
@@ -138,8 +139,8 @@ struct ReactionEquilibrium : public Reaction
   }
   explicit ReactionEquilibrium (Block& al)
     : Reaction (al),
-      name_A (al.identifier ("A")),
-      name_B (al.identifier ("B")),
+      name_A (al.name ("A")),
+      name_B (al.name ("B")),
       equilibrium (Librarian::build_item<Equilibrium> (al, "equilibrium")),
       k_AB (Librarian::build_item<Number> (al, "k_AB")),
       k_BA (al.check ("k_BA")

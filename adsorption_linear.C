@@ -26,6 +26,7 @@
 #include "check.h"
 #include "soil.h"
 #include "librarian.h"
+#include "treelog.h"
 
 static const double c_fraction_in_humus = 0.587;
 

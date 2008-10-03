@@ -23,6 +23,8 @@
 #ifndef LEXER_H
 #define LEXER_H
 
+#include "symbol.h"
+
 #include <string>
 #include <memory>
 #include <iosfwd>
@@ -39,7 +41,7 @@ private:
   int column;
 public:
   Treelog& err;
-  const std::string file;
+  const symbol file;
   int error_count;
 
   // Position
@@ -84,7 +86,7 @@ public:
 
   // Create and destroy.
 public:
-  Lexer (const std::string& name, std::istream&, Treelog&);
+  Lexer (symbol name, std::istream&, Treelog&);
   virtual ~Lexer ();
 };
 

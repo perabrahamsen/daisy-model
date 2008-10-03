@@ -34,6 +34,7 @@
 #include "assertion.h"
 #include "memutils.h"
 #include "librarian.h"
+#include "treelog.h"
 #include <sstream>
 
 bool 
@@ -273,7 +274,7 @@ LogSelect::document_entries (Format& format, Metalib& metalib,
 
   // Check if this log parameterizations adds something compared to
   // its parent. 
-  const symbol parent = alist.identifier ("type");
+  const symbol parent = alist.name ("type");
   if (log_lib.check (parent)
       && alist.subset (metalib, 
                        log_lib.lookup (parent), log_lib.syntax (parent),

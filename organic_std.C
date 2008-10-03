@@ -607,7 +607,7 @@ OrganicStandard::Initialization::
     debug_equations (al.integer_sequence ("debug_equations")),
     debug_rows (al.flag ("debug_rows")),
     debug_to_screen (al.flag ("debug_to_screen")),
-    top_summary (al.name ("top_summary", ""))
+    top_summary (al.name ("top_summary", "").name ())
 { 
   if (input < 0)
     return;

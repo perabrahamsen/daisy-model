@@ -139,9 +139,9 @@ SourceStandard::load (Treelog& msg)
 SourceStandard::SourceStandard (Block& al)
   : SourceFile (al),
     units (al.units ()),
-    tag (al.identifier ("tag")),
-    title_ (al.identifier ("title", tag)),
-    dimension_ (al.identifier ("dimension", Syntax::Unknown ())),
+    tag (al.name ("tag")),
+    title_ (al.name ("title", tag)),
+    dimension_ (al.name ("dimension", Syntax::Unknown ())),
     has_factor (al.check ("factor")),
     factor (al.number ("factor", 1.0))
 { }

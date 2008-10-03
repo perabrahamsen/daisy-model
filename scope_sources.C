@@ -89,7 +89,8 @@ ScopeSources::load (Treelog& msg)
   return ok;
 }
 
-std::string ScopeSources::with ()
+symbol
+ScopeSources::with ()
 {
   if (source.size () > 0)
     return source[0]->with ();

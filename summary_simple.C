@@ -36,7 +36,7 @@ struct SummarySimple : public Summary
 {
   static const symbol default_description;
   const symbol description;
-  const std::string file;
+  const symbol file;
   const symbol title;
   const bool print_sum;
   const symbol sum_name;
@@ -70,12 +70,12 @@ SummarySimple::initialize (std::vector<Select*>& select, Treelog& msg)
 
 SummarySimple::SummarySimple (Block& al)
   : Summary (al),
-    description (al.identifier ("description")),
+    description (al.name ("description")),
     file (al.name ("where", "")),
-    title (al.check ("title") ? al.identifier ("title") : name),
+    title (al.check ("title") ? al.name ("title") : name),
     print_sum (al.flag ("print_sum")),
-    sum_name (al.identifier ("sum_name")),
-    period (al.check ("period") ? al.identifier ("period") : symbol ("")),
+    sum_name (al.name ("sum_name")),
+    period (al.check ("period") ? al.name ("period") : symbol ("")),
     precision (al.integer ("precision")),
     fetch (map_construct<Fetch> (al.alist_sequence ("fetch")))
 { }
@@ -133,7 +133,7 @@ SummarySimple::summarize (const int hours, Treelog& msg) const
     msg.message (tmp.str ());
   else
     { 
-      std::ofstream out (file.c_str ());
+      std::ofstream out (file.name ().c_str ());
       out << tmp.str ();
       if (! out.good ())
         msg.error ("Could not write to '" + file + "'");

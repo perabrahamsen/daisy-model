@@ -31,6 +31,7 @@
 #include "vcheck.h"
 #include "submodel.h"
 #include "assertion.h"
+#include "treelog.h"
 #include <sstream>
 
 std::string

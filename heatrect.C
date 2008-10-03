@@ -34,7 +34,7 @@ Heatrect::library_id () const
 }
 
 Heatrect::Heatrect (Block& al)
-  : name (al.identifier ("type"))
+  : name (al.name ("type"))
 { }
 
 Heatrect::~Heatrect ()

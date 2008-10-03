@@ -27,6 +27,7 @@
 #include "alist.h"
 #include "memutils.h"
 #include "librarian.h"
+#include "treelog.h"
 #include <sstream>
 #include <vector>
 #include <memory>
@@ -45,7 +46,7 @@ Stringer::title () const
 { return name.name (); }
 
 Stringer::Stringer (Block& al)
-  : name (al.identifier ("type"))
+  : name (al.name ("type"))
 { }
 
 Stringer::~Stringer ()
@@ -57,7 +58,7 @@ struct StringerCond : public Stringer
   struct Clause
   {
     const std::auto_ptr<Boolean> condition;
-    const std::string value;
+    const symbol  value;
     static void load_syntax (Syntax& syntax, AttributeList& alist)
     {
       alist.add ("description", "\
@@ -83,7 +84,7 @@ Value to return.");
   }
   bool missing (const Scope&) const
   { return false; }
-  std::string value (const Scope& scope) const
+  symbol value (const Scope& scope) const
   { 
     for (size_t i = 0; i < clauses.size (); i++)
       if (clauses[i]->condition->value (scope))
@@ -179,7 +180,7 @@ struct StringerValue : public StringerNumber
 {
   const int precision;
 
-  std::string value (const Scope& scope) const
+  symbol value (const Scope& scope) const
   { 
     std::ostringstream tmp;
     if (precision >= 0)
@@ -216,8 +217,8 @@ Number of decimals after point.  By default, use a floating format.");
 
 struct StringerDimension : public StringerNumber
 {
-  std::string value (const Scope& scope) const
-  { return number->dimension (scope).name (); }
+  symbol value (const Scope& scope) const
+  { return number->dimension (scope); }
 
   StringerDimension (Block& al)
     : StringerNumber (al)
@@ -241,14 +242,14 @@ Extract the dimension of a number as a string.");
 
 struct StringerIdentity : public Stringer
 {
-  const std::string val;
+  const symbol val;
 
   // Simulation.
   void tick (const Units&, const Scope&, Treelog&)
   { }
   bool missing (const Scope&) const
   { return false; }
-  std::string value (const Scope&) const
+  symbol value (const Scope&) const
   { return val; }
 
   // Create.

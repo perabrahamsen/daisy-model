@@ -29,6 +29,7 @@
 #include "alist.h"
 #include "librarian.h"
 #include "block.h"
+#include "treelog.h"
 #include <sstream>
 
 void 

@@ -29,6 +29,7 @@
 #include "plf.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "treelog.h"
 
 class PhenologyStandard : public Phenology
 {

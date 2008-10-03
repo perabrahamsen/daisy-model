@@ -35,8 +35,8 @@
 struct LogCheckpoint : public LogAList
 {
   // Content.
-  const std::string file;		// Name of file to write checkpoint in.
-  const std::string description;	// Comment to go to the start of the file.
+  const symbol file;		// Name of file to write checkpoint in.
+  const symbol description;	// Comment to go to the start of the file.
   std::auto_ptr<Condition> condition; // Should we print a log now?
   Time time;			// Time of current checkpoint.
   const AttributeList* global_alist; // All attributes.
@@ -99,10 +99,10 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
       std::ostringstream scratch;
       scratch.fill (0);
       scratch.width (2);
-      scratch << file.c_str () 
+      scratch << file.name ().c_str () 
 	      << "-" << time.year () << "-" << time.month () << "-" 
 	      << time.mday () << "+" << time.hour () << ".dai";
-      const std::string filename (scratch.str ());
+      const symbol filename (scratch.str ());
 
       // Open log file.
       PrinterFile printer (metalib (), filename);
@@ -128,7 +128,7 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
       if (global_alist->check ("parser_files"))
 	{
 	  const std::vector<symbol> 
-            files (global_alist->identifier_sequence ("parser_files"));
+            files (global_alist->name_sequence ("parser_files"));
 	  const std::string lib_start = "From file '";
 	  const std::string lib_end = "':";
 	  for (unsigned int i = 0; i < files.size (); i++)

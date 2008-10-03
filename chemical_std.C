@@ -237,7 +237,7 @@ ChemicalStandard::Product::load_syntax (Syntax& syntax, AttributeList& alist)
 
 ChemicalStandard::Product::Product (Block& al)
   : fraction (al.number ("fraction")),
-    chemical (al.identifier ("chemical"))
+    chemical (al.name ("chemical"))
 { }
 
 double

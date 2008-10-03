@@ -26,7 +26,7 @@
 #include "librarian.h"
 
 UZmodel::UZmodel (Block& al)
-  : name (al.identifier ("type"))
+  : name (al.name ("type"))
 { }
 
 UZmodel::~UZmodel ()

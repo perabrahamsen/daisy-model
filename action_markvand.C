@@ -27,7 +27,6 @@
 #include "im.h"
 #include "fao.h"
 #include "log.h"
-#include "symbol.h"
 #include "mathlib.h"
 #include "check.h"
 #include "vcheck.h"
@@ -35,6 +34,7 @@
 #include "memutils.h"
 #include "librarian.h"
 #include "vegetation.h"
+#include "treelog.h"
 #include <vector>
 #include <memory>
 #include <sstream>
@@ -342,7 +342,7 @@ struct ActionMarkvand : public Action
 {
   // Soil & Crop.
   const std::auto_ptr<MV_Soil> soil;
-  const struct crop_map_t : public std::map<std::string, const MV_Crop*>
+  const struct crop_map_t : public std::map<symbol, const MV_Crop*>
   {
     static void load_syntax (Syntax& syntax, AttributeList&);
     crop_map_t (Block&, const std::string& key);

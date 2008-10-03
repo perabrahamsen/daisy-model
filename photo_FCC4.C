@@ -37,6 +37,7 @@
 #include <sstream>
 #include "check.h"
 #include "librarian.h"
+#include "treelog.h"
 
 class PhotoFCC4 : public PhotoFarquhar
 {

@@ -23,6 +23,7 @@
 #define LOG_ALL_H
 
 #include "log_select.h"
+#include <stack>
 
 class LogAll : public LogSelect
 {

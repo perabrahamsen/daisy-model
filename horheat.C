@@ -30,6 +30,7 @@
 #include "mathlib.h"
 #include "assertion.h"
 #include "submodel.h"
+#include "treelog.h"
 #include <numeric>
 #include <sstream>
 

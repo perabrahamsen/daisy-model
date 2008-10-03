@@ -36,7 +36,7 @@ StomataCon::library_id () const
 }
 
 StomataCon::StomataCon (Block& al)
-  : ModelLogable (al.identifier ("type"))
+  : ModelLogable (al.name ("type"))
 { }
 
 StomataCon::~StomataCon ()

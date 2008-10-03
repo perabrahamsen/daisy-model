@@ -31,6 +31,7 @@
 #include "soil_heat.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "treelog.h"
 #include <sstream>
 
 struct UZlr : public UZmodel

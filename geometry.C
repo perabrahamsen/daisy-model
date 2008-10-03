@@ -25,6 +25,7 @@
 #include "alist.h"
 #include "check.h"
 #include "vcheck.h"
+#include "treelog.h"
 #include <sstream>
 
 const int Geometry::cell_above;
@@ -687,6 +688,7 @@ Geometry::initialize_layer (std::vector<double>& array,
 	  const double value = layers[i]->number ("value");
 	  if (next < soil_end)
 	    {
+
 	      out.warning (std::string ("WARNING: initial_") + name 
 			   + " layer ends below the last cell");
 	      next = soil_end;

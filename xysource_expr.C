@@ -33,26 +33,26 @@ class XYSourceExpr : public XYSource
 {
   // Content.
   LexerTable lex;
-  std::string with_;
+  symbol with_;
   const bool explicit_with;
   const int style_;
   std::vector<double> xs;
   std::vector<double> ys;
   const std::auto_ptr<Number> x_expr;
   const std::auto_ptr<Number> y_expr;
-  const std::string title_;
+  const symbol title_;
   symbol x_dimension_;
   symbol y_dimension_;
   
   // Interface.
 public:
-  const std::string& title () const
+  symbol title () const
   { return title_; }
   const std::vector<double>& x () const
   { return xs; }
   const std::vector<double>& y () const
   { return ys; }
-  const std::string& with () const
+  symbol with () const
   { return with_; }
   int style () const 
   { return style_; }

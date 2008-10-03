@@ -25,9 +25,10 @@
 #include "alist.h"
 #include "syntax.h"
 #include "program.h"
-#include <sstream>
 #include "mathlib.h"
 #include "librarian.h"
+#include "treelog.h"
+#include <sstream>
 #include <memory>
 
 const char *const WSE::component = "wse";

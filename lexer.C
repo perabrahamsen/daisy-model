@@ -179,7 +179,7 @@ Lexer::eof ()
     error ("Expected end of file");
 }
     
-Lexer::Lexer (const std::string& name, std::istream& input, Treelog& msg)
+Lexer::Lexer (const symbol name, std::istream& input, Treelog& msg)
   : in (input),
     line (1),
     column (0),

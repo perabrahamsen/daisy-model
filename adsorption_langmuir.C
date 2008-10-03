@@ -28,6 +28,7 @@
 #include "check.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "treelog.h"
 
 class AdsorptionLangmuir : public Adsorption
 {

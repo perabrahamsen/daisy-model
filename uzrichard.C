@@ -34,6 +34,7 @@
 #include "log.h"
 #include "average.h"
 #include "librarian.h"
+#include "treelog.h"
 #include <sstream>
 #include <memory>
 

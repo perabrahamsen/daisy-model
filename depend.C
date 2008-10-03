@@ -119,7 +119,7 @@ TraverseDepend::enter_model (const Syntax&, AttributeList& alist,
   // Check if this model is inherited from the model we are examining.
   if (dep_lib == component
       && alist.check ("type") 
-      && alist.identifier ("type") == dep_par)
+      && alist.name ("type") == dep_par)
     { 
       Treelog::Open nest1 (treelog, name);
       treelog.entry (dep_par + " inherited by " + name);
@@ -215,7 +215,7 @@ TraverseDepend::enter_object (const Library& library,
 			      const symbol name)
 {
   daisy_assert (alist.check ("type"));
-  const symbol super = alist.identifier ("type");
+  const symbol super = alist.name ("type");
   if (dep_lib == library.name () && super == dep_par)
     { 
       treelog.entry (name + " inherits " + dep_par);

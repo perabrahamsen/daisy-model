@@ -63,7 +63,7 @@ public:
   { return id != other.id; }
   bool operator< (const symbol& other) const
   { return id < other.id; }
-  const std::string& name () const;
+  const std::string& name () const EXPORT;
 
   // Utilities.
 public:

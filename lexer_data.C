@@ -170,7 +170,7 @@ LexerData::next_line ()
     }
 }
 
-LexerData::LexerData (const std::string& name,
+LexerData::LexerData (const symbol name,
 		      std::istream& input, Treelog& out)
   : Lexer (name, input, out)
 { }

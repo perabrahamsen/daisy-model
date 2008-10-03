@@ -32,6 +32,7 @@
 #include "movement.h"
 #include "submodel.h"
 #include "mathlib.h"
+#include "treelog.h"
 #include <sstream>
 
 struct Snow::Implementation

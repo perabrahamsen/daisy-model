@@ -26,6 +26,7 @@
 #include "check.h"
 #include "block.h"
 #include "librarian.h"
+#include "treelog.h"
 
 struct StomataCon_Leuning : public StomataCon
 {

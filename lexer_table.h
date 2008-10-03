@@ -40,12 +40,12 @@ class LexerTable
   // Content.
 private:
   Path& path;
-  const std::string filename;  
+  const symbol filename;  
   std::auto_ptr<std::istream> owned_stream;
   std::auto_ptr<LexerData> lex;
   std::string field_sep;
   std::string type_;
-  const std::vector<std::string> missing;
+  const std::vector<symbol> missing;
   std::vector<symbol> tag_names;
   std::map<symbol,int> tag_pos;
   std::vector<size_t> fil_col;

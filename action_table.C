@@ -31,6 +31,7 @@
 #include "lexer_table.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "treelog.h"
 #include <set>
 #include <map>
 #include <memory>
@@ -187,7 +188,7 @@ ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
       else
         {
           double water = 0.0;
-          const std::string syntax = fert.name ("syntax");
+          const symbol syntax = fert.name ("syntax");
           std::ostringstream tmp;
           if (syntax == "mineral")
             tmp << "Fertilizing " << fert.number ("weight") 

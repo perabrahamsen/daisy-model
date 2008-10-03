@@ -31,6 +31,7 @@
 #include "block.h"
 #include "secondary.h"
 #include "check.h"
+#include "treelog.h"
 #include <sstream>
 
 void

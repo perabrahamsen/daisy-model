@@ -51,9 +51,9 @@ struct NumberPLF : public Number
     
     Point (const AttributeList& al)
       : x_value (al.number ("x")),
-	x_dimension (al.identifier ("x")),
+	x_dimension (al.name ("x")),
 	y_value (al.number ("y")),
-	y_dimension (al.identifier ("y"))
+	y_dimension (al.name ("y"))
     { }
   };
 
@@ -91,8 +91,8 @@ struct NumberPLF : public Number
   }
   static bool check_alist (const AttributeList& al, Treelog& msg) 
   {
-    const symbol domain (al.identifier ("domain"));
-    const symbol range (al.identifier ("range"));
+    const symbol domain (al.name ("domain"));
+    const symbol range (al.name ("range"));
     const auto_vector<const Point*> points 
       = map_construct_const<Point> (al.alist_sequence ("points"));
 
@@ -148,8 +148,8 @@ struct NumberPLF : public Number
   static const PLF build_plf (Block& al) 
   {
     const Units& units = al.units ();
-    const symbol domain (al.identifier ("domain"));
-    const symbol range (al.identifier ("range"));
+    const symbol domain (al.name ("domain"));
+    const symbol range (al.name ("range"));
     const auto_vector<const Point*> points 
       = map_construct_const<Point> (al.alist_sequence ("points"));
 
@@ -176,8 +176,8 @@ struct NumberPLF : public Number
   NumberPLF (Block& al)
     : Number (al),
       operand (Librarian::build_item<Number> (al, "operand")),
-      domain (al.identifier ("domain")),
-      range (al.identifier ("range")),
+      domain (al.name ("domain")),
+      range (al.name ("range")),
       plf (build_plf (al))
   { }
 };

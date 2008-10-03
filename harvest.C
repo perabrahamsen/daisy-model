@@ -103,9 +103,9 @@ Harvest::load_syntax (Syntax& syntax, AttributeList& alist)
 }
 
 Harvest::Harvest (Block& alist)
-  : column (alist.identifier ("column")),
+  : column (alist.name ("column")),
     time (alist.alist ("time")),
-    crop (alist.identifier ("crop")),
+    crop (alist.name ("crop")),
     stem_DM (alist.number ("stem_DM")),
     stem_N (alist.number ("stem_N")),
     stem_C (alist.number ("stem_C")),

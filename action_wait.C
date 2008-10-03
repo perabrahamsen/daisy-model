@@ -28,6 +28,7 @@
 #include "daisy.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "treelog.h"
 #include <memory>
 #include <sstream>
 

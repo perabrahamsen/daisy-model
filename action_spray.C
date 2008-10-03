@@ -29,6 +29,7 @@
 #include "chemical.h"
 #include "check.h"
 #include "librarian.h"
+#include "treelog.h"
 #include <sstream>
 
 struct ActionSpray : public Action
@@ -53,7 +54,7 @@ struct ActionSpray : public Action
 
   ActionSpray (Block& al)
     : Action (al),
-      chemical (al.identifier ("chemical")),
+      chemical (al.name ("chemical")),
       amount (al.number ("amount"))
   { }
 };

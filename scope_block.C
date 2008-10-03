@@ -126,7 +126,7 @@ ScopeBlock::dimension (symbol tag_symbol) const
         return symbol (dim);
       if (!alist.check (tag))
         return Syntax::Unknown ();
-      return alist.identifier (tag);
+      return alist.name (tag);
     }
 
   // Handle number objects.
@@ -149,7 +149,7 @@ ScopeBlock::dimension (symbol tag_symbol) const
 }
 
 bool 
-ScopeBlock::has_identifier (const symbol tag_symbol) const
+ScopeBlock::has_name (const symbol tag_symbol) const
 {
   const std::string& tag = tag_symbol.name ();
 
@@ -190,7 +190,7 @@ ScopeBlock::has_identifier (const symbol tag_symbol) const
 }
 
 symbol
-ScopeBlock::identifier (const symbol tag_symbol) const
+ScopeBlock::name (const symbol tag_symbol) const
 { 
   const std::string& tag = tag_symbol.name ();
 
@@ -204,7 +204,7 @@ ScopeBlock::identifier (const symbol tag_symbol) const
 
   //Handle primitive names.
   if (type == Syntax::String)
-    return alist.identifier (tag);
+    return alist.name (tag);
 
   // Handle number objects.
   daisy_assert (type == Syntax::Object);

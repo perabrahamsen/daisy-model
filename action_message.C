@@ -27,11 +27,12 @@
 #include "log.h"
 #include "daisy.h"
 #include "librarian.h"
+#include "treelog.h"
 
 struct ActionAssert : public Action
 {
   std::auto_ptr<Condition> condition;
-  const std::string message;
+  const symbol message;
 
   void tick (const Daisy& daisy, const Scope& scope, Treelog& out)
   { condition->tick (daisy, scope, out); }
@@ -63,11 +64,11 @@ struct ActionAssert : public Action
 
 struct ActionMessage : public Action
 {
-  const std::string message;
+  const symbol message;
 
   void doIt (Daisy&, const Scope&, Treelog& out)
   { 
-    out.message (message);
+    out.message (message.name ());
   }
 
   void tick (const Daisy&, const Scope&, Treelog&)
@@ -88,11 +89,11 @@ struct ActionMessage : public Action
 
 struct ActionWarning : public Action
 {
-  const std::string message;
+  const symbol message;
 
   void doIt (Daisy&, const Scope&, Treelog& out)
   { 
-    out.warning (message);
+    out.warning (message.name ());
   }
 
   void tick (const Daisy&, const Scope&, Treelog&)
@@ -113,11 +114,11 @@ struct ActionWarning : public Action
 
 struct ActionError : public Action
 {
-  const std::string message;
+  const symbol message;
 
   void doIt (Daisy&, const Scope&, Treelog& out)
   { 
-    out.error (message);
+    out.error (message.name ());
   }
 
   void tick (const Daisy&, const Scope&, Treelog&)
@@ -138,7 +139,7 @@ struct ActionError : public Action
 
 struct ActionPanic : public Action
 {
-  const std::string message;
+  const symbol message;
 
   void doIt (Daisy&, const Scope&, Treelog& msg)
   { 

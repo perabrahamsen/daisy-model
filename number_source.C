@@ -26,6 +26,7 @@
 #include "source.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "treelog.h"
 #include <sstream>
 #include <memory>
 

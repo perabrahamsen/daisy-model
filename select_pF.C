@@ -27,6 +27,7 @@
 #include "mathlib.h"
 #include "check.h"
 #include "vcheck.h"
+#include "treelog.h"
 #include "librarian.h"
 
 struct SelectPF : public Select

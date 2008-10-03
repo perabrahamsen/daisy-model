@@ -23,7 +23,6 @@
 
 #include "gnuplot.h"
 #include <vector>
-#include <string>
 #include <map>
 
 class Syntax;
@@ -33,12 +32,12 @@ class GnuplotBase : public Gnuplot
 {
   // Content.
 private:
-  const std::string file;
+  const symbol file;
 protected:
-  const std::string device;
+  const symbol device;
   const std::vector<symbol> extra;
 private:
-  const std::string title;
+  const symbol title;
 
 private:
   struct Size 
@@ -53,11 +52,11 @@ private:
   
   // Legend placement.
 protected:
-  static struct LegendTable : public std::map<std::string,std::string>
+  static struct LegendTable : public std::map<symbol, symbol>
   {
     explicit LegendTable ();
   } legend_table;
-  std::string legend;
+  symbol legend;
 
   // Use.
 protected:
@@ -68,7 +67,7 @@ protected:
 public:
   static void load_syntax (Syntax& syntax, AttributeList&);
 private:
-  static std::string file2device (const std::string& file);
+  static symbol file2device (symbol file);
 protected:
   explicit GnuplotBase (Block& al);
   ~GnuplotBase ();

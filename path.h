@@ -3,8 +3,8 @@
 #ifndef PATH_H
 #define PATH_H
 
+#include "symbol.h"
 #include <vector>
-#include <string>
 #include <iosfwd>
 #include <memory>
 #include <boost/noncopyable.hpp>
@@ -23,35 +23,34 @@ class Path : private boost::noncopyable
 {
   // Shared content.
 private:
-  static std::string daisy_home;
-  static std::vector<std::string> daisy_path;
+  static std::vector<symbol> daisy_path;
 
 public:
-  static const std::vector<std::string>& get_daisy_path ();
-  static const std::string& get_daisy_home ();
-  static EXPORT const std::string nodir (const std::string& name);
+  static const std::vector<symbol>& get_daisy_path ();
+  static symbol get_daisy_home ();
+  static EXPORT symbol nodir (symbol name);
 
   // Content.
 private:
-  std::vector<std::string> path;
-  std::string current_directory;
+  std::vector<symbol> path;
+  symbol current_directory;
 
   // Use.
 public:
-  std::auto_ptr<std::istream> open_file (const std::string& name) const;
-  bool set_directory (const std::string& directory);
-  const std::string& get_directory () const;
-  void set_path (const std::vector<std::string>& path);
+  std::auto_ptr<std::istream> open_file (symbol name) const;
+  bool set_directory (symbol directory);
+  symbol get_directory () const;
+  void set_path (const std::vector<symbol>& path);
 
   // Utilities.
 public:
   class InDirectory
   {
     Path& path;
-    const std::string from;
+    const symbol from;
     const bool ok;
   public:
-    InDirectory (Path& path, const std::string& to);
+    InDirectory (Path& path, symbol to);
     bool check () const;
     ~InDirectory ();
   };

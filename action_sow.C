@@ -28,6 +28,8 @@
 #include "crop.h"
 #include "librarian.h"
 #include "check.h"
+#include "dlf.h"
+#include "treelog.h"
 
 struct ActionSow : public Action
 {

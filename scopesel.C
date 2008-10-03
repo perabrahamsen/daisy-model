@@ -27,6 +27,7 @@
 #include "block.h"
 #include "alist.h"
 #include "librarian.h"
+#include "treelog.h"
 
 const char *const Scopesel::component = "scopesel";
 
@@ -75,7 +76,7 @@ public:
   // Create.
 public:
   ScopeselName (Block& al)
-    : name (al.identifier ("name"))
+    : name (al.name ("name"))
   { }
 };
 

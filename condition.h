@@ -37,7 +37,7 @@ class Condition : public ModelAListed
 public:
   static const char *const component;
   symbol library_id () const;
-  virtual const std::string timestep ();
+  virtual symbol timestep ();
 
   // Simulation.
 public:

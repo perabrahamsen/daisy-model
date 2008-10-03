@@ -58,7 +58,7 @@ Program::ui_set_progress (const double value)
 }
 
 Program::Program (Block& al)
-  : name (al.identifier ("type")),
+  : name (al.name ("type")),
     alist (al.alist ()),
     ui (NULL)
 { }

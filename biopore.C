@@ -30,6 +30,7 @@
 #include "check.h"
 #include "geometry.h"
 #include "log.h"
+#include "treelog.h"
 #include <sstream>
 
 // biopore component.

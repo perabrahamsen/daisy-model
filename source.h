@@ -43,7 +43,7 @@ public:
 public:
   virtual symbol title () const = 0;
   virtual symbol dimension () const = 0;
-  virtual const std::string& with () const = 0;
+  virtual symbol with () const = 0;
   virtual int style () const = 0;
   virtual const std::vector<Time>& time () const = 0;
   virtual const std::vector<double>& value () const = 0;

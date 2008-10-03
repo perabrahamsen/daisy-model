@@ -80,8 +80,8 @@ GnuplotMulti::plot (std::ostream& out, Treelog& msg)
 
 GnuplotMulti::GnuplotMulti (Block& al)
   : Gnuplot (al),
-    before (al.identifier_sequence ("before")),
-    after (al.identifier_sequence ("after")),
+    before (al.name_sequence ("before")),
+    after (al.name_sequence ("after")),
     graph (Librarian::build_vector<Gnuplot> (al, "graph"))
 { }
 

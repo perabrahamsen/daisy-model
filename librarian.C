@@ -51,7 +51,7 @@ Librarian::build_free (const char *const component, Metalib& metalib,
                        symbol scope_id)
 {
   daisy_assert (alist.check ("type"));
-  const symbol type = alist.identifier ("type");
+  const symbol type = alist.name ("type");
   const Library& lib = metalib.library (component);
 
   if (!lib.check (type))
@@ -91,7 +91,7 @@ Librarian::build_alist (const char *const component,
                         symbol scope_id)
 {
   daisy_assert (alist.check ("type"));
-  const symbol type = alist.identifier ("type");
+  const symbol type = alist.name ("type");
   const Library& lib = parent.metalib ().library (component);
   if (!lib.check (type))
     {
@@ -118,7 +118,7 @@ Librarian::build_alist (const char *const component,
                         symbol scope_id, size_t index)
 {
   daisy_assert (alist.check ("type"));
-  const symbol type = alist.identifier ("type");
+  const symbol type = alist.name ("type");
   const Library& lib = parent.metalib ().library (component);
   if (!lib.check (type))
     {

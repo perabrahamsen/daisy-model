@@ -222,7 +222,7 @@ TraverseXRef::enter_submodel_default (const Syntax&, const AttributeList& al,
     {
       // We are traversing a top level submodels.
       daisy_assert (al.check ("submodel"));
-      daisy_assert (al.identifier ("submodel") == name);
+      daisy_assert (al.name ("submodel") == name);
       daisy_assert (path.empty ());
       type = is_submodel;
       current_submodel = name;
@@ -276,7 +276,7 @@ TraverseXRef::enter_object (const Library& library,
 			    const symbol)
 {
   daisy_assert (alist.check ("type"));
-  use_model (library, alist.identifier ("type"));
+  use_model (library, alist.name ("type"));
   return false; 
 }
 
@@ -312,7 +312,7 @@ TraverseXRef::enter_parameter (const Syntax& syntax,
     {
       // Ignore base parameters.
       const Library& library = metalib.library (current_component);
-      const symbol base_model = alist.identifier ("base_model");
+      const symbol base_model = alist.name ("base_model");
       if (base_model != current_model)
         {
           const Syntax& base_syntax = library.syntax (base_model);

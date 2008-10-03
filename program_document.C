@@ -140,7 +140,7 @@ struct ProgramDocument : public Program
     : Program (al),
       metalib (al.metalib ()),
       xref (metalib),
-      out (al.name ("where").c_str ()),
+      out (al.name ("where").name ().c_str ()),
       format (Librarian::build_item<Format> (al, "format")),
       print_parameterizations (al.flag ("print_parameterizations"))
   { }
@@ -409,7 +409,7 @@ ProgramDocument::print_entry_value (const symbol name,
 	    break;
 	  case Syntax::String:
 	    {
-	      const std::string value = alist.name (name);
+	      const std::string value = alist.name (name).name ();
 	      if (value.length () < 30)
 		format->text (" (default `" + value + "')");
 	      else
@@ -433,7 +433,7 @@ ProgramDocument::print_entry_value (const symbol name,
 	    {
 	      const AttributeList& object = alist.alist (name);
 	      daisy_assert (object.check ("type"));
-	      const symbol type = object.identifier ("type");
+	      const symbol type = object.name ("type");
 	      format->text (" (default `" + type.name () + "')");
 	      const Library& library = syntax.library (metalib, name);
 	      const AttributeList& super = library.lookup (type);
@@ -608,7 +608,7 @@ ProgramDocument::print_sample_entry (const symbol name,
 	      break;
 	    case Syntax::String:
 	      {
-		const std::string value = alist.name (name);
+		const std::string value = alist.name (name).name ();
 		if (value.length () < 20)
 		  {
 		    format->special ("nbsp");
@@ -729,8 +729,8 @@ ProgramDocument::own_entries (const Metalib& metalib,
   if (alist.check ("base_model") || alist.check ("type"))
     {
       const symbol base_model = alist.check ("base_model")
-        ? alist.identifier ("base_model")
-        : alist.identifier ("type");
+        ? alist.name ("base_model")
+        : alist.name ("type");
           
       if (base_model != name)
         {
@@ -759,7 +759,7 @@ ProgramDocument::inherited_entries (const Metalib& metalib,
 
   if (alist.check ("base_model"))
     {
-      const symbol base_model = alist.identifier ("base_model");
+      const symbol base_model = alist.name ("base_model");
           
       if (base_model != name)
         {
@@ -920,7 +920,7 @@ ProgramDocument::print_sample_entries (const symbol name,
 	  format->text (";; Shared parameters are described in section");
 	  format->special ("nbsp");
 	  format->ref ("model", 
-		       lib_name + "-" + alist.identifier ("base_model"));
+		       lib_name + "-" + alist.name ("base_model"));
 	}
       }
       for (unsigned int i = 0; i < base.size (); i++)
@@ -1082,7 +1082,7 @@ ProgramDocument::print_model (const symbol name, const Library& library,
   if (alist.check ("type"))
     {
       // This is a parameterization.
-      const symbol type = alist.identifier ("type");
+      const symbol type = alist.name ("type");
       format->soft_linebreak ();
       Format::Section dummy (*format, "section", name.name (), "model", 
 			     current_component + "-" + name);
@@ -1174,8 +1174,8 @@ class ModelCompare
     daisy_assert (root != leaf);
     const AttributeList& al = library.lookup (leaf);
     const symbol type = al.check ("type")
-      ? al.identifier ("type") 
-      : al.identifier ("base_model");
+      ? al.name ("type") 
+      : al.name ("base_model");
     if (type == root)
       return leaf;
     

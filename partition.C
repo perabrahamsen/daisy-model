@@ -28,6 +28,7 @@
 #include "alist.h"
 #include "check.h"
 #include "mathlib.h"
+#include "treelog.h"
 #include <sstream>
 
 void

@@ -65,7 +65,7 @@ struct SelectVolume : public SelectValue
   // Create and Destroy.
   symbol default_dimension (const symbol spec_dim) const;
   bool initialize (const Units&, const Volume& default_volume, 
-		   const std::string& timestep, Treelog& msg);
+		   const symbol timestep, Treelog& msg);
   bool check_border (const Border& border, 
                      const Volume& default_volume,
                      Treelog& msg) const;
@@ -233,7 +233,7 @@ SelectVolume::default_dimension (const symbol spec_dim) const
 
 bool 
 SelectVolume::initialize (const Units& units, const Volume& default_volume, 
-                          const std::string& timestep, Treelog& msg)
+                          const symbol timestep, Treelog& msg)
 {
   bool ok = true;
 
@@ -261,7 +261,7 @@ SelectVolume::SelectVolume (Block& al)
     last_geo (NULL),
     last_soil (NULL),
     min_root_density (al.number ("min_root_density")),
-    min_root_crop (al.identifier ("min_root_crop")),
+    min_root_crop (al.name ("min_root_crop")),
     bd_convert (NULL)
 { }
   

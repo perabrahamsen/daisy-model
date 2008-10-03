@@ -49,6 +49,7 @@
 #include "check.h"
 #include "fao.h"
 #include "librarian.h"
+#include "treelog.h"
 #include <sstream>
 
 struct BioclimateStandard : public Bioclimate
@@ -306,6 +307,7 @@ struct BioclimateStandard : public Bioclimate
 void 
 BioclimateStandard::initialize (Block& block, const Weather& weather)
 {
+
   Treelog::Open nest (block.msg (), "Bioclimate: " + name);
 
   const Metalib& metalib = block.metalib ();

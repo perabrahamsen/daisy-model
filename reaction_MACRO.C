@@ -31,6 +31,7 @@
 #include "log.h"
 #include "geometry.h"
 #include "soil.h"
+#include "treelog.h"
 
 struct ReactionMACRO : public Reaction
 {
@@ -171,7 +172,7 @@ ReactionMACRO::check (const Units&, const Geometry& geo,
 
 ReactionMACRO::ReactionMACRO (Block& al)
   : Reaction (al),
-    colloid_name (al.identifier ("colloid")),
+    colloid_name (al.name ("colloid")),
     Mmax (al.number ("Mmax")),
     kd (al.number ("kd")),
     kr (al.number ("kr")),

@@ -32,6 +32,7 @@
 #include "scopesel.h"
 #include "librarian.h"
 #include "assertion.h"
+#include "treelog.h"
 #include <memory>
 
 struct ConditionExtern : public Condition

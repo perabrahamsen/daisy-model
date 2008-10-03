@@ -27,6 +27,7 @@
 #include "daisy.h"
 #include "check.h"
 #include "librarian.h"
+#include "treelog.h"
 
 struct ConditionSoilTemperature : public Condition
 {

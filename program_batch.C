@@ -35,14 +35,14 @@ struct ProgramBatch : public Program
   // Content.
   Metalib& metalib;
   Path& path;
-  const std::string directory;
+  const symbol directory;
   std::vector<Program*> program;
   
   // Use.
   bool run (Treelog& msg)
   { 
 
-    Path::InDirectory cwd (path, directory);
+    Path::InDirectory cwd (path, directory.name ());
     if (!cwd.check ())
       {
         msg.error ("Could not change to directory '" + directory + "'");

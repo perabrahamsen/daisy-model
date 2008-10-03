@@ -38,6 +38,7 @@
 #include "groundwater.h"
 #include "im.h"
 #include "units.h"
+#include "treelog.h"
 #include <sstream>
 
 struct TertiaryBiopores : public Tertiary, public Tertsmall

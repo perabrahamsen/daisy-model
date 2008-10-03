@@ -30,6 +30,7 @@
 #include "log.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "treelog.h"
 #include <sstream>
 
 struct TransportHansen : public Transport

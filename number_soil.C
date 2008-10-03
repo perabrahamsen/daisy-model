@@ -33,6 +33,7 @@
 #include "librarian.h"
 #include "scope.h"
 #include "units.h"
+#include "treelog.h"
 #include <memory>
 
 struct NumberByDepth : public Number

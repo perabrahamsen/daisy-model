@@ -28,6 +28,7 @@
 #include "harvest.h"
 #include "librarian.h"
 #include "vegetation.h"
+#include "treelog.h"
 #include <sstream>
 
 // The 'emerge' action model.
@@ -66,7 +67,7 @@ struct ActionEmerge : public Action
 
   ActionEmerge (Block& al)
     : Action (al),
-      crop (al.identifier ("crop"))
+      crop (al.name ("crop"))
   { }
 };
 
@@ -176,7 +177,7 @@ This is mostly useful for silage.");
 
   ActionHarvest (Block& al)
     : Action (al),
-      crop (al.identifier ("crop")), 
+      crop (al.name ("crop")), 
       stub (al.number ("stub")),
       stem (al.number ("stem")),
       leaf (al.number ("leaf")),
@@ -276,7 +277,7 @@ If this was intended, you should use the 'harvest' action instead to avoid this 
 
   ActionPluck (Block& al)
     : Action (al),
-      crop (al.identifier ("crop")), 
+      crop (al.name ("crop")), 
       stem (al.number ("stem")),
       leaf (al.number ("leaf")),
       sorg (al.number ("sorg"))

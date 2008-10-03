@@ -27,6 +27,7 @@
 #include "field.h"
 #include "check.h"
 #include "librarian.h"
+#include "treelog.h"
 
 struct ActionSetHeatSource : public Action
 {

@@ -75,7 +75,7 @@ Groundwater::load_syntax (Syntax& syntax, AttributeList&)
 }
 
 Groundwater::Groundwater (Block& al)
-  : ModelLogable (al.identifier ("type"))
+  : ModelLogable (al.name ("type"))
 { }
 
 Groundwater::~Groundwater ()

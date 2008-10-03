@@ -31,7 +31,7 @@
 #include <ostream>
 
 DLF::type 
-DLF::string2type (const std::string& s)
+DLF::string2type (const symbol s)
 { 
   if (s == "true")
     return Full;
@@ -43,8 +43,7 @@ DLF::string2type (const std::string& s)
 
 void
 DLF::start (std::ostream& out, const symbol name,
-            const std::string& file,
-            const std::string& parsed_from_file) const
+            const symbol file, const symbol parsed_from_file) const
 {
   if (value == DLF::None)
     return;
@@ -72,8 +71,9 @@ DLF::interval (std::ostream& out, const Volume& volume) const
 { out << "INTERVAL: " << volume.one_line_description () << "\n"; }
 
 void
-DLF::log_description (std::ostream& out, const std::string& description) const
+DLF::log_description (std::ostream& out, const symbol description_s) const
 {
+  const std::string description = description_s.name ();
   if (value != DLF::Full)
     return;
 
@@ -99,7 +99,7 @@ DLF::finish (std::ostream& out, const Daisy& daisy)
   if (al.check ("parser_files"))
     {
       const std::vector<symbol>& files 
-        = al.identifier_sequence ("parser_files");
+        = al.name_sequence ("parser_files");
       if (value == Terse)
         {
           out << "SIMFILE:";
@@ -115,11 +115,12 @@ DLF::finish (std::ostream& out, const Daisy& daisy)
     out << "SIMFILE:\n";
 
   // SIM:
-  const std::string sim_description = al.name ("description");
-  if ((sim_description != Daisy::default_description
-       && sim_description != Toplevel::default_description)
+  const symbol sim_description_s = al.name ("description");
+  if ((sim_description_s != Daisy::default_description
+       && sim_description_s != Toplevel::default_description)
       || value == Terse)
     {
+      const std::string sim_description = sim_description_s.name ();
       out << "SIM: ";
       for (unsigned int i = 0; i < sim_description.size (); i++)
         if (sim_description[i] != '\n')

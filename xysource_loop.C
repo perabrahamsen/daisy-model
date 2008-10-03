@@ -29,17 +29,18 @@
 #include "vcheck.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "treelog.h"
 
 class XYSourceLoop : public XYSource
 {
   // Content.
-  const std::string with_;
+  const symbol with_;
   const int style_;
   std::vector<double> xs;
   std::vector<double> ys;
   const std::auto_ptr<Number> x_expr;
   const std::auto_ptr<Number> y_expr;
-  const std::string title_;
+  const symbol title_;
   symbol x_dimension_;
   symbol y_dimension_;
 
@@ -51,13 +52,13 @@ class XYSourceLoop : public XYSource
   
   // Interface.
 public:
-  const std::string& title () const
+  symbol title () const
   { return title_; }
   const std::vector<double>& x () const
   { return xs; }
   const std::vector<double>& y () const
   { return ys; }
-  const std::string& with () const
+  symbol with () const
   { return with_; }
   int style () const 
   { return style_; }
@@ -135,8 +136,8 @@ XYSourceLoop::XYSourceLoop (Block& al)
     begin (al.number ("begin")),
     end (al.number ("end")),
     step (al.number ("step")),
-    tag (al.identifier ("tag")),
-    scope (tag, al.identifier ("begin"))
+    tag (al.name ("tag")),
+    scope (tag, al.name ("begin"))
 { }
 
 XYSourceLoop::~XYSourceLoop ()

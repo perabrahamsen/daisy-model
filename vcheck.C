@@ -31,6 +31,7 @@
 #include <sstream>
 #include "assertion.h"
 #include "mathlib.h"
+#include "treelog.h"
 #include <algorithm>
 #include <numeric>
 #include <map>
@@ -545,7 +546,7 @@ VCheck::String::check (const Metalib&, const Syntax& syntax, const AttributeList
     validate (alist.name (key));
   else
     {
-      const std::vector<symbol> names = alist.identifier_sequence (key);
+      const std::vector<symbol> names = alist.name_sequence (key);
       for (size_t i = 0; i < names.size (); i++)
         validate (names[i].name ());
     }
@@ -572,10 +573,10 @@ VCheck::Compatible::check (const Metalib& metalib,
   daisy_assert (!syntax.is_log (key));
   const Units& units = metalib.units ();
   if (syntax.size (key) == Syntax::Singleton)
-    validate (units, alist.identifier (key));
+    validate (units, alist.name (key));
   else
     {
-      const std::vector<symbol> names = alist.identifier_sequence (key);
+      const std::vector<symbol> names = alist.name_sequence (key);
       for (size_t i = 0; i < names.size (); i++)
         validate (units, names[i]);
     }
@@ -666,10 +667,10 @@ VCheck::InLibrary::check (const Metalib& metalib,
   daisy_assert (alist.check (key));
   daisy_assert (!syntax.is_log (key));
   if (syntax.size (key) == Syntax::Singleton)
-    validate (metalib, alist.identifier (key));
+    validate (metalib, alist.name (key));
   else
     {
-      const std::vector<symbol> names = alist.identifier_sequence (key);
+      const std::vector<symbol> names = alist.name_sequence (key);
       for (size_t i = 0; i < names.size (); i++)
         validate (metalib, names[i]);
     }
@@ -739,7 +740,7 @@ VCheck::unique ()
           unique_validate (alist.flag_sequence (key));
           break;
         case Syntax::String:
-          unique_validate (alist.identifier_sequence (key));
+          unique_validate (alist.name_sequence (key));
           break;
         case Syntax::Integer:
           unique_validate (alist.integer_sequence (key));
@@ -750,7 +751,7 @@ VCheck::unique ()
 	    std::map<symbol, size_t> found;
 	    for (size_t i = 0; i < list.size (); i++)
 	      {
-		const symbol type = list[i]->identifier ("type");
+		const symbol type = list[i]->name ("type");
 		std::map<symbol, size_t>::const_iterator f = found.find (type);
 		if (f != found.end ())
 		  {

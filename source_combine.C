@@ -28,6 +28,7 @@
 #include "vcheck.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "treelog.h"
 
 struct SourceCombine : public Source
 {
@@ -38,14 +39,14 @@ struct SourceCombine : public Source
   const std::auto_ptr<Number> expr;
   const symbol title_;
   symbol dimension_;
-  std::string with_;
+  symbol with_;
   const int style_;
   std::vector<Time> times;
   std::vector<double> values;
 
   // Interface.
 public:
-  const std::string& with () const
+  symbol with () const
   { return with_; }
   int style () const 
   { return style_; }
@@ -113,7 +114,7 @@ SourceCombine::SourceCombine (Block& al)
     units (al.units ()),
     scope (Librarian::build_vector<Source> (al, "source")),
     expr (Librarian::build_item<Number> (al, "expr")),
-    title_ (al.identifier ("title", expr->title ())),
+    title_ (al.name ("title", expr->title ())),
     dimension_ ("UNINITIALIZED"),
     with_ (al.name ("with", "")),
     style_ (al.integer ("style", -1))

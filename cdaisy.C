@@ -44,6 +44,7 @@
 #include "chemical.h"
 #include "scope.h"
 #include "assertion.h"
+#include "treelog.h"
 #include <string>
 #include <typeinfo>
 
@@ -156,7 +157,7 @@ daisy_alist_get_number (const AttributeList* alist, const char* name)
 
 extern "C" const char* EXPORT
 daisy_alist_get_string (const AttributeList* alist, const char* name)
-{ return alist->name (name).c_str (); }
+{ return alist->name (name).name ().c_str (); }
 
 extern "C" daisy_bool EXPORT
 daisy_alist_get_flag (const AttributeList* alist, const char* name)
@@ -195,7 +196,7 @@ daisy_alist_size_integer (const AttributeList* alist, const char* name)
 
 extern "C" unsigned int EXPORT
 daisy_alist_size_string (const AttributeList* alist, const char* name)
-{ return alist->identifier_sequence (name).size (); }
+{ return alist->name_sequence (name).size (); }
 
 extern "C" unsigned int EXPORT
 daisy_alist_size_flag (const AttributeList* alist, const char* name)
@@ -225,7 +226,7 @@ daisy_alist_get_integer_at (const AttributeList* alist, const char* name,
 extern "C" const char* EXPORT
 daisy_alist_get_string_at (const AttributeList* alist, const char* name,
 			    unsigned int index)
-{ return alist->identifier_sequence (name)[index].name ().c_str (); }
+{ return alist->name_sequence (name)[index].name ().c_str (); }
 
 extern "C" daisy_bool EXPORT
 daisy_alist_get_flag_at (const AttributeList* alist, const char* name,
@@ -266,7 +267,7 @@ daisy_alist_set_string_at (AttributeList* alist, const char* name,
 {
   std::vector<symbol> v;
   if (alist->check (name))
-    v = alist->identifier_sequence (name);
+    v = alist->name_sequence (name);
   if (v.size () <= index)
     while (v.size () <= index)
       v.push_back (symbol (value));
@@ -367,7 +368,7 @@ daisy_library_file (const Library* library, const char* name)
 { 
   const AttributeList& alist = library->lookup (symbol (name));
   if (alist.check ("parsed_from_file"))
-    return alist.name ("parsed_from_file").c_str ();
+    return alist.name ("parsed_from_file").name ().c_str ();
   
   return NULL;
 }
@@ -633,7 +634,7 @@ daisy_column_get_description (const Column* column)
 { 
   const AttributeList& alist = column->alist; 
   if (alist.check ("description"))
-    return alist.name ("description").c_str ();
+    return alist.name ("description").name ().c_str ();
   return "";
 }
 
@@ -735,7 +736,7 @@ daisy_scope_dimension (const Scope* scope, const char* name)
 extern "C" const int EXPORT	// check if NAME is defined in SCOPE.
 daisy_scope_has_string (const Scope* scope, const char* name)
 { 
-  if (scope->has_identifier (symbol (name)))
+  if (scope->has_name (symbol (name)))
     return 1;
   else 
     return 0; 
@@ -744,7 +745,7 @@ daisy_scope_has_string (const Scope* scope, const char* name)
 extern "C" const char* EXPORT	// Return string value of NAME in SCOPE.
 daisy_scope_string (const Scope* scope, const char* name)
 { 
-  return scope->identifier (symbol (name)).name ().c_str ();
+  return scope->name (symbol (name)).name ().c_str ();
 }
 
 extern "C" const char* EXPORT	// Return UNITS of NAME defined in SCOPE.

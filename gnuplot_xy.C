@@ -329,7 +329,7 @@ set style data lines\n";
     {
       if (source[i]->x ().size () < 1)
         continue;
-      const std::string with = source[i]->with ();
+      const symbol with = source[i]->with ();
       if (first)
         first = false;
       else

@@ -279,7 +279,7 @@ public:
 struct ConditionHour : public Condition
 {
   const int at;
-  const std::string timestep ()
+  symbol timestep ()
   { return "d"; } 
   bool match (const Daisy& daisy, const Scope&, Treelog&) const
   { return daisy.time.hour () == at; }
@@ -407,9 +407,9 @@ public:
 struct ConditionTimestep : public Condition
 {
   std::auto_ptr<Condition> condition;
-  const std::string dt;
+  const symbol dt;
 
-  const std::string timestep ()
+  symbol timestep ()
   { return dt; } 
 
   bool match (const Daisy& daisy, const Scope& scope, Treelog& msg) const
@@ -613,11 +613,11 @@ Timestep to use.");
 
 struct ConditionEnd : public Condition
 {
-  const std::string timestep_name;
+  const symbol timestep_name;
   typedef int (Time::*entry_type) () const;
   entry_type entry;
 
-  const std::string timestep ()
+  symbol timestep ()
   { return timestep_name; } 
 
   bool match (const Daisy& daisy, const Scope&, Treelog&) const
@@ -634,7 +634,7 @@ struct ConditionEnd : public Condition
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ConditionEnd (Block& al, const std::string& tstep, entry_type e)
+  ConditionEnd (Block& al, const symbol& tstep, entry_type e)
     : Condition (al),
       timestep_name (tstep),
       entry (e)
@@ -759,7 +759,7 @@ struct ConditionInterval : public Condition
 {
 private:
   const Timestep interval;
-  const std::string step;
+  const symbol step;
   Time next;
   bool does_match;
 
@@ -796,7 +796,7 @@ public:
   }
 
 private:
-  static std::string find_timestep (const Timestep& tstep)
+  static symbol find_timestep (const Timestep& tstep)
   {
     if (tstep == Timestep::second ())
       return "s";

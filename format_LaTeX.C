@@ -381,7 +381,7 @@ FormatLaTeX::alist_description (const AttributeList& alist)
   Format::alist_description (alist);
   if (!alist.check ("cite"))
     return;
-  std::vector<symbol> cite = alist.identifier_sequence ("cite");
+  std::vector<symbol> cite = alist.name_sequence ("cite");
   if (cite.size () < 1)
     return;
   out () << "See also \\cite{" << cite[0];

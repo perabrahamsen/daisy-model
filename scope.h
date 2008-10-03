@@ -58,8 +58,8 @@ public:
   virtual double number (symbol) const = 0;
   virtual symbol dimension (symbol) const = 0;
 
-  virtual bool has_identifier (symbol) const;
-  virtual symbol identifier (symbol) const;
+  virtual bool has_name (symbol) const;
+  virtual symbol name (symbol) const;
 
   virtual bool has_integer (symbol) const;
   virtual int integer (symbol) const;

@@ -27,6 +27,7 @@
 #include "alist.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "treelog.h"
 
 void 
 GnuplotBase::Size::load_syntax (Syntax& syntax, AttributeList&)
@@ -90,11 +91,13 @@ bool
 GnuplotBase::interactive () const
 { return device == "screen" || device == "windows" || "device" == "x11"; }
 
-std::string 
-GnuplotBase::file2device (const std::string& file)
+symbol
+GnuplotBase::file2device (const symbol file_s)
 {
-  if (file == "screen" || file == "windows" || file == "x11")
-    return file;
+  if (file_s == "screen" || file_s == "windows" || file_s == "x11")
+    return file_s;
+
+  const std::string file = file_s.name ();
   if (file.size () < 5 || file[file.size () - 4] != '.')
     return "unknown";
 
@@ -116,7 +119,7 @@ GnuplotBase::GnuplotBase (Block& al)
   : Gnuplot (al),
     file (al.name ("where")),
     device (al.name ("device", file2device (file))),
-    extra (al.identifier_sequence ("extra")),
+    extra (al.name_sequence ("extra")),
     title (al.name ("title", "")),
     size (al.check ("size")
 	  ? al.alist ("size")
@@ -150,7 +153,7 @@ the screen instead of being stored in a file.");
       daisy_assert (key == "where");
       daisy_assert (syntax.lookup (key) == Syntax::String);
       daisy_assert (syntax.size (key) == Syntax::Singleton);
-      const std::string file = alist.name (key);
+      const symbol file = alist.name (key);
       if (file == "screen")
         return;
       if (GnuplotBase::file2device (file) == "unknown")
@@ -194,7 +197,7 @@ cross the legend.");
       daisy_assert (key == "legend");
       daisy_assert (syntax.lookup (key) == Syntax::String);
       daisy_assert (syntax.size (key) == Syntax::Singleton);
-      const std::string legend = alist.name (key);
+      const symbol legend = alist.name (key);
       if (legend == "auto")
         return;
       if (GnuplotBase::legend_table.find (legend) 

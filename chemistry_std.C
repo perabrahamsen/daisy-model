@@ -32,6 +32,7 @@
 #include "memutils.h"
 #include "librarian.h"
 #include "vcheck.h"
+#include "treelog.h"
 
 struct ChemistryStandard : public Chemistry
 {

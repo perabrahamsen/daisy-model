@@ -54,11 +54,11 @@ Scope::is_number (symbol tag) const
 }
 
 bool
-Scope::has_identifier (symbol) const
+Scope::has_name (symbol) const
 { return false; }
 
 symbol
-Scope::identifier (symbol) const
+Scope::name (symbol) const
 { daisy_notreached (); }
 
 bool
@@ -110,7 +110,7 @@ Scope::Scope (const char *const t)
 { }
 
 Scope::Scope (Block& al)
-  : title_ (al.identifier ("where", al.identifier ("type")))
+  : title_ (al.name ("where", al.name ("type")))
 { }
 
 Scope::~Scope ()
@@ -132,6 +132,6 @@ WScope::~WScope ()
 { }
 
 static Librarian Scope_init (Scope::component, "\
-A scope maps identifiers to values.");
+A scope maps names to values.");
 
 // scope.C ends here

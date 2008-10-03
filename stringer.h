@@ -24,7 +24,6 @@
 
 #include "model.h"
 #include "symbol.h"
-#include <string>
 
 class Scope;
 class Block;
@@ -44,7 +43,7 @@ public:
 public:
   virtual void tick (const Units&, const Scope& scope, Treelog& msg) = 0;
   virtual bool missing (const Scope& scope) const = 0;
-  virtual std::string value (const Scope&) const = 0; 
+  virtual symbol value (const Scope&) const = 0; 
 
   // Create and Destroy.
 public:

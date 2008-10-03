@@ -29,6 +29,7 @@
 #include "log.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "treelog.h"
 #include <memory>
 
 struct DomsorpStandard : public Domsorp

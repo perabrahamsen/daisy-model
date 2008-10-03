@@ -37,8 +37,8 @@ public:
   bool has_number (symbol tag) const;
   double number (symbol tag) const;
   symbol dimension (symbol tag) const;
-  virtual bool has_identifier (symbol) const;
-  virtual symbol identifier (symbol) const;
+  virtual bool has_name (symbol) const;
+  virtual symbol name (symbol) const;
   symbol get_description (symbol) const;
 
   // Create and Destroy.

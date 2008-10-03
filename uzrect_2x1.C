@@ -32,6 +32,7 @@
 #include "assertion.h"
 #include "memutils.h"
 #include "librarian.h"
+#include "treelog.h"
 #include <sstream>
 
 struct UZRect2x1 : public UZRect

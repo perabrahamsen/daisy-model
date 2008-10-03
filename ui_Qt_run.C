@@ -31,6 +31,7 @@
 #include "alist.h"
 #include "assertion.h"
 #include "path.h"
+#include "treelog.h"
 #include <sstream>
 
 #include <QtGui/QMenuBar>
@@ -181,7 +182,7 @@ UIRun::attach (Toplevel& toplevel)
   font.setBold (true);
   qt_name->setFont (font);
   if (alist.check ("type"))
-    qt_name->setText (alist.name ("type").c_str ());
+    qt_name->setText (alist.name ("type").name ().c_str ());
   else
     qt_name->setText ("No program");
   top_layout->addWidget (qt_name /* , Qt::AlignLeft */);
@@ -235,7 +236,7 @@ UIRun::attach (Toplevel& toplevel)
   qt_description->setToolTip ("The description of the selected program.");
   if (alist.check ("description")
       && alist.name ("description") != Toplevel::default_description)
-    qt_description->setText (alist.name ("description").c_str ());
+    qt_description->setText (alist.name ("description").name ().c_str ());
   else
     qt_description->hide (); // setText ("No description.");
   layout->addWidget (qt_description /* , Qt::AlignLeft */);
@@ -377,7 +378,7 @@ UIRun::reset ()
 
   // The program name.
   if (alist.check ("type"))
-    qt_name->setText (alist.name ("type").c_str ());
+    qt_name->setText (alist.name ("type").name ().c_str ());
   else
     qt_name->setText ("No program");
 
@@ -390,7 +391,7 @@ UIRun::reset ()
       break;
     case 1:
       qt_file->setToolTip ("This is the name of the loaded setup file.");
-      qt_file->setText (Path::nodir (files[0]).c_str ());
+      qt_file->setText (Path::nodir (files[0]).name ().c_str ());
       break;
     default:
       qt_file->setToolTip ("Multiple setup files have been loaded.");
@@ -400,14 +401,14 @@ UIRun::reset ()
   // The program description.
   if (alist.check ("description")
       && alist.name ("description") != Toplevel::default_description)
-    qt_description->setText (alist.name ("description").c_str ());
+    qt_description->setText (alist.name ("description").name ().c_str ());
   else
     qt_description->setText ("No setup file has been loaded.\n\
 You can drag a setup file to the Daisy icon to run a simulation.");
 
   // The title.
   if (files.size () == 1)
-    qt_main.set_file_name (Path::nodir (files[0]).c_str ());
+    qt_main.set_file_name (Path::nodir (files[0]).name ().c_str ());
   else
     qt_main.set_file_name ("");
   qt_main.set_title ();

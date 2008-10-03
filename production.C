@@ -31,6 +31,7 @@
 #include "time.h"
 #include "plf.h"
 #include "submodel.h"
+#include "treelog.h"
 #include <sstream>
 #include "mathlib.h"
 

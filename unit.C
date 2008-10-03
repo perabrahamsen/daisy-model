@@ -88,7 +88,7 @@ Unit::create_convertion (const Unit&) const
 { return NULL; }
 
 Unit::Unit (Block& al, const symbol base)
-  : name (al.identifier ("type")),
+  : name (al.name ("type")),
     base_name_ (base)
 { }
 
@@ -637,7 +637,7 @@ struct UnitBase : public Unit
   { return true; }
 
   UnitBase (Block& al)
-    : Unit (al, al.identifier ("type"))
+    : Unit (al, al.name ("type"))
   { }
 };
 
@@ -696,7 +696,7 @@ struct UnitFactor : public Unit
   { return true; }
 
   UnitFactor (Block& al)
-    : Unit (al, al.identifier ("base")),
+    : Unit (al, al.name ("base")),
       factor (al.number ("factor"))
   { }
 };
@@ -763,7 +763,7 @@ struct UnitOffset : public Unit
   { return true; }
 
   UnitOffset (Block& al)
-    : Unit (al, al.identifier ("base")),
+    : Unit (al, al.name ("base")),
       factor (al.number ("factor")),
       offset (al.number ("offset"))
   { }

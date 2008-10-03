@@ -35,7 +35,7 @@ Mactrans::library_id () const
 }
 
 Mactrans::Mactrans (Block& al)
-  : name (al.identifier ("type"))
+  : name (al.name ("type"))
 { }
 
 Mactrans::Mactrans (const symbol n)

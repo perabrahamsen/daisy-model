@@ -50,7 +50,7 @@ struct NumberLet : public Number
         syntax.order ("identifier", "expr");
       }
       Clause (Block& al)
-        : id (al.identifier ("identifier")),
+        : id (al.name ("identifier")),
           expr (Librarian::build_item<Number> (al, "expr"))
       { }
     }; 
