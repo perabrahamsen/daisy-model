@@ -321,12 +321,14 @@ Syntax::Implementation::entries (std::vector<symbol>& result) const
 
 // Each syntax entry should have an associated type.
 
-const std::string&
+symbol
 Syntax::type_name (type t)
 {
-  static const std::string names[] = 
+  static const symbol names[] = 
     { "Number", "AList", "PLF", "Boolean", "String",
       "Integer", "Object", "Library", "Error" };
+  daisy_assert (t >= 0);
+  daisy_assert (t < sizeof (names) / sizeof (symbol));
   return names[t];
 }
 
@@ -337,7 +339,7 @@ Syntax::type operator++ (Syntax::type& t)
 }
 
 Syntax::type
-Syntax::type_number (const std::string& name)
+Syntax::type_number (const symbol name)
 { 
   for (type i = Number; i != Error; ++i)
     if (name == type_name (i))
@@ -373,19 +375,30 @@ Syntax::User ()
   return unit; 
 }
 
-static const std::string category_names[] = 
-{ "Const", "State", "OptionalState", "OptionalConst", "LogOnly"};
+symbol 
+Syntax::category_name (category c)
+{ 
+  static const symbol names[] = 
+    { "Const", "State", "OptionalState", "OptionalConst", "LogOnly"};
 
-const std::string& Syntax::category_name (category c)
-{ return category_names[c]; }
+  daisy_assert (c >= 0);
+  daisy_assert (c < sizeof (names) / sizeof (symbol));
+  return names[c]; 
+}
 
 int
-Syntax::category_number (const std::string& name)
+Syntax::category_number (const symbol name)
 { 
-  for (int i = 0; category_names[i] != "LogOnly"; i++)
-    if (name == category_names[i])
-      return i;
-  return -1;
+  static const symbol category_end ("LogOnly");
+
+  for (int i = 0;; i++)
+    {
+      const symbol entry = category_name (category (i));
+      if (name == entry)
+        return i;
+      else if (entry == category_end)
+        return -1;
+    }
 }
 
 bool

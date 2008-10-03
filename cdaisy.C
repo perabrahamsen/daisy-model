@@ -109,7 +109,7 @@ daisy_category_number (const char* name)
 
 extern "C" const char* EXPORT
 daisy_category_name (Syntax::category number)
-{ return Syntax::category_name (number).c_str (); }
+{ return Syntax::category_name (number).name ().c_str (); }
 
 extern "C" int EXPORT
 daisy_size_sequence ()
@@ -125,7 +125,7 @@ daisy_type_number (const char* name)
 
 extern "C" const char* EXPORT
 daisy_type_name (Syntax::type number)
-{ return Syntax::type_name (number).c_str (); }
+{ return Syntax::type_name (number).name ().c_str (); }
 
 // @ The daisy_alist Type.
 

@@ -26,7 +26,6 @@
 #include "treelog.h"
 #include "symbol.h"
 #include <vector>
-#include <string>
 
 class AttributeList;
 class Library;
@@ -69,8 +68,8 @@ public:
   enum type 
   { Number, AList, PLF, Boolean, String,
     Integer, Object, Library, Error };
-  static const std::string& type_name (type);
-  static type type_number (const std::string& name);
+  static symbol type_name (type);
+  static type type_number (symbol name);
     
   // The requirements with regard to input and output varies with each
   // syntax entry.
@@ -94,8 +93,8 @@ public:
     // and not a part of the simulation state. 
     LogOnly
   };
-  static const std::string& category_name (category);
-  static int category_number (const std::string& name);
+  static symbol category_name (category);
+  static int category_number (symbol name);
 
   // This function will check that an alist conform to the syntax.
   bool check (const Metalib&, const AttributeList&, Treelog& err) const;
