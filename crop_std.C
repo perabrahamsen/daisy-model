@@ -302,6 +302,9 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
 {
   TREELOG_MODEL (msg);
 
+  // No production yet.
+  production.PotCanopyAss = 0.0;
+
   // Check age.
   const double DS = development->DS;
   if (DS <= 0.0 || development->mature ())

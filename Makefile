@@ -572,7 +572,7 @@ EXECUTABLES = daisy${EXE} tkdaisy${EXE} cdaisy${EXE} gdaisy${EXE}
 
 # Select files to be removed by the next svn update.
 #
-REMOVE = uzrect_r3.C colloids_MACRO.C colloids.C colloids.h
+REMOVE = colloids_MACRO.C colloids.C colloids.h
 
 REMOVED = msoltranrect_2x1.C msoltranrect_forward.C\
 	select_soil.C adsorption_none.C adsorption_full.C ABAprod_expr.C \
