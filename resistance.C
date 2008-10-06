@@ -28,6 +28,7 @@
 #include "treelog.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include <sstream>
 
 //----------------------------------------------------
 // Boundary layer conductance
@@ -256,9 +257,12 @@ Resistance::r_a (const double z /* reference height above canopy [m]*/,
   const double A = 1.0 + N; //[]
   const double B = log((z - d)/z_0h) + 2. * N * log((z - d)/z_0); 
   const double C = N * sqr(log ((z - d)/z_0));
-
-  double S = (B - sqrt(sqr (B) - 4. * A * C))/(2. * A);
-  if(S < -5.0) S = -5.0; 
+  const double D = sqr (B) - 4. * A * C;
+  double S; 
+  if (D < 0.0 || std::fabs (A) < 1e-4)
+    S = -5.0;
+  else 
+    S = std::max ((B - sqrt(D))/(2. * A), -5.0);
 
   double r_a;
   if (N <= 0.0)
@@ -266,6 +270,13 @@ Resistance::r_a (const double z /* reference height above canopy [m]*/,
   else
     r_a = (log((z - d)/z_0) * log((z - d)/z_0h))
       / (sqr(k) * U_z * pow(1. + N, 3./4.));
+
+  std::ostringstream tmp;
+  tmp << "z_0 = " << z_0 << ", z = " << z << ", z0_h " << z_0h << ", d = " << d 
+      << ", N = " << N << ", U_z = " << U_z << ", S = " << S 
+      << ", r_a = " << r_a;
+  Assertion::message (tmp.str ());
+
   return r_a; // [s m^-1]
 }
 
@@ -309,12 +320,10 @@ Resistance::U_c (const double z_r /* reference height above canopy [m]*/,
       daisy_assert (T_0 > T_a);
       daisy_assert (L_mo != 0.0);
 
-      const double y = 1. - 15. * pow((z_r - d)/L_mo,-0.25); // []
+      const double y = pow(1. - 16. * (z_r - d)/L_mo,-0.25); // []
       const double psi = log(sqr((1. + y)/ 2.) * (1. + sqr(y))/2.) 
         - 2./(tan(y)) + M_PI/2.;//[]
 
-      daisy_assert (psi > U_z * (log((h_veg - d)/z_0)/(log((z_r - d)/z_0))));
-      
       if (L_mo >= 0.0)
         U_c = U_z * (log((h_veg - d)/z_0)
                      /(log((z_r - d)/z_0) + 4.7 * (z_r - d)/L_mo));

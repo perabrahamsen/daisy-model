@@ -1033,11 +1033,10 @@ BioclimateStandard::WaterDistribution (const Units& units,
   // Our initial guess for transpiration is based on remaining energy.
   double crop_ea_svat_old = crop_ea_soil;
   
-  std::ostringstream tmp;
-  tmp << "Svat: " << svat->name;
   const int max_svat_iterations = 100;
   const double max_svat_absolute_difference = 0.01; // [mm/h]
   int iteration;
+
   for (iteration = 0; iteration < max_svat_iterations; iteration++)
     {
       // Find stomata conductance based on ABA and crown potential
@@ -1045,11 +1044,15 @@ BioclimateStandard::WaterDistribution (const Units& units,
       vegetation.find_stomata_conductance (units, time, *this, dt, msg);
       const double gs = vegetation.stomata_conductance ();
 
+      if (LAI () < 1.0)
+        goto success;
+
       // Find expected transpiration from stomate conductance.
       svat->solve (gs, msg);
       
       const double crop_ea_svat = svat->transpiration ();
 
+      std::ostringstream tmp;
       tmp << "\n" << iteration << ": new = " << crop_ea_svat
           << ", old = " << crop_ea_svat_old
           << ", crop = " << crop_ea_
@@ -1073,8 +1076,10 @@ BioclimateStandard::WaterDistribution (const Units& units,
   msg.error ("SVAT transpiration and stomata conductance"
              " loop did not converge");
  success:;
+#if 0
   if (iteration > 0)
     msg.message (tmp.str ());
+#endif
 
   // Stress calculated by the SVAT model.
   production_stress = svat->production_stress ();

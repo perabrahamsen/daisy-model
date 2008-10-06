@@ -634,7 +634,7 @@ struct ConditionEnd : public Condition
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ConditionEnd (Block& al, const symbol& tstep, entry_type e)
+  ConditionEnd (Block& al, const symbol tstep, entry_type e)
     : Condition (al),
       timestep_name (tstep),
       entry (e)

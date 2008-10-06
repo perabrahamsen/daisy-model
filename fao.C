@@ -29,6 +29,7 @@
 #include "treelog.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include <sstream>
 
 double 
 FAO::CanopyResistance (const double LAI, const double rs_min)
@@ -212,13 +213,23 @@ double
 FAO::RefPenmanMonteith (double Rn, double G, double Temp, double ea,
 			double U2, double AtmPressure)
 {
-  double E3 = 0.03525 * SlopeVapourPressureCurve (Temp) * (Rn - G) +
-    PsychrometricConstant (AtmPressure, Temp)
-    * 0.9 / (Temp + 273) * U2 *
-    (SaturationVapourPressure (Temp) - ea);
-  E3 /= SlopeVapourPressureCurve (Temp) +
-    PsychrometricConstant (AtmPressure, Temp) * (1 + 0.34 * U2);
-  return E3 / 86400.0; // [kg/m2/s]
+  const double s = SlopeVapourPressureCurve (Temp);
+  const double gamma = PsychrometricConstant (AtmPressure, Temp);
+  const double e_sat = SaturationVapourPressure (Temp);
+  double E3 = 0.03525 * s * (Rn - G) +
+    gamma * 0.9 / (Temp + 273) * U2 *
+    (e_sat - ea);
+  E3 /= s + gamma * (1 + 0.34 * U2);
+  const double value = E3 / 86400.0; // [kg/m2/s]
+#if 0
+  std::ostringstream tmp;
+  tmp << "Rn = " << Rn << ", G = " << G << ", Temp = " << Temp
+      << ", ea = " << ea << ", U2 = " << U2 << ", AtmPressure = " << AtmPressure
+      << ", s  = " << s << ", gamma = " << gamma << ", e_sat = " << e_sat
+      << ", value = " << value;
+  Assertion::message (tmp.str ());
+#endif
+  return value;
 }
 
 double

@@ -57,11 +57,11 @@ private:
 
   // Use.
 public:
-  bool operator== (const symbol& other) const
+  bool operator== (const symbol other) const
   { return id == other.id; }
-  bool operator!= (const symbol& other) const
+  bool operator!= (const symbol other) const
   { return id != other.id; }
-  bool operator< (const symbol& other) const
+  bool operator< (const symbol other) const
   { return id < other.id; }
   const std::string& name () const EXPORT;
 
@@ -80,7 +80,7 @@ public:
   symbol (const symbol& other)
     : id (other.id)
   { }
-  void operator= (const symbol& other)
+  void operator= (const symbol other)
   { id = other.id; }
   ~symbol ()
   { }

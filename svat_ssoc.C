@@ -265,6 +265,12 @@ SVAT_SSOC::tick (const Weather& weather, const Vegetation& vegetation,
         }
     }
   else initialized_canopy = false;
+
+#if 1 // PACHANGES
+  T_c = T_a; //[K]
+  T_sun = T_shadow = T_0 = T_c;
+  e_c = e_a;
+#endif
 }
 
 void 
@@ -278,8 +284,8 @@ SVAT_SSOC::calculate_conductances (const double g_s /* stomata cond. [m/s]*/, Tr
   const double d = Resistance::d (h_veg, c_drag, LAI);
   // Atmospheric stability indicator (F4)
   if (U_z <= 0.0) U_z = 0.1;
-  //  const double N = Resistance::N (z_r, d, T_0 - TK, T_a - TK, U_z);
-  const double N = Resistance::N (z_r, d, T_c - TK, T_a - TK, U_z);
+  const double N = Resistance::N (z_r, d, T_0 - TK, T_a - TK, U_z);
+  // const double N = Resistance::N (z_r, d, T_c - TK, T_a - TK, U_z);
   // Roughness lenght for momentum transport (F2)
   const double z_0 = Resistance::z_0 (h_veg, c_drag, d, LAI);
   // Roughness lenght for sensible heat transfer (F1)
@@ -490,6 +496,21 @@ SVAT_SSOC:: calculate_temperatures(Treelog& msg)
                                    /(G_R_shadow + G_H_shadow_c * (1. - a_can_shadow)
                                      + G_W_shadow_c * (s - b_can_shadow)));//[]
 
+
+#if 0
+      enum { iT_s, iT_sun, iT_shadow, iT_c, ie_c };
+
+      Solver::Matrix A (5); 
+      Solver::Vector b (5);
+      Solver::Vector x (5);
+
+      b (iT_s) = - a_soil;
+      A (iT_s, iT_c) = a_soil_c;
+      solver->solve (A, b, x);
+#endif
+        
+
+
       // -------------------------------------------
       // Temperature of sunlit leaves 
       // -------------------------------------------
@@ -684,10 +705,12 @@ SVAT_SSOC:: calculate_temperatures(Treelog& msg)
     }
 
   else // bare soil
-    T_s =((R_eq_abs_soil + G_R_soil * (T_a) + G_H_a * (T_a) 
-           + k_h / z0 * (T_z0) - (lambda * E_soil))
-          / (G_R_soil + G_H_a +  k_h / z0));  //[K]
-
+    {
+      T_s =((R_eq_abs_soil + G_R_soil * (T_a) + G_H_a * (T_a) 
+             + k_h / z0 * (T_z0) - (lambda * E_soil))
+            / (G_R_soil + G_H_a +  k_h / z0));  //[K]
+      T_c = T_s;
+    }
 } 
 
 void
@@ -799,9 +822,9 @@ SVAT_SSOC::solve(const double gs /* stomata cond. [m/s]*/, Treelog& msg )
   msg.error("Too many iterations.");
  success:
   
-  tmp << "T_a  = "<< T_a << ", T_s = " << T_s << "\n"
-      << "T_sun = " << T_sun << ", T_shadow = " << T_shadow << "\n"
-      << "T_c  = "<< T_c << ", e_c = " << e_c << "\n";
+  tmp << "T_a  = "<< T_a << ", T_s = " << T_s << ", T_z0 = " << T_z0
+      << ", T_sun = " << T_sun << ", T_shadow = " << T_shadow 
+      << ", T_c  = "<< T_c << ", e_c = " << e_c;
   
   msg.message (tmp.str ());
   

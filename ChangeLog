@@ -1,3 +1,7 @@
+2008-10-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* all: Use 'symbol' even more places.
+
 2008-10-01  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* svat_pmsw.C: Removed dead code.

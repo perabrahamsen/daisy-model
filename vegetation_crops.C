@@ -841,7 +841,7 @@ VegetationCrops::sow (Metalib& metalib, const AttributeList& al,
   if (!crop)
     {
       msg.error ("Sowing failed");
-      throw 8;
+      return;
     }
   const symbol name = crop->name;
   for (CropList::iterator i = crops.begin();

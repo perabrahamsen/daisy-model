@@ -41,7 +41,11 @@ namespace Resistance
   const double g = 9.82;         // Gravitational acceleration [m s^-2]
   const double ku = 0.5;         // Parameter that describes the vertical variation 
                                  // of wind speed within the canopy
+#if 1 // PACHANGE
+  const double z_0b = 0.006;    // Bare soil roughness height for momentum [m]
+#else
   const double z_0b = 0.0006;    // Bare soil roughness height for momentum [m]
+#endif
   const double k = 0.41;         // Von Karman's constant []
   const double h_soil = 0.05;    // Height above the soil surface where the effect
                                  // of soil roughness is minimal [m]

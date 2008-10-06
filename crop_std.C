@@ -747,6 +747,22 @@ CropStandard::output (Log& log) const
   output_submodule (nitrogen, "CrpN", log);
 }
 
+static std::auto_ptr<WSE> 
+find_WSE (Block& al, Photo& photo)
+{
+  if (al.check ("water_stress_effect"))
+    return std::auto_ptr<WSE> 
+      (Librarian::build_item<WSE> (al, "water_stress_effect"));
+  Treelog& msg = al.msg ();
+  if (photo.handle_water_stress ())
+    {
+      msg.debug ("Implicit water stress in photosynthesis module");
+      return WSE::create_none ();
+    }
+  msg.debug ("Water stress calculated from energy balance");
+  return WSE::create_full ();
+}
+
 CropStandard::CropStandard (Block& al)
   : Crop (al),
     initial_weight (al.number ("weight", -42.42e42)),
@@ -765,15 +781,19 @@ CropStandard::CropStandard (Block& al)
                    : Vernalization::no_vernalization ()),
     photo (Librarian::build_item<Photo> (al, "LeafPhot")),
     nitrogen (al.alist ("CrpN")),
-    water_stress_effect (al.check ("water_stress_effect")
-                         ? std::auto_ptr<WSE> (Librarian::build_item<WSE> 
-                                               (al, "water_stress_effect"))
-                         : (photo->handle_water_stress ()
-                            ? WSE::create_none ()
-                            : WSE::create_full ())),
+    water_stress_effect (find_WSE (al, *photo)),
     enable_N_stress (al.flag ("enable_N_stress", !photo->handle_N_stress ())),
     min_light_fraction (al.number ("min_light_fraction"))
-{ }
+{ 
+  if (!al.check ("enable_N_stress"))
+    {
+      Treelog& msg = al.msg ();
+      if (photo->handle_N_stress ())
+        msg.debug ("Nitrogen stress handled by photosynthesis module");
+      else
+        msg.debug ("Nitrogen stress handled by crop nitrogen module");
+    }
+}
 
 CropStandard::~CropStandard ()
 { }
