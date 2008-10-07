@@ -2315,6 +2315,18 @@ sum of all chemicals will be logged."
            (number (path column "${column}" Bioclimate "*" svat SSOC cover)
                    (spec svat SSOC cover)
                    (handle sum))
+          (number (path column "${column}" Bioclimate "*" svat SSOC G_W_sun_c)
+                   (spec svat SSOC G_W_sun_c)
+                   (handle sum))
+          (number (path column "${column}" Bioclimate "*" svat SSOC rho_a)
+                   (spec svat SSOC rho_a)
+                   (handle sum))
+          (number (path column "${column}" Bioclimate "*" svat SSOC gamma)
+                   (spec svat SSOC gamma)
+                   (handle sum))
+          (number (path column "${column}" Bioclimate "*" svat SSOC lambda)
+                  (spec svat SSOC lambda)
+                  (handle sum))
            ))
 
 (deflog "Groundwater" column

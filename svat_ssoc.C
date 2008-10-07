@@ -661,7 +661,7 @@ SVAT_SSOC:: calculate_temperatures(Treelog& msg)
 #endif // !PA_EQUATIONS
     }
 
-  if (has_LAI && !has_light) // canopy and soil during night time
+  else if (has_LAI && !has_light) // canopy and soil during night time
     {
       // Radiation "conductivity"
       G_R_leaf = 4. * epsilon * sigma * pow(T_a, 3.) * cover; //[W m^-2 K^-1]
@@ -826,6 +826,7 @@ SVAT_SSOC::solve(const double gs /* stomata cond. [m/s]*/, Treelog& msg )
         goto success;
     } 
   msg.error("Too many iterations.");
+  initialized_soil = has_LAI = false; // Prevent log.
   T_c = T_sun = T_shadow = T_s = T_a;
   calculate_conductances(gs, msg);
  success:
@@ -838,6 +839,9 @@ SVAT_SSOC::output(Log& log) const
 {
   if (initialized_soil)
     {
+      output_variable (gamma, log);
+      output_variable (lambda, log);
+      output_variable (rho_a, log);
       output_variable (T_s, log);
       output_variable (T_0, log);
       output_variable (g_a, log);  
@@ -856,6 +860,7 @@ SVAT_SSOC::output(Log& log) const
       output_variable (g_H_s_c, log); 
       output_variable (g_H_sun_c, log);  
       output_variable (g_W_sun_c, log);
+      output_variable (G_W_sun_c, log);
       output_variable (g_H_shadow_c, log);
       output_variable (g_W_shadow_c, log);      
       output_variable (R_abs_sun, log);
@@ -894,6 +899,9 @@ False for amphistomatous leaves (possesing stomata on both surfaces).");
   alist.add ("hypostomatous", true);
   
   // For log.
+  syntax.add ("lambda", "J kg^-1", Syntax::LogOnly, "Latent heat of vaporization in atmosphere.");
+  syntax.add ("rho_a", "kg m^-3", Syntax::LogOnly, "Air density.");
+  syntax.add ("gamma", "Pa K^-1", Syntax::LogOnly, "Psychrometric constant.");
   syntax.add ("T_s", "K", Syntax::LogOnly, "Soil surface temperature.");
   syntax.add ("T_0", "K", Syntax::LogOnly, "Surface temperature (large scale).");
   syntax.add ("T_c", "K", Syntax::LogOnly, "Canopy-point temperature.");
@@ -908,6 +916,8 @@ to reference height (screen height).");
               "Heat conductance from sunlit leaves to canopy point.");
   syntax.add ("g_W_sun_c", "m s^-1", Syntax::LogOnly, 
               "Water conductance from sunlit leaves to canopy point.");
+  syntax.add ("G_W_sun_c", "W m^-2 K^-1", Syntax::LogOnly, 
+              "Scaled water conductance from sunlit leaves to canopy point.");
   syntax.add ("g_H_shadow_c", "m s^-1", Syntax::LogOnly,
               "Heat conductance from shadow leaves to canopy point.");
   syntax.add ("g_W_shadow_c", "m s^-1", Syntax::LogOnly,
