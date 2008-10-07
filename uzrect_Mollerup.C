@@ -547,7 +547,8 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
   // 0 = Old - New - S * dt + q_in * dt - q_out * dt + Error
   Theta_error -= Theta;         // Old - New
   Theta_error -= S * dt;
-  Theta_error -= S_macro * dt;
+  for (size_t c = 0; c < cell_size; c++)
+    Theta_error (c) -= (S_matrix_sum[c] + S_drain_sum[c]) * dt;
   
   for (size_t edge = 0; edge != edge_size; ++edge) 
     {
