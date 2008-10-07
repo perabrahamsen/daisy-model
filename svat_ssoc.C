@@ -19,6 +19,8 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#define PA_EQUATIONS
+
 #define BUILD_DLL
 
 #include "svat.h"
@@ -39,10 +41,17 @@
 #include "treelog.h"
 #include "mathlib.h"
 #include "librarian.h"
+#ifdef PA_EQUATIONS
+#include "solver.h"
+#include <memory>
+#endif // PA_EQUATIONS
 #include <sstream>
 
 struct SVAT_SSOC : public SVAT
 {
+#ifdef PA_EQUATIONS
+  const std::auto_ptr<Solver> solver;
+#endif // PA_EQUATIONS
   // Constants.
   static const double epsilon; // Emmision of Longwave rad == SurEmiss [] 
   static const double sigma;   // Stefan Boltzman constant [W m^-2 K^-4]
@@ -446,6 +455,126 @@ SVAT_SSOC:: calculate_temperatures(Treelog& msg)
       G_W_sun_c =  c_p * rho_a * g_W_sun_c / gamma;// * cover *  sun_LAI_fraction_total;  //[m s^-1] 
       G_W_shadow_c =  c_p * rho_a * g_W_shadow_c / gamma;// * cover *  (1.-sun_LAI_fraction_total);  //[m s^-1] 
     
+#ifdef PA_EQUATIONS
+      // We have an equation system with five unknowns, and five equations.
+
+      // We assign a number and an equation to each unknown.
+      enum { iT_s, iT_c, ie_c, iT_sun, iT_shadow, isize };
+
+      // A x = b
+      Solver::Matrix A (isize); 
+      Solver::Vector b (isize);
+      Solver::Vector x (isize);
+
+      // 1. The soil equation.
+      // 
+      // R_eq_abs_soil - G_R_soil * (T_s - T_a)
+      // = (k_h / z0) * (T_s - T_z0) + G_H_s_c * (T_s - T_c) + lambda * E_soil
+      // 
+      // <=>
+      //
+      // R_eq_abs_soil + G_R_soil * T_a + (k_h / z0) * T_z0 - lambda * E_soil
+      // = (G_R_soil + (k_h / z0) + G_H_s_c) * T_s
+      // - G_H_s_c * T_c
+
+      b (iT_s) = R_eq_abs_soil + G_R_soil * T_a 
+               + (k_h / z0) * T_z0 - lambda * E_soil;
+      A (iT_s, iT_s) = G_R_soil + (k_h / z0) + G_H_s_c;
+      A (iT_s, iT_c) = - G_H_s_c;
+        
+      // 2. The canopy equation.
+      // 
+      // H_atm = H_soil + H_sun + H_shadow 
+      // 
+      // <=>
+      //
+      // G_H_a * (T_c - T_a) 
+      // = G_H_s_c * (T_s - T_c) + G_H_sun_c * (T_sun - T_c)
+      // + G_H_shadow_c * (T_shadow - T_c)
+      //
+      // - G_H_a * T_a
+      // = - (G_H_a + G_H_s_c + G_H_sun_c + G_H_shadow_c) * T_c 
+      // + G_H_s_c * T_s + G_H_sun_c * T_sun + G_H_shadow_c * T_shadow
+      
+      b (iT_c) = - G_H_a * T_a;
+      A (iT_c, iT_s) = G_H_s_c;
+      A (iT_c, iT_c) = - (G_H_a + G_H_s_c + G_H_sun_c + G_H_shadow_c);
+      A (iT_c, iT_sun) = G_H_sun_c;
+      A (iT_c, iT_shadow) = G_H_shadow_c;
+
+      // 3. The vapour pressure equation.
+      // 
+      // LE_atm  = LE_soil + LE_sun + LE_shadow
+      // 
+      // <=>
+      //
+      // G_W_a * (e_c - e_a) 
+      // = lambda * E_soil 
+      // + G_W_sun_c * (s * (T_sun - T_a) + (e_sat_air - e_c))
+      // + G_W_shadow_c * (s * (T_shadow - T_a) + (e_sat_air - e_c))
+      //
+      // <=>
+      //
+      // (G_W_sun_c + G_W_shadow_c) * (s * T_a - e_sat_air)
+      // - G_W_a * e_a - lambda * E_soil 
+      // = G_W_sun_c * s * T_sun + G_W_shadow_c * s * T_shadow
+      // - (G_W_a + G_W_sun_c + G_W_shadow_c) * e_c
+      
+      b (ie_c) = (G_W_sun_c + G_W_shadow_c) * (s * T_a - e_sat_air)
+        - G_W_a * e_a - lambda * E_soil;
+      A (ie_c, ie_c) = - (G_W_a + G_W_sun_c + G_W_shadow_c);
+      A (ie_c, iT_sun) = G_W_sun_c * s;
+      A (ie_c, iT_shadow) = G_W_shadow_c * s;
+
+      // 4. The sunlit leaves equation.
+      // 
+      // R_abs_sun = H_sun_c + lambda * E_sun_c
+      // 
+      // R_eq_abs_sun - G_R_sun * (T_sun - T_a) 
+      // = G_H_sun_c * (T_sun - T_c) 
+      // + G_W_sun_c * (s * (T_sun - T_a) + (e_sat_air - e_c))
+      // 
+      // <=>
+      //
+      // R_eq_abs_sun + (G_R_sun + G_W_sun_c * s) * T_a - G_W_sun_c * e_sat_air
+      // = (G_R_sun + G_H_sun_c + G_W_sun_c * s) * T_sun 
+      // - G_H_sun_c * T_c - G_W_sun_c * e_c
+      
+      b (iT_sun) = R_eq_abs_sun + (G_R_sun + G_W_sun_c * s) * T_a 
+                 - G_W_sun_c * e_sat_air;
+      A (iT_sun, iT_c) = - G_H_sun_c;
+      A (iT_sun, ie_c) = - G_W_sun_c;
+      A (iT_sun, iT_sun) = (G_R_sun + G_H_sun_c + G_W_sun_c * s);
+
+      // 5. The shadow leaves equation.
+      // 
+      // R_abs_shadow = H_shadow_c + lambda * E_shadow_c
+      // 
+      // R_eq_abs_shadow - G_R_shadow * (T_shadow - T_a) 
+      // = G_H_shadow_c * (T_shadow - T_c) 
+      // + G_W_shadow_c * (s * (T_shadow - T_a) + (e_sat_air - e_c))
+      // 
+      // <=>
+      //
+      // R_eq_abs_shadow + (G_R_shadow + G_W_shadow_c * s) * T_a - G_W_shadow_c * e_sat_air
+      // = (G_R_shadow + G_H_shadow_c + G_W_shadow_c * s) * T_shadow 
+      // - G_H_shadow_c * T_c - G_W_shadow_c * e_c
+      
+      b (iT_shadow) = R_eq_abs_shadow + (G_R_shadow + G_W_shadow_c * s) * T_a 
+                 - G_W_shadow_c * e_sat_air;
+      A (iT_shadow, iT_c) = - G_H_shadow_c;
+      A (iT_shadow, ie_c) = - G_W_shadow_c;
+      A (iT_shadow, iT_shadow) = (G_R_shadow + G_H_shadow_c + G_W_shadow_c * s);
+
+      // Solve and extract.
+      solver->solve (A, b, x);
+      T_s = x[iT_s];
+      T_c = x[iT_c];
+      T_sun = x[iT_sun];
+      T_shadow = x[iT_shadow];
+      e_c = x[ie_c];
+#else // !PA_EQUATIONS
+
       // inter-inter-intermediate variables
       const double a_soil = ((R_eq_abs_soil + G_R_soil * (T_a - T_a)
                               + k_h/z0 * (T_z0 - T_a) - lambda * E_soil) 
@@ -499,20 +628,6 @@ SVAT_SSOC:: calculate_temperatures(Treelog& msg)
                                      + G_W_shadow_c * (s - b_can_shadow)));//[]
 
 
-#if 0
-      enum { iT_s, iT_sun, iT_shadow, iT_c, ie_c };
-
-      Solver::Matrix A (5); 
-      Solver::Vector b (5);
-      Solver::Vector x (5);
-
-      b (iT_s) = - a_soil;
-      A (iT_s, iT_c) = a_soil_c;
-      solver->solve (A, b, x);
-#endif
-        
-
-
       // -------------------------------------------
       // Temperature of sunlit leaves 
       // -------------------------------------------
@@ -543,6 +658,7 @@ SVAT_SSOC:: calculate_temperatures(Treelog& msg)
       // -------------------------------------------
       e_c = b_can + b_can_sun *(T_sun - T_a) 
         + b_can_shadow * (T_shadow - T_a) + e_a; //[Pa]
+#endif // !PA_EQUATIONS
     }
 
   if (has_LAI && !has_light) // canopy and soil during night time
@@ -766,6 +882,12 @@ SVAT_SSOC::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   SVAT::load_syntax (syntax, alist);
 
+#ifdef PA_EQUATIONS
+  syntax.add_object ("solver", Solver::component, 
+		     Syntax::Const, Syntax::Singleton, "\
+Model used for solving the energy balance equation system.");
+  alist.add ("solver", Solver::default_model ());
+#endif // PA_EQUATIONS
   syntax.add ("hypostomatous", Syntax::Boolean, Syntax::Const,
               "True for hypostomatous leaves. \n\
 False for amphistomatous leaves (possesing stomata on both surfaces).");
@@ -834,6 +956,7 @@ to reference height (screen height).");
 
 SVAT_SSOC::SVAT_SSOC (Block& al)
   : SVAT (al), 
+    solver (Librarian::build_item<Solver> (al, "solver")),
     hypostomatous (al.flag ("hypostomatous")),
     T_a (-42.42e42),
     z_r (-42.42e42),
@@ -911,3 +1034,5 @@ static struct SVAT_SSOCSyntax
     Librarian::add_type (SVAT::component, "SSOC", alist, syntax, &make);
   }
 } SVAT_ssoc_syntax;
+
+// svat_ssoc.C ends here
