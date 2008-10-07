@@ -2307,12 +2307,13 @@ sum of all chemicals will be logged."
                    (handle sum))
            (number (path column "${column}" Bioclimate "*" svat SSOC LAI)
                    (spec svat SSOC LAI)
-                   ;;(dimension "${R_unit}")
                    (handle sum))
            (number (path column "${column}" Bioclimate "*" svat SSOC 
                          sun_LAI_fraction_total)
                    (spec svat SSOC sun_LAI_fraction_total)
-                   ;;(dimension "${R_unit}")
+                   (handle sum))
+           (number (path column "${column}" Bioclimate "*" svat SSOC cover)
+                   (spec svat SSOC cover)
                    (handle sum))
            ))
 

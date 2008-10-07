@@ -1044,8 +1044,10 @@ BioclimateStandard::WaterDistribution (const Units& units,
       vegetation.find_stomata_conductance (units, time, *this, dt, msg);
       const double gs = vegetation.stomata_conductance ();
 
+#if 0
       if (LAI () < 1.0)
         goto success;
+#endif
 
       // Find expected transpiration from stomate conductance.
       svat->solve (gs, msg);

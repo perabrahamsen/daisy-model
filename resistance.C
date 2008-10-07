@@ -250,10 +250,10 @@ Resistance::r_a (const double z /* reference height above canopy [m]*/,
                  const double U_z /* surface wind speed [m s^-1]*/)
 {
   daisy_assert (z_0 > 0.0);
- daisy_assert (z > d);
+  daisy_assert (z > d);
   daisy_assert (z_0h > 0.0);
   daisy_assert ((sqr (k) * U_z) > 0.0);
-
+  
   const double A = 1.0 + N; //[]
   const double B = log((z - d)/z_0h) + 2. * N * log((z - d)/z_0); 
   const double C = N * sqr(log ((z - d)/z_0));
@@ -271,11 +271,13 @@ Resistance::r_a (const double z /* reference height above canopy [m]*/,
     r_a = (log((z - d)/z_0) * log((z - d)/z_0h))
       / (sqr(k) * U_z * pow(1. + N, 3./4.));
 
+#if 0
   std::ostringstream tmp;
   tmp << "z_0 = " << z_0 << ", z = " << z << ", z0_h " << z_0h << ", d = " << d 
       << ", N = " << N << ", U_z = " << U_z << ", S = " << S 
       << ", r_a = " << r_a;
   Assertion::message (tmp.str ());
+#endif
 
   return r_a; // [s m^-1]
 }
@@ -331,9 +333,9 @@ Resistance::U_c (const double z_r /* reference height above canopy [m]*/,
         U_c = U_z * (log((h_veg - d)/z_0)
                      /(log((z_r - d)/z_0) - psi));
 
-      daisy_assert (U_c > 0.0);
+      //      daisy_assert (U_c > 0.0);
     }
-  daisy_assert (U_c > 0.0);
+  //  daisy_assert (U_c > 0.0);
 
   return U_c; // [m s^-1]
 }
