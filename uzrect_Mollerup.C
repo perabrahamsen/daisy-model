@@ -127,11 +127,18 @@ struct UZRectMollerup : public UZRect
 			     const int debug,
                              Treelog& msg, const double BIG_DT);
   static void drain (const GeometryRect& geo,
-		     const std::vector<size_t>& drain_cell,
-		     const ublas::vector<double>& h,
-		     Solver::Matrix& A,
-		     ublas::vector<double>& b, 
-		     const int debug, Treelog& msg);
+                     const std::vector<size_t>& drain_cell,
+                     const ublas::vector<double>& h,
+                     const ublas::vector<double>& Theta_previous,
+                     const ublas::vector<double>& Theta,
+                     const ublas::vector<double>& S_vol,
+                     const ublas::vector<double>& S_macro,
+                     const ublas::vector<double>& dq,
+                     const double& ddt,
+                     std::vector<bool>& drain_cell_on,
+                     Solver::Matrix& A,
+                     ublas::vector<double>& b, 
+                     const int debug, Treelog& msg);
   static void diffusion (const GeometryRect& geo,
 			 const ublas::vector<double>& Kedge,
 			 Solver::Matrix& diff);
@@ -188,7 +195,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
   std::vector<double> S_drain (cell_size, 0.0); // matrix-> macro -> drain flow 
   std::vector<double> S_drain_sum (cell_size, 0.0); // For large timestep
   std::vector<double> S_matrix (cell_size, 0.0);  // matrix -> macro 
-  std::vector<double> S_matrix_sum (cell_size, 0.0); // for large timestep
+  std::vector<double> S_matrix_sum (cell_size, 0.0); // for large timestep   
   ublas::vector<double> T (cell_size); // temperature 
   ublas::vector<double> K (cell_size); // hydraulic conductivity
   ublas::vector<double> Kold (cell_size); // old hydraulic conductivity
@@ -199,6 +206,9 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
   const std::vector<size_t>& edge_above = geo.cell_edges (Geometry::cell_above);
   const size_t edge_above_size = edge_above.size ();
   ublas::vector<double> remaining_water (edge_above_size);
+  std::vector<bool> drain_cell_on (drain_cell.size (),false); 
+
+
   for (size_t i = 0; i < edge_above_size; i++)
     {
       const size_t edge = edge_above[i];
@@ -357,6 +367,8 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 			 K, dq, Dm_mat, Dm_vec, Gm, B, msg);
 	  upperboundary (geo, soil, T, surface, state, remaining_water, h,
 			 K, dq, Dm_mat, Dm_vec, Gm, B, ddt, debug, msg, dt);
+          Darcy (geo, Kedge, h, dq); //for calculating drain fluxes 
+
 
 	  //Initialize water capacity  matrix
 	  ublas::banded_matrix<double> Cw (cell_size, cell_size, 0, 0);
@@ -404,7 +416,8 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 				      + prod (Qmat, Theta_previous-Theta));
 
 	  // Force active drains to zero h.
-	  drain (geo, drain_cell, h, A, b, debug, msg);
+          drain (geo, drain_cell, h, Theta_previous, Theta, S_vol, S_macro,
+                 dq, ddt, drain_cell_on, A, b, debug, msg);  
 
           try {
             solver->solve (A, b, h); // Solve Ah=b with regard to h.
@@ -417,7 +430,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
               break;
           }
 
-	  for (int c=0; c < cell_size; c++) // update Theta - not neccessary???
+	  for (int c=0; c < cell_size; c++) // update Theta 
 	    Theta (c) = soil.Theta (c, h (c), h_ice (c)); 
 
 	  if (debug > 1)
@@ -490,11 +503,10 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
               S_matrix_sum[c] += S_matrix[c] * ddt/dt;
             }
           
-          //---------new stuff mmo ------------------
+
           std::vector<double> h_std_new (cell_size);
           std::copy(h.begin (), h.end (), h_std_new.begin ());
           tertiary.update_active (h_std_new); 
-          //-----------------------------------------
 
 	  // Update remaining_water.
 	  for (size_t i = 0; i < edge_above.size (); i++)
@@ -914,11 +926,18 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
 
 void 
 UZRectMollerup::drain (const GeometryRect& geo,
-		       const std::vector<size_t>& drain_cell,
-		       const ublas::vector<double>& h,
-		       Solver::Matrix& A,
-		       ublas::vector<double>& b,
-		       const int debug, Treelog& msg)
+                       const std::vector<size_t>& drain_cell,
+                       const ublas::vector<double>& h,
+                       const ublas::vector<double>& Theta_previous,
+                       const ublas::vector<double>& Theta,
+                       const ublas::vector<double>& S_vol,
+                       const ublas::vector<double>& S_macro,
+                       const ublas::vector<double>& dq,
+                       const double& ddt,
+                       std::vector<bool>& drain_cell_on,
+                       Solver::Matrix& A,
+                       ublas::vector<double>& b,
+                       const int debug, Treelog& msg)
 {
   const size_t drain_size  = drain_cell.size (); // // number of drains   
     
@@ -927,7 +946,61 @@ UZRectMollerup::drain (const GeometryRect& geo,
   for (size_t d = 0; d < drain_size; d++)
     {
       const size_t cell = drain_cell[d];
+      
+      if (drain_cell_on[d])    //drain on
+        {
+          //Calculate fluxes to drain from last timestep 
+          
+          double drain_sink = Theta_previous (cell);
+          drain_sink -= Theta (cell);
+          drain_sink -= ddt * (S_vol (cell) + S_macro (cell))/
+            geo.cell_volume (cell);
+                    
+          const std::vector<size_t>& edges = geo.cell_edges (cell);
+          const size_t edge_size = edges.size ();
+          for (size_t i = 0; i < edge_size; i++)
+            {
+              const size_t edge = edges[i]; 
+              const double flux = dq (edge) * geo.edge_area (edge) * ddt;
+              const int from = geo.edge_from (edge);
+              const int to = geo.edge_to (edge);
+              
+              if (cell == from)
+                drain_sink  -= flux / geo.cell_volume (cell);
+              else if (cell == to)
+                drain_sink  += flux / geo.cell_volume (cell); 
+            }
+          if (drain_sink <= 0.0)
+            drain_cell_on[d] == false;
+        }
+      else   // drain off
+        if (h (cell) > 0.0)
+          drain_cell_on[d] = true;   
 
+          
+      if (drain_cell_on[d] == true)
+        {
+          const std::vector<size_t>& edges = geo.cell_edges (cell);
+          const size_t edge_size = edges.size ();
+          
+          // Force pressure to be zero.
+          for (size_t i = 0; i < edge_size; i++)
+            {
+              const size_t edge =  edges[i];
+              if (!geo.edge_is_internal (edge))
+                continue;
+              
+              const size_t other = geo.edge_other (edge, cell);
+              A (cell, other) = 0.0;
+            }
+          A (cell, cell) = 1.0;
+          b (cell) = 0.0;
+        }
+    }
+}
+
+
+#if 0
       // Guestimate pressure in cell from surrounding cells.
       const std::vector<size_t>& edges = geo.cell_edges (cell);
       const size_t edge_size = edges.size ();
@@ -974,6 +1047,12 @@ UZRectMollerup::drain (const GeometryRect& geo,
   if (tmp.str ().size () > 0)
     msg.message (tmp.str ());
 }
+#endif 
+//-------End, dr-----
+
+
+
+
 
 void 
 UZRectMollerup::diffusion (const GeometryRect& geo,
