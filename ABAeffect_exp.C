@@ -55,8 +55,8 @@ double
 ABAEffect_exp::ABA_effect (const double ABA_xylem /* [g/cm^3] */, Treelog&)
 {
   daisy_assert (ABA_xylem >= 0.0);
-  const double Mw = 264.32; //Molecular weight of ABA (Abscisic Acid)[g mol^-1]
-  const double ABA_xylem_ = ABA_xylem / Mw; // [g/cm^3]->[µmol/m^3]
+  //  const double Mw = 264.32; //Molecular weight of ABA (Abscisic Acid)[g mol^-1]
+  const double ABA_xylem_ = ABA_xylem; // [g/cm^3]
   const double ABAeffect = alpha * exp(-k * ABA_xylem_); //[]
   return ABAeffect;
 }
@@ -67,12 +67,12 @@ static struct ABAEffectexpSyntax
   { return *new ABAEffect_exp (al); }
   static void load_syntax (Syntax& syntax, AttributeList& alist)
   {
-    syntax.add ("k", "m^3/µmole", Check::non_negative (), Syntax::Const,
+    syntax.add ("k", "cm^3/g", Check::non_negative (), Syntax::Const,
                 "Coefficient");
-    alist.add ("k", 0.0062);
-    syntax.add ("alpha", Syntax::None (), Check::non_negative (), Syntax::Const,
-                "Coefficient, value from Fuilai et al., 2005");
-    alist.add ("alpha", 0.7368);
+    alist.add ("k", 0.0);
+    syntax.add ("alpha", Syntax::None(), Check::non_negative (), Syntax::Const,
+                "Coefficient");
+    alist.add ("alpha", 1.0);
   }  
   ABAEffectexpSyntax ()
   {
