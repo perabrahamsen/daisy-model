@@ -420,7 +420,7 @@ Summarize water content in the specified volume.");
     load_syntax (syntax, alist);
     alist.add ("description", "\
 Summarize water content in the specified interval.\n\
-This is similar to 'volume', except for the default values of\n\
+This is similar to 'water_volume', except for the default values of\n\
 'density_x' and 'density_y', and the unqiue 'from' and 'to' parameters.");
     alist.add ("density_z", false);
     alist.add ("density_x", true);

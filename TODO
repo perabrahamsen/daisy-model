@@ -2,6 +2,18 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * SSOC
 
+min sun angle par
+min radiation par
+
+ssoc max_iterations par
+ssoc max_diff_T par
+ssoc max_diff_e par
+
+bio max_iterations par
+bio max_diff par
+
+* SSOC BB fix?
+
 G_R_soil->sun
 G_R_sun->soil
 

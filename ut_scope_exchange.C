@@ -25,6 +25,6 @@ TEST (ScopeExchange, All)
   EXPECT_EQ (scope.dimension (x_symbol), x_dim);
   EXPECT_EQ (scope.get_description (x_symbol), x_desc);
   EXPECT_EQ (scope.has_number (symbol ("no such number")), false);
-  EXPECT_EQ (scope.has_identifier (symbol ("no such identifier")), false);
-  EXPECT_EQ (scope.has_identifier (x_symbol), false);
+  EXPECT_EQ (scope.has_name (symbol ("no such identifier")), false);
+  EXPECT_EQ (scope.has_name (x_symbol), false);
 }

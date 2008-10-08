@@ -146,6 +146,7 @@ struct BioclimateStandard : public Bioclimate
   static double albedo (const Vegetation& crops, const Surface& surface, 
                         const Geometry&, const Soil&, const SoilWater&);
   std::auto_ptr<Raddist> raddist;// Radiation distribution model.
+  const double min_sun_angle;    // Lowest sun angle for some models.
   void RadiationDistribution (const Vegetation&, double sin_beta, Treelog&);
   std::auto_ptr<Difrad> difrad;  // Diffuse radiation model.
   double difrad0;                // Diffuse radiation above canopy [W/m2]
@@ -517,6 +518,12 @@ what the SVAT module requires.");
               "Measured wind speed.");
 
   //Radiation
+  syntax.add ("min_sun_angle", "rad", Syntax::Const, "\
+Minimum sun angle above ground for some 'raddist' and 'svat' models.\n\
+\n\
+The 'DPF' raddist model will zero radiation if the angle is below this,\n\
+and the 'SSOC' svat model will revert to a one leaf description.");
+  alist.add ("min_sun_angle", 5.0 * M_PI / 180.0);
   syntax.add_object ("raddist", Raddist::component, 
                      "Radiation distribution model.");
   alist.add ("raddist", Raddist::default_model ());
@@ -649,6 +656,7 @@ BioclimateStandard::BioclimateStandard (Block& al)
     crop_ea_ (0.0),
     production_stress (-1.0),
     raddist (Librarian::build_item<Raddist> (al, "raddist")),
+    min_sun_angle (al.number ("min_sun_angle")),
     difrad (al.check ("difrad") 
          ? Librarian::build_item<Difrad> (al, "difrad")
          : NULL),

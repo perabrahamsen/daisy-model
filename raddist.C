@@ -89,3 +89,4 @@ Raddist::~Raddist ()
 static Librarian Raddist_init (Raddist::component, "\
 The 'raddist' component calculates the radiation distribution in the canopy.");
 
+// raddist.C ends here.

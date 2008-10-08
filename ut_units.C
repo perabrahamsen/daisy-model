@@ -5,8 +5,11 @@
 #include "metalib.h"
 #include "treelog.h"
 #include "assertion.h"
+#include "mathlib.h"
 
 #include <gtest/gtest.h>
+
+
 
 struct UnitsTest : public testing::Test
 {
@@ -54,3 +57,17 @@ TEST_F (UnitsTest, Kelvin2Fahrenheit)
   ASSERT_TRUE (units.can_convert ("K", "dg F"));
   EXPECT_NEAR (units.convert ("K", "dg F", 0.0), -459.67, 0.01);
 }
+
+TEST_F (UnitsTest, Radians2Degrees)
+{
+  EXPECT_TRUE (units.has_unit ("rad"));
+  EXPECT_TRUE (units.has_unit ("dg"));
+  ASSERT_TRUE (units.can_convert ("rad", "dg"));
+  EXPECT_NEAR (units.convert ("rad", "dg", 0.0), 0.0, 0.01);
+  EXPECT_NEAR (units.convert ("rad", "dg", M_PI), 180.0, 0.01);
+  EXPECT_NEAR (units.convert ("rad", "dg", -M_PI), -180.0, 0.01);
+  EXPECT_NEAR (units.convert ("dg", "rad", 0.0), 0.0, 0.01);
+  EXPECT_NEAR (units.convert ("dg", "rad", 180.0), M_PI, 0.0001);
+  EXPECT_NEAR (units.convert ("dg", "rad", -180.0), -M_PI, 0.0001);
+}
+

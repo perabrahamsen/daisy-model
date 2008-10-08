@@ -28,6 +28,7 @@
 #include "block.h"
 #include "mathlib.h"
 #include "convert.h"
+#include "units.h"
 #include <sstream>
 
 // Component 'unit'.
@@ -325,6 +326,8 @@ Factor to multiply with to get base unit.");
          "Per meter.");
     add ("cm^-1", 1.0 / p_c, name, syntax, alist, -1, 0, 0, 0, 0, 0, 0,
          "Per centimeter.");
+    add ("mm^-1", 1.0 / p_c, name, syntax, alist, -1, 0, 0, 0, 0, 0, 0,
+         "Per millimeter.");
 
     add ("m^-2", 1.0, name, syntax, alist, -2, 0, 0, 0, 0, 0, 0,
          "Per aquare meter.");
@@ -667,6 +670,12 @@ static struct UnitBaseSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "A base unit.");
     Librarian::add_type (Unit::component, name, alist, syntax, &make);
+
+    // Specials.
+    add (Syntax::Unknown (), name, syntax, alist, 
+         "Unknown unit.");
+    add (Units::error_symbol (), name, syntax, alist, 
+         "Bogus unit.");
 
     // Add geographical coordinates.
     add ("dgEast", name, syntax, alist, 

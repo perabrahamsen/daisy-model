@@ -1,3 +1,13 @@
+2008-10-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.51 released.
+
+2008-10-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* unit.C (UnitBaseSyntax): Added 'Syntax::Unknown ()' and
+	'Syntax::Error ()'.
+	(UnitSIFactorSyntax): Add [mm^-1].
+
 2008-10-03  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* all: Use 'symbol' even more places.
