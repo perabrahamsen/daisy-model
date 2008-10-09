@@ -244,9 +244,7 @@ SVAT_SSOC::tick (const Weather& weather, const Vegetation& vegetation,
   c_drag = 0.07;
 
   const double sin_beta = bio.sin_beta ();
-  const double min_dg = 10.0;
-  const double min_rad = min_dg * M_PI /180.0;
-  const double min_sin_beta = std::sin (min_rad);
+  const double min_sin_beta = bio.min_sin_beta ();
   has_light = (sin_beta > min_sin_beta);
   if (has_light)
     kb = 0.50 / sin_beta;
