@@ -707,7 +707,8 @@ ColumnStandard::check (bool require_weather,
       {
         Treelog::Open nest (msg, "Weather: " + weather->name);
 	if (!weather->check (from, to, msg))
-	  ok = false;
+          // The rest is uninitialized, don't check it!
+	  return false;
       }
 
     else if (require_weather)

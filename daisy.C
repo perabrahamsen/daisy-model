@@ -211,7 +211,7 @@ Daisy::check (Treelog& msg)
   {
     Treelog::Open nest (msg, "weather");
     if (weather.get () && !weather->check (time, stop, msg))
-      ok = false;
+      return false;
   }
 
   // Check field.
