@@ -741,7 +741,7 @@ GTESTLIB = -L$(GTESTHOME)/lib -lgtest -lgtest_main
 UTESTSRC = ut_units.C ut_scope_exchange.C
 UTESTOBJ = $(UTESTSRC:.C=${OBJ})
 
-utest.exe: $(UTESTOBJ) $(LIBOBJ)
+utest${EXE}: $(UTESTOBJ) $(LIBOBJ)
 	$(CC) -o $@ $^ $(GTESTLIB) $(CPPLIB) $(MATHLIB) $(CXSPARSELIB) 
 
 unittest:

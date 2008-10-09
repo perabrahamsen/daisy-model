@@ -27,19 +27,6 @@
   "The right side of the root zone."
   (left finite 15 [cm]))
 
-;; Volumes for logging TDR
-(defvolume "left-TDR" box
-  (top finite 0 [cm])
-  (bottom finite -60 [cm])
-  (left finite 0 [cm])
-  (right finite 5 [cm]))
-
-(defvolume "right-TDR" box
-  (top finite 0 [cm])
-  (bottom finite -60 [cm])
-  (left finite 25 [cm])
-  (right finite 30 [cm]))
-
 (defABAproduction "Fulai Liu uptake" uptake
   "ABA concentration in water uptake as function of water potential.
 Based on data collected by Fulai Liu, 2007."
@@ -108,21 +95,6 @@ Based on data collected by Fulai Liu, 2007."
 ;; Some additional log files.
 ;;----------------------------------------
 
-(deflog "TDR" crop
-  "Water content of each side of the root zone."
-  (when hourly)
-  (where "TDR.dlf")
-  (entries (volume (tag "left-tdr")
-                   (path column "${column}" SoilWater Theta)
-                   (spec fixed SoilWater Theta)
-                   (volume left-TDR)
-                   (density true))
-           (volume (tag "right-tdr")
-                   (path column "${column}" SoilWater Theta)
-                   (spec fixed SoilWater Theta)
-                   (volume right-TDR)
-                   (density true))))
-
 (deflog "Root zone water" crop
   "Water status of each side of the root zone."
   (when hourly)
@@ -160,8 +132,8 @@ Based on data collected by Fulai Liu, 2007."
                            (min_root_density 0.1 [cm/cm^3]))))
 
 ;; Base program.
-(defprogram Safir_2D Daisy 
-  "SAFIR setup 2D."
+(defprogram Safir Daisy 
+  "SAFIR common setup."
 
   ;; Let us know that the simulation is running.
   (print_time periodic)
@@ -175,7 +147,8 @@ Based on data collected by Fulai Liu, 2007."
            (when (crop_ds_after "SiteCrop" 0.0))
            (volume left-side)
            (where "prd_left.dlf"))
-          ("Root zone water" (crop "Potato; Exp") 
+          ("Root zone water" 
+           (crop "SiteCrop") 
            (when (crop_ds_after "SiteCrop" 0.0))
            (volume right-side)
            (where "prd_right.dlf"))
