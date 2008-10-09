@@ -8,6 +8,7 @@ SETUPS  = test-colloids.dai \
 	heat-properties.dai batch.dai sample.dai test.dai DrainDrying.dai 
 DATA = dk-foulum.dwf dk-jyndevad.dwf cz-valecov.dwf pl-jadwisin.dwf \
 	sk-bratislava.dwf it-bologna.dwf taastrup.dwf example.gwt it-cer.gwt
+SAFIR = safir-common.dai safir-site.dai
 TEXT	= Makefile README $(SETUPS) $(DATA) $(LIBS)
 REMOVE 	=  NOTHING
 

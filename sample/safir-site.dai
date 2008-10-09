@@ -1,0 +1,200 @@
+;; Description that will occur in all output files
+(description "Simulation demonstrating Partial Rootzone Drying in Daisy")
+
+;; Setting "working directory"
+;; If the working directory is set correctly the output files and the daisy.log-file
+;; will be found here:
+;;(directory "C:/Daisy-2D/output")
+
+;; Here Daisy can find the weather file, library files and daisy.exe:
+;;(path "C:/Daisy-2D/input" 
+;;      "C:/Programmer/Daisy/daisy-src/lib" 
+;;      "C:/Programmer/Daisy/daisy-src/sample")
+
+;; Geometry - The x-axes.
+;;
+;; We assume the drip poins are 30 cm apart. This means that the
+;; left dripper is at 0 [cm], the right dripper is 30 [cm], and the
+;; tuber at 15 [cm].  The drip line is placed 7 [cm] below soil
+;; surface. We inject the water in a box volume 2 [cm] above and below the
+;; drip point.
+
+(defvolume drip-depth box
+  "The depth of the drip point."
+  (top finite -5 [cm])
+  (bottom finite -9 [cm]))
+
+;; Including external settings- or library-files
+(input file "safir-common.dai")
+
+;;  Defining soil horizons of a silty clay
+(defhorizon A USDA3
+   (clay 28.9 [%])
+   (silt 42.7 [%])
+   (sand 28.4 [%])
+   (humus 4.4 [%])  
+   (dry_bulk_density 1.6 [g/cm^3]))
+
+(defhorizon B USDA3
+   (clay 29.2 [%])
+   (silt 39.1 [%])
+   (sand 31.7 [%])
+   (humus 0.1 [%])  
+   (dry_bulk_density 1.58 [g/cm^3]))
+
+(defhorizon C USDA3
+   (clay 21.2 [%])
+   (silt 41.96 [%])
+   (sand 36.84 [%])
+   (humus 0.1 [%]) 
+   (dry_bulk_density 1.53 [g/cm^3]))
+
+;;  Parameterisation of the column called "Silty clay"
+(defcolumn "Site" default
+  (SoilWater (max_exfiltration_gradient 15 [cm/cm]))
+  (Bioclimate original (svat SSOC (solver ublas))) ;; soil vegetation atmosphere transfer model SSOC
+  (Soil (MaxRootingDepth 200 [cm])
+        (horizons (  -30 [cm] "A")
+                  (  -60 [cm] "B")
+                  ( -110 [cm] "C")
+                  ( -400 [cm] "C"))) ;; No data below 110 cm 
+  (Movement rectangle
+            ;(Tertiary old)
+            ;; The soil is divided into a 2D rectangular grid.  
+            ;; The 'xplus' and 'zplus' specifies the horisontal and
+            ;; vertical grid lines, respectively:
+            (Geometry (xplus 3 6 9 12 15 18 21 24 27 30 [cm])
+                      (zplus -1.5 -3 -5 -7 -10 -15 -20 -25 -30 -35 -40 -45
+                             -50 -60 -70 -80 -90 -100 -120
+                             -140  -160  -180 -200 [cm])))
+  (OrganicMatter original (init (input 3000 [kg C/ha/y])))
+  (Groundwater deep)) ;; free drainage by gravitational forces
+
+
+;; If you make any changes to the crop, they should go here.
+(defcrop "SiteCrop" "Potato; Folva; SAFIR" 
+  "The crop paramterization used in my experiment.")
+
+;; Warmup period.
+(defaction Potato_management activity
+  (wait_mm_dd 10 18)  
+  (plowing)
+  (wait_mm_dd 4 18)
+  
+  (seed_bed_preparation)  
+  (wait_mm_dd 5 5)
+  (sow ("Potato") 
+       (seed 2765 [kg w.w./ha])
+       (plant_distance 0.30 [m]))
+  (wait_mm_dd 7 21)
+  ;;Fertigation
+  (fertilize (mineral    ;
+              (weight 89.68 [kg N/ha]) ;; wet veight of total N (sum of NO3 and NH4)
+              (NH4_fraction 0.5 [])))  ;; fraction of NH4 of total N  
+  
+  (wait_mm_dd 8 1)
+  (fertilize (mineral  
+              (weight 89.68 [kg N/ha])   
+              (NH4_fraction 0.5 [])))      
+  
+  (wait_mm_dd 8 18)
+  (fertilize (mineral 
+              (weight 89.68 [kg N/ha])   
+              (NH4_fraction 0.5 [])))    
+  (wait_mm_dd 9 25)
+  (harvest "Potato"))
+
+;; Warmup period (2005)
+(defaction warmup 
+  (Potato_management))
+  
+  
+(defaction irrigation_subsoil_full activity
+  (wait_mm_dd 7 21)  
+    (progn
+      (irrigate_subsoil 2.6 [mm/h] (volume left-drip) (hours 5)) 
+      (irrigate_subsoil 2.6 [mm/h] (volume right-drip) (hours 5)))
+    (wait_mm_dd 7 26)          
+    (progn
+      (irrigate_subsoil 2.6 [mm/h] (volume left-drip) (hours 5)) 
+    	(irrigate_subsoil 2.6 [mm/h] (volume right-drip) (hours 5)))
+    (wait_mm_dd 7 28) 
+    (progn
+      (irrigate_subsoil 2.75 [mm/h] (volume left-drip) (hours 5)) 
+      (irrigate_subsoil 2.75 [mm/h] (volume right-drip) (hours 5)))
+    (wait_mm_dd 8 1)          
+    (progn
+      	(irrigate_subsoil 2.6 [mm/h] (volume left-drip) (hours 5)) 
+    	(irrigate_subsoil 2.6 [mm/h] (volume right-drip) (hours 5)))
+    (wait_mm_dd 8 18) 
+    (progn
+      (irrigate_subsoil 2.6 [mm/h] (volume left-drip) (hours 5)) 
+      (irrigate_subsoil 2.6 [mm/h] (volume right-drip) (hours 5)))
+    )
+
+(defaction irrigation_subsoil_PRD_left activity
+  (wait_mm_dd 7 21)          
+  (irrigate_subsoil 3 [mm/h] (hours 6) (volume left-drip))
+  (wait_mm_dd 7 28)          
+  (irrigate_subsoil 3.5 [mm/h] (hours 2) (volume left-drip))
+  (wait_mm_dd 8 1)          
+  (irrigate_subsoil 2.7 [mm/h] (hours 4) (volume left-drip))
+  (wait_mm_dd 8 11)          
+  (irrigate_subsoil 2.7 [mm/h] (hours 4) (volume left-drip)))
+
+(defaction irrigation_subsoil_PRD_right activity
+  (wait_mm_dd 7 21)          
+  (irrigate_subsoil 3 [mm/h] (hours 6) (volume right-drip))
+  (wait_mm_dd 7 26)          
+  (irrigate_subsoil 3 [mm/h] (hours 6) (volume right-drip))
+  (wait_mm_dd 8 1)          
+  (irrigate_subsoil 2.7 [mm/h] (hours 4) (volume right-drip))
+  (wait_mm_dd 8 11)          
+  (irrigate_subsoil 2.7 [mm/h] (hours 4) (volume right-drip)))
+
+                           
+(defprogram plot-2006 Safir_2D
+  
+  ;; Weather data
+  (weather default "taastrup.dwf"
+           (missing_years ((2000 2010) (1980 1990))))
+  
+  ;;  Selecting column
+  (column "Site")
+  
+  ;; Start of simulation.
+  (time 2004 10 1)
+  
+  (stop 2006 9 30)
+  (activate_output (after 2005 10 1))
+  
+  ;; Additional output files
+  (output &old))
+
+(defprogram Potatoe-Subsoil-Full plot-2006
+  "Year 2006, subsoil full"
+  ;; Selecting management
+  (manager activity
+           warmup
+           (while (wait false)
+             Potato_management
+             irrigation_subsoil_full)))
+
+
+(defprogram Potatoe-Subsoil-PRD plot-2006 
+  "Year 2006, subsoil PRD "
+  ;; Selecting management
+  (manager activity
+           warmup
+           (while (wait false)
+             Potato_management
+             irrigation_subsoil_PRD_left         
+             irrigation_subsoil_PRD_right)))
+
+
+
+(run batch
+     (run (batch (run Potatoe-Subsoil-Full) (directory "/subsoil_Full"))
+          (batch (run Potatoe-Subsoil-PRD ) (directory "/subsoil_PRD"))
+          ))
+
