@@ -58,7 +58,8 @@ public:
                                              double row_position);
   static std::auto_ptr<Rootdens> create_uniform ();
 public:
-  virtual void initialize (const Geometry& geo, double row_width, 
+  virtual void initialize (const Geometry& geo, 
+                           double row_width, double row_position, 
                            Treelog& msg) = 0;
   static void load_base (Syntax&, AttributeList&);
 protected:

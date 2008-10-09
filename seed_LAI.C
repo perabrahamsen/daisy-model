@@ -26,6 +26,7 @@
 #include "librarian.h"
 #include "plf.h"
 #include "log.h"
+#include "treelog.h"
 #include <cmath>
 
 struct SeedLAI : public Seed
@@ -45,10 +46,16 @@ struct SeedLAI : public Seed
   { output_variable (InitCAI, log); }
   
   // Create and Destroy.
-  double initial_N (const double /* weight */) const
+  double initial_N () const
   { return -42.42e42; }
-  void initialize (const double /* weight */)
-  { }
+  void initialize (const double weight, Treelog& msg)
+  { 
+    if (weight >= 0.)
+      {
+        TREELOG_MODEL (msg);
+        msg.warning ("Seed amount is ignored by this model.");
+      }
+  }
   bool check (Treelog&) const
   { return true; }
   static void load_syntax (Syntax& syntax, AttributeList& alist);

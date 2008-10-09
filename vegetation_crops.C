@@ -201,6 +201,8 @@ struct VegetationCrops : public Vegetation
   void cleanup_canopy (symbol crop_name, Treelog&);
   void sow (Metalib&, const AttributeList& al, 
             const double row_width /* [cm] */,
+            const double row_pos /* [cm] */,
+            const double seed /* [kg w.w./ha] */,
             const Geometry&, OrganicMatter&, 
             double SoilLimit,
             double& seed_N /* kg/ha/h */, double& seed_C /* kg/ha/h */,
@@ -830,6 +832,8 @@ VegetationCrops::cleanup_canopy (const symbol crop_name, Treelog& msg)
 void
 VegetationCrops::sow (Metalib& metalib, const AttributeList& al,
                       const double row_width,
+                      const double row_pos,
+                      const double seed,
 		      const Geometry& geo,
 		      OrganicMatter& organic_matter, 
                       const double SoilLimit,
@@ -851,7 +855,7 @@ VegetationCrops::sow (Metalib& metalib, const AttributeList& al,
       msg.error ("There is already an " + name + " on the field.\n\
 If you want two " + name + " you should rename one of them");
   const Units& units = metalib.units ();
-  crop->initialize (units, geo, row_width, organic_matter,
+  crop->initialize (units, geo, row_width, row_pos, seed, organic_matter,
                     SoilLimit, time, msg);
   if (!crop->check (units, msg))
     {

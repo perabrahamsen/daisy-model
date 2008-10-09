@@ -55,7 +55,6 @@
 struct CropStandard : public Crop
 {
   // Content.
-  const double initial_weight;  // [g w.w./m^2]
   const std::auto_ptr<Seed> seed;
   const std::auto_ptr<RootSystem> root_system;
   CanopyStandard canopy;
@@ -181,10 +180,9 @@ struct CropStandard : public Crop
   { return root_system->Density; }
 
   // Create and Destroy.
-  void initialize (const Units&, 
-                   const Geometry& geometry, double row_width, OrganicMatter&, 
-                   double SoilLimit,
-                   const Time&, Treelog&);
+  void initialize (const Units&, const Geometry& geometry, 
+                   double row_width, double row_pos, double seed,
+                   OrganicMatter&, double SoilLimit, const Time&, Treelog&);
   void initialize (const Units&, const Geometry&, OrganicMatter&, 
                    double SoilLimit, const Time&, Treelog&);
   void initialize_shared (const Geometry&, OrganicMatter&, 
@@ -224,13 +222,16 @@ CropStandard::SOrg_DM () const
 { return production.WSOrg * 10.0 /* [g/m^2 -> kg/ha] */;}
 
 void
-CropStandard::initialize (const Units& units,
-                          const Geometry& geo, const double row_width,
+CropStandard::initialize (const Units& units, const Geometry& geo, 
+                          const double row_width, const double row_pos, 
+                          const double seed_w,
                           OrganicMatter& organic_matter,
                           const double SoilLimit,
                           const Time& now, Treelog& msg)
 {
-  root_system->initialize (units, geo, row_width, msg);
+  TREELOG_MODEL (msg);
+  root_system->initialize (units, geo, row_width, row_pos, msg);
+  seed->initialize (seed_w, msg);
   initialize_shared (geo, organic_matter, SoilLimit, now, msg);
 }
 
@@ -240,7 +241,9 @@ CropStandard::initialize (const Units& units, const Geometry& geo,
                           const double SoilLimit,
                           const Time& now, Treelog& msg)
 {
+  TREELOG_MODEL (msg);
   root_system->initialize (units, geo, msg);
+  seed->initialize (-42.42e42, msg);
   initialize_shared (geo, organic_matter, SoilLimit, now, msg);
 }
 
@@ -252,8 +255,7 @@ CropStandard::initialize_shared (const Geometry& geo,
 {
   if (!last_time.get ())
     last_time.reset (new Time (now));
-  seed->initialize (initial_weight);
-  production.initialize (seed->initial_N (initial_weight));
+  production.initialize (seed->initial_N ());
 
   const double DS = development->DS;
   if (DS >= 0)
@@ -285,8 +287,7 @@ CropStandard::check (const Units& units, Treelog& msg) const
     ok = false;
   if (!root_system->check (units, msg))
     ok = false;
-  if (seed->initial_N (initial_weight) <= 0.0
-      && production.NCrop <= 0.0)
+  if (seed->initial_N () <= 0.0 && production.NCrop <= 0.0)
     {
       ok = false;
       msg.error ("\
@@ -768,7 +769,6 @@ find_WSE (Block& al, Photo& photo)
 
 CropStandard::CropStandard (Block& al)
   : Crop (al),
-    initial_weight (al.number ("weight", -42.42e42)),
     seed (Librarian::build_item<Seed> (al, "Seed")),
     root_system (submodel<RootSystem> (al, "Root")),
     canopy (al.alist ("Canopy")),
@@ -816,8 +816,6 @@ CropStandardSyntax::CropStandardSyntax ()
 	      "Description of this parameterization."); 
   alist.add ("description", "Standard Daisy crop model.  Hansen, 1999.");
 
-  syntax.add ("weight", "g w.w./m^2", Check::positive (), Syntax::OptionalConst,
-              "Amount of seeds applied when sowing.");
   syntax.add_object ("Seed", Seed::component, 
                      "Initial crop growth.");
   alist.add ("Seed", Seed::default_model ());

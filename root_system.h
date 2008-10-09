@@ -132,8 +132,8 @@ public:
 
   // Create and Destroy
 public:
-  void initialize (const Units&, 
-                   const Geometry& geo, double row_width, Treelog& msg);
+  void initialize (const Units&, const Geometry& geo, 
+                   double row_width, double row_pos, Treelog& msg);
   void initialize (const Units&, const Geometry& geo, Treelog& msg);
   bool check (const Units&, Treelog& msg) const;
   static void load_syntax (Syntax& syntax, AttributeList& alist);

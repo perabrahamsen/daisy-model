@@ -35,12 +35,14 @@ struct ActionSow : public Action
 {
   const AttributeList& crop;
   const double row_width;
+  const double row_pos;
+  const double seed;
 
   void doIt (Daisy& daisy, const Scope&, Treelog& msg)
   { 
     msg.message ("Sowing " + crop.name ("type"));      
-    daisy.field->sow (daisy.metalib, crop, row_width, daisy.time, 
-                      daisy.dt, msg); 
+    daisy.field->sow (daisy.metalib, crop, row_width, row_pos, seed, 
+                      daisy.time, daisy.dt, msg); 
   }
 
   void tick (const Daisy&, const Scope&, Treelog&)
@@ -54,7 +56,10 @@ struct ActionSow : public Action
     : Action (al),
       crop (al.alist ("crop")),
       // Use 'plant_distance' if set, otherwise use 'row_width'.
-      row_width (al.number ("plant_distance", al.number ("row_width")))
+      row_width (al.number ("plant_distance", al.number ("row_width"))),
+      // Use 'plant_distance' if set, otherwise use 'row_width'.
+      row_pos (al.number ("plant_position", al.number ("row_position"))),
+      seed (al.number ("seed", -42.42e42))
   { }
 };
 
@@ -83,11 +88,24 @@ paramater is to provide the user with a more intuitive name for\n\
 'row_width' for the situation where you have a 2D simulation, where\n\
 the x axis is parallel with the actual rows in the field, rather than\n\
 ortogonal to the rows as is otherwise assumed by Daisy.");
-    syntax.add ("seed", "kg DM/ha", Check::positive (), Syntax::OptionalConst,
-                "Amount of seed applied.  NOT YET IMPLEMENTED.\n\
-Currently, initial growth will be governed by 'typical' seed amounts.");
+    syntax.add ("row_position", "cm", Check::non_negative (), 
+                Syntax::Const, "Position of plant row on x-axes.\n\
+Specify zero to spread equally over the area (no rows).");
+    alist.add ("row_position", 0.0);
+    syntax.add ("plant_position", "cm", Check::non_negative (),
+                Syntax::OptionalConst, "Position of plant on x-axes.\n\
+\n                                                                      \
+Setting this will overrule 'row_position'.  The only purpose of this\n\
+paramater is to provide the user with a more intuitive name for\n       \
+'row_position' for the situation where you have a 2D simulation, where\n\
+the x axis is parallel with the actual rows in the field, rather than\n\
+ortogonal to the rows as is otherwise assumed by Daisy.");
+    syntax.add ("seed", "g w.w./m^2", Check::positive (), Syntax::OptionalConst,
+                "Amount of seed applied.\n\
+By default, initial growth will be governed by 'typical' seed amounts.");
     Librarian::add_type (Action::component, "sow", alist, syntax, &make);
     Librarian::add_alias (Action::component, symbol ("plant"), symbol ("sow"));
   }
 } ActionSow_syntax;
 
+// action_sow.C ends here.

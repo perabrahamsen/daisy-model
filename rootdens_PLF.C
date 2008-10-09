@@ -66,7 +66,7 @@ struct Rootdens_PLF : public Rootdens
   { }
 
   // Create.
-  void initialize (const Geometry&, double /* row_width */, Treelog&)
+  void initialize (const Geometry&, double /* row_width */, double, Treelog&)
   { }
   Rootdens_PLF (Block&);
   ~Rootdens_PLF ();

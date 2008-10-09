@@ -74,7 +74,8 @@ struct Rootdens_GP1D : public Rootdens
   void output (Log& log) const;
 
   // Create.
-  void initialize (const Geometry&, double row_width, Treelog& msg);
+  void initialize (const Geometry&, double row_width, double row_pos, 
+                   Treelog& msg);
   static void load_syntax (Syntax&, AttributeList&);
   explicit Rootdens_GP1D (Block&);
   explicit Rootdens_GP1D (const AttributeList&);
@@ -270,7 +271,8 @@ Rootdens_GP1D::output (Log& log) const
 }
 
 void 
-Rootdens_GP1D::initialize (const Geometry&, double row_width, Treelog& msg)
+Rootdens_GP1D::initialize (const Geometry&, double row_width, double, 
+                           Treelog& msg)
 {
   if (!iszero (row_width))
     msg.warning ("Row width not supported for '" + name 

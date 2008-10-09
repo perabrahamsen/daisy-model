@@ -79,7 +79,8 @@ struct Rootdens_GP2D : public Rootdens
   void output (Log& log) const;
 
   // Create.
-  void initialize (const Geometry&, double /* row_width */, Treelog&);
+  void initialize (const Geometry&, 
+                   double row_width, double row_pos, Treelog&);
   static void load_syntax (Syntax&, AttributeList&);
   explicit Rootdens_GP2D (Block&);
   explicit Rootdens_GP2D (const AttributeList&);
@@ -310,8 +311,12 @@ Rootdens_GP2D::output (Log& log) const
 }
 
 void 
-Rootdens_GP2D::initialize (const Geometry& geo, double row_width, Treelog& msg)
+Rootdens_GP2D::initialize (const Geometry& geo, 
+                           const double row_width, const double row_pos,
+                           Treelog& msg)
 { 
+  TREELOG_MODEL (msg);
+
   const double geo_width = geo.right () - geo.left ();
   if (!approximate (geo_width, row_width))
     {
@@ -325,6 +330,13 @@ Rootdens_GP2D::initialize (const Geometry& geo, double row_width, Treelog& msg)
       std::ostringstream tmp;
       tmp << "Row width (" << row_width << ") does not match root distance ("
           << row_distance << ")";
+      msg.warning (tmp.str ());
+    }
+  if (!approximate (row_position, row_pos))
+    {
+      std::ostringstream tmp;
+      tmp << "Row position (" << row_pos << ") does not match root position ("
+          << row_position << ")";
       msg.warning (tmp.str ());
     }
 }

@@ -89,8 +89,9 @@ public:
   const Horizon& horizon_at (double z, double x, double y) const;
 
   // Actions.
-  void sow (Metalib&, const AttributeList&, const double row_width,
-            const Time&, const double dt, Treelog&);
+  void sow (Metalib&, const AttributeList&, 
+            double row_width, double row_pos, double seed,
+            const Time&, double dt, Treelog&);
   void ridge (const AttributeList& al);
   void irrigate_overhead (double flux, double temp, const IM&, double dt,
 			  Treelog& msg);
@@ -180,9 +181,10 @@ ColumnStandard::horizon_at (const double z,
 
 void 
 ColumnStandard::sow (Metalib& metalib, const AttributeList& al, 
-                     const double row_width, const Time& time,
-                     const double dt, Treelog& msg)
-{ vegetation->sow (metalib, al, row_width, 
+                     const double row_width, const double row_pos,
+                     const double seed,
+                     const Time& time, const double dt, Treelog& msg)
+{ vegetation->sow (metalib, al, row_width, row_pos, seed,
                    geometry, *organic_matter, -soil->MaxRootingHeight (),
                    seed_N, seed_C, time, dt, msg); }
 

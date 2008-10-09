@@ -30,6 +30,8 @@
 
 struct SeedRelease : public Seed
 {
+  const double initial_weight;  // [g w.w./m^2]
+
   // Parameters.
   const double DM_fraction;      // Dry matter content in seeds. [g DM/g w.w.]
   const double C_fraction;      // Carbon content in seeds. [g C/g DM]
@@ -46,8 +48,8 @@ struct SeedRelease : public Seed
   void output (Log& log) const;
   
   // Create and Destroy.
-  double initial_N (double weight) const; // [g N/m^2]
-  void initialize (double weight);
+  double initial_N () const; // [g N/m^2]
+  void initialize (double seed_w, Treelog& msg);
   bool check (Treelog& msg) const;
   static void load_syntax (Syntax& syntax, AttributeList&);
   SeedRelease (Block& al);
@@ -67,12 +69,21 @@ SeedRelease::output (Log& log) const
 { output_variable (C, log); }
 
 double 
-SeedRelease::initial_N (const double weight) const
-{ return weight * DM_fraction * N_fraction; }
+SeedRelease::initial_N () const
+{ return (C / C_fraction) * N_fraction; }
 
 void 
-SeedRelease::initialize (double weight)
-{ C = weight * DM_fraction * C_fraction; }
+SeedRelease::initialize (const double seed_w, Treelog&)
+{ 
+  
+  if (C < -1.0)
+    {
+      if (seed_w > 0.0)
+        C = seed_w * DM_fraction * C_fraction; 
+      else
+        C = initial_weight * DM_fraction * C_fraction; 
+    }
+}
 
 bool 
 SeedRelease::check (Treelog& msg) const
@@ -91,6 +102,10 @@ SeedRelease::check (Treelog& msg) const
 void
 SeedRelease::load_syntax (Syntax& syntax, AttributeList& alist)
 {
+  syntax.add ("initial_weight", "g w.w./m^2",
+              Check::positive (), Syntax::OptionalConst, "\
+Initial seed weight to use when not specified by the sow operation.\n\
+If not specified here, specifying seed amount when sowing is mandatory.");
   syntax.add ("DM_fraction", Syntax::Fraction (), Syntax::Const, "\
 Dry matter content in seeds.");
   syntax.add ("C_fraction", Syntax::Fraction (), Syntax::Const, "\
@@ -105,6 +120,7 @@ Unreleased carbon left in seeds.");
 
 SeedRelease::SeedRelease (Block& al)
   : Seed (al),
+    initial_weight (al.number ("initial_weight", -42.42e42)),
     DM_fraction (al.number ("DM_fraction")),
     C_fraction (al.number ("C_fraction")),
     N_fraction (al.number ("N_fraction")),

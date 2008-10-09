@@ -150,11 +150,13 @@ public:
                       std::vector<double>& residuals_N_soil,
                       std::vector<double>& residuals_C_soil,
                       Treelog&) = 0;
-  virtual void sow (Metalib&, const AttributeList& al, double row_width,
+  virtual void sow (Metalib&, const AttributeList& al, 
+                    double row_width /* [cm] */, double row_pos /* [cm] */, 
+                    double seed /* kg w.w./ha */,
                     const Geometry&, OrganicMatter&, 
                     double SoilLimit /* [cm] */,
-                    double& seed_N /* kg/ha/h */,
-                    double& seed_C /* kg/ha/h */,
+                    double& seed_N /* [kg N/ha/h] */,
+                    double& seed_C /* [kg C/ha/h] */,
                     const Time&, double dt, Treelog& msg) = 0;
   virtual void output (Log&) const;
   

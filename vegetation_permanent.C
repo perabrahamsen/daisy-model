@@ -187,7 +187,8 @@ struct VegetationPermanent : public Vegetation
               std::vector<double>&, std::vector<double>&,
               Treelog&)
   { }
-  void sow (Metalib&, const AttributeList&, const double, 
+  void sow (Metalib&, const AttributeList&, 
+            const double, const double, const double,
             const Geometry&, OrganicMatter&, const double, 
             double&, double&, const Time&, double, Treelog&)
   { throw "Can't sow on permanent vegetation"; }
@@ -366,7 +367,7 @@ VegetationPermanent::initialize (const Units& units, const Time& time,
                                  Treelog& msg)
 {
   reset_canopy_structure (time);
-  root_system->initialize (units, geo, 0.0, msg);
+  root_system->initialize (units, geo, 0.0, 0.0, msg);
   root_system->full_grown (geo, soil.MaxRootingHeight (), WRoot, msg);
 
   static const symbol vegetation_symbol ("vegetation");

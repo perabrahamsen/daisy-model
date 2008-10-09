@@ -146,7 +146,7 @@ struct BioclimateStandard : public Bioclimate
   static double albedo (const Vegetation& crops, const Surface& surface, 
                         const Geometry&, const Soil&, const SoilWater&);
   std::auto_ptr<Raddist> raddist;// Radiation distribution model.
-  const double min_sun_angle;    // Lowest sun angle for some models.
+  const double min_sin_beta_;     // Sinus to lowest sun angle for some models.
   void RadiationDistribution (const Vegetation&, double sin_beta, Treelog&);
   std::auto_ptr<Difrad> difrad;  // Diffuse radiation model.
   double difrad0;                // Diffuse radiation above canopy [W/m2]
@@ -271,6 +271,8 @@ struct BioclimateStandard : public Bioclimate
   { return crop_ea_; }
   double canopy_ea () const // [mm/h]
   { return canopy_ea_; }
+  double min_sin_beta () const // []
+  { return min_sin_beta_; }
   double get_intercepted_water () const // [mm]
   { return canopy_water_storage; }
   double get_snow_storage () const // [mm]
@@ -656,7 +658,7 @@ BioclimateStandard::BioclimateStandard (Block& al)
     crop_ea_ (0.0),
     production_stress (-1.0),
     raddist (Librarian::build_item<Raddist> (al, "raddist")),
-    min_sun_angle (al.number ("min_sun_angle")),
+    min_sin_beta_ (std::sin (al.number ("min_sun_angle"))),
     difrad (al.check ("difrad") 
          ? Librarian::build_item<Difrad> (al, "difrad")
          : NULL),
@@ -731,7 +733,8 @@ BioclimateStandard::RadiationDistribution (const Vegetation& vegetation,
 					   const double sin_beta_, Treelog& msg)
 {
   raddist->tick(sun_LAI_fraction_, sun_PAR_, total_PAR_, sun_NIR_, total_NIR_,
-                global_radiation (), difrad0, sin_beta_, vegetation, msg);
+                global_radiation (), difrad0, min_sin_beta_, sin_beta_, 
+                vegetation, msg);
 
   //Absorbed PAR in the canopy and the soil:
   incoming_PAR_radiation = total_PAR_[0]; // [W/m2]

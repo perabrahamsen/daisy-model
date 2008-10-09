@@ -34,7 +34,7 @@ struct RaddistStandard : public Raddist
              std::vector <double>& sun_PAR, std::vector <double>& total_PAR, 
              std::vector <double>& sun_NIR, std::vector <double>& total_NIR, 
              double global_radiation, double diffuse_radiation, 
-             double sin_beta, const Vegetation&, Treelog&);
+             double min_sin_beta, double sin_beta, const Vegetation&, Treelog&);
 
   void output(Log& log) const 
   {}
@@ -51,7 +51,8 @@ void RaddistStandard::tick (std::vector <double>& sun_LAI_fraction,
                             std::vector <double>& sun_NIR, 
                             std::vector <double>& total_NIR, 
                             double global_radiation, 
-			    double /*diffuse_radiation*/, double /*sin_beta*/, 
+			    double /*diffuse_radiation*/, 
+                            double /* min_sin_beta */, double /*sin_beta*/, 
 			    const Vegetation& vegetation,
 			    Treelog&) 
 {

@@ -671,11 +671,9 @@ static struct UnitBaseSyntax
     alist.add ("description", "A base unit.");
     Librarian::add_type (Unit::component, name, alist, syntax, &make);
 
-    // Specials.
-    add (Syntax::Unknown (), name, syntax, alist, 
-         "Unknown unit.");
-    add (Units::error_symbol (), name, syntax, alist, 
-         "Bogus unit.");
+    // Angles
+    add ("rad", name, syntax, alist, 
+         "Radians");
 
     // Add geographical coordinates.
     add ("dgEast", name, syntax, alist, 
@@ -686,6 +684,8 @@ static struct UnitBaseSyntax
     // Unknown unit.
     add (Syntax::Unknown (), name, syntax, alist, 
          "Nothing is known about the dimension of this unit.");
+    add (Units::error_symbol (), name, syntax, alist, 
+         "Bogus unit.");
   }
 } UnitBase_syntax;
 
@@ -746,6 +746,12 @@ Base unit to convert to and from.");
     syntax.add ("factor", Syntax::None (), Check::non_zero (), Syntax::Const, "\
 Factor to multiply with to get base unit.");
     Librarian::add_type (Unit::component, name, alist, syntax, &make);
+
+    // Add angles.
+    add ("dg", M_PI / 180.0, "rad", name, syntax, alist,
+         "Degrees");
+    add ("new dg", M_PI / 200.0, "rad", name, syntax, alist,
+         "New degrees");
 
     // Add geographical coordinates.
     add ("dgWest", -1.0, "dgEast", name, syntax, alist,

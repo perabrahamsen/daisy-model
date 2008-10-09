@@ -806,7 +806,6 @@ Production::initialize (const double SeedN)
 {
   if (NCrop <= 0.0)
     NCrop = SeedN;
-  daisy_assert (NCrop >= 0.0);
 }
 
 void

@@ -109,6 +109,7 @@ public:
   virtual double crop_ep () const = 0; // [mm/h]
   virtual double crop_ea () const = 0; // [mm/h]
   virtual double canopy_ea () const = 0; // [mm/h]
+  virtual double min_sin_beta () const = 0; // [] Lowest sun angle.
 
   // Utilities.
 public:

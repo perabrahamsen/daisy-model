@@ -1,3 +1,7 @@
+2008-10-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* unit.C ("rad", "dg", "new dg"): Added units.
+
 2008-10-08  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.51 released.

@@ -64,8 +64,9 @@ public:
   void tick (std::vector <double>& fraction_sun_LAI,
              std::vector <double>& sun_PAR, std::vector <double>& total_PAR, 
              std::vector <double>& sun_NIR, std::vector <double>& total_NIR, 
-             double global_radiation, double diffuse_radiation, 
-             double sin_beta, const Vegetation&, Treelog&);
+             const double global_radiation, const double diffuse_radiation, 
+             const double min_sin_beta, const double sin_beta,
+             const Vegetation&, Treelog&);
 
   void output(Log& log) const;
 
@@ -96,6 +97,7 @@ void RaddistDPF::tick (std::vector <double>& fraction_sun_LAI,
 		       std::vector <double>& total_NIR, 
                        const double global_radiation, 
 		       const double diffuse_radiation,
+                       const double min_sin_beta,
                        const double sin_beta,
 		       const Vegetation& vegetation,
 		       Treelog&)
@@ -105,10 +107,6 @@ void RaddistDPF::tick (std::vector <double>& fraction_sun_LAI,
   const size_t No = fraction_sun_LAI.size ();
   daisy_assert (No + 1 == total_PAR.size());
   daisy_assert (No + 1 == sun_PAR.size());
-
-  const double min_dg = 10.0;
-  const double min_rad = min_dg * M_PI / 180.0;
-  const double min_sin_beta = std::sin (min_rad);
 
   if (sin_beta < min_sin_beta)
     // Ingen SUNLIT

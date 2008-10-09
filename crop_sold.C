@@ -143,6 +143,7 @@ public:
   // Create and Destroy.
 public:
   void initialize (const Units&, const Geometry& geo, double row_width, 
+                   double row_pos, double seed,
                    OrganicMatter&, double, const Time&, Treelog&);
   void initialize (const Units&, const Geometry& geo, OrganicMatter&, double, const Time&, Treelog&);
   bool check (const Units&, Treelog&) const
@@ -630,11 +631,18 @@ CropSold::Variables::~Variables ()
 void
 CropSold::initialize (const Units& units,
                       const Geometry& geo, const double row_width,
+                      const double, const double seed,
                       OrganicMatter& organic_matter, const double SoilLimit,
                       const Time& time, Treelog& msg)
 {
+  TREELOG_MODEL (msg);
+  if (seed > 0.0)
+    msg.warning ("This crop model ignores seed");
   if (!std::isnormal (row_width))
-    throw "The 'old' crop model does not work with row crops.";
+    {
+      msg.touch ();
+      throw "This crop model does not work with row crops";
+    }
   initialize (units, geo, organic_matter, SoilLimit, time, msg);
 }
 

@@ -162,7 +162,8 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Units&, const Geometry& geo, double row_width,
+  void initialize (const Units&, const Geometry& geo, 
+                   double row_width, double row_pos, double seed,
                    OrganicMatter&, double SoilLimit, const Time&, Treelog&);
   void initialize (const Units&, const Geometry& geo, 
                    OrganicMatter&, double SoilLimit, const Time&, Treelog&);
@@ -402,10 +403,15 @@ CropSimple::total_C () const
 void
 CropSimple::initialize (const Units& units, const Geometry& geo, 
                         const double row_width, 
+                        const double row_pos, 
+                        const double seed,
                         OrganicMatter&, double /* SoilLimit */,
                         const Time&, Treelog& msg)
 {
-  root_system->initialize (units, geo, row_width, msg);
+  TREELOG_MODEL (msg);
+  if (seed >= 0)
+    msg.warning ("Seed ignored by simple crop model");
+  root_system->initialize (units, geo, row_width, row_pos, msg);
   CropCAI ();
 }
 

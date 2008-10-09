@@ -150,7 +150,8 @@ public:
 public:
   virtual void initialize (const Units&, const Geometry&, OrganicMatter&, 
                            double SoilLimit, const Time& now, Treelog&) = 0;
-  virtual void initialize (const Units&, const Geometry&, double row_width, 
+  virtual void initialize (const Units&, const Geometry&,
+                           double row_width, double row_pos, double seed,
                            OrganicMatter&, 
                            double SoilLimit, const Time& now, Treelog&) = 0;
   virtual bool check (const Units&, Treelog& msg) const = 0;

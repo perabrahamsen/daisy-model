@@ -63,7 +63,8 @@ public:
 
   // Actions.
 public:
-  void sow (Metalib&, const AttributeList& crop, double row_width,
+  void sow (Metalib&, const AttributeList& crop, 
+            double row_width, double row_pos, double seed,
             const Time&, double dt, Treelog&);
   void ridge (const AttributeList& ridge);
   void irrigate_overhead (double water, double temp, const IM&, double dt,

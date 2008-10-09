@@ -6,6 +6,36 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.52
+
+** New paramters for the 'sow' action.
+
+*** 'plant_distance' is now an alias for 'row_width'
+
+The intention for this is for PRD irrigation of potatoes, where the
+drip line is withing the ridge, where we are more interested in the
+soil gradient within the row, than between the rows.
+
+*** New 'row_position' and 'plant_position' parameters.
+
+These avoid the need to set them explicitly in the rood density submodel.
+
+*** New 'seed' parameter.
+
+This will overwrite the seed initial weight parameter
+
+** New svat model 'SSOC'.
+
+
+
+* 4.51
+
+** Bug fixes and SVAT work.
+
+* 4.50
+
+** Proper logging of "direct to drain" biopores.
+
 * 4.49
 
 ** More work on biopores and SVAT.

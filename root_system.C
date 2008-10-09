@@ -461,17 +461,17 @@ RootSystem::output (Log& log) const
 void
 RootSystem::initialize (const Units& units, 
                         const Geometry& geo, const double row_width, 
-                        Treelog& msg)
+                        const double row_pos, Treelog& msg)
 {
   const bool is_row_crop = row_width > 0.0;
   if (rootdens.get ())
     /* We already has a root density model. */;
   else if (is_row_crop)
-    rootdens = Rootdens::create_row (row_width, 0.0);
+    rootdens = Rootdens::create_row (row_width, row_pos);
   else
     rootdens = Rootdens::create_uniform ();
 
-  rootdens->initialize (geo, row_width, msg);
+  rootdens->initialize (geo, row_width, row_pos, msg);
   initialize (units, geo, msg);
 }
 
