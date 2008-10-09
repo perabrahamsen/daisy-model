@@ -326,7 +326,7 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
   const std::vector<double>& PAR_height = bioclimate.height ();
 
   // Anything do do?
-  const double min_PAR = 5.0;   // [W/m^2]
+  const double min_PAR = 0.0;   // [W/m^2]
   if (total_PAR[0] < min_PAR)
     return;
 
