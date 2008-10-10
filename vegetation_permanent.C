@@ -419,7 +419,7 @@ VegetationPermanentSyntax
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    Vegetation::load_syntax (syntax, alist);
+    Vegetation::load_base (syntax, alist);
     alist.add ("description", "Permanent (non-crop) vegetation.");
     syntax.add ("LAIvsDAY", "m^2/m^2", "yday", Check::non_negative (),
                 Syntax::Const, 

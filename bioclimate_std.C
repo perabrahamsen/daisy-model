@@ -732,6 +732,8 @@ void
 BioclimateStandard::RadiationDistribution (const Vegetation& vegetation, 
 					   const double sin_beta_, Treelog& msg)
 {
+  TREELOG_MODEL (msg);
+
   raddist->tick(sun_LAI_fraction_, sun_PAR_, total_PAR_, sun_NIR_, total_NIR_,
                 global_radiation (), difrad0, min_sin_beta_, sin_beta_, 
                 vegetation, msg);
@@ -789,6 +791,8 @@ BioclimateStandard::WaterDistribution (const Units& units,
 				       const SoilHeat& soil_heat, 
                                        const double dt, Treelog& msg)
 {
+  TREELOG_MODEL (msg);
+
   // Overview.
   //
   // First we calculate the external water sources (precipitation,
@@ -1050,27 +1054,20 @@ BioclimateStandard::WaterDistribution (const Units& units,
 
   for (iteration = 0; iteration < max_svat_iterations; iteration++)
     {
+      std::ostringstream tmp;
+      tmp << "svat iteration " << iteration;
+      Treelog::Open nest (msg, tmp.str ());
+
       // Find stomata conductance based on ABA and crown potential
       // from last attempt at crop transpiration.
       vegetation.find_stomata_conductance (units, time, *this, dt, msg);
       const double gs = vegetation.stomata_conductance ();
-
-#if 0
-      if (LAI () < 1.0)
-        goto success;
-#endif
 
       // Find expected transpiration from stomate conductance.
       svat->solve (gs, msg);
       
       const double crop_ea_svat = svat->transpiration ();
 
-      std::ostringstream tmp;
-      tmp << "\n" << iteration << ": new = " << crop_ea_svat
-          << ", old = " << crop_ea_svat_old
-          << ", crop = " << crop_ea_
-          << ", soil = " << crop_ea_soil
-          << ", potential = " << crop_ep_;
       if (std::fabs (crop_ea_svat - crop_ea_svat_old) 
           < max_svat_absolute_difference)
         {
@@ -1089,10 +1086,6 @@ BioclimateStandard::WaterDistribution (const Units& units,
   msg.error ("SVAT transpiration and stomata conductance"
              " loop did not converge");
  success:;
-#if 0
-  if (iteration > 0)
-    msg.message (tmp.str ());
-#endif
 
   // Stress calculated by the SVAT model.
   production_stress = svat->production_stress ();

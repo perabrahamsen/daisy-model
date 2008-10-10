@@ -104,22 +104,6 @@
    (humus 0.1 [%]) 
    (dry_bulk_density 1.53 [g/cm^3]))
 
-;;  Parameterisation of the column called "Silty clay"
-(defcolumn "SiteSoil" default
-  (Bioclimate original
-              ;; soil vegetation atmosphere transfer model SSOC
-              (svat SSOC)
-              (raddist sun-shade))
-  (Soil (MaxRootingDepth 200 [cm])
-        (horizons (  -30 [cm] "A")
-                  (  -60 [cm] "B")
-                  ( -110 [cm] "C")
-                  ( -400 [cm] "C"))) ;; No data below 110 cm 
-  (Movement SiteMovement)
-  (OrganicMatter original (init (input 3000 [kg C/ha/y])))
-  (Groundwater deep)) ;; free drainage by gravitational forces
-
-
 ;; If you make any changes to the crop, they should go here.
 (defcrop "SiteCrop" "Potato; Folva; SAFIR" 
   "The crop paramterization used in my experiment."
@@ -130,11 +114,72 @@
          (DSRate2 0.011 [DS/d])
          )
   ;; Step 2: Fill in measured leaf area to leaf weight ratio.
-    (Canopy (SpLAI  0.020 [(m^2/m^2)/(g DM/m^2)])
-          (LeafAIMod (1.5 1.1)(2.0 0.3)))
+  (Canopy (SpLAI  0.020 [(m^2/m^2)/(g DM/m^2)])
+          (LeafAIMod (1.5 1.1)(2.0 0.3))
+          )
 
+  ;; Step 3: Fill in measured root data.
+  ;; This can be indirectly measured, through soil water.
+  (Root (DptEmr     20 [cm])
+        (PenPar1    0.30 [cm/dg C/d])
+        (PenPar2     4.0 [dg C])
+        (MaxPen       50 [cm]))
+
+  ;; Step 4: Set ForcedLAI in vegetation below.
   
+  ;; Step 5: Get total production right.
+  (LeafPhot original
+            (Xn 1.0e-3 [mol/mol/s])
+            )
+
+  ;; Step 6: Get partitioning right.
+  (Partit (Root (0.00 0.20) (1.00 0.20) (1.36 0.00))
+          (Leaf (0.00 0.95) (1.00 0.80) (1.05 0.20) (1.25 0.15) (1.35 0.00))
+          (Stem (0.00 0.05) (1.00 0.20) (1.05 0.35) (1.25 0.00) (1.35 0.00))
+          (nitrogen_stress_limit 0.01)
+          )
+  
+  ;; Step 7: Get crop nitrogen right. 
+  ;; This might involve repeating Step 4 and 5.
+  (CrpN (PtLeafCnc (0.00 0.0600) (1.00 0.0500) (1.30 0.0400) (1.50 0.025) (2.00 0.020))
+        (CrLeafCnc (0.00 0.0450) (1.00 0.0400) (1.30 0.0300) (1.50 0.020) (2.00 0.010))
+        (NfLeafCnc (0.00 0.0100) (1.00 0.0100) (2.00 0.0100))
+        (PtStemCnc (0.00 0.0400) (1.00 0.0350) (1.30 0.0200) (1.50 0.010) (2.00 0.010))
+        (CrStemCnc (0.00 0.0200) (1.00 0.0150) (1.30 0.0100) (1.50 0.005) (2.00 0.005))
+        (PtSOrgCnc (0.00 0.0200) (1.30 0.0150) (2.00 0.0100))
+        (CrSOrgCnc (0.00 0.0080) (1.30 0.0080) (2.00 0.0070))
+        (NfSOrgCnc (1.00 0.004) (2.00 0.004))
+        ;; Look at soil N to adjust these:
+        (NH4_root_min 1E-8 [g N/cm^3])
+        (NO3_root_min 1E-8 [g N/cm^3])
+        )
+  
+  ;; Step 8: Remove ForcedLAI from vegetation below.
+  ;; This should not affect results significantly.
   )
+
+(defvegetation SiteVegetation crops
+  ;; Step 3:  TEMPORARILY force LAI to confirm to measurements.
+  ;; (ForcedLAI (2006 (100 0) (200 5.0) (300 0.2)))
+  ;; Step 8: REMOVE ForcedLAI again.
+  ;; Relying on ForcedLAI means the crop can't be used for scenarious.
+  )
+
+;;  Parameterisation of the column called "Silty clay"
+(defcolumn "SiteSoil" default
+  (Bioclimate original
+              ;; soil vegetation atmosphere transfer model SSOC
+              (svat SSOC)
+              (raddist sun-shade))
+  (Vegetation SiteVegetation)
+  (Soil (MaxRootingDepth 200 [cm])
+        (horizons (  -30 [cm] "A")
+                  (  -60 [cm] "B")
+                  ( -110 [cm] "C")
+                  ( -400 [cm] "C"))) ;; No data below 110 cm 
+  (Movement SiteMovement)
+  (OrganicMatter original (init (input 3000 [kg C/ha/y])))
+  (Groundwater deep)) ;; free drainage by gravitational forces
 
 ;; Warmup management.
 (defcrop Lettuce Potato)                ;No Lettuce in Daisy.

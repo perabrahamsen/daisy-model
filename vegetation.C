@@ -72,7 +72,7 @@ Vegetation::output (Log& log) const
 }
 
 void
-Vegetation::load_syntax (Syntax& syntax, AttributeList& alist)
+Vegetation::load_base (Syntax& syntax, AttributeList& alist)
 {
   alist.add ("base_model", "common");
   syntax.add ("description", Syntax::String, Syntax::OptionalConst,
@@ -130,7 +130,7 @@ static struct VegetationSyntax
   { 
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    Vegetation::load_syntax (syntax, alist);
+    Vegetation::load_base (syntax, alist);
 
     Librarian::add_base (Vegetation::component, alist, syntax);
   }

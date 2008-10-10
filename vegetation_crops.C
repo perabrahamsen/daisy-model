@@ -221,6 +221,7 @@ struct VegetationCrops : public Vegetation
                    const Soil& soil, OrganicMatter&,
                    Treelog& msg);
   bool check (const Units& units, Treelog& msg) const;
+  static void load_syntax (Syntax& syntax, AttributeList& alist);
   static CropList build_crops (Block& block, const std::string& key);
   VegetationCrops (Block&);
   ~VegetationCrops ();
@@ -901,11 +902,49 @@ VegetationCrops::check (const Units& units, Treelog& msg) const
   return ok;
 }
 
+void 
+VegetationCrops::load_syntax (Syntax& syntax, AttributeList& alist)
+{
+  Vegetation::load_base (syntax, alist);
+  syntax.add_submodule_sequence("ForcedLAI", Syntax::Const, "\
+By default, the total LAI for the vegetation will be the sum of the\n\
+simulated LAI for the individual crops.  However, you can force the\n\
+model to use a different values for LAI by setting this attribute.\n\
+The specified LAI will be distributed among the crops on the field\n\
+corresponding to their simulated LAI.\n\
+\n\
+'ForcedLAI' can be useful if you have measured the total LAI on the\n\
+field, and want to force the model to confirm to the measurements.  \n\
+\n\
+'ForcedDAY' will not affect the LAI for crops that have not yet\n\
+emerged.  If no crops have emerged on the field, it will be ignored.",
+                                VegetationCrops::ForcedLAI::load_syntax);
+  alist.add ("ForcedLAI", std::vector<const AttributeList*> ());
+  syntax.add_object ("crops", Crop::component, 
+                     Syntax::State, Syntax::Sequence,
+                     "List of crops growing in the field");
+  alist.add ("crops", std::vector<const AttributeList*> ());
+}
+
 VegetationCrops::CropList
 VegetationCrops::build_crops (Block& al, const std::string& key)
 {
   const std::vector<Crop*> v = Librarian::build_vector<Crop> (al, key);
   return CropList (v.begin (), v.end ());
+}
+
+const AttributeList& 
+Vegetation::default_model ()
+{
+  static AttributeList alist;
+  
+  if (!alist.check ("type"))
+    {
+      Syntax dummy;
+      VegetationCrops::load_syntax (dummy, alist);
+      alist.add ("type", "crops");
+    }
+  return alist;
 }
 
 VegetationCrops::VegetationCrops (Block& al)
@@ -948,26 +987,8 @@ VegetationCropsSyntax
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    Vegetation::load_syntax (syntax, alist);
+    VegetationCrops::load_syntax (syntax, alist);
     alist.add ("description", "Keep track of all crops on the field.");
-    syntax.add_submodule_sequence("ForcedLAI", Syntax::Const, "\
-By default, the total LAI for the vegetation will be the sum of the\n\
-simulated LAI for the individual crops.  However, you can force the\n\
-model to use a different values for LAI by setting this attribute.\n\
-The specified LAI will be distributed among the crops on the field\n\
-corresponding to their simulated LAI.\n\
-\n\
-'ForcedLAI' can be useful if you have measured the total LAI on the\n\
-field, and want to force the model to confirm to the measurements.  \n\
-\n\
-'ForcedDAY' will not affect the LAI for crops that have not yet\n\
-emerged.  If no crops have emerged on the field, it will be ignored.",
-				  VegetationCrops::ForcedLAI::load_syntax);
-    alist.add ("ForcedLAI", std::vector<const AttributeList*> ());
-    syntax.add_object ("crops", Crop::component, 
-                       Syntax::State, Syntax::Sequence,
-                       "List of crops growing in the field");
-    alist.add ("crops", std::vector<const AttributeList*> ());
     Librarian::add_type (Vegetation::component, "crops", alist, syntax, &make);
   }
 } VegetationCrops_syntax;

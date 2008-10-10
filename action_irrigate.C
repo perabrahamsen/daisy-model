@@ -80,19 +80,21 @@ struct ActionIrrigate : public Action
     if (!activated)
       {
 	activated = true;
-        remaining_time = days * 24 + hours ;
+        if (remaining_time < -1.0)
+          remaining_time = days * 24 + hours ;
         std::ostringstream tmp;
         tmp << "Irrigating " << flux << " mm/h for "
             << remaining_time << " hour";
         if (!approximate (remaining_time, 1.0))
           tmp << "s";
+        tmp << " total " << flux * remaining_time << " mm";
 	static const symbol conc_flux_unit ("kg/ha/mm");
         const Unit& u_cf = daisy.units ().get_unit (conc_flux_unit);
         const double N = (sm.get_value (Chemical::NO3 (), u_cf)
 			  + sm.get_value (Chemical::NH4 (), u_cf))
-	  * flux * (days * 24 + hours);
+	  * flux * remaining_time;
         if (N > 1e-10)
-          tmp << "; " << N << " kg N/ha";
+          tmp << "; adding " << N << " kg N/ha";
 	for (IM::const_iterator i = sm.begin (); i != sm.end (); i++)
 	  {
 	    const symbol chem = *i;
@@ -173,8 +175,8 @@ Setting this overrides the 'days' and 'hours' parameters.");
     : Action (al),
       days (al.integer ("days")),
       hours (al.integer ("hours", (days > 0) ? 0 : 1)),
-      activated (al.check ("remaining_time")),
-      remaining_time (al.number ("remaining_time", 0.0)),
+      activated (false),
+      remaining_time (al.number ("remaining_time", -42.42e42)),
       expr_flux (Librarian::build_item<Number> (al, "flux")),
       flux (-42.42e42),
       temp (al.number ("temperature", at_air_temperature)),

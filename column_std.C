@@ -976,12 +976,7 @@ the simulation.  If unspecified, used global weather.");
     syntax.add_object ("Vegetation", Vegetation::component,
                        Syntax::State, Syntax::Singleton,
                        "The crops on the field.");
-    AttributeList vegetation_alist;
-    vegetation_alist.add ("type", "crops");
-    vegetation_alist.add ("crops", std::vector<const AttributeList*> ());
-    vegetation_alist.add ("ForcedLAI", std::vector<const AttributeList*> ());
-    vegetation_alist.add ("EpInterchange", 0.6);
-    alist.add ("Vegetation", vegetation_alist);
+    alist.add ("Vegetation", Vegetation::default_model ());
 
     syntax.add_object ("Bioclimate", Bioclimate::component, 
                        Syntax::State, Syntax::Singleton,
