@@ -160,9 +160,16 @@ void RaddistDPF::tick (std::vector <double>& fraction_sun_LAI,
       Tau_d += 2.* exp(-kb_gamma * LAI) * sin(gamma) * cos(gamma) * dgamma;
     }
   // Extinction coefficient for black leaves in diffuse radiation 
-  const double kd = LAI > 1e-10 
-    ? -log(Tau_d)/LAI //note: log == ln i C++
-    : 1.0;                      // Extinction coefficient is irrelevant without LAI.
+  double kd;
+  
+  if (LAI < 1e-10)
+    // Extinction coefficient is irrelevant without LAI.
+    kd = 1.0;
+  else if (Tau_d > 0.99)
+    // Tau_d can only be large if LAI is small.
+    kd = 1.0;
+  else
+    kd = -log(Tau_d)/LAI; //note: log == ln i C++
   daisy_assert (kd >= 0.0);
 
   // ------------------------------------------------

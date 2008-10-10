@@ -525,7 +525,7 @@ Minimum sun angle above ground for some 'raddist' and 'svat' models.\n\
 \n\
 The 'DPF' raddist model will zero radiation if the angle is below this,\n\
 and the 'SSOC' svat model will revert to a one leaf description.");
-  alist.add ("min_sun_angle", 3.0 * M_PI / 180.0);
+  alist.add ("min_sun_angle", 3.6 * M_PI / 180.0);
   syntax.add_object ("raddist", Raddist::component, 
                      "Radiation distribution model.");
   alist.add ("raddist", Raddist::default_model ());
