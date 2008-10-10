@@ -550,7 +550,7 @@ SoilWater::MaxExfiltration (const Geometry& geo, const size_t edge,
   const double h0 = h (n);
   const double K0 = soil.K (n, h0, h_ice (n), T);
   if (max_exfiltration_gradient > 0.0)
-    return  K0 * max_exfiltration_gradient;
+    return K0 * max_exfiltration_gradient;
   const double Cw2 = soil.Cw2 (n, h0);
   const double Theta0 = Theta (n);
   const double Theta_surf = soil.Theta_res (n);
