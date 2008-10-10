@@ -307,7 +307,7 @@
       irrigation_subsoil_PRD_right)))
 
 (run batch
-     (run (batch (run Crop-Subsoil-Full) (directory "/subsoil_Full"))
-          (batch (run Crop-Subsoil-PRD ) (directory "/subsoil_PRD"))))
+     (run (batch (run Crop-Subsoil-Full) (directory "subsoil_Full"))
+          (batch (run Crop-Subsoil-PRD ) (directory "subsoil_PRD"))))
 
 ;;; safir-site.dai ends here.
