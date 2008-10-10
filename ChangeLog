@@ -1,3 +1,7 @@
+2008-10-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* path.C (Path::set_directory): Canonicalize directory.
+
 2008-10-09  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* unit.C ("rad", "dg", "new dg"): Added units.

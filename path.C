@@ -47,6 +47,18 @@ extern "C" int mkdir(const char *pathname, int mode);
 #define PATH_SEPARATOR ";"
 #endif
 
+// Find current directory.
+static const std::string
+get_cwd ()
+{
+  const size_t BUFFER_SIZE = 10000;
+  char buffer[BUFFER_SIZE];
+  char *wd = getcwd (buffer, BUFFER_SIZE);
+  if (!wd)
+    throw "Current directory path is too long";
+  return wd;
+}
+
 std::vector<symbol> Path::daisy_path;
 
 symbol
@@ -201,13 +213,24 @@ Path::open_file (symbol name_s) const
 }
 
 bool 
-Path::set_directory (symbol directory)
+Path::set_directory (symbol directory_s)
 { 
-  const char *const dir = directory.name ().c_str ();
+  const std::string& directory = directory_s.name ();
+  const char *const dir = directory.c_str ();
   const bool result 
     = chdir (dir) == 0 || (mkdir (dir, 0777) == 0 && chdir (dir) == 0); 
   
-  current_directory = directory;
+  // Absolute filename.
+  if (directory[0] == '/'
+#ifndef __unix__
+      || directory[0] == '\\' || directory[1] == ':'
+#endif
+      )
+    // Already absolute.
+    current_directory = directory;
+  else
+    // Make it absolute.
+    current_directory = get_cwd () + "/" + directory;
 
   std::ostringstream tmp;
   tmp << "Changing directory to '" << directory << "' " 
@@ -252,15 +275,7 @@ Path::reset ()
 {
   // Find path.
   path = get_daisy_path ();
-
-  // Find current directory.
-  const size_t BUFFER_SIZE = 10000;
-  char buffer[BUFFER_SIZE];
-  char *wd = getcwd (buffer, BUFFER_SIZE);
-  if (!wd)
-    throw "Current directory path is too long";
-
-  current_directory = wd;
+  current_directory = get_cwd ();
 
   std::ostringstream tmp;
   tmp << "Reseting current directory to '" << current_directory << "'";
