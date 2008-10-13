@@ -167,6 +167,7 @@ Movement1D::tick_water (const Geometry1D& geo,
 
   for (size_t m = 0; m < matrix_water.size (); m++)
     {
+      water_attempt (m);
       Treelog::Open nest (msg, matrix_water[m]->name);
       try
         {
@@ -211,6 +212,7 @@ Movement1D::tick_water (const Geometry1D& geo,
       
       // Make sure we don't call tertiary transport right after reserve model.
       tertiary->deactivate (3); 
+      water_failure (m);
     }
   throw "Water matrix transport failed"; 
 }

@@ -1,16 +1,22 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Crop calib
+* TODO før SAFIR workshop
 
-1. Phenology
+** Få massebalance
 
-2. SpLAI.
+*** Test from/to
 
-3. Dry matter production
+*** Log S_incorp bs irrigate_subsoil
 
-4. Partit
+** Udskriv rejseplan til Søren.
 
-5. CrpN
+** Indsæt plantecalib i BGJ præsentation
+
+** Crop Excel Templates?
+
+** Lav distrbution
+
+** Distribution på memory key
 
 * SSOC
 
@@ -23,21 +29,13 @@ ssoc max_diff_e par
 bio max_iterations par
 bio max_diff par
 
-* SSOC BB fix?
-
-G_R_soil->sun
-G_R_sun->soil
-
-G_R_soil->shadow
-G_R_shadow->soil
-
-* WIKI science
-
-never -> newer
-
 * OpenMI
 
 ** ElementSet
+
+** Enheder?
+
+*** Er cdaisy funktioner eksporteret?
 
 * SVAT
 

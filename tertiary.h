@@ -81,7 +81,7 @@ public:
 protected:
   explicit Tertiary (Block& al);
 public:
-  virtual ~Tertiary ();
+  ~Tertiary ();
 };
 
 #endif // TERTIARY_H

@@ -145,7 +145,8 @@ public:
   bool initialize (Block&, const Output&, const Time&, const Weather*,
 		   const Scope&);
   Field (Block&, const std::string& key);
-  virtual ~Field ();
+  void summarize (Treelog& msg) const;
+  ~Field ();
 };
 
 #endif // FIELD_H

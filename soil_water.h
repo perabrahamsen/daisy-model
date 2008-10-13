@@ -167,7 +167,7 @@ public:
   void initialize (const AttributeList&, const Geometry&,
                    const Soil&, const SoilHeat&, const Groundwater&, Treelog&);
   SoilWater (Block&);
-  virtual ~SoilWater ();
+  ~SoilWater ();
 };
 
 #endif // SOIL_WATER_H

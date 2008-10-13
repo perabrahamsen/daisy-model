@@ -165,6 +165,7 @@ public:
   ColumnStandard (Block& al);
   bool initialize (Block&, const Output&, const Time&, const Weather*,
 		   const Scope& scope);
+  void summarize (Treelog& msg) const;
   ~ColumnStandard ();
 };
 
@@ -922,6 +923,14 @@ ColumnStandard::initialize (Block& block,
   soil_heat->tick_after (geometry.cell_size (), *soil, *soil_water, msg);
 
   return ok;
+}
+
+void 
+ColumnStandard::summarize (Treelog& msg) const
+{
+  TREELOG_MODEL (msg);
+  movement->summarize (msg);
+  bioclimate->summarize (msg);
 }
 
 ColumnStandard::~ColumnStandard ()

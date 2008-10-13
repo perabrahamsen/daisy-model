@@ -126,6 +126,7 @@ public:
   bool initialize (Block&, const Output&, const Time&, const Weather*, 
 		   const Scope&);
   Implementation (Block& parent, const std::string& key);
+  void summarize (Treelog& msg) const;
   ~Implementation ();
 };
 
@@ -782,6 +783,16 @@ Field::Implementation::Implementation (Block& parent,
     selected (NULL)
 { }
 
+void
+Field::Implementation::summarize (Treelog& msg) const
+{ 
+  for (ColumnList::const_iterator i = columns.begin ();
+       i != columns.end ();
+       i++)
+    (*i)->summarize (msg);
+}
+
+
 Field::Implementation::~Implementation ()
 {
   daisy_assert (selected == NULL);
@@ -1019,6 +1030,10 @@ Field::initialize (Block& block, const Output& output,
 Field::Field (Block& parent, const std::string& key)
   : impl (new Implementation (parent, key))
 { }
+
+void
+Field::summarize (Treelog& msg) const
+{ impl->summarize (msg); }
 
 Field::~Field ()
 { }

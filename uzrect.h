@@ -63,6 +63,7 @@ private:
 protected:
   explicit UZRect (Block&);
 public:
+  virtual void summarize (Treelog& msg) const;
   ~UZRect ();
 };
 

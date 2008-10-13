@@ -140,7 +140,9 @@ Based on data collected by Fulai Liu, 2007."
   
   ;; Create these log files.
   (output harvest
+          ("Soil nitrogen")
           ("Field nitrogen")
+          ("Soil water")
           ("Field water")
           ("Root zone water" 
            (crop "SiteCrop") 

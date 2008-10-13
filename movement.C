@@ -26,6 +26,8 @@
 #include "tertiary.h"
 #include "log.h"
 #include "treelog.h"
+#include "assertion.h"
+#include <sstream>
 
 const char *const Movement::component = "movement";
 
@@ -34,6 +36,71 @@ Movement::library_id () const
 {
   static const symbol id (component);
   return id;
+}
+
+void 
+Movement::water_attempt (const size_t level)
+{
+  while (water_total.size () <= level)
+    water_total.push_back (0);
+  water_total[level]++;
+}
+
+void 
+Movement::water_failure (const size_t level)
+{
+  while (water_fail.size () <= level)
+    water_fail.push_back (0);
+  water_fail[level]++;
+}
+
+void 
+Movement::solute_attempt (const size_t level)
+{
+  while (solute_total.size () <= level)
+    solute_total.push_back (0);
+  solute_total[level]++;
+}
+
+void 
+Movement::solute_failure (const size_t level)
+{
+  while (solute_fail.size () <= level)
+    solute_fail.push_back (0);
+  solute_fail[level]++;
+}
+
+void 
+Movement::summarize (Treelog& msg) const
+{
+  TREELOG_MODEL (msg);
+  bool found = false;
+  for (size_t i = 0; i < water_fail.size (); i++)
+    if (water_fail[i] > 0)
+      {
+        found = true;
+        Treelog::Open nest (msg, "matrix_water", i, name);
+        daisy_assert (water_total[i] > 0);
+        std::ostringstream tmp;
+        tmp << "Matrix water transport model " << i << " failed " 
+            << water_fail[i] << " times out of " << water_total[i] << ", or "
+            << (100.0 * water_fail[i] / (water_total[i] + 0.0)) << "%";
+        msg.warning (tmp.str ());
+      }
+  for (size_t i = 0; i < solute_fail.size (); i++)
+    if (solute_fail[i] > 0)
+      {
+        found = true;
+        Treelog::Open nest (msg, "matrix_solute", i, name);
+        daisy_assert (solute_total[i] > 0);
+        std::ostringstream tmp;
+        tmp << "Matrix solute transport model " << i << " failed " 
+            << solute_fail[i] << " times out of " << solute_total[i] << ", or "
+            << (100.0 * solute_fail[i] / (solute_total[i] + 0.0)) << "%";
+        msg.warning (tmp.str ());
+      }
+  if (found)
+    msg.message ("See 'daisy.log' for details.");
 }
 
 void 

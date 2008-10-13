@@ -615,6 +615,7 @@ MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
   // Solute primary transport.
   for (size_t i = 0; i < matrix_solute.size (); i++)
     {
+      solute_attempt (i);
       Treelog::Open nest (msg, "solute", i, matrix_solute[i]->library_id ());
       try
         {
@@ -622,17 +623,18 @@ MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
                              *matrix_solute[i], J_primary, C_border,
                              chemical, S_extra, dt, scope, msg);
           if (i > 0)
-            msg.message ("Succeeded");
+            msg.debug ("Succeeded");
           return;
         }
       catch (const char* error)
         {
-          msg.warning (std::string ("Solute problem: ") + error);
+          msg.debug (std::string ("Solute problem: ") + error);
         }
       catch (const std::string& error)
         {
-          msg.warning (std::string ("Solute trouble: ") + error);
+          msg.debug(std::string ("Solute trouble: ") + error);
         }
+      solute_failure (i);
     }
   throw "Matrix solute transport failed";
 }

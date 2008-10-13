@@ -123,7 +123,7 @@ public:
 protected:
   explicit Biopore (Block& al);
 public:
-  virtual ~Biopore ();
+  ~Biopore ();
 };
 
 #endif // BIOPORE_H

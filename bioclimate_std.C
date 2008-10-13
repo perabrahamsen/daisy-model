@@ -304,6 +304,7 @@ struct BioclimateStandard : public Bioclimate
   void initialize (Block&, const Weather&);
   static void load_syntax (Syntax& syntax, AttributeList& alist);
   BioclimateStandard (Block&);
+  void summarize (Treelog& msg) const;
   ~BioclimateStandard ();
 };
 
@@ -677,6 +678,13 @@ BioclimateStandard::BioclimateStandard (Block& al)
     atmospheric_CO2_ (-42.42e42),
     atmospheric_relative_humidity_ (-42.42e42)
 { }
+
+void 
+BioclimateStandard::summarize (Treelog& msg) const
+{
+  TREELOG_MODEL (msg);
+  svat->summarize (msg);
+}
 
 BioclimateStandard::~BioclimateStandard ()
 { }

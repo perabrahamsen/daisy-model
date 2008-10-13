@@ -1,4 +1,3 @@
-
 // movement_rect.C --- Movement in a rectangular 2D grid.
 // 
 // Copyright 2006, 2008 Per Abrahamsen and KVL.
@@ -47,6 +46,9 @@ struct MovementRect : public MovementSolute
   // Geometry.
   std::auto_ptr<GeometryRect> geo;
   Geometry& geometry () const;
+
+  // Failures.
+  void summarize (Treelog& msg) const;
 
   // Drains
   struct Point;
@@ -97,6 +99,18 @@ struct MovementRect : public MovementSolute
 Geometry& 
 MovementRect::geometry () const
 { return *geo; }
+
+void 
+MovementRect::summarize (Treelog& msg) const
+{
+  Movement::summarize (msg);
+  TREELOG_MODEL (msg);
+  for (size_t i = 0; i < matrix_water.size (); i++)
+    {
+      Treelog::Open nest (msg, "matrix_water", i, name);
+      matrix_water[i]->summarize (msg);
+    }
+}
 
 struct MovementRect::Point 
 {
@@ -224,6 +238,7 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
 
   for (size_t i = 0; i < matrix_water.size (); i++)
     {
+      water_attempt (i);
       Treelog::Open nest (msg, matrix_water[i]->name);
       Anystate old_tertiary = tertiary->implicit ().get_state ();
       try
@@ -252,19 +267,20 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
                 }
             }
           if (i > 0)
-            msg.message ("Reserve model succeeded");
+            msg.debug ("Reserve model succeeded");
           return;
         }
       catch (const char* error)
         {
-          msg.warning (std::string ("UZ problem: ") + error);
+          msg.debug (std::string ("UZ problem: ") + error);
         }
       catch (const std::string& error)
         {
-          msg.warning (std::string ("UZ trouble: ") + error);
+          msg.debug (std::string ("UZ trouble: ") + error);
         }
       tertiary->implicit ().set_state (old_tertiary); // For small timesteps.
       tertiary->deactivate (3); // Don't try tertiary right after reserve.
+      water_failure (i);
     }
   throw "Matrix water transport failed";
 }

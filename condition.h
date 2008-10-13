@@ -50,6 +50,7 @@ public:
 public:
   virtual void initialize (const Daisy&, const Scope&, Treelog&) = 0;
   virtual bool check (const Daisy&, const Scope&, Treelog&) const = 0;
+  static const AttributeList& periodic_model ();
   static std::auto_ptr<Condition> create_true ();
 protected:
   Condition (Block& al);

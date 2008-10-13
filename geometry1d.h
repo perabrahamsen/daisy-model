@@ -88,7 +88,7 @@ public:
 			 const double max_rooting_depth,
 			 const double max_interval,
 			 Treelog& msg);
-  virtual ~Geometry1D ();
+  ~Geometry1D ();
 };
 
 #endif // GEOMETRY1D_H

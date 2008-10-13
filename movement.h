@@ -55,6 +55,20 @@ public:
 
   virtual Geometry& geometry () const = 0;
 
+  // Failures.
+private:
+  std::vector<size_t> water_fail;
+  std::vector<size_t> water_total;
+  std::vector<size_t> solute_fail;
+  std::vector<size_t> solute_total;
+protected:
+  void water_attempt (size_t level);
+  void water_failure (size_t level);
+  void solute_attempt (size_t level);
+  void solute_failure (size_t level);
+public:
+  virtual void summarize (Treelog& msg) const;
+
   // Tertiary transport.
 protected:
   std::auto_ptr<Tertiary> tertiary;

@@ -487,7 +487,8 @@ SPECIALS = weather_base.C \
 
 # Various utility code that are neither a component nor a (sub)model.
 # 
-OTHER = resistance.C convert.C units.C tertsmall.C anystate.C imvec.C im.C frame.C \
+OTHER = border.C resistance.C \
+	convert.C units.C tertsmall.C anystate.C imvec.C im.C frame.C \
 	bdconv.C abiotic.C scope_soil.C run.C treelog_text.C treelog_store.C \
 	intrinsics.C metalib.C model.C output.C scope_block.C librarian.C \
 	gnuplot_utils.C scope_sources.C scope_table.C lexer_table.C \
@@ -499,7 +500,7 @@ OTHER = resistance.C convert.C units.C tertsmall.C anystate.C imvec.C im.C frame
 	mathlib.C cdaisy.C nrutil.C submodel.C version.C
 
 # Utilities in header or source alone.
-HEADONLY = submodeler.h border.h memutils.h iterative.h $(CXSPARSEHEAD)
+HEADONLY = submodeler.h memutils.h iterative.h $(CXSPARSEHEAD)
 SRCONLY = 
 
 # Everything that has an interface.
@@ -999,7 +1000,7 @@ secondary${OBJ}: secondary.C secondary.h model.h symbol.h alist.h block.h \
 heatrect${OBJ}: heatrect.C heatrect.h model.h symbol.h alist.h block.h \
   syntax.h plf.h librarian.h
 unit${OBJ}: unit.C unit.h model.h symbol.h alist.h check.h librarian.h \
-  syntax.h block.h plf.h mathlib.h assertion.h convert.h
+  syntax.h block.h plf.h mathlib.h assertion.h convert.h units.h
 ABAprod${OBJ}: ABAprod.C ABAprod.h model.h symbol.h alist.h block.h syntax.h \
   plf.h librarian.h
 solver${OBJ}: solver.C solver.h model.h symbol.h alist.h block.h syntax.h \
@@ -1038,7 +1039,8 @@ difrad${OBJ}: difrad.C difrad.h model.h symbol.h alist.h block.h syntax.h \
 organic_matter${OBJ}: organic_matter.C organic_matter.h model.h symbol.h \
   alist.h block.h syntax.h plf.h librarian.h
 movement${OBJ}: movement.C movement.h model.h symbol.h alist.h block.h \
-  syntax.h plf.h librarian.h tertiary.h log.h time.h border.h treelog.h
+  syntax.h plf.h librarian.h tertiary.h log.h time.h border.h treelog.h \
+  assertion.h
 integer${OBJ}: integer.C integer.h model.h symbol.h alist.h boolean.h \
   submodeler.h block.h syntax.h plf.h assertion.h treelog.h memutils.h \
   librarian.h
@@ -1299,6 +1301,7 @@ printer_file${OBJ}: printer_file.C printer_file.h printer.h model.h symbol.h \
   path.h assertion.h librarian.h
 log_alist${OBJ}: log_alist.C log_alist.h log.h time.h border.h model.h \
   symbol.h alist.h library.h syntax.h assertion.h
+border${OBJ}: border.C border.h
 resistance${OBJ}: resistance.C resistance.h alist.h symbol.h syntax.h \
   net_radiation.h model.h assertion.h treelog.h mathlib.h librarian.h
 convert${OBJ}: convert.C convert.h
@@ -1405,7 +1408,7 @@ version${OBJ}: version.C
 svat_ssoc${OBJ}: svat_ssoc.C svat.h model.h symbol.h alist.h syntax.h block.h \
   plf.h librarian.h resistance.h fao.h soil_heat.h bioclimate.h soil.h \
   geometry.h mathlib.h assertion.h weather.h im.h vegetation.h log.h \
-  time.h border.h treelog.h
+  time.h border.h treelog.h solver.h
 reaction_MACRO${OBJ}: reaction_MACRO.C reaction.h model.h symbol.h alist.h \
   mathlib.h assertion.h check.h block.h syntax.h plf.h librarian.h \
   chemistry.h chemical.h log.h time.h border.h geometry.h soil.h \
@@ -1415,7 +1418,7 @@ reaction_filter${OBJ}: reaction_filter.C reaction.h model.h symbol.h alist.h \
   soil_water.h log.h time.h border.h assertion.h librarian.h check.h \
   mathlib.h treelog.h
 seed_LAI${OBJ}: seed_LAI.C seed.h model.h symbol.h alist.h block.h syntax.h \
-  plf.h librarian.h log.h time.h border.h
+  plf.h librarian.h log.h time.h border.h treelog.h
 seed_release${OBJ}: seed_release.C seed.h model.h symbol.h alist.h block.h \
   syntax.h plf.h librarian.h log.h time.h border.h check.h treelog.h
 stomatacon_BB${OBJ}: stomatacon_BB.C stomatacon.h model.h symbol.h alist.h \

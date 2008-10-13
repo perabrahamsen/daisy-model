@@ -68,6 +68,7 @@ public:
 protected:
   SVAT (Block&);
 public:
+  virtual void summarize (Treelog& msg) const = 0;
   ~SVAT ();
 };
 

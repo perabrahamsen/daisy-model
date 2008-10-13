@@ -1,6 +1,6 @@
-// uzrect.C --- 2D water movement in a rectangular grid.
+// border.C -- Saving information about the simulation.
 // 
-// Copyright 2006 Per Abrahamsen and KVL.
+// Copyright 2005 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -18,39 +18,9 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#define BUILD_DLL
+#include "border.h"
 
-#include "uzrect.h"
-#include "block.h"
-#include "librarian.h"
-
-const char *const UZRect::component = "uzrect";
-
-symbol
-UZRect::library_id () const
-{
-  static const symbol id (component);
-  return id;
-}
-
-void 
-UZRect::summarize (Treelog&) const
+Border::~Border ()
 { }
 
-
-bool 
-UZRect::obey_surface ()
-{ return true; }
-
-
-UZRect::UZRect (Block& al)
-  : name (al.name ("type"))
-{ }
-
-UZRect::~UZRect ()
-{ }
-
-static Librarian UZRect_init (UZRect::component, "\
-2D water movement in a rectangular grid.");
-
-// uzrect.C ends here.
+// border.C ends here.

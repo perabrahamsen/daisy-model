@@ -1332,6 +1332,8 @@ public:
 
   // Create and Destroy.
   SVAT_PMSW (Block& al);
+  void summarize (Treelog&) const
+  { }
   ~SVAT_PMSW();
 }; // end class SVAT_PMSW
 

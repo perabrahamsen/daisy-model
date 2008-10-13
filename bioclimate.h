@@ -130,6 +130,7 @@ public:
 protected:
   explicit Bioclimate (Block&);
 public:
+  virtual void summarize (Treelog& msg) const = 0;
   ~Bioclimate ();
 };
 

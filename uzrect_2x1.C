@@ -37,6 +37,17 @@
 
 struct UZRect2x1 : public UZRect
 {
+  // Failure.
+  std::vector<size_t> vertical_fail;
+  std::vector<size_t> vertical_total;
+  std::vector<size_t> horizontal_fail;
+  std::vector<size_t> horizontal_total;
+  void vertical_attempt (size_t level);
+  void vertical_failure (size_t level);
+  void horizontal_attempt (size_t level);
+  void horizontal_failure (size_t level);
+  void summarize (Treelog&) const;
+
   // Parameters.
   const std::vector<UZmodel*> vertical;
   const std::vector<UZ1D*> horizontal;
@@ -69,6 +80,76 @@ struct UZRect2x1 : public UZRect
   UZRect2x1 (Block& al);
   ~UZRect2x1 ();
 };
+
+void 
+UZRect2x1::vertical_attempt (const size_t level)
+{
+  while (vertical_total.size () <= level)
+    vertical_total.push_back (0);
+  vertical_total[level]++;
+}
+
+void 
+UZRect2x1::vertical_failure (const size_t level)
+{
+  while (vertical_fail.size () <= level)
+    vertical_fail.push_back (0);
+  vertical_fail[level]++;
+}
+
+void 
+UZRect2x1::horizontal_attempt (const size_t level)
+{
+  while (horizontal_total.size () <= level)
+    horizontal_total.push_back (0);
+  horizontal_total[level]++;
+}
+
+void 
+UZRect2x1::horizontal_failure (const size_t level)
+{
+  while (horizontal_fail.size () <= level)
+    horizontal_fail.push_back (0);
+  horizontal_fail[level]++;
+}
+
+void 
+UZRect2x1::summarize (Treelog& msg) const
+{
+  TREELOG_MODEL (msg);
+  bool found = false;
+  for (size_t i = 0; i < vertical_fail.size (); i++)
+    if (vertical_fail[i] > 0)
+      {
+        found = true;
+        daisy_assert (vertical.size () > i);
+        Treelog::Open nest (msg, "vertical", i, vertical[i]->name);
+        daisy_assert (vertical_total[i] > 0);
+        std::ostringstream tmp;
+        tmp << "Matrix vertical transport model " << i << " failed " 
+            << vertical_fail[i] << " times out of "
+            << vertical_total[i] << ", or "
+            << (100.0 * vertical_fail[i] / (vertical_total[i] + 0.0)) << "%";
+        msg.warning (tmp.str ());
+      }
+  for (size_t i = 0; i < horizontal_fail.size (); i++)
+    if (horizontal_fail[i] > 0)
+      {
+        found = true;
+        daisy_assert (horizontal.size () > i);
+        Treelog::Open nest (msg, "horizontal", i, horizontal[i]->name);
+        daisy_assert (horizontal_total[i] > 0);
+        std::ostringstream tmp;
+        tmp << "Matrix horizontal transport model " << i << " failed " 
+            << horizontal_fail[i] << " times out of " 
+            << horizontal_total[i] << ", or "
+            << (100.0 * horizontal_fail[i] / (horizontal_total[i] + 0.0))
+            << "%";
+        msg.warning (tmp.str ());
+      }
+  if (found)
+    msg.message ("See 'daisy.log' for details.");
+}
 
 void 
 UZRect2x1::tick (const GeometryRect& geo, std::vector<size_t>&, 
@@ -147,22 +228,24 @@ UZRect2x1::tick (const GeometryRect& geo, std::vector<size_t>&,
 
       for (size_t i = 0; i < horizontal.size (); i++)
         {
+          horizontal_attempt (i);
           Treelog::Open nest (msg, horizontal[i]->name);
           try 
             {
               horizontal[i]->tick (smm, 0.0, dt, msg);
               if (i > 0)
-                msg.message ("Reserve model succeeded");
+                msg.debug ("Reserve model succeeded");
               goto success;
             }
           catch (const char* error)
             {
-              msg.warning (std::string ("UZhor problem: ") + error);
+              msg.debug (std::string ("UZhor problem: ") + error);
             }
           catch (const std::string& error)
             {
-              msg.warning (std::string ("UZhor trouble: ") + error);
+              msg.debug (std::string ("UZhor trouble: ") + error);
             }
+          horizontal_failure (i);
         }
       msg.error ("No useful horizontal transport found");
     success:
@@ -219,6 +302,7 @@ UZRect2x1::water_column (const GeometryRect& geo, const Soil& soil,
   // Calculate matrix flow next.
   for (size_t m = 0; m < vertical.size (); m++)
     {
+      vertical_attempt (m);
       Treelog::Open nest (msg, vertical[m]->name);
       try
         {
@@ -242,17 +326,18 @@ UZRect2x1::water_column (const GeometryRect& geo, const Soil& soil,
             }
 #endif // INERT_GROUNDWATER
           if (m > 0)
-            msg.message ("Reserve model succeeded");
+            msg.debug ("Reserve model succeeded");
           return;
         }
       catch (const char* error)
         {
-          msg.warning (std::string ("UZ problem: ") + error);
+          msg.debug (std::string ("UZ problem: ") + error);
         }
       catch (const std::string& error)
         {
-          msg.warning (std::string ("UZ trouble: ") + error);
+          msg.debug (std::string ("UZ trouble: ") + error);
         }
+      vertical_failure (m);
     }
   throw "Vertical transport failed";
 }

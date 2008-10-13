@@ -399,7 +399,7 @@ UZRichard::richard (Treelog& msg,
                   tmp << "ABSURD: h[0] = " << h[0] << " h[1] = " << h[1] 
                       << " h[" << (size-1) << "] = " << h[size-1]
                       << " stepping down";
-                  msg.warning (tmp.str ());
+                  msg.debug (tmp.str ());
                 }
 	      iterations_used = max_iterations + 42;
 	      break;
@@ -535,7 +535,7 @@ UZRichard::richard (Treelog& msg,
 		  else
 		    {
                       if (debug > 0)
-                        msg.message ("Emptied pond, switching to flux top");
+                        msg.debug ("Emptied pond, switching to flux top");
 		      flux = true;
 		      accepted = false;
 		    }
@@ -559,7 +559,7 @@ UZRichard::richard (Treelog& msg,
                   tmp << "last: " << switched_top_last 
                       << "; time left: " << time_left << "; h[" << first 
                       << "] = " << h[first] <<"; q = " << q_top;
-                  msg.message (tmp.str ());
+                  msg.debug (tmp.str ());
                 }
 	      Theta = Theta_previous;
               goto try_again;
@@ -568,7 +568,7 @@ UZRichard::richard (Treelog& msg,
 	    // We have saturated soil, make it a pressure top.
 	    {
               if (debug > 0)
-                msg.message ("Saturated soil, switching to pressure top");
+                msg.debug ("Saturated soil, switching to pressure top");
 	      flux = false;
 	      accepted = false;
 	    }
@@ -590,7 +590,7 @@ UZRichard::richard (Treelog& msg,
 	  else
 	    {
               if (debug > 0)
-                msg.message ("Not accepted, mark switched top");
+                msg.debug ("Not accepted, mark switched top");
 	      switched_top_last = time_left;
 	      Theta = Theta_previous;
 	      h = h_previous;

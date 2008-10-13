@@ -119,7 +119,7 @@ public:
 public:
   static void load_syntax (Syntax& syntax, AttributeList& alist);
   PhotoFarquhar (Block& al);
-  virtual ~PhotoFarquhar ();
+  ~PhotoFarquhar ();
 };
 
 inline double pow2 (double x)

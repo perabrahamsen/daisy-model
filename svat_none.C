@@ -62,6 +62,8 @@ struct SVAT_none : public SVAT
   SVAT_none (Block& al)
     : SVAT (al)
   { }
+  void summarize (Treelog&) const
+  { }
 };
 
 static struct SVAT_NoneSyntax

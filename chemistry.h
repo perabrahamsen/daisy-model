@@ -120,7 +120,7 @@ public:
 protected:
   explicit Chemistry (Block& al);
 public:
-  virtual ~Chemistry ();
+  ~Chemistry ();
 };
 
 #endif // CHEMISTRY_H

@@ -46,7 +46,7 @@ public:
 public:
   static const AttributeList& none_model ();
   Secondary (Block& al);
-  virtual ~Secondary ();
+  ~Secondary ();
 };
 
 #endif // SECONDARY_H

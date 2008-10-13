@@ -160,7 +160,9 @@ struct SVAT_SSOC : public SVAT
 
   bool initialized_soil; 
   bool initialized_canopy;
-  
+  size_t converge_fail;
+  size_t converge_total;
+
   // Simulation.
   void tick (const Weather&, const Vegetation&,
 	     const Geometry&, const Soil&, const SoilHeat&,
@@ -197,6 +199,20 @@ struct SVAT_SSOC : public SVAT
   // Create.
   static void load_syntax (Syntax& syntax, AttributeList& alist);
   SVAT_SSOC (Block& al);
+  void summarize (Treelog& msg) const
+  { 
+    if (converge_fail > 0)
+      {
+        TREELOG_MODEL (msg);
+        daisy_assert (converge_total > 0);
+        std::ostringstream tmp;
+        tmp << "Convergence failed " << converge_fail << " times out of "
+            << converge_total << "; or "
+            << (100.0 * converge_fail / (converge_total + 0.0)) << "%";
+        msg.warning (tmp.str ());
+        msg.message ("See 'daisy.log' for details");
+      }
+  }
  ~SVAT_SSOC ()
   { }
 
@@ -823,12 +839,13 @@ SVAT_SSOC::solve(const double gs /* stomata cond. [m/s]*/, Treelog& msg )
          && std::fabs( old_e_c - e_c) < maxEdiff)
         goto success;
     } 
-  msg.error("Too many iterations.");
+  msg.debug ("Too many iterations.");
   initialized_soil = has_LAI = false; // Prevent log.
   T_c = T_sun = T_shadow = T_s = T_a;
   calculate_conductances(gs, msg);
+  converge_fail++;
  success:
-
+  converge_total++;
   calculate_fluxes();
 }
 
@@ -1027,7 +1044,9 @@ SVAT_SSOC::SVAT_SSOC (Block& al)
     R_eq_abs_sun (-42.42e42),
     R_eq_abs_shadow (-42.42e42),
     initialized_soil (false), 
-    initialized_canopy (false) 
+    initialized_canopy (false),
+    converge_fail (0),
+    converge_total (0)
 { }
 
 static struct SVAT_SSOCSyntax

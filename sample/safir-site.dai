@@ -1,5 +1,5 @@
 ;; Description that will occur in all output files
-(description "Simulation demonstrating Partial Rootzone Drying in Daisy")
+(description "Simulation for my site.")
 
 ;; Setting "working directory"
 ;; If the working directory is set correctly the output files and the daisy.log-file
@@ -30,21 +30,21 @@
   ;; The 'xplus' and 'zplus' specifies the horisontal and
   ;; vertical grid lines, respectively:
   (Geometry (xplus 3 6 9 12 15 18 21 24 27 30 [cm])
-            (zplus -1.5 -3 -5 -7 -10 -15 -20 -25 -30 -35 -40 -45
+            (zplus -1.5 -3 -5 -7 -9 -12 -16 -20 -25 -30 -35 -40 -45
                    -50 -60 -70 -80 -90 -100 -120
                    -140 -160 -180 -200 [cm])))
 
 ;; "Good enough" for crop calibration and full irrigation.
 (defmovement "Fast" rectangle
   (Geometry (xplus 15 30 [cm])
-            (zplus -1.5 -3 -5 -7 -10 -15 -20 -25 -30 -35 -40 -45
+            (zplus -1.5 -3 -5 -7 -9 -12 -16 -20 -25 -30 -35 -40 -45
                    -50 -60 -70 -80 -90 -100 -120
                    -140 -160 -180 -200 [cm])))
 
 ;; Much faster, but different code.
 (defmovement "1D" rectangle
   (Tertiary none)                       ;Prevent macropores from being added.
-  (Geometry (zplus -1.5 -3 -5 -7 -10 -15 -20 -25 -30 -35 -40 -45
+  (Geometry (zplus -1.5 -3 -5 -7 -9 -12 -16 -20 -25 -30 -35 -40 -45
                    -50 -60 -70 -80 -90 -100 -120
                    -140 -160 -180 -200 [cm])))
 
@@ -127,6 +127,9 @@
    )
 
   ;; Step 4: Set ForcedLAI in vegetation below.
+
+  ;; You can calibrate the soil physics based on water measurements
+  ;; now, as LAI will be "correct".
   
   ;; Step 5: Get total production right.
   (LeafPhot original
@@ -160,7 +163,7 @@
   )
 
 (defvegetation SiteVegetation crops
-  ;; Step 3:  TEMPORARILY force LAI to confirm to measurements.
+  ;; Step 3: TEMPORARILY force LAI to confirm to measurements.
   ;; (ForcedLAI (2006 (100 0) (200 5.0) (300 0.2)))
   ;; Step 8: REMOVE ForcedLAI again.
   ;; Relying on ForcedLAI means the crop can't be used for scenarious.
@@ -191,9 +194,7 @@
   (wait_mm_dd 4 18)
   (seed_bed_preparation)  
   (wait_mm_dd 5 5)
-  (sow ("Lettuce") 
-       (seed 2765 [kg w.w./ha])
-       (plant_distance 0.30 [m]))
+  (sow ("Lettuce"))
   (wait_mm_dd 7 21)
   (fertilize (mineral    
               ;; Weight of total N (sum of NO3 and NH4).
@@ -353,8 +354,7 @@
       irrigation_subsoil_PRD_right)))
 
 (run batch
-     (run ;;(batch (run Crop-Subsoil-Full) (directory "subsoil_Full"))
-          (batch (run Crop-Subsoil-PRD ) (directory "subsoil_PRD"))
-          ))
+     (run (batch (run Crop-Subsoil-Full) (directory "subsoil_Full"))
+          (batch (run Crop-Subsoil-PRD ) (directory "subsoil_PRD"))))
 
 ;;; safir-site.dai ends here.

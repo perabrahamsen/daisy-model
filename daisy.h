@@ -97,6 +97,8 @@ public:
   bool check (Treelog& err);
   static void load_syntax (Syntax&, AttributeList&);
   explicit Daisy (Block&);
+private:
+  void summarize (Treelog&) const;
   ~Daisy ();
 };
 

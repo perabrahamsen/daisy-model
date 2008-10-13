@@ -266,12 +266,15 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 
       if (n_small_time_steps > 0
           && (n_small_time_steps%msg_number_of_small_time_steps) == 0)
-        msg.touch ();
+        {
+          msg.touch ();
+          msg.flush ();
+        }
       
       n_small_time_steps++;
       if (n_small_time_steps > max_number_of_small_time_steps) 
         {
-          msg.touch ();
+          msg.debug ("Too many small timesteps");
           throw "Too many small timesteps";
         }
       
@@ -451,7 +454,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
                   std::ostringstream tmp;
                   tmp << "Pressure potential out of realistic range, h[" 
                       << c << "] = " << h (c);
-                  msg.warning (tmp.str ());
+                  msg.debug (tmp.str ());
                   iterations_used = max_iterations + 100;
                   break;
                 } 
@@ -468,7 +471,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
           
 	  if (number_of_time_step_reductions > max_time_step_reductions)
             {
-              msg.touch ();
+              msg.debug ("Could not find solution");
               throw "Could not find solution";
             }
 

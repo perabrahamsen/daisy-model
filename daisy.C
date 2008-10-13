@@ -102,7 +102,7 @@ Daisy::run (Treelog& msg)
       }
     while (running);
   }
-  output_log->summarize (msg);
+  summarize (msg);
   return true;
 }
 
@@ -283,9 +283,7 @@ Scope to evaluate expessions in.");
 The simulation time will also be printed whenever there are any news\n\
 to report, like emergence of crop or various management operations.\n\
 Good values for this parameter would be hourly, daily or monthly.");
-  AttributeList false_alist;
-  false_alist.add ("type", "false");
-  alist.add ("print_time", false_alist);
+  alist.add ("print_time", Condition::periodic_model ());
 
   syntax.add_object ("manager", Action::component, Syntax::State,
                      Syntax::Singleton,
@@ -313,6 +311,13 @@ the simulation.  Can be overwritten by column specific weather.");
 				 "Total list of all crop yields.",
 				 Harvest::load_syntax);
   alist.add ("harvest", std::vector<const AttributeList*> ());
+}
+
+void
+Daisy::summarize (Treelog& msg) const
+{
+  output_log->summarize (msg);
+  field->summarize (msg);
 }
 
 Daisy::~Daisy ()
