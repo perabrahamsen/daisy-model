@@ -108,7 +108,7 @@
          )
   ;; Step 2: Fill in measured leaf area to leaf weight ratio.
   (Canopy ;;(SpLAI  0.020 [(m^2/m^2)/(g DM/m^2)])
-          ;;(LeafAIMod (1.5 1.1)(2.0 0.3))
+          ;;(LeafAIMod (0.0 2.2) (0.4 1.1)(1.5 1.1)(2.0 0.3))
           )
 
   ;; Step 3: Fill in measured root data.
