@@ -41,13 +41,6 @@
                    -50 -60 -70 -80 -90 -100 -120
                    -140 -160 -180 -200 [cm])))
 
-;; Much faster, but different code.
-(defmovement "1D" rectangle
-  (Tertiary none)                       ;Prevent macropores from being added.
-  (Geometry (zplus -1.5 -3 -5 -7 -9 -12 -16 -20 -25 -30 -35 -40 -45
-                   -50 -60 -70 -80 -90 -100 -120
-                   -140 -160 -180 -200 [cm])))
-
 ;; Choose whether to use a fast or precise geometry.
 (defmovement "SiteMovement" "Fast")
 
@@ -126,24 +119,19 @@
         ;;(MaxPen       50 [cm])
    )
 
-  ;; Step 4: Set ForcedLAI in vegetation below.
-
-  ;; You can calibrate the soil physics based on water measurements
-  ;; now, as LAI will be "correct".
-  
-  ;; Step 5: Get total production right.
+  ;; Step 4: Get total production right.
   (LeafPhot original
             ;; (Xn 1.0e-3 [mol/mol/s])
             )
 
-  ;; Step 6: Get partitioning right.
+  ;; Step 5: Get partitioning right.
   (Partit ;;(Root (0.00 0.20) (1.00 0.20) (1.36 0.00))
           ;;(Leaf (0.00 0.95) (1.00 0.80) (1.05 0.20) (1.25 0.15) (1.35 0.00))
           ;;(Stem (0.00 0.05) (1.00 0.20) (1.05 0.35) (1.25 0.00) (1.35 0.00))
           ;;(nitrogen_stress_limit 0.01)
           )
   
-  ;; Step 7: Get crop nitrogen right. 
+  ;; Step 6: Get crop nitrogen right. 
   ;; This might involve repeating Step 4 and 5.
   (CrpN ;;(PtLeafCnc (0.00 0.0600) (1.00 0.0500) (1.30 0.0400) (1.50 0.025) (2.00 0.020))
         ;;(CrLeafCnc (0.00 0.0450) (1.00 0.0400) (1.30 0.0300) (1.50 0.020) (2.00 0.010))
@@ -157,15 +145,13 @@
         ;;(NH4_root_min 1E-8 [g N/cm^3])
         ;;(NO3_root_min 1E-8 [g N/cm^3])
         )
-  
-  ;; Step 8: Remove ForcedLAI from vegetation below.
-  ;; This should not affect results significantly.
   )
 
 (defvegetation SiteVegetation crops
-  ;; Step 3: TEMPORARILY force LAI to confirm to measurements.
+  ;; BEFORE calibrating the rest of the system, FORCE LAI to confirm
+  ;; to measurements.
   ;; (ForcedLAI (2006 (100 0) (200 5.0) (300 0.2)))
-  ;; Step 8: REMOVE ForcedLAI again.
+  ;; AFTER calibrating the soil water and crop, REMOVE ForcedLAI again.
   ;; Relying on ForcedLAI means the crop can't be used for scenarious.
   )
 
