@@ -16,13 +16,13 @@
 ;; We assume the drip poins are 30 cm apart. This means that the
 ;; left dripper is at 0 [cm], the right dripper is 30 [cm], and the
 ;; tuber at 15 [cm].  The drip line is placed 7 [cm] below soil
-;; surface. We inject the water in a box volume 2 [cm] above and below the
+;; surface. We inject the water in a box volume 5 [cm] around the
 ;; drip point.
 
 (defvolume drip-depth box
   "The depth of the drip point."
-  (top finite -5 [cm])
-  (bottom finite -9 [cm]))
+  (top finite -2 [cm])
+  (bottom finite -12 [cm]))
 
 ;; We need a fine discretization for PRD.
 (defmovement "Precise" rectangle

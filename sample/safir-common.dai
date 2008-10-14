@@ -12,11 +12,11 @@
 (defvolume left-drip drip-depth
   "The left drip point."
   (left finite 0 [cm])
-  (right finite 3 [cm]))
+  (right finite 5 [cm]))
 
 (defvolume right-drip drip-depth
   "The right drip point."
-  (left finite 27 [cm])
+  (left finite 25 [cm])
   (right finite 30 [cm]))
 
 (defvolume left-side box 

@@ -1146,7 +1146,7 @@ Model used for solving matrix equation system.");
   syntax.add ("max_time_step_reductions",
               Syntax::Integer, Syntax::Const, "\
 Number of times we may reduce the time step before giving up");
-  alist.add ("max_time_step_reductions", 4);
+  alist.add ("max_time_step_reductions", 8);
   syntax.add ("time_step_reduction", Syntax::Integer, Syntax::Const, 
               "Divide the time step with this at each reduction.");
   alist.add ("time_step_reduction", 4);
@@ -1156,7 +1156,7 @@ the time step.");
   alist.add ("max_iterations", 12);
   syntax.add ("max_number_of_small_time_steps", Syntax::Integer, Syntax::Const, "\
 Maximum number of small time steps in a large time step.");
-  alist.add ("max_number_of_small_time_steps", 1000);  
+  alist.add ("max_number_of_small_time_steps", 2000);  
   syntax.add ("msg_number_of_small_time_steps", Syntax::Integer, Syntax::Const, "\
 Number of small time steps in a large time step between message.");
   alist.add ("msg_number_of_small_time_steps", 100);  
@@ -1168,7 +1168,7 @@ Maximum relative difference in 'h' values for convergence.");
   alist.add ("max_relative_difference", 0.001); 
   syntax.add ("max_pressure_potential", Syntax::None (), Syntax::Const, "\
 Maximum pressure potential for convergence.");
-  alist.add ("max_pressure_potential", 1000.0); 
+  alist.add ("max_pressure_potential", 1e9); 
   syntax.add ("min_pressure_potential", Syntax::None (), Syntax::Const, "\
 minimum pressure potential for convergence.");
   alist.add ("min_pressure_potential", -1.0e9); 
