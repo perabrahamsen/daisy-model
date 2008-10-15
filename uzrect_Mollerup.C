@@ -1156,7 +1156,7 @@ the time step.");
   alist.add ("max_iterations", 12);
   syntax.add ("max_number_of_small_time_steps", Syntax::Integer, Syntax::Const, "\
 Maximum number of small time steps in a large time step.");
-  alist.add ("max_number_of_small_time_steps", 2000);  
+  alist.add ("max_number_of_small_time_steps", 10000);  
   syntax.add ("msg_number_of_small_time_steps", Syntax::Integer, Syntax::Const, "\
 Number of small time steps in a large time step between message.");
   alist.add ("msg_number_of_small_time_steps", 100);  
