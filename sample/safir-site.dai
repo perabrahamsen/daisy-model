@@ -328,7 +328,9 @@
   (activate_output (after 2005 10 1))
   
   ;; Additional output files
-  (output &old TDR))
+  (output &old                          ;Reuse output from safir-common.dai.
+          (checkpoint (when (at 2006 05 1 8)))
+          TDR))
 
 (defprogram Crop-Subsoil-Full Field-2006
   "Year 2006, subsoil full."
