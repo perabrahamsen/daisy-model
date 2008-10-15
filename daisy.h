@@ -27,6 +27,8 @@
 #include "time.h"
 #include "timestep.h"
 #include "memutils.h"
+#include "alist.h"
+
 #include <vector>
 #include <memory>
 
@@ -36,7 +38,6 @@ class Weather;
 class Log;
 class Field;
 class Syntax;
-class AttributeList;
 class Treelog;
 class Output;
 class Condition;
@@ -52,6 +53,7 @@ public:
   static const char *const default_description;
   Metalib& metalib;
   const Units& units () const;
+  const AttributeList alist;
 
   // Content.
   const std::string directory;  // Initialize, check and run here.

@@ -77,7 +77,7 @@ LogCheckpoint::match (const Daisy& daisy, Treelog& out)
   if (is_active)
     {
       static const symbol daisy_symbol ("daisy");
-      push (daisy_symbol, daisy.metalib.syntax (), daisy.metalib.alist ());
+      push (daisy_symbol, daisy.metalib.syntax (), daisy.alist);
       global_alist = &daisy.metalib.alist ();
       time = daisy.time;
     }
