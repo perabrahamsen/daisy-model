@@ -32,6 +32,12 @@
 #include "librarian.h"
 #include <sstream>
 
+#define USE_PROGRAM
+
+#ifdef USE_PROGRAM
+#include "library.h"
+#endif
+
 struct LogCheckpoint : public LogAList
 {
   // Content.
@@ -99,8 +105,7 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
       std::ostringstream scratch;
       scratch.fill (0);
       scratch.width (2);
-      scratch << file.name ().c_str () 
-	      << "-" << time.year () << "-" << time.month () << "-" 
+      scratch << file << "-" << time.year () << "-" << time.month () << "-" 
 	      << time.mday () << "+" << time.hour () << ".dai";
       const symbol filename (scratch.str ());
 
@@ -154,11 +159,38 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
       // Print content.
       printer.print_comment ("Content");
       
+#ifdef USE_PROGRAM
+      Library& library = metalib ().library (Program::component);
+      symbol super ("Daisy");
+      if (alist ().check ("type"))
+        super = alist ().name ("type");
+      std::string name = super + " Checkpoint";
+      while (library.check (name))
+        name += "+";
+      daisy_assert (library.check (super));
+      library.add_derived (name, alist (), super);
+      printer.print_parameterization (Program::component, name);
+#if 1
+      AttributeList program_alist (alist ());
+      program_alist.add ("type", name);
+      AttributeList run_alist;
+      run_alist.add ("run", program_alist);
+      printer.print_entry (run_alist, syntax (), "run");
+#else 
+      std::ostringstream tmp;
+      tmp << "(run ";
+      PrinterFile::print_string (tmp, name);
+      tmp << ")";
+      printer.print_comment (tmp.str ());
+#endif
+      library.remove (name);
+#else  // !USE_PROGRAM
       Syntax daisy_syntax;
       AttributeList default_alist;
       Daisy::load_syntax (daisy_syntax, default_alist);
 
       printer.print_alist (alist (), daisy_syntax, default_alist, daisy_syntax);
+#endif // !USE_PROGRAM
 
       if (!printer.good ())
 	{

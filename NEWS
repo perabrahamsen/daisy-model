@@ -26,8 +26,6 @@ This will overwrite the seed initial weight parameter
 
 ** New svat model 'SSOC'.
 
-
-
 * 4.51
 
 ** Bug fixes and SVAT work.
