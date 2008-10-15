@@ -325,17 +325,17 @@ LogAList::close_alist ()
     close_ignore (); 
 }
 void
-LogAList::open_derived (symbol field, symbol type, const char *const library)
+LogAList::open_derived (const symbol field, const symbol type, 
+                        const char *const library)
 { 
-  const std::string& sfield = field.name ();
-  if (!alist ().check (sfield))
+  if (!alist ().check (field))
     {
       std::ostringstream tmp;
       tmp << "No field '" << field << "' (type " << type
           << ") within library '" << library << "'";
       daisy_panic (tmp.str ());
     }
-  open_object (field, type, alist ().alist (sfield), library);
+  open_object (field, type, alist ().alist (field), library);
 }
 	
 void

@@ -24,24 +24,31 @@
   (top finite -2 [cm])
   (bottom finite -12 [cm]))
 
-;; We need a fine discretization for PRD.
-(defmovement "Precise" rectangle
+;; "Good enough" for crop calibration and full irrigation.
+(defmovement "Fast" rectangle
   ;; The soil is divided into a 2D rectangular grid.  
   ;; The 'xplus' and 'zplus' specifies the horisontal and
   ;; vertical grid lines, respectively:
-  (Geometry (xplus 3 6 9 12 15 18 21 24 27 30 [cm])
-            (zplus -1.5 -3 -5 -7 -9 -12 -16 -20 -25 -30 -35 -40 -45
-                   -50 -60 -70 -80 -90 -100 -120
-                   -140 -160 -180 -200 [cm])))
-
-;; "Good enough" for crop calibration and full irrigation.
-(defmovement "Fast" rectangle
   (Geometry (xplus 15 30 [cm])
             (zplus -1.5 -3 -5 -7 -9 -12 -16 -20 -25 -30 -35 -40 -45
                    -50 -60 -70 -80 -90 -100 -120
                    -140 -160 -180 -200 [cm])))
 
-;; Choose whether to use a fast or precise geometry.
+;; We need a fine discretization for PRD.
+(defmovement "Medium" rectangle
+  (Geometry (xplus 3 6 9 12 15 18 21 24 27 30 [cm])
+            (zplus -1.5 -3 -5 -7 -9 -12 -16 -20 -25 -30 -35 -40 -45
+                   -50 -60 -70 -80 -90 -100 -120
+                   -140 -160 -180 -200 [cm])))
+
+;; For final run, we need to be sure the primary water transport model is 
+;; used.
+(defmovement Precise Medium
+  (matrix_water (Mollerup (max_time_step_reductions 16)
+                          (max_number_of_small_time_steps 1000000))
+                (v+h)))
+
+;; Choose whether to use a fast, medium or precise movement.
 (defmovement "SiteMovement" "Fast")
 
 ;; Including external settings- or library-files
