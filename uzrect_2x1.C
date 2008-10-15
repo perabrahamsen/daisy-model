@@ -367,7 +367,9 @@ If none succeeds, the simulation ends.");
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends."); 
   std::vector<const AttributeList*> horizontal_models;
+#if 0
   horizontal_models.push_back (&UZ1D::default_model ());
+#endif
   horizontal_models.push_back (&UZ1D::none_model ());
   alist.add ("horizontal", horizontal_models);
 }
