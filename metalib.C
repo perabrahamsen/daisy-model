@@ -32,7 +32,7 @@
 #include "librarian.h"
 #include "path.h"
 #include "units.h"
-#include "unit.h"
+#include "unit_model.h"
 #include <map>
 #include <sstream>
 
@@ -126,8 +126,8 @@ Metalib::refile_parsed (const std::string& from, const std::string& to)
 void 
 Metalib::added_object (const symbol library, const symbol object)
 {
-  // Make sur ewe can use units right after we defined them.
-  if (library == symbol (Unit::component))
+  // Make sure we can use units right after we defined them.
+  if (library == symbol (MUnit::component))
     impl->units->add_unit (*this, object);
 }
 

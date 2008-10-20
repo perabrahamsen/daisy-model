@@ -37,7 +37,7 @@
 
 symbol 
 Scalar::dimension () const
-{ return unit_.name; }
+{ return unit_.native_name (); }
 
 symbol
 IM::storage_unit ()

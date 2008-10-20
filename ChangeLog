@@ -1,3 +1,16 @@
+2008-10-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* unit_model.C, unit_model.h: Split out from 'unit.C' and 'unit.h'
+	* Makefile (OTHER, COMPONENTS): Adjust.
+	* im.C, am.C, units.C, metalib.C: Adjust.
+
+	* photo.h, photo.C (min_PAR): New parameter and virtual member
+	function. 
+	* crop_std.C (CropStandard::find_stomata_conductance): Use it.
+	* bioclimate_std.C (max_svat_iterations):
+	( max_svat_absolute_difference): New parameters.
+	* svat_ssoc.C (maxTdiff, maxEdiff, max_iteration): New parameters.
+
 2008-10-15  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.52 released.

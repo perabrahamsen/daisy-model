@@ -448,7 +448,7 @@ DISABLED = log_clone.C action_merge.C action_divide.C \
 # A component is a common interface to a number of models.
 #
 COMPONENTS = seed.C \
-	stomatacon.C tertiary.C biopore.C secondary.C heatrect.C unit.C \
+	stomatacon.C tertiary.C biopore.C secondary.C heatrect.C unit_model.C \
 	ABAprod.C solver.C element.C ui.C reaction.C scopesel.C scope.C \
 	ABAeffect.C transport.C uzrect.C bound.C volume.C uz1d.C \
 	rubiscoNdist.C raddist.C difrad.C organic_matter.C movement.C integer.C\
@@ -485,7 +485,7 @@ SPECIALS = weather_base.C \
 
 # Various utility code that are neither a component nor a (sub)model.
 # 
-OTHER = border.C resistance.C \
+OTHER = unit.C border.C resistance.C \
 	convert.C units.C tertsmall.C anystate.C imvec.C im.C frame.C \
 	bdconv.C abiotic.C scope_soil.C run.C treelog_text.C treelog_store.C \
 	intrinsics.C metalib.C model.C output.C scope_block.C librarian.C \
@@ -970,8 +970,9 @@ secondary${OBJ}: secondary.C secondary.h model.h symbol.h alist.h block.h \
   syntax.h plf.h librarian.h assertion.h
 heatrect${OBJ}: heatrect.C heatrect.h model.h symbol.h alist.h block.h \
   syntax.h plf.h librarian.h
-unit${OBJ}: unit.C unit.h model.h symbol.h alist.h check.h librarian.h \
-  syntax.h block.h plf.h mathlib.h assertion.h convert.h units.h
+unit_model${OBJ}: unit_model.C unit_model.h unit.h symbol.h model.h alist.h \
+  check.h librarian.h syntax.h block.h plf.h mathlib.h assertion.h \
+  convert.h units.h
 ABAprod${OBJ}: ABAprod.C ABAprod.h model.h symbol.h alist.h block.h syntax.h \
   plf.h librarian.h
 solver${OBJ}: solver.C solver.h model.h symbol.h alist.h block.h syntax.h \
@@ -1027,7 +1028,7 @@ stringer${OBJ}: stringer.C stringer.h model.h symbol.h alist.h boolean.h \
 source${OBJ}: source.C source.h model.h symbol.h alist.h time.h block.h \
   syntax.h plf.h librarian.h
 photo${OBJ}: photo.C photo.h model.h symbol.h alist.h block.h syntax.h plf.h \
-  librarian.h
+  librarian.h check.h
 format${OBJ}: format.C format.h model.h symbol.h alist.h assertion.h block.h \
   syntax.h plf.h librarian.h
 depth${OBJ}: depth.C depth.h model.h symbol.h alist.h block.h syntax.h plf.h \
@@ -1272,13 +1273,14 @@ printer_file${OBJ}: printer_file.C printer_file.h printer.h model.h symbol.h \
   path.h assertion.h librarian.h
 log_alist${OBJ}: log_alist.C log_alist.h log.h time.h border.h model.h \
   symbol.h alist.h library.h syntax.h assertion.h
+unit${OBJ}: unit.C unit.h symbol.h
 border${OBJ}: border.C border.h
 resistance${OBJ}: resistance.C resistance.h alist.h symbol.h syntax.h \
   net_radiation.h model.h assertion.h treelog.h mathlib.h librarian.h
 convert${OBJ}: convert.C convert.h
-units${OBJ}: units.C units.h symbol.h unit.h model.h alist.h convert.h \
-  oldunits.h memutils.h treelog.h assertion.h librarian.h metalib.h \
-  library.h syntax.h
+units${OBJ}: units.C units.h symbol.h unit_model.h unit.h model.h alist.h \
+  convert.h oldunits.h memutils.h treelog.h assertion.h librarian.h \
+  metalib.h library.h syntax.h
 tertsmall${OBJ}: tertsmall.C tertsmall.h anystate.h
 anystate${OBJ}: anystate.C anystate.h assertion.h
 imvec${OBJ}: imvec.C imvec.h symbol.h syntax.h assertion.h log.h time.h \
@@ -1301,7 +1303,7 @@ intrinsics${OBJ}: intrinsics.C intrinsics.h symbol.h assertion.h library.h \
   memutils.h
 metalib${OBJ}: metalib.C metalib.h symbol.h intrinsics.h librarian.h model.h \
   alist.h library.h block.h syntax.h plf.h assertion.h memutils.h path.h \
-  units.h unit.h
+  units.h unit_model.h unit.h
 model${OBJ}: model.C model.h symbol.h alist.h log.h time.h border.h syntax.h
 output${OBJ}: output.C output.h condition.h model.h symbol.h alist.h \
   memutils.h time.h daisy.h program.h run.h timestep.h vcheck.h log_all.h \
@@ -1688,7 +1690,7 @@ rootdens_AP${OBJ}: rootdens_AP.C rootdens.h model.h symbol.h alist.h block.h \
   syntax.h plf.h geometry.h mathlib.h assertion.h log.h time.h border.h \
   check.h librarian.h
 number_const${OBJ}: number_const.C number.h symbol.h model.h alist.h block.h \
-  syntax.h plf.h scope.h units.h assertion.h librarian.h treelog.h
+  syntax.h plf.h scope.h units.h unit.h assertion.h librarian.h treelog.h
 domsorp_std${OBJ}: domsorp_std.C domsorp.h model.h symbol.h alist.h block.h \
   syntax.h plf.h transform.h dom.h som.h om.h soil.h log.h time.h \
   border.h assertion.h librarian.h treelog.h
@@ -1953,7 +1955,7 @@ condition_soil${OBJ}: condition_soil.C condition.h model.h symbol.h alist.h \
 log_checkpoint${OBJ}: log_checkpoint.C log_alist.h log.h time.h border.h \
   model.h symbol.h alist.h metalib.h block.h syntax.h plf.h condition.h \
   daisy.h program.h run.h timestep.h vcheck.h memutils.h printer_file.h \
-  printer.h scope.h assertion.h librarian.h
+  printer.h scope.h assertion.h librarian.h library.h
 uznone${OBJ}: uznone.C uzmodel.h model.h symbol.h alist.h syntax.h soil.h \
   mathlib.h assertion.h librarian.h
 condition_daisy${OBJ}: condition_daisy.C condition.h model.h symbol.h alist.h \

@@ -836,7 +836,7 @@ AM::get_NH4 (const AttributeList& al)
 IM
 AM::get_IM (const Unit& unit, const AttributeList& al)
 {
-  daisy_assert (unit.name == IM::storage_unit ());
+  daisy_assert (unit.native_name () == IM::storage_unit ());
   IM result (unit);
   result.set_value (Chemical::NH4 (), unit, get_NH4 (al));
   result.set_value (Chemical::NO3 (), unit, get_NO3 (al));

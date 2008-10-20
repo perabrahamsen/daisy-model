@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "units.h"
-#include "unit.h"
+#include "unit_model.h"
 #include "convert.h"
 #include "oldunits.h"
 #include "memutils.h"
@@ -149,10 +149,6 @@ Units::base_convert (const symbol from, const symbol to,
   throw "Cannot convert base [" + from + "] to [" + to + "]";
 }
 
-symbol 
-Units::get_name (const Unit& unit)
-{ return unit.name; }
-
 bool 
 Units::compatible (const Unit& from_unit, const Unit& to_unit)
 {
@@ -176,8 +172,8 @@ Units::unit_convert (const Unit& from, const Unit& to,
                      const double value)
 {
   if (!compatible (from, to))
-    throw std::string ("Cannot convert [") + from.name 
-      + "] with base [" + from.base_name () + "] to [" + to.name
+    throw std::string ("Cannot convert [") + from.native_name () 
+      + "] with base [" + from.base_name () + "] to [" + to.native_name ()
       + "] with base [" + to.base_name () + "]";
 
   const double from_base = from.to_base (value);
@@ -188,8 +184,8 @@ Units::unit_convert (const Unit& from, const Unit& to,
   
 #if 0
   std::ostringstream tmp;
-  tmp << "Converting " << value << " [" << from.name << "] to " << native 
-      << " [" << to.name << "] through " << from_base << " [" 
+  tmp << "Converting " << value << " [" << from.native_name () << "] to " << native 
+      << " [" << to.native_name () << "] through " << from_base << " [" 
       << from.base_name () << "]";
   if (from.base_name () == to.base_name ())
     daisy_approximate (from_base, to_base);
@@ -204,8 +200,8 @@ Units::unit_convert (const Unit& from, const Unit& to,
 double 
 Units::multiply (const Unit& a, const Unit& b, double value, const Unit& result)
 {
-  const symbol ab = multiply (a.name, b.name);
-  return Oldunits::convert (ab, result.name, value);
+  const symbol ab = multiply (a.native_name (), b.native_name ());
+  return Oldunits::convert (ab, result.native_name (), value);
 }
 
 symbol
@@ -224,7 +220,7 @@ Units::unknown () const
 
 bool
 Units::is_known (const Unit& unit) const
-{ return unit.name != Syntax::Unknown (); }
+{ return unit.native_name () != Syntax::Unknown (); }
 
 const Unit&
 Units::error () const
@@ -236,7 +232,7 @@ Units::error () const
 
 bool
 Units::is_error (const Unit& unit) const
-{ return unit.name == Units::error_symbol (); }
+{ return unit.native_name () == Units::error_symbol (); }
 
 bool 
 Units::allow_old () const
@@ -488,15 +484,15 @@ Units::add_unit (Metalib& metalib, const symbol name)
     }
   
   // Is it defined?
-  const Library& library = metalib.library (Unit::component);
+  const Library& library = metalib.library (MUnit::component);
   if (!library.complete (metalib, name))
     return;
 
   // Build it.
   AttributeList alist (library.lookup (name));
   alist.add ("type", name);
-  this->units[name] = Librarian::build_free<Unit> (metalib, Treelog::null (),
-                                                   alist, "unit");
+  this->units[name] = Librarian::build_free<MUnit> (metalib, Treelog::null (),
+                                                    alist, "unit");
 }
 
 void
@@ -515,7 +511,7 @@ Units::Units (Metalib& metalib)
   : allow_old_ (true)
 #endif
 { 
-  const Library& library = metalib.library (Unit::component);
+  const Library& library = metalib.library (MUnit::component);
   std::vector<symbol> entries;
   library.entries (entries);
   for (size_t i = 0; i < entries.size (); i++)

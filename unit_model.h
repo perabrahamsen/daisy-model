@@ -1,4 +1,4 @@
-// unit.h -- Specify unit for scalar.
+// unit_model.h -- The 'unit' component.
 // 
 // Copyright 2007, 2008 Per Abrahamsen and KVL.
 //
@@ -18,43 +18,44 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef UNIT_H
-#define UNIT_H
+#ifndef UNIT_MODEL_H
+#define UNIT_MODEL_H
 
-#include "symbol.h"
-#include <boost/noncopyable.hpp>
+#include "unit.h"
+#include "model.h"
 
-class Convert;
+class Block;
 
-class Unit : private boost::noncopyable
+// Component 'unit'.
+
+class MUnit : public Model, public Unit
 {
-  // Base units.
+  // Identity.
 public:
-  static symbol pressure ();
-  static symbol mass_per_volume ();
-  static symbol amount_of_substance_per_area_per_time ();
-  static symbol energy_per_area_per_time ();
-  static symbol mass_per_area_per_time ();
-  static symbol length_per_time ();
-  
-  // Use.
+  const symbol name;
+  static const char *const component;
+  symbol library_id () const;
+private:
+  const symbol base_name_;
 public:
-  virtual symbol base_name () const = 0;
-  virtual symbol native_name () const = 0;
-  virtual double to_base (double) const = 0;
-  virtual double to_native (double) const = 0;
-  virtual bool in_native (double) const = 0;
-  virtual bool in_base (double) const = 0;
+
+  // Unit interface.
+public:
+  symbol base_name () const
+  { return base_name_; }
+  symbol native_name () const
+  { return name; }
 
   // Convert.
 public:
-  virtual const Convert* create_convertion (const Unit& to) const = 0;
+  const Convert* create_convertion (const Unit& to) const;
 
   // Create and Destroy.
 protected:
-  Unit ();
+  MUnit (Block& al, symbol base);
 public:
-  virtual ~Unit ();
+  virtual ~MUnit ();
 };
 
-#endif // UNIT_H
+#endif // UNIT_MODEL_H
+

@@ -61,7 +61,6 @@ private:
 
   // Utilities.
 public:
-  static symbol get_name (const Unit&);
   static bool compatible (const Unit& from, const Unit& to);
   static double unit_convert (const Unit& from, const Unit& to, double value);
   static double multiply (const Unit&, const Unit&, double, const Unit& result);

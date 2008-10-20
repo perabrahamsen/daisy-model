@@ -25,6 +25,7 @@
 #include "alist.h"
 #include "scope.h"
 #include "units.h"
+#include "unit.h"
 #include "assertion.h"
 #include "librarian.h"
 #include "treelog.h"
@@ -43,7 +44,7 @@ struct NumberConst : public Number
   double value (const Scope&) const
   { return val; }
   symbol dimension (const Scope&) const
-  { return Units::get_name (unit_); }
+  { return unit_.native_name (); }
   const Unit& unit () const
   { return unit_; }
 
@@ -97,7 +98,7 @@ struct NumberLeaf : public Number
   void tick (const Units&, const Scope&, Treelog&)
   { }
   symbol dimension (const Scope&) const
-  { return Units::get_name (unit_); }
+  { return unit_.native_name (); }
   const Unit& unit () const
   { return unit_; }
 
