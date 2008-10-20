@@ -19,8 +19,6 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#define PA_EQUATIONS
-
 #define BUILD_DLL
 
 #include "svat.h"
@@ -41,17 +39,14 @@
 #include "treelog.h"
 #include "mathlib.h"
 #include "librarian.h"
-#ifdef PA_EQUATIONS
 #include "solver.h"
 #include <memory>
-#endif // PA_EQUATIONS
 #include <sstream>
 
 struct SVAT_SSOC : public SVAT
 {
-#ifdef PA_EQUATIONS
   const std::auto_ptr<Solver> solver;
-#endif // PA_EQUATIONS
+
   // Constants.
   static const double epsilon; // Emmision of Longwave rad == SurEmiss [] 
   static const double sigma;   // Stefan Boltzman constant [W m^-2 K^-4]
@@ -60,6 +55,9 @@ struct SVAT_SSOC : public SVAT
 
   //Parameters
   const bool hypostomatous;    // True for hypostomatous leaves;
+  const double maxTdiff;        // Largest temperature difference for conv. [K]
+  const double maxEdiff;        // Largest humidity difference for converg. [Pa]
+  const double max_iteration;   // Max number of iterations before giving up c.
 
   // Driving variables.
   // - Upper boundary
@@ -469,7 +467,6 @@ SVAT_SSOC:: calculate_temperatures(Treelog& msg)
       G_W_sun_c =  c_p * rho_a * g_W_sun_c / gamma;// * cover *  sun_LAI_fraction_total;  //[m s^-1] 
       G_W_shadow_c =  c_p * rho_a * g_W_shadow_c / gamma;// * cover *  (1.-sun_LAI_fraction_total);  //[m s^-1] 
     
-#ifdef PA_EQUATIONS
       // We have an equation system with five unknowns, and five equations.
 
       // We assign a number and an equation to each unknown.
@@ -587,92 +584,6 @@ SVAT_SSOC:: calculate_temperatures(Treelog& msg)
       T_sun = x[iT_sun];
       T_shadow = x[iT_shadow];
       e_c = x[ie_c];
-#else // !PA_EQUATIONS
-
-      // inter-inter-intermediate variables
-      const double a_soil = ((R_eq_abs_soil + G_R_soil * (T_a - T_a)
-                              + k_h/z0 * (T_z0 - T_a) - lambda * E_soil) 
-                             / (G_R_soil + G_H_s_c + k_h/z0)); //[K]
-      
-      const double a_soil_c = G_H_s_c / (G_R_soil + G_H_s_c + k_h/z0); // []
-      
-      const double a_can = ((G_H_a * (T_a - T_a) + G_H_s_c * a_soil)
-                            /(G_H_a + G_H_s_c * (1. - a_soil_c)
-                              + G_H_sun_c + G_H_shadow_c));//[K]
-      
-      const double a_can_sun = G_H_sun_c / (G_H_a + G_H_s_c * (1. - a_soil_c) 
-                                            + G_H_sun_c + G_H_shadow_c); // []
-      
-      const double a_can_shadow = G_H_shadow_c / (G_H_a + G_H_s_c * (1. - a_soil_c) 
-                                                  + G_H_sun_c + G_H_shadow_c); // []
-
-      const double b_can = ((G_W_a * (e_a - e_a) /*[W m^-2]*/ + lambda * E_soil 
-                             + G_W_sun_c * ((e_sat_air - e_a) - s * (T_a - T_a))
-                             + G_W_shadow_c * ((e_sat_air - e_a) - s * (T_a - T_a )))
-                            /(G_W_a + G_W_sun_c + G_W_shadow_c /*[m s^-1]*/)); 
-                           //[W s m^-3]
-      
-      const double b_can_sun = ((G_W_sun_c /*[m s^-1]*/ * s /*[W s m^-3 K^-1]*/)
-                                /(G_W_a + G_W_sun_c + G_W_shadow_c)); //[W s m^-3 K^-1]
-
-      const double b_can_shadow = ((G_W_shadow_c * s)
-                                   /(G_W_a + G_W_sun_c + G_W_shadow_c));//[W s m^-3 K^-1]
-      
-      const double c_sun = ((R_eq_abs_sun + G_R_sun * (T_a - T_a) + G_H_sun_c * a_can 
-                             + G_W_sun_c * (s * (T_a - T_a) 
-                                            - (e_sat_air - e_a) + b_can))
-                            /*[W m^-2]*/
-                            / (G_R_sun + G_H_sun_c * (1. - a_can_sun)
-                               + G_W_sun_c * (s - b_can_sun)))/*[W m^-2 K^-1]*/; // [K]
-      
-      const double c_sun_shadow = ((G_H_sun_c * a_can_shadow 
-                                    + G_W_sun_c * b_can_shadow)/*[W m^-2 K^-1]*/
-                                   /(G_R_sun + G_H_sun_c * (1. - a_can_sun)
-                                     + G_W_sun_c * (s - b_can_sun))/*[W m^-2 K^-1]*/);
-                                   //[]
-      
-      const double c_shadow = ((R_eq_abs_shadow + G_R_shadow * (T_a - T_a) 
-                                + G_H_shadow_c * a_can + G_W_shadow_c 
-                                * (s * (T_a - T_a) - (e_sat_air - e_a) + b_can)) 
-                               / (G_R_shadow + G_H_shadow_c * (1. - a_can_shadow)
-                                  + G_W_shadow_c * (s - b_can_shadow))); //[K]
-      
-      const double c_shadow_sun = ((G_H_shadow_c * a_can_sun + G_W_shadow_c * b_can_sun)
-                                   /(G_R_shadow + G_H_shadow_c * (1. - a_can_shadow)
-                                     + G_W_shadow_c * (s - b_can_shadow)));//[]
-
-
-      // -------------------------------------------
-      // Temperature of sunlit leaves 
-      // -------------------------------------------
-      T_sun = ((c_sun + c_sun_shadow * c_shadow) 
-               / (1. - c_sun_shadow * c_shadow_sun)) + T_a; //[K]
-      
-      // -------------------------------------------
-      // Temperature of shadow leaves 
-      // -------------------------------------------
-      T_shadow = (c_shadow + c_shadow_sun * (T_sun - T_a)) + T_a; //[K]
-      //T_shadow = (T_sun - c_sun)/c_sun_shadow; //[K]
-     
-      //daisy_assert (T_sun >= T_shadow);
-      
-      // -------------------------------------------
-      // Canopy-point temperature
-      // -------------------------------------------
-      T_c = (a_can + a_can_sun * (T_sun - T_a) + a_can_shadow * (T_shadow - T_a)) 
-        + T_a; //[K]
-
-      // -------------------------------------------
-      // Soil surface temperature
-      // -------------------------------------------
-      T_s =(a_soil + a_soil_c * (T_c - T_a)) + T_a;  //[K]
-
-      // -------------------------------------------
-      // Canopy vapour pressure 
-      // -------------------------------------------
-      e_c = b_can + b_can_sun *(T_sun - T_a) 
-        + b_can_shadow * (T_shadow - T_a) + e_a; //[Pa]
-#endif // !PA_EQUATIONS
     }
 
   else if (has_LAI && !has_light) // canopy and soil during night time
@@ -817,9 +728,6 @@ SVAT_SSOC::solve(const double gs /* stomata cond. [m/s]*/, Treelog& msg )
 {
   TREELOG_MODEL (msg);
   std::ostringstream tmp;
-  const double maxTdiff = 0.001; //0.1 [K]
-  const double maxEdiff = 0.01; //1.0 [Pa]
-  const double max_iteration = 150.;
 
   for (int i = 0; i<max_iteration; i++)
     {    
@@ -902,16 +810,24 @@ SVAT_SSOC::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   SVAT::load_syntax (syntax, alist);
 
-#ifdef PA_EQUATIONS
   syntax.add_object ("solver", Solver::component, 
 		     Syntax::Const, Syntax::Singleton, "\
 Model used for solving the energy balance equation system.");
   alist.add ("solver", Solver::default_model ());
-#endif // PA_EQUATIONS
   syntax.add ("hypostomatous", Syntax::Boolean, Syntax::Const,
               "True for hypostomatous leaves. \n\
 False for amphistomatous leaves (possesing stomata on both surfaces).");
   alist.add ("hypostomatous", true);
+
+  syntax.add ("maxTdiff", "K", Syntax::Const, "\
+Largest temperature difference for convergence.");
+  alist.add ("maxTdiff", 0.001);
+  syntax.add ("maxEdiff", "Pa", Syntax::Const, "\
+Largest humidity difference for convergence.");
+  alist.add ("maxEdiff", 0.01);
+  syntax.add ("max_iteration", Syntax::Integer, Syntax::Const, "\
+Largest number of iterations before giving up on convergence.");
+  alist.add ("max_iteration", 150);  
   
   // For log.
   syntax.add ("lambda", "J kg^-1", Syntax::LogOnly, "Latent heat of vaporization in atmosphere.");
@@ -983,6 +899,9 @@ SVAT_SSOC::SVAT_SSOC (Block& al)
   : SVAT (al), 
     solver (Librarian::build_item<Solver> (al, "solver")),
     hypostomatous (al.flag ("hypostomatous")),
+    maxTdiff (al.number ("maxTdiff")),
+    maxEdiff (al.number ("maxEdiff")),
+    max_iteration (al.integer ("max_iteration")),
     T_a (-42.42e42),
     z_r (-42.42e42),
     RH (-42.42e42),

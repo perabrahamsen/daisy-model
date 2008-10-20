@@ -428,6 +428,7 @@ PhotoFarquhar::handle_water_stress () const
 void 
 PhotoFarquhar::load_syntax (Syntax& syntax, AttributeList& alist)
 {
+  Photo::load_base (syntax, alist);
   alist.add ("base_model", "Farquhar");
 
   alist.add ("description", "Faquhar et al. (1980) photosynthesis and Ball et al. (1987) stomataconductance model coupled as described by Collatz et al., 1991.");

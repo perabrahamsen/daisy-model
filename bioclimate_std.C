@@ -121,6 +121,8 @@ struct BioclimateStandard : public Bioclimate
   double soil_ea_;		// Actual exfiltration. [mm/h]
 
   // Water transpirated through plant roots.
+  const int max_svat_iterations; // Max number of iterations with SVAT model.
+  const double max_svat_absolute_difference; // Max difference. [mm/h]
   std::auto_ptr<SVAT> svat;     // Soil Vegetation Atmosphere model.
   double crop_ep_;		// Potential transpiration. [mm/h]
   double crop_ea_soil;		// Crop limited transpiration. [mm/h]
@@ -477,6 +479,13 @@ The intended use is colloid generation.");
               "Actual evaporation from pond.");
 
   // Water going through soil surface.
+  syntax.add ("max_svat_iterations", Syntax::Integer, Syntax::Const, "\
+Max number of svat iterations before giving up on cobvergence.");
+  alist.add ("max_svat_iterations", 100);  
+  syntax.add ("max_svat_absolute_difference", "mm/h", Syntax::Const, "\
+Maximum absolute difference in svat ea values for convergence.");
+  alist.add ("max_svat_absolute_difference", 0.01);
+
   syntax.add_object ("svat", SVAT::component, 
                      "Soil Vegetation Atmosphere component.");
   AttributeList svat_alist;
@@ -652,6 +661,8 @@ BioclimateStandard::BioclimateStandard (Block& al)
     pond_ea_ (0.0),
     soil_ep (0.0),
     soil_ea_ (0.0),
+    max_svat_iterations (al.integer ("max_svat_iterations")),
+    max_svat_absolute_difference (al.number ("max_svat_absolute_difference")),
     svat (Librarian::build_item<SVAT> (al, "svat")),
     crop_ep_ (0.0),
     crop_ea_soil (0.0),
@@ -1056,11 +1067,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
   // Our initial guess for transpiration is based on remaining energy.
   double crop_ea_svat_old = crop_ea_soil;
   
-  const int max_svat_iterations = 100;
-  const double max_svat_absolute_difference = 0.01; // [mm/h]
-  int iteration;
-
-  for (iteration = 0; iteration < max_svat_iterations; iteration++)
+  for (int iteration = 0; iteration < max_svat_iterations; iteration++)
     {
       std::ostringstream tmp;
       tmp << "svat iteration " << iteration;

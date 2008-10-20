@@ -71,6 +71,7 @@ public:
   { return false; }
   bool handle_water_stress () const
   { return false; }
+  static void load_syntax (Syntax&, AttributeList&);
   PhotoGL (Block& al)
     : Photo (al),
       Qeff (al.number ("Qeff")),
@@ -162,16 +163,38 @@ Photo::default_model ()
   
   if (!alist.check ("type"))
     {
-      PLF DS_null_eff;
-      DS_null_eff.add (0.0, 1.00);
-      DS_null_eff.add (2.0, 1.00);
-      alist.add ("DSEff",DS_null_eff);
-      alist.add ("DAPEff",DS_null_eff);
-
+      Syntax dummy;
+      PhotoGL::load_syntax (dummy, alist);
       alist.add ("used_to_be_a_submodel", true);
       alist.add ("type", "GL");
     }
   return alist;
+}
+
+void
+PhotoGL::load_syntax (Syntax& syntax, AttributeList& alist)
+{ 
+  Photo::load_base (syntax, alist);
+
+  PLF DS_null_eff;
+  DS_null_eff.add (0.0, 1.00);
+  DS_null_eff.add (2.0, 1.00);
+
+  syntax.add ("Qeff", "(g CO2/m^2/h)/(W/m^2)", Syntax::Const,
+              "Quantum efficiency at low light.");
+  syntax.add ("Fm", "g CO2/m^2/h", Check::positive (), Syntax::Const,
+              "Maximum assimilation rate.");
+  syntax.add ("TempEff", "dg C", Syntax::None (), Check::non_negative (),
+              Syntax::Const,
+              "Temperature factor for assimilate production.");
+  syntax.add ("DSEff", "DS", Syntax::None (), Check::non_negative (),
+              Syntax::Const, "\
+Development stage factor for assimilate production.");
+  alist.add ("DSEff",DS_null_eff);
+  syntax.add ("DAPEff", "d", Syntax::None (), Check::non_negative (),
+              Syntax::Const, "Age factor for assimilate production.\n\
+Age is given as day after planting.");
+  alist.add ("DAPEff",DS_null_eff);
 }
 
 static struct Photo_GLSyntax
@@ -182,29 +205,8 @@ static struct Photo_GLSyntax
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-
-    PLF DS_null_eff;
-    DS_null_eff.add (0.0, 1.00);
-    DS_null_eff.add (2.0, 1.00);
-
+    PhotoGL::load_syntax (syntax, alist);
     alist.add ("description", "Goudriaan and Laar, 1978.");
-
-    syntax.add ("Qeff", "(g CO2/m^2/h)/(W/m^2)", Syntax::Const,
-                "Quantum efficiency at low light.");
-    syntax.add ("Fm", "g CO2/m^2/h", Check::positive (), Syntax::Const,
-                "Maximum assimilation rate.");
-    syntax.add ("TempEff", "dg C", Syntax::None (), Check::non_negative (),
-                Syntax::Const,
-                "Temperature factor for assimilate production.");
-    syntax.add ("DSEff", "DS", Syntax::None (), Check::non_negative (),
-                Syntax::Const, "\
-Development stage factor for assimilate production.");
-    alist.add ("DSEff",DS_null_eff);
-    syntax.add ("DAPEff", "d", Syntax::None (), Check::non_negative (),
-                Syntax::Const, "Age factor for assimilate production.\n\
-Age is given as day after planting.");
-    alist.add ("DAPEff",DS_null_eff);
-
     Librarian::add_type (Photo::component, "GL", alist, syntax, &make);
   }
 } PhotoGL_syntax;

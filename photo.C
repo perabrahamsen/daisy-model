@@ -23,6 +23,7 @@
 #include "photo.h"
 #include "block.h"
 #include "librarian.h"
+#include "check.h"
 
 const char *const Photo::component = "photosynthesis";
 
@@ -33,12 +34,26 @@ Photo::library_id () const
   return id;
 }
 
+double
+Photo::min_PAR () const // Minimum PAR at top of canopy. [W/m^2]
+{ return min_PAR_; }
+
 void
 Photo::clear ()
 { }
 
+void
+Photo::load_base (Syntax& syntax, AttributeList& alist)
+{ 
+  syntax.add ("min_PAR", "W/m^2", Check::non_negative (), Syntax::Const,
+	      "Minimum PAR at top of canopy for photosynthesis.\n\
+If radiation is below this amount, photosynthesis will be disabled.");
+  alist.add ("min_PAR", 0.1);
+}
+
 Photo::Photo (Block& al)
-  : ModelLogable (al.name ("type"))
+  : ModelLogable (al.name ("type")),
+    min_PAR_ (al.number ("min_PAR"))
 { }
 
 Photo::~Photo ()
@@ -47,3 +62,4 @@ Photo::~Photo ()
 static Librarian Photo_init (Photo::component, "\
 Leaf photosynthesis.");
 
+// photo.C ends here.

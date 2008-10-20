@@ -31,6 +31,7 @@ class Treelog;
 class Block;
 class AttributeList;
 class Units;
+class Syntax;
 
 class Photo : public ModelLogable
 {
@@ -38,9 +39,12 @@ class Photo : public ModelLogable
 public:
   static const char *const component;
   symbol library_id () const;
+private:
+  double min_PAR_;              // Minimumm PAR at top of canopy. [W/m^2]
 
   // Simulation.
 public:
+  virtual double min_PAR () const; // Minimumm PAR at top of canopy. [W/m^2]
   virtual double assimilate (const Units& units,
                              const double ABA_xylem, const double rel_hum, 
 			     const double CO2_atm, double Ta, double Tc, double Tl, 
@@ -62,6 +66,7 @@ public:
   virtual bool handle_N_stress () const = 0;
   virtual bool handle_water_stress () const = 0;
   static const AttributeList& default_model ();
+  static void load_base (Syntax&, AttributeList&);
   Photo (Block&);
   ~Photo ();
 };
