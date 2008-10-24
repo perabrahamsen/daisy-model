@@ -10,9 +10,9 @@ Begin:	1994-01-01
 # PA: Fixed date format below
 End:	2005-09-12
 NH4WetDep:	0	ppm
-NH4DryDep:	0	kgN/year
+NH4DryDep:	0	kgN/ha/year
 NO3WetDep:	0	ppm
-NO3DryDep:	0	kgN/year
+NO3DryDep:	0	kgN/ha/year
 TAverage:	14.03	dgC
 TAmplitude:	11.04	dgC
 MaxTDay:	208	yday											

@@ -43,9 +43,9 @@ ScreenHeight:		2	m
 Begin:		1991-1-1	
 End:		2005-12-19	
 NH4WetDep:		0.57	ppm
-NH4DryDep:		8.5	kgN/year
+NH4DryDep:		8.5	kgN/ha/year
 NO3WetDep:		0.5	ppm
-NO3DryDep:		8.8	kgN/year
+NO3DryDep:		8.8	kgN/ha/year
 TAverage:		7.8	dgC										
 TAmplitude:		10.1	dgC										
 MaxTDay:		201	yday										

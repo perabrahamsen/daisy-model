@@ -11,9 +11,9 @@ Begin:      1997-01-01
 End:        2005-12-21
 Timestep:   24 hours
 NH4WetDep:  0.9 ppm
-NH4DryDep:  2.2 kgN/year
+NH4DryDep:  2.2 kgN/ha/year
 NO3WetDep:  0.6 ppm
-NO3DryDep:  1.1 kgN/year
+NO3DryDep:  1.1 kgN/ha/year
 TAverage:    7.9 dgC
 TAmplitude:  7.8 dgC
 MaxTDay:     209 yday
