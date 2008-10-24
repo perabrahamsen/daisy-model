@@ -31,7 +31,7 @@ degradation of ABA are all ignored in favor of a system where the ABA
 concentration in the canopy is solely function of the current water
 status in the root system.
 
-ABA also has other effects, such as on roth growth and plant
+ABA also has other effects, such as on root growth and plant
 phenology, but these are not implemented in Daisy and outside the
 scope of this paper.
 
@@ -121,9 +121,15 @@ calculated as decribed in \eqref{eq:aba-cond}.
 
 \subsection{ABA effect on transpiration}
 
-This effect has yet to be implemented.  Currently transpiration is
-calculated based on an energy balance, and limited by the root systems
-potential water uptake.  Stomata conductance is ignored.
+The sun shade open canopy (ssoc) soil vegetation atmosphere (svat)
+model will use the calculated stomata conductance as part of an energy
+balance between soil, atmosphere, canopy, dark, and sunlit leaves.
+The mechanics of the ssoc svat model is outside the scope of this
+note.  As part of this energy balance, transpiration will be
+estimated.  The transpiration will affect ABA production in soil,
+which again will affect stomata conductance.  A one step iteration
+model is used for finding a solution for both ABA production and
+stomata conductance.
 
 \section{List of symbols}
 
