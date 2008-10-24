@@ -2,7 +2,8 @@ LIBS 	= cz-sample.dai cz-management.dai \
 	  cz-soil.dai pl-sample.dai pl-management.dai pl-soil.dai \
 	  sk-sample.dai sk-management.dai sk-soil.dai it-sample.dai\
 	  it-management.dai it-soil.dai dk-soil.dai log-sample.dai \
-	  init-soil.dai pedo-soil.dai irrigation.dai dk-management.dai
+	  init-soil.dai pedo-soil.dai irrigation.dai dk-management.dai \
+	  dk-veg-man.dai
 SETUPS  = test-colloids.dai \
 	test-prd.dai test-aba.dai OpenMI_simple.dai OpenMI_management.dai \
 	heat-properties.dai batch.dai sample.dai test.dai DrainDrying.dai 
