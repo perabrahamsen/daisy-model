@@ -16,4 +16,14 @@
 (input file "ryegrass.dai")
 (input file "wclover.dai")
 
+(input file "beetroot.dai")
+(input file "broccoli.dai")
+(input file "brusselssprouts.dai")
+(input file "celeriac.dai")
+(input file "earlypotato.dai")
+(input file "earlywhitecabbage.dai")
+(input file "onion.dai")
+(input file "onion_plantingofsets.dai")
+(input file "whitecabbage.dai")
+
 ;;; crop.dai ends here

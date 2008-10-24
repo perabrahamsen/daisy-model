@@ -8,10 +8,15 @@ NEWCROPS = ryegrass.dai wclover.dai potato.dai \
 DKCROPS = dk-wrape.dai dk-grass.dai dk-maize.dai dk-pea.dai \
 	dk-rye.dai dk-wwheat.dai dk-wbarley.dai dk-sbarley.dai
 
+
+VEGCROPS = beetroot.dai broccoli.dai brusselssprouts.dai celeriac.dai \
+	earlypotato.dai earlywhitecabbage.dai onion.dai \
+	onion_plantingofsets.dai whitecabbage.dai
+
 DAISY 	= OpenMI.dai markvand.dai log-std.dai dk-fertilizer.dai \
 	dk-crop.dai dk-horizon.dai log-old.dai crop-old.dai vegetation.dai \
 	crop.dai fertilizer.dai tillage.dai log.dai mini.dai chemistry.dai \
-	$(OLDCROPS) $(NEWCROPS) $(DKCROPS)
+	$(OLDCROPS) $(NEWCROPS) $(DKCROPS) $(VEGCROPS)
 TEXT	= Makefile  all.dai ui-Qt.dai
 REMOVE 	=  weather.dwf dk-soil.dai mshe.dai mshe-standalone.dai
 
