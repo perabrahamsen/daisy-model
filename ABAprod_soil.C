@@ -89,9 +89,9 @@ ABAProdSoil::production (const Units& units,
   for (size_t c = 0; c < cell_size; c++)
     {
       // Set up values in scope.
-      scope.set_number (h_name, soil_water.h (c));
-      scope.set_number (L_name, L[c]);
-      scope.set_number (S_name, S[c]);
+      scope.add (h_name, soil_water.h (c));
+      scope.add (L_name, L[c]);
+      scope.add (S_name, S[c]);
 
       // Find expr value.
       double value = 0.0;

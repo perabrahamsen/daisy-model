@@ -48,7 +48,7 @@ ScopeID::get_description (symbol tag) const
 
   // WScope interface.
 void
-ScopeID::set_number (symbol, double val)
+ScopeID::add (symbol, double val)
 { value = val; }
 
 void

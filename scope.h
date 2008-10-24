@@ -82,7 +82,7 @@ class WScope : public Scope     // Writable scope.
 {
   // Use.
 public:
-  virtual void set_number (symbol, double) = 0;
+  virtual void add (symbol, double) = 0;
 
   // Create and Destroy.
 private:

@@ -168,7 +168,7 @@ Biopore::initialize_base (const Units& units,
         density_cell.push_back (0.0);
       else
         {
-          own_scope.set_number (x_symbol (), geo.cell_x (c));
+          own_scope.add (x_symbol (), geo.cell_x (c));
           if (!density_expr->tick_value (units, value,
                                          per_square_centimeter, scope, msg))
             ok = false;

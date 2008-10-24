@@ -81,7 +81,7 @@ ABAProdRoot::production (const Units& units,
   for (size_t c = 0; c < cell_size; c++)
     {
       // Set up 'h' in scope.
-      scope.set_number (h_name, soil_water.h (c));
+      scope.add (h_name, soil_water.h (c));
 
       // Find root value.
       double value = 0.0;

@@ -94,12 +94,12 @@ rubiscoNdist_expr::function (const Units& units,
 			     const double relative_distance_from_top,
                              const double DS)
 {
-  scope.set_number (distance_from_top_symbol, distance_from_top);
-  scope.set_number (relative_distance_from_top_symbol,
+  scope.add (distance_from_top_symbol, distance_from_top);
+  scope.add (relative_distance_from_top_symbol,
                     relative_distance_from_top);
-  scope.set_number (LAI_symbol, LAI);
-  scope.set_number (relative_LAI_symbol, relative_LAI);
-  scope.set_number (DS_symbol, DS);
+  scope.add (LAI_symbol, LAI);
+  scope.add (relative_LAI_symbol, relative_LAI);
+  scope.add (DS_symbol, DS);
   double value = -1.0;
   if (!expr->tick_value (units, value, Syntax::Fraction (), scope,
                          Treelog::null ()))

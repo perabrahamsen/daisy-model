@@ -244,7 +244,7 @@ ScopeExchange::get_description (symbol tag) const
 }
 
 void 
-ScopeExchange::set_number (symbol tag, double value)
+ScopeExchange::add (symbol tag, double value)
 { 
   const std::map<symbol, Exchange*>::const_iterator i = named.find (tag);
   daisy_assert (i != named.end ());

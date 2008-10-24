@@ -767,7 +767,7 @@ daisy_scope_set_number (Scope* scope,
 { 
   WScope* wscope = dynamic_cast<WScope*> (scope);
   daisy_assert (wscope);
-  wscope->set_number (symbol (name), value);
+  wscope->add (symbol (name), value);
 }
 
 // @ Miscellaneous.

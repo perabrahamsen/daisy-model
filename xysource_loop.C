@@ -106,9 +106,9 @@ XYSourceLoop::load (const Units& units, Treelog& msg)
 
   // Read data.
   daisy_assert (xs.size () == ys.size ());
-  for (scope.set_number (tag, begin); 
+  for (scope.add (tag, begin); 
        (step > 0.0) ? (scope.number (tag) < end) : (scope.number (tag) > end); 
-       scope.set_number (tag, scope.number (tag) + step))
+       scope.add (tag, scope.number (tag) + step))
     {
       // Missing value.
       if (x_expr->missing (scope) || y_expr->missing (scope))

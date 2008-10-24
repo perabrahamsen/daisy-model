@@ -348,7 +348,7 @@ double
 Select::Implementation::convert (double value) const
 { 
 
-  scope.set_number (x_symbol, value);
+  scope.add (x_symbol, value);
   value = expr->value (scope);
 
   if (spec_conv)
