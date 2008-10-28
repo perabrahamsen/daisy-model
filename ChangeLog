@@ -4,6 +4,8 @@
 
 2008-10-20  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* log_checkpoint.C: Save state as program.
+	
 	* unit_model.C, unit_model.h: Split out from 'unit.C' and 'unit.h'
 	* Makefile (OTHER, COMPONENTS): Adjust.
 	* im.C, am.C, units.C, metalib.C: Adjust.

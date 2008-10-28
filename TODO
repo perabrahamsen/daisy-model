@@ -1,11 +1,22 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* SAFIR report
+* SAFIR
+
+** report
 
 rootdens
-aba : stamata conductance
+aba
 manual
 svat
+
+OpenMI 1.4
+Seed
+max_exfiltration_gradient
+pluck
+2d drip fertigation
+2d heat transport
+
+** send brev om transplanted vegestables
 
 * Rootdens & Sayed
 

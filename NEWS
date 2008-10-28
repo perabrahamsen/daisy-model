@@ -6,6 +6,14 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.54
+
+** Added vegestables.
+
+* 4.53
+
+** Checkpoints are now defined as programs.
+
 * 4.52
 
 ** New paramters for the 'sow' action.
