@@ -133,6 +133,10 @@ TransportConvection::flow (const Geometry& geo,
       for (size_t c = 0; c < cell_size; c++)
         M[c] += S[c] * ddt;
 
+      // Update C.
+      for (size_t c = 0; c < cell_size; c++)
+        C[c] = M[c] / Theta[c];
+
       // Find fluxes using new values (more stable).
       std::vector<double> dJ (edge_size);
       for (size_t e = 0; e < edge_size; e++)

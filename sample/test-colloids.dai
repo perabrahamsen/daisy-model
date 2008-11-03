@@ -6,40 +6,7 @@
 (input file "tillage.dai")
 (input file "crop.dai")
 (input file "log.dai")
-
-
-;; (input file "chemistry.dai")
-
-(defchemical solid default
-  "Non-dissolvable chemicals"
-  (crop_uptake_reflection_factor 1 [])
-  (canopy_dissipation_rate 0 [h^-1])
-  (canopy_washoff_coefficient 1 [])
-  (diffusion_coefficient 1 [cm^2/s])
-  (adsorption full)
-  (decompose_rate 0 [h^-1]))
-  
-(defchemical common default
-  "For chemicals where we know no better."
-  (canopy_dissipation_rate 0.0083 [h^-1])
-  (canopy_washoff_coefficient 1.0 [])
-  (crop_uptake_reflection_factor 1 [])
-  (diffusion_coefficient 4.6e-6 [cm^2/s]))
-
-(defchemical colloid common
-  "Mobile colloids."
-  ;; DOM (Hinedi et al, 1997)
-  (diffusion_coefficient 6.75e-6 [cm^2/s])
-  (decompose_rate 0 [h^-1]))
-
-(defchemical colloid-filtered solid
-  "Once mobile colloids, filtered by the soil.")
-
-(defchemistry colloids default
-  (trace colloid); colloid-filtered)
-  (reaction ;;(filter (mobile colloid) (immobile colloid-filtered))
-            (MACRO (colloid colloid))))
-
+(input file "chemistry.dai")
 
 ;; Weather data.
 (weather default "taastrup.dwf")
@@ -48,9 +15,6 @@
 (defhorizon Ap FAO3
   "Andeby top soil."
   (secondary_domain none)
-  ;;(mobile_solute mixed
-  ;;               (h_lim -20 [cm])
-  ;;               (alpha 0.001 [h^-1]))
   (clay 8.0 [%])
   (silt 10.5 [%])
   (sand 81.5 [%])
@@ -60,7 +24,6 @@
 
 (defhorizon C Ap
   "Andeby C horizon."
-  ;;(mobile_solute full)
   (secondary_domain pressure
                     (h_lim -20 [cm])
                     (alpha 0.001 [h^-1]))
@@ -71,7 +34,7 @@
   "The B.And farm, Andeby, 2002."
   (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
         (MaxRootingDepth 60.0 [cm]))
-  (Chemistry original (combine &old colloids))
+  (Chemistry multi (combine colloids))
   (Movement original 
             (Tertiary (biopores (use_small_timesteps false)
                                 (classes (matrix (height_start 0 [cm])
@@ -88,13 +51,7 @@
                                                  (pipe_position -150 [cm]))
                                          ))))
                              
-  (OrganicMatter original
-                 (init (input 1400 [kg C/ha/y])
-                       (root 480 [kg C/ha/y])
-                       (end -20 [cm])))
-  ;; Measured numbers for groundwater table can be read from a file, like this:
-  ;; (Groundwater file "example.gwt")
-  ;; But here we assume free drainage.
+  (OrganicMatter none)
   (Groundwater deep))
 
 ;; Use it.
@@ -102,6 +59,7 @@
 
 ;; Simulation start date.
 (time 1986 12 1 1)
+(stop 1988 4 1 1)
 
 (manager activity
   (wait (at 1987 3 20 1))
@@ -111,9 +69,7 @@
                       (NH4_fraction 0.5 [])))
   (wait (at 1987 4 5 1))
   (progn
-    (sow ("Grass"
-          (water_stress_effect none)
-          (enable_N_stress false)))
+    (sow ("Grass" (water_stress_effect none)))
     (sow ("Spring Barley" (Canopy (EpFac 1.5)))))
   (wait (or (crop_ds_after "Spring Barley" 2.0)
             (at 1987 9 5 1)))
@@ -124,9 +80,7 @@
   (wait (at 1987 10 10 1))
   (harvest "Grass"
            (stub 8.0 [cm])              ;Leave 8 cm stub.
-           (stem 1.00 []))             ;Harvest everything above stub.
-  (wait (at 1988 4 1 1))
-  (stop))
+           (stem 1.00 [])))             ;Harvest everything above stub.
 
 ;; Create these log files.
 (output harvest
@@ -135,6 +89,10 @@
         ("Crop Production" (crop "Spring Barley") (where "sbarley.dlf"))
         ("Field chemical" (chemical colloid))
         ("Soil chemical" (chemical colloid-filtered))
+        ("Chemical Content" (chemical colloid)
+         (where "M-colloids.dlf"))
+        ("Chemical Content" (chemical colloid-filtered)
+         (where "M-filtered.dlf"))
         ("Colloids")
         (checkpoint (when (at 1987 8 7 6))))
 

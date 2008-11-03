@@ -8,7 +8,12 @@ release.
 
 * 4.54
 
-** Added vegestables.
+** Added vegetables.
+
+** New WP_ET in harvest log.
+
+This is the weight of the storage organ divided by the total
+evapotranspiration since emergence.
 
 * 4.53
 

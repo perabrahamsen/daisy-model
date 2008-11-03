@@ -1250,9 +1250,13 @@ NO3DryDep: " << DryDeposit.get_value (Chemical::NO3 (), u_dpu)
   has_max_temperature = has_data ("T_max");
   has_vapor_pressure_ = has_data ("VapPres");
   has_diffuse_radiation_ = has_data ("DiffRad");
+  if (has_diffuse_radiation_ && timestep > 3)
+    lex->warning ("You should not specify DiffRad with long timesteps");
   has_relative_humidity_ = has_data ("RelHum");
   if (has_relative_humidity_ && has_vapor_pressure_)
     lex->error ("You should only specify one of VapPres or RelHum");
+  if (has_relative_humidity_ && timestep > 6)
+    lex->warning ("You should not specify RelHum with long timesteps");
   has_wind_speed = has_data ("Wind");
   has_reference_evapotranspiration_ = has_data ("RefEvap");
   for (unsigned int j = 0; j < data_description_size; j++)

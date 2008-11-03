@@ -348,7 +348,7 @@ CropSimple::harvest (const symbol column_name,
 		       0.0, 0.0, 0.0, 
 		       0.0, 0.0, 0.0, 
 		       0.0, N_actual - NRoot, 0.0,
-		       wsd, nsd);
+		       wsd, nsd, -1.0);
 }
 
 void

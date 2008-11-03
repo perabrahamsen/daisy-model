@@ -2066,7 +2066,7 @@ CropOld::harvest (const symbol column_name,
 		       0.0, 0.0, 0.0,
 		       0.0, 0.0, 0.0,
 		       WSOrg * sorg_harvest, NSOrg * sorg_harvest, 0.0,
-                       wsd, nsd);
+                       wsd, nsd, -1.0);
 }
 
 void

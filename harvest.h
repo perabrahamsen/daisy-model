@@ -52,6 +52,7 @@ public:
   const double sorg_C;
   const double water_stress_days;
   const double nitrogen_stress_days;
+  const double water_productivity;
   double total_N () const;
   double total_C () const;
   double total_DM () const;
@@ -67,7 +68,7 @@ public:
   Harvest (symbol col, Time t, symbol crp, 
 	   double sDM, double sN, double sC, double dDM, double dN, double dC,
 	   double lDM, double lN, double lC, double oDM, double oN, double oC,
-           double wsd, double nsd);
+           double wsd, double nsd, double wp_et);
 };      
 
 #endif // HARVEST_H

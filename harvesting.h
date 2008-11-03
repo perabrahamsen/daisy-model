@@ -62,6 +62,7 @@ private:
   const PLF cut_delay;		// -||- as function of removed fraction.
 public:
   double cut_stress;		// Cut induced stress.
+  double total_water_use;       // Accumulated water use [kg H2O].
 
 public:
   const double sorg_height;     // Location above ground of storage organ [cm].
@@ -92,6 +93,7 @@ public:
                           double& water_stress_days,
                           double& nitrogen_stress_days);
   void tick (const Time& time);
+  void water_use (double amount /* [kg H2O] */);
   void output (Log& log) const;
 
   // Create and Destroy.

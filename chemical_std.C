@@ -319,8 +319,12 @@ ChemicalStandard::set_primary (const Soil& soil, const SoilWater& soil_water,
 
   for (size_t c = 0; c < cell_size; c++)
     {
+      // Try to compensate for earlier errors.
+      M_primary_[c] += M_error[c];
+      M_error[c] = 0.0;
       if (M_primary_[c] < 0.0)
         {
+          // Did not work, save error for next timestep.
           M_error[c] += M_primary_[c];
           M_primary_[c] = 0.0;
         }

@@ -59,6 +59,7 @@ Harvest::output (Log& log) const
   output_variable (sorg_C, log);
   output_variable (water_stress_days, log);
   output_variable (nitrogen_stress_days, log);
+  output_variable (water_productivity, log);
 }
 
 void 
@@ -100,6 +101,8 @@ Harvest::load_syntax (Syntax& syntax, AttributeList& alist)
               "Production days lost due to water stress.");
   syntax.add ("nitrogen_stress_days", "d", Syntax::State, 
               "Production days lost due to water stress.");
+  syntax.add ("water_productivity", "kg DM/m^3 H2O", Syntax::State, 
+              "Storage organ harvested per evapotranspiration.");
 }
 
 Harvest::Harvest (Block& alist)
@@ -119,7 +122,8 @@ Harvest::Harvest (Block& alist)
     sorg_N (alist.number ("sorg_N")),
     sorg_C (alist.number ("sorg_C")),
     water_stress_days (alist.number ("water_stress_days")),
-    nitrogen_stress_days (alist.number ("nitrogen_stress_days"))
+    nitrogen_stress_days (alist.number ("nitrogen_stress_days")),
+    water_productivity (alist.number ("water_productivity"))
 { }
   
 
@@ -128,7 +132,7 @@ Harvest::Harvest (const symbol col, Time t, const symbol crp,
 		  double dDM, double dN, double dC,
 		  double lDM, double lN, double lC, 
 		  double oDM, double oN, double oC, 
-                  double wsd, double nsd)
+                  double wsd, double nsd, double wp_et)
   : column (col),
     time (t),
     crop (crp),
@@ -145,8 +149,11 @@ Harvest::Harvest (const symbol col, Time t, const symbol crp,
     sorg_N (oN),
     sorg_C (oC),
     water_stress_days (wsd),
-    nitrogen_stress_days (nsd)
+    nitrogen_stress_days (nsd),
+    water_productivity (wp_et)
 { }
 
 static Submodel::Register 
 harvest_submodel ("Harvest", Harvest::load_syntax);
+
+// harvest.C ends here.

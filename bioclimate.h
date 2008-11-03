@@ -102,6 +102,7 @@ public:
 		       
   // Communication with SVAT.
   virtual double total_ep () const = 0; // [mm/h]
+  virtual double total_ea () const = 0; // [mm/h]
   virtual double snow_ea () const = 0; // [mm/h]
   virtual double pond_ea () const = 0; // [mm/h]
   virtual double soil_ea () const = 0; // [mm/h]

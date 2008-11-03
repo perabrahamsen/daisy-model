@@ -162,13 +162,13 @@ static struct ReactionFilterSyntax
     syntax.add ("F_secondary", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 		"Filtration in secondary domain (inter-aggregate pores).");
 
-    syntax.add ("fc_primary", "m^-1", Check::positive (), Syntax::Const,
+    syntax.add ("fc_primary", "cm^-1", Check::positive (), Syntax::Const,
                 "Filter coefficient in the primary domain");
-    alist.add ("fc_primary", 100.0);
+    alist.add ("fc_primary", 1.0);
    
-    syntax.add ("fc_secondary", "m^-1", Check::positive (), Syntax::Const,
+    syntax.add ("fc_secondary", "cm^-1", Check::positive (), Syntax::Const,
                 "Filter coefficient in secondary domain");
-    alist.add ("fc_secondary", 50.0);
+    alist.add ("fc_secondary", 0.5);
 
     Librarian::add_type (Reaction::component, "filter", alist, syntax, &make);
   }

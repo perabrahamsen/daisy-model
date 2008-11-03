@@ -74,7 +74,7 @@ struct BioclimateStandard : public Bioclimate
   std::auto_ptr<NetRadiation> net_radiation;
   std::auto_ptr<Pet> pet;       // Potential Evapotranspiration model.
   double total_ep_;		// Potential evapotranspiration [mm/h]
-  double total_ea;		// Actual evapotranspiration [mm/h]
+  double total_ea_;		// Actual evapotranspiration [mm/h]
   double direct_rain_;          // Rain hitting soil directly [mm/h]
   double irrigation_overhead;	// Irrigation above canopy [mm/h]
   double irrigation_overhead_old;	// Old value for logging.
@@ -259,6 +259,8 @@ struct BioclimateStandard : public Bioclimate
   // Communication with svat and external model.
   double total_ep () const // [mm/h]
   { return total_ep_; }
+  double total_ea () const // [mm/h]
+  { return total_ea_; }
   double snow_ea () const // [mm/h]
   { return snow_ea_; }
   double pond_ea () const // [mm/h]
@@ -626,7 +628,7 @@ BioclimateStandard::BioclimateStandard (Block& al)
          ? Librarian::build_item<Pet> (al, "pet")
          : NULL),
     total_ep_ (0.0),
-    total_ea (0.0),
+    total_ea_ (0.0),
     direct_rain_ (0.0),
     irrigation_overhead (0.0),
     irrigation_overhead_old (0.0),
@@ -844,7 +846,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
              geo, soil, soil_heat, soil_water, msg);
   total_ep_ = pet->wet ();
   daisy_assert (total_ep_ >= 0.0);
-  total_ea = 0.0;		// To be calculated.
+  total_ea_ = 0.0;		// To be calculated.
 
   // 1.2 Irrigation
   //
@@ -856,7 +858,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
 
   // 2 Snow Pack
 
-  snow_ep = total_ep_ - total_ea;
+  snow_ep = total_ep_ - total_ea_;
   daisy_assert (snow_ep >= 0.0);
   snow_water_in = rain + irrigation_overhead;
   daisy_assert (snow_water_in >= 0.0);
@@ -873,8 +875,8 @@ BioclimateStandard::WaterDistribution (const Units& units,
 	     snow_water_in_temperature, snow_ep, dt);
   snow_ea_ = snow.evaporation ();
   daisy_assert (snow_ea_ >= 0.0);
-  total_ea += snow_ea_;
-  daisy_assert (total_ea >= 0.0);
+  total_ea_ += snow_ea_;
+  daisy_assert (total_ea_ >= 0.0);
   snow_water_out = snow.percolation ();
   if (snow_water_out < 0.0)
     {
@@ -914,8 +916,8 @@ BioclimateStandard::WaterDistribution (const Units& units,
 
   canopy_ea_ = std::min (canopy_ep, canopy_water_storage / dt + canopy_water_in);
   daisy_assert (canopy_ea_ >= 0.0);
-  total_ea += canopy_ea_;
-  daisy_assert (total_ea >= 0.0);
+  total_ea_ += canopy_ea_;
+  daisy_assert (total_ea_ >= 0.0);
   
   canopy_water_storage += (canopy_water_in - canopy_ea_) * dt;
   if (canopy_water_storage < 0.0)
@@ -967,8 +969,8 @@ BioclimateStandard::WaterDistribution (const Units& units,
   litter_ea = std::max (std::min (litter_ep,
                         litter_water_storage / dt + litter_water_in),
                    0.0);
-  total_ea += litter_ea;
-  daisy_assert (total_ea >= 0.0);
+  total_ea_ += litter_ea;
+  daisy_assert (total_ea_ >= 0.0);
   
   const double litter_water_capacity = vegetation.litter_water_capacity ();
   litter_water_storage += (litter_water_in - litter_ea) * dt;
@@ -1018,8 +1020,8 @@ BioclimateStandard::WaterDistribution (const Units& units,
 		geo, soil, soil_water, soil_T, dt);
   pond_ea_ = surface.evap_pond (dt, msg);
   daisy_assert (pond_ea_ >= 0.0);
-  total_ea += pond_ea_;
-  daisy_assert (total_ea >= 0.0);
+  total_ea_ += pond_ea_;
+  daisy_assert (total_ea_ >= 0.0);
 
   // 6 Soil
 
@@ -1038,8 +1040,8 @@ BioclimateStandard::WaterDistribution (const Units& units,
     }
   soil_ea_ = surface.exfiltration (dt);
   daisy_assert (soil_ea_ >= 0.0);
-  total_ea += soil_ea_;
-  daisy_assert (total_ea >= 0.0);
+  total_ea_ += soil_ea_;
+  daisy_assert (total_ea_ >= 0.0);
 
   // 7 Transpiration
 
@@ -1107,8 +1109,8 @@ BioclimateStandard::WaterDistribution (const Units& units,
   vegetation.force_production_stress (production_stress);
 
   // Total evapotranspiration.
-  total_ea += crop_ea_;
-  daisy_assert (total_ea >= 0.0);
+  total_ea_ += crop_ea_;
+  daisy_assert (total_ea_ >= 0.0);
 
   // Direct rain, used for colloid generation
   if (snow.storage () < 0.1)
@@ -1130,7 +1132,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
   // Check
   // Note: total_ea can be larger than total_ep, as PMSW uses a
   // different method for calculating PET.
-  daisy_assert (approximate (total_ea,
+  daisy_assert (approximate (total_ea_,
                              snow_ea_ + canopy_ea_ + litter_ea
                              + pond_ea_ + soil_ea_ + crop_ea_));
 }  
@@ -1238,7 +1240,7 @@ BioclimateStandard::output (Log& log) const
   daisy_assert (pet.get () != NULL);
   output_object (pet.get (), "pet", log);
   output_value (total_ep_, "total_ep", log);
-  output_variable (total_ea, log);
+  output_value (total_ea_, "total_ea", log);
   output_value (direct_rain_, "direct_rain", log);
   output_value (irrigation_overhead_old, "irrigation_overhead", log);
   output_value (irrigation_overhead_temperature, 

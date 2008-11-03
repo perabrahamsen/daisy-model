@@ -532,6 +532,8 @@ CropStandard::tick (const Time& time, const Bioclimate& bioclimate,
                    bioclimate.day_fraction (dt),
                    *root_system, dt);
 
+  harvesting->water_use (bioclimate.total_ea () * dt);
+
   const double nitrogen_stress = nitrogen.nitrogen_stress;
   const double water_stress = root_system->water_stress;
 

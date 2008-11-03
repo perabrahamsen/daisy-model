@@ -447,6 +447,12 @@ Harvesting::harvest (const symbol column_name,
   const double nsd = nitrogen_stress_days;
   water_stress_days = nitrogen_stress_days = 0.0;
 
+  // WP_ET
+  const double wp_et = (total_water_use > 0.0)
+    ? SOrg_W_Yield / total_water_use
+    : -1.0;
+  total_water_use = 0.0;
+
   // Return harvest.
   if (combine)
     return *new Harvest (column_name, time, crop_name,
@@ -456,14 +462,13 @@ Harvesting::harvest (const symbol column_name,
                          0.0, 0.0, 0.0,
                          0.0, 0.0, 0.0,
                          0.0, 0.0, 0.0,
-                         wsd, nsd);
+                         wsd, nsd, wp_et);
   else
     return *new Harvest (column_name, time, crop_name,
                          Stem_W_Yield, Stem_N_Yield, Stem_C_Yield,
                          Dead_W_Yield, Dead_N_Yield, Dead_C_Yield,
                          Leaf_W_Yield, Leaf_N_Yield, Leaf_C_Yield,
-                         WEYRm, NEYRm, CEYRm, wsd, nsd);
-  
+                         WEYRm, NEYRm, CEYRm, wsd, nsd, wp_et);
 }
 
 void
@@ -493,6 +498,10 @@ Harvesting::tick (const Time& time)
     }
 }
 
+void
+Harvesting::water_use (const double amount) 
+{ total_water_use += amount; }
+
 void 
 Harvesting::output (Log& log) const
 { 
@@ -500,6 +509,7 @@ Harvesting::output (Log& log) const
     output_submodule (last_cut, "last_cut", log);
   output_variable (production_delay, log);
   output_variable (cut_stress, log);
+  output_variable (total_water_use, log);
 }
 
 void 
@@ -564,6 +574,10 @@ removed by harvest.  By default, there is no delay.");
   alist.add ("cut_delay", no_delay);
   syntax.add_fraction ("cut_stress", Syntax::LogOnly, 
 		       "Stress induced due to last cut.");
+  syntax.add ("total_water_use", "kg H2O", Check::non_negative (), 
+              Syntax::State, "\
+Total evapotranspiration since emergence.");
+  alist.add ("total_water_use", 0.0);
   syntax.add ("sorg_height", "cm", Syntax::OptionalConst, 
               "Vertical location of storage organ.\n\
 Set this to a negative number for root fruits, this will cause harvesting\n\
@@ -590,6 +604,7 @@ Harvesting::Harvesting (Block& al)
     production_delay (al.number ("production_delay")),
     cut_delay (al.plf ("cut_delay")),
     cut_stress (0.0),
+    total_water_use (al.number ("total_water_use")),
     sorg_height (al.number ("sorg_height", 42.42e42))
 { }
 
@@ -598,3 +613,5 @@ Harvesting::~Harvesting ()
 
 static Submodel::Register 
 soil_submodel ("Harvesting", Harvesting::load_syntax);
+
+// harvesting.C ends here.

@@ -1,22 +1,20 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* SAFIR
+* SAFIR brev
 
-** report
+Hi SAFIR field sites and Daisy modellers.
 
-rootdens
-aba
-manual
-svat
+During the Daisy workshop it came to our intention that some sites would have have a difficult time finding hourly data.  As a result we (that is, Birgitte) has tried to see the sensitivity of using daily data.  The results are in the attached file.  It shows crop growth, transpiration and photosynthesis for a spring barley and a winter wheat, using various combinations of hourly and daily weather data.
 
-OpenMI 1.4
-Seed
-max_exfiltration_gradient
-pluck
-2d drip fertigation
-2d heat transport
+It seems the models are robust with regard to photosynthesis and dry matter production, but less so with regard to transpiration.  If you use daily data, you should provide both minimum and maximum temperatures, this cut the error in half compared to using just average temperatures.
 
-** send brev om transplanted vegestables
+And if you use daily data, you should specify vapour pressure rather than relative humidity, which is worse than useless with daily values.  If you leave out both Daisy will attempt to estimate it from temperature variation.  The estimate is poor enough to cause an error in transpiration around around 10% for the winter wheat.
+
+You can find information about how to specify min abd max temperatures in the Daisy user guide from the workshop.
+
+Regards,
+
+The Daisy developers.
 
 * Rootdens & Sayed
 
@@ -31,10 +29,6 @@ pluck
 * SVAT
 
 ** Check initialisering of soil_heat
-
-* SAFIR
-
-** Finn opsætning
 
 * R2D2
 

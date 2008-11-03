@@ -312,13 +312,13 @@ This is not a model, but a list of parameters shared by all weather models.");
 	      "Minumum temperature this day.");
   syntax.add ("daily_max_air_temperature", "dg C", Syntax::LogOnly,
 	      "Maximum temperature this day.");
-  if (syntax.lookup ("air_temperature") == Syntax::Error)
+  if (syntax.lookup ("global_radiation") == Syntax::Error)
     // May be set by derived class (WeatherNone).
     syntax.add ("global_radiation", "W/m^2", Syntax::LogOnly,
                 "Global radiation this hour.");
   syntax.add ("daily_global_radiation", "W/m^2", Syntax::LogOnly,
 	      "Average radiation this day.");
-  syntax.add ("diffuse__radiation", "W/m^2", Syntax::LogOnly,
+  syntax.add ("diffuse_radiation", "W/m^2", Syntax::LogOnly,
 	      "Diffuse radiation this hour.");
   syntax.add ("reference_evapotranspiration", "mm/h", Syntax::LogOnly,
 	      "Reference evapotranspiration this hour");

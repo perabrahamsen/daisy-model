@@ -1,3 +1,20 @@
+2008-10-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* reaction_filter.C (fc_primary, fc_secondary): Fix units.
+	* transport_convection.C (TransportConvection::flow): Update C
+	between sink and flux.
+
+2008-10-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* weather_std.C (WeatherStandard::initialize): Added warning for
+	RelHum or DiffRad and long timesteps.
+	
+	* bioclimate_std.C, bioclimate.h (total_ea): New virtual member.
+	* harvest.C, harvest.h (water_productivity): New member.
+	* harvesting.C, harvesting.h (total_water_use): New state variable.
+	(water_use): New member function.
+	* crop_std.C (tick): Call it.
+	
 2008-10-24  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.53 released.

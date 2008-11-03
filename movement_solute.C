@@ -69,6 +69,21 @@ MovementSolute::secondary_flow (const Geometry& geo,
       // Find new timestep.
       double ddt = time_left;
   
+#if 0             // Not needed, since we fall back on primary domain.
+      // Limit timestep based on source term.
+      for (size_t c = 0; c < cell_size; c++)
+        if (S[c] < 0.0 && M[c] > 0.0) // If it is a sink.
+          {
+            const double time_to_empty = -M[c] / S[c];
+            if (time_to_empty < min_timestep_factor * dt)
+              // Unreasonable small time step.  Give up.
+              continue;
+            
+            // Go down in timestep while it takes less than two to empty cell.
+            while (time_to_empty < 2.0 * ddt)
+              ddt *= 0.5;
+          }
+#endif
       // Limit timestep based on water flux.
       for (size_t e = 0; e < edge_size; e++)
         {
