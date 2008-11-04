@@ -2,8 +2,7 @@
 // 
 // Copyright 2006, 2007, 2008 Mikkel Mollerup, Per Abrahamsen and KVL.
 //
-// This file is part of Daisy.
-// 
+// This file
 // Daisy is free software; you can redistribute it and/or modify
 // it under the terms of the GNU Lesser Public License as published by
 // the Free Software Foundation; either version 2.1 of the License, or
@@ -721,49 +720,7 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
       daisy_assert (in_sign > 0);
       const double area = geo.edge_area (edge);
       const double sin_angle = geo.edge_sin_angle (edge);
-      //-------------------- Old -----------------------------
 
-#ifdef HARDCODED_BOTTOM
-      //-----------------New, hardcoded-----------------------
-      // Multiplied with 2 because it is a boundary cell...
-      const double Z_aquitard = 200;    //thickness 
-      const double h_aquifer = 200;    //pressure above aquitard
-      const double K_aquitard = 0.001;  //Conductivity
-
-      const double Dz_i = 2 * geo.edge_length (edge);  
-      const double K_i = K (cell);   //Conductivity in cell
-      const double h_i = h (cell);   //Pressure in cell
-        
-      
-      const double numerator = K_i * (2.0 * h_i / Dz_i + 1.0)
-        + K_aquitard * (h_aquifer / Z_aquitard - 1.0);
-      const double denominator = K_aquitard + 2.0 * K_i * Z_aquitard / Dz_i;
-      
-      // Flux into domain.
-      const double q_up = -K_aquitard * (numerator / denominator 
-                                         - h_aquifer / Z_aquitard + 1.0);
-
-
-      // -------- plot stuff-------------------------------------------
-      std::cout << "--------h_i = " << h_i << '\n';
-      std::cout << "----------q_up = " << q_up << '\n';
-      
-      double h_b = (K_i*(2*h_i/Dz_i+1)+ K_aquitard*(h_aquifer/Z_aquitard-1))
-        / (K_aquitard/Z_aquitard + 2*K_i/Dz_i);
-      std::cout << "-------h_b = " << h_b << '\n';
-      double q_aq = -K_aquitard * ((h_b-h_aquifer)/Z_aquitard + 1);
-      std::cout << "-------q_aq = " << q_aq << '\n';
-      double q_cell = -K_i * (2*(h_i-h_b)/Dz_i + 1);
-      std::cout << "------q_cell = " << q_cell << '\n';
-      std::cout << "-----area = " << area << '\n';
-      // ----------------------------------------------------------------
-
-      //const double flux =  in_sign * q_up * area;  //old
-      const double flux =  in_sign * q_up;
-      
-      Neumann (edge, cell, area, in_sign, flux, dq, B); 
-      // --------------End, hardcoded -----------------------
-#else // !HARDCODED_BOTTOM
       switch (groundwater.bottom_type ())
         {
         case Groundwater::free_drainage:
@@ -776,33 +733,56 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
           break;
         case Groundwater::forced_flux:
           {
-            //const double flux = groundwater.q_bottom (edge) * area; //old
+#if 0
+            //---------------Forced flux BC -----------------------------------
             const double flux = groundwater.q_bottom (edge);
             Neumann (edge, cell, area, in_sign, flux, dq, B);
+            //---------------End forced flux BC -------------------------------
+#elif 1 
+            
+            //-----------This is a lysimeter BC (placed wrong place)-----------
+            if (active_lysimeter[cell])
+              {
+                //Neumann - not so good
+                //const double flux = -in_sign * sin_angle * K (cell);
+                //Neumann (edge, cell, area, in_sign, flux, dq, B);
+                //Dirichlet - better
+                const double value = -K (cell) * geo.edge_area_per_length (edge);
+                const double pressure =  0.0;
+                Dirichlet (edge, cell, area, in_sign, sin_angle,
+                           K (cell), h (cell),
+                           value, pressure, dq, Dm_mat, Dm_vec, Gm);
+              }
+            //---------------------- End lysimeter BC ------------------------
+ 
+
+#else
+            //---- Pressure BC ------------------------------
+            const double value = -K (cell) * geo.edge_area_per_length (edge);
+            const double pressure =  0.0;
+            Dirichlet (edge, cell, area, in_sign, sin_angle,
+                       K (cell), h (cell),
+                       value, pressure, dq, Dm_mat, Dm_vec, Gm);
+            //std::cout << "Pressure BC \n"; 
+            //----End pressure BC ---------------------------
+#endif 
           }
           break;
         case Groundwater::pressure:
           {
             const double value = -K (cell) * geo.edge_area_per_length (edge);
             const double pressure =  groundwater.table () - geo.zplus (cell);
- 
+            
             Dirichlet (edge, cell, area, in_sign, sin_angle, 
                        K (cell), h (cell),
                        value, pressure,
                        dq, Dm_mat, Dm_vec, Gm);
-#if 0
-            std::ostringstream tmp;
-            const double l = geo.edge_length (edge);
-            const double Darcy = -K (cell) * (1.0 + (h (cell) - pressure) / l);
-            tmp << "dq (cell) = " << dq (edge) << ", Darcy = " << Darcy
-                << ", l = " << l << ", area = " << area 
-                << ", area/l = " << geo.edge_area_per_length (edge) 
-                << " = " << area / l << ", K = " << K (cell);
-            msg.message (tmp.str ());
-#endif
           }
           break;
+
+
         case Groundwater::lysimeter:
+
           if (active_lysimeter[cell])
             {
               const double value = -K (cell) * geo.edge_area_per_length (edge);
@@ -811,11 +791,12 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
                          K (cell), h (cell),
                          value, pressure, dq, Dm_mat, Dm_vec, Gm);
             }
+                    
           break;
+          
         default:
           daisy_panic ("Unknown groundwater type");
         }
-#endif
     }
 }
 
