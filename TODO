@@ -2,6 +2,8 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * SAFIR brev
 
+Brug BRJ version.
+
 Hi SAFIR field sites and Daisy modellers.
 
 During the Daisy workshop it came to our intention that some sites would have have a difficult time finding hourly data.  As a result we (that is, Birgitte) has tried to see the sensitivity of using daily data.  The results are in the attached file.  It shows crop growth, transpiration and photosynthesis for a spring barley and a winter wheat, using various combinations of hourly and daily weather data.
@@ -19,6 +21,10 @@ The Daisy developers.
 * Rootdens & Sayed
 
 * OpenMI
+
+** Få en reaktion.
+
+Lave et "install" eller "local" target for en lokal bin (lib, sample).
 
 ** ElementSet
 

@@ -39,7 +39,6 @@ dist:
 	(cd $(FTPDIR); ln -s daisy-lib/daisy-lib-$(TAG).zip daisy-lib.zip)
 
 setup:
-	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	mkdir $(SETUPDIR)/lib
 	cp $(DAISY) $(TEXT) $(SETUPDIR)/lib
 

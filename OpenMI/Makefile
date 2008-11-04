@@ -19,9 +19,12 @@ help:
 
 all:	$(TARGETS)
 
-setup: $(TARGETS)
+.PHONY: install
+install: $(TARGETS)
 	cp $(TARGETS) $(SETUPDIR)/bin
 	( cd "$(OPENMIASS)" && cp $(OPENMIDLL) $(SETUPDIR)/bin )
+
+setup: install
 	mkdir $(SETUPDIR)/src/OpenMI
 	cp $(TEXT) $(SETUPDIR)/src/OpenMI
 

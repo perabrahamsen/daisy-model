@@ -846,10 +846,6 @@ commit:
 done:	update add commit
 
 
-cast:
-	fgrep _cast $(INTERFACES) $(MODELS) $(MAIN)
-	wc -l  $(INTERFACES) $(MODELS) $(MAIN)
-
 setup:	svnci
 	$(MAKE) setupnosvn
 	$(MAKE) upload
@@ -883,10 +879,6 @@ setupnosvn:
 	$(MAKENSIS) /V2 /DVERSION=$(TAG) setup.nsi
 
 
-tmp:
-	(cd OpenMI && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
-	$(MAKENSIS) /V2 /DVERSION=$(TAG) setup.nsi
-
 upload:
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	./libdeps/googlecode_upload.py -p daisy-model \
@@ -894,8 +886,22 @@ upload:
 		-l Type-Installer,OpSys-Windows,Featured \
 		daisy-$(TAG)-setup.exe
 
-daisysetup:
-	$(MAKENSIS) /V2 /DVERSION=$(TAG) setup.nsi
+.PHONY: install
+install:
+	$(MAKE) native 
+	rm -rf $(SETUPDIR)
+	mkdir $(SETUPDIR)
+	(cd lib && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
+	(cd sample && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) setup)
+	mkdir $(SETUPDIR)/bin
+	cp -p $(OBJHOME)/daisy.exe $(SETUPDIR)/bin
+	cp -p $(OBJHOME)/daisyw.exe $(SETUPDIR)/bin
+	cp -p $(OBJHOME)/daisy.dll $(SETUPDIR)/bin
+	cp $(Q4HOME)/bin/QtCore4.dll $(SETUPDIR)/bin
+	cp $(Q4HOME)/bin/QtGui4.dll $(SETUPDIR)/bin
+	cp $(MINGWHOME)/bin/mingwm10.dll $(SETUPDIR)/bin
+	(cd OpenMI && $(MAKE) SETUPDIR=$(SETUPDIR) TAG=$(TAG) install)
+
 
 # How to compile the assembler file.
 #

@@ -36,7 +36,6 @@ dist:
 # Prepare setup file.
 #
 setup:
-	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	mkdir $(SETUPDIR)/sample
 	cp $(TEXT) $(SETUPDIR)/sample
 
