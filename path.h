@@ -25,6 +25,8 @@ class Path : private boost::noncopyable
 private:
   static std::vector<symbol> daisy_path;
 
+  static void parse_path (const std::string& colonpath,
+                          std::vector<symbol>& result);
 public:
   static const std::vector<symbol>& get_daisy_path ();
   static symbol get_daisy_home ();
@@ -41,6 +43,7 @@ public:
   bool set_directory (symbol directory);
   symbol get_directory () const;
   void set_path (const std::vector<symbol>& path);
+  void set_path (const std::string& colon_path);
 
   // Utilities.
 public:

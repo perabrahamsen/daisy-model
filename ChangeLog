@@ -1,3 +1,7 @@
+2008-11-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* path.C, path.h (set_path, parse_path): New member functions.
+
 2008-10-30  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* reaction_filter.C (fc_primary, fc_secondary): Fix units.

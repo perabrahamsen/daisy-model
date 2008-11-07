@@ -61,6 +61,22 @@ get_cwd ()
 
 std::vector<symbol> Path::daisy_path;
 
+
+void 
+Path::parse_path (const std::string& colon_path, std::vector<symbol>& result)
+{ 
+  int last = 0;
+  for (;;)
+    {
+      const int next = colon_path.find (PATH_SEPARATOR, last);
+      if (next < 0)
+        break;
+      result.push_back (colon_path.substr (last, next - last));
+      last = next + 1;
+    }
+  result.push_back (colon_path.substr (last));
+}
+
 symbol
 Path::get_daisy_home ()
 {
@@ -112,17 +128,7 @@ Path::get_daisy_path ()
       if (daisy_path_env)
 	{
 	  Assertion::debug ("Has DAISYPATH environment variable.");
-	  const std::string colon_path = daisy_path_env;
-	  int last = 0;
-	  for (;;)
-	    {
-	      const int next = colon_path.find (PATH_SEPARATOR, last);
-	      if (next < 0)
-		break;
-	      daisy_path.push_back (colon_path.substr (last, next - last));
-	      last = next + 1;
-	    }
-	  daisy_path.push_back (colon_path.substr (last));
+          parse_path (daisy_path_env, daisy_path);
 	}
       else
 	{
@@ -255,6 +261,14 @@ Path::set_path (const std::vector<symbol>& value)
     tmp << "\n" << i << ": '" << value[i] << "'";
   tmp << "\ndone";
   Assertion::debug (tmp.str ());
+}
+
+void 
+Path::set_path (const std::string& colon_path)
+{ 
+  std::vector<symbol> result;
+  parse_path (colon_path, result);
+  set_path (result);
 }
 
 Path::InDirectory::InDirectory (Path& p, const symbol to)

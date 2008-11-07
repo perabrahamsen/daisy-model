@@ -150,7 +150,7 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
           Theta_new = Theta_res;
         }
       const double h_new = Theta_new >= Theta_sat 
-        ? std::max (h_old[i], soil.h (i, Theta_new))
+        ? std::max (h_old[i], 0.0)
         : soil.h (i, Theta_new);
       double K_new = soil.K (i, h_new, h_ice[i], soil_heat.T (i));
 
@@ -171,11 +171,11 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
         case Groundwater::pressure:
           h_lim = std::max (bottom.table () - z, h_fc);
           break;
+        case Groundwater::lysimeter:
         default:
           h_lim = std::max (geo.zplus (last) - z, h_fc);
           break;
         }
-      // daisy_assert (h_lim < 0.0);
 
       if (use_darcy && z > z_top && i < last)
         // Dry earth, near top.  Use darcy to move water up.
@@ -225,7 +225,8 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
 	    }
 	  else if (bottom.bottom_type () == Groundwater::forced_flux)
 	    K_new = -bottom.q_bottom (bottom_edge);
-          
+          // else keep K_new from the node.
+            
 	  const double Theta_lim = soil.Theta (i, h_lim, h_ice[i]);
 	  const double Theta_next = Theta_new - K_new * dt / dz;
 
@@ -248,7 +249,7 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
 	    {
 	      q[i+1] = (Theta_sat - Theta_new) * dz / dt;
 	      Theta[i] = Theta_sat;
-	      h[i] = 0.0;
+	      h[i] = std::max (h_old[i], 0.0);
 	    }
 	  else
 	    {
@@ -260,7 +261,7 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
       daisy_assert (std::isfinite (h[i]));
       daisy_assert (std::isfinite (Theta[i]));
       daisy_assert (std::isfinite (q[i+1]));
-      // daisy_assert (Theta[i] <= Theta_sat);
+      daisy_assert (Theta[i] <= Theta_sat);
       daisy_assert (Theta[i] >= Theta_res);
     }
 

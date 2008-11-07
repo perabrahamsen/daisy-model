@@ -618,7 +618,8 @@ exp:
 native:	
 	(mkdir -p $(NATIVEHOME) \
 	 && cd $(NATIVEHOME) \
-         && time $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile $(NATIVEEXE))
+         && time $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile $(NATIVEEXE) \
+         && time $(MAKE) VPATH=$(SRCDIR)/OpenMI -f $(SRCDIR)/OpenMI/Makefile all)
 
 cnative:
 	(mkdir -p $(NATIVEHOME) \

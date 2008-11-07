@@ -10,7 +10,8 @@ TEXT = $(SOURCES) Makefile
 REMOVE = daisyDotNetAccess.cs
 
 OPENMIDLL = OpenMI.Standard.dll Oatc.OpenMI.Sdk.Backbone.dll \
-	Oatc.OpenMI.Sdk.Wrapper.dll Oatc.OpenMI.Sdk.DevelopmentSupport.dll
+	Oatc.OpenMI.Sdk.Wrapper.dll Oatc.OpenMI.Sdk.DevelopmentSupport.dll \
+	Oatc.OpenMI.Sdk.Buffer.dll
 
 OPENMIASS = ..\libdeps
 
