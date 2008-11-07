@@ -372,7 +372,7 @@ NOLINK = -c
 # 
 
 LATER = tertiary_instant.C 
-MODELS = svat_ssoc.C reaction_MACRO.C \
+MODELS = program_GP2D.C svat_ssoc.C reaction_MACRO.C \
 	reaction_filter.C seed_LAI.C seed_release.C \
 	stomatacon_BB.C stomatacon_SHA.C stomatacon_Leuning.C \
 	tertiary_old.C \

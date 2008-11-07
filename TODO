@@ -1,30 +1,14 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* SAFIR brev
-
-Brug BRJ version.
-
-Hi SAFIR field sites and Daisy modellers.
-
-During the Daisy workshop it came to our intention that some sites would have have a difficult time finding hourly data.  As a result we (that is, Birgitte) has tried to see the sensitivity of using daily data.  The results are in the attached file.  It shows crop growth, transpiration and photosynthesis for a spring barley and a winter wheat, using various combinations of hourly and daily weather data.
-
-It seems the models are robust with regard to photosynthesis and dry matter production, but less so with regard to transpiration.  If you use daily data, you should provide both minimum and maximum temperatures, this cut the error in half compared to using just average temperatures.
-
-And if you use daily data, you should specify vapour pressure rather than relative humidity, which is worse than useless with daily values.  If you leave out both Daisy will attempt to estimate it from temperature variation.  The estimate is poor enough to cause an error in transpiration around around 10% for the winter wheat.
-
-You can find information about how to specify min abd max temperatures in the Daisy user guide from the workshop.
-
-Regards,
-
-The Daisy developers.
-
 * Rootdens & Sayed
+
+Der ser ud til at være en faktor 2 fejl i spreadsheeted.
+
+** Prøv at se om Daisy giver det samme.
 
 * OpenMI
 
 ** Find ud af hvor imput exchange items er blevet af.
-
-
 
 ** ElementSet
 
@@ -39,6 +23,10 @@ The Daisy developers.
 * R2D2
 
 ** colloids error
+
+* daisy.bib
+
+** Tilføj N bog
 
 * test-mibsol.dai
 

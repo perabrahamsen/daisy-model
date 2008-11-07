@@ -424,10 +424,8 @@ and the x-axis is horizontal and ortogonal to the row.  The row is\n\
 assumed to be uniform (dense), allowing us to ignore that dimension.\n\
 \n\
 We assume the root density decrease with horizontal distance to row,\n\
-as well as depth below row.\n\
-\n\
-See Gerwitz, S. and E.R. Page (1974): An empirical mathematical model\n\
-to describe plant root systems.  J. Appl. Ecol. 11, 773-781.");
+as well as depth below row.");
+    alist.add_strings ("cite", "gp74");
     Rootdens_GP2D::load_syntax (syntax, alist);
     
     Librarian::add_type (Rootdens::component, "GP2D", alist, syntax, &make);
