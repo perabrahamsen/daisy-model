@@ -1513,7 +1513,7 @@ February, etc.");
     // C02
     syntax.add ("CO2", "Pa", Syntax::Const, 
                 "Atmostpheric CO2 lavel at station.");
-    alist.add ("T_rain", 35.0);
+    alist.add ("CO2", 35.0);
 
     Librarian::add_type (Weather::component, "default", alist, syntax, &make);
   }
