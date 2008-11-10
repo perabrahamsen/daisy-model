@@ -1,5 +1,13 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* OpenMI
+
+** ElementSet
+
+
+
+** Enheder?
+
 * Rootdens & Sayed
 
 Der ser ud til at være en faktor 2 fejl i spreadsheeted.
@@ -9,16 +17,6 @@ Der ser ud til at være en faktor 2 fejl i spreadsheeted.
 Det gør den ikke.
 
 ** Udskriv parametre m.m.
-
-* OpenMI
-
-** Find ud af hvor imput exchange items er blevet af.
-
-** ElementSet
-
-** Enheder?
-
-*** Er cdaisy funktioner eksporteret?
 
 * lysimeter
 
