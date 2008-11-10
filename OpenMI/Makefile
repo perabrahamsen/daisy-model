@@ -55,7 +55,7 @@ daisy_OpenMI.dll: $(OPENMISRC)
 	"/reference:$(OPENMIASS)\Oatc.OpenMI.Sdk.Backbone.dll" \
 	"/reference:$(OPENMIASS)\Oatc.OpenMI.Sdk.Wrapper.dll" \
 	"/reference:$(OPENMIASS)\Oatc.OpenMI.Sdk.DevelopmentSupport.dll" \
-	daisywrapper.cs daisyOpenMIcomponent.cs 
+	$<
 
 .cs.netmodule:
 	$(CSHARP) /target:module $<

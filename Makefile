@@ -616,10 +616,10 @@ exp:
          && $(MAKE) VPATH=$(SRCDIR) USE_PROFILE=true -f $(SRCDIR)/Makefile daisy)
 
 native:	
-	(mkdir -p $(NATIVEHOME) \
+	(cd OpenMI && time $(MAKE) all ) \
+	 && mkdir -p $(NATIVEHOME) \
 	 && cd $(NATIVEHOME) \
-         && time $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile $(NATIVEEXE) \
-         && time $(MAKE) VPATH=$(SRCDIR)/OpenMI -f $(SRCDIR)/OpenMI/Makefile all)
+         && time $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile $(NATIVEEXE)
 
 cnative:
 	(mkdir -p $(NATIVEHOME) \
@@ -1385,6 +1385,10 @@ cdaisy${OBJ}: cdaisy.C scope.h symbol.h model.h alist.h block.h syntax.h \
 nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h symbol.h syntax.h alist.h assertion.h
 version${OBJ}: version.C
+program_GP2D${OBJ}: program_GP2D.C program.h model.h symbol.h alist.h run.h \
+  geometry_rect.h geometry_vert.h geometry.h syntax.h mathlib.h \
+  assertion.h rootdens.h treelog.h block.h plf.h submodeler.h check.h \
+  librarian.h
 svat_ssoc${OBJ}: svat_ssoc.C svat.h model.h symbol.h alist.h syntax.h block.h \
   plf.h librarian.h resistance.h fao.h soil_heat.h bioclimate.h soil.h \
   geometry.h mathlib.h assertion.h weather.h im.h vegetation.h log.h \

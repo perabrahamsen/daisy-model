@@ -6,6 +6,10 @@ Der ser ud til at være en faktor 2 fejl i spreadsheeted.
 
 ** Prøv at se om Daisy giver det samme.
 
+Det gør den ikke.
+
+** Udskriv parametre m.m.
+
 * OpenMI
 
 ** Find ud af hvor imput exchange items er blevet af.
@@ -16,9 +20,15 @@ Der ser ud til at være en faktor 2 fejl i spreadsheeted.
 
 *** Er cdaisy funktioner eksporteret?
 
+* lysimeter
+
+** v+h richards ser ud til at have et problem med trykrand.
+
+*** sammenlign 1D & 2x1 kode
+
 * SVAT
 
-** Check initialisering of soil_heat
+** Check initialisering af soil_heat
 
 * R2D2
 
