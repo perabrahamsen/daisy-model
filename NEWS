@@ -8,6 +8,10 @@ release.
 
 * 4.54
 
+** New 'CO2' parameter for the default weather model.
+
+This affects the FCC3 and FCC4 photosynthesis models.
+
 ** Added vegetables.
 
 ** New WP_ET in harvest log.
