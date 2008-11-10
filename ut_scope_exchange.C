@@ -8,6 +8,7 @@ TEST (ScopeExchange, All)
   const symbol x_dim = symbol ("x dim");
   const symbol x_desc = symbol ("x desc");
   const symbol y_symbol = symbol ("y");
+  const symbol n_symbol = symbol ("n");
 
   ScopeExchange scope;
   scope.add_item (new ExchangeNumber (x_symbol, 
@@ -19,7 +20,7 @@ TEST (ScopeExchange, All)
   EXPECT_EQ (scope.has_number (y_symbol), true);
   EXPECT_EQ (scope.number (y_symbol), 42.0);
   EXPECT_EQ (scope.has_number (x_symbol), false);
-  scope.set_number (x_symbol, 43.0);
+  scope.add (x_symbol, 43.0);
   EXPECT_EQ (scope.has_number (x_symbol), true);
   EXPECT_EQ (scope.number (x_symbol), 43.0);
   EXPECT_EQ (scope.dimension (x_symbol), x_dim);

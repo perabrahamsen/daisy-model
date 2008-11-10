@@ -114,6 +114,11 @@ struct WeatherStandard : public WeatherBase
   std::vector<double> temperature_scale;
   std::vector<double> temperature_offset;
 
+  // Overwrite keywords.
+  double CO2_;
+  double CO2 () const //[Pa]
+  { return CO2_; }
+
   // Data description.
   struct data_description_type
   {
@@ -435,6 +440,7 @@ WeatherStandard::keyword_description[] =
   { { "Latitude", "dgNorth", &WeatherStandard::latitude_, -90, 90, true },
     { "Longitude", "dgEast", &WeatherStandard::longitude_, -360, 360, true },
     { "Elevation", "m", &WeatherStandard::elevation_, 0, 10000, true },
+    { "CO2", "Pa", &WeatherStandard::CO2_, 10, 100, false },
     { "TimeZone", "dgEast", &WeatherStandard::timezone_, -360, 360, true },
     { "ScreenHeight", "m", &WeatherStandard::screen_height_, 0, 100, true },
     { "TAverage", "dgC", &WeatherStandard::T_average, -10, 40, true },
@@ -1305,6 +1311,7 @@ WeatherStandard::WeatherStandard (Block& al)
     precipitation_scale (al.number_sequence ("PrecipScale")),
     temperature_scale (al.number_sequence ("TempScale")),
     temperature_offset (al.number_sequence ("TempOffset")),
+    CO2_ (WeatherBase::CO2 ()),
     has_date (false),
     has_hour (false),
     has_temperature (false),

@@ -222,7 +222,11 @@ ScopeExchange::has_name (symbol tag) const
 {
   const std::map<symbol, Exchange*>::const_iterator i = named.find (tag);
   if (i == named.end ())
-    return false;
+    {
+      Assertion::message ("Scope '" + title () + "' hasn't tag '"
+                          + tag + "'");
+      return false;
+    }
 
   return (*i).second->has_name (); 
 }

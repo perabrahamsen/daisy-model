@@ -737,9 +737,17 @@ extern "C" const int EXPORT	// check if NAME is defined in SCOPE.
 daisy_scope_has_string (const Scope* scope, const char* name)
 { 
   if (scope->has_name (symbol (name)))
-    return 1;
+    {
+      Assertion::message ("Scope '" + scope->title () + "' has name '"
+                          + symbol (name) + "'");
+      return 1;
+    }
   else 
-    return 0; 
+    {
+      Assertion::message ("Scope '" + scope->title () + "' hasn't name '"
+                          + symbol (name) + "'");
+      return 0; 
+    }
 }
 
 extern "C" const char* EXPORT	// Return string value of NAME in SCOPE.
@@ -756,8 +764,11 @@ extern "C" int EXPORT           // True, iff SCOPE is writable.
 daisy_scope_writable (Scope* scope)
 { 
   if (dynamic_cast<WScope*> (scope))
-    return 1; 
-
+    {
+      Assertion::message ("Scope '" + scope->title () + "' is writable");
+      return 1; 
+    }
+  Assertion::message ("Scope '" + scope->title () + "' is read-only");
   return 0;
 }
 
