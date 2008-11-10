@@ -37,9 +37,11 @@ public:
   symbol library_id () const;
 
   // Content.
-public:
-  const symbol name_;
+private:
+  const symbol tag_;
   const symbol description;
+public:
+  symbol tag () const;
 
   // Use.
 public:

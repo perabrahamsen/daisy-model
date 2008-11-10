@@ -440,7 +440,6 @@ WeatherStandard::keyword_description[] =
   { { "Latitude", "dgNorth", &WeatherStandard::latitude_, -90, 90, true },
     { "Longitude", "dgEast", &WeatherStandard::longitude_, -360, 360, true },
     { "Elevation", "m", &WeatherStandard::elevation_, 0, 10000, true },
-    { "CO2", "Pa", &WeatherStandard::CO2_, 10, 100, false },
     { "TimeZone", "dgEast", &WeatherStandard::timezone_, -360, 360, true },
     { "ScreenHeight", "m", &WeatherStandard::screen_height_, 0, 100, true },
     { "TAverage", "dgC", &WeatherStandard::T_average, -10, 40, true },
@@ -1311,7 +1310,7 @@ WeatherStandard::WeatherStandard (Block& al)
     precipitation_scale (al.number_sequence ("PrecipScale")),
     temperature_scale (al.number_sequence ("TempScale")),
     temperature_offset (al.number_sequence ("TempOffset")),
-    CO2_ (WeatherBase::CO2 ()),
+    CO2_ (al.number ("CO2")),
     has_date (false),
     has_hour (false),
     has_temperature (false),
@@ -1510,6 +1509,11 @@ the file before it is used in the simulation, depending on the\n\
 month.  The first number corresponds to January, the second to\n\
 February, etc.");
     alist.add ("TempOffset", std::vector<double> (12, 0.0));
+
+    // C02
+    syntax.add ("CO2", "Pa", Syntax::Const, 
+                "Atmostpheric CO2 lavel at station.");
+    alist.add ("T_rain", 35.0);
 
     Librarian::add_type (Weather::component, "default", alist, syntax, &make);
   }

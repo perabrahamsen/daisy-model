@@ -37,13 +37,17 @@ Exchange::library_id () const
   return id;
 }
 
+symbol 
+Exchange::tag () const
+{ return tag_; }
+
 bool 
 Exchange::is_number () const
 { return false; }
 
 symbol 
 Exchange::name () const
-{ return name_; }
+{ daisy_notreached (); }
 
 double 
 Exchange::number () const
@@ -79,7 +83,7 @@ Name of value to exchange.");
 }
 
 Exchange::Exchange (const symbol n, const symbol d)
-  : name_ (n),
+  : tag_ (n),
     description (d)
 { }
   
@@ -222,11 +226,7 @@ ScopeExchange::has_name (symbol tag) const
 {
   const std::map<symbol, Exchange*>::const_iterator i = named.find (tag);
   if (i == named.end ())
-    {
-      Assertion::message ("Scope '" + title () + "' hasn't tag '"
-                          + tag + "'");
-      return false;
-    }
+    return false;
 
   return (*i).second->has_name (); 
 }
@@ -261,7 +261,7 @@ ScopeExchange::find_all_numbers (const std::vector<Exchange*>& entries)
   std::vector<symbol> result;
   for (size_t i = 0; i < entries.size (); i++)
     if (entries[i]->is_number ())
-      result.push_back (entries[i]->name ());
+      result.push_back (entries[i]->tag ());
   return result;
 }
 
@@ -270,7 +270,7 @@ ScopeExchange::find_named (const std::vector<Exchange*>& entries)
 {
   std::map<symbol, Exchange*> result;
   for (size_t i = 0; i < entries.size (); i++)
-    result[entries[i]->name ()] = entries[i];
+    result[entries[i]->tag ()] = entries[i];
   return result;
 }
 
