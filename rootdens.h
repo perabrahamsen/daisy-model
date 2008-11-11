@@ -55,7 +55,8 @@ public:
   // Create and Destroy.
 public:
   static std::auto_ptr<Rootdens> create_row (double row_width, 
-                                             double row_position);
+                                             double row_position,
+                                             bool debug = false);
   static std::auto_ptr<Rootdens> create_uniform ();
 public:
   virtual void initialize (const Geometry& geo, 

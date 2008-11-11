@@ -34,11 +34,10 @@
 
 #include <sstream>
 
-static const double default_DensRtTip = 0.1;
-
 struct Rootdens_GP2D : public Rootdens
 {
   // Parameters.
+  const int debug;             // Enable debug messages.
   const double row_position;	// Horizontal position of row crops. [cm]
   const double row_distance;	// Distance betweeen rows. [cm]
   const double DensRtTip;	// Root density at (pot) pen. depth. [cm/cm^3]
@@ -95,6 +94,7 @@ Rootdens_GP2D::set_density (const Geometry& geo,
 			    std::vector<double>& Density  /* [cm/cm^3] */,
 			    Treelog& msg)
 {
+  TREELOG_MODEL (msg);
   const size_t cell_size = geo.cell_size ();
 
   // Check input.
@@ -119,7 +119,7 @@ Rootdens_GP2D::set_density (const Geometry& geo,
   // Root length per half row.
   const double l_R = l_r * 0.5 * R; // [cm/cm]
 
-  // Crop width.
+  // Horizontal radius of root system.
   const double w_c = CropWidth;	// [cm]
 
   // Potential depth.
@@ -229,6 +229,35 @@ Rootdens_GP2D::set_density (const Geometry& geo,
 
   // Redistribute roots from outside root zone.
   limit_depth (geo, l_r, d_s, d_a, Density, msg);
+
+  if (debug > 0)
+    {
+      std::ostringstream tmp;
+      tmp << "R =\t" << R << "\tcm\tRow distance\n"
+          << "M_r =\t" << M_r << "\tg/cm^2\tRoot dry matter per area\n"
+          << "S_r =\t" << S_r << "\tcm/g\tSpecific root length\n"
+          << "l_r =\t" << l_r << "\tcm/cm^2\tRoot length\n"
+          << "l_R =\t" << l_R << "\tcm/cm\tRoot length per half row\n"
+          << "w_c =\t" << w_c << "\tcm\tHorisontal radius of root system\n"
+          << "d_c =\t" << d_c << "\tcm\tPotential depth\n"
+          << "d_s =\t" << d_s << "\tcm\tSoil depth\n"
+          << "d_a =\t" << d_a << "\tcm\tActual depth\n"
+          << "L_m =\t" << L_m << "\tcm/cm^3\tMinimum density\n"
+          << "l_m =\t" << l_m << "\tcm/cm^2\tMinimum root length in root zone\n"
+          << "D =\t" << D << "\t\t\
+Minimum root length as fraction of total root length\n"
+          << "Q_max =\t" << Q_max << "\t\t\
+The function g has a local maximum at -2\n"
+          << "D_max =\t" << D_max << "\t\t\
+There is no solution when D is above the value at Q_max\n"
+          << "Q =\t" << Q << "\t\tSolution to 'g (Q) = 0'\n"
+          << "g_Q =\t" << g_Q << "\t\tg (Q)\n"
+          << "a_z =\t" << a_z << "\tcm^-1\tVertical decrease\n"
+          << "a_x =\t" << a_x << "\tcm^-1\tHorisontal decrease\n"
+          << "L00 =\t" << L00 << "\tcm/cm^3\tDensity at (0, 0)\t\n"
+          << "k =\t" << k << "\t\tScale factor";
+      msg.message (tmp.str ());
+    }
 }
 
 void
@@ -318,11 +347,14 @@ Rootdens_GP2D::initialize (const Geometry& geo,
   TREELOG_MODEL (msg);
 
   const double geo_width = geo.right () - geo.left ();
-  if (!approximate (geo_width, row_width))
+  daisy_assert (row_width > 0.0);
+  const double half_rows = geo_width / (0.5 * row_width);
+  if (!approximate (half_rows, static_cast<int> (half_rows)))
     {
       std::ostringstream tmp;
-      tmp << "Row width (" << row_width << ") should match geometry width ("
-          << geo_width << ")";
+      tmp << "Geometry width (" << geo_width 
+          << ") should be an integral number of half rows (" 
+          << 0.5 * row_width << ")";
       msg.warning (tmp.str ());
     }
   if (!approximate (row_distance, row_width))
@@ -345,6 +377,9 @@ void
 Rootdens_GP2D::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   Rootdens::load_base (syntax, alist);
+  syntax.add ("debug", Syntax::Integer, Syntax::Const, "\
+Add debug messages if larger than 0.");
+  alist.add ("debug", 0);
   syntax.add ("row_position", "cm", Syntax::Const, "\
 Horizontal position of row crops.");
   alist.add ("row_position", 0.0);
@@ -352,7 +387,7 @@ Horizontal position of row crops.");
               "Distance between rows of crops.");
   syntax.add ("DensRtTip", "cm/cm^3", Check::positive (), Syntax::Const,
               "Root density at (potential) penetration depth.");
-  alist.add ("DensRtTip", default_DensRtTip);
+  alist.add ("DensRtTip", 0.1);
   syntax.add ("DensIgnore", "cm/cm^3", Check::positive (),
               Syntax::OptionalConst,
               "Ignore cells with less than this root density.\n\
@@ -374,6 +409,7 @@ density with this scale factor.");
 
 Rootdens_GP2D::Rootdens_GP2D (Block& al)
   : Rootdens (al),
+    debug (al.integer ("debug")),
     row_position (al.number ("row_position")),
     row_distance (al.number ("row_distance")),
     DensRtTip (al.number ("DensRtTip")),
@@ -386,6 +422,7 @@ Rootdens_GP2D::Rootdens_GP2D (Block& al)
 
 Rootdens_GP2D::Rootdens_GP2D (const AttributeList& al)
   : Rootdens (al),
+    debug (al.integer ("debug")),
     row_position (al.number ("row_position")),
     row_distance (al.number ("row_distance")),
     DensRtTip (al.number ("DensRtTip")),
@@ -397,7 +434,8 @@ Rootdens_GP2D::Rootdens_GP2D (const AttributeList& al)
 { }
 
 std::auto_ptr<Rootdens> 
-Rootdens::create_row (const double row_width, const double row_position)
+Rootdens::create_row (const double row_width, const double row_position,
+                      const bool debug)
 {
   Syntax dummy;
   AttributeList alist;
@@ -405,6 +443,7 @@ Rootdens::create_row (const double row_width, const double row_position)
   alist.add ("type", "GP2D");
   alist.add ("row_position", row_position);
   alist.add ("row_distance", row_width);
+  alist.add ("debug", debug ? 1 : 0);
   return std::auto_ptr<Rootdens> (new Rootdens_GP2D (alist)); 
 }
 

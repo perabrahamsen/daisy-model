@@ -42,7 +42,6 @@ struct ProgramGP2D : public Program
   const double crop_width;
   const double WRoot;
   const double DS;
-  const bool use_center;
 
   // Use.
   bool table_center (const GeometryRect& geo, 
@@ -81,15 +80,16 @@ struct ProgramGP2D : public Program
   // Use.
   bool run (Treelog& msg)
   {
+    // Find it.
     std::auto_ptr<Rootdens> rootdens 
-      = Rootdens::create_row (row_width, row_position);
-    // rootdens->initialize (*geo, row_width, row_position, msg);
+      = Rootdens::create_row (row_width, row_position, true);
+    rootdens->initialize (*geo, row_width, row_position, msg);
     std::vector<double> Density (geo->cell_size ());
     rootdens->set_density (*geo, soil_depth, crop_depth, crop_width,
                            WRoot, DS, Density, msg);
     
-    if (use_center)
-      table_center (*geo, Density, msg);
+    // Print it.
+    table_center (*geo, Density, msg);
 
     // Ok.
     return true;
@@ -105,6 +105,7 @@ struct ProgramGP2D : public Program
     geo->initialize_zplus (volatile_bottom, fixed, soil_depth, max_interval, 
                            al.msg ());
   }
+
   bool check (Treelog& msg)
   {
     bool ok = true;
@@ -112,6 +113,7 @@ struct ProgramGP2D : public Program
       ok = false;
     return ok; 
   }
+
   ProgramGP2D (Block& al)
     : Program (al),
       geo (submodel<GeometryRect> (al, "Geometry")),
@@ -121,8 +123,7 @@ struct ProgramGP2D : public Program
       crop_depth (al.number ("crop_depth")),
       crop_width (al.number ("crop_width")),
       WRoot (al.number ("WRoot")),
-      DS (al.number ("DS")),
-      use_center (al.flag ("use_center"))
+      DS (al.number ("DS"))
   { }
   ~ProgramGP2D ()
   { }
@@ -151,14 +152,12 @@ Limit on root depth by soil (no crops have roots below this).");
     syntax.add ("crop_depth", "cm", Check::positive (), Syntax::Const, "\
 Limit of root depth by crop (no soil have roots below this).");
     syntax.add ("crop_width", "cm", Check::positive (), Syntax::Const, "\
-Horizontal diameter of root zone.");
+Maximum horizontal distance of roots from plant.");
     syntax.add ("WRoot", "g DM/m^2", Check::positive (), Syntax::Const, "\
 Totoal root dry matter.");
-    syntax.add ("DS", "DS", Syntax::Const, "Development stage [0-2].");
+    syntax.add ("DS", "DS", Syntax::Const, "Development stage [0-2].\n\
+Not currently used.");
     alist.add ("DS", 2.0);
-    syntax.add ("use_center", Syntax::Boolean, Syntax::Const, "\
-True to list root density at cell center, false for cell corners.");
-    alist.add ("use_center", true);
     Librarian::add_type (Program::component, "GP2D", alist, syntax, &make);
   }
 } ProgramGP2D_syntax;
