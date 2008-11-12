@@ -2,6 +2,16 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * OpenMI
 
+** Få det til at virke
+
+*** ../libdeps?  Er det der den finde dll'er?
+
+*** Unittests
+
+*** Brug 5.54
+
+
+
 ** ElementSet
 
 *** Initialize
@@ -46,16 +56,6 @@ for i = 0 to element_set.size - 1
   scope.set_number (quantityID, value[i])
  
 ** Enheder?
-
-* Rootdens & Sayed
-
-Der ser ud til at være en faktor 2 fejl i spreadsheeted.
-
-** Prøv at se om Daisy giver det samme.
-
-Det gør den ikke.
-
-** Udskriv parametre m.m.
 
 * lysimeter
 
