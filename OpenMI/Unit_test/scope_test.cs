@@ -84,8 +84,8 @@ namespace Unit_test
             string name = "GroundWaterTable";
             Assert.AreEqual(true, scope.IsNumber(name));
             Assert.AreEqual("Ground water table.", scope.Description(name));
-            name = "column";
-            Assert.AreEqual("Exchange a string value.", scope.Description(name));
+            //name = "column";
+            //Assert.AreEqual("Exchange a string value.", scope.Description(name));
         }
         [Test]
         public void Writeable()

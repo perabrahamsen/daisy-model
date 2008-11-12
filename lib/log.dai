@@ -1542,22 +1542,27 @@ sum of all chemicals will be logged."
            (number (path column "${column}" Vegetation crops crops "${crop}"
                          Prod NetPhotosynthesis)
 		   (spec fixed Production NetPhotosynthesis)
+                   (dimension "g CO2/m^2/&")
                    (handle sum))
            (number (path column "${column}" Vegetation crops crops "${crop}"
                          Prod RootRespiration)
 		   (spec fixed Production RootRespiration)
+                   (dimension "g CO2/m^2/&")
                    (handle sum))
            (number (path column "${column}" Vegetation crops crops "${crop}"
                          Prod CanopyAss)
 		   (spec fixed Production CanopyAss)
+                   (dimension "g CH2O/m^2/&")
                    (handle sum))
            (number (path column "${column}" Vegetation crops crops "${crop}"
                          Prod PotCanopyAss)
 		   (spec fixed Production PotCanopyAss)
+                   (dimension "g CO2/m^2/&")
                    (handle sum))
            (number (path column "${column}" OrganicMatter "*" Bioincorporation CO2)
 		   (spec fixed Bioincorporation CO2)
                    (tag "Bioinc_CO2")
+                   (dimension "g C/m^2/&")
                    (handle sum)) 
            (interval (path column "${column}" OrganicMatter "*" CO2)
 		     (spec organic default CO2)

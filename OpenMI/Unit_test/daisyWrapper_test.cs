@@ -114,7 +114,7 @@ namespace Unit_test
         {
             DaisyWrapper Daisy = GetInitDaisy();
             Assert.AreEqual("Simulation for use in tutorial.", Daisy.GetModelDescription());
-            Assert.AreEqual("Daisy version 4.44", Daisy.GetComponentDescription());
+            Assert.AreEqual("Daisy version 4.53", Daisy.GetComponentDescription());
             Assert.AreEqual("Simulation for use in tutorial.", Daisy.GetDescription());
         }
         [Test]
@@ -127,7 +127,7 @@ namespace Unit_test
        public void GetValues()
        {
            DaisyWrapper Daisy = GetInitDaisy();
-           global::OpenMI.Standard.IValueSet value = Daisy.GetValues("Water", "Andeby");
+           global::OpenMI.Standard.IValueSet value = Daisy.GetValues("height", "Gaaseroed");
            Oatc.OpenMI.Sdk.Backbone.ScalarSet test = (Oatc.OpenMI.Sdk.Backbone.ScalarSet)value;
            Assert.AreEqual(1, value.Count);
            Assert.AreEqual(Daisy.GetMissingValueDefinition(), test.data[0]);

@@ -1,7 +1,8 @@
 ;;; test.dai -- Sample file using the Daisy libraries.
 
 (description "Simulation for use in tutorial.")
-(path "." "C:/Programmer/Daisy/daisy-src/lib/" )
+(path "." "C:/Programmer/Daisy/daisy-src/lib/" 
+          "C:/Programmer/Daisy/daisy-src/sample/")
 
 ;; Use standard parameterizations.
 (input file "tillage.dai")
@@ -9,7 +10,8 @@
 (input file "log.dai")
 
 ;; Weather data.
-(weather default  "C:/Programmer/Daisy/daisy-src/sample/taastrup.dwf")
+;;(weather default  "C:/Programmer/Daisy/daisy-src/sample/taastrup.dwf")
+(weather default  "taastrup.dwf")
 
 ;; We have some very sandy soil.
 (defhorizon Ap FAO3
