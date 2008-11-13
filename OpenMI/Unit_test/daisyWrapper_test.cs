@@ -114,7 +114,7 @@ namespace Unit_test
         {
             DaisyWrapper Daisy = GetInitDaisy();
             Assert.AreEqual("Simulation for use in tutorial.", Daisy.GetModelDescription());
-            Assert.AreEqual("Daisy version 4.53", Daisy.GetComponentDescription());
+            Assert.AreEqual("Daisy version 4.55", Daisy.GetComponentDescription());
             Assert.AreEqual("Simulation for use in tutorial.", Daisy.GetDescription());
         }
         [Test]

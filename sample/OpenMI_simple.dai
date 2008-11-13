@@ -2,9 +2,6 @@
 
 (description "Simulation for use in simple OpenMI coupling with two soil columns and bare soil.")
 
-;; Location of input files:
-(path "." "C:/Programmer/Daisy/daisy-src/lib/" )
-
 ;; Use standard parameterizations.
 (input file "OpenMI.dai")
 (input file "log.dai")
@@ -31,7 +28,7 @@
 (defcolumn Andeby default
   "The B.And farm, Andeby, 2002."
   ;; Location (X Y) point
-  (location (-10 100))
+  (location (-10 100) (10 100) (100 -10) (-100 -10))
   ;; Extern input
   (scope name "Lower_boundary_input_Andeby")
   ;; Daisy use solute NO3 concentration in lower boundary given by: 

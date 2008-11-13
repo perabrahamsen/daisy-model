@@ -45,7 +45,7 @@ USE_GUI = Q4
 BOOSTINC = -isystem $(CYGHOME)/usr/include/boost-1_33_1
 #BOOSTINC = -isystem /cygdrive/c/boostcvs
 #BOOSTINC = -isystem /cygdrive/c/boostsvn/boost-sandbox
-SETUPDIR = /home/abraham/daisy/install
+SETUPDIR = $(HOME)/daisy/install
 MAKENSIS = "/cygdrive/c/Program Files/NSIS/makensis.exe"
 MINGWHOME = /cygdrive/c/MinGW
 endif

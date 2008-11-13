@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual C# Express 2005
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual C# Express 2008
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenMI_Daisy", "OpenMI_Daisy.csproj", "{2C8F65FA-4777-40A7-8BDE-9567B1747352}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unit_test", "Unit_test\Unit_test.csproj", "{B7416E01-1749-4D15-A91D-23FA0FFA6B2A}"

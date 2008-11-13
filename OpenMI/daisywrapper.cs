@@ -63,6 +63,7 @@ namespace dk.ku.life.Daisy.OpenMI
         // Oatc.OpenMI.Sdk.Backbone.OutputExchangeItem:
         ArrayList _inputExchangeItems;
         ArrayList _outputExchangeItems;
+        Hashtable _elementSets;
         string FilePath;
         string ModelDescription;
 
@@ -146,6 +147,7 @@ namespace dk.ku.life.Daisy.OpenMI
         {
             _inputExchangeItems = new ArrayList();
             _outputExchangeItems = new ArrayList();
+            _elementSets = new Hashtable();
             FilePath = ((string)properties["FilePath"]);
 
             InitializeDaisy((string)properties["FilePath"]);
@@ -159,73 +161,77 @@ namespace dk.ku.life.Daisy.OpenMI
                 if (!scope.HasString("column"))
                     continue;
 
+                // Create element.
                 string columnID = scope.String("column");
-                ElementSet elementSet;
-
-                // Daisy column?
-                if (!_daisyEngine.HasColumn(columnID))
-                {
-                    string columnDescription = scope.Description("column");
-                    elementSet = new ElementSet(columnDescription, columnID, ElementType.IDBased, new SpatialReference(""));
-                    Element element = new Element(columnID);
-                    elementSet.AddElement(element);
-                }
-                else
+                Element element = new Element (columnID);
+                if (_daisyEngine.HasColumn(columnID))
                 {
                     Column column = _daisyEngine.GetColumn(columnID);
-                    string columnDescription = column.GetColumnDescription();
-                    switch (column.LocationSize())
-                    {
-                        case 0:
-                            // ID based
-                            elementSet = new ElementSet(columnDescription, columnID, ElementType.XYPoint, new SpatialReference(""));
-                            break;
-                        case 1:
-                            // Point based
-                            elementSet = new ElementSet(columnDescription, columnID, ElementType.XYPoint, new SpatialReference(""));
-                            break;
-                        case 2:
-                            // Error
-                            throw new ApplicationException("Error: Column must not contain exactly two (X Y)-points!");
-                        default:
-                            // Polygon
-                            elementSet = new ElementSet(columnDescription, columnID, ElementType.XYPolygon, new SpatialReference(""));
-                            break;
-                    }
-
-                    Element element = new Element(columnID);
-                    
                     for (uint ii = 0; ii < column.LocationSize(); ii++)
                     {
                         double x = column.LocationX(ii);
                         double y = column.LocationY(ii);
                         double z = 0.0;
-                        element.AddVertex(new Vertex(x, y, z));    
+                        element.AddVertex(new Vertex(x, y, z));
                     }
-                    elementSet.AddElement(element);
-                }
+                }                          
 
+                // Add exchange items.
                 for (uint j = 0; j < scope.NumberSize(); j++)
                 {
                     string name = scope.NumberName(j);
-                    string description = scope.Description(name);
-                    string dim = scope.Dimension(name);
+                    ElementSet elementSet;
 
-                    Quantity quantity = Quantity(dim, description, name);
-                    if (scope.Writeable())
+                    // Find or create element set.
+                    if (_elementSets.Contains(name))
                     {
-                        InputExchangeItem input = new InputExchangeItem();
-                        input.Quantity = quantity;
-                        input.ElementSet = elementSet;
-                        _inputExchangeItems.Add(input);
+                        elementSet = (ElementSet)_elementSets[name];
+                        elementSet.Description += " " + columnID;
+                        // TODO: We should test the type matches here.                    
                     }
                     else
                     {
-                        OutputExchangeItem output = new OutputExchangeItem();
-                        output.Quantity = quantity;
-                        output.ElementSet = elementSet;
-                        _outputExchangeItems.Add(output);
+                        switch (element.VertexCount)
+                        {
+                            case 0:
+                                // ID based
+                                elementSet = new ElementSet(columnID, name, ElementType.XYPoint, new SpatialReference(""));
+                                break;
+                            case 1:
+                                // Point based
+                                elementSet = new ElementSet(columnID, name, ElementType.XYPoint, new SpatialReference(""));
+                                break;
+                            case 2:
+                                // Error
+                                throw new ApplicationException("Error: Column must not contain exactly two (X Y)-points!");
+                            default:
+                                // Polygon
+                                elementSet = new ElementSet(columnID, name, ElementType.XYPolygon, new SpatialReference(""));
+                                break;
+                        }
+                        _elementSets[name] = elementSet;
+                        string dim = scope.Dimension(name);
+                        string description = scope.Description(name);
+
+                        Quantity quantity = Quantity(dim, description, name);
+                        if (scope.Writeable())
+                        {
+                            InputExchangeItem input = new InputExchangeItem();
+                            input.Quantity = quantity;
+                            input.ElementSet = elementSet;
+                            _inputExchangeItems.Add(input);
+                        }
+                        else
+                        {
+                            OutputExchangeItem output = new OutputExchangeItem();
+                            output.Quantity = quantity;
+                            output.ElementSet = elementSet;
+                            _outputExchangeItems.Add(output);
+                        }
                     }
+
+                    // Add it.
+                    elementSet.AddElement(element);
                 }
             }
         }
@@ -382,4 +388,14 @@ namespace dk.ku.life.Daisy.OpenMI
         {
         }
     }
+
+    public class DaisyOpenMIComponent : Oatc.OpenMI.Sdk.Wrapper.LinkableEngine
+    {
+        protected override void SetEngineApiAccess ()
+        {
+            // Create the DaisyWrapper and assigns it to the protected 
+            // field variable _engineApiAccess:
+            _engineApiAccess = new DaisyWrapper ();
+        }
+    } 
 }

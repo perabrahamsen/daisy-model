@@ -1,14 +1,20 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{B7416E01-1749-4D15-A91D-23FA0FFA6B2A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Unit_test</RootNamespace>
     <AssemblyName>Unit_test</AssemblyName>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -28,22 +34,25 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework, Version=2.2.9.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL" />
+    <Reference Include="nunit, Version=2.4.8.0, Culture=neutral">
+      <ExecutableExtension>.exe</ExecutableExtension>
+    </Reference>
+    <Reference Include="nunit.framework, Version=2.4.8.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77" />
     <Reference Include="Oatc.OpenMI.Sdk.Backbone, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\libdeps\OpenMi\Oatc\src\csharp\Sdk\Backbone\bin\Release\Oatc.OpenMI.Sdk.Backbone.dll</HintPath>
+      <HintPath>..\..\libdeps\Oatc.OpenMI.Sdk.Backbone.dll</HintPath>
     </Reference>
     <Reference Include="Oatc.OpenMI.Sdk.DevelopmentSupport, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\libdeps\OpenMi\Oatc\src\csharp\Sdk\DevelopmentSupport\bin\Release\Oatc.OpenMI.Sdk.DevelopmentSupport.dll</HintPath>
+      <HintPath>..\..\libdeps\Oatc.OpenMI.Sdk.DevelopmentSupport.dll</HintPath>
     </Reference>
     <Reference Include="Oatc.OpenMI.Sdk.Wrapper, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\libdeps\OpenMi\Oatc\src\csharp\Sdk\Wrapper\bin\Release\Oatc.OpenMI.Sdk.Wrapper.dll</HintPath>
+      <HintPath>..\..\libdeps\Oatc.OpenMI.Sdk.Wrapper.dll</HintPath>
     </Reference>
     <Reference Include="OpenMI.Standard, Version=1.4.0.0, Culture=neutral, PublicKeyToken=82bbb00ca5ab39e4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\libdeps\OpenMi\OpenMI.Standard\src\csharp\bin\OpenMI.Standard.dll</HintPath>
+      <HintPath>..\..\libdeps\OpenMI.Standard.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -62,6 +71,9 @@
       <Project>{2C8F65FA-4777-40A7-8BDE-9567B1747352}</Project>
       <Name>OpenMI_Daisy</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
