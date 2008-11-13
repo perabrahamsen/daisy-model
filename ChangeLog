@@ -1,6 +1,7 @@
-2008-11-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+2008-11-13  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* Version 4.55 released.
+	* OpenMI: If a quantity is exported or imported for multiple
+	columns, the columns are merged into a single element set.
 
 2008-11-12  Per Abrahamsen  <abraham@dina.kvl.dk>
 

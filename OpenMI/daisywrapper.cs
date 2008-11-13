@@ -284,38 +284,49 @@ namespace dk.ku.life.Daisy.OpenMI
         }
         public global::OpenMI.Standard.IValueSet GetValues(string QuantityID, string ElementSetID)
         {
-            double[] returnValues = new double[1];
-            bool found = false;
+            if (QuantityID != ElementSetID)
+                throw new ApplicationException("Element sets should be named after quantities");
+            if (!_elementSets.Contains(ElementSetID))
+                throw new ApplicationException("Unknown element set '" + ElementSetID + "'");
+            ElementSet elementSet = (ElementSet) _elementSets[ElementSetID];
+            int count = elementSet.ElementCount;
+            double[] returnValues = new double[count];
 
-            for (int i = 0; i < _daisyEngine.ScopeSize(); i++)
+            // This is O (e * s * q) instead of O (1).
+            for (int e = 0; e < count; e++)
             {
-                Scope scope = _daisyEngine.GetScope(i);
-
-                if (!scope.HasString("column"))
-                    continue;
-                if (scope.Writeable())
-                    continue;
-
-                if (scope.String("column") != ElementSetID)
-                    continue;
-
-                for (uint j = 0; j < scope.NumberSize(); j++)
+                Element element = elementSet.GetElement(e);
+                string ColumnID = element.ID;
+                bool found = false;
+                for (int i = 0; i < _daisyEngine.ScopeSize(); i++)
                 {
-                    if (scope.NumberName(j) == QuantityID)
+                    Scope scope = _daisyEngine.GetScope(i);
+
+                    if (!scope.HasString("column"))
+                        continue;
+                    if (scope.Writeable())
+                        continue;
+
+                    if (scope.String("column") != ColumnID)
+                        continue;
+
+                    for (uint j = 0; j < scope.NumberSize(); j++)
                     {
-                        if (found)
-                            throw new Exception("Duplicate QuantityID: '" + QuantityID + "' in DaisyEngine");
-                        if (scope.HasNumber(QuantityID))
-                            returnValues[0] = scope.Number(QuantityID);
-                        else
-                            returnValues[0] = GetMissingValueDefinition();
-                        found = true;
+                        if (scope.NumberName(j) == QuantityID)
+                        {
+                            if (found)
+                                throw new Exception("Duplicate QuantityID: '" + QuantityID + "' in DaisyEngine");
+                            if (scope.HasNumber(QuantityID))
+                                returnValues[e] = scope.Number(QuantityID);
+                            else
+                                returnValues[e] = GetMissingValueDefinition();
+                            found = true;
+                        }
                     }
                 }
+                if (!found)
+                    throw new Exception("No QuantityID: '" + QuantityID + "' for column '" + ColumnID + "' defined in DaisyEngine");
             }
-            if (!found)
-                throw new Exception("No QuantityID: '" + QuantityID + "' defined in DaisyEngine");
-
             Oatc.OpenMI.Sdk.Backbone.ScalarSet values = new Oatc.OpenMI.Sdk.Backbone.ScalarSet(returnValues);
             return values;
         }
@@ -341,35 +352,53 @@ namespace dk.ku.life.Daisy.OpenMI
         }
         public void SetValues(string QuantityID, string ElementSetID, global::OpenMI.Standard.IValueSet value)
         {
-            bool found = false;
+            if (QuantityID != ElementSetID)
+                throw new ApplicationException("Element sets should be named after quantities");
+            if (!_elementSets.Contains(ElementSetID))
+                throw new ApplicationException("Unknown element set '" + ElementSetID + "'");
+            ElementSet elementSet = (ElementSet)_elementSets[ElementSetID];
+            int count = elementSet.ElementCount;
+            if (count != value.Count)
+                throw new ApplicationException("Wrong number of values given to '" + QuantityID + "'");
+            global::OpenMI.Standard.IScalarSet val = (global::OpenMI.Standard.IScalarSet)value;
 
-            for (int i = 0; i < _daisyEngine.ScopeSize(); i++)
+            // This is O (e * s * q) instead of O (1).
+            for (int e = 0; e < count; e++)
             {
-                Scope scope = _daisyEngine.GetScope(i);
-
-                if (!scope.HasString("column"))
-                    continue;
-                if (!scope.Writeable())
-                    continue;
-
-                if (scope.String("column") != ElementSetID)
-                    continue;
-
-                for (uint j = 0; j < scope.NumberSize(); j++)
+                Element element = elementSet.GetElement(e);
+                string ColumnID = element.ID;
+                bool found = false;
+                for (int i = 0; i < _daisyEngine.ScopeSize(); i++)
                 {
-                    if (scope.NumberName(j) == QuantityID)
+                    Scope scope = _daisyEngine.GetScope(i);
+
+                    if (!scope.HasString("column"))
+                        continue;
+                    if (!scope.Writeable())
+                        continue;
+
+                    if (scope.String("column") != ColumnID)
+                        continue;
+
+                    for (uint j = 0; j < scope.NumberSize(); j++)
                     {
-                        if (found)
-                            throw new Exception("Duplicate QuantityID: '" + QuantityID + "' used as argument in Daisy SetValues method");
-                        global::OpenMI.Standard.IScalarSet val = (global::OpenMI.Standard.IScalarSet)value;
-                        if (scope.IsNumber(QuantityID))
-                            scope.SetNumber(QuantityID, val.GetScalar(0));
-                        found = true;
+                        if (scope.NumberName(j) == QuantityID)
+                        {
+                            if (found)
+                                throw new Exception("Duplicate QuantityID: '" + QuantityID + "' in DaisyEngine");
+                            if (scope.IsNumber(QuantityID))
+                                scope.SetNumber(QuantityID, val.GetScalar(0));
+                            else
+                                throw new Exception("'" + QuantityID + "' is not a number");
+                            found = true;
+                        }
                     }
                 }
+                if (!found)
+                    throw new Exception("No QuantityID: '" + QuantityID + "' for column '" + ColumnID + "' defined in DaisyEngine");
             }
-            if (!found)
-                throw new Exception("No QuantityID: '" + QuantityID + "' used as argument in Daisy SetValues method");
+            
+          
         }
         public bool PerformTimeStep()
         {

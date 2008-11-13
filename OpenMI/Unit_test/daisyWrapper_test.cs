@@ -127,14 +127,14 @@ namespace Unit_test
        public void GetValues()
        {
            DaisyWrapper Daisy = GetInitDaisy();
-           global::OpenMI.Standard.IValueSet value = Daisy.GetValues("height", "Gaaseroed");
+           global::OpenMI.Standard.IValueSet value = Daisy.GetValues("height", "height");
            Oatc.OpenMI.Sdk.Backbone.ScalarSet test = (Oatc.OpenMI.Sdk.Backbone.ScalarSet)value;
-           Assert.AreEqual(1, value.Count);
+           Assert.AreEqual(3, value.Count);
            Assert.AreEqual(Daisy.GetMissingValueDefinition(), test.data[0]);
 
            Daisy.PerformTimeStep();
-           value = Daisy.GetValues("Water", "Andeby");
-           Assert.AreEqual(1, value.Count);
+           value = Daisy.GetValues("Water", "Water");
+           Assert.AreEqual(3, value.Count);
            test = (Oatc.OpenMI.Sdk.Backbone.ScalarSet)value;
            Assert.Greater(test.data[0],400);
        }
@@ -145,7 +145,7 @@ namespace Unit_test
            Oatc.OpenMI.Sdk.Backbone.ScalarSet val = new Oatc.OpenMI.Sdk.Backbone.ScalarSet();
            val.data = new double[1];
            val.data[0] = 100.100;
-           Daisy.SetValues("GroundWaterTable", "Andeby", val);
+           Daisy.SetValues("GroundWaterTable", "GroundWaterTable", val);
        }
        [Test]
        public void GetInputExchangeItem()
