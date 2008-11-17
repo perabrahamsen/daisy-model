@@ -1,3 +1,8 @@
+2008-11-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* chemical_std.C (ChemicalStandard::tick_soil): Supress warning
+	for numeric uncertainty.
+
 2008-11-13  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 5.56 released.
