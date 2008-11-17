@@ -1,61 +1,8 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* OpenMI
+* R2D2
 
-** Få det til at virke
-
-*** ../libdeps?  Er det der den finde dll'er?
-
-*** Unittests
-
-*** Brug 5.54
-
-
-
-** ElementSet
-
-*** Initialize
-
-for each scope
-  column = scope.get_column ()
-  create element
-  for each scope.quantity
-    if (element_sets.contain (quantity))
-      assert same type as original
-    else
-      element_sets[quantity] = new ElemenSet;
-      if (scope.writable)
-        add inputs
-      else
-        all outputs
-    end
-    element_sets[quantity].add_element (element);
-  end
-end
-
-*** GetValues (quantityID, element_setID)
-
-assert (quantityID == element_setID)
-find element_set
-result[element_set.size ()];
-for i = 0 to element_set.size - 1
-  element = element_set[i]
-  column = element.id
-  scope = find scope (colum)
-  result[i] = scope.get_number (quantityID)
-
-*** SetValues (quantityID, element_setID, value)
-
-assert (quantityID == element_setID)
-find element_set
-assert value.size () == element_set.size ();
-for i = 0 to element_set.size - 1
-  element = element_set[i]
-  column = element.id
-  scope = find scope (colum)
-  scope.set_number (quantityID, value[i])
- 
-** Enheder?
+** colloids error
 
 * lysimeter
 
@@ -63,13 +10,13 @@ for i = 0 to element_set.size - 1
 
 *** sammenlign 1D & 2x1 kode
 
+* OpenMI
+
+** Enheder?
+
 * SVAT
 
 ** Check initialisering af soil_heat
-
-* R2D2
-
-** colloids error
 
 * daisy.bib
 
