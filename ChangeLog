@@ -1,3 +1,11 @@
+2008-11-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* uzrichard.C (UZRichard::q_darcy): Bug fix with multiple columns.
+
+2008-11-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("Crop Production"): Log max water stress.
+
 2008-11-17  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* chemical_std.C (ChemicalStandard::tick_soil): Supress warning

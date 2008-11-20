@@ -78,7 +78,7 @@ double
 HydraulicM_BaC::h (const double Theta) const
 {
   if (Theta < Theta_sat)
-    return h_b / pow((Theta_res - Theta) / (Theta_res - Theta_sat), 1 / lambda);
+    return h_b / pow((Theta_res - Theta) / (Theta_res - Theta_sat), 1.0 / lambda);
   else
     return h_b;
 }

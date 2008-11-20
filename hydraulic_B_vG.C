@@ -68,7 +68,7 @@ HydraulicB_vG::K (const double h) const
   if (h < 0)
     {
       const double Se_h = Se (h);
-      return K_sat * pow (Se_h, l) * (1 - pow (1 - pow (Se_h, 1/m), m));
+      return K_sat * pow (Se_h, l) * (1 - pow (1 - pow (Se_h, 1.0/m), m));
     }
   else
     return K_sat;
@@ -90,8 +90,9 @@ double
 HydraulicB_vG::h (const double Theta) const
 {
   if (Theta < Theta_sat)
-    return pow(pow(Theta_res / (Theta_res - Theta_sat) 
-		   + Theta / (Theta_sat - Theta_res), -1 / m) - 1, 1 / n) / a;
+    return pow (pow (Theta_res / (Theta_res - Theta_sat) 
+                     + Theta / (Theta_sat - Theta_res), -1.0 / m) 
+                - 1.0, 1.0 / n) / a;
   else
     return 0.0;
 }

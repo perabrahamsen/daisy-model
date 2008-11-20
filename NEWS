@@ -6,6 +6,10 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.57
+
+** Bug fixes.
+
 * 4.56
 
 ** OpenMI now exports multiple columns as one element set.

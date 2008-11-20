@@ -1,3 +1,4 @@
+
 // uzrichard.C --- Using Richard's Equation to calculate water flow.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
@@ -707,14 +708,16 @@ calculating flow with pressure top.\n";
           << "last " << last << " ends at " << geo.zplus (last) << " [cm]";
       throw (tmp.str ());
     }
-
-  for (; start > 0; start--)
+#ifdef REQUIRE_UNSATURATED_DARCY
+  for (; start > first; start--)
     {
       if (h[start - first] < 0.0 && h[start + 1 - first] < 0.0)
 	break;
     }
-  if (start == 0)
+  if (start == first)
     throw ("We couldn't find an unsaturated area.");
+#endif // REQUIRE_UNSATURATED_DARCY
+
   // Use Darcy equation to find flux here.
   q[start + 1] = -Kplus[start - first] 
     * (  (  (h[start - first] - h[start + 1 - first])

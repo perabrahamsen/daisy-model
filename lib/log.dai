@@ -1655,7 +1655,8 @@ sum of all chemicals will be logged."
                    (dimension "kg N/ha")
                    (factor 10.0))
            (number (path column "${column}" Vegetation crops crops "${crop}"
-                         Root water_stress))
+                         Root water_stress)
+                   (handle max))
            (number (path column "${column}" Vegetation crops crops "${crop}"
                          Root water_stress_days))
            (number (path column "${column}" Vegetation crops crops "${crop}"

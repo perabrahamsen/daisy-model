@@ -461,6 +461,18 @@ SoilWater::mass_balance (const Geometry& geo, double dt, Treelog& msg)
           << ") + boundary input (" << total_boundary_input
           << ") != " << total_expected << " mm, got " << total_new 
           << " mm, difference is " << total_diff << " mm";
+      for (size_t e = 0; e < edge_size; e++)
+        {
+          if (geo.edge_is_internal (e))
+            continue;
+          tmp << "\nedge " << geo.edge_name (e)
+              << ": primary " << q_primary_[e]
+              << ", secondary = " << q_secondary_[e];
+          if (!approximate (q_primary_[e] + q_secondary_[e], q_matrix_[e]))
+            tmp << ", NOT MATCHING matrix = " << q_matrix_[e];
+          tmp << ", tertiary = " << q_tertiary_[e]
+              << ", area = " << geo.edge_area (e);
+        }
       msg.error (tmp.str ());
     }
 }

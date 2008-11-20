@@ -1,12 +1,16 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* R2D2
+* colloids 
 
-** colloids error
+** Check med opsætning med makroporestrøm
+
+** colloid plus stof
 
 * lysimeter
 
 ** v+h richards ser ud til at have et problem med trykrand.
+
+Det sker kun med to søjler, ikke med 1!
 
 *** sammenlign 1D & 2x1 kode
 

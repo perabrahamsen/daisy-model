@@ -273,6 +273,7 @@ UZRect2x1::water_column (const GeometryRect& geo, const Soil& soil,
 {
   // Find top edge.
   const size_t top_edge = top_cell + q_offset;
+  daisy_assert (geo.edge_from (top_edge) == top_cell);
   daisy_assert (geo.edge_to (top_edge) == Geometry::cell_above);
   daisy_assert (q.size () > bottom_cell + 1);
 
@@ -283,7 +284,10 @@ UZRect2x1::water_column (const GeometryRect& geo, const Soil& soil,
 
   // Limit for groundwater table.
   const size_t bottom_edge = bottom_cell + q_offset + 1U;
+  daisy_assert (geo.edge_to (bottom_edge) == bottom_cell);
+  daisy_assert (geo.edge_from (bottom_edge) == Geometry::cell_below);
   size_t last = bottom_cell;
+
 #ifdef INERT_GROUNDWATER
   if (groundwater.bottom_type () == Groundwater::pressure)
     {
