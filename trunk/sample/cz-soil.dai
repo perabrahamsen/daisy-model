@@ -1,0 +1,173 @@
+;; cz-soil.dai -- Sample soil from Czeckia, from FertOrgaNic project.
+
+;;Dates from Valecov averages from areas A,B,C and D 
+;;SOIL CHARACTERISTICS: Valecov_PG )
+                    
+(defhorizon "Orh(g)_Valecov_PG" default
+  (clay 0.141 [])
+  (silt 0.407 [])
+  (sand 0.452 [])
+  (humus 0.022 [])
+  (C_per_N 8.6 [g C/g N])
+  (dry_bulk_density 1.514 [g/cm^3])
+  (SOM_fractions 0.30 0.70 []) 
+ ; (SOM_C_per_N 5.0 5.0 [g C/g N])
+ ;;PTF Van Genuchten Mualem
+  (hydraulic M_BaC_Bimodal
+	(K_sat 1.00 [cm/h])
+	(K_b 0.20 [cm/h])
+	(Theta_sat 0.449 [cm^3 H2O/cm^3])
+	(Theta_b 0.395 [])
+	(Theta_res 0.004 [cm^3 H2O/cm^3])
+	(h_b -10 [cm])
+	(lambda 0.112)
+	)
+;  (hydraulic M_vG [cm/h])
+;             (K_sat 0.794 [cm/h]) ; (K_sat 0.612 [cm/h])
+;             (Theta_res 0.0469 [cm^3 H2O/cm^3])
+;             (Theta_sat 0.3622 [cm^3 H2O/cm^3])
+;             (alpha 0.0128 [cm^-1])
+;             (n 1.4711))
+)
+
+(defhorizon "E(g)_Valecov_PG" default
+  (C_per_N 8.6 [g C/g N])
+  (dry_bulk_density 1.586 [g/cm^3])
+  (clay 0.186 [])
+  (silt 0.373 [])
+  (sand 0.441 [])
+  (humus 0.005 [])
+  (SOM_fractions 0.50 0.50 []) 
+;  (SOM_C_per_N 6.0 6.0 [g C/g N])
+  ;;PTF Van Genuchten Mualem
+(hydraulic M_BaC_Bimodal
+	(K_sat 0.89 [cm/h])
+	(K_b 0.18 [cm/h])
+	(Theta_sat 0.423 [cm^3 H2O/cm^3])
+	(Theta_b 0.386 [])
+	(Theta_res 0.0 [cm^3 H2O/cm^3])
+	(h_b -10 [cm])
+	(lambda 0.117)
+	)
+;  (hydraulic M_vG
+;             (K_sat 0.663 [cm/h]) ; (K_sat 0.342 [cm/h])
+;             (Theta_res 0.0530 [cm^3 H2O/cm^3])
+;             (Theta_sat 0.3601 [cm^3 H2O/cm^3])
+;             (alpha 0.0143 [cm^-1])
+;             (n 1.4169))
+)
+
+(defhorizon "E(g)/Ig_Valecov_PG" default
+  (C_per_N 8.6 [g C/g N])
+  (dry_bulk_density 1.593 [g/cm^3])
+  (clay 0.218 [])
+  (silt 0.310 [])
+  (sand 0.472 [])
+  (humus 0.003 [])
+  (SOM_fractions 0.80 0.20 []) 
+;  (SOM_C_per_N 8.6 8.6 [g C/g N])
+  ;;PTF Van Genuchten Mualem
+(hydraulic M_BaC_Bimodal
+	(K_sat 0.75 [cm/h])
+	(K_b 0.15 [cm/h])
+	(Theta_sat 0.417 [cm^3 H2O/cm^3])
+	(Theta_b 0.385 [])
+	(Theta_res 0.0[cm^3 H2O/cm^3])
+	(h_b -10 [cm])
+	(lambda 0.107)
+	)
+;  (hydraulic M_vG
+;             (K_sat 0.056 [cm/h]) ; (K_sat 0.323 [cm/h])
+;             (Theta_res 0.0576 [cm^3 H2O/cm^3])
+;             (Theta_sat 0.3692 [cm^3 H2O/cm^3])
+;             (alpha 0.0170 [cm^-1])
+;             (n 1.3704))
+  )
+
+(defhorizon "Ig_Valecov_PG" default
+  (C_per_N 8.6 [g C/g N])
+  (dry_bulk_density 1.649 [g/cm^3])
+  (clay 0.214 [])
+  (silt 0.272 [])
+  (sand 0.515 [])
+  (humus 0.002 [])
+  (SOM_fractions 0.90 0.10 []) 
+;  (SOM_C_per_N 8.6 8.6 [g C/g N])
+  ;;PTF Van Genuchten Mualem
+(hydraulic M_BaC_Bimodal
+	(K_sat 0.58 [cm/h])
+	(K_b 0.12 [cm/h])
+	(Theta_sat 0.384 [cm^3 H2O/cm^3])
+	(Theta_b 0.366 [])
+	(Theta_res 0.0 [cm^3 H2O/cm^3])
+	(h_b -10 [cm])
+	(lambda 0.117)
+	)
+;  (hydraulic M_vG
+;             (K_sat 0.140 [cm/h]) ; (K_sat 0.314 [cm/h])
+;             (Theta_res 0.0541 [cm^3 H2O/cm^3])
+;             (Theta_sat 0.3563 [cm^3 H2O/cm^3])
+;             (alpha 0.0217 [cm^-1])
+;             (n 1.3148))
+  )
+
+
+(defhorizon "Pg_Valecov_PG" default
+  (C_per_N 8.6 [g C/g N])
+  (dry_bulk_density 1.640 [g/cm^3])
+  (clay 0.199 [])
+  (silt 0.192 [])
+  (sand 0.609 [])
+  (humus 0.001 [])
+  (SOM_fractions 0.90 0.10 []) 
+;  (SOM_C_per_N 8.6 8.6 [g C/g N])
+  ;;PTF Van Genuchten Mualem
+(hydraulic M_BaC_Bimodal
+	(K_sat 0.48 [cm/h])
+	(K_b 0.10 [cm/h])
+	(Theta_sat 0.383 [cm^3 H2O/cm^3])
+	(Theta_b 0.364 [])
+	(Theta_res 0.0 [cm^3 H2O/cm^3])
+	(h_b -10 [cm])
+	(lambda 0.170)
+	)
+;  (hydraulic M_vG
+;             (K_sat 0.140 [cm/h]) ; (K_sat 0.517 [cm/h])
+;             (Theta_res 0.0533 [cm^3 H2O/cm^3])
+;             (Theta_sat 0.3609 [cm^3 H2O/cm^3])
+;             (alpha 0.0272 [cm^-1])
+;             (n 1.3112))
+  )
+
+;;  Parameterisation of column FertOrgaNic 2003 Czech Republic
+(defcolumn "Valecov_PG" default
+     (SoilWater (macro default
+                       (height_start 0 [cm])
+                       (height_end -100 [cm])
+                       (distribution (-100 1) (-30 0.5) (0 0))
+                       (pressure_initiate -2 [cm])
+                       (pressure_end -10 [cm])
+                       (pond_max 0.5 [mm])))
+     (OrganicMatter original
+                    (init (input 6000 [kg C/ha/y])
+         	;;(input 1500 [kg C/ha/y]);total yearly carbon input p.12
+               (root 1500 [kg C/ha/y]) ; dead roots (from input)  p.12
+               (background_mineralization 160 [kg N/ha/y]) 
+                   ;(background_mineralization 60 [kg N/ha/y]) 
+                   ; difference between the netto mineralization and 
+                   ; the amount of added organically bound nitrogen
+               (end -25 [cm]))) ;the depth of plowing layer
+	(Soil (MaxRootingDepth 60 [cm])
+              (border -8 -10 -30 -45 -50 -60 -75 -150 [cm])
+          (horizons (  -29 [cm] "Orh(g)_Valecov_PG")
+                    (  -40 [cm] "E(g)_Valecov_PG")
+                    (  -60 [cm] "E(g)/Ig_Valecov_PG")                  
+                    (  -90 [cm] "Ig_Valecov_PG")
+                    ( -130 [cm] "Pg_Valecov_PG")
+                    ( -250 [cm] "Pg_Valecov_PG"); Pa 17/01-06
+)
+)
+     (Groundwater deep)
+)
+
+;; cz-soil.dai ends here

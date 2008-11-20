@@ -1,0 +1,277 @@
+;Mikkel Mollerup, KVL
+;for AArhus County, 2004/2005
+;
+;Documentation in "Parameteriseringer af grønsager til Daisy, 2005"
+
+;; Get vegestables.
+(input file "crop.dai")
+(input file "tillage.dai")
+
+;; Define fertilizers.
+(defam KAS mineral
+  (description "Kalkammonsalpeter (KAS)")
+  (NH4_fraction 0.50))
+  
+(defam N15B mineral
+  (description "Nitrabor (N 15 B)")
+  (NH4_fraction 0.06))
+    
+(defam N46 mineral
+  (description "Urea (N 46)")
+  (NH4_fraction 1.0))
+  
+(defam "NP 12-23-0" mineral
+  (description "Monoammoniumfosfat (MAP)")
+  (NH4_fraction 0.57))
+ 
+(defam "NPK 14-3-18" mineral
+  (description "NPK 14-3-18")
+  (NH4_fraction 0.54)) 
+  
+(defam "NS 24-7" mineral
+  (description "NS 24-7")
+  (NH4_fraction 0.50))
+
+;; Define tillage.
+(defaction "harrowing" mix -15
+  (penetration 0.8))
+
+;; Define irrigation strategies.
+(defaction "irrigation" activity
+  (wait (not (soil_water_pressure_above (height -20.0 [cm])
+	                                (potential -300 [cm])))) 
+  (irrigate_overhead 10 [mm/h] (hours 3))
+  (wait_days 2))
+
+(defaction "irrigation onion" activity
+  (wait (not (soil_water_pressure_above (height -10.0 [cm])
+	                                (potential -250 [cm])))) 
+  (irrigate_overhead 10 [mm/h] (hours 2))
+  (wait_days 1))
+
+;; Management
+
+(defaction "Beetroot management" activity
+  (wait_mm_dd 4 1)
+  (plowing) 		 
+  (wait_mm_dd 5 20)
+  (fertilize (KAS (weight 40 [kg N/ha])))
+  (harrowing)
+  (seed_bed_preparation)
+  (sow "Beetroot")
+  (wait_mm_dd 6 10)
+  (while (wait_mm_dd 6 23)
+         (repeat "irrigation"))
+  (fertilize (KAS (weight 95 [kg N/ha]))) 
+  (while (wait_mm_dd 8 15)
+         (repeat "irrigation"))
+  (fertilize (N15B (weight 30 [kg N/ha])))
+  (while (wait_mm_dd 10 8)
+         (repeat "irrigation"))
+  (harvest "Beetroot" (stub 0.0 [cm])
+                      (sorg 1.0)
+                      (stem 0.0) 
+                      (leaf 0.0)))
+
+(defaction "Broccoli - transplanted management" activity
+  (wait_mm_dd 4 1)
+  (plowing) 		 
+  (wait_mm_dd 06 05)
+  (fertilize (KAS (weight 85 [kg N/ha])))
+  (harrowing)
+  (seed_bed_preparation)
+  (sow "Broccoli - transplanted")
+  (while (wait_mm_dd 07 01)
+           (repeat "irrigation"))
+  (fertilize ("NPK 14-3-18" (weight 85 [kg N/ha])))
+  (while (wait_mm_dd 07 21)
+           (repeat "irrigation"))
+  (fertilize (N15B (weight 40 [kg N/ha])))
+  (while (wait (or (crop_ds_after "Broccoli - transplanted" 1.8 [])  
+                   (mm_dd 10 15)))
+           (repeat "irrigation"))
+  (harvest "Broccoli - transplanted" 
+                        (stub 0.0 [cm])
+                        (sorg 1.0)
+                        (stem 0.0) 
+                        (leaf 0.0))) 
+
+(defaction "Brussels sprouts management" activity	 
+  (wait_mm_dd 04 25)
+  (fertilize (KAS (weight 105 [kg N/ha])))
+  (harrowing)
+  (seed_bed_preparation)
+  (sow "Brussels sprouts")
+  (while (wait_mm_dd 6 21)
+           (repeat "irrigation"))
+  (fertilize (KAS (weight 50 [kg N/ha])))
+  (while (wait_mm_dd 7 31)
+           (repeat "irrigation"))
+  (fertilize (KAS (weight 50 [kg N/ha])))
+  (while (wait_mm_dd 10 1)
+           (repeat "irrigation"))
+  ;(wait_mm_dd 10 15)
+  ;(fertilize (N46 (weight 25 [kg N/ha])))
+  (wait_mm_dd 12 15)
+  (harvest "Brussels sprouts" 
+        (stub 0.0 [cm])
+        (sorg 1.0)
+        (stem 0.0) 
+        (leaf 0.0))) 
+
+
+(defaction "Brussels sprouts - transplanted management" activity	 
+  (wait_mm_dd 05 07)
+  (fertilize (KAS (weight 130 [kg N/ha])))
+  (harrowing)
+  (seed_bed_preparation)
+  (sow "Brussels sprouts - transplanted")
+  (while (wait_mm_dd 6 21)
+           (repeat "irrigation"))
+  (fertilize (KAS (weight 50 [kg N/ha])))
+  (while (wait_mm_dd 7 31)
+           (repeat "irrigation"))
+  (fertilize (KAS (weight 50 [kg N/ha])))
+  (while (wait_mm_dd 10 1)
+           (repeat "irrigation"))
+  (wait_mm_dd 12 01)
+  (harvest "Brussels sprouts - transplanted" 
+        (stub 0.0 [cm])
+        (sorg 1.0)
+        (stem 0.0) 
+        (leaf 0.0))) 
+
+(defaction "Celeriac - transplanted management" activity
+  (wait_mm_dd 4 1)
+  (plowing) 		 
+  (wait_mm_dd 5 5)
+  (fertilize (KAS (weight 100 [kg N/ha])))
+  (harrowing)
+  (seed_bed_preparation)
+  (sow "Celeriac - transplanted")
+  (while (wait_mm_dd 6 30)
+           (repeat "irrigation"))
+  (fertilize (KAS (weight 70 [kg N/ha])))
+  (while (wait_mm_dd 8 15)
+           (repeat "irrigation"))
+  (fertilize (N15B (weight 50 [kg N/ha])))
+  (while (wait_mm_dd 10 15)
+           (repeat "irrigation"))
+  (harvest "Celeriac - transplanted" 
+             (stub 0.0 [cm])
+             (sorg 1.0)
+             (stem 0.0) 
+             (leaf 0.0)))
+
+(defaction "Early potato management" activity	 
+  (wait_mm_dd 04 15)
+  (fertilize ("NPK 14-3-18" (weight 130 [kg N/ha])))
+  (harrowing)
+  (seed_bed_preparation)
+  (sow "Early potato") 
+  (wait_mm_dd 06 01) 
+  (while (wait (or (and (crop_ds_after "Early potato" 1.1 [])  
+                        (crop_dm_over "Early potato" 4650 [kg DM/ha]  
+                             (height 0 [cm])))
+                   (mm_dd 08 01)))
+       (repeat "irrigation"))
+  (if (crop_ds_after "Early potato" 0.1 [])
+          (harvest "Early potato" 
+              (stub 0.0 [cm])
+              (sorg 1.0)
+              (stem 0.0) 
+              (leaf 0.0))))
+
+(defaction "Onion management" activity	 
+  (wait_mm_dd 04 12)
+  (fertilize ("NP 12-23-0" (weight 45 [kg N/ha])))  
+  (harrowing)
+  (seed_bed_preparation)
+  (sow "Onion")
+  (wait_mm_dd 05 15)
+  (fertilize (KAS (weight 45 [kg N/ha]))) 
+  (while (wait_mm_dd 06 15)
+           (repeat "irrigation onion"))
+  (fertilize ("NPK 14-3-18" (weight 30 [kg N/ha])))
+  (while (wait_mm_dd 08 15)
+           (repeat "irrigation onion"))
+  (while (wait (or (crop_ds_after "Onion" 0.85 [])  
+                     (mm_dd 09 01)))
+           (repeat "irrigation onion"))
+  (wait (or (crop_ds_after "Onion" 0.85 [])  
+                       (mm_dd 09 15)))
+  (harvest "Onion" 
+        (stub 0.0 [cm])
+        (sorg 1.0)
+        (stem 0.0) 
+        (leaf 0.0)))
+ 
+(defaction "Onion - planting of sets management" activity	 
+  (wait_mm_dd 04 01)
+  (fertilize ("NP 12-23-0" (weight 45 [kg N/ha])))  
+  (harrowing)
+  (seed_bed_preparation)
+  (sow "Onion - planting of sets")
+  (wait_mm_dd 04 15)	;;04 15
+  (while (wait_mm_dd 05 05)			
+           (repeat "irrigation onion"))				
+  (fertilize ("KAS" (weight 55 [kg N/ha])))             
+  (while (wait_mm_dd 06 05)
+           (repeat "irrigation onion"))
+  (fertilize ("NPK 14-3-18" (weight 30 [kg N/ha])))
+  (while (wait_mm_dd 07 20)
+           (repeat "irrigation onion"))
+  (while (wait (or (crop_ds_after "Onion - planting of sets" 0.85 [])  
+                       (mm_dd 08 15)))
+             (repeat "irrigation onion"))
+  (wait (or (crop_ds_after "Onion - planting of sets" 0.85 [])  
+                       (mm_dd 09 01)))
+  (harvest "Onion - planting of sets" 
+           (stub 0.0 [cm])
+           (sorg 1.0)
+           (stem 0.0) 
+           (leaf 0.0))) 
+
+(defaction "White cabbage - transplanted management" activity	 
+  (wait_mm_dd 05 01)
+  (fertilize (KAS (weight 125 [kg N/ha])))  
+  (harrowing)
+  (seed_bed_preparation)
+  (sow "White cabbage - transplanted")
+  (while (wait_mm_dd 06 21)
+           (repeat "irrigation"))
+  (fertilize ("NPK 14-3-18" (weight 75 [kg N/ha])))
+  (while (wait_mm_dd 7 31)
+           (repeat "irrigation"))
+  (fertilize ("NS 24-7" (weight 50 [kg N/ha])))
+  (while (wait_mm_dd 10 01)
+           (repeat "irrigation"))
+  (wait (or (crop_ds_after "White cabbage - transplanted" 0.85 [])  
+                   (mm_dd 10 25)))
+  (harvest "White cabbage - transplanted" 
+        (stub 0.0 [cm])
+        (sorg 1.0)
+        (stem 0.0) 
+        (leaf 0.0)))
+
+ (defaction "Early white cabbage - transplanted management" activity	 
+   (wait_mm_dd 04 01)
+   (fertilize (KAS (weight 150 [kg N/ha])))  
+   (harrowing)
+   (seed_bed_preparation)
+   (sow "Early white cabbage - transplanted")
+   (while (wait_mm_dd 04 25)
+            (repeat "irrigation"))
+   (fertilize ("NPK 14-3-18" (weight 50 [kg N/ha]))) 
+   (while (wait_mm_dd 05 20)  
+            (repeat "irrigation"))
+   (while (wait (or (crop_ds_after "Early white cabbage - transplanted" 0.8 [])  
+                   (mm_dd 07 01)))
+           (repeat "irrigation"))
+   (harvest "Early white cabbage - transplanted"  
+         (stub 0.0 [cm])
+         (sorg 1.0)
+         (stem 0.0) 
+         (leaf 0.0)))
+
+;; dk-veg-man.dai ends here.

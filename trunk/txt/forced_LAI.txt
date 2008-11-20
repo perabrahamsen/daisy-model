@@ -1,0 +1,78 @@
+Meget forsimplet virker plantevækst i Daisy ved hver time at udføre
+følgende beregninger:
+
+  Growth := fotosyntese (LAI, lys) - respiration (WCrop)
+  WCrop += Growth
+  WLeaf += f_Leaf (DS) * Growth
+  LAI := Wleaf * SpLAI
+
+Las os tage linierne en af gangen:
+
+  Growth := fotosyntese (LAI, lys) - respiration (WCrop)
+
+Væksten er produktionen fra fotosyntesen minus den del der går til
+respiration.  Fotosyntesen er afhængig af lys og bladdække, jo mere af
+hver jo mere vækst.  Respirationen afhænger primært af den totale
+plantemasse (WCrop). 
+
+  WCrop += Growth
+
+Den totale plantemasse vokser med det "overkydende" assimilate. "+="
+betyder her "vokser med".
+
+  WLeaf += f_Leaf (DS) * Growth
+
+Bladmassen (WLeaf) vokser med en fraktion (f_Leaf) af den samlede
+vækst.  Den fraktion afhænger af udviklingstrin (DS).
+
+  LAI := WLeaf * SpLAI
+
+Den ny LAI er den ny bladmasse gange bladtykkelse (SpLAI) som er en
+planteparameter.
+
+...
+
+Der er masser af detaljer udeladt ovenfor, WCrop er for eksempel
+delt op i forskellige plantedele med forskellig respiration, men
+ovenstående er hovedprincipet.  
+
+Når vi kører med tvungen LAI erstattes den sidste linie med
+
+  LAI := Forced_LAI
+
+I stedet for udregne LAI på basis af bladvægt, bruger vi blot de tal
+som er angivet i setup-filen.  Man kunne evt. sige at det er SpLAI der
+varierer efter formlen
+
+  SpLAI = LAI / WLeaf
+
+omend Daisy ikke beregner denne.
+
+Hvad vil der nu ske hvis vi måler en LAI som er højere end den Daisy
+selv ville have beregnet?  Altså Forced_LAI > WLeaf * SpLAI.  Væksten
+vil stige.  Det skyldes at første led i udtrykket for vækst
+
+  fotosyntese (LAI, lys) - respiration (WCrop)
+
+afhænger af den målte LAI, og fotosyntesen stiger med LAI.
+Respirationen derimod er uændret, vi bruger stadig den beregnede
+WLeaf, så alt i alt vokser planten hurtigere.  Mere fotosyntese og
+samme respiration giver hurtigere vækst.  Efter 
+
+  WLeaf += f_Leaf (DS) * Growth
+
+vil den hurtigere vækst også betyde at bladmassen vokser hurtigere end
+ellers. 
+
+Tilsvarende vil en målt LAI der er lavere end hvad Daisy selv ville
+have beregnet udfra bladmassen give en langsommere vækst, da
+fotosyntesen vil være mindre og respirationen den samme.
+
+Den samlede effekt er at hvis den beregnede bladmasse er for lille i
+forhold til den målte LAI, så vil målingerne få bladmassen til at
+vokse hurtigere end den ville have gjort uden målingerne.  Og omvendt,
+hvis den beregnede bladmasse er for stor i forhold til den målte, vil
+målingerne få væksten til at gå langsommere.
+
+Med andre ord, den beregnede bladmasse vil, med en vis forsinkelse,
+tilpasse sig de målte bladarealer.

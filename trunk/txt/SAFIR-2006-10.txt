@@ -1,0 +1,36 @@
+A major requirement for every programming project involving Daisy for the
+last 10 years, has been that the added functionality of the project
+should me merged into the mainstream code.  When individual project
+requirements conflicted, such as when they specified different models
+for the same process, both models would be implemented as a user
+selectable choice.  When the program framework didn't allow this, the
+program framework would have to be modified to allow it.  This
+approach is significantly more expensive to implement than to branch
+the mainstream code for each project.  However, the advantage to the
+individual projects is even more significant, each project will
+benefit from improvements made in all the other projects.
+
+The major requirement to Daisy in SAFIR is the 2 dimensional transport
+of water and solutes in the soil.  This requirement goes against the
+existing framework in one major way, and also requires a
+generalisation in other areas.  The main conflict was that Daisy was
+organised so the transport code was close to the turnover code.  This
+has been changed to all transport functionality now are part of the
+same selectable "Movement" component.  This component also contain the
+discretization, which has been generalized so the discretization
+framework now in theory can handle 1, 2 or 3 dimensions.  Only 1D and
+a simple 2D discretization have been implemented though.  The old, 1D
+functionality of Daisy is available if the user choose the "vertical"
+Movement model.  A new 2D model named "rectangle" supporting a simple,
+rectangular grid of vertical and horizontal lines has been implemented
+as a proof-of-concept of the new framework.  Currently only vertical
+soil water transport has been implemented, with decoupled horizontal
+soil water transport under development.
+
+A stand-alone prototype for coupled 2D transport has also been
+developed, and needs to be integrated in the new Daisy framework.
+
+Heat and solute transport has not yet been developed for anything but
+the old 1D solution, but they have been ported to the new framework so
+the "vertical" model now have functionality nearly identical to the
+old code.

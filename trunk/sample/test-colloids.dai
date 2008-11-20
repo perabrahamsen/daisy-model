@@ -1,0 +1,99 @@
+;;; test-colloids.dai -- Sample file demonstrating the use of colloids.
+
+(description "Simulation of colloids.")
+
+;; Use standard parameterizations.
+(input file "tillage.dai")
+(input file "crop.dai")
+(input file "log.dai")
+(input file "chemistry.dai")
+
+;; Weather data.
+(weather default "taastrup.dwf")
+
+;; We have some very sandy soil.
+(defhorizon Ap FAO3
+  "Andeby top soil."
+  (secondary_domain none)
+  (clay 8.0 [%])
+  (silt 10.5 [%])
+  (sand 81.5 [%])
+  (humus 1.12 [%])
+  (C_per_N 11.0 [g C/g N])
+  (dry_bulk_density 1.5 [g/cm^3]))
+
+(defhorizon C Ap
+  "Andeby C horizon."
+  (secondary_domain pressure
+                    (h_lim -20 [cm])
+                    (alpha 0.001 [h^-1]))
+  (humus 0.12 [%]))
+
+;; We build the column from the horizons.
+(defcolumn Andeby default
+  "The B.And farm, Andeby, 2002."
+  (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
+        (MaxRootingDepth 60.0 [cm]))
+  (Chemistry multi (combine colloids))
+  (Movement original 
+            (Tertiary (biopores (use_small_timesteps false)
+                                (classes (matrix (height_start 0 [cm])
+                                                 (height_end -2 [m])
+                                                 ;;(debug 1)
+                                                 (density 200 [m^-2])
+                                                 (diameter 10 [mm])
+                                                 (R_primary 100 [h])
+                                                 (R_secondary 10 [h]))
+                                         (drain  (height_start -5 [cm])
+                                                 (height_end -1.5 [m])
+                                                 (diameter 10 [mm])
+                                                 (density 100 [m^-2])
+                                                 (pipe_position -150 [cm]))
+                                         ))))
+                             
+  (OrganicMatter none)
+  (Groundwater deep))
+
+;; Use it.
+(column Andeby)
+
+;; Simulation start date.
+(time 1986 12 1 1)
+(stop 1988 4 1 1)
+
+(manager activity
+  (wait (at 1987 3 20 1))
+  (plowing)
+  (wait (at 1987 4 4 1))
+  (fertilize (mineral (weight 100.0 [kg N/ha])
+                      (NH4_fraction 0.5 [])))
+  (wait (at 1987 4 5 1))
+  (progn
+    (sow ("Grass" (water_stress_effect none)))
+    (sow ("Spring Barley" (Canopy (EpFac 1.5)))))
+  (wait (or (crop_ds_after "Spring Barley" 2.0)
+            (at 1987 9 5 1)))
+  (harvest "Spring Barley")
+  (wait (at 1987 9 8 1))
+  (fertilize (mineral (weight 80.0 [kg N/ha])
+                      (NH4_fraction 0.5 [])))
+  (wait (at 1987 10 10 1))
+  (harvest "Grass"
+           (stub 8.0 [cm])              ;Leave 8 cm stub.
+           (stem 1.00 [])))             ;Harvest everything above stub.
+
+;; Create these log files.
+(output harvest
+        "Tertiary biopores water" "Tertiary water sink"
+        ("Soil water" (to -1 [m])) ("Field water")
+        ("Crop Production" (crop "Spring Barley") (where "sbarley.dlf"))
+        ("Field chemical" (chemical colloid))
+        ("Soil chemical" (chemical colloid-filtered))
+        ("Chemical Content" (chemical colloid)
+         (where "M-colloids.dlf"))
+        ("Chemical Content" (chemical colloid-filtered)
+         (where "M-filtered.dlf"))
+        ("Colloids")
+        (checkpoint (when (at 1987 8 7 6))))
+
+;;; test-mibsol.dai ends here.
