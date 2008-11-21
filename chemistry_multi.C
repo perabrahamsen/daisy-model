@@ -419,16 +419,16 @@ ChemistryMulti::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   Chemistry::load_syntax (syntax, alist);
   syntax.add_object ("combine", Chemistry::component, 
-                     Syntax::State, Syntax::Sequence, "\
+                     Value::State, Value::Sequence, "\
 List of chemistry parameterizations you want to combine.");
-  syntax.add ("ignore", Syntax::String, Syntax::State, Syntax::Sequence,
+  syntax.add ("ignore", Value::String, Value::State, Value::Sequence,
               "Don't warn when spraying one of these chemicals.\n\
 The first time an untraced chemical not on the list is sprayed on the\n\
 field, Daisy will issue a warning and add the chemical to this list.");
   syntax.add_check ("ignore", VCheck::unique ());
   alist.add ("ignore", std::vector<symbol> ());
   syntax.add_object ("trace", Chemical::component, 
-                     Syntax::LogOnly, Syntax::Sequence, "\
+                     Value::LogOnly, Value::Sequence, "\
 List of chemicals in nested chemistries.");
 }
 

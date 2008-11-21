@@ -67,41 +67,41 @@ Harvest::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   alist.add ("submodel", "Harvest");
   alist.add ("description", "Log of all harvests during the simulation.");
-  syntax.add ("column", Syntax::String, Syntax::State,
+  syntax.add ("column", Value::String, Value::State,
 	      "Name of column where the yield were harvested.");
-  syntax.add_submodule ("time", alist, Syntax::State,
+  syntax.add_submodule ("time", alist, Value::State,
 			"Time of the harvest operation.", Time::load_syntax);
-  syntax.add ("crop", Syntax::String, Syntax::State,
+  syntax.add ("crop", Value::String, Value::State,
 	      "Name of crop that was harvested.");
-  syntax.add ("stem_DM", "g/m^2", Syntax::State,
+  syntax.add ("stem_DM", "g/m^2", Value::State,
 	      "Total stem dry matter in harvest.");
-  syntax.add ("stem_N", "g/m^2", Syntax::State,
+  syntax.add ("stem_N", "g/m^2", Value::State,
 	      "Total stem nitrogen in harvest.");
-  syntax.add ("stem_C", "g/m^2", Syntax::State,
+  syntax.add ("stem_C", "g/m^2", Value::State,
 	      "Total stem carbon in harvest.");
-  syntax.add ("dead_DM", "g/m^2", Syntax::State,
+  syntax.add ("dead_DM", "g/m^2", Value::State,
 	      "Total dead leaf dry matter in harvest.");
-  syntax.add ("dead_N", "g/m^2", Syntax::State,
+  syntax.add ("dead_N", "g/m^2", Value::State,
 	      "Total dead leaf nitrogen in harvest.");
-  syntax.add ("dead_C", "g/m^2", Syntax::State,
+  syntax.add ("dead_C", "g/m^2", Value::State,
 	      "Total dead leaf carbon in harvest.");
-  syntax.add ("leaf_DM", "g/m^2", Syntax::State,
+  syntax.add ("leaf_DM", "g/m^2", Value::State,
 	      "Total leaf dry matter in harvest.");
-  syntax.add ("leaf_N", "g/m^2", Syntax::State,
+  syntax.add ("leaf_N", "g/m^2", Value::State,
 	      "Total leaf nitrogen in harvest.");
-  syntax.add ("leaf_C", "g/m^2", Syntax::State,
+  syntax.add ("leaf_C", "g/m^2", Value::State,
 	      "Total leaf carbon in harvest.");
-  syntax.add ("sorg_DM", "g/m^2", Syntax::State,
+  syntax.add ("sorg_DM", "g/m^2", Value::State,
 	      "Total storage organ dry matter in harvest.");
-  syntax.add ("sorg_N", "g/m^2", Syntax::State,
+  syntax.add ("sorg_N", "g/m^2", Value::State,
 	      "Total storage organ nitrogen in harvest.");
-  syntax.add ("sorg_C", "g/m^2", Syntax::State,
+  syntax.add ("sorg_C", "g/m^2", Value::State,
 	      "Total storage organ carbon in harvest.");
-  syntax.add ("water_stress_days", "d", Syntax::State, 
+  syntax.add ("water_stress_days", "d", Value::State, 
               "Production days lost due to water stress.");
-  syntax.add ("nitrogen_stress_days", "d", Syntax::State, 
+  syntax.add ("nitrogen_stress_days", "d", Value::State, 
               "Production days lost due to water stress.");
-  syntax.add ("water_productivity", "kg DM/m^3 H2O", Syntax::State, 
+  syntax.add ("water_productivity", "kg DM/m^3 H2O", Value::State, 
               "Storage organ harvested per evapotranspiration.");
 }
 

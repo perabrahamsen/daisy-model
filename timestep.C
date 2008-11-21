@@ -113,9 +113,9 @@ Timestep::GenCheck::check (const Metalib&,
                            const symbol key) const throw (std::string)
 { 
   daisy_assert (alist.check (key));
-  daisy_assert (syntax.lookup (key) == Syntax::AList);
+  daisy_assert (syntax.lookup (key) == Value::AList);
   daisy_assert (!syntax.is_log (key));
-  daisy_assert (syntax.size (key) == Syntax::Singleton);
+  daisy_assert (syntax.size (key) == Value::Singleton);
 
   Timestep timestep (alist.alist (key));
   check_dt (timestep.total_hours ());
@@ -152,19 +152,19 @@ Timestep::non_zero ()
 void 
 Timestep::load_syntax (Syntax& syntax, AttributeList& alist)
 {
-  syntax.add ("years", Syntax::Integer, Syntax::State, 
+  syntax.add ("years", Value::Integer, Value::State, 
               "Number of years.");
   alist.add ("years", 0);
-  syntax.add ("days", Syntax::Integer, Syntax::State, 
+  syntax.add ("days", Value::Integer, Value::State, 
               "Number of days.");
   alist.add ("days", 0);
-  syntax.add ("hours", Syntax::Integer, Syntax::State, 
+  syntax.add ("hours", Value::Integer, Value::State, 
               "Number of hours.");
   alist.add ("hours", 0);
-  syntax.add ("minutes", Syntax::Integer, Syntax::State, 
+  syntax.add ("minutes", Value::Integer, Value::State, 
               "Number of minutes.");
   alist.add ("minutes", 0);
-  syntax.add ("seconds", Syntax::Integer, Syntax::State, 
+  syntax.add ("seconds", Value::Integer, Value::State, 
               "Number of seconds.");
   alist.add ("seconds", 0);
 }

@@ -122,11 +122,11 @@ static struct SelectPFSyntax
     alist.add ("description", "Extract pF for all array points.\n\
 The original dimension is assumed to be in cm, no matter what is specified.");
 
-    syntax.add ("max_h", "cm", Check::negative (), Syntax::Const, 
+    syntax.add ("max_h", "cm", Check::negative (), Value::Const, 
                 "Maximum water pressure in log.\n\
 Pressure above this value will be represented as this value.");
     alist.add ("max_h", -0.1);
-    syntax.add ("value", Syntax::Unknown (), Syntax::State, Syntax::Sequence,
+    syntax.add ("value", Value::Unknown (), Value::State, Value::Sequence,
 		"The current accumulated value.");
     std::vector<double> empty;
     alist.add ("value", empty);

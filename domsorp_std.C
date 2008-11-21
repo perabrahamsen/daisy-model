@@ -142,13 +142,13 @@ static struct DomsorpStandardSyntax
 	       "Transformation between two soil chemicals.");
     syntax.add_object ("transform", Transform::component,
                        "Tranformation process between DOM and SOM.");
-    syntax.add ("dom_pool", Syntax::Integer, Syntax::Const,
+    syntax.add ("dom_pool", Value::Integer, Value::Const,
 		"Number of the DOM pool affected by the transformation.");
-    syntax.add ("som_pool", Syntax::Integer, Syntax::Const,
+    syntax.add ("som_pool", Value::Integer, Value::Const,
 		"Number of the SOM pool affected by the transformation.");
-    syntax.add ("S_C", "g C/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+    syntax.add ("S_C", "g C/cm^3/h", Value::LogOnly, Value::Sequence,
 		"Carbon converted from DOM to SOM (may be negative).");
-    syntax.add ("S_N", "g N/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+    syntax.add ("S_N", "g N/cm^3/h", Value::LogOnly, Value::Sequence,
 		"Carbon converted from DOM to SOM (may be negative).");
 
     Librarian::add_type (Domsorp::component, "default", alist, syntax, &make);

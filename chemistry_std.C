@@ -394,12 +394,12 @@ ChemistryStandardSyntax::load_syntax (Syntax& syntax, AttributeList& alist)
   Chemistry::load_syntax (syntax, alist);
 
   syntax.add_object ("trace", Chemical::component, 
-                     Syntax::State, Syntax::Sequence, "\
+                     Value::State, Value::Sequence, "\
 List of chemicals you want to trace in the simulation.");
   syntax.add_check ("trace", VCheck::unique ());
   alist.add ("trace", std::vector<const AttributeList*> ());
   syntax.add_object ("reaction", Reaction::component, 
-                     Syntax::State, Syntax::Sequence, "\
+                     Value::State, Value::Sequence, "\
 List of chemical reactions you want to simulate.");
   alist.add ("reaction", std::vector<const AttributeList*> ());
 }

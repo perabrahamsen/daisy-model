@@ -65,7 +65,7 @@ struct StringerCond : public Stringer
 If condition is true, return value.");
       syntax.add_object ("condition", Boolean::component, "\
 Condition to test for.");
-      syntax.add ("value", Syntax::String, Syntax::Const, "\
+      syntax.add ("value", Value::String, Value::Const, "\
 Value to return.");
       syntax.order ("condition", "value");
     }
@@ -133,7 +133,7 @@ static struct StringerCondSyntax
 
     alist.add ("description", "\
 Return the value of the first clause whose condition is true.");
-    syntax.add_submodule_sequence ("clauses", Syntax::Const, "\
+    syntax.add_submodule_sequence ("clauses", Value::Const, "\
 List of clauses to match for.",
                                    StringerCond::Clause::load_syntax);
     syntax.order ("clauses");
@@ -209,7 +209,7 @@ static struct StringerValueSyntax
     StringerNumber::load_syntax (syntax, alist);
     alist.add ("description", "\
 Extract the value of a number as a string.");
-    syntax.add ("precision", Syntax::Integer, Syntax::OptionalConst, "\
+    syntax.add ("precision", Value::Integer, Value::OptionalConst, "\
 Number of decimals after point.  By default, use a floating format.");
     Librarian::add_type (Stringer::component, "value", alist, syntax, &make);
   }
@@ -277,7 +277,7 @@ static struct StringerIdentitySyntax
 
     alist.add ("description", "\
 Return the specified value.");
-    syntax.add ("value", Syntax::String, Syntax::Const, "\
+    syntax.add ("value", Value::String, Value::Const, "\
 Constant value.");
     Librarian::add_type (Stringer::component, "identity", alist, syntax, &make);
   }

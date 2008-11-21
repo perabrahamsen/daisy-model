@@ -90,7 +90,7 @@ static struct ScopeselNameSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Select named scope.");
-    syntax.add ("name", Syntax::String, Syntax::Const,
+    syntax.add ("name", Value::String, Value::Const,
                 "Name of scope to select.");
     syntax.order ("name");
     Librarian::add_type (Scopesel::component, "name", alist, syntax, &make);

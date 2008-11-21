@@ -44,8 +44,8 @@ struct NumberPLF : public Number
 
     static void load_syntax (Syntax& syntax, AttributeList& alist)
     {
-      syntax.add ("x", Syntax::User (), Syntax::Const, "Operand.");
-      syntax.add ("y", Syntax::User (), Syntax::Const, "Value.");
+      syntax.add ("x", Value::User (), Value::Const, "Operand.");
+      syntax.add ("y", Value::User (), Value::Const, "Value.");
       syntax.order ("x", "y");
     }
     
@@ -112,7 +112,7 @@ struct NumberPLF : public Number
 #ifdef HAS_METALIB
 	const symbol x_dim = point.x_dimension;
 
-	if (domain != Syntax::Unknown () && x_dim != Syntax::Unknown ())
+	if (domain != Value::Unknown () && x_dim != Value::Unknown ())
 	  try
 	    { x = units.convert (x_dim, domain, x); }
 	  catch (const std::string& err)
@@ -132,7 +132,7 @@ struct NumberPLF : public Number
 
 #ifdef HAS_METALIB
 	const symbol y_dim = point.y_dimension;
-	if (domain != Syntax::Unknown () && y_dim != Syntax::Unknown ())
+	if (domain != Value::Unknown () && y_dim != Value::Unknown ())
 	  try
 	    { (void) units.convert (x_dim, domain, x); }
 	  catch (const std::string& err)
@@ -161,11 +161,11 @@ struct NumberPLF : public Number
 
 	double x = point.x_value;
 	const symbol x_dim = point.x_dimension;
-	if (domain != Syntax::Unknown () && x_dim != Syntax::Unknown ())
+	if (domain != Value::Unknown () && x_dim != Value::Unknown ())
 	  x = units.convert (x_dim, domain, x);
 	double y = point.y_value;
 	const symbol y_dim = point.y_dimension;
-	if (range != Syntax::Unknown () && y_dim != Syntax::Unknown ())
+	if (range != Value::Unknown () && y_dim != Value::Unknown ())
 	  y = units.convert (y_dim, range, y);
 	
 	plf.add (x, y);
@@ -197,13 +197,13 @@ static struct NumberPLFSyntax
 
     syntax.add_object ("operand", Number::component,
                        "Operand for this function.");
-    syntax.add ("domain", Syntax::String, Syntax::Const, "\
+    syntax.add ("domain", Value::String, Value::Const, "\
 Unit for the operand of the function.");
-    alist.add ("domain", Syntax::Unknown ());
-    syntax.add ("range", Syntax::String, Syntax::Const, "\
+    alist.add ("domain", Value::Unknown ());
+    syntax.add ("range", Value::String, Value::Const, "\
 Unit for the operand of the function.");
-    alist.add ("range", Syntax::Unknown ());
-    syntax.add_submodule_sequence ("points", Syntax::Const, "\
+    alist.add ("range", Value::Unknown ());
+    syntax.add_submodule_sequence ("points", Value::Const, "\
 List of points (x y) defining the piecewise linear function.\n\
 The x values must be ordered lowest first.", NumberPLF::Point::load_syntax);
 

@@ -109,14 +109,14 @@ SourceFile::load_style (Syntax& syntax, AttributeList& alist,
 By default, data from dwf and dlf files will be\n\
 drawn with lines, and data from ddf files will be drawn with points.", 
                            default_title);
-  syntax.add ("handle", Syntax::String, Syntax::Const, "\
+  syntax.add ("handle", Value::String, Value::Const, "\
 Determine how to handle multiple simultaniously.  Possible values are:\n\
 \n\
 sum: use the sum of the values.\n\
 \n\
 normal: use the arithemetic average of the values, and calculate the\n\
 standard deviation.");
-  syntax.add ("default_hour", Syntax::Integer, Syntax::Const, "\
+  syntax.add ("default_hour", Value::Integer, Value::Const, "\
 Hour to assume when nothing else is specified;");
   alist.add ("default_hour", 8);
   syntax.add_check ("default_hour", VCheck::valid_hour ());

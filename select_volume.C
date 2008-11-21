@@ -85,7 +85,7 @@ SelectVolume::special_convert (const Units& units,
   static const symbol bulk_density ("g/cm^3");
   const symbol bulk_dim = default_dimension (bulk_density);
   if (units.can_convert (has, bulk_dim)
-      && units.can_convert (Syntax::Fraction (), want))
+      && units.can_convert (Value::Fraction (), want))
     bd_convert.reset (new BD_convert (units, has, want, bulk_dim));
   return bd_convert.get ();
 }
@@ -277,25 +277,25 @@ static struct SelectVolumeSyntax
   {
     SelectValue::load_syntax (syntax, alist);
 
-    syntax.add ("density", Syntax::Boolean, Syntax::Const, 
+    syntax.add ("density", Value::Boolean, Value::Const, 
 		"If true, divide total content with volume.\n\
 Otherwise, obey 'density_z', 'density_x', and 'density_y'.");
     alist.add ("density", false);
-    syntax.add ("density_z", Syntax::Boolean, Syntax::Const, 
+    syntax.add ("density_z", Value::Boolean, Value::Const, 
 		"If true, divide total content with volume height.\n\
 This parameter is ignored if 'density' is true.");
-    syntax.add ("density_x", Syntax::Boolean, Syntax::Const, 
+    syntax.add ("density_x", Value::Boolean, Value::Const, 
 		"If true, divide total content with volume width.\n\
 This parameter is ignored if 'density' is true.");
-    syntax.add ("density_y", Syntax::Boolean, Syntax::Const, 
+    syntax.add ("density_y", Value::Boolean, Value::Const, 
 		"If true, divide total content with volume depth.\n\
 This parameter is ignored if 'density' is true.");
     syntax.add_object ("volume", Volume::component, 
-                       Syntax::Const, Syntax::Singleton,
+                       Value::Const, Value::Singleton,
                        "Soil volume to log.");
     alist.add ("volume", Volume::infinite_box ());
 
-    syntax.add ("min_root_density", "cm/cm^3", Syntax::Const, "\
+    syntax.add ("min_root_density", "cm/cm^3", Value::Const, "\
 Minimum root density in cells.\n\
 \n\
 Set this paramater to a positive amount in order to log only cells\n\
@@ -307,7 +307,7 @@ the cell will be scaled to zero, while if there is only half the\n\
 specified minimum root density, the data for the cell will be scaled\n\
 to 0.5.");
     alist.add ("min_root_density", -1.0);
-    syntax.add ("min_root_crop", Syntax::String, Syntax::Const, "\
+    syntax.add ("min_root_crop", Value::String, Value::Const, "\
 Name of crop whose roots scould be used for the root density requirements.\n\
 Set this to \"*\" to use all roots.");
     alist.add ("min_root_crop", "*");	// Select::wildcard may not be initialized.
@@ -334,11 +334,11 @@ This is similar to 'volume', except for the default values of\n\
     alist.add ("density_z", false);
     alist.add ("density_x", true);
     alist.add ("density_y", true);
-    syntax.add ("from", "cm", Syntax::OptionalConst,
+    syntax.add ("from", "cm", Value::OptionalConst,
 		"Specify height (negative) to measure from.\n\
 By default, measure from the top.\n\
 OBSOLETE: Use (volume box (top FROM)) instead.");
-    syntax.add ("to", "cm", Syntax::OptionalConst,
+    syntax.add ("to", "cm", Value::OptionalConst,
 		"Specify height (negative) to measure interval.\n\
 By default, measure to the bottom.\n\
 OBSOLETE: Use (volume box (bottom TO)) instead.");
@@ -392,9 +392,9 @@ static struct SelectWaterSyntax
   {
     SelectVolumeSyntax::load_syntax (syntax, alist);
 
-    syntax.add ("h", "cm", Check::non_positive (), Syntax::Const, 
+    syntax.add ("h", "cm", Check::non_positive (), Value::Const, 
                 "Pressure to log water content for.");
-    syntax.add ("h_ice", "cm", Check::non_positive (), Syntax::Const, 
+    syntax.add ("h_ice", "cm", Check::non_positive (), Value::Const, 
 		"Pressure at which all air is out of the matrix.\n\
 When there are no ice, this is 0.0.  When there are ice, the ice is\n\
 presumed to occupy the large pores, so it is h (Theta_sat - X_ice).");
@@ -425,11 +425,11 @@ This is similar to 'water_volume', except for the default values of\n\
     alist.add ("density_z", false);
     alist.add ("density_x", true);
     alist.add ("density_y", true);
-    syntax.add ("from", "cm", Syntax::OptionalConst,
+    syntax.add ("from", "cm", Value::OptionalConst,
 		"Specify height (negative) to measure from.\n\
 By default, measure from the top.\n\
 OBSOLETE: Use (volume box (top FROM)) instead.");
-    syntax.add ("to", "cm", Syntax::OptionalConst,
+    syntax.add ("to", "cm", Value::OptionalConst,
 		"Specify height (negative) to measure interval.\n\
 By default, measure to the bottom.\n\
 OBSOLETE: Use (volume box (bottom TO)) instead.");

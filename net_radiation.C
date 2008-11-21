@@ -132,17 +132,17 @@ NetRadiationParent::load_base (Syntax& syntax, AttributeList& alist)
   alist.add ("description", "\
 This is not a model, but a list of parameters shared by all net radiation models.");
 
-  syntax.add ("net_radiation", "W/m^2", Syntax::LogOnly,
+  syntax.add ("net_radiation", "W/m^2", Value::LogOnly,
               "The calculated net radiation (positive downwards).");
-  syntax.add ("L_n", "W/m^2", Syntax::LogOnly,
+  syntax.add ("L_n", "W/m^2", Value::LogOnly,
               "The calculated net longwave radiation (positive downwards).");
-  syntax.add ("L_ia", "W/m^2", Syntax::LogOnly,
+  syntax.add ("L_ia", "W/m^2", Value::LogOnly,
               "The calculated incoming longwave radiation (positive downwards).");
-  syntax.add ("L_i0", "W/m^2", Syntax::LogOnly,
+  syntax.add ("L_i0", "W/m^2", Value::LogOnly,
               "The calculated clear sky incoming longwave radiation (positive downwards).");
-  syntax.add ("epsilon_0", Syntax::None(), Syntax::LogOnly,
+  syntax.add ("epsilon_0", Value::None(), Value::LogOnly,
               "Atmospheric effective clearsky emmisivity (range 0-1).");
-  syntax.add ("black_body_radiation", "W/m^2", Syntax::LogOnly,
+  syntax.add ("black_body_radiation", "W/m^2", Value::LogOnly,
               "Radiation emitted by black bodies at current air temperature.\n\
 Stefan-Boltzmann's law.");
 }
@@ -201,10 +201,10 @@ NetRadiationBrunt::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("description", "\
 Brunt, 1932.  Default parameterization by Jensen et.al., 1990.\n\
 FAO recommendation.");
-  syntax.add ("a", Syntax::None (), Syntax::Const,
+  syntax.add ("a", Value::None (), Value::Const,
               "Brunt 'a' parameter (offset).");
   alist.add ("a", 0.34);
-  syntax.add ("b", "1/sqrt(kPa)", Syntax::Const,
+  syntax.add ("b", "1/sqrt(kPa)", Value::Const,
               "Brunt 'b' parameter (vapor pressure factor).");
   alist.add ("b", 0.14);
 }

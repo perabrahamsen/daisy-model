@@ -255,14 +255,14 @@ static struct ClayOMBiomodSyntax
 	       "Clay influence on organic matter from BIOMOD project.\n\
 All SMB pools are affected, but not the SOM pools.  Additionally, the\n\
 ration between maintenance and turnover is also clay dependent.");
-    syntax.add ("a", Syntax::None (), Check::positive (), Syntax::Const,
+    syntax.add ("a", Value::None (), Check::positive (), Value::Const,
 		"Maintenance parameter.");
 #ifdef OLD_VERSION
-    syntax.add ("alpha", Syntax::None (), Check::positive (), Syntax::Const,
+    syntax.add ("alpha", Value::None (), Check::positive (), Value::Const,
 		"Speed parameter.");
 #else // !OLD_VERSION
-    syntax.add ("factor", Syntax::Fraction (), Syntax::None (),
-		Syntax::Const, "\
+    syntax.add ("factor", Value::Fraction (), Value::None (),
+		Value::Const, "\
 Function of clay content, multiplied to the maintenance and turnover rates\n\
 of the SMB pools.");
     PLF factor;
@@ -271,11 +271,11 @@ of the SMB pools.");
     factor.add (1.00, 0.5);
     alist.add ("factor", factor);
 #endif // !OLD_VERSION
-    syntax.add_fraction ("E_SMB", Syntax::Const,
+    syntax.add_fraction ("E_SMB", Value::Const,
 			 "SMB efficiency in processing organic matter.\n\
 Note that you must set the 'efficiency' parameter for all OM pools to\n\
 this number for the BIOMOD clay response model to work correctly.");
-    syntax.add_fraction ("f_SMB1", Syntax::Const,
+    syntax.add_fraction ("f_SMB1", Value::Const,
 			 "Fraction of AOM pools goind to SMB1.\n\
 Only the fraction of AOM going to a SMB pool count, so this is really\n\
 a fraction of the fraction coing to the SMB pools.\n\

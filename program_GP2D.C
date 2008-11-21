@@ -139,23 +139,23 @@ static struct ProgramGP2DSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "\
 Write root density table using 2D extension to Gerwitz and Page");
-    syntax.add_submodule ("Geometry", alist, Syntax::Const,
+    syntax.add_submodule ("Geometry", alist, Value::Const,
                           "Discretization of the soil.",
                           GeometryRect::load_syntax);
-    syntax.add ("row_width", "cm", Check::positive (), Syntax::Const, "\
+    syntax.add ("row_width", "cm", Check::positive (), Value::Const, "\
 Distance between rows.");
-    syntax.add ("row_position", "cm", Check::non_negative (), Syntax::Const, "\
+    syntax.add ("row_position", "cm", Check::non_negative (), Value::Const, "\
 Position of row on x-axis.");
     alist.add ("row_position", 0.0);
-    syntax.add ("soil_depth", "cm", Check::positive (), Syntax::Const, "\
+    syntax.add ("soil_depth", "cm", Check::positive (), Value::Const, "\
 Limit on root depth by soil (no crops have roots below this).");
-    syntax.add ("crop_depth", "cm", Check::positive (), Syntax::Const, "\
+    syntax.add ("crop_depth", "cm", Check::positive (), Value::Const, "\
 Limit of root depth by crop (no soil have roots below this).");
-    syntax.add ("crop_width", "cm", Check::positive (), Syntax::Const, "\
+    syntax.add ("crop_width", "cm", Check::positive (), Value::Const, "\
 Maximum horizontal distance of roots from plant.");
-    syntax.add ("WRoot", "g DM/m^2", Check::positive (), Syntax::Const, "\
+    syntax.add ("WRoot", "g DM/m^2", Check::positive (), Value::Const, "\
 Totoal root dry matter.");
-    syntax.add ("DS", "DS", Syntax::Const, "Development stage [0-2].\n\
+    syntax.add ("DS", "DS", Value::Const, "Development stage [0-2].\n\
 Not currently used.");
     alist.add ("DS", 2.0);
     Librarian::add_type (Program::component, "GP2D", alist, syntax, &make);

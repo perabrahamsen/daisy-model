@@ -518,30 +518,30 @@ Time::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("submodel", "Time");
   alist.add ("description", "Year, month, day and hour.");
   syntax.add_check (check_alist);
-  syntax.add ("year", Syntax::Integer, Syntax::State, "Current year.");
+  syntax.add ("year", Value::Integer, Value::State, "Current year.");
   syntax.add_check ("year", VCheck::valid_year ());
-  syntax.add ("month", Syntax::Integer, Syntax::State, "Current month.");
+  syntax.add ("month", Value::Integer, Value::State, "Current month.");
   static VCheck::IRange mm (1, 12);
   syntax.add_check ("month", mm);
-  syntax.add ("mday", Syntax::Integer, Syntax::State, 
+  syntax.add ("mday", Value::Integer, Value::State, 
 	      "Current day in the month.");
   static VCheck::IRange dd (1, 31);
   syntax.add_check ("mday", dd);
-  syntax.add ("hour", Syntax::Integer, Syntax::State, "Current hour.");
+  syntax.add ("hour", Value::Integer, Value::State, "Current hour.");
   static VCheck::IRange hh (0, 23);
   syntax.add_check ("hour", hh);
   alist.add ("hour", 0);
   syntax.order ("year", "month", "mday", "hour");
-  syntax.add ("minute", Syntax::Integer, Syntax::State, "Current minute.");
+  syntax.add ("minute", Value::Integer, Value::State, "Current minute.");
   static VCheck::IRange ss (0, 59);
   syntax.add_check ("minute", ss);
   alist.add ("minute", 0);
-  syntax.add ("second", Syntax::Integer, Syntax::State, "Current second.");
+  syntax.add ("second", Value::Integer, Value::State, "Current second.");
   syntax.add_check ("second", ss);
   alist.add ("second", 0);
-  syntax.add ("week", Syntax::Integer, Syntax::LogOnly, "Current week.");
-  syntax.add ("yday", Syntax::Integer, Syntax::LogOnly, "Current Julian day.");
-  syntax.add ("wday", Syntax::String, Syntax::LogOnly, "Current weekday.\n\
+  syntax.add ("week", Value::Integer, Value::LogOnly, "Current week.");
+  syntax.add ("yday", Value::Integer, Value::LogOnly, "Current Julian day.");
+  syntax.add ("wday", Value::String, Value::LogOnly, "Current weekday.\n\
 Monday is 1, Sunday is 7.");
 }
 

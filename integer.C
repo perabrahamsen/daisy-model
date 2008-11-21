@@ -83,7 +83,7 @@ static struct IntegerConstSyntax
 
     alist.add ("description", 
 	       "Always give the specified value.");
-    syntax.add ("value", Syntax::Integer, Syntax::Const,
+    syntax.add ("value", Value::Integer, Value::Const,
 		"Fixed value for this integer.");
     syntax.order ("value");
     Librarian::add_type (Integer::component, "const", alist, syntax, &make);
@@ -103,7 +103,7 @@ struct IntegerCond : public Integer
 If condition is true, return value.");
       syntax.add_object ("condition", Boolean::component, "\
 Condition to test for.");
-      syntax.add ("value", Syntax::Integer, Syntax::Const, "\
+      syntax.add ("value", Value::Integer, Value::Const, "\
 Value to return.");
       syntax.order ("condition", "value");
     }
@@ -166,7 +166,7 @@ static struct IntegerCondSyntax
 
     alist.add ("description", "\
 Return the value of the first clause whose condition is true.");
-    syntax.add_submodule_sequence ("clauses", Syntax::Const, "\
+    syntax.add_submodule_sequence ("clauses", Value::Const, "\
 List of clauses to match for.",
                                    IntegerCond::Clause::load_syntax);
     syntax.order ("clauses");

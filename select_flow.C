@@ -68,11 +68,11 @@ void
 SelectFlow::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   SelectValue::load_syntax (syntax, alist);
-  syntax.add ("density", Syntax::Boolean, Syntax::Const, 
+  syntax.add ("density", Value::Boolean, Value::Const, 
               "If true, divide value with volume height.");
   alist.add ("density", false);
   syntax.add_object ("volume", Volume::component, 
-                     Syntax::Const, Syntax::Singleton,
+                     Value::Const, Value::Singleton,
                      "Soil volume to log flow into.");
   alist.add ("volume", Volume::infinite_box ());
 }
@@ -213,7 +213,7 @@ static struct SelectFlowTopSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Extract flow from top of specified volume.");
     SelectFlow::load_syntax (syntax, alist);
-    syntax.add ("from", "cm", Syntax::OptionalConst,
+    syntax.add ("from", "cm", Value::OptionalConst,
 		"Specify height (negative) to measure from.\n\
 By default, measure from the top.\n\
 OBSOLETE: Use (volume box (top FROM)) instead.");
@@ -234,7 +234,7 @@ static struct SelectFluxTopSyntax
     alist.add ("description", "Flux leaving top of specified volume.\n\
 OBSOLETE: Use '(flow_top (negate true) (density true))' instead.");
     SelectFlow::load_syntax (syntax, alist);
-    syntax.add ("from", "cm", Syntax::OptionalConst,
+    syntax.add ("from", "cm", Value::OptionalConst,
 		"Specify height (negative) to measure from.\n\
 By default, measure from the top.\n\
 OBSOLETE: Use (volume box (top FROM)) instead.");
@@ -272,7 +272,7 @@ static struct SelectFlowBottomSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Extract flow from bottom of specified volume.");
     SelectFlow::load_syntax (syntax, alist);
-    syntax.add ("to", "cm", Syntax::OptionalConst,
+    syntax.add ("to", "cm", Value::OptionalConst,
 		"Specify height (negative) to measure interval.\n\
 By default, measure to the bottom.\n\
 OBSOLETE: Use (volume box (bottom TO)) instead.");
@@ -293,7 +293,7 @@ static struct SelectFluxBottomSyntax
     alist.add ("description", "Flux entering bottom of specified volume.\n\
 OBSOLETE: Use '(flow_bottom (density true))' instead.");
     SelectFlow::load_syntax (syntax, alist);
-    syntax.add ("to", "cm", Syntax::OptionalConst,
+    syntax.add ("to", "cm", Value::OptionalConst,
 		"Specify height (negative) to measure to.\n\
 By default, measure from the bottom.\n\
 OBSOLETE: Use (volume box (bottom TO)) instead.");

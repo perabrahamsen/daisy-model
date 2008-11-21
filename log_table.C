@@ -186,9 +186,9 @@ LogTable::common_done (const std::vector<Time::component_t>& time_columns,
 
 	  const int size = entries[i]->size ();
 	  symbol dimension = entries[i]->dimension ().name ();
-	  if (dimension == Syntax::None () 
-	      || dimension == Syntax::Unknown ()
-	      || dimension == Syntax::Fraction ())
+	  if (dimension == Value::None () 
+	      || dimension == Value::Unknown ()
+	      || dimension == Value::Fraction ())
 	    dimension = "";
 
 	  if (size >= 0)
@@ -474,54 +474,54 @@ static struct LogTableSyntax
       AttributeList& alist = *new AttributeList ();
       LogSelect::load_syntax (syntax, alist);
       alist.add ("description", LogTable::default_description);
-      syntax.add ("parameter_names", Syntax::String, 
-                  Syntax::Const, Syntax::Sequence, "\
+      syntax.add ("parameter_names", Value::String, 
+                  Value::Const, Value::Sequence, "\
 List of string parameters to print to the table header.\n\
 \n\
 For example, if you have defined 'column' and 'crop' parameters for\n\
 this table log parameterization, you can print them to the log file\n\
 header by specifying '(names column crop)'.");
       alist.add ("parameter_names", std::vector<symbol> ());
-      syntax.add ("where", Syntax::String, Syntax::Const,
+      syntax.add ("where", Value::String, Value::Const,
 		  "Name of the log file to create.");
-      syntax.add ("print_header", Syntax::String, Syntax::Const,
+      syntax.add ("print_header", Value::String, Value::Const,
 		  "If this is set to 'false', no header is printed.\n\
 If this is set to 'true', a full header is printer.\n\
 If this is set to 'fixed', a small fixed size header is printed.");
       static VCheck::Enum check_header ("false", "true", "fixed");
       syntax.add_check ("print_header", check_header);
       alist.add ("print_header", "true");
-      syntax.add ("print_tags", Syntax::Boolean, Syntax::Const,
+      syntax.add ("print_tags", Value::Boolean, Value::Const,
 		  "Print a tag line in the file.");
       alist.add ("print_tags", true);
-      syntax.add ("print_dimension", Syntax::Boolean, Syntax::Const,
+      syntax.add ("print_dimension", Value::Boolean, Value::Const,
 		  "Print a line with units after the tag line.");
       alist.add ("print_dimension", true);
-      syntax.add ("print_initial", Syntax::Boolean, Syntax::Const,
+      syntax.add ("print_initial", Value::Boolean, Value::Const,
 		  "Print a line with initial values when logging starts.");
       alist.add ("print_initial", true);
-      syntax.add ("flush", Syntax::Boolean, Syntax::Const,
+      syntax.add ("flush", Value::Boolean, Value::Const,
 		  "Flush to disk after each entry (for debugging).");
       alist.add ("flush", false);
-      syntax.add ("record_separator", Syntax::String, Syntax::Const, "\
+      syntax.add ("record_separator", Value::String, Value::Const, "\
 String to print between records (time steps).");
       alist.add ("record_separator", "\n");
-      syntax.add ("field_separator", Syntax::String, Syntax::Const, "\
+      syntax.add ("field_separator", Value::String, Value::Const, "\
 String to print between fields.");
       alist.add ("field_separator", "\t");
-      syntax.add ("error_string", Syntax::String, Syntax::Const, "\
+      syntax.add ("error_string", Value::String, Value::Const, "\
 String to print when errors are encountered.");
       alist.add ("error_string", "!");
-      syntax.add ("missing_value", Syntax::String, Syntax::Const, "\
+      syntax.add ("missing_value", Value::String, Value::Const, "\
 String to print when the path doesn't match anything.\n\
 This can be relevant for example if you are logging a crop, and there are\n\
 no crops on the field.");
       alist.add ("missing_value", "00.00");
-      syntax.add ("array_separator", Syntax::String, Syntax::Const, "\
+      syntax.add ("array_separator", Value::String, Value::Const, "\
 String to print between array entries.");
       alist.add ("array_separator", "\t");
       syntax.add_object ("summary", Summary::component,
-                         Syntax::Const, Syntax::Sequence,
+                         Value::Const, Value::Sequence,
                          "Summaries for this log file.");
       alist.add ("summary", std::vector<const AttributeList*> ());
       Librarian::add_type (Log::component, "table", alist, syntax, &make);

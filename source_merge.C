@@ -115,7 +115,7 @@ SourceMerge::load (Treelog& msg)
         }
       
       // Set or check dimension.
-      if (dimension_ == Syntax::Unknown ())
+      if (dimension_ == Value::Unknown ())
         dimension_ = source[i]->dimension ();
       else if (!units.can_convert (source[i]->dimension (), dimension_))
         {
@@ -195,7 +195,7 @@ SourceMerge::SourceMerge (Block& al)
     units (al.units ()),
     source (Librarian::build_vector<Source> (al, "source")),
     title_ (al.name ("title")),
-    dimension_ (al.name ("dimension", Syntax::Unknown ())),
+    dimension_ (al.name ("dimension", Value::Unknown ())),
     with_ (al.name ("with", "")),
     style_ (al.integer ("style", -1))
 { }
@@ -218,10 +218,10 @@ Any errorbars on the original timeseries are ignored, but the merged\n\
 timeseries may have errorbars if there are multiple values for the\n\
 same time.");
     syntax.add_object ("source", Source::component, 
-                       Syntax::State, Syntax::Sequence, "\
+                       Value::State, Value::Sequence, "\
 List of timeseries to merge.");
     syntax.add_check ("source", VCheck::min_size_1 ());
-    syntax.add ("dimension", Syntax::String, Syntax::OptionalConst, "\
+    syntax.add ("dimension", Value::String, Value::OptionalConst, "\
 Dimension of data to plot.\n\
 By default use the first source with a known dimension.");
 

@@ -126,9 +126,9 @@ static struct HydraulicM_CSyntax
 	       "Campbell retention curve model with Mualem theory.");
     Hydraulic::load_Theta_sat (syntax, alist);
     Hydraulic::load_K_sat (syntax, alist);
-    syntax.add ("h_b", "cm", Check::negative (), Syntax::Const,
+    syntax.add ("h_b", "cm", Check::negative (), Value::Const,
 		"Bubbling pressure.");
-    syntax.add ("b", Syntax::None (), Check::positive (), Syntax::Const,
+    syntax.add ("b", Value::None (), Check::positive (), Value::Const,
 		"Campbell parameter.");
 
     Librarian::add_type (Hydraulic::component, "M_C", alist, syntax, &make);

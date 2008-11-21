@@ -185,33 +185,33 @@ DOM::load_syntax (Syntax& syntax, AttributeList& alist)
 A single Dissolved Organic Matter pool.");
 
   // Content.
-  syntax.add_submodule ("C", alist, Syntax::State,
+  syntax.add_submodule ("C", alist, Value::State,
 			"Carbon content of DOM pool.",
 			DOE::load_syntax);
-  syntax.add_submodule ("N", alist, Syntax::State,
+  syntax.add_submodule ("N", alist, Value::State,
 			"Nitrogen content of DOM pool.",
 			DOE::load_syntax);
 
   // Transport
   syntax.add ("diffusion_coefficient", "cm^2/s", Check::positive (),
-	      Syntax::Const, "Diffusion coefficient.");
+	      Value::Const, "Diffusion coefficient.");
 
   // Turnover.
-  syntax.add ("heat_factor", "dg C", Syntax::None (), Syntax::OptionalConst,
+  syntax.add ("heat_factor", "dg C", Value::None (), Value::OptionalConst,
 	      "Heat factor.  If empty, use default from 'OrganicMatter'.");
-  syntax.add ("water_factor", "cm", Syntax::None (), Syntax::OptionalConst, "\
+  syntax.add ("water_factor", "cm", Value::None (), Value::OptionalConst, "\
 Water potential factor.  If empty, use default from 'OrganicMatter'.");
   syntax.add ("turnover_rate", "h^-1", Check::fraction (), 
-	      Syntax::OptionalConst,
+	      Value::OptionalConst,
 	      "Fraction converted to other pools each hour.\n\
 You must specify either this or 'turnover_halftime'.");
   syntax.add ("turnover_halftime", "h", Check::positive (), 
-	      Syntax::OptionalConst,
+	      Value::OptionalConst,
 	      "Time until half had been converted to other pools.\n\
 You must specify either this or 'turnover_rate'.");
-  syntax.add_fraction ("efficiency", Syntax::Const, Syntax::Sequence, "\
+  syntax.add_fraction ("efficiency", Value::Const, Value::Sequence, "\
 the efficiency this pool can be digested by each of the SMB pools.");
-  syntax.add_fraction ("fractions", Syntax::Const, Syntax::Sequence, "\
+  syntax.add_fraction ("fractions", Value::Const, Value::Sequence, "\
 Fraction of this pool that ends up in each SMB pools");
 }
 

@@ -62,7 +62,7 @@ public:
 
   // Nested scope handling.
 public:
-  Syntax::type lookup (symbol) const;
+  Value::type lookup (symbol) const;
   const Syntax& find_syntax (const symbol key) const;
   const AttributeList& find_alist (const symbol key) const;
 

@@ -721,7 +721,7 @@ MovementSolute::load_solute (Syntax& syntax, AttributeList& alist,
   load_base (syntax, alist);
 
   syntax.add_object ("matrix_solute", Transport::component, 
-                     Syntax::State, Syntax::Sequence,
+                     Value::State, Value::Sequence,
                      "Matrix solute transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends.");
@@ -735,7 +735,7 @@ If none succeeds, the simulation ends.");
   alist.add ("matrix_solute", matrix_solute_models);
 
   syntax.add_object ("matrix_solid", Transport::component, 
-                     Syntax::Const, Syntax::Singleton, "\
+                     Value::Const, Value::Singleton, "\
 Matrix solute transport model used for fully sorbed constituents.");
   alist.add ("matrix_solid", Transport::none_model ());
 }

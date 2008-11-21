@@ -45,7 +45,7 @@ struct Block::Implementation
   bool is_ok;
 
   // Use.
-  Syntax::type lookup (symbol) const;
+  Value::type lookup (symbol) const;
   const Syntax& find_syntax (const symbol key) const;
   const AttributeList& find_alist (const symbol key) const;
   symbol expand_string (Block&, symbol) const;
@@ -68,11 +68,11 @@ struct Block::Implementation
 
 const Syntax Block::Implementation::empty_syntax;
 
-Syntax::type 
+Value::type 
 Block::Implementation::lookup (const symbol key) const
 {
-  Syntax::type type = syntax.lookup (key);
-  if (type == Syntax::Error && parent)
+  Value::type type = syntax.lookup (key);
+  if (type == Value::Error && parent)
     return parent->impl->lookup (key);
   return type;
 }
@@ -80,8 +80,8 @@ Block::Implementation::lookup (const symbol key) const
 const Syntax& 
 Block::Implementation::find_syntax (const symbol key) const
 {
-  Syntax::type type = syntax.lookup (key);
-  if (type != Syntax::Error)
+  Value::type type = syntax.lookup (key);
+  if (type != Value::Error)
     return syntax;
   daisy_assert (parent != NULL);
   return parent->impl->find_syntax (key);
@@ -90,8 +90,8 @@ Block::Implementation::find_syntax (const symbol key) const
 const AttributeList& 
 Block::Implementation::find_alist (const symbol key) const
 {
-  Syntax::type type = syntax.lookup (key);
-  if (type != Syntax::Error)
+  Value::type type = syntax.lookup (key);
+  if (type != Value::Error)
     return alist;
   daisy_assert (parent != NULL);
   return parent->impl->find_alist (key);
@@ -138,11 +138,11 @@ Block::Implementation::expand_string (Block& block,
             {
               try 
                 {
-                  const Syntax::type type = lookup (key);
-                  if (type == Syntax::Error)
+                  const Value::type type = lookup (key);
+                  if (type == Value::Error)
                     throw "Unknown expansion: '" + key + "'";
                   const Syntax& syntax = find_syntax (key);
-                  if (syntax.size (key) != Syntax::Singleton)
+                  if (syntax.size (key) != Value::Singleton)
                     throw "'" + key 
                       + "' is a sequence, can only expand singletons";
                   const AttributeList& alist = find_alist (key);
@@ -150,16 +150,16 @@ Block::Implementation::expand_string (Block& block,
                     throw "'" + key + "' has no value";
                   switch (type)
                     {
-                    case Syntax::String:
+                    case Value::String:
                       result << alist.name (key); 
                       break;
-                    case Syntax::Integer:
+                    case Value::Integer:
                       result << alist.integer (key); 
                       break;
-                    case Syntax::Number:
+                    case Value::Number:
                       result << alist.number (key); 
                       break;
-                    case Syntax::Object:
+                    case Value::Object:
                       {
                         Treelog::Open nest (msg, "${" + key + "}");
                         const AttributeList& obj = alist.alist (key);
@@ -194,10 +194,10 @@ Block::Implementation::expand_string (Block& block,
                               throw "Bad number: '"+ type + "'";
                             result << number->value (scope);
                             const symbol dim = number->dimension (scope);
-                            if (dim == Syntax::Fraction ()
-                                || dim == Syntax::None ())
+                            if (dim == Value::Fraction ()
+                                || dim == Value::None ())
                               result << " []";
-                            else if (dim != Syntax::Unknown ())
+                            else if (dim != Value::Unknown ())
                               result << " [" << dim << "]";
                           }
                         else
@@ -240,8 +240,8 @@ Block::Implementation::expand_reference (const symbol key)
     }
   if (lookup (var) == syntax.lookup (key)
       && (find_syntax (var).size (var) == syntax.size (key)
-          || (syntax.size (key) == Syntax::Sequence
-              && find_syntax (var).size (var) != Syntax::Singleton)))
+          || (syntax.size (key) == Value::Sequence
+              && find_syntax (var).size (var) != Value::Singleton)))
     return var;
 
   error ("Value of '" + key + "' is $" + var
@@ -300,7 +300,7 @@ void
 Block::set_error ()
 { impl->set_error (); }
 
-Syntax::type 
+Value::type 
 Block::lookup (const symbol key) const
 { return impl->lookup (key); }
 

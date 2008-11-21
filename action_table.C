@@ -376,21 +376,21 @@ it with the 'enable_fertilization' attribute.\n\
 \n\
 Fertilizer [name]: The type of fertilizer to be applied.");
     syntax.add_object ("sow", Action::component, 
-                       Syntax::OptionalConst, Syntax::Singleton, 
+                       Value::OptionalConst, Value::Singleton, 
                        "Sow action.");
     syntax.add_object ("emerge", Action::component, 
-                       Syntax::OptionalConst, Syntax::Singleton, 
+                       Value::OptionalConst, Value::Singleton, 
                        "Emerge action.");
     syntax.add_object ("harvest", Action::component, 
-                       Syntax::OptionalConst, Syntax::Singleton, 
+                       Value::OptionalConst, Value::Singleton, 
                        "Harvest action.");
     syntax.add_object ("fertilizer", AM::component,
-                       Syntax::OptionalConst, Syntax::Singleton, "\
+                       Value::OptionalConst, Value::Singleton, "\
 The fertilizer you want to apply.");
-    syntax.add ("enable_irrigation", Syntax::Boolean, Syntax::Const, "\
+    syntax.add ("enable_irrigation", Value::Boolean, Value::Const, "\
 Set this to false to ignore any irrigation information in the file.");
     alist.add ("enable_irrigation", true);
-    syntax.add ("enable_fertilization", Syntax::Boolean, Syntax::Const, "\
+    syntax.add ("enable_fertilization", Value::Boolean, Value::Const, "\
 Set this to false to ignore any fertilization information in the file.");
     alist.add ("enable_fertilization", true);
     Librarian::add_type (Action::component, "table", alist, syntax, &make);

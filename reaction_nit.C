@@ -141,11 +141,11 @@ static struct ReactionNitrificationSyntax
     alist.add ("description", "Nitrification.\n\
 The actual nitrification specification is part of the horizon models, this\n\
 reaction just applies the models and logs the result. ");
-    syntax.add ("NH4", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence, 
+    syntax.add ("NH4", "g/cm^3/h", Value::LogOnly, Value::Sequence, 
 		"Amount of ammonium consumed this hour.");
-    syntax.add ("NO3", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence, 
+    syntax.add ("NO3", "g/cm^3/h", Value::LogOnly, Value::Sequence, 
 		"Amount of nitrate generated this hour.");
-    syntax.add ("N2O", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence, 
+    syntax.add ("N2O", "g/cm^3/h", Value::LogOnly, Value::Sequence, 
 		"Amount of nitrous oxide generated this hour.");
   }
   ReactionNitrificationSyntax ()

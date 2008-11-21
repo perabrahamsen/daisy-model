@@ -151,11 +151,11 @@ HorizonSystem::System::add_to_lib (Model& (make)(Block&),
           tmp << "between " << limits[i-1] << " [um] and";
         tmp << " " << limits[i] << " [um].";
         
-        syntax.add_fraction (names[i], Syntax::Const, tmp.str ());
+        syntax.add_fraction (names[i], Value::Const, tmp.str ());
       }
-    syntax.add_fraction ("humus", Syntax::Const,
+    syntax.add_fraction ("humus", Value::Const,
                          "Humus content of soil.");
-    syntax.add ("normalize", Syntax::Boolean, Syntax::Const, "\
+    syntax.add ("normalize", Value::Boolean, Value::Const, "\
 If this is true, normalize the mineral fraction to 1.0.\n\
 Otherwise, give an error if the sum is not 1.0.");
     alist.add ("normalize", false);

@@ -127,21 +127,21 @@ thresholds do not contribute to the temeprature sum.\n\
 Cut stress and leaf respiration does not affect this phenology model.");
 
     // Parameters.
-    syntax.add ("EmrTSum", "dg C d", Syntax::Const,
+    syntax.add ("EmrTSum", "dg C d", Value::Const,
 		"Soil temperature sum at emergence.");
-    syntax.add ("EmrThrs", "dg C", Syntax::Const,
+    syntax.add ("EmrThrs", "dg C", Value::Const,
 		"Minimum soil temperature for emergence.\n\
 Temperature below this will not count in the sum.");
     alist.add ("EmrThrs", 0.0);
-    syntax.add ("VegTSum", "dg C d", Syntax::Const,
+    syntax.add ("VegTSum", "dg C d", Value::Const,
 		"Air temperature sum for vegetative fase.");
-    syntax.add ("VegThrs", "dg C", Syntax::Const,
+    syntax.add ("VegThrs", "dg C", Value::Const,
 		"Minimum air temperature for development in vegetative fase.\n\
 Temperature below this will not count in the sum.");
     alist.add ("VegThrs", 0.0);
-    syntax.add ("RepTSum", "dg C d", Syntax::Const,
+    syntax.add ("RepTSum", "dg C d", Value::Const,
 		"Air temperature sum for vegetative fase.");
-    syntax.add ("RepThrs", "dg C", Syntax::Const,
+    syntax.add ("RepThrs", "dg C", Value::Const,
 		"Minimum air temperature for development in vegetative fase.\n\
 Temperature below this will not count in the sum.");
     alist.add ("RepThrs", 0.0);

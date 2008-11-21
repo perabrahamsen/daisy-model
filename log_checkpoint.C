@@ -233,11 +233,11 @@ static struct LogCheckpointSyntax
 Create a checkpoint of the entire simulation state, suitable for later\n\
 hot start.");
     LogAList::load_syntax (syntax, alist);
-    syntax.add ("where", Syntax::String, Syntax::Const,
+    syntax.add ("where", Value::String, Value::Const,
                 "File name prefix for the generated checkpoint.\n\
 The time will be appended, together with the '.dai' suffix.");
     alist.add ("where", "checkpoint");
-    syntax.add ("description", Syntax::String, Syntax::Const,
+    syntax.add ("description", Value::String, Value::Const,
                 "Description of this particular checkpoint.");
     alist.add ("description", "\
 Create a checkpoint of the entire simulation state, suitable for later\n\

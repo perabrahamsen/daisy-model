@@ -1,18 +1,25 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* colloids 
+* Artkler
 
-** Check med opsætning med makroporestrøm
+rootdens: seyed, pa, sha, mmo
+ominit: pa, bgj, sha
+farmer: pa, sha
 
-** colloid plus stof
+Farquhar: bgj, sha; pa
+svat: bgj, sha; pa
 
-* lysimeter
+1d vs 2d dræn: ; sha
+cto macro: mmo; sha, pa, cpe
 
-** v+h richards ser ud til at have et problem med trykrand.
+rørrende vand: mmo, cpe, nabi, maha, sha, pa
+stof?  
 
-Det sker kun med to søjler, ikke med 1!
+[2d, makro, sekundært domæne, kolloid ]
 
-*** sammenlign 1D & 2x1 kode
+vap
+
+------------------
 
 * OpenMI
 
@@ -28,16 +35,6 @@ Det sker kun med to søjler, ikke med 1!
 
 * test-mibsol.dai
 
-** Colloids
-
-*** test setup
-
-*** tilføj sekundært og tertiært domæne.
-
-*** skriv specialiseret log fil.
-
-Tertiart biopores log mm water samt solute per area
-
 * Tertiary 
 
 ** Små tidsskridt
@@ -52,7 +49,7 @@ Kun matrix -> biopore ?
 
 * Next?
 
-SAFIR workshop, plantefys, kolloider
+SAFIR workshop, plantefys
 
 * edge baseret kode til rect solute og vand
 

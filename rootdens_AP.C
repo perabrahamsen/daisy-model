@@ -141,15 +141,15 @@ In this variant of Gerwitz and Page, 'a' is specified as a function of\n\
 development stage.");
     alist.add_strings ("cite", "gp74");
 
-    syntax.add ("a_DS", "DS", "cm^-1", Syntax::Const, 
+    syntax.add ("a_DS", "DS", "cm^-1", Value::Const, 
                 "Form parameter as a function of development stage.");
-    syntax.add ("q", "cm", Check::non_negative (), Syntax::Const, 
+    syntax.add ("q", "cm", Check::non_negative (), Value::Const, 
                 "Extra root length below max rooting depth.\n\
 Root density will decrease linearly from the GP calculated amount\n\
 at max rooting depth to zero 'q' further down.");
-    syntax.add ("a", "cm^-1", Syntax::LogOnly, "Form parameter.\n\
+    syntax.add ("a", "cm^-1", Value::LogOnly, "Form parameter.\n\
 Calculated from 'a_DS'.");
-    syntax.add ("L0", "cm/cm^3", Syntax::LogOnly,
+    syntax.add ("L0", "cm/cm^3", Value::LogOnly,
                 "Root density at soil surface.");
     Librarian::add_type (Rootdens::component, "Anders Pedersen", alist, syntax, &make);
   }

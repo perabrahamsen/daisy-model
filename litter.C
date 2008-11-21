@@ -32,14 +32,14 @@ Litter::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("submodel", "Litter");
   alist.add ("description", "\
 Properties of litter below permanent vegetation.");
-  syntax.add_fraction ("vapor_flux_factor", Syntax::Const, "\
+  syntax.add_fraction ("vapor_flux_factor", Value::Const, "\
 Reduction factor for potential evaporation below litter.");
   alist.add ("vapor_flux_factor", 1.0);
-  syntax.add ("interception_capacity", "mm", Syntax::Const,
+  syntax.add ("interception_capacity", "mm", Value::Const,
 	      "Storage capacity of litter.");
   alist.add ("interception_capacity", 0.0);
-  syntax.add ("albedo", Syntax::None (), Check::positive (),
-              Syntax::OptionalConst, "Reflection factor.\n\
+  syntax.add ("albedo", Value::None (), Check::positive (),
+              Value::OptionalConst, "Reflection factor.\n\
 By default, the surface albedo will be used.");
 }
 

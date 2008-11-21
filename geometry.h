@@ -257,7 +257,7 @@ public:
 
   // Layers -- Support initializing soil arrays layer by layer.
 public:
-  static void add_layer (Syntax& syntax, Syntax::category, 
+  static void add_layer (Syntax& syntax, Value::category, 
                          symbol name,
 			 symbol dimension,
                          symbol description);

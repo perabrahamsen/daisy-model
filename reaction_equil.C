@@ -163,20 +163,20 @@ static struct ReactionEquilibriumSyntax
 
     alist.add ("description", 
 	       "Equilibrium between two soil chemicals.");
-    syntax.add ("A", Syntax::String, Syntax::Const,
+    syntax.add ("A", Value::String, Value::Const,
 		"Name of first soil component in equilibrium.");
-    syntax.add ("B", Syntax::String, Syntax::Const,
+    syntax.add ("B", Value::String, Value::Const,
 		"Name of second soil component in equilibrium.");
     syntax.add_object ("equilibrium", Equilibrium::component,
                        "Function for calculating equilibrium between A and B.");
     syntax.add_object ("k_AB", Number::component,
-                       Syntax::Const, Syntax::Singleton, 
+                       Value::Const, Value::Singleton, 
                        "Tranformation rate from soil component 'A' to 'B'.");
     syntax.add_object ("k_BA", Number::component,
-                       Syntax::OptionalConst, Syntax::Singleton,
+                       Value::OptionalConst, Value::Singleton,
                        "Tranformation rate from soil component 'B' to 'A'.\n\
 By default, this is identical to 'k_AB'.");
-    syntax.add ("S_AB", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+    syntax.add ("S_AB", "g/cm^3/h", Value::LogOnly, Value::Sequence,
 		"Converted from A to B this timestep (may be negative).");
 
     Librarian::add_type (Reaction::component, "equilibrium",

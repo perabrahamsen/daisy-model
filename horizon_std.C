@@ -189,23 +189,23 @@ distinguish between fine and coarse sand?");
 The soil consitutents are automatically normalized.\n\
 \n\
 OBSOLETE: Use the USDA or FAO model instead.");
-    syntax.add ("clay", Syntax::None (), Check::non_negative (), Syntax::Const,
+    syntax.add ("clay", Value::None (), Check::non_negative (), Value::Const,
                 "Relative fraction of clay in soil.");
-    syntax.add ("silt", Syntax::None (), Check::non_negative (), Syntax::Const,
+    syntax.add ("silt", Value::None (), Check::non_negative (), Value::Const,
                 "Relative fraction of silt in soil.");
-    syntax.add ("fine_sand", Syntax::None (), Check::non_negative (), 
-                Syntax::OptionalConst,
+    syntax.add ("fine_sand", Value::None (), Check::non_negative (), 
+                Value::OptionalConst,
                 "Relative fraction of fine sand in soil.\n\
 NOTE: Not a real texture class, use 'sand' instead.");
-    syntax.add ("coarse_sand", Syntax::None (), Check::non_negative (), 
-                Syntax::OptionalConst,
+    syntax.add ("coarse_sand", Value::None (), Check::non_negative (), 
+                Value::OptionalConst,
                 "Relative fraction of coarse sand in soil.\n\
 NOTE: Not a real texture class, use 'sand' instead.");
-    syntax.add ("sand", Syntax::None (), Check::non_negative (), 
-                Syntax::OptionalConst,
+    syntax.add ("sand", Value::None (), Check::non_negative (), 
+                Value::OptionalConst,
                 "Relative fraction of sand in soil.");
-    syntax.add ("humus", Syntax::None (), Check::non_negative (), 
-                Syntax::Const,
+    syntax.add ("humus", Value::None (), Check::non_negative (), 
+                Value::Const,
                 "Relative fraction of humus in soil.");
 
     Librarian::add_type (Horizon::component, "default", alist, syntax, &make);

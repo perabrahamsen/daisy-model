@@ -107,14 +107,14 @@ static struct AdsorptionLangmuirSyntax
     syntax.add_check (check_alist);
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "M = rho (my_max C) / (K + C) + Theta C");
-    syntax.add ("K", "g/cm^3", Check::non_negative (), Syntax::Const, "Half saturation constant.");
+    syntax.add ("K", "g/cm^3", Check::non_negative (), Value::Const, "Half saturation constant.");
     syntax.add ("my_max_clay", "g/cm^3", Check::non_negative (), 
-		Syntax::OptionalConst,
+		Value::OptionalConst,
 		"Max adsorption capacity (clay).\n\
 It is multiplied with the soil clay fraction to get the clay part of\n\
 'my_max'.  If 'my_max_OC' is specified, 'my_max_clay' defaults to 0.");
     syntax.add ("my_max_OC", "g/cm^3", Check::non_negative (), 
-		Syntax::OptionalConst,
+		Value::OptionalConst,
 		"Max adsorption capacity (humus).\n\
 It is multiplied with the soil organic carbon fraction to get the\n\
 carbon part of 'my_max'.  By default, 'my_max_OC' is equal to 'my_max_clay'.");

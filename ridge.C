@@ -442,35 +442,35 @@ Ridge::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("description", "Surface model after ridging.");
   
   // Parameters.
-  syntax.add ("z", Syntax::Fraction (), "cm", Check::none (), Syntax::Const, "\
+  syntax.add ("z", Value::Fraction (), "cm", Check::none (), Value::Const, "\
 The basic ridge parameter is the height, formulated as z (x),\n\
 where x is the relative distance from the middle of the ridge.\n\
 x = 0.0 is in the middle of a ridge, while x = 1.0 is at the\n\
 maximal distance.  The ridge is assumed to be symmetric.\n\
 z (x) is measured in centimeter above the unridged soil surface, which\n\
 means it is in the same reference system as the rest of the model.");
-  syntax.add ("R_crust", "h", Check::non_negative (), Syntax::Const,
+  syntax.add ("R_crust", "h", Check::non_negative (), Value::Const,
 	      "Resistance in crust.");
-  syntax.add_fraction ("switch", Syntax::Const, "\
+  syntax.add_fraction ("switch", Value::Const, "\
 Fraction of ridge height where we switch from bottom regime to wall regime.");
   alist.add ("switch", 1.0/3.0);
 
   // Content.
-  syntax.add ("Theta", "cm^3/cm^3", Syntax::LogOnly, "Soil water content.");
-  syntax.add ("Theta_pre", "cm^3/cm^3", Syntax::LogOnly, 
+  syntax.add ("Theta", "cm^3/cm^3", Value::LogOnly, "Soil water content.");
+  syntax.add ("Theta_pre", "cm^3/cm^3", Value::LogOnly, 
 	      "Soil water content before transport.");
-  syntax.add ("h", "cm", Syntax::LogOnly, "Soil water pressure.");
-  syntax.add ("z_pond", "cm", Syntax::LogOnly, "Internal free water height.");
-  syntax.add ("x_pond", "", Syntax::LogOnly, "Water to soil point.");
-  syntax.add ("internal_ponding", "cm", Syntax::LogOnly, 
+  syntax.add ("h", "cm", Value::LogOnly, "Soil water pressure.");
+  syntax.add ("z_pond", "cm", Value::LogOnly, "Internal free water height.");
+  syntax.add ("x_pond", "", Value::LogOnly, "Water to soil point.");
+  syntax.add ("internal_ponding", "cm", Value::LogOnly, 
 	      "Distance from ridge bottom to water surface.");
-  syntax.add ("R_bottom", "h", Syntax::LogOnly, "Resistance in ridge bottom.");
-  syntax.add ("R_wall", "h", Syntax::LogOnly, "Resistance in ridge wall.");
-  syntax.add ("I_bottom", "cm/h", Syntax::LogOnly, 
+  syntax.add ("R_bottom", "h", Value::LogOnly, "Resistance in ridge bottom.");
+  syntax.add ("R_wall", "h", Value::LogOnly, "Resistance in ridge wall.");
+  syntax.add ("I_bottom", "cm/h", Value::LogOnly, 
 	      "Infiltration through ridge bottom.");
-  syntax.add ("I_wall", "cm/h", Syntax::LogOnly,
+  syntax.add ("I_wall", "cm/h", Value::LogOnly,
 	      "Infiltration through ridge wall.");
-  syntax.add ("I", "cm/h", Syntax::LogOnly, "Total infiltration.");
+  syntax.add ("I", "cm/h", Value::LogOnly, "Total infiltration.");
 }
 
 PLF 

@@ -131,10 +131,10 @@ static struct ProgramGnuplotSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description",
                "Generate a gnuplot command file."); 
-    syntax.add ("command_file", Syntax::String, Syntax::Const, "\
+    syntax.add ("command_file", Value::String, Value::Const, "\
 File name for gnuplot commands.");
     alist.add ("command_file", "daisy.gnuplot");
-    syntax.add ("cd", Syntax::Boolean, Syntax::Const, "\
+    syntax.add ("cd", Value::Boolean, Value::Const, "\
 Set this flag to add a 'cd' command to the current working directory.\n\
 This is useful under MS Windows when dragging the file to a gnuplot icon.");
 #if defined(__unix)
@@ -142,13 +142,13 @@ This is useful under MS Windows when dragging the file to a gnuplot icon.");
 #else
     alist.add ("cd", true);
 #endif
-    syntax.add ("extra", Syntax::String, Syntax::Const, 
-                Syntax::Sequence, "List of extra gnuplot commands.\n\
+    syntax.add ("extra", Value::String, Value::Const, 
+                Value::Sequence, "List of extra gnuplot commands.\n\
 The commands will be inserted right before the list of graphs.");
     alist.add ("extra", std::vector<symbol> ());
                 
-    syntax.add_object ("graph", Gnuplot::component, Syntax::State, 
-                       Syntax::Sequence, "Graphs to plot.");
+    syntax.add_object ("graph", Gnuplot::component, Value::State, 
+                       Value::Sequence, "Graphs to plot.");
     Librarian::add_type (Program::component, "gnuplot", alist, syntax, &make);
   }
 } ProgramGnuplot_syntax;

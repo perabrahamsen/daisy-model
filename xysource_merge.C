@@ -189,12 +189,12 @@ By default, let the first source decide.", "");
 	       "Merge multiple xy data series into one.");
 
     syntax.add_object ("source", XYSource::component,
-                       Syntax::State, Syntax::Sequence,
+                       Value::State, Value::Sequence,
                        "XY data series to merge.");
     syntax.add_check ("source", VCheck::min_size_1 ());
-    syntax.add ("x_dimension", Syntax::String, Syntax::Const, "\
+    syntax.add ("x_dimension", Value::String, Value::Const, "\
 Dimension for x points.");
-    syntax.add ("y_dimension", Syntax::String, Syntax::Const, "\
+    syntax.add ("y_dimension", Value::String, Value::Const, "\
 Dimension for y points.");
 
     Librarian::add_type (XYSource::component, "merge", alist, syntax, &make);

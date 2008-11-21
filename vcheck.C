@@ -53,10 +53,10 @@ struct ValidYear : public VCheck
 	      const symbol key) const throw (std::string)
   { 
     daisy_assert (alist.check (key));
-    daisy_assert (syntax.lookup (key) == Syntax::Integer);
+    daisy_assert (syntax.lookup (key) == Value::Integer);
     daisy_assert (!syntax.is_log (key));
 
-    if (syntax.size (key) == Syntax::Singleton)
+    if (syntax.size (key) == Value::Singleton)
       validate (alist.integer (key));
     else
       {
@@ -89,9 +89,9 @@ VCheck::IRange::check (const Metalib&, const Syntax& syntax, const AttributeList
 {
   daisy_assert (alist.check (key));
   daisy_assert (!syntax.is_log (key));
-  daisy_assert (syntax.lookup (key) == Syntax::Integer);
+  daisy_assert (syntax.lookup (key) == Value::Integer);
 
-  if (syntax.size (key) == Syntax::Singleton)
+  if (syntax.size (key) == Value::Singleton)
     validate (alist.integer (key));
   else
     {
@@ -132,9 +132,9 @@ struct LocalOrder : public VCheck
   
     switch (syntax.lookup (key))
       {
-      case Syntax::Number:
+      case Value::Number:
 	{
-	  daisy_assert (syntax.size (key) != Syntax::Singleton);
+	  daisy_assert (syntax.size (key) != Value::Singleton);
 	  const std::vector<double>& numbers = alist.number_sequence (key);
 	  if (numbers.size () < 2)
 	    return;
@@ -147,8 +147,8 @@ struct LocalOrder : public VCheck
 	    }
 	}
 	break;
-      case Syntax::PLF:
-	if (syntax.size (key) == Syntax::Singleton)
+      case Value::PLF:
+	if (syntax.size (key) == Value::Singleton)
 	  validate_plf (alist.plf (key));
 	else
 	  {
@@ -344,15 +344,15 @@ VCheck::SumEqual::check (const Metalib&, const Syntax& syntax, const AttributeLi
   
   switch (syntax.lookup (key))
     {
-    case Syntax::Number:
+    case Value::Number:
       {
-	daisy_assert (syntax.size (key) != Syntax::Singleton);
+	daisy_assert (syntax.size (key) != Value::Singleton);
 	const std::vector<double>& numbers = alist.number_sequence (key);
 	validate (accumulate (numbers.begin (), numbers.end (), 0.0));
       }
       break;
-    case Syntax::PLF:
-      if (syntax.size (key) == Syntax::Singleton)
+    case Value::PLF:
+      if (syntax.size (key) == Value::Singleton)
 	validate (alist.plf (key));
       else
 	{
@@ -394,16 +394,16 @@ VCheck::StartValue::check (const Metalib&, const Syntax& syntax, const Attribute
   
   switch (syntax.lookup (key))
     {
-    case Syntax::Number:
+    case Value::Number:
       {
-	daisy_assert (syntax.size (key) != Syntax::Singleton);
+	daisy_assert (syntax.size (key) != Value::Singleton);
 	const std::vector<double>& numbers = alist.number_sequence (key);
 	if (numbers.size () > 0)
 	  validate (numbers[0]);
       }
       break;
-    case Syntax::PLF:
-      if (syntax.size (key) == Syntax::Singleton)
+    case Value::PLF:
+      if (syntax.size (key) == Value::Singleton)
 	validate (alist.plf (key));
       else
 	{
@@ -448,16 +448,16 @@ VCheck::EndValue::check (const Metalib&, const Syntax& syntax, const AttributeLi
   
   switch (syntax.lookup (key))
     {
-    case Syntax::Number:
+    case Value::Number:
       {
-	daisy_assert (syntax.size (key) != Syntax::Singleton);
+	daisy_assert (syntax.size (key) != Value::Singleton);
 	const std::vector<double>& numbers = alist.number_sequence (key);
 	if (numbers.size () > 0)
 	  validate (numbers[numbers.size () - 1]);
       }
       break;
-    case Syntax::PLF:
-      if (syntax.size (key) == Syntax::Singleton)
+    case Value::PLF:
+      if (syntax.size (key) == Value::Singleton)
 	validate (alist.plf (key));
       else
 	{
@@ -496,8 +496,8 @@ VCheck::FixedPoint::check (const Metalib&, const Syntax& syntax, const Attribute
   
   switch (syntax.lookup (key))
     {
-    case Syntax::PLF:
-      if (syntax.size (key) == Syntax::Singleton)
+    case Value::PLF:
+      if (syntax.size (key) == Value::Singleton)
 	validate (alist.plf (key));
       else
 	{
@@ -522,7 +522,7 @@ VCheck::MinSize::check (const Metalib&, const Syntax& syntax, const AttributeLis
 {
   daisy_assert (alist.check (key));
   daisy_assert (!syntax.is_log (key));
-  daisy_assert (syntax.size (key) == Syntax::Sequence);
+  daisy_assert (syntax.size (key) == Value::Sequence);
   if (alist.size (key) < min_size)
     {
       std::ostringstream tmp;
@@ -542,7 +542,7 @@ VCheck::String::check (const Metalib&, const Syntax& syntax, const AttributeList
 {
   daisy_assert (alist.check (key));
   daisy_assert (!syntax.is_log (key));
-  if (syntax.size (key) == Syntax::Singleton)
+  if (syntax.size (key) == Value::Singleton)
     validate (alist.name (key));
   else
     {
@@ -572,7 +572,7 @@ VCheck::Compatible::check (const Metalib& metalib,
   daisy_assert (alist.check (key));
   daisy_assert (!syntax.is_log (key));
   const Units& units = metalib.units ();
-  if (syntax.size (key) == Syntax::Singleton)
+  if (syntax.size (key) == Value::Singleton)
     validate (units, alist.name (key));
   else
     {
@@ -589,7 +589,7 @@ VCheck::Compatible::Compatible (const symbol dim)
 const VCheck& 
 VCheck::fraction ()
 {
-  static Compatible fraction (Syntax::Fraction ());
+  static Compatible fraction (Value::Fraction ());
   return fraction;
 }
 
@@ -666,7 +666,7 @@ VCheck::InLibrary::check (const Metalib& metalib,
 {
   daisy_assert (alist.check (key));
   daisy_assert (!syntax.is_log (key));
-  if (syntax.size (key) == Syntax::Singleton)
+  if (syntax.size (key) == Value::Singleton)
     validate (metalib, alist.name (key));
   else
     {
@@ -725,27 +725,27 @@ VCheck::unique ()
                 const symbol key) const throw (std::string)
     { 
       daisy_assert (alist.check (key));
-      daisy_assert (syntax.size (key) != Syntax::Singleton);
+      daisy_assert (syntax.size (key) != Value::Singleton);
       daisy_assert (!syntax.is_log (key));
       
       switch (syntax.lookup (key))
         {
-        case Syntax::Number:
+        case Value::Number:
           unique_validate (alist.number_sequence (key));
           break;
-        case Syntax::PLF:
+        case Value::PLF:
           unique_validate (alist.plf_sequence (key));
           break;
-        case Syntax::Boolean:
+        case Value::Boolean:
           unique_validate (alist.flag_sequence (key));
           break;
-        case Syntax::String:
+        case Value::String:
           unique_validate (alist.name_sequence (key));
           break;
-        case Syntax::Integer:
+        case Value::Integer:
           unique_validate (alist.integer_sequence (key));
           break;
-	case Syntax::Object:
+	case Value::Object:
 	  {
 	    std::vector<const AttributeList*> list = alist.alist_sequence (key);
 	    std::map<symbol, size_t> found;
@@ -766,7 +766,7 @@ VCheck::unique ()
 	  }
         default:
           daisy_panic ("Unhandled list type "
-                       + Syntax::type_name (syntax.lookup (key)));
+                       + Value::type_name (syntax.lookup (key)));
         }
     }      
   } unique;

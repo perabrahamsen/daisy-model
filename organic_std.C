@@ -338,21 +338,21 @@ OrganicStandard::Buffer::load_syntax (Syntax& syntax,
 {
   const std::vector<double> empty_vector;
   syntax.add ("C", "g C/cm^3", Check::non_negative (),
-	      Syntax::State, Syntax::Sequence,
+	      Value::State, Value::Sequence,
 	      "Buffer carbon content.");
   alist.add ("C", empty_vector);
-  syntax.add ("N", "g N/cm^3", Check::non_negative (), Syntax::State, Syntax::Sequence,
+  syntax.add ("N", "g N/cm^3", Check::non_negative (), Value::State, Value::Sequence,
 	      "Buffer nitrogen content.");
   alist.add ("N", empty_vector);
-  syntax.add ("turnover_rate", "h^-1", Check::fraction (), Syntax::Const,
+  syntax.add ("turnover_rate", "h^-1", Check::fraction (), Value::Const,
 	      "Turnover rate from buffer into SOM.\n\
 Ignored if you specify 'turnover_halftime'.");
   alist.add ("turnover_rate", 1.0);
   syntax.add ("turnover_halftime", "h", Check::positive (),
-	      Syntax::OptionalConst, 
+	      Value::OptionalConst, 
 	      "Turnover halftime from buffer into SOM.\n\
 Overrules 'turnover_rate' if specified.");
-  syntax.add ("where", Syntax::Integer, Syntax::Const,
+  syntax.add ("where", Value::Integer, Value::Const,
 	      "The SOM pool to move the buffer content into.\n\
 The first and slow SOM pool is numbered '0', the second and faster\n\
 is numbered '1'.");
@@ -405,12 +405,12 @@ OrganicStandard::Initialization::
 /**/ load_syntax (Syntax& syntax, AttributeList& alist)
 {
   syntax.add ("input", "kg C/ha/y", Check::non_negative (),
-	      Syntax::OptionalConst, "\
+	      Value::OptionalConst, "\
 Amount of carbon added to the organic matter system.\n\
 \n\
 If this is unspecifed, the input rate from the inital added matter\n\
 pools will be used instead.");
-  syntax.add_fraction ("fractions", Syntax::Const, Syntax::Sequence, "\
+  syntax.add_fraction ("fractions", Value::Const, Value::Sequence, "\
 Desitinations for AOM input.  The first numbers corresponds to each\n\
 SMB pool, while the last number correspond to the SOM buffer.\n\
 This is only used if you specify the input parameter.");
@@ -420,42 +420,42 @@ This is only used if you specify the input parameter.");
   fractions.push_back (1.0);
   fractions.push_back (0.0);
   alist.add ("fractions", fractions);
-  syntax.add_fraction ("efficiency", Syntax::Const, Syntax::Sequence, "\
+  syntax.add_fraction ("efficiency", Value::Const, Value::Sequence, "\
 The efficiency this pool can be digested by each of the SMB pools.\n\
 This is only used if you specify the input parameter.");
   std::vector<double> efficiency;
   efficiency.push_back (0.5);
   efficiency.push_back (0.5);
   alist.add ("efficiency", efficiency);
-  syntax.add ("root", "kg C/ha/y", Check::non_negative (), Syntax::Const, "\
+  syntax.add ("root", "kg C/ha/y", Check::non_negative (), Value::Const, "\
 Amount of carbon added to the organic matter system from dead roots.\n\
 \n\
 This is part of the total amount specified by the 'input' parameter.");
   alist.add ("root", 800.0); // According to HSV simulations.
-  syntax.add ("dist", "cm", Check::positive (), Syntax::Const, "\
+  syntax.add ("dist", "cm", Check::positive (), Value::Const, "\
 Distance to go down in order to decrease the root density to half the\n\
 original.");
   alist.add ("dist", 7.0);
   syntax.add ("end", "cm", Check::negative (),
-	      Syntax::OptionalConst, "Depth of non-root input.\n\
+	      Value::OptionalConst, "Depth of non-root input.\n\
 \n\
 The input will distributes uniformly down to this size, after\n\
 subtracting the part of the input allocated to the 'root' parameter.\n\
 \n\
 By default, the end of the first horizon will be used.");
-  syntax.add ("bioinc", "kg C/ha/y", Check::non_negative (), Syntax::Const, "\
+  syntax.add ("bioinc", "kg C/ha/y", Check::non_negative (), Value::Const, "\
 Amount of carbon added to the organic matter system from bioincorporation.\n\
 \n\
 This is part of the total amount specified by the 'input' parameter.");
   alist.add ("bioinc", 0.0);
-  syntax.add ("T", "dg C", Temperature, Syntax::OptionalConst, "\
+  syntax.add ("T", "dg C", Temperature, Value::OptionalConst, "\
 Temperature used for equilibrium.\n\
 \n\
 By default, the yearly average from the weather component will be used.");
-  syntax.add ("h", "cm", Check::non_positive (), Syntax::Const, "\
+  syntax.add ("h", "cm", Check::non_positive (), Value::Const, "\
 Pressure used for equilibrium.");
   alist.add ("h", -100.0);
-  syntax.add ("variable_pool", Syntax::Integer, Syntax::OptionalConst, "\
+  syntax.add ("variable_pool", Value::Integer, Value::OptionalConst, "\
 If neither the C content nor 'SOM_fractions' are specified, equilibrium is\n\
 assumed for all SOM pools except the one specified by this parameter.\n\
 If you set this to -1 (or any number nor corresponding to a SOM pool),\n\
@@ -463,14 +463,14 @@ equilibrium will be assumed for all pools, and the humus content\n\
 specified by the horizon will be ignored.\n\
 Note, the numbering is zero-based, so '0' specifies SOM1.\n\
 By default, the slowest active pool will be used.");
-  syntax.add ("variable_pool_2", Syntax::Integer, Syntax::OptionalConst, "\
+  syntax.add ("variable_pool_2", Value::Integer, Value::OptionalConst, "\
 If 'background_mineralization' is specified, this pool is no longer\n\
 assumed to be in equilibrium.\n\
 Note, the numbering is zero-based, so '0' specifies SOM1.\n\
 By default, the second slowest active pool will be used.");
   static RangeII min_range (-1000.0, 1000.0);
   syntax.add ("background_mineralization", "kg N/ha/y", 
-	      min_range, Syntax::OptionalConst, "\
+	      min_range, Value::OptionalConst, "\
 The background mineralization is the mineralization from all SMB and\n\
 SOM pools, but not from the AOM pools.\n\
 \n\
@@ -484,12 +484,12 @@ The subsoil is not affected by this parameter.\n\
 \n\
 If the background mineralization is unspecified, 'variable_pool_2' will be\n\
 assumed to be in equilibrium instead.");
-  syntax.add ("SOM_limit_where", Syntax::Integer, Syntax::Const, "\
+  syntax.add ("SOM_limit_where", Value::Integer, Value::Const, "\
 This is the SOM pool that must be within the limits specified by\n\
 'SOM_limit_lower' and 'SOM_limit_upper'.  Use negative number to disable.\n\
 Note, the numbering is zero-based, so '0' specifies SOM1.");
   alist.add ("SOM_limit_where", 0);
-  syntax.add_fraction ("SOM_limit_lower", Syntax::Const, Syntax::Sequence, "\
+  syntax.add_fraction ("SOM_limit_lower", Value::Const, Value::Sequence, "\
 Lower limit for for automatic SOM partitioning.\n\
 \n\
 The SOM pool specified by 'SOM_limit_where' must contain at least the\n\
@@ -508,7 +508,7 @@ for soil layers below 'end'.");
   SOM_limit_lower.push_back (0.7);
   SOM_limit_lower.push_back (0.0);
   alist.add ("SOM_limit_lower", SOM_limit_lower);
-  syntax.add_fraction ("SOM_limit_upper", Syntax::Const, Syntax::Sequence, "\
+  syntax.add_fraction ("SOM_limit_upper", Value::Const, Value::Sequence, "\
 Upper limit for for automatic SOM partitioning.\n\
 Works like 'SOM_limit_lower'.");
   syntax.add_check ("SOM_limit_upper", VCheck::sum_equal_1 ());
@@ -518,17 +518,17 @@ Works like 'SOM_limit_lower'.");
   SOM_limit_upper.push_back (0.0);
   alist.add ("SOM_limit_upper", SOM_limit_upper);
   
-  syntax.add ("debug_equations", Syntax::Integer, Syntax::Const, 
-	      Syntax::Sequence, "\
+  syntax.add ("debug_equations", Value::Integer, Value::Const, 
+	      Value::Sequence, "\
 Print equations used for initialization for the specified intervals.");
   alist.add ("debug_equations", std::vector<int> ());
-  syntax.add ("debug_rows", Syntax::Boolean, Syntax::Const, "\
+  syntax.add ("debug_rows", Value::Boolean, Value::Const, "\
 Print summari information for each row.");
   alist.add ("debug_rows", true);
-  syntax.add ("debug_to_screen", Syntax::Boolean, Syntax::Const, "\
+  syntax.add ("debug_to_screen", Value::Boolean, Value::Const, "\
 If true, print debug information to screen, else to the 'daisy.log' file.");
   alist.add ("debug_to_screen", false);
-  syntax.add ("top_summary", Syntax::String, Syntax::OptionalConst, "\
+  syntax.add ("top_summary", Value::String, Value::OptionalConst, "\
 Name of file to print a summary of the organic carbon and nitrogen\n\
 content in the zone down to the 'end' parameter.\n\
 If unspecified, no such file will be generated, but the summary will\n\
@@ -2922,65 +2922,65 @@ OrganicStandard::load_syntax (Syntax& syntax, AttributeList& alist)
 Mineralization and immobilization in soil.");
   alist.add_strings ("cite", "daisy-fertilizer", "daisy-somnew");
   syntax.add_check (check_alist);
-  syntax.add ("active_underground", Syntax::Boolean, Syntax::Const, "\
+  syntax.add ("active_underground", Value::Boolean, Value::Const, "\
 Set this flag to turn on mineralization below the root zone.");
   alist.add ("active_underground", false);
-  syntax.add ("active_groundwater", Syntax::Boolean, Syntax::OptionalConst, "\
+  syntax.add ("active_groundwater", Value::Boolean, Value::OptionalConst, "\
 IGNORED: Use 'water_factor' to disable mineralization.");
-  syntax.add ("K_NH4", "h^-1", Check::fraction (), Syntax::Const, 
+  syntax.add ("K_NH4", "h^-1", Check::fraction (), Value::Const, 
 	      "Maximal immobilization rate for ammonium.");
   alist.add ("K_NH4", 0.020833); // 0.5 / 24.
-  syntax.add ("K_NO3", "h^-1", Check::fraction (), Syntax::Const, 
+  syntax.add ("K_NO3", "h^-1", Check::fraction (), Value::Const, 
 	      "Maximal immobilization rate for nitrate.");
   alist.add ("K_NO3", 0.020833); // 0.5 / 24.
-  syntax.add_submodule ("Bioincorporation", alist, Syntax::State, "\
+  syntax.add_submodule ("Bioincorporation", alist, Value::State, "\
 Biological incorporation of litter.",
 			Bioincorporation::load_syntax);
-  syntax.add ("NO3_source", "g N/cm^3/h", Syntax::LogOnly, Syntax::Sequence, "\
+  syntax.add ("NO3_source", "g N/cm^3/h", Value::LogOnly, Value::Sequence, "\
 Mineralization this time step (negative numbers mean immobilization).");
-  syntax.add ("NH4_source", "g N/cm^3/h", Syntax::LogOnly, Syntax::Sequence, "\
+  syntax.add ("NH4_source", "g N/cm^3/h", Value::LogOnly, Value::Sequence, "\
 Mineralization this time step (negative numbers mean immobilization).");
-  syntax.add ("fertilized_N", "g N/cm^2/h", Syntax::LogOnly,
+  syntax.add ("fertilized_N", "g N/cm^2/h", Value::LogOnly,
               "Amount of organic bound nitrogen applied.\n\
 This includes nitrogen incorporated directly in the soil.");
-  syntax.add ("fertilized_C", "g C/cm^2/h", Syntax::LogOnly,
+  syntax.add ("fertilized_C", "g C/cm^2/h", Value::LogOnly,
               "Amount of organic bound carbon applied.\n\
 This includes carbon incorporated directly in the soil.");
-  syntax.add ("tillage_N_top", "g N/m^2/h", Syntax::LogOnly,
+  syntax.add ("tillage_N_top", "g N/m^2/h", Value::LogOnly,
               "Amount of nitrogen added to surface during tillage.\n\
 This is a negative number.");
-  syntax.add ("tillage_C_top", "g C/m^2/h", Syntax::LogOnly,
+  syntax.add ("tillage_C_top", "g C/m^2/h", Value::LogOnly,
               "Amount of carbon added to surface during tillage.\n\
 This is a negative number.");
   syntax.add ("tillage_N_soil", "g N/cm^3/h", 
-              Syntax::LogOnly, Syntax::Sequence,
+              Value::LogOnly, Value::Sequence,
               "Amount of nitrogen added to soil during tillage.");
   syntax.add ("tillage_C_soil", "g C/cm^3/h",
-              Syntax::LogOnly, Syntax::Sequence,
+              Value::LogOnly, Value::Sequence,
               "Amount of carbon added to surface during tillage.");
-  syntax.add ("humus", "g/cm^3", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("humus", "g/cm^3", Value::LogOnly, Value::Sequence,
 	      "Total organic matter in the soil layer.");
-  syntax.add ("total_C", "g C/cm^3", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("total_C", "g C/cm^3", Value::LogOnly, Value::Sequence,
 	      "Total organic C in the soil layer.");
-  syntax.add ("total_N", "g N/cm^3", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("total_N", "g N/cm^3", Value::LogOnly, Value::Sequence,
 	      "Total organic N in the soil layer.");
-  syntax.add ("CO2", "g CO_2-C/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("CO2", "g CO_2-C/cm^3/h", Value::LogOnly, Value::Sequence,
 	      "CO2 evolution in soil from all pools.");
-  syntax.add ("CO2_fast", "g CO_2-C/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("CO2_fast", "g CO_2-C/cm^3/h", Value::LogOnly, Value::Sequence,
 	      "CO2 evolution in soil from pools faster than 'CO2_threshold'.");
-  syntax.add ("CO2_threshold", "h^-1", Check::fraction (), Syntax::Const, "\
+  syntax.add ("CO2_threshold", "h^-1", Check::fraction (), Value::Const, "\
 Turnover rate above which pools will contribute to 'CO2_fast'.");
   alist.add ("CO2_threshold", 1e-4); // SMB2 and default AOM pools.
-  syntax.add ("top_CO2", "g CO_2-C/cm^2/h", Syntax::LogOnly,
+  syntax.add ("top_CO2", "g CO_2-C/cm^2/h", Value::LogOnly,
 	      "CO2 evolution at surface.");
   syntax.add_object ("am", AM::component, 
-                     Syntax::State, Syntax::Sequence, 
+                     Value::State, Value::Sequence, 
                      "Added organic matter pools.");
   std::vector<const AttributeList*> am;
   AttributeList root (AM::default_root ());
   am.push_back (&root);
   alist.add ("am", am);
-  syntax.add_submodule ("buffer", alist, Syntax::State,
+  syntax.add_submodule ("buffer", alist, Value::State,
 			"Buffer between AOM pools and SOM.",
 			Buffer::load_syntax);
 
@@ -2989,7 +2989,7 @@ Turnover rate above which pools will contribute to 'CO2_fast'.");
   AttributeList smb_alist;
   SMB::load_syntax (smb_syntax, smb_alist);
 
-  syntax.add_submodule_sequence ("smb", Syntax::State, "\
+  syntax.add_submodule_sequence ("smb", Value::State, "\
 Soil MicroBiomass pools.\n\
 Initial value will be estimated based on equilibrium with AM and SOM pools.",
 				 SMB::load_syntax);
@@ -3032,7 +3032,7 @@ Initial value will be estimated based on equilibrium with AM and SOM pools.",
   SMB.push_back (&SMB2);
   alist.add ("smb", SMB);
 
-  syntax.add_submodule_sequence ("som", Syntax::State, 
+  syntax.add_submodule_sequence ("som", Value::State, 
 				 "Soil Organic Matter pools.",
 				 SOM::load_syntax);
   Syntax som_syntax;
@@ -3087,37 +3087,37 @@ Initial value will be estimated based on equilibrium with AM and SOM pools.",
   
   Syntax& layer_syntax = *new Syntax ();
   AttributeList layer_alist;
-  layer_syntax.add ("end", "cm", Check::negative (), Syntax::Const,
+  layer_syntax.add ("end", "cm", Check::negative (), Value::Const,
 		    "End point of this layer (a negative number).");
   layer_syntax.add ("weight", "kg C/m^2", Check::positive (),
-		    Syntax::Const,
+		    Value::Const,
 		    "organic carbon content of this layer.");
   layer_syntax.order ("end", "weight");
-  syntax.add ("initial_SOM", layer_syntax, layer_alist, Syntax::OptionalConst,
-	      Syntax::Sequence,
+  syntax.add ("initial_SOM", layer_syntax, layer_alist, Value::OptionalConst,
+	      Value::Sequence,
 	      "Layered initialization of soil SOM content.");
 
-  syntax.add_submodule_sequence ("dom", Syntax::State, 
+  syntax.add_submodule_sequence ("dom", Value::State, 
 				 "Dissolved Organic Matter pools.",
 				 DOM::load_syntax);
   alist.add ("dom", std::vector<const AttributeList*> ());
   syntax.add_object ("domsorp", Domsorp::component, 
-                     Syntax::State, Syntax::Sequence, 
+                     Value::State, Value::Sequence, 
                      "Interchange between DOM and SOM pools.");
   alist.add ("domsorp", std::vector<const AttributeList*> ());
 
-  syntax.add ("heat_factor", "dg C", Syntax::None (), Check::non_negative (),
-	      Syntax::Const,
+  syntax.add ("heat_factor", "dg C", Value::None (), Check::non_negative (),
+	      Value::Const,
 	      "Default heat factor, used if not specified by OM pool.");
   alist.add ("heat_factor", PLF::empty ());
-  syntax.add ("water_factor", "cm", Syntax::None (), Check::non_negative (),
-	      Syntax::Const, "\
+  syntax.add ("water_factor", "cm", Value::None (), Check::non_negative (),
+	      Value::Const, "\
 Default water potential factor, used if not specified by OM pool.\n\
 If the PLF is empty, a build-in PLF of pF will be used instead.\n\
 It is 0.6 at pF < 0, 1.0 at 1.5 < pF < 2.5, and 0 at pF > 6.5.");
   alist.add ("water_factor", PLF::empty ());
-  syntax.add ("abiotic_factor", Syntax::None (), 
-              Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("abiotic_factor", Value::None (), 
+              Value::LogOnly, Value::Sequence,
 	      "Product of current heat and water factors."); 
   syntax.add_object ("ClayOM", ClayOM::component, "Clay effect model.");
   AttributeList clay_alist;
@@ -3128,28 +3128,28 @@ It is 0.6 at pF < 0, 1.0 at 1.5 < pF < 2.5, and 0 at pF > 6.5.");
   clay_factor.add (1.00, 0.5);
   clay_alist.add ("factor", clay_factor);
   alist.add ("ClayOM", clay_alist);
-  syntax.add ("tillage_age", "d", Syntax::OptionalState, Syntax::Sequence,
+  syntax.add ("tillage_age", "d", Value::OptionalState, Value::Sequence,
 	      "Time since the latest tillage operation was performed."); 
-  syntax.add ("smb_tillage_factor", "d", Syntax::None (), 
-	      Check::non_negative (), Syntax::Const, Syntax::Sequence,
+  syntax.add ("smb_tillage_factor", "d", Value::None (), 
+	      Check::non_negative (), Value::Const, Value::Sequence,
 	      "Tillage influence on turnover rates for each SMB pool.\n\
 If no value is given, tillage will have no influence.");
   alist.add ("smb_tillage_factor", std::vector<const PLF*> ());
-  syntax.add ("som_tillage_factor", "d", Syntax::None (), 
-	      Check::non_negative (), Syntax::Const, Syntax::Sequence,
+  syntax.add ("som_tillage_factor", "d", Value::None (), 
+	      Check::non_negative (), Value::Const, Value::Sequence,
 	      "Tillage influence on SOM turnover rates for each SOM pool.\n\
 If no value is given, tillage will have no influence.");
   alist.add ("som_tillage_factor", std::vector<const PLF*> ());
 
-  syntax.add ("min_AM_C", "g C/m^2", Check::non_negative (), Syntax::Const, 
+  syntax.add ("min_AM_C", "g C/m^2", Check::non_negative (), Value::Const, 
 	      "Minimal amount of carbon in AOM ensuring it is not removed.");
   alist.add ("min_AM_C", 0.5);
   //  We require 5 kg C / Ha in order to keep an AM dk:pulje.
-  syntax.add ("min_AM_N", "g N/m^2", Check::non_negative (), Syntax::Const, 
+  syntax.add ("min_AM_N", "g N/m^2", Check::non_negative (), Value::Const, 
 	      "Minimal amount of nitrogen in AOM ensuring it is not removed.");
   // We require ½ kg N / Ha in order to keep an AM dk:pulje.
   alist.add ("min_AM_N", 0.05);
-  syntax.add_submodule ("init", alist, Syntax::Const, "\
+  syntax.add_submodule ("init", alist, Value::Const, "\
 Parameters for initialization of the SOM and SMB pools.\n\
 \n\
 If the C content of all the pools have been specified explicitly, use\n\

@@ -143,11 +143,11 @@ HydraulicB_vGSyntax::HydraulicB_vGSyntax ()
 	     "van Genuchten retention curve model with Burdine theory.");
   Hydraulic::load_Theta_res (syntax, alist);
   Hydraulic::load_K_sat (syntax, alist);
-  syntax.add ("alpha", "cm^-1", Syntax::Const,
+  syntax.add ("alpha", "cm^-1", Value::Const,
 	      "van Genuchten alpha.");
-  syntax.add ("n", Syntax::None (), Syntax::Const,
+  syntax.add ("n", Value::None (), Value::Const,
 	      "van Genuchten n.");
-  syntax.add ("l", Syntax::None (), Syntax::Const,
+  syntax.add ("l", Value::None (), Value::Const,
 	      "tortuosity parameter.");
   alist.add ("l", 2.0);
 

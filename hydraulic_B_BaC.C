@@ -127,9 +127,9 @@ HydraulicB_BaCSyntax::HydraulicB_BaCSyntax ()
 	     "Brooks and Corey retention curve model with Burdine theory.");
   Hydraulic::load_Theta_res (syntax, alist);
   Hydraulic::load_K_sat (syntax, alist);
-  syntax.add ("lambda", Syntax::None (), Syntax::Const,
+  syntax.add ("lambda", Value::None (), Value::Const,
 	      "Pore size index.");
-  syntax.add ("h_b", "cm", Syntax::Const,
+  syntax.add ("h_b", "cm", Value::Const,
 	      "Bubbling pressure.");
 
   Librarian::add_type (Hydraulic::component, "B_BaC", alist, syntax, make);

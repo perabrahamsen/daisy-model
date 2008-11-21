@@ -1754,17 +1754,17 @@ void
 TransportMollerup::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   syntax.add_object ("solver", Solver::component, 
-                     Syntax::Const, Syntax::Singleton, "\
+                     Value::Const, Value::Singleton, "\
 Model used for solving matrix equation system.");
   alist.add ("solver", Solver::default_model ());
-  syntax.add ("enable_boundary_diffusion", Syntax::Boolean, Syntax::Const, "\
+  syntax.add ("enable_boundary_diffusion", Value::Boolean, Value::Const, "\
 If this is set, diffusion over boundaries is enabled."); 
   alist.add ("enable_boundary_diffusion", true);
-  syntax.add ("debug", Syntax::Integer, Syntax::Const, "\
+  syntax.add ("debug", Value::Integer, Value::Const, "\
 Enable additional debug message.\n\
 A value of 0 means no message, higher numbers means more messages.");
   alist.add ("debug", 0);
-  syntax.add ("upstream_weight", Syntax::Fraction(), Syntax::Const, "\
+  syntax.add ("upstream_weight", Value::Fraction(), Value::Const, "\
 Upstream weighting factor: 1 = full upstream formulation, 0.5 = equal weight.");
   alist.add ("upstream_weight", 1.0);
 }

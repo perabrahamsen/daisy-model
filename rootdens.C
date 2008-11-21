@@ -41,7 +41,7 @@ void
 Rootdens::load_base (Syntax& syntax, AttributeList& alist)
 {
   Model::load_model (syntax, alist);
-  syntax.add ("SpRtLength", "m/g", Check::positive (), Syntax::Const,
+  syntax.add ("SpRtLength", "m/g", Check::positive (), Value::Const,
 	      "Specific root length");
   alist.add ("SpRtLength", 100.0);
 }

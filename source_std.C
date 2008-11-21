@@ -69,7 +69,7 @@ SourceStandard::load (Treelog& msg)
 
   // Read dimensions.
   const symbol original (lex.dimension (tag_c));
-  if (original != Syntax::Unknown () && dimension_ == Syntax::Unknown ())
+  if (original != Value::Unknown () && dimension_ == Value::Unknown ())
     dimension_ = original;
   else if (!has_factor && !units.can_convert (original, dimension_))
     {
@@ -141,7 +141,7 @@ SourceStandard::SourceStandard (Block& al)
     units (al.units ()),
     tag (al.name ("tag")),
     title_ (al.name ("title", tag)),
-    dimension_ (al.name ("dimension", Syntax::Unknown ())),
+    dimension_ (al.name ("dimension", Value::Unknown ())),
     has_factor (al.check ("factor")),
     factor (al.number ("factor", 1.0))
 { }
@@ -164,13 +164,13 @@ By default the same as 'tag'.");
     alist.add ("description", "\
 Read a a single column from a Daisy log, weather or data file.");
 
-    syntax.add ("tag", Syntax::String, Syntax::Const, "\
+    syntax.add ("tag", Value::String, Value::Const, "\
 Name of column in Daisy log file where data is found.");
-    syntax.add ("dimension", Syntax::String, Syntax::OptionalConst, "\
+    syntax.add ("dimension", Value::String, Value::OptionalConst, "\
 Dimension of data to plot.\n\
 By default this is the same as 'original'.\n\
 If 'factor' is not specified, Daisy will attempt to convert the data.");
-    syntax.add ("factor", Syntax::Unknown (), Syntax::OptionalConst, "\
+    syntax.add ("factor", Value::Unknown (), Value::OptionalConst, "\
 Multiply all data by this number.\n\
 By default Daisy will convert from 'original' to 'dimension'.");
 

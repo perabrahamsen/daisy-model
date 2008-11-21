@@ -59,7 +59,7 @@ public:
   bool is_optional (const symbol) const;
   bool is_log (const symbol) const;
   bool is_state (const symbol) const;
-  Syntax::type lookup (const symbol) const;
+  Value::type lookup (const symbol) const;
   const Syntax& syntax (const symbol) const;
   ::Library& library (const Metalib&, const symbol) const;
   int  size (const symbol) const;
@@ -72,105 +72,105 @@ public:
   // Add attribute types.
 public:
   void add (const symbol key,	// Generic.
-	    Syntax::type t, 
-	    Syntax::category cat,
+	    Value::type t, 
+	    Value::category cat,
 	    int size,
 	    const symbol description);
   void add (const symbol key,
-	    Syntax::type t, 
-	    Syntax::category cat,
+	    Value::type t, 
+	    Value::category cat,
 	    const symbol description)
-  { add (key, t, cat, Syntax::Singleton, description); }
+  { add (key, t, cat, Value::Singleton, description); }
 
   void add (const symbol key, // Number.
 	    const symbol dim,
-	    Syntax::category cat,
+	    Value::category cat,
 	    int size,
 	    const symbol description);
   void add (const symbol key, 
 	    const symbol dim,
-	    Syntax::category cat,
+	    Value::category cat,
 	    const symbol description)
-  { add (key, dim, cat, Syntax::Singleton, description); } 
+  { add (key, dim, cat, Value::Singleton, description); } 
   void add (const symbol key,
 	    const symbol dim,
 	    const Check& check,
-	    Syntax::category cat,
+	    Value::category cat,
 	    int size,
 	    const symbol description);
   void add (const symbol key, 
 	    const symbol dim,
 	    const Check& check,
-	    Syntax::category cat,
+	    Value::category cat,
 	    const symbol description)
-  { add (key, dim, check, cat, Syntax::Singleton, description); } 
+  { add (key, dim, check, cat, Value::Singleton, description); } 
   void add_fraction (const symbol key, 
-		     Syntax::category cat,
+		     Value::category cat,
 		     int size,
 		     const symbol description);
   void add_fraction (const symbol key, 
-		     Syntax::category cat,
+		     Value::category cat,
 		     const symbol description);
 
   void add (const symbol key, // PLF.
 	    const symbol domain,
 	    const symbol range,
-	    Syntax::category cat,
+	    Value::category cat,
 	    int size,
 	    const symbol description);
   void add (const symbol key, 
 	    const symbol domain,
 	    const symbol range,
-	    Syntax::category cat,
+	    Value::category cat,
 	    const symbol description)
-  { add (key, domain, range, cat, Syntax::Singleton, description); } 
+  { add (key, domain, range, cat, Value::Singleton, description); } 
   void add (const symbol key,
 	    const symbol domain,
 	    const symbol range,
 	    const Check& check,
-	    Syntax::category cat,
+	    Value::category cat,
 	    int size,
 	    const symbol description);
   void add (const symbol key, 
 	    const symbol domain,
 	    const symbol range,
 	    const Check& check,
-	    Syntax::category cat,
+	    Value::category cat,
 	    const symbol description)
-  { add (key, domain, range, check, cat, Syntax::Singleton, description); } 
+  { add (key, domain, range, check, cat, Value::Singleton, description); } 
 
   void add (const symbol key,  // AList
 	    const Syntax& syntax,
 	    int size,
 	    const symbol description)
-  { add (key, syntax, Syntax::State, size, description); }
+  { add (key, syntax, Value::State, size, description); }
   void add (const symbol key,  // AList
 	    const Syntax& syntax,
 	    const symbol description)
-  { add (key, syntax, Syntax::State, Syntax::Singleton, description); }
+  { add (key, syntax, Value::State, Value::Singleton, description); }
   void add (const symbol, const Syntax&,
-	    Syntax::category cat, int size, 
+	    Value::category cat, int size, 
 	    const symbol description);
   void add (const symbol, const Syntax&, const AttributeList&,	
 	    // Alist sequence with default element.
-	    Syntax::category, int size, const symbol description);
+	    Value::category, int size, const symbol description);
 
   void add_object (const symbol key,// Object
                    const char *const lib, 
                    const symbol description)
-  { add_object (key, lib, Syntax::State, Syntax::Singleton, description); }
+  { add_object (key, lib, Value::State, Value::Singleton, description); }
   void add_object (const symbol, const char* lib,
-                   Syntax::category, int size, const symbol description);
+                   Value::category, int size, const symbol description);
   void add_object (const symbol, symbol lib,
-                   Syntax::category, int size, const symbol description);
+                   Value::category, int size, const symbol description);
 
   void add_library (const symbol, symbol lib);
 
   typedef void (*load_syntax_fun) (Syntax& syntax, AttributeList& alist);
   void add_submodule (const symbol name, AttributeList& alist,
-		      Syntax::category cat, const symbol description,
+		      Value::category cat, const symbol description,
 		      load_syntax_fun load_syntax);
-  void add_submodule_sequence (const symbol name, Syntax::category cat, 
+  void add_submodule_sequence (const symbol name, Value::category cat, 
 			       const symbol description,
 			       load_syntax_fun load_syntax);
 

@@ -48,24 +48,27 @@ public:
   static const char *const component;
   symbol library_id () const;
 
+  // Type.
+public:
+  virtual symbol dimension (symbol) const = 0;
+
+  // Value.
+public:
+  virtual double number (symbol) const = 0;
+  virtual symbol name (symbol) const;
+  virtual int integer (symbol) const;
+
   // Use.
 public:
   symbol title () const;
-
+  
   virtual const std::vector<symbol>& all_numbers () const = 0;
   bool is_number (symbol) const;
   virtual bool has_number (symbol) const = 0;
-  virtual double number (symbol) const = 0;
-  virtual symbol dimension (symbol) const = 0;
-
   virtual bool has_name (symbol) const;
-  virtual symbol name (symbol) const;
-
   virtual bool has_integer (symbol) const;
-  virtual int integer (symbol) const;
-
   virtual symbol get_description (symbol) const = 0;
-
+  
   // Create and Destroy.
 private:
   Scope (const Scope&);

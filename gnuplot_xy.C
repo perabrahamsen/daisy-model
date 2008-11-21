@@ -410,33 +410,33 @@ static struct GnuplotXYSyntax
     alist.add ("description",
                "Generate a gnuplot graph with up to two x-axes."); 
 
-    syntax.add ("xmin", Syntax::User (), Syntax::OptionalConst, "\
+    syntax.add ("xmin", Value::User (), Value::OptionalConst, "\
 Fixed lowest value on left x-axis.\n\
 By default determine this from the data.");
-    syntax.add ("xmax", Syntax::User (), Syntax::OptionalConst, "\
+    syntax.add ("xmax", Value::User (), Value::OptionalConst, "\
 Fixed highest value on right x-axis.\n\
 By default determine this from the data.");
-    syntax.add ("x2min", Syntax::User (), Syntax::OptionalConst, "\
+    syntax.add ("x2min", Value::User (), Value::OptionalConst, "\
 Fixed lowest value on left x-axis.\n\
 By default determine this from the data.");
-    syntax.add ("x2max", Syntax::User (), Syntax::OptionalConst, "\
+    syntax.add ("x2max", Value::User (), Value::OptionalConst, "\
 Fixed highest value on right x-axis.\n\
 By default determine this from the data.");
-    syntax.add ("ymin", Syntax::User (), Syntax::OptionalConst, "\
+    syntax.add ("ymin", Value::User (), Value::OptionalConst, "\
 Fixed lowest value on left y-axis.\n\
 By default determine this from the data.");
-    syntax.add ("ymax", Syntax::User (), Syntax::OptionalConst, "\
+    syntax.add ("ymax", Value::User (), Value::OptionalConst, "\
 Fixed highest value on right y-axis.\n\
 By default determine this from the data.");
-    syntax.add ("y2min", Syntax::User (), Syntax::OptionalConst, "\
+    syntax.add ("y2min", Value::User (), Value::OptionalConst, "\
 Fixed lowest value on left y-axis.\n\
 By default determine this from the data.");
-    syntax.add ("y2max", Syntax::User (), Syntax::OptionalConst, "\
+    syntax.add ("y2max", Value::User (), Value::OptionalConst, "\
 Fixed highest value on right y-axis.\n\
 By default determine this from the data.");
                 
-    syntax.add_object ("source", XYSource::component, Syntax::State, 
-                       Syntax::Sequence, "\
+    syntax.add_object ("source", XYSource::component, Value::State, 
+                       Value::Sequence, "\
 XY series to plot.");
     Librarian::add_type (Gnuplot::component, "xy", alist, syntax, &make);
   }

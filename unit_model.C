@@ -106,7 +106,7 @@ UnitSI::load_syntax (Syntax& syntax, AttributeList& alist)
     {
       const std::string unit = base_unit[i].unit;
       const std::string dimension = base_unit[i].dimension;
-      syntax.add (dimension, Syntax::Integer, Syntax::Const, "\
+      syntax.add (dimension, Value::Integer, Value::Const, "\
 Dimension, base unit [" + unit + "].");
       alist.add (dimension, 0);
     }
@@ -213,7 +213,7 @@ static struct UnitSIFactorSyntax
     alist.add ("description", "\
 Connvert to SI base units by multiplying with a factor.");
     UnitSI::load_syntax (syntax, alist);
-    syntax.add ("factor", Syntax::None (), Check::non_zero (), Syntax::Const, "\
+    syntax.add ("factor", Value::None (), Check::non_zero (), Value::Const, "\
 Factor to multiply with to get base unit.");
     Librarian::add_type (MUnit::component, name, alist, syntax, &make);
 
@@ -238,9 +238,9 @@ Factor to multiply with to get base unit.");
     static const double u_g = 1.0 / p_k;         // Gram.
 
     // Unitless.
-    add (Syntax::None (), 1.0, name, syntax, alist, 0, 0, 0, 0, 0, 0, 0,
+    add (Value::None (), 1.0, name, syntax, alist, 0, 0, 0, 0, 0, 0, 0,
          "Unitless.");
-    add (Syntax::Fraction (), 1.0, name, syntax, alist, 0, 0, 0, 0, 0, 0, 0,
+    add (Value::Fraction (), 1.0, name, syntax, alist, 0, 0, 0, 0, 0, 0, 0,
          "Unitless.");
     add ("", 1.0, name, syntax, alist, 0, 0, 0, 0, 0, 0, 0,
          "Unitless.");
@@ -639,7 +639,7 @@ static struct UnitBaseSyntax
          "Degrees North of Equator.");
 
     // Unknown unit.
-    add (Syntax::Unknown (), name, syntax, alist, 
+    add (Value::Unknown (), name, syntax, alist, 
          "Nothing is known about the dimension of this unit.");
     add (Units::error_symbol (), name, syntax, alist, 
          "Bogus unit.");
@@ -697,10 +697,10 @@ static struct UnitFactorSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "\
 Connvert to base units by multiplying with a factor.");
-    syntax.add ("base", Syntax::String, Syntax::Const, "\
+    syntax.add ("base", Value::String, Value::Const, "\
 Base unit to convert to and from.");
     // TODO: Should add check that 'base' is indeed a base unit.
-    syntax.add ("factor", Syntax::None (), Check::non_zero (), Syntax::Const, "\
+    syntax.add ("factor", Value::None (), Check::non_zero (), Value::Const, "\
 Factor to multiply with to get base unit.");
     Librarian::add_type (MUnit::component, name, alist, syntax, &make);
 
@@ -773,13 +773,13 @@ static struct UnitOffsetSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "\
 Connvert to base units by multiplying factor, then substracting offset.");
-    syntax.add ("base", Syntax::String, Syntax::Const, "\
+    syntax.add ("base", Value::String, Value::Const, "\
 Base unit to convert to and from.");
     // TODO: Should add check that 'base' is indeed a base unit.
-    syntax.add ("factor", Syntax::None (), Check::non_zero (), Syntax::Const, "\
+    syntax.add ("factor", Value::None (), Check::non_zero (), Value::Const, "\
 Factor to multiply with to get base unit.");
     alist.add ("factor", 1.0);
-    syntax.add ("offset", Syntax::None (), Syntax::Const, "\
+    syntax.add ("offset", Value::None (), Value::Const, "\
 Offset to add after multiplying with factor to get base unit.");
     alist.add ("offset", 0.0);
     Librarian::add_type (MUnit::component, name, alist, syntax, &make);

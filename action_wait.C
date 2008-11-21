@@ -219,12 +219,12 @@ Wait until the specified condition is true.");
       syntax.add_check (check_days);	
       alist.add ("description", "\
 Waits the specified number of days.");
-      syntax.add ("days", Syntax::Integer, Syntax::Const, 
+      syntax.add ("days", Value::Integer, Value::Const, 
 		  "Wait this number of days.");
-      syntax.add ("hours", Syntax::Integer, Syntax::Const, 
+      syntax.add ("hours", Value::Integer, Value::Const, 
 		  "Wait this number of hours.");
       alist.add ("hours", 0);
-      syntax.add_submodule ("end_time", alist, Syntax::OptionalState,
+      syntax.add_submodule ("end_time", alist, Value::OptionalState,
 		  "Wait until this date.\
 Setting this overrides the 'days' and 'hours' parameters.", Time::load_syntax);
       syntax.order ("days");
@@ -236,12 +236,12 @@ Setting this overrides the 'days' and 'hours' parameters.", Time::load_syntax);
       syntax.add_check (check_days);	
       alist.add ("description", "\
 Waits the specified number of hours.");
-      syntax.add ("days", Syntax::Integer, Syntax::Const, 
+      syntax.add ("days", Value::Integer, Value::Const, 
 		  "Wait this number of days.");
       alist.add ("days", 0);
-      syntax.add ("hours", Syntax::Integer, Syntax::Const, 
+      syntax.add ("hours", Value::Integer, Value::Const, 
 		  "Wait this number of hours.");
-      syntax.add_submodule ("end_time", alist, Syntax::OptionalState,
+      syntax.add_submodule ("end_time", alist, Value::OptionalState,
 		  "Wait until this date.\
 Setting this overrides the 'days' and 'hours' parameters.", Time::load_syntax);
       syntax.order ("hours");
@@ -253,11 +253,11 @@ Setting this overrides the 'days' and 'hours' parameters.", Time::load_syntax);
       syntax.add_check (check_mm_dd);	
       alist.add ("description", "\
 Wait until a specific month and day in the year.");
-      syntax.add ("month", Syntax::Integer, Syntax::Const, 
+      syntax.add ("month", Value::Integer, Value::Const, 
 		  "Wait until this month.");
-      syntax.add ("day", Syntax::Integer, Syntax::Const, 
+      syntax.add ("day", Value::Integer, Value::Const, 
 		  "Wait until this day in the month.");
-      syntax.add ("hour", Syntax::Integer, Syntax::Const, 
+      syntax.add ("hour", Value::Integer, Value::Const, 
 		  "Wait until this hour.");
       alist.add ("hour", 8);
       syntax.order ("month", "day");

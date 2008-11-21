@@ -98,16 +98,16 @@ static struct GnuplotMultiSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description",
                "Generate multiple graphs for the gnuplot command file."); 
-    syntax.add ("before", Syntax::String, Syntax::Const, 
-                Syntax::Sequence, "List of extra gnuplot commands.\n\
+    syntax.add ("before", Value::String, Value::Const, 
+                Value::Sequence, "List of extra gnuplot commands.\n\
 The commands will be inserted right before the first graph.");
     alist.add ("before", std::vector<symbol> ());
-    syntax.add ("after", Syntax::String, Syntax::Const, 
-                Syntax::Sequence, "List of extra gnuplot commands.\n\
+    syntax.add ("after", Value::String, Value::Const, 
+                Value::Sequence, "List of extra gnuplot commands.\n\
 The commands will be inserted right after the last graph.");
     alist.add ("after", std::vector<symbol> ());
-    syntax.add_object ("graph", Gnuplot::component, Syntax::State, 
-                       Syntax::Sequence, "Graphs to plot.");
+    syntax.add_object ("graph", Gnuplot::component, Value::State, 
+                       Value::Sequence, "Graphs to plot.");
 
     Librarian::add_type (Gnuplot::component, "multi", alist, syntax, &make);
   }

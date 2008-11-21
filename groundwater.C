@@ -70,7 +70,7 @@ Groundwater::output (Log& log) const
 void
 Groundwater::load_syntax (Syntax& syntax, AttributeList&)
 {
-  syntax.add ("height", "cm", Syntax::LogOnly,
+  syntax.add ("height", "cm", Value::LogOnly,
 	      "Groundwater level.  Positive numbers indicate free drainage.");
 }
 

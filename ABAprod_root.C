@@ -132,7 +132,7 @@ The assumptions are that that each length of root will produce ABA\n\
 with a rate that depends solely on the water pressure in that cell,\n\
 and that all the ABA will be included in the water uptake.");
     syntax.add_object ("expr", Number::component, 
-                       Syntax::Const, Syntax::Singleton, "\
+                       Value::Const, Value::Singleton, "\
 Expression to evaluate to ABA production per root length [g/cm/h].\n\
 The symbol 'h' will be bound to the water pressure [cm].");
     Librarian::add_type (ABAProd::component, "root", alist, syntax, &make);

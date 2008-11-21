@@ -96,37 +96,37 @@ daisy_syntax_check (const Syntax* syntax, const AttributeList* alist,
 
 extern "C" void EXPORT
 daisy_syntax_add (Syntax* syntax, const char* name,
-		  Syntax::category cat, Syntax::type type, int size)
+		  Value::category cat, Value::type type, int size)
 { syntax->add (name, type, cat, size, "added from C API"); }
 
 extern "C" void EXPORT
 daisy_syntax_add_alist (Syntax* syntax, const char* name,
-			Syntax::category cat, Syntax* nested, int size)
+			Value::category cat, Syntax* nested, int size)
 { syntax->add (name, *nested, cat, size, "added from C API"); }
 
 extern "C" int EXPORT
 daisy_category_number (const char* name)
-{ return Syntax::category_number (name); }
+{ return Value::category_number (name); }
 
 extern "C" const char* EXPORT
-daisy_category_name (Syntax::category number)
-{ return Syntax::category_name (number).name ().c_str (); }
+daisy_category_name (Value::category number)
+{ return Value::category_name (number).name ().c_str (); }
 
 extern "C" int EXPORT
 daisy_size_sequence ()
-{ return Syntax::Sequence; }
+{ return Value::Sequence; }
 
 extern "C" int EXPORT
 daisy_size_singleton ()
-{ return Syntax::Singleton; }
+{ return Value::Singleton; }
 
 extern "C" int EXPORT
 daisy_type_number (const char* name)
-{ return Syntax::type_number (name); }
+{ return Value::type_number (name); }
 
 extern "C" const char* EXPORT
-daisy_type_name (Syntax::type number)
-{ return Syntax::type_name (number).name ().c_str (); }
+daisy_type_name (Value::type number)
+{ return Value::type_name (number).name ().c_str (); }
 
 // @ The daisy_alist Type.
 
@@ -212,7 +212,7 @@ daisy_alist_size_alist (const AttributeList* alist, const char* name)
 {
   // KLUDGE: Work around the use of non-sequence value as the default
   // for each element in the sequence.
-  if (alist->size (name) == Syntax::Singleton)
+  if (alist->size (name) == Value::Singleton)
     return 0;
   
   return alist->alist_sequence (name).size (); }

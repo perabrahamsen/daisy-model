@@ -129,16 +129,16 @@ SummaryBalance::print_entries (std::ostream& out, const std::vector<symbol>& nam
                                const int max_size, const int width, 
                                const int hours) const
 {
-  symbol dim = Syntax::User ();
+  symbol dim = Value::User ();
   for (unsigned int i = 0; i < fetch.size (); i++)
     {
       if (!in_list (i, names))
         continue;
           
-      if (dim == Syntax::User ())
+      if (dim == Value::User ())
         dim = fetch[i]->dimension (period);
       else if (fetch[i]->dimension (period) != dim)
-        dim = Syntax::Unknown ();
+        dim = Value::Unknown ();
 
       out << std::string (max_size - fetch[i]->name_size (), ' ');
       fetch[i]->summarize (out, width, period, hours);
@@ -157,7 +157,7 @@ SummaryBalance::print_balance (std::ostream& out,
       << std::string (max_size - title.name ().size (), ' ') << title << " = ";
   out.width (width);
   out << total;
-  if (dim != Syntax::Unknown ())
+  if (dim != Value::Unknown ())
     out << " [" << dim << "]";
   out << "\n";
 }
@@ -202,7 +202,7 @@ SummaryBalance::summarize (const int hours, Treelog& msg) const
                          fetch[i]->dimension (period).name ().size ());
 
   // Print all entries.
-  symbol shared_dim = Syntax::User ();
+  symbol shared_dim = Value::User ();
   if (input.size () > 0)
     {
       const symbol dim = print_entries (tmp, input, max_size, width, hours);
@@ -217,10 +217,10 @@ SummaryBalance::summarize (const int hours, Treelog& msg) const
       const symbol dim = print_entries (tmp, output, max_size, width, hours);
       print_balance (tmp, "Total output", total_output, dim,
                      dim_size, max_size, width);
-      if (shared_dim == Syntax::User ()) 
+      if (shared_dim == Value::User ()) 
         shared_dim = dim;
       else if (dim != shared_dim)
-        shared_dim = Syntax::Unknown ();
+        shared_dim = Value::Unknown ();
       tmp << "\n";
     }
 
@@ -229,10 +229,10 @@ SummaryBalance::summarize (const int hours, Treelog& msg) const
       const symbol dim = print_entries (tmp, content, max_size, width, hours);
       print_balance (tmp, content_title, total_content, dim,
                      dim_size, max_size, width);
-      if (shared_dim == Syntax::User ()) 
+      if (shared_dim == Value::User ()) 
         shared_dim = dim;
       else if (dim != shared_dim)
-        shared_dim = Syntax::Unknown ();
+        shared_dim = Value::Unknown ();
       tmp << "\n";
     }
 
@@ -260,30 +260,30 @@ static struct SummaryBalanceSyntax
     {
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
-      syntax.add ("description", Syntax::String, Syntax::Const,
+      syntax.add ("description", Value::String, Value::Const,
 		  "Description of this summary format.");
       alist.add ("description", SummaryBalance::default_description);
-      syntax.add ("where", Syntax::String, Syntax::OptionalConst,
+      syntax.add ("where", Value::String, Value::OptionalConst,
                   "File name to store the summary.\n\
 By default, the summary will be stored in daisy.log and the screen.");
-      syntax.add ("title", Syntax::String, Syntax::OptionalConst,
+      syntax.add ("title", Value::String, Value::OptionalConst,
 		  "Title of this summary.\n\
 By default, use the name of the parameterization.");
-      syntax.add ("period", Syntax::String, Syntax::OptionalConst, "\
+      syntax.add ("period", Value::String, Value::OptionalConst, "\
 Set this to 'y', 'm', 'w', 'd' or 'h' to get fluxes per time period\n\
 instead of total amount.");
-      syntax.add ("precision", Syntax::Integer, Syntax::Const,
+      syntax.add ("precision", Value::Integer, Value::Const,
 		  "Number of digits to print after decimal point.");
       alist.add ("precision", 2);
-      syntax.add ("require_top", Syntax::Boolean, Syntax::Const, "\
+      syntax.add ("require_top", Value::Boolean, Value::Const, "\
 If the balance only hold true when logging the top of the soil, i.e. the\n\
 `from' parameter of the log model is 0, this flag should be set.");
       alist.add ("require_top", false);
-      syntax.add ("input", Syntax::String, Syntax::Const, Syntax::Sequence,
+      syntax.add ("input", Value::String, Value::Const, Value::Sequence,
                   "Tags of columns in log file representing inputs.");
-      syntax.add ("output", Syntax::String, Syntax::Const, Syntax::Sequence,
+      syntax.add ("output", Value::String, Value::Const, Value::Sequence,
                   "Tags of columns in log file representing outputs.");
-      syntax.add ("content", Syntax::String, Syntax::Const, Syntax::Sequence,
+      syntax.add ("content", Value::String, Value::Const, Value::Sequence,
                   "Tags of columns in log file representing content.");
       Librarian::add_type (Summary::component, "balance", alist, syntax, &make);
     }

@@ -793,28 +793,28 @@ UZRichard::~UZRichard ()
 void 
 UZRichard::load_syntax (Syntax& syntax, AttributeList& alist)
 {
-  syntax.add ("debug", Syntax::Integer, Syntax::Const, "\
+  syntax.add ("debug", Value::Integer, Value::Const, "\
 Print additional debug messages, higher numbers means more messages.");
   alist.add ("debug", 1);
   syntax.add ("max_time_step_reductions",
-              Syntax::Integer, Syntax::Const, "\
+              Value::Integer, Value::Const, "\
 Number of times we may reduce the time step before giving up");
   alist.add ("max_time_step_reductions", 4);
-  syntax.add ("time_step_reduction", Syntax::Integer, Syntax::Const, 
+  syntax.add ("time_step_reduction", Value::Integer, Value::Const, 
               "Divide the time step with this at each reduction.");
   alist.add ("time_step_reduction", 4);
-  syntax.add ("max_iterations", Syntax::Integer, Syntax::Const, "\
+  syntax.add ("max_iterations", Value::Integer, Value::Const, "\
 Maximum number of iterations when seeking convergence before reducing\n\
 the time step.");
   alist.add ("max_iterations", 25);
-  syntax.add ("max_absolute_difference", "cm", Syntax::Const, "\
+  syntax.add ("max_absolute_difference", "cm", Value::Const, "\
 Maximum absolute difference in 'h' values for convergence.");
   alist.add ("max_absolute_difference", 0.02);
-  syntax.add ("max_relative_difference", Syntax::None (), Syntax::Const, "\
+  syntax.add ("max_relative_difference", Value::None (), Value::Const, "\
 Maximum relative difference in 'h' values for convergence.");
   alist.add ("max_relative_difference", 0.001);
   syntax.add_object ("K_average", Average::component,
-                     Syntax::OptionalConst, Syntax::Singleton,
+                     Value::OptionalConst, Value::Singleton,
                      "Model for calculating average K between cells.\n\
 The default model is 'geometric' if there are macropores, and\n\
 'arithmetic' otherwise.");

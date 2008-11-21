@@ -662,29 +662,29 @@ SoilHeat::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   alist.add ("submodel", "SoilHeat");
   alist.add ("description", "Temperature and heat flux in soil.");
-  Geometry::add_layer (syntax, Syntax::OptionalState, "T", "dg C",
+  Geometry::add_layer (syntax, Value::OptionalState, "T", "dg C",
                        "Soil temperature.");
-  syntax.add ("S", "erg/cm^3/h", Syntax::OptionalState, 
+  syntax.add ("S", "erg/cm^3/h", Value::OptionalState, 
               "External heat source, by default zero.");
-  syntax.add ("conductivity", "erg/cm/dg C/h", Syntax::LogOnly, 
+  syntax.add ("conductivity", "erg/cm/dg C/h", Value::LogOnly, 
               "Heat conductivity.");
-  syntax.add ("capacity", "erg/cm^3/dg C", Syntax::LogOnly, 
+  syntax.add ("capacity", "erg/cm^3/dg C", Value::LogOnly, 
               "Heat capacity.");
-  syntax.add ("h_frozen", "cm^-1", Syntax::Const,
+  syntax.add ("h_frozen", "cm^-1", Value::Const,
               "Pressure below which no more water will freeze.");
   alist.add ("h_frozen", -15000.0);
-  syntax.add ("enable_ice", Syntax::Boolean, Syntax::Const,
+  syntax.add ("enable_ice", Value::Boolean, Value::Const,
               "Disable this to prevent water from freezing.");
   alist.add ("enable_ice", false);
-  syntax.add ("T_top", "dg C", Syntax::OptionalState, 
+  syntax.add ("T_top", "dg C", Value::OptionalState, 
               "Surface temperature at previous time step.");
-  syntax.add ("T_freezing", "dg C", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("T_freezing", "dg C", Value::LogOnly, Value::Sequence,
               "Freezing point depression for freezing.");
-  syntax.add ("T_thawing", "dg C", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("T_thawing", "dg C", Value::LogOnly, Value::Sequence,
               "Freezing point depression for thawing.");
-  syntax.add ("q", "erg/cm^2/h", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("q", "erg/cm^2/h", Value::LogOnly, Value::Sequence,
               "Heat flux.");
-  syntax.add ("state", Syntax::Unknown (), Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("state", Value::Unknown (), Value::LogOnly, Value::Sequence,
               "Current freezing/melting state.");
 }
 

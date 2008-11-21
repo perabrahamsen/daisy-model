@@ -205,99 +205,99 @@ Default crop nitrogen parameters.");
 
   // Content.
   syntax.add ("PtLeafCnc", "DS", " g N/g DM", Check::non_negative (),
-	      Syntax::Const,
+	      Value::Const,
 	      "Upper limit for N-concentration in leaves.");
   syntax.add ("CrLeafCnc", "DS", " g N/g DM", Check::non_negative (),
-	      Syntax::Const,
+	      Value::Const,
 	      "Critical limit for N-concentration in leaves.");
   syntax.add ("NfLeafCnc", "DS", " g N/g DM", Check::non_negative (),
-	      Syntax::Const, "\
+	      Value::Const, "\
 Non-functional limit for N-concentration in leaves.");
   syntax.add ("PtStemCnc", "DS", " g N/g DM", Check::non_negative (),
-              Syntax::Const,
+              Value::Const,
 	      "Upper limit for N-concentration in stem.");
   syntax.add ("CrStemCnc", "DS", " g N/g DM", Check::non_negative (),
-              Syntax::Const,
+              Value::Const,
 	      "Critical limit for N-concentration in stem.");
   syntax.add ("NfStemCnc", "DS", " g N/g DM", Check::non_negative (),
-              Syntax::Const, "\
+              Value::Const, "\
 Non-functional limit for N-concentration in stem.");
   syntax.add ("PtSOrgCnc", "DS", " g N/g DM", Check::non_negative (),
-              Syntax::Const, "\
+              Value::Const, "\
 Upper limit for N-concentration in storage organ.");
   syntax.add ("CrSOrgCnc", "DS", " g N/g DM", Check::non_negative (),
-              Syntax::Const, "\
+              Value::Const, "\
 Critical limit for N-concentration in storage organ.");
   syntax.add ("NfSOrgCnc", "DS", " g N/g DM", Check::non_negative (),
-              Syntax::Const, "\
+              Value::Const, "\
 Non-functional limit for N-concentration in storage organ.");
   syntax.add ("PtRootCnc", "DS", " g N/g DM", Check::non_negative (),
-              Syntax::Const,
+              Value::Const,
 	      "Upper limit for N-concentration in roots.");
   syntax.add ("CrRootCnc", "DS", " g N/g DM", Check::non_negative (),
-              Syntax::Const,
+              Value::Const,
 	      "Critical limit for N-concentration in roots.");
   syntax.add ("NfRootCnc", "DS", " g N/g DM", Check::non_negative (),
-              Syntax::Const, "\
+              Value::Const, "\
 Non-functional lim for N-concentration in roots.");
-  syntax.add ("TLLeafEff", "DS", Syntax::Fraction (), Check::fraction (),
-	      Syntax::Const,
+  syntax.add ("TLLeafEff", "DS", Value::Fraction (), Check::fraction (),
+	      Value::Const,
 	      "Translocation effiency, Leaf.");
   PLF TLLeafEff;
   TLLeafEff.add (0.00, 0.90);
   TLLeafEff.add (2.00, 0.90);
   alist.add ("TLLeafEff", TLLeafEff);
-  syntax.add ("TLRootEff", "DS", Syntax::Fraction (), Check::fraction (),
-	      Syntax::Const,
+  syntax.add ("TLRootEff", "DS", Value::Fraction (), Check::fraction (),
+	      Value::Const,
 	      "Translocation effiency, Root.");
   PLF TLRootEff;
   TLRootEff.add (0.00, 0.10);
   TLRootEff.add (2.00, 0.10);
   alist.add ("TLRootEff", TLRootEff);
-  syntax.add ("PtNCnt", "g/m^2", Syntax::LogOnly,
+  syntax.add ("PtNCnt", "g/m^2", Value::LogOnly,
 	      "Potential nitrogen content in crop.");
-  syntax.add ("CrNCnt", "g/m^2", Syntax::LogOnly,
+  syntax.add ("CrNCnt", "g/m^2", Value::LogOnly,
 	      "Critical nitrogen content in crop.");
-  syntax.add ("NfNCnt", "g/m^2", Syntax::LogOnly,
+  syntax.add ("NfNCnt", "g/m^2", Value::LogOnly,
 	      "Non-functional nitrogen content in crop.");
 
   // Root uptake.
   syntax.add ("NO3_root_min", "g N/cm^3", Check::non_negative (), 
-	      Syntax::Const, "\
+	      Value::Const, "\
 Minimum nitrate concentration near roots for uptake.");
   alist.add ("NO3_root_min", 0.0);
   syntax.add ("NH4_root_min", "g N/cm^3", Check::non_negative (),
-	      Syntax::Const, "\
+	      Value::Const, "\
 Minimum ammonium concentration near roots for uptake.");
   alist.add ("NH4_root_min", 0.0);
 
   // Stress.
-  syntax.add ("nitrogen_stress", Syntax::None (), Check::fraction (),
-	      Syntax::LogOnly,
+  syntax.add ("nitrogen_stress", Value::None (), Check::fraction (),
+	      Value::LogOnly,
 	       "Nitrogen stress factor.");
   syntax.add ("nitrogen_stress_days", "d", Check::non_negative (),
-	      Syntax::State,
+	      Value::State,
 	       "Number of days production has halted due to nitrogen stress.\n\
 This is the sum of nitrogen stress for each hour, multiplied with the\n\
 action of the radition of that day that was received that hour.");
   alist.add ("nitrogen_stress_days", 0.0);
 
   // Fixation.
-  syntax.add ("DS_fixate", Syntax::None (), Syntax::Const,
+  syntax.add ("DS_fixate", Value::None (), Value::Const,
 	      "DS at which to start fixation of atmospheric N.");
   alist.add ("DS_fixate", 42000.0);
-  syntax.add ("DS_cut_fixate", Syntax::None (), Syntax::Const,
+  syntax.add ("DS_cut_fixate", Value::None (), Value::Const,
 	      "Restore fixation this DS after cut.");
   alist.add ("DS_cut_fixate", 0.0);
-  syntax.add ("fixate_factor", Syntax::None (), Syntax::Const,
+  syntax.add ("fixate_factor", Value::None (), Value::Const,
 	      "Fraction of needed N fixated by day.");
   alist.add ("fixate_factor", 0.8);
-  syntax.add ("Fixated", "g N/m^2/h", Syntax::LogOnly,
+  syntax.add ("Fixated", "g N/m^2/h", Value::LogOnly,
 	      "N fixation from air.");
-  syntax.add ("AccFixated", "g N/m^2", Syntax::LogOnly, 
+  syntax.add ("AccFixated", "g N/m^2", Value::LogOnly, 
 	      "Accumuated N fixation from air.");
   alist.add ("AccFixated", 0.0);
-  syntax.add ("DS_start_fixate", Syntax::None (), Syntax::OptionalState,
+  syntax.add ("DS_start_fixate", Value::None (), Value::OptionalState,
 	      "Development stage at which to restart fixation after a cut.");
 }
 

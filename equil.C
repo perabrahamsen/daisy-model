@@ -37,7 +37,7 @@ Equilibrium::library_id () const
 void
 Equilibrium::load_syntax (Syntax& syntax, AttributeList&)
 {
-  syntax.add ("description", Syntax::String, Syntax::OptionalConst,
+  syntax.add ("description", Value::String, Value::OptionalConst,
 	      "Description of this parameterization."); 
 }
 

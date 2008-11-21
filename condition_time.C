@@ -483,19 +483,19 @@ True after specific month, day and hour in the year.");
     after_alist.add ("hour", 8);
     after_alist.add ("minute", 0);
     after_alist.add ("second", 0);
-    syntax.add ("month", Syntax::Integer, Syntax::Const, 
+    syntax.add ("month", Value::Integer, Value::Const, 
 		"Month to test for.");
     syntax.add_check ("month", VCheck::valid_month ());
-    syntax.add ("day", Syntax::Integer, Syntax::Const, 
+    syntax.add ("day", Value::Integer, Value::Const, 
 		"Day in the month to test for.");
     syntax.add_check ("day", VCheck::valid_mday ());
-    syntax.add ("hour", Syntax::Integer, Syntax::Const, 
+    syntax.add ("hour", Value::Integer, Value::Const, 
 		"Hour to test for.");
     syntax.add_check ("hour", VCheck::valid_hour ());
-    syntax.add ("minute", Syntax::Integer, Syntax::Const, 
+    syntax.add ("minute", Value::Integer, Value::Const, 
 		"Minute to test for.");
     syntax.add_check ("hour", VCheck::valid_minute ());
-    syntax.add ("second", Syntax::Integer, Syntax::Const, 
+    syntax.add ("second", Value::Integer, Value::Const, 
 		"Second to test for.");
     syntax.add_check ("second", VCheck::valid_second ());
     syntax.order ("month", "day");
@@ -511,7 +511,7 @@ True after specific month, day and hour in the year.");
   {
     Syntax& syntax = *new Syntax ();
     AttributeList alist_time;
-    syntax.add_submodule ("time", alist_time, Syntax::Const,
+    syntax.add_submodule ("time", alist_time, Value::Const,
 			  "Fixed time to test for.", Time::load_syntax);
     AttributeList& alist_at = *new AttributeList (alist_time);
     alist_at.add ("description", "\
@@ -535,7 +535,7 @@ True, iff the simulation time is after the specified time.");
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "True, at the specified hour.");
-    syntax.add ("at", Syntax::Integer, Syntax::Const,
+    syntax.add ("at", Value::Integer, Value::Const,
                 "Hour when the condition is true [0-23].");
     syntax.add_check ("at", VCheck::valid_hour ());
     syntax.order ("at");
@@ -547,7 +547,7 @@ True, iff the simulation time is after the specified time.");
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "True, at the specified day in the month.");
-    syntax.add ("at", Syntax::Integer, Syntax::Const,
+    syntax.add ("at", Value::Integer, Value::Const,
 		"Day in the month when the condition is true [1-31].");
     syntax.add_check ("at", VCheck::valid_mday ());
     syntax.order ("at");
@@ -559,7 +559,7 @@ True, iff the simulation time is after the specified time.");
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "True, at the specified julian day.");
-    syntax.add ("at", Syntax::Integer, Syntax::Const,
+    syntax.add ("at", Value::Integer, Value::Const,
                 "Julian day when the condition is true [1-366].");
     static VCheck::IRange valid_jday (1, 366);
     syntax.add_check ("at", valid_jday);
@@ -572,7 +572,7 @@ True, iff the simulation time is after the specified time.");
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "True, at the specified month.");
-    syntax.add ("at", Syntax::Integer, Syntax::Const,
+    syntax.add ("at", Value::Integer, Value::Const,
                 "Month when the condition is true [1-12].");
     syntax.add_check ("at", VCheck::valid_month ());
     syntax.order ("at");
@@ -584,7 +584,7 @@ True, iff the simulation time is after the specified time.");
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "True, at the specified year.");
-    syntax.add ("at", Syntax::Integer, Syntax::Const,
+    syntax.add ("at", Value::Integer, Value::Const,
 		"Year when the condition is true.");
     syntax.add_check ("at", VCheck::valid_year ());
     syntax.order ("at");
@@ -601,7 +601,7 @@ It is true whenever 'operand' is true, but will let Daisy know what\n\
 in log files.");
     syntax.add_object ("operand", Condition::component, 
                        "Condition to use.");
-    syntax.add ("timestep", Syntax::String, Syntax::Const, "\
+    syntax.add ("timestep", Value::String, Value::Const, "\
 Timestep to use.");
     syntax.order ("operand", "timestep");
     Librarian::add_type (Condition::component, "timestep", alist, syntax,
@@ -790,7 +790,7 @@ private:
 public:
   static void load_syntax (Syntax& syntax, AttributeList& alist)
   {
-    syntax.add_submodule ("next", alist, Syntax::OptionalState,
+    syntax.add_submodule ("next", alist, Value::OptionalState,
                           "Time for next match.",
                           Time::load_syntax);
   }

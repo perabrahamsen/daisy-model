@@ -68,7 +68,7 @@ static struct ProgramCDSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Change working directory."); 
-    syntax.add ("directory", Syntax::String, Syntax::Const, "\
+    syntax.add ("directory", Value::String, Value::Const, "\
 Name of directory to change into.");
     syntax.order ("directory");
     Librarian::add_type (Program::component, "cd", alist, syntax, &make);
@@ -122,9 +122,9 @@ static struct ProgramWriteSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Write string to file."); 
-    syntax.add ("what", Syntax::String, Syntax::Const, "\
+    syntax.add ("what", Value::String, Value::Const, "\
 String to write.");
-    syntax.add ("where", Syntax::String, Syntax::Const, "\
+    syntax.add ("where", Value::String, Value::Const, "\
 File to write it in.\n\
 If the value is 'screen', write the string to the screen.");
     alist.add ("where", "screen");

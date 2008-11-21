@@ -246,7 +246,7 @@ void
 TertiaryOld::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   syntax.add_object ("macro", Macro::component,
-                     Syntax::OptionalState, Syntax::Singleton,
+                     Value::OptionalState, Value::Singleton,
                      "Preferential flow model.\n\
 By default, preferential flow is enabled if and only if the combined\n\
 amount of humus and clay in the top horizon is above 5%.");

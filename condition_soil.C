@@ -174,9 +174,9 @@ static struct ConditionSoilSyntax
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "\
 Test if the soil is warmer than the specified temperature.");
-      syntax.add ("temperature", "dg C", Syntax::Const, "\
+      syntax.add ("temperature", "dg C", Value::Const, "\
 Lowest soil temperature for which the condition is true.");
-      syntax.add ("height", "cm", Check::non_positive (), Syntax::Const, "\
+      syntax.add ("height", "cm", Check::non_positive (), Value::Const, "\
 Soil depth in which to test the temperature.");
       Librarian::add_type (Condition::component, "soil_temperature_above",
 				      alist, syntax, &make_temperature);
@@ -186,9 +186,9 @@ Soil depth in which to test the temperature.");
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "\
 Test if the soil is wetter than the specified pressure potential.");
-      syntax.add ("potential", "cm", Syntax::Const, "\
+      syntax.add ("potential", "cm", Value::Const, "\
 The soil should be wetter than this for the condition to be true.");
-      syntax.add ("height", "cm", Check::non_positive (), Syntax::Const, "\
+      syntax.add ("height", "cm", Check::non_positive (), Value::Const, "\
 Depth at which to example the pressure potential.");
       Librarian::add_type (Condition::component, "soil_water_pressure_above",
 				      alist, syntax, &make_potential);
@@ -199,12 +199,12 @@ Depth at which to example the pressure potential.");
       syntax.add_check (check_water_content);
       alist.add ("description", "\
 Test if the soil contains more water than the specified amount.");
-      syntax.add ("water", "mm", Check::non_negative (), Syntax::Const, "\
+      syntax.add ("water", "mm", Check::non_negative (), Value::Const, "\
 The soil should contain more water than this for the condition to be true.");
-      syntax.add ("from", "cm", Check::non_positive (), Syntax::Const, "\
+      syntax.add ("from", "cm", Check::non_positive (), Value::Const, "\
 Top of interval to measure soil water content in.");
       alist.add ("from", 0.0);
-      syntax.add ("to", "cm", Check::non_positive (), Syntax::Const, "\
+      syntax.add ("to", "cm", Check::non_positive (), Value::Const, "\
 Bottom of interval to measure soil water content in.");
       syntax.order ("water");
       Librarian::add_type (Condition::component, "soil_water_content_above",
@@ -217,13 +217,13 @@ Bottom of interval to measure soil water content in.");
       alist.add ("description", "\
 Test if the soil contains more mineral nitrogen than the specified amount.");
       syntax.add ("amount", "kg N/ha",
-		  Check::non_negative (), Syntax::Const, "\
+		  Check::non_negative (), Value::Const, "\
 The soil should contain more inorganic nitrogen than this for\n\
 the condition to be true.");
-      syntax.add ("from", "cm", Check::non_positive (), Syntax::Const, "\
+      syntax.add ("from", "cm", Check::non_positive (), Value::Const, "\
 Top of interval to measure soil content in.");
       alist.add ("from", 0.0);
-      syntax.add ("to", "cm", Check::non_positive (), Syntax::Const, "\
+      syntax.add ("to", "cm", Check::non_positive (), Value::Const, "\
 Bottom of interval to measure soil content in.");
       syntax.order ("amount");
       Librarian::add_type (Condition::component, "soil_inorganic_N_above",

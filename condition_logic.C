@@ -305,7 +305,7 @@ True iff all the listed conditions are true.\n\
 The conditions are tested in the sequence listed, until a false is found,\n\
 or the end of the list is reached.");
     syntax.add_object ("operands", Condition::component, 
-                       Syntax::State, Syntax::Sequence, "Conditions to test.");
+                       Value::State, Value::Sequence, "Conditions to test.");
     syntax.order ("operands");
     Librarian::add_type (Condition::component, "or", alist_or, syntax, &make_or);
     Librarian::add_type (Condition::component, "and", alist_and, syntax, &make_and);

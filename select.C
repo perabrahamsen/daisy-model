@@ -165,10 +165,10 @@ Select::Implementation::Spec::dimension () const
 {
   Syntax buffer;
   const Syntax& syntax = leaf_syntax (buffer);
-  if (syntax.lookup (leaf_name ()) == Syntax::Number)
+  if (syntax.lookup (leaf_name ()) == Value::Number)
     return symbol (syntax.dimension (leaf_name ()));
   else
-    return Syntax::Unknown ();
+    return Value::Unknown ();
 }
 
 symbol /* can't return reference because buffer is automatic */
@@ -226,18 +226,18 @@ Select::Implementation::Spec::check_path (const std::vector<symbol>& path,
     {
       const std::string name = path[i].name ();
       bool last = (i + 1 == path.size ());
-      const Syntax::type type = syntax->lookup (name);
+      const Value::type type = syntax->lookup (name);
 
       if (!last)
 	{
-	  if (type != Syntax::AList)
+	  if (type != Value::AList)
 	    {
 	      err.error ("'" + name + "': no such submodel");
 	      ok = false;
 	      break;
 	    }
 
-          if (syntax->size (name) != Syntax::Singleton || !alist->check (name))
+          if (syntax->size (name) != Value::Singleton || !alist->check (name))
             alist = &syntax->default_alist (name);
           else
             alist = &alist->alist (name);
@@ -247,7 +247,7 @@ Select::Implementation::Spec::check_path (const std::vector<symbol>& path,
             err.warning ("'" + name + "' is a fixed '" 
                          + alist->name ("submodel") + "' component");
 	}
-      else if (type == Syntax::Error)
+      else if (type == Value::Error)
 	{
 	  err.error ("'" + name + "': no such attribute");
 	  ok = false;
@@ -319,13 +319,13 @@ void
 Select::Implementation::Spec::load_syntax (Syntax& syntax, AttributeList&)
 { 
   syntax.add_object_check (check_alist);
-  syntax.add ("library", Syntax::String, Syntax::Const, "\
+  syntax.add ("library", Value::String, Value::Const, "\
 Name of library where the attribute belong.\n\
 Use 'fixed' to denote a fixed component.");
-  syntax.add ("model", Syntax::String, Syntax::Const, "\
+  syntax.add ("model", Value::String, Value::Const, "\
 Name of model or fixed component where the attribute belongs.");
-  syntax.add ("submodels_and_attribute", Syntax::String, 
-	      Syntax::Const, Syntax::Sequence, "\
+  syntax.add ("submodels_and_attribute", Value::String, 
+	      Value::Const, Value::Sequence, "\
 Name of submodels and attribute.");
   syntax.order ("library", "model", "submodels_and_attribute");
 }
@@ -365,7 +365,7 @@ bool
 Select::Implementation::check (const symbol spec_dim, Treelog& err) const
 {
   bool ok = true;
-  if (spec.get () && !spec_conv && spec->dimension () != Syntax::Unknown ())
+  if (spec.get () && !spec_conv && spec->dimension () != Value::Unknown ())
     err.warning ("Don't know how to convert [" + spec_dim
                  + "] to [" + dimension + "]");
   return ok;
@@ -468,7 +468,7 @@ Select::Implementation::Implementation (Block& al)
   : spec (al.check ("spec")
 	  ? submodel<Spec> (al, "spec")
 	  : NULL),
-    scope (x_symbol, Syntax::Unknown ()),
+    scope (x_symbol, Value::Unknown ()),
     spec_conv (NULL),
     expr (get_expr (al)),
     negate (al.flag ("negate")
@@ -477,7 +477,7 @@ Select::Implementation::Implementation (Block& al)
             /**/ .is_derived_from (al.name ("type"), flux_top_symbol)),
     tag (Select::select_get_tag (al.alist ())),
     dimension (al.check ("dimension")
-	       ? al.name ("dimension") : Syntax::Unknown ()),
+	       ? al.name ("dimension") : Value::Unknown ()),
     description (find_description (al.metalib (), al.alist ()))
 { }
   
@@ -626,22 +626,22 @@ Select::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   syntax.add_check (check_alist);
   alist.add ("base_model", "common");
-  syntax.add ("tag", Syntax::String, Syntax::OptionalConst,
+  syntax.add ("tag", Value::String, Value::OptionalConst,
 	      "Tag to identify the column.\n\
 These will be printed in the first line of the log file.\n\
 The default tag is the last element in the path.");
-  syntax.add ("dimension", Syntax::String, Syntax::OptionalConst,
+  syntax.add ("dimension", Value::String, Value::OptionalConst,
 	      "The unit for numbers in this column.\n\
 These will be printed in the second line of the log file.\n\
 The character '&' will be replaced with the log timestep.\n\
 If you do not specify the dimension explicitly, a value will\n\
 be interfered from 'spec' if available.");
-  syntax.add ("description", Syntax::String, Syntax::Const,
+  syntax.add ("description", Value::String, Value::Const,
 	      "A description of this column.");
   alist.add ("description", "\
 This is not a model, but a list of parameters shared by all select models.");
-  syntax.add ("path", Syntax::String, Syntax::Const, 
-	      Syntax::Sequence, "\
+  syntax.add ("path", Value::String, Value::Const, 
+	      Value::Sequence, "\
 Sequence of attribute names leading to the variable you want to log in\n\
 this column.  The first name should be one of the attributes of the\n\
 daisy component itself.  What to specify as the next name depends on\n\
@@ -664,7 +664,7 @@ values, they will be added before they are printed in the log file.\n\
 All values that start with a \"$\" will work like \"*\".  They are intended\n\
 to be mapped with the 'set' attribute in the 'table' log model.");
   syntax.add_check ("path", VCheck::min_size_1 ());
-  syntax.add_submodule ("spec", alist, Syntax::OptionalConst, "\
+  syntax.add_submodule ("spec", alist, Value::OptionalConst, "\
 Specification for the attribute to be logged of the form\n\
 \n\
   library model submodel* attribute\n\
@@ -675,14 +675,14 @@ wildcards, so only a single model can be matches.  The spec is used for\n\
 helping Daisy establish a unique dimension and description for the\n\
 attribute.", Select::Implementation::Spec::load_syntax);
   syntax.add_object ("when", Condition::component,
-                     Syntax::OptionalConst, Syntax::Singleton,
+                     Value::OptionalConst, Value::Singleton,
                      "\
 OBSOLETE.  If you set this variable, 'flux' will be set to true.\n\
 This overwrites any direct setting of 'flux'.");
-  syntax.add ("flux", Syntax::Boolean, Syntax::OptionalConst, "\
+  syntax.add ("flux", Value::Boolean, Value::OptionalConst, "\
 OBSOLETE.  This value will be used if 'handle' is not specified.\
 A value of true then means 'sum', and false means 'current'.");
-  syntax.add ("handle", Syntax::String, Syntax::OptionalConst, "\
+  syntax.add ("handle", Value::String, Value::OptionalConst, "\
 This option determine how the specified variable should be logged.  \n\
 \n\
 min: Log the smallest value seen since last time the variable was logged.\n\
@@ -707,30 +707,30 @@ If 'accumulate' is true, the printed values will be accumulated..");
   static VCheck::Enum handle_check ("min", "max", "average", "geometric", 
                                     "sum", "current");
   syntax.add_check ("handle", handle_check);
-  syntax.add ("interesting_content", Syntax::Boolean, Syntax::Const, "\
+  syntax.add ("interesting_content", Value::Boolean, Value::Const, "\
 True if the content of this column is interesting enough to warrent an\n\
 initial line in the log file.  This only affects non-flux variables.");
   alist.add ("interesting_content", true);
   syntax.add_object ("expr", Number::component, 
-                     Syntax::OptionalConst, Syntax::Singleton, "\
+                     Value::OptionalConst, Value::Singleton, "\
 Expression for findig the value for the log file, given the internal\n\
 value 'x'.  For example '(expr (ln x))' will give you the natural\n\
 logarithm of the value.");  
-  syntax.add ("factor", Syntax::Unknown (), Check::none (), Syntax::Const, "\
+  syntax.add ("factor", Value::Unknown (), Check::none (), Value::Const, "\
 Factor to multiply the calculated value with, before logging.\n\
 OBSOLETE: Use 'expr' instead.");
   alist.add ("factor", 1.0);
-  syntax.add ("offset", Syntax::Unknown (), Check::none (), Syntax::Const, "\
+  syntax.add ("offset", Value::Unknown (), Check::none (), Value::Const, "\
 Offset to add to the calculated value, before logging.\n\
 OBSOLETE: Use 'expr' instead.");
   alist.add ("offset", 0.0);
-  syntax.add ("negate", Syntax::Boolean, Syntax::Const, "\
+  syntax.add ("negate", Value::Boolean, Value::Const, "\
 Switch sign of value.  I.e. upward fluxes become downward fluxes.");
   alist.add ("negate", false);
-  syntax.add ("accumulate", Syntax::Boolean, Syntax::Const,
+  syntax.add ("accumulate", Value::Boolean, Value::Const,
 	      "Log accumulated values.");
   alist.add ("accumulate", false);
-  syntax.add ("count", Syntax::Integer, Syntax::State, "\
+  syntax.add ("count", Value::Integer, Value::State, "\
 Number of times the path has matched a variable since the last log entry.");
   alist.add ("count", 0);
 }
@@ -755,7 +755,7 @@ Select::initialize (const Units& units, const Volume&,
   if (impl->spec.get ())
     spec_dim = default_dimension (impl->spec->dimension ());
   else
-    spec_dim = Syntax::Unknown ();
+    spec_dim = Value::Unknown ();
 
   // Let the expression modify the dimension.
   impl->scope.set_dimension (Implementation::x_symbol, spec_dim);
@@ -771,7 +771,7 @@ Select::initialize (const Units& units, const Volume&,
       spec_dim = impl->expr->dimension (impl->scope);
     }
 
-  if (impl->dimension == Syntax::Unknown ())
+  if (impl->dimension == Value::Unknown ())
     impl->dimension = spec_dim;
 
   // Attempt to find convertion with original dimension.

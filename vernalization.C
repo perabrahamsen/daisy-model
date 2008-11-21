@@ -71,13 +71,13 @@ Vernalization::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("submodel", "Vernalization");
   alist.add ("description", "\
 Default crop vernalization submodel.");
-  syntax.add ("required", Syntax::Boolean, Syntax::OptionalConst,
+  syntax.add ("required", Value::Boolean, Value::OptionalConst,
 	      "True, iff the crop requires vernalization.");
-  syntax.add ("DSLim", Syntax::None (), Syntax::Const,
+  syntax.add ("DSLim", Value::None (), Value::Const,
 	      "Development stage at vernalization.");
-  syntax.add ("TaLim", "dg C", Syntax::Const,
+  syntax.add ("TaLim", "dg C", Value::Const,
 	      "Vernalization temperature threshold.");
-  syntax.add ("TaSum", "dg C d", Syntax::State,
+  syntax.add ("TaSum", "dg C d", Value::State,
 	      "Vernalization temperature-sum requirement.");
 }
 

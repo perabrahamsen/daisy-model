@@ -118,9 +118,9 @@ struct MovementRect::Point
   const double x;
   static void load_syntax (Syntax& syntax, AttributeList&)
   {
-    syntax.add ("z", "cm", Check::negative (), Syntax::Const, 
+    syntax.add ("z", "cm", Check::negative (), Value::Const, 
 		"Vertical position.");
-    syntax.add ("x", "cm", Check::positive (), Syntax::Const,
+    syntax.add ("x", "cm", Check::positive (), Value::Const,
 		"Horizontal position.");
     syntax.order ("z", "x");
   }
@@ -339,15 +339,15 @@ static struct MovementRectSyntax
 
     alist.add ("description", 
                "Two dimensional movement in a rectangular grid.");
-    syntax.add_submodule ("Geometry", alist, Syntax::Const,
+    syntax.add_submodule ("Geometry", alist, Value::Const,
                           "Discretization of the soil.",
                           GeometryRect::load_syntax);
-    syntax.add_submodule_sequence ("drain", Syntax::Const,
+    syntax.add_submodule_sequence ("drain", Value::Const,
 				   "Location of cells with drain pipes.",
 				   MovementRect::Point::load_syntax);
     alist.add ("drain", std::vector<const AttributeList*> ());
     syntax.add_object ("matrix_water", UZRect::component, 
-                       Syntax::Const, Syntax::Sequence,
+                       Value::Const, Value::Sequence,
                        "Matrix water transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends.");
@@ -360,7 +360,7 @@ If none succeeds, the simulation ends.");
     matrix_water_models.push_back (&matrix_water_none);
     alist.add ("matrix_water", matrix_water_models);
     syntax.add_object ("heat", Heatrect::component, 
-                       Syntax::Const, Syntax::Singleton, "\
+                       Value::Const, Value::Singleton, "\
 Heat transport model.");
     alist.add ("heat", Heatrect::default_model ());
 

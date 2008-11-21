@@ -130,7 +130,7 @@ By default the name of the 'expr' object.");
 Calculate a single value for each time step, based on the value\n\
 in the various columns.");
     syntax.add_object ("expr", Number::component, 
-                       Syntax::Const, Syntax::Singleton, "\
+                       Value::Const, Value::Singleton, "\
 Expression for calculating the value for this source for each row.\n\
 The expression can refer to the value in a specific column by the tag\n\
 for that column.");

@@ -320,27 +320,27 @@ void
 VolumeBox::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   syntax.add_object ("bottom", Bound::component, 
-                     Syntax::Const, Syntax::Singleton,
+                     Value::Const, Value::Singleton,
                      "Lower boundary on the z-axis.");
   alist.add ("bottom", Bound::none_model ());
   syntax.add_object ("top", Bound::component,
-                     Syntax::Const, Syntax::Singleton,
+                     Value::Const, Value::Singleton,
                      "Upper boundary on the z-axis.");
   alist.add ("top", Bound::none_model ());
   syntax.add_object ("left", Bound::component,
-                     Syntax::Const, Syntax::Singleton,
+                     Value::Const, Value::Singleton,
                      "Lower boundary on the x-axis.");
   alist.add ("left", Bound::none_model ());
   syntax.add_object ("right", Bound::component,
-                     Syntax::Const, Syntax::Singleton,
+                     Value::Const, Value::Singleton,
                      "Upper boundary on the x-axis.");
   alist.add ("right", Bound::none_model ());
   syntax.add_object ("front", Bound::component,
-                     Syntax::Const, Syntax::Singleton,
+                     Value::Const, Value::Singleton,
                      "Lower boundary on the y-axis.");
   alist.add ("front", Bound::none_model ());
   syntax.add_object ("back", Bound::component,
-                     Syntax::Const, Syntax::Singleton,
+                     Value::Const, Value::Singleton,
                      "Upper boundary on the y-axis.");
   alist.add ("back", Bound::none_model ());
 }

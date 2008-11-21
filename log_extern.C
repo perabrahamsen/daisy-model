@@ -208,9 +208,9 @@ struct LogExtern::NumEntry
 
   static void load_syntax (Syntax& syntax, AttributeList&)
   {
-    syntax.add ("name", Syntax::String, Syntax::State, "\
+    syntax.add ("name", Value::String, Value::State, "\
 Name to refer to number with.");
-    syntax.add ("value", Syntax::Unknown (), Syntax::State, "\
+    syntax.add ("value", Value::Unknown (), Value::State, "\
 Numeric value.");
   }
 
@@ -225,13 +225,13 @@ LogExtern::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   LogSelect::load_syntax (syntax, alist);
 
-  syntax.add_submodule_sequence ("numbers", Syntax::OptionalState, "\
+  syntax.add_submodule_sequence ("numbers", Value::OptionalState, "\
 Inititial numeric values.  By default, none.", NumEntry::load_syntax);
-  syntax.add ("where", Syntax::String, Syntax::OptionalConst,
+  syntax.add ("where", Value::String, Value::OptionalConst,
               "Name of the extern log to use.\n\
 By default, use the model name.");
-  syntax.add ("parameter_names", Syntax::String, 
-              Syntax::Const, Syntax::Sequence, "\
+  syntax.add ("parameter_names", Value::String, 
+              Value::Const, Value::Sequence, "\
 List of parameters to export.\n\
 \n\
 For example, if you have defined 'column' and 'crop' parameters for\n\

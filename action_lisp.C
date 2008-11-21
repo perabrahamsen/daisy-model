@@ -158,7 +158,7 @@ struct ActionCond : public Action
       syntax.add_object ("condition", Condition::component, 
                   "Condition for performing the actions.");
       syntax.add_object ("actions", Action::component,
-                         Syntax::State, Syntax::Sequence, 
+                         Value::State, Value::Sequence, 
                          "Actions to perform when condition is meet.");
       syntax.order ("condition", "actions");
     }
@@ -350,7 +350,7 @@ ActionLispSyntax::ActionLispSyntax ()
 Perform all the specified actions in the sequence listed.\n\
 All the actions will be performed in the same time step.");
     syntax.add_object ("actions", Action::component, 
-                       Syntax::State, Syntax::Sequence,
+                       Value::State, Value::Sequence,
                        "List of actions to perform.");
     syntax.order ("actions");
     Librarian::add_type (Action::component, "progn", alist, syntax, &make_progn);
@@ -361,7 +361,7 @@ All the actions will be performed in the same time step.");
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "\
 Perform the actions associated with the first true condition in the list.");
-    syntax.add_submodule_sequence ("clauses", Syntax::State, "\
+    syntax.add_submodule_sequence ("clauses", Value::State, "\
 Each clause consist of a condition and a sequence of actions.\n\
 The first clause whose condition is true, will have its actions activated.",
                                    ActionCond::clause::load_syntax);

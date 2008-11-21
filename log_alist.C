@@ -173,13 +173,13 @@ LogAList::open (const symbol name)
 	  const bool has_value = alist ().check (sname);
 	  switch (syntax ().lookup (sname))
 	    {
-	    case Syntax::AList:
-	      if (size != Syntax::Singleton && has_value)
+	    case Value::AList:
+	      if (size != Value::Singleton && has_value)
 		push (name, 
 		      syntax ().syntax (sname), 
 		      syntax ().default_alist (sname),
 		      alist ().alist_sequence (sname));
-	      else if (size != Syntax::Singleton || !has_value)
+	      else if (size != Value::Singleton || !has_value)
 		push (name, 
 		      syntax ().syntax (sname), 
 		      syntax ().default_alist (sname));
@@ -189,8 +189,8 @@ LogAList::open (const symbol name)
 		      alist ().alist (sname));
 		      
 	      break;
-	    case Syntax::Object:
-	      daisy_assert (size != Syntax::Singleton);
+	    case Value::Object:
+	      daisy_assert (size != Value::Singleton);
 	      push (name, 
 		    syntax ().library (metalib (), sname), 
 		    syntax ().default_alist (sname));
@@ -224,17 +224,17 @@ LogAList::close ()
 	{
 	  const std::string& sold_entry = old_entry.name ();
 	  daisy_assert (syntax_stack.front ());
-	  const Syntax::type type = syntax ().lookup (sold_entry);
+	  const Value::type type = syntax ().lookup (sold_entry);
 	  switch (type)
 	    { 
-	    case Syntax::Object:
+	    case Value::Object:
 	      // Object sequence.
-	      daisy_assert (syntax ().size (sold_entry) != Syntax::Singleton);
+	      daisy_assert (syntax ().size (sold_entry) != Value::Singleton);
 	      alist ().add (sold_entry, old_alist_sequence);
 	      break;
-	    case Syntax::AList:
+	    case Value::AList:
 	      // AList sequence or singleton.
-	      if (syntax ().size (sold_entry) == Syntax::Singleton)
+	      if (syntax ().size (sold_entry) == Value::Singleton)
 		{
 		  daisy_assert (old_alist_sequence.size () == 0);
 		  alist ().add (sold_entry, old_alist);
@@ -288,8 +288,8 @@ LogAList::close_unnamed ()
 	unnamed_stack[0]++;
       daisy_assert (syntax_stack.size () > 1);
       const std::string& sentry = entry ().name ();
-      daisy_assert (syntax_stack[1]->lookup (sentry) == Syntax::AList);
-      daisy_assert (syntax_stack[1]->size (sentry) != Syntax::Singleton);
+      daisy_assert (syntax_stack[1]->lookup (sentry) == Value::AList);
+      daisy_assert (syntax_stack[1]->size (sentry) != Value::Singleton);
     }
   else
     close_ignore ();
@@ -301,8 +301,8 @@ LogAList::open_alist (symbol name, const AttributeList& alist)
   if (is_active)
     {
       const std::string& sname = name.name ();
-      daisy_assert (syntax ().lookup (sname) == Syntax::AList);
-      daisy_assert (syntax ().size (sname) == Syntax::Singleton);
+      daisy_assert (syntax ().lookup (sname) == Value::AList);
+      daisy_assert (syntax ().size (sname) == Value::Singleton);
       const Syntax& syn = syntax ().syntax (sname);
       push (name, syn, alist);
     }
@@ -349,8 +349,8 @@ LogAList::open_object (symbol field, symbol type,
   if (is_active)
     {
       const std::string& sfield = field.name ();
-      daisy_assert (syntax ().lookup (sfield) == Syntax::Object);
-      daisy_assert (syntax ().size (sfield) == Syntax::Singleton);
+      daisy_assert (syntax ().lookup (sfield) == Value::Object);
+      daisy_assert (syntax ().size (sfield) == Value::Singleton);
       const Library& library = syntax ().library (metalib (), sfield);
       daisy_assert (library.name () == symbol (lib));
       if (!library.check (type))

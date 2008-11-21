@@ -117,11 +117,11 @@ static struct ReactionStandardSyntax
 	       "Transformation between two soil chemicals.");
     syntax.add_object ("transform", Transform::component,
                        "Tranformation process between 'A' to 'B'.");
-    syntax.add ("A", Syntax::String, Syntax::Const,
+    syntax.add ("A", Value::String, Value::Const,
 		"Name of first soil component in equilibrium.");
-    syntax.add ("B", Syntax::String, Syntax::Const,
+    syntax.add ("B", Value::String, Value::Const,
 		"Name of second soil component in equilibrium.");
-    syntax.add ("S_AB", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+    syntax.add ("S_AB", "g/cm^3/h", Value::LogOnly, Value::Sequence,
 		"Converted from A to B this timestep (may be negative).");
 
     Librarian::add_type (Reaction::component, "default", alist, syntax, &make);

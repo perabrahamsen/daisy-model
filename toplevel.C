@@ -649,7 +649,7 @@ Toplevel::load_run (Syntax& syntax, AttributeList& alist)
 
   Units::load_syntax (syntax, alist);
 
-  syntax.add ("install_directory", Syntax::String, Syntax::Const,
+  syntax.add ("install_directory", Value::String, Value::Const,
               "Directory where Daisy has been installed.\n\
 \n\
 This is used for looking up files that came with the installation, in\n\
@@ -663,12 +663,12 @@ are not running MS Windows), a hardcoded value is used.  This is\n\
 The value found in the manual corresponds to the system where the\n\
 manual was generated.");
   alist.add ("install_directory", Path::get_daisy_home ());
-  syntax.add ("directory", Syntax::String, Syntax::OptionalConst,
+  syntax.add ("directory", Value::String, Value::OptionalConst,
               "Run program in this directory.\n\
 This can affect both where input files are found and where log files\n\
 are generated.");
-  syntax.add ("path", Syntax::String,
-              Syntax::OptionalConst, Syntax::Sequence,
+  syntax.add ("path", Value::String,
+              Value::OptionalConst, Value::Sequence,
               "List of directories to search for input files in.\n\
 The special value \".\" means the current directory.\n\
 \n\
@@ -686,17 +686,17 @@ working directory followed by the standard parameter libraries.");
   alist.add ("path", default_path);
 
   syntax.add_object ("input", Parser::component,
-                     Syntax::OptionalConst, Syntax::Singleton,
+                     Value::OptionalConst, Value::Singleton,
                      "Command to add more information about the simulation.");
   syntax.add_object ("run", Program::component, 
-                     Syntax::OptionalState, Syntax::Singleton, 
+                     Value::OptionalState, Value::Singleton, 
                      "Program to run.\n\
 \n\
 If this option is specified, all the 'Daisy' specific top-level attributes\n\
 will be ignored.  If unspecified, run 'Daisy' on the current top-level\n\
 attributes.");
   syntax.add_object ("ui", UI::component, 
-                     Syntax::OptionalState, Syntax::Singleton, 
+                     Value::OptionalState, Value::Singleton, 
                      "Top level user interface.");
 }
 

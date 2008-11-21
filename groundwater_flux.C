@@ -75,7 +75,7 @@ static struct GroundwaterFluxSyntax
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "Flux groundwater, free drainage.");
       Groundwater::load_syntax (syntax, alist);
-      syntax.add ("flux", "cm/h", Check::none (), Syntax::Const,
+      syntax.add ("flux", "cm/h", Check::none (), Value::Const,
 		  "Constant flux to groundwater.");
       syntax.order ("flux");
       Librarian::add_type (Groundwater::component, "flux", alist, syntax, &make);

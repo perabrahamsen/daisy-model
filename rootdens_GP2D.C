@@ -377,28 +377,28 @@ void
 Rootdens_GP2D::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   Rootdens::load_base (syntax, alist);
-  syntax.add ("debug", Syntax::Integer, Syntax::Const, "\
+  syntax.add ("debug", Value::Integer, Value::Const, "\
 Add debug messages if larger than 0.");
   alist.add ("debug", 0);
-  syntax.add ("row_position", "cm", Syntax::Const, "\
+  syntax.add ("row_position", "cm", Value::Const, "\
 Horizontal position of row crops.");
   alist.add ("row_position", 0.0);
-  syntax.add ("row_distance", "cm", Syntax::Const, 
+  syntax.add ("row_distance", "cm", Value::Const, 
               "Distance between rows of crops.");
-  syntax.add ("DensRtTip", "cm/cm^3", Check::positive (), Syntax::Const,
+  syntax.add ("DensRtTip", "cm/cm^3", Check::positive (), Value::Const,
               "Root density at (potential) penetration depth.");
   alist.add ("DensRtTip", 0.1);
   syntax.add ("DensIgnore", "cm/cm^3", Check::positive (),
-              Syntax::OptionalConst,
+              Value::OptionalConst,
               "Ignore cells with less than this root density.\n\
 By default, this is the same as DensRtTip.");
-  syntax.add ("a_z", "cm^-1", Syntax::LogOnly, "Form parameter.\n\
+  syntax.add ("a_z", "cm^-1", Value::LogOnly, "Form parameter.\n\
 Calculated from 'DensRtTip'.");
-  syntax.add ("a_x", "cm^-1", Syntax::LogOnly, "Form parameter.\n\
+  syntax.add ("a_x", "cm^-1", Value::LogOnly, "Form parameter.\n\
 Calculated from 'DensRtTip'.");
-  syntax.add ("L00", "cm/cm^3", Syntax::LogOnly,
+  syntax.add ("L00", "cm/cm^3", Value::LogOnly,
               "Root density at row crop at soil surface.");
-  syntax.add ("k", Syntax::None (), Syntax::LogOnly,
+  syntax.add ("k", Value::None (), Value::LogOnly,
               "Scale factor due to soil limit.\n\
 \n\
 Some roots might be below the soil imposed maximum root depth, or in areas\n\

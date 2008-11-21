@@ -69,7 +69,7 @@ struct BooleanNumbers : public Boolean
     Treelog::Open nest (msg, name);
     bool ok = true;
 
-    symbol dim = Syntax::Unknown ();
+    symbol dim = Value::Unknown ();
     for (size_t i = 0; i < operand.size (); i++)
       if (!operand[i]->check (units, scope, msg))
         ok = false;
@@ -77,13 +77,13 @@ struct BooleanNumbers : public Boolean
         {
           static const symbol blank ("");
           symbol new_dim = operand[i]->dimension (scope);
-          if (new_dim == Syntax::None ()
-              || new_dim == Syntax::Fraction ())
+          if (new_dim == Value::None ()
+              || new_dim == Value::Fraction ())
             new_dim = blank;
           if (new_dim != dim)
-            if (dim == Syntax::Unknown ())
+            if (dim == Value::Unknown ())
               dim = new_dim;
-            else if (new_dim != Syntax::Unknown ())
+            else if (new_dim != Value::Unknown ())
               {
                 msg.error ("I don't know how to compare [" + dim + "] with ["
                            + new_dim + "]");
@@ -96,7 +96,7 @@ struct BooleanNumbers : public Boolean
   static void load_syntax (Syntax& syntax, AttributeList&)
   {
     syntax.add_object ("operands", Number::component, 
-                       Syntax::Const, Syntax::Sequence, "\
+                       Value::Const, Value::Sequence, "\
 List of operands to compare.");
     syntax.order ("operands");
   }

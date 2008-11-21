@@ -130,10 +130,10 @@ static struct ActionWithColumnSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Perform actions on a specific column.");
-    syntax.add ("column", Syntax::String, Syntax::Const, 
+    syntax.add ("column", Value::String, Value::Const, 
 		"Name of column to perform actions on.");
     syntax.add_object ("actions", Action::component, 
-                       Syntax::State, Syntax::Sequence,
+                       Value::State, Value::Sequence,
                        "Actions to perform on the specified column.");
     syntax.order ("column", "actions");
     Librarian::add_type (Action::component, "with-column", alist, syntax, &make);

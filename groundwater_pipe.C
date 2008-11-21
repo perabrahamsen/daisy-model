@@ -391,34 +391,34 @@ below the last cell, or above the soil surface.");
       // We define our own "height", so don't load from here.
       // Groundwater::load_syntax (syntax, alist);
 
-      syntax.add ("L", "cm", Check::positive (), Syntax::Const,
+      syntax.add ("L", "cm", Check::positive (), Value::Const,
 		  "Distance between pipes.");
       alist.add ("L", 1800.0);
-      syntax.add ("x", "cm", Check::positive (), Syntax::OptionalConst,
+      syntax.add ("x", "cm", Check::positive (), Value::OptionalConst,
 		  "Horizontal distance to nearest pipe.\n\
 By default, this is 1/2 L.");
-      syntax.add ("pipe_position", "cm", Check::negative (), Syntax::Const,
+      syntax.add ("pipe_position", "cm", Check::negative (), Value::Const,
 		  "Height pipes are placed in the soil (a negative number).");
       alist.add ("pipe_position", -110.0);
       syntax.add ("K_to_pipes", "cm/h", Check::non_negative (), 
-                  Syntax::OptionalConst,
+                  Value::OptionalConst,
 		  "Horizontal conductivity in saturated soil.\n\
 By default this is calculated from the horizontal conductivity and the\n\
 anisotropy of the horizon.");
-      syntax.add ("K_aquitard", "cm/h", Check::non_negative (), Syntax::Const,
+      syntax.add ("K_aquitard", "cm/h", Check::non_negative (), Value::Const,
 		  "Conductivity of the aquitard.");
       alist.add ("K_aquitard", 1e-3);
-      syntax.add ("Z_aquitard", "cm", Check::positive (), Syntax::Const,
+      syntax.add ("Z_aquitard", "cm", Check::positive (), Value::Const,
 		  "Thickness of the aquitard.\n\
 The aquitard begins below the bottommost soil horizon.");
       alist.add ("Z_aquitard", 200.0);
-      syntax.add ("h_aquifer", "cm", Check::positive (), Syntax::OptionalState,
+      syntax.add ("h_aquifer", "cm", Check::positive (), Value::OptionalState,
 		  "Pressure potential in the aquifer below the aquitard.\n\
 By default. this is Z_aquitard.\n\
 You can alternatively specify the pressure as a virtual groundwater level.\n\
 See 'pressure_table'.");
       syntax.add_object ("pressure_table", Depth::component,
-                         Syntax::OptionalConst, Syntax::Singleton, "\
+                         Value::OptionalConst, Value::Singleton, "\
 Height of groundwater the corresponds to the pressure in the aquifer.  \n\
 \n\
 If you drilled a well down to the aquifer, this is number what the\n\
@@ -427,17 +427,17 @@ number).  This is different from the actual groundwater table, because\n\
 the aquitart block the water, and the pipes lead the water away.\n\
 You can alternatively specify the pressure directly, with 'h_aquifer'.");
       syntax.add ("height", "cm", Check::non_positive (), 
-		  Syntax::OptionalState,
+		  Value::OptionalState,
 		  "Current groundwater level (a negative number).");
-      syntax.add ("DrainFlow", "cm/h", Syntax::LogOnly,
+      syntax.add ("DrainFlow", "cm/h", Value::LogOnly,
 		  "Drain flow to pipes.");
-      syntax.add ("EqDrnFlow", "cm/h", Syntax::LogOnly,
+      syntax.add ("EqDrnFlow", "cm/h", Value::LogOnly,
 		  "Equilibrium drain flow to pipes.");
-      syntax.add ("deficit", "cm", Syntax::LogOnly,
+      syntax.add ("deficit", "cm", Value::LogOnly,
 		  "Deficit.");
-      syntax.add ("DeepPercolation", "cm/h", Syntax::LogOnly,
+      syntax.add ("DeepPercolation", "cm/h", Value::LogOnly,
 		  "Deep percolation to aquifer.");
-      syntax.add ("S", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+      syntax.add ("S", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
 		  "Pipe drainage.");
       Librarian::add_type (Groundwater::component, "pipe", alist, syntax, &make);
     }

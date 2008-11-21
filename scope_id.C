@@ -84,9 +84,9 @@ static struct ScopeIDSyntax
 
     alist.add ("description", 
                "A scope containing just a single number.");
-    syntax.add ("name", Syntax::String, Syntax::Const, 
+    syntax.add ("name", Value::String, Value::Const, 
                 "Identifier name.");
-    syntax.add ("value", Syntax::User (), Syntax::Const, 
+    syntax.add ("value", Value::User (), Value::Const, 
                 "Initial value and dimension.");
     Librarian::add_type (Scope::component, "id", alist, syntax, &make);
   }

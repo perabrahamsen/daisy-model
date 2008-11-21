@@ -32,9 +32,9 @@
 void 
 GnuplotBase::Size::load_syntax (Syntax& syntax, AttributeList&)
 {
-  syntax.add ("x", Syntax::None (), Syntax::Const, "\
+  syntax.add ("x", Value::None (), Value::Const, "\
 Relative horizontal size of plot.");
-  syntax.add ("y", Syntax::None (), Syntax::Const, "\
+  syntax.add ("y", Value::None (), Value::Const, "\
 Relative vertical size of plot.");
   syntax.order ("x", "y");
 }
@@ -135,7 +135,7 @@ GnuplotBase::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   alist.add ("base_model", "common");
 
-  syntax.add ("where", Syntax::String, Syntax::OptionalConst, "\
+  syntax.add ("where", Value::String, Value::OptionalConst, "\
 File to store results in.  By default, show them on a window.\n\
 The format is determined from the file name extension:\n\
   *.tex: LaTeX code with PostScript specials.\n\
@@ -151,8 +151,8 @@ the screen instead of being stored in a file.");
                 const symbol key) const throw (std::string)
     {
       daisy_assert (key == "where");
-      daisy_assert (syntax.lookup (key) == Syntax::String);
-      daisy_assert (syntax.size (key) == Syntax::Singleton);
+      daisy_assert (syntax.lookup (key) == Value::String);
+      daisy_assert (syntax.size (key) == Value::Singleton);
       const symbol file = alist.name (key);
       if (file == "screen")
         return;
@@ -162,21 +162,21 @@ the screen instead of being stored in a file.");
   } check_where;
   syntax.add_check ("where", check_where);
   alist.add ("where", "screen");
-  syntax.add ("device", Syntax::String, Syntax::OptionalConst, "\
+  syntax.add ("device", Value::String, Value::OptionalConst, "\
 Output device.  By default, this is derived from the file extenstion.");
-  syntax.add ("extra", Syntax::String, Syntax::Const, 
-              Syntax::Sequence, "List of extra gnuplot commands.\n\
+  syntax.add ("extra", Value::String, Value::Const, 
+              Value::Sequence, "List of extra gnuplot commands.\n\
 The commands will be inserted right before the plot command.\n\
 Note that if you have multiple plots in the same command file,\n\
 The extra commands may affect the subsequence plots.");
   alist.add ("extra", std::vector<symbol> ());
-  syntax.add ("title", Syntax::String, Syntax::OptionalConst, "\
+  syntax.add ("title", Value::String, Value::OptionalConst, "\
 Title of the plot, if any.  Set it to an empty string to disable.");
-  syntax.add_submodule ("size", alist, Syntax::OptionalConst, "\
+  syntax.add_submodule ("size", alist, Value::OptionalConst, "\
 Relative to size of plot.\n\
 The standard size is 1.0, specify other numbers to scale accordingly.", 
                         GnuplotBase::Size::load_syntax);
-  syntax.add ("legend", Syntax::String, Syntax::OptionalConst, "\
+  syntax.add ("legend", Value::String, Value::OptionalConst, "\
 Placement of legend.  This can be one of the four corners, named by\n\
 compas locations (nw, ne, sw, se) to get the legend inside the graph\n\
 in that corner, 'below' to get the legend below the graph, 'outside'\n\
@@ -195,8 +195,8 @@ cross the legend.");
                 const symbol key) const throw (std::string)
     {
       daisy_assert (key == "legend");
-      daisy_assert (syntax.lookup (key) == Syntax::String);
-      daisy_assert (syntax.size (key) == Syntax::Singleton);
+      daisy_assert (syntax.lookup (key) == Value::String);
+      daisy_assert (syntax.size (key) == Value::Singleton);
       const symbol legend = alist.name (key);
       if (legend == "auto")
         return;

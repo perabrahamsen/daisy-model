@@ -83,7 +83,7 @@ ActionEmergeSyntax::ActionEmergeSyntax ()
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
   alist.add ("description", "Force a crop to emerge.");
-  syntax.add ("crop", Syntax::String, Syntax::Const, 
+  syntax.add ("crop", Value::String, Value::Const, 
 	      "Name of the crop to emerge.\n\
 If you specify 'all', all crops will emerge.\n\
 If there are no crop on the field with the specified name,\n\
@@ -149,25 +149,25 @@ If this was intended, you should use the 'cut' action instead to avoid this mess
 
   static void load_syntax (Syntax& syntax, AttributeList& alist)
   { 
-    syntax.add ("crop", Syntax::String, Syntax::Const, 
+    syntax.add ("crop", Value::String, Value::Const, 
                 "Name of the crop to harvest or cut.\n\
 If you specify 'all', all crops will be harvested.\n\
 If there are no crop on the field with the specified name,\n\
 nothing will happen.");
     alist.add ("crop", Vegetation::all_crops ());
-    syntax.add ("stub", "cm", Syntax::Const, "\
+    syntax.add ("stub", "cm", Value::Const, "\
 Leave stem and leafs below this height on the field.");
     alist.add ("stub", 0.0);
-    syntax.add_fraction ("stem", Syntax::Const, "\
+    syntax.add_fraction ("stem", Value::Const, "\
 Fraction of stem (above stub) to harvest.");
     alist.add ("stem", 1.0);
-    syntax.add_fraction ("leaf", Syntax::Const, "\
+    syntax.add_fraction ("leaf", Value::Const, "\
 Fraction of leafs (above stub) to harvest.");
     alist.add ("leaf", 1.0);
-    syntax.add_fraction ("sorg", Syntax::Const, "\
+    syntax.add_fraction ("sorg", Value::Const, "\
 Fraction of storage organ to harvest.");
     alist.add ("sorg", 1.0);
-    syntax.add ("combine", Syntax::Boolean, Syntax::Const, "\
+    syntax.add ("combine", Value::Boolean, Value::Const, "\
 Set this to 'true' in order to combine all crop parts into stem\n\
 in the harvest log files.\n\
 This is mostly useful for silage.");
@@ -299,19 +299,19 @@ ActionPluckSyntax::ActionPluckSyntax ()
 Unlike the 'harvest' operation, this allows you to pluck selected parts of\n\
 the above ground dry matter without killing the crop.\n\
 It is intended for crops like tomatoes, that are harvested multiple times.");
-  syntax.add ("crop", Syntax::String, Syntax::Const, 
+  syntax.add ("crop", Value::String, Value::Const, 
 	      "Name of the crop to pluck.\n\
 If you specify 'all', all crops will be plucked.\n\
 If there are no crop on the field with the specified name,\n\
 nothing will happen.");
   alist.add ("crop", Vegetation::all_crops ());
-  syntax.add_fraction ("stem", Syntax::Const, "\
+  syntax.add_fraction ("stem", Value::Const, "\
 Fraction of stem to pluck.");
   alist.add ("stem", 0.0);
-  syntax.add_fraction ("leaf", Syntax::Const, "\
+  syntax.add_fraction ("leaf", Value::Const, "\
 Fraction of leaves to pluck.");
   alist.add ("leaf", 0.0);
-  syntax.add_fraction ("sorg", Syntax::Const, "\
+  syntax.add_fraction ("sorg", Value::Const, "\
 Fraction of storage organ to pluck.");
   alist.add ("sorg", 1.0);
   syntax.order ("crop");

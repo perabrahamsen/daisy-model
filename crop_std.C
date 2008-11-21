@@ -813,47 +813,47 @@ CropStandardSyntax::CropStandardSyntax ()
 {
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
-  syntax.add ("description", Syntax::String, Syntax::OptionalConst,
+  syntax.add ("description", Value::String, Value::OptionalConst,
 	      "Description of this parameterization."); 
   alist.add ("description", "Standard Daisy crop model.  Hansen, 1999.");
 
   syntax.add_object ("Seed", Seed::component, 
                      "Initial crop growth.");
   alist.add ("Seed", Seed::default_model ());
-  syntax.add_submodule ("Root", alist, Syntax::State, 
+  syntax.add_submodule ("Root", alist, Value::State, 
 			"Root system.", RootSystem::load_syntax);
-  syntax.add_submodule ("Canopy", alist, Syntax::State,
+  syntax.add_submodule ("Canopy", alist, Value::State,
 			"Canopy.", CanopyStandard::load_syntax);
-  syntax.add_submodule ("Harvest", alist, Syntax::State,
+  syntax.add_submodule ("Harvest", alist, Value::State,
 			"Harvest parameters.", Harvesting::load_syntax);
-  syntax.add_submodule ("Prod", alist, Syntax::State,
+  syntax.add_submodule ("Prod", alist, Value::State,
 			"Production.", Production::load_syntax);
-  syntax.add_submodule ("last_time", alist, Syntax::OptionalState,
+  syntax.add_submodule ("last_time", alist, Value::OptionalState,
 			"The time of the previous timestep.",
                         Time::load_syntax);
   syntax.add_object ("Devel", Phenology::component, 
                      "Development and phenology.");
-  syntax.add_submodule ("Partit", alist, Syntax::Const,
+  syntax.add_submodule ("Partit", alist, Value::Const,
 			"Assimilate partitioning.", Partition::load_syntax);
-  syntax.add_submodule ("Vernal", alist, Syntax::OptionalState, 
+  syntax.add_submodule ("Vernal", alist, Value::OptionalState, 
 			"Vernalization.", Vernalization::load_syntax);
   syntax.add_object ("LeafPhot", Photo::component,
-                     Syntax::Const, Syntax::Singleton,
+                     Value::Const, Value::Singleton,
                      "Leaf photosynthesis.");
   alist.add ("LeafPhot", Photo::default_model ());
-  syntax.add_submodule ("CrpN", alist, Syntax::State,
+  syntax.add_submodule ("CrpN", alist, Value::State,
 			"Nitrogen parameters.", CrpN::load_syntax);
 
   syntax.add_object ("water_stress_effect", WSE::component, 
-                     Syntax::OptionalConst, Syntax::Singleton,
+                     Value::OptionalConst, Value::Singleton,
                      "Effect of water stress on production.\n\
 By default, this will be 'none' iff the selected photosynthesis model\n\
 does handle water stress implicitly, and 'full' otherwise.");
-  syntax.add ("enable_N_stress", Syntax::Boolean, Syntax::OptionalConst,
+  syntax.add ("enable_N_stress", Value::Boolean, Value::OptionalConst,
 	      "Set this true to let nitrogen stress limit production.\n\
 By default, it will be true iff the selected photosynthesis model does\n \
 handle nitrogen stress implicitly.");
-  syntax.add_fraction ("min_light_fraction", Syntax::Const, "\n\
+  syntax.add_fraction ("min_light_fraction", Value::Const, "\n\
 When multiple crops are competing for light, this parameter specifies\n\
 a minumum amount of the light this crop will receive.  The idea is\n\
 that the field has patches where one crop is dominating, as specified\n\

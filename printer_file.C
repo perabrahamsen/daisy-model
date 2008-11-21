@@ -100,7 +100,7 @@ PrinterFile::Implementation::is_complex (const AttributeList& alist,
     return false;
 
   // Sequences are complex...
-  if (syntax.size (key) != Syntax::Singleton)
+  if (syntax.size (key) != Value::Singleton)
     {
       // when they are not part of a total order...
       if (!syntax.total_order ())
@@ -114,20 +114,20 @@ PrinterFile::Implementation::is_complex (const AttributeList& alist,
 
   switch (syntax.lookup (key))
     {
-    case Syntax::Number:
-    case Syntax::Integer:
-    case Syntax::Boolean:
-    case Syntax::String:
+    case Value::Number:
+    case Value::Integer:
+    case Value::Boolean:
+    case Value::String:
       return false;
-    case Syntax::Object:
+    case Value::Object:
       return syntax.order_index (key) >= 0
 	|| is_complex_object (alist.alist (key), 
                               syntax.library (metalib, key));
-    case Syntax::AList:
-    case Syntax::PLF:
+    case Value::AList:
+    case Value::PLF:
       return true;
-    case Syntax::Library:
-    case Syntax::Error:
+    case Value::Library:
+    case Value::Error:
     default:
       daisy_notreached ();
     } 
@@ -196,11 +196,11 @@ PrinterFile::Implementation::print_dimension (const AttributeList& alist,
                                               const symbol key,
                                               const symbol dim)
 {
-  if (dim == Syntax::Unknown ())
+  if (dim == Value::Unknown ())
     /* do nothing */;
-  else if (dim == Syntax::None () || dim == Syntax::Fraction ())
+  else if (dim == Value::None () || dim == Value::Fraction ())
     out << " []";
-  else if (dim == Syntax::User ())
+  else if (dim == Value::User ())
     out << " [" << alist.name (key) << "]";
   else
     out << " [" << dim << "]";
@@ -215,7 +215,7 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 					  int indent, bool need_wrapper)
 { 
   daisy_assert (alist.check (key));
-  Syntax::type type = syntax.lookup (key);
+  Value::type type = syntax.lookup (key);
 
   const bool do_wrap 
     = (need_wrapper && is_complex (alist, syntax, super_alist, key));
@@ -225,15 +225,15 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
       indent++;
     }
 
-  if (syntax.size (key) == Syntax::Singleton)
+  if (syntax.size (key) == Value::Singleton)
     {
       switch (type)
 	{
-	case Syntax::Number:
+	case Value::Number:
 	  out << alist.number (key);
           print_dimension (alist, key, syntax.dimension (key));
 	  break;
-	case Syntax::AList:
+	case Value::AList:
 	  if (super_alist.check (key))
 	    print_alist (alist.alist (key), syntax.syntax (key), 
 			 super_alist.alist (key), 
@@ -243,19 +243,19 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 			 syntax.default_alist (key), 
                          syntax.syntax (key), indent, false); 
 	  break;
-	case Syntax::PLF:
+	case Value::PLF:
 	  print_plf (alist.plf (key), indent);
 	  break;
-	case Syntax::Boolean:
+	case Value::Boolean:
 	  print_bool (alist.flag (key));
 	  break;
-	case Syntax::String:
+	case Value::String:
 	  print_symbol (alist.name (key));
 	  break;
-	case Syntax::Integer:
+	case Value::Integer:
 	  out << alist.integer (key);
 	  break;
-	case Syntax::Object:
+	case Value::Object:
 	  if (super_alist.check (key))
 	    print_object (alist.alist (key), syntax.library (metalib, key), 
                           super_alist.alist (key), indent);
@@ -263,10 +263,10 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
             print_object (alist.alist (key), syntax.library (metalib, key), 
                           AttributeList (), indent);
 	  break;
-	case Syntax::Library:
-	case Syntax::Error:
+	case Value::Library:
+	case Value::Error:
 	default:
-	  out << "<Unknown: " << Syntax::type_name (syntax.lookup (key))
+	  out << "<Unknown: " << Value::type_name (syntax.lookup (key))
 	      << ">";
 	}
     }
@@ -274,7 +274,7 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
     {
       switch (type)
 	{
-	case Syntax::Number:
+	case Value::Number:
 	  {
 	    const std::vector<double>& value = alist.number_sequence (key);
 	    
@@ -287,7 +287,7 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
             print_dimension (alist, key, syntax.dimension (key));
 	  }
 	  break;
-	case Syntax::AList:
+	case Value::AList:
 	  {
 	    const AttributeList& other = syntax.default_alist (key);
 	    const Syntax& nested = syntax.syntax (key);
@@ -304,7 +304,7 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 	      }
 	  }
 	  break;
-	case Syntax::PLF:
+	case Value::PLF:
 	  {
 	    const std::vector<const PLF*>& value = alist.plf_sequence (key);
 	    
@@ -318,7 +318,7 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 	      }
 	  }
 	  break;
-	case Syntax::Boolean:
+	case Value::Boolean:
 	  {
 	    const std::vector<bool>& value = alist.flag_sequence (key);
 	    
@@ -330,7 +330,7 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 	      }
 	  }
 	  break;
-	case Syntax::String:
+	case Value::String:
 	  {
 	    const std::vector<symbol>& value 
 	      = alist.name_sequence (key);
@@ -343,7 +343,7 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 	      }
 	  }
 	  break;
-	case Syntax::Integer:
+	case Value::Integer:
 	  {
 	    const std::vector<int>& value = alist.integer_sequence (key);
 	    
@@ -355,7 +355,7 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 	      }
 	  }
 	  break;
-	case Syntax::Object:
+	case Value::Object:
 	  {
 	    const Library& library = syntax.library (metalib, key);
 	    const std::vector<const AttributeList*>& value = alist.alist_sequence (key);
@@ -376,10 +376,10 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 	      }
 	  }
 	  break;
-	case Syntax::Library:
-	case Syntax::Error:
+	case Value::Library:
+	case Value::Error:
 	default:
-	  out << "<" << Syntax::type_name (syntax.lookup (key)) 
+	  out << "<" << Value::type_name (syntax.lookup (key)) 
 	      << " sequence>";
 	}
     }
@@ -459,8 +459,8 @@ PrinterFile::Implementation::print_alist (const AttributeList& alist,
 	  // ordered complex values.  However, the parser doesn't
 	  // expect these for alist sequences, so we don't print them
 	  // either. 
-	  if (syntax.lookup (key) == Syntax::AList
-	      && syntax.size (key) != Syntax::Singleton)
+	  if (syntax.lookup (key) == Value::AList
+	      && syntax.size (key) != Value::Singleton)
 	    print_entry (alist, syntax, super_alist, super_syntax, 
                          key, indent, false);
 	  else
@@ -501,41 +501,41 @@ PrinterFile::Implementation::print_alist (const AttributeList& alist,
           out << "(declare " << key << " ";
 
           const int size = syntax.size (key);
-          if (size == Syntax::Singleton)
+          if (size == Value::Singleton)
             /* do nothing */;
-          else if (size == Syntax::Sequence)
+          else if (size == Value::Sequence)
             out << "[] ";
           else
             out << "[" << size << "] ";
           
-          const Syntax::type type = syntax.lookup (key);
+          const Value::type type = syntax.lookup (key);
           switch (type)
             {
-            case Syntax::Boolean:
-            case Syntax::String:
-            case Syntax::Integer:
-              out << Syntax::type_name (type);
+            case Value::Boolean:
+            case Value::String:
+            case Value::Integer:
+              out << Value::type_name (type);
               break;
-            case Syntax::Number:
-              out << Syntax::type_name (type) << " ";
+            case Value::Number:
+              out << Value::type_name (type) << " ";
               print_dimension (alist, key, syntax.dimension (key));
               break;
-            case Syntax::AList:
+            case Value::AList:
               {
                 out << "fixed ";
-                daisy_assert (size == Syntax::Singleton);
+                daisy_assert (size == Value::Singleton);
                 daisy_assert (alist.check (key));
                 const AttributeList& fixed = alist.alist (key);
                 daisy_assert (fixed.check ("submodel"));
                 out << fixed.name ("submodel");
               }
               break;
-            case Syntax::Object:
+            case Value::Object:
               out << syntax.library (metalib, key).name ();
               break;
-            case Syntax::PLF: 
-            case Syntax::Library:
-            case Syntax::Error:
+            case Value::PLF: 
+            case Value::Library:
+            case Value::Error:
             default:
               out << "<Error>";
             }
@@ -872,7 +872,7 @@ static struct PrinterFileSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", 
                "Print internal datastructures with lots of parentheses.");
-    syntax.add ("where", Syntax::String, Syntax::Const,
+    syntax.add ("where", Value::String, Value::Const,
                 "File to print in.");
     syntax.order ("where");
     Librarian::add_type (Printer::component, "file", alist, syntax, &make);

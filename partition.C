@@ -96,22 +96,22 @@ goes to roots at a given development stage.  The remaining assimilate goes\n\
 to the shoot.  The 'Leaf' and 'Stem' parameters determine what fraction of\n\
 the shoot assimilate goes to the leaf and stem respectively.  The remaining\n\
 shoot assimilate will go to the storage organ.");
-  syntax.add ("Root", "DS", Syntax::Fraction (), Check::fraction (),
-	      Syntax::Const, "\
+  syntax.add ("Root", "DS", Value::Fraction (), Check::fraction (),
+	      Value::Const, "\
 Fraction of assimilate for growth that goes to the roots, as a function of\n\
 the crop development stage.  The remaining growth assimilate goes to the\n\
 shoot.");
-  syntax.add ("Leaf", "DS", Syntax::Fraction (), Check::fraction (),
-	      Syntax::Const,
+  syntax.add ("Leaf", "DS", Value::Fraction (), Check::fraction (),
+	      Value::Const,
 	      "Fraction of shoot assimilate that goes to the leafs.");
-  syntax.add ("Stem", "DS", Syntax::Fraction (), Check::fraction (),
-	      Syntax::Const,
+  syntax.add ("Stem", "DS", Value::Fraction (), Check::fraction (),
+	      Value::Const,
 	      "Fraction of shoot assimilate that goes to the stem.");
-  syntax.add ("RSR", "DS", Syntax::None (), Check::positive (), Syntax::Const,
+  syntax.add ("RSR", "DS", Value::None (), Check::positive (), Value::Const,
 	      "Maximal root/shoot ratio as a function of development state.\n\
 If the root/shoot ratio is above this, the roots will start dying.");
-  syntax.add ("nitrogen_stress_limit", Syntax::None (), Check::fraction (), 
-              Syntax::Const,
+  syntax.add ("nitrogen_stress_limit", Value::None (), Check::fraction (), 
+              Value::Const,
 	      "If nitrogen stress is above this number and DS is above 1,\n\
 allocate all assimilate to the storage organ.");
   alist.add ("nitrogen_stress_limit", 1.0);

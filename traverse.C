@@ -228,18 +228,18 @@ Traverse::traverse_parameter (const Syntax& syntax, const AttributeList& alist,
 {
   if (enter_parameter (syntax, alist, default_alist, name, parameter))
     {
-      const Syntax::type type = syntax.lookup (parameter);
+      const Value::type type = syntax.lookup (parameter);
       const int size = syntax.size (parameter);
       const bool has_value = alist.check (parameter);
 
       // Children.
       switch (type)
 	{
-	case Syntax::AList:
+	case Value::AList:
 	  {
 	    const Syntax& entry_syntax = syntax.syntax (parameter);
 
-	    if (size == Syntax::Singleton)
+	    if (size == Value::Singleton)
 	      {
 		if (has_value)
 		  {
@@ -279,11 +279,11 @@ Traverse::traverse_parameter (const Syntax& syntax, const AttributeList& alist,
 	      }
 	  }
 	  break;
-	case Syntax::Object:
+	case Value::Object:
 	  {
 	    if (has_value)
 	      {
-		if (size == Syntax::Singleton)
+		if (size == Value::Singleton)
 		  {
 		    AttributeList& entry_alist = alist.alist (parameter);
 		    daisy_assert (entry_alist.check ("type"));

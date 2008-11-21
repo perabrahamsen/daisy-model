@@ -142,9 +142,9 @@ static struct PhenologyStandardSyntax
 	       "Default crop phenology model.");
 
     // Parameters.
-    syntax.add ("EmrTSum", "dg C d", Syntax::Const,
+    syntax.add ("EmrTSum", "dg C d", Value::Const,
 		"Soil temperature sum at emergence.");
-    syntax.add ("EmrSMF", "cm", "d", Syntax::Const,
+    syntax.add ("EmrSMF", "cm", "d", Value::Const,
 		"Soil moisture (h-function) effect on emergense.");
     PLF SMF;
     SMF.add (-1000.0, 1.00);
@@ -152,29 +152,29 @@ static struct PhenologyStandardSyntax
     SMF.add (-50.00, 1.00);
     SMF.add (-30.00, 1.00);
     alist.add("EmrSMF",SMF);
-    syntax.add ("DS_Emr", "DS", Syntax::Const,
+    syntax.add ("DS_Emr", "DS", Value::Const,
 		"Development stage at emergence.");
     alist.add ("DS_Emr", 0.01);
-    syntax.add ("DSRate1", "DS/d", Syntax::Const,
+    syntax.add ("DSRate1", "DS/d", Value::Const,
 		"Development rate in the vegetative stage.");
-    syntax.add ("DSRate2", "DS/d", Syntax::Const,
+    syntax.add ("DSRate2", "DS/d", Value::Const,
 		"Development rate in the reproductive stage.");
-    syntax.add ("TempEff1", "dg C", Syntax::None (), Syntax::Const,
+    syntax.add ("TempEff1", "dg C", Value::None (), Value::Const,
 		"Temperature effect, vegetative stage.");
-    syntax.add ("TempEff2", "dg C", Syntax::None (), Syntax::Const,
+    syntax.add ("TempEff2", "dg C", Value::None (), Value::Const,
 		"Temperature effect, reproductive stage.");
-    syntax.add ("PhotEff1", "h", Syntax::None (), Syntax::Const,
+    syntax.add ("PhotEff1", "h", Value::None (), Value::Const,
 		"Photoperiode effect, vegetative stage.");
-    syntax.add ("DSMature", "DS", Syntax::Const,
+    syntax.add ("DSMature", "DS", Value::Const,
 		"Development stage at maturation.");
     alist.add ("DSMature", 2.0);
-    syntax.add ("DSRepeat", "DS", Syntax::Const,
+    syntax.add ("DSRepeat", "DS", Value::Const,
 		"Development stage when DS set back is activated.");
     alist.add ("DSRepeat", 4.0);
-    syntax.add ("DSSetBack", "DS", Syntax::Const,
+    syntax.add ("DSSetBack", "DS", Value::Const,
 		"Development stage set back at DSRepeat.");
     alist.add ("DSSetBack", 1.7);
-    syntax.add ("defined_until_ds", "DS", Syntax::Const, "\
+    syntax.add ("defined_until_ds", "DS", Value::Const, "\
 This parameterization is only valid until the specified development state.");
     alist.add ("defined_until_ds", 2.0);
 

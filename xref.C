@@ -316,7 +316,7 @@ TraverseXRef::enter_parameter (const Syntax& syntax,
       if (base_model != current_model)
         {
           const Syntax& base_syntax = library.syntax (base_model);
-          if (base_syntax.lookup (name) != Syntax::Error)
+          if (base_syntax.lookup (name) != Value::Error)
             {
               const AttributeList& base_alist = library.lookup (base_model);
               if (alist.subset (metalib, base_alist, syntax, name))
@@ -326,7 +326,7 @@ TraverseXRef::enter_parameter (const Syntax& syntax,
     }
   path.push_back (name);
 
-  if (syntax.lookup (name) == Syntax::Object)
+  if (syntax.lookup (name) == Value::Object)
     // We always use the component, even if it has no value, or a
     // value that is an empty sequence.
     use_component (syntax.library (metalib, name));

@@ -65,15 +65,15 @@ public:
     : RubiscoNdist (al),
       expr (Librarian::build_item<Number> (al, "value"))
   {
-    scope.add_item (new ExchangeNumber (LAI_symbol, Syntax::None(),
+    scope.add_item (new ExchangeNumber (LAI_symbol, Value::None(),
 					"Leaf area index"));
     scope.add_item (new ExchangeNumber (distance_from_top_symbol, "cm",
 					"Distance_From_Top of canopy"));
-    scope.add_item (new ExchangeNumber (relative_LAI_symbol, Syntax::None(),
+    scope.add_item (new ExchangeNumber (relative_LAI_symbol, Value::None(),
 					"Relative leaf area index"));
-    scope.add_item (new ExchangeNumber (relative_distance_from_top_symbol, Syntax::None(),
+    scope.add_item (new ExchangeNumber (relative_distance_from_top_symbol, Value::None(),
 					"Relative distance_from_top of canopy"));
-    scope.add_item (new ExchangeNumber (DS_symbol, Syntax::None(),
+    scope.add_item (new ExchangeNumber (DS_symbol, Value::None(),
 					"Development stage"));
     scope.done ();
     expr->initialize (al.units (), scope, al.msg());
@@ -139,7 +139,7 @@ static struct rubiscoNdist_forcedSyntax
   static void load_syntax (Syntax& syntax, AttributeList& alist)
   {
     syntax.add_object ("value", Number::component, 
-                       Syntax::Const, Syntax::Singleton, "\
+                       Value::Const, Value::Singleton, "\
 Expression that evaluates to the relative rubisco capacity where 1 is the value in top of the canopy.");
     syntax.order ("value");
   }  

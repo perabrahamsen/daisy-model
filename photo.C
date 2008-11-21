@@ -45,7 +45,7 @@ Photo::clear ()
 void
 Photo::load_base (Syntax& syntax, AttributeList& alist)
 { 
-  syntax.add ("min_PAR", "W/m^2", Check::non_negative (), Syntax::Const,
+  syntax.add ("min_PAR", "W/m^2", Check::non_negative (), Value::Const,
 	      "Minimum PAR at top of canopy for photosynthesis.\n\
 If radiation is below this amount, photosynthesis will be disabled.");
   alist.add ("min_PAR", 0.1);

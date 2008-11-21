@@ -218,76 +218,76 @@ CanopyStandard::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("description", "Standard canopy model.");
 
   // Parameters.
-  syntax.add ("SpLAI", "(m^2/m^2)/(g DM/m^2)", Syntax::Const,
+  syntax.add ("SpLAI", "(m^2/m^2)/(g DM/m^2)", Value::Const,
 	      " Specific leaf weight.");
-  syntax.add ("LeafAIMod", "DS", Syntax::None (), Syntax::Const,
+  syntax.add ("LeafAIMod", "DS", Value::None (), Value::Const,
 	      "Specific leaf weight modifier.\n\
 Used only after the intital phase.");
   PLF AIDef;
   AIDef.add (0.00, 1.00);
   AIDef.add (2.00, 1.00);
   alist.add ("LeafAIMod", AIDef);
-  syntax.add ("SpSOrgAI", "(m^2/m^2)/(g DM/m^2)", Syntax::Const,
+  syntax.add ("SpSOrgAI", "(m^2/m^2)/(g DM/m^2)", Value::Const,
 	      "Specific storage organ weight.\n\
 Used only after the intital phase.");
   alist.add ("SpSOrgAI", 0.0);
-  syntax.add ("SOrgAIMod", "DS", Syntax::None (), Syntax::Const,
+  syntax.add ("SOrgAIMod", "DS", Value::None (), Value::Const,
 	      "Specific storage organ weight modifier.\n\
 Used only after the intital phase.");
   alist.add ("SOrgAIMod", AIDef);
-  syntax.add ("SOrgPhotEff", Syntax::None (), Syntax::Const,
+  syntax.add ("SOrgPhotEff", Value::None (), Value::Const,
 	      "Relative photosynthetic efficiency of storage organ.\n\
 Used only after the intital phase.");
   alist.add ("SOrgPhotEff", 1.0);
-  syntax.add ("SpStemAI", "(m^2/m^2)/(g DM/m^2)", Syntax::Const,
+  syntax.add ("SpStemAI", "(m^2/m^2)/(g DM/m^2)", Value::Const,
 	      "Specific stem weight.\n\
 Used only after the intital phase.");
   alist.add ("SpStemAI", 0.0);
-  syntax.add ("StemAIMod", "DS", Syntax::None (), Syntax::Const,
+  syntax.add ("StemAIMod", "DS", Value::None (), Value::Const,
 	      "Specific stem weight modifier.\n\
 Used only after the intital phase.");
   alist.add ("StemAIMod", AIDef);
-  syntax.add ("StemPhotEff", Syntax::None (), Syntax::Const,
+  syntax.add ("StemPhotEff", Value::None (), Value::Const,
 	      "Relative photosynthetic efficiency of stem.\n\
 Used only after the intital phase.");
   alist.add ("StemPhotEff", 1.0);
-  syntax.add ("HvsDS", Syntax::None (), "cm", Syntax::Const,
+  syntax.add ("HvsDS", Value::None (), "cm", Value::Const,
 	      "Crop height as function of DS.");
   PLF HvsStem;
   HvsStem.add (0.00 , 0.10);
   HvsStem.add (200.0, 1.00);
-  syntax.add ("HvsWStem", "g DM/m^2", Syntax::Fraction (), Syntax::Const,
+  syntax.add ("HvsWStem", "g DM/m^2", Value::Fraction (), Value::Const,
 	      "Relative crop height as function of stem weight.\n\
 By default, it needs 200 g DM/m^2 to reach full height.");
   alist.add ("HvsWStem", HvsStem);
-  syntax.add ("LAIDist0", Syntax::None (), Syntax::Const, 3,
+  syntax.add ("LAIDist0", Value::None (), Value::Const, 3,
 	      "Relative CAI distribution at DS=0.");
-  syntax.add ("LAIDist1", Syntax::None (), Syntax::Const, 3,
+  syntax.add ("LAIDist1", Value::None (), Value::Const, 3,
 	      "Relative CAI distribution at DS=1.");
-  syntax.add ("PARrel", Syntax::None (), Syntax::Const,
+  syntax.add ("PARrel", Value::None (), Value::Const,
 	      "Relative PAR below the canopy.\n\
 If the relative PAR get below this, the bottom leaves will start dying.");
   alist.add ("PARrel", 0.05);
 
   // Variables.
-  syntax.add ("Offset", "cm", Syntax::State, "Extra height after harvest.");
+  syntax.add ("Offset", "cm", Value::State, "Extra height after harvest.");
   alist.add ("Offset", 0.0);
-  syntax.add ("LeafAI", "m^2/m^2", Syntax::State, "Leaf Area Index.");
+  syntax.add ("LeafAI", "m^2/m^2", Value::State, "Leaf Area Index.");
   alist.add ("LeafAI", 0.0);
-  syntax.add ("StemAI", "m^2/m^2", Syntax::State, "Stem Area Index.");
+  syntax.add ("StemAI", "m^2/m^2", Value::State, "Stem Area Index.");
   alist.add ("StemAI", 0.0);
-  syntax.add ("SOrgAI", "m^2/m^2", Syntax::State, "Storage Organ Area Index.");
+  syntax.add ("SOrgAI", "m^2/m^2", Value::State, "Storage Organ Area Index.");
   alist.add ("SOrgAI", 0.0);
-  syntax.add ("LADm", "cm^2/cm^3", Syntax::State,
+  syntax.add ("LADm", "cm^2/cm^3", Value::State,
 	      "Maximal Leaf Area Density.");
   alist.add ("LADm", -9999.99);
 
   // Log Variables.
-  syntax.add ("ForcedCAI", "m^2/m^2", Syntax::LogOnly,
+  syntax.add ("ForcedCAI", "m^2/m^2", Value::LogOnly,
 	      "CAI forced upon us by vegetation module.");
-  syntax.add ("SimCAI", "m^2/m^2", Syntax::LogOnly,
+  syntax.add ("SimCAI", "m^2/m^2", Value::LogOnly,
 	      "CAI simulated by crop model.");
-  syntax.add ("CAImRat", Syntax::None (), Syntax::LogOnly,
+  syntax.add ("CAImRat", Value::None (), Value::LogOnly,
 	      "(CAIm - CAI) / CAIm.");
 }
 

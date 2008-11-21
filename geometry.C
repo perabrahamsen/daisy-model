@@ -607,9 +607,9 @@ static struct CheckLayers : public VCheck
 	      const symbol key) const throw (std::string)
   {
     daisy_assert (alist.check (key));
-    daisy_assert (syntax.lookup (key) == Syntax::AList);
+    daisy_assert (syntax.lookup (key) == Value::AList);
     daisy_assert (!syntax.is_log (key));
-    daisy_assert (syntax.size (key) == Syntax::Sequence);
+    daisy_assert (syntax.size (key) == Value::Sequence);
 
     const std::vector<const AttributeList*>& layers = alist.alist_sequence (key);
 
@@ -634,33 +634,33 @@ static struct CheckLayers : public VCheck
 } check_layers;
 
 void 
-Geometry::add_layer (Syntax& syntax, Syntax::category cat, 
+Geometry::add_layer (Syntax& syntax, Value::category cat, 
                      symbol name,
 		     symbol dimension,
                      symbol description)
 {
   Syntax& layer = *new Syntax ();
-  layer.add ("end", "cm", Check::negative (), Syntax::Const, 
+  layer.add ("end", "cm", Check::negative (), Value::Const, 
 	     "End point of this layer (a negative number).");
-  if (dimension == Syntax::Fraction ())
-    layer.add_fraction ("value", Syntax::Const, description);
+  if (dimension == Value::Fraction ())
+    layer.add_fraction ("value", Value::Const, description);
   else
-    layer.add ("value", dimension, Syntax::Const, description);
+    layer.add ("value", dimension, Value::Const, description);
   layer.order ("end", "value");
 
   const std::string iname = "initial_" + name;
   syntax.add (iname, layer,
-	      Syntax::OptionalConst, Syntax::Sequence, 
+	      Value::OptionalConst, Value::Sequence, 
 	      "Initial value of the '" + name + "' parameter.\n\
 The initial value is given as a sequence of (END VALUE) pairs, starting\n\
 from the top and going down.  The parameter will be initialized to\n\
 VALUE from the END of the previous layer, to the END of the current layer.");
   syntax.add_check (iname, check_layers);
-  if (dimension == Syntax::Fraction ())
-    syntax.add_fraction (name, cat, Syntax::Sequence, 
+  if (dimension == Value::Fraction ())
+    syntax.add_fraction (name, cat, Value::Sequence, 
                          description);
   else
-    syntax.add (name, dimension, cat, Syntax::Sequence, 
+    syntax.add (name, dimension, cat, Value::Sequence, 
                 description);
 }
 

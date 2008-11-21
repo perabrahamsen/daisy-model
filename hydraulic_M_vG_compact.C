@@ -172,19 +172,19 @@ static struct HydraulicM_vG_compactSyntax
 	       "van Genuchten retention curve model with Mualem theory\n\
 and compaction.");
     Hydraulic::load_Theta_res (syntax, alist);
-    syntax.add ("ref_alpha", "cm^-1", Syntax::Const,
+    syntax.add ("ref_alpha", "cm^-1", Value::Const,
 		"Reference van Genuchten alpha.");
-    syntax.add ("ref_n", Syntax::None (), Syntax::Const,
+    syntax.add ("ref_n", Value::None (), Value::Const,
 		"Reference van Genuchten n.");
-    syntax.add ("ref_K_sat", "cm/h", Syntax::Const,
+    syntax.add ("ref_K_sat", "cm/h", Value::Const,
 		"Reference water conductivity of saturated soil.");
-    syntax.add ("mod_alpha", Syntax::Fraction (), Syntax::None (), 
-		Syntax::Const,
+    syntax.add ("mod_alpha", Value::Fraction (), Value::None (), 
+		Value::Const,
 		"Porosity modifier for van Genuchten alpha.");
-    syntax.add ("mod_n", Syntax::Fraction (), Syntax::None (), Syntax::Const,
+    syntax.add ("mod_n", Value::Fraction (), Value::None (), Value::Const,
 		"Porosity modifier for van Genuchten n.");
-    syntax.add ("mod_K_sat", Syntax::Fraction (), Syntax::None (),
-		Syntax::Const,
+    syntax.add ("mod_K_sat", Value::Fraction (), Value::None (),
+		Value::Const,
 		"Porosity modifier for water conductivity of saturated soil.");
 
     Librarian::add_type (Hydraulic::component, "M_vG_compact", alist, syntax, &make);

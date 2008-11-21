@@ -175,18 +175,18 @@ This function is described in ``Soil hydraulic properties near\n\
 saturation, an improved model'' by Boergesen et. al, submitted to\n\
 Water Resources Research 2003.");
   Hydraulic::load_Theta_res (syntax, alist);
-  syntax.add ("K_sat", "cm/h", Check::non_negative (), Syntax::OptionalConst,
+  syntax.add ("K_sat", "cm/h", Check::non_negative (), Value::OptionalConst,
 	      "Water conductivity of saturated soil.");
-  syntax.add ("alpha", "cm^-1", Syntax::Const,
+  syntax.add ("alpha", "cm^-1", Value::Const,
 	      "van Genuchten alpha.");
-  syntax.add ("n", Syntax::None (), Syntax::Const,
+  syntax.add ("n", Value::None (), Value::Const,
 	      "van Genuchten n.");
-  syntax.add ("l", Syntax::None (), Syntax::Const,
+  syntax.add ("l", Value::None (), Value::Const,
 	      "tortuosity parameter.");
   alist.add ("l", 0.5);
-  syntax.add ("h_m", "cm", Check::negative (), Syntax::Const,
+  syntax.add ("h_m", "cm", Check::negative (), Value::Const,
 	      "Pressure point of chance between matrix and macropores.");
-  syntax.add ("f", Syntax::None (), Check::non_negative (), Syntax::Const,
+  syntax.add ("f", Value::None (), Check::non_negative (), Value::Const,
 	      "Macropores conductivity curve shape parameter.");
     
   Librarian::add_type (Hydraulic::component, "M_vGp", alist, syntax, make);

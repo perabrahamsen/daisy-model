@@ -85,7 +85,7 @@ static struct StomataConLeuningSyntax
   { return *new StomataCon_Leuning (al); }
   static void load_syntax (Syntax& syntax, AttributeList& alist)
   {
-    syntax.add ("Do", "[Pa]", Check::non_negative (), Syntax::Const,
+    syntax.add ("Do", "[Pa]", Check::non_negative (), Value::Const,
                 "Coefficient, value after Leuning (1995)");
     alist.add ("Do", 1500.);
 

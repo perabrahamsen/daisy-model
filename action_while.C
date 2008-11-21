@@ -112,7 +112,7 @@ Perform all the specified actions in the sequence listed, but in the\n\
 same timestep.  The 'while' action is done when the first action in the\n\
 list is done.");
     syntax.add_object ("actions", Action::component, 
-                       Syntax::State, Syntax::Sequence,
+                       Value::State, Value::Sequence,
                        "List of actions to perform.");
     syntax.order ("actions");
     Librarian::add_type (Action::component, "while", alist, syntax, &make);

@@ -332,28 +332,28 @@ void
 LogSelect::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   syntax.add_check (check_alist);
-  syntax.add ("description", Syntax::String, Syntax::Const,
+  syntax.add ("description", Value::String, Value::Const,
 	      "Description of this log file format.");
   alist.add ("description", "\
 Each selected variable is represented by a column in the log.");
   syntax.add_object ("when", Condition::component, "\
 Add entries to the log file when this condition is true.");
   syntax.add_object ("entries", Select::component, 
-                     Syntax::State, Syntax::Sequence,
+                     Value::State, Value::Sequence,
                      "What to log in each column.");
-  syntax.add ("time_columns", Syntax::Boolean, Syntax::OptionalConst, "\
+  syntax.add ("time_columns", Value::Boolean, Value::OptionalConst, "\
 Iff true, add columns for year, month, mday and hour in the begining of\n\
 the lines.  By default, this will be true of you have not specified any\n\
 time entries yourself.");
   syntax.add_object ("volume", Volume::component, 
-                     Syntax::Const, Syntax::Singleton,
+                     Value::Const, Value::Singleton,
                      "Soil volume to log.");
   alist.add ("volume", Volume::infinite_box ());
-  syntax.add ("from", "cm", Syntax::OptionalConst,
+  syntax.add ("from", "cm", Value::OptionalConst,
 	      "Default 'from' value for all entries.\n\
 By default, use the top of the soil.\n\
 OBSOLETE: Use (volume box (top FROM)) instead.");
-  syntax.add ("to", "cm", Syntax::OptionalConst,
+  syntax.add ("to", "cm", Value::OptionalConst,
 	      "Default 'to' value for all entries.\n\
 By default, use the bottom of the soil.\n\
 OBSOLETE: Use (volume box (bottom TO)) instead.");

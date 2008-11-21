@@ -133,9 +133,9 @@ HydraulicM_BaCSyntax::HydraulicM_BaCSyntax ()
 	     "Brooks and Corey retention curve model with Mualem theory.");
   Hydraulic::load_Theta_res (syntax, alist);
   Hydraulic::load_K_sat (syntax, alist);
-  syntax.add ("lambda", Syntax::None (), Syntax::Const,
+  syntax.add ("lambda", Value::None (), Value::Const,
 	      "Pore size index.");
-  syntax.add ("h_b", "cm", Check::negative (), Syntax::Const,
+  syntax.add ("h_b", "cm", Check::negative (), Value::Const,
 	      "Bubbling pressure.");
 
   Librarian::add_type (Hydraulic::component, "M_BaC", alist, syntax, make);

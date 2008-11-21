@@ -142,7 +142,7 @@ static struct ABAProdSoilSyntax
     alist.add ("description", "\
 ABA production based on soil location.");
     syntax.add_object ("expr", Number::component, 
-                       Syntax::Const, Syntax::Singleton, "\
+                       Value::Const, Value::Singleton, "\
 Expression to evaluate to ABA uptake [g/cm^3/h].\n\
 The symbol 'h' will be bound to the water pressure [cm].\n\
 The symbol 'L' will be bound to the root density [cm/cm^3].\n\

@@ -497,10 +497,10 @@ void
 HeatrectMollerup::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   syntax.add_object ("solver", Solver::component, 
-		     Syntax::Const, Syntax::Singleton, "\
+		     Value::Const, Value::Singleton, "\
 Model used for solving matrix equation system.");
   alist.add ("solver", Solver::default_model ());
-  syntax.add ("debug", Syntax::Integer, Syntax::Const, "\
+  syntax.add ("debug", Value::Integer, Value::Const, "\
 Enable additional debug message.\n\
 A value of 0 means no message, higher numbers means more messages.");
   alist.add ("debug", 0);

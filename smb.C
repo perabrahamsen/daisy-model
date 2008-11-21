@@ -135,7 +135,7 @@ of SMB pools plus the number of SOM pools plus the number of DOM pools.");
   alist.add ("submodel", "SMB");
   alist.add ("description", "\
 A single Soil MicroBiological pool.");
-  syntax.add ("maintenance", "h^-1", Check::fraction (), Syntax::Const, "\
+  syntax.add ("maintenance", "h^-1", Check::fraction (), Value::Const, "\
 The fraction used for staying alive each hour.");
 }
 

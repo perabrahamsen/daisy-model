@@ -382,7 +382,7 @@ ParserFile::Implementation::check_dimension (const symbol syntax,
 {
   if (syntax != read)
     {
-      if (syntax == Syntax::Unknown ())
+      if (syntax == Value::Unknown ())
 	{
 	  if (read.name ().length () == 0 || read.name ()[0] != '?')
 	    warning ("you must use [?<dim>] for entries with unknown syntax");
@@ -391,8 +391,8 @@ ParserFile::Implementation::check_dimension (const symbol syntax,
                                               msg))
 	{
 	  error (std::string ("expected [") 
-                 + ((syntax == Syntax::Fraction ()
-                     || syntax == Syntax::None ())
+                 + ((syntax == Value::Fraction ()
+                     || syntax == Value::None ())
                     ? "" : syntax) + "] got [" + read + "]");
 	  return false; 
 	}
@@ -406,16 +406,16 @@ ParserFile::Implementation::convert (double value,
 				     const symbol read, 
 				     const Lexer::Position& pos)
 { 
-  if (syntax == Syntax::Unknown ())
+  if (syntax == Value::Unknown ())
     return value; 
   if (syntax == read)
     return value;
-  if (syntax == Syntax::Fraction () && read == "%")
+  if (syntax == Value::Fraction () && read == "%")
     return value * 0.01;
   
   try
     {
-      if (syntax == Syntax::None () || syntax == Syntax::Fraction ())
+      if (syntax == Value::None () || syntax == Value::Fraction ())
 	if (read == "")
 	  return value;
 	else
@@ -554,7 +554,7 @@ ParserFile::Implementation::add_derived (Library& lib)
   daisy_assert (!syntax.ordered () 
                 || syntax.order ().begin () != syntax.order ().end ());
   if ((!syntax.ordered () 
-       || syntax.lookup (*(syntax.order ().begin ())) != Syntax::String) 
+       || syntax.lookup (*(syntax.order ().begin ())) != Value::String) 
       && looking_at ('"'))
     atts.add ("description", get_string ());
   // Add separate attributes for this object.
@@ -729,47 +729,47 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	  bool ok = true;
 	  // Special handling of block local parameters.
 	  const std::string var = get_string ();
-	  if (syntax.lookup (var) != Syntax::Error)
+	  if (syntax.lookup (var) != Value::Error)
 	    {
 	      error ("'" + var + "' already exists");
 	      ok = false;
 	    }
-          int size = Syntax::Singleton;
+          int size = Value::Singleton;
           if (looking_at ('['))
             {
               skip ("[");
               if (looking_at (']'))
-                size = Syntax::Sequence;
+                size = Value::Sequence;
               else
                 size = get_integer ();
               skip ("]");
             }
 	  const std::string type_name = get_string ();
 	  symbol doc = "User defined " + type_name + ".";
-	  const Syntax::type type = Syntax::type_number (type_name);
+	  const Value::type type = Value::type_number (type_name);
 	  switch (type)
 	    {
-	    case Syntax::String:
-	    case Syntax::Integer:
+	    case Value::String:
+	    case Value::Integer:
 	      {
 		if (!looking_at ('('))
 		  doc = get_symbol ();
 		if (ok)
-		  syntax.add (var, type, Syntax::Const, size, doc);
+		  syntax.add (var, type, Value::Const, size, doc);
 		break;
 	      }
-	    case Syntax::Number:
+	    case Value::Number:
 	      {
-		symbol dim = Syntax::Unknown ();
+		symbol dim = Value::Unknown ();
 		if (looking_at ('['))
 		  dim = get_symbol ();
 		if (!looking_at ('('))
 		  doc = get_symbol ();
 		if (ok)
-		  syntax.add (var, dim, Syntax::Const, size, doc);
+		  syntax.add (var, dim, Value::Const, size, doc);
 		break;
 	      }
-	    case Syntax::Error:
+	    case Value::Error:
 	      {
                 if (type_name == "fixed")
                   {
@@ -785,9 +785,9 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
                             AttributeList& sub_al = *new AttributeList ();
                             Submodel::load_syntax (submodel, sub_syn, sub_al);
                             // This mimics what Syntax::add_submodule does
-                            // for a Syntax::Const.
+                            // for a Value::Const.
                             syntax.add (var, sub_syn, 
-                                        Syntax::Const, size, doc);
+                                        Value::Const, size, doc);
                             atts.add (var, sub_al);
                           }
                         break;
@@ -802,7 +802,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
                           doc = get_string ();
                         if (ok)
                           syntax.add_object (var, type_symbol, 
-                                             Syntax::Const, size, doc);
+                                             Value::Const, size, doc);
                         break;
                       }
                   }
@@ -819,8 +819,8 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
       // Duplicate warning.
       if (found.find (name) != found.end ())
 	warning (name + " specified twice, last takes precedence");
-      else if (syntax.lookup (name) != Syntax::Library // (deffoo ...)
-	       && (syntax.lookup (name) != Syntax::Object
+      else if (syntax.lookup (name) != Value::Library // (deffoo ...)
+	       && (syntax.lookup (name) != Value::Object
 		   || (syntax.library (metalib, name).name () // (input file )
 		       != symbol (Parser::component))))
 	found.insert (name);
@@ -838,16 +838,16 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
           else
             atts.add_reference (name, var);
         }
-      else if (syntax.size (name) == Syntax::Singleton)
+      else if (syntax.size (name) == Value::Singleton)
 	switch (syntax.lookup (name))
 	  {
-	  case Syntax::Number:
+	  case Value::Number:
 	    {
-              if (syntax.dimension (name) == Syntax::User ())
+              if (syntax.dimension (name) == Value::User ())
                 {
                   const double value = get_number ();
                   const symbol dim = 
-		    looking_at ('[') ? get_dimension () : Syntax::Unknown ();
+		    looking_at ('[') ? get_dimension () : Value::Unknown ();
                   check_value (syntax, name, value);
                   atts.add (name, value, dim);
                   break;
@@ -857,7 +857,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	      atts.add (name, value);
 	      break;
 	    }
-	  case Syntax::AList: 
+	  case Value::AList: 
 	    {
               Treelog::Open nest (msg, "In submodel '" + name + "'");
 	      bool alist_skipped = false;
@@ -883,7 +883,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		skip (")");
 	      break;
 	    }
-	  case Syntax::PLF:
+	  case Value::PLF:
 	    {
 	      Parskip skip (*this, in_order);
 	      PLF plf;
@@ -927,14 +927,14 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		atts.add (name, plf);
 	      break;
 	    }
-	  case Syntax::String:
+	  case Value::String:
 	    atts.add (name, get_string ());
 	    // Handle "directory" immediately.
 	    if (&syntax == &metalib.syntax () && name == "directory")
 	      if (!metalib.path ().set_directory (atts.name (name).name ()))
 		error ("Could not set directory '" + atts.name (name) + "'");
 	    break;
-	  case Syntax::Boolean:
+	  case Value::Boolean:
 	    {
 	      const std::string flag = get_string ();
 
@@ -948,14 +948,14 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		}
 	      break;
 	    }
-	  case Syntax::Integer:
+	  case Value::Integer:
 	    atts.add (name, get_integer ());
 	    break;
-	  case Syntax::Library:
+	  case Value::Library:
 	    // Handled specially: Put directly in global library.
 	    add_derived (syntax.library (metalib, name));
 	    break;
-	  case Syntax::Object:
+	  case Value::Object:
 	    {
               std::auto_ptr<AttributeList> al;
 	      const Library& lib = syntax.library (metalib, name);
@@ -988,7 +988,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		}
 	    }
 	    break;
-	  case Syntax::Error:
+	  case Value::Error:
 	    error (std::string("Unknown singleton '") + name + "'");
 	    skip_to_end ();
 	    break;
@@ -1017,7 +1017,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 	  // Support for sequences not really finished yet.
 	  switch (syntax.lookup (name))
 	    {
-	    case Syntax::Object:
+	    case Value::Object:
 	      {
 		const Library& lib = syntax.library (metalib, name);
 		static const std::vector<const AttributeList*> no_sequence;
@@ -1065,7 +1065,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		sequence_delete (sequence.begin (), sequence.end ());
 		break;
 	      }
-	    case Syntax::AList:
+	    case Value::AList:
 	      {
 		const size_t size = syntax.size (name);
 		static const std::vector<const AttributeList*> no_sequence;
@@ -1113,7 +1113,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		  }
 		if (skipped)
 		  skip (")");
-		if (size != Syntax::Sequence && sequence.size () != size)
+		if (size != Value::Sequence && sequence.size () != size)
 		  {
 		    std::ostringstream str;
 		    str << "Got " << sequence.size ()
@@ -1124,7 +1124,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		sequence_delete (sequence.begin (), sequence.end ());
 		break;
 	      }
-	    case Syntax::PLF:
+	    case Value::PLF:
 	      {
 		std::vector<const PLF*> plfs;
 		int total = 0;
@@ -1174,7 +1174,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		    total++;
 		    plfs.push_back (&plf);
 		  }
-		if (size != Syntax::Sequence && total != size)
+		if (size != Value::Sequence && total != size)
 		  {
 		    std::ostringstream str;
 		    str << "Got " << total
@@ -1188,7 +1188,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		sequence_delete (plfs.begin (), plfs.end ());
 		break;
 	      }
-	    case Syntax::Number:
+	    case Value::Number:
 	      {
 		std::vector<double> array;
 		std::vector<Lexer::Position> positions;
@@ -1265,7 +1265,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 			  error (str.str (), positions[i]);
 			}
 		  }
-		if (size != Syntax::Sequence && count != size)
+		if (size != Value::Sequence && count != size)
 		  {
 		    std::ostringstream str;
 		    str << "Got " << count 
@@ -1278,7 +1278,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		atts.add (name, array);
 		break;
 	      }
-	    case Syntax::String:
+	    case Value::String:
 	      {
 		std::vector<symbol> array;
 		int count = 0;
@@ -1300,7 +1300,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		    array.push_back (get_symbol ());
 		    count++;
 		  }
-		if (size != Syntax::Sequence && count != size)
+		if (size != Value::Sequence && count != size)
 		  {
 		    std::ostringstream str;
 		    str << "Got " << count 
@@ -1320,7 +1320,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		  }
 		break;
 	      }
-	    case Syntax::Integer:
+	    case Value::Integer:
 	      {
 		std::vector<int> array;
 		int count = 0;
@@ -1342,7 +1342,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		    array.push_back (get_integer ());
 		    count++;
 		  }
-		if (size != Syntax::Sequence && count != size)
+		if (size != Value::Sequence && count != size)
 		  {
 		    std::ostringstream str;
 		    str << "Got " << count 
@@ -1356,7 +1356,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		// Handle "path" immediately.
 		break;
 	      }
-	    case Syntax::Error:
+	    case Value::Error:
 	      error (std::string("Unknown attribute '") + name + "'");
 	      skip_to_end ();
 	      break;
@@ -1461,7 +1461,7 @@ static struct ParserFileSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", 
 	       "Read a setup file containing lots of parentheses.");
-    syntax.add ("where", Syntax::String, Syntax::Const,
+    syntax.add ("where", Value::String, Value::Const,
 		"File to read from.");
     syntax.order ("where");
     Librarian::add_type (Parser::component, "file", alist, syntax, &make);

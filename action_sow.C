@@ -77,11 +77,11 @@ static struct ActionSowSyntax
     syntax.add_object ("crop", Crop::component, "Crop to sow.");
     syntax.order ("crop");
     syntax.add ("row_width", "cm", Check::non_negative (), 
-                Syntax::Const, "Distance between rows.\n\
+                Value::Const, "Distance between rows.\n\
 Specify zero to spread equally over the area (no rows).");
     alist.add ("row_width", 0.0);
     syntax.add ("plant_distance", "cm", Check::non_negative (),
-                Syntax::OptionalConst, "Distance between plants.\n\
+                Value::OptionalConst, "Distance between plants.\n\
 \n\
 Setting this will overrule 'row_width'.  The only purpose of this\n\
 paramater is to provide the user with a more intuitive name for\n\
@@ -89,18 +89,18 @@ paramater is to provide the user with a more intuitive name for\n\
 the x axis is parallel with the actual rows in the field, rather than\n\
 ortogonal to the rows as is otherwise assumed by Daisy.");
     syntax.add ("row_position", "cm", Check::non_negative (), 
-                Syntax::Const, "Position of plant row on x-axes.\n\
+                Value::Const, "Position of plant row on x-axes.\n\
 Specify zero to spread equally over the area (no rows).");
     alist.add ("row_position", 0.0);
     syntax.add ("plant_position", "cm", Check::non_negative (),
-                Syntax::OptionalConst, "Position of plant on x-axes.\n\
+                Value::OptionalConst, "Position of plant on x-axes.\n\
 \n                                                                      \
 Setting this will overrule 'row_position'.  The only purpose of this\n\
 paramater is to provide the user with a more intuitive name for\n       \
 'row_position' for the situation where you have a 2D simulation, where\n\
 the x axis is parallel with the actual rows in the field, rather than\n\
 ortogonal to the rows as is otherwise assumed by Daisy.");
-    syntax.add ("seed", "g w.w./m^2", Check::positive (), Syntax::OptionalConst,
+    syntax.add ("seed", "g w.w./m^2", Check::positive (), Value::OptionalConst,
                 "Amount of seed applied.\n\
 By default, initial growth will be governed by 'typical' seed amounts.");
     Librarian::add_type (Action::component, "sow", alist, syntax, &make);

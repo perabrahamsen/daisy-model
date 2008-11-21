@@ -357,35 +357,35 @@ static struct RaddistDPFSyntax
     alist.add ("description", 
 	       "Sun-shade model of radiation distribution in the canopy.");
 
-    syntax.add ("sigma_PAR", Syntax::None (), Check::positive (), Syntax::Const,
+    syntax.add ("sigma_PAR", Value::None (), Check::positive (), Value::Const,
                 "Leaf scattering coefficient of PAR. sigma_PAR=0,15 (Houborg, 2006)");
     alist.add ("sigma_PAR", 0.15);
 
-    syntax.add ("sigma_NIR", Syntax::None (), Check::positive (), Syntax::Const,
+    syntax.add ("sigma_NIR", Value::None (), Check::positive (), Value::Const,
                 "Leaf scattering coefficient of NIR. sigma_NIR=0,83 (Houborg, 2006)");
     alist.add ("sigma_NIR", 0.83);
 
-    syntax.add ("Ps_PAR", Syntax::None (), Check::positive (), Syntax::Const,
+    syntax.add ("Ps_PAR", Value::None (), Check::positive (), Value::Const,
                 "Soil reflection coefficient of PAR, Ps_PAR = 0.1 (Houborg, 2006)");
     alist.add ("Ps_PAR", 0.1); 
 
-    syntax.add ("Ps_NIR", Syntax::None (), Check::positive (), Syntax::Const,
+    syntax.add ("Ps_NIR", Value::None (), Check::positive (), Value::Const,
                 "Soil reflection coefficient of NIR, Ps_NIR = 0.18 (Houborg, 2006)");
     alist.add ("Ps_NIR", 0.18);
  
-    syntax.add ("IRb0", "W m^-2", Syntax::LogOnly, "Beam radiation above the canopy");
-    syntax.add ("IRd0", "W m^-2", Syntax::LogOnly,
+    syntax.add ("IRb0", "W m^-2", Value::LogOnly, "Beam radiation above the canopy");
+    syntax.add ("IRd0", "W m^-2", Value::LogOnly,
                 "Diffuse radiation above the canopy ");
-    syntax.add ("Ph_PAR", "", Syntax::LogOnly, 
+    syntax.add ("Ph_PAR", "", Value::LogOnly, 
                 "Canopy reflection coefficeint of beam PAR for horizontal leaves");
-    syntax.add ("Pcb_PAR", "", Syntax::LogOnly, "Canopy reflection coefficeint of beam PAR for uniform leaf-angel distribution");
-    syntax.add ("Pscb_PAR", "", Syntax::LogOnly, "Canopy-soil reflection coefficeint of beam PAR for uniform leaf-angel distribution");
-    syntax.add ("Pscd_PAR", "", Syntax::LogOnly, "Canopy-soil reflection coefficeint of diffuse PAR for uniform leaf-angel distribution");
-    syntax.add ("Ph_NIR", "", Syntax::LogOnly, 
+    syntax.add ("Pcb_PAR", "", Value::LogOnly, "Canopy reflection coefficeint of beam PAR for uniform leaf-angel distribution");
+    syntax.add ("Pscb_PAR", "", Value::LogOnly, "Canopy-soil reflection coefficeint of beam PAR for uniform leaf-angel distribution");
+    syntax.add ("Pscd_PAR", "", Value::LogOnly, "Canopy-soil reflection coefficeint of diffuse PAR for uniform leaf-angel distribution");
+    syntax.add ("Ph_NIR", "", Value::LogOnly, 
                 "Canopy reflection coefficeint of beam NIR for horizontal leaves");
-    syntax.add ("Pcb_NIR", "", Syntax::LogOnly, "Canopy reflection coefficeint of beam NIR for uniform leaf-angel distribution");
-    syntax.add ("Pscb_NIR", "", Syntax::LogOnly, "Canopy-soil reflection coefficeint of beam NIR for uniform leaf-angel distribution");
-    syntax.add ("Pscd_NIR", "", Syntax::LogOnly, "Canopy-soil reflection coefficeint of diffuse NIR for uniform leaf-angel distribution");
+    syntax.add ("Pcb_NIR", "", Value::LogOnly, "Canopy reflection coefficeint of beam NIR for uniform leaf-angel distribution");
+    syntax.add ("Pscb_NIR", "", Value::LogOnly, "Canopy-soil reflection coefficeint of beam NIR for uniform leaf-angel distribution");
+    syntax.add ("Pscd_NIR", "", Value::LogOnly, "Canopy-soil reflection coefficeint of diffuse NIR for uniform leaf-angel distribution");
 
     Raddist::load_syntax (syntax, alist);
     Librarian::add_type (Raddist::component, "sun-shade", alist, syntax, &make);

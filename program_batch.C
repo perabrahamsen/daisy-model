@@ -99,14 +99,14 @@ static struct ProgramBatchSyntax
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    syntax.add ("description", Syntax::String, Syntax::Const, 
+    syntax.add ("description", Value::String, Value::Const, 
                 "Description of this batch program.");
     alist.add ("description", "Run a sequence of programs."); 
-    syntax.add ("directory", Syntax::String, Syntax::Const, "\
+    syntax.add ("directory", Value::String, Value::Const, "\
 Directory in which to initialize, check and run the programs.");
     alist.add ("directory", ".");
     syntax.add_object ("run", Program::component, 
-                       Syntax::State, Syntax::Sequence, "\
+                       Value::State, Value::Sequence, "\
 List of programs to run.  The programs will be run in the sequence listed.");
    
     Librarian::add_type (Program::component, "batch", alist, syntax, &make);

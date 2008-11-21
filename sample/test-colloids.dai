@@ -96,4 +96,4 @@
         ("Colloids")
         (checkpoint (when (at 1987 8 7 6))))
 
-;;; test-mibsol.dai ends here.
+;;; test-colloids.dai ends here.

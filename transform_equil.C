@@ -168,10 +168,10 @@ static struct TransformEquilibriumSyntax
     syntax.add_object ("equilibrium", Equilibrium::component,
                        "Function for calculating equilibrium between A and B.");
     syntax.add_object ("k_AB", Number::component,
-                       Syntax::Const, Syntax::Singleton, "\
+                       Value::Const, Value::Singleton, "\
 Tranformation rate from soil component 'A' to 'B' [h^-1].");
     syntax.add_object ("k_BA", Number::component,
-                       Syntax::OptionalConst, Syntax::Singleton, "\
+                       Value::OptionalConst, Value::Singleton, "\
 Tranformation rate from soil component 'B' to 'A' [h^-1].\n\
 By default, this is identical to 'k_AB'.");
     Librarian::add_type (Transform::component, "equilibrium",

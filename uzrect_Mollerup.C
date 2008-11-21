@@ -1117,45 +1117,45 @@ void
 UZRectMollerup::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   syntax.add_object ("solver", Solver::component, 
-		     Syntax::Const, Syntax::Singleton, "\
+		     Value::Const, Value::Singleton, "\
 Model used for solving matrix equation system.");
   alist.add ("solver", Solver::default_model ());
   syntax.add_object ("K_average", Average::component,
-                     Syntax::Const, Syntax::Singleton,
+                     Value::Const, Value::Singleton,
                      "Model for calculating average K between cells.");
   alist.add ("K_average", Average::arithmetic_model ());
   syntax.add ("max_time_step_reductions",
-              Syntax::Integer, Syntax::Const, "\
+              Value::Integer, Value::Const, "\
 Number of times we may reduce the time step before giving up");
   alist.add ("max_time_step_reductions", 4);
-  syntax.add ("time_step_reduction", Syntax::Integer, Syntax::Const, 
+  syntax.add ("time_step_reduction", Value::Integer, Value::Const, 
               "Divide the time step with this at each reduction.");
   alist.add ("time_step_reduction", 4);
-  syntax.add ("max_iterations", Syntax::Integer, Syntax::Const, "\
+  syntax.add ("max_iterations", Value::Integer, Value::Const, "\
 Maximum number of iterations when seeking convergence before reducing\n\
 the time step.");
   alist.add ("max_iterations", 12);
-  syntax.add ("max_number_of_small_time_steps", Syntax::Integer, Syntax::Const, "\
+  syntax.add ("max_number_of_small_time_steps", Value::Integer, Value::Const, "\
 Maximum number of small time steps in a large time step.");
   alist.add ("max_number_of_small_time_steps", 1000);  
-  syntax.add ("msg_number_of_small_time_steps", Syntax::Integer, Syntax::Const, "\
+  syntax.add ("msg_number_of_small_time_steps", Value::Integer, Value::Const, "\
 Number of small time steps in a large time step between message.");
   alist.add ("msg_number_of_small_time_steps", 100);  
-  syntax.add ("max_absolute_difference", "cm", Syntax::Const, "\
+  syntax.add ("max_absolute_difference", "cm", Value::Const, "\
 Maximum absolute difference in 'h' values for convergence.");
   alist.add ("max_absolute_difference", 0.02);
-  syntax.add ("max_relative_difference", Syntax::None (), Syntax::Const, "\
+  syntax.add ("max_relative_difference", Value::None (), Value::Const, "\
 Maximum relative difference in 'h' values for convergence.");
   alist.add ("max_relative_difference", 0.001); 
-  syntax.add ("max_pressure_potential", Syntax::None (), Syntax::Const, "\
+  syntax.add ("max_pressure_potential", Value::None (), Value::Const, "\
 Maximum pressure potential for convergence.");
   alist.add ("max_pressure_potential", 1e9); 
-  syntax.add ("min_pressure_potential", Syntax::None (), Syntax::Const, "\
+  syntax.add ("min_pressure_potential", Value::None (), Value::Const, "\
 minimum pressure potential for convergence.");
   alist.add ("min_pressure_potential", -1.0e9); 
-  syntax.add ("forced_T", "dg C", Syntax::OptionalConst, "\
+  syntax.add ("forced_T", "dg C", Value::OptionalConst, "\
 Force transport equations to use this water temperature.");
-  syntax.add ("debug", Syntax::Integer, Syntax::Const, "\
+  syntax.add ("debug", Value::Integer, Value::Const, "\
 Level of debug messages:\n                              \
  \n                                                     \
 = 0: no debug messages.\n                               \
@@ -1166,7 +1166,7 @@ Level of debug messages:\n                              \
 = 5: Remaining water.");
   alist.add ("debug", 0);
   syntax.add ("Theta_error",
-              Syntax::None (), Syntax::LogOnly, Syntax::Sequence, "\
+              Value::None (), Value::LogOnly, Value::Sequence, "\
 Water mass balance error per cell.");
 }
 

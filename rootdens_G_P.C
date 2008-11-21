@@ -224,19 +224,19 @@ void
 Rootdens_G_P::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   Rootdens::load_base (syntax, alist);
-  syntax.add ("DensRtTip", "cm/cm^3", Check::positive (), Syntax::Const,
+  syntax.add ("DensRtTip", "cm/cm^3", Check::positive (), Value::Const,
               "Root density at (potential) penetration depth.");
   alist.add ("DensRtTip", 0.1);
-  syntax.add ("MinDens", "cm/cm^3", Check::non_negative (), Syntax::Const,
+  syntax.add ("MinDens", "cm/cm^3", Check::non_negative (), Value::Const,
               "Minimal root density\n\
 Root density will never be below this, as long as there is enough root mass.\n \
 Extra root mass will be distributed according to Gerwitz and Page.\n\
 If there are too little root mass, the root will have the same density\n\
 all the way down.");
   alist.add ("MinDens", 0.0);
-  syntax.add ("a", "cm^-1", Syntax::LogOnly, "Form parameter.\n\
+  syntax.add ("a", "cm^-1", Value::LogOnly, "Form parameter.\n\
 Calculated from 'DensRtTip'.");
-  syntax.add ("L0", "cm/cm^3", Syntax::LogOnly,
+  syntax.add ("L0", "cm/cm^3", Value::LogOnly,
               "Root density at soil surface.");
 }
 

@@ -41,8 +41,8 @@ Column::library_id () const
 void
 Column::Point::load_syntax (Syntax& syntax, AttributeList&)
 { 
-  syntax.add ("x", Syntax::Unknown (), Syntax::Const, "X-Coordinate.");
-  syntax.add ("y", Syntax::Unknown (), Syntax::Const, "Y-Coordinate.");
+  syntax.add ("x", Value::Unknown (), Value::Const, "X-Coordinate.");
+  syntax.add ("y", Value::Unknown (), Value::Const, "Y-Coordinate.");
   syntax.order ("x", "y");
 }
 
@@ -67,12 +67,12 @@ Column::output (Log& log) const
 void
 Column::load_syntax (Syntax& syntax, AttributeList& alist)
 {
-  syntax.add ("size", Syntax::Unknown (), Syntax::State,
+  syntax.add ("size", Value::Unknown (), Value::State,
 	      "Area covered by this column, for use by the 'merge' action.\n\
 The dimension is up to you, as long as all columns use the same unit.");
   alist.add ("size", 1.0);
 
-  syntax.add_submodule_sequence ("location", Syntax::Const, "\
+  syntax.add_submodule_sequence ("location", Value::Const, "\
 Location of this column.\n\
 \n\
 The meaning depends on the number of point in the sequence.\n\

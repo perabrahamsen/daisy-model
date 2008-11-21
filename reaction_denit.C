@@ -204,37 +204,37 @@ denitrification is also affected by temperature and water pressure.\n\
 Additional denitrification from CO2 produced from fast OM pools can\n\
 be triggered by setting alpha_fast or water_factor_fast different.\n\
 This additional denitrification is limited by K_fast.");
-    syntax.add ("converted", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+    syntax.add ("converted", "g/cm^3/h", Value::LogOnly, Value::Sequence,
 		"Amount of denitrification.");
-    syntax.add ("converted_fast", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+    syntax.add ("converted_fast", "g/cm^3/h", Value::LogOnly, Value::Sequence,
 		"Additional denitrification due to turnover in fast pools.");
-    syntax.add ("converted_redox", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+    syntax.add ("converted_redox", "g/cm^3/h", Value::LogOnly, Value::Sequence,
 		"Additional denitrification due to chemical redox processes.");
-    syntax.add ("potential", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+    syntax.add ("potential", "g/cm^3/h", Value::LogOnly, Value::Sequence,
 		"Potential amount of denitrification at anarobic conditions.");
-    syntax.add ("potential_fast", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+    syntax.add ("potential_fast", "g/cm^3/h", Value::LogOnly, Value::Sequence,
 		"Additional potential due to turnover in fast pools.");
-    syntax.add ("K", "h^-1", Check::fraction (), Syntax::Const, "\
+    syntax.add ("K", "h^-1", Check::fraction (), Value::Const, "\
 Maximum fraction of nitrate converted at each time step from slow pools.");
     alist.add ("K", 0.020833);
-    syntax.add ("K_fast", "h^-1", Check::fraction (), Syntax::OptionalConst, "\
+    syntax.add ("K_fast", "h^-1", Check::fraction (), Value::OptionalConst, "\
 Maximum fraction of nitrate converted at each time step from fast pools.\n \
 By default this is identical to 'K'.");
     syntax.add ("alpha", "(g NO3-N/h)/(g CO2-C/h)", Check::non_negative (),
-		Syntax::Const, "\
+		Value::Const, "\
 Anaerobic denitrification constant for slow pools.");
     alist.add ("alpha", 0.1);
     syntax.add ("alpha_fast", "(g NO3-N/h)/(g CO2-C/h)", Check::non_negative (),
-		Syntax::OptionalConst, "\
+		Value::OptionalConst, "\
 Anaerobic denitrification constant for fast pools.\n			\
 This applies to the CO2 produced from turnover of fast OM pools.\n\
 By default, this is identical to alpha.");
-    syntax.add ("heat_factor", "dg C", Syntax::None (), Check::non_negative (),
-		Syntax::OptionalConst, "Heat factor.\n\
+    syntax.add ("heat_factor", "dg C", Value::None (), Check::non_negative (),
+		Value::OptionalConst, "Heat factor.\n\
 By default, use a build in function valid for temperate climates.");
-    syntax.add ("water_factor", Syntax::Fraction (), Syntax::None (), 
+    syntax.add ("water_factor", Value::Fraction (), Value::None (), 
 		Check::non_negative (),
-		Syntax::OptionalConst,
+		Value::OptionalConst,
 		"Water potential factor for slow pools.\n\
 This is a function of the current water content as a fraction of the\n\
 maximal water content.");
@@ -242,13 +242,13 @@ maximal water content.");
     water_factor.add (0.7, 0.0);
     water_factor.add (1.0, 1.0);
     alist.add ("water_factor", water_factor);
-    syntax.add ("water_factor_fast", Syntax::Fraction (), Syntax::None (), 
+    syntax.add ("water_factor_fast", Value::Fraction (), Value::None (), 
 		Check::non_negative (),
-	      Syntax::OptionalConst,
+	      Value::OptionalConst,
 		"Water potential factor for fast pools\n\
 By default, this is identical to the 'water_factor' parameter.");
     syntax.add  ("redox_height", "cm", Check::non_positive (),
-		 Syntax::OptionalConst,  "\
+		 Value::OptionalConst,  "\
 Height (a negative number) blow which redox processes start.\n	\
 All NO3 below this height will be denitrified immediately.\n\
 By default no redox denitrification occurs.");

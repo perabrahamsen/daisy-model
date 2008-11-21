@@ -61,7 +61,7 @@ public:
 void 
 ConditionPeriodic::load_syntax (Syntax& syntax, AttributeList& alist)
 {
-    syntax.add ("period", Syntax::Integer, Syntax::Const, 
+    syntax.add ("period", Value::Integer, Value::Const, 
 		"Number of walltime seconds between success.");
     alist.add ("period", 1);
     syntax.order ("period");

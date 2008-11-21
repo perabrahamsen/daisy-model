@@ -90,11 +90,11 @@ symbol
 ScopeSoil::dimension (const symbol tag) const
 {
   if (tag == humus)
-    return Syntax::Fraction ();
+    return Value::Fraction ();
   if (tag == h)
     return Units::cm ();
   if (tag == Theta)
-    return Syntax::None ();
+    return Value::None ();
 
   static const symbol T_dim ("dg C");
   if (tag == T)

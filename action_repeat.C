@@ -121,10 +121,10 @@ static struct ActionRepeatSyntax
 Perform all of the specified action.  When done, repeat the action.\n\
 The action may take several timesteps.");
       syntax.add_object ("repeat", Action::component,
-                         Syntax::Const, Syntax::Singleton,
+                         Value::Const, Value::Singleton,
                          "Action to perform repeatedly.");
       syntax.add_object ("do", Action::component, 
-                         Syntax::OptionalState, Syntax::Singleton,
+                         Value::OptionalState, Value::Singleton,
                          "Action currently being performed.");
       syntax.order ("repeat");
       Librarian::add_type (Action::component, "repeat", alist, syntax, &make);

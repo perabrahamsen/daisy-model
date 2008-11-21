@@ -269,13 +269,13 @@ of SMB pools plus 1 plus optionally the number of DOM pools.");
   alist.add ("submodel", "AOM");
   alist.add ("description", "\
 A single Added Organic Matter pool.");
-  syntax.add_fraction ("initial_fraction", Syntax::OptionalConst, "\
+  syntax.add_fraction ("initial_fraction", Value::OptionalConst, "\
 The initial fraction of the total available carbon\n\
 allocated to this pool for AOM.  One pool should be left unspecified.");
-  syntax.add ("top_C", "g C/cm^2", Check::non_negative (), Syntax::State,
+  syntax.add ("top_C", "g C/cm^2", Check::non_negative (), Value::State,
 	      "Carbon on top of soil.");
   alist.add ("top_C", 0.0);
-  syntax.add ("top_N", "g N/cm^2", Check::non_negative (), Syntax::State,
+  syntax.add ("top_N", "g N/cm^2", Check::non_negative (), Value::State,
 	      "Nitrogen on top of soil.");
   alist.add ("top_N", 0.0);
 }

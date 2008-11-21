@@ -108,7 +108,7 @@ static struct ConditionExternSyntax
       alist.add ("description", "\
 Test if a boolean expression is true,using extern log.");
       syntax.add_object ("scope", Scopesel::component, 
-                         Syntax::Const, Syntax::Singleton, "\
+                         Value::Const, Value::Singleton, "\
 Scope to evaluate expession in.");
       syntax.add_object ("expr", Boolean::component, "\
 Expression to evaluate.");

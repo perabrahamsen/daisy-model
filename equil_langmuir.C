@@ -131,10 +131,10 @@ static struct EquilibriumLangmuirSyntax
     Equilibrium::load_syntax (syntax, alist);
     alist.add ("description", "A = (my_max B) / (K + B)");
     syntax.add_object ("K", Number::component, 
-                       Syntax::Const, Syntax::Singleton,
+                       Value::Const, Value::Singleton,
                        "Half saturation constant [g/cm^3].");
     syntax.add_object ("my_max", Number::component, 
-                       Syntax::Const, Syntax::Singleton,
+                       Value::Const, Value::Singleton,
                        "Max equilibrium capacity [g/cm^3].");
     Librarian::add_type (Equilibrium::component,
 			 "Langmuir", alist, syntax, &make);

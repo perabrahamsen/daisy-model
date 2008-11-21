@@ -300,68 +300,68 @@ static struct Photo_FCC3Syntax
 
     alist.add ("description", "Photosynthesis for C3 crops described by Faquhar et al. (1980).");
 
-    syntax.add ("TempEff","dg C", Syntax::None (), Check::non_negative (),Syntax::Const,
+    syntax.add ("TempEff","dg C", Value::None (), Check::non_negative (),Value::Const,
                 "Temperature factor for assimilate production.");
 
 
-    syntax.add ("Kc25", "Pa", Check::positive (), Syntax::Const,
+    syntax.add ("Kc25", "Pa", Check::positive (), Value::Const,
                 "Micahyaelis-Menten constant of Rubisco for CO2. Kc25 = 40.4 Pa for wheat (Collatz et al.,1991) ");
 
     alist.add ("Kc25", 40.4);
 
-    syntax.add ("Ko25", "Pa", Check::positive (), Syntax::Const,
+    syntax.add ("Ko25", "Pa", Check::positive (), Value::Const,
                 "Micahaelis-Menten constant of Rubisco for O2 at 25 degrees. Ko25 = 24800 Pa for wheat (Collatz et al., 1991)");
     alist.add ("Ko25", 24800.);
 
-    syntax.add ("S", "J/mol/K", Check::positive (), Syntax::Const,
+    syntax.add ("S", "J/mol/K", Check::positive (), Value::Const,
                 "Electron transport temperature response parameter,(De Pury & Farquhar, 1997)");
     alist.add ("S", 710.);
     
-    syntax.add ("H", "J/mol", Check::positive (), Syntax::Const,
+    syntax.add ("H", "J/mol", Check::positive (), Value::Const,
                 "Curvature parameter of Jm, (De Pury & Farquhar, 1997)");
     alist.add ("H", 220000.);
     
-    syntax.add ("c_Vm", "", Check::positive (), Syntax::Const,
+    syntax.add ("c_Vm", "", Check::positive (), Value::Const,
                 "Temperature scaling constant for Vmax. c_Vm, = 26.35 (Bernacchi et al., 2001)");
     alist.add ("c_Vm", 26.35);
     
-    syntax.add ("Ea_Vm", "J/mol", Check::positive (), Syntax::Const,
+    syntax.add ("Ea_Vm", "J/mol", Check::positive (), Value::Const,
                 "Activation energy for Vmax. Ea_Vm = 65330 J/mol (Ball, 1988)");
     alist.add ("Ea_Vm", 65330.);
 
-    syntax.add ("Eda_Vm", "J/mol", Check::positive (), Syntax::Const,
+    syntax.add ("Eda_Vm", "J/mol", Check::positive (), Value::Const,
                 "Deactimation energy for Vmax. Eda_Vm = 202900 J/mol");
     alist.add ("Eda_Vm", 202900.);
    
-    syntax.add ("Ea_Jm", "J/mol", Check::positive (), Syntax::Const,
+    syntax.add ("Ea_Jm", "J/mol", Check::positive (), Value::Const,
                 "Actimation energy for Jm. Ea_Jm = 37000 J/mol (Farquhar et al., 1980).");
     alist.add ("Ea_Jm", 37000.);
 
-    syntax.add ("Ea_ko", "J/mol", Check::positive (), Syntax::Const,
+    syntax.add ("Ea_ko", "J/mol", Check::positive (), Value::Const,
                 "Actimation energy for ko. Ea_ko 0 36000 J/mol (Badger & Collatz, 1977).");
     alist.add ("Ea_ko", 36000.);
 
-    syntax.add ("Ea_kc", "J/mol", Check::positive (), Syntax::Const,
+    syntax.add ("Ea_kc", "J/mol", Check::positive (), Value::Const,
                 "Actimation energy for kc. Ea_kc = 59400 J/mol (Badger & Collatz, 1977)");
     alist.add ("Ea_kc", 59400.);
 
-    syntax.add ("Ea_rd", "J/mol", Check::positive (), Syntax::Const,
+    syntax.add ("Ea_rd", "J/mol", Check::positive (), Value::Const,
                 "Actimation energy for rd. Ea_rd = 66400 J/mol (Farquhar et al., 1980)");
     alist.add ("Ea_rd", 66400.);
 
-    syntax.add ("Sv", "J/mol/K", Check::positive (), Syntax::Const,
+    syntax.add ("Sv", "J/mol/K", Check::positive (), Value::Const,
                 "Entropy term. Sv = 650 J/mol/K");
     alist.add ("Sv", 650.);
   
-    syntax.add ("theta", "", Check::positive (), Syntax::Const,
+    syntax.add ("theta", "", Check::positive (), Value::Const,
                 "Curvature of leaf response of electron transport to irradiance, (De Pury & Farquhar, 1997");
     alist.add ("theta", 0.7);
     
-    syntax.add ("beta", " ", Check::positive (), Syntax::Const,
+    syntax.add ("beta", " ", Check::positive (), Value::Const,
                 "Curvature, Collatz et al., 1991");
     alist.add ("beta", 0.95);
 
-    syntax.add ("alfa", "mol/mol", Check::positive (), Syntax::Const,
+    syntax.add ("alfa", "mol/mol", Check::positive (), Value::Const,
                 "Fraction of PAR effectively absorbed by PSII, ");
     alist.add ("alfa", 0.08);
 

@@ -222,25 +222,25 @@ static struct LogHarvestSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Create a log of all harvests.");
-    syntax.add ("where", Syntax::String, Syntax::Const,
+    syntax.add ("where", Value::String, Value::Const,
 		"Name of the log file to create.");
     alist.add ("where", "harvest.dlf");
-    syntax.add ("print_header", Syntax::String, Syntax::Const,
+    syntax.add ("print_header", Value::String, Value::Const,
                 "If this is set to 'false', no header is printed.\n\
 If this is set to 'true', a full header is printer.\n\
 If this is set to 'fixed', a small fixed size header is printed.");
     static VCheck::Enum check_header ("false", "true", "fixed");
     syntax.add_check ("print_header", check_header);
     alist.add ("print_header", "true");
-    syntax.add ("print_tags", Syntax::Boolean, Syntax::Const,
+    syntax.add ("print_tags", Value::Boolean, Value::Const,
 		"Print a tag line in the file.");
     alist.add ("print_tags", true);
-    syntax.add ("print_dimension", Syntax::Boolean, Syntax::Const,
+    syntax.add ("print_dimension", Value::Boolean, Value::Const,
 		"Print a line with units after the tag line.");
-    syntax.add ("print_N", Syntax::Boolean, Syntax::Const,
+    syntax.add ("print_N", Value::Boolean, Value::Const,
 		"Print nitrogen content of harvest.");
     alist.add ("print_N", true);
-    syntax.add ("print_C", Syntax::Boolean, Syntax::Const,
+    syntax.add ("print_C", Value::Boolean, Value::Const,
 		"Print carbon content of harvest.");
     alist.add ("print_C", false);
     alist.add ("print_dimension", true);

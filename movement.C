@@ -158,7 +158,7 @@ void
 Movement::load_base (Syntax& syntax, AttributeList&)
 {
   syntax.add_object ("Tertiary", Tertiary::component, 
-                     Syntax::OptionalState, Syntax::Singleton, "\
+                     Value::OptionalState, Value::Singleton, "\
 Tertiary (that is, non-matrix) transport method.");
 }
 

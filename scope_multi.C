@@ -122,7 +122,7 @@ static struct ScopeMultiSyntax
     alist.add ("description", 
                "A scope combining other scopes.");
     syntax.add_object ("scope", Scope::component,
-                       Syntax::Const, Syntax::Sequence, 
+                       Value::Const, Value::Sequence, 
                        "List of scopes to combine, first one takes precedence.");
     Librarian::add_type (Scope::component, "multi", alist, syntax, &make);
   }

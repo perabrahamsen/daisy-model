@@ -45,10 +45,10 @@ struct NumberOperand : public Number
   { return operand->missing (scope); }
   symbol dimension (const Scope& scope) const
   {
-    if (operand->dimension (scope) == Syntax::None ())
-      return Syntax::None ();
+    if (operand->dimension (scope) == Value::None ())
+      return Value::None ();
 
-    return Syntax::Unknown (); 
+    return Value::Unknown (); 
   }
 
   // Create.
@@ -263,7 +263,7 @@ struct NumberPow : public Number
     return pow (x, y); 
   }
   symbol dimension (const Scope&) const 
-  { return Syntax::Unknown (); }
+  { return Value::Unknown (); }
 
   // Create.
   bool initialize (const Units& units, const Scope& scope, Treelog& err)
@@ -330,10 +330,10 @@ struct NumberOperands : public Number
         else
           {
             if (operands[i]->dimension (scope) != found)
-              return Syntax::Unknown ();
+              return Value::Unknown ();
           }
     
-    return found != unspecified ? found : Syntax::Unknown ();
+    return found != unspecified ? found : Value::Unknown ();
   }
 
   // Use.
@@ -464,7 +464,7 @@ static struct NumberMaxSyntax
     alist.add ("description", 
 	       "Use the largest value of its operands.");
     syntax.add_object ("operands", Number::component,
-                       Syntax::Const, Syntax::Sequence,
+                       Value::Const, Value::Sequence,
                        "The operands for this function.");
 #ifdef CHECK_OPERANDS_DIM
     static VCheck::All all (VCheck::min_size_1 (),
@@ -512,7 +512,7 @@ static struct NumberMinSyntax
     alist.add ("description", 
 	       "Use the smallest value of its operands.");
     syntax.add_object ("operands", Number::component,
-                       Syntax::Const, Syntax::Sequence,
+                       Value::Const, Value::Sequence,
                        "The operands for this function.");
 #ifdef CHECK_OPERANDS_DIM
     static VCheck::All all (VCheck::min_size_1 (), 
@@ -538,7 +538,7 @@ struct NumberProduct : public NumberOperands
   }
   symbol dimension (const Scope& scope) const 
   { 
-    symbol dim = Syntax::None ();
+    symbol dim = Value::None ();
     for (size_t i = 0; i < operands.size (); i++)
       dim = Units::multiply (dim, operands[i]->dimension (scope));
     return dim;
@@ -562,7 +562,7 @@ static struct NumberProductSyntax
     alist.add ("description", 
 	       "Use the product of its operands.");
     syntax.add_object ("operands", Number::component,
-                       Syntax::Const, Syntax::Sequence,
+                       Value::Const, Value::Sequence,
                        "The operands for this function.");
     syntax.order ("operands");
     Librarian::add_type (Number::component, "*", alist, syntax, &make);
@@ -600,7 +600,7 @@ static struct NumberSumSyntax
     alist.add ("description", 
 	       "Use the sum of its operands.");
     syntax.add_object ("operands", Number::component,
-                       Syntax::Const, Syntax::Sequence,
+                       Value::Const, Value::Sequence,
                        "The operands for this function.");
 #ifdef CHECK_OPERANDS_DIM
     syntax.add_check ("operands", NumberOperands::unique);
@@ -646,7 +646,7 @@ static struct NumberSubtractSyntax
 With one operand, negates it.  With more than one operand,\n\
 subtracts all but the first from the first.");
     syntax.add_object ("operands", Number::component,
-                       Syntax::Const, Syntax::Sequence,
+                       Value::Const, Value::Sequence,
                        "The operands for this function.");
 #ifdef CHECK_OPERANDS_DIM
     static VCheck::All all (VCheck::min_size_1 (), 
@@ -670,7 +670,7 @@ struct NumberDivide : public NumberOperands
     return val;
   }
   symbol dimension (const Scope&) const 
-  { return Syntax::Unknown (); }
+  { return Value::Unknown (); }
 
   // Create.
   NumberDivide (Block& al)
@@ -690,7 +690,7 @@ static struct NumberDivideSyntax
     alist.add ("description", 
 	       "Divide the first operand by the rest.");
     syntax.add_object ("operands", Number::component,
-                       Syntax::Const, Syntax::Sequence,
+                       Value::Const, Value::Sequence,
                        "The operands for this function.");
     syntax.add_check ("operands", VCheck::min_size_1 ());
     syntax.order ("operands");

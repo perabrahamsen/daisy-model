@@ -117,7 +117,7 @@ static struct ActionExternSyntax
 Select an external scope, and perform action.");
 
     syntax.add_object ("scope", Scopesel::component, 
-                       Syntax::Const, Syntax::Singleton, "\
+                       Value::Const, Value::Singleton, "\
 Scope to evaluate expessions in.");
     syntax.add_object ("action", Action::component, 
                        "Action to perform if the condition is false.");
@@ -314,30 +314,30 @@ irrigation water if available, and otherwise be spread on the soil\n\
 surface.");
 
     syntax.add_object ("scope", Scopesel::component, 
-                       Syntax::Const, Syntax::Singleton, "\
+                       Value::Const, Value::Singleton, "\
 Scope to evaluate expessions in.");
     alist.add ("scope", Scopesel::default_model ());
 
     syntax.add_object ("surface", Number::component, 
-		       Syntax::Const, Syntax::Singleton, 
+		       Value::Const, Value::Singleton, 
 "Amount of surface irrigation applied.");
     syntax.add_object ("overhead", Number::component, 
-		       Syntax::Const, Syntax::Singleton, 
+		       Value::Const, Value::Singleton, 
 "Amount of overhead irrigation applied.");
     syntax.add_object ("subsoil", Number::component, 
-		       Syntax::Const, Syntax::Singleton, 
+		       Value::Const, Value::Singleton, 
 "Amount of subsoil irrigation applied.");
     syntax.add_object ("NO3", Number::component, 
-		       Syntax::Const, Syntax::Singleton, 
+		       Value::Const, Value::Singleton, 
 "Amount of NO3 in irrigation.");
     syntax.add_object ("NH4", Number::component, 
-		       Syntax::Const, Syntax::Singleton, 
+		       Value::Const, Value::Singleton, 
 "Amount of NH4 in irrigation.");
 
-    syntax.add ("from", "cm", Check::non_positive (), Syntax::Const, "\
+    syntax.add ("from", "cm", Check::non_positive (), Value::Const, "\
 Height where you want to start the incorporation (a negative number).");
     alist.add ("from", 0.0);
-    syntax.add ("to", "cm", Check::negative (), Syntax::Const, "\
+    syntax.add ("to", "cm", Check::negative (), Value::Const, "\
 Height where you want to end the incorporation (a negative number).");
     alist.add ("from", -10.0);
 

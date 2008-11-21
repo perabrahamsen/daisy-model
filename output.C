@@ -209,7 +209,7 @@ void
 Output::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   syntax.add_object ("output", Log::component,
-                     Syntax::State, Syntax::Sequence,
+                     Value::State, Value::Sequence,
                      "List of logs for output during the simulation.");
   syntax.add_object ("activate_output", Condition::component,
                      "Activate output logs when this condition is true.\n\
@@ -220,7 +220,7 @@ period.");
   alist.add ("activate_output", true_alist);
 
   syntax.add_object ("exchange", Scope::component,
-                     Syntax::Const, Syntax::Sequence, "\
+                     Value::Const, Value::Sequence, "\
 List of exchange items for communicating with external models.");
   alist.add ("exchange", std::vector<const AttributeList*> ());
 
@@ -239,7 +239,7 @@ List of default time components to include in log files. Choose between:\n";
 	valid_component.add (name);
     }
   syntax.add ("log_time_columns",
-	      Syntax::String, Syntax::Const, Syntax::Sequence, 
+	      Value::String, Value::Const, Value::Sequence, 
 	      log_time_doc);
   syntax.add_check ("log_time_columns", valid_component);
   std::vector<symbol> default_time;

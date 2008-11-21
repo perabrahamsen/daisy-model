@@ -351,12 +351,12 @@ UZlr::~UZlr ()
 void 
 UZlr::load_syntax (Syntax& syntax, AttributeList& alist)
 {
-  syntax.add ("overflow_warn", Syntax::Boolean, Syntax::Const, "\
+  syntax.add ("overflow_warn", Value::Boolean, Value::Const, "\
 If true, warn the first time the soil profile is oversaturated.");
   alist.add ("overflow_warn", true);
-  syntax.add ("h_fc", "cm", Syntax::Const, "Field capacity.");
+  syntax.add ("h_fc", "cm", Value::Const, "Field capacity.");
   alist.add ("h_fc", -100.0);
-  syntax.add ("z_top", "cm", Syntax::Const, 
+  syntax.add ("z_top", "cm", Value::Const, 
               "Depth of layer where upward water movement is possible.");
   alist.add ("z_top", -10.0);
 }

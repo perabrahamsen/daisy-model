@@ -524,46 +524,46 @@ Surface::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("submodel", "Surface");
   alist.add ("description", "Keep track of things on the soil surface.");
   syntax.add_check (check_alist);
-  syntax.add ("EpFactor", Syntax::None (), Check::non_negative (), 
-	      Syntax::Const,
+  syntax.add ("EpFactor", Value::None (), Check::non_negative (), 
+	      Value::Const,
 	      "Convertion of reference evapotranspiration to\n\
 potential evaporation for bare soil.");
   alist.add ("EpFactor", 1.0);
-  syntax.add ("albedo_dry", Syntax::None (), Check::non_negative (),
-	      Syntax::Const,
+  syntax.add ("albedo_dry", Value::None (), Check::non_negative (),
+	      Value::Const,
 	      "Albedo of dry soil (pF >= 3)");
   alist.add ("albedo_dry", 0.15);
-  syntax.add ("albedo_wet", Syntax::None (), Check::non_negative (),
-	      Syntax::Const,
+  syntax.add ("albedo_wet", Value::None (), Check::non_negative (),
+	      Value::Const,
 	      "Albedo of wet soil (pf <= 1.7)");
   alist.add ("albedo_wet", 0.08);
-    syntax.add ("forced_pressure", "mm", Syntax::OptionalConst, "\
+    syntax.add ("forced_pressure", "mm", Value::OptionalConst, "\
 Set this to force a permanent pressure top.");
-  syntax.add ("forced_flux", "mm/h", Syntax::OptionalConst, "\
+  syntax.add ("forced_flux", "mm/h", Value::OptionalConst, "\
 Set this to force a permanent flux top.  Positive upwards (exfiltration).");
-  syntax.add ("pond", "mm", Syntax::State, "\
+  syntax.add ("pond", "mm", Value::State, "\
 Amount of ponding on the surface.\n\
 Negative numbers indicate soil exfiltration.");
   alist.add ("pond", 0.0);
-  syntax.add ("EvapSoilSurface", "mm/h", Syntax::LogOnly, "\
+  syntax.add ("EvapSoilSurface", "mm/h", Value::LogOnly, "\
 Water evaporated from the surface, including the pond and exfiltration.");
-  syntax.add ("Eps", "mm/h", Syntax::LogOnly, "\
+  syntax.add ("Eps", "mm/h", Value::LogOnly, "\
 Potential evaporation from the surface.");
-  syntax.add ("T", "dg C", Syntax::LogOnly, "\
+  syntax.add ("T", "dg C", Value::LogOnly, "\
 Temperature of water or air directly above the surface.");
   syntax.add ("DetentionCapacity", "mm", Check::non_negative (),
-	      Syntax::State, "Amount of ponding the surface can retain.");
+	      Value::State, "Amount of ponding the surface can retain.");
   alist.add ("DetentionCapacity", 1000.0);
   syntax.add ("ReservoirConstant", "h^-1", Check::fraction (), 
-	      Syntax::Const, "\
+	      Value::Const, "\
 Fraction of ponding above DetentionCapacity that runoffs each hour.");
   alist.add ("ReservoirConstant", 1.0);
-  syntax.add ("runoff", "mm/h", Syntax::LogOnly, "\
+  syntax.add ("runoff", "mm/h", Value::LogOnly, "\
 Amount of water runoff from ponding this hour.");
-  syntax.add ("R_mixing", "h/mm", Check::non_negative (), Syntax::Const, "\
+  syntax.add ("R_mixing", "h/mm", Check::non_negative (), Value::Const, "\
 Resistance to mixing inorganic N between soil and ponding.");
   alist.add ("R_mixing", 1.0e9);
-  syntax.add_submodule ("ridge", alist, Syntax::OptionalState, "\
+  syntax.add_submodule ("ridge", alist, Value::OptionalState, "\
 Active ridge system, if any.",
 			Ridge::load_syntax);
 }

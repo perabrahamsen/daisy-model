@@ -918,37 +918,37 @@ static struct BioporeMatrixSyntax
     Biopore::load_base (syntax, alist);
 
     syntax.add ("xplus", "cm", Check::positive (), 
-                Syntax::OptionalConst, Syntax::Sequence,
+                Value::OptionalConst, Value::Sequence,
                 "Right side of each biopore interval.\n\
 Water and chemical content is tracked individually for each interval.\n\
 By default, use intervals as specified by the geometry.");
     syntax.add_check ("xplus", VCheck::increasing ());
-    syntax.add ("R_primary", "h", Check::positive (), Syntax::Const, "\
+    syntax.add ("R_primary", "h", Check::positive (), Value::Const, "\
 Resistance for water moving from biopore through wall to primary domain.");
     syntax.add ("R_secondary", "h", Check::positive (), 
-                Syntax::OptionalConst, "\
+                Value::OptionalConst, "\
 Resistance for water moving from biopore through wall to secondary domain.\n\
 If not specified, this will be identical to 'R_primary'.");
-    syntax.add ("debug", Syntax::Integer, Syntax::Const, "Debug level.\n\
+    syntax.add ("debug", Value::Integer, Value::Const, "Debug level.\n\
 Increase value to get more debug message.");
     alist.add ("debug", 0);
-    syntax.add ("h_bottom", "cm", Syntax::OptionalState, Syntax::Sequence,
+    syntax.add ("h_bottom", "cm", Value::OptionalState, Value::Sequence,
                 "Pressure at the bottom of the biopores in each interval.");
-    IMvec::add_syntax (syntax, alist, Syntax::OptionalState, "solute",
+    IMvec::add_syntax (syntax, alist, Value::OptionalState, "solute",
                        IM::mass_unit (),
                        "Chemical concentration in biopore intervals.");
-    syntax.add ("water", "cm^3", Syntax::LogOnly, "Water content.");    
-    syntax.add ("iterations", Syntax::Integer, Syntax::LogOnly, 
+    syntax.add ("water", "cm^3", Value::LogOnly, "Water content.");    
+    syntax.add ("iterations", Value::Integer, Value::LogOnly, 
                 "Number of iterations used for finding a solution.");
-    syntax.add ("h3_soil", "cm", Syntax::LogOnly, Syntax::Sequence,
+    syntax.add ("h3_soil", "cm", Value::LogOnly, Value::Sequence,
                 "Pressure suggested by the soil for each interval.");
-    syntax.add ("max_iterations", Syntax::Integer, Syntax::Const, "\
+    syntax.add ("max_iterations", Value::Integer, Value::Const, "\
 Maximum number of iterations when seeking convergence.");
     alist.add ("max_iterations", 50);
-    syntax.add ("max_absolute_difference", "cm", Syntax::Const, "\
+    syntax.add ("max_absolute_difference", "cm", Value::Const, "\
 Maximum absolute difference in biopore content for convergence.");
     alist.add ("max_absolute_difference", 0.02);
-    syntax.add ("max_relative_difference", Syntax::None (), Syntax::Const, "\
+    syntax.add ("max_relative_difference", Value::None (), Value::Const, "\
 Maximum relative difference in biopore content for convergence.");
     alist.add ("max_relative_difference", 0.001);
       

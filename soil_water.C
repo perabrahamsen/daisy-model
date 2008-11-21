@@ -634,53 +634,53 @@ SoilWater::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("submodel", "SoilWater");
 
   syntax.add ("max_exfiltration_gradient", "cm/cm", Check::positive (), 
-              Syntax::OptionalConst,
+              Value::OptionalConst,
               "Maximal pressure gradient for calculating exfiltration.\n\
 The gradient is assumed from center of top node to surface of top node.\n\
 By default, there is no maximum.");
-  Geometry::add_layer (syntax, Syntax::OptionalState, 
+  Geometry::add_layer (syntax, Value::OptionalState, 
                        "h", "cm", "Soil water pressure.");
-  Geometry::add_layer (syntax, Syntax::OptionalState,
-                       "Theta", Syntax::Fraction (),
+  Geometry::add_layer (syntax, Value::OptionalState,
+                       "Theta", Value::Fraction (),
                        "Soil water content.");
-  syntax.add ("Theta_primary", "cm^3/cm^3", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("Theta_primary", "cm^3/cm^3", Value::LogOnly, Value::Sequence,
               "Water content in primary matrix system.\n\
 Conventionally, this is the intra-aggregate pores.");
-  syntax.add ("Theta_secondary", "cm^3/cm^3", Syntax::LogOnly, 
-              Syntax::Sequence,
+  syntax.add ("Theta_secondary", "cm^3/cm^3", Value::LogOnly, 
+              Value::Sequence,
               "Water content in secondary matrix system.\n\
 Conventionally, this is the inter-aggregate pores.");
-  syntax.add ("S_sum", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("S_sum", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
 	      "Total water sink (due to root uptake and macropores).");
-  syntax.add ("S_root", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("S_root", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
 	      "Water sink due to root uptake.");
-  syntax.add ("S_drain", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("S_drain", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
 	      "Water sink due to soil drainage.");
-  syntax.add ("S_incorp", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("S_incorp", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
 	      "Incorporated water sink, typically from subsoil irrigation.");
-  syntax.add ("tillage", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("tillage", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
 	      "Changes in water content due to tillage operations.");
-  syntax.add ("S_p", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("S_p", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
 	      "Water sink (due to macropores).");
-  syntax.add ("S_permanent", "cm^3/cm^3/h", Syntax::State, Syntax::Sequence,
+  syntax.add ("S_permanent", "cm^3/cm^3/h", Value::State, Value::Sequence,
 	      "Permanent water sink, e.g. subsoil irrigation.");
   alist.add ("S_permanent", std::vector<double> ());
-  syntax.add ("S_ice", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("S_ice", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
 	      "Ice sink (due to thawing or freezing).");
-  syntax.add_fraction ("X_ice", Syntax::OptionalState, Syntax::Sequence,
+  syntax.add_fraction ("X_ice", Value::OptionalState, Value::Sequence,
 		       "Ice volume fraction in soil.");
-  syntax.add ("X_ice_buffer", Syntax::None (), 
-	      Syntax::OptionalState, Syntax::Sequence,
+  syntax.add ("X_ice_buffer", Value::None (), 
+	      Value::OptionalState, Value::Sequence,
 	      "Ice volume that didn't fit the soil durin freezing.");
-  syntax.add ("h_ice", Syntax::None (), Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("h_ice", Value::None (), Value::LogOnly, Value::Sequence,
 	      "Pressure at which all air is out of the matrix.\n\
 When there are no ice, this is 0.0.  When there are ice, the ice is\n\
 presummed to occupy the large pores, so it is h (Theta_sat - X_ice).");
-  syntax.add ("q", "cm/h", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("q", "cm/h", Value::LogOnly, Value::Sequence,
 	      "Matrix water flux (positive numbers mean upward).");  
-  syntax.add ("q_p", "cm/h", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("q_p", "cm/h", Value::LogOnly, Value::Sequence,
 	      "Water flux in macro pores (positive numbers mean upward).");
-  syntax.add ("K", "cm/h", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("K", "cm/h", Value::LogOnly, Value::Sequence,
 	      "Hydraulic conductivity.");
 }
 

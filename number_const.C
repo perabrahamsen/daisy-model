@@ -82,7 +82,7 @@ static struct NumberConstSyntax
 
     alist.add ("description", 
 	       "Always give the specified value.");
-    syntax.add ("value", Syntax::User (), Syntax::Const,
+    syntax.add ("value", Value::User (), Value::Const,
 		"Fixed value for this number.");
     syntax.order ("value");
     Librarian::add_type (Number::component, "const", alist, syntax, &make);
@@ -193,9 +193,9 @@ static struct NumberGetSyntax
 
     alist.add ("description", 
 	       "Get the value of symbol in the current scope.");
-    syntax.add ("name", Syntax::String, Syntax::Const, 
+    syntax.add ("name", Value::String, Value::Const, 
                 "Name of a the symbol.");
-    syntax.add ("dimension", Syntax::String, Syntax::Const, 
+    syntax.add ("dimension", Value::String, Value::Const, 
                 "Expected dimension for the symbol.");
     syntax.order ("name", "dimension");
     Librarian::add_type (Number::component, "get", alist, syntax, &make);
@@ -214,14 +214,14 @@ struct NumberFetch : public Number
   static double* fetch_default_value (Block& al, const symbol key_symbol)
   {
     const std::string& key = key_symbol.name ();
-    if (al.lookup (key) != Syntax::Number)
+    if (al.lookup (key) != Value::Number)
       return NULL;
     const AttributeList& alist = al.find_alist (key);
     if (!alist.check (key))
       return NULL;
     const Syntax& syntax = al.find_syntax (key);
-    daisy_assert (syntax.lookup (key) == Syntax::Number);
-    if (syntax.size (key) != Syntax::Singleton)
+    daisy_assert (syntax.lookup (key) == Value::Number);
+    if (syntax.size (key) != Value::Singleton)
       {
 	al.msg ().warning ("Parameter '" + key + "' is a sequence, ignored");
 	return NULL;
@@ -231,12 +231,12 @@ struct NumberFetch : public Number
   static symbol fetch_default_dimension (Block& al, const symbol key_symbol)
   {
     const std::string& key = key_symbol.name ();
-    if (al.lookup (key) != Syntax::Number)
-      return Syntax::Unknown ();
+    if (al.lookup (key) != Value::Number)
+      return Value::Unknown ();
     const Syntax& syntax = al.find_syntax (key);
-    daisy_assert (syntax.lookup (key) == Syntax::Number);
+    daisy_assert (syntax.lookup (key) == Value::Number);
     const symbol dim (syntax.dimension (key));
-    if (dim == Syntax::User ())
+    if (dim == Value::User ())
       {
 	const AttributeList& alist = al.find_alist (key);
 	if (alist.check (key))
@@ -299,7 +299,7 @@ static struct NumberFetchSyntax
 
     alist.add ("description", 
 	       "Fetch the value and dimension in the current scope.");
-    syntax.add ("name", Syntax::String, Syntax::Const, 
+    syntax.add ("name", Value::String, Value::Const, 
                 "Name of a the symbol.");
     syntax.order ("name");
     Librarian::add_type (Number::component, "fetch", alist, syntax, &make);
@@ -377,7 +377,7 @@ struct NumberIdentity : public NumberChild
   NumberIdentity (Block& al)
     : NumberChild (al),
       units (al.units ()),
-      dim (al.name ("dimension", Syntax::Unknown ()))
+      dim (al.name ("dimension", Value::Unknown ()))
   { }
 };
 
@@ -391,7 +391,7 @@ static struct NumberIdentitySyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Pass value unchanged.");
     NumberChild::load_syntax (syntax, alist);
-    syntax.add ("dimension", Syntax::String, Syntax::OptionalConst,
+    syntax.add ("dimension", Value::String, Value::OptionalConst,
 		"Dimension of this value.");
     Librarian::add_type (Number::component, "identity", alist, syntax, &make);
   }
@@ -452,7 +452,7 @@ static struct NumberConvertSyntax
 
     alist.add ("description", "Convert to specified dimension.");
     NumberChild::load_syntax (syntax, alist);
-    syntax.add ("dimension", Syntax::String, Syntax::Const,
+    syntax.add ("dimension", Value::String, Value::Const,
 		"Dimension to convert to.");
     syntax.order ("value", "dimension");
     Librarian::add_type (Number::component, "convert", alist, syntax, &make);
@@ -507,10 +507,10 @@ static struct NumberDimSyntax
 
     alist.add ("description", "Specify dimension for number.");
     NumberChild::load_syntax (syntax, alist);
-    syntax.add ("warn_known", Syntax::Boolean, Syntax::Const,
+    syntax.add ("warn_known", Value::Boolean, Value::Const,
                 "Issue a warning if the dimensions is already known.");
     alist.add ("warn_known", true);
-    syntax.add ("dimension", Syntax::String, Syntax::Const,
+    syntax.add ("dimension", Value::String, Value::Const,
 		"Dimension to use.");
     syntax.order ("value", "dimension");
     Librarian::add_type (Number::component, "dim", alist, syntax, &make);

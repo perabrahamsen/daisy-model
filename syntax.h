@@ -23,6 +23,7 @@
 #ifndef SYNTAX_H
 #define SYNTAX_H
 
+#include "value.h"
 #include "symbol.h"
 #include <vector>
 #include <memory>
@@ -49,54 +50,8 @@ class EXPORT Syntax
   struct Implementation;
   friend struct Implementation;
   std::auto_ptr<Implementation> impl;
+
 public:
-  // A syntax entry has an associated size.  If the size is a positive
-  // integer, the syntax entry specifies an array of that size.  The
-  // default size 'Singleton' indicating that the syntax entry match a
-  // single item of the specified type, while the 'Sequence' used for
-  // entries that contain an array of unspecified length. 
-  static const int Singleton;	
-  static const int Sequence;
-  static const int Unspecified;
-
-  // A syntax may have a dimension associated.
-  static symbol Unknown ();
-  static symbol None ();
-  static symbol Fraction ();
-  static symbol User ();
-
-  // Each syntax entry should have an associated type.
-  enum type 
-  { Number, AList, PLF, Boolean, String,
-    Integer, Object, Library, Error };
-  static symbol type_name (type);
-  static type type_number (symbol name);
-    
-  // The requirements with regard to input and output varies with each
-  // syntax entry.
-  enum category
-  {
-    // This is a parameter, i.e. its value doesn't change during the
-    // compilation, and it cannot be written to the log.
-    Const,
-    // This a state variable, it must be provided at initialization
-    // and can be written to the log.
-    State,
-    // This is a state variable that can be computed from other
-    // parameters or state variables, and therefore does not need to
-    // be specified before the simulation starts. 
-    OptionalState, 
-    // This is a paramter that can be computer from other parameters,
-    // and therefore does not need to be specified before 
-    // the simulation starts. 
-    OptionalConst, 
-    // This is a variable that is only computed for logging purposes
-    // and not a part of the simulation state. 
-    LogOnly
-  };
-  static symbol category_name (category);
-  static int category_number (symbol name);
-
   // This function will check that an alist conform to the syntax.
   bool check (const Metalib&, const AttributeList&, Treelog& err) const;
   
@@ -114,7 +69,7 @@ public:
   bool is_log (symbol) const;
   bool is_state (symbol) const;
 
-  type lookup (symbol) const;
+  Value::type lookup (symbol) const;
   const Syntax& syntax (symbol) const;
   ::Library& library (const Metalib&, symbol) const;
   int  size (symbol) const;
@@ -134,105 +89,105 @@ public:
 
   // Add syntax entries
   void add (symbol key,	// Generic.
-	    type t, 
-	    category cat,
+	    Value::type t, 
+	    Value::category cat,
 	    int size,
 	    const symbol description);
   void add (symbol key,
-	    type t, 
-	    category cat,
+	    Value::type t, 
+	    Value::category cat,
 	    const symbol description)
-  { add (key, t, cat, Singleton, description); }
+  { add (key, t, cat, Value::Singleton, description); }
 
   void add (symbol key, // Number.
 	    symbol dim,
-	    category cat,
+	    Value::category cat,
 	    int size,
 	    const symbol description);
   void add (symbol key, 
 	    symbol dim,
-	    category cat,
+	    Value::category cat,
 	    const symbol description)
-  { add (key, dim, cat, Singleton, description); } 
+  { add (key, dim, cat, Value::Singleton, description); } 
   void add (symbol key,
 	    symbol dim,
 	    const Check& check,
-	    category cat,
+	    Value::category cat,
 	    int size,
 	    const symbol description);
   void add (symbol key, 
 	    symbol dim,
 	    const Check& check,
-	    category cat,
+	    Value::category cat,
 	    const symbol description)
-  { add (key, dim, check, cat, Singleton, description); } 
+  { add (key, dim, check, cat, Value::Singleton, description); } 
   void add_fraction (symbol key, 
-		     category cat,
+		     Value::category cat,
 		     int size,
 		     const symbol description);
   void add_fraction (symbol key, 
-		     category cat,
+		     Value::category cat,
 		     const symbol description);
 
   void add (symbol key, // PLF.
 	    symbol domain,
 	    symbol range,
-	    category cat,
+	    Value::category cat,
 	    int size,
 	    const symbol description);
   void add (symbol key, 
 	    symbol domain,
 	    symbol range,
-	    category cat,
+	    Value::category cat,
 	    const symbol description)
-  { add (key, domain, range, cat, Singleton, description); } 
+  { add (key, domain, range, cat, Value::Singleton, description); } 
   void add (symbol key,
 	    symbol domain,
 	    symbol range,
 	    const Check& check,
-	    category cat,
+	    Value::category cat,
 	    int size,
 	    const symbol description);
   void add (symbol key, 
 	    symbol domain,
 	    symbol range,
 	    const Check& check,
-	    category cat,
+	    Value::category cat,
 	    const symbol description)
-  { add (key, domain, range, check, cat, Singleton, description); } 
+  { add (key, domain, range, check, cat, Value::Singleton, description); } 
 
   void add (symbol key,  // AList
 	    const Syntax& syntax,
 	    int size,
 	    const symbol description)
-  { add (key, syntax, State, size, description); }
+  { add (key, syntax, Value::State, size, description); }
   void add (symbol key,  // AList
 	    const Syntax& syntax,
 	    const symbol description)
-  { add (key, syntax, State, Singleton, description); }
+  { add (key, syntax, Value::State, Value::Singleton, description); }
   void add (symbol, const Syntax&,
-	    category cat, int size, 
+	    Value::category cat, int size, 
 	    const symbol description);
   void add (symbol, const Syntax&, const AttributeList&,	
 	    // Alist sequence with default element.
-	    category, int size, const symbol description);
+	    Value::category, int size, const symbol description);
 
   void add_object (symbol key,// Object
                    const char *const lib, 
                    const symbol description)
-  { add_object (key, lib, State, Singleton, description); }
+  { add_object (key, lib, Value::State, Value::Singleton, description); }
   void add_object (symbol, const char* lib,
-                   category, int size, const symbol description);
+                   Value::category, int size, const symbol description);
   void add_object (symbol, symbol lib,
-                   category, int size, const symbol description);
+                   Value::category, int size, const symbol description);
 
   void add_library (symbol, symbol lib);
 
   typedef void (*load_syntax_fun) (Syntax& syntax, AttributeList& alist);
   void add_submodule (symbol name, AttributeList& alist,
-		      Syntax::category cat, const symbol description,
+		      Value::category cat, const symbol description,
 		      load_syntax_fun load_syntax);
-  void add_submodule_sequence (symbol name, Syntax::category cat, 
+  void add_submodule_sequence (symbol name, Value::category cat, 
 			       const symbol description,
 			       load_syntax_fun load_syntax);
 		      

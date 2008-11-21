@@ -1,3 +1,8 @@
+2008-11-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* value.h, value.C: New utility.
+	* all: Use it.
+
 2008-11-20  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.57 released.

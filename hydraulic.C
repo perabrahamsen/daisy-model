@@ -55,9 +55,9 @@ struct Hydraulic::K_at_h
   // Create and Destroy.
   static void load_syntax (Syntax& syntax, AttributeList&)
   {
-    syntax.add ("h", "cm", Check::non_positive (), Syntax::Const, 
+    syntax.add ("h", "cm", Check::non_positive (), Value::Const, 
 		"Soil water pressure.");
-    syntax.add ("K", "cm/h", Check::positive (), Syntax::Const, 
+    syntax.add ("K", "cm/h", Check::positive (), Value::Const, 
 		"Water conductivity.");
     syntax.order ("h", "K");
   }
@@ -137,14 +137,14 @@ check_Theta_res (const AttributeList& al, Treelog& err)
 
 void
 Hydraulic::load_Theta_sat (Syntax& syntax, AttributeList&)
-{ syntax.add_fraction ("Theta_sat",  Syntax::State, "Saturation point."); }
+{ syntax.add_fraction ("Theta_sat",  Value::State, "Saturation point."); }
 
 void
 Hydraulic::load_Theta_res (Syntax& syntax, AttributeList& alist)
 { 
   load_Theta_sat (syntax, alist);
   syntax.add_check (check_Theta_res);
-  syntax.add_fraction ("Theta_res", Syntax::Const, "Soil residual water.");
+  syntax.add_fraction ("Theta_res", Value::Const, "Soil residual water.");
   alist.add ("Theta_res", 0.0);
 }
 
@@ -164,9 +164,9 @@ void
 Hydraulic::load_K_sat_optional (Syntax& syntax, AttributeList& alist)
 {
   syntax.add_check (check_K_sat_optional);
-  syntax.add ("K_sat", "cm/h", Check::positive (), Syntax::OptionalConst,
+  syntax.add ("K_sat", "cm/h", Check::positive (), Value::OptionalConst,
 	      "Water conductivity of saturated soil.");
-  syntax.add_submodule ("K_at_h", alist, Syntax::OptionalConst, "\
+  syntax.add_submodule ("K_at_h", alist, Value::OptionalConst, "\
 Water conductivity at specified pressure.", K_at_h::load_syntax);
 }
 
@@ -277,9 +277,9 @@ static struct ProgramHydraulic_tableSyntax
     alist.add ("description", "\
 Generate a table of the rentention curve and hydraulic conductivity.");
     syntax.add_object ("hydraulic", Hydraulic::component, 
-                       Syntax::Const, Syntax::Singleton, "\
+                       Value::Const, Value::Singleton, "\
 The hydraulic model to show in the table.");
-    syntax.add ("intervals", Syntax::Integer, Syntax::Const, "\
+    syntax.add ("intervals", Value::Integer, Value::Const, "\
 Number of intervals in the table.");
     alist.add ("intervals", 50);
     syntax.order ("hydraulic");

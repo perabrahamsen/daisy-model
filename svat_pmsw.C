@@ -1888,200 +1888,200 @@ static struct SVAT_PMSWSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     SVAT::load_syntax (syntax, alist);
-    syntax.add ("netrad_brunt", "W/m^2", Syntax::LogOnly,
+    syntax.add ("netrad_brunt", "W/m^2", Value::LogOnly,
                 "Net radiation by Brunt");
-    syntax.add ("netlong_brunt", "W/m^2", Syntax::LogOnly,
+    syntax.add ("netlong_brunt", "W/m^2", Value::LogOnly,
                 "Net long radiation by Brunt");
-    syntax.add ("r_a", "s/m", Syntax::LogOnly,
+    syntax.add ("r_a", "s/m", Value::LogOnly,
                 "bulk aerodynamic resistance, neutral conditions");
-    syntax.add ("r_astab", "s/m", Syntax::LogOnly,
+    syntax.add ("r_astab", "s/m", Value::LogOnly,
                 "bulk aerodynamic resistance, stability corrected");
-    syntax.add ("r_aa", "s/m", Syntax::LogOnly,
+    syntax.add ("r_aa", "s/m", Value::LogOnly,
                 "aerodynamic resistance mean source-ref, uncorrected");
-    syntax.add ("r_aastab1", "s/m", Syntax::LogOnly,
+    syntax.add ("r_aastab1", "s/m", Value::LogOnly,
                 "aerodynamic resistance mean source-ref, corrected 'method 1'");
-    syntax.add ("r_aastab2", "s/m", Syntax::LogOnly,
+    syntax.add ("r_aastab2", "s/m", Value::LogOnly,
                 "aerodynamic resistance mean source-ref, corrected,'method 2'");
-    syntax.add ("r_as", "s/m", Syntax::LogOnly,
+    syntax.add ("r_as", "s/m", Value::LogOnly,
                 "aerodynamic resistance from soil to mean source");
-    syntax.add ("r_ac", "s/m", Syntax::LogOnly,
+    syntax.add ("r_ac", "s/m", Value::LogOnly,
                 "aerodynamic resistance from leaf to mean source");
-    syntax.add ("r_sc_1", "s/m", Syntax::LogOnly,
+    syntax.add ("r_sc_1", "s/m", Value::LogOnly,
                 "Bulk canopy resistance (Noilhan et al., 1991)");
-    syntax.add ("r_sc_2", "s/m", Syntax::LogOnly,
+    syntax.add ("r_sc_2", "s/m", Value::LogOnly,
                 "Bulk canopy resistance (Verma et al., 1993)");
-    syntax.add ("tskin", "dg C", Syntax::LogOnly,
+    syntax.add ("tskin", "dg C", Value::LogOnly,
                 "soil/skin temperature");
-    syntax.add ("tcan", "dg C", Syntax::LogOnly,
+    syntax.add ("tcan", "dg C", Value::LogOnly,
                 "canopy temperature at mean source");
-    syntax.add ("tleaf", "dg C", Syntax::LogOnly,
+    syntax.add ("tleaf", "dg C", Value::LogOnly,
                 "Leaf temperature");
-    syntax.add ("e_c_abs", "Pa", Syntax::LogOnly,
+    syntax.add ("e_c_abs", "Pa", Value::LogOnly,
                 "vapor pressure at mean source height");
-    syntax.add ("e_sl_abs", "Pa", Syntax::LogOnly,
+    syntax.add ("e_sl_abs", "Pa", Value::LogOnly,
                 "saturated vapor pressure at leaf surface");
-    syntax.add ("ha", "W/m^2", Syntax::LogOnly,
+    syntax.add ("ha", "W/m^2", Value::LogOnly,
                 "Sensible heat flux from source- to screen height");
-    syntax.add ("hl", "W/m^2", Syntax::LogOnly,
+    syntax.add ("hl", "W/m^2", Value::LogOnly,
                 "Sensible heat flux from leaf to mean source");
-    syntax.add ("hs", "W/m^2", Syntax::LogOnly,
+    syntax.add ("hs", "W/m^2", Value::LogOnly,
                 "Sensible heat flux from soil to mean source");
-    syntax.add ("lea", "W/m^2", Syntax::LogOnly,
+    syntax.add ("lea", "W/m^2", Value::LogOnly,
                 "Latent heat flux from source- to screen height");
-    syntax.add ("lel", "W/m^2", Syntax::LogOnly,
+    syntax.add ("lel", "W/m^2", Value::LogOnly,
                 "Latent heat flux from leaf to mean source");
-    syntax.add ("gflux", "W/m^2", Syntax::LogOnly,
+    syntax.add ("gflux", "W/m^2", Value::LogOnly,
                 "Ground heat flux");
-    syntax.add ("dtcta", "dg C", Syntax::LogOnly,
+    syntax.add ("dtcta", "dg C", Value::LogOnly,
                 "Temperature gradient between mean source og screen height");
-    syntax.add ("dtltc", "dg C", Syntax::LogOnly,
+    syntax.add ("dtltc", "dg C", Value::LogOnly,
                 "Temperature gradient between leaf and mean source");
-    syntax.add ("dtstc", "dg C", Syntax::LogOnly,
+    syntax.add ("dtstc", "dg C", Value::LogOnly,
                 "Temperature gradient between soil and mean source");
-    syntax.add ("dtcta_star", "dg C", Syntax::LogOnly,
+    syntax.add ("dtcta_star", "dg C", Value::LogOnly,
                 "corrected temp gradient between mean source og screen height");
-    syntax.add ("dtltc_star", "dg C", Syntax::LogOnly,
+    syntax.add ("dtltc_star", "dg C", Value::LogOnly,
                 "corrected temperature gradient between leaf and mean source");
-    syntax.add ("dtstc_star", "dg C", Syntax::LogOnly,
+    syntax.add ("dtstc_star", "dg C", Value::LogOnly,
                 "corrected temperature gradient between soil and mean source");
-    syntax.add ("theta_0_20", "cm^3/cm^3", Syntax::LogOnly,
+    syntax.add ("theta_0_20", "cm^3/cm^3", Value::LogOnly,
                 "Averaged soil water content in upper 20 cm");
-    syntax.add ("f_1", Syntax::None (), Syntax::LogOnly,
+    syntax.add ("f_1", Value::None (), Value::LogOnly,
                 "Constraint function (Noilhan) related to solar radiation");
-    syntax.add ("f1_dolman", Syntax::None (), Syntax::LogOnly,
+    syntax.add ("f1_dolman", Value::None (), Value::LogOnly,
                 "???");
-    syntax.add ("f_2", Syntax::None (), Syntax::LogOnly,
+    syntax.add ("f_2", Value::None (), Value::LogOnly,
                 "Constraint function (Noilhan) related to vapor pressure");
-    syntax.add ("f_3", Syntax::None (), Syntax::LogOnly,
+    syntax.add ("f_3", Value::None (), Value::LogOnly,
                 "Constraint function (Noilhan) related to air temperature");
-    syntax.add ("f_4", Syntax::None (), Syntax::LogOnly,
+    syntax.add ("f_4", Value::None (), Value::LogOnly,
                 "Constraint function (Noilhan) related to soil water content");
-    syntax.add ("f_temp", Syntax::None (), Syntax::LogOnly,
+    syntax.add ("f_temp", Value::None (), Value::LogOnly,
                 "Constraint function (Verma) related to air temperature");
-    syntax.add ("f_def", Syntax::None (), Syntax::LogOnly,
+    syntax.add ("f_def", Value::None (), Value::LogOnly,
                 "Constraint function (Verma) related to vapor pressure");
-    syntax.add ("f_theta", Syntax::None (), Syntax::LogOnly,
+    syntax.add ("f_theta", Value::None (), Value::LogOnly,
                 "Constraint function (Steward) related to soil water content");
-    syntax.add ("f_etep", Syntax::None (), Syntax::LogOnly,
+    syntax.add ("f_etep", Value::None (), Value::LogOnly,
                 "Constraint function defined by crop_ea/crop_ep");
-    syntax.add ("r_sc_js", "s/m", Syntax::LogOnly,
+    syntax.add ("r_sc_js", "s/m", Value::LogOnly,
                 "Bulk canopy resistance: f1_dolman*f_def*f3*f4");
-    syntax.add ("r_sc", "s/m", Syntax::LogOnly,
+    syntax.add ("r_sc", "s/m", Value::LogOnly,
                 "Bulk canopy resistance: f1_dolman*f_def*f3*f_etep");
-    syntax.add ("rcmin_star", "s/m", Syntax::LogOnly,
+    syntax.add ("rcmin_star", "s/m", Value::LogOnly,
                 "minimum canopy resistance");
-    syntax.add ("pstress", Syntax::None (), Syntax::LogOnly,
+    syntax.add ("pstress", Value::None (), Value::LogOnly,
                 "crop production stress");
-    syntax.add ("ustar_raa", Syntax::None (), Syntax::LogOnly,
+    syntax.add ("ustar_raa", Value::None (), Value::LogOnly,
                 "friction velocity from RAA()");
-    syntax.add ("ustar_raastab1", Syntax::None (), Syntax::LogOnly,
+    syntax.add ("ustar_raastab1", Value::None (), Value::LogOnly,
                 "friction velocity from RAASTAB1()");
-    syntax.add ("ustar_raastab2", Syntax::None (), Syntax::LogOnly,
+    syntax.add ("ustar_raastab2", Value::None (), Value::LogOnly,
                 "friction velocity from RAASTAB2()");
-    syntax.add ("env_lai_factor", Syntax::None (), Syntax::LogOnly,
+    syntax.add ("env_lai_factor", Value::None (), Value::LogOnly,
                 "LAI*F_i");
-    syntax.add ("e_pa","Pa", Syntax::LogOnly,
+    syntax.add ("e_pa","Pa", Value::LogOnly,
                 "vapor pressure at 2 m");
-    syntax.add ("e_abs", "kg/m^3", Syntax::LogOnly,
+    syntax.add ("e_abs", "kg/m^3", Value::LogOnly,
                 "absolute vapor pressure");
-    syntax.add ("tair", "degr.C", Syntax::LogOnly,
+    syntax.add ("tair", "degr.C", Value::LogOnly,
                 "air temperature");
-    syntax.add ("srad", "W/m^2", Syntax::LogOnly,
+    syntax.add ("srad", "W/m^2", Value::LogOnly,
                 "global radiation");
-    syntax.add ("u_ref", "m/s", Syntax::LogOnly,
+    syntax.add ("u_ref", "m/s", Value::LogOnly,
                 "friction velocity from ??");
-    syntax.add ("prec", "mm", Syntax::LogOnly,
+    syntax.add ("prec", "mm", Value::LogOnly,
                 "precipitation");
-    syntax.add ("albedo", Syntax::None (), Syntax::Const,
+    syntax.add ("albedo", Value::None (), Value::Const,
                 "Bulk albedo");
     alist.add ("albedo", 0.2);
-    syntax.add ("b1", Syntax::None (), Syntax::Const,
+    syntax.add ("b1", Value::None (), Value::Const,
                 "Brunt coefficient 1");
     alist.add ("b1", 0.53);
-    syntax.add ("b2", Syntax::None (), Syntax::Const,
+    syntax.add ("b2", Value::None (), Value::Const,
                 "Brunt coefficient 2");
     alist.add ("b2", 0.0065);
-    syntax.add ("b3", Syntax::None (), Syntax::Const,
+    syntax.add ("b3", Value::None (), Value::Const,
                 "Brunt coefficient 3");
     alist.add ("b3", 0.1);
-    syntax.add ("b4", Syntax::None (), Syntax::Const,
+    syntax.add ("b4", Value::None (), Value::Const,
                 "Brunt coefficient 4");
     alist.add ("b4", 0.9);
-    syntax.add ("ndif", Syntax::None (), Syntax::Const,
+    syntax.add ("ndif", Value::None (), Value::Const,
                 "Eddy diffusivity decay constant in crop");
     alist.add ("ndif", 2.5);
-    syntax.add ("c_d", Syntax::None (), Syntax::Const,
+    syntax.add ("c_d", Value::None (), Value::Const,
                 "Mean drag coefficient for a leaf");
     alist.add ("c_d", 0.05);
-    syntax.add ("z_0s", "m", Syntax::Const,
+    syntax.add ("z_0s", "m", Value::Const,
                 "Roughness length for soil surface, SG (1990)");
     alist.add ("z_0s", 0.01);
-    syntax.add ("z0_def", "m", Syntax::Const,
+    syntax.add ("z0_def", "m", Value::Const,
                 "Roughness length for soil surface, Oke");
     alist.add ("z0_def", 0.005);
-    syntax.add ("w", "m", Syntax::Const,
+    syntax.add ("w", "m", Value::Const,
                 "average leaf width");
     alist.add ("w", 0.0025);
-    syntax.add ("alpha_u", Syntax::None (), Syntax::Const,
+    syntax.add ("alpha_u", Value::None (), Value::Const,
                 "attenuation coefficient for wind speed");
     alist.add ("alpha_u", 3.0);
-    syntax.add ("arac", Syntax::None (), Syntax::Const,
+    syntax.add ("arac", Value::None (), Value::Const,
                 "leaf boundary layer resistance coefficient");
     alist.add ("arac", 0.00662);
-    syntax.add ("alpha_k", Syntax::None (), Syntax::Const,
+    syntax.add ("alpha_k", Value::None (), Value::Const,
                 "Att. coefficient of eddy diffusivity through sparse canopy");
     alist.add ("alpha_k", 2.0);
 
-    syntax.add ("alpha_r", Syntax::None (), Syntax::Const,
+    syntax.add ("alpha_r", Value::None (), Value::Const,
                 "Att. coefficient for vegetation in ACOEFF()");
     alist.add ("alpha_r", 0.5);
-    syntax.add ("theta_w", "cm^3/cm^3", Syntax::Const,
+    syntax.add ("theta_w", "cm^3/cm^3", Value::Const,
                 "Soil water content at 'wilting point'");
     alist.add ("theta_w", 0.05);
-    syntax.add ("theta_c", "cm^3/cm^3", Syntax::Const,
+    syntax.add ("theta_c", "cm^3/cm^3", Value::Const,
                 "Soil water content at 'field capacity'");
     alist.add ("theta_c", 0.25);
-    syntax.add ("rcmin_const", "s/m", Syntax::Const,
+    syntax.add ("rcmin_const", "s/m", Value::Const,
                 "Constant minimum canopy resistance");
     alist.add ("rcmin_const", 30.0);
-    syntax.add ("rcmax", Syntax::None (), Syntax::Const,
+    syntax.add ("rcmax", Value::None (), Value::Const,
                 "Maximum canopy resistance");
     alist.add ("rcmax", 1000.0);
-    syntax.add ("tref", Syntax::None (), Syntax::Const,
+    syntax.add ("tref", Value::None (), Value::Const,
                 "Reference/optimum temperature in temperature dependent "
                 "constraint function");
     alist.add ("tref", 298.0);
-    syntax.add ("zeta", Syntax::None (), Syntax::Const,
+    syntax.add ("zeta", Value::None (), Value::Const,
                 "Coefficient in vapor pressure dependent constraint function");
     alist.add ("zeta", 0.0002);
-    syntax.add ("f3const", Syntax::None (), Syntax::Const,
+    syntax.add ("f3const", Value::None (), Value::Const,
                 "Coefficient in temperature dependent constraint function");
     alist.add ("f3const", 0.0016);
-    syntax.add ("spar", Syntax::None (), Syntax::Const,
+    syntax.add ("spar", Value::None (), Value::Const,
                 "Reference value of photosynthetically active part of Si");
     alist.add ("spar", 100.0);
-    syntax.add ("tmin", "dg C", Syntax::Const,
+    syntax.add ("tmin", "dg C", Value::Const,
                 "Minimum temperature for canopy conductance");
     alist.add ("tmin", 0.0);
-    syntax.add ("tmax", "dg C", Syntax::Const,
+    syntax.add ("tmax", "dg C", Value::Const,
                 "Maximum temperature for canopy conductance");
     alist.add ("tmax", 55.0);
-    syntax.add ("nu_1", Syntax::None (), Syntax::Const,
+    syntax.add ("nu_1", Value::None (), Value::Const,
                 "coefficient in Jarvis (1976) constraint function f_temp");
     alist.add ("nu_1", 26.5);
-    syntax.add ("nu_2", Syntax::None (), Syntax::Const,
+    syntax.add ("nu_2", Value::None (), Value::Const,
                 "coefficient in Lohammar (1980) constraint function f_def");
     alist.add ("nu_2", 0.57);
-    syntax.add ("nu_3", Syntax::None (), Syntax::Const,
+    syntax.add ("nu_3", Value::None (), Value::Const,
                 "coefficient in Steward (1988) constraint function f_theta");
     alist.add ("nu_3", 0.008);
-    syntax.add ("dt1", "dg C", Syntax::Const,
+    syntax.add ("dt1", "dg C", Value::Const,
                 "lower solution limit in Newton-Raphson method");
     alist.add ("dt1", -5.0);
-    syntax.add ("dt2", "dg C", Syntax::Const,
+    syntax.add ("dt2", "dg C", Value::Const,
                 "upper solution limit in Newton-Raphson method");
     alist.add ("dt2", 5.0);
-    syntax.add ("acc", Syntax::None (), Syntax::Const,
+    syntax.add ("acc", Value::None (), Value::Const,
                 "iteration accuracy in Newton-Raphson method");
     alist.add ("acc", 0.01);
     Librarian::add_type (SVAT::component, "PMSW", alist, syntax, &make);

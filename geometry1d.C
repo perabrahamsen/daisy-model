@@ -185,7 +185,7 @@ Geometry1D::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("submodel", "Geometry1D");
   syntax.add_check (check_alist);
   syntax.add ("zplus", "cm", Check::negative (), 
-	      Syntax::OptionalConst, Syntax::Sequence,
+	      Value::OptionalConst, Value::Sequence,
 	      "Depth of each numeric layer (a negative number).\n\
 The end points are listed descending from the surface to the bottom.");
   static VCheck::All zplus_check (VCheck::decreasing (), 

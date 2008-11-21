@@ -302,45 +302,45 @@ WeatherBase::load_base (Syntax& syntax, AttributeList& alist)
   alist.add ("base_model", "common");
   alist.add ("description", "\
 This is not a model, but a list of parameters shared by all weather models.");
-  if (syntax.lookup ("air_temperature") == Syntax::Error)
+  if (syntax.lookup ("air_temperature") == Value::Error)
     // May be set by derived class (WeatherNone).
-    syntax.add ("air_temperature", "dg C", Syntax::LogOnly,
+    syntax.add ("air_temperature", "dg C", Value::LogOnly,
                 "Temperature this hour.");
-  syntax.add ("daily_air_temperature", "dg C", Syntax::LogOnly,
+  syntax.add ("daily_air_temperature", "dg C", Value::LogOnly,
 	      "Average temperature this day.");
-  syntax.add ("daily_min_air_temperature", "dg C", Syntax::LogOnly,
+  syntax.add ("daily_min_air_temperature", "dg C", Value::LogOnly,
 	      "Minumum temperature this day.");
-  syntax.add ("daily_max_air_temperature", "dg C", Syntax::LogOnly,
+  syntax.add ("daily_max_air_temperature", "dg C", Value::LogOnly,
 	      "Maximum temperature this day.");
-  if (syntax.lookup ("global_radiation") == Syntax::Error)
+  if (syntax.lookup ("global_radiation") == Value::Error)
     // May be set by derived class (WeatherNone).
-    syntax.add ("global_radiation", "W/m^2", Syntax::LogOnly,
+    syntax.add ("global_radiation", "W/m^2", Value::LogOnly,
                 "Global radiation this hour.");
-  syntax.add ("daily_global_radiation", "W/m^2", Syntax::LogOnly,
+  syntax.add ("daily_global_radiation", "W/m^2", Value::LogOnly,
 	      "Average radiation this day.");
-  syntax.add ("diffuse_radiation", "W/m^2", Syntax::LogOnly,
+  syntax.add ("diffuse_radiation", "W/m^2", Value::LogOnly,
 	      "Diffuse radiation this hour.");
-  syntax.add ("reference_evapotranspiration", "mm/h", Syntax::LogOnly,
+  syntax.add ("reference_evapotranspiration", "mm/h", Value::LogOnly,
 	      "Reference evapotranspiration this hour");
-  syntax.add ("daily_extraterrastial_radiation", "W/m^2", Syntax::LogOnly,
+  syntax.add ("daily_extraterrastial_radiation", "W/m^2", Value::LogOnly,
 	      "Extraterrestrial radiation this day.");
-  syntax.add ("rain", "mm/h", Syntax::LogOnly, "Rain this hour.");
-  syntax.add ("snow", "mm/h", Syntax::LogOnly, "Snow this hour.");
-  syntax.add ("precipitation", "mm/h", Syntax::LogOnly, 
+  syntax.add ("rain", "mm/h", Value::LogOnly, "Rain this hour.");
+  syntax.add ("snow", "mm/h", Value::LogOnly, "Snow this hour.");
+  syntax.add ("precipitation", "mm/h", Value::LogOnly, 
 	      "Precipitation this hour.");
-  syntax.add_fraction ("cloudiness", Syntax::LogOnly,
+  syntax.add_fraction ("cloudiness", Value::LogOnly,
 	      "Fraction of sky covered by clouds [0-1].");
-  syntax.add_fraction ("daily_cloudiness", Syntax::LogOnly,
+  syntax.add_fraction ("daily_cloudiness", Value::LogOnly,
 	      "Fraction of sky covered by clouds [0-1].");
-  syntax.add ("vapor_pressure", "Pa", Syntax::LogOnly, "Humidity.");
-  syntax.add ("relative_humidity", Syntax::Fraction (), Syntax::LogOnly,
+  syntax.add ("vapor_pressure", "Pa", Value::LogOnly, "Humidity.");
+  syntax.add ("relative_humidity", Value::Fraction (), Value::LogOnly,
               "Relative humidity.");
-  syntax.add ("wind", "m/s", Syntax::LogOnly, "Wind speed.");
-  syntax.add ("day_length", "h", Syntax::LogOnly,
+  syntax.add ("wind", "m/s", Value::LogOnly, "Wind speed.");
+  syntax.add ("day_length", "h", Value::LogOnly,
 	      "Number of light hours this day.");
-  syntax.add ("day_cycle", Syntax::None (), Syntax::LogOnly,
+  syntax.add ("day_cycle", Value::None (), Value::LogOnly,
 	      "Fraction of daily radiation received this hour.");
-  IM::add_syntax (syntax, alist, Syntax::LogOnly, "deposit", IM::flux_unit (),
+  IM::add_syntax (syntax, alist, Value::LogOnly, "deposit", IM::flux_unit (),
 		  "Total atmospheric deposition of nitrogen.");
 }
 

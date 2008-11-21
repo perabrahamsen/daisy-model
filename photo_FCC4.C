@@ -188,35 +188,35 @@ static struct Photo_FCC4Syntax
 
     alist.add ("description", "C4 photosynthesis and stomatal conductance model by Collatz et al., 1992.");
 
-    syntax.add ("Q10k", "", Check::positive (), Syntax::Const,
+    syntax.add ("Q10k", "", Check::positive (), Value::Const,
                 "Q10k = 1.8 (Collatz et al., 1992)");
     alist.add ("Q10k", 1.8);
 
-    syntax.add ("Q10vm", "", Check::positive (), Syntax::Const,
+    syntax.add ("Q10vm", "", Check::positive (), Value::Const,
                 "Q10vm = 2.4 (Collatz et al., 1992)");
     alist.add ("Q10vm", 2.4);
 
-    syntax.add ("Q10rd", "", Check::positive (), Syntax::Const,
+    syntax.add ("Q10rd", "", Check::positive (), Value::Const,
                 "Q10rd = 2.0 (Collatz et al., 1992)");
     alist.add ("Q10rd", 2.0);
 
-    syntax.add ("kj", "", Check::positive (), Syntax::Const,
+    syntax.add ("kj", "", Check::positive (), Value::Const,
                 "Initial slope of photosynthetic CO2 response, kj = 0.6 mol/m²/s (Collatz et al., 1992)");
     alist.add ("kj", 0.6);
 
-    syntax.add ("alpha", "mol/mol", Check::positive (), Syntax::Const,
+    syntax.add ("alpha", "mol/mol", Check::positive (), Value::Const,
                 "Initial slope of photosynthetic light response. alpha = 0.04 (Collatz et al., 1992)");
     alist.add ("alpha", 0.04);
 
-    syntax.add ("paab", "", Check::positive (), Syntax::Const,
+    syntax.add ("paab", "", Check::positive (), Value::Const,
                 "Leaf absorbtivity to PAR. paab = 0.86 (Collatz et al., 1992)");
     alist.add ("paab", 0.86);
 
-    syntax.add ("theta", " ", Check::positive (), Syntax::Const,
+    syntax.add ("theta", " ", Check::positive (), Value::Const,
                 "Curvature parameter");
     alist.add ("theta", 0.83);
     
-    syntax.add ("beta", " ", Check::positive (), Syntax::Const,
+    syntax.add ("beta", " ", Check::positive (), Value::Const,
                 "Curvanture parameter");
     alist.add ("beta", 0.93);
 

@@ -150,24 +150,24 @@ struct ActionIrrigate : public Action
   static void load_syntax (Syntax& syntax, AttributeList& alist)
   {
     syntax.add_check (check_alist);	
-    syntax.add ("days", Syntax::Integer, Syntax::Const, 
+    syntax.add ("days", Value::Integer, Value::Const, 
                 "Irrigate this number of days.");
     alist.add ("days", 0);
-    syntax.add ("hours", Syntax::Integer, Syntax::OptionalConst, 
+    syntax.add ("hours", Value::Integer, Value::OptionalConst, 
                 "Irrigate this number of hours.\n\
 By default, irrigate 1 hour if days is 0, and 0 hours plus the specified\n\
 number of days else.");
-    syntax.add ("remaining_time", "h", Syntax::OptionalState,
+    syntax.add ("remaining_time", "h", Value::OptionalState,
                 "Irrigate this number of hours.\
 Setting this overrides the 'days' and 'hours' parameters.");
     syntax.add_object ("flux", Number::component, 
-                       Syntax::Const, Syntax::Singleton, 
+                       Value::Const, Value::Singleton, 
 "Amount of irrigation applied.");
     syntax.order ("flux");
     syntax.add ("temperature", "dg C", 
-		Check::positive (), Syntax::OptionalConst,
+		Check::positive (), Value::OptionalConst,
 		"Temperature of irrigation (default: air temperature).");
-    IM::add_syntax (syntax, alist, Syntax::Const, "solute", Units::ppm (), 
+    IM::add_syntax (syntax, alist, Value::Const, "solute", Units::ppm (), 
 		    "Solutes in irrigation water.");
   }
 
@@ -321,13 +321,13 @@ static struct ActionIrrigateSubsoilSyntax
 Irrigate the field directly into the soil.\n\
 Currently, the 'temperature' parameter is ignored.");
     syntax.add_object ("volume", Volume::component, 
-                       Syntax::Const, Syntax::Singleton,
+                       Value::Const, Value::Singleton,
                        "Soil volume to add irritaion.");
     alist.add ("volume", Volume::infinite_box ());
-    syntax.add ("from", "cm", Check::non_positive (), Syntax::OptionalConst, "\
+    syntax.add ("from", "cm", Check::non_positive (), Value::OptionalConst, "\
 Height where you want to start the incorporation (a negative number).\n\
 OBSOLETE: Use (volume box (top FROM)) instead.");
-    syntax.add ("to", "cm", Check::non_positive (), Syntax::OptionalConst, "\
+    syntax.add ("to", "cm", Check::non_positive (), Value::OptionalConst, "\
 Height where you want to end the incorporation (a negative number).\n\
 OBSOLETE: Use (volume box (bottom TO)) instead.");
 

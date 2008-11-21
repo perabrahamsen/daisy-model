@@ -101,8 +101,8 @@ static struct ClayOMOldSyntax
     alist.add ("description", 
 	       "Traditional clay influence on organic matter.");
 
-    syntax.add ("factor", Syntax::Fraction (), Syntax::None (),
-		Syntax::Const, "\
+    syntax.add ("factor", Value::Fraction (), Value::None (),
+		Value::Const, "\
 Function of clay content, multiplied to the maintenance and turnover rates\n\
 of SMB1 and all SOM pools.");
     PLF factor;

@@ -76,7 +76,7 @@ static struct ElementAtomSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "An atom.");
     
-    syntax.add ("mass", "g/mol", Syntax::Const, "Atomic mass.");
+    syntax.add ("mass", "g/mol", Value::Const, "Atomic mass.");
 
     Librarian::add_type (Element::component, "atom", alist, syntax, &make);
   }

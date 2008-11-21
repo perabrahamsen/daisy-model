@@ -461,11 +461,11 @@ Movement::load_vertical (Syntax& syntax, AttributeList& alist)
   MovementSolute::load_solute (syntax, alist, Transport::vertical_model ());
   alist.add ("Tertiary", Tertiary::old_model ());
 
-  syntax.add_submodule ("Geometry", alist, Syntax::State,
+  syntax.add_submodule ("Geometry", alist, Value::State,
                         "Discretization of the soil.",
                         Geometry1D::load_syntax);
   syntax.add_object ("matrix_water", UZmodel::component, 
-                     Syntax::Const, Syntax::Sequence,
+                     Value::Const, Value::Sequence,
                      "Vertical matrix water transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends.");

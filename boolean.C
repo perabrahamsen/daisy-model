@@ -171,7 +171,7 @@ struct BooleanOperands : public Boolean
   static void load_syntax (Syntax& syntax, AttributeList&)
   {
     syntax.add_object ("operands", Boolean::component, 
-                       Syntax::Const, Syntax::Sequence, "\
+                       Value::Const, Value::Sequence, "\
 List of operands to compare.");
     syntax.order ("operands");
   }
@@ -263,7 +263,7 @@ static struct BooleanXOrSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     syntax.add_object ("operands", Boolean::component, 
-                       Syntax::Const, 2, "\
+                       Value::Const, 2, "\
 The two operands to compare.");
     syntax.order ("operands");
     alist.add ("description", 
@@ -293,7 +293,7 @@ static struct BooleanNotSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     syntax.add_object ("operands", Boolean::component, 
-                       Syntax::Const, 1, "\
+                       Value::Const, 1, "\
 The operand to check.");
     syntax.order ("operands");
     alist.add ("description", 

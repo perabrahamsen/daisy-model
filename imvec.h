@@ -81,7 +81,7 @@ public:
   // Create and Destroy. 
 public:
   static void add_syntax (Syntax& parent_syntax, AttributeList& parent_alist,
-			  Syntax::category cat, 
+			  Value::category cat, 
 			  const char *const key,
 			  const symbol dimension,
 			  const char *const description);

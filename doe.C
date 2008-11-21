@@ -91,19 +91,19 @@ DOE::load_syntax (Syntax& syntax, AttributeList& alist)
 A single element in a Dissolved Organic Matter pool.");
 
   // Content.
-  syntax.add ("M", "g/cm^3", Syntax::State, Syntax::Sequence,
+  syntax.add ("M", "g/cm^3", Value::State, Value::Sequence,
 	      "Mass in water and soil.");
-  syntax.add ("C", "g/cm^3", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("C", "g/cm^3", Value::LogOnly, Value::Sequence,
 	      "Concentration in water.");
-  syntax.add ("S", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("S", "g/cm^3/h", Value::LogOnly, Value::Sequence,
 	      "Combined source term.");
-  syntax.add ("S_p", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("S_p", "g/cm^3/h", Value::LogOnly, Value::Sequence,
 	      "Source term (macropore transport only).");
-  syntax.add ("S_drain", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("S_drain", "g/cm^3/h", Value::LogOnly, Value::Sequence,
 	      "Source term (soil drainage only).");
-  syntax.add ("J_matrix", "g/cm^2/h", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("J_matrix", "g/cm^2/h", Value::LogOnly, Value::Sequence,
 	      "Transportation in matrix (positive up).");
-  syntax.add ("J_tertiary", "g/cm^2/h", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("J_tertiary", "g/cm^2/h", Value::LogOnly, Value::Sequence,
 	      "Transportation outside matrix (positive up).");
 }
 

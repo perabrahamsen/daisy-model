@@ -94,9 +94,9 @@ static struct GroundwaterExternSyntax
 Look up groundwater table in an scope.  ");
     Groundwater::load_syntax (syntax, alist);
     syntax.add_object ("table", Number::component, 
-                       Syntax::Const, Syntax::Singleton, "\
+                       Value::Const, Value::Singleton, "\
 Expression that evaluates to groundwate table in.");
-    syntax.add ("initial_table", "cm", Check::none (), Syntax::OptionalConst,
+    syntax.add ("initial_table", "cm", Check::none (), Value::OptionalConst,
 		"Groundwater level for initialization of soil water.");
     Librarian::add_type (Groundwater::component, "extern", alist, syntax, &make);
   }

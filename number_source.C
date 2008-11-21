@@ -85,10 +85,10 @@ struct NumberSource : public Number
   {
     syntax.add_object ("source", Source::component, "\
 The time series we want to extract a number from.");
-    syntax.add_submodule ("begin", alist, Syntax::OptionalConst,
+    syntax.add_submodule ("begin", alist, Value::OptionalConst,
 			  "Ignore values before or at this date.", 
                           Time::load_syntax);
-    syntax.add_submodule ("end", alist, Syntax::OptionalConst,
+    syntax.add_submodule ("end", alist, Value::OptionalConst,
 			  "Ignore values after this date.", Time::load_syntax);
   }
   NumberSource (Block& al)

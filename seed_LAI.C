@@ -116,10 +116,10 @@ void
 SeedLAI::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   // Parameters.
-  syntax.add ("DSLAI05", Syntax::None (), Syntax::Const,
+  syntax.add ("DSLAI05", Value::None (), Value::Const,
 	      "DS at CAI=0.5; initial phase.");
   alist.add ("DSLAI05", 0.15);
-  syntax.add ("SpLAIfac", "DS", Syntax::None (), Syntax::Const, "\
+  syntax.add ("SpLAIfac", "DS", Value::None (), Value::Const, "\
 Factor defining maximum specific leaf weight.\n\
 Only used during the initial phase.");
   PLF SpLf;
@@ -130,7 +130,7 @@ Only used during the initial phase.");
   alist.add ("SpLAIfac", SpLf);
 
   // State.
-  syntax.add ("InitCAI", Syntax::Boolean, Syntax::State,
+  syntax.add ("InitCAI", Value::Boolean, Value::State,
 	      "Initial CAI development phase.");
   alist.add ("InitCAI", true);
 

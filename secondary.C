@@ -136,9 +136,9 @@ static struct SecondaryPressureSyntax
 The secondary domain consist of water in matrix pores larger than\n\
 what corresponds to the specified pressure. "); 
   
-    syntax.add ("h_lim", "cm", Syntax::Const, "\
+    syntax.add ("h_lim", "cm", Value::Const, "\
 Pressure for activating secondary domain.");
-    syntax.add ("alpha", "h^-1", Syntax::Const, "\
+    syntax.add ("alpha", "h^-1", Value::Const, "\
 Exchange rate between primary and secondary water."); 
    Librarian::add_type (Secondary::component, "pressure", alist, syntax, &make);
   }

@@ -313,7 +313,7 @@ static struct HydraulicHypresSyntax
 Parameters specified by the HYPRES transfer function.\n\
 See <http://www.macaulay.ac.uk/hypres/>.");
     Hydraulic::load_K_sat_optional (syntax, alist);
-    syntax.add ("topsoil", Syntax::Boolean, Syntax::OptionalConst, "\
+    syntax.add ("topsoil", Value::Boolean, Value::OptionalConst, "\
 If set true this horizon will be initialized as a topsoil (i.e. the\n\
 plowing layer), if set false it will be initialized as a subsoil.\n\
 By default, the horizon will be initialized as a topsoil if and only if\n\

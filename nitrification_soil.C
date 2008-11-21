@@ -97,14 +97,14 @@ static struct NitrificationSoilSyntax
     alist.add ("description", 
                "k_10 * M / (k + M).  Michaelis-Menten kinetics,\n\
 with nitrification based on total ammonium content.");
-    syntax.add ("k", "g N/cm^3", Check::positive (), Syntax::Const, 
+    syntax.add ("k", "g N/cm^3", Check::positive (), Value::Const, 
                 "Half saturation constant.");
-    syntax.add ("k_10", "g N/cm^3/h", Check::non_negative (), Syntax::Const,
+    syntax.add ("k_10", "g N/cm^3/h", Check::non_negative (), Value::Const,
                 "Max rate.");
-    syntax.add ("heat_factor", "dg C", Syntax::None (), Syntax::Const,
+    syntax.add ("heat_factor", "dg C", Value::None (), Value::Const,
                 "Heat factor.");
     alist.add ("heat_factor", PLF::empty ());
-    syntax.add ("water_factor", "cm", Syntax::None (), Syntax::Const,
+    syntax.add ("water_factor", "cm", Value::None (), Value::Const,
                 "Water potential factor.");
     alist.add ("water_factor", PLF::empty ());
     Librarian::add_type (Nitrification::component, "soil", alist, syntax, &make);

@@ -29,7 +29,7 @@ GnuplotUtil::load_style (Syntax& syntax, AttributeList&,
                          const symbol default_with, 
                          const symbol default_title)
 {
-  Syntax::category with_cat = Syntax::Const;
+  Value::category with_cat = Value::Const;
   
   // With
   std::string with_doc = "\
@@ -38,13 +38,13 @@ use 'points' to plot each point individually, or 'lines' to draw\n\
 lines between them.";
   if (default_with.name ().size () > 1)
     {
-      with_cat = Syntax::OptionalConst;
+      with_cat = Value::OptionalConst;
       with_doc += "\n\n" + default_with;
     }
-  syntax.add ("with", Syntax::String, with_cat, with_doc);
+  syntax.add ("with", Value::String, with_cat, with_doc);
 
   // Style
-  syntax.add ("style", Syntax::Integer, Syntax::OptionalConst, "\
+  syntax.add ("style", Value::Integer, Value::OptionalConst, "\
 Style to use for this dataset.\n\
 \n\
 By default, gnuplot will use style 1 for the first source to plot with\n\
@@ -59,15 +59,15 @@ negative number to explicitly request the default behaviour.\n\
 The 'style' parameter is only used if 'with' is either 'points' or 'lines'.");
 
   // Title.
-  Syntax::category title_cat = Syntax::Const;
+  Value::category title_cat = Value::Const;
   std::string title_doc = "\
 Name of data series for the legend on the graph.";
   if (default_title.name ().size () > 1)
     {
-      title_cat = Syntax::OptionalConst;
+      title_cat = Value::OptionalConst;
       title_doc += "\n\n" + default_title;
     }
-  syntax.add ("title", Syntax::String, title_cat, title_doc);
+  syntax.add ("title", Value::String, title_cat, title_doc);
 }
 
 // gnuplot_utils.C ends here

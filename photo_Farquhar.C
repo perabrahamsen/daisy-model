@@ -433,61 +433,61 @@ PhotoFarquhar::load_syntax (Syntax& syntax, AttributeList& alist)
 
   alist.add ("description", "Faquhar et al. (1980) photosynthesis and Ball et al. (1987) stomataconductance model coupled as described by Collatz et al., 1991.");
 
-  syntax.add ("Xn", "mol/mol/s", Check::positive (), Syntax::Const,
+  syntax.add ("Xn", "mol/mol/s", Check::positive (), Value::Const,
 	      "Slope of relationship between leaf rubisco N and Vmax, Xn = 1.16E-3 mol/mol/s for wheat (de Pury & Farquhar, 1997)");
   alist.add ("Xn", 1.16e-3);
 
-  syntax.add ("O2_atm", "Pa", Check::positive (), Syntax::Const,
+  syntax.add ("O2_atm", "Pa", Check::positive (), Value::Const,
 	      "O2 partial pressure of atmosphere");
   alist.add ("O2_atm", 20500.0);
 
-  syntax.add ("Gamma25", "Pa", Check::positive (), Syntax::Const,
+  syntax.add ("Gamma25", "Pa", Check::positive (), Value::Const,
 	      "CO2 compensation point of photosynthesis. Gamma25 = 3.69 Pa for wheat (Collatz et al., 1991)");
   alist.add ("Gamma25", 3.69);
 
-  syntax.add ("Ea_Gamma", "J/mol", Check::positive (), Syntax::Const,
+  syntax.add ("Ea_Gamma", "J/mol", Check::positive (), Value::Const,
 	      "Actimation energy for Gamma. Ea_Gamma = 29000 (Jordan & Ogren, 1984)");
   alist.add ("Ea_Gamma", 29000.);
 
-  syntax.add ("Ptot", "Pa", Check::positive (), Syntax::Const,
+  syntax.add ("Ptot", "Pa", Check::positive (), Value::Const,
 	      "Atmospheric pressure. Ptot = 100000 Pa");
   alist.add ("Ptot", 1.0E5);
 
-  syntax.add ("m", Syntax::None (), Check::positive (), Syntax::Const,
+  syntax.add ("m", Value::None (), Check::positive (), Value::Const,
 	      "Stomatal slope factor. Ball and Berry (1982): m = 9 for soyabean. Wang and Leuning(1998): m = 11 for wheat");
 
-  syntax.add ("b", "mol/m^2/s", Check::positive (), Syntax::Const,
+  syntax.add ("b", "mol/m^2/s", Check::positive (), Value::Const,
 	      "Stomatal intercept factor, Ball and Berry (1982) & Wang and Leuning(1998): (0.01 mol/m2/s)");
 
-    syntax.add ("gbw", "mol/m^2/s", Check::positive (), Syntax::Const,
+    syntax.add ("gbw", "mol/m^2/s", Check::positive (), Value::Const,
                 "Leaf boundary conductance of water. gbw = 2 mol/m²/s (Collatz et al., 1991");
     alist.add ("gbw", 2.00);
 
   //log variables
-  syntax.add ("ABA_effect", Syntax::None (), Syntax::LogOnly,
+  syntax.add ("ABA_effect", Value::None (), Value::LogOnly,
               "Water stress effect induced by ABA");
-  syntax.add ("ci_vector", "Pa", Syntax::LogOnly, Syntax::Sequence, "CO2 pressure in Stomatal in each layer.");
-  syntax.add ("Vm_vector", "mmol/m^2/s", Syntax::LogOnly, Syntax::Sequence, "Photosynthetic capacity in each layer.");
-  syntax.add ("Jm_vector", "mmol/m^2/s", Syntax::LogOnly, Syntax::Sequence, "Potential rate of electron transport in each layer.");
-  syntax.add ("gs_vector", "mol/m^2/s", Syntax::LogOnly, Syntax::Sequence, "Stomata cunductance in each layer.");
-  syntax.add ("gs_sun_vector", "mol/m^2/s", Syntax::LogOnly, Syntax::Sequence, "Stomata cunductance in sunlit fraction of each layer.");
-  syntax.add ("Nleaf_vector", "mol N/m^2", Syntax::LogOnly, Syntax::Sequence, "Distribution of photosynthetic N-leaf.");
-  syntax.add ("Ass_vector", "mol CH2O/m^2/h", Syntax::LogOnly, Syntax::Sequence, "Brutto assimilate.");
-  syntax.add ("sun_LAI_vector", "mol CH2O/m^2/s", Syntax::LogOnly, Syntax::Sequence, "sunlit LAI.");
+  syntax.add ("ci_vector", "Pa", Value::LogOnly, Value::Sequence, "CO2 pressure in Stomatal in each layer.");
+  syntax.add ("Vm_vector", "mmol/m^2/s", Value::LogOnly, Value::Sequence, "Photosynthetic capacity in each layer.");
+  syntax.add ("Jm_vector", "mmol/m^2/s", Value::LogOnly, Value::Sequence, "Potential rate of electron transport in each layer.");
+  syntax.add ("gs_vector", "mol/m^2/s", Value::LogOnly, Value::Sequence, "Stomata cunductance in each layer.");
+  syntax.add ("gs_sun_vector", "mol/m^2/s", Value::LogOnly, Value::Sequence, "Stomata cunductance in sunlit fraction of each layer.");
+  syntax.add ("Nleaf_vector", "mol N/m^2", Value::LogOnly, Value::Sequence, "Distribution of photosynthetic N-leaf.");
+  syntax.add ("Ass_vector", "mol CH2O/m^2/h", Value::LogOnly, Value::Sequence, "Brutto assimilate.");
+  syntax.add ("sun_LAI_vector", "mol CH2O/m^2/s", Value::LogOnly, Value::Sequence, "sunlit LAI.");
 
-  syntax.add ("ci_middel", "Pa", Syntax::LogOnly, "Stomata average CO2 pressure.");
-  syntax.add ("gs", "mol/m^2/s", Syntax::LogOnly, "Stomata conductance.");
-  syntax.add ("gs_ms", "m/s", Syntax::LogOnly, "Stomata conductance.");
-  syntax.add ("Ass", "g CH2O/m^2/h", Syntax::LogOnly, "'Net' leaf assimilate of CO2 (brutto photosynthesis).");
-  syntax.add ("Res", "g CH2O/m^2/h", Syntax::LogOnly, "Farquhar leaf respiration.");
-  syntax.add ("LAI", "", Syntax::LogOnly, "Leaf area index for the canopy used in photosynthesis.");
-  syntax.add ("sun_LAI", "", Syntax::LogOnly, "Leaf area index for the sunlit fraction.");
-  syntax.add ("PAR_", "mol/m^2/h", Syntax::LogOnly, "PAR.");
-  syntax.add ("Vmax", "[mmol/m^2/s]", Syntax::LogOnly, "Photosynthetic Rubisco capacity.");
-  syntax.add ("jm", "[mmol/m^2/s]", Syntax::LogOnly, "Potential rate of electron transport.");
-  syntax.add ("leafPhotN", "[mol N/m^2]", Syntax::LogOnly, "Content of photosynthetic active leaf N.");
-  syntax.add ("fraction_sun", "", Syntax::LogOnly, "Fraction of sunlit in the canopy.");
-  syntax.add ("fraction_total", "", Syntax::LogOnly, "Fraction of leaf contributing to the photosynthesis.");
+  syntax.add ("ci_middel", "Pa", Value::LogOnly, "Stomata average CO2 pressure.");
+  syntax.add ("gs", "mol/m^2/s", Value::LogOnly, "Stomata conductance.");
+  syntax.add ("gs_ms", "m/s", Value::LogOnly, "Stomata conductance.");
+  syntax.add ("Ass", "g CH2O/m^2/h", Value::LogOnly, "'Net' leaf assimilate of CO2 (brutto photosynthesis).");
+  syntax.add ("Res", "g CH2O/m^2/h", Value::LogOnly, "Farquhar leaf respiration.");
+  syntax.add ("LAI", "", Value::LogOnly, "Leaf area index for the canopy used in photosynthesis.");
+  syntax.add ("sun_LAI", "", Value::LogOnly, "Leaf area index for the sunlit fraction.");
+  syntax.add ("PAR_", "mol/m^2/h", Value::LogOnly, "PAR.");
+  syntax.add ("Vmax", "[mmol/m^2/s]", Value::LogOnly, "Photosynthetic Rubisco capacity.");
+  syntax.add ("jm", "[mmol/m^2/s]", Value::LogOnly, "Potential rate of electron transport.");
+  syntax.add ("leafPhotN", "[mol N/m^2]", Value::LogOnly, "Content of photosynthetic active leaf N.");
+  syntax.add ("fraction_sun", "", Value::LogOnly, "Fraction of sunlit in the canopy.");
+  syntax.add ("fraction_total", "", Value::LogOnly, "Fraction of leaf contributing to the photosynthesis.");
 
   // Models
   syntax.add_object ("N-dist", RubiscoNdist::component, 

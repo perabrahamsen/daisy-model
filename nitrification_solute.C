@@ -102,14 +102,14 @@ static struct NitrificationSoluteSyntax
     alist.add ("description", 
 	       "k_10 * C / (k + C).  Michaelis-Menten kinetics,\n\
 with nitrification based on ammonium solute.");
-    syntax.add ("k", "g/cm^3", Check::positive (), Syntax::Const, 
+    syntax.add ("k", "g/cm^3", Check::positive (), Value::Const, 
 		"Half saturation constant.");
     syntax.add ("k_10", "h^-1", Check::non_negative (),
-		Syntax::Const, "Max rate.");
-    syntax.add ("heat_factor", "dg C", Syntax::None (), Syntax::Const,
+		Value::Const, "Max rate.");
+    syntax.add ("heat_factor", "dg C", Value::None (), Value::Const,
 		"Heat factor.");
     alist.add ("heat_factor", PLF::empty ());
-    syntax.add ("water_factor", "cm", Syntax::None (), Syntax::Const,
+    syntax.add ("water_factor", "cm", Value::None (), Value::Const,
 		"Water potential factor.");
     alist.add ("water_factor", PLF::empty ());
     Librarian::add_type (Nitrification::component, "solute", alist, syntax, &make);

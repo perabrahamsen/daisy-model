@@ -65,7 +65,7 @@ static struct ActionSurfaceSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "\
 Set amount of ponding the surface can retain.");
-    syntax.add ("height", "cm", Check::non_negative (), Syntax::Const,
+    syntax.add ("height", "cm", Check::non_negative (), Value::Const,
 		"Max ponding height before runoff.");
     syntax.order ("height");
     Librarian::add_type (Action::component, "set_surface_detention_capacity", 

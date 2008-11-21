@@ -153,20 +153,20 @@ static struct ReactionFilterSyntax
     alist.add ("description",
                "Filtration of soil colloids.");
 
-    syntax.add ("immobile", Syntax::String, Syntax::Const,
+    syntax.add ("immobile", Value::String, Value::Const,
 		"Immobile colloids in the soil.");
-    syntax.add ("mobile", Syntax::String, Syntax::Const,
+    syntax.add ("mobile", Value::String, Value::Const,
 		"Mobile colloids dissolved in soil water.");
-    syntax.add ("F_primary", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+    syntax.add ("F_primary", "g/cm^3/h", Value::LogOnly, Value::Sequence,
 		"Filtration in the primary domain (intra-aggregate pores).");
-    syntax.add ("F_secondary", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+    syntax.add ("F_secondary", "g/cm^3/h", Value::LogOnly, Value::Sequence,
 		"Filtration in secondary domain (inter-aggregate pores).");
 
-    syntax.add ("fc_primary", "cm^-1", Check::positive (), Syntax::Const,
+    syntax.add ("fc_primary", "cm^-1", Check::positive (), Value::Const,
                 "Filter coefficient in the primary domain");
     alist.add ("fc_primary", 1.0);
    
-    syntax.add ("fc_secondary", "cm^-1", Check::positive (), Syntax::Const,
+    syntax.add ("fc_secondary", "cm^-1", Check::positive (), Value::Const,
                 "Filter coefficient in secondary domain");
     alist.add ("fc_secondary", 0.5);
 

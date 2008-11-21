@@ -146,15 +146,15 @@ HydraulicB_BaC_BimodalSyntax::HydraulicB_BaC_BimodalSyntax ()
 	     "Brooks and Corey retention curve model with Burdine theory.\n\
 Bimodal hydraulic conductivity curve.");
   Hydraulic::load_Theta_res (syntax, alist);
-  syntax.add ("K_sat", "cm/h", Check::non_negative (), Syntax::OptionalConst,
+  syntax.add ("K_sat", "cm/h", Check::non_negative (), Value::OptionalConst,
 	      "Water conductivity of saturated soil.");
-  syntax.add ("lambda", Syntax::None (), Syntax::Const,
+  syntax.add ("lambda", Value::None (), Value::Const,
 	      "Pore size index.");
-  syntax.add ("h_b", "cm", Syntax::Const,
+  syntax.add ("h_b", "cm", Value::Const,
 	      "Bubbling pressure.");
-  syntax.add ("Theta_b", Syntax::None (), Syntax::Const,
+  syntax.add ("Theta_b", Value::None (), Value::Const,
 	      "Water content at 'h_b'.");
-  syntax.add ("K_b", "cm/h", Syntax::Const,
+  syntax.add ("K_b", "cm/h", Value::Const,
 	      "Water conductivity at 'h_b'.");
 
   Librarian::add_type (Hydraulic::component, "B_BaC_Bimodal", alist, syntax, make);

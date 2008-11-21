@@ -115,18 +115,18 @@ The temperature sum is the sum of the daily average air temperature since\n\
 last reset.  It is reset once a year.  Days where the average is below 0\n\
 does not count in the sum.");
 
-      syntax.add ("check_hour", Syntax::Integer, Syntax::Const, 
+      syntax.add ("check_hour", Value::Integer, Value::Const, 
 		  "Hour in day to update TSum.");
       alist.add ("check_hour", 6);
-      syntax.add ("reset_mday", Syntax::Integer, Syntax::Const, 
+      syntax.add ("reset_mday", Value::Integer, Value::Const, 
 		  "Day in month to reset TSum.");
       alist.add ("reset_mday", 1);
-      syntax.add ("reset_month", Syntax::Integer, Syntax::Const, 
+      syntax.add ("reset_month", Value::Integer, Value::Const, 
 		  "Month in year to reset TSum.");
       alist.add ("reset_month", 3);
-      syntax.add ("TSum_limit", "dg C d", Syntax::Const, "\
+      syntax.add ("TSum_limit", "dg C d", Value::Const, "\
 Temeperature sum above which the condition becomes true.");
-      syntax.add ("TSum_now", "dg C d", Syntax::OptionalState, "\
+      syntax.add ("TSum_now", "dg C d", Value::OptionalState, "\
 Current temeprature sum since last reset.");
       syntax.order ("TSum_limit");
       Librarian::add_type (Condition::component, "TSum_above",

@@ -352,25 +352,25 @@ static struct GnuplotTimeSyntax
     alist.add ("description",
                "Generate a gnuplot graph with times series."); 
 
-    syntax.add_submodule ("begin", alist, Syntax::OptionalConst,
+    syntax.add_submodule ("begin", alist, Value::OptionalConst,
 			  "First date at x-axis.", Time::load_syntax);
-    syntax.add_submodule ("end", alist, Syntax::OptionalConst,
+    syntax.add_submodule ("end", alist, Value::OptionalConst,
 			  "Last date at x-axis.", Time::load_syntax);
-    syntax.add ("ymin", Syntax::User (), Syntax::OptionalConst, "\
+    syntax.add ("ymin", Value::User (), Value::OptionalConst, "\
 Fixed lowest value on left y-axis.\n\
 By default determine this from the data.");
-    syntax.add ("ymax", Syntax::User (), Syntax::OptionalConst, "\
+    syntax.add ("ymax", Value::User (), Value::OptionalConst, "\
 Fixed highest value on right y-axis.\n\
 By default determine this from the data.");
-    syntax.add ("y2min", Syntax::User (), Syntax::OptionalConst, "\
+    syntax.add ("y2min", Value::User (), Value::OptionalConst, "\
 Fixed lowest value on left y-axis.\n\
 By default determine this from the data.");
-    syntax.add ("y2max", Syntax::User (), Syntax::OptionalConst, "\
+    syntax.add ("y2max", Value::User (), Value::OptionalConst, "\
 Fixed highest value on right y-axis.\n\
 By default determine this from the data.");
                 
-    syntax.add_object ("source", Source::component, Syntax::State, 
-                       Syntax::Sequence, "\
+    syntax.add_object ("source", Source::component, Value::State, 
+                       Value::Sequence, "\
 Time series to plot.");
     Librarian::add_type (Gnuplot::component, "time", alist, syntax, &make);
   }

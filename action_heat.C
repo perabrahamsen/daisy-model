@@ -67,9 +67,9 @@ static struct ActionHeatSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "\
 Set external point heat source at height to value.");
-    syntax.add ("height", "cm", Check::non_positive (), Syntax::Const,
+    syntax.add ("height", "cm", Check::non_positive (), Value::Const,
 		"Height of heat source (a negative number).");
-    syntax.add ("value", "W/m^2", Check::non_negative (), Syntax::Const,
+    syntax.add ("value", "W/m^2", Check::non_negative (), Value::Const,
 		"Value of heat source.");
     syntax.order ("height", "value");
     Librarian::add_type (Action::component, "set_heat_source", 

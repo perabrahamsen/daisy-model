@@ -367,10 +367,10 @@ WeatherStandard::YearMap::YearInterval::load_syntax (Syntax& syntax,
 						     AttributeList&)
 {
   syntax.add_check (check_alist);
-  syntax.add ("from", Syntax::Integer, Syntax::Const,
+  syntax.add ("from", Value::Integer, Value::Const,
 	      "First year of interval.");
   syntax.add_check ("from", VCheck::valid_year ());
-  syntax.add ("to", Syntax::Integer, Syntax::Const,
+  syntax.add ("to", Value::Integer, Value::Const,
 	      "First year of interval.");
   syntax.add_check ("to", VCheck::valid_year ());
   syntax.order ("from", "to");
@@ -412,10 +412,10 @@ void
 WeatherStandard::YearMap::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   syntax.add_check (check_alist);
-  syntax.add_submodule ("from", alist, Syntax::Const, 
+  syntax.add_submodule ("from", alist, Value::Const, 
 			"Interval of years to map from.",
 			YearInterval::load_syntax);
-  syntax.add_submodule ("to", alist, Syntax::Const, 
+  syntax.add_submodule ("to", alist, Value::Const, 
 			"Interval of years to map to.",
 			YearInterval::load_syntax);
   syntax.order ("from", "to");
@@ -1443,11 +1443,11 @@ static struct WeatherStandardSyntax
     alist.add ("description", "Read a Daisy Weather File.");
     WeatherBase::load_base (syntax, alist);
 
-    syntax.add ("where", Syntax::String, Syntax::Const,
+    syntax.add ("where", Value::String, Value::Const,
 		"File to read weather data from.");
     syntax.order ("where");
 
-    syntax.add_submodule_sequence ("missing_years", Syntax::Const, "\
+    syntax.add_submodule_sequence ("missing_years", Value::Const, "\
 How to get data for dates outside the range of the weather file.\n\
 \n\
 The value is a list of maps.  Each map consist of two intervals, and\n\
@@ -1467,16 +1467,16 @@ one will be used.",
     alist.add ("missing_years", std::vector<const AttributeList*> ());
 
     // Division between Rain and Snow.
-    syntax.add ("T_rain", "dg C", Syntax::Const, 
+    syntax.add ("T_rain", "dg C", Value::Const, 
 		"Above this air temperature all precipitation is rain.");
     alist.add ("T_rain", 2.0);
-    syntax.add ("T_snow", "dg C", Syntax::Const,
+    syntax.add ("T_snow", "dg C", Value::Const,
 		"Below this air temperature all precipitation is snow.");
     alist.add ("T_snow", -2.0);
 
     // Scaling.
-    syntax.add ("PrecipScale", Syntax::None (), Check::non_negative (), 
-		Syntax::Const, 12, "\
+    syntax.add ("PrecipScale", Value::None (), Check::non_negative (), 
+		Value::Const, 12, "\
 The precipitation listed in the file will be multiplied by the number\n\
 from this list before it is used in the simulation, depending on the\n\
 month.  The first number corresponds to January, the second to\n\
@@ -1495,15 +1495,15 @@ experimenting with different precipitation values and for reusing data\n\
 from one weather station in nearby areas where only average values are\n\
 known.");
     alist.add ("PrecipScale", std::vector<double> (12, 1.0));
-    syntax.add ("TempScale", Syntax::None (),
-		Syntax::Const, 12, "\
+    syntax.add ("TempScale", Value::None (),
+		Value::Const, 12, "\
 The temperature listed in the file will be multiplied by the number\n\
 from this list before it is used in the simulation, depending on the\n\
 month.  The first number corresponds to January, the second to\n\
 February, etc.");
     alist.add ("TempScale", std::vector<double> (12, 1.0));
     syntax.add ("TempOffset", "dg C",
-		Syntax::Const, 12, "\
+		Value::Const, 12, "\
 Anumber from this list will be added to the temperature listed in\n\
 the file before it is used in the simulation, depending on the\n\
 month.  The first number corresponds to January, the second to\n\
@@ -1511,7 +1511,7 @@ February, etc.");
     alist.add ("TempOffset", std::vector<double> (12, 0.0));
 
     // C02
-    syntax.add ("CO2", "Pa", Syntax::Const, 
+    syntax.add ("CO2", "Pa", Value::Const, 
                 "Atmostpheric CO2 lavel at station.");
     alist.add ("CO2", 35.0);
 

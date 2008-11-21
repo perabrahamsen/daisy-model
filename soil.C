@@ -64,7 +64,7 @@ struct Soil::Implementation
       alist.add ("description", "\
 A location and content of a soil layer.\n\
 The layers apply to the soil section not covered by the 'zones' parameter.");
-      syntax.add ("end", "cm", Check::negative (), Syntax::Const,
+      syntax.add ("end", "cm", Check::negative (), Value::Const,
 		  "End point of this layer (a negative number).");
       syntax.add_object ("horizon", Horizon::component, 
                          "Soil properties of this layer.");
@@ -507,28 +507,28 @@ Soil::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("submodel", "Soil");
   alist.add ("description", "\
 The soil component provides the numeric and physical properties of the soil.");
-  syntax.add_submodule_sequence ("horizons", Syntax::State, "\
+  syntax.add_submodule_sequence ("horizons", Value::State, "\
 Layered description of the soil properties.\n\
 The horizons can be overlapped by the 'zones' parameter.\n\
 Some groundwater models, specifically 'pipe', may cause an extra horizon to\n\
 be added below the one specified here if you do not also specify an explicit\n\
 geometry.",
 				 Implementation::Layer::load_syntax);
-  syntax.add_submodule_sequence ("zones", Syntax::State, "\
+  syntax.add_submodule_sequence ("zones", Value::State, "\
 Zones with special soil properties.\n\
 This overrules the 'horizons' paramter.",
 				 Implementation::Zone::load_syntax);
   alist.add ("zones", std::vector<const AttributeList*> ());
-  syntax.add ("MaxRootingDepth", "cm", Check::positive (), Syntax::Const,
+  syntax.add ("MaxRootingDepth", "cm", Check::positive (), Value::Const,
 	      "Depth at the end of the root zone (a positive number).");
   syntax.add ("dispersivity", "cm", Check::positive (), 
-	      Syntax::Const, "Dispersion length.");
+	      Value::Const, "Dispersion length.");
   alist.add ("dispersivity", 5.0);
   syntax.add ("dispersivity_transversal", "cm", Check::non_negative (), 
-	      Syntax::OptionalConst, "Transversal dispersion length.\n\
+	      Value::OptionalConst, "Transversal dispersion length.\n\
 By default, this is 0.1 times the dispersivity.");
   syntax.add ("border", "cm", Check::negative (), 
-              Syntax::Const, Syntax::Sequence, "\
+              Value::Const, Value::Sequence, "\
 List of flux depths where a mass balance should be possible when logging.\n\
 This attribute is ignored if the geometry is specified explicitly.");
   syntax.add_check ("border", VCheck::decreasing ());

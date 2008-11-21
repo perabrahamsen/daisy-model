@@ -69,7 +69,7 @@ static struct BooleanStringEqualSyntax
 
     alist.add ("description", 
 	       "True iff the supplied strings are identical.");
-    syntax.add ("values", Syntax::String, Syntax::Const, Syntax::Sequence,
+    syntax.add ("values", Value::String, Value::Const, Value::Sequence,
 		"Strings to compare.");
     syntax.order ("values");
     Librarian::add_type (Boolean::component, "string-equal", alist, syntax, &make);

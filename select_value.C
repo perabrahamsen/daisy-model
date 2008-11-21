@@ -96,7 +96,7 @@ void
 SelectValue::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   Select::load_syntax (syntax, alist);
-  syntax.add ("value", Syntax::Unknown (), Syntax::State,
+  syntax.add ("value", Value::Unknown (), Value::State,
 	      "The current accumulated value.");
   alist.add ("value", 0.0);
 }

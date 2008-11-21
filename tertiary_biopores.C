@@ -655,20 +655,20 @@ static struct TertiaryBioporesSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Tertiary domain divided into biopore classes.");
 
-    syntax.add ("enable_solute", Syntax::Boolean, Syntax::Const, "\
+    syntax.add ("enable_solute", Value::Boolean, Value::Const, "\
 fTrue iff solutes should be transport with the water through the biopores.");
     alist.add ("enable_solute", true);
     syntax.add_object ("classes", Biopore::component, 
-                       Syntax::State, Syntax::Sequence,
+                       Value::State, Value::Sequence,
                        "List of biopore classes.");
-    syntax.add ("pressure_initiate", "cm", Syntax::Const, 
+    syntax.add ("pressure_initiate", "cm", Value::Const, 
                 "Pressure needed to activate biopore flow.");
     alist.add ("pressure_initiate", -3.0);
-    syntax.add ("pressure_end", "cm", Syntax::Const, 
+    syntax.add ("pressure_end", "cm", Value::Const, 
                 "Pressure below which biopore flow is deactivated.");
     alist.add ("pressure_end", -30.0);
     syntax.add ("pressure_limit", "cm", Check::non_positive (),
-                Syntax::OptionalConst, "\
+                Value::OptionalConst, "\
 Limit to pressure difference for moving matrix water gradient to biopores.\n\
 \n\
 The idea is that the water is extracted from the matrix by a\n\
@@ -677,34 +677,34 @@ to the height of this water column.  The pressure limit is then the\n\
 maximal length of the column, or the point where the column breaks.\n\
 \n\
 By default, this is equal to 'pressure_end'.");
-    syntax.add ("pressure_barrier", "cm", Check::non_negative (), Syntax::Const,
+    syntax.add ("pressure_barrier", "cm", Check::non_negative (), Value::Const,
                 "Pressure barrier between matrix and biopore domain.\n\
 If the pressure difference between the matrix and biopores is below\n\
 this value, no water will tranfer between the domains.  If you specify\n\
 a too small value for this parameter, the solution may be unstable.");
     alist.add ("pressure_barrier", 5.0);
-    syntax.add ("pond_max", "cm", Check::non_negative (), Syntax::Const, "\
+    syntax.add ("pond_max", "cm", Check::non_negative (), Value::Const, "\
 Maximum height of ponding before spilling into biopores.\n\
 After macropores are activated pond will have this height.");
     alist.add ("pond_max", 0.05);
-    syntax.add ("use_small_timesteps", Syntax::Boolean, Syntax::Const,
+    syntax.add ("use_small_timesteps", Value::Boolean, Value::Const,
                 "True iff the sink is allowed to change within a timestep.");
     alist.add ("use_small_timesteps", true);
-    syntax.add ("active", Syntax::Boolean, Syntax::OptionalState,
-                Syntax::Sequence, "Active biopores in cells.");
-    syntax.add ("water_volume", "cm^3", Syntax::LogOnly, "Water volume.");    
-    syntax.add ("water_height", "cm", Syntax::LogOnly,
+    syntax.add ("active", Value::Boolean, Value::OptionalState,
+                Value::Sequence, "Active biopores in cells.");
+    syntax.add ("water_volume", "cm^3", Value::LogOnly, "Water volume.");    
+    syntax.add ("water_height", "cm", Value::LogOnly,
                 "Water volume multiplied with surface area.");
-    IM::add_syntax (syntax, alist, Syntax::LogOnly, "solute_mass", 
+    IM::add_syntax (syntax, alist, Value::LogOnly, "solute_mass", 
                     IM::mass_unit (),
                     "Total amount of solutes in biopores.");
-    IM::add_syntax (syntax, alist, Syntax::LogOnly, "solute_storage", 
+    IM::add_syntax (syntax, alist, Value::LogOnly, "solute_storage", 
                     IM::storage_unit (), "\
 Total amount of solutes in biopores divided by surface area.");
-    syntax.add ("ddt", "h", Syntax::LogOnly, "Emulated timestep.\n\
+    syntax.add ("ddt", "h", Value::LogOnly, "Emulated timestep.\n\
 Timestep scaled for available water.\n\
 Only relevant if 'use_small_timesteps' is false.");    
-    syntax.add ("deactivate_steps", Syntax::Integer, Syntax::State, 
+    syntax.add ("deactivate_steps", Value::Integer, Value::State, 
                 "No matrix exchange for this number of timesteps.\n\
 Automatically set when matrix pressure is in a disarray, such as after\n\
 tillage operations, or calls to reserve models.");

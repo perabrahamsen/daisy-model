@@ -192,8 +192,8 @@ UIRun::attach (Toplevel& toplevel)
   VisQtTime *const qt_time = new VisQtTime;
   qt_time->setToolTip ("The simulation time.");
   if (alist.check ("time")
-      && syntax.lookup ("time") == Syntax::AList
-      && syntax.size ("time") == Syntax::Singleton)
+      && syntax.lookup ("time") == Value::AList
+      && syntax.size ("time") == Value::Singleton)
     {
       Syntax time_syntax;
       AttributeList time_alist;

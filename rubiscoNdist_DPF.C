@@ -93,11 +93,11 @@ static struct rubiscoNdistDPFSyntax
   { return *new rubiscoNdistDPF (al); }
   static void load_syntax (Syntax& syntax, AttributeList& alist)
   {
-    syntax.add ("kn", Syntax::None (), Check::positive (), Syntax::Const,
+    syntax.add ("kn", Value::None (), Check::positive (), Value::Const,
                 "Extinction coefficient of nitrogen in the canopy, kn = 0.713 (De Pury &Farquhar, 1997)");
     alist.add ("kn", 0.713);
 
-    syntax.add ("f_photo", Syntax::None (), Check::positive (), Syntax::Const,
+    syntax.add ("f_photo", Value::None (), Check::positive (), Value::Const,
                 "Fraction of photosynthetically active N in canopy. According to (Boegh et al., 2002) f_photo = 0.75. However, non-functional N is already substracted from leaf-N in the cropN_std module, therefore f_photo = 1.0 as default.");
     alist.add ("f_photo", 1.00);
   }  

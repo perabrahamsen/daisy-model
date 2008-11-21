@@ -63,7 +63,7 @@ static struct ActionRidgeSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Ridge a ridge on the field.");
-    syntax.add_submodule ("ridge", alist, Syntax::Const,
+    syntax.add_submodule ("ridge", alist, Value::Const,
 			  "Ridge parameters",
 			  Ridge::load_syntax);
     syntax.order ("ridge");

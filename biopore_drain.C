@@ -202,7 +202,7 @@ static struct BioporeDrainSyntax
     alist.add ("description", "Biopores that ends in the drain pipes.");
     Biopore::load_base (syntax, alist);
 
-    syntax.add ("pipe_position", "cm", Check::negative (), Syntax::Const,
+    syntax.add ("pipe_position", "cm", Check::negative (), Value::Const,
                 "Height pipes are placed in the soil (a negative number).\n\
 By default, use the height specified for pipes in the column.");
     Librarian::add_type (Biopore::component, "drain", alist, syntax, &make);

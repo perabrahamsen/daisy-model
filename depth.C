@@ -101,7 +101,7 @@ static struct DepthConstSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Constant depth.");
-    syntax.add ("value", "cm", Check::non_positive (), Syntax::Const, 
+    syntax.add ("value", "cm", Check::non_positive (), Value::Const, 
                 "Constant depth.");
     syntax.order ("value");
     Librarian::add_type (Depth::component, "const", alist, syntax, &make);
@@ -161,9 +161,9 @@ static struct DepthExternSyntax
     alist.add ("description", "\
 Look up depth in an scope.");
     syntax.add_object ("value", Number::component, 
-                       Syntax::Const, Syntax::Singleton, "\
+                       Value::Const, Value::Singleton, "\
 Expression that evaluates to a depth.");
-    syntax.add ("initial_value", "cm", Check::none (), Syntax::OptionalConst,
+    syntax.add ("initial_value", "cm", Check::none (), Value::OptionalConst,
 		"Initial depth.");
 
     Librarian::add_type (Depth::component, "extern", alist, syntax, &make);
@@ -239,9 +239,9 @@ static struct DepthPLFSyntax
 {
   static void entry_syntax (Syntax& syntax, AttributeList& alist)
   {
-    syntax.add_submodule ("time", alist, Syntax::Const, "Time.",
+    syntax.add_submodule ("time", alist, Value::Const, "Time.",
                           Time::load_syntax);
-    syntax.add ("value", "cm", Check::non_positive (), Syntax::Const, 
+    syntax.add ("value", "cm", Check::non_positive (), Value::Const, 
                 "Depth.");
     syntax.order ("time", "value");
   }
@@ -252,7 +252,7 @@ static struct DepthPLFSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Linear interpolation of depth.");
-    syntax.add_submodule_sequence ("table", Syntax::Const, 
+    syntax.add_submodule_sequence ("table", Value::Const, 
                           "Height as a function of time.\n\
 This is a list where each element has the form (TIME VALUE).\n\
 The TIME entries must be increasing cronologically.  The corresponding\n\
@@ -393,7 +393,7 @@ static struct DepthFileSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Linear interpolation of depth read from file.");
-    syntax.add ("file", Syntax::String, Syntax::Const,
+    syntax.add ("file", Value::String, Value::Const,
                 "Name of file to read data from.\n\
 The format of each line in the file is 'YEAR MONTH DAY HEIGHT',\n\
 where HEIGHT should in cm above ground (i.e. a negative number).\n\

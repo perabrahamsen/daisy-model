@@ -98,13 +98,13 @@ static struct DifradDPFSyntax
     alist.add ("description", "\
 Diffuse radiation calculated using the model of De Pury and Farquhar, 1997.");
 
-    syntax.add ("fa", Syntax::Fraction (), Check::positive (), Syntax::Const, "\
+    syntax.add ("fa", Value::Fraction (), Check::positive (), Value::Const, "\
 Diffuse radiation proportion.\n\
 Proportion of attenuated radiation that reaches the surface as diffuse\n\
 radiation.");
     alist.add ("fa", 0.5);
 
-    syntax.add ("a", Syntax::None (), Check::positive (), Syntax::Const, "\
+    syntax.add ("a", Value::None (), Check::positive (), Value::Const, "\
 Atmospheric transmission coefficient of PAR.\n\
 Value around 0.6-0.9 depending on dust particles.");
     alist.add ("a", 0.84);

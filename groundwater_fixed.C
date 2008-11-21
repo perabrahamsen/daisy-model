@@ -75,7 +75,7 @@ static struct GroundwaterFixedSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Fixed high groundwater level.");
     Groundwater::load_syntax (syntax, alist);
-    syntax.add ("table", "cm", Check::none (), Syntax::Const,
+    syntax.add ("table", "cm", Check::none (), Value::Const,
 		"Groundwater level (negative number below surface).");
     syntax.order ("table");
     Librarian::add_type (Groundwater::component, "fixed", alist, syntax, &make);

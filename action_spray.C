@@ -71,10 +71,10 @@ static struct ActionSpraySyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "\
 Spray a chemical (typically a pesticide) on the field.");
-    syntax.add ("chemical", Syntax::String, Syntax::Const,
+    syntax.add ("chemical", Value::String, Value::Const,
 		"Name of pesticide to spray.");
     syntax.add_check ("chemical", Chemical::check_library ());
-    syntax.add ("amount", "g/ha", Check::non_negative (), Syntax::Const,
+    syntax.add ("amount", "g/ha", Check::non_negative (), Value::Const,
 		"Amount of pesticide to spray.");
     syntax.order ("chemical", "amount");
     Librarian::add_type (Action::component, "spray", alist, syntax, &make);

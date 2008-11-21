@@ -180,19 +180,19 @@ PhotoGL::load_syntax (Syntax& syntax, AttributeList& alist)
   DS_null_eff.add (0.0, 1.00);
   DS_null_eff.add (2.0, 1.00);
 
-  syntax.add ("Qeff", "(g CO2/m^2/h)/(W/m^2)", Syntax::Const,
+  syntax.add ("Qeff", "(g CO2/m^2/h)/(W/m^2)", Value::Const,
               "Quantum efficiency at low light.");
-  syntax.add ("Fm", "g CO2/m^2/h", Check::positive (), Syntax::Const,
+  syntax.add ("Fm", "g CO2/m^2/h", Check::positive (), Value::Const,
               "Maximum assimilation rate.");
-  syntax.add ("TempEff", "dg C", Syntax::None (), Check::non_negative (),
-              Syntax::Const,
+  syntax.add ("TempEff", "dg C", Value::None (), Check::non_negative (),
+              Value::Const,
               "Temperature factor for assimilate production.");
-  syntax.add ("DSEff", "DS", Syntax::None (), Check::non_negative (),
-              Syntax::Const, "\
+  syntax.add ("DSEff", "DS", Value::None (), Check::non_negative (),
+              Value::Const, "\
 Development stage factor for assimilate production.");
   alist.add ("DSEff",DS_null_eff);
-  syntax.add ("DAPEff", "d", Syntax::None (), Check::non_negative (),
-              Syntax::Const, "Age factor for assimilate production.\n\
+  syntax.add ("DAPEff", "d", Value::None (), Check::non_negative (),
+              Value::Const, "Age factor for assimilate production.\n\
 Age is given as day after planting.");
   alist.add ("DAPEff",DS_null_eff);
 }

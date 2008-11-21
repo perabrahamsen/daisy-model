@@ -36,7 +36,7 @@
 //
 // Common abstraction of an attribute value.
 
-struct Value
+struct AValue
 {
   struct Scalar
   {
@@ -65,75 +65,75 @@ struct Value
     std::vector<const PLF*>* plf_sequence;
     std::vector<const AttributeList*>* alist_sequence;
   };
-  Syntax::type type;
+  Value::type type;
   bool is_sequence;
   int* ref_count;
 
   bool subset (const Metalib&, 
-               const Value& other, const Syntax&, const symbol key) const;
+               const AValue& other, const Syntax&, const symbol key) const;
 
-  void expect (const symbol key, Syntax::type expected) const;
+  void expect (const symbol key, Value::type expected) const;
   void singleton (const symbol key) const;
   void sequence (const symbol key) const;
 
   // Variable
-  Value (const symbol v, int)
+  AValue (const symbol v, int)
     : name (new symbol (v)),
-      type (Syntax::Object),	// A reference.
+      type (Value::Object),	// A reference.
       is_sequence (false),
       ref_count (new int (1))
     { }
-  Value (double v)
+  AValue (double v)
     : number (v),
-      type (Syntax::Number),
+      type (Value::Number),
       is_sequence (false),
       ref_count (new int (1))
     { }
-  Value (double v, const symbol s)
+  AValue (double v, const symbol s)
     : scalar (new Scalar (v, symbol (s))),
-      type (Syntax::Library),	// Number with user specified dimension.
+      type (Value::Library),	// Number with user specified dimension.
       is_sequence (false),
       ref_count (new int (1))
   { }
-  Value (const symbol v)
+  AValue (const symbol v)
     : name (new symbol (v)),
-      type (Syntax::String),
+      type (Value::String),
       is_sequence (false),
       ref_count (new int (1))
   { }
-  Value (bool v)
+  AValue (bool v)
     : flag (v),
-      type (Syntax::Boolean),
+      type (Value::Boolean),
       is_sequence (false),
       ref_count (new int (1))
     { }
-  Value (const PLF& v)
+  AValue (const PLF& v)
     : plf (new PLF (v)),
-      type (Syntax::PLF),
+      type (Value::PLF),
       is_sequence (false),
       ref_count (new int (1))
     { }
-  Value (const AttributeList& v)
+  AValue (const AttributeList& v)
     : alist (new AttributeList (v)),
-      type (Syntax::AList),
+      type (Value::AList),
       is_sequence (false),
       ref_count (new int (1))
     { }
-  Value (int v)
+  AValue (int v)
     : integer (v),
-      type (Syntax::Integer),
+      type (Value::Integer),
       is_sequence (false),
       ref_count (new int (1))
     { }
-  Value (const std::vector<double>& v)
+  AValue (const std::vector<double>& v)
     : number_sequence (new std::vector<double> (v)),
-      type (Syntax::Number),
+      type (Value::Number),
       is_sequence (true),
       ref_count (new int (1))
     { }
-  Value (const std::vector<symbol>& v)
+  AValue (const std::vector<symbol>& v)
     : name_sequence (new std::vector<symbol> (v)),
-      type (Syntax::String),
+      type (Value::String),
       is_sequence (true),
       ref_count (new int (1))
     { }
@@ -144,21 +144,21 @@ struct Value
       copy->push_back (symbol (org[i]));
     return copy;
   }
-  Value (const std::vector<std::string>& v)
+  AValue (const std::vector<std::string>& v)
     : name_sequence (new_symbol_vector (v)),
-      type (Syntax::String),
+      type (Value::String),
       is_sequence (true),
       ref_count (new int (1))
     { }
-  Value (const std::vector<bool>& v)
+  AValue (const std::vector<bool>& v)
     : flag_sequence (new std::vector<bool> (v)),
-      type (Syntax::Boolean),
+      type (Value::Boolean),
       is_sequence (true),
       ref_count (new int (1))
     { }
-  Value (const std::vector<int>& v)
+  AValue (const std::vector<int>& v)
     : integer_sequence (new std::vector<int> (v)),
-      type (Syntax::Integer),
+      type (Value::Integer),
       is_sequence (true),
       ref_count (new int (1))
     { }
@@ -169,9 +169,9 @@ struct Value
       copy->push_back (new PLF (*org[i]));
     return copy;
   }
-  Value (const std::vector<const PLF*>& v)
+  AValue (const std::vector<const PLF*>& v)
     : plf_sequence (copy_plfs (v)),
-      type (Syntax::PLF),
+      type (Value::PLF),
       is_sequence (true),
       ref_count (new int (1))
     { }
@@ -182,32 +182,32 @@ struct Value
       copy->push_back (new AttributeList (*org[i]));
     return copy;
   }
-  Value (const std::vector<const AttributeList*>& v)
+  AValue (const std::vector<const AttributeList*>& v)
     : alist_sequence (copy_alists (v)),
-      type (Syntax::AList),
+      type (Value::AList),
       is_sequence (true),
       ref_count (new int (1))
     { }
-  Value ()
+  AValue ()
     : number (-42.42e42),
-      type (Syntax::Error),
+      type (Value::Error),
       is_sequence (false),
       ref_count (new int (1))
     { }
-  Value (const Value& v)
+  AValue (const AValue& v)
     : number (v.number),
       type (v.type),
       is_sequence (v.is_sequence),
       ref_count (v.ref_count)
     { (*ref_count)++; }
-  Value& operator = (const Value& v);
-  ~Value ()
+  AValue& operator = (const AValue& v);
+  ~AValue ()
     { cleanup (); }
   void cleanup ();
 };
 
 bool
-Value::subset (const Metalib& metalib, const Value& v, const Syntax& syntax, 
+AValue::subset (const Metalib& metalib, const AValue& v, const Syntax& syntax, 
 	       const symbol key) const
 {
   daisy_assert (type == v.type);
@@ -216,20 +216,20 @@ Value::subset (const Metalib& metalib, const Value& v, const Syntax& syntax,
   if (!is_sequence)
     switch (type)
       {
-      case Syntax::Number:
+      case Value::Number:
 	return iszero (number - v.number);
-      case Syntax::Boolean:
+      case Value::Boolean:
 	return flag == v.flag;
-      case Syntax::Integer:
+      case Value::Integer:
 	return integer == v.integer;
-      case Syntax::AList:
+      case Value::AList:
 	{
 	  const AttributeList& value = *alist;
 	  const AttributeList& other = *v.alist;
-	  const Syntax::type type = syntax.lookup (key);
-	  if (type == Syntax::AList)
+	  const Value::type type = syntax.lookup (key);
+	  if (type == Value::AList)
 	    return value.subset (metalib, other, syntax.syntax (key));
-	  daisy_assert (type == Syntax::Object);
+	  daisy_assert (type == Value::Object);
 	  const Library& library = syntax.library (metalib, key);
 
 	  daisy_assert (value.check ("type"));
@@ -242,21 +242,21 @@ Value::subset (const Metalib& metalib, const Value& v, const Syntax& syntax,
 	    return false;
 	  return value.subset (metalib, other, library.syntax (element));
 	}
-      case Syntax::PLF:
+      case Value::PLF:
 	return *plf == *v.plf;
-      case Syntax::Object:
-      case Syntax::String:
+      case Value::Object:
+      case Value::String:
 	return *name == *v.name;
-      case Syntax::Library:
+      case Value::Library:
         return *scalar == *v.scalar;
-      case Syntax::Error:
+      case Value::Error:
       default:
 	daisy_notreached ();
       }
   else
     switch (type)
       {
-      case Syntax::Number:
+      case Value::Number:
         {
           // We get warnings with -Wfloat-equal if we just do a 
           //   return *number_sequence == *v.number_sequence
@@ -269,11 +269,11 @@ Value::subset (const Metalib& metalib, const Value& v, const Syntax& syntax,
               return false;
           return true;
         }
-      case Syntax::Boolean:
+      case Value::Boolean:
 	return *flag_sequence == *v.flag_sequence;
-      case Syntax::Integer:
+      case Value::Integer:
 	return *integer_sequence == *v.integer_sequence;
-      case Syntax::AList:
+      case Value::AList:
 	{
 	  const std::vector<const AttributeList*>& value = *alist_sequence;
 	  const std::vector<const AttributeList*>& other = *v.alist_sequence;
@@ -281,8 +281,8 @@ Value::subset (const Metalib& metalib, const Value& v, const Syntax& syntax,
 	  const unsigned int size = value.size ();
 	  if (other.size () != size)
 	    return false;
-	  const Syntax::type type = syntax.lookup (key);
-	  if (type == Syntax::AList)
+	  const Value::type type = syntax.lookup (key);
+	  if (type == Value::AList)
 	    {
 	      const Syntax& nested = syntax.syntax (key);
 	      for (unsigned int i = 0; i < size; i++)
@@ -291,7 +291,7 @@ Value::subset (const Metalib& metalib, const Value& v, const Syntax& syntax,
 	      return true;
 		
 	    }
-	  daisy_assert (type == Syntax::Object);
+	  daisy_assert (type == Value::Object);
 	  const Library& library = syntax.library (metalib, key);
 	  for (unsigned int i = 0; i < size; i++)
 	    {
@@ -309,14 +309,14 @@ Value::subset (const Metalib& metalib, const Value& v, const Syntax& syntax,
 	    }
 	  return true;
 	}
-      case Syntax::PLF:
+      case Value::PLF:
 	return *plf_sequence == *v.plf_sequence;
-      case Syntax::String:
+      case Value::String:
 	return *name_sequence == *v.name_sequence;
-      case Syntax::Object:
+      case Value::Object:
 	return *name == *v.name;
-      case Syntax::Library:
-      case Syntax::Error:
+      case Value::Library:
+      case Value::Error:
       default:
 	daisy_panic ("Not reached");
       }
@@ -324,42 +324,42 @@ Value::subset (const Metalib& metalib, const Value& v, const Syntax& syntax,
 }
 
 void 
-Value::expect (const symbol key, Syntax::type expected) const
+AValue::expect (const symbol key, Value::type expected) const
 {
   if (type != expected)
     {
       std::ostringstream tmp;
-      tmp << "Value of parameter '" << key << "' is a '" 
-          << Syntax::type_name (type) << ", expected '"
-          << Syntax::type_name (expected) << "'";
+      tmp << "AValue of parameter '" << key << "' is a '" 
+          << Value::type_name (type) << ", expected '"
+          << Value::type_name (expected) << "'";
       daisy_panic (tmp.str ());
     }
 }
 
 void
-Value::singleton (const symbol key) const
+AValue::singleton (const symbol key) const
 {
   if (!is_sequence)
     return;
   std::ostringstream tmp;
-  tmp << "Value of parameter '" << key 
+  tmp << "AValue of parameter '" << key 
       << "' is a sequence, expected a singleton";
   daisy_panic (tmp.str ());
 }
 
 void
-Value::sequence (const symbol key) const
+AValue::sequence (const symbol key) const
 {
   if (is_sequence)
     return;
   std::ostringstream tmp;
-  tmp << "Value of parameter '" << key 
+  tmp << "AValue of parameter '" << key 
       << "' is a singleton, expected a sequence";
   daisy_panic (tmp.str ());
 }
 
 void 
-Value::cleanup ()
+AValue::cleanup ()
 {
   switch (*ref_count)
     {
@@ -368,25 +368,25 @@ Value::cleanup ()
       if (!is_sequence)
 	switch (type)
 	  {
-	  case Syntax::Number:
-	  case Syntax::Boolean:
-	  case Syntax::Integer:
+	  case Value::Number:
+	  case Value::Boolean:
+	  case Value::Integer:
 	    // Primitives, do nothing.
 	    break;
-	  case Syntax::AList:
+	  case Value::AList:
 	    delete alist;
 	    break;
-	  case Syntax::PLF:
+	  case Value::PLF:
 	    delete plf;
 	    break;
-	  case Syntax::Library:
+	  case Value::Library:
             delete scalar;
             break;
-	  case Syntax::Object:
-	  case Syntax::String:
+	  case Value::Object:
+	  case Value::String:
 	    delete name;
 	    break;
-	  case Syntax::Error:
+	  case Value::Error:
 	    // Empty (dummy) value.
 	    break;
 	  default:
@@ -395,31 +395,31 @@ Value::cleanup ()
       else
 	switch (type)
 	  {
-	  case Syntax::Number:
+	  case Value::Number:
 	    delete number_sequence;
 	    break;
-	  case Syntax::Boolean:
+	  case Value::Boolean:
 	    delete number_sequence;
 	    break;
-	  case Syntax::Integer:
+	  case Value::Integer:
 	    delete number_sequence;
 	    break;
-	  case Syntax::AList:
+	  case Value::AList:
 	    sequence_delete (alist_sequence->begin (), alist_sequence->end ());
 	    delete alist_sequence;
 	    break;
-	  case Syntax::PLF:
+	  case Value::PLF:
 	    sequence_delete (plf_sequence->begin (), plf_sequence->end ());
 	    delete plf_sequence;
 	    break;
-	  case Syntax::String:
+	  case Value::String:
 	    delete name_sequence;
 	    break;
-	  case Syntax::Object:
+	  case Value::Object:
 	    delete name;
 	    break;
-	  case Syntax::Library:
-	  case Syntax::Error:
+	  case Value::Library:
+	  case Value::Error:
 	  default:
 	    daisy_notreached ();
 	  }
@@ -430,8 +430,8 @@ Value::cleanup ()
     }
 }
 
-Value& 
-Value::operator= (const Value& v)
+AValue& 
+AValue::operator= (const AValue& v)
 {
   // Check that we aren't overwriting ourself.
   if (&v == this)
@@ -449,58 +449,58 @@ Value::operator= (const Value& v)
   if (!is_sequence)
     switch (type)
       {
-      case Syntax::Number:
+      case Value::Number:
 	number = v.number;
         break;
-      case Syntax::Boolean:
+      case Value::Boolean:
 	flag = v.flag;
         break;
-      case Syntax::Integer:
+      case Value::Integer:
 	integer = v.integer;
         break;
-      case Syntax::AList:
+      case Value::AList:
         alist = v.alist;
         break;
-      case Syntax::PLF:
+      case Value::PLF:
 	plf = v.plf;
         break;
-      case Syntax::Library:
+      case Value::Library:
         scalar = v.scalar;
         break;
-      case Syntax::String:
-      case Syntax::Object:
+      case Value::String:
+      case Value::Object:
 	name = v.name;
         break;
-      case Syntax::Error:
+      case Value::Error:
       default:
 	daisy_notreached ();
       }
   else
     switch (type)
       {
-      case Syntax::Number:
+      case Value::Number:
 	number_sequence = v.number_sequence;
         break;
-      case Syntax::Boolean:
+      case Value::Boolean:
 	flag_sequence = v.flag_sequence;
         break;
-      case Syntax::Integer:
+      case Value::Integer:
 	integer_sequence = v.integer_sequence;
         break;
-      case Syntax::AList:
+      case Value::AList:
         alist_sequence = v.alist_sequence;
         break;
-      case Syntax::PLF:
+      case Value::PLF:
 	plf_sequence = v.plf_sequence;
         break;
-      case Syntax::String:
+      case Value::String:
 	name_sequence = v.name_sequence;
         break;
-      case Syntax::Object:
+      case Value::Object:
 	name = v.name;
         break;
-      case Syntax::Library:
-      case Syntax::Error:
+      case Value::Library:
+      case Value::Error:
       default:
 	daisy_notreached ();
       }
@@ -513,14 +513,14 @@ Value::operator= (const Value& v)
 
 // @ AttributeList
 
-typedef std::map <symbol, Value> value_map;
+typedef std::map <symbol, AValue> value_map;
 
 struct AttributeList::Implementation
 {
   value_map values;
   bool check (const symbol key) const;
-  const Value& lookup (const symbol key) const;
-  void add (const symbol key, const Value& value);
+  const AValue& lookup (const symbol key) const;
+  void add (const symbol key, const AValue& value);
   void remove (const symbol key);
   void clear ();
 };    
@@ -531,7 +531,7 @@ AttributeList::Implementation::check (const symbol key) const
   return values.find (key) != values.end ();
 }
 
-const Value& 
+const AValue& 
 AttributeList::Implementation::lookup (const symbol key) const
 { 
   value_map::const_iterator i = values.find (key);
@@ -543,7 +543,7 @@ AttributeList::Implementation::lookup (const symbol key) const
 }
 
 void
-AttributeList::Implementation::add (const symbol key, const Value& value)
+AttributeList::Implementation::add (const symbol key, const AValue& value)
 {
   values[key] = value;
 }
@@ -565,7 +565,7 @@ AttributeList::Implementation::clear ()
 bool
 AttributeList::check (const symbol key) const
 { 
-  return impl.check (key) && impl.lookup (key).type != Syntax::Object; 
+  return impl.check (key) && impl.lookup (key).type != Value::Object; 
 }
 
 bool
@@ -609,28 +609,28 @@ AttributeList::subset (const Metalib& metalib,
 int
 AttributeList::size (const symbol key)	const
 {
-  const Value& value = impl.lookup (key);
+  const AValue& value = impl.lookup (key);
 
   if (!value.is_sequence)
-    return (value.type == Syntax::Object) ? -1 : Syntax::Singleton;
+    return (value.type == Value::Object) ? -1 : Value::Singleton;
   switch (value.type)
     {
-    case Syntax::Number:
+    case Value::Number:
       return value.number_sequence->size ();
-    case Syntax::AList:
+    case Value::AList:
       return value.alist_sequence->size ();
-    case Syntax::PLF:
+    case Value::PLF:
       return value.plf_sequence->size ();
-    case Syntax::Boolean:
+    case Value::Boolean:
       return value.flag_sequence->size ();
-    case Syntax::String:
+    case Value::String:
       return value.name_sequence->size ();
-    case Syntax::Integer:
+    case Value::Integer:
       return value.integer_sequence->size ();
-    case Syntax::Object:
+    case Value::Object:
       return -1;
-    case Syntax::Library:
-    case Syntax::Error:
+    case Value::Library:
+    case Value::Error:
     default:
       daisy_notreached ();
     }
@@ -640,29 +640,29 @@ AttributeList::size (const symbol key)	const
   // Variables.
 void 
 AttributeList::add_reference (const symbol key, const symbol v)
-{ impl.add (key, Value (v, -1)); }
+{ impl.add (key, AValue (v, -1)); }
 
 bool
 AttributeList::is_reference (const symbol key) const
-{ return impl.check (key) && impl.lookup (key).type == Syntax::Object; }
+{ return impl.check (key) && impl.lookup (key).type == Value::Object; }
   
 symbol 
 AttributeList::get_reference (const symbol key) const
 {
   daisy_assert (is_reference (key));
-  const Value& value = impl.lookup (key);
-  value.expect (key, Syntax::Object);
+  const AValue& value = impl.lookup (key);
+  value.expect (key, Value::Object);
   return (*value.name).name (); 
 }
 
 double 
 AttributeList::number (const symbol key) const
 {
-  const Value& value = impl.lookup (key);
+  const AValue& value = impl.lookup (key);
   value.singleton (key);
-  if (value.type == Syntax::Library)
+  if (value.type == Value::Library)
     return value.scalar->number;
-  value.expect (key, Syntax::Number);
+  value.expect (key, Value::Number);
   return value.number;
 }
 
@@ -678,11 +678,11 @@ AttributeList::number (const symbol key, const double default_value) const
 symbol
 AttributeList::name (const symbol key) const
 {
-  const Value& value = impl.lookup (key);
+  const AValue& value = impl.lookup (key);
   value.singleton (key);
-  if (value.type == Syntax::Library)
+  if (value.type == Value::Library)
     return value.scalar->name;
-  value.expect (key, Syntax::String);
+  value.expect (key, Value::String);
   return *value.name;
 }
 
@@ -697,8 +697,8 @@ AttributeList::name (const symbol key, const symbol default_value) const
 bool 
 AttributeList::flag (const symbol key) const
 {
-  const Value& value = impl.lookup (key);
-  value.expect (key, Syntax::Boolean);
+  const AValue& value = impl.lookup (key);
+  value.expect (key, Value::Boolean);
   value.singleton (key);
   return value.flag;
 }
@@ -714,8 +714,8 @@ AttributeList::flag (const symbol key, const bool default_value) const
 int
 AttributeList::integer (const symbol key) const
 {
-  const Value& value = impl.lookup (key);
-  value.expect (key, Syntax::Integer);
+  const AValue& value = impl.lookup (key);
+  value.expect (key, Value::Integer);
   value.singleton (key);
   return value.integer;
 }
@@ -731,8 +731,8 @@ AttributeList::integer (const symbol key, const int default_value) const
 const PLF& 
 AttributeList::plf (const symbol key) const
 {
-  const Value& value = impl.lookup (key);
-  value.expect (key, Syntax::PLF);
+  const AValue& value = impl.lookup (key);
+  value.expect (key, Value::PLF);
   value.singleton (key);
   return *value.plf;
 }
@@ -740,8 +740,8 @@ AttributeList::plf (const symbol key) const
 AttributeList& 
 AttributeList::alist (const symbol key) const
 {
-  const Value& value = impl.lookup (key);
-  value.expect (key, Syntax::AList);
+  const AValue& value = impl.lookup (key);
+  value.expect (key, Value::AList);
   value.singleton (key);
   return *value.alist;
 }
@@ -749,8 +749,8 @@ AttributeList::alist (const symbol key) const
 const std::vector<double>& 
 AttributeList::number_sequence (const symbol key) const
 {
-  const Value& value = impl.lookup (key);
-  value.expect (key, Syntax::Number);
+  const AValue& value = impl.lookup (key);
+  value.expect (key, Value::Number);
   value.sequence (key);
   return *value.number_sequence;
 }
@@ -758,8 +758,8 @@ AttributeList::number_sequence (const symbol key) const
 const std::vector<symbol>&
 AttributeList::name_sequence (const symbol key) const
 {
-  const Value& value = impl.lookup (key);
-  value.expect (key, Syntax::String);
+  const AValue& value = impl.lookup (key);
+  value.expect (key, Value::String);
   value.sequence (key);
   return *value.name_sequence;
 }
@@ -767,8 +767,8 @@ AttributeList::name_sequence (const symbol key) const
 const std::vector<bool>& 
 AttributeList::flag_sequence (const symbol key) const
 {
-  const Value& value = impl.lookup (key);
-  value.expect (key, Syntax::Boolean);
+  const AValue& value = impl.lookup (key);
+  value.expect (key, Value::Boolean);
   value.sequence (key);
   return *value.flag_sequence;
 }
@@ -776,8 +776,8 @@ AttributeList::flag_sequence (const symbol key) const
 const std::vector<int>& 
 AttributeList::integer_sequence (const symbol key) const
 {
-  const Value& value = impl.lookup (key);
-  value.expect (key, Syntax::Integer);
+  const AValue& value = impl.lookup (key);
+  value.expect (key, Value::Integer);
   value.sequence (key);
   return *value.integer_sequence;
 }
@@ -785,8 +785,8 @@ AttributeList::integer_sequence (const symbol key) const
 const std::vector<const PLF*>& 
 AttributeList::plf_sequence (const symbol key) const
 {
-  const Value& value = impl.lookup (key);
-  value.expect (key, Syntax::PLF);
+  const AValue& value = impl.lookup (key);
+  value.expect (key, Value::PLF);
   value.sequence (key);
   return *value.plf_sequence;
 }
@@ -794,47 +794,47 @@ AttributeList::plf_sequence (const symbol key) const
 const std::vector<const AttributeList*>& 
 AttributeList::alist_sequence (const symbol key) const
 {
-  const Value& value = impl.lookup (key);
-  value.expect (key, Syntax::AList);
+  const AValue& value = impl.lookup (key);
+  value.expect (key, Value::AList);
   value.sequence (key);
   return *value.alist_sequence;
 }
 
 void 
 AttributeList::add (const symbol key, double v)
-{ impl.add (key, Value (v)); }
+{ impl.add (key, AValue (v)); }
 
 void
 AttributeList::add (const symbol key, double v, const symbol d)
-{ impl.add (key, Value (v, d)); }
+{ impl.add (key, AValue (v, d)); }
 
 void 
 AttributeList::add (const symbol key, const symbol v)
-{ impl.add (key, Value (v)); }
+{ impl.add (key, AValue (v)); }
 
 void 
 AttributeList::add (const symbol key, bool v)
-{ impl.add (key, Value (v)); }
+{ impl.add (key, AValue (v)); }
 
 void 
 AttributeList::add (const symbol key, int v)
-{ impl.add (key, Value (v)); }
+{ impl.add (key, AValue (v)); }
 
 void 
 AttributeList::add (const symbol key, const AttributeList& v)
-{ impl.add (key, Value (v)); }
+{ impl.add (key, AValue (v)); }
 
 void 
 AttributeList::add (const symbol key, const PLF& v)
-{ impl.add (key, Value (v)); }
+{ impl.add (key, AValue (v)); }
 
 void 
 AttributeList::add (const symbol key, const std::vector<double>& v)
-{ impl.add (key, Value (v)); }
+{ impl.add (key, AValue (v)); }
 
 void 
 AttributeList::add (const symbol key, const std::vector<symbol>& v)
-{ impl.add (key, Value (v)); }
+{ impl.add (key, AValue (v)); }
 
 void 
 AttributeList::add_strings (const symbol key, const symbol a)
@@ -868,20 +868,20 @@ AttributeList::add_strings (const symbol key,
 
 void 
 AttributeList::add (const symbol key, const std::vector<bool>& v)
-{ impl.add (key, Value (v)); }
+{ impl.add (key, AValue (v)); }
 
 void 
 AttributeList::add (const symbol key, const std::vector<int>& v)
-{ impl.add (key, Value (v)); }
+{ impl.add (key, AValue (v)); }
 
 void 
 AttributeList::add (const symbol key, 
 		    const std::vector<const AttributeList*>& v)
-{ impl.add (key, Value (v)); }
+{ impl.add (key, AValue (v)); }
 
 void 
 AttributeList::add (const symbol key, const std::vector<const PLF*>& v)
-{ impl.add (key, Value (v)); }
+{ impl.add (key, AValue (v)); }
 
 void 
 AttributeList::remove (const symbol key)
@@ -903,60 +903,60 @@ AttributeList::revert (const Metalib& metalib,
       return true;
     }
 
-  if (syntax.size (key) == Syntax::Singleton)
+  if (syntax.size (key) == Value::Singleton)
     switch (syntax.lookup (key))
       {
-      case Syntax::Number:
-        if (syntax.dimension (key) == Syntax::User ())
+      case Value::Number:
+        if (syntax.dimension (key) == Value::User ())
           add (key, default_alist.number (key), default_alist.name (key));
         else 
           add (key, default_alist.number (key));
         break;
-      case Syntax::Boolean:
+      case Value::Boolean:
 	add (key, default_alist.flag (key));
         break;
-      case Syntax::Integer:
+      case Value::Integer:
 	add (key, default_alist.integer (key));
         break;
-      case Syntax::AList:
-      case Syntax::Object:
+      case Value::AList:
+      case Value::Object:
         add (key, default_alist.alist (key));
         break;
-      case Syntax::PLF:
+      case Value::PLF:
 	add (key, default_alist.plf (key));
         break;
-      case Syntax::String:
+      case Value::String:
 	add (key, default_alist.name (key));
         break;
-      case Syntax::Library:
-      case Syntax::Error:
+      case Value::Library:
+      case Value::Error:
       default:
 	daisy_notreached ();
       }
   else
     switch (syntax.lookup (key))
       {
-      case Syntax::Number:
+      case Value::Number:
 	add (key, default_alist.number_sequence (key));
         break;
-      case Syntax::Boolean:
+      case Value::Boolean:
 	add (key, default_alist.flag_sequence (key));
         break;
-      case Syntax::Integer:
+      case Value::Integer:
 	add (key, default_alist.integer_sequence (key));
         break;
-      case Syntax::AList:
-      case Syntax::Object:
+      case Value::AList:
+      case Value::Object:
         add (key, default_alist.alist_sequence (key));
         break;
-      case Syntax::PLF:
+      case Value::PLF:
 	add (key, default_alist.plf_sequence (key));
         break;
-      case Syntax::String:
+      case Value::String:
 	add (key, default_alist.name_sequence (key));
         break;
-      case Syntax::Library:
-      case Syntax::Error:
+      case Value::Library:
+      case Value::Error:
       default:
 	daisy_notreached ();
       }

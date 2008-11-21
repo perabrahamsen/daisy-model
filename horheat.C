@@ -57,29 +57,29 @@ HorHeat::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("submodel", "HorHeat");
   alist.add ("description", "Heat capacity and conductivity per horizon.");
 
-  syntax.add ("quarts_form_factor", Syntax::None (), Check::positive (), 
-              Syntax::Const,
+  syntax.add ("quarts_form_factor", Value::None (), Check::positive (), 
+              Value::Const,
 	      "Gemetry factor used for conductivity calculation.");
   alist.add ("quarts_form_factor", 2.0);
-  syntax.add ("mineral_form_factor", Syntax::None (), Check::positive (), 
-              Syntax::Const,
+  syntax.add ("mineral_form_factor", Value::None (), Check::positive (), 
+              Value::Const,
 	      "Gemetry factor used for conductivity calculation.");
   alist.add ("mineral_form_factor", 4.0);
-  syntax.add ("intervals", Syntax::Integer, Syntax::Const, "\
+  syntax.add ("intervals", Value::Integer, Value::Const, "\
 Number of numeric intervals to use in the heat coductivity table.");
   alist.add ("intervals", 100);
   syntax.add ("C_soil", "erg/cm^3/dg C", Check::positive (), 
-	      Syntax::OptionalConst,
+	      Value::OptionalConst,
 	      "The soils heat capacity.\n\
 By default, this is calculated from the soil constituents.");
   syntax.add ("K_water",
 	      "erg/s/cm/dg C", Check::positive (),
-	      Syntax::OptionalConst, Syntax::Sequence,
+	      Value::OptionalConst, Value::Sequence,
 	      "Heat conductivity table for water in soil.\n\
 By default, this is calculated from the soil constituents.");
   syntax.add ("K_ice",
 	      "erg/s/cm/dg C", Check::positive (),
-	      Syntax::OptionalConst, Syntax::Sequence,
+	      Value::OptionalConst, Value::Sequence,
 	      "Heat conductivity table for solid frozen soil.\n\
 By default, this is calculated from the soil constituents.");
 }

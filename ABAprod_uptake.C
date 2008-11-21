@@ -144,7 +144,7 @@ The assumption is water uptake from roots in specific region of the soil\n\
 comes with a specific ABA concentration, which depends solely on the\n\
 water pressure in that region.");
     syntax.add_object ("expr", Number::component, 
-                       Syntax::Const, Syntax::Singleton, "\
+                       Value::Const, Value::Singleton, "\
 Expression to evaluate to ABA concentration in water uptake [g/cm^3].\n\
 The symbol 'h' will be bound to the water pressure [cm].");
     Librarian::add_type (ABAProd::component, "uptake", alist, syntax, &make);

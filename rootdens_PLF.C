@@ -77,9 +77,9 @@ static Rootdens_PLF::Check_Indexes check_indexes;
 void 
 Rootdens_PLF::Entry::load_syntax (Syntax& syntax, AttributeList&)
 {
-  syntax.add ("index", Syntax::Unknown (), Check::none (), Syntax::Const, 
+  syntax.add ("index", Value::Unknown (), Check::none (), Value::Const, 
 	      "Index for specifying root density.");
-  syntax.add ("density", Syntax::Unknown (), Syntax::None (), Syntax::Const, "\
+  syntax.add ("density", Value::Unknown (), Value::None (), Value::Const, "\
 Relative root density as a function of root depth .");
   syntax.order ("index", "density");
 }
@@ -91,9 +91,9 @@ Rootdens_PLF::Check_Indexes::check (const Metalib&, const Syntax& syntax,
   const throw (std::string)
 { 
   daisy_assert (alist.check (key));
-  daisy_assert (syntax.lookup (key) == Syntax::AList);
+  daisy_assert (syntax.lookup (key) == Value::AList);
   daisy_assert (!syntax.is_log (key));
-  daisy_assert (syntax.size (key) == Syntax::Sequence);
+  daisy_assert (syntax.size (key) == Value::Sequence);
 
   const std::vector<const AttributeList*>& alists = alist.alist_sequence (key);
 
@@ -234,7 +234,7 @@ static struct Rootdens_DS_Depth_Syntax
     Rootdens::load_base (syntax, alist);
     alist.add ("description", "\
 Specify root density as a function of development stage.");
-    syntax.add_submodule_sequence("entries", Syntax::Const, "\
+    syntax.add_submodule_sequence("entries", Value::Const, "\
 A list of pairs, where the first element of each pair is a development\n\
 stage (usually a number between 0 (emergence) and 2 (ripe), and the\n\
 second element is a PLF specifying the relative root density as a\n\
@@ -285,7 +285,7 @@ static struct Rootdens_DS_Rel_Syntax
     Rootdens::load_base (syntax, alist);
     alist.add ("description", "\
 Specify root density as a function of development stage.");
-    syntax.add_submodule_sequence("entries", Syntax::Const, "\
+    syntax.add_submodule_sequence("entries", Value::Const, "\
 A list of pairs, where the first element of each pair is a development\n\
 stage (usually a number between 0 (emergence) and 2 (ripe), and the\n\
 second element is a PLF specifying the relative root density as a\n\
@@ -336,7 +336,7 @@ static struct Rootdens_Depth_Depth_Syntax
     Rootdens::load_base (syntax, alist);
     alist.add ("description", "\
 Specify root density as a function of development stage.");
-    syntax.add_submodule_sequence("entries", Syntax::Const, "\
+    syntax.add_submodule_sequence("entries", Value::Const, "\
 A list of pairs, where the first element of each pair is the root depth,\
 \n(a positive number), and the second element is a PLF specifying the\n\
 relative root density as a function of soil depth in cm (a positive number).\n\

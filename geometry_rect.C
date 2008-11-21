@@ -126,14 +126,14 @@ GeometryRect::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   alist.add ("submodel", "GeometryRect");
   syntax.add ("zplus", "cm", Check::negative (), 
-	      Syntax::Const, Syntax::Sequence,
+	      Value::Const, Value::Sequence,
 	      "Depth of each numeric layer (a negative number).\n\
 The end points are listed descending from the surface to the bottom.");
   static VCheck::All zplus_check (VCheck::decreasing (), 
 				  VCheck::min_size_1 ());
   syntax.add_check ("zplus", zplus_check);
   syntax.add ("xplus", "cm", Check::positive (), 
-	      Syntax::Const, Syntax::Sequence,
+	      Value::Const, Value::Sequence,
 	      "Horizontal end of each numeric layer (a positive number).\n\
 The end points are listed ascending from left (0.0) to right.");
   static VCheck::All xplus_check (VCheck::increasing (), 

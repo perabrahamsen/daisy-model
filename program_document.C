@@ -169,23 +169,23 @@ ProgramDocument::print_entry_type (const symbol name,
 				   const Syntax& syntax,
 				   const AttributeList& alist)
 {
-  const Syntax::type type = syntax.lookup (name);
+  const Value::type type = syntax.lookup (name);
 
   switch (type)
     {
-    case Syntax::Number:
+    case Value::Number:
       {
 	format->text ("number ");
 	const symbol dimension = syntax.dimension (name);
-	if (dimension == Syntax::None ())
+	if (dimension == Value::None ())
 	  format->text ("(dimensionless)");
-	else if (dimension == Syntax::Unknown ())
+	else if (dimension == Value::Unknown ())
 	  format->text ("(dimension not specified)");
 	else
 	  format->bold ("[" + dimension + "]");
       }
       break;
-    case Syntax::AList:
+    case Value::AList:
       {
 	if (Submodel::is_submodel (syntax, alist, name))
 	  {
@@ -201,7 +201,7 @@ ProgramDocument::print_entry_type (const symbol name,
 	  }
       }
       break;
-    case Syntax::PLF:
+    case Value::PLF:
       {
 	format->text ("plf ");
 	const symbol domain = syntax.domain (name);
@@ -215,18 +215,18 @@ ProgramDocument::print_entry_type (const symbol name,
 	format->bold (range + "]");
       }
       break;
-    case Syntax::Boolean:
+    case Value::Boolean:
       format->text ("boolean ");
       format->see ("section", "type", "boolean");
       break;
-    case Syntax::String:
+    case Value::String:
       format->text ("string ");
       format->see ("section", "type", "string");
       break;
-    case Syntax::Integer:
+    case Value::Integer:
       format->text ("integer");
       break;
-    case Syntax::Object:
+    case Value::Object:
       {
 	const symbol component = syntax.library (metalib, name).name ();
 	format->bold (component.name ());
@@ -234,8 +234,8 @@ ProgramDocument::print_entry_type (const symbol name,
 	format->see ("chapter", "component",  component.name ());
       }
       break;
-    case Syntax::Library:
-    case Syntax::Error:
+    case Value::Library:
+    case Value::Error:
     default:
       daisy_notreached ();
     };
@@ -248,14 +248,14 @@ ProgramDocument::print_entry_submodel (const symbol name,
 				       const AttributeList& alist,
 				       const symbol aref)
 {
-  const Syntax::type type = syntax.lookup (name);
+  const Value::type type = syntax.lookup (name);
   const int size = syntax.size (name);
 
-  if (type == Syntax::AList)
+  if (type == Value::AList)
     {
       const Syntax& child = syntax.syntax (name);
       const AttributeList& nested 
-	= (size != Syntax::Singleton || !alist.check (name))
+	= (size != Value::Singleton || !alist.check (name))
 	? syntax.default_alist (name)
 	: alist.alist (name);
       if (!nested.check ("submodel"))
@@ -271,9 +271,9 @@ ProgramDocument::print_entry_category (const symbol name,
 				       const Syntax& syntax,
 				       const AttributeList& alist)
 {
-  const Syntax::type type = syntax.lookup (name);
+  const Value::type type = syntax.lookup (name);
 
-  if (type == Syntax::Object)	// Objects and ALists don't have categories.
+  if (type == Value::Object)	// Objects and ALists don't have categories.
     {
       if (syntax.is_optional (name))
 	{
@@ -286,7 +286,7 @@ ProgramDocument::print_entry_category (const symbol name,
 	  format->text ("Component");
 	}
     }
-  else if (type == Syntax::AList)
+  else if (type == Value::AList)
     {
       if (syntax.is_optional (name))
 	{
@@ -348,22 +348,22 @@ ProgramDocument::print_entry_value (const symbol name,
 {
   if (alist.check (name))
     {
-      const Syntax::type type = syntax.lookup (name);
+      const Value::type type = syntax.lookup (name);
       const int size = syntax.size (name);
 
       bool print_default_value = false;
       
-      if (size == Syntax::Singleton)
+      if (size == Value::Singleton)
 	switch (type)
 	  {
-	  case Syntax::Number:
+	  case Value::Number:
 	    {
 	      std::ostringstream tmp;
 	      tmp << " (default " << alist.number (name) << ")";
 	      format->text (tmp.str ());
 	    }
 	    break;
-	  case Syntax::AList:
+	  case Value::AList:
 	    {
 	      const bool has_errors
 		= !syntax.syntax (name).check (metalib, alist.alist (name), 
@@ -389,7 +389,7 @@ ProgramDocument::print_entry_value (const symbol name,
 		print_default_value = true;
 	    }
 	    break;
-	  case Syntax::PLF:
+	  case Value::PLF:
 	    {
 	      std::ostringstream tmp;
 	      tmp << " (has default value with " << alist.plf (name).size ()
@@ -399,7 +399,7 @@ ProgramDocument::print_entry_value (const symbol name,
 		print_default_value = true;
 	    }
 	    break;
-	  case Syntax::Boolean:
+	  case Value::Boolean:
 	    format->text (" (default ");
 	    if (alist.flag (name))
 	      format->text ("true");
@@ -407,7 +407,7 @@ ProgramDocument::print_entry_value (const symbol name,
 	      format->text ("false");
 	    format->text (")");
 	    break;
-	  case Syntax::String:
+	  case Value::String:
 	    {
 	      const std::string value = alist.name (name).name ();
 	      if (value.length () < 30)
@@ -422,14 +422,14 @@ ProgramDocument::print_entry_value (const symbol name,
 		}
 	    }
 	    break;
-	  case Syntax::Integer:
+	  case Value::Integer:
 	    {
 	      std::ostringstream tmp;
 	      tmp << " (default " << alist.integer (name) << ")";
 	      format->text (tmp.str ());
 	    }
 	    break;
-	  case Syntax::Object:
+	  case Value::Object:
 	    {
 	      const AttributeList& object = alist.alist (name);
 	      daisy_assert (object.check ("type"));
@@ -441,20 +441,20 @@ ProgramDocument::print_entry_value (const symbol name,
 		print_default_value = true;
 	    }
 	    break;
-	  case Syntax::Library:
-	  case Syntax::Error:
+	  case Value::Library:
+	  case Value::Error:
 	    daisy_notreached ();
 	  }
       else
 	switch (type)
 	  {
-	  case Syntax::Number:
-	  case Syntax::AList:
-	  case Syntax::PLF:
-	  case Syntax::Boolean:
-	  case Syntax::String:
-	  case Syntax::Integer:
-	  case Syntax::Object:
+	  case Value::Number:
+	  case Value::AList:
+	  case Value::PLF:
+	  case Value::Boolean:
+	  case Value::String:
+	  case Value::Integer:
+	  case Value::Object:
 	    if (alist.size (name) == 0)
 	      format->text (" (default: an empty sequence)");
 	    else
@@ -466,8 +466,8 @@ ProgramDocument::print_entry_value (const symbol name,
 		print_default_value = true;
 	      }
 	    break;
-	  case Syntax::Library:
-	  case Syntax::Error:
+	  case Value::Library:
+	  case Value::Error:
 	    daisy_notreached ();
 	  }
 
@@ -562,24 +562,24 @@ ProgramDocument::print_sample_entry (const symbol name,
 
     if (alist.check (name))
       {
-	const Syntax::type type = syntax.lookup (name);
+	const Value::type type = syntax.lookup (name);
 	const int size = syntax.size (name);
 
 	bool print_name = true;
 	comment = "Has default value.";
 
-	if (size == Syntax::Singleton)
+	if (size == Value::Singleton)
 	  switch (type)
 	    {
-	    case Syntax::Number:
+	    case Value::Number:
 	      {
 		format->special ("nbsp");
 		std::ostringstream tmp;
 		tmp << alist.number (name);
                 const symbol dimension = syntax.dimension (name);
-                if (dimension == Syntax::None ())
+                if (dimension == Value::None ())
                   tmp << " []";
-                else if (dimension == Syntax::Unknown ())
+                else if (dimension == Value::Unknown ())
                   tmp << " [?]";
                 else
                   tmp << " [" << dimension << "]";
@@ -588,7 +588,7 @@ ProgramDocument::print_sample_entry (const symbol name,
 		print_name = false;
 	      }
 	      break;
-	    case Syntax::AList:
+	    case Value::AList:
 	      {
 		const bool has_errors
 		  = !syntax.syntax (name).check (metalib,
@@ -598,15 +598,15 @@ ProgramDocument::print_sample_entry (const symbol name,
 		  comment = "Has partial value.";
 	      }
 	      break;
-	    case Syntax::PLF:
+	    case Value::PLF:
 	      break;
-	    case Syntax::Boolean:
+	    case Value::Boolean:
 	      format->special ("nbsp");
 	      format->text (alist.flag (name) ? "true" : "false");
 	      format->text (")");
 	      print_name = false;
 	      break;
-	    case Syntax::String:
+	    case Value::String:
 	      {
 		const std::string value = alist.name (name).name ();
 		if (value.length () < 20)
@@ -618,7 +618,7 @@ ProgramDocument::print_sample_entry (const symbol name,
 		  }
 	      }
 	      break;
-	    case Syntax::Integer:
+	    case Value::Integer:
 	      {
 		format->special ("nbsp");
 		std::ostringstream tmp;
@@ -627,7 +627,7 @@ ProgramDocument::print_sample_entry (const symbol name,
 		print_name = false;
 	      }
 	      break;
-	    case Syntax::Object:
+	    case Value::Object:
 	      {
 		const AttributeList& object = alist.alist (name);
 		daisy_assert (object.check ("type"));
@@ -635,8 +635,8 @@ ProgramDocument::print_sample_entry (const symbol name,
 		comment = "Default " + type + " value.";
 	      }
 	      break;
-	    case Syntax::Library:
-	    case Syntax::Error:
+	    case Value::Library:
+	    case Value::Error:
 	      daisy_notreached ();
 	    }
 	else if (alist.size (name) == 0)
@@ -647,7 +647,7 @@ ProgramDocument::print_sample_entry (const symbol name,
 	else
 	  switch (type)
 	    {
-	    case Syntax::Number:
+	    case Value::Number:
 	      if (alist.size (name) < 5)
 		{
 		  const std::vector<double>& numbers
@@ -663,22 +663,22 @@ ProgramDocument::print_sample_entry (const symbol name,
 		  print_name = false;
 		}
 	      break;
-	    case Syntax::AList:
-	    case Syntax::PLF:
-	    case Syntax::Boolean:
-	    case Syntax::String:
-	    case Syntax::Integer:
-	    case Syntax::Object:
+	    case Value::AList:
+	    case Value::PLF:
+	    case Value::Boolean:
+	    case Value::String:
+	    case Value::Integer:
+	    case Value::Object:
 	      break;
-	    case Syntax::Library:
-	    case Syntax::Error:
+	    case Value::Library:
+	    case Value::Error:
 	      daisy_notreached ();
 	    }
 	if (print_name)
 	  {
 	    format->special ("nbsp");
 	    format->italic (name);
-	    if (syntax.size (name) != Syntax::Singleton)
+	    if (syntax.size (name) != Value::Singleton)
 	      {
 		format->special ("nbsp");
 		format->special ("...");
@@ -692,7 +692,7 @@ ProgramDocument::print_sample_entry (const symbol name,
       {
 	format->special ("nbsp");
 	format->italic (name);
-	if (syntax.size (name) != Syntax::Singleton)
+	if (syntax.size (name) != Value::Singleton)
 	  {
 	    format->special ("nbsp");
 	    format->special ("...");
@@ -846,13 +846,13 @@ ProgramDocument::print_sample_entries (const symbol name,
   for (size_t i = 0; i < own_entries.size (); i++)
     if (syntax.order_index (own_entries[i]) < 0
 	&& !syntax.is_log (own_entries[i])
-	&& syntax.lookup (own_entries[i]) != Syntax::Library)
+	&& syntax.lookup (own_entries[i]) != Value::Library)
       own.push_back (own_entries[i]);
   std::vector<symbol> base;
   for (size_t i = 0; i < base_entries.size (); i++)
     if (syntax.order_index (base_entries[i]) < 0
 	&& !syntax.is_log (base_entries[i])
-	&& syntax.lookup (base_entries[i]) != Syntax::Library)
+	&& syntax.lookup (base_entries[i]) != Value::Library)
       base.push_back (base_entries[i]);
 
   // Count entries.
@@ -882,7 +882,7 @@ ProgramDocument::print_sample_entries (const symbol name,
       for (unsigned int i = 0; i < order.size (); i++)
 	{ 
 	  format->italic (order[i]);
-	  if (syntax.size (order[i]) == Syntax::Sequence)
+	  if (syntax.size (order[i]) == Value::Sequence)
 	    format->special ("...");
 	  format->special ("nbsp");
 	  left--;
@@ -1019,10 +1019,10 @@ ProgramDocument::print_submodel_entry (const symbol name, int level,
   else
     format->soft_linebreak ();
 
-  const Syntax::type type = syntax.lookup (name);
+  const Value::type type = syntax.lookup (name);
 
   // We ignore libraries.
-  if (type == Syntax::Library)
+  if (type == Value::Library)
     return;
 
   const int size = syntax.size (name);
@@ -1036,9 +1036,9 @@ ProgramDocument::print_submodel_entry (const symbol name, int level,
   print_entry_type (name, syntax, alist);
 
   // Print size.
-  if (size == Syntax::Singleton)
+  if (size == Value::Singleton)
     /* do nothing */;
-  else if (size == Syntax::Sequence)
+  else if (size == Value::Sequence)
     format->text (" sequence");
   else
     {
@@ -1059,7 +1059,7 @@ ProgramDocument::print_submodel_entry (const symbol name, int level,
 
   // Print description line.
   const symbol description = syntax.description (name);
-  if (description != Syntax::Unknown ())
+  if (description != Value::Unknown ())
     {
       format->hard_linebreak ();
       format->text (description);
@@ -1283,16 +1283,16 @@ static struct ProgramDocumentSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "\
 Generate the components part of the reference manual.");
-    syntax.add ("where", Syntax::String, Syntax::Const, 
+    syntax.add ("where", Value::String, Value::Const, 
                 "Name of file to store results in.");
     alist.add ("where", "components.tex");
     syntax.add_object ("format", Format::component, 
-                       Syntax::Const, Syntax::Singleton,
+                       Value::Const, Value::Singleton,
                        "Text format used for the document.");
     AttributeList LaTeX_alist;
     LaTeX_alist.add ("type", "LaTeX");
     alist.add ("format", LaTeX_alist);
-    syntax.add ("print_parameterizations", Syntax::Boolean, Syntax::Const,
+    syntax.add ("print_parameterizations", Value::Boolean, Value::Const,
 		"Include a copy of all loaded parameterizations in document.");
     alist.add ("print_parameterizations", false);
     Librarian::add_type (Program::component, "document", alist, syntax, &make);

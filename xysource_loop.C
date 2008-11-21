@@ -191,23 +191,23 @@ The variable cover an interval from 'begin' to 'end' in fixed steps\n\
 'step'.  The name of the variable is specified by 'tag'.  The x and y\n\
 expressions may refer to the variable.");
     syntax.add_object ("x", Number::component, 
-                       Syntax::Const, Syntax::Singleton, "\
+                       Value::Const, Value::Singleton, "\
 Expression for calculating the x value.");
     AttributeList x_alist;
     x_alist.add ("type", "fetch");
     x_alist.add ("name", "x");
     alist.add ("x", x_alist);
     syntax.add_object ("y", Number::component, 
-                       Syntax::Const, Syntax::Singleton, "\
+                       Value::Const, Value::Singleton, "\
 Expression for calculating the y value.");
-    syntax.add ("begin", Syntax::User (), Syntax::Const, "\
+    syntax.add ("begin", Value::User (), Value::Const, "\
 Start of interval.");
-    syntax.add ("end", Syntax::User (), Syntax::Const, "\
+    syntax.add ("end", Value::User (), Value::Const, "\
 End of interval.");
-    syntax.add ("step", Syntax::User (), Check::non_zero (), Syntax::Const, "\
+    syntax.add ("step", Value::User (), Check::non_zero (), Value::Const, "\
 Disretization within interval.");
     
-    syntax.add ("tag", Syntax::String, Syntax::Const, "\
+    syntax.add ("tag", Value::String, Value::Const, "\
 Name of free variable to calculate the 'x' and 'y' expressions from.");
     alist.add ("tag", "x");
 

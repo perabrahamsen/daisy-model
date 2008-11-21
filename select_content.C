@@ -131,17 +131,17 @@ static struct SelectContentSyntax
     alist.add ("description", "Extract content at specified location.\n\
 The \"location\" may be a line, plane or volume if one or more dimension\n\
 parameters are left out.  In that case, the weighted average is used.");
-    syntax.add ("height", "cm", Check::non_positive (), Syntax::OptionalConst,
+    syntax.add ("height", "cm", Check::non_positive (), Value::OptionalConst,
 		"OBSOLETE: Use 'z' instead.");
-    syntax.add ("z", "cm", Syntax::OptionalConst,
+    syntax.add ("z", "cm", Value::OptionalConst,
 		"Specify height (negative below surface) to measure content.\n\
 The value will be a weighted average of all cells containing height.\n\
 By default, cell in all heights will be included.");
-    syntax.add ("x", "cm", Syntax::OptionalConst,
+    syntax.add ("x", "cm", Value::OptionalConst,
 		"Specify width (distance from left side) to measure content.\n\
 The value will be a weighted average of all cells containing width.\n\
 By default, cell in all widths will be included.");
-    syntax.add ("y", "cm", Syntax::OptionalConst,
+    syntax.add ("y", "cm", Value::OptionalConst,
 		"Specify length (distance from front) to measure content.\n\
 The value will be a weighted average of all cells containing length.\n\
 By default, cell in all lengths will be included.");

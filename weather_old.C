@@ -175,47 +175,47 @@ WeatherOld::load_syntax (Syntax& syntax, AttributeList& alist)
   WeatherBase::load_base (syntax, alist);
   syntax.add_check (check_alist);
   // Where in the world are we?
-  syntax.add ("Latitude", "dg North", Syntax::Const,
+  syntax.add ("Latitude", "dg North", Value::Const,
 	      "The position of the weather station on the globe.");
   alist.add ("Latitude", 56.0);
-  syntax.add ("Longitude", "dg East", Syntax::Const,
+  syntax.add ("Longitude", "dg East", Value::Const,
 	      "The position of the weather station on the globe.");
   alist.add ("Longitude", 10.0);
-  syntax.add ("Elevation", "m", Syntax::Const,
+  syntax.add ("Elevation", "m", Value::Const,
 	      "Height above sea level.");
   alist.add ("Elevation", 0.0);
-  syntax.add ("TimeZone", "dg East", Syntax::Const,
+  syntax.add ("TimeZone", "dg East", Value::Const,
 	      "Time zone in effect (no DST).");
   alist.add ("TimeZone", 15.0);
-  syntax.add ("ScreenHeight", "m", Syntax::Const,
+  syntax.add ("ScreenHeight", "m", Value::Const,
 	      "Measurement height above ground.");
   alist.add ("ScreenHeight", 2.0);
-  syntax.add ("UTM_x", Syntax::Unknown (), Syntax::OptionalConst,
+  syntax.add ("UTM_x", Value::Unknown (), Value::OptionalConst,
 	      "X position of weather station."); // Unused.
-  syntax.add ("UTM_y", Syntax::Unknown (), Syntax::OptionalConst,
+  syntax.add ("UTM_y", Value::Unknown (), Value::OptionalConst,
 	      "Y position of weather station."); // Unused.
 
-  IM::add_syntax (syntax, alist, Syntax::Const, "DryDeposit", 
+  IM::add_syntax (syntax, alist, Value::Const, "DryDeposit", 
                   dry_deposit_unit (), "Atmospheric deposition.");
-  IM::add_syntax (syntax, alist, Syntax::Const, "WetDeposit", Units::ppm (), 
+  IM::add_syntax (syntax, alist, Value::Const, "WetDeposit", Units::ppm (), 
 		  "Deposition of solutes with precipitation.");
 
   // Division between Rain and Snow.
-  syntax.add ("T_rain", "dg C", Syntax::Const, 
+  syntax.add ("T_rain", "dg C", Value::Const, 
 	      "Above this air temperature all precipitation is rain.");
   alist.add ("T_rain", 2.0);
-  syntax.add ("T_snow", "dg C", Syntax::Const,
+  syntax.add ("T_snow", "dg C", Value::Const,
 	      "Below this air temperature all precipitation is snow.");
   alist.add ("T_snow", -2.0);
 
   // Yearly average temperatures.
-  syntax.add ("average", "dg C", Syntax::Const,
+  syntax.add ("average", "dg C", Value::Const,
 	      "Average temperature at this location.");
   alist.add ("average", 7.8);
-  syntax.add ("amplitude", "dg C", Syntax::Const,
+  syntax.add ("amplitude", "dg C", Value::Const,
 	      "How much the temperature change during the year.");
   alist.add ("amplitude", 8.5);
-  syntax.add ("max_Ta_yday", "d", Syntax::Const,
+  syntax.add ("max_Ta_yday", "d", Value::Const,
 	      "Julian day where the highest temperature is expected.");
   alist.add ("max_Ta_yday", 209.0);
 }

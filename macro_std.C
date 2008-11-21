@@ -366,14 +366,14 @@ the macropore is distributed in soil below as a source term, according\n\
 to the 'distribution' parameter.");
 
   syntax.add ("height_start", "cm", Check::non_positive (), 
-	      Syntax::OptionalConst, 
+	      Value::OptionalConst, 
 	      "Macropores starts at this depth (a negative number).\n\
 If not specified, use the last point in 'distribution'.");
   syntax.add ("height_end", "cm", Check::non_positive (),
-	      Syntax::OptionalConst, 
+	      Value::OptionalConst, 
 	      "Macropores ends at this depth (a negative number).\n\
 If not specified, use the first point in 'distribution'.");
-  syntax.add ("distribution", "cm", Syntax::Fraction (), Syntax::Const, "\
+  syntax.add ("distribution", "cm", Value::Fraction (), Value::Const, "\
 Distribution of macropore end points as a function of height.\n\
 The function should start with '1' at 'height_end', and then decrease to\n\
 '0' at 'height_start'.  It can be constant, but may never increase.\n\
@@ -385,15 +385,15 @@ where all macropores is assumed to start at the top.");
   static VCheck::All distcheck (start, end, fixpoint, 
 				VCheck::non_increasing ());
   syntax.add_check ("distribution", distcheck);
-  syntax.add ("pressure_initiate", "cm", Syntax::Const, 
+  syntax.add ("pressure_initiate", "cm", Value::Const, 
 	      "Pressure needed to init pref.flow");
   alist.add ("pressure_initiate", defaut_pressure_initiate);
-  syntax.add ("pressure_end", "cm", Syntax::Const, 
+  syntax.add ("pressure_end", "cm", Value::Const, 
 	      "Pressure after pref.flow has been init");
   alist.add ("pressure_end", default_pressure_end);
-  syntax.add ("S_p", "h^-1", Syntax::LogOnly,
+  syntax.add ("S_p", "h^-1", Value::LogOnly,
 	      "Macropore sink term.");
-  syntax.add ("pond_max", "mm", Check::non_negative (), Syntax::Const, "\
+  syntax.add ("pond_max", "mm", Check::non_negative (), Value::Const, "\
 Maximum height of ponding before spilling into macropores.\n\
 After macropores are activated pond will have this height.");
   alist.add ("pond_max", default_pond_max);

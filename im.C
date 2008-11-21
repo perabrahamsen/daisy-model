@@ -236,19 +236,19 @@ IM::~IM ()
 
 void
 IM::add_syntax (Syntax& parent_syntax, AttributeList& parent_alist,
-		Syntax::category cat, 
+		Value::category cat, 
 		const char *const key,
 		const symbol dimension,
 		const char *const description)
 {
   Syntax& child_syntax = *new Syntax ();
-  child_syntax.add ("name", Syntax::String, cat, 
+  child_syntax.add ("name", Value::String, cat, 
 		    "Name of chemical.");
   child_syntax.add_check ("name", Chemical::check_library ());
   child_syntax.add ("value", dimension.name (), Check::non_negative (), cat, 
 		    "Value for chemical.");
   child_syntax.order ("name", "value");
-  parent_syntax.add (key, child_syntax, cat, Syntax::Sequence, description);
+  parent_syntax.add (key, child_syntax, cat, Value::Sequence, description);
   parent_alist.add (key, std::vector<const AttributeList*> ());
 }
 

@@ -120,18 +120,18 @@ static struct HorizonNumericSyntax
     alist.add ("description",
                "A horizon using explicit texture classification.");
     syntax.add ("limits", "um", Check::positive (),
-                Syntax::Const, Syntax::Sequence, 
+                Value::Const, Value::Sequence, 
                 "Numerical limits for particle sizes.");
     static const VCheck::All lim_check (VCheck::increasing (), 
                                         VCheck::min_size_1 ());
     syntax.add_check ("limits", lim_check);
-    syntax.add_fraction ("fractions", Syntax::Const, Syntax::Sequence, "\
+    syntax.add_fraction ("fractions", Value::Const, Value::Sequence, "\
 Fraction of particles between the corresponding numrical limits.");
     syntax.add_check ("fractions", VCheck::min_size_1 ());
     
-    syntax.add_fraction ("humus", Syntax::Const,
+    syntax.add_fraction ("humus", Value::Const,
                          "Humus content of soil.");
-    syntax.add ("normalize", Syntax::Boolean, Syntax::Const, "\
+    syntax.add ("normalize", Value::Boolean, Value::Const, "\
 If this is true, normalize the mineral fraction to 1.0.\n\
 Otherwise, give an error if the sum is not 1.0.");
     alist.add ("normalize", false);

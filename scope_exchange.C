@@ -76,9 +76,9 @@ Exchange::set_number (const double)
 void
 Exchange::load_syntax (Syntax& syntax, AttributeList&)
 {
-  syntax.add ("description", Syntax::String, Syntax::Const, "\
+  syntax.add ("description", Value::String, Value::Const, "\
 Description of value to exchange.");
-  syntax.add ("name", Syntax::String, Syntax::Const, "\
+  syntax.add ("name", Value::String, Value::Const, "\
 Name of value to exchange.");
 }
 
@@ -148,9 +148,9 @@ static struct ExchangeNumberSyntax
     AttributeList& alist = *new AttributeList ();
     Exchange::load_syntax (syntax, alist);
     alist.add ("description", "Exchange a numeric value.");
-    syntax.add ("dimension", Syntax::String, Syntax::Const, "\
+    syntax.add ("dimension", Value::String, Value::Const, "\
 Dimension of value to exchange.");
-    syntax.add ("value", Syntax::Unknown (), Syntax::OptionalState, "\
+    syntax.add ("value", Value::Unknown (), Value::OptionalState, "\
 Current value to exchange.");
     Librarian::add_type (Exchange::component, "number", alist, syntax, &make);
   }
@@ -184,7 +184,7 @@ static struct ExchangeNameSyntax
     AttributeList& alist = *new AttributeList ();
     Exchange::load_syntax (syntax, alist);
     alist.add ("description", "Exchange a string value.");
-    syntax.add ("value", Syntax::String, Syntax::Const, "\
+    syntax.add ("value", Value::String, Value::Const, "\
 Current value to exchange.");
     Librarian::add_type (Exchange::component, "name", alist, syntax, &make);
   }
@@ -311,7 +311,7 @@ static struct ScopeExchangeSyntax
                "Exchange values with an external model.");
 
     syntax.add_object ("entries", Exchange::component, 
-                       Syntax::Const, Syntax::Sequence,
+                       Value::Const, Value::Sequence,
                        "List of items to exchange.");
     Librarian::add_type (Scope::component, "exchange", alist, syntax, &make);
   }

@@ -75,41 +75,41 @@ void
 Vegetation::load_base (Syntax& syntax, AttributeList& alist)
 {
   alist.add ("base_model", "common");
-  syntax.add ("description", Syntax::String, Syntax::OptionalConst,
+  syntax.add ("description", Value::String, Value::OptionalConst,
 	      "Description of this vegetation.");
-  syntax.add ("LAI", "m^2/m^2", Syntax::LogOnly,
+  syntax.add ("LAI", "m^2/m^2", Value::LogOnly,
 	      "Total LAI of all crops on this column");
-  syntax.add ("height", "cm", Syntax::LogOnly,
+  syntax.add ("height", "cm", Value::LogOnly,
 	      "Max crop height in canopy");
-  syntax.add ("cover", "m^2/m^2", Syntax::LogOnly,
+  syntax.add ("cover", "m^2/m^2", Value::LogOnly,
 	      "Fraction of soil covered by crops");
-  syntax.add ("LAIvsH", "m^2/m^2", "cm", Syntax::LogOnly,
+  syntax.add ("LAIvsH", "m^2/m^2", "cm", Value::LogOnly,
 	      "Total canopy LAI below given height");
-  syntax.add ("HvsLAI", "cm", "m^2/m^2", Syntax::LogOnly, "\
+  syntax.add ("HvsLAI", "cm", "m^2/m^2", Value::LogOnly, "\
 Height in which there is a given LAI below in total canopy");
-  syntax.add ("ACExt_PAR", Syntax::None (), Syntax::LogOnly,
+  syntax.add ("ACExt_PAR", Value::None (), Value::LogOnly,
 	      "Canopy extinction coefficient of PAR\
 \n(how fast the light dim as a function of LAI passed)");
-   syntax.add ("ACRef_PAR", Syntax::None (), Syntax::LogOnly,
+   syntax.add ("ACRef_PAR", Value::None (), Value::LogOnly,
 	      "Canopy reflection coefficient of PAR");
-  syntax.add ("ACExt_NIR", Syntax::None (), Syntax::LogOnly,
+  syntax.add ("ACExt_NIR", Value::None (), Value::LogOnly,
 	      "Canopy extinction coefficient of NIR\
 \n(how fast the light dim as a function of LAI passed)");
-   syntax.add ("ACRef_NIR", Syntax::None (), Syntax::LogOnly,
+   syntax.add ("ACRef_NIR", Value::None (), Value::LogOnly,
 	      "Canopy reflection coefficient of NIR");
-  syntax.add ("ARExt", Syntax::None (), Syntax::LogOnly,
+  syntax.add ("ARExt", Value::None (), Value::LogOnly,
 	      "Radiation Extinction coefficient\
 \n(like ACExt, but for all radiation, not just light)");
-  syntax.add ("EpFactor", Syntax::None (), Syntax::LogOnly,
+  syntax.add ("EpFactor", Value::None (), Value::LogOnly,
 	      "Reference to potential evapotranspiration");
-  syntax.add_fraction ("EpInterchange", Syntax::Const, "\
+  syntax.add_fraction ("EpInterchange", Value::Const, "\
 Canopy adsorbtion fraction of unreached potential soil evaporation.");
   alist.add ("EpInterchange", 0.6);
-  syntax.add ("albedo", Syntax::None (), Syntax::LogOnly,
+  syntax.add ("albedo", Value::None (), Value::LogOnly,
 	      "Another reflection factor");
-  syntax.add ("interception_capacity", "mm", Syntax::LogOnly,
+  syntax.add ("interception_capacity", "mm", Value::LogOnly,
 	      "Canopy water storage capacity");
-  syntax.add ("stomata_conductance", "m/s", Syntax::LogOnly,
+  syntax.add ("stomata_conductance", "m/s", Value::LogOnly,
               "Stomata´conductance");
 }
 

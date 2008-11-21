@@ -306,17 +306,17 @@ Bioincorporation::load_syntax (Syntax& syntax, AttributeList& alist)
 	     "Biological incorporation of organic matter in soil.");
 
   // Incorporation speed.
-  syntax.add ("R_max", "g DM/m^2/h", Check::non_negative (), Syntax::Const, 
+  syntax.add ("R_max", "g DM/m^2/h", Check::non_negative (), Value::Const, 
 	      "Maximal speed of incorporation.");
   alist.add ("R_max", 0.5);
-  syntax.add ("k_half", "g DM/m^2", Check::positive (), Syntax::Const,
+  syntax.add ("k_half", "g DM/m^2", Check::positive (), Value::Const,
 	      "Halflife constant.");
   alist.add ("k_half", 1.0);
-  syntax.add ("speed", "g DM/m^2/h", Syntax::LogOnly, 
+  syntax.add ("speed", "g DM/m^2/h", Value::LogOnly, 
 	      "Fraction of litter incorporated this hour.\n\
 The formula is speed = (R_max * litter) / (k_half + litter).");
-  syntax.add ("C_per_N_factor", "(g C/cm^2)/(g N/cm^2)", Syntax::None (), 
-	      Check::non_negative (), Syntax::Const, 
+  syntax.add ("C_per_N_factor", "(g C/cm^2)/(g N/cm^2)", Value::None (), 
+	      Check::non_negative (), Value::Const, 
 	      "Limiting factor for high C/N ratio.");
   PLF C_per_N_factor;
   C_per_N_factor.add (50.0, 1.0);
@@ -324,32 +324,32 @@ The formula is speed = (R_max * litter) / (k_half + litter).");
   C_per_N_factor.add (120.0, 0.01);
   
   alist.add ("C_per_N_factor", C_per_N_factor);
-  syntax.add ("T_factor", "dg C", Syntax::None (), Check::non_negative (), 
-	      Syntax::Const, "Limiting factor for low temperature.");
+  syntax.add ("T_factor", "dg C", Value::None (), Check::non_negative (), 
+	      Value::Const, "Limiting factor for low temperature.");
   PLF T_factor;
   T_factor.add (4.0, 0.0);
   T_factor.add (6.0, 1.0);
   alist.add ("T_factor", T_factor);
 
   // Incorporation amounts.
-  syntax.add_fraction ("respiration", Syntax::Const,
+  syntax.add_fraction ("respiration", Value::Const,
 		       "Fraction of C lost in respiration.");
   alist.add ("respiration", 0.5);
-  syntax.add ("DM", "g DM/m^2/h", Syntax::LogOnly, 
+  syntax.add ("DM", "g DM/m^2/h", Value::LogOnly, 
 	      "DM removed from surface.");
-  syntax.add ("C_removed", "g C/m^2/h", Syntax::LogOnly,
+  syntax.add ("C_removed", "g C/m^2/h", Value::LogOnly,
               "C removed from surface.");
-  syntax.add ("N_removed", "g N/m^2/h", Syntax::LogOnly, 
+  syntax.add ("N_removed", "g N/m^2/h", Value::LogOnly, 
               "N removed from surface.");
-  syntax.add ("CO2", "g C/m^2/h", Syntax::LogOnly, "C respirated.");
-  syntax.add ("C_added", "g C/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("CO2", "g C/m^2/h", Value::LogOnly, "C respirated.");
+  syntax.add ("C_added", "g C/cm^3/h", Value::LogOnly, Value::Sequence,
               "C added to soil.");
-  syntax.add ("N_added", "g N/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("N_added", "g N/cm^3/h", Value::LogOnly, Value::Sequence,
               "N added to soil.");
 
   // Incorporation location.
-  syntax.add ("distribution", "cm", Syntax::None (), Check::non_negative (),
-	      Syntax::Const, "\
+  syntax.add ("distribution", "cm", Value::None (), Check::non_negative (),
+	      Value::Const, "\
 Distribution of incorporated matter in the soil.\
 \n(X, Y), where X is the depth (negative numbers), and Y is the relative\n\
 weight in that depth.  To get the fraction in a specific interval [a:b], we\n\
@@ -399,7 +399,7 @@ the whole profile.");
   std::vector<const AttributeList*> am;
   am.push_back (&AOM1);
   am.push_back (&AOM2);
-  syntax.add_submodule_sequence ("AOM", Syntax::Const, 
+  syntax.add_submodule_sequence ("AOM", Value::Const, 
 				 "Incorporated AM parameters.", 
 				 AOM::load_syntax);
   syntax.add_check ("AOM", AM::check_om_pools ());

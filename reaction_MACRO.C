@@ -191,30 +191,30 @@ static struct ReactionMACROSyntax
   { return *new ReactionMACRO (al); }
   static void load_syntax (Syntax& syntax, AttributeList& alist)
   {
-    syntax.add ("colloid", Syntax::String, Syntax::Const,
+    syntax.add ("colloid", Value::String, Value::Const,
 		"Colloid to generate.");
-    syntax.add ("Mmax", "g/g", Check::non_negative (), Syntax::Const,
+    syntax.add ("Mmax", "g/g", Check::non_negative (), Value::Const,
                 "Maximum amount of detachable particles.");
     alist.add ("Mmax", 0.165);
-    syntax.add ("kd", "g/J", Check::non_negative (), Syntax::Const,
+    syntax.add ("kd", "g/J", Check::non_negative (), Value::Const,
                 "Detachment rate coefficient.");
     alist.add ("kd", 15.0);
-    syntax.add ("kr", "g/cm^2/h", Check::non_negative (), Syntax::Const,
+    syntax.add ("kr", "g/cm^2/h", Check::non_negative (), Value::Const,
                 "Replenishment rate coefficient.");
     alist.add ("kr", 0.1 /* [g/m^2/h] */ / (100.0 /* [cm/m] */ * 100.0));
-    syntax.add ("zi", "cm", Check::positive (), Syntax::Const,
+    syntax.add ("zi", "cm", Check::positive (), Value::Const,
                 "Thickness of surface soil layer.");
     alist.add ("zi", 0.1);
-    syntax.add ("Ms", "g/g", Check::non_negative (), Syntax::OptionalState,
+    syntax.add ("Ms", "g/g", Check::non_negative (), Value::OptionalState,
                 "Current concentration of detachable particles in top soil.\n\
 By default, 10% of Mmax.");
-    syntax.add ("As", "g/cm^2", Syntax::LogOnly, 
+    syntax.add ("As", "g/cm^2", Value::LogOnly, 
                 "Current amount of detachable particles in top soil.");
-    syntax.add ("D", "g/cm^2/h", Syntax::LogOnly, 
+    syntax.add ("D", "g/cm^2/h", Value::LogOnly, 
                 "Depletion of detachable particles from top soil.");
-    syntax.add ("P", "g/cm^2/h", Syntax::LogOnly, 
+    syntax.add ("P", "g/cm^2/h", Value::LogOnly, 
                 "Replenishment of detachable particles to top soil.");
-    syntax.add ("E", "J/cm^2/mm", Syntax::LogOnly, 
+    syntax.add ("E", "J/cm^2/mm", Value::LogOnly, 
                 "Kinetic energy in rain.");
   }
   ReactionMACROSyntax ()

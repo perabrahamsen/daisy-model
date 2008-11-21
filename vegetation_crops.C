@@ -248,9 +248,9 @@ VegetationCrops::ForcedLAI::operator() (int year, int yday)
     
 void VegetationCrops::ForcedLAI::load_syntax (Syntax& syntax, AttributeList&)
 {
-  syntax.add ("year", Syntax::Integer, Syntax::Const, "\
+  syntax.add ("year", Value::Integer, Value::Const, "\
 Year for which to use forced LAI.");
-  syntax.add ("LAIvsDAY", "m^2/m^2", "yday", Syntax::OptionalConst, 
+  syntax.add ("LAIvsDAY", "m^2/m^2", "yday", Value::OptionalConst, 
 		"LAI as a function of Julian day.\n\
 \n\
 The simulated LAI will be used before the first day you specify and\n\
@@ -906,7 +906,7 @@ void
 VegetationCrops::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   Vegetation::load_base (syntax, alist);
-  syntax.add_submodule_sequence("ForcedLAI", Syntax::Const, "\
+  syntax.add_submodule_sequence("ForcedLAI", Value::Const, "\
 By default, the total LAI for the vegetation will be the sum of the\n\
 simulated LAI for the individual crops.  However, you can force the\n\
 model to use a different values for LAI by setting this attribute.\n\
@@ -921,7 +921,7 @@ emerged.  If no crops have emerged on the field, it will be ignored.",
                                 VegetationCrops::ForcedLAI::load_syntax);
   alist.add ("ForcedLAI", std::vector<const AttributeList*> ());
   syntax.add_object ("crops", Crop::component, 
-                     Syntax::State, Syntax::Sequence,
+                     Value::State, Value::Sequence,
                      "List of crops growing in the field");
   alist.add ("crops", std::vector<const AttributeList*> ());
 }

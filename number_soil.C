@@ -150,7 +150,7 @@ struct NumberDepthTheta : public NumberByDepth
   }
 
   symbol dimension (const Scope&) const 
-  { return Syntax::Fraction (); }
+  { return Value::Fraction (); }
 
   // Create.
   NumberDepthTheta (Block& al)
@@ -256,7 +256,7 @@ struct NumberByTension : public Number
 The soil horizon whose properties we want to examine.");
     syntax.add_object ("h", Number::component, "\
 The tension we want to compare with.");
-    syntax.add ("top_soil", Syntax::Boolean, Syntax::Const, "\
+    syntax.add ("top_soil", Value::Boolean, Value::Const, "\
 Set this to true for the A horizon.");
   }
   NumberByTension (Block& al)
@@ -279,7 +279,7 @@ struct NumberSoilTheta : public NumberByTension
                                                       h->value (scope)));
   }
   symbol dimension (const Scope&) const 
-  { return Syntax::Fraction (); }
+  { return Value::Fraction (); }
 
   // Create.
   NumberSoilTheta (Block& al)
@@ -428,12 +428,12 @@ struct NumberTensionByTheta : public Number
   { Theta->tick (units, scope, msg); }
   bool missing (const Scope& scope) const 
   { return Theta->missing (scope) 
-      || !units.can_convert (Theta->dimension (scope), Syntax::Fraction (),
+      || !units.can_convert (Theta->dimension (scope), Value::Fraction (),
                              Theta->value (scope)); }
   double value (const Scope& scope) const
   { 
     return horizon->hydraulic->h (units.convert (Theta->dimension (scope), 
-                                                  Syntax::Fraction (), 
+                                                  Value::Fraction (), 
                                                   Theta->value (scope)));
   }
   symbol dimension (const Scope&) const 
@@ -450,7 +450,7 @@ struct NumberTensionByTheta : public Number
     Treelog::Open nest (msg, name);
     if (!Theta->check (units, scope, msg))
       return false;
-    if (!units.can_convert (Theta->dimension (scope), Syntax::Fraction ()))
+    if (!units.can_convert (Theta->dimension (scope), Value::Fraction ()))
       {
         msg.error ("Cannot convert [" + Theta->dimension (scope) 
                    + "] to fraction for soil hydraulics");
@@ -481,7 +481,7 @@ static struct NumberTensionByThetaSyntax
 The soil horizon whose properties we want to examine.");
     syntax.add_object ("Theta", Number::component, "\
 The water content we want to compare with.");
-    syntax.add ("top_soil", Syntax::Boolean, Syntax::Const, "\
+    syntax.add ("top_soil", Value::Boolean, Value::Const, "\
 Set this to true for the A horizon.");
     Librarian::add_type (Number::component, "soil_h", alist, syntax, &make);
   }

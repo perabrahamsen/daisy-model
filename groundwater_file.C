@@ -185,7 +185,7 @@ static struct GroundwaterFileSyntax
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "Read groundwater table from a file.");
       Groundwater::load_syntax (syntax, alist);
-      syntax.add ("file", Syntax::String, Syntax::Const,
+      syntax.add ("file", Value::String, Value::Const,
 		  "Name of file to read data from.\n\
 The format of each line in the file is 'YEAR MONTH DAY HEIGHT',\n\
 where HEIGHT should in cm above ground (i.e. a negative number).\n\

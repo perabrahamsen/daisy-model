@@ -186,7 +186,7 @@ Assert that condition is true, if not, stop the simulation.");
       syntax.add_object ("condition", Condition::component, 
                          "Condition to check.");
       syntax.order ("condition");
-      syntax.add ("message", Syntax::String, Syntax::Const,
+      syntax.add ("message", Value::String, Value::Const,
 		  "Error message to give iff assertion fails.");
       alist.add ("message", "Required condition not fulfilled");
       Librarian::add_type (Action::component, 
@@ -197,7 +197,7 @@ Assert that condition is true, if not, stop the simulation.");
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "\
 Write a message to the user.");
-      syntax.add ("message", Syntax::String, Syntax::Const,
+      syntax.add ("message", Value::String, Value::Const,
 		  "Message to give to the user.");
       syntax.order ("message");
 
@@ -209,7 +209,7 @@ Write a message to the user.");
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "\
 Write a warning to the user.");
-      syntax.add ("message", Syntax::String, Syntax::Const,
+      syntax.add ("message", Value::String, Value::Const,
 		  "Warning to give to the user.");
       syntax.order ("message");
 
@@ -221,7 +221,7 @@ Write a warning to the user.");
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "\
 Write a error message to the user.");
-      syntax.add ("message", Syntax::String, Syntax::Const,
+      syntax.add ("message", Value::String, Value::Const,
 		  "Error message to give.");
       syntax.order ("message");
       Librarian::add_type (Action::component,
@@ -232,7 +232,7 @@ Write a error message to the user.");
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "\
 Write a error message to the user and stop the simulation.");
-      syntax.add ("message", Syntax::String, Syntax::Const,
+      syntax.add ("message", Value::String, Value::Const,
 		  "Error message to give.");
       syntax.order ("message");
       Librarian::add_type (Action::component,

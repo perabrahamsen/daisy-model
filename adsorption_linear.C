@@ -93,12 +93,12 @@ static struct AdsorptionLinearOldSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "M = rho K C + Theta C");
     syntax.add ("K_clay", "cm^3/g", Check::non_negative (), 
-		Syntax::OptionalConst, 
+		Value::OptionalConst, 
 		"Clay dependent distribution parameter.\n\
 It is multiplied with the soil clay fraction to get the clay part of\n\
 the 'K' factor.  If 'K_OC' is specified, 'K_clay' defaults to 0.");
     syntax.add ("K_OC", "cm^3/g", Check::non_negative (), 
-		Syntax::OptionalConst, 
+		Value::OptionalConst, 
 		"Humus dependent distribution parameter.\n\
 It is multiplied with the soil organic carbon fraction to get the\n\
 carbon part of the 'K' factor.  By default, 'K_OC' is equal to 'K_clay'.");

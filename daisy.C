@@ -276,7 +276,7 @@ Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
   
   Output::load_syntax (syntax, alist);
   syntax.add_object ("scope", Scopesel::component, 
-		     Syntax::Const, Syntax::Singleton, "\
+		     Value::Const, Value::Singleton, "\
 Scope to evaluate expessions in.");
   alist.add ("scope", Scopesel::default_model ());
   syntax.add_object ("print_time", Condition::component,
@@ -286,29 +286,29 @@ to report, like emergence of crop or various management operations.\n\
 Good values for this parameter would be hourly, daily or monthly.");
   alist.add ("print_time", Condition::periodic_model ());
 
-  syntax.add_object ("manager", Action::component, Syntax::State,
-                     Syntax::Singleton,
+  syntax.add_object ("manager", Action::component, Value::State,
+                     Value::Singleton,
                      "Specify the management operations to perform during\n\
 the simulation.");
-  syntax.add_submodule ("time", alist, Syntax::State,
+  syntax.add_submodule ("time", alist, Value::State,
 			"Current time in the simulation.", Time::load_syntax);
-  syntax.add_submodule ("timestep", alist, Syntax::OptionalState,
+  syntax.add_submodule ("timestep", alist, Value::OptionalState,
 			"Length of timestep in simlation.\n\
 The default value is 1 hour, anything else is unlikely to work.",
                         Timestep::load_syntax);
   syntax.add_check ("timestep", Timestep::positive ());
-  syntax.add_submodule ("stop", alist, Syntax::OptionalConst,
+  syntax.add_submodule ("stop", alist, Value::OptionalConst,
 			"Latest time where the simulation stops.\n\
 By default, the simulation will run until the manager request it to stop.",
                         Time::load_syntax);
   syntax.add_object ("column", Column::component, 
-                     Syntax::State, Syntax::Sequence,
+                     Value::State, Value::Sequence,
                      "List of columns to use in this simulation.");
   syntax.add_object ("weather", Weather::component,
-                     Syntax::OptionalState, Syntax::Singleton,
+                     Value::OptionalState, Value::Singleton,
                      "Weather model for providing climate information during\n\
 the simulation.  Can be overwritten by column specific weather.");
-  syntax.add_submodule_sequence ("harvest", Syntax::State, 
+  syntax.add_submodule_sequence ("harvest", Value::State, 
 				 "Total list of all crop yields.",
 				 Harvest::load_syntax);
   alist.add ("harvest", std::vector<const AttributeList*> ());

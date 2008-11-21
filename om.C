@@ -385,33 +385,33 @@ OM::load_syntax (Syntax& syntax, AttributeList& alist,
   syntax.add_check (check_alist);
   alist.add ("submodel", "OM");
   syntax.add ("C", "g C/cm^3", Check::non_negative (),
-	      Syntax::OptionalState, Syntax::Sequence,
+	      Value::OptionalState, Value::Sequence,
 	      "Carbon in each soil interval.");
   syntax.add ("C_per_N", "(g C/cm^3)/(g N/cm^3)", Check::none (), 
-	      Syntax::OptionalState, Syntax::Sequence, 
+	      Value::OptionalState, Value::Sequence, 
 	      "The carbon/nitrogen ratio.");
   syntax.add ("N", "g N/cm^3", Check::non_negative (),
-	      Syntax::OptionalState, Syntax::Sequence,
+	      Value::OptionalState, Value::Sequence,
 	      "Nitrogen in each soil interval.");
   syntax.add ("turnover_rate", "h^-1", Check::fraction (), 
-	      Syntax::OptionalConst,
+	      Value::OptionalConst,
 	      "Fraction converted to other pools each hour.\n\
 You must specify either this or 'turnover_halftime'.");
   syntax.add ("turnover_halftime", "h", Check::positive (), 
-	      Syntax::OptionalConst,
+	      Value::OptionalConst,
 	      "Time until half had been converted to other pools.\n\
 You must specify either this or 'turnover_rate'.");
-  syntax.add_fraction ("efficiency", Syntax::Const, Syntax::Sequence, "\
+  syntax.add_fraction ("efficiency", Value::Const, Value::Sequence, "\
 The efficiency this pool can be digested by each of the SMB pools.");
-  syntax.add_fraction ("fractions", Syntax::Const, Syntax::Sequence, "\
+  syntax.add_fraction ("fractions", Value::Const, Value::Sequence, "\
 How this pool is divided into other pools.\n" + frac_desc);
   syntax.add_check ("fractions", VCheck::sum_equal_1 ());
-  syntax.add ("initial_C_per_N", "g C/g N", Syntax::OptionalState, "\
+  syntax.add ("initial_C_per_N", "g C/g N", Value::OptionalState, "\
 The initial C/N ratio when this pool is created.\n\
 Negative numbers mean unspecified.");
-  syntax.add ("heat_factor", "dg C", Syntax::None (), Syntax::OptionalConst,
+  syntax.add ("heat_factor", "dg C", Value::None (), Value::OptionalConst,
 	      "Heat factor.  If empty, use default from 'OrganicMatter'.");
-  syntax.add ("water_factor", "cm", Syntax::None (), Syntax::OptionalConst, "\
+  syntax.add ("water_factor", "cm", Value::None (), Value::OptionalConst, "\
 Water potential factor.  If empty, use default from 'OrganicMatter'.");
 }
 

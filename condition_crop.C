@@ -76,11 +76,11 @@ static struct ConditionCropDSSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "\
 True iff the crop has reached development stage 'ds'.");
-    syntax.add ("crop", Syntax::String, Syntax::Const,
+    syntax.add ("crop", Value::String, Value::Const,
                 "Name of crop on the field to test.\n\
 Specify \"all\" to use combined weight of all crops on the field in test.");
     static RangeII ds_range (-1.0, 2.0);
-    syntax.add ("ds", Syntax::None (), ds_range, Syntax::Const,
+    syntax.add ("ds", Value::None (), ds_range, Value::Const,
                 "Development stage [-1.0:2.0].");
     syntax.order ("crop", "ds");
     Librarian::add_type (Condition::component, "crop_ds_after",
@@ -130,12 +130,12 @@ static struct ConditionCropDMSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "\
 True iff the crop has reached the specified amount of dry matter.");
-    syntax.add ("crop", Syntax::String, Syntax::Const,
+    syntax.add ("crop", Value::String, Value::Const,
                 "Name of crop on the field to test.");
-    syntax.add ("weight", "kg DM/ha", Check::non_negative (), Syntax::Const,
+    syntax.add ("weight", "kg DM/ha", Check::non_negative (), Value::Const,
                 "\
 Amount of non-root dry-matter required for the condition to be true.");
-    syntax.add ("height", "cm", Check::non_negative (), Syntax::Const,
+    syntax.add ("height", "cm", Check::non_negative (), Value::Const,
                 "\
 Height above which we measure the DM weight.");
     alist.add ("height", 0.0);
@@ -185,9 +185,9 @@ static struct ConditionCropDMSorgSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "\
 True iff the storage organ has reached the specified amount of dry matter.");
-    syntax.add ("crop", Syntax::String, Syntax::Const,
+    syntax.add ("crop", Value::String, Value::Const,
                 "Name of crop on the field to test.");
-    syntax.add ("weight", "kg DM/ha", Check::non_negative (), Syntax::Const,
+    syntax.add ("weight", "kg DM/ha", Check::non_negative (), Value::Const,
                 "\
 Amount of non-root dry-matter required for the condition to be true.");
     syntax.order ("crop", "weight");

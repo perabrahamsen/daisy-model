@@ -148,7 +148,7 @@ static struct BoundFiniteSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Finite interval bound.");
     
-    syntax.add ("bound", "cm", Syntax::Const, "Interval bound to use.");
+    syntax.add ("bound", "cm", Value::Const, "Interval bound to use.");
     syntax.order ("bound");
 
     Librarian::add_type (Bound::component, "finite", alist, syntax, &make);

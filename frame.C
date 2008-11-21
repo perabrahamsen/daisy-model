@@ -61,7 +61,7 @@ Frame::check (const Metalib& metalib, Treelog& err) const
 void 
 Frame::check (const symbol key, double value) const
 { 
-  if (impl->parent && impl->syntax.lookup (key) == Syntax::Error)
+  if (impl->parent && impl->syntax.lookup (key) == Value::Error)
     impl->parent->check (key, value); 
   else
     impl->syntax.check (key, value); 
@@ -75,7 +75,7 @@ Frame::check (const Metalib& metalib,
 bool 
 Frame::is_const (const symbol key) const
 {
-  if (impl->parent && impl->syntax.lookup (key) == Syntax::Error)
+  if (impl->parent && impl->syntax.lookup (key) == Value::Error)
     return impl->parent->is_const (key);
   else
     return impl->syntax.is_const (key);
@@ -84,7 +84,7 @@ Frame::is_const (const symbol key) const
 bool 
 Frame::is_optional (const symbol key) const
 {
-  if (impl->parent && impl->syntax.lookup (key) == Syntax::Error)
+  if (impl->parent && impl->syntax.lookup (key) == Value::Error)
     return impl->parent->is_optional (key);
   else
     return impl->syntax.is_optional (key);
@@ -93,7 +93,7 @@ Frame::is_optional (const symbol key) const
 bool 
 Frame::is_log (const symbol key) const
 {
-  if (impl->parent && impl->syntax.lookup (key) == Syntax::Error)
+  if (impl->parent && impl->syntax.lookup (key) == Value::Error)
     return impl->parent->is_log (key);
   else
     return impl->syntax.is_log (key);
@@ -102,16 +102,16 @@ Frame::is_log (const symbol key) const
 bool 
 Frame::is_state (const symbol key) const
 {
-  if (impl->parent && impl->syntax.lookup (key) == Syntax::Error)
+  if (impl->parent && impl->syntax.lookup (key) == Value::Error)
     return impl->parent->is_state (key);
   else
     return impl->syntax.is_state (key);
 }
 
-Syntax::type 
+Value::type 
 Frame::lookup (const symbol key) const
 {
-  if (impl->parent && impl->syntax.lookup (key) == Syntax::Error)
+  if (impl->parent && impl->syntax.lookup (key) == Value::Error)
     return impl->parent->lookup (key);
   else
     return impl->syntax.lookup (key);
@@ -120,7 +120,7 @@ Frame::lookup (const symbol key) const
 const Syntax& 
 Frame::syntax (const symbol key) const
 {
-  if (impl->parent && impl->syntax.lookup (key) == Syntax::Error)
+  if (impl->parent && impl->syntax.lookup (key) == Value::Error)
     return impl->parent->syntax (key);
   else
     return impl->syntax.syntax (key);
@@ -129,7 +129,7 @@ Frame::syntax (const symbol key) const
 ::Library& 
 Frame::library (const Metalib& metalib, const symbol key) const
 {
-  if (impl->parent && impl->syntax.lookup (key) == Syntax::Error)
+  if (impl->parent && impl->syntax.lookup (key) == Value::Error)
     return impl->parent->library (metalib, key);
   else
     return impl->syntax.library (metalib, key);
@@ -138,7 +138,7 @@ Frame::library (const Metalib& metalib, const symbol key) const
 int  
 Frame::size (const symbol key) const
 {
-  if (impl->parent && impl->syntax.lookup (key) == Syntax::Error)
+  if (impl->parent && impl->syntax.lookup (key) == Value::Error)
     return impl->parent->size (key);
   else
     return impl->syntax.size (key);
@@ -147,7 +147,7 @@ Frame::size (const symbol key) const
 const symbol 
 Frame::dimension (const symbol key) const
 {
-  if (impl->parent && impl->syntax.lookup (key) == Syntax::Error)
+  if (impl->parent && impl->syntax.lookup (key) == Value::Error)
     return impl->parent->dimension (key);
   else
     return impl->syntax.dimension (key);
@@ -156,7 +156,7 @@ Frame::dimension (const symbol key) const
 const symbol 
 Frame::domain (const symbol key) const
 {
-  if (impl->parent && impl->syntax.lookup (key) == Syntax::Error)
+  if (impl->parent && impl->syntax.lookup (key) == Value::Error)
     return impl->parent->domain (key);
   else
     return impl->syntax.domain (key);
@@ -165,7 +165,7 @@ Frame::domain (const symbol key) const
 const symbol 
 Frame::range (const symbol key) const
 {
-  if (impl->parent && impl->syntax.lookup (key) == Syntax::Error)
+  if (impl->parent && impl->syntax.lookup (key) == Value::Error)
     return impl->parent->range (key);
   else
     return impl->syntax.range (key);
@@ -174,7 +174,7 @@ Frame::range (const symbol key) const
 const symbol 
 Frame::description (const symbol key) const
 {
-  if (impl->parent && impl->syntax.lookup (key) == Syntax::Error)
+  if (impl->parent && impl->syntax.lookup (key) == Value::Error)
     return impl->parent->description (key);
   else
     return impl->syntax.description (key);
@@ -183,7 +183,7 @@ Frame::description (const symbol key) const
 const AttributeList& 
 Frame::default_alist (const symbol key) const
 {
-  if (impl->parent && impl->syntax.lookup (key) == Syntax::Error)
+  if (impl->parent && impl->syntax.lookup (key) == Value::Error)
     return impl->parent->default_alist (key);
   else
     return impl->syntax.default_alist (key);
@@ -191,8 +191,8 @@ Frame::default_alist (const symbol key) const
 
 void 
 Frame::add (const symbol key,	// Generic.
-	    Syntax::type t, 
-	    Syntax::category cat,
+	    Value::type t, 
+	    Value::category cat,
 	    int size,
 	    const symbol description)
 { impl->syntax.add (key, t, cat, size, description); }
@@ -201,7 +201,7 @@ Frame::add (const symbol key,	// Generic.
 void 
 Frame::add (const symbol key, // Number.
 	    const symbol dim,
-	    Syntax::category cat,
+	    Value::category cat,
 	    int size,
 	    const symbol description)
 { impl->syntax.add (key, dim, cat, size, description); }
@@ -211,7 +211,7 @@ void
 Frame::add (const symbol key,
 	    const symbol dim,
 	    const Check& check,
-	    Syntax::category cat,
+	    Value::category cat,
 	    int size,
 	    const symbol description)
 { impl->syntax.add (key, dim, check, cat, size, description); }
@@ -219,7 +219,7 @@ Frame::add (const symbol key,
 
 void 
 Frame::add_fraction (const symbol key, 
-		     Syntax::category cat,
+		     Value::category cat,
 		     int size,
 		     const symbol description)
 { impl->syntax.add_fraction (key, cat, size, description); }
@@ -227,7 +227,7 @@ Frame::add_fraction (const symbol key,
 
 void 
 Frame::add_fraction (const symbol key, 
-		     Syntax::category cat,
+		     Value::category cat,
 		     const symbol description)
 { impl->syntax.add_fraction (key, cat, description); }
 
@@ -236,7 +236,7 @@ void
 Frame::add (const symbol key, // PLF.
 	    const symbol domain,
 	    const symbol range,
-	    Syntax::category cat,
+	    Value::category cat,
 	    int size,
 	    const symbol description)
 { impl->syntax.add (key, domain, range, cat, size, description); }
@@ -247,7 +247,7 @@ Frame::add (const symbol key,
 	    const symbol domain,
 	    const symbol range,
 	    const Check& check,
-	    Syntax::category cat,
+	    Value::category cat,
 	    int size,
 	    const symbol description)
 { impl->syntax.add (key, domain, range, check, cat, size, description); }
@@ -255,7 +255,7 @@ Frame::add (const symbol key,
 
 void 
 Frame::add (const symbol key, const Syntax& syntax,
-	    Syntax::category cat, int size, 
+	    Value::category cat, int size, 
 	    const symbol description)
 { impl->syntax.add (key, syntax, cat,size, description); }
 
@@ -263,13 +263,13 @@ void
 Frame::add (const symbol key, 
             const Syntax& syntax, const AttributeList& alist,	
 	    // Alist sequence with default element.
-	    Syntax::category cat, int size, const symbol description)
+	    Value::category cat, int size, const symbol description)
 { impl->syntax.add (key, syntax, alist, cat, size, description); }
 
 
 void 
 Frame::add_object (const symbol key, const char* lib,
-                   Syntax::category cat, int size, const symbol description)
+                   Value::category cat, int size, const symbol description)
 { impl->syntax.add_object (key, lib, cat, size, description); }
 
 void 
@@ -279,12 +279,12 @@ Frame::add_library (const symbol key, symbol lib)
 
 void 
 Frame::add_submodule (const symbol name, AttributeList& alist,
-		      Syntax::category cat, const symbol description,
+		      Value::category cat, const symbol description,
 		      Syntax::load_syntax_fun load_syntax)
 { impl->syntax.add_submodule (name, alist, cat, description, load_syntax); }
 
 void 
-Frame::add_submodule_sequence (const symbol name, Syntax::category cat, 
+Frame::add_submodule_sequence (const symbol name, Value::category cat, 
 			       const symbol description,
 			       Syntax::load_syntax_fun load_syntax)
 { impl->syntax.add_submodule_sequence (name, cat, description, load_syntax); }
@@ -333,7 +333,7 @@ Frame::order () const
 int 
 Frame::order_index (const symbol key) const
 {
-  if (impl->parent && impl->syntax.lookup (key) == Syntax::Error)
+  if (impl->parent && impl->syntax.lookup (key) == Value::Error)
     return impl->parent->order_index (key);
   else
     return impl->syntax.order_index (key);

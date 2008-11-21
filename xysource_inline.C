@@ -116,12 +116,12 @@ static struct XYSourceInlineSyntax
 	       "A list of x, y pairs.");
     GnuplotUtil::load_style (syntax, alist, "", "\
 By default the name of the 'x' and 'y' objects.");
-    syntax.add ("points", Syntax::Unknown (), Syntax::Unknown (), 
-		Syntax::Const, Syntax::Singleton, "\
+    syntax.add ("points", Value::Unknown (), Value::Unknown (), 
+		Value::Const, Value::Singleton, "\
 List of (x y) pairs.");
-    syntax.add ("x_dimension", Syntax::String, Syntax::Const, "\
+    syntax.add ("x_dimension", Value::String, Value::Const, "\
 Dimension for x points.");
-    syntax.add ("y_dimension", Syntax::String, Syntax::Const, "\
+    syntax.add ("y_dimension", Value::String, Value::Const, "\
 Dimension for y points.");
 
     Librarian::add_type (XYSource::component, "inline", alist, syntax, &make);

@@ -43,7 +43,7 @@ struct NumberLet : public Number
       static void load_syntax (Syntax& syntax, AttributeList& alist)
       {
         alist.add ("description", "Bind an identifier to an expression.");
-        syntax.add ("identifier", Syntax::String, Syntax::Const, 
+        syntax.add ("identifier", Value::String, Value::Const, 
                     "Identifier to bind.");
         syntax.add_object ("expr", Number::component, 
                            " Value to give it.");
@@ -135,7 +135,7 @@ struct NumberLet : public Number
     }
     static void load_syntax (Syntax& syntax, AttributeList&)
     {
-      syntax.add_submodule_sequence ("clauses", Syntax::Const, "\
+      syntax.add_submodule_sequence ("clauses", Value::Const, "\
 List of identifiers and values to bind in this scope.", Clause::load_syntax);
     }
     ScopeClause (Block& al)

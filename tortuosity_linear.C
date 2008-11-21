@@ -66,9 +66,9 @@ static struct TortuosityLinearSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Linear Impedance factor.  a + b Theta.");
-    syntax.add ("a", "cm^3/cm^3", Syntax::OptionalConst, "\
+    syntax.add ("a", "cm^3/cm^3", Value::OptionalConst, "\
 Theta offset.  By default, this corresponds to the wilting point.");
-    syntax.add ("b", Syntax::None (), Syntax::Const, "Theta factor.");
+    syntax.add ("b", Value::None (), Value::Const, "Theta factor.");
     alist.add ("b", 2.0);
     Librarian::add_type (Tortuosity::component, "linear", alist, syntax, &make);
   }

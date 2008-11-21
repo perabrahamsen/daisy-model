@@ -125,7 +125,7 @@ static struct PetFAO_PMSyntax
     alist.add ("description",
 	       "Potential evopotranspiration using Penman-Monteith.");
     Pet::load_syntax (syntax, alist);
-    syntax.add ("reference_evapotranspiration_wet", "mm/h", Syntax::LogOnly, 
+    syntax.add ("reference_evapotranspiration_wet", "mm/h", Value::LogOnly, 
                 "Reference evapotranspiration for a dry system.");
     Librarian::add_type (Pet::component, "FAO_PM", alist, syntax, &make);
   }

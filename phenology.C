@@ -58,15 +58,15 @@ void
 Phenology::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   // Variables.
-  syntax.add ("DAP", "d", Syntax::State, "Days after planting.");
+  syntax.add ("DAP", "d", Value::State, "Days after planting.");
   alist.add ("DAP", 0.0);
-  syntax.add ("DS", Syntax::None (), Syntax::State,
+  syntax.add ("DS", Value::None (), Value::State,
 	      "Development Stage.");
   alist.add ("DS", -1.0);
-  syntax.add ("partial_day_length", "h", Syntax::State,
+  syntax.add ("partial_day_length", "h", Value::State,
 	      "Number of light hours this day, so far.");
   alist.add ("partial_day_length", 0.0);
-  syntax.add ("day_length", "h", Syntax::State,
+  syntax.add ("day_length", "h", Value::State,
 	      "Number of light hours yesterday.");
   alist.add ("day_length", 0.0);
 }

@@ -232,9 +232,9 @@ VegetationPermanent::YearlyLAI::operator() (int year, int yday)
 void 
 VegetationPermanent::YearlyLAI::load_syntax (Syntax& syntax, AttributeList&)
 {
-  syntax.add ("year", Syntax::Integer, Syntax::Const, "\
+  syntax.add ("year", Value::Integer, Value::Const, "\
 Year for which to use yearly LAI measurements.");
-  syntax.add ("LAIvsDAY", "m^2/m^2", "yday", Syntax::OptionalConst, 
+  syntax.add ("LAIvsDAY", "m^2/m^2", "yday", Value::OptionalConst, 
 		"LAI as a function of Julian day.\n\
 \n\
 The default LAI will be used before the first day you specify and\n\
@@ -422,47 +422,47 @@ VegetationPermanentSyntax
     Vegetation::load_base (syntax, alist);
     alist.add ("description", "Permanent (non-crop) vegetation.");
     syntax.add ("LAIvsDAY", "m^2/m^2", "yday", Check::non_negative (),
-                Syntax::Const, 
+                Value::Const, 
 		"LAI as a function of Julian day.\n\
 These numbers are used when there are no yearly numbers (YearlyLAI).");
-    syntax.add_submodule_sequence("YearlyLAI", Syntax::Const, "\
+    syntax.add_submodule_sequence("YearlyLAI", Value::Const, "\
 Yearly LAI measurements.", VegetationPermanent::YearlyLAI::load_syntax);
     alist.add ("YearlyLAI", std::vector<const AttributeList*> ());
 
 
-    syntax.add_submodule("Canopy", alist, Syntax::State, "Canopy.",
+    syntax.add_submodule("Canopy", alist, Value::State, "Canopy.",
 			 CanopySimple::load_syntax);
-    syntax.add ("Height", "cm", Check::positive (), Syntax::Const, 
+    syntax.add ("Height", "cm", Check::positive (), Value::Const, 
 		"permanent height of vegetation.");
     alist.add ("Height", 80.0);
-    syntax.add ("N_per_LAI", "kg N/ha/LAI", Check::positive (), Syntax::Const,
+    syntax.add ("N_per_LAI", "kg N/ha/LAI", Check::positive (), Value::Const,
 		"N content as function of LAI.");
     alist.add ("N_per_LAI", 10.0);
     syntax.add ("DM_per_LAI", "Mg DM/ha/LAI", Check::positive (), 
-                Syntax::Const,
+                Value::Const,
 		"DM as function of LAI.");
     alist.add ("DM_per_LAI", 0.5);
-    syntax.add ("N_demand", "g N/m^2", Syntax::LogOnly,
+    syntax.add ("N_demand", "g N/m^2", Value::LogOnly,
 		"Current potential N content.");
-    syntax.add ("N_actual", "g N/m^2", Syntax::OptionalState,
+    syntax.add ("N_actual", "g N/m^2", Value::OptionalState,
 		"N uptake until now (default: 'N_demand').");
-    syntax.add ("N_uptake", "g N/m^2/h", Syntax::LogOnly,
+    syntax.add ("N_uptake", "g N/m^2/h", Value::LogOnly,
 		"Nitrogen uptake this hour.");
-    syntax.add ("N_litter", "g N/m^2/h", Syntax::LogOnly,
+    syntax.add ("N_litter", "g N/m^2/h", Value::LogOnly,
 		"Nitrogen in litter this hour.");
-    syntax.add_submodule_sequence ("litter_am", Syntax::Const,
+    syntax.add_submodule_sequence ("litter_am", Value::Const,
 				   "Litter AOM parameters.", AOM::load_syntax);
     syntax.add_check ("litter_am", AM::check_om_pools ());
     alist.add ("litter_am", AM::default_AM ());
-    syntax.add_submodule("Root", alist, Syntax::State, "Root system.",
+    syntax.add_submodule("Root", alist, Value::State, "Root system.",
 			 RootSystem::load_syntax);
-    syntax.add ("root_DM", "Mg DM/ha", Check::positive (), Syntax::Const, 
+    syntax.add ("root_DM", "Mg DM/ha", Check::positive (), Value::Const, 
 		"Permanent root drymatter.");
     alist.add ("root_DM", 2.0);
-    syntax.add ("Albedo", Syntax::None (), Check::positive (), Syntax::Const, 
+    syntax.add ("Albedo", Value::None (), Check::positive (), Value::Const, 
 		"Reflection factor.");
     alist.add ("Albedo", 0.2);
-    syntax.add_submodule("Litter", alist, Syntax::State, "Dead stuff.",
+    syntax.add_submodule("Litter", alist, Value::State, "Dead stuff.",
 			 Litter::load_syntax);
     
     Librarian::add_type (Vegetation::component, "permanent", alist, syntax, &make);

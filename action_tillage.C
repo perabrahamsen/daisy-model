@@ -69,10 +69,10 @@ static struct ActionMixSyntax
 Mix soil content down to the specified depth.\n\
 The effect is that nitrogen, water, temperature and such are averaged in\n\
 the interval.");
-      syntax.add ("depth", "cm", Check::negative (), Syntax::Const,
+      syntax.add ("depth", "cm", Check::negative (), Value::Const,
 		  "How far down to mix the soil (a negative number).");
       syntax.order ("depth");
-      syntax.add_fraction ("penetration", Syntax::Const, "\
+      syntax.add_fraction ("penetration", Value::Const, "\
 Fraction of organic matter on surface that are incorporated in the soil\n\
 by this operation.");
       alist.add ("penetration", 1.0);
@@ -136,9 +136,9 @@ Swap two soil layers.  The top layer start at the surface and goes down to\n\
  'depth'.  After the operation, the content (such as heat, water, and\n\
 organic matter) will be averaged in each layer, and the bottom layer will\n\
 be placed on top of what used to be the top layer.");
-      syntax.add ("middle", "cm", Check::negative (), Syntax::Const, "\
+      syntax.add ("middle", "cm", Check::negative (), Value::Const, "\
 The end of the first layer and the start of the second layer to swap.");
-      syntax.add ("depth", "cm", Check::negative (), Syntax::Const, "\
+      syntax.add ("depth", "cm", Check::negative (), Value::Const, "\
 The end of the second layer to swap.");
       Librarian::add_type (Action::component, "swap", alist, syntax, &make);
     }
@@ -184,9 +184,9 @@ static struct ActionSetPorositySyntax
       alist.add ("description", "\
 Set the porosity of the horizon at the specified depth.\n\
 To get useful results, you need to use a hydraulic model that supports this.");
-      syntax.add_fraction ("porosity", Syntax::Const, "\
+      syntax.add_fraction ("porosity", Value::Const, "\
 Non-solid fraction of soil.");
-      syntax.add ("depth", "cm", Check::non_positive (), Syntax::Const, "\
+      syntax.add ("depth", "cm", Check::non_positive (), Value::Const, "\
 A point in the horizon to modify.");
       alist.add ("depth", 0.0);
       Librarian::add_type (Action::component, "set_porosity", alist, syntax, &make);

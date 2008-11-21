@@ -67,10 +67,10 @@ static struct ABAEffectexpSyntax
   { return *new ABAEffect_exp (al); }
   static void load_syntax (Syntax& syntax, AttributeList& alist)
   {
-    syntax.add ("k", "cm^3/g", Check::non_negative (), Syntax::Const,
+    syntax.add ("k", "cm^3/g", Check::non_negative (), Value::Const,
                 "Coefficient");
     alist.add ("k", 0.0);
-    syntax.add ("alpha", Syntax::None(), Check::non_negative (), Syntax::Const,
+    syntax.add ("alpha", Value::None(), Check::non_negative (), Value::Const,
                 "Coefficient");
     alist.add ("alpha", 1.0);
   }  

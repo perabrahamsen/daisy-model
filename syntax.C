@@ -34,17 +34,13 @@
 #include <map>
 #include <algorithm>
 
-const int Syntax::Singleton = -117;
-const int Syntax::Sequence = -3212;
-const int Syntax::Unspecified = -666;
-
 struct Syntax::Implementation
 {
   std::vector<check_fun> checker;
   std::vector<check_object> object_checker;
   std::vector<symbol> order;
-  typedef std::map<symbol, type> type_map;
-  typedef std::map<symbol, category> status_map;
+  typedef std::map<symbol, Value::type> type_map;
+  typedef std::map<symbol, Value::category> status_map;
   typedef std::map<symbol, const Syntax*> syntax_map;
   typedef std::map<symbol, int> size_map;
   typedef std::map<symbol, symbol> library_map;
@@ -67,7 +63,7 @@ struct Syntax::Implementation
 
   bool check (const Metalib&, const AttributeList& vl, Treelog& err);
   void check (const symbol key, double value) const;
-  Syntax::type lookup (const symbol key) const;
+  Value::type lookup (const symbol key) const;
   int order_number (const symbol name) const;
   void entries (std::vector<symbol>& result) const;
   Implementation ()
@@ -119,7 +115,7 @@ Syntax::Implementation::check (const Metalib& metalib,
         continue;
       else if (!vl.check (key))
 	{
-	  if (status[key] == Const || status[key] == State)
+	  if (status[key] == Value::Const || status[key] == Value::State)
 	    {
 	      msg.error (key + " missing");
 	      error = true;
@@ -131,7 +127,7 @@ Syntax::Implementation::check (const Metalib& metalib,
       // vcheck_map::const_iterator i = val_checks.find (key);
       
       // Spcial handling of various types.
-      if (types[key] == Number)
+      if (types[key] == Value::Number)
 	{
 	  // This should already be checked by the file parser, but you
 	  // never know... better safe than sorry...  don't drink and
@@ -144,7 +140,7 @@ Syntax::Implementation::check (const Metalib& metalib,
 	    {
 	      const Check *const check = (*i).second;
 
-	      if (size[key] != Singleton)
+	      if (size[key] != Value::Singleton)
 		{
 		  const std::vector<double>& array = vl.number_sequence (key);
 		  for (unsigned int i = 0; i < array.size (); i++)
@@ -167,8 +163,8 @@ Syntax::Implementation::check (const Metalib& metalib,
 		}
 	    }
 	}
-      else if (types[key] == Object)
-	if (size[key] != Singleton)
+      else if (types[key] == Value::Object)
+	if (size[key] != Value::Singleton)
 	  {
 	    const ::Library& lib = metalib.library (libraries[key]);
 	    const std::vector<const AttributeList*>& seq = vl.alist_sequence (key);
@@ -221,10 +217,10 @@ Syntax::Implementation::check (const Metalib& metalib,
 		  error = true;
 	      }
 	  }
-      else if (types[key] == AList)
-	if (size[key] != Singleton)
+      else if (types[key] == Value::AList)
+	if (size[key] != Value::Singleton)
 	  {
-	    daisy_assert (vl.size (key) != Syntax::Singleton);
+	    daisy_assert (vl.size (key) != Value::Singleton);
 	    const std::vector<const AttributeList*>& seq = vl.alist_sequence (key);
 	    int j_index = 0;
 	    for (std::vector<const AttributeList*>::const_iterator j = seq.begin ();
@@ -282,13 +278,13 @@ Syntax::Implementation::check (const symbol key, const double value) const
 }
 
 
-Syntax::type 
+Value::type 
 Syntax::Implementation::lookup (const symbol key) const
 {
   type_map::const_iterator i = types.find (key);
 
   if (i == types.end ())
-    return Syntax::Error;
+    return Value::Error;
   else
     return (*i).second;
 }
@@ -316,88 +312,6 @@ Syntax::Implementation::entries (std::vector<symbol>& result) const
       
       if (order_number (name) < 0)
 	result.push_back (name);
-    }
-}
-
-// Each syntax entry should have an associated type.
-
-symbol
-Syntax::type_name (type t)
-{
-  static const symbol names[] = 
-    { "Number", "AList", "PLF", "Boolean", "String",
-      "Integer", "Object", "Library", "Error" };
-  daisy_assert (t >= 0);
-  daisy_assert (t < sizeof (names) / sizeof (symbol));
-  return names[t];
-}
-
-Syntax::type operator++ (Syntax::type& t)
-{ 
-  t = static_cast<Syntax::type> (static_cast<int> (t) + 1);
-  return t;
-}
-
-Syntax::type
-Syntax::type_number (const symbol name)
-{ 
-  for (type i = Number; i != Error; ++i)
-    if (name == type_name (i))
-      return i;
-  return Error;
-}
-
-symbol
-Syntax::Unknown ()
-{
-  static const symbol unknown ("<unknown>");
-  return unknown; 
-}
-
-symbol
-Syntax::None ()
-{
-  static const symbol unit ("<none>");
-  return unit;
-}
-
-symbol
-Syntax::Fraction ()
-{
-  static const symbol unit ("<fraction>");
-  return unit; 
-}
-
-symbol
-Syntax::User ()
-{
-  static const symbol unit ("<user>");
-  return unit; 
-}
-
-symbol 
-Syntax::category_name (category c)
-{ 
-  static const symbol names[] = 
-    { "Const", "State", "OptionalState", "OptionalConst", "LogOnly"};
-
-  daisy_assert (c >= 0);
-  daisy_assert (c < sizeof (names) / sizeof (symbol));
-  return names[c]; 
-}
-
-int
-Syntax::category_number (const symbol name)
-{ 
-  static const symbol category_end ("LogOnly");
-
-  for (int i = 0;; i++)
-    {
-      const symbol entry = category_name (category (i));
-      if (name == entry)
-        return i;
-      else if (entry == category_end)
-        return -1;
     }
 }
 
@@ -434,7 +348,7 @@ Syntax::check (const Metalib& metalib, const AttributeList& vl,
   return ok;
 }
 
-Syntax::type 
+Value::type 
 Syntax::lookup (const symbol key) const
 { return impl->lookup (key); }
 
@@ -444,8 +358,8 @@ Syntax::is_const (const symbol key) const
   if (impl->status.find (key) == impl->status.end ())
     return false;
 
-  return (impl->status[key] == Const
-	  || impl->status[key] == OptionalConst);
+  return (impl->status[key] == Value::Const
+	  || impl->status[key] == Value::OptionalConst);
 }
 
 bool
@@ -454,8 +368,8 @@ Syntax::is_state (const symbol key) const
   if (impl->status.find (key) == impl->status.end ())
     return false;
 
-  return (impl->status[key] == State
-	  || impl->status[key] == OptionalState);
+  return (impl->status[key] == Value::State
+	  || impl->status[key] == Value::OptionalState);
 }
 
 bool
@@ -464,8 +378,8 @@ Syntax::is_optional (const symbol key) const
   if (impl->status.find (key) == impl->status.end ())
     return false;
 
-  return (impl->status[key] == OptionalState 
-	  || impl->status[key] == OptionalConst);
+  return (impl->status[key] == Value::OptionalState 
+	  || impl->status[key] == Value::OptionalConst);
 }
 
 bool
@@ -474,7 +388,7 @@ Syntax::is_log (const symbol key) const
   if (impl->status.find (key) == impl->status.end ())
     return false;
   
-  return impl->status[key] == LogOnly;
+  return impl->status[key] == Value::LogOnly;
 }
 
 const Syntax&
@@ -508,7 +422,7 @@ Syntax::dimension (const symbol key) const
   Implementation::string_map::const_iterator i = impl->dimensions.find (key);
 
   if (i == impl->dimensions.end ())
-    return Unknown ();
+    return Value::Unknown ();
   else
     return (*i).second;
 }
@@ -519,7 +433,7 @@ Syntax::domain (const symbol key) const
   Implementation::string_map::const_iterator i = impl->domains.find (key);
 
   if (i == impl->domains.end ())
-    return Unknown ();
+    return Value::Unknown ();
   else
     return (*i).second;
 }
@@ -534,7 +448,7 @@ Syntax::description (const symbol key) const
   Implementation::string_map::const_iterator i = impl->descriptions.find (key);
 
   if (i == impl->descriptions.end ())
-    return Unknown ();
+    return Value::Unknown ();
   else
     return (*i).second;
 }
@@ -565,7 +479,7 @@ Syntax::total_order () const
        i != impl->status.end ();
        i++)
     {
-      if ((*i).second != LogOnly)
+      if ((*i).second != Value::LogOnly)
 	non_logs++;
     }
   return impl->order.size () == non_logs; 
@@ -585,29 +499,29 @@ Syntax::default_alist (const symbol key) const
 }
 
 void
-Syntax::add (const symbol key, type t, category req, int s, const symbol d)
+Syntax::add (const symbol key, Value::type t, Value::category req, int s, const symbol d)
 {
   if (impl->size.find (key) != impl->size.end ())
     daisy_panic ("'" + key + "': already defined in syntax");
   impl->size[key] = s;
   impl->types[key] = t;
   impl->status[key] = req;
-  if (d != Unknown ())
+  if (d != Value::Unknown ())
     impl->descriptions[key] = d;
 }
 
 void
-Syntax::add (const symbol key, const symbol dim, category req, int sz,
+Syntax::add (const symbol key, const symbol dim, Value::category req, int sz,
 	     const symbol d)
 {
-  add (key, Number, req, sz, d);
-  if (d != Unknown ())
+  add (key, Value::Number, req, sz, d);
+  if (d != Value::Unknown ())
     impl->dimensions[key] = dim;
 }
 
 void
 Syntax::add (const symbol key, const symbol dim, const Check& check,
-	     category req, int sz, const symbol d)
+	     Value::category req, int sz, const symbol d)
 {
   add (key, dim, req, sz, d);
   impl->num_checks[key] = &check;
@@ -615,47 +529,47 @@ Syntax::add (const symbol key, const symbol dim, const Check& check,
 
 void 
 Syntax::add_fraction (const symbol key, 
-		      category cat,
+		      Value::category cat,
 		      int size,
 		      const symbol description)
-{ add (key, Fraction (), Check::fraction (), cat, size, description); } 
+{ add (key, Value::Fraction (), Check::fraction (), cat, size, description); } 
 
 void 
 Syntax::add_fraction (const symbol key, 
-		      category cat,
+		      Value::category cat,
 		      const symbol description)
-{ add (key, Fraction (), Check::fraction (), cat, Singleton, description); } 
+{ add (key, Value::Fraction (), Check::fraction (), cat, Value::Singleton, description); } 
 
 void
 Syntax::add (const symbol key, const symbol dom, const symbol ran, 
-	     category req, int sz, const symbol d)
+	     Value::category req, int sz, const symbol d)
 {
-  add (key, PLF, req, sz, d);
-  if (dom != Unknown ())
+  add (key, Value::PLF, req, sz, d);
+  if (dom != Value::Unknown ())
     impl->domains[key] = dom;
-  if (ran != Unknown ())
+  if (ran != Value::Unknown ())
     impl->dimensions[key] = ran;
 }
 
 void
 Syntax::add (const symbol key, const symbol dom, const symbol ran, 
-	     const Check& check, category req, int sz, const symbol d)
+	     const Check& check, Value::category req, int sz, const symbol d)
 {
   add (key, dom, ran, req, sz, d);
   impl->num_checks[key] = &check;
 }
 
 void
-Syntax::add (const symbol key, const Syntax& s, category req, int sz,
+Syntax::add (const symbol key, const Syntax& s, Value::category req, int sz,
 	     const symbol d)
 {
-  add (key, AList, req, sz, d);
+  add (key, Value::AList, req, sz, d);
   impl->syntax[key] = &s;
 }
 
 void
 Syntax::add (const symbol key, const Syntax& s, const AttributeList& al,
-	     category req, int sz, const symbol d)
+	     Value::category req, int sz, const symbol d)
 {
   add (key, s, req, sz, d);
   impl->alists[key] = new AttributeList (al);
@@ -663,27 +577,27 @@ Syntax::add (const symbol key, const Syntax& s, const AttributeList& al,
 
 void 
 Syntax::add_object (const symbol key, const char *const l,
-                    category req, int s, const symbol d)
+                    Value::category req, int s, const symbol d)
 { add_object (key, symbol (l), req, s, d); }
 
 void 
 Syntax::add_object (const symbol key, const symbol l,
-                    category req, int s, const symbol d)
+                    Value::category req, int s, const symbol d)
 {
-  add (key, Object, req, s, d);
+  add (key, Value::Object, req, s, d);
   impl->libraries[key] = l;
 }
 
 void 
 Syntax::add_library (const symbol key, const symbol l)
 {
-  add (key, Library, OptionalConst, None ());
+  add (key, Value::Library, Value::OptionalConst, Value::None ());
   impl->libraries[key] = l;
 }
 
 void 
 Syntax::add_submodule (const symbol name, AttributeList& alist,
-		       Syntax::category cat, const symbol description,
+		       Value::category cat, const symbol description,
 		       load_syntax_fun load_syntax)
 {
     Syntax& s = *new Syntax ();
@@ -715,22 +629,22 @@ Syntax::add_submodule (const symbol name, AttributeList& alist,
     // 
     // The solution is to treat the three cases separately.
 
-    if (cat == Syntax::LogOnly)
+    if (cat == Value::LogOnly)
       // Log only, ignore default value.
-      add (name, s, cat, Syntax::Singleton, description);
-    else if (cat == Syntax::Const || cat == Syntax::State)
+      add (name, s, cat, Value::Singleton, description);
+    else if (cat == Value::Const || cat == Value::State)
       {
 	// Mandatory, store in alist.
-	add (name, s, cat, Syntax::Singleton, description);
+	add (name, s, cat, Value::Singleton, description);
 	alist.add (name, a);
       }
     else
       // Optional, store as default_alist.
-      add (name, s, a, cat, Syntax::Singleton, description);
+      add (name, s, a, cat, Value::Singleton, description);
 }
 
 void 
-Syntax::add_submodule_sequence (const symbol name, Syntax::category cat, 
+Syntax::add_submodule_sequence (const symbol name, Value::category cat, 
 				const symbol description,
 				load_syntax_fun load_syntax)
 {
@@ -738,12 +652,12 @@ Syntax::add_submodule_sequence (const symbol name, Syntax::category cat,
     AttributeList a;
     (*load_syntax) (s, a);
 
-    if (cat == Syntax::LogOnly)
+    if (cat == Value::LogOnly)
       // No default value for log only variables.
-      add (name, s, cat, Syntax::Sequence, description);
+      add (name, s, cat, Value::Sequence, description);
     else
       // With default value for sequence members.
-      add (name, s, a, cat, Syntax::Sequence, description);
+      add (name, s, a, cat, Value::Sequence, description);
 }
 
 void 

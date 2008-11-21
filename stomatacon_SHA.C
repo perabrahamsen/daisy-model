@@ -77,19 +77,19 @@ static struct StomataConSHASyntax
   { return *new StomataCon_SHA (al); }
   static void load_syntax (Syntax& syntax, AttributeList& alist)
   {
-    syntax.add ("lambda", Syntax::None (), Check::non_negative (), Syntax::Const,
+    syntax.add ("lambda", Value::None (), Check::non_negative (), Value::Const,
                 "Coefficient");
     alist.add ("lambda", 1.0);
 
-    syntax.add ("alpha", Syntax::None (), Check::non_negative (), Syntax::Const,
+    syntax.add ("alpha", Value::None (), Check::non_negative (), Value::Const,
                 "Coefficient");
     alist.add ("alpha", 1.0);
 
-    syntax.add ("Amax", "[mol/m²leaf/s]", Check::non_negative (), Syntax::Const,
+    syntax.add ("Amax", "[mol/m²leaf/s]", Check::non_negative (), Value::Const,
                 "Max photosynthesis");
     alist.add ("Amax", 1.0);
 
-    syntax.add ("M", "[mol/m²leaf/s]", Check::non_negative (), Syntax::Const,
+    syntax.add ("M", "[mol/m²leaf/s]", Check::non_negative (), Value::Const,
                 "Parameter ??");
     alist.add ("M", 1.0);
   }  

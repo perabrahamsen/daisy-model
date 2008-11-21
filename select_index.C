@@ -55,7 +55,7 @@ static struct SelectIndexSyntax
     SelectValue::load_syntax (syntax, alist);
 
     alist.add ("description", "Extract content at specified array index.");
-    syntax.add ("index", Syntax::Integer, Syntax::Const,
+    syntax.add ("index", Value::Integer, Value::Const,
 		"Specify array index to select.");
 
     Librarian::add_type (Select::component, "index", alist, syntax, &make);

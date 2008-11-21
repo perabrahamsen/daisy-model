@@ -625,178 +625,178 @@ Production::load_syntax (Syntax& syntax, AttributeList& alist)
 Crop production in the default crop model.");
 
   // Remobilization.
-  syntax.add ("ShldResC", Syntax::Fraction (), Syntax::Const,
+  syntax.add ("ShldResC", Value::Fraction (), Value::Const,
 	      "Capacity of shielded reserves (fraction of stem DM).");
   alist.add ("ShldResC", 0.0);
-  syntax.add ("ReMobilDS", Syntax::None (), Syntax::Const,
+  syntax.add ("ReMobilDS", Value::None (), Value::Const,
 	      "Remobilization, Initial DS.");
   alist.add ("ReMobilDS", 1.20);
-  syntax.add ("ReMobilRt", "d^-1", Syntax::Const,
+  syntax.add ("ReMobilRt", "d^-1", Value::Const,
 	      "Remobilization, release rate.");
   alist.add ("ReMobilRt", 0.1);
-  syntax.add ("StemRes", "g DM/m^2", Syntax::State,
+  syntax.add ("StemRes", "g DM/m^2", Value::State,
 	      "Shielded reserves in stems.");
   alist.add ("StemRes", 0.0);
 
   // Parameters.
-  syntax.add ("CH2OReleaseRate", "h^-1", Syntax::Const,
+  syntax.add ("CH2OReleaseRate", "h^-1", Value::Const,
 	      "CH2O Release Rate constant.");
   alist.add ("CH2OReleaseRate", 0.04);
-  syntax.add ("E_Root", Syntax::None (), Syntax::Const,
+  syntax.add ("E_Root", Value::None (), Value::Const,
 	      "Conversion efficiency, root.");
   alist.add ("E_Root", 0.69);
-  syntax.add ("E_Leaf", Syntax::None (), Syntax::Const,
+  syntax.add ("E_Leaf", Value::None (), Value::Const,
 	      "Conversion efficiency, leaf.");
   alist.add ("E_Leaf", 0.68);
-  syntax.add ("E_Stem", Syntax::None (), Syntax::Const,
+  syntax.add ("E_Stem", Value::None (), Value::Const,
 	      "Conversion efficiency, stem.");
   alist.add ("E_Stem", 0.66);
-  syntax.add ("E_SOrg", Syntax::None (), Syntax::Const,
+  syntax.add ("E_SOrg", Value::None (), Value::Const,
 	      "Conversion efficiency, storage organ.");
-  syntax.add ("r_Root", Syntax::None (), Syntax::Const,
+  syntax.add ("r_Root", Value::None (), Value::Const,
 	      "Maintenance respiration coefficient, root.");
   alist.add ("r_Root", 0.015);
-  syntax.add ("r_Leaf", "d^-1", Syntax::Const,
+  syntax.add ("r_Leaf", "d^-1", Value::Const,
 	      "Maintenance respiration coefficient, leaf.");
-  syntax.add ("r_Stem", "d^-1", Syntax::Const,
+  syntax.add ("r_Stem", "d^-1", Value::Const,
 	      "Maintenance respiration coefficient, stem.");
-  syntax.add ("r_SOrg", "d^-1", Syntax::Const,
+  syntax.add ("r_SOrg", "d^-1", Value::Const,
 	      "Maintenance respiration coefficient, storage organ.");
-  syntax.add ("ExfoliationFac", Syntax::None (), Syntax::Const,
+  syntax.add ("ExfoliationFac", Value::None (), Value::Const,
 	      "Exfoliation factor, 0-1.");
   alist.add ("ExfoliationFac", 1.0);
-  syntax.add ("LfDR", "DS", " d^-1", Syntax::Const,
+  syntax.add ("LfDR", "DS", " d^-1", Value::Const,
 	      "Death rate of Leafs.");
-  syntax.add ("RtDR", "DS", " d^-1", Syntax::Const,
+  syntax.add ("RtDR", "DS", " d^-1", Value::Const,
 	      "Death rate of Roots.");
-  syntax.add ("Large_RtDR", "d^-1", Syntax::Const,
+  syntax.add ("Large_RtDR", "d^-1", Value::Const,
 	      "Extra death rate for large root/shoot.");
   alist.add ("Large_RtDR", 0.05);
-  syntax.add ("RtDR_T_factor", "dg C", Syntax::None (), Syntax::Const,
+  syntax.add ("RtDR_T_factor", "dg C", Value::None (), Value::Const,
 	      "Temperature dependent factor for root death rate.");
   PLF none;
   none.add (  0.0, 1.0);
   none.add (100.0, 1.0);
   alist.add ("RtDR_T_factor", none);
-  syntax.add ("IntDSRelRtRes", Syntax::None (), Syntax::Const,
+  syntax.add ("IntDSRelRtRes", Value::None (), Value::Const,
 	      "Initial DS for the release of root reserves.");
   alist.add ("IntDSRelRtRes", 0.80);
-  syntax.add ("EndDSRelRtRes", Syntax::None (), Syntax::Const,
+  syntax.add ("EndDSRelRtRes", Value::None (), Value::Const,
 	      "End DS for the release of root reserves.");
   alist.add ("EndDSRelRtRes", 0.80);
-  syntax.add ("RelRateRtRes", "d^-1", Syntax::Const,
+  syntax.add ("RelRateRtRes", "d^-1", Value::Const,
 	      "Release rate of root reserves.");
   alist.add ("RelRateRtRes", 0.05);
-  syntax.add ("LfRtRelRtRes", Syntax::None (), Syntax::Const,
+  syntax.add ("LfRtRelRtRes", Value::None (), Value::Const,
 	      "Max Leaf:Root for the release of root res.");
   alist.add ("LfRtRelRtRes", 0.80);
 
   // Variables.
-  syntax.add ("CH2OPool", "g CH2O/m^2", Syntax::State, "CH2O Pool.");
+  syntax.add ("CH2OPool", "g CH2O/m^2", Value::State, "CH2O Pool.");
   alist.add ("CH2OPool", 0.001);
-  syntax.add ("WLeaf", "g DM/m^2", Syntax::State, "Leaf dry matter weight.");
+  syntax.add ("WLeaf", "g DM/m^2", Value::State, "Leaf dry matter weight.");
   alist.add ("WLeaf", 0.001);
-  syntax.add ("WStem", "g DM/m^2", Syntax::State, "Stem dry matter weight.");
+  syntax.add ("WStem", "g DM/m^2", Value::State, "Stem dry matter weight.");
   alist.add ("WStem", 0.000);
-  syntax.add ("WRoot", "g DM/m^2", Syntax::State, "Root dry matter weight.");
+  syntax.add ("WRoot", "g DM/m^2", Value::State, "Root dry matter weight.");
   alist.add ("WRoot", 0.001);
-  syntax.add ("WSOrg", "g DM/m^2", Syntax::State,
+  syntax.add ("WSOrg", "g DM/m^2", Value::State,
 	      "Storage organ dry matter weight.");
   alist.add ("WSOrg", 0.000);
-  syntax.add ("WDead", "g DM/m^2", Syntax::State,
+  syntax.add ("WDead", "g DM/m^2", Value::State,
 	      "Dead leaves dry matter weight.");
   alist.add ("WDead", 0.000);
-  syntax.add ("CLeaf", "g C/m^2", Syntax::LogOnly, "Leaf C weight.");
-  syntax.add ("CStem", "g C/m^2", Syntax::LogOnly, "Stem C weight.");
-  syntax.add ("CRoot", "g C/m^2", Syntax::LogOnly, "Root C weight.");
-  syntax.add ("CSOrg", "g C/m^2", Syntax::LogOnly, "Storage organ C weight.");
-  syntax.add ("CDead", "g C/m^2", Syntax::LogOnly, "Dead leaves C weight.");
-  syntax.add ("CCrop", "g C/m^2", Syntax::LogOnly, "Crop C weight.");
-  syntax.add ("NLeaf", "g N/m^2", Syntax::State,
+  syntax.add ("CLeaf", "g C/m^2", Value::LogOnly, "Leaf C weight.");
+  syntax.add ("CStem", "g C/m^2", Value::LogOnly, "Stem C weight.");
+  syntax.add ("CRoot", "g C/m^2", Value::LogOnly, "Root C weight.");
+  syntax.add ("CSOrg", "g C/m^2", Value::LogOnly, "Storage organ C weight.");
+  syntax.add ("CDead", "g C/m^2", Value::LogOnly, "Dead leaves C weight.");
+  syntax.add ("CCrop", "g C/m^2", Value::LogOnly, "Crop C weight.");
+  syntax.add ("NLeaf", "g N/m^2", Value::State,
 	      "Nitrogen stored in the leaves.");
   alist.add ("NLeaf", 0.000);
-  syntax.add ("NStem", "g N/m^2", Syntax::State,
+  syntax.add ("NStem", "g N/m^2", Value::State,
 	      "Nitrogen stored in the stem.");
   alist.add ("NStem", 0.000);
-  syntax.add ("NRoot", "g N/m^2", Syntax::State,
+  syntax.add ("NRoot", "g N/m^2", Value::State,
 	      "Nitrogen stored in the roots.");
   alist.add ("NRoot", 0.000);
-  syntax.add ("NSOrg", "g N/m^2", Syntax::State,
+  syntax.add ("NSOrg", "g N/m^2", Value::State,
 	      "Nitrogen stored in the storage organ.");
   alist.add ("NSOrg", 0.000);
-  syntax.add ("NDead", "g N/m^2", Syntax::State,
+  syntax.add ("NDead", "g N/m^2", Value::State,
 	      "Nitrogen stored in dead leaves.");
   alist.add ("NDead", 0.000);
-  syntax.add ("NCrop", "g N/m^2", Syntax::OptionalState,
+  syntax.add ("NCrop", "g N/m^2", Value::OptionalState,
 	      "Total crop nitrogen content.\n\
 By default, this will start as the amount of N in the seed.");
-  syntax.add ("C_AM", "g C/m^2", Syntax::State,
+  syntax.add ("C_AM", "g C/m^2", Value::State,
 	      "Added C in plant material.");
   alist.add ("C_AM", 0.000);
-  syntax.add ("N_AM", "g N/m^2", Syntax::State,
+  syntax.add ("N_AM", "g N/m^2", Value::State,
 	      "Added N in plant material.");
   alist.add ("N_AM", 0.000);
   
   // Auxiliary.
-  syntax.add ("PotCanopyAss", "g CH2O/m^2/h", Syntax::LogOnly,
+  syntax.add ("PotCanopyAss", "g CH2O/m^2/h", Value::LogOnly,
 	      "Potential canopy assimilation, i.e. stressfree production.");
-  syntax.add ("CanopyAss", "g CH2O/m^2/h", Syntax::LogOnly,
+  syntax.add ("CanopyAss", "g CH2O/m^2/h", Value::LogOnly,
 	      "Canopy assimilation.");
-  syntax.add ("NetPhotosynthesis", "g CO2/m^2/h", Syntax::LogOnly,
+  syntax.add ("NetPhotosynthesis", "g CO2/m^2/h", Value::LogOnly,
 	      "Net Photosynthesis.");
-  syntax.add ("AccNetPhotosynthesis", "g CO2/m^2", Syntax::LogOnly,
+  syntax.add ("AccNetPhotosynthesis", "g CO2/m^2", Value::LogOnly,
 	      "Accumulated Net Photosynthesis.");
-  syntax.add ("Respiration", "g CH2O/m^2/h", Syntax::LogOnly,
+  syntax.add ("Respiration", "g CH2O/m^2/h", Value::LogOnly,
 	      "Crop Respiration.");
-  syntax.add ("MaintRespiration", "g CH2O/m^2/h", Syntax::LogOnly,
+  syntax.add ("MaintRespiration", "g CH2O/m^2/h", Value::LogOnly,
 	      "Maintenance Respiration.");
-  syntax.add ("GrowthRespiration", "g CH2O/m^2/h", Syntax::LogOnly,
+  syntax.add ("GrowthRespiration", "g CH2O/m^2/h", Value::LogOnly,
 	      "Growth Respiration.");
-  syntax.add ("LeafRespiration", "g CO2/m^2/h", Syntax::LogOnly,
+  syntax.add ("LeafRespiration", "g CO2/m^2/h", Value::LogOnly,
 	      "Total Leaf Respiration.");
-  syntax.add ("StemRespiration", "g CO2/m^2/h", Syntax::LogOnly,
+  syntax.add ("StemRespiration", "g CO2/m^2/h", Value::LogOnly,
 	      "Total Stem Respiration.");
-  syntax.add ("SOrgRespiration", "g CO2/m^2/h", Syntax::LogOnly,
+  syntax.add ("SOrgRespiration", "g CO2/m^2/h", Value::LogOnly,
 	      "Total SOrg Respiration.");
-  syntax.add ("RootRespiration", "g CO2/m^2/h", Syntax::LogOnly,
+  syntax.add ("RootRespiration", "g CO2/m^2/h", Value::LogOnly,
 	      "Total Root Respiration.");
-  syntax.add ("LeafMaintRespiration", "g CO2/m^2/h", Syntax::LogOnly,
+  syntax.add ("LeafMaintRespiration", "g CO2/m^2/h", Value::LogOnly,
 	      "Leaf Maintenance Respiration.");
-  syntax.add ("StemMaintRespiration", "g CO2/m^2/h", Syntax::LogOnly,
+  syntax.add ("StemMaintRespiration", "g CO2/m^2/h", Value::LogOnly,
 	      "Stem Maintenance Respiration.");
-  syntax.add ("SOrgMaintRespiration", "g CO2/m^2/h", Syntax::LogOnly,
+  syntax.add ("SOrgMaintRespiration", "g CO2/m^2/h", Value::LogOnly,
 	      "SOrg Maintenance Respiration.");
-  syntax.add ("RootMaintRespiration", "g CO2/m^2/h", Syntax::LogOnly,
+  syntax.add ("RootMaintRespiration", "g CO2/m^2/h", Value::LogOnly,
 	      "Root Maintenance Respiration.");
-  syntax.add ("LeafGrowthRespiration", "g CO2/m^2/h", Syntax::LogOnly,
+  syntax.add ("LeafGrowthRespiration", "g CO2/m^2/h", Value::LogOnly,
 	      "Leaf Growth Respiration.");
-  syntax.add ("StemGrowthRespiration", "g CO2/m^2/h", Syntax::LogOnly,
+  syntax.add ("StemGrowthRespiration", "g CO2/m^2/h", Value::LogOnly,
 	      "Stem Growth Respiration.");
-  syntax.add ("SOrgGrowthRespiration", "g CO2/m^2/h", Syntax::LogOnly,
+  syntax.add ("SOrgGrowthRespiration", "g CO2/m^2/h", Value::LogOnly,
 	      "SOrg Growth Respiration.");
-  syntax.add ("RootGrowthRespiration", "g CO2/m^2/h", Syntax::LogOnly,
+  syntax.add ("RootGrowthRespiration", "g CO2/m^2/h", Value::LogOnly,
 	      "Root Growth Respiration.");
-  syntax.add ("IncWLeaf", "g DM/m^2/h", Syntax::LogOnly,
+  syntax.add ("IncWLeaf", "g DM/m^2/h", Value::LogOnly,
 	      "Leaf growth.");
-  syntax.add ("IncWStem", "g DM/m^2/h", Syntax::LogOnly,
+  syntax.add ("IncWStem", "g DM/m^2/h", Value::LogOnly,
 	      "Stem growth.");
-  syntax.add ("IncWSOrg", "g DM/m^2/h", Syntax::LogOnly,
+  syntax.add ("IncWSOrg", "g DM/m^2/h", Value::LogOnly,
 	      "Storage organ growth.");
-  syntax.add ("IncWRoot", "g DM/m^2/h", Syntax::LogOnly,
+  syntax.add ("IncWRoot", "g DM/m^2/h", Value::LogOnly,
 	      "Root growth.");
-  syntax.add ("DeadWLeaf", "g DM/m^2/h", Syntax::LogOnly,
+  syntax.add ("DeadWLeaf", "g DM/m^2/h", Value::LogOnly,
 	      "Leaf DM removed.");
-  syntax.add ("DeadNLeaf", "g N/m2/h", Syntax::LogOnly,
+  syntax.add ("DeadNLeaf", "g N/m2/h", Value::LogOnly,
 	      "Leaf N removed.");
-  syntax.add ("DeadWRoot", "g DM/m^2/h", Syntax::LogOnly,
+  syntax.add ("DeadWRoot", "g DM/m^2/h", Value::LogOnly,
 	      "Root DM removed.");
-  syntax.add ("DeadNRoot", "g N/m2/h", Syntax::LogOnly,
+  syntax.add ("DeadNRoot", "g N/m2/h", Value::LogOnly,
 	      "Root N removed.");
-  syntax.add ("C_Loss", "g C/m^2/h", Syntax::LogOnly,"C lost from the crop");
-  syntax.add ("DailyNetRoot", "g DM/m^2", Syntax::State,
+  syntax.add ("C_Loss", "g C/m^2/h", Value::LogOnly,"C lost from the crop");
+  syntax.add ("DailyNetRoot", "g DM/m^2", Value::State,
 	      "Root growth minus root respiration so far this day.");
   alist.add ("DailyNetRoot", 0.0);
-  syntax.add ("DailyNetLeaf", "g DM/m^2", Syntax::State,
+  syntax.add ("DailyNetLeaf", "g DM/m^2", Value::State,
 	      "Leaf growth minus leaf respiration so far this day.");
   alist.add ("DailyNetLeaf", 0.0);
 }

@@ -216,17 +216,17 @@ void
 Biopore::load_base (Syntax& syntax, AttributeList&)
 {
   syntax.add_object ("density", Number::component, 
-                       Syntax::Const, Syntax::Singleton, "\
+                       Value::Const, Value::Singleton, "\
 Biopore density [cm^-2] as a function of 'x' [cm].");
-  syntax.add ("height_start", "cm", Check::non_positive (), Syntax::Const, 
+  syntax.add ("height_start", "cm", Check::non_positive (), Value::Const, 
 	      "Biopores starts at this depth (a negative number).");
-  syntax.add ("height_end", "cm", Check::non_positive (), Syntax::Const, 
+  syntax.add ("height_end", "cm", Check::non_positive (), Value::Const, 
 	      "Biopores ends at this depth (a negative number).");
   syntax.add ("diameter", "cm", Check::positive (),
-              Syntax::Const, "Biopore diameter.");
-  syntax.add ("S", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+              Value::Const, "Biopore diameter.");
+  syntax.add ("S", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
 	      "Sink from matrix domain to biopore.");
-  syntax.add ("infiltration", "cm/h", Syntax::LogOnly, "\
+  syntax.add ("infiltration", "cm/h", Value::LogOnly, "\
 Surface infiltration.");
 }
 

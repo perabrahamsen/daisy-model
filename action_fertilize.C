@@ -108,12 +108,12 @@ void
 ActionFertilize::Precision::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   syntax.add_check (&check_alist);
-  syntax.add ("target", "kg N/ha", Syntax::Const, 
+  syntax.add ("target", "kg N/ha", Value::Const, 
 	      "How much N you want.");
-  syntax.add ("from", "cm", Syntax::Const, "\
+  syntax.add ("from", "cm", Value::Const, "\
 Height where you want to start measuring (a negative number).");
   alist.add ("from", 0.0);
-  syntax.add ("to", "cm", Syntax::Const, "\
+  syntax.add ("to", "cm", Value::Const, "\
 Height where you want to end measuring (a negative number).");
   alist.add ("to", -100.0);
   syntax.order ("target");
@@ -258,23 +258,23 @@ ActionFertilize::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add_object ("am", AM::component, "\
 The fertilizer you want to apply.");
   syntax.add ("equivalent_weight", "kg N/ha", Check::non_negative (),
-              Syntax::OptionalConst, 
+              Value::OptionalConst, 
               "\
 When fertilizing with organic matter, you may let Daisy calculate the\n\
 amount of dry matter that corresponds to the specified amount of\n\
 nitrogen.  This requires that the fertilizer has specified the\n\
 'first_year_utilization' parameter, but not the 'weight' parameter.");
   syntax.add ("minimum_weight", "kg N/ha", Check::non_negative (),
-              Syntax::Const,
+              Value::Const,
               "Minimum amount of nitrogen to fertilize with.");
   alist.add ("minimum_weight", 0.0);
   syntax.add_submodule ("precision", alist, 
-                        Syntax::OptionalConst, "\
+                        Value::OptionalConst, "\
 Let the amount of fertilizer depend on the inorganic nitrogen in the soil.\n\
 The amount of fertilizer will be the specified 'target', minus the amount\n\
 already present in the soil zone between 'from' and 'to'.",
                         &ActionFertilize::Precision::load_syntax);
-  syntax.add ("second_year_compensation", Syntax::Boolean, Syntax::Const, "\
+  syntax.add ("second_year_compensation", Value::Boolean, Value::Const, "\
 Compensate for the second year effect of previous fertilizations.\n\
 The second year effect is solely governed by the 'second_year_utilization'\n\
 organic fertilizer parameter.  The second year effect does not fade with\n\
@@ -377,11 +377,11 @@ static struct ActionFertilizeSurfaceSyntax
     alist.add ("description", "Apply fertilizer to the soil surface.");
     ActionFertilize::load_syntax (syntax, alist);
 
-    syntax.add ("from", "cm", Check::non_positive (), Syntax::Const, "\
+    syntax.add ("from", "cm", Check::non_positive (), Value::Const, "\
 Height where you want to start the incorporation (a negative number)\n\
 OBSOLETE:  Use 'fertilize_incorporate' instead.");
     alist.add ("from", 0.0);
-    syntax.add ("to", "cm", Check::non_positive (), Syntax::Const, "\
+    syntax.add ("to", "cm", Check::non_positive (), Value::Const, "\
 Height where you want to end the incorporation (a negative number)\n\
 OBSOLETE:  Use 'fertilize_incorporate' instead.");
     alist.add ("to", 0.0);
@@ -442,7 +442,7 @@ static struct ActionFertilizeIncorporateSyntax
     alist.add ("description", "Incorporate fertilizer.");
     ActionFertilize::load_syntax (syntax, alist);
     syntax.add_object ("volume", Volume::component, 
-                       Syntax::Const, Syntax::Singleton,
+                       Value::Const, Value::Singleton,
                        "Soil volume to incorporate fertilizer in.");
 
     syntax.order ("am");

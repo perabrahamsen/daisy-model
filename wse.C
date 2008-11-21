@@ -123,7 +123,7 @@ production when there is no soil water available.  In between production\n\
 is controled by the 'y_half' parameter.\n\
 \n\
 See SH:REFERENCE for more explanation.");
-    syntax.add_fraction ("y_half", Syntax::Const, "\
+    syntax.add_fraction ("y_half", Value::Const, "\
 Effect on assimilate production of water stress.\n\
 This parameter specifies the effect on assimilate production\n(\
 compared to potential) when the amount of available soil water is\n\
@@ -211,9 +211,9 @@ static struct ProgramWSE_tableSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Generate a table of the water stress effect.");
     syntax.add_object ("wse", WSE::component, 
-                       Syntax::Const, Syntax::Singleton, "\
+                       Value::Const, Value::Singleton, "\
 The water stress effect to show in the table.");
-    syntax.add ("intervals", Syntax::Integer, Syntax::Const, "\
+    syntax.add ("intervals", Value::Integer, Value::Const, "\
 Number of intervals in the table.");
     alist.add ("intervals", 10);
     syntax.order ("wse");

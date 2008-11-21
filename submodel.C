@@ -35,7 +35,7 @@ bool
 Submodel::is_submodel (const Syntax& syntax, const AttributeList& alist,
 		       const symbol name)
 {
-  if (syntax.size (name) != Syntax::Singleton || !alist.check (name))
+  if (syntax.size (name) != Value::Singleton || !alist.check (name))
     {
       const AttributeList& nested = syntax.default_alist (name);
       if (nested.check ("submodel"))
@@ -55,7 +55,7 @@ Submodel::find_submodel (const Syntax& syntax,
 			 const AttributeList& alist,
 			 const symbol name)
 {
-  if (syntax.size (name) != Syntax::Singleton || !alist.check (name))
+  if (syntax.size (name) != Value::Singleton || !alist.check (name))
     {
       const AttributeList& nested = syntax.default_alist (name);
       if (nested.check ("submodel"))

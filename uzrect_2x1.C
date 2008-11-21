@@ -357,7 +357,7 @@ void
 UZRect2x1::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   syntax.add_object ("vertical", UZmodel::component, 
-                     Syntax::Const, Syntax::Sequence,
+                     Value::Const, Value::Sequence,
                      "Vertical matrix water transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends.");
@@ -366,7 +366,7 @@ If none succeeds, the simulation ends.");
   vertical_models.push_back (&UZmodel::reserve_model ());
   alist.add ("vertical", vertical_models);
   syntax.add_object ("horizontal", UZ1D::component,
-                     Syntax::Const, Syntax::Sequence,
+                     Value::Const, Value::Sequence,
                      "Horizontal matrix water transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends."); 
