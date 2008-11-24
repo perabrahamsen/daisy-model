@@ -1557,7 +1557,7 @@ sum of all chemicals will be logged."
            (number (path column "${column}" Vegetation crops crops "${crop}"
                          Prod PotCanopyAss)
 		   (spec fixed Production PotCanopyAss)
-                   (dimension "g CO2/m^2/&")
+                   (dimension "g CH2O/m^2/&")
                    (handle sum))
            (number (path column "${column}" OrganicMatter "*" Bioincorporation CO2)
 		   (spec fixed Bioincorporation CO2)
