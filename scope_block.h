@@ -39,7 +39,7 @@ public:
   symbol dimension (symbol tag) const;
   virtual bool has_name (symbol) const;
   virtual symbol name (symbol) const;
-  symbol get_description (symbol) const;
+  symbol description (symbol) const;
 
   // Create and Destroy.
 private:

@@ -83,7 +83,7 @@ struct ScopeNull : public Scope
   { daisy_notreached (); }
   symbol dimension (symbol) const
   { daisy_notreached (); }
-  symbol get_description (symbol) const
+  symbol description (symbol) const
   { daisy_notreached (); }
 
   // Create and Destroy.

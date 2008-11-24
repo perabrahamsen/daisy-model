@@ -240,7 +240,7 @@ ScopeExchange::name (symbol tag) const
 }
 
 symbol 
-ScopeExchange::get_description (symbol tag) const
+ScopeExchange::description (symbol tag) const
 { 
   const std::map<symbol, Exchange*>::const_iterator i = named.find (tag);
   daisy_assert (i != named.end ());

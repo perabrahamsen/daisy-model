@@ -22,6 +22,7 @@
 #ifndef SCOPE_H
 #define SCOPE_H
 
+#include "value.h"
 #include "symbol.h"
 #include "model.h"
 #include <vector>
@@ -51,6 +52,7 @@ public:
   // Type.
 public:
   virtual symbol dimension (symbol) const = 0;
+  virtual symbol description (symbol) const = 0;
 
   // Value.
 public:
@@ -63,12 +65,16 @@ public:
   symbol title () const;
   
   virtual const std::vector<symbol>& all_numbers () const = 0;
+#if 0
+  virtual Value::type lookup (symbol) const = 0;
+  virtual bool check (symbol) const = 0;
+#else
   bool is_number (symbol) const;
   virtual bool has_number (symbol) const = 0;
   virtual bool has_name (symbol) const;
   virtual bool has_integer (symbol) const;
-  virtual symbol get_description (symbol) const = 0;
-  
+#endif
+
   // Create and Destroy.
 private:
   Scope (const Scope&);

@@ -39,7 +39,7 @@ public:
   bool has_number (symbol name) const;
   double number (symbol) const;
   symbol dimension (symbol) const;
-  symbol get_description (symbol) const;
+  symbol description (symbol) const;
 
   // WScope interface.
 public:

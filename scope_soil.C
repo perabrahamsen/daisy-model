@@ -105,7 +105,7 @@ ScopeSoil::dimension (const symbol tag) const
 }
 
 symbol
-ScopeSoil::get_description (symbol tag) const
+ScopeSoil::description (symbol tag) const
 {
   static const symbol humus_description ("Humus fraction of dry matter.");
   if (tag == humus)

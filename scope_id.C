@@ -43,7 +43,7 @@ ScopeID::dimension (symbol) const
 { return dim;}
 
 symbol
-ScopeID::get_description (symbol tag) const
+ScopeID::description (symbol tag) const
 { return symbol ("Use '" + tag.name () + "' as a free variable"); }
 
   // WScope interface.

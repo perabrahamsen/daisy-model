@@ -121,7 +121,7 @@ public:
   symbol dimension (symbol tag) const;
   bool has_name (symbol tag) const;
   symbol name (symbol tag) const;
-  symbol get_description (symbol tag) const;
+  symbol description (symbol tag) const;
 
   // WScope.
 public:

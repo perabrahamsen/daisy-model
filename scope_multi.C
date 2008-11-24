@@ -61,11 +61,11 @@ ScopeMulti::dimension (const symbol tag) const
 }
 
 symbol
-ScopeMulti::get_description (symbol tag) const
+ScopeMulti::description (symbol tag) const
 {
   for (size_t i = 0; i < scopes.size (); i++)
     if (scopes[i]->has_number (tag))
-      return scopes[i]->get_description (tag);
+      return scopes[i]->description (tag);
   
   daisy_panic ("'" + tag + "' not found in any scope");
 }

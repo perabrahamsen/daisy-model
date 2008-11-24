@@ -750,7 +750,7 @@ daisy_scope_string (const Scope* scope, const char* name)
 
 extern "C" const char* EXPORT	// Return UNITS of NAME defined in SCOPE.
 daisy_scope_description (const Scope* scope, const char* name)
-{ return scope->get_description (symbol (name)).name().c_str (); }
+{ return scope->description (symbol (name)).name().c_str (); }
 
 extern "C" int EXPORT           // True, iff SCOPE is writable.
 daisy_scope_writable (Scope* scope)

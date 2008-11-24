@@ -141,7 +141,7 @@ LogExtern::dimension (symbol tag) const
 }
 
 symbol
-LogExtern::get_description (const symbol tag) const
+LogExtern::description (const symbol tag) const
 {
   for (size_t i = 0; i < entries.size (); i++)
     if (entries[i]->tag () == tag)
@@ -254,7 +254,7 @@ LogExtern::LogExtern (Block& al)
         {
           types[id] = Name;
           names[id] = scope_block.name (id);
-          descriptions[id] = scope_block.get_description (id);
+          descriptions[id] = scope_block.description (id);
         }
       else
         al.msg ().warning ("Parameter name " + id + " not found"); 

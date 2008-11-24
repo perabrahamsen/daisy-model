@@ -222,7 +222,7 @@ ScopeBlock::name (const symbol tag_symbol) const
 }
 
 symbol 
-ScopeBlock::get_description (symbol tag_symbol) const
+ScopeBlock::description (symbol tag_symbol) const
 { 
   static const symbol no_symbol ("No such symbol");
   

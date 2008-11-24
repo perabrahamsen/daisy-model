@@ -68,7 +68,7 @@ ScopeSources::dimension (const symbol tag) const
 }
 
 symbol
-ScopeSources::get_description (const symbol) const
+ScopeSources::description (const symbol) const
 { return symbol ("Descriptions not implemented yet"); }
 
 bool 

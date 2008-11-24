@@ -90,7 +90,7 @@ public:
   symbol dimension (symbol) const;
   bool has_name (symbol tag) const;
   symbol name (symbol tag) const;
-  symbol get_description (symbol) const;
+  symbol description (symbol) const;
 
   // Scope to be?
 private:

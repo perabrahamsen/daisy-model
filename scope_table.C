@@ -56,7 +56,7 @@ ScopeTable::dimension (const symbol tag) const
 }
 
 symbol
-ScopeTable::get_description (const symbol) const
+ScopeTable::description (const symbol) const
 { return symbol ("Descriptions not implemented yet"); }
 
 void 
