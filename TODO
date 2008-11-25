@@ -1,5 +1,7 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* biopore solute_infiltration til MMO
+
 * Colloids and colloid fascilitated transport 
 
 = Introduction =
@@ -9,8 +11,6 @@ Chemicals that sorb strongly to the soil will only be
 
 Colloids are represented as a `chemical` model in Daisy under the name
 `colloids`.  We do not distinguish bet
-
-
 
 Vi regner først på kollider, og så på stoffer der transporteres på
 kolloider.  Kolloider representeres som et 'chemical' i Daisy, kaldet
