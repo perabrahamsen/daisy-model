@@ -1,5 +1,50 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+= Colloids = 
+
+Colloids are represented as a `chemical` model in Daisy under the name
+`colloids`.  We do not distinguish bet
+
+
+
+Vi regner først på kollider, og så på stoffer der transporteres på
+kolloider.  Kolloider representeres som et 'chemical' i Daisy, kaldet
+'colloids'.  Transporten af 'colloids' er som alle andre stoffer.
+
+Der er tre processor som virker på kolloider:
+
+1. 'kolgen': Generering af kolloider fra udvekslingslaget i toppen af
+jorden, baseret på regnintensitet.  Der er flere forskellige modeller
+for denne proces.  Den brøkdel af jorden som bliver frigivet i løbet
+af et tidsskridt bliver logget i en 
+
+
+
+
+* kolloider
+
+** udveksling med jord
+
+colloid
+
+*** kolgen
+*** filter
+*** eq_goal
+
+Udregn colloid_source, colloid_sink
+
+** Stof 
+
+A (solute)
+A-colloid
+A-sorbed
+
+** Reaktion
+
+A <-> A-colloid
+A <-> A-sorbed
+A-colloid <-> A-sorbed
+
 * Artkler
 
 rootdens: seyed, pa, sha, mmo
