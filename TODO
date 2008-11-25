@@ -1,6 +1,11 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-= Colloids = 
+* Colloids and colloid fascilitated transport 
+
+= Introduction =
+
+Chemicals that sorb strongly to the soil will only be 
+
 
 Colloids are represented as a `chemical` model in Daisy under the name
 `colloids`.  We do not distinguish bet
@@ -64,8 +69,6 @@ stof?
 
 vap
 
-------------------
-
 * OpenMI
 
 ** Enheder?
@@ -78,8 +81,6 @@ vap
 
 ** Tilføj N bog
 
-* test-mibsol.dai
-
 * Tertiary 
 
 ** Små tidsskridt
@@ -91,10 +92,6 @@ Eller bruger den S termen fra sidste lille tidsskridt?
 ** Option to disable in top nodes.
 
 Kun matrix -> biopore ?
-
-* Next?
-
-SAFIR workshop, plantefys
 
 * edge baseret kode til rect solute og vand
 

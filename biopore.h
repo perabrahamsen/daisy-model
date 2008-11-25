@@ -25,6 +25,7 @@
 #include "model.h"
 #include "symbol.h"
 #include "number.h"
+#include "im.h"
 #include <memory>
 #include <vector>
 
@@ -61,6 +62,7 @@ protected:
 protected:
   std::vector<double> S;         // Matrix sink term [].
   double infiltration;           // Surface infiltration [cm/h]
+  IM solute_infiltration;       // Solute infiltration [g/cm^2/h]
 
   // Utilities.
 protected:

@@ -139,6 +139,7 @@ Biopore::output_base (Log& log) const
 {
   output_variable (S, log);
   output_variable (infiltration, log);
+  output_submodule (solute_infiltration, "solute_infiltration", log);
 }
 
 bool
@@ -213,7 +214,7 @@ Biopore::check_base (const Geometry& geo, Treelog& msg) const
 }
 
 void 
-Biopore::load_base (Syntax& syntax, AttributeList&)
+Biopore::load_base (Syntax& syntax, AttributeList& alist)
 {
   syntax.add_object ("density", Number::component, 
                        Value::Const, Value::Singleton, "\
@@ -228,6 +229,10 @@ Biopore density [cm^-2] as a function of 'x' [cm].");
 	      "Sink from matrix domain to biopore.");
   syntax.add ("infiltration", "cm/h", Value::LogOnly, "\
 Surface infiltration.");
+  IM::add_syntax (syntax, alist, Value::LogOnly, "solute_infiltration", 
+                  IM::flux_unit (),
+		  "Rate of solute infiltration through surface.");
+
 }
 
 Biopore::Biopore (Block& al)
