@@ -279,6 +279,13 @@ BioporeMatrix::solute_infiltrate (const symbol chem,
                                   const double amount /* [g] */, 
                                   const double dt)
 { 
+  if (!iszero (amount))
+    {
+      std::ostringstream tmp;
+      tmp << "Infiltrate " << amount << " g '" << chem 
+          << "' through " << geo.edge_name (edge);
+      Assertion::message (tmp.str ()); 
+    }
   Biopore::solute_infiltrate (chem, geo, edge, amount, dt);
   const size_t cell = geo.edge_other (edge, Geometry::cell_above);
   add_solute (chem, cell, amount);
