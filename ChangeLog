@@ -1,3 +1,16 @@
+2008-11-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log-std.dai ("Field nitrogen"): Log surface to drain and
+	tertiary content.
+
+2008-11-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* biopore.h (add_solute): Made private.
+	* biopore.h, biopore.C (solute_infiltration): New log variable.
+	* biopore.c, biopore.C, biopore_matrix.C (solute_infiltrate): New
+	virtual member function.
+	* tertiary_biopores.C (TertiaryBiopores::solute): Update caller.
+
 2008-11-21  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* value.h, value.C: New utility.

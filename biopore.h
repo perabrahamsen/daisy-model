@@ -86,6 +86,10 @@ public:
     /* [cm] */ const = 0;
   virtual void infiltrate (const Geometry&, size_t e,
                            double amount /* [cm] */, double dt /* [h] */);
+  virtual void solute_infiltrate (const symbol chem, 
+                                  const Geometry& geo, const size_t e,
+                                  const double amount /* [g] */, 
+                                  const double dt);
   void clear ();
   virtual void update_matrix_sink (const Geometry& geo,    
                                    const Soil& soil,  
@@ -100,8 +104,10 @@ public:
   virtual void add_to_sink (std::vector<double>& S_matrix,
                             std::vector<double>& S_drain) const = 0;
   virtual void update_water () = 0;
+private:
   virtual void add_solute (symbol chem, 
                            size_t cell, double amount /* [g] */) = 0;
+public:
   virtual void matrix_solute (const Geometry& geo, double dt, 
                               const Chemical& chemical, 
                               std::vector<double>& source_chem,

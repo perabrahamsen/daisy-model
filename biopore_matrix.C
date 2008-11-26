@@ -98,6 +98,10 @@ struct BioporeMatrix : public Biopore
     /* [cm] */ const;
   void infiltrate (const Geometry&, size_t e, double amount /* [cm] */,
                    double dt /* [h] */);
+  void solute_infiltrate (const symbol chem, 
+                          const Geometry& geo, const size_t e,
+                          const double amount /* [g] */, 
+                          const double dt);
 
   double matrix_biopore_matrix (size_t c, const Geometry& geo, 
                                 const Soil& soil, bool active, 
@@ -267,6 +271,17 @@ BioporeMatrix::infiltrate (const Geometry& geo, const size_t e,
   daisy_assert (cell < column.size ());
   const double area = geo.edge_area (e);
   add_water (cell, area * amount);
+}
+
+void 
+BioporeMatrix::solute_infiltrate (const symbol chem, 
+                                  const Geometry& geo, const size_t edge,
+                                  const double amount /* [g] */, 
+                                  const double dt)
+{ 
+  Biopore::solute_infiltrate (chem, geo, edge, amount, dt);
+  const size_t cell = geo.edge_other (edge, Geometry::cell_above);
+  add_solute (chem, cell, amount);
 }
 
 double 

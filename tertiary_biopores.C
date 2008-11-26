@@ -529,7 +529,7 @@ TertiaryBiopores::solute (const Geometry& geo, const SoilWater& soil_water,
           Biopore& biopore = *classes[b];
           const double density = biopore.density (cell);
           const double share = total_in * density / total_density;
-          biopore.add_solute (chem, cell, share);
+          biopore.solute_infiltrate (chem, geo, edge, share, dt);
         }
     }
 

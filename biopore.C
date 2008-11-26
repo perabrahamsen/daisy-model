@@ -93,8 +93,22 @@ Biopore::infiltrate (const Geometry& geo, size_t e,
 }
 
 void 
+Biopore::solute_infiltrate (const symbol chem, 
+                            const Geometry& geo, const size_t e,
+                            const double amount /* [g] */, 
+                            const double dt)
+{
+  const double area = geo.edge_area (e);
+  solute_infiltration.add_value (chem, solute_infiltration.unit (), 
+                                 amount / area / dt);
+}
+
+void 
 Biopore::clear ()
-{ infiltration = 0.0; }
+{ 
+  infiltration = 0.0; 
+  solute_infiltration.clear ();
+}
 
 double 
 Biopore::matrix_to_biopore (double K_xx, double M_c, double r_c, 
@@ -240,7 +254,9 @@ Biopore::Biopore (Block& al)
     density_expr (Librarian::build_item<Number> (al, "density")),
     height_start (al.number ("height_start")),
     height_end (al.number ("height_end")),
-    diameter (al.number ("diameter"))
+    diameter (al.number ("diameter")),
+    infiltration (0.0),
+    solute_infiltration (al.units ().get_unit (IM::flux_unit ()))
 { }
 
 Biopore::~Biopore ()
