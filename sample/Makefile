@@ -51,6 +51,8 @@ svnci: $(TEXT)
 add:
 	svn add $(TEXT)
 
+done:	add
+
 # Check
 #
 check: new/Cosby-Nitrogen-Balance.sum
