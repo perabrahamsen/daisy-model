@@ -1,5 +1,8 @@
 2008-11-27  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* sample/genweather.dai: New sample setup.
+	* sample/Makefile (SETUPS): Added it.
+
 	* lib/log-std.dai ("Field chemical"): Include content of tertiary
 	domain in balance.
 
