@@ -279,7 +279,7 @@ BioporeMatrix::solute_infiltrate (const symbol chem,
                                   const double amount /* [g] */, 
                                   const double dt)
 { 
-  if (!iszero (amount))
+  if (!iszero (amount) && debug > 0)
     {
       std::ostringstream tmp;
       tmp << "Infiltrate " << amount << " g '" << chem 
@@ -729,6 +729,11 @@ BioporeMatrix::matrix_solute (const Geometry& geo, const double dt,
   daisy_assert (source_chem.size () == cell_size);
   std::vector<double> sink_chem (cell_size, 0.0);
 
+  // Old content.
+  const std::vector<double>& old_array = solute->get_array (chem);
+  const double old_content
+    = std::accumulate (old_array.begin (), old_array.end (), 0.0);
+
   // Water that left each column.
   const size_t column_size = xplus.size ();
   std::vector<double> water_left (column_size, 0.0); // [cm^3 W]
@@ -739,24 +744,26 @@ BioporeMatrix::matrix_solute (const Geometry& geo, const double dt,
       // Water.
       const double cell_volume = geo.cell_volume (c); // [cm^3 S]
       const double water_sink = S[c]; // [cm^3 W/cm^3 S/h]
-      const double water = -cell_volume * water_sink * dt; // [cm^3 W]
-      if (water_sink <= 0.0)
+      const double water = cell_volume * water_sink * dt; // [cm^3 W]
+      if (water <= 0.0)
         // Keep track of water that is leaving for later.
         {
           const size_t col = column[c];
-          water_left[col] += water;
+          water_left[col] -= water;
           continue;
         }
-      daisy_assert (water < 0.0);
-
+      
       // Matrix concentration.
       const double C = chemical.C_secondary (c); // [g/cm^3 W]
+      daisy_assert (C >= 0.0);
 
       // Add to solute sink.
       sink_chem[c] = water_sink * C; // [g/cm^3 S/h]
 
       // Add to biopore.
       const double M = C * water; // [g]
+      daisy_assert (M >= 0.0);
+      daisy_approximate (sink_chem[c] * cell_volume * dt, M);
       add_solute (chem, c, M);
     }
   
@@ -772,6 +779,7 @@ BioporeMatrix::matrix_solute (const Geometry& geo, const double dt,
       const size_t col = column[c];
       const double total_water  // [cm^3 W]
         = column_water (col) + water_left[col];
+      daisy_assert (total_water >= 0.0);
       const double M = solute->get_value (chem, col); // [g]
       const double C = M / total_water; // [g/cm^3 W]
       sink_chem[c] = water_sink * C; // [g/cm^3 S/h]
@@ -791,6 +799,30 @@ BioporeMatrix::matrix_solute (const Geometry& geo, const double dt,
   // Export.
   for (size_t c = 0; c < cell_size; c++)
     source_chem[c] -= sink_chem[c];
+
+  double total_in = 0.0;
+  double total_out = 0.0;
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      const double amount = sink_chem[c] * geo.cell_volume (c) * dt;
+      if (amount > 0)
+        total_in += amount;
+      else 
+        total_out -= amount;
+    }
+  const std::vector<double>& new_array = solute->get_array (chem);
+  const double new_content
+    = std::accumulate (new_array.begin (), new_array.end (), 0.0);
+  const double growth = total_in - total_out;
+  if (!balance (old_content, new_content, growth))
+    {
+      const double error = old_content + growth - new_content;
+      std::ostringstream tmp;
+      tmp << "In: " << total_in << ", out: " << total_out
+          << ", old: " << old_content << ", new: " << new_content 
+          << ", gain: " << error;
+      msg.message (tmp.str ());
+    }
 }
 
 void

@@ -1,3 +1,11 @@
+2008-11-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log-std.dai ("Field chemical"): Include content of tertiary
+	domain in balance.
+
+	* mathlib.C (balance): Don't ignore 'noise'.
+	* imvec.C (IMvec::add_value): Accumulate, not overwrite..
+
 2008-11-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* lib/log-std.dai ("Field nitrogen"): Log surface to drain and

@@ -165,8 +165,8 @@ bool approximate (const double a, const double b, const double noise)
 bool balance (const double oldval, const double newval, const double growth,
               const double noise)
 {
-  return approximate (newval - oldval, growth)
-    || approximate (oldval + growth, newval);
+  return approximate (newval - oldval, growth, noise)
+    || approximate (oldval + growth, newval, noise);
 }
 
 double halftime_to_rate (double halftime)

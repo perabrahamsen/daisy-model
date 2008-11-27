@@ -303,11 +303,11 @@ The total amount of water in the soil interval")
          "NH4-Deposit" "NO3-Deposit" Fixated "Seed_N")
   (output "N2O-Nitrification" "Denitrification"
           "NH4-Leak-Matrix" "NO3-Leak-Matrix"
-          "NH4-Surface-Tertiary" "NO3-Surface-Tertiary" 
-          "NH4-Soil-Tertiary" "NO3-Soil-Tertiary"
-          "NH4-Drain" "NO3-Drain" "NH4-Surface-Loss"
-          "NO3-Surface-Loss" "Harvest_N")
+          "NH4-Soil-Drain" "NO3-Soil-Drain"
+          "NH4-Surface-Drain" "NO3-Surface-Drain"
+          "NH4-Surface-Loss" "NO3-Surface-Loss" "Harvest_N")
   (content "NH4-Surface"  "NO3-Surface" "NH4-Soil" "NO3-Soil" 
+           "NH4-Tertiary" "NO3-Tertiary"
 	   "Org_N-Surface" "Org_N-Soil" "Crop" "Dead leaves"
            "NH4-Error" "NO3-Error"))
 
@@ -318,9 +318,9 @@ The total amount of water in the soil interval")
   (input "NH4-Surface-Fertilizer" "NH4-Soil-Fertilizer"
 	 "NH4-Deposit" "NH4-Mineralization")
   (output "NH4-Nitrification" "NH4-Leak-Matrix"
-          "NH4-Surface-Tertiary" "NH4-Soil-Tertiary"
-          "NH4-Drain" "NH4-Surface-Loss" "NH4-Crop")
-  (content "NH4-Surface" "NH4-Soil" "NH4-Error"))
+          "NH4-Soil-Drain" "NH4-Surface-Drain" 
+          "NH4-Surface-Loss" "NH4-Crop")
+  (content "NH4-Surface" "NH4-Soil" "NH4-Tertiary" "NH4-Error"))
 
 (defsummary "Field NO3 balance" balance
   "NO3 balance for the complete system."
@@ -329,9 +329,9 @@ The total amount of water in the soil interval")
   (input "NO3-Surface-Fertilizer" "NO3-Soil-Fertilizer" 
 	 "NO3-Deposit" "NO3-Nitrification")
   (output "NO3-Immobilization" "Denitrification"
-          "NO3-Leak-Matrix" "NO3-Surface-Tertiary" "NO3-Soil-Tertiary"
-          "NO3-Drain" "NO3-Surface-Loss" "NO3-Crop")
-  (content "NO3-Surface" "NO3-Soil" "NO3-Error"))
+          "NO3-Leak-Matrix" 
+          "NO3-Soil-Drain" "NO3-Surface-Drain" "NO3-Surface-Loss" "NO3-Crop")
+  (content "NO3-Surface" "NO3-Soil" "NO3-Tertiary" "NO3-Error"))
 
 (defsummary "Field crop nitrogen balance" balance
   "Crop nitrogen balance for the complete system."
@@ -399,13 +399,12 @@ The total amount of water in the soil interval")
                         (negate true)
                         (tag "NH4-Leak-Matrix")
                         (dimension "kg N/ha/&"))
-           (flux_top (path column "${column}"
-                           Chemistry "*" trace NH4 J_tertiary)
-                     (spec chemical default J_tertiary)
-                     (handle sum)
-                     (negate true)
-                     (tag "NH4-Surface-Tertiary")
-                     (dimension "kg N/ha/&"))
+           (number (path column "${column}" Movement "*" 
+                         Tertiary biopores solute_storage NH4 value)
+                   (spec tertiary biopores solute_storage value)
+                   (tag "NH4-Tertiary")
+                   (dimension "kg N/ha")
+                   (handle current))
            (interval (path column "${column}"
                            Chemistry "*" trace NH4 S_tertiary)
                      (spec chemical default S_tertiary)
@@ -416,10 +415,17 @@ The total amount of water in the soil interval")
            (interval (path column "${column}"
 			   Chemistry "*" trace NH4 S_drain)
                      (spec chemical default S_drain)
-                     (tag "NH4-Drain")
+                     (tag "NH4-Soil-Drain")
                      (handle sum)
                      (negate true)
                      (dimension "kg N/ha/&"))
+           (number (path column "${column}" Movement "*" 
+                         Tertiary biopores classes drain 
+                         solute_infiltration NH4 value)
+                   (spec biopore drain solute_infiltration value)
+                   (tag "NH4-Surface-Drain")
+                   (handle sum)
+                   (dimension "kg N/ha/&"))
            (number (path column "${column}"
 			 Vegetation crops crops "*" Root NH4Upt)
                    (spec fixed RootSystem NH4Upt)
@@ -494,6 +500,12 @@ The total amount of water in the soil interval")
                         (handle sum)
                         (negate true)
                         (dimension "kg N/ha/&"))
+           (number (path column "${column}" Movement "*" 
+                         Tertiary biopores solute_storage NO3 value)
+                   (spec tertiary biopores solute_storage value)
+                   (tag "NO3-Tertiary")
+                   (dimension "kg N/ha")
+                   (handle current))
            (flux_top (path column "${column}"
                            Chemistry "*" trace NO3 J_tertiary)
                      (spec chemical default J_tertiary)
@@ -511,10 +523,17 @@ The total amount of water in the soil interval")
            (interval (path column "${column}"
 			   Chemistry "*" trace NO3 S_drain)
                      (spec chemical default S_drain)
-                     (tag "NO3-Drain")
-                     (negate true)
+                     (tag "NO3-Soil-Drain")
                      (handle sum)
+                     (negate true)
                      (dimension "kg N/ha/&"))
+           (number (path column "${column}" Movement "*" 
+                         Tertiary biopores classes drain 
+                         solute_infiltration NO3 value)
+                   (spec biopore drain solute_infiltration value)
+                   (tag "NO3-Surface-Drain")
+                   (handle sum)
+                   (dimension "kg N/ha/&"))
            (number (path column "${column}"
 			 Vegetation crops crops "*" Root NO3Upt)
                    (spec fixed RootSystem NO3Upt)
@@ -849,9 +868,9 @@ The total amount of water in the soil interval")
                     (input "Spray" "Deposit" "External" "Surface Transform" 
                            "Soil Transform")
                     (output "Harvest" "Dissipate" "Surface Decompose" "Runoff"
-                            "Soil Decompose" "Leak-Matrix" "Tertiary" 
-                            "Drain" "Uptake")
-                    (content "Snow" "Canopy" "Surface" "Soil" "Error")))
+                            "Soil Decompose" "Leak-Matrix"
+                            "Surface-Drain" "Soil-Drain" "Uptake")
+                    (content "Snow" "Canopy" "Surface" "Soil"  "Tertiary" "Error")))
   (when hourly)
   (entries ;; Year Month MDay Hour
            (number (path column "${column}" Chemistry "*" trace "${chemical}"
@@ -903,20 +922,20 @@ The total amount of water in the soil interval")
                         (handle sum)
                         (dimension "g/ha/&")
                         (spec chemical default J_matrix))
-           (interval (path column "${column}" Chemistry "*" 
-                           trace "${chemical}" S_tertiary)
-                     (tag "Tertiary")
-                     (negate true)
+           (interval (path column "${column}"
+			   Chemistry "*" trace "${chemical}" S_drain)
+                     (spec chemical default S_drain)
+                     (tag "Soil-Drain")
                      (handle sum)
-                     (dimension "g/ha/&")
-                     (spec chemical default S_tertiary))
-           (interval (path column "${column}" Chemistry "*" 
-                           trace "${chemical}" S_drain)
-                     (tag "Drain")
                      (negate true)
-                     (handle sum)
-                     (dimension "g/ha/&")
-                     (spec chemical default S_drain))
+                     (dimension "g/ha/&"))
+           (number (path column "${column}" Movement "*" 
+                         Tertiary biopores classes drain 
+                         solute_infiltration "${chemical}" value)
+                   (spec biopore drain solute_infiltration value)
+                   (tag "Surface-Drain")
+                   (handle sum)
+                   (dimension "g/ha/&"))
            (interval (path column "${column}" Chemistry "*" 
                            trace "${chemical}" S_external)
                      (tag "External")
@@ -966,6 +985,12 @@ The total amount of water in the soil interval")
                      (tag "Soil")
                      (dimension "g/ha")
                      (spec chemical default M))
+           (number (path column "${column}" Movement "*" 
+                         Tertiary biopores solute_storage "${chemical}" value)
+                   (spec tertiary biopores solute_storage value)
+                   (tag "Tertiary")
+                   (dimension "g/ha")
+                   (handle current))
            (interval (path column "${column}" Chemistry "*" 
                            trace "${chemical}" M_error)
                      (tag "Error")

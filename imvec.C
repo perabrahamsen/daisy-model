@@ -33,9 +33,11 @@
 const std::vector<double>& 
 IMvec::get_array (symbol chem) const
 { 
-  map_type::const_iterator i = content.find (chem);
-  daisy_assert (i != content.end ());
-  return (*i).second; 
+  const map_type::const_iterator i = content.find (chem);
+  if (i != content.end ())
+    return (*i).second; 
+  static const std::vector<double> empty;
+  return empty;
 }
 
 void
@@ -72,7 +74,7 @@ IMvec::add_value (symbol chem, size_t index, double value)
       std::vector<double>& array = (*i).second;
       while (array.size () < index + 1)
         array.push_back (0.0);
-      array[index] = value;
+      array[index] += value;
     }
 }
 
