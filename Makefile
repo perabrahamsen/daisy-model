@@ -845,6 +845,7 @@ commit:
 	svn commit -m make
 
 done:	update add commit
+	(cd $(SAMPLE) && $(MAKE) done)
 
 
 setup:	svnci
