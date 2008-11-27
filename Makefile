@@ -835,6 +835,7 @@ svnci: $(TEXT)
 .IGNORE: add
 
 add:
+	(cd sample && make add)
 	svn add $(TEXT)
 	-svn remove $(REMOVE)
 
