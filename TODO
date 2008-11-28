@@ -1,59 +1,130 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* biopore solute
+* Kolloider og kolloidfascilitetert transport.
 
-** check massebalance
+** Kolloider
 
+Kolloider modeleres i Daisy som et ikke adsorberende stof, med to
+eller tre processer tilknyttet.
 
+Den første process er generering, og den foregår i det øverste
+jordlag, styres af regnintensitet.  Den anden process er filtrering,
+som foregår overalt i jormatricen, og er styret af vandhastighed.  Der
+er flere modeller for generering, og en enkelt for filtrering.  Se
+[Jarvis99] og [MST-kolloid] for en beskrivelse af disse.  En tredje
+process er desorbtion.  Denne process foregår også overalt i
+jormatricen, men er ikke inkluderet i Daisy i denne omgang.
 
-* Colloids and colloid fascilitated transport 
+Til transport af kolloider bliver der brugt samme algoritme som til
+kvælstof og opløste pesticider.  Kolloiderne har deres egen
+diffusionskoefficent.  Se [stoftransport].
 
-= Introduction =
+** Kolloidfaciliteret transport
 
-Chemicals that sorb strongly to the soil will only be 
+For kolloidfaciliteret transport fordeles det adsorberede stof mellem
+immobilt jord og kolloider.  Det adsorbede stof på kolloiderne bliver
+transporteret med samme algoritme som bliver brugt til kolloiderne og
+til opløst stof.  Diffusionskoefficienten for kolloider benyttes til
+transportprocessen.
 
-Colloids are represented as a `chemical` model in Daisy under the name
-`colloids`.  We do not distinguish bet
+*** Ligevægtsfordeling
 
-Vi regner først på kollider, og så på stoffer der transporteres på
-kolloider.  Kolloider representeres som et 'chemical' i Daisy, kaldet
-'colloids'.  Transporten af 'colloids' er som alle andre stoffer.
+Fordelingen af adsorberet stof mellem immobilt jord og kolloiderne
+antages at gå mod en ligevægt, som kan beskrives ud fra forholdet
+mellem immobilt jord og kolloider.  Da kolloiderne generelt regnes for
+lettere tilgængelige end det immobile jord, ganges dog en
+berigelsesesfaktor på først.
 
-Der er tre processor som virker på kolloider:
+A_kolloid_eq = A_total_eq * M_kolloid * B_faktor /(rho_b + M_kolloid * B_faktor)
+A_immobil_eq = A_total_eq - A_kolloid_eq
 
-1. 'kolgen': Generering af kolloider fra udvekslingslaget i toppen af
-jorden, baseret på regnintensitet.  Der er flere forskellige modeller
-for denne proces.  Den brøkdel af jorden som bliver frigivet i løbet
-af et tidsskridt bliver logget i en 
+A_kolloid_eq: adsorberet til kolloid ved ligevægt [M L^-3]
+A_immobil_eq: adsorberet til immobil jord ved ligevægt [M L^-3]
+A_total_eq: total mængde adsorberet stof [M L^-3]
+M_kolloid: massen af kolloider i det aktuelle jordvolumen [M L^-3]
+B_factor: Berigelsesfaktor []
+rho_b: Tør jords massefylde [M L^-3]
 
+Ligevægten mellem A_total og opløst stof (C_eq) bestemmes med en af de
+allerede implementerede adsorptionsmodeller (lineær, Freundlich,
+Langmuir).
 
+*** Dynamisk fordeling
 
+For stoffer der opnår ligevægt hurtigt i forhold længden af tidsskridt
+i Daisy vil stof bliver fordelt mellem opløst, kolloidadsorberet og
+immobilt straks efter udregning af transport af de to førstnævnte.
 
-* kolloider
+**** Adsorption og desorption
 
-** udveksling med jord
+For stoffer hvor ligevægt kun opnås relativt langsomt bruges
+adsorptions- eller desorptionsrate der ganges på afstanden til
+ligevægtspunktet.
 
-colloid
+A_immobile > A_immobile_eq
+  S_adsorption_immobile = (A_immobile_eq - A_immobile) * k_adsorption_immobile
 
-*** kolgen
-*** filter
-*** eq_goal
+A_immobile < A_immobile_eq
+  S_adsorption_immobile = (A_immobile_eq - A_immobile) * k_desorption_immobile
 
-Udregn colloid_source, colloid_sink
+A_kolloid > A_kolloid_eq
+  S_adsorption_kolloid = (A_kolloid_eq - A_kolloid) * k_adsorption_kolloid
 
-** Stof 
+A_kolloid < A_kolloid_eq
+  S_adsorption_kolloid = (A_kolloid_eq - A_kolloid) * k_desorption_kolloid
 
-A (solute)
-A-colloid
-A-sorbed
+A_immobile: Aktuel mængde af stof adsorberet til immobil jord [M L^-3]
+A_kolloid: Aktuel mængde af stof adsorberet til kolloider [M L^-3]
+S_adsorption_immobile: Adsorptionsrate til immobil jord [M L^-3 T^-1]
+S_adsorption_kolloid: Adsorptionsrate til kolloider [M L^-3 T^-1]
+k_adsorption_immobile: Relativ adsorptionrate til immobil jord [T^-1]
+k_adsorption_kolloid: Relativ adsorptionrate til kolloider [T^-1]
+k_desorption_immobile: Relativ desorptionrate til immobil jord [T^-1]
+k_desorption_kolloid: Relativ desorptionrate til kolloider [T^-1]
 
-** Reaktion
+S_adsorption_immobile og S_adsorption_kolloid ingår som sink term i
+løsning af transportligningen for opløst stof.  S_adsorption_kolloid
+indgår som en del af sourcetermen i ligningen for kolloidfaciliteret
+transport S_adsorption_immobile (ganget med tidsskridtet) trækkes fra
+A_immobile forbindelse med at de to transportligninger løses.
 
-A <-> A-colloid
-A <-> A-sorbed
-A-colloid <-> A-sorbed
+*** Generering og filtrering
 
-* Artkler
+Udvekslingen mellem A_kolloid og A_immobile puljerne følger generering
+og frigivelse af kolloider.
+
+f_generate = S_generate / rho_b
+f_filter = S_filter / M_kolloid
+
+S_soil = f_gen * A_immobile - f_filter * A_kolloid
+
+S_generate: frigivelse af kolloider fra jordmartix [M L^-3 T^-1]
+S_filter: filtrering af kolloider i jordmatrix [M L^-3 T^-1]
+f_generate: relativ frigivelse af kolloider [T^-1]
+f_filter: relativ filtrering af kolloider [T^-1]
+S_soil: mobilisering af adsoreret stof [M L^-3 T^-1]
+
+S_soil lægges til source termen i løsningen af transportligningen for
+kolloider, og trækkes fra (ganget med tidsskridt) A_immobile samtidig
+med transportligningerne løses.
+
+* Kolloider
+
+** Klasser af kolloider?
+
+** Hvordan får vi eksporteret S_generate og S_filter
+
+** Dynamik?
+
+** Stoffer?
+
+*** Solute
+
+*** instant eq?
+
+*** dynamic eq?
+
+* Artikler
 
 rootdens: seyed, pa, sha, mmo
 ominit: pa, bgj, sha
@@ -63,7 +134,6 @@ Farquhar: bgj, sha; pa
 svat: bgj, sha; pa
 
 1d vs 2d dræn: ; sha
-cto macro: mmo; sha, pa, cpe
 
 rørrende vand: mmo, cpe, nabi, maha, sha, pa
 stof?  
