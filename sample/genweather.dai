@@ -161,7 +161,7 @@
 (defprogram GenWeather Daisy
   "Generate daily weather."
   ;; EDIT HERE!  Insert name of existing weather file and the period.
-  (weather default "taastrup.dwf"
+  (weather default "dk-taastrup.dwf"
            (missing_years ((1996 1996) (1997 1997))
                           ((1998 1999) (1996 1997))))
   (time 1996 06 01)

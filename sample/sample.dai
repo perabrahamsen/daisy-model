@@ -6,7 +6,7 @@
 (input file "init-soil.dai")
 
 ;; Use them.
-(weather default "taastrup.dwf")
+(weather default "dk-taastrup.dwf")
 
 (time 1990 3 1 1)
 (stop 1994 4 1 1)

@@ -11,7 +11,7 @@
   ;; hydraulic parameters estimated with two different methods.
   (time 1990 3 1 1)
   (stop 1994 4 1 1)
-  (weather default "taastrup.dwf")
+  (weather default "dk-taastrup.dwf")
   (manager activity 
     (while "SBarley w. MF" (repeat irrigate_30_tensiometer_overhead))
     "WBarley w. OF"

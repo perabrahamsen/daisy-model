@@ -1,4 +1,4 @@
-dwf-0.0 -- Sample _hourly_D_aisy _W_eather _F_ile.
+dwf-0.0 -- Hourly weather data from Taastrup.
 
 # The file must start with dwf-0.0 in order to be recognized.  
 # The rest of the first line is a comment.
@@ -29,11 +29,12 @@ End:   2008-10-31
 Timestep: 1 hours
 
 Note: These data are only for test purposes.
-Note: In the periode 2002-05-01 to 2002-06-07 only daily values of air temperature, precipitation, and global radiation are available.
-Note: In the periode 2006-06-19 to 2006-06-26 only manual measure of daily precipitation is available
-Note: In the periode 2007-06-28 to 2007-07-02 the wind measure was bad. Standard value of 3 m/s is used
-Note: There is only a single logical note, but it can span multiple
-Note: lines, all starting with `Note:'.
+Note: In the periode 2002-05-01 to 2002-06-07 only daily values of air
+Note: temperature, precipitation, and global radiation are available.
+Note: In the periode 2006-06-19 to 2006-06-26 only manual measure of 
+Note: daily precipitation is available
+Note: In the periode 2007-06-28 to 2007-07-02 the wind measure was broken.
+Note:  Standard value of 3 m/s is used
 
 # Fixed deposit values.
 
@@ -49,13 +50,13 @@ TAmplitude: 8.5 dgC
 MaxTDay: 209 yday
 
 # The two sections are separated by a line of dashes. 
-# The first line contains the names of each column of data, the second									
-# the dimensions.  The columns are whitespace separated.									
+# The first line contains the names of each column of data, the second 
+# the dimensions.  The columns are whitespace separated.
 
-# The columns can be arranged arbitrarily.  Year, Month, and Day are									
-# mandatory if a period is not specified, otherwise not.									
+# The columns can be arranged arbitrarily.  Year, Month, and Day are 
+# mandatory if a period is not specified, otherwise not.
 
-------------------------------------------------------------------------------									
+------------------------------------------------------------------------------
 Year	Month	Day	Hour	VapPres	Precip	GlobRad	DiffRad	AirTemp	Wind
 year	month	mday	hour	Pa	mm/h	W/m^2	W/m^2	dgC	m/s
 1995	3	24	0	742	0	1	1	6.2	2.5

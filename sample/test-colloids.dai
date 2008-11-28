@@ -9,7 +9,7 @@
 (input file "chemistry.dai")
 
 ;; Weather data.
-(weather default "taastrup.dwf")
+(weather default "dk-taastrup.dwf")
 
 ;; We have some very sandy soil.
 (defhorizon Ap FAO3
