@@ -35,12 +35,12 @@ mellem immobilt jord og kolloider.  Da kolloiderne generelt regnes for
 lettere tilgængelige end det immobile jord, ganges dog en
 berigelsesesfaktor på først.
 
-A_kolloid_eq = A_total_eq * M_kolloid * B_faktor /(rho_b + M_kolloid * B_faktor)
-A_immobil_eq = A_total_eq - A_kolloid_eq
+A_kolloid_eq = A_total * M_kolloid * B_faktor /(rho_b + M_kolloid * B_faktor)
+A_immobil_eq = A_total - A_kolloid_eq
 
 A_kolloid_eq: adsorberet til kolloid ved ligevægt [M L^-3]
 A_immobil_eq: adsorberet til immobil jord ved ligevægt [M L^-3]
-A_total_eq: total mængde adsorberet stof [M L^-3]
+A_total: total mængde adsorberet stof [M L^-3]
 M_kolloid: massen af kolloider i det aktuelle jordvolumen [M L^-3]
 B_factor: Berigelsesfaktor []
 rho_b: Tør jords massefylde [M L^-3]
