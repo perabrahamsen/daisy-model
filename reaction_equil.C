@@ -58,6 +58,7 @@ struct ReactionEquilibrium : public Reaction
 	     const SoilHeat& soil_heat, const OrganicMatter&,
              Chemistry& chemistry, const double dt, Treelog& msg)
   { 
+    TREELOG_MODEL (msg);
     const size_t cell_size = geo.cell_size ();
     Chemical& A = chemistry.find (name_A);
     Chemical& B = chemistry.find (name_B);
@@ -100,11 +101,12 @@ struct ReactionEquilibrium : public Reaction
   }
 
   // Create.
-  bool check (const Units& units, const Geometry&, 
+  bool check (const Units& units, const Geometry& geo, 
               const Soil& soil, const SoilWater& soil_water, 
 	      const SoilHeat& soil_heat,
 	      const Chemistry& chemistry, Treelog& msg) const
   { 
+    TREELOG_MODEL (msg);
     bool ok = true;
     if (!chemistry.know (name_A))
       {
@@ -116,20 +118,25 @@ struct ReactionEquilibrium : public Reaction
         msg.error ("'" + name_B.name () + "' not traced");
         ok = false;
       }
+    const size_t cell_size = geo.cell_size ();
     ScopeSoil scope (soil, soil_water, soil_heat);
-    if (!equilibrium->check (units, scope, msg))
-      ok = false;
-    if (!k_AB->check_dim (units, scope, k_unit, msg))
-      ok = false;
-    if (!k_BA->check_dim (units, scope, k_unit, msg))
-      ok = false;
-
+    for (size_t c = 0; c < cell_size && ok; c++)
+      {
+        scope.set_cell (c);
+        if (!equilibrium->check (units, scope, msg))
+          ok = false;
+        if (!k_AB->check_dim (units, scope, k_unit, msg))
+          ok = false;
+        if (!k_BA->check_dim (units, scope, k_unit, msg))
+          ok = false;
+      }
     return ok;
   }
   void initialize (const Units& units, const Geometry&, const Soil& soil, 
                    const SoilWater& soil_water, const SoilHeat& soil_heat,
                    Treelog& msg)
   { 
+    TREELOG_MODEL (msg);
     ScopeSoil scope (soil, soil_water, soil_heat);
     equilibrium->initialize (units, scope, msg); 
     S_AB.insert (S_AB.begin (), soil.size (), 0.0);

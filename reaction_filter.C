@@ -60,7 +60,6 @@ struct ReactionFilter : public Reaction
   { 
     const size_t cell_size = soil.size ();
     Chemical& mob = chemistry.find (mobile);  
-    Chemical& immob = chemistry.find (immobile); 
     daisy_assert (F_primary.size() == soil.size());
     daisy_assert (F_secondary.size() == soil.size());
 
@@ -101,8 +100,12 @@ struct ReactionFilter : public Reaction
       }
     mob.add_to_transform_sink (F_primary);
     mob.add_to_transform_sink_secondary (F_secondary);
-    immob.add_to_transform_source (F_primary);
-    immob.add_to_transform_source_secondary (F_secondary);
+    if (chemistry.know (immobile))
+      {
+        Chemical& immob = chemistry.find (immobile); 
+        immob.add_to_transform_source (F_primary);
+        immob.add_to_transform_source_secondary (F_secondary);
+      }
   }
 
   // Create.
@@ -111,7 +114,7 @@ struct ReactionFilter : public Reaction
 	      const Chemistry& chemistry, Treelog& msg) const
   { 
     bool ok = true;
-    if (!chemistry.know (immobile))
+    if (!chemistry.know (immobile) && immobile != Value::None ())
       {
         msg.error ("'" + immobile.name () + "' not traced");
         ok = false;
@@ -134,7 +137,7 @@ struct ReactionFilter : public Reaction
   }
   explicit ReactionFilter (Block& al)
     : Reaction (al),
-      immobile (al.name ("immobile")),
+      immobile (al.name ("immobile", Value::None ())),
       mobile (al.name ("mobile")),
       fc_primary (al.number ("fc_primary")),
       fc_secondary (al.number ("fc_secondary"))
@@ -153,8 +156,9 @@ static struct ReactionFilterSyntax
     alist.add ("description",
                "Filtration of soil colloids.");
 
-    syntax.add ("immobile", Value::String, Value::Const,
-		"Immobile colloids in the soil.");
+    syntax.add ("immobile", Value::String, Value::OptionalConst,
+		"Immobile colloids in the soil.\n\
+By default, filtered colloids are not tracked.");
     syntax.add ("mobile", Value::String, Value::Const,
 		"Mobile colloids dissolved in soil water.");
     syntax.add ("F_primary", "g/cm^3/h", Value::LogOnly, Value::Sequence,

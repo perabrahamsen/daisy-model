@@ -1,5 +1,19 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* Kolloider
+
+** Adsorption equilibrium reaction with colloids?
+
+reaction_colequil.C
+
+bound
+solute
+colloid
+
+** Filter reaction.  Same as for colloids?
+
+** Generate reaction?
+
 * Kolloider og kolloidfascilitetert transport.
 
 ** Kolloider
@@ -8,7 +22,7 @@ Kolloider modeleres i Daisy som et ikke adsorberende stof, med to
 eller tre processer tilknyttet.
 
 Den første process er generering, og den foregår i det øverste
-jordlag, styres af regnintensitet.  Den anden process er filtrering,
+jordlag, styret af regnintensitet.  Den anden process er filtrering,
 som foregår overalt i jormatricen, og er styret af vandhastighed.  Der
 er flere modeller for generering, og en enkelt for filtrering.  Se
 [Jarvis99] og [MST-kolloid] for en beskrivelse af disse.  En tredje
@@ -79,8 +93,8 @@ S_adsorption_immobile: Adsorptionsrate til immobil jord [M L^-3 T^-1]
 S_adsorption_kolloid: Adsorptionsrate til kolloider [M L^-3 T^-1]
 k_adsorption_immobile: Relativ adsorptionrate til immobil jord [T^-1]
 k_adsorption_kolloid: Relativ adsorptionrate til kolloider [T^-1]
-k_desorption_immobile: Relativ desorptionrate til immobil jord [T^-1]
-k_desorption_kolloid: Relativ desorptionrate til kolloider [T^-1]
+k_desorption_immobile: Relativ desorptionrate fra immobil jord [T^-1]
+k_desorption_kolloid: Relativ desorptionrate fra kolloider [T^-1]
 
 S_adsorption_immobile og S_adsorption_kolloid ingår som sink term i
 løsning af transportligningen for opløst stof.  S_adsorption_kolloid
@@ -109,21 +123,6 @@ kolloider, og trækkes fra (ganget med tidsskridt) A_immobile samtidig
 med transportligningerne løses.
 
 * Kolloider
-
-** Klasser af kolloider?
-
-** Hvordan får vi eksporteret S_generate og S_filter
-
-** Dynamik?
-
-** Stoffer?
-
-*** Solute
-
-*** instant eq?
-
-*** dynamic eq?
-
 * Artikler
 
 rootdens: seyed, pa, sha, mmo

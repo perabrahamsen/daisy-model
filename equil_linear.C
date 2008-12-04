@@ -56,6 +56,7 @@ EquilibriumLinear::find (const Units& units, const Scope& scope,
                          const double has_A, const double has_B, 
                          double& want_A, double& want_B, Treelog& msg) const
 {
+  Treelog::Open nest (msg, "equil:linear:find");
   daisy_assert (has_A >= 0.0);
   daisy_assert (has_B >= 0.0);
   const double M = has_A + has_B;
@@ -82,13 +83,14 @@ EquilibriumLinear::find (const Units& units, const Scope& scope,
 void
 EquilibriumLinear::initialize (const Units& units, const Scope& scope, Treelog& msg)
 { 
+  Treelog::Open nest (msg, "equil:linear:initialize");
   K_expr->initialize (units, scope, msg);
 }
 
 bool 
 EquilibriumLinear::check (const Units& units, const Scope& scope, Treelog& msg) const
 {
-  Treelog::Open nest (msg, "linear");
+  Treelog::Open nest (msg, "equil:linear:check");
   bool ok = true;
   if (!K_expr->check_dim (units, scope, Value::None (), msg))
     ok = false;

@@ -88,11 +88,8 @@
         ("Soil water" (to -1 [m])) ("Field water")
         ("Crop Production" (crop "Spring Barley") (where "sbarley.dlf"))
         ("Field chemical" (chemical colloid))
-        ("Soil chemical" (chemical colloid-filtered))
         ("Chemical Content" (chemical colloid)
          (where "M-colloids.dlf"))
-        ("Chemical Content" (chemical colloid-filtered)
-         (where "M-filtered.dlf"))
         ("Colloids")
         (checkpoint (when (at 1987 8 7 6))))
 

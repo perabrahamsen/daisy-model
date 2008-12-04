@@ -25,10 +25,6 @@
 #include "value.h"
 #include "assertion.h"
 
-const int Value::Singleton = -117;
-const int Value::Sequence = -3212;
-const int Value::Unspecified = -666;
-
 // Each value should have an associated type.
 
 symbol

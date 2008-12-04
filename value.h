@@ -43,9 +43,9 @@ namespace Value
   // default size 'Singleton' indicating that the value entry match a
   // single item of the specified type, while the 'Sequence' used for
   // entries that contain an array of unspecified length. 
-  EXPORT extern const int Singleton;	
-  extern const int Sequence;
-  extern const int Unspecified;
+  const int Singleton = -117;	
+  const int Sequence = -3212;
+  const int Unspecified = -666;
 
   // A value may have a dimension associated.
   symbol Unknown ();

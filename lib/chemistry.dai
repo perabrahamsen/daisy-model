@@ -76,12 +76,9 @@
   "Mobile colloids."
   (decompose_rate 0 [h^-1]))
 
-(defchemical colloid-filtered solid
-  "Once mobile colloids, filtered by the soil.")
-
 (defchemistry colloids default
-  (trace colloid colloid-filtered)
-  (reaction (filter (mobile colloid) (immobile colloid-filtered))
+  (trace colloid)
+  (reaction (filter (mobile colloid))
             (MACRO (colloid colloid))))
 
 (defchemistry none multi

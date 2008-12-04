@@ -244,8 +244,31 @@ Block::Implementation::expand_reference (const symbol key)
               && find_syntax (var).size (var) != Value::Singleton)))
     return var;
 
-  error ("Value of '" + key + "' is $" + var
-         + ", which is not bound to the right type");
+  std::ostringstream tmp;
+  tmp << "Value of '" << key << "' is $" << var
+      << ", which is a " << Value::type_name (lookup (var));
+  switch (find_syntax (var).size (var))
+    {
+    case Value::Singleton:
+      break;
+    case Value::Sequence:
+      tmp << " sequence";
+      break;
+    default:
+      tmp << "[" << find_syntax (var).size (var) << "]";
+    }
+  tmp << ", should be a " << Value::type_name (syntax.lookup (key));
+  switch (syntax.size (key))
+    {
+    case Value::Singleton:
+      break;
+    case Value::Sequence:
+      tmp << " sequence";
+      break;
+    default:
+      tmp << "[" << syntax.size (key) << "]";
+    }
+  error (tmp.str ());
   throw ("Bad reference");
 }
 

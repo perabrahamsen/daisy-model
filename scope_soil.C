@@ -32,6 +32,12 @@
 #include <sstream>
 
 const symbol 
+ScopeSoil::rho_b ("rho_b");
+
+const symbol 
+ScopeSoil::clay ("clay");
+
+const symbol 
 ScopeSoil::humus ("humus");
 
 const symbol 
@@ -56,7 +62,8 @@ ScopeSoil::has_number (const symbol tag) const
 {
   daisy_assert (cell >= 0);
 
-  if (tag == humus || tag == h || tag == Theta || tag == T)
+  if (tag == rho_b || tag == clay || tag == humus 
+      || tag == h || tag == Theta || tag == T)
     return true;
 
   if (soil.has_attribute (cell, tag))
@@ -74,6 +81,10 @@ ScopeSoil::number (const symbol tag) const
 {
   daisy_assert (cell >= 0);
 
+  if (tag == rho_b)
+    return soil.dry_bulk_density (cell);
+  if (tag == clay)
+    return soil.clay (cell);
   if (tag == humus)
     return soil.humus (cell);
   if (tag == h)
@@ -89,7 +100,10 @@ ScopeSoil::number (const symbol tag) const
 symbol 
 ScopeSoil::dimension (const symbol tag) const
 {
-  if (tag == humus)
+  static const symbol g_per_cm3 ("g/cm^3");
+  if (tag == rho_b)
+    return g_per_cm3;
+  if (tag == humus || tag == clay)
     return Value::Fraction ();
   if (tag == h)
     return Units::cm ();
@@ -107,6 +121,14 @@ ScopeSoil::dimension (const symbol tag) const
 symbol
 ScopeSoil::description (symbol tag) const
 {
+  static const symbol rho_b_description ("Dry bulk density.");
+  if (tag == rho_b)
+    return rho_b_description;
+
+  static const symbol clay_description ("Clay fraction of dry matter.");
+  if (tag == clay)
+    return clay_description;
+
   static const symbol humus_description ("Humus fraction of dry matter.");
   if (tag == humus)
     return humus_description;
@@ -131,6 +153,8 @@ std::vector<symbol>
 ScopeSoil::find_numbers (const Soil&)
 {
   std::vector<symbol> result;
+  result.push_back (rho_b);
+  result.push_back (clay);
   result.push_back (humus);
   result.push_back (h);
   result.push_back (Theta);
