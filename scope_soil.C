@@ -35,6 +35,9 @@ const symbol
 ScopeSoil::rho_b ("rho_b");
 
 const symbol 
+ScopeSoil::rho_b_unit ("g/cm^3");
+
+const symbol 
 ScopeSoil::clay ("clay");
 
 const symbol 
@@ -69,10 +72,6 @@ ScopeSoil::has_number (const symbol tag) const
   if (soil.has_attribute (cell, tag))
     return true;
   
-  std::ostringstream tmp;
-  tmp << "Attribute '" << tag << "' missing in cell " << cell;
-  Assertion::warning (tmp.str ());
-  
   return false;
 }
 
@@ -100,9 +99,8 @@ ScopeSoil::number (const symbol tag) const
 symbol 
 ScopeSoil::dimension (const symbol tag) const
 {
-  static const symbol g_per_cm3 ("g/cm^3");
   if (tag == rho_b)
-    return g_per_cm3;
+    return rho_b_unit;
   if (tag == humus || tag == clay)
     return Value::Fraction ();
   if (tag == h)

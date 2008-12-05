@@ -34,6 +34,8 @@
 #include "librarian.h"
 #include "mathlib.h"
 #include "treelog.h"
+#include "scope_id.h"
+#include "scope_multi.h"
 #include <memory>
 
 struct ReactionEquilibrium : public Reaction
@@ -46,6 +48,7 @@ struct ReactionEquilibrium : public Reaction
   const std::auto_ptr<Equilibrium> equilibrium;
   const std::auto_ptr<Number> k_AB;
   const std::auto_ptr<Number> k_BA;
+  const symbol name_colloid;
   
   // Output.
   std::vector<double> S_AB;
@@ -62,11 +65,20 @@ struct ReactionEquilibrium : public Reaction
     const size_t cell_size = geo.cell_size ();
     Chemical& A = chemistry.find (name_A);
     Chemical& B = chemistry.find (name_B);
+    const Chemical *const colloid = (name_colloid == Value::None ())
+      ? NULL
+      : &chemistry.find (name_colloid);
     
-    ScopeSoil scope (soil, soil_water, soil_heat);
+    ScopeSoil scope_soil (soil, soil_water, soil_heat);
+    ScopeID scope_id (ScopeSoil::rho_b, ScopeSoil::rho_b_unit);
+    ScopeMulti scope (scope_id, scope_soil);
     for (size_t c = 0; c < cell_size; c++)
       { 
-	scope.set_cell (c);
+	scope_soil.set_cell (c);
+        const double rho_b = colloid 
+          ? colloid->M_primary (c)
+          : soil.dry_bulk_density (c);
+        scope_id.add (ScopeSoil::rho_b, rho_b);
 	const double has_A = A.M_primary (c);
 	const double has_B = B.M_primary (c);
 	double want_A;
@@ -110,14 +122,21 @@ struct ReactionEquilibrium : public Reaction
     bool ok = true;
     if (!chemistry.know (name_A))
       {
-        msg.error ("'" + name_A.name () + "' not traced");
+        msg.error ("'" + name_A + "' not traced");
         ok = false;
       }
     if (!chemistry.know (name_B))
       {
-        msg.error ("'" + name_B.name () + "' not traced");
+        msg.error ("'" + name_B + "' not traced");
         ok = false;
       }
+    if (name_colloid != Value::None ()
+        && !chemistry.know (name_colloid))
+      {
+        msg.error ("'" + name_colloid + "' not traced");
+        ok = false;
+      }
+
     const size_t cell_size = geo.cell_size ();
     ScopeSoil scope (soil, soil_water, soil_heat);
     for (size_t c = 0; c < cell_size && ok; c++)
@@ -152,7 +171,8 @@ struct ReactionEquilibrium : public Reaction
       k_AB (Librarian::build_item<Number> (al, "k_AB")),
       k_BA (al.check ("k_BA")
 	    ? Librarian::build_item<Number> (al, "k_BA")
-	    : Librarian::build_item<Number> (al, "k_AB"))
+	    : Librarian::build_item<Number> (al, "k_AB")),
+      name_colloid (al.name ("colloid", Value::None ()))
   { }
 };
 
@@ -185,9 +205,12 @@ static struct ReactionEquilibriumSyntax
 By default, this is identical to 'k_AB'.");
     syntax.add ("S_AB", "g/cm^3/h", Value::LogOnly, Value::Sequence,
 		"Converted from A to B this timestep (may be negative).");
-
     Librarian::add_type (Reaction::component, "equilibrium",
 			 alist, syntax, &make);
+    syntax.add ("colloid", Value::String, Value::OptionalConst,
+		"Let 'rho_b' denote content of specified chemical.\n\
+This affects the evaluation of the 'K' parameter expression.\n\
+By default, 'rho_b' will be the soil dry bulk density.");
   }
 } ReactionEquilibrium_syntax;
 

@@ -32,8 +32,9 @@ class SoilHeat;
 class ScopeSoil : public Scope
 {
   // Content.
-private:
+public:
   static const symbol rho_b;
+  static const symbol rho_b_unit;
   static const symbol clay;
   static const symbol humus;
   static const symbol h;

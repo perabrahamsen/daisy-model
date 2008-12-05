@@ -6,10 +6,291 @@
 (input file "tillage.dai")
 (input file "crop.dai")
 (input file "log.dai")
-(input file "chemistry.dai")
+
+;; Generic chemistry.
+
+(defchemical common default
+  "For chemicals where we know no better."
+  (canopy_dissipation_rate 0.0083 [h^-1])
+  (canopy_washoff_coefficient 1.0 [])
+  (crop_uptake_reflection_factor 1 [])
+  (diffusion_coefficient 4.6e-6 [cm^2/s]))
+
+;; Pesticides.
+
+(defchemical pesticide common
+  "This stuff protects plants.")
+  
+(defchemical herbicide pesticide
+  "This stuff kills plants.")
+
+;; Colloids.
+
+(defchemical colloid common
+  "Mobile colloids."
+  (diffusion_coefficient 4.6e-6 [cm^2/s])
+  (decompose_rate 0 [h^-1]))
+
+(defreaction colloid-filter filter
+  "Filtration of colloids in the soil matrix."
+  (mobile colloid))
+
+(defreaction colloid-generation MACRO
+  "Release of colloids in soil surface from heavy rain."
+  (colloid colloid))
+
+(defchemistry colloids default
+  (trace colloid)
+  (reaction colloid-filter colloid-generation))
+
+;; Colloid bound pesticides.
+
+(defchemical Pendimethalin-base herbicide
+  "Base parameterization for all Pendimethalin forms."
+  (decompose_rate 0.0004 [h^-1]))
+
+(defchemical Pendimethalin Pendimethalin-base
+  "Dissolved pendimethalin."
+  (adsorption none))
+
+(defchemical Pendimethalin-immobile Pendimethalin-base
+  "Pendimethalin sorbed to immobile soil."
+  (adsorption full))
+
+(defnumber K_equilibrium identity
+  "Ratio between sorbed and solute matter at equilibrium."
+
+  ;; Parameters.
+  (declare K_clay Number [cm^3/g]
+           "Clay dependent distribution parameter.
+It is multiplied with the soil clay fraction to get the clay part of
+the 'K' factor.")
+  (K_clay 0.0 [cm^3/g])
+  (declare K_OC Number [cm^3/g]
+           "Humus dependent distribution parameter.
+It is multiplied with the soil organic carbon fraction to get the
+carbon part of the 'K' factor.")
+  (K_OC 0.0 [cm^3/g])
+  (declare soil_enrichment_factor Number []
+           "Relative preference for sorption to colloids.")
+  (soil_enrichment_factor 1.0 [])
+  (declare c_fraction_in_humus Number [] "Carbon fraction of humus.")
+  (c_fraction_in_humus 0.587 [])
+
+  ;; Value.
+  (value 
+   (let ((Kd (+ (* K_clay clay) (* K_OC c_fraction_in_humus humus))))
+     (/ (* Kd rho_b soil_enrichment_factor) Theta)))
+  (dimension []))
+
+(defnumber K_Pendimethalin K_equilibrium
+  "Adsorption for Pendimethalin to immobile soil."
+  (K_OC 16000 [cm^3/g]))
+
+(defreaction Pendimethalin-immobile-sorption equilibrium
+  "Sorption equilibrium between dissolved and immobile Pendimethalin."
+  (A Pendimethalin-immobile)
+  (B Pendimethalin)
+  (equilibrium linear (K K_Pendimethalin))
+  (k_AB 0.01 [h^-1])                    ;Sorption rate.
+  (k_BA 0.001 [h^-1]))                  ;Desorption rate.
+
+(defchemical Pendimethalin-colloid Pendimethalin-base
+  "Pendimethalin sorbed to colloids."
+  (adsorption none)
+  ;; Same diffusion coefficient as other colloids.
+  (diffusion_coefficient 4.6e-6 [cm^2/s]))
+
+(defreaction Pendimethalin-colloid-sorption Pendimethalin-immobile-sorption
+  "Sorption equilibrium between dissolved and colloid-bound Pendimethalin."
+  (colloid colloid)
+  (A Pendimethalin-colloid)
+  (equilibrium linear (K (K_Pendimethalin (soil_enrichment_factor 1000 [])))))
+
+(defreaction Pendimethalin-filter colloid-filter
+  "Filtration of colloid-bound pendimethalin in the soil matrix."
+  (mobile Pendimethalin-colloid)
+  (immobile Pendimethalin-immobile))
+
+(defchemistry Pendimethalin default
+  "Pendimethalin in both immobile, solute and colloid form."
+  (trace Pendimethalin Pendimethalin-immobile Pendimethalin-colloid)
+  (reaction Pendimethalin-immobile-sorption
+            Pendimethalin-colloid-sorption
+            Pendimethalin-filter))
+
+;;; Use in column.
+;; "colloids" must be listed before bound pesticides.
+;; (Chemistry original (combine &old colloids Pendimethalin-colloid))
+
+(defsummary "Colloid bound sorption" balance
+  "Balance between soil, colloid and solute forms."
+  (precision 3)
+  (require_top true)
+  (input "Solute-Sorption")
+  (output "Soil-Sorption" "Colloid-Sorption")
+  (content))
+
+(defsummary "Colloid bound" balance
+  "Balance for all forms of chemical."
+  (precision 3)
+  (require_top true)
+  (input "Solute-Spray")
+  (output  "Solute-Surface-Loss" 
+           "Solute-Decompose" "Colloid-Decompose" "Soil-Decompose"
+           "Solute-Leak" "Colloid-Leak"
+           "Solute-Drain" "Colloid-Drain")
+  (content "Solute-Tertiary" "Colloid-Tertiary"
+           "Solute-Matrix" "Colloid-Matrix" "Soil-Matrix"
+           "Solute-Error" "Colloid-Error" "Soil-Error"))
+
+(deflog "Colloid bound" chemical
+  "Information about a chemical that can be bound to colloids."
+
+  ;; Parameters.
+  (declare solute string
+	   "Name of dissolved form of the chemical.")
+  (solute identity (value "${chemical}"))
+  (declare soil string
+	   "Name of immobile form of the chemical.")
+  (soil identity (value "${chemical}-immobile"))
+  (declare colloid string
+	   "Name of colloid bound form of the chemical.")
+  (colloid identity (value "${chemical}-colloid"))
+  (declare unit String "Base unit.")
+  (unit "g/ha")
+
+  ;; Stuff.
+  (where "${colfid}colloid_${chemfid}.dlf")
+  (summary "Colloid bound sorption" "Colloid bound")
+  (when hourly)
+  (entries (number (path column "${column}" Chemistry "*" trace "${solute}"
+                         spray)
+                   (tag "Solute-Spray")
+                   (handle sum)
+                   (dimension "${unit}/&")
+                   (spec chemical default spray))
+           (number (path column "${column}" Chemistry "*" trace "${solute}"
+                         top_loss)
+                   (tag "Solute-Surface-Loss")
+                   (handle sum)
+                   (dimension "g/ha/&")
+                   (spec chemical default top_loss))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${solute}" S_transform)
+                     (tag "Solute-Sorption")
+                     (handle sum)
+                     (negate true)
+                     (dimension "${unit}/&")
+                     (spec chemical default S_transform))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${colloid}" S_transform)
+                     (tag "Colloid-Sorption")
+                     (handle sum)
+                     (dimension "${unit}/&")
+                     (spec chemical default S_transform))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${soil}" S_transform)
+                     (tag "Soil-Sorption")
+                     (handle sum)
+                     (dimension "${unit}/&")
+                     (spec chemical default S_transform))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${solute}" S_decompose)
+                     (tag "Solute-Decompose")
+                     (handle sum)
+                     (negate true)
+                     (dimension "${unit}/&")
+                     (spec chemical default S_decompose))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${colloid}" S_decompose)
+                     (tag "Colloid-Decompose")
+                     (handle sum)
+                     (negate true)
+                     (dimension "${unit}/&")
+                     (spec chemical default S_decompose))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${soil}" S_decompose)
+                     (tag "Soil-Decompose")
+                     (handle sum)
+                     (negate true)
+                     (dimension "${unit}/&")
+                     (spec chemical default S_decompose))
+           (flux_bottom (path column "${column}" Chemistry "*" 
+                              trace "${solute}" J_matrix)
+                        (tag "Solute-Leak")
+                        (negate true)
+                        (handle sum)
+                        (dimension "${unit}/&")
+                        (spec chemical default J_matrix))
+           (flux_bottom (path column "${column}" Chemistry "*" 
+                              trace "${colloid}" J_matrix)
+                        (tag "Colloid-Leak")
+                        (negate true)
+                        (handle sum)
+                        (dimension "${unit}/&")
+                        (spec chemical default J_matrix))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${solute}" S_drain)
+                     (tag "Solute-Drain")
+                     (negate true)
+                     (handle sum)
+                     (dimension "${unit}/&")
+                     (spec chemical default S_drain))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${colloid}" S_drain)
+                     (tag "Colloid-Drain")
+                     (negate true)
+                     (handle sum)
+                     (dimension "${unit}/&")
+                     (spec chemical default S_drain))
+           (number (path column "${column}" Movement "*" 
+                         Tertiary biopores solute_storage "${solute}" value)
+                   (spec tertiary biopores solute_storage value)
+                   (tag "Solute-Tertiary")
+                   (dimension "${unit}")
+                   (handle current))
+           (number (path column "${column}" Movement "*" 
+                         Tertiary biopores solute_storage "${colloid}" value)
+                   (spec tertiary biopores solute_storage value)
+                   (tag "Colloid-Tertiary")
+                   (dimension "${unit}")
+                   (handle current))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${solute}" M)
+                     (tag "Solute-Matrix")
+                     (dimension "${unit}")
+                     (spec chemical default M))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${colloid}" M)
+                     (tag "Colloid-Matrix")
+                     (dimension "${unit}")
+                     (spec chemical default M))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${soil}" M)
+                     (tag "Soil-Matrix")
+                     (dimension "${unit}")
+                     (spec chemical default M))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${solute}" M_error)
+                     (tag "Solute-Error")
+                     (dimension "${unit}")
+                     (spec chemical default M_error))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${colloid}" M_error)
+                     (tag "Colloid-Error")
+                     (dimension "${unit}")
+                     (spec chemical default M_error))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${soil}" M_error)
+                     (tag "Soil-Error")
+                     (dimension "${unit}")
+                     (spec chemical default M_error))
+           ))
 
 ;; Weather data.
-(weather default "dk-taastrup.dwf")
+(weather default "dk-taastrup-hourly.dwf"
+         (missing_years ((1986 1989) (2000 2003))))
 
 ;; We have some very sandy soil.
 (defhorizon Ap FAO3
@@ -34,7 +315,7 @@
   "The B.And farm, Andeby, 2002."
   (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
         (MaxRootingDepth 60.0 [cm]))
-  (Chemistry multi (combine colloids))
+  (Chemistry multi (combine colloids Pendimethalin))
   (Movement original 
             (Tertiary (biopores (use_small_timesteps false)
                                 (classes (matrix (height_start 0 [cm])
@@ -63,21 +344,27 @@
 
 (manager activity
   (wait (at 1987 3 20 1))
+  (spray Pendimethalin 1 [kg/ha])
   (plowing)
   (wait (at 1987 4 4 1))
+  (spray Pendimethalin 1 [kg/ha])
   (fertilize (mineral (weight 100.0 [kg N/ha])
                       (NH4_fraction 0.5 [])))
   (wait (at 1987 4 5 1))
+  (spray Pendimethalin 1 [kg/ha])
   (progn
     (sow ("Grass" (water_stress_effect none)))
     (sow ("Spring Barley" (Canopy (EpFac 1.5)))))
   (wait (or (crop_ds_after "Spring Barley" 2.0)
             (at 1987 9 5 1)))
+  (spray Pendimethalin 1 [kg/ha])
   (harvest "Spring Barley")
   (wait (at 1987 9 8 1))
+  (spray Pendimethalin 1 [kg/ha])
   (fertilize (mineral (weight 80.0 [kg N/ha])
                       (NH4_fraction 0.5 [])))
   (wait (at 1987 10 10 1))
+  (spray Pendimethalin 1 [kg/ha])
   (harvest "Grass"
            (stub 8.0 [cm])              ;Leave 8 cm stub.
            (stem 1.00 [])))             ;Harvest everything above stub.
@@ -91,6 +378,10 @@
         ("Chemical Content" (chemical colloid)
          (where "M-colloids.dlf"))
         ("Colloids")
+        ("Field chemical" (chemical Pendimethalin))
+        ("Soil chemical" (chemical Pendimethalin-immobile))
+        ("Soil chemical" (chemical Pendimethalin-colloid))
+        ("Colloid bound" (chemical Pendimethalin))
         (checkpoint (when (at 1987 8 7 6))))
 
 ;;; test-colloids.dai ends here.

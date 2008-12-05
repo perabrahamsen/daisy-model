@@ -2,17 +2,31 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Kolloider
 
-** Adsorption equilibrium reaction with colloids?
+** NumberFetch
 
-reaction_colequil.C
+skal have et 'child' som enten er en parameter, const, eller get.
 
-bound
-solute
-colloid
+** Lav en ColloidBound log
 
-** Filter reaction.  Same as for colloids?
+** Adsorption reaction.
+
+Tilføj 'colloid' parameter til 'reaction_equil.C'.
 
 ** Generate reaction?
+
+* Split chemical default.
+
+base -> (mobile, immobile, instant-equilibrium/default)
+
+* MST R2D2 rapport
+
+** Diskuter med BGJ.
+
+* Opsætninger
+
+** Se på Finns opsætning.
+
+** Se på Nannas opsætning.
 
 * Kolloider og kolloidfascilitetert transport.
 

@@ -29,6 +29,7 @@
 #include "assertion.h"
 #include "librarian.h"
 #include "treelog.h"
+#include <sstream>
 
 struct NumberConst : public Number
 {
@@ -211,9 +212,8 @@ struct NumberFetch : public Number
   symbol title () const
   { return name; }
 
-  static double* fetch_default_value (Block& al, const symbol key_symbol)
+  static double* fetch_default_value (Block& al, const symbol key)
   {
-    const std::string& key = key_symbol.name ();
     if (al.lookup (key) != Value::Number)
       return NULL;
     const AttributeList& alist = al.find_alist (key);
@@ -228,9 +228,8 @@ struct NumberFetch : public Number
       }
     return new double (alist.number (key));
   }
-  static symbol fetch_default_dimension (Block& al, const symbol key_symbol)
+  static symbol fetch_default_dimension (Block& al, const symbol key)
   {
-    const std::string& key = key_symbol.name ();
     if (al.lookup (key) != Value::Number)
       return Value::Unknown ();
     const Syntax& syntax = al.find_syntax (key);
@@ -248,7 +247,15 @@ struct NumberFetch : public Number
   void tick (const Units&, const Scope&, Treelog&)
   { }
   bool missing (const Scope& scope) const
-  { return !default_value && !scope.has_number (name); }
+  {
+    if (default_value || scope.has_number (name))
+      return false;
+
+    std::ostringstream tmp;
+    tmp << "Attribute '" << name << "' missing";
+    Assertion::warning (tmp.str ());
+    return true;
+  }
   double value (const Scope& scope) const
   { 
     if (scope.has_number (name))
@@ -283,7 +290,16 @@ struct NumberFetch : public Number
       name (al.name ("name")),
       default_value (fetch_default_value (al, name)),
       default_dimension (fetch_default_dimension (al, name))
-  { }
+  { 
+#if 0
+    std::ostringstream tmp;
+    tmp << "Fetch '" << name << "'";
+    if (default_value)
+      tmp << " with default value " << *default_value 
+          << " [" << default_dimension << "]";
+    al.msg ().message (tmp.str ());
+#endif
+  }
   ~NumberFetch ()
   { delete default_value; }
 };

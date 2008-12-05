@@ -1,3 +1,9 @@
+2008-12-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log-std.dai ("Soil chemical"): Fixed "Decompose" sign.
+
+	* reaction_equil.C (colloid): New parameter.
+
 2008-11-27  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* sample/genweather.dai: New sample setup.
