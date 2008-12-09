@@ -31,11 +31,11 @@
   (diffusion_coefficient 4.6e-6 [cm^2/s])
   (decompose_rate 0 [h^-1]))
 
-(defreaction colloid-filter filter
+(defreaction colloid-filter filter_velocity
   "Filtration of colloids in the soil matrix."
   (mobile colloid))
 
-(defreaction colloid-generation MACRO
+(defreaction colloid-generation colgen_Jarvis99
   "Release of colloids in soil surface from heavy rain."
   (colloid colloid))
 
@@ -76,11 +76,13 @@ carbon part of the 'K' factor.")
   (soil_enrichment_factor 1.0 [])
   (declare c_fraction_in_humus Number [] "Carbon fraction of humus.")
   (c_fraction_in_humus 0.587 [])
+  (declare Kd number "Sorption parameter.")
+  (Kd (+ (* K_clay clay) (* K_OC c_fraction_in_humus humus)))
 
+  (declare ratio number "Ration between per volume matter.")
+  (ratio (/ (* Kd rho_b soil_enrichment_factor) Theta))
   ;; Value.
-  (value 
-   (let ((Kd (+ (* K_clay clay) (* K_OC c_fraction_in_humus humus))))
-     (/ (* Kd rho_b soil_enrichment_factor) Theta)))
+  (value ratio)
   (dimension []))
 
 (defnumber K_Pendimethalin K_equilibrium

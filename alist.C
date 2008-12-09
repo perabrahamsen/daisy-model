@@ -537,7 +537,7 @@ AttributeList::Implementation::lookup (const symbol key) const
   value_map::const_iterator i = values.find (key);
   
   if (i == values.end ())
-    daisy_panic (std::string ("AList: Missing key '") + key + "'");
+    daisy_panic ("AList: Missing key '" + key + "'");
 
   return (*i).second;
 }
@@ -652,7 +652,7 @@ AttributeList::get_reference (const symbol key) const
   daisy_assert (is_reference (key));
   const AValue& value = impl.lookup (key);
   value.expect (key, Value::Object);
-  return (*value.name).name (); 
+  return *value.name;
 }
 
 double 

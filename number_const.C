@@ -28,6 +28,7 @@
 #include "unit.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "library.h"
 #include "treelog.h"
 #include <sstream>
 
@@ -62,10 +63,18 @@ struct NumberConst : public Number
       }
     return ok;
   }
-  NumberConst (Block& al)
+  explicit NumberConst (Block& al)
     : Number (al),
       val (al.number ("value")),
       unit_ (al.units ().get_unit (al.name ("value")))
+  { 
+    if (al.units ().is_error (unit_))
+      al.msg ().warning ("Unknown unit '" + al.name ("value") + "'");
+  }
+  explicit NumberConst (Block& al, const symbol key)
+    : Number (al),
+      val (al.number (key)),
+      unit_ (al.units ().get_unit (al.find_syntax (key).dimension (key)))
   { 
     if (al.units ().is_error (unit_))
       al.msg ().warning ("Unknown unit '" + al.name ("value") + "'");
@@ -90,42 +99,10 @@ static struct NumberConstSyntax
   }
 } NumberConst_syntax;
 
-struct NumberLeaf : public Number
-{
-  // Parameters.
-  const Unit& unit_;
-
-  // Simulation.
-  void tick (const Units&, const Scope&, Treelog&)
-  { }
-  symbol dimension (const Scope&) const
-  { return unit_.native_name (); }
-  const Unit& unit () const
-  { return unit_; }
-
-  // Create.
-  bool check (const Units& units, const Scope&, Treelog& msg) const
-  { 
-    bool ok = true;
-    if (units.is_error (unit_))
-      {
-        msg.error ("Bad unit");
-        ok = false;
-      }
-    return ok;
-  }
-  NumberLeaf (Block& al)
-    : Number (al),
-      unit_ (al.units ().get_unit (al.name ("dimension")))
-  { 
-    if (al.units ().is_error (unit_))
-      al.msg ().warning ("Unknown unit '" + al.name ("dimension") + "'");
-  }
-};
-
-struct NumberGet : public NumberLeaf
+struct NumberGet : public Number
 {
   // Data.
+  const Unit& unit_;
   const Unit* scope_unit;
 
   // Parameters.
@@ -134,6 +111,12 @@ struct NumberGet : public NumberLeaf
   { return name; }
 
   // Simulation.
+  void tick (const Units&, const Scope&, Treelog&)
+  { }
+  symbol dimension (const Scope&) const
+  { return unit_.native_name (); }
+  const Unit& unit () const
+  { return unit_; }
   bool missing (const Scope& scope) const
   { return !scope.has_number (name); }
   double value (const Scope& scope) const
@@ -160,7 +143,12 @@ struct NumberGet : public NumberLeaf
   {
     Treelog::Open nest (msg, name);
 
-    bool ok = NumberLeaf::check (units, scope, msg);
+    bool ok = true;
+    if (units.is_error (unit_))
+      {
+        msg.error ("Bad unit");
+        ok = false;
+      }
     if (!scope_unit)
       {
         msg.error ("'" + name + "' is not a number");
@@ -177,9 +165,19 @@ struct NumberGet : public NumberLeaf
   }
 
   NumberGet (Block& al)
-    : NumberLeaf (al),
+    : Number (al),
+      unit_ (al.units ().get_unit (al.name ("dimension"))),
       scope_unit (NULL),
       name (al.name ("name"))
+  {
+    if (al.units ().is_error (unit_))
+      al.msg ().warning ("Unknown unit '" + al.name ("dimension") + "'");
+  }
+  NumberGet (Block& al, const symbol key)
+    : Number (al),
+      unit_ (al.units ().get_unit (al.name ("dimension"))),
+      scope_unit (NULL),
+      name (key)
   { }
 };
 
@@ -203,105 +201,183 @@ static struct NumberGetSyntax
   }
 } NumberGet_syntax;
 
-struct NumberFetch : public Number
+struct NumberFetchGet : public Number
 {
+  // Data.
+  const Unit* scope_unit;
+
   // Parameters.
   const symbol name;
-  const double *const default_value;
-  const symbol default_dimension;
   symbol title () const
   { return name; }
 
-  static double* fetch_default_value (Block& al, const symbol key)
-  {
-    if (al.lookup (key) != Value::Number)
-      return NULL;
-    const AttributeList& alist = al.find_alist (key);
-    if (!alist.check (key))
-      return NULL;
-    const Syntax& syntax = al.find_syntax (key);
-    daisy_assert (syntax.lookup (key) == Value::Number);
-    if (syntax.size (key) != Value::Singleton)
-      {
-	al.msg ().warning ("Parameter '" + key + "' is a sequence, ignored");
-	return NULL;
-      }
-    return new double (alist.number (key));
-  }
-  static symbol fetch_default_dimension (Block& al, const symbol key)
-  {
-    if (al.lookup (key) != Value::Number)
-      return Value::Unknown ();
-    const Syntax& syntax = al.find_syntax (key);
-    daisy_assert (syntax.lookup (key) == Value::Number);
-    const symbol dim (syntax.dimension (key));
-    if (dim == Value::User ())
-      {
-	const AttributeList& alist = al.find_alist (key);
-	if (alist.check (key))
-	  return alist.name (key);
-      }
-    return dim;
-  }
   // Simulation.
   void tick (const Units&, const Scope&, Treelog&)
   { }
-  bool missing (const Scope& scope) const
-  {
-    if (default_value || scope.has_number (name))
-      return false;
-
-    std::ostringstream tmp;
-    tmp << "Attribute '" << name << "' missing";
-    Assertion::warning (tmp.str ());
-    return true;
+  symbol dimension (const Scope&) const
+  { 
+    daisy_assert (scope_unit);
+    return scope_unit->native_name (); 
   }
+  const Unit& unit () const
+  { 
+    daisy_assert (scope_unit);
+    return *scope_unit; 
+  }
+  bool missing (const Scope& scope) const
+  { return !scope.has_number (name); }
   double value (const Scope& scope) const
   { 
-    if (scope.has_number (name))
-      return scope.number (name);
-    daisy_assert (default_value);
-    return *default_value;
-  }
-  symbol dimension (const Scope& scope) const
-  { 
-    if (scope.is_number (name))
-      return scope.dimension (name); 
-    return default_dimension;
+    daisy_assert (scope.has_number (name));
+    return scope.number ( name);
   }
 
   // Create.
-  bool initialize (const Units&, const Scope&, Treelog&)
-  { return true; }
-  bool check (const Units&, const Scope& scope, Treelog& msg) const
+  bool initialize (const Units& units, const Scope& scope, Treelog& msg)
+  { 
+    if (!scope.is_number (name))
+      {
+        msg.error ("'" + name + "' is not a number");
+        return false;
+      }
+    const symbol got_dim = scope.dimension (name);
+    scope_unit = &units.get_unit (got_dim);
+    return true;
+  }
+  bool check (const Units& units, const Scope& scope, Treelog& msg) const
   {
-    Treelog::Open nest (msg, "Fetch: " + name);
+    Treelog::Open nest (msg, name);
 
     bool ok = true;
-    if (!default_value && !scope.is_number (name))
+    if (!scope_unit)
       {
-        msg.error ("'" + name + "' not in scope");
+        msg.error ("'" + name + "' is not a number");
+        ok = false;
+      }
+    else if (units.is_error (*scope_unit))
+      {
+        daisy_assert (scope.is_number (name));
+        const symbol got_dim = scope.dimension (name);
+        msg.error ("'" + name + "' has unknown dimension [" + got_dim + "]");
         ok = false;
       }
     return ok;
   }
+
+  NumberFetchGet (Block& al, const symbol key)
+    : Number (al),
+      scope_unit (NULL),
+      name (key)
+  { }
+};
+
+struct NumberFetch : public Number
+{
+  // Parameters.
+  const std::auto_ptr<Number> child;
+  symbol title () const
+  { return child->title (); }
+
+  static std::auto_ptr<Number> fetch_child (Block& al, const symbol key)
+  {
+    std::auto_ptr<Number> result;
+    Value::type type = al.lookup (key);
+    switch (type)
+      {
+      case Value::Number:
+        {
+          if (!al.check (key))
+            {
+              al.error ("Parameter '" + key 
+                        + "' is declared, but has no value");
+              break;
+            }
+          const Syntax& syntax = al.find_syntax (key);
+          daisy_assert (syntax.lookup (key) == Value::Number);
+          if (syntax.size (key) != Value::Singleton)
+            {
+              al.error ("Parameter '" + key 
+                         + "' is a sequence, expected singleton");
+              break;
+            }
+          result.reset (new NumberConst (al, key));
+        }
+        break;
+      case Value::Object:
+        {
+          const Metalib& metalib = al.metalib ();
+          const Syntax& syntax = al.find_syntax (key);
+          const Library& lib = syntax.library (al.metalib (), key);
+          if (lib.name () != Number::component)
+            {
+              al.error ("'" + key + "' is a '" + lib.name ()
+                         + "' model, expected a '"
+                         + Number::component + "'");
+              break;
+            }
+          if (syntax.size (key) != Value::Singleton)
+            {
+              al.error ("Parameter '" + key 
+                        + "' is a model sequence, expected singleton");
+              break;
+            }
+          const AttributeList& alist = al.find_alist (key);
+          if (!alist.check (key))
+            {
+              al.error ("'" + key + "' declared, but has no value");
+              break;
+            }
+          if (!syntax.check (metalib, alist, key, al.msg ()))
+            break;
+          result.reset (Librarian::build_item<Number> (al, key));
+        }
+        break;
+      case Value::Error:
+        result.reset (new NumberFetchGet (al, key));
+        break;
+      default:
+        al.error ("'" + key + "' is a " + Value::type_name (type)
+                  + ", expected a number");
+      }
+    return result;
+  }
+  // Simulation.
+  void tick (const Units& units, const Scope& scope, Treelog& msg)
+  { child->tick (units, scope, msg); }
+  bool missing (const Scope& scope) const
+  { return child->missing (scope); }
+  double value (const Scope& scope) const
+  { return child->value (scope); }
+  symbol dimension (const Scope& scope) const
+  { return child->dimension (scope); }
+
+  // Create.
+  bool initialize (const Units& units, const Scope& scope, Treelog& msg)
+  { 
+    if (!child.get ())
+      return false;
+    return child->initialize (units, scope, msg); 
+  }
+  bool check (const Units& units, const Scope& scope, Treelog& msg) const
+  {
+    TREELOG_MODEL (msg);
+
+    bool ok = true;
+    if (!child.get ())
+      {
+        msg.error ("Fetch failed");
+        ok = false;
+      }
+    else if (!child->check (units, scope, msg))
+      ok = false;
+    return ok;
+  }
   NumberFetch (Block& al)
     : Number (al),
-      name (al.name ("name")),
-      default_value (fetch_default_value (al, name)),
-      default_dimension (fetch_default_dimension (al, name))
-  { 
-#if 0
-    std::ostringstream tmp;
-    tmp << "Fetch '" << name << "'";
-    if (default_value)
-      tmp << " with default value " << *default_value 
-          << " [" << default_dimension << "]";
-    al.msg ().message (tmp.str ());
-#endif
-  }
+      child (fetch_child (al, al.name ("name")))
+  { }
   ~NumberFetch ()
-  { delete default_value; }
+  { }
 };
 
 static struct NumberFetchSyntax

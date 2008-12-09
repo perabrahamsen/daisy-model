@@ -157,6 +157,7 @@ struct ReactionEquilibrium : public Reaction
   { 
     TREELOG_MODEL (msg);
     ScopeSoil scope (soil, soil_water, soil_heat);
+    scope.set_cell (0);
     equilibrium->initialize (units, scope, msg); 
     S_AB.insert (S_AB.begin (), soil.size (), 0.0);
     daisy_assert (S_AB.size () == soil.size ());

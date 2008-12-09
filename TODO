@@ -6,13 +6,9 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 skal have et 'child' som enten er en parameter, const, eller get.
 
-** Lav en ColloidBound log
-
-** Adsorption reaction.
-
-Tilføj 'colloid' parameter til 'reaction_equil.C'.
-
 ** Generate reaction?
+
+** Flere colloid generation modeller.
 
 * Split chemical default.
 

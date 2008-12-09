@@ -78,8 +78,8 @@
 
 (defchemistry colloids default
   (trace colloid)
-  (reaction (filter (mobile colloid))
-            (MACRO (colloid colloid))))
+  (reaction (filter_velocity (mobile colloid))
+            (colgen_Jarvis99 (colloid colloid))))
 
 (defchemistry none multi
   (combine))

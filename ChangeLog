@@ -1,3 +1,7 @@
+2008-12-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* block.C: More systematic use of parent scopes.
+
 2008-12-05  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* lib/log-std.dai ("Soil chemical"): Fixed "Decompose" sign.

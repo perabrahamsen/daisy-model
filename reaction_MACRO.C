@@ -1,4 +1,4 @@
-// reaction_MACRO.C -- Colloids generation emulating the MACRO model.
+// reaction_Jarvis99.C -- Colloids generation emulating the MACRO model.
 // 
 // Copyright 2008 Birgitte Gjettermann, Per Abrahamsen and KU
 //
@@ -33,7 +33,7 @@
 #include "soil.h"
 #include "treelog.h"
 
-struct ReactionMACRO : public Reaction
+struct ReactionJarvis99 : public Reaction
 {
   // Parameters.
   const symbol colloid_name;
@@ -70,18 +70,18 @@ struct ReactionMACRO : public Reaction
   bool check (const Units&, const Geometry& geo,
               const Soil&, const SoilWater&, const SoilHeat&,
 	      const Chemistry& chemistry, Treelog& msg) const;
-  ReactionMACRO (Block& al);
+  ReactionJarvis99 (Block& al);
 };
 
 const double 
-ReactionMACRO::R_to_E (const double R)
+ReactionJarvis99::R_to_E (const double R)
 { 
   const double cm2_per_m2 = (100.0 * 100.0);
   return  29.0 * (1 - 0.72 * exp (-0.05 * R)) / cm2_per_m2; 
 }
 
 void
-ReactionMACRO::colloid_generation (const double Rain_intensity, // [mm/h] 
+ReactionJarvis99::colloid_generation (const double Rain_intensity, // [mm/h] 
                                    const double dt) // [h]
 {
   // Kinetic energy of rain. [J cm^-2 mm^-1]
@@ -99,7 +99,7 @@ ReactionMACRO::colloid_generation (const double Rain_intensity, // [mm/h]
 }
 
 void 
-ReactionMACRO::tick_top (const double direct_rain,
+ReactionJarvis99::tick_top (const double direct_rain,
                          Chemistry& chemistry, const double dt, Treelog&)
 {
   Chemical& colloid = chemistry.find (colloid_name);
@@ -115,7 +115,7 @@ ReactionMACRO::tick_top (const double direct_rain,
 }
 
 void 
-ReactionMACRO::output (Log& log) const 
+ReactionJarvis99::output (Log& log) const 
 {
   output_variable (Ms, log); 
   output_variable (As, log); 
@@ -126,7 +126,7 @@ ReactionMACRO::output (Log& log) const
 
 
 void 
-ReactionMACRO::initialize (const Units&, const Geometry& geo,
+ReactionJarvis99::initialize (const Units&, const Geometry& geo,
                            const Soil& soil, const SoilWater&, const SoilHeat&, 
                            Treelog&)
 {  
@@ -152,7 +152,7 @@ ReactionMACRO::initialize (const Units&, const Geometry& geo,
 }
 
 bool 
-ReactionMACRO::check (const Units&, const Geometry& geo,
+ReactionJarvis99::check (const Units&, const Geometry& geo,
                       const Soil&, const SoilWater&, const SoilHeat&,
                       const Chemistry& chemistry, Treelog& msg) const
 { 
@@ -170,7 +170,7 @@ ReactionMACRO::check (const Units&, const Geometry& geo,
   return ok;
 }
 
-ReactionMACRO::ReactionMACRO (Block& al)
+ReactionJarvis99::ReactionJarvis99 (Block& al)
   : Reaction (al),
     colloid_name (al.name ("colloid")),
     Mmax (al.number ("Mmax")),
@@ -185,10 +185,10 @@ ReactionMACRO::ReactionMACRO (Block& al)
     E (R_to_E (0.0))
 { }
 
-static struct ReactionMACROSyntax
+static struct ReactionJarvis99Syntax
 {
   static Model& make (Block& al)
-  { return *new ReactionMACRO (al); }
+  { return *new ReactionJarvis99 (al); }
   static void load_syntax (Syntax& syntax, AttributeList& alist)
   {
     syntax.add ("colloid", Value::String, Value::Const,
@@ -217,7 +217,7 @@ By default, 10% of Mmax.");
     syntax.add ("E", "J/cm^2/mm", Value::LogOnly, 
                 "Kinetic energy in rain.");
   }
-  ReactionMACROSyntax ()
+  ReactionJarvis99Syntax ()
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
@@ -225,8 +225,9 @@ By default, 10% of Mmax.");
 	       "Colloid generation emulating the MACRO model.");
     alist.add_strings ("cite", "macro-colloid");
     load_syntax (syntax, alist);
-    Librarian::add_type (Reaction::component, "MACRO", alist, syntax, &make);
+    Librarian::add_type (Reaction::component, "colgen_Jarvis99",
+                         alist, syntax, &make);
   }
-} ReactionMACROsyntax;
+} ReactionJarvis99syntax;
 
-// reaction_MACRO.C ends here.
+// reaction_Jarvis99.C ends here.

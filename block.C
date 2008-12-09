@@ -48,6 +48,7 @@ struct Block::Implementation
   Value::type lookup (symbol) const;
   const Syntax& find_syntax (const symbol key) const;
   const AttributeList& find_alist (const symbol key) const;
+  bool check (const symbol key) const;
   symbol expand_string (Block&, symbol) const;
   symbol expand_reference (const symbol key);
   void error (const std::string& msg);
@@ -90,11 +91,21 @@ Block::Implementation::find_syntax (const symbol key) const
 const AttributeList& 
 Block::Implementation::find_alist (const symbol key) const
 {
-  Value::type type = syntax.lookup (key);
-  if (type != Value::Error)
+  if (alist.check (key))
     return alist;
   daisy_assert (parent != NULL);
-  return parent->impl->find_alist (key);
+  return parent->find_alist (key);
+}
+
+bool
+Block::Implementation::check (const symbol key) const
+{
+  Value::type type = syntax.lookup (key);
+  if (type != Value::Error)
+    return alist.check (key);
+  if (parent == NULL)
+    return false;
+  return parent->impl->check (key);
 }
 
 symbol
@@ -236,7 +247,7 @@ Block::Implementation::expand_reference (const symbol key)
   if (var == key)
     {
       error ("Value of '" + key + "' refers to itself");
-      throw ("Reference loop");
+      throw "Reference loop";
     }
   if (lookup (var) == syntax.lookup (key)
       && (find_syntax (var).size (var) == syntax.size (key)
@@ -337,24 +348,17 @@ Block::find_alist (const symbol key) const
 
 bool 
 Block::check (const symbol key) const
-{
-  if (!impl->alist.is_reference (key))
-    return impl->alist.check (key); 
-
-  const symbol var = impl->expand_reference (key);
-  return impl->find_alist (var).check (var); 
-}
+{ return impl->check (key); }
 
 double 
 Block::number (const symbol key) const
 { 
-  if (!impl->alist.is_reference (key))
-    return impl->alist.number (key); 
+  const AttributeList& alist = find_alist (key);
+  if (alist.is_reference (key))
+    return this->number (impl->expand_reference (key));
 
-  const symbol var = impl->expand_reference (key);
-  return impl->find_alist (var).number (var); 
+  return alist.number (key); 
 }
-
 
 double 
 Block::number (const symbol key, double default_value) const
@@ -363,11 +367,11 @@ Block::number (const symbol key, double default_value) const
 symbol
 Block::name (const symbol key)
 { 
-  if (!impl->alist.is_reference (key))
-    return impl->expand_string (*this, impl->alist.name (key)); 
+  const AttributeList& alist = find_alist (key);
+  if (alist.is_reference (key))
+    return this->name (impl->expand_reference (key));
 
-  const symbol var = impl->expand_reference (key);
-  return impl->expand_string (*this, impl->find_alist (var).name (var)); 
+  return impl->expand_string (*this, alist.name (key)); 
 }
 
 symbol
@@ -377,11 +381,11 @@ Block::name (const symbol key, const symbol default_value)
 bool 
 Block::flag (const symbol key) const
 { 
-  if (!impl->alist.is_reference (key))
-    return impl->alist.flag (key); 
+  const AttributeList& alist = find_alist (key);
+  if (alist.is_reference (key))
+    return this->flag (impl->expand_reference (key));
 
-  const symbol var = impl->expand_reference (key);
-  return impl->find_alist (var).flag (var); 
+  return alist.flag (key); 
 }
 
 bool 
@@ -391,31 +395,31 @@ Block::flag (const symbol key, bool default_value) const
 const PLF& 
 Block::plf (const symbol key) const
 { 
-  if (!impl->alist.is_reference (key))
-    return impl->alist.plf (key); 
+  const AttributeList& alist = find_alist (key);
+  if (alist.is_reference (key))
+    return this->plf (impl->expand_reference (key));
 
-  const symbol var = impl->expand_reference (key);
-  return impl->find_alist (var).plf (var); 
+  return alist.plf (key); 
 }
 
 AttributeList& 
 Block::alist (const symbol key) const
 { 
-  if (!impl->alist.is_reference (key))
-    return impl->alist.alist (key); 
+  const AttributeList& alist = find_alist (key);
+  if (alist.is_reference (key))
+    return this->alist (impl->expand_reference (key));
 
-  const symbol var = impl->expand_reference (key);
-  return impl->find_alist (var).alist (var); 
+  return alist.alist (key); 
 }
 
 int 
 Block::integer (const symbol key) const
 { 
-  if (!impl->alist.is_reference (key))
-    return impl->alist.integer (key); 
+  const AttributeList& alist = find_alist (key);
+  if (alist.is_reference (key))
+    return this->integer (impl->expand_reference (key));
 
-  const symbol var = impl->expand_reference (key);
-  return impl->find_alist (var).integer (var); 
+  return alist.integer (key); 
 }
 
 int 
@@ -425,11 +429,11 @@ Block::integer (const symbol key, int default_value) const
 const std::vector<double>& 
 Block::number_sequence (const symbol key) const
 { 
-  if (!impl->alist.is_reference (key))
-    return impl->alist.number_sequence (key); 
+  const AttributeList& alist = find_alist (key);
+  if (alist.is_reference (key))
+    return this->number_sequence (impl->expand_reference (key));
 
-  const symbol var = impl->expand_reference (key);
-  return impl->find_alist (var).number_sequence (var); 
+  return alist.number_sequence (key); 
 }
 
 const std::vector<symbol>
@@ -456,41 +460,41 @@ Block::name_sequence (const symbol key)
 const std::vector<bool>& 
 Block::flag_sequence (const symbol key) const
 { 
-  if (!impl->alist.is_reference (key))
-    return impl->alist.flag_sequence (key); 
+  const AttributeList& alist = find_alist (key);
+  if (alist.is_reference (key))
+    return this->flag_sequence (impl->expand_reference (key));
 
-  const symbol var = impl->expand_reference (key);
-  return impl->find_alist (var).flag_sequence (var); 
+  return alist.flag_sequence (key); 
 }
 
 const std::vector<int>& 
 Block::integer_sequence (const symbol key) const
 { 
-  if (!impl->alist.is_reference (key))
-    return impl->alist.integer_sequence (key); 
+  const AttributeList& alist = find_alist (key);
+  if (alist.is_reference (key))
+    return this->integer_sequence (impl->expand_reference (key));
 
-  const symbol var = impl->expand_reference (key);
-  return impl->find_alist (var).integer_sequence (var); 
+  return alist.integer_sequence (key); 
 }
 
 const std::vector<const PLF*>& 
 Block::plf_sequence (const symbol key) const
 { 
-  if (!impl->alist.is_reference (key))
-    return impl->alist.plf_sequence (key); 
+  const AttributeList& alist = find_alist (key);
+  if (alist.is_reference (key))
+    return this->plf_sequence (impl->expand_reference (key));
 
-  const symbol var = impl->expand_reference (key);
-  return impl->find_alist (var).plf_sequence (var); 
+  return alist.plf_sequence (key); 
 }
 
 const std::vector<const AttributeList*>& 
 Block::alist_sequence (const symbol key) const
 { 
-  if (!impl->alist.is_reference (key))
-    return impl->alist.alist_sequence (key); 
+  const AttributeList& alist = find_alist (key);
+  if (alist.is_reference (key))
+    return this->alist_sequence (impl->expand_reference (key));
 
-  const symbol var = impl->expand_reference (key);
-  return impl->find_alist (var).alist_sequence (var); 
+  return alist.alist_sequence (key); 
 }
 
 symbol
