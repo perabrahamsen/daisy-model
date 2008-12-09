@@ -305,29 +305,33 @@ carbon part of the 'K' factor.")
   (C_per_N 11.0 [g C/g N])
   (dry_bulk_density 1.5 [g/cm^3]))
 
+(defhorizon Ap_plowing Ap
+  "Plowing seal."
+  (hydraulic original (K_sat 0.0001 [cm/d])))
+
 (defhorizon C Ap
   "Andeby C horizon."
-  (secondary_domain pressure
-                    (h_lim -20 [cm])
-                    (alpha 0.001 [h^-1]))
+;;  (secondary_domain pressure
+;;                    (h_lim -20 [cm])
+;;                    (alpha 0.001 [h^-1]))
   (humus 0.12 [%]))
 
 ;; We build the column from the horizons.
 (defcolumn Andeby default
   "The B.And farm, Andeby, 2002."
-  (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
+  (Soil (horizons (-20 [cm] Ap) (-25 [cm] Ap_plowing) (-2.5 [m] C))
         (MaxRootingDepth 60.0 [cm]))
   (Chemistry multi (combine colloids Pendimethalin))
   (Movement original 
             (Tertiary (biopores (use_small_timesteps false)
-                                (classes (matrix (height_start 0 [cm])
+                                (classes (matrix (height_start -0.5 [cm])
                                                  (height_end -2 [m])
                                                  ;;(debug 1)
                                                  (density 200 [m^-2])
                                                  (diameter 10 [mm])
                                                  (R_primary 100 [h])
                                                  (R_secondary 10 [h]))
-                                         (drain  (height_start -5 [cm])
+                                         (drain  (height_start -0.5 [cm])
                                                  (height_end -1.5 [m])
                                                  (diameter 10 [mm])
                                                  (density 100 [m^-2])
@@ -335,7 +339,7 @@ carbon part of the 'K' factor.")
                                          ))))
                              
   (OrganicMatter none)
-  (Groundwater deep))
+  (Groundwater pipe (pipe_position -150 [cm])))
 
 ;; Use it.
 (column Andeby)
