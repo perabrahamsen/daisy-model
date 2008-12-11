@@ -119,6 +119,7 @@ carbon part of the 'K' factor.")
   (trace Pendimethalin Pendimethalin-immobile Pendimethalin-colloid)
   (reaction Pendimethalin-immobile-sorption
             Pendimethalin-colloid-sorption
+            (Pendimethalin-colloid-sorption (secondary true))
             Pendimethalin-filter))
 
 ;;; Use in column.
@@ -376,7 +377,7 @@ carbon part of the 'K' factor.")
            (stem 1.00 [])))             ;Harvest everything above stub.
 
 ;; Create these log files.
-(output harvest
+(output harvest Failure
         "Tertiary biopores water" "Tertiary water sink"
         ("Soil water" (to -1 [m])) ("Field water")
         ("Crop Production" (crop "Spring Barley") (where "sbarley.dlf"))

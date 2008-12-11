@@ -1,3 +1,18 @@
+2008-12-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* movement_1D.C (Movement1D::tick_water): Water transport failures
+	now only reported in daisy.log and summary.
+
+	* movement.C, movement.h (water_failure_level)
+	(solute_failure_level): New log variables.
+	(Movement::clear): New function.
+	* column_std.C (ColumnStandard::clear): Call it.
+	* lib/log.dai (Failure): New log paramaterization.
+
+	* scope_soil.C (ScopeSoil::set_old_water, ScopeSoil::set_domain):
+	New member functions.
+	* reaction_equil.C (secondary): New parameter.
+
 2008-12-09  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* block.C: More systematic use of parent scopes.

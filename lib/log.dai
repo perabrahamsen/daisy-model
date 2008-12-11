@@ -3511,6 +3511,17 @@ nowhere go to.  For typical setups, this value will be zero.")
                    (dimension "${unit}/&")
                    (handle sum))))
 
-(deflog "Harvest" harvest)
+(deflog Failure column
+  "Keep track of when our transport models fail."
+  (where "${colfid}failure.dlf")
+  (when hourly)
+  (entries (number (tag "Water")
+                   (path column "${column}" Movement "*" water_failure_level)
+                   (spec movement vertical water_failure_level)
+                   (handle max))
+           (number (tag "Solute")
+                   (path column "${column}" Movement "*" solute_failure_level)
+                   (spec movement vertical solute_failure_level)
+                   (handle max))))
 
 ;;; log.dai ends here

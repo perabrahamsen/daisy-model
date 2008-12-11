@@ -1,10 +1,24 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* Equilibrium
+
+1. Mellem As og C1
+
+2. Mellem As og As
+
+3. Mellem C2 og C2
+
+4. Mellem C1 og C1
+
+5. Mellem K1 of C1
+
+6. Mellem K2 og C2
+
+(colloid colloid)
+(domain secondary)
+
+
 * Kolloider
-
-** NumberFetch
-
-skal have et 'child' som enten er en parameter, const, eller get.
 
 ** Generate reaction?
 
@@ -17,12 +31,6 @@ base -> (mobile, immobile, instant-equilibrium/default)
 * MST R2D2 rapport
 
 ** Diskuter med BGJ.
-
-* Opsætninger
-
-** Se på Finns opsætning.
-
-** Se på Nannas opsætning.
 
 * Kolloider og kolloidfascilitetert transport.
 

@@ -49,6 +49,8 @@ Movement::water_attempt (const size_t level)
 void 
 Movement::water_failure (const size_t level)
 {
+  if (water_failure_level < static_cast<int> (level))
+    water_failure_level = level;
   while (water_fail.size () <= level)
     water_fail.push_back (0);
   water_fail[level]++;
@@ -65,6 +67,8 @@ Movement::solute_attempt (const size_t level)
 void 
 Movement::solute_failure (const size_t level)
 {
+  if (solute_failure_level < static_cast<int> (level))
+    solute_failure_level = level;
   while (solute_fail.size () <= level)
     solute_fail.push_back (0);
   solute_fail[level]++;
@@ -114,9 +118,18 @@ Movement::tick_tertiary (const Units& units,
                          SoilWater& soil_water, Surface& surface, Treelog& msg)
 { tertiary->tick (units, geo, soil, soil_heat, dt, soil_water, surface, msg); }
 
+void
+Movement::clear ()
+{
+  water_failure_level = -1;
+  solute_failure_level = -1;
+}
+
 void 
 Movement::output (Log& log) const
 { 
+  output_variable (water_failure_level, log);
+  output_variable (solute_failure_level, log);
   output_derived (tertiary, "Tertiary", log);
 }
 
@@ -160,10 +173,20 @@ Movement::load_base (Syntax& syntax, AttributeList&)
   syntax.add_object ("Tertiary", Tertiary::component, 
                      Value::OptionalState, Value::Singleton, "\
 Tertiary (that is, non-matrix) transport method.");
+  syntax.add ("water_failure_level", Value::Integer, Value::LogOnly, "\
+The number of the last water transport model to fail.\n\
+It is -1 if the first model succeded, and 0 if the first model failed but\n\
+the second succeded.");
+  syntax.add ("solute_failure_level", Value::Integer, Value::LogOnly, "\
+The number of the last solute transport model to fail.\n                \
+It is -1 if the first model succeded, and 0 if the first model failed but\n\
+the second succeded.");
 }
 
 Movement::Movement (Block& al)
   : ModelLogable (al.name ("type")),
+    water_failure_level (-1),
+    solute_failure_level (-1),
     tertiary (Librarian::build_item<Tertiary> (al, "Tertiary"))
 { }
 

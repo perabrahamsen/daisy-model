@@ -31,7 +31,7 @@ class SoilHeat;
 
 class ScopeSoil : public Scope
 {
-  // Content.
+  // Utilities.
 public:
   static const symbol rho_b;
   static const symbol rho_b_unit;
@@ -40,18 +40,28 @@ public:
   static const symbol h;
   static const symbol Theta;
   static const symbol T;
-public:				// TODO: private
+
+  // Types.
+public:
+  enum domain_t { primary, secondary, matrix };
+
+  // Content.
+private:
   const Soil& soil;
   const SoilWater& soil_water;
   const SoilHeat& soil_heat;
-private:
   const std::vector<symbol> all_numbers_;
 
   // State.
-public:				// TODO: public
+private:
+  bool old_water;
+  domain_t domain;
+public:                         // Abused for debugging in scope_soil.h
   int cell;			// Current cell.
 public:
   void set_cell (size_t);
+  void set_old_water (bool old);
+  void set_domain (domain_t);
 
   // Scope Interface.
 public:

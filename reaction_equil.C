@@ -28,6 +28,7 @@
 #include "chemical.h"
 #include "geometry.h"
 #include "soil.h"
+#include "soil_water.h"
 #include "scope_soil.h"
 #include "log.h"
 #include "assertion.h"
@@ -36,12 +37,13 @@
 #include "treelog.h"
 #include "scope_id.h"
 #include "scope_multi.h"
+#include "vcheck.h"
 #include <memory>
 
 struct ReactionEquilibrium : public Reaction
 {
   static const symbol k_unit;
-  
+
   // Parameters.
   const symbol name_A;
   const symbol name_B;
@@ -49,7 +51,8 @@ struct ReactionEquilibrium : public Reaction
   const std::auto_ptr<Number> k_AB;
   const std::auto_ptr<Number> k_BA;
   const symbol name_colloid;
-  
+  const bool secondary;
+
   // Output.
   std::vector<double> S_AB;
   void output (Log& log) const
@@ -70,17 +73,48 @@ struct ReactionEquilibrium : public Reaction
       : &chemistry.find (name_colloid);
     
     ScopeSoil scope_soil (soil, soil_water, soil_heat);
+    scope_soil.set_old_water (true); // Theta at start of timestep.
+    scope_soil.set_domain (secondary
+                           ? ScopeSoil::secondary 
+                           : ScopeSoil::primary);
     ScopeID scope_id (ScopeSoil::rho_b, ScopeSoil::rho_b_unit);
+    if (secondary && !colloid)
+      // No soil in secondary domain.
+      scope_id.add (ScopeSoil::rho_b, 0.0);
     ScopeMulti scope (scope_id, scope_soil);
     for (size_t c = 0; c < cell_size; c++)
       { 
 	scope_soil.set_cell (c);
-        const double rho_b = colloid 
-          ? colloid->M_primary (c)
-          : soil.dry_bulk_density (c);
-        scope_id.add (ScopeSoil::rho_b, rho_b);
-	const double has_A = A.M_primary (c);
-	const double has_B = B.M_primary (c);
+        double has_A;
+        double has_B;
+
+        if (secondary)
+          {
+            const double Theta_old = soil_water.Theta_secondary_old (c);
+            
+            if (Theta_old < 1e-4 || soil_water.Theta_secondary (c) < 1e-4)
+              // Nothing to do.
+              {
+                S_AB[c] = 0.0;
+                continue;
+              }
+            if (colloid)
+              scope_id.add (ScopeSoil::rho_b, 
+                            colloid->C_secondary (c) * Theta_old);
+            has_A = A.C_secondary (c) * Theta_old;
+            has_B = B.C_secondary (c) * Theta_old;
+          }
+        else
+          {
+            if (colloid)
+              scope_id.add (ScopeSoil::rho_b, colloid->M_primary (c));
+            else
+              scope_id.add (ScopeSoil::rho_b, soil.dry_bulk_density (c));
+
+            has_A = A.M_primary (c);
+            has_B = B.M_primary (c);
+          }
+
 	double want_A;
 	double want_B;
 	equilibrium->find (units, scope, has_A, has_B, want_A, want_B,
@@ -173,7 +207,8 @@ struct ReactionEquilibrium : public Reaction
       k_BA (al.check ("k_BA")
 	    ? Librarian::build_item<Number> (al, "k_BA")
 	    : Librarian::build_item<Number> (al, "k_AB")),
-      name_colloid (al.name ("colloid", Value::None ()))
+      name_colloid (al.name ("colloid", Value::None ())),
+      secondary (al.flag ("secondary"))
   { }
 };
 
@@ -210,8 +245,18 @@ By default, this is identical to 'k_AB'.");
 			 alist, syntax, &make);
     syntax.add ("colloid", Value::String, Value::OptionalConst,
 		"Let 'rho_b' denote content of specified chemical.\n\
-This affects the evaluation of the 'K' parameter expression.\n\
+This miht affect the evaluation of the 'k_AB' and 'k_BA' parameter\n\
+expressions, as well as the 'equilibrium' model.\n\
 By default, 'rho_b' will be the soil dry bulk density.");
+    syntax.add ("secondary", Value::Boolean, Value::Const,
+                "Equilibrium should happen in the secondary domain.\n\
+There will only be a reaction when there is water in the secondary domain\n\
+(inter-aggregate pores), at both the beginning and end of the timestep.\n\
+By default, only the content of the primary domain (soil-bound and\n\
+intra-aggregate pores), will be included in the reaction.\n\
+There is no way to use this model to specify an equilibrium reaction in\n\
+the tertiary domain (biopores).");
+    alist.add ("secondary", false);
   }
 } ReactionEquilibrium_syntax;
 

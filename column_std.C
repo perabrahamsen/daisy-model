@@ -579,6 +579,7 @@ ColumnStandard::bottom () const
 void
 ColumnStandard::clear ()
 { 
+  movement->clear ();
   soil_water->clear ();
   chemistry->clear ();
 

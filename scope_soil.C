@@ -56,6 +56,14 @@ void
 ScopeSoil::set_cell (size_t c)
 { cell = c; }
 
+void 
+ScopeSoil::set_old_water (const bool old)
+{ old_water = old; }
+
+void 
+ScopeSoil::set_domain (const domain_t d)
+{ domain = d; }
+
 const std::vector<symbol>& 
 ScopeSoil::all_numbers () const
 { return all_numbers_; }
@@ -87,9 +95,28 @@ ScopeSoil::number (const symbol tag) const
   if (tag == humus)
     return soil.humus (cell);
   if (tag == h)
-    return soil_water.h (cell);
+    if (old_water)
+      return soil_water.h_old (cell);
+    else 
+      return soil_water.h (cell);
   if (tag == Theta)
-    return soil_water.Theta (cell);
+    switch (domain)
+      {
+      case primary:
+        return old_water 
+          ? soil_water.Theta_primary_old (cell)
+          : soil_water.Theta_primary (cell);
+      case secondary:
+        return old_water 
+          ? soil_water.Theta_secondary_old (cell)
+          : soil_water.Theta_secondary (cell);
+      case matrix:
+        return old_water 
+          ? soil_water.Theta_old (cell)
+          : soil_water.Theta (cell);
+      default:
+        daisy_notreached ();
+      }
   if (tag == T)
     return soil_heat.T (cell);
 
@@ -166,6 +193,8 @@ ScopeSoil::ScopeSoil (const Soil& s, const SoilWater& sw, const SoilHeat& sh)
     soil_water (sw),
     soil_heat (sh),
     all_numbers_ (find_numbers (soil)),
+    old_water (false),
+    domain (matrix),
     cell (-1)
 { }
 

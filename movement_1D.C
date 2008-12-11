@@ -198,16 +198,16 @@ Movement1D::tick_water (const Geometry1D& geo,
           const double q_down = q[soil.size ()] + q_p[soil.size ()];
           groundwater.accept_bottom (q_down * dt, geo, soil.size ());
           if (m > 0)
-            msg.message ("Reserve model succeeded");
+            msg.debug ("Reserve model succeeded");
           return;
         }
       catch (const char* error)
         {
-          msg.warning (std::string ("UZ problem: ") + error);
+          msg.debug (std::string ("UZ problem: ") + error);
         }
       catch (const std::string& error)
         {
-          msg.warning (std::string ("UZ trouble: ") + error);
+          msg.debug (std::string ("UZ trouble: ") + error);
         }
       
       // Make sure we don't call tertiary transport right after reserve model.

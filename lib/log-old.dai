@@ -113,4 +113,6 @@
   (from    0 [cm])
   (to   -100 [cm]))
 
+(deflog "Harvest" harvest)
+
 ;;; log-old.dai ends here.

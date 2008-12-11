@@ -61,6 +61,8 @@ private:
   std::vector<size_t> water_total;
   std::vector<size_t> solute_fail;
   std::vector<size_t> solute_total;
+  int water_failure_level;
+  int solute_failure_level;
 protected:
   void water_attempt (size_t level);
   void water_failure (size_t level);
@@ -80,6 +82,7 @@ public:
 
   // Simulation.
 public:
+  virtual void clear ();
   virtual void tick (const Soil&, SoilWater&, const SoilHeat&, Surface&,
                      Groundwater&, const Time&, const Weather&, 
                      double dt, Treelog&) = 0;
