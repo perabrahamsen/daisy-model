@@ -8,6 +8,25 @@ release.
 
 * 4.58
 
+** Sample taastrup.dwf extendended and renamed to dk-taastrup.dwf
+
+In now contains weather data until 2008-10-31
+
+** New dk-taastrup-hourly.dwf sample file.
+
+This file contains hourly weather data from Taastrup for the period
+1995-03-24 to 2008-10-31.  The data is detailed enough to feed the
+more advanced photosynthesis and svat models in Daisy.
+
+** New genweather.dai sample setup file.
+
+This file demostrates how to aggregate and distribute weather data.
+
+** The 'Field nitrogen' and 'Field chemical' logs now includes tertiary domain.
+
+The content of the biopores is now included in the balance for these
+two log parameterizations.
+
 ** Bug fixes.
 
 * 4.57

@@ -75,7 +75,7 @@ A_immobil_eq: adsorberet til immobil jord ved ligevægt [M L^-3]
 A_total: total mængde adsorberet stof [M L^-3]
 M_kolloid: massen af kolloider i det aktuelle jordvolumen [M L^-3]
 B_factor: Berigelsesfaktor []
-rho_b: Tør jords massefylde [M L^-3]
+rho_b: Tør jords volumenmasse [M L^-3]
 
 Ligevægten mellem A_total og opløst stof (C_eq) bestemmes med en af de
 allerede implementerede adsorptionsmodeller (lineær, Freundlich,
