@@ -8,15 +8,25 @@ release.
 
 * 4.58
 
+** Water transport model failures more discrete.
+
+The number of times the water (or solute) models failed to find a
+solutions is now reported only at the end of the simulation.  You can
+still find them in the daisy.log file, and the new "Failure" log
+paramterization will also include information about when the failures
+occured in an easy parsable format.
+
 ** Sample taastrup.dwf extendended and renamed to dk-taastrup.dwf
 
-In now contains weather data until 2008-10-31
+In now contains weather data until 2008-10-31.  Note that the level of
+quality control of the newer data has been reduced.
 
 ** New dk-taastrup-hourly.dwf sample file.
 
 This file contains hourly weather data from Taastrup for the period
 1995-03-24 to 2008-10-31.  The data is detailed enough to feed the
-more advanced photosynthesis and svat models in Daisy.
+more advanced photosynthesis and svat models in Daisy, but the quality
+control performed on the data is not impressive.
 
 ** New genweather.dai sample setup file.
 
@@ -26,6 +36,25 @@ This file demostrates how to aggregate and distribute weather data.
 
 The content of the biopores is now included in the balance for these
 two log parameterizations.
+
+** New 'secondary' parameter to the 'equilibrium' reaction.
+
+The 'secondary' parameter is a flag indicating that the equilibrium
+reaction takes place in the secondar domain rather than the primary domain. 
+
+** New 'colloid' parameter to the 'equilibrium' reaction.
+
+The value of the 'colloid' parameter should be a name of chemical to
+use instead of the soil for the 'rho_b' scope variable.  The idea is
+to use it in situation where a solute may bind to colloids instead of
+to imoobile soil.  See 'test-colloids.dai' for an example.
+
+** Colloids work.
+
+The 'colloid' chemical and the 'colloids' chemistry have been removed
+from the 'chemistry.dai' file, and move to the 'test-colloids.dai'
+file instead.  The later now contains an example with both colloids
+and a colloid bound pesticide
 
 ** Bug fixes.
 

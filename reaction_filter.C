@@ -168,11 +168,11 @@ By default, filtered colloids are not tracked.");
 
     syntax.add ("fc_primary", "cm^-1", Check::positive (), Value::Const,
                 "Filter coefficient in the primary domain");
-    alist.add ("fc_primary", 1.0);
+    // alist.add ("fc_primary", 1.0);
    
     syntax.add ("fc_secondary", "cm^-1", Check::positive (), Value::Const,
                 "Filter coefficient in secondary domain");
-    alist.add ("fc_secondary", 0.5);
+    // alist.add ("fc_secondary", 0.5);
 
     Librarian::add_type (Reaction::component, "filter_velocity",
                          alist, syntax, &make);

@@ -195,16 +195,16 @@ static struct ReactionJarvis99Syntax
 		"Colloid to generate.");
     syntax.add ("Mmax", "g/g", Check::non_negative (), Value::Const,
                 "Maximum amount of detachable particles.");
-    alist.add ("Mmax", 0.165);
+    // alist.add ("Mmax", 0.165);
     syntax.add ("kd", "g/J", Check::non_negative (), Value::Const,
                 "Detachment rate coefficient.");
-    alist.add ("kd", 15.0);
+    // alist.add ("kd", 15.0);
     syntax.add ("kr", "g/cm^2/h", Check::non_negative (), Value::Const,
                 "Replenishment rate coefficient.");
-    alist.add ("kr", 0.1 /* [g/m^2/h] */ / (100.0 /* [cm/m] */ * 100.0));
+    // alist.add ("kr", 0.1 /* [g/m^2/h] */ / (100.0 /* [cm/m] */ * 100.0));
     syntax.add ("zi", "cm", Check::positive (), Value::Const,
                 "Thickness of surface soil layer.");
-    alist.add ("zi", 0.1);
+    // alist.add ("zi", 0.1);
     syntax.add ("Ms", "g/g", Check::non_negative (), Value::OptionalState,
                 "Current concentration of detachable particles in top soil.\n\
 By default, 10% of Mmax.");
