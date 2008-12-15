@@ -686,12 +686,8 @@ UZRectMollerup::Dirichlet (const size_t edge, const size_t cell,
   double entry = -sin_angle * in_sign;
   const double Gm_val = entry * K_cell * area;
   Gm (cell) += Gm_val;
- 
-  //dq (edge) = in_sign * (K_area_per_length * h_old 
-  //                       + Dm_vec_val + Gm_val) / area;
   dq (edge) = in_sign * (K_area_per_length * h_old 
-                      + Dm_vec_val + Gm_val) / area;
-
+                         + Dm_vec_val + Gm_val) / area;
   daisy_assert (std::isfinite (dq (edge)));
 }
 

@@ -50,6 +50,7 @@ struct GroundwaterAquitard : public Groundwater
   {
     const double aquitard_bottom = geo.bottom () - Z_aquitard;
     h_aquifer = pressure_table->operator()() - aquitard_bottom;
+    std::cout << "h_aquifer = " << h_aquifer << '\n';
   }
 
   // Bottom flux.
