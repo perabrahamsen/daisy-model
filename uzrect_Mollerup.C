@@ -301,12 +301,14 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 
       ublas::vector<double> h_conv;
 
+      
       for (size_t cell = 0; cell != cell_size ; ++cell)
         {
           active_lysimeter[cell] = h (cell) > h_lysimeter (cell);
           Kold [cell] = soil.K (cell, h (cell), h_ice (cell), T (cell));
           Ksum [cell] = 0.0;
         }
+      
 
       std::vector<top_state> state (edge_above.size (), top_undecided);
       
@@ -316,6 +318,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	  h_conv = h;
 	  iterations_used++;
           
+
           std::ostringstream tmp_conv;
           tmp_conv << "Convergence " << iterations_used; 
           Treelog::Open nest (msg, tmp_conv.str ());
@@ -365,6 +368,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	  Gm = ublas::zero_vector<double> (cell_size);
 	  ublas::vector<double> B (cell_size); // Neu bc 
 	  B = ublas::zero_vector<double> (cell_size);
+
 	  lowerboundary (geo, groundwater, active_lysimeter, h,
 			 K, dq, Dm_mat, Dm_vec, Gm, B, msg);
 	  upperboundary (geo, soil, T, surface, state, remaining_water, h,
@@ -691,6 +695,7 @@ UZRectMollerup::Dirichlet (const size_t edge, const size_t cell,
   daisy_assert (std::isfinite (dq (edge)));
 }
 
+
 void 
 UZRectMollerup::lowerboundary (const GeometryRect& geo,
 			       const Groundwater& groundwater,
@@ -727,43 +732,14 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
             Neumann (edge, cell, area, in_sign, flux, dq, B);
           }
           break;
+          
         case Groundwater::forced_flux:
           {
-#if 0
-            //---------------Forced flux BC -----------------------------------
             const double flux = groundwater.q_bottom (edge);
             Neumann (edge, cell, area, in_sign, flux, dq, B);
-            //---------------End forced flux BC -------------------------------
-#elif 1 
-            
-            //-----------This is a lysimeter BC (placed wrong place)-----------
-            if (active_lysimeter[cell])
-              {
-                //Neumann - not so good
-                //const double flux = -in_sign * sin_angle * K (cell);
-                //Neumann (edge, cell, area, in_sign, flux, dq, B);
-                //Dirichlet - better
-                const double value = -K (cell) * geo.edge_area_per_length (edge);
-                const double pressure =  0.0;
-                Dirichlet (edge, cell, area, in_sign, sin_angle,
-                           K (cell), h (cell),
-                           value, pressure, dq, Dm_mat, Dm_vec, Gm);
-              }
-            //---------------------- End lysimeter BC ------------------------
- 
-
-#else
-            //---- Pressure BC ------------------------------
-            const double value = -K (cell) * geo.edge_area_per_length (edge);
-            const double pressure =  0.0;
-            Dirichlet (edge, cell, area, in_sign, sin_angle,
-                       K (cell), h (cell),
-                       value, pressure, dq, Dm_mat, Dm_vec, Gm);
-            //std::cout << "Pressure BC \n"; 
-            //----End pressure BC ---------------------------
-#endif 
           }
           break;
+        
         case Groundwater::pressure:
           {
             const double value = -K (cell) * geo.edge_area_per_length (edge);
@@ -776,18 +752,21 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
           }
           break;
 
-
         case Groundwater::lysimeter:
-
-          if (active_lysimeter[cell])
-            {
-              const double value = -K (cell) * geo.edge_area_per_length (edge);
-              const double pressure =  0.0;
-              Dirichlet (edge, cell, area, in_sign, sin_angle,
-                         K (cell), h (cell),
-                         value, pressure, dq, Dm_mat, Dm_vec, Gm);
-            }
-                    
+          {
+            if (active_lysimeter[cell])
+              {
+                //Neumann - not so good
+                //const double flux = -in_sign * sin_angle * K (cell);
+                //Neumann (edge, cell, area, in_sign, flux, dq, B);
+                //Dirichlet - better
+                const double value = -K (cell) * geo.edge_area_per_length (edge);
+                const double pressure =  0.0;
+                Dirichlet (edge, cell, area, in_sign, sin_angle,
+                           K (cell), h (cell),
+                           value, pressure, dq, Dm_mat, Dm_vec, Gm);
+              }
+          }
           break;
           
         default:
@@ -795,6 +774,7 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
         }
     }
 }
+
 
 void 
 UZRectMollerup::upperboundary (const GeometryRect& geo,
