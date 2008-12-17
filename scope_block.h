@@ -31,15 +31,24 @@ class ScopeBlock : public Scope
 private:
   Block& block;
 
-  // Interface.
+  // Scope interface.
 public:
+  void entries (std::vector<symbol>&) const;
+  Value::type lookup (symbol) const;
+  symbol dimension (symbol tag) const;
+  symbol description (symbol) const;
+  int type_size (symbol tag) const;
+
+  bool check (symbol tag) const;
+  int value_size (symbol tag) const;
+  double number (symbol tag) const;
+  symbol name (symbol) const;
+
+public:
+  // Use.
   const std::vector<symbol>& all_numbers () const;
   bool has_number (symbol tag) const;
-  double number (symbol tag) const;
-  symbol dimension (symbol tag) const;
-  virtual bool has_name (symbol) const;
-  virtual symbol name (symbol) const;
-  symbol description (symbol) const;
+  bool has_name (symbol) const;
 
   // Create and Destroy.
 private:

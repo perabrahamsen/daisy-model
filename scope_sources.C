@@ -28,12 +28,25 @@
 #include "memutils.h"
 #include <sstream>
 
-const std::vector<symbol>& 
-ScopeSources::all_numbers () const
-{ return all_numbers_; }
+void 
+ScopeSources::entries (std::vector<symbol>& all) const
+{ 
+  for (size_t i = 0; i < source.size (); i++)
+    all.push_back (source[i]->title ());
+}
+
+Value::type 
+ScopeSources::lookup (const symbol tag) const
+{
+  for (size_t i = 0; i < source.size (); i++)
+    if (source[i]->title () == tag)
+      return Value::Number;
+
+  return Value::Error;
+}
 
 bool 
-ScopeSources::has_number (const symbol tag) const
+ScopeSources::check (const symbol tag) const
 {
   for (size_t i = 0; i < source.size (); i++)
     if (source[i]->title () == tag 
@@ -140,12 +153,9 @@ ScopeSources::ScopeSources (const std::vector<Source*>& s)
     source (s),
     index (s.size (), -1),
     now (1, 1, 1, 0)
-{ 
-  for (size_t i = 0; i < source.size (); i++)
-    all_numbers_.push_back (source[i]->title ());
-}
+{ }
 
 ScopeSources::~ScopeSources ()
-{ sequence_delete (source.begin (), source.end ()); }
+{ }
 
 // scope_sources.C ends here

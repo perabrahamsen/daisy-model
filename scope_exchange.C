@@ -41,10 +41,6 @@ symbol
 Exchange::tag () const
 { return tag_; }
 
-bool 
-Exchange::is_number () const
-{ return false; }
-
 symbol 
 Exchange::name () const
 { daisy_notreached (); }
@@ -53,17 +49,9 @@ double
 Exchange::number () const
 { daisy_notreached (); }
 
-bool 
-Exchange::has_number () const
-{ return false; }
-
 symbol 
 Exchange::dimension () const
 { daisy_notreached (); }
-
-bool 
-Exchange::has_name () const
-{ return false; }
 
 symbol 
 Exchange::get_description () const
@@ -92,17 +80,17 @@ Exchange::~Exchange ()
 
 // Exchanging a number.
 
-bool 
-ExchangeNumber::is_number () const
-{ return true; }
+Value::type 
+ExchangeNumber::lookup () const
+{ return Value::Number; }
+
+bool
+ExchangeNumber::check () const
+{ return has_value; }
 
 double 
 ExchangeNumber::number () const
 { return value; }
-
-bool 
-ExchangeNumber::has_number () const
-{ return has_value; }
 
 symbol 
 ExchangeNumber::dimension () const
@@ -158,8 +146,12 @@ Current value to exchange.");
 
 // Exchanging a name (or string).
 
-bool 
-ExchangeName::has_name () const
+Value::type 
+ExchangeName::lookup () const
+{ return Value::String; }
+
+bool
+ExchangeName::check () const
 { return true; }
 
 symbol 
@@ -192,17 +184,29 @@ Current value to exchange.");
 
 // The scope.
 
-const std::vector<symbol>& 
-ScopeExchange::all_numbers () const
-{ return all_numbers_; }
+void 
+ScopeExchange::entries (std::vector<symbol>& result) const
+{
+  for (size_t i = 0; i < all.size (); i++)
+    result.push_back (all[i]->tag ());
+}
+
+Value::type 
+ScopeExchange::lookup (const symbol tag) const
+{
+  const std::map<symbol, Exchange*>::const_iterator i = named.find (tag);
+  if (i == named.end ())
+    return Value::Error;
+  return (*i).second->lookup (); 
+}
 
 bool 
-ScopeExchange::has_number (symbol tag) const
+ScopeExchange::check (symbol tag) const
 {
   const std::map<symbol, Exchange*>::const_iterator i = named.find (tag);
   if (i == named.end ())
     return false;
-  return (*i).second->has_number (); 
+  return (*i).second->check ();
 }
 
 double 
@@ -219,16 +223,6 @@ ScopeExchange::dimension (symbol tag) const
   const std::map<symbol, Exchange*>::const_iterator i = named.find (tag);
   daisy_assert (i != named.end ());
   return (*i).second->dimension (); 
-}
-
-bool 
-ScopeExchange::has_name (symbol tag) const
-{
-  const std::map<symbol, Exchange*>::const_iterator i = named.find (tag);
-  if (i == named.end ())
-    return false;
-
-  return (*i).second->has_name (); 
 }
 
 symbol 
@@ -255,16 +249,6 @@ ScopeExchange::add (symbol tag, double value)
   (*i).second->set_number (value); 
 }
   
-std::vector<symbol>
-ScopeExchange::find_all_numbers (const std::vector<Exchange*>& entries)
-{
-  std::vector<symbol> result;
-  for (size_t i = 0; i < entries.size (); i++)
-    if (entries[i]->is_number ())
-      result.push_back (entries[i]->tag ());
-  return result;
-}
-
 std::map<symbol, Exchange*> 
 ScopeExchange::find_named (const std::vector<Exchange*>& entries)
 {
@@ -276,20 +260,16 @@ ScopeExchange::find_named (const std::vector<Exchange*>& entries)
 
 void 
 ScopeExchange::add_item (Exchange* item)
-{ entries.push_back (item); }
+{ all.push_back (item); }
 
 void 
 ScopeExchange::done ()
-{
-  all_numbers_ = find_all_numbers (entries);
-  named = find_named (entries);
-}
+{ named = find_named (all); }
 
 ScopeExchange::ScopeExchange (Block& al)
   : WScope (al),
-    entries (Librarian::build_vector<Exchange> (al, "entries")),
-    all_numbers_ (find_all_numbers (entries)),
-    named (find_named (entries))
+    all (Librarian::build_vector<Exchange> (al, "entries")),
+    named (find_named (all))
 { }
 
 ScopeExchange::ScopeExchange ()

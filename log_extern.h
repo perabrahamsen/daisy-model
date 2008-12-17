@@ -48,8 +48,8 @@ class EXPORT LogExtern : public LogSelect,
   class NumEntry;
 
   // Destination Content.
-  typedef enum { Error, Missing, Number, Name, Array } type;
-  typedef std::map<symbol, type> type_map;
+  typedef enum { Error, Missing, Number, Name, Array } intern_type;
+  typedef std::map<symbol, intern_type> type_map;
   typedef std::map<symbol, double> number_map;
   typedef std::map<symbol, symbol> name_map;
   typedef std::map<symbol, int> int_map;
@@ -61,7 +61,6 @@ class EXPORT LogExtern : public LogSelect,
   int_map sizes;
   name_map dimensions;
   name_map descriptions;
-  std::vector<symbol> all_numbers_;
 
   // Log.
   symbol last_done;
@@ -84,19 +83,21 @@ private:
   // Scope
 public:
   void tick (const Scope&, Treelog&);
-  const std::vector<symbol>& all_numbers () const;
-  bool has_number (symbol) const;
+  void entries (std::vector<symbol>&) const;
+  Value::type lookup (symbol tag) const;
+  int type_size (symbol tag) const;
+  int value_size (symbol tag) const;
+  using LogSelect::check;
+  bool check (symbol tag) const;
   double number (symbol) const;
   symbol dimension (symbol) const;
-  bool has_name (symbol tag) const;
   symbol name (symbol tag) const;
   symbol description (symbol) const;
 
   // Scope to be?
 private:
-  type lookup (symbol tag) const;
+  intern_type intern_lookup (symbol tag) const;
   const std::vector<double>& array (symbol tag) const;
-  int size (symbol tag) const;
 
   // Create and destroy.
   void initialize (Treelog&);

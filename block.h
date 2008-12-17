@@ -62,13 +62,19 @@ public:
 
   // Nested scope handling.
 public:
-  Value::type lookup (symbol) const;
   const Syntax& find_syntax (const symbol key) const;
   const AttributeList& find_alist (const symbol key) const;
+
+  // Syntax emulation.
+public:
+  Value::type lookup (symbol) const;
+  void entries (std::vector<symbol>&) const;
+  int type_size (symbol tag) const;
 
   // AList emulation.
 public:
   bool check (const symbol key) const;
+  int value_size (symbol tag) const;
   double number (symbol) const;
   double number (symbol, double default_value) const;
   symbol name (symbol);

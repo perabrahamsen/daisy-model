@@ -517,7 +517,7 @@ Select::geometry () const
 
 int 
 Select::size () const
-{ return -1; }
+{ return Value::Singleton; }
 
 symbol
 Select::select_get_tag (const AttributeList& al)

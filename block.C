@@ -334,10 +334,6 @@ void
 Block::set_error ()
 { impl->set_error (); }
 
-Value::type 
-Block::lookup (const symbol key) const
-{ return impl->lookup (key); }
-
 const Syntax& 
 Block::find_syntax (const symbol key) const
 { return impl->find_syntax (key); }
@@ -345,6 +341,28 @@ Block::find_syntax (const symbol key) const
 const AttributeList& 
 Block::find_alist (const symbol key) const
 { return impl->find_alist (key); }
+
+Value::type 
+Block::lookup (const symbol key) const
+{ return impl->lookup (key); }
+
+void
+Block::entries (std::vector<symbol>& all) const
+{
+  // Own entries.
+  impl->syntax.entries (all);
+  // Parent entries.
+  if (impl->parent)
+    impl->parent->entries (all);
+}
+
+int 
+Block::type_size (const symbol tag) const
+{ return find_syntax (tag).size (tag); }
+
+int 
+Block::value_size (const symbol tag) const
+{ return find_alist (tag).size (tag); }
 
 bool 
 Block::check (const symbol key) const

@@ -302,7 +302,8 @@ void
 Syntax::Implementation::entries (std::vector<symbol>& result) const
 {
   // All the ordered items first.
-  result = order;
+  for (unsigned int j = 0; j < order.size (); j++)
+    result.push_back (order[j]);
 
   for (type_map::const_iterator i = types.begin ();
        i != types.end ();

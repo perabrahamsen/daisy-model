@@ -39,10 +39,10 @@ LogExtern::done (const std::vector<Time::component_t>& time_columns,
   if (!is_printing)
     return;
 
-  for (size_t i = 0; i < entries.size (); i++)
+  for (size_t i = 0; i < LogSelect::entries.size (); i++)
     {
-      last_done = entries[i]->tag ();
-      entries[i]->done (dt);
+      last_done = LogSelect::entries[i]->tag ();
+      LogSelect::entries[i]->done (dt);
     }
 }
 
@@ -87,6 +87,7 @@ LogExtern::add (const std::vector<double>& value)
 { 
   types[last_done] = Array;
   arrays[last_done] = &value;
+  sizes[last_done] = value.size ();
 }
 
 void 
@@ -107,28 +108,72 @@ void
 LogExtern::tick (const Scope&, Treelog&)
 { }
 
-const std::vector<symbol>&
-LogExtern::all_numbers () const
-{ return all_numbers_; }
-
-bool 
-LogExtern::has_number (symbol tag) const
-{ return lookup (tag) == Number; }
-
-double 
-LogExtern::number (symbol tag) const
+void 
+LogExtern::entries (std::vector<symbol>& all) const
 {
-  daisy_assert (has_number (tag));
-  const number_map::const_iterator i = numbers.find (tag);
-  daisy_assert (i != numbers.end ());
+  for (size_t i = 0; i < LogSelect::entries.size (); i++)
+    all.push_back (LogSelect::entries[i]->tag ());
+}
+
+Value::type 
+LogExtern:: lookup (const symbol tag) const
+{
+  for (size_t i = 0; i < LogSelect::entries.size (); i++)
+    if (LogSelect::entries[i]->tag () == tag)
+      {
+        switch (LogSelect::entries[i]->type ())
+          {
+          case Select::NumberSingleton:
+          case Select::NumberSequence:
+            return Value::Number;
+          }
+        daisy_notreached ();
+      }
+  return Value::Error;
+}
+
+int
+LogExtern::type_size (symbol tag) const
+{
+  const int_map::const_iterator i = sizes.find (tag);
+  if (i == sizes.end ())
+    return Value::Singleton;
   return (*i).second;
 }
 
 int
-LogExtern::size (symbol tag) const
+LogExtern::value_size (symbol tag) const
 {
-  const int_map::const_iterator i = sizes.find (tag);
-  daisy_assert (i != sizes.end ());
+  const array_map::const_iterator i = arrays.find (tag);
+  if (i == arrays.end ())
+    return type_size (tag);
+  return (*i).second->size ();
+}
+
+bool 
+LogExtern::check (const symbol tag) const
+{
+  const type_map::const_iterator i = types.find (tag);
+  if (i == types.end ())
+    return false;
+  switch ((*i).second)
+    {
+    case Number:
+    case Name:
+    case Array:
+      return true;
+    case Missing:
+    case Error:
+      return false;
+    }
+  daisy_notreached ();
+}
+
+double 
+LogExtern::number (symbol tag) const
+{
+  const number_map::const_iterator i = numbers.find (tag);
+  daisy_assert (i != numbers.end ());
   return (*i).second;
 }
 
@@ -143,9 +188,9 @@ LogExtern::dimension (symbol tag) const
 symbol
 LogExtern::description (const symbol tag) const
 {
-  for (size_t i = 0; i < entries.size (); i++)
-    if (entries[i]->tag () == tag)
-      return symbol (entries[i]->get_description ());
+  for (size_t i = 0; i < LogSelect::entries.size (); i++)
+    if (LogSelect::entries[i]->tag () == tag)
+      return symbol (LogSelect::entries[i]->get_description ());
 
   const name_map::const_iterator i = descriptions.find (tag);
   if (i == dimensions.end ())
@@ -154,8 +199,8 @@ LogExtern::description (const symbol tag) const
   return (*i).second;
 }
 
-LogExtern::type 
-LogExtern::lookup (symbol tag) const
+LogExtern::intern_type 
+LogExtern::intern_lookup (symbol tag) const
 { 
   const type_map::const_iterator i = types.find (tag);
 
@@ -164,11 +209,6 @@ LogExtern::lookup (symbol tag) const
 
   return (*i).second;
 }
-
-bool 
-LogExtern::has_name (symbol tag) const
-{ return lookup (tag) == Name; }
-
 
 symbol
 LogExtern::name (symbol tag) const
@@ -189,15 +229,11 @@ LogExtern::array (symbol tag) const
 void 
 LogExtern::initialize (Treelog&)
 {
-  for (size_t i = 0; i < entries.size (); i++)
+  for (size_t i = 0; i < LogSelect::entries.size (); i++)
     {
-      const Select::type_t type = entries[i]->type ();
-      const symbol tag = entries[i]->tag ();
-      const int size = entries[i]->size ();
-      sizes[tag] = size;
-      if (type == Select::NumberSingleton)
-        all_numbers_.push_back (tag);
-      dimensions[tag] = entries[i]->dimension ();
+      const symbol tag = LogSelect::entries[i]->tag ();
+      sizes[tag] = LogSelect::entries[i]->size ();
+      dimensions[tag] = LogSelect::entries[i]->dimension ();
     }
 }
 
@@ -272,8 +308,8 @@ LogExtern::LogExtern (Block& al)
         }
     }
 
-  for (size_t i = 0; i < entries.size (); i++)
-    entries[i]->add_dest (this);
+  for (size_t i = 0; i < LogSelect::entries.size (); i++)
+    LogSelect::entries[i]->add_dest (this);
 }
 
 LogExtern::~LogExtern ()

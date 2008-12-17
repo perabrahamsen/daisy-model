@@ -323,6 +323,10 @@ symbol
 Soil::get_dimension (size_t i, const symbol name) const
 { return horizon_[i]->get_dimension (name); }
 
+void 
+Soil::append_attributes (size_t i, std::vector<symbol>& all) const
+{ horizon_[i]->append_attributes (all); }
+
 void
 Soil::output (Log& log) const
 {

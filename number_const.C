@@ -118,10 +118,10 @@ struct NumberGet : public Number
   const Unit& unit () const
   { return unit_; }
   bool missing (const Scope& scope) const
-  { return !scope.has_number (name); }
+  { return !scope.check (name); }
   double value (const Scope& scope) const
   { 
-    daisy_assert (scope.has_number (name));
+    daisy_assert (scope.check (name));
     daisy_assert (scope_unit);
     const double value = scope.number ( name);
     return Units::unit_convert (*scope_unit, unit (), value);
@@ -130,7 +130,7 @@ struct NumberGet : public Number
   // Create.
   bool initialize (const Units& units, const Scope& scope, Treelog& msg)
   { 
-    if (!scope.is_number (name))
+    if (scope.lookup (name) != Value::Number)
       {
         msg.error ("'" + name + "' is not a number");
         return false;
@@ -156,7 +156,7 @@ struct NumberGet : public Number
       }
     else if (units.is_error (*scope_unit))
       {
-        daisy_assert (scope.is_number (name));
+        daisy_assert (scope.lookup (name) == Value::Number);
         const symbol got_dim = scope.dimension (name);
         msg.error ("'" + name + "' has unknown dimension [" + got_dim + "]");
         ok = false;
@@ -225,17 +225,17 @@ struct NumberFetchGet : public Number
     return *scope_unit; 
   }
   bool missing (const Scope& scope) const
-  { return !scope.has_number (name); }
+  { return !scope.check (name); }
   double value (const Scope& scope) const
   { 
-    daisy_assert (scope.has_number (name));
+    daisy_assert (scope.check (name));
     return scope.number ( name);
   }
 
   // Create.
   bool initialize (const Units& units, const Scope& scope, Treelog& msg)
   { 
-    if (!scope.is_number (name))
+    if (scope.lookup (name) != Value::Number)
       {
         msg.error ("'" + name + "' is not a number");
         return false;
@@ -256,7 +256,7 @@ struct NumberFetchGet : public Number
       }
     else if (units.is_error (*scope_unit))
       {
-        daisy_assert (scope.is_number (name));
+        daisy_assert (scope.lookup (name) == Value::Number);
         const symbol got_dim = scope.dimension (name);
         msg.error ("'" + name + "' has unknown dimension [" + got_dim + "]");
         ok = false;

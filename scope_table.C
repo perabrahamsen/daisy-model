@@ -24,8 +24,20 @@
 #include "lexer_table.h"
 #include "assertion.h"
 
+void 
+ScopeTable::entries (std::vector<symbol>& all) const
+{
+  const std::vector<symbol>& tags = lex.get_tag_names ();
+  for (size_t i = 0; i < tags.size (); i++)
+    all.push_back (tags[i]);
+}
+
+Value::type 
+ScopeTable::lookup (const symbol tag) const
+{ return lex.find_tag (tag) < 0 ? Value::Error : Value::Number; }
+
 bool 
-ScopeTable::has_number (const symbol tag) const
+ScopeTable::check (const symbol tag) const
 {
   const int tag_c = lex.find_tag (tag);
   
@@ -65,8 +77,7 @@ ScopeTable::set (const std::vector<std::string>& entries)
 
 ScopeTable::ScopeTable (const LexerTable& l)
   : Scope ("table"),
-    lex (l),
-    all_numbers_ (l.get_tag_names ())
+    lex (l)
 { }
 
 ScopeTable::~ScopeTable ()

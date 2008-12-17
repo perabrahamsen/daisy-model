@@ -45,11 +45,10 @@ public:
 
   // Use.
 public:
-  virtual bool is_number () const;
+  virtual Value::type lookup () const = 0;
+  virtual bool check () const = 0;
   virtual double number () const;
-  virtual bool has_number () const;
   virtual symbol dimension () const;
-  virtual bool has_name () const;
   virtual symbol name () const;
   symbol get_description () const;
   virtual void set_number (const double);
@@ -73,9 +72,9 @@ private:
 
   // Use 
 public:
-  bool is_number () const;
+  Value::type lookup () const;
+  bool check () const;
   double number () const;
-  bool has_number () const;
   symbol dimension () const;
   void set_number (const double val);
 
@@ -96,7 +95,8 @@ private:
 
   // Use
 public: 
-  bool has_name () const;
+  Value::type lookup () const;
+  bool check () const;
   symbol name () const;
 
   // Create and Destroy.
@@ -109,17 +109,16 @@ class ScopeExchange : public WScope
 {
   // Parameters.
 private: 
-  auto_vector<Exchange*> entries;
-  std::vector<symbol> all_numbers_;
+  auto_vector<Exchange*> all;
   std::map<symbol, Exchange*> named;
 
   // Scope.
 public:
-  const std::vector<symbol>& all_numbers () const;
-  bool has_number (symbol tag) const;
+  void entries (std::vector<symbol>&) const;
+  Value::type lookup (symbol tag) const;
+  bool check (symbol tag) const;
   double number (symbol tag) const;
   symbol dimension (symbol tag) const;
-  bool has_name (symbol tag) const;
   symbol name (symbol tag) const;
   symbol description (symbol tag) const;
 
@@ -129,8 +128,6 @@ public:
   
   // Create.
 private:
-  static std::vector<symbol>
-  /**/ find_all_numbers (const std::vector<Exchange*>& entries);
   static std::map<symbol, Exchange*> 
   /**/ find_named (const std::vector<Exchange*>& entries);
 public:

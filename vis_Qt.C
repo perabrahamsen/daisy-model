@@ -235,17 +235,17 @@ VisQtTime::scope_ready ()
   {
     QMutexLocker lock (&log->mutex);
 
-    if (log->has_number (year_symbol))
+    if (log->check (year_symbol))
       year = double2int (log->number (year_symbol));
-    if (log->has_number (month_symbol))
+    if (log->check (month_symbol))
       month = double2int (log->number (month_symbol));
-    if (log->has_number (mday_symbol))
+    if (log->check (mday_symbol))
       mday = double2int (log->number (mday_symbol));
-    if (log->has_number (hour_symbol))
+    if (log->check (hour_symbol))
       hour = double2int (log->number (hour_symbol));
-    if (log->has_number (minute_symbol))
+    if (log->check (minute_symbol))
       minute = double2int (log->number (minute_symbol));
-    if (log->has_number (second_symbol))
+    if (log->check (second_symbol))
       second = double2int (log->number (second_symbol));
   }
   Time now (year, month, mday, hour, minute, second);

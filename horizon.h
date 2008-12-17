@@ -77,6 +77,7 @@ public:
   bool has_attribute (symbol) const;
   double get_attribute (symbol) const;
   symbol get_dimension (symbol name) const;
+  void append_attributes (std::vector<symbol>& all) const;
 
   // Simulation.
 public:

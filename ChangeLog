@@ -1,3 +1,7 @@
+2008-12-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* syntax.C (entries): Don't overwrite argument.
+
 2008-12-11  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* reaction_Jarvis99.C: Renamed from 'reaction_MACRO.C'.

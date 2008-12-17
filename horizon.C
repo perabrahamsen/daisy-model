@@ -226,6 +226,16 @@ Horizon::get_dimension (const symbol name) const
   return (*i).second;
 }
 
+void 
+Horizon::append_attributes (std::vector<symbol>& all) const
+{
+  for (Implementation::double_map::const_iterator i 
+         = impl->attributes.begin ();
+       i != impl->attributes.end ();
+       i++)
+    all.push_back ((*i).first);
+}
+
 bool
 Horizon::check_alist (const AttributeList& al, Treelog& err)
 {

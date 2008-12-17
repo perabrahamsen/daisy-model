@@ -29,14 +29,14 @@ class ScopeID : public WScope
 {
   // Content.
   const symbol tag;
-  std::vector<symbol> all_numbers_;
   double value;
   symbol dim;
 
   // Scope interface.
 public:
-  const std::vector<symbol>& all_numbers () const;
-  bool has_number (symbol name) const;
+  void entries (std::vector<symbol>&) const;
+  Value::type lookup (symbol) const;
+  bool check (symbol) const;
   double number (symbol) const;
   symbol dimension (symbol) const;
   symbol description (symbol) const;

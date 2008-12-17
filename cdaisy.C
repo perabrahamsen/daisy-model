@@ -706,16 +706,40 @@ daisy_daisy_scope_extern_get (Toplevel *const toplevel,
 
 extern "C" unsigned int EXPORT // Number of numbers in SCOPE.
 daisy_scope_number_size (const Scope *const scope)
-{ return scope->all_numbers ().size (); }
+{ 
+  std::vector<symbol> all;
+  scope->entries (all);
+  size_t count = 0;
+  for (size_t i = 0; i < all.size (); i++)
+    if (scope->lookup (all[i]) == Value::Number)
+      count++;
+  return count; 
+}
 
 extern "C" const char* EXPORT       // Name of number INDEX in SCOPE.
 daisy_scope_number_name (const Scope *const scope, const unsigned int index)
-{ return scope->all_numbers ()[index].name ().c_str (); }
+{
+  std::vector<symbol> all;
+  scope->entries (all);
+  size_t count = 0;
+  for (size_t i = 0; i < all.size (); i++)
+    {
+      const symbol name = all[i];
+      if (scope->lookup (name) == Value::Number)
+        if (count == index)
+          return name.name ().c_str ();
+        else
+          count++;
+    }
+  daisy_notreached ();
+}
 
 extern "C" const int EXPORT	// check if NAME is defined in SCOPE.
 daisy_scope_has_number (const Scope* scope, const char* name)
 { 
-  if (scope->has_number (symbol (name)))
+  if (scope->lookup (name) == Value::Number 
+      && scope->type_size (name) == Value::Singleton
+      && scope->check (name))
     return 1;
   else 
     return 0; 
@@ -736,7 +760,9 @@ daisy_scope_dimension (const Scope* scope, const char* name)
 extern "C" const int EXPORT	// check if NAME is defined in SCOPE.
 daisy_scope_has_string (const Scope* scope, const char* name)
 { 
-  if (scope->has_name (symbol (name)))
+  if (scope->lookup (name) == Value::String 
+      && scope->type_size (name) == Value::Singleton
+      && scope->check (name))
     return 1;
   else 
     return 0; 
@@ -745,12 +771,12 @@ daisy_scope_has_string (const Scope* scope, const char* name)
 extern "C" const char* EXPORT	// Return string value of NAME in SCOPE.
 daisy_scope_string (const Scope* scope, const char* name)
 { 
-  return scope->name (symbol (name)).name ().c_str ();
+  return scope->name (name).name ().c_str ();
 }
 
 extern "C" const char* EXPORT	// Return UNITS of NAME defined in SCOPE.
 daisy_scope_description (const Scope* scope, const char* name)
-{ return scope->description (symbol (name)).name().c_str (); }
+{ return scope->description (name).name().c_str (); }
 
 extern "C" int EXPORT           // True, iff SCOPE is writable.
 daisy_scope_writable (Scope* scope)

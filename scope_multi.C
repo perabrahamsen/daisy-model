@@ -26,17 +26,32 @@
 #include "assertion.h"
 #include "librarian.h"
 
-const std::vector<symbol>& 
-ScopeMulti::all_numbers () const
-{ return all_numbers_; }
-
-bool 
-ScopeMulti::has_number (const symbol tag) const
+void 
+ScopeMulti::entries (std::vector<symbol>& all) const
 {
   for (size_t i = 0; i < scopes.size (); i++)
-    if (scopes[i]->has_number (tag))
+    scopes[i]->entries (all);
+}
+
+Value::type 
+ScopeMulti::lookup (const symbol name) const
+{
+  for (size_t i = 0; i < scopes.size (); i++)
+    {
+      Value::type type = scopes[i]->lookup (name);
+      if (type != Value::Error)
+        return type;
+    }
+  return Value::Error;
+}
+
+bool 
+ScopeMulti::check (const symbol name) const
+{
+  for (size_t i = 0; i < scopes.size (); i++)
+    if (scopes[i]->check (name))
       return true;
-  
+
   return false;
 }
 
@@ -44,9 +59,24 @@ double
 ScopeMulti::number (const symbol tag) const
 {
   for (size_t i = 0; i < scopes.size (); i++)
-    if (scopes[i]->has_number (tag))
-      return scopes[i]->number (tag);
-  
+    {
+      Value::type type = scopes[i]->lookup (tag);
+      switch (type)
+        {
+        case Value::Error:
+          // Not here, try next scope.
+          continue;
+        case Value::Number:
+          // Yeah!
+          daisy_assert (scopes[i]->check (tag));
+          return scopes[i]->number (tag);
+        default:
+          // Wrong type.
+          daisy_panic ("'" + tag + "' should be a " 
+                       + Value::type_name (Value::Number) + ", is a "
+                       + Value::type_name (type));
+        }
+    }
   daisy_panic ("'" + tag + "' not found in any scope");
 }    
 
@@ -54,7 +84,7 @@ symbol
 ScopeMulti::dimension (const symbol tag) const
 {
   for (size_t i = 0; i < scopes.size (); i++)
-    if (scopes[i]->is_number (tag))
+    if (scopes[i]->lookup (tag) == Value::Number)
       return scopes[i]->dimension (tag);
   
   daisy_panic ("'" + tag + "' not found in any scope");
@@ -64,22 +94,10 @@ symbol
 ScopeMulti::description (symbol tag) const
 {
   for (size_t i = 0; i < scopes.size (); i++)
-    if (scopes[i]->has_number (tag))
+    if (scopes[i]->lookup (tag) != Value::Error)
       return scopes[i]->description (tag);
   
   daisy_panic ("'" + tag + "' not found in any scope");
-}
-
-std::vector<symbol>
-ScopeMulti::find_numbers (const std::vector<const Scope*>& scopes)
-{
-  std::vector<symbol> result;
-  for (size_t i = 0; i < scopes.size (); i++)
-    {
-      const std::vector<symbol>& child = scopes[i]->all_numbers ();
-      result.insert (result.end (), child.begin (), child.end ());
-    }
-  return result;
 }
 
 std::vector<const Scope*>
@@ -93,15 +111,13 @@ ScopeMulti::vectorize (const Scope* first, const Scope* second)
 
 ScopeMulti::ScopeMulti (const Scope& first, const Scope& second)
   : Scope ("multi"),
-    scopes (vectorize (&first, &second)),
-    all_numbers_ (find_numbers (scopes))
+    scopes (vectorize (&first, &second))
 { }
 
 #if 0
 ScopeMulti::ScopeMulti (Block& al)
   : Scope (al),
-    scopes (Librarian::build_vector_const<Scope> (al, "scope")),
-    all_numbers_ (find_numbers (scopes))
+    scopes (Librarian::build_vector_const<Scope> (al, "scope"))
 { }
 #endif
 

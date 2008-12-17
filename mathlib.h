@@ -46,6 +46,8 @@ inline bool isequal (const double a, const double b)
 #define	M_PI_2		1.57079632679489661923
 #endif
 
+#define NOT_A_NUMBER nan (0)
+
 void
 tridia (int from,
 	unsigned int size,

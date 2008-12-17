@@ -25,14 +25,19 @@
 #include "alist.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "mathlib.h"
 
-const std::vector<symbol>& 
-ScopeID::all_numbers () const
-{ return all_numbers_; }
+void 
+ScopeID::entries (std::vector<symbol>& all) const
+{ all.push_back (tag); }
+
+Value::type 
+ScopeID::lookup (const symbol name) const
+{ return (name == tag) ? Value::Number : Value::Error; }
 
 bool 
-ScopeID::has_number (symbol name) const
-{ return name == tag; }
+ScopeID::check (const symbol name) const
+{ return name == tag && std::isfinite (value); }
 
 double 
 ScopeID::number (symbol) const
@@ -58,19 +63,19 @@ ScopeID::set_dimension (symbol, symbol d)
 ScopeID::ScopeID (const symbol name, const symbol d)
   : WScope (name),
     tag (name),
-    value (-42.42e42),
+    value (NOT_A_NUMBER),
     dim (d)
-{ all_numbers_.push_back (tag); }
+{ }
 
 ScopeID::ScopeID (Block& al)
   : WScope (al),
     tag (al.name ("name")), 
     value (al.number ("value")),
     dim (al.name ("value"))
-{ all_numbers_.push_back (tag); }
+{ }
 
 ScopeID::~ScopeID ()
-{ daisy_assert (all_numbers_.size () == 1); }
+{ }
 
 static struct ScopeIDSyntax
 {

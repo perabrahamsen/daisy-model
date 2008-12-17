@@ -64,12 +64,24 @@ void
 ScopeSoil::set_domain (const domain_t d)
 { domain = d; }
 
-const std::vector<symbol>& 
-ScopeSoil::all_numbers () const
-{ return all_numbers_; }
+void 
+ScopeSoil::entries (std::vector<symbol>& all) const
+{ 
+  all.push_back (rho_b);
+  all.push_back (clay);
+  all.push_back (humus);
+  all.push_back (h);
+  all.push_back (Theta);
+  all.push_back (T);
+  soil.append_attributes (cell, all); 
+}
+
+Value::type 
+ScopeSoil::lookup (const symbol tag) const
+{ return check (tag) ? Value::Number : Value::Error; }
 
 bool 
-ScopeSoil::has_number (const symbol tag) const
+ScopeSoil::check (const symbol tag) const
 {
   daisy_assert (cell >= 0);
 
@@ -82,6 +94,7 @@ ScopeSoil::has_number (const symbol tag) const
   
   return false;
 }
+
 
 double
 ScopeSoil::number (const symbol tag) const

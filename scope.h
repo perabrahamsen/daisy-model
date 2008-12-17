@@ -51,12 +51,17 @@ public:
 
   // Type.
 public:
+  virtual void entries (std::vector<symbol>&) const = 0;
+  virtual Value::type lookup (symbol) const = 0;
   virtual symbol dimension (symbol) const = 0;
   virtual symbol description (symbol) const = 0;
+  virtual int type_size (symbol tag) const;
 
   // Value.
 public:
+  virtual bool check (symbol) const = 0;
   virtual double number (symbol) const = 0;
+  virtual int value_size (symbol tag) const;
   virtual symbol name (symbol) const;
   virtual int integer (symbol) const;
 
@@ -64,16 +69,6 @@ public:
 public:
   symbol title () const;
   
-  virtual const std::vector<symbol>& all_numbers () const = 0;
-#if 0
-  virtual Value::type lookup (symbol) const = 0;
-  virtual bool check (symbol) const = 0;
-#else
-  bool is_number (symbol) const;
-  virtual bool has_number (symbol) const = 0;
-  virtual bool has_name (symbol) const;
-  virtual bool has_integer (symbol) const;
-#endif
 
   // Create and Destroy.
 private:

@@ -24,6 +24,7 @@
 
 #include "scope.h"
 #include "time.h"
+#include "memutils.h"
 #include <vector>
 
 class Treelog;
@@ -33,16 +34,16 @@ class ScopeSources : public Scope
 {
   // Content.
 private:
-  std::vector<symbol> all_numbers_;
-  const std::vector<Source*> source;
+  auto_vector<Source*> source;
   std::vector<int> index;
 public:
   Time now;
 
   // Interface.
 public:
-  const std::vector<symbol>& all_numbers () const;
-  bool has_number (symbol tag) const;
+  void entries (std::vector<symbol>&) const;
+  Value::type lookup (symbol tag) const;
+  bool check (symbol tag) const;
   double number (symbol tag) const;
   symbol dimension (symbol tag) const;
   symbol description (symbol tag) const;

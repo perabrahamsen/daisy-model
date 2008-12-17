@@ -38,32 +38,17 @@ symbol
 Scope::title () const
 { return title_; }
 
-bool 
-Scope::is_number (symbol tag) const
-{
-  if (has_number (tag))
-    return true;
+int 
+Scope::type_size (const symbol tag) const
+{ return Value::Singleton; }
 
-  const std::vector<symbol>& all = all_numbers ();
-
-  for (size_t i = 0; i < all.size (); i++)
-    if (all[i] == tag)
-      return true;
-
-  return false;
-}
-
-bool
-Scope::has_name (symbol) const
-{ return false; }
+int 
+Scope::value_size (const symbol tag) const
+{ return Value::Singleton; }
 
 symbol
 Scope::name (symbol) const
 { daisy_notreached (); }
-
-bool
-Scope::has_integer (symbol) const
-{ return false; }
 
 int
 Scope::integer (symbol) const
@@ -72,12 +57,11 @@ Scope::integer (symbol) const
 struct ScopeNull : public Scope
 {
   // Use.
-  const std::vector<symbol>& all_numbers () const
-  {
-    static std::vector<symbol> all_numbers_;
-    return all_numbers_; 
-  }
-  bool has_number (symbol) const
+  void entries (std::vector<symbol>&) const
+  { }
+  Value::type lookup (symbol) const
+  { return Value::Error; }
+  bool check (symbol) const
   { return false; }
   double number (symbol) const
   { daisy_notreached (); }
