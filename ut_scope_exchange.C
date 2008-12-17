@@ -16,16 +16,19 @@ TEST (ScopeExchange, All)
                                       x_desc.name ().c_str ()));
   scope.add_item (new ExchangeNumber (y_symbol, 42.0, "y dim", "y desc"));
   scope.done ();
-  EXPECT_EQ (scope.all_numbers ().size (), 2);
-  EXPECT_EQ (scope.has_number (y_symbol), true);
+  std::vector<symbol> entries;
+  scope.entries (entries);
+  EXPECT_EQ (entries.size (), 2);
+  EXPECT_EQ (scope.lookup (y_symbol), Value::Number);
+  EXPECT_TRUE (scope.check (y_symbol));
   EXPECT_EQ (scope.number (y_symbol), 42.0);
-  EXPECT_EQ (scope.has_number (x_symbol), false);
+  EXPECT_EQ (scope.lookup (x_symbol), Value::Number);
+  EXPECT_FALSE (scope.check (x_symbol));
   scope.add (x_symbol, 43.0);
-  EXPECT_EQ (scope.has_number (x_symbol), true);
+  EXPECT_TRUE (scope.check (x_symbol));
   EXPECT_EQ (scope.number (x_symbol), 43.0);
   EXPECT_EQ (scope.dimension (x_symbol), x_dim);
-  EXPECT_EQ (scope.get_description (x_symbol), x_desc);
-  EXPECT_EQ (scope.has_number (symbol ("no such number")), false);
-  EXPECT_EQ (scope.has_name (symbol ("no such identifier")), false);
-  EXPECT_EQ (scope.has_name (x_symbol), false);
+  EXPECT_EQ (scope.description (x_symbol), x_desc);
+  EXPECT_EQ (scope.lookup ("no such number"), Value::Error);
+  EXPECT_FALSE (scope.check ("no such number"));
 }
