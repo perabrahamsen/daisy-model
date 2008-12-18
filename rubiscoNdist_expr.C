@@ -68,7 +68,8 @@ private:
   rubiscoNdist_expr (Block& al)
     : RubiscoNdist (al),
       f_photo (al.number ("f_photo")),
-      expr (Librarian::build_item<Number> (al, "value"))
+      expr (Librarian::build_item<Number> (al, "value")),
+      scope (__FUNCTION__)
   {
     scope.add_item (new ExchangeNumber (LAI_symbol, Value::None(),
 					"Leaf area index"));

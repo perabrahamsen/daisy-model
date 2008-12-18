@@ -30,6 +30,7 @@
 struct Log;
 struct LogAll;
 struct Scope;
+struct MScope;
 struct Border;
 struct Block;
 struct Metalib;
@@ -42,7 +43,7 @@ class Output
   // Content.
 private:
   bool logging;
-  const auto_vector<Scope*> exchanges;
+  const auto_vector<MScope*> exchanges;
   const auto_vector<Log*> logs;
   const std::auto_ptr<LogAll> log_all;
   std::vector<Log*> active_logs;
@@ -68,7 +69,7 @@ private:
   /**/ find_active_logs (const std::vector<Log*>& logs, LogAll& log_all);
   static const std::vector<Scope*> 
   /**/ find_extern_logs (const std::vector<Log*>& logs, 
-                         const std::vector<Scope*>& exchanges);
+                         const std::vector<MScope*>& exchanges);
   static std::vector<Time::component_t>
   /**/ find_time_columns (const std::vector<symbol>& names);
 public:

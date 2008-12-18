@@ -63,7 +63,8 @@ private:
 public:
   rubiscoNdist_forced (Block& al)
     : RubiscoNdist (al),
-      expr (Librarian::build_item<Number> (al, "value"))
+      expr (Librarian::build_item<Number> (al, "value")),
+      scope (__FUNCTION__)
   {
     scope.add_item (new ExchangeNumber (LAI_symbol, Value::None(),
 					"Leaf area index"));

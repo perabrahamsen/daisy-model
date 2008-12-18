@@ -104,6 +104,10 @@ LogExtern::add (symbol value)
   names[last_done] = value;
 }
 
+symbol 
+LogExtern::title () const
+{ return title_; }
+
 void 
 LogExtern::tick (const Scope&, Treelog&)
 { }
@@ -278,7 +282,7 @@ API interface by specifying '(names column crop)'.");
 
 LogExtern::LogExtern (Block& al)
   : LogSelect (al),
-    Scope (al)
+    title_ (al.name ("where", al.name ("type")))
 { 
   std::vector<symbol> par_names = al.name_sequence ("parameter_names");
   ScopeBlock scope_block (al);

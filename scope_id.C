@@ -21,11 +21,13 @@
 #define BUILD_DLL
 
 #include "scope_id.h"
+#include "assertion.h"
+#include "mathlib.h"
+#if 0
 #include "block.h"
 #include "alist.h"
-#include "assertion.h"
 #include "librarian.h"
-#include "mathlib.h"
+#endif
 
 void 
 ScopeID::entries (std::vector<symbol>& all) const
@@ -61,22 +63,24 @@ ScopeID::set_dimension (symbol, symbol d)
 { dim = d; }
 
 ScopeID::ScopeID (const symbol name, const symbol d)
-  : WScope (name),
-    tag (name),
+  : tag (name),
     value (NOT_A_NUMBER),
     dim (d)
 { }
 
+#if 0
 ScopeID::ScopeID (Block& al)
   : WScope (al),
     tag (al.name ("name")), 
     value (al.number ("value")),
     dim (al.name ("value"))
 { }
+#endif
 
 ScopeID::~ScopeID ()
 { }
 
+#if 0
 static struct ScopeIDSyntax
 {
   static Model& make (Block& al)
@@ -96,5 +100,6 @@ static struct ScopeIDSyntax
     Librarian::add_type (Scope::component, "id", alist, syntax, &make);
   }
 } ScopeID_syntax;
+#endif
 
 // scope_id.C ends here

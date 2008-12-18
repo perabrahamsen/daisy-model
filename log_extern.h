@@ -47,6 +47,9 @@ class EXPORT LogExtern : public LogSelect,
 {
   class NumEntry;
 
+  // Scopesel id.
+  const symbol title_;
+
   // Destination Content.
   typedef enum { Error, Missing, Number, Name, Array } intern_type;
   typedef std::map<symbol, intern_type> type_map;
@@ -82,6 +85,7 @@ private:
 
   // Scope
 public:
+  symbol title () const;
   void tick (const Scope&, Treelog&);
   void entries (std::vector<symbol>&) const;
   Value::type lookup (symbol tag) const;

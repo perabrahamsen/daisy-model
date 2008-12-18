@@ -1,6 +1,6 @@
-// scope_id.h -- A name -> value map.
+// scope_model.h -- Scope as a model.
 // 
-// Copyright 2004 Per Abrahamsen and KVL.
+// Copyright 2008 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -19,45 +19,33 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef SCOPE_ID_H
-#define SCOPE_ID_H
+#ifndef SCOPE_MODEL_H
+#define SCOPE_MODEL_H
 
 #include "scope.h"
-#include <string>
+#include "model.h"
+#include <vector>
 
-class ScopeID : public WScope
+class Block;
+
+class MScope : public Model, public WScope
 {
   // Content.
-  const symbol tag;
-  double value;
-  symbol dim;
-
-  // Scope interface.
 public:
-  void entries (std::vector<symbol>&) const;
-  Value::type lookup (symbol) const;
-  bool check (symbol) const;
-  double number (symbol) const;
-  symbol dimension (symbol) const;
-  symbol description (symbol) const;
+  static const char *const component;
+  symbol library_id () const;
 
-  // WScope interface.
-public:
-  void add (symbol, double);
-
-  // ScopeID interface.
-public:
-  void set_dimension (symbol name, symbol dim);
-
-  // Create.
+  // For selecting with the 'scopesel' model.
 private:
-  ScopeID (const ScopeID&);
+  const symbol title_;
 public:
-  explicit ScopeID (const symbol tag, const symbol dim);
-#if 0
-  explicit ScopeID (Block&);
-#endif
-  ~ScopeID ();
+  symbol title () const;
+
+  // Create and Destroy.
+public:
+  explicit MScope (symbol title);
+  explicit MScope (Block&);
+  ~MScope ();
 };
 
-#endif // SCOPE_ID_H
+#endif // SCOPE_MODEL_H

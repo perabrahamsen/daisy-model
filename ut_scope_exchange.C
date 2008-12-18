@@ -10,7 +10,7 @@ TEST (ScopeExchange, All)
   const symbol y_symbol = symbol ("y");
   const symbol n_symbol = symbol ("n");
 
-  ScopeExchange scope;
+  ScopeExchange scope ("test");
   scope.add_item (new ExchangeNumber (x_symbol, 
                                       x_dim.name ().c_str (), 
                                       x_desc.name ().c_str ()));

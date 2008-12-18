@@ -120,6 +120,7 @@ ABAProdSoil::check (const Units& units, Treelog& msg) const
 
 ABAProdSoil::ABAProdSoil (Block& al)
   : ABAProd (al),
+    scope (__FUNCTION__),
     expr (Librarian::build_item<Number> (al, "expr"))
 {
   scope.add_item (new ExchangeNumber (h_name, "cm", "Soil water pressure."));

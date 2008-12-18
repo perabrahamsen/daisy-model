@@ -110,39 +110,10 @@ ScopeMulti::vectorize (const Scope* first, const Scope* second)
 }
 
 ScopeMulti::ScopeMulti (const Scope& first, const Scope& second)
-  : Scope ("multi"),
-    scopes (vectorize (&first, &second))
+  : scopes (vectorize (&first, &second))
 { }
-
-#if 0
-ScopeMulti::ScopeMulti (Block& al)
-  : Scope (al),
-    scopes (Librarian::build_vector_const<Scope> (al, "scope"))
-{ }
-#endif
 
 ScopeMulti::~ScopeMulti ()
 { }
-
-#if 0
-static struct ScopeMultiSyntax
-{
-  static Model& make (Block& al)
-  { return *new ScopeMulti (al); }
-
-  ScopeMultiSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-
-    alist.add ("description", 
-               "A scope combining other scopes.");
-    syntax.add_object ("scope", Scope::component,
-                       Value::Const, Value::Sequence, 
-                       "List of scopes to combine, first one takes precedence.");
-    Librarian::add_type (Scope::component, "multi", alist, syntax, &make);
-  }
-} ScopeMulti_syntax;
-#endif
 
 // scope_multi.C ends here.

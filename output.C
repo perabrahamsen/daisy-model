@@ -31,6 +31,7 @@
 #include "syntax.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "scope_model.h"
 
 static void
 operator++ (Time::component_t& val, int)
@@ -159,9 +160,12 @@ Output::find_active_logs (const std::vector<Log*>& logs, LogAll& log_all)
 
 const std::vector<Scope*> 
 Output::find_extern_logs (const std::vector<Log*>& logs, 
-                          const std::vector<Scope*>& exchanges)
+                          const std::vector<MScope*>& exchanges)
 {
-  std::vector<Scope*> result = exchanges;
+  std::vector<Scope*> result;
+
+  for (size_t i = 0; i < exchanges.size (); i++)
+    result.push_back (exchanges[i]);
 
   for (size_t i = 0; i < logs.size (); i++)
     if (LogExtern* log = dynamic_cast<LogExtern*> (logs[i]))
@@ -185,7 +189,7 @@ Output::find_time_columns (const std::vector<symbol>& names)
 
 Output::Output (Block& al)
   : logging (false),
-    exchanges (Librarian::build_vector<Scope> (al, "exchange")),
+    exchanges (Librarian::build_vector<MScope> (al, "exchange")),
     logs (Librarian::build_vector<Log> (al, "output")),
     log_all (new LogAll (logs)),
     active_logs (find_active_logs (logs, *log_all)),
@@ -196,7 +200,7 @@ Output::Output (Block& al)
 
 Output::Output ()
   : logging (false),
-    exchanges (std::vector<Scope*> ()),
+    exchanges (std::vector<MScope*> ()),
     logs (std::vector<Log*> ()),
     active_logs (std::vector<Log*> ()),
     scopes (std::vector<Scope*> ())
@@ -219,7 +223,7 @@ period.");
   true_alist.add ("type", "true");
   alist.add ("activate_output", true_alist);
 
-  syntax.add_object ("exchange", Scope::component,
+  syntax.add_object ("exchange", MScope::component,
                      Value::Const, Value::Sequence, "\
 List of exchange items for communicating with external models.");
   alist.add ("exchange", std::vector<const AttributeList*> ());

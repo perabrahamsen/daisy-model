@@ -149,8 +149,7 @@ ScopeSources::next ()
 }
 
 ScopeSources::ScopeSources (const std::vector<Source*>& s)
-  : Scope ("sources"),
-    source (s),
+  : source (s),
     index (s.size (), -1),
     now (1, 1, 1, 0)
 { }

@@ -1,3 +1,7 @@
+2008-12-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* all: Reorganized scopes.
+
 2008-12-16  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* syntax.C (entries): Don't overwrite argument.

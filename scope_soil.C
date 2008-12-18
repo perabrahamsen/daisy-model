@@ -201,8 +201,7 @@ ScopeSoil::find_numbers (const Soil&)
 }
 
 ScopeSoil::ScopeSoil (const Soil& s, const SoilWater& sw, const SoilHeat& sh)
-  : Scope ("soil"),
-    soil (s),
+  : soil (s),
     soil_water (sw),
     soil_heat (sh),
     all_numbers_ (find_numbers (soil)),

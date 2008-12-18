@@ -241,8 +241,7 @@ ScopeBlock::name (const symbol tag) const
 }
 
 ScopeBlock::ScopeBlock (Block& b)
-  : Scope ("block"),
-    block (b)
+  : block (b)
 { }
 
 ScopeBlock::~ScopeBlock ()

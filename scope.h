@@ -24,11 +24,8 @@
 
 #include "value.h"
 #include "symbol.h"
-#include "model.h"
 #include <vector>
-
-class Treelog;
-class Block;
+#include <boost/noncopyable.hpp>
 
 #ifdef __unix
 #define EXPORT /* Nothing */
@@ -40,14 +37,11 @@ class Block;
 #define EXPORT __declspec(dllimport)
 #endif
 
-class EXPORT Scope : public Model
+class EXPORT Scope : private boost::noncopyable
 {
-  // Content.
-private:
-  const symbol title_;
+  // For selecting with the 'scopesel' model.
 public:
-  static const char *const component;
-  symbol library_id () const;
+  virtual symbol title () const;
 
   // Type.
 public:
@@ -65,21 +59,12 @@ public:
   virtual symbol name (symbol) const;
   virtual int integer (symbol) const;
 
-  // Use.
-public:
-  symbol title () const;
-  
-
   // Create and Destroy.
-private:
-  Scope (const Scope&);
-  Scope ();
 public:
   static Scope& null ();
-  explicit Scope (symbol title);
-  explicit Scope (const char* title);
-  explicit Scope (Block&);
-  ~Scope ();
+protected:
+  Scope ();
+  virtual ~Scope ();
 };
 
 class WScope : public Scope     // Writable scope.
@@ -87,16 +72,6 @@ class WScope : public Scope     // Writable scope.
   // Use.
 public:
   virtual void add (symbol, double) = 0;
-
-  // Create and Destroy.
-private:
-  WScope (const WScope&);
-  WScope ();
-public:
-  explicit WScope (symbol title);
-  explicit WScope (const char* title);
-  explicit WScope (Block&);
-  ~WScope ();
 };
 
 #endif // SCOPE_H

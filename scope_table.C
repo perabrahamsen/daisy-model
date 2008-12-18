@@ -76,8 +76,7 @@ ScopeTable::set (const std::vector<std::string>& entries)
 { values = entries; }
 
 ScopeTable::ScopeTable (const LexerTable& l)
-  : Scope ("table"),
-    lex (l)
+  : lex (l)
 { }
 
 ScopeTable::~ScopeTable ()

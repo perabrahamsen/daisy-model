@@ -21,22 +21,13 @@
 #define BUILD_DLL
 
 #include "scope.h"
-#include "block.h"
 #include "assertion.h"
-#include "librarian.h"
 
-const char *const Scope::component = "scope";
-
-symbol
-Scope::library_id () const
-{
-  static const symbol id (component);
-  return id;
-}
+// The 'Scope' Interface.
 
 symbol 
 Scope::title () const
-{ return title_; }
+{ return Value::Unknown (); }
 
 int 
 Scope::type_size (const symbol tag) const
@@ -54,68 +45,39 @@ int
 Scope::integer (symbol) const
 { daisy_notreached (); }
 
-struct ScopeNull : public Scope
-{
-  // Use.
-  void entries (std::vector<symbol>&) const
-  { }
-  Value::type lookup (symbol) const
-  { return Value::Error; }
-  bool check (symbol) const
-  { return false; }
-  double number (symbol) const
-  { daisy_notreached (); }
-  symbol dimension (symbol) const
-  { daisy_notreached (); }
-  symbol description (symbol) const
-  { daisy_notreached (); }
-
-  // Create and Destroy.
-  ScopeNull ()
-    : Scope ("null")
-  { }
-  ~ScopeNull ()
-  { }
-};
-
 Scope&
 Scope::null ()
 { 
-  static ScopeNull nullscope;
+  static struct ScopeNull : public Scope
+  {
+    // Use.
+    void entries (std::vector<symbol>&) const
+    { }
+    Value::type lookup (symbol) const
+    { return Value::Error; }
+    bool check (symbol) const
+    { return false; }
+    double number (symbol) const
+    { daisy_notreached (); }
+    symbol dimension (symbol) const
+    { daisy_notreached (); }
+    symbol description (symbol) const
+    { daisy_notreached (); }
+
+    // Create and Destroy.
+    ScopeNull ()
+    { }
+    ~ScopeNull ()
+    { }
+  } nullscope;
+
   return nullscope; 
 }
 
-Scope::Scope (symbol t)
-  : title_ (t)
-{ }
-
-Scope::Scope (const char *const t)
-  : title_ (t)
-{ }
-
-Scope::Scope (Block& al)
-  : title_ (al.name ("where", al.name ("type")))
+Scope::Scope ()
 { }
 
 Scope::~Scope ()
 { }
-
-WScope::WScope (const symbol t)
-  : Scope (t)
-{ }
-
-WScope::WScope (const char *const t)
-  : Scope (t)
-{ }
-
-WScope::WScope (Block& al)
-  : Scope (al)
-{ }
-
-WScope::~WScope ()
-{ }
-
-static Librarian Scope_init (Scope::component, "\
-A scope maps names to values.");
 
 // scope.C ends here

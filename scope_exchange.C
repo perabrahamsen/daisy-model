@@ -266,14 +266,14 @@ void
 ScopeExchange::done ()
 { named = find_named (all); }
 
-ScopeExchange::ScopeExchange (Block& al)
-  : WScope (al),
-    all (Librarian::build_vector<Exchange> (al, "entries")),
-    named (find_named (all))
+ScopeExchange::ScopeExchange (const symbol title)
+  : MScope (title)
 { }
 
-ScopeExchange::ScopeExchange ()
-  : WScope ("ScopeExchange")
+ScopeExchange::ScopeExchange (Block& al)
+  : MScope (al),
+    all (Librarian::build_vector<Exchange> (al, "entries")),
+    named (find_named (all))
 { }
 
 ScopeExchange::~ScopeExchange ()
@@ -293,7 +293,7 @@ static struct ScopeExchangeSyntax
     syntax.add_object ("entries", Exchange::component, 
                        Value::Const, Value::Sequence,
                        "List of items to exchange.");
-    Librarian::add_type (Scope::component, "exchange", alist, syntax, &make);
+    Librarian::add_type (MScope::component, "exchange", alist, syntax, &make);
   }
 } ScopeExchange_syntax;
 

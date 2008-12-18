@@ -20,7 +20,7 @@
 
 #include "model.h"
 #include "symbol.h"
-#include "scope.h"
+#include "scope_model.h"
 #include "memutils.h"
 #include <map>
 #include <vector>
@@ -105,7 +105,7 @@ public:
   ~ExchangeName ();
 };
 
-class ScopeExchange : public WScope
+class ScopeExchange : public MScope
 {
   // Parameters.
 private: 
@@ -133,9 +133,11 @@ private:
 public:
   void add_item (Exchange* item);
   void done ();
+  explicit ScopeExchange (symbol title);
   explicit ScopeExchange (Block& al);
-  explicit ScopeExchange ();
   ~ScopeExchange ();
+private:
+  ScopeExchange ();
 };
 
 // scope_exchange.h ends here.
