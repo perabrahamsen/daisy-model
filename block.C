@@ -31,6 +31,7 @@
 #include "scope_block.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 #include <sstream>
 
 struct Block::Implementation
@@ -552,6 +553,19 @@ Block::Block (Block& block,
   : impl (new Implementation (block.metalib (), &block, block.msg (),
 			      syntax, alist, 
 			      sequence_id (scope_id, index)))
+{ }
+
+Block::Block (Block& block, const Frame& frame, symbol scope_tag)
+  // build_item
+  : impl (new Implementation (block.metalib (), &block, block.msg (),
+			      frame.syntax (), frame.alist (), scope_tag))
+{ }
+
+Block::Block (Block& block, const Frame& frame, symbol scope_tag, size_t index)
+  // build_vector
+  : impl (new Implementation (block.metalib (), &block, block.msg (),
+			      frame.syntax (), frame.alist (), 
+			      sequence_id (scope_tag, index)))
 { }
 
 Block::Block (Block& block, const symbol key)

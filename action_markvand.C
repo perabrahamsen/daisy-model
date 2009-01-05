@@ -393,13 +393,12 @@ ActionMarkvand::crop_map_t::load_syntax (Syntax& syntax, AttributeList&)
 
 ActionMarkvand::crop_map_t::crop_map_t (Block& al, const std::string& key)
 {
-  const Syntax& syntax = al.syntax ().syntax (key);
   const std::vector<const AttributeList*>& alists = al.alist_sequence (key);
   for (size_t i = 0; i < alists.size (); i++)
     {
-      Block nest (al, syntax, *alists[i], key, i);
+      Block nest (al, key, i);
       (*this)[alists[i]->name ("Daisy")] 
-	= Librarian::build_item<MV_Crop> (nest, "MARKVAND");
+        = Librarian::build_item<MV_Crop> (nest, "MARKVAND");
     }
 }
 

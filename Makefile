@@ -1348,7 +1348,7 @@ lexer_table${OBJ}: lexer_table.C lexer_table.h block.h syntax.h value.h \
   submodeler.h treelog.h memutils.h time.h vcheck.h path.h
 block${OBJ}: block.C block.h syntax.h value.h symbol.h plf.h metalib.h \
   library.h alist.h librarian.h model.h stringer.h number.h assertion.h \
-  scope_block.h scope.h treelog.h
+  scope_block.h scope.h treelog.h frame.h
 dlf${OBJ}: dlf.C dlf.h symbol.h volume.h model.h alist.h assertion.h \
   version.h daisy.h program.h run.h time.h timestep.h vcheck.h memutils.h \
   toplevel.h
@@ -1389,7 +1389,7 @@ alist${OBJ}: alist.C plf.h library.h symbol.h alist.h syntax.h value.h time.h \
 syntax${OBJ}: syntax.C syntax.h value.h symbol.h alist.h library.h metalib.h \
   check.h vcheck.h assertion.h memutils.h treelog.h
 library${OBJ}: library.C library.h symbol.h block.h syntax.h value.h plf.h \
-  alist.h treelog.h assertion.h memutils.h
+  alist.h treelog.h assertion.h memutils.h frame_model.h frame.h scope.h
 plf${OBJ}: plf.C plf.h assertion.h mathlib.h
 mathlib${OBJ}: mathlib.C mathlib.h assertion.h
 cdaisy${OBJ}: cdaisy.C scope.h value.h symbol.h block.h syntax.h plf.h \

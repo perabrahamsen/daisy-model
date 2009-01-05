@@ -54,6 +54,8 @@ struct Library::Implementation
 
   // Accessors.
   AttributeList& lookup (symbol) const;
+  const FrameModel& model (symbol) const;
+  Frame& frame (symbol) const;
   bool check (symbol) const;
   void add_ancestors (symbol);
   void add_base (AttributeList&, const Syntax&);
@@ -77,6 +79,28 @@ Library::Implementation::lookup (const symbol key) const
     daisy_panic ("Model '" + key.name ()
                  + "' not in library '" + name.name () + "'");
   return (*i).second->alist ();
+}
+
+const FrameModel&
+Library::Implementation::model (const symbol key) const
+{ 
+  frame_map::const_iterator i = frames.find (key);
+
+  if (i == frames.end ())
+    daisy_panic ("Model '" + key.name ()
+                 + "' not in library '" + name.name () + "'");
+  return *(*i).second;
+}
+
+Frame&
+Library::Implementation::frame (const symbol key) const
+{ 
+  frame_map::const_iterator i = frames.find (key);
+
+  if (i == frames.end ())
+    daisy_panic ("Frame '" + key.name ()
+                 + "' not in library '" + name.name () + "'");
+  return *(*i).second;
 }
 
 bool
@@ -246,6 +270,14 @@ Library::name () const
 const char*
 Library::description () const
 { return impl->description; }
+
+const FrameModel& 
+Library::model (const symbol key) const
+{ return impl->model (key); }
+
+Frame& 
+Library::frame (const symbol key) const
+{ return impl->frame (key); }
 
 AttributeList&
 Library::lookup (const symbol key) const

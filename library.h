@@ -36,6 +36,8 @@ class AttributeList;
 class Treelog;
 class Format;
 class Model;
+class Frame;
+class FrameModel;
 
 #ifdef __unix
 #define EXPORT /* Nothing */
@@ -68,6 +70,8 @@ public:
 public:
   symbol name () const;
   const char* description () const;
+  const FrameModel& model (symbol) const;
+  Frame& frame (symbol) const;
   AttributeList& lookup (symbol) const;
   bool check (symbol) const;
   bool complete (const Metalib&, symbol) const;

@@ -29,16 +29,21 @@ FrameModel::parent () const
 { return parent_; }
 
 Model&
-FrameModel::construct (Block& context, const symbol key) const
+FrameModel::construct (Block& context, const symbol key, 
+                       const FrameModel& frame) const
 { 
   if (builder)
     {
-      Block block (context, syntax (), alist (), key);
+      Block block (context, frame, key);
       return builder (block);
     }
   daisy_assert (parent ());
-  return parent ()->construct (context, key);
+  return parent ()->construct (context, key, frame);
 }
+
+Model&
+FrameModel::construct (Block& context, const symbol key) const
+{ return construct (context, key, *this); }
 
 FrameModel::FrameModel ()
   : Frame (),

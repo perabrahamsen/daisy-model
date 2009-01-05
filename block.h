@@ -32,6 +32,7 @@ class Treelog;
 class Metalib;
 class Path;
 class Units;
+class Frame;
 
 #ifdef __unix
 #define EXPORT /* Nothing */
@@ -100,8 +101,8 @@ private:
 public:
   // Toplevel.
   explicit Block (Metalib&, Treelog& msg, symbol scope_id);
-#define NO_FRAMES
-#ifdef NO_FRAMES
+
+#if 1
   // build_free
   explicit Block (Metalib&, Treelog& msg, const Syntax&, const AttributeList&,
  		  symbol scope_id);
@@ -111,7 +112,12 @@ public:
   // build_vector
   explicit Block (Block&, const Syntax&, const AttributeList&, 
 		  symbol scope_tag, size_t index);
-#endif // NO_FRAMES
+#endif 
+  // build_item
+  explicit Block (Block&, const Frame&, symbol scope_tag);
+  // build_vector
+  explicit Block (Block&, const Frame&, symbol scope_tag, size_t index);
+
   // submodel
   explicit Block (Block&, symbol);
   // map_submodel
