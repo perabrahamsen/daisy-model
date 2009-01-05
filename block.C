@@ -37,7 +37,7 @@ struct Block::Implementation
 {
   static const Syntax empty_syntax;
   Metalib& metalib;
-  Block *const parent;
+  Block *const context;
   const Syntax& syntax;
   const AttributeList& alist;
   Treelog& msg;
@@ -58,7 +58,7 @@ struct Block::Implementation
 		  const Syntax& s, const AttributeList& a,
 		  const symbol scope_id)
     : metalib (lib),
-      parent (p),
+      context (p),
       syntax (s),
       alist (a),
       msg (m),
@@ -73,8 +73,8 @@ Value::type
 Block::Implementation::lookup (const symbol key) const
 {
   Value::type type = syntax.lookup (key);
-  if (type == Value::Error && parent)
-    return parent->impl->lookup (key);
+  if (type == Value::Error && context)
+    return context->impl->lookup (key);
   return type;
 }
 
@@ -84,8 +84,8 @@ Block::Implementation::find_syntax (const symbol key) const
   Value::type type = syntax.lookup (key);
   if (type != Value::Error)
     return syntax;
-  daisy_assert (parent != NULL);
-  return parent->impl->find_syntax (key);
+  daisy_assert (context != NULL);
+  return context->impl->find_syntax (key);
 }
 
 const AttributeList& 
@@ -93,8 +93,8 @@ Block::Implementation::find_alist (const symbol key) const
 {
   if (alist.check (key))
     return alist;
-  daisy_assert (parent != NULL);
-  return parent->find_alist (key);
+  daisy_assert (context != NULL);
+  return context->find_alist (key);
 }
 
 bool
@@ -103,9 +103,9 @@ Block::Implementation::check (const symbol key) const
   Value::type type = syntax.lookup (key);
   if (type != Value::Error)
     return alist.check (key);
-  if (parent == NULL)
+  if (context == NULL)
     return false;
-  return parent->impl->check (key);
+  return context->impl->check (key);
 }
 
 symbol
@@ -294,8 +294,8 @@ void
 Block::Implementation::set_error ()
 { 
   is_ok = false; 
-  if (parent) 
-    parent->set_error (); 
+  if (context) 
+    context->set_error (); 
 }
 
 Metalib& 
@@ -351,9 +351,9 @@ Block::entries (std::vector<symbol>& all) const
 {
   // Own entries.
   impl->syntax.entries (all);
-  // Parent entries.
-  if (impl->parent)
-    impl->parent->entries (all);
+  // Context entries.
+  if (impl->context)
+    impl->context->entries (all);
 }
 
 int 
@@ -524,37 +524,50 @@ Block::sequence_id (const symbol key, size_t index)
 }
 
 Block::Block (Metalib& metalib, Treelog& msg, 
-              const Syntax& syntax, const AttributeList& alist,
- 	      const symbol scope_id)
-  : impl (new Implementation (metalib, NULL, msg, syntax, alist, scope_id))
+              const symbol scope_id)
+  // Toplevel.
+  : impl (new Implementation (metalib, NULL, msg, 
+                              metalib.syntax (), metalib.alist (), scope_id))
 { }
 
 Block::Block (Metalib& metalib, Treelog& msg, 
-              const symbol scope_id)
-  : impl (new Implementation (metalib, NULL, msg, 
-                              metalib.syntax (), metalib.alist (), scope_id))
+              const Syntax& syntax, const AttributeList& alist,
+ 	      const symbol scope_id)
+  // build_free
+  : impl (new Implementation (metalib, NULL, msg, syntax, alist, scope_id))
 { }
 
 Block::Block (Block& block,
 	      const Syntax& syntax, const AttributeList& alist, 
 	      const symbol scope_id)
+  // build_item
   : impl (new Implementation (block.metalib (), &block, block.msg (),
                               syntax, alist, scope_id))
 { }
 
+Block::Block (Block& block,
+	      const Syntax& syntax, const AttributeList& alist, 
+	      const symbol scope_id, size_t index)
+  // build_vector
+  : impl (new Implementation (block.metalib (), &block, block.msg (),
+			      syntax, alist, 
+			      sequence_id (scope_id, index)))
+{ }
+
 Block::Block (Block& block, const symbol key)
+  // submodel.
   : impl (new Implementation (block.metalib (), &block, block.msg (), 
                               block.syntax ().syntax (key), 
                               block.alist ().alist (key),
 			      key))
 { }
 
-Block::Block (Block& block,
-	      const Syntax& syntax, const AttributeList& alist, 
-	      const symbol scope_id, size_t index)
-  : impl (new Implementation (block.metalib (), &block, block.msg (),
-			      syntax, alist, 
-			      sequence_id (scope_id, index)))
+Block::Block (Block& block, const symbol key, const size_t index)
+  // map_submodel.
+  : impl (new Implementation (block.metalib (), &block, block.msg (), 
+                              block.syntax ().syntax (key), 
+                              *block.alist ().alist_sequence (key)[index],
+			      sequence_id (key, index)))
 { }
 
 Block::~Block ()

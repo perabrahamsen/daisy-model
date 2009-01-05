@@ -99,18 +99,23 @@ private:
   Block ();
 public:
   // Toplevel.
+  explicit Block (Metalib&, Treelog& msg, symbol scope_id);
+#define NO_FRAMES
+#ifdef NO_FRAMES
+  // build_free
   explicit Block (Metalib&, Treelog& msg, const Syntax&, const AttributeList&,
  		  symbol scope_id);
-  // build_free
-  explicit Block (Metalib&, Treelog& msg, symbol scope_id);
   // build_item
   explicit Block (Block&, const Syntax&, const AttributeList&, 
 		  symbol scope_tag);
   // build_vector
   explicit Block (Block&, const Syntax&, const AttributeList&, 
 		  symbol scope_tag, size_t index);
+#endif // NO_FRAMES
   // submodel
   explicit Block (Block&, symbol);
+  // map_submodel
+  explicit Block (Block&, symbol, size_t index);
   ~Block ();
 };
 
