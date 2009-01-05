@@ -72,20 +72,20 @@ struct Library::Implementation
 AttributeList&
 Library::Implementation::lookup (const symbol key) const
 { 
-  alist_map::const_iterator i = alists.find (key);
+  frame_map::const_iterator i = frames.find (key);
 
-  if (i == alists.end ())
+  if (i == frames.end ())
     daisy_panic ("Model '" + key.name ()
                  + "' not in library '" + name.name () + "'");
-  return *(*i).second;
+  return (*i).second->alist ();
 }
 
 bool
 Library::Implementation::check (const symbol key) const
 { 
-  alist_map::const_iterator i = alists.find (key);
+  frame_map::const_iterator i = frames.find (key);
 
-  if (i == alists.end ())
+  if (i == frames.end ())
     return false;
 
   return true;
@@ -130,6 +130,7 @@ Library::Implementation::add_base (AttributeList& value,
 {
   daisy_assert (value.check ("base_model"));
   const symbol key = value.name ("base_model");
+  frames[key] = new FrameModel (syntax, value);
   alists[key] = &value;
   syntaxen[key] = &syntax;
   add_ancestors (key);
@@ -139,6 +140,7 @@ void
 Library::Implementation::add (const symbol key, AttributeList& value,
 			      const Syntax& syntax, builder build)
 {
+  frames[key] = new FrameModel (syntax, value, build);
   alists[key] = &value;
   syntaxen[key] = &syntax;
   builders[key] = build;
@@ -170,6 +172,7 @@ Library::Implementation::entries (std::vector<symbol>& result) const
 void
 Library::Implementation::remove (const symbol key)
 {
+  frames.erase (frames.find (key));
   alists.erase (alists.find (key));
   syntaxen.erase (syntaxen.find (key));
 }
@@ -184,6 +187,9 @@ Library::Implementation::clear_parsed ()
       if (alist.check ("parsed_from_file"))
 	{
 	  const symbol key = (*i).first;
+	  frame_map::iterator k = frames.find (key);
+	  daisy_assert (k != frames.end ());
+	  frames.erase (k);
 	  syntax_map::iterator j = syntaxen.find (key);
 	  daisy_assert (j != syntaxen.end ());
 	  syntaxen.erase (j);
@@ -414,6 +420,11 @@ Library::clone () const
 { 
   Library *const lib = new Library (impl->name.name ().c_str ());
   lib->set_description (impl->description);
+  for (Implementation::frame_map::const_iterator i = impl->frames.begin ();
+       i != impl->frames.end ();
+       i++)
+    lib->impl->frames[(*i).first] = new FrameModel (*(*i).second, 
+                                                    FrameModel::parent_copy);
   lib->impl->builders = impl->builders;
   for (Implementation::alist_map::const_iterator i = impl->alists.begin ();
        i != impl->alists.end ();

@@ -53,18 +53,33 @@ FrameModel::root ()
   return frame;
 }
 
-FrameModel::FrameModel (const FrameModel& parent, parent_copy_t)
-  : Frame (parent),
-    parent_ (&parent),
-    builder (parent.builder)
-{ }
-
 FrameModel::FrameModel (const FrameModel& parent, parent_link_t)
   : Frame (),
     parent_ (&parent),
     builder (parent.builder)
 { }
 
+FrameModel::FrameModel (const FrameModel& parent, parent_copy_t)
+  // For cloning a library.
+  : Frame (parent),
+    parent_ (&parent),
+    builder (parent.builder)
+{ }
+
+FrameModel::FrameModel (const Syntax& s, const AttributeList& a)
+  // Base class.
+  : Frame (s, a),
+    parent_ (NULL),
+    builder (NULL)
+{ }
+
+FrameModel::FrameModel (const Syntax& s, const AttributeList& a,
+                        const builder_t b)
+  // Base class.
+  : Frame (s, a),
+    parent_ (NULL),
+    builder (b)
+{ }
 FrameModel::~FrameModel ()
 { }
 

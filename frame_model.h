@@ -46,9 +46,11 @@ private:
 public:
   static const FrameModel& root ();
   enum parent_link_t { parent_link };
-  enum parent_copy_t { parent_copy };
+  enum parent_copy_t { parent_copy }; // OLD: For cloning a library.
   FrameModel (const FrameModel&, parent_link_t);
-  FrameModel (const FrameModel&, parent_copy_t);
+  FrameModel (const FrameModel&, parent_copy_t); // OLD: For cloning a library.
+  FrameModel (const Syntax&, const AttributeList&); // OLD: base class
+  FrameModel (const Syntax&, const AttributeList&, const builder_t); // OLD: m.
   ~FrameModel ();
 };
 

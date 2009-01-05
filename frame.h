@@ -39,8 +39,8 @@ protected:
   virtual const Frame* parent () const = 0;
 
   // Old style access.
-protected:
-  const AttributeList& alist () const;
+public:
+  AttributeList& alist () const;
   const Syntax& syntax () const;
 
   // Common access.
@@ -258,6 +258,7 @@ public:
 protected:
   Frame (const Frame&);
   Frame ();
+  Frame (const Syntax&, const AttributeList&); // Old style.
 public:
   virtual ~Frame ();
 };

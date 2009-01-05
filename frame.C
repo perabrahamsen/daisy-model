@@ -34,9 +34,13 @@ struct Frame::Implementation
   { }
   Implementation ()
   { }
+  Implementation (const Syntax& s, const AttributeList& a)
+    : syntax (s),
+      alist (a)
+  { }
 };
 
-const AttributeList& 
+AttributeList& 
 Frame::alist () const
 { return impl->alist; }
 
@@ -580,6 +584,10 @@ Frame::Frame (const Frame& old)
 
 Frame::Frame ()
   : impl (new Implementation ())
+{ }
+
+Frame::Frame (const Syntax& s, const AttributeList& a)
+  : impl (new Implementation (s, a))
 { }
 
 Frame::~Frame ()
