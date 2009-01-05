@@ -48,7 +48,6 @@ struct Library::Implementation
   // Data (remember to update Library::clone if you change this).
   frame_map frames;
   bmap_type builders;
-  alist_map alists;
   syntax_map syntaxen;
   std::vector<doc_fun> doc_funs;
   ancestor_map ancestors;
@@ -131,7 +130,6 @@ Library::Implementation::add_base (AttributeList& value,
   daisy_assert (value.check ("base_model"));
   const symbol key = value.name ("base_model");
   frames[key] = new FrameModel (syntax, value);
-  alists[key] = &value;
   syntaxen[key] = &syntax;
   add_ancestors (key);
 }
@@ -141,7 +139,6 @@ Library::Implementation::add (const symbol key, AttributeList& value,
 			      const Syntax& syntax, builder build)
 {
   frames[key] = new FrameModel (syntax, value, build);
-  alists[key] = &value;
   syntaxen[key] = &syntax;
   builders[key] = build;
   add_ancestors (key);
@@ -173,7 +170,6 @@ void
 Library::Implementation::remove (const symbol key)
 {
   frames.erase (frames.find (key));
-  alists.erase (alists.find (key));
   syntaxen.erase (syntaxen.find (key));
 }
 
@@ -221,9 +217,6 @@ Library::Implementation::~Implementation ()
 { 
   // Delete frames.
   map_delete (frames.begin (), frames.end ());
-
-  // Delete alists.
-  map_delete (alists.begin (), alists.end ());
 
   // Delete unique syntaxen.
   std::set<const Syntax*> unique;
@@ -423,10 +416,6 @@ Library::clone () const
     lib->impl->frames[(*i).first] = new FrameModel (*(*i).second, 
                                                     FrameModel::parent_copy);
   lib->impl->builders = impl->builders;
-  for (Implementation::alist_map::const_iterator i = impl->alists.begin ();
-       i != impl->alists.end ();
-       i++)
-    lib->impl->alists[(*i).first] = new AttributeList (*(*i).second);
   for (Implementation::syntax_map::const_iterator i = impl->syntaxen.begin ();
        i != impl->syntaxen.end ();
        i++)
