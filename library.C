@@ -181,20 +181,17 @@ void
 Library::Implementation::clear_parsed ()
 {
  retry:
-  for (alist_map::iterator i = alists.begin (); i != alists.end (); i++)
+  for (frame_map::iterator i = frames.begin (); i != frames.end (); i++)
     {
-      AttributeList& alist = *((*i).second);
-      if (alist.check ("parsed_from_file"))
+      Frame& frame = *((*i).second);
+      if (frame.check ("parsed_from_file"))
 	{
 	  const symbol key = (*i).first;
-	  frame_map::iterator k = frames.find (key);
-	  daisy_assert (k != frames.end ());
-	  frames.erase (k);
 	  syntax_map::iterator j = syntaxen.find (key);
 	  daisy_assert (j != syntaxen.end ());
 	  syntaxen.erase (j);
-	  alists.erase (i);
-	  delete &alist;
+	  frames.erase (i);
+	  delete &frame;
 	  goto retry;
 	}
     }
@@ -204,13 +201,13 @@ void
 Library::Implementation::refile_parsed (const std::string& from, const std::string& to)
 {
   daisy_assert (from != to);
-  for (alist_map::iterator i = alists.begin (); i != alists.end (); i++)
+  for (frame_map::iterator i = frames.begin (); i != frames.end (); i++)
     {
-      AttributeList& alist = *((*i).second);
-      if (alist.check ("parsed_from_file")
-	  && alist.name ("parsed_from_file") == from)
+      Frame& frame = *((*i).second);
+      if (frame.check ("parsed_from_file")
+	  && frame.name ("parsed_from_file") == from)
 	{
-	  alist.add ("parsed_from_file", to);
+	  frame.add ("parsed_from_file", to);
 	}
     }
 }
