@@ -217,7 +217,7 @@ Library::Implementation::Implementation (const char* n)
 Library::Implementation::~Implementation ()
 { 
   // Delete frames.
-  map_delete (frame.begin (), frame.end ());
+  map_delete (frames.begin (), frames.end ());
 
   // Delete alists.
   map_delete (alists.begin (), alists.end ());
