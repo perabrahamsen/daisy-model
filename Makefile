@@ -485,7 +485,7 @@ SPECIALS = weather_base.C \
 
 # Various utility code that are neither a component nor a (sub)model.
 # 
-OTHER = scope.C value.C unit.C border.C resistance.C \
+OTHER = frame_model.C scope.C value.C unit.C border.C resistance.C \
 	convert.C units.C tertsmall.C anystate.C imvec.C im.C frame.C \
 	bdconv.C abiotic.C scope_soil.C run.C treelog_text.C treelog_store.C \
 	intrinsics.C metalib.C model.C output.C scope_block.C librarian.C \
@@ -1288,6 +1288,8 @@ printer_file${OBJ}: printer_file.C printer_file.h printer.h model.h symbol.h \
   parser.h path.h assertion.h librarian.h
 log_alist${OBJ}: log_alist.C log_alist.h log.h time.h border.h model.h \
   symbol.h alist.h library.h syntax.h value.h assertion.h
+frame_model${OBJ}: frame_model.C frame_model.h frame.h syntax.h value.h \
+  symbol.h scope.h block.h plf.h assertion.h
 scope${OBJ}: scope.C scope.h value.h symbol.h assertion.h
 value${OBJ}: value.C value.h symbol.h assertion.h
 unit${OBJ}: unit.C unit.h symbol.h
@@ -1306,7 +1308,7 @@ imvec${OBJ}: imvec.C imvec.h symbol.h syntax.h value.h assertion.h log.h \
 im${OBJ}: im.C im.h symbol.h syntax.h value.h chemical.h model.h alist.h \
   units.h unit.h am.h log.h time.h border.h block.h plf.h check.h \
   assertion.h
-frame${OBJ}: frame.C frame.h syntax.h value.h symbol.h alist.h
+frame${OBJ}: frame.C frame.h syntax.h value.h symbol.h scope.h alist.h
 bdconv${OBJ}: bdconv.C bdconv.h convert.h symbol.h geometry.h syntax.h \
   value.h mathlib.h assertion.h soil.h volume.h model.h alist.h units.h
 abiotic${OBJ}: abiotic.C abiotic.h mathlib.h assertion.h

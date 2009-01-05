@@ -26,9 +26,9 @@
 #include "alist.h"
 #include "syntax.h"
 #include "treelog.h"
-#include <sstream>
 #include "assertion.h"
 #include "memutils.h"
+#include "frame_model.h"
 #include <map>
 #include <sstream>
 
@@ -39,12 +39,14 @@ struct Library::Implementation
   const char* description;
 
   // Types.
+  typedef std::map<symbol, FrameModel*> frame_map;
   typedef std::map<symbol, builder> bmap_type;
   typedef std::map<symbol, AttributeList*> alist_map;
   typedef std::map<symbol, const Syntax*> syntax_map;
   typedef std::map<symbol, std::set<symbol>/**/> ancestor_map;
 
   // Data (remember to update Library::clone if you change this).
+  frame_map frames;
   bmap_type builders;
   alist_map alists;
   syntax_map syntaxen;
@@ -214,6 +216,9 @@ Library::Implementation::Implementation (const char* n)
 
 Library::Implementation::~Implementation ()
 { 
+  // Delete frames.
+  map_delete (frame.begin (), frame.end ());
+
   // Delete alists.
   map_delete (alists.begin (), alists.end ());
 

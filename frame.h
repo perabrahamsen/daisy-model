@@ -19,9 +19,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "syntax.h"
+#include "scope.h"
 #include <memory>
 #include <vector>
-#include <boost/noncopyable.hpp>
 
 class AttributeList;
 class PLF;
@@ -29,16 +29,20 @@ class PLF;
 #ifndef FRAME_H
 #define FRAME_H
 
-class Frame : private boost::noncopyable
+class Frame : public WScope
 {
   struct Implementation;
   std::auto_ptr<Implementation> impl;
 
+  // Parent.
+protected:
+  virtual const Frame* parent () const = 0;
+
   // Old style access.
-private:
+protected:
   const AttributeList& alist () const;
   const Syntax& syntax () const;
-  
+
   // Common access.
 public:
   // Get a list of all entries.
@@ -63,10 +67,10 @@ public:
   const Syntax& syntax (const symbol) const;
   ::Library& library (const Metalib&, const symbol) const;
   int  size (const symbol) const;
-  const symbol dimension (const symbol) const;
-  const symbol domain (const symbol) const;
-  const symbol range (const symbol) const;
-  const symbol description (const symbol) const;
+  symbol dimension (const symbol) const;
+  symbol domain (const symbol) const;
+  symbol range (const symbol) const;
+  symbol description (const symbol) const;
   const AttributeList& default_alist (const symbol) const;
 
   // Add attribute types.
@@ -251,11 +255,11 @@ public:
   void add (const symbol, const std::vector<const PLF*>&);
 
   // Create and Destroy.
-public:
-  enum parent_relationship_t { parent_inherit };
-  Frame (const Frame&, parent_relationship_t);
+protected:
+  Frame (const Frame&);
   Frame ();
-  ~Frame ();
+public:
+  virtual ~Frame ();
 };
 
 #endif // FRAME_H

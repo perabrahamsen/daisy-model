@@ -1,5 +1,17 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* Frame
+
+Metalib: 
+  Root (description)
+  Component
+  Base
+  Model (build)
+  Partial parameterizatione (line + file)
+  Full parameterization
+
+Metalib (parent)
+
 * Fjern default værdier fra kolgen (og filter)
 
 * Omskriv wiki side om kolloider.

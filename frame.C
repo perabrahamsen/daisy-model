@@ -25,15 +25,14 @@
 
 struct Frame::Implementation
 {
-  const Frame *const parent;
   Syntax syntax;
   AttributeList alist;
 
-  Implementation ()
-    : parent (NULL)
+  Implementation (const Implementation& old)
+    : syntax (old.syntax),
+      alist (old.alist)
   { }
-  Implementation (const Frame& frame)
-    : parent (&frame)
+  Implementation ()
   { }
 };
 
@@ -61,8 +60,8 @@ Frame::check (const Metalib& metalib, Treelog& err) const
 void 
 Frame::check (const symbol key, double value) const
 { 
-  if (impl->parent && impl->syntax.lookup (key) == Value::Error)
-    impl->parent->check (key, value); 
+  if (parent () && impl->syntax.lookup (key) == Value::Error)
+    parent ()->check (key, value); 
   else
     impl->syntax.check (key, value); 
 }
@@ -75,8 +74,8 @@ Frame::check (const Metalib& metalib,
 bool 
 Frame::is_const (const symbol key) const
 {
-  if (impl->parent && impl->syntax.lookup (key) == Value::Error)
-    return impl->parent->is_const (key);
+  if (parent () && impl->syntax.lookup (key) == Value::Error)
+    return parent ()->is_const (key);
   else
     return impl->syntax.is_const (key);
 }
@@ -84,8 +83,8 @@ Frame::is_const (const symbol key) const
 bool 
 Frame::is_optional (const symbol key) const
 {
-  if (impl->parent && impl->syntax.lookup (key) == Value::Error)
-    return impl->parent->is_optional (key);
+  if (parent () && impl->syntax.lookup (key) == Value::Error)
+    return parent ()->is_optional (key);
   else
     return impl->syntax.is_optional (key);
 }
@@ -93,8 +92,8 @@ Frame::is_optional (const symbol key) const
 bool 
 Frame::is_log (const symbol key) const
 {
-  if (impl->parent && impl->syntax.lookup (key) == Value::Error)
-    return impl->parent->is_log (key);
+  if (parent () && impl->syntax.lookup (key) == Value::Error)
+    return parent ()->is_log (key);
   else
     return impl->syntax.is_log (key);
 }
@@ -102,8 +101,8 @@ Frame::is_log (const symbol key) const
 bool 
 Frame::is_state (const symbol key) const
 {
-  if (impl->parent && impl->syntax.lookup (key) == Value::Error)
-    return impl->parent->is_state (key);
+  if (parent () && impl->syntax.lookup (key) == Value::Error)
+    return parent ()->is_state (key);
   else
     return impl->syntax.is_state (key);
 }
@@ -111,8 +110,8 @@ Frame::is_state (const symbol key) const
 Value::type 
 Frame::lookup (const symbol key) const
 {
-  if (impl->parent && impl->syntax.lookup (key) == Value::Error)
-    return impl->parent->lookup (key);
+  if (parent () && impl->syntax.lookup (key) == Value::Error)
+    return parent ()->lookup (key);
   else
     return impl->syntax.lookup (key);
 }
@@ -120,8 +119,8 @@ Frame::lookup (const symbol key) const
 const Syntax& 
 Frame::syntax (const symbol key) const
 {
-  if (impl->parent && impl->syntax.lookup (key) == Value::Error)
-    return impl->parent->syntax (key);
+  if (parent () && impl->syntax.lookup (key) == Value::Error)
+    return parent ()->syntax (key);
   else
     return impl->syntax.syntax (key);
 }
@@ -129,8 +128,8 @@ Frame::syntax (const symbol key) const
 ::Library& 
 Frame::library (const Metalib& metalib, const symbol key) const
 {
-  if (impl->parent && impl->syntax.lookup (key) == Value::Error)
-    return impl->parent->library (metalib, key);
+  if (parent () && impl->syntax.lookup (key) == Value::Error)
+    return parent ()->library (metalib, key);
   else
     return impl->syntax.library (metalib, key);
 }
@@ -138,44 +137,44 @@ Frame::library (const Metalib& metalib, const symbol key) const
 int  
 Frame::size (const symbol key) const
 {
-  if (impl->parent && impl->syntax.lookup (key) == Value::Error)
-    return impl->parent->size (key);
+  if (parent () && impl->syntax.lookup (key) == Value::Error)
+    return parent ()->size (key);
   else
     return impl->syntax.size (key);
 }
 
-const symbol 
+symbol 
 Frame::dimension (const symbol key) const
 {
-  if (impl->parent && impl->syntax.lookup (key) == Value::Error)
-    return impl->parent->dimension (key);
+  if (parent () && impl->syntax.lookup (key) == Value::Error)
+    return parent ()->dimension (key);
   else
     return impl->syntax.dimension (key);
 }
 
-const symbol 
+symbol 
 Frame::domain (const symbol key) const
 {
-  if (impl->parent && impl->syntax.lookup (key) == Value::Error)
-    return impl->parent->domain (key);
+  if (parent () && impl->syntax.lookup (key) == Value::Error)
+    return parent ()->domain (key);
   else
     return impl->syntax.domain (key);
 }
 
-const symbol 
+symbol 
 Frame::range (const symbol key) const
 {
-  if (impl->parent && impl->syntax.lookup (key) == Value::Error)
-    return impl->parent->range (key);
+  if (parent () && impl->syntax.lookup (key) == Value::Error)
+    return parent ()->range (key);
   else
     return impl->syntax.range (key);
 }
 
-const symbol 
+symbol 
 Frame::description (const symbol key) const
 {
-  if (impl->parent && impl->syntax.lookup (key) == Value::Error)
-    return impl->parent->description (key);
+  if (parent () && impl->syntax.lookup (key) == Value::Error)
+    return parent ()->description (key);
   else
     return impl->syntax.description (key);
 }
@@ -183,8 +182,8 @@ Frame::description (const symbol key) const
 const AttributeList& 
 Frame::default_alist (const symbol key) const
 {
-  if (impl->parent && impl->syntax.lookup (key) == Value::Error)
-    return impl->parent->default_alist (key);
+  if (parent () && impl->syntax.lookup (key) == Value::Error)
+    return parent ()->default_alist (key);
   else
     return impl->syntax.default_alist (key);
 }
@@ -333,8 +332,8 @@ Frame::order () const
 int 
 Frame::order_index (const symbol key) const
 {
-  if (impl->parent && impl->syntax.lookup (key) == Value::Error)
-    return impl->parent->order_index (key);
+  if (parent () && impl->syntax.lookup (key) == Value::Error)
+    return parent ()->order_index (key);
   else
     return impl->syntax.order_index (key);
 }
@@ -355,14 +354,14 @@ bool
 Frame::check (const symbol key) const
 { 
   return impl->alist.check (key)
-    || (impl->parent && impl->parent->check (key));
+    || (parent () && parent ()->check (key));
 }
 
 double 
 Frame::number (const symbol key) const
 { 
-  if (impl->parent && !impl->alist.check (key))
-    return impl->parent->number (key);
+  if (parent () && !impl->alist.check (key))
+    return parent ()->number (key);
   else
     return impl->alist.number (key);
 }
@@ -370,8 +369,8 @@ Frame::number (const symbol key) const
 double 
 Frame::number (const symbol key, double default_value) const
 { 
-  if (impl->parent && !impl->alist.check (key))
-    return impl->parent->number (key, default_value);
+  if (parent () && !impl->alist.check (key))
+    return parent ()->number (key, default_value);
   else
     return impl->alist.number (key, default_value);
 }
@@ -379,8 +378,8 @@ Frame::number (const symbol key, double default_value) const
 symbol
 Frame::name (const symbol key) const
 { 
-  if (impl->parent && !impl->alist.check (key))
-    return impl->parent->name (key);
+  if (parent () && !impl->alist.check (key))
+    return parent ()->name (key);
   else
     return impl->alist.name (key);
 }
@@ -389,8 +388,8 @@ symbol
 Frame::name (const symbol key, 
              const symbol default_value) const
 { 
-  if (impl->parent && !impl->alist.check (key))
-    return impl->parent->name (key, default_value);
+  if (parent () && !impl->alist.check (key))
+    return parent ()->name (key, default_value);
   else
     return impl->alist.name (key, default_value);
 }
@@ -398,8 +397,8 @@ Frame::name (const symbol key,
 bool 
 Frame::flag (const symbol key) const
 { 
-  if (impl->parent && !impl->alist.check (key))
-    return impl->parent->flag (key);
+  if (parent () && !impl->alist.check (key))
+    return parent ()->flag (key);
   else
     return impl->alist.flag (key);
 }
@@ -407,8 +406,8 @@ Frame::flag (const symbol key) const
 bool 
 Frame::flag (const symbol key, bool default_value) const
 { 
-  if (impl->parent && !impl->alist.check (key))
-    return impl->parent->flag (key, default_value);
+  if (parent () && !impl->alist.check (key))
+    return parent ()->flag (key, default_value);
   else
     return impl->alist.flag (key, default_value);
 }
@@ -416,8 +415,8 @@ Frame::flag (const symbol key, bool default_value) const
 const PLF& 
 Frame::plf (const symbol key) const
 { 
-  if (impl->parent && !impl->alist.check (key))
-    return impl->parent->plf (key);
+  if (parent () && !impl->alist.check (key))
+    return parent ()->plf (key);
   else
     return impl->alist.plf (key);
 }
@@ -425,8 +424,8 @@ Frame::plf (const symbol key) const
 AttributeList& 
 Frame::alist (const symbol key) const
 { 
-  if (impl->parent && !impl->alist.check (key))
-    return impl->parent->alist (key);
+  if (parent () && !impl->alist.check (key))
+    return parent ()->alist (key);
   else
     return impl->alist.alist (key);
 }
@@ -434,8 +433,8 @@ Frame::alist (const symbol key) const
 int 
 Frame::integer (const symbol key) const
 { 
-  if (impl->parent && !impl->alist.check (key))
-    return impl->parent->integer (key);
+  if (parent () && !impl->alist.check (key))
+    return parent ()->integer (key);
   else
     return impl->alist.integer (key);
 }
@@ -443,8 +442,8 @@ Frame::integer (const symbol key) const
 int 
 Frame::integer (const symbol key, int default_value) const
 { 
-  if (impl->parent && !impl->alist.check (key))
-    return impl->parent->integer (key, default_value);
+  if (parent () && !impl->alist.check (key))
+    return parent ()->integer (key, default_value);
   else
     return impl->alist.integer (key, default_value);
 }
@@ -452,8 +451,8 @@ Frame::integer (const symbol key, int default_value) const
 const std::vector<double>& 
 Frame::number_sequence (const symbol key) const
 { 
-  if (impl->parent && !impl->alist.check (key))
-    return impl->parent->number_sequence (key);
+  if (parent () && !impl->alist.check (key))
+    return parent ()->number_sequence (key);
   else
     return impl->alist.number_sequence (key);
 }
@@ -461,8 +460,8 @@ Frame::number_sequence (const symbol key) const
 const std::vector<symbol>&
 Frame::name_sequence (const symbol key) const
 { 
-  if (impl->parent && !impl->alist.check (key))
-    return impl->parent->name_sequence (key);
+  if (parent () && !impl->alist.check (key))
+    return parent ()->name_sequence (key);
   else
     return impl->alist.name_sequence (key);
 }
@@ -470,8 +469,8 @@ Frame::name_sequence (const symbol key) const
 const std::vector<bool>& 
 Frame::flag_sequence (const symbol key) const
 { 
-  if (impl->parent && !impl->alist.check (key))
-    return impl->parent->flag_sequence (key);
+  if (parent () && !impl->alist.check (key))
+    return parent ()->flag_sequence (key);
   else
     return impl->alist.flag_sequence (key);
 }
@@ -479,8 +478,8 @@ Frame::flag_sequence (const symbol key) const
 const std::vector<int>& 
 Frame::integer_sequence (const symbol key) const
 { 
-  if (impl->parent && !impl->alist.check (key))
-    return impl->parent->integer_sequence (key);
+  if (parent () && !impl->alist.check (key))
+    return parent ()->integer_sequence (key);
   else
     return impl->alist.integer_sequence (key);
 }
@@ -488,8 +487,8 @@ Frame::integer_sequence (const symbol key) const
 const std::vector<const PLF*>& 
 Frame::plf_sequence (const symbol key) const
 { 
-  if (impl->parent && !impl->alist.check (key))
-    return impl->parent->plf_sequence (key);
+  if (parent () && !impl->alist.check (key))
+    return parent ()->plf_sequence (key);
   else
     return impl->alist.plf_sequence (key);
 }
@@ -497,8 +496,8 @@ Frame::plf_sequence (const symbol key) const
 const std::vector<const AttributeList*>& 
 Frame::alist_sequence (const symbol key) const
 { 
-  if (impl->parent && !impl->alist.check (key))
-    return impl->parent->alist_sequence (key);
+  if (parent () && !impl->alist.check (key))
+    return parent ()->alist_sequence (key);
   else
     return impl->alist.alist_sequence (key);
 }
@@ -575,8 +574,8 @@ void
 Frame::add (const symbol key, const std::vector<const PLF*>& value)
 { impl->alist.add (key, value); }
 
-Frame::Frame (const Frame& parent, parent_relationship_t)
-  : impl (new Implementation (parent))
+Frame::Frame (const Frame& old)
+  : impl (new Implementation (*old.impl))
 { }
 
 Frame::Frame ()
