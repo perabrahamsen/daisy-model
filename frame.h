@@ -36,12 +36,12 @@ class Frame : public WScope
 
   // Parent.
 protected:
-  virtual const Frame* parent () const = 0;
+  virtual const Frame* parent () const;
 
   // Old style access.
 public:
   AttributeList& alist () const;
-  const Syntax& syntax () const;
+  Syntax& syntax () const;
 
   // Common access.
 public:
@@ -258,8 +258,11 @@ public:
 protected:
   Frame (const Frame&);
   Frame ();
-  Frame (const Syntax&, const AttributeList&); // Old style.
 public:
+  Frame (const Syntax&, const AttributeList&); // Old style.
+  typedef void load_syntax_t (Syntax&, AttributeList&);
+  Frame (load_syntax_t);
+  virtual void reset (load_syntax_t);
   virtual ~Frame ();
 };
 

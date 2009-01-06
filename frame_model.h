@@ -37,9 +37,9 @@ private:
 private:
   typedef Model& (*builder_t) (Block&);
   const builder_t builder;
-  Model& construct (Block& context, const symbol key, const FrameModel&) const;
+  Model* construct (Block& context, const symbol key, const FrameModel&) const;
 public:
-  Model& construct (Block& context, const symbol key) const;
+  Model* construct (Block& context, const symbol key) const;
 
   // Create and Destroy.
 private:
@@ -52,6 +52,8 @@ public:
   FrameModel (const FrameModel&, parent_copy_t); // OLD: For cloning a library.
   FrameModel (const Syntax&, const AttributeList&); // OLD: base class
   FrameModel (const Syntax&, const AttributeList&, const builder_t); // OLD: m.
+  FrameModel (const FrameModel&, const AttributeList&); // build_alist, add_d)
+  FrameModel (const FrameModel&, const Syntax&, const AttributeList&); // add_d
   ~FrameModel ();
 };
 

@@ -317,7 +317,8 @@ LogSelect::document_entries (Format& format, Metalib& metalib,
     }
 
   // Complete log.
-  Block block (metalib, msg, syntax, alist, "docselect");
+  const Frame& frame = log_lib.frame(name);  
+  Block block (metalib, msg, frame, "docselect");
   DocSelect select (block);
   daisy_assert (block.ok ());
 

@@ -532,27 +532,11 @@ Block::Block (Metalib& metalib, Treelog& msg,
 { }
 
 Block::Block (Metalib& metalib, Treelog& msg, 
-              const Syntax& syntax, const AttributeList& alist,
+              const Frame& frame,
  	      const symbol scope_id)
   // build_free
-  : impl (new Implementation (metalib, NULL, msg, syntax, alist, scope_id))
-{ }
-
-Block::Block (Block& block,
-	      const Syntax& syntax, const AttributeList& alist, 
-	      const symbol scope_id)
-  // build_item
-  : impl (new Implementation (block.metalib (), &block, block.msg (),
-                              syntax, alist, scope_id))
-{ }
-
-Block::Block (Block& block,
-	      const Syntax& syntax, const AttributeList& alist, 
-	      const symbol scope_id, size_t index)
-  // build_vector
-  : impl (new Implementation (block.metalib (), &block, block.msg (),
-			      syntax, alist, 
-			      sequence_id (scope_id, index)))
+  : impl (new Implementation (metalib, NULL, msg, 
+                              frame.syntax (), frame.alist (), scope_id))
 { }
 
 Block::Block (Block& block, const Frame& frame, symbol scope_tag)

@@ -40,15 +40,10 @@ struct Library::Implementation
 
   // Types.
   typedef std::map<symbol, FrameModel*> frame_map;
-  typedef std::map<symbol, builder> bmap_type;
-  typedef std::map<symbol, AttributeList*> alist_map;
-  typedef std::map<symbol, const Syntax*> syntax_map;
   typedef std::map<symbol, std::set<symbol>/**/> ancestor_map;
 
   // Data (remember to update Library::clone if you change this).
   frame_map frames;
-  bmap_type builders;
-  syntax_map syntaxen;
   std::vector<doc_fun> doc_funs;
   ancestor_map ancestors;
 
@@ -59,7 +54,7 @@ struct Library::Implementation
   bool check (symbol) const;
   void add_ancestors (symbol);
   void add_base (AttributeList&, const Syntax&);
-  void add (symbol, AttributeList&, const Syntax&, builder);
+  void add_model (symbol, FrameModel*);
   const Syntax& syntax (symbol) const;
   void entries (std::vector<symbol>&) const;
   void remove (symbol);
@@ -72,14 +67,7 @@ struct Library::Implementation
 
 AttributeList&
 Library::Implementation::lookup (const symbol key) const
-{ 
-  frame_map::const_iterator i = frames.find (key);
-
-  if (i == frames.end ())
-    daisy_panic ("Model '" + key.name ()
-                 + "' not in library '" + name.name () + "'");
-  return (*i).second->alist ();
-}
+{ return frame (key).alist (); }
 
 const FrameModel&
 Library::Implementation::model (const symbol key) const
@@ -128,14 +116,14 @@ Library::Implementation::add_ancestors (const symbol key)
       if (!check (current))
 	break;
 
-      const AttributeList& alist = lookup (current);
+      const Frame& frame = this->frame (current);
 
       symbol next;
 
-      if (alist.check ("type"))
-	next = alist.name ("type");
-      else if (alist.check ("base_model"))
-	next = alist.name ("base_model");
+      if (frame.check ("type"))
+	next = frame.name ("type");
+      else if (frame.check ("base_model"))
+	next = frame.name ("base_model");
       else
 	break;
 
@@ -154,36 +142,25 @@ Library::Implementation::add_base (AttributeList& value,
   daisy_assert (value.check ("base_model"));
   const symbol key = value.name ("base_model");
   frames[key] = new FrameModel (syntax, value);
-  syntaxen[key] = &syntax;
   add_ancestors (key);
 }
 
 void
-Library::Implementation::add (const symbol key, AttributeList& value,
-			      const Syntax& syntax, builder build)
+Library::Implementation::add_model (const symbol key, FrameModel *const frame)
 {
-  frames[key] = new FrameModel (syntax, value, build);
-  syntaxen[key] = &syntax;
-  builders[key] = build;
+  frames[key] = frame;
   add_ancestors (key);
 }
 
 const Syntax& 
 Library::Implementation::syntax (const symbol key) const
-{ 
-  syntax_map::const_iterator i = syntaxen.find (key);
-
-  if (i == syntaxen.end ())
-    daisy_panic ("'" + key + "' not found");
-
-  return *(*i).second;
-}
+{ return frame (key).syntax (); }
 
 void
 Library::Implementation::entries (std::vector<symbol>& result) const
 {
-  for (syntax_map::const_iterator i = syntaxen.begin ();
-       i != syntaxen.end ();
+  for (frame_map::const_iterator i = frames.begin ();
+       i != frames.end ();
        i++)
     {
       result.push_back ((*i).first);
@@ -192,10 +169,7 @@ Library::Implementation::entries (std::vector<symbol>& result) const
 
 void
 Library::Implementation::remove (const symbol key)
-{
-  frames.erase (frames.find (key));
-  syntaxen.erase (syntaxen.find (key));
-}
+{ frames.erase (frames.find (key)); }
 
 void
 Library::Implementation::clear_parsed ()
@@ -207,9 +181,6 @@ Library::Implementation::clear_parsed ()
       if (frame.check ("parsed_from_file"))
 	{
 	  const symbol key = (*i).first;
-	  syntax_map::iterator j = syntaxen.find (key);
-	  daisy_assert (j != syntaxen.end ());
-	  syntaxen.erase (j);
 	  frames.erase (i);
 	  delete &frame;
 	  goto retry;
@@ -241,18 +212,6 @@ Library::Implementation::~Implementation ()
 { 
   // Delete frames.
   map_delete (frames.begin (), frames.end ());
-
-  // Delete unique syntaxen.
-  std::set<const Syntax*> unique;
-  for (syntax_map::iterator i = syntaxen.begin ();
-       i != syntaxen.end ();
-       i++)
-    {
-      daisy_assert ((*i).second);
-      unique.insert ((*i).second);
-      (*i).second = NULL;
-    }
-  sequence_delete (unique.begin (), unique.end ());
 }
 
 void 
@@ -293,7 +252,7 @@ Library::complete (const Metalib& metalib, const symbol key) const
   if (!check (key))
     return false;
 
-  if (!syntax (key).check (metalib, lookup (key), Treelog::null ()))
+  if (!frame (key).check (metalib, Treelog::null ()))
     return false;
 
   return true;
@@ -304,15 +263,17 @@ Library::add_base (AttributeList& value, const Syntax& syntax)
 { impl->add_base (value, syntax); }
 
 void
-Library::add (const symbol key, AttributeList& value, const Syntax& syntax,
-              builder build)
-{ impl->add (key, value, syntax, build); }
+Library::add_model (const symbol key, AttributeList& value, 
+                    const Syntax& syntax, builder build)
+{ impl->add_model (key, new FrameModel (syntax, value, build)); }
 
 void 
 Library::add_derived (const symbol name, AttributeList& al,
 		      const symbol super)
 { 
-  add_derived (name, syntax (super), al, super); 
+  al.add ("type", super);
+  daisy_assert (check (super));
+  impl->add_model (name, new FrameModel (model (super), al));
 }
 
 void
@@ -320,7 +281,8 @@ Library::add_derived (const symbol name, const Syntax& syn, AttributeList& al,
 		      const symbol super)
 { 
   al.add ("type", super);
-  add (name, al, syn, impl->builders[super]); 
+  daisy_assert (check (super));
+  impl->add_model (name, new FrameModel (model (super), syn, al)); 
 }
 
 const Syntax& 
@@ -415,21 +377,6 @@ void
 Library::remove (const symbol key)
 { impl->remove (key); }
 
-Model* 
-Library::build_raw (const symbol type, Block& block) const
-{ 
-  const Implementation::bmap_type::const_iterator i 
-    = impl->builders.find (type);
-  if  (i == impl->builders.end ())
-    {
-      std::ostringstream tmp;
-      tmp << "No '" << type.name () << "' found in '"  << impl->name.name()
-          << "' library";
-      daisy_panic (tmp.str ());
-    }
-  return &(*i).second (block);
-}
-
 void 
 Library::set_description (const char *const description)
 {
@@ -447,11 +394,6 @@ Library::clone () const
        i++)
     lib->impl->frames[(*i).first] = new FrameModel (*(*i).second, 
                                                     FrameModel::parent_copy);
-  lib->impl->builders = impl->builders;
-  for (Implementation::syntax_map::const_iterator i = impl->syntaxen.begin ();
-       i != impl->syntaxen.end ();
-       i++)
-    lib->impl->syntaxen[(*i).first] = new Syntax (*(*i).second);
   lib->impl->doc_funs = impl->doc_funs;
   lib->impl->ancestors = impl->ancestors;
   return lib;

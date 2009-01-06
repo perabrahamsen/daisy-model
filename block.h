@@ -100,19 +100,10 @@ private:
   Block ();
 public:
   // Toplevel.
-  explicit Block (Metalib&, Treelog& msg, symbol scope_id);
+  explicit Block (Metalib&, Treelog& msg, symbol scope_tag);
 
-#if 1
   // build_free
-  explicit Block (Metalib&, Treelog& msg, const Syntax&, const AttributeList&,
- 		  symbol scope_id);
-  // build_item
-  explicit Block (Block&, const Syntax&, const AttributeList&, 
-		  symbol scope_tag);
-  // build_vector
-  explicit Block (Block&, const Syntax&, const AttributeList&, 
-		  symbol scope_tag, size_t index);
-#endif 
+  explicit Block (Metalib&, Treelog& msg, const Frame&, symbol scope_tag);
   // build_item
   explicit Block (Block&, const Frame&, symbol scope_tag);
   // build_vector

@@ -31,6 +31,7 @@
 #include "library.h"
 #include "alist.h"
 #include "syntax.h"
+#include "frame.h"
 #include "mathlib.h"
 #include "submodel.h"
 #include "submodeler.h"
@@ -579,6 +580,7 @@ Soil::initialize_aquitard (Block& top,
   daisy_assert (library.syntax (aquitard_symbol).check (top.metalib (),
                                                         horizon_alist,
                                                         top.msg ()));
+#if 0
   Syntax layer_syntax;
   AttributeList layer_alist;
   Implementation::Layer::load_syntax (layer_syntax, layer_alist);
@@ -586,6 +588,13 @@ Soil::initialize_aquitard (Block& top,
   layer_alist.add ("horizon", horizon_alist);
   daisy_assert (layer_syntax.check (top.metalib (), layer_alist, top.msg ()));
   Block block (top, layer_syntax, layer_alist, "aquitard layer");
+#else
+  Frame layer_frame (Implementation::Layer::load_syntax);
+  layer_frame.add ("end", new_end);
+  layer_frame.add ("horizon", horizon_alist);
+  daisy_assert (layer_frame.check (top.metalib (), top.msg ()));
+  Block block (top, layer_frame, "aquitard layer");
+#endif
   impl->layers.push_back (new Implementation::Layer (block));
 
   // Return the old end of soil.

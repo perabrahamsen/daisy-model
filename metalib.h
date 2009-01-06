@@ -23,9 +23,9 @@
 #define METALIB_H
 
 #include "symbol.h"
+#include "frame.h"
 #include <memory>
 #include <vector>
-#include <boost/noncopyable.hpp>
 
 class Path;
 class Syntax;
@@ -46,7 +46,7 @@ class Unit;
 #define EXPORT __declspec(dllimport)
 #endif
 
-class EXPORT Metalib : boost::noncopyable
+class EXPORT Metalib : public Frame
 {
   // Content.
   class Implementation;
@@ -57,8 +57,6 @@ public:
   const Units& units () const;
   const Unit& get_unit (symbol name) const;
   Path& path () const;
-  Syntax& syntax () const;
-  AttributeList& alist () const;
   bool exist (symbol name) const;
   Library& library (symbol name) const;
   Library& library (const char*) const;
@@ -70,9 +68,8 @@ public:
 
   // Create and Destroy.
 public:
-  typedef void load_syntax_fun (Syntax& syntax, AttributeList&);
-  void reset (load_syntax_fun);
-  explicit Metalib (load_syntax_fun);
+  void reset (load_syntax_t);
+  explicit Metalib (load_syntax_t);
   ~Metalib ();
 };
 

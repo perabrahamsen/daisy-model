@@ -40,8 +40,6 @@ struct Metalib::Implementation
 {
   // Content.
   Path path;
-  Syntax syntax;
-  AttributeList alist;
   std::auto_ptr<Units> units;
 
   typedef std::map<symbol, Library*> library_map;
@@ -56,10 +54,10 @@ struct Metalib::Implementation
     units.reset (new Units (metalib));
     daisy_assert (units.get ());
   }
-  Implementation (load_syntax_fun load_syntax)
+  Implementation ()
     : all (Librarian::intrinsics ().clone ()),
       sequence (0)
-  { load_syntax (syntax, alist); }
+  { }
   ~Implementation ()
   { map_delete (all.begin (), all.end ()); }
 };
@@ -75,14 +73,6 @@ Metalib::get_unit (const symbol name) const
 Path& 
 Metalib::path () const
 { return impl->path; }
-
-Syntax& 
-Metalib::syntax () const
-{ return impl->syntax; }
-
-AttributeList&
-Metalib::alist () const
-{ return impl->alist; }
 
 bool
 Metalib::exist (const symbol name) const
@@ -141,14 +131,16 @@ Metalib::get_sequence ()
 }
 
 void
-Metalib::reset (const load_syntax_fun load_syntax)
+Metalib::reset (const load_syntax_t load_syntax)
 { 
-  impl.reset (new Implementation (load_syntax)); 
+  Frame::reset (load_syntax);
+  impl.reset (new Implementation ()); 
   impl->initialize (*this);
 }
 
-Metalib::Metalib (load_syntax_fun load_syntax)
-  : impl (new Implementation (load_syntax))
+Metalib::Metalib (load_syntax_t load_syntax)
+  : Frame (load_syntax),
+    impl (new Implementation ())
 {
   impl->initialize (*this);
 }

@@ -23,25 +23,33 @@
 #include "frame_model.h"
 #include "block.h"
 #include "assertion.h"
+#include "treelog.h"
 
 const FrameModel* 
 FrameModel::parent () const
 { return parent_; }
 
-Model&
+Model*
 FrameModel::construct (Block& context, const symbol key, 
                        const FrameModel& frame) const
 { 
   if (builder)
     {
       Block block (context, frame, key);
-      return builder (block);
+      check (context.metalib (), Treelog::null ());
+      try
+        { return &builder (block); }
+      catch (const std::string& err)
+        { block.error ("Build failed: " + err); }
+      catch (const char *const err)
+        { block.error ("Build failure: " + std::string (err)); }
+      return NULL;
     }
   daisy_assert (parent ());
   return parent ()->construct (context, key, frame);
 }
 
-Model&
+Model*
 FrameModel::construct (Block& context, const symbol key) const
 { return construct (context, key, *this); }
 
@@ -85,6 +93,22 @@ FrameModel::FrameModel (const Syntax& s, const AttributeList& a,
     parent_ (NULL),
     builder (b)
 { }
+
+FrameModel::FrameModel (const FrameModel& p, const AttributeList& a)
+  // build_alist
+  : Frame (p.syntax (), a),
+    parent_ (&p),
+    builder (NULL)
+{ }
+
+FrameModel::FrameModel (const FrameModel& p, 
+                        const Syntax& s, const AttributeList& a)
+  // add_derived
+  : Frame (s, a),
+    parent_ (&p),
+    builder (NULL)
+{ }
+
 FrameModel::~FrameModel ()
 { }
 

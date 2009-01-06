@@ -76,7 +76,7 @@ public:
   bool check (symbol) const;
   bool complete (const Metalib&, symbol) const;
   void add_base (AttributeList&, const Syntax&);
-  void add (symbol, AttributeList&, const Syntax&, builder);
+  void add_model (symbol, AttributeList&, const Syntax&, builder);
   void add_derived (symbol name, AttributeList& al,
 		    symbol super);
   void add_derived (symbol name, const Syntax&, AttributeList& al,
@@ -92,9 +92,6 @@ public:
 
   // Dependencies.
   void remove (symbol);
-
-  // Build a model.
-  Model* build_raw (const symbol type, Block& block) const;
 
   void set_description (const char*);
   Library* clone () const;

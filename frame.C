@@ -40,11 +40,15 @@ struct Frame::Implementation
   { }
 };
 
+const Frame* 
+Frame::parent () const
+{ return NULL; }
+
 AttributeList& 
 Frame::alist () const
 { return impl->alist; }
 
-const Syntax& 
+Syntax& 
 Frame::syntax () const
 { return impl->syntax; }
 
@@ -589,6 +593,17 @@ Frame::Frame ()
 Frame::Frame (const Syntax& s, const AttributeList& a)
   : impl (new Implementation (s, a))
 { }
+
+Frame::Frame (load_syntax_t load_syntax)
+  : impl (new Implementation ())
+{ load_syntax (impl->syntax, impl->alist); }
+
+void 
+Frame::reset (load_syntax_t load_syntax)
+{
+  impl.reset (new Implementation ()); 
+  load_syntax (impl->syntax, impl->alist); 
+}
 
 Frame::~Frame ()
 { }

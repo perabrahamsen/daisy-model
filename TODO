@@ -2,6 +2,27 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Frame
 
+** Få Block til at gemme en frame ref i stedet for syntax + alist
+
+** Find på bedre måde at initialisere intrinsics på
+
+gem funktioner til at skabe data, i stedet for data, i static
+constructors.  Det bør klare dependencies.
+
+** Fjern al brug af alist of syntax udenfor frame
+
+** brug parent_link i stedet for parent_copy
+
+** Integrer syntax/alist i frame
+
+** Integrer metalib i frame
+
+** Units skal instantieres i den frame de defineres i.
+
+** Notes
+
+*** hierarchy 
+
 Metalib: 
   Root (description)
   Component

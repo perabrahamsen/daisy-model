@@ -91,7 +91,9 @@ public:
   { return add (key, symbol (value)); }
   void add (symbol, bool);
   void add (symbol, int);
+#if 1
   void add (symbol, const AttributeList&);
+#endif
   void add (symbol, const PLF&);
   void add (symbol, const std::vector<double>&);
   void add (symbol, const std::vector<symbol>&);

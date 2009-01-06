@@ -29,6 +29,7 @@
 #include "treelog_text.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "frame_model.h"
 #include <sstream>
 #include <map>
 
@@ -61,28 +62,20 @@ Librarian::build_free (const char *const component, Metalib& metalib,
           << type << "'";
       daisy_panic (tmp.str ());
     }
-  const Syntax& syntax = lib.syntax (type);
+  const FrameModel frame (lib.model (type), alist);
   {
     TreelogString tlog;
-    if (!syntax.check (metalib, alist, tlog))
+    if (!frame.check (metalib, tlog))
       {
         msg.error (tlog.str ());
         return NULL;
       }
   }
-  Block block (metalib, msg, syntax, alist, scope_id + ": " + type.name ());
-  try
-    { 
-      std::auto_ptr<Model> m (lib.build_raw (type, block)); 
-      if (!block.ok ())
-        return NULL;
-      return m.release ();
-    }
-  catch (const std::string& err)
-    { block.error ("Build failed: " + err); }
-  catch (const char *const err)
-    { block.error ("Build failure: " + std::string (err)); }
-  return NULL;
+  Block parent (metalib, msg, frame, scope_id + ": " + type);
+  std::auto_ptr<Model> m (frame.construct (parent, type)); 
+  if (!parent.ok ())
+    return NULL;
+  return m.release ();
 }
 
 Model* 
@@ -100,16 +93,8 @@ Librarian::build_alist (const char *const component,
           << type << "'";
       daisy_panic (tmp.str ());
     }
-  const Syntax& syntax = lib.syntax (type);
-  Block nested (parent, syntax, alist, scope_id + ": " + type.name ());
-  daisy_assert (syntax.check (parent.metalib (), alist, Treelog::null ()));
-  try
-    {  return lib.build_raw (type, nested); }
-  catch (const std::string& err)
-    { nested.error ("Build failed: " + err); }
-  catch (const char *const err)
-    { nested.error ("Build failure: " + std::string (err)); }
-  return NULL;
+  const FrameModel frame (lib.model (type), alist);
+  return frame.construct (parent, type); 
 }
 
 Model* 
@@ -127,16 +112,8 @@ Librarian::build_alist (const char *const component,
           << type << "'";
       daisy_panic (tmp.str ());
     }
-  const Syntax& syntax = lib.syntax (type);
-  Block nested (parent, syntax, alist, scope_id + ": " + type.name (), index);
-  daisy_assert (syntax.check (parent.metalib (), alist, Treelog::null ()));
-  try
-    {  return lib.build_raw (type, nested); }
-  catch (const std::string& err)
-    { nested.error ("Build failed: " + err); }
-  catch (const char *const err)
-    { nested.error ("Build failure: " + std::string (err)); }
-  return NULL;
+  const FrameModel frame (lib.model (type), alist);
+  return frame.construct (parent, type); 
 }
 
 Model* 
@@ -189,7 +166,7 @@ Librarian::add_type (const char *const component,
                      const symbol name, AttributeList& al,
                      const Syntax& syntax, builder build)
 {
-  library (component).add (name, al, syntax, build); 
+  library (component).add_model (name, al, syntax, build); 
   daisy_assert (!content->closed);
 }
 
@@ -198,7 +175,7 @@ Librarian::add_type (const char *const component,
                      const char *const name, AttributeList& al,
                      const Syntax& syntax, builder build)
 {
-  library (component).add (symbol (name), al, syntax, build); 
+  library (component).add_model (symbol (name), al, syntax, build); 
   daisy_assert (!content->closed);
 }
 
