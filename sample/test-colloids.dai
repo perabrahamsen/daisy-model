@@ -93,15 +93,15 @@ carbon part of the 'K' factor.")
 
 (defnumber K_Pendimethalin K_equilibrium
   "Adsorption for Pendimethalin to immobile soil."
-  (K_OC 16000 [cm^3/g]))
+  (K_OC 19000 [cm^3/g]))
 
 (defreaction Pendimethalin-immobile-sorption equilibrium
   "Sorption equilibrium between dissolved and immobile Pendimethalin."
   (A Pendimethalin-immobile)
   (B Pendimethalin)
   (equilibrium linear (K K_Pendimethalin))
-  (k_AB 0.01 [h^-1])                    ;Sorption rate.
-  (k_BA 0.001 [h^-1]))                  ;Desorption rate.
+  (k_AB 5.0 [d^-1])                   ;Desorption rate.
+  (k_BA 5.0 [d^-1]))                  ;Sorption rate.
 
 (defchemical Pendimethalin-colloid Pendimethalin-base
   "Pendimethalin sorbed to colloids."
@@ -113,7 +113,9 @@ carbon part of the 'K' factor.")
   "Sorption equilibrium between dissolved and colloid-bound Pendimethalin."
   (colloid colloid)
   (A Pendimethalin-colloid)
-  (equilibrium linear (K (K_Pendimethalin (soil_enrichment_factor 1000 [])))))
+  (k_AB 5.0 [d^-1])                   ;Desorption rate.
+  (k_BA 5.0 [d^-1])                   ;Sorption rate.
+  (equilibrium linear (K (K_Pendimethalin (soil_enrichment_factor 100000 [])))))
 
 (defreaction Pendimethalin-filter colloid-filter
   "Filtration of colloid-bound pendimethalin in the soil matrix."
