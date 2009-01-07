@@ -370,6 +370,28 @@ Frame::check (const symbol key) const
     || (parent () && parent ()->check (key));
 }
 
+void
+Frame::add_reference (const symbol key, const symbol val)
+{ impl->alist.add_reference (key, val); }
+
+bool 
+Frame::is_reference (const symbol key) const
+{ 
+  if (parent () && !impl->alist.check (key))
+    return parent ()->is_reference (key);
+  else
+    return impl->alist.is_reference (key);
+}
+
+symbol
+Frame::get_reference (const symbol key) const
+{
+  if (parent () && !impl->alist.check (key))
+    return parent ()->get_reference (key);
+  else
+    return impl->alist.get_reference (key);
+}
+
 double 
 Frame::number (const symbol key) const
 { 

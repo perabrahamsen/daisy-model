@@ -2,10 +2,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Frame
 
-** Få Block til at gemme en frame ref i stedet for syntax + alist
-
-Lav en BlockSubmodel som gemmer en frame.
-
 ** Find på bedre måde at initialisere intrinsics på
 
 gem funktioner til at skabe data, i stedet for data, i static

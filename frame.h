@@ -213,6 +213,11 @@ public:
   // Is 'key' an element of this alist?
   bool check (const symbol key) const;
 
+  // References.
+  void add_reference (symbol key, symbol val);
+  bool is_reference (symbol key) const;
+  symbol get_reference (symbol key) const;
+
   // Extract attribute values.
 public:
   double number (const symbol) const;

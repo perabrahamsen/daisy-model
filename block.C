@@ -40,8 +40,6 @@ struct Block::Implementation
   Metalib& metalib;
   Block *const context;
   const Frame& frame;
-  const Syntax& syntax;
-  const AttributeList& alist;
   Treelog& msg;
   Treelog::Open msg_nest;
   bool is_ok;
@@ -62,8 +60,6 @@ struct Block::Implementation
     : metalib (lib),
       context (p),
       frame (f),
-      syntax (f.syntax ()),
-      alist (f.alist ()),
       msg (m),
       msg_nest (msg, scope_id),
       is_ok (true)
@@ -75,7 +71,7 @@ const Syntax Block::Implementation::empty_syntax;
 Value::type 
 Block::Implementation::lookup (const symbol key) const
 {
-  Value::type type = syntax.lookup (key);
+  Value::type type = frame.lookup (key);
   if (type == Value::Error && context)
     return context->impl->lookup (key);
   return type;
@@ -84,9 +80,9 @@ Block::Implementation::lookup (const symbol key) const
 const Syntax& 
 Block::Implementation::find_syntax (const symbol key) const
 {
-  Value::type type = syntax.lookup (key);
+  Value::type type = frame.lookup (key);
   if (type != Value::Error)
-    return syntax;
+    return frame.syntax ();
   daisy_assert (context != NULL);
   return context->impl->find_syntax (key);
 }
@@ -103,9 +99,9 @@ Block::Implementation::find_frame (const symbol key) const
 bool
 Block::Implementation::check (const symbol key) const
 {
-  Value::type type = syntax.lookup (key);
+  Value::type type = frame.lookup (key);
   if (type != Value::Error)
-    return alist.check (key);
+    return frame.check (key);
   if (context == NULL)
     return false;
   return context->impl->check (key);
@@ -155,11 +151,10 @@ Block::Implementation::expand_string (Block& block,
                   const Value::type type = lookup (key);
                   if (type == Value::Error)
                     throw "Unknown expansion: '" + key + "'";
-                  const Syntax& syntax = find_syntax (key);
-                  if (syntax.size (key) != Value::Singleton)
+                  const Frame& frame = find_frame (key);
+                  if (frame.size (key) != Value::Singleton)
                     throw "'" + key 
                       + "' is a sequence, can only expand singletons";
-                  const Frame& frame = find_frame (key);
                   if (!frame.check (key))
                     throw "'" + key + "' has no value";
                   switch (type)
@@ -178,7 +173,7 @@ Block::Implementation::expand_string (Block& block,
                         Treelog::Open nest (msg, "${" + key + "}");
                         const AttributeList& obj = frame.alist (key);
                         const symbol type = obj.name ("type");
-                        const Library& library = syntax.library (metalib, key);
+                        const Library& library = frame.library (metalib, key);
                         const ScopeBlock scope (block);
                         if (library.name () == symbol (Stringer::component))
                           {
@@ -243,25 +238,25 @@ Block::Implementation::expand_string (Block& block,
 symbol
 Block::Implementation::expand_reference (const symbol key)
 {
-  if (!alist.is_reference (key))
+  if (!frame.is_reference (key))
     return key;
   
-  const symbol var = alist.get_reference (key);
+  const symbol var = frame.get_reference (key);
   if (var == key)
     {
       error ("Value of '" + key + "' refers to itself");
       throw "Reference loop";
     }
-  if (lookup (var) == syntax.lookup (key)
-      && (find_syntax (var).size (var) == syntax.size (key)
-          || (syntax.size (key) == Value::Sequence
-              && find_syntax (var).size (var) != Value::Singleton)))
+  if (lookup (var) == frame.lookup (key)
+      && (find_frame (var).size (var) == frame.size (key)
+          || (frame.size (key) == Value::Sequence
+              && find_frame (var).size (var) != Value::Singleton)))
     return var;
 
   std::ostringstream tmp;
   tmp << "Value of '" << key << "' is $" << var
       << ", which is a " << Value::type_name (lookup (var));
-  switch (find_syntax (var).size (var))
+  switch (find_frame (var).size (var))
     {
     case Value::Singleton:
       break;
@@ -269,10 +264,10 @@ Block::Implementation::expand_reference (const symbol key)
       tmp << " sequence";
       break;
     default:
-      tmp << "[" << find_syntax (var).size (var) << "]";
+      tmp << "[" << find_frame (var).size (var) << "]";
     }
-  tmp << ", should be a " << Value::type_name (syntax.lookup (key));
-  switch (syntax.size (key))
+  tmp << ", should be a " << Value::type_name (frame.lookup (key));
+  switch (frame.size (key))
     {
     case Value::Singleton:
       break;
@@ -280,7 +275,7 @@ Block::Implementation::expand_reference (const symbol key)
       tmp << " sequence";
       break;
     default:
-      tmp << "[" << syntax.size (key) << "]";
+      tmp << "[" << frame.size (key) << "]";
     }
   error (tmp.str ());
   throw ("Bad reference");
@@ -319,11 +314,11 @@ Block::frame () const
 
 const AttributeList&
 Block::alist () const
-{ return impl->alist; }
+{ return impl->frame.alist (); }
 
 const Syntax&
 Block::syntax () const
-{ return impl->syntax; }
+{ return impl->frame.syntax (); }
 
 Treelog&
 Block::msg () const
@@ -357,7 +352,7 @@ void
 Block::entries (std::vector<symbol>& all) const
 {
   // Own entries.
-  impl->syntax.entries (all);
+  impl->frame.entries (all);
   // Context entries.
   if (impl->context)
     impl->context->entries (all);
@@ -365,7 +360,7 @@ Block::entries (std::vector<symbol>& all) const
 
 int 
 Block::type_size (const symbol tag) const
-{ return find_syntax (tag).size (tag); }
+{ return find_frame (tag).size (tag); }
 
 int 
 Block::value_size (const symbol tag) const
@@ -378,11 +373,11 @@ Block::check (const symbol key) const
 double 
 Block::number (const symbol key) const
 { 
-  const AttributeList& alist = find_frame (key).alist ();
-  if (alist.is_reference (key))
+  const Frame& frame = find_frame (key);
+  if (frame.is_reference (key))
     return this->number (impl->expand_reference (key));
 
-  return alist.number (key); 
+  return frame.number (key); 
 }
 
 double 
@@ -392,11 +387,11 @@ Block::number (const symbol key, double default_value) const
 symbol
 Block::name (const symbol key)
 { 
-  const AttributeList& alist = find_frame (key).alist ();
-  if (alist.is_reference (key))
+  const Frame& frame = find_frame (key);
+  if (frame.is_reference (key))
     return this->name (impl->expand_reference (key));
 
-  return impl->expand_string (*this, alist.name (key)); 
+  return impl->expand_string (*this, frame.name (key)); 
 }
 
 symbol
@@ -406,11 +401,11 @@ Block::name (const symbol key, const symbol default_value)
 bool 
 Block::flag (const symbol key) const
 { 
-  const AttributeList& alist = find_frame (key).alist ();
-  if (alist.is_reference (key))
+  const Frame& frame = find_frame (key);
+  if (frame.is_reference (key))
     return this->flag (impl->expand_reference (key));
 
-  return alist.flag (key); 
+  return frame.flag (key); 
 }
 
 bool 
@@ -420,31 +415,31 @@ Block::flag (const symbol key, bool default_value) const
 const PLF& 
 Block::plf (const symbol key) const
 { 
-  const AttributeList& alist = find_frame (key).alist ();
-  if (alist.is_reference (key))
+  const Frame& frame = find_frame (key);
+  if (frame.is_reference (key))
     return this->plf (impl->expand_reference (key));
 
-  return alist.plf (key); 
+  return frame.plf (key); 
 }
 
 AttributeList& 
 Block::alist (const symbol key) const
 { 
-  const AttributeList& alist = find_frame (key).alist ();
-  if (alist.is_reference (key))
+  const Frame& frame = find_frame (key);
+  if (frame.is_reference (key))
     return this->alist (impl->expand_reference (key));
 
-  return alist.alist (key); 
+  return frame.alist (key); 
 }
 
 int 
 Block::integer (const symbol key) const
 { 
-  const AttributeList& alist = find_frame (key).alist ();
-  if (alist.is_reference (key))
+  const Frame& frame = find_frame (key);
+  if (frame.is_reference (key))
     return this->integer (impl->expand_reference (key));
 
-  return alist.integer (key); 
+  return frame.integer (key); 
 }
 
 int 
@@ -454,20 +449,20 @@ Block::integer (const symbol key, int default_value) const
 const std::vector<double>& 
 Block::number_sequence (const symbol key) const
 { 
-  const AttributeList& alist = find_frame (key).alist ();
-  if (alist.is_reference (key))
+  const Frame& frame = find_frame (key);
+  if (frame.is_reference (key))
     return this->number_sequence (impl->expand_reference (key));
 
-  return alist.number_sequence (key); 
+  return frame.number_sequence (key); 
 }
 
 const std::vector<symbol>
 Block::name_sequence (const symbol key)
 { 
-  if (!impl->alist.is_reference (key))
+  if (!impl->frame.is_reference (key))
     {
       const std::vector<symbol>& value 
-        = impl->alist.name_sequence (impl->expand_reference (key));
+        = impl->frame.name_sequence (impl->expand_reference (key));
       std::vector<symbol> result;
       for (size_t i = 0; i < value.size (); i++)
         result.push_back (impl->expand_string (*this, value[i]));
@@ -485,41 +480,41 @@ Block::name_sequence (const symbol key)
 const std::vector<bool>& 
 Block::flag_sequence (const symbol key) const
 { 
-  const AttributeList& alist = find_frame (key).alist ();
-  if (alist.is_reference (key))
+  const Frame& frame = find_frame (key);
+  if (frame.is_reference (key))
     return this->flag_sequence (impl->expand_reference (key));
 
-  return alist.flag_sequence (key); 
+  return frame.flag_sequence (key); 
 }
 
 const std::vector<int>& 
 Block::integer_sequence (const symbol key) const
 { 
-  const AttributeList& alist = find_frame (key).alist ();
-  if (alist.is_reference (key))
+  const Frame& frame = find_frame (key);
+  if (frame.is_reference (key))
     return this->integer_sequence (impl->expand_reference (key));
 
-  return alist.integer_sequence (key); 
+  return frame.integer_sequence (key); 
 }
 
 const std::vector<const PLF*>& 
 Block::plf_sequence (const symbol key) const
 { 
-  const AttributeList& alist = find_frame (key).alist ();
-  if (alist.is_reference (key))
+  const Frame& frame = find_frame (key);
+  if (frame.is_reference (key))
     return this->plf_sequence (impl->expand_reference (key));
 
-  return alist.plf_sequence (key); 
+  return frame.plf_sequence (key); 
 }
 
 const std::vector<const AttributeList*>& 
 Block::alist_sequence (const symbol key) const
 { 
-  const AttributeList& alist = find_frame (key).alist ();
-  if (alist.is_reference (key))
+  const Frame& frame = find_frame (key);
+  if (frame.is_reference (key))
     return this->alist_sequence (impl->expand_reference (key));
 
-  return alist.alist_sequence (key); 
+  return frame.alist_sequence (key); 
 }
 
 symbol
