@@ -46,7 +46,6 @@ struct Block::Implementation
 
   // Use.
   Value::type lookup (symbol) const;
-  const Syntax& find_syntax (const symbol key) const;
   const Frame& find_frame (const symbol key) const;
   bool check (const symbol key) const;
   symbol expand_string (Block&, symbol) const;
@@ -75,16 +74,6 @@ Block::Implementation::lookup (const symbol key) const
   if (type == Value::Error && context)
     return context->impl->lookup (key);
   return type;
-}
-
-const Syntax& 
-Block::Implementation::find_syntax (const symbol key) const
-{
-  Value::type type = frame.lookup (key);
-  if (type != Value::Error)
-    return frame.syntax ();
-  daisy_assert (context != NULL);
-  return context->impl->find_syntax (key);
 }
 
 const Frame& 
@@ -335,10 +324,6 @@ Block::ok () const
 void
 Block::set_error ()
 { impl->set_error (); }
-
-const Syntax& 
-Block::find_syntax (const symbol key) const
-{ return impl->find_syntax (key); }
 
 const Frame& 
 Block::find_frame (const symbol key) const

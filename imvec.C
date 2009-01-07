@@ -29,6 +29,7 @@
 #include "check.h"
 #include "block.h"
 #include "units.h"
+#include "frame.h"
 
 const std::vector<double>& 
 IMvec::get_array (symbol chem) const
@@ -118,8 +119,8 @@ const Unit&
 find_unit (Block& parent, const char* key)
 {
   const Units& units = parent.units ();
-  const Syntax& parent_syntax = parent.find_syntax (key);
-  const Syntax& syntax = parent_syntax.syntax (key);
+  const Frame& parent_frame = parent.find_frame (key);
+  const Syntax& syntax = parent_frame.syntax (key);
   const symbol dim (syntax.dimension ("value"));
   return units.get_unit (dim);
 }

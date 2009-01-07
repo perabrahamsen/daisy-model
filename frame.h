@@ -214,6 +214,7 @@ public:
   bool check (const symbol key) const;
 
   // References.
+public:
   void add_reference (symbol key, symbol val);
   bool is_reference (symbol key) const;
   symbol get_reference (symbol key) const;

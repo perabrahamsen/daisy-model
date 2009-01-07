@@ -75,7 +75,7 @@ struct NumberConst : public Number
   explicit NumberConst (Block& al, const symbol key)
     : Number (al),
       val (al.number (key)),
-      unit_ (al.units ().get_unit (al.find_syntax (key).dimension (key)))
+      unit_ (al.units ().get_unit (al.find_frame (key).dimension (key)))
   { 
     if (al.units ().is_error (unit_))
       al.msg ().warning ("Unknown unit '" + al.name ("value") + "'");
@@ -293,9 +293,9 @@ struct NumberFetch : public Number
                         + "' is declared, but has no value");
               break;
             }
-          const Syntax& syntax = al.find_syntax (key);
-          daisy_assert (syntax.lookup (key) == Value::Number);
-          if (syntax.size (key) != Value::Singleton)
+          const Frame& frame = al.find_frame (key);
+          daisy_assert (frame.lookup (key) == Value::Number);
+          if (frame.size (key) != Value::Singleton)
             {
               al.error ("Parameter '" + key 
                          + "' is a sequence, expected singleton");

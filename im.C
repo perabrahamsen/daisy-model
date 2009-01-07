@@ -33,6 +33,7 @@
 #include "syntax.h"
 #include "check.h"
 #include "assertion.h"
+#include "frame.h"
 #include <cmath>
 
 symbol 
@@ -198,8 +199,8 @@ IM::clear ()
 IM::IM (Block& parent, const char *const key)
 {
   // Find dimension.
-  const Syntax& parent_syntax = parent.find_syntax (key);
-  const Syntax& syntax = parent_syntax.syntax (key);
+  const Frame& parent_frame = parent.find_frame (key);
+  const Syntax& syntax = parent_frame.syntax (key);
   unit_ = &(parent.units ().get_unit (symbol (syntax.dimension ("value"))));
   
   // Find content.

@@ -64,7 +64,6 @@ public:
 
   // Nested scope handling.
 public:
-  const Syntax& find_syntax (const symbol key) const;
   const Frame& find_frame (const symbol key) const;
 
   // Syntax emulation.
