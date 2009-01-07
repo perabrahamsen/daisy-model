@@ -37,6 +37,7 @@
 #include "memutils.h"
 #include "librarian.h"
 #include "path.h"
+#include "treelog.h"
 #include <vector>
 #include <algorithm>
 #include <numeric>

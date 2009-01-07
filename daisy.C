@@ -47,6 +47,7 @@
 #include "memutils.h"
 #include "librarian.h"
 #include "metalib.h"
+#include "treelog.h"
 #include <sstream>
 
 const char *const Daisy::default_description = "\

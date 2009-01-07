@@ -32,6 +32,7 @@
 #include "timestep.h"
 #include "log.h"
 #include "submodeler.h"
+#include "treelog.h"
 #include <sstream>
 
 struct ConditionMMDD : public Condition

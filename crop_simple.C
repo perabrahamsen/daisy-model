@@ -40,6 +40,7 @@
 #include "mathlib.h"
 #include "check.h"
 #include "librarian.h"
+#include "treelog.h"
 
 // Dimensional conversion.
 static const double m2_per_cm2 = 0.0001;

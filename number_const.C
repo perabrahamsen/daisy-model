@@ -30,6 +30,7 @@
 #include "librarian.h"
 #include "library.h"
 #include "treelog.h"
+#include "frame.h"
 #include <sstream>
 
 struct NumberConst : public Number
@@ -305,9 +306,8 @@ struct NumberFetch : public Number
         break;
       case Value::Object:
         {
-          const Metalib& metalib = al.metalib ();
-          const Syntax& syntax = al.find_syntax (key);
-          const Library& lib = syntax.library (al.metalib (), key);
+          const Frame& frame = al.find_frame (key);
+          const Library& lib = frame.library (al.metalib (), key);
           if (lib.name () != Number::component)
             {
               al.error ("'" + key + "' is a '" + lib.name ()
@@ -315,19 +315,18 @@ struct NumberFetch : public Number
                          + Number::component + "'");
               break;
             }
-          if (syntax.size (key) != Value::Singleton)
+          if (frame.size (key) != Value::Singleton)
             {
               al.error ("Parameter '" + key 
                         + "' is a model sequence, expected singleton");
               break;
             }
-          const AttributeList& alist = al.find_alist (key);
-          if (!alist.check (key))
+          if (!frame.check (key))
             {
               al.error ("'" + key + "' declared, but has no value");
               break;
             }
-          if (!syntax.check (metalib, alist, key, al.msg ()))
+          if (!frame.check (al))
             break;
           result.reset (Librarian::build_item<Number> (al, key));
         }

@@ -35,6 +35,7 @@
 #include "librarian.h"
 #include "vegetation.h"
 #include "treelog.h"
+#include "submodeler.h"
 #include <vector>
 #include <memory>
 #include <sstream>
@@ -396,7 +397,7 @@ ActionMarkvand::crop_map_t::crop_map_t (Block& al, const std::string& key)
   const std::vector<const AttributeList*>& alists = al.alist_sequence (key);
   for (size_t i = 0; i < alists.size (); i++)
     {
-      Block nest (al, key, i);
+      BlockSubmodel nest (al, key, i);
       (*this)[alists[i]->name ("Daisy")] 
         = Librarian::build_item<MV_Crop> (nest, "MARKVAND");
     }

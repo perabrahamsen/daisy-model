@@ -25,6 +25,7 @@
 
 class AttributeList;
 class PLF;
+class Block;
 
 #ifndef FRAME_H
 #define FRAME_H
@@ -50,7 +51,8 @@ public:
   unsigned int entries () const;
 
   // This function will check that the alist conform to the syntax.
-  bool check (const Metalib&, Treelog& err) const;
+  bool check (Block&) const;
+  bool check (const Metalib&, Treelog&) const;
   
   // Check that a numeric value is within the allowed range.
   void check (const symbol key, double value) const;

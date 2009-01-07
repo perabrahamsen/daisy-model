@@ -37,6 +37,7 @@
 #include "librarian.h"
 #include "transport.h"
 #include "tertiary.h"
+#include "treelog.h"
 #include <sstream>
 
 static const double rho_water = 1.0; // [g/cm^3]

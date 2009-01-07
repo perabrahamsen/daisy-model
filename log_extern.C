@@ -29,6 +29,7 @@
 #include "assertion.h"
 #include "librarian.h"
 #include "submodeler.h"
+#include "treelog.h"
 
 void 
 LogExtern::done (const std::vector<Time::component_t>& time_columns,

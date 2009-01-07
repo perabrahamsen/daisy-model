@@ -39,6 +39,7 @@ struct Block::Implementation
   static const Syntax empty_syntax;
   Metalib& metalib;
   Block *const context;
+  const Frame& frame;
   const Syntax& syntax;
   const AttributeList& alist;
   Treelog& msg;
@@ -48,7 +49,7 @@ struct Block::Implementation
   // Use.
   Value::type lookup (symbol) const;
   const Syntax& find_syntax (const symbol key) const;
-  const AttributeList& find_alist (const symbol key) const;
+  const Frame& find_frame (const symbol key) const;
   bool check (const symbol key) const;
   symbol expand_string (Block&, symbol) const;
   symbol expand_reference (const symbol key);
@@ -56,12 +57,13 @@ struct Block::Implementation
   void set_error ();
 
   Implementation (Metalib& lib, Block *const p, Treelog& m,
-		  const Syntax& s, const AttributeList& a,
+                  const Frame& f,
 		  const symbol scope_id)
     : metalib (lib),
       context (p),
-      syntax (s),
-      alist (a),
+      frame (f),
+      syntax (f.syntax ()),
+      alist (f.alist ()),
       msg (m),
       msg_nest (msg, scope_id),
       is_ok (true)
@@ -89,13 +91,13 @@ Block::Implementation::find_syntax (const symbol key) const
   return context->impl->find_syntax (key);
 }
 
-const AttributeList& 
-Block::Implementation::find_alist (const symbol key) const
+const Frame& 
+Block::Implementation::find_frame (const symbol key) const
 {
-  if (alist.check (key))
-    return alist;
+  if (frame.check (key))
+    return frame;
   daisy_assert (context != NULL);
-  return context->find_alist (key);
+  return context->find_frame (key);
 }
 
 bool
@@ -157,24 +159,24 @@ Block::Implementation::expand_string (Block& block,
                   if (syntax.size (key) != Value::Singleton)
                     throw "'" + key 
                       + "' is a sequence, can only expand singletons";
-                  const AttributeList& alist = find_alist (key);
-                  if (!alist.check (key))
+                  const Frame& frame = find_frame (key);
+                  if (!frame.check (key))
                     throw "'" + key + "' has no value";
                   switch (type)
                     {
                     case Value::String:
-                      result << alist.name (key); 
+                      result << frame.name (key); 
                       break;
                     case Value::Integer:
-                      result << alist.integer (key); 
+                      result << frame.integer (key); 
                       break;
                     case Value::Number:
-                      result << alist.number (key); 
+                      result << frame.number (key); 
                       break;
                     case Value::Object:
                       {
                         Treelog::Open nest (msg, "${" + key + "}");
-                        const AttributeList& obj = alist.alist (key);
+                        const AttributeList& obj = frame.alist (key);
                         const symbol type = obj.name ("type");
                         const Library& library = syntax.library (metalib, key);
                         const ScopeBlock scope (block);
@@ -311,6 +313,10 @@ Path&
 Block::path ()
 { return impl->metalib.path (); }
 
+const Frame&
+Block::frame () const
+{ return impl->frame; }
+
 const AttributeList&
 Block::alist () const
 { return impl->alist; }
@@ -339,9 +345,9 @@ const Syntax&
 Block::find_syntax (const symbol key) const
 { return impl->find_syntax (key); }
 
-const AttributeList& 
-Block::find_alist (const symbol key) const
-{ return impl->find_alist (key); }
+const Frame& 
+Block::find_frame (const symbol key) const
+{ return impl->find_frame (key); }
 
 Value::type 
 Block::lookup (const symbol key) const
@@ -363,7 +369,7 @@ Block::type_size (const symbol tag) const
 
 int 
 Block::value_size (const symbol tag) const
-{ return find_alist (tag).size (tag); }
+{ return find_frame (tag).size (tag); }
 
 bool 
 Block::check (const symbol key) const
@@ -372,7 +378,7 @@ Block::check (const symbol key) const
 double 
 Block::number (const symbol key) const
 { 
-  const AttributeList& alist = find_alist (key);
+  const AttributeList& alist = find_frame (key).alist ();
   if (alist.is_reference (key))
     return this->number (impl->expand_reference (key));
 
@@ -386,7 +392,7 @@ Block::number (const symbol key, double default_value) const
 symbol
 Block::name (const symbol key)
 { 
-  const AttributeList& alist = find_alist (key);
+  const AttributeList& alist = find_frame (key).alist ();
   if (alist.is_reference (key))
     return this->name (impl->expand_reference (key));
 
@@ -400,7 +406,7 @@ Block::name (const symbol key, const symbol default_value)
 bool 
 Block::flag (const symbol key) const
 { 
-  const AttributeList& alist = find_alist (key);
+  const AttributeList& alist = find_frame (key).alist ();
   if (alist.is_reference (key))
     return this->flag (impl->expand_reference (key));
 
@@ -414,7 +420,7 @@ Block::flag (const symbol key, bool default_value) const
 const PLF& 
 Block::plf (const symbol key) const
 { 
-  const AttributeList& alist = find_alist (key);
+  const AttributeList& alist = find_frame (key).alist ();
   if (alist.is_reference (key))
     return this->plf (impl->expand_reference (key));
 
@@ -424,7 +430,7 @@ Block::plf (const symbol key) const
 AttributeList& 
 Block::alist (const symbol key) const
 { 
-  const AttributeList& alist = find_alist (key);
+  const AttributeList& alist = find_frame (key).alist ();
   if (alist.is_reference (key))
     return this->alist (impl->expand_reference (key));
 
@@ -434,7 +440,7 @@ Block::alist (const symbol key) const
 int 
 Block::integer (const symbol key) const
 { 
-  const AttributeList& alist = find_alist (key);
+  const AttributeList& alist = find_frame (key).alist ();
   if (alist.is_reference (key))
     return this->integer (impl->expand_reference (key));
 
@@ -448,7 +454,7 @@ Block::integer (const symbol key, int default_value) const
 const std::vector<double>& 
 Block::number_sequence (const symbol key) const
 { 
-  const AttributeList& alist = find_alist (key);
+  const AttributeList& alist = find_frame (key).alist ();
   if (alist.is_reference (key))
     return this->number_sequence (impl->expand_reference (key));
 
@@ -469,7 +475,7 @@ Block::name_sequence (const symbol key)
     }
   const symbol var = impl->expand_reference (key);
   const std::vector<symbol>& value
-    = impl->find_alist (var).name_sequence (var); 
+    = impl->find_frame (var).name_sequence (var); 
   std::vector<symbol> result;
   for (size_t i = 0; i < value.size (); i++)
     result.push_back (impl->expand_string (*this, value[i]));
@@ -479,7 +485,7 @@ Block::name_sequence (const symbol key)
 const std::vector<bool>& 
 Block::flag_sequence (const symbol key) const
 { 
-  const AttributeList& alist = find_alist (key);
+  const AttributeList& alist = find_frame (key).alist ();
   if (alist.is_reference (key))
     return this->flag_sequence (impl->expand_reference (key));
 
@@ -489,7 +495,7 @@ Block::flag_sequence (const symbol key) const
 const std::vector<int>& 
 Block::integer_sequence (const symbol key) const
 { 
-  const AttributeList& alist = find_alist (key);
+  const AttributeList& alist = find_frame (key).alist ();
   if (alist.is_reference (key))
     return this->integer_sequence (impl->expand_reference (key));
 
@@ -499,7 +505,7 @@ Block::integer_sequence (const symbol key) const
 const std::vector<const PLF*>& 
 Block::plf_sequence (const symbol key) const
 { 
-  const AttributeList& alist = find_alist (key);
+  const AttributeList& alist = find_frame (key).alist ();
   if (alist.is_reference (key))
     return this->plf_sequence (impl->expand_reference (key));
 
@@ -509,7 +515,7 @@ Block::plf_sequence (const symbol key) const
 const std::vector<const AttributeList*>& 
 Block::alist_sequence (const symbol key) const
 { 
-  const AttributeList& alist = find_alist (key);
+  const AttributeList& alist = find_frame (key).alist ();
   if (alist.is_reference (key))
     return this->alist_sequence (impl->expand_reference (key));
 
@@ -528,7 +534,7 @@ Block::Block (Metalib& metalib, Treelog& msg,
               const symbol scope_id)
   // Toplevel.
   : impl (new Implementation (metalib, NULL, msg, 
-                              metalib.syntax (), metalib.alist (), scope_id))
+                              metalib, scope_id))
 { }
 
 Block::Block (Metalib& metalib, Treelog& msg, 
@@ -536,36 +542,19 @@ Block::Block (Metalib& metalib, Treelog& msg,
  	      const symbol scope_id)
   // build_free
   : impl (new Implementation (metalib, NULL, msg, 
-                              frame.syntax (), frame.alist (), scope_id))
+                              frame, scope_id))
 { }
 
 Block::Block (Block& block, const Frame& frame, symbol scope_tag)
   // build_item
   : impl (new Implementation (block.metalib (), &block, block.msg (),
-			      frame.syntax (), frame.alist (), scope_tag))
+                              frame, scope_tag))
 { }
 
 Block::Block (Block& block, const Frame& frame, symbol scope_tag, size_t index)
   // build_vector
   : impl (new Implementation (block.metalib (), &block, block.msg (),
-			      frame.syntax (), frame.alist (), 
-			      sequence_id (scope_tag, index)))
-{ }
-
-Block::Block (Block& block, const symbol key)
-  // submodel.
-  : impl (new Implementation (block.metalib (), &block, block.msg (), 
-                              block.syntax ().syntax (key), 
-                              block.alist ().alist (key),
-			      key))
-{ }
-
-Block::Block (Block& block, const symbol key, const size_t index)
-  // map_submodel.
-  : impl (new Implementation (block.metalib (), &block, block.msg (), 
-                              block.syntax ().syntax (key), 
-                              *block.alist ().alist_sequence (key)[index],
-			      sequence_id (key, index)))
+                              frame, sequence_id (scope_tag, index)))
 { }
 
 Block::~Block ()

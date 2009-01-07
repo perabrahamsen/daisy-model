@@ -43,6 +43,7 @@
 #include "memutils.h"
 #include "submodeler.h"
 #include "secondary.h"
+#include "treelog.h"
 #include <sstream>
 
 struct ChemicalStandard : public Chemical

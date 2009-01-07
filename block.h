@@ -54,6 +54,7 @@ public:
   Path& path ();
   const AttributeList& alist () const;
   const Syntax& syntax () const;
+  const Frame& frame () const;
   Treelog& msg () const;
 
   // Error handling.
@@ -64,7 +65,7 @@ public:
   // Nested scope handling.
 public:
   const Syntax& find_syntax (const symbol key) const;
-  const AttributeList& find_alist (const symbol key) const;
+  const Frame& find_frame (const symbol key) const;
 
   // Syntax emulation.
 public:
@@ -95,8 +96,9 @@ public:
   /**/ alist_sequence (symbol key) const;
 
   // Create and Destroy.
-private:
+protected:
   static symbol sequence_id (symbol key, size_t index);
+private:
   Block ();
 public:
   // Toplevel.
@@ -104,15 +106,11 @@ public:
 
   // build_free
   explicit Block (Metalib&, Treelog& msg, const Frame&, symbol scope_tag);
-  // build_item
+  // build_item, submodel
   explicit Block (Block&, const Frame&, symbol scope_tag);
-  // build_vector
+  // build_vector, map_submodel
   explicit Block (Block&, const Frame&, symbol scope_tag, size_t index);
 
-  // submodel
-  explicit Block (Block&, symbol);
-  // map_submodel
-  explicit Block (Block&, symbol, size_t index);
   ~Block ();
 };
 

@@ -38,6 +38,7 @@
 #include "librarian.h"
 #include "vegetation.h"
 #include "units.h"
+#include "treelog.h"
 #include <sstream>
 
 struct ActionCrop : public Action

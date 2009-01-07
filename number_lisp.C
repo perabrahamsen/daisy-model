@@ -26,6 +26,8 @@
 #include "submodeler.h"
 #include "memutils.h"
 #include "librarian.h"
+#include "treelog.h"
+#include "assertion.h"
 #include <sstream>
 #include <memory>
 #include <map>

@@ -40,6 +40,7 @@
 #include "librarian.h"
 #include "anystate.h"
 #include "tertsmall.h"
+#include "treelog.h"
 
 struct MovementRect : public MovementSolute
 {

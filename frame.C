@@ -22,6 +22,7 @@
 
 #include "frame.h"
 #include "alist.h"
+#include "block.h"
 
 struct Frame::Implementation
 {
@@ -62,8 +63,12 @@ Frame::entries () const
 { return impl->syntax.entries (); }
 
 bool 
-Frame::check (const Metalib& metalib, Treelog& err) const
-{ return impl->syntax.check (metalib, alist (), err); }
+Frame::check (Block& block) const
+{ return impl->syntax.check (block.metalib (), alist (), block.msg ()); }
+
+bool 
+Frame::check (const Metalib& metalib, Treelog& msg) const
+{ return impl->syntax.check (metalib, alist (), msg); }
 
 void 
 Frame::check (const symbol key, double value) const

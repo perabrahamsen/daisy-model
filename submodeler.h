@@ -23,9 +23,8 @@
 #define SUBMODELER_H
 
 #include "block.h"
-#include "assertion.h"
-#include "treelog.h"
 #include <vector>
+#include <memory>
 
 // Old style (no block scope).
 template <class T> 
@@ -54,6 +53,15 @@ map_construct_const (const std::vector<const AttributeList*>& f)
 
 // New style (block scope).
 
+class BlockSubmodel : public Block
+{
+  std::auto_ptr<const Frame> frame_owner;
+public:
+  BlockSubmodel (Block& parent, const symbol key);
+  BlockSubmodel (Block& parent, const symbol key, const size_t index);
+  ~BlockSubmodel ();
+};
+
 template <class T> 
 T
 submodel_value_block (Block& nested)
@@ -71,7 +79,7 @@ template <class T>
 T
 submodel_value (Block& parent, const std::string& key)
 { 
-  Block nested (parent, key);
+  BlockSubmodel nested (parent, key);
   try
     { return T (nested); }
   catch (const std::string& err)
@@ -93,11 +101,12 @@ submodel_block (Block& nested)
     { nested.error ("Submodel build failed: " + std::string (err)); }
   return NULL;
 }
+
 template <class T> 
 T*
 submodel (Block& parent, const std::string& key)
 { 
-  Block nested (parent, key);
+  BlockSubmodel nested (parent, key);
   return submodel_block<T> (nested);
 }
 
@@ -110,7 +119,7 @@ map_submodel (Block& parent, const std::string& key)
   const std::vector<const AttributeList*> f (parent.alist_sequence (key));
   for (size_t i = 0; i < f.size (); i++)
     {
-      Block nested (parent, key, i);
+      BlockSubmodel nested (parent, key, i);
       t.push_back (submodel_block<T> (nested));
     }
   return t;
@@ -124,7 +133,7 @@ map_submodel_const (Block& parent, const std::string& key)
   const std::vector<const AttributeList*> f (parent.alist_sequence (key));
   for (size_t i = 0; i < f.size (); i++)
     {
-      Block nested (parent, key, i);
+      BlockSubmodel nested (parent, key, i);
       t.push_back (submodel_block<T> (nested));
     }
   return t;

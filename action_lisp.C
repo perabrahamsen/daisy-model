@@ -27,6 +27,7 @@
 #include "memutils.h"
 #include "submodeler.h"
 #include "librarian.h"
+#include "treelog.h"
 
 // We need to initialize the Condition library.
 #include "condition.h"

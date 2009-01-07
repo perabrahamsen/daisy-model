@@ -24,7 +24,7 @@
 #include "library.h"
 #include "number.h"
 #include "stringer.h"
-#include "alist.h"
+#include "frame.h"
 #include "assertion.h"
 #include "librarian.h"
 
@@ -42,33 +42,32 @@ ScopeBlock::dimension (symbol tag) const
   Value::type type = block.lookup (tag);
   if (type == Value::Error)
     return Value::Unknown ();
-  const Syntax& syntax = block.find_syntax (tag);
-  if (syntax.size (tag) != Value::Singleton)
+  const Frame& frame = block.find_frame (tag);
+  if (frame.size (tag) != Value::Singleton)
     return Value::Unknown ();
-  const AttributeList& alist = block.find_alist (tag);
 
   //Handle primitive numbers.
   if (type == Value::Number)
     {
-      const symbol dim = syntax.dimension (tag); 
+      const symbol dim = frame.dimension (tag); 
       if (dim != Value::User ())
         return symbol (dim);
-      if (!alist.check (tag))
+      if (!frame.check (tag))
         return Value::Unknown ();
-      return alist.name (tag);
+      return frame.name (tag);
     }
 
   // Handle number objects.
   if (type != Value::Object)
     return Value::Unknown ();
-  if (syntax.library (block.metalib (), tag).name () 
+  if (frame.library (block.metalib (), tag).name () 
       != symbol (Number::component))
     return Value::Unknown ();
-  if (!syntax.check (block.metalib (), alist, block.msg ()))
+  if (!frame.check (block.metalib (), block.msg ()))
     return Value::Unknown ();
     
   std::auto_ptr<Number> number (Librarian::build_alist<Number>
-                                (block, alist.alist (tag), tag));
+                                (block, frame.alist (tag), tag));
   if (!number.get ())
     return Value::Unknown ();
   if (!number->initialize (block.units (), *this, block.msg ()))
@@ -86,8 +85,8 @@ ScopeBlock::description (symbol tag) const
   if (type == Value::Error)
     return no_symbol;
 
-  const Syntax& syntax = block.find_syntax (tag);
-  return symbol (syntax.description (tag));
+  const Frame& frame = block.find_frame (tag);
+  return symbol (frame.description (tag));
 }
 
 int
@@ -109,12 +108,10 @@ ScopeBlock::has_number (const symbol tag) const
   if (type == Value::Error)
     return false;
 
-  const Syntax& syntax = block.find_syntax (tag);
-  if (syntax.size (tag) != Value::Singleton)
+  const Frame& frame = block.find_frame (tag);
+  if (frame.size (tag) != Value::Singleton)
     return false;
-
-  const AttributeList& alist = block.find_alist (tag);
-  if (!alist.check (tag))
+  if (!frame.check (tag))
     return false;
 
   //Handle primitive numbers.
@@ -124,13 +121,13 @@ ScopeBlock::has_number (const symbol tag) const
   // Handle number objects.
   if (type != Value::Object)
     return false;
-  const Library& library = syntax.library (block.metalib (), tag);
+  const Library& library = frame.library (block.metalib (), tag);
   if (library.name () != symbol (Number::component))
     return false;
-  if (!syntax.check (block.metalib (), alist, block.msg ()))
+  if (!frame.check (block.metalib (), block.msg ()))
     return false;
   std::auto_ptr<Number> number (Librarian::build_alist<Number>
-                                (block, alist.alist (tag), tag));
+                                (block, frame.alist (tag), tag));
   if (!number.get ())
     return false;
   if (!number->initialize (block.units (), *this, block.msg ()))
@@ -146,23 +143,21 @@ ScopeBlock::number (const symbol tag) const
 { 
   Value::type type = block.lookup (tag);
   daisy_assert (type != Value::Error);
-  const Syntax& syntax = block.find_syntax (tag);
-
-  daisy_assert (syntax.size (tag) == Value::Singleton);
-  const AttributeList& alist = block.find_alist (tag);
-  daisy_assert (alist.check (tag));
+  const Frame& frame = block.find_frame (tag);
+  daisy_assert (frame.size (tag) == Value::Singleton);
+  daisy_assert (frame.check (tag));
 
   //Handle primitive numbers.
   if (type == Value::Number)
-    return alist.number (tag);
+    return frame.number (tag);
 
   // Handle number objects.
   daisy_assert (type == Value::Object);
-  daisy_assert (syntax.library (block.metalib (), tag).name ()
+  daisy_assert (frame.library (block.metalib (), tag).name ()
                 == symbol (Number::component));
-  daisy_assert (syntax.check (block.metalib (), alist, block.msg ()));
+  daisy_assert (frame.check (block.metalib (), block.msg ()));
   std::auto_ptr<Number> number (Librarian::build_alist<Number> 
-                                (block, alist.alist (tag), tag));
+                                (block, frame.alist (tag), tag));
   daisy_assert (number.get ());
   daisy_assert (number->initialize (block.units (), *this, block.msg ()));
   daisy_assert (number->check (block.units (), *this, block.msg ()));
@@ -178,12 +173,10 @@ ScopeBlock::has_name (const symbol tag) const
   if (type == Value::Error)
     return false;
 
-  const Syntax& syntax = block.find_syntax (tag);
-  if (syntax.size (tag) != Value::Singleton)
+  const Frame& frame = block.find_frame (tag);
+  if (frame.size (tag) != Value::Singleton)
     return false;
-
-  const AttributeList& alist = block.find_alist (tag);
-  if (!alist.check (tag))
+  if (!frame.check (tag))
     return false;
 
   //Handle primitive names.
@@ -193,13 +186,13 @@ ScopeBlock::has_name (const symbol tag) const
   // Handle stringer objects.
   if (type != Value::Object)
     return false;
-  const Library& library = syntax.library (block.metalib (), tag);
+  const Library& library = frame.library (block.metalib (), tag);
   if (library.name () != symbol (Stringer::component))
     return false;
-  if (!syntax.check (block.metalib (), alist, block.msg ()))
+  if (!frame.check (block.metalib (), block.msg ()))
     return false;
   std::auto_ptr<Stringer> stringer (Librarian::build_alist<Stringer>
-                                    (block, alist.alist (tag), tag));
+                                    (block, frame.alist (tag), tag));
   if (!stringer.get ())
     return false;
   if (!stringer->initialize (block.units (), *this, block.msg ()))
@@ -215,23 +208,21 @@ ScopeBlock::name (const symbol tag) const
 { 
   Value::type type = block.lookup (tag);
   daisy_assert (type != Value::Error);
-  const Syntax& syntax = block.find_syntax (tag);
-
-  daisy_assert (syntax.size (tag) == Value::Singleton);
-  const AttributeList& alist = block.find_alist (tag);
-  daisy_assert (alist.check (tag));
+  const Frame& frame = block.find_frame (tag);
+  daisy_assert (frame.size (tag) == Value::Singleton);
+  daisy_assert (frame.check (tag));
 
   //Handle primitive names.
   if (type == Value::String)
-    return alist.name (tag);
+    return frame.name (tag);
 
   // Handle number objects.
   daisy_assert (type == Value::Object);
-  daisy_assert (syntax.library (block.metalib (), tag).name ()
+  daisy_assert (frame.library (block.metalib (), tag).name ()
                 == symbol (Stringer::component));
-  daisy_assert (syntax.check (block.metalib (), alist, block.msg ()));
+  daisy_assert (frame.check (block.metalib (), block.msg ()));
   std::auto_ptr<Stringer> stringer (Librarian::build_alist<Stringer> 
-                                (block, alist.alist (tag), tag));
+                                (block, frame.alist (tag), tag));
   daisy_assert (stringer.get ());
   daisy_assert (stringer->initialize (block.units (), *this, block.msg ()));
   daisy_assert (stringer->check (block.units (), *this, block.msg ()));

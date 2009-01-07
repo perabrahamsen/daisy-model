@@ -31,6 +31,7 @@
 #include "anystate.h"
 #include "chemical.h"
 #include "groundwater.h"
+#include "treelog.h"
 #include <sstream>
 
 // The 'drain' model.

@@ -48,6 +48,7 @@
 #include "scope_multi.h"
 #include "scopesel.h"
 #include "units.h"
+#include "treelog.h"
 
 struct ColumnStandard : public Column
 {

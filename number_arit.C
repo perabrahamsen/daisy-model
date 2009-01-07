@@ -30,6 +30,7 @@
 #include "block.h"
 #include "librarian.h"
 #include "submodeler.h"
+#include "treelog.h"
 #include <sstream>
 #include <memory>
 

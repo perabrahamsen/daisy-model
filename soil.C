@@ -592,7 +592,7 @@ Soil::initialize_aquitard (Block& top,
   Frame layer_frame (Implementation::Layer::load_syntax);
   layer_frame.add ("end", new_end);
   layer_frame.add ("horizon", horizon_alist);
-  daisy_assert (layer_frame.check (top.metalib (), top.msg ()));
+  daisy_assert (layer_frame.check (top));
   Block block (top, layer_frame, "aquitard layer");
 #endif
   impl->layers.push_back (new Implementation::Layer (block));

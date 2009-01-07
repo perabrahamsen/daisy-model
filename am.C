@@ -39,6 +39,7 @@
 #include "memutils.h"
 #include "librarian.h"
 #include "unit.h"
+#include "treelog.h"
 #include <numeric>
 #include <sstream>
 

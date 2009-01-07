@@ -29,6 +29,7 @@
 #include "memutils.h"
 #include "librarian.h"
 #include "mathlib.h"
+#include "treelog.h"
 #include <sstream>
 
 // Uncomment for fast code that does not catches bugs.
