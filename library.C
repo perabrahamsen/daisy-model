@@ -36,7 +36,7 @@ struct Library::Implementation
 {
   // Id.
   const symbol name;
-  const char* description;
+  symbol description;
 
   // Types.
   typedef std::map<symbol, FrameModel*> frame_map;
@@ -61,7 +61,7 @@ struct Library::Implementation
   void clear_parsed ();
   void refile_parsed (const std::string& from, const std::string& to);
   static void load_syntax (Syntax&, AttributeList&);
-  Implementation (const char* n);
+  Implementation (const symbol n);
   ~Implementation ();
 };
 
@@ -203,9 +203,8 @@ Library::Implementation::refile_parsed (const std::string& from, const std::stri
     }
 }
 
-Library::Implementation::Implementation (const char* n) 
-  : name (symbol (n)),
-    description (NULL)
+Library::Implementation::Implementation (const symbol n) 
+  : name (symbol (n))
 { }
 
 Library::Implementation::~Implementation ()
@@ -226,7 +225,7 @@ symbol
 Library::name () const
 { return impl->name; }
 
-const char*
+symbol
 Library::description () const
 { return impl->description; }
 
@@ -378,11 +377,8 @@ Library::remove (const symbol key)
 { impl->remove (key); }
 
 void 
-Library::set_description (const char *const description)
-{
-  daisy_assert (!impl->description);
-  impl->description = description;
-}
+Library::set_description (const symbol description)
+{ impl->description = description; }
 
 Library* 
 Library::clone () const
@@ -399,7 +395,7 @@ Library::clone () const
   return lib;
 }
 
-Library::Library (const char* name) 
+Library::Library (const symbol name) 
   : impl (new Implementation (name))
 { }
 

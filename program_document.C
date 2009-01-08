@@ -1224,8 +1224,8 @@ ProgramDocument::print_component (const Library& library, Treelog& msg)
 			 "component", name.name ());
   format->index (name.name ());
 
-  const char *const description = library.description ();
-  if (description)
+  const symbol description = library.description ();
+  if (description != symbol ())
     print_description (description);
 
   print_users (xref.components[name]);

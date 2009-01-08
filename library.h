@@ -38,6 +38,7 @@ class Format;
 class Model;
 class Frame;
 class FrameModel;
+class Declare;
 
 #ifdef __unix
 #define EXPORT /* Nothing */
@@ -69,7 +70,7 @@ public:
   // Use.
 public:
   symbol name () const;
-  const char* description () const;
+  symbol description () const;
   const FrameModel& model (symbol) const;
   Frame& frame (symbol) const;
   AttributeList& lookup (symbol) const;
@@ -91,15 +92,17 @@ public:
   std::vector<doc_fun>& doc_funs () const;
 
   // Dependencies.
+public:
   void remove (symbol);
 
-  void set_description (const char*);
+public:
+  void set_description (symbol);
   Library* clone () const;
 private:
   Library ();
   Library (const Library&);
 public:
-  Library (const char* name);
+  Library (symbol name);
   ~Library ();
 };
 

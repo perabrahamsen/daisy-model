@@ -7,6 +7,37 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 gem funktioner til at skabe data, i stedet for data, i static
 constructors.  Det bør klare dependencies.
 
+Måske nedarve fra en RegisterModel class?
+
+*** datakrav
+
+component
+super 
+navn
+"make" function
+"load_frame" function
+
+Dependencies?  Automatisk?  
+
+  frame.add (key, frame)
+
+kan automatisk initialisere det relevante komponent.
+
+FrameInstrinsics?
+
+static const Frame& Intrinsics::frame () ?
+
+static class FooBarSyntax : public Foo::ModelSyntax
+{
+    Model* make (Block& block)
+    { return new FooBar (block); }
+    void load_frame (Frame& frame)
+    { frame.add ... }
+} FooBar_syntax ("bar", "super", "\
+Description of bar.");
+
+bedre, da den automatisk kan "lukke" for flere intrinsics.
+
 ** Fjern al brug af alist of syntax udenfor frame
 
 ** brug parent_link i stedet for parent_copy

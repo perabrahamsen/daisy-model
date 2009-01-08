@@ -26,10 +26,15 @@
 #include <map>
 
 class Library;
+class Declare;
 
 class Intrinsics 
 {
   // Content.
+  typedef std::map<symbol, const Declare*> declare_lib_map_t;
+  typedef std::map<symbol, declare_lib_map_t> declare_map_t;
+  declare_map_t delayed;
+
 public:
   std::map<symbol, Library*> all;
   int count;
@@ -38,8 +43,9 @@ public:
   // Use.
 public:
   std::map<symbol, Library*> clone () const;
-  Library& add (const char *const component);
-  Library& library (const char *const component) const;
+  Library& add (symbol component);
+  Library& library (symbol component) const;
+  void declare (symbol component, symbol model, const Declare&);
 
   // Create and Destroy.
 public:

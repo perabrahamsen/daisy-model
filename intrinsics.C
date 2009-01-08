@@ -41,11 +41,11 @@ Intrinsics::clone () const
 }
 
 Library&
-Intrinsics::add (const char *const component)
+Intrinsics::add (const symbol component)
 {
   daisy_assert (!closed);
   const std::map<symbol, Library*>::const_iterator i
-    = all.find (symbol (component));
+    = all.find (component);
   
   if (i != all.end ())
     return *(*i).second;
@@ -56,14 +56,22 @@ Intrinsics::add (const char *const component)
 }
 
 Library&
-Intrinsics::library (const char *const component) const
+Intrinsics::library (const symbol component) const
 {
   const std::map<symbol, Library*>::const_iterator i
-    = all.find (symbol (component));
+    = all.find (component);
   if (i == all.end ())
-    daisy_panic ("Component '" + std::string (component) + "' not found");
+    daisy_panic ("Component '" + component + "' not found");
   
   return *(*i).second;
+}
+
+void 
+Intrinsics::declare (const symbol component, const symbol model,
+                     const Declare& declaration)
+{ 
+  daisy_assert (!closed);
+  delayed[component][model] = &declaration; 
 }
 
 Intrinsics::Intrinsics ()

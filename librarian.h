@@ -36,6 +36,7 @@ class Library;
 class Metalib;
 class Format;
 class Intrinsics;
+class Declare;
 
 #ifdef __unix
 #define EXPORT /* Nothing */
@@ -59,22 +60,22 @@ public:
 private:
   typedef Model& (*builder) (Block&);
   static void non_null (const void*);
-  static Model* build_free (const char* component,
+  static Model* build_free (symbol component,
                             Metalib&, Treelog&, const AttributeList&, 
                             symbol scope_id);
-  static Model* build_alist (const char* component,
+  static Model* build_alist (symbol component,
                              Block& parent, const AttributeList&, 
                              symbol scope_id);
-  static Model* build_alist (const char* component,
+  static Model* build_alist (symbol component,
                              Block& parent, const AttributeList&, 
                              symbol scope_id, size_t index);
-  static Model* build_item (const char* component,
+  static Model* build_item (symbol component,
                             Block& parent, symbol key);
-  static std::vector<Model*> build_vector (const char* component,
+  static std::vector<Model*> build_vector (symbol component,
                                            Block& al, 
                                            symbol key);
   static std::vector<const Model*>
-  /**/ build_vector_const (const char* component,
+  /**/ build_vector_const (symbol component,
                            Block& al, symbol key);
 
 public:
@@ -146,24 +147,25 @@ public:
 
   // Library.
 private:
-  static Library& library (const char* component);
+  static Library& library (symbol component);
 public:
-  static void add_base (const char* component,
+  static void add_base (symbol component,
                         AttributeList& al, const Syntax& syntax);
-  static void add_type (const char* component,
-                        const symbol name, AttributeList& al,
+  static void add_type (symbol component,
+                        symbol name, AttributeList& al,
                         const Syntax& syntax, builder build);
-  static void add_type (const char* component,
-                        const char* name, AttributeList& al,
-                        const Syntax& syntax, builder build);
-  static void add_alias (const char* component, symbol derived, symbol base);
+  static void add_alias (symbol component, symbol derived, symbol base);
   typedef void (*doc_fun) (Format&, Metalib&, Treelog&, symbol name);
-  static void add_doc_fun (const char* component, doc_fun);
+  static void add_doc_fun (symbol component, doc_fun);
   static void load_syntax (Syntax&, AttributeList&);
+
+  // Declarations.
+  static void declare (symbol component, symbol name, 
+                       const Declare& declaration);
 
   // Create and destroy.
 public:
-  Librarian (const char *const component, const char *const description);
+  Librarian (symbol component, symbol description);
   ~Librarian ();
 };
 

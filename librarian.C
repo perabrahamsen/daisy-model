@@ -47,7 +47,7 @@ Librarian::intrinsics ()
 }
 
 Model* 
-Librarian::build_free (const char *const component, Metalib& metalib,
+Librarian::build_free (const symbol component, Metalib& metalib,
                        Treelog& msg, const AttributeList& alist, 
                        symbol scope_id)
 {
@@ -79,7 +79,7 @@ Librarian::build_free (const char *const component, Metalib& metalib,
 }
 
 Model* 
-Librarian::build_alist (const char *const component,
+Librarian::build_alist (const symbol component,
                         Block& parent, const AttributeList& alist, 
                         symbol scope_id)
 {
@@ -98,7 +98,7 @@ Librarian::build_alist (const char *const component,
 }
 
 Model* 
-Librarian::build_alist (const char *const component,
+Librarian::build_alist (const symbol component,
                         Block& parent, const AttributeList& alist, 
                         symbol scope_id, size_t index)
 {
@@ -117,12 +117,12 @@ Librarian::build_alist (const char *const component,
 }
 
 Model* 
-Librarian::build_item (const char *const component,
+Librarian::build_item (const symbol component,
                        Block& parent, symbol key)
 { return build_alist (component, parent, parent.alist (key), key); }
 
 std::vector<Model*> 
-Librarian::build_vector (const char *const component,
+Librarian::build_vector (const symbol component,
                          Block& al, symbol key)
 { 
   std::vector<Model*> t;
@@ -133,7 +133,7 @@ Librarian::build_vector (const char *const component,
 }
 
 std::vector<const Model*> 
-Librarian::build_vector_const (const char *const component,
+Librarian::build_vector_const (const symbol component,
                                Block& al, symbol key)
 { 
   std::vector<const Model*> t;
@@ -144,17 +144,17 @@ Librarian::build_vector_const (const char *const component,
 }
 
 Library& 
-Librarian::library (const char* component)
+Librarian::library (symbol component)
 {
   if (!content)
     content = new Intrinsics ();
 
-  return content->add (component);
+  return content->add (component.name ().c_str ());
 }
  
 
 void 
-Librarian::add_base (const char *const component,
+Librarian::add_base (const symbol component,
                      AttributeList& al, const Syntax& syntax)
 { 
   library (component).add_base (al, syntax); 
@@ -162,7 +162,7 @@ Librarian::add_base (const char *const component,
 }
 
 void 
-Librarian::add_type (const char *const component,
+Librarian::add_type (const symbol component,
                      const symbol name, AttributeList& al,
                      const Syntax& syntax, builder build)
 {
@@ -170,17 +170,8 @@ Librarian::add_type (const char *const component,
   daisy_assert (!content->closed);
 }
 
-void
-Librarian::add_type (const char *const component,
-                     const char *const name, AttributeList& al,
-                     const Syntax& syntax, builder build)
-{
-  library (component).add_model (symbol (name), al, syntax, build); 
-  daisy_assert (!content->closed);
-}
-
 void 
-Librarian::add_alias (const char *const component,
+Librarian::add_alias (const symbol component,
                       const symbol derived, const symbol base)
 {
   Library& lib = library (component);
@@ -196,7 +187,7 @@ Librarian::add_alias (const char *const component,
 }
 
 void 
-Librarian::add_doc_fun (const char *const component, const doc_fun fun)
+Librarian::add_doc_fun (const symbol component, const doc_fun fun)
 {
   library (component).add_doc_fun (fun); 
   daisy_assert (!content->closed);
@@ -215,10 +206,20 @@ Librarian::load_syntax (Syntax& syntax, AttributeList&)
     }
 }
 
-Librarian::Librarian (const char *const component,
-                      const char *const description)
+void 
+Librarian::declare (const symbol component, const symbol name, 
+                    const Declare& declaration)
+{ 
+  if (!content)
+    content = new Intrinsics ();
+
+  content->declare (component, name, declaration);
+  daisy_assert (!content->closed);
+}
+
+Librarian::Librarian (const symbol component, const symbol description)
 {
-  library (component).set_description (description);
+  library (component).set_description (description.name ().c_str ());
   content->count++;
 }
 

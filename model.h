@@ -22,13 +22,15 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include <boost/noncopyable.hpp>
-
 #include "symbol.h"
 #include "alist.h"
 
+#include <boost/noncopyable.hpp>
+
 class Log;
 class Syntax;
+class Frame;
+class Block;
 
 // 'Model' is the base class for all models.
 // Inheriting from model is needed in order to be put in libraries.

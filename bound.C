@@ -98,6 +98,19 @@ Bound::Bound (const char *const, const type_t type, const double value)
 Bound::~Bound ()
 { }
 
+#if 0
+static struct BoundNoneSyntax : public Librarian::Model<Bound>
+{
+  Model* make (Block& al) const
+  { return new Bound (al, Bound::none, -42.42e42); }
+  void load_frame (Frame&)
+  { }
+  BoundNoneSyntax ()
+    : Librarian::Model<Bound> ("none", "No boundary specified.")
+  { }
+} BoundNone_syntax;
+#endif
+
 // "none" model.
 static struct BoundNoneSyntax
 {
