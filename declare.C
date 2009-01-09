@@ -22,6 +22,14 @@
 
 #include "declare.h"
 #include "librarian.h"
+#include "frame.h"
+
+void 
+Declare::load (Frame& frame) const
+{
+  frame.add ("description", description);
+  load_frame (frame);
+}
 
 Declare::Declare (const symbol c, const symbol name, const symbol s,
                   const symbol d)

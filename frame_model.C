@@ -24,6 +24,7 @@
 #include "block.h"
 #include "assertion.h"
 #include "treelog.h"
+#include "declare.h"
 
 const FrameModel* 
 FrameModel::parent () const
@@ -33,12 +34,12 @@ Model*
 FrameModel::construct (Block& context, const symbol key, 
                        const FrameModel& frame) const
 { 
-  if (builder)
+  if (builder || declaration)
     {
       Block block (context, frame, key);
       check (context.metalib (), Treelog::null ());
       try
-        { return &builder (block); }
+        { return builder ? &builder (block) : declaration->make (block); }
       catch (const std::string& err)
         { block.error ("Build failed: " + err); }
       catch (const char *const err)
@@ -56,7 +57,8 @@ FrameModel::construct (Block& context, const symbol key) const
 FrameModel::FrameModel ()
   : Frame (),
     parent_ (NULL),
-    builder (NULL)
+    builder (NULL),
+    declaration (NULL)
 { }
 
 const FrameModel& 
@@ -69,21 +71,24 @@ FrameModel::root ()
 FrameModel::FrameModel (const FrameModel& parent, parent_link_t)
   : Frame (),
     parent_ (&parent),
-    builder (parent.builder)
+    builder (parent.builder),
+    declaration (NULL)
 { }
 
 FrameModel::FrameModel (const FrameModel& parent, parent_copy_t)
   // For cloning a library.
   : Frame (parent),
     parent_ (&parent),
-    builder (parent.builder)
+    builder (parent.builder),
+    declaration (NULL)
 { }
 
 FrameModel::FrameModel (const Syntax& s, const AttributeList& a)
   // Base class.
   : Frame (s, a),
     parent_ (NULL),
-    builder (NULL)
+    builder (NULL),
+    declaration (NULL)
 { }
 
 FrameModel::FrameModel (const Syntax& s, const AttributeList& a,
@@ -91,14 +96,16 @@ FrameModel::FrameModel (const Syntax& s, const AttributeList& a,
   // Base class.
   : Frame (s, a),
     parent_ (NULL),
-    builder (b)
+    builder (b),
+    declaration (NULL)
 { }
 
 FrameModel::FrameModel (const FrameModel& p, const AttributeList& a)
   // build_alist
   : Frame (p.syntax (), a),
     parent_ (&p),
-    builder (NULL)
+    builder (NULL),
+    declaration (NULL)
 { }
 
 FrameModel::FrameModel (const FrameModel& p, 
@@ -106,8 +113,17 @@ FrameModel::FrameModel (const FrameModel& p,
   // add_derived
   : Frame (s, a),
     parent_ (&p),
-    builder (NULL)
+    builder (NULL),
+    declaration (NULL)
 { }
+
+FrameModel::FrameModel (const Declare& declare)
+  // Declared.
+  : Frame (),
+    parent_ (NULL),
+    builder (NULL),
+    declaration (dynamic_cast<const DeclareModel*> (&declare))
+{ declare.load (*this); }
 
 FrameModel::~FrameModel ()
 { }

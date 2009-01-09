@@ -54,7 +54,7 @@ struct Library::Implementation
   bool check (symbol) const;
   void add_ancestors (symbol);
   void add_base (AttributeList&, const Syntax&);
-  void add_model (symbol, FrameModel*);
+  void add_model (symbol, FrameModel&);
   const Syntax& syntax (symbol) const;
   void entries (std::vector<symbol>&) const;
   void remove (symbol);
@@ -146,9 +146,9 @@ Library::Implementation::add_base (AttributeList& value,
 }
 
 void
-Library::Implementation::add_model (const symbol key, FrameModel *const frame)
+Library::Implementation::add_model (const symbol key, FrameModel& frame)
 {
-  frames[key] = frame;
+  frames[key] = &frame;
   add_ancestors (key);
 }
 
@@ -264,7 +264,11 @@ Library::add_base (AttributeList& value, const Syntax& syntax)
 void
 Library::add_model (const symbol key, AttributeList& value, 
                     const Syntax& syntax, builder build)
-{ impl->add_model (key, new FrameModel (syntax, value, build)); }
+{ add_model (key, *new FrameModel (syntax, value, build)); }
+
+void
+Library::add_model (const symbol key, FrameModel& frame)
+{ impl->add_model (key, frame); }
 
 void 
 Library::add_derived (const symbol name, AttributeList& al,
@@ -272,7 +276,7 @@ Library::add_derived (const symbol name, AttributeList& al,
 { 
   al.add ("type", super);
   daisy_assert (check (super));
-  impl->add_model (name, new FrameModel (model (super), al));
+  impl->add_model (name, *new FrameModel (model (super), al));
 }
 
 void
@@ -281,7 +285,7 @@ Library::add_derived (const symbol name, const Syntax& syn, AttributeList& al,
 { 
   al.add ("type", super);
   daisy_assert (check (super));
-  impl->add_model (name, new FrameModel (model (super), syn, al)); 
+  impl->add_model (name, *new FrameModel (model (super), syn, al)); 
 }
 
 const Syntax& 

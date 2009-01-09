@@ -1288,10 +1288,12 @@ printer_file${OBJ}: printer_file.C printer_file.h printer.h model.h symbol.h \
   plf.h time.h parser.h path.h assertion.h librarian.h
 log_alist${OBJ}: log_alist.C log_alist.h log.h time.h border.h model.h \
   symbol.h alist.h library.h syntax.h value.h assertion.h
+declare${OBJ}: declare.C declare.h symbol.h librarian.h model.h alist.h \
+  frame.h syntax.h value.h scope.h
 submodeler${OBJ}: submodeler.C submodeler.h block.h syntax.h value.h symbol.h \
   plf.h frame.h scope.h alist.h
 frame_model${OBJ}: frame_model.C frame_model.h frame.h syntax.h value.h \
-  symbol.h scope.h block.h plf.h assertion.h treelog.h
+  symbol.h scope.h block.h plf.h assertion.h treelog.h declare.h
 scope${OBJ}: scope.C scope.h value.h symbol.h assertion.h
 value${OBJ}: value.C value.h symbol.h assertion.h
 unit${OBJ}: unit.C unit.h symbol.h
@@ -1306,11 +1308,12 @@ tertsmall${OBJ}: tertsmall.C tertsmall.h anystate.h
 anystate${OBJ}: anystate.C anystate.h assertion.h
 imvec${OBJ}: imvec.C imvec.h symbol.h syntax.h value.h assertion.h log.h \
   time.h border.h model.h alist.h chemical.h check.h block.h plf.h \
-  units.h
+  units.h frame.h scope.h
 im${OBJ}: im.C im.h symbol.h syntax.h value.h chemical.h model.h alist.h \
   units.h unit.h am.h log.h time.h border.h block.h plf.h check.h \
-  assertion.h
-frame${OBJ}: frame.C frame.h syntax.h value.h symbol.h scope.h alist.h
+  assertion.h frame.h scope.h
+frame${OBJ}: frame.C frame.h syntax.h value.h symbol.h scope.h alist.h \
+  block.h plf.h
 bdconv${OBJ}: bdconv.C bdconv.h convert.h symbol.h geometry.h syntax.h \
   value.h mathlib.h assertion.h soil.h volume.h model.h alist.h units.h
 abiotic${OBJ}: abiotic.C abiotic.h mathlib.h assertion.h
@@ -1323,7 +1326,7 @@ treelog_text${OBJ}: treelog_text.C treelog_text.h treelog.h symbol.h \
 treelog_store${OBJ}: treelog_store.C treelog_store.h treelog.h symbol.h \
   assertion.h memutils.h
 intrinsics${OBJ}: intrinsics.C intrinsics.h symbol.h assertion.h library.h \
-  memutils.h
+  memutils.h frame_model.h frame.h syntax.h value.h scope.h
 metalib${OBJ}: metalib.C metalib.h symbol.h frame.h syntax.h value.h scope.h \
   intrinsics.h librarian.h model.h alist.h library.h block.h plf.h \
   assertion.h memutils.h path.h units.h unit_model.h unit.h
@@ -1335,7 +1338,7 @@ output${OBJ}: output.C output.h condition.h model.h symbol.h alist.h \
   treelog.h block.h syntax.h plf.h assertion.h librarian.h scope_model.h
 scope_block${OBJ}: scope_block.C scope_block.h scope.h value.h symbol.h \
   block.h syntax.h plf.h library.h number.h model.h alist.h stringer.h \
-  assertion.h librarian.h
+  frame.h assertion.h librarian.h
 librarian${OBJ}: librarian.C librarian.h model.h symbol.h alist.h library.h \
   metalib.h frame.h syntax.h value.h scope.h intrinsics.h block.h plf.h \
   treelog_text.h treelog.h assertion.h frame_model.h
@@ -1716,7 +1719,8 @@ source_std${OBJ}: source_std.C source_file.h source.h model.h symbol.h \
 action_markvand${OBJ}: action_markvand.C action.h model.h symbol.h alist.h \
   block.h syntax.h value.h plf.h daisy.h program.h run.h time.h \
   timestep.h vcheck.h memutils.h field.h border.h crop.h im.h fao.h log.h \
-  mathlib.h assertion.h check.h librarian.h vegetation.h treelog.h
+  mathlib.h assertion.h check.h librarian.h vegetation.h treelog.h \
+  submodeler.h
 photo_GL${OBJ}: photo_GL.C photo.h model.h symbol.h alist.h block.h syntax.h \
   value.h plf.h canopy_std.h canopy_simple.h phenology.h submodel.h \
   mathlib.h assertion.h check.h librarian.h treelog.h
@@ -1738,7 +1742,7 @@ rootdens_AP${OBJ}: rootdens_AP.C rootdens.h model.h symbol.h alist.h block.h \
   border.h check.h librarian.h
 number_const${OBJ}: number_const.C number.h symbol.h model.h alist.h block.h \
   syntax.h value.h plf.h scope.h units.h unit.h assertion.h librarian.h \
-  library.h treelog.h
+  library.h treelog.h frame.h
 domsorp_std${OBJ}: domsorp_std.C domsorp.h model.h symbol.h alist.h block.h \
   syntax.h value.h plf.h transform.h dom.h som.h om.h soil.h log.h time.h \
   border.h assertion.h librarian.h treelog.h

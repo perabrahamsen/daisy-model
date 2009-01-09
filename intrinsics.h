@@ -24,6 +24,7 @@
 
 #include "symbol.h"
 #include <map>
+#include <vector>
 
 class Library;
 class Declare;
@@ -31,9 +32,9 @@ class Declare;
 class Intrinsics 
 {
   // Content.
-  typedef std::map<symbol, const Declare*> declare_lib_map_t;
+  typedef std::map<symbol, std::vector<const Declare*>/**/> declare_lib_map_t;
   typedef std::map<symbol, declare_lib_map_t> declare_map_t;
-  declare_map_t delayed;
+  mutable declare_map_t delayed;
 
 public:
   std::map<symbol, Library*> all;

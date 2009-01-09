@@ -25,6 +25,8 @@
 
 class Model;
 class Block;
+class Declare;
+class DeclareModel;
 
 class FrameModel : public Frame
 {
@@ -37,6 +39,7 @@ private:
 private:
   typedef Model& (*builder_t) (Block&);
   const builder_t builder;
+  const DeclareModel *const declaration;
   Model* construct (Block& context, const symbol key, const FrameModel&) const;
 public:
   Model* construct (Block& context, const symbol key) const;
@@ -54,6 +57,7 @@ public:
   FrameModel (const Syntax&, const AttributeList&, const builder_t); // OLD: m.
   FrameModel (const FrameModel&, const AttributeList&); // build_alist, add_d)
   FrameModel (const FrameModel&, const Syntax&, const AttributeList&); // add_d
+  FrameModel (const Declare&);  // Declared.
   ~FrameModel ();
 };
 

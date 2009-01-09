@@ -24,12 +24,38 @@
 #include "assertion.h"
 #include "library.h"
 #include "memutils.h"
+#include "frame_model.h"
 
 std::map<symbol, Library*> 
 Intrinsics::clone () const
 { 
+  // Instantiate delayed declarations.
+  for (declare_map_t::const_iterator i = delayed.begin ();
+       i != delayed.end (); 
+       i++)
+    {
+      const symbol component = (*i).first;
+      Library& library = this->library (component);
+      const declare_lib_map_t& libd = (*i).second;
+      for (declare_lib_map_t::const_iterator j = libd.begin ();
+           j != libd.end ();
+           j++)
+        {
+          const symbol model = (*j).first;
+          const std::vector<const Declare*>& decls = (*j).second;
+          daisy_assert (decls.size () == 1);
+          const Declare& declare = *decls[0];
+          library.add_model (model, *new FrameModel (declare));
+        }
+    }
+
+  // Clear delayed.
+  delayed = declare_map_t ();
+
+  // Close for new definitions.
   closed = true;
 
+  // Clone all libraries.
   std::map<symbol, Library*> result;
   
   for (std::map<symbol, Library*>::const_iterator i = all.begin ();
@@ -71,7 +97,7 @@ Intrinsics::declare (const symbol component, const symbol model,
                      const Declare& declaration)
 { 
   daisy_assert (!closed);
-  delayed[component][model] = &declaration; 
+  delayed[component][model].push_back (&declaration); 
 }
 
 Intrinsics::Intrinsics ()

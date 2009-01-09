@@ -78,6 +78,7 @@ public:
   bool complete (const Metalib&, symbol) const;
   void add_base (AttributeList&, const Syntax&);
   void add_model (symbol, AttributeList&, const Syntax&, builder);
+  void add_model (symbol, FrameModel&);
   void add_derived (symbol name, AttributeList& al,
 		    symbol super);
   void add_derived (symbol name, const Syntax&, AttributeList& al,

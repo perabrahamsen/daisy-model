@@ -36,7 +36,11 @@ struct Declare : private boost::noncopyable
   const symbol super;
   const symbol description;
 
-  virtual void load_frame (Frame&) = 0;
+  void load (Frame& frame) const;
+protected:
+  virtual void load_frame (Frame&) const = 0;
+public:
+
   Declare (symbol component, symbol name, symbol super, symbol description);
   Declare (symbol component, symbol name, symbol description);
   virtual ~Declare ();
