@@ -25,7 +25,8 @@
 #include "block.h"
 #include "syntax.h"
 #include "log.h"
-#include "librarian.h"
+#include "declare.h"
+#include "frame.h"
 #include "submodeler.h"
 #include <map>
 
@@ -64,25 +65,6 @@ Column::output (Log& log) const
   output_variable (size, log);
 }
 
-void
-Column::load_syntax (Syntax& syntax, AttributeList& alist)
-{
-  syntax.add ("size", Value::Unknown (), Value::State,
-	      "Area covered by this column, for use by the 'merge' action.\n\
-The dimension is up to you, as long as all columns use the same unit.");
-  alist.add ("size", 1.0);
-
-  syntax.add_submodule_sequence ("location", Value::Const, "\
-Location of this column.\n\
-\n\
-The meaning depends on the number of point in the sequence.\n\
-0 points: The column has no specific location.\n\
-1 point: The column has a location, but no specific area.\n\
-3 or more points: The column represents the area specified by a\n\
-polygon with the specified corner points.", Point::load_syntax);
-  alist.add ("location", std::vector<const AttributeList*> ());
-}
-
 Column::Column (Block& al)
   : ModelAListed (al.alist ()),
     size (al.number ("size")),
@@ -92,8 +74,31 @@ Column::Column (Block& al)
 Column::~Column ()
 { }
 
-static Librarian Column_init (Column::component, "\
+static struct ColumnInit : public DeclareComponent
+{
+  void load_frame (Frame& frame) const
+  { 
+    frame.add ("size", Value::Unknown (), Value::State,
+               "Area covered by this column, for use by the 'merge' action.\n\
+The dimension is up to you, as long as all columns use the same unit.");
+    frame.add ("size", 1.0);
+
+    frame.add_submodule_sequence ("location", Value::Const, "\
+Location of this column.\n\
+\n\
+The meaning depends on the number of point in the sequence.\n\
+0 points: The column has no specific location.\n\
+1 point: The column has a location, but no specific area.\n\
+3 or more points: The column represents the area specified by a\n\
+polygon with the specified corner points.", Column::Point::load_syntax);
+    frame.add ("location", std::vector<const AttributeList*> ());
+  }
+  ColumnInit ()
+    : DeclareComponent (Column::component, "\
 A 'column' is an one-dimensional vertical description of the\n\
 soil/crop/atmosphere system.  The column component contains most of\n\
-the other processes in Daisy as submodels.");
+the other processes in Daisy as submodels.")
+  { }
+} Column_init;
 
+// column.C ends here.

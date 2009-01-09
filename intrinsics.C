@@ -30,22 +30,25 @@ std::map<symbol, Library*>
 Intrinsics::clone () const
 { 
   // Instantiate delayed declarations.
-  for (declare_map_t::const_iterator i = delayed.begin ();
+  for (declare_map_t::iterator i = delayed.begin ();
        i != delayed.end (); 
        i++)
     {
       const symbol component = (*i).first;
       Library& library = this->library (component);
-      const declare_lib_map_t& libd = (*i).second;
-      for (declare_lib_map_t::const_iterator j = libd.begin ();
+      declare_lib_map_t& libd = (*i).second;
+      for (declare_lib_map_t::iterator j = libd.begin ();
            j != libd.end ();
            j++)
         {
           const symbol model = (*j).first;
-          const std::vector<const Declare*>& decls = (*j).second;
+          std::vector<const Declare*>& decls = (*j).second;
+          if (decls.size () == 0)
+            continue;
           daisy_assert (decls.size () == 1);
           const Declare& declare = *decls[0];
           library.add_model (model, *new FrameModel (declare));
+          decls.erase (decls.begin ());
         }
     }
 
@@ -98,6 +101,40 @@ Intrinsics::declare (const symbol component, const symbol model,
 { 
   daisy_assert (!closed);
   delayed[component][model].push_back (&declaration); 
+}
+
+void 
+Intrinsics::instantiate (const symbol component, const symbol model) const
+{ 
+  declare_map_t::iterator i = delayed.find (component);
+  if (i == delayed.end ())
+    {
+      daisy_assert (library (component).check (model));
+      return;
+    }
+
+  daisy_assert (component == (*i).first);
+  Library& library = this->library (component);
+  declare_lib_map_t& libd = (*i).second;
+  declare_lib_map_t::iterator j = libd.find (model);
+  if (j == libd.end ())
+    {
+      daisy_assert (library.check (model));
+      return;
+    }
+
+  daisy_assert (model == (*j).first);
+  std::vector<const Declare*>& decls = (*j).second;
+
+  if (decls.size () == 0)
+    {
+      daisy_assert (library.check (model));
+      return;
+    }
+  daisy_assert (decls.size () == 1);
+  const Declare& declare = *decls[0];
+  library.add_model (model, *new FrameModel (declare));
+  decls.erase (decls.begin ());
 }
 
 Intrinsics::Intrinsics ()

@@ -1089,7 +1089,8 @@ log${OBJ}: log.C log.h time.h border.h model.h symbol.h alist.h library.h \
 weather${OBJ}: weather.C weather.h model.h symbol.h alist.h im.h syntax.h \
   value.h block.h plf.h librarian.h
 column${OBJ}: column.C column.h model.h symbol.h alist.h block.h syntax.h \
-  value.h plf.h log.h time.h border.h librarian.h submodeler.h
+  value.h plf.h log.h time.h border.h declare.h librarian.h frame.h \
+  scope.h submodeler.h
 crop${OBJ}: crop.C crop.h model.h symbol.h alist.h time.h om.h plf.h block.h \
   syntax.h value.h mathlib.h assertion.h librarian.h
 action${OBJ}: action.C action.h model.h symbol.h alist.h block.h syntax.h \
@@ -1289,11 +1290,12 @@ printer_file${OBJ}: printer_file.C printer_file.h printer.h model.h symbol.h \
 log_alist${OBJ}: log_alist.C log_alist.h log.h time.h border.h model.h \
   symbol.h alist.h library.h syntax.h value.h assertion.h
 declare${OBJ}: declare.C declare.h symbol.h librarian.h model.h alist.h \
-  frame.h syntax.h value.h scope.h
+  frame.h syntax.h value.h scope.h intrinsics.h library.h
 submodeler${OBJ}: submodeler.C submodeler.h block.h syntax.h value.h symbol.h \
   plf.h frame.h scope.h alist.h
 frame_model${OBJ}: frame_model.C frame_model.h frame.h syntax.h value.h \
-  symbol.h scope.h block.h plf.h assertion.h treelog.h declare.h
+  symbol.h scope.h block.h plf.h assertion.h treelog.h declare.h \
+  librarian.h model.h alist.h
 scope${OBJ}: scope.C scope.h value.h symbol.h assertion.h
 value${OBJ}: value.C value.h symbol.h assertion.h
 unit${OBJ}: unit.C unit.h symbol.h
@@ -1896,7 +1898,7 @@ column_std${OBJ}: column_std.C column.h model.h symbol.h alist.h library.h \
   vegetation.h bioclimate.h weather.h im.h chemistry.h chemical.h \
   organic_matter.h am.h dom.h plf.h time.h log.h border.h submodeler.h \
   block.h memutils.h librarian.h scope_multi.h scope.h scopesel.h units.h \
-  treelog.h
+  treelog.h declare.h frame.h
 weather_simple${OBJ}: weather_simple.C weather_old.h weather_base.h weather.h \
   model.h symbol.h alist.h im.h syntax.h value.h block.h plf.h time.h \
   log.h border.h mathlib.h assertion.h librarian.h

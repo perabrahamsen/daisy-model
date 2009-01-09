@@ -23,32 +23,54 @@
 #define DECLARE_H
 
 #include "symbol.h"
+#include "librarian.h"
 
 #include <boost/noncopyable.hpp>
 
 class Model;
 class Frame;
+class FrameModel;
 class Block;
 
-struct Declare : private boost::noncopyable
+class Declare : private boost::noncopyable
 {
+public:
   const symbol component;
+private:
   const symbol super;
   const symbol description;
 
+public:
   void load (Frame& frame) const;
 protected:
   virtual void load_frame (Frame&) const = 0;
 public:
+  static symbol root_name ();
 
-  Declare (symbol component, symbol name, symbol super, symbol description);
+  virtual const FrameModel* parent_model () const;
+
+protected:
   Declare (symbol component, symbol name, symbol description);
   virtual ~Declare ();
 };
 
-struct DeclareModel : public Declare
+class DeclareComponent : public Declare
 {
+  Librarian librarian;
+  void load_frame (Frame&) const;
+public:
+  DeclareComponent (symbol component, symbol description);
+};
+
+class DeclareModel : public Declare
+{
+  const symbol super;
+
+public:
   virtual Model* make (Block&) const = 0;
+private:
+  const FrameModel* parent_model () const;
+protected:
   DeclareModel (symbol component, symbol name, symbol super, 
                 symbol description);
   DeclareModel (symbol component, symbol name, symbol description);

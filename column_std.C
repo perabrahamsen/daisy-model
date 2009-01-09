@@ -49,6 +49,9 @@
 #include "scopesel.h"
 #include "units.h"
 #include "treelog.h"
+#include "column.h"
+#include "declare.h"
+#include "frame.h"
 
 struct ColumnStandard : public Column
 {
@@ -938,10 +941,10 @@ ColumnStandard::summarize (Treelog& msg) const
 ColumnStandard::~ColumnStandard ()
 { }
 
-static struct ColumnStandardSyntax
+static struct ColumnStandardSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ColumnStandard (al); }
+  Model* make (Block& al) const
+  { return new ColumnStandard (al); }
 
   static void load_water_and_macro (Syntax& syntax, AttributeList& alist)
   {
@@ -953,104 +956,99 @@ By default, preferential flow is enabled if and only if the combined\n\
 amount of humus and clay in the top horizon is above 5%.");
   }
 
-  ColumnStandardSyntax ()
+  void load_frame (Frame& frame) const
   { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    Column::load_syntax (syntax, alist);
-    syntax.add ("description", Value::String, Value::OptionalConst,
-		"Description of this column."); 
-    alist.add ("description", "\
-Hansen et.al. 1990. with generic movement in soil.");
-
-    syntax.add_object ("scope", Scopesel::component, 
+    frame.add_object ("scope", Scopesel::component, 
 		       Value::Const, Value::Singleton, "\
 Scope to evaluate expessions in.");
-    alist.add ("scope", Scopesel::default_model ());
-    syntax.add_submodule ("Soil", alist, Value::State,
+    frame.add ("scope", Scopesel::default_model ());
+    frame.add_submodule ("Soil", frame.alist (), Value::State,
                           "The numeric and physical soil properties.",
                           Soil::load_syntax);
-    syntax.add_submodule ("SoilWater", alist, Value::State,
+    frame.add_submodule ("SoilWater", frame.alist (), Value::State,
                           "Soil water content and transportation.",
                           load_water_and_macro);
-    syntax.add_submodule ("SoilHeat", alist, Value::State,
+    frame.add_submodule ("SoilHeat", frame.alist (), Value::State,
                           "Soil heat capacity and transportation.",
                           SoilHeat::load_syntax);
-    syntax.add_object ("Movement", Movement::component,
+    frame.add_object ("Movement", Movement::component,
                        Value::State, Value::Singleton, "\
 Discretization and movement of water, heat and solutes in the soil.");
-    alist.add ("Movement", Movement::default_model ());
-    syntax.add_object ("weather", Weather::component,
+    frame.add ("Movement", Movement::default_model ());
+    frame.add_object ("weather", Weather::component,
                        Value::OptionalState, Value::Singleton,
                        "Weather model for providing climate information during\n\
 the simulation.  If unspecified, used global weather.");
-    syntax.add_object ("Vegetation", Vegetation::component,
+    frame.add_object ("Vegetation", Vegetation::component,
                        Value::State, Value::Singleton,
                        "The crops on the field.");
-    alist.add ("Vegetation", Vegetation::default_model ());
+    frame.add ("Vegetation", Vegetation::default_model ());
 
-    syntax.add_object ("Bioclimate", Bioclimate::component, 
+    frame.add_object ("Bioclimate", Bioclimate::component, 
                        Value::State, Value::Singleton,
                        "The water and energy distribution among the crops.");
-    alist.add ("Bioclimate", Bioclimate::default_model ());
-    syntax.add_submodule ("Surface", alist, Value::State,
+    frame.add ("Bioclimate", Bioclimate::default_model ());
+    frame.add_submodule ("Surface", frame.alist (), Value::State,
                           "The upper border of the soil.",
                           Surface::load_syntax);
-    syntax.add_object ("Groundwater", Groundwater::component,
+    frame.add_object ("Groundwater", Groundwater::component,
                        "The groundwater level.");
-    syntax.add_object ("Chemistry", Chemistry::component, 
+    frame.add_object ("Chemistry", Chemistry::component, 
                        Value::State, Value::Singleton,
                        "Chemical compounds in the system.");
-    alist.add ("Chemistry", Chemistry::default_model ());
-    syntax.add ("harvest_DM", "g/m^2/h", Value::LogOnly, 
+    frame.add ("Chemistry", Chemistry::default_model ());
+    frame.add ("harvest_DM", "g/m^2/h", Value::LogOnly, 
                 "Amount of DM removed by harvest this hour.");
-    syntax.add ("harvest_N", "g/m^2/h", Value::LogOnly, 
+    frame.add ("harvest_N", "g/m^2/h", Value::LogOnly, 
                 "Amount of nitrogen removed by harvest this hour.");
-    syntax.add ("harvest_C", "g/m^2/h", Value::LogOnly, 
+    frame.add ("harvest_C", "g/m^2/h", Value::LogOnly, 
                 "Amount of carbon removed by harvest this hour.");
-    syntax.add ("residuals_DM", "g/m^2/h", Value::LogOnly, "\
+    frame.add ("residuals_DM", "g/m^2/h", Value::LogOnly, "\
 Amount of dry matter removed from crops to surface and soil this hour.\n\
 This includes loss as harvest, as well as loss of old leaves and roots.");
-    syntax.add ("residuals_N_top", "g/m^2/h", Value::LogOnly, 
+    frame.add ("residuals_N_top", "g/m^2/h", Value::LogOnly, 
                 "Amount of nitrogen removed from crops to soil this hour.\n\
 This includes loss as harvest, as well as loss of old leaves.");
-    syntax.add ("residuals_C_top", "g/m^2/h", Value::LogOnly, 
+    frame.add ("residuals_C_top", "g/m^2/h", Value::LogOnly, 
                 "Amount of carbon removed from crops to surface this hour.\n\
 This includes loss as harvest, as well as loss of old leaves.");
-    syntax.add ("residuals_N_soil", "g/cm^3/h", Value::LogOnly, Value::Sequence, 
+    frame.add ("residuals_N_soil", "g/cm^3/h", Value::LogOnly, Value::Sequence, 
                 "Amount of nitrogen removed from crops in soil this hour.\n\
 This includes loss as harvest, as well as loss of old roots.");
-    syntax.add ("residuals_C_soil", "g/cm^3/h", Value::LogOnly, Value::Sequence, 
+    frame.add ("residuals_C_soil", "g/cm^3/h", Value::LogOnly, Value::Sequence, 
                 "Amount of carbon removed from crops in soil this hour.\n\
 This includes loss as harvest, as well as loss of old roots.");
-    syntax.add ("residuals_N_root", "g/m^2/h", Value::LogOnly, 
+    frame.add ("residuals_N_root", "g/m^2/h", Value::LogOnly, 
                 "Amount of nitrogen removed from crops to soil this hour.\n\
 This includes loss as harvest, as well as loss of old roots.");
-    syntax.add ("residuals_C_root", "g/m^2/h", Value::LogOnly, 
+    frame.add ("residuals_C_root", "g/m^2/h", Value::LogOnly, 
                 "Amount of carbon removed from crops to surface this hour.\n\
 This includes loss as harvest, as well as loss of old roots.");
-    syntax.add ("surface_water", "mm", Value::LogOnly, 
+    frame.add ("surface_water", "mm", Value::LogOnly, 
                 "Amount of water in the system above ground.\n\
 This include ponded water, intercepted water and the snow pack.");
-    syntax.add_object ("OrganicMatter", OrganicMatter::component,
+    frame.add_object ("OrganicMatter", OrganicMatter::component,
                        Value::State, Value::Singleton, "\
 The organic matter in the soil and on the surface.");
-    alist.add ("OrganicMatter", OrganicMatter::default_model ());
-    syntax.add ("second_year_utilization", "kg N/ha", Value::State,
+    frame.add ("OrganicMatter", OrganicMatter::default_model ());
+    frame.add ("second_year_utilization", "kg N/ha", Value::State,
 		"Estimated accumulated second year fertilizer effect.");
-    alist.add ("second_year_utilization", 0.0);
-    syntax.add ("seed_N", "kg N/ha/h", Value::LogOnly,
+    frame.add ("second_year_utilization", 0.0);
+    frame.add ("seed_N", "kg N/ha/h", Value::LogOnly,
 		"Amount of nitrogen in seed applied this time step.");
-    syntax.add ("seed_C", "kg C/ha/h", Value::LogOnly,
+    frame.add ("seed_C", "kg C/ha/h", Value::LogOnly,
 		"Amount of carbon in seed applied this time step.");
-    syntax.add ("applied_DM", "ton DM/ha/h", Value::LogOnly,
+    frame.add ("applied_DM", "ton DM/ha/h", Value::LogOnly,
 		"Amount of dry matter applied this time step.\n\
 This includes dry matter incorporated directly in the soil.");
-    syntax.add ("first_year_utilization", "kg N/ha/h", Value::LogOnly,
+    frame.add ("first_year_utilization", "kg N/ha/h", Value::LogOnly,
 		"Estimated first year fertilizer effect.");
-    
-    Librarian::add_type (Column::component, "default", alist, syntax, &make);
   }
+    
+  ColumnStandardSyntax ()
+    : DeclareModel (Column::component, "default", "\
+Hansen et.al. 1990. with generic movement in soil.")
+  { }
 } column_syntax;
 
 // column_std.C ends here.

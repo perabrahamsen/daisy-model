@@ -47,6 +47,7 @@ public:
   Library& add (symbol component);
   Library& library (symbol component) const;
   void declare (symbol component, symbol model, const Declare&);
+  void instantiate (symbol component, symbol model) const;
 
   // Create and Destroy.
 public:

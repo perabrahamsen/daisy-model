@@ -2,6 +2,18 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Frame
 
+** Frame::add_submodule skal have en version der tager en frame som argument.
+
+** Frame::add (name, value) skal teste om name er defineret
+
+og har den rigtige tyupe.
+
+** Ryd op i column.C
+
+*** Ret Point
+
+** Ryd op i column_std.C
+
 ** Brug DeclareModel alle steder
 
 ** Fjern al brug af alist of syntax udenfor frame

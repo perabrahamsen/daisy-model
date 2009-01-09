@@ -23,6 +23,8 @@
 #include "declare.h"
 #include "librarian.h"
 #include "frame.h"
+#include "intrinsics.h"
+#include "library.h"
 
 void 
 Declare::load (Frame& frame) const
@@ -31,32 +33,55 @@ Declare::load (Frame& frame) const
   load_frame (frame);
 }
 
-Declare::Declare (const symbol c, const symbol name, const symbol s,
+symbol 
+Declare::root_name ()
+{
+  static const symbol name ("component");
+  return name;
+}
+
+const FrameModel* 
+Declare::parent_model () const
+{ return NULL; }
+
+Declare::Declare (const symbol c, const symbol name,
                   const symbol d)
   : component (c),
-    super (s),
-    description (d)
-{ Librarian::declare (component, name, *this); }
-
-Declare::Declare (const symbol c, const symbol name, const symbol d)
-  : component (c),
-    super ("component"),
     description (d)
 { Librarian::declare (component, name, *this); }
 
 Declare::~Declare ()
 { }
 
+void 
+DeclareComponent::load_frame (Frame&) const
+{ }
+
+DeclareComponent::DeclareComponent (const symbol component,
+                                    const symbol description)
+  : Declare (component, root_name (), description),
+    librarian (component, description)
+{ }
+
+const FrameModel* 
+DeclareModel::parent_model () const
+{ 
+  Librarian::intrinsics ().instantiate (component, super);
+  return &Librarian::intrinsics ().library (component).model (super); 
+}
+
 DeclareModel::DeclareModel (const symbol component,
-                            const symbol name, const symbol super, 
+                            const symbol name, const symbol s, 
                             const symbol description)
-  : Declare (component, name, super, description)
+  : Declare (component, name, description),
+    super (s)
 { }
 
 DeclareModel::DeclareModel (const symbol component, 
                             const symbol name, 
                             const symbol description)
-  : Declare (component, name, description)
+  : Declare (component, name, description),
+    super (root_name ())
 { }
 
 DeclareModel::~DeclareModel ()

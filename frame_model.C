@@ -120,7 +120,7 @@ FrameModel::FrameModel (const FrameModel& p,
 FrameModel::FrameModel (const Declare& declare)
   // Declared.
   : Frame (),
-    parent_ (NULL),
+    parent_ (declare.parent_model ()),
     builder (NULL),
     declaration (dynamic_cast<const DeclareModel*> (&declare))
 { declare.load (*this); }

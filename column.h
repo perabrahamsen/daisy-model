@@ -157,7 +157,6 @@ public:
 protected:
   explicit Column (Block&);
 public:
-  static void load_syntax (Syntax&, AttributeList&);
   virtual bool initialize (Block&, const Output&, const Time&,
                            const Weather*, const Scope&) = 0;
   virtual void summarize (Treelog& msg) const = 0;
