@@ -1315,7 +1315,7 @@ im${OBJ}: im.C im.h symbol.h syntax.h value.h chemical.h model.h alist.h \
   units.h unit.h am.h log.h time.h border.h block.h plf.h check.h \
   assertion.h frame.h scope.h
 frame${OBJ}: frame.C frame.h syntax.h value.h symbol.h scope.h alist.h \
-  block.h plf.h
+  block.h plf.h assertion.h
 bdconv${OBJ}: bdconv.C bdconv.h convert.h symbol.h geometry.h syntax.h \
   value.h mathlib.h assertion.h soil.h volume.h model.h alist.h units.h
 abiotic${OBJ}: abiotic.C abiotic.h mathlib.h assertion.h
@@ -1326,7 +1326,7 @@ run${OBJ}: run.C run.h model.h symbol.h alist.h
 treelog_text${OBJ}: treelog_text.C treelog_text.h treelog.h symbol.h \
   assertion.h
 treelog_store${OBJ}: treelog_store.C treelog_store.h treelog.h symbol.h \
-  assertion.h memutils.h
+  assertion.h memutils.h treelog_text.h
 intrinsics${OBJ}: intrinsics.C intrinsics.h symbol.h assertion.h library.h \
   memutils.h frame_model.h frame.h syntax.h value.h scope.h
 metalib${OBJ}: metalib.C metalib.h symbol.h frame.h syntax.h value.h scope.h \
