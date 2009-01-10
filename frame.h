@@ -172,13 +172,13 @@ public:
 
   void add_library (const symbol, symbol lib);
 
-  typedef void (*load_syntax_fun) (Syntax& syntax, AttributeList& alist);
-  void add_submodule (const symbol name, AttributeList& alist,
+  typedef void (*load_syntax_t) (Syntax& syntax, AttributeList& alist);
+  void add_submodule (const symbol name, 
 		      Value::category cat, const symbol description,
-		      load_syntax_fun load_syntax);
+		      load_syntax_t load_syntax);
   void add_submodule_sequence (const symbol name, Value::category cat, 
 			       const symbol description,
-			       load_syntax_fun load_syntax);
+			       load_syntax_t load_syntax);
 
   // Additional type constraints for a single attribute value. 
   void add_check (const symbol name, const VCheck& vcheck);
@@ -246,6 +246,7 @@ public:
   void add (symbol, double);
   void add (symbol, double, symbol);
   void add (symbol, symbol);
+  void add (symbol, const char*); // Avoid matching bool...
   void add (symbol, bool);
   void add (symbol, int);
   void add (symbol, const AttributeList&);
@@ -266,9 +267,10 @@ protected:
   Frame ();
 public:
   Frame (const Syntax&, const AttributeList&); // Old style.
-  typedef void load_syntax_t (Syntax&, AttributeList&);
+  typedef void load_frame_t (Frame&);
+  Frame (load_frame_t);
+  virtual void reset (load_frame_t);
   Frame (load_syntax_t);
-  virtual void reset (load_syntax_t);
   virtual ~Frame ();
 };
 

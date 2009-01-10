@@ -406,6 +406,13 @@ Syntax::library (const Metalib& metalib, const symbol key) const
   return metalib.library (impl->libraries[key]);
 }
 
+symbol 
+Syntax::component (const symbol key) const
+{
+  daisy_assert (impl->libraries.find (key) != impl->libraries.end ());
+  return impl->libraries[key];
+}
+
 int
 Syntax::size (const symbol key) const
 {

@@ -68,8 +68,8 @@ public:
 
   // Create and Destroy.
 public:
-  void reset (load_syntax_t);
-  explicit Metalib (load_syntax_t);
+  void reset (load_frame_t);
+  explicit Metalib (load_frame_t);
   ~Metalib ();
 };
 

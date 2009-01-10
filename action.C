@@ -23,7 +23,7 @@
 
 #include "action.h"
 #include "block.h"
-#include "librarian.h"
+#include "declare.h"
 
 const char *const Action::component = "action";
 
@@ -65,8 +65,15 @@ Action::Action (Block&, const AttributeList& al)
 Action::~Action ()
 { }
 
-static Librarian Action_init (Action::component, "\
+static struct ActionInit : public DeclareComponent
+{
+  ActionInit ()
+    : DeclareComponent (Action::component, "\
 The 'action' component represents management on different abstraction\n\
 levels, from a single tillage operation to strategies of how to manage\n\
 a farm.  Typically, but not necessarily, the high level management\n\
-strategies are build by combining low level management operations.");
+strategies are build by combining low level management operations.")
+  { }
+} Action_init;
+
+// action.C ends here.

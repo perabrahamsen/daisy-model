@@ -37,7 +37,6 @@ class Harvest;
 class Weather;
 class Log;
 class Field;
-class Syntax;
 class Treelog;
 class Output;
 class Condition;
@@ -45,6 +44,7 @@ class Timestep;
 class Metalib;
 class Scopesel;
 class Scope;
+class Frame;
 
 class Daisy : public Program
 {
@@ -97,7 +97,7 @@ private:
 public:
   void initialize (Block&);
   bool check (Treelog& err);
-  static void load_syntax (Syntax&, AttributeList&);
+  static void load_syntax (Frame&);
   explicit Daisy (Block&);
 private:
   void summarize (Treelog&) const;

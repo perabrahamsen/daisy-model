@@ -72,6 +72,7 @@ public:
   Value::type lookup (symbol) const;
   const Syntax& syntax (symbol) const;
   ::Library& library (const Metalib&, symbol) const;
+  symbol component (symbol) const;
   int  size (symbol) const;
   symbol dimension (symbol) const;
   symbol domain (symbol) const;

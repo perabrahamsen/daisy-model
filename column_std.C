@@ -961,14 +961,14 @@ amount of humus and clay in the top horizon is above 5%.");
     frame.add_object ("scope", Scopesel::component, 
 		       Value::Const, Value::Singleton, "\
 Scope to evaluate expessions in.");
-    frame.add ("scope", Scopesel::default_model ());
-    frame.add_submodule ("Soil", frame.alist (), Value::State,
+    frame.add ("scope", "null");
+    frame.add_submodule ("Soil", Value::State,
                           "The numeric and physical soil properties.",
                           Soil::load_syntax);
-    frame.add_submodule ("SoilWater", frame.alist (), Value::State,
+    frame.add_submodule ("SoilWater", Value::State,
                           "Soil water content and transportation.",
                           load_water_and_macro);
-    frame.add_submodule ("SoilHeat", frame.alist (), Value::State,
+    frame.add_submodule ("SoilHeat", Value::State,
                           "Soil heat capacity and transportation.",
                           SoilHeat::load_syntax);
     frame.add_object ("Movement", Movement::component,
@@ -988,7 +988,7 @@ the simulation.  If unspecified, used global weather.");
                        Value::State, Value::Singleton,
                        "The water and energy distribution among the crops.");
     frame.add ("Bioclimate", Bioclimate::default_model ());
-    frame.add_submodule ("Surface", frame.alist (), Value::State,
+    frame.add_submodule ("Surface", Value::State,
                           "The upper border of the soil.",
                           Surface::load_syntax);
     frame.add_object ("Groundwater", Groundwater::component,

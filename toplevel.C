@@ -66,9 +66,9 @@ struct Toplevel::Implementation : boost::noncopyable
   bool has_daisy_log;
   void add_daisy_log ();
 
-  void reset (Metalib::load_syntax_fun load_syntax);
+  void reset (Metalib::load_frame_t load_syntax);
 
-  Implementation (Metalib::load_syntax_fun load_syntax, 
+  Implementation (Metalib::load_frame_t load_syntax, 
                   const std::string& preferred_ui);
   ~Implementation ();
 };
@@ -166,7 +166,7 @@ Toplevel::Implementation::add_daisy_log ()
 }
 
 void
-Toplevel::Implementation::reset (const Metalib::load_syntax_fun load_syntax)
+Toplevel::Implementation::reset (const Metalib::load_frame_t load_syntax)
 {
   program.reset (NULL);
   start_time = std::time (NULL);
@@ -175,7 +175,7 @@ Toplevel::Implementation::reset (const Metalib::load_syntax_fun load_syntax)
   files_found.clear ();
 }
 
-Toplevel::Implementation::Implementation (Metalib::load_syntax_fun load_syntax,
+Toplevel::Implementation::Implementation (Metalib::load_frame_t load_syntax,
                                           const std::string& pref_ui)
   : preferred_ui (pref_ui),
     program_name ("daisy"),
@@ -701,13 +701,13 @@ attributes.");
 }
 
 void
-Toplevel::load_syntax (Syntax& syntax, AttributeList& alist)
+Toplevel::load_syntax (Frame& frame)
 {
   // Top level Daisy syntax.
-  Daisy::load_syntax (syntax, alist);
-  alist.add ("type", "Daisy");
-  Librarian::load_syntax (syntax, alist);
-  load_run (syntax, alist);
+  Daisy::load_syntax (frame);
+  frame.alist ().add ("type", "Daisy");
+  Librarian::load_syntax (frame.syntax (), frame.alist ());
+  load_run (frame.syntax (), frame.alist ());
 }
 
 Toplevel::Toplevel (const std::string& preferred_ui)

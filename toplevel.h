@@ -32,6 +32,7 @@ class Program;
 class Syntax;
 class AttributeList;
 class Treelog;
+class Frame;
 
 #ifdef __GNUC__
 #define NORETURN __attribute__ ((noreturn))
@@ -108,7 +109,7 @@ public:
   void parse_system_file (const std::string&);
   static void load_run (Syntax&, AttributeList&);
 private:
-  static void load_syntax (Syntax&, AttributeList&);
+  static void load_syntax (Frame&);
 public:
   Toplevel (const std::string& preferred_ui);
   ~Toplevel ();

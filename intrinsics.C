@@ -119,7 +119,9 @@ Intrinsics::instantiate (const symbol component, const symbol model) const
   declare_lib_map_t::iterator j = libd.find (model);
   if (j == libd.end ())
     {
-      daisy_assert (library.check (model));
+      if (!library.check (model))
+        daisy_panic ("Intrinsic model '" + model
+                     + "' not declared in component '" + component + "'");
       return;
     }
 
@@ -128,7 +130,9 @@ Intrinsics::instantiate (const symbol component, const symbol model) const
 
   if (decls.size () == 0)
     {
-      daisy_assert (library.check (model));
+      if (!library.check (model))
+        daisy_panic ("Intrinsic model '" + model
+                     + "' not found for component '" + component + "'");
       return;
     }
   daisy_assert (decls.size () == 1);

@@ -24,6 +24,9 @@
 #include "alist.h"
 #include "block.h"
 #include "assertion.h"
+#include "librarian.h"
+#include "intrinsics.h"
+#include "library.h"
 
 struct Frame::Implementation
 {
@@ -291,10 +294,10 @@ Frame::add_library (const symbol key, symbol lib)
 
 
 void 
-Frame::add_submodule (const symbol name, AttributeList& alist,
+Frame::add_submodule (const symbol name, 
 		      Value::category cat, const symbol description,
 		      Syntax::load_syntax_fun load_syntax)
-{ impl->syntax.add_submodule (name, alist, cat, description, load_syntax); }
+{ impl->syntax.add_submodule (name, alist (), cat, description, load_syntax); }
 
 void 
 Frame::add_submodule_sequence (const symbol name, Value::category cat, 
@@ -573,9 +576,23 @@ Frame::add (const symbol key, double value, const symbol dim)
 void 
 Frame::add (const symbol key, const symbol name)
 {
+  if (lookup (key) == Value::Object)
+    {
+      const symbol component = impl->syntax.component (key);
+      const Intrinsics& intrinsics = Librarian::intrinsics ();
+      intrinsics.instantiate (component, name);
+      AttributeList alist (intrinsics.library (component).lookup (name));
+      alist.add ("type", name);
+      impl->alist.add (key, alist);
+      return;
+    }
   verify (key, Value::String);
   impl->alist.add (key, name); 
 }
+
+void 
+Frame::add (const symbol key, const char *const name)
+{ add (key, symbol (name)); }
 
 void 
 Frame::add (const symbol key, bool value)
@@ -705,16 +722,20 @@ Frame::Frame (const Syntax& s, const AttributeList& a)
   : impl (new Implementation (s, a))
 { }
 
+Frame::Frame (load_frame_t load_syntax)
+  : impl (new Implementation ())
+{ load_syntax (*this); }
+
+void 
+Frame::reset (load_frame_t load_syntax)
+{
+  impl.reset (new Implementation ()); 
+  load_syntax (*this); 
+}
+
 Frame::Frame (load_syntax_t load_syntax)
   : impl (new Implementation ())
 { load_syntax (impl->syntax, impl->alist); }
-
-void 
-Frame::reset (load_syntax_t load_syntax)
-{
-  impl.reset (new Implementation ()); 
-  load_syntax (impl->syntax, impl->alist); 
-}
 
 Frame::~Frame ()
 { }

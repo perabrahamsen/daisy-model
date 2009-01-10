@@ -48,6 +48,7 @@
 #include "librarian.h"
 #include "metalib.h"
 #include "treelog.h"
+#include "declare.h"
 #include <sstream>
 
 const char *const Daisy::default_description = "\
@@ -270,49 +271,49 @@ Daisy::Daisy (Block& al)
 { }
 
 void
-Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
+Daisy::load_syntax (Frame& frame)
 {
-  Model::load_model (syntax, alist);
-  alist.add ("description", default_description);
+  Model::load_model (frame.syntax (), frame.alist ());
+  frame.add ("description", default_description);
   
-  Output::load_syntax (syntax, alist);
-  syntax.add_object ("scope", Scopesel::component, 
+  Output::load_syntax (frame.syntax (), frame.alist ());
+  frame.add_object ("scope", Scopesel::component, 
 		     Value::Const, Value::Singleton, "\
 Scope to evaluate expessions in.");
-  alist.add ("scope", Scopesel::default_model ());
-  syntax.add_object ("print_time", Condition::component,
+  frame.add ("scope", "null");
+  frame.add_object ("print_time", Condition::component,
                      "Print simulation time whenever this condition is true.\n\
 The simulation time will also be printed whenever there are any news\n\
 to report, like emergence of crop or various management operations.\n\
 Good values for this parameter would be hourly, daily or monthly.");
-  alist.add ("print_time", Condition::periodic_model ());
+  frame.add ("print_time", Condition::periodic_model ());
 
-  syntax.add_object ("manager", Action::component, Value::State,
+  frame.add_object ("manager", Action::component, Value::State,
                      Value::Singleton,
                      "Specify the management operations to perform during\n\
 the simulation.");
-  syntax.add_submodule ("time", alist, Value::State,
+  frame.add_submodule ("time", Value::State,
 			"Current time in the simulation.", Time::load_syntax);
-  syntax.add_submodule ("timestep", alist, Value::OptionalState,
+  frame.add_submodule ("timestep", Value::OptionalState,
 			"Length of timestep in simlation.\n\
 The default value is 1 hour, anything else is unlikely to work.",
                         Timestep::load_syntax);
-  syntax.add_check ("timestep", Timestep::positive ());
-  syntax.add_submodule ("stop", alist, Value::OptionalConst,
+  frame.add_check ("timestep", Timestep::positive ());
+  frame.add_submodule ("stop", Value::OptionalConst,
 			"Latest time where the simulation stops.\n\
 By default, the simulation will run until the manager request it to stop.",
                         Time::load_syntax);
-  syntax.add_object ("column", Column::component, 
+  frame.add_object ("column", Column::component, 
                      Value::State, Value::Sequence,
                      "List of columns to use in this simulation.");
-  syntax.add_object ("weather", Weather::component,
+  frame.add_object ("weather", Weather::component,
                      Value::OptionalState, Value::Singleton,
                      "Weather model for providing climate information during\n\
 the simulation.  Can be overwritten by column specific weather.");
-  syntax.add_submodule_sequence ("harvest", Value::State, 
+  frame.add_submodule_sequence ("harvest", Value::State, 
 				 "Total list of all crop yields.",
 				 Harvest::load_syntax);
-  alist.add ("harvest", std::vector<const AttributeList*> ());
+  frame.add ("harvest", std::vector<const AttributeList*> ());
 }
 
 void
@@ -325,18 +326,20 @@ Daisy::summarize (Treelog& msg) const
 Daisy::~Daisy ()
 { }
 
-static struct ProgramDaisySyntax
+static struct ProgramDaisySyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new Daisy (al); }
+  Model* make (Block& al) const
+  { return new Daisy (al); }
   ProgramDaisySyntax ()
+    : DeclareModel (Program::component, "Daisy", 
+                    "A soil-crop-atmosphere simulation model.")
+  { }
+
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    Daisy::load_syntax (syntax, alist);
-    alist.add ("description", "A soil-crop-atmosphere simulation model.");
-    alist.add_strings ("cite", "daisy-def", "daisy-new", "daisy-fertilizer");
-    Librarian::add_type (Program::component, "Daisy", alist, syntax, &make);
+    Daisy::load_syntax (frame);
+    
+    frame.add_strings ("cite", "daisy-def", "daisy-new", "daisy-fertilizer");
   }
 } ProgramDaisy_syntax;
 

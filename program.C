@@ -22,7 +22,7 @@
 
 #include "program.h"
 #include "block.h"
-#include "librarian.h"
+#include "declare.h"
 
 const char *const Program::component = "program";
 
@@ -66,5 +66,12 @@ Program::Program (Block& al)
 Program::~Program ()
 { }
 
-static Librarian Program_init (Program::component, "\
-Run a program.");
+static struct ProgramInit : public DeclareComponent
+{
+  ProgramInit ()
+    : DeclareComponent (Program::component, "\
+Run a program.")
+  { }
+} Program_init;
+
+// program.C ends here.

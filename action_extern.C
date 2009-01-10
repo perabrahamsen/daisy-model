@@ -32,11 +32,12 @@
 #include "log.h"
 #include "treelog.h"
 #include "librarian.h"
-#include "syntax.h"
 #include "block.h"
 #include "check.h"
 #include "assertion.h"
 #include "units.h"
+#include "frame.h"
+#include "declare.h"
 #include <memory>
 
 struct ActionExtern : public Action
@@ -105,25 +106,23 @@ struct ActionExtern : public Action
   { }
 };
 
-static struct ActionExternSyntax
+static struct ActionExternSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ActionExtern (al); }
+  Model* make (Block& al) const
+  { return new ActionExtern (al); }
   ActionExternSyntax ()
+    : DeclareModel (Action::component, "extern", "\
+Select an external scope, and perform action.")
+  { }
+  
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
-Select an external scope, and perform action.");
-
-    syntax.add_object ("scope", Scopesel::component, 
+    frame.add_object ("scope", Scopesel::component, 
                        Value::Const, Value::Singleton, "\
 Scope to evaluate expessions in.");
-    syntax.add_object ("action", Action::component, 
+    frame.add_object ("action", Action::component, 
                        "Action to perform if the condition is false.");
-    syntax.order ("scope", "action");
-
-    Librarian::add_type (Action::component, "extern", alist, syntax, &make);
+    frame.order ("scope", "action");
   }
 } ActionExtern_syntax;
 
@@ -282,7 +281,7 @@ const symbol
 ActionExternFertigation::mm_per_h ("mm/h");
 
 
-static struct ActionExternFertigationSyntax
+static struct ActionExternFertigationSyntax : public DeclareModel
 {
   static bool check_alist (const AttributeList& al, Treelog& err)
   { 
@@ -298,51 +297,48 @@ static struct ActionExternFertigationSyntax
     return ok;
   }
 
-  static Model& make (Block& al)
-  { return *new ActionExternFertigation (al); }
+  Model* make (Block& al) const
+  { return new ActionExternFertigation (al); }
+
   ActionExternFertigationSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    syntax.add_check (check_alist);	
-    
-    alist.add ("description", "\
+    : DeclareModel (Action::component, "extern_fertigation", "\
 Continiues irrigation with mineral nitrogen mix.\n\
 \n\
 If the nitrogen amount is non-zero, it will be applied in the\n\
 irrigation water if available, and otherwise be spread on the soil\n\
-surface.");
-
-    syntax.add_object ("scope", Scopesel::component, 
+surface.")
+  { }
+  
+  void load_frame (Frame& frame) const
+  {
+    frame.add_check (check_alist);	
+    frame.add_object ("scope", Scopesel::component, 
                        Value::Const, Value::Singleton, "\
 Scope to evaluate expessions in.");
-    alist.add ("scope", Scopesel::default_model ());
+    frame.add ("scope", "null");
 
-    syntax.add_object ("surface", Number::component, 
+    frame.add_object ("surface", Number::component, 
 		       Value::Const, Value::Singleton, 
 "Amount of surface irrigation applied.");
-    syntax.add_object ("overhead", Number::component, 
+    frame.add_object ("overhead", Number::component, 
 		       Value::Const, Value::Singleton, 
 "Amount of overhead irrigation applied.");
-    syntax.add_object ("subsoil", Number::component, 
+    frame.add_object ("subsoil", Number::component, 
 		       Value::Const, Value::Singleton, 
 "Amount of subsoil irrigation applied.");
-    syntax.add_object ("NO3", Number::component, 
+    frame.add_object ("NO3", Number::component, 
 		       Value::Const, Value::Singleton, 
 "Amount of NO3 in irrigation.");
-    syntax.add_object ("NH4", Number::component, 
+    frame.add_object ("NH4", Number::component, 
 		       Value::Const, Value::Singleton, 
 "Amount of NH4 in irrigation.");
 
-    syntax.add ("from", "cm", Check::non_positive (), Value::Const, "\
+    frame.add ("from", "cm", Check::non_positive (), Value::Const, "\
 Height where you want to start the incorporation (a negative number).");
-    alist.add ("from", 0.0);
-    syntax.add ("to", "cm", Check::negative (), Value::Const, "\
+    frame.add ("from", 0.0);
+    frame.add ("to", "cm", Check::negative (), Value::Const, "\
 Height where you want to end the incorporation (a negative number).");
-    alist.add ("from", -10.0);
-
-    Librarian::add_type (Action::component, "extern_fertigation",
-			 alist, syntax, &make);
+    frame.add ("from", -10.0);
   }
 } ActionExternFertigation_syntax;
 

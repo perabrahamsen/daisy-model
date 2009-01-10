@@ -25,9 +25,9 @@
 #include "assertion.h"
 #include "output.h"
 #include "block.h"
-#include "alist.h"
-#include "librarian.h"
 #include "treelog.h"
+#include "declare.h"
+#include "frame.h"
 
 const char *const Scopesel::component = "scopesel";
 
@@ -80,21 +80,21 @@ public:
   { }
 };
 
-static struct ScopeselNameSyntax
+static struct ScopeselNameSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ScopeselName (al); }
+  Model* make (Block& al) const
+  { return new ScopeselName (al); }
+
+  void load_frame (Frame& frame) const
+  { 
+    frame.add ("frame", Value::String, Value::Const,
+               "Name of scope to select.");
+    frame.order ("name");
+  }
 
   ScopeselNameSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Select named scope.");
-    syntax.add ("name", Value::String, Value::Const,
-                "Name of scope to select.");
-    syntax.order ("name");
-    Librarian::add_type (Scopesel::component, "name", alist, syntax, &make);
-  }
+    : DeclareModel (Scopesel::component, "name", "Select named scope.")
+  { }
 } ScopeselName_syntax;
 
 class ScopeselNull : public Scopesel
@@ -110,33 +110,27 @@ public:
   { }
 };
 
-static struct ScopeselNullSyntax
+static struct ScopeselNullSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ScopeselNull (al); }
+  Model* make (Block& al) const
+  { return new ScopeselNull (al); }
+
+  void load_frame (Frame&) const
+  { }
 
   ScopeselNullSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Select the empty scope.");
-    Librarian::add_type (Scopesel::component, "null", alist, syntax, &make);
-  }
+    : DeclareModel (Scopesel::component, "null", "Select the empty scope.")
+  { }
 } ScopeselNull_syntax;
 
 
-const AttributeList&
-Scopesel::default_model ()
-{
-  static AttributeList alist;
-  if (!alist.check ("type"))
-    alist.add ("type", "null");
-
-  return alist;
-}
-
-static Librarian Scopesel_init (Scopesel::component, "\
-A method to choose a scope in a Daisy simulation.");
+static struct ScopeselInit : public DeclareComponent
+{ 
+  ScopeselInit ()
+    : DeclareComponent (Scopesel::component, "\
+A method to choose a scope in a Daisy simulation.")
+  { }
+} Scopesel_init;
 
 // scopesel.C ends here
 
