@@ -30,7 +30,11 @@
 
 namespace Assertion
 {
-  std::vector<Treelog*> logs;
+  std::vector<Treelog*>& logs ()
+  {
+    static std::vector<Treelog*> logs;
+    return logs;
+  }
 }
 
 void 
@@ -38,13 +42,13 @@ Assertion::message (const std::string& msg)
 {
   static std::ios_base::Init init;   // Can be called from static constructor.
 
-  if (logs.size () == 0)
+  if (logs ().size () == 0)
     std::cout << msg;
 
-  for (unsigned int i = 0; i < logs.size (); i++)
+  for (unsigned int i = 0; i < logs ().size (); i++)
     {
-      logs[i]->message (msg);
-      logs[i]->flush ();
+      logs ()[i]->message (msg);
+      logs ()[i]->flush ();
     }
 }
 
@@ -53,13 +57,13 @@ Assertion::error (const std::string& msg)
 {
   static std::ios_base::Init init;   // Can be called from static constructor.
 
-  if (logs.size () == 0)
+  if (logs ().size () == 0)
     std::cerr << msg << "\n";
   
-  for (unsigned int i = 0; i < logs.size (); i++)
+  for (unsigned int i = 0; i < logs ().size (); i++)
     {
-      logs[i]->error (msg);
-      logs[i]->flush ();
+      logs ()[i]->error (msg);
+      logs ()[i]->flush ();
     }
 }
 
@@ -68,13 +72,13 @@ Assertion::warning (const std::string& msg)
 {
   static std::ios_base::Init init;   // Can be called from static constructor.
 
-  if (logs.size () == 0)
+  if (logs ().size () == 0)
     std::cerr << msg << "\n";
 
-  for (unsigned int i = 0; i < logs.size (); i++)
+  for (unsigned int i = 0; i < logs ().size (); i++)
     {
-      logs[i]->warning (msg);
-      logs[i]->flush ();
+      logs ()[i]->warning (msg);
+      logs ()[i]->flush ();
     }
 }
 
@@ -83,13 +87,13 @@ Assertion::debug (const std::string& msg)
 {
   static std::ios_base::Init init;   // Can be called from static constructor.
 
-  if (logs.size () == 0)
+  if (logs ().size () == 0)
     std::cerr << msg << "\n";
 
-  for (unsigned int i = 0; i < logs.size (); i++)
+  for (unsigned int i = 0; i < logs ().size (); i++)
     {
-      logs[i]->debug (msg);
-      logs[i]->flush ();
+      logs ()[i]->debug (msg);
+      logs ()[i]->flush ();
     }
 }
 
@@ -104,7 +108,7 @@ Assertion::failure (const char* file, int line, const char* fun,
   
   error (tmp.str ());
 
-  if (logs.size () == 0)
+  if (logs ().size () == 0)
     // Windows dislike throw in static constructors.
     exit (4);
   else
@@ -141,7 +145,7 @@ Assertion::panic (const char* file, int line, const char* fun,
 		  const std::string& msg)
 {
   bug (file, line, fun, msg);
-  if (logs.size () == 0)
+  if (logs ().size () == 0)
     // Windows dislike throw in static constructors.
     exit (6);
   else
@@ -200,17 +204,21 @@ Assertion::balance (const char* file, int line, const char* fun,
 Assertion::Register::Register (Treelog& log)
   : treelog (log)
 {
-  for (unsigned int i = 0; i < logs.size (); i++)
-    daisy_assert (&log != logs[i]);
+  for (unsigned int i = 0; i < logs ().size (); i++)
+    daisy_assert (&log != logs ()[i]);
 
-  logs.push_back (&log);
+  logs ().push_back (&log);
 }
 
 Assertion::Register::~Register ()
 {
-  daisy_assert (find (logs.begin (), logs.end (), &treelog) != logs.end ());
-  logs.erase (find (logs.begin (), logs.end (), &treelog));
-  daisy_assert (find (logs.begin (), logs.end (), &treelog) == logs.end ());
+  daisy_assert (find (logs ().begin (), 
+                      logs ().end (),
+                      &treelog)
+                != logs ().end ());
+  logs ().erase (find (logs ().begin (), logs ().end (), &treelog));
+  daisy_assert (find (logs ().begin (), logs ().end (), &treelog)
+                == logs ().end ());
 }
 
 // assertion.C ends here.

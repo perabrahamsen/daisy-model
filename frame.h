@@ -240,27 +240,25 @@ public:
   /**/ alist_sequence (const symbol key) const;
 
   // Set attribute values.
+private:
+  void verify (symbol key, Value::type want, int size = Value::Singleton);
 public:
-  void add (const symbol, double);
-  void add (const symbol, double, const symbol);
-  void add (const symbol, const char*);
-  void add (const symbol, const symbol);
-  void add (const symbol, bool);
-  void add (const symbol, int);
-  void add (const symbol, const AttributeList&);
-  void add (const symbol, const PLF&);
-  void add (const symbol, const std::vector<double>&);
-  void add (const symbol, const std::vector<symbol>&);
-  void add_strings (const symbol key, const symbol a);
-  void add_strings (const symbol key,
-                    const symbol a, const symbol b);
-  void add_strings (const symbol key,
-                    const symbol a, const symbol b,
-                    const symbol c);
-  void add (const symbol, const std::vector<bool>&);
-  void add (const symbol, const std::vector<int>&);
-  void add (const symbol, const std::vector<const AttributeList*>&);
-  void add (const symbol, const std::vector<const PLF*>&);
+  void add (symbol, double);
+  void add (symbol, double, symbol);
+  void add (symbol, symbol);
+  void add (symbol, bool);
+  void add (symbol, int);
+  void add (symbol, const AttributeList&);
+  void add (symbol, const PLF&);
+  void add (symbol, const std::vector<double>&);
+  void add (symbol, const std::vector<symbol>&);
+  void add_strings (symbol key, symbol a);
+  void add_strings (symbol key, symbol a, symbol b);
+  void add_strings (symbol key, symbol a, symbol b, symbol c);
+  void add (symbol, const std::vector<bool>&);
+  void add (symbol, const std::vector<int>&);
+  void add (symbol, const std::vector<const AttributeList*>&);
+  void add (symbol, const std::vector<const PLF*>&);
 
   // Create and Destroy.
 protected:

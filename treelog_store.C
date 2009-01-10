@@ -23,6 +23,7 @@
 #include "treelog_store.h"
 #include "assertion.h"
 #include "memutils.h"
+#include "treelog_text.h"
 #include <vector>
 
 class TreelogStore::Implementation
@@ -158,6 +159,11 @@ public:
   { }
   ~Implementation ()
   { 
+    // Handle case where no log has been attached yet.
+    if (!closed && client.size () == 0)
+      add_client (new TreelogProgress ());
+      
+    // Close all.
     while (level > 0)
       close (); 
   }

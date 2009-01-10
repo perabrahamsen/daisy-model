@@ -29,7 +29,7 @@
 void 
 Declare::load (Frame& frame) const
 {
-  frame.add ("description", description);
+  frame.alist ().add ("description", description);
   load_frame (frame);
 }
 

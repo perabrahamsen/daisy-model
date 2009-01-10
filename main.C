@@ -29,46 +29,54 @@
 int
 main (int argc, char* argv[])
 {
-  Toplevel toplevel ("progress");
-  try
+  try 
     {
-      // toplevel.set_ui_progress ();
-      toplevel.command_line (argc, argv);
-      toplevel.user_interface ();
-
-      switch (toplevel.state ())
+      Toplevel toplevel ("progress");
+      try
         {
-        case Toplevel::is_unloaded:
-        case Toplevel::is_uninitialized:
-        case Toplevel::is_ready:
-        case Toplevel::is_done:
-          throw EXIT_SUCCESS;
-        case Toplevel::is_running:
-          toplevel.error ("Aborted while simulation was running");
-          throw EXIT_FAILURE;
-        case Toplevel::is_error:
+          // toplevel.set_ui_progress ();
+          toplevel.command_line (argc, argv);
+          toplevel.user_interface ();
+
+          switch (toplevel.state ())
+            {
+            case Toplevel::is_unloaded:
+            case Toplevel::is_uninitialized:
+            case Toplevel::is_ready:
+            case Toplevel::is_done:
+              throw EXIT_SUCCESS;
+            case Toplevel::is_running:
+              toplevel.error ("Aborted while simulation was running");
+              throw EXIT_FAILURE;
+            case Toplevel::is_error:
+              throw EXIT_FAILURE;
+            }
+          toplevel.error ("Program ended with unknown state");
           throw EXIT_FAILURE;
         }
-      toplevel.error ("Program ended with unknown state");
-      throw EXIT_FAILURE;
-    }
-  catch (const char* error)
-    { toplevel.error (std::string ("Exception: ") + error); }
-  catch (const std::string& error)
-    { toplevel.error (std::string ("Exception raised: ") + error); }
-  catch (const std::exception& e)
-    {
-      toplevel.error (std::string ("Standard exception: ") + typeid (e).name ()
-		     + ": " + e.what ());
+      catch (const char* error)
+        { toplevel.error (std::string ("Exception: ") + error); }
+      catch (const std::string& error)
+        { toplevel.error (std::string ("Exception raised: ") + error); }
+      catch (const std::exception& e)
+        {
+          toplevel.error (std::string ("Standard exception: ") 
+                          + typeid (e).name () + ": " + e.what ());
+        }
+      catch (const int exit_code)
+        {
+          // The program already reported the error, just exit.
+          return exit_code;
+        }
+      catch (...)
+        {
+          toplevel.error ("Unknown exception");
+        }
     }
   catch (const int exit_code)
     {
-      // The program already reported the error, just exit.
+      // Error in Toplevel constructor.
       return exit_code;
-    }
-  catch (...)
-    {
-      toplevel.error ("Unknown exception");
     }
   return EXIT_FAILURE;
 }

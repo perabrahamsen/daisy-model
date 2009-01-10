@@ -23,6 +23,7 @@
 #include "frame.h"
 #include "alist.h"
 #include "block.h"
+#include "assertion.h"
 
 struct Frame::Implementation
 {
@@ -538,76 +539,159 @@ Frame::alist_sequence (const symbol key) const
 }
 
 void 
+Frame::verify (const symbol key, const Value::type want, 
+               const int value_size)
+{ 
+  Value::type has = lookup (key);
+  if (has != want)
+    daisy_panic ("'" + key + "' is " + Value::type_name (has) 
+                 + ", should be " + Value::type_name (want));
+  int type_size = size (key);
+  if (type_size == Value::Sequence)
+    {
+      if (value_size == Value::Singleton)
+        daisy_panic ("'" + key + "' is a singleton, should be a sequence");
+    }
+  else if (type_size != value_size)
+    daisy_panic ("Size of value does not match type for '" + key + "'");
+}
+
+void 
 Frame::add (const symbol key, double value)
-{ impl->alist.add (key, value); }
+{ 
+  verify (key, Value::Number);
+  impl->alist.add (key, value); 
+}
 
 void 
 Frame::add (const symbol key, double value, const symbol dim)
-{ impl->alist.add (key, value, dim); }
-
-void 
-Frame::add (const symbol key, const char* name)
-{ impl->alist.add (key, name); }
+{
+  verify (key, Value::Number);
+  impl->alist.add (key, value, dim); 
+}
 
 void 
 Frame::add (const symbol key, const symbol name)
-{ impl->alist.add (key, name); }
+{
+  verify (key, Value::String);
+  impl->alist.add (key, name); 
+}
 
 void 
 Frame::add (const symbol key, bool value)
-{ impl->alist.add (key, value); }
+{
+  verify (key, Value::Boolean);
+  impl->alist.add (key, value); 
+}
 
 void 
 Frame::add (const symbol key, int value)
-{ impl->alist.add (key, value); }
+{
+  verify (key, Value::Integer);
+  impl->alist.add (key, value); 
+}
 
 void 
 Frame::add (const symbol key, const AttributeList& value)
-{ impl->alist.add (key, value); }
+{
+  verify (key, value.check ("type") ? Value::Object : Value::AList);
+  impl->alist.add (key, value); 
+}
 
 void 
 Frame::add (const symbol key, const PLF& value)
-{ impl->alist.add (key, value); }
+{
+  verify (key, Value::PLF);
+  impl->alist.add (key, value); 
+}
 
 void 
 Frame::add (const symbol key, const std::vector<double>& value)
-{ impl->alist.add (key, value); }
+{
+  verify (key, Value::Number, value.size ());
+  impl->alist.add (key, value); 
+}
 
 void 
 Frame::add (const symbol key, const std::vector<symbol>& value)
-{ impl->alist.add (key, value); }
+{
+  verify (key, Value::String, value.size ());
+  impl->alist.add (key, value); 
+}
 
 void 
 Frame::add_strings (const symbol key, const symbol a)
-{ impl->alist.add_strings (key, a); }
+{
+  verify (key, Value::String, 1);
+  impl->alist.add_strings (key, a); 
+}
 
 void 
 Frame::add_strings (const symbol key,
                     const symbol a, const symbol b)
-{ impl->alist.add_strings (key, a, b); }
+{
+  verify (key, Value::String, 2);
+  impl->alist.add_strings (key, a, b); 
+}
 
 void 
 Frame::add_strings (const symbol key,
-                    const symbol a, const symbol b,
-                    const symbol c)
-{ impl->alist.add_strings (key, a, b, c); }
+                    const symbol a, const symbol b, const symbol c)
+{
+  verify (key, Value::String, 3);
+  impl->alist.add_strings (key, a, b, c); 
+}
 
 void 
 Frame::add (const symbol key, const std::vector<bool>& value)
-{ impl->alist.add (key, value); }
+{
+  verify (key, Value::Boolean, value.size ());
+  impl->alist.add (key, value); 
+}
 
 void 
 Frame::add (const symbol key, const std::vector<int>& value)
-{ impl->alist.add (key, value); }
+{
+  verify (key, Value::Integer, value.size ());
+  impl->alist.add (key, value); 
+}
 
 void 
 Frame::add (const symbol key, 
             const std::vector<const AttributeList*>& value)
-{ impl->alist.add (key, value); }
+{
+  const int value_size = value.size ();
+  int type_count = 0;
+  for (size_t i = 0; i < value_size; i++)
+    if (value[i]->check ("type"))
+      type_count++;
+
+  if (value_size == 0)
+    {
+      Value::type has = lookup (key);
+      if (has != Value::AList && has != Value::Object)
+        daisy_panic ("'" + key + "' value is " + Value::type_name (has) 
+                     + ", should be " + Value::type_name (Value::AList)
+                     + " or " + Value::type_name (Value::Object));
+    }
+  else if (type_count == 0)
+    verify (key, Value::AList, value_size);
+  else if (type_count == value_size)
+    verify (key, Value::Object, value_size);
+  else
+    daisy_panic ("'" + key + "' value is mixture of "
+                 + Value::type_name (Value::AList)
+                 + " and " + Value::type_name (Value::Object));
+    
+  impl->alist.add (key, value); 
+}
 
 void 
 Frame::add (const symbol key, const std::vector<const PLF*>& value)
-{ impl->alist.add (key, value); }
+{
+  verify (key, Value::PLF, value.size ());
+  impl->alist.add (key, value); 
+}
 
 Frame::Frame (const Frame& old)
   : impl (new Implementation (*old.impl))
