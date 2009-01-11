@@ -485,7 +485,7 @@ SPECIALS = weather_base.C \
 
 # Various utility code that are neither a component nor a (sub)model.
 # 
-OTHER = declare.C submodeler.C \
+OTHER = submodeler.C \
 	frame_model.C scope.C value.C unit.C border.C resistance.C \
 	convert.C units.C tertsmall.C anystate.C imvec.C im.C frame.C \
 	bdconv.C abiotic.C scope_soil.C run.C treelog_text.C treelog_store.C \
@@ -572,7 +572,7 @@ EXECUTABLES = daisy${EXE} tkdaisy${EXE} cdaisy${EXE} gdaisy${EXE}
 
 # Select files to be removed by the next svn update.
 #
-REMOVE = colloids_MACRO.C colloids.C colloids.h
+REMOVE = declare.C declare.h
 
 REMOVED = msoltranrect_2x1.C msoltranrect_forward.C\
 	select_soil.C adsorption_none.C adsorption_full.C ABAprod_expr.C \
@@ -996,7 +996,7 @@ reaction${OBJ}: reaction.C reaction.h model.h symbol.h alist.h block.h \
   syntax.h value.h plf.h librarian.h
 scopesel${OBJ}: scopesel.C scopesel.h model.h symbol.h alist.h scope.h \
   value.h assertion.h output.h condition.h memutils.h time.h block.h \
-  syntax.h plf.h treelog.h declare.h librarian.h frame.h
+  syntax.h plf.h treelog.h librarian.h frame.h
 ABAeffect${OBJ}: ABAeffect.C ABAeffect.h model.h symbol.h alist.h mathlib.h \
   assertion.h block.h syntax.h value.h plf.h librarian.h
 transport${OBJ}: transport.C transport.h model.h symbol.h alist.h chemical.h \
@@ -1047,7 +1047,7 @@ depth${OBJ}: depth.C depth.h model.h symbol.h alist.h block.h syntax.h \
 wse${OBJ}: wse.C wse.h model.h symbol.h alist.h block.h syntax.h value.h \
   plf.h program.h run.h mathlib.h assertion.h librarian.h treelog.h
 program${OBJ}: program.C program.h model.h symbol.h alist.h run.h block.h \
-  syntax.h value.h plf.h declare.h librarian.h
+  syntax.h value.h plf.h librarian.h
 number${OBJ}: number.C number.h symbol.h model.h alist.h block.h syntax.h \
   value.h plf.h librarian.h units.h assertion.h treelog.h
 domsorp${OBJ}: domsorp.C domsorp.h model.h symbol.h alist.h block.h syntax.h \
@@ -1089,12 +1089,12 @@ log${OBJ}: log.C log.h time.h border.h model.h symbol.h alist.h library.h \
 weather${OBJ}: weather.C weather.h model.h symbol.h alist.h im.h syntax.h \
   value.h block.h plf.h librarian.h
 column${OBJ}: column.C column.h model.h symbol.h alist.h block.h syntax.h \
-  value.h plf.h log.h time.h border.h declare.h librarian.h frame.h \
-  scope.h submodeler.h
+  value.h plf.h log.h time.h border.h librarian.h frame.h scope.h \
+  submodeler.h
 crop${OBJ}: crop.C crop.h model.h symbol.h alist.h time.h om.h plf.h block.h \
   syntax.h value.h mathlib.h assertion.h librarian.h
 action${OBJ}: action.C action.h model.h symbol.h alist.h block.h syntax.h \
-  value.h plf.h declare.h librarian.h
+  value.h plf.h librarian.h
 condition${OBJ}: condition.C condition.h model.h symbol.h alist.h block.h \
   syntax.h value.h plf.h librarian.h
 horizon${OBJ}: horizon.C horizon.h model.h symbol.h alist.h library.h block.h \
@@ -1289,13 +1289,11 @@ printer_file${OBJ}: printer_file.C printer_file.h printer.h model.h symbol.h \
   plf.h time.h parser.h path.h assertion.h librarian.h
 log_alist${OBJ}: log_alist.C log_alist.h log.h time.h border.h model.h \
   symbol.h alist.h library.h syntax.h value.h assertion.h
-declare${OBJ}: declare.C declare.h symbol.h librarian.h model.h alist.h \
-  frame.h syntax.h value.h scope.h intrinsics.h library.h
 submodeler${OBJ}: submodeler.C submodeler.h block.h syntax.h value.h symbol.h \
   plf.h frame.h scope.h alist.h
 frame_model${OBJ}: frame_model.C frame_model.h frame.h syntax.h value.h \
-  symbol.h scope.h block.h plf.h assertion.h treelog.h declare.h \
-  librarian.h model.h alist.h
+  symbol.h scope.h block.h plf.h assertion.h treelog.h librarian.h \
+  model.h alist.h
 scope${OBJ}: scope.C scope.h value.h symbol.h assertion.h
 value${OBJ}: value.C value.h symbol.h assertion.h
 unit${OBJ}: unit.C unit.h symbol.h
@@ -1392,7 +1390,7 @@ daisy${OBJ}: daisy.C daisy.h program.h model.h symbol.h alist.h run.h time.h \
   groundwater.h horizon.h output.h condition.h log.h border.h parser.h \
   nitrification.h bioclimate.h hydraulic.h field.h harvest.h block.h \
   plf.h action.h library.h submodeler.h column.h scope.h scopesel.h \
-  mathlib.h assertion.h librarian.h metalib.h frame.h treelog.h declare.h
+  mathlib.h assertion.h librarian.h metalib.h frame.h treelog.h
 alist${OBJ}: alist.C plf.h library.h symbol.h alist.h syntax.h value.h time.h \
   mathlib.h assertion.h memutils.h
 syntax${OBJ}: syntax.C syntax.h value.h symbol.h alist.h library.h metalib.h \
@@ -1563,7 +1561,7 @@ action_extern${OBJ}: action_extern.C action.h model.h symbol.h alist.h \
   scope_multi.h scope.h value.h scopesel.h number.h daisy.h program.h \
   run.h time.h timestep.h vcheck.h memutils.h field.h border.h am.h im.h \
   syntax.h chemical.h log.h treelog.h librarian.h block.h plf.h check.h \
-  assertion.h units.h frame.h declare.h
+  assertion.h units.h frame.h
 rubiscoNdist_expr${OBJ}: rubiscoNdist_expr.C rubiscoNdist.h model.h symbol.h \
   alist.h mathlib.h assertion.h block.h syntax.h value.h plf.h check.h \
   librarian.h number.h scope_exchange.h scope_model.h scope.h memutils.h \
@@ -1897,8 +1895,8 @@ column_std${OBJ}: column_std.C column.h model.h symbol.h alist.h library.h \
   groundwater.h geometry.h mathlib.h assertion.h soil.h soil_water.h \
   vegetation.h bioclimate.h weather.h im.h chemistry.h chemical.h \
   organic_matter.h am.h dom.h plf.h time.h log.h border.h submodeler.h \
-  block.h memutils.h librarian.h scope_multi.h scope.h scopesel.h units.h \
-  treelog.h declare.h frame.h
+  block.h memutils.h scope_multi.h scope.h scopesel.h units.h treelog.h \
+  librarian.h frame.h
 weather_simple${OBJ}: weather_simple.C weather_old.h weather_base.h weather.h \
   model.h symbol.h alist.h im.h syntax.h value.h block.h plf.h time.h \
   log.h border.h mathlib.h assertion.h librarian.h

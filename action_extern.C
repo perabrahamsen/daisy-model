@@ -37,7 +37,6 @@
 #include "assertion.h"
 #include "units.h"
 #include "frame.h"
-#include "declare.h"
 #include <memory>
 
 struct ActionExtern : public Action

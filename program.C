@@ -22,7 +22,7 @@
 
 #include "program.h"
 #include "block.h"
-#include "declare.h"
+#include "librarian.h"
 
 const char *const Program::component = "program";
 

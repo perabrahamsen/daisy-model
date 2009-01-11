@@ -24,7 +24,7 @@
 #include "block.h"
 #include "assertion.h"
 #include "treelog.h"
-#include "declare.h"
+#include "librarian.h"
 
 const FrameModel* 
 FrameModel::parent () const

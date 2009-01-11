@@ -25,7 +25,7 @@
 #include "block.h"
 #include "syntax.h"
 #include "log.h"
-#include "declare.h"
+#include "librarian.h"
 #include "frame.h"
 #include "submodeler.h"
 #include <map>

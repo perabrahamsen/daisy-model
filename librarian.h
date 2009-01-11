@@ -35,6 +35,7 @@ class Treelog;
 class Library;
 class Metalib;
 class Format;
+class FrameModel;
 class Intrinsics;
 class Declare;
 
@@ -167,6 +168,51 @@ public:
 public:
   Librarian (symbol component, symbol description);
   ~Librarian ();
+};
+
+class Declare : private boost::noncopyable
+{
+public:
+  const symbol component;
+private:
+  const symbol super;
+  const symbol description;
+
+public:
+  void load (Frame& frame) const;
+protected:
+  virtual void load_frame (Frame&) const = 0;
+public:
+  static symbol root_name ();
+
+  virtual const FrameModel* parent_model () const;
+
+protected:
+  Declare (symbol component, symbol name, symbol description);
+  virtual ~Declare ();
+};
+
+class DeclareComponent : public Declare
+{
+  Librarian librarian;
+  void load_frame (Frame&) const;
+public:
+  DeclareComponent (symbol component, symbol description);
+};
+
+class DeclareModel : public Declare
+{
+  const symbol super;
+
+public:
+  virtual Model* make (Block&) const = 0;
+private:
+  const FrameModel* parent_model () const;
+protected:
+  DeclareModel (symbol component, symbol name, symbol super, 
+                symbol description);
+  DeclareModel (symbol component, symbol name, symbol description);
+  ~DeclareModel ();
 };
 
 #endif // LIBRARIAN_H

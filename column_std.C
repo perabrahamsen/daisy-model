@@ -44,13 +44,12 @@
 #include "log.h"
 #include "submodeler.h"
 #include "memutils.h"
-#include "librarian.h"
 #include "scope_multi.h"
 #include "scopesel.h"
 #include "units.h"
 #include "treelog.h"
 #include "column.h"
-#include "declare.h"
+#include "librarian.h"
 #include "frame.h"
 
 struct ColumnStandard : public Column

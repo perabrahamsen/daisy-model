@@ -26,7 +26,7 @@
 #include "output.h"
 #include "block.h"
 #include "treelog.h"
-#include "declare.h"
+#include "librarian.h"
 #include "frame.h"
 
 const char *const Scopesel::component = "scopesel";

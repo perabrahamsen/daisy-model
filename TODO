@@ -2,8 +2,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Frame
 
-** Frame::add_submodule skal have en version der tager en frame som argument.
-
 ** Ryd op i column.C
 
 *** Ret Point
