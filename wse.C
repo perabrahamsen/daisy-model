@@ -221,7 +221,12 @@ Number of intervals in the table.");
   }
 } ProgramWSE_table_syntax;
 
-static Librarian WSE_init (WSE::component, "\
-The water stress effect on crop growth.");
+static struct WSEInit : public DeclareComponent 
+{
+  WSEInit ()
+    : DeclareComponent (WSE::component, "\
+The water stress effect on crop growth.")
+  { }
+} WSE_init;
 
 // wse.C ends here.

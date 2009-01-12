@@ -40,6 +40,11 @@ Summary::Summary (Block& al)
 Summary::~Summary ()
 { }
 
-static Librarian Summary_init (Summary::component, "\
-Summary reports for log parameterizations.");
+static struct SummaryInit : public DeclareComponent 
+{
+  SummaryInit ()
+    : DeclareComponent (Summary::component, "\
+Summary reports for log parameterizations.")
+  { }
+} Summary_init;
 

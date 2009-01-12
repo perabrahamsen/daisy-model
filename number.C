@@ -99,7 +99,12 @@ Number::Number (Block& al)
 Number::~Number ()
 { }
 
-static Librarian Number_init (Number::component, "\
-Generic representation of numbers.");
+static struct NumberInit : public DeclareComponent 
+{
+  NumberInit ()
+    : DeclareComponent (Number::component, "\
+Generic representation of numbers.")
+  { }
+} Number_init;
 
 // number.C ends here.

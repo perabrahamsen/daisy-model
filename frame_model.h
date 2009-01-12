@@ -40,6 +40,9 @@ private:
   typedef Model& (*builder_t) (Block&);
   const builder_t builder;
   const DeclareModel *const declaration;
+public:
+  bool buildable () const;
+private:
   Model* construct (Block& context, const symbol key, const FrameModel&) const;
 public:
   Model* construct (Block& context, const symbol key) const;

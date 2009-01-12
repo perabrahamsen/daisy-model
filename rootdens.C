@@ -59,8 +59,13 @@ Rootdens::Rootdens (Block& al)
 Rootdens::~Rootdens ()
 { }
 
-static Librarian Rootdens_init (Rootdens::component, "\
-Root density calculations.");
+static struct RootdensInit : public DeclareComponent 
+{
+  RootdensInit ()
+    : DeclareComponent (Rootdens::component, "\
+Root density calculations.")
+  { }
+} Rootdens_init;
 
 // rootdens.C ends here.
 

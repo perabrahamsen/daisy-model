@@ -45,7 +45,12 @@ Mactrans::Mactrans (const symbol n)
 Mactrans::~Mactrans ()
 { }
 
-static Librarian Mactrans_init (Mactrans::component, "\
-Macropore transportation of solutes.");
+static struct MactransInit : public DeclareComponent 
+{
+  MactransInit ()
+    : DeclareComponent (Mactrans::component, "\
+Macropore transportation of solutes.")
+  { }
+} Mactrans_init;
 
 // mactrans.C ends here.

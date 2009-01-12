@@ -121,8 +121,13 @@ Vegetation::Vegetation (Block& al)
 Vegetation::~Vegetation ()
 { }
 
-static Librarian Vegetation_init (Vegetation::component, "\
-That green stuff.");
+static struct VegetationInit : public DeclareComponent 
+{
+  VegetationInit ()
+    : DeclareComponent (Vegetation::component, "\
+That green stuff.")
+  { }
+} Vegetation_init;
 
 static struct VegetationSyntax
 {

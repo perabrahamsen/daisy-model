@@ -45,7 +45,12 @@ Domsorp::Domsorp (Block& al)
 Domsorp::~Domsorp ()
 { }
 
-static Librarian Domsorp_init (Domsorp::component, "\
-Sorption and desorption of DOM to SOM.");
+static struct DomsorpInit : public DeclareComponent 
+{
+  DomsorpInit ()
+    : DeclareComponent (Domsorp::component, "\
+Sorption and desorption of DOM to SOM.")
+  { }
+} Domsorp_init;
 
 // domsorp.C ends here.

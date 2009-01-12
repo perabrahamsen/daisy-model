@@ -62,8 +62,13 @@ UI::UI (const char *const id)
 UI::~UI ()
 { }
 
-static Librarian UI_init (UI::component, "\
-Top level user interface.");
+static struct UIInit : public DeclareComponent 
+{
+  UIInit ()
+    : DeclareComponent (UI::component, "\
+Top level user interface.")
+  { }
+} UI_init;
 
 // UIProgress
 

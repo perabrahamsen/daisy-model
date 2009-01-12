@@ -40,5 +40,10 @@ OrganicMatter::OrganicMatter (Block& al)
 OrganicMatter::~OrganicMatter ()
 { }
 
-static Librarian Organic_init (OrganicMatter::component, "\
-Turnover of organic matter in the soil.");
+static struct OrganicInit : public DeclareComponent 
+{
+  OrganicInit ()
+    : DeclareComponent (OrganicMatter::component, "\
+Turnover of organic matter in the soil.")
+  { }
+} Organic_init;

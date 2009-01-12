@@ -973,11 +973,14 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		{
 		  std::auto_ptr<Parser> parser 
                     (Librarian::build_free<Parser> (metalib, msg, *al, name));
-                  if (!parser.get () || !parser->check ())
+                  if (!parser.get ())
                     error ("file error");
                   else
-                    parser->load_nested (atts);
-		  lexer->error_count += parser->error_count ();
+                    {
+                      if (parser->check ())
+                        parser->load_nested (atts);
+                      lexer->error_count += parser->error_count ();
+                    }
 		  inputs.push_back (al.release ());
 		}
 	      else

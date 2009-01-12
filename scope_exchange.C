@@ -297,7 +297,12 @@ static struct ScopeExchangeSyntax
   }
 } ScopeExchange_syntax;
 
-static Librarian Exchange_init (Exchange::component, "\
-A named value to exchange with external models.");
+static struct ExchangeInit : public DeclareComponent 
+{
+  ExchangeInit ()
+    : DeclareComponent (Exchange::component, "\
+A named value to exchange with external models.")
+  { }
+} Exchange_init;
 
 // scope_exchange.C ends here.

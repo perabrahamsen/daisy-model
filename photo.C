@@ -59,7 +59,12 @@ Photo::Photo (Block& al)
 Photo::~Photo ()
 { }
 
-static Librarian Photo_init (Photo::component, "\
-Leaf photosynthesis.");
+static struct PhotoInit : public DeclareComponent 
+{
+  PhotoInit ()
+    : DeclareComponent (Photo::component, "\
+Leaf photosynthesis.")
+  { }
+} Photo_init;
 
 // photo.C ends here.

@@ -168,7 +168,12 @@ static struct BoundFiniteSyntax
   }
 } BoundFinite_syntax;
 
-static Librarian Bound_init (Bound::component, "\
-Specify one end of an interval boundary.");
+static struct BoundInit : public DeclareComponent 
+{
+  BoundInit ()
+    : DeclareComponent (Bound::component, "\
+Specify one end of an interval boundary.")
+  { }
+} Bound_init;
 
 // bound.C ends here.

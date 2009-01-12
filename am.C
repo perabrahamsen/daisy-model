@@ -1303,10 +1303,15 @@ original.");
 } am_syntax;
 
 
-static Librarian AM_init (AM::component, "\
+static struct AMInit : public DeclareComponent 
+{
+  AMInit ()
+    : DeclareComponent (AM::component, "\
 The 'am' component describes various kinds of fertilizer and other\n\
 added matter such as crop residues.  In particular, it describes how\n\
-they decompose.");
+they decompose.")
+  { }
+} AM_init;
 
 struct ProgramAM_table : public Program
 {

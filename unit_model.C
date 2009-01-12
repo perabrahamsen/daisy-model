@@ -53,13 +53,18 @@ MUnit::MUnit (Block& al, const symbol base)
 MUnit::~MUnit ()
 { }
 
-static Librarian Unit_init (MUnit::component, "\
+static struct UnitInit : public DeclareComponent 
+{
+  UnitInit ()
+    : DeclareComponent (MUnit::component, "\
 Specify units of physical quatities.\n\
 \n\
 Daisy will recognise both the build-in and user defined units, and\n\
 convert between different units representing the same physical\n\
 dimension.  This is done by converting to and from the base (usually\n\
-defined by SI) unit for that dimension.");
+defined by SI) unit for that dimension.")
+  { }
+} Unit_init;
 
 // Base model 'SI'.
 

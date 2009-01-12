@@ -193,6 +193,11 @@ Movement::Movement (Block& al)
 Movement::~Movement ()
 { }
 
-static Librarian Movement_init (Movement::component, "\
-This component handles the movement in the soil.");
+static struct MovementInit : public DeclareComponent 
+{
+  MovementInit ()
+    : DeclareComponent (Movement::component, "\
+This component handles the movement in the soil.")
+  { }
+} Movement_init;
 

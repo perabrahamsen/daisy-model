@@ -41,8 +41,13 @@ ABAProd::ABAProd (Block& al)
 ABAProd::~ABAProd ()
 { }
 
-static Librarian ABAProd_init (ABAProd::component, "\
-The 'ABAproduction' component calculates the prod of ABA in soil.");
+static struct ABAProdInit : public DeclareComponent
+{
+  ABAProdInit () 
+    : DeclareComponent (ABAProd::component, "\
+The 'ABAproduction' component calculates the prod of ABA in soil.")
+  { }
+} ABAProd_init;
 
 struct ABAProdNone : public ABAProd
 {

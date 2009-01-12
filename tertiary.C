@@ -46,8 +46,13 @@ Tertiary::Tertiary (Block& al)
 Tertiary::~Tertiary ()
 { }
 
-static Librarian Tertiary_init (Tertiary::component, "\
-Transport of water and solute outside the matrix.");
+static struct TertiaryInit : public DeclareComponent 
+{
+  TertiaryInit ()
+    : DeclareComponent (Tertiary::component, "\
+Transport of water and solute outside the matrix.")
+  { }
+} Tertiary_init;
 
 // The 'none' model.
 

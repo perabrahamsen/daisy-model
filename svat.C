@@ -50,10 +50,15 @@ SVAT::SVAT (Block& al)
 SVAT::~SVAT ()
 { }
 
-static Librarian SVAT_init (SVAT::component, "\
+static struct SVATInit : public DeclareComponent 
+{
+  SVATInit ()
+    : DeclareComponent (SVAT::component, "\
 The task of the 'svat' component is to calculate the production\n\
 stress, given the potential evapotranspiration, the actual\n\
 evaporation from the surface, meteorological data, and the vegetation\n\
-and soil state.");
+and soil state.")
+  { }
+} SVAT_init;
 
 // svat.C ends here.

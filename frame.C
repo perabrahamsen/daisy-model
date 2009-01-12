@@ -68,7 +68,7 @@ Frame::entries () const
 
 bool 
 Frame::check (Block& block) const
-{ return impl->syntax.check (block.metalib (), alist (), block.msg ()); }
+{ return check (block.metalib (), block.msg ()); }
 
 bool 
 Frame::check (const Metalib& metalib, Treelog& msg) const

@@ -98,7 +98,12 @@ struct MV_Soil : public Model
   { }
 };
 
-static Librarian MV_Soil_init (MV_Soil::component, MV_Soil::description);
+static struct MV_SoilInit : public DeclareComponent
+{
+  MV_SoilInit () 
+    : DeclareComponent (MV_Soil::component, MV_Soil::description)
+  { }
+} Soil_init;
 
 
 const char *const MV_Soil::description = "\
@@ -262,7 +267,12 @@ struct MV_Crop : public Model
   { }
 };
 
-static Librarian MV_Crop_init (MV_Crop::component, MV_Crop::description);
+static struct MV_CropInit : public DeclareComponent
+{
+  MV_CropInit () 
+    : DeclareComponent (MV_Crop::component, MV_Crop::description)
+  { }
+} Crop_init;
 
 const char *const MV_Crop::description = "\
 Description of a crop for use by the MARKVAND model.";

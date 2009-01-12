@@ -30,6 +30,17 @@ const FrameModel*
 FrameModel::parent () const
 { return parent_; }
 
+bool 
+FrameModel::buildable () const
+{
+  // Check builder.
+  for (const FrameModel* current = this; current; current = current->parent ())
+    if (current->builder || current->declaration)
+      return true;
+
+  return false;
+}
+
 Model*
 FrameModel::construct (Block& context, const symbol key, 
                        const FrameModel& frame) const
@@ -37,7 +48,10 @@ FrameModel::construct (Block& context, const symbol key,
   if (builder || declaration)
     {
       Block block (context, frame, key);
-      check (context.metalib (), Treelog::null ());
+      
+      if (!frame.check (context))
+        return NULL;
+
       try
         { return builder ? &builder (block) : declaration->make (block); }
       catch (const std::string& err)
@@ -46,7 +60,11 @@ FrameModel::construct (Block& context, const symbol key,
         { block.error ("Build failure: " + std::string (err)); }
       return NULL;
     }
-  daisy_assert (parent ());
+  if (!parent ())
+    {
+      context.error ("Cannot build base model '" + key + "'");
+      return NULL;
+    }
   return parent ()->construct (context, key, frame);
 }
 

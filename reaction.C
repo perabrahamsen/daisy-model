@@ -52,7 +52,12 @@ Reaction::Reaction (Block& al)
 Reaction::~Reaction ()
 { }
 
-static Librarian Reaction_init (Reaction::component, "\
-Generic transformations between soil chemicals.");
+static struct ReactionInit : public DeclareComponent 
+{
+  ReactionInit ()
+    : DeclareComponent (Reaction::component, "\
+Generic transformations between soil chemicals.")
+  { }
+} Reaction_init;
 
 // reaction.C ends here.

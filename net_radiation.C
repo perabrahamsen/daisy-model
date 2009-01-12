@@ -397,8 +397,13 @@ static struct NetRadiationSyntax
   }
 } NetRadiation_syntax;
 
-static Librarian NetRadiation_init (NetRadiation::component, "\
+static struct NetRadiationInit : public DeclareComponent 
+{
+  NetRadiationInit ()
+    : DeclareComponent (NetRadiation::component, "\
 The purpose of this component is to calculate the net radiation from\n\
-other meteorological data.");
+other meteorological data.")
+  { }
+} NetRadiation_init;
 
 // net_radiation.C ends here

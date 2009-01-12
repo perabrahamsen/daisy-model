@@ -154,7 +154,12 @@ std::auto_ptr<const Average>
 Average::build_geometric ()
 { return std::auto_ptr<const Average> (new AverageGeometric (__FUNCTION__)); }
 
-static Librarian Average_init (Average::component, "\
-Find the average of two numbers.");
+static struct AverageInit : public DeclareComponent 
+{
+  AverageInit ()
+    : DeclareComponent (Average::component, "\
+Find the average of two numbers.")
+  { }
+} Average_init;
 
 // average.C ends here.

@@ -117,7 +117,12 @@ Chemistry::Chemistry (Block& al)
 Chemistry::~Chemistry ()
 { }
 
-static Librarian Chemistry_init (Chemistry::component, "\
-Pesticides and other chemicals.");
+static struct ChemistryInit : public DeclareComponent 
+{
+  ChemistryInit ()
+    : DeclareComponent (Chemistry::component, "\
+Pesticides and other chemicals.")
+  { }
+} Chemistry_init;
 
 // chemistry.C ends here.

@@ -41,7 +41,12 @@ UZmodel::library_id () const
   return id;
 }
 
-static Librarian UZmodel_init (UZmodel::component, "\
+static struct UZmodelInit : public DeclareComponent 
+{
+  UZmodelInit ()
+    : DeclareComponent (UZmodel::component, "\
 The 'uzmodel' component handles the vertical water movement in the\n\
-unsaturated zone soil matrix.");
+unsaturated zone soil matrix.")
+  { }
+} UZmodel_init;
 

@@ -173,8 +173,13 @@ UZ1D::UZ1D (Block& al)
 UZ1D::~UZ1D ()
 { }
 
-static Librarian UZ1D_init (UZ1D::component, "\
+static struct UZ1DInit : public DeclareComponent 
+{
+  UZ1DInit ()
+    : DeclareComponent (UZ1D::component, "\
 The 'uz1d' component handles the horizontal water movement in the\n\
-unsaturated zone soil matrix.");
+unsaturated zone soil matrix.")
+  { }
+} UZ1D_init;
 
 // uz1d.C ends here.

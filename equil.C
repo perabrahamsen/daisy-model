@@ -47,5 +47,10 @@ Equilibrium::Equilibrium (Block& al)
 Equilibrium::~Equilibrium ()
 { }
 
-static Librarian Equilibrium_init (Equilibrium::component, "\
-Find equilibrium between two soil chemicals.");
+static struct EquilibriumInit : public DeclareComponent 
+{
+  EquilibriumInit ()
+    : DeclareComponent (Equilibrium::component, "\
+Find equilibrium between two soil chemicals.")
+  { }
+} Equilibrium_init;

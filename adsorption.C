@@ -58,10 +58,15 @@ Adsorption::Adsorption (Block& al)
 Adsorption::~Adsorption ()
 { }
 
-static Librarian Adsorption_init (Adsorption::component, "\
+static struct AdsorptionInit : public DeclareComponent
+{
+  AdsorptionInit () 
+    : DeclareComponent (Adsorption::component, "\
 This component describes the adsorption of a chemical to the soil,\n\
 which among other things affects how large a fraction can be\n\
-transported with the water.");
+transported with the water.")
+  { }
+} Adsorption_init;
 
 // "linear" special.
 

@@ -49,7 +49,12 @@ MScope::MScope (Block& al)
 MScope::~MScope ()
 { }
 
-static Librarian MScope_init (MScope::component, "\
-A scope maps names to values.");
+static struct MScopeInit : public DeclareComponent 
+{
+  MScopeInit ()
+    : DeclareComponent (MScope::component, "\
+A scope maps names to values.")
+  { }
+} MScope_init;
 
 // scope_model.C ends here

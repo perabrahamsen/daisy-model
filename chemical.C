@@ -73,8 +73,13 @@ Chemical::Chemical (Block& al)
 Chemical::~Chemical ()
 { }
 
-static Librarian Chemical_init (Chemical::component, "\
+static struct ChemicalInit : public DeclareComponent 
+{
+  ChemicalInit ()
+    : DeclareComponent (Chemical::component, "\
 This component should, for a specific chemical (typically a pesticide),\n\
-provide a description of the properties of interest to Daisy.");
+provide a description of the properties of interest to Daisy.")
+  { }
+} Chemical_init;
 
 // chemical.C ends here.

@@ -45,8 +45,13 @@ Element::Element (Block& al)
 Element::~Element ()
 { }
 
-static Librarian Element_init (Element::component, "\
-An element of a compound.");
+static struct ElementInit : public DeclareComponent 
+{
+  ElementInit ()
+    : DeclareComponent (Element::component, "\
+An element of a compound.")
+  { }
+} Element_init;
 
 // The 'atom' model.
 

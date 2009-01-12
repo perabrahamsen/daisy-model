@@ -54,5 +54,10 @@ Transform::Transform (Block&)
 Transform::~Transform ()
 { }
 
-static Librarian Transform_init (Transform::component, "\
-Generic transformations between soil components.");
+static struct TransformInit : public DeclareComponent 
+{
+  TransformInit ()
+    : DeclareComponent (Transform::component, "\
+Generic transformations between soil components.")
+  { }
+} Transform_init;

@@ -48,5 +48,10 @@ Gnuplot::Gnuplot (Block& al)
 Gnuplot::~Gnuplot ()
 { }
 
-static Librarian Gnuplot_init (Gnuplot::component, "\
-Plot a graph with gnuplot.");
+static struct GnuplotInit : public DeclareComponent 
+{
+  GnuplotInit ()
+    : DeclareComponent (Gnuplot::component, "\
+Plot a graph with gnuplot.")
+  { }
+} Gnuplot_init;

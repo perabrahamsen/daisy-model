@@ -40,5 +40,10 @@ ClayOM::ClayOM (Block& al)
 ClayOM::~ClayOM ()
 { }
 
-static Librarian ClayOM_init (ClayOM::component, "\
-Find the effect of clay on organic matter processing.");
+static struct ClayOMInit : public DeclareComponent 
+{
+  ClayOMInit ()
+    : DeclareComponent (ClayOM::component, "\
+Find the effect of clay on organic matter processing.")
+  { }
+} ClayOM_init;

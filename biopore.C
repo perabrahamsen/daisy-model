@@ -262,7 +262,12 @@ Biopore::Biopore (Block& al)
 Biopore::~Biopore ()
 { }
 
-static Librarian Biopore_init (Biopore::component, "\
-A single class of biopores.");
+static struct BioporeInit : public DeclareComponent 
+{
+  BioporeInit ()
+    : DeclareComponent (Biopore::component, "\
+A single class of biopores.")
+  { }
+} Biopore_init;
 
 // biopore.C ends here.

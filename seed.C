@@ -40,10 +40,15 @@ Seed::Seed (Block& al)
 Seed::~Seed ()
 { }
 
-static Librarian Seed_init (Seed::component, "\
+static struct SeedInit : public DeclareComponent 
+{
+  SeedInit ()
+    : DeclareComponent (Seed::component, "\
 Initial growth after emergence.\n\
 \n\
 The initial growth process governs the growth of the crop until the\n\
-point where there is enough leaf area for photosynthesis to take over.");
+point where there is enough leaf area for photosynthesis to take over.")
+  { }
+} Seed_init;
 
 // seed.C ends here.

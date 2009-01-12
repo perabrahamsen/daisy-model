@@ -117,7 +117,7 @@ Syntax::Implementation::check (const Metalib& metalib,
 	{
 	  if (status[key] == Value::Const || status[key] == Value::State)
 	    {
-	      msg.error (key + " missing");
+	      msg.error (key + " is missing");
 	      error = true;
 	    }
 	  continue;

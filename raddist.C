@@ -86,7 +86,12 @@ Raddist::Raddist (Block& al)
 Raddist::~Raddist ()
 { }
 
-static Librarian Raddist_init (Raddist::component, "\
-The 'raddist' component calculates the radiation distribution in the canopy.");
+static struct RaddistInit : public DeclareComponent 
+{
+  RaddistInit ()
+    : DeclareComponent (Raddist::component, "\
+The 'raddist' component calculates the radiation distribution in the canopy.")
+  { }
+} Raddist_init;
 
 // raddist.C ends here.

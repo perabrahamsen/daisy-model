@@ -403,7 +403,12 @@ Linear interpolation is used between the datapoints.");
   }
 } DepthFile_syntax;
 
-static Librarian Depth_init (Depth::component, "\
-Find the depth of two numbers.");
+static struct DepthInit : public DeclareComponent 
+{
+  DepthInit ()
+    : DeclareComponent (Depth::component, "\
+Find the depth of two numbers.")
+  { }
+} Depth_init;
 
 // depth.C ends here.

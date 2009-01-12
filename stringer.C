@@ -283,6 +283,11 @@ Constant value.");
   }
 } StringerIdentity_syntax;
 
-static Librarian Stringer_init (Stringer::component, "\
-Generic representation of strings.");
+static struct StringerInit : public DeclareComponent 
+{
+  StringerInit ()
+    : DeclareComponent (Stringer::component, "\
+Generic representation of strings.")
+  { }
+} Stringer_init;
 

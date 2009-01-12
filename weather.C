@@ -48,10 +48,15 @@ Weather::Weather (Block& al)
 Weather::~Weather ()
 { }
 
-static Librarian Weather_init (Weather::component, "\
+static struct WeatherInit : public DeclareComponent 
+{
+  WeatherInit ()
+    : DeclareComponent (Weather::component, "\
 Meteorological data, as well as the global positioning, are the\n\
 responsibility of the 'weather' component, typically be reading the\n\
-data from a file.  The meteorological data are common to all columns.");
+data from a file.  The meteorological data are common to all columns.")
+  { }
+} Weather_init;
 
 
 // weather.C ends here.

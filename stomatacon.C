@@ -42,7 +42,12 @@ StomataCon::StomataCon (Block& al)
 StomataCon::~StomataCon ()
 { }
 
-static Librarian StomataCon_init (StomataCon::component, "\
-The 'Stomatacon' component calculates the stomata conductance of water vapour.");
+static struct StomataConInit : public DeclareComponent 
+{
+  StomataConInit ()
+    : DeclareComponent (StomataCon::component, "\
+The 'Stomatacon' component calculates the stomata conductance of water vapour.")
+  { }
+} StomataCon_init;
 
 // StomataCon.C ends here.

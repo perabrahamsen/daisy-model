@@ -104,5 +104,10 @@ XYSource::XYSource (Block& al)
 XYSource::~XYSource ()
 { }
 
-static Librarian XYSource_init (XYSource::component, "\
-XY data series.");
+static struct XYSourceInit : public DeclareComponent 
+{
+  XYSourceInit ()
+    : DeclareComponent (XYSource::component, "\
+XY data series.")
+  { }
+} XYSource_init;

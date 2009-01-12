@@ -40,7 +40,12 @@ Heatrect::Heatrect (Block& al)
 Heatrect::~Heatrect ()
 { }
 
-static Librarian Heatrect_init (Heatrect::component, "\
-Heat transport in rectangular grid.");
+static struct HeatrectInit : public DeclareComponent 
+{
+  HeatrectInit ()
+    : DeclareComponent (Heatrect::component, "\
+Heat transport in rectangular grid.")
+  { }
+} Heatrect_init;
 
 // heatrect.C ends here

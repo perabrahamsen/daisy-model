@@ -436,7 +436,12 @@ static struct HorizonSyntax
   }
 } Horizon_syntax;
 
-static Librarian Horizon_init (Horizon::component, "\
+static struct HorizonInit : public DeclareComponent 
+{
+  HorizonInit ()
+    : DeclareComponent (Horizon::component, "\
 A `horizon' is a soil type with specific physical properties.  It is\n\
 the responsibility of the `horizon' component to specify these\n\
-properties.");
+properties.")
+  { }
+} Horizon_init;

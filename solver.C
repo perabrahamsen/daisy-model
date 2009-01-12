@@ -48,7 +48,12 @@ Solver::Solver (Block& al)
 Solver::~Solver ()
 { }
 
-static Librarian Solver_init (Solver::component, "\
-A way to solve the matrix equation 'A x = b'.");
+static struct SolverInit : public DeclareComponent 
+{
+  SolverInit ()
+    : DeclareComponent (Solver::component, "\
+A way to solve the matrix equation 'A x = b'.")
+  { }
+} Solver_init;
 
 // solver.C ends here.

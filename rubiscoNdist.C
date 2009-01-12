@@ -41,6 +41,11 @@ RubiscoNdist::RubiscoNdist (Block& al)
 RubiscoNdist::~RubiscoNdist ()
 { }
 
-static Librarian RubiscoNdist_init (RubiscoNdist::component, "\
-The 'rubiscoNdist' component calculates the rubisco N distribution for photosynthesis in the canopy.");
+static struct RubiscoNdistInit : public DeclareComponent 
+{
+  RubiscoNdistInit ()
+    : DeclareComponent (RubiscoNdist::component, "\
+The 'rubiscoNdist' component calculates the rubisco N distribution for photosynthesis in the canopy.")
+  { }
+} RubiscoNdist_init;
 

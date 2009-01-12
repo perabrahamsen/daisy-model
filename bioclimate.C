@@ -79,9 +79,14 @@ Bioclimate::Bioclimate (Block& al)
 Bioclimate::~Bioclimate ()
 { }
 
-static Librarian Bioclimate_init (Bioclimate::component, "\
+static struct BioclimateInit : public DeclareComponent 
+{
+  BioclimateInit ()
+    : DeclareComponent (Bioclimate::component, "\
 The 'bioclimate' component is responsible for distributing the water\n\
 and energy provided by the weather component among the crops and soil\n\
-for a given column.");
+for a given column.")
+  { }
+} Bioclimate_init;
 
 // bioclimate.C ends here.

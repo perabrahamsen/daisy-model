@@ -49,6 +49,11 @@ Macro::Macro (const symbol id)
 Macro::~Macro ()
 { }
 
-static Librarian Macro_init (Macro::component, "\
-Preferention flow in soil macro pores.");
+static struct MacroInit : public DeclareComponent 
+{
+  MacroInit ()
+    : DeclareComponent (Macro::component, "\
+Preferention flow in soil macro pores.")
+  { }
+} Macro_init;
 

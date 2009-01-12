@@ -174,7 +174,12 @@ List of clauses to match for.",
   }
 } IntegerCond_syntax;
 
-static Librarian Integer_init (Integer::component, "\
-Generic representation of integers.");
+static struct IntegerInit : public DeclareComponent 
+{
+  IntegerInit ()
+    : DeclareComponent (Integer::component, "\
+Generic representation of integers.")
+  { }
+} Integer_init;
 
 // integer.C ends here

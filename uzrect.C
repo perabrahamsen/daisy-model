@@ -50,7 +50,12 @@ UZRect::UZRect (Block& al)
 UZRect::~UZRect ()
 { }
 
-static Librarian UZRect_init (UZRect::component, "\
-2D water movement in a rectangular grid.");
+static struct UZRectInit : public DeclareComponent 
+{
+  UZRectInit ()
+    : DeclareComponent (UZRect::component, "\
+2D water movement in a rectangular grid.")
+  { }
+} UZRect_init;
 
 // uzrect.C ends here.

@@ -84,7 +84,12 @@ Volume::Volume (const char *const id)
 Volume::~Volume ()
 { }
 
-static Librarian Volume_init (Volume::component, "\
-A subset of 3D space.");
+static struct VolumeInit : public DeclareComponent 
+{
+  VolumeInit ()
+    : DeclareComponent (Volume::component, "\
+A subset of 3D space.")
+  { }
+} Volume_init;
 
 // volume.C ends here.

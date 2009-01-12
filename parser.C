@@ -45,8 +45,15 @@ Parser::Parser (Block& al)
 Parser::~Parser ()
 { }
 
-static Librarian Parser_init (Parser::component, "\
+static struct ParserInit : public DeclareComponent 
+{
+  ParserInit ()
+    : DeclareComponent (Parser::component, "\
 To start the simulation, many parameters must be specified and state\n\
 variables must be given an initial value.  It is the responsibility of\n\
 the 'parser' component to read these data from an external source\n\
-(typically a setup file), and convert them into the internal format.");
+(typically a setup file), and convert them into the internal format.")
+  { }
+} Parser_init;
+
+// parser.C ends here.

@@ -44,7 +44,10 @@ Secondary::Secondary (Block& al)
 Secondary::~Secondary ()
 { }
 
-static Librarian Secondary_init (Secondary::component, "\
+static struct SecondaryInit : public DeclareComponent 
+{
+  SecondaryInit ()
+    : DeclareComponent (Secondary::component, "\
 Specify secondary domain.\n\
 \n\
 The secondary domain consist typically of soil fractures or other\n\
@@ -57,7 +60,9 @@ saturated soil without solutes in the new water being mixed with\n\
 solutes in the old water.  The effects are twofold: It allows solutes\n\
 applied to the surface to reach deeper soil layers much faster than it\n\
 would otherwise, and it protects solutes in the soil matrix from being\n\
-washed out with fast moving new water.");
+washed out with fast moving new water.")
+  { }
+} Secondary_init;
 
 // "none" model.
 

@@ -251,7 +251,12 @@ Library::complete (const Metalib& metalib, const symbol key) const
   if (!check (key))
     return false;
 
-  if (!frame (key).check (metalib, Treelog::null ()))
+  const FrameModel& frame = model (key);
+
+  if (!frame.check (metalib, Treelog::null ()))
+    return false;
+
+  if (!frame.buildable ())
     return false;
 
   return true;

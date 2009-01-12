@@ -199,8 +199,13 @@ Log::summarize (Treelog&)
 Log::~Log ()
 { }
 
-static Librarian Log_init (Log::component, "\
+static struct LogInit : public DeclareComponent 
+{
+  LogInit ()
+    : DeclareComponent (Log::component, "\
 Running a simulation is uninteresting, unless you can get access to\n\
 the results in one way or another.  The purpose of the 'log' component\n\
 is to provide this access.  Most 'log' models does this by writing a\n\
-summary of the state to a log file.");
+summary of the state to a log file.")
+  { }
+} Log_init;

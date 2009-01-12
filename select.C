@@ -861,5 +861,10 @@ static struct SelectSyntax
   }
 } Select_syntax;
 
-static Librarian Select_init (Select::component, Select::description);
+static struct SelectInit : public DeclareComponent 
+{
+  SelectInit ()
+    : DeclareComponent (Select::component, Select::description)
+  { }
+} Select_init;
 

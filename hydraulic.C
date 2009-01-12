@@ -287,6 +287,11 @@ Number of intervals in the table.");
   }
 } ProgramHydraulic_table_syntax;
 
-static Librarian Hydraulic_init (Hydraulic::component, "\
+static struct HydraulicInit : public DeclareComponent 
+{
+  HydraulicInit ()
+    : DeclareComponent (Hydraulic::component, "\
 This component is responsible for specifying the soils hydraulic\n\
-properties.");
+properties.")
+  { }
+} Hydraulic_init;

@@ -81,7 +81,12 @@ Groundwater::Groundwater (Block& al)
 Groundwater::~Groundwater ()
 { }
 
-static Librarian Groundwater_init (Groundwater::component, "\
+static struct GroundwaterInit : public DeclareComponent 
+{
+  GroundwaterInit ()
+    : DeclareComponent (Groundwater::component, "\
 The 'groundwater' component is responsible for specifying the\n\
-groundwater table at each timestep.");
+groundwater table at each timestep.")
+  { }
+} Groundwater_init;
 

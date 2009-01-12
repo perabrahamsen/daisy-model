@@ -83,6 +83,11 @@ Phenology::Phenology (Block& al)
 Phenology::~Phenology ()
 { }
 
-static Librarian Phenology_init (Phenology::component, "\
-The development process.");
+static struct PhenologyInit : public DeclareComponent 
+{
+  PhenologyInit ()
+    : DeclareComponent (Phenology::component, "\
+The development process.")
+  { }
+} Phenology_init;
 

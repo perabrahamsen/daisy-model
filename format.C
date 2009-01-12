@@ -223,5 +223,10 @@ Format::Format (Block& al)
 Format::~Format ()
 { daisy_assert (nest.empty ()); }
 
-static Librarian Format_init (Format::component, "\
-Text formatting component.");
+static struct FormatInit : public DeclareComponent 
+{
+  FormatInit ()
+    : DeclareComponent (Format::component, "\
+Text formatting component.")
+  { }
+} Format_init;

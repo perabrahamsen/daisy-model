@@ -102,5 +102,10 @@ Source::Source (Block& al)
 Source::~Source ()
 { }
 
-static Librarian Source_init (Source::component, "\
-Time series, with possible error bars and formatting information.");
+static struct SourceInit : public DeclareComponent 
+{
+  SourceInit ()
+    : DeclareComponent (Source::component, "\
+Time series, with possible error bars and formatting information.")
+  { }
+} Source_init;

@@ -42,8 +42,13 @@ Printer::Printer (const AttributeList& al)
 Printer::~Printer ()
 { }
 
-static Librarian Printer_init (Printer::component, "\
+static struct PrinterInit : public DeclareComponent 
+{
+  PrinterInit ()
+    : DeclareComponent (Printer::component, "\
 The 'printer' component is responsible for converting the internal\n\
 format into various internal format.  I.e., it performs the\n\
 opposite function of the 'parser' component.  This is used for --\n\
-among other things -- creating checkpoints of the state.");
+among other things -- creating checkpoints of the state.")
+  { }
+} Printer_init;

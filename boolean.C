@@ -302,5 +302,10 @@ The operand to check.");
   }
 } BooleanNot_syntax;
 
-static Librarian Boolean_init (Boolean::component, "\
-Generic representation of booleans.");
+static struct BooleanInit : public DeclareComponent 
+{
+  BooleanInit ()
+    : DeclareComponent (Boolean::component, "\
+Generic representation of booleans.")
+  { }
+} Boolean_init;

@@ -48,8 +48,13 @@ Difrad::Difrad (Block& al)
 Difrad::~Difrad ()
 { }
 
-static Librarian Difrad_init (Difrad::component, "\
+static struct DifradInit : public DeclareComponent 
+{
+  DifradInit ()
+    : DeclareComponent (Difrad::component, "\
 The 'difrad' component should calculate the diffuse radiation from\n\
-meterological data.");
+meterological data.")
+  { }
+} Difrad_init;
 
 // difrad.C ends here.

@@ -76,7 +76,12 @@ Nitrification::Nitrification (Block& al)
 Nitrification::~Nitrification ()
 { }
 
-static Librarian Nitrification_init (Nitrification::component, "\
+static struct NitrificationInit : public DeclareComponent 
+{
+  NitrificationInit ()
+    : DeclareComponent (Nitrification::component, "\
 The nitrification process, transforming ammonium into nitrate and\n\
-nitrous oxide.");
+nitrous oxide.")
+  { }
+} Nitrification_init;
 

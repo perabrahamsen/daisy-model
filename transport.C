@@ -101,7 +101,12 @@ Transport::Transport (Block& al)
 Transport::~Transport ()
 { }
 
-static Librarian Transport_init (Transport::component, "\
-Solute transport in primary domain.");
+static struct TransportInit : public DeclareComponent 
+{
+  TransportInit ()
+    : DeclareComponent (Transport::component, "\
+Solute transport in primary domain.")
+  { }
+} Transport_init;
 
 // transport.C ends here

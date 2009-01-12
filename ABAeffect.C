@@ -42,7 +42,12 @@ ABAEffect::ABAEffect (Block& al)
 ABAEffect::~ABAEffect ()
 { }
 
-static Librarian ABAEffect_init (ABAEffect::component, "\
-The 'ABAeffect' component calculates the effect of ABA on photosynthesis.");
+static struct ABAEffectInit : public DeclareComponent
+{
+  ABAEffectInit () 
+    : DeclareComponent (ABAEffect::component, "\
+The 'ABAeffect' component calculates the effect of ABA on photosynthesis.")
+  { }
+} ABAEffect_init;
 
 // ABAeffect.C ends here.
