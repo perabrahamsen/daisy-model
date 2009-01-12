@@ -56,27 +56,26 @@ struct ActionMix : public Action
     { }
 };
 
-static struct ActionMixSyntax
+static struct ActionMixSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-    { return *new ActionMix (al); }
+  Model* make (Block& al) const
+    { return new ActionMix (al); }
 
   ActionMixSyntax ()
-    { 
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "\
+    : DeclareModel (Action::component, "mix", "\
 Mix soil content down to the specified depth.\n\
 The effect is that nitrogen, water, temperature and such are averaged in\n\
-the interval.");
-      syntax.add ("depth", "cm", Check::negative (), Value::Const,
+the interval.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+      frame.add ("depth", "cm", Check::negative (), Value::Const,
 		  "How far down to mix the soil (a negative number).");
-      syntax.order ("depth");
-      syntax.add_fraction ("penetration", Value::Const, "\
+      frame.order ("depth");
+      frame.add_fraction ("penetration", Value::Const, "\
 Fraction of organic matter on surface that are incorporated in the soil\n\
 by this operation.");
-      alist.add ("penetration", 1.0);
-      Librarian::add_type (Action::component, "mix", alist, syntax, &make);
+      frame.add ("penetration", 1.0);
     }
 } ActionMix_syntax;
 

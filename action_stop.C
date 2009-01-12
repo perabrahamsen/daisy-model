@@ -43,17 +43,15 @@ struct ActionStop : public Action
     { }
 };
 
-static struct ActionStopSyntax
+static struct ActionStopSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  {
-    return *new ActionStop (al);
-  }
+  Model* make (Block& al) const
+  { return new ActionStop (al); }
   ActionStopSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Stop the simulation.");
-    Librarian::add_type (Action::component, "stop", alist, syntax, &make);
-  }
+    : DeclareModel  (Action::component, "stop", "Stop the simulation.")
+  { }
+  void load_frame (Frame&) const
+  { }
 } ActionStop_syntax;
+
+// action_stop.C ends here.

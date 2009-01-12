@@ -220,4 +220,18 @@ protected:
   ~DeclareModel ();
 };
 
+class DeclareParam : public DeclareBase
+{
+public:
+  DeclareParam (symbol component, symbol name, symbol super, 
+                symbol description);
+};
+
+class DeclareAlias : public DeclareParam
+{
+  void load_frame (Frame&) const;
+public:
+  DeclareAlias (symbol component, symbol name, symbol super);
+};
+
 #endif // LIBRARIAN_H

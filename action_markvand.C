@@ -36,6 +36,7 @@
 #include "vegetation.h"
 #include "treelog.h"
 #include "submodeler.h"
+#include "frame.h"
 #include <vector>
 #include <memory>
 #include <sstream>
@@ -118,42 +119,42 @@ MV_Soil::library_id () const
   return id;
 }
 
-static struct MV_SoilSyntax
+static struct MV_SoilSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new MV_Soil (al); }
+  Model* make (Block& al) const
+  { return new MV_Soil (al); }
   MV_SoilSyntax ()
+    : DeclareModel (MV_Soil::component, "default", 
+                    "Standard MARKVAND soil model.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Standard MARKVAND soil model.");
-    syntax.add ("z_o", "mm", Check::positive (), Value::Const,
+    frame.add ("z_o", "mm", Check::positive (), Value::Const,
                 "Depth of top soil.");
-    syntax.add ("z_xJ", "mm", Check::positive (), Value::Const,
+    frame.add ("z_xJ", "mm", Check::positive (), Value::Const,
                 "Max rooting depth.");
-    syntax.add ("Theta_fo", Value::Fraction (), Check::positive (), 
+    frame.add ("Theta_fo", Value::Fraction (), Check::positive (), 
                 Value::Const, "Field capacity, topsoil.");
-    syntax.add ("Theta_wo", Value::Fraction (), Check::positive (), 
+    frame.add ("Theta_wo", Value::Fraction (), Check::positive (), 
                 Value::Const,
                 "Wielding point, topsoil.");
-    syntax.add ("Theta_fu", Value::Fraction (), Check::positive (), 
+    frame.add ("Theta_fu", Value::Fraction (), Check::positive (), 
                 Value::Const,
                 "Field capacity, subsoil.");
-    syntax.add ("Theta_wu", Value::Fraction (), Check::positive (), 
+    frame.add ("Theta_wu", Value::Fraction (), Check::positive (), 
                 Value::Const,
                 "Wielting point, subsoil.");
-    syntax.add ("C_e", "mm", Check::non_negative (), Value::Const,
+    frame.add ("C_e", "mm", Check::non_negative (), Value::Const,
                 "Capacity of evaporation reservoir.");
-    syntax.add ("c_e", Value::Fraction (), Check::non_negative (), 
+    frame.add ("c_e", Value::Fraction (), Check::non_negative (), 
                 Value::Const,
                 "Basic evaporation factor.");
-    syntax.add ("c_T", "mm", Value::Const,
+    frame.add ("c_T", "mm", Value::Const,
                 "Transpiration constant.");
-    syntax.add ("k_qr", Value::None (), Value::Const,
+    frame.add ("k_qr", Value::None (), Value::Const,
                 "Drainage constant root zone.");
-    syntax.add ("k_qb", Value::None (), Value::Const,
+    frame.add ("k_qb", Value::None (), Value::Const,
                 "Drainage constant subsone.");
-    Librarian::add_type (MV_Soil::component, "default", alist, syntax, &make);
   }
 } MV_Soil_syntax;
 
@@ -286,10 +287,10 @@ MV_Crop::library_id () const
   return id;
 }
 
-static struct MV_CropSyntax
+static struct MV_CropSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new MV_Crop (al); }
+  Model* make (Block& al) const
+  { return new MV_Crop (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& msg)
   {
@@ -304,48 +305,48 @@ static struct MV_CropSyntax
   }
 
   MV_CropSyntax ()
+    : DeclareModel (MV_Crop::component, "default", "\
+Standard MARKVAND crop model.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    syntax.add_check (check_alist);
-    alist.add ("description", "Standard MARKVAND crop model.");
-    syntax.add ("S_F", "dg C d", Check::non_negative (), 
+    frame.add_check (check_alist);
+    frame.add ("S_F", "dg C d", Check::non_negative (), 
                 Value::Const, Value::Sequence,
                 "Temperature sum for each phase.");
-    syntax.add_check ("S_F", VCheck::min_size_1 ());
-    syntax.add ("A_F", Value::Fraction (), Value::Const, Value::Sequence,
+    frame.add_check ("S_F", VCheck::min_size_1 ());
+    frame.add ("A_F", Value::Fraction (), Value::Const, Value::Sequence,
                 "Allowable water deficit for each phase before irrigation.");
-    syntax.add_check ("A_F", VCheck::min_size_1 ());
-    syntax.add ("L_gv", Value::None (), Check::non_negative (), Value::Const,
+    frame.add_check ("A_F", VCheck::min_size_1 ());
+    frame.add ("L_gv", Value::None (), Check::non_negative (), Value::Const,
                 "Green leaf area index at emergence / growth start.");
-    syntax.add ("L_ge", Value::None (), Check::non_negative (),
+    frame.add ("L_ge", Value::None (), Check::non_negative (),
                 Value::Const, "\
 Green leaf area index at the time where growth rate become exponential.");
-    syntax.add ("L_gx", Value::None (), Check::non_negative (), Value::Const,
+    frame.add ("L_gx", Value::None (), Check::non_negative (), Value::Const,
                 "Maximum green leaf area index.");
-    syntax.add ("L_gm", Value::None (), Check::non_negative (), Value::Const,
+    frame.add ("L_gm", Value::None (), Check::non_negative (), Value::Const,
                 "Green leaf area index at maturity.");
-    syntax.add ("L_ym", Value::None (), Check::non_negative (), Value::Const,
+    frame.add ("L_ym", Value::None (), Check::non_negative (), Value::Const,
                 "Yellow leaf area index at maturity.");
-    syntax.add ("S_Le", "dg C d", Check::non_negative (), Value::Const,
+    frame.add ("S_Le", "dg C d", Check::non_negative (), Value::Const,
                 "Temperature sum when green LAI growth turn exponential.");
-    syntax.add ("S_Lx", "dg C d", Check::non_negative (), Value::Const,
+    frame.add ("S_Lx", "dg C d", Check::non_negative (), Value::Const,
                 "Temperature sum maximum green LAI.");
-    syntax.add ("S_Lr", "dg C d", Check::non_negative (), Value::Const,
+    frame.add ("S_Lr", "dg C d", Check::non_negative (), Value::Const,
                 "Temperature sum for start of yellow leaves.");
-    syntax.add ("S_Lm", "dg C d", Check::non_negative (), Value::Const,
+    frame.add ("S_Lm", "dg C d", Check::non_negative (), Value::Const,
                 "Temperature sum at maturity.");
-    syntax.add ("z_0", "mm", Check::non_negative (), Value::Const,
+    frame.add ("z_0", "mm", Check::non_negative (), Value::Const,
                 "Root depth before emergence (growth start).");
-    syntax.add ("z_v", "mm", Check::non_negative (), Value::Const,
+    frame.add ("z_v", "mm", Check::non_negative (), Value::Const,
                 "Root depth at emergence (growth start).");
-    syntax.add ("z_xA", "mm", Check::non_negative (), Value::Const,
+    frame.add ("z_xA", "mm", Check::non_negative (), Value::Const,
                 "Maximum root depth for this crop.");
-    syntax.add ("z_m", "mm", Check::non_negative (), Value::Const,
+    frame.add ("z_m", "mm", Check::non_negative (), Value::Const,
                 "Root depth at maturity.");
-    syntax.add ("c_r", "mm/d", Check::non_negative (), Value::Const,
+    frame.add ("c_r", "mm/d", Check::non_negative (), Value::Const,
                 "Root penetration rate.");
-    Librarian::add_type (MV_Crop::component, "default", alist, syntax, &make);
   }
 } MV_Crop_syntax;
 
@@ -669,54 +670,54 @@ ActionMarkvand::ActionMarkvand (Block& al)
 ActionMarkvand::~ActionMarkvand ()
 { }
 
-static struct ActionMarkvandSyntax
+static struct ActionMarkvandSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ActionMarkvand (al); }
+  Model* make (Block& al) const
+  { return new ActionMarkvand (al); }
   static bool check_alist (const AttributeList&, Treelog&)
   {
     bool ok = true;
     return ok;
   }
   ActionMarkvandSyntax ()
+    : DeclareModel (Action::component, "markvand", "\
+Irrigate the field according to MARKVAND scheduling.")
+  { }
+  void load_frame (Frame& frame) const
   { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    syntax.add_check (check_alist);	
-    syntax.add_object ("soil", MV_Soil::component, Value::Const, 
+    frame.add_check (check_alist);	
+    frame.add_object ("soil", MV_Soil::component, Value::Const, 
                        Value::Singleton,
                        "Soil type to schedule irrigation on.");
-    syntax.add_submodule_sequence ("map", Value::Const, "\
+    frame.add_submodule_sequence ("map", Value::Const, "\
 Map of Daisy crop names into MARKVAND crop descriptions.",
 				   &ActionMarkvand::crop_map_t::load_syntax);
-    syntax.add ("T_sum", "dg C d", Value::OptionalState, 
+    frame.add ("T_sum", "dg C d", Value::OptionalState, 
                 "Temperature sum since emergence.");
-    syntax.add ("dt", "d", Value::OptionalState, 
+    frame.add ("dt", "d", Value::OptionalState, 
                 "Days since emergence.");
-    syntax.add ("V_I", "mm", Value::OptionalState, 
+    frame.add ("V_I", "mm", Value::OptionalState, 
                 "Amount of water intercepter by leaves.");
-    alist.add ("V_I", 0.0);
-    syntax.add ("V_r", "mm", Value::OptionalState, 
+    frame.add ("V_I", 0.0);
+    frame.add ("V_r", "mm", Value::OptionalState, 
                 "Amount of available water in root zone.\n\
 By default, the reservoir will be full at plant emergence.");
-    syntax.add ("V_e", "mm", Value::OptionalState, 
+    frame.add ("V_e", "mm", Value::OptionalState, 
                 "Amount of available water in top soil reservoir.\n\
 This is the water that can be extracted by soil evaporation.\n\
 Included in 'V_r'.\n\
 By default, the reservoir will be full at plant emergence.");
-    syntax.add ("C_u", "mm", Value::OptionalState, 
+    frame.add ("C_u", "mm", Value::OptionalState, 
                 "Capacity of available water in upper root zone.");
-    alist.add ("C_u", 0.0);
-    syntax.add ("V_u", "mm", Value::OptionalState, 
+    frame.add ("C_u", 0.0);
+    frame.add ("V_u", "mm", Value::OptionalState, 
                 "Amount of available water in upper root zone.\n\
 Included in 'V_r'.");
-    alist.add ("V_u", 0.0);
-    syntax.add ("V_b", "mm", Value::OptionalState, 
+    frame.add ("V_u", 0.0);
+    frame.add ("V_b", "mm", Value::OptionalState, 
                 "Amount of water between current and max root depth.\n\
 By default, the reservoir will be full at plant emergence.");
-    alist.add ("description", "\
-Irrigate the field according to MARKVAND scheduling.");
-    Librarian::add_type (Action::component, "markvand", alist, syntax, &make);
   }
 } ActionMarkvand_syntax;
 
+// action_markvand.C ends here.

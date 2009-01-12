@@ -28,6 +28,7 @@
 #include "check.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 
 struct ActionSetHeatSource : public Action
 {
@@ -56,23 +57,23 @@ struct ActionSetHeatSource : public Action
   { }
 };
 
-static struct ActionHeatSyntax
+static struct ActionHeatSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ActionSetHeatSource (al); }
+  Model* make (Block& al) const
+  { return new ActionSetHeatSource (al); }
   
   ActionHeatSyntax ()
+    : DeclareModel (Action::component, "set_heat_source", "\
+Set external point heat source at height to value.")
+  { }
+  void load_frame (Frame& frame) const
   { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
-Set external point heat source at height to value.");
-    syntax.add ("height", "cm", Check::non_positive (), Value::Const,
+    frame.add ("height", "cm", Check::non_positive (), Value::Const,
 		"Height of heat source (a negative number).");
-    syntax.add ("value", "W/m^2", Check::non_negative (), Value::Const,
+    frame.add ("value", "W/m^2", Check::non_negative (), Value::Const,
 		"Value of heat source.");
-    syntax.order ("height", "value");
-    Librarian::add_type (Action::component, "set_heat_source", 
-				 alist, syntax, &make);
+    frame.order ("height", "value");
   }
 } ActionHeat_syntax;
+
+// action_heat.C ends here.

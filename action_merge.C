@@ -45,22 +45,21 @@ struct ActionMerge : public Action
   { }
 };
 
-static struct ActionMergeSyntax
+static struct ActionMergeSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-    { return *new ActionMerge (al); }
+  Model* make (Block& al) const
+    { return new ActionMerge (al); }
   ActionMergeSyntax ()
-    { 
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "\
+    : DeclareModel (Action::component, "merge", "\
 Merge two columns.  After the merge, only the first column will remain,\n\
-but its state will be a average of the the columns, weighted after size.");
-      syntax.add ("combine", Syntax::String, Syntax::Const,
-		  "Column to merge into.");
-      syntax.add ("remove", Syntax::String, Syntax::Const,
-		  "Column to remove after merge.");
-      syntax.order ("combine", "remove");
-      Librarian::add_type (Action::component, "merge", alist, syntax, &make);
-    }
+but its state will be a average of the the columns, weighted after size.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    frame.add ("combine", Syntax::String, Syntax::Const,
+               "Column to merge into.");
+    frame.add ("remove", Syntax::String, Syntax::Const,
+               "Column to remove after merge.");
+    frame.order ("combine", "remove");
+  }
 } ActionMerge_syntax;

@@ -30,6 +30,7 @@
 #include "check.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 #include <sstream>
 
 struct ActionSpray : public Action
@@ -60,24 +61,23 @@ struct ActionSpray : public Action
 };
 
 // Add the ActionSpray syntax to the syntax table.
-static struct ActionSpraySyntax
+static struct ActionSpraySyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ActionSpray (al); }
+  Model* make (Block& al) const
+  { return new ActionSpray (al); }
 
   ActionSpraySyntax ()
+    : DeclareModel (Action::component, "spray", "\
+Spray a chemical (typically a pesticide) on the field.")
+  { }
+  void load_frame (Frame& frame) const
   { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
-Spray a chemical (typically a pesticide) on the field.");
-    syntax.add ("chemical", Value::String, Value::Const,
+    frame.add ("chemical", Value::String, Value::Const,
 		"Name of pesticide to spray.");
-    syntax.add_check ("chemical", Chemical::check_library ());
-    syntax.add ("amount", "g/ha", Check::non_negative (), Value::Const,
+    frame.add_check ("chemical", Chemical::check_library ());
+    frame.add ("amount", "g/ha", Check::non_negative (), Value::Const,
 		"Amount of pesticide to spray.");
-    syntax.order ("chemical", "amount");
-    Librarian::add_type (Action::component, "spray", alist, syntax, &make);
+    frame.order ("chemical", "amount");
   }
 } ActionSpray_syntax;
 

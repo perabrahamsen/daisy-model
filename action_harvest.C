@@ -29,6 +29,7 @@
 #include "librarian.h"
 #include "vegetation.h"
 #include "treelog.h"
+#include "frame.h"
 #include <sstream>
 
 // The 'emerge' action model.
@@ -71,27 +72,61 @@ struct ActionEmerge : public Action
   { }
 };
 
-static struct ActionEmergeSyntax
+static struct ActionEmergeSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ActionEmerge (al); }
-  ActionEmergeSyntax ();
-} ActionEmerge_syntax;
-
-ActionEmergeSyntax::ActionEmergeSyntax ()
-{ 
-  Syntax& syntax = *new Syntax ();
-  AttributeList& alist = *new AttributeList ();
-  alist.add ("description", "Force a crop to emerge.");
-  syntax.add ("crop", Value::String, Value::Const, 
-	      "Name of the crop to emerge.\n\
+  Model* make (Block& al) const
+  { return new ActionEmerge (al); }
+  ActionEmergeSyntax ()
+    : DeclareModel (Action::component, "emerge", "Force a crop to emerge.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    frame.add ("crop", Value::String, Value::Const, 
+                "Name of the crop to emerge.\n\
 If you specify 'all', all crops will emerge.\n\
 If there are no crop on the field with the specified name,\n\
 nothing will happen.");
-  alist.add ("crop", Vegetation::all_crops ());
-  syntax.order ("crop");
-  Librarian::add_type (Action::component, "emerge", alist, syntax, &make);
-}
+    frame.add ("crop", Vegetation::all_crops ());
+    frame.order ("crop");
+  }
+} ActionEmerge_syntax;
+
+// The 'harvest_base' base model.
+
+static struct ActionHarvestBaseSyntax : DeclareBase
+{
+  ActionHarvestBaseSyntax ()
+    : DeclareBase (Action::component, "harvest_base", "\
+Common parameters for harvest operations.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    frame.add ("crop", Value::String, Value::Const, 
+                "Name of the crop to harvest or cut.\n\
+If you specify 'all', all crops will be harvested.\n\
+If there are no crop on the field with the specified name,\n\
+nothing will happen.");
+    frame.add ("crop", Vegetation::all_crops ());
+    frame.add ("stub", "cm", Value::Const, "\
+Leave stem and leafs below this height on the field.");
+    frame.add ("stub", 0.0);
+    frame.add_fraction ("stem", Value::Const, "\
+Fraction of stem (above stub) to harvest.");
+    frame.add ("stem", 1.0);
+    frame.add_fraction ("leaf", Value::Const, "\
+Fraction of leafs (above stub) to harvest.");
+    frame.add ("leaf", 1.0);
+    frame.add_fraction ("sorg", Value::Const, "\
+Fraction of storage organ to harvest.");
+    frame.add ("sorg", 1.0);
+    frame.add ("combine", Value::Boolean, Value::Const, "\
+Set this to 'true' in order to combine all crop parts into stem\n\
+in the harvest log files.\n\
+This is mostly useful for silage.");
+    frame.add ("combine", false);
+    frame.order ("crop");
+  }
+} ActionHarvestBase_syntax;
 
 // The 'harvest' action model.
 
@@ -147,34 +182,6 @@ If this was intended, you should use the 'cut' action instead to avoid this mess
   bool check (const Daisy&, const Scope&, Treelog& err) const
   { return true; }
 
-  static void load_syntax (Syntax& syntax, AttributeList& alist)
-  { 
-    syntax.add ("crop", Value::String, Value::Const, 
-                "Name of the crop to harvest or cut.\n\
-If you specify 'all', all crops will be harvested.\n\
-If there are no crop on the field with the specified name,\n\
-nothing will happen.");
-    alist.add ("crop", Vegetation::all_crops ());
-    syntax.add ("stub", "cm", Value::Const, "\
-Leave stem and leafs below this height on the field.");
-    alist.add ("stub", 0.0);
-    syntax.add_fraction ("stem", Value::Const, "\
-Fraction of stem (above stub) to harvest.");
-    alist.add ("stem", 1.0);
-    syntax.add_fraction ("leaf", Value::Const, "\
-Fraction of leafs (above stub) to harvest.");
-    alist.add ("leaf", 1.0);
-    syntax.add_fraction ("sorg", Value::Const, "\
-Fraction of storage organ to harvest.");
-    alist.add ("sorg", 1.0);
-    syntax.add ("combine", Value::Boolean, Value::Const, "\
-Set this to 'true' in order to combine all crop parts into stem\n\
-in the harvest log files.\n\
-This is mostly useful for silage.");
-    alist.add ("combine", false);
-    syntax.order ("crop");
-  }
-
   ActionHarvest (Block& al)
     : Action (al),
       crop (al.name ("crop")), 
@@ -186,18 +193,16 @@ This is mostly useful for silage.");
   { }
 };
 
-static struct ActionHarvestSyntax
+static struct ActionHarvestSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ActionHarvest (al); }
+  Model* make (Block& al) const
+  { return new ActionHarvest (al); }
   ActionHarvestSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    ActionHarvest::load_syntax (syntax, alist);
-    alist.add ("description", "Harvest a crop.");
-    Librarian::add_type (Action::component, "harvest", alist, syntax, &make);
-  }
+    : DeclareModel (Action::component, "harvest", "harvest_base", "\
+Harvest a crop.")
+  { }
+  void load_frame (Frame& frame) const
+  { }
 } ActionHarvest_syntax;
 
 // The 'cut' action model.
@@ -216,18 +221,15 @@ If this was intended, you should use the 'harvest' action instead to avoid this 
   { }
 };
 
-static struct ActionCutSyntax
+static struct ActionCutSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ActionCut (al); }
+  Model* make (Block& al) const
+  { return new ActionCut (al); }
   ActionCutSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    ActionHarvest::load_syntax (syntax, alist);
-    alist.add ("description", "Cut a crop.");
-    Librarian::add_type (Action::component, "cut", alist, syntax, &make);
-  }
+    : DeclareModel (Action::component, "cut", "harvest_base", "Cut a crop.")
+  { }
+  void load_frame (Frame& frame) const
+  { }
 } ActionCut_syntax;
 
 // The 'pluck' action model.
@@ -284,38 +286,35 @@ If this was intended, you should use the 'harvest' action instead to avoid this 
   { }
 };
 
-static struct ActionPluckSyntax
+static struct ActionPluckSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ActionPluck (al); }
-  ActionPluckSyntax ();
-} ActionPluck_syntax;
-
-ActionPluckSyntax::ActionPluckSyntax ()
-{ 
-  Syntax& syntax = *new Syntax ();
-  AttributeList& alist = *new AttributeList ();
-  alist.add ("description", "Pluck a crop.\n\
+  Model* make (Block& al) const
+  { return new ActionPluck (al); }
+  ActionPluckSyntax ()
+    : DeclareModel (Action::component, "pluck", "Pluck a crop.\n\
 Unlike the 'harvest' operation, this allows you to pluck selected parts of\n\
 the above ground dry matter without killing the crop.\n\
-It is intended for crops like tomatoes, that are harvested multiple times.");
-  syntax.add ("crop", Value::String, Value::Const, 
-	      "Name of the crop to pluck.\n\
+It is intended for crops like tomatoes, that are harvested multiple times.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    frame.add ("crop", Value::String, Value::Const, 
+                "Name of the crop to pluck.\n\
 If you specify 'all', all crops will be plucked.\n\
 If there are no crop on the field with the specified name,\n\
 nothing will happen.");
-  alist.add ("crop", Vegetation::all_crops ());
-  syntax.add_fraction ("stem", Value::Const, "\
+    frame.add ("crop", Vegetation::all_crops ());
+    frame.add_fraction ("stem", Value::Const, "\
 Fraction of stem to pluck.");
-  alist.add ("stem", 0.0);
-  syntax.add_fraction ("leaf", Value::Const, "\
+    frame.add ("stem", 0.0);
+    frame.add_fraction ("leaf", Value::Const, "\
 Fraction of leaves to pluck.");
-  alist.add ("leaf", 0.0);
-  syntax.add_fraction ("sorg", Value::Const, "\
+    frame.add ("leaf", 0.0);
+    frame.add_fraction ("sorg", Value::Const, "\
 Fraction of storage organ to pluck.");
-  alist.add ("sorg", 1.0);
-  syntax.order ("crop");
-  Librarian::add_type (Action::component, "pluck", alist, syntax, &make);
-}
+    frame.add ("sorg", 1.0);
+    frame.order ("crop");
+  }
+} ActionPluck_syntax;
 
 // action_harvest.C ends here.

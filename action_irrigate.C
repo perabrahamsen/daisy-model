@@ -35,6 +35,7 @@
 #include "librarian.h"
 #include "volume.h"
 #include "treelog.h"
+#include "frame.h"
 #include <sstream>
 
 struct ActionIrrigate : public Action
@@ -132,6 +133,28 @@ struct ActionIrrigate : public Action
     return remaining_time < daisy.dt * 0.0001; 
   }
 
+  ActionIrrigate (Block& al)
+    : Action (al),
+      days (al.integer ("days")),
+      hours (al.integer ("hours", (days > 0) ? 0 : 1)),
+      activated (false),
+      remaining_time (al.number ("remaining_time", -42.42e42)),
+      expr_flux (Librarian::build_item<Number> (al, "flux")),
+      flux (-42.42e42),
+      temp (al.number ("temperature", at_air_temperature)),
+      sm (al, "solute")
+  { }
+  ~ActionIrrigate ()
+  { }
+};
+
+static struct ActionIrrigateBaseSyntax : public DeclareBase
+{
+  ActionIrrigateBaseSyntax ()
+    : DeclareBase (Action::component, "irrigate_base", "\
+Shared parameter for irrigate actions.")
+  { }
+
   static bool check_alist (const AttributeList& alist, Treelog& err)
   {
     bool ok = true;
@@ -147,44 +170,31 @@ struct ActionIrrigate : public Action
     return ok;
   }
 
-  static void load_syntax (Syntax& syntax, AttributeList& alist)
+  void load_frame (Frame& frame) const
   {
-    syntax.add_check (check_alist);	
-    syntax.add ("days", Value::Integer, Value::Const, 
+    frame.add_check (check_alist);	
+    frame.add ("days", Value::Integer, Value::Const, 
                 "Irrigate this number of days.");
-    alist.add ("days", 0);
-    syntax.add ("hours", Value::Integer, Value::OptionalConst, 
+    frame.add ("days", 0);
+    frame.add ("hours", Value::Integer, Value::OptionalConst, 
                 "Irrigate this number of hours.\n\
 By default, irrigate 1 hour if days is 0, and 0 hours plus the specified\n\
 number of days else.");
-    syntax.add ("remaining_time", "h", Value::OptionalState,
+    frame.add ("remaining_time", "h", Value::OptionalState,
                 "Irrigate this number of hours.\
 Setting this overrides the 'days' and 'hours' parameters.");
-    syntax.add_object ("flux", Number::component, 
+    frame.add_object ("flux", Number::component, 
                        Value::Const, Value::Singleton, 
 "Amount of irrigation applied.");
-    syntax.order ("flux");
-    syntax.add ("temperature", "dg C", 
+    frame.order ("flux");
+    frame.add ("temperature", "dg C", 
 		Check::positive (), Value::OptionalConst,
 		"Temperature of irrigation (default: air temperature).");
-    IM::add_syntax (syntax, alist, Value::Const, "solute", Units::ppm (), 
+    IM::add_syntax (frame.syntax (), frame.alist (),
+                    Value::Const, "solute", Units::ppm (), 
 		    "Solutes in irrigation water.");
   }
-
-  ActionIrrigate (Block& al)
-    : Action (al),
-      days (al.integer ("days")),
-      hours (al.integer ("hours", (days > 0) ? 0 : 1)),
-      activated (false),
-      remaining_time (al.number ("remaining_time", -42.42e42)),
-      expr_flux (Librarian::build_item<Number> (al, "flux")),
-      flux (-42.42e42),
-      temp (al.number ("temperature", at_air_temperature)),
-      sm (al, "solute")
-  { }
-  ~ActionIrrigate ()
-  { }
-};
+} ActionIrrigateBase_syntax;
 
 const double ActionIrrigate::at_air_temperature = -500;
 
@@ -233,40 +243,34 @@ struct ActionIrrigateSubsoil : public ActionIrrigate
   { }
 };
 
-static struct ActionIrrigateOverheadSyntax
+static struct ActionIrrigateOverheadSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ActionIrrigateOverhead (al); }
+  Model* make (Block& al) const
+  { return new ActionIrrigateOverhead (al); }
   ActionIrrigateOverheadSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    ActionIrrigate::load_syntax (syntax, alist);
-    alist.add ("description", "\
-Irrigate the field from above.");
-    Librarian::add_type (Action::component, "irrigate_overhead", alist, syntax, &make);
-  }
+    : DeclareModel (Action::component, "irrigate_overhead", "irrigate_base", "\
+Irrigate the field from above.")
+  { }
+  void load_frame (Frame&) const
+  { }
 } ActionIrrigateOverhead_syntax;
 
-static struct ActionIrrigateSurfaceSyntax
+static struct ActionIrrigateSurfaceSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ActionIrrigateSurface (al); }
+  Model* make (Block& al) const
+  { return new ActionIrrigateSurface (al); }
   ActionIrrigateSurfaceSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    ActionIrrigate::load_syntax (syntax, alist);
-    alist.add ("description", "\
-Irrigate the field directly on the soil surface, bypassing the canopy.");
-    Librarian::add_type (Action::component, "irrigate_surface", alist, syntax, &make);
-  }
+    : DeclareModel (Action::component, "irrigate_surface", "irrigate_base", "\
+Irrigate the field directly on the soil surface, bypassing the canopy.")
+  { }
+  void load_frame (Frame&) const
+  { }
 } ActionIrrigateSurface_syntax;
 
-static struct ActionIrrigateTopSyntax
+static struct ActionIrrigateTopSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ActionIrrigateOverhead (al); }
+  Model* make (Block& al) const
+  { return new ActionIrrigateOverhead (al); }
   static bool check_alist (const AttributeList&, Treelog& err)
   {
     static bool warned = false;
@@ -277,21 +281,17 @@ static struct ActionIrrigateTopSyntax
     return true;
   }
   ActionIrrigateTopSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    ActionIrrigate::load_syntax (syntax, alist);
-    syntax.add_check (&check_alist);
-    alist.add ("description", "\
-OBSOLETE.  Use 'irrigate_overhead' instead.");
-    Librarian::add_type (Action::component, "irrigate_top", alist, syntax, &make);
-  }
+    : DeclareModel (Action::component, "irrigate_top", "irrigate_base", "\
+OBSOLETE.  Use 'irrigate_overhead' instead.")
+  { }
+  void load_frame (Frame& frame) const
+  { frame.add_check (&check_alist); }
 } ActionIrrigateTop_syntax;
 
-static struct ActionIrrigateSubsoilSyntax
+static struct ActionIrrigateSubsoilSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ActionIrrigateSubsoil (al); }
+  Model* make (Block& al) const
+  { return new ActionIrrigateSubsoil (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)
   { 
@@ -311,28 +311,25 @@ static struct ActionIrrigateSubsoilSyntax
   }
 
   ActionIrrigateSubsoilSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    ActionIrrigate::load_syntax (syntax, alist);
-    syntax.add_check (check_alist);	
-
-    alist.add ("description", "\
+    : DeclareModel (Action::component, "irrigate_subsoil", "irrigate_base", "\
 Irrigate the field directly into the soil.\n\
-Currently, the 'temperature' parameter is ignored.");
-    syntax.add_object ("volume", Volume::component, 
+Currently, the 'temperature' parameter is ignored.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    frame.add_check (check_alist);	
+
+    frame.add_object ("volume", Volume::component, 
                        Value::Const, Value::Singleton,
                        "Soil volume to add irritaion.");
-    alist.add ("volume", Volume::infinite_box ());
-    syntax.add ("from", "cm", Check::non_positive (), Value::OptionalConst, "\
+    frame.add ("volume", Volume::infinite_box ());
+    frame.add ("from", "cm", Check::non_positive (), Value::OptionalConst, "\
 Height where you want to start the incorporation (a negative number).\n\
 OBSOLETE: Use (volume box (top FROM)) instead.");
-    syntax.add ("to", "cm", Check::non_positive (), Value::OptionalConst, "\
+    frame.add ("to", "cm", Check::non_positive (), Value::OptionalConst, "\
 Height where you want to end the incorporation (a negative number).\n\
 OBSOLETE: Use (volume box (bottom TO)) instead.");
-
-    Librarian::add_type (Action::component, "irrigate_subsoil", alist, syntax, &make);
   }
-
 } ActionIrrigateSubsoil_syntax;
 
+// action_irrigate.C ends here.

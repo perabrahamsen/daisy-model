@@ -45,7 +45,9 @@ Intrinsics::clone () const
           std::vector<const Declare*>& decls = (*j).second;
           if (decls.size () == 0)
             continue;
-          daisy_assert (decls.size () == 1);
+          if (decls.size () != 1)
+            daisy_panic ("'" + model + "' declared multiple times in "
+                         + component);
           const Declare& declare = *decls[0];
           library.add_model (model, *new FrameModel (declare));
           decls.erase (decls.begin ());

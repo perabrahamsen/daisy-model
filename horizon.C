@@ -445,3 +445,5 @@ the responsibility of the `horizon' component to specify these\n\
 properties.")
   { }
 } Horizon_init;
+
+// horizon.C ends here.

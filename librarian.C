@@ -312,4 +312,17 @@ DeclareModel::DeclareModel (const symbol component,
 DeclareModel::~DeclareModel ()
 { }
 
+DeclareParam::DeclareParam (symbol component, symbol name, symbol super, 
+                            symbol description)
+  : DeclareBase (component, name, super, description)
+{ }
+
+void DeclareAlias::load_frame (Frame&) const
+{ }
+
+DeclareAlias::DeclareAlias (symbol component, symbol name, symbol super)
+  : DeclareParam (component, name, super, "'" + name
+                  + "' is anothor name for '" + super + "'")
+{ }
+
 // librarian.C ends here

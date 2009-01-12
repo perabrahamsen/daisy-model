@@ -28,6 +28,7 @@
 #include "ridge.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 
 struct ActionRidge : public Action
 {
@@ -53,21 +54,21 @@ struct ActionRidge : public Action
 };
 
 // Add the ActionRidge syntax to the syntax table.
-static struct ActionRidgeSyntax
+static struct ActionRidgeSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ActionRidge (al); }
+  Model* make (Block& al) const
+  { return new ActionRidge (al); }
 
   ActionRidgeSyntax ()
+    : DeclareModel (Action::component, "ridge", "Ridge a ridge on the field.")
+  { }
+  void load_frame (Frame& frame) const
   { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Ridge a ridge on the field.");
-    syntax.add_submodule ("ridge", alist, Value::Const,
+    frame.add_submodule ("ridge", Value::Const,
 			  "Ridge parameters",
 			  Ridge::load_syntax);
-    syntax.order ("ridge");
-    Librarian::add_type (Action::component, "ridge", alist, syntax, &make);
+    frame.order ("ridge");
   }
 } ActionRidge_syntax;
 
+// action_ridge.C ends here.

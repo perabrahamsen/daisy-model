@@ -26,6 +26,7 @@
 #include "block.h"
 #include "log.h"
 #include "librarian.h"
+#include "frame.h"
 
 struct ActionRepeat : public Action
 {
@@ -108,25 +109,26 @@ struct ActionRepeat : public Action
   }
 };
 
-static struct ActionRepeatSyntax
+static struct ActionRepeatSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ActionRepeat (al); }
+  Model* make (Block& al) const
+  { return new ActionRepeat (al); }
 
   ActionRepeatSyntax ()
-    {
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "\
+    : DeclareModel (Action::component, "repeat", "\
 Perform all of the specified action.  When done, repeat the action.\n\
-The action may take several timesteps.");
-      syntax.add_object ("repeat", Action::component,
+The action may take several timesteps.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+      frame.add_object ("repeat", Action::component,
                          Value::Const, Value::Singleton,
                          "Action to perform repeatedly.");
-      syntax.add_object ("do", Action::component, 
+      frame.add_object ("do", Action::component, 
                          Value::OptionalState, Value::Singleton,
                          "Action currently being performed.");
-      syntax.order ("repeat");
-      Librarian::add_type (Action::component, "repeat", alist, syntax, &make);
+      frame.order ("repeat");
     }
 } ActionRepeat_syntax;
+
+// action_repeat.C ends here.

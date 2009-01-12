@@ -28,6 +28,7 @@
 #include "check.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 
 struct ActionSetSurfaceDetentionCapacity : public Action
 {
@@ -54,22 +55,21 @@ struct ActionSetSurfaceDetentionCapacity : public Action
   { }
 };
 
-static struct ActionSurfaceSyntax
+static struct ActionSurfaceSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ActionSetSurfaceDetentionCapacity (al); }
+  Model* make (Block& al) const
+  { return new ActionSetSurfaceDetentionCapacity (al); }
   
   ActionSurfaceSyntax ()
+    : DeclareModel (Action::component, "set_surface_detention_capacity",  "\
+Set amount of ponding the surface can retain.")
+  { }
+  void load_frame (Frame& frame) const
   { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
-Set amount of ponding the surface can retain.");
-    syntax.add ("height", "cm", Check::non_negative (), Value::Const,
+    frame.add ("height", "cm", Check::non_negative (), Value::Const,
 		"Max ponding height before runoff.");
-    syntax.order ("height");
-    Librarian::add_type (Action::component, "set_surface_detention_capacity", 
-				 alist, syntax, &make);
+    frame.order ("height");
   }
 } ActionSurface_syntax;
 
+// action_surface.C ends here.

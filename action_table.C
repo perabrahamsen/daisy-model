@@ -32,6 +32,7 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 #include <set>
 #include <map>
 #include <memory>
@@ -336,17 +337,13 @@ ActionTable::ActionTable (Block& al)
 }
 
 // Add the ActionTable syntax to the syntax table.
-static struct ActionTableSyntax
+static struct ActionTableSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ActionTable (al); }
+  Model* make (Block& al) const
+  { return new ActionTable (al); }
 
   ActionTableSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    LexerTable::load_syntax (syntax, alist);
-    alist.add ("description", "\
+    : DeclareModel (Action::component, "table", "\
 Read management actions from a Daisy data file.\n\
 \n\
 After the ddf header, the following column tags are recognized (with\n\
@@ -374,26 +371,30 @@ The fertilizer type will be either the one specified in the\n\
 'Fertilizer' column, or the 'fertilizer' attribute.  You can disable\n\
 it with the 'enable_fertilization' attribute.\n\
 \n\
-Fertilizer [name]: The type of fertilizer to be applied.");
-    syntax.add_object ("sow", Action::component, 
+Fertilizer [name]: The type of fertilizer to be applied.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    LexerTable::load_syntax (frame.syntax (), frame.alist ());
+    frame.add_object ("sow", Action::component, 
                        Value::OptionalConst, Value::Singleton, 
                        "Sow action.");
-    syntax.add_object ("emerge", Action::component, 
+    frame.add_object ("emerge", Action::component, 
                        Value::OptionalConst, Value::Singleton, 
                        "Emerge action.");
-    syntax.add_object ("harvest", Action::component, 
+    frame.add_object ("harvest", Action::component, 
                        Value::OptionalConst, Value::Singleton, 
                        "Harvest action.");
-    syntax.add_object ("fertilizer", AM::component,
+    frame.add_object ("fertilizer", AM::component,
                        Value::OptionalConst, Value::Singleton, "\
 The fertilizer you want to apply.");
-    syntax.add ("enable_irrigation", Value::Boolean, Value::Const, "\
+    frame.add ("enable_irrigation", Value::Boolean, Value::Const, "\
 Set this to false to ignore any irrigation information in the file.");
-    alist.add ("enable_irrigation", true);
-    syntax.add ("enable_fertilization", Value::Boolean, Value::Const, "\
+    frame.add ("enable_irrigation", true);
+    frame.add ("enable_fertilization", Value::Boolean, Value::Const, "\
 Set this to false to ignore any fertilization information in the file.");
-    alist.add ("enable_fertilization", true);
-    Librarian::add_type (Action::component, "table", alist, syntax, &make);
+    frame.add ("enable_fertilization", true);
   }
 } ActionTable_syntax;
 
+// action_table.C ends here.
