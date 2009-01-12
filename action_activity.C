@@ -23,7 +23,7 @@
 
 
 #include "action.h"
-#include "syntax.h"
+#include "frame.h"
 #include "log.h"
 #include "memutils.h"
 #include "librarian.h"
@@ -93,24 +93,25 @@ struct ActionActivity : public Action
   { sequence_delete (actions.begin (), actions.end ()); }
 };
 
-static struct ActionActivitySyntax
+static struct ActionActivitySyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ActionActivity (al); }
+  Model* make (Block& al) const
+  { return new ActionActivity (al); }
 
   ActionActivitySyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
+    : DeclareModel (Action::component, "activity", "\
 Perform all the specified actions in the sequence listed.  Each\n\
 action is performed until done.  At most one action can be performed\n\
-at each time step.");
-    syntax.add_object ("actions", Action::component, 
+at each time step.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_object ("actions", Action::component, 
                        Value::State, Value::Sequence,
                        "Sequence of actions to perform.");
-    alist.add ("actions", std::vector<const AttributeList*> ());
-    syntax.order ("actions");
-    Librarian::add_type (Action::component, "activity", alist, syntax, &make);
+    frame.add ("actions", std::vector<const AttributeList*> ());
+    frame.order ("actions");
   }
 } ActionActivity_syntax;
+
+// action_activity.C ends here

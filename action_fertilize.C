@@ -34,6 +34,7 @@
 #include "volume.h"
 #include "units.h"
 #include "treelog.h"
+#include "frame.h"
 #include <sstream>
 
 // Base class for fertilize actions.
@@ -202,86 +203,6 @@ ActionFertilize::check (const Daisy& daisy, const Scope&, Treelog& err) const
   return ok;
 }
 
-bool 
-ActionFertilize::check_alist (const AttributeList& al, Treelog& err)
-{ 
-  bool ok = true;
-
-  bool second_year_compensation = al.flag ("second_year_compensation");
-  bool precision = al.check ("precision");
-  bool equivalent_weight = al.check ("equivalent_weight");
-  const AttributeList& am = al.alist ("am");
-  bool fertilizer_weight 
-    = (am.check ("weight") && am.number ("weight") > 0.0);
-
-  if (second_year_compensation && precision)
-    {
-      err.entry ("You cannot use 'second_year_compensation' "
-                 "with 'precision'");
-      ok = false;
-    }
-  if (fertilizer_weight + equivalent_weight + precision != 1)
-    {
-      err.entry ("You must specify exactly one of 'weight', "
-                 "'equivalent_weight' and 'precision'");
-      ok = false;
-    }
-
-  if (equivalent_weight || precision || second_year_compensation)
-    {
-      const symbol syntax = am.name ("syntax");
-      if (syntax != "mineral")
-        {
-          if (!am.check ("first_year_utilization"))
-            {
-              err.entry ("You must specify 'first_year_utilization' for "
-                         "the organic fertilizer");
-              ok = false;
-            }
-          if (!am.check ("weight") || !am.check ("total_N_fraction"))
-            {
-              std::ostringstream tmp;
-              tmp  << "You cannot use 'equivalent_weight' with "
-                   << syntax << " fertilizer";
-              err.entry (tmp.str ());
-            }
-        }
-
-    }
-  return ok;
-}
-
-void 
-ActionFertilize::load_syntax (Syntax& syntax, AttributeList& alist)
-{
-  syntax.add_check (check_alist);
-  syntax.add_object ("am", AM::component, "\
-The fertilizer you want to apply.");
-  syntax.add ("equivalent_weight", "kg N/ha", Check::non_negative (),
-              Value::OptionalConst, 
-              "\
-When fertilizing with organic matter, you may let Daisy calculate the\n\
-amount of dry matter that corresponds to the specified amount of\n\
-nitrogen.  This requires that the fertilizer has specified the\n\
-'first_year_utilization' parameter, but not the 'weight' parameter.");
-  syntax.add ("minimum_weight", "kg N/ha", Check::non_negative (),
-              Value::Const,
-              "Minimum amount of nitrogen to fertilize with.");
-  alist.add ("minimum_weight", 0.0);
-  syntax.add_submodule ("precision", alist, 
-                        Value::OptionalConst, "\
-Let the amount of fertilizer depend on the inorganic nitrogen in the soil.\n\
-The amount of fertilizer will be the specified 'target', minus the amount\n\
-already present in the soil zone between 'from' and 'to'.",
-                        &ActionFertilize::Precision::load_syntax);
-  syntax.add ("second_year_compensation", Value::Boolean, Value::Const, "\
-Compensate for the second year effect of previous fertilizations.\n\
-The second year effect is solely governed by the 'second_year_utilization'\n\
-organic fertilizer parameter.  The second year effect does not fade with\n\
-time, but is zeroed once you fertilize with this flag set.");
-  alist.add ("second_year_compensation", false);
-}
-
 ActionFertilize::ActionFertilize (Block& al)
   : Action (al),
     am (al.alist ("am")),
@@ -298,6 +219,90 @@ ActionFertilize::ActionFertilize (Block& al)
 
 ActionFertilize::~ActionFertilize ()
 { }
+
+static struct ActionFertilizeSyntax : public DeclareBase
+{
+  static bool check_alist (const AttributeList& al, Treelog& err)
+  { 
+    bool ok = true;
+
+    bool second_year_compensation = al.flag ("second_year_compensation");
+    bool precision = al.check ("precision");
+    bool equivalent_weight = al.check ("equivalent_weight");
+    const AttributeList& am = al.alist ("am");
+    bool fertilizer_weight 
+      = (am.check ("weight") && am.number ("weight") > 0.0);
+
+    if (second_year_compensation && precision)
+      {
+        err.entry ("You cannot use 'second_year_compensation' "
+                   "with 'precision'");
+        ok = false;
+      }
+    if (fertilizer_weight + equivalent_weight + precision != 1)
+      {
+        err.entry ("You must specify exactly one of 'weight', "
+                   "'equivalent_weight' and 'precision'");
+        ok = false;
+      }
+
+    if (equivalent_weight || precision || second_year_compensation)
+      {
+        const symbol syntax = am.name ("syntax");
+        if (syntax != "mineral")
+          {
+            if (!am.check ("first_year_utilization"))
+              {
+                err.entry ("You must specify 'first_year_utilization' for "
+                           "the organic fertilizer");
+                ok = false;
+              }
+            if (!am.check ("weight") || !am.check ("total_N_fraction"))
+              {
+                std::ostringstream tmp;
+                tmp  << "You cannot use 'equivalent_weight' with "
+                     << syntax << " fertilizer";
+                err.entry (tmp.str ());
+              }
+          }
+
+      }
+    return ok;
+  }
+
+  ActionFertilizeSyntax ()
+    : DeclareBase (Action::component, "fertilize_base", "\
+Shared parameters for all fertilize actions.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_check (check_alist);
+    frame.add_object ("am", AM::component, "\
+The fertilizer you want to apply.");
+    frame.add ("equivalent_weight", "kg N/ha", Check::non_negative (),
+                Value::OptionalConst, 
+                "\
+When fertilizing with organic matter, you may let Daisy calculate the\n\
+amount of dry matter that corresponds to the specified amount of\n\
+nitrogen.  This requires that the fertilizer has specified the\n\
+'first_year_utilization' parameter, but not the 'weight' parameter.");
+    frame.add ("minimum_weight", "kg N/ha", Check::non_negative (),
+                Value::Const,
+                "Minimum amount of nitrogen to fertilize with.");
+    frame.add ("minimum_weight", 0.0);
+    frame.add_submodule ("precision", Value::OptionalConst, "\
+Let the amount of fertilizer depend on the inorganic nitrogen in the soil.\n\
+The amount of fertilizer will be the specified 'target', minus the amount\n\
+already present in the soil zone between 'from' and 'to'.",
+                          &ActionFertilize::Precision::load_syntax);
+    frame.add ("second_year_compensation", Value::Boolean, Value::Const, "\
+Compensate for the second year effect of previous fertilizations.\n\
+The second year effect is solely governed by the 'second_year_utilization'\n\
+organic fertilizer parameter.  The second year effect does not fade with\n\
+time, but is zeroed once you fertilize with this flag set.");
+    frame.add ("second_year_compensation", false);
+  }
+} ActionFertilize_init;
 
 // Surface fertilizer.
 
@@ -345,10 +350,10 @@ ActionFertilizeSurface::doIt (Daisy& daisy, const Scope&, Treelog& msg)
     }
 }
 
-static struct ActionFertilizeSurfaceSyntax
+static struct ActionFertilizeSurfaceSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ActionFertilizeSurface (al); }
+  Model* make (Block& al) const
+  { return new ActionFertilizeSurface (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)
   { 
@@ -370,23 +375,22 @@ static struct ActionFertilizeSurfaceSyntax
   }
 
   ActionFertilizeSurfaceSyntax ()
+    : DeclareModel (Action::component, "fertilize", "fertilize_base", "\
+Apply fertilizer to the soil surface.")
+  { }
+  void load_frame (Frame& frame) const
   { 
-    Syntax& syntax = *new Syntax ();
-    syntax.add_check (check_alist);
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Apply fertilizer to the soil surface.");
-    ActionFertilize::load_syntax (syntax, alist);
+    frame.add_check (check_alist);
 
-    syntax.add ("from", "cm", Check::non_positive (), Value::Const, "\
+    frame.add ("from", "cm", Check::non_positive (), Value::Const, "\
 Height where you want to start the incorporation (a negative number)\n\
 OBSOLETE:  Use 'fertilize_incorporate' instead.");
-    alist.add ("from", 0.0);
-    syntax.add ("to", "cm", Check::non_positive (), Value::Const, "\
+    frame.add ("from", 0.0);
+    frame.add ("to", "cm", Check::non_positive (), Value::Const, "\
 Height where you want to end the incorporation (a negative number)\n\
 OBSOLETE:  Use 'fertilize_incorporate' instead.");
-    alist.add ("to", 0.0);
-    syntax.order ("am");
-    Librarian::add_type (Action::component, "fertilize", alist, syntax, &make);
+    frame.add ("to", 0.0);
+    frame.order ("am");
   }
 } ActionFertilizeSurface_syntax;
 
@@ -423,10 +427,10 @@ ActionFertilizeIncorporate::doIt (Daisy& daisy, const Scope&, Treelog& msg)
                                    *volume, daisy.dt, msg);
 }
 
-static struct ActionFertilizeIncorporateSyntax
+static struct ActionFertilizeIncorporateSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ActionFertilizeIncorporate (al); }
+  Model* make (Block& al) const
+  { return new ActionFertilizeIncorporate (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)
   { 
@@ -435,19 +439,16 @@ static struct ActionFertilizeIncorporateSyntax
   }
 
   ActionFertilizeIncorporateSyntax ()
+    : DeclareModel (Action::component, "incorporate_fertilizer", 
+                    "fertilize_base", "Incorporate fertilizer.")
+  { }
+  void load_frame (Frame& frame) const
   { 
-    Syntax& syntax = *new Syntax ();
-    syntax.add_check (check_alist);
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Incorporate fertilizer.");
-    ActionFertilize::load_syntax (syntax, alist);
-    syntax.add_object ("volume", Volume::component, 
+    frame.add_check (check_alist);
+    frame.add_object ("volume", Volume::component, 
                        Value::Const, Value::Singleton,
                        "Soil volume to incorporate fertilizer in.");
-
-    syntax.order ("am");
-    Librarian::add_type (Action::component, "incorporate_fertilizer",
-                         alist, syntax, &make);
+    frame.order ("am");
   }
 } ActionFertilizeIncorporate_syntax;
 

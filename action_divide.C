@@ -26,6 +26,7 @@
 #include "daisy.h"
 #include "field.h"
 #include "librarian.h"
+#include "frame.h"
 
 struct ActionDivide : public Action
 {
@@ -49,25 +50,24 @@ struct ActionDivide : public Action
     { }
 };
 
-static struct ActionDivideSyntax
+static struct ActionDivideSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-    { return *new ActionDivide (al); }
+  Model* make (Block& al) const
+  { return new ActionDivide (al); }
   ActionDivideSyntax ()
-    { 
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "\
+    : DeclareModel (Action::component, "divide", "\
 Divide an existing column into two, thus creating a new column.\n\
 The 'size' argument specifies the size of the new column, which must be\n\
-smaller than the size of the original column.");
-      syntax.add ("original", Syntax::String, Syntax::Const,
+smaller than the size of the original column.")
+  { }
+  void load_frame (Frame& frame) const
+    { 
+      frame.add ("original", Syntax::String, Syntax::Const,
 		  "Column to divide");
-      syntax.add ("copy", Syntax::String, Syntax::Const,
+      frame.add ("copy", Syntax::String, Syntax::Const,
 		  "Name of new column.");
-      syntax.add ("size", Syntax::Unknown (), Syntax::Const,
+      frame.add ("size", Syntax::Unknown (), Syntax::Const,
 		  "Size of the partition to remove.");
-      syntax.order ("original", "copy", "size");
-      Librarian::add_type (Action::component, "divide", alist, syntax, &make);
+      frame.order ("original", "copy", "size");
     }
 } ActionDivide_syntax;

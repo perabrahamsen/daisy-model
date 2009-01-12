@@ -39,6 +39,7 @@
 #include "vegetation.h"
 #include "units.h"
 #include "treelog.h"
+#include "frame.h"
 #include <sstream>
 
 struct ActionCrop : public Action
@@ -1014,10 +1015,10 @@ ActionCrop::~ActionCrop ()
 }
 
 // Add the ActionCrop syntax to the syntax table.
-static struct ActionCropSyntax
+static struct ActionCropSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ActionCrop (al); }
+  Model* make (Block& al) const
+  { return new ActionCrop (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)
   {
@@ -1044,60 +1045,62 @@ static struct ActionCropSyntax
   }
 
   ActionCropSyntax ()
+    : DeclareModel (Action::component, "crop", "\
+Manage a specific crop or multicrop.")
+  { }
+  void load_frame (Frame& frame) const
   { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    syntax.add_check (check_alist);
-    alist.add ("description", "Manage a specific crop or multicrop.");
+    frame.add_check (check_alist);
 
-    syntax.add_submodule ("primary", alist, Value::State,
+    frame.add_submodule ("primary", Value::State,
 			  "Primary crop.", ActionCrop::Sow::load_syntax);
-    syntax.add_submodule ("secondary", alist, Value::OptionalState, 
+    frame.add_submodule ("secondary", Value::OptionalState, 
 			  "Secondary crop, if any.",
 			  ActionCrop::Sow::load_syntax);
-    syntax.add_submodule ("harvest_annual", alist,
+    frame.add_submodule ("harvest_annual",
 			  Value::OptionalState,
 			  "Harvest parameters for annual crops.", 
 			  ActionCrop::Annual::load_syntax);
-    syntax.add_submodule ("harvest_perennial", alist,
+    frame.add_submodule ("harvest_perennial",
 			  Value::OptionalState, "\
 Harvest conditions for perennial crops.",
 			  ActionCrop::Perennial::load_syntax);
-    syntax.add_submodule_sequence("fertilize_at", Value::Const, "\
+    frame.add_submodule_sequence("fertilize_at", Value::Const, "\
 Fertilizer application by date.", ActionCrop::Fertilize::load_syntax);
-    alist.add ("fertilize_at", std::vector<const AttributeList*> ());
-    syntax.add ("fertilize_at_index", Value::Integer, Value::State,
+    frame.add ("fertilize_at", std::vector<const AttributeList*> ());
+    frame.add ("fertilize_at_index", Value::Integer, Value::State,
 		"Next entry in 'fertilize_at' to execute.");
-    alist.add ("fertilize_at_index", 0);
-    syntax.add ("fertilize_incorporate", Value::Boolean, Value::Const,
+    frame.add ("fertilize_at_index", 0);
+    frame.add ("fertilize_incorporate", Value::Boolean, Value::Const,
 		"Incorporate organic fertilizer in plowing zone.");
-    alist.add ("fertilize_incorporate", false);
-    syntax.add_submodule_sequence ("tillage", Value::State, "\
+    frame.add ("fertilize_incorporate", false);
+    frame.add_submodule_sequence ("tillage", Value::State, "\
 List of tillage operations to apply.", ActionCrop::Tillage::load_syntax);
-    alist.add ("tillage", std::vector<const AttributeList*> ());
-    syntax.add ("tillage_index", Value::Integer, Value::State,
+    frame.add ("tillage", std::vector<const AttributeList*> ());
+    frame.add ("tillage_index", Value::Integer, Value::State,
 		"Next entry in 'tillage' to execute.");
-    alist.add ("tillage_index", 0);
-    syntax.add_submodule_sequence ("spray", Value::State, "\
+    frame.add ("tillage_index", 0);
+    frame.add_submodule_sequence ("spray", Value::State, "\
 List of chemicals to apply.", ActionCrop::Spray::load_syntax);
-    alist.add ("spray", std::vector<const AttributeList*> ());
-    syntax.add ("spray_index", Value::Integer, Value::State,
+    frame.add ("spray", std::vector<const AttributeList*> ());
+    frame.add ("spray_index", Value::Integer, Value::State,
 		"Next entry in 'spray' to execute.");
-    alist.add ("spray_index", 0);
-    syntax.add_submodule ("irrigation", alist, Value::OptionalConst, "\
+    frame.add ("spray_index", 0);
+    frame.add_submodule ("irrigation", Value::OptionalConst, "\
 Irrigation model for first season.  If missing, don't irrigate.", 
 			  ActionCrop::Irrigation::load_syntax);
-    syntax.add_submodule ("irrigation_rest", alist, Value::OptionalConst, "\
+    frame.add_submodule ("irrigation_rest", Value::OptionalConst, "\
 Irrigation model for remaining seasons.\n\
 If missing, use the same model as first season.",
 			  ActionCrop::Irrigation::load_syntax);
-    syntax.add ("irrigation_year", Value::Integer, Value::OptionalState, 
+    frame.add ("irrigation_year", Value::Integer, Value::OptionalState, 
 		"Year management started.\n\
 Negative number means it hasn't started yet.");
-    syntax.add ("irrigation_delay", Value::Integer, Value::OptionalState, 
+    frame.add ("irrigation_delay", Value::Integer, Value::OptionalState, 
 		"Hours we test for irrigation again.\n\
 This is set at each irrigation, to avoid multiple applications.");
       
-    Librarian::add_type (Action::component, "crop", alist, syntax, &make);
   }
 } ActionCrop_syntax;
+
+// action_crop.C ends here.

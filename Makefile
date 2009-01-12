@@ -1489,14 +1489,14 @@ transport_convection${OBJ}: transport_convection.C transport.h model.h \
   log.h time.h border.h
 ABAprod_uptake${OBJ}: ABAprod_uptake.C ABAprod.h model.h symbol.h alist.h \
   number.h scope_id.h scope.h value.h geometry.h syntax.h mathlib.h \
-  assertion.h soil_water.h units.h librarian.h treelog.h
+  assertion.h soil_water.h units.h librarian.h frame.h treelog.h
 ABAprod_soil${OBJ}: ABAprod_soil.C ABAprod.h model.h symbol.h alist.h \
   number.h scope_exchange.h scope_model.h scope.h value.h memutils.h \
   geometry.h syntax.h mathlib.h assertion.h soil_water.h librarian.h \
-  treelog.h
+  frame.h treelog.h
 ABAprod_root${OBJ}: ABAprod_root.C ABAprod.h model.h symbol.h alist.h \
   number.h scope_id.h scope.h value.h geometry.h syntax.h mathlib.h \
-  assertion.h soil_water.h units.h librarian.h treelog.h
+  assertion.h soil_water.h units.h librarian.h frame.h treelog.h
 solver_ublas${OBJ}: solver_ublas.C solver.h model.h symbol.h alist.h \
   assertion.h syntax.h value.h librarian.h
 solver_cxsparse${OBJ}: solver_cxsparse.C solver.h model.h symbol.h alist.h \
@@ -1801,7 +1801,7 @@ groundwater_file${OBJ}: groundwater_file.C groundwater.h model.h symbol.h \
 action_fertilize${OBJ}: action_fertilize.C action.h model.h symbol.h alist.h \
   block.h syntax.h value.h plf.h daisy.h program.h run.h time.h \
   timestep.h vcheck.h memutils.h field.h border.h am.h im.h check.h \
-  assertion.h librarian.h volume.h units.h treelog.h
+  assertion.h librarian.h volume.h units.h treelog.h frame.h scope.h
 action_repeat${OBJ}: action_repeat.C action.h model.h symbol.h alist.h \
   daisy.h program.h run.h time.h timestep.h vcheck.h memutils.h block.h \
   syntax.h value.h plf.h log.h border.h librarian.h
@@ -1836,7 +1836,7 @@ action_crop${OBJ}: action_crop.C action.h model.h symbol.h alist.h daisy.h \
   program.h run.h time.h timestep.h vcheck.h memutils.h field.h border.h \
   crop.h am.h im.h syntax.h value.h log.h harvest.h block.h plf.h \
   check_range.h check.h submodeler.h mathlib.h assertion.h librarian.h \
-  vegetation.h units.h treelog.h
+  vegetation.h units.h treelog.h frame.h scope.h
 groundwater_lysimeter${OBJ}: groundwater_lysimeter.C groundwater.h model.h \
   symbol.h alist.h geometry.h syntax.h value.h mathlib.h assertion.h \
   librarian.h
@@ -1881,7 +1881,8 @@ action_wait${OBJ}: action_wait.C action.h model.h symbol.h alist.h block.h \
   program.h run.h timestep.h vcheck.h memutils.h assertion.h librarian.h \
   treelog.h
 action_activity${OBJ}: action_activity.C action.h model.h symbol.h alist.h \
-  syntax.h value.h log.h time.h border.h memutils.h librarian.h
+  frame.h syntax.h value.h scope.h log.h time.h border.h memutils.h \
+  librarian.h
 mactrans_std${OBJ}: mactrans_std.C mactrans.h model.h symbol.h alist.h \
   soil_water.h geometry1d.h geometry_vert.h geometry.h syntax.h value.h \
   mathlib.h assertion.h plf.h librarian.h treelog.h
