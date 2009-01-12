@@ -2,12 +2,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Frame
 
-** Ryd op i column.C
-
-*** Ret Point
-
-** Ryd op i column_std.C
-
 ** Brug DeclareModel alle steder
 
 ** Fjern al brug af alist of syntax udenfor frame

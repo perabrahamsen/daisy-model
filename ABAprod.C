@@ -73,17 +73,15 @@ struct ABAProdNone : public ABAProd
   { }
 };
 
-static struct ABAProdNoneSyntax
+static struct ABAProdNoneSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ABAProdNone (al); }
+  Model* make (Block& al) const
+  { return new ABAProdNone (al); }
   ABAProdNoneSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "No ABA production.");
-    Librarian::add_type (ABAProd::component, "none", alist, syntax, &make);
-  }
+    : DeclareModel (ABAProd::component, "none", "No ABA production.")
+  { }
+  void load_frame (Frame& frame) const
+  { }
 } ABAProdNone_syntax;
 
 const AttributeList& 

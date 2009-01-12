@@ -28,8 +28,7 @@
 #include "units.h"
 #include "assertion.h"
 #include "librarian.h"
-#include "syntax.h"
-#include "alist.h"
+#include "frame.h"
 #include "treelog.h"
 #include <sstream>
 
@@ -129,25 +128,24 @@ ABAProdUptake::ABAProdUptake (Block& al)
 ABAProdUptake::~ABAProdUptake ()
 { }
 
-static struct ABAProdUptakeSyntax
+static struct ABAProdUptakeSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ABAProdUptake (al); }
+  Model* make (Block& al) const
+  { return new ABAProdUptake (al); }
   ABAProdUptakeSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
+    : DeclareModel (ABAProd::component, "uptake", "\
 ABA production based on concentration in water uptake.\n\
 \n\
 The assumption is water uptake from roots in specific region of the soil\n\
 comes with a specific ABA concentration, which depends solely on the\n\
-water pressure in that region.");
-    syntax.add_object ("expr", Number::component, 
-                       Value::Const, Value::Singleton, "\
+water pressure in that region.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_object ("expr", Number::component, 
+                      Value::Const, Value::Singleton, "\
 Expression to evaluate to ABA concentration in water uptake [g/cm^3].\n\
 The symbol 'h' will be bound to the water pressure [cm].");
-    Librarian::add_type (ABAProd::component, "uptake", alist, syntax, &make);
   }
 } ABAProdUptake_syntax;
 

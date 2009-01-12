@@ -28,8 +28,7 @@
 #include "units.h"
 #include "assertion.h"
 #include "librarian.h"
-#include "syntax.h"
-#include "alist.h"
+#include "frame.h"
 #include "treelog.h"
 
 struct ABAProdRoot : public ABAProd
@@ -117,25 +116,24 @@ ABAProdRoot::ABAProdRoot (Block& al)
 ABAProdRoot::~ABAProdRoot ()
 { }
 
-static struct ABAProdRootSyntax
+static struct ABAProdRootSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ABAProdRoot (al); }
+  Model* make (Block& al) const
+  { return new ABAProdRoot (al); }
   ABAProdRootSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
+    : DeclareModel (ABAProd::component, "root", "\
 ABA production based on production in roots.\n\
 \n\
 The assumptions are that that each length of root will produce ABA\n\
 with a rate that depends solely on the water pressure in that cell,\n\
-and that all the ABA will be included in the water uptake.");
-    syntax.add_object ("expr", Number::component, 
-                       Value::Const, Value::Singleton, "\
+and that all the ABA will be included in the water uptake.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_object ("expr", Number::component, 
+                      Value::Const, Value::Singleton, "\
 Expression to evaluate to ABA production per root length [g/cm/h].\n\
 The symbol 'h' will be bound to the water pressure [cm].");
-    Librarian::add_type (ABAProd::component, "root", alist, syntax, &make);
   }
 } ABAProdRoot_syntax;
 

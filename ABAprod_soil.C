@@ -27,8 +27,7 @@
 #include "soil_water.h"
 #include "assertion.h"
 #include "librarian.h"
-#include "syntax.h"
-#include "alist.h"
+#include "frame.h"
 #include "treelog.h"
 
 struct ABAProdSoil : public ABAProd
@@ -132,23 +131,22 @@ ABAProdSoil::ABAProdSoil (Block& al)
 ABAProdSoil::~ABAProdSoil ()
 { }
 
-static struct ABAProdSoilSyntax
+static struct ABAProdSoilSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ABAProdSoil (al); }
+  Model* make (Block& al) const
+  { return new ABAProdSoil (al); }
   ABAProdSoilSyntax ()
+    : DeclareModel (ABAProd::component, "soil", "\
+ABA production based on soil location.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
-ABA production based on soil location.");
-    syntax.add_object ("expr", Number::component, 
-                       Value::Const, Value::Singleton, "\
+    frame.add_object ("expr", Number::component, 
+                      Value::Const, Value::Singleton, "\
 Expression to evaluate to ABA uptake [g/cm^3/h].\n\
 The symbol 'h' will be bound to the water pressure [cm].\n\
 The symbol 'L' will be bound to the root density [cm/cm^3].\n\
 The symbol 'S' will be bound to the water uptake [cm^3/cm^3/h].");
-    Librarian::add_type (ABAProd::component, "soil", alist, syntax, &make);
   }
 } ABAProdSoil_syntax;
 
