@@ -29,8 +29,7 @@
 #include "phenology.h"
 #include "log.h"
 #include "plf.h"
-#include "alist.h"
-#include "syntax.h"
+#include "frame.h"
 #include "block.h"
 #include "submodel.h"
 #include "mathlib.h"
@@ -175,55 +174,52 @@ PhotoFCC4::respiration_rate (const double Vm_25, const double Tl) const
   return rd;
 }
 
-static struct Photo_FCC4Syntax
+static struct Photo_FCC4Syntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new PhotoFCC4 (al); }
+  Model* make (Block& al) const
+  { return new PhotoFCC4 (al); }
   Photo_FCC4Syntax ()
+    : DeclareModel (Photo::component, "FC_C4", "Farquhar", "\
+C4 photosynthesis and stomatal conductance model by Collatz et al., 1992.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-
-    PhotoFarquhar::load_syntax(syntax, alist);
-
-    alist.add ("description", "C4 photosynthesis and stomatal conductance model by Collatz et al., 1992.");
-
-    syntax.add ("Q10k", "", Check::positive (), Value::Const,
+    frame.add ("Q10k", Value::Unknown (), Check::positive (), Value::Const,
                 "Q10k = 1.8 (Collatz et al., 1992)");
-    alist.add ("Q10k", 1.8);
+    frame.add ("Q10k", 1.8);
 
-    syntax.add ("Q10vm", "", Check::positive (), Value::Const,
+    frame.add ("Q10vm", Value::Unknown (), Check::positive (), Value::Const,
                 "Q10vm = 2.4 (Collatz et al., 1992)");
-    alist.add ("Q10vm", 2.4);
+    frame.add ("Q10vm", 2.4);
 
-    syntax.add ("Q10rd", "", Check::positive (), Value::Const,
+    frame.add ("Q10rd", Value::Unknown (), Check::positive (), Value::Const,
                 "Q10rd = 2.0 (Collatz et al., 1992)");
-    alist.add ("Q10rd", 2.0);
+    frame.add ("Q10rd", 2.0);
 
-    syntax.add ("kj", "", Check::positive (), Value::Const,
+    frame.add ("kj", Value::Unknown (), Check::positive (), Value::Const,
                 "Initial slope of photosynthetic CO2 response, kj = 0.6 mol/m²/s (Collatz et al., 1992)");
-    alist.add ("kj", 0.6);
+    frame.add ("kj", 0.6);
 
-    syntax.add ("alpha", "mol/mol", Check::positive (), Value::Const,
+    frame.add ("alpha", "mol/mol", Check::positive (), Value::Const,
                 "Initial slope of photosynthetic light response. alpha = 0.04 (Collatz et al., 1992)");
-    alist.add ("alpha", 0.04);
+    frame.add ("alpha", 0.04);
 
-    syntax.add ("paab", "", Check::positive (), Value::Const,
+    frame.add ("paab", Value::Unknown (), Check::positive (), Value::Const,
                 "Leaf absorbtivity to PAR. paab = 0.86 (Collatz et al., 1992)");
-    alist.add ("paab", 0.86);
+    frame.add ("paab", 0.86);
 
-    syntax.add ("theta", " ", Check::positive (), Value::Const,
+    frame.add ("theta", Value::Unknown (), Check::positive (), Value::Const,
                 "Curvature parameter");
-    alist.add ("theta", 0.83);
+    frame.add ("theta", 0.83);
     
-    syntax.add ("beta", " ", Check::positive (), Value::Const,
+    frame.add ("beta", Value::Unknown (), Check::positive (), Value::Const,
                 "Curvanture parameter");
-    alist.add ("beta", 0.93);
+    frame.add ("beta", 0.93);
 
-    alist.add ("m", 3.0);
-    alist.add ("b", 0.08);
- 
-    Librarian::add_type (Photo::component, "FC_C4", alist, syntax, &make);
+    frame.add ("m", 3.0);
+    frame.add ("b", 0.08);
   }
 
 } PhotoFCC4_syntax;
+
+// photo_FCC4 ends here.

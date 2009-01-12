@@ -33,13 +33,12 @@
 #include "phenology.h"
 #include "log.h"
 #include "plf.h"
-#include "alist.h"
-#include "syntax.h"
 #include "submodel.h"
 #include "mathlib.h"
 #include "treelog.h"
 #include "check.h"
 #include "librarian.h"
+#include "frame.h"
 #include <sstream>
 
 PhotoFarquhar::PhotoFarquhar (Block& al)
@@ -425,93 +424,87 @@ bool
 PhotoFarquhar::handle_water_stress () const
 { return true; }
 
-void 
-PhotoFarquhar::load_syntax (Syntax& syntax, AttributeList& alist)
-{
-  Photo::load_base (syntax, alist);
-  alist.add ("base_model", "Farquhar");
-
-  alist.add ("description", "Faquhar et al. (1980) photosynthesis and Ball et al. (1987) stomataconductance model coupled as described by Collatz et al., 1991.");
-
-  syntax.add ("Xn", "mol/mol/s", Check::positive (), Value::Const,
-	      "Slope of relationship between leaf rubisco N and Vmax, Xn = 1.16E-3 mol/mol/s for wheat (de Pury & Farquhar, 1997)");
-  alist.add ("Xn", 1.16e-3);
-
-  syntax.add ("O2_atm", "Pa", Check::positive (), Value::Const,
-	      "O2 partial pressure of atmosphere");
-  alist.add ("O2_atm", 20500.0);
-
-  syntax.add ("Gamma25", "Pa", Check::positive (), Value::Const,
-	      "CO2 compensation point of photosynthesis. Gamma25 = 3.69 Pa for wheat (Collatz et al., 1991)");
-  alist.add ("Gamma25", 3.69);
-
-  syntax.add ("Ea_Gamma", "J/mol", Check::positive (), Value::Const,
-	      "Actimation energy for Gamma. Ea_Gamma = 29000 (Jordan & Ogren, 1984)");
-  alist.add ("Ea_Gamma", 29000.);
-
-  syntax.add ("Ptot", "Pa", Check::positive (), Value::Const,
-	      "Atmospheric pressure. Ptot = 100000 Pa");
-  alist.add ("Ptot", 1.0E5);
-
-  syntax.add ("m", Value::None (), Check::positive (), Value::Const,
-	      "Stomatal slope factor. Ball and Berry (1982): m = 9 for soyabean. Wang and Leuning(1998): m = 11 for wheat");
-
-  syntax.add ("b", "mol/m^2/s", Check::positive (), Value::Const,
-	      "Stomatal intercept factor, Ball and Berry (1982) & Wang and Leuning(1998): (0.01 mol/m2/s)");
-
-    syntax.add ("gbw", "mol/m^2/s", Check::positive (), Value::Const,
-                "Leaf boundary conductance of water. gbw = 2 mol/m²/s (Collatz et al., 1991");
-    alist.add ("gbw", 2.00);
-
-  //log variables
-  syntax.add ("ABA_effect", Value::None (), Value::LogOnly,
-              "Water stress effect induced by ABA");
-  syntax.add ("ci_vector", "Pa", Value::LogOnly, Value::Sequence, "CO2 pressure in Stomatal in each layer.");
-  syntax.add ("Vm_vector", "mmol/m^2/s", Value::LogOnly, Value::Sequence, "Photosynthetic capacity in each layer.");
-  syntax.add ("Jm_vector", "mmol/m^2/s", Value::LogOnly, Value::Sequence, "Potential rate of electron transport in each layer.");
-  syntax.add ("gs_vector", "mol/m^2/s", Value::LogOnly, Value::Sequence, "Stomata cunductance in each layer.");
-  syntax.add ("gs_sun_vector", "mol/m^2/s", Value::LogOnly, Value::Sequence, "Stomata cunductance in sunlit fraction of each layer.");
-  syntax.add ("Nleaf_vector", "mol N/m^2", Value::LogOnly, Value::Sequence, "Distribution of photosynthetic N-leaf.");
-  syntax.add ("Ass_vector", "mol CH2O/m^2/h", Value::LogOnly, Value::Sequence, "Brutto assimilate.");
-  syntax.add ("sun_LAI_vector", "mol CH2O/m^2/s", Value::LogOnly, Value::Sequence, "sunlit LAI.");
-
-  syntax.add ("ci_middel", "Pa", Value::LogOnly, "Stomata average CO2 pressure.");
-  syntax.add ("gs", "mol/m^2/s", Value::LogOnly, "Stomata conductance.");
-  syntax.add ("gs_ms", "m/s", Value::LogOnly, "Stomata conductance.");
-  syntax.add ("Ass", "g CH2O/m^2/h", Value::LogOnly, "'Net' leaf assimilate of CO2 (brutto photosynthesis).");
-  syntax.add ("Res", "g CH2O/m^2/h", Value::LogOnly, "Farquhar leaf respiration.");
-  syntax.add ("LAI", "", Value::LogOnly, "Leaf area index for the canopy used in photosynthesis.");
-  syntax.add ("sun_LAI", "", Value::LogOnly, "Leaf area index for the sunlit fraction.");
-  syntax.add ("PAR_", "mol/m^2/h", Value::LogOnly, "PAR.");
-  syntax.add ("Vmax", "[mmol/m^2/s]", Value::LogOnly, "Photosynthetic Rubisco capacity.");
-  syntax.add ("jm", "[mmol/m^2/s]", Value::LogOnly, "Potential rate of electron transport.");
-  syntax.add ("leafPhotN", "[mol N/m^2]", Value::LogOnly, "Content of photosynthetic active leaf N.");
-  syntax.add ("fraction_sun", "", Value::LogOnly, "Fraction of sunlit in the canopy.");
-  syntax.add ("fraction_total", "", Value::LogOnly, "Fraction of leaf contributing to the photosynthesis.");
-
-  // Models
-  syntax.add_object ("N-dist", RubiscoNdist::component, 
-		     "Rubisco N-distribution in the canopy layer.");
-  alist.add ("N-dist", RubiscoNdist::default_model ());
-
-  syntax.add_object ("ABAeffect", ABAEffect::component, 
-		     "The effect of xylem ABA on stomata conductivity.");
-  alist.add ("ABAeffect", ABAEffect::default_model ());
-
-  syntax.add_object ("Stomatacon", StomataCon::component, 
-		     "Stomata conductance of water vapor.");
-  alist.add ("Stomatacon", StomataCon::default_model ());
-
-}
-
-static struct PhotoFarquharSyntax
+static struct PhotoFarquharSyntax : DeclareBase
 {
   PhotoFarquharSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    PhotoFarquhar::load_syntax (syntax, alist);
+    : DeclareBase (Photo::component, "Farquhar", "\
+Base parameterization for Farquhar derived photosynthesis models.\n\
+\n\
+Faquhar et al. (1980) photosynthesis and Ball et al. (1987)\n\
+stomataconductance model coupled as described by Collatz et al., 1991.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add ("Xn", "mol/mol/s", Check::positive (), Value::Const,
+                "Slope of relationship between leaf rubisco N and Vmax.\n\
+Xn = 1.16E-3 mol/mol/s for wheat (de Pury & Farquhar, 1997)");
+    frame.add ("Xn", 1.16e-3);
 
-    Librarian::add_base (Photo::component, alist, syntax);
+    frame.add ("O2_atm", "Pa", Check::positive (), Value::Const,
+                "O2 partial pressure of atmosphere");
+    frame.add ("O2_atm", 20500.0);
+
+    frame.add ("Gamma25", "Pa", Check::positive (), Value::Const,
+                "CO2 compensation point of photosynthesis. Gamma25 = 3.69 Pa for wheat (Collatz et al., 1991)");
+    frame.add ("Gamma25", 3.69);
+
+    frame.add ("Ea_Gamma", "J/mol", Check::positive (), Value::Const,
+                "Actimation energy for Gamma. Ea_Gamma = 29000 (Jordan & Ogren, 1984)");
+    frame.add ("Ea_Gamma", 29000.);
+
+    frame.add ("Ptot", "Pa", Check::positive (), Value::Const,
+                "Atmospheric pressure. Ptot = 100000 Pa");
+    frame.add ("Ptot", 1.0E5);
+
+    frame.add ("m", Value::None (), Check::positive (), Value::Const,
+                "Stomatal slope factor. Ball and Berry (1982): m = 9 for soyabean. Wang and Leuning(1998): m = 11 for wheat");
+
+    frame.add ("b", "mol/m^2/s", Check::positive (), Value::Const,
+                "Stomatal intercept factor, Ball and Berry (1982) & Wang and Leuning(1998): (0.01 mol/m2/s)");
+
+    frame.add ("gbw", "mol/m^2/s", Check::positive (), Value::Const,
+                "Leaf boundary conductance of water. gbw = 2 mol/m²/s (Collatz et al., 1991");
+    frame.add ("gbw", 2.00);
+
+    //log variables
+    frame.add ("ABA_effect", Value::None (), Value::LogOnly,
+                "Water stress effect induced by ABA");
+    frame.add ("ci_vector", "Pa", Value::LogOnly, Value::Sequence, "CO2 pressure in Stomatal in each layer.");
+    frame.add ("Vm_vector", "mmol/m^2/s", Value::LogOnly, Value::Sequence, "Photosynthetic capacity in each layer.");
+    frame.add ("Jm_vector", "mmol/m^2/s", Value::LogOnly, Value::Sequence, "Potential rate of electron transport in each layer.");
+    frame.add ("gs_vector", "mol/m^2/s", Value::LogOnly, Value::Sequence, "Stomata cunductance in each layer.");
+    frame.add ("gs_sun_vector", "mol/m^2/s", Value::LogOnly, Value::Sequence, "Stomata cunductance in sunlit fraction of each layer.");
+    frame.add ("Nleaf_vector", "mol N/m^2", Value::LogOnly, Value::Sequence, "Distribution of photosynthetic N-leaf.");
+    frame.add ("Ass_vector", "mol CH2O/m^2/h", Value::LogOnly, Value::Sequence, "Brutto assimilate.");
+    frame.add ("sun_LAI_vector", "mol CH2O/m^2/s", Value::LogOnly, Value::Sequence, "sunlit LAI.");
+
+    frame.add ("ci_middel", "Pa", Value::LogOnly, "Stomata average CO2 pressure.");
+    frame.add ("gs", "mol/m^2/s", Value::LogOnly, "Stomata conductance.");
+    frame.add ("gs_ms", "m/s", Value::LogOnly, "Stomata conductance.");
+    frame.add ("Ass", "g CH2O/m^2/h", Value::LogOnly, "'Net' leaf assimilate of CO2 (brutto photosynthesis).");
+    frame.add ("Res", "g CH2O/m^2/h", Value::LogOnly, "Farquhar leaf respiration.");
+    frame.add ("LAI", "", Value::LogOnly, "Leaf area index for the canopy used in photosynthesis.");
+    frame.add ("sun_LAI", "", Value::LogOnly, "Leaf area index for the sunlit fraction.");
+    frame.add ("PAR_", "mol/m^2/h", Value::LogOnly, "PAR.");
+    frame.add ("Vmax", "[mmol/m^2/s]", Value::LogOnly, "Photosynthetic Rubisco capacity.");
+    frame.add ("jm", "[mmol/m^2/s]", Value::LogOnly, "Potential rate of electron transport.");
+    frame.add ("leafPhotN", "[mol N/m^2]", Value::LogOnly, "Content of photosynthetic active leaf N.");
+    frame.add ("fraction_sun", "", Value::LogOnly, "Fraction of sunlit in the canopy.");
+    frame.add ("fraction_total", "", Value::LogOnly, "Fraction of leaf contributing to the photosynthesis.");
+
+    // Models
+    frame.add_object ("N-dist", RubiscoNdist::component, 
+                       "Rubisco N-distribution in the canopy layer.");
+    frame.add ("N-dist", RubiscoNdist::default_model ());
+
+    frame.add_object ("ABAeffect", ABAEffect::component, 
+                       "The effect of xylem ABA on stomata conductivity.");
+    frame.add ("ABAeffect", "ABA-exp");
+
+    frame.add_object ("Stomatacon", StomataCon::component, 
+                       "Stomata conductance of water vapor.");
+    frame.add ("Stomatacon", StomataCon::default_model ());
   }
 } PhotoFarquhar_syntax;
+
+// photo_Farquhar.C ends here.

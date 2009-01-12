@@ -137,7 +137,7 @@ FrameModel::FrameModel (const FrameModel& p,
 
 FrameModel::FrameModel (const Declare& declare)
   // Declared.
-  : Frame (),
+  : Frame (declare.parent_model ()),
     parent_ (declare.parent_model ()),
     builder (NULL),
     declaration (dynamic_cast<const DeclareModel*> (&declare))

@@ -65,8 +65,6 @@ public:
 public:
   virtual bool handle_N_stress () const = 0;
   virtual bool handle_water_stress () const = 0;
-  static const AttributeList& default_model ();
-  static void load_base (Syntax&, AttributeList&);
   Photo (Block&);
   ~Photo ();
 };

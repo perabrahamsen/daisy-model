@@ -30,8 +30,7 @@
 #include "phenology.h"
 #include "log.h"
 #include "plf.h"
-#include "alist.h"
-#include "syntax.h"
+#include "frame.h"
 #include "submodel.h"
 #include "mathlib.h"
 #include <sstream>
@@ -286,89 +285,85 @@ PhotoFCC3::respiration_rate (const double Vm_25, const double Tl) const
   return rd;
 }
 
-static struct Photo_FCC3Syntax
+static struct Photo_FCC3Syntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new PhotoFCC3 (al); }
-  Photo_FCC3Syntax ()
+  Model* make (Block& al) const
+  { return new PhotoFCC3 (al); }
+  Photo_FCC3Syntax () 
+    : DeclareModel (Photo::component, "FC_C3", "Farquhar", "\
+Photosynthesis for C3 crops described by Faquhar et al. (1980).")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-
-    PhotoFarquhar::load_syntax(syntax, alist);
-
-
-    alist.add ("description", "Photosynthesis for C3 crops described by Faquhar et al. (1980).");
-
-    syntax.add ("TempEff","dg C", Value::None (), Check::non_negative (),Value::Const,
+    frame.add ("TempEff", "dg C", Value::None (),
+               Check::non_negative (), Value::Const,
                 "Temperature factor for assimilate production.");
 
-
-    syntax.add ("Kc25", "Pa", Check::positive (), Value::Const,
+    frame.add ("Kc25", "Pa", Check::positive (), Value::Const,
                 "Micahyaelis-Menten constant of Rubisco for CO2. Kc25 = 40.4 Pa for wheat (Collatz et al.,1991) ");
 
-    alist.add ("Kc25", 40.4);
+    frame.add ("Kc25", 40.4);
 
-    syntax.add ("Ko25", "Pa", Check::positive (), Value::Const,
+    frame.add ("Ko25", "Pa", Check::positive (), Value::Const,
                 "Micahaelis-Menten constant of Rubisco for O2 at 25 degrees. Ko25 = 24800 Pa for wheat (Collatz et al., 1991)");
-    alist.add ("Ko25", 24800.);
+    frame.add ("Ko25", 24800.);
 
-    syntax.add ("S", "J/mol/K", Check::positive (), Value::Const,
+    frame.add ("S", "J/mol/K", Check::positive (), Value::Const,
                 "Electron transport temperature response parameter,(De Pury & Farquhar, 1997)");
-    alist.add ("S", 710.);
+    frame.add ("S", 710.);
     
-    syntax.add ("H", "J/mol", Check::positive (), Value::Const,
+    frame.add ("H", "J/mol", Check::positive (), Value::Const,
                 "Curvature parameter of Jm, (De Pury & Farquhar, 1997)");
-    alist.add ("H", 220000.);
+    frame.add ("H", 220000.);
     
-    syntax.add ("c_Vm", "", Check::positive (), Value::Const,
+    frame.add ("c_Vm", Value::Unknown (), Check::positive (), Value::Const,
                 "Temperature scaling constant for Vmax. c_Vm, = 26.35 (Bernacchi et al., 2001)");
-    alist.add ("c_Vm", 26.35);
+    frame.add ("c_Vm", 26.35);
     
-    syntax.add ("Ea_Vm", "J/mol", Check::positive (), Value::Const,
+    frame.add ("Ea_Vm", "J/mol", Check::positive (), Value::Const,
                 "Activation energy for Vmax. Ea_Vm = 65330 J/mol (Ball, 1988)");
-    alist.add ("Ea_Vm", 65330.);
+    frame.add ("Ea_Vm", 65330.);
 
-    syntax.add ("Eda_Vm", "J/mol", Check::positive (), Value::Const,
+    frame.add ("Eda_Vm", "J/mol", Check::positive (), Value::Const,
                 "Deactimation energy for Vmax. Eda_Vm = 202900 J/mol");
-    alist.add ("Eda_Vm", 202900.);
+    frame.add ("Eda_Vm", 202900.);
    
-    syntax.add ("Ea_Jm", "J/mol", Check::positive (), Value::Const,
+    frame.add ("Ea_Jm", "J/mol", Check::positive (), Value::Const,
                 "Actimation energy for Jm. Ea_Jm = 37000 J/mol (Farquhar et al., 1980).");
-    alist.add ("Ea_Jm", 37000.);
+    frame.add ("Ea_Jm", 37000.);
 
-    syntax.add ("Ea_ko", "J/mol", Check::positive (), Value::Const,
+    frame.add ("Ea_ko", "J/mol", Check::positive (), Value::Const,
                 "Actimation energy for ko. Ea_ko 0 36000 J/mol (Badger & Collatz, 1977).");
-    alist.add ("Ea_ko", 36000.);
+    frame.add ("Ea_ko", 36000.);
 
-    syntax.add ("Ea_kc", "J/mol", Check::positive (), Value::Const,
+    frame.add ("Ea_kc", "J/mol", Check::positive (), Value::Const,
                 "Actimation energy for kc. Ea_kc = 59400 J/mol (Badger & Collatz, 1977)");
-    alist.add ("Ea_kc", 59400.);
+    frame.add ("Ea_kc", 59400.);
 
-    syntax.add ("Ea_rd", "J/mol", Check::positive (), Value::Const,
+    frame.add ("Ea_rd", "J/mol", Check::positive (), Value::Const,
                 "Actimation energy for rd. Ea_rd = 66400 J/mol (Farquhar et al., 1980)");
-    alist.add ("Ea_rd", 66400.);
+    frame.add ("Ea_rd", 66400.);
 
-    syntax.add ("Sv", "J/mol/K", Check::positive (), Value::Const,
+    frame.add ("Sv", "J/mol/K", Check::positive (), Value::Const,
                 "Entropy term. Sv = 650 J/mol/K");
-    alist.add ("Sv", 650.);
+    frame.add ("Sv", 650.);
   
-    syntax.add ("theta", "", Check::positive (), Value::Const,
+    frame.add ("theta", Value::Unknown (), Check::positive (), Value::Const,
                 "Curvature of leaf response of electron transport to irradiance, (De Pury & Farquhar, 1997");
-    alist.add ("theta", 0.7);
+    frame.add ("theta", 0.7);
     
-    syntax.add ("beta", " ", Check::positive (), Value::Const,
+    frame.add ("beta", Value::Unknown (), Check::positive (), Value::Const,
                 "Curvature, Collatz et al., 1991");
-    alist.add ("beta", 0.95);
+    frame.add ("beta", 0.95);
 
-    syntax.add ("alfa", "mol/mol", Check::positive (), Value::Const,
+    frame.add ("alfa", "mol/mol", Check::positive (), Value::Const,
                 "Fraction of PAR effectively absorbed by PSII, ");
-    alist.add ("alfa", 0.08);
+    frame.add ("alfa", 0.08);
 
-    alist.add ("m", 11.0);
-    alist.add ("b", 0.01);
-
-    Librarian::add_type (Photo::component, "FC_C3", alist, syntax, &make);
+    frame.add ("m", 11.0);
+    frame.add ("b", 0.01);
   }
 
 } PhotoFCC3_syntax;
+
+// photo_FCC.C ends here.

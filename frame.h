@@ -264,6 +264,7 @@ public:
   // Create and Destroy.
 protected:
   Frame (const Frame&);
+  Frame (const Frame*);
   Frame ();
 public:
   Frame (const Syntax&, const AttributeList&); // Old style.

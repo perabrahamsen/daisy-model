@@ -24,6 +24,7 @@
 #include "block.h"
 #include "librarian.h"
 #include "check.h"
+#include "frame.h"
 
 const char *const Photo::component = "photosynthesis";
 
@@ -42,15 +43,6 @@ void
 Photo::clear ()
 { }
 
-void
-Photo::load_base (Syntax& syntax, AttributeList& alist)
-{ 
-  syntax.add ("min_PAR", "W/m^2", Check::non_negative (), Value::Const,
-	      "Minimum PAR at top of canopy for photosynthesis.\n\
-If radiation is below this amount, photosynthesis will be disabled.");
-  alist.add ("min_PAR", 0.1);
-}
-
 Photo::Photo (Block& al)
   : ModelLogable (al.name ("type")),
     min_PAR_ (al.number ("min_PAR"))
@@ -61,6 +53,13 @@ Photo::~Photo ()
 
 static struct PhotoInit : public DeclareComponent 
 {
+  void load_frame (Frame& frame) const
+  { 
+    frame.add ("min_PAR", "W/m^2", Check::non_negative (), Value::Const,
+               "Minimum PAR at top of canopy for photosynthesis.\n\
+If radiation is below this amount, photosynthesis will be disabled.");
+    frame.add ("min_PAR", 0.1);
+  }
   PhotoInit ()
     : DeclareComponent (Photo::component, "\
 Leaf photosynthesis.")

@@ -26,6 +26,7 @@
 #include "check.h"
 #include "block.h"
 #include "librarian.h"
+#include "frame.h"
 
 struct ABAEffect_exp : public ABAEffect
 {
@@ -61,43 +62,23 @@ ABAEffect_exp::ABA_effect (const double ABA_xylem /* [g/cm^3] */, Treelog&)
   return ABAeffect;
 }
 
-static struct ABAEffectexpSyntax
+static struct ABAEffectexpSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ABAEffect_exp (al); }
-  static void load_syntax (Syntax& syntax, AttributeList& alist)
+  Model* make (Block& al) const
+  { return new ABAEffect_exp (al); }
+  void load_frame (Frame& frame) const
   {
-    syntax.add ("k", "cm^3/g", Check::non_negative (), Value::Const,
+    frame.add ("k", "cm^3/g", Check::non_negative (), Value::Const,
                 "Coefficient");
-    alist.add ("k", 0.0);
-    syntax.add ("alpha", Value::None(), Check::non_negative (), Value::Const,
+    frame.add ("k", 0.0);
+    frame.add ("alpha", Value::None(), Check::non_negative (), Value::Const,
                 "Coefficient");
-    alist.add ("alpha", 1.0);
+    frame.add ("alpha", 1.0);
   }  
   ABAEffectexpSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", 
-	       "Exponential curve for ABA-xylem effect on photosynthesis.");
-
-    load_syntax (syntax, alist);
-
-    Librarian::add_type (ABAEffect::component, "ABA-exp", alist, syntax, &make);
-  }
+    : DeclareModel (ABAEffect::component, "ABA-exp", "\
+Exponential curve for ABA-xylem effect on photosynthesis.")
+  { }
 } ABAEffectexpsyntax;
 
-
-const AttributeList& 
-ABAEffect::default_model ()
-{
-  static AttributeList alist;
-  
-  if (!alist.check ("type"))
-    {
-      Syntax syntax;
-      ABAEffectexpSyntax::load_syntax (syntax, alist);
-      alist.add ("type", "ABA-exp");
-    }
-  return alist;
-}
+// ABAeffect.C ends here.

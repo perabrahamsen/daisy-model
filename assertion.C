@@ -43,7 +43,7 @@ Assertion::message (const std::string& msg)
   static std::ios_base::Init init;   // Can be called from static constructor.
 
   if (logs ().size () == 0)
-    std::cout << msg;
+    std::cout << msg << "\n";
 
   for (unsigned int i = 0; i < logs ().size (); i++)
     {

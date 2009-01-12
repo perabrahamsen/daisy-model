@@ -718,6 +718,10 @@ Frame::Frame ()
   : impl (new Implementation ())
 { }
 
+Frame::Frame (const Frame *const old)
+  : impl (old ? new Implementation (*old->impl) : new Implementation ())
+{ }
+
 Frame::Frame (const Syntax& s, const AttributeList& a)
   : impl (new Implementation (s, a))
 { }

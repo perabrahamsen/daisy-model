@@ -1037,7 +1037,7 @@ stringer${OBJ}: stringer.C stringer.h model.h symbol.h alist.h boolean.h \
 source${OBJ}: source.C source.h model.h symbol.h alist.h time.h block.h \
   syntax.h value.h plf.h librarian.h
 photo${OBJ}: photo.C photo.h model.h symbol.h alist.h block.h syntax.h \
-  value.h plf.h librarian.h check.h
+  value.h plf.h librarian.h check.h frame.h scope.h
 format${OBJ}: format.C format.h model.h symbol.h alist.h assertion.h block.h \
   syntax.h value.h plf.h librarian.h
 depth${OBJ}: depth.C depth.h model.h symbol.h alist.h block.h syntax.h \
@@ -1242,7 +1242,7 @@ photo_Farquhar${OBJ}: photo_Farquhar.C photo_Farquhar.h photo.h model.h \
   symbol.h alist.h block.h syntax.h value.h plf.h rubiscoNdist.h \
   resistance.h ABAeffect.h stomatacon.h bioclimate.h canopy_std.h \
   canopy_simple.h phenology.h log.h time.h border.h submodel.h mathlib.h \
-  assertion.h treelog.h check.h librarian.h
+  assertion.h treelog.h check.h librarian.h frame.h scope.h
 scope_multi${OBJ}: scope_multi.C scope_multi.h scope.h value.h symbol.h \
   syntax.h alist.h assertion.h librarian.h model.h
 scope_id${OBJ}: scope_id.C scope_id.h scope.h value.h symbol.h assertion.h \
@@ -1572,12 +1572,13 @@ uzrect_const${OBJ}: uzrect_const.C uzrect.h model.h symbol.h alist.h \
 photo_FCC3${OBJ}: photo_FCC3.C photo_Farquhar.h photo.h model.h symbol.h \
   alist.h block.h syntax.h value.h plf.h rubiscoNdist.h ABAeffect.h \
   bioclimate.h canopy_std.h canopy_simple.h phenology.h log.h time.h \
-  border.h submodel.h mathlib.h assertion.h check.h librarian.h
+  border.h frame.h scope.h submodel.h mathlib.h assertion.h check.h \
+  librarian.h
 photo_FCC4${OBJ}: photo_FCC4.C photo_Farquhar.h photo.h model.h symbol.h \
   alist.h rubiscoNdist.h ABAeffect.h bioclimate.h canopy_std.h \
-  canopy_simple.h plf.h phenology.h log.h time.h border.h syntax.h \
-  value.h block.h submodel.h mathlib.h assertion.h check.h librarian.h \
-  treelog.h
+  canopy_simple.h plf.h phenology.h log.h time.h border.h frame.h \
+  syntax.h value.h scope.h block.h submodel.h mathlib.h assertion.h \
+  check.h librarian.h treelog.h
 reaction_std${OBJ}: reaction_std.C reaction.h model.h symbol.h alist.h \
   block.h syntax.h value.h plf.h transform.h chemistry.h chemical.h \
   soil.h log.h time.h border.h assertion.h librarian.h treelog.h
@@ -1600,7 +1601,7 @@ groundwater_flux${OBJ}: groundwater_flux.C groundwater.h model.h symbol.h \
   alist.h syntax.h value.h block.h plf.h check.h librarian.h
 ABAeffect_exp${OBJ}: ABAeffect_exp.C ABAeffect.h model.h symbol.h alist.h \
   mathlib.h assertion.h check.h block.h syntax.h value.h plf.h \
-  librarian.h
+  librarian.h frame.h scope.h
 rubiscoNdist_uniform${OBJ}: rubiscoNdist_uniform.C rubiscoNdist.h model.h \
   symbol.h alist.h mathlib.h assertion.h check.h block.h syntax.h value.h \
   plf.h librarian.h
@@ -1722,8 +1723,8 @@ action_markvand${OBJ}: action_markvand.C action.h model.h symbol.h alist.h \
   mathlib.h assertion.h check.h librarian.h vegetation.h treelog.h \
   submodeler.h
 photo_GL${OBJ}: photo_GL.C photo.h model.h symbol.h alist.h block.h syntax.h \
-  value.h plf.h canopy_std.h canopy_simple.h phenology.h submodel.h \
-  mathlib.h assertion.h check.h librarian.h treelog.h
+  value.h plf.h canopy_std.h canopy_simple.h phenology.h frame.h scope.h \
+  submodel.h mathlib.h assertion.h check.h librarian.h treelog.h
 program_gnuplot${OBJ}: program_gnuplot.C program.h model.h symbol.h alist.h \
   run.h block.h syntax.h value.h plf.h gnuplot.h treelog.h path.h \
   memutils.h librarian.h
@@ -1933,7 +1934,7 @@ crop_std${OBJ}: crop_std.C crop.h model.h symbol.h alist.h time.h chemistry.h \
   vernalization.h photo.h crpn.h wse.h log.h border.h timestep.h vcheck.h \
   bioclimate.h soil_water.h geometry.h syntax.h value.h mathlib.h \
   assertion.h soil.h organic_matter.h soil_heat.h am.h im.h submodeler.h \
-  block.h librarian.h memutils.h check.h treelog.h
+  block.h librarian.h memutils.h check.h treelog.h frame.h scope.h
 action_sow${OBJ}: action_sow.C action.h model.h symbol.h alist.h block.h \
   syntax.h value.h plf.h daisy.h program.h run.h time.h timestep.h \
   vcheck.h memutils.h field.h border.h crop.h librarian.h check.h dlf.h \

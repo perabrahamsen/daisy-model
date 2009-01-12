@@ -25,8 +25,7 @@
 #include "canopy_std.h"
 #include "phenology.h"
 #include "plf.h"
-#include "alist.h"
-#include "syntax.h"
+#include "frame.h"
 #include "submodel.h"
 #include "mathlib.h"
 #include <sstream>
@@ -156,57 +155,35 @@ PhotoGL::assimilate (const Units&, const double,  const double, const double,
   return (molWeightCH2O / molWeightCO2) * Teff * Ass;
 }
 
-const AttributeList& 
-Photo::default_model ()
+static struct Photo_GLSyntax : public DeclareModel
 {
-  static AttributeList alist;
-  
-  if (!alist.check ("type"))
-    {
-      Syntax dummy;
-      PhotoGL::load_syntax (dummy, alist);
-      alist.add ("used_to_be_a_submodel", true);
-      alist.add ("type", "GL");
-    }
-  return alist;
-}
+  Model* make (Block& al) const
+  { return new PhotoGL (al); }
+  void load_frame (Frame& frame) const
+  { 
+    PLF DS_null_eff;
+    DS_null_eff.add (0.0, 1.00);
+    DS_null_eff.add (2.0, 1.00);
 
-void
-PhotoGL::load_syntax (Syntax& syntax, AttributeList& alist)
-{ 
-  Photo::load_base (syntax, alist);
-
-  PLF DS_null_eff;
-  DS_null_eff.add (0.0, 1.00);
-  DS_null_eff.add (2.0, 1.00);
-
-  syntax.add ("Qeff", "(g CO2/m^2/h)/(W/m^2)", Value::Const,
-              "Quantum efficiency at low light.");
-  syntax.add ("Fm", "g CO2/m^2/h", Check::positive (), Value::Const,
-              "Maximum assimilation rate.");
-  syntax.add ("TempEff", "dg C", Value::None (), Check::non_negative (),
-              Value::Const,
-              "Temperature factor for assimilate production.");
-  syntax.add ("DSEff", "DS", Value::None (), Check::non_negative (),
-              Value::Const, "\
+    frame.add ("Qeff", "(g CO2/m^2/h)/(W/m^2)", Value::Const,
+                "Quantum efficiency at low light.");
+    frame.add ("Fm", "g CO2/m^2/h", Check::positive (), Value::Const,
+                "Maximum assimilation rate.");
+    frame.add ("TempEff", "dg C", Value::None (), Check::non_negative (),
+                Value::Const,
+                "Temperature factor for assimilate production.");
+    frame.add ("DSEff", "DS", Value::None (), Check::non_negative (),
+                Value::Const, "\
 Development stage factor for assimilate production.");
-  alist.add ("DSEff",DS_null_eff);
-  syntax.add ("DAPEff", "d", Value::None (), Check::non_negative (),
-              Value::Const, "Age factor for assimilate production.\n\
+    frame.add ("DSEff",DS_null_eff);
+    frame.add ("DAPEff", "d", Value::None (), Check::non_negative (),
+                Value::Const, "Age factor for assimilate production.\n\
 Age is given as day after planting.");
-  alist.add ("DAPEff",DS_null_eff);
-}
-
-static struct Photo_GLSyntax
-{
-  static Model& make (Block& al)
-  { return *new PhotoGL (al); }
-  Photo_GLSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    PhotoGL::load_syntax (syntax, alist);
-    alist.add ("description", "Goudriaan and Laar, 1978.");
-    Librarian::add_type (Photo::component, "GL", alist, syntax, &make);
+    frame.add ("DAPEff",DS_null_eff);
   }
+  Photo_GLSyntax () 
+    : DeclareModel (Photo::component, "GL", "Goudriaan and Laar, 1978.")
+  { }
 } PhotoGL_syntax;
+
+// photo_GL.C ends here.
