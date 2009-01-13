@@ -23,8 +23,7 @@
 
 #include "boolean.h"
 #include "block.h"
-#include "syntax.h"
-#include "alist.h"
+#include "frame.h"
 #include "assertion.h"
 #include "memutils.h"
 #include "librarian.h"
@@ -72,19 +71,16 @@ struct BooleanTrue : public Boolean
   { }
 };
 
-static struct BooleanTrueSyntax
+static struct BooleanTrueSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new BooleanTrue (al); }
+  Model* make (Block& al) const
+  { return new BooleanTrue (al); }
   BooleanTrueSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-
-    alist.add ("description", 
-	       "Always true.");
-    Librarian::add_type (Boolean::component, "true", alist, syntax, &make);
-  }
+    : DeclareModel (Boolean::component, "true", 
+                    "Always true.")
+  { }
+  void load_frame (Frame&) const
+  { }
 } BooleanTrue_syntax;
 
 
@@ -108,19 +104,16 @@ struct BooleanFalse : public Boolean
   { }
 };
 
-static struct BooleanFalseSyntax
+static struct BooleanFalseSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new BooleanFalse (al); }
+  Model* make (Block& al) const
+  { return new BooleanFalse (al); }
   BooleanFalseSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-
-    alist.add ("description", 
-	       "Always false.");
-    Librarian::add_type (Boolean::component, "false", alist, syntax, &make);
-  }
+    : DeclareModel (Boolean::component, "false", 
+                    "Always false.")
+  { }
+  void load_frame (Frame&) const
+  {  }
 } BooleanFalse_syntax;
 
 struct BooleanOperands : public Boolean
@@ -168,13 +161,6 @@ struct BooleanOperands : public Boolean
 
     return ok;
   }
-  static void load_syntax (Syntax& syntax, AttributeList&)
-  {
-    syntax.add_object ("operands", Boolean::component, 
-                       Value::Const, Value::Sequence, "\
-List of operands to compare.");
-    syntax.order ("operands");
-  }
   BooleanOperands (Block& al)
     : Boolean (al),
       operand (Librarian::build_vector<Boolean> (al, "operands"))
@@ -182,6 +168,21 @@ List of operands to compare.");
   ~BooleanOperands ()
   { sequence_delete (operand.begin (), operand.end ()); }
 };
+
+static struct BooleanOperandsSyntax : public DeclareBase
+{
+  BooleanOperandsSyntax ()
+    : DeclareBase (Boolean::component, "operands", "\
+Base class for boolean expressions involving multiple boolean operands.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_object ("operands", Boolean::component, 
+                       Value::Const, Value::Sequence, "\
+List of operands to compare.");
+    frame.order ("operands");
+  }
+} BooleanOperands_syntax;
 
 struct BooleanAnd : public BooleanOperands 
 {
@@ -197,19 +198,16 @@ struct BooleanAnd : public BooleanOperands
   { }
 };
 
-static struct BooleanAndSyntax
+static struct BooleanAndSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new BooleanAnd (al); }
+  Model* make (Block& al) const
+  { return new BooleanAnd (al); }
   BooleanAndSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    BooleanOperands::load_syntax (syntax, alist);
-    alist.add ("description", 
-	       "True if and only if all operands are true.");
-    Librarian::add_type (Boolean::component, "and", alist, syntax, &make);
-  }
+    : DeclareModel (Boolean::component, "and", "operands",
+                    "True if and only if all operands are true.")
+  { }
+  void load_frame (Frame&) const
+  { }
 } BooleanAnd_syntax;
 
 
@@ -227,19 +225,16 @@ struct BooleanOr : public BooleanOperands
   { }
 };
 
-static struct BooleanOrSyntax
+static struct BooleanOrSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new BooleanOr (al); }
+  Model* make (Block& al) const
+  { return new BooleanOr (al); }
   BooleanOrSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    BooleanOperands::load_syntax (syntax, alist);
-    alist.add ("description", 
-	       "True if and only if any operand is true.");
-    Librarian::add_type (Boolean::component, "or", alist, syntax, &make);
-  }
+    : DeclareModel (Boolean::component, "or", "operands",
+                    "True if and only if any operand is true.")
+  { }
+  void load_frame (Frame&) const
+  { }
 } BooleanOr_syntax;
 
 struct BooleanXOr : public BooleanOperands 
@@ -254,21 +249,20 @@ struct BooleanXOr : public BooleanOperands
   { }
 };
 
-static struct BooleanXOrSyntax
+static struct BooleanXOrSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new BooleanXOr (al); }
+  Model* make (Block& al) const
+  { return new BooleanXOr (al); }
   BooleanXOrSyntax ()
+    : DeclareModel (Boolean::component, "xor", 
+                    "True if and only if one operand is true, and one false.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    syntax.add_object ("operands", Boolean::component, 
+    frame.add_object ("operands", Boolean::component, 
                        Value::Const, 2, "\
 The two operands to compare.");
-    syntax.order ("operands");
-    alist.add ("description", 
-	       "True if and only if one operand is true, and one false.");
-    Librarian::add_type (Boolean::component, "xor", alist, syntax, &make);
+    frame.order ("operands");
   }
 } BooleanXOr_syntax;
 
@@ -284,21 +278,20 @@ struct BooleanNot : public BooleanOperands
   { }
 };
 
-static struct BooleanNotSyntax
+static struct BooleanNotSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new BooleanNot (al); }
+  Model* make (Block& al) const
+  { return new BooleanNot (al); }
   BooleanNotSyntax ()
+    : DeclareModel (Boolean::component, "not", 
+                    "True if and only if the operand is not true.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    syntax.add_object ("operands", Boolean::component, 
+    frame.add_object ("operands", Boolean::component, 
                        Value::Const, 1, "\
 The operand to check.");
-    syntax.order ("operands");
-    alist.add ("description", 
-	       "True if and only if the operand is not true.");
-    Librarian::add_type (Boolean::component, "not", alist, syntax, &make);
+    frame.order ("operands");
   }
 } BooleanNot_syntax;
 
@@ -309,3 +302,5 @@ static struct BooleanInit : public DeclareComponent
 Generic representation of booleans.")
   { }
 } Boolean_init;
+
+// boolean.C ends here.

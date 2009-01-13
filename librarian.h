@@ -200,16 +200,22 @@ public:
   DeclareComponent (symbol component, symbol description);
 };
 
-class DeclareBase : public Declare
+class DeclareSuper : public Declare
 {
   const symbol super;
   const FrameModel* parent_model () const;
+public:
+  DeclareSuper (symbol component, symbol name, symbol super, symbol description);
+};
+
+class DeclareBase : public DeclareSuper
+{
 public:
   DeclareBase (symbol component, symbol name, symbol super, symbol description);
   DeclareBase (symbol component, symbol name, symbol description);
 };
 
-class DeclareModel : public DeclareBase
+class DeclareModel : public DeclareSuper
 {
 public:
   virtual Model* make (Block&) const = 0;
@@ -220,7 +226,7 @@ protected:
   ~DeclareModel ();
 };
 
-class DeclareParam : public DeclareBase
+class DeclareParam : public DeclareSuper
 {
 public:
   DeclareParam (symbol component, symbol name, symbol super, 

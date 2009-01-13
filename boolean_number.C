@@ -21,8 +21,7 @@
 #define BUILD_DLL
 
 #include "boolean.h"
-#include "syntax.h"
-#include "alist.h"
+#include "frame.h"
 #include "number.h"
 #include "memutils.h"
 #include "librarian.h"
@@ -93,13 +92,6 @@ struct BooleanNumbers : public Boolean
         }
     return ok;
   }
-  static void load_syntax (Syntax& syntax, AttributeList&)
-  {
-    syntax.add_object ("operands", Number::component, 
-                       Value::Const, Value::Sequence, "\
-List of operands to compare.");
-    syntax.order ("operands");
-  }
   BooleanNumbers (Block& al)
     : Boolean (al),
       operand (Librarian::build_vector<Number> (al, "operands"))
@@ -107,6 +99,21 @@ List of operands to compare.");
   ~BooleanNumbers ()
   { sequence_delete (operand.begin (), operand.end ()); }
 };
+
+struct BooleanNumbersSyntax : public DeclareBase
+{
+  BooleanNumbersSyntax ()
+    : DeclareBase (Boolean::component, "numbers", "\
+Base class for boolean expressions involving numbers.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_object ("operands", Number::component, 
+                       Value::Const, Value::Sequence, "\
+List of operands to compare.");
+    frame.order ("operands");
+  }
+} BooleanNumbers_syntax;
 
 struct BooleanNumGT : public BooleanNumbers
 {
@@ -130,19 +137,16 @@ struct BooleanNumGT : public BooleanNumbers
   { }
 };
 
-static struct BooleanNumGTSyntax
+static struct BooleanNumGTSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new BooleanNumGT (al); }
+  Model* make (Block& al) const
+  { return new BooleanNumGT (al); }
   BooleanNumGTSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    BooleanNumbers::load_syntax (syntax, alist);
-    alist.add ("description", 
-	       "True iff each operand is larger than the next.");
-    Librarian::add_type (Boolean::component, ">", alist, syntax, &make);
-  }
+    : DeclareModel (Boolean::component, ">", "numbers",
+                    "True iff each operand is larger than the next.")
+  { }
+  void load_frame (Frame&) const
+  { }
 } BooleanNumGT_syntax;
 
 struct BooleanNumGTE : public BooleanNumbers
@@ -167,19 +171,16 @@ struct BooleanNumGTE : public BooleanNumbers
   { }
 };
 
-static struct BooleanNumGTESyntax
+static struct BooleanNumGTESyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new BooleanNumGTE (al); }
+  Model* make (Block& al) const
+  { return new BooleanNumGTE (al); }
   BooleanNumGTESyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    BooleanNumbers::load_syntax (syntax, alist);
-    alist.add ("description", "\
-True iff each operand is at least as large as the next.");
-    Librarian::add_type (Boolean::component, ">=", alist, syntax, &make);
-  }
+    : DeclareModel (Boolean::component, ">=", "numbers", "\
+True iff each operand is at least as large as the next.")
+  { }
+  void load_frame (Frame&) const
+  { }
 } BooleanNumGTE_syntax;
 
 struct BooleanNumLT : public BooleanNumbers
@@ -204,19 +205,16 @@ struct BooleanNumLT : public BooleanNumbers
   { }
 };
 
-static struct BooleanNumLTSyntax
+static struct BooleanNumLTSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new BooleanNumLT (al); }
+  Model* make (Block& al) const
+  { return new BooleanNumLT (al); }
   BooleanNumLTSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    BooleanNumbers::load_syntax (syntax, alist);
-    alist.add ("description", 
-	       "True iff each operand is smaller than the next.");
-    Librarian::add_type (Boolean::component, "<", alist, syntax, &make);
-  }
+    : DeclareModel (Boolean::component, "<", "numbers",
+                    "True iff each operand is smaller than the next.")
+  { }
+  void load_frame (Frame& frame) const
+  { }
 } BooleanNumLT_syntax;
 
 struct BooleanNumLTE : public BooleanNumbers
@@ -241,19 +239,16 @@ struct BooleanNumLTE : public BooleanNumbers
   { }
 };
 
-static struct BooleanNumLTESyntax
+static struct BooleanNumLTESyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new BooleanNumLTE (al); }
+  Model* make (Block& al) const
+  { return new BooleanNumLTE (al); }
   BooleanNumLTESyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    BooleanNumbers::load_syntax (syntax, alist);
-    alist.add ("description", "\
-True iff each operand is smaller than or equal to the next.");
-    Librarian::add_type (Boolean::component, "<=", alist, syntax, &make);
-  }
+    : DeclareModel (Boolean::component, "<=", "numbers", "\
+True iff each operand is smaller than or equal to the next.")
+  { }
+  void load_frame (Frame&) const
+  { }
 } BooleanNumLTE_syntax;
 
 // boolean_number.C ends here.

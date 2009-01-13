@@ -241,8 +241,7 @@ Declare::load (Frame& frame) const
 {
   frame.alist ().add ("description", description);
   load_frame (frame);
-  if (dynamic_cast<const DeclareBase*> (this)
-      && !dynamic_cast<const DeclareModel*> (this))
+  if (dynamic_cast<const DeclareBase*> (this))
     frame.alist ().add ("base_model", "Farquhar");
 }
 
@@ -277,36 +276,41 @@ DeclareComponent::DeclareComponent (const symbol component,
 { }
 
 const FrameModel* 
-DeclareBase::parent_model () const
+DeclareSuper::parent_model () const
 { 
   Librarian::intrinsics ().instantiate (component, super);
   return &Librarian::intrinsics ().library (component).model (super); 
 }
 
-DeclareBase::DeclareBase (const symbol component,
-                          const symbol name, const symbol s, 
-                          const symbol description)
+DeclareSuper::DeclareSuper (const symbol component,
+                            const symbol name, const symbol s, 
+                            const symbol description)
   : Declare (component, name, description),
     super (s)
 { }
 
+DeclareBase::DeclareBase (const symbol component,
+                            const symbol name, const symbol s, 
+                            const symbol description)
+  : DeclareSuper (component, name, s, description)
+{ }
+
 DeclareBase::DeclareBase (const symbol component, 
-                          const symbol name, 
-                          const symbol description)
-  : Declare (component, name, description),
-    super (root_name ())
+                            const symbol name, 
+                            const symbol description)
+  : DeclareSuper (component, name, root_name (), description)
 { }
 
 DeclareModel::DeclareModel (const symbol component,
                             const symbol name, const symbol s, 
                             const symbol description)
-  : DeclareBase (component, name, s, description)
+  : DeclareSuper (component, name, s, description)
 { }
 
 DeclareModel::DeclareModel (const symbol component, 
                             const symbol name, 
                             const symbol description)
-  : DeclareBase (component, name, description)
+  : DeclareSuper (component, name, root_name (), description)
 { }
 
 DeclareModel::~DeclareModel ()
@@ -314,7 +318,7 @@ DeclareModel::~DeclareModel ()
 
 DeclareParam::DeclareParam (symbol component, symbol name, symbol super, 
                             symbol description)
-  : DeclareBase (component, name, super, description)
+  : DeclareSuper (component, name, super, description)
 { }
 
 void DeclareAlias::load_frame (Frame&) const
