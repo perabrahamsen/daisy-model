@@ -105,20 +105,17 @@ Adsorption_vS_S::M_to_C (const Soil& soil, double Theta, int i, double M) const
   return C;
 }
 
-static struct Adsorption_vS_SSyntax
+static struct Adsorption_vS_SSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  {
-    return *new Adsorption_vS_S (al);
-  }
-
+  Model* make (Block& al) const
+  { return new Adsorption_vS_S (al); }
   Adsorption_vS_SSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
+    : DeclareModel (Adsorption::component, "vS_S", "\
 Model by van Schouwenberg and Schuffelen, 1963, with\n\
-parameterization by Hansen et.al., 1990.");
-    Librarian::add_type (Adsorption::component, "vS_S", alist, syntax, &make);
-  }
+parameterization by Hansen et.al., 1990.")
+  { }
+  void load_frame (Frame& frame) const
+  { }
 } Adsorption_vS_S_syntax;
+
+// adsorption_vS_S.C ends here.

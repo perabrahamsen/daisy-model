@@ -4,6 +4,8 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 ** Brug DeclareModel alle steder
 
+** Frame::alist () og Frame::syntax () skal returnere const ref.
+
 ** Fjern al brug af alist of syntax udenfor frame
 
 ** brug parent_link i stedet for parent_copy

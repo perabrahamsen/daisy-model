@@ -113,21 +113,16 @@ Adsorption::none_model ()
   return alist;
 }
 
-static struct AdsorptionNoneSyntax
+static struct AdsorptionNoneSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  {
-    return *new AdsorptionNone (al);
-  }
-
+  Model* make (Block& al) const
+  { return new AdsorptionNone (al); }
   AdsorptionNoneSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "No adsorption.\n\
-Used for solutes that are not adsorped to the soil.");
-    Librarian::add_type (Adsorption::component, "none", alist, syntax, &make);
-  }
+    : DeclareModel (Adsorption::component, "none", "No adsorption.\n\
+Used for solutes that are not adsorped to the soil.")
+  { }
+  void load_frame (Frame& frame) const
+  { }
 } AdsorptionNone_syntax;
 
 // "full" model.
@@ -168,19 +163,16 @@ Adsorption::full_model ()
   return alist;
 }
 
-static struct AdsorptionFullSyntax
+static struct AdsorptionFullSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new AdsorptionFull (al); }
-
+  Model* make (Block& al) const
+  { return new AdsorptionFull (al); }
   AdsorptionFullSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Full adsorption.\n\
-Used for non-solutes, fully adsorped in the soil.");
-    Librarian::add_type (Adsorption::component, "full", alist, syntax, &make);
-  }
+    : DeclareModel (Adsorption::component, "full", "Full adsorption.\n\
+Used for non-solutes, fully adsorped in the soil.")
+  { }
+  void load_frame (Frame& frame) const
+  { }
 } AdsorptionFull_syntax;
 
 // adsorption.C ends here.

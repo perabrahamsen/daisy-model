@@ -24,8 +24,7 @@
 #include "action.h"
 #include "block.h"
 #include "daisy.h"
-#include "syntax.h"
-#include "alist.h"
+#include "frame.h"
 #include "field.h"
 #include "log.h"
 #include "memutils.h"
@@ -120,22 +119,24 @@ public:
   { sequence_delete (actions.begin (), actions.end ()); }
 };
 
-static struct ActionWithColumnSyntax
+static struct ActionWithColumnSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ActionWithColumn (al); }
+  Model* make (Block& al) const
+  { return new ActionWithColumn (al); }
 
   ActionWithColumnSyntax ()
+    : DeclareModel (Action::component, "with-column", "\
+Perform actions on a specific column.")
+  { }
+  void load_frame (Frame& frame) const
   { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Perform actions on a specific column.");
-    syntax.add ("column", Value::String, Value::Const, 
+    frame.add ("column", Value::String, Value::Const, 
 		"Name of column to perform actions on.");
-    syntax.add_object ("actions", Action::component, 
+    frame.add_object ("actions", Action::component, 
                        Value::State, Value::Sequence,
                        "Actions to perform on the specified column.");
-    syntax.order ("column", "actions");
-    Librarian::add_type (Action::component, "with-column", alist, syntax, &make);
+    frame.order ("column", "actions");
   }
 } ActionWithColumn_syntax;
+
+// action_with.C ends here.

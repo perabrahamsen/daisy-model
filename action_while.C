@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "action.h"
-#include "syntax.h"
+#include "frame.h"
 #include "log.h"
 #include "assertion.h"
 #include "memutils.h"
@@ -85,10 +85,10 @@ struct ActionWhile : public Action
   }
 };
 
-static struct ActionWhileSyntax
+static struct ActionWhileSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ActionWhile (al); }
+  Model* make (Block& al) const
+  { return new ActionWhile (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)
   {
@@ -103,18 +103,19 @@ static struct ActionWhileSyntax
   }
 
   ActionWhileSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    syntax.add_check (check_alist);
-    alist.add ("description", "\
+    : DeclareModel (Action::component, "while", "\
 Perform all the specified actions in the sequence listed, but in the\n\
 same timestep.  The 'while' action is done when the first action in the\n\
-list is done.");
-    syntax.add_object ("actions", Action::component, 
+list is done.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_check (check_alist);
+    frame.add_object ("actions", Action::component, 
                        Value::State, Value::Sequence,
                        "List of actions to perform.");
-    syntax.order ("actions");
-    Librarian::add_type (Action::component, "while", alist, syntax, &make);
+    frame.order ("actions");
   }
 } ActionWhile_syntax;
+
+// action_while.C ends here.

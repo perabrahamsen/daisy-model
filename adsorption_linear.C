@@ -27,6 +27,7 @@
 #include "soil.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 
 static const double c_fraction_in_humus = 0.587;
 
@@ -65,11 +66,11 @@ public:
   { }
 };
 
-static struct AdsorptionLinearOldSyntax
+static struct AdsorptionLinearOldSyntax : DeclareModel
 {
-  static Model& make (Block& al)
+  Model* make (Block& al) const
   {
-    return *new AdsorptionLinearOld (al);
+    return new AdsorptionLinearOld (al);
   }
 
   static bool check_alist (const AttributeList& al, Treelog& err)
@@ -87,22 +88,23 @@ static struct AdsorptionLinearOldSyntax
     return ok;
   }
   AdsorptionLinearOldSyntax ()
+    : DeclareModel (Adsorption::component, "linear", "M = rho K C + Theta C")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    syntax.add_check (check_alist);
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "M = rho K C + Theta C");
-    syntax.add ("K_clay", "cm^3/g", Check::non_negative (), 
+    frame.add_check (check_alist);
+    frame.add ("K_clay", "cm^3/g", Check::non_negative (), 
 		Value::OptionalConst, 
 		"Clay dependent distribution parameter.\n\
 It is multiplied with the soil clay fraction to get the clay part of\n\
 the 'K' factor.  If 'K_OC' is specified, 'K_clay' defaults to 0.");
-    syntax.add ("K_OC", "cm^3/g", Check::non_negative (), 
+    frame.add ("K_OC", "cm^3/g", Check::non_negative (), 
 		Value::OptionalConst, 
 		"Humus dependent distribution parameter.\n\
 It is multiplied with the soil organic carbon fraction to get the\n\
 carbon part of the 'K' factor.  By default, 'K_OC' is equal to 'K_clay'.");
 
-    Librarian::add_type (Adsorption::component, "linear", alist, syntax, &make);
   }
 } AdsorptionLinearOld_syntax;
+
+// adsorption_linear.C ends here.

@@ -28,6 +28,7 @@
 #include "daisy.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 
 struct ActionAssert : public Action
 {
@@ -163,80 +164,88 @@ struct ActionPanic : public Action
   { }
 };
 
-static struct ActionMessageSyntax
+static struct ActionAssertSyntax : public DeclareModel
 {
-  static Model& make_assert (Block& al)
-  { return *new ActionAssert (al); }
-  static Model& make_message (Block& al)
-  { return *new ActionMessage (al); }
-  static Model& make_warning (Block& al)
-  { return *new ActionWarning (al); }
-  static Model& make_error (Block& al)
-  { return *new ActionError (al); }
-  static Model& make_panic (Block& al)
-  { return *new ActionPanic (al); }
-
-  ActionMessageSyntax ()
+  Model* make (Block& al) const
+  { return new ActionAssert (al); }
+  ActionAssertSyntax ()
+    : DeclareModel (Action::component, "assert", "\
+Assert that condition is true, if not, stop the simulation.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    {
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "\
-Assert that condition is true, if not, stop the simulation.");
-      syntax.add_object ("condition", Condition::component, 
+      frame.add_object ("condition", Condition::component, 
                          "Condition to check.");
-      syntax.order ("condition");
-      syntax.add ("message", Value::String, Value::Const,
+      frame.order ("condition");
+      frame.add ("message", Value::String, Value::Const,
 		  "Error message to give iff assertion fails.");
-      alist.add ("message", "Required condition not fulfilled");
-      Librarian::add_type (Action::component, 
-                           "assert", alist, syntax, &make_assert);
-    }
-    {
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "\
-Write a message to the user.");
-      syntax.add ("message", Value::String, Value::Const,
+      frame.add ("message", "Required condition not fulfilled");
+  }
+} ActionAssert_syntax;
+
+static struct ActionMessageSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new ActionMessage (al); }
+  ActionMessageSyntax ()
+    : DeclareModel (Action::component, "message", "\
+Write a message to the user.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+      frame.add ("message", Value::String, Value::Const,
 		  "Message to give to the user.");
-      syntax.order ("message");
-
-      Librarian::add_type (Action::component,
-                           "message", alist, syntax, &make_message);
-    }
-    {
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "\
-Write a warning to the user.");
-      syntax.add ("message", Value::String, Value::Const,
-		  "Warning to give to the user.");
-      syntax.order ("message");
-
-      Librarian::add_type (Action::component, 
-                           "warning", alist, syntax, &make_warning);
-    }
-    {
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "\
-Write a error message to the user.");
-      syntax.add ("message", Value::String, Value::Const,
-		  "Error message to give.");
-      syntax.order ("message");
-      Librarian::add_type (Action::component,
-                           "error", alist, syntax, &make_error);
-    }
-    {
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "\
-Write a error message to the user and stop the simulation.");
-      syntax.add ("message", Value::String, Value::Const,
-		  "Error message to give.");
-      syntax.order ("message");
-      Librarian::add_type (Action::component,
-                           "panic", alist, syntax, &make_panic);
-    }
+      frame.order ("message");
   }
 } ActionMessage_syntax;
+
+static struct ActionWarningSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new ActionWarning (al); }
+  ActionWarningSyntax ()
+    : DeclareModel (Action::component, "warning", "\
+Write a warning to the user.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+      frame.add ("message", Value::String, Value::Const,
+		  "Warning to give to the user.");
+      frame.order ("message");
+  }
+} ActionWarning_syntax;
+
+static struct ActionErrorSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new ActionError (al); }
+  ActionErrorSyntax ()
+    : DeclareModel (Action::component, "error", "\
+Write a error message to the user.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+      frame.add ("message", Value::String, Value::Const,
+		  "Error message to give.");
+      frame.order ("message");
+  }
+} ActionError_syntax;
+
+static struct ActionPanicSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new ActionPanic (al); }
+  ActionPanicSyntax ()
+    : DeclareModel (Action::component, "panic", "\
+Write a error message to the user and stop the simulation.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+      frame.add ("message", Value::String, Value::Const,
+		  "Error message to give.");
+      frame.order ("message");
+  }
+} ActionPanic_syntax;
+
+// action_message.C ends here.
+

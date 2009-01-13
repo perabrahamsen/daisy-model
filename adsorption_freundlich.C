@@ -29,6 +29,7 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 
 static const double c_fraction_in_humus = 0.587;
 
@@ -110,47 +111,46 @@ AdsorptionFreundlich::M_to_C (const Soil& soil,
   return (min_C + max_C) / 2.0;
 }
 
-static struct AdsorptionFreundlichSyntax
+static struct AdsorptionFreundlichSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  {
-    return *new AdsorptionFreundlich (al);
-  }
+  Model* make (Block& al) const
+  { return new AdsorptionFreundlich (al); }
   static bool check_alist (const AttributeList& al, Treelog& err)
-    {
-      bool ok = true;
-
-      const bool has_K_clay = al.check ("K_clay");
-      const bool has_K_OC = al.check ("K_OC");
-      
-      if (!has_K_clay && !has_K_OC)
-	{
-	  err.entry ("You must specify either 'K_clay' or 'K_OC'");
-	  ok = false;
-	}
-      return ok;
-    }
-
-  AdsorptionFreundlichSyntax ()
   {
-    Syntax& syntax = *new Syntax ();
-    syntax.add_check (check_alist);
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "M = rho K C^m + Theta C");
-    syntax.add ("K_clay", "(g/cm^3)^-m", Check::non_negative (),
+    bool ok = true;
+
+    const bool has_K_clay = al.check ("K_clay");
+    const bool has_K_OC = al.check ("K_OC");
+
+    if (!has_K_clay && !has_K_OC)
+      {
+        err.entry ("You must specify either 'K_clay' or 'K_OC'");
+        ok = false;
+      }
+    return ok;
+  }
+  AdsorptionFreundlichSyntax ()
+    : DeclareModel (Adsorption::component, "Freundlich", "\
+M = rho K C^m + Theta C")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_check (check_alist);
+    frame.add ("K_clay", "(g/cm^3)^-m", Check::non_negative (),
 		Value::OptionalConst, 
 		"Clay dependent distribution parameter.\n\
 It is multiplied with the soil clay fraction to get the clay part of\n\
 the 'K' factor.  If 'K_OC' is specified, 'K_clay' defaults to 0.\n\
 The dimension depends on the 'm' parameter.");
-    syntax.add ("K_OC", "(g/cm^3)^-m", Check::non_negative (), 
+    frame.add ("K_OC", "(g/cm^3)^-m", Check::non_negative (), 
 		Value::OptionalConst, 
 		"Humus dependent distribution parameter.\n\
 It is multiplied with the soil organic carbon fraction to get the\n\
 carbon part of the 'K' factor.  By default, 'K_OC' is equal to 'K_clay'.\n\
 The dimension depends on the 'm' parameter.");
-    syntax.add ("m", Value::None (), Check::non_negative (), Value::Const,
+    frame.add ("m", Value::None (), Check::non_negative (), Value::Const,
 		"Freundlich parameter");
-    Librarian::add_type (Adsorption::component, "Freundlich", alist, syntax, &make);
   }
 } AdsorptionFreundlich_syntax;
+
+// adsorption_freundlich.C ends here.

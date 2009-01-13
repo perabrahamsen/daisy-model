@@ -28,6 +28,7 @@
 #include "check.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 
 struct ActionMix : public Action
 {
@@ -106,41 +107,40 @@ struct ActionSwap : public Action
     { }
 };
 
-static struct ActionSwapSyntax
+static struct ActionSwapSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-    { return *new ActionSwap (al); }
+  Model* make (Block& al) const
+  { return new ActionSwap (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)
-    {
-      const double middle (al.number ("middle"));
-      const double depth (al.number ("depth"));
-      bool ok = true;
-      if (middle <= depth)
-	{
-	  err.entry ("swap middle should be above the depth");
-	  ok = false;
-	}
-      return ok;
-    }
+  {
+    const double middle (al.number ("middle"));
+    const double depth (al.number ("depth"));
+    bool ok = true;
+    if (middle <= depth)
+      {
+        err.entry ("swap middle should be above the depth");
+        ok = false;
+      }
+    return ok;
+  }
 
   ActionSwapSyntax ()
-    {
-      Syntax& syntax = *new Syntax ();
-      syntax.add_check (check_alist);
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "\
+    : DeclareModel (Action::component, "swap", "\
 Swap two soil layers.  The top layer start at the surface and goes down to\n\
 'middle', and the second layer starts with 'middle' and goes down to\n\
  'depth'.  After the operation, the content (such as heat, water, and\n\
 organic matter) will be averaged in each layer, and the bottom layer will\n\
-be placed on top of what used to be the top layer.");
-      syntax.add ("middle", "cm", Check::negative (), Value::Const, "\
+be placed on top of what used to be the top layer.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_check (check_alist);
+    frame.add ("middle", "cm", Check::negative (), Value::Const, "\
 The end of the first layer and the start of the second layer to swap.");
-      syntax.add ("depth", "cm", Check::negative (), Value::Const, "\
+    frame.add ("depth", "cm", Check::negative (), Value::Const, "\
 The end of the second layer to swap.");
-      Librarian::add_type (Action::component, "swap", alist, syntax, &make);
-    }
+  }
 } ActionSwap_syntax;
 
 
@@ -171,23 +171,24 @@ struct ActionSetPorosity : public Action
     { }
 };
 
-static struct ActionSetPorositySyntax
+static struct ActionSetPorositySyntax : DeclareModel
 {
-  static Model& make (Block& al)
-    { return *new ActionSetPorosity (al); }
+  Model* make (Block& al) const
+  { return new ActionSetPorosity (al); }
 
   ActionSetPorositySyntax ()
-    {
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "\
+    : DeclareModel (Action::component, "set_porosity", "\
 Set the porosity of the horizon at the specified depth.\n\
-To get useful results, you need to use a hydraulic model that supports this.");
-      syntax.add_fraction ("porosity", Value::Const, "\
+To get useful results, you need to use a hydraulic model that supports this.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_fraction ("porosity", Value::Const, "\
 Non-solid fraction of soil.");
-      syntax.add ("depth", "cm", Check::non_positive (), Value::Const, "\
+    frame.add ("depth", "cm", Check::non_positive (), Value::Const, "\
 A point in the horizon to modify.");
-      alist.add ("depth", 0.0);
-      Librarian::add_type (Action::component, "set_porosity", alist, syntax, &make);
-    }
+    frame.add ("depth", 0.0);
+  }
 } ActionSetPorosity_syntax;
+
+// action_tillage.C ends here.

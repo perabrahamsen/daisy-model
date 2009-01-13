@@ -28,6 +28,7 @@
 #include "submodeler.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 
 // We need to initialize the Condition library.
 #include "condition.h"
@@ -312,80 +313,86 @@ struct ActionIf : public Action
   { }
 };
 
-static struct ActionLispSyntax
+static struct ActionNilSyntax : public DeclareModel
 {
-  static Model& make_nil (Block& al)
-  { return *new ActionNil (al); }
-  static Model& make_t (Block& al)
-  { return *new ActionT (al); }
-  static Model& make_progn (Block& al)
-  { return *new ActionProgn (al); }
-  static Model& make_cond (Block& al)
-  { return *new ActionCond (al); }
-  static Model& make_if (Block& al)
-  { return *new ActionIf (al); }
-  ActionLispSyntax ();
-} ActionLisp_syntax;
+  Model* make (Block& al) const
+  { return new ActionNil (al); }
+  ActionNilSyntax ()
+    : DeclareModel (Action::component, "nil", "\
+This action does nothing, always done.")
+  { }
+  void load_frame (Frame&) const
+  { }
+} ActionNil_syntax;
 
-ActionLispSyntax::ActionLispSyntax ()
-{ 
-  // "nil"
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "This action does nothing, always done.");
-    Librarian::add_type (Action::component, "nil", alist, syntax, &make_nil);
-  }
-  // "t"
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "This action does nothing, never done.");
-    Librarian::add_type (Action::component, "t", alist, syntax, &make_nil);
-  }
-  // "progn"
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
+static struct ActionTSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new ActionT (al); }
+  ActionTSyntax ()
+    : DeclareModel (Action::component, "t", "\
+This action does nothing, never done.")
+  { }
+  void load_frame (Frame&) const
+  { }
+} ActionT_syntax;
+
+static struct ActionPrognSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new ActionProgn (al); }
+  ActionPrognSyntax ()
+    : DeclareModel (Action::component, "progn", "\
 Perform all the specified actions in the sequence listed.\n\
-All the actions will be performed in the same time step.");
-    syntax.add_object ("actions", Action::component, 
+All the actions will be performed in the same time step.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_object ("actions", Action::component, 
                        Value::State, Value::Sequence,
                        "List of actions to perform.");
-    syntax.order ("actions");
-    Librarian::add_type (Action::component, "progn", alist, syntax, &make_progn);
+    frame.order ("actions");
   }
-  // "cond"
+} ActionProgn_syntax;
+
+static struct ActionCondSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new ActionCond (al); }
+  ActionCondSyntax ()
+    : DeclareModel (Action::component, "cond", "\
+Perform the actions associated with the first true condition in the list.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
-Perform the actions associated with the first true condition in the list.");
-    syntax.add_submodule_sequence ("clauses", Value::State, "\
+    frame.add_submodule_sequence ("clauses", Value::State, "\
 Each clause consist of a condition and a sequence of actions.\n\
 The first clause whose condition is true, will have its actions activated.",
                                    ActionCond::clause::load_syntax);
-    syntax.order ("clauses");
-    Librarian::add_type (Action::component, "cond", alist, syntax, &make_cond);
+    frame.order ("clauses");
   }
-  // "if"
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
+} ActionCond_syntax;
+
+static struct ActionIfSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new ActionIf (al); }
+  ActionIfSyntax ()
+    : DeclareModel (Action::component, "if", "\
 If the condition is true, perform the first action,\n\
-otherwise perform the second action.");
-    syntax.add_object ("if", Condition::component, 
+otherwise perform the second action.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_object ("if", Condition::component, 
                        "Condition determining which action to perform.");
-    syntax.add_object ("then", Action::component, 
+    frame.add_object ("then", Action::component, 
                        "Action to perform if the condition is true.");
-    syntax.add_object ("else", Action::component, 
+    frame.add_object ("else", Action::component, 
                        "Action to perform if the condition is false.");
-    syntax.order ("if", "then", "else");
-    AttributeList nilAlist;
-    nilAlist.add ("type", "nil");
-    alist.add ("else", nilAlist);
-    Librarian::add_type (Action::component, "if", alist, syntax, &make_if);
+    frame.order ("if", "then", "else");
+    frame.add ("else", "nil");
   }
-}
+} ActionIf_syntax;
+
+// action_lisp.C ends here.

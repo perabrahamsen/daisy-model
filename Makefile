@@ -1845,7 +1845,7 @@ groundwater_lysimeter${OBJ}: groundwater_lysimeter.C groundwater.h model.h \
 action_message${OBJ}: action_message.C action.h model.h symbol.h alist.h \
   block.h syntax.h value.h plf.h condition.h log.h time.h border.h \
   daisy.h program.h run.h timestep.h vcheck.h memutils.h librarian.h \
-  treelog.h
+  treelog.h frame.h scope.h
 weather_std${OBJ}: weather_std.C weather_base.h weather.h model.h symbol.h \
   alist.h im.h syntax.h value.h chemical.h fao.h lexer_data.h lexer.h \
   time.h plf.h mathlib.h assertion.h units.h submodeler.h block.h check.h \
@@ -1875,13 +1875,13 @@ log_harvest${OBJ}: log_harvest.C log.h time.h border.h model.h symbol.h \
   alist.h daisy.h program.h run.h timestep.h vcheck.h memutils.h \
   harvest.h block.h syntax.h value.h plf.h dlf.h version.h assertion.h \
   librarian.h treelog.h
-action_while${OBJ}: action_while.C action.h model.h symbol.h alist.h syntax.h \
-  value.h log.h time.h border.h assertion.h memutils.h librarian.h \
-  treelog.h
+action_while${OBJ}: action_while.C action.h model.h symbol.h alist.h frame.h \
+  syntax.h value.h scope.h log.h time.h border.h assertion.h memutils.h \
+  librarian.h treelog.h
 action_wait${OBJ}: action_wait.C action.h model.h symbol.h alist.h block.h \
   syntax.h value.h plf.h condition.h log.h time.h border.h daisy.h \
   program.h run.h timestep.h vcheck.h memutils.h assertion.h librarian.h \
-  treelog.h
+  treelog.h frame.h scope.h
 action_activity${OBJ}: action_activity.C action.h model.h symbol.h alist.h \
   frame.h syntax.h value.h scope.h log.h time.h border.h memutils.h \
   librarian.h
@@ -1959,14 +1959,14 @@ action_irrigate${OBJ}: action_irrigate.C action.h model.h symbol.h alist.h \
 action_lisp${OBJ}: action_lisp.C action.h model.h symbol.h alist.h daisy.h \
   program.h run.h time.h timestep.h vcheck.h memutils.h log.h border.h \
   submodeler.h block.h syntax.h value.h plf.h librarian.h treelog.h \
-  condition.h
+  frame.h scope.h condition.h
 weather_none${OBJ}: weather_none.C weather_old.h weather_base.h weather.h \
   model.h symbol.h alist.h im.h syntax.h value.h block.h plf.h \
   librarian.h
 action_tillage${OBJ}: action_tillage.C action.h model.h symbol.h alist.h \
   block.h syntax.h value.h plf.h daisy.h program.h run.h time.h \
   timestep.h vcheck.h memutils.h field.h border.h check.h librarian.h \
-  treelog.h
+  treelog.h frame.h scope.h
 action_harvest${OBJ}: action_harvest.C action.h model.h symbol.h alist.h \
   daisy.h program.h run.h time.h timestep.h vcheck.h memutils.h field.h \
   border.h harvest.h block.h syntax.h value.h plf.h librarian.h \
@@ -1983,7 +1983,8 @@ crop_sold${OBJ}: crop_sold.C crop.h model.h symbol.h alist.h time.h log.h \
   treelog.h
 action_with${OBJ}: action_with.C action.h model.h symbol.h alist.h block.h \
   syntax.h value.h plf.h daisy.h program.h run.h time.h timestep.h \
-  vcheck.h memutils.h field.h border.h log.h librarian.h treelog.h
+  vcheck.h memutils.h frame.h scope.h field.h border.h log.h librarian.h \
+  treelog.h
 nitrification_soil${OBJ}: nitrification_soil.C nitrification.h model.h \
   symbol.h alist.h abiotic.h block.h syntax.h value.h plf.h mathlib.h \
   assertion.h check.h librarian.h
@@ -2004,13 +2005,13 @@ tortuosity_linear${OBJ}: tortuosity_linear.C tortuosity.h model.h symbol.h \
   alist.h block.h syntax.h value.h plf.h hydraulic.h librarian.h
 adsorption_freundlich${OBJ}: adsorption_freundlich.C adsorption.h model.h \
   symbol.h alist.h block.h syntax.h value.h plf.h soil.h check.h \
-  mathlib.h assertion.h librarian.h treelog.h
+  mathlib.h assertion.h librarian.h treelog.h frame.h scope.h
 adsorption_linear${OBJ}: adsorption_linear.C adsorption.h model.h symbol.h \
   alist.h block.h syntax.h value.h plf.h check.h soil.h librarian.h \
-  treelog.h
+  treelog.h frame.h scope.h
 adsorption_langmuir${OBJ}: adsorption_langmuir.C adsorption.h model.h \
   symbol.h alist.h block.h syntax.h value.h plf.h soil.h check.h \
-  mathlib.h assertion.h librarian.h treelog.h
+  mathlib.h assertion.h librarian.h treelog.h frame.h scope.h
 bioclimate_std${OBJ}: bioclimate_std.C bioclimate.h model.h symbol.h alist.h \
   metalib.h frame.h syntax.h value.h scope.h library.h block.h plf.h \
   surface.h uzmodel.h weather.h im.h geometry.h mathlib.h assertion.h \

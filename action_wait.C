@@ -29,6 +29,7 @@
 #include "assertion.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 #include <memory>
 #include <sstream>
 
@@ -149,22 +150,98 @@ struct ActionWaitMMDD : public Action
   { }
 };
 
-static struct ActionWaitSyntax
+static struct ActionWaitSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ActionWait (al); }
-  static Model& make_days (Block& al)
-  { return *new ActionWaitDays (al); }
-  static Model& make_mm_dd (Block& al)
-  { return *new ActionWaitMMDD (al); }
+  Model* make (Block& al) const
+  { return new ActionWait (al); }
+  ActionWaitSyntax ()
+    : DeclareModel (Action::component, "wait", "\
+Wait until the specified condition is true.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+      frame.add_object ("condition", Condition::component, 
+                         "Condition to wait for.");
+      frame.order ("condition");
+  }
+} ActionWait_syntax;
 
-  static bool check_mm_dd (const AttributeList& alist, Treelog& err)
+static struct ActionWaitPeriodSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new ActionWaitDays (al); }
+  ActionWaitPeriodSyntax ()
+    : DeclareModel (Action::component, "wait_period", "\
+Waits the specified period.")
+  { }
+  static bool check_alist (const AttributeList& frame, Treelog& err)
   {
     bool ok = true;
 
-    const int mm = alist.integer ("month");
-    const int dd = alist.integer ("day");
-    const int hh = alist.integer ("hour");
+    const int days = frame.integer ("days");
+    const int hours = frame.integer ("hours");
+
+    if (days * 24 + hours < 1)
+      {
+	err.entry ("you must wait at least 1 hour");
+	ok = false;
+      }
+    return ok;
+  }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_check (check_alist);	
+    frame.add ("days", Value::Integer, Value::Const, 
+                "Wait this number of days.");
+    frame.add ("hours", Value::Integer, Value::Const, 
+                "Wait this number of hours.");
+    frame.add_submodule ("end_time", Value::OptionalState,
+                          "Wait until this date.\
+Setting this overrides the 'days' and 'hours' parameters.", Time::load_syntax);
+  }
+} ActionWaitPeriod_syntax;
+
+static struct ActionWaitDaysSyntax : public DeclareParam
+{
+  ActionWaitDaysSyntax ()
+    : DeclareParam (Action::component, "wait_days", "wait_period", "\
+Waits the specified number of days.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add ("hours", 0);
+    frame.order ("days");
+  }
+} ActionWaitDays_syntax;
+
+static struct ActionWaitHoursSyntax : public DeclareParam
+{
+  ActionWaitHoursSyntax ()
+    : DeclareParam (Action::component, "wait_hours", "wait_period", "\
+Waits the specified number of hours.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add ("days", 0);
+    frame.order ("hours");
+  }
+} ActionWaitHours_syntax;
+
+static struct ActionWaitMMDDSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new ActionWaitMMDD (al); }
+  ActionWaitMMDDSyntax ()
+    : DeclareModel (Action::component, "wait_mm_dd", "\
+Wait until a specific month and day in the year.")
+  { }
+  static bool check_alist (const AttributeList& frame, Treelog& err)
+  {
+    bool ok = true;
+
+    const int mm = frame.integer ("month");
+    const int dd = frame.integer ("day");
+    const int hh = frame.integer ("hour");
 
     if (mm < 1 || mm > 12)
       {
@@ -186,82 +263,18 @@ static struct ActionWaitSyntax
       }
     return ok;
   }
-  static bool check_days (const AttributeList& alist, Treelog& err)
+  void load_frame (Frame& frame) const
   {
-    bool ok = true;
-
-    const int days = alist.integer ("days");
-    const int hours = alist.integer ("hours");
-
-    if (days * 24 + hours < 1)
-      {
-	err.entry ("you must wait at least 1 hour");
-	ok = false;
-      }
-    return ok;
-  }
-
-  ActionWaitSyntax ()
-  {
-    {
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "\
-Wait until the specified condition is true.");
-      syntax.add_object ("condition", Condition::component, 
-                         "Condition to wait for.");
-      syntax.order ("condition");
-      Librarian::add_type (Action::component, "wait", alist, syntax, &make);
-    }
-    {
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      syntax.add_check (check_days);	
-      alist.add ("description", "\
-Waits the specified number of days.");
-      syntax.add ("days", Value::Integer, Value::Const, 
-		  "Wait this number of days.");
-      syntax.add ("hours", Value::Integer, Value::Const, 
-		  "Wait this number of hours.");
-      alist.add ("hours", 0);
-      syntax.add_submodule ("end_time", alist, Value::OptionalState,
-		  "Wait until this date.\
-Setting this overrides the 'days' and 'hours' parameters.", Time::load_syntax);
-      syntax.order ("days");
-      Librarian::add_type (Action::component, "wait_days", alist, syntax, &make_days);
-    }
-    {
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      syntax.add_check (check_days);	
-      alist.add ("description", "\
-Waits the specified number of hours.");
-      syntax.add ("days", Value::Integer, Value::Const, 
-		  "Wait this number of days.");
-      alist.add ("days", 0);
-      syntax.add ("hours", Value::Integer, Value::Const, 
-		  "Wait this number of hours.");
-      syntax.add_submodule ("end_time", alist, Value::OptionalState,
-		  "Wait until this date.\
-Setting this overrides the 'days' and 'hours' parameters.", Time::load_syntax);
-      syntax.order ("hours");
-      Librarian::add_type (Action::component, "wait_hours", alist, syntax, &make_days);
-    }
-    {
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      syntax.add_check (check_mm_dd);	
-      alist.add ("description", "\
-Wait until a specific month and day in the year.");
-      syntax.add ("month", Value::Integer, Value::Const, 
-		  "Wait until this month.");
-      syntax.add ("day", Value::Integer, Value::Const, 
+    frame.add_check (check_alist);	
+    frame.add ("month", Value::Integer, Value::Const, 
+                "Wait until this month.");
+    frame.add ("day", Value::Integer, Value::Const, 
 		  "Wait until this day in the month.");
-      syntax.add ("hour", Value::Integer, Value::Const, 
-		  "Wait until this hour.");
-      alist.add ("hour", 8);
-      syntax.order ("month", "day");
-      Librarian::add_type (Action::component, "wait_mm_dd", alist, syntax, &make_mm_dd);
-    }
+    frame.add ("hour", Value::Integer, Value::Const, 
+                "Wait until this hour.");
+    frame.add ("hour", 8);
+    frame.order ("month", "day");
   }
-} ActionWait_syntax;
+} ActionWaitMMDD_syntax;
+
+// action_wait.C ends here.
