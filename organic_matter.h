@@ -94,7 +94,6 @@ public:
                            const AttributeList&, const Geometry& geo,
                            const Soil&, const SoilWater&, const SoilHeat&,
                            double T_avg, Treelog&) = 0;
-  static const AttributeList& default_model ();
 private:
   OrganicMatter ();
 public:

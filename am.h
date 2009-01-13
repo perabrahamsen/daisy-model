@@ -41,11 +41,10 @@ class Units;
 class AM : public Model
 {
   // Content.
+public:
   struct Implementation;
   std::auto_ptr<Implementation> impl;
   friend class Implementation;
-
-public:
   const AttributeList alist;	// Remember attributes for checkpoint.
   const symbol name;
   static const char *const component;
@@ -101,7 +100,6 @@ public:
 		     symbol sort, symbol part, lock_type lock = Unlocked);
   void initialize (const Geometry& geometry, const double max_rooting_depth);
   static const std::vector<const AttributeList*>& default_AM ();
-  static const AttributeList& default_root ();
   static double get_NO3 (const AttributeList&);	// [g N/cm^2]
   static double get_NH4 (const AttributeList&);	// [g N/cm^2]
   static IM get_IM (const Unit&, const AttributeList&);
@@ -114,10 +112,8 @@ public:
   static double second_year_utilization (const AttributeList& am); // [kg N/ha]
   static void set_mineral (AttributeList&, double NH4, double NO3);// [kg N/ha]
 
-private:
-  friend class AM_Syntax;
-  AM (const AttributeList&);
 public:
+  AM (const AttributeList&);
   ~AM ();
 };
 

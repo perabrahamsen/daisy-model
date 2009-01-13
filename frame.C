@@ -578,6 +578,7 @@ Frame::add (const symbol key, const symbol name)
 {
   if (lookup (key) == Value::Object)
     {
+      verify (key, Value::Object);
       const symbol component = impl->syntax.component (key);
       const Intrinsics& intrinsics = Librarian::intrinsics ();
       intrinsics.instantiate (component, name);
@@ -639,6 +640,19 @@ Frame::add (const symbol key, const std::vector<symbol>& value)
 void 
 Frame::add_strings (const symbol key, const symbol a)
 {
+  if (lookup (key) == Value::Object)
+    {
+      verify (key, Value::Object, 1);
+      const symbol component = impl->syntax.component (key);
+      const Intrinsics& intrinsics = Librarian::intrinsics ();
+      intrinsics.instantiate (component, a);
+      AttributeList alist_a (intrinsics.library (component).lookup (a));
+      alist_a.add ("type", a);
+      std::vector<const AttributeList*> alists;
+      alists.push_back (&alist_a);
+      impl->alist.add (key, alists);
+      return;
+    }
   verify (key, Value::String, 1);
   impl->alist.add_strings (key, a); 
 }

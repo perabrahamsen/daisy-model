@@ -27,8 +27,7 @@
 #include "metalib.h"
 #include "library.h"
 #include "submodeler.h"
-#include "syntax.h"
-#include "alist.h"
+#include "frame.h"
 #include "time.h"
 #include "log.h"
 #include "geometry.h"
@@ -588,8 +587,8 @@ AM::mix (const Geometry& geo,
 	 std::vector<double>& tillage_C_soil,
          const double dt)
 { impl->mix (geo, from, to, penetration, 
-            tillage_N_top, tillage_C_top, 
-            tillage_N_soil, tillage_C_soil, dt); }
+             tillage_N_top, tillage_C_top, 
+             tillage_N_soil, tillage_C_soil, dt); }
 
 void 
 AM::mix (const Geometry& geo,
@@ -599,8 +598,8 @@ AM::mix (const Geometry& geo,
 	 std::vector<double>& tillage_C_soil,
          const double dt)
 { impl->mix (geo, volume, penetration, 
-            tillage_N_top, tillage_C_top, 
-            tillage_N_soil, tillage_C_soil, dt); }
+             tillage_N_top, tillage_C_top, 
+             tillage_N_soil, tillage_C_soil, dt); }
 
 void
 AM::swap (const Geometry& geo,
@@ -761,25 +760,6 @@ AM::default_AM ()
   return am;
 }
 
-const AttributeList& 
-AM::default_root ()
-{
-  static AttributeList root;
-  
-  if (!root.check ("type"))
-    {
-      root.add ("type", "root");
-      root.add ("description", "Initialization of old root remains.");
-      root.add ("syntax", "root");
-      root.add ("dist", 7.0);
-      root.add ("weight", 1.2);
-      root.add ("total_C_fraction", 0.40);
-      root.add ("total_N_fraction", 0.01);
-      root.add ("om", AM::default_AM ());
-    }
-  return root;
-}
-
 double
 AM::get_NO3 (const AttributeList& al)
 {
@@ -920,12 +900,12 @@ AM::utilized_weight (const AttributeList& am)
       && am.check ("total_N_fraction")
       && am.check ("weight"))
     {
-       const double kg_per_ton = 1000.0;
-       return am.number ("weight")
-	 * am.number ("dry_matter_fraction")
-	 * am.number ("total_N_fraction")
-	 * am.number ("first_year_utilization")
-	 * kg_per_ton;
+      const double kg_per_ton = 1000.0;
+      return am.number ("weight")
+        * am.number ("dry_matter_fraction")
+        * am.number ("total_N_fraction")
+        * am.number ("first_year_utilization")
+        * kg_per_ton;
     }
   else if (am.name ("syntax") == "mineral")
     return am.number ("weight");
@@ -940,12 +920,12 @@ AM::second_year_utilization (const AttributeList& am)
       && am.check ("total_N_fraction")
       && am.check ("weight"))
     {
-       const double kg_per_ton = 1000.0;
-       return am.number ("weight")
-	 * am.number ("dry_matter_fraction")
-	 * am.number ("total_N_fraction")
-	 * am.number ("second_year_utilization")
-	 * kg_per_ton;
+      const double kg_per_ton = 1000.0;
+      return am.number ("weight")
+        * am.number ("dry_matter_fraction")
+        * am.number ("total_N_fraction")
+        * am.number ("second_year_utilization")
+        * kg_per_ton;
     }
   return 0.0;
 }
@@ -972,7 +952,7 @@ AM::AM (const AttributeList& al)
 {
   if (al.check ("lock"))
     impl->lock = new AM::Implementation::Lock (al.alist ("lock"));
- }
+}
 
 void
 AM::initialize (const Geometry& geo, const double max_rooting_depth)
@@ -1089,18 +1069,53 @@ AM::initialize (const Geometry& geo, const double max_rooting_depth)
 AM::~AM ()
 { }
 
-static struct AM_Syntax
+struct DeclareAM : public DeclareModel
 {
-  static Model& make (Block& al1)
+  Model* make (Block& al1) const
   { 
     AttributeList al2 (al1.alist ());
     al2.add ("type", "state");
     if (!al2.check ("name"))
       al2.add ("name", al1.name ("type"));
-    return *new AM (al2); 
+    return new AM (al2); 
   }
+  DeclareAM (const symbol c, const symbol n, const symbol d)
+    : DeclareModel (c, n, d)
+  { }
+};
 
-  static bool check_organic (const AttributeList& al, Treelog& err)
+static struct AMStateSyntax : public DeclareAM
+{
+  AMStateSyntax ()
+    : DeclareAM (AM::component, "state", "\
+Most AM models are only used for initialization, they will be comnverted\n\
+to this generic model after creation, so this is what you will see in a\n\
+checkpoint.  This model contains a number (typically 2) of separate\n\
+pools, each of which have their own turnover rate.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_submodule ("creation", Value::OptionalState, 
+                          "Time this AM was created.", Time::load_syntax);
+    frame.alist ().add ("syntax", "state");
+    frame.add ("name", Value::String, Value::State, "\
+A name given to this AOM so you can identify it in for example log files.");
+    frame.add_submodule ("lock", Value::OptionalState, "\
+This AM belongs to a still living plant",
+                          AM::Implementation::Lock::load_syntax);
+    frame.add_submodule_sequence ("om", Value::State, 
+                                   "The individual AOM pools.",
+                                   AOM::load_syntax);
+  }
+} AMState_syntax;
+
+static struct AMOrganicSyntax : public DeclareAM
+{
+  AMOrganicSyntax ()
+    : DeclareAM (AM::component, "organic", "\
+Organic fertilizer, typically slurry or manure from animals.")
+  { }
+  static bool check_alist (const AttributeList& al, Treelog& err)
   { 
     if (!al.check ("syntax"))
       {
@@ -1112,29 +1127,81 @@ static struct AM_Syntax
     daisy_assert (syntax == "organic");
     return true;
   }
-
-  static bool check_root (const AttributeList& al, Treelog& err)
-  { 
-    daisy_assert (al.name ("syntax") == "root");
-  
-    bool ok = true;
-
-    // We need exactly one pool with unspecified OM.
-    daisy_assert (al.check ("om"));
-    int unspecified = 0;
-    const std::vector<const AttributeList*>& om = al.alist_sequence ("om");
-    for (size_t i = 0; i < om.size (); i++)
-      if (approximate (OM::get_initial_C_per_N (*om[i]), OM::Unspecified))
-	unspecified++;
-    if (unspecified != 1)
-      { 
-	err.entry ("You must leave C/N unspecified in exactly one pool.");
-	ok = false;
-      }
-    return ok;
+  void load_frame (Frame& frame) const
+  {
+    frame.add ("description", Value::String, Value::OptionalConst,
+                "Description of this fertilizer type."); 
+    frame.add_check (check_alist);
+    frame.add_submodule ("creation", Value::OptionalState, 
+                          "Time of application.", Time::load_syntax);
+    frame.alist ().add ("syntax", "organic");
+    frame.add ("weight", "Mg w.w./ha", Check::non_negative (),
+                Value::Const,
+                "Amount of fertilizer applied.");
+    frame.add ("weight", 0.0);
+    frame.add_fraction ("first_year_utilization", Value::OptionalConst, 
+                         "\
+Estimated useful N fraction for the first year.\n\
+In Denmark, this is governed by legalisation.");
+    frame.add_fraction ("second_year_utilization", 
+                         Value::OptionalConst, "\
+Estimated useful N fraction for the second year.\n\
+In Denmark, this is governed by legalisation.");
+    frame.add_fraction ("dry_matter_fraction", Value::Const,
+                         "Dry matter fraction of total (wet) weight.");
+    frame.add_fraction ("total_C_fraction", Value::Const,
+                         "Carbon fraction of dry matter.");
+    frame.add_fraction ("total_N_fraction", Value::Const,
+                         "Nitrogen fraction of dry matter.");
+    frame.add_submodule_sequence ("om", Value::State,
+                                   "The individual AOM pools.",
+                                   AOM::load_syntax);
+    frame.add_check ("om", AM::check_om_pools ());
+    frame.add_fraction ("NO3_fraction", Value::Const, 
+                         "Nitrate fraction of total N in fertilizer. \n\
+The remaining nitrogen is assumed to be ammonium or organic.");
+    frame.add ("NO3_fraction", 0.0);
+    frame.add_fraction ("NH4_fraction", Value::Const, "\
+Ammonium fraction of total N in fertilizer. \n\
+The remaining nitrogen is assumed to be nitrate or organic.");
+    frame.add ("NH4_fraction", 0.0);
+    frame.add_fraction ("volatilization", Value::Const, "\
+Fraction of NH4 that evaporates on application.");
+    frame.add ("volatilization", 0.0);
   }
+} AMOrganic_syntax;
 
-  static bool check_initial (const AttributeList& al, Treelog& err)
+static struct AMMineralSyntax : public DeclareAM
+{
+  AMMineralSyntax ()
+    : DeclareAM (AM::component, "mineral", "Mineral fertilizer.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add ("description", Value::String, Value::OptionalConst,
+                "Description of this fertilizer type."); 
+    frame.add_submodule ("creation", Value::OptionalState, 
+                          "Time of application.", Time::load_syntax);
+    frame.add ("weight", "kg N/ha", Check::non_negative (), Value::Const,
+                "Amount of fertilizer applied.");
+    frame.add ("weight", 0.0);
+    frame.add_fraction ("NH4_fraction", Value::Const, "\
+Ammonium fraction of total N in fertilizer. \n\
+The remaining nitrogen is assumed to be nitrate.");
+    frame.add_fraction ("volatilization", Value::Const, "\
+Fraction of NH4 that evaporates on application.");
+    frame.add ("volatilization", 0.0);
+    frame.alist ().add ("syntax", "mineral");
+  }
+} AMMineral_syntax;
+
+static struct AMInitialSyntax : public DeclareAM
+{
+  AMInitialSyntax ()
+    : DeclareAM (AM::component, "initial", "\
+Initial added organic matter at the start of the simulation.")
+  { }
+  static bool check_alist (const AttributeList& al, Treelog& err)
   { 
     daisy_assert (al.name ("syntax") == "initial");
   
@@ -1155,153 +1222,82 @@ static struct AM_Syntax
     return ok;
   }
 
-  AM_Syntax ()
-    {
-      // State.
-      {
-	Syntax& syntax = *new Syntax ();
-	AttributeList& alist = *new AttributeList ();
-	alist.add ("description", "\
-Most AM models are only used for initialization, they will be comnverted\n\
-to this generic model after creation, so this is what you will see in a\n\
-checkpoint.  This model contains a number (typically 2) of separate\n\
-pools, each of which have their own turnover rate.");
-
-	syntax.add_submodule ("creation", alist, Value::OptionalState, 
-			      "Time this AM was created.", Time::load_syntax);
-	alist.add ("syntax", "state");
-	syntax.add ("name", Value::String, Value::State, "\
-A name given to this AOM so you can identify it in for example log files.");
-	syntax.add_submodule ("lock", alist, Value::OptionalState, "\
-This AM belongs to a still living plant",
-			      AM::Implementation::Lock::load_syntax);
-	syntax.add_submodule_sequence ("om", Value::State, 
-				       "The individual AOM pools.",
-				       AOM::load_syntax);
-	Librarian::add_type (AM::component, "state", alist, syntax, &make);
-      }
-      // Organic fertilizer.
-      {
-	Syntax& syntax = *new Syntax ();
-	syntax.add_check (check_organic);
-	AttributeList& alist = *new AttributeList ();
-	syntax.add ("description", Value::String, Value::OptionalConst,
-		    "Description of this fertilizer type."); 
-	alist.add ("description", "\
-Organic fertilizer, typically slurry or manure from animals.");
-	syntax.add_submodule ("creation", alist, Value::OptionalState, 
-			      "Time of application.", Time::load_syntax);
-	alist.add ("syntax", "organic");
-	syntax.add ("weight", "Mg w.w./ha", Check::non_negative (),
-		    Value::Const,
-		    "Amount of fertilizer applied.");
-	alist.add ("weight", 0.0);
-	syntax.add_fraction ("first_year_utilization", Value::OptionalConst, 
-			     "\
-Estimated useful N fraction for the first year.\n\
-In Denmark, this is governed by legalisation.");
-	syntax.add_fraction ("second_year_utilization", 
-			     Value::OptionalConst, "\
-Estimated useful N fraction for the second year.\n\
-In Denmark, this is governed by legalisation.");
-	syntax.add_fraction ("dry_matter_fraction", Value::Const,
-			     "Dry matter fraction of total (wet) weight.");
-	syntax.add_fraction ("total_C_fraction", Value::Const,
-			     "Carbon fraction of dry matter.");
-	syntax.add_fraction ("total_N_fraction", Value::Const,
-			     "Nitrogen fraction of dry matter.");
-	syntax.add_submodule_sequence ("om", Value::State,
-				       "The individual AOM pools.",
-				       AOM::load_syntax);
-	syntax.add_check ("om", AM::check_om_pools ());
-	syntax.add_fraction ("NO3_fraction", Value::Const, 
-		    "Nitrate fraction of total N in fertilizer. \n\
-The remaining nitrogen is assumed to be ammonium or organic.");
-	alist.add ("NO3_fraction", 0.0);
-	syntax.add_fraction ("NH4_fraction", Value::Const, "\
-Ammonium fraction of total N in fertilizer. \n\
-The remaining nitrogen is assumed to be nitrate or organic.");
-	alist.add ("NH4_fraction", 0.0);
-	syntax.add_fraction ("volatilization", Value::Const, "\
-Fraction of NH4 that evaporates on application.");
-	alist.add ("volatilization", 0.0);
-	Librarian::add_type (AM::component, "organic", alist, syntax, &make);
-      }
-      // Mineral fertilizer.
-      {
-	Syntax& syntax = *new Syntax ();
-	AttributeList& alist = *new AttributeList ();
-	syntax.add ("description", Value::String, Value::OptionalConst,
-		    "Description of this fertilizer type."); 
-	alist.add ("description", "Mineral fertilizer.");
-	syntax.add_submodule ("creation", alist, Value::OptionalState, 
-			      "Time of application.", Time::load_syntax);
-	syntax.add ("weight", "kg N/ha", Check::non_negative (), Value::Const,
-		    "Amount of fertilizer applied.");
-	alist.add ("weight", 0.0);
-	syntax.add_fraction ("NH4_fraction", Value::Const, "\
-Ammonium fraction of total N in fertilizer. \n\
-The remaining nitrogen is assumed to be nitrate.");
-	syntax.add_fraction ("volatilization", Value::Const, "\
-Fraction of NH4 that evaporates on application.");
-	alist.add ("volatilization", 0.0);
-	alist.add ("syntax", "mineral");
-	Librarian::add_type (AM::component, "mineral", alist, syntax, &make);
-      }
-      // Initialization.
-      {
-	Syntax& syntax = *new Syntax ();
-	syntax.add_check (check_initial);
-	AttributeList& alist = *new AttributeList ();
-	alist.add ("description", "\
-Initial added organic matter at the start of the simulation.");
-	syntax.add_submodule ("creation", alist, Value::OptionalState,
-			      "Start of simulation.", Time::load_syntax);
-	alist.add ("syntax", "initial");
-	Syntax& layer_syntax = *new Syntax ();
-	layer_syntax.add ("end", "cm", Check::negative (), Value::Const,
-			  "\
+  void load_frame (Frame& frame) const
+  {
+    frame.add_check (check_alist);
+    frame.add_submodule ("creation", Value::OptionalState,
+                          "Start of simulation.", Time::load_syntax);
+    frame.alist ().add ("syntax", "initial");
+    Syntax& layer_syntax = *new Syntax ();
+    layer_syntax.add ("end", "cm", Check::negative (), Value::Const,
+                      "\
 Height where this layer ends (a negative number).");
-	layer_syntax.add ("weight", "kg C/m^2", Check::non_negative (),
-			  Value::Const, "Carbon in this layer.");
-	layer_syntax.order ("end", "weight");
-	syntax.add ("layers", layer_syntax, Value::Sequence, "\
+    layer_syntax.add ("weight", "kg C/m^2", Check::non_negative (),
+                      Value::Const, "Carbon in this layer.");
+    layer_syntax.order ("end", "weight");
+    frame.add ("layers", layer_syntax, Value::Sequence, "\
 Carbon content in different soil layers.  The carbon is assumed to be\n\
 uniformly distributed in each layer.");
-	syntax.add_submodule_sequence ("om", Value::State,
-				       "The individual AOM pools.",
-				       AOM::load_syntax);
-	Librarian::add_type (AM::component, "initial", alist, syntax, &make);
+    frame.add_submodule_sequence ("om", Value::State,
+                                   "The individual AOM pools.",
+                                   AOM::load_syntax);
+  }
+} AMInitial_syntax;
+
+static struct AMRootSyntax : public DeclareAM
+{
+  AMRootSyntax ()
+    : DeclareAM (AM::component, "root", "Initialization of old root remains.")
+  { }
+  static bool check_alist (const AttributeList& al, Treelog& err)
+  { 
+    daisy_assert (al.name ("syntax") == "root");
+  
+    bool ok = true;
+
+    // We need exactly one pool with unspecified OM.
+    daisy_assert (al.check ("om"));
+    int unspecified = 0;
+    const std::vector<const AttributeList*>& om = al.alist_sequence ("om");
+    for (size_t i = 0; i < om.size (); i++)
+      if (approximate (OM::get_initial_C_per_N (*om[i]), OM::Unspecified))
+	unspecified++;
+    if (unspecified != 1)
+      { 
+	err.entry ("You must leave C/N unspecified in exactly one pool.");
+	ok = false;
       }
-      // Root initialization,
-      {
-	Syntax& syntax = *new Syntax ();
-	syntax.add_check (check_root);
-	AttributeList& alist = *new AttributeList (AM::default_root ());
-	alist.remove ("type");
-	syntax.add_submodule ("creation", alist, Value::OptionalState,
-			      "Start of simulation.", Time::load_syntax);
-	syntax.add ("depth", "cm", Check::negative (), 
-		    Value::OptionalConst, "\
+    return ok;
+  }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_check (check_alist);
+    frame.add_submodule ("creation", Value::OptionalState,
+                          "Start of simulation.", Time::load_syntax);
+    frame.alist ().add ("syntax", "root");
+    frame.add ("depth", "cm", Check::negative (), 
+                Value::OptionalConst, "\
 How far down does the old root reach? (a negative number)\n\
 By default, the soils maximal rooting depth will be used.");
-	syntax.add ("dist", "cm", Check::positive (), Value::Const, "\
+    frame.add ("dist", "cm", Check::positive (), Value::Const, "\
 Distance to go down in order to decrease the root density to half the\n\
 original.");
-	syntax.add ("weight", "Mg DM/ha", Check::non_negative (), Value::Const, 
-		    "Total weight of old root dry matter.");
-	syntax.add_fraction ("total_C_fraction", Value::Const, 
-			     "Carbon fraction of total root dry matter");
-	syntax.add_fraction ("total_N_fraction", Value::Const, 
-			     "Nitrogen fraction of total root dry matter");
-	syntax.add_submodule_sequence ("om", Value::State,
-				       "The individual AOM pools.",
-				       AOM::load_syntax);
-	Librarian::add_type (AM::component, "root", alist, syntax, &make);
-      }
-    }
-} am_syntax;
-
+    frame.add ("dist", 7.0);
+    frame.add ("weight", "Mg DM/ha", Check::non_negative (), Value::Const, 
+                "Total weight of old root dry matter.");
+    frame.add ("weight", 1.2);
+    frame.add_fraction ("total_C_fraction", Value::Const, 
+                         "Carbon fraction of total root dry matter");
+    frame.add ("total_C_fraction", 0.40);
+    frame.add_fraction ("total_N_fraction", Value::Const, 
+                         "Nitrogen fraction of total root dry matter");
+    frame.add ("total_N_fraction", 0.01);
+    frame.add_submodule_sequence ("om", Value::State,
+                                   "The individual AOM pools.",
+                                   AOM::load_syntax);
+    frame.add ("om", AM::default_AM ());
+  }
+} AMRoot_syntax;
 
 static struct AMInit : public DeclareComponent 
 {
@@ -1378,17 +1374,16 @@ struct ProgramAM_table : public Program
   { }
 };
 
-static struct ProgramAM_tableSyntax
+static struct ProgramAM_tableSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ProgramAM_table (al); }
+  Model* make (Block& al) const
+  { return new ProgramAM_table (al); }
   ProgramAM_tableSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Generate a table of fertilizers.");
-    Librarian::add_type (Program::component, "AM_table", alist, syntax, &make);
-  }
+    : DeclareModel (Program::component, "AM_table", "\
+Generate a table of fertilizers.")
+  { }
+  void load_frame (Frame& frame) const
+  { }
 } ProgramAM_table_syntax;
 
 // am.C ends here.

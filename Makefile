@@ -1660,11 +1660,12 @@ number_soil${OBJ}: number_soil.C number.h symbol.h model.h alist.h metalib.h \
 organic_none${OBJ}: organic_none.C organic_matter.h model.h symbol.h alist.h \
   geometry.h syntax.h value.h mathlib.h assertion.h librarian.h
 organic_std${OBJ}: organic_std.C organic_matter.h model.h symbol.h alist.h \
-  syntax.h value.h submodeler.h block.h plf.h log.h time.h border.h am.h \
-  im.h om.h som.h smb.h dom.h domsorp.h aom.h clayom.h soil.h geometry.h \
-  mathlib.h assertion.h soil_water.h soil_heat.h chemistry.h chemical.h \
-  bioincorporation.h abiotic.h treelog.h check_range.h check.h vcheck.h \
-  gaussj.h memutils.h librarian.h
+  frame.h syntax.h value.h scope.h submodeler.h block.h plf.h log.h \
+  time.h border.h am.h im.h om.h som.h smb.h dom.h domsorp.h aom.h \
+  clayom.h soil.h geometry.h mathlib.h assertion.h soil_water.h \
+  soil_heat.h chemistry.h chemical.h bioincorporation.h abiotic.h \
+  treelog.h check_range.h check.h vcheck.h gaussj.h memutils.h \
+  librarian.h
 integer_arit${OBJ}: integer_arit.C integer.h model.h symbol.h alist.h \
   syntax.h value.h vcheck.h assertion.h memutils.h librarian.h treelog.h
 source_merge${OBJ}: source_merge.C source.h model.h symbol.h alist.h time.h \

@@ -1029,7 +1029,7 @@ This include ponded water, intercepted water and the snow pack.");
     frame.add_object ("OrganicMatter", OrganicMatter::component,
                        Value::State, Value::Singleton, "\
 The organic matter in the soil and on the surface.");
-    frame.add ("OrganicMatter", OrganicMatter::default_model ());
+    frame.add ("OrganicMatter", "default");
     frame.add ("second_year_utilization", "kg N/ha", Value::State,
 		"Estimated accumulated second year fertilizer effect.");
     frame.add ("second_year_utilization", 0.0);
