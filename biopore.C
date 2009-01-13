@@ -22,7 +22,7 @@
 
 #include "biopore.h"
 #include "block.h"
-#include "alist.h"
+#include "frame.h"
 #include "librarian.h"
 #include "scope_multi.h"
 #include "scope_id.h"
@@ -227,28 +227,6 @@ Biopore::check_base (const Geometry& geo, Treelog& msg) const
   return ok;
 }
 
-void 
-Biopore::load_base (Syntax& syntax, AttributeList& alist)
-{
-  syntax.add_object ("density", Number::component, 
-                       Value::Const, Value::Singleton, "\
-Biopore density [cm^-2] as a function of 'x' [cm].");
-  syntax.add ("height_start", "cm", Check::non_positive (), Value::Const, 
-	      "Biopores starts at this depth (a negative number).");
-  syntax.add ("height_end", "cm", Check::non_positive (), Value::Const, 
-	      "Biopores ends at this depth (a negative number).");
-  syntax.add ("diameter", "cm", Check::positive (),
-              Value::Const, "Biopore diameter.");
-  syntax.add ("S", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
-	      "Sink from matrix domain to biopore.");
-  syntax.add ("infiltration", "cm/h", Value::LogOnly, "\
-Surface infiltration.");
-  IM::add_syntax (syntax, alist, Value::LogOnly, "solute_infiltration", 
-                  IM::flux_unit (),
-		  "Rate of solute infiltration through surface.");
-
-}
-
 Biopore::Biopore (Block& al)
   : ModelAListed (al.alist ()),
     density_expr (Librarian::build_item<Number> (al, "density")),
@@ -268,6 +246,26 @@ static struct BioporeInit : public DeclareComponent
     : DeclareComponent (Biopore::component, "\
 A single class of biopores.")
   { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_object ("density", Number::component, 
+                         Value::Const, Value::Singleton, "\
+Biopore density [cm^-2] as a function of 'x' [cm].");
+    frame.add ("height_start", "cm", Check::non_positive (), Value::Const, 
+                "Biopores starts at this depth (a negative number).");
+    frame.add ("height_end", "cm", Check::non_positive (), Value::Const, 
+                "Biopores ends at this depth (a negative number).");
+    frame.add ("diameter", "cm", Check::positive (),
+                Value::Const, "Biopore diameter.");
+    frame.add ("S", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
+                "Sink from matrix domain to biopore.");
+    frame.add ("infiltration", "cm/h", Value::LogOnly, "\
+Surface infiltration.");
+    IM::add_syntax (frame.syntax (), frame.alist (), Value::LogOnly,
+                    "solute_infiltration", 
+                    IM::flux_unit (),
+                    "Rate of solute infiltration through surface.");
+  }
 } Biopore_init;
 
 // biopore.C ends here.

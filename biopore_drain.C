@@ -32,6 +32,7 @@
 #include "chemical.h"
 #include "groundwater.h"
 #include "treelog.h"
+#include "frame.h"
 #include <sstream>
 
 // The 'drain' model.
@@ -191,22 +192,20 @@ BioporeDrain::BioporeDrain (Block& al)
     pipe_position (al.number ("pipe_position", 42.42e42))
 { }
 
-static struct BioporeDrainSyntax
+static struct BioporeDrainSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new BioporeDrain (al); }
+  Model* make (Block& al) const
+  { return new BioporeDrain (al); }
 
   BioporeDrainSyntax ()
+    : DeclareModel (Biopore::component, "drain", "\
+Biopores that ends in the drain pipes.")
+  { }
+  void load_frame (Frame& frame) const
   { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Biopores that ends in the drain pipes.");
-    Biopore::load_base (syntax, alist);
-
-    syntax.add ("pipe_position", "cm", Check::negative (), Value::Const,
+    frame.add ("pipe_position", "cm", Check::negative (), Value::Const,
                 "Height pipes are placed in the soil (a negative number).\n\
 By default, use the height specified for pipes in the column.");
-    Librarian::add_type (Biopore::component, "drain", alist, syntax, &make);
   }
 } BioporeDrain_syntax;
 

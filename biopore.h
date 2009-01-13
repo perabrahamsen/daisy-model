@@ -127,7 +127,6 @@ public:
                            const Geometry&, const Scope&, const Groundwater&,
                            Treelog&) = 0;
   virtual bool check (const Geometry&, Treelog& msg) const = 0;
-  static void load_base (Syntax& syntax, AttributeList& alist);
 protected:
   explicit Biopore (Block& al);
 public:

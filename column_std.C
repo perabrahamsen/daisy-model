@@ -986,7 +986,7 @@ the simulation.  If unspecified, used global weather.");
     frame.add_object ("Bioclimate", Bioclimate::component, 
                        Value::State, Value::Singleton,
                        "The water and energy distribution among the crops.");
-    frame.add ("Bioclimate", Bioclimate::default_model ());
+    frame.add ("Bioclimate", "default");
     frame.add_submodule ("Surface", Value::State,
                           "The upper border of the soil.",
                           Surface::load_syntax);

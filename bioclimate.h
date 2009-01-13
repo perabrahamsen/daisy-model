@@ -127,7 +127,6 @@ private:
   // Create.
 public:
   virtual void initialize (Block&, const Weather&) = 0;
-  static const AttributeList& default_model ();
 protected:
   explicit Bioclimate (Block&);
 public:

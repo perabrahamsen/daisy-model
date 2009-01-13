@@ -974,9 +974,9 @@ tertiary${OBJ}: tertiary.C tertiary.h model.h symbol.h alist.h tertsmall.h \
   geometry.h syntax.h value.h mathlib.h assertion.h soil_water.h block.h \
   plf.h librarian.h
 biopore${OBJ}: biopore.C biopore.h model.h symbol.h alist.h number.h im.h \
-  syntax.h value.h block.h plf.h librarian.h scope_multi.h scope.h \
-  scope_id.h units.h check.h geometry.h mathlib.h assertion.h log.h \
-  time.h border.h treelog.h
+  syntax.h value.h block.h plf.h frame.h scope.h librarian.h \
+  scope_multi.h scope_id.h units.h check.h geometry.h mathlib.h \
+  assertion.h log.h time.h border.h treelog.h
 secondary${OBJ}: secondary.C secondary.h model.h symbol.h alist.h block.h \
   syntax.h value.h plf.h librarian.h assertion.h
 heatrect${OBJ}: heatrect.C heatrect.h model.h symbol.h alist.h block.h \
@@ -1447,7 +1447,8 @@ tertiary_old${OBJ}: tertiary_old.C tertiary.h model.h symbol.h alist.h \
 biopore_drain${OBJ}: biopore_drain.C biopore.h model.h symbol.h alist.h \
   number.h im.h syntax.h value.h block.h plf.h vcheck.h librarian.h \
   submodeler.h check.h geometry.h mathlib.h assertion.h soil.h \
-  soil_heat.h anystate.h chemical.h groundwater.h treelog.h
+  soil_heat.h anystate.h chemical.h groundwater.h treelog.h frame.h \
+  scope.h
 tertiary_biopores${OBJ}: tertiary_biopores.C tertiary.h model.h symbol.h \
   alist.h tertsmall.h biopore.h number.h im.h syntax.h value.h memutils.h \
   librarian.h block.h plf.h check.h geometry.h mathlib.h assertion.h \
@@ -1457,7 +1458,7 @@ biopore_matrix${OBJ}: biopore_matrix.C biopore.h model.h symbol.h alist.h \
   number.h im.h syntax.h value.h imvec.h block.h plf.h vcheck.h \
   librarian.h submodeler.h geometry.h mathlib.h assertion.h soil.h \
   soil_heat.h secondary.h volume_box.h volume.h log.h time.h border.h \
-  check.h anystate.h chemical.h groundwater.h treelog.h
+  check.h anystate.h chemical.h groundwater.h treelog.h frame.h scope.h
 transport_Mollerup${OBJ}: transport_Mollerup.C transport.h model.h symbol.h \
   alist.h geometry_rect.h geometry_vert.h geometry.h syntax.h value.h \
   mathlib.h assertion.h soil.h solver.h log.h time.h border.h frame.h \
