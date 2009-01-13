@@ -27,6 +27,7 @@
 #include "geometry.h"
 #include "treelog.h"
 #include "librarian.h"
+#include "frame.h"
 #ifdef DEBUG_EDGES
 #include <sstream>
 #endif
@@ -60,22 +61,8 @@ private:
                      const Volume& default_volume,
                      Treelog& msg) const;
 public:
-  static void load_syntax (Syntax& syntax, AttributeList& alist);
   SelectFlow (Block&);
 };
-
-void 
-SelectFlow::load_syntax (Syntax& syntax, AttributeList& alist)
-{
-  SelectValue::load_syntax (syntax, alist);
-  syntax.add ("density", Value::Boolean, Value::Const, 
-              "If true, divide value with volume height.");
-  alist.add ("density", false);
-  syntax.add_object ("volume", Volume::component, 
-                     Value::Const, Value::Singleton,
-                     "Soil volume to log flow into.");
-  alist.add ("volume", Volume::infinite_box ());
-}
 
 symbol 
 SelectFlow::default_dimension (const symbol spec_dim) const
@@ -183,6 +170,23 @@ SelectFlow::SelectFlow (Block& al)
     last_geo (NULL)
 { }
 
+static struct SelectFlowSyntax : public DeclareBase
+{
+  SelectFlowSyntax ()
+    : DeclareBase (Select::component, "flow", "value", "\
+Common base for logging flow through a specific plane.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add ("density", Value::Boolean, Value::Const, 
+               "If true, divide value with volume height.");
+    frame.add ("density", false);
+    frame.add_object ("volume", Volume::component, 
+                      Value::Const, Value::Singleton,
+                      "Soil volume to log flow into.");
+    frame.add ("volume", "box");
+  }
+} SelectFlow_syntax;
 
 struct SelectFlowTop : public SelectFlow
 {
@@ -202,45 +206,33 @@ struct SelectFlowTop : public SelectFlow
   { }
 };
 
-static struct SelectFlowTopSyntax
+static struct SelectFlowTopSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new SelectFlowTop (al); }
+  Model* make (Block& al) const
+  { return new SelectFlowTop (al); }
 
   SelectFlowTopSyntax ()
+    : DeclareModel (Select::component, "flow_top", "flow", "\
+Extract flow from top of specified volume.")
+  { }
+  void load_frame (Frame& frame) const
   { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Extract flow from top of specified volume.");
-    SelectFlow::load_syntax (syntax, alist);
-    syntax.add ("from", "cm", Value::OptionalConst,
+    frame.add ("from", "cm", Value::OptionalConst,
 		"Specify height (negative) to measure from.\n\
 By default, measure from the top.\n\
 OBSOLETE: Use (volume box (top FROM)) instead.");
-
-    Librarian::add_type (Select::component, "flow_top", alist, syntax, &make);
   }
 } Select_flow_top_syntax;
 
-static struct SelectFluxTopSyntax
+static struct SelectFluxTopSyntax : public DeclareParam
 {
-  static Model& make (Block& al)
-  { return *new SelectFlowTop (al); }
-
   SelectFluxTopSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Flux leaving top of specified volume.\n\
-OBSOLETE: Use '(flow_top (negate true) (density true))' instead.");
-    SelectFlow::load_syntax (syntax, alist);
-    syntax.add ("from", "cm", Value::OptionalConst,
-		"Specify height (negative) to measure from.\n\
-By default, measure from the top.\n\
-OBSOLETE: Use (volume box (top FROM)) instead.");
-    alist.add ("density", true);
-    Librarian::add_type (Select::component, "flux_top", alist, syntax, &make);
-  }
+    : DeclareParam (Select::component, "flux_top", "flow_top", "\
+Flux leaving top of specified volume.\n\
+OBSOLETE: Use '(flow_top (negate true) (density true))' instead.")
+  { }
+  void load_frame (Frame& frame) const
+  { frame.add ("density", true); }
 } Select_flux_top_syntax;
 
 struct SelectFlowBottom : public SelectFlow
@@ -261,44 +253,35 @@ struct SelectFlowBottom : public SelectFlow
   { }
 };
 
-static struct SelectFlowBottomSyntax
+static struct SelectFlowBottomSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new SelectFlowBottom (al); }
+  Model* make (Block& al) const
+  { return new SelectFlowBottom (al); }
 
   SelectFlowBottomSyntax ()
+    : DeclareModel (Select::component, "flow_bottom", "flow", "\
+Extract flow from bottom of specified volume.")
+  { }
+  void load_frame (Frame& frame) const
   { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Extract flow from bottom of specified volume.");
-    SelectFlow::load_syntax (syntax, alist);
-    syntax.add ("to", "cm", Value::OptionalConst,
+    frame.add ("to", "cm", Value::OptionalConst,
 		"Specify height (negative) to measure interval.\n\
 By default, measure to the bottom.\n\
 OBSOLETE: Use (volume box (bottom TO)) instead.");
 
-    Librarian::add_type (Select::component, "flow_bottom", alist, syntax, &make);
   }
 } Select_flow_bottom_syntax;
 
-static struct SelectFluxBottomSyntax
+static struct SelectFluxBottomSyntax : public DeclareParam
 {
-  static Model& make (Block& al)
-  { return *new SelectFlowBottom (al); }
-
   SelectFluxBottomSyntax ()
+    : DeclareParam (Select::component, "flux_bottom", "flow_bottom", "\
+Flux entering bottom of specified volume.\n\
+OBSOLETE: Use '(flow_bottom (density true))' instead.")
+  { }
+  void load_frame (Frame& frame) const
   { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Flux entering bottom of specified volume.\n\
-OBSOLETE: Use '(flow_bottom (density true))' instead.");
-    SelectFlow::load_syntax (syntax, alist);
-    syntax.add ("to", "cm", Value::OptionalConst,
-		"Specify height (negative) to measure to.\n\
-By default, measure from the bottom.\n\
-OBSOLETE: Use (volume box (bottom TO)) instead.");
-    alist.add ("density", true);
-    Librarian::add_type (Select::component, "flux_bottom", alist, syntax, &make);
+    frame.add ("density", true);
   }
 } Select_flux_bottom_syntax;
 
@@ -320,20 +303,17 @@ struct SelectFlowLeft : public SelectFlow
   { }
 };
 
-static struct SelectFlowLeftSyntax
+static struct SelectFlowLeftSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new SelectFlowLeft (al); }
+  Model* make (Block& al) const
+  { return new SelectFlowLeft (al); }
 
   SelectFlowLeftSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Extract flow from left of specified volume.");
-    SelectFlow::load_syntax (syntax, alist);
-
-    Librarian::add_type (Select::component, "flow_left", alist, syntax, &make);
-  }
+    : DeclareModel (Select::component, "flow_left", "flow", "\
+Extract flow from left of specified volume.")
+  { }
+  void load_frame (Frame&) const
+  { }
 } Select_flow_left_syntax;
 
 struct SelectFlowRight : public SelectFlow
@@ -354,20 +334,17 @@ struct SelectFlowRight : public SelectFlow
   { }
 };
 
-static struct SelectFlowRightSyntax
+static struct SelectFlowRightSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new SelectFlowRight (al); }
+  Model* make (Block& al) const
+  { return new SelectFlowRight (al); }
 
   SelectFlowRightSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Extract flow from right of specified volume.");
-    SelectFlow::load_syntax (syntax, alist);
-
-    Librarian::add_type (Select::component, "flow_right", alist, syntax, &make);
-  }
+    : DeclareModel (Select::component, "flow_right", "flow", "\
+Extract flow from right of specified volume.")
+  { }
+  void load_frame (Frame& frame) const
+  { }
 } Select_flow_right_syntax;
 
 struct SelectFlowFront : public SelectFlow
@@ -388,20 +365,17 @@ struct SelectFlowFront : public SelectFlow
   { }
 };
 
-static struct SelectFlowFrontSyntax
+static struct SelectFlowFrontSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new SelectFlowFront (al); }
+  Model* make (Block& al) const
+  { return new SelectFlowFront (al); }
 
   SelectFlowFrontSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Extract flow from front of specified volume.");
-    SelectFlow::load_syntax (syntax, alist);
-
-    Librarian::add_type (Select::component, "flow_front", alist, syntax, &make);
-  }
+    : DeclareModel (Select::component, "flow_front", "flow", "\
+Extract flow from front of specified volume.")
+  { }
+  void load_frame (Frame&) const
+  { }
 } Select_flow_front_syntax;
 
 struct SelectFlowBack : public SelectFlow
@@ -422,20 +396,17 @@ struct SelectFlowBack : public SelectFlow
   { }
 };
 
-static struct SelectFlowBackSyntax
+static struct SelectFlowBackSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new SelectFlowBack (al); }
+  Model* make (Block& al) const
+  { return new SelectFlowBack (al); }
 
   SelectFlowBackSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Extract flow from back of specified volume.");
-    SelectFlow::load_syntax (syntax, alist);
-
-    Librarian::add_type (Select::component, "flow_back", alist, syntax, &make);
-  }
+    : DeclareModel (Select::component, "flow_back", "flow", "\
+Extract flow from back of specified volume.")
+  { }
+  void load_frame (Frame&) const
+  { }
 } Select_flow_back_syntax;
 
 // select_flow.C ends here.

@@ -324,7 +324,9 @@ Library::is_derived_from (const symbol a, const symbol b) const
   if (type == b)
     return true;
 
-  daisy_assert (check (type));
+  if (!check (type))
+    daisy_panic ("'" + a + "' is derived from non-existing '" + type 
+                 + "', rather than '" + b + "'");
 
   if (type == a)
     return false;

@@ -35,6 +35,7 @@
 #include "memutils.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 #include <sstream>
 
 bool 
@@ -241,12 +242,6 @@ LogSelect::LogSelect (const char *const id)
 LogSelect::~LogSelect ()
 { }
 
-static bool check_alist (const AttributeList&, Treelog&)
-{
-  bool ok = true;
-  return ok;
-}
-
 // GCC 2.95 doesn't allow classes nested in functions.
 struct DocSelect : public LogSelect 
 {
@@ -329,35 +324,39 @@ LogSelect::document_entries (Format& format, Metalib& metalib,
     select.entries[i]->document (format);
 }
 
-void 
-LogSelect::load_syntax (Syntax& syntax, AttributeList& alist)
+static struct LogSelectSyntax : public DeclareBase
 {
-  syntax.add_check (check_alist);
-  syntax.add ("description", Value::String, Value::Const,
-	      "Description of this log file format.");
-  alist.add ("description", "\
+  LogSelectSyntax ()
+    : DeclareBase (Log::component, "select", "Select variables to log.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add ("description", Value::String, Value::Const,
+                "Description of this log file format.");
+    frame.add ("description", "\
 Each selected variable is represented by a column in the log.");
-  syntax.add_object ("when", Condition::component, "\
+    frame.add_object ("when", Condition::component, "\
 Add entries to the log file when this condition is true.");
-  syntax.add_object ("entries", Select::component, 
-                     Value::State, Value::Sequence,
-                     "What to log in each column.");
-  syntax.add ("time_columns", Value::Boolean, Value::OptionalConst, "\
+    frame.add_object ("entries", Select::component, 
+                       Value::State, Value::Sequence,
+                       "What to log in each column.");
+    frame.add ("time_columns", Value::Boolean, Value::OptionalConst, "\
 Iff true, add columns for year, month, mday and hour in the begining of\n\
 the lines.  By default, this will be true of you have not specified any\n\
 time entries yourself.");
-  syntax.add_object ("volume", Volume::component, 
-                     Value::Const, Value::Singleton,
-                     "Soil volume to log.");
-  alist.add ("volume", Volume::infinite_box ());
-  syntax.add ("from", "cm", Value::OptionalConst,
-	      "Default 'from' value for all entries.\n\
+    frame.add_object ("volume", Volume::component, 
+                       Value::Const, Value::Singleton,
+                       "Soil volume to log.");
+    frame.add ("volume", "box");
+    frame.add ("from", "cm", Value::OptionalConst,
+                "Default 'from' value for all entries.\n\
 By default, use the top of the soil.\n\
 OBSOLETE: Use (volume box (top FROM)) instead.");
-  syntax.add ("to", "cm", Value::OptionalConst,
-	      "Default 'to' value for all entries.\n\
+    frame.add ("to", "cm", Value::OptionalConst,
+                "Default 'to' value for all entries.\n\
 By default, use the bottom of the soil.\n\
 OBSOLETE: Use (volume box (bottom TO)) instead.");
-}
+  }
+} LogSelect_syntax;
 
 // log_select.C ends here.

@@ -322,7 +322,7 @@ Currently, the 'temperature' parameter is ignored.")
     frame.add_object ("volume", Volume::component, 
                        Value::Const, Value::Singleton,
                        "Soil volume to add irritaion.");
-    frame.add ("volume", Volume::infinite_box ());
+    frame.add ("volume", "box");
     frame.add ("from", "cm", Check::non_positive (), Value::OptionalConst, "\
 Height where you want to start the incorporation (a negative number).\n\
 OBSOLETE: Use (volume box (top FROM)) instead.");

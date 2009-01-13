@@ -22,7 +22,7 @@
 
 #include "boolean.h"
 #include "block.h"
-#include "alist.h"
+#include "frame.h"
 #include "librarian.h"
 #include <vector>
 
@@ -58,21 +58,19 @@ struct BooleanStringEqual : public Boolean
   { }
 };
 
-static struct BooleanStringEqualSyntax
+static struct BooleanStringEqualSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new BooleanStringEqual (al); }
+  Model* make (Block& al) const
+  { return new BooleanStringEqual (al); }
   BooleanStringEqualSyntax ()
+    : DeclareModel (Boolean::component, "string-equal", 
+                    "True iff the supplied strings are identical.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-
-    alist.add ("description", 
-	       "True iff the supplied strings are identical.");
-    syntax.add ("values", Value::String, Value::Const, Value::Sequence,
+    frame.add ("values", Value::String, Value::Const, Value::Sequence,
 		"Strings to compare.");
-    syntax.order ("values");
-    Librarian::add_type (Boolean::component, "string-equal", alist, syntax, &make);
+    frame.order ("values");
   }
 } BooleanStringEqual_syntax;
 

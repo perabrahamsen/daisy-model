@@ -65,8 +65,8 @@ class Select : public Model
   // Content.
 public:
   const symbol name;
-private:
   struct Implementation;
+private:
   std::auto_ptr<Implementation> impl;
 protected:
   MultiDest dest;
@@ -157,7 +157,6 @@ public:
   // Create and Destroy.
 public:
   void document (Format&) const;
-  static void load_syntax (Syntax&, AttributeList&);
 protected:
   virtual symbol
   /**/ default_dimension (symbol spec_dim) const;

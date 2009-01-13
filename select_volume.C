@@ -25,13 +25,13 @@
 #include "select_value.h"
 #include "bdconv.h"
 #include "block.h"
-#include "alist.h"
 #include "volume.h"
 #include "geometry.h"
 #include "soil.h"
 #include "vegetation.h"
 #include "check.h"
 #include "librarian.h"
+#include "frame.h"
 #include <memory>
 
 struct SelectVolume : public SelectValue
@@ -268,34 +268,35 @@ SelectVolume::SelectVolume (Block& al)
 SelectVolume::~SelectVolume ()
 { }
 
-static struct SelectVolumeSyntax
+static struct SelectVolumeBase : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new SelectVolume (al); }
-
-  static void load_syntax (Syntax& syntax, AttributeList& alist)
+  Model* make (Block& al) const
+  { return new SelectVolume (al); }
+  SelectVolumeBase ()
+    : DeclareModel (Select::component, "volume_base", "value", "\
+Shared parameters for volume based logs.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    SelectValue::load_syntax (syntax, alist);
-
-    syntax.add ("density", Value::Boolean, Value::Const, 
+    frame.add ("density", Value::Boolean, Value::Const, 
 		"If true, divide total content with volume.\n\
 Otherwise, obey 'density_z', 'density_x', and 'density_y'.");
-    alist.add ("density", false);
-    syntax.add ("density_z", Value::Boolean, Value::Const, 
+    frame.add ("density", false);
+    frame.add ("density_z", Value::Boolean, Value::Const, 
 		"If true, divide total content with volume height.\n\
 This parameter is ignored if 'density' is true.");
-    syntax.add ("density_x", Value::Boolean, Value::Const, 
+    frame.add ("density_x", Value::Boolean, Value::Const, 
 		"If true, divide total content with volume width.\n\
 This parameter is ignored if 'density' is true.");
-    syntax.add ("density_y", Value::Boolean, Value::Const, 
+    frame.add ("density_y", Value::Boolean, Value::Const, 
 		"If true, divide total content with volume depth.\n\
 This parameter is ignored if 'density' is true.");
-    syntax.add_object ("volume", Volume::component, 
+    frame.add_object ("volume", Volume::component, 
                        Value::Const, Value::Singleton,
                        "Soil volume to log.");
-    alist.add ("volume", Volume::infinite_box ());
+    frame.add ("volume", "box");
 
-    syntax.add ("min_root_density", "cm/cm^3", Value::Const, "\
+    frame.add ("min_root_density", "cm/cm^3", Value::Const, "\
 Minimum root density in cells.\n\
 \n\
 Set this paramater to a positive amount in order to log only cells\n\
@@ -306,50 +307,51 @@ scaled down accordingly.  That is, if there are no roots, the data for\n\
 the cell will be scaled to zero, while if there is only half the\n\
 specified minimum root density, the data for the cell will be scaled\n\
 to 0.5.");
-    alist.add ("min_root_density", -1.0);
-    syntax.add ("min_root_crop", Value::String, Value::Const, "\
+    frame.add ("min_root_density", -1.0);
+    frame.add ("min_root_crop", Value::String, Value::Const, "\
 Name of crop whose roots scould be used for the root density requirements.\n\
 Set this to \"*\" to use all roots.");
-    alist.add ("min_root_crop", "*");	// Select::wildcard may not be initialized.
+    frame.add ("min_root_crop", "*"); // Select::wildcard may not be initialized.
   }
-  void add_volume ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    load_syntax (syntax, alist);
-    alist.add ("description", "Summarize specified volume.");
-    alist.add ("density_z", false);
-    alist.add ("density_x", false);
-    alist.add ("density_y", false);
-    Librarian::add_type (Select::component, "volume", alist, syntax, &make);
-  }    
-  void add_interval ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    load_syntax (syntax, alist);
-    alist.add ("description", "Summarize specified interval.\n\
-This is similar to 'volume', except for the default values of\n\
-'density_x' and 'density_y', and the unqiue 'from' and 'to' parameters.");
-    alist.add ("density_z", false);
-    alist.add ("density_x", true);
-    alist.add ("density_y", true);
-    syntax.add ("from", "cm", Value::OptionalConst,
+} SelectVolume_base;
+
+static struct SelectVolumeSyntax : public DeclareParam
+{
+  SelectVolumeSyntax ()
+    : DeclareParam (Select::component, "volume", "volume_base", "\
+Summarize specified volume.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    frame.add ("density_z", false);
+    frame.add ("density_x", false);
+    frame.add ("density_y", false);
+  }
+} Select_volume_syntax;
+
+static struct SelectIntervalSyntax : public DeclareParam
+{
+  SelectIntervalSyntax ()
+    : DeclareParam (Select::component, "interval", "volume_base",
+                    "Summarize specified interval.\n\
+This is similar to 'volume', except for the default values of\n         \
+'density_x' and 'density_y', and the unqiue 'from' and 'to' parameters.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    frame.add ("density_z", false);
+    frame.add ("density_x", true);
+    frame.add ("density_y", true);
+    frame.add ("from", "cm", Value::OptionalConst,
 		"Specify height (negative) to measure from.\n\
 By default, measure from the top.\n\
 OBSOLETE: Use (volume box (top FROM)) instead.");
-    syntax.add ("to", "cm", Value::OptionalConst,
+    frame.add ("to", "cm", Value::OptionalConst,
 		"Specify height (negative) to measure interval.\n\
 By default, measure to the bottom.\n\
 OBSOLETE: Use (volume box (bottom TO)) instead.");
-    Librarian::add_type (Select::component, "interval", alist, syntax, &make);
-  }    
-  SelectVolumeSyntax ()
-  { 
-    add_volume ();
-    add_interval ();
   }
-} Select_volume_syntax;
+} Select_interval_syntax;
 
 // Here follows a hack to log the water content at fixed pressure.
 
@@ -383,64 +385,63 @@ struct SelectWater : public SelectVolume
   { }
 };
 
-static struct SelectWaterSyntax
+static struct SelectWaterSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new SelectWater (al); }
+  Model* make (Block& al) const
+  { return new SelectWater (al); }
 
-  static void load_syntax (Syntax& syntax, AttributeList& alist)
+  SelectWaterSyntax ()
+    : DeclareModel (Select::component, "water", "volume_base", "\
+Shared parameters for water limited volumn logging.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    SelectVolumeSyntax::load_syntax (syntax, alist);
-
-    syntax.add ("h", "cm", Check::non_positive (), Value::Const, 
+    frame.add ("h", "cm", Check::non_positive (), Value::Const, 
                 "Pressure to log water content for.");
-    syntax.add ("h_ice", "cm", Check::non_positive (), Value::Const, 
+    frame.add ("h_ice", "cm", Check::non_positive (), Value::Const, 
 		"Pressure at which all air is out of the matrix.\n\
 When there are no ice, this is 0.0.  When there are ice, the ice is\n\
 presumed to occupy the large pores, so it is h (Theta_sat - X_ice).");
-    alist.add ("h_ice", 0.0);
+    frame.add ("h_ice", 0.0);
   }
-  void add_volume ()
+} SelectWater_syntax;
+  
+static struct SelectWaterVolumeParam : public DeclareParam
+{
+  SelectWaterVolumeParam ()
+    : DeclareParam (Select::component, "water_volume", "water", "\
+Summarize water content in the specified volume.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    load_syntax (syntax, alist);
-    alist.add ("description", "\
-Summarize water content in the specified volume.");
-    alist.add ("density_z", false);
-    alist.add ("density_x", false);
-    alist.add ("density_y", false);
-    Librarian::add_type (Select::component, "water_volume", 
-			 alist, syntax, &make);
-  }    
-  void add_interval ()
+    frame.add ("density_z", false);
+    frame.add ("density_x", false);
+    frame.add ("density_y", false);
+ }    
+} Select_water_volume_syntax;
+
+static struct SelectWaterIntervalParam : public DeclareParam
+{
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    load_syntax (syntax, alist);
-    alist.add ("description", "\
-Summarize water content in the specified interval.\n\
-This is similar to 'water_volume', except for the default values of\n\
-'density_x' and 'density_y', and the unqiue 'from' and 'to' parameters.");
-    alist.add ("density_z", false);
-    alist.add ("density_x", true);
-    alist.add ("density_y", true);
-    syntax.add ("from", "cm", Value::OptionalConst,
+    frame.add ("density_z", false);
+    frame.add ("density_x", true);
+    frame.add ("density_y", true);
+    frame.add ("from", "cm", Value::OptionalConst,
 		"Specify height (negative) to measure from.\n\
 By default, measure from the top.\n\
 OBSOLETE: Use (volume box (top FROM)) instead.");
-    syntax.add ("to", "cm", Value::OptionalConst,
+    frame.add ("to", "cm", Value::OptionalConst,
 		"Specify height (negative) to measure interval.\n\
 By default, measure to the bottom.\n\
 OBSOLETE: Use (volume box (bottom TO)) instead.");
-    Librarian::add_type (Select::component, "water_interval", 
-			 alist, syntax, &make);
   }    
-  SelectWaterSyntax ()
-  { 
-    add_volume ();
-    add_interval ();
-  }
-} Select_water_syntax;
+  SelectWaterIntervalParam ()
+    : DeclareParam (Select::component, "water_interval", "water", "\
+Summarize water content in the specified interval.\n\
+This is similar to 'water_volume', except for the default values of\n\
+'density_x' and 'density_y', and the unqiue 'from' and 'to' parameters.")
+  { }
+} Select_water_interval_syntax;
 
 // select_volumne.C ends here

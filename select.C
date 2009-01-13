@@ -559,40 +559,6 @@ bool
 Select::prevent_printing ()
 { return false; }
 
-static bool check_alist (const AttributeList& al, Treelog& err)
-{
-  bool ok = true;
-  if (al.check ("spec"))
-    {
-      if (!approximate (al.number ("factor"), 1.0, 1e-7))
-	err.warning ("Specifying both 'spec' and 'factor' may conflict");
-      else if (std::isnormal (al.number ("offset")))
-	err.warning ("Specifying both 'spec' and 'offset' may conflict");
-    }
-  if (al.check ("expr"))
-    {
-      if (!approximate (al.number ("factor"), 1.0, 1e-7))
-        {
-          err.error ("Can't specify both 'expr' and 'factor'");
-          ok = false;
-        }
-      else if (std::isnormal (al.number ("offset")))
-        {
-          err.error ("Can't specify both 'expr' and 'offset'");
-          ok = false;
-        }
-    }
-    
-  static bool has_warned_about_when = false;
-  if (!has_warned_about_when && al.check ("when"))
-    {
-      err.warning ("The 'when' select parametere is obsolete.\n\
-Set the 'handle' parameter instead.");
-      has_warned_about_when = true;
-    }
-  return ok;
-}
-
 void 
 Select::document (Format& format) const
 {
@@ -619,120 +585,6 @@ Select::document (Format& format) const
       format.text (impl->spec->description ().name ());
       format.soft_linebreak ();
     }
-}
-
-void 
-Select::load_syntax (Syntax& syntax, AttributeList& alist)
-{
-  syntax.add_check (check_alist);
-  alist.add ("base_model", "common");
-  syntax.add ("tag", Value::String, Value::OptionalConst,
-	      "Tag to identify the column.\n\
-These will be printed in the first line of the log file.\n\
-The default tag is the last element in the path.");
-  syntax.add ("dimension", Value::String, Value::OptionalConst,
-	      "The unit for numbers in this column.\n\
-These will be printed in the second line of the log file.\n\
-The character '&' will be replaced with the log timestep.\n\
-If you do not specify the dimension explicitly, a value will\n\
-be interfered from 'spec' if available.");
-  syntax.add ("description", Value::String, Value::Const,
-	      "A description of this column.");
-  alist.add ("description", "\
-This is not a model, but a list of parameters shared by all select models.");
-  syntax.add ("path", Value::String, Value::Const, 
-	      Value::Sequence, "\
-Sequence of attribute names leading to the variable you want to log in\n\
-this column.  The first name should be one of the attributes of the\n\
-daisy component itself.  What to specify as the next name depends on\n\
-the type of the attribute you selected before.\n\
-\n\
-If the value of that attribute itself is a fixed component, you should\n\
-specify the name of an attribute in that component as the second name.\n\
-\n\
-If the value is a library component, you should specify the name of\n\
-the model or parameterization you are interested in, and then the name\n\
-of the attribute inside the model you want to log.\n\
-\n\
-The last attribute in the patch should be a number, a number sequence,\n\
-a string, or an integer.  These are the only values which can be\n\
-logged by this model.\n\
-\n\
-You can use the special value \"*\" to match everything at a given\n\
-level, for example all crops.  This way the path can specify multiple\n\
-values, they will be added before they are printed in the log file.\n\
-All values that start with a \"$\" will work like \"*\".  They are intended\n\
-to be mapped with the 'set' attribute in the 'table' log model.");
-  syntax.add_check ("path", VCheck::min_size_1 ());
-  syntax.add_submodule ("spec", alist, Value::OptionalConst, "\
-Specification for the attribute to be logged of the form\n\
-\n\
-  library model submodel* attribute\n\
-\n\
-Unlike path, the attribute may occur several different places in the\n\
-simulation, if the model is used at several places.  Also, there is no\n\
-wildcards, so only a single model can be matches.  The spec is used for\n\
-helping Daisy establish a unique dimension and description for the\n\
-attribute.", Select::Implementation::Spec::load_syntax);
-  syntax.add_object ("when", Condition::component,
-                     Value::OptionalConst, Value::Singleton,
-                     "\
-OBSOLETE.  If you set this variable, 'flux' will be set to true.\n\
-This overwrites any direct setting of 'flux'.");
-  syntax.add ("flux", Value::Boolean, Value::OptionalConst, "\
-OBSOLETE.  This value will be used if 'handle' is not specified.\
-A value of true then means 'sum', and false means 'current'.");
-  syntax.add ("handle", Value::String, Value::OptionalConst, "\
-This option determine how the specified variable should be logged.  \n\
-\n\
-min: Log the smallest value seen since last time the variable was logged.\n\
-If 'accumulate' is true, use the smallest value ever.\n\
-\n\
-max: Log the largest value seen since last time the variable was logged.\n\
-If 'accumulate' is true, use the largest value ever.\n\
-\n\
-average: Log the arithmetic average value seen since last time the\n\
-variable was logged.\n\
-If 'accumulate' is true, use the average of all values.\n\
-\n\
-geometric: Log the geometic average value seen since last time the\n\
-variable was logged.\n\
-If 'accumulate' is true, use the average of all values.\n\
-\n\
-sum: Accumulate value since last time the variable was logged.\n\
-If 'accumulate' is true, accumulate since the start of the log.\n\
-\n\
-current: Log the current value for the variable.\n\
-If 'accumulate' is true, the printed values will be accumulated..");
-  static VCheck::Enum handle_check ("min", "max", "average", "geometric", 
-                                    "sum", "current");
-  syntax.add_check ("handle", handle_check);
-  syntax.add ("interesting_content", Value::Boolean, Value::Const, "\
-True if the content of this column is interesting enough to warrent an\n\
-initial line in the log file.  This only affects non-flux variables.");
-  alist.add ("interesting_content", true);
-  syntax.add_object ("expr", Number::component, 
-                     Value::OptionalConst, Value::Singleton, "\
-Expression for findig the value for the log file, given the internal\n\
-value 'x'.  For example '(expr (ln x))' will give you the natural\n\
-logarithm of the value.");  
-  syntax.add ("factor", Value::Unknown (), Check::none (), Value::Const, "\
-Factor to multiply the calculated value with, before logging.\n\
-OBSOLETE: Use 'expr' instead.");
-  alist.add ("factor", 1.0);
-  syntax.add ("offset", Value::Unknown (), Check::none (), Value::Const, "\
-Offset to add to the calculated value, before logging.\n\
-OBSOLETE: Use 'expr' instead.");
-  alist.add ("offset", 0.0);
-  syntax.add ("negate", Value::Boolean, Value::Const, "\
-Switch sign of value.  I.e. upward fluxes become downward fluxes.");
-  alist.add ("negate", false);
-  syntax.add ("accumulate", Value::Boolean, Value::Const,
-	      "Log accumulated values.");
-  alist.add ("accumulate", false);
-  syntax.add ("count", Value::Integer, Value::State, "\
-Number of times the path has matched a variable since the last log entry.");
-  alist.add ("count", 0);
 }
 
 symbol
@@ -849,22 +701,156 @@ Select::Select (Block& al)
 Select::~Select ()
 { }
 
-static struct SelectSyntax
-{
-  SelectSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    Select::load_syntax (syntax, alist);
-
-    Librarian::add_base (Select::component, alist, syntax);
-  }
-} Select_syntax;
-
 static struct SelectInit : public DeclareComponent 
 {
   SelectInit ()
     : DeclareComponent (Select::component, Select::description)
   { }
+  static bool check_alist (const AttributeList& al, Treelog& err)
+  {
+    bool ok = true;
+    if (al.check ("spec"))
+      {
+        if (!approximate (al.number ("factor"), 1.0, 1e-7))
+          err.warning ("Specifying both 'spec' and 'factor' may conflict");
+        else if (std::isnormal (al.number ("offset")))
+          err.warning ("Specifying both 'spec' and 'offset' may conflict");
+      }
+    if (al.check ("expr"))
+      {
+        if (!approximate (al.number ("factor"), 1.0, 1e-7))
+          {
+            err.error ("Can't specify both 'expr' and 'factor'");
+            ok = false;
+          }
+        else if (std::isnormal (al.number ("offset")))
+          {
+            err.error ("Can't specify both 'expr' and 'offset'");
+            ok = false;
+          }
+      }
+
+    static bool has_warned_about_when = false;
+    if (!has_warned_about_when && al.check ("when"))
+      {
+        err.warning ("The 'when' select parametere is obsolete.\n\
+Set the 'handle' parameter instead.");
+        has_warned_about_when = true;
+      }
+    return ok;
+  }
+
+  void load_frame (Frame& frame) const
+  {
+    frame.add_check (check_alist);
+    frame.add ("tag", Value::String, Value::OptionalConst,
+                "Tag to identify the column.\n\
+These will be printed in the first line of the log file.\n\
+The default tag is the last element in the path.");
+    frame.add ("dimension", Value::String, Value::OptionalConst,
+                "The unit for numbers in this column.\n\
+These will be printed in the second line of the log file.\n\
+The character '&' will be replaced with the log timestep.\n\
+If you do not specify the dimension explicitly, a value will\n\
+be interfered from 'spec' if available.");
+    frame.add ("description", Value::String, Value::Const,
+                "A description of this column.");
+    frame.add ("description", "\
+This is not a model, but a list of parameters shared by all select models.");
+    frame.add ("path", Value::String, Value::Const, 
+                Value::Sequence, "\
+Sequence of attribute names leading to the variable you want to log in\n\
+this column.  The first name should be one of the attributes of the\n\
+daisy component itself.  What to specify as the next name depends on\n\
+the type of the attribute you selected before.\n\
+\n\
+If the value of that attribute itself is a fixed component, you should\n\
+specify the name of an attribute in that component as the second name.\n\
+\n\
+If the value is a library component, you should specify the name of\n\
+the model or parameterization you are interested in, and then the name\n\
+of the attribute inside the model you want to log.\n\
+\n\
+The last attribute in the patch should be a number, a number sequence,\n\
+a string, or an integer.  These are the only values which can be\n\
+logged by this model.\n\
+\n\
+You can use the special value \"*\" to match everything at a given\n\
+level, for example all crops.  This way the path can specify multiple\n\
+values, they will be added before they are printed in the log file.\n\
+All values that start with a \"$\" will work like \"*\".  They are intended\n\
+to be mapped with the 'set' attribute in the 'table' log model.");
+    frame.add_check ("path", VCheck::min_size_1 ());
+    frame.add_submodule ("spec", Value::OptionalConst, "\
+Specification for the attribute to be logged of the form\n\
+\n\
+  library model submodel* attribute\n\
+\n\
+Unlike path, the attribute may occur several different places in the\n\
+simulation, if the model is used at several places.  Also, there is no\n\
+wildcards, so only a single model can be matches.  The spec is used for\n\
+helping Daisy establish a unique dimension and description for the\n\
+attribute.", Select::Implementation::Spec::load_syntax);
+    frame.add_object ("when", Condition::component,
+                       Value::OptionalConst, Value::Singleton,
+                       "\
+OBSOLETE.  If you set this variable, 'flux' will be set to true.\n\
+This overwrites any direct setting of 'flux'.");
+    frame.add ("flux", Value::Boolean, Value::OptionalConst, "\
+OBSOLETE.  This value will be used if 'handle' is not specified.\
+A value of true then means 'sum', and false means 'current'.");
+    frame.add ("handle", Value::String, Value::OptionalConst, "\
+This option determine how the specified variable should be logged.  \n\
+\n\
+min: Log the smallest value seen since last time the variable was logged.\n\
+If 'accumulate' is true, use the smallest value ever.\n\
+\n\
+max: Log the largest value seen since last time the variable was logged.\n\
+If 'accumulate' is true, use the largest value ever.\n\
+\n\
+average: Log the arithmetic average value seen since last time the\n\
+variable was logged.\n\
+If 'accumulate' is true, use the average of all values.\n\
+\n\
+geometric: Log the geometic average value seen since last time the\n\
+variable was logged.\n\
+If 'accumulate' is true, use the average of all values.\n\
+\n\
+sum: Accumulate value since last time the variable was logged.\n\
+If 'accumulate' is true, accumulate since the start of the log.\n\
+\n\
+current: Log the current value for the variable.\n\
+If 'accumulate' is true, the printed values will be accumulated..");
+    static VCheck::Enum handle_check ("min", "max", "average", "geometric", 
+                                      "sum", "current");
+    frame.add_check ("handle", handle_check);
+    frame.add ("interesting_content", Value::Boolean, Value::Const, "\
+True if the content of this column is interesting enough to warrent an\n\
+initial line in the log file.  This only affects non-flux variables.");
+    frame.add ("interesting_content", true);
+    frame.add_object ("expr", Number::component, 
+                       Value::OptionalConst, Value::Singleton, "\
+Expression for findig the value for the log file, given the internal\n\
+value 'x'.  For example '(expr (ln x))' will give you the natural\n\
+logarithm of the value.");  
+    frame.add ("factor", Value::Unknown (), Check::none (), Value::Const, "\
+Factor to multiply the calculated value with, before logging.\n\
+OBSOLETE: Use 'expr' instead.");
+    frame.add ("factor", 1.0);
+    frame.add ("offset", Value::Unknown (), Check::none (), Value::Const, "\
+Offset to add to the calculated value, before logging.\n\
+OBSOLETE: Use 'expr' instead.");
+    frame.add ("offset", 0.0);
+    frame.add ("negate", Value::Boolean, Value::Const, "\
+Switch sign of value.  I.e. upward fluxes become downward fluxes.");
+    frame.add ("negate", false);
+    frame.add ("accumulate", Value::Boolean, Value::Const,
+                "Log accumulated values.");
+    frame.add ("accumulate", false);
+    frame.add ("count", Value::Integer, Value::State, "\
+Number of times the path has matched a variable since the last log entry.");
+    frame.add ("count", 0);
+  }
 } Select_init;
 
+// select.C ends here.

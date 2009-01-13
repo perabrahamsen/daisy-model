@@ -30,6 +30,7 @@
 #include "librarian.h"
 #include "submodeler.h"
 #include "treelog.h"
+#include "frame.h"
 
 void 
 LogExtern::done (const std::vector<Time::component_t>& time_columns,
@@ -261,26 +262,6 @@ Numeric value.");
   { }
 };
 
-void
-LogExtern::load_syntax (Syntax& syntax, AttributeList& alist)
-{
-  LogSelect::load_syntax (syntax, alist);
-
-  syntax.add_submodule_sequence ("numbers", Value::OptionalState, "\
-Inititial numeric values.  By default, none.", NumEntry::load_syntax);
-  syntax.add ("where", Value::String, Value::OptionalConst,
-              "Name of the extern log to use.\n\
-By default, use the model name.");
-  syntax.add ("parameter_names", Value::String, 
-              Value::Const, Value::Sequence, "\
-List of parameters to export.\n\
-\n\
-For example, if you have defined 'column' and 'crop' parameters for\n\
-this extern log parameterization, you can export them to through the\n\
-API interface by specifying '(names column crop)'.");
-  alist.add ("parameter_names", std::vector<symbol> ());
-}
-
 LogExtern::LogExtern (Block& al)
   : LogSelect (al),
     title_ (al.name ("where", al.name ("type")))
@@ -320,17 +301,30 @@ LogExtern::LogExtern (Block& al)
 LogExtern::~LogExtern ()
 { }
 
-static struct LogExternSyntax
+static struct LogExternSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return dynamic_cast<Log&> (*new LogExtern (al)); }
+  Model* make (Block& al) const
+  { return new LogExtern (al); }
 
   LogExternSyntax ()
+    : DeclareModel (Log::component, "extern", "select" "\
+Log simulation state for extern use.")
+  { }
+  void load_frame (Frame& frame) const
   { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    LogExtern::load_syntax (syntax, alist);
-    alist.add ("description", "Log simulation state for extern use.");
-    Librarian::add_type (Log::component, "extern", alist, syntax, &make);
+    frame.add_submodule_sequence ("numbers", Value::OptionalState, "\
+Inititial numeric values.  By default, none.", 
+                                  LogExtern::NumEntry::load_syntax);
+    frame.add ("where", Value::String, Value::OptionalConst,
+                "Name of the extern log to use.\n\
+By default, use the model name.");
+    frame.add ("parameter_names", Value::String, 
+                Value::Const, Value::Sequence, "\
+List of parameters to export.\n\
+\n\
+For example, if you have defined 'column' and 'crop' parameters for\n\
+this extern log parameterization, you can export them to through the\n\
+API interface by specifying '(names column crop)'.");
+    frame.add ("parameter_names", std::vector<symbol> ());
   }
 } LogExtern_syntax;

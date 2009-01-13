@@ -236,15 +236,6 @@ Librarian::~Librarian ()
     }
 }
 
-void 
-Declare::load (Frame& frame) const
-{
-  frame.alist ().add ("description", description);
-  load_frame (frame);
-  if (dynamic_cast<const DeclareBase*> (this))
-    frame.alist ().add ("base_model", "Farquhar");
-}
-
 symbol 
 Declare::root_name ()
 {
@@ -264,6 +255,13 @@ Declare::Declare (const symbol c, const symbol name,
 
 Declare::~Declare ()
 { }
+
+void 
+DeclareComponent::load (Frame& frame) const
+{
+  frame.alist ().add ("description", description);
+  load_frame (frame);
+}
 
 void 
 DeclareComponent::load_frame (Frame&) const
@@ -289,6 +287,14 @@ DeclareSuper::DeclareSuper (const symbol component,
     super (s)
 { }
 
+void 
+DeclareBase::load (Frame& frame) const
+{
+  frame.alist ().add ("description", description);
+  frame.alist ().add ("base_class", super);
+  load_frame (frame);
+}
+
 DeclareBase::DeclareBase (const symbol component,
                             const symbol name, const symbol s, 
                             const symbol description)
@@ -300,6 +306,14 @@ DeclareBase::DeclareBase (const symbol component,
                             const symbol description)
   : DeclareSuper (component, name, root_name (), description)
 { }
+
+void 
+DeclareModel::load (Frame& frame) const
+{
+  frame.alist ().add ("description", description);
+  frame.alist ().add ("base_class", super);
+  load_frame (frame);
+}
 
 DeclareModel::DeclareModel (const symbol component,
                             const symbol name, const symbol s, 
@@ -315,6 +329,14 @@ DeclareModel::DeclareModel (const symbol component,
 
 DeclareModel::~DeclareModel ()
 { }
+
+void 
+DeclareParam::load (Frame& frame) const
+{
+  frame.alist ().add ("description", description);
+  frame.alist ().add ("type", super);
+  load_frame (frame);
+}
 
 DeclareParam::DeclareParam (symbol component, symbol name, symbol super, 
                             symbol description)

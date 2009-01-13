@@ -71,7 +71,6 @@ public:
   // Create and Destroy.
 public:
   static std::auto_ptr<Volume> build_obsolete (Block&);
-  static const AttributeList& infinite_box ();
   static std::auto_ptr<Volume> build_none ();
   Volume (Block&);
   Volume (const char* id);

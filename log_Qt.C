@@ -41,20 +41,17 @@ LogQt::LogQt (Block& block)
 LogQt::~LogQt ()
 { }
 
-static struct LogQtSyntax
+static struct LogQtSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return dynamic_cast<Log&> (*new LogQt (al)); }
+  Model* make (Block& al) const
+  { return new LogQt (al); }
 
   LogQtSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    LogExtern::load_syntax (syntax, alist);
-    alist.add ("description", "\
-Log simulation state for use by the Qt user interface.");
-    Librarian::add_type (Log::component, "Qt", alist, syntax, &make);
-  }
+    : DeclareModel (Log::component, "Qt", "extern", "\
+Log simulation state for use by the Qt user interface.")
+  { }
+  void load_frame (Frame&) const
+  { }
 } LogQt_syntax;
 
 // log_Qt.C ends here.

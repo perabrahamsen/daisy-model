@@ -29,6 +29,7 @@
 #include "vcheck.h"
 #include "treelog.h"
 #include "librarian.h"
+#include "frame.h"
 
 struct SelectPF : public Select
 {
@@ -94,10 +95,10 @@ struct SelectPF : public Select
   { }
 };
 
-static struct SelectPFSyntax
+static struct SelectPFSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new SelectPF (al); }
+  Model* make (Block& al) const
+  { return new SelectPF (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)
   {
@@ -112,26 +113,26 @@ static struct SelectPFSyntax
   }
 
   SelectPFSyntax ()
+    : DeclareModel (Select::component, "pF", "\
+Extract pF for all array points.\n\
+The original dimension is assumed to be in cm, no matter what is specified.")
+  { }
+  void load_frame (Frame& frame) const
   { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    Select::load_syntax (syntax, alist);
     static VCheck::Enum current_only ("current");
-    syntax.add_check ("handle", current_only);
-    syntax.add_check (check_alist);
-    alist.add ("description", "Extract pF for all array points.\n\
-The original dimension is assumed to be in cm, no matter what is specified.");
+    frame.add_check ("handle", current_only);
+    frame.add_check (check_alist);
 
-    syntax.add ("max_h", "cm", Check::negative (), Value::Const, 
+    frame.add ("max_h", "cm", Check::negative (), Value::Const, 
                 "Maximum water pressure in log.\n\
 Pressure above this value will be represented as this value.");
-    alist.add ("max_h", -0.1);
-    syntax.add ("value", Value::Unknown (), Value::State, Value::Sequence,
+    frame.add ("max_h", -0.1);
+    frame.add ("value", Value::Unknown (), Value::State, Value::Sequence,
 		"The current accumulated value.");
     std::vector<double> empty;
-    alist.add ("value", empty);
-    alist.add ("dimension", "pF");
-
-    Librarian::add_type (Select::component, "pF", alist, syntax, &make);
+    frame.add ("value", empty);
+    frame.add ("dimension", "pF");
   }
-} Select_syntax;
+} Select_pF_syntax;
+
+// select_pF.C ends here.

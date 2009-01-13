@@ -30,6 +30,7 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 
 struct SelectContent : public SelectValue
 {
@@ -109,11 +110,10 @@ struct SelectContent : public SelectValue
 
 #include <sstream>
 
-static struct SelectContentSyntax
+static struct SelectContentSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new SelectContent (al); }
-
+  Model* make (Block& al) const
+  { return new SelectContent (al); }
   static bool check_alist (const AttributeList& al, Treelog& msg)
   {
     if (al.check ("z") && al.check ("height"))
@@ -122,30 +122,31 @@ static struct SelectContentSyntax
     return true;
   }
   SelectContentSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    SelectValue::load_syntax (syntax, alist);
-    syntax.add_check (check_alist);
-
-    alist.add ("description", "Extract content at specified location.\n\
+    : DeclareModel (Select::component, "content", "value", "\
+Extract content at specified location.\n\
 The \"location\" may be a line, plane or volume if one or more dimension\n\
-parameters are left out.  In that case, the weighted average is used.");
-    syntax.add ("height", "cm", Check::non_positive (), Value::OptionalConst,
+parameters are left out.  In that case, the weighted average is used.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    frame.add_check (check_alist);
+
+    frame.add ("height", "cm", Check::non_positive (), Value::OptionalConst,
 		"OBSOLETE: Use 'z' instead.");
-    syntax.add ("z", "cm", Value::OptionalConst,
+    frame.add ("z", "cm", Value::OptionalConst,
 		"Specify height (negative below surface) to measure content.\n\
 The value will be a weighted average of all cells containing height.\n\
 By default, cell in all heights will be included.");
-    syntax.add ("x", "cm", Value::OptionalConst,
+    frame.add ("x", "cm", Value::OptionalConst,
 		"Specify width (distance from left side) to measure content.\n\
 The value will be a weighted average of all cells containing width.\n\
 By default, cell in all widths will be included.");
-    syntax.add ("y", "cm", Value::OptionalConst,
+    frame.add ("y", "cm", Value::OptionalConst,
 		"Specify length (distance from front) to measure content.\n\
 The value will be a weighted average of all cells containing length.\n\
 By default, cell in all lengths will be included.");
-
-    Librarian::add_type (Select::component, "content", alist, syntax, &make);
   }
-} Select_syntax;
+} SelectContent_syntax;
+
+// select_content.C ends here.
+

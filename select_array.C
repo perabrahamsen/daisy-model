@@ -29,6 +29,7 @@
 #include "alist.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "frame.h"
 
 struct SelectArray : public Select
 {
@@ -221,22 +222,20 @@ struct SelectArray : public Select
   { }
 };
 
-static struct SelectArraySyntax
+static struct SelectArraySyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new SelectArray (al); }
-
+  Model* make (Block& al) const
+  { return new SelectArray (al); }
   SelectArraySyntax ()
+    : DeclareModel (Select::component, "array", "Log all members of an array.")
+  { }
+  void load_frame (Frame& frame) const
   { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    Select::load_syntax (syntax, alist);
-
-    syntax.add ("value", Value::Unknown (), Value::State, Value::Sequence,
+    frame.add ("value", Value::Unknown (), Value::State, Value::Sequence,
 		"The current accumulated value.");
     std::vector<double> empty;
-    alist.add ("value", empty);
-
-    Librarian::add_type (Select::component, "array", alist, syntax, &make);
+    frame.add ("value", empty);
   }
-} Select_syntax;
+} SelectArray_syntax;
+
+// select_array.C ends here.

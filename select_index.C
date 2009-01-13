@@ -25,6 +25,7 @@
 #include "block.h"
 #include "alist.h"
 #include "librarian.h"
+#include "frame.h"
 
 struct SelectIndex : public SelectValue
 {
@@ -43,21 +44,19 @@ struct SelectIndex : public SelectValue
   { }
 };
 
-static struct SelectIndexSyntax
+static struct SelectIndexSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new SelectIndex (al); }
-
+  Model* make (Block& al) const
+  { return new SelectIndex (al); }
   SelectIndexSyntax ()
+    : DeclareModel (Select::component, "index", "value", "\
+Extract content at specified array index.")
+  { }
+  void load_frame (Frame& frame) const
   { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    SelectValue::load_syntax (syntax, alist);
-
-    alist.add ("description", "Extract content at specified array index.");
-    syntax.add ("index", Value::Integer, Value::Const,
-		"Specify array index to select.");
-
-    Librarian::add_type (Select::component, "index", alist, syntax, &make);
+    frame.add ("index", Value::Integer, Value::Const,
+               "Specify array index to select.");
   }
-} Select_syntax;
+} SelectIndex_syntax;
+
+// select_index.C ends here.

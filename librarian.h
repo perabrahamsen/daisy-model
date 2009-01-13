@@ -174,12 +174,12 @@ class Declare : private boost::noncopyable
 {
 public:
   const symbol component;
-private:
+protected:
   const symbol super;
   const symbol description;
 
 public:
-  void load (Frame& frame) const;
+  virtual void load (Frame&) const = 0;
 protected:
   virtual void load_frame (Frame&) const = 0;
 public:
@@ -195,28 +195,31 @@ protected:
 class DeclareComponent : public Declare
 {
   Librarian librarian;
+  void load (Frame&) const;
   void load_frame (Frame&) const;
 public:
   DeclareComponent (symbol component, symbol description);
 };
 
-class DeclareSuper : public Declare
+class EXPORT DeclareSuper : public Declare
 {
+protected:
   const symbol super;
   const FrameModel* parent_model () const;
-public:
   DeclareSuper (symbol component, symbol name, symbol super, symbol description);
 };
 
 class DeclareBase : public DeclareSuper
 {
+  void load (Frame&) const;
 public:
   DeclareBase (symbol component, symbol name, symbol super, symbol description);
   DeclareBase (symbol component, symbol name, symbol description);
 };
 
-class DeclareModel : public DeclareSuper
+class EXPORT DeclareModel : public DeclareSuper
 {
+  void load (Frame&) const;
 public:
   virtual Model* make (Block&) const = 0;
 protected:
@@ -228,6 +231,7 @@ protected:
 
 class DeclareParam : public DeclareSuper
 {
+  void load (Frame&) const;
 public:
   DeclareParam (symbol component, symbol name, symbol super, 
                 symbol description);

@@ -52,7 +52,6 @@ public:
 
   // Create and Destroy.
 public:
-  static const AttributeList& none_model ();
   Bound (Block& al, type_t type_, double val);
   Bound (const char* is, type_t type_, double val);
   ~Bound ();

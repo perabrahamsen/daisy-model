@@ -45,9 +45,11 @@ class EXPORT LogExtern : public LogSelect,
                          public Destination, 
                          public Scope
 {
+public:
   class NumEntry;
 
   // Scopesel id.
+private:
   const symbol title_;
 
   // Destination Content.
@@ -106,7 +108,6 @@ private:
   // Create and destroy.
   void initialize (Treelog&);
 public:
-  static void load_syntax (Syntax&, AttributeList&);
   LogExtern (Block&);
   ~LogExtern ();
 };

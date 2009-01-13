@@ -41,7 +41,6 @@ public:
 
   // Create and Destroy.
 public:
-  static void load_syntax (Syntax&, AttributeList&);
   SelectValue (Block& al);
 };
 

@@ -25,6 +25,7 @@
 #include "alist.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "frame.h"
 #include <sstream>
 
 // bound component.
@@ -112,59 +113,44 @@ static struct BoundNoneSyntax : public Librarian::Model<Bound>
 #endif
 
 // "none" model.
-static struct BoundNoneSyntax
+static struct BoundNoneSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new Bound (al, Bound::none, -42.42e42); }
+  Model* make (Block& al) const
+  { return new Bound (al, Bound::none, -42.42e42); }
   BoundNoneSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "No boundary specified.");
-    Librarian::add_type (Bound::component, "none", alist, syntax, &make);
-  }
+    : DeclareModel (Bound::component, "none", "No boundary specified.")
+  { }
+  void load_frame (Frame& frame) const
+  { }
 } BoundNone_syntax;
 
-const AttributeList& 
-Bound::none_model ()
-{
-  static AttributeList alist;
-  
-  if (!alist.check ("type"))
-      alist.add ("type", "none");
-
-  return alist;
-}
-
 // "full" model.
-static struct BoundFullSyntax
+static struct BoundFullSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new Bound (al, Bound::full, 69.69e69); }
+  Model* make (Block& al) const
+  { return new Bound (al, Bound::full, 69.69e69); }
   BoundFullSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Maximum value for the interval boundary.");
-    Librarian::add_type (Bound::component, "full", alist, syntax, &make);
-  }
+    : DeclareModel (Bound::component, "full", "\
+Maximum value for the interval boundary.")
+  { }
+  void load_frame (Frame& frame) const
+  { }
 } BoundFull_syntax;
 
 // finite model.
-static struct BoundFiniteSyntax
+static struct BoundFiniteSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new Bound (al, Bound::finite, al.number ("bound")); }
+  Model* make (Block& al) const
+  { return new Bound (al, Bound::finite, al.number ("bound")); }
   BoundFiniteSyntax ()
+    : DeclareModel (Bound::component, "finite", "Finite interval bound.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Finite interval bound.");
     
-    syntax.add ("bound", "cm", Value::Const, "Interval bound to use.");
-    syntax.order ("bound");
+    frame.add ("bound", "cm", Value::Const, "Interval bound to use.");
+    frame.order ("bound");
 
-    Librarian::add_type (Bound::component, "finite", alist, syntax, &make);
   }
 } BoundFinite_syntax;
 

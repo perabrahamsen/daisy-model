@@ -35,6 +35,7 @@
 #include "librarian.h"
 #include "scope_block.h"
 #include "treelog.h"
+#include "frame.h"
 #include <sstream>
 #include <fstream>
 
@@ -463,68 +464,67 @@ LogTable::~LogTable ()
     Assertion::error ("Problems writing to '" + file + "'");
 }
 
-static struct LogTableSyntax
+static struct LogTableSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new LogTable (al); }
+  Model* make (Block& al) const
+  { return new LogTable (al); }
 
   LogTableSyntax ()
+    : DeclareModel (Log::component, "table", "select", 
+                    LogTable::default_description)
+  { }
+  void load_frame (Frame& frame) const
     { 
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      LogSelect::load_syntax (syntax, alist);
-      alist.add ("description", LogTable::default_description);
-      syntax.add ("parameter_names", Value::String, 
+      frame.add ("parameter_names", Value::String, 
                   Value::Const, Value::Sequence, "\
 List of string parameters to print to the table header.\n\
 \n\
 For example, if you have defined 'column' and 'crop' parameters for\n\
 this table log parameterization, you can print them to the log file\n\
 header by specifying '(names column crop)'.");
-      alist.add ("parameter_names", std::vector<symbol> ());
-      syntax.add ("where", Value::String, Value::Const,
+      frame.add ("parameter_names", std::vector<symbol> ());
+      frame.add ("where", Value::String, Value::Const,
 		  "Name of the log file to create.");
-      syntax.add ("print_header", Value::String, Value::Const,
+      frame.add ("print_header", Value::String, Value::Const,
 		  "If this is set to 'false', no header is printed.\n\
 If this is set to 'true', a full header is printer.\n\
 If this is set to 'fixed', a small fixed size header is printed.");
       static VCheck::Enum check_header ("false", "true", "fixed");
-      syntax.add_check ("print_header", check_header);
-      alist.add ("print_header", "true");
-      syntax.add ("print_tags", Value::Boolean, Value::Const,
+      frame.add_check ("print_header", check_header);
+      frame.add ("print_header", "true");
+      frame.add ("print_tags", Value::Boolean, Value::Const,
 		  "Print a tag line in the file.");
-      alist.add ("print_tags", true);
-      syntax.add ("print_dimension", Value::Boolean, Value::Const,
+      frame.add ("print_tags", true);
+      frame.add ("print_dimension", Value::Boolean, Value::Const,
 		  "Print a line with units after the tag line.");
-      alist.add ("print_dimension", true);
-      syntax.add ("print_initial", Value::Boolean, Value::Const,
+      frame.add ("print_dimension", true);
+      frame.add ("print_initial", Value::Boolean, Value::Const,
 		  "Print a line with initial values when logging starts.");
-      alist.add ("print_initial", true);
-      syntax.add ("flush", Value::Boolean, Value::Const,
+      frame.add ("print_initial", true);
+      frame.add ("flush", Value::Boolean, Value::Const,
 		  "Flush to disk after each entry (for debugging).");
-      alist.add ("flush", false);
-      syntax.add ("record_separator", Value::String, Value::Const, "\
+      frame.add ("flush", false);
+      frame.add ("record_separator", Value::String, Value::Const, "\
 String to print between records (time steps).");
-      alist.add ("record_separator", "\n");
-      syntax.add ("field_separator", Value::String, Value::Const, "\
+      frame.add ("record_separator", "\n");
+      frame.add ("field_separator", Value::String, Value::Const, "\
 String to print between fields.");
-      alist.add ("field_separator", "\t");
-      syntax.add ("error_string", Value::String, Value::Const, "\
+      frame.add ("field_separator", "\t");
+      frame.add ("error_string", Value::String, Value::Const, "\
 String to print when errors are encountered.");
-      alist.add ("error_string", "!");
-      syntax.add ("missing_value", Value::String, Value::Const, "\
+      frame.add ("error_string", "!");
+      frame.add ("missing_value", Value::String, Value::Const, "\
 String to print when the path doesn't match anything.\n\
 This can be relevant for example if you are logging a crop, and there are\n\
 no crops on the field.");
-      alist.add ("missing_value", "00.00");
-      syntax.add ("array_separator", Value::String, Value::Const, "\
+      frame.add ("missing_value", "00.00");
+      frame.add ("array_separator", Value::String, Value::Const, "\
 String to print between array entries.");
-      alist.add ("array_separator", "\t");
-      syntax.add_object ("summary", Summary::component,
+      frame.add ("array_separator", "\t");
+      frame.add_object ("summary", Summary::component,
                          Value::Const, Value::Sequence,
                          "Summaries for this log file.");
-      alist.add ("summary", std::vector<const AttributeList*> ());
-      Librarian::add_type (Log::component, "table", alist, syntax, &make);
+      frame.add ("summary", std::vector<const AttributeList*> ());
       Librarian::add_doc_fun (LogSelect::component, 
                               LogSelect::document_entries);
     }

@@ -23,7 +23,8 @@
 
 #include "select_value.h"
 #include "block.h"
-#include "alist.h"
+#include "frame.h"
+#include "librarian.h"
 #include "mathlib.h"
 
 void 
@@ -92,17 +93,24 @@ SelectValue::done (const double dt)
     count = 0;
 }
 
-void 
-SelectValue::load_syntax (Syntax& syntax, AttributeList& alist)
-{
-  Select::load_syntax (syntax, alist);
-  syntax.add ("value", Value::Unknown (), Value::State,
-	      "The current accumulated value.");
-  alist.add ("value", 0.0);
-}
-
 // Create and Destroy.
 SelectValue::SelectValue (Block& al)
   : Select (al),
     value (al.number ("value"))
 { }
+
+static struct SelectValueSyntax : public DeclareBase
+{
+  SelectValueSyntax ()
+    : DeclareBase (Select::component, "value", "\
+Log a single numeric value.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add ("value", Value::Unknown (), Value::State,
+                "The current accumulated value.");
+    frame.add ("value", 0.0);
+  }
+} SelectValue_syntax;
+
+// select_value.C ends here.

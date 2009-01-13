@@ -25,6 +25,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "librarian.h"
+#include "frame.h"
 
 struct SelectNumber : public SelectValue
 {
@@ -47,22 +48,19 @@ struct SelectNumber : public SelectValue
   { }
 };
 
-static struct SelectNumberSyntax
+static struct SelectNumberSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new SelectNumber (al); }
+  Model* make (Block& al) const
+  { return new SelectNumber (al); }
 
   SelectNumberSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    SelectValue::load_syntax (syntax, alist);
-    alist.add ("description", "Extract specified number.\n\
+    : DeclareModel (Select::component, "number", "value", "\
+Extract specified number.\n\
 If used on an array, it will treat them as individual numbers as\n\
-specified by the 'handle' parameter.");
-
-    Librarian::add_type (Select::component, "number", alist, syntax, &make);
-  }
-} Select_syntax;
+specified by the 'handle' parameter.")
+  { }
+  void load_frame (Frame&) const
+  { }
+} SelectNumber_syntax;
 
 // select_number.C ends here.

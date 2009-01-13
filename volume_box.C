@@ -27,6 +27,7 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 #include <sstream>
 
 const VolumeBox::bounds_t 
@@ -316,65 +317,42 @@ std::auto_ptr<Volume>
 Volume::build_none ()
 { return std::auto_ptr<Volume> (new VolumeBox ("none")); }
 
-void 
-VolumeBox::load_syntax (Syntax& syntax, AttributeList& alist)
+static struct Volume_BoxSyntax : public DeclareModel
 {
-  syntax.add_object ("bottom", Bound::component, 
-                     Value::Const, Value::Singleton,
-                     "Lower boundary on the z-axis.");
-  alist.add ("bottom", Bound::none_model ());
-  syntax.add_object ("top", Bound::component,
-                     Value::Const, Value::Singleton,
-                     "Upper boundary on the z-axis.");
-  alist.add ("top", Bound::none_model ());
-  syntax.add_object ("left", Bound::component,
-                     Value::Const, Value::Singleton,
-                     "Lower boundary on the x-axis.");
-  alist.add ("left", Bound::none_model ());
-  syntax.add_object ("right", Bound::component,
-                     Value::Const, Value::Singleton,
-                     "Upper boundary on the x-axis.");
-  alist.add ("right", Bound::none_model ());
-  syntax.add_object ("front", Bound::component,
-                     Value::Const, Value::Singleton,
-                     "Lower boundary on the y-axis.");
-  alist.add ("front", Bound::none_model ());
-  syntax.add_object ("back", Bound::component,
-                     Value::Const, Value::Singleton,
-                     "Upper boundary on the y-axis.");
-  alist.add ("back", Bound::none_model ());
-}
-
-static struct Volume_BoxSyntax
-{
-  static Model& make (Block& al)
-  { return *new VolumeBox (al); }
+  Model* make (Block& al) const
+  { return new VolumeBox (al); }
   Volume_BoxSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    VolumeBox::load_syntax (syntax, alist);
-
-    alist.add ("description", "A volume defined by intervals on each axis.\n\
+    : DeclareModel (Volume::component, "box", "A volume defined by intervals on each axis.\n\
 By default, the intervals fill the entire axis.  You can modify this by\n\
-setting the parameters.");
-
-    Librarian::add_type (Volume::component, "box", alist, syntax, &make);
-  }
-} VolumeBox_syntax;
-
-const AttributeList& 
-Volume::infinite_box ()
-{
-  static AttributeList alist;
-  
-  if (!alist.check ("type"))
-    {
-      Syntax dummy;
-      VolumeBox::load_syntax (dummy, alist);
-      alist.add ("type", "box");
+setting the parameters.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_object ("bottom", Bound::component, 
+                       Value::Const, Value::Singleton,
+                       "Lower boundary on the z-axis.");
+    frame.add ("bottom", "none");
+    frame.add_object ("top", Bound::component,
+                       Value::Const, Value::Singleton,
+                       "Upper boundary on the z-axis.");
+    frame.add ("top", "none");
+    frame.add_object ("left", Bound::component,
+                       Value::Const, Value::Singleton,
+                       "Lower boundary on the x-axis.");
+    frame.add ("left", "none");
+    frame.add_object ("right", Bound::component,
+                       Value::Const, Value::Singleton,
+                       "Upper boundary on the x-axis.");
+    frame.add ("right", "none");
+    frame.add_object ("front", Bound::component,
+                       Value::Const, Value::Singleton,
+                       "Lower boundary on the y-axis.");
+    frame.add ("front", "none");
+    frame.add_object ("back", Bound::component,
+                       Value::Const, Value::Singleton,
+                       "Upper boundary on the y-axis.");
+    frame.add ("back", "none");
     }
-  return alist;
-}
+} VolumeBox_syntax;
 
 // volume_box.C ends here.
