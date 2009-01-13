@@ -29,6 +29,7 @@
 #include "time.h"
 #include "librarian.h"
 #include "path.h"
+#include "frame.h"
 #include <istream>
 
 class GroundwaterFile : public Groundwater
@@ -175,23 +176,22 @@ GroundwaterFile::GroundwaterFile (Block& al)
 GroundwaterFile::~GroundwaterFile ()
 { }
 
-static struct GroundwaterFileSyntax
+static struct GroundwaterFileSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-    { return *new GroundwaterFile (al); }
+  Model* make (Block& al) const
+    { return new GroundwaterFile (al); }
   GroundwaterFileSyntax ()
+    : DeclareModel (Groundwater::component, "file", "common", "\
+Read groundwater table from a file.")
+  { }
+  void load_frame (Frame& frame) const
     { 
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "Read groundwater table from a file.");
-      Groundwater::load_syntax (syntax, alist);
-      syntax.add ("file", Value::String, Value::Const,
+      frame.add ("file", Value::String, Value::Const,
 		  "Name of file to read data from.\n\
 The format of each line in the file is 'YEAR MONTH DAY HEIGHT',\n\
 where HEIGHT should in cm above ground (i.e. a negative number).\n\
 Linear interpolation is used between the datapoints.");
-      syntax.order ("file");
-      Librarian::add_type (Groundwater::component, "file", alist, syntax, &make);
+      frame.order ("file");
     }
 } GroundwaterFile_syntax;
 

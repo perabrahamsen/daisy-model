@@ -285,7 +285,7 @@ Scope to evaluate expessions in.");
 The simulation time will also be printed whenever there are any news\n\
 to report, like emergence of crop or various management operations.\n\
 Good values for this parameter would be hourly, daily or monthly.");
-  frame.add ("print_time", Condition::periodic_model ());
+  frame.add ("print_time", "periodic");
 
   frame.add_object ("manager", Action::component, Value::State,
                      Value::Singleton,

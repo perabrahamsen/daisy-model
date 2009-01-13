@@ -27,6 +27,7 @@
 #include "assertion.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 
 class GroundwaterStatic : public Groundwater
 {
@@ -88,11 +89,11 @@ GroundwaterStatic::GroundwaterStatic (Block& al)
 GroundwaterStatic::~GroundwaterStatic ()
 { }
 
-static struct GroundwaterStaticSyntax
+static struct GroundwaterStaticSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
+  Model* make (Block& al) const
   { 
-    return *new GroundwaterStatic (al);
+    return new GroundwaterStatic (al);
   }
   static bool check_alist (const AttributeList& al, Treelog& err)
   {
@@ -107,18 +108,17 @@ static struct GroundwaterStaticSyntax
     return true;
   }
   GroundwaterStaticSyntax ()
+    : DeclareModel (Groundwater::component, "static", "common", "\
+Static groundwater level.\n\
+Provided for backward compatibility, use 'deep' or 'fixed' instead.")
+  { }
+  void load_frame (Frame& frame) const
   { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    syntax.add_check (check_alist);
-    alist.add ("description", "Static groundwater level.\n\
-Provided for backward compatibility, use 'deep' or 'fixed' instead.");
-    Groundwater::load_syntax (syntax, alist);
-    syntax.add ("table", "cm", Value::Const,
+    frame.add_check (check_alist);
+    frame.add ("table", "cm", Value::Const,
 		"Groundwater level.\n\
 Positive numbers indicate free drainage.");
-    alist.add ("table", 1.0);
-    Librarian::add_type (Groundwater::component, "static", alist, syntax, &make);
+    frame.add ("table", 1.0);
   }
 } GroundwaterStatic_syntax;
 

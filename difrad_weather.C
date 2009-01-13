@@ -61,17 +61,14 @@ struct DifradWeather : public Difrad
   { }
 };
 
-static struct DifradWeatherSyntax
+static struct DifradWeatherSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new DifradWeather (al); }
+  Model* make (Block& al) const
+  { return new DifradWeather (al); }
   DifradWeatherSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", 
-	       "Diffuse radiation using weather data.");
-    Difrad::load_syntax (syntax, alist);
-    Librarian::add_type (Difrad::component, "weather", alist, syntax, &make);
-  }
+    : DeclareModel (Difrad::component, "weather", 
+	       "Diffuse radiation using weather data.")
+  { }
+  void load_frame (Frame&) const
+  { }
 } DifradWeather_syntax;

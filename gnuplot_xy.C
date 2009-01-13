@@ -27,6 +27,7 @@
 #include "mathlib.h"
 #include "memutils.h"
 #include "librarian.h"
+#include "frame.h"
 #include <sstream>
 
 struct GnuplotXY : public GnuplotBase
@@ -397,47 +398,43 @@ GnuplotXY::GnuplotXY (Block& al)
 GnuplotXY::~GnuplotXY ()
 { sequence_delete (source.begin (), source.end ()); }
 
-static struct GnuplotXYSyntax
+static struct GnuplotXYSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new GnuplotXY (al); }
+  Model* make (Block& al) const
+  { return new GnuplotXY (al); }
   GnuplotXYSyntax ()
+    : DeclareModel (Gnuplot::component, "xy", "common",
+                    "Generate a gnuplot graph with up to two x-axes.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    GnuplotBase::load_syntax (syntax, alist);
-
-    alist.add ("description",
-               "Generate a gnuplot graph with up to two x-axes."); 
-
-    syntax.add ("xmin", Value::User (), Value::OptionalConst, "\
+    frame.add ("xmin", Value::User (), Value::OptionalConst, "\
 Fixed lowest value on left x-axis.\n\
 By default determine this from the data.");
-    syntax.add ("xmax", Value::User (), Value::OptionalConst, "\
+    frame.add ("xmax", Value::User (), Value::OptionalConst, "\
 Fixed highest value on right x-axis.\n\
 By default determine this from the data.");
-    syntax.add ("x2min", Value::User (), Value::OptionalConst, "\
+    frame.add ("x2min", Value::User (), Value::OptionalConst, "\
 Fixed lowest value on left x-axis.\n\
 By default determine this from the data.");
-    syntax.add ("x2max", Value::User (), Value::OptionalConst, "\
+    frame.add ("x2max", Value::User (), Value::OptionalConst, "\
 Fixed highest value on right x-axis.\n\
 By default determine this from the data.");
-    syntax.add ("ymin", Value::User (), Value::OptionalConst, "\
+    frame.add ("ymin", Value::User (), Value::OptionalConst, "\
 Fixed lowest value on left y-axis.\n\
 By default determine this from the data.");
-    syntax.add ("ymax", Value::User (), Value::OptionalConst, "\
+    frame.add ("ymax", Value::User (), Value::OptionalConst, "\
 Fixed highest value on right y-axis.\n\
 By default determine this from the data.");
-    syntax.add ("y2min", Value::User (), Value::OptionalConst, "\
+    frame.add ("y2min", Value::User (), Value::OptionalConst, "\
 Fixed lowest value on left y-axis.\n\
 By default determine this from the data.");
-    syntax.add ("y2max", Value::User (), Value::OptionalConst, "\
+    frame.add ("y2max", Value::User (), Value::OptionalConst, "\
 Fixed highest value on right y-axis.\n\
 By default determine this from the data.");
                 
-    syntax.add_object ("source", XYSource::component, Value::State, 
+    frame.add_object ("source", XYSource::component, Value::State, 
                        Value::Sequence, "\
 XY series to plot.");
-    Librarian::add_type (Gnuplot::component, "xy", alist, syntax, &make);
   }
 } GnuplotXY_syntax;

@@ -29,6 +29,7 @@
 #include "check.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "frame.h"
 #include <memory>
 #include <sstream>
 
@@ -148,34 +149,31 @@ EquilibriumGoal_A::check (const Units& units,
   return ok;
 }
 
-static struct EquilibriumGoal_ASyntax
+static struct EquilibriumGoal_ASyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new EquilibriumGoal_A (al); }
+  Model* make (Block& al) const
+  { return new EquilibriumGoal_A (al); }
 
   EquilibriumGoal_ASyntax ()
+    : DeclareModel (Equilibrium::component, "goal_A", "Attempt to maintain A at at fixed level.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    Equilibrium::load_syntax (syntax, alist);
-    alist.add ("description", "Attempt to maintain A at at fixed level.");
-    syntax.add_object ("goal_A", Number::component, Value::Const, 
+    frame.add_object ("goal_A", Number::component, Value::Const, 
                        Value::Singleton, "The desired level of A [g/cm^3].");
-    syntax.add ("A_solute", Value::Boolean, Value::Const, 
+    frame.add ("A_solute", Value::Boolean, Value::Const, 
                 "True iff 'goal_A' is in solute (mass per volume water).\n\
 If false, the unit is assumed to be mass per volume space.");
-    syntax.add_object ("min_B", Number::component, Value::Const, 
+    frame.add_object ("min_B", Number::component, Value::Const, 
                        Value::Singleton, "\
 Do not convert B to A if B is smaller than this [g/cm^3].");
-    syntax.add ("B_solute", Value::Boolean, Value::Const, 
+    frame.add ("B_solute", Value::Boolean, Value::Const, 
                 "True iff 'min_B' is in solute (mass per volume water).\n\
 If false, the unit is assumed to be mass per volume space.");
-    syntax.add ("debug_cell", Value::Integer, Value::Const,
+    frame.add ("debug_cell", Value::Integer, Value::Const,
                 "Print debug information for this cell.\n\
 Set it to a negative number to disable it.");
-    alist.add ("debug_cell", -1);
-    Librarian::add_type (Equilibrium::component, "goal_A",
-			 alist, syntax, &make);
+    frame.add ("debug_cell", -1);
   }
 } EquilibriumGoal_A_syntax;
 

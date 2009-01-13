@@ -37,9 +37,6 @@ void
 Difrad::output (Log&) const
 { }
 
-void 
-Difrad::load_syntax (Syntax&, AttributeList&)
-{ }
 
 Difrad::Difrad (Block& al)
   : ModelAListed (al.alist ())

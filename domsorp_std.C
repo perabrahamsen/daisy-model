@@ -30,6 +30,7 @@
 #include "assertion.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 #include <memory>
 
 struct DomsorpStandard : public Domsorp
@@ -128,29 +129,26 @@ struct DomsorpStandard : public Domsorp
   { }
 };
 
-static struct DomsorpStandardSyntax
+static struct DomsorpStandardSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new DomsorpStandard (al); }
+  Model* make (Block& al) const
+  { return new DomsorpStandard (al); }
   DomsorpStandardSyntax ()
+    : DeclareModel (Domsorp::component, "default", 
+	       "Transformation between two soil chemicals.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    Domsorp::load_syntax (syntax, alist);
-
-    alist.add ("description", 
-	       "Transformation between two soil chemicals.");
-    syntax.add_object ("transform", Transform::component,
+    frame.add_object ("transform", Transform::component,
                        "Tranformation process between DOM and SOM.");
-    syntax.add ("dom_pool", Value::Integer, Value::Const,
+    frame.add ("dom_pool", Value::Integer, Value::Const,
 		"Number of the DOM pool affected by the transformation.");
-    syntax.add ("som_pool", Value::Integer, Value::Const,
+    frame.add ("som_pool", Value::Integer, Value::Const,
 		"Number of the SOM pool affected by the transformation.");
-    syntax.add ("S_C", "g C/cm^3/h", Value::LogOnly, Value::Sequence,
+    frame.add ("S_C", "g C/cm^3/h", Value::LogOnly, Value::Sequence,
 		"Carbon converted from DOM to SOM (may be negative).");
-    syntax.add ("S_N", "g N/cm^3/h", Value::LogOnly, Value::Sequence,
+    frame.add ("S_N", "g N/cm^3/h", Value::LogOnly, Value::Sequence,
 		"Carbon converted from DOM to SOM (may be negative).");
 
-    Librarian::add_type (Domsorp::component, "default", alist, syntax, &make);
   }
 } DomsorpStandard_syntax;

@@ -29,6 +29,7 @@
 #include "treelog.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "frame.h"
 #include <sstream>
 
 class ClayOMBiomod : public ClayOM
@@ -242,26 +243,26 @@ ClayOMBiomod::ClayOMBiomod (Block& al)
 ClayOMBiomod::~ClayOMBiomod ()
 { }
 
-static struct ClayOMBiomodSyntax
+static struct ClayOMBiomodSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ClayOMBiomod (al); }
+  Model* make (Block& al) const
+  { return new ClayOMBiomod (al); }
 
   ClayOMBiomodSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", 
+    : DeclareModel (ClayOM::component, "biomod", 
 	       "Clay influence on organic matter from BIOMOD project.\n\
 All SMB pools are affected, but not the SOM pools.  Additionally, the\n\
-ration between maintenance and turnover is also clay dependent.");
-    syntax.add ("a", Value::None (), Check::positive (), Value::Const,
+ration between maintenance and turnover is also clay dependent.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add ("a", Value::None (), Check::positive (), Value::Const,
 		"Maintenance parameter.");
 #ifdef OLD_VERSION
-    syntax.add ("alpha", Value::None (), Check::positive (), Value::Const,
+    frame.add ("alpha", Value::None (), Check::positive (), Value::Const,
 		"Speed parameter.");
 #else // !OLD_VERSION
-    syntax.add ("factor", Value::Fraction (), Value::None (),
+    frame.add ("factor", Value::Fraction (), Value::None (),
 		Value::Const, "\
 Function of clay content, multiplied to the maintenance and turnover rates\n\
 of the SMB pools.");
@@ -269,18 +270,17 @@ of the SMB pools.");
     factor.add (0.00, 1.0);
     factor.add (0.25, 0.5);
     factor.add (1.00, 0.5);
-    alist.add ("factor", factor);
+    frame.add ("factor", factor);
 #endif // !OLD_VERSION
-    syntax.add_fraction ("E_SMB", Value::Const,
+    frame.add_fraction ("E_SMB", Value::Const,
 			 "SMB efficiency in processing organic matter.\n\
 Note that you must set the 'efficiency' parameter for all OM pools to\n\
 this number for the BIOMOD clay response model to work correctly.");
-    syntax.add_fraction ("f_SMB1", Value::Const,
+    frame.add_fraction ("f_SMB1", Value::Const,
 			 "Fraction of AOM pools goind to SMB1.\n\
 Only the fraction of AOM going to a SMB pool count, so this is really\n\
 a fraction of the fraction coing to the SMB pools.\n\
 Note that you must set the 'fraction' parameter of all AOM pools to\n\
 reflect this for the BIOMOD clay response model to work correctly.");
-    Librarian::add_type (ClayOM::component, "biomod", alist, syntax, &make);
   }
 } ClayOMBiomod_syntax;

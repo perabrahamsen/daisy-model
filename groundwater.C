@@ -27,6 +27,7 @@
 #include "block.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "frame.h"
 
 const char *const Groundwater::component = "groundwater";
 
@@ -67,13 +68,6 @@ Groundwater::output (Log& log) const
   output_value (table (), "height", log);
 }
 
-void
-Groundwater::load_syntax (Syntax& syntax, AttributeList&)
-{
-  syntax.add ("height", "cm", Value::LogOnly,
-	      "Groundwater level.  Positive numbers indicate free drainage.");
-}
-
 Groundwater::Groundwater (Block& al)
   : ModelLogable (al.name ("type"))
 { }
@@ -90,3 +84,17 @@ groundwater table at each timestep.")
   { }
 } Groundwater_init;
 
+static struct GroundwaterBaseSyntax : public DeclareBase
+{
+  GroundwaterBaseSyntax ()
+    : DeclareBase (Groundwater::component, "common", "\
+All groundwater models can log height.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+   frame.add ("height", "cm", Value::LogOnly,
+              "Groundwater level.  Positive numbers indicate free drainage.");
+  }
+} GroundwaterBase_syntax;
+
+// groundwater.C ends here.

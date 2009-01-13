@@ -29,6 +29,7 @@
 #include "check.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "frame.h"
 #include <memory>
 
 struct EquilibriumLinear : public Equilibrium
@@ -97,21 +98,18 @@ EquilibriumLinear::check (const Units& units, const Scope& scope, Treelog& msg) 
   return ok;
 }
 
-static struct EquilibriumLinearSyntax
+static struct EquilibriumLinearSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new EquilibriumLinear (al); }
+  Model* make (Block& al) const
+  { return new EquilibriumLinear (al); }
 
   EquilibriumLinearSyntax ()
+    : DeclareModel (Equilibrium::component, "linear", "A = K B")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    Equilibrium::load_syntax (syntax, alist);
-    alist.add ("description", "A = K B");
-    syntax.add_object ("K", Number::component, Value::Const, 
+    frame.add_object ("K", Number::component, Value::Const, 
                        Value::Singleton, "The ratio A/B at equilibrium [].");
 
-    Librarian::add_type (Equilibrium::component, "linear",
-			 alist, syntax, &make);
   }
 } EquilibriumLinear_syntax;

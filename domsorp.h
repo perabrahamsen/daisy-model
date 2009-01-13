@@ -60,7 +60,6 @@ public:
                       const Soil&, const SoilWater&, const SoilHeat&,
 		      size_t dom_size, size_t som_size, 
                       Treelog&) const = 0;
-  static void load_syntax (Syntax&, AttributeList&);
 protected:
   Domsorp (Block& al);
 public:

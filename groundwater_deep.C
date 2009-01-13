@@ -26,6 +26,7 @@
 #include "alist.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "frame.h"
 
 class GroundwaterDeep : public Groundwater
 {
@@ -59,17 +60,16 @@ public:
   { }
 };
 
-static struct GroundwaterDeepSyntax
+static struct GroundwaterDeepSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new GroundwaterDeep (al); }
+  Model* make (Block& al) const
+  { return new GroundwaterDeep (al); }
 
   GroundwaterDeepSyntax ()
+    : DeclareModel (Groundwater::component, "deep", "common", "\
+Deep groundwater, free drainage.")
+  { }
+  void load_frame (Frame& frame) const
     { 
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "Deep groundwater, free drainage.");
-      Groundwater::load_syntax (syntax, alist);
-      Librarian::add_type (Groundwater::component, "deep", alist, syntax, &make);
     }
 } GroundwaterDeep_syntax;

@@ -27,6 +27,7 @@
 #include "mathlib.h"
 #include "memutils.h"
 #include "librarian.h"
+#include "frame.h"
 #include <sstream>
 
 struct GnuplotTime : public GnuplotBase
@@ -339,39 +340,35 @@ GnuplotTime::~GnuplotTime ()
   sequence_delete (source.begin (), source.end ()); 
 }
 
-static struct GnuplotTimeSyntax
+static struct GnuplotTimeSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new GnuplotTime (al); }
+  Model* make (Block& al) const
+  { return new GnuplotTime (al); }
   GnuplotTimeSyntax ()
+    : DeclareModel (Gnuplot::component, "time", "common",
+               "Generate a gnuplot graph with times series.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    GnuplotBase::load_syntax (syntax, alist);
-
-    alist.add ("description",
-               "Generate a gnuplot graph with times series."); 
-
-    syntax.add_submodule ("begin", alist, Value::OptionalConst,
+    frame.add_submodule ("begin", Value::OptionalConst,
 			  "First date at x-axis.", Time::load_syntax);
-    syntax.add_submodule ("end", alist, Value::OptionalConst,
+    frame.add_submodule ("end", Value::OptionalConst,
 			  "Last date at x-axis.", Time::load_syntax);
-    syntax.add ("ymin", Value::User (), Value::OptionalConst, "\
+    frame.add ("ymin", Value::User (), Value::OptionalConst, "\
 Fixed lowest value on left y-axis.\n\
 By default determine this from the data.");
-    syntax.add ("ymax", Value::User (), Value::OptionalConst, "\
+    frame.add ("ymax", Value::User (), Value::OptionalConst, "\
 Fixed highest value on right y-axis.\n\
 By default determine this from the data.");
-    syntax.add ("y2min", Value::User (), Value::OptionalConst, "\
+    frame.add ("y2min", Value::User (), Value::OptionalConst, "\
 Fixed lowest value on left y-axis.\n\
 By default determine this from the data.");
-    syntax.add ("y2max", Value::User (), Value::OptionalConst, "\
+    frame.add ("y2max", Value::User (), Value::OptionalConst, "\
 Fixed highest value on right y-axis.\n\
 By default determine this from the data.");
                 
-    syntax.add_object ("source", Source::component, Value::State, 
+    frame.add_object ("source", Source::component, Value::State, 
                        Value::Sequence, "\
 Time series to plot.");
-    Librarian::add_type (Gnuplot::component, "time", alist, syntax, &make);
   }
 } GnuplotTime_syntax;

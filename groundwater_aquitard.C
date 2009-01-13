@@ -32,6 +32,7 @@
 #include "soil_water.h"
 #include "log.h"
 #include "treelog.h"
+#include "frame.h"
 #include <map>
 #include <sstream>
 
@@ -169,30 +170,30 @@ struct GroundwaterAquitard : public Groundwater
   { }
 };
 
-static struct GroundwaterAquitardSyntax
+static struct GroundwaterAquitardSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new GroundwaterAquitard (al); }
+  Model* make (Block& al) const
+  { return new GroundwaterAquitard (al); }
 
   GroundwaterAquitardSyntax ()
+    : DeclareModel (Groundwater::component, "aquitard", "common", "\
+Aquitard groundwater, free drainage.")
+  { }
+  void load_frame (Frame& frame) const
     { 
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "Aquitard groundwater, free drainage.");
-      Groundwater::load_syntax (syntax, alist);
-      syntax.add ("K_aquitard", "cm/h", Check::non_negative (), Value::Const,
+      frame.add ("K_aquitard", "cm/h", Check::non_negative (), Value::Const,
 		  "Conductivity of the aquitard.");
-      alist.add ("K_aquitard", 1e-3);
-      syntax.add ("Z_aquitard", "cm", Check::positive (), Value::Const,
+      frame.add ("K_aquitard", 1e-3);
+      frame.add ("Z_aquitard", "cm", Check::positive (), Value::Const,
 		  "Thickness of the aquitard.\n\
 The aquitard begins below the bottommost soil horizon.");
-      alist.add ("Z_aquitard", 200.0);
-      syntax.add ("h_aquifer", "cm", Check::positive (), Value::OptionalState,
+      frame.add ("Z_aquitard", 200.0);
+      frame.add ("h_aquifer", "cm", Check::positive (), Value::OptionalState,
 		  "Pressure potential in the aquifer below the aquitard.\n\
 By default. this is Z_aquitard.\n\
 You can alternatively specify the pressure as a virtual groundwater level.\n\
 See 'pressure_table'.");
-      syntax.add_object ("pressure_table", Depth::component,
+      frame.add_object ("pressure_table", Depth::component,
                          Value::OptionalConst, Value::Singleton, "\
 Height of groundwater the corresponds to the pressure in the aquifer.  \n\
 \n\
@@ -201,7 +202,6 @@ water level in the well would be as height above ground (a negative\n\
 number).  This is different from the actual groundwater table, because\n\
 the aquitart block the water, and the pipes lead the water away.\n\
 You can alternatively specify the pressure directly, with 'h_aquifer'.");
-      Librarian::add_type (Groundwater::component, "aquitard", alist, syntax, &make);
     }
 } GroundwaterAquitard_syntax;
 

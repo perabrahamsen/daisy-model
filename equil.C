@@ -24,6 +24,7 @@
 #include "equil.h"
 #include "block.h"
 #include "librarian.h"
+#include "frame.h"
 
 const char *const Equilibrium::component = "equilibrium";
 
@@ -32,13 +33,6 @@ Equilibrium::library_id () const
 {
   static const symbol id (component);
   return id;
-}
-
-void
-Equilibrium::load_syntax (Syntax& syntax, AttributeList&)
-{
-  syntax.add ("description", Value::String, Value::OptionalConst,
-	      "Description of this parameterization."); 
 }
 
 Equilibrium::Equilibrium (Block& al)
@@ -53,4 +47,9 @@ static struct EquilibriumInit : public DeclareComponent
     : DeclareComponent (Equilibrium::component, "\
 Find equilibrium between two soil chemicals.")
   { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add ("description", Value::String, Value::OptionalConst,
+               "Description of this parameterization."); 
+  }
 } Equilibrium_init;

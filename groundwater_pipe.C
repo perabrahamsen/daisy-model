@@ -33,6 +33,7 @@
 #include "mathlib.h"
 #include "check.h"
 #include "librarian.h"
+#include "frame.h"
 #include <memory>
 #include <sstream>
 
@@ -372,52 +373,53 @@ GroundwaterPipe::GroundwaterPipe (Block& al)
     }
 }
 
-static struct GroundwaterPipeSyntax
+static struct GroundwaterPipeSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
+  Model* make (Block& al) const
     {
-      return *new GroundwaterPipe (al);
+      return new GroundwaterPipe (al);
     }
   GroundwaterPipeSyntax ()
-    {
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "Groundwater for pipe (tile) drained soil.\n\
+    : DeclareModel (Groundwater::component, "pipe", "\
+Groundwater for pipe (tile) drained soil.\n\
 If you specify this groundwater model, and does not specify the 'zplus' Soil\n\
 discretization parameter, an extra aquitard soil horizon approximately a third\n\
 of the size of 'Z_aquitart' will be added.  This will allow the grounwater\n\
 level to sink into the aquitart.  The model cannot handle groundwater levels\n\
-below the last cell, or above the soil surface.");
+below the last cell, or above the soil surface.")
+  { }
+  void load_frame (Frame& frame) const
+    {
       // We define our own "height", so don't load from here.
       // Groundwater::load_syntax (syntax, alist);
 
-      syntax.add ("L", "cm", Check::positive (), Value::Const,
+      frame.add ("L", "cm", Check::positive (), Value::Const,
 		  "Distance between pipes.");
-      alist.add ("L", 1800.0);
-      syntax.add ("x", "cm", Check::positive (), Value::OptionalConst,
+      frame.add ("L", 1800.0);
+      frame.add ("x", "cm", Check::positive (), Value::OptionalConst,
 		  "Horizontal distance to nearest pipe.\n\
 By default, this is 1/2 L.");
-      syntax.add ("pipe_position", "cm", Check::negative (), Value::Const,
+      frame.add ("pipe_position", "cm", Check::negative (), Value::Const,
 		  "Height pipes are placed in the soil (a negative number).");
-      alist.add ("pipe_position", -110.0);
-      syntax.add ("K_to_pipes", "cm/h", Check::non_negative (), 
+      frame.add ("pipe_position", -110.0);
+      frame.add ("K_to_pipes", "cm/h", Check::non_negative (), 
                   Value::OptionalConst,
 		  "Horizontal conductivity in saturated soil.\n\
 By default this is calculated from the horizontal conductivity and the\n\
 anisotropy of the horizon.");
-      syntax.add ("K_aquitard", "cm/h", Check::non_negative (), Value::Const,
+      frame.add ("K_aquitard", "cm/h", Check::non_negative (), Value::Const,
 		  "Conductivity of the aquitard.");
-      alist.add ("K_aquitard", 1e-3);
-      syntax.add ("Z_aquitard", "cm", Check::positive (), Value::Const,
+      frame.add ("K_aquitard", 1e-3);
+      frame.add ("Z_aquitard", "cm", Check::positive (), Value::Const,
 		  "Thickness of the aquitard.\n\
 The aquitard begins below the bottommost soil horizon.");
-      alist.add ("Z_aquitard", 200.0);
-      syntax.add ("h_aquifer", "cm", Check::positive (), Value::OptionalState,
+      frame.add ("Z_aquitard", 200.0);
+      frame.add ("h_aquifer", "cm", Check::positive (), Value::OptionalState,
 		  "Pressure potential in the aquifer below the aquitard.\n\
 By default. this is Z_aquitard.\n\
 You can alternatively specify the pressure as a virtual groundwater level.\n\
 See 'pressure_table'.");
-      syntax.add_object ("pressure_table", Depth::component,
+      frame.add_object ("pressure_table", Depth::component,
                          Value::OptionalConst, Value::Singleton, "\
 Height of groundwater the corresponds to the pressure in the aquifer.  \n\
 \n\
@@ -426,20 +428,19 @@ water level in the well would be as height above ground (a negative\n\
 number).  This is different from the actual groundwater table, because\n\
 the aquitart block the water, and the pipes lead the water away.\n\
 You can alternatively specify the pressure directly, with 'h_aquifer'.");
-      syntax.add ("height", "cm", Check::non_positive (), 
+      frame.add ("height", "cm", Check::non_positive (), 
 		  Value::OptionalState,
 		  "Current groundwater level (a negative number).");
-      syntax.add ("DrainFlow", "cm/h", Value::LogOnly,
+      frame.add ("DrainFlow", "cm/h", Value::LogOnly,
 		  "Drain flow to pipes.");
-      syntax.add ("EqDrnFlow", "cm/h", Value::LogOnly,
+      frame.add ("EqDrnFlow", "cm/h", Value::LogOnly,
 		  "Equilibrium drain flow to pipes.");
-      syntax.add ("deficit", "cm", Value::LogOnly,
+      frame.add ("deficit", "cm", Value::LogOnly,
 		  "Deficit.");
-      syntax.add ("DeepPercolation", "cm/h", Value::LogOnly,
+      frame.add ("DeepPercolation", "cm/h", Value::LogOnly,
 		  "Deep percolation to aquifer.");
-      syntax.add ("S", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
+      frame.add ("S", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
 		  "Pipe drainage.");
-      Librarian::add_type (Groundwater::component, "pipe", alist, syntax, &make);
     }
 } GroundwaterPipe_syntax;
 

@@ -69,26 +69,28 @@ struct ConditionFinished : public Condition
   { }
 };
 
-static struct ConditionDaisySyntax
+static struct ConditionRunningSyntax : public DeclareModel
 {
-  static Model& make_running (Block& al)
-  { return *new ConditionRunning (al); }
+  Model* make (Block& al) const
+  { return new ConditionRunning (al); }
   
-  static Model& make_finished (Block& al)
-  { return *new ConditionFinished (al); }
+  ConditionRunningSyntax ()
+    : DeclareModel (Condition::component, "running", 
+                    "True iff the simulation is still running.")
+  { }
+  void load_frame (Frame&) const
+  { }
+} ConditionRunning_syntax;
 
-  ConditionDaisySyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist_running = *new AttributeList ();
-    alist_running.add ("description", 
-                       "True iff the simulation is still running.");
-    AttributeList& alist_finished = *new AttributeList ();
-    alist_finished.add ("description", 
-                        "True iff the simulation has finished.");
-    Librarian::add_type (Condition::component, "running",
-                                    alist_running, syntax, &make_running);
-    Librarian::add_type (Condition::component, "finished",
-                                    alist_finished, syntax, &make_finished);
-  }
-} ConditionDaisy_syntax;
+static struct ConditionFinishedSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new ConditionFinished (al); }
+
+  ConditionFinishedSyntax ()
+    : DeclareModel (Condition::component, "finished", 
+                    "True iff the simulation has finished.")
+  { }
+  void load_frame (Frame&) const
+  { }
+} ConditionFinished_syntax;

@@ -28,6 +28,7 @@
 #include "soil.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "frame.h"
 
 class ClayOMOld : public ClayOM
 {
@@ -89,19 +90,19 @@ ClayOMOld::ClayOMOld (Block& al)
 ClayOMOld::~ClayOMOld ()
 { }
 
-static struct ClayOMOldSyntax
+static struct ClayOMOldSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ClayOMOld (al); }
+  Model* make (Block& al) const
+  { return new ClayOMOld (al); }
 
   ClayOMOldSyntax ()
+    : DeclareModel (ClayOM::component, "old", 
+	       "Traditional clay influence on organic matter.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", 
-	       "Traditional clay influence on organic matter.");
 
-    syntax.add ("factor", Value::Fraction (), Value::None (),
+    frame.add ("factor", Value::Fraction (), Value::None (),
 		Value::Const, "\
 Function of clay content, multiplied to the maintenance and turnover rates\n\
 of SMB1 and all SOM pools.");
@@ -109,8 +110,7 @@ of SMB1 and all SOM pools.");
     factor.add (0.00, 1.0);
     factor.add (0.25, 0.5);
     factor.add (1.00, 0.5);
-    alist.add ("factor", factor);
+    frame.add ("factor", factor);
 
-    Librarian::add_type (ClayOM::component, "old", alist, syntax, &make);
   }
 } ClayOMOld_syntax;

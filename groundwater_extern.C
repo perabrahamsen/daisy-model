@@ -29,6 +29,7 @@
 #include "check.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "frame.h"
 #include <sstream>
 
 class GroundwaterExtern : public Groundwater
@@ -82,22 +83,20 @@ public:
   { }
 };
 
-static struct GroundwaterExternSyntax
+static struct GroundwaterExternSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new GroundwaterExtern (al); }
+  Model* make (Block& al) const
+  { return new GroundwaterExtern (al); }
   GroundwaterExternSyntax ()
+    : DeclareModel (Groundwater::component, "extern", "common", "\
+Look up groundwater table in an scope.  ")
+  { }
+  void load_frame (Frame& frame) const
   { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
-Look up groundwater table in an scope.  ");
-    Groundwater::load_syntax (syntax, alist);
-    syntax.add_object ("table", Number::component, 
+    frame.add_object ("table", Number::component, 
                        Value::Const, Value::Singleton, "\
 Expression that evaluates to groundwate table in.");
-    syntax.add ("initial_table", "cm", Check::none (), Value::OptionalConst,
+    frame.add ("initial_table", "cm", Check::none (), Value::OptionalConst,
 		"Groundwater level for initialization of soil water.");
-    Librarian::add_type (Groundwater::component, "extern", alist, syntax, &make);
   }
 } GroundwaterExtern_syntax;

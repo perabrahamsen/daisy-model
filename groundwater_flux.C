@@ -27,6 +27,7 @@
 #include "block.h"
 #include "check.h"
 #include "librarian.h"
+#include "frame.h"
 
 class GroundwaterFlux : public Groundwater
 {
@@ -64,20 +65,19 @@ public:
   { }
 };
 
-static struct GroundwaterFluxSyntax
+static struct GroundwaterFluxSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new GroundwaterFlux (al); }
+  Model* make (Block& al) const
+  { return new GroundwaterFlux (al); }
 
   GroundwaterFluxSyntax ()
+    : DeclareModel (Groundwater::component, "flux", "common", "\
+Flux groundwater, free drainage.")
+  { }
+  void load_frame (Frame& frame) const
     { 
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "Flux groundwater, free drainage.");
-      Groundwater::load_syntax (syntax, alist);
-      syntax.add ("flux", "cm/h", Check::none (), Value::Const,
+      frame.add ("flux", "cm/h", Check::none (), Value::Const,
 		  "Constant flux to groundwater.");
-      syntax.order ("flux");
-      Librarian::add_type (Groundwater::component, "flux", alist, syntax, &make);
+      frame.order ("flux");
     }
 } GroundwaterFlux_syntax;

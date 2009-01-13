@@ -49,7 +49,6 @@ public:
 public:
   virtual void initialize (const Units&, const Scope&, Treelog&) = 0;
   virtual bool check (const Units& units, const Scope&, Treelog&) const = 0;
-  static void load_syntax (Syntax&, AttributeList&);
 private:
   Equilibrium ();
   Equilibrium (const Equilibrium&);

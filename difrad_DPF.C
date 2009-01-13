@@ -27,6 +27,7 @@
 #include "mathlib.h"
 #include "check.h"
 #include "librarian.h"
+#include "frame.h"
 #include <sstream>
 
 struct DifradDPF : public Difrad
@@ -86,29 +87,26 @@ struct DifradDPF : public Difrad
     { }
 };
 
-static struct DifradDPFSyntax
+static struct DifradDPFSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new DifradDPF (al); }
+  Model* make (Block& al) const
+  { return new DifradDPF (al); }
   DifradDPFSyntax ()
+    : DeclareModel (Difrad::component, "DPF", "\
+Diffuse radiation calculated using the model of De Pury and Farquhar, 1997.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    Difrad::load_syntax (syntax, alist);
-    alist.add ("description", "\
-Diffuse radiation calculated using the model of De Pury and Farquhar, 1997.");
-
-    syntax.add ("fa", Value::Fraction (), Check::positive (), Value::Const, "\
+    frame.add ("fa", Value::Fraction (), Check::positive (), Value::Const, "\
 Diffuse radiation proportion.\n\
 Proportion of attenuated radiation that reaches the surface as diffuse\n\
 radiation.");
-    alist.add ("fa", 0.5);
+    frame.add ("fa", 0.5);
 
-    syntax.add ("a", Value::None (), Check::positive (), Value::Const, "\
+    frame.add ("a", Value::None (), Check::positive (), Value::Const, "\
 Atmospheric transmission coefficient of PAR.\n\
 Value around 0.6-0.9 depending on dust particles.");
-    alist.add ("a", 0.84);
+    frame.add ("a", 0.84);
     
-    Librarian::add_type (Difrad::component, "DPF", alist, syntax, &make);
   }
 } DifradDPF_syntax;

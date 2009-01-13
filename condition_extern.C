@@ -33,6 +33,7 @@
 #include "librarian.h"
 #include "assertion.h"
 #include "treelog.h"
+#include "frame.h"
 #include <memory>
 
 struct ConditionExtern : public Condition
@@ -95,27 +96,23 @@ struct ConditionExtern : public Condition
   { }
 };
 
-static struct ConditionExternSyntax
+static struct ConditionExternSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ConditionExtern (al); }
+  Model* make (Block& al) const
+  { return new ConditionExtern (al); }
 
   ConditionExternSyntax ()
+    : DeclareModel (Condition::component, "extern", "\
+Test if a boolean expression is true,using extern log.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    {
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "\
-Test if a boolean expression is true,using extern log.");
-      syntax.add_object ("scope", Scopesel::component, 
+      frame.add_object ("scope", Scopesel::component, 
                          Value::Const, Value::Singleton, "\
 Scope to evaluate expession in.");
-      syntax.add_object ("expr", Boolean::component, "\
+      frame.add_object ("expr", Boolean::component, "\
 Expression to evaluate.");
-      syntax.order ("scope", "expr");
-      Librarian::add_type (Condition::component, "extern",
-				      alist, syntax, &make);
-    }
+      frame.order ("scope", "expr");
   }
 } ConditionExtern_syntax;
 

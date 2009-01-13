@@ -396,15 +396,13 @@ FormatLaTeX::FormatLaTeX (Block& al)
     list_level (0)
 { }
 
-static struct FormatLaTeXSyntax
+static struct FormatLaTeXSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new FormatLaTeX (al); }
+  Model* make (Block& al) const
+  { return new FormatLaTeX (al); }
   FormatLaTeXSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Format text as LaTeX.");
-    Librarian::add_type (Format::component, "LaTeX", alist, syntax, &make);
-  }
+    : DeclareModel (Format::component, "LaTeX", "Format text as LaTeX.")
+  { }
+  void load_frame (Frame&) const
+  { }
 } FormatLaTeX_syntax;

@@ -25,6 +25,7 @@
 #include "alist.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "frame.h"
 #include <sstream>
 
 // The 'element' component.
@@ -71,19 +72,18 @@ struct Atom : public Element
   { }
 };
 
-static struct ElementAtomSyntax
+static struct ElementAtomSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new Atom (al); }
+  Model* make (Block& al) const
+  { return new Atom (al); }
   ElementAtomSyntax ()
+    : DeclareModel (Element::component, "atom", "An atom.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "An atom.");
     
-    syntax.add ("mass", "g/mol", Value::Const, "Atomic mass.");
+    frame.add ("mass", "g/mol", Value::Const, "Atomic mass.");
 
-    Librarian::add_type (Element::component, "atom", alist, syntax, &make);
   }
 } ElementAtom_syntax;
 

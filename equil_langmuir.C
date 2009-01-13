@@ -30,6 +30,7 @@
 #include "check.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "frame.h"
 #include <memory>
 
 struct EquilibriumLangmuir : public Equilibrium
@@ -119,24 +120,22 @@ EquilibriumLangmuir::check (const Units& units,
   return ok;
 }
 
-static struct EquilibriumLangmuirSyntax
+static struct EquilibriumLangmuirSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new EquilibriumLangmuir (al); }
+  Model* make (Block& al) const
+  { return new EquilibriumLangmuir (al); }
 
   EquilibriumLangmuirSyntax ()
+    : DeclareModel (Equilibrium::component,
+			 "Langmuir", "A = (my_max B) / (K + B)")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    Equilibrium::load_syntax (syntax, alist);
-    alist.add ("description", "A = (my_max B) / (K + B)");
-    syntax.add_object ("K", Number::component, 
+    frame.add_object ("K", Number::component, 
                        Value::Const, Value::Singleton,
                        "Half saturation constant [g/cm^3].");
-    syntax.add_object ("my_max", Number::component, 
+    frame.add_object ("my_max", Number::component, 
                        Value::Const, Value::Singleton,
                        "Max equilibrium capacity [g/cm^3].");
-    Librarian::add_type (Equilibrium::component,
-			 "Langmuir", alist, syntax, &make);
   }
 } EquilibriumLangmuir_syntax;

@@ -25,6 +25,7 @@
 #include "block.h"
 #include "alist.h"
 #include "librarian.h"
+#include "frame.h"
 
 struct ConditionPeriodic : public Condition
 {
@@ -50,7 +51,6 @@ public:
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  static void load_syntax (Syntax&, AttributeList&);
   ConditionPeriodic (Block& al)
     : Condition (al),
       period (al.integer ("period")),
@@ -58,43 +58,21 @@ public:
   { }
 };
 
-void 
-ConditionPeriodic::load_syntax (Syntax& syntax, AttributeList& alist)
+static struct ConditionPeriodicSyntax : public DeclareModel
 {
-    syntax.add ("period", Value::Integer, Value::Const, 
-		"Number of walltime seconds between success.");
-    alist.add ("period", 1);
-    syntax.order ("period");
-}
-
-const AttributeList& 
-Condition::periodic_model ()
-{
-  static AttributeList alist;
-  
-  if (!alist.check ("type"))
-    {
-      Syntax dummy;
-      ConditionPeriodic::load_syntax (dummy, alist);
-      alist.add ("type", "periodic");
-    }
-  return alist;
-}
-
-static struct ConditionPeriodicSyntax
-{
-  static Model& make (Block& al)
-  { return *new ConditionPeriodic (al); }
+  Model* make (Block& al) const
+  { return new ConditionPeriodic (al); }
   ConditionPeriodicSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    ConditionPeriodic::load_syntax (syntax, alist);
-
-    alist.add ("description", "\
+    : DeclareModel (Condition::component, "periodic", "\
 True if move than a specified walltime has passed since last time\n\
-it was true.");
-    Librarian::add_type (Condition::component, "periodic", alist, syntax, make);
+it was true.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add ("period", Value::Integer, Value::Const, 
+		"Number of walltime seconds between success.");
+    frame.add ("period", 1);
+    frame.order ("period");
   }
 } ConditionPeriodic_syntax;
 

@@ -39,7 +39,7 @@ protected:
 private:
   const symbol title;
 
-private:
+public:
   struct Size 
   {
     const double x;
@@ -48,10 +48,11 @@ private:
     static const AttributeList& unset ();
     explicit Size (const AttributeList& al);
   };
+private:
   Size size;
   
   // Legend placement.
-protected:
+public:
   static struct LegendTable : public std::map<symbol, symbol>
   {
     explicit LegendTable ();
@@ -65,8 +66,6 @@ protected:
 
   // Create and Destroy.
 public:
-  static void load_syntax (Syntax& syntax, AttributeList&);
-private:
   static symbol file2device (symbol file);
 protected:
   explicit GnuplotBase (Block& al);

@@ -31,6 +31,7 @@
 #include "check_range.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "frame.h"
 
 // The 'crop_ds_after' condition.
 
@@ -65,26 +66,24 @@ struct ConditionDSAfter : public Condition
   { }
 };
 
-static struct ConditionCropDSSyntax
+static struct ConditionCropDSSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ConditionDSAfter (al); }
+  Model* make (Block& al) const
+  { return new ConditionDSAfter (al); }
 
   ConditionCropDSSyntax ()
+    : DeclareModel (Condition::component, "crop_ds_after", "\
+True iff the crop has reached development stage 'ds'.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
-True iff the crop has reached development stage 'ds'.");
-    syntax.add ("crop", Value::String, Value::Const,
+    frame.add ("crop", Value::String, Value::Const,
                 "Name of crop on the field to test.\n\
 Specify \"all\" to use combined weight of all crops on the field in test.");
     static RangeII ds_range (-1.0, 2.0);
-    syntax.add ("ds", Value::None (), ds_range, Value::Const,
+    frame.add ("ds", Value::None (), ds_range, Value::Const,
                 "Development stage [-1.0:2.0].");
-    syntax.order ("crop", "ds");
-    Librarian::add_type (Condition::component, "crop_ds_after",
-                                      alist, syntax, &make);
+    frame.order ("crop", "ds");
   }
 } ConditionCropDS_syntax;
 
@@ -119,29 +118,27 @@ struct ConditionDMOver : public Condition
   { }
 };
 
-static struct ConditionCropDMSyntax
+static struct ConditionCropDMSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ConditionDMOver (al); }
+  Model* make (Block& al) const
+  { return new ConditionDMOver (al); }
 
   ConditionCropDMSyntax ()
+    : DeclareModel (Condition::component, "crop_dm_over", "\
+True iff the crop has reached the specified amount of dry matter.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
-True iff the crop has reached the specified amount of dry matter.");
-    syntax.add ("crop", Value::String, Value::Const,
+    frame.add ("crop", Value::String, Value::Const,
                 "Name of crop on the field to test.");
-    syntax.add ("weight", "kg DM/ha", Check::non_negative (), Value::Const,
+    frame.add ("weight", "kg DM/ha", Check::non_negative (), Value::Const,
                 "\
 Amount of non-root dry-matter required for the condition to be true.");
-    syntax.add ("height", "cm", Check::non_negative (), Value::Const,
+    frame.add ("height", "cm", Check::non_negative (), Value::Const,
                 "\
 Height above which we measure the DM weight.");
-    alist.add ("height", 0.0);
-    syntax.order ("crop", "weight");
-    Librarian::add_type (Condition::component, "crop_dm_over",
-                         alist, syntax, &make);
+    frame.add ("height", 0.0);
+    frame.order ("crop", "weight");
   }
 } ConditionCropDM_syntax;
 
@@ -174,25 +171,23 @@ struct ConditionDMSOrgOver : public Condition
   { }
 };
 
-static struct ConditionCropDMSorgSyntax
+static struct ConditionCropDMSorgSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ConditionDMSOrgOver (al); }
+  Model* make (Block& al) const
+  { return new ConditionDMSOrgOver (al); }
 
   ConditionCropDMSorgSyntax ()
+    : DeclareModel (Condition::component, "crop_dm_sorg_over", "\
+True iff the storage organ has reached the specified amount of dry matter.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
-True iff the storage organ has reached the specified amount of dry matter.");
-    syntax.add ("crop", Value::String, Value::Const,
+    frame.add ("crop", Value::String, Value::Const,
                 "Name of crop on the field to test.");
-    syntax.add ("weight", "kg DM/ha", Check::non_negative (), Value::Const,
+    frame.add ("weight", "kg DM/ha", Check::non_negative (), Value::Const,
                 "\
 Amount of non-root dry-matter required for the condition to be true.");
-    syntax.order ("crop", "weight");
-    Librarian::add_type (Condition::component, "crop_dm_sorg_over",
-                         alist, syntax, &make);
+    frame.order ("crop", "weight");
   }
 } ConditionCropDMSorg_syntax;
 

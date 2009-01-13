@@ -31,6 +31,7 @@
 #include "log.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 #include <sstream>
 
 struct ConditionTSum : public Condition
@@ -77,10 +78,10 @@ struct ConditionTSum : public Condition
       TSum_now (al.number ("TSum_now", -100.0e100))
   { }
 };
-static struct ConditionWeatherSyntax
+static struct ConditionWeatherSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ConditionTSum (al); }
+  Model* make (Block& al) const
+  { return new ConditionTSum (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)
   {
@@ -104,33 +105,29 @@ static struct ConditionWeatherSyntax
     return ok;
   }
   ConditionWeatherSyntax ()
-  {
-    {
-      Syntax& syntax = *new Syntax ();
-      syntax.add_check (check_alist);
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "\
+    : DeclareModel (Condition::component, "TSum_above", "\
 Test if the temperature sum is above the specified value\n\
 The temperature sum is the sum of the daily average air temperature since\n\
 last reset.  It is reset once a year.  Days where the average is below 0\n\
-does not count in the sum.");
+does not count in the sum.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+      frame.add_check (check_alist);
 
-      syntax.add ("check_hour", Value::Integer, Value::Const, 
+      frame.add ("check_hour", Value::Integer, Value::Const, 
 		  "Hour in day to update TSum.");
-      alist.add ("check_hour", 6);
-      syntax.add ("reset_mday", Value::Integer, Value::Const, 
+      frame.add ("check_hour", 6);
+      frame.add ("reset_mday", Value::Integer, Value::Const, 
 		  "Day in month to reset TSum.");
-      alist.add ("reset_mday", 1);
-      syntax.add ("reset_month", Value::Integer, Value::Const, 
+      frame.add ("reset_mday", 1);
+      frame.add ("reset_month", Value::Integer, Value::Const, 
 		  "Month in year to reset TSum.");
-      alist.add ("reset_month", 3);
-      syntax.add ("TSum_limit", "dg C d", Value::Const, "\
+      frame.add ("reset_month", 3);
+      frame.add ("TSum_limit", "dg C d", Value::Const, "\
 Temeperature sum above which the condition becomes true.");
-      syntax.add ("TSum_now", "dg C d", Value::OptionalState, "\
+      frame.add ("TSum_now", "dg C d", Value::OptionalState, "\
 Current temeprature sum since last reset.");
-      syntax.order ("TSum_limit");
-      Librarian::add_type (Condition::component, "TSum_above",
-				      alist, syntax, &make);
-    }
+      frame.order ("TSum_limit");
   }
 } ConditionWeather_syntax;

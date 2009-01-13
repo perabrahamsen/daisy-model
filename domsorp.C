@@ -34,10 +34,6 @@ Domsorp::library_id () const
   return id;
 }
 
-void
-Domsorp::load_syntax (Syntax&, AttributeList&)
-{ }
-
 Domsorp::Domsorp (Block& al)
   : ModelAListed (al.alist ())
 { }

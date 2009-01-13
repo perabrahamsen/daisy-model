@@ -26,6 +26,7 @@
 #include "treelog.h"
 #include "memutils.h"
 #include "librarian.h"
+#include "frame.h"
 
 struct GnuplotMulti : public Gnuplot
 {
@@ -88,27 +89,26 @@ GnuplotMulti::GnuplotMulti (Block& al)
 GnuplotMulti::~GnuplotMulti ()
 { sequence_delete (graph.begin (), graph.end ()); }
 
-static struct GnuplotMultiSyntax
+static struct GnuplotMultiSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new GnuplotMulti (al); }
+  Model* make (Block& al) const
+  { return new GnuplotMulti (al); }
   GnuplotMultiSyntax ()
+    : DeclareModel (Gnuplot::component, "multi",
+               "Generate multiple graphs for the gnuplot command file.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description",
-               "Generate multiple graphs for the gnuplot command file."); 
-    syntax.add ("before", Value::String, Value::Const, 
+    frame.add ("before", Value::String, Value::Const, 
                 Value::Sequence, "List of extra gnuplot commands.\n\
 The commands will be inserted right before the first graph.");
-    alist.add ("before", std::vector<symbol> ());
-    syntax.add ("after", Value::String, Value::Const, 
+    frame.add ("before", std::vector<symbol> ());
+    frame.add ("after", Value::String, Value::Const, 
                 Value::Sequence, "List of extra gnuplot commands.\n\
 The commands will be inserted right after the last graph.");
-    alist.add ("after", std::vector<symbol> ());
-    syntax.add_object ("graph", Gnuplot::component, Value::State, 
+    frame.add ("after", std::vector<symbol> ());
+    frame.add_object ("graph", Gnuplot::component, Value::State, 
                        Value::Sequence, "Graphs to plot.");
 
-    Librarian::add_type (Gnuplot::component, "multi", alist, syntax, &make);
   }
 } GnuplotMulti_syntax;

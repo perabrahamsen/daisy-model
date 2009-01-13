@@ -31,6 +31,7 @@
 #include "assertion.h"
 #include "daisy.h"
 #include "treelog.h"
+#include "frame.h"
 #include <memory>
 
 struct ConditionBoolean : public Condition
@@ -93,23 +94,19 @@ struct ConditionBoolean : public Condition
   { }
 };
 
-static struct ConditionBooleanSyntax
+static struct ConditionBooleanSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ConditionBoolean (al); }
+  Model* make (Block& al) const
+  { return new ConditionBoolean (al); }
 
   ConditionBooleanSyntax ()
+    : DeclareModel (Condition::component, "check", "\
+Test if a boolean expression is true.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    {
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "\
-Test if a boolean expression is true.");
-      syntax.add_object ("expr", Boolean::component, "\
+    frame.add_object ("expr", Boolean::component, "\
 Expression to evaluate.");
-      syntax.order ("expr");
-      Librarian::add_type (Condition::component, "check",
-				      alist, syntax, &make);
-    }
+    frame.order ("expr");
   }
 } ConditionBoolean_syntax;

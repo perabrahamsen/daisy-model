@@ -27,6 +27,7 @@
 #include "check.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "frame.h"
 
 class GroundwaterFixed : public Groundwater
 {
@@ -65,20 +66,19 @@ public:
   { }
 };
 
-static struct GroundwaterFixedSyntax
+static struct GroundwaterFixedSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new GroundwaterFixed (al); }
+  Model* make (Block& al) const
+  { return new GroundwaterFixed (al); }
   GroundwaterFixedSyntax ()
+    : DeclareModel (Groundwater::component, "fixed", "common", "\
+Fixed high groundwater level.")
+  { }
+  void load_frame (Frame& frame) const
   { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Fixed high groundwater level.");
-    Groundwater::load_syntax (syntax, alist);
-    syntax.add ("table", "cm", Check::none (), Value::Const,
+    frame.add ("table", "cm", Check::none (), Value::Const,
 		"Groundwater level (negative number below surface).");
-    syntax.order ("table");
-    Librarian::add_type (Groundwater::component, "fixed", alist, syntax, &make);
+    frame.order ("table");
   }
 } GroundwaterFixed_syntax;
 

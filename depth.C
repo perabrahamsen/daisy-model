@@ -37,6 +37,7 @@
 #include "librarian.h"
 #include "mathlib.h"
 #include "path.h"
+#include "frame.h"
 #include <string>
 #include <sstream>
 
@@ -92,19 +93,18 @@ Depth*
 Depth::create (const double height)
 { return new DepthConst (height); }
 
-static struct DepthConstSyntax
+static struct DepthConstSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new DepthConst (al); }
+  Model* make (Block& al) const
+  { return new DepthConst (al); }
   DepthConstSyntax ()
+    : DeclareModel (Depth::component, "const", "Constant depth.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Constant depth.");
-    syntax.add ("value", "cm", Check::non_positive (), Value::Const, 
+    frame.add ("value", "cm", Check::non_positive (), Value::Const, 
                 "Constant depth.");
-    syntax.order ("value");
-    Librarian::add_type (Depth::component, "const", alist, syntax, &make);
+    frame.order ("value");
   }
 } DepthConst_syntax;
 
@@ -150,23 +150,22 @@ struct DepthExtern : public Depth
   { }
 };
 
-static struct DepthExternSyntax
+static struct DepthExternSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new DepthExtern (al); }
+  Model* make (Block& al) const
+  { return new DepthExtern (al); }
   DepthExternSyntax ()
+    : DeclareModel (Depth::component, "extern", "\
+Look up depth in an scope.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
-Look up depth in an scope.");
-    syntax.add_object ("value", Number::component, 
+    frame.add_object ("value", Number::component, 
                        Value::Const, Value::Singleton, "\
 Expression that evaluates to a depth.");
-    syntax.add ("initial_value", "cm", Check::none (), Value::OptionalConst,
+    frame.add ("initial_value", "cm", Check::none (), Value::OptionalConst,
 		"Initial depth.");
 
-    Librarian::add_type (Depth::component, "extern", alist, syntax, &make);
   }
 } DepthExtern_syntax;
 
@@ -235,7 +234,7 @@ static const class CheckTable : public VCheck
   }
 } check_table;
 
-static struct DepthPLFSyntax
+static struct DepthPLFSyntax : public DeclareModel
 {
   static void entry_syntax (Syntax& syntax, AttributeList& alist)
   {
@@ -245,23 +244,22 @@ static struct DepthPLFSyntax
                 "Depth.");
     syntax.order ("time", "value");
   }
-  static Model& make (Block& al)
-  { return *new DepthPLF (al); }
+  Model* make (Block& al) const
+  { return new DepthPLF (al); }
   DepthPLFSyntax ()
+    : DeclareModel (Depth::component, "PLF", "Linear interpolation of depth.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Linear interpolation of depth.");
-    syntax.add_submodule_sequence ("table", Value::Const, 
+    frame.add_submodule_sequence ("table", Value::Const, 
                           "Height as a function of time.\n\
 This is a list where each element has the form (TIME VALUE).\n\
 The TIME entries must be increasing cronologically.  The corresponding\n\
 VALUE represents the value at that time.  In order to find\n\
 the depth for other times, linear interpolation between the entries\n\
 in the list will be used.", entry_syntax);
-    syntax.add_check ("table", check_table);
-    syntax.order ("table");
-    Librarian::add_type (Depth::component, "PLF", alist, syntax, &make);
+    frame.add_check ("table", check_table);
+    frame.order ("table");
   }
 } DepthPLF_syntax;
 
@@ -383,23 +381,22 @@ struct DepthFile : public Depth
   { }
 };
 
-static struct DepthFileSyntax
+static struct DepthFileSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new DepthFile (al); }
+  Model* make (Block& al) const
+  { return new DepthFile (al); }
 
   DepthFileSyntax ()
+    : DeclareModel (Depth::component, "file", "Linear interpolation of depth read from file.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Linear interpolation of depth read from file.");
-    syntax.add ("file", Value::String, Value::Const,
+    frame.add ("file", Value::String, Value::Const,
                 "Name of file to read data from.\n\
 The format of each line in the file is 'YEAR MONTH DAY HEIGHT',\n\
 where HEIGHT should in cm above ground (i.e. a negative number).\n\
 Linear interpolation is used between the datapoints.");
-    syntax.order ("file");
-    Librarian::add_type (Depth::component, "file", alist, syntax, &make);
+    frame.order ("file");
   }
 } DepthFile_syntax;
 

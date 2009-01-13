@@ -64,19 +64,17 @@ public:
   { }
 };
 
-static struct GroundwaterLysimeterSyntax
+static struct GroundwaterLysimeterSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new GroundwaterLysimeter (al); }
+  Model* make (Block& al) const
+  { return new GroundwaterLysimeter (al); }
 
   GroundwaterLysimeterSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("descriptions", "Lysimeter bottom.");
-    Groundwater::load_syntax (syntax, alist);
-    Librarian::add_type (Groundwater::component, "lysimeter", alist, syntax, &make);
-  }
+    : DeclareModel (Groundwater::component, "lysimeter", "common", "\
+Lysimeter bottom.")
+  { }
+  void load_frame (Frame&) const
+  { }
 } GroundwaterLysimeter_syntax;
 
 

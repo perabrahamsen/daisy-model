@@ -41,6 +41,7 @@
 #include "check.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 
 // Dimensional conversion.
 static const double m2_per_cm2 = 0.0001;
@@ -467,10 +468,10 @@ CropSimple::CropSimple (Block& al)
 CropSimple::~CropSimple ()
 { delete &canopy; }
 
-static struct CropSimpleSyntax
+static struct CropSimpleSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
- { return *new CropSimple (al); }
+  Model* make (Block& al) const
+ { return new CropSimple (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)
   { 
@@ -508,69 +509,64 @@ static struct CropSimpleSyntax
   }
   
   CropSimpleSyntax ()
+    : DeclareModel (Crop::component, "simple", "Forced growth crop model.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    syntax.add_check (check_alist);
-    syntax.add ("description", Value::String, Value::OptionalConst,
-		"Description of this parameterization."); 
-    alist.add ("description", "Forced growth crop model.");
-
-    syntax.add ("LAIvsTS", "dg C d", "m^2/m^2", Value::OptionalConst, 
+    frame.add_check (check_alist);
+    frame.add ("LAIvsTS", "dg C d", "m^2/m^2", Value::OptionalConst, 
 		"LAI as a function of T_sum");
-    syntax.add ("LAIvsDay", "d", "m^2/m^2", Value::OptionalConst, 
+    frame.add ("LAIvsDay", "d", "m^2/m^2", Value::OptionalConst, 
 		"LAI as a function of number of days since sowing.");
-    syntax.add ("forced_LAI", "m^2/m^2", Check::non_negative (), 
+    frame.add ("forced_LAI", "m^2/m^2", Check::non_negative (), 
 		Value::State, "\
 Minimum LAI, automatically cleared when exceeded by 'LAIvsTS'.");
-    alist.add ("forced_LAI", 0.0);
-    syntax.add_submodule("Canopy", alist, Value::State, "Canopy.",
+    frame.add ("forced_LAI", 0.0);
+    frame.add_submodule("Canopy", Value::State, "Canopy.",
 			 CanopySimple::load_syntax);
-    syntax.add ("height_max", "cm", Check::non_negative (), Value::Const, 
+    frame.add ("height_max", "cm", Check::non_negative (), Value::Const, 
 		"Maximum height of plant, reached when flowering.");
-    alist.add ("height_max", 80.0);
-    syntax.add ("T_sum", "dg C d", Check::non_negative (), Value::State, 
+    frame.add ("height_max", 80.0);
+    frame.add ("T_sum", "dg C d", Check::non_negative (), Value::State, 
 		"Temperature sum since sowing (or spring).");
-    alist.add ("T_sum", 0.0);
-    syntax.add ("day", "d", Check::non_negative (), Value::State, 
+    frame.add ("T_sum", 0.0);
+    frame.add ("day", "d", Check::non_negative (), Value::State, 
 		"Number of days since sowing (or spring).");
-    alist.add ("day", 0.0);
-    syntax.add ("spring", Value::Integer, Value::Const, 2,
+    frame.add ("day", 0.0);
+    frame.add ("spring", Value::Integer, Value::Const, 2,
 		"Zero 'T_sum' at this month and day.");
     std::vector<int> spring_time;
     spring_time.push_back (3);
     spring_time.push_back (1);
-    alist.add ("spring", spring_time);
-    syntax.add ("spring_LAI", "m^2/m^2", Check::non_negative (), Value::Const, 
+    frame.add ("spring", spring_time);
+    frame.add ("spring_LAI", "m^2/m^2", Check::non_negative (), Value::Const, 
 		"Set 'forced_LAI' to this after spring clearence of 'T_sum'.");
-    alist.add ("spring_LAI", 0.1);
-    syntax.add_submodule("Root", alist, Value::State, "Root system.",
+    frame.add ("spring_LAI", 0.1);
+    frame.add_submodule("Root", Value::State, "Root system.",
 			 RootSystem::load_syntax);
-    syntax.add ("root_DM", "Mg DM/ha", Check::non_negative (), Value::Const, 
+    frame.add ("root_DM", "Mg DM/ha", Check::non_negative (), Value::Const, 
 		"Fully developed root drymatter.");
-    alist.add ("root_DM", 2.0);
-    syntax.add ("root_N", "kg N/ha", Check::non_negative (), Value::Const,
+    frame.add ("root_DM", 2.0);
+    frame.add ("root_N", "kg N/ha", Check::non_negative (), Value::Const,
 		"Fully developed root N content.");
-    alist.add ("root_N", 20.0);
-    syntax.add_submodule_sequence ("root_am", Value::Const, 
+    frame.add ("root_N", 20.0);
+    frame.add_submodule_sequence ("root_am", Value::Const, 
 				   "Root AM parameters.", AOM::load_syntax);
-    syntax.add_check ("root_am", AM::check_om_pools ());
-    alist.add ("root_am", AM::default_AM ());
-    syntax.add ("potential_N", "kg N/ha", Check::non_negative (), Value::Const,
+    frame.add_check ("root_am", AM::check_om_pools ());
+    frame.add ("root_am", AM::default_AM ());
+    frame.add ("potential_N", "kg N/ha", Check::non_negative (), Value::Const,
 		"Potential N content at harvest.");
-    syntax.add ("N_demand", "g N/m^2", Value::LogOnly,
+    frame.add ("N_demand", "g N/m^2", Value::LogOnly,
 		"Current potential N content.");
-    syntax.add ("N_actual", "g N/m^2", Check::non_negative (), Value::State,
+    frame.add ("N_actual", "g N/m^2", Check::non_negative (), Value::State,
 		"N uptake until now.");
-    alist.add ("N_actual", 0.0);
-    syntax.add ("N_b", "kg N/ha", Check::non_negative (), Value::Const,
+    frame.add ("N_actual", 0.0);
+    frame.add ("N_b", "kg N/ha", Check::non_negative (), Value::Const,
 		"N uptake form parameter.");
-    alist.add ("N_b", 10.0);
-    syntax.add_fraction ("N_flowering", Value::Const, "\
+    frame.add ("N_b", 10.0);
+    frame.add_fraction ("N_flowering", Value::Const, "\
 Fraction of potential N uptake reached at flowering.");
-    alist.add ("N_flowering", 0.9);
-
-    Librarian::add_type (Crop::component, "simple", alist, syntax, &make);
+    frame.add ("N_flowering", 0.9);
   }
 } simple_crop_syntax;
 
