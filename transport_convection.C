@@ -49,7 +49,6 @@ struct TransportConvection : public Transport
              Treelog& msg) const;
 
   // Create.
-  static void load_syntax (Syntax& syntax, AttributeList& alist);
   TransportConvection (Block& al);
   ~TransportConvection ();
 };
@@ -216,41 +215,18 @@ TransportConvection::TransportConvection (Block& al)
 TransportConvection::~TransportConvection ()
 { }
 
-void 
-TransportConvection::load_syntax (Syntax& syntax, AttributeList&)
-{ }
-
-const AttributeList& 
-Transport::reserve_model ()
+static struct TransportConvectionSyntax : DeclareModel
 {
-  static AttributeList alist;
-
-  if (!alist.check ("type"))
-    {
-      Syntax dummy;
-      TransportConvection::load_syntax (dummy, alist);
-      alist.add ("type", "convection");
-    }
-  return alist;
-}
-
-static struct TransportConvectionSyntax
-{
-  static Model& make (Block& al)
-  { return *new TransportConvection (al); }
+  Model* make (Block& al) const
+  { return new TransportConvection (al); }
 
   TransportConvectionSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
+    : DeclareModel (Transport::component, "convection", "\
 Pure forward calculation of flow except through upper boundary.\n\
-J[edge] = q[edge] * C_old[upstream]");
-    TransportConvection::load_syntax (syntax, alist);
- 
-    Librarian::add_type (Transport::component, "convection",
-                         alist, syntax, &make);
-  }
+J[edge] = q[edge] * C_old[upstream]")
+  { }
+  void load_frame (Frame&) const
+  { }
 } TransportConvection_syntax;
 
 // transport_convection.C ends here.

@@ -34,7 +34,7 @@
 #include "adsorption.h"
 #include "log.h"
 #include "check.h"
-#include "alist.h"
+#include "frame.h"
 #include "submodeler.h"
 #include "tertiary.h"
 #include "librarian.h"
@@ -320,53 +320,37 @@ MovementRect::MovementRect (Block& al)
 MovementRect::~MovementRect ()
 { }
 
-static struct MovementRectSyntax
+static struct MovementRectSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new MovementRect (al); }
+  Model* make (Block& al) const
+  { return new MovementRect (al); }
 
   MovementRectSyntax ()
+    : DeclareModel (Movement::component, "rectangle", "solute",
+                    "Two dimensional movement in a rectangular grid.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-#ifdef HAS_MOLLERUP
-    MovementSolute::load_solute (syntax, alist, 
-                                 Transport::rectangle_model ());
-#else //!HAS_MOLLERUP
-    MovementSolute::load_solute (syntax, alist, 
-                                 Transport::reserve_model ());
-#endif //!HAS_MOLLERUP
-    alist.add ("Tertiary", Tertiary::none_model ());
-
-    alist.add ("description", 
-               "Two dimensional movement in a rectangular grid.");
-    syntax.add_submodule ("Geometry", alist, Value::Const,
+    frame.add_strings ("matrix_solute", "Mollerup", "convection", "none");
+    frame.add ("Tertiary", "none");
+    frame.add_submodule ("Geometry", Value::Const,
                           "Discretization of the soil.",
                           GeometryRect::load_syntax);
-    syntax.add_submodule_sequence ("drain", Value::Const,
+    frame.add_submodule_sequence ("drain", Value::Const,
 				   "Location of cells with drain pipes.",
 				   MovementRect::Point::load_syntax);
-    alist.add ("drain", std::vector<const AttributeList*> ());
-    syntax.add_object ("matrix_water", UZRect::component, 
+    frame.add ("drain", std::vector<const AttributeList*> ());
+    frame.add_object ("matrix_water", UZRect::component, 
                        Value::Const, Value::Sequence,
                        "Matrix water transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends.");
-    std::vector<const AttributeList*> matrix_water_models;
-    AttributeList matrix_water_default (UZRect::default_model ());
-    matrix_water_models.push_back (&matrix_water_default);
-    AttributeList matrix_water_reserve (UZRect::reserve_model ());
-    matrix_water_models.push_back (&matrix_water_reserve);
-    AttributeList matrix_water_none (UZRect::none_model ());
-    matrix_water_models.push_back (&matrix_water_none);
-    alist.add ("matrix_water", matrix_water_models);
-    syntax.add_object ("heat", Heatrect::component, 
+    frame.add_strings ("matrix_water", "Mollerup", "v+h", "const");
+    frame.add_object ("heat", Heatrect::component, 
                        Value::Const, Value::Singleton, "\
 Heat transport model.");
-    alist.add ("heat", Heatrect::default_model ());
+    frame.add ("heat", Heatrect::default_model ());
 
-    Librarian::add_type (Movement::component, "rectangle",
-                         alist, syntax, &make);
   }
 } MovementRect_syntax;
 

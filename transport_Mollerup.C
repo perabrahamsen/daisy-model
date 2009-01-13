@@ -24,7 +24,7 @@
 #include "soil.h"
 #include "solver.h"
 #include "log.h"
-#include "alist.h"
+#include "frame.h"
 #include "submodeler.h"
 #include "memutils.h"
 #include "librarian.h"
@@ -207,7 +207,6 @@ struct TransportMollerup : public Transport
   
   // Create.
   bool check (const Geometry&, Treelog&) const;
-  static void load_syntax (Syntax& syntax, AttributeList& alist);
   TransportMollerup (Block& al);
   ~TransportMollerup ();
 };
@@ -1751,55 +1750,32 @@ TransportMollerup::TransportMollerup (Block& al)
 TransportMollerup::~TransportMollerup ()
 { }
 
-void 
-TransportMollerup::load_syntax (Syntax& syntax, AttributeList& alist)
-{ 
-  syntax.add_object ("solver", Solver::component, 
-                     Value::Const, Value::Singleton, "\
+static struct TransportMollerupSyntax : DeclareModel
+{
+  Model* make (Block& al) const
+  { return new TransportMollerup (al); }
+  TransportMollerupSyntax ()
+    : DeclareModel (Transport::component, "Mollerup", "\
+Coupled vertical and horizontal transport.\n\
+See Mollerup 2007 for details.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_object ("solver", Solver::component, 
+                      Value::Const, Value::Singleton, "\
 Model used for solving matrix equation system.");
-  alist.add ("solver", Solver::default_model ());
-  syntax.add ("enable_boundary_diffusion", Value::Boolean, Value::Const, "\
+    frame.add ("solver", Solver::default_model ());
+    frame.add ("enable_boundary_diffusion", Value::Boolean, Value::Const, "\
 If this is set, diffusion over boundaries is enabled."); 
-  alist.add ("enable_boundary_diffusion", true);
-  syntax.add ("debug", Value::Integer, Value::Const, "\
+    frame.add ("enable_boundary_diffusion", true);
+    frame.add ("debug", Value::Integer, Value::Const, "\
 Enable additional debug message.\n\
 A value of 0 means no message, higher numbers means more messages.");
-  alist.add ("debug", 0);
-  syntax.add ("upstream_weight", Value::Fraction(), Value::Const, "\
+    frame.add ("debug", 0);
+    frame.add ("upstream_weight", Value::Fraction(), Value::Const, "\
 Upstream weighting factor: 1 = full upstream formulation, 0.5 = equal weight.");
-  alist.add ("upstream_weight", 1.0);
-}
-
-const AttributeList& 
-Transport::rectangle_model ()
-{
-  static AttributeList alist;
-
-  if (!alist.check ("type"))
-    {
-      Syntax dummy;
-      TransportMollerup::load_syntax (dummy, alist);
-      alist.add ("type", "Mollerup");
-    }
-  return alist;
-}
-
-static struct TransportMollerupSyntax
-{
-  static Model& make (Block& al)
-  { return *new TransportMollerup (al); }
-
-  TransportMollerupSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
-Coupled vertical and horizontal transport.\n\
-See Mollerup 2007 for details.");
-    TransportMollerup::load_syntax (syntax, alist);
+    frame.add ("upstream_weight", 1.0);
  
-    Librarian::add_type (Transport::component,
-                         "Mollerup", alist, syntax, &make);
   }
 } TransportMollerup_syntax;
 

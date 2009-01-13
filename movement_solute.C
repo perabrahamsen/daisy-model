@@ -26,7 +26,7 @@
 #include "chemical.h"
 #include "adsorption.h"
 #include "tertiary.h"
-#include "alist.h"
+#include "frame.h"
 #include "librarian.h"
 #include "block.h"
 #include "treelog.h"
@@ -712,33 +712,25 @@ MovementSolute::MovementSolute (Block& al)
     matrix_solid (Librarian::build_item<Transport> (al, "matrix_solid"))
 { }
 
-
-void
-MovementSolute::load_solute (Syntax& syntax, AttributeList& alist, 
-                             const AttributeList& prefered_solute)
+static struct MovementSoluteSyntax : public DeclareBase
 {
-  // Tertiary.
-  load_base (syntax, alist);
-
-  syntax.add_object ("matrix_solute", Transport::component, 
-                     Value::State, Value::Sequence,
-                     "Matrix solute transport models.\n\
+  MovementSoluteSyntax ()
+    : DeclareBase (Movement::component, "solute", "\
+Shared paramaters for handling solutes.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_object ("matrix_solute", Transport::component, 
+                       Value::State, Value::Sequence,
+                       "Matrix solute transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends.");
-  std::vector<const AttributeList*> matrix_solute_models;
-  AttributeList matrix_solute_default (prefered_solute);
-  matrix_solute_models.push_back (&matrix_solute_default);
-  AttributeList matrix_solute_reserve (Transport::reserve_model ());
-  matrix_solute_models.push_back (&matrix_solute_reserve);
-  AttributeList matrix_solute_none (Transport::none_model ());
-  matrix_solute_models.push_back (&matrix_solute_none);
-  alist.add ("matrix_solute", matrix_solute_models);
-
-  syntax.add_object ("matrix_solid", Transport::component, 
-                     Value::Const, Value::Singleton, "\
+    frame.add_object ("matrix_solid", Transport::component, 
+                       Value::Const, Value::Singleton, "\
 Matrix solute transport model used for fully sorbed constituents.");
-  alist.add ("matrix_solid", Transport::none_model ());
-}
+    frame.add ("matrix_solid", "none");
+  }
+} MovementSolute_syntax;
 
 // movement_solute.C ends here.
 

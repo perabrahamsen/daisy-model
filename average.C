@@ -61,34 +61,18 @@ struct AverageArithmetic : public Average
   { }
 };
 
-static struct AverageArithmeticSyntax
+static struct AverageArithmeticSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new AverageArithmetic (al); }
+  Model* make (Block& al) const
+  { return new AverageArithmetic (al); }
   AverageArithmeticSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Arithmetic average '(a+b)/2'.");
-    Librarian::add_type (Average::component, "arithmetic", alist, syntax, &make);
-  }
+    : DeclareModel (Average::component, "arithmetic", "\
+Arithmetic average '(a+b)/2'.")
+  { }
+  void load_frame (Frame& frame) const
+  { }
 } AverageArithmetic_syntax;
 
-const AttributeList& 
-Average::arithmetic_model ()
-{
-  static AttributeList alist;
-  
-  if (!alist.check ("type"))
-    {
-#if 0
-      Syntax dummy;
-      AverageArithmetic::load_syntax (dummy, alist);
-#endif
-      alist.add ("type", "arithmetic");
-    }
-  return alist;
-}
 
 std::auto_ptr<const Average>
 Average::build_arithmetic ()
@@ -108,17 +92,16 @@ struct AverageHarmonic : public Average
   { }
 };
 
-static struct AverageHarmonicSyntax
+static struct AverageHarmonicSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new AverageHarmonic (al); }
+  Model* make (Block& al) const
+  { return new AverageHarmonic (al); }
   AverageHarmonicSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Harmonic average '2ab/(a+b)'.");
-    Librarian::add_type (Average::component, "harmonic", alist, syntax, &make);
-  }
+    : DeclareModel (Average::component, "harmonic", "\
+Harmonic average '2ab/(a+b)'.")
+  { }
+  void load_frame (Frame& frame) const
+  { }
 } AverageHarmonic_syntax;
 
 // geometric model.
@@ -137,17 +120,16 @@ struct AverageGeometric : public Average
   { }
 };
 
-static struct AverageGeometricSyntax
+static struct AverageGeometricSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new AverageGeometric (al); }
+  Model* make (Block& al) const
+  { return new AverageGeometric (al); }
   AverageGeometricSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Geometric average 'sqrt(a*b)'.");
-    Librarian::add_type (Average::component, "geometric", alist, syntax, &make);
-  }
+    : DeclareModel (Average::component, "geometric", "\
+Geometric average 'sqrt(a*b)'.")
+  { }
+  void load_frame (Frame& frame) const
+  { }
 } AverageGeometric_syntax;
 
 std::auto_ptr<const Average>

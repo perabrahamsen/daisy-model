@@ -26,8 +26,7 @@
 #include "soil_water.h"
 #include "groundwater.h"
 #include "surface.h"
-#include "syntax.h"
-#include "alist.h"
+#include "frame.h"
 #include "mathlib.h"
 #include "assertion.h"
 #include "memutils.h"
@@ -76,7 +75,6 @@ struct UZRect2x1 : public UZRect
 
   // Create and Destroy.
   void has_macropores (bool);
-  static void load_syntax (Syntax& syntax, AttributeList& alist);
   UZRect2x1 (Block& al);
   ~UZRect2x1 ();
 };
@@ -353,31 +351,6 @@ UZRect2x1::has_macropores (const bool has_them)
     vertical[i]->has_macropores (has_them);
 }
 
-void 
-UZRect2x1::load_syntax (Syntax& syntax, AttributeList& alist)
-{ 
-  syntax.add_object ("vertical", UZmodel::component, 
-                     Value::Const, Value::Sequence,
-                     "Vertical matrix water transport models.\n\
-Each model will be tried in turn, until one succeeds.\n\
-If none succeeds, the simulation ends.");
-  std::vector<const AttributeList*> vertical_models;
-  vertical_models.push_back (&UZmodel::default_model ());
-  vertical_models.push_back (&UZmodel::reserve_model ());
-  alist.add ("vertical", vertical_models);
-  syntax.add_object ("horizontal", UZ1D::component,
-                     Value::Const, Value::Sequence,
-                     "Horizontal matrix water transport models.\n\
-Each model will be tried in turn, until one succeeds.\n\
-If none succeeds, the simulation ends."); 
-  std::vector<const AttributeList*> horizontal_models;
-#if 0
-  horizontal_models.push_back (&UZ1D::default_model ());
-#endif
-  horizontal_models.push_back (&UZ1D::none_model ());
-  alist.add ("horizontal", horizontal_models);
-}
-
 UZRect2x1::UZRect2x1 (Block& al)
   : UZRect (al),
     vertical (Librarian::build_vector<UZmodel> (al, "vertical")),
@@ -390,34 +363,32 @@ UZRect2x1::~UZRect2x1 ()
   sequence_delete (horizontal.begin (), horizontal.end ());
 }
 
-const AttributeList& 
-UZRect::reserve_model ()
+static struct UZRect2x1Syntax : DeclareModel
 {
-  static AttributeList alist;
-  
-  if (!alist.check ("type"))
-    {
-      Syntax dummy;
-      UZRect2x1::load_syntax (dummy, alist);
-      alist.add ("type", "v+h");
-
-    }
-  return alist;
-}
-
-static struct UZRect2x1Syntax
-{
-  static Model& make (Block& al)
-  { return *new UZRect2x1 (al); }
+  Model* make (Block& al) const
+  { return new UZRect2x1 (al); }
   UZRect2x1Syntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
+    : DeclareModel (UZRect::component, "v+h", "\
 Transport water in the matrix in two phases, first vertical, then\n\
-horizontal.");
-    UZRect2x1::load_syntax (syntax, alist);
-    Librarian::add_type (UZRect::component, "v+h", alist, syntax, &make);
+horizontal.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_object ("vertical", UZmodel::component, 
+                      Value::Const, Value::Sequence,
+                      "Vertical matrix water transport models.\n\
+Each model will be tried in turn, until one succeeds.\n\
+If none succeeds, the simulation ends.");
+    frame.add_strings ("vertical", "richards", "lr");
+    frame.add_object ("horizontal", UZ1D::component,
+                      Value::Const, Value::Sequence,
+                      "Horizontal matrix water transport models.\n\
+Each model will be tried in turn, until one succeeds.\n\
+If none succeeds, the simulation ends."); 
+#if 0
+    frame.add_strings ("horizontal", "richards", "none");
+#endif
+    frame.add_strings ("horizontal", "none");
   }
 } UZRect2x1_syntax;
 

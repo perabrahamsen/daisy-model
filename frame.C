@@ -645,10 +645,10 @@ Frame::add_strings (const symbol key, const symbol a)
       verify (key, Value::Object, 1);
       const symbol component = impl->syntax.component (key);
       const Intrinsics& intrinsics = Librarian::intrinsics ();
+      std::vector<const AttributeList*> alists;
       intrinsics.instantiate (component, a);
       AttributeList alist_a (intrinsics.library (component).lookup (a));
       alist_a.add ("type", a);
-      std::vector<const AttributeList*> alists;
       alists.push_back (&alist_a);
       impl->alist.add (key, alists);
       return;
@@ -661,6 +661,23 @@ void
 Frame::add_strings (const symbol key,
                     const symbol a, const symbol b)
 {
+  if (lookup (key) == Value::Object)
+    {
+      verify (key, Value::Object, 2);
+      const symbol component = impl->syntax.component (key);
+      const Intrinsics& intrinsics = Librarian::intrinsics ();
+      std::vector<const AttributeList*> alists;
+      intrinsics.instantiate (component, a);
+      AttributeList alist_a (intrinsics.library (component).lookup (a));
+      alist_a.add ("type", a);
+      alists.push_back (&alist_a);
+      intrinsics.instantiate (component, b);
+      AttributeList alist_b (intrinsics.library (component).lookup (b));
+      alist_b.add ("type", b);
+      alists.push_back (&alist_b);
+      impl->alist.add (key, alists);
+      return;
+    }
   verify (key, Value::String, 2);
   impl->alist.add_strings (key, a, b); 
 }
@@ -669,6 +686,27 @@ void
 Frame::add_strings (const symbol key,
                     const symbol a, const symbol b, const symbol c)
 {
+  if (lookup (key) == Value::Object)
+    {
+      verify (key, Value::Object, 3);
+      const symbol component = impl->syntax.component (key);
+      const Intrinsics& intrinsics = Librarian::intrinsics ();
+      std::vector<const AttributeList*> alists;
+      intrinsics.instantiate (component, a);
+      AttributeList alist_a (intrinsics.library (component).lookup (a));
+      alist_a.add ("type", a);
+      alists.push_back (&alist_a);
+      intrinsics.instantiate (component, b);
+      AttributeList alist_b (intrinsics.library (component).lookup (b));
+      alist_b.add ("type", b);
+      alists.push_back (&alist_b);
+      impl->alist.add (key, alists);
+      intrinsics.instantiate (component, c);
+      AttributeList alist_c (intrinsics.library (component).lookup (c));
+      alist_c.add ("type", c);
+      alists.push_back (&alist_c);
+      return;
+    }
   verify (key, Value::String, 3);
   impl->alist.add_strings (key, a, b, c); 
 }

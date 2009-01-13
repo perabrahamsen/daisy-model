@@ -33,6 +33,7 @@
 #include "surface.h"
 #include "groundwater.h"
 #include "treelog.h"
+#include "frame.h"
 
 struct TertiaryOld : public Tertiary
 {
@@ -72,7 +73,6 @@ public:
                    const Groundwater&, Treelog& msg);
   bool check (const Geometry&, Treelog& msg) const;
   TertiaryOld (Block& al);
-  static void load_syntax (Syntax&, AttributeList&);
 };
 
 void
@@ -242,47 +242,27 @@ TertiaryOld::TertiaryOld (Block& al)
     mactrans  (Librarian::build_item<Mactrans> (al, "mactrans"))
 { }
 
-void 
-TertiaryOld::load_syntax (Syntax& syntax, AttributeList& alist)
+static struct TertiaryOldSyntax : DeclareModel
 {
-  syntax.add_object ("macro", Macro::component,
-                     Value::OptionalState, Value::Singleton,
-                     "Preferential flow model.\n\
-By default, preferential flow is enabled if and only if the combined\n\
-amount of humus and clay in the top horizon is above 5%.");
-  syntax.add_object ("mactrans", Mactrans::component, 
-                     "Solute transport model in macropores.");
-  alist.add ("mactrans", Mactrans::default_model ());
-}
-
-static struct TertiaryOldSyntax
-{
-  static Model& make (Block& al)
-  { return *new TertiaryOld (al); }
+  Model* make (Block& al) const
+  { return new TertiaryOld (al); }
 
   TertiaryOldSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    TertiaryOld::load_syntax (syntax, alist);
-    alist.add ("description", "\
+    : DeclareModel (Tertiary::component, "old", "\
 Tertiary water and solute movement based on the obsolete 'macro'\n\
-and 'mactrans' components.  Provided for backward compatibility.");
-    Librarian::add_type (Tertiary::component, "old", alist, syntax, &make);
+and 'mactrans' components.  Provided for backward compatibility.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_object ("macro", Macro::component,
+                      Value::OptionalState, Value::Singleton,
+                      "Preferential flow model.\n\
+By default, preferential flow is enabled if and only if the combined\n\
+amount of humus and clay in the top horizon is above 5%.");
+    frame.add_object ("mactrans", Mactrans::component, 
+                      "Solute transport model in macropores.");
+    frame.add ("mactrans", Mactrans::default_model ());
   }
 } TertiaryOld_syntax;
-
-const AttributeList&
-Tertiary::old_model ()
-{
-  static AttributeList alist;
-  if (!alist.check ("type"))
-    {
-      Syntax dummy;
-      TertiaryOld::load_syntax (dummy, alist);
-      alist.add ("type", "old");
-    }
-  return alist;
-}
 
 // tertiary_old.C ends here.

@@ -38,6 +38,7 @@
 #include "transport.h"
 #include "tertiary.h"
 #include "treelog.h"
+#include "frame.h"
 #include <sstream>
 
 static const double rho_water = 1.0; // [g/cm^3]
@@ -64,8 +65,8 @@ struct Movement1D : public MovementSolute
                    double dt, Treelog& msg);
 
   // Heat.
-  /* const */ double delay;	// Period delay [ cm/rad ??? ]
-  double T_bottom;		// [dg C]
+  /* const */ double delay;     // Period delay [ cm/rad ??? ]
+  double T_bottom;              // [dg C]
   double surface_snow_T (const Soil& soil,
                          const SoilWater& soil_water,
                          const SoilHeat& soil_heat,
@@ -77,27 +78,27 @@ struct Movement1D : public MovementSolute
   std::vector<double> default_heat (const Soil& soil, 
                                     const Time& time, const Weather& weather);
   static void solve_heat (const Geometry1D& geo,
-			  const std::vector<double>& q_water,
-			  const std::vector<double>& S_water,
-			  const std::vector<double>& S_heat,
-			  const std::vector<double>& capacity_old,
-			  const std::vector<double>& capacity_new,
-			  const std::vector<double>& conductivity,
-			  const double T_top,
-			  const double T_top_new,
-			  const double T_bottom,
-			  std::vector<double>& T,
-			  const double dt);
+                          const std::vector<double>& q_water,
+                          const std::vector<double>& S_water,
+                          const std::vector<double>& S_heat,
+                          const std::vector<double>& capacity_old,
+                          const std::vector<double>& capacity_new,
+                          const std::vector<double>& conductivity,
+                          const double T_top,
+                          const double T_top_new,
+                          const double T_bottom,
+                          std::vector<double>& T,
+                          const double dt);
   void heat (const std::vector<double>& q_water,
-	     const std::vector<double>& S_water,
-	     const std::vector<double>& S_heat,
-	     const std::vector<double>& capacity_old,
-	     const std::vector<double>& capacity_new,
-	     const std::vector<double>& conductivity,
-	     double T_top,
-	     double T_top_new,
-	     std::vector<double>& T,
-	     const double dt, Treelog&) const;
+             const std::vector<double>& S_water,
+             const std::vector<double>& S_heat,
+             const std::vector<double>& capacity_old,
+             const std::vector<double>& capacity_new,
+             const std::vector<double>& conductivity,
+             double T_top,
+             double T_top_new,
+             std::vector<double>& T,
+             const double dt, Treelog&) const;
 
   // Management.
   void ridge (Surface& surface, const Soil& soil, const SoilWater& soil_water,
@@ -278,16 +279,16 @@ Movement1D::default_heat (const Soil& soil,
 
 void 
 Movement1D::solve_heat (const Geometry1D& geo,
-			const std::vector<double>& q_water,
-			const std::vector<double>& /* S_water */,
-			const std::vector<double>& S, // Heat.
-			const std::vector<double>& /* capacity_old */,
-			const std::vector<double>& capacity, // New.
-			const std::vector<double>& conductivity,
-			const double T_top,
-			const double T_top_new,
+                        const std::vector<double>& q_water,
+                        const std::vector<double>& /* S_water */,
+                        const std::vector<double>& S, // Heat.
+                        const std::vector<double>& /* capacity_old */,
+                        const std::vector<double>& capacity, // New.
+                        const std::vector<double>& conductivity,
+                        const double T_top,
+                        const double T_top_new,
                         const double T_bottom,
-			std::vector<double>& T,
+                        std::vector<double>& T,
                         const double dt)
 {
   const size_t size = geo.cell_size ();
@@ -366,19 +367,19 @@ Movement1D::solve_heat (const Geometry1D& geo,
 
 void 
 Movement1D::heat (const std::vector<double>& q_water,
-		  const std::vector<double>& S_water,
-		  const std::vector<double>& S_heat,
-		  const std::vector<double>& capacity_old,
-		  const std::vector<double>& capacity_new,
-		  const std::vector<double>& conductivity,
-		  const double T_top,
-		  const double T_top_new,
-		  std::vector<double>& T,
-		  const double dt, Treelog&) const
+                  const std::vector<double>& S_water,
+                  const std::vector<double>& S_heat,
+                  const std::vector<double>& capacity_old,
+                  const std::vector<double>& capacity_new,
+                  const std::vector<double>& conductivity,
+                  const double T_top,
+                  const double T_top_new,
+                  std::vector<double>& T,
+                  const double dt, Treelog&) const
 {
   solve_heat (*geo, q_water, S_water, S_heat, 
-	      capacity_old, capacity_new, conductivity,
-	      T_top, T_top_new, T_bottom, T, dt);
+              capacity_old, capacity_new, conductivity,
+              T_top, T_top_new, T_bottom, T, dt);
 }
 
 void 
@@ -389,7 +390,7 @@ Movement1D::ridge (Surface& surface, const Soil& soil,
 
 void 
 Movement1D::tick (const Soil& soil, SoilWater& soil_water, 
-		  const SoilHeat& soil_heat,
+                  const SoilHeat& soil_heat,
                   Surface& surface, Groundwater& groundwater,
                   const Time& time, const Weather& weather, 
                   const double dt, Treelog& msg) 
@@ -456,59 +457,33 @@ Movement1D::Movement1D (Block& al)
 Movement1D::~Movement1D ()
 { }
 
-void 
-Movement::load_vertical (Syntax& syntax, AttributeList& alist)
-{
-  MovementSolute::load_solute (syntax, alist, Transport::vertical_model ());
-  alist.add ("Tertiary", Tertiary::old_model ());
-
-  syntax.add_submodule ("Geometry", alist, Value::State,
-                        "Discretization of the soil.",
-                        Geometry1D::load_syntax);
-  syntax.add_object ("matrix_water", UZmodel::component, 
-                     Value::Const, Value::Sequence,
-                     "Vertical matrix water transport models.\n\
-Each model will be tried in turn, until one succeeds.\n\
-If none succeeds, the simulation ends.");
-  std::vector<const AttributeList*> vertical_models;
-  AttributeList vertical_default (UZmodel::default_model ());
-  vertical_models.push_back (&vertical_default);
-  AttributeList vertical_reserve (UZmodel::reserve_model ());
-  vertical_models.push_back (&vertical_reserve);
-  alist.add ("matrix_water", vertical_models);
-}
-
-const AttributeList& 
-Movement::default_model ()
-{
-  static AttributeList alist;
-  
-  if (!alist.check ("type"))
-    {
-      Syntax dummy;
-      Movement::load_vertical (dummy, alist);
-      alist.add ("type", "vertical");
-    }
-  return alist;
-}
-
 Movement*
 Movement::build_vertical (Block& al)
 { return new Movement1D (al); }
 
-static struct Movement1DSyntax
+static struct Movement1DSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new Movement1D (al); }
+  Model* make (Block& al) const
+  { return new Movement1D (al); }
 
   Movement1DSyntax ()
+    : DeclareModel (Movement::component, "vertical", "solute", "\
+One dimensional movement.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "One dimensional movement.");
-    Movement::load_vertical (syntax, alist);
+    frame.add ("Tertiary", "old");
+
+    frame.add_submodule ("Geometry", Value::State,
+                         "Discretization of the soil.",
+                         Geometry1D::load_syntax);
+    frame.add_object ("matrix_water", UZmodel::component, 
+                      Value::Const, Value::Sequence,
+                      "Vertical matrix water transport models.\n\
+Each model will be tried in turn, until one succeeds.\n\
+If none succeeds, the simulation ends.");
+    frame.add_strings ("matrix_water", "richards", "lr");
  
-    Librarian::add_type (Movement::component, "vertical", alist, syntax, &make);
   }
 } Movement1D_syntax;
 

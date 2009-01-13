@@ -23,7 +23,7 @@
 #define BUILD_DLL
 #include "uz1d.h"
 #include "block.h"
-#include "alist.h"
+#include "frame.h"
 #include "average.h"
 #include "librarian.h"
 #include "treelog.h"
@@ -52,7 +52,6 @@ struct UZ1DRichard : public UZ1D
                          double max_relative_difference);
 
   // Create and Destroy.
-  static void load_syntax (Syntax&, AttributeList&);
   UZ1DRichard (Block& al);
   ~UZ1DRichard ();
 };
@@ -289,58 +288,37 @@ UZ1DRichard::UZ1DRichard (Block& al)
 UZ1DRichard::~UZ1DRichard ()
 { }
 
-void 
-UZ1DRichard::load_syntax (Syntax& syntax, AttributeList& alist)
+static struct UZ1DRichardSyntax : DeclareModel
 {
-  syntax.add ("max_time_step_reductions",
-              Value::Integer, Value::Const, "\
+  Model* make (Block& al) const
+  { return new UZ1DRichard (al); }
+  UZ1DRichardSyntax ()
+    : DeclareModel (UZ1D::component, "richards", "\
+A numerical solution to Richard's Equation.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add ("max_time_step_reductions",
+                Value::Integer, Value::Const, "\
 Number of times we may reduce the time step before giving up");
-  alist.add ("max_time_step_reductions", 4);
-  syntax.add ("time_step_reduction", Value::Integer, Value::Const, 
-              "Divide the time step with this at each reduction.");
-  alist.add ("time_step_reduction", 4);
-  syntax.add ("max_iterations", Value::Integer, Value::Const, "\
+    frame.add ("max_time_step_reductions", 4);
+    frame.add ("time_step_reduction", Value::Integer, Value::Const, 
+                "Divide the time step with this at each reduction.");
+    frame.add ("time_step_reduction", 4);
+    frame.add ("max_iterations", Value::Integer, Value::Const, "\
 Maximum number of iterations when seeking convergence before reducing\n\
 the time step.");
-  alist.add ("max_iterations", 25);
-  syntax.add ("max_absolute_difference", "cm", Value::Const, "\
+    frame.add ("max_iterations", 25);
+    frame.add ("max_absolute_difference", "cm", Value::Const, "\
 Maximum absolute difference in 'h' values for convergence.");
-  alist.add ("max_absolute_difference", 0.02);
-  syntax.add ("max_relative_difference", Value::None (), Value::Const, "\
+    frame.add ("max_absolute_difference", 0.02);
+    frame.add ("max_relative_difference", Value::None (), Value::Const, "\
 Maximum relative difference in 'h' values for convergence.");
-  alist.add ("max_relative_difference", 0.001);
-  syntax.add_object ("K_average", Average::component,
-                     Value::OptionalConst, Value::Singleton,
-                     "Model for calculating average K between cells.");
-  alist.add ("K_average", Average::arithmetic_model ());
-}
-
-const AttributeList& 
-UZ1D::default_model ()
-{
-  static AttributeList alist;
-  
-  if (!alist.check ("type"))
-    {
-      Syntax dummy;
-      UZ1DRichard::load_syntax (dummy, alist);
-      alist.add ("type", "richards");
-
-    }
-  return alist;
-}
-
-static struct UZ1DRichardSyntax
-{
-  static Model& make (Block& al)
-  { return *new UZ1DRichard (al); }
-  UZ1DRichardSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "A numerical solution to Richard's Equation.");
-    UZ1DRichard::load_syntax (syntax, alist);
-    Librarian::add_type (UZ1D::component, "richards", alist, syntax, &make);
+    frame.add ("max_relative_difference", 0.001);
+    frame.add_object ("K_average", Average::component,
+                       Value::OptionalConst, Value::Singleton,
+                       "Model for calculating average K between cells.");
+    frame.add ("K_average", "arithmetic");
   }
 } UZ1DRichard_syntax;
 

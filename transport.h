@@ -69,12 +69,6 @@ public:
   // Create and Destroy.
 public:
   virtual bool check (const Geometry&, Treelog&) const;
-  // Generic models.
-  static const AttributeList& none_model ();
-  static const AttributeList& reserve_model ();
-  // Geometry specific models.
-  static const AttributeList& vertical_model ();
-  static const AttributeList& rectangle_model ();
 protected:
   Transport (Block&);
 public:

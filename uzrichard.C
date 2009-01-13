@@ -30,8 +30,7 @@
 #include "soil.h"
 #include "soil_heat.h"
 #include "mathlib.h"
-#include "alist.h"
-#include "syntax.h"
+#include "frame.h"
 #include "log.h"
 #include "average.h"
 #include "librarian.h"
@@ -103,7 +102,6 @@ public:
   void has_macropores (bool); // Tell UZ that there is macropores.
   UZRichard (Block& par);
   ~UZRichard ();
-  static void load_syntax (Syntax& syntax, AttributeList& alist);
 };
 
 bool
@@ -770,67 +768,44 @@ UZRichard::UZRichard (Block& al)
 UZRichard::~UZRichard ()
 { }
 
-void 
-UZRichard::load_syntax (Syntax& syntax, AttributeList& alist)
-{
-  syntax.add ("debug", Value::Integer, Value::Const, "\
-Print additional debug messages, higher numbers means more messages.");
-  alist.add ("debug", 1);
-  syntax.add ("max_time_step_reductions",
-              Value::Integer, Value::Const, "\
-Number of times we may reduce the time step before giving up");
-  alist.add ("max_time_step_reductions", 4);
-  syntax.add ("time_step_reduction", Value::Integer, Value::Const, 
-              "Divide the time step with this at each reduction.");
-  alist.add ("time_step_reduction", 4);
-  syntax.add ("max_iterations", Value::Integer, Value::Const, "\
-Maximum number of iterations when seeking convergence before reducing\n\
-the time step.");
-  alist.add ("max_iterations", 25);
-  syntax.add ("max_absolute_difference", "cm", Value::Const, "\
-Maximum absolute difference in 'h' values for convergence.");
-  alist.add ("max_absolute_difference", 0.02);
-  syntax.add ("max_relative_difference", Value::None (), Value::Const, "\
-Maximum relative difference in 'h' values for convergence.");
-  alist.add ("max_relative_difference", 0.001);
-  syntax.add_object ("K_average", Average::component,
-                     Value::OptionalConst, Value::Singleton,
-                     "Model for calculating average K between cells.\n\
-The default model is 'geometric' if there are macropores, and\n\
-'arithmetic' otherwise.");
-}
-
-const AttributeList& 
-UZmodel::default_model ()
-{
-  static AttributeList alist;
-  
-  if (!alist.check ("type"))
-    {
-      Syntax dummy;
-      UZRichard::load_syntax (dummy, alist);
-      alist.add ("type", "richards");
-
-    }
-  return alist;
-}
-
 // Add the UZRichard syntax to the syntax table.
-static struct UZRichardSyntax
+static struct UZRichardSyntax : DeclareModel
 {
-  static Model& make (Block& al)
-    {
-      return *new UZRichard (al);
-    }
+  Model* make (Block& al) const
+  { return new UZRichard (al); }
 
   UZRichardSyntax ()
-    {
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "A numerical solution to Richard's Equation.");
-      UZRichard::load_syntax (syntax, alist);
-      Librarian::add_type (UZmodel::component, "richards", alist, syntax, &make);
-    }
+    : DeclareModel (UZmodel::component, "richards", "\
+A numerical solution to Richard's Equation.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add ("debug", Value::Integer, Value::Const, "\
+Print additional debug messages, higher numbers means more messages.");
+    frame.add ("debug", 1);
+    frame.add ("max_time_step_reductions",
+               Value::Integer, Value::Const, "\
+Number of times we may reduce the time step before giving up");
+    frame.add ("max_time_step_reductions", 4);
+    frame.add ("time_step_reduction", Value::Integer, Value::Const, 
+               "Divide the time step with this at each reduction.");
+    frame.add ("time_step_reduction", 4);
+    frame.add ("max_iterations", Value::Integer, Value::Const, "\
+Maximum number of iterations when seeking convergence before reducing\n\
+the time step.");
+    frame.add ("max_iterations", 25);
+    frame.add ("max_absolute_difference", "cm", Value::Const, "\
+Maximum absolute difference in 'h' values for convergence.");
+    frame.add ("max_absolute_difference", 0.02);
+    frame.add ("max_relative_difference", Value::None (), Value::Const, "\
+Maximum relative difference in 'h' values for convergence.");
+    frame.add ("max_relative_difference", 0.001);
+    frame.add_object ("K_average", Average::component,
+                      Value::OptionalConst, Value::Singleton,
+                      "Model for calculating average K between cells.\n\
+The default model is 'geometric' if there are macropores, and\n\
+'arithmetic' otherwise.");
+  }
 } UZRichard_syntax;
 
 // uzrichards.C ends here.

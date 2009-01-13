@@ -32,9 +32,8 @@
 #include "surface.h"
 #include "solver.h"
 #include "log.h"
-#include "syntax.h"
+#include "frame.h"
 #include "block.h"
-#include "alist.h"
 #include "mathlib.h"
 #include "assertion.h"
 #include "librarian.h"
@@ -152,7 +151,6 @@ struct UZRectMollerup : public UZRect
 
   // Create and Destroy.
   void has_macropores (bool);
-  static void load_syntax (Syntax& syntax, AttributeList& alist);
   UZRectMollerup (Block& al);
   ~UZRectMollerup ();
 };
@@ -1089,63 +1087,6 @@ void
 UZRectMollerup::has_macropores (const bool)
 { /* Ignore for now. */ }
 
-void 
-UZRectMollerup::load_syntax (Syntax& syntax, AttributeList& alist)
-{ 
-  syntax.add_object ("solver", Solver::component, 
-		     Value::Const, Value::Singleton, "\
-Model used for solving matrix equation system.");
-  alist.add ("solver", Solver::default_model ());
-  syntax.add_object ("K_average", Average::component,
-                     Value::Const, Value::Singleton,
-                     "Model for calculating average K between cells.");
-  alist.add ("K_average", Average::arithmetic_model ());
-  syntax.add ("max_time_step_reductions",
-              Value::Integer, Value::Const, "\
-Number of times we may reduce the time step before giving up");
-  alist.add ("max_time_step_reductions", 4);
-  syntax.add ("time_step_reduction", Value::Integer, Value::Const, 
-              "Divide the time step with this at each reduction.");
-  alist.add ("time_step_reduction", 4);
-  syntax.add ("max_iterations", Value::Integer, Value::Const, "\
-Maximum number of iterations when seeking convergence before reducing\n\
-the time step.");
-  alist.add ("max_iterations", 12);
-  syntax.add ("max_number_of_small_time_steps", Value::Integer, Value::Const, "\
-Maximum number of small time steps in a large time step.");
-  alist.add ("max_number_of_small_time_steps", 1000);  
-  syntax.add ("msg_number_of_small_time_steps", Value::Integer, Value::Const, "\
-Number of small time steps in a large time step between message.");
-  alist.add ("msg_number_of_small_time_steps", 100);  
-  syntax.add ("max_absolute_difference", "cm", Value::Const, "\
-Maximum absolute difference in 'h' values for convergence.");
-  alist.add ("max_absolute_difference", 0.02);
-  syntax.add ("max_relative_difference", Value::None (), Value::Const, "\
-Maximum relative difference in 'h' values for convergence.");
-  alist.add ("max_relative_difference", 0.001); 
-  syntax.add ("max_pressure_potential", Value::None (), Value::Const, "\
-Maximum pressure potential for convergence.");
-  alist.add ("max_pressure_potential", 1e9); 
-  syntax.add ("min_pressure_potential", Value::None (), Value::Const, "\
-minimum pressure potential for convergence.");
-  alist.add ("min_pressure_potential", -1.0e9); 
-  syntax.add ("forced_T", "dg C", Value::OptionalConst, "\
-Force transport equations to use this water temperature.");
-  syntax.add ("debug", Value::Integer, Value::Const, "\
-Level of debug messages:\n                              \
- \n                                                     \
-= 0: no debug messages.\n                               \
-> 0: Initial h and Theta per time step.\n\
-> 1: Same, per iteration.\n              \
-= 3: Upper boundary extra info.\n        \
-= 4: Drain extra info.\n\
-= 5: Remaining water.");
-  alist.add ("debug", 0);
-  syntax.add ("Theta_error",
-              Value::None (), Value::LogOnly, Value::Sequence, "\
-Water mass balance error per cell.");
-}
-
 UZRectMollerup::UZRectMollerup (Block& al)
   : UZRect (al),
     solver (Librarian::build_item<Solver> (al, "solver")),
@@ -1167,34 +1108,70 @@ UZRectMollerup::UZRectMollerup (Block& al)
 UZRectMollerup::~UZRectMollerup ()
 { }
 
-const AttributeList& 
-UZRect::default_model ()
+static struct UZRectMollerupSyntax : DeclareModel
 {
-  static AttributeList alist;
-  
-  if (!alist.check ("type"))
-    {
-      Syntax dummy;
-      UZRectMollerup::load_syntax (dummy, alist);
-      alist.add ("type", "Mollerup");
-    }
-  return alist;
-}
-
-static struct UZRectMollerupSyntax
-{
-  static Model& make (Block& al)
-  { return *new UZRectMollerup (al); }
+  Model* make (Block& al) const
+  { return new UZRectMollerup (al); }
   UZRectMollerupSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
+    : DeclareModel (UZRect::component, "Mollerup", "\
 A finite volume solution to matrix water transport.\n\
-See Mollerup 2007 for details.");
-    UZRectMollerup::load_syntax (syntax, alist);
-    Librarian::add_type (UZRect::component, "Mollerup", alist, syntax, &make);
-  }
+See Mollerup 2007 for details.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_object ("solver", Solver::component, 
+                       Value::Const, Value::Singleton, "\
+Model used for solving matrix equation system.");
+    frame.add ("solver", Solver::default_model ());
+    frame.add_object ("K_average", Average::component,
+                       Value::Const, Value::Singleton,
+                       "Model for calculating average K between cells.");
+    frame.add ("K_average", "arithmetic");
+    frame.add ("max_time_step_reductions",
+                Value::Integer, Value::Const, "\
+Number of times we may reduce the time step before giving up");
+    frame.add ("max_time_step_reductions", 4);
+    frame.add ("time_step_reduction", Value::Integer, Value::Const, 
+                "Divide the time step with this at each reduction.");
+    frame.add ("time_step_reduction", 4);
+    frame.add ("max_iterations", Value::Integer, Value::Const, "\
+Maximum number of iterations when seeking convergence before reducing\n\
+the time step.");
+    frame.add ("max_iterations", 12);
+    frame.add ("max_number_of_small_time_steps", Value::Integer, Value::Const, "\
+Maximum number of small time steps in a large time step.");
+    frame.add ("max_number_of_small_time_steps", 1000);  
+    frame.add ("msg_number_of_small_time_steps", Value::Integer, Value::Const, "\
+Number of small time steps in a large time step between message.");
+    frame.add ("msg_number_of_small_time_steps", 100);  
+    frame.add ("max_absolute_difference", "cm", Value::Const, "\
+Maximum absolute difference in 'h' values for convergence.");
+    frame.add ("max_absolute_difference", 0.02);
+    frame.add ("max_relative_difference", Value::None (), Value::Const, "\
+Maximum relative difference in 'h' values for convergence.");
+    frame.add ("max_relative_difference", 0.001); 
+    frame.add ("max_pressure_potential", Value::None (), Value::Const, "\
+Maximum pressure potential for convergence.");
+    frame.add ("max_pressure_potential", 1e9); 
+    frame.add ("min_pressure_potential", Value::None (), Value::Const, "\
+minimum pressure potential for convergence.");
+    frame.add ("min_pressure_potential", -1.0e9); 
+    frame.add ("forced_T", "dg C", Value::OptionalConst, "\
+Force transport equations to use this water temperature.");
+    frame.add ("debug", Value::Integer, Value::Const, "\
+Level of debug messages:\n                              \
+ \n                                                     \
+= 0: no debug messages.\n                               \
+> 0: Initial h and Theta per time step.\n\
+> 1: Same, per iteration.\n              \
+= 3: Upper boundary extra info.\n        \
+= 4: Drain extra info.\n\
+= 5: Remaining water.");
+    frame.add ("debug", 0);
+    frame.add ("Theta_error",
+                Value::None (), Value::LogOnly, Value::Sequence, "\
+Water mass balance error per cell.");
+    }
 } UZRectMollerup_syntax;
 
 // uzrect_Mollerup.C ends here.

@@ -44,7 +44,6 @@ public:
 public:
   static std::auto_ptr<const Average> build_arithmetic ();
   static std::auto_ptr<const Average> build_geometric ();
-  static const AttributeList& arithmetic_model ();
 protected:
   Average ();
 public:

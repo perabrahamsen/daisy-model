@@ -35,8 +35,6 @@ struct UZ1DNone : public UZ1D
   { }
 
   // Create and Destroy.
-  static void load_syntax (Syntax&, AttributeList&)
-  { }
   UZ1DNone (Block& al)
     : UZ1D (al)
   { }
@@ -44,31 +42,15 @@ struct UZ1DNone : public UZ1D
   { }
 };
 
-const AttributeList& 
-UZ1D::none_model ()
+static struct UZ1DNoneSyntax : DeclareModel
 {
-  static AttributeList alist;
-  
-  if (!alist.check ("type"))
-    {
-      Syntax dummy;
-      UZ1DNone::load_syntax (dummy, alist);
-      alist.add ("type", "none");
-    }
-  return alist;
-}
-
-static struct UZ1DNoneSyntax
-{
-  static Model& make (Block& al)
-  { return *new UZ1DNone (al); }
+  Model* make (Block& al) const
+  { return new UZ1DNone (al); }
   UZ1DNoneSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Disable transport");
-    Librarian::add_type (UZ1D::component, "none", alist, syntax, &make);
-  }
+    : DeclareModel (UZ1D::component, "none", "Disable transport")
+  { }
+  void load_frame (Frame&) const
+  { }
 } UZ1DNone_syntax;
 
 // uz1d_none.C ends here.

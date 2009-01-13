@@ -973,7 +973,7 @@ Scope to evaluate expessions in.");
     frame.add_object ("Movement", Movement::component,
                        Value::State, Value::Singleton, "\
 Discretization and movement of water, heat and solutes in the soil.");
-    frame.add ("Movement", Movement::default_model ());
+    frame.add ("Movement", "vertical");
     frame.add_object ("weather", Weather::component,
                        Value::OptionalState, Value::Singleton,
                        "Weather model for providing climate information during\n\

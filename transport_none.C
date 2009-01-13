@@ -110,39 +110,16 @@ TransportNone::TransportNone (Block& al)
 TransportNone::~TransportNone ()
 { }
 
-void 
-TransportNone::load_syntax (Syntax&, AttributeList&)
-{ }
-
-const AttributeList& 
-Transport::none_model ()
+static struct TransportNoneSyntax : DeclareModel
 {
-  static AttributeList alist;
-
-  if (!alist.check ("type"))
-    {
-      Syntax dummy;
-      TransportNone::load_syntax (dummy, alist);
-      alist.add ("type", "none");
-    }
-  return alist;
-}
-
-static struct TransportNoneSyntax
-{
-  static Model& make (Block& al)
-  { return *new TransportNone (al); }
-
+  Model* make (Block& al) const
+  { return new TransportNone (al); }
   TransportNoneSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", 
-               "Disable all transport except through boundaries.");
-    TransportNone::load_syntax (syntax, alist);
- 
-    Librarian::add_type (Transport::component, "none", alist, syntax, &make);
-  }
+    : DeclareModel (Transport::component, "none", 
+                    "Disable all transport except through boundaries.")
+  { }
+  void load_frame (Frame&) const
+  { }
 } TransportNone_syntax;
 
 // transport_none.C ends here.

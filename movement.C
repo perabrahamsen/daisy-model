@@ -27,6 +27,7 @@
 #include "log.h"
 #include "treelog.h"
 #include "assertion.h"
+#include "frame.h"
 #include <sstream>
 
 const char *const Movement::component = "movement";
@@ -167,22 +168,6 @@ Movement::initialize (const Units& units,
   return ok;
 }
 
-void
-Movement::load_base (Syntax& syntax, AttributeList&)
-{
-  syntax.add_object ("Tertiary", Tertiary::component, 
-                     Value::OptionalState, Value::Singleton, "\
-Tertiary (that is, non-matrix) transport method.");
-  syntax.add ("water_failure_level", Value::Integer, Value::LogOnly, "\
-The number of the last water transport model to fail.\n\
-It is -1 if the first model succeded, and 0 if the first model failed but\n\
-the second succeded.");
-  syntax.add ("solute_failure_level", Value::Integer, Value::LogOnly, "\
-The number of the last solute transport model to fail.\n                \
-It is -1 if the first model succeded, and 0 if the first model failed but\n\
-the second succeded.");
-}
-
 Movement::Movement (Block& al)
   : ModelLogable (al.name ("type")),
     water_failure_level (-1),
@@ -195,6 +180,20 @@ Movement::~Movement ()
 
 static struct MovementInit : public DeclareComponent 
 {
+  void load_frame (Frame& frame) const
+  {
+    frame.add_object ("Tertiary", Tertiary::component, 
+                       Value::OptionalState, Value::Singleton, "\
+Tertiary (that is, non-matrix) transport method.");
+    frame.add ("water_failure_level", Value::Integer, Value::LogOnly, "\
+The number of the last water transport model to fail.\n\
+It is -1 if the first model succeded, and 0 if the first model failed but\n\
+the second succeded.");
+    frame.add ("solute_failure_level", Value::Integer, Value::LogOnly, "\
+The number of the last solute transport model to fail.\n                \
+It is -1 if the first model succeded, and 0 if the first model failed but\n\
+the second succeded.");
+  }
   MovementInit ()
     : DeclareComponent (Movement::component, "\
 This component handles the movement in the soil.")

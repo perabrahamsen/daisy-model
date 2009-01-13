@@ -23,7 +23,7 @@
 
 #include "uzmodel.h"
 #include "block.h"
-#include "alist.h"
+#include "frame.h"
 #include "surface.h"
 #include "groundwater.h"
 #include "geometry_vert.h"
@@ -63,7 +63,6 @@ struct UZlr : public UZmodel
   { }
   UZlr (Block& par);
   ~UZlr ();
-  static void load_syntax (Syntax& syntax, AttributeList& alist);
 };
 
 void
@@ -348,48 +347,27 @@ UZlr::UZlr (Block& al)
 UZlr::~UZlr ()
 { }
 
-void 
-UZlr::load_syntax (Syntax& syntax, AttributeList& alist)
+static struct UZlrSyntax : DeclareModel
 {
-  syntax.add ("overflow_warn", Value::Boolean, Value::Const, "\
-If true, warn the first time the soil profile is oversaturated.");
-  alist.add ("overflow_warn", true);
-  syntax.add ("h_fc", "cm", Value::Const, "Field capacity.");
-  alist.add ("h_fc", -100.0);
-  syntax.add ("z_top", "cm", Value::Const, 
-              "Depth of layer where upward water movement is possible.");
-  alist.add ("z_top", -10.0);
-}
-
-const AttributeList& 
-UZmodel::reserve_model ()
-{
-  static AttributeList alist;
-  
-  if (!alist.check ("type"))
-    {
-      Syntax dummy;
-      UZlr::load_syntax (dummy, alist);
-      alist.add ("type", "lr");
-    }
-  return alist;
-}
-
-static struct UZlrSyntax
-{
-  static Model& make (Block& al)
-  { return *new UZlr (al); }
+  Model* make (Block& al) const
+  { return new UZlr (al); }
 
   UZlrSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
+    : DeclareModel (UZmodel::component, "lr", "\
 Use gravitational water movement for wet soil, where h > h_fc.\n\
 There are no water movement when h < h_fc, except at the layers down\n\
-to z_top, where there can be Darcy movement.");
-    UZlr::load_syntax (syntax, alist);
-    Librarian::add_type (UZmodel::component, "lr", alist, syntax, &make);
+to z_top, where there can be Darcy movement.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add ("overflow_warn", Value::Boolean, Value::Const, "\
+If true, warn the first time the soil profile is oversaturated.");
+    frame.add ("overflow_warn", true);
+    frame.add ("h_fc", "cm", Value::Const, "Field capacity.");
+    frame.add ("h_fc", -100.0);
+    frame.add ("z_top", "cm", Value::Const, 
+               "Depth of layer where upward water movement is possible.");
+    frame.add ("z_top", -10.0);
   }
 } UZlr_syntax;
 

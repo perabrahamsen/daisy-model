@@ -124,9 +124,6 @@ public:
   bool initialize (const Units&,
                    const Soil&, const Groundwater&, const Scope& scope,
                    Treelog& msg);
-  static const AttributeList& default_model ();
-  static void load_base (Syntax& syntax, AttributeList&);
-  static void load_vertical (Syntax& syntax, AttributeList& alist);
   static Movement* build_vertical (Block& al);
 protected:
   Movement (Block&);

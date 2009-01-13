@@ -56,7 +56,6 @@ struct TransportHansen : public Transport
   TransportHansen (Block& al)
     : Transport (al)
   { }
-  static void load_syntax (Syntax& syntax, AttributeList& alist);
 };
 
 void 
@@ -321,20 +320,6 @@ TransportHansen::flow (const Geometry& geo_base,
     }
 }
 
-const AttributeList& 
-Transport::vertical_model ()
-{
-  static AttributeList alist;
-  
-  if (!alist.check ("type"))
-    {
-      Syntax dummy;
-      TransportHansen::load_syntax (dummy, alist);
-      alist.add ("type", "Hansen");
-    }
-  return alist;
-}
-
 bool 
 TransportHansen::check (const Geometry& geo, Treelog& msg) const
 {
@@ -349,25 +334,19 @@ This primary solute transport model only works with 'vertical' movement");
   return ok;
 }
 
-void 
-TransportHansen::load_syntax (Syntax& syntax, AttributeList& alist)
-{ }
-
-static struct TransportHansenSyntax
+static struct TransportHansenSyntax : DeclareModel
 {
-  static Model& make (Block& al)
+  Model* make (Block& al) const
   {
-    return *new TransportHansen (al);
+    return new TransportHansen (al);
   }
 
   TransportHansenSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", 
-	       "Solute transport using convection-dispersion.");
-    TransportHansen::load_syntax (syntax, alist);
-    Librarian::add_type (Transport::component, "Hansen", 
-                         alist, syntax, &make);
-  }
+    : DeclareModel (Transport::component, "Hansen", 
+                    "Solute transport using convection-dispersion.")
+  { }
+  void load_frame (Frame&) const
+  { }
 } TransportHansen_syntax;
+
+// transport_Hansen.C ends here.

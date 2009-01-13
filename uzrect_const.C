@@ -24,7 +24,7 @@
 #include "soil_water.h"
 #include "syntax.h"
 #include "block.h"
-#include "alist.h"
+#include "frame.h"
 #include "mathlib.h"
 #include "assertion.h"
 #include "librarian.h"
@@ -47,7 +47,6 @@ struct UZRectConst : public UZRect
  
   // Create and Destroy.
   void has_macropores (bool);
-  static void load_syntax (Syntax& syntax, AttributeList& alist);
   UZRectConst (Block& al);
   ~UZRectConst ();
 };
@@ -83,18 +82,6 @@ void
 UZRectConst::has_macropores (const bool)
 { /* Ignore for now. */ }
 
-void 
-UZRectConst::load_syntax (Syntax& syntax, AttributeList& alist)
-{ 
-  syntax.add ("q_x", "cm/h", Value::Const, "\
-Horizontal flow.");
-  alist.add ("q_x", 0.0);
-  syntax.add ("q_z", "cm/h", Value::Const, "\
-Vertical flow upwards.");
-  alist.add ("q_z", 0.0); 
-}
-
-
 UZRectConst::UZRectConst (Block& al)
   : UZRect (al),
     q_x (al.number ("q_x")),
@@ -104,34 +91,22 @@ UZRectConst::UZRectConst (Block& al)
 UZRectConst::~UZRectConst ()
 { }
 
-
-const AttributeList& 
-UZRect::none_model ()
+static struct UZRectConstSyntax : DeclareModel
 {
-  static AttributeList alist;
-  
-  if (!alist.check ("type"))
-    {
-      Syntax dummy;
-      UZRectConst::load_syntax (dummy, alist);
-      alist.add ("type", "const");
-
-    }
-  return alist;
-}
-
-static struct UZRectConstSyntax
-{
-  static Model& make (Block& al)
-  { return *new UZRectConst (al); }
+  Model* make (Block& al) const
+  { return new UZRectConst (al); }
   UZRectConstSyntax ()
+    : DeclareModel (UZRect::component, "const", "\
+Steady-state water flow.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
-Steady-state water flow.");
-    UZRectConst::load_syntax (syntax, alist);
-    Librarian::add_type (UZRect::component, "const", alist, syntax, &make);
+    frame.add ("q_x", "cm/h", Value::Const, "\
+Horizontal flow.");
+    frame.add ("q_x", 0.0);
+    frame.add ("q_z", "cm/h", Value::Const, "\
+Vertical flow upwards.");
+    frame.add ("q_z", 0.0); 
   }
 } UZRectConst_syntax;
 
