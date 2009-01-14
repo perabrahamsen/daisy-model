@@ -27,6 +27,7 @@
 #include "block.h"
 #include "alist.h"
 #include "assertion.h"
+#include "frame.h"
 
 #if defined (__MINGW32__) || defined (_MSC_VER)
 #include <windows.h>
@@ -122,22 +123,21 @@ UIProgress::UIProgress (Block& al)
 UIProgress::~UIProgress ()
 { }
 
-static struct UIProgressSyntax
+static struct UIProgressSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new UIProgress (al); }
+  Model* make (Block& al) const
+  { return new UIProgress (al); }
 
   UIProgressSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-
-    alist.add ("description", 
+    : DeclareModel (UI::component, "progress", 
                "Write progress on standard output (or standard error).\n\
 \n\
 This is useful when starting the program from a text terminal, or from\n\
-inside another program such as an editor that can capture the output.");
-    Librarian::add_type (UI::component, "progress", alist, syntax, &make);
+inside another program such as an editor that can capture the output.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+
   }
 } UIProgress_syntax;
 
@@ -170,22 +170,21 @@ UINone::UINone (Block& al)
 UINone::~UINone ()
 { }
 
-static struct UINoneSyntax
+static struct UINoneSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new UINone (al); }
+  Model* make (Block& al) const
+  { return new UINone (al); }
 
   UINoneSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-
-    alist.add ("description", 
+    : DeclareModel (UI::component, "none", 
                "No user unterface.\n\
 \n\
 This is useful when running from a batch program, or as a component in\n\
-a larger system.");
-    Librarian::add_type (UI::component, "none", alist, syntax, &make);
+a larger system.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+
   }
 } UINone_syntax;
 

@@ -27,6 +27,7 @@
 #include "hydraulic.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "frame.h"
 
 class TortuosityM_Q : public Tortuosity
 {
@@ -45,19 +46,18 @@ public:
     { }
 };
 
-static struct TortuosityM_QSyntax
+static struct TortuosityM_QSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
+  Model* make (Block& al) const
   {
-    return *new TortuosityM_Q (al);
+    return new TortuosityM_Q (al);
   }
 
   TortuosityM_QSyntax ()
+    : DeclareModel (Tortuosity::component, "M_Q", "Millington-Quirk.  Theta^(7/3) / Theta_sat^2.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Millington-Quirk.  Theta^(7/3) / Theta_sat^2.");
-    Librarian::add_type (Tortuosity::component, "M_Q", alist, syntax, &make);
   }
 } TortuosityM_Q_syntax;
 

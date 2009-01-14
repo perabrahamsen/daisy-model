@@ -28,6 +28,7 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 #include <sstream>
 #include <memory>
 
@@ -66,20 +67,19 @@ WSE::create_full ()
   return full;
 }
 
-static struct WSE_fullSyntax
+static struct WSE_fullSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new WSE_full (al); }
+  Model* make (Block& al) const
+  { return new WSE_full (al); }
   WSE_fullSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-
-    alist.add ("description", "\
+    : DeclareModel (WSE::component, "full", "\
 Water stress has full effect on crop growth.\n\
 This means that if there is 50% water stress, assimilate production\n\
-will be cut into half."); 
-    Librarian::add_type (WSE::component, "full", alist, syntax, &make);
+will be cut into half.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+
   }
 } WSE_full_syntax;
 
@@ -106,15 +106,12 @@ struct WSE_partial : public WSE
   { }
 };
 
-static struct WSE_partialSyntax
+static struct WSE_partialSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new WSE_partial (al); }
+  Model* make (Block& al) const
+  { return new WSE_partial (al); }
   WSE_partialSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
+    : DeclareModel (WSE::component, "partial", "\
 Water stress has partial effect on crop growth.\n\
 \n\
 With this model, there will be full production when there is enough\n\
@@ -122,13 +119,15 @@ available soil water to cover the potential evapotranspiration, and no\n\
 production when there is no soil water available.  In between production\n\
 is controled by the 'y_half' parameter.\n\
 \n\
-See SH:REFERENCE for more explanation.");
-    syntax.add_fraction ("y_half", Value::Const, "\
+See SH:REFERENCE for more explanation.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_fraction ("y_half", Value::Const, "\
 Effect on assimilate production of water stress.\n\
 This parameter specifies the effect on assimilate production\n(\
 compared to potential) when the amount of available soil water is\n\
 enough to cover exactly half the potential evapotranspiration.");
-    Librarian::add_type (WSE::component, "partial", alist, syntax, &make);
   }
 } WSE_partial_syntax;
 
@@ -152,18 +151,17 @@ WSE::create_none ()
   return none;
 }
 
-static struct WSE_noneSyntax
+static struct WSE_noneSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new WSE_none (al); }
+  Model* make (Block& al) const
+  { return new WSE_none (al); }
   WSE_noneSyntax ()
+    : DeclareModel (WSE::component, "none", 
+               "Water stress has no effect on plant growth.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
 
-    alist.add ("description", 
-               "Water stress has no effect on plant growth.");
-    Librarian::add_type (WSE::component, "none", alist, syntax, &make);
   }
 } WSE_none_syntax;
 
@@ -201,23 +199,22 @@ struct ProgramWSE_table : public Program
   { }
 };
 
-static struct ProgramWSE_tableSyntax
+static struct ProgramWSE_tableSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ProgramWSE_table (al); }
+  Model* make (Block& al) const
+  { return new ProgramWSE_table (al); }
   ProgramWSE_tableSyntax ()
+    : DeclareModel (Program::component, "wse", "Generate a table of the water stress effect.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Generate a table of the water stress effect.");
-    syntax.add_object ("wse", WSE::component, 
+    frame.add_object ("wse", WSE::component, 
                        Value::Const, Value::Singleton, "\
 The water stress effect to show in the table.");
-    syntax.add ("intervals", Value::Integer, Value::Const, "\
+    frame.add ("intervals", Value::Integer, Value::Const, "\
 Number of intervals in the table.");
-    alist.add ("intervals", 10);
-    syntax.order ("wse");
-    Librarian::add_type (Program::component, "wse", alist, syntax, &make);
+    frame.add ("intervals", 10);
+    frame.order ("wse");
   }
 } ProgramWSE_table_syntax;
 

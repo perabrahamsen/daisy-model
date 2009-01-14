@@ -32,6 +32,7 @@
 #include "assertion.h"
 #include "path.h"
 #include "treelog.h"
+#include "frame.h"
 #include <sstream>
 
 #include <QtGui/QMenuBar>
@@ -445,18 +446,17 @@ UIRun::UIRun (Block& al)
 UIRun::~UIRun ()
 { stop_program (); }
 
-static struct UIRunSyntax
+static struct UIRunSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new UIRun (al); }
+  Model* make (Block& al) const
+  { return new UIRun (al); }
 
   UIRunSyntax ()
+    : DeclareModel (UI::component, "GUI", "Run the program in a window.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
 
-    alist.add ("description", "Run the program in a window.");
-    Librarian::add_type (UI::component, "GUI", alist, syntax, &make);
   }
 } UIRun_syntax;
 

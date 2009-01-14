@@ -12,6 +12,8 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 ** brug parent_link i stedet for parent_copy
 
+** Fix FRAME_LINK ifdefs i weather
+
 ** Integrer syntax/alist i frame
 
 ** Integrer metalib i frame

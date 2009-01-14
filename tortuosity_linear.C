@@ -26,6 +26,7 @@
 #include "alist.h"
 #include "hydraulic.h"
 #include "librarian.h"
+#include "frame.h"
 
 static double h_wp = -15000;
 
@@ -54,23 +55,22 @@ public:
     { }
 };
 
-static struct TortuosityLinearSyntax
+static struct TortuosityLinearSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
+  Model* make (Block& al) const
   {
-    return *new TortuosityLinear (al);
+    return new TortuosityLinear (al);
   }
 
   TortuosityLinearSyntax ()
+    : DeclareModel (Tortuosity::component, "linear", "Linear Impedance factor.  a + b Theta.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Linear Impedance factor.  a + b Theta.");
-    syntax.add ("a", "cm^3/cm^3", Value::OptionalConst, "\
+    frame.add ("a", "cm^3/cm^3", Value::OptionalConst, "\
 Theta offset.  By default, this corresponds to the wilting point.");
-    syntax.add ("b", Value::None (), Value::Const, "Theta factor.");
-    alist.add ("b", 2.0);
-    Librarian::add_type (Tortuosity::component, "linear", alist, syntax, &make);
+    frame.add ("b", Value::None (), Value::Const, "Theta factor.");
+    frame.add ("b", 2.0);
   }
 } TortuosityLinear_syntax;
 

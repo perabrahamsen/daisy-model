@@ -29,6 +29,7 @@
 #include "librarian.h"
 #include "block.h"
 #include "units.h"
+#include "frame.h"
 
 // WeatherBase
 
@@ -295,54 +296,6 @@ bool
 WeatherBase::check (const Time&, const Time&, Treelog&) const
 { return true; }
 
-void
-WeatherBase::load_base (Syntax& syntax, AttributeList& alist)
-{
-  // Logs.
-  alist.add ("base_model", "common");
-  alist.add ("description", "\
-This is not a model, but a list of parameters shared by all weather models.");
-  if (syntax.lookup ("air_temperature") == Value::Error)
-    // May be set by derived class (WeatherNone).
-    syntax.add ("air_temperature", "dg C", Value::LogOnly,
-                "Temperature this hour.");
-  syntax.add ("daily_air_temperature", "dg C", Value::LogOnly,
-	      "Average temperature this day.");
-  syntax.add ("daily_min_air_temperature", "dg C", Value::LogOnly,
-	      "Minumum temperature this day.");
-  syntax.add ("daily_max_air_temperature", "dg C", Value::LogOnly,
-	      "Maximum temperature this day.");
-  if (syntax.lookup ("global_radiation") == Value::Error)
-    // May be set by derived class (WeatherNone).
-    syntax.add ("global_radiation", "W/m^2", Value::LogOnly,
-                "Global radiation this hour.");
-  syntax.add ("daily_global_radiation", "W/m^2", Value::LogOnly,
-	      "Average radiation this day.");
-  syntax.add ("diffuse_radiation", "W/m^2", Value::LogOnly,
-	      "Diffuse radiation this hour.");
-  syntax.add ("reference_evapotranspiration", "mm/h", Value::LogOnly,
-	      "Reference evapotranspiration this hour");
-  syntax.add ("daily_extraterrastial_radiation", "W/m^2", Value::LogOnly,
-	      "Extraterrestrial radiation this day.");
-  syntax.add ("rain", "mm/h", Value::LogOnly, "Rain this hour.");
-  syntax.add ("snow", "mm/h", Value::LogOnly, "Snow this hour.");
-  syntax.add ("precipitation", "mm/h", Value::LogOnly, 
-	      "Precipitation this hour.");
-  syntax.add_fraction ("cloudiness", Value::LogOnly,
-	      "Fraction of sky covered by clouds [0-1].");
-  syntax.add_fraction ("daily_cloudiness", Value::LogOnly,
-	      "Fraction of sky covered by clouds [0-1].");
-  syntax.add ("vapor_pressure", "Pa", Value::LogOnly, "Humidity.");
-  syntax.add ("relative_humidity", Value::Fraction (), Value::LogOnly,
-              "Relative humidity.");
-  syntax.add ("wind", "m/s", Value::LogOnly, "Wind speed.");
-  syntax.add ("day_length", "h", Value::LogOnly,
-	      "Number of light hours this day.");
-  syntax.add ("day_cycle", Value::None (), Value::LogOnly,
-	      "Fraction of daily radiation received this hour.");
-  IM::add_syntax (syntax, alist, Value::LogOnly, "deposit", IM::flux_unit (),
-		  "Total atmospheric deposition of nitrogen.");
-}
 
 WeatherBase::WeatherBase (Block& al)
   : Weather (al),
@@ -365,16 +318,66 @@ WeatherBase::WeatherBase (Block& al)
     deposit_ (al, "deposit")
 { }
 
-static struct WeatherBaseSyntax
+static struct WeatherBaseSyntax : public DeclareBase
 {
   WeatherBaseSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    WeatherBase::load_base (syntax, alist);
-
-    Librarian::add_base (Weather::component, alist, syntax);
-  }
+    : DeclareBase (Weather::component, "base", "\
+This is not a model, but a list of parameters shared by all weather models.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+#ifdef FRAME_LINK
+    frame.add ("air_temperature", "dg C", Value::LogOnly,
+                "Temperature this hour.");
+    frame.add ("global_radiation", "W/m^2", Value::LogOnly,
+                "Global radiation this hour.");
+#else // FRAME_LINK
+    // We need to define 'air_temperature' and 'global_radiation'
+    // before calling WeatherOld::load_syntax, as the later will
+    // otherwise define log variables with the same name.  For the
+    // same reason, they need to be Value::State instead of
+    // Value::Const, as WeatherOld::output will try to log them.
+    frame.add ("air_temperature", "dg C", Value::State,
+		"Constant air temperature");
+    frame.add ("air_temperature", 0.0);
+    frame.add ("global_radiation", "W/m^2", Value::State,
+		"Constant global radiation.");
+    frame.add ("global_radiation", 0.0);
+#endif // !FRAME_LINK
+    // Logs.
+    frame.add ("daily_air_temperature", "dg C", Value::LogOnly,
+                "Average temperature this day.");
+    frame.add ("daily_min_air_temperature", "dg C", Value::LogOnly,
+                "Minumum temperature this day.");
+    frame.add ("daily_max_air_temperature", "dg C", Value::LogOnly,
+                "Maximum temperature this day.");
+    frame.add ("daily_global_radiation", "W/m^2", Value::LogOnly,
+                "Average radiation this day.");
+    frame.add ("diffuse_radiation", "W/m^2", Value::LogOnly,
+                "Diffuse radiation this hour.");
+    frame.add ("reference_evapotranspiration", "mm/h", Value::LogOnly,
+                "Reference evapotranspiration this hour");
+    frame.add ("daily_extraterrastial_radiation", "W/m^2", Value::LogOnly,
+                "Extraterrestrial radiation this day.");
+    frame.add ("rain", "mm/h", Value::LogOnly, "Rain this hour.");
+    frame.add ("snow", "mm/h", Value::LogOnly, "Snow this hour.");
+    frame.add ("precipitation", "mm/h", Value::LogOnly, 
+                "Precipitation this hour.");
+    frame.add_fraction ("cloudiness", Value::LogOnly,
+                "Fraction of sky covered by clouds [0-1].");
+    frame.add_fraction ("daily_cloudiness", Value::LogOnly,
+                "Fraction of sky covered by clouds [0-1].");
+    frame.add ("vapor_pressure", "Pa", Value::LogOnly, "Humidity.");
+    frame.add ("relative_humidity", Value::Fraction (), Value::LogOnly,
+                "Relative humidity.");
+    frame.add ("wind", "m/s", Value::LogOnly, "Wind speed.");
+    frame.add ("day_length", "h", Value::LogOnly,
+                "Number of light hours this day.");
+    frame.add ("day_cycle", Value::None (), Value::LogOnly,
+                "Fraction of daily radiation received this hour.");
+    IM::add_syntax (frame, Value::LogOnly, "deposit", IM::flux_unit (),
+                    "Total atmospheric deposition of nitrogen.");
+    }
 } WeatherBase_syntax;
 
 // weather_base.C ends here.

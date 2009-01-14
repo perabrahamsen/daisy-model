@@ -56,7 +56,6 @@ public:
 protected:
   WeatherOld (Block&);
 public:
-  static void load_syntax (Syntax&, AttributeList&);
   ~WeatherOld ();
 };
 

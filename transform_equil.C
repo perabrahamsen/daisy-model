@@ -36,6 +36,7 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 #include <memory>
 #include <sstream>
 
@@ -153,28 +154,24 @@ TransformEquilibrium::initialize (const Units& units, const Soil& soil,
   k_BA_expr->initialize (units, scope, msg); 
 }
 
-static struct TransformEquilibriumSyntax
+static struct TransformEquilibriumSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new TransformEquilibrium (al); }
+  Model* make (Block& al) const
+  { return new TransformEquilibrium (al); }
   TransformEquilibriumSyntax ()
+    : DeclareModel (Transform::component, "equilibrium", 
+	       "Two soil components reching for equilibrium.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    Transform::load_syntax (syntax, alist);
-
-    alist.add ("description", 
-	       "Two soil components reching for equilibrium.");
-    syntax.add_object ("equilibrium", Equilibrium::component,
+    frame.add_object ("equilibrium", Equilibrium::component,
                        "Function for calculating equilibrium between A and B.");
-    syntax.add_object ("k_AB", Number::component,
+    frame.add_object ("k_AB", Number::component,
                        Value::Const, Value::Singleton, "\
 Tranformation rate from soil component 'A' to 'B' [h^-1].");
-    syntax.add_object ("k_BA", Number::component,
+    frame.add_object ("k_BA", Number::component,
                        Value::OptionalConst, Value::Singleton, "\
 Tranformation rate from soil component 'B' to 'A' [h^-1].\n\
 By default, this is identical to 'k_AB'.");
-    Librarian::add_type (Transform::component, "equilibrium",
-			 alist, syntax, &make);
   }
 } TransformEquilibrium_syntax;

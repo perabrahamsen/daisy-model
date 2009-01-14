@@ -44,10 +44,6 @@ Transform::initialize (const Units&,
                        Treelog&)
 { }
 
-void
-Transform::load_syntax (Syntax&, AttributeList&)
-{ }
-
 Transform::Transform (Block&)
 { }
 

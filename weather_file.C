@@ -25,6 +25,7 @@
 #include "time.h"
 #include "log.h"
 #include "librarian.h"
+#include "frame.h"
 #include <fstream>
 
 struct WeatherFile : public WeatherOld
@@ -140,25 +141,24 @@ WeatherFile::tick (const Time& time, Treelog& out)
   Weather::tick_after (time, out);
 }
 
-static struct WeatherFileSyntax
+static struct WeatherFileSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-    { return *new WeatherFile (al); }
+  Model* make (Block& al) const
+    { return new WeatherFile (al); }
 
   WeatherFileSyntax ()
-    { 
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "Read weather data from a file.\n\
+    : DeclareModel (Weather::component, "file", "old", "\
+Read weather data from a file.\n\
 Each line should have the following whitespace separated fields:\n\
 year, month, day, global radiation [W/m^2], air temperature [dg C],\n\
 precipitation [mm/d], and reference evapotranspiration [mm/d].  The\n\
 last field is optional, it is only used if you select the 'weather'\n\
-model in the 'pet' component");
-      WeatherOld::load_syntax (syntax, alist);
-      syntax.add ("file", Syntax::String, Syntax::Const,
-		  "File to read weather data from.");
-      syntax.order ("file");
-      Librarian::add_type (Weather::component, "file", alist, syntax, &make);
-    }
+model in the 'pet' component")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    frame.add ("file", Syntax::String, Syntax::Const,
+                "File to read weather data from.");
+    frame.order ("file");
+  }
 } WeatherFile_syntax;

@@ -982,7 +982,7 @@ the simulation.  If unspecified, used global weather.");
     frame.add_object ("Vegetation", Vegetation::component,
                        Value::State, Value::Singleton,
                        "The crops on the field.");
-    frame.add ("Vegetation", Vegetation::default_model ());
+    frame.add ("Vegetation", "crops");
 
     frame.add_object ("Bioclimate", Bioclimate::component, 
                        Value::State, Value::Singleton,

@@ -991,7 +991,8 @@ solver${OBJ}: solver.C solver.h model.h symbol.h alist.h block.h syntax.h \
 element${OBJ}: element.C element.h model.h symbol.h alist.h block.h syntax.h \
   value.h plf.h mathlib.h assertion.h librarian.h frame.h scope.h
 ui${OBJ}: ui.C ui.h model.h symbol.h alist.h toplevel.h treelog_text.h \
-  treelog.h librarian.h block.h syntax.h value.h plf.h assertion.h
+  treelog.h librarian.h block.h syntax.h value.h plf.h assertion.h \
+  frame.h scope.h
 reaction${OBJ}: reaction.C reaction.h model.h symbol.h alist.h block.h \
   syntax.h value.h plf.h librarian.h
 scopesel${OBJ}: scopesel.C scopesel.h model.h symbol.h alist.h scope.h \
@@ -1046,7 +1047,8 @@ depth${OBJ}: depth.C depth.h model.h symbol.h alist.h block.h syntax.h \
   memutils.h number.h treelog.h units.h check.h vcheck.h assertion.h \
   librarian.h mathlib.h path.h frame.h scope.h
 wse${OBJ}: wse.C wse.h model.h symbol.h alist.h block.h syntax.h value.h \
-  plf.h program.h run.h mathlib.h assertion.h librarian.h treelog.h
+  plf.h program.h run.h mathlib.h assertion.h librarian.h treelog.h \
+  frame.h scope.h
 program${OBJ}: program.C program.h model.h symbol.h alist.h run.h block.h \
   syntax.h value.h plf.h librarian.h
 number${OBJ}: number.C number.h symbol.h model.h alist.h block.h syntax.h \
@@ -1137,7 +1139,8 @@ net_radiation${OBJ}: net_radiation.C net_radiation.h model.h symbol.h alist.h \
 svat${OBJ}: svat.C svat.h model.h symbol.h alist.h log.h time.h border.h \
   block.h syntax.h value.h plf.h librarian.h
 vegetation${OBJ}: vegetation.C vegetation.h model.h symbol.h alist.h log.h \
-  time.h border.h syntax.h value.h block.h plf.h librarian.h
+  time.h border.h frame.h syntax.h value.h scope.h block.h plf.h \
+  librarian.h
 toplevel${OBJ}: toplevel.C toplevel.h metalib.h symbol.h frame.h syntax.h \
   value.h scope.h daisy.h program.h model.h alist.h run.h time.h \
   timestep.h vcheck.h memutils.h ui.h library.h parser_file.h parser.h \
@@ -1229,7 +1232,7 @@ bioincorporation${OBJ}: bioincorporation.C bioincorporation.h alist.h \
   assertion.h
 weather_base${OBJ}: weather_base.C weather_base.h weather.h model.h symbol.h \
   alist.h im.h syntax.h value.h fao.h assertion.h time.h log.h border.h \
-  mathlib.h librarian.h block.h plf.h units.h
+  mathlib.h librarian.h block.h plf.h units.h frame.h scope.h
 volume_box${OBJ}: volume_box.C volume_box.h volume.h model.h symbol.h alist.h \
   syntax.h value.h bound.h border.h mathlib.h assertion.h librarian.h \
   treelog.h frame.h scope.h
@@ -1270,8 +1273,8 @@ select_value${OBJ}: select_value.C select_value.h select.h destination.h \
   symbol.h model.h alist.h units.h volume.h block.h syntax.h value.h \
   plf.h frame.h scope.h librarian.h mathlib.h assertion.h
 weather_old${OBJ}: weather_old.C weather_old.h weather_base.h weather.h \
-  model.h symbol.h alist.h im.h syntax.h value.h block.h plf.h fao.h \
-  time.h units.h treelog.h
+  model.h symbol.h alist.h im.h syntax.h value.h block.h plf.h frame.h \
+  scope.h librarian.h fao.h time.h units.h treelog.h
 log_extern${OBJ}: log_extern.C log_extern.h log_select.h log.h time.h \
   border.h model.h symbol.h alist.h memutils.h destination.h scope.h \
   value.h select.h units.h volume.h scope_block.h block.h syntax.h plf.h \
@@ -1533,7 +1536,7 @@ equil_langmuir${OBJ}: equil_langmuir.C equil.h model.h symbol.h alist.h \
 transform_equil${OBJ}: transform_equil.C transform.h model.h symbol.h alist.h \
   block.h syntax.h value.h plf.h soil.h soil_water.h equil.h scope_soil.h \
   scope.h number.h units.h check.h mathlib.h assertion.h librarian.h \
-  treelog.h
+  treelog.h frame.h
 reaction_nit${OBJ}: reaction_nit.C reaction.h model.h symbol.h alist.h \
   geometry.h value.h soil.h soil_water.h soil_heat.h chemistry.h \
   chemical.h organic_matter.h log.h time.h border.h assertion.h \
@@ -1831,7 +1834,7 @@ vegetation_permanent${OBJ}: vegetation_permanent.C vegetation.h model.h \
   symbol.h alist.h plf.h mathlib.h assertion.h log.h time.h border.h \
   litter.h root_system.h rootdens.h ABAprod.h canopy_simple.h geometry.h \
   value.h soil.h crop.h am.h im.h syntax.h aom.h om.h organic_matter.h \
-  submodeler.h block.h check.h librarian.h
+  submodeler.h block.h check.h librarian.h frame.h scope.h
 vegetation_crops${OBJ}: vegetation_crops.C vegetation.h model.h symbol.h \
   alist.h crop.h time.h organic_matter.h geometry.h value.h soil.h plf.h \
   mathlib.h assertion.h harvest.h block.h syntax.h log.h border.h \
@@ -1872,7 +1875,7 @@ action_message${OBJ}: action_message.C action.h model.h symbol.h alist.h \
 weather_std${OBJ}: weather_std.C weather_base.h weather.h model.h symbol.h \
   alist.h im.h syntax.h value.h chemical.h fao.h lexer_data.h lexer.h \
   time.h plf.h mathlib.h assertion.h units.h submodeler.h block.h check.h \
-  vcheck.h memutils.h librarian.h path.h treelog.h
+  vcheck.h memutils.h librarian.h path.h treelog.h frame.h scope.h
 groundwater_pipe${OBJ}: groundwater_pipe.C groundwater.h model.h symbol.h \
   alist.h block.h syntax.h value.h plf.h log.h time.h border.h geometry.h \
   soil.h soil_heat.h soil_water.h depth.h treelog.h mathlib.h assertion.h \
@@ -1926,7 +1929,7 @@ column_std${OBJ}: column_std.C column.h model.h symbol.h alist.h library.h \
   scope.h scopesel.h units.h treelog.h librarian.h assertion.h frame.h
 weather_simple${OBJ}: weather_simple.C weather_old.h weather_base.h weather.h \
   model.h symbol.h alist.h im.h syntax.h value.h block.h plf.h time.h \
-  log.h border.h mathlib.h assertion.h librarian.h
+  log.h border.h mathlib.h assertion.h librarian.h frame.h scope.h
 uzrichard${OBJ}: uzrichard.C uzmodel.h model.h symbol.h alist.h block.h \
   syntax.h value.h plf.h groundwater.h surface.h geometry_vert.h \
   geometry.h soil.h soil_heat.h mathlib.h assertion.h frame.h scope.h \
@@ -1990,7 +1993,7 @@ action_lisp${OBJ}: action_lisp.C action.h model.h symbol.h alist.h daisy.h \
   frame.h scope.h condition.h
 weather_none${OBJ}: weather_none.C weather_old.h weather_base.h weather.h \
   model.h symbol.h alist.h im.h syntax.h value.h block.h plf.h \
-  librarian.h
+  librarian.h frame.h scope.h
 action_tillage${OBJ}: action_tillage.C action.h model.h symbol.h alist.h \
   block.h syntax.h value.h plf.h daisy.h program.h run.h time.h \
   timestep.h vcheck.h memutils.h field.h border.h check.h librarian.h \
@@ -2030,9 +2033,11 @@ uzlr${OBJ}: uzlr.C uzmodel.h model.h symbol.h alist.h block.h syntax.h \
 adsorption_vS_S${OBJ}: adsorption_vS_S.C adsorption.h model.h symbol.h \
   alist.h syntax.h value.h soil.h mathlib.h assertion.h librarian.h
 tortuosity_M_Q${OBJ}: tortuosity_M_Q.C tortuosity.h model.h symbol.h alist.h \
-  syntax.h value.h hydraulic.h mathlib.h assertion.h librarian.h
+  syntax.h value.h hydraulic.h mathlib.h assertion.h librarian.h frame.h \
+  scope.h
 tortuosity_linear${OBJ}: tortuosity_linear.C tortuosity.h model.h symbol.h \
-  alist.h block.h syntax.h value.h plf.h hydraulic.h librarian.h
+  alist.h block.h syntax.h value.h plf.h hydraulic.h librarian.h frame.h \
+  scope.h
 adsorption_freundlich${OBJ}: adsorption_freundlich.C adsorption.h model.h \
   symbol.h alist.h block.h syntax.h value.h plf.h soil.h check.h \
   mathlib.h assertion.h librarian.h treelog.h frame.h scope.h
@@ -2061,7 +2066,7 @@ log_checkpoint${OBJ}: log_checkpoint.C log_alist.h log.h time.h border.h \
   block.h plf.h condition.h daisy.h program.h run.h timestep.h vcheck.h \
   memutils.h printer_file.h printer.h assertion.h librarian.h library.h
 uznone${OBJ}: uznone.C uzmodel.h model.h symbol.h alist.h syntax.h value.h \
-  soil.h mathlib.h assertion.h librarian.h
+  soil.h mathlib.h assertion.h librarian.h frame.h scope.h
 condition_daisy${OBJ}: condition_daisy.C condition.h model.h symbol.h alist.h \
   syntax.h value.h daisy.h program.h run.h time.h timestep.h vcheck.h \
   memutils.h librarian.h

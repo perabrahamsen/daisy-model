@@ -86,7 +86,7 @@
 		   (description "\
 Total amount of water entering the system as rain and snow.")
                    (path weather "*" precipitation)
-                   (spec weather common precipitation)
+                   (spec weather base precipitation)
                    (handle sum)
                    (dimension "mm/&"))
            (number (tag "Irrigation")

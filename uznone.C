@@ -27,6 +27,7 @@
 #include "soil.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "frame.h"
 
 class UZNone : public UZmodel
 {
@@ -68,18 +69,17 @@ public:
 };
 
 // Add the UZNone syntax to the syntax table.
-static struct UZNoneSyntax
+static struct UZNoneSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
+  Model* make (Block& al) const
     {
-      return *new UZNone (al);
+      return new UZNone (al);
     }
 
   UZNoneSyntax ()
+    : DeclareModel (UZmodel::component, "none", "No water movement, and no sink.")
+  { }
+  void load_frame (Frame& frame) const
     {
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "No water movement, and no sink.");
-      Librarian::add_type (UZmodel::component, "none", alist, syntax, &make);
     }
 } UZNone_syntax;

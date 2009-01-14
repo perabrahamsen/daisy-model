@@ -58,7 +58,6 @@ public:
   virtual void initialize (const Units&,
                            const Soil&, const SoilWater&, const SoilHeat&,
                            Treelog&);
-  static void load_syntax (Syntax&, AttributeList&);
 protected:
   explicit Transform (Block&);
 public:

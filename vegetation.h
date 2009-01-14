@@ -171,8 +171,6 @@ public:
                            const Soil& soil, OrganicMatter&,
                            Treelog&) = 0;
   virtual bool check (const Units&, Treelog& msg) const = 0;
-  static const AttributeList& default_model ();
-  static void load_base (Syntax&, AttributeList&);
   explicit Vegetation (Block&);
   ~Vegetation ();
 };

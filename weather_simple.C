@@ -27,6 +27,7 @@
 #include "log.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "frame.h"
 
 class WeatherSimple : public WeatherOld
 {
@@ -150,29 +151,27 @@ WeatherSimple::~WeatherSimple ()
 { }
 
 // Add the WeatherSimple syntax to the syntax table.
-static struct WeatherSimpleSyntax
+static struct WeatherSimpleSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
+  Model* make (Block& al) const
     {
-      return *new WeatherSimple (al);
+      return new WeatherSimple (al);
     }
 
   WeatherSimpleSyntax ()
+    : DeclareModel (Weather::component, "simple", "old", "\
+A weather model with precipitation at regular intervals.")
+  { }
+  void load_frame (Frame& frame) const
     { 
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "\
-A weather model with precipitation at regular intervals.");
-      WeatherOld::load_syntax (syntax, alist);
-      syntax.add ("precipitation_value", "mm/h", Value::Const,
+      frame.add ("precipitation_value", "mm/h", Value::Const,
 		  "Amount of precipitation.");
-      alist.add ("precipitation_value", 0.0);
-      syntax.add ("interval", Value::Integer, Value::Const,
+      frame.add ("precipitation_value", 0.0);
+      frame.add ("interval", Value::Integer, Value::Const,
 		  "Number of hours between each precipitation event.");
-      alist.add ("interval", 1);
-      syntax.add ("reference_evapotranspiration_value", "mm/h", Value::Const,
+      frame.add ("interval", 1);
+      frame.add ("reference_evapotranspiration_value", "mm/h", Value::Const,
 		  "Constant reference evapotranspiration.");
-      alist.add ("reference_evapotranspiration_value", -1.0);
-      Librarian::add_type (Weather::component, "simple", alist, syntax, &make);
+      frame.add ("reference_evapotranspiration_value", -1.0);
     }
 } WeatherSimple_syntax;

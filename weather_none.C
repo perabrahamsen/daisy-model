@@ -25,6 +25,7 @@
 #include "block.h"
 #include "alist.h"
 #include "librarian.h"
+#include "frame.h"
 
 class WeatherNone : public WeatherOld
 {
@@ -78,38 +79,37 @@ WeatherNone::~WeatherNone ()
 { }
 
 // Add the WeatherNone syntax to the syntax table.
-static struct WeatherNoneSyntax
+static struct WeatherNoneSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new WeatherNone (al); }
+  Model* make (Block& al) const
+  { return new WeatherNone (al); }
   WeatherNoneSyntax ()
+    : DeclareModel (Weather::component, "none", "old",
+                    "Weather that does not change during the simulation.")
+  { }
+  void load_frame (Frame& frame) const
   { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", 
-	       "Weather that does not change during the simulation.");
-
+#ifdef FRAME_LINK
     // We need to define 'air_temperature' and 'global_radiation'
     // before calling WeatherOld::load_syntax, as the later will
     // otherwise define log variables with the same name.  For the
     // same reason, they need to be Value::State instead of
     // Value::Const, as WeatherOld::output will try to log them.
-    syntax.add ("air_temperature", "dg C", Value::State,
+    frame.add ("air_temperature", "dg C", Value::State,
 		"Constant air temperature");
-    alist.add ("air_temperature", 0.0);
-    syntax.add ("global_radiation", "W/m^2", Value::State,
+    frame.add ("air_temperature", 0.0);
+    frame.add ("global_radiation", "W/m^2", Value::State,
 		"Constant global radiation.");
-    alist.add ("global_radiation", 0.0);
-    WeatherOld::load_syntax (syntax, alist);
+    frame.add ("global_radiation", 0.0);
+#endif
     // These must be Value::State because they are logged in
     // Weather::output.  Otherwise, we get an error at checkpoins.
-    syntax.add ("reference_evapotranspiration_value", "mm/h", Value::Const,
+    frame.add ("reference_evapotranspiration_value", "mm/h", Value::Const,
 		"Constant reference evapotranspiration.");
-    alist.add ("reference_evapotranspiration_value", 0.0);
-    syntax.add ("rain_value", "mm/h", Value::Const, "Constant rain.");
-    alist.add ("rain_value", 0.0);
-    syntax.add ("snow_value", "mm/h", Value::Const, "Constant snow.");
-    alist.add ("snow_value", 0.0);
-    Librarian::add_type (Weather::component, "none", alist, syntax, make);
+    frame.add ("reference_evapotranspiration_value", 0.0);
+    frame.add ("rain_value", "mm/h", Value::Const, "Constant rain.");
+    frame.add ("rain_value", 0.0);
+    frame.add ("snow_value", "mm/h", Value::Const, "Constant snow.");
+    frame.add ("snow_value", 0.0);
   }
 } WeatherNone_syntax;

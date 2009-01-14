@@ -37,6 +37,7 @@
 #include "submodeler.h"
 #include "check.h"
 #include "librarian.h"
+#include "frame.h"
 #include <sstream>
 #include <deque>
 
@@ -409,62 +410,59 @@ VegetationPermanent::VegetationPermanent (Block& al)
 VegetationPermanent::~VegetationPermanent ()
 { }
 
-static struct
-VegetationPermanentSyntax
+static struct VegetationPermanentSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new VegetationPermanent (al); }
+  Model* make (Block& al) const
+  { return new VegetationPermanent (al); }
 
   VegetationPermanentSyntax ()
+    : DeclareModel (Vegetation::component, "permanent", "\
+Permanent (non-crop) vegetation.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    Vegetation::load_base (syntax, alist);
-    alist.add ("description", "Permanent (non-crop) vegetation.");
-    syntax.add ("LAIvsDAY", "m^2/m^2", "yday", Check::non_negative (),
+    frame.add ("LAIvsDAY", "m^2/m^2", "yday", Check::non_negative (),
                 Value::Const, 
 		"LAI as a function of Julian day.\n\
 These numbers are used when there are no yearly numbers (YearlyLAI).");
-    syntax.add_submodule_sequence("YearlyLAI", Value::Const, "\
+    frame.add_submodule_sequence("YearlyLAI", Value::Const, "\
 Yearly LAI measurements.", VegetationPermanent::YearlyLAI::load_syntax);
-    alist.add ("YearlyLAI", std::vector<const AttributeList*> ());
+    frame.add ("YearlyLAI", std::vector<const AttributeList*> ());
 
 
-    syntax.add_submodule("Canopy", alist, Value::State, "Canopy.",
+    frame.add_submodule("Canopy", Value::State, "Canopy.",
 			 CanopySimple::load_syntax);
-    syntax.add ("Height", "cm", Check::positive (), Value::Const, 
+    frame.add ("Height", "cm", Check::positive (), Value::Const, 
 		"permanent height of vegetation.");
-    alist.add ("Height", 80.0);
-    syntax.add ("N_per_LAI", "kg N/ha/LAI", Check::positive (), Value::Const,
+    frame.add ("Height", 80.0);
+    frame.add ("N_per_LAI", "kg N/ha/LAI", Check::positive (), Value::Const,
 		"N content as function of LAI.");
-    alist.add ("N_per_LAI", 10.0);
-    syntax.add ("DM_per_LAI", "Mg DM/ha/LAI", Check::positive (), 
+    frame.add ("N_per_LAI", 10.0);
+    frame.add ("DM_per_LAI", "Mg DM/ha/LAI", Check::positive (), 
                 Value::Const,
 		"DM as function of LAI.");
-    alist.add ("DM_per_LAI", 0.5);
-    syntax.add ("N_demand", "g N/m^2", Value::LogOnly,
+    frame.add ("DM_per_LAI", 0.5);
+    frame.add ("N_demand", "g N/m^2", Value::LogOnly,
 		"Current potential N content.");
-    syntax.add ("N_actual", "g N/m^2", Value::OptionalState,
+    frame.add ("N_actual", "g N/m^2", Value::OptionalState,
 		"N uptake until now (default: 'N_demand').");
-    syntax.add ("N_uptake", "g N/m^2/h", Value::LogOnly,
+    frame.add ("N_uptake", "g N/m^2/h", Value::LogOnly,
 		"Nitrogen uptake this hour.");
-    syntax.add ("N_litter", "g N/m^2/h", Value::LogOnly,
+    frame.add ("N_litter", "g N/m^2/h", Value::LogOnly,
 		"Nitrogen in litter this hour.");
-    syntax.add_submodule_sequence ("litter_am", Value::Const,
+    frame.add_submodule_sequence ("litter_am", Value::Const,
 				   "Litter AOM parameters.", AOM::load_syntax);
-    syntax.add_check ("litter_am", AM::check_om_pools ());
-    alist.add ("litter_am", AM::default_AM ());
-    syntax.add_submodule("Root", alist, Value::State, "Root system.",
+    frame.add_check ("litter_am", AM::check_om_pools ());
+    frame.add ("litter_am", AM::default_AM ());
+    frame.add_submodule("Root", Value::State, "Root system.",
 			 RootSystem::load_syntax);
-    syntax.add ("root_DM", "Mg DM/ha", Check::positive (), Value::Const, 
+    frame.add ("root_DM", "Mg DM/ha", Check::positive (), Value::Const, 
 		"Permanent root drymatter.");
-    alist.add ("root_DM", 2.0);
-    syntax.add ("Albedo", Value::None (), Check::positive (), Value::Const, 
+    frame.add ("root_DM", 2.0);
+    frame.add ("Albedo", Value::None (), Check::positive (), Value::Const, 
 		"Reflection factor.");
-    alist.add ("Albedo", 0.2);
-    syntax.add_submodule("Litter", alist, Value::State, "Dead stuff.",
+    frame.add ("Albedo", 0.2);
+    frame.add_submodule("Litter", Value::State, "Dead stuff.",
 			 Litter::load_syntax);
-    
-    Librarian::add_type (Vegetation::component, "permanent", alist, syntax, &make);
   }
 } VegetationPermanent_syntax;

@@ -26,6 +26,7 @@
 #include "log.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "frame.h"
 #include <fstream>
 
 struct WeatherHourly : public WeatherOld
@@ -181,23 +182,22 @@ WeatherHourly::tick (const Time& time, Treelog& out)
   Weather::tick_after (time, out);
 }
 
-static struct WeatherHourlySyntax
+static struct WeatherHourlySyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-    { return *new WeatherHourly (al); }
+  Model* make (Block& al) const
+    { return new WeatherHourly (al); }
 
   WeatherHourlySyntax ()
-    { 
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "Read weather data from a file.\n\
+    : DeclareModel (Weather::component, "hourly", "old", "\
+Read weather data from a file.\n\
 Each line should have the following whitespace separated fields:\n\
 year, month, day, hour, global radiation [W/m^2], air temperature [dg C],\n\
-precipitation [mm/h], cloudiness [0-1] and vapor pressure [Pa].");
-      WeatherOld::load_syntax (syntax, alist);
-      syntax.add ("file", Syntax::String, Syntax::Const,
+precipitation [mm/h], cloudiness [0-1] and vapor pressure [Pa].")
+  { }
+  void load_frame (Frame& frame) const
+    { 
+      frame.add ("file", Syntax::String, Syntax::Const,
 		  "File to read weather data from.");
-      syntax.order ("file");
-      Librarian::add_type (Weather::component, "hourly", alist, syntax, &make);
+      frame.order ("file");
     }
 } WeatherHourly_syntax;

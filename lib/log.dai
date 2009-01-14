@@ -2177,8 +2177,8 @@ sum of all chemicals will be logged."
   (when hourly)
   (entries ;; Year Month MDay Hour
            (number (tag T_air)
-                   (path weather common air_temperature)
-                   (spec weather common air_temperature)
+                   (path weather base air_temperature)
+                   (spec weather base air_temperature)
                    (dimension "${T_unit}")
                    (handle current))
            (number (tag T_soil)
@@ -2207,9 +2207,9 @@ sum of all chemicals will be logged."
                    (dimension "${T_unit}")
                    (handle current))
            (number (tag gs)
-                   (path column "${column}" Vegetation common 
+                   (path column "${column}" Vegetation component 
                          stomata_conductance)
-                   (spec vegetation common stomata_conductance)
+                   (spec vegetation component stomata_conductance)
                    (dimension "${g_unit}")
                    (handle current))
            (number (path column "${column}" Bioclimate "*" svat SSOC g_a)
@@ -3306,7 +3306,7 @@ contains no water."
 		   (description "\
 Amount of water entering the system as rain and snow.")
                    (path weather "*" precipitation)
-                   (spec weather common precipitation)
+                   (spec weather base precipitation)
                    (handle sum)
                    (dimension "mm/&"))
            (number (tag "Overhead irrigation")
