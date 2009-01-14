@@ -174,8 +174,7 @@ class Declare : private boost::noncopyable
 {
 public:
   const symbol component;
-protected:
-  const symbol super;
+  const symbol name;
   const symbol description;
 
 public:

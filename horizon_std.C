@@ -30,6 +30,7 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 
 struct HorizonStandard : public Horizon
 {
@@ -114,10 +115,10 @@ HorizonStandard::HorizonStandard (Block& al)
 HorizonStandard::~HorizonStandard ()
 { }
 
-static struct HorizonStandardSyntax
+static struct HorizonStandardSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new HorizonStandard (al); }
+  Model* make (Block& al) const
+  { return new HorizonStandard (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)
   {
@@ -178,37 +179,35 @@ distinguish between fine and coarse sand?");
     return ok;
   }
   HorizonStandardSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    Horizon::load_syntax (syntax, alist);
-    syntax.add_check (check_alist);
-    alist.add ("description",
+    : DeclareModel (Horizon::component, "default",
                "USDA/FAO texture classification.\n\
 \n\
 The soil consitutents are automatically normalized.\n\
 \n\
-OBSOLETE: Use the USDA or FAO model instead.");
-    syntax.add ("clay", Value::None (), Check::non_negative (), Value::Const,
+OBSOLETE: Use the USDA or FAO model instead.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    frame.add_check (check_alist);
+    frame.add ("clay", Value::None (), Check::non_negative (), Value::Const,
                 "Relative fraction of clay in soil.");
-    syntax.add ("silt", Value::None (), Check::non_negative (), Value::Const,
+    frame.add ("silt", Value::None (), Check::non_negative (), Value::Const,
                 "Relative fraction of silt in soil.");
-    syntax.add ("fine_sand", Value::None (), Check::non_negative (), 
+    frame.add ("fine_sand", Value::None (), Check::non_negative (), 
                 Value::OptionalConst,
                 "Relative fraction of fine sand in soil.\n\
 NOTE: Not a real texture class, use 'sand' instead.");
-    syntax.add ("coarse_sand", Value::None (), Check::non_negative (), 
+    frame.add ("coarse_sand", Value::None (), Check::non_negative (), 
                 Value::OptionalConst,
                 "Relative fraction of coarse sand in soil.\n\
 NOTE: Not a real texture class, use 'sand' instead.");
-    syntax.add ("sand", Value::None (), Check::non_negative (), 
+    frame.add ("sand", Value::None (), Check::non_negative (), 
                 Value::OptionalConst,
                 "Relative fraction of sand in soil.");
-    syntax.add ("humus", Value::None (), Check::non_negative (), 
+    frame.add ("humus", Value::None (), Check::non_negative (), 
                 Value::Const,
                 "Relative fraction of humus in soil.");
 
-    Librarian::add_type (Horizon::component, "default", alist, syntax, &make);
   }
 } HorizonStandard_syntax;
 

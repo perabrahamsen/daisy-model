@@ -572,7 +572,7 @@ EXECUTABLES = daisy${EXE} tkdaisy${EXE} cdaisy${EXE} gdaisy${EXE}
 
 # Select files to be removed by the next svn update.
 #
-REMOVE = declare.C declare.h
+REMOVE = none
 
 REMOVED = msoltranrect_2x1.C msoltranrect_forward.C\
 	select_soil.C adsorption_none.C adsorption_full.C ABAprod_expr.C \
@@ -1098,9 +1098,10 @@ action${OBJ}: action.C action.h model.h symbol.h alist.h block.h syntax.h \
 condition${OBJ}: condition.C condition.h model.h symbol.h alist.h block.h \
   syntax.h value.h plf.h librarian.h
 horizon${OBJ}: horizon.C horizon.h model.h symbol.h alist.h library.h block.h \
-  syntax.h value.h plf.h horheat.h hydraulic.h mathlib.h assertion.h \
-  tortuosity.h texture.h nitrification.h log.h time.h border.h \
-  check_range.h check.h vcheck.h librarian.h secondary.h treelog.h
+  syntax.h value.h plf.h frame.h scope.h horheat.h hydraulic.h mathlib.h \
+  assertion.h tortuosity.h texture.h nitrification.h log.h time.h \
+  border.h check_range.h check.h vcheck.h librarian.h secondary.h \
+  treelog.h
 uzmodel${OBJ}: uzmodel.C uzmodel.h model.h symbol.h alist.h block.h syntax.h \
   value.h plf.h librarian.h
 hydraulic${OBJ}: hydraulic.C hydraulic.h model.h symbol.h alist.h syntax.h \
@@ -1478,12 +1479,13 @@ groundwater_aquitard${OBJ}: groundwater_aquitard.C groundwater.h model.h \
   treelog.h frame.h scope.h
 heatrect_Mollerup${OBJ}: heatrect_Mollerup.C heatrect.h model.h symbol.h \
   alist.h solver.h geometry_rect.h geometry_vert.h geometry.h value.h \
-  plf.h syntax.h block.h librarian.h assertion.h treelog.h
+  plf.h syntax.h block.h librarian.h assertion.h treelog.h frame.h \
+  scope.h
 heatrect_linear${OBJ}: heatrect_linear.C heatrect.h model.h symbol.h alist.h \
   geometry_rect.h geometry_vert.h geometry.h value.h plf.h syntax.h \
-  librarian.h
+  librarian.h frame.h scope.h
 heatrect_none${OBJ}: heatrect_none.C heatrect.h model.h symbol.h alist.h \
-  syntax.h value.h librarian.h
+  syntax.h value.h librarian.h frame.h scope.h
 transport_convection${OBJ}: transport_convection.C transport.h model.h \
   symbol.h alist.h geometry.h value.h soil.h adsorption.h submodeler.h \
   block.h syntax.h plf.h memutils.h librarian.h log.h time.h border.h \
@@ -1756,10 +1758,10 @@ domsorp_std${OBJ}: domsorp_std.C domsorp.h model.h symbol.h alist.h block.h \
   border.h assertion.h librarian.h treelog.h frame.h scope.h
 horizon_numeric${OBJ}: horizon_numeric.C horizon.h model.h symbol.h alist.h \
   block.h syntax.h value.h plf.h texture.h hydraulic.h check.h vcheck.h \
-  mathlib.h assertion.h librarian.h treelog.h
+  mathlib.h assertion.h librarian.h treelog.h frame.h scope.h
 horizon_system${OBJ}: horizon_system.C horizon.h model.h symbol.h alist.h \
-  library.h block.h syntax.h value.h plf.h texture.h hydraulic.h check.h \
-  mathlib.h assertion.h librarian.h treelog.h
+  library.h block.h syntax.h value.h plf.h frame.h scope.h texture.h \
+  hydraulic.h check.h mathlib.h assertion.h librarian.h treelog.h
 select_pF${OBJ}: select_pF.C select.h destination.h symbol.h model.h alist.h \
   units.h volume.h block.h syntax.h value.h plf.h mathlib.h assertion.h \
   check.h vcheck.h treelog.h librarian.h frame.h scope.h
@@ -1939,7 +1941,7 @@ groundwater_static${OBJ}: groundwater_static.C groundwater.h model.h symbol.h \
   treelog.h frame.h scope.h
 horizon_std${OBJ}: horizon_std.C horizon.h model.h symbol.h alist.h block.h \
   syntax.h value.h plf.h texture.h hydraulic.h check.h mathlib.h \
-  assertion.h librarian.h treelog.h
+  assertion.h librarian.h treelog.h frame.h scope.h
 crop_std${OBJ}: crop_std.C crop.h model.h symbol.h alist.h time.h chemistry.h \
   seed.h root_system.h rootdens.h ABAprod.h plf.h canopy_std.h \
   canopy_simple.h harvesting.h production.h phenology.h partition.h \
@@ -1957,9 +1959,10 @@ action_stop${OBJ}: action_stop.C action.h model.h symbol.h alist.h syntax.h \
 condition_time${OBJ}: condition_time.C condition.h model.h symbol.h alist.h \
   block.h syntax.h value.h plf.h time.h daisy.h program.h run.h \
   timestep.h vcheck.h memutils.h librarian.h log.h border.h submodeler.h \
-  treelog.h
+  treelog.h frame.h scope.h
 condition_logic${OBJ}: condition_logic.C condition.h model.h symbol.h alist.h \
-  log.h time.h border.h syntax.h value.h memutils.h librarian.h
+  log.h time.h border.h frame.h syntax.h value.h scope.h memutils.h \
+  librarian.h
 action_irrigate${OBJ}: action_irrigate.C action.h model.h symbol.h alist.h \
   scope.h value.h block.h syntax.h plf.h daisy.h program.h run.h time.h \
   timestep.h vcheck.h memutils.h chemical.h number.h units.h field.h \
@@ -1984,12 +1987,12 @@ crop_old${OBJ}: crop_old.C crop.h model.h symbol.h alist.h time.h log.h \
   border.h bioclimate.h plf.h soil_water.h soil.h geometry.h value.h \
   aom.h om.h organic_matter.h soil_heat.h chemistry.h chemical.h am.h \
   im.h syntax.h harvest.h block.h mathlib.h assertion.h treelog.h \
-  librarian.h
+  librarian.h frame.h scope.h
 crop_sold${OBJ}: crop_sold.C crop.h model.h symbol.h alist.h time.h log.h \
   border.h bioclimate.h plf.h soil_water.h soil.h geometry.h value.h \
   organic_matter.h aom.h om.h soil_heat.h chemistry.h chemical.h am.h \
   im.h syntax.h harvest.h block.h mathlib.h assertion.h librarian.h \
-  treelog.h
+  treelog.h frame.h scope.h
 action_with${OBJ}: action_with.C action.h model.h symbol.h alist.h block.h \
   syntax.h value.h plf.h daisy.h program.h run.h time.h timestep.h \
   vcheck.h memutils.h frame.h scope.h field.h border.h log.h librarian.h \
@@ -2033,8 +2036,9 @@ condition_crop${OBJ}: condition_crop.C condition.h model.h symbol.h alist.h \
   program.h run.h timestep.h vcheck.h memutils.h check_range.h check.h \
   mathlib.h assertion.h librarian.h frame.h scope.h
 condition_soil${OBJ}: condition_soil.C condition.h model.h symbol.h alist.h \
-  block.h syntax.h value.h plf.h field.h border.h daisy.h program.h run.h \
-  time.h timestep.h vcheck.h memutils.h check.h librarian.h treelog.h
+  block.h syntax.h value.h plf.h frame.h scope.h field.h border.h daisy.h \
+  program.h run.h time.h timestep.h vcheck.h memutils.h check.h \
+  librarian.h treelog.h
 log_checkpoint${OBJ}: log_checkpoint.C log_alist.h log.h time.h border.h \
   model.h symbol.h alist.h metalib.h frame.h syntax.h value.h scope.h \
   block.h plf.h condition.h daisy.h program.h run.h timestep.h vcheck.h \

@@ -24,8 +24,7 @@
 #include "horizon.h"
 #include "library.h"
 #include "block.h"
-#include "alist.h"
-#include "syntax.h"
+#include "frame.h"
 #include "plf.h"
 #include "horheat.h"
 #include "hydraulic.h"
@@ -236,24 +235,6 @@ Horizon::append_attributes (std::vector<symbol>& all) const
     all.push_back ((*i).first);
 }
 
-bool
-Horizon::check_alist (const AttributeList& al, Treelog& err)
-{
-  bool ok = true;
-
-  daisy_assert (al.check ("hydraulic"));
-  const AttributeList& hydraulic = al.alist ("hydraulic");
-  if (hydraulic.name ("type") == "hypres"
-      && !al.check ("dry_bulk_density"))
-    {
-      err.entry ("You must specify 'dry_bulk_density' when using the 'hypres' \
-hydraulic model");
-      ok = false;
-    }
-
-  return ok;
-}
-
 void 
 Horizon::nitrification (const double M, const double C, 
                         const double h, const double T,
@@ -294,100 +275,6 @@ static const class SOM_fractions_check_type : public VCheck
   };
 } SOM_fractions_check;
 
-void
-Horizon::load_syntax (Syntax& syntax, AttributeList& alist)
-{
-  alist.add ("base_model", "common");
-  syntax.add_check (check_alist);
-  syntax.add ("description", Value::String, Value::OptionalConst, 
-              "Description of this soil type.");
-  alist.add ("description", "\
-This is not a model, but a list of parameters shared by all horizon models.");
-  syntax.add_object ("hydraulic", Hydraulic::component, 
-                     "The hydraulic propeties of the soil.");
-  AttributeList hydraulic_alist;
-  hydraulic_alist.add ("type", "hypres");
-  alist.add ("hydraulic", hydraulic_alist);
-  syntax.add_object ("tortuosity", Tortuosity::component, 
-                     "The soil tortuosity.");
-  AttributeList tortuosity;
-  tortuosity.add ("type", "M_Q");
-  alist.add ("tortuosity", tortuosity);
-  syntax.add ("anisotropy", Value::None (),
-	      Check::non_negative (), Value::Const, "\
-Horizontal saturated water conductivity relative to vertical saturated\n\
-water conductivity.  The higher this value, the faster the water will\n\
-move towards drain pipes.");
-  alist.add ("anisotropy", 1.0);
-  syntax.add ("dry_bulk_density", "g/cm^3", Value::OptionalConst,
-	      "The soils dry bulk density.\n\
-By default, this is calculated from the soil constituents.");
-  syntax.add ("SOM_C_per_N", "g C/g N", Check::non_negative (), 
-	      Value::Const, Value::Sequence,
-	      "C/N ratio for each SOM pool in this soil.\n\
-If 'C_per_N' is specified, this is used as a goal only.  If 'C_per_N' is\n\
-unspecified, the SOM pools will be initialized with this value.");
-  std::vector<double> SOM_C_per_N;
-  SOM_C_per_N.push_back (11.0);
-  SOM_C_per_N.push_back (11.0);
-  SOM_C_per_N.push_back (11.0);
-  alist.add ("SOM_C_per_N", SOM_C_per_N);
-  syntax.add ("C_per_N", "g C/g N", Check::positive (), Value::OptionalConst,
-	      "Total C/N ratio for this horizon.\n\
-This is the combined initial C/N ratio for all organic matter pools in the\n\
-horizon.  The C/N ration of the AOM and SMB pools is assumed to be known,\n\
-given that this number is used to find the common C/N ration for the SOM\n\
-pools.  The C/N ration for the SOM pools will then gradually move towards\n\
-the values specified by 'SOM_C_per_N'.\n\
-By default, the values given by 'SOM_C_per_N' will be used for\n\
-initialization.");
-  syntax.add_check ("SOM_C_per_N", VCheck::min_size_1 ());
-  
-  static const BelowOrEqual max_1 (1.0);
-  syntax.add ("SOM_fractions",  Value::None (), max_1,
-              Value::OptionalConst, Value::Sequence, "\
-Fraction of humus in each SOM pool, from slowest to fastest.\n\
-Negative numbers mean unspecified, let Daisy find appropriate values.");
-  syntax.add_check ("SOM_fractions", SOM_fractions_check);
-
-  syntax.add ("turnover_factor", Value::None (), Check::non_negative (),
-	      Value::Const, "\
-Factor multiplied to the turnover rate for all organic matter pools in\n\
-this horizon.");
-  alist.add ("turnover_factor", 1.0);
-  syntax.add_object ("Nitrification", Nitrification::component,
-                     "The soil nitrification process.");
-  AttributeList nitrification_alist;
-  nitrification_alist.add ("type", "soil");
-  nitrification_alist.add ("k_10", 2.08333333333e-7); // 5e-6/24 [1/h]
-  nitrification_alist.add ("k", 5.0e-5); // [g N/cm^3]
-  nitrification_alist.add ("heat_factor", PLF::empty ());
-  nitrification_alist.add ("water_factor", PLF::empty ());
-  nitrification_alist.add ("N2O_fraction", 0.02);
-
-  alist.add ("Nitrification", nitrification_alist);
-  
-  syntax.add_object ("secondary_domain", Secondary::component,
-                     "Secondary matrix domain for solute movement.");
-  alist.add ("secondary_domain", Secondary::none_model ());
-
-
-  syntax.add_submodule ("HorHeat", alist, Value::State, 
-                        "Heat capacity and conductivity.",
-                        HorHeat::load_syntax);
-
-  Syntax& attSyntax = *new Syntax ();
-  attSyntax.add ("key", Value::String, Value::Const,
-		 "Name of attribute.");
-  attSyntax.add ("value", Value::User (), Value::Const,
-		 "Value of attribute.");
-  attSyntax.order ("key", "value");
-  syntax.add ("attributes", attSyntax, Value::OptionalConst, Value::Sequence,
-	      "List of additional attributes for this horizon.\n\
-Intended for use with pedotransfer functions.");
-  alist.add ("attributes", std::vector<const AttributeList*> ());
-}
-
 Horizon::Horizon (Block& al)
   : ModelLogable (al.name ("type")),
     impl (new Implementation (al)),
@@ -424,18 +311,6 @@ Horizon::library_id () const
   return id;
 }
 
-static struct HorizonSyntax
-{
-  HorizonSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    Horizon::load_syntax (syntax, alist);
-
-    Librarian::add_base (Horizon::component, alist, syntax);
-  }
-} Horizon_syntax;
-
 static struct HorizonInit : public DeclareComponent 
 {
   HorizonInit ()
@@ -444,6 +319,113 @@ A `horizon' is a soil type with specific physical properties.  It is\n\
 the responsibility of the `horizon' component to specify these\n\
 properties.")
   { }
+  static bool check_alist (const AttributeList& al, Treelog& err)
+  {
+    bool ok = true;
+
+    daisy_assert (al.check ("hydraulic"));
+    const AttributeList& hydraulic = al.alist ("hydraulic");
+    if (hydraulic.name ("type") == "hypres"
+        && !al.check ("dry_bulk_density"))
+      {
+        err.entry ("\
+You must specify 'dry_bulk_density' when using the 'hypres' \
+hydraulic model");
+        ok = false;
+      }
+    return ok;
+  }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_check (check_alist);
+    frame.add ("description", Value::String, Value::OptionalConst, 
+                "Description of this soil type.");
+    frame.add ("description", "\
+This is not a model, but a list of parameters shared by all horizon models.");
+    frame.add_object ("hydraulic", Hydraulic::component, 
+                       "The hydraulic propeties of the soil.");
+    AttributeList hydraulic_alist;
+    hydraulic_alist.add ("type", "hypres");
+    frame.add ("hydraulic", hydraulic_alist);
+    frame.add_object ("tortuosity", Tortuosity::component, 
+                       "The soil tortuosity.");
+    AttributeList tortuosity;
+    tortuosity.add ("type", "M_Q");
+    frame.add ("tortuosity", tortuosity);
+    frame.add ("anisotropy", Value::None (),
+                Check::non_negative (), Value::Const, "\
+Horizontal saturated water conductivity relative to vertical saturated\n\
+water conductivity.  The higher this value, the faster the water will\n\
+move towards drain pipes.");
+    frame.add ("anisotropy", 1.0);
+    frame.add ("dry_bulk_density", "g/cm^3", Value::OptionalConst,
+                "The soils dry bulk density.\n\
+By default, this is calculated from the soil constituents.");
+    frame.add ("SOM_C_per_N", "g C/g N", Check::non_negative (), 
+                Value::Const, Value::Sequence,
+                "C/N ratio for each SOM pool in this soil.\n\
+If 'C_per_N' is specified, this is used as a goal only.  If 'C_per_N' is\n\
+unspecified, the SOM pools will be initialized with this value.");
+    std::vector<double> SOM_C_per_N;
+    SOM_C_per_N.push_back (11.0);
+    SOM_C_per_N.push_back (11.0);
+    SOM_C_per_N.push_back (11.0);
+    frame.add ("SOM_C_per_N", SOM_C_per_N);
+    frame.add ("C_per_N", "g C/g N", Check::positive (), Value::OptionalConst,
+                "Total C/N ratio for this horizon.\n\
+This is the combined initial C/N ratio for all organic matter pools in the\n\
+horizon.  The C/N ration of the AOM and SMB pools is assumed to be known,\n\
+given that this number is used to find the common C/N ration for the SOM\n\
+pools.  The C/N ration for the SOM pools will then gradually move towards\n\
+the values specified by 'SOM_C_per_N'.\n\
+By default, the values given by 'SOM_C_per_N' will be used for\n\
+initialization.");
+    frame.add_check ("SOM_C_per_N", VCheck::min_size_1 ());
+
+    static const BelowOrEqual max_1 (1.0);
+    frame.add ("SOM_fractions",  Value::None (), max_1,
+                Value::OptionalConst, Value::Sequence, "\
+Fraction of humus in each SOM pool, from slowest to fastest.\n\
+Negative numbers mean unspecified, let Daisy find appropriate values.");
+    frame.add_check ("SOM_fractions", SOM_fractions_check);
+
+    frame.add ("turnover_factor", Value::None (), Check::non_negative (),
+                Value::Const, "\
+Factor multiplied to the turnover rate for all organic matter pools in\n\
+this horizon.");
+    frame.add ("turnover_factor", 1.0);
+    frame.add_object ("Nitrification", Nitrification::component,
+                       "The soil nitrification process.");
+    AttributeList nitrification_alist;
+    nitrification_alist.add ("type", "soil");
+    nitrification_alist.add ("k_10", 2.08333333333e-7); // 5e-6/24 [1/h]
+    nitrification_alist.add ("k", 5.0e-5); // [g N/cm^3]
+    nitrification_alist.add ("heat_factor", PLF::empty ());
+    nitrification_alist.add ("water_factor", PLF::empty ());
+    nitrification_alist.add ("N2O_fraction", 0.02);
+
+    frame.add ("Nitrification", nitrification_alist);
+
+    frame.add_object ("secondary_domain", Secondary::component,
+                       "Secondary matrix domain for solute movement.");
+    frame.add ("secondary_domain", Secondary::none_model ());
+
+
+    frame.add_submodule ("HorHeat", Value::State, 
+                          "Heat capacity and conductivity.",
+                          HorHeat::load_syntax);
+
+    Syntax& attSyntax = *new Syntax ();
+    attSyntax.add ("key", Value::String, Value::Const,
+                   "Name of attribute.");
+    attSyntax.add ("value", Value::User (), Value::Const,
+                   "Value of attribute.");
+    attSyntax.order ("key", "value");
+    frame.add ("attributes", attSyntax, Value::OptionalConst, Value::Sequence,
+                "List of additional attributes for this horizon.\n\
+Intended for use with pedotransfer functions.");
+    frame.add ("attributes", std::vector<const AttributeList*> ());
+  }
 } Horizon_init;
 
 // horizon.C ends here.

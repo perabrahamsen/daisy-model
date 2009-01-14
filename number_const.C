@@ -82,21 +82,20 @@ struct NumberConst : public Number
   }
 };
 
-static struct NumberConstSyntax
+static struct NumberConstSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new NumberConst (al); }
+  Model* make (Block& al) const
+  { return new NumberConst (al); }
   NumberConstSyntax ()
+    : DeclareModel (Number::component, "const", 
+	       "Always give the specified value.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
 
-    alist.add ("description", 
-	       "Always give the specified value.");
-    syntax.add ("value", Value::User (), Value::Const,
+    frame.add ("value", Value::User (), Value::Const,
 		"Fixed value for this number.");
-    syntax.order ("value");
-    Librarian::add_type (Number::component, "const", alist, syntax, &make);
+    frame.order ("value");
   }
 } NumberConst_syntax;
 
@@ -182,23 +181,22 @@ struct NumberGet : public Number
   { }
 };
 
-static struct NumberGetSyntax
+static struct NumberGetSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new NumberGet (al); }
+  Model* make (Block& al) const
+  { return new NumberGet (al); }
   NumberGetSyntax ()
+    : DeclareModel (Number::component, "get", 
+	       "Get the value of symbol in the current scope.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
 
-    alist.add ("description", 
-	       "Get the value of symbol in the current scope.");
-    syntax.add ("name", Value::String, Value::Const, 
+    frame.add ("name", Value::String, Value::Const, 
                 "Name of a the symbol.");
-    syntax.add ("dimension", Value::String, Value::Const, 
+    frame.add ("dimension", Value::String, Value::Const, 
                 "Expected dimension for the symbol.");
-    syntax.order ("name", "dimension");
-    Librarian::add_type (Number::component, "get", alist, syntax, &make);
+    frame.order ("name", "dimension");
   }
 } NumberGet_syntax;
 
@@ -379,21 +377,20 @@ struct NumberFetch : public Number
   { }
 };
 
-static struct NumberFetchSyntax
+static struct NumberFetchSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new NumberFetch (al); }
+  Model* make (Block& al) const
+  { return new NumberFetch (al); }
   NumberFetchSyntax ()
+    : DeclareModel (Number::component, "fetch", 
+	       "Fetch the value and dimension in the current scope.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
 
-    alist.add ("description", 
-	       "Fetch the value and dimension in the current scope.");
-    syntax.add ("name", Value::String, Value::Const, 
+    frame.add ("name", Value::String, Value::Const, 
                 "Name of a the symbol.");
-    syntax.order ("name");
-    Librarian::add_type (Number::component, "fetch", alist, syntax, &make);
+    frame.order ("name");
   }
 } NumberFetch_syntax;
 
@@ -409,16 +406,24 @@ struct NumberChild : public Number
   // Create.
   bool initialize (const Units& units, const Scope& scope, Treelog& msg)
   { return child->initialize (units, scope, msg); }
-  static void load_syntax (Syntax& syntax, AttributeList&)
-  {
-    syntax.add_object ("value", Number::component,
-                       "Operand for this function.");
-  }
   NumberChild (Block& al)
     : Number (al),
       child (Librarian::build_item<Number> (al, "value"))
   { }
 };
+
+static struct NumberChildSyntax : public DeclareBase
+{
+  NumberChildSyntax ()
+    : DeclareBase (Number::component, "child", "\
+Numbers based on another number.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_object ("value", Number::component,
+                       "Operand for this function.");
+  }
+} NumberChild_syntax;
 
 struct NumberIdentity : public NumberChild
 {
@@ -472,19 +477,18 @@ struct NumberIdentity : public NumberChild
   { }
 };
 
-static struct NumberIdentitySyntax
+static struct NumberIdentitySyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new NumberIdentity (al); }
+  Model* make (Block& al) const
+  { return new NumberIdentity (al); }
   NumberIdentitySyntax ()
+    : DeclareModel (Number::component, "identity", "child", "\
+Pass value unchanged.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Pass value unchanged.");
-    NumberChild::load_syntax (syntax, alist);
-    syntax.add ("dimension", Value::String, Value::OptionalConst,
+    frame.add ("dimension", Value::String, Value::OptionalConst,
 		"Dimension of this value.");
-    Librarian::add_type (Number::component, "identity", alist, syntax, &make);
   }
 } NumberIdentity_syntax;
 
@@ -532,21 +536,20 @@ struct NumberConvert : public NumberChild
   { }
 };
 
-static struct NumberConvertSyntax
+static struct NumberConvertSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new NumberConvert (al); }
+  Model* make (Block& al) const
+  { return new NumberConvert (al); }
   NumberConvertSyntax ()
+    : DeclareModel (Number::component, "convert", "child", "\
+Convert to specified dimension.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
 
-    alist.add ("description", "Convert to specified dimension.");
-    NumberChild::load_syntax (syntax, alist);
-    syntax.add ("dimension", Value::String, Value::Const,
+    frame.add ("dimension", Value::String, Value::Const,
 		"Dimension to convert to.");
-    syntax.order ("value", "dimension");
-    Librarian::add_type (Number::component, "convert", alist, syntax, &make);
+    frame.order ("value", "dimension");
   }
 } NumberConvert_syntax;
 
@@ -587,24 +590,23 @@ struct NumberDim : public NumberChild
   { }
 };
 
-static struct NumberDimSyntax
+static struct NumberDimSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new NumberDim (al); }
+  Model* make (Block& al) const
+  { return new NumberDim (al); }
   NumberDimSyntax ()
+    : DeclareModel (Number::component, "dim", "child", "\
+Specify dimension for number.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-
-    alist.add ("description", "Specify dimension for number.");
-    NumberChild::load_syntax (syntax, alist);
-    syntax.add ("warn_known", Value::Boolean, Value::Const,
+    frame.add ("warn_known", Value::Boolean, Value::Const,
                 "Issue a warning if the dimensions is already known.");
-    alist.add ("warn_known", true);
-    syntax.add ("dimension", Value::String, Value::Const,
+    frame.add ("warn_known", true);
+    frame.add ("dimension", Value::String, Value::Const,
 		"Dimension to use.");
-    syntax.order ("value", "dimension");
-    Librarian::add_type (Number::component, "dim", alist, syntax, &make);
+    frame.order ("value", "dimension");
   }
 } NumberDim_syntax;
 
+// number_const.C ends here.

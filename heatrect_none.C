@@ -23,6 +23,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "librarian.h"
+#include "frame.h"
 
 struct HeatrectNone : public Heatrect
 {
@@ -40,7 +41,6 @@ struct HeatrectNone : public Heatrect
               const double dt, Treelog&) const
   { }
   // Create.
-  static void load_syntax (Syntax& syntax, AttributeList& alist);
   HeatrectNone (Block& al)
     : Heatrect (al)
   { }
@@ -48,24 +48,16 @@ struct HeatrectNone : public Heatrect
   { }
 };
 
-void 
-HeatrectNone::load_syntax (Syntax&, AttributeList&)
-{ }
-
-static struct HeatrectNoneSyntax
+static struct HeatrectNoneSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new HeatrectNone (al); }
+  Model* make (Block& al) const
+  { return new HeatrectNone (al); }
 
   HeatrectNoneSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "No heat transport.");
-    HeatrectNone::load_syntax (syntax, alist);
- 
-    Librarian::add_type (Heatrect::component, "none", alist, syntax, &make);
-  }
+    : DeclareModel (Heatrect::component, "none", "No heat transport.")
+  { }
+  void load_frame (Frame&) const
+  { }
 } HeatrectNone_syntax;
 
 // heatrect_none.C ends here.

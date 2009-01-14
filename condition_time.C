@@ -33,6 +33,7 @@
 #include "log.h"
 #include "submodeler.h"
 #include "treelog.h"
+#include "frame.h"
 #include <sstream>
 
 struct ConditionMMDD : public Condition
@@ -439,9 +440,13 @@ struct ConditionTimestep : public Condition
   { return *new ConditionTimestep (al); }
 };
 
-static struct ConditionTimeSyntax
+static struct ConditionMM_DDBase : public DeclareBase
 {
-  static bool check_mday (const AttributeList& al, Treelog& err)
+  ConditionMM_DDBase ()
+    : DeclareBase (Condition::component, "mm_dd_base", "\
+Conditions based on month and day.")
+  { }
+  static bool check_alist (const AttributeList& al, Treelog& err)
   {
     bool ok = true;
     const int mm = al.integer ("month");
@@ -457,158 +462,223 @@ static struct ConditionTimeSyntax
       }
     return ok;
   }
-  
-  ConditionTimeSyntax ();
-} ConditionTime_syntax;
+  void load_frame (Frame& frame) const
+  {
+    frame.add_check (check_alist);
+    frame.add ("month", Value::Integer, Value::Const, 
+               "Month to test for.");
+    frame.add_check ("month", VCheck::valid_month ());
+    frame.add ("day", Value::Integer, Value::Const, 
+               "Day in the month to test for.");
+    frame.add_check ("day", VCheck::valid_mday ());
+    frame.add ("hour", Value::Integer, Value::Const, 
+               "Hour to test for.");
+    frame.add_check ("hour", VCheck::valid_hour ());
+    frame.add ("hour", 8);
+    frame.add ("minute", Value::Integer, Value::Const, 
+               "Minute to test for.");
+    frame.add_check ("hour", VCheck::valid_minute ());
+    frame.add ("minute", 0);
+    frame.add ("second", Value::Integer, Value::Const, 
+               "Second to test for.");
+    frame.add_check ("second", VCheck::valid_second ());
+    frame.add ("second", 0);
+    frame.order ("month", "day");
+  }
+} ConditionMM_DD_base;
 
-ConditionTimeSyntax::ConditionTimeSyntax ()
-{ 
-  // Month and day.
+static struct ConditionMMDDSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new ConditionMMDD (al); }
+  ConditionMMDDSyntax ()
+    : DeclareModel (Condition::component, "mm_dd", "mm_dd_base", "\
+True a specific month, day and hour in the year.")
+  { }
+  void load_frame (Frame&) const
+  { }
+} ConditionMMDD_syntax;
+
+static struct ConditionBeforeMMDDSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new ConditionBeforeMMDD (al); }
+  ConditionBeforeMMDDSyntax ()
+    : DeclareModel (Condition::component, "before_mm_dd", "mm_dd_base", "\
+True before specific month, day and hour in the year.")
+  { }
+  void load_frame (Frame&) const
+  { }
+} ConditionBeforeMMDD_syntax;
+
+static struct ConditionAfterMMDDSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new ConditionAfterMMDD (al); }
+  ConditionAfterMMDDSyntax ()
+    : DeclareModel (Condition::component, "after_mm_dd", "mm_dd_base", "\
+True after specific month, day and hour in the year.")
+  { }
+  void load_frame (Frame&) const
+  { }
+} ConditionAfterMMDD_syntax;
+
+static struct ConditionTimeBase : public DeclareBase
+{
+  ConditionTimeBase ()
+    : DeclareBase (Condition::component, "time", "\
+Conditions based on a specific time.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& at_alist = *new AttributeList ();
-    at_alist.add ("description", "\
-True a specific month, day and hour in the year.");
-    at_alist.add ("hour", 8);
-    at_alist.add ("minute", 0);
-    at_alist.add ("second", 0);
-    AttributeList& before_alist = *new AttributeList ();
-    before_alist.add ("description", "\
-True before specific month, day and hour in the year.");
-    before_alist.add ("hour", 8);
-    before_alist.add ("minute", 0);
-    before_alist.add ("second", 0);
-    AttributeList& after_alist = *new AttributeList ();
-    after_alist.add ("description", "\
-True after specific month, day and hour in the year.");
-    after_alist.add ("hour", 8);
-    after_alist.add ("minute", 0);
-    after_alist.add ("second", 0);
-    syntax.add ("month", Value::Integer, Value::Const, 
-		"Month to test for.");
-    syntax.add_check ("month", VCheck::valid_month ());
-    syntax.add ("day", Value::Integer, Value::Const, 
-		"Day in the month to test for.");
-    syntax.add_check ("day", VCheck::valid_mday ());
-    syntax.add ("hour", Value::Integer, Value::Const, 
-		"Hour to test for.");
-    syntax.add_check ("hour", VCheck::valid_hour ());
-    syntax.add ("minute", Value::Integer, Value::Const, 
-		"Minute to test for.");
-    syntax.add_check ("hour", VCheck::valid_minute ());
-    syntax.add ("second", Value::Integer, Value::Const, 
-		"Second to test for.");
-    syntax.add_check ("second", VCheck::valid_second ());
-    syntax.order ("month", "day");
-    syntax.add_check (check_mday);
-    Librarian::add_type (Condition::component, "mm_dd", at_alist, syntax,
-                         &ConditionMMDD::make);
-    Librarian::add_type (Condition::component, "before_mm_dd", before_alist, syntax,
-                         &ConditionBeforeMMDD::make);
-    Librarian::add_type (Condition::component, "after_mm_dd", after_alist, syntax,
-                         &ConditionAfterMMDD::make);
+    frame.add_submodule ("time", Value::Const,
+                         "Fixed time to test for.", Time::load_syntax);
+    frame.order ("time");
   }
-  // At, before, or after a given time.
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList alist_time;
-    syntax.add_submodule ("time", alist_time, Value::Const,
-			  "Fixed time to test for.", Time::load_syntax);
-    AttributeList& alist_at = *new AttributeList (alist_time);
-    alist_at.add ("description", "\
-True, iff the simulation time is at the specified time.");
-    AttributeList& alist_before = *new AttributeList (alist_time);
-    alist_before.add ("description", "\
-True, iff the simulation time is before the specified time.");
-    AttributeList& alist_after = *new AttributeList (alist_time);
-    alist_after.add ("description", "\
-True, iff the simulation time is after the specified time.");
-    syntax.order ("time");
-    Librarian::add_type (Condition::component, "at", alist_at, syntax,
-                         &ConditionAt::make);
-    Librarian::add_type (Condition::component, "before", alist_before, syntax, 
-                         &ConditionBefore::make);
-    Librarian::add_type (Condition::component, "after", alist_after, syntax,
-                         &ConditionAfter::make);
-  }
-  // Specific hour.
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "True, at the specified hour.");
-    syntax.add ("at", Value::Integer, Value::Const,
+} ConditionTime_base;
+
+static struct ConditionAtSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new ConditionAt (al); }
+  ConditionAtSyntax ()
+    : DeclareModel (Condition::component, "at", "time", "\
+True, iff the simulation time is at the specified time.")
+  { }
+  void load_frame (Frame&) const
+  { }
+} ConditionAt_syntax;
+
+static struct ConditionBeforeSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new ConditionBefore (al); }
+  ConditionBeforeSyntax ()
+    : DeclareModel (Condition::component, "before", "time", "\
+True, iff the simulation time is before the specified time.")
+  { }
+  void load_frame (Frame&) const
+  { }
+} ConditionBefore_syntax;
+
+static struct ConditionAfterSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new ConditionAfter (al); }
+  ConditionAfterSyntax ()
+    : DeclareModel (Condition::component, "after", "time", "\
+True, iff the simulation time is after the specified time.")
+  { }
+  void load_frame (Frame&) const
+  { }
+} ConditionAfter_syntax;
+
+static struct ConditionHourSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new ConditionHour (al); }
+  ConditionHourSyntax ()
+    : DeclareModel (Condition::component, "hour", "\
+True, at the specified hour.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    frame.add ("at", Value::Integer, Value::Const,
                 "Hour when the condition is true [0-23].");
-    syntax.add_check ("at", VCheck::valid_hour ());
-    syntax.order ("at");
-    Librarian::add_type (Condition::component, "hour", alist, syntax,
-                         &ConditionHour::make);
+    frame.add_check ("at", VCheck::valid_hour ());
+    frame.order ("at");
   }
-  // Every specific day in the month.
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "True, at the specified day in the month.");
-    syntax.add ("at", Value::Integer, Value::Const,
+} ConditionHour_syntax;
+
+static struct ConditionMDaySyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new ConditionMDay (al); }
+  ConditionMDaySyntax ()
+    : DeclareModel (Condition::component, "mday", "\
+True, at the specified day in the month.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    frame.add ("at", Value::Integer, Value::Const,
 		"Day in the month when the condition is true [1-31].");
-    syntax.add_check ("at", VCheck::valid_mday ());
-    syntax.order ("at");
-    Librarian::add_type (Condition::component, "mday", alist, syntax,
-                         &ConditionMDay::make);
+    frame.add_check ("at", VCheck::valid_mday ());
+    frame.order ("at");
   }
-  // Every specific day in the year.
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "True, at the specified julian day.");
-    syntax.add ("at", Value::Integer, Value::Const,
+} ConditionMDay_syntax;
+
+static struct ConditionYDaySyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new ConditionYDay (al); }
+  ConditionYDaySyntax ()
+    : DeclareModel (Condition::component, "yday", "\
+True, at the specified julian day.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    frame.add ("at", Value::Integer, Value::Const,
                 "Julian day when the condition is true [1-366].");
     static VCheck::IRange valid_jday (1, 366);
-    syntax.add_check ("at", valid_jday);
-    syntax.order ("at");
-    Librarian::add_type (Condition::component, "yday", alist, syntax,
-                         &ConditionYDay::make);
+    frame.add_check ("at", valid_jday);
+    frame.order ("at");
   }
-  // Every specific month.
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "True, at the specified month.");
-    syntax.add ("at", Value::Integer, Value::Const,
+} ConditionYDay_syntax;
+
+static struct ConditionMonthSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new ConditionMonth (al); }
+  ConditionMonthSyntax ()
+    : DeclareModel (Condition::component, "month", "\
+True, at the specified month.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    frame.add ("at", Value::Integer, Value::Const,
                 "Month when the condition is true [1-12].");
-    syntax.add_check ("at", VCheck::valid_month ());
-    syntax.order ("at");
-    Librarian::add_type (Condition::component, "month", alist, syntax, 
-                         &ConditionMonth::make);
+    frame.add_check ("at", VCheck::valid_month ());
+    frame.order ("at");
   }
-  // A specific year.
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "True, at the specified year.");
-    syntax.add ("at", Value::Integer, Value::Const,
+} ConditionMonth_syntax;
+
+static struct ConditionYearSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new ConditionYear (al); }
+  ConditionYearSyntax ()
+    : DeclareModel (Condition::component, "year", "\
+True, at the specified year.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    frame.add ("at", Value::Integer, Value::Const,
 		"Year when the condition is true.");
-    syntax.add_check ("at", VCheck::valid_year ());
-    syntax.order ("at");
-    Librarian::add_type (Condition::component, "year", alist, syntax,
-                         &ConditionYear::make);
+    frame.add_check ("at", VCheck::valid_year ());
+    frame.order ("at");
   }
-  // Add timestep to condition.
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Add a timestep to a condition.\n\
+} ConditionYear_syntax;
+
+static struct ConditionTimestepSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new ConditionTimestep (al); }
+  ConditionTimestepSyntax ()
+    : DeclareModel (Condition::component, "timestep", "\
+Add a timestep to a condition.\n\
 It is true whenever 'operand' is true, but will let Daisy know what\n\
 'timestep' it represents.  The timestep is used for the dimension\n\
-in log files.");
-    syntax.add_object ("operand", Condition::component, 
+in log files.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    frame.add_object ("operand", Condition::component, 
                        "Condition to use.");
-    syntax.add ("timestep", Value::String, Value::Const, "\
+    frame.add ("timestep", Value::String, Value::Const, "\
 Timestep to use.");
-    syntax.order ("operand", "timestep");
-    Librarian::add_type (Condition::component, "timestep", alist, syntax,
-                         &ConditionTimestep::make);
+    frame.order ("operand", "timestep");
   }
-}
+} ConditionTimestep_syntax;
 
 // The 'end' base model.
 
@@ -644,113 +714,106 @@ struct ConditionEnd : public Condition
 
 // The 'hourly' model.
 
-static struct ConditionHourlySyntax
+static struct ConditionHourlySyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ConditionEnd (al, "h", &Time::hour); }
+  Model* make (Block& al) const
+  { return new ConditionEnd (al, "h", &Time::hour); }
 
   ConditionHourlySyntax ()
+    : DeclareModel (Condition::component, "hourly", "True at the end of each hour.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "True at the end of each hour.");
-    Librarian::add_type (Condition::component, "hourly", alist, syntax, make);
   }
 } ConditionHourly_syntax;
 
 // The 'secondly' model.
 
-static struct ConditionSecondlySyntax
+static struct ConditionSecondlySyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ConditionEnd (al, "s", &Time::second); }
+  Model* make (Block& al) const
+  { return new ConditionEnd (al, "s", &Time::second); }
 
   ConditionSecondlySyntax ()
+    : DeclareModel (Condition::component, "secondly", "True at the end of each second.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "True at the end of each second.");
-    Librarian::add_type (Condition::component, "secondly", alist, syntax, make);
   }
 } ConditionSecondly_syntax;
 
 // The 'minutely' model.
 
-static struct ConditionMinutelySyntax
+static struct ConditionMinutelySyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ConditionEnd (al, "min", &Time::minute); }
+  Model* make (Block& al) const
+  { return new ConditionEnd (al, "min", &Time::minute); }
 
   ConditionMinutelySyntax ()
+    : DeclareModel (Condition::component, "minutely", "True at the end of each minute.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "True at the end of each minute.");
-    Librarian::add_type (Condition::component, "minutely", alist, syntax, make);
   }
 } ConditionMinutely_syntax;
 
 // The 'daily' model.
 
-static struct ConditionDailySyntax
+static struct ConditionDailySyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ConditionEnd (al, "d", &Time::mday); }
+  Model* make (Block& al) const
+  { return new ConditionEnd (al, "d", &Time::mday); }
 
   ConditionDailySyntax ()
+    : DeclareModel (Condition::component, "daily", "True at the end of each day.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "True at the end of each day.");
-    Librarian::add_type (Condition::component, "daily", alist, syntax, make);
   }
 } ConditionDaily_syntax;
 
 // The 'weekly' model.
 
-static struct ConditionWeeklySyntax
+static struct ConditionWeeklySyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ConditionEnd (al, "w", &Time::week); }
+  Model* make (Block& al) const
+  { return new ConditionEnd (al, "w", &Time::week); }
 
   ConditionWeeklySyntax ()
+    : DeclareModel (Condition::component, "weekly", "True at the end of each week.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "True at the end of each week.");
-    Librarian::add_type (Condition::component, "weekly", alist, syntax, make);
   }
 } ConditionWeekly_syntax;
 
 // The 'monthly' model.
 
-static struct ConditionMonthlySyntax
+static struct ConditionMonthlySyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ConditionEnd (al, "m", &Time::month); }
+  Model* make (Block& al) const
+  { return new ConditionEnd (al, "m", &Time::month); }
 
   ConditionMonthlySyntax ()
+    : DeclareModel (Condition::component, "monthly", "True at the end of each month.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "True at the end of each month.");
-    Librarian::add_type (Condition::component, "monthly", alist, syntax, make);
   }
 } ConditionMonthly_syntax;
 
 // The 'yearly' model.
 
-static struct ConditionYearlySyntax
+static struct ConditionYearlySyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ConditionEnd (al, "y", &Time::year); }
+  Model* make (Block& al) const
+  { return new ConditionEnd (al, "y", &Time::year); }
 
   ConditionYearlySyntax ()
+    : DeclareModel (Condition::component, "yearly", "True at the end of each year.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "True at the end of each year.");
-    Librarian::add_type (Condition::component, "yearly", alist, syntax, make);
   }
 } ConditionYearly_syntax;
 
@@ -788,14 +851,6 @@ private:
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-public:
-  static void load_syntax (Syntax& syntax, AttributeList& alist)
-  {
-    syntax.add_submodule ("next", alist, Value::OptionalState,
-                          "Time for next match.",
-                          Time::load_syntax);
-  }
-
 private:
   static symbol find_timestep (const Timestep& tstep)
   {
@@ -829,19 +884,20 @@ public:
 
 // The 'every' model.
 
-static struct ConditionEverySyntax
+static struct ConditionEverySyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ConditionInterval (al, submodel_value_block<Timestep> (al)); }
+  Model* make (Block& al) const
+  { return new ConditionInterval (al, submodel_value_block<Timestep> (al)); }
 
   ConditionEverySyntax ()
+    : DeclareModel (Condition::component, "every", "Matches simulation with fixed time intervals.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    Timestep::load_syntax (syntax, alist); // We steal all timestep attributes.
-    ConditionInterval::load_syntax (syntax, alist); // Base attributes.
-    alist.add ("description", "Matches simulation with fixed time intervals.");
-    Librarian::add_type (Condition::component, "every", alist, syntax, make);
+    Timestep::load_syntax (frame.syntax (), frame.alist ()); // We steal all timestep attributes.
+    frame.add_submodule ("next", Value::OptionalState,
+                         "Time for next match.",
+                         Time::load_syntax);
   }
 } ConditionEvery_syntax;
 

@@ -247,9 +247,10 @@ const FrameModel*
 Declare::parent_model () const
 { return NULL; }
 
-Declare::Declare (const symbol c, const symbol name,
+Declare::Declare (const symbol c, const symbol n,
                   const symbol d)
   : component (c),
+    name (n),
     description (d)
 { Librarian::declare (component, name, *this); }
 

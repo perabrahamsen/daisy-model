@@ -25,8 +25,7 @@
 
 #include "condition.h"
 #include "log.h"
-#include "syntax.h"
-#include "alist.h"
+#include "frame.h"
 #include "memutils.h"
 #include "librarian.h"
 #include <memory>
@@ -261,79 +260,99 @@ struct ConditionIf : public Condition
   { }
 };
 
-static struct ConditionLogicSyntax
+static struct ConditionFalseSyntax : public DeclareModel
 {
-  static Model& make_false (Block& al)
-  { return *new ConditionFalse (al); }
-  static Model& make_true (Block& al)
-  { return *new ConditionTrue (al); }
-  static Model& make_or (Block& al)
-  { return *new ConditionOr (al); }
-  static Model& make_and (Block& al)
-  { return *new ConditionAnd (al); }
-  static Model& make_not (Block& al)
-  { return *new ConditionNot (al); }
-  static Model& make_if (Block& al)
-  { return *new ConditionIf (al); }
-  ConditionLogicSyntax ();
-} ConditionLogic_syntax;
+  Model* make (Block& al) const
+  { return new ConditionFalse (al); }
+  ConditionFalseSyntax ()
+    : DeclareModel (Condition::component, "false", "Always false.")
+  { }
+  void load_frame (Frame&) const
+  { }
+} ConditionFalse_syntax;
 
-ConditionLogicSyntax::ConditionLogicSyntax ()
+static struct ConditionTrueSyntax : public DeclareModel
 {
-  // "false", "true".
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist_false = *new AttributeList ();
-    alist_false.add ("description", "Always false.");
-    AttributeList& alist_true = *new AttributeList ();
-    alist_true.add ("description", "Always true.");
-    Librarian::add_type (Condition::component, "false", alist_false, syntax, &make_false);
-    Librarian::add_type (Condition::component, "true", alist_true, syntax, &make_true);
-  }
+  Model* make (Block& al) const
+  { return new ConditionTrue (al); }
+  ConditionTrueSyntax ()
+    : DeclareModel (Condition::component, "true", "Always true.")
+  { }
+  void load_frame (Frame&) const
+  { }
+} ConditionTrue_syntax;
 
-  // "or", "and".
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist_or = *new AttributeList ();
-    alist_or.add ("description", "\
+static struct ConditionOrSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new ConditionOr (al); }
+  ConditionOrSyntax ()
+    : DeclareModel (Condition::component, "or", "\
 True iff any of the listed conditions are true.\n\
 The conditions are tested in the sequence listed, until a true is found,\n\
-or the end of the list is reached.");
-    AttributeList& alist_and = *new AttributeList ();
-    alist_and.add ("description", "\
+or the end of the list is reached.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_object ("operands", Condition::component, 
+                       Value::State, Value::Sequence, "Conditions to test.");
+    frame.order ("operands");
+  }
+} ConditionOr_syntax;
+
+static struct ConditionAndSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new ConditionAnd (al); }
+  ConditionAndSyntax ()
+    : DeclareModel (Condition::component, "and", "\
 True iff all the listed conditions are true.\n\
 The conditions are tested in the sequence listed, until a false is found,\n\
-or the end of the list is reached.");
-    syntax.add_object ("operands", Condition::component, 
+or the end of the list is reached.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_object ("operands", Condition::component, 
                        Value::State, Value::Sequence, "Conditions to test.");
-    syntax.order ("operands");
-    Librarian::add_type (Condition::component, "or", alist_or, syntax, &make_or);
-    Librarian::add_type (Condition::component, "and", alist_and, syntax, &make_and);
+    frame.order ("operands");
   }
-  // "not".
+} ConditionAnd_syntax;
+
+static struct ConditionNotSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new ConditionNot (al); }
+  ConditionNotSyntax ()
+    : DeclareModel (Condition::component, "not", "\
+True iff the operand is not true.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "True iff the operand is not true.");
-    syntax.add_object ("operand", Condition::component, 
+    frame.add_object ("operand", Condition::component, 
                        "Condition to test.");
-    syntax.order ("operand");
-    Librarian::add_type (Condition::component, "not", alist, syntax, &make_not);
+    frame.order ("operand");
   }
-  // "if".
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
+} ConditionNot_syntax;
+
+static struct ConditionIfSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new ConditionIf (al); }
+  ConditionIfSyntax ()
+    : DeclareModel (Condition::component, "if", "\
 If the first condition is true, return the value of the second condition,\n\
-else return the value of the third condition.");
-    syntax.add_object ("if", Condition::component, 
+else return the value of the third condition.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_object ("if", Condition::component, 
                        "Condition to test for.");
-    syntax.add_object ("then", Condition::component, 
+    frame.add_object ("then", Condition::component, 
                        "Condition to use of the 'if' test was true.");
-    syntax.add_object ("else", Condition::component, 
+    frame.add_object ("else", Condition::component, 
                        "Condition to use if the 'if' test was false.");
-    syntax.order ("if", "then", "else");
-    Librarian::add_type (Condition::component, "if", alist, syntax, &make_if);
+    frame.order ("if", "then", "else");
   }
-}
+} ConditionIf_syntax;
+
+// condition_logic.C ends here.

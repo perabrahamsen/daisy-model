@@ -350,7 +350,7 @@ If none succeeds, the simulation ends.");
     frame.add_object ("heat", Heatrect::component, 
                        Value::Const, Value::Singleton, "\
 Heat transport model.");
-    frame.add ("heat", Heatrect::default_model ());
+    frame.add ("heat", "Mollerup");
 
   }
 } MovementRect_syntax;

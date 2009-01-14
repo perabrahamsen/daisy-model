@@ -55,8 +55,6 @@ public:
                       const double dt, Treelog&) const = 0;
 
   // Create and Destroy.
-public:
-  static const AttributeList& default_model ();
 protected:
   Heatrect (Block&);
 public:

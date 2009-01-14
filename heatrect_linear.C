@@ -25,6 +25,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "librarian.h"
+#include "frame.h"
 
 struct HeatrectLinear : public Heatrect
 {
@@ -41,7 +42,6 @@ struct HeatrectLinear : public Heatrect
               std::vector<double>& T,
               const double dt, Treelog&) const;
   // Create.
-  static void load_syntax (Syntax& syntax, AttributeList& alist);
   HeatrectLinear (Block& al)
     : Heatrect (al)
   { }
@@ -75,25 +75,17 @@ HeatrectLinear::solve (const GeometryRect& geo,
     T[c] = plf (geo.cell_z (c));
 }
 
-void 
-HeatrectLinear::load_syntax (Syntax&, AttributeList&)
-{ }
-
-static struct HeatrectLinearSyntax
+static struct HeatrectLinearSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new HeatrectLinear (al); }
+  Model* make (Block& al) const
+  { return new HeatrectLinear (al); }
 
   HeatrectLinearSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
-Linear temperature interpolation between top and bottom.");
-    HeatrectLinear::load_syntax (syntax, alist);
- 
-    Librarian::add_type (Heatrect::component, "linear", alist, syntax, &make);
-  }
+    : DeclareModel (Heatrect::component, "linear", "\
+Linear temperature interpolation between top and bottom.")
+  { }
+  void load_frame (Frame&) const
+  { }
 } HeatrectLinear_syntax;
 
 // heatrect_linear.C ends here.

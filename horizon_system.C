@@ -24,7 +24,7 @@
 #include "horizon.h"
 #include "library.h"
 #include "block.h"
-#include "alist.h"
+#include "frame.h"
 #include "texture.h"
 #include "hydraulic.h"
 #include "check.h"
@@ -37,24 +37,24 @@
 struct HorizonSystem : public Horizon
 {
   // Types.
-  struct System 
+  struct System : public DeclareModel
   { 
     // Content.
-    const std::string name;
     std::vector<double> limits;
-    std::vector<std::string> names;
-
+    std::vector<symbol> names;
+    
     // Utilities. 
     const std::vector<double> get_fractions (Block& al) const;
-    bool check_alist (const AttributeList& al, Treelog& err) const;
+
+    // DeclareModel interface.
+    Model* make (Block& al) const;
+    void load_frame (Frame& frame) const;
 
     // Create and destroy.
-    void add (const std::string& name, double limit);
-    System (const std::string n)
-      : name (n)
-    { }
-    void add_to_lib (Model& (*make)(Block&),
-                     Syntax::check_fun check_list) const;
+    Syntax::check_fun checker;
+    bool check_shared (const AttributeList& al, Treelog& err) const;
+    void add (const symbol name, double limit);
+    System (symbol name, Syntax::check_fun check_alist);
   };
 
   // Content.
@@ -98,9 +98,38 @@ HorizonSystem::System::get_fractions (Block& al) const
   return result;
 }
 
+Model* 
+HorizonSystem::System::make (Block& al) const
+{ return new HorizonSystem (*this, al); }
+
+void 
+HorizonSystem::System::load_frame (Frame& frame) const
+{
+  frame.add_check (checker);
+  daisy_assert (names.size () == limits.size ());
+  for (unsigned int i = 0; i < names.size (); i++)
+    {
+      std::ostringstream tmp;
+      tmp << "Mineral particles ";
+      if (i < 1)
+        tmp << "up to";
+      else
+        tmp << "between " << limits[i-1] << " [um] and";
+      tmp << " " << limits[i] << " [um].";
+
+      frame.add_fraction (names[i], Value::Const, tmp.str ());
+    }
+  frame.add_fraction ("humus", Value::Const,
+                       "Humus content of soil.");
+  frame.add ("normalize", Value::Boolean, Value::Const, "\
+If this is true, normalize the mineral fraction to 1.0.\n\
+Otherwise, give an error if the sum is not 1.0.");
+  frame.add ("normalize", false);
+}
+
 bool 
-HorizonSystem::System::check_alist (const AttributeList& al,
-                                    Treelog& err) const
+HorizonSystem::System::check_shared (const AttributeList& al,
+                                     Treelog& err) const
 {
   bool ok = true;
 
@@ -119,7 +148,7 @@ HorizonSystem::System::check_alist (const AttributeList& al,
 }
 
 void 
-HorizonSystem::System::add (const std::string& name, double limit)
+HorizonSystem::System::add (const symbol name, double limit)
 {
   daisy_assert (limits.size () < 1 || limits[limits.size () - 1] < limit);
   limits.push_back (limit);
@@ -129,43 +158,18 @@ HorizonSystem::System::add (const std::string& name, double limit)
   daisy_assert (limits.size () == names.size ());
 }
 
-void
-HorizonSystem::System::add_to_lib (Model& (make)(Block&),
-                                   Syntax::check_fun check_alist) const
-{
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    Horizon::load_syntax (syntax, alist);
-    syntax.add_check (check_alist);
-    alist.add ("description",
-               "A horizon using " +  name + " texture classification.");
-
-    daisy_assert (names.size () == limits.size ());
-    for (unsigned int i = 0; i < names.size (); i++)
-      {
-        std::ostringstream tmp;
-        tmp << "Mineral particles ";
-        if (i < 1)
-          tmp << "up to";
-        else
-          tmp << "between " << limits[i-1] << " [um] and";
-        tmp << " " << limits[i] << " [um].";
-        
-        syntax.add_fraction (names[i], Value::Const, tmp.str ());
-      }
-    syntax.add_fraction ("humus", Value::Const,
-                         "Humus content of soil.");
-    syntax.add ("normalize", Value::Boolean, Value::Const, "\
-If this is true, normalize the mineral fraction to 1.0.\n\
-Otherwise, give an error if the sum is not 1.0.");
-    alist.add ("normalize", false);
-    Librarian::add_type (Horizon::component, symbol (name), alist, syntax, make);
-}
+HorizonSystem::System::System (symbol name, Syntax::check_fun cf)
+  : DeclareModel (Horizon::component, name, 
+                  "A horizon using " +  name + " texture classification."),
+    checker (cf)
+{ }
 
 static const struct USDA3_type : public HorizonSystem::System
 {
+  static bool check_alist (const AttributeList& al, Treelog& err);
+
   USDA3_type ()
-    : System ("USDA3")
+    : System ("USDA3", check_alist)
   {
     add ("clay", 2.0);
     add ("silt", 50.0);
@@ -173,10 +177,16 @@ static const struct USDA3_type : public HorizonSystem::System
   }
 } USDA3;
 
+bool 
+USDA3_type::check_alist (const AttributeList& al, Treelog& err)
+{ return USDA3.check_shared (al, err); }
+
 static const struct USDA7_type : public HorizonSystem::System
 {
+  static bool check_alist (const AttributeList& al, Treelog& err);
+
   USDA7_type ()
-    : System ("USDA7")
+    : System ("USDA7", check_alist)
   {
     add ("clay", 2.0);
     add ("silt", 50.0);
@@ -188,10 +198,16 @@ static const struct USDA7_type : public HorizonSystem::System
   }
 } USDA7;
 
+bool 
+USDA7_type::check_alist (const AttributeList& al, Treelog& err)
+{ return USDA7.check_shared (al, err); }
+
 static const struct ISSS3_type : public HorizonSystem::System
 {
+  static bool check_alist (const AttributeList& al, Treelog& err);
+
   ISSS3_type ()
-    : System ("ISSS3")
+    : System ("ISSS3", check_alist)
   {
     add ("clay", 2.0);
     add ("silt", 20.0);
@@ -199,10 +215,16 @@ static const struct ISSS3_type : public HorizonSystem::System
   }
 } ISSS3;
 
+bool 
+ISSS3_type::check_alist (const AttributeList& al, Treelog& err)
+{ return ISSS3.check_shared (al, err); }
+
 static const struct ISSS4_type : public HorizonSystem::System
 {
+  static bool check_alist (const AttributeList& al, Treelog& err);
+
   ISSS4_type ()
-    : System ("ISSS4")
+    : System ("ISSS4", check_alist)
   {
     add ("clay", 2.0);
     add ("silt", 20.0);
@@ -211,10 +233,16 @@ static const struct ISSS4_type : public HorizonSystem::System
   }
 } ISSS4;
 
+bool 
+ISSS4_type::check_alist (const AttributeList& al, Treelog& err)
+{ return ISSS4.check_shared (al, err); }
+
 static const struct USPRA3_type : public HorizonSystem::System
 {
+  static bool check_alist (const AttributeList& al, Treelog& err);
+
   USPRA3_type ()
-    : System ("USPRA3")
+    : System ("USPRA3", check_alist)
   {
     add ("clay", 5.0);
     add ("silt", 50.0);
@@ -222,10 +250,16 @@ static const struct USPRA3_type : public HorizonSystem::System
   }
 } USPRA3;
 
+bool 
+USPRA3_type::check_alist (const AttributeList& al, Treelog& err)
+{ return USPRA3.check_shared (al, err); }
+
 static const struct USPRA4_type : public HorizonSystem::System
 {
+  static bool check_alist (const AttributeList& al, Treelog& err);
+
   USPRA4_type ()
-    : System ("USPRA4")
+    : System ("USPRA4", check_alist)
   {
     add ("clay", 5.0);
     add ("silt", 50.0);
@@ -234,10 +268,16 @@ static const struct USPRA4_type : public HorizonSystem::System
   }
 } USPRA4;
 
+bool 
+USPRA4_type::check_alist (const AttributeList& al, Treelog& err)
+{ return USPRA4.check_shared (al, err); }
+
 static const struct BSI3_type : public HorizonSystem::System
 {
+  static bool check_alist (const AttributeList& al, Treelog& err);
+
   BSI3_type ()
-    : System ("BSI3")
+    : System ("BSI3", check_alist)
   {
     add ("clay", 2.0);
     add ("silt", 60.0);
@@ -245,10 +285,16 @@ static const struct BSI3_type : public HorizonSystem::System
   }
 } BSI3;
 
+bool 
+BSI3_type::check_alist (const AttributeList& al, Treelog& err)
+{ return BSI3.check_shared (al, err); }
+
 static const struct BSI7_type : public HorizonSystem::System
 {
+  static bool check_alist (const AttributeList& al, Treelog& err);
+
   BSI7_type ()
-    : System ("BSI7")
+    : System ("BSI7", check_alist)
   {
     add ("clay", 2.0);
     add ("fine_silt", 6.0);
@@ -260,10 +306,16 @@ static const struct BSI7_type : public HorizonSystem::System
   }
 } BSI7;
 
+bool 
+BSI7_type::check_alist (const AttributeList& al, Treelog& err)
+{ return BSI7.check_shared (al, err); }
+
 static const struct DIN5_type : public HorizonSystem::System
 {
+  static bool check_alist (const AttributeList& al, Treelog& err);
+
   DIN5_type ()
-    : System ("DIN5")
+    : System ("DIN5", check_alist)
   {
     add ("clay", 2.0);
     add ("silt", 60.0);
@@ -273,79 +325,15 @@ static const struct DIN5_type : public HorizonSystem::System
   }
 } DIN5;
 
-static struct HorizonSystemSyntax
-{
-  static Model& make_USDA3 (Block& al)
-  { return *new HorizonSystem (USDA3, al); }
-  static bool check_USDA3 (const AttributeList& al, Treelog& err)
-  { return USDA3.check_alist (al, err); }
+bool 
+DIN5_type::check_alist (const AttributeList& al, Treelog& err)
+{ return DIN5.check_shared (al, err); }
 
-  static Model& make_USDA7 (Block& al)
-  { return *new HorizonSystem (USDA7, al); }
-  static bool check_USDA7 (const AttributeList& al, Treelog& err)
-  { return USDA7.check_alist (al, err); }
 
-  static Model& make_ISSS3 (Block& al)
-  { return *new HorizonSystem (ISSS3, al); }
-  static bool check_ISSS3 (const AttributeList& al, Treelog& err)
-  { return ISSS3.check_alist (al, err); }
+DeclareAlias FAO3 (Horizon::component, "FAO3", "USDA3");
+DeclareAlias FAO7 (Horizon::component, "FAO7", "USDA7");
+DeclareAlias MIT3 (Horizon::component, "MIT3", "BSI3");
+DeclareAlias MIT7 (Horizon::component, "MIT7", "BSI7");
+DeclareAlias DIN3 (Horizon::component, "DIN3", "BSI3");
 
-  static Model& make_ISSS4 (Block& al)
-  { return *new HorizonSystem (ISSS4, al); }
-  static bool check_ISSS4 (const AttributeList& al, Treelog& err)
-  { return ISSS4.check_alist (al, err); }
-
-  static Model& make_USPRA3 (Block& al)
-  { return *new HorizonSystem (USPRA3, al); }
-  static bool check_USPRA3 (const AttributeList& al, Treelog& err)
-  { return USPRA3.check_alist (al, err); }
-
-  static Model& make_USPRA4 (Block& al)
-  { return *new HorizonSystem (USPRA4, al); }
-  static bool check_USPRA4 (const AttributeList& al, Treelog& err)
-  { return USPRA4.check_alist (al, err); }
-
-  static Model& make_BSI3 (Block& al)
-  { return *new HorizonSystem (BSI3, al); }
-  static bool check_BSI3 (const AttributeList& al, Treelog& err)
-  { return BSI3.check_alist (al, err); }
-
-  static Model& make_BSI7 (Block& al)
-  { return *new HorizonSystem (BSI7, al); }
-  static bool check_BSI7 (const AttributeList& al, Treelog& err)
-  { return BSI7.check_alist (al, err); }
-
-  static Model& make_DIN5 (Block& al)
-  { return *new HorizonSystem (DIN5, al); }
-  static bool check_DIN5 (const AttributeList& al, Treelog& err)
-  { return DIN5.check_alist (al, err); }
-
-  static void derive (const std::string& d, const std::string& b)
-  {
-    const symbol derived = symbol (d);
-    const symbol base = symbol (b);
-    Librarian::add_alias (Horizon::component, derived, base);
-  }
-
-  HorizonSystemSyntax ()
-  { 
-    USDA3.add_to_lib (make_USDA3, check_USDA3);
-    USDA7.add_to_lib (make_USDA7, check_USDA7);
-    derive ("FAO3", "USDA3");
-    derive ("FAO7", "USDA7");
-    ISSS3.add_to_lib (make_ISSS3, check_ISSS3);
-    ISSS4.add_to_lib (make_ISSS4, check_ISSS4);
-    USPRA3.add_to_lib (make_USPRA3, check_USPRA3);
-    USPRA4.add_to_lib (make_USPRA4, check_USPRA4);
-    BSI3.add_to_lib (make_BSI3, check_BSI3);
-    BSI7.add_to_lib (make_BSI7, check_BSI7);
-    derive ("MIT3", "BSI3");
-    derive ("MIT7", "BSI7");
-    DIN5.add_to_lib (make_DIN5, check_DIN5);
-    derive ("DIN3", "BSI3");
-
-    // DIN3 = BSI3
-    // MIT = BSI
-    // FAO = USDA
-  }
-} HorizonSystem_syntax;
+// horizon_system.C ends here.

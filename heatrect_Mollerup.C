@@ -29,6 +29,7 @@
 #include "librarian.h"
 #include "assertion.h"
 #include "treelog.h"
+#include "frame.h"
 
 // Uncomment for fast code that does not catches bugs.
 #define NDEBUG
@@ -331,7 +332,6 @@ struct HeatrectMollerup : public Heatrect
               std::vector<double>& T,
               const double dt, Treelog&) const;
   // Create.
-  static void load_syntax (Syntax& syntax, AttributeList& alist);
   HeatrectMollerup (Block& al)
     : Heatrect (al),
       solver (Librarian::build_item<Solver> (al, "solver")),
@@ -494,50 +494,27 @@ HeatrectMollerup::solve (const GeometryRect& geo,
   
 }
 
-void 
-HeatrectMollerup::load_syntax (Syntax& syntax, AttributeList& alist)
+static struct HeatrectMollerupSyntax : public DeclareModel
 {
-  syntax.add_object ("solver", Solver::component, 
-		     Value::Const, Value::Singleton, "\
-Model used for solving matrix equation system.");
-  alist.add ("solver", Solver::default_model ());
-  syntax.add ("debug", Value::Integer, Value::Const, "\
-Enable additional debug message.\n\
-A value of 0 means no message, higher numbers means more messages.");
-  alist.add ("debug", 0);
-
-  alist.add ("submodel", "HeatRect");
-  alist.add ("description", "Heat transport in a rectangular grid.");
-}
-
-const AttributeList& 
-Heatrect::default_model ()
-{
-  static AttributeList alist;
-
-  if (!alist.check ("type"))
-    {
-      Syntax dummy;
-      HeatrectMollerup::load_syntax (dummy, alist);
-      alist.add ("type", "Mollerup");
-    }
-  return alist;
-}
-
-static struct HeatrectMollerupSyntax
-{
-  static Model& make (Block& al)
-  { return *new HeatrectMollerup (al); }
+  Model* make (Block& al) const
+  { return new HeatrectMollerup (al); }
 
   HeatrectMollerupSyntax ()
+    : DeclareModel (Heatrect::component, "Mollerup", "\
+Finite volume solution to heat transfer by Mikkel Mollerup.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
-Finite volume solution to heat transfer by Mikkel Mollerup.");
-    HeatrectMollerup::load_syntax (syntax, alist);
- 
-    Librarian::add_type (Heatrect::component, "Mollerup", alist, syntax, &make);
+    frame.add_object ("solver", Solver::component, 
+                       Value::Const, Value::Singleton, "\
+Model used for solving matrix equation system.");
+    frame.add ("solver", Solver::default_model ());
+    frame.add ("debug", Value::Integer, Value::Const, "\
+Enable additional debug message.\n\
+A value of 0 means no message, higher numbers means more messages.");
+    frame.add ("debug", 0);
+
+    frame.alist ().add ("submodel", "HeatRect");
   }
 } HeatrectMollerup_syntax;
 

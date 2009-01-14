@@ -2,9 +2,9 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Frame
 
-** DeclareBase -> DeclareSuper
-
 ** Brug DeclareModel alle steder
+
+** remove add_base (og check andre)
 
 ** Frame::alist () og Frame::syntax () skal returnere const ref.
 

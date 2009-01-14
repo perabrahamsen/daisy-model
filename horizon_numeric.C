@@ -31,6 +31,7 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 #include <sstream>
 #include <numeric>
 
@@ -80,10 +81,10 @@ HorizonNumeric::normalize (const std::vector<double>& original)
   return normalized;
 }
 
-static struct HorizonNumericSyntax
+static struct HorizonNumericSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new HorizonNumeric (al); }
+  Model* make (Block& al) const
+  { return new HorizonNumeric (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)
   {
@@ -112,30 +113,30 @@ static struct HorizonNumericSyntax
   }
 
   HorizonNumericSyntax ()
+    : DeclareModel (Horizon::component, "numeric", "\
+A horizon using explicit texture classification.")
+  { }
+  void load_frame (Frame& frame) const
   { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    Horizon::load_syntax (syntax, alist);
-    syntax.add_check (check_alist);
-    alist.add ("description",
-               "A horizon using explicit texture classification.");
-    syntax.add ("limits", "um", Check::positive (),
+    frame.add_check (check_alist);
+    frame.add ("limits", "um", Check::positive (),
                 Value::Const, Value::Sequence, 
                 "Numerical limits for particle sizes.");
     static const VCheck::All lim_check (VCheck::increasing (), 
                                         VCheck::min_size_1 ());
-    syntax.add_check ("limits", lim_check);
-    syntax.add_fraction ("fractions", Value::Const, Value::Sequence, "\
+    frame.add_check ("limits", lim_check);
+    frame.add_fraction ("fractions", Value::Const, Value::Sequence, "\
 Fraction of particles between the corresponding numrical limits.");
-    syntax.add_check ("fractions", VCheck::min_size_1 ());
+    frame.add_check ("fractions", VCheck::min_size_1 ());
     
-    syntax.add_fraction ("humus", Value::Const,
+    frame.add_fraction ("humus", Value::Const,
                          "Humus content of soil.");
-    syntax.add ("normalize", Value::Boolean, Value::Const, "\
+    frame.add ("normalize", Value::Boolean, Value::Const, "\
 If this is true, normalize the mineral fraction to 1.0.\n\
 Otherwise, give an error if the sum is not 1.0.");
-    alist.add ("normalize", false);
+    frame.add ("normalize", false);
 
-    Librarian::add_type (Horizon::component, "numeric", alist, syntax, make);
   }
 } HorizonNumeric_syntax;
+
+// horizon_numeric.C ends here.

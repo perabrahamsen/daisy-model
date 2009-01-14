@@ -53,7 +53,6 @@ public:
 
   // Create.
 public:
-  static void load_syntax (Syntax&, AttributeList&);
   HeatRect (Block&);
   ~HeatRect ();
 };
