@@ -93,10 +93,6 @@ XYSource::distance (const double xmin, const double xmax,
     }
 }
 
-void
-XYSource::load_syntax (Syntax&, AttributeList&)
-{ }
-
 XYSource::XYSource (Block& al)
   : name (al.name ("type"))
 { }

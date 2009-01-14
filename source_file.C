@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "source_file.h"
-#include "alist.h"
+#include "frame.h"
 #include "gnuplot_utils.h"
 #include "vcheck.h"
 #include "mathlib.h"
@@ -100,29 +100,28 @@ SourceFile::read_entry (std::vector<std::string>& entries, Time& time)
 }
 
 void
-SourceFile::load_style (Syntax& syntax, AttributeList& alist, 
+SourceFile::load_style (Frame& frame, 
                         const symbol default_title)
 {
-  Source::load_syntax (syntax, alist);
-  LexerTable::load_syntax (syntax, alist);
-  GnuplotUtil::load_style (syntax, alist, "\
+  LexerTable::load_syntax (frame);
+  GnuplotUtil::load_style (frame, "\
 By default, data from dwf and dlf files will be\n\
 drawn with lines, and data from ddf files will be drawn with points.", 
                            default_title);
-  syntax.add ("handle", Value::String, Value::Const, "\
+  frame.add ("handle", Value::String, Value::Const, "\
 Determine how to handle multiple simultaniously.  Possible values are:\n\
 \n\
 sum: use the sum of the values.\n\
 \n\
 normal: use the arithemetic average of the values, and calculate the\n\
 standard deviation.");
-  syntax.add ("default_hour", Value::Integer, Value::Const, "\
+  frame.add ("default_hour", Value::Integer, Value::Const, "\
 Hour to assume when nothing else is specified;");
-  alist.add ("default_hour", 8);
-  syntax.add_check ("default_hour", VCheck::valid_hour ());
+  frame.add ("default_hour", 8);
+  frame.add_check ("default_hour", VCheck::valid_hour ());
   static VCheck::Enum handle_check ("sum", "normal");
-  syntax.add_check ("handle", handle_check);
-  alist.add ("handle", "normal");
+  frame.add_check ("handle", handle_check);
+  frame.add ("handle", "normal");
 }
 
 SourceFile::SourceFile (Block& al)

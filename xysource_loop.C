@@ -30,6 +30,7 @@
 #include "assertion.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 
 class XYSourceLoop : public XYSource
 {
@@ -144,10 +145,10 @@ XYSourceLoop::~XYSourceLoop ()
 { }
 
 
-static struct XYSourceLoopSyntax
+static struct XYSourceLoopSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new XYSourceLoop (al); }
+  Model* make (Block& al) const
+  { return new XYSourceLoop (al); }
 
   static bool check_alist (const AttributeList& alist, Treelog& msg)
   {
@@ -175,43 +176,41 @@ static struct XYSourceLoopSyntax
   }
 
   XYSourceLoopSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    XYSource::load_syntax (syntax, alist);
-    GnuplotUtil::load_style (syntax, alist, "", "\
-By default the name of the 'x' and 'y' objects.");
-    alist.add ("with", "lines");
-    
-    syntax.add_check (check_alist);
-    alist.add ("description", 
+    : DeclareModel (XYSource::component, "loop", 
 	       "Calculate x and y pairs based on a single variable.\n\
 \n\
 The variable cover an interval from 'begin' to 'end' in fixed steps\n\
 'step'.  The name of the variable is specified by 'tag'.  The x and y\n\
-expressions may refer to the variable.");
-    syntax.add_object ("x", Number::component, 
+expressions may refer to the variable.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    GnuplotUtil::load_style (frame, "", "\
+By default the name of the 'x' and 'y' objects.");
+    frame.add ("with", "lines");
+    
+    frame.add_check (check_alist);
+    frame.add_object ("x", Number::component, 
                        Value::Const, Value::Singleton, "\
 Expression for calculating the x value.");
     AttributeList x_alist;
     x_alist.add ("type", "fetch");
     x_alist.add ("name", "x");
-    alist.add ("x", x_alist);
-    syntax.add_object ("y", Number::component, 
+    frame.add ("x", x_alist);
+    frame.add_object ("y", Number::component, 
                        Value::Const, Value::Singleton, "\
 Expression for calculating the y value.");
-    syntax.add ("begin", Value::User (), Value::Const, "\
+    frame.add ("begin", Value::User (), Value::Const, "\
 Start of interval.");
-    syntax.add ("end", Value::User (), Value::Const, "\
+    frame.add ("end", Value::User (), Value::Const, "\
 End of interval.");
-    syntax.add ("step", Value::User (), Check::non_zero (), Value::Const, "\
+    frame.add ("step", Value::User (), Check::non_zero (), Value::Const, "\
 Disretization within interval.");
     
-    syntax.add ("tag", Value::String, Value::Const, "\
+    frame.add ("tag", Value::String, Value::Const, "\
 Name of free variable to calculate the 'x' and 'y' expressions from.");
-    alist.add ("tag", "x");
+    frame.add ("tag", "x");
 
-    Librarian::add_type (XYSource::component, "loop", alist, syntax, &make);
   }
 } XYSourceLoop_syntax;
 

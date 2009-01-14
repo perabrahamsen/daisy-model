@@ -813,7 +813,7 @@ SVAT_SSOC::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add_object ("solver", Solver::component, 
 		     Value::Const, Value::Singleton, "\
 Model used for solving the energy balance equation system.");
-  alist.add ("solver", Solver::default_model ());
+  alist.add ("solver", "cxsparse");
   syntax.add ("hypostomatous", Value::Boolean, Value::Const,
               "True for hypostomatous leaves. \n\
 False for amphistomatous leaves (possesing stomata on both surfaces).");

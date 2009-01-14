@@ -62,10 +62,7 @@ protected:
 
   // Create.
 public:
-  static void load_style (Syntax&, AttributeList&, 
-                          const symbol default_title);
-private:
-  static void load_syntax (Syntax&, AttributeList&);
+  static void load_style (Frame&, const symbol default_title);
 protected:
   explicit SourceFile (Block&);
 public:

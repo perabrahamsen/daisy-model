@@ -28,6 +28,7 @@
 #include "vcheck.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "frame.h"
 
 class XYSourceExpr : public XYSource
 {
@@ -173,37 +174,35 @@ XYSourceExpr::~XYSourceExpr ()
 { }
 
 
-static struct XYSourceExprSyntax
+static struct XYSourceExprSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new XYSourceExpr (al); }
+  Model* make (Block& al) const
+  { return new XYSourceExpr (al); }
 
   XYSourceExprSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    XYSource::load_syntax (syntax, alist);
-    alist.add ("description", 
+    : DeclareModel (XYSource::component, "arithmetic", 
 	       "Read a daisy log, weather or data file.\n\
 Calculate an x and an y value for each time step, based on the value\n\
-in the various columns.");
-    LexerTable::load_syntax (syntax, alist);
-    GnuplotUtil::load_style (syntax, alist, "\
+in the various columns.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    LexerTable::load_syntax (frame);
+    GnuplotUtil::load_style (frame, "\
 By default, data from dwf and dlf files will be\n\
 drawn with lines, and data from ddf files will be drawn with points.", "\
 By default the name of the 'x' and 'y' objects.");
-    syntax.add_object ("x", Number::component, 
+    frame.add_object ("x", Number::component, 
                        Value::Const, Value::Singleton, "\
 Expression for calculating the x value for this source for each row.\n\
 The expression can refer to the value in a specific column by the tag\n\
 for that column.");
-    syntax.add_object ("y", Number::component, 
+    frame.add_object ("y", Number::component, 
                        Value::Const, Value::Singleton, "\
 Expression for calculating the y value for this source for each row.\n\
 The expression can refer to the value in a specific column by the tag\n\
 for that column.");
 
-    Librarian::add_type (XYSource::component, "arithmetic", alist, syntax, &make);
   }
 } XYSourceExpr_syntax;
 

@@ -24,6 +24,7 @@
 #include "number.h"
 #include "alist.h"
 #include "librarian.h"
+#include "frame.h"
 
 struct SourceExpr : public SourceFile
 {
@@ -114,28 +115,27 @@ SourceExpr::~SourceExpr ()
 { }
 
 
-static struct SourceExprSyntax
+static struct SourceExprSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new SourceExpr (al); }
+  Model* make (Block& al) const
+  { return new SourceExpr (al); }
 
   SourceExprSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    SourceFile::load_style (syntax, alist, "\
-By default the name of the 'expr' object.");
-    alist.add ("description", 
+    : DeclareModel (Source::component, "arithmetic", 
 	       "Read a daisy log, weather or data file.\n\
 Calculate a single value for each time step, based on the value\n\
-in the various columns.");
-    syntax.add_object ("expr", Number::component, 
+in the various columns.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    SourceFile::load_style (frame, "\
+By default the name of the 'expr' object.");
+    frame.add_object ("expr", Number::component, 
                        Value::Const, Value::Singleton, "\
 Expression for calculating the value for this source for each row.\n\
 The expression can refer to the value in a specific column by the tag\n\
 for that column.");
 
-    Librarian::add_type (Source::component, "arithmetic", alist, syntax, &make);
   }
 } SourceExpr_syntax;
 

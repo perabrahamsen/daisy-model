@@ -25,6 +25,7 @@
 #include "alist.h"
 #include "librarian.h"
 #include "assertion.h"
+#include "frame.h"
 
 // secondary component.
 
@@ -80,19 +81,18 @@ struct SecondaryNone : public Secondary
   {}
 };
 
-static struct SecondaryNoneSyntax
+static struct SecondaryNoneSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new SecondaryNone (al); }
+  Model* make (Block& al) const
+  { return new SecondaryNone (al); }
   SecondaryNoneSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "No secondary domain.\n\
+    : DeclareModel (Secondary::component, "none", "No secondary domain.\n\
 \n\
 There is always full equilibrium between solute in different size\n\
-matrix pores.");
-    Librarian::add_type (Secondary::component, "none", alist, syntax, &make);
+matrix pores.")
+  { }
+  void load_frame (Frame& frame) const
+  {
   }
 } SecondaryNone_syntax;
 
@@ -128,24 +128,22 @@ struct SecondaryPressure : public Secondary
   {}
 };
 
-static struct SecondaryPressureSyntax
+static struct SecondaryPressureSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new SecondaryPressure (al); }
+  Model* make (Block& al) const
+  { return new SecondaryPressure (al); }
   SecondaryPressureSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Horizon has secondary domain.\n\
+    : DeclareModel (Secondary::component, "pressure", "Horizon has secondary domain.\n\
 \n\
 The secondary domain consist of water in matrix pores larger than\n\
-what corresponds to the specified pressure. "); 
-  
-    syntax.add ("h_lim", "cm", Value::Const, "\
+what corresponds to the specified pressure. ")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add ("h_lim", "cm", Value::Const, "\
 Pressure for activating secondary domain.");
-    syntax.add ("alpha", "h^-1", Value::Const, "\
+    frame.add ("alpha", "h^-1", Value::Const, "\
 Exchange rate between primary and secondary water."); 
-   Librarian::add_type (Secondary::component, "pressure", alist, syntax, &make);
   }
 } SecondaryPressure_syntax;
 

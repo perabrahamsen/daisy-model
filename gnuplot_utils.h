@@ -23,13 +23,12 @@
 
 #include "symbol.h"
 
-class Syntax;
-class AttributeList;
+class Frame;
 
 namespace GnuplotUtil
 {
   // Add gnuplot data series style information.
-  void load_style (Syntax&, AttributeList&, const symbol default_with, 
+  void load_style (Frame&, const symbol default_with, 
                    const symbol default_title);
 }
 

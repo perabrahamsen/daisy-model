@@ -28,6 +28,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "librarian.h"
+#include "frame.h"
 
 struct SolverNone : public Solver
 { 
@@ -38,16 +39,15 @@ struct SolverNone : public Solver
   { }
 };
 
-static struct SolverNoneSyntax
+static struct SolverNoneSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new SolverNone (al); }
+  Model* make (Block& al) const
+  { return new SolverNone (al); }
   SolverNoneSyntax ()
+    : DeclareModel (Solver::component, "none", "Don't solve the equation.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Don't solve the equation.");
-    Librarian::add_type (Solver::component, "none", alist, syntax, &make);
   }
 } SolverNone_syntax;
 

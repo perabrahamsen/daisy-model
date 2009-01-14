@@ -977,7 +977,7 @@ biopore${OBJ}: biopore.C biopore.h model.h symbol.h alist.h number.h im.h \
   scope_multi.h scope_id.h units.h check.h geometry.h log.h time.h \
   border.h treelog.h assertion.h mathlib.h
 secondary${OBJ}: secondary.C secondary.h model.h symbol.h alist.h block.h \
-  syntax.h value.h plf.h librarian.h assertion.h
+  syntax.h value.h plf.h librarian.h assertion.h frame.h scope.h
 heatrect${OBJ}: heatrect.C heatrect.h model.h symbol.h alist.h block.h \
   syntax.h value.h plf.h librarian.h
 unit_model${OBJ}: unit_model.C unit_model.h unit.h symbol.h model.h alist.h \
@@ -1238,7 +1238,7 @@ movement_solute${OBJ}: movement_solute.C movement_solute.h movement.h model.h \
   block.h plf.h treelog.h assertion.h mathlib.h
 scope_exchange${OBJ}: scope_exchange.C scope_exchange.h model.h symbol.h \
   alist.h scope_model.h scope.h value.h memutils.h block.h syntax.h plf.h \
-  assertion.h librarian.h
+  assertion.h librarian.h frame.h
 photo_Farquhar${OBJ}: photo_Farquhar.C photo_Farquhar.h photo.h model.h \
   symbol.h alist.h block.h syntax.h value.h plf.h rubiscoNdist.h \
   resistance.h ABAeffect.h stomatacon.h bioclimate.h canopy_std.h \
@@ -1254,8 +1254,8 @@ gnuplot_base${OBJ}: gnuplot_base.C gnuplot_base.h gnuplot.h model.h symbol.h \
   alist.h vcheck.h block.h syntax.h value.h plf.h frame.h scope.h \
   assertion.h librarian.h treelog.h
 source_file${OBJ}: source_file.C source_file.h source.h model.h symbol.h \
-  alist.h time.h lexer_table.h block.h syntax.h value.h plf.h \
-  gnuplot_utils.h vcheck.h mathlib.h assertion.h
+  alist.h time.h lexer_table.h block.h syntax.h value.h plf.h frame.h \
+  scope.h gnuplot_utils.h vcheck.h mathlib.h assertion.h
 format_LaTeX${OBJ}: format_LaTeX.C format_LaTeX.h format.h model.h symbol.h \
   alist.h syntax.h value.h version.h assertion.h librarian.h
 log_all${OBJ}: log_all.C log_all.h log_select.h log.h time.h border.h model.h \
@@ -1344,15 +1344,15 @@ scope_block${OBJ}: scope_block.C scope_block.h scope.h value.h symbol.h \
 librarian${OBJ}: librarian.C librarian.h model.h symbol.h alist.h library.h \
   metalib.h frame.h syntax.h value.h scope.h intrinsics.h block.h plf.h \
   treelog_text.h treelog.h assertion.h frame_model.h
-gnuplot_utils${OBJ}: gnuplot_utils.C gnuplot_utils.h symbol.h syntax.h \
-  value.h alist.h
+gnuplot_utils${OBJ}: gnuplot_utils.C gnuplot_utils.h symbol.h frame.h \
+  syntax.h value.h scope.h
 scope_sources${OBJ}: scope_sources.C scope_sources.h scope.h value.h symbol.h \
   time.h memutils.h source.h model.h alist.h treelog.h assertion.h
 scope_table${OBJ}: scope_table.C scope_table.h scope.h value.h symbol.h \
   lexer_table.h block.h syntax.h plf.h assertion.h
 lexer_table${OBJ}: lexer_table.C lexer_table.h block.h syntax.h value.h \
-  symbol.h plf.h lexer_data.h lexer.h alist.h assertion.h mathlib.h \
-  submodeler.h memutils.h time.h vcheck.h path.h
+  symbol.h plf.h lexer_data.h lexer.h frame.h scope.h assertion.h \
+  mathlib.h submodeler.h memutils.h time.h vcheck.h path.h
 block${OBJ}: block.C block.h syntax.h value.h symbol.h plf.h metalib.h \
   frame.h scope.h library.h alist.h librarian.h model.h stringer.h \
   number.h assertion.h scope_block.h treelog.h
@@ -1428,10 +1428,11 @@ reaction_filter${OBJ}: reaction_filter.C reaction.h model.h symbol.h alist.h \
   soil.h soil_water.h log.h time.h border.h assertion.h librarian.h \
   check.h mathlib.h treelog.h frame.h scope.h
 seed_LAI${OBJ}: seed_LAI.C seed.h model.h symbol.h alist.h block.h syntax.h \
-  value.h plf.h librarian.h log.h time.h border.h treelog.h
+  value.h plf.h librarian.h log.h time.h border.h treelog.h frame.h \
+  scope.h
 seed_release${OBJ}: seed_release.C seed.h model.h symbol.h alist.h block.h \
   syntax.h value.h plf.h librarian.h log.h time.h border.h check.h \
-  treelog.h
+  treelog.h frame.h scope.h
 stomatacon_BB${OBJ}: stomatacon_BB.C stomatacon.h model.h symbol.h alist.h \
   mathlib.h assertion.h check.h block.h syntax.h value.h plf.h \
   librarian.h
@@ -1503,11 +1504,11 @@ ABAprod_root${OBJ}: ABAprod_root.C ABAprod.h model.h symbol.h alist.h \
   number.h scope_id.h scope.h value.h geometry.h soil_water.h units.h \
   assertion.h librarian.h frame.h syntax.h treelog.h
 solver_ublas${OBJ}: solver_ublas.C solver.h model.h symbol.h alist.h \
-  assertion.h syntax.h value.h librarian.h
+  assertion.h syntax.h value.h librarian.h frame.h scope.h
 solver_cxsparse${OBJ}: solver_cxsparse.C solver.h model.h symbol.h alist.h \
-  syntax.h value.h librarian.h ublas_cxsparse.h
+  syntax.h value.h librarian.h ublas_cxsparse.h frame.h scope.h
 solver_none${OBJ}: solver_none.C solver.h model.h symbol.h alist.h syntax.h \
-  value.h librarian.h
+  value.h librarian.h frame.h scope.h
 movement_rect${OBJ}: movement_rect.C movement_solute.h movement.h model.h \
   symbol.h alist.h memutils.h geometry_rect.h geometry_vert.h geometry.h \
   value.h heatrect.h soil.h soil_water.h soil_heat.h transport.h \
@@ -1683,7 +1684,7 @@ integer_arit${OBJ}: integer_arit.C integer.h model.h symbol.h alist.h \
   frame.h scope.h
 source_merge${OBJ}: source_merge.C source.h model.h symbol.h alist.h time.h \
   block.h syntax.h value.h plf.h gnuplot_utils.h units.h vcheck.h \
-  mathlib.h assertion.h memutils.h librarian.h treelog.h
+  mathlib.h assertion.h memutils.h librarian.h treelog.h frame.h scope.h
 number_source${OBJ}: number_source.C number.h symbol.h model.h alist.h \
   block.h syntax.h value.h plf.h source.h time.h assertion.h librarian.h \
   treelog.h frame.h scope.h
@@ -1697,23 +1698,24 @@ action_table${OBJ}: action_table.C action.h model.h symbol.h alist.h \
   treelog.h
 xysource_merge${OBJ}: xysource_merge.C xysource.h model.h symbol.h alist.h \
   block.h syntax.h value.h plf.h gnuplot_utils.h number.h scope_sources.h \
-  scope.h time.h memutils.h units.h vcheck.h librarian.h treelog.h
+  scope.h time.h memutils.h units.h vcheck.h librarian.h treelog.h \
+  frame.h
 xysource_inline${OBJ}: xysource_inline.C xysource.h model.h symbol.h alist.h \
   block.h syntax.h value.h plf.h gnuplot_utils.h number.h vcheck.h \
-  assertion.h librarian.h
+  assertion.h librarian.h frame.h scope.h
 xysource_loop${OBJ}: xysource_loop.C xysource.h model.h symbol.h alist.h \
   block.h syntax.h value.h plf.h gnuplot_utils.h scope_id.h scope.h \
-  number.h check.h vcheck.h assertion.h librarian.h treelog.h
+  number.h check.h vcheck.h assertion.h librarian.h treelog.h frame.h
 xysource_combine${OBJ}: xysource_combine.C xysource.h model.h symbol.h \
   alist.h block.h syntax.h value.h plf.h gnuplot_utils.h number.h \
   scope_sources.h scope.h time.h memutils.h source.h assertion.h \
-  librarian.h
+  librarian.h frame.h
 gnuplot_xy${OBJ}: gnuplot_xy.C gnuplot_base.h gnuplot.h model.h symbol.h \
   alist.h block.h syntax.h value.h plf.h xysource.h treelog.h mathlib.h \
   assertion.h memutils.h librarian.h frame.h scope.h
 xysource_expr${OBJ}: xysource_expr.C xysource.h model.h symbol.h alist.h \
   lexer_table.h block.h syntax.h value.h plf.h scope_table.h scope.h \
-  gnuplot_utils.h number.h vcheck.h assertion.h librarian.h
+  gnuplot_utils.h number.h vcheck.h assertion.h librarian.h frame.h
 gnuplot_multi${OBJ}: gnuplot_multi.C gnuplot.h model.h symbol.h alist.h \
   block.h syntax.h value.h plf.h source.h time.h treelog.h memutils.h \
   librarian.h frame.h scope.h
@@ -1722,16 +1724,17 @@ gnuplot_time${OBJ}: gnuplot_time.C gnuplot_base.h gnuplot.h model.h symbol.h \
   mathlib.h assertion.h memutils.h librarian.h frame.h scope.h
 source_combine${OBJ}: source_combine.C source.h model.h symbol.h alist.h \
   time.h block.h syntax.h value.h plf.h number.h scope_sources.h scope.h \
-  memutils.h gnuplot_utils.h vcheck.h assertion.h librarian.h treelog.h
+  memutils.h gnuplot_utils.h vcheck.h assertion.h librarian.h treelog.h \
+  frame.h
 number_arit${OBJ}: number_arit.C number.h symbol.h model.h alist.h syntax.h \
   value.h units.h vcheck.h mathlib.h assertion.h memutils.h block.h plf.h \
   librarian.h submodeler.h treelog.h frame.h scope.h
 source_expr${OBJ}: source_expr.C source_file.h source.h model.h symbol.h \
   alist.h time.h lexer_table.h block.h syntax.h value.h plf.h \
-  scope_table.h scope.h number.h librarian.h
+  scope_table.h scope.h number.h librarian.h frame.h
 source_std${OBJ}: source_std.C source_file.h source.h model.h symbol.h \
   alist.h time.h lexer_table.h block.h syntax.h value.h plf.h units.h \
-  librarian.h
+  librarian.h frame.h scope.h
 action_markvand${OBJ}: action_markvand.C action.h model.h symbol.h alist.h \
   block.h syntax.h value.h plf.h daisy.h program.h run.h time.h \
   timestep.h vcheck.h memutils.h field.h border.h crop.h im.h fao.h log.h \

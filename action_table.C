@@ -375,7 +375,7 @@ Fertilizer [name]: The type of fertilizer to be applied.")
   { }
   void load_frame (Frame& frame) const
   { 
-    LexerTable::load_syntax (frame.syntax (), frame.alist ());
+    LexerTable::load_syntax (frame);
     frame.add_object ("sow", Action::component, 
                        Value::OptionalConst, Value::Singleton, 
                        "Sow action.");

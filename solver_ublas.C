@@ -29,6 +29,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "librarian.h"
+#include "frame.h"
 
 #include <boost/numeric/ublas/triangular.hpp>
 #include <boost/numeric/ublas/vector_proxy.hpp>
@@ -52,16 +53,15 @@ struct SolverUBLAS : public Solver
   { }
 };
 
-static struct SolverUBLASSyntax
+static struct SolverUBLASSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new SolverUBLAS (al); }
+  Model* make (Block& al) const
+  { return new SolverUBLAS (al); }
   SolverUBLASSyntax ()
+    : DeclareModel (Solver::component, "ublas", "Solve equation using UBLAS lu functions.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Solve equation using UBLAS lu functions.");
-    Librarian::add_type (Solver::component, "ublas", alist, syntax, &make);
   }
 } SolverUBLAS_syntax;
 

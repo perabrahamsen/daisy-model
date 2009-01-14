@@ -29,6 +29,7 @@
 #include "assertion.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 
 struct SourceCombine : public Source
 {
@@ -120,33 +121,31 @@ SourceCombine::SourceCombine (Block& al)
     style_ (al.integer ("style", -1))
 { }
 
-static struct SourceCombineSyntax
+static struct SourceCombineSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new SourceCombine (al); }
+  Model* make (Block& al) const
+  { return new SourceCombine (al); }
 
   SourceCombineSyntax ()
+    : DeclareModel (Source::component, "combine", 
+	       "Combine data from multiple sources with a single expression.")
+  { }
+  void load_frame (Frame& frame) const
   { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    Source::load_syntax (syntax, alist);
-    GnuplotUtil::load_style (syntax, alist, "\
+    GnuplotUtil::load_style (frame, "\
 By default, let the first source decide.", "\
 By default the name of the 'expr' object.");
-    alist.add ("description", 
-	       "Combine data from multiple sources with a single expression.");
-    syntax.add_object ("source", Source::component, 
+    frame.add_object ("source", Source::component, 
                        Value::State, Value::Sequence, "\
 List of sources for data.  The style information for the sources is\n\
 ignored, but the dates, title and value is used as specified by\n\
 'expr' to calculate the combines date and value pairs.");
-    syntax.add_object ("expr", Number::component, 
+    frame.add_object ("expr", Number::component, 
                        Value::Const, Value::Singleton, "\
 Expression for calculating the value for this source for each row.\n\
 A row is any date found in any of the member of 'source'.  The\n\
 expression may refer to the value of each source by its title.");
     
-    Librarian::add_type (Source::component, "combine", alist, syntax, &make);
   }
 } SourceCombine_syntax;
 

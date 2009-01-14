@@ -27,6 +27,7 @@
 #include "plf.h"
 #include "log.h"
 #include "treelog.h"
+#include "frame.h"
 #include <cmath>
 
 struct SeedLAI : public Seed
@@ -112,58 +113,34 @@ SeedLAI::forced_CAI (const double WLeaf, const double SpLAI, const double DS)
   return -1.0;              // No force.
 }
 
-void
-SeedLAI::load_syntax (Syntax& syntax, AttributeList& alist)
+static struct Seed_LAISyntax : public DeclareModel
 {
-  // Parameters.
-  syntax.add ("DSLAI05", Value::None (), Value::Const,
-	      "DS at CAI=0.5; initial phase.");
-  alist.add ("DSLAI05", 0.15);
-  syntax.add ("SpLAIfac", "DS", Value::None (), Value::Const, "\
+  Model* make (Block& al) const
+  { return new SeedLAI (al); }
+  Seed_LAISyntax ()
+    : DeclareModel (Seed::component, "LAI", "\
+Initial crop growth is governed by a forced LAI function.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    // Parameters.
+    frame.add ("DSLAI05", Value::None (), Value::Const,
+                "DS at CAI=0.5; initial phase.");
+    frame.add ("DSLAI05", 0.15);
+    frame.add ("SpLAIfac", "DS", Value::None (), Value::Const, "\
 Factor defining maximum specific leaf weight.\n\
 Only used during the initial phase.");
-  PLF SpLf;
-  SpLf.add (0.00, 3.00);
-  SpLf.add (0.20, 1.50);
-  SpLf.add (0.40, 1.25);
-  SpLf.add (0.60, 1.00);
-  alist.add ("SpLAIfac", SpLf);
+    PLF SpLf;
+    SpLf.add (0.00, 3.00);
+    SpLf.add (0.20, 1.50);
+    SpLf.add (0.40, 1.25);
+    SpLf.add (0.60, 1.00);
+    frame.add ("SpLAIfac", SpLf);
 
-  // State.
-  syntax.add ("InitCAI", Value::Boolean, Value::State,
-	      "Initial CAI development phase.");
-  alist.add ("InitCAI", true);
-
-}
-
-const AttributeList& 
-Seed::default_model ()
-{
-  static AttributeList alist;
-  
-  if (!alist.check ("type"))
-    {
-      Syntax dummy;
-      SeedLAI::load_syntax (dummy, alist);
-      alist.add ("type", "LAI");
-    }
-  return alist;
-}
-
-static struct Seed_LAISyntax
-{
-  static Model& make (Block& al)
-  { return *new SeedLAI (al); }
-  Seed_LAISyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-
-    alist.add ("description", "\
-Initial crop growth is governed by a forced LAI function.");
-    SeedLAI::load_syntax (syntax, alist);
-
-    Librarian::add_type (Seed::component, "LAI", alist, syntax, &make);
+    // State.
+    frame.add ("InitCAI", Value::Boolean, Value::State,
+                "Initial CAI development phase.");
+    frame.add ("InitCAI", true);
   }
 } SeedLAI_syntax;
 

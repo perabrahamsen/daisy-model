@@ -29,6 +29,7 @@
 #include "memutils.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 #include <numeric>
 #include <sstream>
 
@@ -200,33 +201,31 @@ SourceMerge::SourceMerge (Block& al)
     style_ (al.integer ("style", -1))
 { }
 
-static struct SourceMergeSyntax
+static struct SourceMergeSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new SourceMerge (al); }
+  Model* make (Block& al) const
+  { return new SourceMerge (al); }
 
   SourceMergeSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    Source::load_syntax (syntax, alist);
-    GnuplotUtil::load_style (syntax, alist, "\
-By default, let the first source decide.", "");
-    alist.add ("description", 
+    : DeclareModel (Source::component, "merge", 
 	       "Merge multiple timeseries into one.\n\
 Any errorbars on the original timeseries are ignored, but the merged\n\
 timeseries may have errorbars if there are multiple values for the\n\
-same time.");
-    syntax.add_object ("source", Source::component, 
+same time.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    GnuplotUtil::load_style (frame, "\
+By default, let the first source decide.", "");
+    frame.add_object ("source", Source::component, 
                        Value::State, Value::Sequence, "\
 List of timeseries to merge.");
-    syntax.add_check ("source", VCheck::min_size_1 ());
-    syntax.add ("dimension", Value::String, Value::OptionalConst, "\
+    frame.add_check ("source", VCheck::min_size_1 ());
+    frame.add ("dimension", Value::String, Value::OptionalConst, "\
 Dimension of data to plot.\n\
 By default use the first source with a known dimension.");
 
     
-    Librarian::add_type (Source::component, "merge", alist, syntax, &make);
   }
 } SourceMerge_syntax;
 

@@ -44,7 +44,6 @@ public:
   virtual double initial_N () const = 0;
   virtual void initialize (double weight, Treelog& msg) = 0;
   virtual bool check (Treelog& msg) const = 0;
-  static const AttributeList& default_model ();
   Seed (Block&);
   ~Seed ();
 };

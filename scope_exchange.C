@@ -24,6 +24,7 @@
 #include "alist.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "frame.h"
 
 // The Exchange item model.
 
@@ -61,15 +62,6 @@ void
 Exchange::set_number (const double)
 { daisy_notreached (); }
 
-void
-Exchange::load_syntax (Syntax& syntax, AttributeList&)
-{
-  syntax.add ("description", Value::String, Value::Const, "\
-Description of value to exchange.");
-  syntax.add ("name", Value::String, Value::Const, "\
-Name of value to exchange.");
-}
-
 Exchange::Exchange (const symbol n, const symbol d)
   : tag_ (n),
     description (d)
@@ -77,6 +69,21 @@ Exchange::Exchange (const symbol n, const symbol d)
   
 Exchange::~Exchange ()
 { }
+
+static struct ExchangeInit : public DeclareComponent 
+{
+  ExchangeInit ()
+    : DeclareComponent (Exchange::component, "\
+A named value to exchange with external models.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add ("description", Value::String, Value::Const, "\
+Description of value to exchange.");
+    frame.add ("name", Value::String, Value::Const, "\
+Name of value to exchange.");
+  }
+} Exchange_init;
 
 // Exchanging a number.
 
@@ -126,21 +133,19 @@ ExchangeNumber::ExchangeNumber (const symbol n, const double val,
 ExchangeNumber::~ExchangeNumber ()
 { }
 
-static struct ExchangeNumberSyntax
+static struct ExchangeNumberSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ExchangeNumber (al); }
+  Model* make (Block& al) const
+  { return new ExchangeNumber (al); }
   ExchangeNumberSyntax ()
+    : DeclareModel (Exchange::component, "number", "Exchange a numeric value.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    Exchange::load_syntax (syntax, alist);
-    alist.add ("description", "Exchange a numeric value.");
-    syntax.add ("dimension", Value::String, Value::Const, "\
+    frame.add ("dimension", Value::String, Value::Const, "\
 Dimension of value to exchange.");
-    syntax.add ("value", Value::Unknown (), Value::OptionalState, "\
+    frame.add ("value", Value::Unknown (), Value::OptionalState, "\
 Current value to exchange.");
-    Librarian::add_type (Exchange::component, "number", alist, syntax, &make);
   }
 } ExchangeNumber_syntax;
 
@@ -166,19 +171,17 @@ ExchangeName::ExchangeName (Block& al)
 ExchangeName::~ExchangeName ()
 { }
 
-static struct ExchangeNameSyntax
+static struct ExchangeNameSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ExchangeName (al); }
+  Model* make (Block& al) const
+  { return new ExchangeName (al); }
   ExchangeNameSyntax ()
+    : DeclareModel (Exchange::component, "name", "Exchange a string value.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    Exchange::load_syntax (syntax, alist);
-    alist.add ("description", "Exchange a string value.");
-    syntax.add ("value", Value::String, Value::Const, "\
+    frame.add ("value", Value::String, Value::Const, "\
 Current value to exchange.");
-    Librarian::add_type (Exchange::component, "name", alist, syntax, &make);
   }
 } ExchangeName_syntax;
 
@@ -279,30 +282,20 @@ ScopeExchange::ScopeExchange (Block& al)
 ScopeExchange::~ScopeExchange ()
 { }
 
-static struct ScopeExchangeSyntax
+static struct ScopeExchangeSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ScopeExchange (al); }
+  Model* make (Block& al) const
+  { return new ScopeExchange (al); }
   ScopeExchangeSyntax ()
+    : DeclareModel (MScope::component, "exchange", 
+               "Exchange values with an external model.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", 
-               "Exchange values with an external model.");
-
-    syntax.add_object ("entries", Exchange::component, 
+    frame.add_object ("entries", Exchange::component, 
                        Value::Const, Value::Sequence,
                        "List of items to exchange.");
-    Librarian::add_type (MScope::component, "exchange", alist, syntax, &make);
   }
 } ScopeExchange_syntax;
-
-static struct ExchangeInit : public DeclareComponent 
-{
-  ExchangeInit ()
-    : DeclareComponent (Exchange::component, "\
-A named value to exchange with external models.")
-  { }
-} Exchange_init;
 
 // scope_exchange.C ends here.

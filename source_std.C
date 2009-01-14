@@ -24,6 +24,7 @@
 #include "lexer_table.h"
 #include "alist.h"
 #include "librarian.h"
+#include "frame.h"
 #include <sstream>
 
 struct SourceStandard : public SourceFile
@@ -150,31 +151,30 @@ SourceStandard::~SourceStandard ()
 { }
 
 
-static struct SourceStandardSyntax
+static struct SourceStandardSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new SourceStandard (al); }
+  Model* make (Block& al) const
+  { return new SourceStandard (al); }
 
   SourceStandardSyntax ()
+    : DeclareModel (Source::component, "column", "\
+Read a a single column from a Daisy log, weather or data file.")
+  { }
+  void load_frame (Frame& frame) const
   { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    SourceFile::load_style (syntax, alist, "\
+    SourceFile::load_style (frame, "\
 By default the same as 'tag'.");
-    alist.add ("description", "\
-Read a a single column from a Daisy log, weather or data file.");
 
-    syntax.add ("tag", Value::String, Value::Const, "\
+    frame.add ("tag", Value::String, Value::Const, "\
 Name of column in Daisy log file where data is found.");
-    syntax.add ("dimension", Value::String, Value::OptionalConst, "\
+    frame.add ("dimension", Value::String, Value::OptionalConst, "\
 Dimension of data to plot.\n\
 By default this is the same as 'original'.\n\
 If 'factor' is not specified, Daisy will attempt to convert the data.");
-    syntax.add ("factor", Value::Unknown (), Value::OptionalConst, "\
+    frame.add ("factor", Value::Unknown (), Value::OptionalConst, "\
 Multiply all data by this number.\n\
 By default Daisy will convert from 'original' to 'dimension'.");
 
-    Librarian::add_type (Source::component, "column", alist, syntax, &make);
   }
 } SourceStandard_syntax;
 

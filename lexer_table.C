@@ -22,7 +22,7 @@
 
 #include "lexer_table.h"
 #include "lexer_data.h"
-#include "alist.h"
+#include "frame.h"
 #include "assertion.h"
 #include "mathlib.h"
 #include "submodeler.h"
@@ -441,21 +441,21 @@ LexerTable::error (const std::string& str) const
 { lex->error (str); }
 
 void 
-LexerTable::load_syntax (Syntax& syntax, AttributeList& alist)
+LexerTable::load_syntax (Frame& frame)
 {
-  syntax.add ("file", Value::String, Value::Const, "\
+  frame.add ("file", Value::String, Value::Const, "\
 Name of Daisy log file where data is found.");
-  syntax.add ("missing", Value::String, Value::Const, Value::Sequence, "\
+  frame.add ("missing", Value::String, Value::Const, Value::Sequence, "\
 List of strings indicating missing values.");
   std::vector<symbol> misses;
   misses.push_back (symbol (""));
   misses.push_back (symbol ("00.00"));
-  alist.add ("missing", misses);
-  syntax.add_submodule_sequence ("filter", Value::Const, "\
+  frame.add ("missing", misses);
+  frame.add_submodule_sequence ("filter", Value::Const, "\
 Only include data from rows that passes all these filters.",
 				 LexerTable::Filter::load_syntax);
-  alist.add ("filter", std::vector<const AttributeList*> ());
-  syntax.add ("original", Value::String, Value::OptionalConst, 
+  frame.add ("filter", std::vector<const AttributeList*> ());
+  frame.add ("original", Value::String, Value::OptionalConst, 
               Value::Sequence, "\
 List of dimensions of the data in the data file.\n\
 \n\
@@ -464,7 +464,7 @@ dimension for all columns in the file.  Otherwise, the list must have\n\
 one element for each column.\n\
 \n\
 By default Daisy will use the names specified in data file.");
-  syntax.add ("dim_line", Value::Boolean, Value::OptionalConst, "\
+  frame.add ("dim_line", Value::Boolean, Value::OptionalConst, "\
 If true, assume the line after the tags contain dimensions.\n\
 By default this will be true iff 'original' is not specified.");
 }

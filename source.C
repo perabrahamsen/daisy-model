@@ -91,10 +91,6 @@ Source::distance (const Time begin, const Time end,
     }
 }
 
-void
-Source::load_syntax (Syntax&, AttributeList&)
-{ }
-
 Source::Source (Block& al)
   : name (al.name ("type"))
 { }

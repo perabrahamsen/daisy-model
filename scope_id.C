@@ -27,6 +27,7 @@
 #include "block.h"
 #include "alist.h"
 #include "librarian.h"
+#include "frame.h"
 #endif
 
 void 
@@ -81,23 +82,22 @@ ScopeID::~ScopeID ()
 { }
 
 #if 0
-static struct ScopeIDSyntax
+static struct ScopeIDSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ScopeID (al); }
+  Model* make (Block& al) const
+  { return new ScopeID (al); }
 
   ScopeIDSyntax ()
+    : DeclareModel (Scope::component, "id", 
+               "A scope containing just a single number.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
 
-    alist.add ("description", 
-               "A scope containing just a single number.");
-    syntax.add ("name", Value::String, Value::Const, 
+    frame.add ("name", Value::String, Value::Const, 
                 "Identifier name.");
-    syntax.add ("value", Value::User (), Value::Const, 
+    frame.add ("value", Value::User (), Value::Const, 
                 "Initial value and dimension.");
-    Librarian::add_type (Scope::component, "id", alist, syntax, &make);
   }
 } ScopeID_syntax;
 #endif

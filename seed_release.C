@@ -27,6 +27,7 @@
 #include "log.h"
 #include "check.h"
 #include "treelog.h"
+#include "frame.h"
 
 struct SeedRelease : public Seed
 {
@@ -99,25 +100,6 @@ SeedRelease::check (Treelog& msg) const
   return ok;
 }
 
-void
-SeedRelease::load_syntax (Syntax& syntax, AttributeList& alist)
-{
-  syntax.add ("initial_weight", "g w.w./m^2",
-              Check::positive (), Value::OptionalConst, "\
-Initial seed weight to use when not specified by the sow operation.\n\
-If not specified here, specifying seed amount when sowing is mandatory.");
-  syntax.add ("DM_fraction", Value::Fraction (), Value::Const, "\
-Dry matter content in seeds.");
-  syntax.add ("C_fraction", Value::Fraction (), Value::Const, "\
-Carbon content in seeds.");
-  syntax.add ("N_fraction", Value::Fraction (), Value::Const, "\
-Nitrogen content in seeds.");
-  syntax.add ("rate", "h^-1", Check::positive (), Value::Const, "\
-Release rate of seed carbon to assimilate pool.");
-  syntax.add ("C", "g C/m^2", Check::non_negative (), Value::OptionalState, "\
-Unreleased carbon left in seeds.");
-}
-
 SeedRelease::SeedRelease (Block& al)
   : Seed (al),
     initial_weight (al.number ("initial_weight", -42.42e42)),
@@ -131,35 +113,30 @@ SeedRelease::SeedRelease (Block& al)
 SeedRelease::~SeedRelease ()
 { }
 
-#if 0
-const AttributeList& 
-Seed::default_model ()
+static struct Seed_ReleaseSyntax : public DeclareModel
 {
-  static AttributeList alist;
-  
-  if (!alist.check ("type"))
-    {
-      Syntax dummy;
-      SeedRelease::load_syntax (dummy, alist);
-      alist.add ("type", "release");
-    }
-  return alist;
-}
-#endif
-
-static struct Seed_ReleaseSyntax
-{
-  static Model& make (Block& al)
-  { return *new SeedRelease (al); }
+  Model* make (Block& al) const
+  { return new SeedRelease (al); }
   Seed_ReleaseSyntax ()
+    : DeclareModel (Seed::component, "release", "\
+Initial crop growth is governed by carbon released from seeds.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    SeedRelease::load_syntax (syntax, alist);
-    alist.add ("description", "\
-Initial crop growth is governed by carbon released from seeds.");
-
-    Librarian::add_type (Seed::component, "release", alist, syntax, &make);
+    frame.add ("initial_weight", "g w.w./m^2",
+                Check::positive (), Value::OptionalConst, "\
+Initial seed weight to use when not specified by the sow operation.\n\
+If not specified here, specifying seed amount when sowing is mandatory.");
+    frame.add ("DM_fraction", Value::Fraction (), Value::Const, "\
+Dry matter content in seeds.");
+    frame.add ("C_fraction", Value::Fraction (), Value::Const, "\
+Carbon content in seeds.");
+    frame.add ("N_fraction", Value::Fraction (), Value::Const, "\
+Nitrogen content in seeds.");
+    frame.add ("rate", "h^-1", Check::positive (), Value::Const, "\
+Release rate of seed carbon to assimilate pool.");
+    frame.add ("C", "g C/m^2", Check::non_negative (), Value::OptionalState, "\
+Unreleased carbon left in seeds.");
   }
 } SeedRelease_syntax;
 

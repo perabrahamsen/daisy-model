@@ -1122,7 +1122,7 @@ See Mollerup 2007 for details.")
     frame.add_object ("solver", Solver::component, 
                        Value::Const, Value::Singleton, "\
 Model used for solving matrix equation system.");
-    frame.add ("solver", Solver::default_model ());
+    frame.add ("solver", "cxsparse");
     frame.add_object ("K_average", Average::component,
                        Value::Const, Value::Singleton,
                        "Model for calculating average K between cells.");

@@ -820,7 +820,7 @@ static struct CropStandardSyntax : public DeclareModel
 
     frame.add_object ("Seed", Seed::component, 
                        "Initial crop growth.");
-    frame.add ("Seed", Seed::default_model ());
+    frame.add ("Seed", "LAI");
     frame.add_submodule ("Root", Value::State, 
                           "Root system.", RootSystem::load_syntax);
     frame.add_submodule ("Canopy", Value::State,

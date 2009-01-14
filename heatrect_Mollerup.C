@@ -508,7 +508,7 @@ Finite volume solution to heat transfer by Mikkel Mollerup.")
     frame.add_object ("solver", Solver::component, 
                        Value::Const, Value::Singleton, "\
 Model used for solving matrix equation system.");
-    frame.add ("solver", Solver::default_model ());
+    frame.add ("solver", "cxsparse");
     frame.add ("debug", Value::Integer, Value::Const, "\
 Enable additional debug message.\n\
 A value of 0 means no message, higher numbers means more messages.");

@@ -29,6 +29,7 @@
 #include "alist.h"
 #include "librarian.h"
 #include "ublas_cxsparse.h"
+#include "frame.h"
 
 #define MEMCHECK(foo) if (!(foo)) throw "CXSparse: Bad matrix: " #foo ;
 
@@ -62,34 +63,23 @@ struct SolverCXSparse : public Solver
   { }
 };
 
-static struct SolverCXSparseSyntax
+static struct SolverCXSparseSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new SolverCXSparse (al); }
+  Model* make (Block& al) const
+  { return new SolverCXSparse (al); }
   SolverCXSparseSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
+    : DeclareModel (Solver::component, "cxsparse", "\
 Solve equation using CXSparse library described in:\n\
 \n\
 Direct Methods for Sparse Linear Systems, T. A. Davis, SIAM,\n\
 Philadelphia, Sept. 2006. Part of the SIAM Book Series on the\n\
 Fundamentals of Algorithms.\n\
 \n\
-The uBLAS interface was provided by Gunter Winkler <guwi17@gmx.de>.");
-    Librarian::add_type (Solver::component, "cxsparse", alist, syntax, &make);
+The uBLAS interface was provided by Gunter Winkler <guwi17@gmx.de>.")
+  { }
+  void load_frame (Frame& frame) const
+  {
   }
 } SolverCXSparse_syntax;
-
-const AttributeList&
-Solver::default_model ()
-{
-  static AttributeList alist;
-  if (!alist.check ("type"))
-    alist.add ("type", "cxsparse");
-
-  return alist;
-}
 
 // solver_cxsparse.C ends here.

@@ -27,6 +27,7 @@
 #include "vcheck.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "frame.h"
 
 
 class XYSourceInline : public XYSource
@@ -102,29 +103,27 @@ XYSourceInline::~XYSourceInline ()
 { }
 
 
-static struct XYSourceInlineSyntax
+static struct XYSourceInlineSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new XYSourceInline (al); }
+  Model* make (Block& al) const
+  { return new XYSourceInline (al); }
 
   XYSourceInlineSyntax ()
+    : DeclareModel (XYSource::component, "inline", 
+	       "A list of x, y pairs.")
+  { }
+  void load_frame (Frame& frame) const
   { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    XYSource::load_syntax (syntax, alist);
-    alist.add ("description", 
-	       "A list of x, y pairs.");
-    GnuplotUtil::load_style (syntax, alist, "", "\
+    GnuplotUtil::load_style (frame, "", "\
 By default the name of the 'x' and 'y' objects.");
-    syntax.add ("points", Value::Unknown (), Value::Unknown (), 
+    frame.add ("points", Value::Unknown (), Value::Unknown (), 
 		Value::Const, Value::Singleton, "\
 List of (x y) pairs.");
-    syntax.add ("x_dimension", Value::String, Value::Const, "\
+    frame.add ("x_dimension", Value::String, Value::Const, "\
 Dimension for x points.");
-    syntax.add ("y_dimension", Value::String, Value::Const, "\
+    frame.add ("y_dimension", Value::String, Value::Const, "\
 Dimension for y points.");
 
-    Librarian::add_type (XYSource::component, "inline", alist, syntax, &make);
   }
 } XYSourceInline_syntax;
 

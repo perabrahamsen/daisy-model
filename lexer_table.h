@@ -99,7 +99,7 @@ public:
 
   // Create and Destroy.
 public:
-  static void load_syntax (Syntax& syntax, AttributeList&);
+  static void load_syntax (Frame&);
 private:
   LexerTable (const LexerTable&);
   LexerTable ();

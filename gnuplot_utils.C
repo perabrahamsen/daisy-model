@@ -21,11 +21,10 @@
 #define BUILD_DLL
 
 #include "gnuplot_utils.h"
-#include "syntax.h"
-#include "alist.h"
+#include "frame.h"
 
 void 
-GnuplotUtil::load_style (Syntax& syntax, AttributeList&, 
+GnuplotUtil::load_style (Frame& frame,
                          const symbol default_with, 
                          const symbol default_title)
 {
@@ -41,10 +40,10 @@ lines between them.";
       with_cat = Value::OptionalConst;
       with_doc += "\n\n" + default_with;
     }
-  syntax.add ("with", Value::String, with_cat, with_doc);
+  frame.add ("with", Value::String, with_cat, with_doc);
 
   // Style
-  syntax.add ("style", Value::Integer, Value::OptionalConst, "\
+  frame.add ("style", Value::Integer, Value::OptionalConst, "\
 Style to use for this dataset.\n\
 \n\
 By default, gnuplot will use style 1 for the first source to plot with\n\
@@ -67,7 +66,7 @@ Name of data series for the legend on the graph.";
       title_cat = Value::OptionalConst;
       title_doc += "\n\n" + default_title;
     }
-  syntax.add ("title", Value::String, title_cat, title_doc);
+  frame.add ("title", Value::String, title_cat, title_doc);
 }
 
 // gnuplot_utils.C ends here

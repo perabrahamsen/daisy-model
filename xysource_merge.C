@@ -31,6 +31,7 @@
 #include "memutils.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 #include <sstream>
 
 struct XYSourceMerge : public XYSource
@@ -173,31 +174,29 @@ XYSourceMerge::XYSourceMerge (Block& al)
     style_ (al.integer ("style", -1))
 { }
 
-static struct XYSourceMergeSyntax
+static struct XYSourceMergeSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new XYSourceMerge (al); }
+  Model* make (Block& al) const
+  { return new XYSourceMerge (al); }
 
   XYSourceMergeSyntax ()
+    : DeclareModel (XYSource::component, "merge", 
+	       "Merge multiple xy data series into one.")
+  { }
+  void load_frame (Frame& frame) const
   { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    XYSource::load_syntax (syntax, alist);
-    GnuplotUtil::load_style (syntax, alist, "\
+    GnuplotUtil::load_style (frame, "\
 By default, let the first source decide.", "");
-    alist.add ("description", 
-	       "Merge multiple xy data series into one.");
 
-    syntax.add_object ("source", XYSource::component,
+    frame.add_object ("source", XYSource::component,
                        Value::State, Value::Sequence,
                        "XY data series to merge.");
-    syntax.add_check ("source", VCheck::min_size_1 ());
-    syntax.add ("x_dimension", Value::String, Value::Const, "\
+    frame.add_check ("source", VCheck::min_size_1 ());
+    frame.add ("x_dimension", Value::String, Value::Const, "\
 Dimension for x points.");
-    syntax.add ("y_dimension", Value::String, Value::Const, "\
+    frame.add ("y_dimension", Value::String, Value::Const, "\
 Dimension for y points.");
 
-    Librarian::add_type (XYSource::component, "merge", alist, syntax, &make);
   }
 } XYSourceMerge_syntax;
 

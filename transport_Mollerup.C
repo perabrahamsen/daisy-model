@@ -1764,7 +1764,7 @@ See Mollerup 2007 for details.")
     frame.add_object ("solver", Solver::component, 
                       Value::Const, Value::Singleton, "\
 Model used for solving matrix equation system.");
-    frame.add ("solver", Solver::default_model ());
+    frame.add ("solver", "cxsparse");
     frame.add ("enable_boundary_diffusion", Value::Boolean, Value::Const, "\
 If this is set, diffusion over boundaries is enabled."); 
     frame.add ("enable_boundary_diffusion", true);

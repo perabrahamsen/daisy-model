@@ -28,6 +28,7 @@
 #include "source.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "frame.h"
 
 struct XYSourceCombine : public XYSource
 {
@@ -127,39 +128,37 @@ XYSourceCombine::XYSourceCombine (Block& al)
     style_ (al.integer ("style", -1))
 { }
 
-static struct XYSourceCombineSyntax
+static struct XYSourceCombineSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new XYSourceCombine (al); }
+  Model* make (Block& al) const
+  { return new XYSourceCombine (al); }
 
   XYSourceCombineSyntax ()
+    : DeclareModel (XYSource::component, "combine", "\
+Combine data from multiple time series with a single expression.\n\
+Data from times series are matched by date.")
+  { }
+  void load_frame (Frame& frame) const
   { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    XYSource::load_syntax (syntax, alist);
-    GnuplotUtil::load_style (syntax, alist, "\
+    GnuplotUtil::load_style (frame, "\
 By default, let the first source decide.", "\
 By default a combination of the x and y objects.");
-    alist.add ("description", "\
-Combine data from multiple time series with a single expression.\n\
-Data from times series are matched by date.");
-    syntax.add_object ("source", Source::component, 
+    frame.add_object ("source", Source::component, 
                        Value::State, Value::Sequence, "\
 List of sources for data.\n\
 The style information for the sources is ignored, but the dates, title\n\
 and value is used as specified by 'expr' to calculate the combined\n\
 date and value pairs.");
-    syntax.add_object ("x", Number::component, 
+    frame.add_object ("x", Number::component, 
                        Value::Const, Value::Singleton, "\
 Expression for calculating the x value for this source for each row.\n\
 A row is any date found in any of the member of 'source'.  The\n\
 expression may refer to the value of each source by its title.");
-    syntax.add_object ("y", Number::component, 
+    frame.add_object ("y", Number::component, 
                        Value::Const, Value::Singleton, "\
 Expression for calculating the y value for this source for each row.\n\
 A row is any date found in any of the member of 'source'.  The\n\
 expression may refer to the value of each source by its title.");
-    Librarian::add_type (XYSource::component, "combine", alist, syntax, &make);
   }
 } XYSourceCombine_syntax;
 

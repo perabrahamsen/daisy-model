@@ -59,8 +59,6 @@ public:
   virtual void solve (Matrix& A, const Vector& b, Vector& x) const = 0;
 
   // Create and Destroy.
-public:
-  static const AttributeList& default_model ();
 private:
   Solver ();			// Disable
 public:
