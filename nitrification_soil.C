@@ -29,6 +29,7 @@
 #include "plf.h"
 #include "check.h"
 #include "librarian.h"
+#include "frame.h"
 
 class NitrificationSoil : public Nitrification
 {
@@ -84,29 +85,26 @@ NitrificationSoil::NitrificationSoil (Block& al)
     water_factor (al.plf ("water_factor"))
 { }
 
-static struct NitrificationSoilSyntax
+static struct NitrificationSoilSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new NitrificationSoil (al); }
+  Model* make (Block& al) const
+  { return new NitrificationSoil (al); }
   NitrificationSoilSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    Nitrification::load_syntax (syntax, alist);
-
-    alist.add ("description", 
+    : DeclareModel (Nitrification::component, "soil", 
                "k_10 * M / (k + M).  Michaelis-Menten kinetics,\n\
-with nitrification based on total ammonium content.");
-    syntax.add ("k", "g N/cm^3", Check::positive (), Value::Const, 
+with nitrification based on total ammonium content.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add ("k", "g N/cm^3", Check::positive (), Value::Const, 
                 "Half saturation constant.");
-    syntax.add ("k_10", "g N/cm^3/h", Check::non_negative (), Value::Const,
+    frame.add ("k_10", "g N/cm^3/h", Check::non_negative (), Value::Const,
                 "Max rate.");
-    syntax.add ("heat_factor", "dg C", Value::None (), Value::Const,
+    frame.add ("heat_factor", "dg C", Value::None (), Value::Const,
                 "Heat factor.");
-    alist.add ("heat_factor", PLF::empty ());
-    syntax.add ("water_factor", "cm", Value::None (), Value::Const,
+    frame.add ("heat_factor", PLF::empty ());
+    frame.add ("water_factor", "cm", Value::None (), Value::Const,
                 "Water potential factor.");
-    alist.add ("water_factor", PLF::empty ());
-    Librarian::add_type (Nitrification::component, "soil", alist, syntax, &make);
+    frame.add ("water_factor", PLF::empty ());
   }
 } NitrificationSoil_syntax;

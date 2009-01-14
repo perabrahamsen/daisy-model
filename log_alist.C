@@ -479,10 +479,6 @@ bool
 LogAList::check (const Border&, Treelog&) const
 { return true; }
 
-void
-LogAList::load_syntax (Syntax&, AttributeList&)
-{ }
-
 LogAList::LogAList (Block& al)
   : Log (al),
     is_active (false),

@@ -30,6 +30,7 @@
 #include "librarian.h"
 #include "submodeler.h"
 #include "treelog.h"
+#include "frame.h"
 #include <sstream>
 #include <memory>
 
@@ -183,33 +184,32 @@ struct NumberPLF : public Number
   { }
 };
 
-static struct NumberPLFSyntax
+static struct NumberPLFSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new NumberPLF (al); }
+  Model* make (Block& al) const
+  { return new NumberPLF (al); }
 
   NumberPLFSyntax ()
+    : DeclareModel (Number::component, "plf", 
+	       "Look up argumen in a piecewise linear function.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    syntax.add_check (NumberPLF::check_alist);
-    alist.add ("description", 
-	       "Look up argumen in a piecewise linear function.");
+    frame.add_check (NumberPLF::check_alist);
 
-    syntax.add_object ("operand", Number::component,
+    frame.add_object ("operand", Number::component,
                        "Operand for this function.");
-    syntax.add ("domain", Value::String, Value::Const, "\
+    frame.add ("domain", Value::String, Value::Const, "\
 Unit for the operand of the function.");
-    alist.add ("domain", Value::Unknown ());
-    syntax.add ("range", Value::String, Value::Const, "\
+    frame.add ("domain", Value::Unknown ());
+    frame.add ("range", Value::String, Value::Const, "\
 Unit for the operand of the function.");
-    alist.add ("range", Value::Unknown ());
-    syntax.add_submodule_sequence ("points", Value::Const, "\
+    frame.add ("range", Value::Unknown ());
+    frame.add_submodule_sequence ("points", Value::Const, "\
 List of points (x y) defining the piecewise linear function.\n\
 The x values must be ordered lowest first.", NumberPLF::Point::load_syntax);
 
-    syntax.order ("operand");
-    Librarian::add_type (Number::component, "plf", alist, syntax, &make);
+    frame.order ("operand");
   }
 } NumberPLF_syntax;
 

@@ -36,6 +36,7 @@
 
 #ifdef USE_PROGRAM
 #include "library.h"
+#include "frame.h"
 #endif
 
 struct LogCheckpoint : public LogAList
@@ -220,34 +221,31 @@ LogCheckpoint::LogCheckpoint (Block& al)
 LogCheckpoint::~LogCheckpoint ()
 { }
 
-static struct LogCheckpointSyntax
+static struct LogCheckpointSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new LogCheckpoint (al); }
+  Model* make (Block& al) const
+  { return new LogCheckpoint (al); }
 
   LogCheckpointSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
+    : DeclareModel (Log::component, "checkpoint", "\
 Create a checkpoint of the entire simulation state, suitable for later\n\
-hot start.");
-    LogAList::load_syntax (syntax, alist);
-    syntax.add ("where", Value::String, Value::Const,
+hot start.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    frame.add ("where", Value::String, Value::Const,
                 "File name prefix for the generated checkpoint.\n\
 The time will be appended, together with the '.dai' suffix.");
-    alist.add ("where", "checkpoint");
-    syntax.add ("description", Value::String, Value::Const,
+    frame.add ("where", "checkpoint");
+    frame.add ("description", Value::String, Value::Const,
                 "Description of this particular checkpoint.");
-    alist.add ("description", "\
+    frame.add ("description", "\
 Create a checkpoint of the entire simulation state, suitable for later\n\
 hot start.");
-    syntax.add_object ("when", Condition::component,
+    frame.add_object ("when", Condition::component,
                        "Make a checkpoint every time this condition is true.");
-    AttributeList finished_alist;
-    finished_alist.add ("type", "finished");
-    alist.add ("when", finished_alist);
-    Librarian::add_type (Log::component, "checkpoint", alist, syntax, &make);
+    frame.add ("when", "finished");
   }
 } LogCheckpoint_syntax;
 
+// log_checkpoint.C ends here.

@@ -28,6 +28,7 @@
 #include "librarian.h"
 #include "treelog.h"
 #include "assertion.h"
+#include "frame.h"
 #include <sstream>
 #include <memory>
 #include <map>
@@ -202,21 +203,20 @@ List of identifiers and values to bind in this scope.", Clause::load_syntax);
   { }
 };
 
-static struct NumberLetSyntax
+static struct NumberLetSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new NumberLet (al); }
+  Model* make (Block& al) const
+  { return new NumberLet (al); }
   NumberLetSyntax ()
+    : DeclareModel (Number::component, "let", "\
+Bind symbols in 'clauses' in a new scope, and evaluate 'expr' in that scope.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
-Bind symbols in 'clauses' in a new scope, and evaluate 'expr' in that scope.");
-    NumberLet::ScopeClause::load_syntax (syntax, alist);
-    syntax.add_object ("expr", Number::component, "\
+    NumberLet::ScopeClause::load_syntax (frame.syntax (), frame.alist ());
+    frame.add_object ("expr", Number::component, "\
 Expression to evaluate.");
-    syntax.order ("clauses", "expr");
-    Librarian::add_type (Number::component, "let", alist, syntax, &make);
+    frame.order ("clauses", "expr");
   }
 } NumberLet_syntax;
 

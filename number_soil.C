@@ -34,6 +34,7 @@
 #include "scope.h"
 #include "units.h"
 #include "treelog.h"
+#include "frame.h"
 #include <memory>
 
 struct NumberByDepth : public Number
@@ -104,15 +105,6 @@ struct NumberByDepth : public Number
       }
     return ok;
   }
-  static void load_syntax (Syntax& syntax, AttributeList&)
-  {
-    syntax.add_object ("column", Column::component, "\
-The soil column whose properties we want to examine.");
-    syntax.add_object ("h", Number::component, "\
-The tension we want to compare with.");
-    syntax.add_object ("z", Number::component, "\
-The height we want to compare with.");
-  }
   NumberByDepth (Block& al)
     : Number (al),
       units (al.units ()),
@@ -136,6 +128,23 @@ The height we want to compare with.");
   }
 };
 
+static struct NumberDepthSyntax : public DeclareBase
+{
+  NumberDepthSyntax ()
+    : DeclareBase (Number::component, "depth", 
+                   "Find soil value at specific depth.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_object ("column", Column::component, "\
+The soil column whose properties we want to examine.");
+    frame.add_object ("h", Number::component, "\
+The tension we want to compare with.");
+    frame.add_object ("z", Number::component, "\
+The height we want to compare with.");
+  }
+} NumberDepth_syntax;
+
 struct NumberDepthTheta : public NumberByDepth
 {
   // Simulation.
@@ -158,20 +167,16 @@ struct NumberDepthTheta : public NumberByDepth
   { }
 };
 
-static struct NumberDepthThetaSyntax
+static struct NumberDepthThetaSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new NumberDepthTheta (al); }
+  Model* make (Block& al) const
+  { return new NumberDepthTheta (al); }
   NumberDepthThetaSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-
-    alist.add ("description", 
-	       "Find water content (Theta) for a given pressure (h).");
-    NumberByDepth::load_syntax (syntax, alist);
-    Librarian::add_type (Number::component, "depth_Theta", alist, syntax, &make);
-  }
+    : DeclareModel (Number::component, "depth_Theta", "depth",
+                    "Find water content (Theta) for a given pressure (h).")
+  { }
+  void load_frame (Frame&) const
+  { }
 } NumberDepthTheta_syntax;
 
 struct NumberDepthK : public NumberByDepth
@@ -196,20 +201,16 @@ struct NumberDepthK : public NumberByDepth
   { }
 };
 
-static struct NumberDepthKSyntax
+static struct NumberDepthKSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new NumberDepthK (al); }
+  Model* make (Block& al) const
+  { return new NumberDepthK (al); }
   NumberDepthKSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-
-    alist.add ("description", 
-	       "Find water conductivity (K) for a given pressure (h).");
-    NumberByDepth::load_syntax (syntax, alist);
-    Librarian::add_type (Number::component, "depth_K", alist, syntax, &make);
-  }
+    : DeclareModel (Number::component, "depth_K", "depth", 
+                    "Find water conductivity (K) for a given pressure (h).")
+  { }
+  void load_frame (Frame&) const
+  { }
 } NumberDepthK_syntax;
 
 struct NumberByTension : public Number
@@ -250,15 +251,6 @@ struct NumberByTension : public Number
       }
     return true;
   }
-  static void load_syntax (Syntax& syntax, AttributeList&)
-  {
-    syntax.add_object ("horizon", Horizon::component, "\
-The soil horizon whose properties we want to examine.");
-    syntax.add_object ("h", Number::component, "\
-The tension we want to compare with.");
-    syntax.add ("top_soil", Value::Boolean, Value::Const, "\
-Set this to true for the A horizon.");
-  }
   NumberByTension (Block& al)
     : Number (al),
       units (al.units ()),
@@ -266,6 +258,24 @@ Set this to true for the A horizon.");
       h (Librarian::build_item<Number> (al, "h"))
   { horizon->initialize (al.flag ("top_soil"), 2, al.msg ()); }
 };
+
+static struct NumberHorizonSyntax : public DeclareBase
+{
+  NumberHorizonSyntax ()
+    : DeclareBase (Number::component, "horizon", 
+                   "Find soil value at specific horizon.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_object ("horizon", Horizon::component, "\
+The soil horizon whose properties we want to examine.");
+    frame.add_object ("h", Number::component, "\
+The tension we want to compare with.");
+    frame.add ("top_soil", Value::Boolean, Value::Const, "\
+Set this to true for the A horizon.");
+  }
+} NumberHorizon_syntax;
+
 
 struct NumberSoilTheta : public NumberByTension
 {
@@ -287,20 +297,16 @@ struct NumberSoilTheta : public NumberByTension
   { }
 };
 
-static struct NumberSoilThetaSyntax
+static struct NumberSoilThetaSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new NumberSoilTheta (al); }
+  Model* make (Block& al) const
+  { return new NumberSoilTheta (al); }
   NumberSoilThetaSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-
-    alist.add ("description", 
-	       "Find water content (Theta) for a given pressure (h).");
-    NumberByTension::load_syntax (syntax, alist);
-    Librarian::add_type (Number::component, "soil_Theta", alist, syntax, &make);
-  }
+    : DeclareModel (Number::component, "soil_Theta", "horizon",
+	       "Find water content (Theta) for a given pressure (h).")
+  { }
+  void load_frame (Frame&) const
+  { }
 } NumberSoilTheta_syntax;
 
 struct NumberSoilK : public NumberByTension
@@ -321,20 +327,16 @@ struct NumberSoilK : public NumberByTension
   { }
 };
 
-static struct NumberSoilKSyntax
+static struct NumberSoilKSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new NumberSoilK (al); }
+  Model* make (Block& al) const
+  { return new NumberSoilK (al); }
   NumberSoilKSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-
-    alist.add ("description", 
-	       "Find hydraulic conductivity (K) for a given pressure (h).");
-    NumberByTension::load_syntax (syntax, alist);
-    Librarian::add_type (Number::component, "soil_K", alist, syntax, &make);
-  }
+    : DeclareModel (Number::component, "soil_K", "horizon",
+	       "Find hydraulic conductivity (K) for a given pressure (h).")
+  { }
+  void load_frame (Frame&) const
+  { }
 } NumberSoilK_syntax;
 
 struct NumberSoilHeatCapacity : public NumberByTension
@@ -360,20 +362,16 @@ struct NumberSoilHeatCapacity : public NumberByTension
   { }
 };
 
-static struct NumberSoilHeatCapacitySyntax
+static struct NumberSoilHeatCapacitySyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new NumberSoilHeatCapacity (al); }
+  Model* make (Block& al) const
+  { return new NumberSoilHeatCapacity (al); }
   NumberSoilHeatCapacitySyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-
-    alist.add ("description", 
-	       "Find heat capacity for a given pressure (h).");
-    NumberByTension::load_syntax (syntax, alist);
-    Librarian::add_type (Number::component, "soil_heat_capacity", alist, syntax, &make);
-  }
+    : DeclareModel (Number::component, "soil_heat_capacity", "horizon",
+	       "Find heat capacity for a given pressure (h).")
+  { }
+  void load_frame (Frame&) const
+  { }
 } NumberSoilHeatCapacity_syntax;
 
 struct NumberSoilHeatConductivity : public NumberByTension
@@ -399,20 +397,16 @@ struct NumberSoilHeatConductivity : public NumberByTension
   { }
 };
 
-static struct NumberSoilHeatConductivitySyntax
+static struct NumberSoilHeatConductivitySyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new NumberSoilHeatConductivity (al); }
+  Model* make (Block& al) const
+  { return new NumberSoilHeatConductivity (al); }
   NumberSoilHeatConductivitySyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-
-    alist.add ("description", 
-	       "Find heat conductivity for a given pressure (h).");
-    NumberByTension::load_syntax (syntax, alist);
-    Librarian::add_type (Number::component, "soil_heat_conductivity", alist, syntax, &make);
-  }
+    : DeclareModel (Number::component, "soil_heat_conductivity", "horizon",
+	       "Find heat conductivity for a given pressure (h).")
+  { }
+  void load_frame (Frame&) const
+  { }
 } NumberSoilHeatConductivity_syntax;
 
 struct NumberTensionByTheta : public Number
@@ -466,24 +460,23 @@ struct NumberTensionByTheta : public Number
   { horizon->initialize (al.flag ("top_soil"), 2, al.msg ()); }
 };
 
-static struct NumberTensionByThetaSyntax
+static struct NumberTensionByThetaSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new NumberTensionByTheta (al); }
+  Model* make (Block& al) const
+  { return new NumberTensionByTheta (al); }
   NumberTensionByThetaSyntax()
+    : DeclareModel (Number::component, "soil_h", 
+                    "Find pressure (h) for a given water content (Theta).")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
 
-    alist.add ("description", 
-	       "Find pressure (h) for a given water content (Theta).");
-    syntax.add_object ("horizon", Horizon::component, "\
+    frame.add_object ("horizon", Horizon::component, "\
 The soil horizon whose properties we want to examine.");
-    syntax.add_object ("Theta", Number::component, "\
+    frame.add_object ("Theta", Number::component, "\
 The water content we want to compare with.");
-    syntax.add ("top_soil", Value::Boolean, Value::Const, "\
+    frame.add ("top_soil", Value::Boolean, Value::Const, "\
 Set this to true for the A horizon.");
-    Librarian::add_type (Number::component, "soil_h", alist, syntax, &make);
   }
 } NumberTensionByTheta_syntax;
 

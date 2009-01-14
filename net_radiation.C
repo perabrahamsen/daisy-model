@@ -28,6 +28,7 @@
 #include "syntax.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "frame.h"
 
 const char *const NetRadiation::component = "net_radiation";
 
@@ -98,7 +99,6 @@ struct NetRadiationParent : public NetRadiation
   }
 
   // Create & Destroy.
-  static void load_base (Syntax& syntax, AttributeList& alist);
   NetRadiationParent (Block& al)
     : NetRadiation (al),
       net_radiation_ (0.0),
@@ -123,41 +123,6 @@ NetRadiationParent::output (Log& log) const
   output_variable (epsilon_0, log);
   output_variable (black_body_radiation, log);  
 }
-
-void
-NetRadiationParent::load_base (Syntax& syntax, AttributeList& alist)
-{
-  // Logs.
-  alist.add ("base_model", "common");
-  alist.add ("description", "\
-This is not a model, but a list of parameters shared by all net radiation models.");
-
-  syntax.add ("net_radiation", "W/m^2", Value::LogOnly,
-              "The calculated net radiation (positive downwards).");
-  syntax.add ("L_n", "W/m^2", Value::LogOnly,
-              "The calculated net longwave radiation (positive downwards).");
-  syntax.add ("L_ia", "W/m^2", Value::LogOnly,
-              "The calculated incoming longwave radiation (positive downwards).");
-  syntax.add ("L_i0", "W/m^2", Value::LogOnly,
-              "The calculated clear sky incoming longwave radiation (positive downwards).");
-  syntax.add ("epsilon_0", Value::None(), Value::LogOnly,
-              "Atmospheric effective clearsky emmisivity (range 0-1).");
-  syntax.add ("black_body_radiation", "W/m^2", Value::LogOnly,
-              "Radiation emitted by black bodies at current air temperature.\n\
-Stefan-Boltzmann's law.");
-}
-
-static struct NetRadiationParentSyntax
-{
-  NetRadiationParentSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    NetRadiationParent::load_base (syntax, alist);
-
-    Librarian::add_base (NetRadiation::component, alist, syntax);
-  }
-} NetRadiationParent_syntax;
 
 // Model classes.
 
@@ -186,42 +151,12 @@ struct NetRadiationBrunt : public NetRadiationParent
     return A + B * sqrt (ea); 
   }
 
-  static void load_syntax (Syntax& syntax, AttributeList& alist);
   NetRadiationBrunt (Block& al)
     : NetRadiationParent (al),
       a (al.number ("a")),
       b (al.number ("b"))
   { }
 };
-
-void
-NetRadiationBrunt::load_syntax (Syntax& syntax, AttributeList& alist)
-{
-  NetRadiationParent::load_base (syntax, alist);
-  alist.add ("description", "\
-Brunt, 1932.  Default parameterization by Jensen et.al., 1990.\n\
-FAO recommendation.");
-  syntax.add ("a", Value::None (), Value::Const,
-              "Brunt 'a' parameter (offset).");
-  alist.add ("a", 0.34);
-  syntax.add ("b", "1/sqrt(kPa)", Value::Const,
-              "Brunt 'b' parameter (vapor pressure factor).");
-  alist.add ("b", 0.14);
-}
-
-const AttributeList& 
-NetRadiation::default_model ()
-{
-  static AttributeList alist;
-  
-  if (!alist.check ("type"))
-    {
-      Syntax dummy;
-      NetRadiationBrunt::load_syntax (dummy, alist);
-      alist.add ("type", "brunt");
-    }
-  return alist;
-}
 
 struct NetRadiationIdsoJackson : public NetRadiationParent
 {
@@ -330,72 +265,87 @@ struct NetRadiationPrata : public NetRadiationParent
 
 // Add models to library.
 
-static struct NetRadiationSyntax
+static struct NetRadiationBruntSyntax : public DeclareModel
 {
-  static Model& make_brunt (Block& al)
-  { return *new NetRadiationBrunt (al); }
-  static Model& make_idso_jackson (Block& al)
-  { return *new NetRadiationIdsoJackson (al); }
-  static Model& make_brutsaert (Block& al)
-  { return *new NetRadiationBrutsaert (al); }
-  static Model& make_swinbank (Block& al)
-  { return *new NetRadiationSwinbank (al); }
-  static Model& make_satterlund (Block& al)
-  { return *new NetRadiationSatterlund (al); }
-  static Model& make_prata (Block& al)
-  { return *new NetRadiationPrata (al); }
+  Model* make (Block& al) const
+  { return new NetRadiationBrunt (al); }
 
-  NetRadiationSyntax ()
+  NetRadiationBruntSyntax ()
+    : DeclareModel (NetRadiation::component, "brunt", "\
+Brunt, 1932.  Default parameterization by Jensen et.al., 1990.\n\
+FAO recommendation.")
+  { }
+  void load_frame (Frame& frame) const
   {
     // Brunt.
-    Syntax& syntax_brunt = *new Syntax ();
-    AttributeList& alist_brunt = *new AttributeList ();
-    NetRadiationBrunt::load_syntax (syntax_brunt, alist_brunt);
-    Librarian::add_type (NetRadiation::component, "brunt",
-                         alist_brunt, syntax_brunt,
-                         &make_brunt);
-    // Others.
-    Syntax& syntax_idso_jackson = *new Syntax ();
-    AttributeList& alist_idso_jackson = *new AttributeList ();
-    NetRadiationParent::load_base (syntax_idso_jackson, alist_idso_jackson);
-    alist_idso_jackson.add ("description", "Idso and Jackson, 1969");
-    Librarian::add_type (NetRadiation::component, "idso_jackson",
-                         alist_idso_jackson, syntax_idso_jackson,
-                         &make_idso_jackson);
-
-    Syntax& syntax_brutsaert = *new Syntax ();
-    AttributeList& alist_brutsaert = *new AttributeList ();
-    NetRadiationParent::load_base (syntax_brutsaert, alist_brutsaert);
-    alist_brutsaert.add ("description", "Brutsaert, 1975");
-    Librarian::add_type (NetRadiation::component, "brutsaert",
-                         alist_brutsaert, syntax_brutsaert,
-                         &make_brutsaert);
-
-    Syntax& syntax_swinbank = *new Syntax ();
-    AttributeList& alist_swinbank = *new AttributeList ();
-    NetRadiationParent::load_base (syntax_swinbank, alist_swinbank);
-    alist_swinbank.add ("description", "Swinbank, 1963");
-    Librarian::add_type (NetRadiation::component, "swinbank",
-                         alist_swinbank, syntax_swinbank,
-                         &make_swinbank);
-
-    Syntax& syntax_satterlund = *new Syntax ();
-    AttributeList& alist_satterlund = *new AttributeList ();
-    NetRadiationParent::load_base (syntax_satterlund, alist_satterlund);
-    alist_satterlund.add ("description", "Satterlund, 1979");
-    Librarian::add_type (NetRadiation::component, "satterlund", 
-                         alist_satterlund, syntax_satterlund,
-                         &make_satterlund);
-
-    Syntax& syntax_prata = *new Syntax ();
-    AttributeList& alist_prata = *new AttributeList ();
-    NetRadiationParent::load_base (syntax_prata, alist_prata);
-    alist_satterlund.add ("description", "Prata, 1996");
-    Librarian::add_type (NetRadiation::component, "prata", 
-                         alist_prata, syntax_prata,
-                         &make_prata);
+  frame.add ("a", Value::None (), Value::Const,
+              "Brunt 'a' parameter (offset).");
+  frame.add ("a", 0.34);
+  frame.add ("b", "1/sqrt(kPa)", Value::Const,
+              "Brunt 'b' parameter (vapor pressure factor).");
+  frame.add ("b", 0.14);
   }
-} NetRadiation_syntax;
+} NetRadiationBrunt_syntax;
+
+static struct NetRadiationIJSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new NetRadiationIdsoJackson (al); }
+
+  NetRadiationIJSyntax ()
+    : DeclareModel (NetRadiation::component, "idso_jackson", "Idso and Jackson, 1969")
+  { }
+  void load_frame (Frame& frame) const
+  { }
+} NetRadiationIH_syntax;
+
+static struct NetRadiationBrutsaertSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new NetRadiationBrutsaert (al); }
+
+  NetRadiationBrutsaertSyntax ()
+    : DeclareModel (NetRadiation::component, "brutsaert", "Brutsaert, 1975")
+  { }
+  void load_frame (Frame&) const
+  { }
+} NetRadiationBrutsaert_syntax;
+
+static struct NetRadiationSwinbankSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new NetRadiationSwinbank (al); }
+
+  NetRadiationSwinbankSyntax ()
+    : DeclareModel (NetRadiation::component, "swinbank", "Swinbank, 1963")
+  { }
+  void load_frame (Frame&) const
+  { }
+} NetRadiationSwinbank_syntax;
+
+static struct NetRadiationSatterlundSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new NetRadiationSatterlund (al); }
+
+  NetRadiationSatterlundSyntax ()
+    : DeclareModel (NetRadiation::component, "satterlund", "Satterlund, 1979")
+  { }
+  void load_frame (Frame&) const
+  { }
+} NetRadiationSatterlund_syntax;
+
+static struct NetRadiationPrataSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new NetRadiationPrata (al); }
+
+  NetRadiationPrataSyntax ()
+    : DeclareModel (NetRadiation::component, "prata", "Prata, 1996")
+  { }
+  void load_frame (Frame&) const
+  { }
+} NetRadiationPrata_syntax;
 
 static struct NetRadiationInit : public DeclareComponent 
 {
@@ -404,6 +354,23 @@ static struct NetRadiationInit : public DeclareComponent
 The purpose of this component is to calculate the net radiation from\n\
 other meteorological data.")
   { }
+  void load_frame (Frame& frame) const
+  {
+    // Logs.
+    frame.add ("net_radiation", "W/m^2", Value::LogOnly,
+                "The calculated net radiation (positive downwards).");
+    frame.add ("L_n", "W/m^2", Value::LogOnly,
+                "The calculated net longwave radiation (positive downwards).");
+    frame.add ("L_ia", "W/m^2", Value::LogOnly,
+                "The calculated incoming longwave radiation (positive downwards).");
+    frame.add ("L_i0", "W/m^2", Value::LogOnly,
+                "The calculated clear sky incoming longwave radiation (positive downwards).");
+    frame.add ("epsilon_0", Value::None(), Value::LogOnly,
+                "Atmospheric effective clearsky emmisivity (range 0-1).");
+    frame.add ("black_body_radiation", "W/m^2", Value::LogOnly, "\
+Radiation emitted by black bodies at current air temperature.\n\
+Stefan-Boltzmann's law.");
+  }
 } NetRadiation_init;
 
 // net_radiation.C ends here

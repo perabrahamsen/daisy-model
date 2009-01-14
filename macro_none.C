@@ -25,6 +25,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "librarian.h"
+#include "frame.h"
 
 struct MacroNone : public Macro
 {
@@ -55,16 +56,15 @@ struct MacroNone : public Macro
     { }
 };
 
-static struct MacroNoneSyntax
+static struct MacroNoneSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-    { return *new MacroNone (al); }
+  Model* make (Block& al) const
+    { return new MacroNone (al); }
   MacroNoneSyntax ()
+    : DeclareModel (Macro::component, "none", "No macropores.")
+  { }
+  void load_frame (Frame& frame) const
     {
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "No macropores.");
-      Librarian::add_type (Macro::component, "none", alist, syntax, &make);
     }
 } MacroNone_syntax;
 

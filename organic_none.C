@@ -24,6 +24,7 @@
 #include "geometry.h"
 #include "librarian.h"
 #include "syntax.h"
+#include "frame.h"
 
 // Convertions
 
@@ -99,18 +100,17 @@ struct OrganicNone : public OrganicMatter
   { }
 };
 
-static struct OrganicNoneSyntax
+static struct OrganicNoneSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new OrganicNone (al); }
+  Model* make (Block& al) const
+  { return new OrganicNone (al); }
 
   OrganicNoneSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
-Ignore all soil organic matter dynamics.");
- 
-    Librarian::add_type (OrganicMatter::component, "none", alist, syntax, &make);
-  }
+    : DeclareModel (OrganicMatter::component, "none", "\
+Ignore all soil organic matter dynamics.")
+  { }
+  void load_frame (Frame&) const
+  { }
 } OrganicNone_syntax;
+
+// organic_none.C ends here.

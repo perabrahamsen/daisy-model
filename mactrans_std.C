@@ -30,6 +30,7 @@
 #include "librarian.h"
 #include "treelog.h"
 #include "syntax.h"
+#include "frame.h"
 #include <sstream>
 #include <vector>
 
@@ -209,16 +210,15 @@ Mactrans::default_model ()
   return alist;
 }
 
-static struct MactransStandardSyntax
+static struct MactransStandardSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-    { return *new MactransStandard (al); }
+  Model* make (Block& al) const
+    { return new MactransStandard (al); }
   MactransStandardSyntax ()
+    : DeclareModel (Mactrans::component, "default", "Solute follows water.")
+  { }
+  void load_frame (Frame& frame) const
     {
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "Solute follows water.");
-      Librarian::add_type (Mactrans::component, "default", alist, syntax, &make);
     }
 } MactransStandard_syntax;
 

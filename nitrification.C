@@ -23,8 +23,7 @@
 
 #include "nitrification.h"
 #include "block.h"
-#include "syntax.h"
-#include "alist.h"
+#include "frame.h"
 #include "soil.h"
 #include "soil_water.h"
 #include "soil_heat.h"
@@ -61,14 +60,6 @@ Nitrification::f_h (double h)
   return 0.0;
 }
 
-void
-Nitrification::load_syntax (Syntax& syntax, AttributeList& alist)
-{
-  syntax.add_fraction ("N2O_fraction", Value::Const, 
-                       "Fraction of ammonium lost as N2O.");
-  alist.add ("N2O_fraction", 0.02);
-}
-
 Nitrification::Nitrification (Block& al)
   : N2O_fraction (al.number ("N2O_fraction"))
 { }
@@ -83,5 +74,11 @@ static struct NitrificationInit : public DeclareComponent
 The nitrification process, transforming ammonium into nitrate and\n\
 nitrous oxide.")
   { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_fraction ("N2O_fraction", Value::Const, 
+                        "Fraction of ammonium lost as N2O.");
+    frame.add ("N2O_fraction", 0.02);
+  }
 } Nitrification_init;
 

@@ -31,6 +31,7 @@
 #include "librarian.h"
 #include "submodeler.h"
 #include "treelog.h"
+#include "frame.h"
 #include <sstream>
 #include <memory>
 
@@ -85,21 +86,20 @@ struct NumberLog10 : public NumberOperand
   { }
 };
 
-static struct NumberLog10Syntax
+static struct NumberLog10Syntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new NumberLog10 (al); }
+  Model* make (Block& al) const
+  { return new NumberLog10 (al); }
   NumberLog10Syntax ()
+    : DeclareModel (Number::component, "log10", 
+	       "Take the base 10 logarithm of its argument.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
 
-    alist.add ("description", 
-	       "Take the base 10 logarithm of its argument.");
-    syntax.add_object ("operand", Number::component,
+    frame.add_object ("operand", Number::component,
                        "Operand for this function.");
-    syntax.order ("operand");
-    Librarian::add_type (Number::component, "log10", alist, syntax, &make);
+    frame.order ("operand");
   }
 } NumberLog10_syntax;
 
@@ -119,21 +119,20 @@ struct NumberLn : public NumberOperand
   { }
 };
 
-static struct NumberLnSyntax
+static struct NumberLnSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new NumberLn (al); }
+  Model* make (Block& al) const
+  { return new NumberLn (al); }
   NumberLnSyntax ()
+    : DeclareModel (Number::component, "ln", 
+	       "Take the natural logarithm of its argument.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
 
-    alist.add ("description", 
-	       "Take the natural logarithm of its argument.");
-    syntax.add_object ("operand", Number::component,
+    frame.add_object ("operand", Number::component,
                        "Operand for this function.");
-    syntax.order ("operand");
-    Librarian::add_type (Number::component, "ln", alist, syntax, &make);
+    frame.order ("operand");
   }
 } NumberLn_syntax;
 
@@ -152,21 +151,20 @@ struct NumberExp : public NumberOperand
   { }
 };
 
-static struct NumberExpSyntax
+static struct NumberExpSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new NumberExp (al); }
+  Model* make (Block& al) const
+  { return new NumberExp (al); }
   NumberExpSyntax ()
+    : DeclareModel (Number::component, "exp", 
+	       "Take the exponential of its argument.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
 
-    alist.add ("description", 
-	       "Take the exponential of its argument.");
-    syntax.add_object ("operand", Number::component,
+    frame.add_object ("operand", Number::component,
                        "Operand for this function.");
-    syntax.order ("operand");
-    Librarian::add_type (Number::component, "exp", alist, syntax, &make);
+    frame.order ("operand");
   }
 } NumberExp_syntax;
 
@@ -186,21 +184,20 @@ struct NumberSqrt : public NumberOperand
   { }
 };
 
-static struct NumberSqrtSyntax
+static struct NumberSqrtSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new NumberSqrt (al); }
+  Model* make (Block& al) const
+  { return new NumberSqrt (al); }
   NumberSqrtSyntax ()
+    : DeclareModel (Number::component, "sqrt", 
+	       "Take the square root of its argument.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
 
-    alist.add ("description", 
-	       "Take the square root of its argument.");
-    syntax.add_object ("operand", Number::component,
+    frame.add_object ("operand", Number::component,
                        "Operand for this function.");
-    syntax.order ("operand");
-    Librarian::add_type (Number::component, "sqrt", alist, syntax, &make);
+    frame.order ("operand");
   }
 } NumberSqrt_syntax;
 
@@ -224,21 +221,20 @@ struct NumberSqr : public NumberOperand
   { }
 };
 
-static struct NumberSqrSyntax
+static struct NumberSqrSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new NumberSqr (al); }
+  Model* make (Block& al) const
+  { return new NumberSqr (al); }
   NumberSqrSyntax ()
+    : DeclareModel (Number::component, "sqr", 
+	       "Take the square of its argument.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
 
-    alist.add ("description", 
-	       "Take the square of its argument.");
-    syntax.add_object ("operand", Number::component,
+    frame.add_object ("operand", Number::component,
                        "Operand for this function.");
-    syntax.order ("operand");
-    Librarian::add_type (Number::component, "sqr", alist, syntax, &make);
+    frame.order ("operand");
   }
 } NumberSqr_syntax;
 
@@ -294,23 +290,22 @@ struct NumberPow : public Number
   { }
 };
 
-static struct NumberPowSyntax
+static struct NumberPowSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new NumberPow (al); }
+  Model* make (Block& al) const
+  { return new NumberPow (al); }
   NumberPowSyntax ()
+    : DeclareModel (Number::component, "pow", 
+	       "Raise 'base' to the power of 'exponent'.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
 
-    alist.add ("description", 
-	       "Raise 'base' to the power of 'exponent'.");
-    syntax.add_object ("base", Number::component,
+    frame.add_object ("base", Number::component,
                        "The base operand for this function.");
-    syntax.add_object ("exponent", Number::component,
+    frame.add_object ("exponent", Number::component,
                        "The exponent operand for this function.");
-    syntax.order ("base", "exponent");
-    Librarian::add_type (Number::component, "pow", alist, syntax, &make);
+    frame.order ("base", "exponent");
   }
 } NumberPow_syntax;
 
@@ -453,27 +448,26 @@ struct NumberMax : public NumberOperands
   { }
 };
 
-static struct NumberMaxSyntax
+static struct NumberMaxSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new NumberMax (al); }
+  Model* make (Block& al) const
+  { return new NumberMax (al); }
   NumberMaxSyntax ()
+    : DeclareModel (Number::component, "max", 
+	       "Use the largest value of its operands.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
 
-    alist.add ("description", 
-	       "Use the largest value of its operands.");
-    syntax.add_object ("operands", Number::component,
+    frame.add_object ("operands", Number::component,
                        Value::Const, Value::Sequence,
                        "The operands for this function.");
 #ifdef CHECK_OPERANDS_DIM
     static VCheck::All all (VCheck::min_size_1 (),
                             NumberOperands::unique);
 #endif // CHECK_OPERANDS_DIM
-    syntax.add_check ("operands", VCheck::min_size_1 ());
-    syntax.order ("operands");
-    Librarian::add_type (Number::component, "max", alist, syntax, &make);
+    frame.add_check ("operands", VCheck::min_size_1 ());
+    frame.order ("operands");
   }
 } NumberMax_syntax;
 
@@ -501,29 +495,28 @@ struct NumberMin : public NumberOperands
   { }
 };
 
-static struct NumberMinSyntax
+static struct NumberMinSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new NumberMin (al); }
+  Model* make (Block& al) const
+  { return new NumberMin (al); }
   NumberMinSyntax ()
+    : DeclareModel (Number::component, "min", 
+	       "Use the smallest value of its operands.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
 
-    alist.add ("description", 
-	       "Use the smallest value of its operands.");
-    syntax.add_object ("operands", Number::component,
+    frame.add_object ("operands", Number::component,
                        Value::Const, Value::Sequence,
                        "The operands for this function.");
 #ifdef CHECK_OPERANDS_DIM
     static VCheck::All all (VCheck::min_size_1 (), 
                             NumberOperands::unique);
-    syntax.add_check ("operands", all);
+    frame.add_check ("operands", all);
 #else // !CHECK_OPERANDS_DIM
-    syntax.add_check ("operands", VCheck::min_size_1 ());
+    frame.add_check ("operands", VCheck::min_size_1 ());
 #endif // !CHECK_OPERANDS_DIM
-    syntax.order ("operands");
-    Librarian::add_type (Number::component, "min", alist, syntax, &make);
+    frame.order ("operands");
   }
 } NumberMin_syntax;
 
@@ -551,22 +544,21 @@ struct NumberProduct : public NumberOperands
   { }
 };
 
-static struct NumberProductSyntax
+static struct NumberProductSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new NumberProduct (al); }
+  Model* make (Block& al) const
+  { return new NumberProduct (al); }
   NumberProductSyntax ()
+    : DeclareModel (Number::component, "*", 
+	       "Use the product of its operands.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
 
-    alist.add ("description", 
-	       "Use the product of its operands.");
-    syntax.add_object ("operands", Number::component,
+    frame.add_object ("operands", Number::component,
                        Value::Const, Value::Sequence,
                        "The operands for this function.");
-    syntax.order ("operands");
-    Librarian::add_type (Number::component, "*", alist, syntax, &make);
+    frame.order ("operands");
   }
 } NumberProduct_syntax;
 
@@ -589,25 +581,24 @@ struct NumberSum : public NumberOperands
   { }
 };
 
-static struct NumberSumSyntax
+static struct NumberSumSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new NumberSum (al); }
+  Model* make (Block& al) const
+  { return new NumberSum (al); }
   NumberSumSyntax ()
+    : DeclareModel (Number::component, "+", 
+	       "Use the sum of its operands.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
 
-    alist.add ("description", 
-	       "Use the sum of its operands.");
-    syntax.add_object ("operands", Number::component,
+    frame.add_object ("operands", Number::component,
                        Value::Const, Value::Sequence,
                        "The operands for this function.");
 #ifdef CHECK_OPERANDS_DIM
-    syntax.add_check ("operands", NumberOperands::unique);
+    frame.add_check ("operands", NumberOperands::unique);
 #endif // CHECK_OPERANDS_DIM
-    syntax.order ("operands");
-    Librarian::add_type (Number::component, "+", alist, syntax, &make);
+    frame.order ("operands");
   }
 } NumberSum_syntax;
 
@@ -633,29 +624,28 @@ struct NumberSubtract : public NumberOperands
   { }
 };
 
-static struct NumberSubtractSyntax
+static struct NumberSubtractSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new NumberSubtract (al); }
+  Model* make (Block& al) const
+  { return new NumberSubtract (al); }
   NumberSubtractSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-
-    alist.add ("description", 
+    : DeclareModel (Number::component, "-", 
 	       "Negate number or subtract numbers.\n\
 With one operand, negates it.  With more than one operand,\n\
-subtracts all but the first from the first.");
-    syntax.add_object ("operands", Number::component,
+subtracts all but the first from the first.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+
+    frame.add_object ("operands", Number::component,
                        Value::Const, Value::Sequence,
                        "The operands for this function.");
 #ifdef CHECK_OPERANDS_DIM
     static VCheck::All all (VCheck::min_size_1 (), 
                             NumberOperands::unique);
-    syntax.add_check ("operands", all);
+    frame.add_check ("operands", all);
 #endif // CHECK_OPERANDS_DIM
-    syntax.order ("operands");
-    Librarian::add_type (Number::component, "-", alist, syntax, &make);
+    frame.order ("operands");
   }
 } NumberSubtract_syntax;
 
@@ -679,23 +669,22 @@ struct NumberDivide : public NumberOperands
   { }
 };
 
-static struct NumberDivideSyntax
+static struct NumberDivideSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new NumberDivide (al); }
+  Model* make (Block& al) const
+  { return new NumberDivide (al); }
   NumberDivideSyntax ()
+    : DeclareModel (Number::component, "/", 
+	       "Divide the first operand by the rest.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
 
-    alist.add ("description", 
-	       "Divide the first operand by the rest.");
-    syntax.add_object ("operands", Number::component,
+    frame.add_object ("operands", Number::component,
                        Value::Const, Value::Sequence,
                        "The operands for this function.");
-    syntax.add_check ("operands", VCheck::min_size_1 ());
-    syntax.order ("operands");
-    Librarian::add_type (Number::component, "/", alist, syntax, &make);
+    frame.add_check ("operands", VCheck::min_size_1 ());
+    frame.order ("operands");
   }
 } NumberDivide_syntax;
 

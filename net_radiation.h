@@ -49,8 +49,6 @@ public:
 		     Treelog&) = 0;
 
   // Create and Destroy.
-public:
-  static const AttributeList& default_model ();
 protected:
   NetRadiation (Block&);
 public:

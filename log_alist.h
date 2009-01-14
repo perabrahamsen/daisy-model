@@ -104,7 +104,6 @@ struct LogAList : public Log
   void output_entry (symbol name, const PLF& value);
 
   // Create and Destroy.
-  static void load_syntax (Syntax&, AttributeList&);
   bool check (const Border&, Treelog& err) const;
   LogAList (Block&);
   ~LogAList ();

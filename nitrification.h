@@ -59,7 +59,6 @@ public:
 
   // Create and Destroy.
 public:
-  static void load_syntax (Syntax&, AttributeList&);
   Nitrification (Block& al);
 public:
   ~Nitrification ();

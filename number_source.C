@@ -27,6 +27,7 @@
 #include "assertion.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 #include <sstream>
 #include <memory>
 
@@ -80,17 +81,6 @@ struct NumberSource : public Number
     daisy_assert (state != uninitialized);
     return state != error; 
   }
-
-  static void load_syntax (Syntax& syntax, AttributeList& alist)
-  {
-    syntax.add_object ("source", Source::component, "\
-The time series we want to extract a number from.");
-    syntax.add_submodule ("begin", alist, Value::OptionalConst,
-			  "Ignore values before or at this date.", 
-                          Time::load_syntax);
-    syntax.add_submodule ("end", alist, Value::OptionalConst,
-			  "Ignore values after this date.", Time::load_syntax);
-  }
   NumberSource (Block& al)
     : Number (al),
       source (Librarian::build_item<Source> (al, "source")),
@@ -100,6 +90,25 @@ The time series we want to extract a number from.");
       val (-42.42e42)
   { }
 };
+
+static struct NumberSourceSyntax : public DeclareBase
+{
+  NumberSourceSyntax ()
+    : DeclareBase (Number::component, "source", 
+                   "Extract information from a time series.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_object ("source", Source::component, "\
+The time series we want to extract a number from.");
+    frame.add_submodule ("begin", Value::OptionalConst,
+			  "Ignore values before or at this date.", 
+                          Time::load_syntax);
+    frame.add_submodule ("end", Value::OptionalConst,
+			  "Ignore values after this date.", Time::load_syntax);
+  }
+} NumberSource_syntax;
+
 
 struct NumberSourceUnique : public NumberSource
 {
@@ -136,19 +145,16 @@ struct NumberSourceUnique : public NumberSource
   { }
 };
 
-static struct NumberSourceUniqueSyntax
+static struct NumberSourceUniqueSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new NumberSourceUnique (al); }
+  Model* make (Block& al) const
+  { return new NumberSourceUnique (al); }
   NumberSourceUniqueSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", 
-	       "Find unique number in time series.");
-    NumberSource::load_syntax (syntax, alist);
-    Librarian::add_type (Number::component, "source_unique", alist, syntax, &make);
-  }
+    : DeclareModel (Number::component, "source_unique", "source",
+	       "Find unique number in time series.")
+  { }
+  void load_frame (Frame&) const
+  { }
 } NumberSourceUnique_syntax;
 
 struct NumberSourceAverage : public NumberSource
@@ -183,19 +189,16 @@ struct NumberSourceAverage : public NumberSource
   { }
 };
 
-static struct NumberSourceAverageSyntax
+static struct NumberSourceAverageSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new NumberSourceAverage (al); }
+  Model* make (Block& al) const
+  { return new NumberSourceAverage (al); }
   NumberSourceAverageSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", 
-	       "Find average number in time series.");
-    NumberSource::load_syntax (syntax, alist);
-    Librarian::add_type (Number::component, "source_average", alist, syntax, &make);
-  }
+    : DeclareModel (Number::component, "source_average", "source",
+                    "Find average number in time series.")
+  { }
+  void load_frame (Frame&) const
+  { }
 } NumberSourceAverage_syntax;
 
 struct NumberSourceSum : public NumberSource
@@ -216,19 +219,16 @@ struct NumberSourceSum : public NumberSource
   { }
 };
 
-static struct NumberSourceSumSyntax
+static struct NumberSourceSumSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new NumberSourceSum (al); }
+  Model* make (Block& al) const
+  { return new NumberSourceSum (al); }
   NumberSourceSumSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", 
-	       "Calculate the sum of the values in a time series.");
-    NumberSource::load_syntax (syntax, alist);
-    Librarian::add_type (Number::component, "source_sum", alist, syntax, &make);
-  }
+    : DeclareModel (Number::component, "source_sum", "source", 
+	       "Calculate the sum of the values in a time series.")
+  { }
+  void load_frame (Frame&) const
+  { }
 } NumberSourceSum_syntax;
 
 struct NumberSourceIncrease : public NumberSource
@@ -262,19 +262,16 @@ struct NumberSourceIncrease : public NumberSource
   { }
 };
 
-static struct NumberSourceIncreaseSyntax
+static struct NumberSourceIncreaseSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new NumberSourceIncrease (al); }
+  Model* make (Block& al) const
+  { return new NumberSourceIncrease (al); }
   NumberSourceIncreaseSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", 
-	       "Find increase in value during time series.");
-    NumberSource::load_syntax (syntax, alist);
-    Librarian::add_type (Number::component, "source_increase", alist, syntax, &make);
-  }
+    : DeclareModel (Number::component, "source_increase", "source",
+	       "Find increase in value during time series.")
+  { }
+  void load_frame (Frame&) const
+  { }
 } NumberSourceIncrease_syntax;
 
 // number_source.C ends here

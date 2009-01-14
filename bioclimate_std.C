@@ -1140,7 +1140,7 @@ End points of canopy layers, first entry is top of canopy, last is soil surface.
     // External water sources and sinks.
     frame.add_object ("net_radiation", NetRadiation::component,
                        "Net radiation.");
-    frame.add ("net_radiation", NetRadiation::default_model ());
+    frame.add ("net_radiation", "brunt");
     frame.add_object ("pet", Pet::component, 
                        Value::OptionalState, Value::Singleton, 
                        "Potential Evapotranspiration component.\n\

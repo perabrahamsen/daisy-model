@@ -32,6 +32,7 @@
 #include "plf.h"
 #include "check.h"
 #include "librarian.h"
+#include "frame.h"
 
 class NitrificationSolute : public Nitrification
 {
@@ -86,32 +87,29 @@ NitrificationSolute::NitrificationSolute (Block& al)
     water_factor (al.plf ("water_factor"))
 { }
 
-static struct NitrificationSoluteSyntax
+static struct NitrificationSoluteSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
+  Model* make (Block& al) const
   {
-    return *new NitrificationSolute (al);
+    return new NitrificationSolute (al);
   }
 
   NitrificationSoluteSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    Nitrification::load_syntax (syntax, alist);
-
-    alist.add ("description", 
+    : DeclareModel (Nitrification::component, "solute", 
 	       "k_10 * C / (k + C).  Michaelis-Menten kinetics,\n\
-with nitrification based on ammonium solute.");
-    syntax.add ("k", "g/cm^3", Check::positive (), Value::Const, 
+with nitrification based on ammonium solute.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add ("k", "g/cm^3", Check::positive (), Value::Const, 
 		"Half saturation constant.");
-    syntax.add ("k_10", "h^-1", Check::non_negative (),
+    frame.add ("k_10", "h^-1", Check::non_negative (),
 		Value::Const, "Max rate.");
-    syntax.add ("heat_factor", "dg C", Value::None (), Value::Const,
+    frame.add ("heat_factor", "dg C", Value::None (), Value::Const,
 		"Heat factor.");
-    alist.add ("heat_factor", PLF::empty ());
-    syntax.add ("water_factor", "cm", Value::None (), Value::Const,
+    frame.add ("heat_factor", PLF::empty ());
+    frame.add ("water_factor", "cm", Value::None (), Value::Const,
 		"Water potential factor.");
-    alist.add ("water_factor", PLF::empty ());
-    Librarian::add_type (Nitrification::component, "solute", alist, syntax, &make);
+    frame.add ("water_factor", PLF::empty ());
   }
 } NitrificationSolute_syntax;
