@@ -26,6 +26,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "librarian.h"
+#include "frame.h"
 
 struct SVAT_none : public SVAT
 {
@@ -66,15 +67,14 @@ struct SVAT_none : public SVAT
   { }
 };
 
-static struct SVAT_NoneSyntax
+static struct SVAT_NoneSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new SVAT_none (al); }
+  Model* make (Block& al) const
+  { return new SVAT_none (al); }
   SVAT_NoneSyntax ()
+    : DeclareModel (SVAT::component, "none", "No SVAT in effect.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    SVAT::load_syntax (syntax, alist);
-    Librarian::add_type (SVAT::component, "none", alist, syntax, &make);
   }
 } SVAT_none_syntax;

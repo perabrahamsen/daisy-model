@@ -28,6 +28,7 @@
 #include "treelog.h"
 #include "memutils.h"
 #include "librarian.h"
+#include "frame.h"
 #include <sstream>
 #include <algorithm>
 #include <fstream>
@@ -252,40 +253,38 @@ SummaryBalance::summarize (const int hours, Treelog& msg) const
     } 
 }
 
-static struct SummaryBalanceSyntax
+static struct SummaryBalanceSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new SummaryBalance (al); }
+  Model* make (Block& al) const
+  { return new SummaryBalance (al); }
   SummaryBalanceSyntax ()
+    : DeclareModel (Summary::component, "balance",
+                    SummaryBalance::default_description)
+  { }
+  void load_frame (Frame& frame) const
     {
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      syntax.add ("description", Value::String, Value::Const,
-		  "Description of this summary format.");
-      alist.add ("description", SummaryBalance::default_description);
-      syntax.add ("where", Value::String, Value::OptionalConst,
+      frame.add ("where", Value::String, Value::OptionalConst,
                   "File name to store the summary.\n\
 By default, the summary will be stored in daisy.log and the screen.");
-      syntax.add ("title", Value::String, Value::OptionalConst,
+      frame.add ("title", Value::String, Value::OptionalConst,
 		  "Title of this summary.\n\
 By default, use the name of the parameterization.");
-      syntax.add ("period", Value::String, Value::OptionalConst, "\
+      frame.add ("period", Value::String, Value::OptionalConst, "\
 Set this to 'y', 'm', 'w', 'd' or 'h' to get fluxes per time period\n\
 instead of total amount.");
-      syntax.add ("precision", Value::Integer, Value::Const,
+      frame.add ("precision", Value::Integer, Value::Const,
 		  "Number of digits to print after decimal point.");
-      alist.add ("precision", 2);
-      syntax.add ("require_top", Value::Boolean, Value::Const, "\
+      frame.add ("precision", 2);
+      frame.add ("require_top", Value::Boolean, Value::Const, "\
 If the balance only hold true when logging the top of the soil, i.e. the\n\
 `from' parameter of the log model is 0, this flag should be set.");
-      alist.add ("require_top", false);
-      syntax.add ("input", Value::String, Value::Const, Value::Sequence,
+      frame.add ("require_top", false);
+      frame.add ("input", Value::String, Value::Const, Value::Sequence,
                   "Tags of columns in log file representing inputs.");
-      syntax.add ("output", Value::String, Value::Const, Value::Sequence,
+      frame.add ("output", Value::String, Value::Const, Value::Sequence,
                   "Tags of columns in log file representing outputs.");
-      syntax.add ("content", Value::String, Value::Const, Value::Sequence,
+      frame.add ("content", Value::String, Value::Const, Value::Sequence,
                   "Tags of columns in log file representing content.");
-      Librarian::add_type (Summary::component, "balance", alist, syntax, &make);
     }
 } SummaryBalance_syntax;
 

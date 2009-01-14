@@ -64,7 +64,6 @@ public:
   virtual double ShadowLeafTemperature () const = 0; // [dg C]
 
   // Create and Destroy.
-  static void load_syntax (Syntax&, AttributeList&);
 protected:
   SVAT (Block&);
 public:

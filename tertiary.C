@@ -27,6 +27,7 @@
 #include "block.h"
 #include "alist.h"
 #include "librarian.h"
+#include "frame.h"
 
 // The 'tertiary' component.
 
@@ -90,25 +91,16 @@ public:
   { }
 };
 
-static struct TertiaryNoneSyntax
+static struct TertiaryNoneSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new TertiaryNone (al); }
+  Model* make (Block& al) const
+  { return new TertiaryNone (al); }
   TertiaryNoneSyntax ()
+    : DeclareModel (Tertiary::component, "none", "No tertiary transport.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "No tertiary transport.");
-    Librarian::add_type (Tertiary::component, "none", alist, syntax, &make);
   }
 } TertiaryNone_syntax;
 
-const AttributeList&
-Tertiary::none_model ()
-{
-  static AttributeList alist;
-  if (!alist.check ("type"))
-    alist.add ("type", "none");
-  return alist;
-}
 // tertiary.C ends here.

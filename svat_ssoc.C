@@ -40,6 +40,7 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include "solver.h"
+#include "frame.h"
 #include <memory>
 #include <sstream>
 
@@ -195,7 +196,6 @@ struct SVAT_SSOC : public SVAT
   void output(Log& log) const;
 
   // Create.
-  static void load_syntax (Syntax& syntax, AttributeList& alist);
   SVAT_SSOC (Block& al);
   void summarize (Treelog& msg) const
   { 
@@ -805,96 +805,6 @@ SVAT_SSOC::output(Log& log) const
     }
 }
 
-void 
-SVAT_SSOC::load_syntax (Syntax& syntax, AttributeList& alist)
-{
-  SVAT::load_syntax (syntax, alist);
-
-  syntax.add_object ("solver", Solver::component, 
-		     Value::Const, Value::Singleton, "\
-Model used for solving the energy balance equation system.");
-  alist.add ("solver", "cxsparse");
-  syntax.add ("hypostomatous", Value::Boolean, Value::Const,
-              "True for hypostomatous leaves. \n\
-False for amphistomatous leaves (possesing stomata on both surfaces).");
-  alist.add ("hypostomatous", true);
-
-  syntax.add ("maxTdiff", "K", Value::Const, "\
-Largest temperature difference for convergence.");
-  alist.add ("maxTdiff", 0.001);
-  syntax.add ("maxEdiff", "Pa", Value::Const, "\
-Largest humidity difference for convergence.");
-  alist.add ("maxEdiff", 0.01);
-  syntax.add ("max_iteration", Value::Integer, Value::Const, "\
-Largest number of iterations before giving up on convergence.");
-  alist.add ("max_iteration", 150);  
-  
-  // For log.
-  syntax.add ("lambda", "J kg^-1", Value::LogOnly, "Latent heat of vaporization in atmosphere.");
-  syntax.add ("rho_a", "kg m^-3", Value::LogOnly, "Air density.");
-  syntax.add ("gamma", "Pa K^-1", Value::LogOnly, "Psychrometric constant.");
-  syntax.add ("T_s", "K", Value::LogOnly, "Soil surface temperature.");
-  syntax.add ("T_0", "K", Value::LogOnly, "Surface temperature (large scale).");
-  syntax.add ("T_c", "K", Value::LogOnly, "Canopy-point temperature.");
-  syntax.add ("T_sun", "K", Value::LogOnly, "Temperature of sunlit leaves.");
-  syntax.add ("T_shadow", "K", Value::LogOnly, "Temperature of shadow leaves.");
-  syntax.add ("g_a", "m s^-1", Value::LogOnly, 
-              "Heat conductance in the atmosphere - from canopy point \n\
-to reference height (screen height).");
-  syntax.add ("g_H_s_c", "m s^-1", Value::LogOnly, 
-              "Heat conductance from soil surface to canopy point.");
-  syntax.add ("g_H_sun_c", "m s^-1", Value::LogOnly, 
-              "Heat conductance from sunlit leaves to canopy point.");
-  syntax.add ("g_W_sun_c", "m s^-1", Value::LogOnly, 
-              "Water conductance from sunlit leaves to canopy point.");
-  syntax.add ("G_W_sun_c", "W m^-2 K^-1", Value::LogOnly, 
-              "Scaled water conductance from sunlit leaves to canopy point.");
-  syntax.add ("g_H_shadow_c", "m s^-1", Value::LogOnly,
-              "Heat conductance from shadow leaves to canopy point.");
-  syntax.add ("g_W_shadow_c", "m s^-1", Value::LogOnly,
-              "Water conductance from shadow leaves to canopy point.");
-  syntax.add ("e_a", "Pa", Value::LogOnly, 
-              "Vapour pressure of water in the atmosphere.");  
-  syntax.add ("e_sat_air", "Pa", Value::LogOnly, 
-              "Saturated vapour pressure of water in the air.");  
-  syntax.add ("s", "Pa K^-1", Value::LogOnly, 
-              "Slope of water vapour pressure curve.");  
-  syntax.add ("e_c", "Pa", Value::LogOnly, 
-              "Vapour pressure of water in the canopy.");
-  syntax.add ("R_abs_soil", "W m^-2", Value::LogOnly, "Absorbed radiation in soil.");
-  syntax.add ("R_eq_abs_soil", "W m^-2", Value::LogOnly, 
-              "Absorbed radiation in soil at equilibrium.");
-  syntax.add ("R_abs_sun", "W m^-2", Value::LogOnly, 
-              "Absorbed radiation in sunlit leaves.");
-  syntax.add ("R_eq_abs_sun", "W m^-2", Value::LogOnly, 
-              "Absorbed radiation in sunlit leaves at equilibrium.");
-  syntax.add ("R_abs_shadow", "W m^-2", Value::LogOnly, 
-              "Absorbed radiation in shadow leaves.");
-  syntax.add ("R_eq_abs_shadow", "W m^-2", Value::LogOnly, 
-              "Absorbed radiation in shadow leaves at equilibrium."); 
-  syntax.add ("LAI", "m^2 m^-2", Value::LogOnly, "Leaf area index.");
-  syntax.add ("sun_LAI_fraction_total","", Value::LogOnly, 
-              "Sunlit fraction of leaf area in the canopy.");
-  syntax.add ("cover", "", Value::LogOnly, "Vegetation cover.");
-  syntax.add ("H_soil", "W m^-2", Value::LogOnly, 
-              "Sensible heat flux from the soil.");
-  syntax.add ("H_sun", "W m^-2", Value::LogOnly, 
-              "Sensible heat flux from the sunlit leaves to the canopy point.");
-  syntax.add ("H_shadow", "W m^-2", Value::LogOnly, 
-              "Sensible heat flux from the shadow leaves to canopy point.");
-  syntax.add ("H_c_a", "W m^-2", Value::LogOnly, 
-              "Sensible heat flux from the canopy point to free atmosphere.");
-  syntax.add ("LE_sun", "W m^-2", Value::LogOnly, 
-              "Latent heat flux from the sunlit leaves to the canopy point.");
-  syntax.add ("LE_shadow", "W m^-2", Value::LogOnly, 
-              "Latent heat flux from the shadow leaves to the canopy point.");
-  syntax.add ("LE_atm", "W m^-2", Value::LogOnly, 
-              "Latent heat flux from the canopy point to the free atmosphere.");
-  syntax.add ("E_trans", "mm/h", Value::LogOnly, "Leaf transpiration.");
-
-  //  syntax.add ("", "", Value::LogOnly, ".");
-}
-
 SVAT_SSOC::SVAT_SSOC (Block& al)
   : SVAT (al), 
     solver (Librarian::build_item<Solver> (al, "solver")),
@@ -968,17 +878,99 @@ SVAT_SSOC::SVAT_SSOC (Block& al)
     converge_total (0)
 { }
 
-static struct SVAT_SSOCSyntax
+static struct SVAT_SSOCSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new SVAT_SSOC (al); }
+  Model* make (Block& al) const
+  { return new SVAT_SSOC (al); }
   SVAT_SSOCSyntax ()
+    : DeclareModel (SVAT::component, "SSOC", "Sun-Shade Open Canopy.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    SVAT_SSOC::load_syntax (syntax, alist);
-    Librarian::add_type (SVAT::component, "SSOC", alist, syntax, &make);
-  }
+    frame.add_object ("solver", Solver::component, 
+                       Value::Const, Value::Singleton, "\
+Model used for solving the energy balance equation system.");
+    frame.add ("solver", "cxsparse");
+    frame.add ("hypostomatous", Value::Boolean, Value::Const,
+                "True for hypostomatous leaves. \n\
+False for amphistomatous leaves (possesing stomata on both surfaces).");
+    frame.add ("hypostomatous", true);
+
+    frame.add ("maxTdiff", "K", Value::Const, "\
+Largest temperature difference for convergence.");
+    frame.add ("maxTdiff", 0.001);
+    frame.add ("maxEdiff", "Pa", Value::Const, "\
+Largest humidity difference for convergence.");
+    frame.add ("maxEdiff", 0.01);
+    frame.add ("max_iteration", Value::Integer, Value::Const, "\
+Largest number of iterations before giving up on convergence.");
+    frame.add ("max_iteration", 150);  
+
+    // For log.
+    frame.add ("lambda", "J kg^-1", Value::LogOnly, "Latent heat of vaporization in atmosphere.");
+    frame.add ("rho_a", "kg m^-3", Value::LogOnly, "Air density.");
+    frame.add ("gamma", "Pa K^-1", Value::LogOnly, "Psychrometric constant.");
+    frame.add ("T_s", "K", Value::LogOnly, "Soil surface temperature.");
+    frame.add ("T_0", "K", Value::LogOnly, "Surface temperature (large scale).");
+    frame.add ("T_c", "K", Value::LogOnly, "Canopy-point temperature.");
+    frame.add ("T_sun", "K", Value::LogOnly, "Temperature of sunlit leaves.");
+    frame.add ("T_shadow", "K", Value::LogOnly, "Temperature of shadow leaves.");
+    frame.add ("g_a", "m s^-1", Value::LogOnly, 
+                "Heat conductance in the atmosphere - from canopy point \n\
+to reference height (screen height).");
+    frame.add ("g_H_s_c", "m s^-1", Value::LogOnly, 
+                "Heat conductance from soil surface to canopy point.");
+    frame.add ("g_H_sun_c", "m s^-1", Value::LogOnly, 
+                "Heat conductance from sunlit leaves to canopy point.");
+    frame.add ("g_W_sun_c", "m s^-1", Value::LogOnly, 
+                "Water conductance from sunlit leaves to canopy point.");
+    frame.add ("G_W_sun_c", "W m^-2 K^-1", Value::LogOnly, 
+                "Scaled water conductance from sunlit leaves to canopy point.");
+    frame.add ("g_H_shadow_c", "m s^-1", Value::LogOnly,
+                "Heat conductance from shadow leaves to canopy point.");
+    frame.add ("g_W_shadow_c", "m s^-1", Value::LogOnly,
+                "Water conductance from shadow leaves to canopy point.");
+    frame.add ("e_a", "Pa", Value::LogOnly, 
+                "Vapour pressure of water in the atmosphere.");  
+    frame.add ("e_sat_air", "Pa", Value::LogOnly, 
+                "Saturated vapour pressure of water in the air.");  
+    frame.add ("s", "Pa K^-1", Value::LogOnly, 
+                "Slope of water vapour pressure curve.");  
+    frame.add ("e_c", "Pa", Value::LogOnly, 
+                "Vapour pressure of water in the canopy.");
+    frame.add ("R_abs_soil", "W m^-2", Value::LogOnly, "Absorbed radiation in soil.");
+    frame.add ("R_eq_abs_soil", "W m^-2", Value::LogOnly, 
+                "Absorbed radiation in soil at equilibrium.");
+    frame.add ("R_abs_sun", "W m^-2", Value::LogOnly, 
+                "Absorbed radiation in sunlit leaves.");
+    frame.add ("R_eq_abs_sun", "W m^-2", Value::LogOnly, 
+                "Absorbed radiation in sunlit leaves at equilibrium.");
+    frame.add ("R_abs_shadow", "W m^-2", Value::LogOnly, 
+                "Absorbed radiation in shadow leaves.");
+    frame.add ("R_eq_abs_shadow", "W m^-2", Value::LogOnly, 
+                "Absorbed radiation in shadow leaves at equilibrium."); 
+    frame.add ("LAI", "m^2 m^-2", Value::LogOnly, "Leaf area index.");
+    frame.add ("sun_LAI_fraction_total","", Value::LogOnly, 
+                "Sunlit fraction of leaf area in the canopy.");
+    frame.add ("cover", "", Value::LogOnly, "Vegetation cover.");
+    frame.add ("H_soil", "W m^-2", Value::LogOnly, 
+                "Sensible heat flux from the soil.");
+    frame.add ("H_sun", "W m^-2", Value::LogOnly, 
+                "Sensible heat flux from the sunlit leaves to the canopy point.");
+    frame.add ("H_shadow", "W m^-2", Value::LogOnly, 
+                "Sensible heat flux from the shadow leaves to canopy point.");
+    frame.add ("H_c_a", "W m^-2", Value::LogOnly, 
+                "Sensible heat flux from the canopy point to free atmosphere.");
+    frame.add ("LE_sun", "W m^-2", Value::LogOnly, 
+                "Latent heat flux from the sunlit leaves to the canopy point.");
+    frame.add ("LE_shadow", "W m^-2", Value::LogOnly, 
+                "Latent heat flux from the shadow leaves to the canopy point.");
+    frame.add ("LE_atm", "W m^-2", Value::LogOnly, 
+                "Latent heat flux from the canopy point to the free atmosphere.");
+    frame.add ("E_trans", "mm/h", Value::LogOnly, "Leaf transpiration.");
+
+    //  frame.add ("", "", Value::LogOnly, ".");
+    }
 } SVAT_ssoc_syntax;
 
 // svat_ssoc.C ends here

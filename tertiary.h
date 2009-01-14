@@ -72,8 +72,6 @@ public:
 
   // Create and Destroy.
 public:
-  static const AttributeList& none_model ();
-  static const AttributeList& old_model ();
   virtual bool initialize (const Units&,
                            const Geometry&, const Soil&, const Scope&, 
                            const Groundwater&, Treelog&) = 0;

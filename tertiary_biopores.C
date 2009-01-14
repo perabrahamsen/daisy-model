@@ -41,6 +41,7 @@
 #include "treelog.h"
 #include "assertion.h"
 #include "mathlib.h"
+#include "frame.h"
 #include <sstream>
 
 struct TertiaryBiopores : public Tertiary, public Tertsmall
@@ -646,30 +647,30 @@ TertiaryBiopores::TertiaryBiopores (Block& al)
     deactivate_steps (al.integer ("deactivate_steps"))
 { }
 
-static struct TertiaryBioporesSyntax
+static struct TertiaryBioporesSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new TertiaryBiopores (al); }
+  Model* make (Block& al) const
+  { return new TertiaryBiopores (al); }
 
   TertiaryBioporesSyntax ()
+    : DeclareModel (Tertiary::component, "biopores", "Tertiary domain divided into biopore classes.")
+  { }
+  void load_frame (Frame& frame) const
   { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Tertiary domain divided into biopore classes.");
 
-    syntax.add ("enable_solute", Value::Boolean, Value::Const, "\
+    frame.add ("enable_solute", Value::Boolean, Value::Const, "\
 fTrue iff solutes should be transport with the water through the biopores.");
-    alist.add ("enable_solute", true);
-    syntax.add_object ("classes", Biopore::component, 
+    frame.add ("enable_solute", true);
+    frame.add_object ("classes", Biopore::component, 
                        Value::State, Value::Sequence,
                        "List of biopore classes.");
-    syntax.add ("pressure_initiate", "cm", Value::Const, 
+    frame.add ("pressure_initiate", "cm", Value::Const, 
                 "Pressure needed to activate biopore flow.");
-    alist.add ("pressure_initiate", -3.0);
-    syntax.add ("pressure_end", "cm", Value::Const, 
+    frame.add ("pressure_initiate", -3.0);
+    frame.add ("pressure_end", "cm", Value::Const, 
                 "Pressure below which biopore flow is deactivated.");
-    alist.add ("pressure_end", -30.0);
-    syntax.add ("pressure_limit", "cm", Check::non_positive (),
+    frame.add ("pressure_end", -30.0);
+    frame.add ("pressure_limit", "cm", Check::non_positive (),
                 Value::OptionalConst, "\
 Limit to pressure difference for moving matrix water gradient to biopores.\n\
 \n\
@@ -679,40 +680,38 @@ to the height of this water column.  The pressure limit is then the\n\
 maximal length of the column, or the point where the column breaks.\n\
 \n\
 By default, this is equal to 'pressure_end'.");
-    syntax.add ("pressure_barrier", "cm", Check::non_negative (), Value::Const,
+    frame.add ("pressure_barrier", "cm", Check::non_negative (), Value::Const,
                 "Pressure barrier between matrix and biopore domain.\n\
 If the pressure difference between the matrix and biopores is below\n\
 this value, no water will tranfer between the domains.  If you specify\n\
 a too small value for this parameter, the solution may be unstable.");
-    alist.add ("pressure_barrier", 5.0);
-    syntax.add ("pond_max", "cm", Check::non_negative (), Value::Const, "\
+    frame.add ("pressure_barrier", 5.0);
+    frame.add ("pond_max", "cm", Check::non_negative (), Value::Const, "\
 Maximum height of ponding before spilling into biopores.\n\
 After macropores are activated pond will have this height.");
-    alist.add ("pond_max", 0.05);
-    syntax.add ("use_small_timesteps", Value::Boolean, Value::Const,
+    frame.add ("pond_max", 0.05);
+    frame.add ("use_small_timesteps", Value::Boolean, Value::Const,
                 "True iff the sink is allowed to change within a timestep.");
-    alist.add ("use_small_timesteps", true);
-    syntax.add ("active", Value::Boolean, Value::OptionalState,
+    frame.add ("use_small_timesteps", true);
+    frame.add ("active", Value::Boolean, Value::OptionalState,
                 Value::Sequence, "Active biopores in cells.");
-    syntax.add ("water_volume", "cm^3", Value::LogOnly, "Water volume.");    
-    syntax.add ("water_height", "cm", Value::LogOnly,
+    frame.add ("water_volume", "cm^3", Value::LogOnly, "Water volume.");    
+    frame.add ("water_height", "cm", Value::LogOnly,
                 "Water volume multiplied with surface area.");
-    IM::add_syntax (syntax, alist, Value::LogOnly, "solute_mass", 
+    IM::add_syntax (frame, Value::LogOnly, "solute_mass", 
                     IM::mass_unit (),
                     "Total amount of solutes in biopores.");
-    IM::add_syntax (syntax, alist, Value::LogOnly, "solute_storage", 
+    IM::add_syntax (frame, Value::LogOnly, "solute_storage", 
                     IM::storage_unit (), "\
 Total amount of solutes in biopores divided by surface area.");
-    syntax.add ("ddt", "h", Value::LogOnly, "Emulated timestep.\n\
+    frame.add ("ddt", "h", Value::LogOnly, "Emulated timestep.\n\
 Timestep scaled for available water.\n\
 Only relevant if 'use_small_timesteps' is false.");    
-    syntax.add ("deactivate_steps", Value::Integer, Value::State, 
+    frame.add ("deactivate_steps", Value::Integer, Value::State, 
                 "No matrix exchange for this number of timesteps.\n\
 Automatically set when matrix pressure is in a disarray, such as after\n\
 tillage operations, or calls to reserve models.");
-    alist.add ("deactivate_steps", 3);
-
-    Librarian::add_type (Tertiary::component, "biopores", alist, syntax, &make);
+    frame.add ("deactivate_steps", 3);
   }
 } TertiaryBiopores_syntax;
 

@@ -26,6 +26,7 @@
 #include "check.h"
 #include "block.h"
 #include "librarian.h"
+#include "frame.h"
 
 struct StomataCon_BB : public StomataCon
 {
@@ -61,22 +62,18 @@ StomataCon_BB::stomata_con (const double wsf /*[]*/, const double m /*[]*/,
   return gsw;
 }
 
-static struct StomataConBBSyntax
+static struct StomataConBBSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new StomataCon_BB (al); }
-  static void load_syntax (Syntax& syntax, AttributeList& alist)
-  {  }  
+  Model* make (Block& al) const
+  { return new StomataCon_BB (al); }
   StomataConBBSyntax ()
+    : DeclareModel (StomataCon::component, "BB", 
+	       "Stomata conductance calculated by the Ball & Berry model.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", 
-	       "Stomata conductance calculated by the Ball & Berry model.");
 
-    load_syntax (syntax, alist);
 
-    Librarian::add_type (StomataCon::component, "BB", alist, syntax, &make);
   }
 } StomataConBBsyntax;
 

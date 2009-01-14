@@ -503,7 +503,7 @@ Xn = 1.16E-3 mol/mol/s for wheat (de Pury & Farquhar, 1997)");
 
     frame.add_object ("Stomatacon", StomataCon::component, 
                        "Stomata conductance of water vapor.");
-    frame.add ("Stomatacon", StomataCon::default_model ());
+    frame.add ("Stomatacon", "Leuning");
   }
 } PhotoFarquhar_syntax;
 

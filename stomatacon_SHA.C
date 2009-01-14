@@ -26,6 +26,7 @@
 #include "check.h"
 #include "block.h"
 #include "librarian.h"
+#include "frame.h"
 
 struct StomataCon_SHA : public StomataCon
 {
@@ -71,38 +72,33 @@ StomataCon_SHA::stomata_con (const double wsf /*[]*/,
   return gsw;
 }
 
-static struct StomataConSHASyntax
+static struct StomataConSHASyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new StomataCon_SHA (al); }
-  static void load_syntax (Syntax& syntax, AttributeList& alist)
-  {
-    syntax.add ("lambda", Value::None (), Check::non_negative (), Value::Const,
-                "Coefficient");
-    alist.add ("lambda", 1.0);
-
-    syntax.add ("alpha", Value::None (), Check::non_negative (), Value::Const,
-                "Coefficient");
-    alist.add ("alpha", 1.0);
-
-    syntax.add ("Amax", "[mol/m²leaf/s]", Check::non_negative (), Value::Const,
-                "Max photosynthesis");
-    alist.add ("Amax", 1.0);
-
-    syntax.add ("M", "[mol/m²leaf/s]", Check::non_negative (), Value::Const,
-                "Parameter ??");
-    alist.add ("M", 1.0);
-  }  
+  Model* make (Block& al) const
+  { return new StomataCon_SHA (al); }
   StomataConSHASyntax ()
+    : DeclareModel (StomataCon::component, "SHA", 
+	       "Stomata conductance calculated by the model given by Seyed Hamid Ahmadi.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", 
-	       "Stomata conductance calculated by the model given by Seyed Hamid Ahmadi.");
 
-    load_syntax (syntax, alist);
+    frame.add ("lambda", Value::None (), Check::non_negative (), Value::Const,
+                "Coefficient");
+    frame.add ("lambda", 1.0);
 
-    Librarian::add_type (StomataCon::component, "SHA", alist, syntax, &make);
+    frame.add ("alpha", Value::None (), Check::non_negative (), Value::Const,
+                "Coefficient");
+    frame.add ("alpha", 1.0);
+
+    frame.add ("Amax", "[mol/m²leaf/s]", Check::non_negative (), Value::Const,
+                "Max photosynthesis");
+    frame.add ("Amax", 1.0);
+
+    frame.add ("M", "[mol/m²leaf/s]", Check::non_negative (), Value::Const,
+                "Parameter ??");
+    frame.add ("M", 1.0);
+
   }
 } StomataConSHAsyntax;
 

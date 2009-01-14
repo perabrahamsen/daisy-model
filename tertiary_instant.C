@@ -27,6 +27,7 @@
 #include "vcheck.h"
 #include "librarian.h"
 #include "block.h"
+#include "frame.h"
 
 struct TertiaryInstant : public Tertiary
 {
@@ -135,31 +136,31 @@ TertiaryInstant::TertiaryInstant (Block& al)
     pond_max (al.number ("pond_max"))
 { }
 
-static struct TertiaryInstantSyntax
+static struct TertiaryInstantSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new TertiaryInstant (al); }
+  Model* make (Block& al) const
+  { return new TertiaryInstant (al); }
 
   TertiaryInstantSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
+    : DeclareModel (Tertiary::component, "instant", "\
 The area between 'height_start' and 'height_end' contains macropores,\n\
 which are initiated when the water potential reach 'pressure_initiate',\n\
 and then immediately emptied down to 'pressure_end'.  The water entering\n\
 the macropore is distributed in soil below as a source term, according\n\
-to the 'distribution' parameter.");
+to the 'distribution' parameter.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
 
-    syntax.add ("height_start", "cm", Check::non_positive (), 
+    frame.add ("height_start", "cm", Check::non_positive (), 
                 Syntax::OptionalConst, 
                 "Macropores starts at this depth (a negative number).\n\
 If not specified, use the last point in 'distribution'.");
-    syntax.add ("height_end", "cm", Check::non_positive (),
+    frame.add ("height_end", "cm", Check::non_positive (),
                 Syntax::OptionalConst, 
                 "Macropores ends at this depth (a negative number).\n\
 If not specified, use the first point in 'distribution'.");
-    syntax.add ("distribution", "cm", Syntax::Fraction (), Syntax::Const, "\
+    frame.add ("distribution", "cm", Syntax::Fraction (), Syntax::Const, "\
 Distribution of macropore end points as a function of height.\n\
 The function should start with '1' at 'height_end', and then decrease to\n\
 '0' at 'height_start'.  It can be constant, but may never increase.\n\
@@ -170,20 +171,19 @@ where all macropores is assumed to start at the top.");
     static VCheck::FixedPoint fixpoint (0.0, 0.0);
     static VCheck::All distcheck (start, end, fixpoint, 
                                   VCheck::non_increasing ());
-    syntax.add_check ("distribution", distcheck);
+    frame.add_check ("distribution", distcheck);
 
-    syntax.add ("pressure_initiate", "cm", Syntax::Const, 
+    frame.add ("pressure_initiate", "cm", Syntax::Const, 
                 "Pressure needed to initiate biopore flow.");
-    alist.add ("pressure_initiate", -3.0);
-    syntax.add ("pressure_end", "cm", Syntax::Const, 
+    frame.add ("pressure_initiate", -3.0);
+    frame.add ("pressure_end", "cm", Syntax::Const, 
                 "Pressure after biopore flow has been initiated.");
-    alist.add ("pressure_end", -30.0);
-    syntax.add ("pond_max", "mm", Check::non_negative (), Syntax::Const, "\
+    frame.add ("pressure_end", -30.0);
+    frame.add ("pond_max", "mm", Check::non_negative (), Syntax::Const, "\
 Maximum height of ponding before spilling into instant.\n\
 After macropores are activated pond will have this height.");
-    alist.add ("pond_max", 0.5);
+    frame.add ("pond_max", 0.5);
 
-    Librarian::add_type (Tertiary::component, "instant", alist, syntax, &make);
   }
 } TertiaryInstant_syntax;
 

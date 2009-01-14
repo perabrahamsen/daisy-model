@@ -51,7 +51,6 @@ protected:
   StomataCon (Block&);
 
 public:
-  static const AttributeList& default_model ();
   ~StomataCon ();
 };
 

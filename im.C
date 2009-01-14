@@ -31,6 +31,7 @@
 #include "block.h"
 #include "alist.h"
 #include "syntax.h"
+#include "frame.h"
 #include "check.h"
 #include "assertion.h"
 #include "frame.h"
@@ -234,6 +235,15 @@ IM::IM (const Unit& u, const IM& im)
 
 IM::~IM ()
 { daisy_assert (unit_);  }
+
+void
+IM::add_syntax (Frame& parent_frame,
+		Value::category cat, 
+		const char *const key,
+		const symbol dimension,
+		const char *const description)
+{ add_syntax (parent_frame.syntax (), parent_frame.alist (), 
+              cat, key, dimension, description); }
 
 void
 IM::add_syntax (Syntax& parent_syntax, AttributeList& parent_alist,

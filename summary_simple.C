@@ -28,6 +28,7 @@
 #include "memutils.h"
 #include "submodeler.h"
 #include "librarian.h"
+#include "frame.h"
 #include <sstream>
 #include <fstream>
 #include <string>
@@ -140,39 +141,37 @@ SummarySimple::summarize (const int hours, Treelog& msg) const
     } 
 }
 
-static struct SummarySimpleSyntax
+static struct SummarySimpleSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new SummarySimple (al); }
+  Model* make (Block& al) const
+  { return new SummarySimple (al); }
   SummarySimpleSyntax ()
-    {
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      syntax.add ("description", Value::String, Value::Const,
-		  "Description of this summary format.");
-      alist.add ("description", SummarySimple::default_description);
-      syntax.add ("where", Value::String, Value::OptionalConst,
-                  "File name to store the summary.\n\
+    : DeclareModel (Summary::component, "simple",
+                    SummarySimple::default_description)
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add ("where", Value::String, Value::OptionalConst,
+                "File name to store the summary.\n\
 By default, the summary will be stored in daisy.log and the screen.");
-      syntax.add ("title", Value::String, Value::OptionalConst,
-		  "Title of this summary.\n\
+    frame.add ("title", Value::String, Value::OptionalConst,
+                "Title of this summary.\n\
 By default, use the name of the parameterization.");
-      syntax.add ("print_sum", Value::Boolean, Value::Const, 
-		  "Print sum of all the summary lines.");
-      alist.add ("print_sum", true);
-      syntax.add ("sum_name", Value::String, Value::Const,
-		  "Name of the sum of all the entries.");
-      alist.add ("sum_name", "Sum");	
-      syntax.add ("period", Value::String, Value::OptionalConst, "\
+    frame.add ("print_sum", Value::Boolean, Value::Const, 
+                "Print sum of all the summary lines.");
+    frame.add ("print_sum", true);
+    frame.add ("sum_name", Value::String, Value::Const,
+                "Name of the sum of all the entries.");
+    frame.add ("sum_name", "Sum");	
+    frame.add ("period", Value::String, Value::OptionalConst, "\
 Set this to 'y', 'm', 'w', 'd' or 'h' to get fluxes per time period\n\
 instead of total amount.");
-      syntax.add_submodule_sequence ("fetch", Value::Const, "\
+    frame.add_submodule_sequence ("fetch", Value::Const, "\
 List of columns to fetch for the summary.", Fetch::load_syntax);
-      syntax.add ("precision", Value::Integer, Value::Const,
-		  "Number of digits to print after decimal point.");
-      alist.add ("precision", 2);
-      Librarian::add_type (Summary::component, "simple", alist, syntax, &make);
-    }
+    frame.add ("precision", Value::Integer, Value::Const,
+                "Number of digits to print after decimal point.");
+    frame.add ("precision", 2);
+  }
 } SummarySimple_syntax;
 
 // summary_simple.C ends here.

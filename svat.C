@@ -39,10 +39,6 @@ void
 SVAT::output (Log&) const
 { }
 
-void 
-SVAT::load_syntax (Syntax&, AttributeList&)
-{ }
-
 SVAT::SVAT (Block& al)
   : ModelLogable (al.name ("type"))
 { }

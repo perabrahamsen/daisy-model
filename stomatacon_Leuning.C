@@ -27,6 +27,7 @@
 #include "block.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 
 struct StomataCon_Leuning : public StomataCon
 {
@@ -79,41 +80,24 @@ StomataCon_Leuning::stomata_con (double wsf /*[]*/, const double m /*[]*/,
   return gsw;
 }
 
-static struct StomataConLeuningSyntax
+static struct StomataConLeuningSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new StomataCon_Leuning (al); }
-  static void load_syntax (Syntax& syntax, AttributeList& alist)
-  {
-    syntax.add ("Do", "[Pa]", Check::non_negative (), Value::Const,
-                "Coefficient, value after Leuning (1995)");
-    alist.add ("Do", 1500.);
-
-  }  
+  Model* make (Block& al) const
+  { return new StomataCon_Leuning (al); }
   StomataConLeuningSyntax ()
+    : DeclareModel (StomataCon::component, "Leuning", 
+	       "Stomata conductance calculated by the Ball & Berry model.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", 
-	       "Stomata conductance calculated by the Ball & Berry model.");
 
-    load_syntax (syntax, alist);
+    frame.add ("Do", "[Pa]", Check::non_negative (), Value::Const,
+                "Coefficient, value after Leuning (1995)");
+    frame.add ("Do", 1500.);
 
-    Librarian::add_type (StomataCon::component, "Leuning", alist, syntax, &make);
+
+
   }
 } StomataConLeuningsyntax;
 
 
-const AttributeList& 
-StomataCon::default_model ()
-{
-  static AttributeList alist;
-  
-  if (!alist.check ("type"))
-    {
-      Syntax syntax;
-      StomataConLeuningSyntax::load_syntax (syntax, alist);
-      alist.add ("type", "Leuning");
-    }
-  return alist;
-}

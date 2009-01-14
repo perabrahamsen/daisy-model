@@ -31,6 +31,7 @@
 class Log;
 class Syntax;
 class AttributeList;
+class Frame;
 class Block;
 class Unit;
 
@@ -123,6 +124,11 @@ public:
   // Create. 
 public:
   static void add_syntax (Syntax& parent_syntax, AttributeList& parent_alist,
+			  Value::category cat, 
+			  const char *const key,
+			  const symbol dimension,
+			  const char *const description);
+  static void add_syntax (Frame& parent_frame,
 			  Value::category cat, 
 			  const char *const key,
 			  const symbol dimension,

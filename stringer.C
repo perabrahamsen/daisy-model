@@ -24,10 +24,11 @@
 #include "boolean.h"
 #include "number.h"
 #include "submodeler.h"
-#include "alist.h"
+#include "frame.h"
 #include "memutils.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 #include <sstream>
 #include <vector>
 #include <memory>
@@ -122,22 +123,21 @@ Value to return.");
   { sequence_delete (clauses.begin (), clauses.end ()); }
 };
 
-static struct StringerCondSyntax
+static struct StringerCondSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new StringerCond (al); }
+  Model* make (Block& al) const
+  { return new StringerCond (al); }
   StringerCondSyntax ()
+    : DeclareModel (Stringer::component, "cond", "\
+Return the value of the first clause whose condition is true.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
 
-    alist.add ("description", "\
-Return the value of the first clause whose condition is true.");
-    syntax.add_submodule_sequence ("clauses", Value::Const, "\
+    frame.add_submodule_sequence ("clauses", Value::Const, "\
 List of clauses to match for.",
                                    StringerCond::Clause::load_syntax);
-    syntax.order ("clauses");
-    Librarian::add_type (Stringer::component, "cond", alist, syntax, &make);
+    frame.order ("clauses");
   }
 } StringerCond_syntax;
 
@@ -153,11 +153,6 @@ struct StringerNumber : public Stringer
   { return number->missing (scope); }
 
   // Create.
-  static void load_syntax (Syntax& syntax, AttributeList&)
-  { 
-    syntax.add_object ("number", Number::component, "\
-Number to manipulate."); 
-  }
   bool initialize (const Units& units, const Scope& scope, Treelog& msg)
   { 
     Treelog::Open nest (msg, name);
@@ -175,6 +170,19 @@ Number to manipulate.");
   ~StringerNumber ()
   { }
 };
+
+static struct StringerNumberSyntax : public DeclareBase
+{
+  StringerNumberSyntax ()
+    : DeclareBase (Stringer::component, "number", "\
+Extract the value of a number.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_object ("number", Number::component, "\
+Number to manipulate."); 
+  }
+} StringerNumber_syntax;
 
 struct StringerValue : public StringerNumber
 {
@@ -198,20 +206,18 @@ struct StringerValue : public StringerNumber
   { }
 };
 
-static struct StringerValueSyntax
+static struct StringerValueSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new StringerValue (al); }
+  Model* make (Block& al) const
+  { return new StringerValue (al); }
   StringerValueSyntax ()
+    : DeclareModel (Stringer::component, "value", "number", "\
+Extract the value of a number as a string.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    StringerNumber::load_syntax (syntax, alist);
-    alist.add ("description", "\
-Extract the value of a number as a string.");
-    syntax.add ("precision", Value::Integer, Value::OptionalConst, "\
+    frame.add ("precision", Value::Integer, Value::OptionalConst, "\
 Number of decimals after point.  By default, use a floating format.");
-    Librarian::add_type (Stringer::component, "value", alist, syntax, &make);
   }
 } StringerValue_syntax;
 
@@ -225,18 +231,16 @@ struct StringerDimension : public StringerNumber
   { }
 };
 
-static struct StringerDimensionSyntax
+static struct StringerDimensionSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new StringerDimension (al); }
+  Model* make (Block& al) const
+  { return new StringerDimension (al); }
   StringerDimensionSyntax ()
+    : DeclareModel (Stringer::component, "dimension", "number", "\
+Extract the dimension of a number as a string.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    StringerNumber::load_syntax (syntax, alist);
-    alist.add ("description", "\
-Extract the dimension of a number as a string.");
-    Librarian::add_type (Stringer::component, "dimension", alist, syntax, &make);
   }
 } StringerDimension_syntax;
 
@@ -266,20 +270,19 @@ struct StringerIdentity : public Stringer
   { }
 };
 
-static struct StringerIdentitySyntax
+static struct StringerIdentitySyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new StringerIdentity (al); }
+  Model* make (Block& al) const
+  { return new StringerIdentity (al); }
   StringerIdentitySyntax ()
+    : DeclareModel (Stringer::component, "identity", "\
+Return the specified value.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
 
-    alist.add ("description", "\
-Return the specified value.");
-    syntax.add ("value", Value::String, Value::Const, "\
+    frame.add ("value", Value::String, Value::Const, "\
 Constant value.");
-    Librarian::add_type (Stringer::component, "identity", alist, syntax, &make);
   }
 } StringerIdentity_syntax;
 

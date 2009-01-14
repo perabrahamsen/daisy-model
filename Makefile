@@ -971,7 +971,8 @@ seed${OBJ}: seed.C seed.h model.h symbol.h alist.h block.h syntax.h value.h \
 stomatacon${OBJ}: stomatacon.C stomatacon.h model.h symbol.h alist.h \
   mathlib.h assertion.h block.h syntax.h value.h plf.h librarian.h
 tertiary${OBJ}: tertiary.C tertiary.h model.h symbol.h alist.h tertsmall.h \
-  geometry.h value.h soil_water.h block.h syntax.h plf.h librarian.h
+  geometry.h value.h soil_water.h block.h syntax.h plf.h librarian.h \
+  frame.h scope.h
 biopore${OBJ}: biopore.C biopore.h model.h symbol.h alist.h number.h im.h \
   syntax.h value.h block.h plf.h frame.h scope.h librarian.h \
   scope_multi.h scope_id.h units.h check.h geometry.h log.h time.h \
@@ -1032,8 +1033,8 @@ boolean${OBJ}: boolean.C boolean.h model.h symbol.h alist.h block.h syntax.h \
   value.h plf.h frame.h scope.h assertion.h memutils.h librarian.h \
   treelog.h
 stringer${OBJ}: stringer.C stringer.h model.h symbol.h alist.h boolean.h \
-  number.h submodeler.h block.h syntax.h value.h plf.h memutils.h \
-  librarian.h treelog.h
+  number.h submodeler.h block.h syntax.h value.h plf.h frame.h scope.h \
+  memutils.h librarian.h treelog.h
 source${OBJ}: source.C source.h model.h symbol.h alist.h time.h block.h \
   syntax.h value.h plf.h librarian.h
 photo${OBJ}: photo.C photo.h model.h symbol.h alist.h block.h syntax.h \
@@ -1312,8 +1313,8 @@ imvec${OBJ}: imvec.C imvec.h symbol.h syntax.h value.h assertion.h log.h \
   time.h border.h model.h alist.h chemical.h check.h block.h plf.h \
   units.h frame.h scope.h
 im${OBJ}: im.C im.h symbol.h syntax.h value.h chemical.h model.h alist.h \
-  units.h unit.h am.h log.h time.h border.h block.h plf.h check.h \
-  assertion.h frame.h scope.h
+  units.h unit.h am.h log.h time.h border.h block.h plf.h frame.h scope.h \
+  check.h assertion.h
 frame${OBJ}: frame.C frame.h syntax.h value.h symbol.h scope.h alist.h \
   block.h plf.h assertion.h librarian.h model.h intrinsics.h library.h
 bdconv${OBJ}: bdconv.C bdconv.h convert.h symbol.h geometry.h value.h soil.h \
@@ -1418,7 +1419,7 @@ program_GP2D${OBJ}: program_GP2D.C program.h model.h symbol.h alist.h run.h \
 svat_ssoc${OBJ}: svat_ssoc.C svat.h model.h symbol.h alist.h syntax.h value.h \
   block.h plf.h librarian.h resistance.h fao.h soil_heat.h bioclimate.h \
   soil.h geometry.h weather.h im.h vegetation.h assertion.h log.h time.h \
-  border.h treelog.h mathlib.h solver.h
+  border.h treelog.h mathlib.h solver.h frame.h scope.h
 reaction_Jarvis99${OBJ}: reaction_Jarvis99.C reaction.h model.h symbol.h \
   alist.h mathlib.h assertion.h check.h block.h syntax.h value.h plf.h \
   librarian.h chemistry.h chemical.h log.h time.h border.h geometry.h \
@@ -1435,13 +1436,13 @@ seed_release${OBJ}: seed_release.C seed.h model.h symbol.h alist.h block.h \
   treelog.h frame.h scope.h
 stomatacon_BB${OBJ}: stomatacon_BB.C stomatacon.h model.h symbol.h alist.h \
   mathlib.h assertion.h check.h block.h syntax.h value.h plf.h \
-  librarian.h
+  librarian.h frame.h scope.h
 stomatacon_SHA${OBJ}: stomatacon_SHA.C stomatacon.h model.h symbol.h alist.h \
   mathlib.h assertion.h check.h block.h syntax.h value.h plf.h \
-  librarian.h
+  librarian.h frame.h scope.h
 stomatacon_Leuning${OBJ}: stomatacon_Leuning.C stomatacon.h model.h symbol.h \
   alist.h mathlib.h assertion.h check.h block.h syntax.h value.h plf.h \
-  librarian.h treelog.h
+  librarian.h treelog.h frame.h scope.h
 tertiary_old${OBJ}: tertiary_old.C tertiary.h model.h symbol.h alist.h \
   tertsmall.h geometry1d.h geometry_vert.h geometry.h value.h soil.h \
   soil_water.h chemical.h macro.h syntax.h mactrans.h librarian.h block.h \
@@ -1455,7 +1456,8 @@ tertiary_biopores${OBJ}: tertiary_biopores.C tertiary.h model.h symbol.h \
   alist.h tertsmall.h biopore.h number.h im.h syntax.h value.h memutils.h \
   librarian.h block.h plf.h check.h geometry.h soil.h soil_water.h \
   soil_heat.h log.h time.h border.h anystate.h surface.h uzmodel.h \
-  chemical.h groundwater.h units.h treelog.h assertion.h mathlib.h
+  chemical.h groundwater.h units.h treelog.h assertion.h mathlib.h \
+  frame.h scope.h
 biopore_matrix${OBJ}: biopore_matrix.C biopore.h model.h symbol.h alist.h \
   number.h im.h syntax.h value.h imvec.h block.h plf.h vcheck.h \
   librarian.h submodeler.h geometry.h soil.h soil_heat.h secondary.h \
@@ -1755,7 +1757,7 @@ program_batch${OBJ}: program_batch.C program.h model.h symbol.h alist.h run.h \
   librarian.h frame.h scope.h
 summary_balance${OBJ}: summary_balance.C summary.h model.h symbol.h alist.h \
   block.h syntax.h value.h plf.h fetch.h destination.h select.h units.h \
-  volume.h treelog.h memutils.h librarian.h
+  volume.h treelog.h memutils.h librarian.h frame.h scope.h
 rootdens_AP${OBJ}: rootdens_AP.C rootdens.h model.h symbol.h alist.h block.h \
   syntax.h value.h plf.h geometry.h log.h time.h border.h check.h \
   mathlib.h assertion.h librarian.h frame.h scope.h
@@ -1785,7 +1787,7 @@ hydraulic_M_vGp${OBJ}: hydraulic_M_vGp.C hydraulic.h model.h symbol.h alist.h \
   librarian.h frame.h scope.h
 summary_simple${OBJ}: summary_simple.C summary.h model.h symbol.h alist.h \
   fetch.h destination.h select.h units.h volume.h treelog.h memutils.h \
-  submodeler.h block.h syntax.h value.h plf.h librarian.h
+  submodeler.h block.h syntax.h value.h plf.h librarian.h frame.h scope.h
 phenology_TSum${OBJ}: phenology_TSum.C phenology.h model.h symbol.h alist.h \
   block.h syntax.h value.h plf.h production.h vernalization.h assertion.h \
   librarian.h treelog.h frame.h scope.h
@@ -2082,7 +2084,7 @@ pet_weather${OBJ}: pet_weather.C pet.h model.h symbol.h alist.h syntax.h \
   value.h weather.h im.h log.h time.h border.h librarian.h frame.h \
   scope.h
 svat_none${OBJ}: svat_none.C svat.h model.h symbol.h alist.h bioclimate.h \
-  syntax.h value.h librarian.h
+  syntax.h value.h librarian.h frame.h scope.h
 action_spray${OBJ}: action_spray.C action.h model.h symbol.h alist.h \
   library.h block.h syntax.h value.h plf.h daisy.h program.h run.h time.h \
   timestep.h vcheck.h memutils.h field.h border.h chemical.h check.h \
@@ -2093,7 +2095,7 @@ pet_PM${OBJ}: pet_PM.C pet.h model.h symbol.h alist.h syntax.h value.h fao.h \
 svat_pmsw${OBJ}: svat_pmsw.C svat.h model.h symbol.h alist.h mathlib.h \
   assertion.h block.h syntax.h value.h plf.h weather.h im.h geometry.h \
   soil.h soil_water.h soil_heat.h bioclimate.h vegetation.h log.h time.h \
-  border.h fao.h gaussj.h librarian.h nrutil.h
+  border.h fao.h gaussj.h librarian.h nrutil.h frame.h scope.h
 action_surface${OBJ}: action_surface.C action.h model.h symbol.h alist.h \
   block.h syntax.h value.h plf.h daisy.h program.h run.h time.h \
   timestep.h vcheck.h memutils.h field.h border.h check.h librarian.h \
