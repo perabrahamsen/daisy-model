@@ -23,6 +23,7 @@
 #include "alist.h"
 #include "geometry.h"
 #include "librarian.h"
+#include "syntax.h"
 
 // Convertions
 

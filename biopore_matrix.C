@@ -39,6 +39,7 @@
 #include "groundwater.h"
 #include "treelog.h"
 #include "frame.h"
+#include "mathlib.h"
 #include <sstream>
 #include <numeric>
 

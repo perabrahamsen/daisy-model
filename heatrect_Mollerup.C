@@ -27,6 +27,7 @@
 #include "alist.h"
 #include "block.h"
 #include "librarian.h"
+#include "assertion.h"
 #include "treelog.h"
 
 // Uncomment for fast code that does not catches bugs.

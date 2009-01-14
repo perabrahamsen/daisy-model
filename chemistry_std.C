@@ -33,6 +33,7 @@
 #include "librarian.h"
 #include "vcheck.h"
 #include "treelog.h"
+#include "frame.h"
 
 struct ChemistryStandard : public Chemistry
 {
@@ -360,76 +361,42 @@ ChemistryStandard::ChemistryStandard (Block& al)
     reactions (Librarian::build_vector<Reaction> (al, "reaction"))
 { }
 
-static struct ChemistryStandardSyntax
+static struct ChemistryStandardSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ChemistryStandard (al); }
-  static void load_syntax (Syntax& syntax, AttributeList& alist);
-  static void load_N (Syntax& syntax, AttributeList& alist);
-  static void build_default ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    load_syntax (syntax, alist);
-    Librarian::add_type (Chemistry::component, "default", alist, syntax, &make);
-  }
-  static void build_N ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    load_N (syntax, alist);
-    alist.add ("type", "default");
-    Librarian::add_type (Chemistry::component, "N", alist, syntax, &make);
-  }
+  Model* make (Block& al) const
+  { return new ChemistryStandard (al); }
   ChemistryStandardSyntax ()
+    : DeclareModel (Chemistry::component, "default", "\
+Handle chemicals and reactions.")
+  { }
+  void load_frame (Frame& frame) const
   { 
-    build_default ();
-    build_N ();
+    frame.add_object ("trace", Chemical::component, 
+                      Value::State, Value::Sequence, "\
+List of chemicals you want to trace in the simulation.");
+    frame.add_check ("trace", VCheck::unique ());
+    frame.add ("trace", std::vector<const AttributeList*> ());
+    frame.add_object ("reaction", Reaction::component, 
+                      Value::State, Value::Sequence, "\
+List of chemical reactions you want to simulate.");
+    frame.add ("reaction", std::vector<const AttributeList*> ());
   }
 } ChemistryStandard_syntax;
 
-void
-ChemistryStandardSyntax::load_syntax (Syntax& syntax, AttributeList& alist)
-{ 
-  Chemistry::load_syntax (syntax, alist);
-
-  syntax.add_object ("trace", Chemical::component, 
-                     Value::State, Value::Sequence, "\
-List of chemicals you want to trace in the simulation.");
-  syntax.add_check ("trace", VCheck::unique ());
-  alist.add ("trace", std::vector<const AttributeList*> ());
-  syntax.add_object ("reaction", Reaction::component, 
-                     Value::State, Value::Sequence, "\
-List of chemical reactions you want to simulate.");
-  alist.add ("reaction", std::vector<const AttributeList*> ());
-}
-
-void
-ChemistryStandardSyntax::load_N (Syntax& syntax, AttributeList& alist)
-{ 
-  load_syntax (syntax, alist);
-  alist.add ("description", "Inorganic nitrogen.");
-  std::vector<const AttributeList*> trace;
-  trace.push_back (&Chemical::NO3_model ());
-  trace.push_back (&Chemical::NH4_model ());
-  alist.add ("trace", trace);
-  std::vector<const AttributeList*> reaction;
-  reaction.push_back (&Reaction::nitrification_model ());
-  reaction.push_back (&Reaction::denitrification_model ());
-  alist.add ("reaction", reaction);
-}
-
-const AttributeList& 
-Chemistry::N_model ()
-{ 
-  static AttributeList alist;
-  if (!alist.check ("type"))
-    {
-      Syntax dummy;
-      ChemistryStandardSyntax::load_N (dummy, alist);
-      alist.add ("type", "N");
-    }
-  return alist;
-}
+static struct ChemistryNitrogenSyntax : public DeclareParam
+{
+  ChemistryNitrogenSyntax ()
+    : DeclareParam (Chemistry::component, "N", "default", "\
+Inorganic nitrogen.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_strings ("trace", "NO3", "NH4");
+    std::vector<const AttributeList*> reaction;
+    reaction.push_back (&Reaction::nitrification_model ());
+    reaction.push_back (&Reaction::denitrification_model ());
+    frame.add ("reaction", reaction);
+  }
+} ChemistryNitrogen_syntax;
 
 // chemistry_std.C ends her.

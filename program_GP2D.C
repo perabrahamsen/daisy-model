@@ -30,6 +30,7 @@
 #include "submodeler.h"
 #include "check.h"
 #include "librarian.h"
+#include "assertion.h"
 #include <sstream>
 
 struct ProgramGP2D : public Program

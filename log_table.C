@@ -37,6 +37,7 @@
 #include "treelog.h"
 #include "frame.h"
 #include <sstream>
+#include "assertion.h"
 #include <fstream>
 
 struct LogTable : public LogSelect, public Destination

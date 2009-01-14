@@ -28,6 +28,8 @@
 #include "alist.h"
 #include "submodel.h"
 #include "treelog.h"
+#include "assertion.h"
+#include "mathlib.h"
 #include <sstream>
 
 size_t 

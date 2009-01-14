@@ -107,8 +107,6 @@ public:
 
   // Create & Destroy.
 public:
-  static const AttributeList& default_model ();
-  static const AttributeList& N_model ();
   virtual void initialize (const Scope&,
                            const AttributeList&, const Geometry& geo,
                            const Soil&, const SoilWater&, const SoilHeat&,
@@ -116,7 +114,6 @@ public:
   virtual bool check (const Scope&, const Geometry&,
 		      const Soil&, const SoilWater&, const SoilHeat&,
 		      const Chemistry&, Treelog&) const = 0;
-  static void load_syntax (Syntax&, AttributeList&);
 protected:
   explicit Chemistry (Block& al);
 public:

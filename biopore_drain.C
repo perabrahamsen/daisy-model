@@ -33,6 +33,8 @@
 #include "groundwater.h"
 #include "treelog.h"
 #include "frame.h"
+#include "assertion.h"
+#include "mathlib.h"
 #include <sstream>
 
 // The 'drain' model.

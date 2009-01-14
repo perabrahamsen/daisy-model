@@ -22,8 +22,8 @@
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
-#include "syntax.h"
-#include "mathlib.h"
+#include "symbol.h"
+#include "value.h"
 #include <vector>
 #include <string>
 
@@ -32,6 +32,8 @@ class AttributeList;
 class Treelog;
 class Groundwater;
 class Volume;
+class Frame;
+class Syntax;
 
 class Geometry
 {
@@ -46,12 +48,12 @@ public:
 
   // Parameters.
 protected:
-  size_t size_;		// Number of cells.
+  size_t size_;         // Number of cells.
 
   // Helper data.
 protected:
   std::vector<std::vector<size_t> > cell_edges_; // Edges connected with cell.
-  std::vector<double> edge_length_;	      // Distance between cell centers.
+  std::vector<double> edge_length_;           // Distance between cell centers.
   std::vector<double> edge_area_;             // Area connecting cells.
   std::vector<double> edge_area_per_length_;  // One divided by the other.
   
@@ -167,7 +169,7 @@ public:
   // that contain the height is weighted by their volume.
   template<class T> 
   double content_height (const T& obj, double (T::*content) (size_t) const,
-                     const double z) const
+                         const double z) const
   { return access_content_height (Accessor<T> (obj, content), z); }
   // The 'access_content_height' function does the same, using the
   // 'Access' class instead of a soil container template.
@@ -259,11 +261,15 @@ public:
 public:
   static void add_layer (Syntax& syntax, Value::category, 
                          symbol name,
-			 symbol dimension,
+                         symbol dimension,
+                         symbol description);
+  static void add_layer (Frame& frame, Value::category, 
+                         symbol name,
+                         symbol dimension,
                          symbol description);
   void initialize_layer (std::vector<double>& value, 
-			 const AttributeList& al, 
-			 symbol name, Treelog&) const;
+                         const AttributeList& al, 
+                         symbol name, Treelog&) const;
   virtual void fill_xplus (std::vector<double>&) const = 0;
 
   // Creation.

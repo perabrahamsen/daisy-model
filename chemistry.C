@@ -105,10 +105,6 @@ void
 Chemistry::output (Log&) const
 { }
 
-void
-Chemistry::load_syntax (Syntax& syntax, AttributeList& alist)
-{ }
-
 Chemistry::Chemistry (Block& al)
   : ModelAListed (al.alist ()),
     units (al.units ())

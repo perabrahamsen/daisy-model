@@ -285,7 +285,11 @@ DeclareSuper::DeclareSuper (const symbol component,
                             const symbol description)
   : Declare (component, name, description),
     super (s)
-{ }
+{ 
+  if (name == super)
+    daisy_panic ("'" + name + "' has itself as superclass in '"
+                 + component + "'");
+}
 
 void 
 DeclareBase::load (Frame& frame) const

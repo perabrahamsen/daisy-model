@@ -24,6 +24,7 @@
 #include "groundwater.h"
 #include "alist.h"
 #include "geometry.h"
+#include "assertion.h"
 #include "librarian.h"
 
 class GroundwaterLysimeter : public Groundwater

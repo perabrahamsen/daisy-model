@@ -29,7 +29,9 @@
 #include "chemical.h"
 #include "organic_matter.h"
 #include "log.h"
+#include "assertion.h"
 #include "librarian.h"
+#include "syntax.h"
 
 struct ReactionNitrification : public Reaction
 {

@@ -39,6 +39,8 @@
 #include "tertiary.h"
 #include "treelog.h"
 #include "frame.h"
+#include "assertion.h"
+#include "mathlib.h"
 #include <sstream>
 
 static const double rho_water = 1.0; // [g/cm^3]

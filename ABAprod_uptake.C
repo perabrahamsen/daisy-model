@@ -30,6 +30,7 @@
 #include "librarian.h"
 #include "frame.h"
 #include "treelog.h"
+#include "mathlib.h"
 #include <sstream>
 
 struct ABAProdUptake : public ABAProd

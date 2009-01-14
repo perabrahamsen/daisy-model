@@ -138,8 +138,6 @@ public:
 
   // Create and Destroy.
 public:
-  static const AttributeList& NO3_model ();
-  static const AttributeList& NH4_model ();
   static const VCheck& check_library ();
   virtual bool check (const Units&, const Scope&, 
                       const Geometry&, const Soil&, const SoilWater&,

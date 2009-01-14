@@ -39,6 +39,8 @@
 #include "im.h"
 #include "units.h"
 #include "treelog.h"
+#include "assertion.h"
+#include "mathlib.h"
 #include <sstream>
 
 struct TertiaryBiopores : public Tertiary, public Tertsmall

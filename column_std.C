@@ -50,6 +50,7 @@
 #include "treelog.h"
 #include "column.h"
 #include "librarian.h"
+#include "assertion.h"
 #include "frame.h"
 
 struct ColumnStandard : public Column
@@ -995,7 +996,7 @@ the simulation.  If unspecified, used global weather.");
     frame.add_object ("Chemistry", Chemistry::component, 
                        Value::State, Value::Singleton,
                        "Chemical compounds in the system.");
-    frame.add ("Chemistry", Chemistry::default_model ());
+    frame.add ("Chemistry", "nutrient");
     frame.add ("harvest_DM", "g/m^2/h", Value::LogOnly, 
                 "Amount of DM removed by harvest this hour.");
     frame.add ("harvest_N", "g/m^2/h", Value::LogOnly, 

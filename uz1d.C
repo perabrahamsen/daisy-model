@@ -23,6 +23,8 @@
 #include "uz1d.h"
 #include "block.h"
 #include "librarian.h"
+#include "assertion.h"
+#include "mathlib.h"
 
 void 
 SMM1D::reset (std::vector<double>& h, std::vector<double>& Theta) const

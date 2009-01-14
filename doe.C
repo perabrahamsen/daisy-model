@@ -30,6 +30,7 @@
 #include "soil.h"
 #include "soil_water.h"
 #include "treelog.h"
+#include "assertion.h"
 #include <string>
 
 void 

@@ -29,6 +29,7 @@
 #include "memutils.h"
 #include "librarian.h"
 #include "vcheck.h"
+#include "frame.h"
 #include <map>
 #include <sstream>
  
@@ -94,8 +95,6 @@ struct ChemistryMulti : public Chemistry
   static const std::vector<Chemical*> 
   /**/ find_chemicals (const std::vector<Chemistry*>& combine);
   explicit ChemistryMulti (Block& al);
-  static bool check_alist (const AttributeList& al, Treelog& msg);
-  static void load_syntax (Syntax& syntax, AttributeList& alist);
 };
 
 bool 
@@ -414,52 +413,39 @@ ChemistryMulti::ChemistryMulti (Block& al)
     chemicals (find_chemicals (combine))
 { }
 
-void
-ChemistryMulti::load_syntax (Syntax& syntax, AttributeList& alist)
-{ 
-  Chemistry::load_syntax (syntax, alist);
-  syntax.add_object ("combine", Chemistry::component, 
-                     Value::State, Value::Sequence, "\
+static struct ChemistryMultiSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new ChemistryMulti (al); }
+  ChemistryMultiSyntax ()
+    : DeclareModel (Chemistry::component, "multi", "Handle multile chemistries.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+
+    frame.add_object ("combine", Chemistry::component, 
+                      Value::State, Value::Sequence, "\
 List of chemistry parameterizations you want to combine.");
-  syntax.add ("ignore", Value::String, Value::State, Value::Sequence,
-              "Don't warn when spraying one of these chemicals.\n\
+    frame.add ("ignore", Value::String, Value::State, Value::Sequence,
+               "Don't warn when spraying one of these chemicals.\n\
 The first time an untraced chemical not on the list is sprayed on the\n\
 field, Daisy will issue a warning and add the chemical to this list.");
-  syntax.add_check ("ignore", VCheck::unique ());
-  alist.add ("ignore", std::vector<symbol> ());
-  syntax.add_object ("trace", Chemical::component, 
-                     Value::LogOnly, Value::Sequence, "\
+    frame.add_check ("ignore", VCheck::unique ());
+    frame.add ("ignore", std::vector<symbol> ());
+    frame.add_object ("trace", Chemical::component, 
+                      Value::LogOnly, Value::Sequence, "\
 List of chemicals in nested chemistries.");
-}
-
-const AttributeList& 
-Chemistry::default_model ()
-{
-  static AttributeList alist;
-  
-  if (!alist.check ("type"))
-    {
-      Syntax dummy;
-      ChemistryMulti::load_syntax (dummy, alist);
-      std::vector<const AttributeList*> combine;
-      combine.push_back (&N_model ());
-      alist.add ("combine", combine);
-      alist.add ("type", "multi");
-    }
-  return alist;
-}
-
-static struct ChemistryMultiSyntax
-{
-  static Model& make (Block& al)
-  { return *new ChemistryMulti (al); }
-  ChemistryMultiSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    ChemistryMulti::load_syntax (syntax, alist);
-    Librarian::add_type (Chemistry::component, "multi", alist, syntax, &make);
   }
 } ChemistryMulti_syntax;
+
+static struct ChemistryNutrientSyntax : public DeclareParam
+{ 
+  ChemistryNutrientSyntax ()
+    : DeclareParam (Chemistry::component, "nutrient", "multi", "\
+Include 'N' chemistry so organic matter and plants will work.")
+  { }
+  void load_frame (Frame& frame) const
+  { frame.add_strings ("combine", "N"); }
+} ChemistryNutrient_syntax;
 
 // chemistry_multi.C ends here

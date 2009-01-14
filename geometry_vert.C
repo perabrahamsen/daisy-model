@@ -23,6 +23,7 @@
 #include "geometry_vert.h"
 #include "block.h"
 #include "treelog.h"
+#include "mathlib.h"
 #include <sstream>
 
 bool 

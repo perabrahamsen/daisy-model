@@ -32,6 +32,8 @@
 #include "secondary.h"
 #include "check.h"
 #include "treelog.h"
+#include "assertion.h"
+#include "mathlib.h"
 #include <sstream>
 
 void

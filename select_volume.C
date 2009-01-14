@@ -32,6 +32,8 @@
 #include "check.h"
 #include "librarian.h"
 #include "frame.h"
+#include "assertion.h"
+#include "mathlib.h"
 #include <memory>
 
 struct SelectVolume : public SelectValue

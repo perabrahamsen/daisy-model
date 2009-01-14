@@ -28,6 +28,9 @@
 #include "treelog.h"
 #include "librarian.h"
 #include "frame.h"
+#include "assertion.h"
+#include "mathlib.h"
+
 #ifdef DEBUG_EDGES
 #include <sstream>
 #endif

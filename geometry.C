@@ -26,6 +26,9 @@
 #include "check.h"
 #include "vcheck.h"
 #include "treelog.h"
+#include "frame.h"
+#include "assertion.h"
+#include "mathlib.h"
 #include <sstream>
 
 const int Geometry::cell_above;
@@ -634,10 +637,17 @@ static struct CheckLayers : public VCheck
 } check_layers;
 
 void 
-Geometry::add_layer (Syntax& syntax, Value::category cat, 
-                     symbol name,
-		     symbol dimension,
-                     symbol description)
+Geometry::add_layer (Frame& frame, const Value::category cat, 
+                     const symbol name,
+		     const symbol dimension,
+                     const symbol description)
+{ add_layer (frame.syntax (), cat, name, dimension, description); }
+
+void 
+Geometry::add_layer (Syntax& syntax, const Value::category cat, 
+                     const symbol name,
+		     const symbol dimension,
+                     const symbol description)
 {
   Syntax& layer = *new Syntax ();
   layer.add ("end", "cm", Check::negative (), Value::Const, 

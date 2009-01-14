@@ -30,6 +30,8 @@
 #include "librarian.h"
 #include "block.h"
 #include "treelog.h"
+#include "assertion.h"
+#include "mathlib.h"
 #include <sstream>
 
 void 

@@ -31,6 +31,8 @@
 #include "geometry.h"
 #include "log.h"
 #include "treelog.h"
+#include "assertion.h"
+#include "mathlib.h"
 #include <sstream>
 
 // biopore component.

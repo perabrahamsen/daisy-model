@@ -33,6 +33,7 @@
 #include "log.h"
 #include "submodel.h"
 #include "treelog.h"
+#include "assertion.h"
 #include <sstream>
 
 static const double rho_water = 1.0; // [g/cm^3]

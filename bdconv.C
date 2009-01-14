@@ -25,6 +25,7 @@
 #include "soil.h"
 #include "volume.h"
 #include "units.h"
+#include "assertion.h"
 
 double
 BD_convert::operator()(double value) const

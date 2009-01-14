@@ -35,6 +35,8 @@
 #include "log.h"
 #include "check.h"
 #include "librarian.h"
+#include "assertion.h"
+#include "mathlib.h"
 
 void 
 DOM::output (Log& log) const

@@ -27,6 +27,8 @@
 #include "average.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "assertion.h"
+#include "mathlib.h"
 #include <sstream>
 
 struct UZ1DRichard : public UZ1D
