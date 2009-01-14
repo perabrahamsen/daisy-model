@@ -73,10 +73,10 @@ protected:
 
   // Create and Destroy.
 public:
-  static void load_Theta_res (Syntax&, AttributeList&);
-  static void load_Theta_sat (Syntax&, AttributeList&);
-  static void load_K_sat_optional (Syntax&, AttributeList&);
-  static void load_K_sat (Syntax&, AttributeList&);
+  static void load_Theta_res (Frame&);
+  static void load_Theta_sat (Frame&);
+  static void load_K_sat_optional (Frame&);
+  static void load_K_sat (Frame&);
   virtual void initialize (const Texture&, double rho_b, bool top_soil,
 			   Treelog&);
   virtual bool check (Treelog&) const;

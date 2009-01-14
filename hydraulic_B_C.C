@@ -26,6 +26,7 @@
 #include "check.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "frame.h"
 
 class HydraulicB_C : public Hydraulic
 {
@@ -108,27 +109,26 @@ HydraulicB_C::~HydraulicB_C ()
 
 // Add the HydraulicB_C syntax to the syntax table.
 
-static struct HydraulicB_CSyntax
+static struct HydraulicB_CSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
+  Model* make (Block& al) const
     {
-      return *new HydraulicB_C (al);
+      return new HydraulicB_C (al);
     }
 
   HydraulicB_CSyntax ()
+    : DeclareModel (Hydraulic::component, "B_C", 
+		 "Campbell retention curve model with Burdine theory.")
+  { }
+  void load_frame (Frame& frame) const
     { 
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", 
-		 "Campbell retention curve model with Burdine theory.");
-      Hydraulic::load_Theta_sat (syntax, alist);
-      Hydraulic::load_K_sat (syntax, alist);
-      syntax.add ("h_b", "cm", Check::negative (), Value::Const,
+      Hydraulic::load_Theta_sat (frame);
+      Hydraulic::load_K_sat (frame);
+      frame.add ("h_b", "cm", Check::negative (), Value::Const,
 		  "Bubbling pressure.");
-      syntax.add ("b", Value::None (), Check::positive (), Value::Const,
+      frame.add ("b", Value::None (), Check::positive (), Value::Const,
 		  "Campbell parameter.");
 
-      Librarian::add_type (Hydraulic::component, "B_C", alist, syntax, &make);
     }
 } hydraulicB_C_syntax;
 

@@ -31,6 +31,7 @@
 #include "treelog.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "frame.h"
 #include <sstream>
 
 class Hydraulic_Cosby : public Hydraulic
@@ -171,18 +172,17 @@ Hydraulic_Cosby::~Hydraulic_Cosby ()
 { }
 
 // Add the Hydraulic_Cosby syntax to the syntax table.
-static struct Hydraulic_CosbySyntax
+static struct Hydraulic_CosbySyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new Hydraulic_Cosby (al); }
+  Model* make (Block& al) const
+  { return new Hydraulic_Cosby (al); }
 
   Hydraulic_CosbySyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
+    : DeclareModel (Hydraulic::component, "Cosby_et_al", "\
 Modified Campbell retention curve model with Burdine theory.\n\
-Parameters estimated from soil texture as specified by Cosby et at.");
-    Librarian::add_type (Hydraulic::component, "Cosby_et_al", alist, syntax, &make);
+Parameters estimated from soil texture as specified by Cosby et at.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
   }
 } hydraulic_Cosby_syntax;

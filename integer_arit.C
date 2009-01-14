@@ -28,6 +28,7 @@
 #include "memutils.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 #include <sstream>
 #include <memory>
 
@@ -72,21 +73,20 @@ struct IntegerSqr : public IntegerOperand
   { }
 };
 
-static struct IntegerSqrSyntax
+static struct IntegerSqrSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new IntegerSqr (al); }
+  Model* make (Block& al) const
+  { return new IntegerSqr (al); }
   IntegerSqrSyntax ()
+    : DeclareModel (Integer::component, "sqr", 
+	       "Take the square of its argument.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
 
-    alist.add ("description", 
-	       "Take the square of its argument.");
-    syntax.add_object ("operand", Integer::component,
+    frame.add_object ("operand", Integer::component,
                        "Operand for this function.");
-    syntax.order ("operand");
-    Librarian::add_type (Integer::component, "sqr", alist, syntax, &make);
+    frame.order ("operand");
   }
 } IntegerSqr_syntax;
 
@@ -163,23 +163,22 @@ struct IntegerMax : public IntegerOperands
   { }
 };
 
-static struct IntegerMaxSyntax
+static struct IntegerMaxSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new IntegerMax (al); }
+  Model* make (Block& al) const
+  { return new IntegerMax (al); }
   IntegerMaxSyntax ()
+    : DeclareModel (Integer::component, "max", 
+	       "Use the largest value of its operands.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
 
-    alist.add ("description", 
-	       "Use the largest value of its operands.");
-    syntax.add_object ("operands", Integer::component,
+    frame.add_object ("operands", Integer::component,
                        Value::Const, Value::Sequence,
                        "The operands for this function.");
-    syntax.add_check ("operands", VCheck::min_size_1 ());
-    syntax.order ("operands");
-    Librarian::add_type (Integer::component, "max", alist, syntax, &make);
+    frame.add_check ("operands", VCheck::min_size_1 ());
+    frame.order ("operands");
   }
 } IntegerMax_syntax;
 
@@ -205,23 +204,22 @@ struct IntegerMin : public IntegerOperands
   { }
 };
 
-static struct IntegerMinSyntax
+static struct IntegerMinSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new IntegerMin (al); }
+  Model* make (Block& al) const
+  { return new IntegerMin (al); }
   IntegerMinSyntax ()
+    : DeclareModel (Integer::component, "min", 
+	       "Use the smallest value of its operands.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
 
-    alist.add ("description", 
-	       "Use the smallest value of its operands.");
-    syntax.add_object ("operands", Integer::component,
+    frame.add_object ("operands", Integer::component,
                        Value::Const, Value::Sequence,
                        "The operands for this function.");
-    syntax.add_check ("operands", VCheck::min_size_1 ());
-    syntax.order ("operands");
-    Librarian::add_type (Integer::component, "min", alist, syntax, &make);
+    frame.add_check ("operands", VCheck::min_size_1 ());
+    frame.order ("operands");
   }
 } IntegerMin_syntax;
 
@@ -242,22 +240,21 @@ struct IntegerProduct : public IntegerOperands
   { }
 };
 
-static struct IntegerProductSyntax
+static struct IntegerProductSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new IntegerProduct (al); }
+  Model* make (Block& al) const
+  { return new IntegerProduct (al); }
   IntegerProductSyntax ()
+    : DeclareModel (Integer::component, "*", 
+	       "Use the product of its operands.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
 
-    alist.add ("description", 
-	       "Use the product of its operands.");
-    syntax.add_object ("operands", Integer::component,
+    frame.add_object ("operands", Integer::component,
                        Value::Const, Value::Sequence,
                        "The operands for this function.");
-    syntax.order ("operands");
-    Librarian::add_type (Integer::component, "*", alist, syntax, &make);
+    frame.order ("operands");
   }
 } IntegerProduct_syntax;
 
@@ -278,25 +275,24 @@ struct IntegerSum : public IntegerOperands
   { }
 };
 
-static struct IntegerSumSyntax
+static struct IntegerSumSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new IntegerSum (al); }
+  Model* make (Block& al) const
+  { return new IntegerSum (al); }
   IntegerSumSyntax ()
+    : DeclareModel (Integer::component, "+", 
+	       "Use the sum of its operands.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
 
-    alist.add ("description", 
-	       "Use the sum of its operands.");
-    syntax.add_object ("operands", Integer::component,
+    frame.add_object ("operands", Integer::component,
                        Value::Const, Value::Sequence,
                        "The operands for this function.");
 #ifdef CHECK_OPERANDS_DIM
-    syntax.add_check ("operands", IntegerOperands::unique);
+    frame.add_check ("operands", IntegerOperands::unique);
 #endif // CHECK_OPERANDS_DIM
-    syntax.order ("operands");
-    Librarian::add_type (Integer::component, "+", alist, syntax, &make);
+    frame.order ("operands");
   }
 } IntegerSum_syntax;
 
@@ -320,24 +316,23 @@ struct IntegerSubtract : public IntegerOperands
   { }
 };
 
-static struct IntegerSubtractSyntax
+static struct IntegerSubtractSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new IntegerSubtract (al); }
+  Model* make (Block& al) const
+  { return new IntegerSubtract (al); }
   IntegerSubtractSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-
-    alist.add ("description", 
+    : DeclareModel (Integer::component, "-", 
 	       "Negate integer or subtract integers.\n\
 With one operand, negates it.  With more than one operand,\n\
-subtracts all but the first from the first.");
-    syntax.add_object ("operands", Integer::component,
+subtracts all but the first from the first.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+
+    frame.add_object ("operands", Integer::component,
                        Value::Const, Value::Sequence,
                        "The operands for this function.");
-    syntax.order ("operands");
-    Librarian::add_type (Integer::component, "-", alist, syntax, &make);
+    frame.order ("operands");
   }
 } IntegerSubtract_syntax;
 
@@ -398,40 +393,39 @@ struct IntegerModulo : public IntegerDivide
   { }
 };
 
-static struct IntegerModuloSyntax
+static struct IntegerModuloSyntax : public DeclareModel
 {
-  static Model& make_mod (Block& al)
-  { return *new IntegerModulo (al); }
-  static Model& make_div (Block& al)
-  { return *new IntegerDivide (al); }
+  Model* make (Block& al) const
+  { return new IntegerModulo (al); }
   IntegerModuloSyntax ()
+    : DeclareModel (Integer::component, "mod", 
+                 "Modulo the first operand by the rest.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    // div
-    {
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
 
-      alist.add ("description", 
-                 "Modulo the first operand by the rest.");
-      syntax.add_object ("operands", Integer::component,
+      frame.add_object ("operands", Integer::component,
                          Value::Const, 2,
                          "The operands for this function.");
-      syntax.order ("operands");
-      Librarian::add_type (Integer::component, "mod", alist, syntax, &make_div);
-    }
-    // mod
-    {
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
+      frame.order ("operands");
+  }
+} IntegerModulo_syntax;
 
-      alist.add ("description", 
-                 "Divide the first operand by the rest.");
-      syntax.add_object ("operands", Integer::component,
+static struct IntegerDivideSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new IntegerDivide (al); }
+  IntegerDivideSyntax ()
+    : DeclareModel (Integer::component, "div", 
+                 "Divide the first operand by the rest.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+
+      frame.add_object ("operands", Integer::component,
                          Value::Const, 2,
                          "The operands for this function.");
-      syntax.order ("operands");
-      Librarian::add_type (Integer::component, "div", alist, syntax, &make_mod);
-    }
+      frame.order ("operands");
   }
 } IntegerDivide_syntax;
 

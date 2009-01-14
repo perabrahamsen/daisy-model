@@ -29,6 +29,7 @@
 #include "plf.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "frame.h"
 
 class HydraulicM_vG_compact : public Hydraulic
 {
@@ -159,35 +160,34 @@ HydraulicM_vG_compact::~HydraulicM_vG_compact ()
 { }
 
 // Register the HydraulicM_vG_compact syntax.
-static struct HydraulicM_vG_compactSyntax
+static struct HydraulicM_vG_compactSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new HydraulicM_vG_compact (al); }
+  Model* make (Block& al) const
+  { return new HydraulicM_vG_compact (al); }
 
   HydraulicM_vG_compactSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", 
+    : DeclareModel (Hydraulic::component, "M_vG_compact", 
 	       "van Genuchten retention curve model with Mualem theory\n\
-and compaction.");
-    Hydraulic::load_Theta_res (syntax, alist);
-    syntax.add ("ref_alpha", "cm^-1", Value::Const,
+and compaction.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    Hydraulic::load_Theta_res (frame);
+    frame.add ("ref_alpha", "cm^-1", Value::Const,
 		"Reference van Genuchten alpha.");
-    syntax.add ("ref_n", Value::None (), Value::Const,
+    frame.add ("ref_n", Value::None (), Value::Const,
 		"Reference van Genuchten n.");
-    syntax.add ("ref_K_sat", "cm/h", Value::Const,
+    frame.add ("ref_K_sat", "cm/h", Value::Const,
 		"Reference water conductivity of saturated soil.");
-    syntax.add ("mod_alpha", Value::Fraction (), Value::None (), 
+    frame.add ("mod_alpha", Value::Fraction (), Value::None (), 
 		Value::Const,
 		"Porosity modifier for van Genuchten alpha.");
-    syntax.add ("mod_n", Value::Fraction (), Value::None (), Value::Const,
+    frame.add ("mod_n", Value::Fraction (), Value::None (), Value::Const,
 		"Porosity modifier for van Genuchten n.");
-    syntax.add ("mod_K_sat", Value::Fraction (), Value::None (),
+    frame.add ("mod_K_sat", Value::Fraction (), Value::None (),
 		Value::Const,
 		"Porosity modifier for water conductivity of saturated soil.");
 
-    Librarian::add_type (Hydraulic::component, "M_vG_compact", alist, syntax, &make);
   }
 } hydraulicM_vG_compact_syntax;
 

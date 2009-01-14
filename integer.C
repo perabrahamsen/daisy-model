@@ -28,6 +28,7 @@
 #include "memutils.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 #include <sstream>
 
 const char *const Integer::component = "integer";
@@ -72,21 +73,20 @@ struct IntegerConst : public Integer
   { }
 };
 
-static struct IntegerConstSyntax
+static struct IntegerConstSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new IntegerConst (al); }
+  Model* make (Block& al) const
+  { return new IntegerConst (al); }
   IntegerConstSyntax ()
+    : DeclareModel (Integer::component, "const", 
+	       "Always give the specified value.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
 
-    alist.add ("description", 
-	       "Always give the specified value.");
-    syntax.add ("value", Value::Integer, Value::Const,
+    frame.add ("value", Value::Integer, Value::Const,
 		"Fixed value for this integer.");
-    syntax.order ("value");
-    Librarian::add_type (Integer::component, "const", alist, syntax, &make);
+    frame.order ("value");
   }
 } IntegerConst_syntax;
 
@@ -155,22 +155,21 @@ Value to return.");
   { sequence_delete (clauses.begin (), clauses.end ()); }
 };
 
-static struct IntegerCondSyntax
+static struct IntegerCondSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new IntegerCond (al); }
+  Model* make (Block& al) const
+  { return new IntegerCond (al); }
   IntegerCondSyntax ()
+    : DeclareModel (Integer::component, "cond", "\
+Return the value of the first clause whose condition is true.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
 
-    alist.add ("description", "\
-Return the value of the first clause whose condition is true.");
-    syntax.add_submodule_sequence ("clauses", Value::Const, "\
+    frame.add_submodule_sequence ("clauses", Value::Const, "\
 List of clauses to match for.",
                                    IntegerCond::Clause::load_syntax);
-    syntax.order ("clauses");
-    Librarian::add_type (Integer::component, "cond", alist, syntax, &make);
+    frame.order ("clauses");
   }
 } IntegerCond_syntax;
 

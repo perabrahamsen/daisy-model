@@ -33,6 +33,7 @@
 #include <sstream>
 #include "mathlib.h"
 #include "librarian.h"
+#include "frame.h"
 
 class HydraulicHypres : public Hydraulic
 {
@@ -293,10 +294,10 @@ HydraulicHypres::~HydraulicHypres ()
 
 // Add the HydraulicHypres syntax to the syntax table.
 
-static struct HydraulicHypresSyntax
+static struct HydraulicHypresSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new HydraulicHypres (al); }
+  Model* make (Block& al) const
+  { return new HydraulicHypres (al); }
 
   static bool check_alist (const AttributeList&, Treelog&)
   {
@@ -304,21 +305,20 @@ static struct HydraulicHypresSyntax
     return ok;
   }
   HydraulicHypresSyntax ()
-  { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    syntax.add_check (check_alist);
-    alist.add ("description", 
+    : DeclareModel (Hydraulic::component, "hypres", 
 	       "van Genuchten retention curve model with Mualem theory.\n\
 Parameters specified by the HYPRES transfer function.\n\
-See <http://www.macaulay.ac.uk/hypres/>.");
-    Hydraulic::load_K_sat_optional (syntax, alist);
-    syntax.add ("topsoil", Value::Boolean, Value::OptionalConst, "\
+See <http://www.macaulay.ac.uk/hypres/>.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    frame.add_check (check_alist);
+    Hydraulic::load_K_sat_optional (frame);
+    frame.add ("topsoil", Value::Boolean, Value::OptionalConst, "\
 If set true this horizon will be initialized as a topsoil (i.e. the\n\
 plowing layer), if set false it will be initialized as a subsoil.\n\
 By default, the horizon will be initialized as a topsoil if and only if\n\
 it is the topmost horison in the soil profile.");
-    Librarian::add_type (Hydraulic::component, "hypres", alist, syntax, make);
   }
 } hydraulicHypres_syntax;
 

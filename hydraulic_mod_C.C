@@ -29,6 +29,7 @@
 #include "check.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "frame.h"
 
 class Hydraulic_mod_C : public Hydraulic
 {
@@ -123,26 +124,23 @@ Hydraulic_mod_C::~Hydraulic_mod_C ()
 
 // Add the Hydraulic_mod_C syntax to the syntax table.
 
-static struct Hydraulic_mod_CSyntax
+static struct Hydraulic_mod_CSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new Hydraulic_mod_C (al); }
+  Model* make (Block& al) const
+  { return new Hydraulic_mod_C (al); }
 
-  Hydraulic_mod_CSyntax ();
+  Hydraulic_mod_CSyntax ()
+    : DeclareModel (Hydraulic::component, "mod_C", "\
+Modified Campbell retention curve model with Burdine theory.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    Hydraulic::load_Theta_sat (frame);
+    Hydraulic::load_K_sat (frame);
+    frame.add ("h_b", "cm", Check::negative (), Value::Const,
+                "Bubbling pressure.");
+    frame.add ("b", Value::None (), Check::positive (), Value::Const,
+                "Campbell parameter.");
+
+  }
 } hydraulic_mod_C_syntax;
-
-Hydraulic_mod_CSyntax::Hydraulic_mod_CSyntax ()
-{ 
-  Syntax& syntax = *new Syntax ();
-  AttributeList& alist = *new AttributeList ();
-  alist.add ("description", "\
-Modified Campbell retention curve model with Burdine theory.");
-  Hydraulic::load_Theta_sat (syntax, alist);
-  Hydraulic::load_K_sat (syntax, alist);
-  syntax.add ("h_b", "cm", Check::negative (), Value::Const,
-	      "Bubbling pressure.");
-  syntax.add ("b", Value::None (), Check::positive (), Value::Const,
-	      "Campbell parameter.");
-
-  Librarian::add_type (Hydraulic::component, "mod_C", alist, syntax, make);
-}

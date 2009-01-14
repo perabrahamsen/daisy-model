@@ -1023,7 +1023,7 @@ movement${OBJ}: movement.C movement.h model.h symbol.h alist.h block.h \
   treelog.h assertion.h frame.h scope.h
 integer${OBJ}: integer.C integer.h model.h symbol.h alist.h boolean.h \
   submodeler.h block.h syntax.h value.h plf.h memutils.h librarian.h \
-  treelog.h
+  treelog.h frame.h scope.h
 xysource${OBJ}: xysource.C xysource.h model.h symbol.h alist.h block.h \
   syntax.h value.h plf.h assertion.h librarian.h
 gnuplot${OBJ}: gnuplot.C gnuplot.h model.h symbol.h alist.h block.h syntax.h \
@@ -1106,8 +1106,8 @@ uzmodel${OBJ}: uzmodel.C uzmodel.h model.h symbol.h alist.h block.h syntax.h \
   value.h plf.h librarian.h
 hydraulic${OBJ}: hydraulic.C hydraulic.h model.h symbol.h alist.h syntax.h \
   value.h library.h block.h plf.h log.h time.h border.h check_range.h \
-  check.h treelog.h mathlib.h assertion.h program.h run.h vcheck.h \
-  librarian.h
+  check.h frame.h scope.h treelog.h mathlib.h assertion.h program.h run.h \
+  vcheck.h librarian.h
 bioclimate${OBJ}: bioclimate.C bioclimate.h model.h symbol.h alist.h \
   weather.h im.h syntax.h value.h block.h plf.h mathlib.h assertion.h \
   librarian.h
@@ -1675,7 +1675,8 @@ organic_std${OBJ}: organic_std.C organic_matter.h model.h symbol.h alist.h \
   chemical.h bioincorporation.h abiotic.h mathlib.h assertion.h treelog.h \
   check_range.h check.h vcheck.h gaussj.h memutils.h librarian.h
 integer_arit${OBJ}: integer_arit.C integer.h model.h symbol.h alist.h \
-  syntax.h value.h vcheck.h assertion.h memutils.h librarian.h treelog.h
+  syntax.h value.h vcheck.h assertion.h memutils.h librarian.h treelog.h \
+  frame.h scope.h
 source_merge${OBJ}: source_merge.C source.h model.h symbol.h alist.h time.h \
   block.h syntax.h value.h plf.h gnuplot_utils.h units.h vcheck.h \
   mathlib.h assertion.h memutils.h librarian.h treelog.h
@@ -1773,7 +1774,7 @@ pet_Hargreaves${OBJ}: pet_Hargreaves.C pet.h model.h symbol.h alist.h \
   assertion.h librarian.h
 hydraulic_M_vGp${OBJ}: hydraulic_M_vGp.C hydraulic.h model.h symbol.h alist.h \
   syntax.h value.h block.h plf.h mathlib.h assertion.h check.h \
-  librarian.h
+  librarian.h frame.h scope.h
 summary_simple${OBJ}: summary_simple.C summary.h model.h symbol.h alist.h \
   fetch.h destination.h select.h units.h volume.h treelog.h memutils.h \
   submodeler.h block.h syntax.h value.h plf.h librarian.h
@@ -1785,7 +1786,7 @@ phenology_std${OBJ}: phenology_std.C phenology.h model.h symbol.h alist.h \
   assertion.h librarian.h treelog.h
 hydraulic_hypres${OBJ}: hydraulic_hypres.C hydraulic.h model.h symbol.h \
   alist.h syntax.h value.h block.h plf.h texture.h treelog.h mathlib.h \
-  assertion.h librarian.h
+  assertion.h librarian.h frame.h scope.h
 clayom_biomod${OBJ}: clayom_biomod.C clayom.h model.h symbol.h alist.h \
   block.h syntax.h value.h plf.h check.h smb.h om.h soil.h treelog.h \
   mathlib.h assertion.h librarian.h frame.h scope.h
@@ -1794,7 +1795,7 @@ clayom_old${OBJ}: clayom_old.C clayom.h model.h symbol.h alist.h block.h \
   frame.h scope.h
 hydraulic_Cosby${OBJ}: hydraulic_Cosby.C hydraulic.h model.h symbol.h alist.h \
   syntax.h value.h texture.h plf.h treelog.h mathlib.h assertion.h \
-  librarian.h
+  librarian.h frame.h scope.h
 condition_weather${OBJ}: condition_weather.C condition.h model.h symbol.h \
   alist.h block.h syntax.h value.h plf.h field.h border.h daisy.h \
   program.h run.h time.h timestep.h vcheck.h memutils.h check.h log.h \
@@ -1845,7 +1846,7 @@ action_heat${OBJ}: action_heat.C action.h model.h symbol.h alist.h block.h \
   frame.h scope.h
 hydraulic_M_vG_compact${OBJ}: hydraulic_M_vG_compact.C hydraulic.h model.h \
   symbol.h alist.h syntax.h value.h block.h plf.h mathlib.h assertion.h \
-  librarian.h
+  librarian.h frame.h scope.h
 action_crop${OBJ}: action_crop.C action.h model.h symbol.h alist.h daisy.h \
   program.h run.h time.h timestep.h vcheck.h memutils.h field.h border.h \
   crop.h am.h im.h syntax.h value.h log.h harvest.h block.h plf.h \
@@ -1920,22 +1921,26 @@ uzrichard${OBJ}: uzrichard.C uzmodel.h model.h symbol.h alist.h block.h \
   geometry.h soil.h soil_heat.h mathlib.h assertion.h frame.h scope.h \
   log.h time.h border.h average.h librarian.h treelog.h
 hydraulic_yolo${OBJ}: hydraulic_yolo.C hydraulic.h model.h symbol.h alist.h \
-  syntax.h value.h block.h plf.h mathlib.h assertion.h librarian.h
+  syntax.h value.h block.h plf.h mathlib.h assertion.h librarian.h \
+  frame.h scope.h
 hydraulic_M_vG${OBJ}: hydraulic_M_vG.C hydraulic.h model.h symbol.h alist.h \
-  syntax.h value.h block.h plf.h mathlib.h assertion.h librarian.h
+  syntax.h value.h block.h plf.h mathlib.h assertion.h librarian.h \
+  frame.h scope.h
 hydraulic_B_vG${OBJ}: hydraulic_B_vG.C hydraulic.h model.h symbol.h alist.h \
-  syntax.h value.h block.h plf.h mathlib.h assertion.h librarian.h
+  syntax.h value.h block.h plf.h mathlib.h assertion.h librarian.h \
+  frame.h scope.h
 hydraulic_M_C${OBJ}: hydraulic_M_C.C hydraulic.h model.h symbol.h alist.h \
   syntax.h value.h block.h plf.h check.h mathlib.h assertion.h \
-  librarian.h
+  librarian.h frame.h scope.h
 hydraulic_B_C${OBJ}: hydraulic_B_C.C hydraulic.h model.h symbol.h alist.h \
   syntax.h value.h block.h plf.h check.h mathlib.h assertion.h \
-  librarian.h
+  librarian.h frame.h scope.h
 hydraulic_M_BaC${OBJ}: hydraulic_M_BaC.C hydraulic.h model.h symbol.h alist.h \
   syntax.h value.h block.h plf.h check.h mathlib.h assertion.h \
-  librarian.h
+  librarian.h frame.h scope.h
 hydraulic_B_BaC${OBJ}: hydraulic_B_BaC.C hydraulic.h model.h symbol.h alist.h \
-  syntax.h value.h block.h plf.h mathlib.h assertion.h librarian.h
+  syntax.h value.h block.h plf.h mathlib.h assertion.h librarian.h \
+  frame.h scope.h
 groundwater_static${OBJ}: groundwater_static.C groundwater.h model.h symbol.h \
   alist.h block.h syntax.h value.h plf.h assertion.h librarian.h \
   treelog.h frame.h scope.h
@@ -2005,7 +2010,7 @@ nitrification_solute${OBJ}: nitrification_solute.C nitrification.h model.h \
   soil_water.h soil_heat.h mathlib.h assertion.h check.h librarian.h
 hydraulic_mod_C${OBJ}: hydraulic_mod_C.C hydraulic.h model.h symbol.h alist.h \
   syntax.h value.h block.h plf.h check.h mathlib.h assertion.h \
-  librarian.h
+  librarian.h frame.h scope.h
 uzlr${OBJ}: uzlr.C uzmodel.h model.h symbol.h alist.h block.h syntax.h \
   value.h plf.h frame.h scope.h surface.h groundwater.h geometry_vert.h \
   geometry.h soil.h soil_heat.h mathlib.h assertion.h librarian.h \
@@ -2056,10 +2061,10 @@ chemical_std${OBJ}: chemical_std.C chemical.h model.h symbol.h alist.h \
   submodeler.h secondary.h treelog.h
 hydraulic_M_BaC_Bimodal${OBJ}: hydraulic_M_BaC_Bimodal.C hydraulic.h model.h \
   symbol.h alist.h syntax.h value.h block.h plf.h check.h mathlib.h \
-  assertion.h librarian.h
+  assertion.h librarian.h frame.h scope.h
 hydraulic_B_BaC_Bimodal${OBJ}: hydraulic_B_BaC_Bimodal.C hydraulic.h model.h \
   symbol.h alist.h syntax.h value.h block.h plf.h check.h mathlib.h \
-  assertion.h librarian.h
+  assertion.h librarian.h frame.h scope.h
 pet_makkink${OBJ}: pet_makkink.C pet.h model.h symbol.h alist.h syntax.h \
   value.h weather.h im.h fao.h log.h time.h border.h librarian.h
 pet_weather${OBJ}: pet_weather.C pet.h model.h symbol.h alist.h syntax.h \

@@ -27,13 +27,14 @@
 #include "plf.h"
 #include "log.h"
 #include "check_range.h"
-#include "syntax.h"
+#include "frame.h"
 #include "block.h"
 #include "treelog.h"
 #include "mathlib.h"
 #include "program.h"
 #include "vcheck.h"
 #include "librarian.h"
+#include "frame.h"
 #include <memory>
 #include <sstream>
 
@@ -136,16 +137,16 @@ check_Theta_res (const AttributeList& al, Treelog& err)
 }  
 
 void
-Hydraulic::load_Theta_sat (Syntax& syntax, AttributeList&)
-{ syntax.add_fraction ("Theta_sat",  Value::State, "Saturation point."); }
+Hydraulic::load_Theta_sat (Frame& frame)
+{ frame.add_fraction ("Theta_sat",  Value::State, "Saturation point."); }
 
 void
-Hydraulic::load_Theta_res (Syntax& syntax, AttributeList& alist)
+Hydraulic::load_Theta_res (Frame& frame)
 { 
-  load_Theta_sat (syntax, alist);
-  syntax.add_check (check_Theta_res);
-  syntax.add_fraction ("Theta_res", Value::Const, "Soil residual water.");
-  alist.add ("Theta_res", 0.0);
+  load_Theta_sat (frame);
+  frame.add_check (check_Theta_res);
+  frame.add_fraction ("Theta_res", Value::Const, "Soil residual water.");
+  frame.add ("Theta_res", 0.0);
 }
 
 static bool
@@ -161,12 +162,12 @@ check_K_sat_optional (const AttributeList& al, Treelog& err)
   return ok;
 }  
 void
-Hydraulic::load_K_sat_optional (Syntax& syntax, AttributeList& alist)
+Hydraulic::load_K_sat_optional (Frame& frame)
 {
-  syntax.add_check (check_K_sat_optional);
-  syntax.add ("K_sat", "cm/h", Check::positive (), Value::OptionalConst,
+  frame.add_check (check_K_sat_optional);
+  frame.add ("K_sat", "cm/h", Check::positive (), Value::OptionalConst,
 	      "Water conductivity of saturated soil.");
-  syntax.add_submodule ("K_at_h", alist, Value::OptionalConst, "\
+  frame.add_submodule ("K_at_h", Value::OptionalConst, "\
 Water conductivity at specified pressure.", K_at_h::load_syntax);
 }
 
@@ -184,10 +185,10 @@ check_K_sat (const AttributeList& al, Treelog& err)
 }
 
 void
-Hydraulic::load_K_sat (Syntax& syntax, AttributeList& alist)
+Hydraulic::load_K_sat (Frame& frame)
 {
-  syntax.add_check (check_K_sat);
-  load_K_sat_optional (syntax, alist);
+  frame.add_check (check_K_sat);
+  load_K_sat_optional (frame);
 }
 
 void
@@ -266,24 +267,23 @@ struct ProgramHydraulic_table : public Program
   { }
 };
 
-static struct ProgramHydraulic_tableSyntax
+static struct ProgramHydraulic_tableSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ProgramHydraulic_table (al); }
+  Model* make (Block& al) const
+  { return new ProgramHydraulic_table (al); }
   ProgramHydraulic_tableSyntax ()
+    : DeclareModel (Program::component, "hydraulic", "\
+Generate a table of the rentention curve and hydraulic conductivity.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
-Generate a table of the rentention curve and hydraulic conductivity.");
-    syntax.add_object ("hydraulic", Hydraulic::component, 
+    frame.add_object ("hydraulic", Hydraulic::component, 
                        Value::Const, Value::Singleton, "\
 The hydraulic model to show in the table.");
-    syntax.add ("intervals", Value::Integer, Value::Const, "\
+    frame.add ("intervals", Value::Integer, Value::Const, "\
 Number of intervals in the table.");
-    alist.add ("intervals", 50);
-    syntax.order ("hydraulic");
-    Librarian::add_type (Program::component, "hydraulic", alist, syntax, &make);
+    frame.add ("intervals", 50);
+    frame.order ("hydraulic");
   }
 } ProgramHydraulic_table_syntax;
 

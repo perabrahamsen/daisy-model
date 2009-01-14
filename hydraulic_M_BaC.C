@@ -29,6 +29,7 @@
 #include "check.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "frame.h"
 
 class HydraulicM_BaC : public Hydraulic
 {
@@ -117,28 +118,25 @@ HydraulicM_BaC::~HydraulicM_BaC ()
 
 // Add the HydraulicM_BaC syntax to the syntax table.
 
-static struct HydraulicM_BaCSyntax
+static struct HydraulicM_BaCSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new HydraulicM_BaC (al); }
+  Model* make (Block& al) const
+  { return new HydraulicM_BaC (al); }
 
-  HydraulicM_BaCSyntax ();
+  HydraulicM_BaCSyntax ()
+    : DeclareModel (Hydraulic::component, "M_BaC", 
+               "Brooks and Corey retention curve model with Mualem theory.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    Hydraulic::load_Theta_res (frame);
+    Hydraulic::load_K_sat (frame);
+    frame.add ("lambda", Value::None (), Value::Const,
+                "Pore size index.");
+    frame.add ("h_b", "cm", Check::negative (), Value::Const,
+                "Bubbling pressure.");
+
+  }
 } hydraulicM_BaC_syntax;
-
-HydraulicM_BaCSyntax::HydraulicM_BaCSyntax ()
-{ 
-  Syntax& syntax = *new Syntax ();
-  AttributeList& alist = *new AttributeList ();
-  alist.add ("description", 
-	     "Brooks and Corey retention curve model with Mualem theory.");
-  Hydraulic::load_Theta_res (syntax, alist);
-  Hydraulic::load_K_sat (syntax, alist);
-  syntax.add ("lambda", Value::None (), Value::Const,
-	      "Pore size index.");
-  syntax.add ("h_b", "cm", Check::negative (), Value::Const,
-	      "Bubbling pressure.");
-
-  Librarian::add_type (Hydraulic::component, "M_BaC", alist, syntax, make);
-}
 
 // hydraulic_M_BaC.C ends here.

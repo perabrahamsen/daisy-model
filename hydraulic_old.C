@@ -27,6 +27,7 @@
 #include "mathlib.h"
 #include "plf.h"
 #include "librarian.h"
+#include "frame.h"
 #include <fstream>
 
 class HydraulicOld : public Hydraulic
@@ -145,24 +146,22 @@ Model& make (Block& al)
   return *new HydraulicOld (al);
 }
 
-static struct HydraulicOldSyntax
+static struct HydraulicOldSyntax : public DeclareModel
 {
-  HydraulicOldSyntax ();
-} hydraulicOld_syntax;
-
-HydraulicOldSyntax::HydraulicOldSyntax ()
-{ 
-  Syntax& syntax = *new Syntax ();
-  AttributeList& alist = *new AttributeList ();
-  alist.add ("description", "\
+  HydraulicOldSyntax ()
+    : DeclareModel (Hydraulic::component, "old", "\
 Reads a file of lines in the format < pF Theta Cw2 K >, where pF is the\n\
 water pressure, Theta is the water content at that  pressure, cw2 is\n\
 dTheta/dh at that pressure [m^-1], and K is the water conductivity at\n\
-that pressure [m/s].");
-  syntax.add ("M_intervals", Syntax::Integer, Syntax::Const,
-	      "Number of intervals for numeric integration of K.");
-  alist.add ("M_intervals", 500);
-  syntax.add ("file", Syntax::String, Syntax::Const, "The file to read.");
-  syntax.order ("file");
-  Librarian::add_type (Hydraulic::component, "old", alist, syntax, &HydraulicOld::make);
-}
+that pressure [m/s].")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    frame.add ("M_intervals", Syntax::Integer, Syntax::Const,
+                "Number of intervals for numeric integration of K.");
+    frame.add ("M_intervals", 500);
+    frame.add ("file", Syntax::String, Syntax::Const, "The file to read.");
+    frame.order ("file");
+  }
+} hydraulicOld_syntax;
+

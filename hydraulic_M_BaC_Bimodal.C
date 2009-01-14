@@ -30,6 +30,7 @@
 #include "check.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "frame.h"
 
 class HydraulicM_BaC_Bimodal : public Hydraulic
 {
@@ -129,32 +130,29 @@ HydraulicM_BaC_Bimodal::~HydraulicM_BaC_Bimodal ()
 
 // Add the HydraulicM_BaC_Bimodal syntax to the syntax table.
 
-static struct HydraulicM_BaC_BimodalSyntax
+static struct HydraulicM_BaC_BimodalSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new HydraulicM_BaC_Bimodal (al); }
+  Model* make (Block& al) const
+  { return new HydraulicM_BaC_Bimodal (al); }
 
-  HydraulicM_BaC_BimodalSyntax ();
+  HydraulicM_BaC_BimodalSyntax ()
+    : DeclareModel (Hydraulic::component, "M_BaC_Bimodal", 
+               "Brooks and Corey retention curve model with Mualem theory.\n\
+Bimodal hydraulic conductivity curve.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    Hydraulic::load_Theta_res (frame);
+    frame.add ("K_sat", "cm/h", Check::non_negative (), Value::OptionalConst,
+                "Water conductivity of saturated soil.");
+    frame.add ("lambda", Value::None (), Value::Const,
+                "Pore size index.");
+    frame.add ("h_b", "cm", Value::Const,
+                "Bubbling pressure.");
+    frame.add ("Theta_b", Value::None (), Value::Const,
+                "Water content at 'h_b'.");
+    frame.add ("K_b", "cm/h", Value::Const,
+                "Water conductivity at 'h_b'.");
+
+  }
 } HydraulicM_BaC_Bimodal_syntax;
-
-HydraulicM_BaC_BimodalSyntax::HydraulicM_BaC_BimodalSyntax ()
-{
-  Syntax& syntax = *new Syntax ();
-  AttributeList& alist = *new AttributeList ();
-  alist.add ("description", 
-	     "Brooks and Corey retention curve model with Mualem theory.\n\
-Bimodal hydraulic conductivity curve.");
-  Hydraulic::load_Theta_res (syntax, alist);
-  syntax.add ("K_sat", "cm/h", Check::non_negative (), Value::OptionalConst,
-	      "Water conductivity of saturated soil.");
-  syntax.add ("lambda", Value::None (), Value::Const,
-	      "Pore size index.");
-  syntax.add ("h_b", "cm", Value::Const,
-	      "Bubbling pressure.");
-  syntax.add ("Theta_b", Value::None (), Value::Const,
-	      "Water content at 'h_b'.");
-  syntax.add ("K_b", "cm/h", Value::Const,
-	      "Water conductivity at 'h_b'.");
-
-  Librarian::add_type (Hydraulic::component, "M_BaC_Bimodal", alist, syntax, make);
-}

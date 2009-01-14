@@ -29,6 +29,7 @@
 #include "plf.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "frame.h"
 
 class HydraulicB_vG : public Hydraulic
 {
@@ -127,29 +128,26 @@ HydraulicB_vG::~HydraulicB_vG ()
 
 // Add the HydraulicB_vG syntax to the syntax table.
 
-static struct HydraulicB_vGSyntax
+static struct HydraulicB_vGSyntax : public DeclareModel
 {
-  static Model& make (Block& al) 
-  { return *new HydraulicB_vG (al); }
+  Model* make (Block& al) const 
+  { return new HydraulicB_vG (al); }
 
-  HydraulicB_vGSyntax ();
+  HydraulicB_vGSyntax ()
+    : DeclareModel (Hydraulic::component, "B_vG", 
+               "van Genuchten retention curve model with Burdine theory.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    Hydraulic::load_Theta_res (frame);
+    Hydraulic::load_K_sat (frame);
+    frame.add ("alpha", "cm^-1", Value::Const,
+                "van Genuchten alpha.");
+    frame.add ("n", Value::None (), Value::Const,
+                "van Genuchten n.");
+    frame.add ("l", Value::None (), Value::Const,
+                "tortuosity parameter.");
+    frame.add ("l", 2.0);
+
+  }
 } hydraulicB_vG_syntax;
-
-HydraulicB_vGSyntax::HydraulicB_vGSyntax ()
-{ 
-  Syntax& syntax = *new Syntax ();
-  AttributeList& alist = *new AttributeList ();
-  alist.add ("description", 
-	     "van Genuchten retention curve model with Burdine theory.");
-  Hydraulic::load_Theta_res (syntax, alist);
-  Hydraulic::load_K_sat (syntax, alist);
-  syntax.add ("alpha", "cm^-1", Value::Const,
-	      "van Genuchten alpha.");
-  syntax.add ("n", Value::None (), Value::Const,
-	      "van Genuchten n.");
-  syntax.add ("l", Value::None (), Value::Const,
-	      "tortuosity parameter.");
-  alist.add ("l", 2.0);
-
-  Librarian::add_type (Hydraulic::component, "B_vG", alist, syntax, make);
-}

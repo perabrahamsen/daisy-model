@@ -27,6 +27,7 @@
 #include "plf.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "frame.h"
 
 class HydraulicYolo : public Hydraulic
 {
@@ -103,20 +104,17 @@ HydraulicYolo::~HydraulicYolo ()
 
 // Add the HydraulicYolo syntax to the syntax table.
 
-static struct HydraulicYoloSyntax
+static struct HydraulicYoloSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new HydraulicYolo (al); }
-  HydraulicYoloSyntax ();
+  Model* make (Block& al) const
+  { return new HydraulicYolo (al); }
+  HydraulicYoloSyntax ()
+    : DeclareModel (Hydraulic::component, "yolo", "Yolo soil.  Haverkamp et.al., 1977.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    frame.add ("M_intervals", Value::Integer, Value::Const,
+                "Number of intervals for numeric integration of K.");
+    frame.add ("M_intervals", 500);
+  }
 } hydraulicYolo_syntax;
-
-HydraulicYoloSyntax::HydraulicYoloSyntax ()
-{ 
-  Syntax& syntax = *new Syntax ();
-  AttributeList& alist = *new AttributeList ();
-  alist.add ("description", "Yolo soil.  Haverkamp et.al., 1977.");
-  syntax.add ("M_intervals", Value::Integer, Value::Const,
-	      "Number of intervals for numeric integration of K.");
-  alist.add ("M_intervals", 500);
-  Librarian::add_type (Hydraulic::component, "yolo", alist, syntax, make);
-}

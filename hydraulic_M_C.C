@@ -29,6 +29,7 @@
 #include "check.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "frame.h"
 
 class HydraulicM_C : public Hydraulic
 {
@@ -111,27 +112,26 @@ HydraulicM_C::~HydraulicM_C ()
 
 // Add the HydraulicM_C syntax to the syntax table.
 
-static struct HydraulicM_CSyntax
+static struct HydraulicM_CSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
+  Model* make (Block& al) const
   {
-    return *new HydraulicM_C (al);
+    return new HydraulicM_C (al);
   }
 
   HydraulicM_CSyntax ()
+    : DeclareModel (Hydraulic::component, "M_C", 
+	       "Campbell retention curve model with Mualem theory.")
+  { }
+  void load_frame (Frame& frame) const
   { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", 
-	       "Campbell retention curve model with Mualem theory.");
-    Hydraulic::load_Theta_sat (syntax, alist);
-    Hydraulic::load_K_sat (syntax, alist);
-    syntax.add ("h_b", "cm", Check::negative (), Value::Const,
+    Hydraulic::load_Theta_sat (frame);
+    Hydraulic::load_K_sat (frame);
+    frame.add ("h_b", "cm", Check::negative (), Value::Const,
 		"Bubbling pressure.");
-    syntax.add ("b", Value::None (), Check::positive (), Value::Const,
+    frame.add ("b", Value::None (), Check::positive (), Value::Const,
 		"Campbell parameter.");
 
-    Librarian::add_type (Hydraulic::component, "M_C", alist, syntax, &make);
   }
 } hydraulicM_C_syntax;
 

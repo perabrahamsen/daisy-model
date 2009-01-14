@@ -30,6 +30,7 @@
 #include "mathlib.h"
 #include "check.h"
 #include "librarian.h"
+#include "frame.h"
 
 class HydraulicM_vGp : public Hydraulic
 {
@@ -150,20 +151,14 @@ HydraulicM_vGp::~HydraulicM_vGp ()
 
 // Add the HydraulicM_vGp syntax to the syntax table.
 
-static struct HydraulicM_vGpSyntax
+static struct HydraulicM_vGpSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new HydraulicM_vGp (al); }
+  Model* make (Block& al) const
+  { return new HydraulicM_vGp (al); }
 
-  HydraulicM_vGpSyntax ();
-} hydraulicM_vGp_syntax;
-
-HydraulicM_vGpSyntax::HydraulicM_vGpSyntax ()
-{ 
-  Syntax& syntax = *new Syntax ();
-  AttributeList& alist = *new AttributeList ();
-  alist.add ("description", 
-	     "van Genuchten retention curve model with Mualem theory.\n\
+  HydraulicM_vGpSyntax ()
+    : DeclareModel (Hydraulic::component, "M_vGp", 
+               "van Genuchten retention curve model with Mualem theory.\n\
 A p_m (h) function is multiplied to the conductivity to simulate the\n\
 change near maropores.\n\
 \n\
@@ -173,23 +168,26 @@ X = 1 cm^-1\n\
 \n\
 This function is described in ``Soil hydraulic properties near\n\
 saturation, an improved model'' by Boergesen et. al, submitted to\n\
-Water Resources Research 2003.");
-  Hydraulic::load_Theta_res (syntax, alist);
-  syntax.add ("K_sat", "cm/h", Check::non_negative (), Value::OptionalConst,
-	      "Water conductivity of saturated soil.");
-  syntax.add ("alpha", "cm^-1", Value::Const,
-	      "van Genuchten alpha.");
-  syntax.add ("n", Value::None (), Value::Const,
-	      "van Genuchten n.");
-  syntax.add ("l", Value::None (), Value::Const,
-	      "tortuosity parameter.");
-  alist.add ("l", 0.5);
-  syntax.add ("h_m", "cm", Check::negative (), Value::Const,
-	      "Pressure point of chance between matrix and macropores.");
-  syntax.add ("f", Value::None (), Check::non_negative (), Value::Const,
-	      "Macropores conductivity curve shape parameter.");
-    
-  Librarian::add_type (Hydraulic::component, "M_vGp", alist, syntax, make);
-}
+Water Resources Research 2003.")
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    Hydraulic::load_Theta_res (frame);
+    frame.add ("K_sat", "cm/h", Check::non_negative (), Value::OptionalConst,
+                "Water conductivity of saturated soil.");
+    frame.add ("alpha", "cm^-1", Value::Const,
+                "van Genuchten alpha.");
+    frame.add ("n", Value::None (), Value::Const,
+                "van Genuchten n.");
+    frame.add ("l", Value::None (), Value::Const,
+                "tortuosity parameter.");
+    frame.add ("l", 0.5);
+    frame.add ("h_m", "cm", Check::negative (), Value::Const,
+                "Pressure point of chance between matrix and macropores.");
+    frame.add ("f", Value::None (), Check::non_negative (), Value::Const,
+                "Macropores conductivity curve shape parameter.");
+
+  }
+} hydraulicM_vGp_syntax;
 
 // hydraulic_M_vGp.C ends here.
