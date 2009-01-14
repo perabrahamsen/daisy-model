@@ -33,6 +33,7 @@
 #include "check.h"
 #include "mathlib.h"
 #include "treelog.h"
+#include "frame.h"
 #include <memory>
 
 struct ReactionFilter : public Reaction
@@ -144,38 +145,36 @@ struct ReactionFilter : public Reaction
   { }
 };
 
-static struct ReactionFilterSyntax
+static struct ReactionFilterSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ReactionFilter (al); }
+  Model* make (Block& al) const
+  { return new ReactionFilter (al); }
   ReactionFilterSyntax ()
+    : DeclareModel (Reaction::component, "filter_velocity",
+               "Filtration of soil colloids.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
 
-    alist.add ("description",
-               "Filtration of soil colloids.");
 
-    syntax.add ("immobile", Value::String, Value::OptionalConst,
+    frame.add ("immobile", Value::String, Value::OptionalConst,
 		"Immobile colloids in the soil.\n\
 By default, filtered colloids are not tracked.");
-    syntax.add ("mobile", Value::String, Value::Const,
+    frame.add ("mobile", Value::String, Value::Const,
 		"Mobile colloids dissolved in soil water.");
-    syntax.add ("F_primary", "g/cm^3/h", Value::LogOnly, Value::Sequence,
+    frame.add ("F_primary", "g/cm^3/h", Value::LogOnly, Value::Sequence,
 		"Filtration in the primary domain (intra-aggregate pores).");
-    syntax.add ("F_secondary", "g/cm^3/h", Value::LogOnly, Value::Sequence,
+    frame.add ("F_secondary", "g/cm^3/h", Value::LogOnly, Value::Sequence,
 		"Filtration in secondary domain (inter-aggregate pores).");
 
-    syntax.add ("fc_primary", "cm^-1", Check::positive (), Value::Const,
+    frame.add ("fc_primary", "cm^-1", Check::positive (), Value::Const,
                 "Filter coefficient in the primary domain");
-    // alist.add ("fc_primary", 1.0);
+    // frame.add ("fc_primary", 1.0);
    
-    syntax.add ("fc_secondary", "cm^-1", Check::positive (), Value::Const,
+    frame.add ("fc_secondary", "cm^-1", Check::positive (), Value::Const,
                 "Filter coefficient in secondary domain");
-    // alist.add ("fc_secondary", 0.5);
+    // frame.add ("fc_secondary", 0.5);
 
-    Librarian::add_type (Reaction::component, "filter_velocity",
-                         alist, syntax, &make);
   }
   
 } ReactionFilter_syntax;

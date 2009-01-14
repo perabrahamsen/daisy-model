@@ -31,6 +31,7 @@
 #include "check.h"
 #include "librarian.h"
 #include "assertion.h"
+#include "frame.h"
 #include <sstream>
 
 struct ProgramGP2D : public Program
@@ -130,36 +131,35 @@ struct ProgramGP2D : public Program
   { }
 };
 
-static struct ProgramGP2DSyntax
+static struct ProgramGP2DSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ProgramGP2D (al); }
+  Model* make (Block& al) const
+  { return new ProgramGP2D (al); }
   ProgramGP2DSyntax ()
+    : DeclareModel (Program::component, "GP2D", "\
+Write root density table using 2D extension to Gerwitz and Page")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
-Write root density table using 2D extension to Gerwitz and Page");
-    syntax.add_submodule ("Geometry", alist, Value::Const,
+    frame.add_submodule ("Geometry", Value::Const,
                           "Discretization of the soil.",
                           GeometryRect::load_syntax);
-    syntax.add ("row_width", "cm", Check::positive (), Value::Const, "\
+    frame.add ("row_width", "cm", Check::positive (), Value::Const, "\
 Distance between rows.");
-    syntax.add ("row_position", "cm", Check::non_negative (), Value::Const, "\
+    frame.add ("row_position", "cm", Check::non_negative (), Value::Const, "\
 Position of row on x-axis.");
-    alist.add ("row_position", 0.0);
-    syntax.add ("soil_depth", "cm", Check::positive (), Value::Const, "\
+    frame.add ("row_position", 0.0);
+    frame.add ("soil_depth", "cm", Check::positive (), Value::Const, "\
 Limit on root depth by soil (no crops have roots below this).");
-    syntax.add ("crop_depth", "cm", Check::positive (), Value::Const, "\
+    frame.add ("crop_depth", "cm", Check::positive (), Value::Const, "\
 Limit of root depth by crop (no soil have roots below this).");
-    syntax.add ("crop_width", "cm", Check::positive (), Value::Const, "\
+    frame.add ("crop_width", "cm", Check::positive (), Value::Const, "\
 Maximum horizontal distance of roots from plant.");
-    syntax.add ("WRoot", "g DM/m^2", Check::positive (), Value::Const, "\
+    frame.add ("WRoot", "g DM/m^2", Check::positive (), Value::Const, "\
 Totoal root dry matter.");
-    syntax.add ("DS", "DS", Value::Const, "Development stage [0-2].\n\
+    frame.add ("DS", "DS", Value::Const, "Development stage [0-2].\n\
 Not currently used.");
-    alist.add ("DS", 2.0);
-    Librarian::add_type (Program::component, "GP2D", alist, syntax, &make);
+    frame.add ("DS", 2.0);
   }
 } ProgramGP2D_syntax;
 

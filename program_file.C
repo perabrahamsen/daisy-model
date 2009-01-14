@@ -26,6 +26,7 @@
 #include "path.h"
 #include "treelog.h"
 #include "librarian.h"
+#include "frame.h"
 #include <string>
 #include <fstream>
 
@@ -59,19 +60,18 @@ struct ProgramCD : public Program
   { }
 };
 
-static struct ProgramCDSyntax
+static struct ProgramCDSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ProgramCD (al); }
+  Model* make (Block& al) const
+  { return new ProgramCD (al); }
   ProgramCDSyntax ()
+    : DeclareModel (Program::component, "cd", "Change working directory.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Change working directory."); 
-    syntax.add ("directory", Value::String, Value::Const, "\
+    frame.add ("directory", Value::String, Value::Const, "\
 Name of directory to change into.");
-    syntax.order ("directory");
-    Librarian::add_type (Program::component, "cd", alist, syntax, &make);
+    frame.order ("directory");
   }
 } ProgramCD_syntax;
 
@@ -113,21 +113,20 @@ struct ProgramWrite : public Program
   { }
 };
 
-static struct ProgramWriteSyntax
+static struct ProgramWriteSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ProgramWrite (al); }
+  Model* make (Block& al) const
+  { return new ProgramWrite (al); }
   ProgramWriteSyntax ()
+    : DeclareModel (Program::component, "write", "Write string to file.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "Write string to file."); 
-    syntax.add ("what", Value::String, Value::Const, "\
+    frame.add ("what", Value::String, Value::Const, "\
 String to write.");
-    syntax.add ("where", Value::String, Value::Const, "\
+    frame.add ("where", Value::String, Value::Const, "\
 File to write it in.\n\
 If the value is 'screen', write the string to the screen.");
-    alist.add ("where", "screen");
-    Librarian::add_type (Program::component, "write", alist, syntax, &make);
+    frame.add ("where", "screen");
   }
 } ProgramWrite_syntax;

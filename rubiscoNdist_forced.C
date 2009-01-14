@@ -28,6 +28,7 @@
 #include "librarian.h"
 #include "number.h"
 #include "scope_exchange.h"
+#include "frame.h"
 
 static const double Mw = 14.0; //The molecular weight for N [g mol¯1]
 static const symbol LAI_symbol = symbol("LAI");
@@ -133,27 +134,23 @@ rubiscoNdist_forced
     }
 }
 
-static struct rubiscoNdist_forcedSyntax
+static struct rubiscoNdist_forcedSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new rubiscoNdist_forced (al); }
-  static void load_syntax (Syntax& syntax, AttributeList& alist)
-  {
-    syntax.add_object ("value", Number::component, 
-                       Value::Const, Value::Singleton, "\
-Expression that evaluates to the relative rubisco capacity where 1 is the value in top of the canopy.");
-    syntax.order ("value");
-  }  
+  Model* make (Block& al) const
+  { return new rubiscoNdist_forced (al); }
 
   rubiscoNdist_forcedSyntax ()
+    : DeclareModel (RubiscoNdist::component, "forced", 
+	       "Forced rubisco capacity distribution model in the canopy.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", 
-	       "Forced rubisco capacity distribution model in the canopy.");
 
-    load_syntax (syntax, alist);
-    Librarian::add_type (RubiscoNdist::component, "forced", alist, syntax, &make);
+    frame.add_object ("value", Number::component, 
+                       Value::Const, Value::Singleton, "\
+Expression that evaluates to the relative rubisco capacity where 1 is the value in top of the canopy.");
+    frame.order ("value");
+
   }
 } rubiscoNdist_forcedsyntax;
 

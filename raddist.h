@@ -74,8 +74,6 @@ protected:
   Raddist (Block&);
 
 public:
-  static const AttributeList& default_model ();
-  static void load_syntax (Syntax&, AttributeList&);
   ~Raddist ();
 };
 

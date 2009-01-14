@@ -60,7 +60,6 @@ public:
   virtual void output (Log&) const;
 
   // Create and Destroy.
-  static void load_syntax (Syntax&, AttributeList&);
 protected:
   Pet (Block&);
 public:

@@ -35,6 +35,7 @@
 #include "treelog.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "frame.h"
 #include <sstream>
 #include <fstream>
 #include <memory>
@@ -1273,28 +1274,25 @@ standard parameterizations for the model.");
   }
 }
 
-static struct ProgramDocumentSyntax
+static struct ProgramDocumentSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ProgramDocument (al); }
+  Model* make (Block& al) const
+  { return new ProgramDocument (al); }
   ProgramDocumentSyntax ()
+    : DeclareModel (Program::component, "document", "\
+Generate the components part of the reference manual.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
-Generate the components part of the reference manual.");
-    syntax.add ("where", Value::String, Value::Const, 
+    frame.add ("where", Value::String, Value::Const, 
                 "Name of file to store results in.");
-    alist.add ("where", "components.tex");
-    syntax.add_object ("format", Format::component, 
+    frame.add ("where", "components.tex");
+    frame.add_object ("format", Format::component, 
                        Value::Const, Value::Singleton,
                        "Text format used for the document.");
-    AttributeList LaTeX_alist;
-    LaTeX_alist.add ("type", "LaTeX");
-    alist.add ("format", LaTeX_alist);
-    syntax.add ("print_parameterizations", Value::Boolean, Value::Const,
+    frame.add ("format", "LaTeX");
+    frame.add ("print_parameterizations", Value::Boolean, Value::Const,
 		"Include a copy of all loaded parameterizations in document.");
-    alist.add ("print_parameterizations", false);
-    Librarian::add_type (Program::component, "document", alist, syntax, &make);
+    frame.add ("print_parameterizations", false);
   }
 } ProgramDocument_syntax;

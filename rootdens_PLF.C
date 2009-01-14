@@ -31,6 +31,7 @@
 #include "mathlib.h"
 #include "memutils.h"
 #include "librarian.h"
+#include "frame.h"
 
 struct Rootdens_PLF : public Rootdens
 {
@@ -221,20 +222,18 @@ struct Rootdens_DS_Depth : public Rootdens_PLF
   { }
 };
 
-static struct Rootdens_DS_Depth_Syntax
+static struct Rootdens_DS_Depth_Syntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new Rootdens_DS_Depth (al); }
+  Model* make (Block& al) const
+  { return new Rootdens_DS_Depth (al); }
 
   Rootdens_DS_Depth_Syntax ()
+    : DeclareModel (Rootdens::component, "DS_Depth", "\
+Specify root density as a function of development stage.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-
-    Rootdens::load_base (syntax, alist);
-    alist.add ("description", "\
-Specify root density as a function of development stage.");
-    syntax.add_submodule_sequence("entries", Value::Const, "\
+    frame.add_submodule_sequence("entries", Value::Const, "\
 A list of pairs, where the first element of each pair is a development\n\
 stage (usually a number between 0 (emergence) and 2 (ripe), and the\n\
 second element is a PLF specifying the relative root density as a\n\
@@ -245,8 +244,7 @@ root density distribution specified for the entries before and after\n\
 the current development stage, and scale them to match the current\n\
 total root mass.",
 				  Rootdens_PLF::Entry::load_syntax);
-    syntax.add_check ("entries", check_indexes);
-    Librarian::add_type (Rootdens::component, "DS_Depth", alist, syntax, make);
+    frame.add_check ("entries", check_indexes);
   }
 } Rootdens_DS_Depth_syntax;
 
@@ -272,20 +270,18 @@ struct Rootdens_DS_Rel : public Rootdens_PLF
   { }
 };
 
-static struct Rootdens_DS_Rel_Syntax
+static struct Rootdens_DS_Rel_Syntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new Rootdens_DS_Rel (al); }
+  Model* make (Block& al) const
+  { return new Rootdens_DS_Rel (al); }
 
   Rootdens_DS_Rel_Syntax ()
+    : DeclareModel (Rootdens::component, "DS_Rel", "\
+Specify root density as a function of development stage.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-
-    Rootdens::load_base (syntax, alist);
-    alist.add ("description", "\
-Specify root density as a function of development stage.");
-    syntax.add_submodule_sequence("entries", Value::Const, "\
+    frame.add_submodule_sequence("entries", Value::Const, "\
 A list of pairs, where the first element of each pair is a development\n\
 stage (usually a number between 0 (emergence) and 2 (ripe), and the\n\
 second element is a PLF specifying the relative root density as a\n\
@@ -296,9 +292,8 @@ root density distribution specified for the entries before and after\n\
 the current development stage, and scale them to match the current\n\
 total root mass.",
 				  Rootdens_PLF::Entry::load_syntax);
-    syntax.add_check ("entries", check_indexes);
+    frame.add_check ("entries", check_indexes);
 
-    Librarian::add_type (Rootdens::component, "DS_Rel", alist, syntax, make);
   }
 } Rootdens_DS_Rel_syntax;
 
@@ -323,20 +318,18 @@ struct Rootdens_Depth_Depth : public Rootdens_PLF
   { }
 };
 
-static struct Rootdens_Depth_Depth_Syntax
+static struct Rootdens_Depth_Depth_Syntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new Rootdens_Depth_Depth (al); }
+  Model* make (Block& al) const
+  { return new Rootdens_Depth_Depth (al); }
 
   Rootdens_Depth_Depth_Syntax ()
+    : DeclareModel (Rootdens::component, "Depth_Depth", "\
+Specify root density as a function of development stage.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-
-    Rootdens::load_base (syntax, alist);
-    alist.add ("description", "\
-Specify root density as a function of development stage.");
-    syntax.add_submodule_sequence("entries", Value::Const, "\
+    frame.add_submodule_sequence("entries", Value::Const, "\
 A list of pairs, where the first element of each pair is the root depth,\
 \n(a positive number), and the second element is a PLF specifying the\n\
 relative root density as a function of soil depth in cm (a positive number).\n\
@@ -346,9 +339,8 @@ root density distribution specified for the entries before and after\n\
 the current development stage, and scale them to match the current\n\
 total root mass.",
 				  Rootdens_PLF::Entry::load_syntax);
-    syntax.add_check ("entries", check_indexes);
+    frame.add_check ("entries", check_indexes);
 
-    Librarian::add_type (Rootdens::component, "Depth_Depth", alist, syntax, make);
   }
 } Rootdens_Depth_Depth_syntax;
 

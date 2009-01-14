@@ -27,6 +27,7 @@
 #include "log.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "frame.h"
 
 struct PetHargreaves : public Pet
 {
@@ -80,15 +81,12 @@ struct PetHargreaves : public Pet
     { }
 };
 
-static struct PetHargreavesSyntax
+static struct PetHargreavesSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-    { return *new PetHargreaves (al); }
+  Model* make (Block& al) const
+    { return new PetHargreaves (al); }
   PetHargreavesSyntax ()
-    {
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", 
+    : DeclareModel (Pet::component, "Hargreaves", 
 		 "Potential evopotranspiration using Samani and Hargreaves.\n\
 \n\
 Hargreaves, G.H., and Samani, Z.A. (1982) Estimating potential\n\
@@ -97,8 +95,8 @@ evapotranspiration. Tech. Note, J. Irrig. and Drain. Engrg., ASCE,\n\
 \n\
 Hargreaves, G.H., and Samani, Z.A. (1985) Reference crop\n\
 evapotranspiration from temperature. Appl. Engrg. in Agric.,\n\
-1(2):96-99.");
-      Pet::load_syntax (syntax, alist);
-      Librarian::add_type (Pet::component, "Hargreaves", alist, syntax, &make);
-    }
+1(2):96-99.")
+  { }
+  void load_frame (Frame&) const
+  { }
 } PetHargreaves_syntax;

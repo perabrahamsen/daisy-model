@@ -39,6 +39,7 @@
 #include "mathlib.h"
 #include "memutils.h"
 #include "librarian.h"
+#include "frame.h"
 #include <set>
 #include <memory>
 #include <sstream>
@@ -1453,21 +1454,20 @@ ParserFile::ParserFile (Block& al)
 ParserFile::~ParserFile ()
 { }
 
-static struct ParserFileSyntax
+static struct ParserFileSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ParserFile (al); }
+  Model* make (Block& al) const
+  { return new ParserFile (al); }
 
   ParserFileSyntax ()
+    : DeclareModel (Parser::component, "file", 
+	       "Read a setup file containing lots of parentheses.")
+  { }
+  void load_frame (Frame& frame) const
   { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", 
-	       "Read a setup file containing lots of parentheses.");
-    syntax.add ("where", Value::String, Value::Const,
+    frame.add ("where", Value::String, Value::Const,
 		"File to read from.");
-    syntax.order ("where");
-    Librarian::add_type (Parser::component, "file", alist, syntax, &make);
+    frame.order ("where");
   }
 } ParserFile_syntax;
 

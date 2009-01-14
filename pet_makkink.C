@@ -27,6 +27,7 @@
 #include "fao.h"
 #include "log.h"
 #include "librarian.h"
+#include "frame.h"
 
 struct PetMakkink : public Pet
 {
@@ -64,17 +65,14 @@ struct PetMakkink : public Pet
     { }
 };
 
-static struct PetMakkinkSyntax
+static struct PetMakkinkSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-    { return *new PetMakkink (al); }
+  Model* make (Block& al) const
+    { return new PetMakkink (al); }
   PetMakkinkSyntax ()
-    {
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", 
-		 "Potential evopotranspiration using Makkink's Equation.");
-      Pet::load_syntax (syntax, alist);
-      Librarian::add_type (Pet::component, "makkink", alist, syntax, &make);
-    }
+    : DeclareModel (Pet::component, "makkink", 
+		 "Potential evopotranspiration using Makkink's Equation.")
+  { }
+  void load_frame (Frame&) const
+  { }
 } PetMakkink_syntax;

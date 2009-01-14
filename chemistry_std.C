@@ -392,10 +392,7 @@ Inorganic nitrogen.")
   void load_frame (Frame& frame) const
   {
     frame.add_strings ("trace", "NO3", "NH4");
-    std::vector<const AttributeList*> reaction;
-    reaction.push_back (&Reaction::nitrification_model ());
-    reaction.push_back (&Reaction::denitrification_model ());
-    frame.add ("reaction", reaction);
+    frame.add_strings ("reaction", "nitrification", "denitrification");
   }
 } ChemistryNitrogen_syntax;
 

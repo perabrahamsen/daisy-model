@@ -75,10 +75,6 @@ Raddist::intensity_distribution (const int No, const double LAI,
     Rad[i] = Rad0 * exp (- Ext * dLAI * i);
 }
 
-void 
-Raddist::load_syntax (Syntax&, AttributeList&)
-{ }
-
 Raddist::Raddist (Block& al)
   : ModelLogable (al.name ("type"))
 { }

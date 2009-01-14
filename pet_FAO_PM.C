@@ -32,6 +32,7 @@
 #include "vegetation.h"
 #include "log.h"
 #include "librarian.h"
+#include "frame.h"
 #include <sstream>
 #include <memory>
 
@@ -114,19 +115,17 @@ PetFAO_PM::tick (const Time&, const Weather& weather, const double Rn,
                               reference_evapotranspiration_wet);
 }
 
-static struct PetFAO_PMSyntax
+static struct PetFAO_PMSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new PetFAO_PM (al); }
+  Model* make (Block& al) const
+  { return new PetFAO_PM (al); }
   PetFAO_PMSyntax ()
+    : DeclareModel (Pet::component, "FAO_PM",
+	       "Potential evopotranspiration using Penman-Monteith.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description",
-	       "Potential evopotranspiration using Penman-Monteith.");
-    Pet::load_syntax (syntax, alist);
-    syntax.add ("reference_evapotranspiration_wet", "mm/h", Value::LogOnly, 
+    frame.add ("reference_evapotranspiration_wet", "mm/h", Value::LogOnly, 
                 "Reference evapotranspiration for a dry system.");
-    Librarian::add_type (Pet::component, "FAO_PM", alist, syntax, &make);
   }
 } PetFAO_PM_syntax;

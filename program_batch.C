@@ -28,6 +28,7 @@
 #include "assertion.h"
 #include "memutils.h"
 #include "librarian.h"
+#include "frame.h"
 #include <vector>
 
 struct ProgramBatch : public Program
@@ -91,24 +92,21 @@ struct ProgramBatch : public Program
   { sequence_delete (program.begin (), program.end ()); }
 };
 
-static struct ProgramBatchSyntax
+static struct ProgramBatchSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ProgramBatch (al); }
+  Model* make (Block& al) const
+  { return new ProgramBatch (al); }
   ProgramBatchSyntax ()
+    : DeclareModel (Program::component, "batch", "Run a sequence of programs.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    syntax.add ("description", Value::String, Value::Const, 
-                "Description of this batch program.");
-    alist.add ("description", "Run a sequence of programs."); 
-    syntax.add ("directory", Value::String, Value::Const, "\
+    frame.add ("directory", Value::String, Value::Const, "\
 Directory in which to initialize, check and run the programs.");
-    alist.add ("directory", ".");
-    syntax.add_object ("run", Program::component, 
+    frame.add ("directory", ".");
+    frame.add_object ("run", Program::component, 
                        Value::State, Value::Sequence, "\
 List of programs to run.  The programs will be run in the sequence listed.");
    
-    Librarian::add_type (Program::component, "batch", alist, syntax, &make);
   }
 } ProgramBatch_syntax;

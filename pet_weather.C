@@ -26,6 +26,7 @@
 #include "weather.h"
 #include "log.h"
 #include "librarian.h"
+#include "frame.h"
 
 struct PetWeather : public Pet
 {
@@ -62,17 +63,14 @@ struct PetWeather : public Pet
     { }
 };
 
-static struct PetWeatherSyntax
+static struct PetWeatherSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-    { return *new PetWeather (al); }
+  Model* make (Block& al) const
+    { return new PetWeather (al); }
   PetWeatherSyntax ()
-    {
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", 
-		 "Potential evopotranspiration using weather data.");
-      Pet::load_syntax (syntax, alist);
-      Librarian::add_type (Pet::component, "weather", alist, syntax, &make);
-    }
+    : DeclareModel (Pet::component, "weather", 
+		 "Potential evopotranspiration using weather data.")
+  { }
+  void load_frame (Frame&) const
+  { }
 } PetWeather_syntax;

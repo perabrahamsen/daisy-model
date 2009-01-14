@@ -36,6 +36,7 @@
 #include "librarian.h"
 #include "mathlib.h"
 #include "treelog.h"
+#include "frame.h"
 #include <memory>
 
 struct ReactionAdsorption : public Reaction
@@ -158,42 +159,35 @@ struct ReactionAdsorption : public Reaction
   { }
 };
 
-static struct ReactionAdsorptionSyntax
+static struct ReactionAdsorptionSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ReactionAdsorption (al); }
-  static void load_syntax (Syntax& syntax, AttributeList& alist)
+  Model* make (Block& al) const
+  { return new ReactionAdsorption (al); }
+
+  ReactionAdsorptionSyntax ()
+    : DeclareModel (Reaction::component, "adsorption", 
+	       "Maintain equilibrium between solute and sorbed from.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    alist.add ("description", 
-	       "Maintain equilibrium between solute and sorbed from.");
-    syntax.add ("solute", Value::String, Value::Const,
+    frame.add ("solute", Value::String, Value::Const,
 		"Name of solute form of chemical.");
-    syntax.add ("sorbed", Value::String, Value::Const,
+    frame.add ("sorbed", Value::String, Value::Const,
 		"Name of sorbed form of chemical.");
-    syntax.add_object ("equilibrium", Adsorption::component, "\
+    frame.add_object ("equilibrium", Adsorption::component, "\
 Function for calculating equilibrium between solute and sorbed form.");
-    syntax.add_object ("adsorption_rate", Number::component,
+    frame.add_object ("adsorption_rate", Number::component,
                        Value::Const, Value::Singleton, 
                        "Tranformation rate from solute to sorbed form.");
-    syntax.add_object ("desorption_rate", Number::component,
+    frame.add_object ("desorption_rate", Number::component,
                        Value::OptionalConst, Value::Singleton,
                        "Tranformation rate from sorbed to solute form.\n\
 By default, this is identical to 'adsorption_rate'.");
-    syntax.add ("adsorption_source", "g/cm^3/h", 
+    frame.add ("adsorption_source", "g/cm^3/h", 
 		Value::LogOnly, Value::Sequence, "\
 Converted from solute to sorbed form this timestep (may be negative).");
-  }
-  static void build_adsoption ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
 
-    load_syntax (syntax, alist);
-    Librarian::add_type (Reaction::component, "adsorption",
-			 alist, syntax, &make);
   }
-  ReactionAdsorptionSyntax ()
-  { build_adsoption (); }
 } ReactionAdsorption_syntax;
 
 // reaction_adsorption.C ends here.

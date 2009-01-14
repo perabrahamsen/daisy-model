@@ -39,6 +39,7 @@
 #include "log.h"
 #include "check.h"
 #include "mathlib.h"
+#include "frame.h"
 
 struct ReactionDenit : public Reaction
 {
@@ -190,49 +191,51 @@ ReactionDenit::ReactionDenit (Block& al)
     redox_height (al.number ("redox_height", 1.0))
 { }
 
-static struct ReactionDenitSyntax
+static struct ReactionDenitSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ReactionDenit (al); }
-  static void load_syntax (Syntax& syntax, AttributeList& alist)
-  {
-    alist.add ("description", "Denitrification in soil (conversion\n\
+  Model* make (Block& al) const
+  { return new ReactionDenit (al); }
+  ReactionDenitSyntax ()
+    : DeclareModel (Reaction::component, "denitrification", "Denitrification in soil (conversion\n\
 of nitrate to atmospheric nitrogen).  In this model, it is made\n\
 proportional to the CO2 development, as specified by the parameter\n\
 alpha, with a maximum rate specified by the parameter 'K'.  The\n\
 denitrification is also affected by temperature and water pressure.\n\
 Additional denitrification from CO2 produced from fast OM pools can\n\
 be triggered by setting alpha_fast or water_factor_fast different.\n\
-This additional denitrification is limited by K_fast.");
-    syntax.add ("converted", "g/cm^3/h", Value::LogOnly, Value::Sequence,
+This additional denitrification is limited by K_fast.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add ("converted", "g/cm^3/h", Value::LogOnly, Value::Sequence,
 		"Amount of denitrification.");
-    syntax.add ("converted_fast", "g/cm^3/h", Value::LogOnly, Value::Sequence,
+    frame.add ("converted_fast", "g/cm^3/h", Value::LogOnly, Value::Sequence,
 		"Additional denitrification due to turnover in fast pools.");
-    syntax.add ("converted_redox", "g/cm^3/h", Value::LogOnly, Value::Sequence,
+    frame.add ("converted_redox", "g/cm^3/h", Value::LogOnly, Value::Sequence,
 		"Additional denitrification due to chemical redox processes.");
-    syntax.add ("potential", "g/cm^3/h", Value::LogOnly, Value::Sequence,
+    frame.add ("potential", "g/cm^3/h", Value::LogOnly, Value::Sequence,
 		"Potential amount of denitrification at anarobic conditions.");
-    syntax.add ("potential_fast", "g/cm^3/h", Value::LogOnly, Value::Sequence,
+    frame.add ("potential_fast", "g/cm^3/h", Value::LogOnly, Value::Sequence,
 		"Additional potential due to turnover in fast pools.");
-    syntax.add ("K", "h^-1", Check::fraction (), Value::Const, "\
+    frame.add ("K", "h^-1", Check::fraction (), Value::Const, "\
 Maximum fraction of nitrate converted at each time step from slow pools.");
-    alist.add ("K", 0.020833);
-    syntax.add ("K_fast", "h^-1", Check::fraction (), Value::OptionalConst, "\
+    frame.add ("K", 0.020833);
+    frame.add ("K_fast", "h^-1", Check::fraction (), Value::OptionalConst, "\
 Maximum fraction of nitrate converted at each time step from fast pools.\n \
 By default this is identical to 'K'.");
-    syntax.add ("alpha", "(g NO3-N/h)/(g CO2-C/h)", Check::non_negative (),
+    frame.add ("alpha", "(g NO3-N/h)/(g CO2-C/h)", Check::non_negative (),
 		Value::Const, "\
 Anaerobic denitrification constant for slow pools.");
-    alist.add ("alpha", 0.1);
-    syntax.add ("alpha_fast", "(g NO3-N/h)/(g CO2-C/h)", Check::non_negative (),
+    frame.add ("alpha", 0.1);
+    frame.add ("alpha_fast", "(g NO3-N/h)/(g CO2-C/h)", Check::non_negative (),
 		Value::OptionalConst, "\
 Anaerobic denitrification constant for fast pools.\n			\
 This applies to the CO2 produced from turnover of fast OM pools.\n\
 By default, this is identical to alpha.");
-    syntax.add ("heat_factor", "dg C", Value::None (), Check::non_negative (),
+    frame.add ("heat_factor", "dg C", Value::None (), Check::non_negative (),
 		Value::OptionalConst, "Heat factor.\n\
 By default, use a build in function valid for temperate climates.");
-    syntax.add ("water_factor", Value::Fraction (), Value::None (), 
+    frame.add ("water_factor", Value::Fraction (), Value::None (), 
 		Check::non_negative (),
 		Value::OptionalConst,
 		"Water potential factor for slow pools.\n\
@@ -241,40 +244,18 @@ maximal water content.");
     PLF water_factor;
     water_factor.add (0.7, 0.0);
     water_factor.add (1.0, 1.0);
-    alist.add ("water_factor", water_factor);
-    syntax.add ("water_factor_fast", Value::Fraction (), Value::None (), 
+    frame.add ("water_factor", water_factor);
+    frame.add ("water_factor_fast", Value::Fraction (), Value::None (), 
 		Check::non_negative (),
 	      Value::OptionalConst,
 		"Water potential factor for fast pools\n\
 By default, this is identical to the 'water_factor' parameter.");
-    syntax.add  ("redox_height", "cm", Check::non_positive (),
+    frame.add  ("redox_height", "cm", Check::non_positive (),
 		 Value::OptionalConst,  "\
 Height (a negative number) blow which redox processes start.\n	\
 All NO3 below this height will be denitrified immediately.\n\
 By default no redox denitrification occurs.");
   }
-  ReactionDenitSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    load_syntax (syntax, alist);
-    Librarian::add_type (Reaction::component, "denitrification",
-			 alist, syntax, &make);
-  }
 } ReactionDenit_syntax;
-
-const AttributeList& 
-Reaction::denitrification_model ()
-{
-  static AttributeList alist;
-  if (!alist.check ("type"))
-    {
-      Syntax dummy;
-      ReactionDenitSyntax::load_syntax (dummy, alist);
-      alist.add ("type", "denitrification");
-    }
-  return alist;
-
-}
 
 // reaction_denit.C ends here.

@@ -25,6 +25,7 @@
 #include "check.h"
 #include "block.h"
 #include "librarian.h"
+#include "frame.h"
 
 static const double Mw = 14.0; //The molecular weight for N [g mol¯1]
 
@@ -75,27 +76,20 @@ rubiscoNdistUniform::rubiscoN_distribution (const Units&,
 
 }
 
-static struct rubiscoNdistUniformSyntax
+static struct rubiscoNdistUniformSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new rubiscoNdistUniform (al); }
-  static void load_syntax (Syntax& syntax, AttributeList& alist)
-  {
-    syntax.add ("f_photo", Value::None (), Check::positive (), Value::Const,
-                "Fraction of photosynthetically active N in canopy, f_photo = 0.75 (Boegh et al., 2002). However, non-functional N is already substracted from leaf-N in the cropN_std module, therefore f_photo = 1.0 as default.");
-    alist.add ("f_photo", 1.0);
-
-  }  
+  Model* make (Block& al) const
+  { return new rubiscoNdistUniform (al); }
   rubiscoNdistUniformSyntax ()
+    : DeclareModel (RubiscoNdist::component, "uniform", 
+	       "Uniform  rubisco N-distribution model in the canopy for photosynthesis.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", 
-	       "Uniform  rubisco N-distribution model in the canopy for photosynthesis.");
+    frame.add ("f_photo", Value::None (), Check::positive (), Value::Const,
+                "Fraction of photosynthetically active N in canopy, f_photo = 0.75 (Boegh et al., 2002). However, non-functional N is already substracted from leaf-N in the cropN_std module, therefore f_photo = 1.0 as default.");
+    frame.add ("f_photo", 1.0);
 
-    load_syntax (syntax, alist);
-
-    Librarian::add_type (RubiscoNdist::component, "uniform", alist, syntax, &make);
   }
 } rubiscoNdistUniform_syntax;
 

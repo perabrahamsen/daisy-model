@@ -23,8 +23,7 @@
 
 #include "rootdens.h"
 #include "block.h"
-#include "syntax.h"
-#include "alist.h"
+#include "frame.h"
 #include "check.h"
 #include "librarian.h"
 
@@ -37,17 +36,8 @@ Rootdens::library_id () const
   return id;
 }
 
-void
-Rootdens::load_base (Syntax& syntax, AttributeList& alist)
-{
-  Model::load_model (syntax, alist);
-  syntax.add ("SpRtLength", "m/g", Check::positive (), Value::Const,
-	      "Specific root length");
-  alist.add ("SpRtLength", 100.0);
-}
-
-Rootdens::Rootdens (const AttributeList& al)
-  : ModelAListed (al),
+Rootdens::Rootdens (const Frame& al)
+  : ModelAListed (al.alist ()),
     SpRtLength (al.number ("SpRtLength"))
 { }
 
@@ -65,6 +55,13 @@ static struct RootdensInit : public DeclareComponent
     : DeclareComponent (Rootdens::component, "\
 Root density calculations.")
   { }
+  void load_frame (Frame& frame) const
+  {
+    Model::load_model (frame.syntax (), frame.alist ());
+    frame.add ("SpRtLength", "m/g", Check::positive (), Value::Const,
+               "Specific root length");
+    frame.add ("SpRtLength", 100.0);
+  }
 } Rootdens_init;
 
 // rootdens.C ends here.

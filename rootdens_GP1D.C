@@ -31,6 +31,7 @@
 #include "librarian.h"
 #include "iterative.h"
 #include "treelog.h"
+#include "frame.h"
 
 #include <sstream>
 
@@ -76,7 +77,6 @@ struct Rootdens_GP1D : public Rootdens
   // Create.
   void initialize (const Geometry&, double row_width, double row_pos, 
                    Treelog& msg);
-  static void load_syntax (Syntax&, AttributeList&);
   explicit Rootdens_GP1D (Block&);
   explicit Rootdens_GP1D (const AttributeList&);
 };
@@ -279,30 +279,6 @@ Rootdens_GP1D::initialize (const Geometry&, double row_width, double,
                  + "' root density model");
 }
 
-void
-Rootdens_GP1D::load_syntax (Syntax& syntax, AttributeList& alist)
-{
-  Rootdens::load_base (syntax, alist);
-  syntax.add ("DensRtTip", "cm/cm^3", Check::positive (), Value::Const,
-              "Root density at (potential) penetration depth.");
-  alist.add ("DensRtTip", 0.1);
-  syntax.add ("DensIgnore", "cm/cm^3", Check::positive (),
-              Value::OptionalConst,
-              "Ignore cells with less than this root density.\n\
-By default, this is the same as DensRtTip.");
-  syntax.add ("a", "cm^-1", Value::LogOnly, "Form parameter.\n\
-Calculated from 'DensRtTip'.");
-  syntax.add ("L0", "cm/cm^3", Value::LogOnly,
-              "Root density at soil surface.");
-  syntax.add ("k", Value::None (), Value::LogOnly,
-              "Scale factor due to soil limit.\n\
-\n\
-Some roots might be below the soil imposed maximum root depth, or in areas\n\
-with a density lower than the limit specified by DensIgnore.\n\
-These roots will be re distributed within the root zone by multiplying the\n\
-density with this scale factor.");
-}
-
 Rootdens_GP1D::Rootdens_GP1D (Block& al)
   : Rootdens (al),
     DensRtTip (al.number ("DensRtTip")),
@@ -312,30 +288,37 @@ Rootdens_GP1D::Rootdens_GP1D (Block& al)
     k (-42.42e42)
 { }
 
-Rootdens_GP1D::Rootdens_GP1D (const AttributeList& al)
-  : Rootdens (al),
-    DensRtTip (al.number ("DensRtTip")),
-    DensIgnore (al.number ("DensIgnore", DensRtTip)),
-    a (-42.42e42),
-    L0 (-42.42e42),
-    k (-42.42e42)
-{ }
-
-static struct Rootdens_GP1DSyntax
+static struct Rootdens_GP1DSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new Rootdens_GP1D (al); }
+  Model* make (Block& al) const
+  { return new Rootdens_GP1D (al); }
   Rootdens_GP1DSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", 
+    : DeclareModel (Rootdens::component, "GP1D", 
 	       "Use exponential function for root density.\n\
 \n\
 See Gerwitz, S. and E.R. Page (1974): An empirical mathematical model\n\
-to describe plant root systems.  J. Appl. Ecol. 11, 773-781.");
-    Rootdens_GP1D::load_syntax (syntax, alist);
-    Librarian::add_type (Rootdens::component, "GP1D", alist, syntax, &make);
+to describe plant root systems.  J. Appl. Ecol. 11, 773-781.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add ("DensRtTip", "cm/cm^3", Check::positive (), Value::Const,
+                "Root density at (potential) penetration depth.");
+    frame.add ("DensRtTip", 0.1);
+    frame.add ("DensIgnore", "cm/cm^3", Check::positive (),
+                Value::OptionalConst,
+                "Ignore cells with less than this root density.\n\
+By default, this is the same as DensRtTip.");
+    frame.add ("a", "cm^-1", Value::LogOnly, "Form parameter.\n\
+Calculated from 'DensRtTip'.");
+    frame.add ("L0", "cm/cm^3", Value::LogOnly,
+                "Root density at soil surface.");
+    frame.add ("k", Value::None (), Value::LogOnly,
+                "Scale factor due to soil limit.\n\
+\n\
+Some roots might be below the soil imposed maximum root depth, or in areas\n\
+with a density lower than the limit specified by DensIgnore.\n\
+These roots will be re distributed within the root zone by multiplying the\n\
+density with this scale factor.");
   }
 } Rootdens_GP1D_syntax;
 

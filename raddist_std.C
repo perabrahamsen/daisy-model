@@ -25,6 +25,7 @@
 #include "vegetation.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "frame.h"
 #include <sstream>
 
 struct RaddistStandard : public Raddist
@@ -96,31 +97,16 @@ void RaddistStandard::tick (std::vector <double>& sun_LAI_fraction,
 
 }
 
-static struct RaddistStandardSyntax
+static struct RaddistStandardSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new RaddistStandard (al); }
+  Model* make (Block& al) const
+  { return new RaddistStandard (al); }
   RaddistStandardSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", 
-	       "Default model of radiation distribution in the canopy.");
-    Raddist::load_syntax (syntax, alist);
-    Librarian::add_type (Raddist::component, "default", alist, syntax, &make);
-  }
+    : DeclareModel (Raddist::component, "default", 
+	       "Default model of radiation distribution in the canopy.")
+  { }
+  void load_frame (Frame&) const
+  { }
 } RaddistStandard_syntax;
 
-const AttributeList& 
-Raddist::default_model ()
-{
-  static AttributeList alist;
-  
-  if (!alist.check ("type"))
-    {
-      Syntax syntax;
-      Raddist::load_syntax (syntax, alist);
-      alist.add ("type", "default");
-    }
-  return alist;
-}
+// raddist_std.C ends here.

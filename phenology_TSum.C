@@ -30,6 +30,7 @@
 #include "assertion.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 
 class PhenologyTSum : public Phenology
 {
@@ -109,43 +110,40 @@ PhenologyTSum::PhenologyTSum (Block& al)
     RepThrs (al.number ("RepThrs"))
 { }
 
-static struct PhenologyTSumSyntax
+static struct PhenologyTSumSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new PhenologyTSum (al); }
+  Model* make (Block& al) const
+  { return new PhenologyTSum (al); }
 
   PhenologyTSumSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    Phenology::load_syntax (syntax, alist);
-    alist.add ("description", 
+    : DeclareModel (Phenology::component, "TSum", 
 	       "Crop phenology model purely based on temperature sums.\n\
 The length of emergence, and the vegetative and reproductive fase are all\n\
 based on the specified temperature sums.  Temperatures below the specified\n\
 thresholds do not contribute to the temeprature sum.\n\
-Cut stress and leaf respiration does not affect this phenology model.");
-
+Cut stress and leaf respiration does not affect this phenology model.")
+  { }
+  void load_frame (Frame& frame) const
+  {
     // Parameters.
-    syntax.add ("EmrTSum", "dg C d", Value::Const,
+    frame.add ("EmrTSum", "dg C d", Value::Const,
 		"Soil temperature sum at emergence.");
-    syntax.add ("EmrThrs", "dg C", Value::Const,
+    frame.add ("EmrThrs", "dg C", Value::Const,
 		"Minimum soil temperature for emergence.\n\
 Temperature below this will not count in the sum.");
-    alist.add ("EmrThrs", 0.0);
-    syntax.add ("VegTSum", "dg C d", Value::Const,
+    frame.add ("EmrThrs", 0.0);
+    frame.add ("VegTSum", "dg C d", Value::Const,
 		"Air temperature sum for vegetative fase.");
-    syntax.add ("VegThrs", "dg C", Value::Const,
+    frame.add ("VegThrs", "dg C", Value::Const,
 		"Minimum air temperature for development in vegetative fase.\n\
 Temperature below this will not count in the sum.");
-    alist.add ("VegThrs", 0.0);
-    syntax.add ("RepTSum", "dg C d", Value::Const,
+    frame.add ("VegThrs", 0.0);
+    frame.add ("RepTSum", "dg C d", Value::Const,
 		"Air temperature sum for vegetative fase.");
-    syntax.add ("RepThrs", "dg C", Value::Const,
+    frame.add ("RepThrs", "dg C", Value::Const,
 		"Minimum air temperature for development in vegetative fase.\n\
 Temperature below this will not count in the sum.");
-    alist.add ("RepThrs", 0.0);
+    frame.add ("RepThrs", 0.0);
 
-    Librarian::add_type (Phenology::component, "TSum", alist, syntax, &make);
   }
 } PhenologyTSum_syntax;

@@ -32,6 +32,7 @@
 #include "assertion.h"
 #include "librarian.h"
 #include "syntax.h"
+#include "frame.h"
 
 struct ReactionNitrification : public Reaction
 {
@@ -134,45 +135,27 @@ ReactionNitrification::ReactionNitrification (Block& al)
   : Reaction (al)
 { }
 
-static struct ReactionNitrificationSyntax
+static struct ReactionNitrificationSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ReactionNitrification (al); }
-  static void load_syntax (Syntax& syntax, AttributeList& alist)
-  {
-    alist.add ("description", "Nitrification.\n\
-The actual nitrification specification is part of the horizon models, this\n\
-reaction just applies the models and logs the result. ");
-    syntax.add ("NH4", "g/cm^3/h", Value::LogOnly, Value::Sequence, 
-		"Amount of ammonium consumed this hour.");
-    syntax.add ("NO3", "g/cm^3/h", Value::LogOnly, Value::Sequence, 
-		"Amount of nitrate generated this hour.");
-    syntax.add ("N2O", "g/cm^3/h", Value::LogOnly, Value::Sequence, 
-		"Amount of nitrous oxide generated this hour.");
-  }
+  Model* make (Block& al) const
+  { return new ReactionNitrification (al); }
   ReactionNitrificationSyntax ()
+    : DeclareModel (Reaction::component, "nitrification", "Nitrification.\n\
+The actual nitrification specification is part of the horizon models, this\n\
+reaction just applies the models and logs the result. ")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
 
-    load_syntax (syntax, alist);
+    frame.add ("NH4", "g/cm^3/h", Value::LogOnly, Value::Sequence, 
+		"Amount of ammonium consumed this hour.");
+    frame.add ("NO3", "g/cm^3/h", Value::LogOnly, Value::Sequence, 
+		"Amount of nitrate generated this hour.");
+    frame.add ("N2O", "g/cm^3/h", Value::LogOnly, Value::Sequence, 
+		"Amount of nitrous oxide generated this hour.");
 
-    Librarian::add_type (Reaction::component, "nitrification",
-			 alist, syntax, &make);
+
   }
 } ReactionNitrification_syntax;
-
-const AttributeList& 
-Reaction::nitrification_model ()
-{
-  static AttributeList alist;
-  if (!alist.check ("type"))
-    {
-      Syntax dummy;
-      ReactionNitrificationSyntax::load_syntax (dummy, alist);
-      alist.add ("type", "nitrification");
-    }
-  return alist;
-}
 
 // reaction_nit.C ends here.

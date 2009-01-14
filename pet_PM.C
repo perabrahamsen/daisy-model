@@ -32,6 +32,7 @@
 #include "vegetation.h"
 #include "log.h"
 #include "librarian.h"
+#include "frame.h"
 #include <sstream>
 #include <memory>
 
@@ -139,21 +140,14 @@ PetPM::tick (const Time&, const Weather& weather, const double Rn,
     }
 }
 
-static struct PetPMSyntax
+static struct PetPMSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new PetPM (al); }
+  Model* make (Block& al) const
+  { return new PetPM (al); }
   PetPMSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description",
-	       "Potential evopotranspiration using Penman-Monteith.");
-    Pet::load_syntax (syntax, alist);
-    Syntax Rn_syntax;
-    AttributeList Rn_alist;
-    Rn_alist.add ("type", "brunt");
-    alist.add ("net_radiation", Rn_alist);
-    Librarian::add_type (Pet::component, "PM", alist, syntax, &make);
-  }
+    : DeclareModel (Pet::component, "PM",
+	       "Potential evopotranspiration using Penman-Monteith.")
+  { }
+  void load_frame (Frame&) const
+  { }
 } PetPM_syntax;

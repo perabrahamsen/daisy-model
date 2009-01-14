@@ -1296,7 +1296,7 @@ and the 'SSOC' svat model will revert to a one leaf description.");
     frame.add ("min_sun_angle", 3.6 * M_PI / 180.0);
     frame.add_object ("raddist", Raddist::component, 
                        "Radiation distribution model.");
-    frame.add ("raddist", Raddist::default_model ());
+    frame.add ("raddist", "default");
     frame.add_object ("difrad", Difrad::component, 
                        Value::OptionalState, Value::Singleton, 
                        "Diffuse radiation component.\n\

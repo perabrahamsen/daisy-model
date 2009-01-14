@@ -38,6 +38,7 @@
 #include "scope_id.h"
 #include "scope_multi.h"
 #include "vcheck.h"
+#include "frame.h"
 #include <memory>
 
 struct ReactionEquilibrium : public Reaction
@@ -215,40 +216,38 @@ struct ReactionEquilibrium : public Reaction
 const symbol
 ReactionEquilibrium::k_unit ("h^-1");
 
-static struct ReactionEquilibriumSyntax
+static struct ReactionEquilibriumSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ReactionEquilibrium (al); }
+  Model* make (Block& al) const
+  { return new ReactionEquilibrium (al); }
   ReactionEquilibriumSyntax ()
+    : DeclareModel (Reaction::component, "equilibrium", 
+	       "Equilibrium between two soil chemicals.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
 
-    alist.add ("description", 
-	       "Equilibrium between two soil chemicals.");
-    syntax.add ("A", Value::String, Value::Const,
+    frame.add ("A", Value::String, Value::Const,
 		"Name of first soil component in equilibrium.");
-    syntax.add ("B", Value::String, Value::Const,
+    frame.add ("B", Value::String, Value::Const,
 		"Name of second soil component in equilibrium.");
-    syntax.add_object ("equilibrium", Equilibrium::component,
+    frame.add_object ("equilibrium", Equilibrium::component,
                        "Function for calculating equilibrium between A and B.");
-    syntax.add_object ("k_AB", Number::component,
+    frame.add_object ("k_AB", Number::component,
                        Value::Const, Value::Singleton, 
                        "Tranformation rate from soil component 'A' to 'B'.");
-    syntax.add_object ("k_BA", Number::component,
+    frame.add_object ("k_BA", Number::component,
                        Value::OptionalConst, Value::Singleton,
                        "Tranformation rate from soil component 'B' to 'A'.\n\
 By default, this is identical to 'k_AB'.");
-    syntax.add ("S_AB", "g/cm^3/h", Value::LogOnly, Value::Sequence,
+    frame.add ("S_AB", "g/cm^3/h", Value::LogOnly, Value::Sequence,
 		"Converted from A to B this timestep (may be negative).");
-    Librarian::add_type (Reaction::component, "equilibrium",
-			 alist, syntax, &make);
-    syntax.add ("colloid", Value::String, Value::OptionalConst,
+    frame.add ("colloid", Value::String, Value::OptionalConst,
 		"Let 'rho_b' denote content of specified chemical.\n\
 This miht affect the evaluation of the 'k_AB' and 'k_BA' parameter\n\
 expressions, as well as the 'equilibrium' model.\n\
 By default, 'rho_b' will be the soil dry bulk density.");
-    syntax.add ("secondary", Value::Boolean, Value::Const,
+    frame.add ("secondary", Value::Boolean, Value::Const,
                 "Equilibrium should happen in the secondary domain.\n\
 There will only be a reaction when there is water in the secondary domain\n\
 (inter-aggregate pores), at both the beginning and end of the timestep.\n\
@@ -256,7 +255,7 @@ By default, only the content of the primary domain (soil-bound and\n\
 intra-aggregate pores), will be included in the reaction.\n\
 There is no way to use this model to specify an equilibrium reaction in\n\
 the tertiary domain (biopores).");
-    alist.add ("secondary", false);
+    frame.add ("secondary", false);
   }
 } ReactionEquilibrium_syntax;
 

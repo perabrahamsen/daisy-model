@@ -29,6 +29,9 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame_model.h"
+#include "intrinsics.h"
+#include "library.h"
 
 #include <sstream>
 
@@ -53,9 +56,8 @@ struct Rootdens_G_P : public Rootdens
   // Create.
   void initialize (const Geometry&, double /* row_width */, double, Treelog&)
   { }
-  static void load_syntax (Syntax&, AttributeList&);
   Rootdens_G_P (Block&);
-  Rootdens_G_P (const AttributeList&);
+  Rootdens_G_P (const Frame&);
 };
 
 double
@@ -220,26 +222,6 @@ Rootdens_G_P::output (Log& log) const
   output_variable (L0, log); 
 }
 
-void
-Rootdens_G_P::load_syntax (Syntax& syntax, AttributeList& alist)
-{
-  Rootdens::load_base (syntax, alist);
-  syntax.add ("DensRtTip", "cm/cm^3", Check::positive (), Value::Const,
-              "Root density at (potential) penetration depth.");
-  alist.add ("DensRtTip", 0.1);
-  syntax.add ("MinDens", "cm/cm^3", Check::non_negative (), Value::Const,
-              "Minimal root density\n\
-Root density will never be below this, as long as there is enough root mass.\n \
-Extra root mass will be distributed according to Gerwitz and Page.\n\
-If there are too little root mass, the root will have the same density\n\
-all the way down.");
-  alist.add ("MinDens", 0.0);
-  syntax.add ("a", "cm^-1", Value::LogOnly, "Form parameter.\n\
-Calculated from 'DensRtTip'.");
-  syntax.add ("L0", "cm/cm^3", Value::LogOnly,
-              "Root density at soil surface.");
-}
-
 Rootdens_G_P::Rootdens_G_P (Block& al)
   : Rootdens (al),
     DensRtTip (al.number ("DensRtTip")),
@@ -248,7 +230,7 @@ Rootdens_G_P::Rootdens_G_P (Block& al)
     L0 (-42.42e42)
 { }
 
-Rootdens_G_P::Rootdens_G_P (const AttributeList& al)
+Rootdens_G_P::Rootdens_G_P (const Frame& al)
   : Rootdens (al),
     DensRtTip (al.number ("DensRtTip")),
     MinDens (al.number ("MinDens")),
@@ -259,32 +241,39 @@ Rootdens_G_P::Rootdens_G_P (const AttributeList& al)
 std::auto_ptr<Rootdens> 
 Rootdens::create_uniform ()
 {
-  static AttributeList alist;
-  if (!alist.check ("type"))
-    {
-      Syntax dummy;
-      Rootdens_G_P::load_syntax (dummy, alist);
-      alist.add ("type", "Gerwitz+Page74");
-    }
-  return std::auto_ptr<Rootdens> (new Rootdens_G_P (alist)); 
+  const Intrinsics& intrinsics = Librarian::intrinsics ();
+  const Library& library = intrinsics.library (Rootdens::component);
+  const FrameModel& parent = library.model ("Gerwitz+Page74");
+  FrameModel frame (parent, FrameModel::parent_copy);
+  frame.alist ().add ("type", "GP2D");
+  return std::auto_ptr<Rootdens> (new Rootdens_G_P (frame)); 
 }
 
-
-static struct Rootdens_G_PSyntax
+static struct Rootdens_G_PSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new Rootdens_G_P (al); }
+  Model* make (Block& al) const
+  { return new Rootdens_G_P (al); }
   Rootdens_G_PSyntax ()
+    : DeclareModel (Rootdens::component, "Gerwitz+Page74", 
+	       "Use exponential function for root density.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    Rootdens_G_P::load_syntax (syntax, alist);
-    alist.add ("description", 
-	       "Use exponential function for root density.");
-    alist.add_strings ("cite", "gp74");
-
-    Librarian::add_type (Rootdens::component, "Gerwitz+Page74", 
-                         alist, syntax, &make);
+    frame.add_strings ("cite", "gp74");
+    frame.add ("DensRtTip", "cm/cm^3", Check::positive (), Value::Const,
+                "Root density at (potential) penetration depth.");
+    frame.add ("DensRtTip", 0.1);
+    frame.add ("MinDens", "cm/cm^3", Check::non_negative (), Value::Const,
+                "Minimal root density\n\
+Root density will never be below this, as long as there is enough root mass.\n \
+Extra root mass will be distributed according to Gerwitz and Page.\n\
+If there are too little root mass, the root will have the same density\n\
+all the way down.");
+    frame.add ("MinDens", 0.0);
+    frame.add ("a", "cm^-1", Value::LogOnly, "Form parameter.\n\
+Calculated from 'DensRtTip'.");
+    frame.add ("L0", "cm/cm^3", Value::LogOnly,
+                "Root density at soil surface.");
   }
 } Rootdens_G_P_syntax;
 

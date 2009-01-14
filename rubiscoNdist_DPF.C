@@ -26,6 +26,7 @@
 #include <sstream>
 #include "check.h"
 #include "librarian.h"
+#include "frame.h"
 
 static const double Mw = 14.0; //The molecular weight for N [g mol¯1]
 
@@ -87,44 +88,26 @@ rubiscoNdistDPF::rubiscoN_distribution (const Units&,
 
 }
 
-static struct rubiscoNdistDPFSyntax
+static struct rubiscoNdistDPFSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new rubiscoNdistDPF (al); }
-  static void load_syntax (Syntax& syntax, AttributeList& alist)
-  {
-    syntax.add ("kn", Value::None (), Check::positive (), Value::Const,
-                "Extinction coefficient of nitrogen in the canopy, kn = 0.713 (De Pury &Farquhar, 1997)");
-    alist.add ("kn", 0.713);
-
-    syntax.add ("f_photo", Value::None (), Check::positive (), Value::Const,
-                "Fraction of photosynthetically active N in canopy. According to (Boegh et al., 2002) f_photo = 0.75. However, non-functional N is already substracted from leaf-N in the cropN_std module, therefore f_photo = 1.0 as default.");
-    alist.add ("f_photo", 1.00);
-  }  
+  Model* make (Block& al) const
+  { return new rubiscoNdistDPF (al); }
 
   rubiscoNdistDPFSyntax ()
+    : DeclareModel (RubiscoNdist::component, "exp", 
+	       "Boegh et al.(2002) rubisco N-distribution model in the canopy for photosynthesis.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", 
-	       "Boegh et al.(2002) rubisco N-distribution model in the canopy for photosynthesis.");
 
-    load_syntax (syntax, alist);
-    Librarian::add_type (RubiscoNdist::component, "exp", alist, syntax, &make);
+    frame.add ("kn", Value::None (), Check::positive (), Value::Const,
+                "Extinction coefficient of nitrogen in the canopy, kn = 0.713 (De Pury &Farquhar, 1997)");
+    frame.add ("kn", 0.713);
+
+    frame.add ("f_photo", Value::None (), Check::positive (), Value::Const,
+                "Fraction of photosynthetically active N in canopy. According to (Boegh et al., 2002) f_photo = 0.75. However, non-functional N is already substracted from leaf-N in the cropN_std module, therefore f_photo = 1.0 as default.");
+    frame.add ("f_photo", 1.00);
   }
 } rubiscoNdistDPF_syntax;
 
-
-const AttributeList& 
-RubiscoNdist::default_model ()
-{
-  static AttributeList alist;
-  
-  if (!alist.check ("type"))
-    {
-      Syntax syntax;
-      rubiscoNdistDPFSyntax::load_syntax (syntax, alist);
-      alist.add ("type", "exp");
-    }
-  return alist;
-}
+// rubiscoNdist_DPF.C ends here

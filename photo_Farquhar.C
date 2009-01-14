@@ -495,7 +495,7 @@ Xn = 1.16E-3 mol/mol/s for wheat (de Pury & Farquhar, 1997)");
     // Models
     frame.add_object ("N-dist", RubiscoNdist::component, 
                        "Rubisco N-distribution in the canopy layer.");
-    frame.add ("N-dist", RubiscoNdist::default_model ());
+    frame.add ("N-dist", "exp");
 
     frame.add_object ("ABAeffect", ABAEffect::component, 
                        "The effect of xylem ABA on stomata conductivity.");

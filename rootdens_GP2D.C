@@ -31,6 +31,9 @@
 #include "librarian.h"
 #include "iterative.h"
 #include "treelog.h"
+#include "frame_model.h"
+#include "intrinsics.h"
+#include "library.h"
 
 #include <sstream>
 
@@ -80,9 +83,8 @@ struct Rootdens_GP2D : public Rootdens
   // Create.
   void initialize (const Geometry&, 
                    double row_width, double row_pos, Treelog&);
-  static void load_syntax (Syntax&, AttributeList&);
   explicit Rootdens_GP2D (Block&);
-  explicit Rootdens_GP2D (const AttributeList&);
+  explicit Rootdens_GP2D (const Frame&);
 };
 
 void
@@ -373,40 +375,6 @@ Rootdens_GP2D::initialize (const Geometry& geo,
     }
 }
 
-void
-Rootdens_GP2D::load_syntax (Syntax& syntax, AttributeList& alist)
-{
-  Rootdens::load_base (syntax, alist);
-  syntax.add ("debug", Value::Integer, Value::Const, "\
-Add debug messages if larger than 0.");
-  alist.add ("debug", 0);
-  syntax.add ("row_position", "cm", Value::Const, "\
-Horizontal position of row crops.");
-  alist.add ("row_position", 0.0);
-  syntax.add ("row_distance", "cm", Value::Const, 
-              "Distance between rows of crops.");
-  syntax.add ("DensRtTip", "cm/cm^3", Check::positive (), Value::Const,
-              "Root density at (potential) penetration depth.");
-  alist.add ("DensRtTip", 0.1);
-  syntax.add ("DensIgnore", "cm/cm^3", Check::positive (),
-              Value::OptionalConst,
-              "Ignore cells with less than this root density.\n\
-By default, this is the same as DensRtTip.");
-  syntax.add ("a_z", "cm^-1", Value::LogOnly, "Form parameter.\n\
-Calculated from 'DensRtTip'.");
-  syntax.add ("a_x", "cm^-1", Value::LogOnly, "Form parameter.\n\
-Calculated from 'DensRtTip'.");
-  syntax.add ("L00", "cm/cm^3", Value::LogOnly,
-              "Root density at row crop at soil surface.");
-  syntax.add ("k", Value::None (), Value::LogOnly,
-              "Scale factor due to soil limit.\n\
-\n\
-Some roots might be below the soil imposed maximum root depth, or in areas\n\
-with a density lower than the limit specified by 'DensIgnore'.\n\
-These roots will be re distributed within the root zone by multiplying the\n\
-density with this scale factor.");
-}
-
 Rootdens_GP2D::Rootdens_GP2D (Block& al)
   : Rootdens (al),
     debug (al.integer ("debug")),
@@ -420,7 +388,7 @@ Rootdens_GP2D::Rootdens_GP2D (Block& al)
     k (-42.42e42)
 { }
 
-Rootdens_GP2D::Rootdens_GP2D (const AttributeList& al)
+Rootdens_GP2D::Rootdens_GP2D (const Frame& al)
   : Rootdens (al),
     debug (al.integer ("debug")),
     row_position (al.number ("row_position")),
@@ -437,25 +405,23 @@ std::auto_ptr<Rootdens>
 Rootdens::create_row (const double row_width, const double row_position,
                       const bool debug)
 {
-  Syntax dummy;
-  AttributeList alist;
-  Rootdens_GP2D::load_syntax (dummy, alist);
-  alist.add ("type", "GP2D");
-  alist.add ("row_position", row_position);
-  alist.add ("row_distance", row_width);
-  alist.add ("debug", debug ? 1 : 0);
-  return std::auto_ptr<Rootdens> (new Rootdens_GP2D (alist)); 
+  const Intrinsics& intrinsics = Librarian::intrinsics ();
+  const Library& library = intrinsics.library (Rootdens::component);
+  const FrameModel& parent = library.model ("Gerwitz+Page74");
+  FrameModel frame (parent, FrameModel::parent_copy);
+  frame.alist ().add ("type", "GP2D");
+  frame.add ("row_position", row_position);
+  frame.add ("row_distance", row_width);
+  frame.add ("debug", debug ? 1 : 0);
+  return std::auto_ptr<Rootdens> (new Rootdens_GP2D (frame)); 
 }
 
-static struct Rootdens_GP2DSyntax
+static struct Rootdens_GP2DSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new Rootdens_GP2D (al); }
+  Model* make (Block& al) const
+  { return new Rootdens_GP2D (al); }
   Rootdens_GP2DSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", 
+    : DeclareModel (Rootdens::component, "GP2D", 
 	       "Use exponential function for root density in row crops.\n\
 \n\
 This is a two dimension model (z, x), where the z-axis is vertical,\n\
@@ -463,12 +429,41 @@ and the x-axis is horizontal and ortogonal to the row.  The row is\n\
 assumed to be uniform (dense), allowing us to ignore that dimension.\n\
 \n\
 We assume the root density decrease with horizontal distance to row,\n\
-as well as depth below row.");
-    alist.add_strings ("cite", "gp74");
-    Rootdens_GP2D::load_syntax (syntax, alist);
-    
-    Librarian::add_type (Rootdens::component, "GP2D", alist, syntax, &make);
-  }
+as well as depth below row.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_strings ("cite", "gp74");
+    frame.add ("debug", Value::Integer, Value::Const, "\
+Add debug messages if larger than 0.");
+    frame.add ("debug", 0);
+    frame.add ("row_position", "cm", Value::Const, "\
+Horizontal position of row crops.");
+    frame.add ("row_position", 0.0);
+    frame.add ("row_distance", "cm", Value::Const, 
+                "Distance between rows of crops.");
+    frame.add ("DensRtTip", "cm/cm^3", Check::positive (), Value::Const,
+                "Root density at (potential) penetration depth.");
+    frame.add ("DensRtTip", 0.1);
+    frame.add ("DensIgnore", "cm/cm^3", Check::positive (),
+                Value::OptionalConst,
+                "Ignore cells with less than this root density.\n\
+By default, this is the same as DensRtTip.");
+    frame.add ("a_z", "cm^-1", Value::LogOnly, "Form parameter.\n\
+Calculated from 'DensRtTip'.");
+    frame.add ("a_x", "cm^-1", Value::LogOnly, "Form parameter.\n\
+Calculated from 'DensRtTip'.");
+    frame.add ("L00", "cm/cm^3", Value::LogOnly,
+                "Root density at row crop at soil surface.");
+    frame.add ("k", Value::None (), Value::LogOnly,
+                "Scale factor due to soil limit.\n\
+\n\
+Some roots might be below the soil imposed maximum root depth, or in areas\n\
+with a density lower than the limit specified by 'DensIgnore'.\n\
+These roots will be re distributed within the root zone by multiplying the\n\
+density with this scale factor.");
+
+    }
 } Rootdens_GP2D_syntax;
 
 // rootdens_GP2D.C ends here.

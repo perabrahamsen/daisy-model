@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "pet.h"
-#include "syntax.h"
+#include "frame.h"
 #include "block.h"
 #include "log.h"
 #include "vegetation.h"
@@ -60,17 +60,6 @@ Pet::output (Log& log) const
   output_value (dry (), "dry", log);
 }
 
-void 
-Pet::load_syntax (Syntax& syntax, AttributeList&)
-{
-  syntax.add ("wet", "mm/h", Value::LogOnly, 
-	      "Potential evapotranspiration for a wet system.");
-  syntax.add ("dry", "mm/h", Value::LogOnly, 
-	      "Potential evapotranspiration for a dry system.");
-  syntax.add ("reference_evapotranspiration", "mm/h", Value::LogOnly, 
-	      "Reference evapotranspiration for a dry system.");
-}
-
 Pet::Pet (Block& al)
   : ModelAListed (al.alist ())
 { }
@@ -85,5 +74,14 @@ static struct PetInit : public DeclareComponent
 The 'pet' component should calculate the potential evapotranspiration\n\
 from meteorological data, as well as the crop and soil state.")
   { }
+  void load_syntax (Frame& frame)
+  {
+    frame.add ("wet", "mm/h", Value::LogOnly, 
+               "Potential evapotranspiration for a wet system.");
+    frame.add ("dry", "mm/h", Value::LogOnly, 
+               "Potential evapotranspiration for a dry system.");
+    frame.add ("reference_evapotranspiration", "mm/h", Value::LogOnly, 
+               "Reference evapotranspiration for a dry system.");
+  }
 } Pet_init;
 

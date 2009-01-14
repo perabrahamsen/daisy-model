@@ -24,8 +24,7 @@
 #include "phenology.h"
 #include "block.h"
 #include "log.h"
-#include "syntax.h"
-#include "alist.h"
+#include "frame.h"
 #include "librarian.h"
 
 const char *const Phenology::component = "phenology";
@@ -54,23 +53,6 @@ bool
 Phenology::mature () const
 { return DS >= 2.0; }
 
-void 
-Phenology::load_syntax (Syntax& syntax, AttributeList& alist)
-{
-  // Variables.
-  syntax.add ("DAP", "d", Value::State, "Days after planting.");
-  alist.add ("DAP", 0.0);
-  syntax.add ("DS", Value::None (), Value::State,
-	      "Development Stage.");
-  alist.add ("DS", -1.0);
-  syntax.add ("partial_day_length", "h", Value::State,
-	      "Number of light hours this day, so far.");
-  alist.add ("partial_day_length", 0.0);
-  syntax.add ("day_length", "h", Value::State,
-	      "Number of light hours yesterday.");
-  alist.add ("day_length", 0.0);
-}
-
 Phenology::Phenology (Block& al)
   : ModelLogable (al.name ("type")),
     // State.
@@ -89,5 +71,20 @@ static struct PhenologyInit : public DeclareComponent
     : DeclareComponent (Phenology::component, "\
 The development process.")
   { }
+  void load_frame (Frame& frame) const
+  {
+    // Variables.
+    frame.add ("DAP", "d", Value::State, "Days after planting.");
+    frame.add ("DAP", 0.0);
+    frame.add ("DS", Value::None (), Value::State,
+                "Development Stage.");
+    frame.add ("DS", -1.0);
+    frame.add ("partial_day_length", "h", Value::State,
+                "Number of light hours this day, so far.");
+    frame.add ("partial_day_length", 0.0);
+    frame.add ("day_length", "h", Value::State,
+                "Number of light hours yesterday.");
+    frame.add ("day_length", 0.0);
+  }
 } Phenology_init;
 

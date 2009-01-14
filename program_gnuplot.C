@@ -27,6 +27,7 @@
 #include "path.h"
 #include "memutils.h"
 #include "librarian.h"
+#include "frame.h"
 #include <string>
 #include <set>
 #include <fstream>
@@ -121,34 +122,33 @@ ProgramGnuplot::ProgramGnuplot (Block& al)
 ProgramGnuplot::~ProgramGnuplot ()
 { sequence_delete (graph.begin (), graph.end ()); }
 
-static struct ProgramGnuplotSyntax
+static struct ProgramGnuplotSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ProgramGnuplot (al); }
+  Model* make (Block& al) const
+  { return new ProgramGnuplot (al); }
   ProgramGnuplotSyntax ()
+    : DeclareModel (Program::component, "gnuplot",
+               "Generate a gnuplot command file.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description",
-               "Generate a gnuplot command file."); 
-    syntax.add ("command_file", Value::String, Value::Const, "\
+    frame.add ("command_file", Value::String, Value::Const, "\
 File name for gnuplot commands.");
-    alist.add ("command_file", "daisy.gnuplot");
-    syntax.add ("cd", Value::Boolean, Value::Const, "\
+    frame.add ("command_file", "daisy.gnuplot");
+    frame.add ("cd", Value::Boolean, Value::Const, "\
 Set this flag to add a 'cd' command to the current working directory.\n\
 This is useful under MS Windows when dragging the file to a gnuplot icon.");
 #if defined(__unix)
-    alist.add ("cd", false);
+    frame.add ("cd", false);
 #else
-    alist.add ("cd", true);
+    frame.add ("cd", true);
 #endif
-    syntax.add ("extra", Value::String, Value::Const, 
+    frame.add ("extra", Value::String, Value::Const, 
                 Value::Sequence, "List of extra gnuplot commands.\n\
 The commands will be inserted right before the list of graphs.");
-    alist.add ("extra", std::vector<symbol> ());
+    frame.add ("extra", std::vector<symbol> ());
                 
-    syntax.add_object ("graph", Gnuplot::component, Value::State, 
+    frame.add_object ("graph", Gnuplot::component, Value::State, 
                        Value::Sequence, "Graphs to plot.");
-    Librarian::add_type (Program::component, "gnuplot", alist, syntax, &make);
   }
 } ProgramGnuplot_syntax;

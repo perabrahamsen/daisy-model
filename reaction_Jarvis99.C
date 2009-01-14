@@ -32,6 +32,7 @@
 #include "geometry.h"
 #include "soil.h"
 #include "treelog.h"
+#include "frame.h"
 
 struct ReactionJarvis99 : public Reaction
 {
@@ -185,48 +186,42 @@ ReactionJarvis99::ReactionJarvis99 (Block& al)
     E (R_to_E (0.0))
 { }
 
-static struct ReactionJarvis99Syntax
+static struct ReactionJarvis99Syntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ReactionJarvis99 (al); }
-  static void load_syntax (Syntax& syntax, AttributeList& alist)
+  Model* make (Block& al) const
+  { return new ReactionJarvis99 (al); }
+  ReactionJarvis99Syntax ()
+    : DeclareModel (Reaction::component, "colgen_Jarvis99", "\
+Colloid generation emulating the MACRO model.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    syntax.add ("colloid", Value::String, Value::Const,
+    frame.alist ().add_strings ("cite", "macro-colloid");
+    frame.add ("colloid", Value::String, Value::Const,
 		"Colloid to generate.");
-    syntax.add ("Mmax", "g/g", Check::non_negative (), Value::Const,
+    frame.add ("Mmax", "g/g", Check::non_negative (), Value::Const,
                 "Maximum amount of detachable particles.");
-    // alist.add ("Mmax", 0.165);
-    syntax.add ("kd", "g/J", Check::non_negative (), Value::Const,
+    // frame.add ("Mmax", 0.165);
+    frame.add ("kd", "g/J", Check::non_negative (), Value::Const,
                 "Detachment rate coefficient.");
-    // alist.add ("kd", 15.0);
-    syntax.add ("kr", "g/cm^2/h", Check::non_negative (), Value::Const,
+    // frame.add ("kd", 15.0);
+    frame.add ("kr", "g/cm^2/h", Check::non_negative (), Value::Const,
                 "Replenishment rate coefficient.");
-    // alist.add ("kr", 0.1 /* [g/m^2/h] */ / (100.0 /* [cm/m] */ * 100.0));
-    syntax.add ("zi", "cm", Check::positive (), Value::Const,
+    // frame.add ("kr", 0.1 /* [g/m^2/h] */ / (100.0 /* [cm/m] */ * 100.0));
+    frame.add ("zi", "cm", Check::positive (), Value::Const,
                 "Thickness of surface soil layer.");
-    // alist.add ("zi", 0.1);
-    syntax.add ("Ms", "g/g", Check::non_negative (), Value::OptionalState,
+    // frame.add ("zi", 0.1);
+    frame.add ("Ms", "g/g", Check::non_negative (), Value::OptionalState,
                 "Current concentration of detachable particles in top soil.\n\
 By default, 10% of Mmax.");
-    syntax.add ("As", "g/cm^2", Value::LogOnly, 
+    frame.add ("As", "g/cm^2", Value::LogOnly, 
                 "Current amount of detachable particles in top soil.");
-    syntax.add ("D", "g/cm^2/h", Value::LogOnly, 
+    frame.add ("D", "g/cm^2/h", Value::LogOnly, 
                 "Depletion of detachable particles from top soil.");
-    syntax.add ("P", "g/cm^2/h", Value::LogOnly, 
+    frame.add ("P", "g/cm^2/h", Value::LogOnly, 
                 "Replenishment of detachable particles to top soil.");
-    syntax.add ("E", "J/cm^2/mm", Value::LogOnly, 
+    frame.add ("E", "J/cm^2/mm", Value::LogOnly, 
                 "Kinetic energy in rain.");
-  }
-  ReactionJarvis99Syntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", 
-	       "Colloid generation emulating the MACRO model.");
-    alist.add_strings ("cite", "macro-colloid");
-    load_syntax (syntax, alist);
-    Librarian::add_type (Reaction::component, "colgen_Jarvis99",
-                         alist, syntax, &make);
   }
 } ReactionJarvis99syntax;
 

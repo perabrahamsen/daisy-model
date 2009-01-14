@@ -29,6 +29,7 @@
 #include "check.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "frame.h"
 #include <sstream>
 
 struct Rootdens_AP : public Rootdens
@@ -126,31 +127,29 @@ Rootdens_AP::Rootdens_AP (Block& al)
   
 { }
 
-static struct Rootdens_APSyntax
+static struct Rootdens_APSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new Rootdens_AP (al); }
+  Model* make (Block& al) const
+  { return new Rootdens_AP (al); }
   Rootdens_APSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    Rootdens::load_base (syntax, alist);
-    alist.add ("description", 
+    : DeclareModel (Rootdens::component, "Anders Pedersen", 
 	       "Use exponential function for root density.\n\
 In this variant of Gerwitz and Page, 'a' is specified as a function of\n\
-development stage.");
-    alist.add_strings ("cite", "gp74");
+development stage.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add_strings ("cite", "gp74");
 
-    syntax.add ("a_DS", "DS", "cm^-1", Value::Const, 
+    frame.add ("a_DS", "DS", "cm^-1", Value::Const, 
                 "Form parameter as a function of development stage.");
-    syntax.add ("q", "cm", Check::non_negative (), Value::Const, 
+    frame.add ("q", "cm", Check::non_negative (), Value::Const, 
                 "Extra root length below max rooting depth.\n\
 Root density will decrease linearly from the GP calculated amount\n\
 at max rooting depth to zero 'q' further down.");
-    syntax.add ("a", "cm^-1", Value::LogOnly, "Form parameter.\n\
+    frame.add ("a", "cm^-1", Value::LogOnly, "Form parameter.\n\
 Calculated from 'a_DS'.");
-    syntax.add ("L0", "cm/cm^3", Value::LogOnly,
+    frame.add ("L0", "cm/cm^3", Value::LogOnly,
                 "Root density at soil surface.");
-    Librarian::add_type (Rootdens::component, "Anders Pedersen", alist, syntax, &make);
   }
 } Rootdens_AP_syntax;

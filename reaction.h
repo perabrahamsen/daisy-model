@@ -53,9 +53,6 @@ public:
   virtual void output (Log&) const = 0;
 
   // Create and Destroy.
-  static const AttributeList& nitrification_model ();
-  static const AttributeList& denitrification_model ();
-  static const AttributeList& NH4_sorption_model ();
 public:
   virtual void initialize (const Units& units, const Geometry& geo,
                            const Soil&, const SoilWater&, const SoilHeat&, 

@@ -29,6 +29,7 @@
 #include "number.h"
 #include "scope_exchange.h"
 #include "treelog.h"
+#include "frame.h"
 
 static const double Mw = 14.0; //The molecular weight for N [g mol¯1]
 static const symbol LAI_symbol ("LAI");
@@ -171,31 +172,27 @@ rubiscoNdist_expr
     }
 }
 
-static struct rubiscoNdist_exprSyntax
+static struct rubiscoNdist_exprSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new rubiscoNdist_expr (al); }
-  static void load_syntax (Syntax& syntax, AttributeList& alist)
-  {
-    syntax.add ("f_photo", Value::None (), Check::positive (), Value::Const,
-                "Fraction of photosynthetically active N in canopy. According to (Boegh et al., 2002) f_photo = 0.75. However, non-functional N is already substracted from leaf-N in the cropN_std module, therefore f_photo = 1.0 as default.");
-    alist.add ("f_photo", 1.0);
-
-    syntax.add_object ("value", Number::component, 
-                       Value::Const, Value::Singleton, "\
-Expression that evaluates to the relative rubisco N intesity where 1 is the value in top of the canopy.");
-    syntax.order ("value");
-  }  
+  Model* make (Block& al) const
+  { return new rubiscoNdist_expr (al); }
 
   rubiscoNdist_exprSyntax ()
+    : DeclareModel (RubiscoNdist::component, "expr", 
+	       "expr rubisco N-distribution model in the canopy.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", 
-	       "expr rubisco N-distribution model in the canopy.");
 
-    load_syntax (syntax, alist);
-    Librarian::add_type (RubiscoNdist::component, "expr", alist, syntax, &make);
+    frame.add ("f_photo", Value::None (), Check::positive (), Value::Const,
+                "Fraction of photosynthetically active N in canopy. According to (Boegh et al., 2002) f_photo = 0.75. However, non-functional N is already substracted from leaf-N in the cropN_std module, therefore f_photo = 1.0 as default.");
+    frame.add ("f_photo", 1.0);
+
+    frame.add_object ("value", Number::component, 
+                       Value::Const, Value::Singleton, "\
+Expression that evaluates to the relative rubisco N intesity where 1 is the value in top of the canopy.");
+    frame.order ("value");
+
   }
 } rubiscoNdist_exprsyntax;
 

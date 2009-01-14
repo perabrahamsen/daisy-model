@@ -32,6 +32,7 @@
 #include "path.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "frame.h"
 #include <sstream>
 #include <fstream>
 #include <algorithm>
@@ -861,20 +862,19 @@ PrinterFile::PrinterFile (Block& al)
 PrinterFile::~PrinterFile ()
 { }
 
-static struct PrinterFileSyntax
+static struct PrinterFileSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new PrinterFile (al); }
+  Model* make (Block& al) const
+  { return new PrinterFile (al); }
 
   PrinterFileSyntax ()
+    : DeclareModel (Printer::component, "file", 
+               "Print internal datastructures with lots of parentheses.")
+  { }
+  void load_frame (Frame& frame) const
   { 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", 
-               "Print internal datastructures with lots of parentheses.");
-    syntax.add ("where", Value::String, Value::Const,
+    frame.add ("where", Value::String, Value::Const,
                 "File to print in.");
-    syntax.order ("where");
-    Librarian::add_type (Printer::component, "file", alist, syntax, &make);
+    frame.order ("where");
   }
 } PrinterFile_syntax;

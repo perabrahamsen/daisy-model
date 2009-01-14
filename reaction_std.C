@@ -30,6 +30,7 @@
 #include "assertion.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 #include <memory>
 
 struct ReactionStandard : public Reaction
@@ -104,26 +105,25 @@ struct ReactionStandard : public Reaction
   { }
 };
 
-static struct ReactionStandardSyntax
+static struct ReactionStandardSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new ReactionStandard (al); }
+  Model* make (Block& al) const
+  { return new ReactionStandard (al); }
   ReactionStandardSyntax ()
+    : DeclareModel (Reaction::component, "default", 
+	       "Transformation between two soil chemicals.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
 
-    alist.add ("description", 
-	       "Transformation between two soil chemicals.");
-    syntax.add_object ("transform", Transform::component,
+    frame.add_object ("transform", Transform::component,
                        "Tranformation process between 'A' to 'B'.");
-    syntax.add ("A", Value::String, Value::Const,
+    frame.add ("A", Value::String, Value::Const,
 		"Name of first soil component in equilibrium.");
-    syntax.add ("B", Value::String, Value::Const,
+    frame.add ("B", Value::String, Value::Const,
 		"Name of second soil component in equilibrium.");
-    syntax.add ("S_AB", "g/cm^3/h", Value::LogOnly, Value::Sequence,
+    frame.add ("S_AB", "g/cm^3/h", Value::LogOnly, Value::Sequence,
 		"Converted from A to B this timestep (may be negative).");
 
-    Librarian::add_type (Reaction::component, "default", alist, syntax, &make);
   }
 } ReactionStandard_syntax;

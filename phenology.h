@@ -61,7 +61,6 @@ public:
 
   // Create and Destroy.
 public:
-  static void load_syntax (Syntax& syntax, AttributeList& alist);
   Phenology (Block&);
   ~Phenology ();
 };
