@@ -23,14 +23,14 @@
 #include "unit_model.h"
 #include "check.h"
 #include "librarian.h"
-#include "alist.h"
-#include "syntax.h"
+#include "frame.h"
 #include "block.h"
 #include "mathlib.h"
 #include "convert.h"
 #include "units.h"
 #include "model.h"
 #include "frame.h"
+#include "memutils.h"
 #include <sstream>
 
 const char *const MUnit::component = "unit";
@@ -135,16 +135,16 @@ UnitSI::find_base (Block& al)
 static struct UnitSISyntax : public DeclareBase
 {
   UnitSISyntax ()
-    : DeclareBase (Unit::component, "SI", "\
+    : DeclareBase (MUnit::component, "SI", "\
 Base parameterization for all SI based units.")
   {
   }
   void load_frame (Frame& frame) const
   {
-    for (size_t i = 0; i < base_unit_size; i++)
+    for (size_t i = 0; i < UnitSI::base_unit_size; i++)
       {
-        const symbol unit = base_unit[i].unit;
-        const symbol dimension = base_unit[i].dimension;
+        const symbol unit = UnitSI::base_unit[i].unit;
+        const symbol dimension = UnitSI::base_unit[i].dimension;
         frame.add (dimension, Value::Integer, Value::Const, "\
 Dimension, base unit [" + unit + "].");
         frame.add (dimension, 0);
@@ -213,7 +213,7 @@ struct DeclareSIFactor : public DeclareParam
                    const int amount_of_substance_,
                    const int luminous_intensity_,
                    const symbol description)
-    : DeclareParam (Unit::component, name, "SIfactor", description),
+    : DeclareParam (MUnit::component, name, "SIfactor", description),
       factor (factor_),
       length (length_),
       mass (mass_),
@@ -234,7 +234,7 @@ struct DeclareSIFactor : public DeclareParam
     frame.add ("luminous_intensity", luminous_intensity);
     frame.add ("factor", factor);
   }
-}
+};
 
 static struct UnitSIFactorSyntax : public DeclareModel
 {
@@ -243,12 +243,12 @@ static struct UnitSIFactorSyntax : public DeclareModel
   Model* make (Block& al) const
   { return new UnitSIFactor (al); }
 
-  static void add (const symbol name, const double factor,
-                   const int length, const int mass, const int time,
-                   const int electric_current,
-                   const int thermodynamic_temperature,
-                   const int amount_of_substance, const int luminous_intensity,
-                   const symbol description)
+  void add (const symbol name, const double factor,
+            const int length, const int mass, const int time,
+            const int electric_current,
+            const int thermodynamic_temperature,
+            const int amount_of_substance, const int luminous_intensity,
+            const symbol description)
   {
     declarations.push_back (new DeclareSIFactor (name, factor, length, mass,
                                                  time,electric_current,
@@ -260,16 +260,7 @@ static struct UnitSIFactorSyntax : public DeclareModel
   UnitSIFactorSyntax ()
     : DeclareModel (MUnit::component, "SIfactor", "SI", "\
 Connvert to SI base units by multiplying with a factor.")
-  { }
-  void load_frame (Frame& frame) const
-  {
-    static const symbol name ("SIfactor");
-    
-    // Add the 'SIfactor' base model.
-    UnitSI::load_syntax (syntax, alist);
-    frame.add ("factor", Value::None (), Check::non_zero (), Value::Const, "\
-Factor to multiply with to get base unit.");
-
+  { 
     // Prefix constants.
     static const double p_n = 1e-9; // Nano-
     static const double p_u = 1e-6; // Micro-
@@ -291,315 +282,323 @@ Factor to multiply with to get base unit.");
     static const double u_g = 1.0 / p_k;         // Gram.
 
     // Unitless.
-    add (Value::None (), 1.0, name, syntax, alist, 0, 0, 0, 0, 0, 0, 0,
+    add (Value::None (), 1.0, 0, 0, 0, 0, 0, 0, 0,
          "Unitless.");
-    add (Value::Fraction (), 1.0, name, syntax, alist, 0, 0, 0, 0, 0, 0, 0,
+    add (Value::Fraction (), 1.0, 0, 0, 0, 0, 0, 0, 0,
          "Unitless.");
-    add ("", 1.0, name, syntax, alist, 0, 0, 0, 0, 0, 0, 0,
+    add ("", 1.0, 0, 0, 0, 0, 0, 0, 0,
          "Unitless.");
-    add ("none", 1.0, name, syntax, alist, 0, 0, 0, 0, 0, 0, 0,
+    add ("none", 1.0, 0, 0, 0, 0, 0, 0, 0,
          "Unitless.");
-    add ("%", 0.01, name, syntax, alist, 0, 0, 0, 0, 0, 0, 0,
+    add ("%", 0.01, 0, 0, 0, 0, 0, 0, 0,
          "Percent.");
-    add ("ppm", p_u, name, syntax, alist, 0, 0, 0, 0, 0, 0, 0,
+    add ("ppm", p_u, 0, 0, 0, 0, 0, 0, 0,
          "Part per million.");
-    add ("mg N/kg dry soil", 1e-6, name, syntax, alist, 0, 0, 0, 0, 0, 0, 0,
+    add ("mg N/kg dry soil", 1e-6, 0, 0, 0, 0, 0, 0, 0,
          "Nitrogen concentration in dry soil.");
-    add ("cm^3/cm^3", p_c_3 / p_c_3, name, syntax, alist,
+    add ("cm^3/cm^3", p_c_3 / p_c_3,
          0, 0, 0, 0, 0, 0, 0,
          "Soil water fraction.");
-    add ("cm^3 H2O/cm^3", p_c_3 / p_c_3, name, syntax, alist,
+    add ("cm^3 H2O/cm^3", p_c_3 / p_c_3,
          0, 0, 0, 0, 0, 0, 0,
          "Soil water fraction.");
 
     // Length.
-    add ("m", 1.0, name, syntax, alist, 1, 0, 0, 0, 0, 0, 0,
+    add ("m", 1.0, 1, 0, 0, 0, 0, 0, 0,
          "Meter.");
-    add ("cm", p_c, name, syntax, alist, 1, 0, 0, 0, 0, 0, 0,
+    add ("cm", p_c, 1, 0, 0, 0, 0, 0, 0,
          "Centimeter.");
-    add ("mm", p_m, name, syntax, alist, 1, 0, 0, 0, 0, 0, 0,
+    add ("mm", p_m, 1, 0, 0, 0, 0, 0, 0,
          "Millimeter.");
 
-    add ("m^2", 1.0, name, syntax, alist, 2, 0, 0, 0, 0, 0, 0,
+    add ("m^2", 1.0, 2, 0, 0, 0, 0, 0, 0,
          "Square meter.");
-    add ("cm^2", p_c_2, name, syntax, alist, 2, 0, 0, 0, 0, 0, 0,
+    add ("cm^2", p_c_2, 2, 0, 0, 0, 0, 0, 0,
          "Square centimeter.");
-    add ("ha", u_ha, name, syntax, alist, 2, 0, 0, 0, 0, 0, 0,
+    add ("ha", u_ha, 2, 0, 0, 0, 0, 0, 0,
          "Hectare.");
 
-    add ("m^3", 1.0, name, syntax, alist, 3, 0, 0, 0, 0, 0, 0,
+    add ("m^3", 1.0, 3, 0, 0, 0, 0, 0, 0,
          "Cube meter.");
-    add ("cm^3", p_c_3, name, syntax, alist, 3, 0, 0, 0, 0, 0, 0,
+    add ("cm^3", p_c_3, 3, 0, 0, 0, 0, 0, 0,
          "Cube centimeter.");
 
-    add ("m^-1", 1.0, name, syntax, alist, -1, 0, 0, 0, 0, 0, 0,
+    add ("m^-1", 1.0, -1, 0, 0, 0, 0, 0, 0,
          "Per meter.");
-    add ("cm^-1", 1.0 / p_c, name, syntax, alist, -1, 0, 0, 0, 0, 0, 0,
+    add ("cm^-1", 1.0 / p_c, -1, 0, 0, 0, 0, 0, 0,
          "Per centimeter.");
-    add ("mm^-1", 1.0 / p_c, name, syntax, alist, -1, 0, 0, 0, 0, 0, 0,
+    add ("mm^-1", 1.0 / p_c, -1, 0, 0, 0, 0, 0, 0,
          "Per millimeter.");
 
-    add ("m^-2", 1.0, name, syntax, alist, -2, 0, 0, 0, 0, 0, 0,
+    add ("m^-2", 1.0, -2, 0, 0, 0, 0, 0, 0,
          "Per aquare meter.");
-    add ("cm^-2", 1.0 / p_c_2, name, syntax, alist, -2, 0, 0, 0, 0, 0, 0,
+    add ("cm^-2", 1.0 / p_c_2, -2, 0, 0, 0, 0, 0, 0,
          "Per aquare centimeter.");
 
     // Mass.
-    add ("kg", p_k * u_g, name, syntax, alist, 0, 1, 0, 0, 0, 0, 0,
+    add ("kg", p_k * u_g, 0, 1, 0, 0, 0, 0, 0,
          "Kilogram.");
-    add ("g", u_g, name, syntax, alist, 0, 1, 0, 0, 0, 0, 0,
+    add ("g", u_g, 0, 1, 0, 0, 0, 0, 0,
          "Gram.");
 
     // Time.
-    add ("s", 1.0, name, syntax, alist, 0, 0, 1, 0, 0, 0, 0,
+    add ("s", 1.0, 0, 0, 1, 0, 0, 0, 0,
          "Second.");
-    add ("h", u_h, name, syntax, alist, 0, 0, 1, 0, 0, 0, 0,
+    add ("h", u_h, 0, 0, 1, 0, 0, 0, 0,
          "Hour.");
-    add ("d", u_d, name, syntax, alist, 0, 0, 1, 0, 0, 0, 0,
+    add ("d", u_d, 0, 0, 1, 0, 0, 0, 0,
          "Day.");
 
-    add ("s^-1", 1.0, name, syntax, alist, 0, 0, -1, 0, 0, 0, 0,
+    add ("s^-1", 1.0, 0, 0, -1, 0, 0, 0, 0,
          "Second.");
-    add ("h^-1", 1.0 / u_h, name, syntax, alist, 0, 0, -1, 0, 0, 0, 0,
+    add ("h^-1", 1.0 / u_h, 0, 0, -1, 0, 0, 0, 0,
          "Hour.");
-    add ("d^-1", 1.0 / u_d, name, syntax, alist, 0, 0, -1, 0, 0, 0, 0,
+    add ("d^-1", 1.0 / u_d, 0, 0, -1, 0, 0, 0, 0,
          "Day.");
 
     // Electric currect.
-    add ("A", 1.0, name, syntax, alist, 0, 0, 0, 1, 0, 0, 0,
+    add ("A", 1.0, 0, 0, 0, 1, 0, 0, 0,
          "Ampere.");
 
     // Thermodynamic temperature.
-    add ("K", 1.0, name, syntax, alist, 0, 0, 0, 0, 1, 0, 0,
+    add ("K", 1.0, 0, 0, 0, 0, 1, 0, 0,
          "Kelvin.");
 
     // Amount of substance.
-    add ("mol", 1.0, name, syntax, alist, 0, 0, 0, 0, 0, 1, 0,
+    add ("mol", 1.0, 0, 0, 0, 0, 0, 1, 0,
          "Mole.");
     
     // Luminous intensity.
-    add ("cd", 1.0, name, syntax, alist, 0, 0, 0, 0, 0, 0, 1,
+    add ("cd", 1.0, 0, 0, 0, 0, 0, 0, 1,
          "Candela.");
     
     // Speed.
-    add ("m/s", 1.0, name, syntax, alist, 1, 0, -1, 0, 0, 0, 0,
+    add ("m/s", 1.0, 1, 0, -1, 0, 0, 0, 0,
          "Base speed.");
-    add ("m s^-1", 1.0, name, syntax, alist, 1, 0, -1, 0, 0, 0, 0,
+    add ("m s^-1", 1.0, 1, 0, -1, 0, 0, 0, 0,
          "Base speed.");
-    add ("mm/s", p_m / u_s, name, syntax, alist, 1, 0, -1, 0, 0, 0, 0,
+    add ("mm/s", p_m / u_s, 1, 0, -1, 0, 0, 0, 0,
          "Percolation intensity.");
-    add ("mm/h", p_m / u_h, name, syntax, alist, 1, 0, -1, 0, 0, 0, 0,
+    add ("mm/h", p_m / u_h, 1, 0, -1, 0, 0, 0, 0,
          "Percolation intensity.");
-    add ("mm/d", p_m / u_d, name, syntax, alist, 
+    add ("mm/d", p_m / u_d, 
          1, 0, -1, 0, 0, 0, 0,
          "Percolation intensity.");
-    add ("cm/h", p_c / u_h, name, syntax, alist, 1, 0, -1, 0, 0, 0, 0,
+    add ("cm/h", p_c / u_h, 1, 0, -1, 0, 0, 0, 0,
          "Soil water movement.");
-    add ("cm/d", p_c / u_d, name, syntax, alist, 
+    add ("cm/d", p_c / u_d, 
          1, 0, -1, 0, 0, 0, 0,
          "Soil water movement.");
 
     // Mass per length.
-    add ("kg/m", 1e0, name, syntax, alist, -1, 1, 0, 0, 0, 0, 0,
+    add ("kg/m", 1e0, -1, 1, 0, 0, 0, 0, 0,
          "Base mass per length.");
 
     // Mass per length flux.
-    add ("kg/m/s", p_k * u_g, name, syntax, alist, -1, 1, -1, 0, 0, 0, 0,
+    add ("kg/m/s", p_k * u_g, -1, 1, -1, 0, 0, 0, 0,
          "Base mass per length flux.");
-    add ("ng/mm/h", p_n * u_g / p_m / u_h, name, syntax, alist,
+    add ("ng/mm/h", p_n * u_g / p_m / u_h,
          -1, 1, -1, 0, 0, 0, 0,
          "Mass per length flux.");
-    add ("g/cm/h", u_g / p_c / u_h, name, syntax, alist,
+    add ("g/cm/h", u_g / p_c / u_h,
          -1, 1, -1, 0, 0, 0, 0,
          "Base mass per length flux.");
     
     // Mass per area.
-    add ("kg/m^2", p_k * u_g, name, syntax, alist, -2, 1, 0, 0, 0, 0, 0,
+    add ("kg/m^2", p_k * u_g, -2, 1, 0, 0, 0, 0, 0,
          "Base mass per area.");
-    add ("mg/m^2", p_m * u_g, name, syntax, alist, -2, 1, 0, 0, 0, 0, 0,
+    add ("mg/m^2", p_m * u_g, -2, 1, 0, 0, 0, 0, 0,
          "Crop scale pesticide per area.");
-    add ("g/m^2", u_g, name, syntax, alist, -2, 1, 0, 0, 0, 0, 0,
+    add ("g/m^2", u_g, -2, 1, 0, 0, 0, 0, 0,
          "Crop scale mass per area.");
-    add ("g DM/m^2", u_g, name, syntax, alist, -2, 1, 0, 0, 0, 0, 0,
+    add ("g DM/m^2", u_g, -2, 1, 0, 0, 0, 0, 0,
          "Crop scale dry matter per area.");
-    add ("g/cm^2", u_g / p_c_2, name, syntax, alist, -2, 1, 0, 0, 0, 0, 0,
+    add ("g/cm^2", u_g / p_c_2, -2, 1, 0, 0, 0, 0, 0,
          "Soil scale mass per area.");
-    add ("g N/cm^2", u_g / p_c_2, name, syntax, alist, -2, 1, 0, 0, 0, 0, 0,
+    add ("g N/cm^2", u_g / p_c_2, -2, 1, 0, 0, 0, 0, 0,
          "Soil scale nitrogen per area.");
-    add ("g C/cm^2", u_g / p_c_2, name, syntax, alist, -2, 1, 0, 0, 0, 0, 0,
+    add ("g C/cm^2", u_g / p_c_2, -2, 1, 0, 0, 0, 0, 0,
          "Soil scale carbon per area.");
-    add ("g N/m^2", u_g, name, syntax, alist, -2, 1, 0, 0, 0, 0, 0,
+    add ("g N/m^2", u_g, -2, 1, 0, 0, 0, 0, 0,
          "Crop scale nitrogen per area.");
-    add ("g C/m^2", u_g, name, syntax, alist, -2, 1, 0, 0, 0, 0, 0,
+    add ("g C/m^2", u_g, -2, 1, 0, 0, 0, 0, 0,
          "Crop scale carbon per area.");
-    add ("g/ha", u_g / u_ha, name, syntax, alist, -2, 1, 0, 0, 0, 0, 0,
+    add ("g/ha", u_g / u_ha, -2, 1, 0, 0, 0, 0, 0,
          "Field scale pesticide mass per area.");
-    add ("g w.w./m^2", u_g, name, syntax, alist, -2, 1, 0, 0, 0, 0, 0,
+    add ("g w.w./m^2", u_g, -2, 1, 0, 0, 0, 0, 0,
          "Wet weight per area.");
-    add ("kg/ha", p_k * u_g / u_ha, name, syntax, alist, -2, 1, 0, 0, 0, 0, 0,
+    add ("kg/ha", p_k * u_g / u_ha, -2, 1, 0, 0, 0, 0, 0,
          "Field scale mass per area.");
-    add ("kg N/ha", p_k * u_g / u_ha, name, syntax, alist, -2, 1, 0, 0, 0, 0, 0,
+    add ("kg N/ha", p_k * u_g / u_ha, -2, 1, 0, 0, 0, 0, 0,
          "Field scale nitrogen per area.");
-    add ("kg C/ha", p_k * u_g / u_ha, name, syntax, alist, -2, 1, 0, 0, 0, 0, 0,
+    add ("kg C/ha", p_k * u_g / u_ha, -2, 1, 0, 0, 0, 0, 0,
          "Field scale carbon per area.");
-    add ("kg w.w./ha", p_k * u_g / u_ha, name, syntax, alist,
+    add ("kg w.w./ha", p_k * u_g / u_ha,
          -2, 1, 0, 0, 0, 0, 0,
          "Wet weight per area.");
-    add ("Mg/ha", p_M * u_g / u_ha, name, syntax, alist, 
+    add ("Mg/ha", p_M * u_g / u_ha, 
          -2, 1, 0, 0, 0, 0, 0,
          "Ton per hectar.");
-    add ("t/ha", p_M * u_g / u_ha, name, syntax, alist, 
+    add ("t/ha", p_M * u_g / u_ha, 
          -2, 1, 0, 0, 0, 0, 0,
          "Ton per hectar.");
-    add ("Mg DM/ha", p_M * u_g / u_ha, name, syntax, alist, 
+    add ("Mg DM/ha", p_M * u_g / u_ha, 
          -2, 1, 0, 0, 0, 0, 0,
          "Ton dry matter per hectar.");
-    add ("Mg w.w./ha", p_M * u_g / u_ha, name, syntax, alist, 
+    add ("Mg w.w./ha", p_M * u_g / u_ha, 
          -2, 1, 0, 0, 0, 0, 0,
          "Wet weight per area.");
-    add ("T w.w./ha", p_M * u_g / u_ha, name, syntax, alist, 
+    add ("T w.w./ha", p_M * u_g / u_ha, 
          -2, 1, 0, 0, 0, 0, 0,
          "Wet weight per area.");
 
     // Mass per area flux.
-    add ("kg/m^2/s", p_k * u_g, name, syntax, alist, -2, 1, -1, 0, 0, 0, 0,
+    add ("kg/m^2/s", p_k * u_g, -2, 1, -1, 0, 0, 0, 0,
          "Base mass per area flux.");
     add (Unit::mass_per_area_per_time ().name (),
-         p_k * u_g, name, syntax, alist, -2, 1, -1, 0, 0, 0, 0,
+         p_k * u_g, -2, 1, -1, 0, 0, 0, 0,
          "Base mass per area flux.");
-    add ("kg m^-2 s^-1", p_k * u_g, name, syntax, alist, -2, 1, -1, 0, 0, 0, 0,
+    add ("kg m^-2 s^-1", p_k * u_g, -2, 1, -1, 0, 0, 0, 0,
          "Base mass per area flux.");
-    add ("g/m^2/h", u_g / u_h, name, syntax, alist, 
+    add ("g/m^2/h", u_g / u_h, 
          -2, 1, -1, 0, 0, 0, 0,
          "Gram per square meter per hour.");
-    add ("g/cm^2/h", u_g / p_c_2 / u_h, name, syntax, alist, 
+    add ("g/cm^2/h", u_g / p_c_2 / u_h, 
          -2, 1, -1, 0, 0, 0, 0,
          "Mass per area flux.");
-    add ("g N/m^2/h", u_g /  u_h, name, syntax, alist, 
+    add ("g N/m^2/h", u_g /  u_h, 
          -2, 1, -1, 0, 0, 0, 0,
          "Nitrogen per aquare meter per hour.");
-    add ("g N/cm^2/h", u_g / p_c_2 / u_h, name, syntax, alist, 
+    add ("g N/cm^2/h", u_g / p_c_2 / u_h, 
          -2, 1, -1, 0, 0, 0, 0,
          "Nitrogen per aquare centimeter per hour.");
-    add ("g/ha/h", u_g / u_ha / u_h, name, syntax, alist,
+    add ("g/ha/h", u_g / u_ha / u_h,
          -2, 1, -1, 0, 0, 0, 0,
          "Pesticide application.");
-    add ("kg N/ha/h", p_k * u_g / u_ha / u_h, name, syntax, alist,
+    add ("kg N/ha/h", p_k * u_g / u_ha / u_h,
          -2, 1, -1, 0, 0, 0, 0,
          "Field scale application and removal of nitrogen.");
-    add ("kg C/ha/h", p_k * u_g / u_ha / u_h, name, syntax, alist,
+    add ("kg C/ha/h", p_k * u_g / u_ha / u_h,
          -2, 1, -1, 0, 0, 0, 0,
          "Field scale application and removal of carbon.");
-    add ("kg/ha/h", p_k * u_g / u_ha / u_h, name, syntax, alist,
+    add ("kg/ha/h", p_k * u_g / u_ha / u_h,
          -2, 1, -1, 0, 0, 0, 0,
          "Harvest and fertilizing.");
-    add ("kg N/ha/d", p_k * u_g / u_ha / u_d, name, syntax, alist,
+    add ("kg N/ha/d", p_k * u_g / u_ha / u_d,
          -2, 1, -1, 0, 0, 0, 0,
          "Field scale nitrogen.");
-    add ("kg C/ha/d", p_k * u_g / u_ha / u_d, name, syntax, alist,
+    add ("kg C/ha/d", p_k * u_g / u_ha / u_d,
          -2, 1, -1, 0, 0, 0, 0,
          "Field scale carbon.");
-    add ("kg/ha/y", p_k * u_g / u_ha / u_y, name, syntax, alist,
+    add ("kg/ha/y", p_k * u_g / u_ha / u_y,
          -2, 1, -1, 0, 0, 0, 0,
          "Deposition.");
-    add ("kgN/ha/year", p_k * u_g / u_ha / u_y, name, syntax, alist,
+    add ("kgN/ha/year", p_k * u_g / u_ha / u_y,
          -2, 1, -1, 0, 0, 0, 0,
          "Deposition.");
-    add ("Mg DM/ha/h", p_M * u_g / u_ha / u_h, name, syntax, alist,
+    add ("Mg DM/ha/h", p_M * u_g / u_ha / u_h,
          -2, 1, -1, 0, 0, 0, 0,
          "Harvest and fertilizing.");
 
     // Mass per volume.
-    add ("kg/m^3", p_k * u_g, name, syntax, alist, -3, 1, 0, 0, 0, 0, 0,
+    add ("kg/m^3", p_k * u_g, -3, 1, 0, 0, 0, 0, 0,
          "Base mass per volume.");
-    add ("ng/l", p_n * u_g / u_l, name, syntax, alist,
+    add ("ng/l", p_n * u_g / u_l,
          -3, 1, 0, 0, 0, 0, 0,
          "Low solute concentration.");
-    add ("ng/cm^3", p_n * u_g / p_c_3, name, syntax, alist,
+    add ("ng/cm^3", p_n * u_g / p_c_3,
          -3, 1, 0, 0, 0, 0, 0,
          "Low solute concentration.");
-    add ("ug/m^3", p_k * u_g, name, syntax, alist, -3, 1, 0, 0, 0, 0, 0,
+    add ("ug/m^3", p_k * u_g, -3, 1, 0, 0, 0, 0, 0,
          "Mass per volume.");
-    add ("mg/l", p_m * u_g / u_l, name, syntax, alist, -3, 1, 0, 0, 0, 0, 0,
+    add ("mg/l", p_m * u_g / u_l, -3, 1, 0, 0, 0, 0, 0,
          "Concentration.");
-    add ("mg N/l", p_m * u_g / u_l, name, syntax, alist, -3, 1, 0, 0, 0, 0, 0,
+    add ("mg N/l", p_m * u_g / u_l, -3, 1, 0, 0, 0, 0, 0,
          "Nitrogen concentration.");
-    add ("g/cm^2/mm", u_g / p_c_2 / p_m, name, syntax, alist,
+    add ("g/cm^2/mm", u_g / p_c_2 / p_m,
          -3, 1, 0, 0, 0, 0, 0,
          "Irrigation and percolation concentration.");
-    add ("g/cm^3", u_g / p_c_3, name, syntax, alist, -3, 1, 0, 0, 0, 0, 0,
+    add ("g/cm^3", u_g / p_c_3, -3, 1, 0, 0, 0, 0, 0,
          "Solute concentration.");
-    add ("g C/cm^3", u_g / p_c_3, name, syntax, alist, -3, 1, 0, 0, 0, 0, 0,
+    add ("g C/cm^3", u_g / p_c_3, -3, 1, 0, 0, 0, 0, 0,
          "Carbon concentration.");
-    add ("g N/cm^3", u_g / p_c_3, name, syntax, alist, -3, 1, 0, 0, 0, 0, 0,
+    add ("g N/cm^3", u_g / p_c_3, -3, 1, 0, 0, 0, 0, 0,
          "Nitrogen concentration.");
-    add ("kg/ha/mm", p_k * u_g / u_ha / p_m, name, syntax, alist,
+    add ("kg/ha/mm", p_k * u_g / u_ha / p_m,
          -3, 1, 0, 0, 0, 0, 0,
          "Irrigation and percolation concentration.");
-    add ("kg N/ha/mm", p_k * u_g / u_ha / p_m, name, syntax, alist,
+    add ("kg N/ha/mm", p_k * u_g / u_ha / p_m,
          -3, 1, 0, 0, 0, 0, 0,
          "Irrigation and percolation concentration.");
     
     // Volume per mass.
-    add ("m^3/kg", 1e0, name, syntax, alist, 3, -1, 0, 0, 0, 0, 0,
+    add ("m^3/kg", 1e0, 3, -1, 0, 0, 0, 0, 0,
          "Base volume per mass.");
-    add ("l/kg", u_l, name, syntax, alist, 3, -1, 0, 0, 0, 0, 0,
+    add ("l/kg", u_l, 3, -1, 0, 0, 0, 0, 0,
          "Volume per mass.");
-    add ("L/kg", u_l, name, syntax, alist, 3, -1, 0, 0, 0, 0, 0,
+    add ("L/kg", u_l, 3, -1, 0, 0, 0, 0, 0,
          "Volume per mass.");
-    add ("cm^3/g", p_c_3 / u_g, name, syntax, alist, 3, -1, 0, 0, 0, 0, 0,
+    add ("cm^3/g", p_c_3 / u_g, 3, -1, 0, 0, 0, 0, 0,
          "Volume per mass.");
-    add ("cm^3/ng", p_c_3 / (p_n * u_g), name, syntax, alist,
+    add ("cm^3/ng", p_c_3 / (p_n * u_g),
          3, -1, 0, 0, 0, 0, 0,
          "Volume per mass.");
     
     // Pressure.
-    add ("Pa", 1e0, name, syntax, alist, -1, 1, -2, 0, 0, 0, 0,
+    add ("Pa", 1e0, -1, 1, -2, 0, 0, 0, 0,
          "Pascal.");
-    add ("hPa", p_h, name, syntax, alist, -1, 1, -2, 0, 0, 0, 0,
+    add ("hPa", p_h, -1, 1, -2, 0, 0, 0, 0,
          "Hectopascal.");
-    add ("kPa", p_k, name, syntax, alist, -1, 1, -2, 0, 0, 0, 0,
+    add ("kPa", p_k, -1, 1, -2, 0, 0, 0, 0,
          "Kilopascal.");
-    add ("MPa", p_M, name, syntax, alist, -1, 1, -2, 0, 0, 0, 0,
+    add ("MPa", p_M, -1, 1, -2, 0, 0, 0, 0,
          "Megapascal.");
 
     // Inverse Pressure.
-    add ("Pa^-1", 1e0, name, syntax, alist, 1, -1, 2, 0, 0, 0, 0,
+    add ("Pa^-1", 1e0, 1, -1, 2, 0, 0, 0, 0,
          "Base inverse pressure.");
-    add ("MPa^-1", 1e0 / p_M, name, syntax, alist, 1, -1, 2, 0, 0, 0, 0,
+    add ("MPa^-1", 1e0 / p_M, 1, -1, 2, 0, 0, 0, 0,
          "Inverse pressure.");
 
     // Amount of substance per area.
-    add ("mol/m^2", 1.0, name, syntax, alist, -2, 0, 0, 0, 0, 1, 0,
+    add ("mol/m^2", 1.0, -2, 0, 0, 0, 0, 1, 0,
          "Mole per square meter.");
-    add ("mmol/m^2", p_m, name, syntax, alist, -2, 0, 0, 0, 0, 1, 0,
+    add ("mmol/m^2", p_m, -2, 0, 0, 0, 0, 1, 0,
          "Millimole per square meter.");
 
     // Amount of substance flux per area.
-    add ("mol/m^2/s", 1.0, name, syntax, alist, -2, 0, -1, 0, 0, 1, 0,
+    add ("mol/m^2/s", 1.0, -2, 0, -1, 0, 0, 1, 0,
          "Mole per square meter per second.");
-    add ("mmol/m^2/s", p_m, name, syntax, alist, -2, 0, -1, 0, 0, 1, 0,
+    add ("mmol/m^2/s", p_m, -2, 0, -1, 0, 0, 1, 0,
          "Millimole per square meter per second.");
 
     // Energy.
-    add ("J", 1.0, name, syntax, alist, 2, 1, -2, 0, 0, 0, 0,
+    add ("J", 1.0, 2, 1, -2, 0, 0, 0, 0,
          "Joule.");
 
     // Energy flux.
-    add ("W", 1.0, name, syntax, alist, 2, 1, -3, 0, 0, 0, 0,
+    add ("W", 1.0, 2, 1, -3, 0, 0, 0, 0,
          "Watt.");
 
     // Energy flux per area.
-    add ("W/m^2", 1.0, name, syntax, alist, 0, 1, -3, 0, 0, 0, 0,
+    add ("W/m^2", 1.0, 0, 1, -3, 0, 0, 0, 0,
          "Watt per square meter.");
-    add ("W m^-2", 1.0, name, syntax, alist, 0, 1, -3, 0, 0, 0, 0,
+    add ("W m^-2", 1.0, 0, 1, -3, 0, 0, 0, 0,
          "Watt per square meter.");
-    add ("MJ/d/m^2", p_M / u_d, name, syntax, alist,
+    add ("MJ/d/m^2", p_M / u_d,
          0, 1, -3, 0, 0, 0, 0,
          "Megajoule per day per square meter.");
-    add ("MJ/m^2/d", p_M / u_d, name, syntax, alist,
+    add ("MJ/m^2/d", p_M / u_d,
          0, 1, -3, 0, 0, 0, 0,
          "Megajoule per square meter per day.");
+  }
+  void load_frame (Frame& frame) const
+  {
+    static const symbol name ("SIfactor");
+    
+    // Add the 'SIfactor' base model.
+    frame.add ("factor", Value::None (), Check::non_zero (), Value::Const, "\
+Factor to multiply with to get base unit.");
   }
 } UnitSIFactor_syntax;
 
@@ -621,18 +620,17 @@ struct UnitpF : public MUnit
   { }
 };
 
-static struct UnitpFSyntax
+static struct UnitpFSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new UnitpF (al); }
+  Model* make (Block& al) const
+  { return new UnitpF (al); }
 
   UnitpFSyntax ()
+    : DeclareModel (MUnit::component, "pF", "log10 (- cmH2O).")
+  { }
+  void load_frame (Frame& frame) const
   {
     // Add the 'pF' base model.
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "log10 (- cmH2O).");
-    Librarian::add_type (MUnit::component, "pF", alist, syntax, &make);
   }
 } UnitpF_syntax;
 
@@ -654,50 +652,39 @@ struct UnitBase : public MUnit
   { }
 };
 
-static struct UnitBaseSyntax
+
+static struct UnitBaseSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new UnitBase (al); }
+  Model* make (Block& al) const
+  { return new UnitBase (al); }
   
-  static void add (const symbol name,
-                   const symbol super,
-                   const Syntax& super_syntax, const AttributeList& super_alist,
-                   const symbol description)
-  {
-    // Add the 'base' 
-    AttributeList& alist = *new AttributeList (super_alist);
-    alist.add ("type", super);
-    alist.add ("description", description);
-    Librarian::add_type (MUnit::component, name, alist, super_syntax, &make);
-  }
-
   UnitBaseSyntax ()
-  {
-    static const symbol name ("base");
-
-    // Add the 'base' base model.
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "A base unit.");
-    Librarian::add_type (MUnit::component, name, alist, syntax, &make);
-
-    // Angles
-    add ("rad", name, syntax, alist, 
-         "Radians");
-
-    // Add geographical coordinates.
-    add ("dgEast", name, syntax, alist, 
-         "Degrees East of Greenwich.");
-    add ("dgNorth", name, syntax, alist, 
-         "Degrees North of Equator.");
-
-    // Unknown unit.
-    add (Value::Unknown (), name, syntax, alist, 
-         "Nothing is known about the dimension of this unit.");
-    add (Units::error_symbol (), name, syntax, alist, 
-         "Bogus unit.");
-  }
+    : DeclareModel (MUnit::component, "base", "A base unit.")
+  { }
+  void load_frame (Frame&) const
+  { }
 } UnitBase_syntax;
+
+struct DeclareBaseUnit : public DeclareParam
+{
+  DeclareBaseUnit (const symbol name, const symbol description)
+    : DeclareParam (MUnit::component, name, "base", description)
+  { }
+  void load_frame (Frame&) const
+  { }
+};
+
+// Angles
+static DeclareBaseUnit Base_rad ("rad", "Radians");
+
+// Add geographical coordinates.
+static DeclareBaseUnit Base_dgEast ("dgEast", "Degrees East of Greenwich.");
+static DeclareBaseUnit Base_dgNorth ("dgNorth", "Degrees North of Equator.");
+
+// Unknown unit.
+static DeclareBaseUnit Base_unknown (Value::Unknown (), "\
+Nothing is known about the dimension of this unit.");
+static DeclareBaseUnit Base_error (Units::error_symbol (), "Bogus unit.");
 
 // Model 'factor'.
 
@@ -720,56 +707,53 @@ struct UnitFactor : public MUnit
   { }
 };
 
-static struct UnitFactorSyntax
+static struct UnitFactorSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new UnitFactor (al); }
-  
-  static void add (const symbol name_string, const double factor,
-                   const symbol base,
-                   const symbol super,
-                   const Syntax& super_syntax, const AttributeList& super_alist,
-                   const symbol description)
-  {
-    const symbol name (name_string);
-
-    AttributeList& alist = *new AttributeList (super_alist);
-    alist.add ("type", super);
-    alist.add ("base", base);
-    alist.add ("factor", factor);
-    alist.add ("description", description);
-    Librarian::add_type (MUnit::component, name, alist, super_syntax, &make);
-  }
-
+  Model* make (Block& al) const
+  { return new UnitFactor (al); }
   UnitFactorSyntax ()
+    : DeclareModel (MUnit::component, "factor", "\
+Connvert to base units by multiplying with a factor.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    static const symbol name ("factor");
-
     // Add the 'factor' factor model.
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
-Connvert to base units by multiplying with a factor.");
-    syntax.add ("base", Value::String, Value::Const, "\
+    frame.add ("base", Value::String, Value::Const, "\
 Base unit to convert to and from.");
     // TODO: Should add check that 'base' is indeed a base unit.
-    syntax.add ("factor", Value::None (), Check::non_zero (), Value::Const, "\
+    frame.add ("factor", Value::None (), Check::non_zero (), Value::Const, "\
 Factor to multiply with to get base unit.");
-    Librarian::add_type (MUnit::component, name, alist, syntax, &make);
-
-    // Add angles.
-    add ("dg", M_PI / 180.0, "rad", name, syntax, alist,
-         "Degrees");
-    add ("new dg", M_PI / 200.0, "rad", name, syntax, alist,
-         "New degrees");
-
-    // Add geographical coordinates.
-    add ("dgWest", -1.0, "dgEast", name, syntax, alist,
-         "Degrees West of Greenwich.");
-    add ("dgSouth", -1.0, "dgNorth", name, syntax, alist,
-         "Degrees North of Equator.");
   }
 } UnitFactor_syntax;
+
+struct DeclareBaseFactor : public DeclareParam
+{
+  const double factor;
+  const symbol base;
+  DeclareBaseFactor (const symbol name, const double factor_,
+                     const symbol base_, const symbol description)
+    : DeclareParam (MUnit::component, name, "factor", description),
+      factor (factor_),
+      base (base_)
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    frame.add ("base", base);
+    frame.add ("factor", factor);
+  }
+};
+
+// Add angles.
+static DeclareBaseFactor Base_dg ("dg", M_PI / 180.0, "rad", "\
+Degrees");
+static DeclareBaseFactor Base_new_dg ("new dg", M_PI / 200.0, "rad", "\
+New degrees");
+
+// Add geographical coordinates.
+static DeclareBaseFactor Base_dg_West ("dgWest", -1.0, "dgEast", "\
+Degrees West of Greenwich.");
+static DeclareBaseFactor Base_dgSouth ("dgSouth", -1.0, "dgNorth", "\
+Degrees North of Equator.");
 
 // Model 'offset'.
 
@@ -794,54 +778,57 @@ struct UnitOffset : public MUnit
   { }
 };
 
-static struct UnitOffsetSyntax
+static struct UnitOffsetSyntax : public DeclareModel
 {
-  static Model& make (Block& al)
-  { return *new UnitOffset (al); }
-  
-  static void add (const symbol name, const double factor,
-                   const double offset,
-                   const symbol base,
-                   const symbol super,
-                   const Syntax& super_syntax, const AttributeList& super_alist,
-                   const symbol description)
-  {
-    AttributeList& alist = *new AttributeList (super_alist);
-    alist.add ("type", super);
-    alist.add ("base", base);
-    alist.add ("factor", factor);
-    alist.add ("offset", offset);
-    alist.add ("description", description);
-    Librarian::add_type (MUnit::component, name, alist, super_syntax, &make);
-  }
+  Model* make (Block& al) const
+  { return new UnitOffset (al); }
 
   UnitOffsetSyntax ()
+    : DeclareModel (MUnit::component, "offset", "\
+Connvert to base units by multiplying factor, then substracting offset.")
+  { }
+  void load_frame (Frame& frame) const
   {
-    static const symbol name ("offset");
-
     // Add the 'SIoffset' offset model.
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
-Connvert to base units by multiplying factor, then substracting offset.");
-    syntax.add ("base", Value::String, Value::Const, "\
+    frame.add ("base", Value::String, Value::Const, "\
 Base unit to convert to and from.");
     // TODO: Should add check that 'base' is indeed a base unit.
-    syntax.add ("factor", Value::None (), Check::non_zero (), Value::Const, "\
+    frame.add ("factor", Value::None (), Check::non_zero (), Value::Const, "\
 Factor to multiply with to get base unit.");
-    alist.add ("factor", 1.0);
-    syntax.add ("offset", Value::None (), Value::Const, "\
+    frame.add ("factor", 1.0);
+    frame.add ("offset", Value::None (), Value::Const, "\
 Offset to add after multiplying with factor to get base unit.");
-    alist.add ("offset", 0.0);
-    Librarian::add_type (MUnit::component, name, alist, syntax, &make);
-
-    // Add geographical coordinates.
-    add ("dg C", 1.0, 273.15, "K", name, syntax, alist,
-         "degree Celcius.");
-    // Absolute zero is -459.67 degree Fahrenheit.
-    add ("dg F", 5.0/9.0, 459.67 * 5.0 / 9.0, "K", name, syntax, alist,
-         "degree Fahrenheit.");
+    frame.add ("offset", 0.0);
   }
 } UnitOffset_syntax;
+
+struct DeclareBaseOffset : public DeclareParam
+{
+  const double factor;
+  const double offset;
+  const symbol base;
+  DeclareBaseOffset (const symbol name, const double factor_,
+                     const double offset_, const symbol base_,
+                     const symbol description)
+    : DeclareParam (MUnit::component, name, "offset", description),
+      factor (factor_),
+      offset (offset_),
+      base (base_)
+  { }
+  void load_frame (Frame& frame) const
+  { 
+    frame.add ("base", base);
+    frame.add ("factor", factor);
+    frame.add ("offset", offset);
+  }
+};
+
+
+static DeclareBaseOffset Base_Celcius ("dg C", 1.0, 273.15, "K", "\
+degree Celcius.");
+// Absolute zero is -459.67 degree Fahrenheit.
+static DeclareBaseOffset Base_Fahrenheit ("dg F", 
+                                          5.0/9.0, 459.67 * 5.0 / 9.0, "K", "\
+degree Fahrenheit.");
 
 // unit_model.C ends here.
