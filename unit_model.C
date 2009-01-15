@@ -30,6 +30,7 @@
 #include "convert.h"
 #include "units.h"
 #include "model.h"
+#include "frame.h"
 #include <sstream>
 
 const char *const MUnit::component = "unit";
@@ -73,8 +74,8 @@ struct UnitSI : public MUnit
   // Content.
   static const struct base_unit_type
   { 
-    std::string unit; 
-    std::string dimension;
+    const symbol unit; 
+    const symbol dimension;
   } base_unit[];
   static const size_t base_unit_size;
 
@@ -107,14 +108,6 @@ UnitSI::base_unit_size
 void
 UnitSI::load_syntax (Syntax& syntax, AttributeList& alist)
 {
-  for (size_t i = 0; i < base_unit_size; i++)
-    {
-      const std::string unit = base_unit[i].unit;
-      const std::string dimension = base_unit[i].dimension;
-      syntax.add (dimension, Value::Integer, Value::Const, "\
-Dimension, base unit [" + unit + "].");
-      alist.add (dimension, 0);
-    }
 }
 
 symbol
@@ -138,6 +131,26 @@ UnitSI::find_base (Block& al)
     }
   return symbol (tmp.str ());
 }
+
+static struct UnitSISyntax : public DeclareBase
+{
+  UnitSISyntax ()
+    : DeclareBase (Unit::component, "SI", "\
+Base parameterization for all SI based units.")
+  {
+  }
+  void load_frame (Frame& frame) const
+  {
+    for (size_t i = 0; i < base_unit_size; i++)
+      {
+        const symbol unit = base_unit[i].unit;
+        const symbol dimension = base_unit[i].dimension;
+        frame.add (dimension, Value::Integer, Value::Const, "\
+Dimension, base unit [" + unit + "].");
+        frame.add (dimension, 0);
+      }
+  }
+} UnitSI_syntax;
 
 // Model 'SIfactor'.
 
@@ -181,46 +194,81 @@ struct UnitSIFactor : public UnitSI
   { }
 };
 
-static struct UnitSIFactorSyntax
+struct DeclareSIFactor : public DeclareParam
 {
-  static Model& make (Block& al)
-  { return *new UnitSIFactor (al); }
+  const double factor;
+  const symbol super;
+  const int length;
+  const int mass;
+  const int time;
+  const int electric_current;
+  const int thermodynamic_temperature;
+  const int amount_of_substance;
+  const int luminous_intensity;
+
+  DeclareSIFactor (const symbol name, const double factor_,
+                   const int length_, const int mass_, const int time_,
+                   const int electric_current_,
+                   const int thermodynamic_temperature_,
+                   const int amount_of_substance_,
+                   const int luminous_intensity_,
+                   const symbol description)
+    : DeclareParam (Unit::component, name, "SIfactor", description),
+      factor (factor_),
+      length (length_),
+      mass (mass_),
+      time (time_),
+      electric_current (electric_current_),
+      thermodynamic_temperature (thermodynamic_temperature_),
+      amount_of_substance (amount_of_substance_),
+      luminous_intensity (luminous_intensity_)
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add ("length", length);
+    frame.add ("mass", mass);
+    frame.add ("time", time);
+    frame.add ("electric_current", electric_current);
+    frame.add ("thermodynamic_temperature", thermodynamic_temperature);
+    frame.add ("amount_of_substance", amount_of_substance);
+    frame.add ("luminous_intensity", luminous_intensity);
+    frame.add ("factor", factor);
+  }
+}
+
+static struct UnitSIFactorSyntax : public DeclareModel
+{
+  auto_vector<const DeclareSIFactor*> declarations;
+
+  Model* make (Block& al) const
+  { return new UnitSIFactor (al); }
 
   static void add (const symbol name, const double factor,
-                   const symbol super,
-                   const Syntax& super_syntax, const AttributeList& super_alist,
                    const int length, const int mass, const int time,
                    const int electric_current,
                    const int thermodynamic_temperature,
                    const int amount_of_substance, const int luminous_intensity,
                    const symbol description)
   {
-    AttributeList& alist = *new AttributeList (super_alist);
-    alist.add ("type", super);
-    alist.add ("length", length);
-    alist.add ("mass", mass);
-    alist.add ("time", time);
-    alist.add ("electric_current", electric_current);
-    alist.add ("thermodynamic_temperature", thermodynamic_temperature);
-    alist.add ("amount_of_substance", amount_of_substance);
-    alist.add ("luminous_intensity", luminous_intensity);
-    alist.add ("factor", factor);
-    alist.add ("description", description);
-    Librarian::add_type (MUnit::component, name, alist, super_syntax, &make);
+    declarations.push_back (new DeclareSIFactor (name, factor, length, mass,
+                                                 time,electric_current,
+                                                 thermodynamic_temperature,
+                                                 amount_of_substance, 
+                                                 luminous_intensity,
+                                                 description));
   }
   UnitSIFactorSyntax ()
+    : DeclareModel (MUnit::component, "SIfactor", "SI", "\
+Connvert to SI base units by multiplying with a factor.")
+  { }
+  void load_frame (Frame& frame) const
   {
     static const symbol name ("SIfactor");
     
     // Add the 'SIfactor' base model.
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "\
-Connvert to SI base units by multiplying with a factor.");
     UnitSI::load_syntax (syntax, alist);
-    syntax.add ("factor", Value::None (), Check::non_zero (), Value::Const, "\
+    frame.add ("factor", Value::None (), Check::non_zero (), Value::Const, "\
 Factor to multiply with to get base unit.");
-    Librarian::add_type (MUnit::component, name, alist, syntax, &make);
 
     // Prefix constants.
     static const double p_n = 1e-9; // Nano-
@@ -614,7 +662,7 @@ static struct UnitBaseSyntax
   static void add (const symbol name,
                    const symbol super,
                    const Syntax& super_syntax, const AttributeList& super_alist,
-                   const std::string& description)
+                   const symbol description)
   {
     // Add the 'base' 
     AttributeList& alist = *new AttributeList (super_alist);
@@ -677,11 +725,11 @@ static struct UnitFactorSyntax
   static Model& make (Block& al)
   { return *new UnitFactor (al); }
   
-  static void add (const std::string& name_string, const double factor,
-                   const std::string& base,
+  static void add (const symbol name_string, const double factor,
+                   const symbol base,
                    const symbol super,
                    const Syntax& super_syntax, const AttributeList& super_alist,
-                   const std::string& description)
+                   const symbol description)
   {
     const symbol name (name_string);
 
@@ -751,15 +799,13 @@ static struct UnitOffsetSyntax
   static Model& make (Block& al)
   { return *new UnitOffset (al); }
   
-  static void add (const std::string& name_string, const double factor,
+  static void add (const symbol name, const double factor,
                    const double offset,
-                   const std::string& base,
+                   const symbol base,
                    const symbol super,
                    const Syntax& super_syntax, const AttributeList& super_alist,
-                   const std::string& description)
+                   const symbol description)
   {
-    const symbol name (name_string);
-
     AttributeList& alist = *new AttributeList (super_alist);
     alist.add ("type", super);
     alist.add ("base", base);
