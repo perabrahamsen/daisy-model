@@ -24,7 +24,6 @@
 #define HYDRAULIC_H
 
 #include "model.h"
-#include "syntax.h"
 
 class Log;
 class PLF;

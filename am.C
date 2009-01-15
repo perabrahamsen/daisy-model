@@ -39,6 +39,7 @@
 #include "librarian.h"
 #include "unit.h"
 #include "treelog.h"
+#include "syntax.h"
 #include <numeric>
 #include <sstream>
 

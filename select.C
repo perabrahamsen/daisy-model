@@ -30,6 +30,7 @@
 #include "metalib.h"
 #include "library.h"
 #include "alist.h"
+#include "syntax.h"
 #include "check.h"
 #include "vcheck.h"
 #include "format.h"

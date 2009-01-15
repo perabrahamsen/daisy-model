@@ -51,10 +51,10 @@ struct HorizonSystem : public Horizon
     void load_frame (Frame& frame) const;
 
     // Create and destroy.
-    Syntax::check_fun checker;
+    Frame::check_fun checker;
     bool check_shared (const AttributeList& al, Treelog& err) const;
     void add (const symbol name, double limit);
-    System (symbol name, Syntax::check_fun check_alist);
+    System (symbol name, Frame::check_fun check_alist);
   };
 
   // Content.
@@ -158,7 +158,7 @@ HorizonSystem::System::add (const symbol name, double limit)
   daisy_assert (limits.size () == names.size ());
 }
 
-HorizonSystem::System::System (symbol name, Syntax::check_fun cf)
+HorizonSystem::System::System (symbol name, Frame::check_fun cf)
   : DeclareModel (Horizon::component, name, 
                   "A horizon using " +  name + " texture classification."),
     checker (cf)

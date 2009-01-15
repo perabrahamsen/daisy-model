@@ -179,7 +179,7 @@ Librarian::declare (const symbol component, const symbol name,
   if (!content)
     content = new Intrinsics ();
 
-  content->declare (component, name, declaration);
+  content->declare_model (component, name, declaration);
   daisy_assert (!content->closed);
 }
 

@@ -26,6 +26,7 @@
 #include "block.h"
 #include "assertion.h"
 #include "mathlib.h"
+#include "syntax.h"
 #include <memory>
 
 struct Timestep::Implementation

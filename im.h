@@ -24,7 +24,7 @@
 #define IM_H
 
 #include "symbol.h"
-#include "syntax.h"
+#include "value.h"
 #include <map>
 #include <boost/noncopyable.hpp>
 

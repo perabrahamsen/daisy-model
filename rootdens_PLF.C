@@ -32,6 +32,7 @@
 #include "memutils.h"
 #include "librarian.h"
 #include "frame.h"
+#include "syntax.h"
 
 struct Rootdens_PLF : public Rootdens
 {

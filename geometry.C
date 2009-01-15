@@ -29,6 +29,7 @@
 #include "frame.h"
 #include "assertion.h"
 #include "mathlib.h"
+#include "syntax.h"
 #include <sstream>
 
 const int Geometry::cell_above;

@@ -49,6 +49,7 @@
 #include "fao.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "syntax.h"
 #include <sstream>
 
 struct BioclimateStandard : public Bioclimate

@@ -24,6 +24,7 @@
 #include "metalib.h"
 #include "library.h"
 #include "alist.h"
+#include "syntax.h"
 #include "librarian.h"
 #include "stringer.h"
 #include "number.h"

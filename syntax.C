@@ -605,54 +605,6 @@ Syntax::add_library (const symbol key, const symbol l)
 }
 
 void 
-Syntax::add_submodule (const symbol name, AttributeList& alist,
-		       Value::category cat, const symbol description,
-		       load_syntax_fun load_syntax)
-{
-    Frame frame (load_syntax);
-    Syntax& s = *new Syntax (frame.syntax ());
-    const AttributeList& a = frame.alist () ;
-
-    // Phew.  There are basically two places one can store the alist
-    // containing the default values for the variables and parameters
-    // of a submodel.  The first place is as an initial value in the
-    // parent alist, the other is as the 'default_alist' syntax table
-    // attribute.   Neither solution works well in all cases.  
-    //
-    // Using the initial value will not work for optional singletons,
-    // because if there is an initial value in the parent alist, the
-    // submodel isn't really optional.  The initial value will ensure
-    // that it is alwayes there.  The initial value will not work for
-    // submodel sequences either, because we do not know the the
-    // length of the sequence. 
-    //
-    // However, using the 'default_alist' for fully specified
-    // non-optional submodels won't work either.  The problems is if
-    // the user is satisfied with the default value, and don't try to
-    // overwrite anything.  In that case the entry will be empty in
-    // the parent alist after loading, causing an 'missing value'
-    // error.  
-    // 
-    // Log variables doesn't have a value, so the problem does not
-    // apply to them.
-    // 
-    // The solution is to treat the three cases separately.
-
-    if (cat == Value::LogOnly)
-      // Log only, ignore default value.
-      add (name, s, cat, Value::Singleton, description);
-    else if (cat == Value::Const || cat == Value::State)
-      {
-	// Mandatory, store in alist.
-	add (name, s, cat, Value::Singleton, description);
-	alist.add (name, a);
-      }
-    else
-      // Optional, store as default_alist.
-      add (name, s, a, cat, Value::Singleton, description);
-}
-
-void 
 Syntax::add_submodule_sequence (const symbol name, Value::category cat, 
 				const symbol description,
 				load_syntax_fun load_syntax)

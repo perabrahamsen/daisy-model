@@ -98,8 +98,8 @@ Intrinsics::library (const symbol component) const
 }
 
 void 
-Intrinsics::declare (const symbol component, const symbol model,
-                     const Declare& declaration)
+Intrinsics::declare_model (const symbol component, const symbol model,
+                           const Declare& declaration)
 { 
   daisy_assert (!closed);
   delayed[component][model].push_back (&declaration); 

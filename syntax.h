@@ -186,9 +186,11 @@ public:
   void add_library (symbol, symbol lib);
 
   typedef void (*load_syntax_fun) (Frame& alist);
+#if 0
   void add_submodule (symbol name, AttributeList& alist,
 		      Value::category cat, const symbol description,
 		      load_syntax_fun load_syntax);
+#endif
   void add_submodule_sequence (symbol name, Value::category cat, 
 			       const symbol description,
 			       load_syntax_fun load_syntax);

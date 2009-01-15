@@ -22,6 +22,7 @@
 
 #include "frame.h"
 #include "alist.h"
+#include "syntax.h"
 #include "block.h"
 #include "assertion.h"
 #include "librarian.h"
@@ -296,8 +297,50 @@ Frame::add_library (const symbol key, symbol lib)
 void 
 Frame::add_submodule (const symbol name, 
 		      Value::category cat, const symbol description,
-		      Syntax::load_syntax_fun load_syntax)
-{ impl->syntax.add_submodule (name, alist (), cat, description, load_syntax); }
+		      load_syntax_t load_syntax)
+{
+    Frame frame (load_syntax);
+    Syntax& s = *new Syntax (frame.syntax ());
+    const AttributeList& a = frame.alist () ;
+
+    // Phew.  There are basically two places one can store the alist
+    // containing the default values for the variables and parameters
+    // of a submodel.  The first place is as an initial value in the
+    // parent alist, the other is as the 'default_alist' syntax table
+    // attribute.   Neither solution works well in all cases.  
+    //
+    // Using the initial value will not work for optional singletons,
+    // because if there is an initial value in the parent alist, the
+    // submodel isn't really optional.  The initial value will ensure
+    // that it is alwayes there.  The initial value will not work for
+    // submodel sequences either, because we do not know the the
+    // length of the sequence. 
+    //
+    // However, using the 'default_alist' for fully specified
+    // non-optional submodels won't work either.  The problems is if
+    // the user is satisfied with the default value, and don't try to
+    // overwrite anything.  In that case the entry will be empty in
+    // the parent alist after loading, causing an 'missing value'
+    // error.  
+    // 
+    // Log variables doesn't have a value, so the problem does not
+    // apply to them.
+    // 
+    // The solution is to treat the three cases separately.
+
+    if (cat == Value::LogOnly)
+      // Log only, ignore default value.
+      impl->syntax.add (name, s, cat, Value::Singleton, description);
+    else if (cat == Value::Const || cat == Value::State)
+      {
+	// Mandatory, store in alist.
+	impl->syntax.add (name, s, cat, Value::Singleton, description);
+	impl->alist.add (name, a);
+      }
+    else
+      // Optional, store as default_alist.
+      impl->syntax.add (name, s, a, cat, Value::Singleton, description);
+}
 
 void 
 Frame::add_submodule_sequence (const symbol name, Value::category cat, 

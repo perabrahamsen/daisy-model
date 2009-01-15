@@ -22,10 +22,10 @@
 #ifndef BLOCK_H
 #define BLOCK_H
 
-#include "syntax.h"
 #include "symbol.h"
-#include "plf.h"
+#include "value.h"
 #include <string>
+#include <vector>
 #include <boost/noncopyable.hpp>
 
 class Treelog;
@@ -33,6 +33,9 @@ class Metalib;
 class Path;
 class Units;
 class Frame;
+class Syntax;
+class PLF;
+class AttributeList;
 
 #ifdef __unix
 #define EXPORT /* Nothing */

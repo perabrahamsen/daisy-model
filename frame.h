@@ -18,7 +18,6 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "syntax.h"
 #include "scope.h"
 #include <memory>
 #include <vector>
@@ -26,6 +25,12 @@
 class AttributeList;
 class PLF;
 class Block;
+class Library;
+class Check;
+class VCheck;
+class Treelog;
+class Metalib;
+class Syntax;
 
 #ifndef FRAME_H
 #define FRAME_H
@@ -216,9 +221,12 @@ public:
   bool total_order () const;	// True iff all members are ordered.
 
   // Additional constraints involving multiple attributes.
+  typedef bool (*check_fun)(const AttributeList&, Treelog& err);
+  typedef bool (*check_object)(const Metalib&, 
+                               const AttributeList&, Treelog& err);
 public:
-  void add_check (Syntax::check_fun);
-  void add_object_check (Syntax::check_object);
+  void add_check (check_fun);
+  void add_object_check (check_object);
 
   // Is 'key' an element of this alist?
   bool check (const symbol key) const;

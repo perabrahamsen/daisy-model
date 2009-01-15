@@ -38,6 +38,7 @@
 #include "librarian.h"
 #include "secondary.h"
 #include "treelog.h"
+#include "syntax.h"
 #include <vector>
 #include <map>
 

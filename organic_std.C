@@ -45,16 +45,17 @@
 #include "time.h"
 #include "mathlib.h"
 #include "plf.h"
-#include <sstream>
 #include "treelog.h"
 #include "check_range.h"
 #include "vcheck.h"
 #include "gaussj.h"
 #include "memutils.h"
 #include "librarian.h"
+#include "syntax.h"
 #include <algorithm>
 #include <numeric>
 #include <fstream>
+#include <sstream>
 #include <time.h>
 
 // Convertions

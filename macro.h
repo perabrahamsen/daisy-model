@@ -24,7 +24,6 @@
 #define MACRO_H
 
 #include "model.h"
-#include "syntax.h"
 #include <vector>
 
 class Geometry1D;
