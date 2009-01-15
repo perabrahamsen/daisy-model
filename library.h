@@ -76,7 +76,6 @@ public:
   AttributeList& lookup (symbol) const;
   bool check (symbol) const;
   bool complete (const Metalib&, symbol) const;
-  void add_model (symbol, AttributeList&, const Syntax&, builder);
   void add_model (symbol, FrameModel&);
   void add_derived (symbol name, AttributeList& al,
 		    symbol super);

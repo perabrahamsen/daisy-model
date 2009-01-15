@@ -252,11 +252,6 @@ Library::complete (const Metalib& metalib, const symbol key) const
 }
 
 void
-Library::add_model (const symbol key, AttributeList& value, 
-                    const Syntax& syntax, builder build)
-{ add_model (key, *new FrameModel (syntax, value, build)); }
-
-void
 Library::add_model (const symbol key, FrameModel& frame)
 { impl->add_model (key, frame); }
 
