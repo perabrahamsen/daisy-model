@@ -54,13 +54,13 @@ struct Hydraulic::K_at_h
   const double K;
 
   // Create and Destroy.
-  static void load_syntax (Syntax& syntax, AttributeList&)
+  static void load_syntax (Frame& frame)
   {
-    syntax.add ("h", "cm", Check::non_positive (), Value::Const, 
+    frame.add ("h", "cm", Check::non_positive (), Value::Const, 
 		"Soil water pressure.");
-    syntax.add ("K", "cm/h", Check::positive (), Value::Const, 
+    frame.add ("K", "cm/h", Check::positive (), Value::Const, 
 		"Water conductivity.");
-    syntax.order ("h", "K");
+    frame.order ("h", "K");
   }
   K_at_h (const AttributeList& al)
     : h (al.number ("h")),

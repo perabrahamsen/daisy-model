@@ -356,7 +356,7 @@ struct ActionMarkvand : public Action
   const std::auto_ptr<MV_Soil> soil;
   const struct crop_map_t : public std::map<symbol, const MV_Crop*>
   {
-    static void load_syntax (Syntax& syntax, AttributeList&);
+    static void load_syntax (Frame&);
     crop_map_t (Block&, const std::string& key);
     ~crop_map_t ();
   } crop_map;
@@ -393,14 +393,14 @@ struct ActionMarkvand : public Action
 };
 
 void 
-ActionMarkvand::crop_map_t::load_syntax (Syntax& syntax, AttributeList&)
+ActionMarkvand::crop_map_t::load_syntax (Frame& frame)
 { 
-  syntax.add ("Daisy", Value::String, Value::Const, 
+  frame.add ("Daisy", Value::String, Value::Const, 
 	      "Name of Daisy crop.");
-  syntax.add_object ("MARKVAND", MV_Crop::component, 
+  frame.add_object ("MARKVAND", MV_Crop::component, 
                      Value::Const, Value::Singleton,
                      "MARKVAND crop description.");
-  syntax.order ("Daisy", "MARKVAND");
+  frame.order ("Daisy", "MARKVAND");
 }
 
 ActionMarkvand::crop_map_t::crop_map_t (Block& al, const std::string& key)

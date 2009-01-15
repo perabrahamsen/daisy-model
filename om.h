@@ -27,7 +27,7 @@
 #include <vector>
 
 class AttributeList;
-class Syntax;
+class Frame;
 class Log;
 class Geometry;
 class SOM;
@@ -99,8 +99,7 @@ public:
 public:
   void initialize (size_t);
 protected:
-  static void load_syntax (Syntax&, AttributeList&, 
-                           const std::string& frac_desc);
+  static void load_syntax (Frame&, const std::string& frac_desc);
   OM (const AttributeList& al);
   virtual ~OM ();
 };

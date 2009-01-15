@@ -131,14 +131,14 @@ Metalib::get_sequence ()
 }
 
 void
-Metalib::reset (const load_frame_t load_syntax)
+Metalib::reset (const load_syntax_t load_syntax)
 { 
   Frame::reset (load_syntax);
   impl.reset (new Implementation ()); 
   impl->initialize (*this);
 }
 
-Metalib::Metalib (load_frame_t load_syntax)
+Metalib::Metalib (load_syntax_t load_syntax)
   : Frame (load_syntax),
     impl (new Implementation ())
 {

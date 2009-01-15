@@ -24,7 +24,7 @@
 #include "aom.h"
 #include "submodel.h"
 #include "alist.h"
-#include "syntax.h"
+#include "frame.h"
 #include "check.h"
 #include "assertion.h"
 #include "smb.h"
@@ -259,25 +259,25 @@ AOM::tick (const std::vector<bool>& active, const double* abiotic_factor,
 }
 
 void 
-AOM::load_syntax (Syntax& syntax, AttributeList& alist)
+AOM::load_syntax (Frame& frame)
 {
-  OM::load_syntax (syntax, alist, "\
+  OM::load_syntax (frame, "\
 The first numbers corresponds to each of the SMB pools, the next\n\
 number to the SOM buffer, and any remaining numbers to each of\n\
 the DOM pools.  The length of the sequence should thus be the number\n\
 of SMB pools plus 1 plus optionally the number of DOM pools."); 
-  alist.add ("submodel", "AOM");
-  alist.add ("description", "\
+  frame.alist ().add ("submodel", "AOM");
+  frame.alist ().add ("description", "\
 A single Added Organic Matter pool.");
-  syntax.add_fraction ("initial_fraction", Value::OptionalConst, "\
+  frame.add_fraction ("initial_fraction", Value::OptionalConst, "\
 The initial fraction of the total available carbon\n\
 allocated to this pool for AOM.  One pool should be left unspecified.");
-  syntax.add ("top_C", "g C/cm^2", Check::non_negative (), Value::State,
+  frame.add ("top_C", "g C/cm^2", Check::non_negative (), Value::State,
 	      "Carbon on top of soil.");
-  alist.add ("top_C", 0.0);
-  syntax.add ("top_N", "g N/cm^2", Check::non_negative (), Value::State,
+  frame.add ("top_C", 0.0);
+  frame.add ("top_N", "g N/cm^2", Check::non_negative (), Value::State,
 	      "Nitrogen on top of soil.");
-  alist.add ("top_N", 0.0);
+  frame.add ("top_N", 0.0);
 }
 
 AOM::AOM (const AttributeList& al)

@@ -23,7 +23,7 @@
 
 #include "snow.h"
 #include "alist.h"
-#include "syntax.h"
+#include "frame.h"
 #include "log.h"
 #include "geometry.h"
 #include "soil.h"
@@ -360,66 +360,66 @@ Snow::storage () const
 }
 
 void
-Snow::load_syntax (Syntax& syntax, AttributeList& alist)
+Snow::load_syntax (Frame& frame)
 { 
-  alist.add ("submodel", "Snow");
-  alist.add ("description", "Simulate snow pack on surface.\n\
+  frame.alist ().add ("submodel", "Snow");
+  frame.alist ().add ("description", "Simulate snow pack on surface.\n\
 _Snow Hydrology_, U.S. Corps of Engineers, 1956.");
 
   static const double hours_per_day = 24.0; // [h/d]
 
-  syntax.add ("EvapSnowPack", "mm", Value::LogOnly, 
+  frame.add ("EvapSnowPack", "mm", Value::LogOnly, 
 	      "Evaporation from snowpack.");
-  syntax.add ("q_s", "mm", Value::LogOnly,
+  frame.add ("q_s", "mm", Value::LogOnly,
 	      "Leaking water.");
-  syntax.add ("Ssnow", "mm", Value::State,
+  frame.add ("Ssnow", "mm", Value::State,
 	      "Snow storage expressed as water.");
-  alist.add ("Ssnow", 0.0);
-  syntax.add ("Swater", "mm", Value::State, 
+  frame.add ("Ssnow", 0.0);
+  frame.add ("Swater", "mm", Value::State, 
 	      "Water in snow storage.");
-  alist.add ("Swater", 0.0);
-  syntax.add ("age", "h", Value::State,
+  frame.add ("Swater", 0.0);
+  frame.add ("age", "h", Value::State,
 	      "Time since last snow.");
-  alist.add ("age", 0.0);
-  syntax.add ("dZs", "m", Value::State,
+  frame.add ("age", 0.0);
+  frame.add ("dZs", "m", Value::State,
 	      "Depth of snow layer.");
-  alist.add ("dZs", 0.0);
-  syntax.add ("mf", "m^-1", Value::Const,
+  frame.add ("dZs", 0.0);
+  frame.add ("mf", "m^-1", Value::Const,
 	      "Snow pack depth melting factor.");
-  alist.add ("mf", 10.0);
-  syntax.add ("mtprime", "kg/m^2/h C", Value::Const,
+  frame.add ("mf", 10.0);
+  frame.add ("mtprime", "kg/m^2/h C", Value::Const,
 	      "Air temperature melting factor.");
-  alist.add ("mtprime", 2.0 / hours_per_day);
-  syntax.add ("mrprime", "kg/J", Value::Const,
+  frame.add ("mtprime", 2.0 / hours_per_day);
+  frame.add ("mrprime", "kg/J", Value::Const,
 	      "Radiation melting factor.");
-  alist.add ("mrprime", 1.5e-7);
-  syntax.add ("m1", "kg/J", Value::Const,
+  frame.add ("mrprime", 1.5e-7);
+  frame.add ("m1", "kg/J", Value::Const,
 	      "Radiation melting linear.");
-  alist.add ("m1", 2.0);
-  syntax.add ("m2", "h^-1", Value::Const, 
+  frame.add ("m1", 2.0);
+  frame.add ("m2", "h^-1", Value::Const, 
 	      "Radiation melting exponential factor.");
-  alist.add ("m2", 0.1 / hours_per_day);
-  syntax.add ("rho_s", "kg/m^3", Value::Const,
+  frame.add ("m2", 0.1 / hours_per_day);
+  frame.add ("rho_s", "kg/m^3", Value::Const,
 	      "Density of newly fallen snow.");
-  alist.add ("rho_s", 100.0);
-  syntax.add ("f_c", Value::None (), Value::Const,
+  frame.add ("rho_s", 100.0);
+  frame.add ("f_c", Value::None (), Value::Const,
 	      "Water capacity in snow factor.");
-  alist.add ("f_c", 0.07);
-  syntax.add ("rho_1", "kg/m^3", Value::Const,
+  frame.add ("f_c", 0.07);
+  frame.add ("rho_1", "kg/m^3", Value::Const,
 	      "Water collapse factor.");
-  alist.add ("rho_1", 200.0);
-  syntax.add ("rho_2", "m^-1", Value::Const, 
+  frame.add ("rho_1", 200.0);
+  frame.add ("rho_2", "m^-1", Value::Const, 
 	      "Snow collapse factor.");
-  alist.add ("rho_2", 0.5);
-  syntax.add ("Psa", "mm", Value::Const, 
+  frame.add ("rho_2", 0.5);
+  frame.add ("Psa", "mm", Value::Const, 
 	      "Absolute amount of snow required for snow to become new.");
-  alist.add ("Psa", 5.0 / hours_per_day);
-  syntax.add ("fsa", Value::None (), Value::Const, 
+  frame.add ("Psa", 5.0 / hours_per_day);
+  frame.add ("fsa", Value::None (), Value::Const, 
 	      "Relative amount of snow required for snow to become new.");
-  alist.add ("fsa", 0.9);
-  syntax.add ("K_snow_factor", "W m^5/kg^2/dg C", Value::Const,
+  frame.add ("fsa", 0.9);
+  frame.add ("K_snow_factor", "W m^5/kg^2/dg C", Value::Const,
 	      "Factor related to thermal conductivity for snow water mix.");
-  alist.add ("K_snow_factor", 2.86e-6);
+  frame.add ("K_snow_factor", 2.86e-6);
 }
   
 Snow::Snow (const AttributeList& al)

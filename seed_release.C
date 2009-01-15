@@ -52,7 +52,6 @@ struct SeedRelease : public Seed
   double initial_N () const; // [g N/m^2]
   void initialize (double seed_w, Treelog& msg);
   bool check (Treelog& msg) const;
-  static void load_syntax (Syntax& syntax, AttributeList&);
   SeedRelease (Block& al);
   ~SeedRelease ();
 };

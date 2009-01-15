@@ -2,7 +2,13 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Frame
 
-** remove add_base, add_type (og check andre)
+** Kig på submodel
+
+Vi skal nok have gemt en frame for hver submodel.
+
+** Fjern "type", "base_model", "submodel" attributes.
+
+Tænk over brug af "description".
 
 ** Frame::alist () og Frame::syntax () skal returnere const ref.
 
@@ -17,6 +23,10 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 ** Integrer metalib i frame
 
 ** Units skal instantieres i den frame de defineres i.
+
+** ParserFile rewrite (order ikke i defmodel)
+
+** static root model frame skal definere "cite" og "description".
 
 ** Notes
 

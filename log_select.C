@@ -331,10 +331,7 @@ static struct LogSelectSyntax : public DeclareBase
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("description", Value::String, Value::Const,
-                "Description of this log file format.");
-    frame.add ("description", "\
-Each selected variable is represented by a column in the log.");
+    Model::load_model (frame);
     frame.add_object ("when", Condition::component, "\
 Add entries to the log file when this condition is true.");
     frame.add_object ("entries", Select::component, 

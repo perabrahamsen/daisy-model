@@ -29,7 +29,7 @@
 #include "submodel.h"
 #include "block.h"
 #include "alist.h"
-#include "syntax.h"
+#include "frame.h"
 #include "soil.h"
 #include "soil_water.h"
 #include "log.h"
@@ -179,41 +179,41 @@ DOM::tock (const std::vector<bool>& active,
 }
 
 void 
-DOM::load_syntax (Syntax& syntax, AttributeList& alist)
+DOM::load_syntax (Frame& frame)
 {
   // Submodel.
-  alist.add ("submodel", "DOM");
-  alist.add ("description", "\
+  frame.alist ().add ("submodel", "DOM");
+  frame.alist ().add ("description", "\
 A single Dissolved Organic Matter pool.");
 
   // Content.
-  syntax.add_submodule ("C", alist, Value::State,
+  frame.add_submodule ("C", Value::State,
 			"Carbon content of DOM pool.",
 			DOE::load_syntax);
-  syntax.add_submodule ("N", alist, Value::State,
+  frame.add_submodule ("N", Value::State,
 			"Nitrogen content of DOM pool.",
 			DOE::load_syntax);
 
   // Transport
-  syntax.add ("diffusion_coefficient", "cm^2/s", Check::positive (),
+  frame.add ("diffusion_coefficient", "cm^2/s", Check::positive (),
 	      Value::Const, "Diffusion coefficient.");
 
   // Turnover.
-  syntax.add ("heat_factor", "dg C", Value::None (), Value::OptionalConst,
+  frame.add ("heat_factor", "dg C", Value::None (), Value::OptionalConst,
 	      "Heat factor.  If empty, use default from 'OrganicMatter'.");
-  syntax.add ("water_factor", "cm", Value::None (), Value::OptionalConst, "\
+  frame.add ("water_factor", "cm", Value::None (), Value::OptionalConst, "\
 Water potential factor.  If empty, use default from 'OrganicMatter'.");
-  syntax.add ("turnover_rate", "h^-1", Check::fraction (), 
+  frame.add ("turnover_rate", "h^-1", Check::fraction (), 
 	      Value::OptionalConst,
 	      "Fraction converted to other pools each hour.\n\
 You must specify either this or 'turnover_halftime'.");
-  syntax.add ("turnover_halftime", "h", Check::positive (), 
+  frame.add ("turnover_halftime", "h", Check::positive (), 
 	      Value::OptionalConst,
 	      "Time until half had been converted to other pools.\n\
 You must specify either this or 'turnover_rate'.");
-  syntax.add_fraction ("efficiency", Value::Const, Value::Sequence, "\
+  frame.add_fraction ("efficiency", Value::Const, Value::Sequence, "\
 the efficiency this pool can be digested by each of the SMB pools.");
-  syntax.add_fraction ("fractions", Value::Const, Value::Sequence, "\
+  frame.add_fraction ("fractions", Value::Const, Value::Sequence, "\
 Fraction of this pool that ends up in each SMB pools");
 }
 

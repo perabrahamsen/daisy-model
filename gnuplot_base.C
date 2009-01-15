@@ -29,13 +29,13 @@
 #include "treelog.h"
 
 void 
-GnuplotBase::Size::load_syntax (Syntax& syntax, AttributeList&)
+GnuplotBase::Size::load_syntax (Frame& frame)
 {
-  syntax.add ("x", Value::None (), Value::Const, "\
+  frame.add ("x", Value::None (), Value::Const, "\
 Relative horizontal size of plot.");
-  syntax.add ("y", Value::None (), Value::Const, "\
+  frame.add ("y", Value::None (), Value::Const, "\
 Relative vertical size of plot.");
-  syntax.order ("x", "y");
+  frame.order ("x", "y");
 }
 const AttributeList& GnuplotBase::Size::unset ()
 {

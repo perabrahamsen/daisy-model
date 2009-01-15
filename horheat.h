@@ -24,7 +24,7 @@
 #define HORHEAT_H
 
 struct AttributeList;
-struct Syntax;
+struct Frame;
 struct Treelog;
 struct Texture;
 struct Hydraulic;
@@ -47,7 +47,7 @@ struct HorHeat
   double heat_capacity (double Theta, double Ice) const; // [erg/cm^3/dg C]
 
   // Create and Destroy.
-  static void load_syntax (Syntax& syntax, AttributeList& alist);
+  static void load_syntax (Frame&);
   // Note:  These variables are really not used after initialization.
   enum constituents
   { 

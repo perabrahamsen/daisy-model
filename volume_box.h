@@ -74,7 +74,6 @@ private:
 
   // Create and Destroy.
 public:
-  static void load_syntax (Syntax& syntax, AttributeList& alist);
   VolumeBox (Block& al);
   VolumeBox (const char *const id);
   VolumeBox (const char *const id, 

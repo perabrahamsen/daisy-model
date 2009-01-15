@@ -63,7 +63,7 @@ public:
 
   // Create and Destroy.
 public:
-  static void load_syntax (Syntax&, AttributeList&);
+  static void load_syntax (Frame&);
   Harvest (Block& al);
   Harvest (symbol col, Time t, symbol crp, 
 	   double sDM, double sN, double sC, double dDM, double dN, double dC,

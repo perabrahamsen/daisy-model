@@ -236,13 +236,13 @@ static const class CheckTable : public VCheck
 
 static struct DepthPLFSyntax : public DeclareModel
 {
-  static void entry_syntax (Syntax& syntax, AttributeList& alist)
+  static void entry_syntax (Frame& frame)
   {
-    syntax.add_submodule ("time", alist, Value::Const, "Time.",
+    frame.add_submodule ("time", Value::Const, "Time.",
                           Time::load_syntax);
-    syntax.add ("value", "cm", Check::non_positive (), Value::Const, 
+    frame.add ("value", "cm", Check::non_positive (), Value::Const, 
                 "Depth.");
-    syntax.order ("time", "value");
+    frame.order ("time", "value");
   }
   Model* make (Block& al) const
   { return new DepthPLF (al); }

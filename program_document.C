@@ -378,11 +378,13 @@ ProgramDocument::print_entry_value (const symbol name,
 		  const AttributeList& nested = alist.alist (name);
 		  const symbol submodel
 		    = Submodel::find_submodel (syntax, alist, name);
-		  Syntax nested_syntax;
-		  AttributeList default_alist;
-		  Submodel::load_syntax (submodel, 
-					 nested_syntax, default_alist);
-		  
+
+                  const Syntax dummy_syntax;
+                  const AttributeList dummy_alist;
+                  Frame frame (dummy_syntax, dummy_alist);
+                  Submodel::load_syntax (submodel, frame);
+		  const Syntax& nested_syntax = frame.syntax ();
+		  const AttributeList& default_alist = frame.alist ();
 		  if (!nested.subset (metalib, default_alist, nested_syntax))
 		    print_default_value = true;
 		}
@@ -1267,10 +1269,11 @@ standard parameterizations for the model.");
   for (unsigned int i = 0; i < fixed.size (); i++)
     {
       const symbol name = fixed[i];
-      Syntax syntax;
-      AttributeList alist;
-      Submodel::load_syntax (name, syntax, alist);
-      print_fixed (name, syntax, alist);
+      const Syntax dummy_syntax;
+      const AttributeList dummy_alist;
+      Frame frame (dummy_syntax, dummy_alist);
+      Submodel::load_syntax (name, frame);
+      print_fixed (name, frame.syntax (), frame.alist ());
   }
 }
 

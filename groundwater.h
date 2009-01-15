@@ -70,7 +70,7 @@ public:
 
     // Create and Destroy.
 public:
-  static void load_syntax (Syntax&, AttributeList&);
+  static void load_syntax (Frame&);
   virtual void initialize (const Units&, const Geometry&, const Time&, 
 			   const Scope&, Treelog&) = 0;
   virtual bool check (const Units&, 

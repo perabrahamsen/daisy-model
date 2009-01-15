@@ -78,8 +78,7 @@ A named value to exchange with external models.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("description", Value::String, Value::Const, "\
-Description of value to exchange.");
+    Model::load_model (frame);
     frame.add ("name", Value::String, Value::Const, "\
 Name of value to exchange.");
   }

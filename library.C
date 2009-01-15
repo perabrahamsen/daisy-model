@@ -53,14 +53,13 @@ struct Library::Implementation
   Frame& frame (symbol) const;
   bool check (symbol) const;
   void add_ancestors (symbol);
-  void add_base (AttributeList&, const Syntax&);
   void add_model (symbol, FrameModel&);
   const Syntax& syntax (symbol) const;
   void entries (std::vector<symbol>&) const;
   void remove (symbol);
   void clear_parsed ();
   void refile_parsed (const std::string& from, const std::string& to);
-  static void load_syntax (Syntax&, AttributeList&);
+  static void load_syntax (Frame&);
   Implementation (const symbol n);
   ~Implementation ();
 };
@@ -133,16 +132,6 @@ Library::Implementation::add_ancestors (const symbol key)
       current = next;
     }
   ancestors[key] = all;
-}
-
-void
-Library::Implementation::add_base (AttributeList& value,
-				   const Syntax& syntax)
-{
-  daisy_assert (value.check ("base_model"));
-  const symbol key = value.name ("base_model");
-  frames[key] = new FrameModel (syntax, value);
-  add_ancestors (key);
 }
 
 void
@@ -261,10 +250,6 @@ Library::complete (const Metalib& metalib, const symbol key) const
 
   return true;
 }
-
-void
-Library::add_base (AttributeList& value, const Syntax& syntax)
-{ impl->add_base (value, syntax); }
 
 void
 Library::add_model (const symbol key, AttributeList& value, 

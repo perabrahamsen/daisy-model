@@ -24,7 +24,7 @@
 #include "geometry1d.h"
 #include "volume.h"
 #include "block.h"
-#include "syntax.h"
+#include "frame.h"
 #include "alist.h"
 #include "mathlib.h"
 #include "check.h"
@@ -180,17 +180,17 @@ Geometry1D::swap (std::vector<double>& v, double from, double middle, double to)
 #endif
 
 void
-Geometry1D::load_syntax (Syntax& syntax, AttributeList& alist)
+Geometry1D::load_syntax (Frame& frame)
 { 
-  alist.add ("submodel", "Geometry1D");
-  syntax.add_check (check_alist);
-  syntax.add ("zplus", "cm", Check::negative (), 
+  frame.alist ().add ("submodel", "Geometry1D");
+  frame.add_check (check_alist);
+  frame.add ("zplus", "cm", Check::negative (), 
 	      Value::OptionalConst, Value::Sequence,
 	      "Depth of each numeric layer (a negative number).\n\
 The end points are listed descending from the surface to the bottom.");
   static VCheck::All zplus_check (VCheck::decreasing (), 
 				  VCheck::min_size_1 ());
-  syntax.add_check ("zplus", zplus_check);
+  frame.add_check ("zplus", zplus_check);
 }
   
 Geometry1D::Geometry1D (Block& al)

@@ -196,13 +196,13 @@ UIRun::attach (Toplevel& toplevel)
       && syntax.lookup ("time") == Value::AList
       && syntax.size ("time") == Value::Singleton)
     {
-      Syntax time_syntax;
-      AttributeList time_alist;
-      Time::load_syntax (time_syntax, time_alist);
-
+      const Syntax dummy_syntax;
+      const AttributeList dummy_alist;
+      Frame time_frame (dummy_syntax, dummy_alist);
+      Time::load_syntax (time_frame);
       const AttributeList& start_alist = alist.alist ("time");
-      if (time_syntax.check (toplevel.metalib (),
-                             start_alist, Treelog::null ()))
+      if (time_frame.syntax ().check (toplevel.metalib (),
+                                      start_alist, Treelog::null ()))
         {
           Time time (start_alist);
           qt_time->set_time (time);

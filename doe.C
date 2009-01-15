@@ -20,13 +20,12 @@
 
 #define BUILD_DLL
 
-
 #include "doe.h"
 #include "log.h"
 #include "geometry.h"
 #include "submodel.h"
 #include "alist.h"
-#include "syntax.h"
+#include "frame.h"
 #include "soil.h"
 #include "soil_water.h"
 #include "treelog.h"
@@ -84,27 +83,27 @@ DOE::tick (const size_t cell_size, const SoilWater& soil_water, const double dt)
 }
 
 void 
-DOE::load_syntax (Syntax& syntax, AttributeList& alist)
+DOE::load_syntax (Frame& frame)
 {
   // Submodel.
-  alist.add ("submodel", "DOM-Element");
-  alist.add ("description", "\
+  frame.alist ().add ("submodel", "DOM-Element");
+  frame.alist ().add ("description", "\
 A single element in a Dissolved Organic Matter pool.");
 
   // Content.
-  syntax.add ("M", "g/cm^3", Value::State, Value::Sequence,
+  frame.add ("M", "g/cm^3", Value::State, Value::Sequence,
 	      "Mass in water and soil.");
-  syntax.add ("C", "g/cm^3", Value::LogOnly, Value::Sequence,
+  frame.add ("C", "g/cm^3", Value::LogOnly, Value::Sequence,
 	      "Concentration in water.");
-  syntax.add ("S", "g/cm^3/h", Value::LogOnly, Value::Sequence,
+  frame.add ("S", "g/cm^3/h", Value::LogOnly, Value::Sequence,
 	      "Combined source term.");
-  syntax.add ("S_p", "g/cm^3/h", Value::LogOnly, Value::Sequence,
+  frame.add ("S_p", "g/cm^3/h", Value::LogOnly, Value::Sequence,
 	      "Source term (macropore transport only).");
-  syntax.add ("S_drain", "g/cm^3/h", Value::LogOnly, Value::Sequence,
+  frame.add ("S_drain", "g/cm^3/h", Value::LogOnly, Value::Sequence,
 	      "Source term (soil drainage only).");
-  syntax.add ("J_matrix", "g/cm^2/h", Value::LogOnly, Value::Sequence,
+  frame.add ("J_matrix", "g/cm^2/h", Value::LogOnly, Value::Sequence,
 	      "Transportation in matrix (positive up).");
-  syntax.add ("J_tertiary", "g/cm^2/h", Value::LogOnly, Value::Sequence,
+  frame.add ("J_tertiary", "g/cm^2/h", Value::LogOnly, Value::Sequence,
 	      "Transportation outside matrix (positive up).");
 }
 

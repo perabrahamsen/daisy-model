@@ -24,7 +24,7 @@
 #include "select.h"
 #include "treelog.h"
 #include "alist.h"
-#include "syntax.h"
+#include "frame.h"
 #include "mathlib.h"
 #include <ostream>
 
@@ -257,18 +257,18 @@ Fetch::initialize (const std::vector<Fetch*>& fetch,
 }
 
 void
-Fetch::load_syntax (Syntax& syntax, AttributeList& alist)
+Fetch::load_syntax (Frame& frame)
 { 
-  alist.add ("description", "A summary file line.");
-  syntax.add ("tag", Value::String, Value::Const, "\
+  frame.alist ().add ("description", "A summary file line.");
+  frame.add ("tag", Value::String, Value::Const, "\
 The tag of a column in the log file to summarize in this line.");
-  syntax.add ("factor", Value::None (), Value::Const, "\
+  frame.add ("factor", Value::None (), Value::Const, "\
 Factor to multiply with to get the sum.\n\
 Typically 1.0 to add this line, or -1.0 to subtract it.");
-  alist.add ("factor", 1.0);
-  syntax.add ("name", Value::String, Value::OptionalConst, "\
+  frame.add ("factor", 1.0);
+  frame.add ("name", Value::String, Value::OptionalConst, "\
 Name to use for this line.  By default use the tag.");
-  syntax.order ("tag");
+  frame.order ("tag");
 }
 
 Fetch::Fetch (const AttributeList& al)

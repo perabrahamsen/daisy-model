@@ -23,7 +23,7 @@
 #define VERNALIZATION_H
 
 class AttributeList;
-class Syntax;
+class Frame;
 class Log;
 class PLF;
 
@@ -48,7 +48,7 @@ public:
   // Create and Destroy.
 public:
   static const AttributeList& no_vernalization ();
-  static void load_syntax (Syntax& syntax, AttributeList& alist);
+  static void load_syntax (Frame&);
   Vernalization (const AttributeList&);
   ~Vernalization ();
 };

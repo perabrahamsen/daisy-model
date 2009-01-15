@@ -34,6 +34,7 @@
 #include "ridge.h"
 #include "check.h"
 #include "treelog.h"
+#include "frame.h"
 #include <sstream>
 #include <map>
 
@@ -519,51 +520,51 @@ Surface::Implementation::initialize (const Geometry& geo)
 }
 
 void
-Surface::load_syntax (Syntax& syntax, AttributeList& alist)
+Surface::load_syntax (Frame& frame)
 {
-  alist.add ("submodel", "Surface");
-  alist.add ("description", "Keep track of things on the soil surface.");
-  syntax.add_check (check_alist);
-  syntax.add ("EpFactor", Value::None (), Check::non_negative (), 
+  frame.alist ().add ("submodel", "Surface");
+  frame.alist ().add ("description", "Keep track of things on the soil surface.");
+  frame.add_check (check_alist);
+  frame.add ("EpFactor", Value::None (), Check::non_negative (), 
 	      Value::Const,
 	      "Convertion of reference evapotranspiration to\n\
 potential evaporation for bare soil.");
-  alist.add ("EpFactor", 1.0);
-  syntax.add ("albedo_dry", Value::None (), Check::non_negative (),
+  frame.add ("EpFactor", 1.0);
+  frame.add ("albedo_dry", Value::None (), Check::non_negative (),
 	      Value::Const,
 	      "Albedo of dry soil (pF >= 3)");
-  alist.add ("albedo_dry", 0.15);
-  syntax.add ("albedo_wet", Value::None (), Check::non_negative (),
+  frame.add ("albedo_dry", 0.15);
+  frame.add ("albedo_wet", Value::None (), Check::non_negative (),
 	      Value::Const,
 	      "Albedo of wet soil (pf <= 1.7)");
-  alist.add ("albedo_wet", 0.08);
-    syntax.add ("forced_pressure", "mm", Value::OptionalConst, "\
+  frame.add ("albedo_wet", 0.08);
+    frame.add ("forced_pressure", "mm", Value::OptionalConst, "\
 Set this to force a permanent pressure top.");
-  syntax.add ("forced_flux", "mm/h", Value::OptionalConst, "\
+  frame.add ("forced_flux", "mm/h", Value::OptionalConst, "\
 Set this to force a permanent flux top.  Positive upwards (exfiltration).");
-  syntax.add ("pond", "mm", Value::State, "\
+  frame.add ("pond", "mm", Value::State, "\
 Amount of ponding on the surface.\n\
 Negative numbers indicate soil exfiltration.");
-  alist.add ("pond", 0.0);
-  syntax.add ("EvapSoilSurface", "mm/h", Value::LogOnly, "\
+  frame.add ("pond", 0.0);
+  frame.add ("EvapSoilSurface", "mm/h", Value::LogOnly, "\
 Water evaporated from the surface, including the pond and exfiltration.");
-  syntax.add ("Eps", "mm/h", Value::LogOnly, "\
+  frame.add ("Eps", "mm/h", Value::LogOnly, "\
 Potential evaporation from the surface.");
-  syntax.add ("T", "dg C", Value::LogOnly, "\
+  frame.add ("T", "dg C", Value::LogOnly, "\
 Temperature of water or air directly above the surface.");
-  syntax.add ("DetentionCapacity", "mm", Check::non_negative (),
+  frame.add ("DetentionCapacity", "mm", Check::non_negative (),
 	      Value::State, "Amount of ponding the surface can retain.");
-  alist.add ("DetentionCapacity", 1000.0);
-  syntax.add ("ReservoirConstant", "h^-1", Check::fraction (), 
+  frame.add ("DetentionCapacity", 1000.0);
+  frame.add ("ReservoirConstant", "h^-1", Check::fraction (), 
 	      Value::Const, "\
 Fraction of ponding above DetentionCapacity that runoffs each hour.");
-  alist.add ("ReservoirConstant", 1.0);
-  syntax.add ("runoff", "mm/h", Value::LogOnly, "\
+  frame.add ("ReservoirConstant", 1.0);
+  frame.add ("runoff", "mm/h", Value::LogOnly, "\
 Amount of water runoff from ponding this hour.");
-  syntax.add ("R_mixing", "h/mm", Check::non_negative (), Value::Const, "\
+  frame.add ("R_mixing", "h/mm", Check::non_negative (), Value::Const, "\
 Resistance to mixing inorganic N between soil and ponding.");
-  alist.add ("R_mixing", 1.0e9);
-  syntax.add_submodule ("ridge", alist, Value::OptionalState, "\
+  frame.add ("R_mixing", 1.0e9);
+  frame.add_submodule ("ridge", Value::OptionalState, "\
 Active ridge system, if any.",
 			Ridge::load_syntax);
 }

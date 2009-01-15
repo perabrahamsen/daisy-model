@@ -135,7 +135,7 @@ public:
   void initialize_zplus (const bool, const std::vector<double>&,
                          const double, const double, Treelog&)
   { }
-  static void load_syntax (Syntax& syntax, AttributeList&);
+  static void load_syntax (Frame&);
   GeometryRect (Block&);
   ~GeometryRect ();
 };

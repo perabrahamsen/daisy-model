@@ -72,7 +72,7 @@ public:
 
   // Create and Destroy.
 public:
-  static void load_syntax (Syntax& syntax, AttributeList& alist);
+  static void load_syntax (Frame&);
   CanopyStandard (const AttributeList&);
   ~CanopyStandard ();
 };

@@ -69,7 +69,7 @@ public:
   };
   static const VCheck& positive ();
   static const VCheck& non_zero ();
-  static void load_syntax (Syntax&, AttributeList&);
+  static void load_syntax (Frame&);
   static const Timestep& null ();
   explicit Timestep (Block&);
   Timestep (int years, int days, int hours, int minutes, int seconds);

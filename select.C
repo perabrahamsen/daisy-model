@@ -91,7 +91,7 @@ struct Select::Implementation
     const std::vector<symbol> submodels_and_attribute;
     
     // Use.
-    const Syntax& leaf_syntax (Syntax&) const;
+    const Syntax& leaf_syntax (Frame&) const;
     symbol leaf_name () const;
     symbol dimension () const;
     symbol description () const;
@@ -99,11 +99,10 @@ struct Select::Implementation
 
     // Create and Destroy.
     static bool check_path (const std::vector<symbol>& path,
-			    const Syntax& syntax,
-			    const AttributeList& alist,
+			    const Frame& frame,
 			    Treelog& err);
     static bool check_alist (const Metalib&, const AttributeList&, Treelog&);
-    static void load_syntax (Syntax& syntax, AttributeList&);
+    static void load_syntax (Frame&);
     Spec (Block&);
     ~Spec ();
   };
@@ -131,15 +130,14 @@ struct Select::Implementation
 };
 
 const Syntax&
-Select::Implementation::Spec::leaf_syntax (Syntax& buffer) const
+Select::Implementation::Spec::leaf_syntax (Frame& buffer) const
 {
   const Syntax* syntax;
 
   if (library_name == symbol ("fixed"))
     {
-      AttributeList alist;
-      Submodel::load_syntax (model_name.name (), buffer, alist);
-      syntax = &buffer;
+      Submodel::load_syntax (model_name.name (), buffer);
+      syntax = &buffer.syntax ();
     }
   else
     {
@@ -163,7 +161,9 @@ Select::Implementation::Spec::leaf_name () const
 symbol
 Select::Implementation::Spec::dimension () const
 {
-  Syntax buffer;
+  const Syntax dummy_syntax;
+  const AttributeList dummy_alist;
+  Frame buffer (dummy_syntax, dummy_alist);
   const Syntax& syntax = leaf_syntax (buffer);
   if (syntax.lookup (leaf_name ()) == Value::Number)
     return symbol (syntax.dimension (leaf_name ()));
@@ -174,7 +174,9 @@ Select::Implementation::Spec::dimension () const
 symbol /* can't return reference because buffer is automatic */
 Select::Implementation::Spec::description () const
 { 
-  Syntax buffer;
+  const Syntax dummy_syntax;
+  const AttributeList dummy_alist;
+  Frame buffer (dummy_syntax, dummy_alist);
   return leaf_syntax (buffer).description (leaf_name ()); 
 }
 
@@ -214,12 +216,11 @@ Select::Implementation::Spec::refer (Format& format) const
 
 bool 
 Select::Implementation::Spec::check_path (const std::vector<symbol>& path,
-					  const Syntax& top_syntax,
-					  const AttributeList& top_alist,
+					  const Frame& top_frame,
 					  Treelog& err)
 {
-  const Syntax* syntax = &top_syntax;
-  const AttributeList* alist = &top_alist;
+  const Syntax* syntax = &top_frame.syntax ();
+  const AttributeList* alist = &top_frame.alist ();
 
   bool ok = true;
   for (unsigned int i = 0; i < path.size (); i++)
@@ -283,10 +284,11 @@ Select::Implementation::Spec::check_alist (const Metalib& metalib,
 	}
       else
 	{
-	  Syntax syntax;
-	  AttributeList alist;
-	  Submodel::load_syntax (model_name.name (), syntax, alist);
-	  if (!check_path (submodels_and_attribute, syntax, alist, err))
+	  const Syntax dummy_syntax;
+	  const AttributeList dummy_alist;
+          Frame frame (dummy_syntax, dummy_alist);
+	  Submodel::load_syntax (model_name.name (), frame);
+	  if (!check_path (submodels_and_attribute, frame, err))
 	    ok = false;
 	}
     }
@@ -306,9 +308,8 @@ Select::Implementation::Spec::check_alist (const Metalib& metalib,
 	}
       else
 	{
-	  const Syntax& syntax = library.syntax (model_name);
-	  const AttributeList& alist = library.lookup (model_name);
-	  if (!check_path (submodels_and_attribute, syntax, alist, err))
+	  const Frame& frame = library.frame (model_name);
+	  if (!check_path (submodels_and_attribute, frame, err))
 	    ok = false;
 	}
     }
@@ -316,18 +317,18 @@ Select::Implementation::Spec::check_alist (const Metalib& metalib,
 }
 
 void 
-Select::Implementation::Spec::load_syntax (Syntax& syntax, AttributeList&)
+Select::Implementation::Spec::load_syntax (Frame& frame)
 { 
-  syntax.add_object_check (check_alist);
-  syntax.add ("library", Value::String, Value::Const, "\
+  frame.add_object_check (check_alist);
+  frame.add ("library", Value::String, Value::Const, "\
 Name of library where the attribute belong.\n\
 Use 'fixed' to denote a fixed component.");
-  syntax.add ("model", Value::String, Value::Const, "\
+  frame.add ("model", Value::String, Value::Const, "\
 Name of model or fixed component where the attribute belongs.");
-  syntax.add ("submodels_and_attribute", Value::String, 
+  frame.add ("submodels_and_attribute", Value::String, 
 	      Value::Const, Value::Sequence, "\
 Name of submodels and attribute.");
-  syntax.order ("library", "model", "submodels_and_attribute");
+  frame.order ("library", "model", "submodels_and_attribute");
 }
 
 Select::Implementation::Spec::Spec (Block& al)
@@ -742,6 +743,7 @@ Set the 'handle' parameter instead.");
 
   void load_frame (Frame& frame) const
   {
+    Model::load_model (frame);
     frame.add_check (check_alist);
     frame.add ("tag", Value::String, Value::OptionalConst,
                 "Tag to identify the column.\n\
@@ -753,10 +755,6 @@ These will be printed in the second line of the log file.\n\
 The character '&' will be replaced with the log timestep.\n\
 If you do not specify the dimension explicitly, a value will\n\
 be interfered from 'spec' if available.");
-    frame.add ("description", Value::String, Value::Const,
-                "A description of this column.");
-    frame.add ("description", "\
-This is not a model, but a list of parameters shared by all select models.");
     frame.add ("path", Value::String, Value::Const, 
                 Value::Sequence, "\
 Sequence of attribute names leading to the variable you want to log in\n\

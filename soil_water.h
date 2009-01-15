@@ -29,7 +29,7 @@ class Surface;
 class Groundwater;
 class Log;
 class Soil;
-class Syntax;
+class Frame;
 class Geometry;
 class SoilHeat;
 class Volume;
@@ -163,7 +163,7 @@ public:
 
   // Creation.
 public:
-  static void load_syntax (Syntax&, AttributeList&);
+  static void load_syntax (Frame&);
   void initialize (const AttributeList&, const Geometry&,
                    const Soil&, const SoilHeat&, const Groundwater&, Treelog&);
   SoilWater (Block&);

@@ -24,7 +24,7 @@
 #include "canopy_simple.h"
 #include "submodel.h"
 #include "log.h"
-#include "syntax.h"
+#include "frame.h"
 
 double
 CanopySimple::EpFactor (double DS) const
@@ -39,55 +39,55 @@ CanopySimple::output (Log& log) const
 }
 
 void 
-CanopySimple::load_syntax (Syntax& syntax, AttributeList& alist)
+CanopySimple::load_syntax (Frame& frame)
 {
-  alist.add ("submodel", "CanopySimple");
-  alist.add ("description", "Simple canopy model.");
+  frame.alist ().add ("submodel", "CanopySimple");
+  frame.alist ().add ("description", "Simple canopy model.");
 
   // Parameters.
-  syntax.add ("PARref", Value::None (), Value::Const,
+  frame.add ("PARref", Value::None (), Value::Const,
 	      "PAR reflectance.");
-  alist.add ("PARref", 0.06);
-  syntax.add ("PARext", Value::None (), Value::Const,
+  frame.add ("PARref", 0.06);
+  frame.add ("PARext", Value::None (), Value::Const,
 	      "PAR extinction coefficient.");
-  alist.add ("PARext", 0.60);
-  syntax.add ("NIRref", Value::None (), Value::Const,
+  frame.add ("PARext", 0.60);
+  frame.add ("NIRref", Value::None (), Value::Const,
 	      "NIR reflectance. NIRref = 0.51 (Ross, 1975)");
-  alist.add ("NIRref", 0.51);
-  syntax.add ("NIRext", Value::None (), Value::Const,
+  frame.add ("NIRref", 0.51);
+  frame.add ("NIRext", Value::None (), Value::Const,
 	      "NIR extinction coefficient. NIRext = 0.18 (Jones, 1983)");
-  alist.add ("NIRext", 0.18);
-  syntax.add ("EPext", Value::None (), Value::Const,
+  frame.add ("NIRext", 0.18);
+  frame.add ("EPext", Value::None (), Value::Const,
 	      "EP extinction coefficient.");
-  alist.add ("EPext", 0.5);
-  syntax.add ("IntcpCap", "mm", Value::Const,
+  frame.add ("EPext", 0.5);
+  frame.add ("IntcpCap", "mm", Value::Const,
 	      "Interception capacity.");
-  alist.add ("IntcpCap", 0.5);
-  syntax.add ("EpFac", Value::None (), Value::Const,
+  frame.add ("IntcpCap", 0.5);
+  frame.add ("EpFac", Value::None (), Value::Const,
 	      "Potential evapotranspiration factor.");
-  alist.add ("EpFac", 1.15);
-  syntax.add ("EpFacDS", "DS", Value::None (), Value::Const,
+  frame.add ("EpFac", 1.15);
+  frame.add ("EpFacDS", "DS", Value::None (), Value::Const,
 	      "DS dependent potential evapotranspiration factor.");
   PLF EpFacDS;
   EpFacDS.add (1.0, 1.0);
-  alist.add ("EpFacDS", EpFacDS);
-  syntax.add ("rs_max", "s/m", Value::Const,
+  frame.add ("EpFacDS", EpFacDS);
+  frame.add ("rs_max", "s/m", Value::Const,
 	      "Maximum transpiration resistance.");
-  alist.add ("rs_max", 1.0e5);
-  syntax.add ("rs_min", "s/m", Value::Const,
+  frame.add ("rs_max", 1.0e5);
+  frame.add ("rs_min", "s/m", Value::Const,
 	      "Minimum transpiration resistance.");
-  alist.add ("rs_min", 100.0);
+  frame.add ("rs_min", 100.0);
 
   // Variables.
-  syntax.add ("Height", "cm", Value::State, "Crop height.");
-  alist.add ("Height", 0.0);
+  frame.add ("Height", "cm", Value::State, "Crop height.");
+  frame.add ("Height", 0.0);
   PLF leaf_width;
   leaf_width.add (0.0, 3.0);
   leaf_width.add (2.0, 3.0);
-  syntax.add ("leaf_width", "DS", "cm", Value::Const, "Leaf width.");
-  alist.add ("leaf_width", leaf_width);
-  syntax.add ("CAI", "m^2/m^2", Value::LogOnly, "Crop Area Index.");
-  syntax.add ("LAIvsH", "cm", "m^2/m^2", Value::LogOnly,
+  frame.add ("leaf_width", "DS", "cm", Value::Const, "Leaf width.");
+  frame.add ("leaf_width", leaf_width);
+  frame.add ("CAI", "m^2/m^2", Value::LogOnly, "Crop Area Index.");
+  frame.add ("LAIvsH", "cm", "m^2/m^2", Value::LogOnly,
 	      "Accumulated Leaf Area Index at Height.");
 }
 

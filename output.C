@@ -28,7 +28,7 @@
 #include "time.h"
 #include "timestep.h"
 #include "block.h"
-#include "syntax.h"
+#include "frame.h"
 #include "assertion.h"
 #include "librarian.h"
 #include "scope_model.h"
@@ -210,23 +210,21 @@ Output::~Output ()
 { }
 
 void
-Output::load_syntax (Syntax& syntax, AttributeList& alist)
+Output::load_syntax (Frame& frame)
 {
-  syntax.add_object ("output", Log::component,
+  frame.add_object ("output", Log::component,
                      Value::State, Value::Sequence,
                      "List of logs for output during the simulation.");
-  syntax.add_object ("activate_output", Condition::component,
+  frame.add_object ("activate_output", Condition::component,
                      "Activate output logs when this condition is true.\n\
 You can use the 'after' condition to avoid logging during an initialization\n\
 period.");
-  AttributeList true_alist;
-  true_alist.add ("type", "true");
-  alist.add ("activate_output", true_alist);
+  frame.add ("activate_output", "true");
 
-  syntax.add_object ("exchange", MScope::component,
+  frame.add_object ("exchange", MScope::component,
                      Value::Const, Value::Sequence, "\
 List of exchange items for communicating with external models.");
-  alist.add ("exchange", std::vector<const AttributeList*> ());
+  frame.add ("exchange", std::vector<const AttributeList*> ());
 
   // The log_time paramater.
   static VCheck::Enum valid_component;
@@ -242,10 +240,10 @@ List of default time components to include in log files. Choose between:\n";
       if (empty_valid)
 	valid_component.add (name);
     }
-  syntax.add ("log_time_columns",
+  frame.add ("log_time_columns",
 	      Value::String, Value::Const, Value::Sequence, 
 	      log_time_doc);
-  syntax.add_check ("log_time_columns", valid_component);
+  frame.add_check ("log_time_columns", valid_component);
   std::vector<symbol> default_time;
   default_time.push_back (symbol ("year"));
   default_time.push_back (symbol ("month"));
@@ -255,7 +253,7 @@ List of default time components to include in log files. Choose between:\n";
   default_time.push_back (symbol ("minute"));
   default_time.push_back (symbol ("second"));
 #endif
-  alist.add ("log_time_columns", default_time);
+  frame.add ("log_time_columns", default_time);
 }
 
 // output.C ends here.

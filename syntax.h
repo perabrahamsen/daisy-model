@@ -34,6 +34,7 @@ class Metalib;
 class Check;
 class VCheck;
 class Treelog;
+class Frame;
 
 #ifdef __unix
 #define EXPORT /* Nothing */
@@ -184,7 +185,7 @@ public:
 
   void add_library (symbol, symbol lib);
 
-  typedef void (*load_syntax_fun) (Syntax& syntax, AttributeList& alist);
+  typedef void (*load_syntax_fun) (Frame& alist);
   void add_submodule (symbol name, AttributeList& alist,
 		      Value::category cat, const symbol description,
 		      load_syntax_fun load_syntax);

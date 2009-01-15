@@ -55,7 +55,7 @@ struct ActionFertilize : public Action
     
     // Create and Destroy.
     static bool check_alist (const AttributeList& al, Treelog& err);
-    static void load_syntax (Syntax& syntax, AttributeList& alist);
+    static void load_syntax (Frame&);
     Precision (const AttributeList& al);
     ~Precision ();
   };
@@ -71,7 +71,7 @@ struct ActionFertilize : public Action
   { }
   bool check (const Daisy& daisy, const Scope&, Treelog& err) const;
   static bool check_alist (const AttributeList& al, Treelog& err);
-  static void load_syntax (Syntax& syntax, AttributeList& alist);
+  static void load_syntax (Frame&);
 protected:
   ActionFertilize (Block& al);
   ~ActionFertilize ();
@@ -106,18 +106,18 @@ ActionFertilize::Precision::check_alist (const AttributeList& al, Treelog& err)
 }
 
 void 
-ActionFertilize::Precision::load_syntax (Syntax& syntax, AttributeList& alist)
+ActionFertilize::Precision::load_syntax (Frame& frame)
 {
-  syntax.add_check (&check_alist);
-  syntax.add ("target", "kg N/ha", Value::Const, 
+  frame.add_check (&check_alist);
+  frame.add ("target", "kg N/ha", Value::Const, 
 	      "How much N you want.");
-  syntax.add ("from", "cm", Value::Const, "\
+  frame.add ("from", "cm", Value::Const, "\
 Height where you want to start measuring (a negative number).");
-  alist.add ("from", 0.0);
-  syntax.add ("to", "cm", Value::Const, "\
+  frame.add ("from", 0.0);
+  frame.add ("to", "cm", Value::Const, "\
 Height where you want to end measuring (a negative number).");
-  alist.add ("to", -100.0);
-  syntax.order ("target");
+  frame.add ("to", -100.0);
+  frame.order ("target");
 }
 
     

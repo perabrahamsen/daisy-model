@@ -57,19 +57,19 @@ public:
       }
     return false;
   }
-  static void load_syntax (Syntax& syntax, AttributeList&);
+  static void load_syntax (Frame&);
   explicit Filter (Block&);
 };
 
 void 
-LexerTable::Filter::load_syntax (Syntax& syntax, AttributeList&)
+LexerTable::Filter::load_syntax (Frame& frame)
 {
-  syntax.add ("tag", Value::String, Value::Const, "\
+  frame.add ("tag", Value::String, Value::Const, "\
 Name of column in Daisy log file to filter for.");
-  syntax.add ("allowed", Value::String, Value::Const, Value::Sequence, "\
+  frame.add ("allowed", Value::String, Value::Const, Value::Sequence, "\
 List of allowable values in filter.");
-  syntax.add_check ("allowed", VCheck::min_size_1 ());
-  syntax.order ("tag", "allowed");
+  frame.add_check ("allowed", VCheck::min_size_1 ());
+  frame.order ("tag", "allowed");
 }
 
 LexerTable::Filter::Filter (Block& al)

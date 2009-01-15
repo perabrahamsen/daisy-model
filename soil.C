@@ -60,16 +60,16 @@ struct Soil::Implementation
     { output_derived (horizon, "horizon", log); }
 
     // Create and Destroy.
-    static void load_syntax (Syntax& syntax, AttributeList& alist)
+    static void load_syntax (Frame& frame)
     { 
-      alist.add ("description", "\
+      frame.alist ().add ("description", "\
 A location and content of a soil layer.\n\
 The layers apply to the soil section not covered by the 'zones' parameter.");
-      syntax.add ("end", "cm", Check::negative (), Value::Const,
+      frame.add ("end", "cm", Check::negative (), Value::Const,
 		  "End point of this layer (a negative number).");
-      syntax.add_object ("horizon", Horizon::component, 
+      frame.add_object ("horizon", Horizon::component, 
                          "Soil properties of this layer.");
-      syntax.order ("end", "horizon");
+      frame.order ("end", "horizon");
     }
     Layer (Block& al)
       : end (al.number ("end")),
@@ -93,20 +93,20 @@ The layers apply to the soil section not covered by the 'zones' parameter.");
     { output_derived (horizon, "horizon", log); }
 
     // Create and Destroy.
-    static void load_syntax (Syntax& syntax, AttributeList& alist)
+    static void load_syntax (Frame& frame)
     { 
-      alist.add ("description", "\
+      frame.alist ().add ("description", "\
 A location and content of a soil zone.\n\
 If several zones cover the same soil, the first one listed is used.\n\
 If no zones cover the soil, the 'horizons' parameter is used.\n\
 \n\
 With regard to the numeric discretization, the whole cell is assumed to\n\
 be of the soil found in the cell center.");
-      syntax.add_object ("volume", Volume::component, 
+      frame.add_object ("volume", Volume::component, 
                          "Volume covered by this zone.");
-      syntax.add_object ("horizon", Horizon::component, 
+      frame.add_object ("horizon", Horizon::component, 
                          "Soil properties of this zone.");
-      syntax.order ("volume", "horizon");
+      frame.order ("volume", "horizon");
     }
     Zone (Block& al)
       : volume (Librarian::build_item<Volume> (al, "volume")),
@@ -506,40 +506,40 @@ check_alist (const AttributeList& al, Treelog& err)
 }  
 
 void
-Soil::load_syntax (Syntax& syntax, AttributeList& alist)
+Soil::load_syntax (Frame& frame)
 { 
-  syntax.add_check (check_alist);
-  alist.add ("submodel", "Soil");
-  alist.add ("description", "\
+  frame.add_check (check_alist);
+  frame.alist ().add ("submodel", "Soil");
+  frame.alist ().add ("description", "\
 The soil component provides the numeric and physical properties of the soil.");
-  syntax.add_submodule_sequence ("horizons", Value::State, "\
+  frame.add_submodule_sequence ("horizons", Value::State, "\
 Layered description of the soil properties.\n\
 The horizons can be overlapped by the 'zones' parameter.\n\
 Some groundwater models, specifically 'pipe', may cause an extra horizon to\n\
 be added below the one specified here if you do not also specify an explicit\n\
 geometry.",
 				 Implementation::Layer::load_syntax);
-  syntax.add_submodule_sequence ("zones", Value::State, "\
+  frame.add_submodule_sequence ("zones", Value::State, "\
 Zones with special soil properties.\n\
 This overrules the 'horizons' paramter.",
 				 Implementation::Zone::load_syntax);
-  alist.add ("zones", std::vector<const AttributeList*> ());
-  syntax.add ("MaxRootingDepth", "cm", Check::positive (), Value::Const,
+  frame.add ("zones", std::vector<const AttributeList*> ());
+  frame.add ("MaxRootingDepth", "cm", Check::positive (), Value::Const,
 	      "Depth at the end of the root zone (a positive number).");
-  syntax.add ("dispersivity", "cm", Check::positive (), 
+  frame.add ("dispersivity", "cm", Check::positive (), 
 	      Value::Const, "Dispersion length.");
-  alist.add ("dispersivity", 5.0);
-  syntax.add ("dispersivity_transversal", "cm", Check::non_negative (), 
+  frame.add ("dispersivity", 5.0);
+  frame.add ("dispersivity_transversal", "cm", Check::non_negative (), 
 	      Value::OptionalConst, "Transversal dispersion length.\n\
 By default, this is 0.1 times the dispersivity.");
-  syntax.add ("border", "cm", Check::negative (), 
+  frame.add ("border", "cm", Check::negative (), 
               Value::Const, Value::Sequence, "\
 List of flux depths where a mass balance should be possible when logging.\n\
 This attribute is ignored if the geometry is specified explicitly.");
-  syntax.add_check ("border", VCheck::decreasing ());
+  frame.add_check ("border", VCheck::decreasing ());
   std::vector<double> default_borders;
   default_borders.push_back (-100.0);
-  alist.add ("border", default_borders);
+  frame.add ("border", default_borders);
 }
   
 Soil::Soil (Block& al)

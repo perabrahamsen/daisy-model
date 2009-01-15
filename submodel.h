@@ -27,20 +27,21 @@
 
 #include <vector>
 
+class Frame;
 class Syntax;
 class AttributeList;
 
 class Submodel
 {
 public:
-  typedef void (*load_fun) (Syntax&, AttributeList&);
+  typedef void (*load_fun) (Frame&);
   
   static bool is_submodel (const Syntax&, const AttributeList&, 
 			   const symbol);
   static symbol find_submodel (const Syntax&, const AttributeList&, 
                                const symbol);
   static void all (std::vector<symbol>& entries);
-  static void load_syntax (const symbol model, Syntax&, AttributeList&);
+  static void load_syntax (const symbol model, Frame&);
   static bool registered (const symbol submodel);
 
   class Register

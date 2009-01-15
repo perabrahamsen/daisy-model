@@ -25,7 +25,7 @@
 #include "time.h"
 #include "assertion.h"
 #include "log.h"
-#include "syntax.h"
+#include "frame.h"
 #include "alist.h"
 #include "vcheck.h"
 #include "submodel.h"
@@ -513,35 +513,35 @@ static bool check_alist (const AttributeList& al, Treelog& msg)
   return ok;
 }
 void
-Time::load_syntax (Syntax& syntax, AttributeList& alist)
+Time::load_syntax (Frame& frame)
 {
-  alist.add ("submodel", "Time");
-  alist.add ("description", "Year, month, day and hour.");
-  syntax.add_check (check_alist);
-  syntax.add ("year", Value::Integer, Value::State, "Current year.");
-  syntax.add_check ("year", VCheck::valid_year ());
-  syntax.add ("month", Value::Integer, Value::State, "Current month.");
+  frame.alist ().add ("submodel", "Time");
+  frame.alist ().add ("description", "Year, month, day and hour.");
+  frame.add_check (check_alist);
+  frame.add ("year", Value::Integer, Value::State, "Current year.");
+  frame.add_check ("year", VCheck::valid_year ());
+  frame.add ("month", Value::Integer, Value::State, "Current month.");
   static VCheck::IRange mm (1, 12);
-  syntax.add_check ("month", mm);
-  syntax.add ("mday", Value::Integer, Value::State, 
+  frame.add_check ("month", mm);
+  frame.add ("mday", Value::Integer, Value::State, 
 	      "Current day in the month.");
   static VCheck::IRange dd (1, 31);
-  syntax.add_check ("mday", dd);
-  syntax.add ("hour", Value::Integer, Value::State, "Current hour.");
+  frame.add_check ("mday", dd);
+  frame.add ("hour", Value::Integer, Value::State, "Current hour.");
   static VCheck::IRange hh (0, 23);
-  syntax.add_check ("hour", hh);
-  alist.add ("hour", 0);
-  syntax.order ("year", "month", "mday", "hour");
-  syntax.add ("minute", Value::Integer, Value::State, "Current minute.");
+  frame.add_check ("hour", hh);
+  frame.add ("hour", 0);
+  frame.order ("year", "month", "mday", "hour");
+  frame.add ("minute", Value::Integer, Value::State, "Current minute.");
   static VCheck::IRange ss (0, 59);
-  syntax.add_check ("minute", ss);
-  alist.add ("minute", 0);
-  syntax.add ("second", Value::Integer, Value::State, "Current second.");
-  syntax.add_check ("second", ss);
-  alist.add ("second", 0);
-  syntax.add ("week", Value::Integer, Value::LogOnly, "Current week.");
-  syntax.add ("yday", Value::Integer, Value::LogOnly, "Current Julian day.");
-  syntax.add ("wday", Value::String, Value::LogOnly, "Current weekday.\n\
+  frame.add_check ("minute", ss);
+  frame.add ("minute", 0);
+  frame.add ("second", Value::Integer, Value::State, "Current second.");
+  frame.add_check ("second", ss);
+  frame.add ("second", 0);
+  frame.add ("week", Value::Integer, Value::LogOnly, "Current week.");
+  frame.add ("yday", Value::Integer, Value::LogOnly, "Current Julian day.");
+  frame.add ("wday", Value::String, Value::LogOnly, "Current weekday.\n\
 Monday is 1, Sunday is 7.");
 }
 

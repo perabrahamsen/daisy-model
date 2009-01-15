@@ -44,11 +44,11 @@ struct NumberPLF : public Number
     const double y_value;
     const symbol y_dimension;
 
-    static void load_syntax (Syntax& syntax, AttributeList& alist)
+    static void load_syntax (Frame& frame)
     {
-      syntax.add ("x", Value::User (), Value::Const, "Operand.");
-      syntax.add ("y", Value::User (), Value::Const, "Value.");
-      syntax.order ("x", "y");
+      frame.add ("x", Value::User (), Value::Const, "Operand.");
+      frame.add ("y", Value::User (), Value::Const, "Value.");
+      frame.order ("x", "y");
     }
     
     Point (const AttributeList& al)

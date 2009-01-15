@@ -28,7 +28,6 @@
 #include <boost/noncopyable.hpp>
 
 class Log;
-class Syntax;
 class Frame;
 class Block;
 
@@ -38,7 +37,7 @@ class Model : private boost::noncopyable
 {
   // Create and Destroy.
 public:
-  static void load_model (Syntax&, AttributeList&);
+  static void load_model (Frame&);
 protected:
   Model ();
 public:

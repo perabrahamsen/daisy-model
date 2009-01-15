@@ -150,15 +150,9 @@ public:
 private:
   static Library& library (symbol component);
 public:
-  static void add_base (symbol component,
-                        AttributeList& al, const Syntax& syntax);
-  static void add_type (symbol component,
-                        symbol name, AttributeList& al,
-                        const Syntax& syntax, builder build);
-  static void add_alias (symbol component, symbol derived, symbol base);
   typedef void (*doc_fun) (Format&, Metalib&, Treelog&, symbol name);
   static void add_doc_fun (symbol component, doc_fun);
-  static void load_syntax (Syntax&, AttributeList&);
+  static void load_syntax (Frame&);
 
   // Declarations.
   static void declare (symbol component, symbol name, 
@@ -184,7 +178,7 @@ protected:
 public:
   static symbol root_name ();
 
-  virtual const FrameModel* parent_model () const;
+  virtual const FrameModel* parent_model () const = 0;
 
 protected:
   Declare (symbol component, symbol name, symbol description);
@@ -196,6 +190,7 @@ class DeclareComponent : public Declare
   Librarian librarian;
   void load (Frame&) const;
   void load_frame (Frame&) const;
+  const FrameModel* parent_model () const;
 public:
   DeclareComponent (symbol component, symbol description);
 };

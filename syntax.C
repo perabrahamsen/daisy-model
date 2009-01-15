@@ -23,6 +23,7 @@
 
 #include "syntax.h"
 #include "alist.h"
+#include "frame.h"
 #include "library.h"
 #include "metalib.h"
 #include "check.h"
@@ -608,9 +609,9 @@ Syntax::add_submodule (const symbol name, AttributeList& alist,
 		       Value::category cat, const symbol description,
 		       load_syntax_fun load_syntax)
 {
-    Syntax& s = *new Syntax ();
-    AttributeList a;
-    (*load_syntax) (s, a);
+    Frame frame (load_syntax);
+    Syntax& s = *new Syntax (frame.syntax ());
+    const AttributeList& a = frame.alist () ;
 
     // Phew.  There are basically two places one can store the alist
     // containing the default values for the variables and parameters
@@ -655,10 +656,10 @@ void
 Syntax::add_submodule_sequence (const symbol name, Value::category cat, 
 				const symbol description,
 				load_syntax_fun load_syntax)
-{
-    Syntax& s = *new Syntax ();
-    AttributeList a;
-    (*load_syntax) (s, a);
+{   
+    const Frame frame (load_syntax);
+    const Syntax& s = *new Syntax (frame.syntax ());
+    const AttributeList& a = frame.alist ();
 
     if (cat == Value::LogOnly)
       // No default value for log only variables.

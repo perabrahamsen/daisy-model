@@ -107,7 +107,7 @@ public:
   void command_line (int& argc, char**& argv);
   void parse_file (const std::string&);
   void parse_system_file (const std::string&);
-  static void load_run (Syntax&, AttributeList&);
+  static void load_run (Frame&);
 private:
   static void load_syntax (Frame&);
 public:

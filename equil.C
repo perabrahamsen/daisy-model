@@ -48,8 +48,5 @@ static struct EquilibriumInit : public DeclareComponent
 Find equilibrium between two soil chemicals.")
   { }
   void load_frame (Frame& frame) const
-  {
-    frame.add ("description", Value::String, Value::OptionalConst,
-               "Description of this parameterization."); 
-  }
+  { Model::load_model (frame); }
 } Equilibrium_init;

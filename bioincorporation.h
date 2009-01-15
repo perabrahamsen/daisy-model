@@ -26,7 +26,7 @@
 #include <vector>
 
 class AttributeList;
-class Syntax;
+class Frame;
 class Log;
 class AM;
 class Geometry;
@@ -55,7 +55,7 @@ public:
   void initialize (const Geometry&, const Soil&);
   AM* create_am (const Geometry&);
   void set_am (AM*);
-  static void load_syntax (Syntax&, AttributeList&);
+  static void load_syntax (Frame&);
   Bioincorporation (const AttributeList&);
   ~Bioincorporation ();
 };

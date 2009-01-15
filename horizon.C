@@ -337,11 +337,8 @@ hydraulic model");
   }
   void load_frame (Frame& frame) const
   {
+    Model::load_model (frame);
     frame.add_check (check_alist);
-    frame.add ("description", Value::String, Value::OptionalConst, 
-                "Description of this soil type.");
-    frame.add ("description", "\
-This is not a model, but a list of parameters shared by all horizon models.");
     frame.add_object ("hydraulic", Hydraulic::component, 
                        "The hydraulic propeties of the soil.");
     AttributeList hydraulic_alist;

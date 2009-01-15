@@ -25,7 +25,7 @@
 #include "texture.h"
 #include "hydraulic.h"
 #include "alist.h"
-#include "syntax.h"
+#include "frame.h"
 #include "check.h"
 #include "mathlib.h"
 #include "assertion.h"
@@ -52,32 +52,32 @@ HorHeat::heat_capacity (double pTheta, double pIce) const
     + heat_capacity_table[Ice] * pIce; }
 
 void
-HorHeat::load_syntax (Syntax& syntax, AttributeList& alist)
+HorHeat::load_syntax (Frame& frame)
 {
-  alist.add ("submodel", "HorHeat");
-  alist.add ("description", "Heat capacity and conductivity per horizon.");
+  frame.alist ().add ("submodel", "HorHeat");
+  frame.alist ().add ("description", "Heat capacity and conductivity per horizon.");
 
-  syntax.add ("quarts_form_factor", Value::None (), Check::positive (), 
+  frame.add ("quarts_form_factor", Value::None (), Check::positive (), 
               Value::Const,
 	      "Gemetry factor used for conductivity calculation.");
-  alist.add ("quarts_form_factor", 2.0);
-  syntax.add ("mineral_form_factor", Value::None (), Check::positive (), 
+  frame.add ("quarts_form_factor", 2.0);
+  frame.add ("mineral_form_factor", Value::None (), Check::positive (), 
               Value::Const,
 	      "Gemetry factor used for conductivity calculation.");
-  alist.add ("mineral_form_factor", 4.0);
-  syntax.add ("intervals", Value::Integer, Value::Const, "\
+  frame.add ("mineral_form_factor", 4.0);
+  frame.add ("intervals", Value::Integer, Value::Const, "\
 Number of numeric intervals to use in the heat coductivity table.");
-  alist.add ("intervals", 100);
-  syntax.add ("C_soil", "erg/cm^3/dg C", Check::positive (), 
+  frame.add ("intervals", 100);
+  frame.add ("C_soil", "erg/cm^3/dg C", Check::positive (), 
 	      Value::OptionalConst,
 	      "The soils heat capacity.\n\
 By default, this is calculated from the soil constituents.");
-  syntax.add ("K_water",
+  frame.add ("K_water",
 	      "erg/s/cm/dg C", Check::positive (),
 	      Value::OptionalConst, Value::Sequence,
 	      "Heat conductivity table for water in soil.\n\
 By default, this is calculated from the soil constituents.");
-  syntax.add ("K_ice",
+  frame.add ("K_ice",
 	      "erg/s/cm/dg C", Check::positive (),
 	      Value::OptionalConst, Value::Sequence,
 	      "Heat conductivity table for solid frozen soil.\n\

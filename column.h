@@ -55,7 +55,7 @@ public:
     const double x;
     const double y;
 
-    static void load_syntax (Syntax&, AttributeList&);
+    static void load_syntax (Frame&);
     Point (const Block&);
     ~Point ();
   };

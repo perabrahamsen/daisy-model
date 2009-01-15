@@ -73,7 +73,7 @@ struct WeatherStandard : public WeatherBase
 
       // Create and Destroy.
       static bool check_alist (const AttributeList& al, Treelog&);
-      static void load_syntax (Syntax&, AttributeList&);
+      static void load_syntax (Frame&);
       YearInterval (const AttributeList&);
     };
 
@@ -87,7 +87,7 @@ struct WeatherStandard : public WeatherBase
 
     // Create and Destroy.
     static bool check_alist (const AttributeList& al, Treelog&);
-    static void load_syntax (Syntax&, AttributeList&);
+    static void load_syntax (Frame&);
     YearMap (Block&);
   };
   const auto_vector<const YearMap*> missing_years;
@@ -365,17 +365,16 @@ WeatherStandard::hours_unit ()
 }
 
 void 
-WeatherStandard::YearMap::YearInterval::load_syntax (Syntax& syntax, 
-						     AttributeList&)
+WeatherStandard::YearMap::YearInterval::load_syntax (Frame& frame)
 {
-  syntax.add_check (check_alist);
-  syntax.add ("from", Value::Integer, Value::Const,
+  frame.add_check (check_alist);
+  frame.add ("from", Value::Integer, Value::Const,
 	      "First year of interval.");
-  syntax.add_check ("from", VCheck::valid_year ());
-  syntax.add ("to", Value::Integer, Value::Const,
+  frame.add_check ("from", VCheck::valid_year ());
+  frame.add ("to", Value::Integer, Value::Const,
 	      "First year of interval.");
-  syntax.add_check ("to", VCheck::valid_year ());
-  syntax.order ("from", "to");
+  frame.add_check ("to", VCheck::valid_year ());
+  frame.order ("from", "to");
 }
 
 WeatherStandard::YearMap::YearInterval::YearInterval (const AttributeList& al)
@@ -411,16 +410,16 @@ WeatherStandard::YearMap::check_alist (const AttributeList& al, Treelog& msg)
 }
 
 void 
-WeatherStandard::YearMap::load_syntax (Syntax& syntax, AttributeList& alist)
+WeatherStandard::YearMap::load_syntax (Frame& frame)
 { 
-  syntax.add_check (check_alist);
-  syntax.add_submodule ("from", alist, Value::Const, 
+  frame.add_check (check_alist);
+  frame.add_submodule ("from", Value::Const, 
 			"Interval of years to map from.",
 			YearInterval::load_syntax);
-  syntax.add_submodule ("to", alist, Value::Const, 
+  frame.add_submodule ("to", Value::Const, 
 			"Interval of years to map to.",
 			YearInterval::load_syntax);
-  syntax.order ("from", "to");
+  frame.order ("from", "to");
 }
 
 WeatherStandard::YearMap::YearMap (Block& al)

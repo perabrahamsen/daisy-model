@@ -272,10 +272,9 @@ Daisy::Daisy (Block& al)
 void
 Daisy::load_syntax (Frame& frame)
 {
-  Model::load_model (frame.syntax (), frame.alist ());
-  frame.add ("description", default_description);
+  Model::load_model (frame);
   
-  Output::load_syntax (frame.syntax (), frame.alist ());
+  Output::load_syntax (frame);
   frame.add_object ("scope", Scopesel::component, 
 		     Value::Const, Value::Singleton, "\
 Scope to evaluate expessions in.");
@@ -330,8 +329,7 @@ static struct ProgramDaisySyntax : public DeclareModel
   Model* make (Block& al) const
   { return new Daisy (al); }
   ProgramDaisySyntax ()
-    : DeclareModel (Program::component, "Daisy", 
-                    "A soil-crop-atmosphere simulation model.")
+    : DeclareModel (Program::component, "Daisy", Daisy::default_description)
   { }
 
   void load_frame (Frame& frame) const

@@ -28,7 +28,7 @@ class SOM : public OM
 { 
   // Create & Destroy.
 public:
-  static void load_syntax (Syntax&, AttributeList&);
+  static void load_syntax (Frame&);
   SOM (const AttributeList& al);
 };
 

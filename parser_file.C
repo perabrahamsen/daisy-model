@@ -781,10 +781,14 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
                           doc = get_string ();
                         if (ok)
                           {
+                            const Syntax dummy_syntax;
+                            const AttributeList dummy_alist;
+                            Frame frame (dummy_syntax, dummy_alist);
+                            Submodel::load_syntax (submodel, frame);
                             // BUG: Do these ever get freed?
-                            Syntax& sub_syn = *new Syntax ();
-                            AttributeList& sub_al = *new AttributeList ();
-                            Submodel::load_syntax (submodel, sub_syn, sub_al);
+                            Syntax& sub_syn = *new Syntax (frame.syntax ());
+                            AttributeList& sub_al 
+                              = *new AttributeList (frame.alist ());
                             // This mimics what Syntax::add_submodule does
                             // for a Value::Const.
                             syntax.add (var, sub_syn, 

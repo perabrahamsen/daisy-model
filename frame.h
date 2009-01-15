@@ -30,7 +30,17 @@ class Block;
 #ifndef FRAME_H
 #define FRAME_H
 
-class Frame : public WScope
+#ifdef __unix
+#define EXPORT /* Nothing */
+#elif defined (BUILD_DLL)
+/* DLL export */
+#define EXPORT __declspec(dllexport)
+#else
+/* EXE import */
+#define EXPORT __declspec(dllimport)
+#endif
+
+class EXPORT Frame : public WScope
 {
   struct Implementation;
   std::auto_ptr<Implementation> impl;
@@ -172,7 +182,7 @@ public:
 
   void add_library (const symbol, symbol lib);
 
-  typedef void (*load_syntax_t) (Syntax& syntax, AttributeList& alist);
+  typedef void (*load_syntax_t) (Frame&);
   void add_submodule (const symbol name, 
 		      Value::category cat, const symbol description,
 		      load_syntax_t load_syntax);
@@ -268,9 +278,7 @@ protected:
   Frame ();
 public:
   Frame (const Syntax&, const AttributeList&); // Old style.
-  typedef void load_frame_t (Frame&);
-  Frame (load_frame_t);
-  virtual void reset (load_frame_t);
+  virtual void reset (load_syntax_t);
   Frame (load_syntax_t);
   virtual ~Frame ();
 };

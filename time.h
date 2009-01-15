@@ -38,7 +38,7 @@
 #endif
 
 class AttributeList;
-class Syntax;
+class Frame;
 class Log;
 class Block;
 
@@ -112,7 +112,7 @@ public:
 
   // Create.
 public:
-  static void load_syntax (Syntax&, AttributeList&);
+  static void load_syntax (Frame&);
   explicit Time (const AttributeList&);
   explicit Time (Block&);
 

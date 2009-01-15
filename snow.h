@@ -26,7 +26,7 @@
 struct AttributeList;
 struct Weather;
 struct Bioclimate;
-struct Syntax;
+struct Frame;
 struct Log;
 struct Movement;
 struct Soil;
@@ -56,7 +56,7 @@ public:
 
   // Create & Destroy.
 public:
-  static void load_syntax (Syntax&, AttributeList&);
+  static void load_syntax (Frame&);
   Snow (const AttributeList& al);
   ~Snow ();
 };

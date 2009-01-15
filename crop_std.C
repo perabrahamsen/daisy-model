@@ -814,10 +814,7 @@ static struct CropStandardSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("description", Value::String, Value::OptionalConst,
-                "Description of this parameterization."); 
-    frame.add ("description", "Standard Daisy crop model.  Hansen, 1999.");
-
+    Model::load_model (frame);
     frame.add_object ("Seed", Seed::component, 
                        "Initial crop growth.");
     frame.add ("Seed", "LAI");

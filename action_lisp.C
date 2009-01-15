@@ -155,14 +155,14 @@ struct ActionCond : public Action
       output_derived (condition, "condition", log);
       output_list (actions, "actions", log, Action::component);
     }
-    static void load_syntax (Syntax& syntax, AttributeList&)
+    static void load_syntax (Frame& frame)
     {
-      syntax.add_object ("condition", Condition::component, 
+      frame.add_object ("condition", Condition::component, 
                   "Condition for performing the actions.");
-      syntax.add_object ("actions", Action::component,
+      frame.add_object ("actions", Action::component,
                          Value::State, Value::Sequence, 
                          "Actions to perform when condition is meet.");
-      syntax.order ("condition", "actions");
+      frame.order ("condition", "actions");
     }
     clause (Block& al) 
       : condition (Librarian::build_item<Condition> (al, "condition")),

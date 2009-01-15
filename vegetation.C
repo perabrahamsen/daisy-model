@@ -87,8 +87,7 @@ That green stuff.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("description", Value::String, Value::OptionalConst,
-                "Description of this vegetation.");
+    Model::load_model (frame);
     frame.add ("LAI", "m^2/m^2", Value::LogOnly,
                 "Total LAI of all crops on this column");
     frame.add ("height", "cm", Value::LogOnly,

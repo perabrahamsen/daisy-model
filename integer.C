@@ -97,15 +97,15 @@ struct IntegerCond : public Integer
   {
     const std::auto_ptr<Boolean> condition;
     const int value;
-    static void load_syntax (Syntax& syntax, AttributeList& alist)
+    static void load_syntax (Frame& frame)
     {
-      alist.add ("description", "\
+      frame.alist ().add ("description", "\
 If condition is true, return value.");
-      syntax.add_object ("condition", Boolean::component, "\
+      frame.add_object ("condition", Boolean::component, "\
 Condition to test for.");
-      syntax.add ("value", Value::Integer, Value::Const, "\
+      frame.add ("value", Value::Integer, Value::Const, "\
 Value to return.");
-      syntax.order ("condition", "value");
+      frame.order ("condition", "value");
     }
     Clause (Block& al)
       : condition (Librarian::build_item<Boolean> (al, "condition")),

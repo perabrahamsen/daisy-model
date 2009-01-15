@@ -26,6 +26,7 @@
 #include "vcheck.h"
 #include "block.h"
 #include "alist.h"
+#include "frame.h"
 #include "submodel.h"
 #include "treelog.h"
 #include "assertion.h"
@@ -124,23 +125,23 @@ GeometryRect::check_y_border (const double, Treelog& err) const
 }
 
 void
-GeometryRect::load_syntax (Syntax& syntax, AttributeList& alist)
+GeometryRect::load_syntax (Frame& frame)
 { 
-  alist.add ("submodel", "GeometryRect");
-  syntax.add ("zplus", "cm", Check::negative (), 
+  frame.alist ().add ("submodel", "GeometryRect");
+  frame.add ("zplus", "cm", Check::negative (), 
 	      Value::Const, Value::Sequence,
 	      "Depth of each numeric layer (a negative number).\n\
 The end points are listed descending from the surface to the bottom.");
   static VCheck::All zplus_check (VCheck::decreasing (), 
 				  VCheck::min_size_1 ());
-  syntax.add_check ("zplus", zplus_check);
-  syntax.add ("xplus", "cm", Check::positive (), 
+  frame.add_check ("zplus", zplus_check);
+  frame.add ("xplus", "cm", Check::positive (), 
 	      Value::Const, Value::Sequence,
 	      "Horizontal end of each numeric layer (a positive number).\n\
 The end points are listed ascending from left (0.0) to right.");
   static VCheck::All xplus_check (VCheck::increasing (), 
 				  VCheck::min_size_1 ());
-  syntax.add_check ("xplus", xplus_check);
+  frame.add_check ("xplus", xplus_check);
 }
   
 GeometryRect::GeometryRect (Block& al)

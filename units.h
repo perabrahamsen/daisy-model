@@ -29,7 +29,7 @@ class Metalib;
 class Treelog;
 class Unit;
 class Convert;
-class Syntax;
+class Frame;
 class AttributeList;
 
 class Units : private boost::noncopyable
@@ -99,7 +99,7 @@ public:
   // Create and destroy.
 public:
   void add_unit (Metalib&, const symbol name);
-  static void load_syntax (Syntax&, AttributeList&);
+  static void load_syntax (Frame&);
   Units (Metalib&);
   ~Units ();
 };

@@ -91,7 +91,7 @@ struct OrganicStandard : public OrganicMatter
 	       const std::vector<SOM*>&);
     void mix (const Geometry&, double from, double to);
     void swap (const Geometry&, double from, double middle, double to);
-    static void load_syntax (Syntax& syntax, AttributeList& alist);
+    static void load_syntax (Frame&);
     void initialize (const Geometry& geo);
     Buffer (const AttributeList& al);
   } buffer;
@@ -144,7 +144,7 @@ struct OrganicStandard : public OrganicMatter
     static int find_som_2 (const std::vector<SOM*>& som);
     static bool check_alist (const AttributeList&, Treelog&);
   public:
-    static void load_syntax (Syntax&, AttributeList&);
+    static void load_syntax (Frame&);
     Initialization (const AttributeList&, const Geometry& geo,
                     const Soil& soil, 
                     const Bioincorporation& bioincorporation, 
@@ -331,30 +331,29 @@ OrganicStandard::Buffer::swap (const Geometry& geo,
 }
 
 void
-OrganicStandard::Buffer::load_syntax (Syntax& syntax,
-                                      AttributeList& alist)
+OrganicStandard::Buffer::load_syntax (Frame& frame)
 {
   const std::vector<double> empty_vector;
-  syntax.add ("C", "g C/cm^3", Check::non_negative (),
+  frame.add ("C", "g C/cm^3", Check::non_negative (),
 	      Value::State, Value::Sequence,
 	      "Buffer carbon content.");
-  alist.add ("C", empty_vector);
-  syntax.add ("N", "g N/cm^3", Check::non_negative (), Value::State, Value::Sequence,
+  frame.add ("C", empty_vector);
+  frame.add ("N", "g N/cm^3", Check::non_negative (), Value::State, Value::Sequence,
 	      "Buffer nitrogen content.");
-  alist.add ("N", empty_vector);
-  syntax.add ("turnover_rate", "h^-1", Check::fraction (), Value::Const,
+  frame.add ("N", empty_vector);
+  frame.add ("turnover_rate", "h^-1", Check::fraction (), Value::Const,
 	      "Turnover rate from buffer into SOM.\n\
 Ignored if you specify 'turnover_halftime'.");
-  alist.add ("turnover_rate", 1.0);
-  syntax.add ("turnover_halftime", "h", Check::positive (),
+  frame.add ("turnover_rate", 1.0);
+  frame.add ("turnover_halftime", "h", Check::positive (),
 	      Value::OptionalConst, 
 	      "Turnover halftime from buffer into SOM.\n\
 Overrules 'turnover_rate' if specified.");
-  syntax.add ("where", Value::Integer, Value::Const,
+  frame.add ("where", Value::Integer, Value::Const,
 	      "The SOM pool to move the buffer content into.\n\
 The first and slow SOM pool is numbered '0', the second and faster\n\
 is numbered '1'.");
-  alist.add ("where", 1);
+  frame.add ("where", 1);
 }
 
 void 
@@ -400,60 +399,60 @@ OrganicStandard::Initialization::
 
 void
 OrganicStandard::Initialization::
-/**/ load_syntax (Syntax& syntax, AttributeList& alist)
+/**/ load_syntax (Frame& frame)
 {
-  syntax.add ("input", "kg C/ha/y", Check::non_negative (),
+  frame.add ("input", "kg C/ha/y", Check::non_negative (),
 	      Value::OptionalConst, "\
 Amount of carbon added to the organic matter system.\n\
 \n\
 If this is unspecifed, the input rate from the inital added matter\n\
 pools will be used instead.");
-  syntax.add_fraction ("fractions", Value::Const, Value::Sequence, "\
+  frame.add_fraction ("fractions", Value::Const, Value::Sequence, "\
 Desitinations for AOM input.  The first numbers corresponds to each\n\
 SMB pool, while the last number correspond to the SOM buffer.\n\
 This is only used if you specify the input parameter.");
-  syntax.add_check ("fractions", VCheck::sum_equal_1 ());
+  frame.add_check ("fractions", VCheck::sum_equal_1 ());
   std::vector<double> fractions;
   fractions.push_back (0.0);
   fractions.push_back (1.0);
   fractions.push_back (0.0);
-  alist.add ("fractions", fractions);
-  syntax.add_fraction ("efficiency", Value::Const, Value::Sequence, "\
+  frame.add ("fractions", fractions);
+  frame.add_fraction ("efficiency", Value::Const, Value::Sequence, "\
 The efficiency this pool can be digested by each of the SMB pools.\n\
 This is only used if you specify the input parameter.");
   std::vector<double> efficiency;
   efficiency.push_back (0.5);
   efficiency.push_back (0.5);
-  alist.add ("efficiency", efficiency);
-  syntax.add ("root", "kg C/ha/y", Check::non_negative (), Value::Const, "\
+  frame.add ("efficiency", efficiency);
+  frame.add ("root", "kg C/ha/y", Check::non_negative (), Value::Const, "\
 Amount of carbon added to the organic matter system from dead roots.\n\
 \n\
 This is part of the total amount specified by the 'input' parameter.");
-  alist.add ("root", 800.0); // According to HSV simulations.
-  syntax.add ("dist", "cm", Check::positive (), Value::Const, "\
+  frame.add ("root", 800.0); // According to HSV simulations.
+  frame.add ("dist", "cm", Check::positive (), Value::Const, "\
 Distance to go down in order to decrease the root density to half the\n\
 original.");
-  alist.add ("dist", 7.0);
-  syntax.add ("end", "cm", Check::negative (),
+  frame.add ("dist", 7.0);
+  frame.add ("end", "cm", Check::negative (),
 	      Value::OptionalConst, "Depth of non-root input.\n\
 \n\
 The input will distributes uniformly down to this size, after\n\
 subtracting the part of the input allocated to the 'root' parameter.\n\
 \n\
 By default, the end of the first horizon will be used.");
-  syntax.add ("bioinc", "kg C/ha/y", Check::non_negative (), Value::Const, "\
+  frame.add ("bioinc", "kg C/ha/y", Check::non_negative (), Value::Const, "\
 Amount of carbon added to the organic matter system from bioincorporation.\n\
 \n\
 This is part of the total amount specified by the 'input' parameter.");
-  alist.add ("bioinc", 0.0);
-  syntax.add ("T", "dg C", Temperature, Value::OptionalConst, "\
+  frame.add ("bioinc", 0.0);
+  frame.add ("T", "dg C", Temperature, Value::OptionalConst, "\
 Temperature used for equilibrium.\n\
 \n\
 By default, the yearly average from the weather component will be used.");
-  syntax.add ("h", "cm", Check::non_positive (), Value::Const, "\
+  frame.add ("h", "cm", Check::non_positive (), Value::Const, "\
 Pressure used for equilibrium.");
-  alist.add ("h", -100.0);
-  syntax.add ("variable_pool", Value::Integer, Value::OptionalConst, "\
+  frame.add ("h", -100.0);
+  frame.add ("variable_pool", Value::Integer, Value::OptionalConst, "\
 If neither the C content nor 'SOM_fractions' are specified, equilibrium is\n\
 assumed for all SOM pools except the one specified by this parameter.\n\
 If you set this to -1 (or any number nor corresponding to a SOM pool),\n\
@@ -461,13 +460,13 @@ equilibrium will be assumed for all pools, and the humus content\n\
 specified by the horizon will be ignored.\n\
 Note, the numbering is zero-based, so '0' specifies SOM1.\n\
 By default, the slowest active pool will be used.");
-  syntax.add ("variable_pool_2", Value::Integer, Value::OptionalConst, "\
+  frame.add ("variable_pool_2", Value::Integer, Value::OptionalConst, "\
 If 'background_mineralization' is specified, this pool is no longer\n\
 assumed to be in equilibrium.\n\
 Note, the numbering is zero-based, so '0' specifies SOM1.\n\
 By default, the second slowest active pool will be used.");
   static RangeII min_range (-1000.0, 1000.0);
-  syntax.add ("background_mineralization", "kg N/ha/y", 
+  frame.add ("background_mineralization", "kg N/ha/y", 
 	      min_range, Value::OptionalConst, "\
 The background mineralization is the mineralization from all SMB and\n\
 SOM pools, but not from the AOM pools.\n\
@@ -482,12 +481,12 @@ The subsoil is not affected by this parameter.\n\
 \n\
 If the background mineralization is unspecified, 'variable_pool_2' will be\n\
 assumed to be in equilibrium instead.");
-  syntax.add ("SOM_limit_where", Value::Integer, Value::Const, "\
+  frame.add ("SOM_limit_where", Value::Integer, Value::Const, "\
 This is the SOM pool that must be within the limits specified by\n\
 'SOM_limit_lower' and 'SOM_limit_upper'.  Use negative number to disable.\n\
 Note, the numbering is zero-based, so '0' specifies SOM1.");
-  alist.add ("SOM_limit_where", 0);
-  syntax.add_fraction ("SOM_limit_lower", Value::Const, Value::Sequence, "\
+  frame.add ("SOM_limit_where", 0);
+  frame.add_fraction ("SOM_limit_lower", Value::Const, Value::Sequence, "\
 Lower limit for for automatic SOM partitioning.\n\
 \n\
 The SOM pool specified by 'SOM_limit_where' must contain at least the\n\
@@ -500,33 +499,33 @@ If the SOM partitioning have been specified directly, either by the\n\
 'SOM_fractions' horizon parameter or by specifying the C content of\n\
 each pool, this parameter will be ignored.  The limit is also ignore\n\
 for soil layers below 'end'.");
-  syntax.add_check ("SOM_limit_lower", VCheck::sum_equal_1 ());
+  frame.add_check ("SOM_limit_lower", VCheck::sum_equal_1 ());
   std::vector<double> SOM_limit_lower;
   SOM_limit_lower.push_back (0.3);
   SOM_limit_lower.push_back (0.7);
   SOM_limit_lower.push_back (0.0);
-  alist.add ("SOM_limit_lower", SOM_limit_lower);
-  syntax.add_fraction ("SOM_limit_upper", Value::Const, Value::Sequence, "\
+  frame.add ("SOM_limit_lower", SOM_limit_lower);
+  frame.add_fraction ("SOM_limit_upper", Value::Const, Value::Sequence, "\
 Upper limit for for automatic SOM partitioning.\n\
 Works like 'SOM_limit_lower'.");
-  syntax.add_check ("SOM_limit_upper", VCheck::sum_equal_1 ());
+  frame.add_check ("SOM_limit_upper", VCheck::sum_equal_1 ());
   std::vector<double> SOM_limit_upper;
   SOM_limit_upper.push_back (0.7);
   SOM_limit_upper.push_back (0.3);
   SOM_limit_upper.push_back (0.0);
-  alist.add ("SOM_limit_upper", SOM_limit_upper);
+  frame.add ("SOM_limit_upper", SOM_limit_upper);
   
-  syntax.add ("debug_equations", Value::Integer, Value::Const, 
+  frame.add ("debug_equations", Value::Integer, Value::Const, 
 	      Value::Sequence, "\
 Print equations used for initialization for the specified intervals.");
-  alist.add ("debug_equations", std::vector<int> ());
-  syntax.add ("debug_rows", Value::Boolean, Value::Const, "\
+  frame.add ("debug_equations", std::vector<int> ());
+  frame.add ("debug_rows", Value::Boolean, Value::Const, "\
 Print summari information for each row.");
-  alist.add ("debug_rows", true);
-  syntax.add ("debug_to_screen", Value::Boolean, Value::Const, "\
+  frame.add ("debug_rows", true);
+  frame.add ("debug_to_screen", Value::Boolean, Value::Const, "\
 If true, print debug information to screen, else to the 'daisy.log' file.");
-  alist.add ("debug_to_screen", false);
-  syntax.add ("top_summary", Value::String, Value::OptionalConst, "\
+  frame.add ("debug_to_screen", false);
+  frame.add ("top_summary", Value::String, Value::OptionalConst, "\
 Name of file to print a summary of the organic carbon and nitrogen\n\
 content in the zone down to the 'end' parameter.\n\
 If unspecified, no such file will be generated, but the summary will\n\
@@ -2924,7 +2923,7 @@ Mineralization and immobilization in soil.")
 
   void load_frame (Frame& frame) const
   {
-    Model::load_model (frame.syntax (), frame.alist ());
+    Model::load_model (frame);
     frame.add_strings ("cite", "daisy-fertilizer", "daisy-somnew");
     frame.add_check (check_alist);
     frame.add ("active_underground", Value::Boolean, Value::Const, "\
@@ -2987,10 +2986,8 @@ Turnover rate above which pools will contribute to 'CO2_fast'.");
                          OrganicStandard::Buffer::load_syntax);
 
     // Create defaults for som and smb.
-    Syntax smb_syntax;
-    AttributeList smb_alist;
-    SMB::load_syntax (smb_syntax, smb_alist);
-
+    Frame smb_frame (SMB::load_syntax);
+    const AttributeList& smb_alist = smb_frame.alist ();
     frame.add_submodule_sequence ("smb", Value::State, "\
 Soil MicroBiomass pools.\n\
 Initial value will be estimated based on equilibrium with AM and SOM pools.",
@@ -3037,9 +3034,8 @@ Initial value will be estimated based on equilibrium with AM and SOM pools.",
     frame.add_submodule_sequence ("som", Value::State, 
                                   "Soil Organic Matter pools.",
                                   SOM::load_syntax);
-    Syntax som_syntax;
-    AttributeList som_alist;
-    SOM::load_syntax (som_syntax, som_alist);
+    Frame som_frame (SOM::load_syntax);
+    const AttributeList& som_alist = som_frame.alist ();
     std::vector<const AttributeList*> SOM;
     AttributeList SOM1 (som_alist);
 #if 1 // SANDER_PARAMS

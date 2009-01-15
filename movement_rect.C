@@ -118,13 +118,13 @@ struct MovementRect::Point
 {
   const double z;
   const double x;
-  static void load_syntax (Syntax& syntax, AttributeList&)
+  static void load_syntax (Frame& frame)
   {
-    syntax.add ("z", "cm", Check::negative (), Value::Const, 
+    frame.add ("z", "cm", Check::negative (), Value::Const, 
 		"Vertical position.");
-    syntax.add ("x", "cm", Check::positive (), Value::Const,
+    frame.add ("x", "cm", Check::positive (), Value::Const,
 		"Horizontal position.");
-    syntax.order ("z", "x");
+    frame.order ("z", "x");
   }
   Point (const AttributeList& al)
     : z (al.number ("z")),

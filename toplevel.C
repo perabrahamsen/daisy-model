@@ -66,9 +66,9 @@ struct Toplevel::Implementation : boost::noncopyable
   bool has_daisy_log;
   void add_daisy_log ();
 
-  void reset (Metalib::load_frame_t load_syntax);
+  void reset (Metalib::load_syntax_t load_syntax);
 
-  Implementation (Metalib::load_frame_t load_syntax, 
+  Implementation (Metalib::load_syntax_t load_syntax, 
                   const std::string& preferred_ui);
   ~Implementation ();
 };
@@ -166,7 +166,7 @@ Toplevel::Implementation::add_daisy_log ()
 }
 
 void
-Toplevel::Implementation::reset (const Metalib::load_frame_t load_syntax)
+Toplevel::Implementation::reset (const Metalib::load_syntax_t load_syntax)
 {
   program.reset (NULL);
   start_time = std::time (NULL);
@@ -175,7 +175,7 @@ Toplevel::Implementation::reset (const Metalib::load_frame_t load_syntax)
   files_found.clear ();
 }
 
-Toplevel::Implementation::Implementation (Metalib::load_frame_t load_syntax,
+Toplevel::Implementation::Implementation (Metalib::load_syntax_t load_syntax,
                                           const std::string& pref_ui)
   : preferred_ui (pref_ui),
     program_name ("daisy"),
@@ -642,14 +642,14 @@ Toplevel::parse_system_file (const std::string& filename)
 }
 
 void
-Toplevel::load_run (Syntax& syntax, AttributeList& alist)
+Toplevel::load_run (Frame& frame)
 {
-  alist.add ("submodel", "Toplevel");
-  alist.add ("description", Toplevel::default_description);
+  frame.alist ().add ("submodel", "Toplevel");
+  frame.alist ().add ("description", Toplevel::default_description);
 
-  Units::load_syntax (syntax, alist);
+  Units::load_syntax (frame);
 
-  syntax.add ("install_directory", Value::String, Value::Const,
+  frame.add ("install_directory", Value::String, Value::Const,
               "Directory where Daisy has been installed.\n\
 \n\
 This is used for looking up files that came with the installation, in\n\
@@ -662,12 +662,12 @@ are not running MS Windows), a hardcoded value is used.  This is\n\
 \n\
 The value found in the manual corresponds to the system where the\n\
 manual was generated.");
-  alist.add ("install_directory", Path::get_daisy_home ());
-  syntax.add ("directory", Value::String, Value::OptionalConst,
+  frame.add ("install_directory", Path::get_daisy_home ());
+  frame.add ("directory", Value::String, Value::OptionalConst,
               "Run program in this directory.\n\
 This can affect both where input files are found and where log files\n\
 are generated.");
-  syntax.add ("path", Value::String,
+  frame.add ("path", Value::String,
               Value::OptionalConst, Value::Sequence,
               "List of directories to search for input files in.\n\
 The special value \".\" means the current directory.\n\
@@ -683,19 +683,19 @@ working directory followed by the standard parameter libraries.");
   default_path.push_back (symbol ("."));
   default_path.push_back (symbol ("${install_directory}/lib"));
   default_path.push_back (symbol ("${install_directory}/sample"));
-  alist.add ("path", default_path);
+  frame.add ("path", default_path);
 
-  syntax.add_object ("input", Parser::component,
+  frame.add_object ("input", Parser::component,
                      Value::OptionalConst, Value::Singleton,
                      "Command to add more information about the simulation.");
-  syntax.add_object ("run", Program::component, 
+  frame.add_object ("run", Program::component, 
                      Value::OptionalState, Value::Singleton, 
                      "Program to run.\n\
 \n\
 If this option is specified, all the 'Daisy' specific top-level attributes\n\
 will be ignored.  If unspecified, run 'Daisy' on the current top-level\n\
 attributes.");
-  syntax.add_object ("ui", UI::component, 
+  frame.add_object ("ui", UI::component, 
                      Value::OptionalState, Value::Singleton, 
                      "Top level user interface.");
 }
@@ -706,8 +706,8 @@ Toplevel::load_syntax (Frame& frame)
   // Top level Daisy syntax.
   Daisy::load_syntax (frame);
   frame.alist ().add ("type", "Daisy");
-  Librarian::load_syntax (frame.syntax (), frame.alist ());
-  load_run (frame.syntax (), frame.alist ());
+  Librarian::load_syntax (frame);
+  load_run (frame);
 }
 
 Toplevel::Toplevel (const std::string& preferred_ui)

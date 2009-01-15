@@ -22,23 +22,23 @@
 
 #include "litter.h"
 #include "submodel.h"
-#include "syntax.h"
+#include "frame.h"
 #include "alist.h"
 #include "check.h"
 
 void
-Litter::load_syntax (Syntax& syntax, AttributeList& alist)
+Litter::load_syntax (Frame& frame)
 {
-  alist.add ("submodel", "Litter");
-  alist.add ("description", "\
+  frame.alist ().add ("submodel", "Litter");
+  frame.alist ().add ("description", "\
 Properties of litter below permanent vegetation.");
-  syntax.add_fraction ("vapor_flux_factor", Value::Const, "\
+  frame.add_fraction ("vapor_flux_factor", Value::Const, "\
 Reduction factor for potential evaporation below litter.");
-  alist.add ("vapor_flux_factor", 1.0);
-  syntax.add ("interception_capacity", "mm", Value::Const,
+  frame.add ("vapor_flux_factor", 1.0);
+  frame.add ("interception_capacity", "mm", Value::Const,
 	      "Storage capacity of litter.");
-  alist.add ("interception_capacity", 0.0);
-  syntax.add ("albedo", Value::None (), Check::positive (),
+  frame.add ("interception_capacity", 0.0);
+  frame.add ("albedo", Value::None (), Check::positive (),
               Value::OptionalConst, "Reflection factor.\n\
 By default, the surface albedo will be used.");
 }

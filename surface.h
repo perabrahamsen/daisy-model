@@ -83,7 +83,7 @@ public:
 
   // Create.
   void initialize (const Geometry&);
-  static void load_syntax (Syntax&, AttributeList&);
+  static void load_syntax (Frame&);
   Surface (const AttributeList& par);
   ~Surface ();
 };

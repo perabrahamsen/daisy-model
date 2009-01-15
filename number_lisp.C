@@ -43,14 +43,14 @@ struct NumberLet : public Number
       symbol id;
       std::auto_ptr<Number> expr;
 
-      static void load_syntax (Syntax& syntax, AttributeList& alist)
+      static void load_syntax (Frame& frame)
       {
-        alist.add ("description", "Bind an identifier to an expression.");
-        syntax.add ("identifier", Value::String, Value::Const, 
+        frame.alist ().add ("description", "Bind an identifier to an expression.");
+        frame.add ("identifier", Value::String, Value::Const, 
                     "Identifier to bind.");
-        syntax.add_object ("expr", Number::component, 
+        frame.add_object ("expr", Number::component, 
                            " Value to give it.");
-        syntax.order ("identifier", "expr");
+        frame.order ("identifier", "expr");
       }
       Clause (Block& al)
         : id (al.name ("identifier")),
@@ -143,9 +143,9 @@ struct NumberLet : public Number
         }
       return ok;
     }
-    static void load_syntax (Syntax& syntax, AttributeList&)
+    static void load_syntax (Frame& frame)
     {
-      syntax.add_submodule_sequence ("clauses", Value::Const, "\
+      frame.add_submodule_sequence ("clauses", Value::Const, "\
 List of identifiers and values to bind in this scope.", Clause::load_syntax);
     }
     ScopeClause (Block& al)
@@ -213,7 +213,7 @@ Bind symbols in 'clauses' in a new scope, and evaluate 'expr' in that scope.")
   { }
   void load_frame (Frame& frame) const
   {
-    NumberLet::ScopeClause::load_syntax (frame.syntax (), frame.alist ());
+    NumberLet::ScopeClause::load_syntax (frame);
     frame.add_object ("expr", Number::component, "\
 Expression to evaluate.");
     frame.order ("clauses", "expr");

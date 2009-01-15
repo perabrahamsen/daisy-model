@@ -24,7 +24,7 @@
 #include "partition.h"
 #include "plf.h"
 #include "submodel.h"
-#include "syntax.h"
+#include "frame.h"
 #include "alist.h"
 #include "check.h"
 #include "mathlib.h"
@@ -85,36 +85,36 @@ static bool check_alist (const AttributeList& al, Treelog& err)
 }
 
 void 
-Partition::load_syntax (Syntax& syntax, AttributeList& alist)
+Partition::load_syntax (Frame& frame)
 {
-  syntax.add_check (check_alist);
-  alist.add ("submodel", "Partition");
-  alist.add ("description", "\
+  frame.add_check (check_alist);
+  frame.alist ().add ("submodel", "Partition");
+  frame.alist ().add ("description", "\
 Assimilate partitioning in the default crop model.\n\
 The 'Root' parameter determine what fraction of the assimilate for growth\n\
 goes to roots at a given development stage.  The remaining assimilate goes\n\
 to the shoot.  The 'Leaf' and 'Stem' parameters determine what fraction of\n\
 the shoot assimilate goes to the leaf and stem respectively.  The remaining\n\
 shoot assimilate will go to the storage organ.");
-  syntax.add ("Root", "DS", Value::Fraction (), Check::fraction (),
+  frame.add ("Root", "DS", Value::Fraction (), Check::fraction (),
 	      Value::Const, "\
 Fraction of assimilate for growth that goes to the roots, as a function of\n\
 the crop development stage.  The remaining growth assimilate goes to the\n\
 shoot.");
-  syntax.add ("Leaf", "DS", Value::Fraction (), Check::fraction (),
+  frame.add ("Leaf", "DS", Value::Fraction (), Check::fraction (),
 	      Value::Const,
 	      "Fraction of shoot assimilate that goes to the leafs.");
-  syntax.add ("Stem", "DS", Value::Fraction (), Check::fraction (),
+  frame.add ("Stem", "DS", Value::Fraction (), Check::fraction (),
 	      Value::Const,
 	      "Fraction of shoot assimilate that goes to the stem.");
-  syntax.add ("RSR", "DS", Value::None (), Check::positive (), Value::Const,
+  frame.add ("RSR", "DS", Value::None (), Check::positive (), Value::Const,
 	      "Maximal root/shoot ratio as a function of development state.\n\
 If the root/shoot ratio is above this, the roots will start dying.");
-  syntax.add ("nitrogen_stress_limit", Value::None (), Check::fraction (), 
+  frame.add ("nitrogen_stress_limit", Value::None (), Check::fraction (), 
               Value::Const,
 	      "If nitrogen stress is above this number and DS is above 1,\n\
 allocate all assimilate to the storage organ.");
-  alist.add ("nitrogen_stress_limit", 1.0);
+  frame.add ("nitrogen_stress_limit", 1.0);
 }
 
 Partition::Partition (const AttributeList& al)

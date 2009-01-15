@@ -68,7 +68,7 @@ struct ChemicalStandard : public Chemical
   {
     const double fraction;
     const symbol chemical;
-    static void load_syntax (Syntax&, AttributeList&);
+    static void load_syntax (Frame&);
     Product (Block&);
   };
   const auto_vector<const Product*> product;
@@ -227,13 +227,13 @@ const symbol
 ChemicalStandard::g_per_cm3 ("g/cm^3");
 
 void
-ChemicalStandard::Product::load_syntax (Syntax& syntax, AttributeList& alist)
+ChemicalStandard::Product::load_syntax (Frame& frame)
 {
-  syntax.add ("fraction", Value::Fraction (), Value::Const,
+  frame.add ("fraction", Value::Fraction (), Value::Const,
 	      "Fraction of decomposed matter that become this chemcial.");
-  syntax.add ("chemical", Value::String, Value::Const, 
+  frame.add ("chemical", Value::String, Value::Const, 
 	      "Chemical product of decomposed matter.");
-  syntax.order ("fraction", "chemical");
+  frame.order ("fraction", "chemical");
 }
 
 ChemicalStandard::Product::Product (Block& al)
@@ -1372,11 +1372,7 @@ You may not specify both 'decompose_rate' and 'decompose_halftime'");
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);
-
-    frame.add ("description", Value::String, Value::OptionalConst,
-               "Description of this parameterization."); 
-    frame.add ("description", "\
-Read chemical properties as normal Daisy parameters.");
+    Model::load_model (frame);
 
     // Surface parameters.
     frame.add_fraction ("crop_uptake_reflection_factor", Value::Const, "\

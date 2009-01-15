@@ -80,8 +80,7 @@ struct UnitSI : public MUnit
   static const size_t base_unit_size;
 
   // Create and destroy.
-  static void load_syntax (Syntax& syntax, AttributeList& alist);
-  static symbol find_base (Block& al);
+  static symbol find_base (Block&);
   UnitSI (Block& al)
     : MUnit (al, find_base (al))
   { }
@@ -104,11 +103,6 @@ const size_t
 UnitSI::base_unit_size
 /**/ = sizeof (UnitSI::base_unit) / sizeof (UnitSI::base_unit_type);
   
-
-void
-UnitSI::load_syntax (Syntax& syntax, AttributeList& alist)
-{
-}
 
 symbol
 UnitSI::find_base (Block& al)

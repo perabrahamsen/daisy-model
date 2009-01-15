@@ -52,11 +52,12 @@ Traverse::traverse_all_submodels ()
 
   for (unsigned int i = 0; i < submodels.size (); i++)
     {
-      Syntax syntax;
-      AttributeList alist;
+      Syntax dummy_syntax;
+      AttributeList dummy_alist;
+      Frame frame (dummy_syntax, dummy_alist);
       const symbol submodel = submodels[i];
-      Submodel::load_syntax (submodel, syntax, alist);
-      traverse_submodel_default (syntax, alist, submodel);
+      Submodel::load_syntax (submodel, frame);
+      traverse_submodel_default (frame.syntax (), frame.alist (), submodel);
     }
 }
 

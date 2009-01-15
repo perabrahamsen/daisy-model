@@ -946,10 +946,10 @@ static struct ColumnStandardSyntax : public DeclareModel
   Model* make (Block& al) const
   { return new ColumnStandard (al); }
 
-  static void load_water_and_macro (Syntax& syntax, AttributeList& alist)
+  static void load_water_and_macro (Frame& frame)
   {
-    SoilWater::load_syntax (syntax, alist);
-    syntax.add_object ("macro", Macro::component,
+    SoilWater::load_syntax (frame);
+    frame.add_object ("macro", Macro::component,
                        Value::OptionalState, Value::Singleton,
                        "Preferential flow model.\n\
 By default, preferential flow is enabled if and only if the combined\n\

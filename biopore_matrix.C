@@ -990,7 +990,7 @@ Increase value to get more debug message.");
     frame.add ("debug", 0);
     frame.add ("h_bottom", "cm", Value::OptionalState, Value::Sequence,
                 "Pressure at the bottom of the biopores in each interval.");
-    IMvec::add_syntax (frame.syntax (), frame.alist (), 
+    IMvec::add_syntax (frame,
                        Value::OptionalState, "solute",
                        IM::mass_unit (),
                        "Chemical concentration in biopore intervals.");

@@ -57,7 +57,7 @@ struct ActionCrop : public Action
     
     // Create and Destroy.
     static bool check_alist (const AttributeList& al, Treelog&);
-    static void load_syntax (Syntax&, AttributeList&);
+    static void load_syntax (Frame&);
     MM_DD (const AttributeList&);
     ~MM_DD ();
   };
@@ -77,7 +77,7 @@ struct ActionCrop : public Action
 
     // Create and Destroy.
     static bool check_alist (const AttributeList& al, Treelog&);
-    static void load_syntax (Syntax&, AttributeList&);
+    static void load_syntax (Frame&);
     Sow (const AttributeList&);
     ~Sow ();
   };
@@ -100,7 +100,7 @@ struct ActionCrop : public Action
 
     // Create and Destroy.
     static bool check_alist (const AttributeList& al, Treelog&);
-    static void load_syntax (Syntax&, AttributeList&);
+    static void load_syntax (Frame&);
     Annual (const AttributeList&);
     ~Annual ();
   };
@@ -131,7 +131,7 @@ struct ActionCrop : public Action
 
     // Create and Destroy.
     static bool check_alist (const AttributeList& al, Treelog&);
-    static void load_syntax (Syntax&, AttributeList&);
+    static void load_syntax (Frame&);
     Perennial (const AttributeList&);
     ~Perennial ();
   };
@@ -144,7 +144,7 @@ struct ActionCrop : public Action
     const AttributeList& what;
     
     static bool check_alist (const AttributeList& al, Treelog&);
-    static void load_syntax (Syntax&, AttributeList&);
+    static void load_syntax (Frame&);
     Fertilize (const AttributeList&);
     ~Fertilize ();
   };
@@ -165,7 +165,7 @@ struct ActionCrop : public Action
 
     // Create and Destroy.
     static bool check_alist (const AttributeList& al, Treelog&);
-    static void load_syntax (Syntax&, AttributeList&);
+    static void load_syntax (Frame&);
     Tillage (Block&);
     ~Tillage ();
   };
@@ -185,7 +185,7 @@ struct ActionCrop : public Action
 
     // Create and Destroy.
     static bool check_alist (const AttributeList& al, Treelog&);
-    static void load_syntax (Syntax&, AttributeList&);
+    static void load_syntax (Frame&);
     Spray (const AttributeList&);
     ~Spray ();
   };
@@ -204,7 +204,7 @@ struct ActionCrop : public Action
     bool doIt (Daisy&, const Scope&, Treelog&) const;
 
     // Create and Destroy.
-    static void load_syntax (Syntax&, AttributeList&);
+    static void load_syntax (Frame&);
     Irrigation (const AttributeList&);
     ~Irrigation ();
   };
@@ -233,13 +233,13 @@ ActionCrop::MM_DD::match (const Time& time) const
     && time.hour () == hour; }
 
 bool 
-ActionCrop::MM_DD::check_alist (const AttributeList& alist, Treelog& err)
+ActionCrop::MM_DD::check_alist (const AttributeList& frame, Treelog& err)
 {
   bool ok = true;
 
-  const int mm = alist.integer ("month");
-  const int dd = alist.integer ("day");
-  const int hh = alist.integer ("hour");
+  const int mm = frame.integer ("month");
+  const int dd = frame.integer ("day");
+  const int hh = frame.integer ("hour");
 
   if (mm < 1 || mm > 12)
     {
@@ -263,17 +263,17 @@ ActionCrop::MM_DD::check_alist (const AttributeList& alist, Treelog& err)
 }
 
 void 
-ActionCrop::MM_DD::load_syntax (Syntax& syntax, AttributeList& alist)
+ActionCrop::MM_DD::load_syntax (Frame& frame)
 {
-  syntax.add_check (check_alist);
-  syntax.add ("month", Value::Integer, Value::Const, 
+  frame.add_check (check_alist);
+  frame.add ("month", Value::Integer, Value::Const, 
 	      "Month in the year.");
-  syntax.add ("day", Value::Integer, Value::Const, 
+  frame.add ("day", Value::Integer, Value::Const, 
 	      "Day in the month.");
-  syntax.add ("hour", Value::Integer, Value::Const, 
+  frame.add ("hour", Value::Integer, Value::Const, 
 	      "Hour in the day.");
-  alist.add ("hour", 8);
-  syntax.order ("month", "day");
+  frame.add ("hour", 8);
+  frame.order ("month", "day");
 }
 
 ActionCrop::MM_DD::MM_DD (const AttributeList& al)
@@ -310,15 +310,15 @@ ActionCrop::Sow::check_alist (const AttributeList&, Treelog&)
 }
 
 void 
-ActionCrop::Sow::load_syntax (Syntax& syntax, AttributeList& alist)
+ActionCrop::Sow::load_syntax (Frame& frame)
 { 
-  syntax.add_check (check_alist);
-  syntax.add_submodule ("date", alist, Value::Const, "Date to sow.",
-			MM_DD::load_syntax);
-  syntax.add_object ("crop", Crop::component, "Crop to sow.");
-  syntax.add ("done", Value::Boolean, Value::State, 
+  frame.add_check (check_alist);
+  frame.add_submodule ("date", Value::Const, "Date to sow.",
+                       MM_DD::load_syntax);
+  frame.add_object ("crop", Crop::component, "Crop to sow.");
+  frame.add ("done", Value::Boolean, Value::State, 
 	      "True iff the crop has been sowed.");
-  alist.add ("done", false);
+  frame.add ("done", false);
 }
 
 ActionCrop::Sow::Sow (const AttributeList& al)
@@ -364,19 +364,19 @@ ActionCrop::Annual::check_alist (const AttributeList&, Treelog&)
 }
 
 void 
-ActionCrop::Annual::load_syntax (Syntax& syntax, AttributeList& alist)
+ActionCrop::Annual::load_syntax (Frame& frame)
 { 
-  syntax.add_check (check_alist);
-  syntax.add_fraction ("loss", Value::Const, "Fraction lost during harvest.");
-  syntax.add ("remove_residuals", Value::Boolean, Value::Const,
+  frame.add_check (check_alist);
+  frame.add_fraction ("loss", Value::Const, "Fraction lost during harvest.");
+  frame.add ("remove_residuals", Value::Boolean, Value::Const,
 	      "Remove residuals at harvest.");
-  syntax.add_submodule ("latest", alist, Value::Const, 
+  frame.add_submodule ("latest", Value::Const, 
 			"Latest harvest date.\n\
 If the crop is ripe before this date, it will be harvested at that point.",
 			MM_DD::load_syntax);
-  syntax.add ("done", Value::Boolean, Value::State, 
+  frame.add ("done", Value::Boolean, Value::State, 
 	      "True iff the crop has been sowed.");
-  alist.add ("done", false);
+  frame.add ("done", false);
 }
 
 ActionCrop::Annual::Annual (const AttributeList& al)
@@ -480,38 +480,38 @@ ActionCrop::Perennial::check_alist (const AttributeList& al, Treelog& err)
 }
 
 void 
-ActionCrop::Perennial::load_syntax (Syntax& syntax, AttributeList& alist)
+ActionCrop::Perennial::load_syntax (Frame& frame)
 { 
-  syntax.add_check (check_alist);
-  syntax.add ("seasons", Value::Integer, Value::Const, 
+  frame.add_check (check_alist);
+  frame.add ("seasons", Value::Integer, Value::Const, 
 	      "Number of seasons to harvest crop.\n\
 The crop will be harvested whenever the specified DS or DM are reached.\n\
 The first season is the year the crop management starts.");
-  syntax.add_submodule ("end", alist, Value::Const, 
+  frame.add_submodule ("end", Value::Const, 
 			"End management this date the last season.",
 			MM_DD::load_syntax);
   static RangeEI ds_range (0.0, 2.0);
-  syntax.add ("DS", Value::None (), ds_range, Value::Const, 
+  frame.add ("DS", Value::None (), ds_range, Value::Const, 
 	      "Development stage at or above which to initiate harvest.");
-  syntax.add ("DM", "kg DM/ha", Check::positive (), Value::Const, 
+  frame.add ("DM", "kg DM/ha", Check::positive (), Value::Const, 
 	      "Dry matter at or above which to initiate harvest.");
-  syntax.add ("year_of_last_harvest", Value::Integer, Value::OptionalState, 
+  frame.add ("year_of_last_harvest", Value::Integer, Value::OptionalState, 
 	      "Year of last season.");
-  syntax.add_object ("fertilize", AM::component,
+  frame.add_object ("fertilize", AM::component,
                      Value::OptionalConst, Value::Sequence,"\
 Fertilizer applications after harvest first season.\n\
 First season is defined as the year where the first harvest occurs.");
-  syntax.add ("fertilize_index", Value::Integer, Value::State,
+  frame.add ("fertilize_index", Value::Integer, Value::State,
 	      "Next entry in 'fertilize' to execute.");
-  alist.add ("fertilize_index", 0);
-  syntax.add_object ("fertilize_rest", AM::component,
+  frame.add ("fertilize_index", 0);
+  frame.add_object ("fertilize_rest", AM::component,
                      Value::OptionalConst, Value::Sequence,"\
 Fertilizer applications after harvest remaining seasons.\n\
 If missing, use the same fertilizer as first season.");
-  syntax.add ("fertilize_rest_index", Value::Integer, Value::State,
+  frame.add ("fertilize_rest_index", Value::Integer, Value::State,
 	      "Next entry in 'fertilize_rest' to execute.");
-  alist.add ("fertilize_rest_index", 0);
-  syntax.add ("fertilize_year", Value::Integer, Value::OptionalState, 
+  frame.add ("fertilize_rest_index", 0);
+  frame.add ("fertilize_year", Value::Integer, Value::OptionalState, 
 	      "Year last fertilization was applid.");
 }
 
@@ -563,15 +563,15 @@ ActionCrop::Fertilize::check_alist (const AttributeList& al, Treelog& err)
 }
 
 void 
-ActionCrop::Fertilize::load_syntax (Syntax& syntax, AttributeList&)
+ActionCrop::Fertilize::load_syntax (Frame& frame)
 { 
-  syntax.add_check (check_alist);
-  syntax.add ("month", Value::Integer, Value::Const, 
+  frame.add_check (check_alist);
+  frame.add ("month", Value::Integer, Value::Const, 
 	      "Month in the year.");
-  syntax.add ("day", Value::Integer, Value::Const, 
+  frame.add ("day", Value::Integer, Value::Const, 
 	      "Day in the month.");
-  syntax.add_object ("what", AM::component, "Fertilizer to apply.");
-  syntax.order ("month", "day", "what");
+  frame.add_object ("what", AM::component, "Fertilizer to apply.");
+  frame.order ("month", "day", "what");
 }
 
 ActionCrop::Fertilize::Fertilize (const AttributeList& al)
@@ -627,18 +627,18 @@ ActionCrop::Tillage::check_alist (const AttributeList& al, Treelog& err)
 }
 
 void 
-ActionCrop::Tillage::load_syntax (Syntax& syntax, AttributeList&)
+ActionCrop::Tillage::load_syntax (Frame& frame)
 { 
-  syntax.add_check (check_alist);
-  syntax.add ("month", Value::Integer, Value::Const, 
+  frame.add_check (check_alist);
+  frame.add ("month", Value::Integer, Value::Const, 
 	      "Month in the year.");
-  syntax.add_check ("month", VCheck::valid_month ());
-  syntax.add ("day", Value::Integer, Value::Const, 
+  frame.add_check ("month", VCheck::valid_month ());
+  frame.add ("day", Value::Integer, Value::Const, 
 	      "Day in the month.");
-  syntax.add_check ("mday", VCheck::valid_mday ());
-  syntax.add_object ("operation", Action::component, 
+  frame.add_check ("mday", VCheck::valid_mday ());
+  frame.add_object ("operation", Action::component, 
                      "Tillage operation.");
-  syntax.order ("month", "day", "operation");
+  frame.order ("month", "day", "operation");
 }
 
 ActionCrop::Tillage::Tillage (Block& al)
@@ -679,18 +679,18 @@ ActionCrop::Spray::check_alist (const AttributeList& al, Treelog& err)
 }
 
 void 
-ActionCrop::Spray::load_syntax (Syntax& syntax, AttributeList&)
+ActionCrop::Spray::load_syntax (Frame& frame)
 { 
-  syntax.add_check (check_alist);
-  syntax.add ("month", Value::Integer, Value::Const, 
+  frame.add_check (check_alist);
+  frame.add ("month", Value::Integer, Value::Const, 
 	      "Month in the year.");
-  syntax.add ("day", Value::Integer, Value::Const, 
+  frame.add ("day", Value::Integer, Value::Const, 
 	      "Day in the month.");
-  syntax.add ("name", Value::String, Value::Const,
+  frame.add ("name", Value::String, Value::Const,
 	      "Name of chemichal to spray.");
-  syntax.add ("amount", "g/ha", Check::non_negative (), Value::Const,
+  frame.add ("amount", "g/ha", Check::non_negative (), Value::Const,
 	      "Amount of chemichal to spray.");
-  syntax.order ("month", "day", "name", "amount");
+  frame.order ("month", "day", "name", "amount");
 }
 
 ActionCrop::Spray::Spray (const AttributeList& al)
@@ -733,17 +733,17 @@ ActionCrop::Irrigation::doIt (Daisy& daisy, const Scope&, Treelog& msg) const
 }
 
 void 
-ActionCrop::Irrigation::load_syntax (Syntax& syntax, AttributeList& alist)
+ActionCrop::Irrigation::load_syntax (Frame& frame)
 { 
-  syntax.add_submodule ("from", alist, Value::Const, 
+  frame.add_submodule ("from", Value::Const, 
 			"Start of irrigation period.",
 			MM_DD::load_syntax);
-  syntax.add_submodule ("to", alist, Value::Const, 
+  frame.add_submodule ("to", Value::Const, 
 			"End of irrigation period.",
 			MM_DD::load_syntax);
-  syntax.add ("amount", "mm", Check::non_negative (), Value::Const, 
+  frame.add ("amount", "mm", Check::non_negative (), Value::Const, 
 	      "Amount of water to apply on irrigation.");
-  syntax.add ("potential", "cm", Check::negative (), Value::Const, 
+  frame.add ("potential", "cm", Check::negative (), Value::Const, 
 	      "Soil potential at which to irrigate.");
 }
 

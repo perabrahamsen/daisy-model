@@ -24,7 +24,7 @@
 #define RIDGE_H
 
 struct AttributeList;
-struct Syntax;
+struct Frame;
 struct Log;
 struct Geometry1D;
 struct Soil;
@@ -54,7 +54,7 @@ public:
 
   // Create & Destroy.
 public:
-  static void load_syntax (Syntax&, AttributeList&);
+  static void load_syntax (Frame&);
   void initialize (const Geometry1D& geo,
                    const Soil&, const SoilWater&);
   Ridge (const AttributeList& al);

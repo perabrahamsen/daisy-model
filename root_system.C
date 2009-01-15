@@ -36,6 +36,7 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "frame.h"
 #include <sstream>
 
 double 
@@ -502,109 +503,109 @@ RootSystem::check (const Units& units, Treelog& msg) const
 }
 
 void 
-RootSystem::load_syntax (Syntax& syntax, AttributeList& alist)
+RootSystem::load_syntax (Frame& frame)
 {
-  alist.add ("submodel", "RootSystem");
-  alist.add ("description", "Standard root system model.");
+  frame.alist ().add ("submodel", "RootSystem");
+  frame.alist ().add ("description", "Standard root system model.");
 
-  syntax.add_object ("rootdens", Rootdens::component, 
+  frame.add_object ("rootdens", Rootdens::component, 
                      Value::OptionalConst, Value::Singleton,
                      "Root density model.");
 
-  syntax.add_object ("ABAprod", ABAProd::component,
+  frame.add_object ("ABAprod", ABAProd::component,
                      "ABA production model.");
-  alist.add ("ABAprod", ABAProd::default_model ());
+  frame.add ("ABAprod", ABAProd::default_model ());
 
-  syntax.add ("DptEmr", "cm", Check::non_negative (), Value::Const,
+  frame.add ("DptEmr", "cm", Check::non_negative (), Value::Const,
 	    "Penetration at emergence.");
-  alist.add ("DptEmr", 10.0);
-  syntax.add ("PenPar1", "cm/dg C/d", Check::non_negative (), Value::Const,
+  frame.add ("DptEmr", 10.0);
+  frame.add ("PenPar1", "cm/dg C/d", Check::non_negative (), Value::Const,
 	    "Penetration rate parameter, coefficient.");
-  alist.add ("PenPar1", 0.25);
-  syntax.add ("PenPar2", "dg C", Check::none (), Value::Const,
+  frame.add ("PenPar1", 0.25);
+  frame.add ("PenPar2", "dg C", Check::none (), Value::Const,
 	    "Penetration rate parameter, threshold.");
-  alist.add ("PenPar2", 4.0);
-  syntax.add ("PenClayFac", Value::Fraction (), Value::None (),
+  frame.add ("PenPar2", 4.0);
+  frame.add ("PenClayFac", Value::Fraction (), Value::None (),
 	      Check::non_negative (), Value::Const, 
 	      "Clay dependent factor to multiply 'PenPar1' with.");
   PLF clay;
   clay.add (0.0, 1.0);
   clay.add (1.0, 1.0);
-  alist.add ("PenClayFac", clay);
-  syntax.add ("MaxPen", "cm", Check::positive (), Value::Const,
+  frame.add ("PenClayFac", clay);
+  frame.add ("MaxPen", "cm", Check::positive (), Value::Const,
 	    "Maximum penetration depth.");
-  alist.add ("MaxPen", 100.0);
-  syntax.add ("MaxWidth", "cm", Check::positive (), Value::OptionalConst,
+  frame.add ("MaxPen", 100.0);
+  frame.add ("MaxWidth", "cm", Check::positive (), Value::OptionalConst,
               "Maximum horizontal distance of roots from plant.");
-  syntax.add ("Rad", "cm", Check::positive (), Value::Const,
+  frame.add ("Rad", "cm", Check::positive (), Value::Const,
 	    "Root radius.");
-  alist.add ("Rad", 0.005);
-  syntax.add ("h_wp", "cm", Check::none (), Value::Const,
+  frame.add ("Rad", 0.005);
+  frame.add ("h_wp", "cm", Check::none (), Value::Const,
 	    "Matrix potential at wilting point.");
-  alist.add ("h_wp",-15000.0);
-  syntax.add ("MxNH4Up", "g/cm/h", Check::non_negative (), Value::Const,
+  frame.add ("h_wp",-15000.0);
+  frame.add ("MxNH4Up", "g/cm/h", Check::non_negative (), Value::Const,
 	    "Maximum NH4 uptake per unit root length.");
-  alist.add ("MxNH4Up", 2.5e-7);
-  syntax.add ("MxNO3Up", "g/cm/h", Check::non_negative (), Value::Const,
+  frame.add ("MxNH4Up", 2.5e-7);
+  frame.add ("MxNO3Up", "g/cm/h", Check::non_negative (), Value::Const,
 	    "Maximum NO3 uptake per unit root length.");
-  alist.add ("MxNO3Up", 2.5e-7);
-  syntax.add ("Rxylem", Value::None (), Check::non_negative (), Value::Const,
+  frame.add ("MxNO3Up", 2.5e-7);
+  frame.add ("Rxylem", Value::None (), Check::non_negative (), Value::Const,
 	    "Transport resistence in xyleme.");
-  alist.add ("Rxylem", 10.0);
+  frame.add ("Rxylem", 10.0);
 
-  syntax.add ("PotRtDpt", "cm", Check::non_negative (), Value::OptionalState,
+  frame.add ("PotRtDpt", "cm", Check::non_negative (), Value::OptionalState,
 	      "Potential root penetration depth.");
-  syntax.add ("Depth", "cm", Check::non_negative (), Value::OptionalState,
+  frame.add ("Depth", "cm", Check::non_negative (), Value::OptionalState,
 	      "Rooting Depth.");
-  syntax.add ("Density", "cm/cm^3", Check::non_negative (),
+  frame.add ("Density", "cm/cm^3", Check::non_negative (),
 	      Value::LogOnly, Value::Sequence,
 	       "Root density in soil layers.");
-  syntax.add ("H2OExtraction", "cm^3/cm^3/h", Check::non_negative (), 
+  frame.add ("H2OExtraction", "cm^3/cm^3/h", Check::non_negative (), 
 	      Value::LogOnly, Value::Sequence,
 	       "Extraction of H2O in soil layers.");
-  syntax.add ("NH4Extraction", "g N/cm^3/h", Check::non_negative (), 
+  frame.add ("NH4Extraction", "g N/cm^3/h", Check::non_negative (), 
 	      Value::LogOnly, Value::Sequence,
 	       "Extraction of NH4-N in soil layers.");
-  syntax.add ("NO3Extraction", "g N/cm^3/h", Check::non_negative (), 
+  frame.add ("NO3Extraction", "g N/cm^3/h", Check::non_negative (), 
 	      Value::LogOnly, Value::Sequence,
 	       "Extraction of NO3-N in soil layers.");
-  syntax.add ("ABAExtraction", "g/cm^3/h", Check::non_negative (), 
+  frame.add ("ABAExtraction", "g/cm^3/h", Check::non_negative (), 
 	      Value::LogOnly, Value::Sequence,
 	      "Extraction of ABA in soil layers.");
-  syntax.add ("ABAConc", "g/cm^3", Check::non_negative (), 
+  frame.add ("ABAConc", "g/cm^3", Check::non_negative (), 
 	      Value::State, "ABA concentration in water uptake.");
-  alist.add ("ABAConc", 0.0);
-  syntax.add ("h_x", "cm", Check::none (), Value::State,
+  frame.add ("ABAConc", 0.0);
+  frame.add ("h_x", "cm", Check::none (), Value::State,
 	       "Root extraction at surface.");
-  alist.add ("h_x", 0.0);
-  syntax.add ("partial_soil_temperature", "dg C h", Value::State,
+  frame.add ("h_x", 0.0);
+  frame.add ("partial_soil_temperature", "dg C h", Value::State,
 	      "Soil temperature hours this day, so far.");
-  alist.add ("partial_soil_temperature", 0.0);
-  syntax.add ("partial_day", "h", Value::State,
+  frame.add ("partial_soil_temperature", 0.0);
+  frame.add ("partial_day", "h", Value::State,
 	      "Hours we have accumulated soil temperature this day.");
-  alist.add ("partial_day", 0.0);
-  syntax.add ("soil_temperature", "dg C", Value::State,
+  frame.add ("partial_day", 0.0);
+  frame.add ("soil_temperature", "dg C", Value::State,
 	      "Average soil temperature yesterday.");
-  alist.add ("soil_temperature", 0.0);
-  syntax.add ("water_stress", Value::None (), Check::fraction (),
+  frame.add ("soil_temperature", 0.0);
+  frame.add ("water_stress", Value::None (), Check::fraction (),
 	      Value::LogOnly,
 	       "Fraction of requested water we didn't get.");
-  syntax.add ("water_stress_days", "d", Check::non_negative (),
+  frame.add ("water_stress_days", "d", Check::non_negative (),
 	      Value::State,
 	       "Number of days production has halted due to water stress.\n\
 This is the sum of water stress for each hour, multiplied with the\n\
 fraction of the radition of that day that was received that hour.");
-  alist.add ("water_stress_days", 0.0);
-  syntax.add ("production_stress", Value::None (), Check::fraction (), 
+  frame.add ("water_stress_days", 0.0);
+  frame.add ("production_stress", Value::None (), Check::fraction (), 
 	      Value::LogOnly,
 	       "SVAT induced stress, or -1 if not applicable.");
-  syntax.add ("Ept", "mm/h", Check::none (), Value::LogOnly,
+  frame.add ("Ept", "mm/h", Check::none (), Value::LogOnly,
 	       "Potential transpiration.");
-  syntax.add ("H2OUpt", "mm/h", Check::non_negative (), Value::LogOnly,
+  frame.add ("H2OUpt", "mm/h", Check::non_negative (), Value::LogOnly,
 	      "H2O uptake.");
-  syntax.add ("NH4Upt", "g N/m^2/h", Check::non_negative (), Value::LogOnly,
+  frame.add ("NH4Upt", "g N/m^2/h", Check::non_negative (), Value::LogOnly,
 	      "NH4-N uptake.");
-  syntax.add ("NO3Upt", "g N/m^2/h", Check::non_negative (), Value::LogOnly,
+  frame.add ("NO3Upt", "g N/m^2/h", Check::non_negative (), Value::LogOnly,
 	      "NO3-N uptake.");
 }
 

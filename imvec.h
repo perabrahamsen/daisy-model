@@ -25,7 +25,7 @@
 #define IMVEC_H
 
 #include "symbol.h"
-#include "syntax.h"
+#include "value.h"
 #include <map>
 #include <vector>
 #include <boost/noncopyable.hpp>
@@ -33,6 +33,7 @@
 class Log;
 class Block;
 class Unit;
+class Frame;
 
 class IMvec : private boost::noncopyable
 {
@@ -80,7 +81,7 @@ public:
 
   // Create and Destroy. 
 public:
-  static void add_syntax (Syntax& parent_syntax, AttributeList& parent_alist,
+  static void add_syntax (Frame& parent,
 			  Value::category cat, 
 			  const char *const key,
 			  const symbol dimension,

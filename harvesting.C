@@ -34,6 +34,7 @@
 #include "submodel.h"
 #include "check_range.h"
 #include "submodeler.h"
+#include "frame.h"
 #include <numeric>
 
 // Dimensional conversion.
@@ -513,72 +514,72 @@ Harvesting::output (Log& log) const
 }
 
 void 
-Harvesting::load_syntax (Syntax& syntax, AttributeList& alist)
+Harvesting::load_syntax (Frame& frame)
 {
   // Submodel.
-  alist.add ("submodel", "Harvesting");
-  alist.add ("description", 
+  frame.alist ().add ("submodel", "Harvesting");
+  frame.alist ().add ("description", 
 	     "Information about what happens to the crop at harvest and cut.");
 
-  syntax.add_submodule_sequence ("Stem", Value::Const, 
+  frame.add_submodule_sequence ("Stem", Value::Const, 
 				 "Stem AM parameters.", AOM::load_syntax);
-  syntax.add_check ("Stem", AM::check_om_pools ());
-  alist.add ("Stem", AM::default_AM ());
-  syntax.add_submodule_sequence ("Leaf", Value::Const,
+  frame.add_check ("Stem", AM::check_om_pools ());
+  frame.add ("Stem", AM::default_AM ());
+  frame.add_submodule_sequence ("Leaf", Value::Const,
 				 "Leaf AM parameters.", AOM::load_syntax);
-  syntax.add_check ("Leaf", AM::check_om_pools ());
-  alist.add ("Leaf", AM::default_AM ());
-  syntax.add_submodule_sequence ("Dead", Value::Const,
+  frame.add_check ("Leaf", AM::check_om_pools ());
+  frame.add ("Leaf", AM::default_AM ());
+  frame.add_submodule_sequence ("Dead", Value::Const,
 				 "Dead leaves AM parameters.",
 				 AOM::load_syntax);
-  syntax.add_check ("Dead", AM::check_om_pools ());
-  alist.add ("Dead", AM::default_AM ());
-  syntax.add_submodule_sequence ("SOrg", Value::Const,
+  frame.add_check ("Dead", AM::check_om_pools ());
+  frame.add ("Dead", AM::default_AM ());
+  frame.add_submodule_sequence ("SOrg", Value::Const,
 				 "Storage organ AM parameters.", 
 				 AOM::load_syntax);
-  syntax.add_check ("SOrg", AM::check_om_pools ());
-  alist.add ("SOrg", AM::default_AM ());
-  syntax.add_submodule_sequence ("Root", Value::Const,
+  frame.add_check ("SOrg", AM::check_om_pools ());
+  frame.add ("SOrg", AM::default_AM ());
+  frame.add_submodule_sequence ("Root", Value::Const,
 				 "Root AM parameters.", AOM::load_syntax);
-  syntax.add_check ("Root", AM::check_om_pools ());
-  alist.add ("Root", AM::default_AM ());
-  syntax.add ("EconomicYield_W", Value::None (), Value::Const, "\
+  frame.add_check ("Root", AM::check_om_pools ());
+  frame.add ("Root", AM::default_AM ());
+  frame.add ("EconomicYield_W", Value::None (), Value::Const, "\
 Valuable fraction of storage organ (DM), e.g. grain or tuber.");
-  alist.add ("EconomicYield_W", 1.00);
-  syntax.add ("EconomicYield_N", Value::None (), Value::OptionalConst,
+  frame.add ("EconomicYield_W", 1.00);
+  frame.add ("EconomicYield_N", Value::None (), Value::OptionalConst,
                "Valuable fraction of storage organ (N).\n\
 By default the value for DM is used.");
-  syntax.add ("DSmax", Value::None (), Check::non_negative (), 
+  frame.add ("DSmax", Value::None (), Check::non_negative (), 
 	      Value::Const, "\
 Maximal development stage for which the crop survives harvest.");
-  alist.add ("DSmax", 0.80);
-  syntax.add ("DSnew", Value::None (), Check::non_negative (),
+  frame.add ("DSmax", 0.80);
+  frame.add ("DSnew", Value::None (), Check::non_negative (),
               Value::OptionalConst,
 	      "New development stage after harvest.\n\
 If not specified, use the DS where an uncut crop would first reach the\n\
 height it now has after the cut.  I.e. it uses the inverse function of\n\
 the HvsDS Canopy parameter to find the new DS.");
-  syntax.add_submodule ("last_cut", alist, Value::OptionalState,
+  frame.add_submodule ("last_cut", Value::OptionalState,
 			"Date of last cut.  Used for calculating cut delay.",
 			Time::load_syntax);
-  syntax.add ("production_delay", "d", Value::State,
+  frame.add ("production_delay", "d", Value::State,
 	      "production delay caused by last cut");
-  alist.add ("production_delay", 0.0);
-  syntax.add ("cut_delay", "kg DM/ha", "d", Value::Const,
+  frame.add ("production_delay", 0.0);
+  frame.add ("cut_delay", "kg DM/ha", "d", Value::Const,
 	      "\
 Production and development delay in days as a function of the shoot DM\n\
 removed by harvest.  By default, there is no delay.");
   PLF no_delay;
   no_delay.add (0.0, 0.0);
   no_delay.add (1.0, 0.0);
-  alist.add ("cut_delay", no_delay);
-  syntax.add_fraction ("cut_stress", Value::LogOnly, 
+  frame.add ("cut_delay", no_delay);
+  frame.add_fraction ("cut_stress", Value::LogOnly, 
 		       "Stress induced due to last cut.");
-  syntax.add ("total_water_use", "kg H2O", Check::non_negative (), 
+  frame.add ("total_water_use", "kg H2O", Check::non_negative (), 
               Value::State, "\
 Total evapotranspiration since emergence.");
-  alist.add ("total_water_use", 0.0);
-  syntax.add ("sorg_height", "cm", Value::OptionalConst, 
+  frame.add ("total_water_use", 0.0);
+  frame.add ("sorg_height", "cm", Value::OptionalConst, 
               "Vertical location of storage organ.\n\
 Set this to a negative number for root fruits, this will cause harvesting\n\
 to imply a suitable tillage operation, and guarentee that harvest will kill\n\

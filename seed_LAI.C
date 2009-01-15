@@ -59,7 +59,6 @@ struct SeedLAI : public Seed
   }
   bool check (Treelog&) const
   { return true; }
-  static void load_syntax (Syntax& syntax, AttributeList& alist);
   SeedLAI (Block& al)
     : Seed (al),
       DSLAI05 (al.number ("DSLAI05")),

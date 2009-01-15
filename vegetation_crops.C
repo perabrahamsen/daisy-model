@@ -56,7 +56,7 @@ struct VegetationCrops : public Vegetation
     double operator() (int year, int yday);
     
     // Create;
-    static void load_syntax (Syntax&, AttributeList&);
+    static void load_syntax (Frame&);
     ForcedLAI (const std::vector<const AttributeList*>& als);
   } forced_LAI;
 
@@ -246,17 +246,17 @@ VegetationCrops::ForcedLAI::operator() (int year, int yday)
   return -1.0;
 }
     
-void VegetationCrops::ForcedLAI::load_syntax (Syntax& syntax, AttributeList&)
+void VegetationCrops::ForcedLAI::load_syntax (Frame& frame)
 {
-  syntax.add ("year", Value::Integer, Value::Const, "\
+  frame.add ("year", Value::Integer, Value::Const, "\
 Year for which to use forced LAI.");
-  syntax.add ("LAIvsDAY", "m^2/m^2", "yday", Value::OptionalConst, 
+  frame.add ("LAIvsDAY", "m^2/m^2", "yday", Value::OptionalConst, 
 		"LAI as a function of Julian day.\n\
 \n\
 The simulated LAI will be used before the first day you specify and\n\
 after the last specified day.  Simulated LAI will also be used\n\
 whenever 'LAIvsDAY' becomes negative.");
-  syntax.order ("year", "LAIvsDAY");
+  frame.order ("year", "LAIvsDAY");
 }
 
 VegetationCrops::ForcedLAI::ForcedLAI (const std::vector<const AttributeList*>& als)

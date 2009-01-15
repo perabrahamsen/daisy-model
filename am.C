@@ -167,7 +167,7 @@ struct AM::Implementation::Lock
   void output (Log&) const;
     
   // Create and Destroy.
-  static void load_syntax (Syntax& syntax, AttributeList&);
+  static void load_syntax (Frame&);
   Lock (symbol c, symbol p);
   Lock (const AttributeList& al);
 };
@@ -181,11 +181,11 @@ AM::Implementation::Lock::output (Log& log) const
 
 
 void
-AM::Implementation::Lock::load_syntax (Syntax& syntax, AttributeList&)
+AM::Implementation::Lock::load_syntax (Frame& frame)
 {
-  syntax.add ("crop", Value::String, Value::State, 
+  frame.add ("crop", Value::String, Value::State, 
 	      "Crop to which this am is locked");
-  syntax.add ("part", Value::String, Value::State, 
+  frame.add ("part", Value::String, Value::State, 
 	      "Crop part to which this am is locked");
 }
 
@@ -720,9 +720,8 @@ AM::default_AM ()
 
   if (am.size () < 1)
     {
-      Syntax aom_syntax;
-      AttributeList aom_alist;
-      AOM::load_syntax (aom_syntax, aom_alist);
+      Frame aom_frame (AOM::load_syntax);
+      const AttributeList& aom_alist = aom_frame.alist ();
       AttributeList& AOM1 = *new AttributeList (aom_alist);
       AttributeList& AOM2 = *new AttributeList (aom_alist);
       AOM1.add ("initial_fraction", 0.80);
@@ -1129,8 +1128,7 @@ Organic fertilizer, typically slurry or manure from animals.")
   }
   void load_frame (Frame& frame) const
   {
-    frame.add ("description", Value::String, Value::OptionalConst,
-                "Description of this fertilizer type."); 
+    Model::load_model (frame);
     frame.add_check (check_alist);
     frame.add_submodule ("creation", Value::OptionalState, 
                           "Time of application.", Time::load_syntax);
@@ -1178,8 +1176,7 @@ static struct AMMineralSyntax : public DeclareAM
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("description", Value::String, Value::OptionalConst,
-                "Description of this fertilizer type."); 
+    Model::load_model (frame);
     frame.add_submodule ("creation", Value::OptionalState, 
                           "Time of application.", Time::load_syntax);
     frame.add ("weight", "kg N/ha", Check::non_negative (), Value::Const,

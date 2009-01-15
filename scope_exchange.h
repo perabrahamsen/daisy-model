@@ -55,7 +55,7 @@ public:
 
   // Create and Destroy.
 public:
-  static void load_syntax (Syntax&, AttributeList&);
+  static void load_syntax (Frame&);
 protected:
   explicit Exchange (symbol name, symbol description);
 public:

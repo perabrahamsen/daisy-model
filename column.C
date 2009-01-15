@@ -40,11 +40,11 @@ Column::library_id () const
 }
 
 void
-Column::Point::load_syntax (Syntax& syntax, AttributeList&)
+Column::Point::load_syntax (Frame& frame)
 { 
-  syntax.add ("x", Value::Unknown (), Value::Const, "X-Coordinate.");
-  syntax.add ("y", Value::Unknown (), Value::Const, "Y-Coordinate.");
-  syntax.order ("x", "y");
+  frame.add ("x", Value::Unknown (), Value::Const, "X-Coordinate.");
+  frame.add ("y", Value::Unknown (), Value::Const, "Y-Coordinate.");
+  frame.order ("x", "y");
 }
 
 Column::Point::Point (const Block& al)

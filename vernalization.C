@@ -25,7 +25,7 @@
 #include "submodel.h"
 #include "log.h"
 #include "alist.h"
-#include "syntax.h"
+#include "frame.h"
 
 void
 Vernalization::operator () (double Ta, double& DS)
@@ -66,18 +66,18 @@ Vernalization::no_vernalization ()
 }
 
 void 
-Vernalization::load_syntax (Syntax& syntax, AttributeList& alist)
+Vernalization::load_syntax (Frame& frame)
 {
-  alist.add ("submodel", "Vernalization");
-  alist.add ("description", "\
+  frame.alist ().add ("submodel", "Vernalization");
+  frame.alist ().add ("description", "\
 Default crop vernalization submodel.");
-  syntax.add ("required", Value::Boolean, Value::OptionalConst,
+  frame.add ("required", Value::Boolean, Value::OptionalConst,
 	      "True, iff the crop requires vernalization.");
-  syntax.add ("DSLim", Value::None (), Value::Const,
+  frame.add ("DSLim", Value::None (), Value::Const,
 	      "Development stage at vernalization.");
-  syntax.add ("TaLim", "dg C", Value::Const,
+  frame.add ("TaLim", "dg C", Value::Const,
 	      "Vernalization temperature threshold.");
-  syntax.add ("TaSum", "dg C d", Value::State,
+  frame.add ("TaSum", "dg C d", Value::State,
 	      "Vernalization temperature-sum requirement.");
 }
 

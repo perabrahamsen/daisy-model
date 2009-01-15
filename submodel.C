@@ -82,12 +82,11 @@ Submodel::all (std::vector<symbol>& entries)
 }
 
 void
-Submodel::load_syntax (const symbol model, 
-		       Syntax& syntax, AttributeList& alist)
+Submodel::load_syntax (const symbol model, Frame& frame)
 {
   submodel_map_type::const_iterator i = submodel_map->find (model);
   daisy_assert (i != submodel_map->end ());
-  (*i).second (syntax, alist);
+  (*i).second (frame);
 }
 
 bool

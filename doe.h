@@ -28,7 +28,7 @@ class Geometry;
 class Soil;
 class SoilWater;
 class Treelog;
-class Syntax;
+class Frame;
 class AttributeList;
 
 class DOE
@@ -54,7 +54,7 @@ public:
   
   // Create and Destroy.
 public:
-  static void load_syntax (Syntax&, AttributeList&);
+  static void load_syntax (Frame&);
   void initialize (const Geometry&, 
                    const Soil&, const SoilWater&, Treelog&);
   DOE (const AttributeList& al);

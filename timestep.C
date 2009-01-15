@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "timestep.h"
-#include "syntax.h"
+#include "frame.h"
 #include "alist.h"
 #include "block.h"
 #include "assertion.h"
@@ -150,23 +150,23 @@ Timestep::non_zero ()
 }
 
 void 
-Timestep::load_syntax (Syntax& syntax, AttributeList& alist)
+Timestep::load_syntax (Frame& frame)
 {
-  syntax.add ("years", Value::Integer, Value::State, 
+  frame.add ("years", Value::Integer, Value::State, 
               "Number of years.");
-  alist.add ("years", 0);
-  syntax.add ("days", Value::Integer, Value::State, 
+  frame.add ("years", 0);
+  frame.add ("days", Value::Integer, Value::State, 
               "Number of days.");
-  alist.add ("days", 0);
-  syntax.add ("hours", Value::Integer, Value::State, 
+  frame.add ("days", 0);
+  frame.add ("hours", Value::Integer, Value::State, 
               "Number of hours.");
-  alist.add ("hours", 0);
-  syntax.add ("minutes", Value::Integer, Value::State, 
+  frame.add ("hours", 0);
+  frame.add ("minutes", Value::Integer, Value::State, 
               "Number of minutes.");
-  alist.add ("minutes", 0);
-  syntax.add ("seconds", Value::Integer, Value::State, 
+  frame.add ("minutes", 0);
+  frame.add ("seconds", Value::Integer, Value::State, 
               "Number of seconds.");
-  alist.add ("seconds", 0);
+  frame.add ("seconds", 0);
 }
 
 const Timestep& 

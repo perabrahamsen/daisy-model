@@ -29,7 +29,7 @@ class SoilWater;
 class Chemistry;
 class RootSystem;
 class AttributeList;
-class Syntax;
+class Frame;
 class Log;
 class PLF;
 class Treelog;
@@ -101,7 +101,7 @@ public:
 private:
   bool check_alist (const AttributeList& al, Treelog& err);
 public:
-  static void load_syntax (Syntax& syntax, AttributeList& alist);
+  static void load_syntax (Frame&);
   CrpN (const AttributeList&);
   ~CrpN ();
 };

@@ -233,15 +233,11 @@ hot start.")
   { }
   void load_frame (Frame& frame) const
   { 
+    Model::load_model (frame);
     frame.add ("where", Value::String, Value::Const,
                 "File name prefix for the generated checkpoint.\n\
 The time will be appended, together with the '.dai' suffix.");
     frame.add ("where", "checkpoint");
-    frame.add ("description", Value::String, Value::Const,
-                "Description of this particular checkpoint.");
-    frame.add ("description", "\
-Create a checkpoint of the entire simulation state, suitable for later\n\
-hot start.");
     frame.add_object ("when", Condition::component,
                        "Make a checkpoint every time this condition is true.");
     frame.add ("when", "finished");

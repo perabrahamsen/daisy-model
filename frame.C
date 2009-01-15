@@ -305,7 +305,6 @@ Frame::add_submodule_sequence (const symbol name, Value::category cat,
 			       Syntax::load_syntax_fun load_syntax)
 { impl->syntax.add_submodule_sequence (name, cat, description, load_syntax); }
 
-
 void 
 Frame::add_check (const symbol name, const VCheck& vcheck)
 { impl->syntax.add_check (name, vcheck); }
@@ -778,20 +777,17 @@ Frame::Frame (const Syntax& s, const AttributeList& a)
   : impl (new Implementation (s, a))
 { }
 
-Frame::Frame (load_frame_t load_syntax)
-  : impl (new Implementation ())
-{ load_syntax (*this); }
-
 void 
-Frame::reset (load_frame_t load_syntax)
+Frame::reset (load_syntax_t load_syntax)
 {
   impl.reset (new Implementation ()); 
   load_syntax (*this); 
 }
 
+
 Frame::Frame (load_syntax_t load_syntax)
   : impl (new Implementation ())
-{ load_syntax (impl->syntax, impl->alist); }
+{ load_syntax (*this); }
 
 Frame::~Frame ()
 { }

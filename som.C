@@ -23,17 +23,18 @@
 #include "som.h"
 #include "submodel.h"
 #include "alist.h"
+#include "frame.h"
 
 void 
-SOM::load_syntax (Syntax& syntax, AttributeList& alist)
+SOM::load_syntax (Frame& frame)
 {
-  OM::load_syntax (syntax, alist, "\
+  OM::load_syntax (frame, "\
 The first numbers corresponds to each of the SMB pools, the next\n\
 numbers corresponds to the SOM pools, and the last numbers to each of\n\
 the DOM pools.  The length of the sequence should thus be the number\n\
 of SMB pools plus the number of SOM pools plus the number of DOM pools."); 
-  alist.add ("submodel", "SOM");
-  alist.add ("description", "\
+  frame.alist ().add ("submodel", "SOM");
+  frame.alist ().add ("description", "\
 A single Soil Organic Matter pool.");
 }
 

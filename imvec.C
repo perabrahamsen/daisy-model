@@ -98,7 +98,7 @@ IMvec::output (Log& log) const
 }
 
 void 
-IMvec::add_syntax (Syntax& parent_syntax, AttributeList& parent_alist,
+IMvec::add_syntax (Frame& parent,
                    Value::category cat, 
                    const char *const key,
                    const symbol dimension,
@@ -111,8 +111,8 @@ IMvec::add_syntax (Syntax& parent_syntax, AttributeList& parent_alist,
   child_syntax.add ("value", dimension.name (), Check::non_negative (), cat, 
                     Value::Sequence, "Value for chemical.");
   child_syntax.order ("name", "value");
-  parent_syntax.add (key, child_syntax, cat, Value::Sequence, description);
-  parent_alist.add (key, std::vector<const AttributeList*> ());
+  parent.add (key, child_syntax, cat, Value::Sequence, description);
+  parent.add (key, std::vector<const AttributeList*> ());
 }
 
 const Unit&

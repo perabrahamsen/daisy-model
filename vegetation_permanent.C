@@ -54,7 +54,7 @@ struct VegetationPermanent : public Vegetation
     double operator() (int year, int yday);
     
     // Create;
-    static void load_syntax (Syntax&, AttributeList&);
+    static void load_syntax (Frame&);
     YearlyLAI (const std::vector<const AttributeList*>& als);
   } yearly_LAI;
   const PLF LAIvsDAY;		// LAI as a function of time.
@@ -231,17 +231,17 @@ VegetationPermanent::YearlyLAI::operator() (int year, int yday)
 }
     
 void 
-VegetationPermanent::YearlyLAI::load_syntax (Syntax& syntax, AttributeList&)
+VegetationPermanent::YearlyLAI::load_syntax (Frame& frame)
 {
-  syntax.add ("year", Value::Integer, Value::Const, "\
+  frame.add ("year", Value::Integer, Value::Const, "\
 Year for which to use yearly LAI measurements.");
-  syntax.add ("LAIvsDAY", "m^2/m^2", "yday", Value::OptionalConst, 
+  frame.add ("LAIvsDAY", "m^2/m^2", "yday", Value::OptionalConst, 
 		"LAI as a function of Julian day.\n\
 \n\
 The default LAI will be used before the first day you specify and\n\
 after the last specified day.  Default LAI will also be used\n\
 whenever 'LAIvsDAY' becomes negative.");
-  syntax.order ("year", "LAIvsDAY");
+  frame.order ("year", "LAIvsDAY");
 }
 
 VegetationPermanent::YearlyLAI::YearlyLAI (const std::vector<const AttributeList*>& als)

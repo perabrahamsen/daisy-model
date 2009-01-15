@@ -248,11 +248,11 @@ struct LogExtern::NumEntry
   const symbol name;
   const double value;
 
-  static void load_syntax (Syntax& syntax, AttributeList&)
+  static void load_syntax (Frame& frame)
   {
-    syntax.add ("name", Value::String, Value::State, "\
+    frame.add ("name", Value::String, Value::State, "\
 Name to refer to number with.");
-    syntax.add ("value", Value::Unknown (), Value::State, "\
+    frame.add ("value", Value::Unknown (), Value::State, "\
 Numeric value.");
   }
 

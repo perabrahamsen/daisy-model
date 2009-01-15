@@ -26,7 +26,7 @@
 #include <memory>
 
 struct Log;
-struct Syntax;
+struct Frame;
 struct AttributeList;
 struct Geometry;
 struct Soil;
@@ -86,7 +86,7 @@ private:
 
   // Create & Destroy.
 public:
-  static void load_syntax (Syntax&, AttributeList&);
+  static void load_syntax (Frame&);
   void initialize (const Geometry& geo, 
                    const Soil&, const SoilWater&, Treelog&);
   DOM (Block& al);

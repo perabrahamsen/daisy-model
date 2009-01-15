@@ -31,7 +31,7 @@ class CrpN;
 class Partition;
 class Geometry;
 class AttributeList;
-class Syntax;
+class Frame;
 class Log;
 class PLF;
 class AM;
@@ -170,7 +170,7 @@ public:
 		   const std::vector<const AttributeList*>& root,
 		   const std::vector<const AttributeList*>& dead,
 		   const Geometry&, OrganicMatter&);
-  static void load_syntax (Syntax& syntax, AttributeList& alist);
+  static void load_syntax (Frame&);
   Production (const AttributeList&);
   ~Production ();
 };

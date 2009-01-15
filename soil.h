@@ -32,7 +32,7 @@ class Horizon;
 class Log;
 class Geometry;
 class Groundwater;
-class Syntax;
+class Frame;
 class Block;
 class Treelog;
 class Secondary;
@@ -107,7 +107,7 @@ public:
   bool check_x_border (double, Treelog& err) const;
   bool check_y_border (double, Treelog& err) const;
 
-  static void load_syntax (Syntax&, AttributeList&);
+  static void load_syntax (Frame&);
 private:
   Soil (const Soil&);
 public:

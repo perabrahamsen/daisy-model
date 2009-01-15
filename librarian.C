@@ -152,40 +152,6 @@ Librarian::library (symbol component)
   return content->add (component.name ().c_str ());
 }
  
-
-void 
-Librarian::add_base (const symbol component,
-                     AttributeList& al, const Syntax& syntax)
-{ 
-  library (component).add_base (al, syntax); 
-  daisy_assert (!content->closed);
-}
-
-void 
-Librarian::add_type (const symbol component,
-                     const symbol name, AttributeList& al,
-                     const Syntax& syntax, builder build)
-{
-  library (component).add_model (name, al, syntax, build); 
-  daisy_assert (!content->closed);
-}
-
-void 
-Librarian::add_alias (const symbol component,
-                      const symbol derived, const symbol base)
-{
-  Library& lib = library (component);
-
-  daisy_assert (lib.check (base));
-  daisy_assert (!lib.check (derived));
-  AttributeList& alist = *new AttributeList (lib.lookup (base));
-  alist.add ("description", 
-             "The " + derived.name ()
-             + " model is an alias for " + base.name () + ".");
-  lib.add_derived (derived, alist, base);
-  daisy_assert (!content->closed);
-}
-
 void 
 Librarian::add_doc_fun (const symbol component, const doc_fun fun)
 {
@@ -194,7 +160,7 @@ Librarian::add_doc_fun (const symbol component, const doc_fun fun)
 } 
 
 void
-Librarian::load_syntax (Syntax& syntax, AttributeList&)
+Librarian::load_syntax (Frame& frame)
 {
   const std::string def = "def";
   for (std::map<symbol, Library*>::const_iterator i = content->all.begin (); 
@@ -202,7 +168,7 @@ Librarian::load_syntax (Syntax& syntax, AttributeList&)
        i++)
     { 
       const symbol name = (*i).first;
-      syntax.add_library (def + name, name);
+      frame.add_library (def + name, name);
     }
 }
 
@@ -243,10 +209,6 @@ Declare::root_name ()
   return name;
 }
 
-const FrameModel* 
-Declare::parent_model () const
-{ return NULL; }
-
 Declare::Declare (const symbol c, const symbol n,
                   const symbol d)
   : component (c),
@@ -267,6 +229,10 @@ DeclareComponent::load (Frame& frame) const
 void 
 DeclareComponent::load_frame (Frame&) const
 { }
+
+const FrameModel* 
+DeclareComponent::parent_model () const
+{ return &FrameModel::root (); }
 
 DeclareComponent::DeclareComponent (const symbol component,
                                     const symbol description)
