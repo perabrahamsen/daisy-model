@@ -193,7 +193,7 @@ static struct UnitSIFactorSyntax
                    const int electric_current,
                    const int thermodynamic_temperature,
                    const int amount_of_substance, const int luminous_intensity,
-                   const std::string& description)
+                   const symbol description)
   {
     AttributeList& alist = *new AttributeList (super_alist);
     alist.add ("type", super);
