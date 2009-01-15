@@ -33,7 +33,6 @@ class Treelog;
 class Groundwater;
 class Volume;
 class Frame;
-class Syntax;
 
 class Geometry
 {
@@ -259,10 +258,6 @@ public:
 
   // Layers -- Support initializing soil arrays layer by layer.
 public:
-  static void add_layer (Syntax& syntax, Value::category, 
-                         symbol name,
-                         symbol dimension,
-                         symbol description);
   static void add_layer (Frame& frame, Value::category, 
                          symbol name,
                          symbol dimension,

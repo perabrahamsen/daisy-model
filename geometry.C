@@ -641,13 +641,6 @@ Geometry::add_layer (Frame& frame, const Value::category cat,
                      const symbol name,
 		     const symbol dimension,
                      const symbol description)
-{ add_layer (frame.syntax (), cat, name, dimension, description); }
-
-void 
-Geometry::add_layer (Syntax& syntax, const Value::category cat, 
-                     const symbol name,
-		     const symbol dimension,
-                     const symbol description)
 {
   Syntax& layer = *new Syntax ();
   layer.add ("end", "cm", Check::negative (), Value::Const, 
@@ -659,19 +652,19 @@ Geometry::add_layer (Syntax& syntax, const Value::category cat,
   layer.order ("end", "value");
 
   const std::string iname = "initial_" + name;
-  syntax.add (iname, layer,
+  frame.add (iname, layer,
 	      Value::OptionalConst, Value::Sequence, 
 	      "Initial value of the '" + name + "' parameter.\n\
 The initial value is given as a sequence of (END VALUE) pairs, starting\n\
 from the top and going down.  The parameter will be initialized to\n\
 VALUE from the END of the previous layer, to the END of the current layer.");
-  syntax.add_check (iname, check_layers);
+  frame.add_check (iname, check_layers);
   if (dimension == Value::Fraction ())
-    syntax.add_fraction (name, cat, Value::Sequence, 
-                         description);
+    frame.add_fraction (name, cat, Value::Sequence, 
+                        description);
   else
-    syntax.add (name, dimension, cat, Value::Sequence, 
-                description);
+    frame.add (name, dimension, cat, Value::Sequence, 
+               description);
 }
 
 void 
