@@ -65,9 +65,6 @@ public:
 		 is_ready, is_running, is_done, is_error };
 
   // Accessors.
-private:
-  Syntax& syntax ();
-  AttributeList& alist ();
 public:
   const Syntax& program_syntax () const;
   const AttributeList& program_alist () const;

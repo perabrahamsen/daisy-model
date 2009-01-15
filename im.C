@@ -242,15 +242,6 @@ IM::add_syntax (Frame& parent_frame,
 		const char *const key,
 		const symbol dimension,
 		const char *const description)
-{ add_syntax (parent_frame.syntax (), parent_frame.alist (), 
-              cat, key, dimension, description); }
-
-void
-IM::add_syntax (Syntax& parent_syntax, AttributeList& parent_alist,
-		Value::category cat, 
-		const char *const key,
-		const symbol dimension,
-		const char *const description)
 {
   Syntax& child_syntax = *new Syntax ();
   child_syntax.add ("name", Value::String, cat, 
@@ -259,8 +250,8 @@ IM::add_syntax (Syntax& parent_syntax, AttributeList& parent_alist,
   child_syntax.add ("value", dimension.name (), Check::non_negative (), cat, 
 		    "Value for chemical.");
   child_syntax.order ("name", "value");
-  parent_syntax.add (key, child_syntax, cat, Value::Sequence, description);
-  parent_alist.add (key, std::vector<const AttributeList*> ());
+  parent_frame.add (key, child_syntax, cat, Value::Sequence, description);
+  parent_frame.add (key, std::vector<const AttributeList*> ());
 }
 
 // im.C ends here.

@@ -234,14 +234,6 @@ the value must be a primitive of that type.  For Number, you can also\n\
 specify a dimension in square brackets afterwards.  DOC is a\n\
 non-optional description of the new parameter.";
 
-Syntax& 
-Toplevel::syntax () 
-{ return metalib ().syntax (); }
-
-AttributeList&
-Toplevel::alist ()
-{ return metalib ().alist (); }
-
 const Syntax& 
 Toplevel::program_syntax () const
 {

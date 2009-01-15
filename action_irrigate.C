@@ -190,7 +190,7 @@ Setting this overrides the 'days' and 'hours' parameters.");
     frame.add ("temperature", "dg C", 
 		Check::positive (), Value::OptionalConst,
 		"Temperature of irrigation (default: air temperature).");
-    IM::add_syntax (frame.syntax (), frame.alist (),
+    IM::add_syntax (frame,
                     Value::Const, "solute", Units::ppm (), 
 		    "Solutes in irrigation water.");
   }
