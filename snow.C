@@ -23,7 +23,7 @@
 
 #include "snow.h"
 #include "alist.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "log.h"
 #include "geometry.h"
 #include "soil.h"
@@ -360,7 +360,7 @@ Snow::storage () const
 }
 
 void
-Snow::load_syntax (Frame& frame)
+Snow::load_syntax (FrameSubmodel& frame)
 { 
   frame.alist ().add ("submodel", "Snow");
   frame.alist ().add ("description", "Simulate snow pack on surface.\n\

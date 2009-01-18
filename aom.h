@@ -25,6 +25,7 @@
 #include "om.h"
 #include <vector>
 
+class FrameSubmodel;
 class Volume;
 
 class AOM : public OM
@@ -74,7 +75,7 @@ private:
 
   // Create & Destroy.
 public:
-  static void load_syntax (Frame&);
+  static void load_syntax (FrameSubmodel&);
   AOM (const AttributeList& al);
 };
 

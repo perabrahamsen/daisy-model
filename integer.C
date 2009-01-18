@@ -28,7 +28,7 @@
 #include "memutils.h"
 #include "librarian.h"
 #include "treelog.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include <sstream>
 
 const char *const Integer::component = "integer";
@@ -97,7 +97,7 @@ struct IntegerCond : public Integer
   {
     const std::auto_ptr<Boolean> condition;
     const int value;
-    static void load_syntax (Frame& frame)
+    static void load_syntax (FrameSubmodel& frame)
     {
       frame.alist ().add ("description", "\
 If condition is true, return value.");

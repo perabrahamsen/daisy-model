@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "timestep.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "alist.h"
 #include "block.h"
 #include "assertion.h"
@@ -151,7 +151,11 @@ Timestep::non_zero ()
 }
 
 void 
-Timestep::load_syntax (Frame& frame)
+Timestep::load_syntax (FrameSubmodel& frame)
+{ load_frame (frame); }
+
+void 
+Timestep::load_frame (Frame& frame)
 {
   frame.add ("years", Value::Integer, Value::State, 
               "Number of years.");

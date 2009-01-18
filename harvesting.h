@@ -29,6 +29,7 @@
 #include <vector>
 #include <string>
 
+class FrameSubmodel;
 class AttributeList;
 class Syntax;
 class Log;
@@ -98,7 +99,7 @@ public:
 
   // Create and Destroy.
 public:
-  static void load_syntax (Frame&);
+  static void load_syntax (FrameSubmodel&);
   Harvesting (Block&);
   ~Harvesting ();
 };

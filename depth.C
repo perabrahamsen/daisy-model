@@ -37,7 +37,7 @@
 #include "librarian.h"
 #include "mathlib.h"
 #include "path.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include <string>
 #include <sstream>
 
@@ -236,7 +236,7 @@ static const class CheckTable : public VCheck
 
 static struct DepthPLFSyntax : public DeclareModel
 {
-  static void entry_syntax (Frame& frame)
+  static void entry_syntax (FrameSubmodel& frame)
   {
     frame.add_submodule ("time", Value::Const, "Time.",
                           Time::load_syntax);

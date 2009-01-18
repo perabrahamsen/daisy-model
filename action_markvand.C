@@ -36,7 +36,7 @@
 #include "vegetation.h"
 #include "treelog.h"
 #include "submodeler.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include <vector>
 #include <memory>
 #include <sstream>
@@ -356,7 +356,7 @@ struct ActionMarkvand : public Action
   const std::auto_ptr<MV_Soil> soil;
   const struct crop_map_t : public std::map<symbol, const MV_Crop*>
   {
-    static void load_syntax (Frame&);
+    static void load_syntax (FrameSubmodel&);
     crop_map_t (Block&, const std::string& key);
     ~crop_map_t ();
   } crop_map;
@@ -393,7 +393,7 @@ struct ActionMarkvand : public Action
 };
 
 void 
-ActionMarkvand::crop_map_t::load_syntax (Frame& frame)
+ActionMarkvand::crop_map_t::load_syntax (FrameSubmodel& frame)
 { 
   frame.add ("Daisy", Value::String, Value::Const, 
 	      "Name of Daisy crop.");

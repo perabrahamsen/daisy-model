@@ -34,7 +34,7 @@
 #include "program.h"
 #include "vcheck.h"
 #include "librarian.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include <memory>
 #include <sstream>
 
@@ -54,7 +54,7 @@ struct Hydraulic::K_at_h
   const double K;
 
   // Create and Destroy.
-  static void load_syntax (Frame& frame)
+  static void load_syntax (FrameSubmodel& frame)
   {
     frame.add ("h", "cm", Check::non_positive (), Value::Const, 
 		"Soil water pressure.");

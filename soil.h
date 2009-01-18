@@ -27,6 +27,7 @@
 #include <vector>
 #include <memory>
 
+class FrameSubmodel;
 class AttributeList;
 class Horizon;
 class Log;
@@ -107,7 +108,7 @@ public:
   bool check_x_border (double, Treelog& err) const;
   bool check_y_border (double, Treelog& err) const;
 
-  static void load_syntax (Frame&);
+  static void load_syntax (FrameSubmodel&);
 private:
   Soil (const Soil&);
 public:

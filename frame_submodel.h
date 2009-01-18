@@ -1,6 +1,6 @@
-// som.h --- A single soil organic matter pool.
+// frame_submodel.h -- Submodel parameterizations.
 // 
-// Copyright 2002 Per Abrahamsen and KVL.
+// Copyright 2009 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -18,20 +18,17 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#ifndef FRAME_SUBMODEL_H
+#define FRAME_SUBMODEL_H
 
-#ifndef SOM_H
-#define SOM_H
+#include "frame.h"
 
-#include "om.h"
-
-class FrameSubmodel;
-
-class SOM : public OM
-{ 
-  // Create & Destroy.
+class FrameSubmodel : public Frame
+{
+  // Create and Destroy.
 public:
-  static void load_syntax (FrameSubmodel&);
-  SOM (const AttributeList& al);
+  explicit FrameSubmodel (load_syntax_t);
+  ~FrameSubmodel ();
 };
 
-#endif // SOM_H
+#endif // FRAME_SUBMODEL_H

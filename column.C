@@ -26,7 +26,7 @@
 #include "syntax.h"
 #include "log.h"
 #include "librarian.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "submodeler.h"
 #include <map>
 
@@ -40,7 +40,7 @@ Column::library_id () const
 }
 
 void
-Column::Point::load_syntax (Frame& frame)
+Column::Point::load_syntax (FrameSubmodel& frame)
 { 
   frame.add ("x", Value::Unknown (), Value::Const, "X-Coordinate.");
   frame.add ("y", Value::Unknown (), Value::Const, "Y-Coordinate.");

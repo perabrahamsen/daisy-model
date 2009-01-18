@@ -23,14 +23,14 @@
 #ifndef RIDGE_H
 #define RIDGE_H
 
+#include <vector>
+
 struct AttributeList;
-struct Frame;
+struct FrameSubmodel;
 struct Log;
 struct Geometry1D;
 struct Soil;
 struct SoilWater;
-
-#include <vector>
 
 class Ridge
 { 
@@ -54,7 +54,7 @@ public:
 
   // Create & Destroy.
 public:
-  static void load_syntax (Frame&);
+  static void load_syntax (FrameSubmodel&);
   void initialize (const Geometry1D& geo,
                    const Soil&, const SoilWater&);
   Ridge (const AttributeList& al);

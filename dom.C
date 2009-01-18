@@ -29,7 +29,7 @@
 #include "submodel.h"
 #include "block.h"
 #include "alist.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "soil.h"
 #include "soil_water.h"
 #include "log.h"
@@ -179,7 +179,7 @@ DOM::tock (const std::vector<bool>& active,
 }
 
 void 
-DOM::load_syntax (Frame& frame)
+DOM::load_syntax (FrameSubmodel& frame)
 {
   // Submodel.
   frame.alist ().add ("submodel", "DOM");

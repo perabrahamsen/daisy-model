@@ -23,6 +23,7 @@
 #ifndef SNOW_H
 #define SNOW_H
 
+class FrameSubmodel;
 struct AttributeList;
 struct Weather;
 struct Bioclimate;
@@ -56,7 +57,7 @@ public:
 
   // Create & Destroy.
 public:
-  static void load_syntax (Frame&);
+  static void load_syntax (FrameSubmodel&);
   Snow (const AttributeList& al);
   ~Snow ();
 };

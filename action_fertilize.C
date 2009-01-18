@@ -34,7 +34,7 @@
 #include "volume.h"
 #include "units.h"
 #include "treelog.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include <sstream>
 
 // Base class for fertilize actions.
@@ -55,7 +55,7 @@ struct ActionFertilize : public Action
     
     // Create and Destroy.
     static bool check_alist (const AttributeList& al, Treelog& err);
-    static void load_syntax (Frame&);
+    static void load_syntax (FrameSubmodel&);
     Precision (const AttributeList& al);
     ~Precision ();
   };
@@ -71,7 +71,7 @@ struct ActionFertilize : public Action
   { }
   bool check (const Daisy& daisy, const Scope&, Treelog& err) const;
   static bool check_alist (const AttributeList& al, Treelog& err);
-  static void load_syntax (Frame&);
+  static void load_syntax (FrameSubmodel&);
 protected:
   ActionFertilize (Block& al);
   ~ActionFertilize ();
@@ -106,7 +106,7 @@ ActionFertilize::Precision::check_alist (const AttributeList& al, Treelog& err)
 }
 
 void 
-ActionFertilize::Precision::load_syntax (Frame& frame)
+ActionFertilize::Precision::load_syntax (FrameSubmodel& frame)
 {
   frame.add_check (&check_alist);
   frame.add ("target", "kg N/ha", Value::Const, 

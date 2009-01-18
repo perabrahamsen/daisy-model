@@ -506,7 +506,7 @@ unit conversation.");
 
 Units::Units (Metalib& metalib)
 #if 1
-  : allow_old_ (metalib.alist ().flag ("allow_old_units"))
+  : allow_old_ (metalib.flag ("allow_old_units"))
 #else
   : allow_old_ (true)
 #endif

@@ -24,7 +24,7 @@
 #include "partition.h"
 #include "plf.h"
 #include "submodel.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "alist.h"
 #include "check.h"
 #include "mathlib.h"
@@ -85,7 +85,7 @@ static bool check_alist (const AttributeList& al, Treelog& err)
 }
 
 void 
-Partition::load_syntax (Frame& frame)
+Partition::load_syntax (FrameSubmodel& frame)
 {
   frame.add_check (check_alist);
   frame.alist ().add ("submodel", "Partition");

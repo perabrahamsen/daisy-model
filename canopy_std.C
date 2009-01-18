@@ -24,7 +24,7 @@
 #include "canopy_std.h"
 #include "submodel.h"
 #include "log.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "mathlib.h"
 
 double
@@ -211,7 +211,7 @@ CanopyStandard::output (Log& log) const
 }
 
 void 
-CanopyStandard::load_syntax (Frame& frame)
+CanopyStandard::load_syntax (FrameSubmodel& frame)
 {
   CanopySimple::load_syntax (frame);
   frame.alist ().add ("submodel", "CanopyStandard");

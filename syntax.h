@@ -35,6 +35,7 @@ class Check;
 class VCheck;
 class Treelog;
 class Frame;
+class FrameSubmodel;
 
 #ifdef __unix
 #define EXPORT /* Nothing */
@@ -185,7 +186,7 @@ public:
 
   void add_library (symbol, symbol lib);
 
-  typedef void (*load_syntax_fun) (Frame& alist);
+  typedef void (*load_syntax_fun) (FrameSubmodel& alist);
 #if 0
   void add_submodule (symbol name, AttributeList& alist,
 		      Value::category cat, const symbol description,

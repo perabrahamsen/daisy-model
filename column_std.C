@@ -51,7 +51,7 @@
 #include "column.h"
 #include "librarian.h"
 #include "assertion.h"
-#include "frame.h"
+#include "frame_submodel.h"
 
 struct ColumnStandard : public Column
 {
@@ -946,7 +946,7 @@ static struct ColumnStandardSyntax : public DeclareModel
   Model* make (Block& al) const
   { return new ColumnStandard (al); }
 
-  static void load_water_and_macro (Frame& frame)
+  static void load_water_and_macro (FrameSubmodel& frame)
   {
     SoilWater::load_syntax (frame);
     frame.add_object ("macro", Macro::component,

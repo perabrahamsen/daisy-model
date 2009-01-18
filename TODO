@@ -2,9 +2,13 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Frame
 
-** Kig på submodel
+** Få det til at compilere
 
-Vi skal nok have gemt en frame for hver submodel.
+** Fjern submodel.h og submodel.C
+
+** fjern syntax::add (foo, syntax) for submodel
+
+I stedet skal vi have en add (foo, load_syntax), men kun gennem add_submodule
 
 ** Fjern "type", "base_model", "submodel" attributes.
 

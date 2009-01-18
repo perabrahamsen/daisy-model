@@ -28,6 +28,7 @@
 #include "librarian.h"
 #include "intrinsics.h"
 #include "library.h"
+#include "frame_submodel.h"
 
 struct Frame::Implementation
 {
@@ -299,7 +300,7 @@ Frame::add_submodule (const symbol name,
 		      Value::category cat, const symbol description,
 		      load_syntax_t load_syntax)
 {
-    Frame frame (load_syntax);
+    FrameSubmodel frame (load_syntax);
     Syntax& s = *new Syntax (frame.syntax ());
     const AttributeList& a = frame.alist () ;
 
@@ -345,7 +346,7 @@ Frame::add_submodule (const symbol name,
 void 
 Frame::add_submodule_sequence (const symbol name, Value::category cat, 
 			       const symbol description,
-			       Syntax::load_syntax_fun load_syntax)
+			       load_syntax_t load_syntax)
 { impl->syntax.add_submodule_sequence (name, cat, description, load_syntax); }
 
 void 
@@ -402,11 +403,11 @@ Frame::total_order () const
 { return impl->syntax.total_order (); }
 
 void 
-Frame::add_check (Syntax::check_fun fun)
+Frame::add_check (check_fun fun)
 { impl->syntax.add_check (fun); }
 
 void 
-Frame::add_object_check (Syntax::check_object fun)
+Frame::add_object_check (check_object fun)
 { impl->syntax.add_object_check (fun); }
 
 bool 
@@ -821,16 +822,8 @@ Frame::Frame (const Syntax& s, const AttributeList& a)
 { }
 
 void 
-Frame::reset (load_syntax_t load_syntax)
-{
-  impl.reset (new Implementation ()); 
-  load_syntax (*this); 
-}
-
-
-Frame::Frame (load_syntax_t load_syntax)
-  : impl (new Implementation ())
-{ load_syntax (*this); }
+Frame::reset ()
+{ impl.reset (new Implementation ()); }
 
 Frame::~Frame ()
 { }

@@ -38,7 +38,7 @@
 #include "librarian.h"
 #include "path.h"
 #include "treelog.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include <vector>
 #include <algorithm>
 #include <numeric>
@@ -73,7 +73,7 @@ struct WeatherStandard : public WeatherBase
 
       // Create and Destroy.
       static bool check_alist (const AttributeList& al, Treelog&);
-      static void load_syntax (Frame&);
+      static void load_syntax (FrameSubmodel&);
       YearInterval (const AttributeList&);
     };
 
@@ -87,7 +87,7 @@ struct WeatherStandard : public WeatherBase
 
     // Create and Destroy.
     static bool check_alist (const AttributeList& al, Treelog&);
-    static void load_syntax (Frame&);
+    static void load_syntax (FrameSubmodel&);
     YearMap (Block&);
   };
   const auto_vector<const YearMap*> missing_years;
@@ -365,7 +365,7 @@ WeatherStandard::hours_unit ()
 }
 
 void 
-WeatherStandard::YearMap::YearInterval::load_syntax (Frame& frame)
+WeatherStandard::YearMap::YearInterval::load_syntax (FrameSubmodel& frame)
 {
   frame.add_check (check_alist);
   frame.add ("from", Value::Integer, Value::Const,
@@ -410,7 +410,7 @@ WeatherStandard::YearMap::check_alist (const AttributeList& al, Treelog& msg)
 }
 
 void 
-WeatherStandard::YearMap::load_syntax (Frame& frame)
+WeatherStandard::YearMap::load_syntax (FrameSubmodel& frame)
 { 
   frame.add_check (check_alist);
   frame.add_submodule ("from", Value::Const, 

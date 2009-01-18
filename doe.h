@@ -23,6 +23,7 @@
 
 #include <vector>
 
+class FrameSubmodel;
 class Log;
 class Geometry;
 class Soil;
@@ -54,7 +55,7 @@ public:
   
   // Create and Destroy.
 public:
-  static void load_syntax (Frame&);
+  static void load_syntax (FrameSubmodel&);
   void initialize (const Geometry&, 
                    const Soil&, const SoilWater&, Treelog&);
   DOE (const AttributeList& al);

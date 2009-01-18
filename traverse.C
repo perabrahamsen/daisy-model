@@ -28,6 +28,8 @@
 #include "alist.h"
 #include "submodel.h"
 #include "assertion.h"
+#include "librarian.h"
+#include "frame_submodel.h"
 
 void 
 Traverse::traverse_all_libraries ()
@@ -52,11 +54,8 @@ Traverse::traverse_all_submodels ()
 
   for (unsigned int i = 0; i < submodels.size (); i++)
     {
-      Syntax dummy_syntax;
-      AttributeList dummy_alist;
-      Frame frame (dummy_syntax, dummy_alist);
       const symbol submodel = submodels[i];
-      Submodel::load_syntax (submodel, frame);
+      const Frame& frame = Librarian::submodel_frame (submodel);
       traverse_submodel_default (frame.syntax (), frame.alist (), submodel);
     }
 }

@@ -32,7 +32,7 @@
 #include "librarian.h"
 #include "metalib.h"
 #include "treelog.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include <sstream>
 #include <deque>
 
@@ -56,7 +56,7 @@ struct VegetationCrops : public Vegetation
     double operator() (int year, int yday);
     
     // Create;
-    static void load_syntax (Frame&);
+    static void load_syntax (FrameSubmodel&);
     ForcedLAI (const std::vector<const AttributeList*>& als);
   } forced_LAI;
 
@@ -246,7 +246,7 @@ VegetationCrops::ForcedLAI::operator() (int year, int yday)
   return -1.0;
 }
     
-void VegetationCrops::ForcedLAI::load_syntax (Frame& frame)
+void VegetationCrops::ForcedLAI::load_syntax (FrameSubmodel& frame)
 {
   frame.add ("year", Value::Integer, Value::Const, "\
 Year for which to use forced LAI.");

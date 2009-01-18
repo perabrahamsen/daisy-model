@@ -25,7 +25,7 @@
 #include "time.h"
 #include "assertion.h"
 #include "log.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "alist.h"
 #include "vcheck.h"
 #include "submodel.h"
@@ -513,7 +513,7 @@ static bool check_alist (const AttributeList& al, Treelog& msg)
   return ok;
 }
 void
-Time::load_syntax (Frame& frame)
+Time::load_syntax (FrameSubmodel& frame)
 {
   frame.alist ().add ("submodel", "Time");
   frame.alist ().add ("description", "Year, month, day and hour.");

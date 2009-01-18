@@ -27,6 +27,7 @@
 #include <vector>
 #include <string>
 
+class FrameSubmodel;
 class Block;
 class AttributeList;
 class Treelog;
@@ -81,7 +82,7 @@ public:
   bool check (Treelog&) const;
   bool check_x_border (const double value, Treelog& err) const;
   bool check_y_border (const double value, Treelog& err) const;
-  static void load_syntax (Frame&);
+  static void load_syntax (FrameSubmodel&);
   Geometry1D (Block&);
   void initialize_zplus (bool volatile_bottom,
 			 const std::vector<double>& fixed,

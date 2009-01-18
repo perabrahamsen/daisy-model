@@ -1,6 +1,6 @@
-// som.C --- A single soil organic matter pool.
+// frame_submodel.C -- Submodel parameterizations.
 // 
-// Copyright 2002 Per Abrahamsen and KVL.
+// Copyright 2009 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -20,26 +20,14 @@
 
 #define BUILD_DLL
 
-#include "som.h"
-#include "submodel.h"
-#include "alist.h"
 #include "frame_submodel.h"
 
-void 
-SOM::load_syntax (FrameSubmodel& frame)
-{
-  OM::load_syntax (frame, "\
-The first numbers corresponds to each of the SMB pools, the next\n\
-numbers corresponds to the SOM pools, and the last numbers to each of\n\
-the DOM pools.  The length of the sequence should thus be the number\n\
-of SMB pools plus the number of SOM pools plus the number of DOM pools."); 
-  frame.alist ().add ("submodel", "SOM");
-  frame.alist ().add ("description", "\
-A single Soil Organic Matter pool.");
-}
+FrameSubmodel::FrameSubmodel (load_syntax_t load_syntax)
+  : Frame ()
+{ load_syntax (*this); }
 
-SOM::SOM (const AttributeList& al)
-  : OM (al)
+FrameSubmodel::~FrameSubmodel ()
 { }
 
-static Submodel::Register som_submodel ("SOM", SOM::load_syntax);
+// frame_submodel.C ends here.
+

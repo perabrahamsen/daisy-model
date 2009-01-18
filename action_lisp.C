@@ -28,7 +28,7 @@
 #include "submodeler.h"
 #include "librarian.h"
 #include "treelog.h"
-#include "frame.h"
+#include "frame_submodel.h"
 
 // We need to initialize the Condition library.
 #include "condition.h"
@@ -155,7 +155,7 @@ struct ActionCond : public Action
       output_derived (condition, "condition", log);
       output_list (actions, "actions", log, Action::component);
     }
-    static void load_syntax (Frame& frame)
+    static void load_syntax (FrameSubmodel& frame)
     {
       frame.add_object ("condition", Condition::component, 
                   "Condition for performing the actions.");

@@ -23,7 +23,7 @@
 
 #include "syntax.h"
 #include "alist.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "library.h"
 #include "metalib.h"
 #include "check.h"
@@ -609,7 +609,7 @@ Syntax::add_submodule_sequence (const symbol name, Value::category cat,
 				const symbol description,
 				load_syntax_fun load_syntax)
 {   
-    const Frame frame (load_syntax);
+    const FrameSubmodel frame (load_syntax);
     const Syntax& s = *new Syntax (frame.syntax ());
     const AttributeList& a = frame.alist ();
 

@@ -22,12 +22,13 @@
 #ifndef PARTITION_H
 #define PARTITION_H
 
+#include "plf.h"
+#include <vector>
+
+class FrameSubmodel;
 class AttributeList;
 class Frame;
 class Log;
-
-#include "plf.h"
-#include <vector>
 
 class Partition 
 {
@@ -49,7 +50,7 @@ public:
 
   // Create and Destroy.
 public:
-  static void load_syntax (Frame&);
+  static void load_syntax (FrameSubmodel&);
   Partition (const AttributeList&);
   ~Partition ();
 };

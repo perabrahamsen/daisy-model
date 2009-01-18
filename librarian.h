@@ -36,6 +36,7 @@ class Library;
 class Metalib;
 class Format;
 class FrameModel;
+class FrameSubmodel;
 class Intrinsics;
 class Declare;
 
@@ -56,6 +57,10 @@ private:
   static Intrinsics* content;
 public:
   static const Intrinsics& intrinsics ();
+  static const FrameSubmodel& submodel_frame (symbol);
+  typedef void (*load_syntax_t) (FrameSubmodel&);
+  static const FrameSubmodel& submodel_frame (load_syntax_t);
+  static symbol submodel_description (symbol);
 
   // Build.
 private:

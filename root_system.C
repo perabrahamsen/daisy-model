@@ -36,7 +36,7 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include "treelog.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include <sstream>
 
 double 
@@ -503,7 +503,7 @@ RootSystem::check (const Units& units, Treelog& msg) const
 }
 
 void 
-RootSystem::load_syntax (Frame& frame)
+RootSystem::load_syntax (FrameSubmodel& frame)
 {
   frame.alist ().add ("submodel", "RootSystem");
   frame.alist ().add ("description", "Standard root system model.");

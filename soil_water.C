@@ -34,7 +34,7 @@
 #include "treelog.h"
 #include "assertion.h"
 #include "mathlib.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include <sstream>
 
 void
@@ -632,7 +632,7 @@ SoilWater::check (const size_t n, Treelog& msg) const
 }
 
 void
-SoilWater::load_syntax (Frame& frame)
+SoilWater::load_syntax (FrameSubmodel& frame)
 {
   frame.alist ().add ("submodel", "SoilWater");
 

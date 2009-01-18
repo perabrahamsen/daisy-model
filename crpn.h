@@ -22,6 +22,7 @@
 #ifndef CRPN_H
 #define CRPN_H
 
+class FrameSubmodel;
 class Production;
 class Geometry;
 class Soil;
@@ -101,7 +102,7 @@ public:
 private:
   bool check_alist (const AttributeList& al, Treelog& err);
 public:
-  static void load_syntax (Frame&);
+  static void load_syntax (FrameSubmodel&);
   CrpN (const AttributeList&);
   ~CrpN ();
 };

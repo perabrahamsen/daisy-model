@@ -59,7 +59,7 @@ struct Library::Implementation
   void remove (symbol);
   void clear_parsed ();
   void refile_parsed (const std::string& from, const std::string& to);
-  static void load_syntax (Frame&);
+  static void load_syntax (FrameSubmodel&);
   Implementation (const symbol n);
   ~Implementation ();
 };

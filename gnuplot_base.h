@@ -25,6 +25,7 @@
 #include <vector>
 #include <map>
 
+class FrameSubmodel;
 class Syntax;
 class AttributeList;
 
@@ -44,7 +45,7 @@ public:
   {
     const double x;
     const double y;
-    static void load_syntax (Frame&);
+    static void load_syntax (FrameSubmodel&);
     static const AttributeList& unset ();
     explicit Size (const AttributeList& al);
   };

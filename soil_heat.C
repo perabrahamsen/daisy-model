@@ -29,7 +29,7 @@
 #include "surface.h"
 #include "movement.h"
 #include "weather.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "log.h"
 #include "submodel.h"
 #include "treelog.h"
@@ -659,7 +659,7 @@ SoilHeat::check (const size_t n, Treelog& err) const
 }
 
 void
-SoilHeat::load_syntax (Frame& frame)
+SoilHeat::load_syntax (FrameSubmodel& frame)
 { 
   frame.alist ().add ("submodel", "SoilHeat");
   frame.alist ().add ("description", "Temperature and heat flux in soil.");

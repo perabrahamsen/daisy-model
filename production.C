@@ -33,7 +33,7 @@
 #include "submodel.h"
 #include "treelog.h"
 #include "mathlib.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include <sstream>
 
 // Chemical constants affecting the crop.
@@ -619,7 +619,7 @@ Production::output (Log& log) const
 }
 
 void 
-Production::load_syntax (Frame& frame)
+Production::load_syntax (FrameSubmodel& frame)
 {
   frame.alist ().add ("submodel", "Production");
   frame.alist ().add ("description", "\

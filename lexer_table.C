@@ -22,7 +22,7 @@
 
 #include "lexer_table.h"
 #include "lexer_data.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "assertion.h"
 #include "mathlib.h"
 #include "submodeler.h"
@@ -57,12 +57,12 @@ public:
       }
     return false;
   }
-  static void load_syntax (Frame&);
+  static void load_syntax (FrameSubmodel&);
   explicit Filter (Block&);
 };
 
 void 
-LexerTable::Filter::load_syntax (Frame& frame)
+LexerTable::Filter::load_syntax (FrameSubmodel& frame)
 {
   frame.add ("tag", Value::String, Value::Const, "\
 Name of column in Daisy log file to filter for.");

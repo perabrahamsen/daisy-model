@@ -28,26 +28,44 @@
 
 class Library;
 class Declare;
+class FrameSubmodel;
 
 class Intrinsics 
 {
-  // Content.
+  // Models.
   typedef std::map<symbol, std::vector<const Declare*>/**/> declare_lib_map_t;
   typedef std::map<symbol, declare_lib_map_t> declare_map_t;
   mutable declare_map_t delayed;
-
 public:
   std::map<symbol, Library*> all;
-  int count;
-  mutable int closed;
-
-  // Use.
-public:
   std::map<symbol, Library*> clone () const;
   Library& add (symbol component);
   Library& library (symbol component) const;
   void declare_model (symbol component, symbol model, const Declare&);
   void instantiate (symbol component, symbol model) const;
+
+  // Submodels.
+private:
+  typedef void (*load_syntax_t) (FrameSubmodel&);
+  typedef std::map<load_syntax_t, const FrameSubmodel*> submodel_load_frame_t;
+  typedef std::map<symbol, load_syntax_t> submodel_name_load_t;
+  typedef std::map<load_syntax_t, symbol> submodel_load_name_t;
+  typedef std::map<symbol, symbol> submodel_name_desc_t;
+  mutable submodel_load_frame_t submodel_load_frame;
+  mutable submodel_name_load_t submodel_name_load;
+  mutable submodel_load_name_t submodel_load_name;
+  mutable submodel_name_desc_t submodel_name_desc;
+  void submodel_instantiate (load_syntax_t);
+public:
+  const FrameSubmodel& submodel_frame (symbol);
+  const FrameSubmodel& submodel_frame (load_syntax_t);
+  symbol submodel_description (symbol) const;
+  
+  // Intrinsics.
+public:
+  int count;
+  mutable int closed;
+
 
   // Create and Destroy.
 public:

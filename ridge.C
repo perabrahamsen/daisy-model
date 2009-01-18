@@ -26,7 +26,7 @@
 #include "geometry1d.h"
 #include "plf.h"
 #include "submodel.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "submodel.h"
 #include "mathlib.h"
 #include "log.h"
@@ -74,7 +74,7 @@ struct Ridge::Implementation
   void output (Log& log) const;
 
   // Create and Destroy.
-  static void load_syntax (Frame&);
+  static void load_syntax (FrameSubmodel&);
   void initialize (const Geometry1D& geo, const Soil&, const SoilWater&);
   static PLF normalize (PLF plf);
   Implementation (const AttributeList&);
@@ -436,7 +436,7 @@ Ridge::Implementation::initialize (const Geometry1D& geo,
 }
 
 void
-Ridge::load_syntax (Frame& frame)
+Ridge::load_syntax (FrameSubmodel& frame)
 {
   frame.alist ().add ("submodel", "Ridge");
   frame.alist ().add ("description", "Surface model after ridging.");

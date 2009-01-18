@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "harvest.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "log.h"
 #include "submodel.h"
 
@@ -63,7 +63,7 @@ Harvest::output (Log& log) const
 }
 
 void 
-Harvest::load_syntax (Frame& frame)
+Harvest::load_syntax (FrameSubmodel& frame)
 {
   frame.alist ().add ("submodel", "Harvest");
   frame.alist ().add ("description", "Log of all harvests during the simulation.");

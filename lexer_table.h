@@ -30,6 +30,7 @@
 #include <memory>
 #include <iosfwd>
 
+class FrameSubmodel;
 class Treelog;
 class LexerData;
 class Time;

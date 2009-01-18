@@ -30,7 +30,7 @@
 #include "librarian.h"
 #include "submodeler.h"
 #include "treelog.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include <sstream>
 #include <memory>
 
@@ -44,7 +44,7 @@ struct NumberPLF : public Number
     const double y_value;
     const symbol y_dimension;
 
-    static void load_syntax (Frame& frame)
+    static void load_syntax (FrameSubmodel& frame)
     {
       frame.add ("x", Value::User (), Value::Const, "Operand.");
       frame.add ("y", Value::User (), Value::Const, "Value.");

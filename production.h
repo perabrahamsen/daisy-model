@@ -26,6 +26,7 @@
 #include <string>
 #include <vector>
 
+class FrameSubmodel;
 class OrganicMatter;
 class CrpN;
 class Partition;
@@ -170,7 +171,7 @@ public:
 		   const std::vector<const AttributeList*>& root,
 		   const std::vector<const AttributeList*>& dead,
 		   const Geometry&, OrganicMatter&);
-  static void load_syntax (Frame&);
+  static void load_syntax (FrameSubmodel&);
   Production (const AttributeList&);
   ~Production ();
 };

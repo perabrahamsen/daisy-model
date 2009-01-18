@@ -24,6 +24,8 @@
 
 #include "geometry_vert.h"
 
+class FrameSubmodel;
+
 class GeometryRect : public GeometryVert
 {
   // Parameters.
@@ -135,7 +137,7 @@ public:
   void initialize_zplus (const bool, const std::vector<double>&,
                          const double, const double, Treelog&)
   { }
-  static void load_syntax (Frame&);
+  static void load_syntax (FrameSubmodel&);
   GeometryRect (Block&);
   ~GeometryRect ();
 };

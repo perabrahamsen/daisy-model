@@ -22,9 +22,11 @@
 #define BUILD_DLL
 
 #include "submodel.h"
+#include "frame_submodel.h"
 #include "syntax.h"
 #include "alist.h"
 #include "assertion.h"
+#include "librarian.h"
 #include <map>
 
 typedef std::map<symbol, Submodel::load_fun> submodel_map_type;
@@ -82,7 +84,7 @@ Submodel::all (std::vector<symbol>& entries)
 }
 
 void
-Submodel::load_syntax (const symbol model, Frame& frame)
+Submodel::load_syntax (const symbol model, FrameSubmodel& frame)
 {
   submodel_map_type::const_iterator i = submodel_map->find (model);
   daisy_assert (i != submodel_map->end ());
@@ -98,6 +100,7 @@ Submodel::Register::Register (const symbol name, load_fun fun)
   if (!submodel_map)
     submodel_map = new submodel_map_type;
   (*submodel_map)[name] = fun;
+  (void) Librarian::submodel_frame (fun);
 }
 
 Submodel::Register::~Register ()

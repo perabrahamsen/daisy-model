@@ -25,16 +25,16 @@
 #include "som.h"
 #include "smb.h"
 #include "dom.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "alist.h"
 #include "check.h"
 #include "vcheck.h"
 #include "geometry.h"
 #include "log.h"
 #include "mathlib.h"
-#include <sstream>
 #include "assertion.h"
 #include "treelog.h"
+#include <sstream>
 #include <numeric>
 
 void
@@ -379,7 +379,7 @@ You cannot specify 'C_per_N' for intervals where 'C' is unspecified.");
 }
 
 void
-OM::load_syntax (Frame& frame, const std::string& frac_desc)
+OM::load_syntax (FrameSubmodel& frame, const std::string& frac_desc)
 {
   frame.add_check (check_alist);
   frame.alist ().add ("submodel", "OM");

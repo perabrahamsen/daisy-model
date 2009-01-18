@@ -25,7 +25,7 @@
 #include "submodel.h"
 #include "log.h"
 #include "alist.h"
-#include "frame.h"
+#include "frame_submodel.h"
 
 void
 Vernalization::operator () (double Ta, double& DS)
@@ -66,7 +66,7 @@ Vernalization::no_vernalization ()
 }
 
 void 
-Vernalization::load_syntax (Frame& frame)
+Vernalization::load_syntax (FrameSubmodel& frame)
 {
   frame.alist ().add ("submodel", "Vernalization");
   frame.alist ().add ("description", "\

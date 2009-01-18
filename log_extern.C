@@ -30,7 +30,7 @@
 #include "librarian.h"
 #include "submodeler.h"
 #include "treelog.h"
-#include "frame.h"
+#include "frame_submodel.h"
 
 void 
 LogExtern::done (const std::vector<Time::component_t>& time_columns,
@@ -248,7 +248,7 @@ struct LogExtern::NumEntry
   const symbol name;
   const double value;
 
-  static void load_syntax (Frame& frame)
+  static void load_syntax (FrameSubmodel& frame)
   {
     frame.add ("name", Value::String, Value::State, "\
 Name to refer to number with.");

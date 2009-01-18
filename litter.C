@@ -22,12 +22,12 @@
 
 #include "litter.h"
 #include "submodel.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "alist.h"
 #include "check.h"
 
 void
-Litter::load_syntax (Frame& frame)
+Litter::load_syntax (FrameSubmodel& frame)
 {
   frame.alist ().add ("submodel", "Litter");
   frame.alist ().add ("description", "\

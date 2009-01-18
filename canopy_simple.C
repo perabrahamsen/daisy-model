@@ -24,7 +24,7 @@
 #include "canopy_simple.h"
 #include "submodel.h"
 #include "log.h"
-#include "frame.h"
+#include "frame_submodel.h"
 
 double
 CanopySimple::EpFactor (double DS) const
@@ -39,7 +39,7 @@ CanopySimple::output (Log& log) const
 }
 
 void 
-CanopySimple::load_syntax (Frame& frame)
+CanopySimple::load_syntax (FrameSubmodel& frame)
 {
   frame.alist ().add ("submodel", "CanopySimple");
   frame.alist ().add ("description", "Simple canopy model.");

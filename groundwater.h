@@ -16,6 +16,7 @@
 // GNU Lesser Public License for more details.
 // 
 // You should have received a copy of the GNU Lesser Public License
+
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
@@ -25,6 +26,7 @@
 
 #include "model.h"
 
+class FrameSubmodel;
 class Time;
 class Treelog;
 class Geometry;
@@ -70,7 +72,7 @@ public:
 
     // Create and Destroy.
 public:
-  static void load_syntax (Frame&);
+  static void load_syntax (FrameSubmodel&);
   virtual void initialize (const Units&, const Geometry&, const Time&, 
 			   const Scope&, Treelog&) = 0;
   virtual bool check (const Units&, 

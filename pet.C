@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "pet.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "block.h"
 #include "log.h"
 #include "vegetation.h"
@@ -74,7 +74,7 @@ static struct PetInit : public DeclareComponent
 The 'pet' component should calculate the potential evapotranspiration\n\
 from meteorological data, as well as the crop and soil state.")
   { }
-  void load_syntax (Frame& frame)
+  void load_syntax (FrameSubmodel& frame)
   {
     frame.add ("wet", "mm/h", Value::LogOnly, 
                "Potential evapotranspiration for a wet system.");

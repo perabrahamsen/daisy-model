@@ -23,6 +23,8 @@
 #include "canopy_simple.h"
 #include <vector>
 
+class FrameSubmodel;
+
 class CanopyStandard : public CanopySimple
 {
   // Paramaters.
@@ -72,7 +74,7 @@ public:
 
   // Create and Destroy.
 public:
-  static void load_syntax (Frame&);
+  static void load_syntax (FrameSubmodel&);
   CanopyStandard (const AttributeList&);
   ~CanopyStandard ();
 };

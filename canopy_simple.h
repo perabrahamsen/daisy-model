@@ -22,6 +22,7 @@
 
 #include "plf.h"
 
+class FrameSubmodel;
 struct Log;
 struct AttributeList;
 struct Frame;
@@ -57,7 +58,7 @@ public:
 
   // Create and Destroy.
 public:
-  static void load_syntax (Frame&);
+  static void load_syntax (FrameSubmodel&);
   CanopySimple (const AttributeList&);
   ~CanopySimple ();
 };

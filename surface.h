@@ -22,6 +22,7 @@
 
 #include "uzmodel.h"
 
+class FrameSubmodel;
 class AttributeList;
 class Log;
 class SoilWater;
@@ -83,7 +84,7 @@ public:
 
   // Create.
   void initialize (const Geometry&);
-  static void load_syntax (Frame&);
+  static void load_syntax (FrameSubmodel&);
   Surface (const AttributeList& par);
   ~Surface ();
 };

@@ -27,7 +27,7 @@
 #include "metalib.h"
 #include "library.h"
 #include "submodeler.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "time.h"
 #include "log.h"
 #include "geometry.h"
@@ -168,7 +168,7 @@ struct AM::Implementation::Lock
   void output (Log&) const;
     
   // Create and Destroy.
-  static void load_syntax (Frame&);
+  static void load_syntax (FrameSubmodel&);
   Lock (symbol c, symbol p);
   Lock (const AttributeList& al);
 };
@@ -182,7 +182,7 @@ AM::Implementation::Lock::output (Log& log) const
 
 
 void
-AM::Implementation::Lock::load_syntax (Frame& frame)
+AM::Implementation::Lock::load_syntax (FrameSubmodel& frame)
 {
   frame.add ("crop", Value::String, Value::State, 
 	      "Crop to which this am is locked");
@@ -721,7 +721,7 @@ AM::default_AM ()
 
   if (am.size () < 1)
     {
-      Frame aom_frame (AOM::load_syntax);
+      FrameSubmodel aom_frame (AOM::load_syntax);
       const AttributeList& aom_alist = aom_frame.alist ();
       AttributeList& AOM1 = *new AttributeList (aom_alist);
       AttributeList& AOM2 = *new AttributeList (aom_alist);

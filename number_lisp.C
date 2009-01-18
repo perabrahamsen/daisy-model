@@ -28,7 +28,7 @@
 #include "librarian.h"
 #include "treelog.h"
 #include "assertion.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include <sstream>
 #include <memory>
 #include <map>
@@ -43,7 +43,7 @@ struct NumberLet : public Number
       symbol id;
       std::auto_ptr<Number> expr;
 
-      static void load_syntax (Frame& frame)
+      static void load_syntax (FrameSubmodel& frame)
       {
         frame.alist ().add ("description", "Bind an identifier to an expression.");
         frame.add ("identifier", Value::String, Value::Const, 

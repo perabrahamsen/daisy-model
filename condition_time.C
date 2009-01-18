@@ -894,7 +894,7 @@ static struct ConditionEverySyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    Timestep::load_syntax (frame); // We steal all timestep attributes.
+    Timestep::load_frame (frame); // We steal all timestep attributes.
     frame.add_submodule ("next", Value::OptionalState,
                          "Time for next match.",
                          Time::load_syntax);

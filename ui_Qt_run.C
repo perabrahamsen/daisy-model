@@ -32,7 +32,7 @@
 #include "assertion.h"
 #include "path.h"
 #include "treelog.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "syntax.h"
 #include <sstream>
 
@@ -197,10 +197,7 @@ UIRun::attach (Toplevel& toplevel)
       && syntax.lookup ("time") == Value::AList
       && syntax.size ("time") == Value::Singleton)
     {
-      const Syntax dummy_syntax;
-      const AttributeList dummy_alist;
-      Frame time_frame (dummy_syntax, dummy_alist);
-      Time::load_syntax (time_frame);
+      const Frame& time_frame = Librarian::submodel_frame ("Time");
       const AttributeList& start_alist = alist.alist ("time");
       if (time_frame.syntax ().check (toplevel.metalib (),
                                       start_alist, Treelog::null ()))

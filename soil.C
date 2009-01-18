@@ -31,7 +31,7 @@
 #include "library.h"
 #include "alist.h"
 #include "syntax.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "mathlib.h"
 #include "submodel.h"
 #include "submodeler.h"
@@ -60,7 +60,7 @@ struct Soil::Implementation
     { output_derived (horizon, "horizon", log); }
 
     // Create and Destroy.
-    static void load_syntax (Frame& frame)
+    static void load_syntax (FrameSubmodel& frame)
     { 
       frame.alist ().add ("description", "\
 A location and content of a soil layer.\n\
@@ -93,7 +93,7 @@ The layers apply to the soil section not covered by the 'zones' parameter.");
     { output_derived (horizon, "horizon", log); }
 
     // Create and Destroy.
-    static void load_syntax (Frame& frame)
+    static void load_syntax (FrameSubmodel& frame)
     { 
       frame.alist ().add ("description", "\
 A location and content of a soil zone.\n\
@@ -506,7 +506,7 @@ check_alist (const AttributeList& al, Treelog& err)
 }  
 
 void
-Soil::load_syntax (Frame& frame)
+Soil::load_syntax (FrameSubmodel& frame)
 { 
   frame.add_check (check_alist);
   frame.alist ().add ("submodel", "Soil");
@@ -589,7 +589,7 @@ Soil::initialize_aquitard (Block& top,
   daisy_assert (layer_syntax.check (top.metalib (), layer_alist, top.msg ()));
   Block block (top, layer_syntax, layer_alist, "aquitard layer");
 #else
-  Frame layer_frame (Implementation::Layer::load_syntax);
+  FrameSubmodel layer_frame (Implementation::Layer::load_syntax);
   layer_frame.add ("end", new_end);
   layer_frame.add ("horizon", horizon_alist);
   daisy_assert (layer_frame.check (top));

@@ -31,6 +31,7 @@
 #include "library.h"
 #include "alist.h"
 #include "syntax.h"
+#include "frame_submodel.h"
 #include "check.h"
 #include "vcheck.h"
 #include "format.h"
@@ -92,7 +93,7 @@ struct Select::Implementation
     const std::vector<symbol> submodels_and_attribute;
     
     // Use.
-    const Syntax& leaf_syntax (Frame&) const;
+    const Syntax& leaf_syntax () const;
     symbol leaf_name () const;
     symbol dimension () const;
     symbol description () const;
@@ -103,7 +104,7 @@ struct Select::Implementation
 			    const Frame& frame,
 			    Treelog& err);
     static bool check_alist (const Metalib&, const AttributeList&, Treelog&);
-    static void load_syntax (Frame&);
+    static void load_syntax (FrameSubmodel&);
     Spec (Block&);
     ~Spec ();
   };
@@ -131,15 +132,12 @@ struct Select::Implementation
 };
 
 const Syntax&
-Select::Implementation::Spec::leaf_syntax (Frame& buffer) const
+Select::Implementation::Spec::leaf_syntax () const
 {
   const Syntax* syntax;
 
-  if (library_name == symbol ("fixed"))
-    {
-      Submodel::load_syntax (model_name.name (), buffer);
-      syntax = &buffer.syntax ();
-    }
+  if (library_name == "fixed")
+    syntax = &Librarian::submodel_frame (model_name).syntax ();
   else
     {
       const Library& library = metalib.library (library_name);
@@ -147,7 +145,7 @@ Select::Implementation::Spec::leaf_syntax (Frame& buffer) const
     }
 
   for (unsigned int i = 0; i < submodels_and_attribute.size () - 1; i++)
-    syntax = &syntax->syntax (submodels_and_attribute[i].name ());
+    syntax = &syntax->syntax (submodels_and_attribute[i]);
 
   return *syntax;
 }
@@ -162,10 +160,7 @@ Select::Implementation::Spec::leaf_name () const
 symbol
 Select::Implementation::Spec::dimension () const
 {
-  const Syntax dummy_syntax;
-  const AttributeList dummy_alist;
-  Frame buffer (dummy_syntax, dummy_alist);
-  const Syntax& syntax = leaf_syntax (buffer);
+  const Syntax& syntax = leaf_syntax ();
   if (syntax.lookup (leaf_name ()) == Value::Number)
     return symbol (syntax.dimension (leaf_name ()));
   else
@@ -175,10 +170,7 @@ Select::Implementation::Spec::dimension () const
 symbol /* can't return reference because buffer is automatic */
 Select::Implementation::Spec::description () const
 { 
-  const Syntax dummy_syntax;
-  const AttributeList dummy_alist;
-  Frame buffer (dummy_syntax, dummy_alist);
-  return leaf_syntax (buffer).description (leaf_name ()); 
+  return leaf_syntax ().description (leaf_name ()); 
 }
 
 void 
@@ -285,10 +277,7 @@ Select::Implementation::Spec::check_alist (const Metalib& metalib,
 	}
       else
 	{
-	  const Syntax dummy_syntax;
-	  const AttributeList dummy_alist;
-          Frame frame (dummy_syntax, dummy_alist);
-	  Submodel::load_syntax (model_name.name (), frame);
+          const Frame& frame = Librarian::submodel_frame (model_name);
 	  if (!check_path (submodels_and_attribute, frame, err))
 	    ok = false;
 	}
@@ -318,7 +307,7 @@ Select::Implementation::Spec::check_alist (const Metalib& metalib,
 }
 
 void 
-Select::Implementation::Spec::load_syntax (Frame& frame)
+Select::Implementation::Spec::load_syntax (FrameSubmodel& frame)
 { 
   frame.add_object_check (check_alist);
   frame.add ("library", Value::String, Value::Const, "\

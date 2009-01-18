@@ -24,7 +24,7 @@
 #include "select.h"
 #include "treelog.h"
 #include "alist.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "mathlib.h"
 #include <ostream>
 
@@ -257,7 +257,7 @@ Fetch::initialize (const std::vector<Fetch*>& fetch,
 }
 
 void
-Fetch::load_syntax (Frame& frame)
+Fetch::load_syntax (FrameSubmodel& frame)
 { 
   frame.alist ().add ("description", "A summary file line.");
   frame.add ("tag", Value::String, Value::Const, "\

@@ -24,7 +24,7 @@
 
 #include "bioincorporation.h"
 #include "alist.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "log.h"
 #include "geometry.h"
 #include "soil.h"
@@ -298,7 +298,7 @@ Bioincorporation::set_am (AM* am)
 { impl.set_am (am); }
 
 void
-Bioincorporation::load_syntax (Frame& frame)
+Bioincorporation::load_syntax (FrameSubmodel& frame)
 { 
   // Submodel.
   frame.alist ().add ("submodel", "Bioincorporation");
@@ -362,7 +362,7 @@ the whole profile.");
   frame.add ("distribution", distribution);
 
   // Incorporated AM parameters.
-  Frame aom_frame (AOM::load_syntax);
+  FrameSubmodel aom_frame (AOM::load_syntax);
   const AttributeList& aom_alist = aom_frame.alist ();
   
   AttributeList AOM1 (aom_alist);

@@ -27,12 +27,13 @@
 #include <memory>
 #include <boost/noncopyable.hpp>
 
+class Frame;
+class FrameSubmodel;
 class Metalib;
 class Program;
 class Syntax;
 class AttributeList;
 class Treelog;
-class Frame;
 
 #ifdef __GNUC__
 #define NORETURN __attribute__ ((noreturn))
@@ -104,7 +105,8 @@ public:
   void command_line (int& argc, char**& argv);
   void parse_file (const std::string&);
   void parse_system_file (const std::string&);
-  static void load_run (Frame&);
+  static void load_submodel (FrameSubmodel&);
+  static void load_frame (Frame&);
 private:
   static void load_syntax (Frame&);
 public:

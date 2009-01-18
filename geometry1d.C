@@ -24,7 +24,7 @@
 #include "geometry1d.h"
 #include "volume.h"
 #include "block.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "alist.h"
 #include "mathlib.h"
 #include "check.h"
@@ -180,7 +180,7 @@ Geometry1D::swap (std::vector<double>& v, double from, double middle, double to)
 #endif
 
 void
-Geometry1D::load_syntax (Frame& frame)
+Geometry1D::load_syntax (FrameSubmodel& frame)
 { 
   frame.alist ().add ("submodel", "Geometry1D");
   frame.add_check (check_alist);

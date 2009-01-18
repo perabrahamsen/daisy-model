@@ -23,7 +23,7 @@
 #define BUILD_DLL
 
 #include "organic_matter.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "submodeler.h"
 #include "log.h"
 #include "am.h"
@@ -92,7 +92,7 @@ struct OrganicStandard : public OrganicMatter
 	       const std::vector<SOM*>&);
     void mix (const Geometry&, double from, double to);
     void swap (const Geometry&, double from, double middle, double to);
-    static void load_syntax (Frame&);
+    static void load_syntax (FrameSubmodel&);
     void initialize (const Geometry& geo);
     Buffer (const AttributeList& al);
   } buffer;
@@ -145,7 +145,7 @@ struct OrganicStandard : public OrganicMatter
     static int find_som_2 (const std::vector<SOM*>& som);
     static bool check_alist (const AttributeList&, Treelog&);
   public:
-    static void load_syntax (Frame&);
+    static void load_syntax (FrameSubmodel&);
     Initialization (const AttributeList&, const Geometry& geo,
                     const Soil& soil, 
                     const Bioincorporation& bioincorporation, 
@@ -332,7 +332,7 @@ OrganicStandard::Buffer::swap (const Geometry& geo,
 }
 
 void
-OrganicStandard::Buffer::load_syntax (Frame& frame)
+OrganicStandard::Buffer::load_syntax (FrameSubmodel& frame)
 {
   const std::vector<double> empty_vector;
   frame.add ("C", "g C/cm^3", Check::non_negative (),
@@ -400,7 +400,7 @@ OrganicStandard::Initialization::
 
 void
 OrganicStandard::Initialization::
-/**/ load_syntax (Frame& frame)
+/**/ load_syntax (FrameSubmodel& frame)
 {
   frame.add ("input", "kg C/ha/y", Check::non_negative (),
 	      Value::OptionalConst, "\
@@ -2987,7 +2987,7 @@ Turnover rate above which pools will contribute to 'CO2_fast'.");
                          OrganicStandard::Buffer::load_syntax);
 
     // Create defaults for som and smb.
-    Frame smb_frame (SMB::load_syntax);
+    const Frame& smb_frame = Librarian::submodel_frame (SMB::load_syntax);
     const AttributeList& smb_alist = smb_frame.alist ();
     frame.add_submodule_sequence ("smb", Value::State, "\
 Soil MicroBiomass pools.\n\
@@ -3035,7 +3035,7 @@ Initial value will be estimated based on equilibrium with AM and SOM pools.",
     frame.add_submodule_sequence ("som", Value::State, 
                                   "Soil Organic Matter pools.",
                                   SOM::load_syntax);
-    Frame som_frame (SOM::load_syntax);
+    const Frame& som_frame = Librarian::submodel_frame (SOM::load_syntax);
     const AttributeList& som_alist = som_frame.alist ();
     std::vector<const AttributeList*> SOM;
     AttributeList SOM1 (som_alist);

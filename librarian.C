@@ -46,6 +46,27 @@ Librarian::intrinsics ()
   return *content;
 }
 
+const FrameSubmodel& 
+Librarian::submodel_frame (const symbol name)
+{
+  daisy_assert (content);
+  return content->submodel_frame (name); 
+}
+
+const FrameSubmodel& 
+Librarian::submodel_frame (const load_syntax_t load_syntax)
+{
+  daisy_assert (content);
+  return content->submodel_frame (load_syntax); 
+}
+
+symbol
+Librarian::submodel_description (const symbol name)
+{ 
+  daisy_assert (content);
+  return content->submodel_description (name); 
+}
+
 Model* 
 Librarian::build_free (const symbol component, Metalib& metalib,
                        Treelog& msg, const AttributeList& alist, 

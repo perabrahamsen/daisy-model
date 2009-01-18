@@ -28,6 +28,7 @@
 #include <vector>
 #include <memory>
 
+class FrameSubmodel;
 struct Geometry;
 struct Soil;
 struct SoilWater;
@@ -136,7 +137,7 @@ public:
                    double row_width, double row_pos, Treelog& msg);
   void initialize (const Units&, const Geometry& geo, Treelog& msg);
   bool check (const Units&, Treelog& msg) const;
-  static void load_syntax (Frame&);
+  static void load_syntax (FrameSubmodel&);
   RootSystem (Block& al);
   ~RootSystem ();
 };

@@ -23,14 +23,14 @@
 #include "gnuplot_base.h"
 #include "vcheck.h"
 #include "block.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "assertion.h"
 #include "librarian.h"
 #include "treelog.h"
 #include "syntax.h"
 
 void 
-GnuplotBase::Size::load_syntax (Frame& frame)
+GnuplotBase::Size::load_syntax (FrameSubmodel& frame)
 {
   frame.add ("x", Value::None (), Value::Const, "\
 Relative horizontal size of plot.");

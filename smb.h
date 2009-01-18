@@ -23,8 +23,9 @@
 #define SMB_H
 
 #include "om.h"
-
 #include <vector>
+
+class FrameSubmodel;
 
 class SMB : public OM
 { 
@@ -49,7 +50,7 @@ private:
 
   // Create & Destroy.
 public:
-  static void load_syntax (Frame&);
+  static void load_syntax (FrameSubmodel&);
   SMB (const AttributeList& al);
 };
 

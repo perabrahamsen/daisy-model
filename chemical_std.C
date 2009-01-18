@@ -31,7 +31,7 @@
 #include "chemistry.h"
 #include "log.h"
 #include "block.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "mathlib.h"
 #include "plf.h"
 #include "check.h"
@@ -68,7 +68,7 @@ struct ChemicalStandard : public Chemical
   {
     const double fraction;
     const symbol chemical;
-    static void load_syntax (Frame&);
+    static void load_syntax (FrameSubmodel&);
     Product (Block&);
   };
   const auto_vector<const Product*> product;
@@ -227,7 +227,7 @@ const symbol
 ChemicalStandard::g_per_cm3 ("g/cm^3");
 
 void
-ChemicalStandard::Product::load_syntax (Frame& frame)
+ChemicalStandard::Product::load_syntax (FrameSubmodel& frame)
 {
   frame.add ("fraction", Value::Fraction (), Value::Const,
 	      "Fraction of decomposed matter that become this chemcial.");

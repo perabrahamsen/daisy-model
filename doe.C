@@ -25,7 +25,7 @@
 #include "geometry.h"
 #include "submodel.h"
 #include "alist.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "soil.h"
 #include "soil_water.h"
 #include "treelog.h"
@@ -83,7 +83,7 @@ DOE::tick (const size_t cell_size, const SoilWater& soil_water, const double dt)
 }
 
 void 
-DOE::load_syntax (Frame& frame)
+DOE::load_syntax (FrameSubmodel& frame)
 {
   // Submodel.
   frame.alist ().add ("submodel", "DOM-Element");

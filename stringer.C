@@ -24,7 +24,7 @@
 #include "boolean.h"
 #include "number.h"
 #include "submodeler.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "memutils.h"
 #include "librarian.h"
 #include "treelog.h"
@@ -60,7 +60,7 @@ struct StringerCond : public Stringer
   {
     const std::auto_ptr<Boolean> condition;
     const symbol  value;
-    static void load_syntax (Frame& frame)
+    static void load_syntax (FrameSubmodel& frame)
     {
       frame.alist ().add ("description", "\
 If condition is true, return value.");

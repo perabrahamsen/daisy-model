@@ -35,7 +35,7 @@
 #include "treelog.h"
 #include "assertion.h"
 #include "librarian.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "syntax.h"
 #include <sstream>
 #include <fstream>
@@ -380,10 +380,7 @@ ProgramDocument::print_entry_value (const symbol name,
 		  const symbol submodel
 		    = Submodel::find_submodel (syntax, alist, name);
 
-                  const Syntax dummy_syntax;
-                  const AttributeList dummy_alist;
-                  Frame frame (dummy_syntax, dummy_alist);
-                  Submodel::load_syntax (submodel, frame);
+                  const Frame& frame = Librarian::submodel_frame (submodel);
 		  const Syntax& nested_syntax = frame.syntax ();
 		  const AttributeList& default_alist = frame.alist ();
 		  if (!nested.subset (metalib, default_alist, nested_syntax))
@@ -1269,11 +1266,7 @@ standard parameterizations for the model.");
   Submodel::all (fixed);
   for (unsigned int i = 0; i < fixed.size (); i++)
     {
-      const symbol name = fixed[i];
-      const Syntax dummy_syntax;
-      const AttributeList dummy_alist;
-      Frame frame (dummy_syntax, dummy_alist);
-      Submodel::load_syntax (name, frame);
+      const Frame& frame = Librarian::submodel_frame (name);
       print_fixed (name, frame.syntax (), frame.alist ());
   }
 }

@@ -25,7 +25,7 @@
 #include "texture.h"
 #include "hydraulic.h"
 #include "alist.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "check.h"
 #include "mathlib.h"
 #include "assertion.h"
@@ -52,7 +52,7 @@ HorHeat::heat_capacity (double pTheta, double pIce) const
     + heat_capacity_table[Ice] * pIce; }
 
 void
-HorHeat::load_syntax (Frame& frame)
+HorHeat::load_syntax (FrameSubmodel& frame)
 {
   frame.alist ().add ("submodel", "HorHeat");
   frame.alist ().add ("description", "Heat capacity and conductivity per horizon.");

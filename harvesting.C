@@ -34,7 +34,7 @@
 #include "submodel.h"
 #include "check_range.h"
 #include "submodeler.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include <numeric>
 
 // Dimensional conversion.
@@ -514,7 +514,7 @@ Harvesting::output (Log& log) const
 }
 
 void 
-Harvesting::load_syntax (Frame& frame)
+Harvesting::load_syntax (FrameSubmodel& frame)
 {
   // Submodel.
   frame.alist ().add ("submodel", "Harvesting");

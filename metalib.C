@@ -39,6 +39,7 @@
 struct Metalib::Implementation
 {
   // Content.
+  const Frame::load_frame_t load_frame;
   Path path;
   std::auto_ptr<Units> units;
 
@@ -54,8 +55,9 @@ struct Metalib::Implementation
     units.reset (new Units (metalib));
     daisy_assert (units.get ());
   }
-  Implementation ()
-    : all (Librarian::intrinsics ().clone ()),
+  Implementation (Frame::load_frame_t lf)
+    : load_frame (lf),
+      all (Librarian::intrinsics ().clone ()),
       sequence (0)
   { }
   ~Implementation ()
@@ -131,17 +133,20 @@ Metalib::get_sequence ()
 }
 
 void
-Metalib::reset (const load_syntax_t load_syntax)
+Metalib::reset ()
 { 
-  Frame::reset (load_syntax);
-  impl.reset (new Implementation ()); 
+  Frame::reset ();
+  load_frame_t load_frame = impl->load_frame;
+  impl.reset (new Implementation (load_frame)); 
+  load_frame (*this);
   impl->initialize (*this);
 }
 
-Metalib::Metalib (load_syntax_t load_syntax)
-  : Frame (load_syntax),
-    impl (new Implementation ())
+Metalib::Metalib (load_frame_t load_frame)
+  : Frame (),
+    impl (new Implementation (load_frame))
 {
+  load_frame (*this);
   impl->initialize (*this);
 }
 

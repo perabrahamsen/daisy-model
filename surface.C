@@ -34,7 +34,7 @@
 #include "ridge.h"
 #include "check.h"
 #include "treelog.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include <sstream>
 #include <map>
 
@@ -520,7 +520,7 @@ Surface::Implementation::initialize (const Geometry& geo)
 }
 
 void
-Surface::load_syntax (Frame& frame)
+Surface::load_syntax (FrameSubmodel& frame)
 {
   frame.alist ().add ("submodel", "Surface");
   frame.alist ().add ("description", "Keep track of things on the soil surface.");

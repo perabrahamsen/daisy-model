@@ -39,7 +39,7 @@
 #include "mathlib.h"
 #include "memutils.h"
 #include "librarian.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "syntax.h"
 #include <set>
 #include <memory>
@@ -782,10 +782,8 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
                           doc = get_string ();
                         if (ok)
                           {
-                            const Syntax dummy_syntax;
-                            const AttributeList dummy_alist;
-                            Frame frame (dummy_syntax, dummy_alist);
-                            Submodel::load_syntax (submodel, frame);
+                            const Frame& frame 
+                              = Librarian::submodel_frame (submodel);
                             // BUG: Do these ever get freed?
                             Syntax& sub_syn = *new Syntax (frame.syntax ());
                             AttributeList& sub_al 

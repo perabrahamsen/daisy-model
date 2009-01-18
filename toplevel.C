@@ -38,6 +38,7 @@
 #include "treelog_store.h"
 #include "librarian.h"
 #include "units.h"
+#include "frame_submodel.h"
 
 #include <sstream>
 #include <ctime>
@@ -66,9 +67,9 @@ struct Toplevel::Implementation : boost::noncopyable
   bool has_daisy_log;
   void add_daisy_log ();
 
-  void reset (Metalib::load_syntax_t load_syntax);
+  void reset ();
 
-  Implementation (Metalib::load_syntax_t load_syntax, 
+  Implementation (Frame::load_frame_t load_syntax, 
                   const std::string& preferred_ui);
   ~Implementation ();
 };
@@ -166,16 +167,16 @@ Toplevel::Implementation::add_daisy_log ()
 }
 
 void
-Toplevel::Implementation::reset (const Metalib::load_syntax_t load_syntax)
+Toplevel::Implementation::reset ()
 {
   program.reset (NULL);
   start_time = std::time (NULL);
-  metalib.reset (load_syntax);
+  metalib.reset ();
   state = is_unloaded;
   files_found.clear ();
 }
 
-Toplevel::Implementation::Implementation (Metalib::load_syntax_t load_syntax,
+Toplevel::Implementation::Implementation (Metalib::load_frame_t load_syntax,
                                           const std::string& pref_ui)
   : preferred_ui (pref_ui),
     program_name ("daisy"),
@@ -469,7 +470,7 @@ Toplevel::initialize ()
 
 void
 Toplevel::reset ()
-{ impl->reset (load_syntax); }
+{ impl->reset (); }
 
 std::string
 Toplevel::get_arg (int& argc, char**& argv)
@@ -634,11 +635,17 @@ Toplevel::parse_system_file (const std::string& filename)
 }
 
 void
-Toplevel::load_run (Frame& frame)
+Toplevel::load_submodel (FrameSubmodel& frame)
 {
   frame.alist ().add ("submodel", "Toplevel");
   frame.alist ().add ("description", Toplevel::default_description);
 
+  load_frame (frame);
+}
+
+void
+Toplevel::load_frame (Frame& frame)
+{
   Units::load_syntax (frame);
 
   frame.add ("install_directory", Value::String, Value::Const,
@@ -699,7 +706,7 @@ Toplevel::load_syntax (Frame& frame)
   Daisy::load_syntax (frame);
   frame.alist ().add ("type", "Daisy");
   Librarian::load_syntax (frame);
-  load_run (frame);
+  load_frame (frame);
 }
 
 Toplevel::Toplevel (const std::string& preferred_ui)
@@ -721,6 +728,6 @@ Toplevel::~Toplevel ()
 }
 
 static Submodel::Register 
-toplevel_submodel ("Toplevel", Toplevel::load_run);
+toplevel_submodel ("Toplevel", Toplevel::load_submodel);
 
 // toplevel.C ends here.

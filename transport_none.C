@@ -47,7 +47,7 @@ struct TransportNone : public Transport
              Treelog& msg) const;
 
   // Create.
-  static void load_syntax (Frame&);
+  static void load_syntax (FrameSubmodel&);
   TransportNone (Block& al);
   ~TransportNone ();
 };

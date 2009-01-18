@@ -25,6 +25,7 @@
 #include "plf.h"
 #include <memory>
 
+class FrameSubmodel;
 struct Log;
 struct Frame;
 struct AttributeList;
@@ -86,7 +87,7 @@ private:
 
   // Create & Destroy.
 public:
-  static void load_syntax (Frame&);
+  static void load_syntax (FrameSubmodel&);
   void initialize (const Geometry& geo, 
                    const Soil&, const SoilWater&, Treelog&);
   DOM (Block& al);

@@ -25,6 +25,7 @@
 #include <vector>
 #include <boost/noncopyable.hpp>
 
+class FrameSubmodel;
 class Time;
 class Weather;
 class AttributeList;
@@ -133,7 +134,7 @@ private:
 public:
   void output (Log&) const;
   bool check (size_t n, Treelog&) const;
-  static void load_syntax (Frame&);
+  static void load_syntax (FrameSubmodel&);
   SoilHeat (const Block&);
   void initialize (const AttributeList&, const Geometry& geo, 
                    const std::vector<double>& default_T, Treelog&);

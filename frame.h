@@ -22,6 +22,7 @@
 #include <memory>
 #include <vector>
 
+class FrameSubmodel;
 class AttributeList;
 class PLF;
 class Block;
@@ -187,7 +188,7 @@ public:
 
   void add_library (const symbol, symbol lib);
 
-  typedef void (*load_syntax_t) (Frame&);
+  typedef void (*load_syntax_t) (FrameSubmodel&);
   void add_submodule (const symbol name, 
 		      Value::category cat, const symbol description,
 		      load_syntax_t load_syntax);
@@ -286,8 +287,13 @@ protected:
   Frame ();
 public:
   Frame (const Syntax&, const AttributeList&); // Old style.
+  typedef void (*load_frame_t) (Frame&);
+#if 1
+  virtual void reset ();
+#else
   virtual void reset (load_syntax_t);
   Frame (load_syntax_t);
+#endif
   virtual ~Frame ();
 };
 

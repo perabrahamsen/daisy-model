@@ -34,7 +34,7 @@
 #include "adsorption.h"
 #include "log.h"
 #include "check.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "submodeler.h"
 #include "tertiary.h"
 #include "librarian.h"
@@ -118,7 +118,7 @@ struct MovementRect::Point
 {
   const double z;
   const double x;
-  static void load_syntax (Frame& frame)
+  static void load_syntax (FrameSubmodel& frame)
   {
     frame.add ("z", "cm", Check::negative (), Value::Const, 
 		"Vertical position.");

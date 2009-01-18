@@ -25,6 +25,7 @@
 #include "library.h"
 #include "memutils.h"
 #include "frame_model.h"
+#include "frame_submodel.h"
 
 std::map<symbol, Library*> 
 Intrinsics::clone () const
@@ -141,6 +142,73 @@ Intrinsics::instantiate (const symbol component, const symbol model) const
   const Declare& declare = *decls[0];
   library.add_model (model, *new FrameModel (declare));
   decls.erase (decls.begin ());
+}
+
+void 
+Intrinsics::submodel_instantiate (const load_syntax_t load_syntax) 
+{
+  if (submodel_load_frame.find (load_syntax)
+      != submodel_load_frame.end ())
+    // Already there.
+    return;
+  
+  // Create frame and load->frame mapping.
+  const FrameSubmodel *const frame = new FrameSubmodel (load_syntax);
+  daisy_assert (frame);
+  submodel_load_frame[load_syntax] = frame;
+  daisy_assert (submodel_load_frame.find (load_syntax)
+                != submodel_load_frame.end ());
+
+  if (!frame->check ("submodel"))
+    // No name.
+    return;
+
+  // Bidirectional name<->load mapping.
+  const symbol submodel = frame->name ("submodel");
+  daisy_assert (submodel_name_load.find (submodel)
+                == submodel_name_load.end ());
+  submodel_name_load[submodel] = load_syntax;
+  daisy_assert (submodel_load_name.find (load_syntax) 
+                == submodel_load_name.end ());
+  submodel_load_name[load_syntax] = submodel;
+
+  if (!frame->check ("description"))
+    // No description
+    return;
+
+  // Name -> Description mapping.
+  const symbol description = frame->name ("description");
+  daisy_assert (submodel_name_desc.find (submodel)
+                == submodel_name_desc.end ());
+  submodel_name_desc[submodel] = description;
+}  
+
+const FrameSubmodel& 
+Intrinsics::submodel_frame (const symbol name)
+{
+  const submodel_name_load_t::const_iterator i = submodel_name_load.find (name);
+  if (i == submodel_name_load.end ())
+    daisy_panic ("Unable to find submodel '" + name + "'");
+  return submodel_frame ((*i).second);
+}
+
+const FrameSubmodel& 
+Intrinsics::submodel_frame (const load_syntax_t load_syntax)
+{
+  submodel_instantiate (load_syntax);
+  const submodel_load_frame_t::const_iterator i 
+    = submodel_load_frame.find (load_syntax);
+  daisy_assert (i != submodel_load_frame.end ());
+  daisy_assert ((*i).second);
+  return *(*i).second;
+}
+
+symbol 
+Intrinsics::submodel_description (const symbol name) const
+{
+  const submodel_name_desc_t::const_iterator i = submodel_name_desc.find (name);
+  daisy_assert (i != submodel_name_desc.end ());
+  return (*i).second;
 }
 
 Intrinsics::Intrinsics ()

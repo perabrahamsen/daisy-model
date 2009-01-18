@@ -26,6 +26,7 @@
 #include "model.h"
 #include "alist.h"
 
+class FrameSubmodel;
 class Log;
 class Time;
 class Weather;
@@ -55,7 +56,7 @@ public:
     const double x;
     const double y;
 
-    static void load_syntax (Frame&);
+    static void load_syntax (FrameSubmodel&);
     Point (const Block&);
     ~Point ();
   };

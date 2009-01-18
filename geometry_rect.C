@@ -26,7 +26,7 @@
 #include "vcheck.h"
 #include "block.h"
 #include "alist.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "submodel.h"
 #include "treelog.h"
 #include "assertion.h"
@@ -125,7 +125,7 @@ GeometryRect::check_y_border (const double, Treelog& err) const
 }
 
 void
-GeometryRect::load_syntax (Frame& frame)
+GeometryRect::load_syntax (FrameSubmodel& frame)
 { 
   frame.alist ().add ("submodel", "GeometryRect");
   frame.add ("zplus", "cm", Check::negative (), 
