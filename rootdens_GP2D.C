@@ -335,6 +335,8 @@ Rootdens_GP2D::uniform (const Geometry& geo, const double l_r, const double d_a,
 void 
 Rootdens_GP2D::output (Log& log) const
 {
+  output_variable (row_position, log);
+  output_variable (row_distance, log);
   output_variable (a_z, log); 
   output_variable (a_x, log); 
   output_variable (L00, log); 
@@ -407,7 +409,8 @@ Rootdens::create_row (const double row_width, const double row_position,
 {
   const Intrinsics& intrinsics = Librarian::intrinsics ();
   const Library& library = intrinsics.library (Rootdens::component);
-  const FrameModel& parent = library.model ("Gerwitz+Page74");
+  // const FrameModel& parent = library.model ("Gerwitz+Page74");
+  const FrameModel& parent = library.model ("GP2D");
   FrameModel frame (parent, FrameModel::parent_copy);
   frame.alist ().add ("type", "GP2D");
   frame.add ("row_position", row_position);
@@ -437,10 +440,10 @@ as well as depth below row.")
     frame.add ("debug", Value::Integer, Value::Const, "\
 Add debug messages if larger than 0.");
     frame.add ("debug", 0);
-    frame.add ("row_position", "cm", Value::Const, "\
+    frame.add ("row_position", "cm", Value::State, "\
 Horizontal position of row crops.");
     frame.add ("row_position", 0.0);
-    frame.add ("row_distance", "cm", Value::Const, 
+    frame.add ("row_distance", "cm", Value::State, 
                 "Distance between rows of crops.");
     frame.add ("DensRtTip", "cm/cm^3", Check::positive (), Value::Const,
                 "Root density at (potential) penetration depth.");

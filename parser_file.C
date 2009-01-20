@@ -882,7 +882,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		}
 	      AttributeList list (atts.check (name) 
 				  ? atts.alist (name)
-				  : syntax.default_alist (name));
+				  : syntax.default_frame (name).alist ());
 	      // TODO: allow local parameters in submodels.
 	      Syntax syn (syntax.syntax (name));
 	      load_list (syn, list);
@@ -1116,7 +1116,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
 		    AttributeList& al
 		      = *new AttributeList (old_sequence.size () > element
 					    ? *old_sequence[element]
-					    : syntax.default_alist (name));
+					    : syntax.default_frame (name).alist ());
 		    // TODO: Allow local parameters in submodels.
 		    Syntax s (syn);
 		    load_list (s, al);

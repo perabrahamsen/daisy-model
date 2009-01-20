@@ -258,7 +258,7 @@ ProgramDocument::print_entry_submodel (const symbol name,
       const Syntax& child = syntax.syntax (name);
       const AttributeList& nested 
 	= (size != Value::Singleton || !alist.check (name))
-	? syntax.default_alist (name)
+	? syntax.default_frame (name).alist ()
 	: alist.alist (name);
       if (!nested.check ("submodel"))
 	{

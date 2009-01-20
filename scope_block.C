@@ -63,7 +63,7 @@ ScopeBlock::dimension (symbol tag) const
   if (frame.library (block.metalib (), tag).name () 
       != symbol (Number::component))
     return Value::Unknown ();
-  if (!frame.check (block.metalib (), block.msg ()))
+  if (!frame.check (block))
     return Value::Unknown ();
     
   std::auto_ptr<Number> number (Librarian::build_alist<Number>
@@ -124,7 +124,7 @@ ScopeBlock::has_number (const symbol tag) const
   const Library& library = frame.library (block.metalib (), tag);
   if (library.name () != symbol (Number::component))
     return false;
-  if (!frame.check (block.metalib (), block.msg ()))
+  if (!frame.check (block))
     return false;
   std::auto_ptr<Number> number (Librarian::build_alist<Number>
                                 (block, frame.alist (tag), tag));
@@ -155,7 +155,7 @@ ScopeBlock::number (const symbol tag) const
   daisy_assert (type == Value::Object);
   daisy_assert (frame.library (block.metalib (), tag).name ()
                 == symbol (Number::component));
-  daisy_assert (frame.check (block.metalib (), block.msg ()));
+  daisy_assert (frame.check (block));
   std::auto_ptr<Number> number (Librarian::build_alist<Number> 
                                 (block, frame.alist (tag), tag));
   daisy_assert (number.get ());
@@ -189,7 +189,7 @@ ScopeBlock::has_name (const symbol tag) const
   const Library& library = frame.library (block.metalib (), tag);
   if (library.name () != symbol (Stringer::component))
     return false;
-  if (!frame.check (block.metalib (), block.msg ()))
+  if (!frame.check (block))
     return false;
   std::auto_ptr<Stringer> stringer (Librarian::build_alist<Stringer>
                                     (block, frame.alist (tag), tag));
@@ -220,7 +220,7 @@ ScopeBlock::name (const symbol tag) const
   daisy_assert (type == Value::Object);
   daisy_assert (frame.library (block.metalib (), tag).name ()
                 == symbol (Stringer::component));
-  daisy_assert (frame.check (block.metalib (), block.msg ()));
+  daisy_assert (frame.check (block));
   std::auto_ptr<Stringer> stringer (Librarian::build_alist<Stringer> 
                                 (block, frame.alist (tag), tag));
   daisy_assert (stringer.get ());

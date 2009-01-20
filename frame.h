@@ -82,14 +82,13 @@ public:
   bool is_log (const symbol) const;
   bool is_state (const symbol) const;
   Value::type lookup (const symbol) const;
-  const Syntax& syntax (const symbol) const;
   ::Library& library (const Metalib&, const symbol) const;
   int  size (const symbol) const;
   symbol dimension (const symbol) const;
   symbol domain (const symbol) const;
   symbol range (const symbol) const;
   symbol description (const symbol) const;
-  const AttributeList& default_alist (const symbol) const;
+  const Frame& default_frame (const symbol) const;
 
   // Add attribute types.
 public:

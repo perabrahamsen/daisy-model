@@ -250,18 +250,18 @@ Traverse::traverse_parameter (const Syntax& syntax, const AttributeList& alist,
 					 parameter);
 		    else
 		      traverse_submodel (entry_syntax, entry_alist,
-					 syntax.default_alist (parameter), 
+					 syntax.default_frame (parameter).alist (), 
 					 parameter);
 		  }
 		else 
 		  traverse_submodel_default (entry_syntax, 
-					     syntax.default_alist (parameter),
+					     syntax.default_frame (parameter).alist (),
 					     parameter);
 	      }
 	    else
 	      {
 		const AttributeList& nested_default_alist 
-		  = syntax.default_alist (parameter);
+		  = syntax.default_frame (parameter).alist ();
 
 		traverse_submodel_sequence_default (entry_syntax, 
 						    nested_default_alist, 

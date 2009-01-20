@@ -245,7 +245,7 @@ Rootdens::create_uniform ()
   const Library& library = intrinsics.library (Rootdens::component);
   const FrameModel& parent = library.model ("Gerwitz+Page74");
   FrameModel frame (parent, FrameModel::parent_copy);
-  frame.alist ().add ("type", "GP2D");
+  frame.alist ().add ("type", "Gerwitz+Page74");
   return std::auto_ptr<Rootdens> (new Rootdens_G_P (frame)); 
 }
 

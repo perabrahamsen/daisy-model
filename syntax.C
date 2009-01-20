@@ -43,27 +43,16 @@ struct Syntax::Implementation
   std::vector<symbol> order;
   typedef std::map<symbol, Value::type> type_map;
   typedef std::map<symbol, Value::category> status_map;
-#if 1
   typedef std::map<symbol, Syntax::load_syntax_t> submodel_map;
-#else
-  typedef std::map<symbol, const Syntax*> syntax_map;
-#endif
   typedef std::map<symbol, int> size_map;
   typedef std::map<symbol, symbol> library_map;
   typedef std::map<symbol, symbol> string_map;
-#if 0
-  typedef std::map<symbol, const AttributeList*> alist_map;
-#endif
   typedef std::map<symbol, const Check*> check_map;
   typedef std::map<symbol, const VCheck*> vcheck_map;
 
   type_map types;
   status_map status;
-#if 1
   submodel_map submodels;
-#else
-  syntax_map syntax;
-#endif
   size_map size;
   library_map libraries;
   string_map domains;
@@ -71,9 +60,6 @@ struct Syntax::Implementation
   check_map num_checks;
   vcheck_map val_checks;
   string_map descriptions;
-#if 0
-  alist_map alists;
-#endif
 
   bool check (const Metalib&, const AttributeList& vl, Treelog& err);
   void check (const symbol key, double value) const;
@@ -88,9 +74,7 @@ struct Syntax::Implementation
       order (old.order),
       types (old.types),
       status (old.status),
-#if 1
       submodels (old.submodels),
-#endif
       size (old.size),
       libraries (old.libraries),
       domains (old.domains),
@@ -98,27 +82,9 @@ struct Syntax::Implementation
       num_checks (old.num_checks),
       val_checks (old.val_checks),
       descriptions (old.descriptions)
-  {
-#if 0
-    // Clone syntax.
-    for (syntax_map::const_iterator i = old.syntax.begin ();
-	 i != old.syntax.end (); 
-	 i++)
-      syntax[(*i).first] = new Syntax (*(*i).second);
-    // Clone alists.
-    for (alist_map::const_iterator i = old.alists.begin ();
-	 i != old.alists.end (); 
-	 i++)
-      alists[(*i).first] = new AttributeList (*(*i).second);
-#endif
-  }
+  { }
   ~Implementation ()
-  {
-#if 0
-    map_delete (syntax.begin (), syntax.end ());
-    map_delete (alists.begin (), alists.end ());
-#endif 
-  }
+  { }
 };    
 
 bool 
@@ -423,17 +389,12 @@ Syntax::is_log (const symbol key) const
 const Syntax&
 Syntax::syntax (const symbol key) const
 {
-#if 1
   const Implementation::submodel_map::const_iterator i 
     = impl->submodels.find (key);
   daisy_assert (i != impl->submodels.end ());
   const load_syntax_t load_syntax = (*i).second;
   const FrameSubmodel& frame = Librarian::submodel_frame (load_syntax);
   return frame.syntax ();
-#else
-  daisy_assert (impl->syntax.find (key) != impl->syntax.end ());
-  return *impl->syntax[key];
-#endif
 }
 
 ::Library&
@@ -530,28 +491,15 @@ Syntax::total_order () const
   return impl->order.size () == non_logs; 
 }
 
-const AttributeList& 
-Syntax::default_alist (const symbol key) const
+const Frame& 
+Syntax::default_frame (const symbol key) const
 {
-  static const AttributeList empty_alist;
-
-#if 1
   Implementation::submodel_map::const_iterator i = impl->submodels.find (key);
   if (i == impl->submodels.end ())
-    return empty_alist;
-  else
-    {
-      const load_syntax_t load_syntax = (*i).second;
-      const FrameSubmodel& frame = Librarian::submodel_frame (load_syntax);
-      return frame.alist ();
-    }
-#else
-  Implementation::alist_map::const_iterator i = impl->alists.find (key);
-  if (i == impl->alists.end ())
-    return empty_alist;
-  else
-    return *((*i).second);
-#endif
+    daisy_panic ("'" + key + "' has no default frame");
+
+  const load_syntax_t load_syntax = (*i).second;
+  return Librarian::submodel_frame (load_syntax);
 }
 
 void
@@ -621,13 +569,7 @@ Syntax::add (const symbol key, const load_syntax_t load_syntax,
              const symbol description)
 {
   add (key, Value::AList, cat, size, description);
-#if 1
   impl->submodels[key] = load_syntax;
-#else
-  const FrameSubmodel& frame = Librarian::submodel_frame (load_syntax);
-  impl->syntax[key] = new Syntax (frame.syntax ()); 
-  impl->alists[key] = new AttributeList (frame.alist ());
-#endif
 }
 
 void 

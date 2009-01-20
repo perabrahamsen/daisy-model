@@ -242,7 +242,7 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
                          super_syntax.syntax (key), indent, false); 
 	  else
 	    print_alist (alist.alist (key), syntax.syntax (key), 
-			 syntax.default_alist (key), 
+			 syntax.default_frame (key).alist (), 
                          syntax.syntax (key), indent, false); 
 	  break;
 	case Value::PLF:
@@ -291,7 +291,7 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 	  break;
 	case Value::AList:
 	  {
-	    const AttributeList& other = syntax.default_alist (key);
+	    const AttributeList& other = syntax.default_frame (key).alist ();
 	    const Syntax& nested = syntax.syntax (key);
 	    const std::vector<const AttributeList*>& value = alist.alist_sequence (key);
 	    

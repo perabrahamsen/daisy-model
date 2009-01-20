@@ -232,7 +232,7 @@ Select::Implementation::Spec::check_path (const std::vector<symbol>& path,
 	    }
 
           if (syntax->size (name) != Value::Singleton || !alist->check (name))
-            alist = &syntax->default_alist (name);
+            alist = &syntax->default_frame (name).alist ();
           else
             alist = &alist->alist (name);
 	  syntax = &syntax->syntax (name);

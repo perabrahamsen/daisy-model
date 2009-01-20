@@ -135,15 +135,6 @@ Frame::lookup (const symbol key) const
     return impl->syntax.lookup (key);
 }
 
-const Syntax& 
-Frame::syntax (const symbol key) const
-{
-  if (parent () && impl->syntax.lookup (key) == Value::Error)
-    return parent ()->syntax (key);
-  else
-    return impl->syntax.syntax (key);
-}
-
 ::Library& 
 Frame::library (const Metalib& metalib, const symbol key) const
 {
@@ -198,13 +189,13 @@ Frame::description (const symbol key) const
     return impl->syntax.description (key);
 }
 
-const AttributeList& 
-Frame::default_alist (const symbol key) const
+const Frame& 
+Frame::default_frame (const symbol key) const
 {
   if (parent () && impl->syntax.lookup (key) == Value::Error)
-    return parent ()->default_alist (key);
+    return parent ()->default_frame (key);
   else
-    return impl->syntax.default_alist (key);
+    return impl->syntax.default_frame (key);
 }
 
 void 
@@ -259,7 +250,6 @@ Frame::add (const symbol key, // PLF.
 	    const symbol description)
 { impl->syntax.add (key, domain, range, cat, size, description); }
 
-
 void 
 Frame::add (const symbol key,
 	    const symbol domain,
@@ -269,39 +259,6 @@ Frame::add (const symbol key,
 	    int size,
 	    const symbol description)
 { impl->syntax.add (key, domain, range, check, cat, size, description); }
-
-
-#if 0
-  void add (const symbol key,  // AList
-	    const Syntax& syntax,
-	    int size,
-	    const symbol description)
-  { add (key, syntax, Value::State, size, description); }
-  void add (const symbol key,  // AList
-	    const Syntax& syntax,
-	    const symbol description)
-  { add (key, syntax, Value::State, Value::Singleton, description); }
-  void add (const symbol, const Syntax&,
-	    Value::category cat, int size, 
-	    const symbol description);
-  void add (const symbol, const Syntax&, const AttributeList&,	
-	    // Alist sequence with default element.
-	    Value::category, int size, const symbol description);
-
-void 
-Frame::add (const symbol key, const Syntax& syntax,
-	    Value::category cat, int size, 
-	    const symbol description)
-{ impl->syntax.add (key, syntax, cat,size, description); }
-
-void 
-Frame::add (const symbol key, 
-            const Syntax& syntax, const AttributeList& alist,	
-	    // Alist sequence with default element.
-	    Value::category cat, int size, const symbol description)
-{ impl->syntax.add (key, syntax, alist, cat, size, description); }
-
-#endif
 
 void 
 Frame::add_object (const symbol key, const char* lib,
@@ -318,54 +275,10 @@ Frame::add_submodule (const symbol name,
 		      Value::category cat, const symbol description,
 		      load_syntax_t load_syntax)
 {
-#if 1
   impl->syntax.add (name, load_syntax, cat, Value::Singleton, description);
   if (cat == Value::Const || cat == Value::State)
-    // TODO: Move this to Frame::alist (name)
-    impl->alist.add (name, impl->syntax.default_alist (name));
-#else
-    const FrameSubmodel& frame = Librarian::submodel_frame (load_syntax);
-    Syntax& s = *new Syntax (frame.syntax ());
-    const AttributeList& a = frame.alist () ;
-
-    // Phew.  There are basically two places one can store the alist
-    // containing the default values for the variables and parameters
-    // of a submodel.  The first place is as an initial value in the
-    // parent alist, the other is as the 'default_alist' syntax table
-    // attribute.   Neither solution works well in all cases.  
-    //
-    // Using the initial value will not work for optional singletons,
-    // because if there is an initial value in the parent alist, the
-    // submodel isn't really optional.  The initial value will ensure
-    // that it is alwayes there.  The initial value will not work for
-    // submodel sequences either, because we do not know the the
-    // length of the sequence. 
-    //
-    // However, using the 'default_alist' for fully specified
-    // non-optional submodels won't work either.  The problems is if
-    // the user is satisfied with the default value, and don't try to
-    // overwrite anything.  In that case the entry will be empty in
-    // the parent alist after loading, causing an 'missing value'
-    // error.  
-    // 
-    // Log variables doesn't have a value, so the problem does not
-    // apply to them.
-    // 
-    // The solution is to treat the three cases separately.
-   
-    if (cat == Value::LogOnly)
-      // Log only, ignore default value.
-      impl->syntax.add (name, s, cat, Value::Singleton, description);
-    else if (cat == Value::Const || cat == Value::State)
-      {
-	// Mandatory, store in alist.
-	impl->syntax.add (name, s, cat, Value::Singleton, description);
-	impl->alist.add (name, a);
-      }
-    else
-      // Optional, store as default_alist.
-      impl->syntax.add (name, s, a, cat, Value::Singleton, description);
-#endif
+    // TODO: Move this to Frame::alist (name) (must return const first).
+    impl->alist.add (name, impl->syntax.default_frame (name).alist ());
 }
 
 void 
@@ -373,11 +286,7 @@ Frame::add_submodule_sequence (const symbol name, Value::category cat,
 			       const symbol description,
 			       load_syntax_t load_syntax)
 {
-#if 1
   impl->syntax.add (name, load_syntax, cat, Value::Sequence, description);
-#else
-  impl->syntax.add_submodule_sequence (name, cat, description, load_syntax); 
-#endif
 }
 
 void 

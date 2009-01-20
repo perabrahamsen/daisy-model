@@ -2,9 +2,9 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Frame
 
-** Syntax skal gemme load_syntax_t i stedet for Syntax for submodels.
-
 ** Gør Frame::syntax () const
+
+Requires ParserFile to use frame first.
 
 ** DeclareSubmodel
 

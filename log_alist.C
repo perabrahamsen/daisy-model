@@ -26,6 +26,7 @@
 #include "log_alist.h"
 #include "library.h"
 #include "syntax.h"
+#include "frame.h"
 #include "assertion.h"
 #include <sstream>
 
@@ -177,12 +178,12 @@ LogAList::open (const symbol name)
 	      if (size != Value::Singleton && has_value)
 		push (name, 
 		      syntax ().syntax (sname), 
-		      syntax ().default_alist (sname),
+		      syntax ().default_frame (sname).alist (),
 		      alist ().alist_sequence (sname));
 	      else if (size != Value::Singleton || !has_value)
 		push (name, 
 		      syntax ().syntax (sname), 
-		      syntax ().default_alist (sname));
+		      syntax ().default_frame (sname).alist ());
 	      else 
 		push (name, 
 		      syntax ().syntax (sname), 
@@ -190,10 +191,13 @@ LogAList::open (const symbol name)
 		      
 	      break;
 	    case Value::Object:
-	      daisy_assert (size != Value::Singleton);
-	      push (name, 
-		    syntax ().library (metalib (), sname), 
-		    syntax ().default_alist (sname));
+              {
+                static const AttributeList empty_alist;
+                daisy_assert (size != Value::Singleton);
+                push (name, 
+                      syntax ().library (metalib (), sname), 
+                      empty_alist);
+              }
 	      break;
 	    default:
 	      daisy_notreached ();

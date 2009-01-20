@@ -115,8 +115,8 @@ find_unit (Block& parent, const char* key)
 {
   const Units& units = parent.units ();
   const Frame& parent_frame = parent.find_frame (key);
-  const Syntax& syntax = parent_frame.syntax (key);
-  const symbol dim (syntax.dimension ("value"));
+  const Frame& child_frame = parent_frame.default_frame (key);
+  const symbol dim (child_frame.dimension ("value"));
   return units.get_unit (dim);
 }
 

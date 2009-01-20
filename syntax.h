@@ -84,7 +84,7 @@ public:
   const std::vector<symbol>& order () const;
   int order_index (symbol name) const; // Return index in order, or -1
   bool total_order () const;	// True iff all members are ordered.
-  const AttributeList& default_alist (symbol) const;
+  const Frame& default_frame (symbol) const;
 
   // Get a list of all entries.
   void entries (std::vector<symbol>&) const;
@@ -160,28 +160,10 @@ public:
   { add (key, domain, range, check, cat, Value::Singleton, description); } 
 
   // Submodel.
-#if 1
   typedef void (*load_syntax_t) (FrameSubmodel&);
   void add (symbol, load_syntax_t, 
 	    Value::category cat, int size, 
 	    const symbol description);
-#else
-  void add (symbol key,  // AList
-	    const Syntax& syntax,
-	    int size,
-	    const symbol description)
-  { add (key, syntax, Value::State, size, description); }
-  void add (symbol key,  // AList
-	    const Syntax& syntax,
-	    const symbol description)
-  { add (key, syntax, Value::State, Value::Singleton, description); }
-  void add (symbol, const Syntax&,
-	    Value::category cat, int size, 
-	    const symbol description);
-  void add (symbol, const Syntax&, const AttributeList&,	
-	    // Alist sequence with default element.
-	    Value::category, int size, const symbol description);
-#endif
 
   void add_object (symbol key,// Object
                    const char *const lib, 
@@ -194,16 +176,6 @@ public:
 
   void add_library (symbol, symbol lib);
 
-#if 0
-  typedef void (*load_syntax_t) (FrameSubmodel& alist);
-  void add_submodule (symbol name, AttributeList& alist,
-		      Value::category cat, const symbol description,
-		      load_syntax_t load_syntax);
-  void add_submodule_sequence (symbol name, Value::category cat, 
-			       const symbol description,
-			       load_syntax_t load_syntax);
-#endif
-		      
   void add_check (symbol name, const VCheck& vcheck);
 
   // It is possible to impose an order on the syntax entries, which

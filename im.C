@@ -201,8 +201,8 @@ IM::IM (Block& parent, const char *const key)
 {
   // Find dimension.
   const Frame& parent_frame = parent.find_frame (key);
-  const Syntax& child = parent_frame.syntax (key);
-  const symbol dim = child.dimension ("value");
+  const Frame& child_frame = parent_frame.default_frame (key);
+  const symbol dim = child_frame.dimension ("value");
   unit_ = &(parent.units ().get_unit (dim));
   
   // Find content.
