@@ -165,8 +165,8 @@ Intrinsics::submodel_instantiate (const load_syntax_t load_syntax)
 
   // Bidirectional name<->load mapping.
   const symbol submodel = frame->name ("submodel");
-  daisy_assert (submodel_name_load.find (submodel)
-                == submodel_name_load.end ());
+  if (submodel_name_load.find (submodel) != submodel_name_load.end ())
+    daisy_panic ("Submodel " + submodel + " already instantiated");
   submodel_name_load[submodel] = load_syntax;
   daisy_assert (submodel_load_name.find (load_syntax) 
                 == submodel_load_name.end ());

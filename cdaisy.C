@@ -99,10 +99,12 @@ daisy_syntax_add (Syntax* syntax, const char* name,
 		  Value::category cat, Value::type type, int size)
 { syntax->add (name, type, cat, size, "added from C API"); }
 
+#if 0
 extern "C" void EXPORT
 daisy_syntax_add_alist (Syntax* syntax, const char* name,
 			Value::category cat, Syntax* nested, int size)
 { syntax->add (name, *nested, cat, size, "added from C API"); }
+#endif
 
 extern "C" int EXPORT
 daisy_category_number (const char* name)

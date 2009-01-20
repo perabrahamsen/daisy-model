@@ -626,7 +626,7 @@ Toplevel::parse_system_file (const std::string& filename)
       throw EXIT_FAILURE;
     }
   
-  parser.load (impl->metalib.alist ());
+  parser.load_top ();
   if (parser.error_count () > 0)
     {
       impl->state = is_error;

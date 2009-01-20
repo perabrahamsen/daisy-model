@@ -31,6 +31,7 @@
 #include "assertion.h"
 #include "memutils.h"
 #include "treelog.h"
+#include "librarian.h"
 #include <sstream>
 #include <map>
 #include <algorithm>
@@ -568,6 +569,18 @@ Syntax::add (const symbol key, const symbol dom, const symbol ran,
   impl->num_checks[key] = &check;
 }
 
+#if 1
+void 
+Syntax::add (const symbol key, const load_syntax_t load_syntax, 
+             const Value::category cat, const int size, 
+             const symbol description)
+{
+  add (key, Value::AList, cat, size, description);
+  const FrameSubmodel& frame = Librarian::submodel_frame (load_syntax);
+  impl->syntax[key] = new Syntax (frame.syntax ()); 
+  impl->alists[key] = new AttributeList (frame.alist ());
+}
+#else    
 void
 Syntax::add (const symbol key, const Syntax& s, Value::category req, int sz,
 	     const symbol d)
@@ -583,6 +596,7 @@ Syntax::add (const symbol key, const Syntax& s, const AttributeList& al,
   add (key, s, req, sz, d);
   impl->alists[key] = new AttributeList (al);
 }
+#endif
 
 void 
 Syntax::add_object (const symbol key, const char *const l,
@@ -604,6 +618,7 @@ Syntax::add_library (const symbol key, const symbol l)
   impl->libraries[key] = l;
 }
 
+#if 0
 void 
 Syntax::add_submodule_sequence (const symbol name, Value::category cat, 
 				const symbol description,
@@ -620,6 +635,7 @@ Syntax::add_submodule_sequence (const symbol name, Value::category cat,
       // With default value for sequence members.
       add (name, s, a, cat, Value::Sequence, description);
 }
+#endif
 
 void 
 Syntax::add_check (const symbol name, const VCheck& vcheck)

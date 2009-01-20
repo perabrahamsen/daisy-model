@@ -159,6 +159,13 @@ public:
 	    const symbol description)
   { add (key, domain, range, check, cat, Value::Singleton, description); } 
 
+  // Submodel.
+#if 1
+  typedef void (*load_syntax_t) (FrameSubmodel&);
+  void add (symbol, load_syntax_t, 
+	    Value::category cat, int size, 
+	    const symbol description);
+#else
   void add (symbol key,  // AList
 	    const Syntax& syntax,
 	    int size,
@@ -174,6 +181,7 @@ public:
   void add (symbol, const Syntax&, const AttributeList&,	
 	    // Alist sequence with default element.
 	    Value::category, int size, const symbol description);
+#endif
 
   void add_object (symbol key,// Object
                    const char *const lib, 
@@ -186,15 +194,15 @@ public:
 
   void add_library (symbol, symbol lib);
 
-  typedef void (*load_syntax_fun) (FrameSubmodel& alist);
 #if 0
+  typedef void (*load_syntax_t) (FrameSubmodel& alist);
   void add_submodule (symbol name, AttributeList& alist,
 		      Value::category cat, const symbol description,
-		      load_syntax_fun load_syntax);
-#endif
+		      load_syntax_t load_syntax);
   void add_submodule_sequence (symbol name, Value::category cat, 
 			       const symbol description,
-			       load_syntax_fun load_syntax);
+			       load_syntax_t load_syntax);
+#endif
 		      
   void add_check (symbol name, const VCheck& vcheck);
 

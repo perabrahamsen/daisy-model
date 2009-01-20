@@ -782,6 +782,9 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
                           doc = get_string ();
                         if (ok)
                           {
+#if 1
+                            error ("fixed submodels not supported yet");
+#else
                             const Frame& frame 
                               = Librarian::submodel_frame (submodel);
                             // BUG: Do these ever get freed?
@@ -793,6 +796,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
                             syntax.add (var, sub_syn, 
                                         Value::Const, size, doc);
                             atts.add (var, sub_al);
+#endif
                           }
                         break;
                       }
@@ -982,7 +986,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
                   else
                     {
                       if (parser->check ())
-                        parser->load_nested (atts);
+                        parser->load_nested ();
                       lexer->error_count += parser->error_count ();
                     }
 		  inputs.push_back (al.release ());
@@ -1406,31 +1410,31 @@ ParserFile::Implementation::~Implementation ()
 { }
 
 void
-ParserFile::load_nested (AttributeList& alist)
+ParserFile::load_nested ()
 {
   impl->initialize ();
   impl->skip ();
-  impl->load_list (impl->metalib.syntax (), alist);
+  impl->load_list (impl->metalib.syntax (), impl->metalib.alist ());
   impl->skip ();
   impl->eof ();
 }
 
 void
-ParserFile::load (AttributeList& alist)
+ParserFile::load_top ()
 {
-  load_nested (alist);
+  load_nested ();
   
   // Add inputs.
-  alist.add ("parser_inputs", impl->inputs);
+  impl->metalib.alist ().add ("parser_inputs", impl->inputs);
   sequence_delete (impl->inputs.begin (), impl->inputs.end ());
   impl->inputs.erase (impl->inputs.begin (), impl->inputs.end ());
 
   // Remember filename.
   std::vector<symbol> files;
-  if (alist.check ("parser_files"))
-    files = alist.name_sequence ("parser_files");
+  if (impl->metalib.check ("parser_files"))
+    files = impl->metalib.name_sequence ("parser_files");
   files.push_back (symbol (impl->file));
-  alist.add ("parser_files", files);
+  impl->metalib.alist ().add ("parser_files", files);
 }
 
 int

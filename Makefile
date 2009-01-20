@@ -431,7 +431,7 @@ MODELS = program_GP2D.C svat_ssoc.C reaction_Jarvis99.C \
 	crop_std.C action_sow.C action_stop.C condition_time.C \
 	condition_logic.C action_irrigate.C action_lisp.C \
 	weather_none.C action_tillage.C \
-	action_harvest.C crop_old.C crop_sold.C \
+	action_harvest.C \
 	action_with.C nitrification_soil.C \
 	nitrification_solute.C hydraulic_mod_C.C uzlr.C adsorption_vS_S.C \
 	tortuosity_M_Q.C tortuosity_linear.C \
@@ -443,7 +443,7 @@ MODELS = program_GP2D.C svat_ssoc.C reaction_Jarvis99.C \
 	pet_makkink.C pet_weather.C svat_none.C action_spray.C pet_PM.C \
 	svat_pmsw.C action_surface.C
 
-DISABLED = log_clone.C action_merge.C action_divide.C \
+DISABLED = crop_old.C crop_sold.C log_clone.C action_merge.C action_divide.C \
 	weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C 
 # A component is a common interface to a number of models.
 # 
@@ -1415,7 +1415,7 @@ alist${OBJ}: alist.C plf.h library.h symbol.h alist.h syntax.h value.h time.h \
   mathlib.h assertion.h memutils.h
 syntax${OBJ}: syntax.C syntax.h value.h symbol.h alist.h frame_submodel.h \
   frame.h scope.h library.h metalib.h check.h vcheck.h assertion.h \
-  memutils.h treelog.h
+  memutils.h treelog.h librarian.h model.h
 library${OBJ}: library.C library.h symbol.h block.h value.h alist.h syntax.h \
   treelog.h assertion.h memutils.h frame_model.h frame.h scope.h
 plf${OBJ}: plf.C plf.h assertion.h mathlib.h
@@ -1992,16 +1992,6 @@ action_harvest${OBJ}: action_harvest.C action.h model.h symbol.h alist.h \
   daisy.h program.h run.h time.h timestep.h vcheck.h memutils.h field.h \
   border.h harvest.h block.h value.h librarian.h vegetation.h treelog.h \
   frame.h scope.h
-crop_old${OBJ}: crop_old.C crop.h model.h symbol.h alist.h time.h log.h \
-  border.h bioclimate.h plf.h soil_water.h soil.h geometry.h value.h \
-  aom.h om.h organic_matter.h soil_heat.h chemistry.h chemical.h am.h \
-  im.h harvest.h block.h mathlib.h assertion.h treelog.h librarian.h \
-  frame.h scope.h syntax.h
-crop_sold${OBJ}: crop_sold.C crop.h model.h symbol.h alist.h time.h log.h \
-  border.h bioclimate.h plf.h soil_water.h soil.h geometry.h value.h \
-  organic_matter.h aom.h om.h soil_heat.h chemistry.h chemical.h am.h \
-  im.h harvest.h block.h mathlib.h assertion.h librarian.h treelog.h \
-  frame.h scope.h syntax.h
 action_with${OBJ}: action_with.C action.h model.h symbol.h alist.h block.h \
   value.h daisy.h program.h run.h time.h timestep.h vcheck.h memutils.h \
   frame.h scope.h field.h border.h log.h librarian.h treelog.h

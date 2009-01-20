@@ -27,7 +27,8 @@
 #include "symbol.h"
 
 class Treelog;
-class AttributeList;
+class Frame;
+class Metalib;
 class Block;
 
 class Parser : public Model
@@ -40,8 +41,8 @@ public:
 
   // Interface.
 public:
-  virtual void load_nested (AttributeList&) = 0;
-  virtual void load (AttributeList&) = 0;
+  virtual void load_nested () = 0;
+  virtual void load_top () = 0;
   virtual int error_count () const = 0;
  
   // Create and Destroy.

@@ -946,6 +946,7 @@ static struct ColumnStandardSyntax : public DeclareModel
   Model* make (Block& al) const
   { return new ColumnStandard (al); }
 
+#if 0
   static void load_water_and_macro (FrameSubmodel& frame)
   {
     SoilWater::load_syntax (frame);
@@ -955,6 +956,7 @@ static struct ColumnStandardSyntax : public DeclareModel
 By default, preferential flow is enabled if and only if the combined\n\
 amount of humus and clay in the top horizon is above 5%.");
   }
+#endif
 
   void load_frame (Frame& frame) const
   { 
@@ -966,8 +968,8 @@ Scope to evaluate expessions in.");
                           "The numeric and physical soil properties.",
                           Soil::load_syntax);
     frame.add_submodule ("SoilWater", Value::State,
-                          "Soil water content and transportation.",
-                          load_water_and_macro);
+                         "Soil water content and transportation.",
+                         SoilWater::load_syntax);
     frame.add_submodule ("SoilHeat", Value::State,
                           "Soil heat capacity and transportation.",
                           SoilHeat::load_syntax);

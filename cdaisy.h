@@ -90,9 +90,11 @@ EXPORT void                            /* Add element to syntax table. */
 daisy_syntax_add (daisy_syntax* syntax, const char* name,
                   int cat, int type, int size);
 
+#if 0
 EXPORT void                            /* Add alist type to syntax table. */
 daisy_syntax_add_alist (daisy_syntax* syntax, const char* name,
                         int cat, daisy_syntax* nested, int size);
+#endif
 
 /* The following functions return "magic" values used by the 'cat',
    'type', and 'size' arguments to 'daisy_syntax_add'.

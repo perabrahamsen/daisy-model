@@ -38,9 +38,10 @@ private:
   std::auto_ptr<Implementation> impl;
 
   // Use.
+private:
+  void load_nested ();
 public:
-  void load_nested (AttributeList&);
-  void load (AttributeList&);
+  void load_top ();
   int error_count () const;
 
   // Create and Destroy.

@@ -161,24 +161,6 @@ public:
 	    const symbol description)
   { add (key, domain, range, check, cat, Value::Singleton, description); } 
 
-#if 1
-  void add (const symbol key,  // AList
-	    const Syntax& syntax,
-	    int size,
-	    const symbol description)
-  { add (key, syntax, Value::State, size, description); }
-  void add (const symbol key,  // AList
-	    const Syntax& syntax,
-	    const symbol description)
-  { add (key, syntax, Value::State, Value::Singleton, description); }
-  void add (const symbol, const Syntax&,
-	    Value::category cat, int size, 
-	    const symbol description);
-  void add (const symbol, const Syntax&, const AttributeList&,	
-	    // Alist sequence with default element.
-	    Value::category, int size, const symbol description);
-#endif
-
   void add_object (const symbol key,// Object
                    const char *const lib, 
                    const symbol description)

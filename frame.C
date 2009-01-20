@@ -271,6 +271,23 @@ Frame::add (const symbol key,
 { impl->syntax.add (key, domain, range, check, cat, size, description); }
 
 
+#if 0
+  void add (const symbol key,  // AList
+	    const Syntax& syntax,
+	    int size,
+	    const symbol description)
+  { add (key, syntax, Value::State, size, description); }
+  void add (const symbol key,  // AList
+	    const Syntax& syntax,
+	    const symbol description)
+  { add (key, syntax, Value::State, Value::Singleton, description); }
+  void add (const symbol, const Syntax&,
+	    Value::category cat, int size, 
+	    const symbol description);
+  void add (const symbol, const Syntax&, const AttributeList&,	
+	    // Alist sequence with default element.
+	    Value::category, int size, const symbol description);
+
 void 
 Frame::add (const symbol key, const Syntax& syntax,
 	    Value::category cat, int size, 
@@ -284,6 +301,7 @@ Frame::add (const symbol key,
 	    Value::category cat, int size, const symbol description)
 { impl->syntax.add (key, syntax, alist, cat, size, description); }
 
+#endif
 
 void 
 Frame::add_object (const symbol key, const char* lib,
@@ -300,7 +318,13 @@ Frame::add_submodule (const symbol name,
 		      Value::category cat, const symbol description,
 		      load_syntax_t load_syntax)
 {
-    FrameSubmodel frame (load_syntax);
+#if 1
+  impl->syntax.add (name, load_syntax, cat, Value::Singleton, description);
+  if (cat == Value::Const || cat == Value::State)
+    // TODO: Move this to Frame::alist (name)
+    impl->alist.add (name, impl->syntax.default_alist (name));
+#else
+    const FrameSubmodel& frame = Librarian::submodel_frame (load_syntax);
     Syntax& s = *new Syntax (frame.syntax ());
     const AttributeList& a = frame.alist () ;
 
@@ -328,7 +352,7 @@ Frame::add_submodule (const symbol name,
     // apply to them.
     // 
     // The solution is to treat the three cases separately.
-
+   
     if (cat == Value::LogOnly)
       // Log only, ignore default value.
       impl->syntax.add (name, s, cat, Value::Singleton, description);
@@ -341,13 +365,20 @@ Frame::add_submodule (const symbol name,
     else
       // Optional, store as default_alist.
       impl->syntax.add (name, s, a, cat, Value::Singleton, description);
+#endif
 }
 
 void 
 Frame::add_submodule_sequence (const symbol name, Value::category cat, 
 			       const symbol description,
 			       load_syntax_t load_syntax)
-{ impl->syntax.add_submodule_sequence (name, cat, description, load_syntax); }
+{
+#if 1
+  impl->syntax.add (name, load_syntax, cat, Value::Sequence, description);
+#else
+  impl->syntax.add_submodule_sequence (name, cat, description, load_syntax); 
+#endif
+}
 
 void 
 Frame::add_check (const symbol name, const VCheck& vcheck)
