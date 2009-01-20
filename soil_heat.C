@@ -658,13 +658,16 @@ SoilHeat::check (const size_t n, Treelog& err) const
   return ok;
 }
 
+static void
+load_T (FrameSubmodel& frame)
+{ Geometry::add_layer (frame, "dg C", Value::Const, "Soil temperature."); }
+
 void
 SoilHeat::load_syntax (FrameSubmodel& frame)
 { 
   frame.alist ().add ("submodel", "SoilHeat");
   frame.alist ().add ("description", "Temperature and heat flux in soil.");
-  Geometry::add_layer (frame, Value::OptionalState, "T", "dg C",
-                       "Soil temperature.");
+  Geometry::add_layer (frame, Value::OptionalState, "T", load_T);
   frame.add ("S", "erg/cm^3/h", Value::OptionalState, 
               "External heat source, by default zero.");
   frame.add ("conductivity", "erg/cm/dg C/h", Value::LogOnly, 

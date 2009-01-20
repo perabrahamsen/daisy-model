@@ -1299,8 +1299,8 @@ parser_file${OBJ}: parser_file.C parser_file.h parser.h model.h symbol.h \
   path.h units.h mathlib.h assertion.h memutils.h librarian.h \
   frame_submodel.h syntax.h
 geometry${OBJ}: geometry.C geometry.h symbol.h value.h volume.h model.h \
-  alist.h check.h vcheck.h treelog.h frame.h scope.h assertion.h \
-  mathlib.h syntax.h
+  alist.h check.h vcheck.h treelog.h frame_submodel.h frame.h scope.h \
+  assertion.h mathlib.h syntax.h librarian.h
 printer_file${OBJ}: printer_file.C printer_file.h printer.h model.h symbol.h \
   alist.h metalib.h frame.h scope.h value.h library.h block.h plf.h \
   time.h parser.h path.h assertion.h librarian.h syntax.h

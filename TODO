@@ -2,22 +2,11 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Frame
 
+** Gør Frame::syntax () const
+
+** Syntax skal gemme load_syntax_t i stedet for Syntax for submodels.
+
 ** DeclareSubmodel
-
-** Hvad gør vi med dynamisk genererede submodeller?
-
-*** Geometry::add_layer
-
-chemical_std.C:1529:    Geometry::add_layer (frame, Value::OptionalState, "C", "g/cm^3",
-chemical_std.C:1531:    Geometry::add_layer (frame, Value::OptionalState, "C_secondary", "g/cm^3",
-chemical_std.C:1533:    Geometry::add_layer (frame, Value::LogOnly, "C_primary", "g/cm^3",
-chemical_std.C:1535:    Geometry::add_layer (frame, Value::OptionalState, "M", "g/cm^3", 
-chemical_std.C:1537:    Geometry::add_layer (frame, Value::LogOnly, "M_primary", "g/cm^3", 
-chemical_std.C:1539:    Geometry::add_layer (frame, Value::OptionalConst,
-geometry.C:641:Geometry::add_layer (Frame& frame, const Value::category cat, 
-soil_heat.C:666:  Geometry::add_layer (frame, Value::OptionalState, "T", "dg C",
-soil_water.C:644:  Geometry::add_layer (frame, Value::OptionalState, 
-soil_water.C:646:  Geometry::add_layer (frame, Value::OptionalState,
 
 ** CropOld -> submodels
 

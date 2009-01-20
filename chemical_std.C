@@ -1369,6 +1369,33 @@ You may not specify both 'decompose_rate' and 'decompose_halftime'");
     return ok;
   }
 
+  static void load_C (FrameSubmodel& frame)
+  { Geometry::add_layer (frame, "g/cm^3", Value::Const, "\
+Concentration in water."); }
+
+  static void load_C_secondary (FrameSubmodel& frame)
+  { Geometry::add_layer (frame, "g/cm^3", Value::Const, "\
+Concentration in secondary domain."); }
+
+  static void load_C_primary (FrameSubmodel& frame)
+  { Geometry::add_layer (frame, "g/cm^3", Value::Const, "\
+Concentration in primary domain."); }
+
+  static void load_M (FrameSubmodel& frame)
+  { Geometry::add_layer (frame, "g/cm^3", Value::Const, "\
+Total mass per volume water, soil, and air."); }
+
+  static void load_M_primary (FrameSubmodel& frame)
+  { Geometry::add_layer (frame, "g/cm^3", Value::Const, "\
+Primary domain mass per volume water, soil, and air."); }
+
+  static void load_Ms (FrameSubmodel& frame)
+  { Geometry::add_layer (frame, Value::Fraction (), Value::Const, "\
+Mass in dry soil.\n\
+This include all matter in both soil and water, relative to the\n\
+dry matter weight.\n\
+Only for initialization of the 'M' parameter."); }
+
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);
@@ -1526,21 +1553,13 @@ infiltration.  It also includes the net loss through transformation,\n\
 which can be negative.");
 
     // Soil variables.
-    Geometry::add_layer (frame, Value::OptionalState, "C", "g/cm^3",
-                         "Concentration in water.");
-    Geometry::add_layer (frame, Value::OptionalState, "C_secondary", "g/cm^3",
-                         "Concentration in secondary domain.");
-    Geometry::add_layer (frame, Value::LogOnly, "C_primary", "g/cm^3",
-                         "Concentration in primary domain.");
-    Geometry::add_layer (frame, Value::OptionalState, "M", "g/cm^3", 
-                         "Total mass per volume water, soil, and air.");
-    Geometry::add_layer (frame, Value::LogOnly, "M_primary", "g/cm^3", 
-                         "Primary domain mass per volume water, soil, and air.");
-    Geometry::add_layer (frame, Value::OptionalConst,
-                         "Ms", Value::Fraction (), "Mass in dry soil.\n\
-This include all matter in both soil and water, relative to the\n\
-dry matter weight.\n\
-Only for initialization of the 'M' parameter.");
+    Geometry::add_layer (frame, Value::OptionalState, "C", load_C);
+    Geometry::add_layer (frame, Value::OptionalState, "C_secondary",
+                         load_C_secondary);
+    Geometry::add_layer (frame, Value::LogOnly, "C_primary", load_C_primary);
+    Geometry::add_layer (frame, Value::OptionalState, "M", load_M);
+    Geometry::add_layer (frame, Value::LogOnly, "M_primary", load_M_primary);
+    Geometry::add_layer (frame, Value::OptionalConst, "Ms", load_Ms);
     frame.add ("M_error", "g/cm^3", Value::LogOnly, Value::Sequence, 
                "Mass substracted to avoid negative values.");
     frame.add ("S_secondary", "g/cm^3/h", Value::LogOnly, Value::Sequence,

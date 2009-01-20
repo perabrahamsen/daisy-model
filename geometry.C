@@ -26,10 +26,11 @@
 #include "check.h"
 #include "vcheck.h"
 #include "treelog.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "assertion.h"
 #include "mathlib.h"
 #include "syntax.h"
+#include "librarian.h"
 #include <sstream>
 
 const int Geometry::cell_above;
@@ -638,34 +639,40 @@ static struct CheckLayers : public VCheck
 } check_layers;
 
 void 
-Geometry::add_layer (Frame& frame, const Value::category cat, 
-                     const symbol name,
-		     const symbol dimension,
+Geometry::add_layer (FrameSubmodel& frame, const symbol dimension,
+                     const Value::category cat, 
                      const symbol description)
 {
-  Syntax& layer = *new Syntax ();
-  layer.add ("end", "cm", Check::negative (), Value::Const, 
+  frame.add ("end", "cm", Check::negative (), Value::Const, 
 	     "End point of this layer (a negative number).");
   if (dimension == Value::Fraction ())
-    layer.add_fraction ("value", Value::Const, description);
+    frame.add_fraction ("value", Value::Const, description);
   else
-    layer.add ("value", dimension, Value::Const, description);
-  layer.order ("end", "value");
+    frame.add ("value", dimension, Value::Const, description);
+  frame.order ("end", "value");
+}
 
+void 
+Geometry::add_layer (Frame& frame, const Value::category cat, 
+                     const symbol name,
+                     load_syntax_t load_syntax)
+{
+  const FrameSubmodel child = Librarian::submodel_frame (load_syntax);
+  const symbol description = child.description ("value");
+  const symbol dimension = child.dimension ("value");
+  
   const std::string iname = "initial_" + name;
-  frame.add (iname, layer,
-	      Value::OptionalConst, Value::Sequence, 
-	      "Initial value of the '" + name + "' parameter.\n\
-The initial value is given as a sequence of (END VALUE) pairs, starting\n\
+  frame.add_submodule_sequence (iname, Value::OptionalConst, "\
+Initial value of the '" + name + "' parameter.\n\
+The initial value is given as a sequence of (END VALUE) pairs, starting\n \
 from the top and going down.  The parameter will be initialized to\n\
-VALUE from the END of the previous layer, to the END of the current layer.");
+VALUE from the END of the previous layer, to the END of the current layer.",
+                                load_syntax);
   frame.add_check (iname, check_layers);
   if (dimension == Value::Fraction ())
-    frame.add_fraction (name, cat, Value::Sequence, 
-                        description);
+    frame.add_fraction (name, cat, Value::Sequence, description);
   else
-    frame.add (name, dimension, cat, Value::Sequence, 
-               description);
+    frame.add (name, dimension, cat, Value::Sequence, description);
 }
 
 void 

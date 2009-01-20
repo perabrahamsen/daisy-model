@@ -631,6 +631,15 @@ SoilWater::check (const size_t n, Treelog& msg) const
   return ok;
 }
 
+static void
+load_h (FrameSubmodel& frame)
+{ Geometry::add_layer (frame, "cm", Value::Const, "Soil water pressure."); }
+
+static void
+load_Theta (FrameSubmodel& frame)
+{ Geometry::add_layer (frame, Value::Fraction (), Value::Const, 
+                       "Soil water content."); }
+
 void
 SoilWater::load_syntax (FrameSubmodel& frame)
 {
@@ -641,11 +650,8 @@ SoilWater::load_syntax (FrameSubmodel& frame)
               "Maximal pressure gradient for calculating exfiltration.\n\
 The gradient is assumed from center of top node to surface of top node.\n\
 By default, there is no maximum.");
-  Geometry::add_layer (frame, Value::OptionalState, 
-                       "h", "cm", "Soil water pressure.");
-  Geometry::add_layer (frame, Value::OptionalState,
-                       "Theta", Value::Fraction (),
-                       "Soil water content.");
+  Geometry::add_layer (frame, Value::OptionalState, "h", load_h);
+  Geometry::add_layer (frame, Value::OptionalState, "Theta", load_Theta);
   frame.add ("Theta_primary", "cm^3/cm^3", Value::LogOnly, Value::Sequence,
               "Water content in primary matrix system.\n\
 Conventionally, this is the intra-aggregate pores.");
