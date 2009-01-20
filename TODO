@@ -16,10 +16,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 ** omskriv Parser til at at bruge frame
 
-** fjern syntax::add (foo, syntax) for submodel
-
-I stedet skal vi have en add (foo, load_syntax), men kun gennem add_submodule
-
 ** Fjern submodel.h og submodel.C
 
 ** Fjern "type", "base_model", "submodel" attributes.
