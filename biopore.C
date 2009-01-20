@@ -248,6 +248,9 @@ static struct BioporeInit : public DeclareComponent
     : DeclareComponent (Biopore::component, "\
 A single class of biopores.")
   { }
+  static void load_flux (FrameSubmodel& frame)
+  { IM::add_syntax (frame, Value::LogOnly, IM::flux_unit ()); }
+
   void load_frame (Frame& frame) const
   {
     frame.add_object ("density", Number::component, 
@@ -263,10 +266,8 @@ Biopore density [cm^-2] as a function of 'x' [cm].");
                 "Sink from matrix domain to biopore.");
     frame.add ("infiltration", "cm/h", Value::LogOnly, "\
 Surface infiltration.");
-    IM::add_syntax (frame, Value::LogOnly,
-                    "solute_infiltration", 
-                    IM::flux_unit (),
-                    "Rate of solute infiltration through surface.");
+    frame.add_submodule_sequence ("solute_infiltration", Value::Const, "\
+Rate of solute infiltration through surface.", load_flux);
   }
 } Biopore_init;
 

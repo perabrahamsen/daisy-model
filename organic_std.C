@@ -2922,6 +2922,15 @@ static struct OrganicStandardSyntax : DeclareModel
 Mineralization and immobilization in soil.")
   { }
 
+  static void load_layer (FrameSubmodel& frame)
+  {
+    frame.add ("end", "cm", Check::negative (), Value::Const, "\
+End point of this layer (a negative number).");
+    frame.add ("weight", "kg C/m^2", Check::positive (), Value::Const, "\
+Organic carbon content of this layer.");
+    frame.order ("end", "weight");
+  }
+
   void load_frame (Frame& frame) const
   {
     Model::load_model (frame);
@@ -3084,17 +3093,8 @@ Initial value will be estimated based on equilibrium with AM and SOM pools.",
     SOM.push_back (&SOM3);
     frame.add ("som", SOM);
   
-    Syntax& layer_syntax = *new Syntax ();
-    AttributeList layer_alist;
-    layer_syntax.add ("end", "cm", Check::negative (), Value::Const,
-                     "End point of this layer (a negative number).");
-    layer_syntax.add ("weight", "kg C/m^2", Check::positive (),
-                     Value::Const,
-                     "organic carbon content of this layer.");
-    layer_syntax.order ("end", "weight");
-    frame.add ("initial_SOM", layer_syntax, layer_alist, Value::OptionalConst,
-               Value::Sequence,
-               "Layered initialization of soil SOM content.");
+    frame.add_submodule_sequence ("initial_SOM", Value::OptionalConst, "\
+Layered initialization of soil SOM content.", load_layer);
 
     frame.add_submodule_sequence ("dom", Value::State, 
                                   "Dissolved Organic Matter pools.",

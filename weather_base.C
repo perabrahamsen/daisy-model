@@ -324,6 +324,8 @@ static struct WeatherBaseSyntax : public DeclareBase
     : DeclareBase (Weather::component, "base", "\
 This is not a model, but a list of parameters shared by all weather models.")
   { }
+  static void load_flux (FrameSubmodel& frame)
+  { IM::add_syntax (frame, Value::LogOnly, IM::flux_unit ()); }
   void load_frame (Frame& frame) const
   {
 #ifdef FRAME_LINK
@@ -375,8 +377,8 @@ This is not a model, but a list of parameters shared by all weather models.")
                 "Number of light hours this day.");
     frame.add ("day_cycle", Value::None (), Value::LogOnly,
                 "Fraction of daily radiation received this hour.");
-    IM::add_syntax (frame, Value::LogOnly, "deposit", IM::flux_unit (),
-                    "Total atmospheric deposition of nitrogen.");
+    frame.add_submodule_sequence ("deposit", Value::LogOnly, "\
+Total atmospheric deposition of nitrogen.", load_flux);
     }
 } WeatherBase_syntax;
 

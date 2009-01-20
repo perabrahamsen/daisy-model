@@ -170,6 +170,9 @@ Shared parameter for irrigate actions.")
     return ok;
   }
 
+  static void load_ppm (FrameSubmodel& frame)
+  { IM::add_syntax (frame, Value::Const, Units::ppm ()); }
+
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);	
@@ -190,9 +193,9 @@ Setting this overrides the 'days' and 'hours' parameters.");
     frame.add ("temperature", "dg C", 
 		Check::positive (), Value::OptionalConst,
 		"Temperature of irrigation (default: air temperature).");
-    IM::add_syntax (frame,
-                    Value::Const, "solute", Units::ppm (), 
-		    "Solutes in irrigation water.");
+    frame.add_submodule_sequence ("solute", Value::Const, "\
+Solutes in irrigation water.", load_ppm);
+    frame.add ("solute", std::vector<const AttributeList*> ());
   }
 } ActionIrrigateBase_syntax;
 

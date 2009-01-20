@@ -60,7 +60,8 @@ public:
   const FrameSubmodel& submodel_frame (symbol);
   const FrameSubmodel& submodel_frame (load_syntax_t);
   symbol submodel_description (symbol) const;
-  
+  void submodel_declare (load_syntax_t load_syntax, symbol name, symbol desc);
+
   // Intrinsics.
 public:
   int count;

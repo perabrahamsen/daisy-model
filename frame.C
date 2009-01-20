@@ -681,6 +681,20 @@ Frame::add (const symbol key, const std::vector<symbol>& value)
 }
 
 void 
+Frame::add_strings (const symbol key)
+{
+  if (lookup (key) == Value::Object)
+    {
+      verify (key, Value::Object, 0);
+      std::vector<const AttributeList*> alists;
+      impl->alist.add (key, alists);
+      return;
+    }
+  verify (key, Value::String, 0);
+  impl->alist.add_strings (key); 
+}
+
+void 
 Frame::add_strings (const symbol key, const symbol a)
 {
   if (lookup (key) == Value::Object)

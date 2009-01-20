@@ -971,6 +971,8 @@ static struct BioporeMatrixSyntax : DeclareModel
     : DeclareModel (Biopore::component, "matrix", "\
 Biopores that ends in the matrix.")
   { }
+  static void load_solute (FrameSubmodel& frame)
+  { IMvec::add_syntax (frame, Value::OptionalState, IM::mass_unit ()); }
   void load_frame (Frame& frame) const
   { 
     frame.add ("xplus", "cm", Check::positive (), 
@@ -990,10 +992,9 @@ Increase value to get more debug message.");
     frame.add ("debug", 0);
     frame.add ("h_bottom", "cm", Value::OptionalState, Value::Sequence,
                 "Pressure at the bottom of the biopores in each interval.");
-    IMvec::add_syntax (frame,
-                       Value::OptionalState, "solute",
-                       IM::mass_unit (),
-                       "Chemical concentration in biopore intervals.");
+    frame.add_submodule_sequence ("solute", Value::OptionalState, "\
+Chemical concentration in biopore intervals.", load_solute);
+    frame.add ("solute", std::vector<const AttributeList*> ());
     frame.add ("water", "cm^3", Value::LogOnly, "Water content.");    
     frame.add ("iterations", Value::Integer, Value::LogOnly, 
                 "Number of iterations used for finding a solution.");

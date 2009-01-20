@@ -67,6 +67,16 @@ Librarian::submodel_description (const symbol name)
   return content->submodel_description (name); 
 }
 
+void 
+Librarian::declare_submodel (const load_syntax_t load_syntax, 
+                             const symbol name, const symbol desc)
+{
+  if (!content)
+    content = new Intrinsics ();
+
+  content->submodel_declare (load_syntax, name, desc);
+}
+
 Model* 
 Librarian::build_free (const symbol component, Metalib& metalib,
                        Treelog& msg, const AttributeList& alist, 
@@ -341,6 +351,13 @@ void DeclareAlias::load_frame (Frame&) const
 DeclareAlias::DeclareAlias (symbol component, symbol name, symbol super)
   : DeclareParam (component, name, super, "'" + name
                   + "' is anothor name for '" + super + "'")
+{ }
+
+DeclareSubmodel::DeclareSubmodel (const Librarian::load_syntax_t load_syntax,
+                                  const symbol name, const symbol description)
+{ Librarian::declare_submodel (load_syntax, name, description); }
+
+DeclareSubmodel::~DeclareSubmodel ()
 { }
 
 // librarian.C ends here

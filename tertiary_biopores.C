@@ -655,6 +655,11 @@ static struct TertiaryBioporesSyntax : public DeclareModel
   TertiaryBioporesSyntax ()
     : DeclareModel (Tertiary::component, "biopores", "Tertiary domain divided into biopore classes.")
   { }
+  static void load_mass (FrameSubmodel& frame)
+  { IM::add_syntax (frame, Value::LogOnly, IM::mass_unit ()); }
+  static void load_storage (FrameSubmodel& frame)
+  { IM::add_syntax (frame, Value::LogOnly, IM::storage_unit ()); }
+
   void load_frame (Frame& frame) const
   { 
 
@@ -698,12 +703,10 @@ After macropores are activated pond will have this height.");
     frame.add ("water_volume", "cm^3", Value::LogOnly, "Water volume.");    
     frame.add ("water_height", "cm", Value::LogOnly,
                 "Water volume multiplied with surface area.");
-    IM::add_syntax (frame, Value::LogOnly, "solute_mass", 
-                    IM::mass_unit (),
-                    "Total amount of solutes in biopores.");
-    IM::add_syntax (frame, Value::LogOnly, "solute_storage", 
-                    IM::storage_unit (), "\
-Total amount of solutes in biopores divided by surface area.");
+    frame.add_submodule_sequence ("solute_mass", Value::LogOnly, "\
+Total amount of solutes in biopores.", load_mass);
+    frame.add_submodule_sequence ("solute_storage", Value::LogOnly, "\
+Total amount of solutes in biopores divided by surface area.", load_storage);
     frame.add ("ddt", "h", Value::LogOnly, "Emulated timestep.\n\
 Timestep scaled for available water.\n\
 Only relevant if 'use_small_timesteps' is false.");    

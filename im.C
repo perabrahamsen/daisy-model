@@ -31,7 +31,7 @@
 #include "block.h"
 #include "alist.h"
 #include "syntax.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "check.h"
 #include "assertion.h"
 #include "frame.h"
@@ -201,10 +201,16 @@ IM::IM (Block& parent, const char *const key)
 {
   // Find dimension.
   const Frame& parent_frame = parent.find_frame (key);
-  const Syntax& syntax = parent_frame.syntax (key);
-  unit_ = &(parent.units ().get_unit (symbol (syntax.dimension ("value"))));
+  const Syntax& child = parent_frame.syntax (key);
+  const symbol dim = child.dimension ("value");
+  Assertion::message ("Created IM '" + symbol (key) + "' [" + dim + "]");
+  unit_ = &(parent.units ().get_unit (dim));
   
   // Find content.
+  if (!parent.check (key))
+    return;
+
+  // Add content.
   const std::vector<const AttributeList*>& alists = parent.alist_sequence (key);
   for (size_t i = 0; i < alists.size (); i++)
     {
@@ -237,21 +243,15 @@ IM::~IM ()
 { daisy_assert (unit_);  }
 
 void
-IM::add_syntax (Frame& parent_frame,
+IM::add_syntax (FrameSubmodel& frame,
 		Value::category cat, 
-		const char *const key,
-		const symbol dimension,
-		const char *const description)
+		const symbol dimension)
 {
-  Syntax& child_syntax = *new Syntax ();
-  child_syntax.add ("name", Value::String, cat, 
-		    "Name of chemical.");
-  child_syntax.add_check ("name", Chemical::check_library ());
-  child_syntax.add ("value", dimension.name (), Check::non_negative (), cat, 
-		    "Value for chemical.");
-  child_syntax.order ("name", "value");
-  parent_frame.add (key, child_syntax, cat, Value::Sequence, description);
-  parent_frame.add (key, std::vector<const AttributeList*> ());
+  frame.add ("name", Value::String, cat, "Name of chemical.");
+  frame.add_check ("name", Chemical::check_library ());
+  frame.add ("value", dimension, Check::non_negative (), cat, 
+             "Value for chemical.");
+  frame.order ("name", "value");
 }
 
 // im.C ends here.

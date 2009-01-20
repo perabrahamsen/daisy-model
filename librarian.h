@@ -61,6 +61,7 @@ public:
   typedef void (*load_syntax_t) (FrameSubmodel&);
   static const FrameSubmodel& submodel_frame (load_syntax_t);
   static symbol submodel_description (symbol);
+  static void declare_submodel (load_syntax_t, symbol name, symbol desc);
 
   // Build.
 private:
@@ -241,6 +242,12 @@ class DeclareAlias : public DeclareParam
   void load_frame (Frame&) const;
 public:
   DeclareAlias (symbol component, symbol name, symbol super);
+};
+
+struct DeclareSubmodel : private boost::noncopyable
+{
+  DeclareSubmodel (Librarian::load_syntax_t, symbol name, symbol description);
+  ~DeclareSubmodel ();
 };
 
 #endif // LIBRARIAN_H

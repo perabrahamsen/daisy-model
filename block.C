@@ -80,9 +80,10 @@ Block::Implementation::lookup (const symbol key) const
 const Frame& 
 Block::Implementation::find_frame (const symbol key) const
 {
-  if (frame.check (key))
+  if (frame.check (key) || frame.lookup (key) != Value::Error)
     return frame;
-  daisy_assert (context != NULL);
+  if (context == NULL)
+    daisy_panic ("Couldn't find '" + key + "' in this block or its context");
   return context->find_frame (key);
 }
 

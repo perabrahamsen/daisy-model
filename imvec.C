@@ -29,7 +29,7 @@
 #include "check.h"
 #include "block.h"
 #include "units.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "syntax.h"
 
 const std::vector<double>& 
@@ -99,21 +99,15 @@ IMvec::output (Log& log) const
 }
 
 void 
-IMvec::add_syntax (Frame& parent,
+IMvec::add_syntax (FrameSubmodel& frame,
                    Value::category cat, 
-                   const char *const key,
-                   const symbol dimension,
-                   const char *const description)
+                   const symbol dimension)
 {
-  Syntax& child_syntax = *new Syntax ();
-  child_syntax.add ("name", Value::String, cat, 
-		    "Name of chemical.");
-  child_syntax.add_check ("name", Chemical::check_library ());
-  child_syntax.add ("value", dimension.name (), Check::non_negative (), cat, 
-                    Value::Sequence, "Value for chemical.");
-  child_syntax.order ("name", "value");
-  parent.add (key, child_syntax, cat, Value::Sequence, description);
-  parent.add (key, std::vector<const AttributeList*> ());
+  frame.add ("name", Value::String, cat, "Name of chemical.");
+  frame.add_check ("name", Chemical::check_library ());
+  frame.add ("value", dimension, Check::non_negative (), cat,
+             Value::Sequence, "Value for chemical.");
+  frame.order ("name", "value");
 }
 
 const Unit&

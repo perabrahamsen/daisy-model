@@ -97,6 +97,7 @@ public:
   void add (symbol, const PLF&);
   void add (symbol, const std::vector<double>&);
   void add (symbol, const std::vector<symbol>&);
+  void add_strings (symbol key);
   void add_strings (symbol key, symbol a);
   void add_strings (symbol key,
                     symbol a, symbol b);

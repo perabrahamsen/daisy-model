@@ -837,6 +837,13 @@ AttributeList::add (const symbol key, const std::vector<symbol>& v)
 { impl.add (key, AValue (v)); }
 
 void 
+AttributeList::add_strings (const symbol key)
+{
+  std::vector<symbol> all;
+  add (key, all);
+}
+
+void 
 AttributeList::add_strings (const symbol key, const symbol a)
 {
   std::vector<symbol> all;

@@ -1097,9 +1097,9 @@ action${OBJ}: action.C action.h model.h symbol.h alist.h block.h value.h \
 condition${OBJ}: condition.C condition.h model.h symbol.h alist.h block.h \
   value.h librarian.h
 horizon${OBJ}: horizon.C horizon.h model.h symbol.h alist.h library.h block.h \
-  value.h frame.h scope.h plf.h horheat.h hydraulic.h mathlib.h \
-  assertion.h tortuosity.h texture.h nitrification.h log.h time.h \
-  border.h check_range.h check.h vcheck.h librarian.h secondary.h \
+  value.h frame_submodel.h frame.h scope.h plf.h horheat.h hydraulic.h \
+  mathlib.h assertion.h tortuosity.h texture.h nitrification.h log.h \
+  time.h border.h check_range.h check.h vcheck.h librarian.h secondary.h \
   treelog.h syntax.h
 uzmodel${OBJ}: uzmodel.C uzmodel.h model.h symbol.h alist.h block.h value.h \
   librarian.h
@@ -1325,11 +1325,11 @@ units${OBJ}: units.C units.h symbol.h unit_model.h unit.h model.h alist.h \
 tertsmall${OBJ}: tertsmall.C tertsmall.h anystate.h
 anystate${OBJ}: anystate.C anystate.h assertion.h
 imvec${OBJ}: imvec.C imvec.h symbol.h value.h assertion.h log.h time.h \
-  border.h model.h alist.h chemical.h check.h block.h units.h frame.h \
-  scope.h syntax.h
+  border.h model.h alist.h chemical.h check.h block.h units.h \
+  frame_submodel.h frame.h scope.h syntax.h
 im${OBJ}: im.C im.h symbol.h value.h chemical.h model.h alist.h units.h \
-  unit.h am.h log.h time.h border.h block.h syntax.h frame.h scope.h \
-  check.h assertion.h
+  unit.h am.h log.h time.h border.h block.h syntax.h frame_submodel.h \
+  frame.h scope.h check.h assertion.h
 frame${OBJ}: frame.C frame.h scope.h value.h symbol.h alist.h syntax.h \
   block.h assertion.h librarian.h model.h intrinsics.h library.h \
   frame_submodel.h

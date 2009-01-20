@@ -174,6 +174,12 @@ Shared parameters for old models.")
 
     return ok;
   }
+  static void load_dry (FrameSubmodel& frame)
+  { IM::add_syntax (frame, Value::Const, Weather::dry_deposit_unit ()); }
+
+  static void load_ppm (FrameSubmodel& frame)
+  { IM::add_syntax (frame, Value::Const, Units::ppm ()); }
+
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);
@@ -197,11 +203,12 @@ Shared parameters for old models.")
                 "X position of weather station."); // Unused.
     frame.add ("UTM_y", Value::Unknown (), Value::OptionalConst,
                 "Y position of weather station."); // Unused.
-
-    IM::add_syntax (frame, Value::Const, "DryDeposit", 
-                    Weather::dry_deposit_unit (), "Atmospheric deposition.");
-    IM::add_syntax (frame, Value::Const, "WetDeposit", Units::ppm (), 
-                    "Deposition of solutes with precipitation.");
+    frame.add_submodule_sequence ("DryDeposit", Value::Const, "\
+Atmospheric deposition.", load_dry);
+    frame.add ("DryDeposit", std::vector<const AttributeList*> ());
+    frame.add_submodule_sequence ("WetDeposit", Value::Const, "\
+Deposition of solutes with precipitation.", load_ppm);
+    frame.add ("WetDeposit", std::vector<const AttributeList*> ());
 
     // Division between Rain and Snow.
     frame.add ("T_rain", "dg C", Value::Const, 

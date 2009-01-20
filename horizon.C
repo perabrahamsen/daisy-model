@@ -24,7 +24,7 @@
 #include "horizon.h"
 #include "library.h"
 #include "block.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "plf.h"
 #include "horheat.h"
 #include "hydraulic.h"
@@ -336,6 +336,14 @@ hydraulic model");
       }
     return ok;
   }
+  static void load_attributes (FrameSubmodel& frame)
+  {
+    frame.add ("key", Value::String, Value::Const,
+                   "Name of attribute.");
+    frame.add ("value", Value::User (), Value::Const,
+               "Value of attribute.");
+    frame.order ("key", "value");
+  }
   void load_frame (Frame& frame) const
   {
     Model::load_model (frame);
@@ -413,15 +421,9 @@ this horizon.");
                           "Heat capacity and conductivity.",
                           HorHeat::load_syntax);
 
-    Syntax& attSyntax = *new Syntax ();
-    attSyntax.add ("key", Value::String, Value::Const,
-                   "Name of attribute.");
-    attSyntax.add ("value", Value::User (), Value::Const,
-                   "Value of attribute.");
-    attSyntax.order ("key", "value");
-    frame.add ("attributes", attSyntax, Value::OptionalConst, Value::Sequence,
-                "List of additional attributes for this horizon.\n\
-Intended for use with pedotransfer functions.");
+    frame.add_submodule_sequence ("attributes", Value::OptionalConst, "\
+List of additional attributes for this horizon.\n\
+Intended for use with pedotransfer functions.", load_attributes);
     frame.add ("attributes", std::vector<const AttributeList*> ());
   }
 } Horizon_init;

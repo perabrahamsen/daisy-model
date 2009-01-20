@@ -1220,22 +1220,24 @@ Initial added organic matter at the start of the simulation.")
     return ok;
   }
 
+  static void load_layer (FrameSubmodel& frame)
+  {
+    frame.add ("end", "cm", Check::negative (), Value::Const, "\
+Height where this layer ends (a negative number).");
+    frame.add ("weight", "kg C/m^2", Check::non_negative (),
+               Value::Const, "Carbon in this layer.");
+    frame.order ("end", "weight");
+  }
+
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);
     frame.add_submodule ("creation", Value::OptionalState,
                           "Start of simulation.", Time::load_syntax);
     frame.alist ().add ("syntax", "initial");
-    Syntax& layer_syntax = *new Syntax ();
-    layer_syntax.add ("end", "cm", Check::negative (), Value::Const,
-                      "\
-Height where this layer ends (a negative number).");
-    layer_syntax.add ("weight", "kg C/m^2", Check::non_negative (),
-                      Value::Const, "Carbon in this layer.");
-    layer_syntax.order ("end", "weight");
-    frame.add ("layers", layer_syntax, Value::Sequence, "\
-Carbon content in different soil layers.  The carbon is assumed to be\n\
-uniformly distributed in each layer.");
+    frame.add_submodule_sequence ("layers", Value::Const, "\
+Carbon content in different soil layers.  The carbon is assumed to be\n \
+uniformly distributed in each layer.", load_layer);
     frame.add_submodule_sequence ("om", Value::State,
                                    "The individual AOM pools.",
                                    AOM::load_syntax);

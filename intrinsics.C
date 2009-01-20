@@ -211,6 +211,26 @@ Intrinsics::submodel_description (const symbol name) const
   return (*i).second;
 }
 
+void
+Intrinsics::submodel_declare (const load_syntax_t load_syntax, 
+                              const symbol submodel, const symbol description)
+{
+  submodel_instantiate (load_syntax);
+  
+  // Bidirectional name<->load mapping.
+  if (submodel_name_load.find (submodel) == submodel_name_load.end ())
+    submodel_name_load[submodel] = load_syntax;
+  daisy_assert (submodel_name_load[submodel] == load_syntax);
+  if (submodel_load_name.find (load_syntax) == submodel_load_name.end ())
+    submodel_load_name[load_syntax] = submodel;
+  daisy_assert (submodel_load_name[load_syntax] == submodel);
+
+  // Name -> Description mapping.
+  if (submodel_name_desc.find (submodel) == submodel_name_desc.end ())
+    submodel_name_desc[submodel] = description;
+  daisy_assert (submodel_name_desc[submodel] == description);
+}
+
 Intrinsics::Intrinsics ()
   : count (1),
     closed (false)
