@@ -1290,6 +1290,79 @@ ChemicalStandard::ChemicalStandard (Block& al)
 	 : std::vector<double> ())
 { }
 
+struct NumberInitialC : public Number
+{
+  const double C;
+
+  // Simulation.
+  void tick (const Units&, const Scope&, Treelog&)
+  { }
+  symbol dimension (const Scope&) const
+  { 
+    static const symbol unit ("g/cm^3");
+    return unit; 
+  }
+  bool missing (const Scope& scope) const
+  { return !scope.check ("Theta"); }
+  double value (const Scope& scope) const
+  { 
+    const double Theta = scope.number ("Theta");
+    return C * Theta;
+  }
+
+  // Create.
+  bool initialize (const Units&, const Scope&, Treelog&)
+  { return true; }
+  bool check (const Units&, const Scope&, Treelog&) const
+  { return true; }
+
+  NumberInitialC (Block& al)
+    : Number (al),
+      C (al.number ("C"))
+  { }
+};
+
+static struct NumberInitialCSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new NumberInitialC (al); }
+  NumberInitialCSyntax ()
+    : DeclareModel (Number::component, "initial_C", "\
+Find initial content from concentration.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+
+    frame.add ("C", "g/cm^3", Value::Const, "\
+Initial concentration in soil water.");
+    frame.order ("C");
+  }
+} NumberInitialC_syntax;
+
+static struct InitialZeroSyntax : public DeclareParam
+{ 
+  InitialZeroSyntax ()
+    : DeclareParam (Number::component, "initial_zero", "const", "\
+Initial zero concentration in soil water.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add ("value", 0.0, "g/cm^3");
+  }
+} InitialZero_syntax;
+
+static struct ZeroGradientSyntax : public DeclareParam
+{ 
+  ZeroGradientSyntax ()
+    : DeclareParam (Number::component, "zero_gradient", "const", "\
+Assume same concentration in groundwater as in the bottom of the soil profile.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add ("value", -1.0, "g/cm^3");
+  }
+} ZeroGradient_syntax;
+
 static struct ChemicalStandardSyntax : public DeclareModel
 {
   Model* make (Block& al) const
@@ -1298,23 +1371,6 @@ static struct ChemicalStandardSyntax : public DeclareModel
     : DeclareModel (Chemical::component, "default", "\
 Read chemical properties as normal Daisy parameters.")
   { }
-  static void initial_C (const double value, Frame& frame)
-  {
-    AttributeList initial;
-    initial.add ("type", "*");
-    std::vector<const AttributeList*> operands;
-    AttributeList factor;
-    factor.add ("type", "const");
-    factor.add ("value", value, "g/cm^3");
-    operands.push_back (&factor);
-    AttributeList Theta;
-    Theta.add ("type", "get");
-    Theta.add ("name", "Theta");
-    Theta.add ("dimension", Value::None ());
-    operands.push_back (&Theta);
-    initial.add ("operands", operands);
-    frame.add ("initial", initial);
-  }
   static bool check_alist (const AttributeList& al, Treelog& msg)
   { 
     bool ok = true;
@@ -1474,20 +1530,14 @@ decomposition begins.  It can never be more than 1.0 or less than 0.0.");
                       Value::Const, Value::Singleton, "\
 Concentration below the layer of soil being examined.\n\
 Use a negative number to indicate same concentration as in lowest cell.");
-    AttributeList minus_one;
-    minus_one.add ("value", -1.0, "g/cm^3");
-    minus_one.add ("type", "const");
     frame.add_submodule_sequence ("decompose_products", Value::Const, "\
 List of products from decomposition.", ChemicalStandard::Product::load_syntax);
     frame.add ("decompose_products", std::vector<const AttributeList*> ());
-    frame.add ("C_below", minus_one);
+    frame.add ("C_below", "zero_gradient");
     frame.add_object ("initial", Number::component, 
                       Value::Const, Value::Singleton, "\
 Initial content if otherwise unspecified. [g/cm^3]");
-    AttributeList zero;
-    zero.add ("value", 0.0, "g/cm^3");
-    zero.add ("type", "const");
-    frame.add ("initial", zero);
+    frame.add ("initial", "initial_zero");
     frame.add_object ("adsorption", Adsorption::component, 
                       Value::Const, Value::Singleton, "\
 Instant equilibrium between sorbed and solute phases.\n\
@@ -1615,6 +1665,20 @@ Plants eat this stuff.")
   }
 } ChemicalNutrient_syntax;
 
+static struct InitialNO3Syntax : public DeclareParam
+{ 
+  InitialNO3Syntax ()
+    : DeclareParam (Number::component, "initial_NO3", "initial_C", "\
+Initial NO3 concentration in soil water.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    // We initialize to approximatey half the allowed content in
+    // drinking water [ 0.5 * 100 mg NO3/l ~= 5.0e-6 g NO3-N/cm^3 ]
+    frame.add ("C", 5e-6); 
+  }
+} InitialNO3_syntax;
+
 static struct ChemicalNO3Syntax : public DeclareParam
 { 
   ChemicalNO3Syntax ()
@@ -1624,9 +1688,7 @@ Nitrate-N.")
   void load_frame (Frame& frame) const
   {
     frame.add ("diffusion_coefficient", 2.0e-5);
-    // We initialize to approximatey half the allowed content in
-    // drinking water [ 0.5 * 100 mg NO3/l ~= 5.0e-6 g NO3-N/cm^3 ]
-    ChemicalStandardSyntax::initial_C (5e-6, frame);
+    frame.add ("initial", "initial_NO3");
   }
 } ChemicalNO3_syntax;
 
@@ -1643,6 +1705,21 @@ Adsorption of ammonium.")
   }
 } AdsorptionNH4_syntax;
 
+static struct InitialNH4Syntax : public DeclareParam
+{ 
+  InitialNH4Syntax ()
+    : DeclareParam (Number::component, "initial_NH4", "initial_C", "\
+Initial NH4 concentration in soil water.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    // We initialize to approximatey 5% of the N corresponding to the
+    // allowed content of NO3 in drinking water.
+    // [ 0.05 * 100 mg/l = 0.5e-6 g/cm^3 ]
+    frame.add ("C", 0.55e-6); 
+  }
+} InitialNH4_syntax;
+
 static struct ChemicalNH4Syntax : public DeclareParam
 { 
   ChemicalNH4Syntax ()
@@ -1653,10 +1730,7 @@ Ammonium-N.")
   {
     frame.add ("adsorption", "NH4");
     frame.add ("diffusion_coefficient", 1.8e-5);
-    // We initialize to approximatey 5% of the N corresponding to the
-    // allowed content of NO3 in drinking water.
-    // [ 0.05 * 100 mg/l = 0.5e-6 g/cm^3 ]
-    ChemicalStandardSyntax::initial_C (0.5e-6, frame);
+    frame.add ("initial", "initial_NH4");
   }
 } ChemicalNH4_syntax;
 

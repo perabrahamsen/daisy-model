@@ -4,10 +4,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 ** fjern alist.add (name, alist)
 
-*** Hvordan klarer vi de særlige Number funktioner i chemical_std?
-
-Jeg tror vi skal lave en specialiseret number model for hver...
-
 *** Ny hydraulic::create_something funtion
 
 *** Ny horizon::create_aquitard funktion
