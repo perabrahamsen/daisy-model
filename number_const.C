@@ -394,6 +394,16 @@ static struct NumberFetchSyntax : public DeclareModel
   }
 } NumberFetch_syntax;
 
+static struct NumberXSyntax : public DeclareParam
+{ 
+  NumberXSyntax ()
+    : DeclareParam (Number::component, "x", "fetch", "\
+Fetch the value of 'x' in the current scope.")
+  { }
+  void load_frame (Frame& frame) const
+  { frame.add ("name", "x"); }
+} NumberX_syntax;
+
 struct NumberChild : public Number
 {
   // Parameters.

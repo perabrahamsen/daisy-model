@@ -26,6 +26,7 @@
 #include "memutils.h"
 #include "frame_model.h"
 #include "frame_submodel.h"
+#include "alist.h"
 
 std::map<symbol, Library*> 
 Intrinsics::clone () const
@@ -145,43 +146,15 @@ Intrinsics::instantiate (const symbol component, const symbol model) const
 }
 
 void 
-Intrinsics::submodel_instantiate (const load_syntax_t load_syntax) 
+Intrinsics::submodel_instantiate (const load_syntax_t load_syntax)
 {
-  if (submodel_load_frame.find (load_syntax)
-      != submodel_load_frame.end ())
-    // Already there.
-    return;
-  
-  // Create frame and load->frame mapping.
-  const FrameSubmodel *const frame = new FrameSubmodel (load_syntax);
-  daisy_assert (frame);
-  submodel_load_frame[load_syntax] = frame;
-  daisy_assert (submodel_load_frame.find (load_syntax)
-                != submodel_load_frame.end ());
+  if (submodel_load_frame.find (load_syntax) == submodel_load_frame.end ())
+    submodel_load_frame[load_syntax] = NULL;
+}
 
-  if (!frame->check ("submodel"))
-    // No name.
-    return;
-
-  // Bidirectional name<->load mapping.
-  const symbol submodel = frame->name ("submodel");
-  if (submodel_name_load.find (submodel) != submodel_name_load.end ())
-    daisy_panic ("Submodel " + submodel + " already instantiated");
-  submodel_name_load[submodel] = load_syntax;
-  daisy_assert (submodel_load_name.find (load_syntax) 
-                == submodel_load_name.end ());
-  submodel_load_name[load_syntax] = submodel;
-
-  if (!frame->check ("description"))
-    // No description
-    return;
-
-  // Name -> Description mapping.
-  const symbol description = frame->name ("description");
-  daisy_assert (submodel_name_desc.find (submodel)
-                == submodel_name_desc.end ());
-  submodel_name_desc[submodel] = description;
-}  
+bool 
+Intrinsics::submodel_registered (const symbol name)
+{ return submodel_name_load.find (name) != submodel_name_load.end (); }
 
 const FrameSubmodel& 
 Intrinsics::submodel_frame (const symbol name)
@@ -196,11 +169,68 @@ const FrameSubmodel&
 Intrinsics::submodel_frame (const load_syntax_t load_syntax)
 {
   submodel_instantiate (load_syntax);
-  const submodel_load_frame_t::const_iterator i 
+  const submodel_load_frame_t::iterator i 
     = submodel_load_frame.find (load_syntax);
   daisy_assert (i != submodel_load_frame.end ());
-  daisy_assert ((*i).second);
-  return *(*i).second;
+
+  if ((*i).second)
+    // Already created.
+    return *(*i).second;
+  
+  // Create it.
+  FrameSubmodel *const frame = new FrameSubmodel (load_syntax);
+  daisy_assert (frame);
+  (*i).second = frame;
+
+  // load->name && load->desc links.
+  if (frame->check ("submodel"))
+    // Old style.
+    {
+      const symbol submodel = frame->name ("submodel");
+      if (submodel_load_name.find (load_syntax) == submodel_load_name.end ())
+        submodel_load_name[load_syntax] = submodel;
+      else
+        daisy_assert (submodel_load_name[load_syntax] == submodel);
+
+      if (!frame->check ("description"))
+        daisy_panic ("Submodel '" + submodel + "' has no decsription");
+
+      const symbol description = frame->name ("description");
+      if (submodel_name_desc.find (submodel) == submodel_name_desc.end ())
+        submodel_name_desc[submodel] = description;
+      else
+        daisy_assert (submodel_name_desc[submodel] == description);
+    }
+  else if (submodel_load_name.find (load_syntax) != submodel_load_name.end ())
+    // New style.
+    {
+      const symbol submodel = submodel_load_name[load_syntax];
+      if (frame->check ("submodel"))
+        daisy_assert (frame->name ("submodel") == submodel);
+      else
+        frame->alist ().add ("submodel", submodel);
+
+      daisy_assert (submodel_name_desc.find (submodel) 
+                    != submodel_name_desc.end ());
+      const symbol description = submodel_name_desc[submodel];
+      if (frame->check ("description"))
+        daisy_assert (frame->name ("description") == description);
+      else
+        frame->alist ().add ("description", description);
+    }
+  else
+    // Not named.
+    return *frame;
+
+  // name->load link
+  const symbol submodel = submodel_load_name[load_syntax];
+  if (submodel_name_load.find (submodel) == submodel_name_load.end ())
+    submodel_name_load[submodel] = load_syntax;
+  else
+    daisy_assert (submodel_name_load[submodel] == load_syntax);
+
+  // All done.
+  return *frame;
 }
 
 symbol 

@@ -1497,7 +1497,7 @@ solute phases typically reaches equilibrium within a single timestep.\n\
 Slower adsorption processes should be modelled as two chemicals, one\n\
 with 'none' adsorption and one with 'full' adsorption, and an\n\
 'adsorption' reaction between them.");
-    frame.add ("adsorption", Adsorption::none_model ());
+    frame.add ("adsorption", "none");
 
     // Management and climate fluxes.
     frame.add ("deposit", "g/m^2/h", Value::LogOnly,
@@ -1630,6 +1630,19 @@ Nitrate-N.")
   }
 } ChemicalNO3_syntax;
 
+static struct AdsorptionNH4Syntax : public DeclareParam
+{ 
+  AdsorptionNH4Syntax ()
+    : DeclareParam (Adsorption::component, "NH4", "linear", "\
+Adsorption of ammonium.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add ("K_clay", 117.116);
+    frame.add ("K_OC", 117.116);
+  }
+} AdsorptionNH4_syntax;
+
 static struct ChemicalNH4Syntax : public DeclareParam
 { 
   ChemicalNH4Syntax ()
@@ -1638,11 +1651,7 @@ Ammonium-N.")
   { }
   void load_frame (Frame& frame) const
   {
-    AttributeList linear;
-    linear.add ("type", "linear");
-    linear.add ("K_clay", 117.116);
-    linear.add ("K_OC", 117.116);
-    frame.add ("adsorption", linear);
+    frame.add ("adsorption", "NH4");
     frame.add ("diffusion_coefficient", 1.8e-5);
     // We initialize to approximatey 5% of the N corresponding to the
     // allowed content of NO3 in drinking water.

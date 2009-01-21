@@ -102,17 +102,6 @@ Adsorption::none ()
   return none;
 }
 
-const AttributeList& 
-Adsorption::none_model ()
-{
-  static AttributeList alist;
-
-  if (!alist.check ("type"))
-    alist.add ("type", "none");
-
-  return alist;
-}
-
 static struct AdsorptionNoneSyntax : DeclareModel
 {
   Model* make (Block& al) const
@@ -151,17 +140,6 @@ public:
     : Adsorption (al)
   { }
 };
-
-const AttributeList& 
-Adsorption::full_model ()
-{
-  static AttributeList alist;
-
-  if (!alist.check ("type"))
-    alist.add ("type", "full");
-
-  return alist;
-}
 
 static struct AdsorptionFullSyntax : DeclareModel
 {

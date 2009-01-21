@@ -350,14 +350,10 @@ hydraulic model");
     frame.add_check (check_alist);
     frame.add_object ("hydraulic", Hydraulic::component, 
                        "The hydraulic propeties of the soil.");
-    AttributeList hydraulic_alist;
-    hydraulic_alist.add ("type", "hypres");
-    frame.add ("hydraulic", hydraulic_alist);
+    frame.add ("hydraulic", "hypres");
     frame.add_object ("tortuosity", Tortuosity::component, 
                        "The soil tortuosity.");
-    AttributeList tortuosity;
-    tortuosity.add ("type", "M_Q");
-    frame.add ("tortuosity", tortuosity);
+    frame.add ("tortuosity", "M_Q");
     frame.add ("anisotropy", Value::None (),
                 Check::non_negative (), Value::Const, "\
 Horizontal saturated water conductivity relative to vertical saturated\n\
@@ -402,19 +398,11 @@ this horizon.");
     frame.add ("turnover_factor", 1.0);
     frame.add_object ("Nitrification", Nitrification::component,
                        "The soil nitrification process.");
-    AttributeList nitrification_alist;
-    nitrification_alist.add ("type", "soil");
-    nitrification_alist.add ("k_10", 2.08333333333e-7); // 5e-6/24 [1/h]
-    nitrification_alist.add ("k", 5.0e-5); // [g N/cm^3]
-    nitrification_alist.add ("heat_factor", PLF::empty ());
-    nitrification_alist.add ("water_factor", PLF::empty ());
-    nitrification_alist.add ("N2O_fraction", 0.02);
-
-    frame.add ("Nitrification", nitrification_alist);
+    frame.add ("Nitrification", "soil");
 
     frame.add_object ("secondary_domain", Secondary::component,
                        "Secondary matrix domain for solute movement.");
-    frame.add ("secondary_domain", Secondary::none_model ());
+    frame.add ("secondary_domain", "none");
 
 
     frame.add_submodule ("HorHeat", Value::State, 
@@ -427,5 +415,21 @@ Intended for use with pedotransfer functions.", load_attributes);
     frame.add ("attributes", std::vector<const AttributeList*> ());
   }
 } Horizon_init;
+
+static struct HorizonAquitardSyntax : public DeclareParam
+{ 
+  HorizonAquitardSyntax ()
+    : DeclareParam (Horizon::component, "aquitard", "default", "\
+Tecture for implicit aquitard horizon.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add ("clay", 50.0);
+    frame.add ("silt", 20.0);
+    frame.add ("sand", 29.99);
+    frame.add ("humus", 0.01);
+    frame.add ("dry_bulk_density", 2.0);
+  }
+} HorizonAquitard_syntax;
 
 // horizon.C ends here.

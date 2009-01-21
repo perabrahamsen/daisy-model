@@ -27,7 +27,7 @@
 #include "soil_heat.h"
 #include "groundwater.h"
 #include "log.h"
-#include "submodel.h"
+#include "librarian.h"
 #include "block.h"
 #include "secondary.h"
 #include "check.h"
@@ -643,8 +643,6 @@ load_Theta (FrameSubmodel& frame)
 void
 SoilWater::load_syntax (FrameSubmodel& frame)
 {
-  frame.alist ().add ("submodel", "SoilWater");
-
   frame.add ("max_exfiltration_gradient", "cm/cm", Check::positive (), 
               Value::OptionalConst,
               "Maximal pressure gradient for calculating exfiltration.\n\
@@ -829,7 +827,8 @@ SoilWater::SoilWater (Block& al)
 SoilWater::~SoilWater ()
 { }
 
-static Submodel::Register 
-soil_water_submodel ("SoilWater", SoilWater::load_syntax);
+static DeclareSubmodel 
+soil_water_submodel (SoilWater::load_syntax, "SoilWater", "\
+Keep track of water and pressure in the soil matrix.");
 
 // soil_water.C ends here.

@@ -35,7 +35,6 @@
 #include "check.h"
 #include "vcheck.h"
 #include "format.h"
-#include "submodel.h"
 #include "submodeler.h"
 #include "mathlib.h"
 #include "librarian.h"
@@ -226,7 +225,8 @@ Select::Implementation::Spec::check_path (const std::vector<symbol>& path,
 	{
 	  if (type != Value::AList)
 	    {
-	      err.error ("'" + name + "': no such submodel");
+	      err.error ("'" + name + "': no such submodel (is a " 
+                         + Value::type_name (type) + ")");
 	      ok = false;
 	      break;
 	    }
@@ -270,7 +270,7 @@ Select::Implementation::Spec::check_alist (const Metalib& metalib,
     }
   if (library_name == "fixed")
     {
-      if (!Submodel::registered (model_name.name ()))
+      if (!Librarian::submodel_registered (model_name))
 	{
 	  err.entry ("'" + model_name + "': no such submodel");
 	  ok = false;

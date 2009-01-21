@@ -47,7 +47,7 @@ public:
   // Submodels.
 private:
   typedef void (*load_syntax_t) (FrameSubmodel&);
-  typedef std::map<load_syntax_t, const FrameSubmodel*> submodel_load_frame_t;
+  typedef std::map<load_syntax_t, FrameSubmodel*> submodel_load_frame_t;
   typedef std::map<symbol, load_syntax_t> submodel_name_load_t;
   typedef std::map<load_syntax_t, symbol> submodel_load_name_t;
   typedef std::map<symbol, symbol> submodel_name_desc_t;
@@ -55,8 +55,9 @@ private:
   mutable submodel_name_load_t submodel_name_load;
   mutable submodel_load_name_t submodel_load_name;
   mutable submodel_name_desc_t submodel_name_desc;
-  void submodel_instantiate (load_syntax_t);
 public:
+  void submodel_instantiate (load_syntax_t);
+  bool submodel_registered (symbol);
   const FrameSubmodel& submodel_frame (symbol);
   const FrameSubmodel& submodel_frame (load_syntax_t);
   symbol submodel_description (symbol) const;

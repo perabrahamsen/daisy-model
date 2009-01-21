@@ -27,7 +27,6 @@
 #include "block.h"
 #include "alist.h"
 #include "lexer.h"
-#include "submodel.h"
 #include "scope.h"
 #include "number.h"
 #include "integer.h"
@@ -776,7 +775,7 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
                 if (type_name == "fixed")
                   {
                     const std::string submodel = get_string ();
-                    if (Submodel::registered (submodel))
+                    if (Librarian::submodel_registered (submodel))
                       {
                         if (!looking_at ('('))
                           doc = get_string ();

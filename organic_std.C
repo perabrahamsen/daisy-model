@@ -3119,14 +3119,7 @@ It is 0.6 at pF < 0, 1.0 at 1.5 < pF < 2.5, and 0 at pF > 6.5.");
                Value::LogOnly, Value::Sequence,
                "Product of current heat and water factors."); 
     frame.add_object ("ClayOM", ClayOM::component, "Clay effect model.");
-    AttributeList clay_alist;
-    clay_alist.add ("type", "old");
-    PLF clay_factor;
-    clay_factor.add (0.00, 1.0);
-    clay_factor.add (0.25, 0.5);
-    clay_factor.add (1.00, 0.5);
-    clay_alist.add ("factor", clay_factor);
-    frame.add ("ClayOM", clay_alist);
+    frame.add ("ClayOM", "old");
     frame.add ("tillage_age", "d", Value::OptionalState, Value::Sequence,
                "Time since the latest tillage operation was performed."); 
     frame.add ("smb_tillage_factor", "d", Value::None (), 

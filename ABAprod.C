@@ -23,7 +23,6 @@
 #include "ABAprod.h"
 #include "block.h"
 #include "librarian.h"
-#include "alist.h"
 
 const char *const ABAProd::component = "ABAproduction";
 
@@ -83,18 +82,6 @@ static struct ABAProdNoneSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   { }
 } ABAProdNone_syntax;
-
-const AttributeList& 
-ABAProd::default_model ()
-{
-  static AttributeList alist;
-  
-  if (!alist.check ("type"))
-    {
-      alist.add ("type", "none");
-    }
-  return alist;
-}
 
 // ABAprod.C ends here
 

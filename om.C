@@ -382,7 +382,6 @@ void
 OM::load_syntax (FrameSubmodel& frame, const std::string& frac_desc)
 {
   frame.add_check (check_alist);
-  frame.alist ().add ("submodel", "OM");
   frame.add ("C", "g C/cm^3", Check::non_negative (),
 	      Value::OptionalState, Value::Sequence,
 	      "Carbon in each soil interval.");
@@ -489,4 +488,6 @@ OM::OM (const AttributeList& al)
 
 OM::~OM ()
 { }
+
+// om.C ends here.
 

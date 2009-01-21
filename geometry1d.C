@@ -25,11 +25,10 @@
 #include "volume.h"
 #include "block.h"
 #include "frame_submodel.h"
-#include "alist.h"
 #include "mathlib.h"
 #include "check.h"
 #include "vcheck.h"
-#include "submodel.h"
+#include "librarian.h"
 #include "assertion.h"
 #include "treelog.h"
 #include <sstream>
@@ -182,7 +181,6 @@ Geometry1D::swap (std::vector<double>& v, double from, double middle, double to)
 void
 Geometry1D::load_syntax (FrameSubmodel& frame)
 { 
-  frame.alist ().add ("submodel", "Geometry1D");
   frame.add_check (check_alist);
   frame.add ("zplus", "cm", Check::negative (), 
 	      Value::OptionalConst, Value::Sequence,
@@ -336,5 +334,8 @@ Can't automatically make discretizations less than 1 [cm], needed at "
 Geometry1D::~Geometry1D ()
 { }
 
-static Submodel::Register 
-geometry1d_submodel ("Geometry1D", Geometry1D::load_syntax);
+static DeclareSubmodel
+geometry1d_submodel (Geometry1D::load_syntax, "Geometry1D", "\
+A one dimensional discretization of the soil.");
+
+// geometry1d.C ends here.

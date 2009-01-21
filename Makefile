@@ -1072,8 +1072,8 @@ rootdens${OBJ}: rootdens.C rootdens.h model.h symbol.h alist.h block.h \
 select${OBJ}: select.C select.h destination.h symbol.h model.h alist.h \
   units.h volume.h condition.h block.h value.h geometry.h number.h \
   scope_id.h scope.h metalib.h frame.h library.h syntax.h \
-  frame_submodel.h check.h vcheck.h format.h submodel.h submodeler.h \
-  mathlib.h assertion.h librarian.h convert.h treelog.h
+  frame_submodel.h check.h vcheck.h format.h submodeler.h mathlib.h \
+  assertion.h librarian.h convert.h treelog.h
 average${OBJ}: average.C average.h model.h symbol.h alist.h block.h value.h \
   syntax.h mathlib.h assertion.h librarian.h
 mactrans${OBJ}: mactrans.C mactrans.h model.h symbol.h alist.h block.h \
@@ -1145,14 +1145,14 @@ timestep${OBJ}: timestep.C timestep.h time.h vcheck.h symbol.h \
   mathlib.h syntax.h
 geometry_rect${OBJ}: geometry_rect.C geometry_rect.h geometry_vert.h \
   geometry.h symbol.h value.h volume.h model.h alist.h check.h vcheck.h \
-  block.h frame_submodel.h frame.h scope.h submodel.h treelog.h \
+  block.h frame_submodel.h frame.h scope.h librarian.h treelog.h \
   assertion.h mathlib.h
 doe${OBJ}: doe.C doe.h log.h time.h border.h model.h symbol.h alist.h \
   geometry.h value.h submodel.h frame_submodel.h frame.h scope.h soil.h \
   soil_water.h treelog.h assertion.h
 geometry1d${OBJ}: geometry1d.C geometry1d.h geometry_vert.h geometry.h \
   symbol.h value.h volume.h model.h alist.h block.h frame_submodel.h \
-  frame.h scope.h mathlib.h assertion.h check.h vcheck.h submodel.h \
+  frame.h scope.h mathlib.h assertion.h check.h vcheck.h librarian.h \
   treelog.h
 fetch${OBJ}: fetch.C fetch.h destination.h symbol.h select.h model.h alist.h \
   units.h volume.h treelog.h frame_submodel.h frame.h scope.h value.h \
@@ -1169,9 +1169,9 @@ som${OBJ}: som.C som.h om.h plf.h submodel.h symbol.h alist.h \
   frame_submodel.h frame.h scope.h value.h
 smb${OBJ}: smb.C smb.h om.h plf.h dom.h submodel.h symbol.h frame_submodel.h \
   frame.h scope.h value.h alist.h assertion.h check.h mathlib.h
-aom${OBJ}: aom.C aom.h om.h plf.h submodel.h symbol.h alist.h \
+aom${OBJ}: aom.C aom.h om.h plf.h librarian.h model.h symbol.h alist.h \
   frame_submodel.h frame.h scope.h value.h check.h assertion.h smb.h \
-  dom.h log.h time.h border.h model.h geometry.h mathlib.h
+  dom.h log.h time.h border.h geometry.h mathlib.h
 dom${OBJ}: dom.C dom.h plf.h doe.h smb.h om.h geometry.h symbol.h value.h \
   submodel.h block.h alist.h frame_submodel.h frame.h scope.h soil.h \
   soil_water.h log.h time.h border.h model.h check.h librarian.h \
@@ -1221,7 +1221,7 @@ surface${OBJ}: surface.C surface.h uzmodel.h model.h symbol.h alist.h \
   plf.h ridge.h check.h treelog.h frame_submodel.h frame.h scope.h
 soil_water${OBJ}: soil_water.C soil_water.h geometry.h symbol.h value.h \
   soil.h soil_heat.h groundwater.h model.h alist.h log.h time.h border.h \
-  submodel.h block.h secondary.h check.h treelog.h assertion.h mathlib.h \
+  librarian.h block.h secondary.h check.h treelog.h assertion.h mathlib.h \
   frame_submodel.h frame.h scope.h
 soil_heat${OBJ}: soil_heat.C soil_heat.h block.h symbol.h value.h alist.h \
   geometry.h soil.h soil_water.h surface.h uzmodel.h model.h movement.h \
@@ -1236,10 +1236,10 @@ harvest${OBJ}: harvest.C harvest.h time.h symbol.h block.h value.h \
 field${OBJ}: field.C field.h border.h symbol.h column.h model.h alist.h log.h \
   time.h log_clone.h log_alist.h treelog.h library.h block.h value.h \
   memutils.h assertion.h librarian.h
-bioincorporation${OBJ}: bioincorporation.C bioincorporation.h alist.h \
-  symbol.h frame_submodel.h frame.h scope.h value.h log.h time.h border.h \
-  model.h geometry.h soil.h am.h im.h submodel.h plf.h aom.h om.h check.h \
-  vcheck.h mathlib.h assertion.h
+bioincorporation${OBJ}: bioincorporation.C bioincorporation.h \
+  frame_submodel.h frame.h scope.h value.h symbol.h log.h time.h border.h \
+  model.h alist.h geometry.h soil.h am.h im.h librarian.h plf.h aom.h \
+  om.h check.h vcheck.h mathlib.h assertion.h
 weather_base${OBJ}: weather_base.C weather_base.h weather.h model.h symbol.h \
   alist.h im.h value.h fao.h assertion.h time.h log.h border.h mathlib.h \
   librarian.h block.h units.h frame.h scope.h
@@ -1295,9 +1295,8 @@ log_select${OBJ}: log_select.C log_select.h log.h time.h border.h model.h \
   format.h assertion.h librarian.h treelog.h syntax.h
 parser_file${OBJ}: parser_file.C parser_file.h parser.h model.h symbol.h \
   alist.h metalib.h frame.h scope.h value.h library.h block.h lexer.h \
-  submodel.h number.h integer.h plf.h time.h treelog_text.h treelog.h \
-  path.h units.h mathlib.h assertion.h memutils.h librarian.h \
-  frame_submodel.h syntax.h
+  number.h integer.h plf.h time.h treelog_text.h treelog.h path.h units.h \
+  mathlib.h assertion.h memutils.h librarian.h frame_submodel.h syntax.h
 geometry${OBJ}: geometry.C geometry.h symbol.h value.h volume.h model.h \
   alist.h check.h vcheck.h treelog.h frame_submodel.h frame.h scope.h \
   assertion.h mathlib.h syntax.h librarian.h
@@ -1345,7 +1344,8 @@ treelog_text${OBJ}: treelog_text.C treelog_text.h treelog.h symbol.h \
 treelog_store${OBJ}: treelog_store.C treelog_store.h treelog.h symbol.h \
   assertion.h memutils.h treelog_text.h
 intrinsics${OBJ}: intrinsics.C intrinsics.h symbol.h assertion.h library.h \
-  memutils.h frame_model.h frame.h scope.h value.h frame_submodel.h
+  memutils.h frame_model.h frame.h scope.h value.h frame_submodel.h \
+  alist.h
 metalib${OBJ}: metalib.C metalib.h symbol.h frame.h scope.h value.h \
   intrinsics.h librarian.h model.h alist.h library.h block.h syntax.h \
   assertion.h memutils.h path.h units.h unit_model.h unit.h
@@ -1428,7 +1428,8 @@ cdaisy${OBJ}: cdaisy.C scope.h value.h symbol.h block.h metalib.h frame.h \
   assertion.h treelog.h
 nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h symbol.h frame_submodel.h frame.h \
-  scope.h value.h syntax.h alist.h assertion.h librarian.h model.h
+  scope.h value.h syntax.h alist.h assertion.h librarian.h model.h \
+  intrinsics.h
 version${OBJ}: version.C
 program_GP2D${OBJ}: program_GP2D.C program.h model.h symbol.h alist.h run.h \
   geometry_rect.h geometry_vert.h geometry.h value.h rootdens.h treelog.h \

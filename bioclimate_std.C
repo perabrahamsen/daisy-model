@@ -1247,9 +1247,7 @@ Maximum absolute difference in svat ea values for convergence.");
 
     frame.add_object ("svat", SVAT::component, 
                        "Soil Vegetation Atmosphere component.");
-    AttributeList svat_alist;
-    svat_alist.add ("type", "none");
-    frame.add ("svat", svat_alist);
+    frame.add ("svat", "none");
     frame.add ("soil_ep", "mm/h", Value::LogOnly,
                 "Potential exfiltration.");
     frame.add ("soil_ea", "mm/h", Value::LogOnly,

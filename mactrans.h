@@ -61,7 +61,6 @@ protected:
   Mactrans (const symbol name);
 public:
   ~Mactrans ();
-  static const AttributeList& default_model ();
   static std::auto_ptr<Mactrans> create_default ();
 };
 

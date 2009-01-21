@@ -559,21 +559,9 @@ Soil::initialize_aquitard (Block& top,
   Library& library = top.metalib ().library (Horizon::component);
   static const symbol aquitard_symbol ("aquitard");
   static const symbol default_symbol ("default");
-  if (!library.check (aquitard_symbol))
-    {
-      // Create aquitard horizon.
-      AttributeList& alist 
-        = *new AttributeList (library.lookup (default_symbol));
-      alist.add ("clay", 50.0);
-      alist.add ("silt", 20.0);
-      alist.add ("sand", 29.99);
-      alist.add ("humus", 0.01);
-      alist.add ("dry_bulk_density", 2.0);
-      library.add_derived (aquitard_symbol, alist, default_symbol);
-    }
   daisy_assert (library.check (aquitard_symbol));
   AttributeList horizon_alist (library.lookup (aquitard_symbol));
-  horizon_alist.add ("type", "aquitard");
+  horizon_alist.add ("type", aquitard_symbol);
   AttributeList hydraulic_alist (horizon_alist.alist ("hydraulic"));
   hydraulic_alist.add ("K_sat", K_aquitard);
   horizon_alist.add ("hydraulic", hydraulic_alist);

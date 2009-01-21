@@ -512,9 +512,8 @@ RootSystem::load_syntax (FrameSubmodel& frame)
                      Value::OptionalConst, Value::Singleton,
                      "Root density model.");
 
-  frame.add_object ("ABAprod", ABAProd::component,
-                     "ABA production model.");
-  frame.add ("ABAprod", ABAProd::default_model ());
+  frame.add_object ("ABAprod", ABAProd::component, "ABA production model.");
+  frame.add ("ABAprod", "none");
 
   frame.add ("DptEmr", "cm", Check::non_negative (), Value::Const,
 	    "Penetration at emergence.");

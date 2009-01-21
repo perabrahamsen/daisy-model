@@ -56,7 +56,6 @@ protected:
   ABAProd (Block&);
 
 public:
-  static const AttributeList& default_model ();
   ~ABAProd ();
 };
 

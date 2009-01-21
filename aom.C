@@ -22,8 +22,7 @@
 
 
 #include "aom.h"
-#include "submodel.h"
-#include "alist.h"
+#include "librarian.h"
 #include "frame_submodel.h"
 #include "check.h"
 #include "assertion.h"
@@ -266,9 +265,6 @@ The first numbers corresponds to each of the SMB pools, the next\n\
 number to the SOM buffer, and any remaining numbers to each of\n\
 the DOM pools.  The length of the sequence should thus be the number\n\
 of SMB pools plus 1 plus optionally the number of DOM pools."); 
-  frame.alist ().add ("submodel", "AOM");
-  frame.alist ().add ("description", "\
-A single Added Organic Matter pool.");
   frame.add_fraction ("initial_fraction", Value::OptionalConst, "\
 The initial fraction of the total available carbon\n\
 allocated to this pool for AOM.  One pool should be left unspecified.");
@@ -287,4 +283,7 @@ AOM::AOM (const AttributeList& al)
     top_N (al.number ("top_N"))
 { }
 
-static Submodel::Register aom_submodel ("AOM", AOM::load_syntax);
+static DeclareSubmodel aom_submodel (AOM::load_syntax, "AOM", "\
+A single Added Organic Matter pool.");
+
+// aom.C ends here.

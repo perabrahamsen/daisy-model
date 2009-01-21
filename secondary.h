@@ -26,7 +26,6 @@
 #include "symbol.h"
 
 class Block;
-class AttributeList;
 
 class Secondary : public Model
 {
@@ -44,7 +43,6 @@ public:
 
   // Create and Destroy.
 public:
-  static const AttributeList& none_model ();
   Secondary (Block& al);
   ~Secondary ();
 };

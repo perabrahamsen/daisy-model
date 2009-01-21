@@ -261,7 +261,7 @@ By default, preferential flow is enabled if and only if the combined\n\
 amount of humus and clay in the top horizon is above 5%.");
     frame.add_object ("mactrans", Mactrans::component, 
                       "Solute transport model in macropores.");
-    frame.add ("mactrans", Mactrans::default_model ());
+    frame.add ("mactrans", "default");
   }
 } TertiaryOld_syntax;
 

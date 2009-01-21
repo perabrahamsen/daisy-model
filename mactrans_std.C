@@ -197,19 +197,6 @@ This tertiary solute transport model only works with vertical geometries");
   return ok; 
 }
 
-const AttributeList& 
-Mactrans::default_model ()
-{
-  static AttributeList alist;
-  
-  if (!alist.check ("type"))
-    {
-      Syntax dummy;
-      alist.add ("type", "default");
-    }
-  return alist;
-}
-
 static struct MactransStandardSyntax : public DeclareModel
 {
   Model* make (Block& al) const

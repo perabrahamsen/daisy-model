@@ -46,6 +46,22 @@ Librarian::intrinsics ()
   return *content;
 }
 
+void 
+Librarian::submodel_instantiate (const load_syntax_t load_syntax)
+{
+  if (!content)
+    content = new Intrinsics ();
+
+  content->submodel_instantiate (load_syntax);
+}
+
+bool
+Librarian::submodel_registered (const symbol name)
+{ 
+  daisy_assert (content);
+  return content->submodel_registered (name); 
+}
+
 const FrameSubmodel& 
 Librarian::submodel_frame (const symbol name)
 {

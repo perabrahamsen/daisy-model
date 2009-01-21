@@ -96,17 +96,6 @@ matrix pores.")
   }
 } SecondaryNone_syntax;
 
-const AttributeList& 
-Secondary::none_model ()
-{
-  static AttributeList alist;
-  
-  if (!alist.check ("type"))
-    alist.add ("type", "none");
-
-  return alist;
-}
-
 // "pressure" model.
 
 struct SecondaryPressure : public Secondary

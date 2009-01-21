@@ -115,9 +115,6 @@ public:
   virtual void tick (SMM1D&, double gravity, double dt, Treelog&) = 0;
 
   // Create and Destroy.
-public:
-  static const AttributeList& default_model ();
-  static const AttributeList& none_model ();
 private:
   UZ1D ();
 protected:

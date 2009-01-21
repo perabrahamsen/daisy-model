@@ -47,8 +47,6 @@ public:
   // Create and Destroy.
 public:
   static const Adsorption& none ();
-  static const AttributeList& none_model ();
-  static const AttributeList& full_model ();
 protected:
   Adsorption (const char* name);
   Adsorption (Block& al);

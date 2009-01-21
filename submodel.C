@@ -27,6 +27,7 @@
 #include "alist.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "intrinsics.h"
 #include <map>
 
 typedef std::map<symbol, Submodel::load_fun> submodel_map_type;
@@ -100,7 +101,7 @@ Submodel::Register::Register (const symbol name, load_fun fun)
   if (!submodel_map)
     submodel_map = new submodel_map_type;
   (*submodel_map)[name] = fun;
-  (void) Librarian::submodel_frame (fun);
+  Librarian::submodel_instantiate (fun);
 }
 
 Submodel::Register::~Register ()

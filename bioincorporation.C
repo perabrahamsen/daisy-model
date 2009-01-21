@@ -23,13 +23,12 @@
 
 
 #include "bioincorporation.h"
-#include "alist.h"
 #include "frame_submodel.h"
 #include "log.h"
 #include "geometry.h"
 #include "soil.h"
 #include "am.h"
-#include "submodel.h"
+#include "librarian.h"
 #include "plf.h"
 #include "time.h"
 #include "aom.h"
@@ -300,11 +299,6 @@ Bioincorporation::set_am (AM* am)
 void
 Bioincorporation::load_syntax (FrameSubmodel& frame)
 { 
-  // Submodel.
-  frame.alist ().add ("submodel", "Bioincorporation");
-  frame.alist ().add ("description", 
-	     "Biological incorporation of organic matter in soil.");
-
   // Incorporation speed.
   frame.add ("R_max", "g DM/m^2/h", Check::non_negative (), Value::Const, 
 	      "Maximal speed of incorporation.");
@@ -417,5 +411,8 @@ Bioincorporation::Bioincorporation (const AttributeList& al)
 Bioincorporation::~Bioincorporation ()
 { delete &impl; }
 
-static Submodel::Register bioincorporation_submodel
-/**/ ("Bioincorporation", Bioincorporation::load_syntax);
+static DeclareSubmodel
+bioincorporation_submodel (Bioincorporation::load_syntax, "Bioincorporation", "\
+Biological incorporation of organic matter in soil.");
+
+// bioincorporation.C ends here.

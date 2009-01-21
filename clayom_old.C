@@ -114,3 +114,5 @@ of SMB1 and all SOM pools.");
 
   }
 } ClayOMOld_syntax;
+
+// clayom_old.C ends here.

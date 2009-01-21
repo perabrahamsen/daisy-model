@@ -25,9 +25,8 @@
 #include "check.h"
 #include "vcheck.h"
 #include "block.h"
-#include "alist.h"
 #include "frame_submodel.h"
-#include "submodel.h"
+#include "librarian.h"
 #include "treelog.h"
 #include "assertion.h"
 #include "mathlib.h"
@@ -127,7 +126,6 @@ GeometryRect::check_y_border (const double, Treelog& err) const
 void
 GeometryRect::load_syntax (FrameSubmodel& frame)
 { 
-  frame.alist ().add ("submodel", "GeometryRect");
   frame.add ("zplus", "cm", Check::negative (), 
 	      Value::Const, Value::Sequence,
 	      "Depth of each numeric layer (a negative number).\n\
@@ -344,5 +342,6 @@ GeometryRect::GeometryRect (Block& al)
 GeometryRect::~GeometryRect ()
 { }
 
-static Submodel::Register 
-geometry_rect_submodel ("GeometryRect", GeometryRect::load_syntax);
+static DeclareSubmodel
+geometry_rect_submodel (GeometryRect::load_syntax, "GeometryRect", "\
+A rectangular discretization of the soil.");

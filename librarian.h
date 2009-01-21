@@ -57,8 +57,10 @@ private:
   static Intrinsics* content;
 public:
   static const Intrinsics& intrinsics ();
-  static const FrameSubmodel& submodel_frame (symbol);
   typedef void (*load_syntax_t) (FrameSubmodel&);
+  static void submodel_instantiate (load_syntax_t);
+  static bool submodel_registered (symbol);
+  static const FrameSubmodel& submodel_frame (symbol);
   static const FrameSubmodel& submodel_frame (load_syntax_t);
   static symbol submodel_description (symbol);
   static void declare_submodel (load_syntax_t, symbol name, symbol desc);

@@ -48,7 +48,6 @@ private:
 			      const double cropN /*[g/m²area]*/, Treelog&);
   void output (Log&) const
   { }
-  const AttributeList& default_model ();
 
   // Create.
   public:

@@ -193,10 +193,7 @@ By default the name of the 'x' and 'y' objects.");
     frame.add_object ("x", Number::component, 
                        Value::Const, Value::Singleton, "\
 Expression for calculating the x value.");
-    AttributeList x_alist;
-    x_alist.add ("type", "fetch");
-    x_alist.add ("name", "x");
-    frame.add ("x", x_alist);
+    frame.add ("x", "x");
     frame.add_object ("y", Number::component, 
                        Value::Const, Value::Singleton, "\
 Expression for calculating the y value.");

@@ -98,8 +98,10 @@ with nitrification based on total ammonium content.")
   {
     frame.add ("k", "g N/cm^3", Check::positive (), Value::Const, 
                 "Half saturation constant.");
+    frame.add ("k", 5.0e-5); // [g N/cm^3]
     frame.add ("k_10", "g N/cm^3/h", Check::non_negative (), Value::Const,
                 "Max rate.");
+    frame.add ("k_10", 2.08333333333e-7); // 5e-6/24 [1/h]
     frame.add ("heat_factor", "dg C", Value::None (), Value::Const,
                 "Heat factor.");
     frame.add ("heat_factor", PLF::empty ());
