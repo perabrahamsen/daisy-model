@@ -198,6 +198,16 @@ Frame::default_frame (const symbol key) const
     return impl->syntax.default_frame (key);
 }
 
+symbol 
+Frame::submodel_name (const symbol key) const
+{ 
+  const Frame& frame = default_frame (key);
+  if (frame.check ("submodel"))
+    return frame.name ("submodel");
+
+  return Value::None ();
+}
+
 void 
 Frame::add (const symbol key,	// Generic.
 	    Value::type t, 

@@ -27,7 +27,6 @@
 #include "metalib.h"
 #include "block.h"
 #include "alist.h"
-#include "submodel.h"
 #include "printer_file.h"
 #include "xref.h"
 #include "plf.h"
@@ -189,12 +188,12 @@ ProgramDocument::print_entry_type (const symbol name,
       break;
     case Value::AList:
       {
-	if (Submodel::is_submodel (syntax, alist, name))
+        const symbol submodel_name = syntax.submodel_name (name);
+	if (submodel_name != Value::None ())
 	  {
-	    format->bold (Submodel::find_submodel (syntax, alist, name));
+	    format->bold (submodel_name);
 	    format->text (" fixed component ");
-	    format->see ("section", "fixed", 
-			 Submodel::find_submodel (syntax, alist, name));
+	    format->see ("section", "fixed", submodel_name);
 	  }
 	else
 	  {
@@ -374,12 +373,10 @@ ProgramDocument::print_entry_value (const symbol name,
 		format->text (" (has partially specified default value)");
 	      else 
 		format->text (" (has fully specified default value)");
-	      if (Submodel::is_submodel (syntax, alist, name))
+              const symbol submodel = syntax.submodel_name (name);
+              if (submodel != Value::None ())
 		{
 		  const AttributeList& nested = alist.alist (name);
-		  const symbol submodel
-		    = Submodel::find_submodel (syntax, alist, name);
-
                   const Frame& frame = Librarian::submodel_frame (submodel);
 		  const Syntax& nested_syntax = frame.syntax ();
 		  const AttributeList& default_alist = frame.alist ();
@@ -1263,7 +1260,7 @@ that there can only be one model, that is, only a single implementation\n\
 of the component, and that it is not possible to define libraries of\n\
 standard parameterizations for the model."); 
   std::vector<symbol> fixed;
-  Submodel::all (fixed);
+  Librarian::submodel_all (fixed);
   for (unsigned int i = 0; i < fixed.size (); i++)
     {
       const Frame& frame = Librarian::submodel_frame (name);

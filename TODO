@@ -2,14 +2,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Frame
 
-** Fjern referencer til submodel fra
-
-*** traverse.C
-
-*** program_document.C
-
-** slet submodel.C / submodel.h
-
 ** fjern referencer til "submodel" og "description" (i submodels).
 
 ** fjern alist.add (name, alist)

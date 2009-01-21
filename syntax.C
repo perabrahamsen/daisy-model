@@ -502,6 +502,17 @@ Syntax::default_frame (const symbol key) const
   return Librarian::submodel_frame (load_syntax);
 }
 
+symbol 
+Syntax::submodel_name (const symbol key) const
+{
+  const Frame& frame = default_frame (key);
+  if (frame.check ("submodel"))
+    return frame.name ("submodel");
+
+  return Value::None ();
+}
+
+
 void
 Syntax::add (const symbol key, Value::type t, Value::category req, int s, const symbol d)
 {

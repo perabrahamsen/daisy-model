@@ -93,6 +93,13 @@ Librarian::declare_submodel (const load_syntax_t load_syntax,
   content->submodel_declare (load_syntax, name, desc);
 }
 
+void
+Librarian::submodel_all (std::vector<symbol>& all)
+{
+  daisy_assert (content);
+  return content->submodel_all (all); 
+}
+  
 Model* 
 Librarian::build_free (const symbol component, Metalib& metalib,
                        Treelog& msg, const AttributeList& alist, 

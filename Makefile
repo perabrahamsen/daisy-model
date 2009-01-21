@@ -496,7 +496,7 @@ OTHER = frame_submodel.C submodeler.C \
 	check.C check_range.C path.C traverse_delete.C \
 	depend.C traverse.C treelog.C \
 	lexer_data.C lexer.C daisy.C alist.C syntax.C library.C plf.C \
-	mathlib.C cdaisy.C nrutil.C submodel.C version.C
+	mathlib.C cdaisy.C nrutil.C version.C
 
 # Utilities in header or source alone.
 HEADONLY = memutils.h iterative.h $(CXSPARSEHEAD)
@@ -572,7 +572,7 @@ EXECUTABLES = daisy${EXE} tkdaisy${EXE} cdaisy${EXE} gdaisy${EXE}
 
 # Select files to be removed by the next svn update.
 #
-REMOVE = none
+REMOVE = submodel.C submodel.h
 
 REMOVED = msoltranrect_2x1.C msoltranrect_forward.C\
 	select_soil.C adsorption_none.C adsorption_full.C ABAprod_expr.C \
@@ -1386,7 +1386,7 @@ vcheck${OBJ}: vcheck.C vcheck.h symbol.h units.h metalib.h frame.h scope.h \
   treelog.h
 assertion${OBJ}: assertion.C assertion.h treelog.h symbol.h mathlib.h
 xref${OBJ}: xref.C xref.h symbol.h traverse.h metalib.h frame.h scope.h \
-  value.h library.h syntax.h alist.h submodel.h assertion.h
+  value.h library.h syntax.h alist.h librarian.h model.h assertion.h
 oldunits${OBJ}: oldunits.C oldunits.h symbol.h syntax.h value.h mathlib.h \
   assertion.h memutils.h
 check${OBJ}: check.C check.h mathlib.h assertion.h
@@ -1398,8 +1398,8 @@ traverse_delete${OBJ}: traverse_delete.C traverse_delete.h symbol.h \
 depend${OBJ}: depend.C depend.h symbol.h traverse.h library.h metalib.h \
   frame.h scope.h value.h syntax.h alist.h treelog.h assertion.h
 traverse${OBJ}: traverse.C traverse.h symbol.h metalib.h frame.h scope.h \
-  value.h library.h syntax.h alist.h submodel.h assertion.h librarian.h \
-  model.h frame_submodel.h
+  value.h library.h syntax.h alist.h assertion.h librarian.h model.h \
+  frame_submodel.h
 treelog${OBJ}: treelog.C treelog.h symbol.h
 lexer_data${OBJ}: lexer_data.C lexer_data.h lexer.h symbol.h time.h mathlib.h \
   assertion.h
@@ -1426,9 +1426,6 @@ cdaisy${OBJ}: cdaisy.C scope.h value.h symbol.h block.h metalib.h frame.h \
   action.h horizon.h printer_file.h printer.h version.h chemical.h \
   assertion.h treelog.h
 nrutil${OBJ}: nrutil.C
-submodel${OBJ}: submodel.C submodel.h symbol.h frame_submodel.h frame.h \
-  scope.h value.h syntax.h alist.h assertion.h librarian.h model.h \
-  intrinsics.h
 version${OBJ}: version.C
 program_GP2D${OBJ}: program_GP2D.C program.h model.h symbol.h alist.h run.h \
   geometry_rect.h geometry_vert.h geometry.h value.h rootdens.h treelog.h \
@@ -1749,7 +1746,7 @@ program_gnuplot${OBJ}: program_gnuplot.C program.h model.h symbol.h alist.h \
   run.h block.h value.h gnuplot.h treelog.h path.h memutils.h librarian.h \
   frame.h scope.h
 program_document${OBJ}: program_document.C program.h model.h symbol.h alist.h \
-  run.h library.h metalib.h frame.h scope.h value.h block.h submodel.h \
+  run.h library.h metalib.h frame.h scope.h value.h block.h \
   printer_file.h printer.h xref.h plf.h format.h treelog.h assertion.h \
   librarian.h frame_submodel.h syntax.h
 program_batch${OBJ}: program_batch.C program.h model.h symbol.h alist.h run.h \

@@ -153,7 +153,7 @@ Intrinsics::submodel_instantiate (const load_syntax_t load_syntax)
 }
 
 bool 
-Intrinsics::submodel_registered (const symbol name)
+Intrinsics::submodel_registered (const symbol name) const
 { return submodel_name_load.find (name) != submodel_name_load.end (); }
 
 const FrameSubmodel& 
@@ -259,6 +259,15 @@ Intrinsics::submodel_declare (const load_syntax_t load_syntax,
   if (submodel_name_desc.find (submodel) == submodel_name_desc.end ())
     submodel_name_desc[submodel] = description;
   daisy_assert (submodel_name_desc[submodel] == description);
+}
+
+void
+Intrinsics::submodel_all (std::vector<symbol>& all) const
+{
+  for (submodel_name_load_t::const_iterator i = submodel_name_load.begin ();
+       i != submodel_name_load.end ();
+       i++)
+    all.push_back ((*i).first);
 }
 
 Intrinsics::Intrinsics ()

@@ -26,7 +26,6 @@
 #include "library.h"
 #include "syntax.h"
 #include "alist.h"
-#include "submodel.h"
 #include "assertion.h"
 #include "librarian.h"
 #include "frame_submodel.h"

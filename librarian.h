@@ -64,6 +64,7 @@ public:
   static const FrameSubmodel& submodel_frame (load_syntax_t);
   static symbol submodel_description (symbol);
   static void declare_submodel (load_syntax_t, symbol name, symbol desc);
+  static void submodel_all (std::vector<symbol>&);
 
   // Build.
 private:

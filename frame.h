@@ -89,6 +89,7 @@ public:
   symbol range (const symbol) const;
   symbol description (const symbol) const;
   const Frame& default_frame (const symbol) const;
+  symbol submodel_name (const symbol) const;
 
   // Add attribute types.
 public:
