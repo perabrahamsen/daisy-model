@@ -1948,7 +1948,7 @@ groundwater_static${OBJ}: groundwater_static.C groundwater.h model.h symbol.h \
   scope.h
 horizon_std${OBJ}: horizon_std.C horizon.h model.h symbol.h alist.h block.h \
   value.h texture.h plf.h hydraulic.h check.h mathlib.h assertion.h \
-  librarian.h treelog.h frame.h scope.h
+  librarian.h treelog.h frame.h scope.h intrinsics.h library.h
 crop_std${OBJ}: crop_std.C crop.h model.h symbol.h alist.h time.h chemistry.h \
   seed.h root_system.h rootdens.h ABAprod.h plf.h canopy_std.h \
   canopy_simple.h harvesting.h production.h phenology.h partition.h \
@@ -1993,7 +1993,7 @@ action_with${OBJ}: action_with.C action.h model.h symbol.h alist.h block.h \
   frame.h scope.h field.h border.h log.h librarian.h treelog.h
 nitrification_soil${OBJ}: nitrification_soil.C nitrification.h model.h \
   symbol.h alist.h abiotic.h block.h value.h mathlib.h assertion.h plf.h \
-  check.h librarian.h frame.h scope.h
+  check.h librarian.h frame.h scope.h intrinsics.h library.h
 nitrification_solute${OBJ}: nitrification_solute.C nitrification.h model.h \
   symbol.h alist.h abiotic.h block.h value.h soil.h soil_water.h \
   soil_heat.h mathlib.h assertion.h plf.h check.h librarian.h frame.h \

@@ -167,7 +167,14 @@ LogAList::open (const symbol name)
   if (is_active)
     {
       const std::string& sname = name.name ();
-      daisy_assert (!syntax ().is_const (sname));
+      if (syntax ().is_const (sname))
+        {
+          std::stringstream tmp;
+          tmp << "'" << name << "' is const;";
+          for (size_t i = 0; i < entry_stack.size (); i++)
+            tmp << " " << entry_stack[i];
+          daisy_panic (tmp.str ());
+        }
       if (syntax ().is_state (sname))
 	{
 	  const int size = syntax ().size (sname);

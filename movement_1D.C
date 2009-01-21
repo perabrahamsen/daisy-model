@@ -475,6 +475,7 @@ One dimensional movement.")
   void load_frame (Frame& frame) const
   {
     frame.add ("Tertiary", "old");
+    frame.add_strings ("matrix_solute", "Hansen", "convection", "none");
 
     frame.add_submodule ("Geometry", Value::State,
                          "Discretization of the soil.",

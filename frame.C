@@ -29,6 +29,7 @@
 #include "intrinsics.h"
 #include "library.h"
 #include "frame_submodel.h"
+#include <vector>
 
 struct Frame::Implementation
 {
@@ -766,6 +767,39 @@ Frame::add (const symbol key, const std::vector<const PLF*>& value)
 {
   verify (key, Value::PLF, value.size ());
   impl->alist.add (key, value); 
+}
+
+void 
+Frame::add_empty (const symbol key)
+{
+  switch (lookup (key))
+    {
+    case Value::Number:
+      impl->alist.add (key, std::vector<double> ());
+      break;
+    case Value::AList:
+      impl->alist.add (key, std::vector<const AttributeList*> ());
+      break;
+    case Value::PLF:
+      impl->alist.add (key, std::vector<const PLF*> ());
+      break;
+    case Value::Boolean:
+      impl->alist.add (key, std::vector<bool> ());
+      break;
+    case Value::String:
+      impl->alist.add (key, std::vector<symbol> ());
+      break;
+    case Value::Integer:
+      impl->alist.add (key, std::vector<int> ());
+      break;
+    case Value::Object:
+      impl->alist.add (key, std::vector<const AttributeList*> ());
+      break;
+    case Value::Library:
+    case Value::Error:
+    default:
+      daisy_notreached ();
+    }
 }
 
 Frame::Frame (const Frame& old)

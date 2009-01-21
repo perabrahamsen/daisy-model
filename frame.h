@@ -264,6 +264,7 @@ public:
   void add (symbol, const std::vector<int>&);
   void add (symbol, const std::vector<const AttributeList*>&);
   void add (symbol, const std::vector<const PLF*>&);
+  void add_empty (symbol);
 
   // Create and Destroy.
 protected:

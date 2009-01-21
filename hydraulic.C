@@ -228,6 +228,14 @@ Hydraulic::Hydraulic (Block& al)
     K_sat (al.number ("K_sat", -42.42e42))
 { }
 
+Hydraulic::Hydraulic (const symbol name_, const double K_sat_)
+  : ModelLogable (name_),
+    K_init (NULL),
+    Theta_sat (-42.42e42),
+    Theta_res (0.0),
+    K_sat (K_sat_)
+{ }
+
 Hydraulic::~Hydraulic ()
 { }
 

@@ -73,6 +73,10 @@ The layers apply to the soil section not covered by the 'zones' parameter.");
       : end (al.number ("end")),
 	horizon (Librarian::build_item<Horizon> (al, "horizon"))
     { }
+    Layer (const double end_, const double K_sat)
+      : end (end_),
+	horizon (Horizon::create_aquitard (K_sat))
+    { }
     ~Layer ()
     { }
   };
@@ -550,35 +554,7 @@ Soil::initialize_aquitard (Block& top,
     = (Z_aquitard > 5.0) ? floor (Z_aquitard / 3.0)	: (Z_aquitard / 3.0);
   const double new_end = old_end - Z_horizon;
 
-  // Add layer.
-  Library& library = top.metalib ().library (Horizon::component);
-  static const symbol aquitard_symbol ("aquitard");
-  static const symbol default_symbol ("default");
-  daisy_assert (library.check (aquitard_symbol));
-  AttributeList horizon_alist (library.lookup (aquitard_symbol));
-  horizon_alist.add ("type", aquitard_symbol);
-  AttributeList hydraulic_alist (horizon_alist.alist ("hydraulic"));
-  hydraulic_alist.add ("K_sat", K_aquitard);
-  horizon_alist.add ("hydraulic", hydraulic_alist);
-  daisy_assert (library.syntax (aquitard_symbol).check (top.metalib (),
-                                                        horizon_alist,
-                                                        top.msg ()));
-#if 0
-  Syntax layer_syntax;
-  AttributeList layer_alist;
-  Implementation::Layer::load_syntax (layer_syntax, layer_alist);
-  layer_alist.add ("end", new_end);
-  layer_alist.add ("horizon", horizon_alist);
-  daisy_assert (layer_syntax.check (top.metalib (), layer_alist, top.msg ()));
-  Block block (top, layer_syntax, layer_alist, "aquitard layer");
-#else
-  FrameSubmodel layer_frame (Implementation::Layer::load_syntax);
-  layer_frame.add ("end", new_end);
-  layer_frame.add ("horizon", horizon_alist);
-  daisy_assert (layer_frame.check (top));
-  Block block (top, layer_frame, "aquitard layer");
-#endif
-  impl->layers.push_back (new Implementation::Layer (block));
+  impl->layers.push_back (new Implementation::Layer (new_end, K_aquitard));
 
   // Return the old end of soil.
   return old_end;

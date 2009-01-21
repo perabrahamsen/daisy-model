@@ -91,6 +91,8 @@ void output (Log&) const;
   // Create and Destroy.
 public:
   explicit Horizon (Block&);
+  Horizon (const Frame&, double K_sat);
+  static std::auto_ptr<Horizon> create_aquitard (double K_sat);
   virtual void initialize (bool top_soil, int som_size, Treelog&) = 0;
 protected:
   void initialize_base (bool top_soil, int som_size, const Texture& texture, 

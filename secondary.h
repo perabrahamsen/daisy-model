@@ -24,6 +24,7 @@
 
 #include "model.h"
 #include "symbol.h"
+#include <memory>
 
 class Block;
 
@@ -42,8 +43,11 @@ public:
   virtual double alpha () const = 0; // The value of the 'alpha' parameter.
 
   // Create and Destroy.
+protected:
+  explicit Secondary (Block& al);
+  explicit Secondary (const symbol name);
 public:
-  Secondary (Block& al);
+  static std::auto_ptr<Secondary> create_none ();
   ~Secondary ();
 };
 

@@ -74,6 +74,8 @@ public:
   Value::type lookup (symbol) const;
   void entries (std::vector<symbol>&) const;
   int type_size (symbol tag) const;
+  symbol dimension (symbol) const;
+  symbol description (symbol) const;
 
   // AList emulation.
 public:

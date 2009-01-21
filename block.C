@@ -41,7 +41,7 @@ struct Block::Implementation
   Metalib& metalib;
   Block *const context;
   const Frame& frame;
-  Treelog& msg;
+  mutable Treelog& msg;
   Treelog::Open msg_nest;
   bool is_ok;
 
@@ -49,7 +49,7 @@ struct Block::Implementation
   Value::type lookup (symbol) const;
   const Frame& find_frame (const symbol key) const;
   bool check (const symbol key) const;
-  symbol expand_string (Block&, symbol) const;
+  symbol expand_string (Block&, symbol);
   symbol expand_reference (const symbol key);
   void error (const std::string& msg);
   void set_error ();
@@ -100,7 +100,7 @@ Block::Implementation::check (const symbol key) const
 
 symbol
 Block::Implementation::expand_string (Block& block,
-				      const symbol value_s) const
+				      const symbol value_s)
 {
   const std::string value = value_s.name ();
   std::ostringstream result;
@@ -127,7 +127,7 @@ Block::Implementation::expand_string (Block& block,
 	    }
 	  else
 	    {
-	      // BUG: We still have too many $col and $crop around to warn.
+	      // BUG: We still have too many $col and $crop around to throw.
 	      msg.warning (std::string ("Unknown $ escape '") 
 			   + c + "', ignored");
 	      result << '$' << c;
@@ -349,13 +349,22 @@ int
 Block::type_size (const symbol tag) const
 { return find_frame (tag).size (tag); }
 
-int 
-Block::value_size (const symbol tag) const
-{ return find_frame (tag).size (tag); }
+
+symbol 
+Block::dimension (const symbol tag) const
+{ return find_frame (tag).dimension (tag); }
+
+symbol
+Block::description (const symbol tag) const
+{ return find_frame (tag).description (tag); }
 
 bool 
 Block::check (const symbol key) const
 { return impl->check (key); }
+
+int 
+Block::value_size (const symbol tag) const
+{ return find_frame (tag).size (tag); }
 
 double 
 Block::number (const symbol key) const

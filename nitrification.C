@@ -64,6 +64,10 @@ Nitrification::Nitrification (Block& al)
   : N2O_fraction (al.number ("N2O_fraction"))
 { }
 
+Nitrification::Nitrification (const Frame& al)
+  : N2O_fraction (al.number ("N2O_fraction"))
+{ }
+
 Nitrification::~Nitrification ()
 { }
 

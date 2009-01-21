@@ -25,6 +25,7 @@
 
 #include "model.h"
 #include "symbol.h"
+#include <memory>
 
 class Hydraulic;
 class Block;
@@ -43,8 +44,10 @@ public:
 
   // Create and Destroy.
 protected:
-  Tortuosity (Block&);
+  explicit Tortuosity (Block&);
+  explicit Tortuosity (const symbol name);
 public:
+  static std::auto_ptr<Tortuosity> create_default ();
   ~Tortuosity ();
 };
 

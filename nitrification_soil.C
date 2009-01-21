@@ -30,6 +30,8 @@
 #include "check.h"
 #include "librarian.h"
 #include "frame.h"
+#include "intrinsics.h"
+#include "library.h"
 
 class NitrificationSoil : public Nitrification
 {
@@ -49,6 +51,7 @@ public:
   // Create.
 public:
   NitrificationSoil (Block&);
+  NitrificationSoil (const Frame&);
 };
 
 void 
@@ -85,6 +88,14 @@ NitrificationSoil::NitrificationSoil (Block& al)
     water_factor (al.plf ("water_factor"))
 { }
 
+NitrificationSoil::NitrificationSoil (const Frame& al)
+  : Nitrification (al),
+    k (al.number ("k")),
+    k_10 (al.number ("k_10")),
+    heat_factor (al.plf ("heat_factor")),
+    water_factor (al.plf ("water_factor"))
+{ }
+
 static struct NitrificationSoilSyntax : public DeclareModel
 {
   Model* make (Block& al) const
@@ -110,3 +121,14 @@ with nitrification based on total ammonium content.")
     frame.add ("water_factor", PLF::empty ());
   }
 } NitrificationSoil_syntax;
+
+std::auto_ptr<Nitrification> 
+Nitrification::create_default ()
+{
+  const Library& library = Librarian::intrinsics ().library (component);
+  daisy_assert (library.check ("soil"));
+  const Frame& frame = library.frame ("soil");
+  return std::auto_ptr<Nitrification> (new NitrificationSoil (frame));
+}
+
+// nitrification_soil.C ends here.

@@ -70,6 +70,7 @@ struct Horizon::Implementation
   static double_map get_attributes (const std::vector<const AttributeList*>& alists);
   static symbol_map get_dimensions (const std::vector<const AttributeList*>& alists);
   Implementation (Block& al);
+  Implementation (const Frame& al);
   ~Implementation ();
 };
 
@@ -132,6 +133,22 @@ Horizon::Implementation::Implementation (Block& al)
     dimensions (get_dimensions (al.alist_sequence ("attributes"))),
     nitrification (Librarian::build_item<Nitrification> (al, "Nitrification")),
     secondary (Librarian::build_item<Secondary> (al, "secondary_domain")),
+    hor_heat (al.alist ("HorHeat"))
+{ }
+
+Horizon::Implementation::Implementation (const Frame& al)
+  : dry_bulk_density (al.number ("dry_bulk_density", -42.42e42)),
+    SOM_C_per_N (al.number_sequence ("SOM_C_per_N")),
+    C_per_N (al.number ("C_per_N", -42.42e42)),
+    SOM_fractions (al.check ("SOM_fractions") 
+		   ? al.number_sequence ("SOM_fractions")
+		   : std::vector<double> ()),
+    turnover_factor (al.number ("turnover_factor")),
+    anisotropy (al.number ("anisotropy")),
+    attributes (get_attributes (al.alist_sequence ("attributes"))),
+    dimensions (get_dimensions (al.alist_sequence ("attributes"))),
+    nitrification (Nitrification::create_default ()),
+    secondary (Secondary::create_none ()),
     hor_heat (al.alist ("HorHeat"))
 { }
 
@@ -285,6 +302,15 @@ Horizon::Horizon (Block& al)
     tortuosity (Librarian::build_item<Tortuosity> (al, "tortuosity"))
 { }
 
+Horizon::Horizon (const Frame& al, const double K_sat)
+  : ModelLogable ("aquitard"),
+    impl (new Implementation (al)),
+    fast_clay (-42.42e42),
+    fast_humus (-42.42e42),
+    hydraulic (Hydraulic::create_aquitard (K_sat)),
+    tortuosity (Tortuosity::create_default ())
+{ }
+  
 void 
 Horizon::initialize_base (bool top_soil,
                           int som_size, const Texture& texture, 
@@ -415,21 +441,5 @@ Intended for use with pedotransfer functions.", load_attributes);
     frame.add ("attributes", std::vector<const AttributeList*> ());
   }
 } Horizon_init;
-
-static struct HorizonAquitardSyntax : public DeclareParam
-{ 
-  HorizonAquitardSyntax ()
-    : DeclareParam (Horizon::component, "aquitard", "default", "\
-Tecture for implicit aquitard horizon.")
-  { }
-  void load_frame (Frame& frame) const
-  {
-    frame.add ("clay", 50.0);
-    frame.add ("silt", 20.0);
-    frame.add ("sand", 29.99);
-    frame.add ("humus", 0.01);
-    frame.add ("dry_bulk_density", 2.0);
-  }
-} HorizonAquitard_syntax;
 
 // horizon.C ends here.

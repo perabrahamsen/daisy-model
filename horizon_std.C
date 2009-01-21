@@ -31,6 +31,8 @@
 #include "librarian.h"
 #include "treelog.h"
 #include "frame.h"
+#include "intrinsics.h"
+#include "library.h"
 
 struct HorizonStandard : public Horizon
 {
@@ -44,9 +46,12 @@ struct HorizonStandard : public Horizon
   // Create and Destroy.
   static const std::vector<double>& get_limits ();
   static const std::vector<double> get_fractions (Block& al);
+  static const std::vector<double> get_fractions (const Frame& al);
   static double get_humus (Block& al);
+  static double get_humus (const Frame& al);
   void initialize (bool top_soil, int som_size, Treelog& msg);
   HorizonStandard (Block& al);
+  HorizonStandard (const Frame& al, const double K_sat);
   ~HorizonStandard ();
 };
 
@@ -86,8 +91,47 @@ HorizonStandard::get_fractions (Block& al)
   return result;
 }
 
+const std::vector<double>
+HorizonStandard::get_fractions (const Frame& al)
+{
+  daisy_assert (al.check ("sand") || 
+		(al.check ("fine_sand") && al.check ("coarse_sand")));
+  const double sand = al.check ("sand") 
+    ? al.number ("sand") 
+    : (al.number ("fine_sand")
+       + al.number ("coarse_sand"));
+  const double silt =  al.number ("silt");
+  const double clay =  al.number ("clay");
+  const double total = sand + silt + clay;
+  daisy_assert (total > 0.0);
+
+  std::vector<double> result;
+  result.push_back (clay / total);
+  result.push_back (silt / total);
+  result.push_back (sand / total);
+  daisy_assert (get_limits().size () == result.size ());
+
+  return result;
+}
+
 double
 HorizonStandard::get_humus (Block& al)
+{
+  daisy_assert (al.check ("sand") || 
+		(al.check ("fine_sand") && al.check ("coarse_sand")));
+  const double sand = al.check ("sand") 
+    ? al.number ("sand") 
+    : (al.number ("fine_sand")
+       + al.number ("coarse_sand"));
+  const double silt =  al.number ("silt");
+  const double clay =  al.number ("clay");
+  const double humus =  al.number ("humus");
+  const double total =  sand + silt + clay + humus;
+  return humus / total;
+}
+
+double
+HorizonStandard::get_humus (const Frame& al)
 {
   daisy_assert (al.check ("sand") || 
 		(al.check ("fine_sand") && al.check ("coarse_sand")));
@@ -108,6 +152,12 @@ HorizonStandard::initialize (bool top_soil, int som_size, Treelog& msg)
 
 HorizonStandard::HorizonStandard (Block& al)
   : Horizon (al),
+    texture (get_limits (), get_fractions (al), 
+             get_humus (al), 0.0)
+{ }
+
+HorizonStandard::HorizonStandard (const Frame& al, const double K_sat)
+  : Horizon (al, K_sat),
     texture (get_limits (), get_fractions (al), 
              get_humus (al), 0.0)
 { }
@@ -211,3 +261,29 @@ NOTE: Not a real texture class, use 'sand' instead.");
   }
 } HorizonStandard_syntax;
 
+static struct HorizonAquitardSyntax : public DeclareParam
+{ 
+  HorizonAquitardSyntax ()
+    : DeclareParam (Horizon::component, "aquitard", "default", "\
+Tecture for implicit aquitard horizon.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add ("clay", 50.0);
+    frame.add ("silt", 20.0);
+    frame.add ("sand", 29.99);
+    frame.add ("humus", 0.01);
+    frame.add ("dry_bulk_density", 2.0);
+  }
+} HorizonAquitard_syntax;
+
+std::auto_ptr<Horizon> 
+Horizon::create_aquitard (double K_sat)
+{
+  const Library& library = Librarian::intrinsics ().library (component);
+  daisy_assert (library.check ("aquitard"));
+  const Frame& frame = library.frame ("aquitard");
+  return std::auto_ptr<Horizon> (new HorizonStandard (frame, K_sat));
+}
+
+// horizon_std.C ends here.

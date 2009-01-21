@@ -38,6 +38,10 @@ Tortuosity::Tortuosity (Block& al)
   : name (al.name ("type"))
 { }
 
+Tortuosity::Tortuosity (const symbol name_)
+  : name (name_)
+{ }
+
 Tortuosity::~Tortuosity ()
 { }
 

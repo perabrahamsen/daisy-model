@@ -957,9 +957,7 @@ BioporeMatrix::BioporeMatrix (Block& al)
     h_bottom (al.check ("h_bottom") 
               ? al.number_sequence ("h_bottom") 
               : std::vector<double> ()),
-    solute (al.check ("solute")
-            ? new IMvec (al, "solute")
-            : NULL)
+    solute (new IMvec (al, "solute"))
 { }
 
 static struct BioporeMatrixSyntax : DeclareModel
@@ -992,9 +990,9 @@ Increase value to get more debug message.");
     frame.add ("debug", 0);
     frame.add ("h_bottom", "cm", Value::OptionalState, Value::Sequence,
                 "Pressure at the bottom of the biopores in each interval.");
-    frame.add_submodule_sequence ("solute", Value::OptionalState, "\
+    frame.add_submodule_sequence ("solute", Value::State, "\
 Chemical concentration in biopore intervals.", load_solute);
-    frame.add ("solute", std::vector<const AttributeList*> ());
+    frame.add_empty ("solute");
     frame.add ("water", "cm^3", Value::LogOnly, "Water content.");    
     frame.add ("iterations", Value::Integer, Value::LogOnly, 
                 "Number of iterations used for finding a solution.");

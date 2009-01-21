@@ -66,6 +66,7 @@ private:
   // Create and Destroy.
 public:
   HydraulicHypres (Block&);
+  HydraulicHypres (symbol name, double K_sat);
   void initialize (const Texture&, double rho_b, bool top_soil,
 		   Treelog& msg);
 public:
@@ -289,8 +290,23 @@ HydraulicHypres::HydraulicHypres (Block& al)
     M_ ()
 { }
 
+HydraulicHypres::HydraulicHypres (const symbol name_, const double K_sat_)
+  : Hydraulic (name_, K_sat_),
+    soil_type (unknown),
+    alpha (-42.42e42),
+    a (-42.42e42),
+    n (-42.42e42),
+    m (-42.42e42),
+    l (-42.42e42),
+    M_ ()
+{ }
+
 HydraulicHypres::~HydraulicHypres ()
 { }
+
+std::auto_ptr<Hydraulic>
+Hydraulic::create_aquitard (const double K_sat)
+{ return std::auto_ptr<Hydraulic> (new HydraulicHypres ("aquitard", K_sat)); }
 
 // Add the HydraulicHypres syntax to the syntax table.
 

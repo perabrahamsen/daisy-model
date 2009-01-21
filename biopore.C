@@ -266,7 +266,7 @@ Biopore density [cm^-2] as a function of 'x' [cm].");
                 "Sink from matrix domain to biopore.");
     frame.add ("infiltration", "cm/h", Value::LogOnly, "\
 Surface infiltration.");
-    frame.add_submodule_sequence ("solute_infiltration", Value::Const, "\
+    frame.add_submodule_sequence ("solute_infiltration", Value::LogOnly, "\
 Rate of solute infiltration through surface.", load_flux);
   }
 } Biopore_init;

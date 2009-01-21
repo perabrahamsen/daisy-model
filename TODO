@@ -2,13 +2,7 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Frame
 
-** fjern alist.add (name, alist)
-
-*** Ny hydraulic::create_something funtion
-
-*** Ny horizon::create_aquitard funktion
-
-*** Fjern kunstig aqutard alist fra soil.
+** fjern frame.add (name, alist)
 
 ** Gem frame i alist
 

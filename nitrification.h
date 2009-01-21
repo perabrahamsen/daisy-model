@@ -25,6 +25,7 @@
 
 #include "model.h"
 #include "symbol.h"
+#include <memory>
 
 class Soil;
 class SoilWater;
@@ -60,6 +61,8 @@ public:
   // Create and Destroy.
 public:
   Nitrification (Block& al);
+  Nitrification (const Frame& al);
+  static std::auto_ptr<Nitrification> create_default ();
 public:
   ~Nitrification ();
 };

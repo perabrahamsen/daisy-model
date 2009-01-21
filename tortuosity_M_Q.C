@@ -34,30 +34,35 @@ class TortuosityM_Q : public Tortuosity
   // Simulation.
 public:
   double factor (const Hydraulic& hydraulic, double Theta) const
-    {
-      const double n = hydraulic.Theta (0.0);
-      return pow (Theta, 7.0 / 3.0) / (n * n); // Tortuosity factor []
-    }
+  {
+    const double n = hydraulic.Theta (0.0);
+    return pow (Theta, 7.0 / 3.0) / (n * n); // Tortuosity factor []
+  }
 
   // Create.
 public:
   TortuosityM_Q (Block& al)
     : Tortuosity (al)
-    { }
+  { }
+  TortuosityM_Q ()
+    : Tortuosity ("M_Q")
+  { }
 };
+
+std::auto_ptr<Tortuosity>
+Tortuosity::create_default ()
+{ return std::auto_ptr<Tortuosity> (new TortuosityM_Q ());  }
 
 static struct TortuosityM_QSyntax : public DeclareModel
 {
   Model* make (Block& al) const
-  {
-    return new TortuosityM_Q (al);
-  }
-
+  { return new TortuosityM_Q (al); }
   TortuosityM_QSyntax ()
-    : DeclareModel (Tortuosity::component, "M_Q", "Millington-Quirk.  Theta^(7/3) / Theta_sat^2.")
+    : DeclareModel (Tortuosity::component, "M_Q", "\
+Millington-Quirk.  Theta^(7/3) / Theta_sat^2.")
   { }
-  void load_frame (Frame& frame) const
-  {
-  }
+  void load_frame (Frame&) const
+  { }
 } TortuosityM_Q_syntax;
 
+// tortuosity_M_Q.C ends here.

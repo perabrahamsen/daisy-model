@@ -42,6 +42,10 @@ Secondary::Secondary (Block& al)
   : name (al.name ("type"))
 { }
 
+Secondary::Secondary (const symbol name_)
+  : name (name_)
+{ }
+
 Secondary::~Secondary ()
 { }
 
@@ -76,10 +80,17 @@ struct SecondaryNone : public Secondary
   double alpha () const         // The value of the 'alpha' parameter.
   { daisy_notreached (); }
 
-  SecondaryNone (Block& al)
+  explicit SecondaryNone (Block& al)
     : Secondary (al)
   {}
+  SecondaryNone ()
+    : Secondary ("none")
+  {}
 };
+
+std::auto_ptr<Secondary>
+Secondary::create_none ()
+{ return std::auto_ptr<Secondary> (new SecondaryNone ());  }
 
 static struct SecondaryNoneSyntax : public DeclareModel
 {
