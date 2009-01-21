@@ -26,7 +26,7 @@
 #include "library.h"
 #include "syntax.h"
 #include "alist.h"
-#include "submodel.h"
+#include "librarian.h"
 #include "assertion.h"
 #include <deque>
 
@@ -97,7 +97,7 @@ private:
 void 
 TraverseXRef::use_submodel (const symbol submodel)
 {
-  daisy_assert (Submodel::registered (submodel));
+  daisy_assert (Librarian::submodel_registered (submodel));
   XRef::Users& moi = xref.submodels[submodel];
   
   switch (type)

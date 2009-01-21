@@ -22,7 +22,6 @@
 #define BUILD_DLL
 
 #include "snow.h"
-#include "alist.h"
 #include "frame_submodel.h"
 #include "log.h"
 #include "geometry.h"
@@ -30,7 +29,7 @@
 #include "soil_water.h"
 #include "soil_heat.h"
 #include "movement.h"
-#include "submodel.h"
+#include "librarian.h"
 #include "mathlib.h"
 #include "treelog.h"
 #include <sstream>
@@ -362,9 +361,6 @@ Snow::storage () const
 void
 Snow::load_syntax (FrameSubmodel& frame)
 { 
-  frame.alist ().add ("submodel", "Snow");
-  frame.alist ().add ("description", "Simulate snow pack on surface.\n\
-_Snow Hydrology_, U.S. Corps of Engineers, 1956.");
 
   static const double hours_per_day = 24.0; // [h/d]
 
@@ -429,4 +425,6 @@ Snow::Snow (const AttributeList& al)
 Snow::~Snow ()
 { delete &impl; }
 
-static Submodel::Register snow_submodel ("Snow", Snow::load_syntax);
+static DeclareSubmodel snow_submodel (Snow::load_syntax, "Snow", "\
+Simulate snow pack on surface.\n\
+_Snow Hydrology_, U.S. Corps of Engineers, 1956.");

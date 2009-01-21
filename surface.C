@@ -23,13 +23,12 @@
 
 #include "surface.h"
 #include "syntax.h"
-#include "alist.h"
 #include "geometry1d.h"
 #include "soil.h"
 #include "soil_water.h"
 #include "log.h"
 #include "mathlib.h"
-#include "submodel.h"
+#include "librarian.h"
 #include "plf.h"
 #include "ridge.h"
 #include "check.h"
@@ -522,8 +521,6 @@ Surface::Implementation::initialize (const Geometry& geo)
 void
 Surface::load_syntax (FrameSubmodel& frame)
 {
-  frame.alist ().add ("submodel", "Surface");
-  frame.alist ().add ("description", "Keep track of things on the soil surface.");
   frame.add_check (check_alist);
   frame.add ("EpFactor", Value::None (), Check::non_negative (), 
 	      Value::Const,
@@ -599,7 +596,8 @@ Surface::~Surface ()
 Surface::Implementation::~Implementation ()
 { }
 
-static Submodel::Register 
-surface_submodel ("Surface", Surface::load_syntax);
+static DeclareSubmodel 
+surface_submodel (Surface::load_syntax, "Surface", "\
+Keep track of things on the soil surface.");
 
 // surface.C ends here.

@@ -2,10 +2,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Frame
 
-** DeclareSubmodel
-
-Brug den alle steder.
-
 ** Fjern referencer til submodel fra
 
 *** traverse.C
@@ -17,6 +13,16 @@ Brug den alle steder.
 ** fjern referencer til "submodel" og "description" (i submodels).
 
 ** fjern alist.add (name, alist)
+
+*** Hvordan klarer vi de særlige Number funktioner i chemical_std?
+
+Jeg tror vi skal lave en specialiseret number model for hver...
+
+*** Ny hydraulic::create_something funtion
+
+*** Ny horizon::create_aquitard funktion
+
+*** Fjern kunstig aqutard alist fra soil.
 
 ** Gør Frame::syntax () const
 

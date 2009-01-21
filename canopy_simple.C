@@ -22,9 +22,9 @@
 #define BUILD_DLL
 
 #include "canopy_simple.h"
-#include "submodel.h"
 #include "log.h"
 #include "frame_submodel.h"
+#include "librarian.h"
 
 double
 CanopySimple::EpFactor (double DS) const
@@ -41,8 +41,6 @@ CanopySimple::output (Log& log) const
 void 
 CanopySimple::load_syntax (FrameSubmodel& frame)
 {
-  frame.alist ().add ("submodel", "CanopySimple");
-  frame.alist ().add ("description", "Simple canopy model.");
 
   // Parameters.
   frame.add ("PARref", Value::None (), Value::Const,
@@ -110,7 +108,8 @@ CanopySimple::CanopySimple (const AttributeList& vl)
 CanopySimple::~CanopySimple ()
 { }
 
-static Submodel::Register 
-canopy_simple_submodel ("CanopySimple", CanopySimple::load_syntax);
+static DeclareSubmodel 
+canopy_simple_submodel (CanopySimple::load_syntax, "CanopySimple", "\
+Simple canopy model.");
 
 // canopy_simple.C ends here.

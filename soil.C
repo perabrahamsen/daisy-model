@@ -29,11 +29,10 @@
 #include "groundwater.h"
 #include "metalib.h"
 #include "library.h"
-#include "alist.h"
 #include "syntax.h"
 #include "frame_submodel.h"
 #include "mathlib.h"
-#include "submodel.h"
+#include "librarian.h"
 #include "submodeler.h"
 #include "log.h"
 #include "check.h"
@@ -42,7 +41,6 @@
 #include "treelog.h"
 #include "memutils.h"
 #include "mathlib.h"
-#include "librarian.h"
 #include "volume.h"
 #include <sstream>
 
@@ -509,9 +507,6 @@ void
 Soil::load_syntax (FrameSubmodel& frame)
 { 
   frame.add_check (check_alist);
-  frame.alist ().add ("submodel", "Soil");
-  frame.alist ().add ("description", "\
-The soil component provides the numeric and physical properties of the soil.");
   frame.add_submodule_sequence ("horizons", Value::State, "\
 Layered description of the soil properties.\n\
 The horizons can be overlapped by the 'zones' parameter.\n\
@@ -706,7 +701,8 @@ Soil::initialize (Block& block, Geometry& geo,
 Soil::~Soil ()
 { }
 
-static Submodel::Register 
-soil_submodel ("Soil", Soil::load_syntax);
+static DeclareSubmodel 
+soil_submodel (Soil::load_syntax, "Soil", "\
+The soil component provides the numeric and physical properties of the soil.");
 
 // soil.C ends here.

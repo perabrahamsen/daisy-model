@@ -31,7 +31,6 @@
 #include "log.h"
 #include "plf.h"
 #include "frame.h"
-#include "submodel.h"
 #include "mathlib.h"
 #include <sstream>
 #include "check.h"

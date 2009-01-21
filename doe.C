@@ -23,8 +23,7 @@
 #include "doe.h"
 #include "log.h"
 #include "geometry.h"
-#include "submodel.h"
-#include "alist.h"
+#include "librarian.h"
 #include "frame_submodel.h"
 #include "soil.h"
 #include "soil_water.h"
@@ -86,9 +85,6 @@ void
 DOE::load_syntax (FrameSubmodel& frame)
 {
   // Submodel.
-  frame.alist ().add ("submodel", "DOM-Element");
-  frame.alist ().add ("description", "\
-A single element in a Dissolved Organic Matter pool.");
 
   // Content.
   frame.add ("M", "g/cm^3", Value::State, Value::Sequence,
@@ -137,7 +133,8 @@ DOE::DOE (const AttributeList& al)
 DOE::~DOE ()
 { }
 
-static Submodel::Register 
-dom_element_submodel ("DOM-Element", DOE::load_syntax);
+static DeclareSubmodel 
+dom_element_submodel (DOE::load_syntax, "DOM-Element", "\
+A single element in a Dissolved Organic Matter pool.");
 
 // doe.C ends here

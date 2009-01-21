@@ -21,17 +21,13 @@
 #define BUILD_DLL
 
 #include "litter.h"
-#include "submodel.h"
+#include "librarian.h"
 #include "frame_submodel.h"
-#include "alist.h"
 #include "check.h"
 
 void
 Litter::load_syntax (FrameSubmodel& frame)
 {
-  frame.alist ().add ("submodel", "Litter");
-  frame.alist ().add ("description", "\
-Properties of litter below permanent vegetation.");
   frame.add_fraction ("vapor_flux_factor", Value::Const, "\
 Reduction factor for potential evaporation below litter.");
   frame.add ("vapor_flux_factor", 1.0);
@@ -52,5 +48,6 @@ Litter::Litter (const AttributeList& al)
 Litter::~Litter ()
 { }
 
-static Submodel::Register 
-lutter_submodel ("Litter", Litter::load_syntax);
+static DeclareSubmodel 
+lutter_submodel (Litter::load_syntax, "Litter", "\
+Properties of litter below permanent vegetation.");

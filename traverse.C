@@ -50,7 +50,7 @@ Traverse::traverse_all_submodels ()
   // Traverse through all registered submodels.
 {
   std::vector<symbol> submodels;
-  Submodel::all (submodels);
+  Librarian::submodel_all (submodels);
 
   for (unsigned int i = 0; i < submodels.size (); i++)
     {

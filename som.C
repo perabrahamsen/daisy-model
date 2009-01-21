@@ -21,8 +21,7 @@
 #define BUILD_DLL
 
 #include "som.h"
-#include "submodel.h"
-#include "alist.h"
+#include "librarian.h"
 #include "frame_submodel.h"
 
 void 
@@ -33,13 +32,12 @@ The first numbers corresponds to each of the SMB pools, the next\n\
 numbers corresponds to the SOM pools, and the last numbers to each of\n\
 the DOM pools.  The length of the sequence should thus be the number\n\
 of SMB pools plus the number of SOM pools plus the number of DOM pools."); 
-  frame.alist ().add ("submodel", "SOM");
-  frame.alist ().add ("description", "\
-A single Soil Organic Matter pool.");
 }
 
 SOM::SOM (const AttributeList& al)
   : OM (al)
 { }
 
-static Submodel::Register som_submodel ("SOM", SOM::load_syntax);
+static 
+DeclareSubmodel som_submodel (SOM::load_syntax, "SOM", "\
+A single Soil Organic Matter pool.");

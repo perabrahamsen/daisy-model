@@ -26,9 +26,8 @@
 #include "assertion.h"
 #include "log.h"
 #include "frame_submodel.h"
-#include "alist.h"
 #include "vcheck.h"
-#include "submodel.h"
+#include "librarian.h"
 #include "block.h"
 #include "treelog.h"
 #include <sstream>
@@ -515,8 +514,6 @@ static bool check_alist (const AttributeList& al, Treelog& msg)
 void
 Time::load_syntax (FrameSubmodel& frame)
 {
-  frame.alist ().add ("submodel", "Time");
-  frame.alist ().add ("description", "Year, month, day and hour.");
   frame.add_check (check_alist);
   frame.add ("year", Value::Integer, Value::State, "Current year.");
   frame.add_check ("year", VCheck::valid_year ());
@@ -565,8 +562,9 @@ Time::Time (const AttributeList& al)
                               al.integer ("second")))
 { }
 
-static Submodel::Register 
-time_submodel ("Time", Time::load_syntax);
+static DeclareSubmodel 
+time_submodel (Time::load_syntax, "Time", "\
+Year, month, day and hour.");
 
 // @ Construct.
 

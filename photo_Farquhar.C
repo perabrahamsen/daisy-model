@@ -33,7 +33,6 @@
 #include "phenology.h"
 #include "log.h"
 #include "plf.h"
-#include "submodel.h"
 #include "mathlib.h"
 #include "treelog.h"
 #include "check.h"

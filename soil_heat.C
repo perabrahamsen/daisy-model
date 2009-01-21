@@ -31,9 +31,9 @@
 #include "weather.h"
 #include "frame_submodel.h"
 #include "log.h"
-#include "submodel.h"
 #include "treelog.h"
 #include "assertion.h"
+#include "librarian.h"
 #include <sstream>
 
 static const double rho_water = 1.0; // [g/cm^3]
@@ -665,8 +665,6 @@ load_T (FrameSubmodel& frame)
 void
 SoilHeat::load_syntax (FrameSubmodel& frame)
 { 
-  frame.alist ().add ("submodel", "SoilHeat");
-  frame.alist ().add ("description", "Temperature and heat flux in soil.");
   Geometry::add_layer (frame, Value::OptionalState, "T", load_T);
   frame.add ("S", "erg/cm^3/h", Value::OptionalState, 
               "External heat source, by default zero.");
@@ -737,7 +735,8 @@ SoilHeat::initialize (const AttributeList& al, const Geometry& geo,
 SoilHeat::~SoilHeat ()
 { }
 
-static Submodel::Register 
-soil_heat_submodel ("SoilHeat", SoilHeat::load_syntax);
+static DeclareSubmodel 
+soil_heat_submodel (SoilHeat::load_syntax, "SoilHeat", "\
+Temperature and heat flux in soil.");
 
 // soil_heat.C ends here.

@@ -25,9 +25,8 @@
 #include "soil.h"
 #include "geometry1d.h"
 #include "plf.h"
-#include "submodel.h"
+#include "librarian.h"
 #include "frame_submodel.h"
-#include "submodel.h"
 #include "mathlib.h"
 #include "log.h"
 #include "soil.h"
@@ -438,8 +437,6 @@ Ridge::Implementation::initialize (const Geometry1D& geo,
 void
 Ridge::load_syntax (FrameSubmodel& frame)
 {
-  frame.alist ().add ("submodel", "Ridge");
-  frame.alist ().add ("description", "Surface model after ridging.");
   
   // Parameters.
   frame.add ("z", Value::Fraction (), "cm", Check::none (), Value::Const, "\
@@ -523,5 +520,5 @@ Ridge::~Ridge ()
 Ridge::Implementation::~Implementation ()
 { }
 
-static Submodel::Register 
-soil_submodel ("Ridge", Ridge::load_syntax);
+static DeclareSubmodel 
+soil_submodel (Ridge::load_syntax, "Ridge", "Surface model after ridging.");

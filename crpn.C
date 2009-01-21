@@ -29,7 +29,7 @@
 #include "log.h"
 #include "plf.h"
 #include "mathlib.h"
-#include "submodel.h"
+#include "librarian.h"
 #include "check.h"
 #include <sstream>
 
@@ -198,9 +198,6 @@ CrpN::check_alist (const AttributeList& al, Treelog& err)
 void 
 CrpN::load_syntax (FrameSubmodel& frame)
 {
-  frame.alist ().add ("submodel", "CrpN");
-  frame.alist ().add ("description", "\
-Default crop nitrogen parameters.");
 
   // Content.
   frame.add ("PtLeafCnc", "DS", " g N/g DM", Check::non_negative (),
@@ -336,5 +333,6 @@ CrpN::CrpN (const AttributeList& al)
 CrpN::~CrpN ()
 { }
 
-static Submodel::Register 
-crpn_submodel ("CrpN", CrpN::load_syntax);
+static DeclareSubmodel 
+crpn_submodel (CrpN::load_syntax, "CrpN", "\
+Default crop nitrogen parameters.");

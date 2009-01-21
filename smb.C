@@ -22,9 +22,8 @@
 
 #include "smb.h"
 #include "dom.h"
-#include "submodel.h"
+#include "librarian.h"
 #include "frame_submodel.h"
-#include "alist.h"
 #include "assertion.h"
 #include "check.h"
 #include "mathlib.h"
@@ -132,9 +131,6 @@ The first numbers corresponds to each of the SMB pools, the next\n\
 numbers corresponds to the SOM pools, and the last numbers to each of\n\
 the DOM pools.  The length of the sequence should thus be the number\n\
 of SMB pools plus the number of SOM pools plus the number of DOM pools."); 
-  frame.alist ().add ("submodel", "SMB");
-  frame.alist ().add ("description", "\
-A single Soil MicroBiological pool.");
   frame.add ("maintenance", "h^-1", Check::fraction (), Value::Const, "\
 The fraction used for staying alive each hour.");
 }
@@ -144,4 +140,5 @@ SMB::SMB (const AttributeList& al)
     maintenance (al.number ("maintenance"))
 { }
 
-static Submodel::Register smb_submodel ("SMB", SMB::load_syntax);
+static DeclareSubmodel smb_submodel (SMB::load_syntax, "SMB", "\
+A single Soil MicroBiological pool.");

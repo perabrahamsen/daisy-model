@@ -30,10 +30,10 @@
 #include "log.h"
 #include "time.h"
 #include "plf.h"
-#include "submodel.h"
 #include "treelog.h"
 #include "mathlib.h"
 #include "frame_submodel.h"
+#include "librarian.h"
 #include <sstream>
 
 // Chemical constants affecting the crop.
@@ -621,9 +621,6 @@ Production::output (Log& log) const
 void 
 Production::load_syntax (FrameSubmodel& frame)
 {
-  frame.alist ().add ("submodel", "Production");
-  frame.alist ().add ("description", "\
-Crop production in the default crop model.");
 
   // Remobilization.
   frame.add ("ShldResC", Value::Fraction (), Value::Const,
@@ -926,5 +923,6 @@ Production::Production (const AttributeList& al)
 Production::~Production ()
 { }
 
-static Submodel::Register 
-production_submodel ("Production", Production::load_syntax);
+static DeclareSubmodel 
+production_submodel (Production::load_syntax, "Production", "\
+Crop production in the default crop model.");

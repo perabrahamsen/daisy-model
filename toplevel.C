@@ -26,11 +26,9 @@
 #include "ui.h"
 #include "library.h"
 #include "parser_file.h"
-#include "submodel.h"
 #include "block.h"
 #include "program.h"
 #include "syntax.h"
-#include "alist.h"
 #include "path.h"
 #include "version.h"
 #include "assertion.h"
@@ -637,9 +635,6 @@ Toplevel::parse_system_file (const std::string& filename)
 void
 Toplevel::load_submodel (FrameSubmodel& frame)
 {
-  frame.alist ().add ("submodel", "Toplevel");
-  frame.alist ().add ("description", Toplevel::default_description);
-
   load_frame (frame);
 }
 
@@ -727,7 +722,8 @@ Toplevel::~Toplevel ()
     { error ("Exception occured during cleanup"); }
 }
 
-static Submodel::Register 
-toplevel_submodel ("Toplevel", Toplevel::load_submodel);
+static DeclareSubmodel 
+toplevel_submodel (Toplevel::load_submodel, "Toplevel",
+                   Toplevel::default_description);
 
 // toplevel.C ends here.

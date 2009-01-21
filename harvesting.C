@@ -31,7 +31,7 @@
 #include "log.h"
 #include "timestep.h"
 #include "mathlib.h"
-#include "submodel.h"
+#include "librarian.h"
 #include "check_range.h"
 #include "submodeler.h"
 #include "frame_submodel.h"
@@ -517,9 +517,6 @@ void
 Harvesting::load_syntax (FrameSubmodel& frame)
 {
   // Submodel.
-  frame.alist ().add ("submodel", "Harvesting");
-  frame.alist ().add ("description", 
-	     "Information about what happens to the crop at harvest and cut.");
 
   frame.add_submodule_sequence ("Stem", Value::Const, 
 				 "Stem AM parameters.", AOM::load_syntax);
@@ -612,7 +609,8 @@ Harvesting::Harvesting (Block& al)
 Harvesting::~Harvesting ()
 {  }
 
-static Submodel::Register 
-soil_submodel ("Harvesting", Harvesting::load_syntax);
+static DeclareSubmodel 
+soil_submodel (Harvesting::load_syntax, "Harvesting", "\
+Information about what happens to the crop at harvest and cut.");
 
 // harvesting.C ends here.

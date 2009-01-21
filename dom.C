@@ -26,9 +26,8 @@
 #include "smb.h"
 #include "om.h"
 #include "geometry.h"
-#include "submodel.h"
+#include "librarian.h"
 #include "block.h"
-#include "alist.h"
 #include "frame_submodel.h"
 #include "soil.h"
 #include "soil_water.h"
@@ -182,9 +181,6 @@ void
 DOM::load_syntax (FrameSubmodel& frame)
 {
   // Submodel.
-  frame.alist ().add ("submodel", "DOM");
-  frame.alist ().add ("description", "\
-A single Dissolved Organic Matter pool.");
 
   // Content.
   frame.add_submodule ("C", Value::State,
@@ -247,4 +243,5 @@ DOM::~DOM ()
   delete &N;
 }
 
-static Submodel::Register dom_submodel ("DOM", DOM::load_syntax);
+static DeclareSubmodel dom_submodel (DOM::load_syntax, "DOM", "\
+A single Dissolved Organic Matter pool.");

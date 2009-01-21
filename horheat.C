@@ -24,12 +24,11 @@
 #include "horheat.h"
 #include "texture.h"
 #include "hydraulic.h"
-#include "alist.h"
 #include "frame_submodel.h"
 #include "check.h"
 #include "mathlib.h"
 #include "assertion.h"
-#include "submodel.h"
+#include "librarian.h"
 #include "treelog.h"
 #include <numeric>
 #include <sstream>
@@ -54,8 +53,6 @@ HorHeat::heat_capacity (double pTheta, double pIce) const
 void
 HorHeat::load_syntax (FrameSubmodel& frame)
 {
-  frame.alist ().add ("submodel", "HorHeat");
-  frame.alist ().add ("description", "Heat capacity and conductivity per horizon.");
 
   frame.add ("quarts_form_factor", Value::None (), Check::positive (), 
               Value::Const,
@@ -312,4 +309,5 @@ HorHeat::HorHeat (const AttributeList& al)
 HorHeat::~HorHeat ()
 { }
 
-static Submodel::Register horheat_submodel ("HorHeat", HorHeat::load_syntax);
+static DeclareSubmodel horheat_submodel (HorHeat::load_syntax, "HorHeat", "\
+Heat capacity and conductivity per horizon.");

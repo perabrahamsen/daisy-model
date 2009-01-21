@@ -22,9 +22,8 @@
 #define BUILD_DLL
 
 #include "vernalization.h"
-#include "submodel.h"
+#include "librarian.h"
 #include "log.h"
-#include "alist.h"
 #include "frame_submodel.h"
 
 void
@@ -68,9 +67,6 @@ Vernalization::no_vernalization ()
 void 
 Vernalization::load_syntax (FrameSubmodel& frame)
 {
-  frame.alist ().add ("submodel", "Vernalization");
-  frame.alist ().add ("description", "\
-Default crop vernalization submodel.");
   frame.add ("required", Value::Boolean, Value::OptionalConst,
 	      "True, iff the crop requires vernalization.");
   frame.add ("DSLim", Value::None (), Value::Const,
@@ -91,5 +87,8 @@ Vernalization::Vernalization (const AttributeList& al)
 Vernalization::~Vernalization ()
 { }
 
-static Submodel::Register 
-vernalization_submodel ("Vernalization", Vernalization::load_syntax);
+static DeclareSubmodel 
+vernalization_submodel (Vernalization::load_syntax, "Vernalization", "\
+Default crop vernalization submodel.");
+
+// vernalization.C ends here.

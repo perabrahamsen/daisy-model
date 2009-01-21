@@ -22,10 +22,10 @@
 #define BUILD_DLL
 
 #include "canopy_std.h"
-#include "submodel.h"
 #include "log.h"
 #include "frame_submodel.h"
 #include "mathlib.h"
+#include "librarian.h"
 
 double
 CanopyStandard::specific_LAI (const double DS)
@@ -214,8 +214,6 @@ void
 CanopyStandard::load_syntax (FrameSubmodel& frame)
 {
   CanopySimple::load_syntax (frame);
-  frame.alist ().add ("submodel", "CanopyStandard");
-  frame.alist ().add ("description", "Standard canopy model.");
 
   // Parameters.
   frame.add ("SpLAI", "(m^2/m^2)/(g DM/m^2)", Value::Const,
@@ -319,5 +317,6 @@ CanopyStandard::CanopyStandard (const AttributeList& vl)
 CanopyStandard::~CanopyStandard ()
 { }
 
-static Submodel::Register 
-canopy_standard_submodel ("CanopyStandard", CanopyStandard::load_syntax);
+static DeclareSubmodel 
+canopy_standard_submodel (CanopyStandard::load_syntax, "CanopyStandard", "\
+Standard canopy model.");

@@ -24,7 +24,7 @@
 #include "harvest.h"
 #include "frame_submodel.h"
 #include "log.h"
-#include "submodel.h"
+#include "librarian.h"
 
 double
 Harvest::total_N () const
@@ -65,8 +65,6 @@ Harvest::output (Log& log) const
 void 
 Harvest::load_syntax (FrameSubmodel& frame)
 {
-  frame.alist ().add ("submodel", "Harvest");
-  frame.alist ().add ("description", "Log of all harvests during the simulation.");
   frame.add ("column", Value::String, Value::State,
 	      "Name of column where the yield were harvested.");
   frame.add_submodule ("time", Value::State,
@@ -153,7 +151,8 @@ Harvest::Harvest (const symbol col, Time t, const symbol crp,
     water_productivity (wp_et)
 { }
 
-static Submodel::Register 
-harvest_submodel ("Harvest", Harvest::load_syntax);
+static DeclareSubmodel 
+harvest_submodel (Harvest::load_syntax, "Harvest", "\
+Log of all harvests during the simulation.");
 
 // harvest.C ends here.

@@ -23,9 +23,9 @@
 
 #include "partition.h"
 #include "plf.h"
-#include "submodel.h"
-#include "frame_submodel.h"
 #include "alist.h"
+#include "librarian.h"
+#include "frame_submodel.h"
 #include "check.h"
 #include "mathlib.h"
 #include "treelog.h"
@@ -88,14 +88,6 @@ void
 Partition::load_syntax (FrameSubmodel& frame)
 {
   frame.add_check (check_alist);
-  frame.alist ().add ("submodel", "Partition");
-  frame.alist ().add ("description", "\
-Assimilate partitioning in the default crop model.\n\
-The 'Root' parameter determine what fraction of the assimilate for growth\n\
-goes to roots at a given development stage.  The remaining assimilate goes\n\
-to the shoot.  The 'Leaf' and 'Stem' parameters determine what fraction of\n\
-the shoot assimilate goes to the leaf and stem respectively.  The remaining\n\
-shoot assimilate will go to the storage organ.");
   frame.add ("Root", "DS", Value::Fraction (), Check::fraction (),
 	      Value::Const, "\
 Fraction of assimilate for growth that goes to the roots, as a function of\n\
@@ -128,5 +120,13 @@ Partition::Partition (const AttributeList& al)
 Partition::~Partition ()
 { }
 
-static Submodel::Register 
-partition_submodel ("Partition", Partition::load_syntax);
+static DeclareSubmodel 
+partition_submodel (Partition::load_syntax, "Partition", "\
+Assimilate partitioning in the default crop model.\n\
+The 'Root' parameter determine what fraction of the assimilate for growth\n\
+goes to roots at a given development stage.  The remaining assimilate goes\n\
+to the shoot.  The 'Leaf' and 'Stem' parameters determine what fraction of\n\
+the shoot assimilate goes to the leaf and stem respectively.  The remaining\n\
+shoot assimilate will go to the storage organ.");
+
+// partition.C ends here.

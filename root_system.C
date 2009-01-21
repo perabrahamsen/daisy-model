@@ -23,7 +23,7 @@
 
 #include "root_system.h"
 #include "rootdens.h"
-#include "submodel.h"
+#include "librarian.h"
 #include "geometry.h"
 #include "soil_heat.h"
 #include "soil_water.h"
@@ -505,8 +505,6 @@ RootSystem::check (const Units& units, Treelog& msg) const
 void 
 RootSystem::load_syntax (FrameSubmodel& frame)
 {
-  frame.alist ().add ("submodel", "RootSystem");
-  frame.alist ().add ("description", "Standard root system model.");
 
   frame.add_object ("rootdens", Rootdens::component, 
                      Value::OptionalConst, Value::Singleton,
@@ -652,5 +650,6 @@ RootSystem::RootSystem (Block& al)
 RootSystem::~RootSystem ()
 { }
 
-static Submodel::Register 
-root_system_submodel ("RootSystem", RootSystem::load_syntax);
+static DeclareSubmodel 
+root_system_submodel (RootSystem::load_syntax, "RootSystem", "\
+Standard root system model.");
