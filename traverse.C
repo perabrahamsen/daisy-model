@@ -55,7 +55,8 @@ Traverse::traverse_all_submodels ()
     {
       const symbol submodel = submodels[i];
       const Frame& frame = Librarian::submodel_frame (submodel);
-      traverse_submodel_default (frame.syntax (), frame.alist (), submodel);
+      traverse_submodel_default (frame.syntax (), frame.alist (), submodel, 
+                                 submodel);
     }
 }
 
@@ -109,10 +110,10 @@ Traverse::traverse_model (const symbol component, const symbol model)
 void
 Traverse::traverse_submodel (const Syntax& syntax, AttributeList& alist,
 			     const AttributeList& default_alist,
-			     const symbol name)
+			     const symbol name, const symbol registered)
   // Traverse through a submodel, typically a nested alist.
 {
-  if (enter_submodel (syntax, alist, default_alist, name))
+  if (enter_submodel (syntax, alist, default_alist, name, registered))
     {
       traverse_alist (syntax, alist, default_alist, name);
       leave_submodel ();
@@ -122,11 +123,11 @@ Traverse::traverse_submodel (const Syntax& syntax, AttributeList& alist,
 void
 Traverse::traverse_submodel_default (const Syntax& syntax, 
 				     const AttributeList& default_alist,
-				     const symbol name)
+				     const symbol name, const symbol registered)
   // Traverse through a submodel with no actual value, but a default
   // value.  This only happens in buildin models.
 {
-  if (enter_submodel_default (syntax, default_alist, name))
+  if (enter_submodel_default (syntax, default_alist, name, registered))
     {
       static AttributeList empty_alist;
       traverse_alist (syntax, const_cast<AttributeList&> (default_alist),
@@ -139,10 +140,11 @@ void
 Traverse::traverse_submodel_sequence (const Syntax& syntax,
 				      const AttributeList& alist,
 				      const AttributeList& default_alist,
-				      const symbol name, unsigned index)
+				      const symbol name, const unsigned index,
+                                      const symbol registered)
   // Traverse through a submodel, typically a nested alist.
 {
-  if (enter_submodel_sequence (syntax, alist, default_alist, name, index))
+  if (enter_submodel_sequence (syntax, alist, default_alist, name, index, registered))
     {
       traverse_alist (syntax, alist, default_alist, name);
       leave_submodel_sequence ();
@@ -153,11 +155,12 @@ void
 Traverse::traverse_submodel_sequence_default (const Syntax& syntax, 
 					      const AttributeList&
 					      /**/ default_alist,
-					      const symbol name)
+					      const symbol name,
+                                              const symbol registered)
   // Traverse through the common default value for members of a
   // submodel sequence.
 {
-  if (enter_submodel_sequence_default (syntax, default_alist, name))
+  if (enter_submodel_sequence_default (syntax, default_alist, name, registered))
     {
       static AttributeList empty_alist;
       traverse_alist (syntax, const_cast<AttributeList&> (default_alist),
@@ -246,16 +249,19 @@ Traverse::traverse_parameter (const Syntax& syntax, const AttributeList& alist,
 		    if (default_alist.check (parameter))
 		      traverse_submodel (entry_syntax, entry_alist, 
 					 default_alist.alist (parameter), 
-					 parameter);
+					 parameter,
+                                         syntax.submodel_name (parameter));
 		    else
 		      traverse_submodel (entry_syntax, entry_alist,
 					 syntax.default_frame (parameter).alist (), 
-					 parameter);
+					 parameter,
+                                         syntax.submodel_name (parameter));
 		  }
 		else 
 		  traverse_submodel_default (entry_syntax, 
 					     syntax.default_frame (parameter).alist (),
-					     parameter);
+					     parameter,
+                                             syntax.submodel_name (parameter));
 	      }
 	    else
 	      {
@@ -264,7 +270,8 @@ Traverse::traverse_parameter (const Syntax& syntax, const AttributeList& alist,
 
 		traverse_submodel_sequence_default (entry_syntax, 
 						    nested_default_alist, 
-						    parameter);
+						    parameter,
+                                                    syntax.submodel_name (parameter));
 		
 		if (has_value)
 		  {
@@ -273,7 +280,8 @@ Traverse::traverse_parameter (const Syntax& syntax, const AttributeList& alist,
 		    for (unsigned int i = 0; i < sequence.size (); i++)
 		      traverse_submodel_sequence (entry_syntax, *sequence[i],
 						  nested_default_alist,
-						  parameter, i);
+						  parameter, i,
+                                                  syntax.submodel_name (parameter));
 		  }
 	      }
 	  }

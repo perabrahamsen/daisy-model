@@ -62,20 +62,23 @@ private:
   void leave_model (symbol component, symbol name);
   bool enter_submodel (const Syntax& syntax, AttributeList& alist,
   		       const AttributeList& default_alist,
-  		       const symbol name);
+  		       const symbol name, const symbol registered);
   void leave_submodel ();
   bool enter_submodel_default (const Syntax& syntax, 
 			       const AttributeList& default_alist,
-			       const symbol name);
+			       const symbol name,
+                               const symbol registered);
   void leave_submodel_default ();
   bool enter_submodel_sequence (const Syntax& syntax,
   				const AttributeList& alist,
   				const AttributeList& default_alist,
-  				const symbol name, unsigned index);
+  				const symbol name, unsigned index, 
+                                const symbol registered);
   void leave_submodel_sequence ();
   bool enter_submodel_sequence_default (const Syntax& syntax, 
   					const AttributeList& default_alist,
-  					const symbol name);
+  					const symbol name, 
+                                        const symbol registered);
   void leave_submodel_sequence_default ();
   bool enter_object (const Library&, 
 		     const Syntax& syntax, const AttributeList& alist,
@@ -207,8 +210,8 @@ TraverseXRef::leave_model (const symbol component, const symbol name)
 bool
 TraverseXRef::enter_submodel (const Syntax& syntax, AttributeList& al,
 			      const AttributeList&,
-			      const symbol name)
-{ return enter_submodel_default (syntax, al, name); }
+			      const symbol name, const symbol registered)
+{ return enter_submodel_default (syntax, al, name, registered); }
 
 void
 TraverseXRef::leave_submodel ()
@@ -216,7 +219,8 @@ TraverseXRef::leave_submodel ()
 
 bool
 TraverseXRef::enter_submodel_default (const Syntax&, const AttributeList& al, 
-				      const symbol name)
+				      const symbol name, 
+                                      const symbol registered)
 { 
   if (type == is_invalid)
     {
@@ -226,10 +230,10 @@ TraverseXRef::enter_submodel_default (const Syntax&, const AttributeList& al,
       current_submodel = name;
       return true;
     }
-  if (al.check ("submodel"))
+  if (registered != Value::None ())
     {
       // Nested submodel.  Register and stop.
-      use_submodel (al.name ("submodel"));
+      use_submodel (registered);
       return false;
     }
   return true; 
@@ -250,8 +254,9 @@ bool
 TraverseXRef::enter_submodel_sequence (const Syntax& syntax,
 				       const AttributeList& al,
 				       const AttributeList&,
-				       const symbol name, unsigned)
-{ return enter_submodel_default (syntax, al, name); }
+				       const symbol name, unsigned,
+                                       const symbol registered)
+{ return enter_submodel_default (syntax, al, name, registered); }
 
 void
 TraverseXRef::leave_submodel_sequence ()
@@ -260,8 +265,9 @@ TraverseXRef::leave_submodel_sequence ()
 bool
 TraverseXRef::enter_submodel_sequence_default (const Syntax& syntax, 
 					       const AttributeList& al,
-					       const symbol name)
-{ return enter_submodel_default (syntax, al, name); }
+					       const symbol name,
+                                               const symbol registered)
+{ return enter_submodel_default (syntax, al, name, registered); }
 
 void
 TraverseXRef::leave_submodel_sequence_default ()

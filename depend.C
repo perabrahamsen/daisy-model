@@ -67,20 +67,21 @@ private:
   void leave_model (symbol component, symbol name);
   bool enter_submodel (const Syntax& syntax, AttributeList& alist,
   		       const AttributeList& default_alist,
-  		       const symbol name);
+  		       const symbol name, const symbol registered);
   void leave_submodel ();
   bool enter_submodel_default (const Syntax& syntax, 
 			       const AttributeList& default_alist,
-			       const symbol name);
+			       const symbol name, const symbol registered);
   void leave_submodel_default ();
   bool enter_submodel_sequence (const Syntax& syntax,
   				const AttributeList& alist,
   				const AttributeList& default_alist,
-  				const symbol name, unsigned index);
+  				const symbol name, unsigned index, 
+                                const symbol registered);
   void leave_submodel_sequence ();
   bool enter_submodel_sequence_default (const Syntax& syntax, 
   					const AttributeList& default_alist,
-  					const symbol name);
+  					const symbol name, const symbol registered);
   void leave_submodel_sequence_default ();
   bool enter_object (const Library&, 
 		     const Syntax& syntax, const AttributeList& alist,
@@ -163,7 +164,7 @@ TraverseDepend::leave_model (const symbol component, const symbol name)
 bool
 TraverseDepend::enter_submodel (const Syntax&, AttributeList&,
 				const AttributeList&,
-				const symbol name)
+				const symbol name, const symbol registered)
 {
   treelog.open (name);
   return true; 
@@ -175,7 +176,7 @@ TraverseDepend::leave_submodel ()
 
 bool
 TraverseDepend::enter_submodel_default (const Syntax&, const AttributeList&, 
-					const symbol)
+					const symbol, const symbol)
 { return false; }
 
 void
@@ -186,7 +187,8 @@ bool
 TraverseDepend::enter_submodel_sequence (const Syntax&,
 					 const AttributeList&,
 					 const AttributeList&,
-					 const symbol name, unsigned index)
+					 const symbol name, unsigned index, 
+                                         const symbol)
 { 
   std::ostringstream str;
   str << name << "[" << index << "]";
@@ -201,7 +203,7 @@ TraverseDepend::leave_submodel_sequence ()
 bool
 TraverseDepend::enter_submodel_sequence_default (const Syntax&, 
 						 const AttributeList&,
-						 const symbol)
+						 const symbol, const symbol)
 { return false; }
 
 void
@@ -289,20 +291,6 @@ has_dependencies (const Metalib& metalib,
 }
 
 bool
-has_dependencies (const Metalib& metalib,
-                  const symbol component, const symbol parameterization, 
-		  const Syntax& syntax, AttributeList& alist,
-		  const symbol name)
-{
-  dep_map dependencies;
-  TraverseDepend depend (metalib, component, parameterization,
-			 Treelog::null (), dependencies, false);
-  depend.traverse_submodel (syntax, alist, AttributeList (), name);
-
-  return depend.found_any;
-}
-
-bool
 check_dependencies (const Metalib& metalib,
                     const symbol component, const symbol parameterization, 
 		    Treelog& treelog)
@@ -311,20 +299,6 @@ check_dependencies (const Metalib& metalib,
   TraverseDepend depend (metalib, component, parameterization, 
 			 treelog, dependencies, true);
   depend.traverse_all_libraries ();
-
-  return depend.found_any;
-}
-
-bool
-check_dependencies (const Metalib& metalib,
-                    const symbol component, const symbol parameterization, 
-		    const Syntax& syntax, AttributeList& alist,
-		    const symbol name, Treelog& treelog)
-{
-  dep_map dependencies;
-  TraverseDepend depend (metalib, component, parameterization, 
-			 treelog, dependencies, true);
-  depend.traverse_submodel (syntax, alist, AttributeList (), name);
 
   return depend.found_any;
 }

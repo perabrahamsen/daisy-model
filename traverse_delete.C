@@ -54,20 +54,22 @@ private:
   void leave_model (symbol component, symbol name);
   bool enter_submodel (const Syntax& syntax, AttributeList& alist,
   		       const AttributeList& default_alist,
-  		       const symbol name);
+  		       const symbol name, const symbol registered);
   void leave_submodel ();
   bool enter_submodel_default (const Syntax& syntax, 
 			       const AttributeList& default_alist,
-			       const symbol name);
+			       const symbol name,
+                               const symbol registered);
   void leave_submodel_default ();
   bool enter_submodel_sequence (const Syntax& syntax,
   				const AttributeList& alist,
   				const AttributeList& default_alist,
-  				const symbol name, unsigned index);
+  				const symbol name, unsigned index, 
+                                const symbol registered);
   void leave_submodel_sequence ();
   bool enter_submodel_sequence_default (const Syntax& syntax, 
   					const AttributeList& default_alist,
-  					const symbol name);
+  					const symbol name, const symbol registered);
   void leave_submodel_sequence_default ();
   bool enter_object (const Library&, 
 		     const Syntax& syntax, const AttributeList& alist,
@@ -114,7 +116,7 @@ TraverseDelete::leave_model (const symbol, const symbol)
 bool
 TraverseDelete::enter_submodel (const Syntax&, AttributeList&,
 				const AttributeList&,
-				const symbol)
+				const symbol, const symbol)
 { return true; }
 
 void
@@ -123,7 +125,7 @@ TraverseDelete::leave_submodel ()
 
 bool
 TraverseDelete::enter_submodel_default (const Syntax&, const AttributeList&, 
-					const symbol)
+					const symbol, const symbol registered)
 { return false; }
 
 void
@@ -134,7 +136,7 @@ bool
 TraverseDelete::enter_submodel_sequence (const Syntax&,
 					 const AttributeList&,
 					 const AttributeList&,
-					 const symbol, unsigned)
+					 const symbol, unsigned, const symbol)
 { return true; }
 
 void
@@ -144,7 +146,7 @@ TraverseDelete::leave_submodel_sequence ()
 bool
 TraverseDelete::enter_submodel_sequence_default (const Syntax&, 
 						 const AttributeList&,
-						 const symbol)
+						 const symbol, const symbol)
 { return false; }
 
 void
@@ -225,11 +227,4 @@ remove_dependencies (const Metalib& mlib,
   depend.traverse_all_libraries ();
 }
 
-void
-remove_dependencies (const Metalib& mlib,
-                     symbol component, symbol parameterization, 
-		     const Syntax& syntax, AttributeList& alist)
-{
-  TraverseDelete depend (mlib, component, parameterization);
-  depend.traverse_submodel (syntax, alist, AttributeList (), "dummy");
-}
+// traverse_depend.C ends here.

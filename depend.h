@@ -41,23 +41,11 @@ has_dependencies (const Metalib&,
                   const std::string& parameterization);
 
 bool
-has_dependencies (const Metalib&,
-                  const std::string& component,
-                  const std::string& parameterization, 
-                  const Syntax& syntax, AttributeList& alist,
-                  const std::string& name);
-bool
 check_dependencies (const Metalib&,
                   const std::string& component,
                     const std::string& parameterization, 
 		    Treelog& treelog);
 
-bool
-check_dependencies (const Metalib&,
-                  const std::string& component,
-                    const std::string& parameterization, 
-		    const Syntax& syntax, AttributeList& alist,
-		    const std::string& name, Treelog& treelog);
 bool
 find_dependencies (const Metalib&,
                    const std::string& component,

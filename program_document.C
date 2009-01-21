@@ -118,7 +118,8 @@ struct ProgramDocument : public Program
   void print_model (symbol name, const Library& library, Treelog&);
   void print_fixed (const symbol name, 
 		    const Syntax& syntax,
-		    const AttributeList& alist);
+		    const AttributeList& alist,
+                    const symbol description);
   void print_component (const Library& library, Treelog& msg);
 
   // Print it.
@@ -1147,14 +1148,15 @@ ProgramDocument::print_model (const symbol name, const Library& library,
 void
 ProgramDocument::print_fixed (const symbol name, 
 			      const Syntax& syntax,
-			      const AttributeList& alist)
+			      const AttributeList& alist, 
+                              const symbol description)
 {
   format->soft_linebreak ();
   Format::Section dummy (*format, "section", name, "fixed", name);
   format->index (name);
 
   // Print description, if any.
-  format->alist_description (alist);
+  print_description (description);
 
   print_users (xref.submodels[name]);
 
@@ -1264,7 +1266,8 @@ standard parameterizations for the model.");
   for (unsigned int i = 0; i < fixed.size (); i++)
     {
       const Frame& frame = Librarian::submodel_frame (name);
-      print_fixed (name, frame.syntax (), frame.alist ());
+      const symbol description = Librarian::submodel_description (name);
+      print_fixed (name, frame.syntax (), frame.alist (), description);
   }
 }
 

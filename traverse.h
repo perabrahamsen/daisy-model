@@ -43,19 +43,21 @@ public:
   void traverse_model (const symbol component, const symbol model);
   void traverse_submodel (const Syntax& syntax, AttributeList& alist,
 			  const AttributeList& default_alist,
-			  const symbol name);
+			  const symbol name, const symbol registered);
   
   // Minor calls.
   void traverse_submodel_default (const Syntax& syntax, 
 				  const AttributeList& default_alist,
-				  const symbol name);
+				  const symbol name, const symbol registered);
   void traverse_submodel_sequence (const Syntax& syntax,
 				   const AttributeList& alist,
 				   const AttributeList& default_alist,
-				   const symbol name, unsigned index);
+				   const symbol name, unsigned index,
+                                   const symbol registered);
   void traverse_submodel_sequence_default (const Syntax& syntax, 
 					   const AttributeList& default_alist,
-					   const symbol name);
+					   const symbol name,
+                                           const symbol registered);
   void traverse_object (const Library& library,
 			const Syntax& syntax, AttributeList& alist,
 			const AttributeList& default_alist,
@@ -81,22 +83,25 @@ protected:
   virtual void leave_model (symbol component, symbol name) = 0;
   virtual bool enter_submodel (const Syntax& syntax, AttributeList& alist,
 			       const AttributeList& default_alist,
-			       const symbol name) = 0;
+			       const symbol name, const symbol registered) = 0;
   virtual void leave_submodel () = 0;
   virtual bool enter_submodel_default (const Syntax& syntax, 
 				       const AttributeList& default_alist,
-				       const symbol name) = 0;
+				       const symbol name,
+                                       const symbol registered) = 0;
   virtual void leave_submodel_default () = 0;
   virtual bool enter_submodel_sequence (const Syntax& syntax,
 					const AttributeList& alist,
 					const AttributeList& default_alist,
 					const symbol name, 
-					unsigned index) = 0;
+					unsigned index,
+                                        const symbol registered) = 0;
   virtual void leave_submodel_sequence () = 0;
   virtual bool enter_submodel_sequence_default (const Syntax& syntax, 
 						const AttributeList&
 						/**/ default_alist,
-						const symbol name) = 0;
+						const symbol name,
+                                                const symbol registered) = 0;
   virtual void leave_submodel_sequence_default () = 0;
   virtual bool enter_object (const Library&, 
 			     const Syntax& syntax, const AttributeList& alist,
