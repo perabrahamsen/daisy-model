@@ -523,14 +523,7 @@ PrinterFile::Implementation::print_alist (const AttributeList& alist,
               print_dimension (alist, key, syntax.dimension (key));
               break;
             case Value::AList:
-              {
-                out << "fixed ";
-                daisy_assert (size == Value::Singleton);
-                daisy_assert (alist.check (key));
-                const AttributeList& fixed = alist.alist (key);
-                daisy_assert (fixed.check ("submodel"));
-                out << fixed.name ("submodel");
-              }
+              out << "fixed " << syntax.submodel_name (key);
               break;
             case Value::Object:
               out << syntax.library (metalib, key).name ();

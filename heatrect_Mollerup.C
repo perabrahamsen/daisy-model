@@ -513,8 +513,6 @@ Model used for solving matrix equation system.");
 Enable additional debug message.\n\
 A value of 0 means no message, higher numbers means more messages.");
     frame.add ("debug", 0);
-
-    frame.alist ().add ("submodel", "HeatRect");
   }
 } HeatrectMollerup_syntax;
 

@@ -77,6 +77,13 @@ Librarian::submodel_frame (const load_syntax_t load_syntax)
 }
 
 symbol
+Librarian::submodel_name (const load_syntax_t load_syntax)
+{
+  daisy_assert (content);
+  return content->submodel_name (load_syntax); 
+}
+
+symbol
 Librarian::submodel_description (const symbol name)
 { 
   daisy_assert (content);

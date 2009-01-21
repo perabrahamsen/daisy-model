@@ -221,8 +221,6 @@ TraverseXRef::enter_submodel_default (const Syntax&, const AttributeList& al,
   if (type == is_invalid)
     {
       // We are traversing a top level submodels.
-      daisy_assert (al.check ("submodel"));
-      daisy_assert (al.name ("submodel") == name);
       daisy_assert (path.empty ());
       type = is_submodel;
       current_submodel = name;

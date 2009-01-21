@@ -230,17 +230,17 @@ Select::Implementation::Spec::check_path (const std::vector<symbol>& path,
 	      ok = false;
 	      break;
 	    }
+          const symbol submodel_name = syntax->submodel_name (name);
+          if (submodel_name != Value::None ())
+            err.warning ("'" + name + "' is a fixed '" 
+                         + submodel_name + "' component");
 
           if (syntax->size (name) != Value::Singleton || !alist->check (name))
             alist = &syntax->default_frame (name).alist ();
           else
             alist = &alist->alist (name);
 	  syntax = &syntax->syntax (name);
-          
-          if (alist->check ("submodel"))
-            err.warning ("'" + name + "' is a fixed '" 
-                         + alist->name ("submodel") + "' component");
-	}
+        }
       else if (type == Value::Error)
 	{
 	  err.error ("'" + name + "': no such attribute");

@@ -505,11 +505,12 @@ Syntax::default_frame (const symbol key) const
 symbol 
 Syntax::submodel_name (const symbol key) const
 {
-  const Frame& frame = default_frame (key);
-  if (frame.check ("submodel"))
-    return frame.name ("submodel");
+  Implementation::submodel_map::const_iterator i = impl->submodels.find (key);
+  if (i == impl->submodels.end ())
+    daisy_panic ("'" + key + "' has no submodel");
 
-  return Value::None ();
+  const load_syntax_t load_syntax = (*i).second;
+  return Librarian::submodel_name (load_syntax);
 }
 
 

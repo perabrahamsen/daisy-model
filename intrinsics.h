@@ -60,6 +60,7 @@ public:
   bool submodel_registered (symbol) const;
   const FrameSubmodel& submodel_frame (symbol);
   const FrameSubmodel& submodel_frame (load_syntax_t);
+  symbol submodel_name (load_syntax_t);
   symbol submodel_description (symbol) const;
   void submodel_declare (load_syntax_t load_syntax, symbol name, symbol desc);
   void submodel_all (std::vector<symbol>&) const;

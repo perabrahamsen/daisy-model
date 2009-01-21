@@ -201,11 +201,10 @@ Frame::default_frame (const symbol key) const
 symbol 
 Frame::submodel_name (const symbol key) const
 { 
-  const Frame& frame = default_frame (key);
-  if (frame.check ("submodel"))
-    return frame.name ("submodel");
-
-  return Value::None ();
+  if (parent () && impl->syntax.lookup (key) == Value::Error)
+    return parent ()->submodel_name (key);
+  else
+    return impl->syntax.submodel_name (key);
 }
 
 void 

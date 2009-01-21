@@ -259,7 +259,7 @@ ProgramDocument::print_entry_submodel (const symbol name,
 	= (size != Value::Singleton || !alist.check (name))
 	? syntax.default_frame (name).alist ()
 	: alist.alist (name);
-      if (!nested.check ("submodel"))
+      if (syntax.submodel_name (name) == Value::None ())
 	{
 	  print_sample (name, child, nested, false);
 	  print_submodel (name, level, child, nested, aref);
