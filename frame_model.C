@@ -35,7 +35,7 @@ FrameModel::buildable () const
 {
   if (!parent ())
     return false;
-
+  
   return parent ()->buildable ();
 }
 
@@ -45,7 +45,7 @@ FrameModel::construct (Block& context, const symbol key,
 { 
   if (!parent ())
     {
-      context.error ("Cannot build base model '" + key + "'");
+      daisy_panic ("Cannot build base model '" + key + "'");
       return NULL;
     }
   return parent ()->construct (context, key, frame);

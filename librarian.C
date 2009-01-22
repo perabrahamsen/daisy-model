@@ -19,7 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #define BUILD_DLL
-
+#define protected public
 #include "librarian.h"
 #include "library.h"
 #include "metalib.h"
@@ -263,58 +263,51 @@ Librarian::~Librarian ()
     }
 }
 
-class FrameBuildable : public FrameModel
+class FrameDeclared : public FrameModel
+{
+public:
+  explicit FrameDeclared (const Declare& declare)
+    : FrameModel (*declare.parent_model (), parent_copy)
+  { declare.load (*this); }
+};
+
+class FrameBuildable : public FrameDeclared
 {
 private:
   const DeclareModel *const declaration;
-  bool buildable () const;
-  Model* construct (Block&, const symbol, const FrameModel&) const;
-public:
-  explicit FrameBuildable (const Declare&);  // Declared.
-};
+  bool buildable () const
+  { 
+    if (declaration) 
+      return true;
 
-bool 
-FrameBuildable::buildable () const
-{ 
-  if (declaration) 
-    return true;
+    return FrameModel::buildable ();
+  }
+  Model* construct (Block& context, const symbol key, 
+                    const FrameModel& frame) const
+  {
+    if (declaration)
+      {
+        Block block (context, frame, key);
 
-  return FrameModel::buildable ();
-}
+        if (!frame.check (context))
+          return NULL;
 
-Model* 
-FrameBuildable::construct (Block& context, const symbol key, 
-                           const FrameModel& frame) const
-{
-  if (declaration)
-    {
-      Block block (context, frame, key);
-      
-      if (!frame.check (context))
+        try
+          { return declaration->make (block); }
+        catch (const std::string& err)
+          { block.error ("Build failed: " + err); }
+        catch (const char *const err)
+          { block.error ("Build failure: " + std::string (err)); }
         return NULL;
-
-      try
-        { return declaration->make (block); }
-      catch (const std::string& err)
-        { block.error ("Build failed: " + err); }
-      catch (const char *const err)
-        { block.error ("Build failure: " + std::string (err)); }
-      return NULL;
-    }
-  return FrameModel::construct (context, key, frame);
-}
-
-FrameBuildable::FrameBuildable (const Declare& declare)
-  // Declared.
-  : FrameModel (*declare.parent_model (), parent_copy),
-    declaration (dynamic_cast<const DeclareModel*> (&declare))
-{ declare.load (*this); }
-
-FrameModel& 
-Declare::create_frame () const 
-{ 
-  return *new FrameBuildable (*this); 
-}
+      }
+    return FrameModel::construct (context, key, frame);
+  }
+public:
+  explicit FrameBuildable (const Declare& declare)
+    : FrameDeclared (declare),
+      declaration (dynamic_cast<const DeclareModel*> (&declare))
+  { }
+};
 
 symbol 
 Declare::root_name ()
@@ -332,6 +325,19 @@ Declare::Declare (const symbol c, const symbol n,
 
 Declare::~Declare ()
 { }
+
+FrameModel& 
+Declare::create_frame () const 
+{ 
+  if (const DeclareModel* model = dynamic_cast<const DeclareModel*> (this))
+    {
+      std::ostringstream tmp;
+      tmp << "Component = " << component << "; name = " << name 
+          << "; super = " << model->super;
+      daisy_panic (tmp.str ());
+    }
+  return *new FrameBuildable (*this); 
+}
 
 void 
 DeclareComponent::load (Frame& frame) const
@@ -391,6 +397,10 @@ DeclareBase::DeclareBase (const symbol component,
                             const symbol description)
   : DeclareSuper (component, name, root_name (), description)
 { }
+
+FrameModel& 
+DeclareModel::create_frame () const 
+{ return *new FrameBuildable (*this); }
 
 void 
 DeclareModel::load (Frame& frame) const
