@@ -263,6 +263,59 @@ Librarian::~Librarian ()
     }
 }
 
+class FrameBuildable : public FrameModel
+{
+private:
+  const DeclareModel *const declaration;
+  bool buildable () const;
+  Model* construct (Block&, const symbol, const FrameModel&) const;
+public:
+  explicit FrameBuildable (const Declare&);  // Declared.
+};
+
+bool 
+FrameBuildable::buildable () const
+{ 
+  if (declaration) 
+    return true;
+
+  return FrameModel::buildable ();
+}
+
+Model* 
+FrameBuildable::construct (Block& context, const symbol key, 
+                           const FrameModel& frame) const
+{
+  if (declaration)
+    {
+      Block block (context, frame, key);
+      
+      if (!frame.check (context))
+        return NULL;
+
+      try
+        { return declaration->make (block); }
+      catch (const std::string& err)
+        { block.error ("Build failed: " + err); }
+      catch (const char *const err)
+        { block.error ("Build failure: " + std::string (err)); }
+      return NULL;
+    }
+  return FrameModel::construct (context, key, frame);
+}
+
+FrameBuildable::FrameBuildable (const Declare& declare)
+  // Declared.
+  : FrameModel (*declare.parent_model (), parent_copy),
+    declaration (dynamic_cast<const DeclareModel*> (&declare))
+{ declare.load (*this); }
+
+FrameModel& 
+Declare::create_frame () const 
+{ 
+  return *new FrameBuildable (*this); 
+}
+
 symbol 
 Declare::root_name ()
 {

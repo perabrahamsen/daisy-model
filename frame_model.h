@@ -25,8 +25,6 @@
 
 class Model;
 class Block;
-class Declare;
-class DeclareModel;
 
 class FrameModel : public Frame
 {
@@ -36,12 +34,10 @@ private:
   const FrameModel* parent () const;
 
   // Construct.
-private:
-  const DeclareModel *const declaration;
 public:
-  bool buildable () const;
-private:
-  Model* construct (Block& context, const symbol key, const FrameModel&) const;
+  virtual bool buildable () const;
+protected:
+  virtual Model* construct (Block&, const symbol, const FrameModel&) const;
 public:
   Model* construct (Block& context, const symbol key) const;
 
@@ -56,7 +52,6 @@ public:
   FrameModel (const FrameModel&, parent_copy_t); // OLD: For cloning a library.
   FrameModel (const FrameModel&, const AttributeList&); // build_alist, add_d)
   FrameModel (const FrameModel&, const Syntax&, const AttributeList&); // add_d
-  FrameModel (const Declare&);  // Declared.
   ~FrameModel ();
 };
 

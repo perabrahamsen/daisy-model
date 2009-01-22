@@ -24,9 +24,8 @@
 #include "assertion.h"
 #include "library.h"
 #include "memutils.h"
-#include "frame_model.h"
 #include "frame_submodel.h"
-#include "alist.h"
+#include "librarian.h"
 
 std::map<symbol, Library*> 
 Intrinsics::clone () const
@@ -51,7 +50,7 @@ Intrinsics::clone () const
             daisy_panic ("'" + model + "' declared multiple times in "
                          + component);
           const Declare& declare = *decls[0];
-          library.add_model (model, *new FrameModel (declare));
+          library.add_model (model, declare.create_frame ());
           decls.erase (decls.begin ());
         }
     }
@@ -141,7 +140,7 @@ Intrinsics::instantiate (const symbol component, const symbol model) const
     }
   daisy_assert (decls.size () == 1);
   const Declare& declare = *decls[0];
-  library.add_model (model, *new FrameModel (declare));
+  library.add_model (model, declare.create_frame ());
   decls.erase (decls.begin ());
 }
 

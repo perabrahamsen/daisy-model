@@ -182,6 +182,7 @@ public:
   const symbol description;
 
 public:
+  FrameModel& create_frame () const;
   virtual void load (Frame&) const = 0;
 protected:
   virtual void load_frame (Frame&) const = 0;
