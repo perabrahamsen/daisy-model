@@ -699,11 +699,11 @@ Frame::add_strings (const symbol key,
       AttributeList alist_b (intrinsics.library (component).lookup (b));
       alist_b.add ("type", b);
       alists.push_back (&alist_b);
-      impl->alist.add (key, alists);
       intrinsics.instantiate (component, c);
       AttributeList alist_c (intrinsics.library (component).lookup (c));
       alist_c.add ("type", c);
       alists.push_back (&alist_c);
+      impl->alist.add (key, alists);
       return;
     }
   verify (key, Value::String, 3);

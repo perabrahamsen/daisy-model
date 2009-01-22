@@ -22,13 +22,22 @@
 #ifndef SMB_H
 #define SMB_H
 
+#include "model.h"
 #include "om.h"
 #include <vector>
 
 class Frame;
 
-class SMB : public OM
+class SMB : public ModelAListed, public OM
 { 
+  // Model.
+public:
+  static const char *const component;
+  symbol library_id () const;
+
+  void output(Log& log) const
+  { OM::output (log); }
+
   // Content.
 public:
   const double maintenance;	// How fast does it eat itself?
@@ -50,8 +59,7 @@ private:
 
   // Create & Destroy.
 public:
-  static void load_syntax (Frame&);
-  SMB (const AttributeList& al);
+  SMB (Block& al);
 };
 
 #endif // SMB_H

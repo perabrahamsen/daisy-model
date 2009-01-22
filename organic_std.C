@@ -816,8 +816,8 @@ OrganicStandard::output (Log& log) const
 	    }
 	}
     }
-  output_ordered (smb, "smb", log);
-  output_ordered (som, "som", log);
+  output_list (smb, "smb", log, SMB::component);
+  output_list (som, "som", log, SOM::component);
   output_ordered (dom, "dom", log);
   output_list (domsorp, "domsorp", log, Domsorp::component);
   output_submodule (buffer, "buffer", log);
@@ -2579,8 +2579,8 @@ OrganicStandard::OrganicStandard (Block& al)
     CO2_threshold (al.number ("CO2_threshold")),
     top_CO2 (0.0),
     am (Librarian::build_vector<AM> (al, "am")),
-    smb (map_construct<SMB> (al.alist_sequence ("smb"))),
-    som (map_construct<SOM> (al.alist_sequence ("som"))),
+    smb (Librarian::build_vector<SMB> (al, "smb")),
+    som (Librarian::build_vector<SOM> (al, "som")),
     dom (map_submodel<DOM> (al, "dom")),
     domsorp (Librarian::build_vector<Domsorp> (al, "domsorp")),
     buffer (al.alist ("buffer")),
@@ -2996,102 +2996,13 @@ Turnover rate above which pools will contribute to 'CO2_fast'.");
                          OrganicStandard::Buffer::load_syntax);
 
     // Create defaults for som and smb.
-    const Frame& smb_frame = Librarian::submodel_frame (SMB::load_syntax);
-    const AttributeList& smb_alist = smb_frame.alist ();
-    frame.add_submodule_sequence ("smb", Value::State, "\
+    frame.add_object ("smb", SMB::component, Value::State, Value::Sequence, "\
 Soil MicroBiomass pools.\n\
-Initial value will be estimated based on equilibrium with AM and SOM pools.",
-                                  SMB::load_syntax);
-    std::vector<const AttributeList*> SMB;
-    AttributeList SMB1 (smb_alist);
-    std::vector<double> SMB1_C_per_N;
-    SMB1_C_per_N.push_back (6.7);
-    SMB1.add ("C_per_N", SMB1_C_per_N);
-    SMB1.add ("turnover_rate", 7.708e-6);
-    std::vector<double> SMB1_efficiency;
-    SMB1_efficiency.push_back (0.60);
-    SMB1_efficiency.push_back (0.60);
-    SMB1.add ("efficiency", SMB1_efficiency);
-    SMB1.add ("maintenance", 7.500e-5);
-    std::vector<double> SMB1_fractions;
-    SMB1_fractions.push_back (0.0);
-    SMB1_fractions.push_back (0.6);
-    SMB1_fractions.push_back (0.0);
-    SMB1_fractions.push_back (0.4);
-    SMB1_fractions.push_back (0.0);
-    SMB1.add ("fractions", SMB1_fractions);
-    SMB.push_back (&SMB1);
-    AttributeList SMB2 (smb_alist);
-    std::vector<double> SMB2_C_per_N;
-    SMB2_C_per_N.push_back (6.7);
-    SMB2.add ("C_per_N", SMB2_C_per_N);
-    SMB2.add ("turnover_rate", 4.16666666667e-4);
-    std::vector<double> SMB2_efficiency;
-    SMB2_efficiency.push_back (0.60);
-    SMB2_efficiency.push_back (0.60);
-    SMB2.add ("efficiency", SMB2_efficiency);
-    SMB2.add ("maintenance", 4.16666666667e-4);
-    std::vector<double> SMB2_fractions;
-    SMB2_fractions.push_back (0.0);
-    SMB2_fractions.push_back (0.4);
-    SMB2_fractions.push_back (0.0);
-    SMB2_fractions.push_back (0.6);
-    SMB2_fractions.push_back (0.0);
-    SMB2.add ("fractions", SMB2_fractions);
-    SMB.push_back (&SMB2);
-    frame.add ("smb", SMB);
-
-    frame.add_submodule_sequence ("som", Value::State, 
-                                  "Soil Organic Matter pools.",
-                                  SOM::load_syntax);
-    const Frame& som_frame = Librarian::submodel_frame (SOM::load_syntax);
-    const AttributeList& som_alist = som_frame.alist ();
-    std::vector<const AttributeList*> SOM;
-    AttributeList SOM1 (som_alist);
-#if 1 // SANDER_PARAMS
-    SOM1.add ("turnover_rate", 4.3e-5 / 24.0 /* 1.7916667e-6 */);
-#else
-    SOM1.add ("turnover_rate", 2.7e-6 / 24.0 /* 1.125e-7 */);
-#endif
-    std::vector<double> SOM1_efficiency;
-    SOM1_efficiency.push_back (0.40); // SMB1
-    SOM1_efficiency.push_back (0.40); // SMB2
-    SOM1.add ("efficiency", SOM1_efficiency);
-    std::vector<double> SOM1_fractions;
-    SOM1_fractions.push_back (1.0); // SMB1
-    SOM1_fractions.push_back (0.0); // SMB2
-    SOM1_fractions.push_back (0.0); // SOM1
-    SOM1_fractions.push_back (0.0); // SOM2
-    SOM1_fractions.push_back (0.0); // SOM3
-    SOM1.add ("fractions", SOM1_fractions);
-    SOM.push_back (&SOM1);
-    AttributeList SOM2 (som_alist);
-    SOM2.add ("turnover_rate", 1.4e-4 / 24.0 /* 5.83333333333e-6 */);
-    std::vector<double> SOM2_efficiency;
-    SOM2_efficiency.push_back (0.50); // SMB1
-    SOM2_efficiency.push_back (0.50); // SMB2
-    SOM2.add ("efficiency", SOM2_efficiency);
-    std::vector<double> SOM2_fractions;
-#if 1 // SANDER_PARAMS
-    SOM2_fractions.push_back (0.7); // SMB1
-    SOM2_fractions.push_back (0.0); // SMB2
-    SOM2_fractions.push_back (0.3); // SOM1
-    SOM2_fractions.push_back (0.0); // SOM2
-#else
-    SOM2_fractions.push_back (0.9); // SMB1
-    SOM2_fractions.push_back (0.0); // SMB2
-    SOM2_fractions.push_back (0.1); // SOM1
-    SOM2_fractions.push_back (0.0); // SOM2
-#endif
-    SOM2_fractions.push_back (0.0); // SOM3
-    SOM2.add ("fractions", SOM2_fractions);
-    SOM.push_back (&SOM2);
-    AttributeList SOM3 (som_alist);
-    SOM3.add ("turnover_rate", 0.0);
-    SOM3.add ("efficiency", SOM2_efficiency); // Doesn't matter.
-    SOM3.add ("fractions", SOM2_fractions); // Doesn't matter.
-    SOM.push_back (&SOM3);
-    frame.add ("som", SOM);
+Initial value will be estimated based on equilibrium with AM and SOM pools.");
+    frame.add_strings ("smb", "SMB-SLOW", "SMB-FAST");
+    frame.add_object ("som", SOM::component, Value::State, Value::Sequence,
+                      "Soil Organic Matter pools.");
+    frame.add_strings ("som", "SOM-SLOW", "SOM-FAST", "SOM-INERT");
   
     frame.add_submodule_sequence ("initial_SOM", Value::OptionalConst, "\
 Layered initialization of soil SOM content.", load_layer);

@@ -2,16 +2,11 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Frame
 
-** Gør AOM, SOM, SMB, og DOM til modeller
+** Gør AOM til model
 
-Lav SMB1, SMB2, SOM1 ... parameteriseringer.
+** ret default_AM
 
 ** fjern frame.add (name, alists)
-
-*** default_AM, SOM1, SOM2, SMB1...
-
-De skal gøres til parameteriseringer (eller til flere submodeller), og
-overføres som navne.
 
 ** fjern alist.add (name, alist)
 

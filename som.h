@@ -22,16 +22,23 @@
 #ifndef SOM_H
 #define SOM_H
 
+#include "model.h"
 #include "om.h"
 
 class Frame;
 
-class SOM : public OM
+class SOM : public ModelAListed, public OM
 { 
+public:
+  static const char *const component;
+  symbol library_id () const;
+
+  void output(Log& log) const
+  { OM::output (log); }
+
   // Create & Destroy.
 public:
-  static void load_syntax (Frame&);
-  SOM (const AttributeList& al);
+  SOM (Block&);
 };
 
 #endif // SOM_H

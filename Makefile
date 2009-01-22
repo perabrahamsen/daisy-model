@@ -1160,16 +1160,16 @@ litter${OBJ}: litter.C litter.h librarian.h model.h symbol.h alist.h frame.h \
   scope.h value.h check.h
 time${OBJ}: time.C time.h assertion.h log.h border.h model.h symbol.h alist.h \
   frame.h scope.h value.h vcheck.h librarian.h block.h treelog.h
-som${OBJ}: som.C som.h om.h plf.h librarian.h model.h symbol.h alist.h \
-  frame.h scope.h value.h
-smb${OBJ}: smb.C smb.h om.h plf.h dom.h librarian.h model.h symbol.h alist.h \
-  frame.h scope.h value.h assertion.h check.h mathlib.h
+som${OBJ}: som.C som.h model.h symbol.h alist.h om.h plf.h librarian.h \
+  block.h value.h frame.h scope.h
+smb${OBJ}: smb.C smb.h model.h symbol.h alist.h om.h plf.h dom.h librarian.h \
+  frame.h scope.h value.h assertion.h check.h mathlib.h block.h
 aom${OBJ}: aom.C aom.h om.h plf.h librarian.h model.h symbol.h alist.h \
   frame.h scope.h value.h check.h assertion.h smb.h dom.h log.h time.h \
   border.h geometry.h mathlib.h
-dom${OBJ}: dom.C dom.h plf.h doe.h smb.h om.h geometry.h symbol.h value.h \
-  librarian.h model.h alist.h block.h frame.h scope.h soil.h soil_water.h \
-  log.h time.h border.h check.h assertion.h mathlib.h
+dom${OBJ}: dom.C dom.h plf.h doe.h smb.h model.h symbol.h alist.h om.h \
+  geometry.h value.h librarian.h block.h frame.h scope.h soil.h \
+  soil_water.h log.h time.h border.h check.h assertion.h mathlib.h
 crpn${OBJ}: crpn.C crpn.h production.h symbol.h root_system.h rootdens.h \
   model.h alist.h ABAprod.h plf.h frame.h scope.h value.h treelog.h log.h \
   time.h border.h mathlib.h assertion.h librarian.h check.h
@@ -1263,8 +1263,8 @@ log_all${OBJ}: log_all.C log_all.h log_select.h log.h time.h border.h model.h \
   symbol.h alist.h memutils.h select.h destination.h units.h volume.h \
   metalib.h frame.h scope.h value.h library.h block.h syntax.h treelog.h \
   assertion.h
-om${OBJ}: om.C om.h plf.h som.h smb.h dom.h frame.h scope.h value.h symbol.h \
-  alist.h check.h vcheck.h geometry.h log.h time.h border.h model.h \
+om${OBJ}: om.C om.h plf.h som.h model.h symbol.h alist.h smb.h dom.h frame.h \
+  scope.h value.h check.h vcheck.h geometry.h log.h time.h border.h \
   mathlib.h assertion.h treelog.h
 select_value${OBJ}: select_value.C select_value.h select.h destination.h \
   symbol.h model.h alist.h units.h volume.h block.h value.h frame.h \

@@ -98,8 +98,8 @@ public:
   // Create & Destroy.
 public:
   void initialize (size_t);
-protected:
   static void load_syntax (Frame&, const std::string& frac_desc);
+protected:
   OM (const AttributeList& al);
   virtual ~OM ();
 };
