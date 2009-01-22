@@ -1464,7 +1464,7 @@ year in the second interval.\n\
 If a given year is covered by multiple intervals in the list, the first\n\
 one will be used.",
 				   WeatherStandard::YearMap::load_syntax);
-    frame.add ("missing_years", std::vector<const AttributeList*> ());
+    frame.add_empty ("missing_years");
 
     // Division between Rain and Snow.
     frame.add ("T_rain", "dg C", Value::Const, 

@@ -1275,9 +1275,9 @@ log_all${OBJ}: log_all.C log_all.h log_select.h log.h time.h border.h model.h \
   symbol.h alist.h memutils.h select.h destination.h units.h volume.h \
   metalib.h frame.h scope.h value.h library.h block.h syntax.h treelog.h \
   assertion.h
-om${OBJ}: om.C om.h plf.h som.h smb.h dom.h frame_submodel.h frame.h scope.h \
-  value.h symbol.h alist.h check.h vcheck.h geometry.h log.h time.h \
-  border.h model.h mathlib.h assertion.h treelog.h
+om${OBJ}: om.C om.h plf.h som.h smb.h dom.h frame.h scope.h value.h symbol.h \
+  alist.h check.h vcheck.h geometry.h log.h time.h border.h model.h \
+  mathlib.h assertion.h treelog.h
 select_value${OBJ}: select_value.C select_value.h select.h destination.h \
   symbol.h model.h alist.h units.h volume.h block.h value.h frame.h \
   scope.h librarian.h mathlib.h assertion.h

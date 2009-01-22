@@ -2,11 +2,24 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Frame
 
-** fjern frame.add (name, alist)
+** DeclareSolo
+
+** Gør AOM, SOM, SMB, og DOM til modeller
+
+Lav SMB1, SMB2, SOM1 ... parameteriseringer.
+
+** fjern frame.add (name, alists)
+
+*** default_AM, SOM1, SOM2, SMB1...
+
+De skal gøres til parameteriseringer (eller til flere submodeller), og
+overføres som navne.
+
+** fjern alist.add (name, alist)
 
 ** Gem frame i alist
 
-Overvej ejerskab.
+Overvej ejerskab. auto_ptr? copy vs inherit
 
 ** Gør Frame::syntax () const
 

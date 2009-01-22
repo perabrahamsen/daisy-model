@@ -522,7 +522,7 @@ geometry.",
 Zones with special soil properties.\n\
 This overrules the 'horizons' paramter.",
 				 Implementation::Zone::load_syntax);
-  frame.add ("zones", std::vector<const AttributeList*> ());
+  frame.add_empty ("zones");
   frame.add ("MaxRootingDepth", "cm", Check::positive (), Value::Const,
 	      "Depth at the end of the root zone (a positive number).");
   frame.add ("dispersivity", "cm", Check::positive (), 

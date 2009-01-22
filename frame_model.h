@@ -37,8 +37,6 @@ private:
 
   // Construct.
 private:
-  typedef Model& (*builder_t) (Block&);
-  const builder_t builder;
   const DeclareModel *const declaration;
 public:
   bool buildable () const;
@@ -56,8 +54,6 @@ public:
   enum parent_copy_t { parent_copy }; // OLD: For cloning a library.
   FrameModel (const FrameModel&, parent_link_t);
   FrameModel (const FrameModel&, parent_copy_t); // OLD: For cloning a library.
-  FrameModel (const Syntax&, const AttributeList&); // OLD: base class
-  FrameModel (const Syntax&, const AttributeList&, const builder_t); // OLD: m.
   FrameModel (const FrameModel&, const AttributeList&); // build_alist, add_d)
   FrameModel (const FrameModel&, const Syntax&, const AttributeList&); // add_d
   FrameModel (const Declare&);  // Declared.

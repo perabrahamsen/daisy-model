@@ -1067,7 +1067,7 @@ Harvest conditions for perennial crops.",
 			  ActionCrop::Perennial::load_syntax);
     frame.add_submodule_sequence("fertilize_at", Value::Const, "\
 Fertilizer application by date.", ActionCrop::Fertilize::load_syntax);
-    frame.add ("fertilize_at", std::vector<const AttributeList*> ());
+    frame.add_empty ("fertilize_at");
     frame.add ("fertilize_at_index", Value::Integer, Value::State,
 		"Next entry in 'fertilize_at' to execute.");
     frame.add ("fertilize_at_index", 0);
@@ -1076,13 +1076,13 @@ Fertilizer application by date.", ActionCrop::Fertilize::load_syntax);
     frame.add ("fertilize_incorporate", false);
     frame.add_submodule_sequence ("tillage", Value::State, "\
 List of tillage operations to apply.", ActionCrop::Tillage::load_syntax);
-    frame.add ("tillage", std::vector<const AttributeList*> ());
+    frame.add_empty ("tillage");
     frame.add ("tillage_index", Value::Integer, Value::State,
 		"Next entry in 'tillage' to execute.");
     frame.add ("tillage_index", 0);
     frame.add_submodule_sequence ("spray", Value::State, "\
 List of chemicals to apply.", ActionCrop::Spray::load_syntax);
-    frame.add ("spray", std::vector<const AttributeList*> ());
+    frame.add_empty ("spray");
     frame.add ("spray_index", Value::Integer, Value::State,
 		"Next entry in 'spray' to execute.");
     frame.add ("spray_index", 0);

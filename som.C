@@ -41,3 +41,5 @@ SOM::SOM (const AttributeList& al)
 static 
 DeclareSubmodel som_submodel (SOM::load_syntax, "SOM", "\
 A single Soil Organic Matter pool.");
+
+// som.C ends here.

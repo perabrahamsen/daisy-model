@@ -962,11 +962,11 @@ field, and want to force the model to confirm to the measurements.  \n\
 'ForcedDAY' will not affect the LAI for crops that have not yet\n\
 emerged.  If no crops have emerged on the field, it will be ignored.",
                                   VegetationCrops::ForcedLAI::load_syntax);
-    frame.add ("ForcedLAI", std::vector<const AttributeList*> ());
+    frame.add_empty ("ForcedLAI");
     frame.add_object ("crops", Crop::component, 
                        Value::State, Value::Sequence,
                        "List of crops growing in the field");
-    frame.add ("crops", std::vector<const AttributeList*> ());
+    frame.add_empty ("crops");
     }
 } VegetationCrops_syntax;
 

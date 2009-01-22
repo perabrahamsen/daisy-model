@@ -311,7 +311,7 @@ the simulation.  Can be overwritten by column specific weather.");
   frame.add_submodule_sequence ("harvest", Value::State, 
 				 "Total list of all crop yields.",
 				 Harvest::load_syntax);
-  frame.add ("harvest", std::vector<const AttributeList*> ());
+  frame.add_empty ("harvest");
 }
 
 void

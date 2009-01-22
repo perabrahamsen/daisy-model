@@ -438,7 +438,7 @@ this horizon.");
     frame.add_submodule_sequence ("attributes", Value::OptionalConst, "\
 List of additional attributes for this horizon.\n\
 Intended for use with pedotransfer functions.", load_attributes);
-    frame.add ("attributes", std::vector<const AttributeList*> ());
+    frame.add_empty ("attributes");
   }
 } Horizon_init;
 

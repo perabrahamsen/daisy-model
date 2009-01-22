@@ -340,7 +340,7 @@ static struct MovementRectSyntax : DeclareModel
     frame.add_submodule_sequence ("drain", Value::Const,
 				   "Location of cells with drain pipes.",
 				   MovementRect::Point::load_syntax);
-    frame.add ("drain", std::vector<const AttributeList*> ());
+    frame.add_empty ("drain");
     frame.add_object ("matrix_water", UZRect::component, 
                        Value::Const, Value::Sequence,
                        "Matrix water transport models.\n\

@@ -375,11 +375,11 @@ Handle chemicals and reactions.")
                       Value::State, Value::Sequence, "\
 List of chemicals you want to trace in the simulation.");
     frame.add_check ("trace", VCheck::unique ());
-    frame.add ("trace", std::vector<const AttributeList*> ());
+    frame.add_empty ("trace");
     frame.add_object ("reaction", Reaction::component, 
                       Value::State, Value::Sequence, "\
 List of chemical reactions you want to simulate.");
-    frame.add ("reaction", std::vector<const AttributeList*> ());
+    frame.add_empty ("reaction");
   }
 } ChemistryStandard_syntax;
 

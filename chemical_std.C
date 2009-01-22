@@ -1532,7 +1532,7 @@ Concentration below the layer of soil being examined.\n\
 Use a negative number to indicate same concentration as in lowest cell.");
     frame.add_submodule_sequence ("decompose_products", Value::Const, "\
 List of products from decomposition.", ChemicalStandard::Product::load_syntax);
-    frame.add ("decompose_products", std::vector<const AttributeList*> ());
+    frame.add_empty ("decompose_products");
     frame.add ("C_below", "zero_gradient");
     frame.add_object ("initial", Number::component, 
                       Value::Const, Value::Singleton, "\

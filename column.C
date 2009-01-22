@@ -91,7 +91,7 @@ The meaning depends on the number of point in the sequence.\n\
 1 point: The column has a location, but no specific area.\n\
 3 or more points: The column represents the area specified by a\n\
 polygon with the specified corner points.", Column::Point::load_syntax);
-    frame.add ("location", std::vector<const AttributeList*> ());
+    frame.add_empty ("location");
   }
   ColumnInit ()
     : DeclareComponent (Column::component, "\

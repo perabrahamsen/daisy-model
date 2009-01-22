@@ -195,7 +195,7 @@ Setting this overrides the 'days' and 'hours' parameters.");
 		"Temperature of irrigation (default: air temperature).");
     frame.add_submodule_sequence ("solute", Value::Const, "\
 Solutes in irrigation water.", load_ppm);
-    frame.add ("solute", std::vector<const AttributeList*> ());
+    frame.add_empty ("solute");
   }
 } ActionIrrigateBase_syntax;
 

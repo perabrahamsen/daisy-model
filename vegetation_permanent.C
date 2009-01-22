@@ -427,7 +427,7 @@ Permanent (non-crop) vegetation.")
 These numbers are used when there are no yearly numbers (YearlyLAI).");
     frame.add_submodule_sequence("YearlyLAI", Value::Const, "\
 Yearly LAI measurements.", VegetationPermanent::YearlyLAI::load_syntax);
-    frame.add ("YearlyLAI", std::vector<const AttributeList*> ());
+    frame.add_empty ("YearlyLAI");
 
 
     frame.add_submodule("Canopy", Value::State, "Canopy.",

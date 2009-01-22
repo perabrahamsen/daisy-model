@@ -224,7 +224,7 @@ period.");
   frame.add_object ("exchange", MScope::component,
                      Value::Const, Value::Sequence, "\
 List of exchange items for communicating with external models.");
-  frame.add ("exchange", std::vector<const AttributeList*> ());
+  frame.add_empty ("exchange");
 
   // The log_time paramater.
   static VCheck::Enum valid_component;

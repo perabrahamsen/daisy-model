@@ -603,13 +603,6 @@ Frame::add (const symbol key, int value)
 }
 
 void 
-Frame::add (const symbol key, const AttributeList& value)
-{
-  verify (key, value.check ("type") ? Value::Object : Value::AList);
-  impl->alist.add (key, value); 
-}
-
-void 
 Frame::add (const symbol key, const PLF& value)
 {
   verify (key, Value::PLF);

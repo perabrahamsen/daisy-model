@@ -454,7 +454,7 @@ List of strings indicating missing values.");
   frame.add_submodule_sequence ("filter", Value::Const, "\
 Only include data from rows that passes all these filters.",
 				 LexerTable::Filter::load_syntax);
-  frame.add ("filter", std::vector<const AttributeList*> ());
+  frame.add_empty ("filter");
   frame.add ("original", Value::String, Value::OptionalConst, 
               Value::Sequence, "\
 List of dimensions of the data in the data file.\n\

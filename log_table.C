@@ -525,7 +525,7 @@ String to print between array entries.");
       frame.add_object ("summary", Summary::component,
                          Value::Const, Value::Sequence,
                          "Summaries for this log file.");
-      frame.add ("summary", std::vector<const AttributeList*> ());
+      frame.add_empty ("summary");
       Librarian::add_doc_fun (LogSelect::component, 
                               LogSelect::document_entries);
     }

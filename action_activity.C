@@ -109,7 +109,7 @@ at each time step.")
     frame.add_object ("actions", Action::component, 
                        Value::State, Value::Sequence,
                        "Sequence of actions to perform.");
-    frame.add ("actions", std::vector<const AttributeList*> ());
+    frame.add_empty ("actions");
     frame.order ("actions");
   }
 } ActionActivity_syntax;

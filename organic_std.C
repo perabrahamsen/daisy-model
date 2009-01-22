@@ -3099,11 +3099,11 @@ Layered initialization of soil SOM content.", load_layer);
     frame.add_submodule_sequence ("dom", Value::State, 
                                   "Dissolved Organic Matter pools.",
                                   DOM::load_syntax);
-    frame.add ("dom", std::vector<const AttributeList*> ());
+    frame.add_empty ("dom");
     frame.add_object ("domsorp", Domsorp::component, 
                       Value::State, Value::Sequence, 
                       "Interchange between DOM and SOM pools.");
-    frame.add ("domsorp", std::vector<const AttributeList*> ());
+    frame.add_empty ("domsorp");
 
     frame.add ("heat_factor", "dg C", Value::None (), Check::non_negative (),
                Value::Const,

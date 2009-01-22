@@ -205,10 +205,10 @@ Shared parameters for old models.")
                 "Y position of weather station."); // Unused.
     frame.add_submodule_sequence ("DryDeposit", Value::Const, "\
 Atmospheric deposition.", load_dry);
-    frame.add ("DryDeposit", std::vector<const AttributeList*> ());
+    frame.add_empty ("DryDeposit");
     frame.add_submodule_sequence ("WetDeposit", Value::Const, "\
 Deposition of solutes with precipitation.", load_ppm);
-    frame.add ("WetDeposit", std::vector<const AttributeList*> ());
+    frame.add_empty ("WetDeposit");
 
     // Division between Rain and Snow.
     frame.add ("T_rain", "dg C", Value::Const, 

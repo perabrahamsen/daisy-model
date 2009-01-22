@@ -252,7 +252,6 @@ public:
   void add (symbol, const char*); // Avoid matching bool...
   void add (symbol, bool);
   void add (symbol, int);
-  void add (symbol, const AttributeList&);
   void add (symbol, const PLF&);
   void add (symbol, const std::vector<double>&);
   void add (symbol, const std::vector<symbol>&);
