@@ -34,7 +34,7 @@
 #include "librarian.h"
 #include "check_range.h"
 #include "submodeler.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include <numeric>
 
 // Dimensional conversion.

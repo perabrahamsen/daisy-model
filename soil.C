@@ -30,7 +30,7 @@
 #include "metalib.h"
 #include "library.h"
 #include "syntax.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include "mathlib.h"
 #include "librarian.h"
 #include "submodeler.h"

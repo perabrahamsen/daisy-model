@@ -35,7 +35,6 @@ class Check;
 class VCheck;
 class Treelog;
 class Frame;
-class Frame;
 
 #ifdef __unix
 #define EXPORT /* Nothing */

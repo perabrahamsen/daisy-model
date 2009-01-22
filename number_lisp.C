@@ -28,7 +28,7 @@
 #include "librarian.h"
 #include "treelog.h"
 #include "assertion.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include <sstream>
 #include <memory>
 #include <map>

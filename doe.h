@@ -23,7 +23,6 @@
 
 #include <vector>
 
-class Frame;
 class Log;
 class Geometry;
 class Soil;

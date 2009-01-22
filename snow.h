@@ -23,7 +23,6 @@
 #ifndef SNOW_H
 #define SNOW_H
 
-class Frame;
 struct AttributeList;
 struct Weather;
 struct Bioclimate;

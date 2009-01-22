@@ -22,7 +22,6 @@
 #ifndef CRPN_H
 #define CRPN_H
 
-class Frame;
 class Production;
 class Geometry;
 class Soil;

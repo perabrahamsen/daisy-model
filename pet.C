@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "pet.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include "block.h"
 #include "log.h"
 #include "vegetation.h"

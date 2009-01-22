@@ -27,7 +27,6 @@
 #include <vector>
 #include <iosfwd>
 
-class Frame;
 class Syntax;
 class AttributeList;
 class Frame;

@@ -28,7 +28,7 @@
 #include "submodeler.h"
 #include "librarian.h"
 #include "treelog.h"
-#include "frame_submodel.h"
+#include "frame.h"
 
 // We need to initialize the Condition library.
 #include "condition.h"

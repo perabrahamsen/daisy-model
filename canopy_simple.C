@@ -23,7 +23,7 @@
 
 #include "canopy_simple.h"
 #include "log.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include "librarian.h"
 
 double

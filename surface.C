@@ -33,7 +33,7 @@
 #include "ridge.h"
 #include "check.h"
 #include "treelog.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include <sstream>
 #include <map>
 

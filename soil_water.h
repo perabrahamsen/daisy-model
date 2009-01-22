@@ -24,7 +24,6 @@
 
 #include <vector>
 
-class Frame;
 class AttributeList;
 class Surface;
 class Groundwater;

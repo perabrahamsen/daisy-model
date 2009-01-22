@@ -24,7 +24,7 @@
 #include "horizon.h"
 #include "library.h"
 #include "block.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include "plf.h"
 #include "horheat.h"
 #include "hydraulic.h"

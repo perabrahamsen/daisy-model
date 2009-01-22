@@ -22,7 +22,6 @@
 
 #include "plf.h"
 
-class Frame;
 struct Log;
 struct AttributeList;
 struct Frame;

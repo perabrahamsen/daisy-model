@@ -34,7 +34,7 @@
 #include "program.h"
 #include "vcheck.h"
 #include "librarian.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include <memory>
 #include <sstream>
 

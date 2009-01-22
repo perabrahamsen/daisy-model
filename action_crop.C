@@ -39,7 +39,7 @@
 #include "vegetation.h"
 #include "units.h"
 #include "treelog.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include <sstream>
 
 struct ActionCrop : public Action

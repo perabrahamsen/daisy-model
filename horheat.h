@@ -25,7 +25,6 @@
 
 #include <vector>
 
-class Frame;
 struct AttributeList;
 struct Frame;
 struct Treelog;

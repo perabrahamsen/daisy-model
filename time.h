@@ -37,7 +37,6 @@
 #define EXPORT __declspec(dllimport)
 #endif
 
-class Frame;
 class AttributeList;
 class Frame;
 class Log;

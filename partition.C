@@ -25,7 +25,7 @@
 #include "plf.h"
 #include "alist.h"
 #include "librarian.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include "check.h"
 #include "mathlib.h"
 #include "treelog.h"

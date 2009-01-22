@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "source_file.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include "gnuplot_utils.h"
 #include "vcheck.h"
 #include "mathlib.h"

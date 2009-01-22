@@ -38,7 +38,7 @@
 #include "librarian.h"
 #include "path.h"
 #include "treelog.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include <vector>
 #include <algorithm>
 #include <numeric>

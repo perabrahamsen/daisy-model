@@ -36,7 +36,7 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include "treelog.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include <sstream>
 
 double 

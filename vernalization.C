@@ -24,7 +24,7 @@
 #include "vernalization.h"
 #include "librarian.h"
 #include "log.h"
-#include "frame_submodel.h"
+#include "frame.h"
 
 void
 Vernalization::operator () (double Ta, double& DS)

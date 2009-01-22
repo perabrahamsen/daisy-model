@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "timestep.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include "alist.h"
 #include "block.h"
 #include "assertion.h"

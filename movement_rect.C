@@ -34,7 +34,7 @@
 #include "adsorption.h"
 #include "log.h"
 #include "check.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include "submodeler.h"
 #include "tertiary.h"
 #include "librarian.h"

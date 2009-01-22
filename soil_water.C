@@ -34,7 +34,7 @@
 #include "treelog.h"
 #include "assertion.h"
 #include "mathlib.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include <sstream>
 
 void

@@ -30,7 +30,7 @@
 #include "librarian.h"
 #include "submodeler.h"
 #include "treelog.h"
-#include "frame_submodel.h"
+#include "frame.h"
 
 void 
 LogExtern::done (const std::vector<Time::component_t>& time_columns,

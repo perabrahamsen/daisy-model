@@ -27,7 +27,6 @@
 #include <vector>
 #include <memory>
 
-class Frame;
 class AttributeList;
 class Horizon;
 class Log;

@@ -32,7 +32,6 @@
 #include <vector>
 #include <memory>
 
-class Frame;
 class Action;
 class Harvest;
 class Weather;

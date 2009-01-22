@@ -37,7 +37,7 @@
 #include "librarian.h"
 #include "mathlib.h"
 #include "path.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include <string>
 #include <sstream>
 

@@ -32,7 +32,7 @@
 #include "librarian.h"
 #include "metalib.h"
 #include "treelog.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include <sstream>
 #include <deque>
 

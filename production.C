@@ -32,7 +32,7 @@
 #include "plf.h"
 #include "treelog.h"
 #include "mathlib.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include "librarian.h"
 #include <sstream>
 

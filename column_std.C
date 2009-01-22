@@ -51,7 +51,7 @@
 #include "column.h"
 #include "librarian.h"
 #include "assertion.h"
-#include "frame_submodel.h"
+#include "frame.h"
 
 struct ColumnStandard : public Column
 {

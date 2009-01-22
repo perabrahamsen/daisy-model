@@ -36,7 +36,7 @@
 #include "vegetation.h"
 #include "treelog.h"
 #include "submodeler.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include <vector>
 #include <memory>
 #include <sstream>

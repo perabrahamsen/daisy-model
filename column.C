@@ -26,7 +26,7 @@
 #include "syntax.h"
 #include "log.h"
 #include "librarian.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include "submodeler.h"
 #include <map>
 

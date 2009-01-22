@@ -25,7 +25,6 @@
 #include <vector>
 #include <boost/noncopyable.hpp>
 
-class Frame;
 class Time;
 class Weather;
 class AttributeList;

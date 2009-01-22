@@ -31,7 +31,7 @@
 #include "chemistry.h"
 #include "log.h"
 #include "block.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include "mathlib.h"
 #include "plf.h"
 #include "check.h"

@@ -24,7 +24,7 @@
 #include "select.h"
 #include "treelog.h"
 #include "alist.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include "mathlib.h"
 #include <ostream>
 

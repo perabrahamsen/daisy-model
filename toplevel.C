@@ -36,7 +36,7 @@
 #include "treelog_store.h"
 #include "librarian.h"
 #include "units.h"
-#include "frame_submodel.h"
+#include "frame.h"
 
 #include <sstream>
 #include <ctime>

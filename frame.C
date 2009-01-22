@@ -28,7 +28,6 @@
 #include "librarian.h"
 #include "intrinsics.h"
 #include "library.h"
-#include "frame_submodel.h"
 #include <vector>
 
 struct Frame::Implementation

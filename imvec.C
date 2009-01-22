@@ -29,7 +29,7 @@
 #include "check.h"
 #include "block.h"
 #include "units.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include "syntax.h"
 
 const std::vector<double>& 

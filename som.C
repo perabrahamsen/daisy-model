@@ -22,7 +22,7 @@
 
 #include "som.h"
 #include "librarian.h"
-#include "frame_submodel.h"
+#include "frame.h"
 
 void 
 SOM::load_syntax (Frame& frame)

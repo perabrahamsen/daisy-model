@@ -31,7 +31,7 @@
 #include "block.h"
 #include "alist.h"
 #include "syntax.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include "check.h"
 #include "assertion.h"
 #include "frame.h"

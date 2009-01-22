@@ -24,7 +24,7 @@
 #include "crpn.h"
 #include "production.h"
 #include "root_system.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include "treelog.h"
 #include "log.h"
 #include "plf.h"

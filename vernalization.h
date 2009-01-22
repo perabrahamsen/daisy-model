@@ -22,7 +22,6 @@
 #ifndef VERNALIZATION_H
 #define VERNALIZATION_H
 
-class Frame;
 class AttributeList;
 class Frame;
 class Log;

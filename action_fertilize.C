@@ -34,7 +34,7 @@
 #include "volume.h"
 #include "units.h"
 #include "treelog.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include <sstream>
 
 // Base class for fertilize actions.

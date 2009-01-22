@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "harvest.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include "log.h"
 #include "librarian.h"
 

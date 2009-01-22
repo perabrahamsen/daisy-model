@@ -29,7 +29,7 @@
 #include "surface.h"
 #include "movement.h"
 #include "weather.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include "log.h"
 #include "treelog.h"
 #include "assertion.h"

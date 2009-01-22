@@ -23,7 +23,7 @@
 #include "gnuplot_base.h"
 #include "vcheck.h"
 #include "block.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include "assertion.h"
 #include "librarian.h"
 #include "treelog.h"

@@ -28,7 +28,7 @@
 #include "geometry.h"
 #include "librarian.h"
 #include "block.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include "soil.h"
 #include "soil_water.h"
 #include "log.h"

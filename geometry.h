@@ -33,7 +33,6 @@ class Treelog;
 class Groundwater;
 class Volume;
 class Frame;
-class Frame;
 
 class Geometry
 {

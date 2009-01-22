@@ -22,7 +22,7 @@
 
 #include "lexer_table.h"
 #include "lexer_data.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include "assertion.h"
 #include "mathlib.h"
 #include "submodeler.h"

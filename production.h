@@ -26,7 +26,6 @@
 #include <string>
 #include <vector>
 
-class Frame;
 class OrganicMatter;
 class CrpN;
 class Partition;

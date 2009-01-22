@@ -26,7 +26,7 @@
 #include "geometry1d.h"
 #include "plf.h"
 #include "librarian.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include "mathlib.h"
 #include "log.h"
 #include "soil.h"

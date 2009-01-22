@@ -24,7 +24,7 @@
 #include "horheat.h"
 #include "texture.h"
 #include "hydraulic.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include "check.h"
 #include "mathlib.h"
 #include "assertion.h"

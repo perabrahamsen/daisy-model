@@ -28,7 +28,6 @@
 #include <boost/noncopyable.hpp>
 
 class Frame;
-class Frame;
 class Metalib;
 class Program;
 class Syntax;

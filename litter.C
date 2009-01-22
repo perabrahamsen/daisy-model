@@ -22,7 +22,7 @@
 
 #include "litter.h"
 #include "librarian.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include "check.h"
 
 void

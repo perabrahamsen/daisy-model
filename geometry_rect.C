@@ -25,7 +25,7 @@
 #include "check.h"
 #include "vcheck.h"
 #include "block.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include "librarian.h"
 #include "treelog.h"
 #include "assertion.h"

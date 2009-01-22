@@ -23,7 +23,7 @@
 #include "smb.h"
 #include "dom.h"
 #include "librarian.h"
-#include "frame_submodel.h"
+#include "frame.h"
 #include "assertion.h"
 #include "check.h"
 #include "mathlib.h"
