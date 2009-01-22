@@ -180,6 +180,8 @@ public:
   const symbol component;
   const symbol name;
   const symbol description;
+  class Builder
+  { protected: virtual Model* make (Block&) const = 0; };
 
 public:
   virtual FrameModel& create_frame () const;
@@ -206,6 +208,13 @@ public:
   DeclareComponent (symbol component, symbol description);
 };
 
+class DeclareSolo : public DeclareComponent, public Declare::Builder
+{
+  FrameModel& create_frame () const;
+public:
+  DeclareSolo (symbol component, symbol description);
+};
+  
 class EXPORT DeclareSuper : public Declare
 {
 protected:
@@ -222,12 +231,10 @@ public:
   DeclareBase (symbol component, symbol name, symbol description);
 };
 
-class EXPORT DeclareModel : public DeclareSuper
+class EXPORT DeclareModel : public DeclareSuper, public Declare::Builder
 {
   FrameModel& create_frame () const;
   void load (Frame&) const;
-public:
-  virtual Model* make (Block&) const = 0;
 protected:
   DeclareModel (symbol component, symbol name, symbol super, 
                 symbol description);

@@ -2,12 +2,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Frame
 
-** parent_copy skal stadig linke til parent, og sætte builder til NULL
-
-** FrameBuildable
-
-** DeclareSolo
-
 ** Gør AOM, SOM, SMB, og DOM til modeller
 
 Lav SMB1, SMB2, SOM1 ... parameteriseringer.

@@ -273,39 +273,30 @@ public:
 
 class FrameBuildable : public FrameDeclared
 {
-private:
-  const DeclareModel *const declaration;
+  const Declare::Builder& builder;
   bool buildable () const
-  { 
-    if (declaration) 
-      return true;
-
-    return FrameModel::buildable ();
-  }
+  { return true; }
   Model* construct (Block& context, const symbol key, 
                     const FrameModel& frame) const
   {
-    if (declaration)
-      {
-        Block block (context, frame, key);
+    Block block (context, frame, key);
 
-        if (!frame.check (context))
-          return NULL;
+    if (!frame.check (context))
+      return NULL;
 
-        try
-          { return declaration->make (block); }
-        catch (const std::string& err)
-          { block.error ("Build failed: " + err); }
-        catch (const char *const err)
-          { block.error ("Build failure: " + std::string (err)); }
-        return NULL;
-      }
-    return FrameModel::construct (context, key, frame);
+    try
+      { return builder.make (block); }
+    catch (const std::string& err)
+      { block.error ("Build failed: " + err); }
+    catch (const char *const err)
+      { block.error ("Build failure: " + std::string (err)); }
+    return NULL;
   }
 public:
-  explicit FrameBuildable (const Declare& declare)
+  explicit FrameBuildable (const Declare& declare,
+                           const Declare::Builder& build)
     : FrameDeclared (declare),
-      declaration (dynamic_cast<const DeclareModel*> (&declare))
+      builder (build)
   { }
 };
 
@@ -328,16 +319,7 @@ Declare::~Declare ()
 
 FrameModel& 
 Declare::create_frame () const 
-{ 
-  if (const DeclareModel* model = dynamic_cast<const DeclareModel*> (this))
-    {
-      std::ostringstream tmp;
-      tmp << "Component = " << component << "; name = " << name 
-          << "; super = " << model->super;
-      daisy_panic (tmp.str ());
-    }
-  return *new FrameBuildable (*this); 
-}
+{ return *new FrameDeclared (*this); }
 
 void 
 DeclareComponent::load (Frame& frame) const
@@ -358,6 +340,14 @@ DeclareComponent::DeclareComponent (const symbol component,
                                     const symbol description)
   : Declare (component, root_name (), description),
     librarian (component, description)
+{ }
+
+FrameModel& 
+DeclareSolo::create_frame () const
+{ return *new FrameBuildable (*this, *this); }
+
+DeclareSolo::DeclareSolo (const symbol component, const symbol description)
+  : DeclareComponent (component, description)
 { }
 
 const FrameModel* 
@@ -400,7 +390,7 @@ DeclareBase::DeclareBase (const symbol component,
 
 FrameModel& 
 DeclareModel::create_frame () const 
-{ return *new FrameBuildable (*this); }
+{ return *new FrameBuildable (*this, *this); }
 
 void 
 DeclareModel::load (Frame& frame) const
