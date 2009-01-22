@@ -51,7 +51,7 @@ HorHeat::heat_capacity (double pTheta, double pIce) const
     + heat_capacity_table[Ice] * pIce; }
 
 void
-HorHeat::load_syntax (FrameSubmodel& frame)
+HorHeat::load_syntax (Frame& frame)
 {
 
   frame.add ("quarts_form_factor", Value::None (), Check::positive (), 

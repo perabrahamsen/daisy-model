@@ -58,7 +58,7 @@ struct Soil::Implementation
     { output_derived (horizon, "horizon", log); }
 
     // Create and Destroy.
-    static void load_syntax (FrameSubmodel& frame)
+    static void load_syntax (Frame& frame)
     { 
       frame.alist ().add ("description", "\
 A location and content of a soil layer.\n\
@@ -95,7 +95,7 @@ The layers apply to the soil section not covered by the 'zones' parameter.");
     { output_derived (horizon, "horizon", log); }
 
     // Create and Destroy.
-    static void load_syntax (FrameSubmodel& frame)
+    static void load_syntax (Frame& frame)
     { 
       frame.alist ().add ("description", "\
 A location and content of a soil zone.\n\
@@ -508,7 +508,7 @@ check_alist (const AttributeList& al, Treelog& err)
 }  
 
 void
-Soil::load_syntax (FrameSubmodel& frame)
+Soil::load_syntax (Frame& frame)
 { 
   frame.add_check (check_alist);
   frame.add_submodule_sequence ("horizons", Value::State, "\

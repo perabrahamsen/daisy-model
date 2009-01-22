@@ -99,7 +99,7 @@ IMvec::output (Log& log) const
 }
 
 void 
-IMvec::add_syntax (FrameSubmodel& frame,
+IMvec::add_syntax (Frame& frame,
                    Value::category cat, 
                    const symbol dimension)
 {

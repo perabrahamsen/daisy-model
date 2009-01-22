@@ -168,7 +168,7 @@ struct AM::Implementation::Lock
   void output (Log&) const;
     
   // Create and Destroy.
-  static void load_syntax (FrameSubmodel&);
+  static void load_syntax (Frame&);
   Lock (symbol c, symbol p);
   Lock (const AttributeList& al);
 };
@@ -182,7 +182,7 @@ AM::Implementation::Lock::output (Log& log) const
 
 
 void
-AM::Implementation::Lock::load_syntax (FrameSubmodel& frame)
+AM::Implementation::Lock::load_syntax (Frame& frame)
 {
   frame.add ("crop", Value::String, Value::State, 
 	      "Crop to which this am is locked");
@@ -1220,7 +1220,7 @@ Initial added organic matter at the start of the simulation.")
     return ok;
   }
 
-  static void load_layer (FrameSubmodel& frame)
+  static void load_layer (Frame& frame)
   {
     frame.add ("end", "cm", Check::negative (), Value::Const, "\
 Height where this layer ends (a negative number).");

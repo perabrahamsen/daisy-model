@@ -503,7 +503,7 @@ RootSystem::check (const Units& units, Treelog& msg) const
 }
 
 void 
-RootSystem::load_syntax (FrameSubmodel& frame)
+RootSystem::load_syntax (Frame& frame)
 {
 
   frame.add_object ("rootdens", Rootdens::component, 

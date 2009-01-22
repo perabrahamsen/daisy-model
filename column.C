@@ -40,7 +40,7 @@ Column::library_id () const
 }
 
 void
-Column::Point::load_syntax (FrameSubmodel& frame)
+Column::Point::load_syntax (Frame& frame)
 { 
   frame.add ("x", Value::Unknown (), Value::Const, "X-Coordinate.");
   frame.add ("y", Value::Unknown (), Value::Const, "Y-Coordinate.");

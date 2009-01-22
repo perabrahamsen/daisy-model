@@ -619,7 +619,7 @@ Production::output (Log& log) const
 }
 
 void 
-Production::load_syntax (FrameSubmodel& frame)
+Production::load_syntax (Frame& frame)
 {
 
   // Remobilization.

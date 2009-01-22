@@ -359,7 +359,7 @@ Snow::storage () const
 }
 
 void
-Snow::load_syntax (FrameSubmodel& frame)
+Snow::load_syntax (Frame& frame)
 { 
 
   static const double hours_per_day = 24.0; // [h/d]

@@ -659,11 +659,11 @@ SoilHeat::check (const size_t n, Treelog& err) const
 }
 
 static void
-load_T (FrameSubmodel& frame)
+load_T (Frame& frame)
 { Geometry::add_layer (frame, "dg C", Value::Const, "Soil temperature."); }
 
 void
-SoilHeat::load_syntax (FrameSubmodel& frame)
+SoilHeat::load_syntax (Frame& frame)
 { 
   Geometry::add_layer (frame, Value::OptionalState, "T", load_T);
   frame.add ("S", "erg/cm^3/h", Value::OptionalState, 

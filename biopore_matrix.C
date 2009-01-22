@@ -969,7 +969,7 @@ static struct BioporeMatrixSyntax : DeclareModel
     : DeclareModel (Biopore::component, "matrix", "\
 Biopores that ends in the matrix.")
   { }
-  static void load_solute (FrameSubmodel& frame)
+  static void load_solute (Frame& frame)
   { IMvec::add_syntax (frame, Value::OptionalState, IM::mass_unit ()); }
   void load_frame (Frame& frame) const
   { 

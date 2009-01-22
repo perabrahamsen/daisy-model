@@ -53,7 +53,7 @@ struct Rootdens_PLF : public Rootdens
     const PLF& density;
     
     // Create and Destroy.
-    static void load_syntax (FrameSubmodel&);
+    static void load_syntax (Frame&);
     Entry (const AttributeList&);
     ~Entry ();
   };
@@ -77,7 +77,7 @@ struct Rootdens_PLF : public Rootdens
 static Rootdens_PLF::Check_Indexes check_indexes;
 
 void 
-Rootdens_PLF::Entry::load_syntax (FrameSubmodel& frame)
+Rootdens_PLF::Entry::load_syntax (Frame& frame)
 {
   frame.add ("index", Value::Unknown (), Check::none (), Value::Const, 
 	      "Index for specifying root density.");

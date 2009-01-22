@@ -33,7 +33,7 @@ class Treelog;
 class Groundwater;
 class Volume;
 class Frame;
-class FrameSubmodel;
+class Frame;
 
 class Geometry
 {
@@ -258,9 +258,9 @@ public:
                         const double from, const double to) const;
 
   // Layers -- Support initializing soil arrays layer by layer.
-  typedef void (*load_syntax_t) (FrameSubmodel&);
+  typedef void (*load_syntax_t) (Frame&);
 public:
-  static void add_layer (FrameSubmodel&, symbol dimension, Value::category, 
+  static void add_layer (Frame&, symbol dimension, Value::category, 
                          symbol description);
   static void add_layer (Frame& frame, Value::category, 
                          symbol name,

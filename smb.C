@@ -124,7 +124,7 @@ SMB::turnover_dom (const std::vector<bool>& active, const double* factor,
 }
 
 void 
-SMB::load_syntax (FrameSubmodel& frame)
+SMB::load_syntax (Frame& frame)
 {
   OM::load_syntax (frame, "\
 The first numbers corresponds to each of the SMB pools, the next\n\

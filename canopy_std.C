@@ -211,7 +211,7 @@ CanopyStandard::output (Log& log) const
 }
 
 void 
-CanopyStandard::load_syntax (FrameSubmodel& frame)
+CanopyStandard::load_syntax (Frame& frame)
 {
   CanopySimple::load_syntax (frame);
 

@@ -633,7 +633,7 @@ Toplevel::parse_system_file (const std::string& filename)
 }
 
 void
-Toplevel::load_submodel (FrameSubmodel& frame)
+Toplevel::load_submodel (Frame& frame)
 {
   load_frame (frame);
 }

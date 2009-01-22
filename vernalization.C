@@ -65,7 +65,7 @@ Vernalization::no_vernalization ()
 }
 
 void 
-Vernalization::load_syntax (FrameSubmodel& frame)
+Vernalization::load_syntax (Frame& frame)
 {
   frame.add ("required", Value::Boolean, Value::OptionalConst,
 	      "True, iff the crop requires vernalization.");

@@ -54,7 +54,7 @@ struct Hydraulic::K_at_h
   const double K;
 
   // Create and Destroy.
-  static void load_syntax (FrameSubmodel& frame)
+  static void load_syntax (Frame& frame)
   {
     frame.add ("h", "cm", Check::non_positive (), Value::Const, 
 		"Soil water pressure.");

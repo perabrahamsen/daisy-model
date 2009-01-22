@@ -27,7 +27,7 @@
 #include <vector>
 #include <iosfwd>
 
-class FrameSubmodel;
+class Frame;
 class Syntax;
 class AttributeList;
 class Frame;
@@ -81,7 +81,7 @@ private:
 public:
   static void initialize (const std::vector<Fetch*>& fetch,
                           std::vector<Select*>& select, Treelog& msg);
-  static void load_syntax (FrameSubmodel&);
+  static void load_syntax (Frame&);
   explicit Fetch (const AttributeList& al);
   explicit Fetch (const symbol key);
 };

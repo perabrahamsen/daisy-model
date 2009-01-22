@@ -30,7 +30,7 @@
 #include "syntax.h"
 
 void 
-GnuplotBase::Size::load_syntax (FrameSubmodel& frame)
+GnuplotBase::Size::load_syntax (Frame& frame)
 {
   frame.add ("x", Value::None (), Value::Const, "\
 Relative horizontal size of plot.");

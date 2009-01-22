@@ -28,6 +28,7 @@
 
 class Library;
 class Declare;
+class Frame;
 class FrameSubmodel;
 
 class Intrinsics 
@@ -46,7 +47,7 @@ public:
 
   // Submodels.
 private:
-  typedef void (*load_syntax_t) (FrameSubmodel&);
+  typedef void (*load_syntax_t) (Frame&);
   typedef std::map<load_syntax_t, FrameSubmodel*> submodel_load_frame_t;
   typedef std::map<symbol, load_syntax_t> submodel_name_load_t;
   typedef std::map<load_syntax_t, symbol> submodel_load_name_t;

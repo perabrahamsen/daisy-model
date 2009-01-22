@@ -124,7 +124,7 @@ GeometryRect::check_y_border (const double, Treelog& err) const
 }
 
 void
-GeometryRect::load_syntax (FrameSubmodel& frame)
+GeometryRect::load_syntax (Frame& frame)
 { 
   frame.add ("zplus", "cm", Check::negative (), 
 	      Value::Const, Value::Sequence,

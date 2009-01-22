@@ -207,7 +207,7 @@ Syntax::Implementation::check (const Metalib& metalib,
       else if (types[key] == Value::AList)
         {
           const Syntax::load_syntax_t load_syntax = submodels[key];
-          const FrameSubmodel& key_frame 
+          const Frame& key_frame 
             = Librarian::submodel_frame (load_syntax);
           const Syntax& key_syntax = key_frame.syntax ();
 
@@ -393,7 +393,7 @@ Syntax::syntax (const symbol key) const
     = impl->submodels.find (key);
   daisy_assert (i != impl->submodels.end ());
   const load_syntax_t load_syntax = (*i).second;
-  const FrameSubmodel& frame = Librarian::submodel_frame (load_syntax);
+  const Frame& frame = Librarian::submodel_frame (load_syntax);
   return frame.syntax ();
 }
 

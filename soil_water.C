@@ -632,16 +632,16 @@ SoilWater::check (const size_t n, Treelog& msg) const
 }
 
 static void
-load_h (FrameSubmodel& frame)
+load_h (Frame& frame)
 { Geometry::add_layer (frame, "cm", Value::Const, "Soil water pressure."); }
 
 static void
-load_Theta (FrameSubmodel& frame)
+load_Theta (Frame& frame)
 { Geometry::add_layer (frame, Value::Fraction (), Value::Const, 
                        "Soil water content."); }
 
 void
-SoilWater::load_syntax (FrameSubmodel& frame)
+SoilWater::load_syntax (Frame& frame)
 {
   frame.add ("max_exfiltration_gradient", "cm/cm", Check::positive (), 
               Value::OptionalConst,

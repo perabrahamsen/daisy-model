@@ -73,7 +73,7 @@ struct Ridge::Implementation
   void output (Log& log) const;
 
   // Create and Destroy.
-  static void load_syntax (FrameSubmodel&);
+  static void load_syntax (Frame&);
   void initialize (const Geometry1D& geo, const Soil&, const SoilWater&);
   static PLF normalize (PLF plf);
   Implementation (const AttributeList&);
@@ -435,7 +435,7 @@ Ridge::Implementation::initialize (const Geometry1D& geo,
 }
 
 void
-Ridge::load_syntax (FrameSubmodel& frame)
+Ridge::load_syntax (Frame& frame)
 {
   
   // Parameters.

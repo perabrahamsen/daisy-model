@@ -22,7 +22,7 @@
 #include <memory>
 #include <vector>
 
-class FrameSubmodel;
+class Frame;
 class AttributeList;
 class PLF;
 class Block;
@@ -172,7 +172,7 @@ public:
 
   void add_library (const symbol, symbol lib);
 
-  typedef void (*load_syntax_t) (FrameSubmodel&);
+  typedef void (*load_syntax_t) (Frame&);
   void add_submodule (const symbol name, 
 		      Value::category cat, const symbol description,
 		      load_syntax_t load_syntax);

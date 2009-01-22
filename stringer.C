@@ -60,7 +60,7 @@ struct StringerCond : public Stringer
   {
     const std::auto_ptr<Boolean> condition;
     const symbol  value;
-    static void load_syntax (FrameSubmodel& frame)
+    static void load_syntax (Frame& frame)
     {
       frame.alist ().add ("description", "\
 If condition is true, return value.");

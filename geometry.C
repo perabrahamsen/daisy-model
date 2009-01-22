@@ -639,7 +639,7 @@ static struct CheckLayers : public VCheck
 } check_layers;
 
 void 
-Geometry::add_layer (FrameSubmodel& frame, const symbol dimension,
+Geometry::add_layer (Frame& frame, const symbol dimension,
                      const Value::category cat, 
                      const symbol description)
 {

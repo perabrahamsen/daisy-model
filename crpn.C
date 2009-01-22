@@ -196,7 +196,7 @@ CrpN::check_alist (const AttributeList& al, Treelog& err)
 }
 
 void 
-CrpN::load_syntax (FrameSubmodel& frame)
+CrpN::load_syntax (Frame& frame)
 {
 
   // Content.

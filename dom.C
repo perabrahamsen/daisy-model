@@ -178,7 +178,7 @@ DOM::tock (const std::vector<bool>& active,
 }
 
 void 
-DOM::load_syntax (FrameSubmodel& frame)
+DOM::load_syntax (Frame& frame)
 {
   // Submodel.
 

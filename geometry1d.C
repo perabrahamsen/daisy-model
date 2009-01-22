@@ -179,7 +179,7 @@ Geometry1D::swap (std::vector<double>& v, double from, double middle, double to)
 #endif
 
 void
-Geometry1D::load_syntax (FrameSubmodel& frame)
+Geometry1D::load_syntax (Frame& frame)
 { 
   frame.add_check (check_alist);
   frame.add ("zplus", "cm", Check::negative (), 

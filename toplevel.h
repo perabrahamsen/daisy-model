@@ -28,7 +28,7 @@
 #include <boost/noncopyable.hpp>
 
 class Frame;
-class FrameSubmodel;
+class Frame;
 class Metalib;
 class Program;
 class Syntax;
@@ -105,7 +105,7 @@ public:
   void command_line (int& argc, char**& argv);
   void parse_file (const std::string&);
   void parse_system_file (const std::string&);
-  static void load_submodel (FrameSubmodel&);
+  static void load_submodel (Frame&);
   static void load_frame (Frame&);
 private:
   static void load_syntax (Frame&);

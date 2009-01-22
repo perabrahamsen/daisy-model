@@ -57,12 +57,12 @@ public:
       }
     return false;
   }
-  static void load_syntax (FrameSubmodel&);
+  static void load_syntax (Frame&);
   explicit Filter (Block&);
 };
 
 void 
-LexerTable::Filter::load_syntax (FrameSubmodel& frame)
+LexerTable::Filter::load_syntax (Frame& frame)
 {
   frame.add ("tag", Value::String, Value::Const, "\
 Name of column in Daisy log file to filter for.");

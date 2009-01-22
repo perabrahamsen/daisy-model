@@ -25,7 +25,7 @@
 
 #include <vector>
 
-class FrameSubmodel;
+class Frame;
 struct AttributeList;
 struct Frame;
 struct Treelog;
@@ -48,7 +48,7 @@ struct HorHeat
   double heat_capacity (double Theta, double Ice) const; // [erg/cm^3/dg C]
 
   // Create and Destroy.
-  static void load_syntax (FrameSubmodel&);
+  static void load_syntax (Frame&);
   // Note:  These variables are really not used after initialization.
   enum constituents
   { 

@@ -512,7 +512,7 @@ static bool check_alist (const AttributeList& al, Treelog& msg)
   return ok;
 }
 void
-Time::load_syntax (FrameSubmodel& frame)
+Time::load_syntax (Frame& frame)
 {
   frame.add_check (check_alist);
   frame.add ("year", Value::Integer, Value::State, "Current year.");

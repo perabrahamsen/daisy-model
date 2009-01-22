@@ -23,7 +23,7 @@
 #define LITTER_H
 
 class AttributeList;
-class FrameSubmodel;
+class Frame;
 
 class Litter
 {
@@ -35,7 +35,7 @@ public:
 
   // Create and Destroy.
 public:
-  static void load_syntax (FrameSubmodel&);
+  static void load_syntax (Frame&);
   Litter (const AttributeList&);
   ~Litter ();
 };

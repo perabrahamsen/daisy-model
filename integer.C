@@ -97,7 +97,7 @@ struct IntegerCond : public Integer
   {
     const std::auto_ptr<Boolean> condition;
     const int value;
-    static void load_syntax (FrameSubmodel& frame)
+    static void load_syntax (Frame& frame)
     {
       frame.alist ().add ("description", "\
 If condition is true, return value.");

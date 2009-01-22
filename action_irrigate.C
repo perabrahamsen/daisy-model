@@ -170,7 +170,7 @@ Shared parameter for irrigate actions.")
     return ok;
   }
 
-  static void load_ppm (FrameSubmodel& frame)
+  static void load_ppm (Frame& frame)
   { IM::add_syntax (frame, Value::Const, Units::ppm ()); }
 
   void load_frame (Frame& frame) const

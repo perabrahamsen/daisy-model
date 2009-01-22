@@ -57,7 +57,7 @@ struct ActionCrop : public Action
     
     // Create and Destroy.
     static bool check_alist (const AttributeList& al, Treelog&);
-    static void load_syntax (FrameSubmodel&);
+    static void load_syntax (Frame&);
     MM_DD (const AttributeList&);
     ~MM_DD ();
   };
@@ -77,7 +77,7 @@ struct ActionCrop : public Action
 
     // Create and Destroy.
     static bool check_alist (const AttributeList& al, Treelog&);
-    static void load_syntax (FrameSubmodel&);
+    static void load_syntax (Frame&);
     Sow (const AttributeList&);
     ~Sow ();
   };
@@ -100,7 +100,7 @@ struct ActionCrop : public Action
 
     // Create and Destroy.
     static bool check_alist (const AttributeList& al, Treelog&);
-    static void load_syntax (FrameSubmodel&);
+    static void load_syntax (Frame&);
     Annual (const AttributeList&);
     ~Annual ();
   };
@@ -131,7 +131,7 @@ struct ActionCrop : public Action
 
     // Create and Destroy.
     static bool check_alist (const AttributeList& al, Treelog&);
-    static void load_syntax (FrameSubmodel&);
+    static void load_syntax (Frame&);
     Perennial (const AttributeList&);
     ~Perennial ();
   };
@@ -144,7 +144,7 @@ struct ActionCrop : public Action
     const AttributeList& what;
     
     static bool check_alist (const AttributeList& al, Treelog&);
-    static void load_syntax (FrameSubmodel&);
+    static void load_syntax (Frame&);
     Fertilize (const AttributeList&);
     ~Fertilize ();
   };
@@ -165,7 +165,7 @@ struct ActionCrop : public Action
 
     // Create and Destroy.
     static bool check_alist (const AttributeList& al, Treelog&);
-    static void load_syntax (FrameSubmodel&);
+    static void load_syntax (Frame&);
     Tillage (Block&);
     ~Tillage ();
   };
@@ -185,7 +185,7 @@ struct ActionCrop : public Action
 
     // Create and Destroy.
     static bool check_alist (const AttributeList& al, Treelog&);
-    static void load_syntax (FrameSubmodel&);
+    static void load_syntax (Frame&);
     Spray (const AttributeList&);
     ~Spray ();
   };
@@ -204,7 +204,7 @@ struct ActionCrop : public Action
     bool doIt (Daisy&, const Scope&, Treelog&) const;
 
     // Create and Destroy.
-    static void load_syntax (FrameSubmodel&);
+    static void load_syntax (Frame&);
     Irrigation (const AttributeList&);
     ~Irrigation ();
   };
@@ -263,7 +263,7 @@ ActionCrop::MM_DD::check_alist (const AttributeList& frame, Treelog& err)
 }
 
 void 
-ActionCrop::MM_DD::load_syntax (FrameSubmodel& frame)
+ActionCrop::MM_DD::load_syntax (Frame& frame)
 {
   frame.add_check (check_alist);
   frame.add ("month", Value::Integer, Value::Const, 
@@ -310,7 +310,7 @@ ActionCrop::Sow::check_alist (const AttributeList&, Treelog&)
 }
 
 void 
-ActionCrop::Sow::load_syntax (FrameSubmodel& frame)
+ActionCrop::Sow::load_syntax (Frame& frame)
 { 
   frame.add_check (check_alist);
   frame.add_submodule ("date", Value::Const, "Date to sow.",
@@ -364,7 +364,7 @@ ActionCrop::Annual::check_alist (const AttributeList&, Treelog&)
 }
 
 void 
-ActionCrop::Annual::load_syntax (FrameSubmodel& frame)
+ActionCrop::Annual::load_syntax (Frame& frame)
 { 
   frame.add_check (check_alist);
   frame.add_fraction ("loss", Value::Const, "Fraction lost during harvest.");
@@ -480,7 +480,7 @@ ActionCrop::Perennial::check_alist (const AttributeList& al, Treelog& err)
 }
 
 void 
-ActionCrop::Perennial::load_syntax (FrameSubmodel& frame)
+ActionCrop::Perennial::load_syntax (Frame& frame)
 { 
   frame.add_check (check_alist);
   frame.add ("seasons", Value::Integer, Value::Const, 
@@ -563,7 +563,7 @@ ActionCrop::Fertilize::check_alist (const AttributeList& al, Treelog& err)
 }
 
 void 
-ActionCrop::Fertilize::load_syntax (FrameSubmodel& frame)
+ActionCrop::Fertilize::load_syntax (Frame& frame)
 { 
   frame.add_check (check_alist);
   frame.add ("month", Value::Integer, Value::Const, 
@@ -627,7 +627,7 @@ ActionCrop::Tillage::check_alist (const AttributeList& al, Treelog& err)
 }
 
 void 
-ActionCrop::Tillage::load_syntax (FrameSubmodel& frame)
+ActionCrop::Tillage::load_syntax (Frame& frame)
 { 
   frame.add_check (check_alist);
   frame.add ("month", Value::Integer, Value::Const, 
@@ -679,7 +679,7 @@ ActionCrop::Spray::check_alist (const AttributeList& al, Treelog& err)
 }
 
 void 
-ActionCrop::Spray::load_syntax (FrameSubmodel& frame)
+ActionCrop::Spray::load_syntax (Frame& frame)
 { 
   frame.add_check (check_alist);
   frame.add ("month", Value::Integer, Value::Const, 
@@ -733,7 +733,7 @@ ActionCrop::Irrigation::doIt (Daisy& daisy, const Scope&, Treelog& msg) const
 }
 
 void 
-ActionCrop::Irrigation::load_syntax (FrameSubmodel& frame)
+ActionCrop::Irrigation::load_syntax (Frame& frame)
 { 
   frame.add_submodule ("from", Value::Const, 
 			"Start of irrigation period.",

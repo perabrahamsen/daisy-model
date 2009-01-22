@@ -248,7 +248,7 @@ struct LogExtern::NumEntry
   const symbol name;
   const double value;
 
-  static void load_syntax (FrameSubmodel& frame)
+  static void load_syntax (Frame& frame)
   {
     frame.add ("name", Value::String, Value::State, "\
 Name to refer to number with.");

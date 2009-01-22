@@ -26,7 +26,7 @@
 #include <string>
 #include <memory>
 
-class FrameSubmodel;
+class Frame;
 class AttributeList;
 class Syntax;
 class Block;
@@ -70,7 +70,7 @@ public:
   };
   static const VCheck& positive ();
   static const VCheck& non_zero ();
-  static void load_syntax (FrameSubmodel&);
+  static void load_syntax (Frame&);
   static void load_frame (Frame&);
   static const Timestep& null ();
   explicit Timestep (Block&);

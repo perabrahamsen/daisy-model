@@ -25,7 +25,7 @@
 
 #include <vector>
 
-class FrameSubmodel;
+class Frame;
 class AttributeList;
 class Frame;
 class Log;
@@ -56,7 +56,7 @@ public:
   void initialize (const Geometry&, const Soil&);
   AM* create_am (const Geometry&);
   void set_am (AM*);
-  static void load_syntax (FrameSubmodel&);
+  static void load_syntax (Frame&);
   Bioincorporation (const AttributeList&);
   ~Bioincorporation ();
 };

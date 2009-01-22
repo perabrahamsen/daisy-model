@@ -362,7 +362,7 @@ hydraulic model");
       }
     return ok;
   }
-  static void load_attributes (FrameSubmodel& frame)
+  static void load_attributes (Frame& frame)
   {
     frame.add ("key", Value::String, Value::Const,
                    "Name of attribute.");

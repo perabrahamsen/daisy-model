@@ -43,7 +43,7 @@ struct NumberLet : public Number
       symbol id;
       std::auto_ptr<Number> expr;
 
-      static void load_syntax (FrameSubmodel& frame)
+      static void load_syntax (Frame& frame)
       {
         frame.alist ().add ("description", "Bind an identifier to an expression.");
         frame.add ("identifier", Value::String, Value::Const, 

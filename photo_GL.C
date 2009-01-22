@@ -69,7 +69,7 @@ public:
   { return false; }
   bool handle_water_stress () const
   { return false; }
-  static void load_syntax (FrameSubmodel&);
+  static void load_syntax (Frame&);
   PhotoGL (Block& al)
     : Photo (al),
       Qeff (al.number ("Qeff")),

@@ -236,7 +236,7 @@ static const class CheckTable : public VCheck
 
 static struct DepthPLFSyntax : public DeclareModel
 {
-  static void entry_syntax (FrameSubmodel& frame)
+  static void entry_syntax (Frame& frame)
   {
     frame.add_submodule ("time", Value::Const, "Time.",
                           Time::load_syntax);

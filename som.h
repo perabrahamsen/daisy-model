@@ -24,13 +24,13 @@
 
 #include "om.h"
 
-class FrameSubmodel;
+class Frame;
 
 class SOM : public OM
 { 
   // Create & Destroy.
 public:
-  static void load_syntax (FrameSubmodel&);
+  static void load_syntax (Frame&);
   SOM (const AttributeList& al);
 };
 

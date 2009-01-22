@@ -947,7 +947,7 @@ static struct ColumnStandardSyntax : public DeclareModel
   { return new ColumnStandard (al); }
 
 #if 0
-  static void load_water_and_macro (FrameSubmodel& frame)
+  static void load_water_and_macro (Frame& frame)
   {
     SoilWater::load_syntax (frame);
     frame.add_object ("macro", Macro::component,

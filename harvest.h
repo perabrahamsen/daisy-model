@@ -27,7 +27,7 @@
 #include "symbol.h"
 #include "block.h"
 
-class FrameSubmodel;
+class Frame;
 class AttributeList;
 class Syntax;
 class Log;
@@ -64,7 +64,7 @@ public:
 
   // Create and Destroy.
 public:
-  static void load_syntax (FrameSubmodel&);
+  static void load_syntax (Frame&);
   Harvest (Block& al);
   Harvest (symbol col, Time t, symbol crp, 
 	   double sDM, double sN, double sC, double dDM, double dN, double dC,

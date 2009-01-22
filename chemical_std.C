@@ -68,7 +68,7 @@ struct ChemicalStandard : public Chemical
   {
     const double fraction;
     const symbol chemical;
-    static void load_syntax (FrameSubmodel&);
+    static void load_syntax (Frame&);
     Product (Block&);
   };
   const auto_vector<const Product*> product;
@@ -227,7 +227,7 @@ const symbol
 ChemicalStandard::g_per_cm3 ("g/cm^3");
 
 void
-ChemicalStandard::Product::load_syntax (FrameSubmodel& frame)
+ChemicalStandard::Product::load_syntax (Frame& frame)
 {
   frame.add ("fraction", Value::Fraction (), Value::Const,
 	      "Fraction of decomposed matter that become this chemcial.");
@@ -1425,27 +1425,27 @@ You may not specify both 'decompose_rate' and 'decompose_halftime'");
     return ok;
   }
 
-  static void load_C (FrameSubmodel& frame)
+  static void load_C (Frame& frame)
   { Geometry::add_layer (frame, "g/cm^3", Value::Const, "\
 Concentration in water."); }
 
-  static void load_C_secondary (FrameSubmodel& frame)
+  static void load_C_secondary (Frame& frame)
   { Geometry::add_layer (frame, "g/cm^3", Value::Const, "\
 Concentration in secondary domain."); }
 
-  static void load_C_primary (FrameSubmodel& frame)
+  static void load_C_primary (Frame& frame)
   { Geometry::add_layer (frame, "g/cm^3", Value::Const, "\
 Concentration in primary domain."); }
 
-  static void load_M (FrameSubmodel& frame)
+  static void load_M (Frame& frame)
   { Geometry::add_layer (frame, "g/cm^3", Value::Const, "\
 Total mass per volume water, soil, and air."); }
 
-  static void load_M_primary (FrameSubmodel& frame)
+  static void load_M_primary (Frame& frame)
   { Geometry::add_layer (frame, "g/cm^3", Value::Const, "\
 Primary domain mass per volume water, soil, and air."); }
 
-  static void load_Ms (FrameSubmodel& frame)
+  static void load_Ms (Frame& frame)
   { Geometry::add_layer (frame, Value::Fraction (), Value::Const, "\
 Mass in dry soil.\n\
 This include all matter in both soil and water, relative to the\n\

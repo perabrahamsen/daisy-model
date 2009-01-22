@@ -44,7 +44,7 @@ struct NumberPLF : public Number
     const double y_value;
     const symbol y_dimension;
 
-    static void load_syntax (FrameSubmodel& frame)
+    static void load_syntax (Frame& frame)
     {
       frame.add ("x", Value::User (), Value::Const, "Operand.");
       frame.add ("y", Value::User (), Value::Const, "Value.");

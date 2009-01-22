@@ -258,7 +258,7 @@ AOM::tick (const std::vector<bool>& active, const double* abiotic_factor,
 }
 
 void 
-AOM::load_syntax (FrameSubmodel& frame)
+AOM::load_syntax (Frame& frame)
 {
   OM::load_syntax (frame, "\
 The first numbers corresponds to each of the SMB pools, the next\n\

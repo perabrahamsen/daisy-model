@@ -85,7 +85,7 @@ static bool check_alist (const AttributeList& al, Treelog& err)
 }
 
 void 
-Partition::load_syntax (FrameSubmodel& frame)
+Partition::load_syntax (Frame& frame)
 {
   frame.add_check (check_alist);
   frame.add ("Root", "DS", Value::Fraction (), Check::fraction (),

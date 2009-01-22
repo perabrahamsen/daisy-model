@@ -37,7 +37,7 @@
 #define EXPORT __declspec(dllimport)
 #endif
 
-class FrameSubmodel;
+class Frame;
 class AttributeList;
 class Frame;
 class Log;
@@ -113,7 +113,7 @@ public:
 
   // Create.
 public:
-  static void load_syntax (FrameSubmodel&);
+  static void load_syntax (Frame&);
   explicit Time (const AttributeList&);
   explicit Time (Block&);
 

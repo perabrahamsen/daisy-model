@@ -514,7 +514,7 @@ Harvesting::output (Log& log) const
 }
 
 void 
-Harvesting::load_syntax (FrameSubmodel& frame)
+Harvesting::load_syntax (Frame& frame)
 {
   // Submodel.
 

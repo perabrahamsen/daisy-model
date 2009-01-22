@@ -26,7 +26,7 @@
 #include "check.h"
 
 void
-Litter::load_syntax (FrameSubmodel& frame)
+Litter::load_syntax (Frame& frame)
 {
   frame.add_fraction ("vapor_flux_factor", Value::Const, "\
 Reduction factor for potential evaporation below litter.");

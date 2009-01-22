@@ -174,10 +174,10 @@ Shared parameters for old models.")
 
     return ok;
   }
-  static void load_dry (FrameSubmodel& frame)
+  static void load_dry (Frame& frame)
   { IM::add_syntax (frame, Value::Const, Weather::dry_deposit_unit ()); }
 
-  static void load_ppm (FrameSubmodel& frame)
+  static void load_ppm (Frame& frame)
   { IM::add_syntax (frame, Value::Const, Units::ppm ()); }
 
   void load_frame (Frame& frame) const

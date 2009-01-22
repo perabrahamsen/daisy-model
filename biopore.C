@@ -248,7 +248,7 @@ static struct BioporeInit : public DeclareComponent
     : DeclareComponent (Biopore::component, "\
 A single class of biopores.")
   { }
-  static void load_flux (FrameSubmodel& frame)
+  static void load_flux (Frame& frame)
   { IM::add_syntax (frame, Value::LogOnly, IM::flux_unit ()); }
 
   void load_frame (Frame& frame) const

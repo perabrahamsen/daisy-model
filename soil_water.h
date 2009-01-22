@@ -24,7 +24,7 @@
 
 #include <vector>
 
-class FrameSubmodel;
+class Frame;
 class AttributeList;
 class Surface;
 class Groundwater;
@@ -164,7 +164,7 @@ public:
 
   // Creation.
 public:
-  static void load_syntax (FrameSubmodel&);
+  static void load_syntax (Frame&);
   void initialize (const AttributeList&, const Geometry&,
                    const Soil&, const SoilHeat&, const Groundwater&, Treelog&);
   SoilWater (Block&);

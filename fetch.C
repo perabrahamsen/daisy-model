@@ -257,7 +257,7 @@ Fetch::initialize (const std::vector<Fetch*>& fetch,
 }
 
 void
-Fetch::load_syntax (FrameSubmodel& frame)
+Fetch::load_syntax (Frame& frame)
 { 
   frame.alist ().add ("description", "A summary file line.");
   frame.add ("tag", Value::String, Value::Const, "\

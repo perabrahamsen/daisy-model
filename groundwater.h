@@ -26,7 +26,7 @@
 
 #include "model.h"
 
-class FrameSubmodel;
+class Frame;
 class Time;
 class Treelog;
 class Geometry;
@@ -72,7 +72,7 @@ public:
 
     // Create and Destroy.
 public:
-  static void load_syntax (FrameSubmodel&);
+  static void load_syntax (Frame&);
   virtual void initialize (const Units&, const Geometry&, const Time&, 
 			   const Scope&, Treelog&) = 0;
   virtual bool check (const Units&, 

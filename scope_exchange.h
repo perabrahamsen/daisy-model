@@ -25,7 +25,7 @@
 #include <map>
 #include <vector>
 
-class FrameSubmodel;
+class Frame;
 class Block;
 class Syntax;
 class AttributeList;
@@ -56,7 +56,7 @@ public:
 
   // Create and Destroy.
 public:
-  static void load_syntax (FrameSubmodel&);
+  static void load_syntax (Frame&);
 protected:
   explicit Exchange (symbol name, symbol description);
 public:

@@ -63,7 +63,7 @@ Harvest::output (Log& log) const
 }
 
 void 
-Harvest::load_syntax (FrameSubmodel& frame)
+Harvest::load_syntax (Frame& frame)
 {
   frame.add ("column", Value::String, Value::State,
 	      "Name of column where the yield were harvested.");

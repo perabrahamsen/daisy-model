@@ -324,7 +324,7 @@ static struct WeatherBaseSyntax : public DeclareBase
     : DeclareBase (Weather::component, "base", "\
 This is not a model, but a list of parameters shared by all weather models.")
   { }
-  static void load_flux (FrameSubmodel& frame)
+  static void load_flux (Frame& frame)
   { IM::add_syntax (frame, Value::LogOnly, IM::flux_unit ()); }
   void load_frame (Frame& frame) const
   {

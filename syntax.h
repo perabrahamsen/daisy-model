@@ -35,7 +35,7 @@ class Check;
 class VCheck;
 class Treelog;
 class Frame;
-class FrameSubmodel;
+class Frame;
 
 #ifdef __unix
 #define EXPORT /* Nothing */
@@ -161,7 +161,7 @@ public:
   { add (key, domain, range, check, cat, Value::Singleton, description); } 
 
   // Submodel.
-  typedef void (*load_syntax_t) (FrameSubmodel&);
+  typedef void (*load_syntax_t) (Frame&);
   void add (symbol, load_syntax_t, 
 	    Value::category cat, int size, 
 	    const symbol description);

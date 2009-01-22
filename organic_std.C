@@ -92,7 +92,7 @@ struct OrganicStandard : public OrganicMatter
 	       const std::vector<SOM*>&);
     void mix (const Geometry&, double from, double to);
     void swap (const Geometry&, double from, double middle, double to);
-    static void load_syntax (FrameSubmodel&);
+    static void load_syntax (Frame&);
     void initialize (const Geometry& geo);
     Buffer (const AttributeList& al);
   } buffer;
@@ -145,7 +145,7 @@ struct OrganicStandard : public OrganicMatter
     static int find_som_2 (const std::vector<SOM*>& som);
     static bool check_alist (const AttributeList&, Treelog&);
   public:
-    static void load_syntax (FrameSubmodel&);
+    static void load_syntax (Frame&);
     Initialization (const AttributeList&, const Geometry& geo,
                     const Soil& soil, 
                     const Bioincorporation& bioincorporation, 
@@ -332,7 +332,7 @@ OrganicStandard::Buffer::swap (const Geometry& geo,
 }
 
 void
-OrganicStandard::Buffer::load_syntax (FrameSubmodel& frame)
+OrganicStandard::Buffer::load_syntax (Frame& frame)
 {
   const std::vector<double> empty_vector;
   frame.add ("C", "g C/cm^3", Check::non_negative (),
@@ -400,7 +400,7 @@ OrganicStandard::Initialization::
 
 void
 OrganicStandard::Initialization::
-/**/ load_syntax (FrameSubmodel& frame)
+/**/ load_syntax (Frame& frame)
 {
   frame.add ("input", "kg C/ha/y", Check::non_negative (),
 	      Value::OptionalConst, "\
@@ -2922,7 +2922,7 @@ static struct OrganicStandardSyntax : DeclareModel
 Mineralization and immobilization in soil.")
   { }
 
-  static void load_layer (FrameSubmodel& frame)
+  static void load_layer (Frame& frame)
   {
     frame.add ("end", "cm", Check::negative (), Value::Const, "\
 End point of this layer (a negative number).");

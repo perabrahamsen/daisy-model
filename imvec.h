@@ -33,7 +33,7 @@
 class Log;
 class Block;
 class Unit;
-class FrameSubmodel;
+class Frame;
 
 class IMvec : private boost::noncopyable
 {
@@ -81,7 +81,7 @@ public:
 
   // Create and Destroy. 
 public:
-  static void add_syntax (FrameSubmodel& parent,
+  static void add_syntax (Frame& parent,
 			  Value::category cat, 
 			  const symbol dimension);
   explicit IMvec (Block&, const char*);

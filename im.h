@@ -31,7 +31,7 @@
 class Log;
 class Syntax;
 class AttributeList;
-class FrameSubmodel;
+class Frame;
 class Block;
 class Unit;
 
@@ -123,7 +123,7 @@ public:
 
   // Create. 
 public:
-  static void add_syntax (FrameSubmodel&, Value::category cat, 
+  static void add_syntax (Frame&, Value::category cat, 
 			  const symbol dimension);
   explicit IM (Block&, const char* key);
   explicit IM ();

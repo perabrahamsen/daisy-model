@@ -22,7 +22,7 @@
 #ifndef VERNALIZATION_H
 #define VERNALIZATION_H
 
-class FrameSubmodel;
+class Frame;
 class AttributeList;
 class Frame;
 class Log;
@@ -49,7 +49,7 @@ public:
   // Create and Destroy.
 public:
   static const AttributeList& no_vernalization ();
-  static void load_syntax (FrameSubmodel&);
+  static void load_syntax (Frame&);
   Vernalization (const AttributeList&);
   ~Vernalization ();
 };

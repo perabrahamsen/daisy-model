@@ -54,7 +54,7 @@ struct VegetationPermanent : public Vegetation
     double operator() (int year, int yday);
     
     // Create;
-    static void load_syntax (FrameSubmodel&);
+    static void load_syntax (Frame&);
     YearlyLAI (const std::vector<const AttributeList*>& als);
   } yearly_LAI;
   const PLF LAIvsDAY;		// LAI as a function of time.
@@ -231,7 +231,7 @@ VegetationPermanent::YearlyLAI::operator() (int year, int yday)
 }
     
 void 
-VegetationPermanent::YearlyLAI::load_syntax (FrameSubmodel& frame)
+VegetationPermanent::YearlyLAI::load_syntax (Frame& frame)
 {
   frame.add ("year", Value::Integer, Value::Const, "\
 Year for which to use yearly LAI measurements.");

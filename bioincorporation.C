@@ -297,7 +297,7 @@ Bioincorporation::set_am (AM* am)
 { impl.set_am (am); }
 
 void
-Bioincorporation::load_syntax (FrameSubmodel& frame)
+Bioincorporation::load_syntax (Frame& frame)
 { 
   // Incorporation speed.
   frame.add ("R_max", "g DM/m^2/h", Check::non_negative (), Value::Const, 

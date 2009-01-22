@@ -151,7 +151,7 @@ Timestep::non_zero ()
 }
 
 void 
-Timestep::load_syntax (FrameSubmodel& frame)
+Timestep::load_syntax (Frame& frame)
 { load_frame (frame); }
 
 void 

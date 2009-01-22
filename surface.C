@@ -519,7 +519,7 @@ Surface::Implementation::initialize (const Geometry& geo)
 }
 
 void
-Surface::load_syntax (FrameSubmodel& frame)
+Surface::load_syntax (Frame& frame)
 {
   frame.add_check (check_alist);
   frame.add ("EpFactor", Value::None (), Check::non_negative (), 

@@ -25,7 +25,7 @@
 #include "frame_submodel.h"
 
 void 
-SOM::load_syntax (FrameSubmodel& frame)
+SOM::load_syntax (Frame& frame)
 {
   OM::load_syntax (frame, "\
 The first numbers corresponds to each of the SMB pools, the next\n\

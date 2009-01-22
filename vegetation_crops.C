@@ -56,7 +56,7 @@ struct VegetationCrops : public Vegetation
     double operator() (int year, int yday);
     
     // Create;
-    static void load_syntax (FrameSubmodel&);
+    static void load_syntax (Frame&);
     ForcedLAI (const std::vector<const AttributeList*>& als);
   } forced_LAI;
 
@@ -246,7 +246,7 @@ VegetationCrops::ForcedLAI::operator() (int year, int yday)
   return -1.0;
 }
     
-void VegetationCrops::ForcedLAI::load_syntax (FrameSubmodel& frame)
+void VegetationCrops::ForcedLAI::load_syntax (Frame& frame)
 {
   frame.add ("year", Value::Integer, Value::Const, "\
 Year for which to use forced LAI.");

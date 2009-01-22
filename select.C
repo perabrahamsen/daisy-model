@@ -103,7 +103,7 @@ struct Select::Implementation
 			    const Frame& frame,
 			    Treelog& err);
     static bool check_alist (const Metalib&, const AttributeList&, Treelog&);
-    static void load_syntax (FrameSubmodel&);
+    static void load_syntax (Frame&);
     Spec (Block&);
     ~Spec ();
   };
@@ -307,7 +307,7 @@ Select::Implementation::Spec::check_alist (const Metalib& metalib,
 }
 
 void 
-Select::Implementation::Spec::load_syntax (FrameSubmodel& frame)
+Select::Implementation::Spec::load_syntax (Frame& frame)
 { 
   frame.add_object_check (check_alist);
   frame.add ("library", Value::String, Value::Const, "\

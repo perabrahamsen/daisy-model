@@ -242,7 +242,7 @@ IM::~IM ()
 { daisy_assert (unit_);  }
 
 void
-IM::add_syntax (FrameSubmodel& frame,
+IM::add_syntax (Frame& frame,
 		Value::category cat, 
 		const symbol dimension)
 {

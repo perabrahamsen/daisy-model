@@ -39,7 +39,7 @@ CanopySimple::output (Log& log) const
 }
 
 void 
-CanopySimple::load_syntax (FrameSubmodel& frame)
+CanopySimple::load_syntax (Frame& frame)
 {
 
   // Parameters.

@@ -25,7 +25,7 @@
 #include "om.h"
 #include <vector>
 
-class FrameSubmodel;
+class Frame;
 
 class SMB : public OM
 { 
@@ -50,7 +50,7 @@ private:
 
   // Create & Destroy.
 public:
-  static void load_syntax (FrameSubmodel&);
+  static void load_syntax (Frame&);
   SMB (const AttributeList& al);
 };
 

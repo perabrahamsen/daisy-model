@@ -655,9 +655,9 @@ static struct TertiaryBioporesSyntax : public DeclareModel
   TertiaryBioporesSyntax ()
     : DeclareModel (Tertiary::component, "biopores", "Tertiary domain divided into biopore classes.")
   { }
-  static void load_mass (FrameSubmodel& frame)
+  static void load_mass (Frame& frame)
   { IM::add_syntax (frame, Value::LogOnly, IM::mass_unit ()); }
-  static void load_storage (FrameSubmodel& frame)
+  static void load_storage (Frame& frame)
   { IM::add_syntax (frame, Value::LogOnly, IM::storage_unit ()); }
 
   void load_frame (Frame& frame) const

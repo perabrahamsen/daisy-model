@@ -118,7 +118,7 @@ struct MovementRect::Point
 {
   const double z;
   const double x;
-  static void load_syntax (FrameSubmodel& frame)
+  static void load_syntax (Frame& frame)
   {
     frame.add ("z", "cm", Check::negative (), Value::Const, 
 		"Vertical position.");
