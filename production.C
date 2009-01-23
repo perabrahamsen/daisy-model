@@ -807,11 +807,11 @@ Production::initialize (const double SeedN)
 }
 
 void
-Production::initialize (const symbol name, 
+Production::initialize (Metalib& metalib, const symbol name, 
 			const std::vector<const AttributeList*>& root,
 			const std::vector<const AttributeList*>& dead,
 			const Geometry& geo,
-			OrganicMatter& organic_matter)
+			OrganicMatter& organic_matter, Treelog& msg)
 {
   // Hotstart, find pool in organic matter.
   daisy_assert (AM_root == NULL);
@@ -824,15 +824,15 @@ Production::initialize (const symbol name,
   // If not found, we is planting emerged crops.  Create pools.
   if (!AM_root)
     {
-      AM_root = &AM::create (geo.cell_size (), Time (1, 1, 1, 1), root,
-			     name, root_symbol, AM::Locked);
+      AM_root = &AM::create (metalib, geo, Time (1, 1, 1, 1), root,
+			     name, root_symbol, AM::Locked, msg);
       organic_matter.add (*AM_root);
     }
 	  
   if (!AM_leaf)
     {
-      AM_leaf = &AM::create (geo.cell_size (), Time (1, 1, 1, 1), dead,
-			     name, dead_symbol, AM::Locked);
+      AM_leaf = &AM::create (metalib, geo, Time (1, 1, 1, 1), dead,
+			     name, dead_symbol, AM::Locked, msg);
       organic_matter.add (*AM_leaf);
     }
   daisy_assert (AM_root);

@@ -77,26 +77,30 @@ public:
                          double dt, Treelog& msg);
   void irrigate_subsoil (double water, const IM&, const Volume&, 
                          double dt, Treelog& msg);
-  void fertilize (const Metalib&, const AttributeList&,
+  void fertilize (Metalib&, const AttributeList&,
                   double from, double to, 
                   const Time&, double dt, Treelog& msg); // Organic.
-  void fertilize (const Metalib&, const AttributeList&, const Volume&,
+  void fertilize (Metalib&, const AttributeList&, const Volume&,
                   const Time&, double dt, Treelog&); // Organic.
-  void fertilize (const Metalib&, const AttributeList&,
+  void fertilize (Metalib&, const AttributeList&,
                   const Time&, double dt, Treelog& msg);
   void clear_second_year_utilization ();
   void emerge (symbol crop, Treelog&);
-  void harvest (const Time&, double dt, symbol name,
+  void harvest (Metalib& metalib, 
+                const Time&, double dt, symbol name,
 		double stub_length, 
 		double stem_harvest, double leaf_harvest, double sorg_harvest,
                 bool combine,
 		std::vector<const Harvest*>&, Treelog&);
-  void pluck (const Time&, double dt, symbol name,
+  void pluck (Metalib& metalib, 
+              const Time&, double dt, symbol name,
               double stem_harvest, double leaf_harvest, double sorg_harvest,
               std::vector<const Harvest*>&, Treelog&);
-  void mix (double from, double to, double penetration, 
+  void mix (Metalib& metalib, 
+            double from, double to, double penetration, 
             const Time&, double dt, Treelog&);
-  void swap (double from, double middle, double to, 
+  void swap (Metalib& metalib, 
+             double from, double middle, double to, 
              const Time&, double dt, Treelog&);
   void set_porosity (double at, double Theta);
   void set_heat_source (double at, double value); // [W/m^2]
@@ -123,9 +127,11 @@ public:
   std::string crop_names () const;
   // Simulation.
   void clear ();
-  void tick_all (const Time&, double dt, const Weather*, 
+  void tick_all (Metalib& metalib, 
+                 const Time&, double dt, const Weather*, 
 		 const Scope&, Treelog&);
-  void tick_one (size_t, const Time&, double dt, const Weather*,
+  void tick_one (Metalib& metalib, 
+                 size_t, const Time&, double dt, const Weather*,
 		 const Scope&, Treelog&);
   void output (Log&) const;
 

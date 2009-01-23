@@ -47,7 +47,8 @@ static double DM_to_C_factor (double E)
 }
 
 const Harvest&
-Harvesting::harvest (const symbol column_name,
+Harvesting::harvest (Metalib& metalib, 
+                     const symbol column_name,
                      const symbol crop_name,
                      const std::vector<double>& density,
                      const Time& time,
@@ -68,7 +69,8 @@ Harvesting::harvest (const symbol column_name,
                      std::vector<double>& residuals_C_soil,
                      const bool combine,
                      double& water_stress_days,
-                     double& nitrogen_stress_days)
+                     double& nitrogen_stress_days,
+                     Treelog& msg)
 {
   const double old_DM = production.DM ();
 
@@ -228,7 +230,8 @@ Harvesting::harvest (const symbol column_name,
 
   // Add crop remains to the soil.
   static const symbol stem_symbol ("stem");
-  AM& AM_stem = AM::create (geo.cell_size (), time, Stem, crop_name, stem_symbol);
+  AM& AM_stem = AM::create (metalib, geo, time, Stem, crop_name, stem_symbol,
+                            AM::Unlocked, msg);
   residuals.push_back (&AM_stem);
   if (Stem_W_Loss > 0.0)
     {
@@ -244,8 +247,8 @@ Harvesting::harvest (const symbol column_name,
     {
       static const symbol dead_symbol ("dead");
       production.AM_leaf
-	= &AM::create (geo.cell_size (), time, Dead, crop_name, dead_symbol, 
-		       AM::Unlocked /* no organic matter */);
+	= &AM::create (metalib, geo, time, Dead, crop_name, dead_symbol, 
+		       AM::Unlocked /* no organic matter */, msg);
     }
   if (Dead_W_Loss > 0.0)
     {
@@ -258,8 +261,8 @@ Harvesting::harvest (const symbol column_name,
     }
 
   static const symbol leaf_symbol ("leaf");
-  AM& AM_leaf = AM::create (geo.cell_size (),
-                            time, Leaf, crop_name, leaf_symbol);
+  AM& AM_leaf = AM::create (metalib, geo, time, Leaf, crop_name, leaf_symbol, 
+                            AM::Unlocked, msg);
   residuals.push_back (&AM_leaf);
   if (Leaf_W_Loss > 0.0)
     {
@@ -272,8 +275,8 @@ Harvesting::harvest (const symbol column_name,
     }
 
   static const symbol sorg_symbol ("sorg");
-  AM& AM_sorg = AM::create (geo.cell_size (),
-                            time, SOrg, crop_name, sorg_symbol);
+  AM& AM_sorg = AM::create (metalib, geo,
+                            time, SOrg, crop_name, sorg_symbol, AM::Unlocked, msg);
   residuals.push_back (&AM_sorg);
   if (SOrg_W_Loss > 0.0)
     {
@@ -319,9 +322,9 @@ Harvesting::harvest (const symbol column_name,
       // Create root AM if missing.
       static const symbol root_symbol ("root");
       if (!production.AM_root)
-	production.AM_root = &AM::create (geo.cell_size (), time, Root,
+	production.AM_root = &AM::create (metalib, geo, time, Root,
 					  crop_name, root_symbol, 
-					  AM::Unlocked /* inorganic */);
+					  AM::Unlocked /* inorganic */, msg);
 
 
       // Add crop to residuals.

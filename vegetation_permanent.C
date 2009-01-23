@@ -149,7 +149,7 @@ struct VegetationPermanent : public Vegetation
   void find_stomata_conductance (const Units&, const Time&, 
                                  const Bioclimate&, double, Treelog&)
   { }
-  void tick (const Time& time, const Bioclimate&, 
+  void tick (Metalib&, const Time& time, const Bioclimate&, 
              const Geometry& geo, const Soil&, const SoilHeat&,
              SoilWater&, Chemistry&, OrganicMatter&,
              double& residuals_DM,
@@ -162,11 +162,11 @@ struct VegetationPermanent : public Vegetation
   { }
   void emerge (const symbol, Treelog&)
   { }
-  void kill_all (symbol, const Time&, const Geometry&,
+  void kill_all (Metalib&, symbol, const Time&, const Geometry&,
 		 std::vector<AM*>&, double&, double&, double&, 
 		 std::vector<double>&, std::vector<double>&, Treelog&)
   { }
-  void harvest (symbol, symbol,
+  void harvest (Metalib&, symbol, symbol,
 		const Time&, const Geometry&, 
 		double, double, double, double, 
 		std::vector<const Harvest*>&,
@@ -178,7 +178,7 @@ struct VegetationPermanent : public Vegetation
                 const bool,
 		Treelog&)
   { }
-  void pluck (symbol, symbol,
+  void pluck (Metalib&, symbol, symbol,
               const Time&, const Geometry&, 
               double, double, double,
               std::vector<const Harvest*>&,
@@ -203,7 +203,8 @@ struct VegetationPermanent : public Vegetation
   { return litter.albedo; }
 
   // Create and destroy.
-  void initialize (const Units&, const Time& time, const Geometry& geo,
+  void initialize (Metalib& metalib, 
+                   const Units&, const Time& time, const Geometry& geo,
                    const Soil& soil, OrganicMatter&, 
                    Treelog&);
   bool check (const Units&, Treelog&) const;
@@ -268,7 +269,8 @@ VegetationPermanent::reset_canopy_structure (const Time& time)
   HvsLAI_ = canopy.LAIvsH.inverse ();
 }
 void
-VegetationPermanent::tick (const Time& time, const Bioclimate&, 
+VegetationPermanent::tick (Metalib& metalib,
+                           const Time& time, const Bioclimate&, 
                            const Geometry& geo, const Soil& soil, 
                            const SoilHeat&,
 			   SoilWater& soil_water, Chemistry& chemistry,
@@ -277,7 +279,7 @@ VegetationPermanent::tick (const Time& time, const Bioclimate&,
 			   double& residuals_N_top, double& residuals_C_top,
 			   std::vector<double>& /* residuals_N_soil */,
 			   std::vector<double>& /* residuals_C_soil */,
-                           const double dt, Treelog&)
+                           const double dt, Treelog& msg)
 {
   // Canopy.
   const double old_LAI = canopy.CAI;
@@ -312,9 +314,9 @@ VegetationPermanent::tick (const Time& time, const Bioclimate&,
           static const symbol vegetation_symbol ("vegetation");
           static const symbol dead_symbol ("dead");
 
-          AM_litter = &AM::create (geo.cell_size (), time, litter_am,
+          AM_litter = &AM::create (metalib, geo, time, litter_am,
                                    vegetation_symbol, dead_symbol,
-                                   AM::Locked);
+                                   AM::Locked, msg);
           organic_matter.add (*AM_litter);
 
         }
@@ -361,7 +363,8 @@ VegetationPermanent::output (Log& log) const
 }
 
 void
-VegetationPermanent::initialize (const Units& units, const Time& time, 
+VegetationPermanent::initialize (Metalib&, 
+                                 const Units& units, const Time& time, 
                                  const Geometry& geo,
                                  const Soil& soil, 
 				 OrganicMatter& organic_matter,

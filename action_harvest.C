@@ -150,9 +150,9 @@ struct ActionHarvest : public Action
     double old_DM = 0.0;
     for (size_t i = 0; i < daisy.harvest.size (); i++)
       old_DM += daisy.harvest[i]->total_DM ();
-    daisy.field->harvest (daisy.time, daisy.dt, 
-                         crop, stub, stem, leaf, sorg, combine,
-			 daisy.harvest, msg);
+    daisy.field->harvest (daisy.metalib, daisy.time, daisy.dt, 
+                          crop, stub, stem, leaf, sorg, combine,
+                          daisy.harvest, msg);
     double new_DM = 0.0;
     for (size_t i = 0; i < daisy.harvest.size (); i++)
       new_DM += daisy.harvest[i]->total_DM ();
@@ -252,7 +252,8 @@ struct ActionPluck : public Action
     double old_DM = 0.0;
     for (size_t i = 0; i < daisy.harvest.size (); i++)
       old_DM += daisy.harvest[i]->total_DM ();
-    daisy.field->pluck (daisy.time, daisy.dt, crop, stem, leaf, sorg, 
+    daisy.field->pluck (daisy.metalib, 
+                        daisy.time, daisy.dt, crop, stem, leaf, sorg, 
                         daisy.harvest, msg);
     double new_DM = 0.0;
     for (size_t i = 0; i < daisy.harvest.size (); i++)

@@ -221,7 +221,7 @@ struct OrganicStandard : public OrganicMatter
 
   // Simulation.
   void clear ();
-  void monthly (const Geometry&);
+  void monthly (Metalib&, const Geometry&, Treelog&);
   const std::vector<bool>& active () const;
   void tick (const Geometry& geo,
              const SoilWater&, const SoilHeat&, 
@@ -248,14 +248,15 @@ struct OrganicStandard : public OrganicMatter
 	      const Chemistry&, Treelog& err) const;
   bool check_am (const AttributeList& am, Treelog& err) const;
   void add (AM&);
-  void fertilize (const Metalib& metalib, const AttributeList&, const Geometry&, 
-                  const Time&, double dt);
-  void fertilize (const Metalib& metalib, const AttributeList&, const Geometry&,
-                  double from, double to, const Time&, double dt);
-  void fertilize (const Metalib& metalib, const AttributeList&, const Geometry&, 
-                  const Volume&, const Time&, double dt);
+  void fertilize (Metalib&, const AttributeList&, const Geometry&, 
+                  const Time&, double dt, Treelog&);
+  void fertilize (Metalib&, const AttributeList&, const Geometry&,
+                  double from, double to, const Time&, double dt, Treelog&);
+  void fertilize (Metalib&, const AttributeList&, const Geometry&, 
+                  const Volume&, const Time&, double dt, Treelog&);
   AM* find_am (symbol sort, symbol part) const;
-  void initialize (const Units&, const AttributeList&, const Geometry& geo,
+  void initialize (Metalib&, 
+                   const Units&, const AttributeList&, const Geometry& geo,
                    const Soil&, const SoilWater&, const SoilHeat&,
 		   double T_avg, Treelog&);
   OrganicStandard ();
@@ -868,23 +869,23 @@ OrganicStandard::add (AM& om)
 }
 
 void 
-OrganicStandard::fertilize (const Metalib& metalib, const AttributeList& al, 
+OrganicStandard::fertilize (Metalib& metalib, const AttributeList& al, 
                             const Geometry& geo, 
-                            const Time& now, const double dt)
+                            const Time& now, const double dt, Treelog& msg)
 { 
-  AM& om = AM::create (metalib, al, geo, now);
+  AM& om = AM::create (metalib, al, geo, now, AM::Unlocked, msg);
   fertilized_N += om.total_N (geo) / geo.surface_area () / dt; 
   fertilized_C += om.total_C (geo) / geo.surface_area () / dt;
   add (om);
 }
 
 void 
-OrganicStandard::fertilize (const Metalib& metalib, const AttributeList& al,
+OrganicStandard::fertilize (Metalib& metalib, const AttributeList& al,
                             const Geometry& geo,
                             const double from, const double to,
-                            const Time& now, const double dt)
+                            const Time& now, const double dt, Treelog& msg)
 { 
-  AM& om = AM::create (metalib, al, geo, now);
+  AM& om = AM::create (metalib, al, geo, now, AM::Unlocked, msg);
   fertilized_N += om.total_N (geo) / geo.surface_area () / dt; 
   fertilized_C += om.total_C (geo) / geo.surface_area () / dt;
   om.mix (geo, from, to, 1.0,
@@ -894,11 +895,11 @@ OrganicStandard::fertilize (const Metalib& metalib, const AttributeList& al,
 }
 
 void 
-OrganicStandard::fertilize (const Metalib& metalib, const AttributeList& al,
+OrganicStandard::fertilize (Metalib& metalib, const AttributeList& al,
                             const Geometry& geo, const Volume& volume,
-                            const Time& now, const double dt)
+                            const Time& now, const double dt, Treelog& msg)
 { 
-  AM& om = AM::create (metalib, al, geo, now);
+  AM& om = AM::create (metalib, al, geo, now, AM::Unlocked, msg);
   fertilized_N += om.total_N (geo) / geo.surface_area () / dt; 
   fertilized_C += om.total_C (geo) / geo.surface_area () / dt;
   om.mix (geo, volume, 1.0,
@@ -919,16 +920,17 @@ OrganicStandard::clear ()
 }
 
 void
-OrganicStandard::monthly (const Geometry& geo)
+OrganicStandard::monthly (Metalib& metalib, const Geometry& geo,
+                          Treelog& msg)
 {
   static const symbol am_symbol ("am");
   static const symbol cleanup_symbol ("cleanup");
   AM* remainder = find_am (am_symbol, cleanup_symbol);
   if (!remainder)
     {
-      remainder = &AM::create (geo.cell_size (),
+      remainder = &AM::create (metalib, geo,
                                Time (1, 1, 1, 1), AM::default_AM (),
-			       am_symbol, cleanup_symbol, AM::Locked);
+			       am_symbol, cleanup_symbol, AM::Locked, msg);
       add (*remainder);
     }
 
@@ -2321,7 +2323,8 @@ OrganicStandard::update_pools
 }
 
 void
-OrganicStandard::initialize (const Units& units, const AttributeList& al,
+OrganicStandard::initialize (Metalib& metalib, 
+                             const Units& units, const AttributeList& al,
                              const Geometry& geo,
                              const Soil& soil, 
                              const SoilWater& soil_water,
@@ -2395,7 +2398,7 @@ OrganicStandard::initialize (const Units& units, const AttributeList& al,
   if (bioam)
     bioincorporation.set_am (bioam);
   else
-    am.push_back (bioincorporation.create_am (geo)); 
+    am.push_back (bioincorporation.create_am (metalib, geo, msg)); 
 
   // Warnings in case of explicit SOM or SMB initialization.
   for (size_t pool = 0; pool < som_size; pool++)

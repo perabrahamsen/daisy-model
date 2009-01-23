@@ -92,12 +92,12 @@ public:
 public:
   static const VCheck& check_om_pools ();
   // Initialization & Fertilizer.
-  static AM& create (const Metalib&, const AttributeList&, const Geometry&, 
-                     const Time&, double max_rooting_depth = 1.0);
+  static AM& create (Metalib&, const AttributeList&, const Geometry&, 
+                     const Time&, double max_rooting_depth, Treelog& msg);
   // Crop part.
-  static AM& create (const size_t cell_size, const Time&,
+  static AM& create (Metalib&, const Geometry&, const Time&,
 		     const std::vector<const AttributeList*>&,
-		     symbol sort, symbol part, lock_type lock = Unlocked);
+		     symbol sort, symbol part, lock_type lock, Treelog& msg);
   void initialize (const Geometry& geometry, const double max_rooting_depth);
   static const std::vector<const AttributeList*>& default_AM ();
 
@@ -136,7 +136,7 @@ public:
   static bool is_organic (const Metalib&, const AttributeList&);
 public:
   AM (const AttributeList&);
-  ~AM ();
+  virtual ~AM ();
 };
 
 #endif // AM_H

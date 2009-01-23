@@ -129,7 +129,7 @@ struct CropStandard : public Crop
   // Simulation.
   void find_stomata_conductance (const Units&, const Time& time, 
                                  const Bioclimate&, double dt, Treelog&);
-  void tick (const Time& time, const Bioclimate&, double ForcedCAI,
+  void tick (Metalib&, const Time& time, const Bioclimate&, double ForcedCAI,
              const Geometry& geo, const Soil&, const SoilHeat&,
              SoilWater&, Chemistry&, OrganicMatter&,
              double& residuals_DM,
@@ -139,7 +139,8 @@ struct CropStandard : public Crop
              double dt, Treelog&);
   void emerge ()
   { development->DS = -1e-10; }
-  const Harvest& harvest (symbol column_name,
+  const Harvest& harvest (Metalib& metalib, 
+                          symbol column_name,
 			  const Time&, const Geometry&,
 			  double stub_length, double stem_harvest,
 			  double leaf_harvest, double sorg_harvest,
@@ -151,7 +152,8 @@ struct CropStandard : public Crop
 			  std::vector<double>& residuals_C_soil,
                           const bool combine,
 			  Treelog&);
-  const Harvest& pluck (const symbol column_name,
+  const Harvest& pluck (Metalib& metalib, 
+                        const symbol column_name,
                         const Time& time,
                         const Geometry& geometry,
                         const double stem_harvest,
@@ -182,12 +184,15 @@ struct CropStandard : public Crop
   { return root_system->Density; }
 
   // Create and Destroy.
-  void initialize (const Units&, const Geometry& geometry, 
+  void initialize (Metalib& metalib, 
+                   const Units&, const Geometry& geometry, 
                    double row_width, double row_pos, double seed,
                    OrganicMatter&, double SoilLimit, const Time&, Treelog&);
-  void initialize (const Units&, const Geometry&, OrganicMatter&, 
+  void initialize (Metalib& metalib, 
+                   const Units&, const Geometry&, OrganicMatter&, 
                    double SoilLimit, const Time&, Treelog&);
-  void initialize_shared (const Geometry&, OrganicMatter&, 
+  void initialize_shared (Metalib& metalib, 
+                          const Geometry&, OrganicMatter&, 
                           double SoilLimit, const Time&, Treelog&);
   bool check (const Units&, Treelog&) const;
   CropStandard (Block& vl);
@@ -224,7 +229,8 @@ CropStandard::SOrg_DM () const
 { return production.WSOrg * 10.0 /* [g/m^2 -> kg/ha] */;}
 
 void
-CropStandard::initialize (const Units& units, const Geometry& geo, 
+CropStandard::initialize (Metalib& metalib, 
+                          const Units& units, const Geometry& geo, 
                           const double row_width, const double row_pos, 
                           const double seed_w,
                           OrganicMatter& organic_matter,
@@ -234,11 +240,12 @@ CropStandard::initialize (const Units& units, const Geometry& geo,
   TREELOG_MODEL (msg);
   root_system->initialize (units, geo, row_width, row_pos, msg);
   seed->initialize (seed_w, msg);
-  initialize_shared (geo, organic_matter, SoilLimit, now, msg);
+  initialize_shared (metalib, geo, organic_matter, SoilLimit, now, msg);
 }
 
 void
-CropStandard::initialize (const Units& units, const Geometry& geo, 
+CropStandard::initialize (Metalib& metalib,
+                          const Units& units, const Geometry& geo, 
                           OrganicMatter& organic_matter,
                           const double SoilLimit,
                           const Time& now, Treelog& msg)
@@ -246,11 +253,11 @@ CropStandard::initialize (const Units& units, const Geometry& geo,
   TREELOG_MODEL (msg);
   root_system->initialize (units, geo, msg);
   seed->initialize (-42.42e42, msg);
-  initialize_shared (geo, organic_matter, SoilLimit, now, msg);
+  initialize_shared (metalib, geo, organic_matter, SoilLimit, now, msg);
 }
 
 void
-CropStandard::initialize_shared (const Geometry& geo, 
+CropStandard::initialize_shared (Metalib& metalib, const Geometry& geo, 
                                  OrganicMatter& organic_matter,
                                  const double SoilLimit,
                                  const Time& now, Treelog& msg)
@@ -263,8 +270,8 @@ CropStandard::initialize_shared (const Geometry& geo,
   if (DS >= 0)
     {
       // Dead organic matter.
-      production.initialize (name, harvesting->Root, harvesting->Dead,
-                             geo, organic_matter);
+      production.initialize (metalib, name, harvesting->Root, harvesting->Dead,
+                             geo, organic_matter, msg);
       
       // Update derived state content.
       const double WLeaf = production.WLeaf;
@@ -429,7 +436,8 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
 }
 
 void
-CropStandard::tick (const Time& time, const Bioclimate& bioclimate, 
+CropStandard::tick (Metalib& metalib, 
+                    const Time& time, const Bioclimate& bioclimate, 
                     const double ForcedCAI,
                     const Geometry& geo, const Soil& soil, 
                     const SoilHeat& soil_heat,
@@ -498,27 +506,27 @@ CropStandard::tick (const Time& time, const Bioclimate& bioclimate,
           if (!production.AM_root)
             {
               production.AM_root
-                = &AM::create (geo.cell_size (), time, harvesting->Root,
-                               name, root_symbol, AM::Locked);
+                = &AM::create (metalib, geo, time, harvesting->Root,
+                               name, root_symbol, AM::Locked, msg);
               organic_matter.add (*production.AM_root);
             }
           if (!production.AM_leaf)
             {
               production.AM_leaf
-                = &AM::create (geo.cell_size (), time, harvesting->Dead,
-                               name, dead_symbol, AM::Locked);
+                = &AM::create (metalib, geo, time, harvesting->Dead,
+                               name, dead_symbol, AM::Locked, msg);
               organic_matter.add (*production.AM_leaf);
 	    }
 	  else
 	    {
 	      if (!production.AM_root)
 		production.AM_root
-		  = &AM::create (geo.cell_size (), time, harvesting->Root,
-				 name, root_symbol, AM::Unlocked);
+		  = &AM::create (metalib, geo, time, harvesting->Root,
+				 name, root_symbol, AM::Unlocked, msg);
 	      if (!production.AM_leaf)
 		production.AM_leaf
-		  = &AM::create (geo.cell_size (), time, harvesting->Dead,
-				 name, dead_symbol, AM::Unlocked);
+		  = &AM::create (metalib, geo, time, harvesting->Dead,
+				 name, dead_symbol, AM::Unlocked, msg);
 	    }
 	}
       return;
@@ -580,7 +588,8 @@ CropStandard::tick (const Time& time, const Bioclimate& bioclimate,
 }
 
 const Harvest&
-CropStandard::harvest (const symbol column_name,
+CropStandard::harvest (Metalib& metalib, 
+                       const symbol column_name,
 		       const Time& time,
 		       const Geometry& geometry,
 		       const double stub_length,
@@ -623,7 +632,7 @@ CropStandard::harvest (const symbol column_name,
     }
 
   const Harvest& harvest 
-    = harvesting->harvest (column_name, name, 
+    = harvesting->harvest (metalib, column_name, name, 
                            root_system->Density,
                            time, geometry, production, development->DS,
                            stem_harvest, leaf_harvest, 1.0,
@@ -634,7 +643,7 @@ CropStandard::harvest (const symbol column_name,
                            residuals_N_soil, residuals_C_soil,
                            combine,
                            root_system->water_stress_days, 
-                           nitrogen.nitrogen_stress_days);
+                           nitrogen.nitrogen_stress_days, msg);
 
   if (!approximate (development->DS, DSremove))
     {
@@ -673,7 +682,8 @@ CropStandard::harvest (const symbol column_name,
 }
 
 const Harvest&
-CropStandard::pluck (const symbol column_name,
+CropStandard::pluck (Metalib& metalib, 
+                     const symbol column_name,
                      const Time& time,
                      const Geometry& geometry,
                      const double stem_harvest,
@@ -693,7 +703,7 @@ CropStandard::pluck (const symbol column_name,
 
   // Harvest.
   const Harvest& harvest 
-    = harvesting->harvest (column_name, name, 
+    = harvesting->harvest (metalib, column_name, name, 
                            root_system->Density,
                            time, geometry, production, development->DS,
                            stem_harvest, leaf_harvest, sorg_harvest,
@@ -703,7 +713,7 @@ CropStandard::pluck (const symbol column_name,
                            residuals_N_soil, residuals_C_soil,
                            false,
                            root_system->water_stress_days, 
-                           nitrogen.nitrogen_stress_days);
+                           nitrogen.nitrogen_stress_days, msg);
 
   // Phenology may be affected.
   if (!approximate (development->DS, DSremove))

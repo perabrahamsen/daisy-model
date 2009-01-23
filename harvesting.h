@@ -37,6 +37,8 @@ class Geometry;
 class Production;
 class AM;
 class Harvest;
+class Metalib;
+class Treelog;
 
 class Harvesting 
 {
@@ -71,7 +73,7 @@ public:
                                 // plant and imply a mix operation.
   // Simulation.
 public:
-  const Harvest& harvest (symbol column_name,
+  const Harvest& harvest (Metalib&, symbol column_name,
                           symbol crop_name,
                           const std::vector<double>& density,
                           const Time& time,
@@ -92,7 +94,8 @@ public:
                           std::vector<double>& residuals_C_soil,
                           const bool combine,
                           double& water_stress_days,
-                          double& nitrogen_stress_days);
+                          double& nitrogen_stress_days,
+                          Treelog&);
   void tick (const Time& time);
   void water_use (double amount /* [kg H2O] */);
   void output (Log& log) const;

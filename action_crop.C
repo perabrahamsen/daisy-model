@@ -340,9 +340,9 @@ ActionCrop::Annual::doIt (Daisy& daisy, const Scope&, Treelog& msg, symbol name)
       const double stem = remove_residuals ? 1.0 : 0.0;
       const double leaf = remove_residuals ? 1.0 : 0.0;
       const double sorg = (1.0 - loss);
-      daisy.field->harvest (daisy.time, daisy.dt, 
+      daisy.field->harvest (daisy.metalib, daisy.time, daisy.dt, 
                             Vegetation::all_crops (), stub, stem, leaf, sorg, 
-			   false, daisy.harvest, msg);
+                            false, daisy.harvest, msg);
       msg.message ("Annual harvest of " + name);
       done = true;
       return true;
@@ -396,9 +396,9 @@ ActionCrop::Perennial::harvest (Daisy& daisy, Treelog& msg)
   const double stem = 1.0;
   const double leaf = 1.0;
   const double sorg = 1.0;
-  daisy.field->harvest (daisy.time, daisy.dt,
+  daisy.field->harvest (daisy.metalib, daisy.time, daisy.dt,
                         Vegetation::all_crops (), stub, stem, leaf, sorg, 
-		       false, daisy.harvest, msg);
+                        false, daisy.harvest, msg);
   msg.message ("Perennial harvest");
 }
 

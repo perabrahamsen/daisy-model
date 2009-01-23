@@ -6,14 +6,13 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 *** Fjern syntax == "mineral"
 
-AM::is_mineral () 
-AM::is_organic ()
+*** Split initialize up i en for hver model
 
-Brug "derived from" i stedet for.
+Hav en fælles "initialized" variable der bestemmer om de lokale bliver kalder.
 
 ** Gør AOM til model
 
-** ret default_AM
+*** ret default_AM
 
 ** fjern frame.add (name, alists)
 

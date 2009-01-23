@@ -99,7 +99,7 @@ public:
   virtual void find_stomata_conductance (const Units&, const Time& time, 
                                          const Bioclimate&,
                                          double dt, Treelog&) = 0;
-  virtual void tick (const Time&, const Bioclimate&, 
+  virtual void tick (Metalib&, const Time&, const Bioclimate&, 
                      const Geometry&, const Soil&, const SoilHeat&,
                      SoilWater&, Chemistry&, OrganicMatter&,
                      double& residuals_DM,
@@ -108,7 +108,7 @@ public:
                      std::vector<double>& residuals_C_soil,
                      double dt, Treelog&) = 0;
   virtual void force_production_stress  (double pstress) = 0;
-  virtual void kill_all (symbol, const Time&, const Geometry&,
+  virtual void kill_all (Metalib&, symbol, const Time&, const Geometry&,
 			 std::vector<AM*>& residuals, 
 			 double& residuals_DM,
 			 double& residuals_N_top, double& residuals_C_top,
@@ -116,7 +116,7 @@ public:
 			 std::vector<double>& residuals_C_soil,
 			 Treelog&) = 0;
   virtual void emerge (symbol crop_name, Treelog&) = 0;
-  virtual void harvest (symbol column_name,
+  virtual void harvest (Metalib&, symbol column_name,
 			symbol crop_name,
 			const Time&, const Geometry&, 
 			double stub_length,
@@ -134,7 +134,7 @@ public:
 			std::vector<double>& residuals_C_soil,
                         const bool combine,
 			Treelog&) = 0;
-  virtual void pluck (symbol column_name,
+  virtual void pluck (Metalib&, symbol column_name,
                       symbol crop_name,
                       const Time&, const Geometry&, 
                       double stem_harvest,
@@ -167,7 +167,8 @@ public:
 
   // Create and Destroy.
 public:
-  virtual void initialize (const Units&, const Time&, const Geometry& geo,
+  virtual void initialize (Metalib& metalib, 
+                           const Units&, const Time&, const Geometry& geo,
                            const Soil& soil, OrganicMatter&,
                            Treelog&) = 0;
   virtual bool check (const Units&, Treelog& msg) const = 0;

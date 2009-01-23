@@ -121,7 +121,7 @@ public:
 
   // Simulation.
 public:
-  void tick (const Time& time, const Bioclimate&, double ForcedCAI,
+  void tick (Metalib&, const Time& time, const Bioclimate&, double ForcedCAI,
              const Geometry& geo, const Soil&, const SoilHeat&,
              SoilWater&, Chemistry&, OrganicMatter&,
              double& residuals_DM,
@@ -138,7 +138,8 @@ public:
       day = std::max (day, T_emergence - 0.1);
 
   }
-  const Harvest& harvest (symbol column_name,
+  const Harvest& harvest (Metalib&, 
+                          symbol column_name,
 			  const Time&, const Geometry&, 
 			  double stub_length, double stem_harvest,
 			  double leaf_harvest, double sorg_harvest,
@@ -164,10 +165,12 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Units&, const Geometry& geo, 
+  void initialize (Metalib& metalib, 
+                   const Units&, const Geometry& geo, 
                    double row_width, double row_pos, double seed,
                    OrganicMatter&, double SoilLimit, const Time&, Treelog&);
-  void initialize (const Units&, const Geometry& geo, 
+  void initialize (Metalib& metalib, 
+                   const Units&, const Geometry& geo, 
                    OrganicMatter&, double SoilLimit, const Time&, Treelog&);
   bool check (const Units& units, Treelog&) const;
   CropSimple (Block& vl);
@@ -217,7 +220,7 @@ CropSimple::force_production_stress  (double pstress)
 { root_system->production_stress = pstress; }
 
 void
-CropSimple::tick (const Time& time, const Bioclimate& bioclimate, 
+CropSimple::tick (Metalib&, const Time& time, const Bioclimate& bioclimate, 
                   const double ForcedCAI,
                   const Geometry& geo, const Soil& soil,
 		  const SoilHeat& soil_heat,
@@ -301,7 +304,8 @@ CropSimple::tick (const Time& time, const Bioclimate& bioclimate,
 }
 
 const Harvest&
-CropSimple::harvest (const symbol column_name,
+CropSimple::harvest (Metalib& metalib, 
+                     const symbol column_name,
 		     const Time& time,
 		     const Geometry& geo,
 		     double /* stub_length */,
@@ -316,7 +320,7 @@ CropSimple::harvest (const symbol column_name,
 		     std::vector<double>& residuals_N_soil,
 		     std::vector<double>& residuals_C_soil,
                      const bool,
-		     Treelog&)
+		     Treelog& msg)
 {
   dead = true;
 
@@ -327,7 +331,8 @@ CropSimple::harvest (const symbol column_name,
       const double this_far = std::min (1.0, (T - T_emergence) / T_growth);
 
       static const symbol root_symbol ("root");
-      AM& am = AM::create (geo.cell_size (), time, root_am, name, root_symbol);
+      AM& am = AM::create (metalib, geo, time, root_am, name, root_symbol,
+                           AM::Unlocked, msg);
       daisy_assert (geo.total_soil (root_system->Density) > 0.0);
       am.add_surface (geo, 
                       this_far * WRoot * 0.420 * m2_per_cm2,
@@ -403,7 +408,8 @@ CropSimple::total_C () const
 }
 
 void
-CropSimple::initialize (const Units& units, const Geometry& geo, 
+CropSimple::initialize (Metalib& metalib, 
+                        const Units& units, const Geometry& geo, 
                         const double row_width, 
                         const double row_pos, 
                         const double seed,
@@ -418,7 +424,8 @@ CropSimple::initialize (const Units& units, const Geometry& geo,
 }
 
 void
-CropSimple::initialize (const Units& units, const Geometry& geo, 
+CropSimple::initialize (Metalib& metalib, 
+                        const Units& units, const Geometry& geo, 
                         OrganicMatter&, double /* SoilLimit */, 
                         const Time&, Treelog& msg)
 {

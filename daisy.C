@@ -129,11 +129,13 @@ Daisy::tick_before (Treelog& msg)
 
 void
 Daisy::tick_columns (Treelog& msg)
-{ field->tick_all (time, dt, weather.get (), *extern_scope, msg); }
+{ field->tick_all (metalib, time, dt, 
+                   weather.get (), *extern_scope, msg); }
 
 void
 Daisy::tick_column (const size_t col, Treelog& msg)
-{ field->tick_one (col, time, dt, weather.get (), *extern_scope, msg); }
+{ field->tick_one (metalib, col, time, dt,
+                   weather.get (), *extern_scope, msg); }
 
 void
 Daisy::tick_after (Treelog& msg)

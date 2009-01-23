@@ -679,8 +679,8 @@ AM::check_om_pools ()
 }
 
 AM& 
-AM::create (const Metalib&, const AttributeList& al1 , const Geometry& geo, 
-            const Time& now, const double max_rooting_depth)
+AM::create (Metalib&, const AttributeList& al1 , const Geometry& geo, 
+            const Time& now, const double max_rooting_depth, Treelog&)
 { 
   AttributeList al2 (al1);
   al2.add ("type", "state");
@@ -699,10 +699,10 @@ AM::create (const Metalib&, const AttributeList& al1 , const Geometry& geo,
 
 // Crop part.
 AM& 
-AM::create (const size_t cell_size, const Time& time,
+AM::create (Metalib&, const Geometry& geo, const Time& time,
 	    const std::vector<const AttributeList*>& ol,
 	    const symbol sort, const symbol part,
-	    AM::lock_type lock)
+	    AM::lock_type lock, Treelog& msg)
 {
   AttributeList al;
   al.add ("type", "state");
@@ -713,7 +713,7 @@ AM::create (const size_t cell_size, const Time& time,
   al.add ("om", ol);
   AM& am = *new AM (al);
   for (size_t i = 0; i < am.impl->om.size (); i++)
-    am.impl->om[i]->initialize (cell_size);
+    am.impl->om[i]->initialize (geo.cell_size ());
   if (lock == AM::Locked)
     am.impl->lock = new AM::Implementation::Lock (sort, part);
   return am;

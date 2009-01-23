@@ -152,7 +152,7 @@ struct VegetationCrops : public Vegetation
 			double dt, Treelog&);
   void find_stomata_conductance (const Units&, const Time& time, 
                                  const Bioclimate&, double dt, Treelog&);
-  void tick (const Time& time, const Bioclimate&, 
+  void tick (Metalib&, const Time& time, const Bioclimate&, 
              const Geometry& geo, const Soil&, const SoilHeat&,
              SoilWater&, Chemistry&, OrganicMatter&,
              double& residuals_DM,
@@ -162,7 +162,7 @@ struct VegetationCrops : public Vegetation
              double dt,
              Treelog&);
   void force_production_stress  (double pstress);
-  void kill_all (symbol, const Time&, const Geometry&,
+  void kill_all (Metalib&, symbol, const Time&, const Geometry&,
                  std::vector<AM*>& residuals, 			 
 		 double& residuals_DM,
 		 double& residuals_N_top, double& residuals_C_top,
@@ -170,7 +170,7 @@ struct VegetationCrops : public Vegetation
 		 std::vector<double>& residuals_C_soil,
 		 Treelog&);
   void emerge (symbol crop_name, Treelog&);
-  void harvest (symbol column_name, symbol crop_name,
+  void harvest (Metalib&, symbol column_name, symbol crop_name,
 		const Time&, const Geometry&,
 		double stub_length,
 		double stem_harvest, double leaf_harvest, double sorg_harvest,
@@ -183,7 +183,7 @@ struct VegetationCrops : public Vegetation
 		std::vector<double>& residuals_C_soil,
                 const bool combine,
 		Treelog&);
-  void pluck (symbol column_name,
+  void pluck (Metalib&, symbol column_name,
               symbol crop_name,
               const Time&, const Geometry&, 
               double stem_harvest,
@@ -218,7 +218,8 @@ struct VegetationCrops : public Vegetation
   { return -1.0; }
 
   // Create and destroy.
-  void initialize (const Units&, const Time&, const Geometry& geo,
+  void initialize (Metalib& metalib, 
+                   const Units&, const Time&, const Geometry& geo,
                    const Soil& soil, OrganicMatter&,
                    Treelog& msg);
   bool check (const Units& units, Treelog& msg) const;
@@ -413,7 +414,8 @@ VegetationCrops::find_stomata_conductance (const Units& units,
 }
 
 void 
-VegetationCrops::tick (const Time& time, const Bioclimate& bioclimate, 
+VegetationCrops::tick (Metalib& metalib, 
+                       const Time& time, const Bioclimate& bioclimate, 
                        const Geometry& geo, const Soil& soil,
 		       const SoilHeat& soil_heat,
 		       SoilWater& soil_water, Chemistry& chemistry,
@@ -453,7 +455,7 @@ VegetationCrops::tick (const Time& time, const Bioclimate& bioclimate,
       const double my_force = use_force ? (MyLAI / SimLAI) * ForcedLAI : -1.0;
       
       // Tick.
-      (*crop)->tick (time, bioclimate, my_force, geo, soil, soil_heat, 
+      (*crop)->tick (metalib, time, bioclimate, my_force, geo, soil, soil_heat, 
                      soil_water, chemistry, organic_matter, 
                      residuals_DM, residuals_N_top, residuals_C_top,
 		     residuals_N_soil, residuals_C_soil, dt, msg);
@@ -622,7 +624,8 @@ VegetationCrops::force_production_stress (double pstress)
 }
 
 void
-VegetationCrops::kill_all (symbol name, const Time& time, 
+VegetationCrops::kill_all (Metalib& metalib, 
+                           symbol name, const Time& time, 
 			   const Geometry& geo, 
 			   std::vector<AM*>& residuals,
 			   double& residuals_DM,
@@ -635,7 +638,7 @@ VegetationCrops::kill_all (symbol name, const Time& time,
        crop != crops.end(); 
        crop++)
     {
-      (*crop)->kill (name, time, geo, residuals, 
+      (*crop)->kill (metalib, name, time, geo, residuals, 
 		     residuals_DM, residuals_N_top, residuals_C_top,
 		     residuals_N_soil, residuals_C_soil, msg);
       delete *crop;
@@ -660,7 +663,8 @@ VegetationCrops::emerge (const symbol crop_name, Treelog&)
 
 
 void
-VegetationCrops::harvest (const symbol column_name,
+VegetationCrops::harvest (Metalib& metalib,
+                          const symbol column_name,
 			  const symbol crop_name,
 			  const Time& time, 
 			  const Geometry& geo, 
@@ -695,7 +699,7 @@ VegetationCrops::harvest (const symbol column_name,
         const bool root_fruit = (sorg_height < 0.0);
         min_height = std::min (min_height, sorg_height);
 	const Harvest& mine = 
-	  (*crop)->harvest (column_name, time, 
+	  (*crop)->harvest (metalib, column_name, time, 
 			    geo, 
 			    stub_length, stem_harvest,
 			    leaf_harvest, sorg_harvest, 
@@ -735,7 +739,7 @@ VegetationCrops::harvest (const symbol column_name,
 }
 
 void 
-VegetationCrops::pluck (symbol column_name,
+VegetationCrops::pluck (Metalib& metalib, symbol column_name,
                         symbol crop_name,
                         const Time& time, const Geometry& geo, 
                         double stem_harvest,
@@ -766,7 +770,7 @@ VegetationCrops::pluck (symbol column_name,
         const double old_residuals_C 
           = old_residuals_C_top + old_residuals_C_soil;
 	const Harvest& mine 
-          = (*crop)->pluck (column_name, time, geo, 
+          = (*crop)->pluck (metalib, column_name, time, geo, 
                             stem_harvest, leaf_harvest, sorg_harvest, 
                             residuals, 
                             residuals_DM, residuals_N_top, residuals_C_top,
@@ -856,7 +860,8 @@ VegetationCrops::sow (Metalib& metalib, const AttributeList& al,
       msg.error ("There is already an " + name + " on the field.\n\
 If you want two " + name + " you should rename one of them");
   const Units& units = metalib.units ();
-  crop->initialize (units, geo, row_width, row_pos, seed, organic_matter,
+  crop->initialize (metalib, 
+                    units, geo, row_width, row_pos, seed, organic_matter,
                     SoilLimit, time, msg);
   if (!crop->check (units, msg))
     {
@@ -877,7 +882,8 @@ VegetationCrops::output (Log& log) const
 }
 
 void
-VegetationCrops::initialize (const Units& units, 
+VegetationCrops::initialize (Metalib& metalib, 
+                             const Units& units, 
                              const Time& time, const Geometry& geo,
                              const Soil& soil, 
 			     OrganicMatter& organic_matter,
@@ -885,7 +891,8 @@ VegetationCrops::initialize (const Units& units,
 {
   const double SoilLimit = -soil.MaxRootingHeight ();
   for (unsigned int i = 0; i < crops.size (); i++)
-    crops[i]->initialize (units, geo, organic_matter, SoilLimit, time, msg);
+    crops[i]->initialize (metalib, 
+                          units, geo, organic_matter, SoilLimit, time, msg);
 
   reset_canopy_structure (msg);
 }

@@ -108,19 +108,19 @@ public:
   void irrigate_subsoil (double flux, const IM& sm, 
                          const Volume& volume, double dt, Treelog& msg);
   void fertilize (const IM&, double dt, Treelog& msg);
-  void fertilize (const Metalib&, const AttributeList&,
+  void fertilize (Metalib&, const AttributeList&,
                   const Time&, double dt, Treelog& msg);
-  void fertilize (const Metalib&, const AttributeList&, double from, double to, 
+  void fertilize (Metalib&, const AttributeList&, double from, double to, 
                   const Time&, double dt, Treelog& msg);
-  void fertilize (const Metalib&, const AttributeList&, const Volume&, 
+  void fertilize (Metalib&, const AttributeList&, const Volume&, 
                   const Time&, double dt, Treelog& msg);
   void clear_second_year_utilization ();
   void emerge (const symbol crop_name, Treelog& msg);
-  void harvest (const Time& time, double dt, const symbol crop_name,
+  void harvest (Metalib&, const Time& time, double dt, const symbol crop_name,
                 double stub_length, double stem_harvest,
                 double leaf_harvest, double sorg_harvest, const bool combine,
                 std::vector<const Harvest*>& harvest, Treelog& msg);
-  void pluck (const Time& time, double dt, const symbol crop_name,
+  void pluck (Metalib&, const Time& time, double dt, const symbol crop_name,
               const double stem_harvest,
               const double leaf_harvest,
               const double sorg_harvest,
@@ -128,9 +128,9 @@ public:
               Treelog& msg);
 
   void add_residuals (std::vector<AM*>& residuals);
-  void mix (double from, double to, double penetration, 
+  void mix (Metalib&, double from, double to, double penetration, 
             const Time&, double dt, Treelog&);
-  void swap (double from, double middle, double to, 
+  void swap (Metalib&, double from, double middle, double to, 
              const Time&, double dt, Treelog&);
   void set_porosity (double at, double Theta);
   void set_heat_source (double at, double value); // [W/m^2]
@@ -154,7 +154,7 @@ public:
 
   // Simulation.
   void clear ();
-  void tick (const Time&, const double dt, const Weather*,
+  void tick (Metalib& metalib, const Time&, const double dt, const Weather*,
 	     const Scope&, Treelog&);
   bool check (bool require_weather,
               const Time& from, const Time& to, 
@@ -290,7 +290,7 @@ ColumnStandard::fertilize (const IM& im, const double dt, Treelog& msg)
 { chemistry->spray (im, dt, msg); }
 
 void
-ColumnStandard::fertilize (const Metalib& metalib, const AttributeList& al, 
+ColumnStandard::fertilize (Metalib& metalib, const AttributeList& al, 
                            const Time& now, const double dt, Treelog& msg)
 {
   // Utilization log.
@@ -306,12 +306,12 @@ ColumnStandard::fertilize (const Metalib& metalib, const AttributeList& al,
 
   // Add organic matter, if any.
   if (!AM::is_mineral (metalib, al))
-    organic_matter->fertilize (metalib, al, geometry, now, dt);
+    organic_matter->fertilize (metalib, al, geometry, now, dt, msg);
   applied_DM += AM::get_DM (metalib, al) / dt;
 }
 
 void 
-ColumnStandard::fertilize (const Metalib& metalib, const AttributeList& al, 
+ColumnStandard::fertilize (Metalib& metalib, const AttributeList& al, 
                            const double from, const double to, 
                            const Time& now, const double dt, Treelog& msg)
 {
@@ -332,11 +332,11 @@ ColumnStandard::fertilize (const Metalib& metalib, const AttributeList& al,
 
   // Add organic matter, if any.
   if (!AM::is_mineral (metalib, al))
-      organic_matter->fertilize (metalib, al, geometry, from, to, now, dt);
+    organic_matter->fertilize (metalib, al, geometry, from, to, now, dt, msg);
 }
 
 void 
-ColumnStandard::fertilize (const Metalib& metalib, const AttributeList& al, 
+ColumnStandard::fertilize (Metalib& metalib, const AttributeList& al, 
                            const Volume& volume,
                            const Time& now, const double dt, Treelog& msg)
 {
@@ -355,7 +355,7 @@ ColumnStandard::fertilize (const Metalib& metalib, const AttributeList& al,
 
   // Add organic matter, if any.
   if (!AM::is_mineral (metalib, al))
-    organic_matter->fertilize (metalib, al, geometry, volume, now, dt);
+    organic_matter->fertilize (metalib, al, geometry, volume, now, dt, msg);
 }
 
 void 
@@ -367,7 +367,7 @@ ColumnStandard::emerge (const symbol crop_name, Treelog& msg)
 { vegetation->emerge (crop_name, msg); }
 
 void
-ColumnStandard::harvest (const Time& time, const double dt,
+ColumnStandard::harvest (Metalib& metalib, const Time& time, const double dt,
                          const symbol crop_name,
                          const double stub_length,
                          const double stem_harvest,
@@ -379,7 +379,7 @@ ColumnStandard::harvest (const Time& time, const double dt,
   const double old_LAI = vegetation->LAI ();
   std::vector<AM*> residuals;
   double min_height = 100.0;
-  vegetation->harvest (name, crop_name, time, geometry,
+  vegetation->harvest (metalib, name, crop_name, time, geometry,
                        stub_length, 
                        stem_harvest, leaf_harvest, sorg_harvest,
                        harvest, min_height, 
@@ -389,7 +389,7 @@ ColumnStandard::harvest (const Time& time, const double dt,
                        combine, msg); 
   add_residuals (residuals);
   if (min_height < 0.0)
-    mix (0.0, min_height, 0.0, time, dt, msg);
+    mix (metalib, 0.0, min_height, 0.0, time, dt, msg);
 
   // Chemicals removed by harvest.  BUG: We assume chemicals are above stub.
   const double new_LAI = vegetation->LAI ();
@@ -403,7 +403,8 @@ ColumnStandard::harvest (const Time& time, const double dt,
 }
 
 void 
-ColumnStandard::pluck (const Time& time, double dt, const symbol crop_name,
+ColumnStandard::pluck (Metalib& metalib, 
+                       const Time& time, double dt, const symbol crop_name,
                        const double stem_harvest,
                        const double leaf_harvest,
                        const double sorg_harvest,
@@ -412,7 +413,7 @@ ColumnStandard::pluck (const Time& time, double dt, const symbol crop_name,
 { 
   const double old_LAI = vegetation->LAI ();
   std::vector<AM*> residuals;
-  vegetation->pluck (name, crop_name, time, geometry,
+  vegetation->pluck (metalib, name, crop_name, time, geometry,
                      stem_harvest, leaf_harvest, sorg_harvest,
                      harvest, harvest_DM, harvest_N, harvest_C, 
                      residuals, residuals_DM, residuals_N_top, residuals_C_top,
@@ -441,13 +442,13 @@ ColumnStandard::add_residuals (std::vector<AM*>& residuals)
 }
 
 void 
-ColumnStandard::mix (const double from, const double to,
+ColumnStandard::mix (Metalib& metalib, const double from, const double to,
                      const double penetration, 
                      const Time& time, const double dt,
                      Treelog& msg)
 {
   std::vector<AM*> residuals;
-  vegetation->kill_all (name, time, geometry, residuals, 
+  vegetation->kill_all (metalib, name, time, geometry, residuals, 
                         residuals_DM, residuals_N_top, residuals_C_top, 
                         residuals_N_soil, residuals_C_soil, msg);
   add_residuals (residuals);
@@ -463,11 +464,12 @@ ColumnStandard::mix (const double from, const double to,
 }
 
 void 
-ColumnStandard::swap (const double from, const double middle, const double to,
+ColumnStandard::swap (Metalib& metalib, 
+                      const double from, const double middle, const double to,
 		      const Time& time, const double dt, Treelog& msg)
 {
-  mix (from, middle, 1.0, time, dt, msg);
-  mix (middle, to, 0.0, time, dt, msg);
+  mix (metalib, from, middle, 1.0, time, dt, msg);
+  mix (metalib, middle, to, 0.0, time, dt, msg);
   soil_water->swap (geometry, *soil, *soil_heat, from, middle, to, dt, msg);
   soil_heat->swap (geometry, from, middle, to);
   chemistry->swap (geometry, *soil, *soil_water, from, middle, to, dt);
@@ -606,7 +608,7 @@ ColumnStandard::clear ()
 }
 
 void
-ColumnStandard::tick (const Time& time, const double dt,
+ColumnStandard::tick (Metalib& metalib, const Time& time, const double dt,
                       const Weather* global_weather, const Scope& parent_scope,
 		      Treelog& msg)
 {
@@ -628,7 +630,7 @@ ColumnStandard::tick (const Time& time, const double dt,
                     *vegetation, *movement,
                     geometry, *soil, *soil_water, *soil_heat, *chemistry,
                     dt, msg);
-  vegetation->tick (time, *bioclimate, geometry, *soil, 
+  vegetation->tick (metalib, time, *bioclimate, geometry, *soil, 
 		    *soil_heat, *soil_water, *chemistry, *organic_matter, 
                     residuals_DM, residuals_N_top, residuals_C_top, 
                     residuals_N_soil, residuals_C_soil, dt, msg);
@@ -671,7 +673,7 @@ ColumnStandard::tick (const Time& time, const double dt,
   
   // Once a month we clean up old AM from organic matter.
   if (time.hour () == 13 && time.mday () == 13)
-    organic_matter->monthly (geometry);
+    organic_matter->monthly (metalib, geometry, msg);
 }
 
 bool
@@ -920,10 +922,12 @@ ColumnStandard::initialize (Block& block,
   
   // Organic matter and vegetation.
   const double T_avg = my_weather.average_temperature ();
-  organic_matter->initialize (units, alist.alist ("OrganicMatter"), 
+  organic_matter->initialize (block.metalib (), 
+                              units, alist.alist ("OrganicMatter"), 
                               geometry, *soil, *soil_water, *soil_heat, 
                               T_avg, msg);
-  vegetation->initialize (units, time, geometry, *soil, *organic_matter, msg);
+  vegetation->initialize (block.metalib (), 
+                          units, time, geometry, *soil, *organic_matter, msg);
   
   // Soil conductivity and capacity logs.
   soil_heat->tick_after (geometry.cell_size (), *soil, *soil_water, msg);

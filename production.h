@@ -36,6 +36,7 @@ class Log;
 class PLF;
 class AM;
 class Treelog;
+class Metalib;
 
 class Production 
 {
@@ -166,10 +167,10 @@ public:
   // Create and Destroy.
 public:
   void initialize (const double SeedN);
-  void initialize (symbol name,
+  void initialize (Metalib&, symbol name,
 		   const std::vector<const AttributeList*>& root,
 		   const std::vector<const AttributeList*>& dead,
-		   const Geometry&, OrganicMatter&);
+		   const Geometry&, OrganicMatter&, Treelog&);
   static void load_syntax (Frame&);
   Production (const AttributeList&);
   ~Production ();
