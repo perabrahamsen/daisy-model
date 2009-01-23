@@ -100,6 +100,7 @@ public:
 		     symbol sort, symbol part, lock_type lock = Unlocked);
   void initialize (const Geometry& geometry, const double max_rooting_depth);
   static const std::vector<const AttributeList*>& default_AM ();
+
   static double get_NO3 (const AttributeList&);	// [g N/cm^2]
   static double get_NH4 (const AttributeList&);	// [g N/cm^2]
   static IM get_IM (const Unit&, const AttributeList&);
@@ -111,6 +112,23 @@ public:
   static double utilized_weight (const AttributeList& am); // [kg N/ha]
   static double second_year_utilization (const AttributeList& am); // [kg N/ha]
   static void set_mineral (AttributeList&, double NH4, double NO3);// [kg N/ha]
+
+  static double get_NO3 (const Metalib&, const AttributeList&);	// [g N/cm^2]
+  static double get_NH4 (const Metalib&, const AttributeList&);	// [g N/cm^2]
+  static IM get_IM (const Metalib&, const Unit&, const AttributeList&);
+  static double get_volatilization (const Metalib&,
+                                    const AttributeList&);	// [g N/m^2]
+  static double get_DM (const Metalib&, const AttributeList&);	// [Mg DM/ha]
+  static double get_water (const Metalib&, const AttributeList&);	// [mm]
+  static void set_utilized_weight (const Metalib&, AttributeList& am,
+				   const double weight /* [kg N/ha] */);
+  static double utilized_weight (const Metalib&,
+                                 const AttributeList& am); // [kg N/ha]
+  static double second_year_utilization (const Metalib&,
+                                         const AttributeList& am); // [kg N/ha]
+  static void set_mineral (const Metalib&, AttributeList&, 
+                           double NH4, double NO3);// [kg N/ha]
+
   static bool is_fertilizer (const Metalib&, const AttributeList&);
   static bool is_mineral (const Metalib&, const AttributeList&);
   static bool is_organic (const Metalib&, const AttributeList&);
