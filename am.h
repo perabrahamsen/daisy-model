@@ -92,8 +92,8 @@ public:
 public:
   static const VCheck& check_om_pools ();
   // Initialization & Fertilizer.
-  static AM& create (const AttributeList&, const Geometry&, 
-                     double max_rooting_depth = 1.0);
+  static AM& create (const Metalib&, const AttributeList&, const Geometry&, 
+                     const Time&, double max_rooting_depth = 1.0);
   // Crop part.
   static AM& create (const size_t cell_size, const Time&,
 		     const std::vector<const AttributeList*>&,
@@ -111,7 +111,9 @@ public:
   static double utilized_weight (const AttributeList& am); // [kg N/ha]
   static double second_year_utilization (const AttributeList& am); // [kg N/ha]
   static void set_mineral (AttributeList&, double NH4, double NO3);// [kg N/ha]
-
+  static bool is_fertilizer (const Metalib&, const AttributeList&);
+  static bool is_mineral (const Metalib&, const AttributeList&);
+  static bool is_organic (const Metalib&, const AttributeList&);
 public:
   AM (const AttributeList&);
   ~AM ();

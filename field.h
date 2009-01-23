@@ -77,11 +77,13 @@ public:
                          double dt, Treelog& msg);
   void irrigate_subsoil (double water, const IM&, const Volume&, 
                          double dt, Treelog& msg);
-  void fertilize (const AttributeList&,
-                  double from, double to, double dt, Treelog& msg); // Organic.
-  void fertilize (const AttributeList&,
-                  const Volume&, double dt, Treelog& msg); // Organic.
-  void fertilize (const AttributeList&, double dt, Treelog& msg);
+  void fertilize (const Metalib&, const AttributeList&,
+                  double from, double to, 
+                  const Time&, double dt, Treelog& msg); // Organic.
+  void fertilize (const Metalib&, const AttributeList&, const Volume&,
+                  const Time&, double dt, Treelog&); // Organic.
+  void fertilize (const Metalib&, const AttributeList&,
+                  const Time&, double dt, Treelog& msg);
   void clear_second_year_utilization ();
   void emerge (symbol crop, Treelog&);
   void harvest (const Time&, double dt, symbol name,

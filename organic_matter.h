@@ -82,12 +82,13 @@ public:
 		      const Chemistry&, Treelog&) const = 0;
   virtual bool check_am (const AttributeList& am, Treelog& err) const = 0;
   virtual void add (AM&) = 0;
-  virtual void fertilize (const AttributeList&, const Geometry&, 
-                          double dt) = 0;
-  virtual void fertilize (const AttributeList&, const Geometry&,
-                          double from, double to, double dt) = 0;
-  virtual void fertilize (const AttributeList&, const Geometry&,
-                          const Volume&, double dt) = 0;
+  virtual void fertilize (const Metalib&, const AttributeList&, 
+                          const Geometry&, 
+                          const Time&, double dt) = 0;
+  virtual void fertilize (const Metalib&, const AttributeList&, const Geometry&,
+                          double from, double to, const Time&, double dt) = 0;
+  virtual void fertilize (const Metalib&, const AttributeList&, const Geometry&,
+                          const Volume&, const Time&, double dt) = 0;
   virtual AM* find_am (symbol sort, symbol part) const = 0;
 public:
   virtual void initialize (const Units&, 

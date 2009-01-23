@@ -189,12 +189,11 @@ ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
       else
         {
           double water = 0.0;
-          const symbol syntax = fert.name ("syntax");
           std::ostringstream tmp;
-          if (syntax == "mineral")
+          if (AM::is_mineral (daisy.metalib, fert))
             tmp << "Fertilizing " << fert.number ("weight") 
                 << " kg "<< fert.name ("type") << "-N/ha";
-          else if (syntax == "organic")
+          else if (AM::is_organic (daisy.metalib, fert))
             {
               tmp  << "Fertilizing " << fert.number ("weight") 
                    << " ton "<< fert.name ("type") << " ww/ha";
@@ -208,13 +207,8 @@ ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
           else
             tmp << "Fertilizing " << fert.name ("type");
           msg.message (tmp.str ());
-          if (syntax != "mineral")
-            {
-              AttributeList new_time;
-              daisy.time.set_alist (new_time);
-              fert.add ("creation", new_time);
-            }
-          daisy.field->fertilize (fert, daisy.dt, msg);
+          daisy.field->fertilize (daisy.metalib, fert, 
+                                  daisy.time, daisy.dt, msg);
           if (water > 0.0)
             daisy.field->irrigate_surface (water, IM (u_solute), daisy.dt, msg);
         }

@@ -79,13 +79,14 @@ struct OrganicNone : public OrganicMatter
   { return true; }
   void add (AM&)
   { }
-  void fertilize (const AttributeList&, const Geometry&, double)
+  void fertilize (const Metalib&, const AttributeList&, const Geometry&,
+                  const Time&, double)
   { }
-  void fertilize (const AttributeList&, const Geometry&, 
-                  double, double, double)
+  void fertilize (const Metalib&, const AttributeList&, const Geometry&, 
+                  double, double, const Time&, double)
   { }
-  void fertilize (const AttributeList&, const Geometry&, 
-                  const Volume&, double)
+  void fertilize (const Metalib&, const AttributeList&, const Geometry&, 
+                  const Volume&, const Time&, double)
   { }
   AM* find_am (symbol, symbol) const
   { return NULL; }

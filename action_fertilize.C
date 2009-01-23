@@ -167,12 +167,12 @@ ActionFertilize::common_doIt (Daisy& daisy, double& water, Treelog& msg)
       return;
     }
 
-  const symbol syntax = am.name ("syntax");
+  Metalib& metalib = daisy.metalib;
   std::ostringstream tmp;
-  if (syntax == "mineral")
+  if (AM::is_mineral (metalib, am))
     tmp << "Fertilizing " << am.number ("weight") 
 	<< " kg "<< am.name ("type") << "-N/ha";
-  else if (syntax == "organic")
+  else if (AM::is_organic (metalib, am))
     {
       tmp  << "Fertilizing " << am.number ("weight") 
 	   << " ton "<< am.name ("type") << " ww/ha";
@@ -186,19 +186,13 @@ ActionFertilize::common_doIt (Daisy& daisy, double& water, Treelog& msg)
   else
     tmp << "Fertilizing " << am.name ("type");
   msg.message (tmp.str ());
-  if (syntax != "mineral")
-    {
-      AttributeList new_time;
-      daisy.time.set_alist (new_time);
-      am.add ("creation", new_time);
-    }
 }
 
 bool 
 ActionFertilize::check (const Daisy& daisy, const Scope&, Treelog& err) const
 {
   bool ok = true;
-  if (am.name ("syntax") != "mineral" && !daisy.field->check_am (am, err))
+  if (!AM::is_mineral (daisy.metalib, am) && !daisy.field->check_am (am, err))
     ok = false;
   return ok;
 }
@@ -212,7 +206,6 @@ ActionFertilize::ActionFertilize (Block& al)
 	       ? new Precision (al.alist ("precision"))
 	       : NULL)
 { 
-  daisy_assert (am.check ("syntax")); 
   if (al.check ("equivalent_weight"))
     AM::set_utilized_weight (am, al.number ("equivalent_weight"));
 }
@@ -222,7 +215,8 @@ ActionFertilize::~ActionFertilize ()
 
 static struct ActionFertilizeSyntax : public DeclareBase
 {
-  static bool check_alist (const AttributeList& al, Treelog& err)
+  static bool check_object (const Metalib& metalib, 
+                            const AttributeList& al, Treelog& err)
   { 
     bool ok = true;
 
@@ -239,8 +233,7 @@ static struct ActionFertilizeSyntax : public DeclareBase
                    "with 'precision'");
         ok = false;
       }
-    if (fertilizer_weight + equivalent_weight + precision != 1)
-      {
+    if (fertilizer_weight + equivalent_weight + precision != 1)      {
         err.entry ("You must specify exactly one of 'weight', "
                    "'equivalent_weight' and 'precision'");
         ok = false;
@@ -248,8 +241,7 @@ static struct ActionFertilizeSyntax : public DeclareBase
 
     if (equivalent_weight || precision || second_year_compensation)
       {
-        const symbol syntax = am.name ("syntax");
-        if (syntax != "mineral")
+        if (!AM::is_mineral (metalib, am))
           {
             if (!am.check ("first_year_utilization"))
               {
@@ -261,11 +253,10 @@ static struct ActionFertilizeSyntax : public DeclareBase
               {
                 std::ostringstream tmp;
                 tmp  << "You cannot use 'equivalent_weight' with "
-                     << syntax << " fertilizer";
+                     << am.name ("type") << " fertilizer";
                 err.entry (tmp.str ());
               }
           }
-
       }
     return ok;
   }
@@ -276,7 +267,7 @@ Shared parameters for all fertilize actions.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_check (check_alist);
+    frame.add_object_check (check_object);
     frame.add_object ("am", AM::component, "\
 The fertilizer you want to apply.");
     frame.add ("equivalent_weight", "kg N/ha", Check::non_negative (),
@@ -334,7 +325,8 @@ ActionFertilizeSurface::doIt (Daisy& daisy, const Scope&, Treelog& msg)
 
   if (to < from)
     {
-      daisy.field->fertilize (am, from, to, daisy.dt, msg);
+      daisy.field->fertilize (daisy.metalib, am, from, to, 
+                              daisy.time, daisy.dt, msg);
       if (water > 0.0)
         daisy.field->irrigate_subsoil (water,
                                        IM (units.get_unit (IM::solute_unit ())),
@@ -342,7 +334,7 @@ ActionFertilizeSurface::doIt (Daisy& daisy, const Scope&, Treelog& msg)
     }
   else
     {
-      daisy.field->fertilize (am, daisy.dt, msg);
+      daisy.field->fertilize (daisy.metalib, am, daisy.time, daisy.dt, msg);
       if (water > 0.0)
         daisy.field->irrigate_surface (water, 
                                        IM (units.get_unit (IM::solute_unit ())),
@@ -419,7 +411,8 @@ ActionFertilizeIncorporate::doIt (Daisy& daisy, const Scope&, Treelog& msg)
   double water = 0.0;
   common_doIt (daisy, water, msg);
 
-  daisy.field->fertilize (am, *volume, daisy.dt, msg);
+  daisy.field->fertilize (daisy.metalib, am, *volume,
+                          daisy.time, daisy.dt, msg);
   if (water > 0.0)
     daisy.field->irrigate_subsoil (water,
                                    IM (daisy.units ()

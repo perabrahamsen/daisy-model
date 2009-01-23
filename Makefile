@@ -1566,7 +1566,7 @@ action_extern${OBJ}: action_extern.C action.h model.h symbol.h alist.h \
   scope_multi.h scope.h value.h scopesel.h number.h daisy.h program.h \
   run.h time.h timestep.h vcheck.h memutils.h field.h border.h am.h im.h \
   chemical.h log.h treelog.h librarian.h block.h check.h assertion.h \
-  units.h frame.h
+  units.h frame.h metalib.h library.h
 rubiscoNdist_expr${OBJ}: rubiscoNdist_expr.C rubiscoNdist.h model.h symbol.h \
   alist.h mathlib.h assertion.h block.h value.h syntax.h check.h \
   librarian.h number.h scope_exchange.h scope_model.h scope.h memutils.h \

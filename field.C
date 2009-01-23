@@ -58,11 +58,12 @@ struct Field::Implementation
                          double dt, Treelog& msg);
   void irrigate_subsoil (double flux, const IM&, const Volume&,
                          double dt, Treelog& msg);
-  void fertilize (const AttributeList&, const Volume&, double dt, 
-		  Treelog& msg);
-  void fertilize (const AttributeList&, double from, double to, double dt, 
-		  Treelog& msg);
-  void fertilize (const AttributeList&, double dt, Treelog& msg);
+  void fertilize (const Metalib&, const AttributeList&, const Volume&, 
+                  const Time&, double dt, Treelog& msg);
+  void fertilize (const Metalib&, const AttributeList&, double from, double to, 
+                  const Time&, double dt, Treelog& msg);
+  void fertilize (const Metalib&, const AttributeList&, 
+                  const Time&, double dt, Treelog& msg);
   void clear_second_year_utilization ();
   void emerge (symbol crop, Treelog&);
   void harvest (const Time&, double dt, symbol name,
@@ -262,38 +263,41 @@ Field::Implementation::irrigate_subsoil (const double flux, const IM& im,
 }
 
 void 
-Field::Implementation::fertilize (const AttributeList& al, 
+Field::Implementation::fertilize (const Metalib& metalib, const AttributeList& al, 
 				  const double from, const double to,
-                                  const double dt, Treelog& msg)
+                                  const Time& now, const double dt, 
+                                  Treelog& msg)
 {
   if (selected)
-    selected->fertilize (al, from, to, dt, msg);
+    selected->fertilize (metalib, al, from, to, now, dt, msg);
   else for (ColumnList::iterator i = columns.begin ();
 	    i != columns.end ();
 	    i++)
-	 (*i)->fertilize (al, from, to, dt, msg);
+	 (*i)->fertilize (metalib, al, from, to, now, dt, msg);
 }
 
 void 
-Field::Implementation::fertilize (const AttributeList& al, 
+Field::Implementation::fertilize (const Metalib& metalib, const AttributeList& al, 
                                   const Volume& volume,
-                                  const double dt, Treelog& msg)
+                                  const Time& now, const double dt,
+                                  Treelog& msg)
 {
   if (selected)
-    selected->fertilize (al, volume, dt, msg);
+    selected->fertilize (metalib, al, volume, now, dt, msg);
   else for (ColumnList::iterator i = columns.begin ();
 	    i != columns.end ();
 	    i++)
-	 (*i)->fertilize (al, volume, dt, msg);
+	 (*i)->fertilize (metalib, al, volume, now, dt, msg);
 }
 
 void 
-Field::Implementation::fertilize (const AttributeList& al, const double dt,
-				  Treelog& msg)
+Field::Implementation::fertilize (const Metalib& metalib, const AttributeList& al, 
+                                  const Time& now, const double dt, 
+                                  Treelog& msg)
 {
   if (selected)
     {
-      selected->fertilize (al, dt, msg);
+      selected->fertilize (metalib, al, now, dt, msg);
     }
   else 
     {
@@ -301,7 +305,7 @@ Field::Implementation::fertilize (const AttributeList& al, const double dt,
 	   i != columns.end ();
 	   i++)
 	{
-	  (*i)->fertilize (al, dt, msg);
+	  (*i)->fertilize (metalib, al, now, dt, msg);
 	}
     }
 }
@@ -847,20 +851,21 @@ Field::irrigate_subsoil (double water, const IM& im,
 { impl->irrigate_subsoil (water, im, volume, dt, msg); }
 
 void 
-Field::fertilize (const AttributeList& al, 
-                  const double from, const double to, const double dt,
-		  Treelog& msg)
-{ impl->fertilize (al, from, to, dt, msg); }
+Field::fertilize (const Metalib& metalib, const AttributeList& al, 
+                  const double from, const double to, 
+                  const Time& now, const double dt, Treelog& msg)
+{ impl->fertilize (metalib, al, from, to, now, dt, msg); }
 
 void 
-Field::fertilize (const AttributeList& al, 
-                  const Volume& volume, const double dt,
-		  Treelog& msg)
-{ impl->fertilize (al, volume, dt, msg); }
+Field::fertilize (const Metalib& metalib, const AttributeList& al, 
+                  const Volume& volume, 
+                  const Time& now, const double dt, Treelog& msg)
+{ impl->fertilize (metalib, al, volume, now, dt, msg); }
 
 void 
-Field::fertilize (const AttributeList& al, const double dt, Treelog& msg)
-{ impl->fertilize (al, dt, msg); }
+Field::fertilize (const Metalib& metalib, const AttributeList& al, 
+                  const Time& now, const double dt, Treelog& msg)
+{ impl->fertilize (metalib, al, now, dt, msg); }
 
 void 
 Field::clear_second_year_utilization ()

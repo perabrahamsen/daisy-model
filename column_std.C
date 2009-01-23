@@ -108,11 +108,12 @@ public:
   void irrigate_subsoil (double flux, const IM& sm, 
                          const Volume& volume, double dt, Treelog& msg);
   void fertilize (const IM&, double dt, Treelog& msg);
-  void fertilize (const AttributeList&, double dt, Treelog& msg);
-  void fertilize (const AttributeList&, double from, double to, double dt,
-		  Treelog& msg);
-  void fertilize (const AttributeList&, const Volume&, double dt,
-		  Treelog& msg);
+  void fertilize (const Metalib&, const AttributeList&,
+                  const Time&, double dt, Treelog& msg);
+  void fertilize (const Metalib&, const AttributeList&, double from, double to, 
+                  const Time&, double dt, Treelog& msg);
+  void fertilize (const Metalib&, const AttributeList&, const Volume&, 
+                  const Time&, double dt, Treelog& msg);
   void clear_second_year_utilization ();
   void emerge (const symbol crop_name, Treelog& msg);
   void harvest (const Time& time, double dt, const symbol crop_name,
@@ -289,8 +290,8 @@ ColumnStandard::fertilize (const IM& im, const double dt, Treelog& msg)
 { chemistry->spray (im, dt, msg); }
 
 void
-ColumnStandard::fertilize (const AttributeList& al, const double dt,
-			   Treelog& msg)
+ColumnStandard::fertilize (const Metalib& metalib, const AttributeList& al, 
+                           const Time& now, const double dt, Treelog& msg)
 {
   // Utilization log.
   first_year_utilization += AM::utilized_weight (al);
@@ -304,15 +305,15 @@ ColumnStandard::fertilize (const AttributeList& al, const double dt,
   fertilize (AM::get_IM (units.get_unit (IM::storage_unit ()), al), dt, msg);
 
   // Add organic matter, if any.
-  if (al.name ("syntax") != "mineral")
-    organic_matter->fertilize (al, geometry, dt);
+  if (!AM::is_mineral (metalib, al))
+    organic_matter->fertilize (metalib, al, geometry, now, dt);
   applied_DM += AM::get_DM (al) / dt;
 }
 
 void 
-ColumnStandard::fertilize (const AttributeList& al, 
-                           const double from, const double to, const double dt,
-			   Treelog& msg)
+ColumnStandard::fertilize (const Metalib& metalib, const AttributeList& al, 
+                           const double from, const double to, 
+                           const Time& now, const double dt, Treelog& msg)
 {
   daisy_assert (to < from);
 
@@ -330,14 +331,14 @@ ColumnStandard::fertilize (const AttributeList& al,
   applied_DM += AM::get_DM (al) / dt;
 
   // Add organic matter, if any.
-  if (al.name ("syntax") != "mineral")
-    organic_matter->fertilize (al, geometry, from, to, dt);
+  if (!AM::is_mineral (metalib, al))
+      organic_matter->fertilize (metalib, al, geometry, from, to, now, dt);
 }
 
 void 
-ColumnStandard::fertilize (const AttributeList& al, 
-                           const Volume& volume, const double dt,
-			   Treelog& msg)
+ColumnStandard::fertilize (const Metalib& metalib, const AttributeList& al, 
+                           const Volume& volume,
+                           const Time& now, const double dt, Treelog& msg)
 {
   // Utilization log.
   first_year_utilization += AM::utilized_weight (al);
@@ -353,8 +354,8 @@ ColumnStandard::fertilize (const AttributeList& al,
   applied_DM += AM::get_DM (al) / dt;
 
   // Add organic matter, if any.
-  if (al.name ("syntax") != "mineral")
-    organic_matter->fertilize (al, geometry, volume, dt);
+  if (!AM::is_mineral (metalib, al))
+    organic_matter->fertilize (metalib, al, geometry, volume, now, dt);
 }
 
 void 

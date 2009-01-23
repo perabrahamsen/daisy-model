@@ -127,7 +127,6 @@ Original parameterization of the fast SOM pool.")
   void load_frame (Frame& frame) const
   {
     frame.alist ().add_strings ("cite", "mueller-smb");
-    frame.add ("turnover_rate", 1.4e-4 / 24.0 /* 5.83333333333e-6 */);
     std::vector<double> fractions;
     fractions.push_back (0.9); // SMB1
     fractions.push_back (0.0); // SMB2

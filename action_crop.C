@@ -589,18 +589,14 @@ ActionCrop::fertilize (Daisy& daisy, Treelog& msg,
 {
   msg.message (std::string ("[Fertilizing ") + am.name ("type") + "]");
 
-#if 0
-  if (am.name ("syntax") != "mineral")
-    am.add ("creation", daisy.time);
-#endif
-
   const double from = 0.0;
   const double to = -18.0;
       
   if (fertilize_incorporate)
-    daisy.field->fertilize (am, from, to, daisy.dt, msg);
+    daisy.field->fertilize (daisy.metalib, am, from, to, 
+                            daisy.time, daisy.dt, msg);
   else
-    daisy.field->fertilize (am, daisy.dt, msg);
+    daisy.field->fertilize (daisy.metalib, am, daisy.time, daisy.dt, msg);
 }
 
 void 

@@ -87,11 +87,13 @@ public:
   virtual void irrigate_subsoil (double flux, const IM&, const Volume&,
                                  double dt, 
 				 Treelog& msg) = 0;
-  virtual void fertilize (const AttributeList&, 
-                          double from, double to, double dt, Treelog& msg) = 0;
-  virtual void fertilize (const AttributeList&, 
-                          const Volume&, double dt, Treelog& msg) = 0;
-  virtual void fertilize (const AttributeList&, double dt, Treelog& msg) = 0;
+  virtual void fertilize (const Metalib&, const AttributeList&,
+                          double from, double to, 
+                          const Time&, double dt, Treelog& msg) = 0;
+  virtual void fertilize (const Metalib&, const AttributeList&, const Volume&, 
+                          const Time&, double dt, Treelog& msg) = 0;
+  virtual void fertilize (const Metalib&, const AttributeList&, 
+                          const Time&, double dt, Treelog& msg) = 0;
   virtual void clear_second_year_utilization () = 0;
   virtual void emerge (symbol crop, Treelog&) = 0;
   virtual void harvest (const Time&, double dt, symbol name,

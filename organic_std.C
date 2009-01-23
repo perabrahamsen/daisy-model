@@ -248,11 +248,12 @@ struct OrganicStandard : public OrganicMatter
 	      const Chemistry&, Treelog& err) const;
   bool check_am (const AttributeList& am, Treelog& err) const;
   void add (AM&);
-  void fertilize (const AttributeList&, const Geometry&, double dt);
-  void fertilize (const AttributeList&, const Geometry&,
-                  double from, double to, double dt);
-  void fertilize (const AttributeList&, const Geometry&, 
-                  const Volume&, double dt);
+  void fertilize (const Metalib& metalib, const AttributeList&, const Geometry&, 
+                  const Time&, double dt);
+  void fertilize (const Metalib& metalib, const AttributeList&, const Geometry&,
+                  double from, double to, const Time&, double dt);
+  void fertilize (const Metalib& metalib, const AttributeList&, const Geometry&, 
+                  const Volume&, const Time&, double dt);
   AM* find_am (symbol sort, symbol part) const;
   void initialize (const Units&, const AttributeList&, const Geometry& geo,
                    const Soil&, const SoilWater&, const SoilHeat&,
@@ -867,22 +868,23 @@ OrganicStandard::add (AM& om)
 }
 
 void 
-OrganicStandard::fertilize (const AttributeList& al, 
-                            const Geometry& geo, const double dt)
+OrganicStandard::fertilize (const Metalib& metalib, const AttributeList& al, 
+                            const Geometry& geo, 
+                            const Time& now, const double dt)
 { 
-  AM& om = AM::create (al, geo);
+  AM& om = AM::create (metalib, al, geo, now);
   fertilized_N += om.total_N (geo) / geo.surface_area () / dt; 
   fertilized_C += om.total_C (geo) / geo.surface_area () / dt;
   add (om);
 }
 
 void 
-OrganicStandard::fertilize (const AttributeList& al,
+OrganicStandard::fertilize (const Metalib& metalib, const AttributeList& al,
                             const Geometry& geo,
                             const double from, const double to,
-                            const double dt)
+                            const Time& now, const double dt)
 { 
-  AM& om = AM::create (al, geo);
+  AM& om = AM::create (metalib, al, geo, now);
   fertilized_N += om.total_N (geo) / geo.surface_area () / dt; 
   fertilized_C += om.total_C (geo) / geo.surface_area () / dt;
   om.mix (geo, from, to, 1.0,
@@ -892,12 +894,11 @@ OrganicStandard::fertilize (const AttributeList& al,
 }
 
 void 
-OrganicStandard::fertilize (const AttributeList& al,
-                            const Geometry& geo,
-                            const Volume& volume,
-                            const double dt)
+OrganicStandard::fertilize (const Metalib& metalib, const AttributeList& al,
+                            const Geometry& geo, const Volume& volume,
+                            const Time& now, const double dt)
 { 
-  AM& om = AM::create (al, geo);
+  AM& om = AM::create (metalib, al, geo, now);
   fertilized_N += om.total_N (geo) / geo.surface_area () / dt; 
   fertilized_C += om.total_C (geo) / geo.surface_area () / dt;
   om.mix (geo, volume, 1.0,
@@ -2670,7 +2671,8 @@ OrganicStandard::check_am (const AttributeList& am, Treelog& err) const
 		  ok = false;
 		}
 	    }
-	  else ok = false;
+	  else 
+            ok = false;
 	}
     }
   return ok;

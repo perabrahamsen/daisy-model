@@ -2,6 +2,15 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Frame
 
+** Gør AM mere fornuftig
+
+*** Fjern syntax == "mineral"
+
+AM::is_mineral () 
+AM::is_organic ()
+
+Brug "derived from" i stedet for.
+
 ** Gør AOM til model
 
 ** ret default_AM
@@ -13,6 +22,8 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 ** Gem frame i alist
 
 Overvej ejerskab. auto_ptr? copy vs inherit
+
+Få et overblik over hvor de bliver kaldt først.
 
 ** Gør Frame::syntax () const
 
