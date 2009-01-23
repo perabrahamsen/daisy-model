@@ -133,6 +133,7 @@ ActionFertilize::Precision::~Precision ()
 void 
 ActionFertilize::common_doIt (Daisy& daisy, double& water, Treelog& msg)
 {
+  const Metalib& metalib = daisy.metalib;
   if (precision.get ())
     {
       const double weight 
@@ -144,11 +145,11 @@ ActionFertilize::common_doIt (Daisy& daisy, double& water, Treelog& msg)
 	  msg.message ("Not fertilizing due to precision farming");
 	  return;
 	}
-      AM::set_utilized_weight (am, weight);
+      AM::set_utilized_weight (metalib, am, weight);
     }
   else if (second_year_compensation)
     {
-      const double weight = AM::utilized_weight (am);
+      const double weight = AM::utilized_weight (metalib, am);
       const double compensation = daisy.field->second_year_utilization ();
       daisy.field->clear_second_year_utilization ();
 
@@ -158,16 +159,15 @@ ActionFertilize::common_doIt (Daisy& daisy, double& water, Treelog& msg)
 	  return;
 	}
       else
-	AM::set_utilized_weight (am, weight - compensation);
+	AM::set_utilized_weight (metalib, am, weight - compensation);
     }
   else if (minimum_weight > 0.0
-	   && minimum_weight > AM::utilized_weight (am))
+	   && minimum_weight > AM::utilized_weight (metalib, am))
     {
       msg.message ("Not fertilizing due to minimum weight");
       return;
     }
 
-  Metalib& metalib = daisy.metalib;
   std::ostringstream tmp;
   if (AM::is_mineral (metalib, am))
     tmp << "Fertilizing " << am.number ("weight") 
@@ -176,10 +176,10 @@ ActionFertilize::common_doIt (Daisy& daisy, double& water, Treelog& msg)
     {
       tmp  << "Fertilizing " << am.number ("weight") 
 	   << " ton "<< am.name ("type") << " ww/ha";
-      const double utilized_weight = AM::utilized_weight (am);
+      const double utilized_weight = AM::utilized_weight (metalib, am);
       if (utilized_weight > 0.0)
         tmp << "; utilized " << utilized_weight << " kg N/ha";
-      water = AM::get_water (am);
+      water = AM::get_water (metalib, am);
       if (water > 0.0)
         tmp << "; water " << water << " mm";
     }
@@ -207,7 +207,8 @@ ActionFertilize::ActionFertilize (Block& al)
 	       : NULL)
 { 
   if (al.check ("equivalent_weight"))
-    AM::set_utilized_weight (am, al.number ("equivalent_weight"));
+    AM::set_utilized_weight (al.metalib (), 
+                             am, al.number ("equivalent_weight"));
 }
 
 ActionFertilize::~ActionFertilize ()

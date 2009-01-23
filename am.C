@@ -766,30 +766,6 @@ AM::default_AM ()
 }
 
 double
-AM::get_NO3 (const AttributeList& al)
-{
-  if (al.check ("weight"))
-    {
-      if (al.name ("syntax") == "organic")
-	{
-	  // Organic fertilizer.
-	  const double weight = al.number ("weight") 
-	    * al.number ("dry_matter_fraction") 
-	    * 0.01;			// T w.w. / ha --> g / cm²
-	  const double N = weight * al.number ("total_N_fraction");
-	  return N * al.number ("NO3_fraction");
-	}
-      // Mineral fertilizer.
-      daisy_assert (al.name ("syntax") == "mineral");
-      return al.number ("weight")
-	* (1.0 - al.number ("NH4_fraction"))
-	* (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0))); // kg/ha -> g/cm^2
-    }
-  // Other.
-  return al.number ("NO3");
-}
-
-double
 AM::get_NO3 (const Metalib& metalib, const AttributeList& al)
 {
   if (al.check ("weight"))
@@ -811,36 +787,6 @@ AM::get_NO3 (const Metalib& metalib, const AttributeList& al)
     }
   // Other.
   return al.number ("NO3");
-}
-
-double
-AM::get_NH4 (const AttributeList& al)
-{
-  daisy_assert (IM::storage_unit () == symbol ("g/cm^2"));
-
-  if (al.check ("weight"))
-    {
-      const double volatilization = al.number ("volatilization");
-
-      if (al.name ("syntax") == "organic")
-	{
-	  // Organic fertilizer.
-	  const double weight = al.number ("weight") 
-	    * al.number ("dry_matter_fraction") 
-	    * 0.01;			// T w.w. / ha --> g / cm²
-	  const double N = weight * al.number ("total_N_fraction");
-	  return N * al.number ("NH4_fraction") * (1.0 - volatilization);
-	}
-      // Mineral fertilizer.
-      daisy_assert (al.name ("syntax") == "mineral");
-      
-      return al.number ("weight")
-	* al.number ("NH4_fraction") * (1.0 - volatilization)
-	* (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0))); // kg/ha -> g/cm^2
-    }
-  // Other.
-  daisy_assert (!al.check ("volatilization"));
-  return al.number ("NH4");
 }
 
 double
@@ -874,40 +820,13 @@ AM::get_NH4 (const Metalib& metalib, const AttributeList& al)
 }
 
 IM
-AM::get_IM (const Unit& unit, const AttributeList& al)
+AM::get_IM (const Metalib& metalib, const Unit& unit, const AttributeList& al)
 {
   daisy_assert (unit.native_name () == IM::storage_unit ());
   IM result (unit);
-  result.set_value (Chemical::NH4 (), unit, get_NH4 (al));
-  result.set_value (Chemical::NO3 (), unit, get_NO3 (al));
+  result.set_value (Chemical::NH4 (), unit, get_NH4 (metalib, al));
+  result.set_value (Chemical::NO3 (), unit, get_NO3 (metalib, al));
   return result;
-}
-
-double
-AM::get_volatilization (const AttributeList& al)
-{
-  if (al.check ("weight"))
-    {
-      const double volatilization = al.number ("volatilization");
-
-      if (al.name ("syntax") == "organic")
-	{
-	  // Organic fertilizer.
-	  const double weight = al.number ("weight") 
-	    * al.number ("dry_matter_fraction") 
-	    * 100.0;			// T w.w. / ha --> g / m^2
-	  const double N = weight * al.number ("total_N_fraction");
-	  return N * al.number ("NH4_fraction") * volatilization;
-	}
-      // Mineral fertilizer.
-      daisy_assert (al.name ("syntax") == "mineral");
-      
-      return al.number ("weight")
-	* al.number ("NH4_fraction") * volatilization; 
-    }
-  // Other.
-  daisy_assert (!al.check ("volatilization"));
-  return 0.0;
 }
 
 double
@@ -938,30 +857,10 @@ AM::get_volatilization (const Metalib& metalib, const AttributeList& al)
 }
 
 double
-AM::get_DM (const AttributeList& al)	// [Mg DM/ha]
-{
-  if (al.check ("weight") && al.name ("syntax") == "organic")
-    return al.number ("weight") * al.number ("dry_matter_fraction");
-
-  return 0.0;
-}
-
-double
 AM::get_DM (const Metalib& metalib, const AttributeList& al)	// [Mg DM/ha]
 {
   if (al.check ("weight") && is_organic (metalib, al))
     return al.number ("weight") * al.number ("dry_matter_fraction");
-
-  return 0.0;
-}
-
-double
-AM::get_water (const AttributeList& al)	// [mm]
-{
-  if (al.check ("weight") && al.name ("syntax") == "organic")
-    return al.number ("weight")
-      * (1.0  - al.number ("dry_matter_fraction"))
-      * 0.1;                    // t/ha -> mm
 
   return 0.0;
 }
@@ -975,27 +874,6 @@ AM::get_water (const Metalib& metalib, const AttributeList& al)	// [mm]
       * 0.1;                    // t/ha -> mm
 
   return 0.0;
-}
-
-void
-AM::set_utilized_weight (AttributeList& am, const double weight)
-{
-  const symbol syntax = am.name ("syntax");
-    
-  if (syntax == "mineral")
-    am.add ("weight", weight);
-  else
-    {
-      daisy_assert (syntax == "organic");
-      daisy_assert (am.check ("total_N_fraction"));
-      daisy_assert (am.check ("dry_matter_fraction"));
-      const double N_fraction = am.number ("total_N_fraction");
-      const double utilization = am.number ("first_year_utilization", 1.0);
-      const double dry_matter_fraction = am.number ("dry_matter_fraction");
-      const double kg_per_ton = 1000.0;
-      am.add ("weight", weight 
-	      / (dry_matter_fraction *N_fraction * utilization * kg_per_ton));
-    }
 }
 
 void
@@ -1016,27 +894,6 @@ AM::set_utilized_weight (const Metalib& metalib,
       am.add ("weight", weight 
 	      / (dry_matter_fraction *N_fraction * utilization * kg_per_ton));
     }
-}
-
-double
-AM::utilized_weight (const AttributeList& am)
-{
-  if (am.check ("first_year_utilization")
-      && am.check ("dry_matter_fraction")
-      && am.check ("total_N_fraction")
-      && am.check ("weight"))
-    {
-      const double kg_per_ton = 1000.0;
-      return am.number ("weight")
-        * am.number ("dry_matter_fraction")
-        * am.number ("total_N_fraction")
-        * am.number ("first_year_utilization")
-        * kg_per_ton;
-    }
-  else if (am.name ("syntax") == "mineral")
-    return am.number ("weight");
-
-  return 0.0;
 }
 
 double
@@ -1061,25 +918,6 @@ AM::utilized_weight (const Metalib& metalib, const AttributeList& am)
 }
 
 double
-AM::second_year_utilization (const AttributeList& am)
-{
-  if (am.check ("second_year_utilization")
-      && am.check ("dry_matter_fraction")
-      && am.check ("total_N_fraction")
-      && am.check ("weight"))
-    {
-      const double kg_per_ton = 1000.0;
-      return am.number ("weight")
-        * am.number ("dry_matter_fraction")
-        * am.number ("total_N_fraction")
-        * am.number ("second_year_utilization")
-        * kg_per_ton;
-    }
-  return 0.0;
-}
-
-
-double
 AM::second_year_utilization (const Metalib&, const AttributeList& am)
 {
   if (am.check ("second_year_utilization")
@@ -1095,16 +933,6 @@ AM::second_year_utilization (const Metalib&, const AttributeList& am)
         * kg_per_ton;
     }
   return 0.0;
-}
-
-void
-AM::set_mineral (AttributeList& am, double NH4, double NO3)
-{
-  am.add ("syntax", "mineral");
-  const double total_N = NH4 + NO3;
-  am.add ("weight", total_N);
-  am.add ("NH4_fraction", (total_N > 0.0) ? NH4 / total_N : 0.0);
-  am.add ("volatilization", 0.0);
 }
 
 void

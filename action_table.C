@@ -141,6 +141,7 @@ void
 ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
 { 
   // Units.
+  const Metalib& metalib = daisy.metalib;
   const Units& units = daisy.units ();
   static const symbol mg_per_square_m ("mg/m^2");
   const Unit& u_mg_per_square_m = units.get_unit (mg_per_square_m);
@@ -162,7 +163,7 @@ ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
       AttributeList fert ((fertilizers.find (daisy.time) != fertilizers.end ())
                           ? *fertilizers[daisy.time] : *am);
 
-      AM::set_utilized_weight (fert, fertilize_events[daisy.time]);
+      AM::set_utilized_weight (metalib, fert, fertilize_events[daisy.time]);
       if (irrigate_events.find (daisy.time) != irrigate_events.end ())
         {
           double value = irrigate_events[daisy.time];
@@ -172,7 +173,7 @@ ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
               tmp << "Applying minimum of 0.1 mm\n";
               value = 0.1;
             }
-          IM im = AM::get_IM (u_mg_per_square_m, fert);
+          IM im = AM::get_IM (metalib, u_mg_per_square_m, fert);
 	  daisy_assert (std::isnormal (value));
 	  im.multiply_assign (Scalar (1.0 / value, u_per_mm), u_ppm);
           daisy.field->irrigate_subsoil (value, im, -5.0, -25.0, daisy.dt, msg);
@@ -197,10 +198,11 @@ ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
             {
               tmp  << "Fertilizing " << fert.number ("weight") 
                    << " ton "<< fert.name ("type") << " ww/ha";
-              const double utilized_weight = AM::utilized_weight (fert);
+              const double utilized_weight 
+                = AM::utilized_weight (metalib, fert);
               if (utilized_weight > 0.0)
                 tmp << "; utilized " << utilized_weight << " kg N/ha";
-              water = AM::get_water (fert);
+              water = AM::get_water (metalib, fert);
               if (water > 0.0)
                 tmp << "; water " << water << " mm";
             }

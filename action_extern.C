@@ -203,7 +203,7 @@ struct ActionExternFertigation : public Action
         Metalib& metalib = daisy.metalib;
         const Library& library = metalib.library (AM::component);
 	AttributeList alist (library.lookup ("mineral"));
-	AM::set_mineral (alist, NH4_value, NO3_value);
+	AM::set_mineral (metalib, alist, NH4_value, NO3_value);
         field.fertilize (metalib, alist, daisy.time, dt, msg);
       }
   }

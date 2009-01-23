@@ -101,6 +101,7 @@ public:
   void initialize (const Geometry& geometry, const double max_rooting_depth);
   static const std::vector<const AttributeList*>& default_AM ();
 
+#if 0
   static double get_NO3 (const AttributeList&);	// [g N/cm^2]
   static double get_NH4 (const AttributeList&);	// [g N/cm^2]
   static IM get_IM (const Unit&, const AttributeList&);
@@ -112,6 +113,7 @@ public:
   static double utilized_weight (const AttributeList& am); // [kg N/ha]
   static double second_year_utilization (const AttributeList& am); // [kg N/ha]
   static void set_mineral (AttributeList&, double NH4, double NO3);// [kg N/ha]
+#endif
 
   static double get_NO3 (const Metalib&, const AttributeList&);	// [g N/cm^2]
   static double get_NH4 (const Metalib&, const AttributeList&);	// [g N/cm^2]

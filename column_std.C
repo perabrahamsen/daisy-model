@@ -294,20 +294,20 @@ ColumnStandard::fertilize (const Metalib& metalib, const AttributeList& al,
                            const Time& now, const double dt, Treelog& msg)
 {
   // Utilization log.
-  first_year_utilization += AM::utilized_weight (al);
-  second_year_utilization_ += AM::second_year_utilization (al);
+  first_year_utilization += AM::utilized_weight (metalib, al);
+  second_year_utilization_ += AM::second_year_utilization (metalib, al);
 
   // Volatilization.
-  const double lost_NH4 = AM::get_volatilization (al);
+  const double lost_NH4 = AM::get_volatilization (metalib, al);
   chemistry->dissipate (Chemical::NH4 (), lost_NH4, dt, msg);
 
   // Add inorganic matter.
-  fertilize (AM::get_IM (units.get_unit (IM::storage_unit ()), al), dt, msg);
+  fertilize (AM::get_IM (metalib, units.get_unit (IM::storage_unit ()), al), dt, msg);
 
   // Add organic matter, if any.
   if (!AM::is_mineral (metalib, al))
     organic_matter->fertilize (metalib, al, geometry, now, dt);
-  applied_DM += AM::get_DM (al) / dt;
+  applied_DM += AM::get_DM (metalib, al) / dt;
 }
 
 void 
@@ -318,17 +318,17 @@ ColumnStandard::fertilize (const Metalib& metalib, const AttributeList& al,
   daisy_assert (to < from);
 
   // Utilization log.
-  first_year_utilization += AM::utilized_weight (al);
-  second_year_utilization_ += AM::second_year_utilization (al);
+  first_year_utilization += AM::utilized_weight (metalib, al);
+  second_year_utilization_ += AM::second_year_utilization (metalib, al);
 
   // Volatilization.
-  const double lost_NH4 = AM::get_volatilization (al);
+  const double lost_NH4 = AM::get_volatilization (metalib, al);
   chemistry->dissipate (Chemical::NH4 (), lost_NH4, dt, msg);
 
   // Add inorganic matter.
-  const IM im = AM::get_IM (units.get_unit (IM::storage_unit ()), al);
+  const IM im = AM::get_IM (metalib, units.get_unit (IM::storage_unit ()), al);
   chemistry->incorporate (geometry, im, from, to, dt, msg);
-  applied_DM += AM::get_DM (al) / dt;
+  applied_DM += AM::get_DM (metalib, al) / dt;
 
   // Add organic matter, if any.
   if (!AM::is_mineral (metalib, al))
@@ -341,17 +341,17 @@ ColumnStandard::fertilize (const Metalib& metalib, const AttributeList& al,
                            const Time& now, const double dt, Treelog& msg)
 {
   // Utilization log.
-  first_year_utilization += AM::utilized_weight (al);
-  second_year_utilization_ += AM::second_year_utilization (al);
+  first_year_utilization += AM::utilized_weight (metalib, al);
+  second_year_utilization_ += AM::second_year_utilization (metalib, al);
 
   // Volatilization.
-  const double lost_NH4 = AM::get_volatilization (al);
+  const double lost_NH4 = AM::get_volatilization (metalib, al);
   chemistry->dissipate (Chemical::NH4 (), lost_NH4, dt, msg);
 
   // Add inorganic matter.
-  const IM im = AM::get_IM (units.get_unit (IM::storage_unit ()), al);
+  const IM im = AM::get_IM (metalib, units.get_unit (IM::storage_unit ()), al);
   chemistry->incorporate (geometry, im, volume, dt, msg);
-  applied_DM += AM::get_DM (al) / dt;
+  applied_DM += AM::get_DM (metalib, al) / dt;
 
   // Add organic matter, if any.
   if (!AM::is_mineral (metalib, al))
