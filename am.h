@@ -38,15 +38,13 @@ class Treelog;
 class VCheck;
 class Units;
 
-class AM : public Model
+class AM : public ModelAListed
 {
   // Content.
 public:
   struct Implementation;
   std::auto_ptr<Implementation> impl;
   friend class Implementation;
-  const AttributeList alist;	// Remember attributes for checkpoint.
-  const symbol name;
   static const char *const component;
   symbol library_id () const;
   void append_to (std::vector<AOM*>& added);
@@ -138,7 +136,6 @@ public:
   static bool is_organic (const Metalib&, const AttributeList&);
 public:
   AM (Block&);
-  AM (const AttributeList&);
   virtual ~AM ();
 };
 

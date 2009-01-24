@@ -1027,31 +1027,15 @@ AM::is_organic (const Metalib& metalib, const AttributeList& am)
   return m1;
 }
 
-AM::AM (const AttributeList& al)
-  : impl (new Implementation 
-	  (al.flag ("initialized"),
-           al.check ("creation")
-	   ? Time (al.alist ("creation"))
-	   : Time (1, 1, 1, 1),
-           al.check ("name") ? al.name ("name") : al.name ("type"),
-	   map_construct<AOM> (al.alist_sequence ("om")))),
-    alist (al),
-    name ("state")
-{
-  if (al.check ("lock"))
-    impl->lock = new AM::Implementation::Lock (al.alist ("lock"));
-}
-
 AM::AM (Block& al)
-  : impl (new Implementation 
+  : ModelAListed (al.alist ()),
+    impl (new Implementation 
 	  (al.flag ("initialized"),
            al.check ("creation")
 	   ? Time (al.alist ("creation"))
 	   : Time (1, 1, 1, 1),
            al.check ("name") ? al.name ("name") : al.name ("type"),
-	   map_construct<AOM> (al.alist_sequence ("om")))),
-    alist (al.alist ()),
-    name ("state")
+	   map_construct<AOM> (al.alist_sequence ("om"))))
 {
   if (al.check ("lock"))
     impl->lock = new AM::Implementation::Lock (al.alist ("lock"));
@@ -1238,19 +1222,12 @@ This AM belongs to a still living plant",
   }
 } AMBase_syntax;
 
-struct DeclareAM : public DeclareModel
+static struct AMStateSyntax : public DeclareModel
 {
   Model* make (Block& al) const
   { return new AM (al); }
-  DeclareAM (const symbol c, const symbol n, const symbol d)
-    : DeclareModel (c, n, "base", d)
-  { }
-};
-
-static struct AMStateSyntax : public DeclareAM
-{
   AMStateSyntax ()
-    : DeclareAM (AM::component, "state", "\
+    : DeclareModel (AM::component, "state", "base", "\
 Most AM models are only used for initialization, they will be comnverted\n\
 to this generic model after creation, so this is what you will see in a\n\
 checkpoint.  This model contains a number (typically 2) of separate\n\
@@ -1262,10 +1239,12 @@ pools, each of which have their own turnover rate.")
   }
 } AMState_syntax;
 
-static struct AMOrganicSyntax : public DeclareAM
+static struct AMOrganicSyntax : public DeclareModel
 {
+  Model* make (Block& al) const
+  { return new AM (al); }
   AMOrganicSyntax ()
-    : DeclareAM (AM::component, "organic", "\
+    : DeclareModel (AM::component, "organic", "base", "\
 Organic fertilizer, typically slurry or manure from animals.")
   { }
   static bool check_alist (const AttributeList& al, Treelog& err)
@@ -1318,10 +1297,12 @@ Fraction of NH4 that evaporates on application.");
   }
 } AMOrganic_syntax;
 
-static struct AMInitialSyntax : public DeclareAM
+static struct AMInitialSyntax : public DeclareModel
 {
+  Model* make (Block& al) const
+  { return new AM (al); }
   AMInitialSyntax ()
-    : DeclareAM (AM::component, "initial", "\
+    : DeclareModel (AM::component, "initial", "base", "\
 Initial added organic matter at the start of the simulation.")
   { }
   static bool check_alist (const AttributeList& al, Treelog& err)
@@ -1368,10 +1349,13 @@ uniformly distributed in each layer.", load_layer);
   }
 } AMInitial_syntax;
 
-static struct AMRootSyntax : public DeclareAM
+static struct AMRootSyntax : public DeclareModel
 {
+  Model* make (Block& al) const
+  { return new AM (al); }
   AMRootSyntax ()
-    : DeclareAM (AM::component, "root", "Initialization of old root remains.")
+    : DeclareModel (AM::component, "root", "base", "\
+Initialization of old root remains.")
   { }
   static bool check_alist (const AttributeList& al, Treelog& err)
   { 
