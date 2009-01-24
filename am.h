@@ -98,22 +98,8 @@ public:
 		     symbol sort, symbol part, lock_type lock, Treelog& msg);
   void initialize (const Geometry&, const double max_rooting_depth);
   virtual void initialize_derived (const Geometry&, 
-                                   const double max_rooting_depth);
+                                   const double max_rooting_depth) = 0;
   static const std::vector<const AttributeList*>& default_AM ();
-
-#if 0
-  static double get_NO3 (const AttributeList&);	// [g N/cm^2]
-  static double get_NH4 (const AttributeList&);	// [g N/cm^2]
-  static IM get_IM (const Unit&, const AttributeList&);
-  static double get_volatilization (const AttributeList&);	// [g N/m^2]
-  static double get_DM (const AttributeList&);	// [Mg DM/ha]
-  static double get_water (const AttributeList&);	// [mm]
-  static void set_utilized_weight (AttributeList& am,
-				   const double weight /* [kg N/ha] */);
-  static double utilized_weight (const AttributeList& am); // [kg N/ha]
-  static double second_year_utilization (const AttributeList& am); // [kg N/ha]
-  static void set_mineral (AttributeList&, double NH4, double NO3);// [kg N/ha]
-#endif
 
   static double get_NO3 (const Metalib&, const AttributeList&);	// [g N/cm^2]
   static double get_NH4 (const Metalib&, const AttributeList&);	// [g N/cm^2]
@@ -134,8 +120,9 @@ public:
   static bool is_fertilizer (const Metalib&, const AttributeList&);
   static bool is_mineral (const Metalib&, const AttributeList&);
   static bool is_organic (const Metalib&, const AttributeList&);
-public:
+protected:
   AM (Block&);
+public:
   virtual ~AM ();
 };
 

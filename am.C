@@ -1057,112 +1057,6 @@ AM::initialize (const Geometry& geo, const double max_rooting_depth)
     }
 }
 
-void
-AM::initialize_derived (const Geometry& geo, const double max_rooting_depth)
-{
-  const symbol syntax = alist.name ("syntax");
-
-  if (syntax == "state")
-    /* Do nothing */;
-  else if (syntax == "organic")
-    {
-      // Get initialization parameters.
-      const double weight = alist.number ("weight") 
-	* alist.number ("dry_matter_fraction") 
-	* 0.01;			// T / ha --> g / cm²
-
-      const double C = weight * alist.number ("total_C_fraction");
-      const double N = weight * alist.number ("total_N_fraction")
-	* (1.0 - (alist.number ("NO3_fraction") 
-		  + alist.number ("NH4_fraction")));
-      add (C, N);
-    }
-  else if (syntax == "mineral")
-    daisy_notreached ();
-  else if (syntax == "crop")
-    daisy_notreached ();
-  else if (syntax == "initial")
-    {
-      const std::vector<const AttributeList*>& oms
-	= alist.alist_sequence ("om");
-      const std::vector<AOM*>& om = impl->om;
-      
-      const std::vector<const AttributeList*>& layers
-	= alist.alist_sequence ("layers");
-      
-      double last = 0.0;
-      for (size_t i = 0; i < layers.size (); i++)
-	{
-	  const double end = layers[i]->number ("end");
-	  const double weight = layers[i]->number ("weight"); // Kg C/m²
-	  const double C = weight * 1000.0 / (100.0 * 100.0); // g C / cm²
-	  int missing_number = -1;
-	  double missing_fraction = 1.0;
-	  for (size_t j = 0; j < oms.size (); j++)
-	    {
-	      if (oms[j]->check  ("initial_fraction"))
-		{
-		  const double fraction = oms[j]->number ("initial_fraction");
-		  daisy_assert (fraction >= 0.0);
-		  daisy_assert (fraction <= 1.0);
-		  missing_fraction -= fraction;
-		  geo.add_surface (om[j]->C, last, end, C * fraction);
-		}
-	      else if (missing_number != -1)
-		// Should be catched by syntax check.
-		throw ("Missing initial fraction in initial am");
-	      else
-		missing_number = j;
-	    }
-	  if (missing_number > -1)
-	    {
-	      if (missing_fraction < -0.1e-10)
-		throw ("Specified over 100% C in om in initial am");
-	      else if (missing_fraction > 0.0)
-		geo.add_surface (om[missing_number]->C, 
-                                 last, end, C * missing_fraction);
-	    }
-	  else if (missing_fraction < -0.1e-10)
-	    throw ("Specified more than all C in om in initial am");
-	  else if (missing_fraction > 0.1e-10)
-	    throw ("Specified less than all C in om in initial am");
-	  
-	  last = end;
-	}
-      // Fill N to match C.
-      for (size_t i = 0; i < om.size (); i++)
-	{
-	  daisy_assert (om[i]->initial_C_per_N > 0);
-	  while (om[i]->N.size () < om[i]->C.size ())
-	    om[i]->N.push_back (om[i]->C[om[i]->N.size ()] 
-			        / om[i]->initial_C_per_N);
-	}
-    }
-  else if (syntax == "root")
-    {
-      // Get paramters.
-      const double weight = alist.number ("weight"); // T DM / ha
-      const double total_C_fraction = alist.number ("total_C_fraction");
-      const double total_N_fraction = alist.number ("total_N_fraction");
-      const double C = weight * 1000.0*1000.0 / (100.0*100.0*100.0*100.0)
-	* total_C_fraction; // g C / cm²;
-      const double N = weight * 1000.0*1000.0 / (100.0*100.0*100.0*100.0)
-	* total_N_fraction; // g C / cm²;
-      const double k = M_LN2 / alist.number ("dist");
-      const double depth = alist.number ("depth", max_rooting_depth);
-      daisy_assert (depth < 0.0);
-
-      // Calculate density.
-      std::vector<double> density (geo.cell_size (), 0.0);
-      for (size_t i = 0; i < geo.cell_size (); i++)
-        if (geo.cell_z (i) > depth)
-          density[i] = k * exp (k * geo.cell_z (i));
-
-      // Add it.
-      impl->add_surface (geo, C, N, density);
-    }
-}
-
 AM::~AM ()
 { }
 
@@ -1197,6 +1091,8 @@ Fraction of NH4 that evaporates on application.");
   }
 } AMMineral_syntax;
 
+// The 'base' AM base model.
+
 static struct AMBaseSyntax : public DeclareBase
 {
   AMBaseSyntax ()
@@ -1222,10 +1118,21 @@ This AM belongs to a still living plant",
   }
 } AMBase_syntax;
 
+// The 'state' AM model.
+
+struct AMState : public AM
+{
+  void initialize_derived (const Geometry&, const double)
+  { }
+  AMState (Block& al)
+    : AM (al)
+  { }
+};
+
 static struct AMStateSyntax : public DeclareModel
 {
   Model* make (Block& al) const
-  { return new AM (al); }
+  { return new AMState (al); }
   AMStateSyntax ()
     : DeclareModel (AM::component, "state", "base", "\
 Most AM models are only used for initialization, they will be comnverted\n\
@@ -1239,10 +1146,32 @@ pools, each of which have their own turnover rate.")
   }
 } AMState_syntax;
 
+// The 'organic' AM model.
+
+struct AMOrganic : public AM
+{
+  void initialize_derived (const Geometry& geo, const double)
+  {
+    // Get initialization parameters.
+    const double weight = alist.number ("weight") 
+      * alist.number ("dry_matter_fraction") 
+      * 0.01;			// T / ha --> g / cm²
+
+    const double C = weight * alist.number ("total_C_fraction");
+    const double N = weight * alist.number ("total_N_fraction")
+      * (1.0 - (alist.number ("NO3_fraction") 
+                + alist.number ("NH4_fraction")));
+    add (C, N);
+  }
+  AMOrganic (Block& al)
+    : AM (al)
+  { }
+};
+
 static struct AMOrganicSyntax : public DeclareModel
 {
   Model* make (Block& al) const
-  { return new AM (al); }
+  { return new AMOrganic (al); }
   AMOrganicSyntax ()
     : DeclareModel (AM::component, "organic", "base", "\
 Organic fertilizer, typically slurry or manure from animals.")
@@ -1297,10 +1226,76 @@ Fraction of NH4 that evaporates on application.");
   }
 } AMOrganic_syntax;
 
+// The 'initial' AM model.
+
+struct AMInitial : public AM
+{
+  void initialize_derived (const Geometry& geo, const double)
+  {
+    const std::vector<const AttributeList*>& oms
+      = alist.alist_sequence ("om");
+    const std::vector<AOM*>& om = impl->om;
+
+    const std::vector<const AttributeList*>& layers
+      = alist.alist_sequence ("layers");
+
+    double last = 0.0;
+    for (size_t i = 0; i < layers.size (); i++)
+      {
+        const double end = layers[i]->number ("end");
+        const double weight = layers[i]->number ("weight"); // Kg C/m²
+        const double C = weight * 1000.0 / (100.0 * 100.0); // g C / cm²
+        int missing_number = -1;
+        double missing_fraction = 1.0;
+        for (size_t j = 0; j < oms.size (); j++)
+          {
+            if (oms[j]->check  ("initial_fraction"))
+              {
+                const double fraction = oms[j]->number ("initial_fraction");
+                daisy_assert (fraction >= 0.0);
+                daisy_assert (fraction <= 1.0);
+                missing_fraction -= fraction;
+                geo.add_surface (om[j]->C, last, end, C * fraction);
+              }
+            else if (missing_number != -1)
+              // Should be catched by syntax check.
+              throw ("Missing initial fraction in initial am");
+            else
+              missing_number = j;
+          }
+        if (missing_number > -1)
+          {
+            if (missing_fraction < -0.1e-10)
+              throw ("Specified over 100% C in om in initial am");
+            else if (missing_fraction > 0.0)
+              geo.add_surface (om[missing_number]->C, 
+                               last, end, C * missing_fraction);
+          }
+        else if (missing_fraction < -0.1e-10)
+          throw ("Specified more than all C in om in initial am");
+        else if (missing_fraction > 0.1e-10)
+          throw ("Specified less than all C in om in initial am");
+
+        last = end;
+      }
+    // Fill N to match C.
+    for (size_t i = 0; i < om.size (); i++)
+      {
+        daisy_assert (om[i]->initial_C_per_N > 0);
+        while (om[i]->N.size () < om[i]->C.size ())
+          om[i]->N.push_back (om[i]->C[om[i]->N.size ()] 
+                              / om[i]->initial_C_per_N);
+      }
+  }
+  AMInitial (Block& al)
+    : AM (al)
+  { }
+};
+
 static struct AMInitialSyntax : public DeclareModel
 {
   Model* make (Block& al) const
-  { return new AM (al); }
+  { return new AMInitial (al); }
   AMInitialSyntax ()
     : DeclareModel (AM::component, "initial", "base", "\
 Initial added organic matter at the start of the simulation.")
@@ -1349,10 +1344,42 @@ uniformly distributed in each layer.", load_layer);
   }
 } AMInitial_syntax;
 
+// The 'root' AM model.
+
+struct AMRoot : public AM
+{
+  void initialize_derived (const Geometry& geo, const double max_rooting_depth)
+  {
+    // Get paramters.
+    const double weight = alist.number ("weight"); // T DM / ha
+    const double total_C_fraction = alist.number ("total_C_fraction");
+    const double total_N_fraction = alist.number ("total_N_fraction");
+    const double C = weight * 1000.0*1000.0 / (100.0*100.0*100.0*100.0)
+      * total_C_fraction; // g C / cm²;
+    const double N = weight * 1000.0*1000.0 / (100.0*100.0*100.0*100.0)
+      * total_N_fraction; // g C / cm²;
+    const double k = M_LN2 / alist.number ("dist");
+    const double depth = alist.number ("depth", max_rooting_depth);
+    daisy_assert (depth < 0.0);
+
+    // Calculate density.
+    std::vector<double> density (geo.cell_size (), 0.0);
+    for (size_t i = 0; i < geo.cell_size (); i++)
+      if (geo.cell_z (i) > depth)
+        density[i] = k * exp (k * geo.cell_z (i));
+
+    // Add it.
+    impl->add_surface (geo, C, N, density);
+  }
+  AMRoot (Block& al)
+    : AM (al)
+  { }
+};
+
 static struct AMRootSyntax : public DeclareModel
 {
   Model* make (Block& al) const
-  { return new AM (al); }
+  { return new AMRoot (al); }
   AMRootSyntax ()
     : DeclareModel (AM::component, "root", "base", "\
 Initialization of old root remains.")
@@ -1405,6 +1432,8 @@ original.");
     frame.add ("om", AM::default_AM ());
   }
 } AMRoot_syntax;
+
+// The 'AM_table' program model.
 
 struct ProgramAM_table : public Program
 {
