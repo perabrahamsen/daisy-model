@@ -137,6 +137,7 @@ public:
   static bool is_mineral (const Metalib&, const AttributeList&);
   static bool is_organic (const Metalib&, const AttributeList&);
 public:
+  AM (Block&);
   AM (const AttributeList&);
   virtual ~AM ();
 };

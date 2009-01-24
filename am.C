@@ -695,8 +695,6 @@ AM::create (Metalib&, const AttributeList& al1 , const Geometry& geo,
       now.set_alist (time_alist);
       al2.add ("creation", time_alist);
     }
-  if (!al2.check ("name"))
-    al2.add ("name", al1.name ("type"));
   if (!al2.check ("initialized"))
     al2.add ("initialized", false);
   AM& am = *new AM (al2); 
@@ -983,9 +981,24 @@ AM::AM (const AttributeList& al)
            al.check ("creation")
 	   ? Time (al.alist ("creation"))
 	   : Time (1, 1, 1, 1),
-	   al.name ("name"),
+           al.check ("name") ? al.name ("name") : al.name ("type"),
 	   map_construct<AOM> (al.alist_sequence ("om")))),
     alist (al),
+    name ("state")
+{
+  if (al.check ("lock"))
+    impl->lock = new AM::Implementation::Lock (al.alist ("lock"));
+}
+
+AM::AM (Block& al)
+  : impl (new Implementation 
+	  (al.flag ("initialized"),
+           al.check ("creation")
+	   ? Time (al.alist ("creation"))
+	   : Time (1, 1, 1, 1),
+           al.check ("name") ? al.name ("name") : al.name ("type"),
+	   map_construct<AOM> (al.alist_sequence ("om")))),
+    alist (al.alist ()),
     name ("state")
 {
   if (al.check ("lock"))
@@ -1178,9 +1191,12 @@ struct DeclareAM : public DeclareModel
   Model* make (Block& al1) const
   { 
     AttributeList al2 (al1.alist ());
+#if 0
     al2.add ("type", "state");
     if (!al2.check ("name"))
       al2.add ("name", al1.name ("type"));
+#endif
+    daisy_assert (al2.check ("type"));
     daisy_assert (al2.check ("initialized"));
     return new AM (al2); 
   }
