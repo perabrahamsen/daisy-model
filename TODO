@@ -2,14 +2,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Frame
 
-** Gør AM mere fornuftig
-
-*** Fjern syntax == "mineral"
-
-*** Split initialize up i en for hver model
-
-Hav en fælles "initialized" variable der bestemmer om de lokale bliver kalder.
-
 ** Gør AOM til model
 
 *** ret default_AM

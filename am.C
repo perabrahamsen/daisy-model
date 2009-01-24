@@ -996,7 +996,6 @@ AM::second_year_utilization (const Metalib&, const AttributeList& am)
 void
 AM::set_mineral (const Metalib&, AttributeList& am, double NH4, double NO3)
 {
-  am.add ("syntax", "mineral");
   const double total_N = NH4 + NO3;
   am.add ("weight", total_N);
   am.add ("NH4_fraction", (total_N > 0.0) ? NH4 / total_N : 0.0);
@@ -1011,20 +1010,14 @@ bool
 AM::is_mineral (const Metalib& metalib, const AttributeList& am)
 { 
   Library& library = metalib.library (component);
-  const bool m1 = library.is_derived_from (am.name ("type"), "mineral");
-  const bool m2 = am.name ("syntax") == "mineral"; 
-  daisy_assert (m1 == m2);
-  return m1;
+  return library.is_derived_from (am.name ("type"), "mineral");
 }
 
 bool 
 AM::is_organic (const Metalib& metalib, const AttributeList& am)
 { 
   Library& library = metalib.library (component);
-  const bool m1 = library.is_derived_from (am.name ("type"), "organic");
-  const bool m2 = am.name ("syntax") == "organic"; 
-  daisy_assert (m1 == m2);
-  return m1;
+  return library.is_derived_from (am.name ("type"), "organic");
 }
 
 AM::AM (Block& al)
@@ -1087,7 +1080,6 @@ The remaining nitrogen is assumed to be nitrate.");
     frame.add_fraction ("volatilization", Value::Const, "\
 Fraction of NH4 that evaporates on application.");
     frame.add ("volatilization", 0.0);
-    frame.alist ().add ("syntax", "mineral");
   }
 } AMMineral_syntax;
 
@@ -1140,10 +1132,8 @@ to this generic model after creation, so this is what you will see in a\n\
 checkpoint.  This model contains a number (typically 2) of separate\n\
 pools, each of which have their own turnover rate.")
   { }
-  void load_frame (Frame& frame) const
-  {
-    frame.alist ().add ("syntax", "state");
-  }
+  void load_frame (Frame&) const
+  { }
 } AMState_syntax;
 
 // The 'organic' AM model.
@@ -1176,23 +1166,9 @@ static struct AMOrganicSyntax : public DeclareModel
     : DeclareModel (AM::component, "organic", "base", "\
 Organic fertilizer, typically slurry or manure from animals.")
   { }
-  static bool check_alist (const AttributeList& al, Treelog& err)
-  { 
-    if (!al.check ("syntax"))
-      {
-	err.entry ("no syntax");
-	return false;
-      }
-
-    const symbol syntax = al.name ("syntax");
-    daisy_assert (syntax == "organic");
-    return true;
-  }
   void load_frame (Frame& frame) const
   {
     Model::load_model (frame);
-    frame.add_check (check_alist);
-    frame.alist ().add ("syntax", "organic");
     frame.add ("weight", "Mg w.w./ha", Check::non_negative (),
                 Value::Const,
                 "Amount of fertilizer applied.");
@@ -1306,8 +1282,6 @@ Initial added organic matter at the start of the simulation.")
       // No checking checkpoints.
     return true;
 
-    daisy_assert (al.name ("syntax") == "initial");
-  
     bool ok = true;
 
     // We need exactly one pool with unspecified OM.
@@ -1337,7 +1311,6 @@ Height where this layer ends (a negative number).");
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);
-    frame.alist ().add ("syntax", "initial");
     frame.add_submodule_sequence ("layers", Value::Const, "\
 Carbon content in different soil layers.  The carbon is assumed to be\n \
 uniformly distributed in each layer.", load_layer);
@@ -1388,10 +1361,8 @@ Initialization of old root remains.")
   { 
     if (al.flag ("initialized", false))
       // No checking checkpoints.
-    return true;
+      return true;
 
-    daisy_assert (al.name ("syntax") == "root");
-  
     bool ok = true;
 
     // We need exactly one pool with unspecified OM.
@@ -1411,7 +1382,6 @@ Initialization of old root remains.")
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);
-    frame.alist ().add ("syntax", "root");
     frame.add ("depth", "cm", Check::negative (), 
                Value::OptionalConst, "\
 How far down does the old root reach? (a negative number)\n\
@@ -1445,7 +1415,7 @@ struct ProgramAM_table : public Program
     std::vector<symbol> entries;
     library.entries (entries);
     std::ostringstream tmp;
-    tmp << "Name\tClass\tSuper\tFile\tNH4\tNO3\tvolatilization\tN\tC\tDM";
+    tmp << "Name\tSuper\tFile\tNH4\tNO3\tvolatilization\tN\tC\tDM";
     for (std::vector<symbol>::const_iterator i = entries.begin ();
          i != entries.end ();
          i++)
@@ -1455,13 +1425,11 @@ struct ProgramAM_table : public Program
         daisy_assert (library.check (name));
         const AttributeList& alist = library.lookup (name);
         // const Syntax& syntax = library.syntax (name);
-        daisy_assert (alist.check ("syntax"));
-        const symbol type = alist.name ("syntax");
         static const symbol buildin ("build-in");
         const symbol super = alist.check ("type") 
           ? alist.name ("type")
           : buildin;
-        tmp << name << "\t" << type << "\t" << super << "\t";
+        tmp << name << "\t" << super << "\t";
         if (alist.check ("parsed_from_file"))
           tmp << alist.name ("parsed_from_file");
         tmp << "\t";
