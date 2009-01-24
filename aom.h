@@ -22,14 +22,19 @@
 #ifndef AOM_H
 #define AOM_H
 
+#include "model.h"
 #include "om.h"
 #include <vector>
 
 class Frame;
 class Volume;
 
-class AOM : public OM
+class AOM : public ModelAListed, public OM
 { 
+public:
+  static const char *const component;
+  symbol library_id () const;
+
   // Parameters.
 public:
   const double initial_fraction; // Relative fraction for this om.
@@ -75,8 +80,7 @@ private:
 
   // Create & Destroy.
 public:
-  static void load_syntax (Frame&);
-  AOM (const AttributeList& al);
+  AOM (Block& al);
 };
 
 #endif // AOM_H

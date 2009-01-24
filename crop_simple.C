@@ -557,8 +557,9 @@ Minimum LAI, automatically cleared when exceeded by 'LAIvsTS'.");
     frame.add ("root_N", "kg N/ha", Check::non_negative (), Value::Const,
 		"Fully developed root N content.");
     frame.add ("root_N", 20.0);
-    frame.add_submodule_sequence ("root_am", Value::Const, 
-				   "Root AM parameters.", AOM::load_syntax);
+    frame.add_object ("root_am", AOM::component, 
+                      Value::Const, Value::Sequence, "\
+Root AM parameters.");
     frame.add_check ("root_am", AM::check_om_pools ());
     frame.add ("root_am", AM::default_AM ());
     frame.add ("potential_N", "kg N/ha", Check::non_negative (), Value::Const,

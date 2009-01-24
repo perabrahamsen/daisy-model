@@ -582,20 +582,8 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence,
   skip ();
   int c = peek ();
 
-  if (original && original->check (compatibility_symbol) && c == '(')
-    {
-      // Special hack to allow skipping the "original" keyword for
-      // models that used to be submodels.
-      daisy_assert (original->flag (compatibility_symbol));
-      daisy_assert (original->check ("type"));
-      const symbol original_type = original->name ("type");
-      daisy_assert (lib.check (original_type));
-
-      type = original_symbol;
-      warning ("Model specified missing, assuming 'original'");
-    }
   // Handle numeric literals.
-  else if (isdigit (c) || c == '.' || c == '-')
+  if (isdigit (c) || c == '.' || c == '-')
     {                          
       alist = new AttributeList ();
       if (lib.name () == symbol (Number::component))
@@ -618,15 +606,36 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence,
         }
       return *alist;
     }
+ 
+  if (c == '(' && in_sequence)
+    {
+      skip ("(");
+      skipped = true;
+      c = peek ();
+    }
+
+  if (original && original->check (compatibility_symbol) && c == '(')
+    {
+      // Special hack to allow skipping the "original" keyword for
+      // models that used to be submodels.
+      daisy_assert (original->flag (compatibility_symbol));
+      daisy_assert (original->check ("type"));
+      const symbol original_type = original->name ("type");
+      daisy_assert (lib.check (original_type));
+
+      type = original_symbol;
+      warning ("Model specified missing, assuming 'original'");
+    }
   else
     {
-      if (c == '(')
+      if (c == '(' && !in_sequence)
         {
           skip ("(");
           skipped = true;
         }
       type = get_symbol ();
     }
+
   try
     {
       if (type == original_symbol)

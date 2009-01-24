@@ -21,7 +21,6 @@
 
 #define BUILD_DLL
 
-
 #include "bioincorporation.h"
 #include "frame_submodel.h"
 #include "log.h"
@@ -37,6 +36,20 @@
 #include "mathlib.h"
 #include <algorithm>
 #include <sstream>
+
+static struct AOMSlowBioincorporationSyntax : public DeclareParam
+{
+  AOMSlowBioincorporationSyntax ()
+    : DeclareParam (AOM::component, "AOM-SLOW-BIOINCORPORATION", "AOM-SLOW", "\
+Lower C/N ration for bioincorporated matter.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    std::vector<double> CN;
+    CN.push_back (60.0);
+    frame.add ("C_per_N", CN);
+  }
+} AOMSlowBioincorporation_syntax;
 
 struct Bioincorporation::Implementation
 { 
@@ -358,53 +371,10 @@ the whole profile.");
   distribution.add (0.0, 100.0);
   frame.add ("distribution", distribution);
 
-  // Incorporated AM parameters.
-  FrameSubmodel aom_frame (AOM::load_syntax);
-  const AttributeList& aom_alist = aom_frame.alist ();
-  
-  AttributeList AOM1 (aom_alist);
-  AttributeList AOM2 (aom_alist);
-  AOM1.add ("initial_fraction", 0.80);
-  std::vector<double> CN;
-  CN.push_back (60.0);
-  AOM1.add ("C_per_N", CN);
-  std::vector<double> efficiency1;
-  efficiency1.push_back (0.50);
-  efficiency1.push_back (0.50);
-  AOM1.add ("efficiency", efficiency1);
-  AOM1.add ("turnover_rate", 2.0e-4);
-  std::vector<double> fractions1;
-#if 1 // SANDER_PARAMS
-      fractions1.push_back (0.00);
-      fractions1.push_back (1.00);
-#else
-      fractions1.push_back (0.50);
-      fractions1.push_back (0.50);
-#endif
-  fractions1.push_back (0.00);
-  AOM1.add ("fractions", fractions1);
-  std::vector<double> efficiency2;
-  efficiency2.push_back (0.50);
-  efficiency2.push_back (0.50);
-  AOM2.add ("efficiency", efficiency2);
-  AOM2.add ("turnover_rate", 2.0e-3);
-  std::vector<double> fractions2;
-  fractions2.push_back (0.00);
-  fractions2.push_back (1.00);
-  fractions2.push_back (0.00);
-  AOM2.add ("fractions", fractions2);
-  std::vector<const AttributeList*> am;
-  am.push_back (&AOM1);
-  am.push_back (&AOM2);
-  frame.add_submodule_sequence ("AOM", Value::Const, 
-				 "Incorporated AM parameters.", 
-				 AOM::load_syntax);
+  frame.add_object ("AOM", AOM::component, Value::Const, Value::Sequence, "\
+Incorporated AM parameters.");
   frame.add_check ("AOM", AM::check_om_pools ());
-  frame.add ("AOM", am);
-#if 0				// Dsiabled: We need metalib.
-  // Check that default value is ok.
-  AM::check_om_pools ().check (metalib, syntax, alist, "AOM");
-#endif
+  frame.add_strings ("AOM", "AOM-SLOW-BIOINCORPORATION", "AOM-FAST");
 }
   
 Bioincorporation::Bioincorporation (const AttributeList& al)

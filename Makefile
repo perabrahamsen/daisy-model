@@ -1164,9 +1164,9 @@ som${OBJ}: som.C som.h model.h symbol.h alist.h om.h plf.h librarian.h \
   block.h value.h frame.h scope.h
 smb${OBJ}: smb.C smb.h model.h symbol.h alist.h om.h plf.h dom.h librarian.h \
   frame.h scope.h value.h assertion.h check.h mathlib.h block.h
-aom${OBJ}: aom.C aom.h om.h plf.h librarian.h model.h symbol.h alist.h \
+aom${OBJ}: aom.C aom.h model.h symbol.h alist.h om.h plf.h librarian.h \
   frame.h scope.h value.h check.h assertion.h smb.h dom.h log.h time.h \
-  border.h geometry.h mathlib.h
+  border.h geometry.h mathlib.h block.h
 dom${OBJ}: dom.C dom.h plf.h doe.h smb.h model.h symbol.h alist.h om.h \
   geometry.h value.h librarian.h block.h frame.h scope.h soil.h \
   soil_water.h log.h time.h border.h check.h assertion.h mathlib.h
@@ -1317,7 +1317,8 @@ im${OBJ}: im.C im.h symbol.h value.h chemical.h model.h alist.h units.h \
   unit.h am.h log.h time.h border.h block.h syntax.h frame.h scope.h \
   check.h assertion.h
 frame${OBJ}: frame.C frame.h scope.h value.h symbol.h alist.h syntax.h \
-  block.h assertion.h librarian.h model.h intrinsics.h library.h
+  block.h assertion.h librarian.h model.h intrinsics.h library.h \
+  memutils.h
 bdconv${OBJ}: bdconv.C bdconv.h convert.h symbol.h geometry.h value.h soil.h \
   volume.h model.h alist.h units.h assertion.h
 abiotic${OBJ}: abiotic.C abiotic.h mathlib.h assertion.h
@@ -1668,7 +1669,8 @@ organic_std${OBJ}: organic_std.C organic_matter.h model.h symbol.h alist.h \
   time.h border.h am.h im.h om.h plf.h som.h smb.h dom.h domsorp.h aom.h \
   clayom.h soil.h geometry.h soil_water.h soil_heat.h chemistry.h \
   chemical.h bioincorporation.h abiotic.h mathlib.h assertion.h treelog.h \
-  check_range.h check.h vcheck.h gaussj.h memutils.h librarian.h syntax.h
+  check_range.h check.h vcheck.h gaussj.h memutils.h librarian.h \
+  library.h metalib.h
 integer_arit${OBJ}: integer_arit.C integer.h model.h symbol.h alist.h \
   syntax.h value.h vcheck.h assertion.h memutils.h librarian.h treelog.h \
   frame.h scope.h

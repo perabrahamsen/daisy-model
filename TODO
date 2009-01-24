@@ -2,9 +2,7 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Frame
 
-** Gør AOM til model
-
-*** ret default_AM
+** Frame::add_strings skal kalde Frame::add
 
 ** fjern frame.add (name, alists)
 

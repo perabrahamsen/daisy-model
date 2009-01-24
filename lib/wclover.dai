@@ -1,3 +1,8 @@
+(defAOM Wclover-SLOW CROP-SLOW
+  "Slow AOM pool modified for Wclover."
+  (initial_fraction 0.50)
+  (C_per_N 50.0))
+
 (defcrop Wclover default (description "v.30 Developed by Henning Høgh Jensen")
 ;; this crop has been develeped to be grown in mixtures with grass. It is proper validated on clayey loams but not on sandy soils
 
@@ -94,46 +99,12 @@
 	(TLLeafEff (0.00 0.900) (2.00 0.900))
 	(TLRootEff (0.00 0.100) (2.00 0.100)))
  
- (Harvest (Dead ((initial_fraction 0.5)   ; this fraction goes to AOM1
-		  (C_per_N 50.0)                 
-		  (efficiency 0.5 0.5)
-		  (turnover_rate 2.917e-4) ; 0.700e-02 / 24 [ 1/h ]
-		  (fractions 0.5 0.5 0.0)) ; going to SMB1,SMB2 and SOM2
-		 ((efficiency 0.5 0.5)     ; of the fraction going into AOM2  
-		  (turnover_rate 2.917e-3) ; 0.700e-01 / 24 [ 1/h ]
-		  (fractions 0.0 1.0 0.0))) ; all going into SMB2
-	   (Stem ((initial_fraction 0.5)
-		  (C_per_N 50.0)
-		  (efficiency 0.5 0.5)
-		  (turnover_rate 2.917e-4)
-		  (fractions 0.5 0.5 0.0))
-		 ((efficiency 0.5 0.5)
-		  (turnover_rate 2.917e-3)
-		  (fractions 0.0 1.0 0.0)))
-	   (Leaf ((initial_fraction 0.5)
-		  (C_per_N 50.0)
-		  (efficiency 0.5 0.5)
-		  (turnover_rate 2.917e-4)
-		  (fractions 0.5 0.5 0.0))
-		 ((efficiency 0.5 0.5)
-		  (turnover_rate 2.917e-3)
-		  (fractions 0.0 1.0 0.0)))
-	   (SOrg ((initial_fraction 0.9)
-		  (C_per_N 50.0)
-		  (efficiency 0.5 0.5)
-		  (turnover_rate 2.917e-4)
-		  (fractions 0.5 0.5 0.0))
-		 ((efficiency 0.5 0.5)
-		  (turnover_rate 2.917e-3)
-		  (fractions 0.0 1.0 0.0)))
-	   (Root ((initial_fraction 0.5)
-		 (C_per_N 50.0)
-		 (efficiency 0.5 0.5)
-		 (turnover_rate 2.917e-4)
-		 (fractions 0.5 0.5 0.0))
-		 ((efficiency 0.5 0.5)
-		 (turnover_rate 2.917e-3)
-		 (fractions 0.0 1.0 0.0)))
+ (Harvest (Dead  "Wclover-SLOW" "CROP-FAST") ; all going into SMB2
+	   (Stem "Wclover-SLOW" "CROP-FAST")
+	   (Leaf "Wclover-SLOW" "CROP-FAST")
+	   (SOrg (Wclover-SLOW (initial_fraction 0.9))
+		 "CROP-FAST")
+	   (Root  "Wclover-SLOW" "CROP-FAST")
 	    (DSmax 2.0)
 	    (DSnew 0.27) 
 	    (cut_delay (500 10) (1000 35) (2000 45) (7000 75)) ; kg dm/ha gives delay in days

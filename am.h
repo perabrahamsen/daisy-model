@@ -99,7 +99,7 @@ public:
   void initialize (const Geometry&, const double max_rooting_depth);
   virtual void initialize_derived (const Geometry&, 
                                    const double max_rooting_depth) = 0;
-  static const std::vector<const AttributeList*>& default_AM ();
+  static const std::vector<symbol>& default_AM ();
 
   static double get_NO3 (const Metalib&, const AttributeList&);	// [g N/cm^2]
   static double get_NH4 (const Metalib&, const AttributeList&);	// [g N/cm^2]

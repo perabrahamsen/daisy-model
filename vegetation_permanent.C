@@ -453,8 +453,9 @@ Yearly LAI measurements.", VegetationPermanent::YearlyLAI::load_syntax);
 		"Nitrogen uptake this hour.");
     frame.add ("N_litter", "g N/m^2/h", Value::LogOnly,
 		"Nitrogen in litter this hour.");
-    frame.add_submodule_sequence ("litter_am", Value::Const,
-				   "Litter AOM parameters.", AOM::load_syntax);
+    frame.add_object ("litter_am", AOM::component, 
+                      Value::Const, Value::Sequence, "\
+Litter AOM parameters.");
     frame.add_check ("litter_am", AM::check_om_pools ());
     frame.add ("litter_am", AM::default_AM ());
     frame.add_submodule("Root", Value::State, "Root system.",

@@ -124,7 +124,7 @@ AM::Implementation::Check_OM_Pools::check (const Metalib&,
   const throw (std::string)
 { 
   daisy_assert (alist.check (key));
-  daisy_assert (syntax.lookup (key) == Value::AList);
+  daisy_assert (syntax.lookup (key) == Value::Object);
   daisy_assert (!syntax.is_log (key));
   daisy_assert (syntax.size (key) == Value::Sequence);
 
@@ -429,7 +429,7 @@ AM::Implementation::output (Log& log) const
   output_variable (name, log);
   if (lock)
     output_submodule (*lock, "lock", log);
-  output_ordered (om, "om", log);
+  output_list (om, "om", log, AOM::component);
 }
 
 bool 
@@ -687,7 +687,6 @@ AM::check_om_pools ()
   return check;
 }
 
-#if 1
 AM& 
 AM::create (Metalib& metalib, const AttributeList& al1 , const Geometry& geo, 
             const Time& now, const double max_rooting_depth, Treelog& msg)
@@ -733,93 +732,18 @@ AM::create (Metalib& metalib, const Geometry& geo, const Time& time,
   return am;
 }
 
-#else
-AM& 
-AM::create (Metalib&, const AttributeList& al1 , const Geometry& geo, 
-            const Time& now, const double max_rooting_depth, Treelog&)
-{ 
-  AttributeList al2 (al1);
-  al2.add ("type", "state");
-  if (!al2.check ("creation"))
-    {
-      AttributeList time_alist;
-      now.set_alist (time_alist);
-      al2.add ("creation", time_alist);
-    }
-  if (!al2.check ("initialized"))
-    al2.add ("initialized", false);
-  AM& am = *new AM (al2); 
-  am.initialize (geo, max_rooting_depth);
-  return am;
-}
-
-// Crop part.
-AM& 
-AM::create (Metalib&, const Geometry& geo, const Time& time,
-	    const std::vector<const AttributeList*>& ol,
-	    const symbol sort, const symbol part,
-	    AM::lock_type lock, Treelog& msg)
-{
-  AttributeList al;
-  al.add ("type", "state");
-  AttributeList new_time;
-  time.set_alist (new_time);
-  al.add ("creation", new_time);
-  al.add ("name", sort + "/" + part);
-  al.add ("om", ol);
-  al.add ("initialized", false);
-  AM& am = *new AM (al);
-  for (size_t i = 0; i < am.impl->om.size (); i++)
-    am.impl->om[i]->initialize (geo.cell_size ());
-  if (lock == AM::Locked)
-    am.impl->lock = new AM::Implementation::Lock (sort, part);
-  return am;
-}
-#endif
-
-const std::vector<const AttributeList*>&
+const std::vector<symbol>&
 AM::default_AM ()
 {
-  static std::vector<const AttributeList*> am;
-
-  if (am.size () < 1)
+  static const struct DefaultAM : public std::vector<symbol> 
+  {
+    DefaultAM ()
     {
-      FrameSubmodel aom_frame (AOM::load_syntax);
-      const AttributeList& aom_alist = aom_frame.alist ();
-      AttributeList& AOM1 = *new AttributeList (aom_alist);
-      AttributeList& AOM2 = *new AttributeList (aom_alist);
-      AOM1.add ("initial_fraction", 0.80);
-      std::vector<double> CN;
-      CN.push_back (90.0);
-      AOM1.add ("C_per_N", CN);
-      std::vector<double> efficiency1;
-      efficiency1.push_back (0.50);
-      efficiency1.push_back (0.50);
-      AOM1.add ("efficiency", efficiency1);
-      AOM1.add ("turnover_rate", 2.0e-4);
-      std::vector<double> fractions1;
-#if 1 // SANDER_PARAMS
-      fractions1.push_back (0.00);
-      fractions1.push_back (1.00);
-#else
-      fractions1.push_back (0.50);
-      fractions1.push_back (0.50);
-#endif
-      fractions1.push_back (0.00);
-      AOM1.add ("fractions", fractions1);
-      std::vector<double> efficiency2;
-      efficiency2.push_back (0.50);
-      efficiency2.push_back (0.50);
-      AOM2.add ("efficiency", efficiency2);
-      AOM2.add ("turnover_rate", 2.0e-3);
-      std::vector<double> fractions2;
-      fractions2.push_back (0.00);
-      fractions2.push_back (1.00);
-      fractions2.push_back (0.00);
-      AOM2.add ("fractions", fractions2);
-      am.push_back (&AOM1);
-      am.push_back (&AOM2);
+      push_back ("AOM-SLOW");
+      push_back ("AOM-FAST");
     }
+  } am;
+  
   return am;
 }
 
@@ -1028,7 +952,7 @@ AM::AM (Block& al)
 	   ? Time (al.alist ("creation"))
 	   : Time (1, 1, 1, 1),
            al.check ("name") ? al.name ("name") : al.name ("type"),
-	   map_construct<AOM> (al.alist_sequence ("om"))))
+	   Librarian::build_vector<AOM> (al, "om")))
 {
   if (al.check ("lock"))
     impl->lock = new AM::Implementation::Lock (al.alist ("lock"));
@@ -1104,9 +1028,9 @@ A name given to this AOM so you can identify it in for example log files.");
     frame.add_submodule ("lock", Value::OptionalState, "\
 This AM belongs to a still living plant",
                           AM::Implementation::Lock::load_syntax);
-    frame.add_submodule_sequence ("om", Value::OptionalState, 
-                                  "The individual AOM pools.",
-                                  AOM::load_syntax);
+    frame.add_object ("om", AOM::component, 
+                      Value::OptionalState, Value::Sequence, "\
+The individual AOM pools.");
   }
 } AMBase_syntax;
 

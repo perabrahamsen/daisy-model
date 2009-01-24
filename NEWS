@@ -8,6 +8,14 @@ release.
 
 * 4.58
 
+** Major internal restructuring.
+
+A lot of code has been modified, which potentially could mean many new
+bugs.  The most visible non-bug being that the AOM pool is now a
+component, which will cause warnings in some old crop
+parameterizations.  The SMB and SOM pools have also been converted to
+components.
+
 ** Water transport model failures more discrete.
 
 The number of times the water (or solute) models failed to find a

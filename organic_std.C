@@ -51,7 +51,8 @@
 #include "gaussj.h"
 #include "memutils.h"
 #include "librarian.h"
-#include "syntax.h"
+#include "library.h"
+#include "metalib.h"
 #include <algorithm>
 #include <numeric>
 #include <fstream>
@@ -928,8 +929,18 @@ OrganicStandard::monthly (Metalib& metalib, const Geometry& geo,
   AM* remainder = find_am (am_symbol, cleanup_symbol);
   if (!remainder)
     {
+      const Library& library = metalib.library (AOM::component);
+      const std::vector<symbol>& names = AM::default_AM ();
+      auto_vector<const AttributeList*> alists;
+      for (size_t i = 0; i < names.size (); i++)
+        {
+          const symbol name = names[i];
+          AttributeList& alist = *new AttributeList (library.lookup (name));
+          alist.add ("type", name);
+          alists.push_back (&alist);
+        }
       remainder = &AM::create (metalib, geo,
-                               Time (1, 1, 1, 1), AM::default_AM (),
+                               Time (1, 1, 1, 1), alists,
 			       am_symbol, cleanup_symbol, AM::Locked, msg);
       add (*remainder);
     }

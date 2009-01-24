@@ -521,26 +521,24 @@ Harvesting::load_syntax (Frame& frame)
 {
   // Submodel.
 
-  frame.add_submodule_sequence ("Stem", Value::Const, 
-				 "Stem AM parameters.", AOM::load_syntax);
+  frame.add_object ("Stem", AOM::component, Value::Const, Value::Sequence, "\
+Stem AM parameters.");
   frame.add_check ("Stem", AM::check_om_pools ());
   frame.add ("Stem", AM::default_AM ());
-  frame.add_submodule_sequence ("Leaf", Value::Const,
-				 "Leaf AM parameters.", AOM::load_syntax);
+  frame.add_object ("Leaf", AOM::component, Value::Const, Value::Sequence, "\
+Leaf AM parameters.");
   frame.add_check ("Leaf", AM::check_om_pools ());
   frame.add ("Leaf", AM::default_AM ());
-  frame.add_submodule_sequence ("Dead", Value::Const,
-				 "Dead leaves AM parameters.",
-				 AOM::load_syntax);
+  frame.add_object ("Dead", AOM::component, Value::Const, Value::Sequence, "\
+Dead leaves AM parameters.");
   frame.add_check ("Dead", AM::check_om_pools ());
   frame.add ("Dead", AM::default_AM ());
-  frame.add_submodule_sequence ("SOrg", Value::Const,
-				 "Storage organ AM parameters.", 
-				 AOM::load_syntax);
+  frame.add_object ("SOrg", AOM::component, Value::Const, Value::Sequence, "\
+Storage organ AM parameters.");
   frame.add_check ("SOrg", AM::check_om_pools ());
   frame.add ("SOrg", AM::default_AM ());
-  frame.add_submodule_sequence ("Root", Value::Const,
-				 "Root AM parameters.", AOM::load_syntax);
+  frame.add_object ("Root", AOM::component, Value::Const, Value::Sequence, "\
+Root AM parameters.");
   frame.add_check ("Root", AM::check_om_pools ());
   frame.add ("Root", AM::default_AM ());
   frame.add ("EconomicYield_W", Value::None (), Value::Const, "\

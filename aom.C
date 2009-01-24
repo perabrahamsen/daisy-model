@@ -20,7 +20,6 @@
 
 #define BUILD_DLL
 
-
 #include "aom.h"
 #include "librarian.h"
 #include "frame.h"
@@ -31,6 +30,16 @@
 #include "log.h"
 #include "geometry.h"
 #include "mathlib.h"
+#include "block.h"
+
+const char *const AOM::component = "AOM";
+
+symbol
+AOM::library_id () const
+{
+  static const symbol id (component);
+  return id;
+}
 
 void
 AOM::output (Log& log) const
@@ -257,33 +266,132 @@ AOM::tick (const std::vector<bool>& active, const double* abiotic_factor,
     }
 }
 
-void 
-AOM::load_syntax (Frame& frame)
-{
-  OM::load_syntax (frame, "\
-The first numbers corresponds to each of the SMB pools, the next\n\
-number to the SOM buffer, and any remaining numbers to each of\n\
-the DOM pools.  The length of the sequence should thus be the number\n\
-of SMB pools plus 1 plus optionally the number of DOM pools."); 
-  frame.add_fraction ("initial_fraction", Value::OptionalConst, "\
-The initial fraction of the total available carbon\n\
-allocated to this pool for AOM.  One pool should be left unspecified.");
-  frame.add ("top_C", "g C/cm^2", Check::non_negative (), Value::State,
-	      "Carbon on top of soil.");
-  frame.add ("top_C", 0.0);
-  frame.add ("top_N", "g N/cm^2", Check::non_negative (), Value::State,
-	      "Nitrogen on top of soil.");
-  frame.add ("top_N", 0.0);
-}
-
-AOM::AOM (const AttributeList& al)
-  : OM (al),
+AOM::AOM (Block& al)
+  : ModelAListed (al.alist ()),
+    OM (al.alist ()),
     initial_fraction (al.number ("initial_fraction", Unspecified)),
     top_C (al.number ("top_C")),
     top_N (al.number ("top_N"))
 { }
 
-static DeclareSubmodel aom_submodel (AOM::load_syntax, "AOM", "\
-A single Added Organic Matter pool.");
+static struct AOMInit : public DeclareSolo
+{
+  Model* make (Block& al) const
+  { return new AOM (al); }
+  void load_frame (Frame& frame) const
+  {
+    frame.alist ().add ("used_to_be_a_submodel", true);
+    OM::load_syntax (frame, "\
+The first numbers corresponds to each of the SMB pools, the next\n\
+number to the SOM buffer, and any remaining numbers to each of\n\
+the DOM pools.  The length of the sequence should thus be the number\n\
+of SMB pools plus 1 plus optionally the number of DOM pools."); 
+    frame.add_fraction ("initial_fraction", Value::OptionalConst, "\
+The initial fraction of the total available carbon\n\
+allocated to this pool for AOM.  One pool should be left unspecified.");
+    frame.add ("top_C", "g C/cm^2", Check::non_negative (), Value::State,
+                "Carbon on top of soil.");
+    frame.add ("top_C", 0.0);
+    frame.add ("top_N", "g N/cm^2", Check::non_negative (), Value::State,
+                "Nitrogen on top of soil.");
+    frame.add ("top_N", 0.0);
+  }
+  AOMInit ()
+    : DeclareSolo (AOM::component, "\
+A single Added Organic Matter pool.")
+  { }
+} AOM_init;
+
+static struct AOMSlowSyntax : public DeclareParam
+{
+  AOMSlowSyntax ()
+    : DeclareParam (AOM::component, "AOM-SLOW", root_name (), "\
+Slow AOM pool parameterization by Sander Bruun.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.alist ().add_strings ("cite", "daisy-aomnew");
+    frame.add ("initial_fraction", 0.80);
+    std::vector<double> CN;
+    CN.push_back (90.0);
+    frame.add ("C_per_N", CN);
+    std::vector<double> efficiency1;
+    efficiency1.push_back (0.50);
+    efficiency1.push_back (0.50);
+    frame.add ("efficiency", efficiency1);
+    frame.add ("turnover_rate", 2.0e-4);
+    std::vector<double> fractions1;
+    fractions1.push_back (0.00);
+    fractions1.push_back (1.00);
+    fractions1.push_back (0.00);
+    frame.add ("fractions", fractions1);
+  }
+} AOMSlow_syntax;
+
+static struct AOMSlowOldSyntax : public DeclareParam
+{
+  AOMSlowOldSyntax ()
+    : DeclareParam (AOM::component, "AOM-SLOW-OLD", "AOM-SLOW", "\
+Original parameterization of the slow AOM pool.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.alist ().add_strings ("cite", "mueller-smb");
+    std::vector<double> fractions1;
+    fractions1.push_back (0.50);
+    fractions1.push_back (0.50);
+    fractions1.push_back (0.00);
+    frame.add ("fractions", fractions1);
+  }
+} AOMSlowOld_syntax;
+
+static struct AOMFastSyntax : public DeclareParam
+{
+  AOMFastSyntax ()
+    : DeclareParam (AOM::component, "AOM-FAST", root_name (), "\
+Fast AOM pool parameterization by Sander Bruun.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.alist ().add_strings ("cite", "daisy-somnew");
+    std::vector<double> efficiency2;
+    efficiency2.push_back (0.50);
+    efficiency2.push_back (0.50);
+    frame.add ("efficiency", efficiency2);
+    frame.add ("turnover_rate", 2.0e-3);
+    std::vector<double> fractions2;
+    fractions2.push_back (0.00);
+    fractions2.push_back (1.00);
+    fractions2.push_back (0.00);
+    frame.add ("fractions", fractions2);
+  }
+} AOMFast_syntax;
+
+static struct AOMSlowCropSyntax : public DeclareParam
+{
+  AOMSlowCropSyntax ()
+    : DeclareParam (AOM::component, "CROP-SLOW", "AOM-SLOW", "\
+Parameterization used for slow pool of some crop residuals.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    std::vector<double> CN;
+    CN.push_back (100.0);
+    frame.add ("C_per_N", CN);
+    frame.add ("turnover_rate", 2.917E-0004);
+  }
+} AOMSlowCrop_syntax;
+
+static struct AOMFastCropSyntax : public DeclareParam
+{
+  AOMFastCropSyntax ()
+    : DeclareParam (AOM::component, "CROP-FAST", "AOM-FAST", "\
+Parameterization used for fast pool of some crop residuals.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.add ("turnover_rate", 2.917E-0003);
+  }
+} AOMFastCrop_syntax;
 
 // aom.C ends here.

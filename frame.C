@@ -28,6 +28,7 @@
 #include "librarian.h"
 #include "intrinsics.h"
 #include "library.h"
+#include "memutils.h"
 #include <vector>
 
 struct Frame::Implementation
@@ -618,6 +619,24 @@ Frame::add (const symbol key, const std::vector<double>& value)
 void 
 Frame::add (const symbol key, const std::vector<symbol>& value)
 {
+  if (lookup (key) == Value::Object)
+    {
+      verify (key, Value::Object, value.size ());
+      const symbol component = impl->syntax.component (key);
+      const Intrinsics& intrinsics = Librarian::intrinsics ();
+      auto_vector<const AttributeList*> alists;
+      for (size_t i = 0; i < value.size (); i++)
+        {
+          const symbol a = value[i];
+          intrinsics.instantiate (component, a);
+          AttributeList& alist_a 
+            = *new AttributeList (intrinsics.library (component).lookup (a));
+          alist_a.add ("type", a);
+          alists.push_back (&alist_a);
+        }
+      impl->alist.add (key, alists);
+      return;
+    }
   verify (key, Value::String, value.size ());
   impl->alist.add (key, value); 
 }

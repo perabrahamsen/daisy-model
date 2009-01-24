@@ -54,7 +54,7 @@ hydraulisk ledningsevne i nogle danske jorde .Beretning nr. S
   	(alpha 0.054)(n 2.816)(K_sat 92.52 [cm/h])))
 
 (defcolumn Jyndevad default
-  (description "This is a JB1 soil with free drainage")
+  "This is a JB1 soil with free drainage"
   (Groundwater deep)
   (Soil (MaxRootingDepth 60 [cm])
         (horizons (  -30.00 "Jyndevad Ap")
