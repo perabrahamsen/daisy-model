@@ -128,6 +128,10 @@ AM::Implementation::Check_OM_Pools::check (const Metalib&,
   daisy_assert (!syntax.is_log (key));
   daisy_assert (syntax.size (key) == Value::Sequence);
 
+  if (alist.flag ("initialized", false))
+    // No checking checkpoints.
+    return;
+
   const std::vector<const AttributeList*>& om_alist 
     = alist.alist_sequence (key);
   int missing_initial_fraction = 0;
@@ -683,6 +687,53 @@ AM::check_om_pools ()
   return check;
 }
 
+#if 1
+AM& 
+AM::create (Metalib& metalib, const AttributeList& al1 , const Geometry& geo, 
+            const Time& now, const double max_rooting_depth, Treelog& msg)
+{ 
+  AttributeList al2 (al1);
+  if (!al2.check ("type"))
+    al2.add ("type", "state");
+  if (!al2.check ("creation"))
+    {
+      AttributeList time_alist;
+      now.set_alist (time_alist);
+      al2.add ("creation", time_alist);
+    }
+  if (!al2.check ("initialized"))
+    al2.add ("initialized", false);
+  AM& am = *Librarian::build_free<AM> (metalib, msg, al2, "fertilizer");
+  am.initialize (geo, max_rooting_depth);
+  return am;
+}
+
+// Crop part.
+AM& 
+AM::create (Metalib& metalib, const Geometry& geo, const Time& time,
+	    const std::vector<const AttributeList*>& ol,
+	    const symbol sort, const symbol part,
+	    AM::lock_type lock, Treelog& msg)
+{
+  const Library& library = metalib.library (AM::component);
+  const Frame& frame = library.frame ("state");
+  AttributeList al (frame.alist ());
+  al.add ("type", "state");
+  al.add ("initialized", true);
+  AttributeList new_time;
+  time.set_alist (new_time);
+  al.add ("creation", new_time);
+  al.add ("name", sort + "/" + part);
+  al.add ("om", ol);
+  AM& am = *Librarian::build_free<AM> (metalib, msg, al, "crop part");
+  for (size_t i = 0; i < am.impl->om.size (); i++)
+    am.impl->om[i]->initialize (geo.cell_size ());
+  if (lock == AM::Locked)
+    am.impl->lock = new AM::Implementation::Lock (sort, part);
+  return am;
+}
+
+#else
 AM& 
 AM::create (Metalib&, const AttributeList& al1 , const Geometry& geo, 
             const Time& now, const double max_rooting_depth, Treelog&)
@@ -724,6 +775,7 @@ AM::create (Metalib&, const Geometry& geo, const Time& time,
     am.impl->lock = new AM::Implementation::Lock (sort, part);
   return am;
 }
+#endif
 
 const std::vector<const AttributeList*>&
 AM::default_AM ()
@@ -1188,18 +1240,8 @@ This AM belongs to a still living plant",
 
 struct DeclareAM : public DeclareModel
 {
-  Model* make (Block& al1) const
-  { 
-    AttributeList al2 (al1.alist ());
-#if 0
-    al2.add ("type", "state");
-    if (!al2.check ("name"))
-      al2.add ("name", al1.name ("type"));
-#endif
-    daisy_assert (al2.check ("type"));
-    daisy_assert (al2.check ("initialized"));
-    return new AM (al2); 
-  }
+  Model* make (Block& al) const
+  { return new AM (al); }
   DeclareAM (const symbol c, const symbol n, const symbol d)
     : DeclareModel (c, n, "base", d)
   { }
@@ -1284,6 +1326,10 @@ Initial added organic matter at the start of the simulation.")
   { }
   static bool check_alist (const AttributeList& al, Treelog& err)
   { 
+    if (al.flag ("initialized", false))
+      // No checking checkpoints.
+    return true;
+
     daisy_assert (al.name ("syntax") == "initial");
   
     bool ok = true;
@@ -1329,6 +1375,10 @@ static struct AMRootSyntax : public DeclareAM
   { }
   static bool check_alist (const AttributeList& al, Treelog& err)
   { 
+    if (al.flag ("initialized", false))
+      // No checking checkpoints.
+    return true;
+
     daisy_assert (al.name ("syntax") == "root");
   
     bool ok = true;
