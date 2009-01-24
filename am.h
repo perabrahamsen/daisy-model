@@ -98,7 +98,9 @@ public:
   static AM& create (Metalib&, const Geometry&, const Time&,
 		     const std::vector<const AttributeList*>&,
 		     symbol sort, symbol part, lock_type lock, Treelog& msg);
-  void initialize (const Geometry& geometry, const double max_rooting_depth);
+  void initialize (const Geometry&, const double max_rooting_depth);
+  virtual void initialize_derived (const Geometry&, 
+                                   const double max_rooting_depth);
   static const std::vector<const AttributeList*>& default_AM ();
 
 #if 0

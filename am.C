@@ -64,6 +64,7 @@ struct AM::Implementation
   };
 
   // Content.
+  bool initialized;             // Whether initialize_derived has been called.
   const Time creation;		// When it was created.
   const symbol name;		// What is was.
   const std::vector<AOM*> om;		// Organic matter pool.
@@ -110,7 +111,8 @@ struct AM::Implementation
   void multiply_top (double fraction);
 
   // Create and Destroy.
-  Implementation (const Time& c, symbol n, const std::vector<AOM*>& o);
+  Implementation (bool initialized, 
+                  const Time& c, symbol n, const std::vector<AOM*>& o);
   ~Implementation ();
 };
 
@@ -417,6 +419,7 @@ AM::Implementation::append_to (std::vector<AOM*>& added)
 void
 AM::Implementation::output (Log& log) const
 { 
+  output_variable (initialized, log);
   if (creation != Time (1, 1, 1, 1))
     output_submodule (creation, "creation", log);
   output_variable (name, log);
@@ -548,9 +551,11 @@ AM::Implementation::pour (std::vector<double>& cc, std::vector<double>& nn)
     om[i]->pour (cc, nn);
 }
 
-AM::Implementation::Implementation (const Time& c, const symbol n,
+AM::Implementation::Implementation (const bool i,
+                                    const Time& c, const symbol n,
 				    const std::vector<AOM*>& o)
-  : creation (c),
+  : initialized (i),
+    creation (c),
     name (n),
     om (o),
     lock (NULL)
@@ -692,6 +697,8 @@ AM::create (Metalib&, const AttributeList& al1 , const Geometry& geo,
     }
   if (!al2.check ("name"))
     al2.add ("name", al1.name ("type"));
+  if (!al2.check ("initialized"))
+    al2.add ("initialized", false);
   AM& am = *new AM (al2); 
   am.initialize (geo, max_rooting_depth);
   return am;
@@ -711,6 +718,7 @@ AM::create (Metalib&, const Geometry& geo, const Time& time,
   al.add ("creation", new_time);
   al.add ("name", sort + "/" + part);
   al.add ("om", ol);
+  al.add ("initialized", false);
   AM& am = *new AM (al);
   for (size_t i = 0; i < am.impl->om.size (); i++)
     am.impl->om[i]->initialize (geo.cell_size ());
@@ -971,7 +979,8 @@ AM::is_organic (const Metalib& metalib, const AttributeList& am)
 
 AM::AM (const AttributeList& al)
   : impl (new Implementation 
-	  (al.check ("creation")
+	  (al.flag ("initialized"),
+           al.check ("creation")
 	   ? Time (al.alist ("creation"))
 	   : Time (1, 1, 1, 1),
 	   al.name ("name"),
@@ -989,13 +998,23 @@ AM::initialize (const Geometry& geo, const double max_rooting_depth)
   for (size_t i = 0; i < impl->om.size (); i++)
     impl->om[i]->initialize (geo.cell_size ());
 
-  const symbol syntax = alist.name ("syntax");
-  
-  if (syntax == "state")
+  if (alist.check ("lock"))
+    impl->lock = new Implementation::Lock (alist.alist ("lock"));
+
+  if (!impl->initialized)
     {
-      if (alist.check ("lock"))
-	impl->lock = new Implementation::Lock (alist.alist ("lock"));
+      impl->initialized = true;
+      initialize_derived (geo, max_rooting_depth);
     }
+}
+
+void
+AM::initialize_derived (const Geometry& geo, const double max_rooting_depth)
+{
+  const symbol syntax = alist.name ("syntax");
+
+  if (syntax == "state")
+    /* Do nothing */;
   else if (syntax == "organic")
     {
       // Get initialization parameters.
@@ -1137,6 +1156,10 @@ Common attributes for all added organic matter models.")
   { }
   void load_frame (Frame& frame) const
   {
+    frame.add ("initialized", Value::Boolean, Value::State, "\
+True if this AM has been initialized.\n\
+It will usually be false in user setup files, but true in checkpoints.");
+    frame.add ("initialized", false);
     frame.add_submodule ("creation", Value::OptionalState, 
                          "Time this AM was created.", Time::load_syntax);
     frame.add ("name", Value::String, Value::OptionalState, "\
@@ -1158,6 +1181,7 @@ struct DeclareAM : public DeclareModel
     al2.add ("type", "state");
     if (!al2.check ("name"))
       al2.add ("name", al1.name ("type"));
+    daisy_assert (al2.check ("initialized"));
     return new AM (al2); 
   }
   DeclareAM (const symbol c, const symbol n, const symbol d)
