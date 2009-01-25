@@ -185,9 +185,11 @@ EXPORT void                            /* Set bool NAME from ALIST to VALUE. */
 daisy_alist_set_flag (daisy_alist* alist, const char* name,
                       daisy_bool value);
 
+#if 0
 EXPORT void                            /* Set alist NAME from ALIST to VALUE. */
 daisy_alist_set_alist (daisy_alist* alist, const char* name,
                        daisy_alist* value);
+#endif
 
 /* The following functions are for manipulating array members of an alist.
    It is an error to call them if the member is not an array.  The

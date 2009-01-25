@@ -22,14 +22,13 @@
 #ifndef AOM_H
 #define AOM_H
 
-#include "model.h"
 #include "om.h"
 #include <vector>
 
 class Frame;
 class Volume;
 
-class AOM : public ModelAListed, public OM
+class AOM : public OM
 { 
 public:
   static const char *const component;

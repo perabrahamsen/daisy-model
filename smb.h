@@ -22,13 +22,12 @@
 #ifndef SMB_H
 #define SMB_H
 
-#include "model.h"
 #include "om.h"
 #include <vector>
 
 class Frame;
 
-class SMB : public ModelAListed, public OM
+class SMB : public OM
 { 
   // Model.
 public:

@@ -22,12 +22,11 @@
 #ifndef SOM_H
 #define SOM_H
 
-#include "model.h"
 #include "om.h"
 
 class Frame;
 
-class SOM : public ModelAListed, public OM
+class SOM : public OM
 { 
 public:
   static const char *const component;

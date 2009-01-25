@@ -33,6 +33,7 @@
 #include "mathlib.h"
 #include "assertion.h"
 #include "treelog.h"
+#include "block.h"
 #include <sstream>
 #include <numeric>
 
@@ -451,8 +452,9 @@ OM::initialize (size_t size)
     N.insert (N.end (), extra_N, 0.0);
 }
 
-OM::OM (const AttributeList& al)
-  : initial_C_per_N (get_initial_C_per_N (al)),
+OM::OM (Block& al)
+  : ModelAListed (al.alist ()),
+    initial_C_per_N (get_initial_C_per_N (al.alist ())),
     turnover_rate (al.check ("turnover_rate")
 		   ? al.number ("turnover_rate")
 		   : halftime_to_rate (al.number ("turnover_halftime"))),

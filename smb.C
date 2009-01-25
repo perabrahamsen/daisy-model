@@ -134,8 +134,7 @@ SMB::turnover_dom (const std::vector<bool>& active, const double* factor,
 }
 
 SMB::SMB (Block& al)
-  : ModelAListed (al.alist ()),
-    OM (al.alist ()),
+  : OM (al),
     maintenance (al.number ("maintenance"))
 { }
 

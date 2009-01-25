@@ -2,6 +2,8 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Frame
 
+** Om skal nedarve fra model.
+
 ** fjern alist.add (name, alist)
 
 ** Gem frame i alist

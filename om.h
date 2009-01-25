@@ -23,6 +23,7 @@
 #ifndef OM_H
 #define OM_H
 
+#include "model.h"
 #include "plf.h"
 #include <vector>
 
@@ -35,7 +36,7 @@ class SMB;
 class DOM;
 class Volume;
 
-class OM
+class OM : public ModelAListed
 { 
   // Parameters
 public:
@@ -100,7 +101,7 @@ public:
   void initialize (size_t);
   static void load_syntax (Frame&, const std::string& frac_desc);
 protected:
-  OM (const AttributeList& al);
+  OM (Block&);
   virtual ~OM ();
 };
 

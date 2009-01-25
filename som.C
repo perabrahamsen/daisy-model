@@ -35,8 +35,7 @@ SOM::library_id () const
 }
 
 SOM::SOM (Block& al)
-  : ModelAListed (al.alist ()),
-    OM (al.alist ())
+  : OM (al)
 { }
 
 static struct SOMInit : public DeclareSolo

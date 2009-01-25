@@ -267,8 +267,7 @@ AOM::tick (const std::vector<bool>& active, const double* abiotic_factor,
 }
 
 AOM::AOM (Block& al)
-  : ModelAListed (al.alist ()),
-    OM (al.alist ()),
+  : OM (al),
     initial_fraction (al.number ("initial_fraction", Unspecified)),
     top_C (al.number ("top_C")),
     top_N (al.number ("top_N"))

@@ -185,10 +185,12 @@ extern "C" void EXPORT
 daisy_alist_set_flag (AttributeList* alist, const char* name, daisy_bool value)
 { alist->add (name, bool (value)); }
 
+#if 0
 extern "C" void EXPORT
 daisy_alist_set_alist (AttributeList* alist, const char* name,
 		       AttributeList* value)
 { alist->add (name, *value); }
+#endif
 
 #ifdef UNINPLEMENTED
 extern "C" unsigned int EXPORT
