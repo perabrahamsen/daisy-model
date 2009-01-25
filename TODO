@@ -2,8 +2,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Frame
 
-** Frame::add_strings skal kalde Frame::add
-
 ** fjern frame.add (name, alists)
 
 ** fjern alist.add (name, alist)

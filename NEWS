@@ -14,7 +14,7 @@ A lot of code has been modified, which potentially could mean many new
 bugs.  The most visible non-bug being that the AOM pool is now a
 component, which will cause warnings in some old crop
 parameterizations.  The SMB and SOM pools have also been converted to
-components.
+components.  Log parameterisation may have to be adjusted.
 
 ** Water transport model failures more discrete.
 

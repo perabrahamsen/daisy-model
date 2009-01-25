@@ -644,89 +644,37 @@ Frame::add (const symbol key, const std::vector<symbol>& value)
 void 
 Frame::add_strings (const symbol key)
 {
-  if (lookup (key) == Value::Object)
-    {
-      verify (key, Value::Object, 0);
-      std::vector<const AttributeList*> alists;
-      impl->alist.add (key, alists);
-      return;
-    }
-  verify (key, Value::String, 0);
-  impl->alist.add_strings (key); 
+  std::vector<symbol> all;
+  add (key, all);
 }
 
 void 
 Frame::add_strings (const symbol key, const symbol a)
 {
-  if (lookup (key) == Value::Object)
-    {
-      verify (key, Value::Object, 1);
-      const symbol component = impl->syntax.component (key);
-      const Intrinsics& intrinsics = Librarian::intrinsics ();
-      std::vector<const AttributeList*> alists;
-      intrinsics.instantiate (component, a);
-      AttributeList alist_a (intrinsics.library (component).lookup (a));
-      alist_a.add ("type", a);
-      alists.push_back (&alist_a);
-      impl->alist.add (key, alists);
-      return;
-    }
-  verify (key, Value::String, 1);
-  impl->alist.add_strings (key, a); 
+  std::vector<symbol> all;
+  all.push_back (a);
+  add (key, all);
 }
 
 void 
 Frame::add_strings (const symbol key,
                     const symbol a, const symbol b)
 {
-  if (lookup (key) == Value::Object)
-    {
-      verify (key, Value::Object, 2);
-      const symbol component = impl->syntax.component (key);
-      const Intrinsics& intrinsics = Librarian::intrinsics ();
-      std::vector<const AttributeList*> alists;
-      intrinsics.instantiate (component, a);
-      AttributeList alist_a (intrinsics.library (component).lookup (a));
-      alist_a.add ("type", a);
-      alists.push_back (&alist_a);
-      intrinsics.instantiate (component, b);
-      AttributeList alist_b (intrinsics.library (component).lookup (b));
-      alist_b.add ("type", b);
-      alists.push_back (&alist_b);
-      impl->alist.add (key, alists);
-      return;
-    }
-  verify (key, Value::String, 2);
-  impl->alist.add_strings (key, a, b); 
+  std::vector<symbol> all;
+  all.push_back (a);
+  all.push_back (b);
+  add (key, all);
 }
 
 void 
 Frame::add_strings (const symbol key,
                     const symbol a, const symbol b, const symbol c)
 {
-  if (lookup (key) == Value::Object)
-    {
-      verify (key, Value::Object, 3);
-      const symbol component = impl->syntax.component (key);
-      const Intrinsics& intrinsics = Librarian::intrinsics ();
-      std::vector<const AttributeList*> alists;
-      intrinsics.instantiate (component, a);
-      AttributeList alist_a (intrinsics.library (component).lookup (a));
-      alist_a.add ("type", a);
-      alists.push_back (&alist_a);
-      intrinsics.instantiate (component, b);
-      AttributeList alist_b (intrinsics.library (component).lookup (b));
-      alist_b.add ("type", b);
-      alists.push_back (&alist_b);
-      intrinsics.instantiate (component, c);
-      AttributeList alist_c (intrinsics.library (component).lookup (c));
-      alist_c.add ("type", c);
-      alists.push_back (&alist_c);
-      impl->alist.add (key, alists);
-      return;
-    }
-  verify (key, Value::String, 3);
-  impl->alist.add_strings (key, a, b, c); 
+  std::vector<symbol> all;
+  all.push_back (a);
+  all.push_back (b);
+  all.push_back (c);
+  add (key, all);
 }
 
 void 
