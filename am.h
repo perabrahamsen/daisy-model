@@ -91,7 +91,7 @@ public:
   static const VCheck& check_om_pools ();
   // Initialization & Fertilizer.
   static AM& create (Metalib&, const AttributeList&, const Geometry&, 
-                     const Time&, double max_rooting_depth, Treelog& msg);
+                     const Time&, Treelog& msg);
   // Crop part.
   static AM& create (Metalib&, const Geometry&, const Time&,
 		     const std::vector<const AttributeList*>&,

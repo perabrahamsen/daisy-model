@@ -689,7 +689,7 @@ AM::check_om_pools ()
 
 AM& 
 AM::create (Metalib& metalib, const AttributeList& al1 , const Geometry& geo, 
-            const Time& now, const double max_rooting_depth, Treelog& msg)
+            const Time& now, Treelog& msg)
 { 
   AttributeList al2 (al1);
   if (!al2.check ("type"))
@@ -703,7 +703,7 @@ AM::create (Metalib& metalib, const AttributeList& al1 , const Geometry& geo,
   if (!al2.check ("initialized"))
     al2.add ("initialized", false);
   AM& am = *Librarian::build_free<AM> (metalib, msg, al2, "fertilizer");
-  am.initialize (geo, max_rooting_depth);
+  am.initialize (geo, -42.42e42);
   return am;
 }
 

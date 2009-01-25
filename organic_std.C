@@ -874,7 +874,7 @@ OrganicStandard::fertilize (Metalib& metalib, const AttributeList& al,
                             const Geometry& geo, 
                             const Time& now, const double dt, Treelog& msg)
 { 
-  AM& om = AM::create (metalib, al, geo, now, AM::Unlocked, msg);
+  AM& om = AM::create (metalib, al, geo, now, msg);
   fertilized_N += om.total_N (geo) / geo.surface_area () / dt; 
   fertilized_C += om.total_C (geo) / geo.surface_area () / dt;
   add (om);
@@ -886,7 +886,7 @@ OrganicStandard::fertilize (Metalib& metalib, const AttributeList& al,
                             const double from, const double to,
                             const Time& now, const double dt, Treelog& msg)
 { 
-  AM& om = AM::create (metalib, al, geo, now, AM::Unlocked, msg);
+  AM& om = AM::create (metalib, al, geo, now, msg);
   fertilized_N += om.total_N (geo) / geo.surface_area () / dt; 
   fertilized_C += om.total_C (geo) / geo.surface_area () / dt;
   om.mix (geo, from, to, 1.0,
@@ -900,7 +900,7 @@ OrganicStandard::fertilize (Metalib& metalib, const AttributeList& al,
                             const Geometry& geo, const Volume& volume,
                             const Time& now, const double dt, Treelog& msg)
 { 
-  AM& om = AM::create (metalib, al, geo, now, AM::Unlocked, msg);
+  AM& om = AM::create (metalib, al, geo, now, msg);
   fertilized_N += om.total_N (geo) / geo.surface_area () / dt; 
   fertilized_C += om.total_C (geo) / geo.surface_area () / dt;
   om.mix (geo, volume, 1.0,
