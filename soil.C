@@ -29,7 +29,6 @@
 #include "groundwater.h"
 #include "metalib.h"
 #include "library.h"
-#include "syntax.h"
 #include "frame.h"
 #include "mathlib.h"
 #include "librarian.h"

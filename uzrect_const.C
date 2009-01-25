@@ -22,7 +22,6 @@
 #include "uzrect.h"
 #include "geometry_rect.h"
 #include "soil_water.h"
-#include "syntax.h"
 #include "block.h"
 #include "frame.h"
 #include "mathlib.h"

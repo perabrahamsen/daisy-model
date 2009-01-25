@@ -20,7 +20,6 @@
 
 #include "log_Qt.h"
 #include "librarian.h"
-#include "syntax.h"
 #include "alist.h"
 
 void

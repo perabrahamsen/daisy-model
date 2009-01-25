@@ -25,7 +25,6 @@
 #include "soil_water.h"
 #include "soil_heat.h"
 #include "units.h"
-#include "syntax.h"
 #include "alist.h"
 #include "assertion.h"
 #include "librarian.h"

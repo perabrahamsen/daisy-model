@@ -25,7 +25,6 @@
 #include "log.h"
 #include "weather.h"
 #include "block.h"
-#include "syntax.h"
 #include "mathlib.h"
 #include "librarian.h"
 #include "frame.h"

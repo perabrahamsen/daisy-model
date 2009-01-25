@@ -23,7 +23,6 @@
 #include "chemical.h"
 #include "log.h"
 #include "block.h"
-#include "syntax.h"
 #include "treelog.h"
 #include "assertion.h"
 #include "memutils.h"

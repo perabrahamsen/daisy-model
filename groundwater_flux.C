@@ -22,7 +22,6 @@
 #define BUILD_DLL
 
 #include "groundwater.h"
-#include "syntax.h"
 #include "alist.h"
 #include "block.h"
 #include "check.h"

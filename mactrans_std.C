@@ -29,7 +29,6 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include "treelog.h"
-#include "syntax.h"
 #include "frame.h"
 #include <sstream>
 #include <vector>

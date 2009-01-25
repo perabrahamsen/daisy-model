@@ -21,7 +21,6 @@
 #define BUILD_DLL
 
 #include "raddist.h"
-#include "syntax.h"
 #include "vegetation.h"
 #include "mathlib.h"
 #include "librarian.h"

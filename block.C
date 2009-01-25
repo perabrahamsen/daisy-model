@@ -24,7 +24,6 @@
 #include "metalib.h"
 #include "library.h"
 #include "alist.h"
-#include "syntax.h"
 #include "librarian.h"
 #include "stringer.h"
 #include "number.h"
@@ -37,7 +36,6 @@
 
 struct Block::Implementation
 {
-  static const Syntax empty_syntax;
   Metalib& metalib;
   Block *const context;
   const Frame& frame;
@@ -65,8 +63,6 @@ struct Block::Implementation
       is_ok (true)
   { }
 };
-
-const Syntax Block::Implementation::empty_syntax;
 
 Value::type 
 Block::Implementation::lookup (const symbol key) const

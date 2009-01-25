@@ -24,7 +24,6 @@
 #define BUILD_DLL
 
 #include "condition.h"
-#include "syntax.h"
 #include "alist.h"
 #include "daisy.h"
 #include "librarian.h"

@@ -23,7 +23,6 @@
 #define QMAIN_H
 
 // Daisy
-#include "syntax.h"
 #include "alist.h"
 
 // Qt

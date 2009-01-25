@@ -22,7 +22,6 @@
 #include "rubiscoNdist.h"
 #include "mathlib.h"
 #include "block.h"
-#include "syntax.h"
 #include <sstream>
 #include "check.h"
 #include "librarian.h"

@@ -30,7 +30,6 @@
 #include "plf.h"
 #include "time.h"
 #include "library.h"
-#include "syntax.h"
 #include "alist.h"
 #include "parser.h"
 #include <deque>

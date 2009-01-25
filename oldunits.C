@@ -21,9 +21,9 @@
 #define BUILD_DLL
 
 #include "oldunits.h"
-#include "syntax.h"
 #include "mathlib.h"
 #include "memutils.h"
+#include "value.h"
 #include <map>
 
 struct Oldunits::Content

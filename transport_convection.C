@@ -28,7 +28,6 @@
 #include "memutils.h"
 #include "librarian.h"
 #include "log.h"
-#include "syntax.h"
 #include "mathlib.h"
 #include <sstream>
 

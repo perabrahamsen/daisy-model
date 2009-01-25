@@ -22,7 +22,6 @@
 #include "qmain_edit.h"
 
 #include "alist.h"
-#include "syntax.h"
 #include "library.h"
 #include "plf.h"
 #include "time.h"

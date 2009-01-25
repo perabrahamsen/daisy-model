@@ -22,7 +22,6 @@
 #define BUILD_DLL
 
 #include "action.h"
-#include "syntax.h"
 #include "daisy.h"
 #include "librarian.h"
 

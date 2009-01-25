@@ -40,7 +40,6 @@
 #include "librarian.h"
 #include "treelog.h"
 #include "frame.h"
-#include "syntax.h"
 #include <sstream>
 
 class CropSold : public Crop

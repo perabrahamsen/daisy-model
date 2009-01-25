@@ -36,7 +36,6 @@
 #include "action.h"
 #include "timestep.h"
 #include "library.h"
-#include "syntax.h"
 #include "condition.h"
 #include "alist.h"
 #include "submodeler.h"

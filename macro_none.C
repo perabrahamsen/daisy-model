@@ -22,7 +22,6 @@
 #define BUILD_DLL
 
 #include "macro.h"
-#include "syntax.h"
 #include "alist.h"
 #include "librarian.h"
 #include "frame.h"

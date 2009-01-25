@@ -30,7 +30,6 @@
 #include "librarian.h"
 #include "metalib.h"
 #include "library.h"
-#include "syntax.h"
 #include <sstream>
 
 // The 'Units' Interface.

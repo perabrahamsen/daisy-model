@@ -21,7 +21,6 @@
 #define BUILD_DLL
 
 #include "difrad.h"
-#include "syntax.h"
 #include "weather.h"
 #include "mathlib.h"
 #include "librarian.h"

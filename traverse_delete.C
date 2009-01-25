@@ -25,7 +25,6 @@
 #include "traverse.h"
 #include "metalib.h"
 #include "library.h"
-#include "syntax.h"
 #include "alist.h"
 #include "assertion.h"
 

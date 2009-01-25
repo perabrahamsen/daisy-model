@@ -22,7 +22,6 @@
 #include "heatrect.h"
 #include "geometry_rect.h"
 #include "plf.h"
-#include "syntax.h"
 #include "alist.h"
 #include "librarian.h"
 #include "frame.h"

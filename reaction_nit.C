@@ -31,7 +31,6 @@
 #include "log.h"
 #include "assertion.h"
 #include "librarian.h"
-#include "syntax.h"
 #include "frame.h"
 
 struct ReactionNitrification : public Reaction

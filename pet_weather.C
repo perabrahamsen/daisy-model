@@ -22,7 +22,6 @@
 #define BUILD_DLL
 
 #include "pet.h"
-#include "syntax.h"
 #include "weather.h"
 #include "log.h"
 #include "librarian.h"

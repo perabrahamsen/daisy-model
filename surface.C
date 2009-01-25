@@ -22,7 +22,6 @@
 #define BUILD_DLL
 
 #include "surface.h"
-#include "syntax.h"
 #include "geometry1d.h"
 #include "soil.h"
 #include "soil_water.h"

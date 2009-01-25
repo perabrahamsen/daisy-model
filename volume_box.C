@@ -20,7 +20,6 @@
 
 #define BUILD_DLL
 #include "volume_box.h"
-#include "syntax.h"
 #include "alist.h"
 #include "bound.h"
 #include "border.h"

@@ -30,7 +30,6 @@
 #include "log.h"
 #include "block.h"
 #include "alist.h"
-#include "syntax.h"
 #include "frame.h"
 #include "check.h"
 #include "assertion.h"

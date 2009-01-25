@@ -22,7 +22,6 @@
 #define BUILD_DLL
 
 #include "select_value.h"
-#include "syntax.h"
 #include "alist.h"
 #include "librarian.h"
 #include "frame.h"

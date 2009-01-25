@@ -25,7 +25,6 @@
 #define BUILD_DLL
 
 #include "hydraulic.h"
-#include "syntax.h"
 #include "alist.h"
 #include "texture.h"
 #include "treelog.h"

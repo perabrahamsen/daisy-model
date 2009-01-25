@@ -22,7 +22,6 @@
 
 #include "equil.h"
 #include "block.h"
-#include "syntax.h"
 #include "alist.h"
 #include "number.h"
 #include "treelog.h"

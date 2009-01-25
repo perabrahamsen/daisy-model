@@ -30,7 +30,6 @@
 #include "block.h"
 #include "units.h"
 #include "frame.h"
-#include "syntax.h"
 
 const std::vector<double>& 
 IMvec::get_array (symbol chem) const

@@ -22,7 +22,6 @@
 #define BUILD_DLL
 
 #include "tortuosity.h"
-#include "syntax.h"
 #include "alist.h"
 #include "hydraulic.h"
 #include "mathlib.h"
