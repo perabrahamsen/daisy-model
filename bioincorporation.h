@@ -24,6 +24,7 @@
 #define BIOINCORPORATION_H
 
 #include <vector>
+#include <memory>
 
 class AttributeList;
 class Frame;
@@ -39,7 +40,7 @@ class Bioincorporation
   // Content.
 private:
   struct Implementation;
-  Implementation& impl;
+  std::auto_ptr<Implementation> impl;
   
   // Simulation.
 public:

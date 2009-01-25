@@ -284,33 +284,33 @@ void
 Bioincorporation::tick (const Geometry& geo, std::vector <AM*>& am, double T,
 			double& CO2, const double dt)
 {
-  impl.tick (geo, am, T, CO2, dt);
+  impl->tick (geo, am, T, CO2, dt);
 }
 
 void 
 Bioincorporation::output (Log& log) const
 {
-  impl.output (log);
+  impl->output (log);
 }
 
 void 
 Bioincorporation::add (const Geometry& geo, std::vector<double>& input,
 		       const double amount) const
-{ impl.add (geo, input, amount); }
+{ impl->add (geo, input, amount); }
 
 void 
 Bioincorporation::initialize (const Geometry& geo,
                               const Soil& soil)
-{ impl.initialize (geo, soil); }
+{ impl->initialize (geo, soil); }
 
 AM*
 Bioincorporation::create_am (Metalib& metalib, const Geometry& geo,
                              Treelog& msg)
-{ return impl.create_am (metalib, geo, msg); }
+{ return impl->create_am (metalib, geo, msg); }
 
 void 
 Bioincorporation::set_am (AM* am)
-{ impl.set_am (am); }
+{ impl->set_am (am); }
 
 void
 Bioincorporation::load_syntax (Frame& frame)
@@ -378,11 +378,11 @@ Incorporated AM parameters.");
 }
   
 Bioincorporation::Bioincorporation (const AttributeList& al)
-  : impl (*new Implementation (al))
+  : impl (new Implementation (al))
 { }
 
 Bioincorporation::~Bioincorporation ()
-{ delete &impl; }
+{ }
 
 static DeclareSubmodel
 bioincorporation_submodel (Bioincorporation::load_syntax, "Bioincorporation", "\
