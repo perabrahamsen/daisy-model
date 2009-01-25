@@ -692,36 +692,6 @@ Frame::add (const symbol key, const std::vector<int>& value)
 }
 
 void 
-Frame::add (const symbol key, 
-            const std::vector<const AttributeList*>& value)
-{
-  const int value_size = value.size ();
-  int type_count = 0;
-  for (size_t i = 0; i < value_size; i++)
-    if (value[i]->check ("type"))
-      type_count++;
-
-  if (value_size == 0)
-    {
-      Value::type has = lookup (key);
-      if (has != Value::AList && has != Value::Object)
-        daisy_panic ("'" + key + "' value is " + Value::type_name (has) 
-                     + ", should be " + Value::type_name (Value::AList)
-                     + " or " + Value::type_name (Value::Object));
-    }
-  else if (type_count == 0)
-    verify (key, Value::AList, value_size);
-  else if (type_count == value_size)
-    verify (key, Value::Object, value_size);
-  else
-    daisy_panic ("'" + key + "' value is mixture of "
-                 + Value::type_name (Value::AList)
-                 + " and " + Value::type_name (Value::Object));
-    
-  impl->alist.add (key, value); 
-}
-
-void 
 Frame::add (const symbol key, const std::vector<const PLF*>& value)
 {
   verify (key, Value::PLF, value.size ());
