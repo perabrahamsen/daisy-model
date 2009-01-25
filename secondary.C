@@ -22,7 +22,6 @@
 
 #include "secondary.h"
 #include "block.h"
-#include "alist.h"
 #include "librarian.h"
 #include "assertion.h"
 #include "frame.h"

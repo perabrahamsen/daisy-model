@@ -22,7 +22,6 @@
 #define BUILD_DLL
 
 #include "mactrans.h"
-#include "alist.h"
 #include "soil_water.h"
 #include "geometry1d.h"
 #include "plf.h"

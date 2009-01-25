@@ -22,7 +22,6 @@
 #include "source_file.h"
 #include "scope_table.h"
 #include "number.h"
-#include "alist.h"
 #include "librarian.h"
 #include "frame.h"
 

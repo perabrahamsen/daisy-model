@@ -21,7 +21,6 @@
 #define BUILD_DLL
 
 #include "number.h"
-#include "alist.h"
 #include "plf.h"
 #include "units.h"
 #include "memutils.h"

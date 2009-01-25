@@ -25,7 +25,6 @@
 #include "metalib.h"
 #include "intrinsics.h"
 #include "block.h"
-#include "alist.h"
 #include "treelog_text.h"
 #include "assertion.h"
 #include "librarian.h"
@@ -175,6 +174,39 @@ Librarian::build_alist (const symbol component,
     }
   const FrameModel frame (lib.model (type), alist);
   return frame.construct (parent, type); 
+}
+
+Model* 
+Librarian::build_stock (const symbol component, Metalib& metalib,
+                        Treelog& msg, const symbol type, 
+                        const symbol scope_id)
+{
+  const Library& lib = metalib.library (component);
+
+  if (!lib.check (type))
+    {
+      std::ostringstream tmp;
+      tmp << "Library '" << lib.name () << "' contains no model '"
+          << type << "'";
+      daisy_panic (tmp.str ());
+    }
+  const FrameModel& frame_model = lib.model (type);
+  FrameModel frame (frame_model, FrameModel::parent_copy);
+  frame.alist ().add ("type", type);
+  {
+    TreelogString tlog;
+    if (!frame.check (metalib, tlog))
+      {
+        msg.error (tlog.str ());
+        return NULL;
+      }
+  }
+  
+  Block parent (metalib, msg, frame, scope_id + ": " + type);
+  std::auto_ptr<Model> m (frame.construct (parent, type)); 
+  if (!parent.ok ())
+    return NULL;
+  return m.release ();
 }
 
 Model* 

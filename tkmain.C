@@ -21,7 +21,6 @@
 
 
 #include "daisy.h"
-#include "alist.h"
 #include "library.h"
 
 extern "C" {

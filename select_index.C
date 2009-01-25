@@ -23,7 +23,6 @@
 
 #include "select_value.h"
 #include "block.h"
-#include "alist.h"
 #include "librarian.h"
 #include "frame.h"
 

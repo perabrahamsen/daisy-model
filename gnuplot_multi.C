@@ -21,7 +21,6 @@
 #define BUILD_DLL
 #include "gnuplot.h"
 #include "block.h"
-#include "alist.h"
 #include "source.h"
 #include "treelog.h"
 #include "memutils.h"

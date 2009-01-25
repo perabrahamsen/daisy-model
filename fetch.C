@@ -23,7 +23,6 @@
 #include "fetch.h"
 #include "select.h"
 #include "treelog.h"
-#include "alist.h"
 #include "frame.h"
 #include "mathlib.h"
 #include <ostream>

@@ -29,7 +29,6 @@
 #include "scope_id.h"
 #include "metalib.h"
 #include "library.h"
-#include "alist.h"
 #include "syntax.h"
 #include "frame_submodel.h"
 #include "check.h"

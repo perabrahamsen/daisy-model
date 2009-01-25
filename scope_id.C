@@ -25,7 +25,6 @@
 #include "mathlib.h"
 #if 0
 #include "block.h"
-#include "alist.h"
 #include "librarian.h"
 #include "frame.h"
 #endif

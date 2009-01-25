@@ -23,7 +23,6 @@
 
 #include "groundwater.h"
 #include "block.h"
-#include "alist.h"
 #include "assertion.h"
 #include "librarian.h"
 #include "treelog.h"

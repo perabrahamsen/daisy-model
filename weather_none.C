@@ -23,7 +23,6 @@
 
 #include "weather_old.h"
 #include "block.h"
-#include "alist.h"
 #include "librarian.h"
 #include "frame.h"
 

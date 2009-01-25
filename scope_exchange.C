@@ -21,7 +21,6 @@
 #define BUILD_DLL
 #include "scope_exchange.h"
 #include "block.h"
-#include "alist.h"
 #include "assertion.h"
 #include "librarian.h"
 #include "frame.h"

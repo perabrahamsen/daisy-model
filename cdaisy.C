@@ -28,7 +28,6 @@
 #include "metalib.h"
 #include "library.h"
 #include "syntax.h"
-#include "alist.h"
 #include "daisy.h"
 #include "output.h"
 #include "toplevel.h"

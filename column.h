@@ -24,7 +24,6 @@
 #define COLUMN_H
 
 #include "model.h"
-#include "alist.h"
 
 class Frame;
 class Log;

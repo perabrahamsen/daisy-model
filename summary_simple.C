@@ -21,7 +21,6 @@
 #define BUILD_DLL
 
 #include "summary.h"
-#include "alist.h"
 #include "fetch.h"
 #include "select.h"
 #include "treelog.h"

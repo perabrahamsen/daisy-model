@@ -22,7 +22,6 @@
 
 #include "geometry.h"
 #include "volume.h"
-#include "alist.h"
 #include "check.h"
 #include "vcheck.h"
 #include "treelog.h"

@@ -23,7 +23,6 @@
 #define RUBISCONDIST_H
 
 #include "model.h"
-#include "alist.h"
 #include <vector>
 
 class Log;

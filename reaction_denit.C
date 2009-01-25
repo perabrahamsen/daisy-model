@@ -26,7 +26,6 @@
 #include "abiotic.h"
 #include "librarian.h"
 #include "block.h"
-#include "alist.h"
 #include "geometry.h"
 #include "soil.h"
 #include "soil_water.h"

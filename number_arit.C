@@ -21,7 +21,6 @@
 #define BUILD_DLL
 
 #include "number.h"
-#include "alist.h"
 #include "units.h"
 #include "vcheck.h"
 #include "mathlib.h"

@@ -22,7 +22,6 @@
 #define BUILD_DLL
 
 #include "syntax.h"
-#include "alist.h"
 #include "frame_submodel.h"
 #include "library.h"
 #include "metalib.h"

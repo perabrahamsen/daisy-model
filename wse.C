@@ -22,7 +22,6 @@
 
 #include "wse.h"
 #include "block.h"
-#include "alist.h"
 #include "program.h"
 #include "mathlib.h"
 #include "librarian.h"

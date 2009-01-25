@@ -28,7 +28,6 @@
 #include "library.h"
 #include "librarian.h"
 #include "block.h"
-#include "alist.h"
 #include "assertion.h"
 #include "path.h"
 #include "treelog.h"
@@ -93,21 +92,23 @@ UIRun::build_log (Block& block, const std::string& name)
   if (i != logs.end ())
     return;
 
-  const Library& library = block.metalib ().library (Log::component);
-  if (!library.complete (block.metalib (), id))
+  Metalib& metalib = block.metalib ();
+  Treelog& msg = block.msg ();
+    
+  const Library& library = metalib.library (Log::component);
+  if (!library.complete (metalib, id))
     return;
   
-  const AttributeList& alist = library.lookup (id);
   std::auto_ptr<Log> log_raw 
-    (Librarian::build_alist<Log> (block, alist, name));
+    (Librarian::build_stock<Log> (metalib, msg, id, __FUNCTION__));
   LogQt *const log = dynamic_cast<LogQt*> (log_raw.get ());
   if (log)
     {
-      log->initialize_common (block.metalib (), block.msg ());
+      log->initialize_common (metalib, msg);
       all_logs.push_back (log);
       logs[id] = log;
       log_raw.release ();
-      block.msg ().debug ("Qt log '" + name + "' attached.");
+      msg.debug ("Qt log '" + name + "' attached.");
     }
 }
 

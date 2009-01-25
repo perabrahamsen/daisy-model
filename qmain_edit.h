@@ -22,7 +22,6 @@
 #ifndef QMAIN_EDIT_H
 #define QMAIN_EDIT_H
 
-#include "alist.h"
 
 struct Syntax;
 struct PLF;

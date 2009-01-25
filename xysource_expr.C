@@ -20,7 +20,6 @@
 
 #define BUILD_DLL
 #include "xysource.h"
-#include "alist.h"
 #include "lexer_table.h"
 #include "scope_table.h"
 #include "gnuplot_utils.h"

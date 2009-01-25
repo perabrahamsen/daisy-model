@@ -23,7 +23,6 @@
 
 #include "daisy.h"
 #include "syntax.h"
-#include "alist.h"
 #include "library.h"
 #include <gtk--.h>
 

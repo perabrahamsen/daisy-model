@@ -23,7 +23,6 @@
 #define QMAIN_H
 
 // Daisy
-#include "alist.h"
 
 // Qt
 #include <qmainwindow.h>

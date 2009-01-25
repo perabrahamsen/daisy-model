@@ -23,7 +23,6 @@
 #define BUILD_DLL
 
 #include "condition.h"
-#include "alist.h"
 #include "boolean.h"
 #include "scope.h"
 #include "librarian.h"

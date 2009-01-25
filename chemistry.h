@@ -24,7 +24,6 @@
 
 #include "model.h"
 #include "symbol.h"
-#include "alist.h"
 #include <vector>
 
 class Log;

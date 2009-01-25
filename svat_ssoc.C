@@ -22,7 +22,6 @@
 #define BUILD_DLL
 
 #include "svat.h"
-#include "alist.h"
 #include "block.h"
 #include "librarian.h"
 #include "resistance.h"

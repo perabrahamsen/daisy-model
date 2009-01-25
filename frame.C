@@ -21,7 +21,6 @@
 #define BUILD_DLL
 
 #include "frame.h"
-#include "alist.h"
 #include "syntax.h"
 #include "block.h"
 #include "assertion.h"

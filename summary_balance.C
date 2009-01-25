@@ -22,7 +22,6 @@
 
 #include "summary.h"
 #include "block.h"
-#include "alist.h"
 #include "fetch.h"
 #include "select.h"
 #include "treelog.h"

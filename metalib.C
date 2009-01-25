@@ -25,7 +25,6 @@
 #include "librarian.h"
 #include "library.h"
 #include "block.h"
-#include "alist.h"
 #include "assertion.h"
 #include "memutils.h"
 #include "librarian.h"

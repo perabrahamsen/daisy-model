@@ -21,7 +21,6 @@
 #define BUILD_DLL
 
 #include "integer.h"
-#include "alist.h"
 #include "vcheck.h"
 #include "assertion.h"
 #include "memutils.h"

@@ -23,7 +23,6 @@
 #include "block.h"
 #include "metalib.h"
 #include "library.h"
-#include "alist.h"
 #include "librarian.h"
 #include "stringer.h"
 #include "number.h"

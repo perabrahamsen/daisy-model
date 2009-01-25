@@ -22,7 +22,6 @@
 #define BUILD_DLL
 
 #include "adsorption.h"
-#include "alist.h"
 #include "soil.h"
 #include "mathlib.h"
 #include "librarian.h"

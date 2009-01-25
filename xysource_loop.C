@@ -21,7 +21,6 @@
 #define BUILD_DLL
 #include "xysource.h"
 #include "block.h"
-#include "alist.h"
 #include "gnuplot_utils.h"
 #include "scope_id.h"
 #include "number.h"

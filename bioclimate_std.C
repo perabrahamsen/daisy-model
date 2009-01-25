@@ -22,8 +22,6 @@
 #define BUILD_DLL
 
 #include "bioclimate.h"
-#include "metalib.h"
-#include "library.h"
 #include "block.h"
 #include "surface.h"
 #include "weather.h"
@@ -49,7 +47,6 @@
 #include "fao.h"
 #include "librarian.h"
 #include "treelog.h"
-#include "syntax.h"
 #include <sstream>
 
 struct BioclimateStandard : public Bioclimate
@@ -314,10 +311,10 @@ struct BioclimateStandard : public Bioclimate
 void 
 BioclimateStandard::initialize (Block& block, const Weather& weather)
 {
+  Metalib& metalib = block.metalib ();
+  Treelog& msg = block.msg ();
+  Treelog::Open nest (msg, "Bioclimate: " + name);
 
-  Treelog::Open nest (block.msg (), "Bioclimate: " + name);
-
-  const Metalib& metalib = block.metalib ();
 
   if (!pet.get ())                      // Explicit.
     {
@@ -337,16 +334,8 @@ BioclimateStandard::initialize (Block& block, const Weather& weather)
       else
 	type = symbol ("makkink");
 
-      block.msg ().debug ("Pet choosen: " + type);
-
-      const Library& library = metalib.library (Pet::component);
-      daisy_assert (library.check (type));
-  
-      AttributeList alist (library.lookup (type));
-      alist.add ("type", type);
-      const Syntax& syntax  = library.syntax (type);
-      daisy_assert (syntax.check (metalib, alist, block.msg ()));
-      pet.reset (Librarian::build_alist<Pet> (block, alist, "pet"));
+      msg.debug ("Pet choosen: " + type);
+      pet.reset (Librarian::build_stock<Pet> (metalib, msg, type, "pet"));
     }
 
   if (!difrad.get ())                      // Explicit.
@@ -358,16 +347,9 @@ BioclimateStandard::initialize (Block& block, const Weather& weather)
       else
 	type = symbol ("DPF");
 
-      block.msg ().debug ("Difrad choosen: " + type);
-
-      const Library& library = metalib.library (Difrad::component);
-      daisy_assert (library.check (type));
-  
-      AttributeList alist (library.lookup (type));
-      alist.add ("type", type);
-      const Syntax& syntax = library.syntax (type);
-      daisy_assert (syntax.check (metalib, alist, block.msg ()));
-      difrad.reset (Librarian::build_alist<Difrad> (block, alist, "difrad"));
+      msg.debug ("Difrad choosen: " + type);
+      difrad.reset (Librarian::build_stock<Difrad> (metalib, msg, type, 
+                                                    "difrad"));
     }
 }
 

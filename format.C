@@ -24,7 +24,6 @@
 #include "assertion.h"
 #include "block.h"
 #include "librarian.h"
-#include "alist.h"
 
 const char *const Format::component = "format";
 

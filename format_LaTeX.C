@@ -21,7 +21,6 @@
 #define BUILD_DLL
 
 #include "format_LaTeX.h"
-#include "alist.h"
 #include "version.h"
 #include "assertion.h"
 #include "librarian.h"

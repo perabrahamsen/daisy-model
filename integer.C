@@ -24,7 +24,6 @@
 #include "boolean.h"
 #include "submodeler.h"
 #include "block.h"
-#include "alist.h"
 #include "memutils.h"
 #include "librarian.h"
 #include "treelog.h"

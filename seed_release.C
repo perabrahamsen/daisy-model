@@ -21,7 +21,6 @@
 #define BUILD_DLL
 #include "seed.h"
 #include "block.h"
-#include "alist.h"
 #include "librarian.h"
 #include "log.h"
 #include "check.h"

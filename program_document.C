@@ -26,7 +26,6 @@
 #include "library.h"
 #include "metalib.h"
 #include "block.h"
-#include "alist.h"
 #include "printer_file.h"
 #include "xref.h"
 #include "plf.h"
@@ -239,7 +238,7 @@ ProgramDocument::print_entry_type (const symbol name,
     case Value::Library:
     case Value::Error:
     default:
-      daisy_notreached ();
+      daisy_panic ("Unknown entry '" + name + "'");
     };
 }
 
@@ -1265,6 +1264,7 @@ standard parameterizations for the model.");
   Librarian::submodel_all (fixed);
   for (unsigned int i = 0; i < fixed.size (); i++)
     {
+      const symbol name = fixed[i];
       const Frame& frame = Librarian::submodel_frame (name);
       const symbol description = Librarian::submodel_description (name);
       print_fixed (name, frame.syntax (), frame.alist (), description);

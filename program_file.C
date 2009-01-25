@@ -22,7 +22,6 @@
 
 #include "program.h"
 #include "block.h"
-#include "alist.h"
 #include "path.h"
 #include "treelog.h"
 #include "librarian.h"

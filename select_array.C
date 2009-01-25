@@ -26,7 +26,6 @@
 #include "soil.h"
 #include "bdconv.h"
 #include "block.h"
-#include "alist.h"
 #include "mathlib.h"
 #include "librarian.h"
 #include "frame.h"

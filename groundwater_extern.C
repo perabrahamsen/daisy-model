@@ -24,7 +24,6 @@
 #include "output.h"
 #include "number.h"
 #include "block.h"
-#include "alist.h"
 #include "units.h"
 #include "check.h"
 #include "assertion.h"

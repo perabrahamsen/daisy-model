@@ -89,7 +89,7 @@ static struct ScopeselNameSyntax : public DeclareModel
   { 
     frame.add ("frame", Value::String, Value::Const,
                "Name of scope to select.");
-    frame.order ("name");
+    frame.order ("frame");
   }
 
   ScopeselNameSyntax ()

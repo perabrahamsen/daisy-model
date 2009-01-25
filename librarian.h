@@ -80,6 +80,8 @@ private:
   static Model* build_alist (symbol component,
                              Block& parent, const AttributeList&, 
                              symbol scope_id, size_t index);
+  static Model* build_stock (symbol component,
+                             Metalib&, Treelog&, symbol name, symbol scope_id);
   static Model* build_item (symbol component,
                             Block& parent, symbol key);
   static std::vector<Model*> build_vector (symbol component,
@@ -117,6 +119,11 @@ public:
     non_null (x);
     return x;
   }
+
+  template <class T> static T* 
+  build_stock (Metalib& metalib, Treelog& msg, symbol name, symbol scope_id)
+  { return dynamic_cast<T*> (Librarian::build_stock (T::component, metalib, msg,
+                                                     name, scope_id)); }
 
   template <class T> static T* 
   build_item (Block& parent, symbol key)

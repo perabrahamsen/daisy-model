@@ -87,25 +87,11 @@ Toplevel::Implementation::run_program (const std::string& name_str)
           msg.error (program_name + ": '" + name + "' unknown program");
           throw EXIT_FAILURE;
         }
-      const Syntax& p_syntax = library.syntax (name);
-      AttributeList p_alist (library.lookup (name));
-      p_alist.add ("type", name);
-      if (!p_syntax.check (metalib, p_alist, msg))
-        {
-          msg.error ("Cannot run incomplete program");
-          throw EXIT_FAILURE;
-        }
+      program.reset (Librarian::build_stock<Program> (metalib, msg, name,
+                                                      "Command line"));
+      if (!program.get ())
+        throw EXIT_FAILURE;
 
-      // std::auto_ptr<Program> program;
-
-      // Build.
-      {
-        Block block (metalib, msg, "Building");
-        program.reset (Librarian::build_alist<Program> (block, p_alist,
-                                                        "Command line"));
-        if (!block.ok ())
-          throw EXIT_FAILURE;
-      }
       // Initialize.
       {
         Block block (metalib, msg, "Initializing");

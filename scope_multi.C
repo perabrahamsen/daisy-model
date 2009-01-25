@@ -21,7 +21,6 @@
 #define BUILD_DLL
 
 #include "scope_multi.h"
-#include "alist.h"
 #include "assertion.h"
 #include "librarian.h"
 

@@ -21,7 +21,6 @@
 #define BUILD_DLL
 
 #include "resistance.h"
-#include "alist.h"
 #include "net_radiation.h"
 #include "assertion.h"
 #include "treelog.h"

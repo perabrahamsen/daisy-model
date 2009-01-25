@@ -29,7 +29,6 @@
 #include "am.h"
 #include "log.h"
 #include "block.h"
-#include "alist.h"
 #include "frame.h"
 #include "check.h"
 #include "assertion.h"

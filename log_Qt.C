@@ -20,7 +20,6 @@
 
 #include "log_Qt.h"
 #include "librarian.h"
-#include "alist.h"
 
 void
 LogQt::done (const std::vector<Time::component_t>& time_columns,

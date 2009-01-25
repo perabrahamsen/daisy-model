@@ -24,7 +24,6 @@
 #define AM_H
 
 #include "model.h"
-#include "alist.h"
 #include "im.h"
 #include <vector>
 #include <memory>

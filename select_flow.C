@@ -21,7 +21,6 @@
 #define BUILD_DLL
 #include "select_value.h"
 #include "block.h"
-#include "alist.h"
 #include "volume.h"
 #include "border.h"
 #include "geometry.h"

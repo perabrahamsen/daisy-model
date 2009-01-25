@@ -26,7 +26,6 @@
 #include "smb.h"
 #include "dom.h"
 #include "frame.h"
-#include "alist.h"
 #include "check.h"
 #include "vcheck.h"
 #include "geometry.h"

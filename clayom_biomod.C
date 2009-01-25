@@ -22,7 +22,6 @@
 
 #include "clayom.h"
 #include "block.h"
-#include "alist.h"
 #include "check.h"
 #include "smb.h"
 #include "soil.h"

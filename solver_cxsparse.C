@@ -25,7 +25,6 @@
 #define NDEBUG
 
 #include "solver.h"
-#include "alist.h"
 #include "librarian.h"
 #include "ublas_cxsparse.h"
 #include "frame.h"

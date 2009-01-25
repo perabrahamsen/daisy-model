@@ -22,7 +22,6 @@
 
 #include "number.h"
 #include "block.h"
-#include "alist.h"
 #include "source.h"
 #include "assertion.h"
 #include "librarian.h"

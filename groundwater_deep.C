@@ -22,7 +22,6 @@
 #define BUILD_DLL
 
 #include "groundwater.h"
-#include "alist.h"
 #include "assertion.h"
 #include "librarian.h"
 #include "frame.h"

@@ -25,7 +25,6 @@
 #include "metalib.h"
 #include "library.h"
 #include "syntax.h"
-#include "alist.h"
 #include "librarian.h"
 #include "assertion.h"
 #include <deque>

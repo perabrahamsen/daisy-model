@@ -26,7 +26,6 @@
 
 #include "solver.h"
 #include "assertion.h"
-#include "alist.h"
 #include "librarian.h"
 #include "frame.h"
 

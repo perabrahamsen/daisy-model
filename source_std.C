@@ -22,7 +22,6 @@
 #include "source_file.h"
 #include "units.h"
 #include "lexer_table.h"
-#include "alist.h"
 #include "librarian.h"
 #include "frame.h"
 #include <sstream>

@@ -22,7 +22,6 @@
 
 #include "xysource.h"
 #include "block.h"
-#include "alist.h"
 #include "gnuplot_utils.h"
 #include "number.h"
 #include "scope_sources.h"

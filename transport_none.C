@@ -23,7 +23,6 @@
 #include "geometry.h"
 #include "soil.h"
 #include "adsorption.h"
-#include "alist.h"
 #include "submodeler.h"
 #include "memutils.h"
 #include "librarian.h"

@@ -22,7 +22,6 @@
 
 #include "equil.h"
 #include "block.h"
-#include "alist.h"
 #include "scope_soil.h"
 #include "number.h"
 #include "treelog.h"
