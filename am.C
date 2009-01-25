@@ -688,25 +688,10 @@ AM::check_om_pools ()
 }
 
 AM& 
-AM::create (Metalib& metalib, const AttributeList& al1 , const Geometry& geo, 
+AM::create (Metalib& metalib, const AttributeList& alist, const Geometry& geo, 
             const Time& now, Treelog& msg)
 { 
-#if 0
-  AttributeList al2 (al1);
-  daisy_assert (al2.check ("type"))
-    al2.add ("type", "state");
-  if (!al2.check ("creation"))
-    {
-      AttributeList time_alist;
-      now.set_alist (time_alist);
-      al2.add ("creation", time_alist);
-    }
-  if (!al2.check ("initialized"))
-    al2.add ("initialized", false);
-  AM& am = *Librarian::build_free<AM> (metalib, msg, al2, "fertilizer");
-#else
-  AM& am = *Librarian::build_free<AM> (metalib, msg, al1, "fertilizer");
-#endif
+  AM& am = *Librarian::build_free<AM> (metalib, msg, alist, "fertilizer");
   am.impl->creation = now;
   am.initialize (geo, -42.42e42);
   return am;
@@ -714,7 +699,7 @@ AM::create (Metalib& metalib, const AttributeList& al1 , const Geometry& geo,
 
 // Crop part.
 AM& 
-AM::create (Metalib& metalib, const Geometry& geo, const Time& time,
+AM::create (Metalib& metalib, const Geometry& geo, const Time& now,
 	    const std::vector<const AttributeList*>& ol,
 	    const symbol sort, const symbol part,
 	    AM::lock_type lock, Treelog& msg)
@@ -724,12 +709,10 @@ AM::create (Metalib& metalib, const Geometry& geo, const Time& time,
   AttributeList al (frame.alist ());
   al.add ("type", "state");
   al.add ("initialized", true);
-  AttributeList new_time;
-  time.set_alist (new_time);
-  al.add ("creation", new_time);
   al.add ("name", sort + "/" + part);
   al.add ("om", ol);
   AM& am = *Librarian::build_free<AM> (metalib, msg, al, "crop part");
+  am.impl->creation = now;
   for (size_t i = 0; i < am.impl->om.size (); i++)
     am.impl->om[i]->initialize (geo.cell_size ());
   if (lock == AM::Locked)
