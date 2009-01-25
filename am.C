@@ -65,7 +65,7 @@ struct AM::Implementation
 
   // Content.
   bool initialized;             // Whether initialize_derived has been called.
-  const Time creation;		// When it was created.
+  Time creation;		// When it was created.
   const symbol name;		// What is was.
   const std::vector<AOM*> om;		// Organic matter pool.
 
@@ -691,8 +691,9 @@ AM&
 AM::create (Metalib& metalib, const AttributeList& al1 , const Geometry& geo, 
             const Time& now, Treelog& msg)
 { 
+#if 0
   AttributeList al2 (al1);
-  if (!al2.check ("type"))
+  daisy_assert (al2.check ("type"))
     al2.add ("type", "state");
   if (!al2.check ("creation"))
     {
@@ -703,6 +704,10 @@ AM::create (Metalib& metalib, const AttributeList& al1 , const Geometry& geo,
   if (!al2.check ("initialized"))
     al2.add ("initialized", false);
   AM& am = *Librarian::build_free<AM> (metalib, msg, al2, "fertilizer");
+#else
+  AM& am = *Librarian::build_free<AM> (metalib, msg, al1, "fertilizer");
+#endif
+  am.impl->creation = now;
   am.initialize (geo, -42.42e42);
   return am;
 }
