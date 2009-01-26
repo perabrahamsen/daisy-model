@@ -25,6 +25,7 @@
 #include "metalib.h"
 #include "library.h"
 #include "block.h"
+#include "alist.h"
 #include "lexer.h"
 #include "scope.h"
 #include "number.h"

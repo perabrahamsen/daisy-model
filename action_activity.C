@@ -30,7 +30,7 @@
 
 struct ActionActivity : public Action
 {
-  std::vector<Action*> actions;
+  auto_vector<Action*> actions;
 
   void tick (const Daisy& daisy, const Scope& scope, Treelog& out)
   { 
@@ -90,7 +90,7 @@ struct ActionActivity : public Action
   { }
 
   ~ActionActivity ()
-  { sequence_delete (actions.begin (), actions.end ()); }
+  { }
 };
 
 static struct ActionActivitySyntax : public DeclareModel

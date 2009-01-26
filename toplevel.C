@@ -121,8 +121,6 @@ Toplevel::Implementation::add_daisy_ui (Toplevel& toplevel)
   if (ui.get ())
     return;
 
-  const Library& library = metalib.library (UI::component);
-
   if (metalib.alist ().check ("ui"))
     /* Do nothing */;
   else 
