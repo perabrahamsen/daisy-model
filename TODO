@@ -2,29 +2,17 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Frame
 
+** ParserFile skal bruge frame.
+
 ** fjern alist.add (name, alist)
 
-** Gem frame i alist
-
-Overvej ejerskab. auto_ptr? copy vs inherit
-
-Få et overblik over hvor de bliver kaldt først.
-
 ** Gør Frame::syntax () const
-
-Requires ParserFile to use frame first.
-
-** CropOld -> submodels
-
-** CropSold -> submodels.
-
-** Fjern syntaxen fra Syntax
-
-** omskriv Parser til at at bruge frame
 
 ** Fjern "type", "base_model", attributes.
 
 Tænk over brug af "description".  Hvad med cite?
+
+*** static root model frame skal definere "cite" og "description".
 
 ** Frame::alist () og Frame::syntax () skal returnere const ref.
 
@@ -36,13 +24,11 @@ Tænk over brug af "description".  Hvad med cite?
 
 ** Integrer syntax/alist i frame
 
-** Integrer metalib i frame
+** CropOld -> submodels
+
+** CropSold -> submodels.
 
 ** Units skal instantieres i den frame de defineres i.
-
-** ParserFile rewrite (order ikke i defmodel)
-
-** static root model frame skal definere "cite" og "description".
 
 ** Notes
 
