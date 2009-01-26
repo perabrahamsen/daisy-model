@@ -78,6 +78,8 @@ BibTeX keys that would be relevant for this model or paramterization.");
       this->add ("cite", std::vector<symbol> ());
 #endif 
     }
+    FrameRoot& clone () const
+    { daisy_notreached (); }
   } frame;
   return frame;
 }
@@ -94,6 +96,12 @@ FrameModel::FrameModel (const FrameModel& parent, parent_copy_t)
     parent_ (&parent)
 { }
 
+FrameModel::FrameModel (const FrameModel& parent, parent_clone_t)
+  // For cloning a model
+  : Frame (parent),
+    parent_ (parent.parent ())
+{ }
+
 FrameModel::FrameModel (const FrameModel& p, const AttributeList& a)
   // build_alist
   : Frame (p.syntax (), a),
@@ -106,6 +114,10 @@ FrameModel::FrameModel (const FrameModel& p,
   : Frame (s, a),
     parent_ (&p)
 { }
+
+FrameModel&
+FrameModel::clone () const
+{ return *new FrameModel (*this, parent_clone); }
 
 FrameModel::~FrameModel ()
 { }

@@ -148,6 +148,10 @@ Metalib::Metalib (load_frame_t load_frame)
   impl->initialize (*this);
 }
 
+Metalib& 
+Metalib::clone () const
+{ daisy_notreached (); }
+
 Metalib::~Metalib ()
 { }
 

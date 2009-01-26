@@ -297,6 +297,10 @@ Librarian::~Librarian ()
 
 class FrameDeclared : public FrameModel
 {
+protected:
+  FrameDeclared (const FrameDeclared& frame, parent_clone_t)
+    : FrameModel (frame, parent_clone)
+  { }
 public:
   explicit FrameDeclared (const Declare& declare)
     : FrameModel (*declare.parent_model (), parent_copy)
@@ -324,12 +328,18 @@ class FrameBuildable : public FrameDeclared
       { block.error ("Build failure: " + std::string (err)); }
     return NULL;
   }
+  explicit FrameBuildable (const FrameBuildable& frame, const parent_clone_t)
+    : FrameDeclared (frame, parent_clone),
+      builder (frame.builder)
+  { }
 public:
-  explicit FrameBuildable (const Declare& declare,
-                           const Declare::Builder& build)
+  FrameBuildable (const Declare& declare,
+                  const Declare::Builder& build)
     : FrameDeclared (declare),
       builder (build)
   { }
+  FrameBuildable& clone () const
+  { return *new FrameBuildable (*this, parent_clone); }
 };
 
 symbol 

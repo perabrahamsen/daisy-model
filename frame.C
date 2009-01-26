@@ -461,6 +461,15 @@ Frame::alist (const symbol key) const
     return impl->alist.alist (key);
 }
 
+Frame& 
+Frame::frame (const symbol key) const
+{ 
+  if (parent () && !impl->alist.check (key))
+    return parent ()->frame (key);
+  else
+    return impl->alist.frame (key);
+}
+
 int 
 Frame::integer (const symbol key) const
 { 

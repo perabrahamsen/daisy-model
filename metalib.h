@@ -67,11 +67,10 @@ public:
   void added_object (symbol library, symbol object);
 
   // Create and Destroy.
-private:
-  
 public:
   void reset ();
   explicit Metalib (load_frame_t);
+  Metalib& clone () const;
   ~Metalib ();
 };
 

@@ -232,6 +232,7 @@ public:
   bool flag (const symbol, bool default_value) const;
   const PLF& plf (const symbol) const;
   AttributeList& alist (const symbol) const;
+  Frame& frame (const symbol) const;
   int integer (const symbol) const;
   int integer (const symbol, int default_value) const;
   const std::vector<double>& number_sequence (const symbol) const;
@@ -269,8 +270,10 @@ protected:
   Frame (const Frame&);
   Frame (const Frame*);
   Frame ();
-public:
   Frame (const Syntax&, const AttributeList&); // Old style.
+public:
+  enum parent_clone_t { parent_clone }; // For temporary models.
+  virtual Frame& clone () const = 0;
   typedef void (*load_frame_t) (Frame&);
 #if 1
   virtual void reset ();

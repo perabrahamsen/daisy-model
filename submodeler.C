@@ -24,11 +24,24 @@
 #include "frame.h"
 #include "alist.h"
 #include "syntax.h"
+#include "assertion.h"
+
+struct FrameBlockSubmodel : public Frame
+{
+  FrameBlockSubmodel (const Syntax& syntax, const AttributeList& alist)
+    : Frame (syntax, alist)
+  { }
+  explicit FrameBlockSubmodel (const FrameBlockSubmodel& frame)
+    : Frame (frame)
+  { }
+  FrameBlockSubmodel& clone () const
+  { return *new FrameBlockSubmodel (*this); }
+};
 
 BlockSubmodel::BlockSubmodel (Block& parent, const symbol key)
   : Block (parent,
-           *new Frame (parent.syntax ().syntax (key), 
-                       parent.alist ().alist(key)),
+           *new FrameBlockSubmodel (parent.syntax ().syntax (key), 
+                                    parent.alist ().alist(key)),
            key),
     frame_owner (&frame ())
 { }
@@ -36,8 +49,8 @@ BlockSubmodel::BlockSubmodel (Block& parent, const symbol key)
 BlockSubmodel::BlockSubmodel (Block& parent, const symbol key, 
                               const size_t index)
   : Block (parent,
-           *new Frame (parent.syntax ().syntax (key),
-                       *parent.alist ().alist_sequence (key)[index]),
+           *new FrameBlockSubmodel (parent.syntax ().syntax (key),
+                                    *parent.alist ().alist_sequence (key)[index]),
            sequence_id (key, index)),
     frame_owner (&frame ())
 { }

@@ -89,6 +89,7 @@ public:
   bool flag (symbol, bool default_value) const;
   const PLF& plf (symbol) const;
   AttributeList& alist (symbol) const;
+  Frame& frame (symbol) const;
   int integer (symbol) const;
   int integer (symbol, int default_value) const;
   const std::vector<double>& number_sequence (symbol) const;
@@ -106,14 +107,16 @@ private:
   Block ();
 public:
   // Toplevel.
-  explicit Block (Metalib&, Treelog& msg, symbol scope_tag);
+  Block (Metalib&, Treelog& msg, symbol scope_tag);
 
   // build_free
-  explicit Block (Metalib&, Treelog& msg, const Frame&, symbol scope_tag);
-  // build_item, submodel
-  explicit Block (Block&, const Frame&, symbol scope_tag);
+  Block (Metalib&, Treelog& msg, const Frame&, symbol scope_tag);
+  // submodel
+  Block (Block&, symbol key);
+  // build_item
+  Block (Block&, const Frame&, symbol scope_tag);
   // build_vector, map_submodel
-  explicit Block (Block&, const Frame&, symbol scope_tag, size_t index);
+  Block (Block&, const Frame&, symbol scope_tag, size_t index);
 
   ~Block ();
 };

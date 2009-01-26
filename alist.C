@@ -29,6 +29,7 @@
 #include "mathlib.h"
 #include "memutils.h"
 #include "assertion.h"
+#include "frame.h"
 #include <map>
 #include <sstream>
 
@@ -56,7 +57,10 @@ struct AValue
     symbol* name;
     bool flag;
     PLF* plf;
-    AttributeList* alist;
+    struct {
+      Frame* frame;
+      AttributeList* alist;
+    } fa;
     int integer;
     std::vector<double>* number_sequence;
     std::vector<symbol>* name_sequence;
@@ -114,11 +118,21 @@ struct AValue
       ref_count (new int (1))
     { }
   AValue (const AttributeList& v)
-    : alist (new AttributeList (v)),
-      type (Value::AList),
+    : type (Value::AList),
       is_sequence (false),
       ref_count (new int (1))
-    { }
+    { 
+      fa.alist = new AttributeList (v);
+      fa.frame = NULL;
+    }
+  AValue (const Frame& f)
+    : type (Value::AList),
+      is_sequence (false),
+      ref_count (new int (1))
+    { 
+      fa.alist = NULL;
+      fa.frame = &f.clone ();
+    }
   AValue (int v)
     : integer (v),
       type (Value::Integer),
@@ -224,8 +238,12 @@ AValue::subset (const Metalib& metalib, const AValue& v, const Syntax& syntax,
 	return integer == v.integer;
       case Value::AList:
 	{
-	  const AttributeList& value = *alist;
-	  const AttributeList& other = *v.alist;
+	  const AttributeList& value = fa.alist
+            ? *fa.alist
+            : fa.frame->alist ();
+	  const AttributeList& other = v.fa.alist
+            ? *v.fa.alist
+            : v.fa.frame->alist ();
 	  const Value::type type = syntax.lookup (key);
 	  if (type == Value::AList)
 	    return value.subset (metalib, other, syntax.syntax (key));
@@ -374,7 +392,10 @@ AValue::cleanup ()
 	    // Primitives, do nothing.
 	    break;
 	  case Value::AList:
-	    delete alist;
+	    if (fa.alist)
+              delete fa.alist;
+            else
+              delete fa.frame;
 	    break;
 	  case Value::PLF:
 	    delete plf;
@@ -459,7 +480,10 @@ AValue::operator= (const AValue& v)
 	integer = v.integer;
         break;
       case Value::AList:
-        alist = v.alist;
+        if (v.fa.alist)
+          fa.alist = v.fa.alist;
+        else
+          fa.frame = v.fa.frame;
         break;
       case Value::PLF:
 	plf = v.plf;
@@ -743,7 +767,22 @@ AttributeList::alist (const symbol key) const
   const AValue& value = impl.lookup (key);
   value.expect (key, Value::AList);
   value.singleton (key);
-  return *value.alist;
+  if (value.fa.alist)
+    return *value.fa.alist;
+  else
+    return value.fa.frame->alist ();
+}
+
+Frame& 
+AttributeList::frame (const symbol key) const
+{
+  const AValue& value = impl.lookup (key);
+  value.expect (key, Value::AList);
+  value.singleton (key);
+  if (value.fa.alist)
+    daisy_panic ("Value of '" + key + "' is an alist, a frame was requested");
+  else
+    return *value.fa.frame;
 }
 
 const std::vector<double>& 

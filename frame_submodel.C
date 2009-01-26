@@ -22,9 +22,17 @@
 
 #include "frame_submodel.h"
 
+FrameSubmodel::FrameSubmodel (const FrameSubmodel& frame, const parent_clone_t) 
+  : Frame (frame)
+{ }
+
 FrameSubmodel::FrameSubmodel (load_syntax_t load_syntax)
   : Frame ()
 { load_syntax (*this); }
+
+FrameSubmodel& 
+FrameSubmodel::clone () const
+{ return *new FrameSubmodel (*this, parent_clone); }
 
 FrameSubmodel::~FrameSubmodel ()
 { }

@@ -423,6 +423,16 @@ Block::alist (const symbol key) const
   return frame.alist (key); 
 }
 
+Frame& 
+Block::frame (const symbol key) const
+{ 
+  const Frame& frame = find_frame (key);
+  if (frame.is_reference (key))
+    return this->frame (impl->expand_reference (key));
+
+  return frame.frame (key); 
+}
+
 int 
 Block::integer (const symbol key) const
 { 
@@ -529,6 +539,12 @@ Block::Block (Metalib& metalib, Treelog& msg,
   // build_free
   : impl (new Implementation (metalib, NULL, msg, 
                               frame, scope_id))
+{ }
+
+Block::Block (Block& block, const symbol key)
+  // submodel
+  : impl (new Implementation (block.metalib (), &block, block.msg (),
+                              block.frame (key), key))
 { }
 
 Block::Block (Block& block, const Frame& frame, symbol scope_tag)

@@ -29,6 +29,7 @@ class PLF;
 class AttributeList;
 class Syntax;
 class Metalib;
+class Frame;
 
 #ifdef __unix
 #define EXPORT /* Nothing */
@@ -72,6 +73,7 @@ public:
   bool flag (symbol, bool default_value) const;
   const PLF& plf (symbol) const;
   AttributeList& alist (symbol) const;
+  Frame& frame (symbol) const;
   int integer (symbol) const;
   int integer (symbol, int default_value) const;
   const std::vector<double>& number_sequence (symbol) const;
@@ -91,9 +93,8 @@ public:
   { return add (key, symbol (value)); }
   void add (symbol, bool);
   void add (symbol, int);
-#if 1
   void add (symbol, const AttributeList&);
-#endif
+  void add (symbol, const Frame&);
   void add (symbol, const PLF&);
   void add (symbol, const std::vector<double>&);
   void add (symbol, const std::vector<symbol>&);
