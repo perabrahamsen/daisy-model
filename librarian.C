@@ -33,8 +33,11 @@
 #include <map>
 
 void 
-Librarian::non_null (const void *const p)
-{ daisy_assert (p); }
+Librarian::non_null (Block& block, const void *const p)
+{ 
+  if (!p)
+    block.error ("Build failed");
+}
 
 Intrinsics* Librarian::content = 0;  
 
@@ -113,6 +116,7 @@ Librarian::submodel_all (std::vector<symbol>& all)
   return content->submodel_all (all); 
 }
   
+#if 0
 Model* 
 Librarian::build_free (const symbol component, Metalib& metalib,
                        Treelog& msg, const AttributeList& alist, 
@@ -182,6 +186,7 @@ Librarian::build_alist (const symbol component,
   const FrameModel frame (lib.model (type), alist);
   return frame.construct (parent, type); 
 }
+#endif
 
 Model*
 Librarian::build_frame (const symbol component,
@@ -247,16 +252,19 @@ Librarian::build_stock (const symbol component, Metalib& metalib,
 Model* 
 Librarian::build_item (const symbol component,
                        Block& parent, symbol key)
-{ return build_alist (component, parent, parent.alist (key), key); }
+{ return build_frame (component, parent, parent.model (key), key); }
 
 std::vector<Model*> 
 Librarian::build_vector (const symbol component,
                          Block& al, symbol key)
 { 
   std::vector<Model*> t;
-  const std::vector<const AttributeList*>& f (al.alist_sequence (key));
+  const std::vector<const Frame*>& f (al.frame_sequence (key));
   for (size_t i = 0; i < f.size (); i++)
-    t.push_back (build_alist (component, al, *f[i], key, i));
+    {
+      const FrameModel& model = dynamic_cast<const FrameModel&> (*f[i]);
+      t.push_back (build_frame (component, al, model, key, i));
+    }
   return t;
 }
 
@@ -265,9 +273,12 @@ Librarian::build_vector_const (const symbol component,
                                Block& al, symbol key)
 { 
   std::vector<const Model*> t;
-  const std::vector<const AttributeList*>& f (al.alist_sequence (key));
+  const std::vector<const Frame*>& f (al.frame_sequence (key));
   for (size_t i = 0; i < f.size (); i++)
-    t.push_back (build_alist (component, al, *f[i], key, i));
+    {
+      const FrameModel& model = dynamic_cast<const FrameModel&> (*f[i]);
+      t.push_back (build_frame (component, al, model, key, i));
+    }
   return t;
 }
 

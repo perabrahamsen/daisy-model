@@ -71,16 +71,7 @@ public:
   // Build.
 private:
   typedef Model& (*builder) (Block&);
-  static void non_null (const void*);
-  static Model* build_free (symbol component,
-                            Metalib&, Treelog&, const AttributeList&, 
-                            symbol scope_id);
-  static Model* build_alist (symbol component,
-                             Block& parent, const AttributeList&, 
-                             symbol scope_id);
-  static Model* build_alist (symbol component,
-                             Block& parent, const AttributeList&, 
-                             symbol scope_id, size_t index);
+  static void non_null (Block&, const void*);
   static Model* build_frame (symbol component,
                              Block&, const FrameModel&, 
                              symbol scope_id);
@@ -103,43 +94,23 @@ private:
 
 public:
   template <class T> static T* 
-  build_free (Metalib& metalib, Treelog& msg,
-              const AttributeList& alist, 
-              symbol scope_id)
-  { return dynamic_cast<T*> (Librarian::build_free (T::component, metalib, msg,
-                                                    alist, scope_id)); }
-
-  template <class T> static T* 
-  build_alist (Block& parent, const AttributeList& alist, 
-               symbol scope_id)
-  { 
-    T* x = dynamic_cast<T*> (Librarian::build_alist (T::component, 
-                                                     parent, alist, scope_id));
-    non_null (x);
-    return x;
-  }
-
-  template <class T> static T* 
-  build_alist (Block& parent, const AttributeList& alist, 
-               symbol scope_id, const size_t index)
-  { 
-    T* x = dynamic_cast<T*> (Librarian::build_alist (T::component, 
-                                                     parent, alist, 
-                                                     scope_id, index));
-    non_null (x);
-    return x;
-  }
-
-  template <class T> static T* 
   build_frame (Block& block, const FrameModel& frame, symbol scope_id)
-  { return dynamic_cast<T*> (Librarian::build_frame (T::component, block,
-                                                     frame, scope_id)); }
+  { 
+    T* x = dynamic_cast<T*> (Librarian::build_frame (T::component, block,
+                                                     frame, scope_id)); 
+    non_null (block, x);
+    return x;
+}
 
   template <class T> static T* 
   build_frame (Block& block, const FrameModel& frame, const symbol scope_id, 
                const size_t index)
-  { return dynamic_cast<T*> (Librarian::build_frame (T::component, block,
-                                                     frame, scope_id, index)); }
+  { 
+    T* x = dynamic_cast<T*> (Librarian::build_frame (T::component, block,
+                                                     frame, scope_id, index)); 
+    non_null (block, x);
+    return x;
+  }
 
   template <class T> static T* 
   build_frame (Metalib& metalib, Treelog& msg, const FrameModel& frame,
@@ -157,7 +128,7 @@ public:
   { 
     T* x = dynamic_cast<T*> (Librarian::build_item (T::component, 
                                                     parent, key)); 
-    non_null (x);
+    non_null (parent, x);
     return x;
   }
 
@@ -170,7 +141,7 @@ public:
     for (size_t i = 0; i < c.size (); i++)
       {
         T* x = dynamic_cast<T*> (c[i]);
-        non_null (x);
+        non_null (al, x);
         t.push_back (x);
       }
     return t;
@@ -184,7 +155,7 @@ public:
     for (size_t i = 0; i < c.size (); i++)
       {
         const T* x = dynamic_cast<const T*> (c[i]);
-        non_null (x);
+        non_null (al, x);
         t.push_back (x);
       }
     return t;

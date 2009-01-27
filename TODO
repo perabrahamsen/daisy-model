@@ -2,13 +2,17 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Frame
 
-** Søg efter andre brug af build_alist og build_free
-
-Erstat med build_frame
-
-** fjern alist.add (name, alist)
+** submodeller.C: Brug frame
 
 ** Gør Frame::syntax () const
+
+** Ret log_alist, log_checkpoint
+
+** Ret traverse, xref
+
+** Ret program_document
+
+** fjern alist.add (name, alist) og alist.add (name, alist_sequence)
 
 ** Fjern "type", "base_model", attributes.
 

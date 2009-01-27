@@ -537,7 +537,8 @@ ParserFile::Implementation::add_derived (Library& lib)
     : get_symbol ();
   if (!lib.check (super))
     {
-      error (std::string ("Unknown '") + lib.name () + "' model '" + super + "'");
+      error (std::string ("Unknown '") + lib.name ()
+             + "' model '" + super + "'");
       skip_to_end ();
       return;
     }
