@@ -55,7 +55,6 @@ map_construct_const (const std::vector<const AttributeList*>& f)
 
 class BlockSubmodel : public Block
 {
-  std::auto_ptr<const Frame> frame_owner;
 public:
   BlockSubmodel (Block& parent, const symbol key);
   BlockSubmodel (Block& parent, const symbol key, const size_t index);

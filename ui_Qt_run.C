@@ -144,7 +144,8 @@ UIRun::attach (Toplevel& toplevel)
 
   // Build log.
   {
-    Block block (toplevel.metalib (), toplevel.msg (), "UI logs");
+    Block block (toplevel.metalib (), toplevel.msg (),
+                 toplevel.metalib (), "UI logs");
     build_log (block, "QtTime");   
   }
 

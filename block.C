@@ -547,36 +547,15 @@ Block::sequence_id (const symbol key, size_t index)
 }
 
 Block::Block (Metalib& metalib, Treelog& msg, 
-              const symbol scope_id)
-  // Toplevel.
-  : impl (new Implementation (metalib, NULL, msg, 
-                              metalib, scope_id))
-{ }
-
-Block::Block (Metalib& metalib, Treelog& msg, 
               const Frame& frame,
  	      const symbol scope_id)
-  // build_free
   : impl (new Implementation (metalib, NULL, msg, 
                               frame, scope_id))
 { }
 
-Block::Block (Block& block, const symbol key)
-  // submodel
-  : impl (new Implementation (block.metalib (), &block, block.msg (),
-                              block.frame (key), key))
-{ }
-
 Block::Block (Block& block, const Frame& frame, symbol scope_tag)
-  // build_item
   : impl (new Implementation (block.metalib (), &block, block.msg (),
                               frame, scope_tag))
-{ }
-
-Block::Block (Block& block, const Frame& frame, symbol scope_tag, size_t index)
-  // build_vector
-  : impl (new Implementation (block.metalib (), &block, block.msg (),
-                              frame, sequence_id (scope_tag, index)))
 { }
 
 Block::~Block ()

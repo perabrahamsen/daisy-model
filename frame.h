@@ -59,7 +59,7 @@ protected:
   // Old style access.
 public:
   AttributeList& alist () const;
-  Syntax& syntax () const;
+  const Syntax& syntax () const;
 
   // Common access.
 public:

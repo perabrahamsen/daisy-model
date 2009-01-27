@@ -109,18 +109,10 @@ protected:
 private:
   Block ();
 public:
-  // Toplevel.
-  Block (Metalib&, Treelog& msg, symbol scope_tag);
-
-  // build_free
+  // Freestanding
   Block (Metalib&, Treelog& msg, const Frame&, symbol scope_tag);
-  // submodel
-  Block (Block&, symbol key);
-  // build_item
+  // Context
   Block (Block&, const Frame&, symbol scope_tag);
-  // build_vector, map_submodel
-  Block (Block&, const Frame&, symbol scope_tag, size_t index);
-
   ~Block ();
 };
 

@@ -26,33 +26,15 @@
 #include "syntax.h"
 #include "assertion.h"
 
-struct FrameBlockSubmodel : public Frame
-{
-  FrameBlockSubmodel (const Syntax& syntax, const AttributeList& alist)
-    : Frame (syntax, alist)
-  { }
-  explicit FrameBlockSubmodel (const FrameBlockSubmodel& frame)
-    : Frame (frame)
-  { }
-  FrameBlockSubmodel& clone () const
-  { return *new FrameBlockSubmodel (*this); }
-};
-
 BlockSubmodel::BlockSubmodel (Block& parent, const symbol key)
-  : Block (parent,
-           *new FrameBlockSubmodel (parent.syntax ().syntax (key), 
-                                    parent.alist ().alist(key)),
-           key),
-    frame_owner (&frame ())
+  : Block (parent, parent.frame (key), key)
 { }
 
 BlockSubmodel::BlockSubmodel (Block& parent, const symbol key, 
                               const size_t index)
   : Block (parent,
-           *new FrameBlockSubmodel (parent.syntax ().syntax (key),
-                                    *parent.alist ().alist_sequence (key)[index]),
-           sequence_id (key, index)),
-    frame_owner (&frame ())
+           *parent.alist ().frame_sequence (key)[index],
+           sequence_id (key, index))
 { }
 
 BlockSubmodel::~BlockSubmodel ()

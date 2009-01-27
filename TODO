@@ -2,8 +2,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Frame
 
-** submodeller.C: Brug frame
-
 ** Gør Frame::syntax () const
 
 ** Ret log_alist, log_checkpoint

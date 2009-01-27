@@ -56,7 +56,7 @@ AttributeList&
 Frame::alist () const
 { return impl->alist; }
 
-Syntax& 
+const Syntax& 
 Frame::syntax () const
 { return impl->syntax; }
 

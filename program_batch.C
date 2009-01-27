@@ -28,6 +28,7 @@
 #include "memutils.h"
 #include "librarian.h"
 #include "frame.h"
+#include "metalib.h"
 #include <vector>
 
 struct ProgramBatch : public Program
@@ -57,7 +58,7 @@ struct ProgramBatch : public Program
         Treelog::Open nest (msg, name.name (), i, program[i]->name);
         msg.touch ();
         {
-          Block block (metalib, msg, "Initializing");
+          Block block (metalib, msg, metalib, "Initializing");
           program[0]->initialize (block);
           if (!block.ok ())
             throw EXIT_FAILURE;
