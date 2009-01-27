@@ -28,7 +28,7 @@
 #include <vector>
 
 class AttributeList;
-class Syntax;
+class FrameModel;
 class Log;
 class AM;
 class DOM;
@@ -80,15 +80,15 @@ public:
   virtual bool check (const Units&,
                       const Soil&, const SoilWater&, const SoilHeat&,
 		      const Chemistry&, Treelog&) const = 0;
-  virtual bool check_am (const AttributeList& am, Treelog& err) const = 0;
+  virtual bool check_am (const FrameModel& am, Treelog& err) const = 0;
   virtual void add (AM&) = 0;
-  virtual void fertilize (Metalib&, const AttributeList&, 
+  virtual void fertilize (Metalib&, const FrameModel&, 
                           const Geometry&, 
                           const Time&, double dt, Treelog&) = 0;
-  virtual void fertilize (Metalib&, const AttributeList&, const Geometry&,
+  virtual void fertilize (Metalib&, const FrameModel&, const Geometry&,
                           double from, double to, const Time&, double dt,
                           Treelog&) = 0;
-  virtual void fertilize (Metalib&, const AttributeList&, const Geometry&,
+  virtual void fertilize (Metalib&, const FrameModel&, const Geometry&,
                           const Volume&, const Time&, double dt, Treelog&) = 0;
   virtual AM* find_am (symbol sort, symbol part) const = 0;
 public:

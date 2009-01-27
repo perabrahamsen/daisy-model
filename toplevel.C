@@ -121,18 +121,9 @@ Toplevel::Implementation::add_daisy_ui (Toplevel& toplevel)
   if (ui.get ())
     return;
 
-  if (metalib.alist ().check ("ui"))
-    /* Do nothing */;
-  else 
-    {
-#if 0
-      AttributeList alist (library.lookup (preferred_ui));
-      alist.add ("type", preferred_ui);
-      metalib.alist ().add ("ui", alist);
-#else
-      metalib.add ("ui", preferred_ui);
-#endif
-    }
+  if (!metalib.alist ().check ("ui"))
+    metalib.add ("ui", preferred_ui);
+
   Block block (metalib, msg, "UI");
   ui.reset (Librarian::build_item<UI> (block, "ui"));
   if (!ui.get ())

@@ -70,7 +70,7 @@ struct VegetationPermanent : public Vegetation
   AM* AM_litter;                // Dead plant matter.
   double N_uptake;		// N uptake this hour. [g N/m^2/h]
   double N_litter;		// N litter this hour. [g N/m^2/h]
-  const std::vector<const AttributeList*>& litter_am; // Litter AM parameters.
+  const std::vector<const Frame*>& litter_am; // Litter AM parameters.
   // Root.
   std::auto_ptr<RootSystem> root_system;
   const double WRoot;		// Root dry matter weight [g DM/m^2]
@@ -188,7 +188,7 @@ struct VegetationPermanent : public Vegetation
               std::vector<double>&, std::vector<double>&,
               Treelog&)
   { }
-  void sow (Metalib&, const AttributeList&, 
+  void sow (Metalib&, const FrameModel&, 
             const double, const double, const double,
             const Geometry&, OrganicMatter&, const double, 
             double&, double&, const Time&, double, Treelog&)
@@ -401,7 +401,7 @@ VegetationPermanent::VegetationPermanent (Block& al)
     AM_litter (NULL),
     N_uptake (0.0),
     N_litter (0.0),
-    litter_am (al.alist_sequence ("litter_am")),
+    litter_am (al.frame_sequence ("litter_am")),
     root_system (submodel<RootSystem> (al, "Root")),
     WRoot (al.number ("root_DM") * 100.0), // [Mg DM / ha] -> [g DM / m^2]
     albedo_ (al.number ("Albedo")),

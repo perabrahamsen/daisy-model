@@ -61,7 +61,7 @@ struct Bioincorporation::Implementation
   const double respiration;
   const PLF distribution;
   std::vector<double> density;
-  const std::vector<const AttributeList*>& aom_alists; // Stem AM parameters.
+  const std::vector<const Frame*>& aom_alists; // Stem AM parameters.
   
   // Content.
   AM* aom;
@@ -274,7 +274,7 @@ Bioincorporation::Implementation::Implementation (const AttributeList& al)
     T_factor (al.plf ("T_factor")),
     respiration (al.number ("respiration")),
     distribution (al.plf ("distribution")), 
-    aom_alists (al.alist_sequence ("AOM")),
+    aom_alists (al.frame_sequence ("AOM")),
     C_removed (0.0),
     N_removed (0.0),
     speed (-42.42e42)

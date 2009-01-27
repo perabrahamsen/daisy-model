@@ -36,6 +36,8 @@ class AOM;
 class Treelog;
 class VCheck;
 class Units;
+class Frame;
+class FrameModel;
 
 class AM : public ModelAListed
 {
@@ -89,36 +91,36 @@ public:
 public:
   static const VCheck& check_om_pools ();
   // Initialization & Fertilizer.
-  static AM& create (Metalib&, const AttributeList&, const Geometry&, 
+  static AM& create (Metalib&, const FrameModel&, const Geometry&, 
                      const Time&, Treelog& msg);
   // Crop part.
   static AM& create (Metalib&, const Geometry&, const Time&,
-		     const std::vector<const AttributeList*>&,
+		     const std::vector<const Frame*>&,
 		     symbol sort, symbol part, lock_type lock, Treelog& msg);
   void initialize (const Geometry&, const double max_rooting_depth);
   virtual void initialize_derived (const Geometry&, 
                                    const double max_rooting_depth) = 0;
   static const std::vector<symbol>& default_AM ();
 
-  static double get_NO3 (const Metalib&, const AttributeList&);	// [g N/cm^2]
-  static double get_NH4 (const Metalib&, const AttributeList&);	// [g N/cm^2]
-  static IM get_IM (const Metalib&, const Unit&, const AttributeList&);
+  static double get_NO3 (const Metalib&, const FrameModel&);	// [g N/cm^2]
+  static double get_NH4 (const Metalib&, const FrameModel&);	// [g N/cm^2]
+  static IM get_IM (const Metalib&, const Unit&, const FrameModel&);
   static double get_volatilization (const Metalib&,
-                                    const AttributeList&);	// [g N/m^2]
-  static double get_DM (const Metalib&, const AttributeList&);	// [Mg DM/ha]
-  static double get_water (const Metalib&, const AttributeList&);	// [mm]
-  static void set_utilized_weight (const Metalib&, AttributeList& am,
+                                    const FrameModel&);	// [g N/m^2]
+  static double get_DM (const Metalib&, const FrameModel&);	// [Mg DM/ha]
+  static double get_water (const Metalib&, const FrameModel&);	// [mm]
+  static void set_utilized_weight (const Metalib&, FrameModel& am,
 				   const double weight /* [kg N/ha] */);
   static double utilized_weight (const Metalib&,
-                                 const AttributeList& am); // [kg N/ha]
+                                 const FrameModel& am); // [kg N/ha]
   static double second_year_utilization (const Metalib&,
-                                         const AttributeList& am); // [kg N/ha]
-  static void set_mineral (const Metalib&, AttributeList&, 
+                                         const FrameModel& am); // [kg N/ha]
+  static void set_mineral (const Metalib&, FrameModel&, 
                            double NH4, double NO3);// [kg N/ha]
 
-  static bool is_fertilizer (const Metalib&, const AttributeList&);
-  static bool is_mineral (const Metalib&, const AttributeList&);
-  static bool is_organic (const Metalib&, const AttributeList&);
+  static bool is_fertilizer (const Metalib&, const FrameModel&);
+  static bool is_mineral (const Metalib&, const FrameModel&);
+  static bool is_organic (const Metalib&, const FrameModel&);
 protected:
   AM (Block&);
 public:

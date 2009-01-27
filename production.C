@@ -808,8 +808,8 @@ Production::initialize (const double SeedN)
 
 void
 Production::initialize (Metalib& metalib, const symbol name, 
-			const std::vector<const AttributeList*>& root,
-			const std::vector<const AttributeList*>& dead,
+			const std::vector<const Frame*>& root,
+			const std::vector<const Frame*>& dead,
 			const Geometry& geo,
 			OrganicMatter& organic_matter, Treelog& msg)
 {

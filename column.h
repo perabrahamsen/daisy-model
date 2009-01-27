@@ -26,6 +26,7 @@
 #include "model.h"
 
 class Frame;
+class FrameModel;
 class Log;
 class Time;
 class Weather;
@@ -68,7 +69,7 @@ public:
 
   // Actions.
 public:
-  virtual void sow (Metalib&, const AttributeList& crop, 
+  virtual void sow (Metalib&, const FrameModel& crop, 
                     double row_width, double row_width, double seed,
                     const Time&, double dt, Treelog&) = 0;
   virtual void ridge (const AttributeList& ridge) = 0;
@@ -86,12 +87,12 @@ public:
   virtual void irrigate_subsoil (double flux, const IM&, const Volume&,
                                  double dt, 
 				 Treelog& msg) = 0;
-  virtual void fertilize (Metalib&, const AttributeList&,
+  virtual void fertilize (Metalib&, const FrameModel&,
                           double from, double to, 
                           const Time&, double dt, Treelog& msg) = 0;
-  virtual void fertilize (Metalib&, const AttributeList&, const Volume&, 
+  virtual void fertilize (Metalib&, const FrameModel&, const Volume&, 
                           const Time&, double dt, Treelog& msg) = 0;
-  virtual void fertilize (Metalib&, const AttributeList&, 
+  virtual void fertilize (Metalib&, const FrameModel&, 
                           const Time&, double dt, Treelog& msg) = 0;
   virtual void clear_second_year_utilization () = 0;
   virtual void emerge (symbol crop, Treelog&) = 0;
@@ -151,7 +152,7 @@ public:
   virtual bool check (bool require_weather,
 		      const Time& from, const Time& to, 
 		      const Scope&, Treelog&) const = 0;
-  virtual bool check_am (const AttributeList& am, Treelog&) const = 0;
+  virtual bool check_am (const FrameModel& am, Treelog&) const = 0;
   virtual bool check_z_border (double, Treelog&) const = 0;
   virtual bool check_x_border (double, Treelog&) const = 0;
   virtual bool check_y_border (double, Treelog&) const = 0;

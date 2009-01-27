@@ -32,7 +32,7 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include "treelog.h"
-#include "frame.h"
+#include "frame_model.h"
 #include <set>
 #include <map>
 #include <memory>
@@ -43,19 +43,19 @@ struct ActionTable : public Action
   const std::auto_ptr<Action> sow;
   const std::auto_ptr<Action> emerge;
   const std::auto_ptr<Action> harvest;
-  const std::auto_ptr<AttributeList> am;
+  const std::auto_ptr<FrameModel> am;
 
   std::set<Time> sow_dates;
   std::set<Time> emerge_dates;
   std::set<Time> harvest_dates;
   std::map<Time, double> fertilize_events;
   std::map<Time, double> irrigate_events;
-  std::map<Time, const AttributeList*> fertilizers;
+  std::map<Time, const FrameModel*> fertilizers;
 
-  static void read_alist (const LexerTable&,
+  static void read_model (const LexerTable&,
                           const std::vector<std::string>& entries, 
                           int tag_c, const Library& library,
-                          std::map<Time, const AttributeList*>& alists);
+                          std::map<Time, const FrameModel*>& alists);
   static void read_event (const LexerTable&,
                           const std::vector<std::string>& entries, 
                           int tag_c, std::map<Time, double>& events);
@@ -92,10 +92,10 @@ ActionTable::read_event (const LexerTable& lex,
 }
 
 void 
-ActionTable::read_alist (const LexerTable& lex,
+ActionTable::read_model (const LexerTable& lex,
                          const std::vector<std::string>& entries, 
                          int tag_c, const Library& library,
-                         std::map<Time, const AttributeList*>& alists)
+                         std::map<Time, const FrameModel*>& alists)
 {
   if (tag_c < 0)
     return;
@@ -114,7 +114,7 @@ ActionTable::read_alist (const LexerTable& lex,
   if (!lex.get_time (entries, time, 8))
     return;
 
-  alists[time] = &library.lookup (symbol (val));
+  alists[time] = &library.model (symbol (val));
 }
 
 void 
@@ -160,8 +160,8 @@ ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
        || fertilizers.find (daisy.time) != fertilizers.end ())
       && fertilize_events.find (daisy.time) != fertilize_events.end ())
     {
-      AttributeList fert ((fertilizers.find (daisy.time) != fertilizers.end ())
-                          ? *fertilizers[daisy.time] : *am);
+      FrameModel fert (((fertilizers.find (daisy.time) != fertilizers.end ())
+                        ? *fertilizers[daisy.time] : *am), Frame::parent_copy);
 
       AM::set_utilized_weight (metalib, fert, fertilize_events[daisy.time]);
       if (irrigate_events.find (daisy.time) != irrigate_events.end ())
@@ -273,7 +273,7 @@ ActionTable::ActionTable (Block& al)
              ? Librarian::build_item<Action> (al, "harvest")
              : NULL),
     am (al.check ("fertilizer") 
-        ? new AttributeList (al.alist ("fertilizer")) 
+        ? &al.model ("fertilizer").clone ()
         : NULL)
 { 
   LexerTable lex (al);
@@ -316,7 +316,7 @@ ActionTable::ActionTable (Block& al)
 
       read_event (lex, entries, irrigate_c, irrigate_events);
       read_event (lex, entries, fertilize_c, fertilize_events);
-      read_alist (lex, entries, fertilizer_c, 
+      read_model (lex, entries, fertilizer_c, 
                   al.metalib ().library (AM::component),
                   fertilizers);
       read_date (lex, entries, sow_c, sow_dates);

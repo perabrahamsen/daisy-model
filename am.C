@@ -27,7 +27,7 @@
 #include "metalib.h"
 #include "library.h"
 #include "submodeler.h"
-#include "frame_submodel.h"
+#include "frame_model.h"
 #include "time.h"
 #include "log.h"
 #include "geometry.h"
@@ -132,8 +132,8 @@ AM::Implementation::Check_OM_Pools::check (const Metalib&,
     // No checking checkpoints.
     return;
 
-  const std::vector<const AttributeList*>& om_alist 
-    = alist.alist_sequence (key);
+  const std::vector<const Frame*>& om_alist 
+    = alist.frame_sequence (key);
   int missing_initial_fraction = 0;
   int missing_C_per_N = 0;
   double total_fractions = 0.0;
@@ -688,10 +688,10 @@ AM::check_om_pools ()
 }
 
 AM& 
-AM::create (Metalib& metalib, const AttributeList& alist, const Geometry& geo, 
+AM::create (Metalib& metalib, const FrameModel& frame, const Geometry& geo, 
             const Time& now, Treelog& msg)
 { 
-  AM& am = *Librarian::build_free<AM> (metalib, msg, alist, "fertilizer");
+  AM& am = *Librarian::build_frame<AM> (metalib, msg, frame, "fertilizer");
   am.impl->creation = now;
   am.initialize (geo, -42.42e42);
   return am;
@@ -700,18 +700,17 @@ AM::create (Metalib& metalib, const AttributeList& alist, const Geometry& geo,
 // Crop part.
 AM& 
 AM::create (Metalib& metalib, const Geometry& geo, const Time& now,
-	    const std::vector<const AttributeList*>& ol,
+	    const std::vector<const Frame*>& ol,
 	    const symbol sort, const symbol part,
 	    AM::lock_type lock, Treelog& msg)
 {
   const Library& library = metalib.library (AM::component);
-  const Frame& frame = library.frame ("state");
-  AttributeList al (frame.alist ());
-  al.add ("type", "state");
-  al.add ("initialized", true);
-  al.add ("name", sort + "/" + part);
-  al.add ("om", ol);
-  AM& am = *Librarian::build_free<AM> (metalib, msg, al, "crop part");
+  FrameModel frame (library.model ("state"), Frame::parent_copy);
+  frame.alist ().add ("type", "state");
+  frame.add ("initialized", true);
+  frame.add ("name", sort + "/" + part);
+  frame.add ("om", ol);
+  AM& am = *Librarian::build_frame<AM> (metalib, msg, frame, "crop part");
   am.impl->creation = now;
   for (size_t i = 0; i < am.impl->om.size (); i++)
     am.impl->om[i]->initialize (geo.cell_size ());
@@ -736,7 +735,7 @@ AM::default_AM ()
 }
 
 double
-AM::get_NO3 (const Metalib& metalib, const AttributeList& al)
+AM::get_NO3 (const Metalib& metalib, const FrameModel& al)
 {
   if (al.check ("weight"))
     {
@@ -760,7 +759,7 @@ AM::get_NO3 (const Metalib& metalib, const AttributeList& al)
 }
 
 double
-AM::get_NH4 (const Metalib& metalib, const AttributeList& al)
+AM::get_NH4 (const Metalib& metalib, const FrameModel& al)
 {
   daisy_assert (IM::storage_unit () == symbol ("g/cm^2"));
 
@@ -790,7 +789,7 @@ AM::get_NH4 (const Metalib& metalib, const AttributeList& al)
 }
 
 IM
-AM::get_IM (const Metalib& metalib, const Unit& unit, const AttributeList& al)
+AM::get_IM (const Metalib& metalib, const Unit& unit, const FrameModel& al)
 {
   daisy_assert (unit.native_name () == IM::storage_unit ());
   IM result (unit);
@@ -800,7 +799,7 @@ AM::get_IM (const Metalib& metalib, const Unit& unit, const AttributeList& al)
 }
 
 double
-AM::get_volatilization (const Metalib& metalib, const AttributeList& al)
+AM::get_volatilization (const Metalib& metalib, const FrameModel& al)
 {
   if (al.check ("weight"))
     {
@@ -827,7 +826,7 @@ AM::get_volatilization (const Metalib& metalib, const AttributeList& al)
 }
 
 double
-AM::get_DM (const Metalib& metalib, const AttributeList& al)	// [Mg DM/ha]
+AM::get_DM (const Metalib& metalib, const FrameModel& al)	// [Mg DM/ha]
 {
   if (al.check ("weight") && is_organic (metalib, al))
     return al.number ("weight") * al.number ("dry_matter_fraction");
@@ -836,7 +835,7 @@ AM::get_DM (const Metalib& metalib, const AttributeList& al)	// [Mg DM/ha]
 }
 
 double
-AM::get_water (const Metalib& metalib, const AttributeList& al)	// [mm]
+AM::get_water (const Metalib& metalib, const FrameModel& al)	// [mm]
 {
   if (al.check ("weight") && is_organic (metalib, al))
     return al.number ("weight")
@@ -848,7 +847,7 @@ AM::get_water (const Metalib& metalib, const AttributeList& al)	// [mm]
 
 void
 AM::set_utilized_weight (const Metalib& metalib, 
-                         AttributeList& am, const double weight)
+                         FrameModel& am, const double weight)
 {
   if (is_mineral (metalib, am))
     am.add ("weight", weight);
@@ -867,7 +866,7 @@ AM::set_utilized_weight (const Metalib& metalib,
 }
 
 double
-AM::utilized_weight (const Metalib& metalib, const AttributeList& am)
+AM::utilized_weight (const Metalib& metalib, const FrameModel& am)
 {
   if (am.check ("first_year_utilization")
       && am.check ("dry_matter_fraction")
@@ -888,7 +887,7 @@ AM::utilized_weight (const Metalib& metalib, const AttributeList& am)
 }
 
 double
-AM::second_year_utilization (const Metalib&, const AttributeList& am)
+AM::second_year_utilization (const Metalib&, const FrameModel& am)
 {
   if (am.check ("second_year_utilization")
       && am.check ("dry_matter_fraction")
@@ -906,7 +905,7 @@ AM::second_year_utilization (const Metalib&, const AttributeList& am)
 }
 
 void
-AM::set_mineral (const Metalib&, AttributeList& am, double NH4, double NO3)
+AM::set_mineral (const Metalib&, FrameModel& am, double NH4, double NO3)
 {
   const double total_N = NH4 + NO3;
   am.add ("weight", total_N);
@@ -915,18 +914,18 @@ AM::set_mineral (const Metalib&, AttributeList& am, double NH4, double NO3)
 }
 
 bool 
-AM::is_fertilizer (const Metalib& metalib, const AttributeList& am) 
+AM::is_fertilizer (const Metalib& metalib, const FrameModel& am) 
 { return is_mineral (metalib, am) || is_organic (metalib, am); }
 
 bool 
-AM::is_mineral (const Metalib& metalib, const AttributeList& am)
+AM::is_mineral (const Metalib& metalib, const FrameModel& am)
 { 
   Library& library = metalib.library (component);
   return library.is_derived_from (am.name ("type"), "mineral");
 }
 
 bool 
-AM::is_organic (const Metalib& metalib, const AttributeList& am)
+AM::is_organic (const Metalib& metalib, const FrameModel& am)
 { 
   Library& library = metalib.library (component);
   return library.is_derived_from (am.name ("type"), "organic");
@@ -1120,8 +1119,8 @@ struct AMInitial : public AM
 {
   void initialize_derived (const Geometry& geo, const double)
   {
-    const std::vector<const AttributeList*>& oms
-      = alist.alist_sequence ("om");
+    const std::vector<const Frame*>& oms
+      = alist.frame_sequence ("om");
     const std::vector<AOM*>& om = impl->om;
 
     const std::vector<const AttributeList*>& layers
@@ -1198,7 +1197,7 @@ Initial added organic matter at the start of the simulation.")
 
     // We need exactly one pool with unspecified OM.
     daisy_assert (al.check ("om"));
-    const std::vector<const AttributeList*>& om = al.alist_sequence ("om");
+    const std::vector<const Frame*>& om = al.frame_sequence ("om");
     for (size_t i = 0; i < om.size (); i++)
       if (approximate (OM::get_initial_C_per_N (*om[i]), OM::Unspecified))
 	{
@@ -1280,7 +1279,7 @@ Initialization of old root remains.")
     // We need exactly one pool with unspecified OM.
     daisy_assert (al.check ("om"));
     int unspecified = 0;
-    const std::vector<const AttributeList*>& om = al.alist_sequence ("om");
+    const std::vector<const Frame*>& om = al.frame_sequence ("om");
     for (size_t i = 0; i < om.size (); i++)
       if (approximate (OM::get_initial_C_per_N (*om[i]), OM::Unspecified))
 	unspecified++;

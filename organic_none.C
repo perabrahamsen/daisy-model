@@ -73,17 +73,17 @@ struct OrganicNone : public OrganicMatter
   bool check (const Units&, const Soil&, const SoilWater&, const SoilHeat&,
 	      const Chemistry&, Treelog&) const
   { return true; }
-  bool check_am (const AttributeList&, Treelog&) const
+  bool check_am (const FrameModel&, Treelog&) const
   { return true; }
   void add (AM&)
   { }
-  void fertilize (Metalib&, const AttributeList&, const Geometry&,
+  void fertilize (Metalib&, const FrameModel&, const Geometry&,
                   const Time&, double, Treelog&)
   { }
-  void fertilize (Metalib&, const AttributeList&, const Geometry&, 
+  void fertilize (Metalib&, const FrameModel&, const Geometry&, 
                   double, double, const Time&, double, Treelog&)
   { }
-  void fertilize (Metalib&, const AttributeList&, const Geometry&, 
+  void fertilize (Metalib&, const FrameModel&, const Geometry&, 
                   const Volume&, const Time&, double, Treelog&)
   { }
   AM* find_am (symbol, symbol) const

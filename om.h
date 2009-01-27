@@ -94,7 +94,7 @@ public:
 
   // Utilities.
 public:
-  static double get_initial_C_per_N (const AttributeList&);
+  static double get_initial_C_per_N (const Frame&);
 
   // Create & Destroy.
 public:

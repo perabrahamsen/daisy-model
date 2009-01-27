@@ -24,6 +24,7 @@
 
 #include "organic_matter.h"
 #include "frame_submodel.h"
+#include "frame_model.h"
 #include "submodeler.h"
 #include "log.h"
 #include "am.h"
@@ -247,13 +248,13 @@ struct OrganicStandard : public OrganicMatter
   int som_pools () const;
   bool check (const Units&, const Soil&, const SoilWater&, const SoilHeat&,
 	      const Chemistry&, Treelog& err) const;
-  bool check_am (const AttributeList& am, Treelog& err) const;
+  bool check_am (const FrameModel& am, Treelog& err) const;
   void add (AM&);
-  void fertilize (Metalib&, const AttributeList&, const Geometry&, 
+  void fertilize (Metalib&, const FrameModel&, const Geometry&, 
                   const Time&, double dt, Treelog&);
-  void fertilize (Metalib&, const AttributeList&, const Geometry&,
+  void fertilize (Metalib&, const FrameModel&, const Geometry&,
                   double from, double to, const Time&, double dt, Treelog&);
-  void fertilize (Metalib&, const AttributeList&, const Geometry&, 
+  void fertilize (Metalib&, const FrameModel&, const Geometry&, 
                   const Volume&, const Time&, double dt, Treelog&);
   AM* find_am (symbol sort, symbol part) const;
   void initialize (Metalib&, 
@@ -870,23 +871,23 @@ OrganicStandard::add (AM& om)
 }
 
 void 
-OrganicStandard::fertilize (Metalib& metalib, const AttributeList& al, 
+OrganicStandard::fertilize (Metalib& metalib, const FrameModel& frame, 
                             const Geometry& geo, 
                             const Time& now, const double dt, Treelog& msg)
 { 
-  AM& om = AM::create (metalib, al, geo, now, msg);
+  AM& om = AM::create (metalib, frame, geo, now, msg);
   fertilized_N += om.total_N (geo) / geo.surface_area () / dt; 
   fertilized_C += om.total_C (geo) / geo.surface_area () / dt;
   add (om);
 }
 
 void 
-OrganicStandard::fertilize (Metalib& metalib, const AttributeList& al,
+OrganicStandard::fertilize (Metalib& metalib, const FrameModel& frame,
                             const Geometry& geo,
                             const double from, const double to,
                             const Time& now, const double dt, Treelog& msg)
 { 
-  AM& om = AM::create (metalib, al, geo, now, msg);
+  AM& om = AM::create (metalib, frame, geo, now, msg);
   fertilized_N += om.total_N (geo) / geo.surface_area () / dt; 
   fertilized_C += om.total_C (geo) / geo.surface_area () / dt;
   om.mix (geo, from, to, 1.0,
@@ -896,11 +897,11 @@ OrganicStandard::fertilize (Metalib& metalib, const AttributeList& al,
 }
 
 void 
-OrganicStandard::fertilize (Metalib& metalib, const AttributeList& al,
+OrganicStandard::fertilize (Metalib& metalib, const FrameModel& frame,
                             const Geometry& geo, const Volume& volume,
                             const Time& now, const double dt, Treelog& msg)
 { 
-  AM& om = AM::create (metalib, al, geo, now, msg);
+  AM& om = AM::create (metalib, frame, geo, now, msg);
   fertilized_N += om.total_N (geo) / geo.surface_area () / dt; 
   fertilized_C += om.total_C (geo) / geo.surface_area () / dt;
   om.mix (geo, volume, 1.0,
@@ -931,13 +932,13 @@ OrganicStandard::monthly (Metalib& metalib, const Geometry& geo,
     {
       const Library& library = metalib.library (AOM::component);
       const std::vector<symbol>& names = AM::default_AM ();
-      auto_vector<const AttributeList*> alists;
+      auto_vector<const Frame*> alists;
       for (size_t i = 0; i < names.size (); i++)
         {
           const symbol name = names[i];
-          AttributeList& alist = *new AttributeList (library.lookup (name));
-          alist.add ("type", name);
-          alists.push_back (&alist);
+          FrameModel& frame = library.model (name).clone ();
+          frame.alist ().add ("type", name);
+          alists.push_back (&frame);
         }
       remainder = &AM::create (metalib, geo,
                                Time (1, 1, 1, 1), alists,
@@ -2646,13 +2647,12 @@ OrganicStandard::CO2_fast (size_t i) const
 }
 
 bool
-OrganicStandard::check_am (const AttributeList& am, Treelog& err) const
+OrganicStandard::check_am (const FrameModel& am, Treelog& err) const
 {
   bool ok = true;
   if (ok)
     {
-      const std::vector<const AttributeList*>& om_alist
-	= am.alist_sequence ("om");
+      const std::vector<const Frame*>& om_alist = am.frame_sequence ("om");
       
       for (size_t i = 0; i < om_alist.size(); i++)
 	{
@@ -2704,10 +2704,10 @@ check_alist (const AttributeList& al, Treelog& err)
   if (al.check ("active_groundwater"))
     err.warning ("The 'active_groundwater' parameter is ignored.");
 
-  const std::vector<const AttributeList*>& am_alist = al.alist_sequence ("am");
-  const std::vector<const AttributeList*>& smb_alist = al.alist_sequence ("smb");
-  const std::vector<const AttributeList*>& som_alist = al.alist_sequence ("som");
-  const std::vector<const AttributeList*>& dom_alist = al.alist_sequence ("dom");
+  const std::vector<const Frame*>& am_alist = al.frame_sequence ("am");
+  const std::vector<const Frame*>& smb_alist = al.frame_sequence ("smb");
+  const std::vector<const Frame*>& som_alist = al.frame_sequence ("som");
+  const std::vector<const Frame*>& dom_alist = al.frame_sequence ("dom");
 
   for (size_t j = 0; j < am_alist.size(); j++)
     {
@@ -2718,8 +2718,8 @@ check_alist (const AttributeList& al, Treelog& err)
       if (am_ok)
 	{
 	  bool om_ok = true;
-	  const std::vector<const AttributeList*>& om_alist
-	    = am_alist[j]->alist_sequence ("om");
+	  const std::vector<const Frame*>& om_alist
+	    = am_alist[j]->frame_sequence ("om");
 	  for (size_t i = 0; i < om_alist.size(); i++)
 	    {
 	      std::ostringstream tmp;

@@ -120,7 +120,7 @@ struct NumberByDepth : public Number
     frame.add ("average", T);
     frame.add ("amplitude", 0.0);
     frame.add ("air_temperature", T);
-    frame.add ("type", "none");
+    frame.alist ().add ("type", "none");
     std::auto_ptr<Weather> weather (Librarian::build_frame<Weather>
                                     (al, frame, "initialize"));
     column->initialize (al, output, time, weather.get (), Scope::null ());

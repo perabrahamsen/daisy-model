@@ -200,7 +200,7 @@ struct VegetationCrops : public Vegetation
               std::vector<double>& residuals_C_soil,
               Treelog&);
   void cleanup_canopy (symbol crop_name, Treelog&);
-  void sow (Metalib&, const AttributeList& al, 
+  void sow (Metalib&, const FrameModel& al, 
             const double row_width /* [cm] */,
             const double row_pos /* [cm] */,
             const double seed /* [kg w.w./ha] */,
@@ -835,7 +835,7 @@ VegetationCrops::cleanup_canopy (const symbol crop_name, Treelog& msg)
 }
 
 void
-VegetationCrops::sow (Metalib& metalib, const AttributeList& al,
+VegetationCrops::sow (Metalib& metalib, const FrameModel& al,
                       const double row_width,
                       const double row_pos,
                       const double seed,
@@ -846,7 +846,7 @@ VegetationCrops::sow (Metalib& metalib, const AttributeList& al,
                       const double dt,
                       Treelog& msg)
 {
-  Crop *const crop = Librarian::build_free<Crop> (metalib, msg, al, "sow");
+  Crop *const crop = Librarian::build_frame<Crop> (metalib, msg, al, "sow");
   if (!crop)
     {
       msg.error ("Sowing failed");

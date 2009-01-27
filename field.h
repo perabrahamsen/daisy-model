@@ -30,7 +30,7 @@
 #include <memory>
 
 class Column;
-class AttributeList;
+class FrameModel;
 class Time;
 class IM;
 class Harvest;
@@ -42,6 +42,7 @@ class Block;
 class Metalib;
 class Scope;
 class Volume;
+class AttributeList;
 
 class Field : public Border
 { 
@@ -63,7 +64,7 @@ public:
 
   // Actions.
 public:
-  void sow (Metalib&, const AttributeList& crop, 
+  void sow (Metalib&, const FrameModel& crop, 
             double row_width, double row_pos, double seed,
             const Time&, double dt, Treelog&);
   void ridge (const AttributeList& ridge);
@@ -77,12 +78,12 @@ public:
                          double dt, Treelog& msg);
   void irrigate_subsoil (double water, const IM&, const Volume&, 
                          double dt, Treelog& msg);
-  void fertilize (Metalib&, const AttributeList&,
+  void fertilize (Metalib&, const FrameModel&,
                   double from, double to, 
                   const Time&, double dt, Treelog& msg); // Organic.
-  void fertilize (Metalib&, const AttributeList&, const Volume&,
+  void fertilize (Metalib&, const FrameModel&, const Volume&,
                   const Time&, double dt, Treelog&); // Organic.
-  void fertilize (Metalib&, const AttributeList&,
+  void fertilize (Metalib&, const FrameModel&,
                   const Time&, double dt, Treelog& msg);
   void clear_second_year_utilization ();
   void emerge (symbol crop, Treelog&);
@@ -145,7 +146,7 @@ public:
   // Create and destroy.
   bool check (bool require_weather, const Time& from, const Time& to, 
 	      const Scope&, Treelog&) const;
-  bool check_am (const AttributeList& am, Treelog&) const;
+  bool check_am (const FrameModel& am, Treelog&) const;
   bool check_z_border (double, Treelog&) const;
   bool check_x_border (double, Treelog&) const;
   bool check_y_border (double, Treelog&) const;

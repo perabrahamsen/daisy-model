@@ -30,19 +30,19 @@
 #include "check.h"
 #include "dlf.h"
 #include "treelog.h"
-#include "frame.h"
+#include "frame_model.h"
 
 struct ActionSow : public Action
 {
-  const AttributeList& crop;
+  const std::auto_ptr<FrameModel> crop;
   const double row_width;
   const double row_pos;
   const double seed;
 
   void doIt (Daisy& daisy, const Scope&, Treelog& msg)
   { 
-    msg.message ("Sowing " + crop.name ("type"));      
-    daisy.field->sow (daisy.metalib, crop, row_width, row_pos, seed, 
+    msg.message ("Sowing " + crop->name ("type"));      
+    daisy.field->sow (daisy.metalib, *crop, row_width, row_pos, seed, 
                       daisy.time, daisy.dt, msg); 
   }
 
@@ -55,7 +55,7 @@ struct ActionSow : public Action
 
   ActionSow (Block& al)
     : Action (al),
-      crop (al.alist ("crop")),
+      crop (&al.model ("crop").clone ()),
       // Use 'plant_distance' if set, otherwise use 'row_width'.
       row_width (al.number ("plant_distance", al.number ("row_width"))),
       // Use 'plant_distance' if set, otherwise use 'row_width'.

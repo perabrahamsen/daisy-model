@@ -168,8 +168,8 @@ public:
 public:
   void initialize (const double SeedN);
   void initialize (Metalib&, symbol name,
-		   const std::vector<const AttributeList*>& root,
-		   const std::vector<const AttributeList*>& dead,
+		   const std::vector<const Frame*>& root,
+		   const std::vector<const Frame*>& dead,
 		   const Geometry&, OrganicMatter&, Treelog&);
   static void load_syntax (Frame&);
   Production (const AttributeList&);

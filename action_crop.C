@@ -39,7 +39,7 @@
 #include "vegetation.h"
 #include "units.h"
 #include "treelog.h"
-#include "frame.h"
+#include "frame_model.h"
 #include <sstream>
 
 struct ActionCrop : public Action
@@ -66,7 +66,7 @@ struct ActionCrop : public Action
   {
     // Parameters.
     const MM_DD date;
-    const AttributeList& crop;
+    const std::auto_ptr<const FrameModel> crop;
     
     // State.
     bool done;
@@ -78,7 +78,7 @@ struct ActionCrop : public Action
     // Create and Destroy.
     static bool check_alist (const AttributeList& al, Treelog&);
     static void load_syntax (Frame&);
-    Sow (const AttributeList&);
+    Sow (const Frame&);
     ~Sow ();
   };
   Sow *const primary;
@@ -114,9 +114,9 @@ struct ActionCrop : public Action
     const double DS;
     const double DM;
     int year_of_last_harvest;
-    const std::vector<const AttributeList*> *const fertilize;
+    const std::vector<const Frame*> *const fertilize;
     int fertilize_index;
-    const std::vector<const AttributeList*> *const fertilize_rest;
+    const std::vector<const Frame*> *const fertilize_rest;
     int fertilize_rest_index;
     int fertilize_year;
 
@@ -141,17 +141,17 @@ struct ActionCrop : public Action
   {
     const int month;
     const int day;
-    const AttributeList& what;
+    const std::auto_ptr<const FrameModel> what;
     
     static bool check_alist (const AttributeList& al, Treelog&);
     static void load_syntax (Frame&);
-    Fertilize (const AttributeList&);
+    Fertilize (Block&);
     ~Fertilize ();
   };
   const std::vector <const Fertilize*> fertilize_at;
   int fertilize_at_index;
   const bool fertilize_incorporate;
-  void fertilize (Daisy& daisy, Treelog&, const AttributeList& am) const;
+  void fertilize (Daisy& daisy, Treelog&, const FrameModel& am) const;
 
   struct Tillage		// Tillage operations.
   {
@@ -290,8 +290,8 @@ ActionCrop::Sow::doIt (Daisy& daisy, const Scope&, Treelog& msg)
 {
   if (!done && date.match (daisy.time))
     {
-      msg.message ("Sowing " + crop.name ("type"));      
-      daisy.field->sow (daisy.metalib, crop, 0.0, 0.0, -42.42e42,
+      msg.message ("Sowing " + crop->name ("type"));      
+      daisy.field->sow (daisy.metalib, *crop, 0.0, 0.0, -42.42e42,
                         daisy.time, daisy.dt, msg); 
       done = true;
     }
@@ -321,9 +321,9 @@ ActionCrop::Sow::load_syntax (Frame& frame)
   frame.add ("done", false);
 }
 
-ActionCrop::Sow::Sow (const AttributeList& al)
+ActionCrop::Sow::Sow (const Frame& al)
   : date (al.alist ("date")),
-    crop (al.alist ("crop")),
+    crop (&al.model ("crop")),
     done (al.flag ("done"))
 { }
 
@@ -524,11 +524,11 @@ ActionCrop::Perennial::Perennial (const AttributeList& al)
 			  ? al.integer ("year_of_last_harvest")
 			  : -1),
     fertilize (al.check ("fertilize")
-	       ? &al.alist_sequence ("fertilize")
+	       ? &al.frame_sequence ("fertilize")
 	       : NULL),
     fertilize_index (al.integer ("fertilize_index")),
     fertilize_rest (al.check ("fertilize_rest")
-		    ? &al.alist_sequence ("fertilize_rest")
+		    ? &al.frame_sequence ("fertilize_rest")
 		    : NULL),
     fertilize_rest_index (al.integer ("fertilize_rest_index")),
     fertilize_year (al.check ("fertilize_year")
@@ -574,10 +574,10 @@ ActionCrop::Fertilize::load_syntax (Frame& frame)
   frame.order ("month", "day", "what");
 }
 
-ActionCrop::Fertilize::Fertilize (const AttributeList& al)
+ActionCrop::Fertilize::Fertilize (Block& al)
   : month (al.integer ("month")),
     day (al.integer ("day")),
-    what (al.alist ("what"))
+    what (&al.model ("what"))
 { }
 
 ActionCrop::Fertilize::~Fertilize ()
@@ -585,7 +585,7 @@ ActionCrop::Fertilize::~Fertilize ()
 
 void
 ActionCrop::fertilize (Daisy& daisy, Treelog& msg,
-		       const AttributeList& am) const
+		       const FrameModel& am) const
 {
   msg.message (std::string ("[Fertilizing ") + am.name ("type") + "]");
 
@@ -772,12 +772,12 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
 	  // If annual done, do perennial.
 	  if (secondary->done 
 	      && harvest_perennial->doIt (daisy, scope, msg,
-					  secondary->crop.name ("type")))
+					  secondary->crop->name ("type")))
 	    harvested = true;
 	}
       else if (primary->done 
 	       && harvest_annual->doIt (daisy, scope, msg, 
-					primary->crop.name ("type")))
+					primary->crop->name ("type")))
 	// else do annual.
 	harvested = true;
     }
@@ -786,7 +786,7 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
       // We have only annual crops.  Let 'primary' when they are harvested.
       if (primary->done 
 	  && harvest_annual->doIt (daisy, scope, 
-                                   msg, primary->crop.name ("type")))
+                                   msg, primary->crop->name ("type")))
 	harvested = true;
     }
   else
@@ -798,13 +798,13 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
 	  // If we have two, let them both control.
 	  if ((primary->done || secondary->done)
 	      && harvest_perennial->doIt (daisy, scope, msg,
-					  primary->crop.name ("type"),
-					  secondary->crop.name ("type")))
+					  primary->crop->name ("type"),
+					  secondary->crop->name ("type")))
 	    harvested = true;
 	}
       else if (primary->done 
 	       && harvest_perennial->doIt (daisy, scope, msg, 
-					   primary->crop.name ("type")))
+					   primary->crop->name ("type")))
 	// If we have only one, it is of course in control.
 	harvested = true;
     }
@@ -816,7 +816,7 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
       && daisy.time.mday () == fertilize_at[fertilize_at_index]->day)
     {
       // Fertilize by date.
-      fertilize (daisy, msg, fertilize_at[fertilize_at_index]->what);
+      fertilize (daisy, msg, *fertilize_at[fertilize_at_index]->what);
       fertilize_at_index++;
     }
   if (harvested && harvest_perennial && harvest_perennial->fertilize)
@@ -850,8 +850,10 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
 	  < harvest_perennial->fertilize->size ())
 	{
 	  // If 'fertilize' is active, use it.
-	  fertilize (daisy, msg, *(*harvest_perennial->fertilize)
-		     [harvest_perennial->fertilize_index]);
+          const Frame& frame = *(*harvest_perennial->fertilize) 
+            [harvest_perennial->fertilize_index];
+          const FrameModel& model = dynamic_cast<const FrameModel&> (frame);
+	  fertilize (daisy, msg, model);
 	  harvest_perennial->fertilize_index++;
 	}
       else if (harvest_perennial->fertilize_rest 
@@ -859,8 +861,10 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
 		   < harvest_perennial->fertilize_rest->size ()))
 	{
 	  // Else, if 'fertilize_rest' is active, us that.
-	  fertilize (daisy, msg, *(*harvest_perennial->fertilize_rest)
-		     [harvest_perennial->fertilize_rest_index]);
+          const Frame& frame = *(*harvest_perennial->fertilize_rest)
+            [harvest_perennial->fertilize_rest_index];
+          const FrameModel& model = dynamic_cast<const FrameModel&> (frame);
+          fertilize (daisy, msg, model);
 	  harvest_perennial->fertilize_rest_index++;
 	}
     }
@@ -965,9 +969,9 @@ ActionCrop::check (const Daisy& daisy, const Scope& scope, Treelog& msg) const
 
 ActionCrop::ActionCrop (Block& al)
   : Action (al),
-    primary (new Sow (al.alist ("primary"))),
+    primary (new Sow (al.frame ("primary"))),
     secondary (al.check ("secondary") 
-	       ? new Sow (al.alist ("secondary"))
+	       ? new Sow (al.frame ("secondary"))
 	       : NULL),
     harvest_annual (al.check ("harvest_annual") 
 	       ? new Annual (al.alist ("harvest_annual"))
@@ -975,8 +979,7 @@ ActionCrop::ActionCrop (Block& al)
     harvest_perennial (al.check ("harvest_perennial") 
 		       ? new Perennial (al.alist ("harvest_perennial"))
 		       : NULL),
-    fertilize_at (map_construct_const<Fertilize> 
-		  (al.alist_sequence ("fertilize_at"))),
+    fertilize_at (map_submodel_const<Fertilize> (al, "fertilize_at")),
     fertilize_at_index (al.integer ("fertilize_at_index")),
     fertilize_incorporate (al.flag ("fertilize_incorporate")),
     tillage (map_submodel_const<Tillage> (al, "tillage")),

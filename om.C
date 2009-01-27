@@ -414,7 +414,7 @@ Water potential factor.  If empty, use default from 'OrganicMatter'.");
 }
 
 double
-OM::get_initial_C_per_N (const AttributeList& al)
+OM::get_initial_C_per_N (const Frame& al)
 {
   if (al.check ("initial_C_per_N"))
     if (al.number ("initial_C_per_N") < 0.0)
@@ -454,7 +454,7 @@ OM::initialize (size_t size)
 
 OM::OM (Block& al)
   : ModelAListed (al.alist ()),
-    initial_C_per_N (get_initial_C_per_N (al.alist ())),
+    initial_C_per_N (get_initial_C_per_N (al.frame ())),
     turnover_rate (al.check ("turnover_rate")
 		   ? al.number ("turnover_rate")
 		   : halftime_to_rate (al.number ("turnover_halftime"))),

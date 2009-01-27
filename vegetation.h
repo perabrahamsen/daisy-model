@@ -43,7 +43,7 @@ class AM;
 class Metalib;
 class Treelog;
 class Block;
-class AttributeList;
+class FrameModel;
 class Syntax;
 class Units;
 
@@ -150,7 +150,7 @@ public:
                       std::vector<double>& residuals_N_soil,
                       std::vector<double>& residuals_C_soil,
                       Treelog&) = 0;
-  virtual void sow (Metalib&, const AttributeList& al, 
+  virtual void sow (Metalib&, const FrameModel& al, 
                     double row_width /* [cm] */, double row_pos /* [cm] */, 
                     double seed /* kg w.w./ha */,
                     const Geometry&, OrganicMatter&, 

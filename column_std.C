@@ -93,7 +93,7 @@ public:
   const Horizon& horizon_at (double z, double x, double y) const;
 
   // Actions.
-  void sow (Metalib&, const AttributeList&, 
+  void sow (Metalib&, const FrameModel&, 
             double row_width, double row_pos, double seed,
             const Time&, double dt, Treelog&);
   void ridge (const AttributeList& al);
@@ -108,11 +108,11 @@ public:
   void irrigate_subsoil (double flux, const IM& sm, 
                          const Volume& volume, double dt, Treelog& msg);
   void fertilize (const IM&, double dt, Treelog& msg);
-  void fertilize (Metalib&, const AttributeList&,
+  void fertilize (Metalib&, const FrameModel&,
                   const Time&, double dt, Treelog& msg);
-  void fertilize (Metalib&, const AttributeList&, double from, double to, 
+  void fertilize (Metalib&, const FrameModel&, double from, double to, 
                   const Time&, double dt, Treelog& msg);
-  void fertilize (Metalib&, const AttributeList&, const Volume&, 
+  void fertilize (Metalib&, const FrameModel&, const Volume&, 
                   const Time&, double dt, Treelog& msg);
   void clear_second_year_utilization ();
   void emerge (const symbol crop_name, Treelog& msg);
@@ -159,7 +159,7 @@ public:
   bool check (bool require_weather,
               const Time& from, const Time& to, 
               const Scope&, Treelog&) const;
-  bool check_am (const AttributeList& am, Treelog&) const;
+  bool check_am (const FrameModel& am, Treelog&) const;
   bool check_z_border (double, Treelog&) const;
   bool check_x_border (double, Treelog&) const;
   bool check_y_border (double, Treelog&) const;
@@ -186,7 +186,7 @@ ColumnStandard::horizon_at (const double z,
 { return soil->horizon (geometry.cell_at (z, x, y)); }
 
 void 
-ColumnStandard::sow (Metalib& metalib, const AttributeList& al, 
+ColumnStandard::sow (Metalib& metalib, const FrameModel& al, 
                      const double row_width, const double row_pos,
                      const double seed,
                      const Time& time, const double dt, Treelog& msg)
@@ -290,7 +290,7 @@ ColumnStandard::fertilize (const IM& im, const double dt, Treelog& msg)
 { chemistry->spray (im, dt, msg); }
 
 void
-ColumnStandard::fertilize (Metalib& metalib, const AttributeList& al, 
+ColumnStandard::fertilize (Metalib& metalib, const FrameModel& al, 
                            const Time& now, const double dt, Treelog& msg)
 {
   // Utilization log.
@@ -311,7 +311,7 @@ ColumnStandard::fertilize (Metalib& metalib, const AttributeList& al,
 }
 
 void 
-ColumnStandard::fertilize (Metalib& metalib, const AttributeList& al, 
+ColumnStandard::fertilize (Metalib& metalib, const FrameModel& al, 
                            const double from, const double to, 
                            const Time& now, const double dt, Treelog& msg)
 {
@@ -336,7 +336,7 @@ ColumnStandard::fertilize (Metalib& metalib, const AttributeList& al,
 }
 
 void 
-ColumnStandard::fertilize (Metalib& metalib, const AttributeList& al, 
+ColumnStandard::fertilize (Metalib& metalib, const FrameModel& al, 
                            const Volume& volume,
                            const Time& now, const double dt, Treelog& msg)
 {
@@ -750,7 +750,7 @@ ColumnStandard::check (bool require_weather,
 }
 
 bool 
-ColumnStandard::check_am (const AttributeList& am, Treelog& msg) const 
+ColumnStandard::check_am (const FrameModel& am, Treelog& msg) const 
 { 
   Treelog::Open nest (msg, name);
   return organic_matter->check_am (am, msg); 

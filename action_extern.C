@@ -36,7 +36,7 @@
 #include "check.h"
 #include "assertion.h"
 #include "units.h"
-#include "frame.h"
+#include "frame_model.h"
 #include "metalib.h"
 #include "library.h"
 #include <memory>
@@ -202,9 +202,9 @@ struct ActionExternFertigation : public Action
       {
         Metalib& metalib = daisy.metalib;
         const Library& library = metalib.library (AM::component);
-	AttributeList alist (library.lookup ("mineral"));
-	AM::set_mineral (metalib, alist, NH4_value, NO3_value);
-        field.fertilize (metalib, alist, daisy.time, dt, msg);
+	FrameModel frame (library.model ("mineral"), Frame::parent_copy);
+	AM::set_mineral (metalib, frame, NH4_value, NO3_value);
+        field.fertilize (metalib, frame, daisy.time, dt, msg);
       }
   }
 

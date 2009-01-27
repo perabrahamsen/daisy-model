@@ -31,6 +31,7 @@
 #include "memutils.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "frame_model.h"
 
 struct Field::Implementation
 {
@@ -44,7 +45,7 @@ struct Field::Implementation
   void unrestrict ();
 
   // Actions.
-  void sow (Metalib&, const AttributeList& crop, 
+  void sow (Metalib&, const FrameModel& crop, 
             double row_width, double row_pos, double seed,
             const Time& time, double dt, Treelog&);
   void ridge (const AttributeList& ridge);
@@ -58,11 +59,11 @@ struct Field::Implementation
                          double dt, Treelog& msg);
   void irrigate_subsoil (double flux, const IM&, const Volume&,
                          double dt, Treelog& msg);
-  void fertilize (Metalib&, const AttributeList&, const Volume&, 
+  void fertilize (Metalib&, const FrameModel&, const Volume&, 
                   const Time&, double dt, Treelog& msg);
-  void fertilize (Metalib&, const AttributeList&, double from, double to, 
+  void fertilize (Metalib&, const FrameModel&, double from, double to, 
                   const Time&, double dt, Treelog& msg);
-  void fertilize (Metalib&, const AttributeList&, 
+  void fertilize (Metalib&, const FrameModel&, 
                   const Time&, double dt, Treelog& msg);
   void clear_second_year_utilization ();
   void emerge (symbol crop, Treelog&);
@@ -126,7 +127,7 @@ public:
   // Create and destroy.
   bool check (bool require_weather, const Time& from, const Time& to, 
 	      const Scope& scope, Treelog&) const;
-  bool check_am (const AttributeList& am, Treelog& err) const;
+  bool check_am (const FrameModel& am, Treelog& err) const;
   bool check_z_border (double, Treelog& err) const;
   bool check_x_border (double, Treelog& err) const;
   bool check_y_border (double, Treelog& err) const;
@@ -156,7 +157,7 @@ Field::Implementation::unrestrict ()
 }
 
 void 
-Field::Implementation::sow (Metalib& metalib, const AttributeList& crop, 
+Field::Implementation::sow (Metalib& metalib, const FrameModel& crop, 
                             const double row_width, const double row_pos,
                             const double seed,
                             const Time& time, const double dt, Treelog& msg)
@@ -269,7 +270,7 @@ Field::Implementation::irrigate_subsoil (const double flux, const IM& im,
 }
 
 void 
-Field::Implementation::fertilize (Metalib& metalib, const AttributeList& al, 
+Field::Implementation::fertilize (Metalib& metalib, const FrameModel& al, 
 				  const double from, const double to,
                                   const Time& now, const double dt, 
                                   Treelog& msg)
@@ -283,7 +284,7 @@ Field::Implementation::fertilize (Metalib& metalib, const AttributeList& al,
 }
 
 void 
-Field::Implementation::fertilize (Metalib& metalib, const AttributeList& al, 
+Field::Implementation::fertilize (Metalib& metalib, const FrameModel& al, 
                                   const Volume& volume,
                                   const Time& now, const double dt,
                                   Treelog& msg)
@@ -297,7 +298,7 @@ Field::Implementation::fertilize (Metalib& metalib, const AttributeList& al,
 }
 
 void 
-Field::Implementation::fertilize (Metalib& metalib, const AttributeList& al, 
+Field::Implementation::fertilize (Metalib& metalib, const FrameModel& al, 
                                   const Time& now, const double dt, 
                                   Treelog& msg)
 {
@@ -727,7 +728,7 @@ Field::Implementation::check (bool require_weather,
 }
 
 bool 
-Field::Implementation::check_am (const AttributeList& am, Treelog& err) const
+Field::Implementation::check_am (const FrameModel& am, Treelog& err) const
 { 
   Treelog::Open nest (err, am.name ("type"));
 
@@ -825,7 +826,7 @@ Field::Restrict::~Restrict ()
 { field.impl->unrestrict (); }
 
 void 
-Field::sow (Metalib& metalib, const AttributeList& crop,
+Field::sow (Metalib& metalib, const FrameModel& crop,
             const double row_width, const double row_pos, const double seed,
             const Time& time, const double dt, Treelog& msg)
 { impl->sow (metalib, crop, row_width, row_pos, seed, time, dt, msg); }
@@ -863,19 +864,19 @@ Field::irrigate_subsoil (double water, const IM& im,
 { impl->irrigate_subsoil (water, im, volume, dt, msg); }
 
 void 
-Field::fertilize (Metalib& metalib, const AttributeList& al, 
+Field::fertilize (Metalib& metalib, const FrameModel& al, 
                   const double from, const double to, 
                   const Time& now, const double dt, Treelog& msg)
 { impl->fertilize (metalib, al, from, to, now, dt, msg); }
 
 void 
-Field::fertilize (Metalib& metalib, const AttributeList& al, 
+Field::fertilize (Metalib& metalib, const FrameModel& al, 
                   const Volume& volume, 
                   const Time& now, const double dt, Treelog& msg)
 { impl->fertilize (metalib, al, volume, now, dt, msg); }
 
 void 
-Field::fertilize (Metalib& metalib, const AttributeList& al, 
+Field::fertilize (Metalib& metalib, const FrameModel& al, 
                   const Time& now, const double dt, Treelog& msg)
 { impl->fertilize (metalib, al, now, dt, msg); }
 
@@ -1030,7 +1031,7 @@ Field::check (bool require_weather, const Time& from, const Time& to,
 { return impl->check (require_weather, from, to, scope, err); }
 
 bool 
-Field::check_am (const AttributeList& am, Treelog& err) const
+Field::check_am (const FrameModel& am, Treelog& err) const
 { return impl->check_am (am, err); }
 
 bool
