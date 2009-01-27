@@ -39,6 +39,7 @@
 #include "memutils.h"
 #include "librarian.h"
 #include "frame_model.h"
+#include "frame_submodel.h"
 #include "syntax.h"
 #include <set>
 #include <memory>
@@ -1722,7 +1723,6 @@ ParserFile::Implementation::load_object (const Library& lib, bool in_sequence,
 void
 ParserFile::Implementation::load_list (Frame& frame)
 { 
-  Syntax& syntax = frame.syntax ();
   AttributeList& atts = frame.alist ();
   std::vector<symbol>::const_iterator current = frame.order ().begin ();
   const std::vector<symbol>::const_iterator end = frame.order ().end ();
@@ -1913,7 +1913,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 		}
               std::auto_ptr<Frame> child (&frame.frame (name).clone ());
 	      load_list (*child);
-	      atts.add (name, *child);
+	      frame.add (name, *child);
 	      if (alist_skipped)
 		skip (")");
 	      break;
@@ -2095,13 +2095,13 @@ ParserFile::Implementation::load_list (Frame& frame)
 	    case Value::AList:
 	      {
 		const size_t size = frame.size (name);
-		static const std::vector<const AttributeList*> no_sequence;
-		const Syntax& syn = syntax.syntax (name);
-		const std::vector<const AttributeList*>& old_sequence
+		static const std::vector<const Frame*> no_sequence;
+		const Frame& default_frame = frame.default_frame (name);
+		const std::vector<const Frame*>& old_sequence
 		  = frame.check (name) 
-		  ? frame.alist_sequence (name) 
+		  ? frame.frame_sequence (name) 
 		  : no_sequence;
-		std::vector<const AttributeList*> sequence;
+		auto_vector<const Frame*> sequence;
 		bool skipped = false;
 		// We do not force parentheses around the alist if it
 		// is the last member of a fully ordered list.
@@ -2120,8 +2120,7 @@ ParserFile::Implementation::load_list (Frame& frame)
                         if (!frame.check (name))
                           error ("No originals available");
                         for (size_t i = 0; i < old_sequence.size (); i++)
-                          sequence.push_back (new AttributeList 
-                                              /**/(*old_sequence[i]));
+                          sequence.push_back (&old_sequence[i]->clone ());
                         continue;
                       }
 		    Parskip skip (*this);
@@ -2129,14 +2128,14 @@ ParserFile::Implementation::load_list (Frame& frame)
                     std::ostringstream tmp;
                     tmp << "In '" << name << "' submodel #" << element + 1U;
                     Treelog::Open nest (msg, tmp.str ());
-		    AttributeList& al
-		      = *new AttributeList (old_sequence.size () > element
-					    ? *old_sequence[element]
-					    : frame.default_frame (name).alist ());
-		    // TODO: Allow local parameters in submodels.
-		    Syntax s (syn);
-		    load_list (s, al);
-		    sequence.push_back (&al);
+                    std::auto_ptr<Frame> child
+		      = old_sequence.size () > element
+                      ? std::auto_ptr<Frame> (&old_sequence[element]->clone ())
+                      : std::auto_ptr<Frame> (new FrameSubmodelValue 
+                                              (default_frame,
+                                               Frame::parent_copy));
+		    load_list (*child);
+		    sequence.push_back (child.release ());
 		  }
 		if (skipped)
 		  skip (")");
@@ -2147,8 +2146,7 @@ ParserFile::Implementation::load_list (Frame& frame)
                         << " array members, expected " << size;
 		    error (str.str ());
 		  }
-		atts.add (name, sequence);
-		sequence_delete (sequence.begin (), sequence.end ());
+		frame.add (name, sequence);
 		break;
 	      }
 	    case Value::PLF:

@@ -534,6 +534,15 @@ Frame::integer_sequence (const symbol key) const
     return impl->alist.integer_sequence (key);
 }
 
+const std::vector<const Frame*>& 
+Frame::frame_sequence (const symbol key) const
+{ 
+  if (parent () && !impl->alist.check (key))
+    return parent ()->frame_sequence (key);
+  else
+    return impl->alist.frame_sequence (key);
+}
+
 const std::vector<const PLF*>& 
 Frame::plf_sequence (const symbol key) const
 { 

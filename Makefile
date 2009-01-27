@@ -1283,7 +1283,8 @@ log_select${OBJ}: log_select.C log_select.h log.h time.h symbol.h border.h \
 parser_file${OBJ}: parser_file.C parser_file.h parser.h model.h symbol.h \
   alist.h metalib.h frame.h scope.h value.h library.h block.h lexer.h \
   number.h integer.h plf.h time.h treelog_text.h treelog.h path.h units.h \
-  mathlib.h assertion.h memutils.h librarian.h frame_model.h syntax.h
+  mathlib.h assertion.h memutils.h librarian.h frame_model.h \
+  frame_submodel.h syntax.h
 geometry${OBJ}: geometry.C geometry.h symbol.h value.h volume.h model.h \
   alist.h check.h vcheck.h treelog.h frame_submodel.h frame.h scope.h \
   assertion.h mathlib.h syntax.h librarian.h
