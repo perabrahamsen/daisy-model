@@ -25,70 +25,117 @@
 #include "librarian.h"
 #include "log.h"
 #include "frame.h"
+#include "block.h"
 
-void
-Vernalization::operator () (double Ta, double& DS)
+// The 'vernalization' component.
+
+const char *const Vernalization::component = "vernalization";
+
+symbol
+Vernalization::library_id () const
 {
-  if (!required)
-    return;
-
-  if (TaSum < 0)
-    {
-      TaSum -= std::min (Ta - TaLim, 0.0);
-      if (DS > DSLim)
-	DS = DSLim;
-    }
+  static const symbol id (component);
+  return id;
 }
 
-void
-Vernalization::output (Log& log) const
-{
-  if (!required)
-    return;
-
-  output_variable (TaSum, log);
-}
-
-const AttributeList& 
-Vernalization::no_vernalization ()
-{
-  static AttributeList noVernal;
-  
-  if (!noVernal.check ("required"))
-    {
-      noVernal.add ("required", false);
-      noVernal.add ("DSLim", -42.42e42);
-      noVernal.add ("TaLim", -42.42e42);
-      noVernal.add ("TaSum", -42.42e42);
-    }
-  return noVernal;
-}
-
-void 
-Vernalization::load_syntax (Frame& frame)
-{
-  frame.add ("required", Value::Boolean, Value::OptionalConst,
-	      "True, iff the crop requires vernalization.");
-  frame.add ("DSLim", Value::None (), Value::Const,
-	      "Development stage at vernalization.");
-  frame.add ("TaLim", "dg C", Value::Const,
-	      "Vernalization temperature threshold.");
-  frame.add ("TaSum", "dg C d", Value::State,
-	      "Vernalization temperature-sum requirement.");
-}
-
-Vernalization::Vernalization (const AttributeList& al)
-  : required (al.check ("required") ? al.flag ("required") : true),
-    DSLim (al.number ("DSLim")),
-    TaLim (al.number ("TaLim")),
-    TaSum (al.number ("TaSum"))
+Vernalization::Vernalization (Block& al)
+  : ModelLogable (al.name ("type"))
 { }
 
 Vernalization::~Vernalization ()
 { }
 
-static DeclareSubmodel 
-vernalization_submodel (Vernalization::load_syntax, "Vernalization", "\
-Default crop vernalization submodel.");
+static struct VernalizationInit : public DeclareComponent 
+{
+  VernalizationInit ()
+    : DeclareComponent (Vernalization::component, "\
+Requirement for a cold period before flowering.")
+  { }
+} Vernalization_init;
+// The 'default' vernalization model.
+
+struct VernalizationStandard : public Vernalization
+{
+  // Parameters.
+  const double DSLim;		// Max DS without vernalization
+  const double TaLim;		// Vernalization temp threshold
+
+  // State.
+  double TaSum;		// Vernalization T-sum requirement
+
+  // Simulation.
+  void operator () (double Ta, double& DS)
+  {
+    if (TaSum < 0)
+      {
+        TaSum -= std::min (Ta - TaLim, 0.0);
+        if (DS > DSLim)
+          DS = DSLim;
+      }
+  }
+
+  void output (Log& log) const
+  { output_variable (TaSum, log); }
+
+  // Create and Destroy.
+  VernalizationStandard (Block& al)
+    : Vernalization (al),
+      DSLim (al.number ("DSLim")),
+      TaLim (al.number ("TaLim")),
+      TaSum (al.number ("TaSum"))
+  { }
+};
+
+static struct VernalizationStandardSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new VernalizationStandard (al); }
+  VernalizationStandardSyntax ()
+    : DeclareModel (Vernalization::component, "default", "\
+Temperature sum dependent vernalization.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+#if 0
+    // We can't use "used_to_be_a_submodel" since the default model is "none".
+    frame.alist ().add ("used_to_be_a_submodel", true);
+#endif
+    frame.add ("DSLim", Value::None (), Value::Const,
+               "Development stage at vernalization.");
+    frame.add ("TaLim", "dg C", Value::Const,
+               "Vernalization temperature threshold.");
+    frame.add ("TaSum", "dg C d", Value::State,
+               "Vernalization temperature-sum requirement.");
+  }
+} standard_vernalization_syntax;
+
+// The 'none' vernalization model.
+
+struct VernalizationNone : public Vernalization
+{
+  // Simulation.
+  void operator () (double, double&)
+  { return; }
+
+  void output (Log&) const
+  { }
+
+  // Create and Destroy.
+  VernalizationNone (Block& al)
+    : Vernalization (al)
+  { }
+};
+
+static struct VernalizationNoneSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new VernalizationNone (al); }
+  VernalizationNoneSyntax ()
+    : DeclareModel (Vernalization::component, "none", "\
+No vernalization.")
+  { }
+  void load_frame (Frame&) const
+  { }
+} none_vernalization_syntax;
 
 // vernalization.C ends here.

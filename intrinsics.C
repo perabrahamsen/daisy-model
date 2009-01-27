@@ -195,6 +195,14 @@ Intrinsics::submodel_name (const load_syntax_t load_syntax)
   return (*i).second;
 }
   
+Intrinsics::load_syntax_t
+Intrinsics::submodel_load (const symbol name) const
+{
+  const submodel_name_load_t::const_iterator i = submodel_name_load.find (name);
+  daisy_assert (i != submodel_name_load.end ());
+  return (*i).second;
+}
+
 symbol 
 Intrinsics::submodel_description (const symbol name) const
 {

@@ -32,7 +32,6 @@
 #include "path.h"
 #include "treelog.h"
 #include "frame_submodel.h"
-#include "syntax.h"
 #include <sstream>
 
 #include <QtGui/QMenuBar>
@@ -150,8 +149,7 @@ UIRun::attach (Toplevel& toplevel)
   }
 
   // Fetch data.
-  const AttributeList& alist = toplevel.program_alist ();
-  const Syntax& syntax = toplevel.program_syntax ();
+  const Frame& frame = toplevel.program_frame ();
   
   // Attach menubar.
   QMenuBar* menuBar = qt_main.menuBar ();
@@ -184,8 +182,8 @@ UIRun::attach (Toplevel& toplevel)
   QFont font = qt_name->font ();
   font.setBold (true);
   qt_name->setFont (font);
-  if (alist.check ("type"))
-    qt_name->setText (alist.name ("type").name ().c_str ());
+  if (frame.check ("type"))
+    qt_name->setText (frame.name ("type").name ().c_str ());
   else
     qt_name->setText ("No program");
   top_layout->addWidget (qt_name /* , Qt::AlignLeft */);
@@ -194,18 +192,13 @@ UIRun::attach (Toplevel& toplevel)
   // The simulation time.
   VisQtTime *const qt_time = new VisQtTime;
   qt_time->setToolTip ("The simulation time.");
-  if (alist.check ("time")
-      && syntax.lookup ("time") == Value::AList
-      && syntax.size ("time") == Value::Singleton)
+  if (frame.check ("time")
+      && frame.lookup ("time") == Value::AList
+      && frame.size ("time") == Value::Singleton
+      && frame.check (toplevel.metalib (), "time", Treelog::null ()))
     {
-      const Frame& time_frame = Librarian::submodel_frame ("Time");
-      const AttributeList& start_alist = alist.alist ("time");
-      if (time_frame.syntax ().check (toplevel.metalib (),
-                                      start_alist, Treelog::null ()))
-        {
-          Time time (start_alist);
-          qt_time->set_time (time);
-        }
+      Time time (frame.alist ("time"));
+      qt_time->set_time (time);
     }
   if (!attach_log ("QtTime", qt_time)
       && toplevel.state () == Toplevel::is_uninitialized)
@@ -234,9 +227,9 @@ UIRun::attach (Toplevel& toplevel)
 
   // The program description.
   qt_description->setToolTip ("The description of the selected program.");
-  if (alist.check ("description")
-      && alist.name ("description") != Toplevel::default_description)
-    qt_description->setText (alist.name ("description").name ().c_str ());
+  if (frame.check ("description")
+      && frame.name ("description") != Toplevel::default_description)
+    qt_description->setText (frame.name ("description").name ().c_str ());
   else
     qt_description->hide (); // setText ("No description.");
   layout->addWidget (qt_description /* , Qt::AlignLeft */);
@@ -373,12 +366,12 @@ UIRun::reset ()
 {
   // Fetch data.
   daisy_assert (top_level);
-  const AttributeList& alist = top_level->program_alist ();
+  const Frame& frame = top_level->program_frame ();
   const std::vector<std::string> files = top_level->files_found ();
 
   // The program name.
-  if (alist.check ("type"))
-    qt_name->setText (alist.name ("type").name ().c_str ());
+  if (frame.check ("type"))
+    qt_name->setText (frame.name ("type").name ().c_str ());
   else
     qt_name->setText ("No program");
 
@@ -399,9 +392,9 @@ UIRun::reset ()
     }
 
   // The program description.
-  if (alist.check ("description")
-      && alist.name ("description") != Toplevel::default_description)
-    qt_description->setText (alist.name ("description").name ().c_str ());
+  if (frame.check ("description")
+      && frame.name ("description") != Toplevel::default_description)
+    qt_description->setText (frame.name ("description").name ().c_str ());
   else
     qt_description->setText ("No setup file has been loaded.\n\
 You can drag a setup file to the Daisy icon to run a simulation.");

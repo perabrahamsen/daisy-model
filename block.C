@@ -423,7 +423,7 @@ Block::alist (const symbol key) const
   return frame.alist (key); 
 }
 
-Frame& 
+const Frame& 
 Block::frame (const symbol key) const
 { 
   const Frame& frame = find_frame (key);

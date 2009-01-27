@@ -221,27 +221,14 @@ the value must be a primitive of that type.  For Number, you can also\n\
 specify a dimension in square brackets afterwards.  DOC is a\n\
 non-optional description of the new parameter.";
 
-const Syntax& 
-Toplevel::program_syntax () const
+const Frame& 
+Toplevel::program_frame () const
 {
-  if (impl->metalib.alist ().check ("run"))
-    {
-      daisy_assert (program_alist ().check ("type"));
-      const Library& library = impl->metalib.library (Program::component);
-      return library.syntax (program_alist ().name ("type"));
-    }
-  return impl->metalib.syntax ();
+  if (impl->metalib.check ("run"))
+    return impl->metalib.frame ("run");
+  return impl->metalib;
 }
 
-const AttributeList& 
-Toplevel::program_alist () const
-{
-  if (impl->metalib.alist ().check ("run"))
-    return impl->metalib.alist ().alist ("run");
-
-  return impl->metalib.alist ();
-}
- 
 Program& 
 Toplevel::program () const
 {
@@ -427,13 +414,14 @@ Toplevel::initialize ()
       daisy_assert (impl->state == is_uninitialized);
 
       copyright ();
-      if (!program_syntax ().check (metalib (), program_alist (), msg ()))
+      if (!program_frame ().check (metalib (), msg ()))
         throw EXIT_FAILURE;
       {                             // Limit lifetime of block.
         Block block (metalib (), msg (), "Building");
-        impl->program.reset (Librarian::build_alist<Program> (block,
-                                                              program_alist (),
-                                                              "run"));
+        if (metalib ().check ("run"))
+          impl->program.reset (Librarian::build_item<Program> (block, "run"));
+        else
+          impl->program.reset (new Daisy (block));
         if (!block.ok ())
           throw EXIT_FAILURE;
       }

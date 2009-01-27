@@ -17,7 +17,8 @@
 	 (DSRate2 0.020)
 	 (TempEff2 (-4 0.02) (5 0.2) (14 0.70) (20 1.00) (29 1.20) (35 1.20))
 	 (defined_until_ds 2.))
-  (Vernal (DSLim 0.33)
+  (Vernal default
+          (DSLim 0.33)
 	  (TaLim  5.0)
 	  (TaSum  -50.0))
   (LeafPhot original 

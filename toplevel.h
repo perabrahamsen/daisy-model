@@ -66,8 +66,7 @@ public:
 
   // Accessors.
 public:
-  const Syntax& program_syntax () const;
-  const AttributeList& program_alist () const;
+  const Frame& program_frame () const;
   Program& program () const;
   Metalib& metalib ();
   Treelog& msg ();

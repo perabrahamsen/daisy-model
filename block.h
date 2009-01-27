@@ -89,7 +89,7 @@ public:
   bool flag (symbol, bool default_value) const;
   const PLF& plf (symbol) const;
   AttributeList& alist (symbol) const;
-  Frame& frame (symbol) const;
+  const Frame& frame (symbol) const;
   int integer (symbol) const;
   int integer (symbol, int default_value) const;
   const std::vector<double>& number_sequence (symbol) const;

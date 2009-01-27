@@ -23,6 +23,7 @@
 #include <vector>
 
 class Frame;
+class FrameModel;
 class AttributeList;
 class PLF;
 class Block;
@@ -162,11 +163,9 @@ public:
   { add (key, domain, range, check, cat, Value::Singleton, description); } 
 
   void add_object (const symbol key,// Object
-                   const char *const lib, 
+                   const symbol lib, 
                    const symbol description)
   { add_object (key, lib, Value::State, Value::Singleton, description); }
-  void add_object (const symbol, const char* lib,
-                   Value::category, int size, const symbol description);
   void add_object (const symbol, symbol lib,
                    Value::category, int size, const symbol description);
 
@@ -232,7 +231,8 @@ public:
   bool flag (const symbol, bool default_value) const;
   const PLF& plf (const symbol) const;
   AttributeList& alist (const symbol) const;
-  Frame& frame (const symbol) const;
+  const Frame& frame (const symbol) const;
+  const FrameModel& model (const symbol) const;
   int integer (const symbol) const;
   int integer (const symbol, int default_value) const;
   const std::vector<double>& number_sequence (const symbol) const;
@@ -253,6 +253,7 @@ public:
   void add (symbol, const char*); // Avoid matching bool...
   void add (symbol, bool);
   void add (symbol, int);
+  void add (symbol, const Frame&);
   void add (symbol, const PLF&);
   void add (symbol, const std::vector<double>&);
   void add (symbol, const std::vector<symbol>&);
@@ -272,6 +273,8 @@ protected:
   Frame ();
   Frame (const Syntax&, const AttributeList&); // Old style.
 public:
+  enum parent_link_t { parent_link };
+  enum parent_copy_t { parent_copy }; // OLD: For cloning a library.
   enum parent_clone_t { parent_clone }; // For temporary models.
   virtual Frame& clone () const = 0;
   typedef void (*load_frame_t) (Frame&);

@@ -464,11 +464,11 @@ daisy_daisy_parse_file (Toplevel* toplevel, char* filename)
 
 extern "C" EXPORT const Syntax*
 daisy_daisy_get_program_syntax (Toplevel* toplevel)
-{ return &toplevel->program_syntax (); }
+{ return &toplevel->program_frame ().syntax (); }
 
 extern "C" EXPORT const AttributeList*
 daisy_daisy_get_program_alist (Toplevel* toplevel)
-{ return &toplevel->program_alist (); }
+{ return &toplevel->program_frame ().alist (); }
 
 extern "C" EXPORT void
 daisy_daisy_initialize (Toplevel* toplevel)

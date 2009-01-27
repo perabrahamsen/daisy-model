@@ -10,7 +10,7 @@
       (TempEff2 (0.00  0.00) (10.0  0.14) (15.0  0.66) (20.0  1.00) (25.0  1.23))
   )
  
- (Vernal
+ (Vernal default
       (DSLim 0.33)
       (TaLim 5.00)
       (TaSum -50.0)    

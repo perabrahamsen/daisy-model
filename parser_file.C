@@ -38,7 +38,7 @@
 #include "mathlib.h"
 #include "memutils.h"
 #include "librarian.h"
-#include "frame.h"
+#include "frame_model.h"
 #include "syntax.h"
 #include <set>
 #include <memory>
@@ -113,10 +113,14 @@ struct ParserFile::Implementation
   };
   // Parser.
   void check_value (const Syntax& syntax, const symbol name,  double value);
+  void check_value (const Frame& syntax, const symbol name,  double value);
   void add_derived (Library&);
   AttributeList& load_derived (const Library& lib, bool in_sequence,
 			       const AttributeList* original);
   void load_list (Syntax&, AttributeList&);
+  std::auto_ptr<FrameModel> load_object (const Library& lib, bool in_sequence,
+                                         const FrameModel* original);
+  void load_list (Frame&);
 
   // Create and destroy.
   void initialize ();
@@ -203,6 +207,7 @@ ParserFile::Implementation::get_string ()
     }
 }
 
+#ifdef AVOID_FRAME
 int
 ParserFile::Implementation::get_integer ()
 {
@@ -265,6 +270,69 @@ ParserFile::Implementation::get_integer ()
     }
   return integer->value (Scope::null ());
 }
+#else
+int
+ParserFile::Implementation::get_integer ()
+{
+  skip ();
+  int c = peek ();
+
+  // Check for number literals first.
+  if (isdigit (c) || c == '-')
+    {
+      std::string str;
+
+      while (good () && (isdigit (c) || c == '-' || c == '+'))
+        {
+          str += int2char (c);
+          get ();
+          c = peek ();
+        }
+      // Empty number?
+      if (str.size () < 1U)
+        {
+          error ("Integer expected");
+          skip_to_end ();
+          return -42;
+        }
+      return atoi (str.c_str ());
+    }
+  // Then try an integer object.
+  const Library& lib = metalib.library (Integer::component);
+  std::auto_ptr<FrameModel> frame = load_object (lib, true, NULL);
+  if (!frame.get ())
+    return -42;
+  const symbol obj = frame->name ("type");
+  // Check for completness.
+  TreelogString treelog;
+  Treelog::Open nest (treelog, obj);
+  if (!frame->check (metalib, treelog))
+    {
+      error ("Bogus integer '" + obj + "'\n--- details:\n"
+             + treelog.str () + "---");
+      return -42;
+    }
+  std::auto_ptr<Integer> integer 
+    (Librarian::build_frame<Integer> (metalib, treelog, *frame, "integer"));
+  if (!integer.get ()
+      || !integer->initialize (metalib.units (), Scope::null (), treelog)
+      || !integer->check (Scope::null (), treelog))
+    {
+      error ("Bad integer '" + obj + "'\n--- details:\n"
+             + treelog.str () + "---");
+      return -42;
+    }
+  if (treelog.str ().length () > 0)
+    warning ("Warning for integer '" + obj + "'\n--- details:\n"
+             + treelog.str () + "---");
+  if (integer->missing (Scope::null ()))
+    {
+      error ("Missing integer '" + obj + "'");
+      return -42;
+    }
+  return integer->value (Scope::null ());
+}
+#endif
 
 double
 ParserFile::Implementation::get_number ()
@@ -315,6 +383,7 @@ ParserFile::Implementation::get_dimension ()
   return str;
 }
 
+#ifdef AVOID_FRAME
 double
 ParserFile::Implementation::get_number (const symbol syntax_dim)
 {
@@ -376,6 +445,68 @@ ParserFile::Implementation::get_number (const symbol syntax_dim)
     value = convert (value, syntax_dim, read_dim, lexer->position ());
   return value;
 }
+#else
+double
+ParserFile::Implementation::get_number (const symbol syntax_dim)
+{
+  skip ();
+
+  // Check for number literals first.
+  if (peek () == '.' || isdigit (peek ()) || peek () == '-')
+    {
+      double value = get_number ();
+      Lexer::Position pos = lexer->position ();
+
+      if (looking_at ('['))
+        {
+          const symbol read_dim = get_dimension ();
+          if (check_dimension (syntax_dim, read_dim))
+            value = convert (value, syntax_dim, read_dim, pos);
+        }
+      return value;
+    }
+  
+  // Then try a number object.
+  const Library& lib = metalib.library (Number::component);
+  std::auto_ptr<FrameModel> frame = load_object (lib, true, NULL);
+  if (!frame.get ())
+    return -42.42e42;
+  const symbol obj = frame->name ("type");
+  // Check for completness.
+  TreelogString treelog;
+  Treelog::Open nest (treelog, obj);
+  if (!frame->check (metalib, treelog))
+    {
+      error ("Bogus number '" + obj + "'\n--- details:\n"
+             + treelog.str () + "---");
+      return -42.42e42;
+    }
+  std::auto_ptr<Number> number 
+    (Librarian::build_frame<Number> (metalib, msg, *frame, "number"));
+  if (!number.get ()
+      || !number->initialize (metalib.units (), Scope::null (), treelog)
+      || !number->check (metalib.units (), Scope::null (), treelog))
+    {
+      error ("Bad number '" + obj + "'\n--- details:\n"
+             + treelog.str () + "---");
+      return -42.42e42;
+    }
+  number->tick (metalib.units (), Scope::null (), treelog);
+  if (treelog.str ().length () > 0)
+    warning ("Warning for number '" + obj + "'\n--- details:\n"
+             + treelog.str () + "---");
+  if (number->missing (Scope::null ()))
+    {
+      error ("Missing number '" + obj + "'");
+      return -42.42e42;
+    }
+  double value = number->value (Scope::null ());
+  const std::string read_dim = number->dimension (Scope::null ()).name ();
+  if (check_dimension (syntax_dim, read_dim))
+    value = convert (value, syntax_dim, read_dim, lexer->position ());
+  return value;
+}
+#endif
 
 bool 
 ParserFile::Implementation::check_dimension (const symbol syntax, 
@@ -516,6 +647,22 @@ ParserFile::Implementation::check_value (const Syntax& syntax,
 }
 
 void
+ParserFile::Implementation::check_value (const Frame& frame, 
+                                         const symbol name,
+                                         const double value)
+{
+  try
+    {
+      frame.check (name, value);
+    }
+  catch (const std::string& message)
+    {
+      error (name + ": " + message);
+    }
+}
+
+#ifdef AVOID_FRAME
+void
 ParserFile::Implementation::add_derived (Library& lib)
 {
   // Get the name of the class and the existing superclass to derive from.
@@ -565,8 +712,8 @@ ParserFile::Implementation::add_derived (Library& lib)
   lib.add_derived (name, syntax, atts, super);
   // Inform metalib.
   metalib.added_object (lib.name (), name);
-  
 }
+#endif
 
 AttributeList&
 ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence,
@@ -1395,6 +1542,867 @@ ParserFile::Implementation::load_list (Syntax& syntax, AttributeList& atts)
     }
 }
 
+#ifndef AVOID_FRAME
+void
+ParserFile::Implementation::add_derived (Library& lib)
+{
+  // Get the name of the class and the existing superclass to derive from.
+  const symbol name = get_symbol ();
+  // Check for duplicates.
+  if (lib.check (name))
+    {
+      const AttributeList& old = lib.lookup (name);
+      if (old.check ("parsed_from_file"))
+	warning (name + " is already defined in " 
+		 + old.name ("parsed_from_file") + ", overwriting");
+      else
+	warning (name + " is already defined, overwriting");
+      lib.remove (name);
+    }
+  static const symbol const_symbol ("const");
+  skip ();
+  int c = peek ();
+  Parskip skip (*this, c == '(');
+  const symbol super = (isdigit (c) || c == '-' || c == '.')
+    ? const_symbol
+    : get_symbol ();
+  if (!lib.check (super))
+    {
+      error (std::string ("Unknown '") + lib.name () + "' model '" + super + "'");
+      skip_to_end ();
+      return;
+    }
+  std::auto_ptr<FrameModel> frame (new FrameModel (lib.model (super), 
+                                                   Frame::parent_copy));
+  if (!frame.get ())
+    throw "Failed to derive";
+
+  // Remember where we got this object.
+  frame->alist ().add ("parsed_from_file", file);
+  frame->alist ().add ("parsed_sequence", metalib.get_sequence ());
+
+  // Doc string.
+  daisy_assert (!frame->ordered () 
+                || frame->order ().begin () != frame->order ().end ());
+  if ((!frame->ordered () 
+       || frame->lookup (*(frame->order ().begin ())) != Value::String) 
+      && looking_at ('"'))
+    frame->alist ().add ("description", get_string ());
+
+  // Add separate attributes for this object.
+  Treelog::Open nest (msg, "Defining " + lib.name () + " '" + name + "'");
+  load_list (*frame);
+  // Add new object to library.
+  frame->alist ().add ("type", super);
+  lib.add_model (name, *frame.release ());
+
+  // Inform metalib.
+  metalib.added_object (lib.name (), name);
+}
+#endif
+
+std::auto_ptr<FrameModel>
+ParserFile::Implementation::load_object (const Library& lib, bool in_sequence,
+                                         const FrameModel *const original)
+{
+  std::auto_ptr<FrameModel> result;
+  bool skipped = false;
+
+  static const symbol original_symbol ("original");
+  static const std::string compatibility_symbol ("used_to_be_a_submodel");
+
+  symbol type;
+  skip ();
+  int c = peek ();
+
+  // Handle numeric literals.
+  if (isdigit (c) || c == '.' || c == '-')
+    {                          
+      if (lib.name () == symbol (Number::component))
+        {
+          result.reset (new FrameModel (lib.model ("const"),
+                                        Frame::parent_copy));
+          result->alist ().add ("type", "const");
+          const double value = get_number ();
+          const symbol dim = get_dimension ();
+          result->add ("value", value, dim);
+        }
+      else if (lib.name () == symbol (Integer::component))
+        {
+          result.reset (new FrameModel (lib.model ("const"), 
+                                        Frame::parent_copy));
+          result->alist ().add ("type", "const");
+          result->add ("value", get_integer ());
+        }
+      else
+        {
+          error ("Number not expected");
+          skip_to_end ();
+        }
+      return result;
+    }
+ 
+  if (c == '(' && in_sequence)
+    {
+      skip ("(");
+      skipped = true;
+      c = peek ();
+    }
+
+  if (original && original->check (compatibility_symbol) && c == '(')
+    {
+      // Special hack to allow skipping the "original" keyword for
+      // models that used to be submodels.
+      daisy_assert (original->flag (compatibility_symbol));
+      daisy_assert (original->check ("type"));
+      const symbol original_type = original->name ("type");
+      daisy_assert (lib.check (original_type));
+
+      type = original_symbol;
+      warning ("Model specified missing, assuming 'original'");
+    }
+  else
+    {
+      if (c == '(' && !in_sequence)
+        {
+          skip ("(");
+          skipped = true;
+        }
+      type = get_symbol ();
+    }
+
+  try
+    {
+      if (type == original_symbol)
+	{
+	  if (!original)
+	    throw (std::string ("No original value"));
+	  result.reset (&original->clone ());
+	  daisy_assert (result->check ("type"));
+	  type = result->name ("type");
+	  daisy_assert (lib.check (type));
+	}
+      else if (!lib.check (type))
+        {
+          // Special hack to handle numbers in scopes.
+          if (lib.name () == symbol (Number::component))
+            {
+              static const symbol fetch ("fetch");
+              result.reset (new FrameModel (lib.model (fetch), 
+                                            Frame::parent_copy));
+              result->alist ().add ("type", fetch);
+              result->add ("name", type);
+              goto skip_it;
+            }
+          throw (std::string ("Unknown '") + lib.name () + "' model '"
+                 + type + "'");
+        }
+      else
+        {
+          result.reset (new FrameModel (lib.model (type), Frame::parent_copy));
+	  result->alist ().add ("type", type);
+	}
+      if (skipped || !in_sequence)
+	{
+          Treelog::Open nest (msg, "Deriving from '" + type + "'");
+	  load_list (*result);
+	}
+    skip_it:;
+    }
+  catch (const std::string& wrong)
+    {
+      error (wrong);
+      skip_to_end ();
+    }
+  if (skipped)
+    skip (")");
+  return result;
+}
+
+void
+ParserFile::Implementation::load_list (Frame& frame)
+{ 
+  Syntax& syntax = frame.syntax ();
+  AttributeList& atts = frame.alist ();
+  std::vector<symbol>::const_iterator current = frame.order ().begin ();
+  const std::vector<symbol>::const_iterator end = frame.order ().end ();
+  std::set<symbol> found;
+
+  while ( good () && !looking_at (')'))
+    {
+      bool skipped = false;
+      bool in_order = false;
+      symbol name = "";
+      if (current == end)
+	// Unordered association list, get name.
+	{
+	  skip ("(");
+	  skipped = true;
+	  name = get_symbol ();
+	}
+      else
+	// Ordered tupple, name know.
+	{
+	  in_order = true;
+	  name = *current;
+	  current++;
+	}
+
+      // Make sure we skip the ')' afterwards.
+      struct RAII_skip
+      { 
+        ParserFile::Implementation& outer;
+        const bool skipped;
+        
+        RAII_skip (ParserFile::Implementation& o, const bool s)
+          : outer (o),
+            skipped (s)
+        { }
+        ~RAII_skip ()
+        {
+          if (skipped)
+            outer.skip (")");
+          outer.skip ();
+        }
+      } raii_skip (*this, skipped);
+
+      // Declarations.
+      if (name == "declare")
+	{
+	  bool ok = true;
+	  // Special handling of block local parameters.
+	  const std::string var = get_string ();
+	  if (frame.lookup (var) != Value::Error)
+	    {
+	      error ("'" + var + "' already exists");
+	      ok = false;
+	    }
+          int size = Value::Singleton;
+          if (looking_at ('['))
+            {
+              skip ("[");
+              if (looking_at (']'))
+                size = Value::Sequence;
+              else
+                size = get_integer ();
+              skip ("]");
+            }
+	  const std::string type_name = get_string ();
+	  symbol doc = "User defined " + type_name + ".";
+	  const Value::type type = Value::type_number (type_name);
+	  switch (type)
+	    {
+	    case Value::String:
+	    case Value::Integer:
+	      {
+		if (!looking_at ('('))
+		  doc = get_symbol ();
+		if (ok)
+		  frame.add (var, type, Value::Const, size, doc);
+		break;
+	      }
+	    case Value::Number:
+	      {
+		symbol dim = Value::Unknown ();
+		if (looking_at ('['))
+		  dim = get_symbol ();
+		if (!looking_at ('('))
+		  doc = get_symbol ();
+		if (ok)
+		  frame.add (var, dim, Value::Const, size, doc);
+		break;
+	      }
+	    case Value::Error:
+	      {
+                if (type_name == "fixed")
+                  {
+                    const std::string submodel = get_string ();
+                    if (Librarian::submodel_registered (submodel))
+                      {
+                        if (!looking_at ('('))
+                          doc = get_string ();
+                        if (ok)
+                          {
+                            const Frame::load_syntax_t load
+                              = Librarian::submodel_load (submodel);
+                            frame.add_submodule (var, Value::Const, doc, load);
+                          }
+                        break;
+                      }
+                    /* else fallthrough to error handling. */
+                  }
+                else
+                  {
+                    const symbol type_symbol (type_name);
+                    if (metalib.exist (type_symbol))
+                      {
+                        if (!looking_at ('('))
+                          doc = get_string ();
+                        if (ok)
+                          frame.add_object (var, type_symbol, 
+                                             Value::Const, size, doc);
+                        break;
+                      }
+                    /* else fallthrough to error handling. */
+                  }
+	      }
+	      // Fallthrough
+	    default:
+	      error ("'" + type_name + "' unhandled type");
+	      ok = false;
+	    }
+          // Next attribute.
+          continue;
+	}
+
+      // Duplicate warning.
+      if (found.find (name) != found.end ())
+	warning (name + " specified twice, last takes precedence");
+      else if (frame.lookup (name) != Value::Library // (deffoo ...)
+	       && (frame.lookup (name) != Value::Object
+		   || (frame.library (metalib, name).name () // (input file )
+		       != symbol (Parser::component))))
+	found.insert (name);
+
+      // Log variable warning.
+      if (frame.is_log (name))
+        warning (name + " is a log only variable, value will be ignored");
+
+      if (looking_at ('$'))
+        {
+          skip ("$");
+          const std::string var = get_string ();
+          if (name == var)
+            error ("Reference $" + var + " refers to itself");
+          else
+            frame.add_reference (name, var);
+        }
+      else if (frame.size (name) == Value::Singleton)
+	switch (frame.lookup (name))
+	  {
+	  case Value::Number:
+	    {
+              if (frame.dimension (name) == Value::User ())
+                {
+                  const double value = get_number ();
+                  const symbol dim = 
+		    looking_at ('[') ? get_dimension () : Value::Unknown ();
+                  check_value (frame, name, value);
+                  frame.add (name, value, dim);
+                  break;
+                }
+	      const double value = get_number (frame.dimension (name));
+              check_value (frame, name, value);
+	      frame.add (name, value);
+	      break;
+	    }
+	  case Value::AList: 
+	    {
+              Treelog::Open nest (msg, "In submodel '" + name + "'");
+	      bool alist_skipped = false;
+	      if (in_order)
+		{
+		  // Last element of a total order does not need '('.
+		  if (looking_at ('(') 
+		      || current != end 
+		      || !frame.total_order ())
+		    {
+		      alist_skipped = true;
+		      skip ("(");
+		    }
+		}
+              std::auto_ptr<Frame> child (&frame.frame (name).clone ());
+	      load_list (*child);
+	      atts.add (name, *child);
+	      if (alist_skipped)
+		skip (")");
+	      break;
+	    }
+	  case Value::PLF:
+	    {
+	      Parskip skip (*this, in_order);
+	      PLF plf;
+	      double last_x = -42;
+	      int count = 0;
+	      const symbol domain = frame.domain (name);
+	      const symbol range = frame.range (name);
+	      bool ok = true;
+	      while (!looking_at (')') && good ())
+		{
+                  Parskip skip (*this);
+		  double x = get_number (domain);
+		  {
+		    if (count > 0 && x <= last_x)
+		      {
+			error ("Non increasing x value");
+			ok = false;
+		      }
+		    last_x = x;
+		    count++;
+		  }
+		  const double y = get_number (range);
+		  try
+		    {
+		      frame.check (name, y);
+		    }
+		  catch (const std::string& message)
+		    {
+		      error (name + ": " + message);
+		      ok = false;
+		    }
+		  if (ok)
+		    plf.add (x, y);
+		}
+	      if (count < 2)
+		{
+		  error ("Need at least 2 points");
+		  ok = false;
+		}
+	      if (ok)
+		frame.add (name, plf);
+	      break;
+	    }
+	  case Value::String:
+	    frame.add (name, get_string ());
+	    // Handle "directory" immediately.
+	    if (&frame == &metalib && name == "directory")
+	      if (!metalib.path ().set_directory (frame.name (name).name ()))
+		error ("Could not set directory '" + frame.name (name) + "'");
+	    break;
+	  case Value::Boolean:
+	    {
+	      const std::string flag = get_string ();
+
+	      if (flag == "true")
+		frame.add (name, true);
+	      else
+		{
+		  frame.add (name, false);
+		  if (flag != "false")
+		    error ("Expected 'true' or 'false'");
+		}
+	      break;
+	    }
+	  case Value::Integer:
+	    frame.add (name, get_integer ());
+	    break;
+	  case Value::Library:
+	    // Handled specially: Put directly in global library.
+	    add_derived (frame.library (metalib, name));
+	    break;
+	  case Value::Object:
+	    {
+              std::auto_ptr<FrameModel> child;
+	      const Library& lib = frame.library (metalib, name);
+              if (frame.check (name))
+                {
+                  Treelog::Open nest (msg, "Refining model '" + name + "'");
+                  child = load_object (lib, in_order, &frame.model (name));
+                }
+              else
+                {
+                  Treelog::Open nest (msg, "In model '" + name + "'");
+                  child = load_object (lib, in_order, NULL);
+                }
+              if (!child.get ())
+                /* Do nothing */;
+	      else if (lib.name () == symbol (Parser::component))
+		{
+		  std::auto_ptr<Parser> parser 
+                    (Librarian::build_frame<Parser> (metalib, msg, *child,
+                                                     name));
+                  if (!parser.get ())
+                    error ("file error");
+                  else
+                    {
+                      if (parser->check ())
+                        parser->load_nested ();
+                      lexer->error_count += parser->error_count ();
+                    }
+		  inputs.push_back (new AttributeList (child->alist ()));
+		}
+	      else
+                atts.add (name, *child);
+	    }
+	    break;
+	  case Value::Error:
+	    error (std::string("Unknown singleton '") + name + "'");
+	    skip_to_end ();
+	    break;
+	  default:
+	    daisy_notreached ();
+	  }
+      else
+	{
+	  // If this is part of an order, expect parentheses arund the
+	  // list, EXCEPT when there cannot possible be any more
+	  // elements after this one.  I.e. when the element is the
+	  // last of a totally ordered sequence.
+	  if (!in_order)
+	    // Unordered, we already skipped this one
+	    daisy_assert (skipped);
+	  // Support for sequences not really finished yet.
+	  switch (frame.lookup (name))
+	    {
+	    case Value::Object:
+	      {
+		const Library& lib = frame.library (metalib, name);
+		static const std::vector<const AttributeList*> no_sequence;
+		std::vector<const AttributeList*> sequence;
+		const std::vector<const AttributeList*>& old_sequence
+		  = frame.check (name) 
+		  ? frame.alist_sequence (name) 
+		  : no_sequence;
+		while (!looking_at (')') && good ())
+		  {
+                    if (frame.size (name) == sequence.size ())
+                      {
+                        std::ostringstream tmp;
+                        tmp << "The '" << name 
+                            << "' sequence should only contain "
+                            << frame.size (name) << " elements";
+                        error (tmp.str ());
+                      }
+                    if (looking_at ('&'))
+                      {
+                        skip ("&old");
+                        if (!frame.check (name))
+                          error ("No originals available");
+                        for (size_t i = 0; i < old_sequence.size (); i++)
+                          sequence.push_back (new AttributeList 
+                                              /**/(*old_sequence[i]));
+                        continue;
+                      }
+		    const size_t element = sequence.size ();
+                    std::ostringstream tmp;
+                    tmp << "In '" << name << "' model #" << element + 1U;
+                    Treelog::Open nest (msg, tmp.str ());
+
+		    AttributeList& al 
+		      = (old_sequence.size () > element
+			 ? load_derived (lib, true, old_sequence[element])
+			 : load_derived (lib, true, NULL));
+		    const symbol obj = al.name ("type");
+		    if (obj == error_symbol)
+                      delete &al;
+                    else
+                      sequence.push_back (&al);
+		  }
+		atts.add (name, sequence);
+		sequence_delete (sequence.begin (), sequence.end ());
+		break;
+	      }
+	    case Value::AList:
+	      {
+		const size_t size = frame.size (name);
+		static const std::vector<const AttributeList*> no_sequence;
+		const Syntax& syn = syntax.syntax (name);
+		const std::vector<const AttributeList*>& old_sequence
+		  = frame.check (name) 
+		  ? frame.alist_sequence (name) 
+		  : no_sequence;
+		std::vector<const AttributeList*> sequence;
+		bool skipped = false;
+		// We do not force parentheses around the alist if it
+		// is the last member of a fully ordered list.
+		if (in_order && (current != end || !frame.total_order ()))
+		  // in order and (not the last or unordered may follow)
+		  {
+		    daisy_assert (!skipped);
+		    skip ("(");
+		    skipped = true;
+		  }
+		while (!looking_at (')') && good ())
+		  {
+                    if (looking_at ('&'))
+                      {
+                        skip ("&old");
+                        if (!frame.check (name))
+                          error ("No originals available");
+                        for (size_t i = 0; i < old_sequence.size (); i++)
+                          sequence.push_back (new AttributeList 
+                                              /**/(*old_sequence[i]));
+                        continue;
+                      }
+		    Parskip skip (*this);
+		    const size_t element = sequence.size ();
+                    std::ostringstream tmp;
+                    tmp << "In '" << name << "' submodel #" << element + 1U;
+                    Treelog::Open nest (msg, tmp.str ());
+		    AttributeList& al
+		      = *new AttributeList (old_sequence.size () > element
+					    ? *old_sequence[element]
+					    : frame.default_frame (name).alist ());
+		    // TODO: Allow local parameters in submodels.
+		    Syntax s (syn);
+		    load_list (s, al);
+		    sequence.push_back (&al);
+		  }
+		if (skipped)
+		  skip (")");
+		if (size != Value::Sequence && sequence.size () != size)
+		  {
+		    std::ostringstream str;
+		    str << "Got " << sequence.size ()
+                        << " array members, expected " << size;
+		    error (str.str ());
+		  }
+		atts.add (name, sequence);
+		sequence_delete (sequence.begin (), sequence.end ());
+		break;
+	      }
+	    case Value::PLF:
+	      {
+		std::vector<const PLF*> plfs;
+		int total = 0;
+		const int size = frame.size (name);
+		while (good () && !looking_at (')'))
+		  {
+		    Parskip dummy (*this);
+		    PLF& plf = *new PLF ();
+		    double last_x = -42;
+		    int count = 0;
+		    const symbol domain = frame.domain (name);
+		    const symbol range = frame.range (name);
+		    while (!looking_at (')') && good ())
+		      {
+                        if (looking_at ('&'))
+                          {
+                            skip ("&old");
+                            if (!frame.check (name))
+                              error ("No originals available");
+                            const std::vector<const PLF*>& old_sequence
+                              = frame.plf_sequence (name);
+                            for (size_t i = 0; i < old_sequence.size (); i++)
+                              plfs.push_back (new PLF (*old_sequence[i]));
+                            continue;
+                          }
+			Parskip dummy2 (*this);
+			double x = get_number (domain);
+			{
+			  if (count > 0 && x <= last_x)
+			    error ("Non increasing x value");
+			  last_x = x;
+			  count++;
+			}
+			double y = get_number (range);
+			try
+			  {
+			    frame.check (name, y);
+			  }
+			catch (const std::string& message)
+			  {
+			    error (name + ": " + message);
+			  }
+			plf.add (x, y);
+		      }
+		    if (count < 2)
+		      error ("Need at least 2 points");
+		    total++;
+		    plfs.push_back (&plf);
+		  }
+		if (size != Value::Sequence && total != size)
+		  {
+		    std::ostringstream str;
+		    str << "Got " << total
+                        << " array members, expected " << size;
+		    error (str.str ());
+
+		    for (;total < size; total++)
+		      plfs.push_back (new PLF ());
+		  }
+		frame.add (name, plfs);
+		sequence_delete (plfs.begin (), plfs.end ());
+		break;
+	      }
+	    case Value::Number:
+	      {
+		std::vector<double> array;
+		std::vector<Lexer::Position> positions;
+		int count = 0;
+		const int size = frame.size (name);
+		const symbol syntax_dim = frame.dimension (name);
+		unsigned int first_unchecked = 0;
+		while (good () && !looking_at (')'))
+		  {
+                    if (looking_at ('&'))
+                      {
+                        skip ("&old");
+                        if (!frame.check (name))
+                          error ("No originals available");
+                        const std::vector<double>& old_sequence
+                          = frame.number_sequence (name);
+                        for (size_t i = 0; i < old_sequence.size (); i++)
+                          array.push_back (old_sequence[i]);
+                        continue;
+                      }
+		    if (looking_at ('*'))
+		      {
+			skip ("*");
+			const int same = get_integer ();
+			if (array.size () == 0)
+			  error ("must specify number before '*'");
+			else
+			  {
+			    // Append same - 1 copies of last value.
+			    for (int i = 1; i < same; i++)
+			      {
+				array.push_back (array.back ());
+				positions.push_back (Lexer::no_position ());
+				count++;
+			      }
+			  }
+		      }
+                    else if (looking_at ('['))
+                      {
+                        const symbol read_dim = get_dimension ();
+                        if (check_dimension (syntax_dim, read_dim))
+                          {
+                            daisy_assert (positions.size () == array.size ());
+                            for (unsigned int i = first_unchecked;
+                                 i < array.size ();
+                                 i++)
+                              {
+                                array[i] = convert (array[i],
+                                                    syntax_dim, read_dim, 
+                                                    positions[i]);
+                              }
+                            first_unchecked = array.size ();
+                          }
+                      }
+		    else 
+		      {
+			array.push_back (get_number ());
+			positions.push_back (lexer->position ());
+			count++;
+		      }
+		  }
+		daisy_assert (positions.size () == array.size ());
+		for (unsigned int i = 0; i < array.size (); i++)
+		  {
+		    if (positions[i] != Lexer::no_position ())
+		      try
+			{
+			  frame.check (name, array[i]);
+			}
+		      catch (const std::string& message)
+			{
+			  std::ostringstream str;
+			  str << name << "[" << i << "]: " << message;
+			  error (str.str (), positions[i]);
+			}
+		  }
+		if (size != Value::Sequence && count != size)
+		  {
+		    std::ostringstream str;
+		    str << "Got " << count 
+                        << " array members, expected " << size;
+		    error (str.str ());
+
+		    for (;count < size; count++)
+		      array.push_back (-1.0);
+		  }
+		frame.add (name, array);
+		break;
+	      }
+	    case Value::String:
+	      {
+		std::vector<symbol> array;
+		int count = 0;
+		const int size = frame.size (name);
+
+		while (!looking_at (')') && good ())
+		  {
+                    if (looking_at ('&'))
+                      {
+                        skip ("&old");
+                        if (!frame.check (name))
+                          error ("No originals available");
+                        const std::vector<symbol>& old_sequence
+                          = frame.name_sequence (name);
+                        for (size_t i = 0; i < old_sequence.size (); i++)
+                          array.push_back (old_sequence[i]);
+                        continue;
+                      }
+		    array.push_back (get_symbol ());
+		    count++;
+		  }
+		if (size != Value::Sequence && count != size)
+		  {
+		    std::ostringstream str;
+		    str << "Got " << count 
+                        << " array members, expected " << size;
+		    error (str.str ());
+
+		    for (;count < size; count++)
+		      array.push_back (symbol ("<error>"));
+		  }
+		frame.add (name, array);
+		// Handle "path" immediately.
+		if (&frame == &metalib && name == "path")
+		  {
+		    const std::vector<symbol>& symbols 
+		      = frame.name_sequence (name);
+		    metalib.path ().set_path (symbols);
+		  }
+		break;
+	      }
+	    case Value::Integer:
+	      {
+		std::vector<int> array;
+		int count = 0;
+		const int size = frame.size (name);
+
+		while (!looking_at (')') && good ())
+		  {
+                    if (looking_at ('&'))
+                      {
+                        skip ("&old");
+                        if (!frame.check (name))
+                          error ("No originals available");
+                        const std::vector<int>& old_sequence
+                          = frame.integer_sequence (name);
+                        for (size_t i = 0; i < old_sequence.size (); i++)
+                          array.push_back (old_sequence[i]);
+                        continue;
+                      }
+		    array.push_back (get_integer ());
+		    count++;
+		  }
+		if (size != Value::Sequence && count != size)
+		  {
+		    std::ostringstream str;
+		    str << "Got " << count 
+                        << " array members, expected " << size;
+		    error (str.str ());
+
+		    for (;count < size; count++)
+		      array.push_back (-42);
+		  }
+		frame.add (name, array);
+		// Handle "path" immediately.
+		break;
+	      }
+	    case Value::Error:
+	      error (std::string("Unknown attribute '") + name + "'");
+	      skip_to_end ();
+	      break;
+	    default:
+	      error (std::string("Unsupported sequence '") + name + "'");
+	      skip_to_end ();
+	    }
+	}
+
+      // Value check.
+      if (frame.check (name))
+	{
+	  Treelog::Open nest (msg, "Checking value of '" + name + "'");
+	  if (!frame.check (metalib, name, msg))
+	    error ("Invalid value");
+	}
+    }
+}
+
 void
 ParserFile::Implementation::initialize ()
 {
@@ -1422,7 +2430,11 @@ ParserFile::load_nested ()
 {
   impl->initialize ();
   impl->skip ();
+#ifdef AVOID_FRAME
   impl->load_list (impl->metalib.syntax (), impl->metalib.alist ());
+#else
+  impl->load_list (impl->metalib);
+#endif
   impl->skip ();
   impl->eof ();
 }

@@ -23,6 +23,7 @@
 #ifndef TIME_H
 #define TIME_H
 
+#include "symbol.h"
 #include <string>
 #include <vector>
 #include <memory>
@@ -61,7 +62,8 @@ public:
   int minute () const;
   int second () const;
   std::string print () const;
-  void set_alist (AttributeList& alist) const;
+  void set_time (Frame&, symbol key) const;
+  void set_alist (AttributeList&) const;
 
   enum component_t {
     Year, Month, Week, Yday, Mday, Wday, Hour, Minute, Second, 

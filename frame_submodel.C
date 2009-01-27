@@ -37,5 +37,31 @@ FrameSubmodel::clone () const
 FrameSubmodel::~FrameSubmodel ()
 { }
 
+const Frame* 
+FrameSubmodelValue::parent () const
+{ return parent_; }
+
+FrameSubmodelValue::FrameSubmodelValue (const FrameSubmodelValue& frame, 
+                                        const parent_clone_t)
+  : Frame (frame),
+    parent_ (frame.parent ())
+{ }
+
+FrameSubmodelValue& 
+FrameSubmodelValue::clone () const
+{ return *new FrameSubmodelValue (*this, parent_clone); }
+
+FrameSubmodelValue::FrameSubmodelValue (const Frame& frame, parent_copy_t)
+  : Frame (frame),
+    parent_ (&frame)
+{ }
+
+FrameSubmodelValue::FrameSubmodelValue (const Frame& frame, parent_link_t)
+  : Frame (),
+    parent_ (&frame)
+{ }
+FrameSubmodelValue::~FrameSubmodelValue ()
+{ }
+
 // frame_submodel.C ends here.
 

@@ -15,7 +15,8 @@
             (0.00  0.000)    (10.00  0.140)    (15.00  0.660)    (20.00  1.000)    
             (25.00  1.230)      )
   )
-  (Vernal (DSLim 0.99)
+  (Vernal default
+          (DSLim 0.99)
           (TaLim 5.00)
           (TaSum -50.0)    )
   (LeafPhot (Fm 2.16)

@@ -28,9 +28,24 @@ class FrameSubmodel : public Frame
   // Create and Destroy.
   FrameSubmodel (const FrameSubmodel&, parent_clone_t);
 public:
+  FrameSubmodel (const FrameSubmodel&, parent_copy_t);
+  FrameSubmodel (const FrameSubmodel&, parent_link_t);
   explicit FrameSubmodel (load_syntax_t);
   FrameSubmodel& clone () const;
   ~FrameSubmodel ();
+};
+
+class FrameSubmodelValue : public Frame
+{
+  const Frame* parent_;
+  const Frame* parent () const;
+  // Create and Destroy.
+  FrameSubmodelValue (const FrameSubmodelValue&, parent_clone_t);
+public:
+  FrameSubmodelValue& clone () const;
+  FrameSubmodelValue (const Frame&, parent_copy_t);
+  FrameSubmodelValue (const Frame&, parent_link_t);
+  ~FrameSubmodelValue ();
 };
 
 #endif // FRAME_SUBMODEL_H

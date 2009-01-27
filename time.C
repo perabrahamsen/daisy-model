@@ -25,7 +25,7 @@
 #include "time.h"
 #include "assertion.h"
 #include "log.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "vcheck.h"
 #include "librarian.h"
 #include "block.h"
@@ -125,6 +125,19 @@ Time::print () const
       << std::setw (2) << minute () << ":"
       << std::setw (2) << second ();
   return tmp.str ();
+}
+
+void 
+Time::set_time (Frame& parent, const symbol key) const
+{
+  FrameSubmodelValue child (parent.frame (key), Frame::parent_copy);
+  child.add ("year", year ());
+  child.add ("month", month ());
+  child.add ("mday", mday ());
+  child.add ("hour", hour ());
+  child.add ("minute", minute ());
+  child.add ("second", second ());
+  parent.add (key, child);
 }
 
 void 

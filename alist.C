@@ -481,9 +481,17 @@ AValue::operator= (const AValue& v)
         break;
       case Value::AList:
         if (v.fa.alist)
-          fa.alist = v.fa.alist;
+          {
+            fa.alist = v.fa.alist;
+            fa.frame = NULL;
+            daisy_assert (!v.fa.frame);
+          }
         else
-          fa.frame = v.fa.frame;
+          {
+            fa.frame = v.fa.frame;
+            fa.alist = NULL;
+            daisy_assert (!v.fa.alist);
+          }
         break;
       case Value::PLF:
 	plf = v.plf;
@@ -769,8 +777,9 @@ AttributeList::alist (const symbol key) const
   value.singleton (key);
   if (value.fa.alist)
     return *value.fa.alist;
-  else
+  else if (value.fa.frame)
     return value.fa.frame->alist ();
+  daisy_panic ("'key' has neither requested alist nor frame");
 }
 
 Frame& 
@@ -781,8 +790,9 @@ AttributeList::frame (const symbol key) const
   value.singleton (key);
   if (value.fa.alist)
     daisy_panic ("Value of '" + key + "' is an alist, a frame was requested");
-  else
+  else if (value.fa.frame)
     return *value.fa.frame;
+  daisy_panic ("'" + key + "' has neither requested frame nor alist");
 }
 
 const std::vector<double>& 
@@ -861,6 +871,10 @@ AttributeList::add (const symbol key, int v)
 
 void 
 AttributeList::add (const symbol key, const AttributeList& v)
+{ impl.add (key, AValue (v)); }
+
+void 
+AttributeList::add (const symbol key, const Frame& v)
 { impl.add (key, AValue (v)); }
 
 void 

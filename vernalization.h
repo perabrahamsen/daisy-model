@@ -22,34 +22,26 @@
 #ifndef VERNALIZATION_H
 #define VERNALIZATION_H
 
+#include "model.h"
+
 class AttributeList;
 class Frame;
 class Log;
 class PLF;
 
-class Vernalization 
+class Vernalization : public ModelLogable
 {
-  // Parameters.
 public:
-  const bool required;
-private:
-  const double DSLim;		// Max DS without vernalization
-  const double TaLim;		// Vernalization temp threshold
-
-  // State.
-private:
-  double TaSum;		// Vernalization T-sum requirement
+  static const char *const component;
+  symbol library_id () const;
 
   // Simulation.
 public:
-  void operator () (double Ta, double& DS);
-  void output (Log& log) const;
+  virtual void operator () (double Ta, double& DS) = 0;
 
   // Create and Destroy.
 public:
-  static const AttributeList& no_vernalization ();
-  static void load_syntax (Frame&);
-  Vernalization (const AttributeList&);
+  Vernalization (Block&);
   ~Vernalization ();
 };
 

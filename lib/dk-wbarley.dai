@@ -15,7 +15,7 @@ Skabt af Christian Thirup for Daisy standardiseringsprojektet."
       (TempEff2 (0.00  0.000) (10.0  0.140) (15.00  0.66) (20.0  1.00) (25.00  1.23))
   )
 
-  (Vernal
+  (Vernal default
       (DSLim 0.25)
       (TaLim 5.00)
       (TaSum -50.0)

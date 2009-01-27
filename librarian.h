@@ -63,6 +63,7 @@ public:
   static const FrameSubmodel& submodel_frame (symbol);
   static const FrameSubmodel& submodel_frame (load_syntax_t);
   static symbol submodel_name (load_syntax_t);
+  static load_syntax_t submodel_load (symbol);
   static symbol submodel_description (symbol);
   static void declare_submodel (load_syntax_t, symbol name, symbol desc);
   static void submodel_all (std::vector<symbol>&);
@@ -80,6 +81,9 @@ private:
   static Model* build_alist (symbol component,
                              Block& parent, const AttributeList&, 
                              symbol scope_id, size_t index);
+  static Model* build_frame (symbol component,
+                             Metalib&, Treelog&, const FrameModel&, 
+                             symbol scope_id);
   static Model* build_stock (symbol component,
                              Metalib&, Treelog&, symbol name, symbol scope_id);
   static Model* build_item (symbol component,
@@ -119,6 +123,12 @@ public:
     non_null (x);
     return x;
   }
+
+  template <class T> static T* 
+  build_frame (Metalib& metalib, Treelog& msg, const FrameModel& frame,
+               symbol scope_id)
+  { return dynamic_cast<T*> (Librarian::build_frame (T::component, metalib, msg,
+                                                     frame, scope_id)); }
 
   template <class T> static T* 
   build_stock (Metalib& metalib, Treelog& msg, symbol name, symbol scope_id)

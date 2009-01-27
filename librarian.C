@@ -82,6 +82,13 @@ Librarian::submodel_name (const load_syntax_t load_syntax)
   return content->submodel_name (load_syntax); 
 }
 
+Librarian::load_syntax_t
+Librarian::submodel_load (const symbol name)
+{
+  daisy_assert (content);
+  return content->submodel_load (name); 
+}
+
 symbol
 Librarian::submodel_description (const symbol name)
 { 
@@ -177,6 +184,30 @@ Librarian::build_alist (const symbol component,
 }
 
 Model* 
+Librarian::build_frame (const symbol component, Metalib& metalib,
+                        Treelog& msg, const FrameModel& frame,
+                        const symbol scope_id)
+{
+  // Check.
+  {
+    TreelogString tlog;
+    if (!frame.check (metalib, tlog))
+      {
+        msg.error (tlog.str ());
+        return NULL;
+      }
+  }
+  
+  // Build.
+  Block parent (metalib, msg, frame, scope_id);
+  const symbol type = frame.name ("type");
+  std::auto_ptr<Model> m (frame.construct (parent, type)); 
+  if (!parent.ok ())
+    return NULL;
+  return m.release ();
+}
+
+Model* 
 Librarian::build_stock (const symbol component, Metalib& metalib,
                         Treelog& msg, const symbol type, 
                         const symbol scope_id)
@@ -193,20 +224,8 @@ Librarian::build_stock (const symbol component, Metalib& metalib,
   const FrameModel& frame_model = lib.model (type);
   FrameModel frame (frame_model, FrameModel::parent_copy);
   frame.alist ().add ("type", type);
-  {
-    TreelogString tlog;
-    if (!frame.check (metalib, tlog))
-      {
-        msg.error (tlog.str ());
-        return NULL;
-      }
-  }
-  
-  Block parent (metalib, msg, frame, scope_id + ": " + type);
-  std::auto_ptr<Model> m (frame.construct (parent, type)); 
-  if (!parent.ok ())
-    return NULL;
-  return m.release ();
+ 
+  return build_frame (component, metalib, msg, frame, scope_id + ": " + type);
 }
 
 Model* 

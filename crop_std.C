@@ -65,7 +65,7 @@ struct CropStandard : public Crop
   std::auto_ptr<Time> last_time;
   std::auto_ptr<Phenology> development;
   const Partition partition;
-  Vernalization vernalization;
+  std::auto_ptr<Vernalization> vernalization;
   const std::auto_ptr<Photo> photo;
   CrpN nitrogen;
   const std::auto_ptr<WSE> water_stress_effect;
@@ -580,7 +580,7 @@ CropStandard::tick (Metalib& metalib,
 
   development->tick_daily (bioclimate.daily_air_temperature (), 
                            production.leaf_growth (), production, 
-                           vernalization, harvesting->cut_stress, msg);
+                           *vernalization, harvesting->cut_stress, msg);
   root_system->tick_daily (geo, soil, 
                            production.WRoot, production.root_growth (),
                            DS, msg);
@@ -758,8 +758,7 @@ CropStandard::output (Log& log) const
   daisy_assert (last_time.get ());
   output_submodule (*last_time, "last_time", log);
   output_derived (development, "Devel", log);
-  if (vernalization.required)	// Test needed for checkpoint.
-    output_submodule (vernalization, "Vernal", log);
+  output_derived (vernalization, "Vernal", log);
   output_derived (photo, "LeafPhot", log);
   output_submodule (nitrogen, "CrpN", log);
 }
@@ -792,9 +791,7 @@ CropStandard::CropStandard (Block& al)
                : NULL),
     development (Librarian::build_item<Phenology> (al, "Devel")),
     partition (al.alist ("Partit")),
-    vernalization (al.check ("Vernal")
-                   ? al.alist ("Vernal")
-                   : Vernalization::no_vernalization ()),
+    vernalization (Librarian::build_item<Vernalization> (al, "Vernal")),
     photo (Librarian::build_item<Photo> (al, "LeafPhot")),
     nitrogen (al.alist ("CrpN")),
     water_stress_effect (find_WSE (al, *photo)),
@@ -843,8 +840,10 @@ static struct CropStandardSyntax : public DeclareModel
                        "Development and phenology.");
     frame.add_submodule ("Partit", Value::Const,
                           "Assimilate partitioning.", Partition::load_syntax);
-    frame.add_submodule ("Vernal", Value::OptionalState, 
-                          "Vernalization.", Vernalization::load_syntax);
+    frame.add_object ("Vernal", Vernalization::component, 
+                      Value::State, Value::Singleton, "\
+Vernalization.");
+    frame.add ("Vernal", "none");
     frame.add_object ("LeafPhot", Photo::component,
                        Value::Const, Value::Singleton,
                        "Leaf photosynthesis.");

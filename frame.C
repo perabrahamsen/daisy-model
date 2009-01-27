@@ -21,6 +21,7 @@
 #define BUILD_DLL
 
 #include "frame.h"
+#include "frame_model.h"
 #include "syntax.h"
 #include "block.h"
 #include "assertion.h"
@@ -270,7 +271,7 @@ Frame::add (const symbol key,
 { impl->syntax.add (key, domain, range, check, cat, size, description); }
 
 void 
-Frame::add_object (const symbol key, const char* lib,
+Frame::add_object (const symbol key, const symbol lib,
                    Value::category cat, int size, const symbol description)
 { impl->syntax.add_object (key, lib, cat, size, description); }
 
@@ -287,7 +288,7 @@ Frame::add_submodule (const symbol name,
   impl->syntax.add (name, load_syntax, cat, Value::Singleton, description);
   if (cat == Value::Const || cat == Value::State)
     // TODO: Move this to Frame::alist (name) (must return const first).
-    impl->alist.add (name, impl->syntax.default_frame (name).alist ());
+    impl->alist.add (name, impl->syntax.default_frame (name));
 }
 
 void 
@@ -461,13 +462,22 @@ Frame::alist (const symbol key) const
     return impl->alist.alist (key);
 }
 
-Frame& 
+const Frame& 
 Frame::frame (const symbol key) const
 { 
-  if (parent () && !impl->alist.check (key))
+  if (impl->alist.check (key))
+    return impl->alist.frame (key);
+  else if (parent () && parent ()->check (key))
     return parent ()->frame (key);
   else
-    return impl->alist.frame (key);
+    return default_frame (key);
+}
+
+const FrameModel&
+Frame::model (const symbol key) const
+{
+  const Frame& frame = this->frame (key);
+  return dynamic_cast<const FrameModel&> (frame);
 }
 
 int 
@@ -583,9 +593,10 @@ Frame::add (const symbol key, const symbol name)
       const symbol component = impl->syntax.component (key);
       const Intrinsics& intrinsics = Librarian::intrinsics ();
       intrinsics.instantiate (component, name);
-      AttributeList alist (intrinsics.library (component).lookup (name));
-      alist.add ("type", name);
-      impl->alist.add (key, alist);
+      const FrameModel& old = intrinsics.library (component).model (name);
+      FrameModel child (old, parent_copy);
+      child.alist ().add ("type", name);
+      impl->alist.add (key, child);
       return;
     }
   verify (key, Value::String);
@@ -608,6 +619,17 @@ Frame::add (const symbol key, int value)
 {
   verify (key, Value::Integer);
   impl->alist.add (key, value); 
+}
+
+void 
+Frame::add (const symbol key, const Frame& value)
+{
+  if (lookup (key) == Value::Object)
+    verify (key, Value::Object);
+  else
+    verify (key, Value::AList);
+    
+  impl->alist.add (key, value);
 }
 
 void 
