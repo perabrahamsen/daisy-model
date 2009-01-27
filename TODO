@@ -2,14 +2,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Frame
 
-** ParserFile skal bruge frame.
-
-*** ParserFile::load_list skal bruge  Frame::add (symbol, std::vector<Frame*>&)
-
-
-
-*** Fjern syntax/alist varianter
-
 ** Søg efter andre brug af build_alist og build_free
 
 Erstat med build_frame

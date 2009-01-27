@@ -82,6 +82,12 @@ private:
                              Block& parent, const AttributeList&, 
                              symbol scope_id, size_t index);
   static Model* build_frame (symbol component,
+                             Block&, const FrameModel&, 
+                             symbol scope_id);
+  static Model* build_frame (symbol component,
+                             Block&, const FrameModel&, 
+                             symbol scope_id, size_t index);
+  static Model* build_frame (symbol component,
                              Metalib&, Treelog&, const FrameModel&, 
                              symbol scope_id);
   static Model* build_stock (symbol component,
@@ -123,6 +129,17 @@ public:
     non_null (x);
     return x;
   }
+
+  template <class T> static T* 
+  build_frame (Block& block, const FrameModel& frame, symbol scope_id)
+  { return dynamic_cast<T*> (Librarian::build_frame (T::component, block,
+                                                     frame, scope_id)); }
+
+  template <class T> static T* 
+  build_frame (Block& block, const FrameModel& frame, const symbol scope_id, 
+               const size_t index)
+  { return dynamic_cast<T*> (Librarian::build_frame (T::component, block,
+                                                     frame, scope_id, index)); }
 
   template <class T> static T* 
   build_frame (Metalib& metalib, Treelog& msg, const FrameModel& frame,

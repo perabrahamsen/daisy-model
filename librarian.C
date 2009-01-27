@@ -183,6 +183,22 @@ Librarian::build_alist (const symbol component,
   return frame.construct (parent, type); 
 }
 
+Model*
+Librarian::build_frame (const symbol component,
+                        Block& parent, const FrameModel& frame, 
+                        symbol scope_id)
+{ return frame.construct (parent, scope_id); }
+
+Model*
+Librarian::build_frame (const symbol component,
+                        Block& parent, const FrameModel& frame, 
+                        symbol scope_id, size_t index)
+{
+  std::ostringstream tmp;
+  tmp << scope_id << "[" << index << "]";
+  return frame.construct (parent, tmp.str ()); 
+}
+
 Model* 
 Librarian::build_frame (const symbol component, Metalib& metalib,
                         Treelog& msg, const FrameModel& frame,
