@@ -755,7 +755,8 @@ Frame::add_empty (const symbol key)
       impl->alist.add (key, std::vector<double> ());
       break;
     case Value::AList:
-      impl->alist.add (key, std::vector<const AttributeList*> ());
+    case Value::Object:
+      impl->alist.add (key, std::vector<const Frame*> ());
       break;
     case Value::PLF:
       impl->alist.add (key, std::vector<const PLF*> ());
@@ -768,9 +769,6 @@ Frame::add_empty (const symbol key)
       break;
     case Value::Integer:
       impl->alist.add (key, std::vector<int> ());
-      break;
-    case Value::Object:
-      impl->alist.add (key, std::vector<const AttributeList*> ());
       break;
     case Value::Library:
     case Value::Error:

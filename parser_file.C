@@ -2047,11 +2047,11 @@ ParserFile::Implementation::load_list (Frame& frame)
 	    case Value::Object:
 	      {
 		const Library& lib = frame.library (metalib, name);
-		static const std::vector<const AttributeList*> no_sequence;
-		std::vector<const AttributeList*> sequence;
-		const std::vector<const AttributeList*>& old_sequence
+		static const std::vector<const Frame*> no_sequence;
+		auto_vector<const Frame*> sequence;
+		const std::vector<const Frame*>& old_sequence
 		  = frame.check (name) 
-		  ? frame.alist_sequence (name) 
+		  ? frame.frame_sequence (name) 
 		  : no_sequence;
 		while (!looking_at (')') && good ())
 		  {
@@ -2069,8 +2069,7 @@ ParserFile::Implementation::load_list (Frame& frame)
                         if (!frame.check (name))
                           error ("No originals available");
                         for (size_t i = 0; i < old_sequence.size (); i++)
-                          sequence.push_back (new AttributeList 
-                                              /**/(*old_sequence[i]));
+                          sequence.push_back (&old_sequence[i]->clone ());
                         continue;
                       }
 		    const size_t element = sequence.size ();
@@ -2078,18 +2077,22 @@ ParserFile::Implementation::load_list (Frame& frame)
                     tmp << "In '" << name << "' model #" << element + 1U;
                     Treelog::Open nest (msg, tmp.str ());
 
-		    AttributeList& al 
-		      = (old_sequence.size () > element
-			 ? load_derived (lib, true, old_sequence[element])
-			 : load_derived (lib, true, NULL));
-		    const symbol obj = al.name ("type");
-		    if (obj == error_symbol)
-                      delete &al;
+                    std::auto_ptr<Frame> child;
+                    if (old_sequence.size () > element)
+                      {
+                        const Frame* old_frame = old_sequence[element];
+                        const FrameModel* old_model
+                          = dynamic_cast<const FrameModel*> (old_frame);
+                        daisy_assert (old_model);
+                        child = load_object (lib, true, old_model);
+                      }
                     else
-                      sequence.push_back (&al);
+                      child = load_object (lib, true, NULL);
+
+                    if (child.get ())
+                      sequence.push_back (child.release ());
 		  }
-		atts.add (name, sequence);
-		sequence_delete (sequence.begin (), sequence.end ());
+		frame.add (name, sequence);
 		break;
 	      }
 	    case Value::AList:
