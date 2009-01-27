@@ -81,8 +81,8 @@ public:
   const std::vector<bool>& flag_sequence (symbol key) const;
   const std::vector<int>& integer_sequence (symbol key) const;
   const std::vector<const PLF*>& plf_sequence (symbol key) const;
-  const std::vector<const AttributeList*>& 
-  /**/ alist_sequence (symbol key) const;
+  const std::vector<const AttributeList*>& alist_sequence (symbol key) const;
+  const std::vector<const Frame*>& frame_sequence (symbol key) const;
 
   // Create and Destroy.
   void add (symbol, double);
@@ -108,6 +108,7 @@ public:
   void add (symbol, const std::vector<bool>&);
   void add (symbol, const std::vector<int>&);
   void add (symbol, const std::vector<const AttributeList*>&);
+  void add (symbol, const std::vector<const Frame*>&);
   void add (symbol, const std::vector<const PLF*>&);
 
   void remove (symbol);

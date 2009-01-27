@@ -11,10 +11,43 @@ release.
 ** Major internal restructuring.
 
 A lot of code has been modified, which potentially could mean many new
-bugs.  The most visible non-bug being that the AOM pool is now a
-component, which will cause warnings in some old crop
-parameterizations.  The SMB and SOM pools have also been converted to
-components.  Log parameterisation may have to be adjusted.
+bugs.  
+
+** The individual 'AOM', 'SMB' and 'SOM' pools are now components.
+
+If you specify individual pools, you need to precede the parameters
+with the keyword 'component, like this:
+
+   (defam slurry organic
+     (description "Average based on numbers provided by Torben Bonde, Danish
+   Environmental Protection Agency, approximately 1991.
+   Added by <sha@kvl.dk>, 2000.")
+     (volatilization 0.15 [])
+     (om (component (initial_fraction 0.72 [])
+                    (C_per_N 100 [(g C/cm^3)/(g N/cm^3)])
+                    (turnover_rate 2.0e-4 [h^-1])
+                    (efficiency 0.60 0.60 [])
+                    (fractions 0.0 1.0 0.0 []))
+         (component (initial_fraction 0.18 [])
+                    (turnover_rate 2.0e-3 [h^-1])
+                    (efficiency 0.60 0.60 [])
+                    (fractions 0.0 1.0 0.0 []))
+         (component (C_per_N 11 [(g C/cm^3)/(g N/cm^3)])
+                    (turnover_rate 1.0 [h^-1])
+                    (efficiency 1.0 [])
+                    (fractions 0.0 0.0 1.0 []))))
+
+You may want to use some of the build-in parameterizations, which can
+be found in the reference manual.
+
+** The vernalization crop submodule has been made into a component.
+
+This means you have to specify 'default' before the vernalization
+parameters in the crop parameterisation, like this:
+
+   (Vernal default (DSLim 0.33) (TaLim 5.00) (TaSum -50.0))
+  
+The crop parameterizations distributed with Daisy has been updated.
 
 ** Water transport model failures more discrete.
 

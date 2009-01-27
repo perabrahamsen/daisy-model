@@ -67,7 +67,10 @@ struct AValue
     std::vector<bool>* flag_sequence;
     std::vector<int>* integer_sequence;
     std::vector<const PLF*>* plf_sequence;
-    std::vector<const AttributeList*>* alist_sequence;
+    struct {
+      std::vector<const AttributeList*>* alist_sequence;
+      std::vector<const Frame*>* frame_sequence;
+    } fas;
   };
   Value::type type;
   bool is_sequence;
@@ -151,7 +154,8 @@ struct AValue
       is_sequence (true),
       ref_count (new int (1))
     { }
-  static std::vector<symbol>* new_symbol_vector (const std::vector<std::string>& org)
+  static std::vector<symbol>* 
+  /**/ new_symbol_vector (const std::vector<std::string>& org)
   {
     std::vector<symbol>* copy = new std::vector<symbol> ();
     for (unsigned int i = 0; i < org.size (); i++)
@@ -189,19 +193,30 @@ struct AValue
       is_sequence (true),
       ref_count (new int (1))
     { }
-  std::vector<const AttributeList*>* copy_alists (const std::vector<const AttributeList*>& org)
-  {
-    std::vector<const AttributeList*>* copy = new std::vector<const AttributeList*> ();
-    for (unsigned int i = 0; i < org.size (); i++)
-      copy->push_back (new AttributeList (*org[i]));
-    return copy;
-  }
   AValue (const std::vector<const AttributeList*>& v)
-    : alist_sequence (copy_alists (v)),
-      type (Value::AList),
+    : type (Value::AList),
       is_sequence (true),
       ref_count (new int (1))
-    { }
+  { 
+    fas.alist_sequence = new std::vector<const AttributeList*> ();
+    for (unsigned int i = 0; i < v.size (); i++)
+      fas.alist_sequence->push_back (new AttributeList (*v[i]));
+
+    fas.frame_sequence = NULL;
+  }
+  AValue (const std::vector<const Frame*>& v)
+    : type (Value::AList),
+      is_sequence (true),
+      ref_count (new int (1))
+  { 
+    fas.alist_sequence = new std::vector<const AttributeList*> ();
+    fas.frame_sequence = new std::vector<const Frame*> ();
+    for (unsigned int i = 0; i < v.size (); i++)
+      {
+        fas.alist_sequence->push_back (new AttributeList (v[i]->alist ()));
+        fas.frame_sequence->push_back (&v[i]->clone ());
+      }
+  }
   AValue ()
     : number (-42.42e42),
       type (Value::Error),
@@ -293,8 +308,9 @@ AValue::subset (const Metalib& metalib, const AValue& v, const Syntax& syntax,
 	return *integer_sequence == *v.integer_sequence;
       case Value::AList:
 	{
-	  const std::vector<const AttributeList*>& value = *alist_sequence;
-	  const std::vector<const AttributeList*>& other = *v.alist_sequence;
+	  const std::vector<const AttributeList*>& value = *fas.alist_sequence;
+	  const std::vector<const AttributeList*>& other
+            = *v.fas.alist_sequence;
 
 	  const unsigned int size = value.size ();
 	  if (other.size () != size)
@@ -426,8 +442,15 @@ AValue::cleanup ()
 	    delete number_sequence;
 	    break;
 	  case Value::AList:
-	    sequence_delete (alist_sequence->begin (), alist_sequence->end ());
-	    delete alist_sequence;
+	    sequence_delete (fas.alist_sequence->begin (),
+                             fas.alist_sequence->end ());
+	    delete fas.alist_sequence;
+            if (fas.frame_sequence)
+              {
+                sequence_delete (fas.frame_sequence->begin (),
+                                 fas.frame_sequence->end ());
+                delete fas.frame_sequence;
+              }
 	    break;
 	  case Value::PLF:
 	    sequence_delete (plf_sequence->begin (), plf_sequence->end ());
@@ -520,7 +543,8 @@ AValue::operator= (const AValue& v)
 	integer_sequence = v.integer_sequence;
         break;
       case Value::AList:
-        alist_sequence = v.alist_sequence;
+        fas.alist_sequence = v.fas.alist_sequence;
+        fas.frame_sequence = v.fas.frame_sequence;
         break;
       case Value::PLF:
 	plf_sequence = v.plf_sequence;
@@ -650,7 +674,7 @@ AttributeList::size (const symbol key)	const
     case Value::Number:
       return value.number_sequence->size ();
     case Value::AList:
-      return value.alist_sequence->size ();
+      return value.fas.alist_sequence->size ();
     case Value::PLF:
       return value.plf_sequence->size ();
     case Value::Boolean:
@@ -846,7 +870,18 @@ AttributeList::alist_sequence (const symbol key) const
   const AValue& value = impl.lookup (key);
   value.expect (key, Value::AList);
   value.sequence (key);
-  return *value.alist_sequence;
+  return *value.fas.alist_sequence;
+}
+
+const std::vector<const Frame*>& 
+AttributeList::frame_sequence (const symbol key) const
+{
+  const AValue& value = impl.lookup (key);
+  value.expect (key, Value::AList);
+  value.sequence (key);
+  if (!value.fas.frame_sequence)
+    daisy_panic ("'" + key + "' should have a frame sequence, but doesn't");
+  return *value.fas.frame_sequence;
 }
 
 void 
@@ -937,6 +972,11 @@ AttributeList::add (const symbol key, const std::vector<int>& v)
 void 
 AttributeList::add (const symbol key, 
 		    const std::vector<const AttributeList*>& v)
+{ impl.add (key, AValue (v)); }
+
+void 
+AttributeList::add (const symbol key, 
+		    const std::vector<const Frame*>& v)
 { impl.add (key, AValue (v)); }
 
 void 

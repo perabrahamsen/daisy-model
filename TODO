@@ -4,9 +4,9 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 ** ParserFile skal bruge frame.
 
-*** tilføj Frame::add (symbol, std::vector<Frame*>&)
+*** ParserFile::load_list skal bruge  Frame::add (symbol, std::vector<Frame*>&)
 
-*** ParserFile::load_list skal bruge den
+
 
 *** Fjern syntax/alist varianter
 

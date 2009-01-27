@@ -263,6 +263,7 @@ public:
   void add_strings (symbol key, symbol a, symbol b, symbol c);
   void add (symbol, const std::vector<bool>&);
   void add (symbol, const std::vector<int>&);
+  void add (symbol, const std::vector<const Frame*>&);
   void add (symbol, const std::vector<const PLF*>&);
   void add_empty (symbol);
 

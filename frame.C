@@ -654,17 +654,16 @@ Frame::add (const symbol key, const std::vector<symbol>& value)
       verify (key, Value::Object, value.size ());
       const symbol component = impl->syntax.component (key);
       const Intrinsics& intrinsics = Librarian::intrinsics ();
-      auto_vector<const AttributeList*> alists;
+      auto_vector<const Frame*> frames;
       for (size_t i = 0; i < value.size (); i++)
         {
-          const symbol a = value[i];
-          intrinsics.instantiate (component, a);
-          AttributeList& alist_a 
-            = *new AttributeList (intrinsics.library (component).lookup (a));
-          alist_a.add ("type", a);
-          alists.push_back (&alist_a);
+          const symbol name = value[i];
+          intrinsics.instantiate (component, name);
+          Frame& frame = intrinsics.library (component).model (name).clone ();
+          frame.alist ().add ("type", name);
+          frames.push_back (&frame);
         }
-      impl->alist.add (key, alists);
+      impl->alist.add (key, frames);
       return;
     }
   verify (key, Value::String, value.size ());
@@ -718,6 +717,16 @@ void
 Frame::add (const symbol key, const std::vector<int>& value)
 {
   verify (key, Value::Integer, value.size ());
+  impl->alist.add (key, value); 
+}
+
+void 
+Frame::add (const symbol key, const std::vector<const Frame*>& value)
+{
+  if (lookup (key) == Value::AList)
+    verify (key, Value::AList, value.size ());
+  else
+    verify (key, Value::Object, value.size ());
   impl->alist.add (key, value); 
 }
 
