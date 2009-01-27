@@ -30,7 +30,7 @@
 #include "scope_block.h"
 #include "librarian.h"
 #include "treelog.h"
-#include "frame.h"
+#include "frame_model.h"
 #include <sstream>
 
 struct Block::Implementation
@@ -157,14 +157,14 @@ Block::Implementation::expand_string (Block& block,
                     case Value::Object:
                       {
                         Treelog::Open nest (msg, "${" + key + "}");
-                        const AttributeList& obj = frame.alist (key);
+                        const FrameModel& obj = frame.model (key);
                         const symbol type = obj.name ("type");
                         const Library& library = frame.library (metalib, key);
                         const ScopeBlock scope (block);
                         if (library.name () == symbol (Stringer::component))
                           {
                             const std::auto_ptr<Stringer> stringer 
-                              (Librarian::build_alist<Stringer> (block,
+                              (Librarian::build_frame<Stringer> (block,
                                                                  obj, key));
                             if (!block.ok () 
                                 || !stringer->initialize (block.units (),
@@ -177,7 +177,7 @@ Block::Implementation::expand_string (Block& block,
                         else if (library.name () == symbol (Number::component))
                           {
                             const std::auto_ptr<Number> number 
-                              (Librarian::build_alist<Number> (block, 
+                              (Librarian::build_frame<Number> (block, 
                                                                obj, key));
                             if (!block.ok () 
                                 || !number->initialize (block.units (), scope, 
@@ -431,6 +431,16 @@ Block::frame (const symbol key) const
     return this->frame (impl->expand_reference (key));
 
   return frame.frame (key); 
+}
+
+const FrameModel& 
+Block::model (const symbol key) const
+{ 
+  const Frame& frame = find_frame (key);
+  if (frame.is_reference (key))
+    return this->model (impl->expand_reference (key));
+
+  return frame.model (key); 
 }
 
 int 

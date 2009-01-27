@@ -34,7 +34,7 @@
 #include "scope.h"
 #include "units.h"
 #include "treelog.h"
-#include "frame.h"
+#include "frame_model.h"
 #include <memory>
 
 struct NumberByDepth : public Number
@@ -116,13 +116,13 @@ struct NumberByDepth : public Number
     Time time (9999, 1, 1, 0);
     const Library& wlib = al.metalib ().library (Weather::component);
     const double T = 10.0;
-    AttributeList alist = wlib.lookup (symbol ("none"));
-    alist.add ("average", T);
-    alist.add ("amplitude", 0.0);
-    alist.add ("air_temperature", T);
-    alist.add ("type", "none");
-    std::auto_ptr<Weather> weather (Librarian::build_alist<Weather>
-                                    (al, alist, "initialize"));
+    FrameModel frame (wlib.model ("none"), Frame::parent_copy);
+    frame.add ("average", T);
+    frame.add ("amplitude", 0.0);
+    frame.add ("air_temperature", T);
+    frame.add ("type", "none");
+    std::auto_ptr<Weather> weather (Librarian::build_frame<Weather>
+                                    (al, frame, "initialize"));
     column->initialize (al, output, time, weather.get (), Scope::null ());
     max_depth = column->bottom ();
   }

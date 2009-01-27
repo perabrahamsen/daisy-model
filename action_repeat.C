@@ -26,40 +26,35 @@
 #include "block.h"
 #include "log.h"
 #include "librarian.h"
-#include "frame.h"
+#include "frame_model.h"
+#include <memory>
 
 struct ActionRepeat : public Action
 {
-  const AttributeList repeat;
-  Action* action;
+  const std::auto_ptr<FrameModel> repeat;
+  std::auto_ptr<Action> action;
 
   void tick (const Daisy& daisy, const Scope& scope, Treelog& msg)
   { 
-    if (action)
+    if (action.get ())
       action->tick (daisy, scope, msg); 
   }
 
   void doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
   { 
-    if (action && action->done (daisy, scope, msg))
+    if (action.get () && action->done (daisy, scope, msg))
+	action.reset (NULL);
+    if (!action.get ())
       {
-	delete action;
-	action = NULL;
-      }
-    if (action == NULL)
-      {
-	action = Librarian::build_free<Action> (daisy.metalib, 
-						msg, repeat, "repeat");
+	action.reset(Librarian::build_frame<Action> (daisy.metalib, 
+                                                     msg, *repeat, "repeat"));
 	action->initialize (daisy, scope, msg);
 	if (!action->check (daisy, scope, msg))
-	  {
-	    delete action;
-	    action = NULL;
-	  }
+          action.reset (NULL);
 	else
 	  action->tick (daisy, scope, msg);
       }
-    if (action != NULL)         // Build free may fail.
+    if (action.get ())         // Build free may fail.
       action->doIt (daisy, scope, msg);
   }
 
@@ -68,19 +63,19 @@ struct ActionRepeat : public Action
 
   void output (Log& log) const
   { 
-    if (action)
+    if (action.get ())
       output_derived (action, "do", log);
   }
 
   void initialize (const Daisy& daisy, const Scope& scope, Treelog& msg)
   { 
-    if (action)
+    if (action.get ())
       action->initialize (daisy, scope, msg); 
   }
 
   bool check (const Daisy& daisy, const Scope& scope, Treelog& err) const
   { 
-    if (action)
+    if (action.get ())
       return action->check (daisy, scope, err);
     else
       return true;
@@ -90,23 +85,20 @@ struct ActionRepeat : public Action
   {
     AttributeList alist (al);
     if (!alist.check ("do"))
-      alist.add ("do", alist.alist ("repeat"));
+      alist.add ("do", alist.frame ("repeat"));
     return alist;
   }
 
   ActionRepeat (Block& al)
     : Action (al, add_do (al.alist ())),
-      repeat (al.alist ("repeat")),
+      repeat (&al.model ("repeat").clone ()),
       action (al.check ("do") 
               ? Librarian::build_item<Action> (al, "do")
               : Librarian::build_item<Action> (al, "repeat"))
   { }
 
   ~ActionRepeat ()
-  { 
-    if (action)
-      delete action;
-  }
+  { }
 };
 
 static struct ActionRepeatSyntax : DeclareModel

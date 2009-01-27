@@ -33,6 +33,7 @@ class Metalib;
 class Path;
 class Units;
 class Frame;
+class FrameModel;
 class Syntax;
 class PLF;
 class AttributeList;
@@ -90,6 +91,7 @@ public:
   const PLF& plf (symbol) const;
   AttributeList& alist (symbol) const;
   const Frame& frame (symbol) const;
+  const FrameModel& model (symbol) const;
   int integer (symbol) const;
   int integer (symbol, int default_value) const;
   const std::vector<double>& number_sequence (symbol) const;

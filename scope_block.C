@@ -66,8 +66,8 @@ ScopeBlock::dimension (symbol tag) const
   if (!frame.check (block))
     return Value::Unknown ();
     
-  std::auto_ptr<Number> number (Librarian::build_alist<Number>
-                                (block, frame.alist (tag), tag));
+  std::auto_ptr<Number> number (Librarian::build_frame<Number>
+                                (block, frame.model (tag), tag));
   if (!number.get ())
     return Value::Unknown ();
   if (!number->initialize (block.units (), *this, block.msg ()))
@@ -126,8 +126,8 @@ ScopeBlock::has_number (const symbol tag) const
     return false;
   if (!frame.check (block))
     return false;
-  std::auto_ptr<Number> number (Librarian::build_alist<Number>
-                                (block, frame.alist (tag), tag));
+  std::auto_ptr<Number> number (Librarian::build_frame<Number>
+                                (block, frame.model (tag), tag));
   if (!number.get ())
     return false;
   if (!number->initialize (block.units (), *this, block.msg ()))
@@ -156,8 +156,8 @@ ScopeBlock::number (const symbol tag) const
   daisy_assert (frame.library (block.metalib (), tag).name ()
                 == symbol (Number::component));
   daisy_assert (frame.check (block));
-  std::auto_ptr<Number> number (Librarian::build_alist<Number> 
-                                (block, frame.alist (tag), tag));
+  std::auto_ptr<Number> number (Librarian::build_frame<Number> 
+                                (block, frame.model (tag), tag));
   daisy_assert (number.get ());
   daisy_assert (number->initialize (block.units (), *this, block.msg ()));
   daisy_assert (number->check (block.units (), *this, block.msg ()));
@@ -191,8 +191,8 @@ ScopeBlock::has_name (const symbol tag) const
     return false;
   if (!frame.check (block))
     return false;
-  std::auto_ptr<Stringer> stringer (Librarian::build_alist<Stringer>
-                                    (block, frame.alist (tag), tag));
+  std::auto_ptr<Stringer> stringer (Librarian::build_frame<Stringer>
+                                    (block, frame.model (tag), tag));
   if (!stringer.get ())
     return false;
   if (!stringer->initialize (block.units (), *this, block.msg ()))
@@ -221,8 +221,8 @@ ScopeBlock::name (const symbol tag) const
   daisy_assert (frame.library (block.metalib (), tag).name ()
                 == symbol (Stringer::component));
   daisy_assert (frame.check (block));
-  std::auto_ptr<Stringer> stringer (Librarian::build_alist<Stringer> 
-                                (block, frame.alist (tag), tag));
+  std::auto_ptr<Stringer> stringer (Librarian::build_frame<Stringer> 
+                                (block, frame.model (tag), tag));
   daisy_assert (stringer.get ());
   daisy_assert (stringer->initialize (block.units (), *this, block.msg ()));
   daisy_assert (stringer->check (block.units (), *this, block.msg ()));

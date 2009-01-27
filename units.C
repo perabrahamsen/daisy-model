@@ -30,6 +30,7 @@
 #include "librarian.h"
 #include "metalib.h"
 #include "library.h"
+#include "frame_model.h"
 #include <sstream>
 
 // The 'Units' Interface.
@@ -488,10 +489,10 @@ Units::add_unit (Metalib& metalib, const symbol name)
     return;
 
   // Build it.
-  AttributeList alist (library.lookup (name));
-  alist.add ("type", name);
-  this->units[name] = Librarian::build_free<MUnit> (metalib, Treelog::null (),
-                                                    alist, "unit");
+  FrameModel frame (library.model (name), Frame::parent_copy);
+  frame.alist ().add ("type", name);
+  this->units[name] = Librarian::build_frame<MUnit> (metalib, Treelog::null (),
+                                                     frame, "unit");
 }
 
 void

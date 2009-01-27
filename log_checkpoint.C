@@ -30,6 +30,7 @@
 #include "scope.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "treelog.h"
 #include <sstream>
 
 #define USE_PROGRAM
@@ -76,13 +77,15 @@ LogCheckpoint::check_interior (symbol) const
 { return true; }
 
 bool
-LogCheckpoint::match (const Daisy& daisy, Treelog& out)
+LogCheckpoint::match (const Daisy& daisy, Treelog& msg)
 {
   daisy_assert (nested == 0);
-  condition->tick (daisy, Scope::null (), out);
-  is_active = condition->match (daisy, Scope::null (), out);
+  condition->tick (daisy, Scope::null (), msg);
+  is_active = condition->match (daisy, Scope::null (), msg);
   if (is_active)
     {
+      TREELOG_MODEL (msg);
+      msg.message ("Making checkpoint");
       static const symbol daisy_symbol ("daisy");
       push (daisy_symbol, daisy.metalib.syntax (), daisy.alist);
       global_alist = &daisy.metalib.alist ();
