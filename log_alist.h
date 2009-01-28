@@ -26,7 +26,6 @@
 #include <deque>
 
 class Library;
-class Syntax;
 class Frame;
 
 struct LogAList : public Log
@@ -43,8 +42,6 @@ struct LogAList : public Log
   std::deque<symbol> entry_stack; 
   // Library of the object we are logging.
   std::deque<const Library*> library_stack; 
-  // Syntax of the alist we are logging.
-  std::deque<const Syntax*> syntax_stack; 
   // State and parameters of entity.
   std::deque<Frame*> frame_stack; 
   // Ditto for lists.
@@ -55,7 +52,6 @@ struct LogAList : public Log
   // Stack Accessors.
   symbol entry () const;
   const Library& library () const;
-  const Syntax& syntax () const;
   Frame& frame () const;
   std::vector<const Frame*>& frame_sequence ();
   int unnamed ();
@@ -63,11 +59,8 @@ struct LogAList : public Log
   // Stack Constructors.
   void push (symbol entry, 
 	     const Library& library, const Frame& frame);
-  void push (symbol entry, 
-	     const Syntax& syntax, const Frame& frame);
-  void push (symbol entry, 
-	     const Syntax& syntax, 
-	     const Frame& default_frame,
+  void push (symbol entry, const Frame& frame);
+  void push (symbol entry, const Frame& default_frame,
 	     std::vector<const Frame*> frame_sequence);
   void pop ();
 

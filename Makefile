@@ -1282,7 +1282,7 @@ printer_file${OBJ}: printer_file.C printer_file.h printer.h model.h symbol.h \
   metalib.h frame.h scope.h value.h library.h block.h plf.h time.h \
   parser.h path.h assertion.h librarian.h syntax.h alist.h
 log_alist${OBJ}: log_alist.C log_alist.h log.h time.h symbol.h border.h \
-  model.h library.h syntax.h value.h frame.h scope.h assertion.h
+  model.h library.h frame.h scope.h value.h assertion.h
 frame_submodel${OBJ}: frame_submodel.C frame_submodel.h frame.h scope.h \
   value.h symbol.h
 submodeler${OBJ}: submodeler.C submodeler.h block.h symbol.h value.h frame.h \

@@ -2,10 +2,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Frame
 
-** Ret log_alist, log_checkpoint
-
-*** Fjern syntax
-
 ** ret PrinterFile
 
 ** Ret traverse, xref

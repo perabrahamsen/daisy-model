@@ -84,10 +84,7 @@ LogCheckpoint::match (const Daisy& daisy, Treelog& msg)
       msg.message ("Making checkpoint");
       static const symbol daisy_symbol ("daisy");
       global_frame = &daisy.metalib;
-      const Frame& daisy_frame = (global_frame->check ("run")
-                                  ? global_frame->frame ("run") 
-                                  : daisy.frame);
-      push (daisy_symbol, daisy.metalib.syntax (), daisy_frame);
+      push (daisy_symbol, daisy.frame);
       time = daisy.time;
     }
   return is_active;
@@ -100,7 +97,6 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
   if (is_active)
     {
       // Check stacks.
-      daisy_assert (syntax_stack.size () == 1U);
       daisy_assert (frame_stack.size () == 1U);
       daisy_assert (library_stack.size () == 1U);
 
@@ -117,8 +113,10 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
       printer.print_comment (description);
 
       // Print "directory" and "path" before inputs.
-      printer.print_entry (global_frame->alist (), syntax (), "directory");
-      printer.print_entry (global_frame->alist (), syntax (), "path");
+      printer.print_entry (global_frame->alist (), 
+                           global_frame->syntax (), "directory");
+      printer.print_entry (global_frame->alist (), 
+                           global_frame->syntax (), "path");
       frame ().alist ().remove ("directory"); // Avoid printing them twice.
       frame ().alist ().remove ("path"); 
       
@@ -178,7 +176,7 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
       program_alist.add ("type", name);
       AttributeList run_alist;
       run_alist.add ("run", program_alist);
-      printer.print_entry (run_alist, syntax (), "run");
+      printer.print_entry (run_alist, global_frame->syntax (), "run");
       library.remove (name);
 
       if (!printer.good ())
