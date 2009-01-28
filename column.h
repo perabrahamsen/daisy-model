@@ -24,6 +24,7 @@
 #define COLUMN_H
 
 #include "model.h"
+#include <vector>
 
 class Frame;
 class FrameModel;
@@ -41,8 +42,9 @@ class Treelog;
 class Metalib;
 class Block;
 class Scope;
+class AttributeList;
 
-class Column : public ModelAListed
+class Column : public ModelFramed
 {
 public:
   double size;

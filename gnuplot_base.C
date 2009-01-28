@@ -28,6 +28,7 @@
 #include "librarian.h"
 #include "treelog.h"
 #include "syntax.h"
+#include "alist.h"
 
 void 
 GnuplotBase::Size::load_syntax (Frame& frame)

@@ -51,7 +51,7 @@
 #include "column.h"
 #include "librarian.h"
 #include "assertion.h"
-#include "frame.h"
+#include "frame_model.h"
 
 struct ColumnStandard : public Column
 {
@@ -909,21 +909,22 @@ ColumnStandard::initialize (Block& block,
     }
   const Weather& my_weather = weather.get () ? *weather : *global_weather;
   bioclimate->initialize (block, my_weather);
-  soil_heat->initialize (alist.alist ("SoilHeat"), geometry, 
+  daisy_assert (frame.get ());
+  soil_heat->initialize (frame->alist ("SoilHeat"), geometry, 
                          movement->default_heat (*soil, time, my_weather),
                          msg);
 
-  soil_water->initialize (alist.alist ("SoilWater"), 
+  soil_water->initialize (frame->alist ("SoilWater"), 
                           geometry, *soil, *soil_heat, *groundwater, msg);
   
   // Solutes depends on water and heat.
-  chemistry->initialize (scope, alist.alist ("Chemistry"),
+  chemistry->initialize (scope, frame->alist ("Chemistry"),
                          geometry, *soil, *soil_water, *soil_heat, msg);
   
   // Organic matter and vegetation.
   const double T_avg = my_weather.average_temperature ();
   organic_matter->initialize (block.metalib (), 
-                              units, alist.alist ("OrganicMatter"), 
+                              units, frame->alist ("OrganicMatter"), 
                               geometry, *soil, *soil_water, *soil_heat, 
                               T_avg, msg);
   vegetation->initialize (block.metalib (), 

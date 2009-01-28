@@ -25,6 +25,7 @@
 #include "treelog.h"
 #include "frame.h"
 #include "mathlib.h"
+#include "alist.h"
 #include <ostream>
 
 void 

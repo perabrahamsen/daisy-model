@@ -28,6 +28,7 @@
 #include "assertion.h"
 #include "librarian.h"
 #include "frame_submodel.h"
+#include "alist.h"
 
 void 
 Traverse::traverse_all_libraries ()

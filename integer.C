@@ -28,6 +28,7 @@
 #include "librarian.h"
 #include "treelog.h"
 #include "frame.h"
+#include "alist.h"
 #include <sstream>
 
 const char *const Integer::component = "integer";

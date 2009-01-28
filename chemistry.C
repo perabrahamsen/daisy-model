@@ -105,7 +105,7 @@ Chemistry::output (Log&) const
 { }
 
 Chemistry::Chemistry (Block& al)
-  : ModelAListed (al.alist ()),
+  : ModelFramed (al),
     units (al.units ())
 { }
 

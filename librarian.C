@@ -29,6 +29,7 @@
 #include "assertion.h"
 #include "librarian.h"
 #include "frame_model.h"
+#include "alist.h"
 #include <sstream>
 #include <map>
 
@@ -116,78 +117,6 @@ Librarian::submodel_all (std::vector<symbol>& all)
   return content->submodel_all (all); 
 }
   
-#if 0
-Model* 
-Librarian::build_free (const symbol component, Metalib& metalib,
-                       Treelog& msg, const AttributeList& alist, 
-                       symbol scope_id)
-{
-  daisy_assert (alist.check ("type"));
-  const symbol type = alist.name ("type");
-  const Library& lib = metalib.library (component);
-
-  if (!lib.check (type))
-    {
-      std::ostringstream tmp;
-      tmp << "Library '" << lib.name () << "' contains no model '"
-          << type << "'";
-      daisy_panic (tmp.str ());
-    }
-  const FrameModel frame (lib.model (type), alist);
-  {
-    TreelogString tlog;
-    if (!frame.check (metalib, tlog))
-      {
-        msg.error (tlog.str ());
-        return NULL;
-      }
-  }
-  Block parent (metalib, msg, frame, scope_id + ": " + type);
-  std::auto_ptr<Model> m (frame.construct (parent, type)); 
-  if (!parent.ok ())
-    return NULL;
-  return m.release ();
-}
-
-Model* 
-Librarian::build_alist (const symbol component,
-                        Block& parent, const AttributeList& alist, 
-                        symbol scope_id)
-{
-  daisy_assert (alist.check ("type"));
-  const symbol type = alist.name ("type");
-  const Library& lib = parent.metalib ().library (component);
-  if (!lib.check (type))
-    {
-      std::ostringstream tmp;
-      tmp << "Component '" << lib.name () << "' contains no model '"
-          << type << "'";
-      daisy_panic (tmp.str ());
-    }
-  const FrameModel frame (lib.model (type), alist);
-  return frame.construct (parent, type); 
-}
-
-Model* 
-Librarian::build_alist (const symbol component,
-                        Block& parent, const AttributeList& alist, 
-                        symbol scope_id, size_t index)
-{
-  daisy_assert (alist.check ("type"));
-  const symbol type = alist.name ("type");
-  const Library& lib = parent.metalib ().library (component);
-  if (!lib.check (type))
-    {
-      std::ostringstream tmp;
-      tmp << "Component '" << lib.name () << "' contains no model '"
-          << type << "'";
-      daisy_panic (tmp.str ());
-    }
-  const FrameModel frame (lib.model (type), alist);
-  return frame.construct (parent, type); 
-}
-#endif
-
 Model*
 Librarian::build_frame (const symbol component,
                         Block& parent, const FrameModel& frame, 

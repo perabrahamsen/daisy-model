@@ -49,7 +49,7 @@ class Metalib;
 class Treelog;
 class Block;
 
-class EXPORT Log : public ModelAListed
+class EXPORT Log : public ModelFramed
 {
   // Content.
 private:

@@ -30,6 +30,7 @@
 #include "librarian.h"
 #include "block.h"
 #include "treelog.h"
+#include "alist.h"
 #include <sstream>
 #include <iomanip>
 

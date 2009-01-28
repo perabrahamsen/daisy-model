@@ -35,6 +35,7 @@
 #include "librarian.h"
 #include "frame_submodel.h"
 #include "syntax.h"
+#include "alist.h"
 #include <sstream>
 #include <fstream>
 #include <memory>

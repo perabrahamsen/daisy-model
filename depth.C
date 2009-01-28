@@ -36,6 +36,7 @@
 #include "mathlib.h"
 #include "path.h"
 #include "frame.h"
+#include "alist.h"
 #include <string>
 #include <sstream>
 

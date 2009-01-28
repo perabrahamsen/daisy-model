@@ -42,6 +42,7 @@ class Volume;
 class Treelog;
 class Block;
 class Units;
+class Metalib;
 
 class OrganicMatter : public ModelLogable
 {

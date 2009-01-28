@@ -54,6 +54,7 @@
 #include "librarian.h"
 #include "library.h"
 #include "metalib.h"
+#include "alist.h"
 #include <algorithm>
 #include <numeric>
 #include <fstream>
@@ -814,8 +815,9 @@ OrganicStandard::output (Log& log) const
 	  const symbol name = (*item)->real_name ();
 	  if (log.check_entry (name, AM::component))
 	    {
+              daisy_assert ((*item)->frame.get ());
 	      Log::NamedEntry named_entry (log, name, (*item)->name,
-					   (*item)->alist);
+					   (*item)->frame->alist ());
 	      (*item)->output (log);
 	    }
 	}

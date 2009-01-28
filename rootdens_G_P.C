@@ -29,9 +29,8 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include "treelog.h"
-#include "frame_model.h"
-#include "intrinsics.h"
-#include "library.h"
+#include "frame.h"
+#include "alist.h"
 
 #include <sstream>
 
@@ -57,7 +56,6 @@ struct Rootdens_G_P : public Rootdens
   void initialize (const Geometry&, double /* row_width */, double, Treelog&)
   { }
   Rootdens_G_P (Block&);
-  Rootdens_G_P (const Frame&);
 };
 
 double
@@ -230,24 +228,11 @@ Rootdens_G_P::Rootdens_G_P (Block& al)
     L0 (-42.42e42)
 { }
 
-Rootdens_G_P::Rootdens_G_P (const Frame& al)
-  : Rootdens (al),
-    DensRtTip (al.number ("DensRtTip")),
-    MinDens (al.number ("MinDens")),
-    a (-42.42e42),
-    L0 (-42.42e42)
-{ }
-
 std::auto_ptr<Rootdens> 
-Rootdens::create_uniform ()
-{
-  const Intrinsics& intrinsics = Librarian::intrinsics ();
-  const Library& library = intrinsics.library (Rootdens::component);
-  const FrameModel& parent = library.model ("Gerwitz+Page74");
-  FrameModel frame (parent, FrameModel::parent_copy);
-  frame.alist ().add ("type", "Gerwitz+Page74");
-  return std::auto_ptr<Rootdens> (new Rootdens_G_P (frame)); 
-}
+Rootdens::create_uniform (Metalib& metalib, Treelog& msg)
+{ return std::auto_ptr<Rootdens> 
+    (Librarian::build_stock<Rootdens> (metalib, msg, "Gerwitz+Page74",
+                                       "uniform")); }
 
 static struct Rootdens_G_PSyntax : public DeclareModel
 {

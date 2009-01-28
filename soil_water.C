@@ -35,6 +35,7 @@
 #include "assertion.h"
 #include "mathlib.h"
 #include "frame.h"
+#include "alist.h"
 #include <sstream>
 
 void

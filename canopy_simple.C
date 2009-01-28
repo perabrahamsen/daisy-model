@@ -25,6 +25,7 @@
 #include "log.h"
 #include "frame.h"
 #include "librarian.h"
+#include "alist.h"
 
 double
 CanopySimple::EpFactor (double DS) const

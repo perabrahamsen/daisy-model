@@ -32,6 +32,7 @@
 #include "frame.h"
 #include "intrinsics.h"
 #include "library.h"
+#include "alist.h"
 
 struct HorizonStandard : public Horizon
 {

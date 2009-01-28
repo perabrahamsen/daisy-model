@@ -65,7 +65,7 @@ Column::output (Log& log) const
 }
 
 Column::Column (Block& al)
-  : ModelAListed (al.alist ()),
+  : ModelFramed (al),
     size (al.number ("size")),
     location_ (map_submodel_const<Point> (al, "location"))
 { }

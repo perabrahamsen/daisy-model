@@ -31,6 +31,7 @@
 #include "geometry.h"
 #include "mathlib.h"
 #include "block.h"
+#include "alist.h"
 
 const char *const AOM::component = "AOM";
 

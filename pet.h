@@ -37,7 +37,7 @@ class Time;
 class Treelog;
 class Block;
 
-class Pet : public ModelAListed
+class Pet : public ModelFramed
 {
   // Content.
 public:

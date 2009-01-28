@@ -30,6 +30,7 @@
 #include "mathlib.h"
 #include "syntax.h"
 #include "librarian.h"
+#include "alist.h"
 #include <sstream>
 
 const int Geometry::cell_above;

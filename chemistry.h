@@ -41,8 +41,9 @@ class Block;
 class Scope;
 class IM;
 class Units;
+class AttributeList;
 
-class Chemistry : public ModelAListed
+class Chemistry : public ModelFramed
 {
   // Content.
 public:

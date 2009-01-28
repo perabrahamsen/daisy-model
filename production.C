@@ -34,6 +34,7 @@
 #include "mathlib.h"
 #include "frame.h"
 #include "librarian.h"
+#include "alist.h"
 #include <sstream>
 
 // Chemical constants affecting the crop.

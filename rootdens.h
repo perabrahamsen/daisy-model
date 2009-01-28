@@ -32,8 +32,9 @@ class Geometry;
 class Block;
 class Treelog;
 class Syntax;
+class Metalib;
 
-class Rootdens : public ModelAListed
+class Rootdens : public ModelFramed
 {
   // Content.
 public:
@@ -54,16 +55,16 @@ public:
 
   // Create and Destroy.
 public:
-  static std::auto_ptr<Rootdens> create_row (double row_width, 
+  static std::auto_ptr<Rootdens> create_row (Metalib&, Treelog&,
+                                             double row_width, 
                                              double row_position,
                                              bool debug = false);
-  static std::auto_ptr<Rootdens> create_uniform ();
+  static std::auto_ptr<Rootdens> create_uniform (Metalib&, Treelog&);
 public:
   virtual void initialize (const Geometry& geo, 
                            double row_width, double row_position, 
                            Treelog& msg) = 0;
 protected:
-  explicit Rootdens (const Frame&);
   explicit Rootdens (Block&);
 public:
   ~Rootdens ();

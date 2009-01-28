@@ -30,7 +30,7 @@ class Time;
 class Treelog;
 class Block;
 
-class Difrad : public ModelAListed
+class Difrad : public ModelFramed
 {
   // Content.
 public:

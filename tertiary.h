@@ -40,7 +40,7 @@ class Tertsmall;
 class Units;
 class Groundwater;
 
-class Tertiary : public ModelAListed
+class Tertiary : public ModelFramed
 {
   // Identity.
 public:

@@ -26,6 +26,7 @@
 #include "frame.h"
 #include "mathlib.h"
 #include "librarian.h"
+#include "alist.h"
 
 double
 CanopyStandard::specific_LAI (const double DS)

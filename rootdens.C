@@ -36,13 +36,8 @@ Rootdens::library_id () const
   return id;
 }
 
-Rootdens::Rootdens (const Frame& al)
-  : ModelAListed (al.alist ()),
-    SpRtLength (al.number ("SpRtLength"))
-{ }
-
 Rootdens::Rootdens (Block& al)
-  : ModelAListed (al.alist ()),
+  : ModelFramed (al),
     SpRtLength (al.number ("SpRtLength"))
 { }
 

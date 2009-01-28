@@ -24,6 +24,7 @@
 #define BIOCLIMATE_H
 
 #include "model.h"
+#include <vector>
 
 class Surface;
 class Weather;
@@ -42,7 +43,7 @@ class Treelog;
 class Block;
 class Units;
 
-class Bioclimate : public ModelAListed
+class Bioclimate : public ModelFramed
 { 
   // Content.
 public:

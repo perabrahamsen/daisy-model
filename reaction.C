@@ -46,7 +46,7 @@ Reaction::tick (const Units&,
 { }
 
 Reaction::Reaction (Block& al)
-  : ModelAListed (al.alist ())
+  : ModelFramed (al)
 { }
 
 Reaction::~Reaction ()

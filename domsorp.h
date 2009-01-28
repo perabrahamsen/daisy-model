@@ -37,7 +37,7 @@ class Treelog;
 class Syntax;
 class Units;
 
-class Domsorp : public ModelAListed
+class Domsorp : public ModelFramed
 {
   // Content.
 public:

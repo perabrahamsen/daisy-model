@@ -41,6 +41,7 @@
 #include "memutils.h"
 #include "mathlib.h"
 #include "volume.h"
+#include "alist.h"
 #include <sstream>
 
 struct Soil::Implementation

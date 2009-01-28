@@ -39,6 +39,7 @@
 #include "secondary.h"
 #include "treelog.h"
 #include "syntax.h"
+#include "alist.h"
 #include <vector>
 #include <map>
 

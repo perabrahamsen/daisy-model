@@ -28,6 +28,7 @@
 #include "syntax.h"
 #include "frame.h"
 #include "assertion.h"
+#include "alist.h"
 #include <sstream>
 
 bool

@@ -25,6 +25,7 @@
 #define CHEMICAL_H
 
 #include "model.h"
+#include <vector>
 
 class Geometry;
 class Soil;
@@ -40,8 +41,9 @@ class Log;
 class Block;
 class Scope;
 class Units;
+class AttributeList;
 
-class Chemical : public ModelAListed
+class Chemical : public ModelFramed
 {
   // Content.
 public:

@@ -42,6 +42,7 @@
 #include "tertsmall.h"
 #include "treelog.h"
 #include "mathlib.h"
+#include "alist.h"
 
 struct MovementRect : public MovementSolute
 {

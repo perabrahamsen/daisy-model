@@ -36,7 +36,7 @@ class SMB;
 class DOM;
 class Volume;
 
-class OM : public ModelAListed
+class OM : public ModelFramed
 { 
   // Parameters
 public:

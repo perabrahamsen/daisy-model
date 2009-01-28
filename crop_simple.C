@@ -419,7 +419,7 @@ CropSimple::initialize (Metalib& metalib,
   TREELOG_MODEL (msg);
   if (seed >= 0)
     msg.warning ("Seed ignored by simple crop model");
-  root_system->initialize (units, geo, row_width, row_pos, msg);
+  root_system->initialize (metalib, geo, row_width, row_pos, msg);
   CropCAI ();
 }
 

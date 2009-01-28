@@ -73,7 +73,7 @@ Bioclimate::intensity_distribution (const int No, const double LAI,
 }
 
 Bioclimate::Bioclimate (Block& al)
-  : ModelAListed (al.alist ())
+  : ModelFramed (al)
 { }
 
 Bioclimate::~Bioclimate ()

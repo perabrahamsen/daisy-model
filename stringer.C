@@ -29,6 +29,7 @@
 #include "librarian.h"
 #include "treelog.h"
 #include "frame.h"
+#include "alist.h"
 #include <sstream>
 #include <vector>
 #include <memory>

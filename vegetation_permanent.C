@@ -38,6 +38,7 @@
 #include "check.h"
 #include "librarian.h"
 #include "frame.h"
+#include "alist.h"
 #include <sstream>
 #include <deque>
 
@@ -363,15 +364,15 @@ VegetationPermanent::output (Log& log) const
 }
 
 void
-VegetationPermanent::initialize (Metalib&, 
-                                 const Units& units, const Time& time, 
+VegetationPermanent::initialize (Metalib& metalib, 
+                                 const Units&, const Time& time, 
                                  const Geometry& geo,
                                  const Soil& soil, 
 				 OrganicMatter& organic_matter,
                                  Treelog& msg)
 {
   reset_canopy_structure (time);
-  root_system->initialize (units, geo, 0.0, 0.0, msg);
+  root_system->initialize (metalib, geo, 0.0, 0.0, msg);
   root_system->full_grown (geo, soil.MaxRootingHeight (), WRoot, msg);
 
   static const symbol vegetation_symbol ("vegetation");

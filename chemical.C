@@ -67,7 +67,7 @@ Chemical::check_library ()
 }
 
 Chemical::Chemical (Block& al)
-  : ModelAListed (al.alist ())
+  : ModelFramed (al)
 { }
 
 Chemical::~Chemical ()

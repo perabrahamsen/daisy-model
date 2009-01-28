@@ -34,6 +34,7 @@
 #include "assertion.h"
 #include "treelog.h"
 #include "block.h"
+#include "alist.h"
 #include <sstream>
 #include <numeric>
 
@@ -453,7 +454,7 @@ OM::initialize (size_t size)
 }
 
 OM::OM (Block& al)
-  : ModelAListed (al.alist ()),
+  : ModelFramed (al),
     initial_C_per_N (get_initial_C_per_N (al.frame ())),
     turnover_rate (al.check ("turnover_rate")
 		   ? al.number ("turnover_rate")

@@ -31,7 +31,7 @@ class Block;
 class Treelog;
 class Scope;
 
-class Condition : public ModelAListed
+class Condition : public ModelFramed
 {  
   // Content.
 public:

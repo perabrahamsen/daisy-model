@@ -30,6 +30,7 @@
 #include "assertion.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "alist.h"
 #include <numeric>
 #include <sstream>
 

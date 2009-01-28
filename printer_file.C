@@ -33,6 +33,7 @@
 #include "librarian.h"
 #include "frame.h"
 #include "syntax.h"
+#include "alist.h"
 #include <sstream>
 #include <fstream>
 #include <algorithm>

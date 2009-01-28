@@ -31,6 +31,7 @@
 #include "metalib.h"
 #include "library.h"
 #include "frame_model.h"
+#include "alist.h"
 #include <sstream>
 
 // The 'Units' Interface.

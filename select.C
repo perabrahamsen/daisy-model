@@ -30,6 +30,7 @@
 #include "metalib.h"
 #include "library.h"
 #include "syntax.h"
+#include "alist.h"
 #include "frame_submodel.h"
 #include "check.h"
 #include "vcheck.h"

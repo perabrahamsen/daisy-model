@@ -26,6 +26,8 @@
 #include <deque>
 
 class Library;
+class Syntax;
+class AttributeList;
 
 struct LogAList : public Log
 {

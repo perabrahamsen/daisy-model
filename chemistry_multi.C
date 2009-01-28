@@ -29,6 +29,7 @@
 #include "librarian.h"
 #include "vcheck.h"
 #include "frame.h"
+#include "alist.h"
 #include <map>
 #include <sstream>
  

@@ -42,7 +42,7 @@ Condition::timestep ()
 } 
 
 Condition::Condition (Block& al)
-  : ModelAListed (al.alist ())
+  : ModelFramed (al)
 { }
 
 void 
@@ -50,7 +50,7 @@ Condition::initiate_log (const Daisy&)
 { }
 
 Condition::Condition (const char *const id)
-  : ModelAListed (symbol (id))
+  : ModelFramed (symbol (id))
 { }
 
 Condition::~Condition ()

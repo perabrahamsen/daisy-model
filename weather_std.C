@@ -38,6 +38,7 @@
 #include "path.h"
 #include "treelog.h"
 #include "frame.h"
+#include "alist.h"
 #include <vector>
 #include <algorithm>
 #include <numeric>

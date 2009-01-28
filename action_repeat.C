@@ -27,6 +27,7 @@
 #include "log.h"
 #include "librarian.h"
 #include "frame_model.h"
+#include "assertion.h"
 #include <memory>
 
 struct ActionRepeat : public Action
@@ -81,22 +82,17 @@ struct ActionRepeat : public Action
       return true;
   }
 
-  static AttributeList add_do (const AttributeList& al)
-  {
-    AttributeList alist (al);
-    if (!alist.check ("do"))
-      alist.add ("do", alist.frame ("repeat"));
-    return alist;
-  }
-
   ActionRepeat (Block& al)
-    : Action (al, add_do (al.alist ())),
+    : Action (al),
       repeat (&al.model ("repeat").clone ()),
       action (al.check ("do") 
               ? Librarian::build_item<Action> (al, "do")
               : Librarian::build_item<Action> (al, "repeat"))
-  { }
-
+  { 
+    daisy_assert (frame.get ());
+    if (!frame->check ("do"))
+      frame->add ("do", frame->frame ("repeat"));
+  }
   ~ActionRepeat ()
   { }
 };

@@ -34,6 +34,7 @@
 #include "vcheck.h"
 #include "treelog.h"
 #include "frame.h"
+#include "alist.h"
 
 struct ChemistryStandard : public Chemistry
 {

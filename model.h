@@ -23,12 +23,12 @@
 #define MODEL_H
 
 #include "symbol.h"
-#include "alist.h"
-
+#include <memory>
 #include <boost/noncopyable.hpp>
 
 class Log;
 class Frame;
+class FrameModel;
 class Block;
 
 // 'Model' is the base class for all models.
@@ -64,16 +64,16 @@ protected:
   ModelLogable (symbol);
 };
 
-// 'ModelAlisted' is the base class for models that needs to keep
-// track of its own attribute list.  The includes models that are part
+// 'ModelFrame' is the base class for models that needs to keep
+// track of its own attributes.  The includes models that are part
 // of a variable length list, or are created ad-hoc.  Other models
 // will not need to maintain their own attribute lists, as the
 // attribute list of the enclosing frame will be sufficient.
-class ModelAListed : public ModelLogable
+class ModelFramed : public ModelLogable
 {
   // Content.
 public:
-  const AttributeList alist;	// Remember attributes for checkpoint.
+  std::auto_ptr<FrameModel> frame; // Remember attributes for checkpoint.
 
   // Use.
 public:
@@ -82,8 +82,9 @@ public:
   
   // Create and Destroy.
 protected:
-  ModelAListed (const AttributeList&);
-  ModelAListed (symbol);
+  ModelFramed (Block&);
+  ModelFramed (symbol);
+  ~ModelFramed ();
 };
 
 #endif // MODEL_H

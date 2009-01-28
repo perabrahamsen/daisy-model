@@ -238,7 +238,7 @@ CropStandard::initialize (Metalib& metalib,
                           const Time& now, Treelog& msg)
 {
   TREELOG_MODEL (msg);
-  root_system->initialize (units, geo, row_width, row_pos, msg);
+  root_system->initialize (metalib, geo, row_width, row_pos, msg);
   seed->initialize (seed_w, msg);
   initialize_shared (metalib, geo, organic_matter, SoilLimit, now, msg);
 }

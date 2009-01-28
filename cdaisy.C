@@ -44,6 +44,7 @@
 #include "scope.h"
 #include "assertion.h"
 #include "treelog.h"
+#include "frame_model.h"
 #include <string>
 #include <typeinfo>
 
@@ -635,9 +636,10 @@ daisy_column_get_name (const Column* column)
 extern "C" const char* EXPORT
 daisy_column_get_description (const Column* column)
 { 
-  const AttributeList& alist = column->alist; 
-  if (alist.check ("description"))
-    return alist.name ("description").name ().c_str ();
+  daisy_assert (column->frame.get ());
+  const FrameModel& frame = *column->frame; 
+  if (frame.check ("description"))
+    return frame.name ("description").name ().c_str ();
   return "";
 }
 

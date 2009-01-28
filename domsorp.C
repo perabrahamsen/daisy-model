@@ -35,7 +35,7 @@ Domsorp::library_id () const
 }
 
 Domsorp::Domsorp (Block& al)
-  : ModelAListed (al.alist ())
+  : ModelFramed (al)
 { }
 
 Domsorp::~Domsorp ()

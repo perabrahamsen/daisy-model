@@ -35,6 +35,8 @@
 #include "vcheck.h"
 #include "librarian.h"
 #include "frame.h"
+#include "block.h"
+#include "alist.h"
 #include <memory>
 #include <sstream>
 

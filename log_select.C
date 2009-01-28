@@ -37,6 +37,7 @@
 #include "treelog.h"
 #include "frame.h"
 #include "syntax.h"
+#include "alist.h"
 #include <sstream>
 
 bool 

@@ -22,7 +22,9 @@
 
 #include "model.h"
 #include "log.h"
-#include "frame.h"
+#include "frame_model.h"
+#include "assertion.h"
+#include "block.h"
 
 // Base class 'Model'
 
@@ -63,38 +65,45 @@ ModelLogable::ModelLogable (const symbol n)
   : name (n)
 { }
 
-// The 'ModelAListed' Class.
+// The 'ModelFramed' Class.
 
 void 
-ModelAListed::output_as_object (const symbol key, Log& log) const
+ModelFramed::output_as_object (const symbol key, Log& log) const
 {
   const char *const component = library_id ().name ().c_str ();
   if (log.check_derived (key, name, component))
     {
-      Log::Object object (log, key, name, alist, component);
+      daisy_assert (frame.get ());
+      Log::Object object (log, key, name, frame->alist (), component);
       output (log);
     }
 }
 
 void 
-ModelAListed::output_as_entry (Log& log) const
+ModelFramed::output_as_entry (Log& log) const
 {
   const char *const component = library_id ().name ().c_str ();
  
   if (log.check_entry (name, component))
     {
-      Log::Entry entry (log, name, alist, component);
+      daisy_assert (frame.get ());
+      Log::Entry entry (log, name, frame->alist (), component);
       output (log);
     }
 }
 
-ModelAListed::ModelAListed (const AttributeList& al)
+ModelFramed::ModelFramed (Block& al)
   : ModelLogable (al.name ("type")),
-    alist (al)
+    // Block is sometimes fed a temporary frame, thus the need for clone.
+    frame (dynamic_cast<FrameModel*> (&(al.frame ().clone ())))
+{ daisy_assert (frame.get ());  }
+
+ModelFramed::ModelFramed (const symbol n)
+  : ModelLogable (n),
+    frame (NULL)
 { }
 
-ModelAListed::ModelAListed (const symbol n)
-  : ModelLogable (n)
+ModelFramed::~ModelFramed ()
 { }
 
 // model.C ends here.

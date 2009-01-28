@@ -24,6 +24,7 @@
 #include "version.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "alist.h"
 #include <ostream>
 #include <map>
 #include <time.h>

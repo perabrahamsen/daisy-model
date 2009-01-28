@@ -2,7 +2,7 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Frame
 
-** Gør Frame::syntax () const
+** Daisy & Program alist -> ModelFramed?
 
 ** Ret log_alist, log_checkpoint
 
@@ -12,21 +12,31 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 ** fjern alist.add (name, alist) og alist.add (name, alist_sequence)
 
+** Frame::alist () og Frame::syntax () skal returnere const ref.
+
+** Ret check_alist (og check_object)
+
+** Fjern al brug af alist of syntax udenfor frame
+
+** brug parent_link i stedet for parent_copy
+
+Block skal altid fødes med en parent_link frame, fordi vi bruger 
+parent_clone til at gemme.
+
+Måske skal vi have en attribut der skelner mellem midlertidige og
+permanent frames, så vi altid kloner midlertidige?
+
+** Fix FRAME_LINK ifdefs i weather
+
 ** Fjern "type", "base_model", attributes.
 
 Tænk over brug af "description".  Hvad med cite?
 
 *** static root model frame skal definere "cite" og "description".
 
-** Frame::alist () og Frame::syntax () skal returnere const ref.
-
-** Fjern al brug af alist of syntax udenfor frame
-
-** brug parent_link i stedet for parent_copy
-
-** Fix FRAME_LINK ifdefs i weather
-
 ** Integrer syntax/alist i frame
+
+** Behandl FrameModel og FrameSubmodel seperat i Frame.
 
 ** CropOld -> submodels
 
@@ -47,8 +57,6 @@ Metalib:
   Full parameterization
 
 Metalib (parent)
-
-* Fjern default værdier fra kolgen (og filter)
 
 * Omskriv wiki side om kolloider.
 

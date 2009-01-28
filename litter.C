@@ -24,6 +24,7 @@
 #include "librarian.h"
 #include "frame.h"
 #include "check.h"
+#include "alist.h"
 
 void
 Litter::load_syntax (Frame& frame)

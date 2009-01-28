@@ -44,6 +44,7 @@
 #include "submodeler.h"
 #include "secondary.h"
 #include "treelog.h"
+#include "alist.h"
 #include <sstream>
 
 struct ChemicalStandard : public Chemical

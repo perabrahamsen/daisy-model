@@ -27,6 +27,7 @@
 #include "syntax.h"
 #include "librarian.h"
 #include "assertion.h"
+#include "alist.h"
 #include <deque>
 
 class TraverseXRef : public Traverse

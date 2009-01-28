@@ -41,7 +41,7 @@ class Units;
 class Groundwater;
 class IM;
 
-class Biopore : public ModelAListed
+class Biopore : public ModelFramed
 {
   // Identity.
 public:

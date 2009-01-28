@@ -29,6 +29,7 @@
 #include "intrinsics.h"
 #include "library.h"
 #include "memutils.h"
+#include "alist.h"
 #include <vector>
 
 struct Frame::Implementation

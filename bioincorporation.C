@@ -34,6 +34,7 @@
 #include "check.h"
 #include "vcheck.h"
 #include "mathlib.h"
+#include "alist.h"
 #include <algorithm>
 #include <sstream>
 

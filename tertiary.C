@@ -40,7 +40,7 @@ Tertiary::library_id () const
 }
 
 Tertiary::Tertiary (Block& al)
-  : ModelAListed (al.alist ())
+  : ModelFramed (al)
 { }
 
 Tertiary::~Tertiary ()

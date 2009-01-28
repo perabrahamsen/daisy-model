@@ -35,7 +35,7 @@ class Treelog;
 class Block;
 class Units;
 
-class Reaction : public ModelAListed
+class Reaction : public ModelFramed
 {
   // Content.
 public:

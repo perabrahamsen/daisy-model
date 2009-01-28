@@ -33,6 +33,7 @@
 #include "soil.h"
 #include "treelog.h"
 #include "frame.h"
+#include "alist.h"
 
 struct ReactionJarvis99 : public Reaction
 {

@@ -110,7 +110,7 @@ Crop::ds_remove (const Crop* crop)
 { return approximate (crop->DS (), Crop::DSremove); }
 
 Crop::Crop (Block& al)
-  : ModelAListed (al.alist ())
+  : ModelFramed (al)
 { }
 
 Crop::~Crop ()

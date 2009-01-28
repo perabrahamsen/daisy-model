@@ -27,6 +27,7 @@
 #include "assertion.h"
 #include "memutils.h"
 #include "librarian.h"
+#include "alist.h"
 #include "treelog.h"
 
 struct ActionWhile : public Action

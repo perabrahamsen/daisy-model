@@ -230,7 +230,7 @@ Biopore::check_base (const Geometry& geo, Treelog& msg) const
 }
 
 Biopore::Biopore (Block& al)
-  : ModelAListed (al.alist ()),
+  : ModelFramed (al),
     density_expr (Librarian::build_item<Number> (al, "density")),
     height_start (al.number ("height_start")),
     height_end (al.number ("height_end")),

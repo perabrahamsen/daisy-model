@@ -690,7 +690,9 @@ Field::Implementation::output (Log& log) const
     {
       if (log.check_entry ((*i)->name, Column::component))
 	{
-	  Log::Entry open_entry (log, symbol ((*i)->name), (*i)->alist,
+          daisy_assert ((*i)->frame.get ());
+	  Log::Entry open_entry (log, symbol ((*i)->name),
+                                 (*i)->frame->alist (),
 				 Column::component);
 	  (*i)->output (log);
 	}

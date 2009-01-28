@@ -24,6 +24,7 @@
 #include "printer.h"
 #include "block.h"
 #include "librarian.h"
+#include "alist.h"
 
 const char *const Printer::component = "printer";
 

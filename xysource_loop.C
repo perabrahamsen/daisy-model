@@ -30,6 +30,7 @@
 #include "librarian.h"
 #include "treelog.h"
 #include "frame.h"
+#include "alist.h"
 
 class XYSourceLoop : public XYSource
 {

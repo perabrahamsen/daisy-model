@@ -25,6 +25,11 @@
 
 #include "model.h"
 #include "time.h"
+#include "alist.h"
+#include "alist.h"
+#include "alist.h"
+#include "alist.h"
+#include "alist.h"
 #include <vector>
 
 class Log;
@@ -50,7 +55,7 @@ class Block;
 class Units;
 class Metalib;
 
-class Crop : public ModelAListed
+class Crop : public ModelFramed
 {
   // Content.
 public:

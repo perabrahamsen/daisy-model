@@ -36,6 +36,7 @@
 
 struct ProgramGP2D : public Program
 {
+  Metalib& metalib;
   std::auto_ptr<GeometryRect> geo;
   const double row_width;
   const double row_position;
@@ -84,7 +85,7 @@ struct ProgramGP2D : public Program
   {
     // Find it.
     std::auto_ptr<Rootdens> rootdens 
-      = Rootdens::create_row (row_width, row_position, true);
+      = Rootdens::create_row (metalib, msg, row_width, row_position, true);
     rootdens->initialize (*geo, row_width, row_position, msg);
     std::vector<double> Density (geo->cell_size ());
     rootdens->set_density (*geo, soil_depth, crop_depth, crop_width,
@@ -118,6 +119,7 @@ struct ProgramGP2D : public Program
 
   ProgramGP2D (Block& al)
     : Program (al),
+      metalib (al.metalib ()),
       geo (submodel<GeometryRect> (al, "Geometry")),
       row_width (al.number ("row_width")),
       row_position (al.number ("row_position")),

@@ -33,6 +33,7 @@
 #include "check.h"
 #include "assertion.h"
 #include "frame.h"
+#include "alist.h"
 #include <cmath>
 
 symbol 

@@ -32,8 +32,9 @@
 #include "iterative.h"
 #include "treelog.h"
 #include "frame_model.h"
-#include "intrinsics.h"
+#include "metalib.h"
 #include "library.h"
+#include "alist.h"
 
 #include <sstream>
 
@@ -84,7 +85,6 @@ struct Rootdens_GP2D : public Rootdens
   void initialize (const Geometry&, 
                    double row_width, double row_pos, Treelog&);
   explicit Rootdens_GP2D (Block&);
-  explicit Rootdens_GP2D (const Frame&);
 };
 
 void
@@ -390,33 +390,19 @@ Rootdens_GP2D::Rootdens_GP2D (Block& al)
     k (-42.42e42)
 { }
 
-Rootdens_GP2D::Rootdens_GP2D (const Frame& al)
-  : Rootdens (al),
-    debug (al.integer ("debug")),
-    row_position (al.number ("row_position")),
-    row_distance (al.number ("row_distance")),
-    DensRtTip (al.number ("DensRtTip")),
-    DensIgnore (al.number ("DensIgnore", DensRtTip)),
-    a_z (-42.42e42),
-    a_x (-42.42e42),
-    L00 (-42.42e42),
-    k (-42.42e42)
-{ }
-
 std::auto_ptr<Rootdens> 
-Rootdens::create_row (const double row_width, const double row_position,
+Rootdens::create_row (Metalib& metalib, Treelog& msg,
+                      const double row_width, const double row_position,
                       const bool debug)
 {
-  const Intrinsics& intrinsics = Librarian::intrinsics ();
-  const Library& library = intrinsics.library (Rootdens::component);
-  // const FrameModel& parent = library.model ("Gerwitz+Page74");
+  const Library& library = metalib.library (Rootdens::component);
   const FrameModel& parent = library.model ("GP2D");
   FrameModel frame (parent, FrameModel::parent_copy);
   frame.alist ().add ("type", "GP2D");
   frame.add ("row_position", row_position);
   frame.add ("row_distance", row_width);
   frame.add ("debug", debug ? 1 : 0);
-  return std::auto_ptr<Rootdens> (new Rootdens_GP2D (frame)); 
+  return std::auto_ptr<Rootdens> (Librarian::build_frame<Rootdens> (metalib, msg, frame, "row")); 
 }
 
 static struct Rootdens_GP2DSyntax : public DeclareModel

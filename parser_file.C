@@ -39,6 +39,7 @@
 #include "librarian.h"
 #include "frame_model.h"
 #include "frame_submodel.h"
+#include "alist.h"
 #include <set>
 #include <memory>
 #include <sstream>

@@ -29,6 +29,7 @@
 #include "treelog.h"
 #include "librarian.h"
 #include "frame.h"
+#include "alist.h"
 
 struct SelectPF : public Select
 {

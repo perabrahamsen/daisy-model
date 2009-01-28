@@ -61,7 +61,7 @@ Pet::output (Log& log) const
 }
 
 Pet::Pet (Block& al)
-  : ModelAListed (al.alist ())
+  : ModelFramed (al)
 { }
 
 Pet::~Pet ()

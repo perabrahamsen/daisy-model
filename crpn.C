@@ -31,6 +31,7 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include "check.h"
+#include "alist.h"
 #include <sstream>
 
 void

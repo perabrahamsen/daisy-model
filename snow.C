@@ -32,6 +32,7 @@
 #include "librarian.h"
 #include "mathlib.h"
 #include "treelog.h"
+#include "alist.h"
 #include <sstream>
 
 struct Snow::Implementation

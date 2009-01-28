@@ -32,6 +32,7 @@
 #include "soil.h"
 #include "soil_water.h"
 #include "check.h"
+#include "alist.h"
 #include <vector>
 
 struct Ridge::Implementation

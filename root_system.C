@@ -37,6 +37,8 @@
 #include "librarian.h"
 #include "treelog.h"
 #include "frame.h"
+#include "alist.h"
+#include "metalib.h"
 #include <sstream>
 
 double 
@@ -460,7 +462,7 @@ RootSystem::output (Log& log) const
 }
 
 void
-RootSystem::initialize (const Units& units, 
+RootSystem::initialize (Metalib& metalib, 
                         const Geometry& geo, const double row_width, 
                         const double row_pos, Treelog& msg)
 {
@@ -468,12 +470,12 @@ RootSystem::initialize (const Units& units,
   if (rootdens.get ())
     /* We already has a root density model. */;
   else if (is_row_crop)
-    rootdens = Rootdens::create_row (row_width, row_pos);
+    rootdens = Rootdens::create_row (metalib, msg, row_width, row_pos);
   else
-    rootdens = Rootdens::create_uniform ();
+    rootdens = Rootdens::create_uniform (metalib, msg);
 
   rootdens->initialize (geo, row_width, row_pos, msg);
-  initialize (units, geo, msg);
+  initialize (metalib.units (), geo, msg);
 }
 
 void

@@ -29,6 +29,7 @@
 #include "submodeler.h"
 #include "treelog.h"
 #include "frame.h"
+#include "alist.h"
 #include <sstream>
 #include <memory>
 

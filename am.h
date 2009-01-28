@@ -38,8 +38,9 @@ class VCheck;
 class Units;
 class Frame;
 class FrameModel;
+class Metalib;
 
-class AM : public ModelAListed
+class AM : public ModelFramed
 {
   // Content.
 public:

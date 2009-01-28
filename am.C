@@ -40,6 +40,7 @@
 #include "unit.h"
 #include "treelog.h"
 #include "syntax.h"
+#include "alist.h"
 #include <numeric>
 #include <sstream>
 
@@ -932,7 +933,7 @@ AM::is_organic (const Metalib& metalib, const FrameModel& am)
 }
 
 AM::AM (Block& al)
-  : ModelAListed (al.alist ()),
+  : ModelFramed (al),
     impl (new Implementation 
 	  (al.flag ("initialized"),
            al.check ("creation")
@@ -951,8 +952,9 @@ AM::initialize (const Geometry& geo, const double max_rooting_depth)
   for (size_t i = 0; i < impl->om.size (); i++)
     impl->om[i]->initialize (geo.cell_size ());
 
-  if (alist.check ("lock"))
-    impl->lock = new Implementation::Lock (alist.alist ("lock"));
+  daisy_assert (frame.get ());
+  if (frame->check ("lock"))
+    impl->lock = new Implementation::Lock (frame->alist ("lock"));
 
   if (!impl->initialized)
     {
@@ -1054,14 +1056,15 @@ struct AMOrganic : public AM
   void initialize_derived (const Geometry& geo, const double)
   {
     // Get initialization parameters.
-    const double weight = alist.number ("weight") 
-      * alist.number ("dry_matter_fraction") 
+    daisy_assert (frame.get ());
+    const double weight = frame->number ("weight") 
+      * frame->number ("dry_matter_fraction") 
       * 0.01;			// T / ha --> g / cm²
 
-    const double C = weight * alist.number ("total_C_fraction");
-    const double N = weight * alist.number ("total_N_fraction")
-      * (1.0 - (alist.number ("NO3_fraction") 
-                + alist.number ("NH4_fraction")));
+    const double C = weight * frame->number ("total_C_fraction");
+    const double N = weight * frame->number ("total_N_fraction")
+      * (1.0 - (frame->number ("NO3_fraction") 
+                + frame->number ("NH4_fraction")));
     add (C, N);
   }
   AMOrganic (Block& al)
@@ -1119,12 +1122,13 @@ struct AMInitial : public AM
 {
   void initialize_derived (const Geometry& geo, const double)
   {
+    daisy_assert (frame.get ());
     const std::vector<const Frame*>& oms
-      = alist.frame_sequence ("om");
+      = frame->frame_sequence ("om");
     const std::vector<AOM*>& om = impl->om;
 
     const std::vector<const AttributeList*>& layers
-      = alist.alist_sequence ("layers");
+      = frame->alist_sequence ("layers");
 
     double last = 0.0;
     for (size_t i = 0; i < layers.size (); i++)
@@ -1235,15 +1239,16 @@ struct AMRoot : public AM
   void initialize_derived (const Geometry& geo, const double max_rooting_depth)
   {
     // Get paramters.
-    const double weight = alist.number ("weight"); // T DM / ha
-    const double total_C_fraction = alist.number ("total_C_fraction");
-    const double total_N_fraction = alist.number ("total_N_fraction");
+    daisy_assert (frame.get ());
+    const double weight = frame->number ("weight"); // T DM / ha
+    const double total_C_fraction = frame->number ("total_C_fraction");
+    const double total_N_fraction = frame->number ("total_N_fraction");
     const double C = weight * 1000.0*1000.0 / (100.0*100.0*100.0*100.0)
       * total_C_fraction; // g C / cm²;
     const double N = weight * 1000.0*1000.0 / (100.0*100.0*100.0*100.0)
       * total_N_fraction; // g C / cm²;
-    const double k = M_LN2 / alist.number ("dist");
-    const double depth = alist.number ("depth", max_rooting_depth);
+    const double k = M_LN2 / frame->number ("dist");
+    const double depth = frame->number ("depth", max_rooting_depth);
     daisy_assert (depth < 0.0);
 
     // Calculate density.

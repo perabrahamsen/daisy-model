@@ -29,15 +29,16 @@
 #include <memory>
 
 class Frame;
-struct Geometry;
-struct Soil;
-struct SoilWater;
-struct Chemical;
-struct Chemistry;
-struct Log;
-struct AttributeList;
-struct Syntax;
-struct Units;
+class Geometry;
+class Soil;
+class SoilWater;
+class Chemical;
+class Chemistry;
+class Log;
+class AttributeList;
+class Syntax;
+class Metalib;
+class Units;
 
 class RootSystem
 {
@@ -133,7 +134,7 @@ public:
 
   // Create and Destroy
 public:
-  void initialize (const Units&, const Geometry& geo, 
+  void initialize (Metalib&, const Geometry& geo, 
                    double row_width, double row_pos, Treelog& msg);
   void initialize (const Units&, const Geometry& geo, Treelog& msg);
   bool check (const Units&, Treelog& msg) const;

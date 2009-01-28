@@ -55,12 +55,14 @@ Action::check (const Daisy&, const Scope&, Treelog&) const
 { return true; }
 
 Action::Action (Block& al)
-  : ModelAListed (al.alist ())
+  : ModelFramed (al)
 { }
 
+#if 0
 Action::Action (Block&, const AttributeList& al)
-  : ModelAListed (al)
+  : ModelFramed (al)
 { }
+#endif
 
 Action::~Action ()
 { }

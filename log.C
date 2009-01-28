@@ -28,6 +28,7 @@
 #include "daisy.h"
 #include "assertion.h"
 #include "librarian.h"
+#include "alist.h"
 #include <sstream>
 #include <list>
 #include <string>
@@ -183,12 +184,12 @@ Log::initialize_common (const Metalib& metalib, Treelog& msg)
 }
 
 Log::Log (Block& al)
-  : ModelAListed (al.alist ()),
+  : ModelFramed (al),
     impl (new Implementation ())
 { }
 
 Log::Log (const char *const id)
-  : ModelAListed (symbol (id)),
+  : ModelFramed (symbol (id)),
     impl (new Implementation ())
 { }
 
