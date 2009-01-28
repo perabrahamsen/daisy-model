@@ -70,7 +70,7 @@ public:
 public:
   void reset ();
   explicit Metalib (load_frame_t);
-  Metalib& clone () const;
+  Frame& clone () const;
   ~Metalib ();
 };
 

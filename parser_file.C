@@ -53,7 +53,7 @@ struct ParserFile::Implementation
   Treelog& msg;
 
   // Inputs.
-  auto_vector<const AttributeList*> inputs;
+  auto_vector<const Frame*> inputs;
 
   // Lexer.
   const symbol file;
@@ -987,7 +987,7 @@ ParserFile::Implementation::load_list (Frame& frame)
                         parser->load_nested ();
                       lexer->error_count += parser->error_count ();
                     }
-		  inputs.push_back (new AttributeList (child->alist ()));
+		  inputs.push_back (&child->clone ());
 		}
 	      else
                 frame.add (name, *child);
@@ -1384,7 +1384,7 @@ ParserFile::Implementation::Implementation (Metalib& mlib,
                                             Treelog& treelog)
   : metalib (mlib),
     msg (treelog),
-    inputs (std::vector<const AttributeList*> ()),
+    inputs (std::vector<const Frame*> ()),
     file (filename),
     owned_stream (mlib.path ().open_file (filename.name ())),
     lexer (new Lexer (filename.name (), *owned_stream, msg))

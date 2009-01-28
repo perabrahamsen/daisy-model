@@ -49,8 +49,6 @@ public:
   FrameModel (const FrameModel&, parent_link_t);
   FrameModel (const FrameModel&, parent_copy_t);
   FrameModel (const FrameModel&, parent_clone_t);
-  FrameModel (const FrameModel&, const AttributeList&); // build_alist, add_d)
-  FrameModel (const FrameModel&, const Syntax&, const AttributeList&); // add_d
   FrameModel& clone () const;
   ~FrameModel ();
 };

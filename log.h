@@ -48,6 +48,7 @@ class Vegetation;
 class Metalib;
 class Treelog;
 class Block;
+class Frame;
 
 class EXPORT Log : public ModelFramed
 {
@@ -163,14 +164,14 @@ public:
   private:
     Log& ll;
   public:
-    AList (Log& l, symbol name, const AttributeList& alist)
+    AList (Log& l, symbol name, const Frame& alist)
       : ll (l)
     { ll.open_alist (name, alist); }
     ~AList ()
     { ll.close_alist (); }
   };
 private:
-  virtual void open_alist (symbol name, const AttributeList& alist);
+  virtual void open_alist (symbol name, const Frame& alist);
   virtual void close_alist ();
   friend struct Log::AList;
 
@@ -202,7 +203,7 @@ public:
     Log& ll;
   public:
     Object (Log& l, const symbol field, const symbol type, 
-            const AttributeList& alist, const char *const library)
+            const Frame& alist, const char *const library)
       : ll (l)
     { ll.open_object (field, type, alist, library); }
     ~Object ()
@@ -210,7 +211,7 @@ public:
   };
 private:
   virtual void open_object (symbol field, symbol type, 
-			    const AttributeList& alist, 
+			    const Frame& alist, 
 			    const char* library) = 0;
   virtual void close_object () = 0;
   friend struct Log::Object;
@@ -223,14 +224,14 @@ public:
     Log& ll;
   public:
     Entry (Log& l, const symbol type,
-	   const AttributeList& alist, const char *const library)
+	   const Frame& alist, const char *const library)
       : ll (l)
     { ll.open_entry (type, alist, library); }
     ~Entry ()
     { ll.close_entry (); }
   };
 private:
-  virtual void open_entry (symbol type, const AttributeList&, 
+  virtual void open_entry (symbol type, const Frame&, 
 			   const char* library) = 0;
   virtual void close_entry () = 0;
   friend struct Log::Entry;
@@ -243,7 +244,7 @@ public:
     Log& ll;
   public:
     NamedEntry (Log& l, symbol name, symbol type, 
-		const AttributeList& alist)
+		const Frame& alist)
       : ll (l)
     { ll.open_named_entry (name, type, alist); }
     ~NamedEntry ()
@@ -251,7 +252,7 @@ public:
   };
 private:
   virtual void open_named_entry (symbol name, symbol type,
-				 const AttributeList&) = 0;
+				 const Frame&) = 0;
   virtual void close_named_entry () = 0;
   friend struct Log::NamedEntry;
 
@@ -290,7 +291,7 @@ public:
 
   // Utilities
 public:
-  static void print_dlf_header (std::ostream& out, const AttributeList& al);
+  static void print_dlf_header (std::ostream& out, const Frame& al);
 
   // Self use.
 public:

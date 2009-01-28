@@ -817,7 +817,7 @@ OrganicStandard::output (Log& log) const
 	    {
               daisy_assert ((*item)->frame.get ());
 	      Log::NamedEntry named_entry (log, name, (*item)->name,
-					   (*item)->frame->alist ());
+					   *(*item)->frame);
 	      (*item)->output (log);
 	    }
 	}

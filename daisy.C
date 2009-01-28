@@ -46,6 +46,7 @@
 #include "librarian.h"
 #include "metalib.h"
 #include "treelog.h"
+#include "frame_model.h"
 #include <sstream>
 
 const char *const Daisy::default_description = "\
@@ -244,6 +245,7 @@ Daisy::check (Treelog& msg)
 Daisy::Daisy (Block& al)
   : Program (al),
     metalib (al.metalib ()),
+    frame (dynamic_cast<const FrameModel&> (al.frame ())),
     running (false),
     output_log (new Output (al)),
     scopesel (Librarian::build_item<Scopesel> (al, "scope")),

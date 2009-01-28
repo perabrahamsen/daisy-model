@@ -28,7 +28,6 @@
 #include "syntax.h"
 #include "frame.h"
 #include "assertion.h"
-#include "alist.h"
 #include <sstream>
 
 bool
@@ -62,19 +61,19 @@ LogAList::syntax () const
   return *syntax_stack.front ();
 }
 
-AttributeList&
-LogAList::alist () const
+Frame&
+LogAList::frame () const
 {
-  daisy_assert (alist_stack.size () > 0U);
-  daisy_assert (alist_stack.front ());
-  return *alist_stack.front ();
+  daisy_assert (frame_stack.size () > 0U);
+  daisy_assert (frame_stack.front ());
+  return *frame_stack.front ();
 }
 
-std::vector<const AttributeList*>&
-LogAList::alist_sequence ()
+std::vector<const Frame*>&
+LogAList::frame_sequence ()
 {
-  daisy_assert (alist_sequence_stack.size () > 0U);
-  return alist_sequence_stack.front ();
+  daisy_assert (frame_sequence_stack.size () > 0U);
+  return frame_sequence_stack.front ();
 }
 
 int
@@ -85,38 +84,38 @@ LogAList::unnamed ()
 }
 
 void
-LogAList::push (symbol entry, const Library& library, const AttributeList& alist)
+LogAList::push (symbol entry, const Library& library, const Frame& frame)
 {
   entry_stack.push_front (entry);
   library_stack.push_front (&library);
   syntax_stack.push_front (NULL);
-  alist_stack.push_front (new AttributeList (alist));
-  alist_sequence_stack.push_front (std::vector<const AttributeList*> ());
+  frame_stack.push_front (&frame.clone ());
+  frame_sequence_stack.push_front (std::vector<const Frame*> ());
   unnamed_stack.push_front (-1);
 }
 
 void
-LogAList::push (symbol entry, const Syntax& syntax, const AttributeList& alist)
+LogAList::push (symbol entry, const Syntax& syntax, const Frame& frame)
 {
   entry_stack.push_front (entry);
   library_stack.push_front (NULL);
   syntax_stack.push_front (&syntax);
-  alist_stack.push_front (new AttributeList (alist));
-  alist_sequence_stack.push_front (std::vector<const AttributeList*> ());
+  frame_stack.push_front (&frame.clone ());
+  frame_sequence_stack.push_front (std::vector<const Frame*> ());
   unnamed_stack.push_front (-1);
 }
 
 void
 LogAList::push (symbol entry, 
 		const Syntax& syntax, 
-		const AttributeList& default_alist,
-		std::vector<const AttributeList*> alist_sequence)
+		const Frame& default_frame,
+		std::vector<const Frame*> frame_sequence)
 {
   entry_stack.push_front (entry);
   library_stack.push_front (NULL);
   syntax_stack.push_front (&syntax);
-  alist_stack.push_front (new AttributeList (default_alist));
-  alist_sequence_stack.push_front (alist_sequence);
+  frame_stack.push_front (&default_frame.clone ());
+  frame_sequence_stack.push_front (frame_sequence);
   unnamed_stack.push_front (0);
 }
 
@@ -127,17 +126,17 @@ LogAList::pop ()
   daisy_assert (entry_stack.size () > 0);
   daisy_assert (library_stack.size () > 0);
   daisy_assert (syntax_stack.size () > 0);
-  daisy_assert (alist_stack.size () > 0);
-  daisy_assert (alist_sequence_stack.size () > 0);
+  daisy_assert (frame_stack.size () > 0);
+  daisy_assert (frame_sequence_stack.size () > 0);
   daisy_assert (unnamed_stack.size () > 0);
-  daisy_assert (unnamed () < 0 || unnamed () == alist_sequence ().size ());
+  daisy_assert (unnamed () < 0 || unnamed () == frame_sequence ().size ());
 
       // Clear old values.
   entry_stack.pop_front ();
   library_stack.pop_front ();
   syntax_stack.pop_front ();
-  alist_stack.pop_front ();      
-  alist_sequence_stack.pop_front ();      
+  frame_stack.pop_front ();      
+  frame_sequence_stack.pop_front ();      
   unnamed_stack.pop_front ();
 }
 
@@ -179,32 +178,30 @@ LogAList::open (const symbol name)
       if (syntax ().is_state (sname))
 	{
 	  const int size = syntax ().size (sname);
-	  const bool has_value = alist ().check (sname);
+	  const bool has_value = frame ().check (sname);
 	  switch (syntax ().lookup (sname))
 	    {
 	    case Value::AList:
 	      if (size != Value::Singleton && has_value)
 		push (name, 
 		      syntax ().syntax (sname), 
-		      syntax ().default_frame (sname).alist (),
-		      alist ().alist_sequence (sname));
+		      syntax ().default_frame (sname),
+		      frame ().frame_sequence (sname));
 	      else if (size != Value::Singleton || !has_value)
 		push (name, 
 		      syntax ().syntax (sname), 
-		      syntax ().default_frame (sname).alist ());
+		      syntax ().default_frame (sname));
 	      else 
 		push (name, 
 		      syntax ().syntax (sname), 
-		      alist ().alist (sname));
+		      frame ().frame (sname));
 		      
 	      break;
 	    case Value::Object:
               {
-                static const AttributeList empty_alist;
+                const Library& library = syntax ().library (metalib (), sname);
                 daisy_assert (size != Value::Singleton);
-                push (name, 
-                      syntax ().library (metalib (), sname), 
-                      empty_alist);
+                push (name, library, library.frame ("component"));
               }
 	      break;
 	    default:
@@ -224,8 +221,8 @@ LogAList::close ()
   if (is_active)
     {
       // Remember old values.
-      AttributeList& old_alist = alist ();
-      std::vector<const AttributeList*> old_alist_sequence = alist_sequence ();
+      Frame& old_frame = frame ();
+      std::vector<const Frame*> old_frame_sequence = frame_sequence ();
       const symbol old_entry = entry ();
 
       // Pop stack.
@@ -242,18 +239,18 @@ LogAList::close ()
 	    case Value::Object:
 	      // Object sequence.
 	      daisy_assert (syntax ().size (sold_entry) != Value::Singleton);
-	      alist ().add (sold_entry, old_alist_sequence);
+	      frame ().add (sold_entry, old_frame_sequence);
 	      break;
 	    case Value::AList:
 	      // AList sequence or singleton.
 	      if (syntax ().size (sold_entry) == Value::Singleton)
 		{
-		  daisy_assert (old_alist_sequence.size () == 0);
-		  alist ().add (sold_entry, old_alist);
+		  daisy_assert (old_frame_sequence.size () == 0);
+		  frame ().add (sold_entry, old_frame);
 		}
 	      else
-		alist ().add (sold_entry, old_alist_sequence);
-	      delete &old_alist;
+		frame ().add (sold_entry, old_frame_sequence);
+	      delete &old_frame;
 	      break;
 	    default:
 	      daisy_notreached ();
@@ -269,13 +266,13 @@ LogAList::open_unnamed ()
 { 
   if (is_active)
     {
-      if (unnamed () < 0 || unnamed () >= alist_sequence ().size ())
-	// Use default alist.
-	push (entry (), syntax (), alist ());
+      if (unnamed () < 0 || unnamed () >= frame_sequence ().size ())
+	// Use default frame.
+	push (entry (), syntax (), frame ());
       else
 	{
-	  // Use specified alist.
-	  push (entry (), syntax (), *alist_sequence ()[unnamed ()]);
+	  // Use specified frame.
+	  push (entry (), syntax (), *frame_sequence ()[unnamed ()]);
 	}
     }
   else
@@ -287,14 +284,14 @@ LogAList::close_unnamed ()
 {
   if (is_active)
     {
-      AttributeList& old_alist = alist ();
+      Frame& old_frame = frame ();
       pop ();
-      if (unnamed () < 0 || unnamed () >= alist_sequence ().size ())
-	// From default alist.
-	alist_sequence ().push_back (&old_alist);
+      if (unnamed () < 0 || unnamed () >= frame_sequence ().size ())
+	// From default frame.
+	frame_sequence ().push_back (&old_frame);
       else
-	// Replace specified alist.
-	alist_sequence ()[unnamed ()] = &old_alist;
+	// Replace specified frame.
+	frame_sequence ()[unnamed ()] = &old_frame;
       // Use next entry.
       if (unnamed () >= 0)
 	unnamed_stack[0]++;
@@ -308,7 +305,7 @@ LogAList::close_unnamed ()
 }
 
 void 
-LogAList::open_alist (symbol name, const AttributeList& alist)
+LogAList::open_alist (symbol name, const Frame& frame)
 {
   if (is_active)
     {
@@ -316,7 +313,7 @@ LogAList::open_alist (symbol name, const AttributeList& alist)
       daisy_assert (syntax ().lookup (sname) == Value::AList);
       daisy_assert (syntax ().size (sname) == Value::Singleton);
       const Syntax& syn = syntax ().syntax (sname);
-      push (name, syn, alist);
+      push (name, syn, frame);
     }
   else
     open_ignore ();
@@ -327,11 +324,11 @@ LogAList::close_alist ()
 { 
   if (is_active)
     {
-      AttributeList& old_alist = alist ();
+      Frame& old_frame = frame ();
       const std::string& old_entry = entry ().name ();
       pop ();
-      alist ().add (old_entry, old_alist);
-      delete &old_alist;
+      frame ().add (old_entry, old_frame);
+      delete &old_frame;
     }
   else
     close_ignore (); 
@@ -340,14 +337,14 @@ void
 LogAList::open_derived (const symbol field, const symbol type, 
                         const char *const library)
 { 
-  if (!alist ().check (field))
+  if (!frame ().check (field))
     {
       std::ostringstream tmp;
       tmp << "No field '" << field << "' (type " << type
           << ") within library '" << library << "'";
       daisy_panic (tmp.str ());
     }
-  open_object (field, type, alist ().alist (field), library);
+  open_object (field, type, frame ().frame (field), library);
 }
 	
 void
@@ -356,7 +353,7 @@ LogAList::close_derived ()
 
 void
 LogAList::open_object (symbol field, symbol type, 
-                       const AttributeList& alist, const char* lib)
+                       const Frame& frame, const char* lib)
 { 
   if (is_active)
     {
@@ -369,7 +366,7 @@ LogAList::open_object (symbol field, symbol type,
         daisy_panic ("Field '" + sfield + "' containing component '"
                      + library.name () + "' has unknown model '" + type + "'");
       const Syntax& syntax = library.syntax (type);
-      push (field, syntax, alist);
+      push (field, syntax, frame);
     }
   else
     open_ignore ();
@@ -380,21 +377,21 @@ LogAList::close_object ()
 { 
   if (is_active)
     {
-      AttributeList& old_alist = alist ();
+      Frame& old_frame = frame ();
       const std::string& old_entry = entry ().name ();
       pop ();
-      alist ().add (old_entry, old_alist);
-      delete &old_alist;
+      frame ().add (old_entry, old_frame);
+      delete &old_frame;
     }
   else
     close_ignore (); 
 }
 
 void
-LogAList::open_entry (symbol type, const AttributeList& alist, const char*)
+LogAList::open_entry (symbol type, const Frame& frame, const char*)
 {
   if (is_active)
-    push (type, library ().syntax (type), alist);
+    push (type, library ().syntax (type), frame);
   else
     open_ignore (); 
 }
@@ -404,9 +401,9 @@ LogAList::close_entry ()
 {
   if (is_active)
     {
-      AttributeList& old_alist = alist ();
+      Frame& old_frame = frame ();
       pop ();
-      alist_sequence ().push_back (&old_alist);
+      frame_sequence ().push_back (&old_frame);
     }
   else
     close_ignore ();
@@ -414,8 +411,8 @@ LogAList::close_entry ()
 
 void
 LogAList::open_named_entry (const symbol, const symbol type,
-			    const AttributeList& alist)
-{ open_entry (type, alist, NULL); }
+			    const Frame& frame)
+{ open_entry (type, frame, NULL); }
 
 void
 LogAList::close_named_entry ()
@@ -429,7 +426,7 @@ LogAList::output_entry (symbol name, const bool value)
   const std::string& sname = name.name ();
   daisy_assert (!syntax ().is_const (sname));
   if (syntax ().is_state (sname))
-    alist ().add (sname, value);
+    frame ().add (sname, value);
 }
 
 void
@@ -440,7 +437,7 @@ LogAList::output_entry (symbol name, const double value)
   const std::string& sname = name.name ();
   daisy_assert (!syntax ().is_const (sname));
   if (syntax ().is_state (sname))
-    alist ().add (sname, value);
+    frame ().add (sname, value);
 }
 
 void
@@ -451,7 +448,7 @@ LogAList::output_entry (symbol name, const int value)
   const std::string& sname = name.name ();
   daisy_assert (!syntax ().is_const (sname));
   if (syntax ().is_state (sname))
-    alist ().add (sname, value);
+    frame ().add (sname, value);
 }
 
 void
@@ -462,7 +459,7 @@ LogAList::output_entry (symbol name, symbol value)
   const std::string& sname = name.name ();
   daisy_assert (!syntax ().is_const (sname));
   if (syntax ().is_state (sname))
-    alist ().add (sname, value);
+    frame ().add (sname, value);
 }
 
 void
@@ -473,7 +470,7 @@ LogAList::output_entry (symbol name, const std::vector<double>& value)
   const std::string& sname = name.name ();
   daisy_assert (!syntax ().is_const (sname));
   if (syntax ().is_state (sname))
-    alist ().add (sname, value);
+    frame ().add (sname, value);
 }
 
 void
@@ -484,7 +481,7 @@ LogAList::output_entry (symbol name, const PLF& value)
   const std::string& sname = name.name ();
   daisy_assert (!syntax ().is_const (sname));
   if (syntax ().is_state (sname))
-    alist ().add (sname, value);
+    frame ().add (sname, value);
 }
 
 bool
@@ -500,3 +497,4 @@ LogAList::LogAList (Block& al)
 LogAList::~LogAList ()
 { }
 
+// log_alist.C ends here.

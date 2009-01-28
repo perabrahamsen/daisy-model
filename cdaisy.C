@@ -377,6 +377,7 @@ daisy_library_file (const Library* library, const char* name)
   return NULL;
 }
 
+#if 0
 extern "C" void EXPORT
 daisy_library_derive (Toplevel *const toplevel, Library* library, 
 		      const char* super, AttributeList* alist, 
@@ -389,6 +390,7 @@ daisy_library_derive (Toplevel *const toplevel, Library* library,
     }
   library->add_derived (symbol (name), *alist, symbol (super));
 }
+#endif
 
 extern "C" void EXPORT
 daisy_library_remove (Library* library, const char* name)

@@ -254,6 +254,7 @@ void
 Library::add_model (const symbol key, FrameModel& frame)
 { impl->add_model (key, frame); }
 
+#if 0
 void 
 Library::add_derived (const symbol name, AttributeList& al,
 		      const symbol super)
@@ -271,6 +272,7 @@ Library::add_derived (const symbol name, const Syntax& syn, AttributeList& al,
   daisy_assert (check (super));
   impl->add_model (name, *new FrameModel (model (super), syn, al)); 
 }
+#endif 
 
 const Syntax& 
 Library::syntax (const symbol key) const

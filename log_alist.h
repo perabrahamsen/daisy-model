@@ -27,7 +27,7 @@
 
 class Library;
 class Syntax;
-class AttributeList;
+class Frame;
 
 struct LogAList : public Log
 {
@@ -46,29 +46,29 @@ struct LogAList : public Log
   // Syntax of the alist we are logging.
   std::deque<const Syntax*> syntax_stack; 
   // State and parameters of entity.
-  std::deque<AttributeList*> alist_stack; 
+  std::deque<Frame*> frame_stack; 
   // Ditto for lists.
-  std::deque<std::vector<const AttributeList*>/**/> alist_sequence_stack; 
-  // Current element of AList sequence.
+  std::deque<std::vector<const Frame*>/**/> frame_sequence_stack; 
+  // Current element of Frame sequence.
   std::deque<int> unnamed_stack;
 
   // Stack Accessors.
   symbol entry () const;
   const Library& library () const;
   const Syntax& syntax () const;
-  AttributeList& alist () const;
-  std::vector<const AttributeList*>& alist_sequence ();
+  Frame& frame () const;
+  std::vector<const Frame*>& frame_sequence ();
   int unnamed ();
 
   // Stack Constructors.
   void push (symbol entry, 
-	     const Library& library, const AttributeList& alist);
+	     const Library& library, const Frame& frame);
   void push (symbol entry, 
-	     const Syntax& syntax, const AttributeList& alist);
+	     const Syntax& syntax, const Frame& frame);
   void push (symbol entry, 
 	     const Syntax& syntax, 
-	     const AttributeList& default_alist,
-	     std::vector<const AttributeList*> alist_sequence);
+	     const Frame& default_frame,
+	     std::vector<const Frame*> frame_sequence);
   void pop ();
 
   // Nesting.
@@ -79,21 +79,21 @@ struct LogAList : public Log
   void open_unnamed ();		// Items in a AList sequence.
   void close_unnamed ();	
   void open_alist (symbol name, // AList singletons variant.
-		   const AttributeList& alist);
+		   const Frame& frame);
   void close_alist ();
 
   void open_derived (symbol field, // Object singletons.
 		     symbol type, const char* library); 
   void close_derived ();
   void open_object (symbol field, // Object singletons with alist.
-		    symbol type, const AttributeList&, const char* library); 
+		    symbol type, const Frame&, const char* library); 
   void close_object ();
   void open_entry (symbol type,   // Items in an Object sequence.
-		   const AttributeList& alist, const char *const library);
+		   const Frame& frame, const char *const library);
   void close_entry ();
   void open_named_entry (symbol name,   // Named items in an Obj seq.
 			 symbol type, 
-			 const AttributeList& alist);
+			 const Frame& frame);
   void close_named_entry ();
 
   // Logging.

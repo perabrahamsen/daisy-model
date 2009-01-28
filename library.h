@@ -77,10 +77,12 @@ public:
   bool check (symbol) const;
   bool complete (const Metalib&, symbol) const;
   void add_model (symbol, FrameModel&);
+#if 0
   void add_derived (symbol name, AttributeList& al,
 		    symbol super);
   void add_derived (symbol name, const Syntax&, AttributeList& al,
 		    symbol super);
+#endif
   const Syntax& syntax (symbol) const;
   void entries (std::vector<symbol>&) const;
   const std::set<symbol>& ancestors (symbol) const;

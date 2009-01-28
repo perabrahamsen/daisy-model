@@ -141,19 +141,19 @@ struct LogHarvest : public Log
   { daisy_notreached (); }
 
   // Derived items with their own alist
-  void open_object (symbol, symbol, const AttributeList&, const char *const)
+  void open_object (symbol, symbol, const Frame&, const char *const)
   { daisy_notreached (); }
   void close_object ()
   { daisy_notreached (); }
 
   // Derived items in a list.
-  void open_entry (symbol, const AttributeList&, const char*)
+  void open_entry (symbol, const Frame&, const char*)
   { daisy_notreached (); }
   void close_entry ()
   { daisy_notreached (); }
 
   // Named derived items in a list.
-  void open_named_entry (symbol, symbol, const AttributeList&)
+  void open_named_entry (symbol, symbol, const Frame&)
   { daisy_notreached (); }
   void close_named_entry ()
   { daisy_notreached (); }

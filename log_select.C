@@ -144,7 +144,7 @@ LogSelect::close_derived ()
 { close (); close (); }
 
 void 
-LogSelect::open_object (symbol field, symbol type, const AttributeList&,
+LogSelect::open_object (symbol field, symbol type, const Frame&,
 			const char *const library)
 { open_derived (field, type, library); }
 
@@ -153,7 +153,7 @@ LogSelect::close_object ()
 { close_derived (); }
 
 void 
-LogSelect::open_entry (symbol type, const AttributeList&, 
+LogSelect::open_entry (symbol type, const Frame&, 
 		       const char *const library)
 { open_derived_type (type, library); }
 
@@ -163,7 +163,7 @@ LogSelect::close_entry ()
 
 void 
 LogSelect::open_named_entry (symbol name, symbol, 
-			     const AttributeList&)
+			     const Frame&)
 { open (name); }
 
 void 

@@ -273,19 +273,14 @@ protected:
   Frame (const Frame&);
   Frame (const Frame*);
   Frame ();
-  Frame (const Syntax&, const AttributeList&); // Old style.
 public:
+  void overwrite_values (const Frame&); // For using metalib as program frame.
   enum parent_link_t { parent_link };
   enum parent_copy_t { parent_copy }; // OLD: For cloning a library.
   enum parent_clone_t { parent_clone }; // For temporary models.
   virtual Frame& clone () const = 0;
   typedef void (*load_frame_t) (Frame&);
-#if 1
   virtual void reset ();
-#else
-  virtual void reset (load_syntax_t);
-  Frame (load_syntax_t);
-#endif
   virtual ~Frame ();
 };
 

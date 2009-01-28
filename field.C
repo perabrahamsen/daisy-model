@@ -24,7 +24,6 @@
 #include "field.h"
 #include "column.h"
 #include "log.h"
-#include "log_clone.h"
 #include "treelog.h"
 #include "library.h"
 #include "block.h"
@@ -691,8 +690,7 @@ Field::Implementation::output (Log& log) const
       if (log.check_entry ((*i)->name, Column::component))
 	{
           daisy_assert ((*i)->frame.get ());
-	  Log::Entry open_entry (log, symbol ((*i)->name),
-                                 (*i)->frame->alist (),
+	  Log::Entry open_entry (log, symbol ((*i)->name), *(*i)->frame,
 				 Column::component);
 	  (*i)->output (log);
 	}

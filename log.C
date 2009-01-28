@@ -28,7 +28,7 @@
 #include "daisy.h"
 #include "assertion.h"
 #include "librarian.h"
-#include "alist.h"
+#include "frame.h"
 #include <sstream>
 #include <list>
 #include <string>
@@ -101,7 +101,7 @@ Log::close_ordered ()
 { close_unnamed (); }
 
 void 
-Log::open_alist (symbol name, const AttributeList&)
+Log::open_alist (symbol name, const Frame&)
 { open (name); }
 
 void 
@@ -147,7 +147,7 @@ Log::vegetation () const
 
 
 void
-Log::print_dlf_header (std::ostream& out, const AttributeList& al)
+Log::print_dlf_header (std::ostream& out, const Frame& al)
 {
   if (al.check ("parser_files"))
   {

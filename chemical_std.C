@@ -1180,8 +1180,9 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
                                 / Theta_primary);
           M_primary_.push_back (adsorption_->C_to_M (soil, Theta_primary, i, 
                                                      C_primary_[i]));
-          M_total_.push_back (M_primary_[i] 
-                              + Theta_secondary * C_secondary_[i]);
+          if (!has_M_total)
+            M_total_.push_back (M_primary_[i] 
+                                + Theta_secondary * C_secondary_[i]);
         }
       else
         // Averarage concentration and total matter known.
@@ -1202,6 +1203,7 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
   daisy_assert (C_secondary_.size () == cell_size);
   daisy_assert (C_primary_.size () == cell_size);
   daisy_assert (M_primary_.size () == cell_size);
+  daisy_assert (M_total_.size () == cell_size);
   M_error.insert (M_error.begin (), cell_size, 0.0);
   S_secondary_.insert (S_secondary_.begin (), cell_size, 0.0);
   S_primary_.insert (S_primary_.begin (), cell_size, 0.0);
@@ -1221,6 +1223,7 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
   J_matrix.insert (J_matrix.begin (), edge_size, 0.0);
   J_tertiary.insert (J_tertiary.begin (), edge_size, 0.0);
   tillage.insert (tillage.begin (), cell_size, 0.0);
+  daisy_assert (tillage.size () == cell_size);
   lag.insert (lag.end (), cell_size - lag.size (), 0.0);
 }
 

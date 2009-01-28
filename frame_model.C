@@ -102,19 +102,6 @@ FrameModel::FrameModel (const FrameModel& parent, parent_clone_t)
     parent_ (parent.parent ())
 { }
 
-FrameModel::FrameModel (const FrameModel& p, const AttributeList& a)
-  // build_alist
-  : Frame (p.syntax (), a),
-    parent_ (&p)
-{ }
-
-FrameModel::FrameModel (const FrameModel& p, 
-                        const Syntax& s, const AttributeList& a)
-  // add_derived
-  : Frame (s, a),
-    parent_ (&p)
-{ }
-
 FrameModel&
 FrameModel::clone () const
 { return *new FrameModel (*this, parent_clone); }

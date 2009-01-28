@@ -31,14 +31,10 @@
 #include "assertion.h"
 #include "librarian.h"
 #include "treelog.h"
-#include <sstream>
-
-#define USE_PROGRAM
-
-#ifdef USE_PROGRAM
 #include "library.h"
 #include "frame.h"
-#endif
+#include "frame_model.h"
+#include <sstream>
 
 struct LogCheckpoint : public LogAList
 {
@@ -47,7 +43,7 @@ struct LogCheckpoint : public LogAList
   const symbol description;	// Comment to go to the start of the file.
   std::auto_ptr<Condition> condition; // Should we print a log now?
   Time time;			// Time of current checkpoint.
-  const AttributeList* global_alist; // All attributes.
+  const Frame* global_frame; // All attributes.
 
   // Start and end of time step.
   bool check_leaf (symbol) const;
@@ -87,11 +83,11 @@ LogCheckpoint::match (const Daisy& daisy, Treelog& msg)
       TREELOG_MODEL (msg);
       msg.message ("Making checkpoint");
       static const symbol daisy_symbol ("daisy");
-      global_alist = &daisy.metalib.alist ();
-      const AttributeList& daisy_alist = (global_alist->check ("run")
-                                          ? global_alist->alist ("run") 
-                                          : *global_alist);
-      push (daisy_symbol, daisy.metalib.syntax (), daisy_alist);
+      global_frame = &daisy.metalib;
+      const Frame& daisy_frame = (global_frame->check ("run")
+                                  ? global_frame->frame ("run") 
+                                  : daisy.frame);
+      push (daisy_symbol, daisy.metalib.syntax (), daisy_frame);
       time = daisy.time;
     }
   return is_active;
@@ -105,7 +101,7 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
     {
       // Check stacks.
       daisy_assert (syntax_stack.size () == 1U);
-      daisy_assert (alist_stack.size () == 1U);
+      daisy_assert (frame_stack.size () == 1U);
       daisy_assert (library_stack.size () == 1U);
 
       // Create file name.
@@ -121,26 +117,26 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
       printer.print_comment (description);
 
       // Print "directory" and "path" before inputs.
-      printer.print_entry (*global_alist, syntax (), "directory");
-      printer.print_entry (*global_alist, syntax (), "path");
-      alist ().remove ("directory"); // Avoid printing them twice.
-      alist ().remove ("path"); 
+      printer.print_entry (global_frame->alist (), syntax (), "directory");
+      printer.print_entry (global_frame->alist (), syntax (), "path");
+      frame ().alist ().remove ("directory"); // Avoid printing them twice.
+      frame ().alist ().remove ("path"); 
       
       // Print input files.
-      if (global_alist->check ("parser_inputs"))
+      if (global_frame->check ("parser_inputs"))
 	{
-	  const std::vector<const AttributeList*> inputs 
-	    (global_alist->alist_sequence ("parser_inputs"));
+	  const std::vector<const Frame*> inputs 
+	    (global_frame->frame_sequence ("parser_inputs"));
 	  printer.print_comment ("Input files.");
 	  for (unsigned int i = 0; i < inputs.size (); i++)
-	    printer.print_input (*inputs[i]);
+	    printer.print_input (inputs[i]->alist ());
 	}
 
       // Print included files.
-      if (global_alist->check ("parser_files"))
+      if (global_frame->check ("parser_files"))
 	{
 	  const std::vector<symbol> 
-            files (global_alist->name_sequence ("parser_files"));
+            files (global_frame->name_sequence ("parser_files"));
 	  const std::string lib_start = "From file '";
 	  const std::string lib_end = "':";
 	  for (unsigned int i = 0; i < files.size (); i++)
@@ -156,48 +152,34 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
       printer.print_library_file ("*clone*");
 
       // Start checkpoint from next timestep.
-      daisy_assert (alist ().check ("time"));
-      Time time (alist ().alist ("time"));
+      daisy_assert (frame ().check ("time"));
+      Time time (frame ().alist ("time"));
       time.tick_hour ();
       AttributeList new_time;
       time.set_alist (new_time);
-      alist ().add ("time", new_time);
+      frame ().alist ().add ("time", new_time);
 
       // Print content.
       printer.print_comment ("Content");
       
-#ifdef USE_PROGRAM
       Library& library = metalib ().library (Program::component);
       symbol super ("Daisy");
-      if (alist ().check ("type"))
-        super = alist ().name ("type");
+      if (frame ().check ("type"))
+        super = frame ().name ("type");
+      else
+        frame ().alist ().add ("type", super);
       std::string name = super + " Checkpoint";
       while (library.check (name))
         name += "+";
       daisy_assert (library.check (super));
-      library.add_derived (name, alist (), super);
+      library.add_model (name, dynamic_cast<FrameModel&> (frame ().clone ()));
       printer.print_parameterization (Program::component, name);
-#if 1
-      AttributeList program_alist (alist ());
+      AttributeList program_alist (frame ().alist ());
       program_alist.add ("type", name);
       AttributeList run_alist;
       run_alist.add ("run", program_alist);
       printer.print_entry (run_alist, syntax (), "run");
-#else 
-      std::ostringstream tmp;
-      tmp << "(run ";
-      PrinterFile::print_string (tmp, name);
-      tmp << ")";
-      printer.print_comment (tmp.str ());
-#endif
       library.remove (name);
-#else  // !USE_PROGRAM
-      Syntax daisy_syntax;
-      AttributeList default_alist;
-      Daisy::load_syntax (daisy_syntax, default_alist);
-
-      printer.print_alist (alist (), daisy_syntax, default_alist, daisy_syntax);
-#endif // !USE_PROGRAM
 
       if (!printer.good ())
 	{
@@ -206,7 +188,7 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
 	  Assertion::error (tmp.str ());
 	}
       // Close stack.
-      delete &alist ();
+      delete &frame ();
       pop ();
     }
   daisy_assert (nested == 0);

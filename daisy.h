@@ -45,6 +45,7 @@ class Metalib;
 class Scopesel;
 class Scope;
 class Frame;
+class FrameModel;
 
 class Daisy : public Program
 {
@@ -52,6 +53,7 @@ class Daisy : public Program
 public:
   static const char *const default_description;
   Metalib& metalib;
+  const FrameModel& frame;      // For checkpoint.
   const Units& units () const;
 
   // Content.

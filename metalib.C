@@ -148,9 +148,19 @@ Metalib::Metalib (load_frame_t load_frame)
   impl->initialize (*this);
 }
 
-Metalib& 
-Metalib::clone () const
-{ daisy_notreached (); }
+Frame& 
+Metalib::clone () const         // Used by checkpoint.
+{ 
+  struct FrameClone : public Frame
+  {
+    Frame& clone () const 
+    { return *new FrameClone (*this); }
+    FrameClone (const Frame& frame)
+      : Frame (frame)
+    { }
+  };
+  return *new FrameClone (*this); 
+}
 
 Metalib::~Metalib ()
 { }

@@ -74,7 +74,7 @@ ModelFramed::output_as_object (const symbol key, Log& log) const
   if (log.check_derived (key, name, component))
     {
       daisy_assert (frame.get ());
-      Log::Object object (log, key, name, frame->alist (), component);
+      Log::Object object (log, key, name, *frame, component);
       output (log);
     }
 }
@@ -87,7 +87,7 @@ ModelFramed::output_as_entry (Log& log) const
   if (log.check_entry (name, component))
     {
       daisy_assert (frame.get ());
-      Log::Entry entry (log, name, frame->alist (), component);
+      Log::Entry entry (log, name, *frame, component);
       output (log);
     }
 }

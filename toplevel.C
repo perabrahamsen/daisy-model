@@ -36,7 +36,7 @@
 #include "treelog_store.h"
 #include "librarian.h"
 #include "units.h"
-#include "frame.h"
+#include "frame_model.h"
 
 #include <sstream>
 #include <ctime>
@@ -48,6 +48,7 @@ struct Toplevel::Implementation : boost::noncopyable
   const symbol preferred_ui;
   const std::string program_name;
   std::auto_ptr<Program> program;
+  std::auto_ptr<FrameModel> program_frame_owner;
   TreelogStore msg;
   Assertion::Register reg;
   Metalib metalib;
@@ -412,7 +413,21 @@ Toplevel::initialize ()
         if (metalib ().check ("run"))
           impl->program.reset (Librarian::build_item<Program> (block, "run"));
         else
-          impl->program.reset (new Daisy (block));
+          {
+            const Library& library = metalib ().library (Program::component);
+            const FrameModel& old_frame = library.model ("Daisy");
+            std::auto_ptr<FrameModel> frame 
+              (new FrameModel (old_frame, Frame::parent_copy));
+            // Frame::overwrite only gives us the values, not the
+            // types.  This means we avoid all the extra crap in
+            // metalib, but also that we don't get any user defined
+            // types.  Solute:  Use "run".
+            frame->overwrite_values (metalib ());
+            frame->alist ().add ("type", "Daisy");
+            impl->program.reset (Librarian::build_frame<Program> (block, *frame,
+                                                                  "toplevel"));
+            impl->program_frame_owner = frame;
+          }
         if (!block.ok ())
           throw EXIT_FAILURE;
       }

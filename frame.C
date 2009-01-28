@@ -43,10 +43,6 @@ struct Frame::Implementation
   { }
   Implementation ()
   { }
-  Implementation (const Syntax& s, const AttributeList& a)
-    : syntax (s),
-      alist (a)
-  { }
 };
 
 const Frame* 
@@ -790,9 +786,14 @@ Frame::Frame (const Frame *const old)
   : impl (old ? new Implementation (*old->impl) : new Implementation ())
 { }
 
-Frame::Frame (const Syntax& s, const AttributeList& a)
-  : impl (new Implementation (s, a))
-{ }
+void
+Frame::overwrite_values (const Frame& other)
+{ 
+  if (this == &other)
+    return;
+
+  impl->alist = other.impl->alist;
+}
 
 void 
 Frame::reset ()

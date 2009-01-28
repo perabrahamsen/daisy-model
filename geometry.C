@@ -356,7 +356,13 @@ Geometry::add_soil (std::vector<double>& v,
   // Pre-conditions.
   daisy_assert (to < from);
   const size_t cell_size = this->cell_size ();
-  daisy_assert (v.size () == cell_size);
+  if (v.size () != cell_size)
+    {
+      std::ostringstream tmp;
+      tmp << "v has " << v.size () << " elements, but cell size is " 
+          << cell_size;
+      daisy_panic (tmp.str ());
+    }
 
   // Remember old value for post-condition.
   const double old_total = total_soil (v);
