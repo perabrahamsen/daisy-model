@@ -38,7 +38,6 @@ class Program : public Model
   // Content.
 public:
   const symbol name;
-  const AttributeList& alist;  	// Remember attributes for checkpoint.
   static const char *const component;
   symbol library_id () const;
 
@@ -63,9 +62,6 @@ public:
   virtual bool check (Treelog& err) = 0;
 protected:
   explicit Program (Block&);
-private:
-  explicit Program ();
-  explicit Program (const Program&);
 public:
   ~Program ();
 };

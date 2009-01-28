@@ -244,7 +244,6 @@ Daisy::check (Treelog& msg)
 Daisy::Daisy (Block& al)
   : Program (al),
     metalib (al.metalib ()),
-    alist (al.alist ()),
     running (false),
     output_log (new Output (al)),
     scopesel (Librarian::build_item<Scopesel> (al, "scope")),

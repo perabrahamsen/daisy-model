@@ -53,7 +53,6 @@ public:
   static const char *const default_description;
   Metalib& metalib;
   const Units& units () const;
-  const AttributeList alist;
 
   // Content.
   const std::string directory;  // Initialize, check and run here.

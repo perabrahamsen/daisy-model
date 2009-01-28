@@ -1351,7 +1351,7 @@ block${OBJ}: block.C block.h symbol.h value.h metalib.h frame.h scope.h \
   scope_block.h treelog.h frame_model.h
 dlf${OBJ}: dlf.C dlf.h symbol.h volume.h model.h assertion.h version.h \
   daisy.h program.h run.h time.h timestep.h vcheck.h memutils.h alist.h \
-  toplevel.h
+  toplevel.h metalib.h frame.h scope.h value.h
 texture${OBJ}: texture.C texture.h plf.h assertion.h mathlib.h
 destination${OBJ}: destination.C destination.h symbol.h
 symbol${OBJ}: symbol.C symbol.h assertion.h

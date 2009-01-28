@@ -87,8 +87,11 @@ LogCheckpoint::match (const Daisy& daisy, Treelog& msg)
       TREELOG_MODEL (msg);
       msg.message ("Making checkpoint");
       static const symbol daisy_symbol ("daisy");
-      push (daisy_symbol, daisy.metalib.syntax (), daisy.alist);
       global_alist = &daisy.metalib.alist ();
+      const AttributeList& daisy_alist = (global_alist->check ("run")
+                                          ? global_alist->alist ("run") 
+                                          : *global_alist);
+      push (daisy_symbol, daisy.metalib.syntax (), daisy_alist);
       time = daisy.time;
     }
   return is_active;

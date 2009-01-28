@@ -26,6 +26,7 @@
 #include "version.h"
 #include "daisy.h"
 #include "toplevel.h"
+#include "metalib.h"
 #include <time.h>
 #include <ostream>
 
@@ -91,14 +92,17 @@ DLF::finish (std::ostream& out, const Daisy& daisy)
   // No (additional) header.
   if (value == None)
     return;
-
-  const AttributeList& al = daisy.alist;
+  
+  const AttributeList& global_alist = daisy.metalib.alist ();
+  const AttributeList& daisy_alist = global_alist.check ("run")
+    ? global_alist.alist ("run")
+    : global_alist;
 
   // SIMFILE:
-  if (al.check ("parser_files"))
+  if (global_alist.check ("parser_files"))
     {
       const std::vector<symbol>& files 
-        = al.name_sequence ("parser_files");
+        = global_alist.name_sequence ("parser_files");
       if (value == Terse)
         {
           out << "SIMFILE:";
@@ -114,7 +118,7 @@ DLF::finish (std::ostream& out, const Daisy& daisy)
     out << "SIMFILE:\n";
 
   // SIM:
-  const symbol sim_description_s = al.name ("description");
+  const symbol sim_description_s = daisy_alist.name ("description");
   if ((sim_description_s != Daisy::default_description
        && sim_description_s != Toplevel::default_description)
       || value == Terse)
