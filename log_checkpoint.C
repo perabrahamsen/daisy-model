@@ -113,10 +113,8 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
       printer.print_comment (description);
 
       // Print "directory" and "path" before inputs.
-      printer.print_entry (global_frame->alist (), 
-                           global_frame->syntax (), "directory");
-      printer.print_entry (global_frame->alist (), 
-                           global_frame->syntax (), "path");
+      printer.print_entry (*global_frame, "directory");
+      printer.print_entry (*global_frame, "path");
       frame ().alist ().remove ("directory"); // Avoid printing them twice.
       frame ().alist ().remove ("path"); 
       
@@ -127,7 +125,7 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
 	    (global_frame->frame_sequence ("parser_inputs"));
 	  printer.print_comment ("Input files.");
 	  for (unsigned int i = 0; i < inputs.size (); i++)
-	    printer.print_input (inputs[i]->alist ());
+	    printer.print_input (*inputs[i]);
 	}
 
       // Print included files.
@@ -172,11 +170,12 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
       daisy_assert (library.check (super));
       library.add_model (name, dynamic_cast<FrameModel&> (frame ().clone ()));
       printer.print_parameterization (Program::component, name);
-      AttributeList program_alist (frame ().alist ());
-      program_alist.add ("type", name);
-      AttributeList run_alist;
-      run_alist.add ("run", program_alist);
-      printer.print_entry (run_alist, global_frame->syntax (), "run");
+      FrameModel program_frame (FrameModel::root (), Frame::parent_link);
+      program_frame.alist ().add ("type", name);
+      FrameModel run_frame (FrameModel::root (), Frame::parent_link);
+      run_frame.add_object ("run", Program::component, "dummy");
+      run_frame.add ("run", program_frame);
+      printer.print_entry (run_frame, "run");
       library.remove (name);
 
       if (!printer.good ())

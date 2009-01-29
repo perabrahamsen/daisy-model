@@ -43,15 +43,14 @@ public:
   // Print comment.
   void print_comment (symbol comment);
   // Print entry in alist.
-  void print_entry (const AttributeList&, const Syntax&,
-		    const symbol key);
+  void print_entry (const Frame&, const symbol key);
   // Print specific parameterization.
   void print_parameterization (symbol library_name, symbol name, 
                                bool print_description = true);
   // Print all elements in all libraries associated with 'filename'.
   void print_library_file (const std::string& filename);
   // Print a parser input.
-  void print_input (const AttributeList& alist);
+  void print_input (const Frame& alist);
 
   // True iff no errors have occured.
   bool good ();

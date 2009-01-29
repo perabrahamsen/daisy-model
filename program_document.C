@@ -454,7 +454,7 @@ ProgramDocument::print_entry_value (const symbol name,
 	{
 	  std::ostringstream tmp;
 	  PrinterFile printer (metalib, tmp);
-	  printer.print_entry (frame.alist (), frame.syntax (), name);
+	  printer.print_entry (frame, name);
 	  format->soft_linebreak ();
 	  format->verbatim (tmp.str ());
 	  format->text ("Description:");

@@ -31,7 +31,7 @@
 #include "path.h"
 #include "assertion.h"
 #include "librarian.h"
-#include "frame.h"
+#include "frame_model.h"
 #include "syntax.h"
 #include "alist.h"
 #include <sstream>
@@ -770,15 +770,16 @@ PrinterFile::print_comment (const symbol comment_s)
 }
 
 void 
-PrinterFile::print_entry (const AttributeList& alist, const Syntax& syntax,
+PrinterFile::print_entry (const Frame& frame,
 			  const symbol key)
 { 
-  if (alist.check (key))
+  if (frame.check (key))
     {
       const AttributeList empty_alist;
       impl->out << "(" << key << " ";
       const int indent = 2 + key.name ().length ();
-      impl->print_entry (alist, syntax, empty_alist, syntax,
+      impl->print_entry (frame.alist (), frame.syntax (),
+                         empty_alist, frame.syntax (),
                          key, indent, false);
       impl->out << ")\n";
     }
@@ -794,15 +795,16 @@ PrinterFile::print_library_file (const std::string& filename)
 { impl->print_library_file (filename); }
 
 void
-PrinterFile::print_input (const AttributeList& alist)
+PrinterFile::print_input (const Frame& frame)
 {
-  daisy_assert (alist.check ("type"));
-  const symbol type = alist.name ("type");
-  const Syntax& syntax 
-    = impl->metalib.library (Parser::component).syntax (type);
+  daisy_assert (frame.check ("type"));
+  const symbol type = frame.name ("type");
+  const Library& library = impl->metalib.library (Parser::component);
+  const FrameModel& base_frame = library.model (type);
 
   impl->out << "(input " << type << " ";
-  impl->print_alist (alist, syntax, AttributeList (), syntax, 7, false);
+  impl->print_alist (frame.alist (), frame.syntax (), base_frame.alist (),
+                     base_frame.syntax (), 7, false);
   impl->out << ")\n";
 }
 
@@ -810,37 +812,20 @@ bool
 PrinterFile::good ()
 { return impl->good (); }
   
-static const AttributeList& 
-get_file_alist ()
-{
-  static AttributeList alist;
-  if (!alist.check ("type"))
-    alist.add ("type", "file");
-  return alist;
-}
-    
 PrinterFile::PrinterFile (const Metalib& mlib,
                           const symbol filename)
-  : Printer (get_file_alist ()),
+  : Printer ("file"),
     impl (new Implementation (mlib, filename))
 { }
     
-static const AttributeList& 
-get_stream_alist ()
-{
-  static AttributeList alist;
-  if (!alist.check ("type"))
-    alist.add ("type", "stream");
-  return alist;
-}
 PrinterFile::PrinterFile (const Metalib& mlib,
                           std::ostream& stream)
-  : Printer (get_stream_alist ()),
+  : Printer ("stream"),
     impl (new Implementation (mlib, stream))
 { }
     
 PrinterFile::PrinterFile (Block& al)
-  : Printer (al.alist ()),
+  : Printer (al.name ("type")),
     impl (new Implementation (al.metalib (), al.name ("where")))
 { }
     

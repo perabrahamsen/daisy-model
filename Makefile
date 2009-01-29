@@ -1110,8 +1110,8 @@ adsorption${OBJ}: adsorption.C adsorption.h model.h symbol.h block.h value.h \
   librarian.h mathlib.h assertion.h
 tortuosity${OBJ}: tortuosity.C tortuosity.h model.h symbol.h block.h value.h \
   librarian.h
-printer${OBJ}: printer.C printer.h model.h symbol.h block.h value.h \
-  librarian.h alist.h
+printer${OBJ}: printer.C printer.h model.h symbol.h librarian.h frame.h \
+  scope.h value.h
 chemical${OBJ}: chemical.C chemical.h model.h symbol.h block.h value.h \
   librarian.h vcheck.h assertion.h
 pet${OBJ}: pet.C pet.h model.h symbol.h frame.h scope.h value.h block.h log.h \
@@ -1280,7 +1280,7 @@ geometry${OBJ}: geometry.C geometry.h symbol.h value.h volume.h model.h \
   mathlib.h syntax.h librarian.h alist.h
 printer_file${OBJ}: printer_file.C printer_file.h printer.h model.h symbol.h \
   metalib.h frame.h scope.h value.h library.h block.h plf.h time.h \
-  parser.h path.h assertion.h librarian.h syntax.h alist.h
+  parser.h path.h assertion.h librarian.h frame_model.h syntax.h alist.h
 log_alist${OBJ}: log_alist.C log_alist.h log.h time.h symbol.h border.h \
   model.h library.h frame.h scope.h value.h assertion.h
 frame_submodel${OBJ}: frame_submodel.C frame_submodel.h frame.h scope.h \

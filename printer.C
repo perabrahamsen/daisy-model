@@ -22,9 +22,8 @@
 #define BUILD_DLL
 
 #include "printer.h"
-#include "block.h"
 #include "librarian.h"
-#include "alist.h"
+#include "frame.h"
 
 const char *const Printer::component = "printer";
 
@@ -35,8 +34,8 @@ Printer::library_id () const
   return id;
 }
 
-Printer::Printer (const AttributeList& al)
-  : name (al.name ("type"))
+Printer::Printer (const symbol n)
+  : name (n)
 { }
 
 Printer::~Printer ()
@@ -52,3 +51,5 @@ opposite function of the 'parser' component.  This is used for --\n\
 among other things -- creating checkpoints of the state.")
   { }
 } Printer_init;
+
+// printer.C ends here.

@@ -28,8 +28,6 @@
 #include <string>
 
 class Block;
-class AttributeList;
-class Syntax;
 class Frame;
 
 class Printer : public Model
@@ -45,19 +43,18 @@ public:
   // Print comment.
   virtual void print_comment (symbol comment) = 0;
   // Print entry in alist.
-  virtual void print_entry (const AttributeList&, const Syntax&,
-			    const symbol key) = 0;
+  virtual void print_entry (const Frame&, const symbol key) = 0;
   // Print all elements in all libraries associated with 'filename'.
   virtual void print_library_file (const std::string& filename) = 0;
   // Print a parser input.
-  virtual void print_input (const AttributeList& alist) = 0;
+  virtual void print_input (const Frame&) = 0;
 
   // True iff no errors have occured.
   virtual bool good () = 0;
 
   // Create and Destroy.
 protected:
-  Printer (const AttributeList& name);
+  Printer (symbol name);
 public:
   ~Printer ();
 };
