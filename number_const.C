@@ -292,7 +292,7 @@ struct NumberFetch : public Number
             }
           const Frame& frame = al.find_frame (key);
           daisy_assert (frame.lookup (key) == Value::Number);
-          if (frame.size (key) != Value::Singleton)
+          if (frame.type_size (key) != Value::Singleton)
             {
               al.error ("Parameter '" + key 
                          + "' is a sequence, expected singleton");
@@ -312,7 +312,7 @@ struct NumberFetch : public Number
                          + Number::component + "'");
               break;
             }
-          if (frame.size (key) != Value::Singleton)
+          if (frame.type_size (key) != Value::Singleton)
             {
               al.error ("Parameter '" + key 
                         + "' is a model sequence, expected singleton");

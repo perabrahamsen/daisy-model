@@ -195,7 +195,7 @@ UIRun::attach (Toplevel& toplevel)
   qt_time->setToolTip ("The simulation time.");
   if (frame.check ("time")
       && frame.lookup ("time") == Value::AList
-      && frame.size ("time") == Value::Singleton
+      && frame.type_size ("time") == Value::Singleton
       && frame.check (toplevel.metalib (), "time", Treelog::null ()))
     {
       Time time (frame.alist ("time"));

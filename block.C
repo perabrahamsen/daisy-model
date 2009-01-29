@@ -138,7 +138,7 @@ Block::Implementation::expand_string (Block& block,
                   if (type == Value::Error)
                     throw "Unknown expansion: '" + key + "'";
                   const Frame& frame = find_frame (key);
-                  if (frame.size (key) != Value::Singleton)
+                  if (frame.type_size (key) != Value::Singleton)
                     throw "'" + key 
                       + "' is a sequence, can only expand singletons";
                   if (!frame.check (key))
@@ -234,15 +234,15 @@ Block::Implementation::expand_reference (const symbol key)
       throw "Reference loop";
     }
   if (lookup (var) == frame.lookup (key)
-      && (find_frame (var).size (var) == frame.size (key)
-          || (frame.size (key) == Value::Sequence
-              && find_frame (var).size (var) != Value::Singleton)))
+      && (find_frame (var).type_size (var) == frame.type_size (key)
+          || (frame.type_size (key) == Value::Sequence
+              && find_frame (var).type_size (var) != Value::Singleton)))
     return var;
 
   std::ostringstream tmp;
   tmp << "Value of '" << key << "' is $" << var
       << ", which is a " << Value::type_name (lookup (var));
-  switch (find_frame (var).size (var))
+  switch (find_frame (var).type_size (var))
     {
     case Value::Singleton:
       break;
@@ -250,10 +250,10 @@ Block::Implementation::expand_reference (const symbol key)
       tmp << " sequence";
       break;
     default:
-      tmp << "[" << find_frame (var).size (var) << "]";
+      tmp << "[" << find_frame (var).type_size (var) << "]";
     }
   tmp << ", should be a " << Value::type_name (frame.lookup (key));
-  switch (frame.size (key))
+  switch (frame.type_size (key))
     {
     case Value::Singleton:
       break;
@@ -261,7 +261,7 @@ Block::Implementation::expand_reference (const symbol key)
       tmp << " sequence";
       break;
     default:
-      tmp << "[" << frame.size (key) << "]";
+      tmp << "[" << frame.type_size (key) << "]";
     }
   error (tmp.str ());
   throw ("Bad reference");
@@ -342,7 +342,7 @@ Block::entries (std::vector<symbol>& all) const
 
 int 
 Block::type_size (const symbol tag) const
-{ return find_frame (tag).size (tag); }
+{ return find_frame (tag).type_size (tag); }
 
 
 symbol 
@@ -359,7 +359,7 @@ Block::check (const symbol key) const
 
 int 
 Block::value_size (const symbol tag) const
-{ return find_frame (tag).size (tag); }
+{ return find_frame (tag).value_size (tag); }
 
 double 
 Block::number (const symbol key) const

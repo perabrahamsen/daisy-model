@@ -151,9 +151,7 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
       daisy_assert (frame ().check ("time"));
       Time time (frame ().alist ("time"));
       time.tick_hour ();
-      AttributeList new_time;
-      time.set_alist (new_time);
-      frame ().alist ().add ("time", new_time);
+      time.set_time (frame (), "time");
 
       // Print content.
       printer.print_comment ("Content");

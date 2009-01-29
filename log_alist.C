@@ -162,7 +162,7 @@ LogAList::open (const symbol name)
         }
       if (frame ().is_state (sname))
 	{
-	  const int size = frame ().size (sname);
+	  const int size = frame ().type_size (sname);
 	  const bool has_value = frame ().check (sname);
 	  switch (frame ().lookup (sname))
 	    {
@@ -219,12 +219,12 @@ LogAList::close ()
 	    { 
 	    case Value::Object:
 	      // Object sequence.
-	      daisy_assert (frame ().size (sold_entry) != Value::Singleton);
+	      daisy_assert (frame ().type_size (sold_entry) != Value::Singleton);
 	      frame ().add (sold_entry, old_frame_sequence);
 	      break;
 	    case Value::AList:
 	      // AList sequence or singleton.
-	      if (frame ().size (sold_entry) == Value::Singleton)
+	      if (frame ().type_size (sold_entry) == Value::Singleton)
 		{
 		  daisy_assert (old_frame_sequence.size () == 0);
 		  frame ().add (sold_entry, old_frame);
@@ -278,7 +278,7 @@ LogAList::close_unnamed ()
 	unnamed_stack[0]++;
       const std::string& sentry = entry ().name ();
       daisy_assert (frame_stack[1]->lookup (sentry) == Value::AList);
-      daisy_assert (frame_stack[1]->size (sentry) != Value::Singleton);
+      daisy_assert (frame_stack[1]->type_size (sentry) != Value::Singleton);
     }
   else
     close_ignore ();
@@ -291,7 +291,7 @@ LogAList::open_alist (symbol name, const Frame& f)
     {
       const std::string& sname = name.name ();
       daisy_assert (frame ().lookup (sname) == Value::AList);
-      daisy_assert (frame ().size (sname) == Value::Singleton);
+      daisy_assert (frame ().type_size (sname) == Value::Singleton);
       push (name, f);
     }
   else
@@ -338,7 +338,7 @@ LogAList::open_object (symbol field, symbol type,
     {
       const std::string& sfield = field.name ();
       daisy_assert (frame ().lookup (sfield) == Value::Object);
-      daisy_assert (frame ().size (sfield) == Value::Singleton);
+      daisy_assert (frame ().type_size (sfield) == Value::Singleton);
       const Library& library = frame ().library (metalib (), sfield);
       daisy_assert (library.name () == symbol (lib));
       if (!library.check (type))

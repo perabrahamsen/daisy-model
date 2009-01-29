@@ -141,17 +141,6 @@ Time::set_time (Frame& parent, const symbol key) const
   parent.add (key, child);
 }
 
-void 
-Time::set_alist (AttributeList& alist) const
-{
-  alist.add ("year", year ());
-  alist.add ("month", month ());
-  alist.add ("mday", mday ());
-  alist.add ("hour", hour ());
-  alist.add ("minute", minute ());
-  alist.add ("second", second ());
-}
-
 int 
 Time::component_value (component_t c) const
 {

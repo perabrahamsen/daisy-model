@@ -845,7 +845,7 @@ ParserFile::Implementation::load_list (Frame& frame)
           else
             frame.add_reference (name, var);
         }
-      else if (frame.size (name) == Value::Singleton)
+      else if (frame.type_size (name) == Value::Singleton)
 	switch (frame.lookup (name))
 	  {
 	  case Value::Number:
@@ -1023,12 +1023,12 @@ ParserFile::Implementation::load_list (Frame& frame)
 		  : no_sequence;
 		while (!looking_at (')') && good ())
 		  {
-                    if (frame.size (name) == sequence.size ())
+                    if (frame.type_size (name) == sequence.size ())
                       {
                         std::ostringstream tmp;
                         tmp << "The '" << name 
                             << "' sequence should only contain "
-                            << frame.size (name) << " elements";
+                            << frame.type_size (name) << " elements";
                         error (tmp.str ());
                       }
                     if (looking_at ('&'))
@@ -1065,7 +1065,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 	      }
 	    case Value::AList:
 	      {
-		const size_t size = frame.size (name);
+		const size_t size = frame.type_size (name);
 		static const std::vector<const Frame*> no_sequence;
 		const Frame& default_frame = frame.default_frame (name);
 		const std::vector<const Frame*>& old_sequence
@@ -1124,7 +1124,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 	      {
 		std::vector<const PLF*> plfs;
 		int total = 0;
-		const int size = frame.size (name);
+		const int size = frame.type_size (name);
 		while (good () && !looking_at (')'))
 		  {
 		    Parskip dummy (*this);
@@ -1189,7 +1189,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 		std::vector<double> array;
 		std::vector<Lexer::Position> positions;
 		int count = 0;
-		const int size = frame.size (name);
+		const int size = frame.type_size (name);
 		const symbol syntax_dim = frame.dimension (name);
 		unsigned int first_unchecked = 0;
 		while (good () && !looking_at (')'))
@@ -1278,7 +1278,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 	      {
 		std::vector<symbol> array;
 		int count = 0;
-		const int size = frame.size (name);
+		const int size = frame.type_size (name);
 
 		while (!looking_at (')') && good ())
 		  {
@@ -1320,7 +1320,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 	      {
 		std::vector<int> array;
 		int count = 0;
-		const int size = frame.size (name);
+		const int size = frame.type_size (name);
 
 		while (!looking_at (')') && good ())
 		  {

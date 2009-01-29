@@ -143,10 +143,10 @@ Frame::library (const Metalib& metalib, const symbol key) const
 }
 
 int  
-Frame::size (const symbol key) const
+Frame::type_size (const symbol key) const
 {
   if (parent () && impl->syntax.lookup (key) == Value::Error)
-    return parent ()->size (key);
+    return parent ()->type_size (key);
   else
     return impl->syntax.size (key);
 }
@@ -364,6 +364,32 @@ Frame::check (const symbol key) const
     || (parent () && parent ()->check (key));
 }
 
+// Is this frame a subset of 'other'?
+bool 
+Frame::subset (const Metalib& metalib, const Frame& other) const
+{
+  // TODO: Rewrite here.
+  return impl->alist.subset (metalib, other.impl->alist, impl->syntax);
+}
+
+// Is the element 'key' in this alist a subset of the corresponding other entry.
+bool 
+Frame::subset (const Metalib& metalib, const Frame& other,
+               const symbol key) const
+{
+  // TODO: Rewrite here.
+  return impl->alist.subset (metalib, other.impl->alist, impl->syntax, key);
+}
+
+int 
+Frame::value_size (const symbol key) const
+{
+  if (parent () && !impl->alist.check (key))
+    return parent ()->value_size (key);
+  else
+    return impl->alist.size (key);
+}
+
 void
 Frame::add_reference (const symbol key, const symbol val)
 { impl->alist.add_reference (key, val); }
@@ -462,7 +488,7 @@ Frame::alist (const symbol key) const
 const Frame& 
 Frame::frame (const symbol key) const
 { 
-  if (size (key) != Value::Singleton)
+  if (type_size (key) != Value::Singleton)
     return default_frame (key);
   else if (impl->alist.check (key))
     return impl->alist.frame (key);
@@ -568,7 +594,7 @@ Frame::verify (const symbol key, const Value::type want,
   if (has != want)
     daisy_panic ("'" + key + "' is " + Value::type_name (has) 
                  + ", should be " + Value::type_name (want));
-  int type_size = size (key);
+  int type_size = this->type_size (key);
   if (type_size == Value::Sequence)
     {
       if (value_size == Value::Singleton)

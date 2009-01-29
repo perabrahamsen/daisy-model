@@ -43,7 +43,7 @@ ScopeBlock::dimension (symbol tag) const
   if (type == Value::Error)
     return Value::Unknown ();
   const Frame& frame = block.find_frame (tag);
-  if (frame.size (tag) != Value::Singleton)
+  if (frame.type_size (tag) != Value::Singleton)
     return Value::Unknown ();
 
   //Handle primitive numbers.
@@ -109,7 +109,7 @@ ScopeBlock::has_number (const symbol tag) const
     return false;
 
   const Frame& frame = block.find_frame (tag);
-  if (frame.size (tag) != Value::Singleton)
+  if (frame.type_size (tag) != Value::Singleton)
     return false;
   if (!frame.check (tag))
     return false;
@@ -144,7 +144,7 @@ ScopeBlock::number (const symbol tag) const
   Value::type type = block.lookup (tag);
   daisy_assert (type != Value::Error);
   const Frame& frame = block.find_frame (tag);
-  daisy_assert (frame.size (tag) == Value::Singleton);
+  daisy_assert (frame.type_size (tag) == Value::Singleton);
   daisy_assert (frame.check (tag));
 
   //Handle primitive numbers.
@@ -174,7 +174,7 @@ ScopeBlock::has_name (const symbol tag) const
     return false;
 
   const Frame& frame = block.find_frame (tag);
-  if (frame.size (tag) != Value::Singleton)
+  if (frame.type_size (tag) != Value::Singleton)
     return false;
   if (!frame.check (tag))
     return false;
@@ -209,7 +209,7 @@ ScopeBlock::name (const symbol tag) const
   Value::type type = block.lookup (tag);
   daisy_assert (type != Value::Error);
   const Frame& frame = block.find_frame (tag);
-  daisy_assert (frame.size (tag) == Value::Singleton);
+  daisy_assert (frame.type_size (tag) == Value::Singleton);
   daisy_assert (frame.check (tag));
 
   //Handle primitive names.

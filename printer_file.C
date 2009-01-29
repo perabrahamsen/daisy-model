@@ -53,17 +53,15 @@ struct PrinterFile::Implementation
 				   const std::string& name);
 
   // Print entry 'key' in alist.
-  void print_dimension (const AttributeList&, const symbol key, 
+  void print_dimension (const Frame&, const symbol key, 
                         const symbol dim);
-  void print_entry (const AttributeList& alist, const Syntax&,
-		    const AttributeList& super_alist, 
-                    const Syntax& super_syntax, const symbol key,
-		    int indent, bool need_wrapper);
+  void print_entry (const Frame& frame, const Frame& super,
+                    const symbol key, int indent, bool need_wrapper);
 
   // Check if entry 'key' need a line for itself.
-  bool is_complex (const AttributeList& alist, const Syntax& syntax,
-		   const AttributeList& super, const symbol key) const;
-  bool is_complex_object (const AttributeList&, const Library&) const;
+  bool is_complex (const Frame& frame, const Frame& super,
+                   const symbol key) const;
+  bool is_complex_object (const Frame&, const Library&) const;
 
   // Print support for specific types.
   void print_string (const std::string& value); 
@@ -71,11 +69,10 @@ struct PrinterFile::Implementation
   { print_string (value.name ()); }
   void print_bool (bool); 
   void print_plf (const PLF&, int indent); 
-  void print_alist (const AttributeList& alist, const Syntax&,
-                    const AttributeList& super_alist, 
-                    const Syntax& super_syntax, int indent, bool skip);
-  void print_object (const AttributeList&, const Library& library,
-                     const AttributeList&, int indent);
+  void print_alist (const Frame& frame, const Frame& super, 
+                    int indent, bool skip);
+  void print_object (const Frame&, const Library& library,
+                     const Frame&, int indent);
 
   // Top level print functions.
   void print_parameterization (symbol library_name, symbol name,
@@ -92,29 +89,28 @@ struct PrinterFile::Implementation
 };
 
 bool 
-PrinterFile::Implementation::is_complex (const AttributeList& alist, 
-					 const Syntax& syntax,
-					 const AttributeList& super,
+PrinterFile::Implementation::is_complex (const Frame& frame,
+                                         const Frame& super,
 					 const symbol key) const
 {
   // Subsets are never complex.
-  if (alist.subset (metalib, super, syntax, key))
+  if (frame.subset (metalib, super, key))
     return false;
 
   // Sequences are complex...
-  if (syntax.size (key) != Value::Singleton)
+  if (frame.type_size (key) != Value::Singleton)
     {
       // when they are not part of a total order...
-      if (!syntax.total_order ())
+      if (!frame.total_order ())
 	return true;
       // or not the last element in the order.
-      if (syntax.order_index (key) + 1U != syntax.order ().size ())
+      if (frame.order_index (key) + 1U != frame.order ().size ())
 	return true;
       return false;
     }
   // We know it is a singleton here.
 
-  switch (syntax.lookup (key))
+  switch (frame.lookup (key))
     {
     case Value::Number:
     case Value::Integer:
@@ -122,9 +118,9 @@ PrinterFile::Implementation::is_complex (const AttributeList& alist,
     case Value::String:
       return false;
     case Value::Object:
-      return syntax.order_index (key) >= 0
-	|| is_complex_object (alist.alist (key), 
-                              syntax.library (metalib, key));
+      return frame.order_index (key) >= 0
+	|| is_complex_object (frame.frame (key), 
+                              frame.library (metalib, key));
     case Value::AList:
     case Value::PLF:
       return true;
@@ -136,7 +132,7 @@ PrinterFile::Implementation::is_complex (const AttributeList& alist,
 }
 
 bool 
-PrinterFile::Implementation::is_complex_object (const AttributeList& value, 
+PrinterFile::Implementation::is_complex_object (const Frame& value, 
 						const Library& library) const
 {
   daisy_assert (value.check ("type"));
@@ -144,11 +140,10 @@ PrinterFile::Implementation::is_complex_object (const AttributeList& value,
   if (!library.check (element))
     return false;
 
-  const Syntax& element_syntax = library.syntax (element);
-  const AttributeList& element_alist = library.lookup (element);
+  const FrameModel& super = library.model (element);
 
-	// Check if we added something over the library.
-  if (value.subset (metalib, element_alist, element_syntax))
+  // Check if we added something over the library.
+  if (value.subset (metalib, super))
     // We didn't.
     return false;
   return true;
@@ -194,7 +189,7 @@ PrinterFile::Implementation::print_quoted_string (std::ostream& out,
 }
 
 void 
-PrinterFile::Implementation::print_dimension (const AttributeList& alist,
+PrinterFile::Implementation::print_dimension (const Frame& frame,
                                               const symbol key,
                                               const symbol dim)
 {
@@ -203,72 +198,70 @@ PrinterFile::Implementation::print_dimension (const AttributeList& alist,
   else if (dim == Value::None () || dim == Value::Fraction ())
     out << " []";
   else if (dim == Value::User ())
-    out << " [" << alist.name (key) << "]";
+    out << " [" << frame.name (key) << "]";
   else
     out << " [" << dim << "]";
 }
 
 void
-PrinterFile::Implementation::print_entry (const AttributeList& alist, 
-					  const Syntax& syntax,
-					  const AttributeList& super_alist, 
-					  const Syntax& super_syntax, 
+PrinterFile::Implementation::print_entry (const Frame& frame, 
+                                          const Frame& super, 
 					  const symbol key,
 					  int indent, bool need_wrapper)
 { 
-  daisy_assert (alist.check (key));
-  Value::type type = syntax.lookup (key);
+  daisy_assert (frame.check (key));
+  Value::type type = frame.lookup (key);
 
   const bool do_wrap 
-    = (need_wrapper && is_complex (alist, syntax, super_alist, key));
+    = (need_wrapper && is_complex (frame, super, key));
   if (do_wrap)
     {
       out << "(";
       indent++;
     }
 
-  if (syntax.size (key) == Value::Singleton)
+  if (frame.type_size (key) == Value::Singleton)
     {
       switch (type)
 	{
 	case Value::Number:
-	  out << alist.number (key);
-          print_dimension (alist, key, syntax.dimension (key));
+	  out << frame.number (key);
+          print_dimension (frame, key, frame.dimension (key));
 	  break;
 	case Value::AList:
-	  if (super_alist.check (key))
-	    print_alist (alist.alist (key), syntax.syntax (key), 
-			 super_alist.alist (key), 
-                         super_syntax.syntax (key), indent, false); 
+	  if (super.check (key))
+	    print_alist (frame.frame (key), super.frame (key), indent, false); 
 	  else
-	    print_alist (alist.alist (key), syntax.syntax (key), 
-			 syntax.default_frame (key).alist (), 
-                         syntax.syntax (key), indent, false); 
+	    print_alist (frame.frame (key), frame.default_frame (key),
+                         indent, false); 
 	  break;
 	case Value::PLF:
-	  print_plf (alist.plf (key), indent);
+	  print_plf (frame.plf (key), indent);
 	  break;
 	case Value::Boolean:
-	  print_bool (alist.flag (key));
+	  print_bool (frame.flag (key));
 	  break;
 	case Value::String:
-	  print_symbol (alist.name (key));
+	  print_symbol (frame.name (key));
 	  break;
 	case Value::Integer:
-	  out << alist.integer (key);
+	  out << frame.integer (key);
 	  break;
 	case Value::Object:
-	  if (super_alist.check (key))
-	    print_object (alist.alist (key), syntax.library (metalib, key), 
-                          super_alist.alist (key), indent);
-	  else
-            print_object (alist.alist (key), syntax.library (metalib, key), 
-                          AttributeList (), indent);
+          {
+            const Library& library = frame.library (metalib, key);
+            if (super.check (key))
+              print_object (frame.frame (key), library, 
+                            super.frame (key), indent);
+            else
+              print_object (frame.frame (key), library, 
+                            FrameModel::root (), indent);
+          }
 	  break;
 	case Value::Library:
 	case Value::Error:
 	default:
-	  out << "<Unknown: " << Value::type_name (syntax.lookup (key))
+	  out << "<Unknown: " << Value::type_name (frame.lookup (key))
 	      << ">";
 	}
     }
@@ -278,7 +271,7 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 	{
 	case Value::Number:
 	  {
-	    const std::vector<double>& value = alist.number_sequence (key);
+	    const std::vector<double>& value = frame.number_sequence (key);
 	    
 	    for (unsigned int i = 0; i < value.size (); i++)
 	      {
@@ -286,29 +279,28 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 		  out << " ";
 		out << value[i]; 
 	      }
-            print_dimension (alist, key, syntax.dimension (key));
+            print_dimension (frame, key, frame.dimension (key));
 	  }
 	  break;
 	case Value::AList:
 	  {
-	    const AttributeList& other = syntax.default_frame (key).alist ();
-	    const Syntax& nested = syntax.syntax (key);
-	    const std::vector<const AttributeList*>& value = alist.alist_sequence (key);
+	    const Frame& other = frame.default_frame (key);
+	    const std::vector<const Frame*>& value 
+              = frame.frame_sequence (key);
 	    
 	    for (unsigned int i = 0; i < value.size (); i++)
 	      {
 		if (i > 0) 
 		  out << "\n" << std::string (indent, ' ');
 		out << "(";
-		print_alist (*value[i], nested, other, nested, 
-                             indent + 1, false); 
+		print_alist (*value[i], other, indent + 1, false); 
 		out << ")";
 	      }
 	  }
 	  break;
 	case Value::PLF:
 	  {
-	    const std::vector<const PLF*>& value = alist.plf_sequence (key);
+	    const std::vector<const PLF*>& value = frame.plf_sequence (key);
 	    
 	    for (unsigned int i = 0; i < value.size (); i++)
 	      {
@@ -322,7 +314,7 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 	  break;
 	case Value::Boolean:
 	  {
-	    const std::vector<bool>& value = alist.flag_sequence (key);
+	    const std::vector<bool>& value = frame.flag_sequence (key);
 	    
 	    for (unsigned int i = 0; i < value.size (); i++)
 	      {
@@ -335,7 +327,7 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 	case Value::String:
 	  {
 	    const std::vector<symbol>& value 
-	      = alist.name_sequence (key);
+	      = frame.name_sequence (key);
 	    
 	    for (unsigned int i = 0; i < value.size (); i++)
 	      {
@@ -347,7 +339,7 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 	  break;
 	case Value::Integer:
 	  {
-	    const std::vector<int>& value = alist.integer_sequence (key);
+	    const std::vector<int>& value = frame.integer_sequence (key);
 	    
 	    for (unsigned int i = 0; i < value.size (); i++)
 	      {
@@ -359,29 +351,34 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 	  break;
 	case Value::Object:
 	  {
-	    const Library& library = syntax.library (metalib, key);
-	    const std::vector<const AttributeList*>& value = alist.alist_sequence (key);
-
+	    const Library& library = frame.library (metalib, key);
+	    const std::vector<const Frame*>& value = frame.frame_sequence (key);
+#ifdef TODO
+            // We really should check original value.
+            const std::vector<const Frame*>& super_value = super.check (key)
+              ? super.frame_sequence (key)
+              : std::vector<const Frame*> ();
+#endif
 	    for (unsigned int i = 0; i < value.size (); i++)
 	      {
-                const AttributeList empty;
+                const Frame& other = FrameModel::root ();
 		if (i > 0)
 		  out << "\n" << std::string (indent, ' ');
 		if (is_complex_object (*value[i], library))
 		  {
 		    out << "(";
-		    print_object (*value[i], library, empty, indent + 1);
+		    print_object (*value[i], library, other, indent + 1);
 		    out << ")";
 		  }
 		else 
-		  print_object (*value[i], library, empty, indent);
+		  print_object (*value[i], library, other, indent);
 	      }
 	  }
 	  break;
 	case Value::Library:
 	case Value::Error:
 	default:
-	  out << "<" << Value::type_name (syntax.lookup (key)) 
+	  out << "<" << Value::type_name (frame.lookup (key)) 
 	      << " sequence>";
 	}
     }
@@ -432,19 +429,17 @@ PrinterFile::Implementation::print_plf (const PLF& plf, int indent)
 }
 
 void 
-PrinterFile::Implementation::print_alist (const AttributeList& alist, 
-					  const Syntax& syntax,
-					  const AttributeList& super_alist,
-					  const Syntax& super_syntax,
+PrinterFile::Implementation::print_alist (const Frame& frame, 
+                                          const Frame& super,
 					  int indent, bool skip)
 {
   // Always print ordered items.
-  const std::vector<symbol>& order = syntax.order ();
+  const std::vector<symbol>& order = frame.order ();
   bool complex_printing = false;
   for (unsigned int i = 0; i < order.size (); i++)
     {
       const symbol key = order[i];
-      if (!complex_printing && is_complex (alist, syntax, super_alist, key))
+      if (!complex_printing && is_complex (frame, super, key))
 	complex_printing = true;
 	
       if (!skip)
@@ -454,33 +449,32 @@ PrinterFile::Implementation::print_alist (const AttributeList& alist,
       else
 	out << " ";
 
-      if (alist.check (key))
+      if (frame.check (key))
 	{
 #if 0
 	  // Design bug: We usually need to put parentheses around
 	  // ordered complex values.  However, the parser doesn't
 	  // expect these for alist sequences, so we don't print them
 	  // either. 
-	  if (syntax.lookup (key) == Value::AList
-	      && syntax.size (key) != Value::Singleton)
+	  if (frame.lookup (key) == Value::AList
+	      && frame.type_size (key) != Value::Singleton)
 	    print_entry (alist, syntax, super_alist, super_syntax, 
                          key, indent, false);
 	  else
 #endif
-	    print_entry (alist, syntax, super_alist, super_syntax,
-                         key, indent, true);
+	    print_entry (frame, super, key, indent, true);
 	}
-      else if (!syntax.is_optional (key))
+      else if (!frame.is_optional (key))
 	out << "<missing " << key << ">";
     }
 
   // Print unordered items.
   std::vector<symbol> entries;
-  syntax.entries (entries);
+  frame.entries (entries);
 
   // Print new declarations.
   std::vector<symbol> super_entries;
-  super_syntax.entries (super_entries);
+  super.entries (super_entries);
   std::set<symbol> super_set (super_entries.begin (),
                               super_entries.end ());
 
@@ -489,7 +483,7 @@ PrinterFile::Implementation::print_alist (const AttributeList& alist,
       const symbol key = entries[i];
       
       // Skip already printed members.
-      if (syntax.order_index (key) >= 0)
+      if (frame.order_index (key) >= 0)
 	continue;
 
       // Declare new members.
@@ -502,7 +496,7 @@ PrinterFile::Implementation::print_alist (const AttributeList& alist,
 
           out << "(declare " << key << " ";
 
-          const int size = syntax.size (key);
+          const int size = frame.type_size (key);
           if (size == Value::Singleton)
             /* do nothing */;
           else if (size == Value::Sequence)
@@ -510,7 +504,7 @@ PrinterFile::Implementation::print_alist (const AttributeList& alist,
           else
             out << "[" << size << "] ";
           
-          const Value::type type = syntax.lookup (key);
+          const Value::type type = frame.lookup (key);
           switch (type)
             {
             case Value::Boolean:
@@ -520,13 +514,13 @@ PrinterFile::Implementation::print_alist (const AttributeList& alist,
               break;
             case Value::Number:
               out << Value::type_name (type) << " ";
-              print_dimension (alist, key, syntax.dimension (key));
+              print_dimension (frame, key, frame.dimension (key));
               break;
             case Value::AList:
-              out << "fixed " << syntax.submodel_name (key);
+              out << "fixed " << frame.submodel_name (key);
               break;
             case Value::Object:
-              out << syntax.library (metalib, key).name ();
+              out << frame.library (metalib, key).name ();
               break;
             case Value::PLF: 
             case Value::Library:
@@ -535,12 +529,12 @@ PrinterFile::Implementation::print_alist (const AttributeList& alist,
               out << "<Error>";
             }
           out << "\n " << std::string (indent, ' ');
-          print_symbol (syntax.description (key));
+          print_symbol (frame.description (key));
           out << ")";
         }
 
       // Skip subset members.
-      if (alist.subset (metalib, super_alist, syntax, key))
+      if (frame.subset (metalib, super, key))
 	continue;
 
       if (!skip)
@@ -550,16 +544,16 @@ PrinterFile::Implementation::print_alist (const AttributeList& alist,
 
       // Now print it.
       out << "(" << key << " ";
-      print_entry (alist, syntax, super_alist, super_syntax, key, 
+      print_entry (frame, super, key, 
 		   indent + key.name ().length () + 2, false);
       out << ")";
     }
 }
 
 void 
-PrinterFile::Implementation::print_object (const AttributeList& value,
+PrinterFile::Implementation::print_object (const Frame& value,
                                            const Library& library, 
-                                           const AttributeList& original, 
+                                           const Frame& original, 
                                            int indent)
 {
   daisy_assert (value.check ("type"));
@@ -569,35 +563,34 @@ PrinterFile::Implementation::print_object (const AttributeList& value,
       out << "<unknown " << element << ">";
       return;
     }
-  const Syntax& element_syntax = library.syntax (element);
-  const AttributeList& element_alist = library.lookup (element);
-
-  // Check if we added something over the library.
-  if (value.subset (metalib, element_alist, element_syntax))
-    {
-      // We didn't.
-      print_symbol (element);
-      return;
-    }
 
   // Check original.
   if (original.check ("type") && original.name ("type") == element)
     {
       out << "original";
       // Check if we added something over the original.
-      if (value.subset (metalib, original, element_syntax))
+      if (value.subset (metalib, original))
         return;
       out << " ";
-      print_alist (value, element_syntax, original, element_syntax,
-                   indent + 9,
-                   false);
+      print_alist (value, original, indent + 9, false);
       return;
 
     }
+  
+  const FrameModel& element_frame = library.model (element);
+  
+  // Check if we added something over the library.
+  if (value.subset (metalib, element_frame))
+    {
+      // We didn't.
+      print_symbol (element);
+      return;
+    }
+
   // Library element with additional attributes.
   print_symbol (element);
   out << " ";
-  print_alist (value, element_syntax, element_alist, element_syntax,
+  print_alist (value, element_frame,
                indent + 1 + element.name ().length ()
                // Buglet: Wrong indentation for elements with strange chars.
                + (is_identifier (element.name ()) ? 0 : 2),
@@ -611,36 +604,31 @@ PrinterFile::Implementation
                               bool print_description)
 {
   Library& library = metalib.library (library_name);
-  AttributeList alist (library.lookup (name));
-  if (!print_description)
-    alist.remove ("description");
-  const AttributeList empty_alist;
+  std::auto_ptr<FrameModel> frame (&library.model (name).clone ());
+  daisy_assert (frame.get ());
+  if (!print_description && frame->alist ().check ("description"))
+    frame->alist ().remove ("description");
+  const FrameModel& root = library.model ("component");
 
   out << "(def" << library_name << " ";
   print_symbol (name);
   out << " ";
-  if (alist.check ("type"))
+  if (frame->check ("type"))
     {
-      const symbol super = alist.name ("type");
+      const symbol super = frame->name ("type");
       print_symbol (super);
       if (!library.check (super))
 	{
 	  out << " ;; unknown superclass\n ";
-	  print_alist (alist, library.syntax (name), 
-		       empty_alist, library.syntax (name), 2, true);
+	  print_alist (*frame, root, 2, true);
 	}
       else
-	{
-	  print_alist (alist, library.syntax (name), 
-		       library.lookup (super), library.syntax (super),
-                       2, true);
-	}
+        print_alist (*frame, library.model (super), 2, true);
     }
   else
     {
       out << "<unknown>\n  ";
-      print_alist (alist, library.syntax (name), 
-		   empty_alist, library.syntax (name), 2, true);
+      print_alist (*frame, root, 2, true);
     }
   out << ")\n";
 }
@@ -687,13 +675,13 @@ PrinterFile::Implementation::print_library_file (const std::string& filename)
 	for (unsigned int j = 0; j < elements.size (); j++)
 	  {
 	    const symbol element = elements[j];
-	    const AttributeList& alist = library.lookup (element);
+	    const FrameModel& frame = library.model (element);
 
-	    if (alist.check ("parsed_from_file") 
-		&& alist.name ("parsed_from_file") == filename)
+	    if (frame.check ("parsed_from_file") 
+		&& frame.name ("parsed_from_file") == filename)
 	      {
 		found.push_back (FoundEntry (library_name, element, 
-					     alist.integer
+					     frame.integer
                                              /**/ ("parsed_sequence")));
 	      }
 	  }
@@ -775,12 +763,9 @@ PrinterFile::print_entry (const Frame& frame,
 { 
   if (frame.check (key))
     {
-      const AttributeList empty_alist;
       impl->out << "(" << key << " ";
       const int indent = 2 + key.name ().length ();
-      impl->print_entry (frame.alist (), frame.syntax (),
-                         empty_alist, frame.syntax (),
-                         key, indent, false);
+      impl->print_entry (frame, FrameModel::root (), key, indent, false);
       impl->out << ")\n";
     }
 }
@@ -803,8 +788,7 @@ PrinterFile::print_input (const Frame& frame)
   const FrameModel& base_frame = library.model (type);
 
   impl->out << "(input " << type << " ";
-  impl->print_alist (frame.alist (), frame.syntax (), base_frame.alist (),
-                     base_frame.syntax (), 7, false);
+  impl->print_alist (frame, base_frame, 7, false);
   impl->out << ")\n";
 }
 

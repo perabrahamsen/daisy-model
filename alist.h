@@ -53,7 +53,7 @@ public:
   // Is this alist a subset of 'other'?
   bool subset (const Metalib&, 
                const AttributeList& other, const Syntax& syntax) const;
-  // Is the element 'key' in this alist a subset of the correspi
+  // Is the element 'key' in this alist a subset of the other entry.
   bool subset (const Metalib&,
                const AttributeList& other, const Syntax& syntax,
 	       symbol key) const;

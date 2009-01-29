@@ -332,7 +332,7 @@ ProgramDocument::print_entry_value (const symbol name,
   if (frame.check (name))
     {
       const Value::type type = frame.lookup (name);
-      const int size = frame.size (name);
+      const int size = frame.type_size (name);
 
       bool print_default_value = false;
       
@@ -371,7 +371,8 @@ ProgramDocument::print_entry_value (const symbol name,
 	  case Value::PLF:
 	    {
 	      std::ostringstream tmp;
-	      tmp << " (has default value with " << frame.plf (name).size ()
+	      tmp << " (has default value with " 
+                  << frame.plf (name).size ()
 		     << " points)";
 	      format->text (tmp.str ());
 	      if (frame.plf (name).size () > 0)
@@ -434,13 +435,13 @@ ProgramDocument::print_entry_value (const symbol name,
 	  case Value::String:
 	  case Value::Integer:
 	  case Value::Object:
-	    if (frame.size (name) == 0)
+	    if (frame.value_size (name) == 0)
 	      format->text (" (default: an empty sequence)");
 	    else
 	      {
 		std::ostringstream tmp;
 		tmp << " (has default value with length " 
-		       << frame.size (name) << ")";
+		       << frame.value_size (name) << ")";
 		format->text (tmp.str ());
 		print_default_value = true;
 	      }
@@ -541,7 +542,7 @@ ProgramDocument::print_sample_entry (const symbol name,
     if (frame.check (name))
       {
 	const Value::type type = frame.lookup (name);
-	const int size = frame.size (name);
+	const int size = frame.type_size (name);
 
 	bool print_name = true;
 	comment = "Has default value.";
@@ -615,7 +616,7 @@ ProgramDocument::print_sample_entry (const symbol name,
 	    case Value::Error:
 	      daisy_notreached ();
 	    }
-	else if (frame.size (name) == 0)
+	else if (frame.value_size (name) == 0)
 	  {
 	    format->text (")");
 	    print_name = false;
@@ -624,7 +625,7 @@ ProgramDocument::print_sample_entry (const symbol name,
 	  switch (type)
 	    {
 	    case Value::Number:
-	      if (frame.size (name) < 5)
+	      if (frame.value_size (name) < 5)
 		{
 		  const std::vector<double>& numbers
 		    = frame.number_sequence (name);
@@ -654,7 +655,7 @@ ProgramDocument::print_sample_entry (const symbol name,
 	  {
 	    format->special ("nbsp");
 	    format->italic (name);
-	    if (frame.size (name) != Value::Singleton)
+	    if (frame.type_size (name) != Value::Singleton)
 	      {
 		format->special ("nbsp");
 		format->special ("...");
@@ -668,7 +669,7 @@ ProgramDocument::print_sample_entry (const symbol name,
       {
 	format->special ("nbsp");
 	format->italic (name);
-	if (frame.size (name) != Value::Singleton)
+	if (frame.type_size (name) != Value::Singleton)
 	  {
 	    format->special ("nbsp");
 	    format->special ("...");
@@ -855,7 +856,7 @@ ProgramDocument::print_sample_entries (const symbol name,
       for (unsigned int i = 0; i < order.size (); i++)
 	{ 
 	  format->italic (order[i]);
-	  if (frame.size (order[i]) == Value::Sequence)
+	  if (frame.type_size (order[i]) != Value::Singleton)
 	    format->special ("...");
 	  format->special ("nbsp");
 	  left--;
@@ -995,7 +996,7 @@ ProgramDocument::print_submodel_entry (const symbol name, int level,
   if (type == Value::Library)
     return;
 
-  const int size = frame.size (name);
+  const int size = frame.type_size (name);
 
   // Print name.
   Format::Item dummy (*format, name);

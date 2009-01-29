@@ -84,7 +84,7 @@ public:
   bool is_state (const symbol) const;
   Value::type lookup (const symbol) const;
   ::Library& library (const Metalib&, const symbol) const;
-  int  size (const symbol) const;
+  int type_size (const symbol) const;
   symbol dimension (const symbol) const;
   symbol domain (const symbol) const;
   symbol range (const symbol) const;
@@ -212,8 +212,14 @@ public:
   void add_check (check_fun);
   void add_object_check (check_object);
 
+public:
   // Is 'key' an element of this alist?
   bool check (const symbol key) const;
+  // Is this frame a subset of 'other'?
+  bool subset (const Metalib&, const Frame& other) const;
+  // Is the element 'key' in this alist a subset of the other entry.
+  bool subset (const Metalib&, const Frame& other, symbol key) const;
+  int value_size (symbol key) const;
 
   // References.
 public:

@@ -63,7 +63,6 @@ public:
   int second () const;
   std::string print () const;
   void set_time (Frame&, symbol key) const;
-  void set_alist (AttributeList&) const;
 
   enum component_t {
     Year, Month, Week, Yday, Mday, Wday, Hour, Minute, Second, 
