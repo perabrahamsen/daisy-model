@@ -353,25 +353,27 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
 	  {
 	    const Library& library = frame.library (metalib, key);
 	    const std::vector<const Frame*>& value = frame.frame_sequence (key);
-#ifdef TODO
             // We really should check original value.
             const std::vector<const Frame*>& super_value = super.check (key)
               ? super.frame_sequence (key)
               : std::vector<const Frame*> ();
-#endif
 	    for (unsigned int i = 0; i < value.size (); i++)
 	      {
-                const Frame& other = FrameModel::root ();
+                const Frame& me = *value[i];
+                const Frame& other = super_value.size () > i
+                  ? *super_value[i]
+                  : FrameModel::root ();
 		if (i > 0)
 		  out << "\n" << std::string (indent, ' ');
-		if (is_complex_object (*value[i], library))
+                if (me.subset (metalib, other)
+                    || !is_complex_object (me, library))
+		  print_object (me, library, other, indent);
+		else 
 		  {
 		    out << "(";
-		    print_object (*value[i], library, other, indent + 1);
+		    print_object (me, library, other, indent + 1);
 		    out << ")";
 		  }
-		else 
-		  print_object (*value[i], library, other, indent);
 	      }
 	  }
 	  break;
