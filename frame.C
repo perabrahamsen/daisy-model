@@ -462,7 +462,9 @@ Frame::alist (const symbol key) const
 const Frame& 
 Frame::frame (const symbol key) const
 { 
-  if (impl->alist.check (key))
+  if (size (key) != Value::Singleton)
+    return default_frame (key);
+  else if (impl->alist.check (key))
     return impl->alist.frame (key);
   else if (parent () && parent ()->check (key))
     return parent ()->frame (key);

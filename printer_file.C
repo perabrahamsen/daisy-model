@@ -770,15 +770,6 @@ PrinterFile::print_comment (const symbol comment_s)
 }
 
 void 
-PrinterFile::print_alist (const AttributeList& alist, const Syntax& syntax, 
-			  const AttributeList& super_alist, 
-                          const Syntax& super_syntax) 
-{ 
-  impl->print_alist (alist, syntax, super_alist, super_syntax, 0, false);
-  impl->out << "\n";
-}
-
-void 
 PrinterFile::print_entry (const AttributeList& alist, const Syntax& syntax,
 			  const symbol key)
 { 

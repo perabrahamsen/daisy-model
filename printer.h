@@ -30,6 +30,7 @@
 class Block;
 class AttributeList;
 class Syntax;
+class Frame;
 
 class Printer : public Model
 {
@@ -43,10 +44,6 @@ public:
 public:
   // Print comment.
   virtual void print_comment (symbol comment) = 0;
-  // Print content of alist.
-  virtual void print_alist (const AttributeList& alist, const Syntax& syntax,
-			    const AttributeList& super_alist,
-                            const Syntax& super_syntax) = 0;
   // Print entry in alist.
   virtual void print_entry (const AttributeList&, const Syntax&,
 			    const symbol key) = 0;

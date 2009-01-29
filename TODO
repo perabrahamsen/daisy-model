@@ -2,15 +2,19 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Frame
 
+** Ret program_document
+
 ** ret PrinterFile
 
 ** Ret traverse, xref
 
-** Ret program_document
-
 ** fjern alist.add (name, alist) og alist.add (name, alist_sequence)
 
-** Frame::alist () og Frame::syntax () skal returnere const ref.
+og fjern fa. & fas.
+
+** Fjern brug af syntax i select.C
+
+** Fjern Frame::syntax ()
 
 ** Ret check_alist (og check_object)
 
@@ -29,6 +33,8 @@ permanent frames, så vi altid kloner midlertidige?
 ** Fjern "type", "base_model", attributes.
 
 Tænk over brug af "description".  Hvad med cite?
+
+** split Frame::frame -> Frame::model & Frame::submodel
 
 *** static root model frame skal definere "cite" og "description".
 

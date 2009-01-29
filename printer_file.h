@@ -42,10 +42,6 @@ private:
 public:
   // Print comment.
   void print_comment (symbol comment);
-  // Print content of alist.
-  void print_alist (const AttributeList& alist, const Syntax& syntax,
-		    const AttributeList& super_alist, 
-                    const Syntax& super_syntax);
   // Print entry in alist.
   void print_entry (const AttributeList&, const Syntax&,
 		    const symbol key);

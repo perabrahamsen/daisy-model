@@ -1711,7 +1711,7 @@ program_gnuplot${OBJ}: program_gnuplot.C program.h model.h symbol.h run.h \
 program_document${OBJ}: program_document.C program.h model.h symbol.h run.h \
   library.h metalib.h frame.h scope.h value.h block.h printer_file.h \
   printer.h xref.h plf.h format.h treelog.h assertion.h librarian.h \
-  frame_submodel.h syntax.h alist.h
+  frame_submodel.h frame_model.h syntax.h alist.h
 program_batch${OBJ}: program_batch.C program.h model.h symbol.h run.h block.h \
   value.h treelog.h path.h assertion.h memutils.h librarian.h frame.h \
   scope.h metalib.h

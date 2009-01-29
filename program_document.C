@@ -34,6 +34,7 @@
 #include "assertion.h"
 #include "librarian.h"
 #include "frame_submodel.h"
+#include "frame_model.h"
 #include "syntax.h"
 #include "alist.h"
 #include <sstream>
@@ -59,26 +60,21 @@ struct ProgramDocument : public Program
   void print_string (const symbol);
 
   // Document functions.
-  void print_entry_type (const symbol name,
-			 const Syntax& syntax,
-			 const AttributeList& alist);
+  void print_entry_type (const symbol name, 
+			 const Frame& frame);
   void print_entry_submodel (const symbol name, 
 			     int level,
-			     const Syntax& syntax,
-			     const AttributeList& alist,
-			     const symbol aref);
+			     const Frame& frame,
+                             const symbol aref);
   void print_entry_category (const symbol name, 
-			     const Syntax& syntax,
-			     const AttributeList& alist);
+			     const Frame& frame);
   void print_entry_value (const symbol name, 
-			  const Syntax& syntax,
-			  const AttributeList& alist);
+			  const Frame& frame);
 
   void print_users (const XRef::Users&);
   void print_sample_entry (const symbol name, 
-			   const Syntax& syntax,
-			   const AttributeList& alist,
-			   bool last);
+			   const Frame& frame,
+                           bool last);
 
   // Print parts of it.
   static void own_entries (const Metalib&,
@@ -89,36 +85,31 @@ struct ProgramDocument : public Program
                                  const symbol name, 
                                  std::vector<symbol>& entries);
   void print_sample (const symbol name,
-		     const Syntax& syntax, const AttributeList& alist,
+		     const Frame& frame,
 		     bool top_level);
   void print_sample (const symbol name, const Library&);
   void print_sample_name (const symbol name, bool top_level);
   void print_sample_end ();
   void print_sample_entries (const symbol name,
-                             const Syntax& syntax,
-                             const AttributeList& alist,
+                             const Frame& frame,
                              const std::vector<symbol>& order,
                              const std::vector<symbol>& own_entries,
                              const symbol lib_name,
                              const std::vector<symbol>& base_entries,
 			     bool top_level);
   void print_submodel (const symbol name, int level,
-		       const Syntax& syntax,
-		       const AttributeList& alist, 
-		       const symbol aref);
+		       const Frame& frame,
+                       const symbol aref);
   void print_submodel_entries (const symbol name, int level,
-                               const Syntax& syntax, 
-                               const AttributeList& alist,
+                               const Frame& frame,
                                const std::vector<symbol>& entries, 
 			       const symbol aref);
   void print_submodel_entry (const symbol, int level,
-                             const Syntax& syntax,
-                             const AttributeList& alist, bool& first, 
+                             const Frame& frame, bool& first, 
 			     const symbol aref);
   void print_model (symbol name, const Library& library, Treelog&);
   void print_fixed (const symbol name, 
-		    const Syntax& syntax,
-		    const AttributeList& alist,
+		    const Frame& frame,
                     const symbol description);
   void print_component (const Library& library, Treelog& msg);
 
@@ -168,17 +159,16 @@ ProgramDocument::print_description (const symbol description)
 
 void 
 ProgramDocument::print_entry_type (const symbol name,
-				   const Syntax& syntax,
-				   const AttributeList& alist)
+				   const Frame& frame)
 {
-  const Value::type type = syntax.lookup (name);
+  const Value::type type = frame.lookup (name);
 
   switch (type)
     {
     case Value::Number:
       {
 	format->text ("number ");
-	const symbol dimension = syntax.dimension (name);
+	const symbol dimension = frame.dimension (name);
 	if (dimension == Value::None ())
 	  format->text ("(dimensionless)");
 	else if (dimension == Value::Unknown ())
@@ -189,7 +179,7 @@ ProgramDocument::print_entry_type (const symbol name,
       break;
     case Value::AList:
       {
-        const symbol submodel_name = syntax.submodel_name (name);
+        const symbol submodel_name = frame.submodel_name (name);
 	if (submodel_name != Value::None ())
 	  {
 	    format->bold (submodel_name);
@@ -206,8 +196,8 @@ ProgramDocument::print_entry_type (const symbol name,
     case Value::PLF:
       {
 	format->text ("plf ");
-	const symbol domain = syntax.domain (name);
-	const symbol range = syntax.range (name);
+	const symbol domain = frame.domain (name);
+	const symbol range = frame.range (name);
 	format->bold ("[" + domain);
         format->text (" ");
 	// format->special("nbsp");
@@ -230,7 +220,7 @@ ProgramDocument::print_entry_type (const symbol name,
       break;
     case Value::Object:
       {
-	const symbol component = syntax.library (metalib, name).name ();
+	const symbol component = frame.library (metalib, name).name ();
 	format->bold (component.name ());
 	format->text (" component ");
 	format->see ("chapter", "component",  component.name ());
@@ -246,43 +236,35 @@ ProgramDocument::print_entry_type (const symbol name,
 void 
 ProgramDocument::print_entry_submodel (const symbol name, 
 				       const int level,
-				       const Syntax& syntax,
-				       const AttributeList& alist,
+				       const Frame& frame,
 				       const symbol aref)
 {
-  const Value::type type = syntax.lookup (name);
-  const int size = syntax.size (name);
-
+  const Value::type type = frame.lookup (name);
   if (type == Value::AList)
     {
-      const Syntax& child = syntax.syntax (name);
-      const AttributeList& nested 
-	= (size != Value::Singleton || !alist.check (name))
-	? syntax.default_frame (name).alist ()
-	: alist.alist (name);
-      if (syntax.submodel_name (name) == Value::None ())
+      const Frame& child = frame.frame (name);
+      if (frame.submodel_name (name) == Value::None ())
 	{
-	  print_sample (name, child, nested, false);
-	  print_submodel (name, level, child, nested, aref);
+	  print_sample (name, child, false);
+	  print_submodel (name, level, child, aref);
 	}
     }
 }
     
 void 
 ProgramDocument::print_entry_category (const symbol name, 
-				       const Syntax& syntax,
-				       const AttributeList& alist)
+				       const Frame& frame)
 {
-  const Value::type type = syntax.lookup (name);
+  const Value::type type = frame.lookup (name);
 
   if (type == Value::Object)	// Objects and ALists don't have categories.
     {
-      if (syntax.is_optional (name))
+      if (frame.is_optional (name))
 	{
 	  format->hard_linebreak ();
 	  format->text ("Optional component");
 	}
-      else if (alist.check (name))
+      else if (frame.check (name))
 	{
 	  format->hard_linebreak ();
 	  format->text ("Component");
@@ -290,30 +272,30 @@ ProgramDocument::print_entry_category (const symbol name,
     }
   else if (type == Value::AList)
     {
-      if (syntax.is_optional (name))
+      if (frame.is_optional (name))
 	{
 	  format->hard_linebreak ();
 	  format->text ("Optional submodel");
 	}
-      else if (alist.check (name))
+      else if (frame.check (name))
 	{
 	  format->hard_linebreak ();
 	  format->text ("Submodel");
 	}
     }
-  else if (syntax.is_optional (name))
+  else if (frame.is_optional (name))
     {
-      if (syntax.is_const (name))
+      if (frame.is_const (name))
 	{
 	  format->hard_linebreak ();
 	  format->text ("Optional parameter");
 	}
-      else if (syntax.is_state (name))
+      else if (frame.is_state (name))
 	{
 	  format->hard_linebreak ();
 	  format->text ("Optional state variable");
 	}
-      else if (syntax.is_log (name))
+      else if (frame.is_log (name))
 	{
 	  format->hard_linebreak ();
 	  format->text ("Optional log variable");
@@ -323,17 +305,17 @@ ProgramDocument::print_entry_category (const symbol name,
     }
   else
     {
-      if (syntax.is_const (name))
+      if (frame.is_const (name))
 	{
 	  format->hard_linebreak ();
 	  format->text ("Parameter");
 	}
-      else if (syntax.is_state (name))
+      else if (frame.is_state (name))
 	{
 	  format->hard_linebreak ();
 	  format->text ("State variable");
 	}
-      else if (syntax.is_log (name))
+      else if (frame.is_log (name))
 	{
 	  format->hard_linebreak ();
 	  format->text ("Log variable");
@@ -345,13 +327,12 @@ ProgramDocument::print_entry_category (const symbol name,
 
 void 
 ProgramDocument::print_entry_value (const symbol name, 
-				    const Syntax& syntax,
-				    const AttributeList& alist)
+				    const Frame& frame)
 {
-  if (alist.check (name))
+  if (frame.check (name))
     {
-      const Value::type type = syntax.lookup (name);
-      const int size = syntax.size (name);
+      const Value::type type = frame.lookup (name);
+      const int size = frame.size (name);
 
       bool print_default_value = false;
       
@@ -361,23 +342,22 @@ ProgramDocument::print_entry_value (const symbol name,
 	  case Value::Number:
 	    {
 	      std::ostringstream tmp;
-	      tmp << " (default " << alist.number (name) << ")";
+	      tmp << " (default " << frame.number (name) << ")";
 	      format->text (tmp.str ());
 	    }
 	    break;
 	  case Value::AList:
 	    {
-	      const bool has_errors
-		= !syntax.syntax (name).check (metalib, alist.alist (name), 
-					       Treelog::null ());
+	      const bool has_errors 
+                = !frame.check (metalib, name, Treelog::null ());
 	      if (has_errors)
 		format->text (" (has partially specified default value)");
 	      else 
 		format->text (" (has fully specified default value)");
-              const symbol submodel = syntax.submodel_name (name);
+              const symbol submodel = frame.submodel_name (name);
               if (submodel != Value::None ())
 		{
-		  const AttributeList& nested = alist.alist (name);
+		  const AttributeList& nested = frame.alist (name);
                   const Frame& frame = Librarian::submodel_frame (submodel);
 		  const Syntax& nested_syntax = frame.syntax ();
 		  const AttributeList& default_alist = frame.alist ();
@@ -391,16 +371,16 @@ ProgramDocument::print_entry_value (const symbol name,
 	  case Value::PLF:
 	    {
 	      std::ostringstream tmp;
-	      tmp << " (has default value with " << alist.plf (name).size ()
+	      tmp << " (has default value with " << frame.plf (name).size ()
 		     << " points)";
 	      format->text (tmp.str ());
-	      if (alist.plf (name).size () > 0)
+	      if (frame.plf (name).size () > 0)
 		print_default_value = true;
 	    }
 	    break;
 	  case Value::Boolean:
 	    format->text (" (default ");
-	    if (alist.flag (name))
+	    if (frame.flag (name))
 	      format->text ("true");
 	    else 
 	      format->text ("false");
@@ -408,7 +388,7 @@ ProgramDocument::print_entry_value (const symbol name,
 	    break;
 	  case Value::String:
 	    {
-	      const std::string value = alist.name (name).name ();
+	      const std::string value = frame.name (name).name ();
 	      if (value.length () < 30)
 		format->text (" (default `" + value + "')");
 	      else
@@ -424,17 +404,17 @@ ProgramDocument::print_entry_value (const symbol name,
 	  case Value::Integer:
 	    {
 	      std::ostringstream tmp;
-	      tmp << " (default " << alist.integer (name) << ")";
+	      tmp << " (default " << frame.integer (name) << ")";
 	      format->text (tmp.str ());
 	    }
 	    break;
 	  case Value::Object:
 	    {
-	      const AttributeList& object = alist.alist (name);
+	      const AttributeList& object = frame.alist (name);
 	      daisy_assert (object.check ("type"));
 	      const symbol type = object.name ("type");
 	      format->text (" (default `" + type.name () + "')");
-	      const Library& library = syntax.library (metalib, name);
+	      const Library& library = frame.library (metalib, name);
 	      const AttributeList& super = library.lookup (type);
 	      if (!object.subset (metalib, super, library.syntax (type)))
 		print_default_value = true;
@@ -454,13 +434,13 @@ ProgramDocument::print_entry_value (const symbol name,
 	  case Value::String:
 	  case Value::Integer:
 	  case Value::Object:
-	    if (alist.size (name) == 0)
+	    if (frame.size (name) == 0)
 	      format->text (" (default: an empty sequence)");
 	    else
 	      {
 		std::ostringstream tmp;
 		tmp << " (has default value with length " 
-		       << alist.size (name) << ")";
+		       << frame.size (name) << ")";
 		format->text (tmp.str ());
 		print_default_value = true;
 	      }
@@ -474,7 +454,7 @@ ProgramDocument::print_entry_value (const symbol name,
 	{
 	  std::ostringstream tmp;
 	  PrinterFile printer (metalib, tmp);
-	  printer.print_entry (alist, syntax, name);
+	  printer.print_entry (frame.alist (), frame.syntax (), name);
 	  format->soft_linebreak ();
 	  format->verbatim (tmp.str ());
 	  format->text ("Description:");
@@ -549,9 +529,8 @@ ProgramDocument::print_users (const XRef::Users& users)
 
 void
 ProgramDocument::print_sample_entry (const symbol name, 
-				     const Syntax& syntax,
-				     const AttributeList& alist,
-				     const bool last)
+				     const Frame& frame,
+                                     const bool last)
 { 
   std::string comment;
   {
@@ -559,10 +538,10 @@ ProgramDocument::print_sample_entry (const symbol name,
     format->text ("(");
     print_string (name);
 
-    if (alist.check (name))
+    if (frame.check (name))
       {
-	const Value::type type = syntax.lookup (name);
-	const int size = syntax.size (name);
+	const Value::type type = frame.lookup (name);
+	const int size = frame.size (name);
 
 	bool print_name = true;
 	comment = "Has default value.";
@@ -574,8 +553,8 @@ ProgramDocument::print_sample_entry (const symbol name,
 	      {
 		format->special ("nbsp");
 		std::ostringstream tmp;
-		tmp << alist.number (name);
-                const symbol dimension = syntax.dimension (name);
+		tmp << frame.number (name);
+                const symbol dimension = frame.dimension (name);
                 if (dimension == Value::None ())
                   tmp << " []";
                 else if (dimension == Value::Unknown ())
@@ -589,10 +568,8 @@ ProgramDocument::print_sample_entry (const symbol name,
 	      break;
 	    case Value::AList:
 	      {
-		const bool has_errors
-		  = !syntax.syntax (name).check (metalib,
-                                                 alist.alist (name), 
-						 Treelog::null ());
+		const bool has_errors 
+                  = !frame.check (metalib, name, Treelog::null ());
 		if (has_errors)
 		  comment = "Has partial value.";
 	      }
@@ -601,13 +578,13 @@ ProgramDocument::print_sample_entry (const symbol name,
 	      break;
 	    case Value::Boolean:
 	      format->special ("nbsp");
-	      format->text (alist.flag (name) ? "true" : "false");
+	      format->text (frame.flag (name) ? "true" : "false");
 	      format->text (")");
 	      print_name = false;
 	      break;
 	    case Value::String:
 	      {
-		const std::string value = alist.name (name).name ();
+		const std::string value = frame.name (name).name ();
 		if (value.length () < 20)
 		  {
 		    format->special ("nbsp");
@@ -621,14 +598,14 @@ ProgramDocument::print_sample_entry (const symbol name,
 	      {
 		format->special ("nbsp");
 		std::ostringstream tmp;
-		tmp << alist.integer (name) << ")";
+		tmp << frame.integer (name) << ")";
 		format->text (tmp.str ());
 		print_name = false;
 	      }
 	      break;
 	    case Value::Object:
 	      {
-		const AttributeList& object = alist.alist (name);
+		const AttributeList& object = frame.alist (name);
 		daisy_assert (object.check ("type"));
 		const symbol type = object.name ("type");
 		comment = "Default " + type + " value.";
@@ -638,7 +615,7 @@ ProgramDocument::print_sample_entry (const symbol name,
 	    case Value::Error:
 	      daisy_notreached ();
 	    }
-	else if (alist.size (name) == 0)
+	else if (frame.size (name) == 0)
 	  {
 	    format->text (")");
 	    print_name = false;
@@ -647,10 +624,10 @@ ProgramDocument::print_sample_entry (const symbol name,
 	  switch (type)
 	    {
 	    case Value::Number:
-	      if (alist.size (name) < 5)
+	      if (frame.size (name) < 5)
 		{
 		  const std::vector<double>& numbers
-		    = alist.number_sequence (name);
+		    = frame.number_sequence (name);
 		  for (int i = 0; i < numbers.size (); i++)
 		    {
 		      format->special ("nbsp");
@@ -677,7 +654,7 @@ ProgramDocument::print_sample_entry (const symbol name,
 	  {
 	    format->special ("nbsp");
 	    format->italic (name);
-	    if (syntax.size (name) != Value::Singleton)
+	    if (frame.size (name) != Value::Singleton)
 	      {
 		format->special ("nbsp");
 		format->special ("...");
@@ -691,7 +668,7 @@ ProgramDocument::print_sample_entry (const symbol name,
       {
 	format->special ("nbsp");
 	format->italic (name);
-	if (syntax.size (name) != Value::Singleton)
+	if (frame.size (name) != Value::Singleton)
 	  {
 	    format->special ("nbsp");
 	    format->special ("...");
@@ -719,30 +696,30 @@ ProgramDocument::own_entries (const Metalib& metalib,
 			      std::vector<symbol>& entries,
                               const bool new_only)
 {
-  const Syntax& syntax = library.syntax (name);
-  const AttributeList& alist = library.lookup (name);
+  const FrameModel& frame = library.model (name);
 
-  syntax.entries (entries);
+  frame.entries (entries);
 
   // Remove base entries.
-  if (alist.check ("base_model") || alist.check ("type"))
+  if (frame.check ("base_model") || frame.check ("type"))
     {
-      const symbol base_model = alist.check ("base_model")
-        ? alist.name ("base_model")
-        : alist.name ("type");
+      const symbol base_model = frame.check ("base_model")
+        ? frame.name ("base_model")
+        : frame.name ("type");
           
       if (base_model != name)
         {
-          const Syntax& base_syntax = library.syntax (base_model);
-          const AttributeList& base_alist = library.lookup (base_model);
+          const FrameModel& base_frame = library.model (base_model);
           std::vector<symbol> base_entries;
-          base_syntax.entries (base_entries);
+          base_frame.entries (base_entries);
           for (size_t i = 0; i < base_entries.size (); i++)
             {
               const symbol key = base_entries[i];
               if (new_only
                   || key == "description"
-                  || alist.subset (metalib, base_alist, base_syntax, key))
+                  || frame.alist ().subset (metalib, 
+                                            base_frame.alist (), 
+                                            base_frame.syntax (), key))
                 entries.erase (find (entries.begin (), entries.end (), key));
             }
         }
@@ -754,22 +731,22 @@ ProgramDocument::inherited_entries (const Metalib& metalib,
                                     const Library& library, const symbol name, 
 				    std::vector<symbol>& entries)
 {
-  const AttributeList& alist = library.lookup (name);
+  const FrameModel& frame = library.model (name);
 
-  if (alist.check ("base_model"))
+  if (frame.check ("base_model"))
     {
-      const symbol base_model = alist.name ("base_model");
+      const symbol base_model = frame.name ("base_model");
           
       if (base_model != name)
         {
-          const Syntax& base_syntax = library.syntax (base_model);
-          const AttributeList& base_alist = library.lookup (base_model);
-          base_syntax.entries (entries);
+          const FrameModel& base_frame = library.model (base_model);
+          base_frame.entries (entries);
           for (size_t i = 0; i < entries.size (); i++)
             {
               const symbol key = entries[i];
               if (key != "description" 
-                  && !alist.subset (metalib, base_alist, base_syntax, key))
+                  && !frame.alist ().subset (metalib, base_frame.alist (), 
+                                             base_frame.syntax (), key))
                 entries.erase (find (entries.begin (), entries.end (), key));
             }
         }
@@ -778,31 +755,29 @@ ProgramDocument::inherited_entries (const Metalib& metalib,
 
 void 
 ProgramDocument::print_sample (const symbol name,
-			       const Syntax& syntax,
-			       const AttributeList& alist,
-			       const bool top_level)
+			       const Frame& frame,
+                               const bool top_level)
 {
-  const std::vector<symbol>& order = syntax.order ();
+  const std::vector<symbol>& order = frame.order ();
   std::vector<symbol> own;
-  syntax.entries (own);
+  frame.entries (own);
   const std::vector<symbol> base;
-  print_sample_entries (name, syntax, alist, order, own, "dummy", base, 
+  print_sample_entries (name, frame, order, own, "dummy", base, 
 			top_level);
 }
 
 void 
 ProgramDocument::print_sample (const symbol name, const Library& library)
 {
-  const Syntax& syntax = library.syntax (name);
-  const AttributeList& alist = library.lookup (name);
+  const FrameModel& frame = library.model (name);
 
-  const std::vector<symbol>& order = syntax.order ();
+  const std::vector<symbol>& order = frame.order ();
   std::vector<symbol> own;
   own_entries (metalib, library, name, own);
   std::vector<symbol> base;
   inherited_entries (metalib, library, name, base);
 
-  print_sample_entries (name.name (), syntax, alist, order, own, 
+  print_sample_entries (name.name (), frame, order, own, 
                         library.name ().name (), base, true);
 }
 
@@ -829,8 +804,7 @@ ProgramDocument::print_sample_end ()
 
 void 
 ProgramDocument::print_sample_entries (const symbol name,
-                                       const Syntax& syntax,
-                                       const AttributeList& alist,
+                                       const Frame& frame,
                                        const std::vector<symbol>& 
                                        /**/ order,
                                        const std::vector<symbol>&
@@ -843,15 +817,15 @@ ProgramDocument::print_sample_entries (const symbol name,
   // Remove uninteresting entries
   std::vector<symbol> own; 
   for (size_t i = 0; i < own_entries.size (); i++)
-    if (syntax.order_index (own_entries[i]) < 0
-	&& !syntax.is_log (own_entries[i])
-	&& syntax.lookup (own_entries[i]) != Value::Library)
+    if (frame.order_index (own_entries[i]) < 0
+	&& !frame.is_log (own_entries[i])
+	&& frame.lookup (own_entries[i]) != Value::Library)
       own.push_back (own_entries[i]);
   std::vector<symbol> base;
   for (size_t i = 0; i < base_entries.size (); i++)
-    if (syntax.order_index (base_entries[i]) < 0
-	&& !syntax.is_log (base_entries[i])
-	&& syntax.lookup (base_entries[i]) != Value::Library)
+    if (frame.order_index (base_entries[i]) < 0
+	&& !frame.is_log (base_entries[i])
+	&& frame.lookup (base_entries[i]) != Value::Library)
       base.push_back (base_entries[i]);
 
   // Count entries.
@@ -881,7 +855,7 @@ ProgramDocument::print_sample_entries (const symbol name,
       for (unsigned int i = 0; i < order.size (); i++)
 	{ 
 	  format->italic (order[i]);
-	  if (syntax.size (order[i]) == Value::Sequence)
+	  if (frame.size (order[i]) == Value::Sequence)
 	    format->special ("...");
 	  format->special ("nbsp");
 	  left--;
@@ -899,7 +873,7 @@ ProgramDocument::print_sample_entries (const symbol name,
       else
 	Format::TableCell empty (*format);
 	  
-      print_sample_entry (own[i], syntax, alist, left == 1);
+      print_sample_entry (own[i], frame, left == 1);
       left--;
     }
  
@@ -919,14 +893,14 @@ ProgramDocument::print_sample_entries (const symbol name,
 	  format->text (";; Shared parameters are described in section");
 	  format->special ("nbsp");
 	  format->ref ("model", 
-		       lib_name + "-" + alist.name ("base_model"));
+		       lib_name + "-" + frame.name ("base_model"));
 	}
       }
       for (unsigned int i = 0; i < base.size (); i++)
 	{
 	  Format::TableRow row (*format);
 	  { Format::TableCell empty (*format); }
-	  print_sample_entry (base[i], syntax, alist, left == 1);
+	  print_sample_entry (base[i], frame, left == 1);
 	  left--;
 	}
     }
@@ -935,28 +909,26 @@ ProgramDocument::print_sample_entries (const symbol name,
 
 void 
 ProgramDocument::print_submodel (const symbol name, int level,
-				 const Syntax& syntax,
-				 const AttributeList& alist, 
-				 const symbol aref)
+				 const Frame& frame,
+                                 const symbol aref)
 {
   std::vector<symbol> entries;
-  syntax.entries (entries);
-  print_submodel_entries (name, level, syntax, alist, entries, aref);
+  frame.entries (entries);
+  print_submodel_entries (name, level, frame, entries, aref);
 }
 
 void 
 ProgramDocument::print_submodel_entries (const symbol name, int level,
-					 const Syntax& syntax,
-					 const AttributeList& alist,
-					 const std::vector<symbol>&
+					 const Frame& frame,
+                                         const std::vector<symbol>&
 					 /**/ entries, 
 					 const symbol aref)
 {
   const std::string bref = aref + "-" + name;
-  const std::vector<symbol>& order = syntax.order ();
+  const std::vector<symbol>& order = frame.order ();
   int log_count = 0;
   for (unsigned int i = 0; i < entries.size (); i++)
-    if (syntax.is_log (entries[i]))
+    if (frame.is_log (entries[i]))
       log_count++;
 
   if (entries.size () == 0)
@@ -974,13 +946,13 @@ ProgramDocument::print_submodel_entries (const symbol name, int level,
 	  bool first = true;
 	  // Ordered members first.
 	  for (unsigned int i = 0; i < order.size (); i++)
-	    print_submodel_entry (order[i], level, syntax, alist, first, bref);
+	    print_submodel_entry (order[i], level, frame, first, bref);
       
 	  // Then the remaining members, except log variables.
 	  for (unsigned int i = 0; i < entries.size (); i++)
-	    if (syntax.order_index (entries[i]) < 0 
-                && !syntax.is_log (entries[i]))
-	      print_submodel_entry (entries[i], level, syntax, alist, first, 
+	    if (frame.order_index (entries[i]) < 0 
+                && !frame.is_log (entries[i]))
+	      print_submodel_entry (entries[i], level, frame, first, 
 				    bref);
 	}
 
@@ -1000,8 +972,8 @@ ProgramDocument::print_submodel_entries (const symbol name, int level,
 	  Format::List dummy (*format);
 	  bool first = true;
 	  for (unsigned int i = 0; i < entries.size (); i++)
-	    if (syntax.is_log (entries[i]))
-	      print_submodel_entry (entries[i], level, syntax, alist, first,
+	    if (frame.is_log (entries[i]))
+	      print_submodel_entry (entries[i], level, frame, first,
 				    bref);
 	}
     }
@@ -1009,8 +981,7 @@ ProgramDocument::print_submodel_entries (const symbol name, int level,
 
 void 
 ProgramDocument::print_submodel_entry (const symbol name, int level,
-				       const Syntax& syntax,
-				       const AttributeList& alist, bool& first,
+				       const Frame& frame, bool& first,
 				       const symbol aref)
 {
   if (first)
@@ -1018,13 +989,13 @@ ProgramDocument::print_submodel_entry (const symbol name, int level,
   else
     format->soft_linebreak ();
 
-  const Value::type type = syntax.lookup (name);
+  const Value::type type = frame.lookup (name);
 
   // We ignore libraries.
   if (type == Value::Library)
     return;
 
-  const int size = syntax.size (name);
+  const int size = frame.size (name);
 
   // Print name.
   Format::Item dummy (*format, name);
@@ -1032,7 +1003,7 @@ ProgramDocument::print_submodel_entry (const symbol name, int level,
   format->index (name);
   
   // Print type.
-  print_entry_type (name, syntax, alist);
+  print_entry_type (name, frame);
 
   // Print size.
   if (size == Value::Singleton)
@@ -1046,18 +1017,18 @@ ProgramDocument::print_submodel_entry (const symbol name, int level,
       format->text (tmp.str ());
     }
 
-  if (!syntax.is_log (name))
+  if (!frame.is_log (name))
     {
       // Print category.
-      print_entry_category (name, syntax, alist);
+      print_entry_category (name, frame);
 
       // Print value.
       if (name != "description")
-        print_entry_value (name, syntax, alist);
+        print_entry_value (name, frame);
     }
 
   // Print description line.
-  const symbol description = syntax.description (name);
+  const symbol description = frame.description (name);
   if (description != Value::Unknown ())
     {
       format->hard_linebreak ();
@@ -1066,7 +1037,7 @@ ProgramDocument::print_submodel_entry (const symbol name, int level,
     }
 
   // print submodel entries, if applicable
-  print_entry_submodel (name, level + 1, syntax, alist, aref);
+  print_entry_submodel (name, level + 1, frame, aref);
 }
 
 
@@ -1074,22 +1045,21 @@ void
 ProgramDocument::print_model (const symbol name, const Library& library,
                               Treelog& msg)
 {
-  const Syntax& syntax = library.syntax (name);
-  const AttributeList& alist = library.lookup (name);  
+  const FrameModel& frame = library.model (name);
 
   const XRef::ModelUsed used (library.name (), name);
-  if (alist.check ("type"))
+  if (frame.check ("type"))
     {
       // This is a parameterization.
-      const symbol type = alist.name ("type");
+      const symbol type = frame.name ("type");
       format->soft_linebreak ();
       Format::Section dummy (*format, "section", name.name (), "model", 
 			     current_component + "-" + name);
       format->index (name.name ());
       format->text ("A `" + type + "' parameterization ");
       
-      if (alist.check ("parsed_from_file"))
-	format->text ("defined in `" + alist.name ("parsed_from_file")
+      if (frame.check ("parsed_from_file"))
+	format->text ("defined in `" + frame.name ("parsed_from_file")
 		      + "'.\n");
       else
 	{
@@ -1098,14 +1068,15 @@ ProgramDocument::print_model (const symbol name, const Library& library,
 	  format->text (".\n");
 	}
 
-      if (library.has_interesting_description (alist))
-        format->alist_description (alist);
+      if (library.has_interesting_description (frame.alist ()))
+        format->alist_description (frame.alist ());
 
       print_users (xref.models[used]);
       std::vector<symbol> entries;
       own_entries (metalib, library, name, entries, true);
       if (entries.size () > 0)
-        print_submodel_entries (name.name (), 0, syntax, alist, entries, 
+        print_submodel_entries (name.name (), 0, 
+                                frame, entries, 
                                 library.name ().name ());
 
       const std::vector<Library::doc_fun>& doc_funs 
@@ -1132,7 +1103,7 @@ ProgramDocument::print_model (const symbol name, const Library& library,
       format->index (name.name ());
 
       // Print description, if any.
-      format->alist_description (alist);
+      format->alist_description (frame.alist ());
 
       print_users (xref.models[used]);
       print_sample (name, library);
@@ -1140,15 +1111,14 @@ ProgramDocument::print_model (const symbol name, const Library& library,
       // Print own entries.
       std::vector<symbol> entries;
       own_entries (metalib, library, name, entries);
-      print_submodel_entries (name.name (), 0, syntax, alist, entries, 
+      print_submodel_entries (name.name (), 0, frame, entries, 
 			      library.name ().name ());
     }
 }
 
 void
 ProgramDocument::print_fixed (const symbol name, 
-			      const Syntax& syntax,
-			      const AttributeList& alist, 
+			      const Frame& frame,
                               const symbol description)
 {
   format->soft_linebreak ();
@@ -1160,8 +1130,8 @@ ProgramDocument::print_fixed (const symbol name,
 
   print_users (xref.submodels[name]);
 
-  print_sample (name, syntax, alist, true);
-  print_submodel (name, 0, syntax, alist, "fixed");
+  print_sample (name, frame, true);
+  print_submodel (name, 0, frame, "fixed");
 }
 
 class ModelCompare
@@ -1268,7 +1238,7 @@ standard parameterizations for the model.");
       const symbol name = fixed[i];
       const Frame& frame = Librarian::submodel_frame (name);
       const symbol description = Librarian::submodel_description (name);
-      print_fixed (name, frame.syntax (), frame.alist (), description);
+      print_fixed (name, frame, description);
   }
 }
 
