@@ -905,10 +905,6 @@ AttributeList::add (const symbol key, int v)
 { impl.add (key, AValue (v)); }
 
 void 
-AttributeList::add (const symbol key, const AttributeList& v)
-{ impl.add (key, AValue (v)); }
-
-void 
 AttributeList::add (const symbol key, const Frame& v)
 { impl.add (key, AValue (v)); }
 
@@ -971,11 +967,6 @@ AttributeList::add (const symbol key, const std::vector<int>& v)
 
 void 
 AttributeList::add (const symbol key, 
-		    const std::vector<const AttributeList*>& v)
-{ impl.add (key, AValue (v)); }
-
-void 
-AttributeList::add (const symbol key, 
 		    const std::vector<const Frame*>& v)
 { impl.add (key, AValue (v)); }
 
@@ -986,82 +977,6 @@ AttributeList::add (const symbol key, const std::vector<const PLF*>& v)
 void 
 AttributeList::remove (const symbol key)
 { impl.remove (key); }
-
-bool
-AttributeList::revert (const Metalib& metalib,
-                       const symbol key, 
-		       const AttributeList& default_alist, 
-		       const Syntax& syntax)
-{
-  if (subset (metalib, default_alist, syntax, key))
-    return false;
-
-  if (!default_alist.check (key))
-    {
-      daisy_assert (check (key));
-      remove (key);
-      return true;
-    }
-
-  if (syntax.size (key) == Value::Singleton)
-    switch (syntax.lookup (key))
-      {
-      case Value::Number:
-        if (syntax.dimension (key) == Value::User ())
-          add (key, default_alist.number (key), default_alist.name (key));
-        else 
-          add (key, default_alist.number (key));
-        break;
-      case Value::Boolean:
-	add (key, default_alist.flag (key));
-        break;
-      case Value::Integer:
-	add (key, default_alist.integer (key));
-        break;
-      case Value::AList:
-      case Value::Object:
-        add (key, default_alist.alist (key));
-        break;
-      case Value::PLF:
-	add (key, default_alist.plf (key));
-        break;
-      case Value::String:
-	add (key, default_alist.name (key));
-        break;
-      case Value::Library:
-      case Value::Error:
-      default:
-	daisy_notreached ();
-      }
-  else
-    switch (syntax.lookup (key))
-      {
-      case Value::Number:
-	add (key, default_alist.number_sequence (key));
-        break;
-      case Value::Boolean:
-	add (key, default_alist.flag_sequence (key));
-        break;
-      case Value::Integer:
-	add (key, default_alist.integer_sequence (key));
-        break;
-      case Value::AList:
-      case Value::Object:
-        add (key, default_alist.alist_sequence (key));
-        break;
-      case Value::PLF:
-	add (key, default_alist.plf_sequence (key));
-        break;
-      case Value::String:
-	add (key, default_alist.name_sequence (key));
-        break;
-      case Value::Library:
-      case Value::Error:
-      default:
-	daisy_notreached ();
-      }
-  return true;
-}
 
 void
 AttributeList::operator += (const AttributeList& al)

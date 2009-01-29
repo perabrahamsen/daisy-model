@@ -312,27 +312,6 @@ daisy_alist_set_number_at (AttributeList* alist, const char* name,
   alist->add (name, v);
 }
 
-extern "C" void EXPORT
-daisy_alist_set_alist_at (AttributeList* alist, const char* name,
-			  AttributeList* value, unsigned int index)
-{ 
-  std::vector<const AttributeList*>& v = alist->check (name)
-    ? *new std::vector<const AttributeList*> (alist->alist_sequence (name))
-    : *new std::vector<const AttributeList*>;
-  if (v.size () <= index)
-    while (v.size () <= index)
-      v.push_back (value);
-  else
-    {
-#if 0
-      // BUG: Might be duplicate, so we can't delete.
-      delete v[index];
-#endif
-      v[index] = value;
-    }
-  alist->add (name, v);
-}
-
 /* @ The daisy_library Type.
  * 
  * A library contains a collection of objects, each containing a

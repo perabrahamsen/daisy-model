@@ -25,7 +25,7 @@
 #include "traverse.h"
 #include "library.h"
 #include "metalib.h"
-#include "alist.h"
+#include "frame_model.h"
 #include "treelog.h"
 #include "assertion.h"
 #include <algorithm>
@@ -61,40 +61,33 @@ private:
   // Implementation.
   bool enter_library (Library& library, symbol component);
   void leave_library ();
-  bool enter_model (const Syntax&, AttributeList&, 
+  bool enter_model (Frame& frame,
 		    symbol component, symbol model);
   void leave_model (symbol component, symbol name);
-  bool enter_submodel (const Syntax& syntax, AttributeList& alist,
-  		       const AttributeList& default_alist,
+  bool enter_submodel (Frame& frame, const Frame& default_alist, 
   		       const symbol name, const symbol registered);
   void leave_submodel ();
-  bool enter_submodel_default (const Syntax& syntax, 
-			       const AttributeList& default_alist,
+  bool enter_submodel_default (const Frame& default_frame,
 			       const symbol name, const symbol registered);
   void leave_submodel_default ();
-  bool enter_submodel_sequence (const Syntax& syntax,
-  				const AttributeList& alist,
-  				const AttributeList& default_alist,
+  bool enter_submodel_sequence (const Frame& frame, 
+                                const Frame& default_frame,
   				const symbol name, unsigned index, 
                                 const symbol registered);
   void leave_submodel_sequence ();
-  bool enter_submodel_sequence_default (const Syntax& syntax, 
-  					const AttributeList& default_alist,
+  bool enter_submodel_sequence_default (const Frame& default_frame,
   					const symbol name, const symbol registered);
   void leave_submodel_sequence_default ();
   bool enter_object (const Library&, 
-		     const Syntax& syntax, const AttributeList& alist,
-  		     const AttributeList& default_alist,
+		     const Frame& frame, const Frame& default_frame,
   		     const symbol name);
   void leave_object ();
-  bool enter_object_sequence (const Library&, const Syntax& syntax,
-  			      const AttributeList& alist,
-  			      const AttributeList& default_alist,
+  bool enter_object_sequence (const Library&, 
+                              const Frame& frame, const Frame& default_frame,
   			      const symbol name, 
   			      unsigned index);
   void leave_object_sequence ();
-  bool enter_parameter (const Syntax&, const AttributeList& alist, 
-			const AttributeList& default_alist, 
+  bool enter_parameter (const Frame& frame, const Frame& default_frame,
 			const symbol name, const symbol parameter);
   void leave_parameter ();
 };
@@ -113,13 +106,13 @@ TraverseDepend::leave_library ()
 { treelog.close (); }
 
 bool
-TraverseDepend::enter_model (const Syntax&, AttributeList& alist,
+TraverseDepend::enter_model (Frame& frame,
 			     const symbol component, const symbol name)
 {
   // Check if this model is inherited from the model we are examining.
   if (dep_lib == component
-      && alist.check ("type") 
-      && alist.name ("type") == dep_par)
+      && frame.check ("type") 
+      && frame.name ("type") == dep_par)
     { 
       Treelog::Open nest1 (treelog, name);
       treelog.entry (dep_par + " inherited by " + name);
@@ -161,8 +154,7 @@ TraverseDepend::leave_model (const symbol component, const symbol name)
 }
 
 bool
-TraverseDepend::enter_submodel (const Syntax&, AttributeList&,
-				const AttributeList&,
+TraverseDepend::enter_submodel (Frame&, const Frame&,
 				const symbol name, const symbol registered)
 {
   treelog.open (name);
@@ -174,8 +166,8 @@ TraverseDepend::leave_submodel ()
 { treelog.close (); }
 
 bool
-TraverseDepend::enter_submodel_default (const Syntax&, const AttributeList&, 
-					const symbol, const symbol)
+TraverseDepend::enter_submodel_default (const Frame&, 
+                                        const symbol, const symbol)
 { return false; }
 
 void
@@ -183,9 +175,7 @@ TraverseDepend::leave_submodel_default ()
 { daisy_notreached (); }
 
 bool
-TraverseDepend::enter_submodel_sequence (const Syntax&,
-					 const AttributeList&,
-					 const AttributeList&,
+TraverseDepend::enter_submodel_sequence (const Frame&, const Frame&,
 					 const symbol name, unsigned index, 
                                          const symbol)
 { 
@@ -200,8 +190,7 @@ TraverseDepend::leave_submodel_sequence ()
 { treelog.close (); }
 
 bool
-TraverseDepend::enter_submodel_sequence_default (const Syntax&, 
-						 const AttributeList&,
+TraverseDepend::enter_submodel_sequence_default (const Frame&,
 						 const symbol, const symbol)
 { return false; }
 
@@ -211,12 +200,11 @@ TraverseDepend::leave_submodel_sequence_default ()
 
 bool
 TraverseDepend::enter_object (const Library& library, 
-			      const Syntax&, const AttributeList& alist,
-			      const AttributeList&,
+			      const Frame& frame, const Frame&,
 			      const symbol name)
 {
-  daisy_assert (alist.check ("type"));
-  const symbol super = alist.name ("type");
+  daisy_assert (frame.check ("type"));
+  const symbol super = frame.name ("type");
   if (dep_lib == library.name () && super == dep_par)
     { 
       treelog.entry (name + " inherits " + dep_par);
@@ -234,15 +222,14 @@ TraverseDepend::leave_object ()
 
 bool
 TraverseDepend::enter_object_sequence (const Library& library, 
-				       const Syntax& syntax, 
-				       const AttributeList& alist,
-				       const AttributeList& default_alist,
+				       const Frame& frame,
+                                       const Frame& default_frame,
 				       const symbol name, unsigned index)
 { 
   std::ostringstream str;
   str << name << "[" << index << "]";
 
-  return enter_object (library, syntax, alist, default_alist, str.str ());
+  return enter_object (library, frame, default_frame, str.str ());
 }
 
 void
@@ -250,8 +237,7 @@ TraverseDepend::leave_object_sequence ()
 { leave_object (); }
 
 bool
-TraverseDepend::enter_parameter (const Syntax&, const AttributeList&, 
-				 const AttributeList&, 
+TraverseDepend::enter_parameter (const Frame&, const Frame&,
 				 const symbol, const symbol)
 { return true; }
 
@@ -320,9 +306,9 @@ sequence_number (const Metalib& metalib,
 {
   const Library& library = metalib.library (component);
   daisy_assert (library.check (parameterization));
-  const AttributeList& alist = library.lookup (parameterization);
-  if (alist.check ("parsed_sequence"))
-    return alist.integer ("parsed_sequence");
+  const Frame& frame = library.model (parameterization);
+  if (frame.check ("parsed_sequence"))
+    return frame.integer ("parsed_sequence");
 
   return -1;
 }
@@ -394,7 +380,9 @@ resequence (Metalib& metalib,
        
       Library& library = metalib.library (component);
       daisy_assert (library.check (parameterization));
-      AttributeList& alist = library.lookup (parameterization);
-      alist.add ("parsed_sequence", metalib.get_sequence ());
+      Frame& frame = library.frame (parameterization);
+      frame.add ("parsed_sequence", metalib.get_sequence ());
     }
 }
+
+// depend.C ends here.

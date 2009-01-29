@@ -24,11 +24,10 @@
 #include "traverse.h"
 #include "metalib.h"
 #include "library.h"
-#include "syntax.h"
 #include "assertion.h"
 #include "librarian.h"
 #include "frame_submodel.h"
-#include "alist.h"
+#include "frame_model.h"
 
 void 
 Traverse::traverse_all_libraries ()
@@ -55,8 +54,7 @@ Traverse::traverse_all_submodels ()
     {
       const symbol submodel = submodels[i];
       const Frame& frame = Librarian::submodel_frame (submodel);
-      traverse_submodel_default (frame.syntax (), frame.alist (), submodel, 
-                                 submodel);
+      traverse_submodel_default (frame, submodel, submodel);
     }
 }
 
@@ -85,203 +83,179 @@ Traverse::traverse_model (const symbol component, const symbol model)
   // Traverse through a specific library member.
 {
   Library& library = metalib.library (component);
-  const Syntax& syntax = library.syntax (model);
-  AttributeList& alist = library.lookup (model);
+  Frame& frame = library.frame (model);
 
-  if (enter_model (syntax, alist, component, model))
+  if (enter_model (frame, component, model))
     {
-      if (alist.check ("type"))
+      if (frame.check ("type"))
 	{
 	  // Derived parameterization, has default values.
-	  const symbol super = alist.name ("type");
-	  const AttributeList& default_alist = library.lookup (super);
-	  traverse_alist (syntax, alist, default_alist, model.name ());
+	  const symbol super = frame.name ("type");
+	  const Frame& default_frame = library.model (super);
+	  traverse_alist (frame, default_frame, model.name ());
 	}
       else
 	{
 	  // Buildin, no default values.
-	  static const AttributeList empty_alist;
-	  traverse_alist (syntax, alist, empty_alist, model.name ());
+	  traverse_alist (frame, FrameModel::root (), model.name ());
 	}	
       leave_model (component, model);
     }
 }
 
 void
-Traverse::traverse_submodel (const Syntax& syntax, AttributeList& alist,
-			     const AttributeList& default_alist,
+Traverse::traverse_submodel (Frame& frame,
+			     const Frame& default_frame,
 			     const symbol name, const symbol registered)
   // Traverse through a submodel, typically a nested alist.
 {
-  if (enter_submodel (syntax, alist, default_alist, name, registered))
+  if (enter_submodel (frame, default_frame, name, registered))
     {
-      traverse_alist (syntax, alist, default_alist, name);
+      traverse_alist (frame, default_frame, name);
       leave_submodel ();
     }
 }
 
 void
-Traverse::traverse_submodel_default (const Syntax& syntax, 
-				     const AttributeList& default_alist,
+Traverse::traverse_submodel_default (const Frame& default_frame,
 				     const symbol name, const symbol registered)
   // Traverse through a submodel with no actual value, but a default
   // value.  This only happens in buildin models.
 {
-  if (enter_submodel_default (syntax, default_alist, name, registered))
+  if (enter_submodel_default (default_frame, name, registered))
     {
-      static AttributeList empty_alist;
-      traverse_alist (syntax, const_cast<AttributeList&> (default_alist),
-		      empty_alist, name);
+      traverse_alist (const_cast<Frame&> (default_frame),
+                      FrameModel::root (), name);
       leave_submodel_default ();
     }
 }
 
 void
-Traverse::traverse_submodel_sequence (const Syntax& syntax,
-				      const AttributeList& alist,
-				      const AttributeList& default_alist,
+Traverse::traverse_submodel_sequence (const Frame& frame,
+				      const Frame& default_frame,
 				      const symbol name, const unsigned index,
                                       const symbol registered)
   // Traverse through a submodel, typically a nested alist.
 {
-  if (enter_submodel_sequence (syntax, alist, default_alist, name, index, registered))
+  if (enter_submodel_sequence (frame, default_frame, name, index, registered))
     {
-      traverse_alist (syntax, alist, default_alist, name);
+      traverse_alist (frame, default_frame, name);
       leave_submodel_sequence ();
     }
 }
 
 void
-Traverse::traverse_submodel_sequence_default (const Syntax& syntax, 
-					      const AttributeList&
-					      /**/ default_alist,
+Traverse::traverse_submodel_sequence_default (const Frame& default_frame,
 					      const symbol name,
                                               const symbol registered)
   // Traverse through the common default value for members of a
   // submodel sequence.
 {
-  if (enter_submodel_sequence_default (syntax, default_alist, name, registered))
+  if (enter_submodel_sequence_default (default_frame, name, registered))
     {
-      static AttributeList empty_alist;
-      traverse_alist (syntax, const_cast<AttributeList&> (default_alist),
-		      empty_alist, name);
+      traverse_alist (const_cast<Frame&> (default_frame), 
+                      FrameModel::root (), name);
       leave_submodel_sequence_default ();
     }
 }
 
 void
 Traverse::traverse_object (const Library& library, 
-			   const Syntax& syntax, AttributeList& alist,
-			   const AttributeList& default_alist,
+			   Frame& frame, const Frame& default_frame,
 			   const symbol name)
   // Traverse through a object parameter value.
 {
-  if (enter_object (library, syntax, alist, default_alist, name))
+  if (enter_object (library, frame, default_frame, name))
     {
-      traverse_alist (syntax, alist, default_alist, name);
+      traverse_alist (frame, default_frame, name);
       leave_object ();
     }
 }
 
 void
 Traverse::traverse_object_sequence (const Library& library,
-				    const Syntax& syntax, 
-				    const AttributeList& alist,
-				    const AttributeList& default_alist,
+				    const Frame& frame,
+				    const Frame& default_frame,
 				    const symbol name, unsigned index)
   // Traverse through a object parameter value.
 {
-  if (enter_object_sequence (library, syntax, alist, default_alist, 
+  if (enter_object_sequence (library, frame, default_frame, 
 			     name, index))
     {
-      traverse_alist (syntax, alist, default_alist, name);
+      traverse_alist (frame, default_frame, name);
       leave_object_sequence ();
     }
 }
 
 void
-Traverse::traverse_alist (const Syntax& syntax, const AttributeList& alist,
-			  const AttributeList& default_alist,
+Traverse::traverse_alist (const Frame& frame,
+			  const Frame& default_frame,
 			  const symbol name)
   // Generic code to traverse through any kind of alist.
   // This is only a helper function for the more specific traversals,
   // such as 'traverse_model'.
 {
-  const std::vector<symbol>& order = syntax.order ();
+  const std::vector<symbol>& order = frame.order ();
   for (unsigned int i = 0; i < order.size (); i++)
-    traverse_parameter (syntax, alist, default_alist, name, order[i]);
+    traverse_parameter (frame, default_frame, name, order[i]);
 
   std::vector<symbol> parameters;
-  syntax.entries (parameters);
+  frame.entries (parameters);
   for (unsigned int i = 0; i < parameters.size (); i++)
     {
       const symbol parameter = parameters[i];
-      if (syntax.order_index (parameter) < 0)
-	traverse_parameter (syntax, alist, default_alist, name, parameter);
+      if (frame.order_index (parameter) < 0)
+	traverse_parameter (frame, default_frame, name, parameter);
   }
 }
 
 void
-Traverse::traverse_parameter (const Syntax& syntax, const AttributeList& alist,
-			      const AttributeList& default_alist,
+Traverse::traverse_parameter (const Frame& frame,
+			      const Frame& default_frame,
 			      const symbol name, const symbol parameter)
   // Traverse through an alist member.  This is most interesting for
   // alist and object members, of course.
 {
-  if (enter_parameter (syntax, alist, default_alist, name, parameter))
+  if (enter_parameter (frame, default_frame, name, parameter))
     {
-      const Value::type type = syntax.lookup (parameter);
-      const int size = syntax.size (parameter);
-      const bool has_value = alist.check (parameter);
+      const Value::type type = frame.lookup (parameter);
+      const int size = frame.type_size (parameter);
+      const bool has_value = frame.check (parameter);
 
       // Children.
       switch (type)
 	{
 	case Value::AList:
 	  {
-	    const Syntax& entry_syntax = syntax.syntax (parameter);
-
+	    Frame& entry_frame = const_cast<Frame&> (frame.frame (parameter));
+            const symbol submodel = frame.submodel_name (parameter);
 	    if (size == Value::Singleton)
 	      {
-		if (has_value)
-		  {
-		    AttributeList& entry_alist = alist.alist (parameter);
-		    if (default_alist.check (parameter))
-		      traverse_submodel (entry_syntax, entry_alist, 
-					 default_alist.alist (parameter), 
-					 parameter,
-                                         syntax.submodel_name (parameter));
-		    else
-		      traverse_submodel (entry_syntax, entry_alist,
-					 syntax.default_frame (parameter).alist (), 
-					 parameter,
-                                         syntax.submodel_name (parameter));
-		  }
-		else 
-		  traverse_submodel_default (entry_syntax, 
-					     syntax.default_frame (parameter).alist (),
-					     parameter,
-                                             syntax.submodel_name (parameter));
+		if (has_value && default_frame.check (parameter))
+                  traverse_submodel (entry_frame, 
+                                     default_frame.frame (parameter), 
+                                     parameter, submodel);
+                else
+                  traverse_submodel (entry_frame,
+                                     frame.default_frame (parameter), 
+                                     parameter, submodel);
 	      }
 	    else
 	      {
-		const AttributeList& nested_default_alist 
-		  = syntax.default_frame (parameter).alist ();
+		const Frame& nested_default_frame 
+                  = frame.default_frame (parameter);
 
-		traverse_submodel_sequence_default (entry_syntax, 
-						    nested_default_alist, 
-						    parameter,
-                                                    syntax.submodel_name (parameter));
+		traverse_submodel_sequence_default (nested_default_frame, 
+						    parameter, submodel);
 		
 		if (has_value)
 		  {
-		    const std::vector<const AttributeList*> sequence
-		      = alist.alist_sequence (parameter);
+		    const std::vector<const Frame*> sequence
+		      = frame.frame_sequence (parameter);
 		    for (unsigned int i = 0; i < sequence.size (); i++)
-		      traverse_submodel_sequence (entry_syntax, *sequence[i],
-						  nested_default_alist,
-						  parameter, i,
-                                                  syntax.submodel_name (parameter));
+		      traverse_submodel_sequence (*sequence[i],
+						  nested_default_frame,
+						  parameter, i, submodel);
 		  }
 	      }
 	  }
@@ -292,37 +266,32 @@ Traverse::traverse_parameter (const Syntax& syntax, const AttributeList& alist,
 	      {
 		if (size == Value::Singleton)
 		  {
-		    AttributeList& entry_alist = alist.alist (parameter);
-		    daisy_assert (entry_alist.check ("type"));
-		    const symbol type = entry_alist.name ("type");
-		    const Library& library = syntax.library (metalib,
-                                                             parameter);
-		    const AttributeList& entry_default_alist 
-		      = library.lookup (type);
-		    const Syntax& entry_syntax = library.syntax (type);
+		    Frame& entry_frame 
+                      = const_cast<Frame&> (frame.frame (parameter));
+		    daisy_assert (entry_frame.check ("type"));
+		    const symbol type = entry_frame.name ("type");
+		    const Library& library 
+                      = frame.library (metalib, parameter);
+		    const Frame& entry_default_frame = library.model (type);
 		
-		    traverse_object (library, entry_syntax, entry_alist, 
-				     entry_default_alist,
+		    traverse_object (library, entry_frame, entry_default_frame,
 				     parameter);
 		  }
 		else
 		  {
-		    const std::vector<const AttributeList*> sequence
-		      = alist.alist_sequence (parameter);
+		    const std::vector<const Frame*> sequence
+		      = frame.frame_sequence (parameter);
 		    for (unsigned int i = 0; i < sequence.size (); i++)
 		      {
-			const AttributeList& entry_alist = *sequence[i];
-			daisy_assert (entry_alist.check ("type"));
-			const symbol type = entry_alist.name ("type");
-			const Library& library = syntax.library (metalib,
-                                                                 parameter);
-			const AttributeList& entry_default_alist 
-			  = library.lookup (type);
-			const Syntax& entry_syntax = library.syntax (type);
+			const Frame& entry_frame = *sequence[i];
+			daisy_assert (entry_frame.check ("type"));
+			const symbol type = entry_frame.name ("type");
+			const Library& library 
+                          = frame.library (metalib, parameter);
+			const Frame& entry_default_frame = library.model (type);
 
-			traverse_object_sequence (library, 
-						  entry_syntax, entry_alist,
-						  entry_default_alist, 
+			traverse_object_sequence (library, entry_frame, 
+                                                  entry_default_frame, 
 						  parameter, i);
 		      }
 		  }

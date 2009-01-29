@@ -93,7 +93,6 @@ public:
   { return add (key, symbol (value)); }
   void add (symbol, bool);
   void add (symbol, int);
-  void add (symbol, const AttributeList&);
   void add (symbol, const Frame&);
   void add (symbol, const PLF&);
   void add (symbol, const std::vector<double>&);
@@ -107,13 +106,10 @@ public:
                     symbol c);
   void add (symbol, const std::vector<bool>&);
   void add (symbol, const std::vector<int>&);
-  void add (symbol, const std::vector<const AttributeList*>&);
   void add (symbol, const std::vector<const Frame*>&);
   void add (symbol, const std::vector<const PLF*>&);
 
   void remove (symbol);
-  bool revert (const Metalib&,
-               symbol, const AttributeList&, const Syntax&);
   void operator += (const AttributeList&);
   void operator = (const AttributeList&);
   void clear ();

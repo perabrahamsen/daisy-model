@@ -1363,20 +1363,20 @@ vcheck${OBJ}: vcheck.C vcheck.h symbol.h units.h metalib.h frame.h scope.h \
   treelog.h
 assertion${OBJ}: assertion.C assertion.h treelog.h symbol.h mathlib.h
 xref${OBJ}: xref.C xref.h symbol.h traverse.h metalib.h frame.h scope.h \
-  value.h library.h syntax.h librarian.h model.h assertion.h alist.h
+  value.h library.h librarian.h model.h assertion.h frame_model.h
 oldunits${OBJ}: oldunits.C oldunits.h symbol.h mathlib.h assertion.h \
   memutils.h value.h
 check${OBJ}: check.C check.h mathlib.h assertion.h
 check_range${OBJ}: check_range.C check_range.h check.h
 path${OBJ}: path.C path.h symbol.h assertion.h w32reg.h version.h
 traverse_delete${OBJ}: traverse_delete.C traverse_delete.h symbol.h \
-  traverse.h metalib.h frame.h scope.h value.h library.h alist.h \
+  traverse.h metalib.h frame.h scope.h value.h library.h frame_model.h \
   assertion.h
 depend${OBJ}: depend.C depend.h symbol.h traverse.h library.h metalib.h \
-  frame.h scope.h value.h alist.h treelog.h assertion.h
+  frame.h scope.h value.h frame_model.h treelog.h assertion.h
 traverse${OBJ}: traverse.C traverse.h symbol.h metalib.h frame.h scope.h \
-  value.h library.h syntax.h assertion.h librarian.h model.h \
-  frame_submodel.h alist.h
+  value.h library.h assertion.h librarian.h model.h frame_submodel.h \
+  frame_model.h
 treelog${OBJ}: treelog.C treelog.h symbol.h
 lexer_data${OBJ}: lexer_data.C lexer_data.h lexer.h symbol.h time.h mathlib.h \
   assertion.h

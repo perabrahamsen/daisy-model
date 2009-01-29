@@ -24,10 +24,9 @@
 #include "traverse.h"
 #include "metalib.h"
 #include "library.h"
-#include "syntax.h"
 #include "librarian.h"
 #include "assertion.h"
-#include "alist.h"
+#include "frame_model.h"
 #include <deque>
 
 class TraverseXRef : public Traverse
@@ -57,42 +56,35 @@ private:
   // Implementation.
   bool enter_library (Library& library, symbol component);
   void leave_library ();
-  bool enter_model (const Syntax&, AttributeList&, 
+  bool enter_model (Frame&, 
 		    symbol component, symbol model);
   void leave_model (symbol component, symbol name);
-  bool enter_submodel (const Syntax& syntax, AttributeList& alist,
-  		       const AttributeList& default_alist,
+  bool enter_submodel (Frame& frame, const Frame& default_frame,
   		       const symbol name, const symbol registered);
   void leave_submodel ();
-  bool enter_submodel_default (const Syntax& syntax, 
-			       const AttributeList& default_alist,
+  bool enter_submodel_default (const Frame&,
 			       const symbol name,
                                const symbol registered);
   void leave_submodel_default ();
-  bool enter_submodel_sequence (const Syntax& syntax,
-  				const AttributeList& alist,
-  				const AttributeList& default_alist,
-  				const symbol name, unsigned index, 
+  bool enter_submodel_sequence (const Frame& frame, 
+                                const Frame& default_frame,
+                                const symbol name, unsigned index, 
                                 const symbol registered);
   void leave_submodel_sequence ();
-  bool enter_submodel_sequence_default (const Syntax& syntax, 
-  					const AttributeList& default_alist,
+  bool enter_submodel_sequence_default (const Frame& default_frame,
   					const symbol name, 
                                         const symbol registered);
   void leave_submodel_sequence_default ();
   bool enter_object (const Library&, 
-		     const Syntax& syntax, const AttributeList& alist,
-  		     const AttributeList& default_alist,
+		     const Frame& frame, const Frame& default_frame,
   		     const symbol name);
   void leave_object ();
-  bool enter_object_sequence (const Library&, const Syntax& syntax,
-  			      const AttributeList& alist,
-  			      const AttributeList& default_alist,
+  bool enter_object_sequence (const Library&, const Frame& frame,
+  			      const Frame& default_frame,
   			      const symbol name, 
   			      unsigned index);
   void leave_object_sequence ();
-  bool enter_parameter (const Syntax&, const AttributeList& alist, 
-			const AttributeList& default_alist, 
+  bool enter_parameter (const Frame& frame, const Frame& default_frame,
 			const symbol name, const symbol parameter);
   void leave_parameter ();
 };
@@ -185,13 +177,13 @@ TraverseXRef::leave_library ()
 }
 
 bool
-TraverseXRef::enter_model (const Syntax&, AttributeList& alist,
+TraverseXRef::enter_model (Frame& frame,
 			   const symbol component, const symbol name)
 {
   daisy_assert (component == current_component);
   daisy_assert (type == is_invalid);
   current_model = name;
-  if (alist.check ("type"))
+  if (frame.check ("type"))
     type = is_parameterization;
   else
     type = is_model;
@@ -208,17 +200,16 @@ TraverseXRef::leave_model (const symbol component, const symbol name)
 }
 
 bool
-TraverseXRef::enter_submodel (const Syntax& syntax, AttributeList& al,
-			      const AttributeList&,
+TraverseXRef::enter_submodel (Frame& frame, const Frame&,
 			      const symbol name, const symbol registered)
-{ return enter_submodel_default (syntax, al, name, registered); }
+{ return enter_submodel_default (frame, name, registered); }
 
 void
 TraverseXRef::leave_submodel ()
 { leave_submodel_default (); }
 
 bool
-TraverseXRef::enter_submodel_default (const Syntax&, const AttributeList& al, 
+TraverseXRef::enter_submodel_default (const Frame& default_frame,
 				      const symbol name, 
                                       const symbol registered)
 { 
@@ -251,23 +242,21 @@ TraverseXRef::leave_submodel_default ()
 }
 
 bool
-TraverseXRef::enter_submodel_sequence (const Syntax& syntax,
-				       const AttributeList& al,
-				       const AttributeList&,
+TraverseXRef::enter_submodel_sequence (const Frame& frame,
+				       const Frame&,
 				       const symbol name, unsigned,
                                        const symbol registered)
-{ return enter_submodel_default (syntax, al, name, registered); }
+{ return enter_submodel_default (frame, name, registered); }
 
 void
 TraverseXRef::leave_submodel_sequence ()
 { leave_submodel_default (); }
 
 bool
-TraverseXRef::enter_submodel_sequence_default (const Syntax& syntax, 
-					       const AttributeList& al,
+TraverseXRef::enter_submodel_sequence_default (const Frame& frame,
 					       const symbol name,
                                                const symbol registered)
-{ return enter_submodel_default (syntax, al, name, registered); }
+{ return enter_submodel_default (frame, name, registered); }
 
 void
 TraverseXRef::leave_submodel_sequence_default ()
@@ -275,12 +264,11 @@ TraverseXRef::leave_submodel_sequence_default ()
 
 bool
 TraverseXRef::enter_object (const Library& library, 
-			    const Syntax&, const AttributeList& alist,
-			    const AttributeList&,
+                            const Frame& frame, const Frame&,
 			    const symbol)
 {
-  daisy_assert (alist.check ("type"));
-  use_model (library, alist.name ("type"));
+  daisy_assert (frame.check ("type"));
+  use_model (library, frame.name ("type"));
   return false; 
 }
 
@@ -290,50 +278,46 @@ TraverseXRef::leave_object ()
 
 bool
 TraverseXRef::enter_object_sequence (const Library& library, 
-				     const Syntax& syntax, 
-				     const AttributeList& alist,
-				     const AttributeList& default_alist,
+                                     const Frame& frame,
+                                     const Frame& default_frame,
 				     const symbol name, unsigned)
-{ return enter_object (library, syntax, alist, default_alist, name); }
+{ return enter_object (library, frame, default_frame, name); }
 
 void
 TraverseXRef::leave_object_sequence ()
 { leave_object (); }
 
 bool
-TraverseXRef::enter_parameter (const Syntax& syntax, 
-			       const AttributeList& alist, 
-			       const AttributeList& default_alist, 
+TraverseXRef::enter_parameter (const Frame& frame, const Frame& default_frame,
 			       const symbol, const symbol name)
 { 
   if (type == is_parameterization)
     {
       // Ignore inherited values.
-      if (alist.subset (metalib, default_alist, syntax, name))
+      if (frame.subset (metalib, default_frame, name))
         return false;
     }
-  else if (type == is_model && alist.check ("base_model"))
+  else if (type == is_model && frame.check ("base_model"))
     {
       // Ignore base parameters.
       const Library& library = metalib.library (current_component);
-      const symbol base_model = alist.name ("base_model");
+      const symbol base_model = frame.name ("base_model");
       if (base_model != current_model)
         {
-          const Syntax& base_syntax = library.syntax (base_model);
-          if (base_syntax.lookup (name) != Value::Error)
+          const Frame& base_frame = library.model (base_model);
+          if (base_frame.lookup (name) != Value::Error)
             {
-              const AttributeList& base_alist = library.lookup (base_model);
-              if (alist.subset (metalib, base_alist, syntax, name))
+              if (frame.subset (metalib, base_frame, name))
                 return false;
             }
         }
     }
   path.push_back (name);
 
-  if (syntax.lookup (name) == Value::Object)
+  if (frame.lookup (name) == Value::Object)
     // We always use the component, even if it has no value, or a
     // value that is an empty sequence.
-    use_component (syntax.library (metalib, name));
+    use_component (frame.library (metalib, name));
 
   return true; 
 }

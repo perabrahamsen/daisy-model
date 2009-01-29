@@ -2,15 +2,9 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Frame
 
-** Brug original i print object sequence
-
-** Ret traverse, xref
-
 ** AList::subset -> Frame::subset
 
-** fjern alist.add (name, alist) og alist.add (name, alist_sequence)
-
-og fjern fa. & fas.
+** Fjern AttributeList fra AttributeList (fa. & fas.)
 
 ** Fjern brug af syntax i select.C
 

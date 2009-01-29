@@ -25,7 +25,7 @@
 #include "traverse.h"
 #include "metalib.h"
 #include "library.h"
-#include "alist.h"
+#include "frame_model.h"
 #include "assertion.h"
 
 class TraverseDelete : public Traverse
@@ -48,41 +48,35 @@ private:
   // Implementation.
   bool enter_library (Library& library, symbol component);
   void leave_library ();
-  bool enter_model (const Syntax&, AttributeList&, 
+  bool enter_model (Frame& frame,
 		    symbol component, symbol model);
   void leave_model (symbol component, symbol name);
-  bool enter_submodel (const Syntax& syntax, AttributeList& alist,
-  		       const AttributeList& default_alist,
+  bool enter_submodel (Frame& frame, const Frame& default_frame,
   		       const symbol name, const symbol registered);
   void leave_submodel ();
-  bool enter_submodel_default (const Syntax& syntax, 
-			       const AttributeList& default_alist,
+  bool enter_submodel_default (const Frame& default_frame,
 			       const symbol name,
                                const symbol registered);
   void leave_submodel_default ();
-  bool enter_submodel_sequence (const Syntax& syntax,
-  				const AttributeList& alist,
-  				const AttributeList& default_alist,
+  bool enter_submodel_sequence (const Frame& frame, const Frame& default_frame,
   				const symbol name, unsigned index, 
                                 const symbol registered);
   void leave_submodel_sequence ();
-  bool enter_submodel_sequence_default (const Syntax& syntax, 
-  					const AttributeList& default_alist,
-  					const symbol name, const symbol registered);
+  bool enter_submodel_sequence_default (const Frame& default_frame,
+  					const symbol name,
+                                        const symbol registered);
+
   void leave_submodel_sequence_default ();
   bool enter_object (const Library&, 
-		     const Syntax& syntax, const AttributeList& alist,
-  		     const AttributeList& default_alist,
+		     const Frame& frame, const Frame& default_frame,
   		     const symbol name);
   void leave_object ();
-  bool enter_object_sequence (const Library&, const Syntax& syntax,
-  			      const AttributeList& alist,
-  			      const AttributeList& default_alist,
+  bool enter_object_sequence (const Library&, 
+                              const Frame& frame, const Frame& default_frame,
   			      const symbol name, 
   			      unsigned index);
   void leave_object_sequence ();
-  bool enter_parameter (const Syntax&, const AttributeList& alist, 
-			const AttributeList& default_alist, 
+  bool enter_parameter (const Frame& frame, const Frame& default_frame,
 			const symbol name, const symbol parameter);
   void leave_parameter ();
 };
@@ -96,14 +90,14 @@ TraverseDelete::leave_library ()
 { }
 
 bool
-TraverseDelete::enter_model (const Syntax&, AttributeList& alist,
+TraverseDelete::enter_model (Frame& frame,
 			     const symbol component, const symbol)
 {
   // Check if this model is inherited from the model we are examining.
   if (dep_lib == component
-      && alist.check ("type") 
-      && alist.name ("type") == dep_par)
-    alist.add ("type", dep_super);
+      && frame.check ("type") 
+      && frame.name ("type") == dep_par)
+    frame.add ("type", dep_super);
 
   return true;
 }
@@ -113,8 +107,7 @@ TraverseDelete::leave_model (const symbol, const symbol)
 { }
 
 bool
-TraverseDelete::enter_submodel (const Syntax&, AttributeList&,
-				const AttributeList&,
+TraverseDelete::enter_submodel (Frame&, const Frame&,
 				const symbol, const symbol)
 { return true; }
 
@@ -123,7 +116,7 @@ TraverseDelete::leave_submodel ()
 { }
 
 bool
-TraverseDelete::enter_submodel_default (const Syntax&, const AttributeList&, 
+TraverseDelete::enter_submodel_default (const Frame&,
 					const symbol, const symbol registered)
 { return false; }
 
@@ -132,10 +125,8 @@ TraverseDelete::leave_submodel_default ()
 { daisy_notreached (); }
 
 bool
-TraverseDelete::enter_submodel_sequence (const Syntax&,
-					 const AttributeList&,
-					 const AttributeList&,
-					 const symbol, unsigned, const symbol)
+TraverseDelete::enter_submodel_sequence (const Frame&, const Frame&,
+                                         const symbol, unsigned, const symbol)
 { return true; }
 
 void
@@ -143,8 +134,7 @@ TraverseDelete::leave_submodel_sequence ()
 { }
 
 bool
-TraverseDelete::enter_submodel_sequence_default (const Syntax&, 
-						 const AttributeList&,
+TraverseDelete::enter_submodel_sequence_default (const Frame&,
 						 const symbol, const symbol)
 { return false; }
 
@@ -154,14 +144,13 @@ TraverseDelete::leave_submodel_sequence_default ()
 
 bool
 TraverseDelete::enter_object (const Library& library, 
-			      const Syntax&, const AttributeList& alist,
-			      const AttributeList&,
+                              const Frame& frame, const Frame&, 
 			      const symbol)
 {
-  daisy_assert (alist.check ("type"));
-  const symbol super = alist.name ("type");
+  daisy_assert (frame.check ("type"));
+  const symbol super = frame.name ("type");
   if (dep_lib == library.name () && super == dep_par)
-    const_cast<AttributeList&> (alist).add ("type", dep_super);
+    const_cast<Frame&> (frame).add ("type", dep_super);
 
   return true; 
 }
@@ -172,19 +161,17 @@ TraverseDelete::leave_object ()
 
 bool
 TraverseDelete::enter_object_sequence (const Library& library, 
-				       const Syntax& syntax, 
-				       const AttributeList& alist,
-				       const AttributeList& default_alist,
+                                       const Frame& frame, 
+                                       const Frame& default_frame,
 				       const symbol, unsigned)
-{ return enter_object (library, syntax, alist, default_alist, "dummy"); }
+{ return enter_object (library, frame, default_frame, "dummy"); }
 
 void
 TraverseDelete::leave_object_sequence ()
 { leave_object (); }
 
 bool
-TraverseDelete::enter_parameter (const Syntax&, const AttributeList&, 
-				 const AttributeList&, 
+TraverseDelete::enter_parameter (const Frame&, const Frame&, 
 				 const symbol, const symbol)
 { return true; }
 
@@ -198,9 +185,9 @@ find_super (const Metalib& metalib,
 { 
   const Library& library = metalib.library (component);
   daisy_assert (library.check (parameterization));
-  const AttributeList& alist = library.lookup (parameterization);
-  daisy_assert (alist.check ("type"));
-  const symbol super = alist.name ("type");
+  const Frame& frame = library.model (parameterization);
+  daisy_assert (frame.check ("type"));
+  const symbol super = frame.name ("type");
   daisy_assert (parameterization != super);
   return super;
 }

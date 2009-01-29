@@ -255,10 +255,6 @@ EXPORT void                    /* Set double NAME[INDEX] from ALIST to VALUE. */
 daisy_alist_set_number_at (daisy_alist* alist, const char* name,
                            double value, unsigned int index);
 
-EXPORT void                    /* Set alist NAME[INDEX] from ALIST to VALUE. */
-daisy_alist_set_alist_at (daisy_alist* alist, const char* name,
-                          daisy_alist* value, unsigned int index);
-
 /* @ The daisy_library Type.
  * 
  * A library contains a collection of objects, each containing a

@@ -25,8 +25,6 @@
 
 #include "symbol.h"
 
-class Syntax;
-class AttributeList;
 class Metalib;
 
 void

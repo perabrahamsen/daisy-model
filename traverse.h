@@ -26,8 +26,7 @@
 #include "symbol.h"
 
 class Library;
-class Syntax;
-class AttributeList;
+class Frame;
 class Metalib;
 
 class Traverse
@@ -41,81 +40,67 @@ public:
   void traverse_all_submodels ();
   void traverse_library (const symbol component);
   void traverse_model (const symbol component, const symbol model);
-  void traverse_submodel (const Syntax& syntax, AttributeList& alist,
-			  const AttributeList& default_alist,
+  void traverse_submodel (Frame& frame, const Frame& default_frame,
 			  const symbol name, const symbol registered);
   
   // Minor calls.
-  void traverse_submodel_default (const Syntax& syntax, 
-				  const AttributeList& default_alist,
+  void traverse_submodel_default (const Frame& default_frame,
 				  const symbol name, const symbol registered);
-  void traverse_submodel_sequence (const Syntax& syntax,
-				   const AttributeList& alist,
-				   const AttributeList& default_alist,
+  void traverse_submodel_sequence (const Frame& frame,
+                                   const Frame& default_frame,
 				   const symbol name, unsigned index,
                                    const symbol registered);
-  void traverse_submodel_sequence_default (const Syntax& syntax, 
-					   const AttributeList& default_alist,
+  void traverse_submodel_sequence_default (const Frame& default_frame,
 					   const symbol name,
                                            const symbol registered);
-  void traverse_object (const Library& library,
-			const Syntax& syntax, AttributeList& alist,
-			const AttributeList& default_alist,
-			const symbol name);
+  void traverse_object (const Library& library, 
+                        Frame& frame, const Frame& default_frame,
+                        const symbol name);
   void traverse_object_sequence (const Library& library,
-				 const Syntax& syntax, 
-				 const AttributeList& alist,
-				 const AttributeList& default_alist,
+				 const Frame& frame, 
+                                 const Frame& default_frame,
 				 const symbol name, unsigned index);
-  void traverse_alist (const Syntax&, const AttributeList& alist, 
-		       const AttributeList& default_alist,
-		       const symbol name);
-  void traverse_parameter (const Syntax&, const AttributeList& alist, 
-			   const AttributeList& default_alist, 
+  void traverse_alist (const Frame& frame, const Frame& default_frame,
+                       const symbol name);
+  void traverse_parameter (const Frame& frame, 
+                           const Frame& default_frame,
 			   const symbol name, const symbol parameter);
 
   // Subclass Responsibility.
 protected:
   virtual bool enter_library (Library&, symbol component) = 0;
   virtual void leave_library () = 0;
-  virtual bool enter_model (const Syntax&, AttributeList&,
+  virtual bool enter_model (Frame&,
 			    symbol component, symbol model) = 0;
   virtual void leave_model (symbol component, symbol name) = 0;
-  virtual bool enter_submodel (const Syntax& syntax, AttributeList& alist,
-			       const AttributeList& default_alist,
+  virtual bool enter_submodel (Frame& frame, const Frame& default_frame,
 			       const symbol name, const symbol registered) = 0;
   virtual void leave_submodel () = 0;
-  virtual bool enter_submodel_default (const Syntax& syntax, 
-				       const AttributeList& default_alist,
+  virtual bool enter_submodel_default (const Frame& default_frame,
 				       const symbol name,
                                        const symbol registered) = 0;
   virtual void leave_submodel_default () = 0;
-  virtual bool enter_submodel_sequence (const Syntax& syntax,
-					const AttributeList& alist,
-					const AttributeList& default_alist,
+  virtual bool enter_submodel_sequence (const Frame& frame, 
+                                        const Frame& default_frame,
 					const symbol name, 
 					unsigned index,
                                         const symbol registered) = 0;
   virtual void leave_submodel_sequence () = 0;
-  virtual bool enter_submodel_sequence_default (const Syntax& syntax, 
-						const AttributeList&
-						/**/ default_alist,
+  virtual bool enter_submodel_sequence_default (const Frame& default_frame,
 						const symbol name,
                                                 const symbol registered) = 0;
   virtual void leave_submodel_sequence_default () = 0;
   virtual bool enter_object (const Library&, 
-			     const Syntax& syntax, const AttributeList& alist,
-			     const AttributeList& default_alist,
+			     const Frame& frame, const Frame& default_frame,
 			     const symbol name) = 0;
   virtual void leave_object () = 0;
-  virtual bool enter_object_sequence (const Library&, const Syntax& syntax, 
-				      const AttributeList& alist,
-				      const AttributeList& default_alist,
+  virtual bool enter_object_sequence (const Library&, 
+                                      const Frame& frame, 
+                                      const Frame& default_frame,
 				      const symbol name, 
 				      unsigned index) = 0;
   virtual void leave_object_sequence () = 0;
-  virtual bool enter_parameter (const Syntax&, const AttributeList& alist, 
-				const AttributeList& default_alist, 
+  virtual bool enter_parameter (const Frame& frame, const Frame& default_frame,
 				const symbol name, 
 				const symbol parameter) = 0;
   virtual void leave_parameter () = 0;
