@@ -8,6 +8,8 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 ** Ret traverse, xref
 
+** AList::subset -> Frame::subset
+
 ** fjern alist.add (name, alist) og alist.add (name, alist_sequence)
 
 og fjern fa. & fas.

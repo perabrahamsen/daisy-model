@@ -221,9 +221,9 @@ ProgramDocument::print_entry_type (const symbol name,
     case Value::Object:
       {
 	const symbol component = frame.library (metalib, name).name ();
-	format->bold (component.name ());
+	format->bold (component);
 	format->text (" component ");
-	format->see ("chapter", "component",  component.name ());
+	format->see ("chapter", "component",  component);
       }
       break;
     case Value::Library:
@@ -413,7 +413,7 @@ ProgramDocument::print_entry_value (const symbol name,
 	      const AttributeList& object = frame.alist (name);
 	      daisy_assert (object.check ("type"));
 	      const symbol type = object.name ("type");
-	      format->text (" (default `" + type.name () + "')");
+	      format->text (" (default `" + type + "')");
 	      const Library& library = frame.library (metalib, name);
 	      const AttributeList& super = library.lookup (type);
 	      if (!object.subset (metalib, super, library.syntax (type)))
@@ -489,11 +489,11 @@ ProgramDocument::print_users (const XRef::Users& users)
       const symbol component = (*i).component;
       const symbol model = (*i).model;
       const std::vector<symbol>& path = (*i).path;
-      format->text (component.name () + " " + model.name () + " ");
+      format->text (component + " " + model + " ");
       for (unsigned int j = 0; j < path.size (); j++)
 	format->text (" " + path[j]);
       format->text (" ");
-      format->see_page ("model", component.name () + "-" + model.name ());
+      format->see_page ("model", component + "-" + model);
     }
 
   for (std::set<XRef::SubmodelUser>::const_iterator i 
@@ -777,8 +777,8 @@ ProgramDocument::print_sample (const symbol name, const Library& library)
   std::vector<symbol> base;
   inherited_entries (metalib, library, name, base);
 
-  print_sample_entries (name.name (), frame, order, own, 
-                        library.name ().name (), base, true);
+  print_sample_entries (name, frame, order, own, 
+                        library.name (), base, true);
 }
 
 void 
@@ -1053,9 +1053,9 @@ ProgramDocument::print_model (const symbol name, const Library& library,
       // This is a parameterization.
       const symbol type = frame.name ("type");
       format->soft_linebreak ();
-      Format::Section dummy (*format, "section", name.name (), "model", 
+      Format::Section dummy (*format, "section", name, "model", 
 			     current_component + "-" + name);
-      format->index (name.name ());
+      format->index (name);
       format->text ("A `" + type + "' parameterization ");
       
       if (frame.check ("parsed_from_file"))
@@ -1075,9 +1075,9 @@ ProgramDocument::print_model (const symbol name, const Library& library,
       std::vector<symbol> entries;
       own_entries (metalib, library, name, entries, true);
       if (entries.size () > 0)
-        print_submodel_entries (name.name (), 0, 
+        print_submodel_entries (name, 0, 
                                 frame, entries, 
-                                library.name ().name ());
+                                library.name ());
 
       const std::vector<Library::doc_fun>& doc_funs 
 	= library.doc_funs ();
@@ -1098,9 +1098,9 @@ ProgramDocument::print_model (const symbol name, const Library& library,
   else
     {
       format->soft_linebreak ();
-      Format::Section dummy (*format, "section", name.name (), "model",
+      Format::Section dummy (*format, "section", name, "model",
 			     current_component + "-" + name);
-      format->index (name.name ());
+      format->index (name);
 
       // Print description, if any.
       format->alist_description (frame.alist ());
@@ -1111,8 +1111,8 @@ ProgramDocument::print_model (const symbol name, const Library& library,
       // Print own entries.
       std::vector<symbol> entries;
       own_entries (metalib, library, name, entries);
-      print_submodel_entries (name.name (), 0, frame, entries, 
-			      library.name ().name ());
+      print_submodel_entries (name, 0, frame, entries, 
+			      library.name ());
     }
 }
 
@@ -1190,9 +1190,9 @@ ProgramDocument::print_component (const Library& library, Treelog& msg)
   const symbol name = library.name ();
   current_component = name;
   format->soft_linebreak ();
-  Format::Section dummy (*format, "chapter", name.name (), 
-			 "component", name.name ());
-  format->index (name.name ());
+  Format::Section dummy (*format, "chapter", name, 
+			 "component", name);
+  format->index (name);
 
   const symbol description = library.description ();
   if (description != symbol ())
