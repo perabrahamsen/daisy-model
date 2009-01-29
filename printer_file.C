@@ -43,7 +43,7 @@
 struct PrinterFile::Implementation
 {
   // Data.
-  const Metalib& metalib;
+  Metalib& metalib;
   const std::auto_ptr<std::ofstream> owned_stream; // If we opened it.
   std::ostream& out;
 
@@ -83,8 +83,8 @@ struct PrinterFile::Implementation
   bool good ();
 
   // Creation.
-  Implementation (const Metalib&, const symbol name);
-  Implementation (const Metalib&, std::ostream& stream);
+  Implementation (Metalib&, const symbol name);
+  Implementation (Metalib&, std::ostream& stream);
   ~Implementation ();
 };
 
@@ -710,14 +710,14 @@ bool
 PrinterFile::Implementation::good ()
 { return out.good (); }
 
-PrinterFile::Implementation::Implementation (const Metalib& mlib,
+PrinterFile::Implementation::Implementation (Metalib& mlib,
                                              const symbol name)
   : metalib (mlib),
     owned_stream (new std::ofstream (name.name ().c_str ())),
     out (*owned_stream)
 { }
 
-PrinterFile::Implementation::Implementation (const Metalib& mlib,
+PrinterFile::Implementation::Implementation (Metalib& mlib,
                                              std::ostream& stream)
   : metalib (mlib),
     owned_stream (NULL),
@@ -798,13 +798,13 @@ bool
 PrinterFile::good ()
 { return impl->good (); }
   
-PrinterFile::PrinterFile (const Metalib& mlib,
+PrinterFile::PrinterFile (Metalib& mlib,
                           const symbol filename)
   : Printer ("file"),
     impl (new Implementation (mlib, filename))
 { }
     
-PrinterFile::PrinterFile (const Metalib& mlib,
+PrinterFile::PrinterFile (Metalib& mlib,
                           std::ostream& stream)
   : Printer ("stream"),
     impl (new Implementation (mlib, stream))

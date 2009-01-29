@@ -31,7 +31,6 @@
 
 class Metalib;
 class Block;
-class Syntax;
 class AttributeList;
 class Treelog;
 class Format;
@@ -75,20 +74,13 @@ public:
   Frame& frame (symbol) const;
   AttributeList& lookup (symbol) const;
   bool check (symbol) const;
-  bool complete (const Metalib&, symbol) const;
+  bool complete (Metalib&, symbol) const;
   void add_model (symbol, FrameModel&);
-#if 0
-  void add_derived (symbol name, AttributeList& al,
-		    symbol super);
-  void add_derived (symbol name, const Syntax&, AttributeList& al,
-		    symbol super);
-#endif
-  const Syntax& syntax (symbol) const;
   void entries (std::vector<symbol>&) const;
   const std::set<symbol>& ancestors (symbol) const;
   bool is_derived_from (symbol a, symbol b) const;
   const symbol base_model (symbol parameterization) const;
-  bool has_interesting_description (const AttributeList& alist) const;
+  bool has_interesting_description (const Frame&) const;
   void add_doc_fun (doc_fun);
   std::vector<doc_fun>& doc_funs () const;
 

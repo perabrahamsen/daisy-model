@@ -28,7 +28,6 @@
 #include <vector>
 #include <memory>
 
-class AttributeList;
 class Library;
 class Metalib;
 class Check;
@@ -54,14 +53,13 @@ class EXPORT Syntax
 
 public:
   // This function will check that an alist conform to the syntax.
-  bool check (const Metalib&, const AttributeList&, Treelog& err) const;
+  bool check (Metalib&, const Frame&, Treelog& err) const;
   
   // Check that a numeric value is within the allowed range.
   void check (symbol key, double value) const;
 
   // Check than an arbitrary alist member is valid.
-  bool check (const Metalib&,
-	      const AttributeList&, symbol key, Treelog&) const;
+  bool check (Metalib&, const Frame&, symbol key, Treelog&) const;
 
   // These functions will allow you to lookup information about a
   // specific syntax entry. 
@@ -71,8 +69,7 @@ public:
   bool is_state (symbol) const;
 
   Value::type lookup (symbol) const;
-  const Syntax& syntax (symbol) const;
-  ::Library& library (const Metalib&, symbol) const;
+  ::Library& library (Metalib&, symbol) const;
   symbol component (symbol) const;
   int  size (symbol) const;
   symbol dimension (symbol) const;
@@ -193,11 +190,8 @@ public:
   // Create and Destroy.
 
   // A check_fun is a function used for extra syntax checking.
-  typedef bool (*check_fun)(const AttributeList&, Treelog& err);
-  typedef bool (*check_object)(const Metalib&, 
-                               const AttributeList&, Treelog& err);
+  typedef bool (*check_fun)(Metalib&, const Frame&, Treelog&);
   void add_check (check_fun);
-  void add_object_check (check_object);
 
   explicit Syntax ();
   explicit Syntax (const Syntax&);

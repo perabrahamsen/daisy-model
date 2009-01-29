@@ -53,11 +53,6 @@ AttributeList&
 Frame::alist () const
 { return impl->alist; }
 
-const Syntax& 
-Frame::syntax () const
-{ return impl->syntax; }
-
-
 void 
 Frame::entries (std::vector<symbol>& e) const
 { impl->syntax.entries (e); }
@@ -71,8 +66,8 @@ Frame::check (Block& block) const
 { return check (block.metalib (), block.msg ()); }
 
 bool 
-Frame::check (const Metalib& metalib, Treelog& msg) const
-{ return impl->syntax.check (metalib, alist (), msg); }
+Frame::check (Metalib& metalib, Treelog& msg) const
+{ return impl->syntax.check (metalib, *this, msg); }
 
 void 
 Frame::check (const symbol key, double value) const
@@ -84,9 +79,9 @@ Frame::check (const symbol key, double value) const
 }
 
 bool 
-Frame::check (const Metalib& metalib, 
+Frame::check (Metalib& metalib, 
               const symbol key, Treelog& msg) const
-{ return impl->syntax.check (metalib, alist (), key, msg); }
+{ return impl->syntax.check (metalib, *this, key, msg); }
 
 bool 
 Frame::is_const (const symbol key) const
@@ -134,7 +129,7 @@ Frame::lookup (const symbol key) const
 }
 
 ::Library& 
-Frame::library (const Metalib& metalib, const symbol key) const
+Frame::library (Metalib& metalib, const symbol key) const
 {
   if (parent () && impl->syntax.lookup (key) == Value::Error)
     return parent ()->library (metalib, key);
@@ -353,10 +348,6 @@ void
 Frame::add_check (check_fun fun)
 { impl->syntax.add_check (fun); }
 
-void 
-Frame::add_object_check (check_object fun)
-{ impl->syntax.add_object_check (fun); }
-
 bool 
 Frame::check (const symbol key) const
 { 
@@ -366,19 +357,19 @@ Frame::check (const symbol key) const
 
 // Is this frame a subset of 'other'?
 bool 
-Frame::subset (const Metalib& metalib, const Frame& other) const
+Frame::subset (Metalib& metalib, const Frame& other) const
 {
   // TODO: Rewrite here.
-  return impl->alist.subset (metalib, other.impl->alist, impl->syntax);
+  return impl->alist.subset (metalib, other.impl->alist, *this);
 }
 
 // Is the element 'key' in this alist a subset of the corresponding other entry.
 bool 
-Frame::subset (const Metalib& metalib, const Frame& other,
+Frame::subset (Metalib& metalib, const Frame& other,
                const symbol key) const
 {
   // TODO: Rewrite here.
-  return impl->alist.subset (metalib, other.impl->alist, impl->syntax, key);
+  return impl->alist.subset (metalib, other.impl->alist, *this, key);
 }
 
 int 

@@ -28,6 +28,6 @@
 class Metalib;
 
 void
-remove_dependencies (const Metalib&, symbol component, symbol par);
+remove_dependencies (Metalib&, symbol component, symbol par);
 
 #endif // TRAVERSE_DELETE_H

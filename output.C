@@ -128,7 +128,7 @@ Output::check (const Border& field, Treelog& msg)
 }
 
 void
-Output::initialize (const Metalib& metalib, Treelog& msg)
+Output::initialize (Metalib& metalib, Treelog& msg)
 {
   for (size_t i = 0; i < logs.size (); i++)
     logs[i]->initialize_common (metalib, msg);

@@ -56,7 +56,7 @@ struct ActionCrop : public Action
     bool match (const Time& time) const;
     
     // Create and Destroy.
-    static bool check_alist (const AttributeList& al, Treelog&);
+    static bool check_alist (Metalib&, const Frame& al, Treelog&);
     static void load_syntax (Frame&);
     MM_DD (const AttributeList&);
     ~MM_DD ();
@@ -76,7 +76,7 @@ struct ActionCrop : public Action
     void output (Log&) const;
 
     // Create and Destroy.
-    static bool check_alist (const AttributeList& al, Treelog&);
+    static bool check_alist (Metalib&, const Frame& al, Treelog&);
     static void load_syntax (Frame&);
     Sow (const Frame&);
     ~Sow ();
@@ -99,7 +99,7 @@ struct ActionCrop : public Action
     void output (Log&) const;
 
     // Create and Destroy.
-    static bool check_alist (const AttributeList& al, Treelog&);
+    static bool check_alist (Metalib&, const Frame& al, Treelog&);
     static void load_syntax (Frame&);
     Annual (const AttributeList&);
     ~Annual ();
@@ -130,7 +130,7 @@ struct ActionCrop : public Action
     void output (Log&) const;
 
     // Create and Destroy.
-    static bool check_alist (const AttributeList& al, Treelog&);
+    static bool check_alist (Metalib&, const Frame& al, Treelog&);
     static void load_syntax (Frame&);
     Perennial (const AttributeList&);
     ~Perennial ();
@@ -143,7 +143,7 @@ struct ActionCrop : public Action
     const int day;
     const std::auto_ptr<const FrameModel> what;
     
-    static bool check_alist (const AttributeList& al, Treelog&);
+    static bool check_alist (Metalib&, const Frame& al, Treelog&);
     static void load_syntax (Frame&);
     Fertilize (Block&);
     ~Fertilize ();
@@ -164,7 +164,7 @@ struct ActionCrop : public Action
     void output (Log&) const;
 
     // Create and Destroy.
-    static bool check_alist (const AttributeList& al, Treelog&);
+    static bool check_alist (Metalib&, const Frame& al, Treelog&);
     static void load_syntax (Frame&);
     Tillage (Block&);
     ~Tillage ();
@@ -184,7 +184,7 @@ struct ActionCrop : public Action
     void output (Log&) const;
 
     // Create and Destroy.
-    static bool check_alist (const AttributeList& al, Treelog&);
+    static bool check_alist (Metalib&, const Frame& al, Treelog&);
     static void load_syntax (Frame&);
     Spray (const AttributeList&);
     ~Spray ();
@@ -233,7 +233,7 @@ ActionCrop::MM_DD::match (const Time& time) const
     && time.hour () == hour; }
 
 bool 
-ActionCrop::MM_DD::check_alist (const AttributeList& frame, Treelog& err)
+ActionCrop::MM_DD::check_alist (Metalib&, const Frame& frame, Treelog& err)
 {
   bool ok = true;
 
@@ -303,7 +303,7 @@ ActionCrop::Sow::output (Log& log) const
 }
 
 bool 
-ActionCrop::Sow::check_alist (const AttributeList&, Treelog&)
+ActionCrop::Sow::check_alist (Metalib&, const Frame&, Treelog&)
 {
   bool ok = true;
   return ok;
@@ -357,7 +357,7 @@ ActionCrop::Annual::output (Log& log) const
 }
 
 bool 
-ActionCrop::Annual::check_alist (const AttributeList&, Treelog&)
+ActionCrop::Annual::check_alist (Metalib&, const Frame&, Treelog&)
 {
   bool ok = true;
   return ok;
@@ -461,7 +461,7 @@ ActionCrop::Perennial::output (Log& log) const
 }
 
 bool 
-ActionCrop::Perennial::check_alist (const AttributeList& al, Treelog& err)
+ActionCrop::Perennial::check_alist (Metalib&, const Frame& al, Treelog& err)
 {
   bool ok = true;
 
@@ -540,7 +540,7 @@ ActionCrop::Perennial::~Perennial ()
 { }
 
 bool 
-ActionCrop::Fertilize::check_alist (const AttributeList& al, Treelog& err)
+ActionCrop::Fertilize::check_alist (Metalib&, const Frame& al, Treelog& err)
 {
   bool ok = true;
   const int mm = al.integer ("month");
@@ -606,7 +606,7 @@ ActionCrop::Tillage::output (Log& log) const
 }
 
 bool 
-ActionCrop::Tillage::check_alist (const AttributeList& al, Treelog& err)
+ActionCrop::Tillage::check_alist (Metalib&, const Frame& al, Treelog& err)
 {
   bool ok = true;
   const int mm = al.integer ("month");
@@ -651,7 +651,7 @@ ActionCrop::Spray::output (Log&) const
 { }
 
 bool 
-ActionCrop::Spray::check_alist (const AttributeList& al, Treelog& err)
+ActionCrop::Spray::check_alist (Metalib&, const Frame& al, Treelog& err)
 {
   bool ok = true;
   const int mm = al.integer ("month");
@@ -1019,7 +1019,7 @@ static struct ActionCropSyntax : public DeclareModel
   Model* make (Block& al) const
   { return new ActionCrop (al); }
 
-  static bool check_alist (const AttributeList& al, Treelog& err)
+  static bool check_alist (Metalib&, const Frame& al, Treelog& err)
   {
     bool ok = true;
 

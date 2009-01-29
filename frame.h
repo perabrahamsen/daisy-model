@@ -32,7 +32,6 @@ class Check;
 class VCheck;
 class Treelog;
 class Metalib;
-class Syntax;
 
 #ifndef FRAME_H
 #define FRAME_H
@@ -59,7 +58,6 @@ protected:
   // Old style access.
 public:
   AttributeList& alist () const;
-  const Syntax& syntax () const;
 
   // Common access.
 public:
@@ -69,13 +67,13 @@ public:
 
   // This function will check that the alist conform to the syntax.
   bool check (Block&) const;
-  bool check (const Metalib&, Treelog&) const;
+  bool check (Metalib&, Treelog&) const;
   
   // Check that a numeric value is within the allowed range.
   void check (const symbol key, double value) const;
 
   // Check than an arbitrary attribute is valid.
-  bool check (const Metalib&, const symbol key, Treelog&) const;
+  bool check (Metalib&, const symbol key, Treelog&) const;
 
   // Extract type information about a specific attribute.
   bool is_const (const symbol) const;
@@ -83,7 +81,7 @@ public:
   bool is_log (const symbol) const;
   bool is_state (const symbol) const;
   Value::type lookup (const symbol) const;
-  ::Library& library (const Metalib&, const symbol) const;
+  ::Library& library (Metalib&, const symbol) const;
   int type_size (const symbol) const;
   symbol dimension (const symbol) const;
   symbol domain (const symbol) const;
@@ -205,20 +203,17 @@ public:
   bool total_order () const;	// True iff all members are ordered.
 
   // Additional constraints involving multiple attributes.
-  typedef bool (*check_fun)(const AttributeList&, Treelog& err);
-  typedef bool (*check_object)(const Metalib&, 
-                               const AttributeList&, Treelog& err);
+  typedef bool (*check_fun)(Metalib&, const Frame&, Treelog&);
 public:
   void add_check (check_fun);
-  void add_object_check (check_object);
 
 public:
   // Is 'key' an element of this alist?
   bool check (const symbol key) const;
   // Is this frame a subset of 'other'?
-  bool subset (const Metalib&, const Frame& other) const;
+  bool subset (Metalib&, const Frame& other) const;
   // Is the element 'key' in this alist a subset of the other entry.
-  bool subset (const Metalib&, const Frame& other, symbol key) const;
+  bool subset (Metalib&, const Frame& other, symbol key) const;
   int value_size (symbol key) const;
 
   // References.

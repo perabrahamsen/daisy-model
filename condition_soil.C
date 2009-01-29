@@ -175,7 +175,7 @@ Depth at which to example the pressure potential.");
   }
 } ConditionSoilPotential_syntax;
 
-static bool check_water_content (const AttributeList& al, Treelog& err)
+static bool check_water_content (Metalib&, const Frame& al, Treelog& err)
 {
   bool ok = true;
 

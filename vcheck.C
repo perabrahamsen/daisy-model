@@ -24,14 +24,13 @@
 #include "units.h"
 #include "metalib.h"
 #include "library.h"
-#include "syntax.h"
-#include "alist.h"
 #include "time.h"
 #include "plf.h"
-#include <sstream>
 #include "assertion.h"
 #include "mathlib.h"
 #include "treelog.h"
+#include "frame_model.h"
+#include <sstream>
 #include <algorithm>
 #include <numeric>
 #include <map>
@@ -49,18 +48,18 @@ struct ValidYear : public VCheck
       }
   }
 
-  void check (const Metalib&, const Syntax& syntax, const AttributeList& alist, 
-	      const symbol key) const throw (std::string)
+  void check (Metalib&, const Frame& frame, const symbol key)
+    const throw (std::string)
   { 
-    daisy_assert (alist.check (key));
-    daisy_assert (syntax.lookup (key) == Value::Integer);
-    daisy_assert (!syntax.is_log (key));
+    daisy_assert (frame.check (key));
+    daisy_assert (frame.lookup (key) == Value::Integer);
+    daisy_assert (!frame.is_log (key));
 
-    if (syntax.size (key) == Value::Singleton)
-      validate (alist.integer (key));
+    if (frame.type_size (key) == Value::Singleton)
+      validate (frame.integer (key));
     else
       {
-	const std::vector<int> years = alist.integer_sequence (key);
+	const std::vector<int> years = frame.integer_sequence (key);
 	for_each (years.begin (), years.end (), validate);
       }
   }
@@ -84,18 +83,18 @@ VCheck::IRange::validate (const int value) const throw (std::string)
 }
 
 void
-VCheck::IRange::check (const Metalib&, const Syntax& syntax, const AttributeList& alist, 
+VCheck::IRange::check (Metalib&, const Frame& frame, 
 		       const symbol key) const throw (std::string)
 {
-  daisy_assert (alist.check (key));
-  daisy_assert (!syntax.is_log (key));
-  daisy_assert (syntax.lookup (key) == Value::Integer);
+  daisy_assert (frame.check (key));
+  daisy_assert (!frame.is_log (key));
+  daisy_assert (frame.lookup (key) == Value::Integer);
 
-  if (syntax.size (key) == Value::Singleton)
-    validate (alist.integer (key));
+  if (frame.type_size (key) == Value::Singleton)
+    validate (frame.integer (key));
   else
     {
-      const std::vector<int> integers = alist.integer_sequence (key);
+      const std::vector<int> integers = frame.integer_sequence (key);
       for (unsigned int i = 0; i < integers.size (); i++)
 	validate (integers[i]);
     }
@@ -108,7 +107,8 @@ VCheck::IRange::IRange (const int min_, const int max_)
 
 struct LocalOrder : public VCheck
 {
-  virtual void validate (double last, double next) const throw (std::string) = 0;
+  virtual void validate (double last, double next)
+    const throw (std::string) = 0;
 
   void validate_plf (const PLF& plf) const throw (std::string)
   {
@@ -124,18 +124,18 @@ struct LocalOrder : public VCheck
       }
   }
 
-  void check (const Metalib&, const Syntax& syntax, const AttributeList& alist, 
-	      const symbol key) const throw (std::string)
+  void check (Metalib&, const Frame& frame, const symbol key)
+    const throw (std::string)
   { 
-    daisy_assert (alist.check (key));
-    daisy_assert (!syntax.is_log (key));
+    daisy_assert (frame.check (key));
+    daisy_assert (!frame.is_log (key));
   
-    switch (syntax.lookup (key))
+    switch (frame.lookup (key))
       {
       case Value::Number:
 	{
-	  daisy_assert (syntax.size (key) != Value::Singleton);
-	  const std::vector<double>& numbers = alist.number_sequence (key);
+	  daisy_assert (frame.type_size (key) != Value::Singleton);
+	  const std::vector<double>& numbers = frame.number_sequence (key);
 	  if (numbers.size () < 2)
 	    return;
 	  double last = numbers[0];
@@ -148,11 +148,11 @@ struct LocalOrder : public VCheck
 	}
 	break;
       case Value::PLF:
-	if (syntax.size (key) == Value::Singleton)
-	  validate_plf (alist.plf (key));
+	if (frame.type_size (key) == Value::Singleton)
+	  validate_plf (frame.plf (key));
 	else
 	  {
-	    const std::vector<const PLF*>& plfs = alist.plf_sequence (key);
+	    const std::vector<const PLF*>& plfs = frame.plf_sequence (key);
 	    for (unsigned int i = 0; i < plfs.size (); i++)
 	      validate_plf (*plfs[i]);
 	  }
@@ -336,27 +336,27 @@ VCheck::SumEqual::validate (const PLF& plf) const throw (std::string)
 }
 
 void
-VCheck::SumEqual::check (const Metalib&, const Syntax& syntax, const AttributeList& alist, 
+VCheck::SumEqual::check (Metalib&, const Frame& frame, 
 			 const symbol key) const throw (std::string)
 {
-  daisy_assert (alist.check (key));
-  daisy_assert (!syntax.is_log (key));
+  daisy_assert (frame.check (key));
+  daisy_assert (!frame.is_log (key));
   
-  switch (syntax.lookup (key))
+  switch (frame.lookup (key))
     {
     case Value::Number:
       {
-	daisy_assert (syntax.size (key) != Value::Singleton);
-	const std::vector<double>& numbers = alist.number_sequence (key);
+	daisy_assert (frame.type_size (key) != Value::Singleton);
+	const std::vector<double>& numbers = frame.number_sequence (key);
 	validate (accumulate (numbers.begin (), numbers.end (), 0.0));
       }
       break;
     case Value::PLF:
-      if (syntax.size (key) == Value::Singleton)
-	validate (alist.plf (key));
+      if (frame.type_size (key) == Value::Singleton)
+	validate (frame.plf (key));
       else
 	{
-	  const std::vector<const PLF*> plfs = alist.plf_sequence (key);
+	  const std::vector<const PLF*> plfs = frame.plf_sequence (key);
 	  for (unsigned int i = 0; i < plfs.size (); i++)
 	    validate (*plfs[i]);
 	}
@@ -386,28 +386,28 @@ VCheck::StartValue::validate (const PLF& plf) const throw (std::string)
 { validate (plf.y (0)); }
 
 void
-VCheck::StartValue::check (const Metalib&, const Syntax& syntax, const AttributeList& alist, 
+VCheck::StartValue::check (Metalib&, const Frame& frame, 
 			   const symbol key) const throw (std::string)
 {
-  daisy_assert (alist.check (key));
-  daisy_assert (!syntax.is_log (key));
+  daisy_assert (frame.check (key));
+  daisy_assert (!frame.is_log (key));
   
-  switch (syntax.lookup (key))
+  switch (frame.lookup (key))
     {
     case Value::Number:
       {
-	daisy_assert (syntax.size (key) != Value::Singleton);
-	const std::vector<double>& numbers = alist.number_sequence (key);
+	daisy_assert (frame.type_size (key) != Value::Singleton);
+	const std::vector<double>& numbers = frame.number_sequence (key);
 	if (numbers.size () > 0)
 	  validate (numbers[0]);
       }
       break;
     case Value::PLF:
-      if (syntax.size (key) == Value::Singleton)
-	validate (alist.plf (key));
+      if (frame.type_size (key) == Value::Singleton)
+	validate (frame.plf (key));
       else
 	{
-	  const std::vector<const PLF*> plfs = alist.plf_sequence (key);
+	  const std::vector<const PLF*> plfs = frame.plf_sequence (key);
 	  for (unsigned int i = 0; i < plfs.size (); i++)
 	    validate (*plfs[i]);
 	}
@@ -440,28 +440,28 @@ VCheck::EndValue::validate (const PLF& plf) const throw (std::string)
 }
 
 void
-VCheck::EndValue::check (const Metalib&, const Syntax& syntax, const AttributeList& alist, 
+VCheck::EndValue::check (Metalib&, const Frame& frame, 
 			   const symbol key) const throw (std::string)
 {
-  daisy_assert (alist.check (key));
-  daisy_assert (!syntax.is_log (key));
+  daisy_assert (frame.check (key));
+  daisy_assert (!frame.is_log (key));
   
-  switch (syntax.lookup (key))
+  switch (frame.lookup (key))
     {
     case Value::Number:
       {
-	daisy_assert (syntax.size (key) != Value::Singleton);
-	const std::vector<double>& numbers = alist.number_sequence (key);
+	daisy_assert (frame.type_size (key) != Value::Singleton);
+	const std::vector<double>& numbers = frame.number_sequence (key);
 	if (numbers.size () > 0)
 	  validate (numbers[numbers.size () - 1]);
       }
       break;
     case Value::PLF:
-      if (syntax.size (key) == Value::Singleton)
-	validate (alist.plf (key));
+      if (frame.type_size (key) == Value::Singleton)
+	validate (frame.plf (key));
       else
 	{
-	  const std::vector<const PLF*> plfs = alist.plf_sequence (key);
+	  const std::vector<const PLF*> plfs = frame.plf_sequence (key);
 	  for (unsigned int i = 0; i < plfs.size (); i++)
 	    validate (*plfs[i]);
 	}
@@ -488,20 +488,20 @@ VCheck::FixedPoint::validate (const PLF& plf) const throw (std::string)
 }
 
 void
-VCheck::FixedPoint::check (const Metalib&, const Syntax& syntax, const AttributeList& alist, 
+VCheck::FixedPoint::check (Metalib&, const Frame& frame, 
 			   const symbol key) const throw (std::string)
 {
-  daisy_assert (alist.check (key));
-  daisy_assert (!syntax.is_log (key));
+  daisy_assert (frame.check (key));
+  daisy_assert (!frame.is_log (key));
   
-  switch (syntax.lookup (key))
+  switch (frame.lookup (key))
     {
     case Value::PLF:
-      if (syntax.size (key) == Value::Singleton)
-	validate (alist.plf (key));
+      if (frame.type_size (key) == Value::Singleton)
+	validate (frame.plf (key));
       else
 	{
-	  const std::vector<const PLF*> plfs = alist.plf_sequence (key);
+	  const std::vector<const PLF*> plfs = frame.plf_sequence (key);
 	  for (unsigned int i = 0; i < plfs.size (); i++)
 	    validate (*plfs[i]);
 	}
@@ -517,17 +517,17 @@ VCheck::FixedPoint::FixedPoint (double x, double y)
 { }
 
 void
-VCheck::MinSize::check (const Metalib&, const Syntax& syntax, const AttributeList& alist, 
+VCheck::MinSize::check (Metalib&, const Frame& frame, 
 			const symbol key) const throw (std::string)
 {
-  daisy_assert (alist.check (key));
-  daisy_assert (!syntax.is_log (key));
-  daisy_assert (syntax.size (key) == Value::Sequence);
-  if (alist.size (key) < min_size)
+  daisy_assert (frame.check (key));
+  daisy_assert (!frame.is_log (key));
+  daisy_assert (frame.type_size (key) == Value::Sequence);
+  if (frame.value_size (key) < min_size)
     {
       std::ostringstream tmp;
       tmp << "Need at least " << min_size << " elements, got " 
-	     << alist.size (key);
+	     << frame.value_size (key);
       throw std::string (tmp.str ());
     }
 }
@@ -537,16 +537,16 @@ VCheck::MinSize::MinSize (unsigned int size)
 { }
 
 void
-VCheck::String::check (const Metalib&, const Syntax& syntax, const AttributeList& alist, 
+VCheck::String::check (Metalib&, const Frame& frame, 
                        const symbol key) const throw (std::string)
 {
-  daisy_assert (alist.check (key));
-  daisy_assert (!syntax.is_log (key));
-  if (syntax.size (key) == Value::Singleton)
-    validate (alist.name (key));
+  daisy_assert (frame.check (key));
+  daisy_assert (!frame.is_log (key));
+  if (frame.type_size (key) == Value::Singleton)
+    validate (frame.name (key));
   else
     {
-      const std::vector<symbol> names = alist.name_sequence (key);
+      const std::vector<symbol> names = frame.name_sequence (key);
       for (size_t i = 0; i < names.size (); i++)
         validate (names[i].name ());
     }
@@ -565,18 +565,18 @@ VCheck::Compatible::validate (const Units& units, symbol value)
 }
 
 void
-VCheck::Compatible::check (const Metalib& metalib,
-                           const Syntax& syntax, const AttributeList& alist, 
+VCheck::Compatible::check (Metalib& metalib,
+                           const Frame& frame, 
                            const symbol key) const throw (std::string)
 {
-  daisy_assert (alist.check (key));
-  daisy_assert (!syntax.is_log (key));
+  daisy_assert (frame.check (key));
+  daisy_assert (!frame.is_log (key));
   const Units& units = metalib.units ();
-  if (syntax.size (key) == Value::Singleton)
-    validate (units, alist.name (key));
+  if (frame.type_size (key) == Value::Singleton)
+    validate (units, frame.name (key));
   else
     {
-      const std::vector<symbol> names = alist.name_sequence (key);
+      const std::vector<symbol> names = frame.name_sequence (key);
       for (size_t i = 0; i < names.size (); i++)
         validate (units, names[i]);
     }
@@ -660,24 +660,24 @@ VCheck::Enum::Enum (const symbol a, const symbol b, const symbol c,
 }
 
 void
-VCheck::InLibrary::check (const Metalib& metalib, 
-			  const Syntax& syntax, const AttributeList& alist, 
+VCheck::InLibrary::check (Metalib& metalib, 
+			  const Frame& frame, 
 			  const symbol key) const throw (std::string)
 {
-  daisy_assert (alist.check (key));
-  daisy_assert (!syntax.is_log (key));
-  if (syntax.size (key) == Value::Singleton)
-    validate (metalib, alist.name (key));
+  daisy_assert (frame.check (key));
+  daisy_assert (!frame.is_log (key));
+  if (frame.type_size (key) == Value::Singleton)
+    validate (metalib, frame.name (key));
   else
     {
-      const std::vector<symbol> names = alist.name_sequence (key);
+      const std::vector<symbol> names = frame.name_sequence (key);
       for (size_t i = 0; i < names.size (); i++)
         validate (metalib, names[i]);
     }
 }
 
 void
-VCheck::InLibrary::validate (const Metalib& metalib,
+VCheck::InLibrary::validate (Metalib& metalib,
 			     const symbol type) const throw (std::string)
 {
   daisy_assert (metalib.exist (lib_name));
@@ -686,9 +686,8 @@ VCheck::InLibrary::validate (const Metalib& metalib,
   if (!library.check (type))
     throw "Unknown '" + lib_name + "' type '" + type + "'";
 
-  const Syntax& syntax = library.syntax (type);
-  const AttributeList& alist = library.lookup (type);
-  if (!syntax.check (metalib, alist, Treelog::null ()))
+  const FrameModel& frame = library.model (type);
+  if (!frame.check (metalib, Treelog::null ()))
     throw "Incomplete type '" + type + "'";
 }
 
@@ -720,34 +719,34 @@ VCheck::unique ()
 {
   static struct Unique : public VCheck
   {
-    void check (const Metalib&,
-		const Syntax& syntax, const AttributeList& alist, 
+    void check (Metalib&,
+		const Frame& frame, 
                 const symbol key) const throw (std::string)
     { 
-      daisy_assert (alist.check (key));
-      daisy_assert (syntax.size (key) != Value::Singleton);
-      daisy_assert (!syntax.is_log (key));
+      daisy_assert (frame.check (key));
+      daisy_assert (frame.type_size (key) != Value::Singleton);
+      daisy_assert (!frame.is_log (key));
       
-      switch (syntax.lookup (key))
+      switch (frame.lookup (key))
         {
         case Value::Number:
-          unique_validate (alist.number_sequence (key));
+          unique_validate (frame.number_sequence (key));
           break;
         case Value::PLF:
-          unique_validate (alist.plf_sequence (key));
+          unique_validate (frame.plf_sequence (key));
           break;
         case Value::Boolean:
-          unique_validate (alist.flag_sequence (key));
+          unique_validate (frame.flag_sequence (key));
           break;
         case Value::String:
-          unique_validate (alist.name_sequence (key));
+          unique_validate (frame.name_sequence (key));
           break;
         case Value::Integer:
-          unique_validate (alist.integer_sequence (key));
+          unique_validate (frame.integer_sequence (key));
           break;
 	case Value::Object:
 	  {
-	    std::vector<const AttributeList*> list = alist.alist_sequence (key);
+	    std::vector<const Frame*> list = frame.frame_sequence (key);
 	    std::map<symbol, size_t> found;
 	    for (size_t i = 0; i < list.size (); i++)
 	      {
@@ -766,7 +765,7 @@ VCheck::unique ()
 	  }
         default:
           daisy_panic ("Unhandled list type "
-                       + Value::type_name (syntax.lookup (key)));
+                       + Value::type_name (frame.lookup (key)));
         }
     }      
   } unique;
@@ -775,12 +774,11 @@ VCheck::unique ()
 }
 
 void
-VCheck::All::check (const Metalib& metalib,
-		    const Syntax& syntax, const AttributeList& alist, 
-		    const symbol key) const throw (std::string)
+VCheck::All::check (Metalib& metalib, const Frame& frame, const symbol key)
+  const throw (std::string)
 {
   for (int i = 0; i < checks.size (); i++)
-    checks[i]->check (metalib, syntax, alist, key);
+    checks[i]->check (metalib, frame, key);
 }
 
 VCheck::All::All (const VCheck& a, const VCheck& b)

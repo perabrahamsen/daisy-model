@@ -73,7 +73,7 @@ static struct AdsorptionLinearOldSyntax : DeclareModel
     return new AdsorptionLinearOld (al);
   }
 
-  static bool check_alist (const AttributeList& al, Treelog& err)
+  static bool check_alist (Metalib&, const Frame& al, Treelog& err)
   {
     bool ok = true;
 

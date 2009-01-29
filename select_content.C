@@ -114,7 +114,7 @@ static struct SelectContentSyntax : public DeclareModel
 {
   Model* make (Block& al) const
   { return new SelectContent (al); }
-  static bool check_alist (const AttributeList& al, Treelog& msg)
+  static bool check_alist (Metalib&, const Frame& al, Treelog& msg)
   {
     if (al.check ("z") && al.check ("height"))
       msg.warning ("Paramater 'z' overwrites 'height'");

@@ -90,7 +90,7 @@ struct NumberPLF : public Number
     Treelog::Open nest (msg, name);
     return operand->check_dim (units, scope, domain, msg); 
   }
-  static bool check_alist (const AttributeList& al, Treelog& msg) 
+  static bool check_alist (Metalib&, const Frame& al, Treelog& msg) 
   {
     const symbol domain (al.name ("domain"));
     const symbol range (al.name ("range"));

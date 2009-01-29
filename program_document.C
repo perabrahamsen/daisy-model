@@ -35,7 +35,6 @@
 #include "librarian.h"
 #include "frame_submodel.h"
 #include "frame_model.h"
-#include "syntax.h"
 #include "alist.h"
 #include <sstream>
 #include <fstream>
@@ -77,11 +76,11 @@ struct ProgramDocument : public Program
                            bool last);
 
   // Print parts of it.
-  static void own_entries (const Metalib&,
+  static void own_entries (Metalib&,
                            const Library& library, const symbol name, 
                            std::vector<symbol>& entries, 
                            bool new_only = false);
-  static void inherited_entries (const Metalib&, const Library& library,
+  static void inherited_entries (Metalib&, const Library& library,
                                  const symbol name, 
                                  std::vector<symbol>& entries);
   void print_sample (const symbol name,
@@ -357,11 +356,9 @@ ProgramDocument::print_entry_value (const symbol name,
               const symbol submodel = frame.submodel_name (name);
               if (submodel != Value::None ())
 		{
-		  const AttributeList& nested = frame.alist (name);
+		  const Frame& nested = frame.frame (name);
                   const Frame& frame = Librarian::submodel_frame (submodel);
-		  const Syntax& nested_syntax = frame.syntax ();
-		  const AttributeList& default_alist = frame.alist ();
-		  if (!nested.subset (metalib, default_alist, nested_syntax))
+		  if (!nested.subset (metalib, frame))
 		    print_default_value = true;
 		}
 	      else
@@ -411,13 +408,13 @@ ProgramDocument::print_entry_value (const symbol name,
 	    break;
 	  case Value::Object:
 	    {
-	      const AttributeList& object = frame.alist (name);
+	      const Frame& object = frame.model (name);
 	      daisy_assert (object.check ("type"));
 	      const symbol type = object.name ("type");
 	      format->text (" (default `" + type + "')");
 	      const Library& library = frame.library (metalib, name);
-	      const AttributeList& super = library.lookup (type);
-	      if (!object.subset (metalib, super, library.syntax (type)))
+	      const Frame& super = library.model (type);
+	      if (!object.subset (metalib, super))
 		print_default_value = true;
 	    }
 	    break;
@@ -606,7 +603,7 @@ ProgramDocument::print_sample_entry (const symbol name,
 	      break;
 	    case Value::Object:
 	      {
-		const AttributeList& object = frame.alist (name);
+		const Frame& object = frame.frame (name);
 		daisy_assert (object.check ("type"));
 		const symbol type = object.name ("type");
 		comment = "Default " + type + " value.";
@@ -692,7 +689,7 @@ ProgramDocument::print_sample_entry (const symbol name,
 }
 
 void
-ProgramDocument::own_entries (const Metalib& metalib,
+ProgramDocument::own_entries (Metalib& metalib,
                               const Library& library, const symbol name, 
 			      std::vector<symbol>& entries,
                               const bool new_only)
@@ -718,9 +715,7 @@ ProgramDocument::own_entries (const Metalib& metalib,
               const symbol key = base_entries[i];
               if (new_only
                   || key == "description"
-                  || frame.alist ().subset (metalib, 
-                                            base_frame.alist (), 
-                                            base_frame.syntax (), key))
+                  || frame.subset (metalib, base_frame, key))
                 entries.erase (find (entries.begin (), entries.end (), key));
             }
         }
@@ -728,7 +723,7 @@ ProgramDocument::own_entries (const Metalib& metalib,
 }
 
 void
-ProgramDocument::inherited_entries (const Metalib& metalib,
+ProgramDocument::inherited_entries (Metalib& metalib,
                                     const Library& library, const symbol name, 
 				    std::vector<symbol>& entries)
 {
@@ -746,8 +741,7 @@ ProgramDocument::inherited_entries (const Metalib& metalib,
             {
               const symbol key = entries[i];
               if (key != "description" 
-                  && !frame.alist ().subset (metalib, base_frame.alist (), 
-                                             base_frame.syntax (), key))
+                  && !frame.subset (metalib, base_frame, key))
                 entries.erase (find (entries.begin (), entries.end (), key));
             }
         }
@@ -1069,7 +1063,7 @@ ProgramDocument::print_model (const symbol name, const Library& library,
 	  format->text (".\n");
 	}
 
-      if (library.has_interesting_description (frame.alist ()))
+      if (library.has_interesting_description (frame))
         format->alist_description (frame.alist ());
 
       print_users (xref.models[used]);
@@ -1265,3 +1259,5 @@ Generate the components part of the reference manual.")
     frame.add ("print_parameterizations", false);
   }
 } ProgramDocument_syntax;
+
+// program_document.C ends here.

@@ -292,7 +292,7 @@ static struct MV_CropSyntax : DeclareModel
   Model* make (Block& al) const
   { return new MV_Crop (al); }
 
-  static bool check_alist (const AttributeList& al, Treelog& msg)
+  static bool check_alist (Metalib&, const Frame& al, Treelog& msg)
   {
     bool ok = true;
     if (al.number_sequence ("S_F").size ()
@@ -674,7 +674,7 @@ static struct ActionMarkvandSyntax : DeclareModel
 {
   Model* make (Block& al) const
   { return new ActionMarkvand (al); }
-  static bool check_alist (const AttributeList&, Treelog&)
+  static bool check_alist (Metalib&, const Frame&, Treelog&)
   {
     bool ok = true;
     return ok;

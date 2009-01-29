@@ -122,7 +122,7 @@ Hydraulic::K_to_M (PLF& plf, const int intervals) const
 }
 
 static bool
-check_Theta_res (const AttributeList& al, Treelog& err)
+check_Theta_res (Metalib&, const Frame& al, Treelog& err)
 {
   bool ok = true;
 
@@ -152,7 +152,7 @@ Hydraulic::load_Theta_res (Frame& frame)
 }
 
 static bool
-check_K_sat_optional (const AttributeList& al, Treelog& err)
+check_K_sat_optional (Metalib&, const Frame& al, Treelog& err)
 {
   bool ok = true;
 
@@ -174,7 +174,7 @@ Water conductivity at specified pressure.", K_at_h::load_syntax);
 }
 
 static bool
-check_K_sat (const AttributeList& al, Treelog& err)
+check_K_sat (Metalib&, const Frame& al, Treelog& err)
 {
   bool ok = true;
 

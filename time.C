@@ -496,7 +496,7 @@ Time::hours_between (const Time& first, const Time& last)
 
 // @ Create.
 
-static bool check_alist (const AttributeList& al, Treelog& msg)
+static bool check_alist (Metalib&, const Frame& al, Treelog& msg)
 { 
   bool ok = true;
 

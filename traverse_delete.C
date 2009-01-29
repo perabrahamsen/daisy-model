@@ -41,7 +41,7 @@ private:
 
   // Create & Destroy.
 public:
-  TraverseDelete (const Metalib&, symbol component, symbol parameterization);
+  TraverseDelete (Metalib&, symbol component, symbol parameterization);
   ~TraverseDelete ();
 
 private:
@@ -180,7 +180,7 @@ TraverseDelete::leave_parameter ()
 { }
 
 static symbol
-find_super (const Metalib& metalib,
+find_super (Metalib& metalib,
             const symbol component, const symbol parameterization)
 { 
   const Library& library = metalib.library (component);
@@ -192,7 +192,7 @@ find_super (const Metalib& metalib,
   return super;
 }
 
-TraverseDelete::TraverseDelete (const Metalib& mlib,
+TraverseDelete::TraverseDelete (Metalib& mlib,
                                 const symbol component,
 				const symbol parameterization)
   : Traverse (mlib),
@@ -206,7 +206,7 @@ TraverseDelete::~TraverseDelete ()
 { }
 
 void
-remove_dependencies (const Metalib& mlib,
+remove_dependencies (Metalib& mlib,
                      symbol component, symbol parameterization)
 {
   TraverseDelete depend (mlib, component, parameterization);

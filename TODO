@@ -2,15 +2,15 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Frame
 
-** AList::subset -> Frame::subset
+** Fjern brug af Frame::alist_sequence.
 
 ** Fjern AttributeList fra AttributeList (fa. & fas.)
+
+** AList::subset -> Frame::subset
 
 ** Fjern brug af syntax i select.C
 
 ** Fjern Frame::syntax ()
-
-** Ret check_alist (og check_object)
 
 ** Fjern al brug af alist of syntax udenfor frame
 
@@ -23,6 +23,8 @@ Måske skal vi have en attribut der skelner mellem midlertidige og
 permanent frames, så vi altid kloner midlertidige?
 
 ** Fix FRAME_LINK ifdefs i weather
+
+** C & OpenMI interface.
 
 ** Fjern "type", "base_model", attributes.
 

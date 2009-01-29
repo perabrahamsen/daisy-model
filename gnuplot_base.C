@@ -150,14 +150,13 @@ The special name 'screen' indicate that the data should be shown on\n\
 the screen instead of being stored in a file.");
     static struct CheckWhere : public VCheck
     {
-      void check (const Metalib&,
-                  const Syntax& syntax, const AttributeList& alist, 
-                  const symbol key) const throw (std::string)
+      void check (Metalib&, const Frame& frame, const symbol key)
+        const throw (std::string)
       {
         daisy_assert (key == "where");
-        daisy_assert (syntax.lookup (key) == Value::String);
-        daisy_assert (syntax.size (key) == Value::Singleton);
-        const symbol file = alist.name (key);
+        daisy_assert (frame.lookup (key) == Value::String);
+        daisy_assert (frame.type_size (key) == Value::Singleton);
+        const symbol file = frame.name (key);
         if (file == "screen")
           return;
         if (GnuplotBase::file2device (file) == "unknown")
@@ -194,14 +193,13 @@ a line conncting two datapoints, one of them outside the graph, may\n\
 cross the legend.");
     static struct CheckLegend : public VCheck
     {
-      void check (const Metalib&,
-                  const Syntax& syntax, const AttributeList& alist, 
-                  const symbol key) const throw (std::string)
+      void check (Metalib&, const Frame& frame, const symbol key) 
+        const throw (std::string)
       {
         daisy_assert (key == "legend");
-        daisy_assert (syntax.lookup (key) == Value::String);
-        daisy_assert (syntax.size (key) == Value::Singleton);
-        const symbol legend = alist.name (key);
+        daisy_assert (frame.lookup (key) == Value::String);
+        daisy_assert (frame.type_size (key) == Value::Singleton);
+        const symbol legend = frame.name (key);
         if (legend == "auto")
           return;
         if (GnuplotBase::legend_table.find (legend) 

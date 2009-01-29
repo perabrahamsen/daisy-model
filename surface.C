@@ -488,7 +488,7 @@ Surface::put_ponding (double p)	// [mm]
 }
 
 static bool
-check_alist (const AttributeList& al, Treelog& msg)
+check_alist (Metalib&, const Frame& al, Treelog& msg)
 {
   bool ok = true;
 

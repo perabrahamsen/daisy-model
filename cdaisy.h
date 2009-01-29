@@ -71,11 +71,13 @@ daisy_syntax_create (void);
 EXPORT void                            /* Delete syntax object. */
 daisy_syntax_delete (daisy_syntax* syntax);
 
+#if 0
 EXPORT daisy_bool                      /* Check that alist match the syntax. */
 daisy_syntax_check (const daisy_syntax* syntax, 
                     const daisy_alist* alist,
                     const char* name,
                     const daisy_daisy* toplevel);
+#endif
 
 /* Elements in the syntax table have the following properties.
    
@@ -270,9 +272,10 @@ daisy_library_size (const daisy_library* library);
 EXPORT const char*                     /* Name of object number INDEX in LIBRARY. */
 daisy_library_name (const daisy_library* library, const unsigned int index);
 
+#if 0
 EXPORT const daisy_syntax*             /* Syntax for object NAME in LIBRARY. */
 daisy_library_syntax (const daisy_library* library, const char* name);
-
+#endif
 EXPORT const daisy_alist*              /* Alist for object NAME in LIBRARY. */
 daisy_library_alist (const daisy_library* library, const char* name);
 
@@ -348,8 +351,10 @@ daisy_daisy_parse_command_line (daisy_daisy* toplevel,
 EXPORT void                     /* Parse command arguments. */
 daisy_daisy_parse_file (daisy_daisy* toplevel, char* filename);
 
+#if 0
 EXPORT daisy_syntax*            /* Extract program syntax. */
 daisy_daisy_get_program_syntax (daisy_daisy* toplevel);
+#endif
 
 EXPORT daisy_alist*             /* Extract program alist. */
 daisy_daisy_get_program_alist (daisy_daisy* toplevel);

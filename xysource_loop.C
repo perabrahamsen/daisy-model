@@ -150,7 +150,7 @@ static struct XYSourceLoopSyntax : public DeclareModel
   Model* make (Block& al) const
   { return new XYSourceLoop (al); }
 
-  static bool check_alist (const AttributeList& alist, Treelog& msg)
+  static bool check_alist (Metalib&, const Frame& alist, Treelog& msg)
   {
     bool ok = true;
     if (alist.name ("end") != alist.name ("begin"))

@@ -59,9 +59,8 @@ struct AM::Implementation
   struct Check_OM_Pools : public VCheck
   {
     // Check that the OM pools are correct for organic fertilizer.
-    void check (const Metalib&, 
-		const Syntax& syntax, const AttributeList& alist, 
-		const symbol key) const throw (std::string);
+    void check (Metalib&, const Frame& frame, const symbol key)
+      const throw (std::string);
   };
 
   // Content.
@@ -118,38 +117,36 @@ struct AM::Implementation
 };
 
 void
-AM::Implementation::Check_OM_Pools::check (const Metalib&, 
-					   const Syntax& syntax, 
-					   const AttributeList& alist, 
+AM::Implementation::Check_OM_Pools::check (Metalib&, const Frame& frame,
 					   const symbol key) 
   const throw (std::string)
 { 
-  daisy_assert (alist.check (key));
-  daisy_assert (syntax.lookup (key) == Value::Object);
-  daisy_assert (!syntax.is_log (key));
-  daisy_assert (syntax.size (key) == Value::Sequence);
+  daisy_assert (frame.check (key));
+  daisy_assert (frame.lookup (key) == Value::Object);
+  daisy_assert (!frame.is_log (key));
+  daisy_assert (frame.type_size (key) == Value::Sequence);
 
-  if (alist.flag ("initialized", false))
+  if (frame.flag ("initialized", false))
     // No checking checkpoints.
     return;
 
-  const std::vector<const Frame*>& om_alist 
-    = alist.frame_sequence (key);
+  const std::vector<const Frame*>& om_frame 
+    = frame.frame_sequence (key);
   int missing_initial_fraction = 0;
   int missing_C_per_N = 0;
   double total_fractions = 0.0;
   bool same_unspecified = false;
-  for (size_t i = 0; i < om_alist.size (); i++)
+  for (size_t i = 0; i < om_frame.size (); i++)
     {
-      if (!om_alist[i]->check ("initial_fraction"))
+      if (!om_frame[i]->check ("initial_fraction"))
 	missing_initial_fraction++;
       else 
-	total_fractions += om_alist[i]->number ("initial_fraction");
-      if (!om_alist[i]->check ("C_per_N"))
+	total_fractions += om_frame[i]->number ("initial_fraction");
+      if (!om_frame[i]->check ("C_per_N"))
 	missing_C_per_N++;
 
-      if (!om_alist[i]->check ("initial_fraction") 
-	  && !om_alist[i]->check ("C_per_N"))
+      if (!om_frame[i]->check ("initial_fraction") 
+	  && !om_frame[i]->check ("C_per_N"))
 	same_unspecified = true;
     }
   daisy_assert (total_fractions >= 0.0);
@@ -736,7 +733,7 @@ AM::default_AM ()
 }
 
 double
-AM::get_NO3 (const Metalib& metalib, const FrameModel& al)
+AM::get_NO3 (Metalib& metalib, const FrameModel& al)
 {
   if (al.check ("weight"))
     {
@@ -760,7 +757,7 @@ AM::get_NO3 (const Metalib& metalib, const FrameModel& al)
 }
 
 double
-AM::get_NH4 (const Metalib& metalib, const FrameModel& al)
+AM::get_NH4 (Metalib& metalib, const FrameModel& al)
 {
   daisy_assert (IM::storage_unit () == symbol ("g/cm^2"));
 
@@ -790,7 +787,7 @@ AM::get_NH4 (const Metalib& metalib, const FrameModel& al)
 }
 
 IM
-AM::get_IM (const Metalib& metalib, const Unit& unit, const FrameModel& al)
+AM::get_IM (Metalib& metalib, const Unit& unit, const FrameModel& al)
 {
   daisy_assert (unit.native_name () == IM::storage_unit ());
   IM result (unit);
@@ -800,7 +797,7 @@ AM::get_IM (const Metalib& metalib, const Unit& unit, const FrameModel& al)
 }
 
 double
-AM::get_volatilization (const Metalib& metalib, const FrameModel& al)
+AM::get_volatilization (Metalib& metalib, const FrameModel& al)
 {
   if (al.check ("weight"))
     {
@@ -827,7 +824,7 @@ AM::get_volatilization (const Metalib& metalib, const FrameModel& al)
 }
 
 double
-AM::get_DM (const Metalib& metalib, const FrameModel& al)	// [Mg DM/ha]
+AM::get_DM (Metalib& metalib, const FrameModel& al)	// [Mg DM/ha]
 {
   if (al.check ("weight") && is_organic (metalib, al))
     return al.number ("weight") * al.number ("dry_matter_fraction");
@@ -836,7 +833,7 @@ AM::get_DM (const Metalib& metalib, const FrameModel& al)	// [Mg DM/ha]
 }
 
 double
-AM::get_water (const Metalib& metalib, const FrameModel& al)	// [mm]
+AM::get_water (Metalib& metalib, const FrameModel& al)	// [mm]
 {
   if (al.check ("weight") && is_organic (metalib, al))
     return al.number ("weight")
@@ -847,7 +844,7 @@ AM::get_water (const Metalib& metalib, const FrameModel& al)	// [mm]
 }
 
 void
-AM::set_utilized_weight (const Metalib& metalib, 
+AM::set_utilized_weight (Metalib& metalib, 
                          FrameModel& am, const double weight)
 {
   if (is_mineral (metalib, am))
@@ -867,7 +864,7 @@ AM::set_utilized_weight (const Metalib& metalib,
 }
 
 double
-AM::utilized_weight (const Metalib& metalib, const FrameModel& am)
+AM::utilized_weight (Metalib& metalib, const FrameModel& am)
 {
   if (am.check ("first_year_utilization")
       && am.check ("dry_matter_fraction")
@@ -888,7 +885,7 @@ AM::utilized_weight (const Metalib& metalib, const FrameModel& am)
 }
 
 double
-AM::second_year_utilization (const Metalib&, const FrameModel& am)
+AM::second_year_utilization (Metalib&, const FrameModel& am)
 {
   if (am.check ("second_year_utilization")
       && am.check ("dry_matter_fraction")
@@ -906,7 +903,7 @@ AM::second_year_utilization (const Metalib&, const FrameModel& am)
 }
 
 void
-AM::set_mineral (const Metalib&, FrameModel& am, double NH4, double NO3)
+AM::set_mineral (Metalib&, FrameModel& am, double NH4, double NO3)
 {
   const double total_N = NH4 + NO3;
   am.add ("weight", total_N);
@@ -915,18 +912,18 @@ AM::set_mineral (const Metalib&, FrameModel& am, double NH4, double NO3)
 }
 
 bool 
-AM::is_fertilizer (const Metalib& metalib, const FrameModel& am) 
+AM::is_fertilizer (Metalib& metalib, const FrameModel& am) 
 { return is_mineral (metalib, am) || is_organic (metalib, am); }
 
 bool 
-AM::is_mineral (const Metalib& metalib, const FrameModel& am)
+AM::is_mineral (Metalib& metalib, const FrameModel& am)
 { 
   Library& library = metalib.library (component);
   return library.is_derived_from (am.name ("type"), "mineral");
 }
 
 bool 
-AM::is_organic (const Metalib& metalib, const FrameModel& am)
+AM::is_organic (Metalib& metalib, const FrameModel& am)
 { 
   Library& library = metalib.library (component);
   return library.is_derived_from (am.name ("type"), "organic");
@@ -1191,7 +1188,7 @@ static struct AMInitialSyntax : public DeclareModel
     : DeclareModel (AM::component, "initial", "base", "\
 Initial added organic matter at the start of the simulation.")
   { }
-  static bool check_alist (const AttributeList& al, Treelog& err)
+  static bool check_alist (Metalib&, const Frame& al, Treelog& err)
   { 
     if (al.flag ("initialized", false))
       // No checking checkpoints.
@@ -1273,7 +1270,7 @@ static struct AMRootSyntax : public DeclareModel
     : DeclareModel (AM::component, "root", "base", "\
 Initialization of old root remains.")
   { }
-  static bool check_alist (const AttributeList& al, Treelog& err)
+  static bool check_alist (Metalib&, const Frame& al, Treelog& err)
   { 
     if (al.flag ("initialized", false))
       // No checking checkpoints.
@@ -1339,33 +1336,33 @@ struct ProgramAM_table : public Program
         tmp << "\n";
         const symbol name = *i;
         daisy_assert (library.check (name));
-        const AttributeList& alist = library.lookup (name);
+        const Frame& frame = library.model (name);
         // const Syntax& syntax = library.syntax (name);
         static const symbol buildin ("build-in");
-        const symbol super = alist.check ("type") 
-          ? alist.name ("type")
+        const symbol super = frame.check ("type") 
+          ? frame.name ("type")
           : buildin;
         tmp << name << "\t" << super << "\t";
-        if (alist.check ("parsed_from_file"))
-          tmp << alist.name ("parsed_from_file");
+        if (frame.check ("parsed_from_file"))
+          tmp << frame.name ("parsed_from_file");
         tmp << "\t";
-        if (alist.check ("NH4_fraction"))
-          tmp << alist.number ("NH4_fraction");
+        if (frame.check ("NH4_fraction"))
+          tmp << frame.number ("NH4_fraction");
         tmp << "\t";
-        if (alist.check ("NO3_fraction"))
-          tmp << alist.number ("NO3_fraction");
+        if (frame.check ("NO3_fraction"))
+          tmp << frame.number ("NO3_fraction");
         tmp << "\t";
-        if (alist.check ("volatilization"))
-          tmp << alist.number ("volatilization");
+        if (frame.check ("volatilization"))
+          tmp << frame.number ("volatilization");
         tmp << "\t";
-        if (alist.check ("total_N_fraction"))
-          tmp << alist.number ("total_N_fraction");
+        if (frame.check ("total_N_fraction"))
+          tmp << frame.number ("total_N_fraction");
         tmp << "\t";
-        if (alist.check ("total_C_fraction"))
-          tmp << alist.number ("total_C_fraction");
+        if (frame.check ("total_C_fraction"))
+          tmp << frame.number ("total_C_fraction");
         tmp << "\t";
-        if (alist.check ("dry_matter_fraction"))
-          tmp << alist.number ("dry_matter_fraction");
+        if (frame.check ("dry_matter_fraction"))
+          tmp << frame.number ("dry_matter_fraction");
       }
     msg.message (tmp.str ());
     return true;

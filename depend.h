@@ -36,18 +36,18 @@ typedef std::set<symbol> symbol_set;
 typedef std::map<symbol, symbol_set> dep_map;
 
 bool
-has_dependencies (const Metalib&,
+has_dependencies (Metalib&,
                   const std::string& component,
                   const std::string& parameterization);
 
 bool
-check_dependencies (const Metalib&,
+check_dependencies (Metalib&,
                   const std::string& component,
                     const std::string& parameterization, 
 		    Treelog& treelog);
 
 bool
-find_dependencies (const Metalib&,
+find_dependencies (Metalib&,
                    const std::string& component,
                    const std::string& parameterization, 
 		   dep_map& dependencies);

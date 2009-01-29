@@ -32,7 +32,7 @@ class Metalib;
 class Traverse
 {
 public:
-  const Metalib& metalib;
+  Metalib& metalib;
 
   // Major calls.
 public:
@@ -107,7 +107,7 @@ protected:
 
   // Create and destroy.
 protected:
-  Traverse (const Metalib&);
+  Traverse (Metalib&);
   virtual ~Traverse ();
 };
 

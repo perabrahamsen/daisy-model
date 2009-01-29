@@ -53,7 +53,7 @@ public:
 
   // Create & Destroy.
 public:
-  TraverseDepend (const Metalib&, symbol component, symbol parameterization, 
+  TraverseDepend (Metalib&, symbol component, symbol parameterization, 
 		  Treelog& treelog, dep_map& dependencies, bool find_all);
   ~TraverseDepend ();
 
@@ -245,7 +245,7 @@ void
 TraverseDepend::leave_parameter ()
 { }
 
-TraverseDepend::TraverseDepend (const Metalib& mlib,
+TraverseDepend::TraverseDepend (Metalib& mlib,
                                 const symbol component,
 				const symbol parameterization,
 				Treelog& tlog,
@@ -264,7 +264,7 @@ TraverseDepend::~TraverseDepend ()
 { }
 
 bool
-has_dependencies (const Metalib& metalib,
+has_dependencies (Metalib& metalib,
                   const symbol component, const symbol parameterization)
 {
   dep_map dependencies;
@@ -276,7 +276,7 @@ has_dependencies (const Metalib& metalib,
 }
 
 bool
-check_dependencies (const Metalib& metalib,
+check_dependencies (Metalib& metalib,
                     const symbol component, const symbol parameterization, 
 		    Treelog& treelog)
 {
@@ -289,7 +289,7 @@ check_dependencies (const Metalib& metalib,
 }
 
 bool
-find_dependencies (const Metalib& metalib,
+find_dependencies (Metalib& metalib,
                    const symbol component, const symbol parameterization, 
 		   dep_map& dependencies)
 {
@@ -301,7 +301,7 @@ find_dependencies (const Metalib& metalib,
 }
 
 static int
-sequence_number (const Metalib& metalib,
+sequence_number (Metalib& metalib,
                  const symbol component, const symbol parameterization)
 {
   const Library& library = metalib.library (component);
@@ -335,12 +335,12 @@ struct object_desc
 
 struct sort_by_sequence 
 {
-  const Metalib& metalib;
+  Metalib& metalib;
   
   int operator()(const object_desc& one, const object_desc& two)
   { return sequence_number (metalib, one.comp, one.par) 
       < sequence_number (metalib, two.comp, two.par); }
-  sort_by_sequence (const Metalib& mlib)
+  sort_by_sequence (Metalib& mlib)
     : metalib (mlib)
   { }
 };

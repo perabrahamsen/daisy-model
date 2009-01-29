@@ -445,7 +445,7 @@ static struct ConditionMM_DDBase : public DeclareBase
     : DeclareBase (Condition::component, "mm_dd_base", "\
 Conditions based on month and day.")
   { }
-  static bool check_alist (const AttributeList& al, Treelog& err)
+  static bool check_alist (Metalib&, const Frame& al, Treelog& err)
   {
     bool ok = true;
     const int mm = al.integer ("month");

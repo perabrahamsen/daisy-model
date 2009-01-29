@@ -140,10 +140,6 @@ Library::Implementation::add_model (const symbol key, FrameModel& frame)
   add_ancestors (key);
 }
 
-const Syntax& 
-Library::Implementation::syntax (const symbol key) const
-{ return frame (key).syntax (); }
-
 void
 Library::Implementation::entries (std::vector<symbol>& result) const
 {
@@ -234,7 +230,7 @@ Library::check (const symbol key) const
 { return impl->check (key); }
 
 bool
-Library::complete (const Metalib& metalib, const symbol key) const
+Library::complete (Metalib& metalib, const symbol key) const
 { 
   if (!check (key))
     return false;
@@ -273,10 +269,6 @@ Library::add_derived (const symbol name, const Syntax& syn, AttributeList& al,
   impl->add_model (name, *new FrameModel (model (super), syn, al)); 
 }
 #endif 
-
-const Syntax& 
-Library::syntax (const symbol key) const
-{ return impl->syntax (key); }
 
 void
 Library::entries (std::vector<symbol>& result) const
@@ -330,18 +322,18 @@ Library::base_model (const symbol parameterization) const
 }
 
 bool 
-Library::has_interesting_description (const AttributeList& alist) const
+Library::has_interesting_description (const Frame& frame) const
 {
   // A missing description is boring.
-  if (!alist.check ("description"))
+  if (!frame.check ("description"))
     return false;
   
   // The description of models are always interesting.
-  if (!alist.check ("type"))
+  if (!frame.check ("type"))
     return true;
   
   // If the model has no description, this one is interesting.
-  const symbol type = alist.name ("type");
+  const symbol type = frame.name ("type");
   if (!check (type))
     {
       daisy_bug (name () + " does not have " + type.name ());
@@ -353,7 +345,7 @@ Library::has_interesting_description (const AttributeList& alist) const
     return true;
   
   // If the model description is different, this one is interesting.
-  return alist.name ("description") != super.name ("description");
+  return frame.name ("description") != super.name ("description");
 }
 
 void

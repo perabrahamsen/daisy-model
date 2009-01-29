@@ -479,7 +479,7 @@ Soil::check_y_border (const double, Treelog&) const
 { return true; }
 
 static bool
-check_alist (const AttributeList& al, Treelog& err)
+check_alist (Metalib&, const Frame& al, Treelog& err)
 {
   bool ok = true;
 

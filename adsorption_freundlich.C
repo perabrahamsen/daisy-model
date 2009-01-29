@@ -115,7 +115,7 @@ static struct AdsorptionFreundlichSyntax : DeclareModel
 {
   Model* make (Block& al) const
   { return new AdsorptionFreundlich (al); }
-  static bool check_alist (const AttributeList& al, Treelog& err)
+  static bool check_alist (Metalib&, const Frame& al, Treelog& err)
   {
     bool ok = true;
 

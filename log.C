@@ -47,13 +47,13 @@ struct Log::Implementation
   std::list<const Soil*> soils;
   std::list<const Geometry*> geometries;
   std::list<const Vegetation*> vegetations;
-  const Metalib* metalib;
+  Metalib* metalib;
   Implementation ()
     : metalib (NULL)
   { }
 };
 
-const Metalib&
+Metalib&
 Log::metalib () const
 {
   daisy_assert (impl->metalib);
@@ -176,7 +176,7 @@ Log::output (Log&) const
 { }
 
 void
-Log::initialize_common (const Metalib& metalib, Treelog& msg)
+Log::initialize_common (Metalib& metalib, Treelog& msg)
 {
   daisy_assert (!impl->metalib);
   impl->metalib = &metalib;

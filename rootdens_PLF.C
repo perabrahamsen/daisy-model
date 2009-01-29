@@ -41,9 +41,8 @@ struct Rootdens_PLF : public Rootdens
   struct Check_Indexes : public VCheck
   {
     // Check that the indexes are monotonically increasing.
-    void check (const Metalib&, 
-		const Syntax& syntax, const AttributeList& alist, 
-		const symbol key) const throw (std::string);
+    void check (Metalib&, const Frame& frame, const symbol key)
+      const throw (std::string);
   };
 
   struct Entry
@@ -87,17 +86,16 @@ Relative root density as a function of root depth .");
 }
 
 void
-Rootdens_PLF::Check_Indexes::check (const Metalib&, const Syntax& syntax, 
-				    const AttributeList& alist, 
-				    const symbol key)
+Rootdens_PLF::Check_Indexes::check (Metalib&, const Frame& frame, 
+                                    const symbol key)
   const throw (std::string)
 { 
-  daisy_assert (alist.check (key));
-  daisy_assert (syntax.lookup (key) == Value::AList);
-  daisy_assert (!syntax.is_log (key));
-  daisy_assert (syntax.size (key) == Value::Sequence);
+  daisy_assert (frame.check (key));
+  daisy_assert (frame.lookup (key) == Value::AList);
+  daisy_assert (!frame.is_log (key));
+  daisy_assert (frame.type_size (key) == Value::Sequence);
 
-  const std::vector<const AttributeList*>& alists = alist.alist_sequence (key);
+  const std::vector<const AttributeList*>& alists = frame.alist_sequence (key);
 
   if (alists.size () < 1)
     throw std::string ("You must specify at least one entry");

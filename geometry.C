@@ -613,16 +613,15 @@ Geometry::total_surface (const std::vector<double>& v,
 
 static struct CheckLayers : public VCheck
 {
-  void check (const Metalib&,
-	      const Syntax& syntax, const AttributeList& alist, 
-	      const symbol key) const throw (std::string)
+  void check (Metalib&, const Frame& frame, const symbol key)
+    const throw (std::string)
   {
-    daisy_assert (alist.check (key));
-    daisy_assert (syntax.lookup (key) == Value::AList);
-    daisy_assert (!syntax.is_log (key));
-    daisy_assert (syntax.size (key) == Value::Sequence);
+    daisy_assert (frame.check (key));
+    daisy_assert (frame.lookup (key) == Value::AList);
+    daisy_assert (!frame.is_log (key));
+    daisy_assert (frame.type_size (key) == Value::Sequence);
 
-    const std::vector<const AttributeList*>& layers = alist.alist_sequence (key);
+    const std::vector<const AttributeList*>& layers = frame.alist_sequence (key);
 
     double last = 0.0;
     for (unsigned int i = 0; i < layers.size (); i++)

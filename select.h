@@ -88,7 +88,7 @@ public:
   virtual symbol tag () const;
   virtual const Geometry* geometry () const; // For array tags.
   virtual int size () const;	// For array tags.
-  static symbol select_get_tag (const AttributeList& al);
+  static symbol select_get_tag (const Frame& al);
 
   // Nesting.
 public:

@@ -53,7 +53,7 @@ struct HorizonSystem : public Horizon
 
     // Create and destroy.
     Frame::check_fun checker;
-    bool check_shared (const AttributeList& al, Treelog& err) const;
+    bool check_shared (const Frame& al, Treelog& err) const;
     void add (const symbol name, double limit);
     System (symbol name, Frame::check_fun check_alist);
   };
@@ -129,8 +129,7 @@ Otherwise, give an error if the sum is not 1.0.");
 }
 
 bool 
-HorizonSystem::System::check_shared (const AttributeList& al,
-                                     Treelog& err) const
+HorizonSystem::System::check_shared (const Frame& al, Treelog& err) const
 {
   bool ok = true;
 
@@ -167,7 +166,7 @@ HorizonSystem::System::System (symbol name, Frame::check_fun cf)
 
 static const struct USDA3_type : public HorizonSystem::System
 {
-  static bool check_alist (const AttributeList& al, Treelog& err);
+  static bool check_alist (Metalib&, const Frame& al, Treelog& err);
 
   USDA3_type ()
     : System ("USDA3", check_alist)
@@ -179,12 +178,12 @@ static const struct USDA3_type : public HorizonSystem::System
 } USDA3;
 
 bool 
-USDA3_type::check_alist (const AttributeList& al, Treelog& err)
+USDA3_type::check_alist (Metalib&, const Frame& al, Treelog& err)
 { return USDA3.check_shared (al, err); }
 
 static const struct USDA7_type : public HorizonSystem::System
 {
-  static bool check_alist (const AttributeList& al, Treelog& err);
+  static bool check_alist (Metalib&, const Frame& al, Treelog& err);
 
   USDA7_type ()
     : System ("USDA7", check_alist)
@@ -200,12 +199,12 @@ static const struct USDA7_type : public HorizonSystem::System
 } USDA7;
 
 bool 
-USDA7_type::check_alist (const AttributeList& al, Treelog& err)
+USDA7_type::check_alist (Metalib&, const Frame& al, Treelog& err)
 { return USDA7.check_shared (al, err); }
 
 static const struct ISSS3_type : public HorizonSystem::System
 {
-  static bool check_alist (const AttributeList& al, Treelog& err);
+  static bool check_alist (Metalib&, const Frame& al, Treelog& err);
 
   ISSS3_type ()
     : System ("ISSS3", check_alist)
@@ -217,12 +216,12 @@ static const struct ISSS3_type : public HorizonSystem::System
 } ISSS3;
 
 bool 
-ISSS3_type::check_alist (const AttributeList& al, Treelog& err)
+ISSS3_type::check_alist (Metalib&, const Frame& al, Treelog& err)
 { return ISSS3.check_shared (al, err); }
 
 static const struct ISSS4_type : public HorizonSystem::System
 {
-  static bool check_alist (const AttributeList& al, Treelog& err);
+  static bool check_alist (Metalib&, const Frame& al, Treelog& err);
 
   ISSS4_type ()
     : System ("ISSS4", check_alist)
@@ -235,12 +234,12 @@ static const struct ISSS4_type : public HorizonSystem::System
 } ISSS4;
 
 bool 
-ISSS4_type::check_alist (const AttributeList& al, Treelog& err)
+ISSS4_type::check_alist (Metalib&, const Frame& al, Treelog& err)
 { return ISSS4.check_shared (al, err); }
 
 static const struct USPRA3_type : public HorizonSystem::System
 {
-  static bool check_alist (const AttributeList& al, Treelog& err);
+  static bool check_alist (Metalib&, const Frame& al, Treelog& err);
 
   USPRA3_type ()
     : System ("USPRA3", check_alist)
@@ -252,12 +251,12 @@ static const struct USPRA3_type : public HorizonSystem::System
 } USPRA3;
 
 bool 
-USPRA3_type::check_alist (const AttributeList& al, Treelog& err)
+USPRA3_type::check_alist (Metalib&, const Frame& al, Treelog& err)
 { return USPRA3.check_shared (al, err); }
 
 static const struct USPRA4_type : public HorizonSystem::System
 {
-  static bool check_alist (const AttributeList& al, Treelog& err);
+  static bool check_alist (Metalib&, const Frame& al, Treelog& err);
 
   USPRA4_type ()
     : System ("USPRA4", check_alist)
@@ -270,12 +269,12 @@ static const struct USPRA4_type : public HorizonSystem::System
 } USPRA4;
 
 bool 
-USPRA4_type::check_alist (const AttributeList& al, Treelog& err)
+USPRA4_type::check_alist (Metalib&, const Frame& al, Treelog& err)
 { return USPRA4.check_shared (al, err); }
 
 static const struct BSI3_type : public HorizonSystem::System
 {
-  static bool check_alist (const AttributeList& al, Treelog& err);
+  static bool check_alist (Metalib&, const Frame& al, Treelog& err);
 
   BSI3_type ()
     : System ("BSI3", check_alist)
@@ -287,12 +286,12 @@ static const struct BSI3_type : public HorizonSystem::System
 } BSI3;
 
 bool 
-BSI3_type::check_alist (const AttributeList& al, Treelog& err)
+BSI3_type::check_alist (Metalib&, const Frame& al, Treelog& err)
 { return BSI3.check_shared (al, err); }
 
 static const struct BSI7_type : public HorizonSystem::System
 {
-  static bool check_alist (const AttributeList& al, Treelog& err);
+  static bool check_alist (Metalib&, const Frame& al, Treelog& err);
 
   BSI7_type ()
     : System ("BSI7", check_alist)
@@ -308,12 +307,12 @@ static const struct BSI7_type : public HorizonSystem::System
 } BSI7;
 
 bool 
-BSI7_type::check_alist (const AttributeList& al, Treelog& err)
+BSI7_type::check_alist (Metalib&, const Frame& al, Treelog& err)
 { return BSI7.check_shared (al, err); }
 
 static const struct DIN5_type : public HorizonSystem::System
 {
-  static bool check_alist (const AttributeList& al, Treelog& err);
+  static bool check_alist (Metalib&, const Frame& al, Treelog& err);
 
   DIN5_type ()
     : System ("DIN5", check_alist)
@@ -327,7 +326,7 @@ static const struct DIN5_type : public HorizonSystem::System
 } DIN5;
 
 bool 
-DIN5_type::check_alist (const AttributeList& al, Treelog& err)
+DIN5_type::check_alist (Metalib&, const Frame& al, Treelog& err)
 { return DIN5.check_shared (al, err); }
 
 

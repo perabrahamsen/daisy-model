@@ -314,7 +314,7 @@ static struct HydraulicHypresSyntax : public DeclareModel
   Model* make (Block& al) const
   { return new HydraulicHypres (al); }
 
-  static bool check_alist (const AttributeList&, Treelog&)
+  static bool check_alist (Metalib&, const Frame&, Treelog&)
   {
     bool ok = true;
     return ok;

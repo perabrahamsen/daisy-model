@@ -141,7 +141,7 @@ void
 ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
 { 
   // Units.
-  const Metalib& metalib = daisy.metalib;
+  Metalib& metalib = daisy.metalib;
   const Units& units = daisy.units ();
   static const symbol mg_per_square_m ("mg/m^2");
   const Unit& u_mg_per_square_m = units.get_unit (mg_per_square_m);

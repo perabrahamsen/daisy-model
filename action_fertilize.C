@@ -54,7 +54,7 @@ struct ActionFertilize : public Action
     const double to;
     
     // Create and Destroy.
-    static bool check_alist (const AttributeList& al, Treelog& err);
+    static bool check_alist (Metalib&, const Frame& al, Treelog& err);
     static void load_syntax (Frame&);
     Precision (const AttributeList& al);
     ~Precision ();
@@ -70,7 +70,7 @@ struct ActionFertilize : public Action
   void initialize (const Daisy&, const Scope&, Treelog&)
   { }
   bool check (const Daisy& daisy, const Scope&, Treelog& err) const;
-  static bool check_alist (const AttributeList& al, Treelog& err);
+  static bool check_alist (Metalib&, const Frame& al, Treelog& err);
   static void load_syntax (Frame&);
 protected:
   ActionFertilize (Block& al);
@@ -78,7 +78,7 @@ protected:
 };
 
 bool 
-ActionFertilize::Precision::check_alist (const AttributeList& al, Treelog& err)
+ActionFertilize::Precision::check_alist (Metalib&, const Frame& al, Treelog& err)
 {
   bool ok = true; 
 
@@ -133,7 +133,7 @@ ActionFertilize::Precision::~Precision ()
 void 
 ActionFertilize::common_doIt (Daisy& daisy, double& water, Treelog& msg)
 {
-  const Metalib& metalib = daisy.metalib;
+  Metalib& metalib = daisy.metalib;
   if (precision.get ())
     {
       const double weight 
@@ -216,8 +216,8 @@ ActionFertilize::~ActionFertilize ()
 
 static struct ActionFertilizeSyntax : public DeclareBase
 {
-  static bool check_object (const Metalib& metalib, 
-                            const AttributeList& al, Treelog& err)
+  static bool check_alist (Metalib& metalib, 
+                           const Frame& al, Treelog& err)
   { 
     bool ok = true;
 
@@ -268,7 +268,7 @@ Shared parameters for all fertilize actions.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_object_check (check_object);
+    frame.add_check (check_alist);
     frame.add_object ("am", AM::component, "\
 The fertilizer you want to apply.");
     frame.add ("equivalent_weight", "kg N/ha", Check::non_negative (),
@@ -348,7 +348,7 @@ static struct ActionFertilizeSurfaceSyntax : public DeclareModel
   Model* make (Block& al) const
   { return new ActionFertilizeSurface (al); }
 
-  static bool check_alist (const AttributeList& al, Treelog& err)
+  static bool check_alist (Metalib&, const Frame& al, Treelog& err)
   { 
     bool ok = true;
     const double from = al.number ("from");
@@ -426,7 +426,7 @@ static struct ActionFertilizeIncorporateSyntax : public DeclareModel
   Model* make (Block& al) const
   { return new ActionFertilizeIncorporate (al); }
 
-  static bool check_alist (const AttributeList& al, Treelog& err)
+  static bool check_alist (Metalib&, const Frame& al, Treelog& err)
   { 
     bool ok = true;
     return ok;

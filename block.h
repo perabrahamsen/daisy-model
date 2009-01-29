@@ -57,7 +57,6 @@ public:
   const Units& units ();
   Path& path ();
   const AttributeList& alist () const;
-  const Syntax& syntax () const;
   const Frame& frame () const;
   Treelog& msg () const;
 

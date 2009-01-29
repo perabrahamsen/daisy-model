@@ -174,7 +174,7 @@ static struct ActionWaitPeriodSyntax : public DeclareModel
     : DeclareModel (Action::component, "wait_period", "\
 Waits the specified period.")
   { }
-  static bool check_alist (const AttributeList& frame, Treelog& err)
+  static bool check_alist (Metalib&, const Frame& frame, Treelog& err)
   {
     bool ok = true;
 
@@ -235,7 +235,7 @@ static struct ActionWaitMMDDSyntax : public DeclareModel
     : DeclareModel (Action::component, "wait_mm_dd", "\
 Wait until a specific month and day in the year.")
   { }
-  static bool check_alist (const AttributeList& frame, Treelog& err)
+  static bool check_alist (Metalib&, const Frame& frame, Treelog& err)
   {
     bool ok = true;
 

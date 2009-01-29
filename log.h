@@ -59,7 +59,7 @@ private:
 public:
   static const char *const component;
   symbol library_id () const;
-  const Metalib& metalib () const;
+  Metalib& metalib () const;
 
   // Filter
 public:
@@ -303,7 +303,7 @@ public:
 protected:
   virtual void initialize (Treelog& out) = 0;
 public:
-  void initialize_common (const Metalib&, Treelog& out);
+  void initialize_common (Metalib&, Treelog& out);
 protected:
   Log (Block& al);
   Log (const char* id);

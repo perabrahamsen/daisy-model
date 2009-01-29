@@ -86,6 +86,7 @@ extern "C" void EXPORT
 daisy_syntax_delete (Syntax* syntax)
 { delete syntax; }
 
+#if 0
 extern "C" int EXPORT
 daisy_syntax_check (const Syntax* syntax, const AttributeList* alist, 
 		    const char* name, Toplevel* toplevel)
@@ -93,6 +94,7 @@ daisy_syntax_check (const Syntax* syntax, const AttributeList* alist,
   Treelog::Open nest (toplevel->msg (), name);
   return syntax->check (toplevel->metalib (), *alist, toplevel->msg ()); 
 }
+#endif
 
 extern "C" void EXPORT
 daisy_syntax_add (Syntax* syntax, const char* name,
@@ -338,9 +340,11 @@ daisy_library_name (const Library* library, const unsigned int index)
   return entries[index].name ().c_str ();
 }
 
+#if 0
 extern "C" const Syntax* EXPORT
 daisy_library_syntax (const Library* library, const char* name)
 { return &library->syntax (symbol (name)); }
+#endif
 
 extern "C" const AttributeList* EXPORT
 daisy_library_alist (const Library* library, const char* name)
@@ -444,9 +448,11 @@ daisy_daisy_parse_file (Toplevel* toplevel, char* filename)
   toplevel->error ("While parsing '" + std::string (filename) + "'");
 }
 
+#if 0
 extern "C" EXPORT const Syntax*
 daisy_daisy_get_program_syntax (Toplevel* toplevel)
 { return &toplevel->program_frame ().syntax (); }
+#endif
 
 extern "C" EXPORT const AttributeList*
 daisy_daisy_get_program_alist (Toplevel* toplevel)

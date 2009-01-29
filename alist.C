@@ -24,7 +24,6 @@
 #include "plf.h"
 #include "library.h"
 #include "alist.h"
-#include "syntax.h"
 #include "time.h"
 #include "mathlib.h"
 #include "memutils.h"
@@ -76,8 +75,8 @@ struct AValue
   bool is_sequence;
   int* ref_count;
 
-  bool subset (const Metalib&, 
-               const AValue& other, const Syntax&, const symbol key) const;
+  bool subset (Metalib&, 
+               const AValue& other, const Frame&, const symbol key) const;
 
   void expect (const symbol key, Value::type expected) const;
   void singleton (const symbol key) const;
@@ -236,7 +235,7 @@ struct AValue
 };
 
 bool
-AValue::subset (const Metalib& metalib, const AValue& v, const Syntax& syntax, 
+AValue::subset (Metalib& metalib, const AValue& v, const Frame& syntax, 
 	       const symbol key) const
 {
   daisy_assert (type == v.type);
@@ -261,7 +260,7 @@ AValue::subset (const Metalib& metalib, const AValue& v, const Syntax& syntax,
             : v.fa.frame->alist ();
 	  const Value::type type = syntax.lookup (key);
 	  if (type == Value::AList)
-	    return value.subset (metalib, other, syntax.syntax (key));
+	    return value.subset (metalib, other, syntax.frame (key));
 	  daisy_assert (type == Value::Object);
 	  const Library& library = syntax.library (metalib, key);
 
@@ -273,7 +272,7 @@ AValue::subset (const Metalib& metalib, const AValue& v, const Syntax& syntax,
 	    return false;
 	  if (!library.check (element))
 	    return false;
-	  return value.subset (metalib, other, library.syntax (element));
+	  return value.subset (metalib, other, library.frame (element));
 	}
       case Value::PLF:
 	return *plf == *v.plf;
@@ -318,7 +317,7 @@ AValue::subset (const Metalib& metalib, const AValue& v, const Syntax& syntax,
 	  const Value::type type = syntax.lookup (key);
 	  if (type == Value::AList)
 	    {
-	      const Syntax& nested = syntax.syntax (key);
+	      const Frame& nested = syntax.frame (key);
 	      for (unsigned int i = 0; i < size; i++)
 		if (!value[i]->subset (metalib, *other[i], nested))
 		  return false;
@@ -338,7 +337,7 @@ AValue::subset (const Metalib& metalib, const AValue& v, const Syntax& syntax,
 	      if (!library.check (element))
 		return false;
 	      if (!value[i]->subset (metalib, 
-                                     *other[i], library.syntax (element)))
+                                     *other[i], library.frame (element)))
 		return false;
 	    }
 	  return true;
@@ -625,8 +624,8 @@ AttributeList::check (const symbol key) const
 }
 
 bool
-AttributeList::subset (const Metalib& metalib, 
-                       const AttributeList& other, const Syntax& syntax) const
+AttributeList::subset (Metalib& metalib, 
+                       const AttributeList& other, const Frame& syntax) const
 { 
   // Find syntax entries.
   std::vector<symbol> entries;
@@ -644,8 +643,8 @@ AttributeList::subset (const Metalib& metalib,
 }
 
 bool 
-AttributeList::subset (const Metalib& metalib, 
-                       const AttributeList& other, const Syntax& syntax,
+AttributeList::subset (Metalib& metalib, 
+                       const AttributeList& other, const Frame& syntax,
 		       const symbol key) const
 {
   if (check (key))

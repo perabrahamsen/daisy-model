@@ -32,6 +32,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "frame_submodel.h"
+#include "frame_model.h"
 #include "check.h"
 #include "vcheck.h"
 #include "format.h"
@@ -86,13 +87,13 @@ struct Select::Implementation
   struct Spec
   {
     // Content.
-    const Metalib& metalib;
+    Metalib& metalib;
     const symbol library_name;
     const symbol model_name;
     const std::vector<symbol> submodels_and_attribute;
     
     // Use.
-    const Syntax& leaf_syntax () const;
+    const Frame& leaf_frame () const;
     symbol leaf_name () const;
     symbol dimension () const;
     symbol description () const;
@@ -102,7 +103,7 @@ struct Select::Implementation
     static bool check_path (const std::vector<symbol>& path,
 			    const Frame& frame,
 			    Treelog& err);
-    static bool check_alist (const Metalib&, const AttributeList&, Treelog&);
+    static bool check_alist (Metalib&, const Frame&, Treelog&);
     static void load_syntax (Frame&);
     Spec (Block&);
     ~Spec ();
@@ -124,29 +125,29 @@ struct Select::Implementation
 
   // Create and Destroy.
   bool check (symbol spec_dim, Treelog& err) const;
-  static symbol find_description (const Metalib&, const AttributeList&);
+  static symbol find_description (Metalib&, const Frame&);
   static Number* get_expr (Block& al);
   Implementation (Block&);
   ~Implementation ();
 };
 
-const Syntax&
-Select::Implementation::Spec::leaf_syntax () const
+const Frame&
+Select::Implementation::Spec::leaf_frame () const
 {
-  const Syntax* syntax;
+  const Frame* frame;
 
   if (library_name == "fixed")
-    syntax = &Librarian::submodel_frame (model_name).syntax ();
+    frame = &Librarian::submodel_frame (model_name);
   else
     {
       const Library& library = metalib.library (library_name);
-      syntax = &library.syntax (model_name);
+      frame = &library.model (model_name);
     }
 
   for (unsigned int i = 0; i < submodels_and_attribute.size () - 1; i++)
-    syntax = &syntax->syntax (submodels_and_attribute[i]);
+    frame = &frame->frame (submodels_and_attribute[i]);
 
-  return *syntax;
+  return *frame;
 }
 
 symbol
@@ -159,17 +160,17 @@ Select::Implementation::Spec::leaf_name () const
 symbol
 Select::Implementation::Spec::dimension () const
 {
-  const Syntax& syntax = leaf_syntax ();
-  if (syntax.lookup (leaf_name ()) == Value::Number)
-    return symbol (syntax.dimension (leaf_name ()));
+  const Frame& frame = leaf_frame ();
+  if (frame.lookup (leaf_name ()) == Value::Number)
+    return frame.dimension (leaf_name ());
   else
     return Value::Unknown ();
 }
 
-symbol /* can't return reference because buffer is automatic */
+symbol
 Select::Implementation::Spec::description () const
 { 
-  return leaf_syntax ().description (leaf_name ()); 
+  return leaf_frame ().description (leaf_name ()); 
 }
 
 void 
@@ -211,15 +212,14 @@ Select::Implementation::Spec::check_path (const std::vector<symbol>& path,
 					  const Frame& top_frame,
 					  Treelog& err)
 {
-  const Syntax* syntax = &top_frame.syntax ();
-  const AttributeList* alist = &top_frame.alist ();
+  const Frame* frame = &top_frame;
 
   bool ok = true;
   for (unsigned int i = 0; i < path.size (); i++)
     {
       const std::string name = path[i].name ();
       bool last = (i + 1 == path.size ());
-      const Value::type type = syntax->lookup (name);
+      const Value::type type = frame->lookup (name);
 
       if (!last)
 	{
@@ -230,16 +230,12 @@ Select::Implementation::Spec::check_path (const std::vector<symbol>& path,
 	      ok = false;
 	      break;
 	    }
-          const symbol submodel_name = syntax->submodel_name (name);
+          const symbol submodel_name = frame->submodel_name (name);
           if (submodel_name != Value::None ())
             err.warning ("'" + name + "' is a fixed '" 
                          + submodel_name + "' component");
 
-          if (syntax->size (name) != Value::Singleton || !alist->check (name))
-            alist = &syntax->default_frame (name).alist ();
-          else
-            alist = &alist->alist (name);
-	  syntax = &syntax->syntax (name);
+	  frame = &frame->frame (name);
         }
       else if (type == Value::Error)
 	{
@@ -252,8 +248,8 @@ Select::Implementation::Spec::check_path (const std::vector<symbol>& path,
 }
 
 bool 
-Select::Implementation::Spec::check_alist (const Metalib& metalib,
-                                           const AttributeList& al,
+Select::Implementation::Spec::check_alist (Metalib& metalib,
+                                           const Frame& al,
 					   Treelog& err)
 {
   bool ok = true;
@@ -309,7 +305,7 @@ Select::Implementation::Spec::check_alist (const Metalib& metalib,
 void 
 Select::Implementation::Spec::load_syntax (Frame& frame)
 { 
-  frame.add_object_check (check_alist);
+  frame.add_check (check_alist);
   frame.add ("library", Value::String, Value::Const, "\
 Name of library where the attribute belong.\n\
 Use 'fixed' to denote a fixed component.");
@@ -363,8 +359,8 @@ Select::Implementation::check (const symbol spec_dim, Treelog& err) const
 }
   
 symbol
-Select::Implementation::find_description (const Metalib& metalib, 
-                                          const AttributeList& al)
+Select::Implementation::find_description (Metalib& metalib, 
+                                          const Frame& al)
 {
   const Library& library = metalib.library (Select::component);
   if (library.has_interesting_description (al))
@@ -466,10 +462,10 @@ Select::Implementation::Implementation (Block& al)
             // Kludge to negate the meaning of negate for "flux_top".
             != al.metalib ().library (Select::component)
             /**/ .is_derived_from (al.name ("type"), flux_top_symbol)),
-    tag (Select::select_get_tag (al.alist ())),
+    tag (Select::select_get_tag (al.frame ())),
     dimension (al.check ("dimension")
 	       ? al.name ("dimension") : Value::Unknown ()),
-    description (find_description (al.metalib (), al.alist ()))
+    description (find_description (al.metalib (), al.frame ()))
 { }
   
 Select::Implementation::~Implementation ()
@@ -511,7 +507,7 @@ Select::size () const
 { return Value::Singleton; }
 
 symbol
-Select::select_get_tag (const AttributeList& al)
+Select::select_get_tag (const Frame& al)
 {
   if (al.check ("tag"))
     return al.name ("tag");
@@ -697,7 +693,7 @@ static struct SelectInit : public DeclareComponent
   SelectInit ()
     : DeclareComponent (Select::component, Select::description)
   { }
-  static bool check_alist (const AttributeList& al, Treelog& err)
+  static bool check_alist (Metalib&, const Frame& al, Treelog& err)
   {
     bool ok = true;
     if (al.check ("spec"))

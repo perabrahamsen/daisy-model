@@ -146,7 +146,7 @@ struct OrganicStandard : public OrganicMatter
   private:
     static int find_som_1 (const std::vector<SOM*>& som);
     static int find_som_2 (const std::vector<SOM*>& som);
-    static bool check_alist (const AttributeList&, Treelog&);
+    static bool check_alist (Metalib&, const Frame&, Treelog&);
   public:
     static void load_syntax (Frame&);
     Initialization (const AttributeList&, const Geometry& geo,
@@ -385,7 +385,7 @@ OrganicStandard::Initialization
 
 bool 
 OrganicStandard::Initialization::
-/**/ check_alist (const AttributeList& al, Treelog& msg)
+/**/ check_alist (Metalib&, const Frame& al, Treelog& msg)
 { 
   bool ok = true;
   if (al.check ("input"))
@@ -2699,7 +2699,7 @@ OrganicStandard::som_pools () const
 { return som.size (); }
 
 static bool 
-check_alist (const AttributeList& al, Treelog& err)
+check_alist (Metalib&, const Frame& al, Treelog& err)
 {
   bool ok = true;
 

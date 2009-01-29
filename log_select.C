@@ -35,9 +35,7 @@
 #include "memutils.h"
 #include "librarian.h"
 #include "treelog.h"
-#include "frame.h"
-#include "syntax.h"
-#include "alist.h"
+#include "frame_model.h"
 #include <sstream>
 
 bool 
@@ -259,11 +257,10 @@ LogSelect::document_entries (Format& format, Metalib& metalib,
                              Treelog& msg, const symbol name)
 {
   const Library& log_lib = metalib.library (Log::component);
-  const Syntax& syntax = log_lib.syntax (name);
-  const AttributeList& alist = log_lib.lookup (name);  
+  const FrameModel& frame = log_lib.model (name);
 
   // We need a type.
-  if (!alist.check ("type"))
+  if (!frame.check ("type"))
     {
       msg.warning ("bug: Orphan log parameterisation.");
       return;
@@ -271,22 +268,20 @@ LogSelect::document_entries (Format& format, Metalib& metalib,
 
   // Check if this log parameterizations adds something compared to
   // its parent. 
-  const symbol parent = alist.name ("type");
+  const symbol parent = frame.name ("type");
   if (log_lib.check (parent)
-      && alist.subset (metalib, 
-                       log_lib.lookup (parent), log_lib.syntax (parent),
-                       "entries"))
+      && frame.subset (metalib, log_lib.model (parent), "entries"))
     // If not, don't document the entries.
     return;
 
   // Incomplete log.
-  if (!syntax.check (metalib, alist, Treelog::null ()))
+  if (!frame.check (metalib, Treelog::null ()))
     {
-      if (!alist.check ("entries"))
+      if (!frame.check ("entries"))
 	return;
 
-      const std::vector<const AttributeList*>& entries 
-        = alist.alist_sequence ("entries");
+      const std::vector<const Frame*>& entries 
+        = frame.frame_sequence ("entries");
       if (entries.size () < 1)
 	return;
 
@@ -304,7 +299,7 @@ LogSelect::document_entries (Format& format, Metalib& metalib,
 
       for (size_t i = 0; i < entries.size (); i++)
 	{
-	  const AttributeList& entry = *entries[i];
+	  const Frame& entry = *entries[i];
 	  Format::Item d2 (format, Select::select_get_tag (entry).name ());
 	  if (library.has_interesting_description (entry))
 	    format.text (entry.name ("description"));
@@ -314,7 +309,6 @@ LogSelect::document_entries (Format& format, Metalib& metalib,
     }
 
   // Complete log.
-  const Frame& frame = log_lib.frame(name);  
   Block block (metalib, msg, frame, "docselect");
   DocSelect select (block);
   daisy_assert (block.ok ());

@@ -324,7 +324,7 @@ static struct MacroStandardSyntax : public DeclareModel
   Model* make (Block& al) const
   { return new MacroStandard (al); }
 
-  static bool check_alist (const AttributeList& al, Treelog& err)
+  static bool check_alist (Metalib&, const Frame& al, Treelog& err)
   {
     bool ok = true;
     const PLF& distribution = al.plf ("distribution");

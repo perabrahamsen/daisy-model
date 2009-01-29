@@ -62,7 +62,7 @@ public:
   // Create and Destroy.
 public:
   bool check (const Border& field, Treelog& msg);
-  void initialize (const Metalib&, Treelog&);
+  void initialize (Metalib&, Treelog&);
   void add_log (Log*);
 private:
   static const std::vector<Log*> 

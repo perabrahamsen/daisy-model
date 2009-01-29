@@ -191,7 +191,7 @@ CrpN::output (Log& log) const
 }
 
 bool 
-CrpN::check_alist (const AttributeList& al, Treelog& err)
+CrpN::check_alist (Metalib&, const Frame& al, Treelog& err)
 {
   return true;
 }

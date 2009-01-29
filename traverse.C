@@ -306,7 +306,7 @@ Traverse::traverse_parameter (const Frame& frame,
     }
 }
 
-Traverse::Traverse (const Metalib& mlib)
+Traverse::Traverse (Metalib& mlib)
   : metalib (mlib)
 { }
 

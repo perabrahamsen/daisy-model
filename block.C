@@ -302,10 +302,6 @@ const AttributeList&
 Block::alist () const
 { return impl->frame.alist (); }
 
-const Syntax&
-Block::syntax () const
-{ return impl->frame.syntax (); }
-
 Treelog&
 Block::msg () const
 { return impl->msg; }

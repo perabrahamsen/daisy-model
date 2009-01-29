@@ -269,15 +269,14 @@ Horizon::output (Log& log) const
 
 static const class SOM_fractions_check_type : public VCheck
 {
-  void check (const Metalib&, const Syntax& syntax, const AttributeList& alist, 
-              const symbol key)
+  void check (Metalib&, const Frame& frame, const symbol key)
     const throw (std::string)
   {
     daisy_assert (key == "SOM_fractions");
-    daisy_assert (alist.check (key));
-    daisy_assert (syntax.lookup (key) == Value::Number);
-    daisy_assert (syntax.size (key) == Value::Sequence);
-    std::vector<double> fractions = alist.number_sequence ("SOM_fractions");
+    daisy_assert (frame.check (key));
+    daisy_assert (frame.lookup (key) == Value::Number);
+    daisy_assert (frame.type_size (key) == Value::Sequence);
+    std::vector<double> fractions = frame.number_sequence ("SOM_fractions");
     bool has_negative = false;
     double sum = 0.0;
     for (unsigned int i = 0; i < fractions.size (); i++)
@@ -347,7 +346,7 @@ A `horizon' is a soil type with specific physical properties.  It is\n\
 the responsibility of the `horizon' component to specify these\n\
 properties.")
   { }
-  static bool check_alist (const AttributeList& al, Treelog& err)
+  static bool check_alist (Metalib&, const Frame& al, Treelog& err)
   {
     bool ok = true;
 

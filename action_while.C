@@ -91,11 +91,11 @@ static struct ActionWhileSyntax : DeclareModel
   Model* make (Block& al) const
   { return new ActionWhile (al); }
 
-  static bool check_alist (const AttributeList& al, Treelog& err)
+  static bool check_alist (Metalib&, const Frame& al, Treelog& err)
   {
     bool ok = true;
 
-    if (al.size ("actions") < 1)
+    if (al.value_size ("actions") < 1)
       {
 	err.entry ("You must specify at least one action");
 	ok = false;

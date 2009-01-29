@@ -108,17 +108,16 @@ Timestep::total_hours () const
 }
 
 void
-Timestep::GenCheck::check (const Metalib&,
-			   const Syntax& syntax, 
-                           const AttributeList& alist, 
+Timestep::GenCheck::check (Metalib&,
+			   const Frame& frame, 
                            const symbol key) const throw (std::string)
 { 
-  daisy_assert (alist.check (key));
-  daisy_assert (syntax.lookup (key) == Value::AList);
-  daisy_assert (!syntax.is_log (key));
-  daisy_assert (syntax.size (key) == Value::Singleton);
+  daisy_assert (frame.check (key));
+  daisy_assert (frame.lookup (key) == Value::AList);
+  daisy_assert (!frame.is_log (key));
+  daisy_assert (frame.type_size (key) == Value::Singleton);
 
-  Timestep timestep (alist.alist (key));
+  Timestep timestep (frame.alist (key));
   check_dt (timestep.total_hours ());
 }
 

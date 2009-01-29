@@ -39,7 +39,6 @@
 struct Syntax::Implementation
 {
   std::vector<check_fun> checker;
-  std::vector<check_object> object_checker;
   std::vector<symbol> order;
   typedef std::map<symbol, Value::type> type_map;
   typedef std::map<symbol, Value::category> status_map;
@@ -61,7 +60,7 @@ struct Syntax::Implementation
   vcheck_map val_checks;
   string_map descriptions;
 
-  bool check (const Metalib&, const AttributeList& vl, Treelog& err);
+  bool check (Metalib&, const Frame& vl, Treelog& err);
   void check (const symbol key, double value) const;
   Value::type lookup (const symbol key) const;
   int order_number (const symbol name) const;
@@ -70,7 +69,6 @@ struct Syntax::Implementation
   { }
   Implementation (const Implementation& old)
     : checker (old.checker),
-      object_checker (old.object_checker),
       order (old.order),
       types (old.types),
       status (old.status),
@@ -88,8 +86,8 @@ struct Syntax::Implementation
 };    
 
 bool 
-Syntax::Implementation::check (const Metalib& metalib,
-                               const AttributeList& vl, Treelog& msg)
+Syntax::Implementation::check (Metalib& metalib,
+                               const Frame& vl, Treelog& msg)
 {
   bool error = false;
 
@@ -154,16 +152,16 @@ Syntax::Implementation::check (const Metalib& metalib,
 	if (size[key] != Value::Singleton)
 	  {
 	    const ::Library& lib = metalib.library (libraries[key]);
-	    const std::vector<const AttributeList*>& seq = vl.alist_sequence (key);
+	    const std::vector<const Frame*>& seq = vl.frame_sequence (key);
 	    int j_index = 0;
-	    for (std::vector<const AttributeList*>::const_iterator j = seq.begin ();
+	    for (std::vector<const Frame*>::const_iterator j = seq.begin ();
 		 j != seq.end ();
 		 j++)
 	      {
 		std::ostringstream tmp;
 		tmp << key << "[" << j_index << "]: ";
 		j_index++;
-		const AttributeList& al = **j;
+		const Frame& al = **j;
 		if (!al.check ("type"))
 		  {
 		    tmp << "Non object found";
@@ -181,16 +179,14 @@ Syntax::Implementation::check (const Metalib& metalib,
 		  {
 		    tmp << al.name ("type");
 		    Treelog::Open nest (msg, tmp.str ());
-                    const Syntax& ssyn = lib.syntax (al.name ("type"));
-		    if (!ssyn.impl->check (metalib, al, msg))
+		    if (!al.check (metalib, msg))
 		      error = true;
 		  }
 	      }
 	  }
 	else 
 	  {
-	    const ::Library& lib = metalib.library (libraries[key]);
-	    const AttributeList& al = vl.alist (key);
+	    const Frame& al = vl.frame (key);
 	    if (!al.check ("type"))
 	      {
 		msg.error (key + "Non object found");
@@ -199,24 +195,18 @@ Syntax::Implementation::check (const Metalib& metalib,
 	    else 
 	      {
 		Treelog::Open nest (msg, key + ": " + al.name ("type"));
-		if (!lib.syntax (al.name ("type")).check (metalib, 
-                                                                al, msg))
+		if (!al.check (metalib, msg))
 		  error = true;
 	      }
 	  }
       else if (types[key] == Value::AList)
         {
-          const Syntax::load_syntax_t load_syntax = submodels[key];
-          const Frame& key_frame 
-            = Librarian::submodel_frame (load_syntax);
-          const Syntax& key_syntax = key_frame.syntax ();
-
           if (size[key] != Value::Singleton)
             {
-              daisy_assert (vl.size (key) != Value::Singleton);
-              const std::vector<const AttributeList*>& seq = vl.alist_sequence (key);
+              daisy_assert (vl.type_size (key) != Value::Singleton);
+              const std::vector<const Frame*>& seq = vl.frame_sequence (key);
               int j_index = 0;
-              for (std::vector<const AttributeList*>::const_iterator j = seq.begin ();
+              for (std::vector<const Frame*>::const_iterator j = seq.begin ();
                    j != seq.end ();
                    j++)
                 {
@@ -224,15 +214,16 @@ Syntax::Implementation::check (const Metalib& metalib,
                   tmp << key << " [" << j_index << "]";
                   Treelog::Open nest (msg, tmp.str ());
                   j_index++;
-                  const AttributeList& al = **j;
-                  if (!key_syntax.impl->check (metalib, al, msg))
+                  const Frame& al = **j;
+                  if (!al.check (metalib, msg))
                     error = true;
                 }
             }
           else 
             {
               Treelog::Open nest (msg, key);
-              if (!key_syntax.impl->check (metalib , vl.alist (key), msg))
+              const Frame& al = vl.frame (key);
+              if (!al.check (metalib, msg))
                 error = true;
             }
         }
@@ -241,18 +232,7 @@ Syntax::Implementation::check (const Metalib& metalib,
     {
       for (unsigned int j = 0; j < checker.size (); j++)
 	{
-	  if (!checker[j] (vl, msg))
-	    {
-	      error = true;
-	      break;
-	    }
-	}
-    }
-  if (!error)
-    {
-      for (unsigned int j = 0; j < object_checker.size (); j++)
-	{
-	  if (!object_checker[j] (metalib, vl, msg))
+	  if (!checker[j] (metalib, vl, msg))
 	    {
 	      error = true;
 	      break;
@@ -311,8 +291,8 @@ Syntax::Implementation::entries (std::vector<symbol>& result) const
 }
 
 bool
-Syntax::check (const Metalib& metalib, 
-               const AttributeList& vl, Treelog& err) const
+Syntax::check (Metalib& metalib, 
+               const Frame& vl, Treelog& err) const
 { return impl->check (metalib, vl, err);}
 
 void
@@ -320,7 +300,7 @@ Syntax::check (const symbol key, const double value) const
 { impl->check (key, value); }
 
 bool 
-Syntax::check (const Metalib& metalib, const AttributeList& vl, 
+Syntax::check (Metalib& metalib, const Frame& vl, 
                const symbol key, Treelog& err) const
 {
   bool ok = true;
@@ -332,7 +312,7 @@ Syntax::check (const Metalib& metalib, const AttributeList& vl,
 
       try
 	{
-	  vcheck->check (metalib, *this, vl, key);
+	  vcheck->check (metalib, vl, key);
 	}
       catch (const std::string& message)
 	{
@@ -386,19 +366,8 @@ Syntax::is_log (const symbol key) const
   return impl->status[key] == Value::LogOnly;
 }
 
-const Syntax&
-Syntax::syntax (const symbol key) const
-{
-  const Implementation::submodel_map::const_iterator i 
-    = impl->submodels.find (key);
-  daisy_assert (i != impl->submodels.end ());
-  const load_syntax_t load_syntax = (*i).second;
-  const Frame& frame = Librarian::submodel_frame (load_syntax);
-  return frame.syntax ();
-}
-
 ::Library&
-Syntax::library (const Metalib& metalib, const symbol key) const
+Syntax::library (Metalib& metalib, const symbol key) const
 {
   daisy_assert (impl->libraries.find (key) != impl->libraries.end ());
   return metalib.library (impl->libraries[key]);
@@ -676,10 +645,6 @@ Syntax::entries () const
 void 
 Syntax::add_check (check_fun fun)
 { impl->checker.push_back (fun); }
-
-void 
-Syntax::add_object_check (check_object fun)
-{ impl->object_checker.push_back (fun); }
 
 Syntax::Syntax ()
   : impl (new Implementation ())

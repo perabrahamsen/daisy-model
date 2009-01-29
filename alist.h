@@ -27,7 +27,6 @@
 
 class PLF;
 class AttributeList;
-class Syntax;
 class Metalib;
 class Frame;
 
@@ -51,11 +50,11 @@ public:
   // Is 'key' an element of this alist?
   bool check (const symbol key) const;
   // Is this alist a subset of 'other'?
-  bool subset (const Metalib&, 
-               const AttributeList& other, const Syntax& syntax) const;
+  bool subset (Metalib&, 
+               const AttributeList& other, const Frame& frame) const;
   // Is the element 'key' in this alist a subset of the other entry.
-  bool subset (const Metalib&,
-               const AttributeList& other, const Syntax& syntax,
+  bool subset (Metalib&,
+               const AttributeList& other, const Frame& frame,
 	       symbol key) const;
   int size (symbol key) const;
 

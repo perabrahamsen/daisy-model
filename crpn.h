@@ -33,6 +33,7 @@ class Frame;
 class Log;
 class PLF;
 class Treelog;
+class Metalib;
 
 class CrpN 
 {
@@ -99,7 +100,7 @@ public:
 
   // Create and Destroy.
 private:
-  bool check_alist (const AttributeList& al, Treelog& err);
+  bool check_alist (Metalib&, const Frame& al, Treelog& err);
 public:
   static void load_syntax (Frame&);
   CrpN (const AttributeList&);
