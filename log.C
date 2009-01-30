@@ -29,6 +29,7 @@
 #include "assertion.h"
 #include "librarian.h"
 #include "frame.h"
+#include "alist.h"
 #include <sstream>
 #include <list>
 #include <string>

@@ -27,6 +27,7 @@
 #include "daisy.h"
 #include "toplevel.h"
 #include "metalib.h"
+#include "frame_model.h"
 #include <time.h>
 #include <ostream>
 
@@ -93,10 +94,8 @@ DLF::finish (std::ostream& out, const Daisy& daisy)
   if (value == None)
     return;
   
-  const AttributeList& global_alist = daisy.metalib.alist ();
-  const AttributeList& daisy_alist = global_alist.check ("run")
-    ? global_alist.alist ("run")
-    : global_alist;
+  const Frame& global_alist = daisy.metalib;
+  const FrameModel& daisy_alist = daisy.frame;
 
   // SIMFILE:
   if (global_alist.check ("parser_files"))

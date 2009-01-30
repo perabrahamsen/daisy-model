@@ -58,7 +58,7 @@ struct ActionCrop : public Action
     // Create and Destroy.
     static bool check_alist (Metalib&, const Frame& al, Treelog&);
     static void load_syntax (Frame&);
-    MM_DD (const AttributeList&);
+    MM_DD (const Frame&);
     ~MM_DD ();
   };
 
@@ -101,7 +101,7 @@ struct ActionCrop : public Action
     // Create and Destroy.
     static bool check_alist (Metalib&, const Frame& al, Treelog&);
     static void load_syntax (Frame&);
-    Annual (const AttributeList&);
+    Annual (const Frame&);
     ~Annual ();
   };
   Annual *const harvest_annual;
@@ -132,7 +132,7 @@ struct ActionCrop : public Action
     // Create and Destroy.
     static bool check_alist (Metalib&, const Frame& al, Treelog&);
     static void load_syntax (Frame&);
-    Perennial (const AttributeList&);
+    Perennial (const Frame&);
     ~Perennial ();
   };
   Perennial *const harvest_perennial;
@@ -205,7 +205,7 @@ struct ActionCrop : public Action
 
     // Create and Destroy.
     static void load_syntax (Frame&);
-    Irrigation (const AttributeList&);
+    Irrigation (const Frame&);
     ~Irrigation ();
   };
   const Irrigation *const irrigation;
@@ -276,7 +276,7 @@ ActionCrop::MM_DD::load_syntax (Frame& frame)
   frame.order ("month", "day");
 }
 
-ActionCrop::MM_DD::MM_DD (const AttributeList& al)
+ActionCrop::MM_DD::MM_DD (const Frame& al)
   : month (al.integer ("month")),
     day (al.integer ("day")),
     hour (al.integer ("hour"))
@@ -322,7 +322,7 @@ ActionCrop::Sow::load_syntax (Frame& frame)
 }
 
 ActionCrop::Sow::Sow (const Frame& al)
-  : date (al.alist ("date")),
+  : date (al.frame ("date")),
     crop (&al.model ("crop")),
     done (al.flag ("done"))
 { }
@@ -379,8 +379,8 @@ If the crop is ripe before this date, it will be harvested at that point.",
   frame.add ("done", false);
 }
 
-ActionCrop::Annual::Annual (const AttributeList& al)
-  : latest (al.alist ("latest")),
+ActionCrop::Annual::Annual (const Frame& al)
+  : latest (al.frame ("latest")),
     loss (al.number ("loss")),
     remove_residuals (al.flag ("remove_residuals")),
     done (al.flag ("done"))
@@ -515,9 +515,9 @@ If missing, use the same fertilizer as first season.");
 	      "Year last fertilization was applid.");
 }
 
-ActionCrop::Perennial::Perennial (const AttributeList& al)
+ActionCrop::Perennial::Perennial (const Frame& al)
   : seasons (al.integer ("seasons")),
-    end (al.alist ("end")),
+    end (al.frame ("end")),
     DS (al.number ("DS")),
     DM (al.number ("DM")),
     year_of_last_harvest (al.check ("year_of_last_harvest")
@@ -743,9 +743,9 @@ ActionCrop::Irrigation::load_syntax (Frame& frame)
 	      "Soil potential at which to irrigate.");
 }
 
-ActionCrop::Irrigation::Irrigation (const AttributeList& al)
-  : from (al.alist ("from")),
-    to (al.alist ("to")),
+ActionCrop::Irrigation::Irrigation (const Frame& al)
+  : from (al.frame ("from")),
+    to (al.frame ("to")),
     amount (al.number ("amount")),
     potential (al.number ("potential"))
 { }
@@ -974,10 +974,10 @@ ActionCrop::ActionCrop (Block& al)
 	       ? new Sow (al.frame ("secondary"))
 	       : NULL),
     harvest_annual (al.check ("harvest_annual") 
-	       ? new Annual (al.alist ("harvest_annual"))
+	       ? new Annual (al.frame ("harvest_annual"))
 	       : NULL),
     harvest_perennial (al.check ("harvest_perennial") 
-		       ? new Perennial (al.alist ("harvest_perennial"))
+		       ? new Perennial (al.frame ("harvest_perennial"))
 		       : NULL),
     fertilize_at (map_submodel_const<Fertilize> (al, "fertilize_at")),
     fertilize_at_index (al.integer ("fertilize_at_index")),
@@ -987,10 +987,10 @@ ActionCrop::ActionCrop (Block& al)
     spray (map_construct_const<Spray> (al.frame_sequence ("spray"))),
     spray_index (al.integer ("spray_index")),
     irrigation (al.check ("irrigation") 
-	       ? new Irrigation (al.alist ("irrigation"))
+	       ? new Irrigation (al.frame ("irrigation"))
 	       : NULL),
     irrigation_rest (al.check ("irrigation_rest") 
-		     ? new Irrigation (al.alist ("irrigation_rest"))
+		     ? new Irrigation (al.frame ("irrigation_rest"))
 		     : NULL),
     irrigation_year (al.check ("irrigation_year")
 		     ? al.integer ("irrigation_year")

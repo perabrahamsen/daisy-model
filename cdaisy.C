@@ -44,6 +44,7 @@
 #include "assertion.h"
 #include "treelog.h"
 #include "frame_model.h"
+#include "alist.h"
 #include <string>
 #include <typeinfo>
 

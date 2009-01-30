@@ -36,6 +36,7 @@
 #include "librarian.h"
 #include "units.h"
 #include "frame_model.h"
+#include "alist.h"
 
 #include <sstream>
 #include <ctime>

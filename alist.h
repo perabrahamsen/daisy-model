@@ -53,9 +53,7 @@ public:
   bool subset (Metalib&, 
                const AttributeList& other, const Frame& frame) const;
   // Is the element 'key' in this alist a subset of the other entry.
-  bool subset (Metalib&,
-               const AttributeList& other, const Frame& frame,
-	       symbol key) const;
+  bool subset (Metalib&, const AttributeList& other, symbol key) const;
   int size (symbol key) const;
 
   // References.

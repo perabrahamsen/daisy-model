@@ -369,7 +369,7 @@ Frame::subset (Metalib& metalib, const Frame& other,
                const symbol key) const
 {
   // TODO: Rewrite here.
-  return impl->alist.subset (metalib, other.impl->alist, *this, key);
+  return impl->alist.subset (metalib, other.impl->alist, key);
 }
 
 int 

@@ -25,17 +25,11 @@
 
 #include "model.h"
 #include "time.h"
-#include "alist.h"
-#include "alist.h"
-#include "alist.h"
-#include "alist.h"
-#include "alist.h"
 #include <vector>
 
 class Log;
 class Weather;
 class Time;
-class AttributeList;
 class Bioclimate;
 class Raddist;
 class PLF;

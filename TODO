@@ -2,10 +2,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Frame
 
-** Fjern brug af Frame::alist_sequence.
-
-** Fjern AttributeList fra AttributeList (fa. & fas.)
-
 ** AList::subset -> Frame::subset
 
 ** Fjern "type", "base_model", attributes.

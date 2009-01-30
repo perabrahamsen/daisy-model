@@ -56,7 +56,7 @@ struct ActionFertilize : public Action
     // Create and Destroy.
     static bool check_alist (Metalib&, const Frame& al, Treelog& err);
     static void load_syntax (Frame&);
-    Precision (const AttributeList& al);
+    Precision (const Frame& al);
     ~Precision ();
   };
   const std::auto_ptr<Precision> precision;
@@ -121,7 +121,7 @@ Height where you want to end measuring (a negative number).");
 }
 
     
-ActionFertilize::Precision::Precision (const AttributeList& al)
+ActionFertilize::Precision::Precision (const Frame& al)
   : target (al.number ("target")),
     from (al.number ("from")),
     to (al.number ("to"))
@@ -203,7 +203,7 @@ ActionFertilize::ActionFertilize (Block& al)
     second_year_compensation (al.flag ("second_year_compensation")),
     minimum_weight (al.number ("minimum_weight")),
     precision (al.check ("precision") 
-	       ? new Precision (al.alist ("precision"))
+	       ? new Precision (al.frame ("precision"))
 	       : NULL)
 { 
   if (al.check ("equivalent_weight"))

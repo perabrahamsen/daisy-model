@@ -34,6 +34,7 @@
 #include "library.h"
 #include "frame.h"
 #include "frame_model.h"
+#include "alist.h"
 #include <sstream>
 
 struct LogCheckpoint : public LogAList

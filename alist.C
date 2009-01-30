@@ -69,8 +69,7 @@ struct AValue
   bool is_sequence;
   int* ref_count;
 
-  bool subset (Metalib&, 
-               const AValue& other, const Frame&, const symbol key) const;
+  bool subset (Metalib&, const AValue& other) const;
 
   void expect (const symbol key, Value::type expected) const;
   void singleton (const symbol key) const;
@@ -204,8 +203,7 @@ struct AValue
 };
 
 bool
-AValue::subset (Metalib& metalib, const AValue& v, const Frame& syntax, 
-	       const symbol key) const
+AValue::subset (Metalib& metalib, const AValue& v) const
 {
   daisy_assert (type == v.type);
   daisy_assert (is_sequence == v.is_sequence);
@@ -264,32 +262,11 @@ AValue::subset (Metalib& metalib, const AValue& v, const Frame& syntax,
 	  const unsigned int size = value.size ();
 	  if (other.size () != size)
 	    return false;
-	  const Value::type type = syntax.lookup (key);
-	  if (type == Value::AList)
-	    {
-	      const Frame& nested = syntax.frame (key);
-	      for (unsigned int i = 0; i < size; i++)
-		if (!value[i]->alist ().subset (metalib,
-                                                other[i]->alist (), nested))
-		  return false;
-	      return true;
-		
-	    }
-	  daisy_assert (type == Value::Object);
-	  const Library& library = syntax.library (metalib, key);
-	  for (unsigned int i = 0; i < size; i++)
-	    {
-	      daisy_assert (value[i]->check ("type"));
-	      if (!other[i]->check ("type"))
-		return false;
-	      const symbol element = value[i]->name ("type");
-	      if (element != other[i]->name ("type"))
-		return false;
-	      if (!library.check (element))
-		return false;
-	      if (!value[i]->subset (metalib, *other[i]))
-		return false;
-	    }
+
+          for (unsigned int i = 0; i < size; i++)
+            if (!value[i]->subset (metalib, *other[i]))
+              return false;
+
 	  return true;
 	}
       case Value::PLF:
@@ -564,7 +541,7 @@ AttributeList::subset (Metalib& metalib,
   for (unsigned int i = 0; i < size; i++)
     {
       const symbol key = entries[i];
-      if (!subset (metalib, other, syntax, key))
+      if (!subset (metalib, other, key))
 	return false;
     }
   return true;
@@ -572,21 +549,19 @@ AttributeList::subset (Metalib& metalib,
 
 bool 
 AttributeList::subset (Metalib& metalib, 
-                       const AttributeList& other, const Frame& syntax,
+                       const AttributeList& other, 
 		       const symbol key) const
 {
-  if (check (key))
-    {
-      if (other.check (key))
-	{
-	  if (!impl.values[key].subset (metalib, 
-                                        other.impl.values[key], syntax, key))
-	    return false;
-	}
-      else
-	return false;
-    }
-  return true;
+  if (!check (key))
+    // Non-existing key is always a subset.
+    return true;
+
+  if (!other.check (key))
+    // Non-existing key is never a superset.
+    return false;
+
+  // Both have key, check value.
+  return impl.values[key].subset (metalib, other.impl.values[key]);
 }
 
 int
