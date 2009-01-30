@@ -77,7 +77,7 @@ SummarySimple::SummarySimple (Block& al)
     sum_name (al.name ("sum_name")),
     period (al.check ("period") ? al.name ("period") : symbol ("")),
     precision (al.integer ("precision")),
-    fetch (map_construct<Fetch> (al.alist_sequence ("fetch")))
+    fetch (map_construct<Fetch> (al.frame_sequence ("fetch")))
 { }
 
 SummarySimple::~SummarySimple ()

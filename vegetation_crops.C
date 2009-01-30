@@ -57,7 +57,7 @@ struct VegetationCrops : public Vegetation
     
     // Create;
     static void load_syntax (Frame&);
-    ForcedLAI (const std::vector<const AttributeList*>& als);
+    ForcedLAI (const std::vector<const Frame*>& als);
   } forced_LAI;
 
   // Canopy structure.
@@ -260,7 +260,7 @@ whenever 'LAIvsDAY' becomes negative.");
   frame.order ("year", "LAIvsDAY");
 }
 
-VegetationCrops::ForcedLAI::ForcedLAI (const std::vector<const AttributeList*>& als)
+VegetationCrops::ForcedLAI::ForcedLAI (const std::vector<const Frame*>& als)
 {
   for (unsigned int i = 0; i < als.size (); i++)
     {
@@ -920,7 +920,7 @@ VegetationCrops::VegetationCrops (Block& al)
   : Vegetation (al),
     crops (build_crops (al, "crops")),
     // deque, so we can't use build_vector.
-    forced_LAI (al.alist_sequence ("ForcedLAI")),
+    forced_LAI (al.frame_sequence ("ForcedLAI")),
     shared_light_fraction_ (1.0),
     LAI_ (0.0),
     height_ (0.0),

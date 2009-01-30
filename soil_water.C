@@ -35,7 +35,6 @@
 #include "assertion.h"
 #include "mathlib.h"
 #include "frame.h"
-#include "alist.h"
 #include <sstream>
 
 void
@@ -693,7 +692,7 @@ presummed to occupy the large pores, so it is h (Theta_sat - X_ice).");
 }
 
 void
-SoilWater::initialize (const AttributeList& al, const Geometry& geo,
+SoilWater::initialize (const Frame& al, const Geometry& geo,
                        const Soil& soil, const SoilHeat& soil_heat,
                        const Groundwater& groundwater, Treelog& msg)
 {

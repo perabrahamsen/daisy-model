@@ -24,7 +24,6 @@
 #include "librarian.h"
 #include "frame.h"
 #include "check.h"
-#include "alist.h"
 
 void
 Litter::load_syntax (Frame& frame)
@@ -40,7 +39,7 @@ Reduction factor for potential evaporation below litter.");
 By default, the surface albedo will be used.");
 }
 
-Litter::Litter (const AttributeList& al)
+Litter::Litter (const Frame& al)
   : vapor_flux_factor (al.number ("vapor_flux_factor")),
     interception_capacity (al.number ("interception_capacity")),
     albedo (al.number ("albedo", -1.0))
@@ -52,3 +51,5 @@ Litter::~Litter ()
 static DeclareSubmodel 
 lutter_submodel (Litter::load_syntax, "Litter", "\
 Properties of litter below permanent vegetation.");
+
+// litter.C ends here.

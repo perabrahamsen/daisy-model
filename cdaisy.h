@@ -59,6 +59,7 @@ typedef struct daisy_scope daisy_scope;
 
 typedef int daisy_bool;
 
+#if 0
 /* @ The daisy_syntax Type.
  * 
  * A syntax describes what attributes that are associated with an
@@ -71,13 +72,11 @@ daisy_syntax_create (void);
 EXPORT void                            /* Delete syntax object. */
 daisy_syntax_delete (daisy_syntax* syntax);
 
-#if 0
 EXPORT daisy_bool                      /* Check that alist match the syntax. */
 daisy_syntax_check (const daisy_syntax* syntax, 
                     const daisy_alist* alist,
                     const char* name,
                     const daisy_daisy* toplevel);
-#endif
 
 /* Elements in the syntax table have the following properties.
    
@@ -92,11 +91,9 @@ EXPORT void                            /* Add element to syntax table. */
 daisy_syntax_add (daisy_syntax* syntax, const char* name,
                   int cat, int type, int size);
 
-#if 0
 EXPORT void                            /* Add alist type to syntax table. */
 daisy_syntax_add_alist (daisy_syntax* syntax, const char* name,
                         int cat, daisy_syntax* nested, int size);
-#endif
 
 /* The following functions return "magic" values used by the 'cat',
    'type', and 'size' arguments to 'daisy_syntax_add'.
@@ -108,6 +105,8 @@ daisy_syntax_add_alist (daisy_syntax* syntax, const char* name,
 /* The currently valid categories are "Const", "State", "Optional",
    and "LogOnly".  Each have an associated number.  Use the following
    functions to switch between number and name. */
+
+#endif
 
 EXPORT int                             /* Number used for specific category. */
 daisy_category_number (const char* name);
@@ -233,9 +232,11 @@ EXPORT double                          /* Get double NAME[INDEX] from ALIST. */
 daisy_alist_get_number_at (const daisy_alist* alist, const char* name,
                            unsigned int index);
 
+#if 0
 EXPORT daisy_alist*                    /* Get alist NAME[INDEX] from ALIST. */
 daisy_alist_get_alist_at (const daisy_alist* alist, const char* name,
                           unsigned int index);
+#endif
 
 #ifdef UNINPLEMENTED
 EXPORT void                    /* Set integer NAME[INDEX] from ALIST to VALUE. */

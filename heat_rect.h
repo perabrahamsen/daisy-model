@@ -26,8 +26,6 @@
 
 class GeometryRect;
 class Solver;
-class Syntax;
-class AttributeList;
 class Block;
 class Treelog;
 

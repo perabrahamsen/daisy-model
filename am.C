@@ -39,7 +39,6 @@
 #include "librarian.h"
 #include "unit.h"
 #include "treelog.h"
-#include "syntax.h"
 #include "alist.h"
 #include <numeric>
 #include <sstream>
@@ -1124,8 +1123,7 @@ struct AMInitial : public AM
       = frame->frame_sequence ("om");
     const std::vector<AOM*>& om = impl->om;
 
-    const std::vector<const AttributeList*>& layers
-      = frame->alist_sequence ("layers");
+    const std::vector<const Frame*>& layers = frame->frame_sequence ("layers");
 
     double last = 0.0;
     for (size_t i = 0; i < layers.size (); i++)

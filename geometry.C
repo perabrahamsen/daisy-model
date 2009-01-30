@@ -28,9 +28,7 @@
 #include "frame_submodel.h"
 #include "assertion.h"
 #include "mathlib.h"
-#include "syntax.h"
 #include "librarian.h"
-#include "alist.h"
 #include <sstream>
 
 const int Geometry::cell_above;
@@ -621,7 +619,7 @@ static struct CheckLayers : public VCheck
     daisy_assert (!frame.is_log (key));
     daisy_assert (frame.type_size (key) == Value::Sequence);
 
-    const std::vector<const AttributeList*>& layers = frame.alist_sequence (key);
+    const std::vector<const Frame*>& layers = frame.frame_sequence (key);
 
     double last = 0.0;
     for (unsigned int i = 0; i < layers.size (); i++)
@@ -682,8 +680,7 @@ VALUE from the END of the previous layer, to the END of the current layer.",
 
 void 
 Geometry::initialize_layer (std::vector<double>& array, 
-                            const AttributeList& al, 
-                            symbol name, Treelog& out) const
+                            const Frame& al, symbol name, Treelog& out) const
 {
   const std::string initial = std::string ("initial_") + name.name ();
   daisy_assert (array.size () == 0);
@@ -693,8 +690,8 @@ Geometry::initialize_layer (std::vector<double>& array,
   else if (al.check (initial))
     {
       // Initialize by layers.
-      const std::vector<const AttributeList*>& layers
-	= al.alist_sequence (initial);
+      const std::vector<const Frame*>& layers
+	= al.frame_sequence (initial);
       const double soil_end = bottom ();
       double last = 0.0;
       for (size_t i = 0; i < layers.size (); i++)

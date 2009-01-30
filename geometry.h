@@ -28,7 +28,6 @@
 #include <string>
 
 class Block;
-class AttributeList;
 class Treelog;
 class Groundwater;
 class Volume;
@@ -265,7 +264,7 @@ public:
                          symbol name,
                          load_syntax_t load_syntax);
   void initialize_layer (std::vector<double>& value, 
-                         const AttributeList& al, 
+                         const Frame& al, 
                          symbol name, Treelog&) const;
   virtual void fill_xplus (std::vector<double>&) const = 0;
 

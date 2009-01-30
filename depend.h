@@ -28,8 +28,6 @@
 #include <map>
 
 class Treelog;
-class Syntax;
-class AttributeList;
 class Metalib;
 
 typedef std::set<symbol> symbol_set;

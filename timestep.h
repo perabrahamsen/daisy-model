@@ -28,7 +28,6 @@
 
 class Frame;
 class AttributeList;
-class Syntax;
 class Block;
 
 class Timestep

@@ -19,6 +19,8 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#ifndef CANOPY_STD_H
+#define CANOPY_STD_H
 
 #include "canopy_simple.h"
 #include <vector>
@@ -75,6 +77,8 @@ public:
   // Create and Destroy.
 public:
   static void load_syntax (Frame&);
-  CanopyStandard (const AttributeList&);
+  CanopyStandard (const Frame&);
   ~CanopyStandard ();
 };
+
+#endif // CANOPY_STD_H

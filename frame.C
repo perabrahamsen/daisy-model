@@ -568,15 +568,6 @@ Frame::plf_sequence (const symbol key) const
     return impl->alist.plf_sequence (key);
 }
 
-const std::vector<const AttributeList*>& 
-Frame::alist_sequence (const symbol key) const
-{ 
-  if (parent () && !impl->alist.check (key))
-    return parent ()->alist_sequence (key);
-  else
-    return impl->alist.alist_sequence (key);
-}
-
 void 
 Frame::verify (const symbol key, const Value::type want, 
                const int value_size)

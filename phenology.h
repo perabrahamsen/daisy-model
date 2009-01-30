@@ -32,8 +32,6 @@ class Production;
 class Vernalization;
 class Treelog;
 class Block;
-class Syntax;
-class AttributeList;
 
 class Phenology : public ModelLogable
 {

@@ -362,19 +362,19 @@ struct NumberOperands : public Number
 #ifdef CHECK_OPERANDS_DIM
   static const struct Unique : public VCheck
   {
-    void check (const Syntax&, const AttributeList& al,
-                const std::string&) const throw (std::string)
+    void check (Metalib&, const Frame& al, const std::string&)
+      const throw (std::string)
     {
       typedef std::vector<const Number*> op_x;
 
       const struct Operands : public  op_x
       {
-        Operands (Block& Block, const std::vector<const AttributeList*>& as)
+        Operands (Block& Block, const std::vector<const Frame*>& as)
           : op_x (Librarian:build_vector_const<Number> (as))
         { }
         ~Operands ()
         { sequence_delete (begin (), end ()); }
-      } operands (al.alist_sequence ("operands"));
+      } operands (frame_sequence ("operands"));
       
       const string* found = NULL;
       for (size_t i = 0; i < operands.size (); i++)

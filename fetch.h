@@ -27,7 +27,6 @@
 #include <vector>
 #include <iosfwd>
 
-class Syntax;
 class AttributeList;
 class Frame;
 class Treelog;
@@ -81,7 +80,7 @@ public:
   static void initialize (const std::vector<Fetch*>& fetch,
                           std::vector<Select*>& select, Treelog& msg);
   static void load_syntax (Frame&);
-  explicit Fetch (const AttributeList& al);
+  explicit Fetch (const Frame& al);
   explicit Fetch (const symbol key);
 };
 

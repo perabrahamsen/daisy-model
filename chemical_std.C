@@ -31,7 +31,7 @@
 #include "chemistry.h"
 #include "log.h"
 #include "block.h"
-#include "frame.h"
+#include "frame_model.h"
 #include "mathlib.h"
 #include "plf.h"
 #include "check.h"
@@ -44,7 +44,6 @@
 #include "submodeler.h"
 #include "secondary.h"
 #include "treelog.h"
-#include "alist.h"
 #include <sstream>
 
 struct ChemicalStandard : public Chemical
@@ -217,8 +216,7 @@ struct ChemicalStandard : public Chemical
               const Geometry&, const Soil&, const SoilWater&, 
 	      const Chemistry&, Treelog&) const;
   static void fillup (std::vector<double>& v, const size_t size);
-  void initialize (const Units&, const Scope&, 
-                   const AttributeList&, const Geometry&,
+  void initialize (const Units&, const Scope&, const Geometry&,
                    const Soil&, const SoilWater&, const SoilHeat&, Treelog&);
   static double find_surface_decompose_rate (Block& al);
   ChemicalStandard (Block&);
@@ -1080,7 +1078,6 @@ ChemicalStandard::fillup (std::vector<double>& v, const size_t size)
 
 void
 ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
-                              const AttributeList& al,
                               const Geometry& geo,
                               const Soil& soil, const SoilWater& soil_water, 
 			      const SoilHeat& soil_heat,
@@ -1092,10 +1089,10 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
   C_below_expr->initialize (units, parent_scope, msg);
 
   std::vector<double> Ms;
-  geo.initialize_layer (C_avg_, al, "C", msg);
-  geo.initialize_layer (C_secondary_, al, "C_secondary", msg);
-  geo.initialize_layer (M_total_, al, "M", msg);
-  geo.initialize_layer (Ms, al, "Ms", msg);
+  geo.initialize_layer (C_avg_, *frame, "C", msg);
+  geo.initialize_layer (C_secondary_, *frame, "C_secondary", msg);
+  geo.initialize_layer (M_total_, *frame, "M", msg);
+  geo.initialize_layer (Ms, *frame, "Ms", msg);
 
   fillup (C_avg_, cell_size);
   fillup (C_secondary_, cell_size);

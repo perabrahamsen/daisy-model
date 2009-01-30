@@ -30,7 +30,6 @@
 #include <string>
 
 class Frame;
-class Syntax;
 class Log;
 class Geometry;
 class Production;

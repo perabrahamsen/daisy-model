@@ -90,7 +90,7 @@ struct Bioincorporation::Implementation
   void initialize (const Geometry&, const Soil&);
   AM* create_am (Metalib&, const Geometry& geo, Treelog&);
   void set_am (AM*);
-  Implementation (const AttributeList& al);
+  Implementation (const Frame& al);
 };
 
 bool 
@@ -268,7 +268,7 @@ void
 Bioincorporation::Implementation::set_am (AM* am)
 { aom = am; }
 
-Bioincorporation::Implementation::Implementation (const AttributeList& al)
+Bioincorporation::Implementation::Implementation (const Frame& al)
   : R_max (al.number ("R_max")),
     k_half (al.number ("k_half")),
     C_per_N_factor (al.plf ("C_per_N_factor")),
@@ -378,7 +378,7 @@ Incorporated AM parameters.");
   frame.add_strings ("AOM", "AOM-SLOW-BIOINCORPORATION", "AOM-FAST");
 }
   
-Bioincorporation::Bioincorporation (const AttributeList& al)
+Bioincorporation::Bioincorporation (const Frame& al)
   : impl (new Implementation (al))
 { }
 

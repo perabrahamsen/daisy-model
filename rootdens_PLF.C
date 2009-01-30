@@ -31,8 +31,6 @@
 #include "memutils.h"
 #include "librarian.h"
 #include "frame.h"
-#include "syntax.h"
-#include "alist.h"
 
 struct Rootdens_PLF : public Rootdens
 {
@@ -53,7 +51,7 @@ struct Rootdens_PLF : public Rootdens
     
     // Create and Destroy.
     static void load_syntax (Frame&);
-    Entry (const AttributeList&);
+    Entry (const Frame&);
     ~Entry ();
   };
   std::vector<const Entry*> entries;
@@ -95,7 +93,7 @@ Rootdens_PLF::Check_Indexes::check (Metalib&, const Frame& frame,
   daisy_assert (!frame.is_log (key));
   daisy_assert (frame.type_size (key) == Value::Sequence);
 
-  const std::vector<const AttributeList*>& alists = frame.alist_sequence (key);
+  const std::vector<const Frame*>& alists = frame.frame_sequence (key);
 
   if (alists.size () < 1)
     throw std::string ("You must specify at least one entry");
@@ -116,7 +114,7 @@ Rootdens_PLF::Check_Indexes::check (Metalib&, const Frame& frame,
     }
 }
 
-Rootdens_PLF::Entry::Entry (const AttributeList& al)
+Rootdens_PLF::Entry::Entry (const Frame& al)
   : index (al.number ("index")),
     density (al.plf ("density"))
 { }
@@ -197,7 +195,7 @@ Rootdens_PLF::get_density (Treelog&, std::vector<double>& abs_dens,
 
 Rootdens_PLF::Rootdens_PLF (Block& al)
   : Rootdens (al),
-    entries (map_construct_const<Entry> (al.alist_sequence ("entries")))
+    entries (map_construct_const<Entry> (al.frame_sequence ("entries")))
 { }
 
 Rootdens_PLF::~Rootdens_PLF ()
@@ -343,3 +341,4 @@ total root mass.",
   }
 } Rootdens_Depth_Depth_syntax;
 
+// rootdens_PLF.C ends here.

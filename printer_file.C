@@ -32,7 +32,6 @@
 #include "assertion.h"
 #include "librarian.h"
 #include "frame_model.h"
-#include "syntax.h"
 #include "alist.h"
 #include <sstream>
 #include <fstream>
@@ -460,8 +459,7 @@ PrinterFile::Implementation::print_alist (const Frame& frame,
 	  // either. 
 	  if (frame.lookup (key) == Value::AList
 	      && frame.type_size (key) != Value::Singleton)
-	    print_entry (alist, syntax, super_alist, super_syntax, 
-                         key, indent, false);
+	    print_entry (frame, super, key, indent, false);
 	  else
 #endif
 	    print_entry (frame, super, key, indent, true);

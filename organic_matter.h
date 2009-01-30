@@ -94,7 +94,7 @@ public:
   virtual AM* find_am (symbol sort, symbol part) const = 0;
 public:
   virtual void initialize (Metalib&, const Units&, 
-                           const AttributeList&, const Geometry& geo,
+                           const Frame&, const Geometry& geo,
                            const Soil&, const SoilWater&, const SoilHeat&,
                            double T_avg, Treelog&) = 0;
 private:

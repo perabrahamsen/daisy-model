@@ -28,8 +28,6 @@
 #include <vector>
 
 class Path;
-class Syntax;
-class AttributeList;
 class Library;
 class Model;
 class Treelog;

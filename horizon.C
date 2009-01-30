@@ -38,8 +38,6 @@
 #include "librarian.h"
 #include "secondary.h"
 #include "treelog.h"
-#include "syntax.h"
-#include "alist.h"
 #include <vector>
 #include <map>
 
@@ -68,8 +66,8 @@ struct Horizon::Implementation
   // Create and Detroy.
   void initialize (const Hydraulic&, const Texture& texture, double quarts, 
                    int som_size, Treelog& msg);
-  static double_map get_attributes (const std::vector<const AttributeList*>& alists);
-  static symbol_map get_dimensions (const std::vector<const AttributeList*>& alists);
+  static double_map get_attributes (const std::vector<const Frame*>& frames);
+  static symbol_map get_dimensions (const std::vector<const Frame*>& frames);
   Implementation (Block& al);
   Implementation (const Frame& al);
   ~Implementation ();
@@ -104,20 +102,20 @@ Horizon::Implementation::initialize (const Hydraulic& hydraulic,
 }
 
 Horizon::Implementation::double_map
-Horizon::Implementation::get_attributes (const std::vector<const AttributeList*>& alists)
+Horizon::Implementation::get_attributes (const std::vector<const Frame*>& frames)
 { 
   double_map result; 
-  for (unsigned int i = 0; i < alists.size (); i++)
-    result[alists[i]->name ("key")] = alists[i]->number ("value");
+  for (unsigned int i = 0; i < frames.size (); i++)
+    result[frames[i]->name ("key")] = frames[i]->number ("value");
   return result;
 }
 
 Horizon::Implementation::symbol_map
-Horizon::Implementation::get_dimensions (const std::vector<const AttributeList*>& alists)
+Horizon::Implementation::get_dimensions (const std::vector<const Frame*>& frames)
 { 
   symbol_map result; 
-  for (unsigned int i = 0; i < alists.size (); i++)
-    result[alists[i]->name ("key")] = alists[i]->name ("value");
+  for (unsigned int i = 0; i < frames.size (); i++)
+    result[frames[i]->name ("key")] = frames[i]->name ("value");
   return result;
 }
 
@@ -130,11 +128,11 @@ Horizon::Implementation::Implementation (Block& al)
 		   : std::vector<double> ()),
     turnover_factor (al.number ("turnover_factor")),
     anisotropy (al.number ("anisotropy")),
-    attributes (get_attributes (al.alist_sequence ("attributes"))),
-    dimensions (get_dimensions (al.alist_sequence ("attributes"))),
+    attributes (get_attributes (al.frame_sequence ("attributes"))),
+    dimensions (get_dimensions (al.frame_sequence ("attributes"))),
     nitrification (Librarian::build_item<Nitrification> (al, "Nitrification")),
     secondary (Librarian::build_item<Secondary> (al, "secondary_domain")),
-    hor_heat (al.alist ("HorHeat"))
+    hor_heat (al.frame ("HorHeat"))
 { }
 
 Horizon::Implementation::Implementation (const Frame& al)
@@ -146,11 +144,11 @@ Horizon::Implementation::Implementation (const Frame& al)
 		   : std::vector<double> ()),
     turnover_factor (al.number ("turnover_factor")),
     anisotropy (al.number ("anisotropy")),
-    attributes (get_attributes (al.alist_sequence ("attributes"))),
-    dimensions (get_dimensions (al.alist_sequence ("attributes"))),
+    attributes (get_attributes (al.frame_sequence ("attributes"))),
+    dimensions (get_dimensions (al.frame_sequence ("attributes"))),
     nitrification (Nitrification::create_default ()),
     secondary (Secondary::create_none ()),
-    hor_heat (al.alist ("HorHeat"))
+    hor_heat (al.frame ("HorHeat"))
 { }
 
 Horizon::Implementation::~Implementation ()
@@ -351,7 +349,7 @@ properties.")
     bool ok = true;
 
     daisy_assert (al.check ("hydraulic"));
-    const AttributeList& hydraulic = al.alist ("hydraulic");
+    const Frame& hydraulic = al.frame ("hydraulic");
     if (hydraulic.name ("type") == "hypres"
         && !al.check ("dry_bulk_density"))
       {

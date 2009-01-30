@@ -27,7 +27,6 @@
 #include "block.h"
 #include "metalib.h"
 #include "library.h"
-#include "syntax.h"
 #include "daisy.h"
 #include "output.h"
 #include "toplevel.h"
@@ -76,6 +75,7 @@
 
 typedef int daisy_bool;
 
+#if 0
 // @ The daisy_syntax Type.
 
 extern "C" Syntax* EXPORT
@@ -86,7 +86,6 @@ extern "C" void EXPORT
 daisy_syntax_delete (Syntax* syntax)
 { delete syntax; }
 
-#if 0
 extern "C" int EXPORT
 daisy_syntax_check (const Syntax* syntax, const AttributeList* alist, 
 		    const char* name, Toplevel* toplevel)
@@ -94,14 +93,12 @@ daisy_syntax_check (const Syntax* syntax, const AttributeList* alist,
   Treelog::Open nest (toplevel->msg (), name);
   return syntax->check (toplevel->metalib (), *alist, toplevel->msg ()); 
 }
-#endif
 
 extern "C" void EXPORT
 daisy_syntax_add (Syntax* syntax, const char* name,
 		  Value::category cat, Value::type type, int size)
 { syntax->add (name, type, cat, size, "added from C API"); }
 
-#if 0
 extern "C" void EXPORT
 daisy_syntax_add_alist (Syntax* syntax, const char* name,
 			Value::category cat, Syntax* nested, int size)
@@ -221,7 +218,8 @@ daisy_alist_size_alist (const AttributeList* alist, const char* name)
   if (alist->size (name) == Value::Singleton)
     return 0;
   
-  return alist->alist_sequence (name).size (); }
+  return alist->frame_sequence (name).size (); 
+}
 
 #ifdef UNINPLEMENTED
 extern "C" int EXPORT
@@ -245,10 +243,12 @@ daisy_alist_get_number_at (const AttributeList* alist, const char* name,
 			    unsigned int index)
 { return alist->number_sequence (name)[index]; }
 
+#if 0
 extern "C" const AttributeList* EXPORT
 daisy_alist_get_alist_at (const AttributeList* alist, const char* name,
 			  unsigned int index)
 { return alist->alist_sequence (name)[index]; }
+#endif
 
 #ifdef UNINPLEMENTED
 extern "C" void EXPORT

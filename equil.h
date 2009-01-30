@@ -26,8 +26,6 @@
 #include "symbol.h"
 
 class Block;
-class Syntax;
-class AttributeList;
 class Treelog;
 class Scope;
 class Units;

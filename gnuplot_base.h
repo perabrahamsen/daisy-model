@@ -26,7 +26,6 @@
 #include <map>
 
 class Frame;
-class Syntax;
 class AttributeList;
 
 class GnuplotBase : public Gnuplot

@@ -29,9 +29,7 @@ class Phenology;
 class Log;
 class Treelog;
 class Block;
-class AttributeList;
 class Units;
-class Syntax;
 
 class Photo : public ModelLogable
 {

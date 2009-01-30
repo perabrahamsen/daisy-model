@@ -127,7 +127,7 @@ struct MovementRect::Point
 		"Horizontal position.");
     frame.order ("z", "x");
   }
-  Point (const AttributeList& al)
+  Point (const Frame& al)
     : z (al.number ("z")),
       x (al.number ("x"))
   { }
@@ -299,7 +299,7 @@ MovementRect::initialize_derived (const Soil&, const Groundwater&,
 MovementRect::MovementRect (Block& al)
   : MovementSolute (al),
     geo (submodel<GeometryRect> (al, "Geometry")),
-    drain_position (map_construct_const<Point> (al.alist_sequence ("drain"))),
+    drain_position (map_construct_const<Point> (al.frame_sequence ("drain"))),
     matrix_water (Librarian::build_vector<UZRect> (al, "matrix_water")),
     heatrect (Librarian::build_item<Heatrect> (al, "heat")),
     T_bottom (-42.42e42)

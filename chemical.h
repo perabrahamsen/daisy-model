@@ -41,7 +41,6 @@ class Log;
 class Block;
 class Scope;
 class Units;
-class AttributeList;
 
 class Chemical : public ModelFramed
 {
@@ -144,8 +143,7 @@ public:
   virtual bool check (const Units&, const Scope&, 
                       const Geometry&, const Soil&, const SoilWater&,
 		      const Chemistry&, Treelog&) const = 0;
-  virtual void initialize (const Units&, const Scope&, const AttributeList&,
-			   const Geometry& geo,
+  virtual void initialize (const Units&, const Scope&, const Geometry&,
                            const Soil&, const SoilWater&, const SoilHeat&,
 			   Treelog&) = 0;
 private:

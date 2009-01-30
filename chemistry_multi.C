@@ -29,7 +29,6 @@
 #include "librarian.h"
 #include "vcheck.h"
 #include "frame.h"
-#include "alist.h"
 #include <map>
 #include <sstream>
  
@@ -87,7 +86,7 @@ struct ChemistryMulti : public Chemistry
   void output (Log&) const;
 
   // Create & Destroy.
-  void initialize (const Scope&, const AttributeList&, const Geometry& geo,
+  void initialize (const Scope&, const Geometry&,
                    const Soil&, const SoilWater&, const SoilHeat&, Treelog&);
   bool check (const Scope&, const Geometry&, 
 	      const Soil&, const SoilWater&, const SoilHeat&, const Chemistry&,
@@ -341,20 +340,15 @@ ChemistryMulti::output (Log& log) const
 }
 
 void 
-ChemistryMulti::initialize (const Scope& scope, const AttributeList& al,
+ChemistryMulti::initialize (const Scope& scope, 
 			    const Geometry& geo,
 			    const Soil& soil, 
 			    const SoilWater& soil_water,
 			    const SoilHeat& soil_heat,
 			    Treelog& msg)
 {
-  const std::vector<const AttributeList*>& alists
-    = al.alist_sequence ("combine");
-  daisy_assert (alists.size () == combine.size ());
-  
   for (size_t c = 0; c < combine.size (); c++)
-    combine[c]->initialize (scope, 
-                            *alists[c], geo, soil, soil_water, soil_heat, msg);
+    combine[c]->initialize (scope, geo, soil, soil_water, soil_heat, msg);
 }
 
 bool 

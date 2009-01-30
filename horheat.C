@@ -30,7 +30,6 @@
 #include "assertion.h"
 #include "librarian.h"
 #include "treelog.h"
-#include "alist.h"
 #include <numeric>
 #include <sstream>
 
@@ -294,7 +293,7 @@ HorHeat::heat_capacity_table[Constituents_End] = // [erg / cm³ / °C]
 // Ice is given as equivalent amount of water.
 { 4.2e7, 1.9e7 * (1.0 / 0.92), 1.25e4, 2.0e7, 2.0e7, 2.5e7 }; 
 
-HorHeat::HorHeat (const AttributeList& al)
+HorHeat::HorHeat (const Frame& al)
   : quarts_form_factor (al.number ("quarts_form_factor")),
     mineral_form_factor (al.number ("mineral_form_factor")),
     C_soil (al.number ("C_soil", -42.42e42)),
@@ -312,3 +311,5 @@ HorHeat::~HorHeat ()
 
 static DeclareSubmodel horheat_submodel (HorHeat::load_syntax, "HorHeat", "\
 Heat capacity and conductivity per horizon.");
+
+// horheat.C ends here.

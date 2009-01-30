@@ -29,8 +29,6 @@
 #include <vector>
 
 class Block;
-class AttributeList;
-class Syntax;
 class Treelog;
 class Library;
 class Metalib;

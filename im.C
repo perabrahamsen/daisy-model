@@ -33,7 +33,6 @@
 #include "check.h"
 #include "assertion.h"
 #include "frame.h"
-#include "alist.h"
 #include <cmath>
 
 symbol 
@@ -209,10 +208,10 @@ IM::IM (Block& parent, const char *const key)
     return;
 
   // Add content.
-  const std::vector<const AttributeList*>& alists = parent.alist_sequence (key);
+  const std::vector<const Frame*>& alists = parent.frame_sequence (key);
   for (size_t i = 0; i < alists.size (); i++)
     {
-      const AttributeList& al = *alists[i];
+      const Frame& al = *alists[i];
       content[al.name ("name")] = al.number ("value");
     }
 }

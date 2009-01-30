@@ -40,7 +40,6 @@ class Bioclimate;
 class Raddist;
 class PLF;
 class Library;
-class Syntax;
 class SoilWater;
 class Soil;
 class Geometry;

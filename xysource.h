@@ -27,8 +27,6 @@
 
 class Block;
 class Treelog;
-class Syntax;
-class AttributeList;
 class Units;
 
 class XYSource : public Model

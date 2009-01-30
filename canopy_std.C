@@ -26,7 +26,6 @@
 #include "frame.h"
 #include "mathlib.h"
 #include "librarian.h"
-#include "alist.h"
 
 double
 CanopyStandard::specific_LAI (const double DS)
@@ -290,7 +289,7 @@ If the relative PAR get below this, the bottom leaves will start dying.");
 	      "(CAIm - CAI) / CAIm.");
 }
 
-CanopyStandard::CanopyStandard (const AttributeList& vl)
+CanopyStandard::CanopyStandard (const Frame& vl)
   : CanopySimple (vl),
     SpLAI (vl.number ("SpLAI")),
     LeafAIMod (vl.plf ("LeafAIMod")),

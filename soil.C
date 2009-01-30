@@ -483,8 +483,7 @@ check_alist (Metalib&, const Frame& al, Treelog& err)
 {
   bool ok = true;
 
-  const std::vector<const AttributeList*>& layers
-    = al.alist_sequence ("horizons");
+  const std::vector<const Frame*>& layers = al.frame_sequence ("horizons");
 
   if (layers.size () < 1U)
     {

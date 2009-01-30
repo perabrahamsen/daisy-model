@@ -34,7 +34,6 @@ class Path;
 class Units;
 class Frame;
 class FrameModel;
-class Syntax;
 class PLF;
 class AttributeList;
 
@@ -99,8 +98,6 @@ public:
   const std::vector<int>& integer_sequence (symbol key) const;
   const std::vector<const Frame*>& frame_sequence (symbol key) const;
   const std::vector<const PLF*>& plf_sequence (symbol key) const;
-  const std::vector<const AttributeList*>& 
-  /**/ alist_sequence (symbol key) const;
 
   // Create and Destroy.
 protected:

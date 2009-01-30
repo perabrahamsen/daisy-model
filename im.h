@@ -29,8 +29,6 @@
 #include <boost/noncopyable.hpp>
 
 class Log;
-class Syntax;
-class AttributeList;
 class Frame;
 class Block;
 class Unit;

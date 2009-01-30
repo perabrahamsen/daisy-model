@@ -699,7 +699,7 @@ SoilHeat::SoilHeat (const Block& al)
 }
 
 void 
-SoilHeat::initialize (const AttributeList& al, const Geometry& geo,
+SoilHeat::initialize (const Frame& al, const Geometry& geo,
                       const std::vector<double>& default_T,
                       Treelog& msg)
 {

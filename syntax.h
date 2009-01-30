@@ -35,17 +35,7 @@ class VCheck;
 class Treelog;
 class Frame;
 
-#ifdef __unix
-#define EXPORT /* Nothing */
-#elif defined (BUILD_DLL)
-/* DLL export */
-#define EXPORT __declspec(dllexport)
-#else
-/* EXE import */
-#define EXPORT __declspec(dllimport)
-#endif
-
-class EXPORT Syntax
+class Syntax
 { 
   struct Implementation;
   friend struct Implementation;

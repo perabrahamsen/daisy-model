@@ -33,8 +33,6 @@ class SoilHeat;
 class SoilNO3;
 class SoilNH4;
 class Block;
-class Syntax;
-class AttributeList;
 
 class Nitrification : public Model
 {

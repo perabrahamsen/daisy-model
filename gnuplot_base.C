@@ -27,7 +27,6 @@
 #include "assertion.h"
 #include "librarian.h"
 #include "treelog.h"
-#include "syntax.h"
 #include "alist.h"
 
 void 
@@ -211,3 +210,5 @@ cross the legend.");
     frame.add ("legend", "auto");
   }
 } Gnuplot_syntax;
+
+// gnuplot_base.C ends her.

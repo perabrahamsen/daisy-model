@@ -31,7 +31,6 @@ class Log;
 class Geometry;
 class Block;
 class Treelog;
-class Syntax;
 class Metalib;
 
 class Rootdens : public ModelFramed

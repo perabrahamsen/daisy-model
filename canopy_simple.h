@@ -19,11 +19,12 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#ifndef CANOPY_SIMPLE_H
+#define CANOPY_SIMPLE_H
 
 #include "plf.h"
 
 struct Log;
-struct AttributeList;
 struct Frame;
 
 class CanopySimple
@@ -58,6 +59,8 @@ public:
   // Create and Destroy.
 public:
   static void load_syntax (Frame&);
-  CanopySimple (const AttributeList&);
+  CanopySimple (const Frame&);
   ~CanopySimple ();
 };
+
+#endif // CANOPY_SIMPLE_H

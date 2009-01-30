@@ -27,8 +27,6 @@
 
 class Frame;
 class Block;
-class Syntax;
-class AttributeList;
 
 class Exchange : public Model
 {

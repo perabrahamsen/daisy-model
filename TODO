@@ -8,11 +8,11 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 ** AList::subset -> Frame::subset
 
-** Fjern brug af syntax i select.C
+** Fjern "type", "base_model", attributes.
 
-** Fjern Frame::syntax ()
+Tænk over brug af "description".  Hvad med cite?
 
-** Fjern al brug af alist of syntax udenfor frame
+** Fjern al brug af alist of udenfor frame
 
 ** brug parent_link i stedet for parent_copy
 
@@ -25,10 +25,6 @@ permanent frames, så vi altid kloner midlertidige?
 ** Fix FRAME_LINK ifdefs i weather
 
 ** C & OpenMI interface.
-
-** Fjern "type", "base_model", attributes.
-
-Tænk over brug af "description".  Hvad med cite?
 
 ** split Frame::frame -> Frame::model & Frame::submodel
 

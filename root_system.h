@@ -35,8 +35,6 @@ class SoilWater;
 class Chemical;
 class Chemistry;
 class Log;
-class AttributeList;
-class Syntax;
 class Metalib;
 class Units;
 

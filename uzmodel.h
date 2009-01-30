@@ -33,8 +33,6 @@ class GeometryVert;
 class Soil;
 class SoilHeat;
 class Library;
-class Syntax;
-class AttributeList;
 class Log;
 class Treelog;
 class Block;

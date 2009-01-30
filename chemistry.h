@@ -36,12 +36,10 @@ class Movement;
 class Chemical;
 class Volume;
 class Treelog;
-class Syntax;
 class Block;
 class Scope;
 class IM;
 class Units;
-class AttributeList;
 
 class Chemistry : public ModelFramed
 {
@@ -107,8 +105,7 @@ public:
 
   // Create & Destroy.
 public:
-  virtual void initialize (const Scope&,
-                           const AttributeList&, const Geometry& geo,
+  virtual void initialize (const Scope&, const Geometry& geo,
                            const Soil&, const SoilWater&, const SoilHeat&,
 			   Treelog&) = 0;
   virtual bool check (const Scope&, const Geometry&,

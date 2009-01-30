@@ -37,8 +37,6 @@ class Surface;
 class Pet;
 class Bioclimate;
 class Block;
-class Syntax;
-class AttributeList;
 class Treelog;
 
 class SVAT : public ModelLogable

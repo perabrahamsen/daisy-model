@@ -271,7 +271,7 @@ Name to use for this line.  By default use the tag.");
   frame.order ("tag");
 }
 
-Fetch::Fetch (const AttributeList& al)
+Fetch::Fetch (const Frame& al)
   : tag (al.name ("tag")),
     factor (al.number ("factor")),
     name (al.check ("name") ? al.name ("name") : tag),

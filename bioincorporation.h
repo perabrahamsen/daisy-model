@@ -26,7 +26,6 @@
 #include <vector>
 #include <memory>
 
-class AttributeList;
 class Frame;
 class Log;
 class AM;
@@ -59,7 +58,7 @@ public:
   AM* create_am (Metalib&, const Geometry&, Treelog&);
   void set_am (AM*);
   static void load_syntax (Frame&);
-  Bioincorporation (const AttributeList&);
+  Bioincorporation (const Frame&);
   ~Bioincorporation ();
 };
 

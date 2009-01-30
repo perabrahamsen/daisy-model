@@ -30,7 +30,6 @@
 #include "block.h"
 #include "units.h"
 #include "frame.h"
-#include "alist.h"
 
 const std::vector<double>& 
 IMvec::get_array (symbol chem) const
@@ -123,10 +122,10 @@ find_unit (Block& parent, const char* key)
 IMvec::IMvec (Block& parent, const char* key)
   : unit_ (find_unit (parent, key))
 {
-  const std::vector<const AttributeList*>& alists = parent.alist_sequence (key);
+  const std::vector<const Frame*>& alists = parent.frame_sequence (key);
   for (size_t i = 0; i < alists.size (); i++)
     {
-      const AttributeList& al = *alists[i];
+      const Frame& al = *alists[i];
       content[al.name ("name")] = al.number_sequence ("value");
     }
 }

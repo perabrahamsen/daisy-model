@@ -44,7 +44,6 @@ class Metalib;
 class Treelog;
 class Block;
 class FrameModel;
-class Syntax;
 class Units;
 
 class Vegetation : public ModelLogable

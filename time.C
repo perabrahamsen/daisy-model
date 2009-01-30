@@ -565,6 +565,17 @@ Time::Time (const AttributeList& al)
                               al.integer ("second")))
 { }
 
+Time::Time (const Frame& al)
+  : impl (new Implementation (al.integer ("year"), 
+                              mday2yday (al.integer ("year"),
+                                         al.integer ("month"),
+                                         al.integer ("mday")),
+                              al.integer ("hour"),
+                              al.integer ("minute"),
+                              al.integer ("second")))
+{ }
+
+
 static DeclareSubmodel 
 time_submodel (Time::load_syntax, "Time", "\
 Year, month, day and hour.");

@@ -524,16 +524,6 @@ Block::plf_sequence (const symbol key) const
   return frame.plf_sequence (key); 
 }
 
-const std::vector<const AttributeList*>& 
-Block::alist_sequence (const symbol key) const
-{ 
-  const Frame& frame = find_frame (key);
-  if (frame.is_reference (key))
-    return this->alist_sequence (impl->expand_reference (key));
-
-  return frame.alist_sequence (key); 
-}
-
 symbol
 Block::sequence_id (const symbol key, size_t index)
 {

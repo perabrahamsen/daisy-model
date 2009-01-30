@@ -25,7 +25,6 @@
 #include "log.h"
 #include "frame.h"
 #include "librarian.h"
-#include "alist.h"
 
 double
 CanopySimple::EpFactor (double DS) const
@@ -90,7 +89,7 @@ CanopySimple::load_syntax (Frame& frame)
 	      "Accumulated Leaf Area Index at Height.");
 }
 
-CanopySimple::CanopySimple (const AttributeList& vl)
+CanopySimple::CanopySimple (const Frame& vl)
   : PARref (vl.number ("PARref")),
     PARext (vl.number ("PARext")),
     NIRref (vl.number ("NIRref")),

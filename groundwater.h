@@ -34,8 +34,6 @@ class Soil;
 class SoilWater;
 class SoilHeat;
 class Block;
-class Syntax;
-class AttributeList;
 class Scope;
 class Units;
 

@@ -910,21 +910,20 @@ ColumnStandard::initialize (Block& block,
   const Weather& my_weather = weather.get () ? *weather : *global_weather;
   bioclimate->initialize (block, my_weather);
   daisy_assert (frame.get ());
-  soil_heat->initialize (frame->alist ("SoilHeat"), geometry, 
+  soil_heat->initialize (frame->frame ("SoilHeat"), geometry, 
                          movement->default_heat (*soil, time, my_weather),
                          msg);
 
-  soil_water->initialize (frame->alist ("SoilWater"), 
+  soil_water->initialize (frame->frame ("SoilWater"), 
                           geometry, *soil, *soil_heat, *groundwater, msg);
   
   // Solutes depends on water and heat.
-  chemistry->initialize (scope, frame->alist ("Chemistry"),
-                         geometry, *soil, *soil_water, *soil_heat, msg);
+  chemistry->initialize (scope, geometry, *soil, *soil_water, *soil_heat, msg);
   
   // Organic matter and vegetation.
   const double T_avg = my_weather.average_temperature ();
   organic_matter->initialize (block.metalib (), 
-                              units, frame->alist ("OrganicMatter"), 
+                              units, frame->frame ("OrganicMatter"), 
                               geometry, *soil, *soil_water, *soil_heat, 
                               T_avg, msg);
   vegetation->initialize (block.metalib (), 

@@ -97,7 +97,7 @@ struct OrganicStandard : public OrganicMatter
     void swap (const Geometry&, double from, double middle, double to);
     static void load_syntax (Frame&);
     void initialize (const Geometry& geo);
-    Buffer (const AttributeList& al);
+    Buffer (const Frame& al);
   } buffer;
   const PLF heat_factor;
   const PLF water_factor;
@@ -149,7 +149,7 @@ struct OrganicStandard : public OrganicMatter
     static bool check_alist (Metalib&, const Frame&, Treelog&);
   public:
     static void load_syntax (Frame&);
-    Initialization (const AttributeList&, const Geometry& geo,
+    Initialization (const Frame&, const Geometry& geo,
                     const Soil& soil, 
                     const Bioincorporation& bioincorporation, 
 		    const std::vector<SOM*>& som, double T_avg);
@@ -259,7 +259,7 @@ struct OrganicStandard : public OrganicMatter
                   const Volume&, const Time&, double dt, Treelog&);
   AM* find_am (symbol sort, symbol part) const;
   void initialize (Metalib&, 
-                   const Units&, const AttributeList&, const Geometry& geo,
+                   const Units&, const Frame&, const Geometry& geo,
                    const Soil&, const SoilWater&, const SoilHeat&,
 		   double T_avg, Treelog&);
   OrganicStandard ();
@@ -586,7 +586,7 @@ OrganicStandard::Initialization::
 }
 
 OrganicStandard::Initialization::
-/**/ Initialization (const AttributeList& al, const Geometry& geo,
+/**/ Initialization (const Frame& al, const Geometry& geo,
                      const Soil& soil, 
                      const Bioincorporation& bioincorporation,
 		     const std::vector<SOM*>& som, double T_avg)
@@ -726,7 +726,7 @@ OrganicStandard::Buffer::initialize (const Geometry& geo)
   daisy_non_negative (C);
 }
 
-OrganicStandard::Buffer::Buffer (const AttributeList& al)
+OrganicStandard::Buffer::Buffer (const Frame& al)
   : C (al.number_sequence ("C")),
     N (al.number_sequence ("N")),
     turnover_rate (al.check ("turnover_halftime")
@@ -2338,7 +2338,7 @@ OrganicStandard::update_pools
 
 void
 OrganicStandard::initialize (Metalib& metalib, 
-                             const Units& units, const AttributeList& al,
+                             const Units& units, const Frame& al,
                              const Geometry& geo,
                              const Soil& soil, 
                              const SoilWater& soil_water,
@@ -2446,8 +2446,8 @@ Using initial C per N for remaining entries");
   // Initialize C from layers, when available.
   if (al.check ("initial_SOM"))
     {
-      const std::vector<const AttributeList*>& layers
-	= al.alist_sequence ("initial_SOM");
+      const std::vector<const Frame*>& layers 
+        = al.frame_sequence ("initial_SOM");
       const double soil_end = geo.bottom ();
       double last = 0.0;
       for (size_t i = 0; i < layers.size (); i++)
@@ -2478,7 +2478,7 @@ An 'initial_SOM' layer in OrganicStandard ends below the last cell");
         total_C[lay] = soil.humus_C (lay);
   }
   // Partitioning.
-  Initialization init (al.alist ("init"), geo, soil, bioincorporation, som, T_avg);
+  Initialization init (al.frame ("init"), geo, soil, bioincorporation, som, T_avg);
 		       
   double total_delta_C = 0.0;
   double total_delta_N = 0.0;
@@ -2601,7 +2601,7 @@ OrganicStandard::OrganicStandard (Block& al)
     som (Librarian::build_vector<SOM> (al, "som")),
     dom (map_submodel<DOM> (al, "dom")),
     domsorp (Librarian::build_vector<Domsorp> (al, "domsorp")),
-    buffer (al.alist ("buffer")),
+    buffer (al.frame ("buffer")),
     heat_factor (al.plf ("heat_factor")),
     water_factor (al.plf ("water_factor")),
     clayom (Librarian::build_item<ClayOM> (al, "ClayOM")),
@@ -2609,7 +2609,7 @@ OrganicStandard::OrganicStandard (Block& al)
     som_tillage_factor (al.plf_sequence ("som_tillage_factor")),
     min_AM_C (al.number ("min_AM_C")),
     min_AM_N (al.number ("min_AM_N")),
-    bioincorporation (al.alist ("Bioincorporation")),
+    bioincorporation (al.frame ("Bioincorporation")),
     fertilized_N (0.0),
     fertilized_C (0.0),
     tillage_N_top (0.0),
@@ -2906,7 +2906,7 @@ check_alist (Metalib&, const Frame& al, Treelog& err)
       if (!om_ok)
 	ok = false;
     }
-  const AttributeList& init_alist = al.alist ("init");
+  const Frame& init_alist = al.frame ("init");
   if (init_alist.number_sequence ("SOM_limit_lower").size ()
       != som_alist.size ())
     {

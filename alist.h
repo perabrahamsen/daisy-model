@@ -80,7 +80,6 @@ public:
   const std::vector<bool>& flag_sequence (symbol key) const;
   const std::vector<int>& integer_sequence (symbol key) const;
   const std::vector<const PLF*>& plf_sequence (symbol key) const;
-  const std::vector<const AttributeList*>& alist_sequence (symbol key) const;
   const std::vector<const Frame*>& frame_sequence (symbol key) const;
 
   // Create and Destroy.

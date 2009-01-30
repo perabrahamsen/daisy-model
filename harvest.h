@@ -28,8 +28,6 @@
 #include "block.h"
 
 class Frame;
-class AttributeList;
-class Syntax;
 class Log;
 
 class Harvest

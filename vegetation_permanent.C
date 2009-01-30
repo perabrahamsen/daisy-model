@@ -38,7 +38,6 @@
 #include "check.h"
 #include "librarian.h"
 #include "frame.h"
-#include "alist.h"
 #include <sstream>
 #include <deque>
 
@@ -56,7 +55,7 @@ struct VegetationPermanent : public Vegetation
     
     // Create;
     static void load_syntax (Frame&);
-    YearlyLAI (const std::vector<const AttributeList*>& als);
+    YearlyLAI (const std::vector<const Frame*>& als);
   } yearly_LAI;
   const PLF LAIvsDAY;		// LAI as a function of time.
   CanopySimple canopy;
@@ -246,7 +245,7 @@ whenever 'LAIvsDAY' becomes negative.");
   frame.order ("year", "LAIvsDAY");
 }
 
-VegetationPermanent::YearlyLAI::YearlyLAI (const std::vector<const AttributeList*>& als)
+VegetationPermanent::YearlyLAI::YearlyLAI (const std::vector<const Frame*>& als)
 {
   for (unsigned int i = 0; i < als.size (); i++)
     {
@@ -391,9 +390,9 @@ VegetationPermanent::check (const Units& units, Treelog& msg) const
 
 VegetationPermanent::VegetationPermanent (Block& al)
   : Vegetation (al),
-    yearly_LAI (al.alist_sequence ("YearlyLAI")),
+    yearly_LAI (al.frame_sequence ("YearlyLAI")),
     LAIvsDAY (al.plf ("LAIvsDAY")),
-    canopy (al.alist ("Canopy")),
+    canopy (al.frame ("Canopy")),
     cover_ (-42.42e42),
     N_per_LAI (al.number ("N_per_LAI") * 0.1), // [kg N / ha] -> [g N / m^2]
     DM_per_LAI (al.number ("DM_per_LAI")),
@@ -406,7 +405,7 @@ VegetationPermanent::VegetationPermanent (Block& al)
     root_system (submodel<RootSystem> (al, "Root")),
     WRoot (al.number ("root_DM") * 100.0), // [Mg DM / ha] -> [g DM / m^2]
     albedo_ (al.number ("Albedo")),
-    litter (al.alist ("Litter"))
+    litter (al.frame ("Litter"))
 {
   canopy.Height = al.number ("Height");
 }
@@ -471,3 +470,5 @@ Litter AOM parameters.");
 			 Litter::load_syntax);
   }
 } VegetationPermanent_syntax;
+
+// vegetation_permanent.C ends here.

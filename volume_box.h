@@ -23,8 +23,6 @@
 
 #include "volume.h"
 
-class Syntax;
-class AttributeList;
 class Bound;
 class Border;
 

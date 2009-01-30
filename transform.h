@@ -30,8 +30,6 @@ class Soil;
 class SoilWater;
 class SoilHeat;
 class Treelog;
-class Syntax;
-class AttributeList;
 class Block;
 class Units;
 

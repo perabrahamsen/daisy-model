@@ -31,8 +31,6 @@ class PLF;
 class Treelog;
 class Texture;
 class Block;
-class Syntax;
-class AttributeList;
 
 class Hydraulic : public ModelLogable
 {

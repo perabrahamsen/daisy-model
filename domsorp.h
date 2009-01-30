@@ -34,7 +34,6 @@ class DOM;
 class AttributeList;
 class Block;
 class Treelog;
-class Syntax;
 class Units;
 
 class Domsorp : public ModelFramed

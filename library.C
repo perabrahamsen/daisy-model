@@ -53,7 +53,6 @@ struct Library::Implementation
   bool check (symbol) const;
   void add_ancestors (symbol);
   void add_model (symbol, FrameModel&);
-  const Syntax& syntax (symbol) const;
   void entries (std::vector<symbol>&) const;
   void remove (symbol);
   void clear_parsed ();
@@ -249,26 +248,6 @@ Library::complete (Metalib& metalib, const symbol key) const
 void
 Library::add_model (const symbol key, FrameModel& frame)
 { impl->add_model (key, frame); }
-
-#if 0
-void 
-Library::add_derived (const symbol name, AttributeList& al,
-		      const symbol super)
-{ 
-  al.add ("type", super);
-  daisy_assert (check (super));
-  impl->add_model (name, *new FrameModel (model (super), al));
-}
-
-void
-Library::add_derived (const symbol name, const Syntax& syn, AttributeList& al,
-		      const symbol super)
-{ 
-  al.add ("type", super);
-  daisy_assert (check (super));
-  impl->add_model (name, *new FrameModel (model (super), syn, al)); 
-}
-#endif 
 
 void
 Library::entries (std::vector<symbol>& result) const

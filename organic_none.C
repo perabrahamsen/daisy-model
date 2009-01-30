@@ -89,7 +89,7 @@ struct OrganicNone : public OrganicMatter
   AM* find_am (symbol, symbol) const
   { return NULL; }
   void initialize (Metalib&, 
-                   const Units&, const AttributeList&, const Geometry& geo,
+                   const Units&, const Frame&, const Geometry& geo,
                    const Soil&, const SoilWater&, const SoilHeat&, 
                    double, Treelog&)
   { active_.insert (active_.end (), geo.cell_size (), false); }

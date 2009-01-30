@@ -186,7 +186,7 @@ struct ActionCrop : public Action
     // Create and Destroy.
     static bool check_alist (Metalib&, const Frame& al, Treelog&);
     static void load_syntax (Frame&);
-    Spray (const AttributeList&);
+    Spray (const Frame&);
     ~Spray ();
   };
   const std::vector<const Spray*> spray;
@@ -689,7 +689,7 @@ ActionCrop::Spray::load_syntax (Frame& frame)
   frame.order ("month", "day", "name", "amount");
 }
 
-ActionCrop::Spray::Spray (const AttributeList& al)
+ActionCrop::Spray::Spray (const Frame& al)
   : month (al.integer ("month")),
     day (al.integer ("day")),
     name (al.name ("name")),
@@ -984,7 +984,7 @@ ActionCrop::ActionCrop (Block& al)
     fertilize_incorporate (al.flag ("fertilize_incorporate")),
     tillage (map_submodel_const<Tillage> (al, "tillage")),
     tillage_index (al.integer ("tillage_index")),
-    spray (map_construct_const<Spray> (al.alist_sequence ("spray"))),
+    spray (map_construct_const<Spray> (al.frame_sequence ("spray"))),
     spray_index (al.integer ("spray_index")),
     irrigation (al.check ("irrigation") 
 	       ? new Irrigation (al.alist ("irrigation"))

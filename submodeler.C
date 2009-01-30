@@ -23,7 +23,6 @@
 #include "submodeler.h"
 #include "frame.h"
 #include "alist.h"
-#include "syntax.h"
 #include "assertion.h"
 
 BlockSubmodel::BlockSubmodel (Block& parent, const symbol key)

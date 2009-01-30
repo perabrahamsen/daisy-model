@@ -28,7 +28,6 @@
 #include "parser_file.h"
 #include "block.h"
 #include "program.h"
-#include "syntax.h"
 #include "path.h"
 #include "version.h"
 #include "assertion.h"

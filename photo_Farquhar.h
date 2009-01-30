@@ -35,7 +35,6 @@ class Treelog;
 class CanopyStandard;
 class Phenology;
 class Log;
-class Syntax;
 
 // Chemical constants affecting the crop.
 static const double molWeightCH2O = 30.0; // [gCH2O/mol]

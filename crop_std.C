@@ -783,7 +783,7 @@ CropStandard::CropStandard (Block& al)
   : Crop (al),
     seed (Librarian::build_item<Seed> (al, "Seed")),
     root_system (submodel<RootSystem> (al, "Root")),
-    canopy (al.alist ("Canopy")),
+    canopy (al.frame ("Canopy")),
     harvesting (submodel<Harvesting> (al, "Harvest")),
     production (al.alist ("Prod")),
     last_time (al.check ("last_time")

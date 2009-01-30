@@ -36,7 +36,7 @@ public:
   // Create and Destroy.
 public:
   static void load_syntax (Frame&);
-  Litter (const AttributeList&);
+  Litter (const Frame&);
   ~Litter ();
 };
 

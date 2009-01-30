@@ -30,8 +30,6 @@
 class Frame;
 class Metalib;
 class Program;
-class Syntax;
-class AttributeList;
 class Treelog;
 
 #ifdef __GNUC__

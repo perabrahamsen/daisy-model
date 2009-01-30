@@ -50,7 +50,7 @@ struct NumberPLF : public Number
       frame.order ("x", "y");
     }
     
-    Point (const AttributeList& al)
+    Point (const Frame& al)
       : x_value (al.number ("x")),
 	x_dimension (al.name ("x")),
 	y_value (al.number ("y")),
@@ -95,7 +95,7 @@ struct NumberPLF : public Number
     const symbol domain (al.name ("domain"));
     const symbol range (al.name ("range"));
     const auto_vector<const Point*> points 
-      = map_construct_const<Point> (al.alist_sequence ("points"));
+      = map_construct_const<Point> (al.frame_sequence ("points"));
 
     if (points.size () < 1)
       {
@@ -152,7 +152,7 @@ struct NumberPLF : public Number
     const symbol domain (al.name ("domain"));
     const symbol range (al.name ("range"));
     const auto_vector<const Point*> points 
-      = map_construct_const<Point> (al.alist_sequence ("points"));
+      = map_construct_const<Point> (al.frame_sequence ("points"));
 
     PLF plf;
 

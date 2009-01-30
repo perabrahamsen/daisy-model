@@ -24,7 +24,6 @@
 
 #include <vector>
 
-class AttributeList;
 class Surface;
 class Groundwater;
 class Log;
@@ -164,7 +163,7 @@ public:
   // Creation.
 public:
   static void load_syntax (Frame&);
-  void initialize (const AttributeList&, const Geometry&,
+  void initialize (const Frame&, const Geometry&,
                    const Soil&, const SoilHeat&, const Groundwater&, Treelog&);
   SoilWater (Block&);
   ~SoilWater ();

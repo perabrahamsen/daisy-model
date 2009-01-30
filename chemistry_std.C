@@ -34,7 +34,6 @@
 #include "vcheck.h"
 #include "treelog.h"
 #include "frame.h"
-#include "alist.h"
 
 struct ChemistryStandard : public Chemistry
 {
@@ -86,8 +85,7 @@ struct ChemistryStandard : public Chemistry
   void output (Log&) const;
 
   // Create & Destroy.
-  void initialize (const Scope& scope, 
-                   const AttributeList&, const Geometry& geo,
+  void initialize (const Scope& scope, const Geometry& geo,
                    const Soil&, const SoilWater&, const SoilHeat&, Treelog&);
   bool check (const Scope& scope, const Geometry&,
 	      const Soil&, const SoilWater&, const SoilHeat&, const Chemistry&,
@@ -310,19 +308,14 @@ ChemistryStandard::output (Log& log) const
 
 void 
 ChemistryStandard::initialize (const Scope& scope, 
-                               const AttributeList& al,
                                const Geometry& geo,
                                const Soil& soil, 
                                const SoilWater& soil_water,
 			       const SoilHeat& soil_heat,
 			       Treelog& msg)
 {
-  const std::vector<const AttributeList*>& alists = al.alist_sequence ("trace");
-  daisy_assert (alists.size () == chemicals.size ());
-  
   for (size_t c = 0; c < chemicals.size (); c++)
-    chemicals[c]->initialize (units, scope, *alists[c],
-                              geo, soil, soil_water, soil_heat, 
+    chemicals[c]->initialize (units, scope, geo, soil, soil_water, soil_heat, 
 			      msg);
 
   for (size_t r = 0; r < reactions.size (); r++)

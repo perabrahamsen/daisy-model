@@ -56,20 +56,14 @@ struct AValue
     symbol* name;
     bool flag;
     PLF* plf;
-    struct {
-      Frame* frame;
-      AttributeList* alist;
-    } fa;
+    Frame* frame;
     int integer;
     std::vector<double>* number_sequence;
     std::vector<symbol>* name_sequence;
     std::vector<bool>* flag_sequence;
     std::vector<int>* integer_sequence;
     std::vector<const PLF*>* plf_sequence;
-    struct {
-      std::vector<const AttributeList*>* alist_sequence;
-      std::vector<const Frame*>* frame_sequence;
-    } fas;
+    std::vector<const Frame*>* frame_sequence;
   };
   Value::type type;
   bool is_sequence;
@@ -119,22 +113,12 @@ struct AValue
       is_sequence (false),
       ref_count (new int (1))
     { }
-  AValue (const AttributeList& v)
-    : type (Value::AList),
-      is_sequence (false),
-      ref_count (new int (1))
-    { 
-      fa.alist = new AttributeList (v);
-      fa.frame = NULL;
-    }
   AValue (const Frame& f)
-    : type (Value::AList),
+    : frame (&f.clone ()),
+      type (Value::AList),
       is_sequence (false),
       ref_count (new int (1))
-    { 
-      fa.alist = NULL;
-      fa.frame = &f.clone ();
-    }
+  { }
   AValue (int v)
     : integer (v),
       type (Value::Integer),
@@ -192,29 +176,14 @@ struct AValue
       is_sequence (true),
       ref_count (new int (1))
     { }
-  AValue (const std::vector<const AttributeList*>& v)
-    : type (Value::AList),
-      is_sequence (true),
-      ref_count (new int (1))
-  { 
-    fas.alist_sequence = new std::vector<const AttributeList*> ();
-    for (unsigned int i = 0; i < v.size (); i++)
-      fas.alist_sequence->push_back (new AttributeList (*v[i]));
-
-    fas.frame_sequence = NULL;
-  }
   AValue (const std::vector<const Frame*>& v)
     : type (Value::AList),
       is_sequence (true),
       ref_count (new int (1))
   { 
-    fas.alist_sequence = new std::vector<const AttributeList*> ();
-    fas.frame_sequence = new std::vector<const Frame*> ();
+    frame_sequence = new std::vector<const Frame*> ();
     for (unsigned int i = 0; i < v.size (); i++)
-      {
-        fas.alist_sequence->push_back (new AttributeList (v[i]->alist ()));
-        fas.frame_sequence->push_back (&v[i]->clone ());
-      }
+      frame_sequence->push_back (&v[i]->clone ());
   }
   AValue ()
     : number (-42.42e42),
@@ -252,27 +221,9 @@ AValue::subset (Metalib& metalib, const AValue& v, const Frame& syntax,
 	return integer == v.integer;
       case Value::AList:
 	{
-	  const AttributeList& value = fa.alist
-            ? *fa.alist
-            : fa.frame->alist ();
-	  const AttributeList& other = v.fa.alist
-            ? *v.fa.alist
-            : v.fa.frame->alist ();
-	  const Value::type type = syntax.lookup (key);
-	  if (type == Value::AList)
-	    return value.subset (metalib, other, syntax.frame (key));
-	  daisy_assert (type == Value::Object);
-	  const Library& library = syntax.library (metalib, key);
-
-	  daisy_assert (value.check ("type"));
-	  if (!other.check ("type"))
-	    return false;
-	  const symbol element = value.name ("type");
-	  if (element != other.name ("type"))
-	    return false;
-	  if (!library.check (element))
-	    return false;
-	  return value.subset (metalib, other, library.frame (element));
+	  const Frame& value = *frame;
+	  const Frame& other = *v.frame;
+          return value.subset (metalib, other);
 	}
       case Value::PLF:
 	return *plf == *v.plf;
@@ -307,9 +258,8 @@ AValue::subset (Metalib& metalib, const AValue& v, const Frame& syntax,
 	return *integer_sequence == *v.integer_sequence;
       case Value::AList:
 	{
-	  const std::vector<const AttributeList*>& value = *fas.alist_sequence;
-	  const std::vector<const AttributeList*>& other
-            = *v.fas.alist_sequence;
+	  const std::vector<const Frame*>& value = *frame_sequence;
+	  const std::vector<const Frame*>& other = *v.frame_sequence;
 
 	  const unsigned int size = value.size ();
 	  if (other.size () != size)
@@ -319,7 +269,8 @@ AValue::subset (Metalib& metalib, const AValue& v, const Frame& syntax,
 	    {
 	      const Frame& nested = syntax.frame (key);
 	      for (unsigned int i = 0; i < size; i++)
-		if (!value[i]->subset (metalib, *other[i], nested))
+		if (!value[i]->alist ().subset (metalib,
+                                                other[i]->alist (), nested))
 		  return false;
 	      return true;
 		
@@ -336,8 +287,7 @@ AValue::subset (Metalib& metalib, const AValue& v, const Frame& syntax,
 		return false;
 	      if (!library.check (element))
 		return false;
-	      if (!value[i]->subset (metalib, 
-                                     *other[i], library.frame (element)))
+	      if (!value[i]->subset (metalib, *other[i]))
 		return false;
 	    }
 	  return true;
@@ -407,10 +357,7 @@ AValue::cleanup ()
 	    // Primitives, do nothing.
 	    break;
 	  case Value::AList:
-	    if (fa.alist)
-              delete fa.alist;
-            else
-              delete fa.frame;
+            delete frame;
 	    break;
 	  case Value::PLF:
 	    delete plf;
@@ -441,15 +388,8 @@ AValue::cleanup ()
 	    delete number_sequence;
 	    break;
 	  case Value::AList:
-	    sequence_delete (fas.alist_sequence->begin (),
-                             fas.alist_sequence->end ());
-	    delete fas.alist_sequence;
-            if (fas.frame_sequence)
-              {
-                sequence_delete (fas.frame_sequence->begin (),
-                                 fas.frame_sequence->end ());
-                delete fas.frame_sequence;
-              }
+            sequence_delete (frame_sequence->begin (), frame_sequence->end ());
+            delete frame_sequence;
 	    break;
 	  case Value::PLF:
 	    sequence_delete (plf_sequence->begin (), plf_sequence->end ());
@@ -502,18 +442,7 @@ AValue::operator= (const AValue& v)
 	integer = v.integer;
         break;
       case Value::AList:
-        if (v.fa.alist)
-          {
-            fa.alist = v.fa.alist;
-            fa.frame = NULL;
-            daisy_assert (!v.fa.frame);
-          }
-        else
-          {
-            fa.frame = v.fa.frame;
-            fa.alist = NULL;
-            daisy_assert (!v.fa.alist);
-          }
+        frame = v.frame;
         break;
       case Value::PLF:
 	plf = v.plf;
@@ -542,8 +471,7 @@ AValue::operator= (const AValue& v)
 	integer_sequence = v.integer_sequence;
         break;
       case Value::AList:
-        fas.alist_sequence = v.fas.alist_sequence;
-        fas.frame_sequence = v.fas.frame_sequence;
+        frame_sequence = v.frame_sequence;
         break;
       case Value::PLF:
 	plf_sequence = v.plf_sequence;
@@ -673,7 +601,7 @@ AttributeList::size (const symbol key)	const
     case Value::Number:
       return value.number_sequence->size ();
     case Value::AList:
-      return value.fas.alist_sequence->size ();
+      return value.frame_sequence->size ();
     case Value::PLF:
       return value.plf_sequence->size ();
     case Value::Boolean:
@@ -798,11 +726,7 @@ AttributeList::alist (const symbol key) const
   const AValue& value = impl.lookup (key);
   value.expect (key, Value::AList);
   value.singleton (key);
-  if (value.fa.alist)
-    return *value.fa.alist;
-  else if (value.fa.frame)
-    return value.fa.frame->alist ();
-  daisy_panic ("'key' has neither requested alist nor frame");
+  return value.frame->alist ();
 }
 
 Frame& 
@@ -811,11 +735,7 @@ AttributeList::frame (const symbol key) const
   const AValue& value = impl.lookup (key);
   value.expect (key, Value::AList);
   value.singleton (key);
-  if (value.fa.alist)
-    daisy_panic ("Value of '" + key + "' is an alist, a frame was requested");
-  else if (value.fa.frame)
-    return *value.fa.frame;
-  daisy_panic ("'" + key + "' has neither requested frame nor alist");
+  return *value.frame;
 }
 
 const std::vector<double>& 
@@ -863,24 +783,13 @@ AttributeList::plf_sequence (const symbol key) const
   return *value.plf_sequence;
 }
 
-const std::vector<const AttributeList*>& 
-AttributeList::alist_sequence (const symbol key) const
-{
-  const AValue& value = impl.lookup (key);
-  value.expect (key, Value::AList);
-  value.sequence (key);
-  return *value.fas.alist_sequence;
-}
-
 const std::vector<const Frame*>& 
 AttributeList::frame_sequence (const symbol key) const
 {
   const AValue& value = impl.lookup (key);
   value.expect (key, Value::AList);
   value.sequence (key);
-  if (!value.fas.frame_sequence)
-    daisy_panic ("'" + key + "' should have a frame sequence, but doesn't");
-  return *value.fas.frame_sequence;
+  return *value.frame_sequence;
 }
 
 void 

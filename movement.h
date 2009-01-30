@@ -39,7 +39,6 @@ class Weather;
 class Time;
 class Treelog;
 class Block;
-class Syntax;
 class AttributeList;
 class Log;
 class Scope;

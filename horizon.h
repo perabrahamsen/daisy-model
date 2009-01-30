@@ -34,8 +34,6 @@ class Tortuosity;
 class Texture;
 class Treelog;
 class Block;
-class Syntax;
-class AttributeList;
 class Secondary;
 
 class Horizon : public ModelLogable

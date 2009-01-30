@@ -39,7 +39,6 @@ class Treelog;
 class Format;
 class Border;
 class Volume;
-class Syntax;
 class Block;
 
 struct Handle
