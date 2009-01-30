@@ -27,6 +27,9 @@
 #include "log.h"
 #include "memutils.h"
 #include "librarian.h"
+#include "metalib.h"
+#include "library.h"
+#include "treelog.h"
 
 struct ActionActivity : public Action
 {
@@ -98,6 +101,21 @@ static struct ActionActivitySyntax : public DeclareModel
   Model* make (Block& al) const
   { return new ActionActivity (al); }
 
+  static bool check_alist (Metalib& metalib, const Frame& al, Treelog& msg)
+  {
+    bool ok = true;
+
+    if (al.check ("description"))
+      {
+        const symbol description = al.name ("description");
+        const Library& library = metalib.library (Action::component);
+        if (library.check (description))
+          msg.warning ("'" + description + "' is taken as a description of this activity, but is also a valid action.  Maybe you meant to write '(" + description + ") instead");
+      }
+
+    return ok;
+  }
+
   ActionActivitySyntax ()
     : DeclareModel (Action::component, "activity", "\
 Perform all the specified actions in the sequence listed.  Each\n\
@@ -106,6 +124,7 @@ at each time step.")
   { }
   void load_frame (Frame& frame) const
   {
+    frame.add_check (check_alist);
     frame.add_object ("actions", Action::component, 
                        Value::State, Value::Sequence,
                        "Sequence of actions to perform.");

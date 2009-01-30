@@ -47,7 +47,7 @@ struct ProgramGP2D : public Program
   const double DS;
 
   // Use.
-  bool table_center (const GeometryRect& geo, 
+  void table_center (const GeometryRect& geo, 
                      const std::vector<double>& Density, Treelog& msg)
   {
     // Print it.

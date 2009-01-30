@@ -31,23 +31,97 @@
 #include "memutils.h"
 #include "alist.h"
 #include <vector>
+#include <set>
+#include <sstream>
 
 struct Frame::Implementation
 {
+  static int counter;
+  int count;
   Syntax syntax;
   AttributeList alist;
+  typedef std::set<const Frame*> child_set;
+  mutable child_set children;
 
   Implementation (const Implementation& old)
-    : syntax (old.syntax),
+    : count (counter),
+      syntax (old.syntax),
       alist (old.alist)
+      
+  { counter++; }
+  Implementation (int old_count, child_set old_children)
+    : count (old_count),
+      children (old_children)
   { }
   Implementation ()
-  { }
+    : count (counter)
+  { counter++; }
 };
+
+int
+Frame::Implementation::counter = 0;
 
 const Frame* 
 Frame::parent () const
 { return NULL; }
+
+static void describe_frame (const Frame& frame, std::ostream& out)
+{
+  out << frame.impl->count;
+  if (frame.check ("type"))
+    out << " type = " << frame.name ("type");
+  if (frame.check ("base model"))
+    out << " base_model = " << frame.name ("base_model");
+  if (frame.check ("submodel"))
+    out << " submodel = " << frame.name ("submodel");
+}
+
+void 
+Frame::register_child (const Frame* child) const
+{ 
+  daisy_assert (child != this);
+  if (impl->children.find (child) != impl->children.end ())
+    {
+      std::ostringstream tmp;
+      tmp << "Dual definition of frame ";
+      describe_frame (*child, tmp);
+      tmp << " in ";
+      describe_frame (*this, tmp);
+      daisy_warning (tmp.str ());
+    }
+  else
+    impl->children.insert (child); 
+}
+
+void 
+Frame::unregister_child (const Frame* child) const
+{
+  const Implementation::child_set::const_iterator i 
+    = impl->children.find (child);
+  daisy_assert (i != impl->children.end ());
+  impl->children.erase (i);
+  const Implementation::child_set::const_iterator j 
+    = impl->children.find (child);
+  daisy_assert (j == impl->children.end ());
+}
+
+void 
+Frame::reparent_children (const Frame* new_parent) const
+{
+  for (Implementation::child_set::const_iterator i = impl->children.begin ();
+       i != impl->children.end ();
+       i++)
+    {
+      (*i)->replace_parent (new_parent);
+      if (new_parent)
+        new_parent->register_child (*i);
+    }
+  impl->children.erase (impl->children.begin (), impl->children.end ());
+}
+
+void
+Frame::replace_parent (const Frame*) const
+{ daisy_assert (!parent ()); }
 
 AttributeList& 
 Frame::alist () const
@@ -359,8 +433,17 @@ Frame::check (const symbol key) const
 bool 
 Frame::subset (Metalib& metalib, const Frame& other) const
 {
-  // TODO: Rewrite here.
-  return impl->alist.subset (metalib, other.impl->alist, *this);
+  // Find syntax entries.
+  std::vector<symbol> all;
+  entries (all);
+  const size_t size = all.size ();
+
+  // Loop over them.
+  for (size_t i = 0; i < size; i++)
+    if (!subset (metalib, other, all[i]))
+      return false;
+
+  return true;
 }
 
 // Is the element 'key' in this alist a subset of the corresponding other entry.
@@ -368,8 +451,30 @@ bool
 Frame::subset (Metalib& metalib, const Frame& other,
                const symbol key) const
 {
-  // TODO: Rewrite here.
-  return impl->alist.subset (metalib, other.impl->alist, key);
+  // Find frame defining my value of key.
+  const Frame* me = this;
+  while (!me->impl->alist.check (key))
+    {
+      daisy_assert (me != me->parent ());
+      me = me->parent ();
+      if (!me)
+        // Missing value is always a subset.
+        return true;
+    }
+
+  // Find frame defining other value of key.
+  const Frame* him = &other;
+  while (!him->impl->alist.check (key))
+    {
+      daisy_assert (him != him->parent ());
+      him = him->parent ();
+      if (!him)
+        // Missing value cannot be a superset of a value.
+        return false;
+    }
+
+  // Both values exist, perform test.
+  return me->impl->alist.subset (metalib, him->impl->alist, key);
 }
 
 int 
@@ -807,9 +912,27 @@ Frame::overwrite_values (const Frame& other)
 
 void 
 Frame::reset ()
-{ impl.reset (new Implementation ()); }
+{ impl.reset (new Implementation (impl->count, impl->children)); }
 
 Frame::~Frame ()
-{ }
+{ 
+#if 0
+  const size_t size = impl->children.size ();
+  std::ostringstream tmp;
+  if (size != 0)
+    {
+      describe_frame (*this, tmp);
+      for (Implementation::child_set::const_iterator i
+             = impl->children.begin ();
+           i != impl->children.end ();
+           i++)
+        {
+          tmp << "\n" << "child" << ": " << *i;
+          describe_frame (**i, tmp);
+        }
+      daisy_warning (tmp.str ());
+    }
+#endif
+}
 
 // frame.C ends here.

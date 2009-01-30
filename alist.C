@@ -397,12 +397,38 @@ AValue::operator= (const AValue& v)
   if (&v == this)
     return *this;
 
+  // Take care of orphans.
+  if (type == Value::AList)
+    {
+      if (is_sequence)
+        {
+          for (size_t i = 0; i < frame_sequence->size (); i++)
+            {
+              const Frame& entry = *(*frame_sequence)[i];
+              entry.reparent_children (entry.parent ());
+            }
+        }
+      else
+        {
+          daisy_assert (frame != v.frame);
+          frame->reparent_children (v.frame);
+        }
+    }
+
   // Delete old value, if necessary.
   cleanup ();
 
   // Copy the data.
-  type = v.type;
-  is_sequence = v.is_sequence;
+  if (type == Value::Error)
+    {
+      type = v.type;
+      is_sequence = v.is_sequence;
+    }
+  else 
+    {
+      daisy_assert (type == v.type);
+      daisy_assert (is_sequence == v.is_sequence);
+    }
   ref_count = v.ref_count;
   (*ref_count)++;
 
@@ -524,27 +550,8 @@ AttributeList::Implementation::clear ()
 
 bool
 AttributeList::check (const symbol key) const
-{ 
+{
   return impl.check (key) && impl.lookup (key).type != Value::Object; 
-}
-
-bool
-AttributeList::subset (Metalib& metalib, 
-                       const AttributeList& other, const Frame& syntax) const
-{ 
-  // Find syntax entries.
-  std::vector<symbol> entries;
-  syntax.entries (entries);
-  const unsigned int size = entries.size ();
-
-  // Loop over them.
-  for (unsigned int i = 0; i < size; i++)
-    {
-      const symbol key = entries[i];
-      if (!subset (metalib, other, key))
-	return false;
-    }
-  return true;
 }
 
 bool 
@@ -552,14 +559,6 @@ AttributeList::subset (Metalib& metalib,
                        const AttributeList& other, 
 		       const symbol key) const
 {
-  if (!check (key))
-    // Non-existing key is always a subset.
-    return true;
-
-  if (!other.check (key))
-    // Non-existing key is never a superset.
-    return false;
-
   // Both have key, check value.
   return impl.values[key].subset (metalib, other.impl.values[key]);
 }
@@ -894,3 +893,5 @@ AttributeList::AttributeList (const AttributeList& old)
 
 AttributeList::~AttributeList ()
 { delete &impl; }
+
+// alist.C ends here.

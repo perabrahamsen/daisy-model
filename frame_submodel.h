@@ -37,8 +37,10 @@ public:
 
 class FrameSubmodelValue : public Frame
 {
-  const Frame* parent_;
+  mutable const Frame* parent_;
   const Frame* parent () const;
+  void replace_parent (const Frame* new_parent) const;
+
   // Create and Destroy.
   FrameSubmodelValue (const FrameSubmodelValue&, parent_clone_t);
 public:

@@ -131,14 +131,14 @@ Time::print () const
 void 
 Time::set_time (Frame& parent, const symbol key) const
 {
-  FrameSubmodelValue child (parent.frame (key), Frame::parent_copy);
-  child.add ("year", year ());
-  child.add ("month", month ());
-  child.add ("mday", mday ());
-  child.add ("hour", hour ());
-  child.add ("minute", minute ());
-  child.add ("second", second ());
-  parent.add (key, child);
+  std::auto_ptr<Frame> child (&parent.frame (key).clone ());
+  child->add ("year", year ());
+  child->add ("month", month ());
+  child->add ("mday", mday ());
+  child->add ("hour", hour ());
+  child->add ("minute", minute ());
+  child->add ("second", second ());
+  parent.add (key, *child);
 }
 
 int 

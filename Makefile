@@ -1282,7 +1282,7 @@ printer_file${OBJ}: printer_file.C printer_file.h printer.h model.h symbol.h \
 log_alist${OBJ}: log_alist.C log_alist.h log.h time.h symbol.h border.h \
   model.h library.h frame.h scope.h value.h assertion.h
 frame_submodel${OBJ}: frame_submodel.C frame_submodel.h frame.h scope.h \
-  value.h symbol.h
+  value.h symbol.h assertion.h
 submodeler${OBJ}: submodeler.C submodeler.h block.h symbol.h value.h frame.h \
   scope.h alist.h assertion.h
 frame_model${OBJ}: frame_model.C frame_model.h frame.h scope.h value.h \
@@ -1853,7 +1853,8 @@ action_wait${OBJ}: action_wait.C action.h model.h symbol.h block.h value.h \
   condition.h log.h time.h border.h daisy.h program.h run.h timestep.h \
   vcheck.h memutils.h assertion.h librarian.h treelog.h frame.h scope.h
 action_activity${OBJ}: action_activity.C action.h model.h symbol.h frame.h \
-  scope.h value.h log.h time.h border.h memutils.h librarian.h
+  scope.h value.h log.h time.h border.h memutils.h librarian.h metalib.h \
+  library.h treelog.h
 mactrans_std${OBJ}: mactrans_std.C mactrans.h model.h symbol.h soil_water.h \
   geometry1d.h geometry_vert.h geometry.h value.h plf.h mathlib.h \
   assertion.h librarian.h treelog.h frame.h scope.h

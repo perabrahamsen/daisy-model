@@ -21,6 +21,7 @@
 #define BUILD_DLL
 
 #include "frame_submodel.h"
+#include "assertion.h"
 
 FrameSubmodel::FrameSubmodel (const FrameSubmodel& frame, const parent_clone_t) 
   : Frame (frame)
@@ -41,11 +42,18 @@ const Frame*
 FrameSubmodelValue::parent () const
 { return parent_; }
 
+void 
+FrameSubmodelValue::replace_parent (const Frame* new_parent) const
+{ parent_ = new_parent; }
+
 FrameSubmodelValue::FrameSubmodelValue (const FrameSubmodelValue& frame, 
                                         const parent_clone_t)
   : Frame (frame),
     parent_ (frame.parent ())
-{ }
+{ 
+  if (this->parent ())
+    this->parent ()->register_child (this); 
+}
 
 FrameSubmodelValue& 
 FrameSubmodelValue::clone () const
@@ -54,14 +62,24 @@ FrameSubmodelValue::clone () const
 FrameSubmodelValue::FrameSubmodelValue (const Frame& frame, parent_copy_t)
   : Frame (frame),
     parent_ (&frame)
-{ }
+{ 
+  daisy_assert (this->parent ());
+  this->parent ()->register_child (this); 
+}
 
 FrameSubmodelValue::FrameSubmodelValue (const Frame& frame, parent_link_t)
   : Frame (),
     parent_ (&frame)
-{ }
+{ 
+  daisy_assert (this->parent ());
+  this->parent ()->register_child (this); 
+}
+
 FrameSubmodelValue::~FrameSubmodelValue ()
-{ }
+{
+  if (parent ())
+    parent ()->unregister_child (this);
+}
 
 // frame_submodel.C ends here.
 

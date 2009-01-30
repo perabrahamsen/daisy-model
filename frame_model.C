@@ -30,6 +30,18 @@ const FrameModel*
 FrameModel::parent () const
 { return parent_; }
 
+void 
+FrameModel::replace_parent (const Frame* new_parent) const
+{ 
+  if (new_parent)
+    {
+      parent_ = dynamic_cast<const FrameModel*> (new_parent); 
+      daisy_assert (parent_);
+    }
+  else
+    parent_ = NULL;
+}
+
 bool 
 FrameModel::buildable () const
 {
@@ -87,27 +99,39 @@ BibTeX keys that would be relevant for this model or paramterization.");
 FrameModel::FrameModel (const FrameModel& parent, parent_link_t)
   : Frame (),
     parent_ (&parent)
-{ }
+{
+  daisy_assert (this->parent ());
+  this->parent ()->register_child (this); 
+}
 
 FrameModel::FrameModel (const FrameModel& parent, parent_copy_t)
   // For cloning a library.
   : Frame (parent),
     // We use parent builder.
     parent_ (&parent)
-{ }
+{ 
+  daisy_assert (this->parent ());
+  this->parent ()->register_child (this); 
+}
 
 FrameModel::FrameModel (const FrameModel& parent, parent_clone_t)
   // For cloning a model
   : Frame (parent),
     parent_ (parent.parent ())
-{ }
+{ 
+  if (this->parent ())
+    this->parent ()->register_child (this); 
+}
 
 FrameModel&
 FrameModel::clone () const
 { return *new FrameModel (*this, parent_clone); }
 
 FrameModel::~FrameModel ()
-{ }
+{
+  if (parent ())
+    parent ()->unregister_child (this);
+}
 
 // frame_model.C ends here.
 

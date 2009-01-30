@@ -1,8 +1,12 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* Svar Yo
+
 * Frame
 
-** AList::subset -> Frame::subset
+** Frame::entries skal inkludere parent entries.
+
+** Integrer Syntax::check i Frame
 
 ** Fjern "type", "base_model", attributes.
 

@@ -49,11 +49,16 @@ class Metalib;
 class EXPORT Frame : public WScope
 {
   struct Implementation;
+public:
   std::auto_ptr<Implementation> impl;
 
   // Parent.
-protected:
+public:
   virtual const Frame* parent () const;
+  void register_child (const Frame* child) const;
+  void unregister_child (const Frame* child) const;
+  void reparent_children (const Frame* new_parent) const;
+  virtual void replace_parent (const Frame* new_parent) const;
 
   // Old style access.
 public:
