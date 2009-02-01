@@ -700,11 +700,11 @@ daisy_daisy_scope_extern_get (Toplevel *const toplevel,
 extern "C" unsigned int EXPORT // Number of numbers in SCOPE.
 daisy_scope_number_size (const Scope *const scope)
 { 
-  std::vector<symbol> all;
+  std::set<symbol> all;
   scope->entries (all);
   size_t count = 0;
-  for (size_t i = 0; i < all.size (); i++)
-    if (scope->lookup (all[i]) == Value::Number)
+  for (std::set<symbol>::const_iterator i = all.begin (); i != all.end (); i++)
+    if (scope->lookup (*i) == Value::Number)
       count++;
   return count; 
 }
@@ -712,12 +712,12 @@ daisy_scope_number_size (const Scope *const scope)
 extern "C" const char* EXPORT       // Name of number INDEX in SCOPE.
 daisy_scope_number_name (const Scope *const scope, const unsigned int index)
 {
-  std::vector<symbol> all;
+  std::set<symbol> all;
   scope->entries (all);
   size_t count = 0;
-  for (size_t i = 0; i < all.size (); i++)
+  for (std::set<symbol>::const_iterator i = all.begin (); i != all.end (); i++)
     {
-      const symbol name = all[i];
+      const symbol name = *i;
       if (scope->lookup (name) == Value::Number)
         if (count == index)
           return name.name ().c_str ();

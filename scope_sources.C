@@ -29,10 +29,10 @@
 #include <sstream>
 
 void 
-ScopeSources::entries (std::vector<symbol>& all) const
+ScopeSources::entries (std::set<symbol>& all) const
 { 
   for (size_t i = 0; i < source.size (); i++)
-    all.push_back (source[i]->title ());
+    all.insert (source[i]->title ());
 }
 
 Value::type 

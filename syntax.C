@@ -64,7 +64,7 @@ struct Syntax::Implementation
   void check (const symbol key, double value) const;
   Value::type lookup (const symbol key) const;
   int order_number (const symbol name) const;
-  void entries (std::vector<symbol>& result) const;
+  void entries (std::set<symbol>& result) const;
   Implementation ()
   { }
   Implementation (const Implementation& old)
@@ -273,20 +273,14 @@ Syntax::Implementation::order_number (const symbol name) const
 }
 
 void
-Syntax::Implementation::entries (std::vector<symbol>& result) const
+Syntax::Implementation::entries (std::set<symbol>& result) const
 {
-  // All the ordered items first.
-  for (unsigned int j = 0; j < order.size (); j++)
-    result.push_back (order[j]);
-
   for (type_map::const_iterator i = types.begin ();
        i != types.end ();
        i++)
     {
       const symbol name = (*i).first;
-      
-      if (order_number (name) < 0)
-	result.push_back (name);
+      result.insert (name);
     }
 }
 
@@ -633,14 +627,8 @@ Syntax::order (const symbol one, const symbol two, const symbol three,
 }
 
 void
-Syntax::entries (std::vector<symbol>& result) const
-{
-  impl->entries (result);
-}
-
-unsigned int
-Syntax::entries () const
-{ return impl->types.size () + 0U; }
+Syntax::entries (std::set<symbol>& result) const
+{ impl->entries (result); }
 
 void 
 Syntax::add_check (check_fun fun)

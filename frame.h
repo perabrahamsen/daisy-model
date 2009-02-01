@@ -21,6 +21,7 @@
 #include "scope.h"
 #include <memory>
 #include <vector>
+#include <set>
 
 class Frame;
 class FrameModel;
@@ -67,8 +68,7 @@ public:
   // Common access.
 public:
   // Get a list of all entries.
-  void entries (std::vector<symbol>&) const;
-  unsigned int entries () const;
+  void entries (std::set<symbol>&) const;
 
   // This function will check that the alist conform to the syntax.
   bool check (Block&) const;

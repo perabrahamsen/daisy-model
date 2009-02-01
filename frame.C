@@ -128,12 +128,12 @@ Frame::alist () const
 { return impl->alist; }
 
 void 
-Frame::entries (std::vector<symbol>& e) const
-{ impl->syntax.entries (e); }
-
-unsigned int 
-Frame::entries () const
-{ return impl->syntax.entries (); }
+Frame::entries (std::set<symbol>& e) const
+{ 
+  if (parent ())
+    parent ()->entries (e);
+  impl->syntax.entries (e); 
+}
 
 bool 
 Frame::check (Block& block) const
@@ -434,13 +434,12 @@ bool
 Frame::subset (Metalib& metalib, const Frame& other) const
 {
   // Find syntax entries.
-  std::vector<symbol> all;
+  std::set<symbol> all;
   entries (all);
-  const size_t size = all.size ();
 
   // Loop over them.
-  for (size_t i = 0; i < size; i++)
-    if (!subset (metalib, other, all[i]))
+  for (std::set<symbol>::const_iterator i = all.begin (); i != all.end (); i++)
+    if (!subset (metalib, other, *i))
       return false;
 
   return true;
@@ -927,7 +926,7 @@ Frame::~Frame ()
            i != impl->children.end ();
            i++)
         {
-          tmp << "\n" << "child" << ": " << *i;
+          tmp << "\n" << "child" << ": ";
           describe_frame (**i, tmp);
         }
       daisy_warning (tmp.str ());

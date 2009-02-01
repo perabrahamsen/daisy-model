@@ -327,7 +327,7 @@ Block::lookup (const symbol key) const
 { return impl->lookup (key); }
 
 void
-Block::entries (std::vector<symbol>& all) const
+Block::entries (std::set<symbol>& all) const
 {
   // Own entries.
   impl->frame.entries (all);

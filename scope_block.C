@@ -29,7 +29,7 @@
 #include "librarian.h"
 
 void 
-ScopeBlock::entries (std::vector<symbol>& all) const
+ScopeBlock::entries (std::set<symbol>& all) const
 { block.entries (all); }
 
 Value::type 

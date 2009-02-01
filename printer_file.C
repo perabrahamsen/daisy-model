@@ -469,18 +469,18 @@ PrinterFile::Implementation::print_alist (const Frame& frame,
     }
 
   // Print unordered items.
-  std::vector<symbol> entries;
+  std::set<symbol> entries;
   frame.entries (entries);
 
   // Print new declarations.
-  std::vector<symbol> super_entries;
-  super.entries (super_entries);
-  std::set<symbol> super_set (super_entries.begin (),
-                              super_entries.end ());
+  std::set<symbol> super_set;
+  super.entries (super_set);
 
-  for (unsigned int i = 0; i < entries.size (); i++)
+  for (std::set<symbol>::const_iterator i = entries.begin ();
+       i != entries.end ();
+       i++)
     {
-      const symbol key = entries[i];
+      const symbol key = *i;
       
       // Skip already printed members.
       if (frame.order_index (key) >= 0)

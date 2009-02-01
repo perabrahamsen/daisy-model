@@ -51,7 +51,7 @@ Scope::null ()
   static struct ScopeNull : public Scope
   {
     // Use.
-    void entries (std::vector<symbol>&) const
+    void entries (std::set<symbol>&) const
     { }
     Value::type lookup (symbol) const
     { return Value::Error; }

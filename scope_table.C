@@ -25,11 +25,11 @@
 #include "assertion.h"
 
 void 
-ScopeTable::entries (std::vector<symbol>& all) const
+ScopeTable::entries (std::set<symbol>& all) const
 {
   const std::vector<symbol>& tags = lex.get_tag_names ();
   for (size_t i = 0; i < tags.size (); i++)
-    all.push_back (tags[i]);
+    all.insert (tags[i]);
 }
 
 Value::type 

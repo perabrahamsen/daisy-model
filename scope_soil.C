@@ -63,14 +63,14 @@ ScopeSoil::set_domain (const domain_t d)
 { domain = d; }
 
 void 
-ScopeSoil::entries (std::vector<symbol>& all) const
+ScopeSoil::entries (std::set<symbol>& all) const
 { 
-  all.push_back (rho_b);
-  all.push_back (clay);
-  all.push_back (humus);
-  all.push_back (h);
-  all.push_back (Theta);
-  all.push_back (T);
+  all.insert (rho_b);
+  all.insert (clay);
+  all.insert (humus);
+  all.insert (h);
+  all.insert (Theta);
+  all.insert (T);
   soil.append_attributes (cell, all); 
 }
 

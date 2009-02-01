@@ -24,7 +24,7 @@
 
 #include "value.h"
 #include "symbol.h"
-#include <vector>
+#include <set>
 #include <boost/noncopyable.hpp>
 
 #ifdef __unix
@@ -45,7 +45,7 @@ public:
 
   // Type.
 public:
-  virtual void entries (std::vector<symbol>&) const = 0;
+  virtual void entries (std::set<symbol>&) const = 0;
   virtual Value::type lookup (symbol) const = 0;
   virtual symbol dimension (symbol) const = 0;
   virtual symbol description (symbol) const = 0;

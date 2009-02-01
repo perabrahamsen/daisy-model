@@ -78,11 +78,11 @@ struct ProgramDocument : public Program
   // Print parts of it.
   static void own_entries (Metalib&,
                            const Library& library, const symbol name, 
-                           std::vector<symbol>& entries, 
+                           std::set<symbol>& entries, 
                            bool new_only = false);
   static void inherited_entries (Metalib&, const Library& library,
                                  const symbol name, 
-                                 std::vector<symbol>& entries);
+                                 std::set<symbol>& entries);
   void print_sample (const symbol name,
 		     const Frame& frame,
 		     bool top_level);
@@ -92,16 +92,16 @@ struct ProgramDocument : public Program
   void print_sample_entries (const symbol name,
                              const Frame& frame,
                              const std::vector<symbol>& order,
-                             const std::vector<symbol>& own_entries,
+                             const std::set<symbol>& own_entries,
                              const symbol lib_name,
-                             const std::vector<symbol>& base_entries,
+                             const std::set<symbol>& base_entries,
 			     bool top_level);
   void print_submodel (const symbol name, int level,
 		       const Frame& frame,
                        const symbol aref);
   void print_submodel_entries (const symbol name, int level,
                                const Frame& frame,
-                               const std::vector<symbol>& entries, 
+                               const std::set<symbol>& entries, 
 			       const symbol aref);
   void print_submodel_entry (const symbol, int level,
                              const Frame& frame, bool& first, 
@@ -691,7 +691,7 @@ ProgramDocument::print_sample_entry (const symbol name,
 void
 ProgramDocument::own_entries (Metalib& metalib,
                               const Library& library, const symbol name, 
-			      std::vector<symbol>& entries,
+			      std::set<symbol>& entries,
                               const bool new_only)
 {
   const FrameModel& frame = library.model (name);
@@ -708,11 +708,13 @@ ProgramDocument::own_entries (Metalib& metalib,
       if (base_model != name)
         {
           const FrameModel& base_frame = library.model (base_model);
-          std::vector<symbol> base_entries;
+          std::set<symbol> base_entries;
           base_frame.entries (base_entries);
-          for (size_t i = 0; i < base_entries.size (); i++)
+          for (std::set<symbol>::const_iterator i = base_entries.begin (); 
+               i != base_entries.end (); 
+               i++)
             {
-              const symbol key = base_entries[i];
+              const symbol key = *i;
               if (new_only
                   || key == "description"
                   || frame.subset (metalib, base_frame, key))
@@ -725,7 +727,7 @@ ProgramDocument::own_entries (Metalib& metalib,
 void
 ProgramDocument::inherited_entries (Metalib& metalib,
                                     const Library& library, const symbol name, 
-				    std::vector<symbol>& entries)
+				    std::set<symbol>& entries)
 {
   const FrameModel& frame = library.model (name);
 
@@ -737,9 +739,11 @@ ProgramDocument::inherited_entries (Metalib& metalib,
         {
           const FrameModel& base_frame = library.model (base_model);
           base_frame.entries (entries);
-          for (size_t i = 0; i < entries.size (); i++)
+          for (std::set<symbol>::const_iterator i = entries.begin ();
+               i != entries.end (); 
+               i++)
             {
-              const symbol key = entries[i];
+              const symbol key = *i;
               if (key != "description" 
                   && !frame.subset (metalib, base_frame, key))
                 entries.erase (find (entries.begin (), entries.end (), key));
@@ -754,9 +758,9 @@ ProgramDocument::print_sample (const symbol name,
                                const bool top_level)
 {
   const std::vector<symbol>& order = frame.order ();
-  std::vector<symbol> own;
+  std::set<symbol> own;
   frame.entries (own);
-  const std::vector<symbol> base;
+  const std::set<symbol> base;
   print_sample_entries (name, frame, order, own, "dummy", base, 
 			top_level);
 }
@@ -767,9 +771,9 @@ ProgramDocument::print_sample (const symbol name, const Library& library)
   const FrameModel& frame = library.model (name);
 
   const std::vector<symbol>& order = frame.order ();
-  std::vector<symbol> own;
+  std::set<symbol> own;
   own_entries (metalib, library, name, own);
-  std::vector<symbol> base;
+  std::set<symbol> base;
   inherited_entries (metalib, library, name, base);
 
   print_sample_entries (name, frame, order, own, 
@@ -800,28 +804,29 @@ ProgramDocument::print_sample_end ()
 void 
 ProgramDocument::print_sample_entries (const symbol name,
                                        const Frame& frame,
-                                       const std::vector<symbol>& 
-                                       /**/ order,
-                                       const std::vector<symbol>&
-                                       /**/ own_entries,
+                                       const std::vector<symbol>& order,
+                                       const std::set<symbol>& own_entries,
                                        const symbol lib_name,
-                                       const std::vector<symbol>& 
-                                       /**/ base_entries, 
+                                       const std::set<symbol>& base_entries, 
 				       const bool top_level)
 {
   // Remove uninteresting entries
-  std::vector<symbol> own; 
-  for (size_t i = 0; i < own_entries.size (); i++)
-    if (frame.order_index (own_entries[i]) < 0
-	&& !frame.is_log (own_entries[i])
-	&& frame.lookup (own_entries[i]) != Value::Library)
-      own.push_back (own_entries[i]);
-  std::vector<symbol> base;
-  for (size_t i = 0; i < base_entries.size (); i++)
-    if (frame.order_index (base_entries[i]) < 0
-	&& !frame.is_log (base_entries[i])
-	&& frame.lookup (base_entries[i]) != Value::Library)
-      base.push_back (base_entries[i]);
+  std::set<symbol> own; 
+  for (std::set<symbol>::const_iterator i = own_entries.begin (); 
+       i != own_entries.end (); 
+       i++)
+    if (frame.order_index (*i) < 0
+	&& !frame.is_log (*i)
+	&& frame.lookup (*i) != Value::Library)
+      own.insert (*i);
+  std::set<symbol> base;
+  for (std::set<symbol>::const_iterator i = base_entries.begin ();
+       i != base_entries.end();
+       i++)
+    if (frame.order_index (*i) < 0
+	&& !frame.is_log (*i)
+	&& frame.lookup (*i) != Value::Library)
+      base.insert (*i);
 
   // Count entries.
   const size_t count = order.size () + own.size () + base.size ();
@@ -860,7 +865,9 @@ ProgramDocument::print_sample_entries (const symbol name,
     }
   
   // Then own members.
-  for (unsigned int i = 0; i < own.size (); i++)
+  for (std::set<symbol>::const_iterator i = own.begin ();
+       i != own.end (); 
+       i++)
     {
       Format::TableRow row (*format);
       if (left == count)
@@ -868,12 +875,12 @@ ProgramDocument::print_sample_entries (const symbol name,
       else
 	Format::TableCell empty (*format);
 	  
-      print_sample_entry (own[i], frame, left == 1);
+      print_sample_entry (*i, frame, left == 1);
       left--;
     }
  
   // Finally inherited members.
-  if (base.size () > 0)
+  if (base.begin () != base.end ())
     {
       {
 	Format::TableRow row (*format);
@@ -891,11 +898,13 @@ ProgramDocument::print_sample_entries (const symbol name,
 		       lib_name + "-" + frame.name ("base_model"));
 	}
       }
-      for (unsigned int i = 0; i < base.size (); i++)
+      for (std::set<symbol>::const_iterator i = base.begin ();
+           i != base.end (); 
+           i++)
 	{
 	  Format::TableRow row (*format);
 	  { Format::TableCell empty (*format); }
-	  print_sample_entry (base[i], frame, left == 1);
+	  print_sample_entry (*i, frame, left == 1);
 	  left--;
 	}
     }
@@ -907,7 +916,7 @@ ProgramDocument::print_submodel (const symbol name, int level,
 				 const Frame& frame,
                                  const symbol aref)
 {
-  std::vector<symbol> entries;
+  std::set<symbol> entries;
   frame.entries (entries);
   print_submodel_entries (name, level, frame, entries, aref);
 }
@@ -915,15 +924,16 @@ ProgramDocument::print_submodel (const symbol name, int level,
 void 
 ProgramDocument::print_submodel_entries (const symbol name, int level,
 					 const Frame& frame,
-                                         const std::vector<symbol>&
-					 /**/ entries, 
+                                         const std::set<symbol>& entries, 
 					 const symbol aref)
 {
   const std::string bref = aref + "-" + name;
   const std::vector<symbol>& order = frame.order ();
   int log_count = 0;
-  for (unsigned int i = 0; i < entries.size (); i++)
-    if (frame.is_log (entries[i]))
+  for (std::set<symbol>::const_iterator i = entries.begin ();
+       i != entries.end (); 
+       i++)
+    if (frame.is_log (*i))
       log_count++;
 
   if (entries.size () == 0)
@@ -944,11 +954,12 @@ ProgramDocument::print_submodel_entries (const symbol name, int level,
 	    print_submodel_entry (order[i], level, frame, first, bref);
       
 	  // Then the remaining members, except log variables.
-	  for (unsigned int i = 0; i < entries.size (); i++)
-	    if (frame.order_index (entries[i]) < 0 
-                && !frame.is_log (entries[i]))
-	      print_submodel_entry (entries[i], level, frame, first, 
-				    bref);
+	  for (std::set<symbol>::const_iterator i = entries.begin (); 
+               i != entries.end (); 
+               i++)
+	    if (frame.order_index (*i) < 0 
+                && !frame.is_log (*i))
+	      print_submodel_entry (*i, level, frame, first, bref);
 	}
 
       if (log_count < entries.size () && log_count > 0)
@@ -966,10 +977,11 @@ ProgramDocument::print_submodel_entries (const symbol name, int level,
 	  
 	  Format::List dummy (*format);
 	  bool first = true;
-	  for (unsigned int i = 0; i < entries.size (); i++)
-	    if (frame.is_log (entries[i]))
-	      print_submodel_entry (entries[i], level, frame, first,
-				    bref);
+	  for (std::set<symbol>::const_iterator i = entries.begin ();
+               i != entries.end (); 
+               i++)
+	    if (frame.is_log (*i))
+	      print_submodel_entry (*i, level, frame, first, bref);
 	}
     }
 }
@@ -1067,7 +1079,7 @@ ProgramDocument::print_model (const symbol name, const Library& library,
         format->alist_description (frame.alist ());
 
       print_users (xref.models[used]);
-      std::vector<symbol> entries;
+      std::set<symbol> entries;
       own_entries (metalib, library, name, entries, true);
       if (entries.size () > 0)
         print_submodel_entries (name, 0, 
@@ -1104,7 +1116,7 @@ ProgramDocument::print_model (const symbol name, const Library& library,
       print_sample (name, library);
       
       // Print own entries.
-      std::vector<symbol> entries;
+      std::set<symbol> entries;
       own_entries (metalib, library, name, entries);
       print_submodel_entries (name, 0, frame, entries, 
 			      library.name ());

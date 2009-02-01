@@ -199,11 +199,13 @@ Traverse::traverse_alist (const Frame& frame,
   for (unsigned int i = 0; i < order.size (); i++)
     traverse_parameter (frame, default_frame, name, order[i]);
 
-  std::vector<symbol> parameters;
+  std::set<symbol> parameters;
   frame.entries (parameters);
-  for (unsigned int i = 0; i < parameters.size (); i++)
+  for (std::set<symbol>::const_iterator i = parameters.begin ();
+       i != parameters.end ();
+       i++)
     {
-      const symbol parameter = parameters[i];
+      const symbol parameter = *i;
       if (frame.order_index (parameter) < 0)
 	traverse_parameter (frame, default_frame, name, parameter);
   }

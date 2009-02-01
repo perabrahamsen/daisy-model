@@ -30,8 +30,8 @@
 #endif
 
 void 
-ScopeID::entries (std::vector<symbol>& all) const
-{ all.push_back (tag); }
+ScopeID::entries (std::set<symbol>& all) const
+{ all.insert (tag); }
 
 Value::type 
 ScopeID::lookup (const symbol name) const

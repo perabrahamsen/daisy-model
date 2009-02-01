@@ -115,10 +115,10 @@ LogExtern::tick (const Scope&, Treelog&)
 { }
 
 void 
-LogExtern::entries (std::vector<symbol>& all) const
+LogExtern::entries (std::set<symbol>& all) const
 {
   for (size_t i = 0; i < LogSelect::entries.size (); i++)
-    all.push_back (LogSelect::entries[i]->tag ());
+    all.insert (LogSelect::entries[i]->tag ());
 }
 
 Value::type 

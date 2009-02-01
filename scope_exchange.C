@@ -186,10 +186,10 @@ Current value to exchange.");
 // The scope.
 
 void 
-ScopeExchange::entries (std::vector<symbol>& result) const
+ScopeExchange::entries (std::set<symbol>& result) const
 {
   for (size_t i = 0; i < all.size (); i++)
-    result.push_back (all[i]->tag ());
+    result.insert (all[i]->tag ());
 }
 
 Value::type 

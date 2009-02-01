@@ -243,13 +243,13 @@ Horizon::get_dimension (const symbol name) const
 }
 
 void 
-Horizon::append_attributes (std::vector<symbol>& all) const
+Horizon::append_attributes (std::set<symbol>& all) const
 {
   for (Implementation::double_map::const_iterator i 
          = impl->attributes.begin ();
        i != impl->attributes.end ();
        i++)
-    all.push_back ((*i).first);
+    all.insert ((*i).first);
 }
 
 void 

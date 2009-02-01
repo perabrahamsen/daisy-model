@@ -26,6 +26,7 @@
 #include "value.h"
 #include "symbol.h"
 #include <vector>
+#include <set>
 #include <memory>
 
 class Library;
@@ -74,8 +75,7 @@ public:
   symbol submodel_name (symbol) const;
 
   // Get a list of all entries.
-  void entries (std::vector<symbol>&) const;
-  unsigned int entries () const;
+  void entries (std::set<symbol>&) const;
 
   // Add syntax entries
   void add (symbol key,	// Generic.

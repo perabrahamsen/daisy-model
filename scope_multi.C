@@ -25,7 +25,7 @@
 #include "librarian.h"
 
 void 
-ScopeMulti::entries (std::vector<symbol>& all) const
+ScopeMulti::entries (std::set<symbol>& all) const
 {
   for (size_t i = 0; i < scopes.size (); i++)
     scopes[i]->entries (all);

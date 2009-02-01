@@ -84,12 +84,12 @@ struct NumberLet : public Number
             }
         }
     }
-    void entries (std::vector<symbol>& all) const
+    void entries (std::set<symbol>& all) const
     {
       for (number_map::const_iterator i = numbers.begin ();
            i != numbers.end ();
            i++)
-        all.push_back ((*i).first);
+        all.insert ((*i).first);
     }
 
     Value::type lookup (const symbol id) const

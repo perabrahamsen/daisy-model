@@ -89,7 +89,7 @@ private:
 public:
   symbol title () const;
   void tick (const Scope&, Treelog&);
-  void entries (std::vector<symbol>&) const;
+  void entries (std::set<symbol>&) const;
   Value::type lookup (symbol tag) const;
   int type_size (symbol tag) const;
   int value_size (symbol tag) const;

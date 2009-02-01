@@ -26,6 +26,7 @@
 #include "value.h"
 #include <string>
 #include <vector>
+#include <set>
 #include <boost/noncopyable.hpp>
 
 class Treelog;
@@ -71,7 +72,7 @@ public:
   // Syntax emulation.
 public:
   Value::type lookup (symbol) const;
-  void entries (std::vector<symbol>&) const;
+  void entries (std::set<symbol>&) const;
   int type_size (symbol tag) const;
   symbol dimension (symbol) const;
   symbol description (symbol) const;

@@ -25,6 +25,7 @@
 
 #include "symbol.h"
 #include <vector>
+#include <set>
 #include <memory>
 
 class AttributeList;
@@ -86,7 +87,7 @@ public:
   bool has_attribute (size_t i, const symbol name) const;
   double get_attribute (size_t i, const symbol name) const;
   symbol get_dimension (size_t i, const symbol name) const;
-  void append_attributes (size_t i, std::vector<symbol>& all) const;
+  void append_attributes (size_t i, std::set<symbol>& all) const;
 
   // Simulation.
 public:

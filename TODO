@@ -1,10 +1,6 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Svar Yo
-
 * Frame
-
-** Frame::entries skal inkludere parent entries.
 
 ** Integrer Syntax::check i Frame
 
