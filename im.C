@@ -29,7 +29,7 @@
 #include "am.h"
 #include "log.h"
 #include "block.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "check.h"
 #include "assertion.h"
 #include "frame.h"

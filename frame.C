@@ -22,6 +22,7 @@
 
 #include "frame.h"
 #include "frame_model.h"
+#include "frame_submodel.h"
 #include "syntax.h"
 #include "block.h"
 #include "assertion.h"
@@ -61,13 +62,22 @@ struct Frame::Implementation
 int
 Frame::Implementation::counter = 0;
 
+symbol 
+Frame::type_name () const
+{
+  if (parent ())
+    return parent ()->type_name ();
+  else
+    return Value::None ();
+}
+
 const Frame* 
 Frame::parent () const
 { return NULL; }
 
 static void describe_frame (const Frame& frame, std::ostream& out)
 {
-  out << frame.impl->count;
+  out << typeid (frame).name () << " " << frame.impl->count;
   if (frame.check ("type"))
     out << " type = " << frame.name ("type");
   if (frame.check ("base model"))
@@ -277,7 +287,7 @@ Frame::description (const symbol key) const
     return impl->syntax.description (key);
 }
 
-const Frame& 
+const FrameSubmodel& 
 Frame::default_frame (const symbol key) const
 {
   if (parent () && impl->syntax.lookup (key) == Value::Error)

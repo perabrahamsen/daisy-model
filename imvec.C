@@ -29,7 +29,7 @@
 #include "check.h"
 #include "block.h"
 #include "units.h"
-#include "frame.h"
+#include "frame_submodel.h"
 
 const std::vector<double>& 
 IMvec::get_array (symbol chem) const

@@ -164,6 +164,27 @@ Intrinsics::submodel_frame (const symbol name)
   return submodel_frame ((*i).second);
 }
 
+struct FrameSubmodelDeclared : public FrameSubmodel
+{
+  load_syntax_t load_syntax;
+
+  symbol type_name () const
+  { return Librarian::submodel_name (load_syntax); }
+
+  FrameSubmodelDeclared& clone () const
+  { return *new FrameSubmodelDeclared (*this, parent_clone); }
+
+  FrameSubmodelDeclared (const FrameSubmodelDeclared& parent, parent_clone_t)
+    : FrameSubmodel (parent, parent_clone),
+      load_syntax (parent.load_syntax)
+  { }
+      
+  FrameSubmodelDeclared (const load_syntax_t load)
+    : FrameSubmodel (load),
+      load_syntax (load)
+  { }
+};
+
 const FrameSubmodel& 
 Intrinsics::submodel_frame (const load_syntax_t load_syntax)
 {
@@ -177,7 +198,7 @@ Intrinsics::submodel_frame (const load_syntax_t load_syntax)
     return *(*i).second;
   
   // Create it.
-  FrameSubmodel *const frame = new FrameSubmodel (load_syntax);
+  FrameSubmodel *const frame = new FrameSubmodelDeclared (load_syntax);
   daisy_assert (frame);
   (*i).second = frame;
 

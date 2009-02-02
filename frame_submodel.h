@@ -26,6 +26,7 @@
 class FrameSubmodel : public Frame
 {
   // Create and Destroy.
+protected:
   FrameSubmodel (const FrameSubmodel&, parent_clone_t);
 public:
   FrameSubmodel (const FrameSubmodel&, parent_copy_t);
@@ -35,7 +36,7 @@ public:
   ~FrameSubmodel ();
 };
 
-class FrameSubmodelValue : public Frame
+class FrameSubmodelValue : public FrameSubmodel
 {
   mutable const Frame* parent_;
   const Frame* parent () const;
@@ -45,8 +46,8 @@ class FrameSubmodelValue : public Frame
   FrameSubmodelValue (const FrameSubmodelValue&, parent_clone_t);
 public:
   FrameSubmodelValue& clone () const;
-  FrameSubmodelValue (const Frame&, parent_copy_t);
-  FrameSubmodelValue (const Frame&, parent_link_t);
+  FrameSubmodelValue (const FrameSubmodel&, parent_copy_t);
+  FrameSubmodelValue (const FrameSubmodel&, parent_link_t);
   ~FrameSubmodelValue ();
 };
 

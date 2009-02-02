@@ -32,6 +32,7 @@
 #include "assertion.h"
 #include "librarian.h"
 #include "frame_model.h"
+#include "frame_submodel.h"
 #include "alist.h"
 #include <sstream>
 #include <fstream>

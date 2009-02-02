@@ -35,6 +35,7 @@ class Check;
 class VCheck;
 class Treelog;
 class Frame;
+class FrameSubmodel;
 
 class Syntax
 { 
@@ -71,7 +72,7 @@ public:
   const std::vector<symbol>& order () const;
   int order_index (symbol name) const; // Return index in order, or -1
   bool total_order () const;	// True iff all members are ordered.
-  const Frame& default_frame (symbol) const;
+  const FrameSubmodel& default_frame (symbol) const;
   symbol submodel_name (symbol) const;
 
   // Get a list of all entries.

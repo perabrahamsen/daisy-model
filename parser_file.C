@@ -1067,7 +1067,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 	      {
 		const size_t size = frame.type_size (name);
 		static const std::vector<const Frame*> no_sequence;
-		const Frame& default_frame = frame.default_frame (name);
+		const FrameSubmodel& default_frame = frame.default_frame (name);
 		const std::vector<const Frame*>& old_sequence
 		  = frame.check (name) 
 		  ? frame.frame_sequence (name) 

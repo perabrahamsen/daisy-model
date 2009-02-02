@@ -454,7 +454,7 @@ Syntax::total_order () const
   return impl->order.size () == non_logs; 
 }
 
-const Frame& 
+const FrameSubmodel& 
 Syntax::default_frame (const symbol key) const
 {
   Implementation::submodel_map::const_iterator i = impl->submodels.find (key);

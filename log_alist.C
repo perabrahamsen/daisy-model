@@ -25,7 +25,7 @@
 
 #include "log_alist.h"
 #include "library.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "assertion.h"
 #include <sstream>
 

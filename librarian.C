@@ -272,13 +272,19 @@ Librarian::~Librarian ()
 
 class FrameDeclared : public FrameModel
 {
+  const Declare& declaration;
+  symbol type_name () const
+  { return declaration.name; }
+  
 protected:
   FrameDeclared (const FrameDeclared& frame, parent_clone_t)
-    : FrameModel (frame, parent_clone)
+    : FrameModel (frame, parent_clone),
+      declaration (frame.declaration)
   { }
 public:
   explicit FrameDeclared (const Declare& declare)
-    : FrameModel (*declare.parent_model (), parent_copy)
+    : FrameModel (*declare.parent_model (), parent_copy),
+      declaration (declare)
   { declare.load (*this); }
 };
 

@@ -25,6 +25,7 @@
 
 class Frame;
 class FrameModel;
+class FrameSubmodel;
 class AttributeList;
 class PLF;
 class Block;
@@ -52,6 +53,7 @@ class EXPORT Frame : public WScope
   struct Implementation;
 public:
   std::auto_ptr<Implementation> impl;
+  virtual symbol type_name () const;
 
   // Parent.
 public:
@@ -94,7 +96,7 @@ public:
   symbol domain (const symbol) const;
   symbol range (const symbol) const;
   symbol description (const symbol) const;
-  const Frame& default_frame (const symbol) const;
+  const FrameSubmodel& default_frame (const symbol) const;
   symbol submodel_name (const symbol) const;
 
   // Add attribute types.
