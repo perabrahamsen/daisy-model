@@ -137,11 +137,22 @@ Frame::entries (std::set<symbol>& e) const
 
 bool 
 Frame::check (Block& block) const
-{ return check (block.metalib (), block.msg ()); }
+{ return check (block.metalib (), *this, block.msg ()); }
 
 bool 
 Frame::check (Metalib& metalib, Treelog& msg) const
-{ return impl->syntax.check (metalib, *this, msg); }
+{ return check (metalib, *this, msg); }
+
+bool 
+Frame::check (Metalib& metalib, const Frame& frame, Treelog& msg) const
+{ 
+  bool ok = true;
+  if (!impl->syntax.check (metalib, frame, msg))
+    ok = false;
+  if (parent () && !parent ()->check (metalib, frame, msg))
+    ok = false;
+  return ok;
+}
 
 void 
 Frame::check (const symbol key, double value) const
@@ -155,7 +166,17 @@ Frame::check (const symbol key, double value) const
 bool 
 Frame::check (Metalib& metalib, 
               const symbol key, Treelog& msg) const
-{ return impl->syntax.check (metalib, *this, key, msg); }
+{ return check (metalib, *this, key, msg); }
+
+bool 
+Frame::check (Metalib& metalib, const Frame& frame,
+              const symbol key, Treelog& msg) const
+{ 
+  if (parent () && impl->syntax.lookup (key) == Value::Error)
+    return parent ()->check (metalib, frame, key, msg);
+  else
+    return impl->syntax.check (metalib, frame, key, msg); 
+}
 
 bool 
 Frame::is_const (const symbol key) const
@@ -915,11 +936,12 @@ Frame::reset ()
 
 Frame::~Frame ()
 { 
-#if 0
   const size_t size = impl->children.size ();
-  std::ostringstream tmp;
   if (size != 0)
     {
+#if 0
+      std::ostringstream tmp;
+      tmp << "Reparenting children of ";
       describe_frame (*this, tmp);
       for (Implementation::child_set::const_iterator i
              = impl->children.begin ();
@@ -930,8 +952,9 @@ Frame::~Frame ()
           describe_frame (**i, tmp);
         }
       daisy_warning (tmp.str ());
-    }
 #endif
+      reparent_children (parent ());
+    }
 }
 
 // frame.C ends here.

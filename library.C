@@ -192,13 +192,6 @@ Library::Implementation::Implementation (const symbol n)
 
 Library::Implementation::~Implementation ()
 { 
-  // Clear dependencies.
-  for (frame_map::iterator i = frames.begin (); i != frames.end (); i++)
-    {
-      Frame& frame = *((*i).second);
-      frame.reparent_children (NULL);
-    }
-
   // Delete frames.
   map_delete (frames.begin (), frames.end ());
 }

@@ -73,12 +73,14 @@ public:
   // This function will check that the alist conform to the syntax.
   bool check (Block&) const;
   bool check (Metalib&, Treelog&) const;
+  bool check (Metalib&, const Frame& frame, Treelog&) const;
   
   // Check that a numeric value is within the allowed range.
   void check (const symbol key, double value) const;
 
   // Check than an arbitrary attribute is valid.
   bool check (Metalib&, const symbol key, Treelog&) const;
+  bool check (Metalib&, const Frame& frame, const symbol key, Treelog&) const;
 
   // Extract type information about a specific attribute.
   bool is_const (const symbol) const;
