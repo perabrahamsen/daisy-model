@@ -92,7 +92,7 @@ will take a look on the \daisy{} model that will be used to examine
 it, and the evolution of the model which will provide further context
 for the initialization problem.
 
-\section{Soil organic matter modeling with the \daisy{} model}
+\subsection{Evolution of the \daisy{} model}
 
 The organic matter model in \daisy{} simulates farming practice at
 field scale, both on the short and the long term. The \daisy{} code
@@ -120,30 +120,31 @@ the \textsc{smb} pools), and directions of flow. Thus, the model can
 be useful as a framework for experimentation with organic matter
 models.
 
-\subsection{Evolution of the organic matter model}
+The original organic matter model in \daisy{} \citep{daisy-def}
+defined a system with two pools of \textsc{som} and \textsc{smb}, and
+two pools of \textsc{aom} for each type of fertilizer applied and crop
+residues left on the field.  It has been modified twice.  The first
+modification is documented in \cite{mueller-smb}, and was an
+adjustment of the turnover rates of the \textsc{smb} pools so the
+biomass content of the soil matched the levels measured at the
+fields. The change did not affect the long time dynamics of the
+system.
 
-The original organic matter model in \daisy{} \citep{daisy-def} is
-depicted in Figure~\ref{fig:om1} which define a system with two pools
-of \textsc{som} and \textsc{smb}, and two pools of \textsc{aom} for
-each type of fertilizer applied and crop residues left on the field.
+The second change in parameterization is documented in
+\cite{daisy-somnew}. This was a complete recalibration that took into
+account the carbon input from rhizodepositions. This change was more
+radical, involving both turnover rates and directions of flow, and
+made the system much more adaptable to new levels of input, another
+effect which has also been observed empirically
+\citep{dk-humus-change}. The recalibration also introduced a new soil
+organic matter pool, the \textsc{som3} pool, which represents a
+deactivated, inert \textsc{som} pool of humified organic matter. The
+resulting model, which is the current standard organic matter model in
+\daisy{}, and is explained in the next section.
 
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=0.8\hsize]{om1}
+\subsection{Organic matter turnover in \daisy{}}
 
-  \caption{The original organic matter model in \daisy{}.}
-  \label{fig:om1}
-\end{figure}
-
-The amount of carbon turned over and decomposed is directly proportional with the size of the pool. We call this the \emph{turnover rate} by the soil microbial biomass. All the pools in figure~\ref{fig:om1} have a fully drawn outgoing line. From the \textsc{som1} pool the outgoing line is marked with the text ``703y''. This indicate the turnover rate of this particular pool and the number is the corresponding halftime (i.e. 703 years for the \textsc{som1} pool), which means that if there was no input to the pool, the pool would be half the original size after 703 years. For some pools this time is given in days, e.g.\ the \textsc{smb2} pool has a turnover halftime of 69 days.
-
-If we follow the line from \textsc{som1} it splits into two parts. 40\% is completely mineralized and lost as CO$_2$, the rest is allocated to the microbial biomass in the \textsc{smb1} pool. Considering the \textsc{som2} pool, we see that 90\% of the carbon not lost as CO$_2$, are allocated to the microbial biomass and the remaining 10\% ends up in \textsc{som1}. Besides a turnover rate, the two \textsc{smb} pools also have a maintenance rate. This rate reflects the cost of staying alive, and is indicated by a stippled line out of the \textsc{smb} pools. In general, the rates and even the number of \textsc{aom} pools are variable, the rates given here are just examples. Also, there can be many sets of added organic matter pools, each set corresponds to a particular fertilizer or residual with its specific parameters.
-
-The coefficients of the turnover rate and maintenance of the pools is affected by abiotic factors as clay content in the soil, soil temperature and moisture. The halftimes listed in Figure~\ref{fig:om1} corresponds to 0\% clay, 10$^\circ$C and field capacity (pF 2). The halftimes will increase with increasing clay content, decreasing
-temperature, or decreasing soil water content. Further information of the abiotic factors included in the organic matter model in \daisy{} is given in \cite{daisy-def}.
-
-The first such experimental change was made by \cite{mueller-smb}, who adjusted the turnover rates of the
-\textsc{smb} pools so the biomass content of the soil matched the levels measured at the fields. The change did not affect the long time dynamics of the system. The second change in parameterization was made by \cite{daisy-somnew}. This was a complete recalibration that took into account the carbon input from rhizodepositions. This change was more radical, involving both turnover rates and directions of flow, and made the system much more adaptable to new levels of input, another effect which has also been observed empirically \citep{dk-humus-change}. The recalibration also introduced a new soil organic matter pool, the \textsc{som3} pool, which represents a deactivated, inert \textsc{som} pool of humified organic matter. The resulting model, which is the current standard organic matter model in \daisy{}, is depicted in Figure~\ref{fig:om2}.
+The current standard organic matter model is depicted in Figure~\ref{fig:om2}.
 
 \begin{figure}[htbp]
   \centering
@@ -153,18 +154,111 @@ The first such experimental change was made by \cite{mueller-smb}, who adjusted 
   \label{fig:om2}
 \end{figure}
 
+The amount of carbon turned over and decomposed is directly
+proportional with the size of the pool. We call this the
+\emph{turnover rate} by the soil microbial biomass. All the pools in
+figure~\ref{fig:om2} have a fully drawn outgoing line. From the
+\textsc{som1} pool the outgoing line is marked with the text
+``44y''. This indicate the turnover rate of this particular pool and
+the number is the corresponding halftime (i.e. 44 years for the
+\textsc{som1} pool), which means that if there was no input to the
+pool, the pool would be half the original size after 44 years. For
+some pools this time is given in days, e.g.\ the \textsc{smb2} pool
+has a turnover halftime of 69 days.
+
+If we follow the line from \textsc{som1} it splits into two
+parts. 60\% is completely mineralized and lost as CO$_2$, the rest is
+allocated to the microbial biomass in the \textsc{smb1}
+pool. Considering the \textsc{som2} pool, we see that 70\% of the
+carbon not lost as CO$_2$, are allocated to the microbial biomass and
+the remaining 30\% ends up in \textsc{som1}. Besides a turnover rate,
+the two \textsc{smb} pools also have a maintenance rate. This rate
+reflects the cost of staying alive, and is indicated by a stippled
+line out of the \textsc{smb} pools. In general, the rates and even the
+number of \textsc{aom} pools are variable, the rates given here are
+just examples. Also, there can be many sets of added organic matter
+pools, each set corresponds to a particular fertilizer or residual
+with its specific parameters.
+
+The coefficients of the turnover rate and maintenance of the pools is
+affected by abiotic factors as clay content in the soil, soil
+temperature and moisture. The halftimes listed in Figure~\ref{fig:om2}
+corresponds to 0\% clay, 10$^\circ$C and field capacity (defined as 10
+hPa). The halftimes will increase with increasing clay content,
+decreasing temperature, or decreasing soil water content. Further
+information of the abiotic factors included in the organic matter
+model in \daisy{} is given in \cite{daisy-def}.
+
+\subsection{Evolution of the \daisy{} user base}
+
+The original development of \daisy{} was founded by the Danish
+Environmental Protection Agency \citep{daisy-def}, and the first
+non-research use was made by expert users who evaluated the national
+environmental plans for limiting nitrogen contamination of groundwater
+and surface water \citep{VMP}. Since then, \daisy{} has been used in
+other parts of the environmental and agricultural agencies \citep{MST,
+  novana} and increasingly by local authorities for evaluating
+regional plans \citep{novanastor} and for evaluation of applications
+for changed farm practice at an individual farm level
+\citep{plantinfo-daisy}. For the last case, \daisy{} has also been
+used by consulting agencies representing the farmers who wants to
+change farming practice.
+
+The effect of this increased use has been that the users is not only
+"experts". Therefore, a project was started in order to provide
+standardized procedures for \daisy{} simulations
+\citep{daisy-staabi}. As part of this project, most components of
+\daisy{} was evaluated in order to find parameters and submodels which
+could be initialized automatically from default values, or from other
+parameters. These parameters and submodels are still available to the
+expert user, but are hidden for the user who do not have the expertise
+or data available. The result is that the software now appears much
+simpler to the user, even though no substantial changes to the model
+have been made.
+
+Initialization of the partition of the organic matter into the various
+soil pools have been a particular stumbling block for most users
+partly because the partition does not reflect an easily identifiable
+property of the system being modeled. The first step of a new
+initialization procedure was conducted by \cite{daisy-init}. They
+found that the ratio between the \textsc{som1} and \textsc{som2} for a
+system in equilibrium would be 49\% vs 51\%. This recalibration
+required the users to readjust the partitioning between \textsc{som1}
+and \textsc{som2}. However, there was a strong tendency that the
+"non-experts" users just picked the equilibrium values.
+
 \subsection{Initializing the standard organic matter model}
-In \daisy{} the current standard to initialize the partition between the organic pools is to use an equilibrium assumption. There are two conditions where equilibrium is a good assumption: 1) when the system quickly reach equilibrium compared to the external imposed changes, or 2) when the dynamic of the system quickly dominate over the initial condition. The assumption of an initial equilibrium is good when a reasonable initial state is needed rather than a correct one. However, as depicted in the introduction the time to reach equilibrium in the soil organic matter system is measured in centuries and the long term simulations of organic matter dynamics are dependent on the initial amount of \textsc{som2}.
 
-The calibration of the current standard \daisy{} model is based primarily on measurements on agricultural topsoil \citep{daisy-somnew,mueller-smb}, where all the humus is presumed to be active. This means the calibration is not suitable for subsoils, nor for some humus-rich topsoils. The \textsc{som3} pool in Figure~\ref{fig:om2} exists to compensate for these shortcomings. The \textsc{som3} pool is inert and does not participate in the organic matter turnover. The inert humus still affects other aspects of \daisy{}, such as the hydraulic and adsorption properties of the soil. For the subsoil, it is assumed that the system is in equilibrium with the input, and park enough humus in the \textsc{som3} pool so that this assumption holds true. The observant reader will remember that we earlier argued that the equilibrium assumption is wrong. However, by definition the organic matter in the subsoil contributes relatively little to the total system so this assumption is good enough. For the topsoil, the user can explicitly put some of the humus in the \textsc{som3} pool, for instance for humus-rich topsoils.
+In \daisy{} the current standard to initialize the partition between
+the organic pools is to use an equilibrium assumption. There are two
+conditions where equilibrium is a good assumption: 1) when the system
+quickly reach equilibrium compared to the external imposed changes, or
+2) when the dynamic of the system quickly dominate over the initial
+condition. The assumption of an initial equilibrium is good when a
+reasonable initial state is needed rather than a correct one. However,
+as depicted in the introduction the time to reach equilibrium in the
+soil organic matter system is measured in centuries and the long term
+simulations of organic matter dynamics are dependent on the initial
+amount of \textsc{som2}.
 
-\subsection{Different users and expertise}
-The original development of \daisy{} was founded by the Danish Environmental Protection Agency \citep{daisy-def}, and the first non-research use was made by expert users who evaluated the national environmental plans for limiting nitrogen contamination of groundwater and surface water \citep{VMP}. Since then, \daisy{} has been used in
-other parts of the environmental and agricultural agencies \citep{MST, novana} and increasingly by local authorities for evaluating regional plans \citep{novanastor} and for evaluation of applications for changed farm practice at an individual farm level \citep{plantinfo-daisy}. For the last case, \daisy{} has also been used by consulting agencies representing the farmers who wants to change farming practice.
-
-The effect of this increased use has been that the users is not only "experts". Therefore, a project was started in order to provide standardized procedures for \daisy{} simulations \citep{daisy-staabi}. As part of this project, most components of \daisy{} was evaluated in order to find parameters and submodels which could be initialized automatically from default values, or from other parameters. These parameters and submodels are still available to the expert user, but are hidden for the user who do not have the expertise or data available. The result is that the software now appears much simpler to the user, even though no substantial changes to the model have been made.
-
-Initialization of the partition of the organic matter into the various soil pools have been a particular stumbling block for most users partly because the partition does not reflect an easily identifiable property of the system being modeled. The first step of a new initialization procedure was conducted by \cite{daisy-init}. They found that the ratio between the \textsc{som1} and \textsc{som2} for a system in equilibrium would be 49\% vs 51\%. This recalibration required the users to readjust the partitioning between \textsc{som1} and \textsc{som2}. However, there was a strong tendency that the "non-experts" users just picked the equilibrium values.
+The calibration of the current standard \daisy{} model is based
+primarily on measurements on agricultural topsoil
+\citep{daisy-somnew,mueller-smb}, where all the humus is presumed to
+be active. This means the calibration is not suitable for subsoils,
+nor for some humus-rich topsoils. The \textsc{som3} pool in
+Figure~\ref{fig:om2} exists to compensate for these shortcomings. The
+\textsc{som3} pool is inert and does not participate in the organic
+matter turnover. The inert humus still affects other aspects of
+\daisy{}, such as the hydraulic and adsorption properties of the
+soil. For the subsoil, it is assumed that the system is in equilibrium
+with the input, and park enough humus in the \textsc{som3} pool so
+that this assumption holds true. The observant reader will remember
+that we earlier argued that the equilibrium assumption is
+wrong. However, by definition the organic matter in the subsoil
+contributes relatively little to the total system so this assumption
+is good enough. For the topsoil, the user can explicitly put some of
+the humus in the \textsc{som3} pool, for instance for humus-rich
+topsoils.
 
 \section{Methodology}
 

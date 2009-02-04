@@ -703,7 +703,6 @@ AM::create (Metalib& metalib, const Geometry& geo, const Time& now,
 {
   const Library& library = metalib.library (AM::component);
   FrameModel frame (library.model ("state"), Frame::parent_copy);
-  frame.alist ().add ("type", "state");
   frame.add ("initialized", true);
   frame.add ("name", sort + "/" + part);
   frame.add ("om", ol);

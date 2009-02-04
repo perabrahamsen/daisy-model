@@ -748,8 +748,7 @@ Frame::add (const symbol key, const symbol name)
       const Intrinsics& intrinsics = Librarian::intrinsics ();
       intrinsics.instantiate (component, name);
       const FrameModel& old = intrinsics.library (component).model (name);
-      FrameModel child (old, parent_copy);
-      child.alist ().add ("type", name);
+      FrameModel child (old, parent_link);
       impl->alist.add (key, child);
       return;
     }
@@ -813,9 +812,8 @@ Frame::add (const symbol key, const std::vector<symbol>& value)
         {
           const symbol name = value[i];
           intrinsics.instantiate (component, name);
-          Frame& frame = intrinsics.library (component).model (name).clone ();
-          frame.alist ().add ("type", name);
-          frames.push_back (&frame);
+          const FrameModel& old = intrinsics.library (component).model (name);
+          frames.push_back (new FrameModel (old, parent_link));
         }
       impl->alist.add (key, frames);
       return;

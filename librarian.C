@@ -171,10 +171,7 @@ Librarian::build_stock (const symbol component, Metalib& metalib,
           << type << "'";
       daisy_panic (tmp.str ());
     }
-  const FrameModel& frame_model = lib.model (type);
-  FrameModel frame (frame_model, FrameModel::parent_copy);
-  frame.alist ().add ("type", type);
- 
+  const FrameModel& frame = lib.model (type);
   return build_frame (component, metalib, msg, frame, scope_id + ": " + type);
 }
 
@@ -442,7 +439,6 @@ void
 DeclareParam::load (Frame& frame) const
 {
   frame.alist ().add ("description", description);
-  frame.alist ().add ("type", super);
   load_frame (frame);
 }
 
