@@ -92,7 +92,7 @@ Source::distance (const Time begin, const Time end,
 }
 
 Source::Source (Block& al)
-  : name (al.name ("type"))
+  : name (al.type_name ())
 { }
 
 Source::~Source ()

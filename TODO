@@ -1,10 +1,32 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* organic.txt
+
+** Indledning
+
+Vi skal have mere om modeluafhængighed og "intuitive" tal ind i
+indledning.  Ellers skal evolutionsdelen ud.
+
+** Ligninger
+
+Vi skal evt nøjes med basisligningerne (4 + total), og så tage hver
+initialiseringsrutine derfra.
+
 * Frame
 
-** Fjern "type", "base_model", attributes.
+** Lexer::Position -> position.h
 
-Tænk over brug af "description".  Hvad med cite?
+** FrameParsed -> frame_parsed.h
+
+** Erstat "parsed_from_file" og "parsed_sequence" med FrameParsed
+
+am.C er et sted.
+
+** Fjern "type", "base_model"
+
+** Fjern brug af "submodel"
+
+** Fjern brug af "description" og "cite"
 
 ** Fjern al brug af alist of udenfor frame
 

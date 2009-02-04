@@ -72,9 +72,11 @@ Log::check_entry (symbol name, const char *const component) const
     {
       if (library.check (name))
 	{
-	  const AttributeList& alist = library.lookup (name);
-	  if (alist.check ("type"))
-	    name = alist.name ("type");
+	  const Frame& frame = library.frame (name);
+          const symbol base = frame.base_name ();
+          daisy_assert (base != name);
+	  if (base != Value::None ())
+	    name = frame.type_name ();
 	  else
 	    looking = false;
 	}

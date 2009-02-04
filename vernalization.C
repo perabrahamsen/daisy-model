@@ -39,7 +39,7 @@ Vernalization::library_id () const
 }
 
 Vernalization::Vernalization (Block& al)
-  : ModelLogable (al.name ("type"))
+  : ModelLogable (al.type_name ())
 { }
 
 Vernalization::~Vernalization ()

@@ -150,7 +150,7 @@ Librarian::build_frame (const symbol component, Metalib& metalib,
   
   // Build.
   Block parent (metalib, msg, frame, scope_id);
-  const symbol type = frame.name ("type");
+  const symbol type = frame.type_name ();
   std::auto_ptr<Model> m (frame.construct (parent, type)); 
   if (!parent.ok ())
     return NULL;

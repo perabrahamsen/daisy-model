@@ -918,14 +918,14 @@ bool
 AM::is_mineral (Metalib& metalib, const FrameModel& am)
 { 
   Library& library = metalib.library (component);
-  return library.is_derived_from (am.name ("type"), "mineral");
+  return library.is_derived_from (am.type_name (), "mineral");
 }
 
 bool 
 AM::is_organic (Metalib& metalib, const FrameModel& am)
 { 
   Library& library = metalib.library (component);
-  return library.is_derived_from (am.name ("type"), "organic");
+  return library.is_derived_from (am.type_name (), "organic");
 }
 
 AM::AM (Block& al)
@@ -935,7 +935,7 @@ AM::AM (Block& al)
            al.check ("creation")
 	   ? Time (al.alist ("creation"))
 	   : Time (1, 1, 1, 1),
-           al.check ("name") ? al.name ("name") : al.name ("type"),
+           al.check ("name") ? al.name ("name") : al.type_name (),
 	   Librarian::build_vector<AOM> (al, "om")))
 {
   if (al.check ("lock"))
@@ -1335,12 +1335,9 @@ struct ProgramAM_table : public Program
         const symbol name = *i;
         daisy_assert (library.check (name));
         const Frame& frame = library.model (name);
+        daisy_assert (frame.type_name () == name);
         // const Syntax& syntax = library.syntax (name);
-        static const symbol buildin ("build-in");
-        const symbol super = frame.check ("type") 
-          ? frame.name ("type")
-          : buildin;
-        tmp << name << "\t" << super << "\t";
+        tmp << name << "\t" << frame.base_name () << "\t";
         if (frame.check ("parsed_from_file"))
           tmp << frame.name ("parsed_from_file");
         tmp << "\t";

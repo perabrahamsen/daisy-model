@@ -54,7 +54,7 @@ Phenology::mature () const
 { return DS >= 2.0; }
 
 Phenology::Phenology (Block& al)
-  : ModelLogable (al.name ("type")),
+  : ModelLogable (al.type_name ()),
     // State.
     DAP (al.number ("DAP")),
     DS (al.number ("DS")),

@@ -48,7 +48,7 @@ Stringer::title () const
 { return name.name (); }
 
 Stringer::Stringer (Block& al)
-  : name (al.name ("type"))
+  : name (al.type_name ())
 { }
 
 Stringer::~Stringer ()

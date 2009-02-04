@@ -35,7 +35,7 @@ RubiscoNdist::library_id () const
 }
 
 RubiscoNdist::RubiscoNdist (Block& al)
-  : ModelLogable (al.name ("type"))
+  : ModelLogable (al.type_name ())
 { }
 
 RubiscoNdist::~RubiscoNdist ()

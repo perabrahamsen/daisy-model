@@ -51,7 +51,7 @@ Adsorption::Adsorption (const char *const type)
 { }
 
 Adsorption::Adsorption (Block& al)
-  : ModelLogable (al.name ("type"))
+  : ModelLogable (al.type_name ())
 { }
 
 Adsorption::~Adsorption ()

@@ -292,7 +292,7 @@ static const class SOM_fractions_check_type : public VCheck
 } SOM_fractions_check;
 
 Horizon::Horizon (Block& al)
-  : ModelLogable (al.name ("type")),
+  : ModelLogable (al.type_name ()),
     impl (new Implementation (al)),
     fast_clay (-42.42e42),
     fast_humus (-42.42e42),
@@ -350,7 +350,7 @@ properties.")
 
     daisy_assert (al.check ("hydraulic"));
     const Frame& hydraulic = al.frame ("hydraulic");
-    if (hydraulic.name ("type") == "hypres"
+    if (hydraulic.type_name () == "hypres"
         && !al.check ("dry_bulk_density"))
       {
         err.entry ("\

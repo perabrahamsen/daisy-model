@@ -115,17 +115,12 @@ Library::Implementation::add_ancestors (const symbol key)
 
       const Frame& frame = this->frame (current);
 
-      symbol next;
-
-      if (frame.check ("type"))
-	next = frame.name ("type");
-      else if (frame.check ("base_model"))
-	next = frame.name ("base_model");
-      else
+      symbol next = frame.base_name ();
+      
+      if (next == Value::None ())
 	break;
 
-      if (next == current)
-	break;
+      daisy_assert (next != current);
 
       current = next;
     }
@@ -135,6 +130,9 @@ Library::Implementation::add_ancestors (const symbol key)
 void
 Library::Implementation::add_model (const symbol key, FrameModel& frame)
 {
+  if (frame.type_name () != key)
+    daisy_panic ("Adding frame named " + frame.type_name () + " under the name "
+                 + key + ", type " + typeid (frame).name ());
   frames[key] = &frame;
   add_ancestors (key);
 }
@@ -152,7 +150,11 @@ Library::Implementation::entries (std::vector<symbol>& result) const
 
 void
 Library::Implementation::remove (const symbol key)
-{ frames.erase (frames.find (key)); }
+{ 
+  const frame_map::iterator i = frames.find (key);
+  delete (*i).second;
+  frames.erase (i); 
+}
 
 void
 Library::Implementation::clear_parsed ()
@@ -264,14 +266,16 @@ Library::is_derived_from (const symbol a, const symbol b) const
   if (a == b)
     return true;
 
-  const AttributeList& al = lookup (a);
+  const FrameModel& frame = this->model (a);
+  if (frame.type_name () != a)
+    daisy_panic ("'" + a + "' in library present itself as a '" 
+                 + frame.type_name () + "', maybe because it is a "
+                 + typeid (frame).name ());
 
-  if (!al.check ("type") && !al.check ("base_model"))
+  const symbol type = frame.base_name ();
+
+  if (type == Value::None ())
     return false;
-
-  const symbol type = al.check ("type") 
-    ? al.name ("type") 
-    : al.name ("base_model");
 
   if (type == b)
     return true;
@@ -281,7 +285,7 @@ Library::is_derived_from (const symbol a, const symbol b) const
                  + "', rather than '" + b + "'");
 
   if (type == a)
-    return false;
+    daisy_panic ("'" + a + "' is derived from itself");
 
   return is_derived_from (type, b);
 }
@@ -289,14 +293,13 @@ Library::is_derived_from (const symbol a, const symbol b) const
 const symbol
 Library::base_model (const symbol parameterization) const
 {
-  const AttributeList& al = lookup (parameterization);
+  const FrameModel& al = this->model (parameterization);
 
-  if (al.check ("type"))
-    return base_model (al.name ("type"));
-  if (al.check ("base_model")
-      && al.name ("base_model") != parameterization)
-    return  base_model (al.name ("base_model"));
-
+  const symbol base = al.base_name ();
+  daisy_assert (base != parameterization);
+  if (base != Value::None ())
+    return base_model (base);
+  
   return parameterization;
 }
 
@@ -308,11 +311,11 @@ Library::has_interesting_description (const Frame& frame) const
     return false;
   
   // The description of models are always interesting.
-  if (!frame.check ("type"))
+  if (frame.base_name () == Value::None ())
     return true;
   
   // If the model has no description, this one is interesting.
-  const symbol type = frame.name ("type");
+  const symbol type = frame.type_name ();
   if (!check (type))
     {
       daisy_bug (name () + " does not have " + type.name ());
@@ -351,8 +354,12 @@ Library::clone () const
   for (Implementation::frame_map::const_iterator i = impl->frames.begin ();
        i != impl->frames.end ();
        i++)
+#if 1
     lib->impl->frames[(*i).first] = new FrameModel (*(*i).second, 
                                                     FrameModel::parent_copy);
+#else
+    lib->impl->frames[(*i).first] = &(*i).second->clone ();
+#endif
   lib->impl->doc_funs = impl->doc_funs;
   lib->impl->ancestors = impl->ancestors;
   return lib;

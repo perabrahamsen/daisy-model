@@ -234,7 +234,7 @@ ParserFile::Implementation::get_integer ()
   std::auto_ptr<FrameModel> frame = load_object (lib, true, NULL);
   if (!frame.get ())
     return -42;
-  const symbol obj = frame->name ("type");
+  const symbol obj = frame->type_name ();
   // Check for completness.
   TreelogString treelog;
   Treelog::Open nest (treelog, obj);
@@ -339,7 +339,7 @@ ParserFile::Implementation::get_number (const symbol syntax_dim)
   std::auto_ptr<FrameModel> frame = load_object (lib, true, NULL);
   if (!frame.get ())
     return -42.42e42;
-  const symbol obj = frame->name ("type");
+  const symbol obj = frame->type_name ();
   // Check for completness.
   TreelogString treelog;
   Treelog::Open nest (treelog, obj);
@@ -513,6 +513,45 @@ ParserFile::Implementation::check_value (const Frame& frame,
     }
 }
 
+class FrameParsed : public FrameModel
+{
+  // Content.
+private:
+  const symbol name;
+  symbol type_name () const
+  { return name; }
+public:
+  const int seq_id;
+  const symbol file;
+  const Lexer::Position position;
+
+  // Create and Destroy.
+private:
+  FrameParsed (const FrameParsed& parent, parent_clone_t)
+    : FrameModel (parent, parent_clone),
+      name (parent.name),
+      seq_id (parent.seq_id),
+      file (parent.file),
+      position (parent.position)
+  { }
+  FrameParsed& clone () const
+  { return *new FrameParsed (*this, parent_clone); }
+
+public:
+  FrameParsed (const symbol name_, const FrameModel& model, const int seq_id_,
+               const symbol file_, const Lexer::Position position_)
+    : FrameModel (model, parent_copy),
+      name (name_),
+      seq_id (seq_id_),
+      file (file_),
+      position (position_)
+  { 
+    this->alist ().add ("parsed_from_file", file);
+    this->alist ().add ("parsed_sequence", seq_id);
+    this->alist ().add ("type", model.type_name ());
+  }
+};
+
 void
 ParserFile::Implementation::add_derived (Library& lib)
 {
@@ -543,20 +582,18 @@ ParserFile::Implementation::add_derived (Library& lib)
       skip_to_end ();
       return;
     }
-  std::auto_ptr<FrameModel> frame (new FrameModel (lib.model (super), 
-                                                   Frame::parent_copy));
+  std::auto_ptr<FrameModel> frame (new FrameParsed (name, lib.model (super), 
+                                                    metalib.get_sequence (),
+                                                    file, lexer->position ()));
   if (!frame.get ())
     throw "Failed to derive";
-
-  // Remember where we got this object.
-  frame->alist ().add ("parsed_from_file", file);
-  frame->alist ().add ("parsed_sequence", metalib.get_sequence ());
 
   // Doc string.
   daisy_assert (!frame->ordered () 
                 || frame->order ().begin () != frame->order ().end ());
   if ((!frame->ordered () 
-       || frame->lookup (*(frame->order ().begin ())) != Value::String) 
+       || (frame->lookup (*(frame->order ().begin ())) != Value::String
+           && frame->lookup (*(frame->order ().begin ())) != Value::Object)) 
       && looking_at ('"'))
     frame->alist ().add ("description", get_string ());
 
@@ -564,7 +601,6 @@ ParserFile::Implementation::add_derived (Library& lib)
   Treelog::Open nest (msg, "Defining " + lib.name () + " '" + name + "'");
   load_list (*frame);
   // Add new object to library.
-  frame->alist ().add ("type", super);
   lib.add_model (name, *frame.release ());
 
   // Inform metalib.
@@ -624,8 +660,7 @@ ParserFile::Implementation::load_object (const Library& lib, bool in_sequence,
       // Special hack to allow skipping the "original" keyword for
       // models that used to be submodels.
       daisy_assert (original->flag (compatibility_symbol));
-      daisy_assert (original->check ("type"));
-      const symbol original_type = original->name ("type");
+      const symbol original_type = original->type_name ();
       daisy_assert (lib.check (original_type));
 
       type = original_symbol;
@@ -648,8 +683,7 @@ ParserFile::Implementation::load_object (const Library& lib, bool in_sequence,
 	  if (!original)
 	    throw (std::string ("No original value"));
 	  result.reset (&original->clone ());
-	  daisy_assert (result->check ("type"));
-	  type = result->name ("type");
+	  type = result->type_name ();
 	  daisy_assert (lib.check (type));
 	}
       else if (!lib.check (type))

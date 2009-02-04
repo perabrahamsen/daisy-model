@@ -47,7 +47,7 @@ MUnit::create_convertion (const Unit&) const
 { return NULL; }
 
 MUnit::MUnit (Block& al, const symbol base)
-  : name (al.name ("type")),
+  : name (al.type_name ()),
     base_name_ (base)
 { }
 
@@ -642,7 +642,7 @@ struct UnitBase : public MUnit
   { return true; }
 
   UnitBase (Block& al)
-    : MUnit (al, al.name ("type"))
+    : MUnit (al, al.type_name ())
   { }
 };
 

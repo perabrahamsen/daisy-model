@@ -1,4 +1,4 @@
-\documentclass[a4paper]{article}
+\documentclass[a4paper,12pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[latin1]{inputenc}
 \usepackage{hyperref}
@@ -22,32 +22,110 @@
 \maketitle
 
 \begin{abstract}
-  Organic matter models using multiple pools for soil biomass and soil organic matter have proved able to simulate both short term and long term change in humus content of agricultural soil. However, these pools do not correspond to measurable physical quantities, and are therefore difficult for a non-expert to understand and use. To initialize
-  these pools it is often assumed that organic matter is in a state of equilibrium. Unfortunately, the time to reach equilibrium is often measured in centuries. Therefore the use of a warm-up period cannot replace the need for a good initial partitioning. In this paper we propose a milder assumption, namely a quasi-equilibrium where all except for the slowest pool is in equilibrium with the amount of carbon input. This assumption allows the non-expert user to initialize the model, and is robust with regard to model changes. The two mandatory input parameters are need, the total organic matter in the soil and the average yearly carbon input in the recent decades to the system. The amount of total organic matter is directly measurable and the carbon input can be estimated by the user by use of \daisy{} simulations.
+  Organic matter models using multiple pools for soil biomass and soil
+  organic matter have proved able to simulate both short term and long
+  term change in humus content of agricultural soil. However, these
+  pools do not correspond to measurable physical quantities, and are
+  therefore difficult for a non-expert to understand and use. To
+  initialize these pools it is often assumed that organic matter is in
+  a state of equilibrium. Unfortunately, the time to reach equilibrium
+  is often measured in centuries. Therefore the use of a warm-up
+  period cannot replace the need for a good initial partitioning. In
+  this paper we propose a milder assumption, namely a
+  quasi-equilibrium where all except for the slowest pool is in
+  equilibrium with the amount of carbon input. This assumption allows
+  the non-expert user to initialize the model, and is robust with
+  regard to model changes.  We compare the initialization resulting
+  from the equilibrium and the quasi-equilibrium with long term
+  dynamic simulations, and discuss where each method is most
+  applicable.
 \end{abstract}
 
 \tableofcontents
 
 \section{Introduction}
-Weather-driven simulation modeling has become an important component of studies of soil nutrients and carbon balances in relation to soil quality, environmental impact, and climate change. In relation to carbon balances, organic matter in soil comprises a large C storage of terrestrial C which may change with change in soil use and climate \citep{Levy, modClima, Cclima, CmodClima} affecting the emission of green house gasses, soil quality, and crop production.
 
-In numeric models, it is conventional and very used to divide the soil organic matter (\textsc{som}) into several fractions (e.g. references listed in \cite{orgReviw} and \cite{CNmodels}). These fractions may be further divided into smaller pools, where the content of each pool have uniform properties (e.g. similar turnover rate and C/N ratio). The dynamics of the modeled system general consist of input in form of new added organic matter (fertilizer, manure, crop residues) and turnover driven by the soil biomass.
+Weather-driven simulation modeling has become an important component
+of studies of soil nutrients and carbon balances in relation to soil
+quality, environmental impact, and climate change. In relation to
+carbon balances, organic matter in soil comprises a large storage of
+terrestrial carbon, which may change with change with soil use and
+climate \citep{Levy, modClima, Cclima, CmodClima} affecting the
+emission of green house gasses, soil quality, and crop production.
 
-A major problem in most organic matter models is to estimate the soil content of the very slowly decomposing or perhaps even inert organic matter pool \citep{biomod, daisy-init}. No techniques have facilitated a clear separation of resistant \textsc{som} and active \textsc{som}, and therefore the precise resistant \textsc{som} fraction can not be estimated. To initialize these pools it is often assumed that organic matter is in a state of equilibrium \citep{orgEq}. Unfortunately, the time to reach equilibrium is often measured in centuries \citep{non-equilibrium} and long-term simulations of \textsc{som} dynamics are dependent on the initial amount of resistant organic matter. Therefore an objective, user friendly and reliable initialization procedure of resistant \textsc{som} and active \textsc{som} is still needed.
+In numeric models, it is common to divide the organic matter in the
+soil into several compartments \citep{orgReviw, CNmodels}, such as
+recentrly added organic matter (\textsc{aom}), soil microbiomass
+(\textsc{smb}), and organic matter that can no longer be traced back
+to its origin (\textsc{som}). These compartments may be further
+divided into smaller pools, where the content of each pool have
+uniform properties, such as turnover rate and C/N ratio. In general,
+having two \textsc{som} and two \textsc{smb} pools allows a well
+calibrated model to capture both the short term \citep{twoPoolFast}
+and long term \citep{twoPoolLong} dynamics of the system. The number
+of \textsc{aom} pools depends on the simulating system. For batch
+experiments and some long time scenarios, a single \textsc{aom} pool
+may be enough. However, to simulate input sources from a farming
+system, a fast and a slow \textsc{aom} pools per source are in general
+needed. The dynamics of the modeled system tupically consist of input
+in form of new added organic matter (fertilizer, manure, crop
+residues) and turnover driven by the soil biomass.
 
-In this paper a milder assumption is tested, a quasi-equilibrium where all except for the slow, most resistant pool is in equilibrium with the carbon input. This assumption allows the non-expert user to initialize the model, and is robust with regard to model changes.
+A major problem in most organic matter models is to estimate the soil
+content of the very slowly decomposing or perhaps even inert organic
+matter pool \citep{biomod, daisy-init}. No techniques have facilitated
+a clear separation of resistant \textsc{som} and active \textsc{som},
+and therefore the precise resistant \textsc{som} fraction can not be
+estimated. To initialize these pools it is often assumed that organic
+matter is in a state of equilibrium \citep{orgEq}. Unfortunately, the
+time to reach equilibrium is often measured in centuries
+\citep{non-equilibrium} and long-term simulations of \textsc{som}
+dynamics are dependent on the initial amount of resistant organic
+matter.  In this paper a milder assumption is tested, a
+quasi-equilibrium where all except for the slow, most resistant pool
+is in equilibrium with the carbon input. This assumption allows the
+non-expert user to initialize the model, and is robust with regard to
+model changes.
 
-Daisy - små tidsskridt, kort tidshorisont (høst og N-udvaskning) CO2 fluxe. Vejr (drivende variable) meget dynamisk indefor året og mellem år.
-Hypotese: at vi kan initialiserer fordelingen af C mellem SOM puljer i en meget dynamisk model med en statisk model.
+Before delving into the equations behind the quasi-equilibrium, we
+will take a look on the \daisy{} model that will be used to examine
+it, and the evolution of the model which will provide further context
+for the initialization problem.
 
+\section{Soil organic matter modeling with the \daisy{} model}
 
-\section{Soil organic matter modeling with the DAISY model}
+The organic matter model in \daisy{} simulates farming practice at
+field scale, both on the short and the long term. The \daisy{} code
+\citep{daisy-def, daisy-fertilizer, daisy-ems} has been validated at
+several occasions \citep{CNmodels} and has been one of the most
+accurate in particular with regard to both short and long term
+predictions of soil organic matter \citep{vereecken91-compar,
+  willigen91-compar, diekkruger95-compar, smith97-compar}. Apart from
+soil organic matter, \daisy{} also simulates a number of other
+processes outside the scope of this article, such as water, heat and
+nitrogen dynamics in the soil, as well as bioclimate, crop development
+and management.
 
-The organic matter model in \daisy{} simulates farming practice at field scale, both on the short and the long term. The \daisy{} code \citep{daisy-def, daisy-fertilizer, daisy-ems} has been validated at several occasions \citep{CNmodels} and has been one of the most accurate in particular with regard to both short and long term predictions of soil organic matter \citep{vereecken91-compar, willigen91-compar, diekkruger95-compar, smith97-compar}. Apart from soil organic matter, \daisy{} also simulates a number of other processes outside the scope of this article, such as water, heat and nitrogen dynamics in the soil, as well as bioclimate, crop development and management.
+The organic matter in \daisy{} comprise three compartments: 1) the
+\emph{added organic matter} (\textsc{aom}) which for a cultivated soil
+may include organic fertilizer, crop residuals, including
+rhizodeposition and dead leaves incorporated to the soil by
+earthworms. 2) The \emph{soil microbial biomass} (\textsc{smb}), the
+living part of the organic matter, excluding roots. 3) Soil humus or
+\emph{soil organic matter} (\textsc{som}), which can no longer be
+traced back to its origin.  The \daisy{} software allows each
+compartment to be divided into a user specified number of pools, as
+well as adjusting the turnover rates, the rates of maintenance (for
+the \textsc{smb} pools), and directions of flow. Thus, the model can
+be useful as a framework for experimentation with organic matter
+models.
 
-\subsection{Development of the organic matter model{}}
+\subsection{Evolution of the organic matter model}
 
-The organic matter in \daisy{} comprise of three fractions: 1) the \emph{added organic matter} (\textsc{aom}) which for a cultivated soil may include organic fertilizer, crop residuals, including rhizodeposition and dead leaves incorporated to the soil by earthworms. 2) The \emph{soil microbial biomass} (\textsc{smb}), the living part of the organic matter, excluding roots. 3) Soil humus or \emph{soil organic matter} (\textsc{som}), which can no longer be traced back to its origin. In general, having two \textsc{som} and two \textsc{smb} pools allows a well calibrated model to capture both the short term \citep{twoPoolFast} and long term \citep{twoPoolLong} dynamics of the system. The number of \textsc{aom} pools depends on the simulating system. For batch experiments and some long time scenarios, a single \textsc{aom} pool may be enough. However, to simulate input sources from a farming system, a fast and a slow \textsc{aom} pools per source are in general needed. The original organic matter model in \daisy{} \citep{daisy-def} is depicted in Figure~\ref{fig:om1} which define a system with two pools of \textsc{som} and \textsc{smb}, and two pools of \textsc{aom} for each type of fertilizer applied and crop residues left on the field.
+The original organic matter model in \daisy{} \citep{daisy-def} is
+depicted in Figure~\ref{fig:om1} which define a system with two pools
+of \textsc{som} and \textsc{smb}, and two pools of \textsc{aom} for
+each type of fertilizer applied and crop residues left on the field.
 
 \begin{figure}[htbp]
   \centering
@@ -63,8 +141,6 @@ If we follow the line from \textsc{som1} it splits into two parts. 40\% is compl
 
 The coefficients of the turnover rate and maintenance of the pools is affected by abiotic factors as clay content in the soil, soil temperature and moisture. The halftimes listed in Figure~\ref{fig:om1} corresponds to 0\% clay, 10$^\circ$C and field capacity (pF 2). The halftimes will increase with increasing clay content, decreasing
 temperature, or decreasing soil water content. Further information of the abiotic factors included in the organic matter model in \daisy{} is given in \cite{daisy-def}.
-
-The \daisy{} software allows the user to adjust the turnover rates, the rates of maintenance, and directions of flow. It also allows the user to specify the number of \textsc{som} and \textsc{smb} pools, as well as the number of \textsc{aom} pools for each fertilizer application and each crop residual type. Thus, the model provides a good basis for experimentation at a scientific level.
 
 The first such experimental change was made by \cite{mueller-smb}, who adjusted the turnover rates of the
 \textsc{smb} pools so the biomass content of the soil matched the levels measured at the fields. The change did not affect the long time dynamics of the system. The second change in parameterization was made by \cite{daisy-somnew}. This was a complete recalibration that took into account the carbon input from rhizodepositions. This change was more radical, involving both turnover rates and directions of flow, and made the system much more adaptable to new levels of input, another effect which has also been observed empirically \citep{dk-humus-change}. The recalibration also introduced a new soil organic matter pool, the \textsc{som3} pool, which represents a deactivated, inert \textsc{som} pool of humified organic matter. The resulting model, which is the current standard organic matter model in \daisy{}, is depicted in Figure~\ref{fig:om2}.
@@ -282,6 +358,10 @@ De årlige fluktioner i vejret kan vi godt ignorerer og stadig få et rimeligt god
 \bibliography{../daisy}
 
 \end{document}
+
+Daisy - små tidsskridt, kort tidshorisont (høst og N-udvaskning) CO2 fluxe. Vejr (drivende variable) meget dynamisk indefor året og mellem år.
+Hypotese: at vi kan initialiserer fordelingen af C mellem SOM puljer i en meget dynamisk model med en statisk model.
+
 
 %%% Local Variables:
 %%% mode: latex

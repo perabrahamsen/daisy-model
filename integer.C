@@ -45,7 +45,7 @@ Integer::title () const
 { return name.name (); }
 
 Integer::Integer (Block& al)
-  : name (al.name ("type"))
+  : name (al.type_name ())
 { }
 
 Integer::~Integer ()

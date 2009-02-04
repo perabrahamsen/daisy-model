@@ -51,7 +51,7 @@ Depth::library_id () const
 }
 
 Depth::Depth (Block& al)
-  : name (al.name ("type"))
+  : name (al.type_name ())
 { }
 
 Depth::Depth (const symbol n)

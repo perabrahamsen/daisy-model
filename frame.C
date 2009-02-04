@@ -67,40 +67,34 @@ Frame::type_name () const
 {
   if (parent ())
     return parent ()->type_name ();
-  else
-    return Value::None ();
+
+  return Value::None ();
+}
+
+symbol 
+Frame::base_name () const
+{
+  const symbol my_name = this->type_name ();
+
+  for (const Frame* f = this->parent (); f != NULL; f = f->parent ())
+    {
+      const symbol base_name = f->type_name ();
+      if (base_name != my_name)
+        return base_name;
+    }
+  return Value::None ();
 }
 
 const Frame* 
 Frame::parent () const
 { return NULL; }
 
-static void describe_frame (const Frame& frame, std::ostream& out)
-{
-  out << typeid (frame).name () << " " << frame.impl->count;
-  if (frame.check ("type"))
-    out << " type = " << frame.name ("type");
-  if (frame.check ("base model"))
-    out << " base_model = " << frame.name ("base_model");
-  if (frame.check ("submodel"))
-    out << " submodel = " << frame.name ("submodel");
-}
-
 void 
 Frame::register_child (const Frame* child) const
 { 
   daisy_assert (child != this);
-  if (impl->children.find (child) != impl->children.end ())
-    {
-      std::ostringstream tmp;
-      tmp << "Dual definition of frame ";
-      describe_frame (*child, tmp);
-      tmp << " in ";
-      describe_frame (*this, tmp);
-      daisy_warning (tmp.str ());
-    }
-  else
-    impl->children.insert (child); 
+  daisy_assert (impl->children.find (child) == impl->children.end ());
+  impl->children.insert (child); 
 }
 
 void 
@@ -240,6 +234,15 @@ Frame::library (Metalib& metalib, const symbol key) const
     return parent ()->library (metalib, key);
   else
     return impl->syntax.library (metalib, key);
+}
+
+symbol
+Frame::component (const symbol key) const
+{
+  if (parent () && impl->syntax.lookup (key) == Value::Error)
+    return parent ()->component (key);
+  else
+    return impl->syntax.component (key);
 }
 
 int  
@@ -741,7 +744,7 @@ Frame::add (const symbol key, const symbol name)
   if (lookup (key) == Value::Object)
     {
       verify (key, Value::Object);
-      const symbol component = impl->syntax.component (key);
+      const symbol component = this->component (key);
       const Intrinsics& intrinsics = Librarian::intrinsics ();
       intrinsics.instantiate (component, name);
       const FrameModel& old = intrinsics.library (component).model (name);
@@ -803,7 +806,7 @@ Frame::add (const symbol key, const std::vector<symbol>& value)
   if (lookup (key) == Value::Object)
     {
       verify (key, Value::Object, value.size ());
-      const symbol component = impl->syntax.component (key);
+      const symbol component = this->component (key);
       const Intrinsics& intrinsics = Librarian::intrinsics ();
       auto_vector<const Frame*> frames;
       for (size_t i = 0; i < value.size (); i++)
@@ -943,6 +946,14 @@ Frame::overwrite_values (const Frame& other)
 void 
 Frame::reset ()
 { impl.reset (new Implementation (impl->count, impl->children)); }
+
+#if 0
+static void describe_frame (const Frame& frame, std::ostream& out)
+{
+  out << typeid (frame).name () << " " << frame.impl->count << " " 
+      << frame.type_name ();
+}
+#endif
 
 Frame::~Frame ()
 { 

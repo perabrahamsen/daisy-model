@@ -171,11 +171,11 @@ ActionFertilize::common_doIt (Daisy& daisy, double& water, Treelog& msg)
   std::ostringstream tmp;
   if (AM::is_mineral (metalib, *am))
     tmp << "Fertilizing " << am->number ("weight") 
-	<< " kg "<< am->name ("type") << "-N/ha";
+	<< " kg "<< am->type_name () << "-N/ha";
   else if (AM::is_organic (metalib, *am))
     {
       tmp  << "Fertilizing " << am->number ("weight") 
-	   << " ton "<< am->name ("type") << " ww/ha";
+	   << " ton "<< am->type_name () << " ww/ha";
       const double utilized_weight = AM::utilized_weight (metalib, *am);
       if (utilized_weight > 0.0)
         tmp << "; utilized " << utilized_weight << " kg N/ha";
@@ -184,7 +184,7 @@ ActionFertilize::common_doIt (Daisy& daisy, double& water, Treelog& msg)
         tmp << "; water " << water << " mm";
     }
   else
-    tmp << "Fertilizing " << am->name ("type");
+    tmp << "Fertilizing " << am->type_name ();
   msg.message (tmp.str ());
 }
 
@@ -254,7 +254,7 @@ static struct ActionFertilizeSyntax : public DeclareBase
               {
                 std::ostringstream tmp;
                 tmp  << "You cannot use 'equivalent_weight' with "
-                     << am.name ("type") << " fertilizer";
+                     << am.type_name () << " fertilizer";
                 err.entry (tmp.str ());
               }
           }

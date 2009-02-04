@@ -165,7 +165,7 @@ TraverseQtTree::enter_model (const Syntax& syntax, AttributeList& alist,
   // We use the base model as value.
   QString value;
   if (alist.check ("type"))
-    value = QString ("'") + alist.name ("type").c_str () + "'";
+    value = QString ("'") + alist.type_name ().c_str () + "'";
   else 
     value = "buildin";
 
@@ -347,7 +347,7 @@ TraverseQtTree::enter_object_sequence (const Library&, const Syntax& syntax,
   QString name;
   name.sprintf ("[%d]", index);
   daisy_assert (alist.check ("type"));
-  QString value = QString ("'") + alist.name ("type").c_str () + "'";
+  QString value = QString ("'") + alist.type_name ().c_str () + "'";
   if (check_alists)
     {
       std::ostringstream errors;
@@ -465,7 +465,7 @@ TraverseQtTree::enter_parameter (const Syntax& syntax, AttributeList& alist,
       if (has_value && size == Syntax::Singleton 
 	  && alist.alist (parameter).check ("type"))
 	{
-	  string type = alist.alist (parameter).name ("type");
+	  string type = alist.alist (parameter).type_name ();
 	  value_name = "'";
 	  value_name += type.c_str ();
 	  value_name += "'";

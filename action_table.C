@@ -193,11 +193,11 @@ ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
           std::ostringstream tmp;
           if (AM::is_mineral (daisy.metalib, fert))
             tmp << "Fertilizing " << fert.number ("weight") 
-                << " kg "<< fert.name ("type") << "-N/ha";
+                << " kg "<< fert.type_name () << "-N/ha";
           else if (AM::is_organic (daisy.metalib, fert))
             {
               tmp  << "Fertilizing " << fert.number ("weight") 
-                   << " ton "<< fert.name ("type") << " ww/ha";
+                   << " ton "<< fert.type_name () << " ww/ha";
               const double utilized_weight 
                 = AM::utilized_weight (metalib, fert);
               if (utilized_weight > 0.0)
@@ -207,7 +207,7 @@ ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
                 tmp << "; water " << water << " mm";
             }
           else
-            tmp << "Fertilizing " << fert.name ("type");
+            tmp << "Fertilizing " << fert.type_name ();
           msg.message (tmp.str ());
           daisy.field->fertilize (daisy.metalib, fert, 
                                   daisy.time, daisy.dt, msg);

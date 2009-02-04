@@ -52,7 +52,7 @@ UI::set_low_priority () const
 }
 
 UI::UI (Block& al)
-  : name (al.name ("type"))
+  : name (al.type_name ())
 { }
 
 UI::UI (const char *const id)

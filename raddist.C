@@ -76,7 +76,7 @@ Raddist::intensity_distribution (const int No, const double LAI,
 }
 
 Raddist::Raddist (Block& al)
-  : ModelLogable (al.name ("type"))
+  : ModelLogable (al.type_name ())
 { }
 
 Raddist::~Raddist ()

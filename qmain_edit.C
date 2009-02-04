@@ -649,7 +649,7 @@ EditObject::refresh ()
 {
   if (value.check ("type"))
     {
-      const QString type = value.name ("type").c_str ();
+      const QString type = value.type_name ().c_str ();
       
       bool found = false;
       for (unsigned int i = 0; i < choice->count (); i++)

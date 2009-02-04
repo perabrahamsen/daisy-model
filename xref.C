@@ -183,7 +183,7 @@ TraverseXRef::enter_model (Frame& frame,
   daisy_assert (component == current_component);
   daisy_assert (type == is_invalid);
   current_model = name;
-  if (frame.check ("type"))
+  if (frame.base_name () != Value::None ())
     type = is_parameterization;
   else
     type = is_model;
@@ -267,8 +267,7 @@ TraverseXRef::enter_object (const Library& library,
                             const Frame& frame, const Frame&,
 			    const symbol)
 {
-  daisy_assert (frame.check ("type"));
-  use_model (library, frame.name ("type"));
+  use_model (library, frame.type_name ());
   return false; 
 }
 
@@ -301,7 +300,7 @@ TraverseXRef::enter_parameter (const Frame& frame, const Frame& default_frame,
     {
       // Ignore base parameters.
       const Library& library = metalib.library (current_component);
-      const symbol base_model = frame.name ("base_model");
+      const symbol base_model = frame.type_name ();
       if (base_model != current_model)
         {
           const Frame& base_frame = library.model (base_model);

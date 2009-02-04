@@ -750,7 +750,7 @@ VCheck::unique ()
 	    std::map<symbol, size_t> found;
 	    for (size_t i = 0; i < list.size (); i++)
 	      {
-		const symbol type = list[i]->name ("type");
+		const symbol type = list[i]->type_name ();
 		std::map<symbol, size_t>::const_iterator f = found.find (type);
 		if (f != found.end ())
 		  {

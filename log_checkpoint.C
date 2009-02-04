@@ -82,7 +82,7 @@ LogCheckpoint::match (const Daisy& daisy, Treelog& msg)
   if (is_active)
     {
       TREELOG_MODEL (msg);
-      msg.message ("Making checkpoint");
+      msg.message ("Making checkpoint of " + daisy.frame.type_name ());
       static const symbol daisy_symbol ("daisy");
       global_frame = &daisy.metalib;
       push (daisy_symbol, daisy.frame);
@@ -90,6 +90,44 @@ LogCheckpoint::match (const Daisy& daisy, Treelog& msg)
     }
   return is_active;
 }
+
+class FrameNamed : public FrameModel
+{
+  const symbol name;
+  
+  symbol type_name () const
+  { return name; }
+
+  FrameNamed (const FrameNamed& frame, parent_clone_t)
+    : FrameModel (frame, parent_clone),
+      name (frame.name)
+  { }
+  FrameNamed& clone () const
+  { return *new FrameNamed (*this, parent_clone); }
+
+public:
+  FrameNamed (const symbol n, const FrameModel& parent)
+    : FrameModel (parent, parent_link),
+      name (n)
+  { }
+  ~FrameNamed ()
+  { }
+};
+
+class FrameDummy : public Frame
+{
+  const Frame& parent_;
+  const Frame* parent () const
+  { return &parent_; }
+  FrameDummy& clone () const
+  { return *new FrameDummy (parent_, parent_link); }
+
+public:
+  FrameDummy (const Frame& frame, parent_link_t)
+    : Frame (),
+      parent_ (frame)
+  { }
+};
 
 void
 LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
@@ -116,9 +154,8 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
       // Print "directory" and "path" before inputs.
       printer.print_entry (*global_frame, "directory");
       printer.print_entry (*global_frame, "path");
-      frame ().alist ().remove ("directory"); // Avoid printing them twice.
-      frame ().alist ().remove ("path"); 
-      
+      FrameModel& daisy = dynamic_cast<FrameModel&> (frame ());
+
       // Print input files.
       if (global_frame->check ("parser_inputs"))
 	{
@@ -149,32 +186,28 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
       printer.print_library_file ("*clone*");
 
       // Start checkpoint from next timestep.
-      daisy_assert (frame ().check ("time"));
-      Time time (frame ().alist ("time"));
+      daisy_assert (daisy.check ("time"));
+      Time time (daisy.alist ("time"));
       time.tick_hour ();
-      time.set_time (frame (), "time");
+      time.set_time (daisy, "time");
 
       // Print content.
       printer.print_comment ("Content");
       
       Library& library = metalib ().library (Program::component);
-      symbol super ("Daisy");
-      if (frame ().check ("type"))
-        super = frame ().name ("type");
-      else
-        frame ().alist ().add ("type", super);
+      const symbol super = daisy.type_name ();
+
       std::string name = super + " Checkpoint";
       while (library.check (name))
         name += "+";
       daisy_assert (library.check (super));
-      library.add_model (name, dynamic_cast<FrameModel&> (frame ().clone ()));
+      std::auto_ptr<FrameNamed> program (new FrameNamed (name, daisy));
+      library.add_model (name, *program);
       printer.print_parameterization (Program::component, name);
-      FrameModel program_frame (FrameModel::root (), Frame::parent_link);
-      program_frame.alist ().add ("type", name);
-      FrameModel run_frame (FrameModel::root (), Frame::parent_link);
-      run_frame.add_object ("run", Program::component, "dummy");
-      run_frame.add ("run", program_frame);
+      FrameDummy run_frame (*global_frame, Frame::parent_link);
+      run_frame.add ("run", *program);
       printer.print_entry (run_frame, "run");
+      program.release ();
       library.remove (name);
 
       if (!printer.good ())

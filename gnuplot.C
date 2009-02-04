@@ -42,7 +42,7 @@ Gnuplot::quote (const symbol value)
 { return quote (value.name ()); }
 
 Gnuplot::Gnuplot (Block& al)
-  : name (al.name ("type"))
+  : name (al.type_name ())
 { }
 
 Gnuplot::~Gnuplot ()

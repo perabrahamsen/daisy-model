@@ -290,7 +290,7 @@ ActionCrop::Sow::doIt (Daisy& daisy, const Scope&, Treelog& msg)
 {
   if (!done && date.match (daisy.time))
     {
-      msg.message ("Sowing " + crop->name ("type"));      
+      msg.message ("Sowing " + crop->type_name ());      
       daisy.field->sow (daisy.metalib, *crop, 0.0, 0.0, -42.42e42,
                         daisy.time, daisy.dt, msg); 
       done = true;
@@ -587,7 +587,7 @@ void
 ActionCrop::fertilize (Daisy& daisy, Treelog& msg,
 		       const FrameModel& am) const
 {
-  msg.message (std::string ("[Fertilizing ") + am.name ("type") + "]");
+  msg.message (std::string ("[Fertilizing ") + am.type_name () + "]");
 
   const double from = 0.0;
   const double to = -18.0;
@@ -772,12 +772,12 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
 	  // If annual done, do perennial.
 	  if (secondary->done 
 	      && harvest_perennial->doIt (daisy, scope, msg,
-					  secondary->crop->name ("type")))
+					  secondary->crop->type_name ()))
 	    harvested = true;
 	}
       else if (primary->done 
 	       && harvest_annual->doIt (daisy, scope, msg, 
-					primary->crop->name ("type")))
+					primary->crop->type_name ()))
 	// else do annual.
 	harvested = true;
     }
@@ -786,7 +786,7 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
       // We have only annual crops.  Let 'primary' when they are harvested.
       if (primary->done 
 	  && harvest_annual->doIt (daisy, scope, 
-                                   msg, primary->crop->name ("type")))
+                                   msg, primary->crop->type_name ()))
 	harvested = true;
     }
   else
@@ -798,13 +798,13 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
 	  // If we have two, let them both control.
 	  if ((primary->done || secondary->done)
 	      && harvest_perennial->doIt (daisy, scope, msg,
-					  primary->crop->name ("type"),
-					  secondary->crop->name ("type")))
+					  primary->crop->type_name (),
+					  secondary->crop->type_name ()))
 	    harvested = true;
 	}
       else if (primary->done 
 	       && harvest_perennial->doIt (daisy, scope, msg, 
-					   primary->crop->name ("type")))
+					   primary->crop->type_name ()))
 	// If we have only one, it is of course in control.
 	harvested = true;
     }

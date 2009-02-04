@@ -87,10 +87,10 @@ Traverse::traverse_model (const symbol component, const symbol model)
 
   if (enter_model (frame, component, model))
     {
-      if (frame.check ("type"))
+      const symbol super = frame.base_name ();
+      if (super != Value::None ())
 	{
 	  // Derived parameterization, has default values.
-	  const symbol super = frame.name ("type");
 	  const Frame& default_frame = library.model (super);
 	  traverse_alist (frame, default_frame, model.name ());
 	}
@@ -270,8 +270,7 @@ Traverse::traverse_parameter (const Frame& frame,
 		  {
 		    Frame& entry_frame 
                       = const_cast<Frame&> (frame.frame (parameter));
-		    daisy_assert (entry_frame.check ("type"));
-		    const symbol type = entry_frame.name ("type");
+		    const symbol type = entry_frame.type_name ();
 		    const Library& library 
                       = frame.library (metalib, parameter);
 		    const Frame& entry_default_frame = library.model (type);
@@ -286,8 +285,7 @@ Traverse::traverse_parameter (const Frame& frame,
 		    for (unsigned int i = 0; i < sequence.size (); i++)
 		      {
 			const Frame& entry_frame = *sequence[i];
-			daisy_assert (entry_frame.check ("type"));
-			const symbol type = entry_frame.name ("type");
+			const symbol type = entry_frame.type_name ();
 			const Library& library 
                           = frame.library (metalib, parameter);
 			const Frame& entry_default_frame = library.model (type);

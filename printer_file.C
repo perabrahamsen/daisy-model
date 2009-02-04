@@ -135,8 +135,8 @@ bool
 PrinterFile::Implementation::is_complex_object (const Frame& value, 
 						const Library& library) const
 {
-  daisy_assert (value.check ("type"));
-  const symbol element = value.name ("type");
+  const symbol element = value.type_name ();
+  daisy_assert (element != Value::None ());
   if (!library.check (element))
     return false;
 
@@ -557,8 +557,7 @@ PrinterFile::Implementation::print_object (const Frame& value,
                                            const Frame& original, 
                                            int indent)
 {
-  daisy_assert (value.check ("type"));
-  const symbol element = value.name ("type");
+  const symbol element = value.type_name ();
   if (!library.check (element))
     {
       out << "<unknown " << element << ">";
@@ -566,7 +565,7 @@ PrinterFile::Implementation::print_object (const Frame& value,
     }
 
   // Check original.
-  if (original.check ("type") && original.name ("type") == element)
+  if (original.type_name () == element)
     {
       out << "original";
       // Check if we added something over the original.
@@ -607,6 +606,11 @@ PrinterFile::Implementation
   Library& library = metalib.library (library_name);
   std::auto_ptr<FrameModel> frame (&library.model (name).clone ());
   daisy_assert (frame.get ());
+  if (frame->type_name () != name)
+    {
+      daisy_bug ("Asking for '" + name + "' getting '" + frame->type_name ()
+                 + "' (base " + frame->base_name () + ")");
+    }
   if (!print_description && frame->alist ().check ("description"))
     frame->alist ().remove ("description");
   const FrameModel& root = library.model ("component");
@@ -614,9 +618,9 @@ PrinterFile::Implementation
   out << "(def" << library_name << " ";
   print_symbol (name);
   out << " ";
-  if (frame->check ("type"))
+  const symbol super = frame->base_name ();
+  if (super != Value::None ())
     {
-      const symbol super = frame->name ("type");
       print_symbol (super);
       if (!library.check (super))
 	{
@@ -783,8 +787,7 @@ PrinterFile::print_library_file (const std::string& filename)
 void
 PrinterFile::print_input (const Frame& frame)
 {
-  daisy_assert (frame.check ("type"));
-  const symbol type = frame.name ("type");
+  const symbol type = frame.type_name ();
   const Library& library = impl->metalib.library (Parser::component);
   const FrameModel& base_frame = library.model (type);
 
@@ -810,7 +813,7 @@ PrinterFile::PrinterFile (Metalib& mlib,
 { }
     
 PrinterFile::PrinterFile (Block& al)
-  : Printer (al.name ("type")),
+  : Printer (al.type_name ()),
     impl (new Implementation (al.metalib (), al.name ("where")))
 { }
     

@@ -162,22 +162,16 @@ Syntax::Implementation::check (Metalib& metalib,
 		tmp << key << "[" << j_index << "]: ";
 		j_index++;
 		const Frame& al = **j;
-		if (!al.check ("type"))
-		  {
-		    tmp << "Non object found";
-		    msg.error (tmp.str ());
-		    error = true;
-		  }
-		else if (!lib.check (al.name ("type")))
+                if (!lib.check (al.type_name ()))
 		  {
 		    tmp << "Unknown library member '"
-			   << al.name ("type") << "'";
+                        << al.type_name () << "'";
 		    msg.error (tmp.str ());
 		    error = true;
 		  }
 		else 
 		  {
-		    tmp << al.name ("type");
+		    tmp << al.type_name ();
 		    Treelog::Open nest (msg, tmp.str ());
 		    if (!al.check (metalib, msg))
 		      error = true;
@@ -187,17 +181,9 @@ Syntax::Implementation::check (Metalib& metalib,
 	else 
 	  {
 	    const Frame& al = vl.frame (key);
-	    if (!al.check ("type"))
-	      {
-		msg.error (key + "Non object found");
-		error = true;
-	      }
-	    else 
-	      {
-		Treelog::Open nest (msg, key + ": " + al.name ("type"));
-		if (!al.check (metalib, msg))
-		  error = true;
-	      }
+            Treelog::Open nest (msg, key + ": " + al.type_name ());
+            if (!al.check (metalib, msg))
+              error = true;
 	  }
       else if (types[key] == Value::AList)
         {
@@ -362,10 +348,7 @@ Syntax::is_log (const symbol key) const
 
 ::Library&
 Syntax::library (Metalib& metalib, const symbol key) const
-{
-  daisy_assert (impl->libraries.find (key) != impl->libraries.end ());
-  return metalib.library (impl->libraries[key]);
-}
+{ return metalib.library (component (key)); }
 
 symbol 
 Syntax::component (const symbol key) const

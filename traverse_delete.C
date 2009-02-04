@@ -95,8 +95,7 @@ TraverseDelete::enter_model (Frame& frame,
 {
   // Check if this model is inherited from the model we are examining.
   if (dep_lib == component
-      && frame.check ("type") 
-      && frame.name ("type") == dep_par)
+      && frame.type_name () == dep_par)
     frame.add ("type", dep_super);
 
   return true;
@@ -147,8 +146,7 @@ TraverseDelete::enter_object (const Library& library,
                               const Frame& frame, const Frame&, 
 			      const symbol)
 {
-  daisy_assert (frame.check ("type"));
-  const symbol super = frame.name ("type");
+  const symbol super = frame.type_name ();
   if (dep_lib == library.name () && super == dep_par)
     const_cast<Frame&> (frame).add ("type", dep_super);
 
@@ -186,8 +184,7 @@ find_super (Metalib& metalib,
   const Library& library = metalib.library (component);
   daisy_assert (library.check (parameterization));
   const Frame& frame = library.model (parameterization);
-  daisy_assert (frame.check ("type"));
-  const symbol super = frame.name ("type");
+  const symbol super = frame.base_name ();
   daisy_assert (parameterization != super);
   return super;
 }

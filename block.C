@@ -158,7 +158,7 @@ Block::Implementation::expand_string (Block& block,
                       {
                         Treelog::Open nest (msg, "${" + key + "}");
                         const FrameModel& obj = frame.model (key);
-                        const symbol type = obj.name ("type");
+                        const symbol type = obj.type_name ();
                         const Library& library = frame.library (metalib, key);
                         const ScopeBlock scope (block);
                         if (library.name () == symbol (Stringer::component))
@@ -305,6 +305,10 @@ Block::alist () const
 Treelog&
 Block::msg () const
 { return impl->msg; }
+
+symbol
+Block::type_name () const
+{ return impl->frame.type_name (); }
 
 void
 Block::error (const std::string& msg)

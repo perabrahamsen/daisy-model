@@ -183,8 +183,9 @@ UIRun::attach (Toplevel& toplevel)
   QFont font = qt_name->font ();
   font.setBold (true);
   qt_name->setFont (font);
-  if (frame.check ("type"))
-    qt_name->setText (frame.name ("type").name ().c_str ());
+  const symbol type_name = frame.type_name ();
+  if (type_name != Value::None ())
+    qt_name->setText (type_name.name ().c_str ());
   else
     qt_name->setText ("No program");
   top_layout->addWidget (qt_name /* , Qt::AlignLeft */);
@@ -371,8 +372,9 @@ UIRun::reset ()
   const std::vector<std::string> files = top_level->files_found ();
 
   // The program name.
-  if (frame.check ("type"))
-    qt_name->setText (frame.name ("type").name ().c_str ());
+  const symbol type_name = frame.type_name ();
+  if (type_name != Value::None ())
+    qt_name->setText (type_name.name ().c_str ());
   else
     qt_name->setText ("No program");
 

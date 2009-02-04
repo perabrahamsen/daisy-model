@@ -259,7 +259,7 @@ TkDaisyEntry::step_alist ()
 	  for (unsigned int i = 0; i < alist_sequence->size (); i++)
 	    {
 	      AttributeList* step = (*alist_sequence)[i];
-	      if (step->check ("type") && step->name ("type") == name)
+	      if (step->check ("type") && step->type_name () == name)
 		alist = step;
 	    }
 	  break;

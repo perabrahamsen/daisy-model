@@ -59,6 +59,7 @@ public:
   const AttributeList& alist () const;
   const Frame& frame () const;
   Treelog& msg () const;
+  symbol type_name () const;
 
   // Error handling.
   void error (const std::string&);

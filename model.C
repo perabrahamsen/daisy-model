@@ -93,7 +93,7 @@ ModelFramed::output_as_entry (Log& log) const
 }
 
 ModelFramed::ModelFramed (Block& al)
-  : ModelLogable (al.name ("type")),
+  : ModelLogable (al.type_name ()),
     // Block is sometimes fed a temporary frame, thus the need for clone.
     frame (dynamic_cast<FrameModel*> (&(al.frame ().clone ())))
 { daisy_assert (frame.get ());  }

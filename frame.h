@@ -54,6 +54,7 @@ class EXPORT Frame : public WScope
 public:
   std::auto_ptr<Implementation> impl;
   virtual symbol type_name () const;
+  symbol base_name () const;
 
   // Parent.
 public:
@@ -91,6 +92,7 @@ public:
   bool is_state (const symbol) const;
   Value::type lookup (const symbol) const;
   ::Library& library (Metalib&, const symbol) const;
+  symbol component (symbol) const;
   int type_size (const symbol) const;
   symbol dimension (const symbol) const;
   symbol domain (const symbol) const;

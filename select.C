@@ -460,7 +460,7 @@ Select::Implementation::Implementation (Block& al)
     negate (al.flag ("negate")
             // Kludge to negate the meaning of negate for "flux_top".
             != al.metalib ().library (Select::component)
-            /**/ .is_derived_from (al.name ("type"), flux_top_symbol)),
+            /**/ .is_derived_from (al.type_name (), flux_top_symbol)),
     tag (Select::select_get_tag (al.frame ())),
     dimension (al.check ("dimension")
 	       ? al.name ("dimension") : Value::Unknown ()),
@@ -667,7 +667,7 @@ Select::check_border (const Border&,
 { return true; }
 
 Select::Select (Block& al)
-  : name (al.name ("type")),
+  : name (al.type_name ()),
     impl (new Implementation (al)),
     accumulate (al.flag ("accumulate")),
     handle (al.check ("handle")

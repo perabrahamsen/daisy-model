@@ -45,7 +45,7 @@ Boolean::title () const
 { return name.name (); }
 
 Boolean::Boolean (Block& al)
-  : name (al.name ("type"))
+  : name (al.type_name ())
 { }
 
 Boolean::~Boolean ()

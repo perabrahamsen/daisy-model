@@ -44,7 +44,7 @@ Photo::clear ()
 { }
 
 Photo::Photo (Block& al)
-  : ModelLogable (al.name ("type")),
+  : ModelLogable (al.type_name ()),
     min_PAR_ (al.number ("min_PAR"))
 { }
 

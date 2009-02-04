@@ -169,7 +169,7 @@ Movement::initialize (const Units& units,
 }
 
 Movement::Movement (Block& al)
-  : ModelLogable (al.name ("type")),
+  : ModelLogable (al.type_name ()),
     water_failure_level (-1),
     solute_failure_level (-1),
     tertiary (Librarian::build_item<Tertiary> (al, "Tertiary"))

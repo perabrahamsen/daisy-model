@@ -730,7 +730,7 @@ Field::Implementation::check (bool require_weather,
 bool 
 Field::Implementation::check_am (const FrameModel& am, Treelog& err) const
 { 
-  Treelog::Open nest (err, am.name ("type"));
+  Treelog::Open nest (err, am.type_name ());
 
   bool ok = true;
   for (ColumnList::const_iterator i = columns.begin ();

@@ -221,7 +221,7 @@ Hydraulic::check (Treelog& msg) const
 }
 
 Hydraulic::Hydraulic (Block& al)
-  : ModelLogable (al.name ("type")),
+  : ModelLogable (al.type_name ()),
     K_init (al.check ("K_at_h")
 	    ? new K_at_h (al.alist ("K_at_h"))
 	    : NULL),

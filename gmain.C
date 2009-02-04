@@ -414,7 +414,7 @@ AList_Item::daisy_label (const string& entry,
 	{
 	  const AttributeList& object = alist.alist (entry);
 	  if (object.check ("type"))
-	    label << object.name ("type");
+	    label << object.type_name ();
 	  else
 	    label << "<unknown>";
 	}

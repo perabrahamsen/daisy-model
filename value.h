@@ -49,7 +49,7 @@ namespace Value
 
   // A value may have a dimension associated.
   symbol Unknown ();
-  symbol None ();
+  symbol None () EXPORT;
   symbol Fraction ();
   symbol User ();
 

@@ -169,7 +169,7 @@ UZ1D::library_id () const
 }
 
 UZ1D::UZ1D (Block& al)
-  : name (al.name ("type"))
+  : name (al.type_name ())
 { }
 
 UZ1D::~UZ1D ()

@@ -74,7 +74,7 @@ Volume::build_obsolete (Block& al)
 }
 
 Volume::Volume (Block& al)
-  : name (al.name ("type"))
+  : name (al.type_name ())
 { }
 
 Volume::Volume (const char *const id)

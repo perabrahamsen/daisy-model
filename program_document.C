@@ -409,8 +409,7 @@ ProgramDocument::print_entry_value (const symbol name,
 	  case Value::Object:
 	    {
 	      const Frame& object = frame.model (name);
-	      daisy_assert (object.check ("type"));
-	      const symbol type = object.name ("type");
+	      const symbol type = object.type_name ();
 	      format->text (" (default `" + type + "')");
 	      const Library& library = frame.library (metalib, name);
 	      const Frame& super = library.model (type);
@@ -604,8 +603,7 @@ ProgramDocument::print_sample_entry (const symbol name,
 	    case Value::Object:
 	      {
 		const Frame& object = frame.frame (name);
-		daisy_assert (object.check ("type"));
-		const symbol type = object.name ("type");
+		const symbol type = object.type_name ();
 		comment = "Default " + type + " value.";
 	      }
 	      break;
@@ -699,27 +697,23 @@ ProgramDocument::own_entries (Metalib& metalib,
   frame.entries (entries);
 
   // Remove base entries.
-  if (frame.check ("base_model") || frame.check ("type"))
+  const symbol base_model = frame.base_name ();
+  if (base_model != Value::None ())
     {
-      const symbol base_model = frame.check ("base_model")
-        ? frame.name ("base_model")
-        : frame.name ("type");
-          
-      if (base_model != name)
+      daisy_assert (base_model != name);
+
+      const FrameModel& base_frame = library.model (base_model);
+      std::set<symbol> base_entries;
+      base_frame.entries (base_entries);
+      for (std::set<symbol>::const_iterator i = base_entries.begin (); 
+           i != base_entries.end (); 
+           i++)
         {
-          const FrameModel& base_frame = library.model (base_model);
-          std::set<symbol> base_entries;
-          base_frame.entries (base_entries);
-          for (std::set<symbol>::const_iterator i = base_entries.begin (); 
-               i != base_entries.end (); 
-               i++)
-            {
-              const symbol key = *i;
-              if (new_only
-                  || key == "description"
-                  || frame.subset (metalib, base_frame, key))
-                entries.erase (find (entries.begin (), entries.end (), key));
-            }
+          const symbol key = *i;
+          if (new_only
+              || key == "description"
+              || frame.subset (metalib, base_frame, key))
+            entries.erase (find (entries.begin (), entries.end (), key));
         }
     }
 }
@@ -733,7 +727,7 @@ ProgramDocument::inherited_entries (Metalib& metalib,
 
   if (frame.check ("base_model"))
     {
-      const symbol base_model = frame.name ("base_model");
+      const symbol base_model = frame.type_name ();
           
       if (base_model != name)
         {
@@ -895,7 +889,7 @@ ProgramDocument::print_sample_entries (const symbol name,
 	  format->text (";; Shared parameters are described in section");
 	  format->special ("nbsp");
 	  format->ref ("model", 
-		       lib_name + "-" + frame.name ("base_model"));
+		       lib_name + "-" + frame.type_name ());
 	}
       }
       for (std::set<symbol>::const_iterator i = base.begin ();
@@ -1055,10 +1049,10 @@ ProgramDocument::print_model (const symbol name, const Library& library,
   const FrameModel& frame = library.model (name);
 
   const XRef::ModelUsed used (library.name (), name);
-  if (frame.check ("type"))
+  const symbol type = frame.base_name ();
+  if (type != Value::None ())
     {
       // This is a parameterization.
-      const symbol type = frame.name ("type");
       format->soft_linebreak ();
       Format::Section dummy (*format, "section", name, "model", 
 			     current_component + "-" + name);
@@ -1149,10 +1143,8 @@ class ModelCompare
   {
     // Find the child of root that leaf is descended from.
     daisy_assert (root != leaf);
-    const AttributeList& al = library.lookup (leaf);
-    const symbol type = al.check ("type")
-      ? al.name ("type") 
-      : al.name ("base_model");
+    const FrameModel& al = library.model (leaf);
+    const symbol type = al.base_name ();
     if (type == root)
       return leaf;
     

@@ -39,7 +39,7 @@ Parser::Parser (const symbol id)
 { }
 
 Parser::Parser (Block& al)
-  : name (al.name ("type"))
+  : name (al.type_name ())
 { }
 
 Parser::~Parser ()

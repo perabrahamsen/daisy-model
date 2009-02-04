@@ -1278,9 +1278,10 @@ geometry${OBJ}: geometry.C geometry.h symbol.h value.h volume.h model.h \
   mathlib.h librarian.h
 printer_file${OBJ}: printer_file.C printer_file.h printer.h model.h symbol.h \
   metalib.h frame.h scope.h value.h library.h block.h plf.h time.h \
-  parser.h path.h assertion.h librarian.h frame_model.h alist.h
+  parser.h path.h assertion.h librarian.h frame_model.h frame_submodel.h \
+  alist.h
 log_alist${OBJ}: log_alist.C log_alist.h log.h time.h symbol.h border.h \
-  model.h library.h frame.h scope.h value.h assertion.h
+  model.h library.h frame_submodel.h frame.h scope.h value.h assertion.h
 frame_submodel${OBJ}: frame_submodel.C frame_submodel.h frame.h scope.h \
   value.h symbol.h assertion.h
 submodeler${OBJ}: submodeler.C submodeler.h block.h symbol.h value.h frame.h \
@@ -1300,12 +1301,14 @@ units${OBJ}: units.C units.h symbol.h unit_model.h unit.h model.h convert.h \
 tertsmall${OBJ}: tertsmall.C tertsmall.h anystate.h
 anystate${OBJ}: anystate.C anystate.h assertion.h
 imvec${OBJ}: imvec.C imvec.h symbol.h value.h assertion.h log.h time.h \
-  border.h model.h chemical.h check.h block.h units.h frame.h scope.h
+  border.h model.h chemical.h check.h block.h units.h frame_submodel.h \
+  frame.h scope.h
 im${OBJ}: im.C im.h symbol.h value.h chemical.h model.h units.h unit.h am.h \
-  log.h time.h border.h block.h frame.h scope.h check.h assertion.h
-frame${OBJ}: frame.C frame.h scope.h value.h symbol.h frame_model.h syntax.h \
-  block.h assertion.h librarian.h model.h intrinsics.h library.h \
-  memutils.h alist.h
+  log.h time.h border.h block.h frame_submodel.h frame.h scope.h check.h \
+  assertion.h
+frame${OBJ}: frame.C frame.h scope.h value.h symbol.h frame_model.h \
+  frame_submodel.h syntax.h block.h assertion.h librarian.h model.h \
+  intrinsics.h library.h memutils.h alist.h
 bdconv${OBJ}: bdconv.C bdconv.h convert.h symbol.h geometry.h value.h soil.h \
   volume.h model.h units.h assertion.h
 abiotic${OBJ}: abiotic.C abiotic.h mathlib.h assertion.h

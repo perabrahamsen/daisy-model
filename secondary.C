@@ -38,7 +38,7 @@ Secondary::library_id () const
 }
 
 Secondary::Secondary (Block& al)
-  : name (al.name ("type"))
+  : name (al.type_name ())
 { }
 
 Secondary::Secondary (const symbol name_)

@@ -264,7 +264,7 @@ Numeric value.");
 
 LogExtern::LogExtern (Block& al)
   : LogSelect (al),
-    title_ (al.name ("where", al.name ("type")))
+    title_ (al.name ("where", al.type_name ()))
 { 
   std::vector<symbol> par_names = al.name_sequence ("parameter_names");
   ScopeBlock scope_block (al);
