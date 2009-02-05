@@ -122,7 +122,7 @@ Toplevel::Implementation::add_daisy_ui (Toplevel& toplevel)
   if (ui.get ())
     return;
 
-  if (!metalib.alist ().check ("ui"))
+  if (!metalib.check ("ui"))
     metalib.add ("ui", preferred_ui);
 
   Block block (metalib, msg, metalib, "UI");
@@ -423,7 +423,6 @@ Toplevel::initialize ()
             // metalib, but also that we don't get any user defined
             // types.  Solute:  Use "run".
             frame->overwrite_values (metalib ());
-            frame->alist ().add ("type", "Daisy");
             impl->program.reset (Librarian::build_frame<Program> (block, *frame,
                                                                   "toplevel"));
             impl->program_frame_owner = frame;
@@ -681,7 +680,6 @@ Toplevel::load_syntax (Frame& frame)
 {
   // Top level Daisy syntax.
   Daisy::load_syntax (frame);
-  frame.alist ().add ("type", "Daisy");
   Librarian::load_syntax (frame);
   load_frame (frame);
 }

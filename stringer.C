@@ -63,8 +63,6 @@ struct StringerCond : public Stringer
     const symbol  value;
     static void load_syntax (Frame& frame)
     {
-      frame.alist ().add ("description", "\
-If condition is true, return value.");
       frame.add_object ("condition", Boolean::component, "\
 Condition to test for.");
       frame.add ("value", Value::String, Value::Const, "\
@@ -123,6 +121,11 @@ Value to return.");
   ~StringerCond ()
   { sequence_delete (clauses.begin (), clauses.end ()); }
 };
+
+static DeclareSubmodel 
+stringer_cond_clause_submodel (StringerCond::Clause::load_syntax,
+                              "StringerCondClause", "\
+If condition is true, return value.");
 
 static struct StringerCondSyntax : public DeclareModel
 {

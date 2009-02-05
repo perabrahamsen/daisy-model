@@ -1,17 +1,5 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* organic.txt
-
-** Indledning
-
-Vi skal have mere om modeluafhængighed og "intuitive" tal ind i
-indledning.  Ellers skal evolutionsdelen ud.
-
-** Ligninger
-
-Vi skal evt nøjes med basisligningerne (4 + total), og så tage hver
-initialiseringsrutine derfra.
-
 * Frame
 
 ** Lexer::Position -> position.h

@@ -382,6 +382,7 @@ You cannot specify 'C_per_N' for intervals where 'C' is unspecified.");
 void
 OM::load_syntax (Frame& frame, const std::string& frac_desc)
 {
+  Model::load_model (frame);
   frame.add_check (check_alist);
   frame.add ("C", "g C/cm^3", Check::non_negative (),
 	      Value::OptionalState, Value::Sequence,

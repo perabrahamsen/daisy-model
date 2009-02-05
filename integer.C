@@ -99,8 +99,6 @@ struct IntegerCond : public Integer
     const int value;
     static void load_syntax (Frame& frame)
     {
-      frame.alist ().add ("description", "\
-If condition is true, return value.");
       frame.add_object ("condition", Boolean::component, "\
 Condition to test for.");
       frame.add ("value", Value::Integer, Value::Const, "\
@@ -154,6 +152,11 @@ Value to return.");
   ~IntegerCond ()
   { sequence_delete (clauses.begin (), clauses.end ()); }
 };
+
+static DeclareSubmodel 
+integer_cond_clause_submodel (IntegerCond::Clause::load_syntax,
+                              "IntegerCondClause", "\
+If condition is true, return value.");
 
 static struct IntegerCondSyntax : public DeclareModel
 {

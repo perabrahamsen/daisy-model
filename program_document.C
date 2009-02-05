@@ -35,7 +35,6 @@
 #include "librarian.h"
 #include "frame_submodel.h"
 #include "frame_model.h"
-#include "alist.h"
 #include <sstream>
 #include <fstream>
 #include <memory>
@@ -1070,7 +1069,7 @@ ProgramDocument::print_model (const symbol name, const Library& library,
 	}
 
       if (library.has_interesting_description (frame))
-        format->alist_description (frame.alist ());
+        format->frame_description (frame);
 
       print_users (xref.models[used]);
       std::set<symbol> entries;
@@ -1104,7 +1103,7 @@ ProgramDocument::print_model (const symbol name, const Library& library,
       format->index (name);
 
       // Print description, if any.
-      format->alist_description (frame.alist ());
+      format->frame_description (frame);
 
       print_users (xref.models[used]);
       print_sample (name, library);

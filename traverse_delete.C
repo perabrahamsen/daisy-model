@@ -94,8 +94,7 @@ TraverseDelete::enter_model (Frame& frame,
 			     const symbol component, const symbol)
 {
   // Check if this model is inherited from the model we are examining.
-  if (dep_lib == component
-      && frame.type_name () == dep_par)
+  if (dep_lib == component && frame.type_name () == dep_par)
     frame.add ("type", dep_super);
 
   return true;

@@ -217,17 +217,100 @@ simpler to the user, even though no substantial changes to the model
 have been made.
 
 Initialization of the partition of the organic matter into the various
-soil pools have been a particular stumbling block for most users
+soil pools have been a particular stumbling block for most users,
 partly because the partition does not reflect an easily identifiable
-property of the system being modeled. The first step of a new
-initialization procedure was conducted by \cite{daisy-init}. They
-found that the ratio between the \textsc{som1} and \textsc{som2} for a
-system in equilibrium would be 49\% vs 51\%. This recalibration
-required the users to readjust the partitioning between \textsc{som1}
-and \textsc{som2}. However, there was a strong tendency that the
-"non-experts" users just picked the equilibrium values.
+property of the system being modeled.  This lead to the development of
+a subsystem for initialization of the organic matter pools based on a
+static approximation of the dynamic model, which will be explored in
+the next section.
+
+\subsection{Initialization of the organic matter pools}
+
+Daisy provides several mechanisms for initialization of the organic
+matter pools, applicable in different situation.  The gratest amount
+of control can be achieved by explicitly specifting the content of
+each pool.  However, since this requires far more information of both
+the soil and the model than the user can reasonably be expected to
+possess, this initialization option is almost exclusively used in
+connection with the ``hotstart'' facility, that is, restarting the
+simulation from the saved state of an earlier simulation.
+
+In order to simplify the initialization, a static approximation of the
+dynamic organic matter turnover model is used.  The organic matter
+model is dynamic due to the uneven application of \textsc{aom}, and
+the weather dependent abiotic factors.  The static model is achieved
+by considering average input of added organic matter, and effective
+static values for the abiotic factors.  If we assume the dynamic model
+is not strongly dependent of the initial conditions, we can combine
+this initial estimate with a warmup period, to achive a reasonable
+initial state for the period we are interested in simulating.
+
+For typical use of \daisy{} (agricultural soil with annual or biannual
+crops) this works well for the initialization of the \textsc{smb} and
+\textsc{aom} pools.  After one or two years, the \textsc{smb} and
+\textsc{aom} pools will have adjusted to level of input, and the
+earlier history will be less relevant.  However, as shall be
+demonstrated later, the \textsc{som} pools can take centuries to reach
+equilibrium with new input levels.
+
+The generalized form for dynamic change of the individual pools
+($\Delta\mbox{\textsc{aom}}i$, $\Delta\mbox{\textsc{smb}}i$ and
+$\Delta\mbox{\textsc{som}}j$) is shown in Equations~\ref{eq:dsmb},
+\ref{eq:dsom} and \ref{eq:daom}:
+
+\begin{equation}
+   \begin{array}{rclcr}
+      \label{eq:dsmb}
+      \Delta\mbox{\textsc{smb}}i &=& \displaystyle
+      \sum_{k=1}^{\mbox{\tiny\#\textsc{smb}}} a_{i,k}\,\mbox{\textsc{smb}}k +
+      \sum_{l=1}^{\mbox{\tiny\#\textsc{som}}} b_{i,l}\,\mbox{\textsc{som}}l +
+      c_i \Delta\mbox{\textsc{aom}}
+      &;&i = 1\ldots\mbox{\#\textsc{smb}}
+   \end{array}
+\end{equation}
+\begin{equation}
+   \begin{array}{rclcr}
+      \label{eq:dsom}
+      \Delta\mbox{\textsc{som}}j &=& \displaystyle
+      \sum_{k=1}^{\mbox{\tiny\#\textsc{smb}}} d_{j,k}\,\mbox{\textsc{smb}}k +
+      \sum_{l=1}^{\mbox{\tiny\#\textsc{som}}} e_{j,l}\,\mbox{\textsc{som}}l +
+      f_j \Delta\mbox{\textsc{aom}}
+      &;&j = 1\ldots\mbox{\#\textsc{som}}
+   \end{array}
+\end{equation}
+
+Static model
+  General equations for smb, som, aom, & total
+  Specific version for the simulation in the next chapter.
+
+Solutions
+
+  Knowns and unknowns, linear equations.
+
+  Explicit som partitioning
+  Equilibrium 
+    (delta SMB & delta SOM = 0)
+    SOM3, TOTAL, delta AOM ukendt
+    1. SOM3 ukendt, subsoil
+    2. TOTAL ukendt, next section
+    3. delta AOM ukendt
+  Quasi-equilibrium
+    delta SOM1 ukendt
+  C/N fixed, delta N kendt
+  
+Next: Compare Eq-3, Quasi-eq og lang opvarmning
+\end{verbatim}
 
 \subsection{Initializing the standard organic matter model}
+
+The first step of a new initialization procedure was conducted by
+\cite{daisy-init}. They found that the ratio between the \textsc{som1}
+and \textsc{som2} for a system in equilibrium would be 49\% vs
+51\%. This recalibration required the users to readjust the
+partitioning between \textsc{som1} and \textsc{som2}. However, there
+was a strong tendency that the "non-experts" users just picked the
+equilibrium values.  As this was usually a poor
+
 
 In \daisy{} the current standard to initialize the partition between
 the organic pools is to use an equilibrium assumption. There are two

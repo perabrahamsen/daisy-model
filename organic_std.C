@@ -934,14 +934,9 @@ OrganicStandard::monthly (Metalib& metalib, const Geometry& geo,
     {
       const Library& library = metalib.library (AOM::component);
       const std::vector<symbol>& names = AM::default_AM ();
-      auto_vector<const Frame*> alists;
+      std::vector<const Frame*> alists;
       for (size_t i = 0; i < names.size (); i++)
-        {
-          const symbol name = names[i];
-          FrameModel& frame = library.model (name).clone ();
-          frame.alist ().add ("type", name);
-          alists.push_back (&frame);
-        }
+        alists.push_back (&library.model (names[i]));
       remainder = &AM::create (metalib, geo,
                                Time (1, 1, 1, 1), alists,
 			       am_symbol, cleanup_symbol, AM::Locked, msg);

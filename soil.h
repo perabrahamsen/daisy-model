@@ -41,8 +41,10 @@ class Secondary;
 class Soil
 {
   // Content.
+public:
   struct Implementation;
   std::auto_ptr<Implementation> impl;
+private:
   // Cache for fast inline access.
   /* const */ std::vector<Horizon*> horizon_;
 

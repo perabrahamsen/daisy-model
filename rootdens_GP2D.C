@@ -398,7 +398,6 @@ Rootdens::create_row (Metalib& metalib, Treelog& msg,
   const Library& library = metalib.library (Rootdens::component);
   const FrameModel& parent = library.model ("GP2D");
   FrameModel frame (parent, FrameModel::parent_copy);
-  frame.alist ().add ("type", "GP2D");
   frame.add ("row_position", row_position);
   frame.add ("row_distance", row_width);
   frame.add ("debug", debug ? 1 : 0);

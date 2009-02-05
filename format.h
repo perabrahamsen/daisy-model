@@ -213,7 +213,7 @@ public:
   virtual void see (const symbol type,
 		    const symbol scope, const symbol id) = 0;
   virtual void see_page (const symbol scope, const symbol id) = 0;
-  virtual void alist_description (const AttributeList&);
+  virtual void frame_description (const Frame&);
 
   // Create and Destroy.
 public:

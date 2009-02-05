@@ -548,7 +548,6 @@ public:
   { 
     this->alist ().add ("parsed_from_file", file);
     this->alist ().add ("parsed_sequence", seq_id);
-    this->alist ().add ("type", model.type_name ());
   }
 };
 
@@ -628,7 +627,6 @@ ParserFile::Implementation::load_object (const Library& lib, bool in_sequence,
         {
           result.reset (new FrameModel (lib.model ("const"),
                                         Frame::parent_copy));
-          result->alist ().add ("type", "const");
           const double value = get_number ();
           const symbol dim = get_dimension ();
           result->add ("value", value, dim);
@@ -637,7 +635,6 @@ ParserFile::Implementation::load_object (const Library& lib, bool in_sequence,
         {
           result.reset (new FrameModel (lib.model ("const"), 
                                         Frame::parent_copy));
-          result->alist ().add ("type", "const");
           result->add ("value", get_integer ());
         }
       else
@@ -694,7 +691,6 @@ ParserFile::Implementation::load_object (const Library& lib, bool in_sequence,
               static const symbol fetch ("fetch");
               result.reset (new FrameModel (lib.model (fetch), 
                                             Frame::parent_copy));
-              result->alist ().add ("type", fetch);
               result->add ("name", type);
               goto skip_it;
             }
@@ -704,7 +700,6 @@ ParserFile::Implementation::load_object (const Library& lib, bool in_sequence,
       else
         {
           result.reset (new FrameModel (lib.model (type), Frame::parent_copy));
-	  result->alist ().add ("type", type);
 	}
       if (skipped || !in_sequence)
 	{

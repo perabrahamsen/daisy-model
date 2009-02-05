@@ -490,10 +490,8 @@ Units::add_unit (Metalib& metalib, const symbol name)
     return;
 
   // Build it.
-  FrameModel frame (library.model (name), Frame::parent_copy);
-  frame.alist ().add ("type", name);
-  this->units[name] = Librarian::build_frame<MUnit> (metalib, Treelog::null (),
-                                                     frame, "unit");
+  this->units[name] = Librarian::build_stock<MUnit> (metalib, Treelog::null (),
+                                                     name, "unit");
 }
 
 void

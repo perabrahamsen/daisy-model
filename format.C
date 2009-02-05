@@ -24,7 +24,7 @@
 #include "assertion.h"
 #include "block.h"
 #include "librarian.h"
-#include "alist.h"
+#include "frame.h"
 
 const char *const Format::component = "format";
 
@@ -191,20 +191,20 @@ Format::Document::~Document ()
 }
 
 void
-Format::alist_description (const AttributeList& alist)
+Format::frame_description (const Frame& frame)
 {
   const std::string native_description = "description_" + format_type ();
-  if (alist.check (native_description))
+  if (frame.check (native_description))
     {
       soft_linebreak ();
-      raw (format_type (), alist.name (native_description));
+      raw (format_type (), frame.name (native_description));
       soft_linebreak ();
       return;
     }
-  if (alist.check ("description"))
+  if (frame.check ("description"))
     {
       soft_linebreak ();
-      text (alist.name ("description"));
+      text (frame.name ("description"));
       soft_linebreak ();
     }
 }

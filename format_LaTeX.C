@@ -24,7 +24,8 @@
 #include "version.h"
 #include "assertion.h"
 #include "librarian.h"
-#include "alist.h"
+#include "format.h"
+#include "frame.h"
 #include <ostream>
 #include <map>
 #include <time.h>
@@ -375,12 +376,12 @@ FormatLaTeX::see_page (const symbol scope, const symbol id)
 }
 
 void
-FormatLaTeX::alist_description (const AttributeList& alist)
+FormatLaTeX::frame_description (const Frame& frame)
 {
-  Format::alist_description (alist);
-  if (!alist.check ("cite"))
+  Format::frame_description (frame);
+  if (!frame.check ("cite"))
     return;
-  std::vector<symbol> cite = alist.name_sequence ("cite");
+  std::vector<symbol> cite = frame.name_sequence ("cite");
   if (cite.size () < 1)
     return;
   out () << "See also \\cite{" << cite[0];

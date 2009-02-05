@@ -310,7 +310,7 @@ Slow AOM pool parameterization by Sander Bruun.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.alist ().add_strings ("cite", "daisy-aomnew");
+    frame.add_strings ("cite", "daisy-aomnew");
     frame.add ("initial_fraction", 0.80);
     std::vector<double> CN;
     CN.push_back (90.0);
@@ -336,7 +336,7 @@ Original parameterization of the slow AOM pool.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.alist ().add_strings ("cite", "mueller-smb");
+    frame.add_strings ("cite", "mueller-smb");
     std::vector<double> fractions1;
     fractions1.push_back (0.50);
     fractions1.push_back (0.50);
@@ -353,7 +353,7 @@ Fast AOM pool parameterization by Sander Bruun.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.alist ().add_strings ("cite", "daisy-somnew");
+    frame.add_strings ("cite", "daisy-somnew");
     std::vector<double> efficiency2;
     efficiency2.push_back (0.50);
     efficiency2.push_back (0.50);

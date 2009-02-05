@@ -25,7 +25,7 @@
 #include "treelog.h"
 #include "frame.h"
 #include "mathlib.h"
-#include "alist.h"
+#include "librarian.h"
 #include <ostream>
 
 void 
@@ -259,7 +259,6 @@ Fetch::initialize (const std::vector<Fetch*>& fetch,
 void
 Fetch::load_syntax (Frame& frame)
 { 
-  frame.alist ().add ("description", "A summary file line.");
   frame.add ("tag", Value::String, Value::Const, "\
 The tag of a column in the log file to summarize in this line.");
   frame.add ("factor", Value::None (), Value::Const, "\
@@ -292,3 +291,8 @@ Fetch::Fetch (const symbol key)
     last (-42.42e42),
     sum (-42.42e42)
 { }
+
+static DeclareSubmodel fetch_submodel (Fetch::load_syntax, "Fetch", "\
+A summary file line.");
+
+// fetch.C ends here.

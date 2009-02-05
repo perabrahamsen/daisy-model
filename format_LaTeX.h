@@ -70,7 +70,7 @@ struct FormatLaTeX : public Format
   void see (const symbol type,
 	    const symbol scope, const symbol id);
   void see_page (const symbol scope, const symbol id);
-  void alist_description (const AttributeList& alist);
+  void frame_description (const Frame& frame);
 
   // Create and Destroy.
   explicit FormatLaTeX (Block&);

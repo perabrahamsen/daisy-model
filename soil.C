@@ -60,9 +60,6 @@ struct Soil::Implementation
     // Create and Destroy.
     static void load_syntax (Frame& frame)
     { 
-      frame.alist ().add ("description", "\
-A location and content of a soil layer.\n\
-The layers apply to the soil section not covered by the 'zones' parameter.");
       frame.add ("end", "cm", Check::negative (), Value::Const,
 		  "End point of this layer (a negative number).");
       frame.add_object ("horizon", Horizon::component, 
@@ -97,13 +94,6 @@ The layers apply to the soil section not covered by the 'zones' parameter.");
     // Create and Destroy.
     static void load_syntax (Frame& frame)
     { 
-      frame.alist ().add ("description", "\
-A location and content of a soil zone.\n\
-If several zones cover the same soil, the first one listed is used.\n\
-If no zones cover the soil, the 'horizons' parameter is used.\n\
-\n\
-With regard to the numeric discretization, the whole cell is assumed to\n\
-be of the soil found in the cell center.");
       frame.add_object ("volume", Volume::component, 
                          "Volume covered by this zone.");
       frame.add_object ("horizon", Horizon::component, 
@@ -173,6 +163,20 @@ be of the soil found in the cell center.");
   ~Implementation ()
   { }
 };
+
+static DeclareSubmodel 
+soil_layer_submodel (Soil::Implementation::Layer::load_syntax, "SoilLayer", "\
+A location and content of a soil layer.\n\
+The layers apply to the soil section not covered by the 'zones' parameter.");
+
+static DeclareSubmodel 
+soil_zone_submodel (Soil::Implementation::Zone::load_syntax, "SoilZone", "\
+A location and content of a soil zone.\n\
+If several zones cover the same soil, the first one listed is used.\n\
+If no zones cover the soil, the 'horizons' parameter is used.\n\
+\n\
+With regard to the numeric discretization, the whole cell is assumed to\n\
+be of the soil found in the cell center.");
 
 size_t 
 Soil::size () const
