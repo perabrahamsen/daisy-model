@@ -8,7 +8,7 @@ SETUPS  = genweather.dai test-GP2D.dai test-colloids.dai \
 	test-prd.dai test-aba.dai OpenMI_simple.dai OpenMI_management.dai \
 	heat-properties.dai batch.dai sample.dai test.dai DrainDrying.dai 
 DATA = dk-foulum.dwf dk-jyndevad.dwf cz-valecov.dwf pl-jadwisin.dwf \
-	sk-bratislava.dwf it-bologna.dwf taastrup.dwf example.gwt it-cer.gwt
+	sk-bratislava.dwf it-bologna.dwf dk-taastrup.dwf example.gwt it-cer.gwt
 SAFIR = safir-common.dai safir-site.dai
 TEXT	= Makefile README $(SETUPS) $(DATA) $(LIBS)
 REMOVE 	=  NOTHING
