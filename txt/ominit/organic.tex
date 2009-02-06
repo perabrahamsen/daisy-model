@@ -40,8 +40,6 @@
   applicable.
 \end{abstract}
 
-\tableofcontents
-
 \introduction
 
 Weather-driven simulation modeling has become an important component
@@ -92,6 +90,7 @@ it, and the evolution of the model which will provide further context
 for the initialization problem.
 
 \subsection{Evolution of the Daisy model}
+\label{sec:daisy-evol}
 
 The organic matter model in Daisy simulates farming practice at
 field scale, both on the short and the long term. The Daisy code
@@ -254,7 +253,7 @@ equilibrium with new input levels.
 
 \subsubsection{Generalized equations}
 
-The generalized form for the dynamic change of the individual pools is
+The generalized form for the change of the individual pools is
 shown in Equation~\ref{eq:generic}.
 \begin{equation}
   \label{eq:generic}
@@ -262,12 +261,12 @@ shown in Equation~\ref{eq:generic}.
     \Delta\mbox{\textsc{smb}}i &=& \displaystyle
     \sum_{j=1}^{\mbox{\tiny\#\textsc{smb}}} a_{i,j}\,\mbox{\textsc{smb}}j +
     \sum_{j=1}^{\mbox{\tiny\#\textsc{som}}} b_{i,j}\,&\mbox{\textsc{som}}j\\
-    & & + \sum_{j=1}^{\mbox{\tiny\#\textsc{som}}} c_{i,j}\,\mbox{\textsc{aom}}j
+    & & + \sum_{j=1}^{\mbox{\tiny\#\textsc{aom}}} c_{i,j}\,\mbox{\textsc{aom}}j
     &;i = 1\ldots\mbox{\#\textsc{smb}}\\
     \Delta\mbox{\textsc{som}}i &=& \displaystyle
     \sum_{j=1}^{\mbox{\tiny\#\textsc{smb}}} d_{i,j}\,\mbox{\textsc{smb}}j +
     \sum_{j=1}^{\mbox{\tiny\#\textsc{som}}} e_{i,j}\,&\mbox{\textsc{som}}j\\
-    & & + \sum_{j=1}^{\mbox{\tiny\#\textsc{som}}} f_{i,j}\,\mbox{\textsc{aom}}j
+    & & + \sum_{j=1}^{\mbox{\tiny\#\textsc{aom}}} f_{i,j}\,\mbox{\textsc{aom}}j
     &;i = 1\ldots\mbox{\#\textsc{som}}\\
     \Delta\mbox{\textsc{aom}}i &=& \displaystyle g_i\,\mbox{\textsc{aom}}i
     &;i = 1\ldots\mbox{\#\textsc{aom}}\\
@@ -286,7 +285,6 @@ respectively.  These relationships are calculated on basis of the
 paramtereization of the organic matter turnover model.  For example,
 the formula for finding $a_{1,2}$ can be found in
 Equation~\ref{eq:a12}.
-
 \begin{equation}
   \label{eq:a12}
   \begin{array}{rcl}
@@ -299,7 +297,7 @@ Equation~\ref{eq:a12}.
   F_{\mbox{\tiny\textsc{smb1}}}^C (X_c)
   \end{array}
 \end{equation}
-where $t_{\mbox{\tiny\textsc{smb1}}}$ is the turnover rate and
+Where $t_{\mbox{\tiny\textsc{smb1}}}$ is the turnover rate and
 $m_{\mbox{\tiny\textsc{smb1}}}$ is the maintenance of the
 \textsc{smb1}
 pool. $X_{\mbox{\tiny\textsc{smb1}}\rightarrow{\mbox{\tiny\textsc{smb2}}}}$
@@ -311,29 +309,108 @@ $F_{\mbox{\tiny\textsc{smb1}}}^\psi$, and
 $F_{\mbox{\tiny\textsc{smb1}}}^C$ are functions describing the effect
 of the abiotic factors for soil temperature, moisture, and clay,
 respectively. The other relationships in Equation~(\ref{eq:generic}))
-can be described by similar forms.  
-
+can be described by similar forms.
 
 \subsubsection{Knowns and unknowns}
 
-For initialization purposes, we assume constant temperature and soil
-humidity, which means $a_{i,j}$, $b_{i,j}$, $c_{i,j}$, $d_{i,j}$,
-$e_{i,j}$, $f_{i,j}$ and $g_i$ will all be constants.  This leaves us
+For initialization purposes, we assume known constant temperature and
+soil humidity, which means $a_{i,j}$, $b_{i,j}$, $c_{i,j}$, $d_{i,j}$,
+$e_{i,j}$, $f_{i,j}$ and $g_i$ will all be known constants.  We
+further assume that input come to the system at a constant rate for
+each pool, so that which means that $\Delta\mbox{\textsc{aom}}i$ will
+denote the input of each type of organic matter.  This still leaves us
 with one equation, and two unknowns (content and change) for each pool
-in our system.  In order to find a solution, we will need to either
-increase the number of equations, or decrease the number of unknowns.  
+in our system.  In order to find a solution, we will need further
+assumptions to either increase the number of equations, or decrease
+the number of unknowns.  
+
+The Daisy software provides the user with several options for this,
+each will result in a linear equation system that can be solved using
+a standard technique (Gauss-Jordan elimination is used in Daisy). All
+the options assume that the \textsc{smb} pools are in equilibrium,
+meaning $\Delta\mbox{\textsc{aom}}i$ are all constant.
+(Equation~\ref{eq:smb-eq}).
+\begin{equation}
+  \label{eq:smb-eq}
+  \Delta\mbox{\textsc{smb}}i = 0 ;i = 1\ldots\mbox{\#\textsc{smb}}
+\end{equation}
+This is reasonable as the \textsc{smb} pools tend to asjust to input
+levels relatively fast (a few years at most).  All but one
+initialization option require the user to specify the total organic
+matter in the soil, which allows us to add Equation~\ref{eq:total} to
+the system without incrasing the number of unknowns.
+\begin{equation}
+  \label{eq:total}
+  total = \sum_{i=1}^{\mbox{\tiny\#\textsc{smb}}} \mbox{\textsc{smb}}i
+    + \sum_{i=1}^{\mbox{\tiny\#\textsc{som}}} \mbox{\textsc{som}}i
+    + \sum_{i=1}^{\mbox{\tiny\#\textsc{aom}}} \mbox{\textsc{aom}}i
+\end{equation}
+The final common assumption is that the carbon input is known, as in
+Equation~\ref{eq:input}.
+\begin{equation}
+  \label{eq:input}
+  \Delta\mbox{\textsc{aom}}i = k_i ;i = 1\ldots\mbox{\#\textsc{aom}}
+\end{equation}
+Here $k_i$ denote the known carbon input to \textsc{aom}$i$, from
+which the size of \textsc{aom}$i$ can trivially be found given
+Equation~\ref{eq:generic} ($\mbox{\textsc{aom}}i = k_i / g_i$), and
+eliminated as unknowns from the equation system.
+
+Combining all three assumptions, we still lack
+$\mbox{\textsc{\#som}}-1$ equations before we can solve the system.
+
+\subsubsection{Explicit SOM partisioning}
+
+The orginal, and still supported, method of initializing the
+\textsc{som} pools was to require the user to explicitly specify the
+fraction of the total \textsc{som} in each pool, at in
+Equation~\ref{eq:som-fractions}.
+\begin{equation}
+  \label{eq:som-fractions}
+  \mbox{som}i = f_{\mbox{\scriptsize\textsc{som}}i} 
+    \sum_{j=1}^{\mbox{\tiny\#\textsc{som}}} \mbox{\textsc{som}}
+    \hspace{1cm};i = 1\ldots\mbox{\#\textsc{som}}
+\end{equation}
+where $f_{\mbox{\scriptsize\textsc{som}}i}$ are user supplied constants.  This
+gives us \mbox{\textsc{\#som}} additional equations, however since
+$\sum_{i=1}^{\mbox{\tiny\#\textsc{som}}} f_{\mbox{\scriptsize\textsc{som}}i} = 1$
+the system is overspecified, and we leave out one of the equations.
+Thus, together with \ref{eq:smb-eq}, \ref{eq:total}, and
+\ref{eq:input} this gives us the right number of equations to find a
+solution.
+
+The explicit \textsc{som} partitioning gives the user good control
+over the simulation with a manageable number of parameters.  However,
+the \textsc{som} partitioning is model specific, and does not
+correspond to measurable quantities.  After the \citet{daisy-somnew}
+recalibration, we did have problems with users continuing to use the
+no longer applicable \textsc{som} partitioning hueristics developed
+for the old model.
+
+\subsubsection{Background mineralization}
+
+For simulations where our main interest is in the soil organic matter
+as a nitrogen storage, Daisy allow the user to specify desired
+background mineralization levels.  The background mineralization is
+defined as the decrease over time of nitrogen stored in the
+\textsc{som} pools.  Assuming a constant C/N ratio for each pool
+($\mbox{\textsc{c/n}}_{\mbox{\scriptsize\textsc{som}}i}$), this
+is gives us the equation
+\begin{equation}
+  \label{eq:cn}
+  background = \sum_{i=1}^{\mbox{\tiny\#\textsc{som}}}
+  \frac{\Delta\mbox{\textsc{som}}i}
+       {\mbox{\textsc{c/n}}_{\mbox{\scriptsize\textsc{som}}i}}
+\end{equation}
+This gives us one extra equation, which is enough when we only have
+two \textsc{som} pools.
+
+\subsubsection{Equilibrium assumptions}
+
+
 
 \begin{verbatim}
 
-Static model
-  General equations for smb, som, aom, & total
-  Specific version for the simulation in the next chapter.
-
-Solutions
-
-  Knowns and unknowns, linear equations.
-
-  Explicit som partitioning
   Equilibrium 
     (delta SMB & delta SOM = 0)
     SOM3, TOTAL, delta AOM ukendt
