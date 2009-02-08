@@ -403,122 +403,59 @@ is gives us the equation
        {\mbox{\textsc{c/n}}_{\mbox{\scriptsize\textsc{som}}i}}
 \end{equation}
 This gives us one extra equation, which is enough when we only have
-two \textsc{som} pools.
+two \textsc{som} pools.  Using background mineralization for
+initializating the system has the advantages of being model
+independent and even indirectly measurable, but requires a good
+understanding of the nitrogen dynamics of the system, and can be
+surprising to users as the short term dynamics tend to dominate the
+system, so they won't see the expected mineralization in the simulation.
 
 \subsubsection{Equilibrium assumptions}
 
+If the system is in equilibrium, none of the pools will change, so we
+can add Equation~\ref{eq:som-eq}.
+\begin{equation}
+  \label{eq:som-eq}
+  \Delta\mbox{\textsc{som}}i = 0 ;i = 1\ldots\mbox{\#\textsc{som}}
+\end{equation}
+Together with \ref{eq:smb-eq}, \ref{eq:total}, and \ref{eq:input} this
+gives us one more equation than needed, so Daisy will allow the user
+to relax some other assumption.
 
+If we have an inert pool, like \textsc{som3} in Figure~\ref{fig:om2},
+adding an equation stating that it doesn't change is redundant.  This
+is the case for the default initialization of the subsoil, here we
+assume the active pools are in equilibrium with the input, and let the
+equation system  find the size of the inert pool.
 
-\begin{verbatim}
+The second equilibrium initialization allows the user to leave out
+Equation~\ref{eq:total}, so the total amound of (active) soil organic
+matter is estimated from the input levels.  This is rarely useful, as
+total amount of organic material is easy to measure, but has been used
+in this paper to initialize the organic matter content for long term
+simulations in section~\ref{sec:simulations}, where we examine the
+period from one equilibrium to another.
 
-  Equilibrium 
-    (delta SMB & delta SOM = 0)
-    SOM3, TOTAL, delta AOM ukendt
-    1. SOM3 ukendt, subsoil
-    2. TOTAL ukendt, next section
-    3. delta AOM ukendt
-  Quasi-equilibrium
-    delta SOM1 ukendt
-  C/N fixed, delta N kendt
-  
-Next: Compare Eq-3, Quasi-eq og lang opvarmning
-\end{verbatim}
+The last and most common euilibrium initialization is to let the user
+specify the size of the inert pool (usually to zero), and leave out
+Equation~\ref{eq:input}.  This is useful for cases where the user have
+no idea of what the input levels for the field used to be.
 
-\subsection{Initializing the standard organic matter model}
+\subsubsection{Quasi-equilibrium}
 
-The first step of a new initialization procedure was conducted by
-\citet{daisy-init}. They found that the ratio between the \textsc{som1}
-and \textsc{som2} for a system in equilibrium would be 49\% vs
-51\%. This recalibration required the users to readjust the
-partitioning between \textsc{som1} and \textsc{som2}. However, there
-was a strong tendency that the "non-experts" users just picked the
-equilibrium values.  As this was usually a poor
-
-
-In Daisy the current standard to initialize the partition between
-the organic pools is to use an equilibrium assumption. There are two
-conditions where equilibrium is a good assumption: 1) when the system
-quickly reach equilibrium compared to the external imposed changes, or
-2) when the dynamic of the system quickly dominate over the initial
-condition. The assumption of an initial equilibrium is good when a
-reasonable initial state is needed rather than a correct one. However,
-as depicted in the introduction the time to reach equilibrium in the
-soil organic matter system is measured in centuries and the long term
-simulations of organic matter dynamics are dependent on the initial
-amount of \textsc{som2}.
-
-The calibration of the current standard Daisy model is based
-primarily on measurements on agricultural topsoil
-\citep{daisy-somnew,mueller-smb}, where all the humus is presumed to
-be active. This means the calibration is not suitable for subsoils,
-nor for some humus-rich topsoils. The \textsc{som3} pool in
-Figure~\ref{fig:om2} exists to compensate for these shortcomings. The
-\textsc{som3} pool is inert and does not participate in the organic
-matter turnover. The inert humus still affects other aspects of
-Daisy, such as the hydraulic and adsorption properties of the
-soil. For the subsoil, it is assumed that the system is in equilibrium
-with the input, and park enough humus in the \textsc{som3} pool so
-that this assumption holds true. The observant reader will remember
-that we earlier argued that the equilibrium assumption is
-wrong. However, by definition the organic matter in the subsoil
-contributes relatively little to the total system so this assumption
-is good enough. For the topsoil, the user can explicitly put some of
-the humus in the \textsc{som3} pool, for instance for humus-rich
-topsoils.
+The default initialization for organic matter in the plowing layer is
+to relax the equilibrium, and allow the pool with the lowest
+(non-zero) turnover rate to change.  That is, we remove one of the
+equations added by Equation~\ref{eq:som-eq}, and keep all of Equations
+\ref{eq:smb-eq}, \ref{eq:total}, and \ref{eq:input}.  The idea is that
+all the fast poools will quickly adapt to the input and to the size of
+the slow pool.  In the next section, we will examine how well this
+works.
 
 \section{Methodology}
+\label{sec:simulations}
 
-Static model
-
-Dynamic model
-
-\subsection{Basic equations}
-
-In order to find a better way to initialize the organic matter pools, we will start by looking at the four equations describing their internal relationships:
-\begin{eqnarray}
-  \Delta\mbox{\textsc{smb1}} &=& a\> \mbox{\textsc{smb1}} + b\>
-  \mbox{\textsc{smb2}} + c\> \mbox{\textsc{som1}} + d\>
-  \mbox{\textsc{som2}} + e\, \Delta\mbox{\textsc{aom}}\label{eq:dsmb1}\\
-  \Delta\mbox{\textsc{smb2}} &=& f\> \mbox{\textsc{smb1}} + g\>
-  \mbox{\textsc{smb2}} + h\> \mbox{\textsc{som1}} + i\>
-  \mbox{\textsc{som2}} + j\, \Delta\mbox{\textsc{aom}}\label{eq:dsmb2}\\
-  \Delta\mbox{\textsc{som1}} &=& k\> \mbox{\textsc{smb1}} + l\>
-  \mbox{\textsc{smb2}} + m\> \mbox{\textsc{som1}} + n\>
-  \mbox{\textsc{som2}} + o\, \Delta\mbox{\textsc{aom}}\\
-  \Delta\mbox{\textsc{som2}} &=& p\> \mbox{\textsc{smb1}} + q\>
-  \mbox{\textsc{smb2}} + r\> \mbox{\textsc{som1}} + s\>
-  \mbox{\textsc{som2}} + t\, \Delta\mbox{\textsc{aom}}\label{eq:dsom2}
-\end{eqnarray}
-The change of matter in the organic pools ($\Delta\mbox{\textsc{smb1}}$, $\Delta\mbox{\textsc{smb2}}$, $\Delta\mbox{\textsc{som1}}$, $\Delta\mbox{\textsc{som2}}$) in Equation~(\ref{eq:dsmb1})-(\ref{eq:dsom2}) are described by the content (\textsc{smb1}, \textsc{smb2}, \textsc{som1}, or \textsc{som2}) and the factors $a$ to $t$. The \textsc{aom} pools are excluded in above equations as they do not receive any input from the other pools. They only receive input from outside sources such as crop residuals and fertilizer which can be ignored in the initialization procedure. However, the $\Delta\mbox{\textsc{aom}}$, are a source to the other pools and represents the total carbon input to the system.
-
-The factors $a$ to $t$ depend on the model. Hence, the factors are different in the the recalibrated model (Figure~\ref{fig:om2}) from the original model (Figure~\ref{fig:om1}). They also depend on the the abiotic factors in the model as the clay content, the soil temperature and water potential. Some of the factors may be zero. For example, no carbon is allocated directly from the \textsc{aom} pools to the \textsc{som1} pool, so $o$ will be zero. For instance, to calculate $f$ from equation~(\ref{eq:dsmb2}) the following equation can be listed:
-\begin{equation}
-  \label{eq:f}
-  f = (t_{\mbox{\tiny\textsc{smb1}}}\,
-  (X_{\mbox{\tiny\textsc{smb1}}\rightarrow{\mbox{\tiny\textsc{smb2}}}}\,
-  E_{\mbox{\tiny\textsc{smb1}}}
-  - 1) - m_{\mbox{\tiny\textsc{smb1}}})\,
-  F_{\mbox{\tiny\textsc{smb1}}}^T (T)\,
-  F_{\mbox{\tiny\textsc{smb1}}}^\psi (\psi)\,
-  F_{\mbox{\tiny\textsc{smb1}}}^C (X_c)
-\end{equation}
-where $t_{\mbox{\tiny\textsc{smb1}}}$ is the turnover rate and $m_{\mbox{\tiny\textsc{smb1}}}$ is the maintenance of the \textsc{smb1} pool. $X_{\mbox{\tiny\textsc{smb1}}\rightarrow{\mbox{\tiny\textsc{smb2}}}}$ is the carbon fraction going from \textsc{smb1} to \textsc{smb2}. $E_{\mbox{\tiny\textsc{smb1}}}$ is the efficiency of which \textsc{smb1} can be decomposed, the remaining part is lost to the atmosphere as CO$_2$. $F_{\mbox{\tiny\textsc{smb1}}}^T$, $F_{\mbox{\tiny\textsc{smb1}}}^\psi$, and $F_{\mbox{\tiny\textsc{smb1}}}^C$ are functions describing the effect of the  abiotic factors for soil temperature, moisture, and clay, respectively. The other factors in Equation~(\ref{eq:dsmb1})-(\ref{eq:dsom2}) can be described by similar forms. The factors are variables as soil temperature ($T$) as well as soil moisture ($\psi$) are variables and changes over time. The clay content is assumed to be constant and specified by the user.
-
-To ensure a robust way of initialization, with regard to changes in the model, the factors $a$ to $t$ are included in the initialization procedure. If only two pools are defined, \textsc{som} and \textsc{smb}, there are four equations (Equation~(\ref{eq:dsmb1})-(\ref{eq:dsom2})) and nine unknowns ($\Delta\mbox{\textsc{smb1}}$, $\Delta\mbox{\textsc{smb2}}$, $\Delta\mbox{\textsc{som1}}$, $\Delta\mbox{\textsc{som2}}$, $\Delta\mbox{\textsc{aom}}$, \textsc{smb1}, \textsc{smb2}, \textsc{som1}, \textsc{som2}). To solve this, more information is needed. The total organic matter content in the field, can be directly measured. This information gives one new equation (Equation~(\ref{eq:total})) and two new variables (\textsc{total} and \textsc{aom}) where the initial content of \mbox{\textsc{aom}} may be given a default value corresponding to typical root residuals left on the field.
-\begin{equation}
-  \label{eq:total}
-  \mbox{\textsc{total}} = \mbox{\textsc{smb1}} + \mbox{\textsc{smb2}}
-  + \mbox{\textsc{som1}} + \mbox{\textsc{som2}} + \mbox{\textsc{aom}}
-\end{equation}
-
-By assuming quasi-equilibrium in the initialization procedure, the slowest pool (\textsc{som1}) is allowed to change. The physical interpretation of this initialization is that all except for the slowest pool have reached a quasi-equilibrium with respect to the input and the size of the slowest pool. When it is assumed that the slowest pool is still changing (and the other pools will have to change to reflect that), this is not a true equilibrium. Hence, in the quasi-equilibrium it is assumed:
-\begin{eqnarray}
-  \Delta\mbox{\textsc{smb1}} &=& 0\\
-  \Delta\mbox{\textsc{smb2}} &=& 0\\
-  \Delta\mbox{\textsc{som2}} &=& 0\label{eq:fastpooleq}\\
-  \Delta\mbox{\textsc{aom}} &=& u\label{eq:daom}
-\end{eqnarray}
-This requires that the user specifies the carbon input ($u$) to the system. We now have nine equations (Equations (\ref{eq:dsmb1})-(\ref{eq:dsom2}) and (\ref{eq:total})-(\ref{eq:daom})) with six unknowns ($\Delta\mbox{\textsc{som1}}$, $\Delta\mbox{\textsc{aom}}$, \textsc{smb1}, \textsc{smb2}, \textsc{som1}, \textsc{som2}) to initialize the system which can be solved.
+Introduction, what we are trying to achieve.
 
 \subsection{Selected soils and management}
 For evaluate the use of assuming quasi-equilibrium in initializing soil organic matter, long-term organic matter simulations have been conducted using Danish management as well as Danish climate and soils. Two standard soils for Danish conditions have been selected, a coarse sandy soil and a sandy loam soil. The particle size distribution of the two soils are listed in Table (\ref{tab:psd}).
