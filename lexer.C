@@ -26,44 +26,9 @@
 #include <sstream>
 #include <vector>
 
-bool 
-Lexer::Position::operator== (const Position& pos) const
-{ return column == pos.column && line == pos.line; }
-
-bool 
-Lexer::Position::operator< (const Position& pos) const
-{ return line < pos.line || (column < pos.column && line == pos.line); }
-
-const Lexer::Position& 
-Lexer::Position::operator= (const Position& pos)
-{ line = pos.line; column = pos.column; return *this; }
-
-Lexer::Position::Position (const Position& pos)
-{ *this = pos; }
-
-Lexer::Position::Position (int l, int c)
-  : line (l),
-    column (c)
-{ }
-  
-Lexer::Position::Position ()
-  : line (-42),
-    column (-42)
-{ }
-   
-Lexer::Position::~Position ()
-{ }
-
-Lexer::Position 
+Filepos
 Lexer::position ()
-{ return Position (line, column); }
-
-const Lexer::Position& 
-Lexer::no_position ()
-{ 
-  static Position none;
-  return none;
-}
+{ return Filepos (file, line, column); }
 
 int
 Lexer::get ()
@@ -105,7 +70,7 @@ Lexer::good ()
 #endif
 }
 
-void Lexer::seek (const Lexer::Position& pos)
+void Lexer::seek (const Filepos& pos)
 {
   if (pos == position ())
     return;
@@ -131,18 +96,20 @@ Lexer::peek ()
 }
 
 void 
-Lexer::warning (const std::string& str, const Position& pos)
+Lexer::warning (const std::string& str, const Filepos& pos)
 {
   std::ostringstream tmp;
-  tmp << file << ":" << pos.line << ":" << (pos.column + 1) << ": " << str;
+  tmp << file << ":" << pos.line () << ":" << (pos.column () + 1) << ": " 
+      << str;
   err.warning (tmp.str ());
 }
 
 void 
-Lexer::error (const std::string& str, const Position& pos)
+Lexer::error (const std::string& str, const Filepos& pos)
 {
   std::ostringstream tmp;
-  tmp << file << ":" << pos.line << ":" << (pos.column + 1) << ": " << str;
+  tmp << file << ":" << pos.line () << ":" << (pos.column () + 1) << ": "
+      << str;
   err.error (tmp.str ());
   error_count++;
 }

@@ -34,6 +34,7 @@ class Check;
 class VCheck;
 class Treelog;
 class Metalib;
+class Filepos;
 
 #ifndef FRAME_H
 #define FRAME_H
@@ -50,11 +51,20 @@ class Metalib;
 
 class EXPORT Frame : public WScope
 {
+
+  // Content.
   struct Implementation;
 public:
   std::auto_ptr<Implementation> impl;
   virtual symbol type_name () const;
   symbol base_name () const;
+
+public:
+  // Parser.
+  virtual const Filepos& own_position () const;
+  const Filepos& inherited_position () const;
+  virtual void reposition (const Filepos&);
+  virtual int sequence_id () const;
 
   // Parent.
 public:

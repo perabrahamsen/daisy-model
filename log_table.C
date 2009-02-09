@@ -36,8 +36,9 @@
 #include "scope_block.h"
 #include "treelog.h"
 #include "frame.h"
-#include <sstream>
+#include "filepos.h"
 #include "assertion.h"
+#include <sstream>
 #include <fstream>
 
 struct LogTable : public LogSelect, public Destination
@@ -412,7 +413,7 @@ LogTable::build_parameters (Block& al)
 
 LogTable::LogTable (Block& al)
   : LogSelect (al),
-    parsed_from_file (al.name ("parsed_from_file", "")),
+    parsed_from_file (al.frame ().inherited_position ().filename ()),
     file (al.name ("where")),
     flush (al.flag ("flush")),
     record_separator (al.name ("record_separator")),

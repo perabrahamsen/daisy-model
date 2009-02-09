@@ -34,6 +34,7 @@
 #include "frame_model.h"
 #include "frame_submodel.h"
 #include "alist.h"
+#include "filepos.h"
 #include <sstream>
 #include <fstream>
 #include <algorithm>
@@ -681,13 +682,11 @@ PrinterFile::Implementation::print_library_file (const std::string& filename)
 	  {
 	    const symbol element = elements[j];
 	    const FrameModel& frame = library.model (element);
-
-	    if (frame.check ("parsed_from_file") 
-		&& frame.name ("parsed_from_file") == filename)
+            const Filepos& pos = frame.own_position ();
+	    if (pos.filename () ==  filename)
 	      {
 		found.push_back (FoundEntry (library_name, element, 
-					     frame.integer
-                                             /**/ ("parsed_sequence")));
+					     frame.sequence_id ()));
 	      }
 	  }
       }

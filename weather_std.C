@@ -163,7 +163,7 @@ struct WeatherStandard : public WeatherBase
   const symbol where;
   std::auto_ptr<std::istream> owned_stream;
   std::auto_ptr<LexerData> lex;
-  Lexer::Position end_of_header;
+  Filepos end_of_header;
 
   // These are the last read values for today.
   Time last_time;
@@ -1325,7 +1325,7 @@ WeatherStandard::WeatherStandard (Block& al)
     where (al.name ("where")),
     owned_stream (NULL),
     lex (NULL),
-    end_of_header (Lexer::no_position ()),
+    end_of_header (Filepos::none ()),
     last_time (end),
     last_air_temperature (-42.42e42),
     last_min_air_temperature (-42.42e42),

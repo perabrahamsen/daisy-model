@@ -40,6 +40,7 @@
 #include "unit.h"
 #include "treelog.h"
 #include "alist.h"
+#include "filepos.h"
 #include <numeric>
 #include <sstream>
 
@@ -1337,9 +1338,7 @@ struct ProgramAM_table : public Program
         daisy_assert (frame.type_name () == name);
         // const Syntax& syntax = library.syntax (name);
         tmp << name << "\t" << frame.base_name () << "\t";
-        if (frame.check ("parsed_from_file"))
-          tmp << frame.name ("parsed_from_file");
-        tmp << "\t";
+        tmp << frame.own_position ().filename () << "\t";
         if (frame.check ("NH4_fraction"))
           tmp << frame.number ("NH4_fraction");
         tmp << "\t";

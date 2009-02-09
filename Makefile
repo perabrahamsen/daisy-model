@@ -485,7 +485,7 @@ SPECIALS = weather_base.C \
 
 # Various utility code that are neither a component nor a (sub)model.
 # 
-OTHER = frame_submodel.C submodeler.C \
+OTHER = filepos.C frame_submodel.C submodeler.C \
 	frame_model.C scope.C value.C unit.C border.C resistance.C \
 	convert.C units.C tertsmall.C anystate.C imvec.C im.C frame.C \
 	bdconv.C abiotic.C scope_soil.C run.C treelog_text.C treelog_store.C \
@@ -1033,11 +1033,11 @@ source${OBJ}: source.C source.h model.h symbol.h time.h block.h value.h \
 photo${OBJ}: photo.C photo.h model.h symbol.h block.h value.h librarian.h \
   check.h frame.h scope.h
 format${OBJ}: format.C format.h model.h symbol.h assertion.h block.h value.h \
-  librarian.h alist.h
+  librarian.h frame.h scope.h
 depth${OBJ}: depth.C depth.h model.h symbol.h block.h value.h time.h plf.h \
-  lexer_data.h lexer.h output.h condition.h memutils.h number.h treelog.h \
-  units.h check.h vcheck.h assertion.h librarian.h mathlib.h path.h \
-  frame.h scope.h
+  lexer_data.h lexer.h filepos.h output.h condition.h memutils.h number.h \
+  treelog.h units.h check.h vcheck.h assertion.h librarian.h mathlib.h \
+  path.h frame.h scope.h
 wse${OBJ}: wse.C wse.h model.h symbol.h block.h value.h program.h run.h \
   mathlib.h assertion.h librarian.h treelog.h frame.h scope.h
 program${OBJ}: program.C program.h model.h symbol.h run.h block.h value.h \
@@ -1139,7 +1139,7 @@ geometry1d${OBJ}: geometry1d.C geometry1d.h geometry_vert.h geometry.h \
   assertion.h check.h vcheck.h librarian.h treelog.h
 fetch${OBJ}: fetch.C fetch.h destination.h symbol.h select.h model.h units.h \
   volume.h treelog.h frame.h scope.h value.h mathlib.h assertion.h \
-  alist.h
+  librarian.h
 horheat${OBJ}: horheat.C horheat.h texture.h plf.h hydraulic.h model.h \
   symbol.h frame.h scope.h value.h check.h mathlib.h assertion.h \
   librarian.h treelog.h
@@ -1246,7 +1246,7 @@ source_file${OBJ}: source_file.C source_file.h source.h model.h symbol.h \
   time.h lexer_table.h block.h value.h frame.h scope.h gnuplot_utils.h \
   vcheck.h mathlib.h assertion.h
 format_LaTeX${OBJ}: format_LaTeX.C format_LaTeX.h format.h model.h symbol.h \
-  version.h assertion.h librarian.h alist.h
+  version.h assertion.h librarian.h frame.h scope.h value.h
 log_all${OBJ}: log_all.C log_all.h log_select.h log.h time.h symbol.h \
   border.h model.h memutils.h select.h destination.h units.h volume.h \
   metalib.h frame.h scope.h value.h library.h block.h treelog.h \
@@ -1269,8 +1269,8 @@ log_select${OBJ}: log_select.C log_select.h log.h time.h symbol.h border.h \
   metalib.h frame.h scope.h value.h library.h block.h field.h format.h \
   assertion.h librarian.h treelog.h frame_model.h
 parser_file${OBJ}: parser_file.C parser_file.h parser.h model.h symbol.h \
-  metalib.h frame.h scope.h value.h library.h block.h lexer.h number.h \
-  integer.h plf.h time.h treelog_text.h treelog.h path.h units.h \
+  metalib.h frame.h scope.h value.h library.h block.h lexer.h filepos.h \
+  number.h integer.h plf.h time.h treelog_text.h treelog.h path.h units.h \
   mathlib.h assertion.h memutils.h librarian.h frame_model.h \
   frame_submodel.h alist.h
 geometry${OBJ}: geometry.C geometry.h symbol.h value.h volume.h model.h \
@@ -1282,6 +1282,7 @@ printer_file${OBJ}: printer_file.C printer_file.h printer.h model.h symbol.h \
   alist.h
 log_alist${OBJ}: log_alist.C log_alist.h log.h time.h symbol.h border.h \
   model.h library.h frame_submodel.h frame.h scope.h value.h assertion.h
+filepos${OBJ}: filepos.C filepos.h symbol.h value.h
 frame_submodel${OBJ}: frame_submodel.C frame_submodel.h frame.h scope.h \
   value.h symbol.h assertion.h
 submodeler${OBJ}: submodeler.C submodeler.h block.h symbol.h value.h frame.h \
@@ -1308,7 +1309,7 @@ im${OBJ}: im.C im.h symbol.h value.h chemical.h model.h units.h unit.h am.h \
   assertion.h
 frame${OBJ}: frame.C frame.h scope.h value.h symbol.h frame_model.h \
   frame_submodel.h syntax.h block.h assertion.h librarian.h model.h \
-  intrinsics.h library.h memutils.h alist.h
+  intrinsics.h library.h memutils.h alist.h filepos.h
 bdconv${OBJ}: bdconv.C bdconv.h convert.h symbol.h geometry.h value.h soil.h \
   volume.h model.h units.h assertion.h
 abiotic${OBJ}: abiotic.C abiotic.h mathlib.h assertion.h
@@ -1343,8 +1344,8 @@ scope_sources${OBJ}: scope_sources.C scope_sources.h scope.h value.h symbol.h \
 scope_table${OBJ}: scope_table.C scope_table.h scope.h value.h symbol.h \
   lexer_table.h block.h assertion.h
 lexer_table${OBJ}: lexer_table.C lexer_table.h block.h symbol.h value.h \
-  lexer_data.h lexer.h frame.h scope.h assertion.h mathlib.h submodeler.h \
-  memutils.h time.h vcheck.h path.h
+  lexer_data.h lexer.h filepos.h frame.h scope.h assertion.h mathlib.h \
+  submodeler.h memutils.h time.h vcheck.h path.h
 block${OBJ}: block.C block.h symbol.h value.h metalib.h frame.h scope.h \
   library.h librarian.h model.h stringer.h number.h assertion.h \
   scope_block.h treelog.h frame_model.h
@@ -1377,9 +1378,9 @@ traverse${OBJ}: traverse.C traverse.h symbol.h metalib.h frame.h scope.h \
   value.h library.h assertion.h librarian.h model.h frame_submodel.h \
   frame_model.h
 treelog${OBJ}: treelog.C treelog.h symbol.h
-lexer_data${OBJ}: lexer_data.C lexer_data.h lexer.h symbol.h time.h mathlib.h \
-  assertion.h
-lexer${OBJ}: lexer.C lexer.h symbol.h treelog.h
+lexer_data${OBJ}: lexer_data.C lexer_data.h lexer.h symbol.h filepos.h time.h \
+  mathlib.h assertion.h
+lexer${OBJ}: lexer.C lexer.h symbol.h filepos.h treelog.h
 daisy${OBJ}: daisy.C daisy.h program.h model.h symbol.h run.h time.h \
   timestep.h vcheck.h memutils.h weather.h im.h value.h groundwater.h \
   horizon.h output.h condition.h log.h border.h parser.h nitrification.h \
@@ -1710,7 +1711,7 @@ program_gnuplot${OBJ}: program_gnuplot.C program.h model.h symbol.h run.h \
 program_document${OBJ}: program_document.C program.h model.h symbol.h run.h \
   library.h metalib.h frame.h scope.h value.h block.h printer_file.h \
   printer.h xref.h plf.h format.h treelog.h assertion.h librarian.h \
-  frame_submodel.h frame_model.h alist.h
+  frame_submodel.h frame_model.h
 program_batch${OBJ}: program_batch.C program.h model.h symbol.h run.h block.h \
   value.h treelog.h path.h assertion.h memutils.h librarian.h frame.h \
   scope.h metalib.h
@@ -1774,8 +1775,8 @@ rootdens_G_P${OBJ}: rootdens_G_P.C rootdens.h model.h symbol.h block.h \
   value.h geometry.h log.h time.h border.h check.h mathlib.h assertion.h \
   librarian.h treelog.h frame.h scope.h alist.h
 groundwater_file${OBJ}: groundwater_file.C groundwater.h model.h symbol.h \
-  block.h value.h lexer_data.h lexer.h assertion.h time.h librarian.h \
-  path.h frame.h scope.h
+  block.h value.h lexer_data.h lexer.h filepos.h assertion.h time.h \
+  librarian.h path.h frame.h scope.h
 action_fertilize${OBJ}: action_fertilize.C action.h model.h symbol.h block.h \
   value.h daisy.h program.h run.h time.h timestep.h vcheck.h memutils.h \
   field.h border.h am.h im.h check.h assertion.h librarian.h volume.h \
@@ -1821,9 +1822,10 @@ action_message${OBJ}: action_message.C action.h model.h symbol.h block.h \
   value.h condition.h log.h time.h border.h daisy.h program.h run.h \
   timestep.h vcheck.h memutils.h librarian.h treelog.h frame.h scope.h
 weather_std${OBJ}: weather_std.C weather_base.h weather.h model.h symbol.h \
-  im.h value.h chemical.h fao.h lexer_data.h lexer.h time.h plf.h \
-  mathlib.h assertion.h units.h submodeler.h block.h check.h vcheck.h \
-  memutils.h librarian.h path.h treelog.h frame.h scope.h alist.h
+  im.h value.h chemical.h fao.h lexer_data.h lexer.h filepos.h time.h \
+  plf.h mathlib.h assertion.h units.h submodeler.h block.h check.h \
+  vcheck.h memutils.h librarian.h path.h treelog.h frame.h scope.h \
+  alist.h
 groundwater_pipe${OBJ}: groundwater_pipe.C groundwater.h model.h symbol.h \
   block.h value.h log.h time.h border.h geometry.h soil.h soil_heat.h \
   soil_water.h depth.h treelog.h mathlib.h assertion.h check.h \

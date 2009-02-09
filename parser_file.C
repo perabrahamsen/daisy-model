@@ -69,7 +69,7 @@ struct ParserFile::Implementation
   { return lexer->good (); }
   void error (const std::string& str)
   { lexer->error (str); }
-  void error (const std::string& str, const Lexer::Position& pos)
+  void error (const std::string& str, const Filepos& pos)
   { lexer->error (str, pos); }
   void warning (const std::string& str)
   { lexer->warning (str); }
@@ -86,7 +86,7 @@ struct ParserFile::Implementation
   double get_number (const symbol dim);
   bool check_dimension (const symbol syntax, const symbol read);
   double convert (double value, const symbol syntax, const symbol read, 
-		  const Lexer::Position&);
+		  const Filepos&);
   void skip (const char*);
   void skip ();
   void skip_to_end ();
@@ -323,7 +323,7 @@ ParserFile::Implementation::get_number (const symbol syntax_dim)
   if (peek () == '.' || isdigit (peek ()) || peek () == '-')
     {
       double value = get_number ();
-      Lexer::Position pos = lexer->position ();
+      Filepos pos = lexer->position ();
 
       if (looking_at ('['))
         {
@@ -403,7 +403,7 @@ double
 ParserFile::Implementation::convert (double value,
 				     const symbol syntax, 
 				     const symbol read, 
-				     const Lexer::Position& pos)
+				     const Filepos& pos)
 { 
   if (syntax == Value::Unknown ())
     return value; 
@@ -520,10 +520,16 @@ private:
   const symbol name;
   symbol type_name () const
   { return name; }
-public:
   const int seq_id;
   const symbol file;
-  const Lexer::Position position;
+  Filepos position_;
+public:
+  const Filepos& own_position () const
+  { return position_; }
+  void reposition (const Filepos& pos)
+  { position_ = pos; }
+  int sequence_id () const
+  { return seq_id; }
 
   // Create and Destroy.
 private:
@@ -532,23 +538,19 @@ private:
       name (parent.name),
       seq_id (parent.seq_id),
       file (parent.file),
-      position (parent.position)
+      position_ (parent.position_)
   { }
   FrameParsed& clone () const
   { return *new FrameParsed (*this, parent_clone); }
 
 public:
   FrameParsed (const symbol name_, const FrameModel& model, const int seq_id_,
-               const symbol file_, const Lexer::Position position_)
+               const Filepos pos)
     : FrameModel (model, parent_copy),
       name (name_),
       seq_id (seq_id_),
-      file (file_),
-      position (position_)
-  { 
-    this->alist ().add ("parsed_from_file", file);
-    this->alist ().add ("parsed_sequence", seq_id);
-  }
+      position_ (pos)
+  { }
 };
 
 void
@@ -559,10 +561,11 @@ ParserFile::Implementation::add_derived (Library& lib)
   // Check for duplicates.
   if (lib.check (name))
     {
-      const AttributeList& old = lib.lookup (name);
-      if (old.check ("parsed_from_file"))
+      const Frame& old = lib.model (name);
+      const Filepos& pos = old.own_position ();
+      if (pos != Filepos::none ())
 	warning (name + " is already defined in " 
-		 + old.name ("parsed_from_file") + ", overwriting");
+		 + pos.filename () + ", overwriting");
       else
 	warning (name + " is already defined, overwriting");
       lib.remove (name);
@@ -583,7 +586,7 @@ ParserFile::Implementation::add_derived (Library& lib)
     }
   std::auto_ptr<FrameModel> frame (new FrameParsed (name, lib.model (super), 
                                                     metalib.get_sequence (),
-                                                    file, lexer->position ()));
+                                                    lexer->position ()));
   if (!frame.get ())
     throw "Failed to derive";
 
@@ -1216,7 +1219,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 	    case Value::Number:
 	      {
 		std::vector<double> array;
-		std::vector<Lexer::Position> positions;
+		std::vector<Filepos> positions;
 		int count = 0;
 		const int size = frame.type_size (name);
 		const symbol syntax_dim = frame.dimension (name);
@@ -1246,7 +1249,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 			    for (int i = 1; i < same; i++)
 			      {
 				array.push_back (array.back ());
-				positions.push_back (Lexer::no_position ());
+				positions.push_back (Filepos::none ());
 				count++;
 			      }
 			  }
@@ -1278,7 +1281,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 		daisy_assert (positions.size () == array.size ());
 		for (unsigned int i = 0; i < array.size (); i++)
 		  {
-		    if (positions[i] != Lexer::no_position ())
+		    if (positions[i] != Filepos::none ())
 		      try
 			{
 			  frame.check (name, array[i]);

@@ -35,6 +35,7 @@
 #include "librarian.h"
 #include "frame_submodel.h"
 #include "frame_model.h"
+#include "filepos.h"
 #include <sstream>
 #include <fstream>
 #include <memory>
@@ -1057,10 +1058,9 @@ ProgramDocument::print_model (const symbol name, const Library& library,
 			     current_component + "-" + name);
       format->index (name);
       format->text ("A `" + type + "' parameterization ");
-      
-      if (frame.check ("parsed_from_file"))
-	format->text ("defined in `" + frame.name ("parsed_from_file")
-		      + "'.\n");
+      const Filepos& pos = frame.own_position ();
+      if (pos != Filepos::none ())
+	format->text ("defined in `" + pos.filename () + "'.\n");
       else
 	{
 	  format->text ("build into ");
@@ -1079,8 +1079,7 @@ ProgramDocument::print_model (const symbol name, const Library& library,
                                 frame, entries, 
                                 library.name ());
 
-      const std::vector<Library::doc_fun>& doc_funs 
-	= library.doc_funs ();
+      const std::vector<Library::doc_fun>& doc_funs = library.doc_funs ();
       for (size_t i = 0; i < doc_funs.size ();i++)
 	{
 	  format->soft_linebreak ();

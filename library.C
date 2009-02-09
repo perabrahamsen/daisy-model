@@ -28,6 +28,7 @@
 #include "assertion.h"
 #include "memutils.h"
 #include "frame_model.h"
+#include "filepos.h"
 #include <map>
 #include <sstream>
 
@@ -163,7 +164,7 @@ Library::Implementation::clear_parsed ()
   for (frame_map::iterator i = frames.begin (); i != frames.end (); i++)
     {
       Frame& frame = *((*i).second);
-      if (frame.check ("parsed_from_file"))
+      if (frame.own_position () != Filepos::none ())
 	{
 	  const symbol key = (*i).first;
 	  frames.erase (i);
@@ -180,11 +181,9 @@ Library::Implementation::refile_parsed (const std::string& from, const std::stri
   for (frame_map::iterator i = frames.begin (); i != frames.end (); i++)
     {
       Frame& frame = *((*i).second);
-      if (frame.check ("parsed_from_file")
-	  && frame.name ("parsed_from_file") == from)
-	{
-	  frame.add ("parsed_from_file", to);
-	}
+      const Filepos& pos = frame.own_position ();
+      if (pos.filename () == from)
+        frame.reposition (Filepos (to, pos.line (), pos.column ()));
     }
 }
 

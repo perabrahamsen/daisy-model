@@ -45,6 +45,7 @@
 #include "treelog.h"
 #include "frame_model.h"
 #include "alist.h"
+#include "filepos.h"
 #include <string>
 #include <typeinfo>
 
@@ -354,27 +355,12 @@ daisy_library_alist (const Library* library, const char* name)
 extern "C" const char* EXPORT
 daisy_library_file (const Library* library, const char* name)
 { 
-  const AttributeList& alist = library->lookup (symbol (name));
-  if (alist.check ("parsed_from_file"))
-    return alist.name ("parsed_from_file").name ().c_str ();
+  const Frame& frame = library->model (name);
+  if (frame.own_position () != Filepos::none ())
+    return frame.own_position ().filename ().name ().c_str ();
   
   return NULL;
 }
-
-#if 0
-extern "C" void EXPORT
-daisy_library_derive (Toplevel *const toplevel, Library* library, 
-		      const char* super, AttributeList* alist, 
-		      const char* name, const char* filename)
-{ 
-  if (filename)
-    {
-      alist->add ("parsed_from_file", filename);
-      alist->add ("parsed_sequence", toplevel->metalib ().get_sequence ());
-    }
-  library->add_derived (symbol (name), *alist, symbol (super));
-}
-#endif
 
 extern "C" void EXPORT
 daisy_library_remove (Library* library, const char* name)

@@ -31,6 +31,7 @@
 #include "library.h"
 #include "memutils.h"
 #include "alist.h"
+#include "filepos.h"
 #include <vector>
 #include <set>
 #include <sstream>
@@ -83,6 +84,38 @@ Frame::base_name () const
         return base_name;
     }
   return Value::None ();
+}
+
+const Filepos& 
+Frame::own_position () const
+{ 
+  return Filepos::none (); 
+}
+
+const Filepos& 
+Frame::inherited_position () const
+{ 
+  if (own_position () != Filepos::none ())
+    return own_position ();
+
+  if (parent ())
+    return parent ()->inherited_position ();
+  
+  return Filepos::none (); 
+}
+
+void
+Frame::reposition (const Filepos& pos)
+{ daisy_notreached (); }
+
+
+int 
+Frame::sequence_id () const
+{
+  if (parent ())
+    return parent ()->sequence_id ();
+  
+  return -1;
 }
 
 const Frame* 

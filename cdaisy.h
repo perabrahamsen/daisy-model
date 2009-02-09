@@ -292,12 +292,6 @@ daisy_library_file (const daisy_library* library, const char* name);
 
    Currently, only the Horizon and Column libraries are supported.
 */
-#if 0
-EXPORT void
-daisy_library_derive (daisy_daisy* daisy, daisy_library* library, 
-                      const char* super, const daisy_alist* alist, 
-                      const char* name, const char* filename);
-#endif
 
 EXPORT void                            /* Remove object NAME from LIBRARY */
 daisy_library_remove (daisy_library* library, const char* name);

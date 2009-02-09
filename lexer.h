@@ -24,7 +24,7 @@
 #define LEXER_H
 
 #include "symbol.h"
-
+#include "filepos.h"
 #include <string>
 #include <memory>
 #include <iosfwd>
@@ -44,41 +44,16 @@ public:
   const symbol file;
   int error_count;
 
-  // Position
-  class Position
-  {
-    // Content.
-  private:
-    int line;
-    int column;
-
-    // Use.
-  public:
-    bool operator== (const Position&) const;
-    bool operator!= (const Position& pos) const
-    { return !(*this == pos); }
-    bool operator< (const Position&) const;
-
-    // Create and Destroy.
-    friend class Lexer;
-  public:
-    const Position& operator= (const Position&);
-    Position (const Position&);
-    Position (int line, int column);
-    Position ();
-    ~Position ();
-  };
-  Position position ();
-  static const Position& no_position ();
-  void seek (const Position&);
+  Filepos position ();
+  void seek (const Filepos&);
 
   // Operations.
 public:
   int get ();
   int peek ();
   bool good ();
-  void warning (const std::string& str, const Position&);
-  void error (const std::string& str, const Position&);
+  void warning (const std::string& str, const Filepos&);
+  void error (const std::string& str, const Filepos&);
   void debug (const std::string& str);
   void warning (const std::string& str);
   void error (const std::string& str);
