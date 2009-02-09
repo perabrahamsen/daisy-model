@@ -199,7 +199,7 @@ UIRun::attach (Toplevel& toplevel)
       && frame.type_size ("time") == Value::Singleton
       && frame.check (toplevel.metalib (), "time", Treelog::null ()))
     {
-      Time time (frame.alist ("time"));
+      Time time (frame.frame ("time"));
       qt_time->set_time (time);
     }
   if (!attach_log ("QtTime", qt_time)
@@ -229,9 +229,9 @@ UIRun::attach (Toplevel& toplevel)
 
   // The program description.
   qt_description->setToolTip ("The description of the selected program.");
-  if (frame.check ("description")
-      && frame.name ("description") != Toplevel::default_description)
-    qt_description->setText (frame.name ("description").name ().c_str ());
+  if (frame.description () != Value::None ()
+      && frame.description () != Toplevel::default_description)
+    qt_description->setText (frame.description ().name ().c_str ());
   else
     qt_description->hide (); // setText ("No description.");
   layout->addWidget (qt_description /* , Qt::AlignLeft */);
@@ -395,9 +395,9 @@ UIRun::reset ()
     }
 
   // The program description.
-  if (frame.check ("description")
-      && frame.name ("description") != Toplevel::default_description)
-    qt_description->setText (frame.name ("description").name ().c_str ());
+  if (frame.description () != Value::None ()
+      && frame.description () != Toplevel::default_description)
+    qt_description->setText (frame.description ().name ().c_str ());
   else
     qt_description->setText ("No setup file has been loaded.\n\
 You can drag a setup file to the Daisy icon to run a simulation.");

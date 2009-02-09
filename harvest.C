@@ -105,7 +105,7 @@ Harvest::load_syntax (Frame& frame)
 
 Harvest::Harvest (Block& alist)
   : column (alist.name ("column")),
-    time (alist.alist ("time")),
+    time (alist.frame ("time")),
     crop (alist.name ("crop")),
     stem_DM (alist.number ("stem_DM")),
     stem_N (alist.number ("stem_N")),

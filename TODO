@@ -1,5 +1,9 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+  // Old style access.
+public:
+  AttributeList& alist () const;
+
 * Frame
 
 ** Lexer::Position -> position.h

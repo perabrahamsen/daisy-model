@@ -105,13 +105,10 @@ static struct ActionActivitySyntax : public DeclareModel
   {
     bool ok = true;
 
-    if (al.check ("description"))
-      {
-        const symbol description = al.name ("description");
-        const Library& library = metalib.library (Action::component);
-        if (library.check (description))
-          msg.warning ("'" + description + "' is taken as a description of this activity, but is also a valid action.  Maybe you meant to write '(" + description + ") instead");
-      }
+    const symbol description = al.description ();
+    const Library& library = metalib.library (Action::component);
+    if (library.check (description))
+      msg.warning ("'" + description + "' is taken as a description of this activity, but is also a valid action.  Maybe you meant to write '(" + description + ") instead");
 
     return ok;
   }

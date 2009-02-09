@@ -29,7 +29,6 @@
 #include "time.h"
 #include "units.h"
 #include "treelog.h"
-#include "alist.h"
 #include <sstream>
 
 struct WeatherOld::Implementation

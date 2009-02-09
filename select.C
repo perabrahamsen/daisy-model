@@ -29,7 +29,6 @@
 #include "scope_id.h"
 #include "metalib.h"
 #include "library.h"
-#include "alist.h"
 #include "frame_submodel.h"
 #include "frame_model.h"
 #include "check.h"
@@ -363,7 +362,7 @@ Select::Implementation::find_description (Metalib& metalib,
 {
   const Library& library = metalib.library (Select::component);
   if (library.has_interesting_description (al))
-    return al.name ("description");
+    return al.description ();
   return "";
 }
 

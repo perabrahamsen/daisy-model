@@ -46,5 +46,7 @@ static struct SummaryInit : public DeclareComponent
     : DeclareComponent (Summary::component, "\
 Summary reports for log parameterizations.")
   { }
+  void load_frame (Frame& frame) const
+  { Model::load_model (frame); }
 } Summary_init;
 

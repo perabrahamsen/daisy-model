@@ -23,7 +23,6 @@
 
 #include "library.h"
 #include "block.h"
-#include "alist.h"
 #include "treelog.h"
 #include "assertion.h"
 #include "memutils.h"
@@ -62,10 +61,6 @@ struct Library::Implementation
   Implementation (const symbol n);
   ~Implementation ();
 };
-
-AttributeList&
-Library::Implementation::lookup (const symbol key) const
-{ return frame (key).alist (); }
 
 const FrameModel&
 Library::Implementation::model (const symbol key) const
@@ -221,10 +216,6 @@ Frame&
 Library::frame (const symbol key) const
 { return impl->frame (key); }
 
-AttributeList&
-Library::lookup (const symbol key) const
-{ return impl->lookup (key); }
-
 bool
 Library::check (const symbol key) const
 { return impl->check (key); }
@@ -306,27 +297,26 @@ bool
 Library::has_interesting_description (const Frame& frame) const
 {
   // A missing description is boring.
-  if (!frame.check ("description"))
+  const symbol my_d = frame.description ();
+  if (my_d == Value::None ())
     return false;
   
-  // The description of models are always interesting.
-  if (frame.base_name () == Value::None ())
+  // Top level description are always interesting.
+  const symbol base_name = frame.base_name ();
+  if (base_name == Value::None ())
     return true;
   
   // If the model has no description, this one is interesting.
-  const symbol type = frame.type_name ();
-  if (!check (type))
+  if (!check (base_name))
     {
-      daisy_bug (name () + " does not have " + type.name ());
-      return false;
+      daisy_bug (name () + " does not have '" + base_name + "' defined");
+      return true;
     }
-  daisy_assert (check (type));
-  const AttributeList& super = lookup (type);
-  if (!super.check ("description"))
-    return true;
+  daisy_assert (check (base_name));
+  const Frame& super = model (base_name);
   
   // If the model description is different, this one is interesting.
-  return frame.name ("description") != super.name ("description");
+  return my_d != super.description ();
 }
 
 void

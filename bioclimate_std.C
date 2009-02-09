@@ -382,7 +382,7 @@ BioclimateStandard::BioclimateStandard (Block& al)
     irrigation_subsoil (0.0),
     irrigation_subsoil_old (0.0),
     irrigation_subsoil_permanent (al.number ("irrigation_subsoil_permanent")),
-    snow (al.alist ("Snow")),
+    snow (al.frame ("Snow")),
     snow_ep (0.0),
     snow_ea_ (0.0),
     snow_water_in (0.0),

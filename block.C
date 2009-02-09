@@ -298,10 +298,6 @@ const Frame&
 Block::frame () const
 { return impl->frame; }
 
-const AttributeList&
-Block::alist () const
-{ return impl->frame.alist (); }
-
 Treelog&
 Block::msg () const
 { return impl->msg; }
@@ -411,16 +407,6 @@ Block::plf (const symbol key) const
     return this->plf (impl->expand_reference (key));
 
   return frame.plf (key); 
-}
-
-AttributeList& 
-Block::alist (const symbol key) const
-{ 
-  const Frame& frame = find_frame (key);
-  if (frame.is_reference (key))
-    return this->alist (impl->expand_reference (key));
-
-  return frame.alist (key); 
 }
 
 const Frame& 

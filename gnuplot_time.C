@@ -318,10 +318,10 @@ set style data lines\n";
 GnuplotTime::GnuplotTime (Block& al)
   : GnuplotBase (al),
     begin (al.check ("begin") 
-	   ? new Time (al.alist ("begin")) 
+	   ? new Time (al.frame ("begin")) 
 	   : NULL),
     end (al.check ("end")
-	 ? new Time (al.alist ("end")) 
+	 ? new Time (al.frame ("end")) 
 	 : NULL),
     ymin_flag (al.check ("ymin")),
     ymin (al.number ("ymin", 42.42e42)),

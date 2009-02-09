@@ -30,7 +30,6 @@ class OrganicMatter;
 class CrpN;
 class Partition;
 class Geometry;
-class AttributeList;
 class Frame;
 class Log;
 class PLF;
@@ -172,7 +171,7 @@ public:
 		   const std::vector<const Frame*>& dead,
 		   const Geometry&, OrganicMatter&, Treelog&);
   static void load_syntax (Frame&);
-  Production (const AttributeList&);
+  Production (const Frame&);
   ~Production ();
 };
 

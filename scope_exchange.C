@@ -106,7 +106,7 @@ ExchangeNumber::set_number (const double val)
 { value = val; has_value = true; }
 
 ExchangeNumber::ExchangeNumber (Block& al)
-  : Exchange (al.name ("name"), al.name ("description")),
+  : Exchange (al.name ("name"), al.frame ().description ()),
     dimension_ (al.name ("dimension")),
     has_value (al.check ("value")),
     value (al.number ("value", -42.42e42))
@@ -162,7 +162,7 @@ ExchangeName::name () const
 { return value; }
 
 ExchangeName::ExchangeName (Block& al)
-  : Exchange (al.name ("name"), al.name ("description")),
+  : Exchange (al.name ("name"), al.frame ().description ()),
     value (al.name ("value"))
 { }
 

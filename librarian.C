@@ -29,7 +29,6 @@
 #include "assertion.h"
 #include "librarian.h"
 #include "frame_model.h"
-#include "alist.h"
 #include <sstream>
 #include <map>
 
@@ -272,6 +271,13 @@ class FrameDeclared : public FrameModel
   const Declare& declaration;
   symbol type_name () const
   { return declaration.name; }
+  using Frame::description;
+  symbol description () const
+  { return declaration.description_; }
+
+  bool used_to_be_a_submodel () const
+  { return declaration.used_to_be_a_submodel (); }
+
   
 protected:
   FrameDeclared (const FrameDeclared& frame, parent_clone_t)
@@ -331,11 +337,15 @@ Declare::Declare (const symbol c, const symbol n,
                   const symbol d)
   : component (c),
     name (n),
-    description (d)
+    description_ (d)
 { Librarian::declare (component, name, *this); }
 
 Declare::~Declare ()
 { }
+
+bool 
+Declare::used_to_be_a_submodel () const
+{ return false; }
 
 FrameModel& 
 Declare::create_frame () const 
@@ -343,10 +353,7 @@ Declare::create_frame () const
 
 void 
 DeclareComponent::load (Frame& frame) const
-{
-  frame.alist ().add ("description", description);
-  load_frame (frame);
-}
+{ load_frame (frame); }
 
 void 
 DeclareComponent::load_frame (Frame&) const
@@ -390,11 +397,7 @@ DeclareSuper::DeclareSuper (const symbol component,
 
 void 
 DeclareBase::load (Frame& frame) const
-{
-  frame.alist ().add ("description", description);
-  frame.alist ().add ("base_class", super);
-  load_frame (frame);
-}
+{ load_frame (frame); }
 
 DeclareBase::DeclareBase (const symbol component,
                             const symbol name, const symbol s, 
@@ -414,11 +417,7 @@ DeclareModel::create_frame () const
 
 void 
 DeclareModel::load (Frame& frame) const
-{
-  frame.alist ().add ("description", description);
-  frame.alist ().add ("base_class", super);
-  load_frame (frame);
-}
+{ load_frame (frame); }
 
 DeclareModel::DeclareModel (const symbol component,
                             const symbol name, const symbol s, 
@@ -437,10 +436,7 @@ DeclareModel::~DeclareModel ()
 
 void 
 DeclareParam::load (Frame& frame) const
-{
-  frame.alist ().add ("description", description);
-  load_frame (frame);
-}
+{ load_frame (frame); }
 
 DeclareParam::DeclareParam (symbol component, symbol name, symbol super, 
                             symbol description)

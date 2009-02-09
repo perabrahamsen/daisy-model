@@ -115,7 +115,6 @@ static struct ReactionStandardSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-
     frame.add_object ("transform", Transform::component,
                        "Tranformation process between 'A' to 'B'.");
     frame.add ("A", Value::String, Value::Const,

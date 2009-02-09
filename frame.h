@@ -26,7 +26,6 @@
 class Frame;
 class FrameModel;
 class FrameSubmodel;
-class AttributeList;
 class PLF;
 class Block;
 class Library;
@@ -58,6 +57,7 @@ public:
   std::auto_ptr<Implementation> impl;
   virtual symbol type_name () const;
   symbol base_name () const;
+  virtual symbol description () const;
 
 public:
   // Parser.
@@ -65,6 +65,7 @@ public:
   const Filepos& inherited_position () const;
   virtual void reposition (const Filepos&);
   virtual int sequence_id () const;
+  virtual bool used_to_be_a_submodel () const;
 
   // Parent.
 public:
@@ -73,10 +74,6 @@ public:
   void unregister_child (const Frame* child) const;
   void reparent_children (const Frame* new_parent) const;
   virtual void replace_parent (const Frame* new_parent) const;
-
-  // Old style access.
-public:
-  AttributeList& alist () const;
 
   // Common access.
 public:
@@ -252,7 +249,6 @@ public:
   bool flag (const symbol) const;
   bool flag (const symbol, bool default_value) const;
   const PLF& plf (const symbol) const;
-  AttributeList& alist (const symbol) const;
   const Frame& frame (const symbol) const;
   const FrameModel& model (const symbol) const;
   int integer (const symbol) const;

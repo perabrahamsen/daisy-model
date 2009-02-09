@@ -86,6 +86,21 @@ Frame::base_name () const
   return Value::None ();
 }
 
+symbol 
+Frame::description () const
+{
+  static const symbol desc ("description");
+
+  if (check (desc) && lookup (desc) == Value::String 
+      && type_size (desc) == Value::Singleton)
+    return name (desc);
+
+  if (parent ())
+    return parent ()->description ();
+
+  return Value::None ();
+}
+
 const Filepos& 
 Frame::own_position () const
 { 
@@ -116,6 +131,15 @@ Frame::sequence_id () const
     return parent ()->sequence_id ();
   
   return -1;
+}
+
+bool 
+Frame::used_to_be_a_submodel () const
+{ 
+  if (parent ())
+    return parent ()->used_to_be_a_submodel ();
+
+  return false;
 }
 
 const Frame* 
@@ -159,10 +183,6 @@ Frame::reparent_children (const Frame* new_parent) const
 void
 Frame::replace_parent (const Frame*) const
 { daisy_assert (!parent ()); }
-
-AttributeList& 
-Frame::alist () const
-{ return impl->alist; }
 
 void 
 Frame::entries (std::set<symbol>& e) const
@@ -636,15 +656,6 @@ Frame::plf (const symbol key) const
     return parent ()->plf (key);
   else
     return impl->alist.plf (key);
-}
-
-AttributeList& 
-Frame::alist (const symbol key) const
-{ 
-  if (parent () && !impl->alist.check (key))
-    return parent ()->alist (key);
-  else
-    return impl->alist.alist (key);
 }
 
 const Frame& 

@@ -215,7 +215,7 @@ LogSelect::check (const Border& border, Treelog& err) const
 
 LogSelect::LogSelect (Block& al)
   : Log (al),
-    description (al.name ("description")),
+    description (al.frame ().description ()),
     condition (Librarian::build_item<Condition> (al, "when")),
     entries (Librarian::build_vector<Select> (al, "entries")),
     volume (Volume::build_obsolete (al))
@@ -302,7 +302,7 @@ LogSelect::document_entries (Format& format, Metalib& metalib,
 	  const Frame& entry = *entries[i];
 	  Format::Item d2 (format, Select::select_get_tag (entry).name ());
 	  if (library.has_interesting_description (entry))
-	    format.text (entry.name ("description"));
+	    format.text (entry.description ());
 	  format.soft_linebreak ();
 	}
       return;

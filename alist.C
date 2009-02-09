@@ -694,15 +694,6 @@ AttributeList::plf (const symbol key) const
   return *value.plf;
 }
 
-AttributeList& 
-AttributeList::alist (const symbol key) const
-{
-  const AValue& value = impl.lookup (key);
-  value.expect (key, Value::AList);
-  value.singleton (key);
-  return value.frame->alist ();
-}
-
 Frame& 
 AttributeList::frame (const symbol key) const
 {

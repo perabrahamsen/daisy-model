@@ -36,7 +36,6 @@ class Units;
 class Frame;
 class FrameModel;
 class PLF;
-class AttributeList;
 
 #ifdef __unix
 #define EXPORT /* Nothing */
@@ -56,7 +55,6 @@ public:
   Metalib& metalib ();
   const Units& units ();
   Path& path ();
-  const AttributeList& alist () const;
   const Frame& frame () const;
   Treelog& msg () const;
   symbol type_name () const;
@@ -89,7 +87,6 @@ public:
   bool flag (symbol) const;
   bool flag (symbol, bool default_value) const;
   const PLF& plf (symbol) const;
-  AttributeList& alist (symbol) const;
   const Frame& frame (symbol) const;
   const FrameModel& model (symbol) const;
   int integer (symbol) const;

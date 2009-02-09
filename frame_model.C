@@ -79,17 +79,7 @@ FrameModel::root ()
   {
     FrameRoot ()
       : FrameModel ()
-    { 
-#ifdef SHARED_PARAMETERS
-      this->add ("description", Value::String, Value::OptionalConst, "\
-Description of this model or parameterization.\n\
-The value will appear in the reference manual, and may also appear in some \
-GUI front ends.");
-      this->add ("cite", Value::String, Value::Const, Value::Sequence, "\
-BibTeX keys that would be relevant for this model or paramterization.");
-      this->add ("cite", std::vector<symbol> ());
-#endif 
-    }
+    { }
     FrameRoot& clone () const
     { daisy_notreached (); }
   } frame;

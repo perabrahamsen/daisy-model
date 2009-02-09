@@ -39,7 +39,6 @@
 #include "librarian.h"
 #include "unit.h"
 #include "treelog.h"
-#include "alist.h"
 #include "filepos.h"
 #include <numeric>
 #include <sstream>
@@ -174,7 +173,7 @@ struct AM::Implementation::Lock
   // Create and Destroy.
   static void load_syntax (Frame&);
   Lock (symbol c, symbol p);
-  Lock (const AttributeList& al);
+  Lock (const Frame& al);
 };
 
 void 
@@ -198,7 +197,7 @@ AM::Implementation::Lock::Lock (symbol c, symbol p)
     part (p)
 { }
   
-AM::Implementation::Lock::Lock (const AttributeList& al)
+AM::Implementation::Lock::Lock (const Frame& al)
   : crop (al.name ("crop")),
     part (al.name ("part"))
 { }
@@ -933,13 +932,13 @@ AM::AM (Block& al)
     impl (new Implementation 
 	  (al.flag ("initialized"),
            al.check ("creation")
-	   ? Time (al.alist ("creation"))
+	   ? Time (al.frame ("creation"))
 	   : Time (1, 1, 1, 1),
            al.check ("name") ? al.name ("name") : al.type_name (),
 	   Librarian::build_vector<AOM> (al, "om")))
 {
   if (al.check ("lock"))
-    impl->lock = new AM::Implementation::Lock (al.alist ("lock"));
+    impl->lock = new AM::Implementation::Lock (al.frame ("lock"));
 }
 
 void
@@ -950,7 +949,7 @@ AM::initialize (const Geometry& geo, const double max_rooting_depth)
 
   daisy_assert (frame.get ());
   if (frame->check ("lock"))
-    impl->lock = new Implementation::Lock (frame->alist ("lock"));
+    impl->lock = new Implementation::Lock (frame->frame ("lock"));
 
   if (!impl->initialized)
     {

@@ -22,7 +22,6 @@
 
 #include "submodeler.h"
 #include "frame.h"
-#include "alist.h"
 #include "assertion.h"
 
 BlockSubmodel::BlockSubmodel (Block& parent, const symbol key)
@@ -32,7 +31,7 @@ BlockSubmodel::BlockSubmodel (Block& parent, const symbol key)
 BlockSubmodel::BlockSubmodel (Block& parent, const symbol key, 
                               const size_t index)
   : Block (parent,
-           *parent.alist ().frame_sequence (key)[index],
+           *parent.frame_sequence (key)[index],
            sequence_id (key, index))
 { }
 

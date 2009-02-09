@@ -31,7 +31,6 @@
 #include "geometry.h"
 #include "mathlib.h"
 #include "block.h"
-#include "alist.h"
 
 const char *const AOM::component = "AOM";
 
@@ -276,11 +275,12 @@ AOM::AOM (Block& al)
 
 static struct AOMInit : public DeclareSolo
 {
+  bool used_to_be_a_submodel () const
+  { return true; }
   Model* make (Block& al) const
   { return new AOM (al); }
   void load_frame (Frame& frame) const
   {
-    frame.alist ().add ("used_to_be_a_submodel", true);
     OM::load_syntax (frame, "\
 The first numbers corresponds to each of the SMB pools, the next\n\
 number to the SOM buffer, and any remaining numbers to each of\n\

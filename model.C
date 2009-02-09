@@ -31,7 +31,6 @@
 void 
 Model::load_model (Frame& frame)
 { 
-#ifndef SHARED_PARAMETERS
   frame.add ("description", Value::String, Value::OptionalConst, "\
 Description of this model or parameterization.\n\
 The value will appear in the reference manual, and may also appear in some \
@@ -39,7 +38,6 @@ GUI front ends.");
   frame.add ("cite", Value::String, Value::Const, Value::Sequence, "\
 BibTeX keys that would be relevant for this model or paramterization.");
   frame.add ("cite", std::vector<symbol> ());
-#endif
 }
 
 Model::Model ()

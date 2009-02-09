@@ -32,7 +32,7 @@
 
 struct ActionRidge : public Action
 {
-  const AttributeList& ridge;
+  const Frame& ridge;
 
   void doIt (Daisy& daisy, const Scope&, Treelog& out)
     { 
@@ -49,7 +49,7 @@ struct ActionRidge : public Action
 
   ActionRidge (Block& al)
     : Action (al),
-      ridge (al.alist ("ridge"))
+      ridge (al.frame ("ridge"))
     { }
 };
 

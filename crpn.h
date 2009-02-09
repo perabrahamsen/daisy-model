@@ -28,7 +28,6 @@ class Soil;
 class SoilWater;
 class Chemistry;
 class RootSystem;
-class AttributeList;
 class Frame;
 class Log;
 class PLF;
@@ -103,7 +102,7 @@ private:
   bool check_alist (Metalib&, const Frame& al, Treelog& err);
 public:
   static void load_syntax (Frame&);
-  CrpN (const AttributeList&);
+  CrpN (const Frame&);
   ~CrpN ();
 };
 

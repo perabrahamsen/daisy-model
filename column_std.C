@@ -96,7 +96,7 @@ public:
   void sow (Metalib&, const FrameModel&, 
             double row_width, double row_pos, double seed,
             const Time&, double dt, Treelog&);
-  void ridge (const AttributeList& al);
+  void ridge (const Frame& al);
   void irrigate_overhead (double flux, double temp, const IM&, double dt,
 			  Treelog& msg);
   void irrigate_surface (double flux, double temp, const IM&, double dt, 
@@ -196,7 +196,7 @@ ColumnStandard::sow (Metalib& metalib, const FrameModel& al,
 
 
 void 
-ColumnStandard::ridge (const AttributeList& al)
+ColumnStandard::ridge (const Frame& al)
 { movement->ridge (surface, *soil, *soil_water, al); }
 
 void 
@@ -851,7 +851,7 @@ ColumnStandard::ColumnStandard (Block& al)
 	     : NULL), 
     vegetation (Librarian::build_item<Vegetation> (al, "Vegetation")),
     bioclimate (Librarian::build_item<Bioclimate> (al, "Bioclimate")),
-    surface (al.alist ("Surface")),
+    surface (al.frame ("Surface")),
     geometry (movement->geometry ()),
     soil (submodel<Soil> (al, "Soil")),
     soil_water (submodel<SoilWater> (al, "SoilWater")),

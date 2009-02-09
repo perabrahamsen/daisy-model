@@ -70,7 +70,7 @@ SummarySimple::initialize (std::vector<Select*>& select, Treelog& msg)
 
 SummarySimple::SummarySimple (Block& al)
   : Summary (al),
-    description (al.name ("description")),
+    description (al.frame ().description ()),
     file (al.name ("where", "")),
     title (al.check ("title") ? al.name ("title") : name),
     print_sum (al.flag ("print_sum")),

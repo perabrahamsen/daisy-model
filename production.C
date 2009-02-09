@@ -34,7 +34,6 @@
 #include "mathlib.h"
 #include "frame.h"
 #include "librarian.h"
-#include "alist.h"
 #include <sstream>
 
 // Chemical constants affecting the crop.
@@ -840,7 +839,7 @@ Production::initialize (Metalib& metalib, const symbol name,
   daisy_assert (AM_leaf);
 }
 
-Production::Production (const AttributeList& al)
+Production::Production (const Frame& al)
   : ShldResC (al.number ("ShldResC")),
     ReMobilDS (al.number ("ReMobilDS")),
     ReMobilRt (al.number ("ReMobilRt")),

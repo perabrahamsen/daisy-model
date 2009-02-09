@@ -96,7 +96,7 @@ SummaryBalance::initialize (std::vector<Select*>& select, Treelog& msg)
 
 SummaryBalance::SummaryBalance (Block& al)
   : Summary (al),
-    description (al.name ("description")),
+    description (al.frame ().description ()),
     file (al.name ("where", "")),
     title (al.check ("title") ? al.name ("title") : name),
     period (al.check ("period") ? al.name ("period") : symbol ("")),

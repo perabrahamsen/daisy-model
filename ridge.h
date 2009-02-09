@@ -25,7 +25,6 @@
 
 #include <vector>
 
-struct AttributeList;
 struct Frame;
 struct Log;
 struct Geometry1D;
@@ -57,7 +56,7 @@ public:
   static void load_syntax (Frame&);
   void initialize (const Geometry1D& geo,
                    const Soil&, const SoilWater&);
-  Ridge (const AttributeList& al);
+  Ridge (const Frame& al);
   ~Ridge ();
 };
 

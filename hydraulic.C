@@ -36,7 +36,6 @@
 #include "librarian.h"
 #include "frame.h"
 #include "block.h"
-#include "alist.h"
 #include <memory>
 #include <sstream>
 
@@ -64,7 +63,7 @@ struct Hydraulic::K_at_h
 		"Water conductivity.");
     frame.order ("h", "K");
   }
-  K_at_h (const AttributeList& al)
+  K_at_h (const Frame& al)
     : h (al.number ("h")),
       K (al.number ("K"))
   { }
@@ -223,7 +222,7 @@ Hydraulic::check (Treelog& msg) const
 Hydraulic::Hydraulic (Block& al)
   : ModelLogable (al.type_name ()),
     K_init (al.check ("K_at_h")
-	    ? new K_at_h (al.alist ("K_at_h"))
+	    ? new K_at_h (al.frame ("K_at_h"))
 	    : NULL),
     Theta_sat (al.number ("Theta_sat", -42.42e42)),
     Theta_res (al.number ("Theta_res", 0.0)),

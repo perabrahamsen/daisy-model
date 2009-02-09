@@ -177,16 +177,17 @@ public:
   ~Librarian ();
 };
 
-class Declare : private boost::noncopyable
+class EXPORT Declare : private boost::noncopyable
 {
 public:
   const symbol component;
   const symbol name;
-  const symbol description;
+  const symbol description_;
   class Builder
   { protected: virtual Model* make (Block&) const = 0; };
 
 public:
+  virtual bool used_to_be_a_submodel () const;
   virtual FrameModel& create_frame () const;
   virtual void load (Frame&) const = 0;
 protected:

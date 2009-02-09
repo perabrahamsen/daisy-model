@@ -37,7 +37,6 @@
 #include "librarian.h"
 #include "treelog.h"
 #include "frame.h"
-#include "alist.h"
 #include "metalib.h"
 #include <sstream>
 

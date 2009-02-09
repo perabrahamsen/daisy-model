@@ -1,7 +1,8 @@
-// snow.h
+// filepos.h --- Position in a file.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
+// Copyright 2009 Per Abrahamsen and KU.
 //
 // This file is part of Daisy.
 // 
@@ -20,44 +21,39 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef SNOW_H
-#define SNOW_H
+#ifndef FILEPOS_H
+#define FILEPOS_H
 
-struct Weather;
-struct Bioclimate;
-struct Frame;
-struct Log;
-struct Movement;
-struct Soil;
-struct SoilWater;
-struct SoilHeat;
-struct Treelog;
+#include "symbol.h"
 
-class Snow
-{ 
-  struct Implementation;
-  Implementation& impl;
-
-  // Simulation.
+// Filepos
+class Filepos 
+{
+  // Content.
+private:
+  symbol file_;
+  int line_;
+  int column_;
 public:
-  void tick (Treelog&, const Movement&,
-             const Soil&, const SoilWater&, const SoilHeat&,
-	     double Si, double q_h, double Prain,
-	     double Psnow, double Pond, double T, double Epot, double dt);
-  void output (Log&) const;
+  symbol filename () const;
+  int line () const;
+  int column () const;
 
-  // Queries.
+  // Use.
 public:
-  double percolation () const;
-  double temperature () const;
-  double evaporation () const;
-  double storage () const;
+  bool operator== (const Filepos&) const;
+  bool operator!= (const Filepos& pos) const
+  { return !(*this == pos); }
+  bool operator< (const Filepos&) const;
 
-  // Create & Destroy.
+  // Create and Destroy.
 public:
-  static void load_syntax (Frame&);
-  Snow (const Frame& al);
-  ~Snow ();
+  static const Filepos& none ();
+  const Filepos& operator= (const Filepos&);
+  Filepos (const Filepos&);
+  Filepos (const symbol file, int line, int column);
+  Filepos ();
+  ~Filepos ();
 };
 
-#endif // SNOW_H
+#endif // FILEPOS_H

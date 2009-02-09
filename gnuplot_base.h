@@ -26,7 +26,6 @@
 #include <map>
 
 class Frame;
-class AttributeList;
 
 class GnuplotBase : public Gnuplot
 {
@@ -45,8 +44,7 @@ public:
     const double x;
     const double y;
     static void load_syntax (Frame&);
-    static const AttributeList& unset ();
-    explicit Size (const AttributeList& al);
+    explicit Size (const Frame* al);
   };
 private:
   Size size;

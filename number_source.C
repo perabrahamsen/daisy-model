@@ -83,8 +83,8 @@ struct NumberSource : public Number
   NumberSource (Block& al)
     : Number (al),
       source (Librarian::build_item<Source> (al, "source")),
-      begin (al.check ("begin") ? new Time (al.alist ("begin")) : NULL),
-      end (al.check ("end") ? new Time (al.alist ("end")) : NULL),
+      begin (al.check ("begin") ? new Time (al.frame ("begin")) : NULL),
+      end (al.check ("end") ? new Time (al.frame ("end")) : NULL),
       state (uninitialized),
       val (-42.42e42)
   { }

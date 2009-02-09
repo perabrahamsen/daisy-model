@@ -33,7 +33,6 @@
 #include "librarian.h"
 #include "frame_model.h"
 #include "frame_submodel.h"
-#include "alist.h"
 #include "filepos.h"
 #include <sstream>
 #include <fstream>
@@ -612,8 +611,10 @@ PrinterFile::Implementation
       daisy_bug ("Asking for '" + name + "' getting '" + frame->type_name ()
                  + "' (base " + frame->base_name () + ")");
     }
+#if 0
   if (!print_description && frame->alist ().check ("description"))
     frame->alist ().remove ("description");
+#endif
   const FrameModel& root = library.model ("component");
 
   out << "(def" << library_name << " ";
@@ -696,7 +697,6 @@ PrinterFile::Implementation::print_library_file (const std::string& filename)
 
   // Print the entries.
   bool first = true;
-  const AttributeList empty_alist;
   for (unsigned int i = 0; i < found.size (); i++)
     {
       if (first)

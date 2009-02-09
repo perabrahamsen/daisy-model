@@ -126,6 +126,8 @@ interest is water and nitrogen uptake at different depths, and the\n\
 vertical leaf area distribution, which are used for competition with\n\
 other crops.")
   { }
+  void load_frame (Frame& frame) const
+  { Model::load_model (frame); }
 } Crop_init;
 
 // crop.C ends here.

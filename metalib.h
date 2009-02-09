@@ -63,6 +63,10 @@ public:
   void clear_all_parsed ();
   void refile_parsed (const std::string& from, const std::string& to);
   void added_object (symbol library, symbol object);
+  const std::vector<symbol>& parser_files () const;
+  void add_parser_file (const symbol file);
+  const std::vector<const Frame*>& parser_inputs () const;
+  void set_parser_inputs (const std::vector<const Frame*>&);
 
   // Create and Destroy.
 public:

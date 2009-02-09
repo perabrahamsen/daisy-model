@@ -291,7 +291,7 @@ public:
 
   // Utilities
 public:
-  static void print_dlf_header (std::ostream& out, const Frame& al);
+  static void print_dlf_header (std::ostream& out, const Metalib& al);
 
   // Self use.
 public:

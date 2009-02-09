@@ -43,8 +43,10 @@ struct Metalib::Implementation
 
   typedef std::map<symbol, Library*> library_map;
   library_map all;
-
+  
   int sequence;
+  std::vector<symbol> parser_files;
+  auto_vector<const Frame*> parser_inputs;
 
   // Create and destroy.
   void initialize (Metalib& metalib)
@@ -128,6 +130,29 @@ Metalib::get_sequence ()
   // Nobody will ever need more than two billion objects --- Per 1998.
   daisy_assert (impl->sequence > 0);
   return impl->sequence;
+}
+
+const std::vector<symbol>& 
+Metalib::parser_files () const
+{ return impl->parser_files; }
+
+void 
+Metalib::add_parser_file (const symbol file)
+{ impl->parser_files.push_back (file); }
+
+const std::vector<const Frame*>& 
+Metalib::parser_inputs () const
+{ return impl->parser_inputs; }
+
+void 
+Metalib::set_parser_inputs (const std::vector<const Frame*>& inputs)
+{
+  sequence_delete (impl->parser_inputs.begin (), impl->parser_inputs.end ());
+  impl->parser_inputs.erase (impl->parser_inputs.begin (), 
+                             impl->parser_inputs.end ());
+  daisy_assert (impl->parser_inputs.size () == 0);
+  for (size_t i = 0; i < inputs.size (); i++)
+    impl->parser_inputs.push_back (&inputs[i]->clone ());
 }
 
 void

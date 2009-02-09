@@ -201,10 +201,11 @@ Format::frame_description (const Frame& frame)
       soft_linebreak ();
       return;
     }
-  if (frame.check ("description"))
+  const symbol d = frame.description ();
+  if (d != Value::None ())
     {
       soft_linebreak ();
-      text (frame.name ("description"));
+      text (d);
       soft_linebreak ();
     }
 }

@@ -58,6 +58,8 @@ static struct ReactionInit : public DeclareComponent
     : DeclareComponent (Reaction::component, "\
 Generic transformations between soil chemicals.")
   { }
+  void load_frame (Frame& frame) const
+  { Model::load_model (frame); }
 } Reaction_init;
 
 // reaction.C ends here.

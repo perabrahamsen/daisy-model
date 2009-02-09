@@ -167,8 +167,10 @@ daisy_alist_get_string (const daisy_alist* alist, const char* name);
 EXPORT daisy_bool                      /* Get bool NAME from ALIST. */
 daisy_alist_get_flag (const daisy_alist* alist, const char* name);
 
+#if 0
 EXPORT const daisy_alist*              /* Get alist NAME from ALIST. */
 daisy_alist_get_alist (const daisy_alist* alist, const char* name);
+#endif
 
 EXPORT void                            /* Set integer NAME from ALIST to VALUE. */
 daisy_alist_set_integer (daisy_alist* alist, const char* name,
@@ -276,9 +278,9 @@ daisy_library_name (const daisy_library* library, const unsigned int index);
 #if 0
 EXPORT const daisy_syntax*             /* Syntax for object NAME in LIBRARY. */
 daisy_library_syntax (const daisy_library* library, const char* name);
-#endif
 EXPORT const daisy_alist*              /* Alist for object NAME in LIBRARY. */
 daisy_library_alist (const daisy_library* library, const char* name);
+#endif
 
 EXPORT const char*                     /* File associated with object NAME in 
                                    LIBRARY, or NULL if none. */
@@ -349,10 +351,10 @@ daisy_daisy_parse_file (daisy_daisy* toplevel, char* filename);
 #if 0
 EXPORT daisy_syntax*            /* Extract program syntax. */
 daisy_daisy_get_program_syntax (daisy_daisy* toplevel);
-#endif
 
 EXPORT daisy_alist*             /* Extract program alist. */
 daisy_daisy_get_program_alist (daisy_daisy* toplevel);
+#endif
 
 EXPORT void                     /* Initialize toplevel object. */
 daisy_daisy_initialize (daisy_daisy* toplevel);

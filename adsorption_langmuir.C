@@ -29,7 +29,6 @@
 #include "librarian.h"
 #include "treelog.h"
 #include "frame.h"
-#include "alist.h"
 
 class AdsorptionLangmuir : public Adsorption
 {

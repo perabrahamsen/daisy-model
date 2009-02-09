@@ -32,7 +32,6 @@
 #include "librarian.h"
 #include "mathlib.h"
 #include "treelog.h"
-#include "alist.h"
 #include <sstream>
 
 struct Snow::Implementation
@@ -71,10 +70,10 @@ struct Snow::Implementation
              const Soil&, const SoilWater&, const SoilHeat&,
 	     double Si, double q_h, double Prain,
 	     double Psnow, double Pond, double T, double Epot, double dt);
-  Implementation (const AttributeList& al);
+  Implementation (const Frame& al);
 };
 
-Snow::Implementation::Implementation (const AttributeList& al)
+Snow::Implementation::Implementation (const Frame& al)
   : EvapSnowPack (0.0),
     q_s (0.0),
     Ssnow (al.number ("Ssnow")),
@@ -419,7 +418,7 @@ Snow::load_syntax (Frame& frame)
   frame.add ("K_snow_factor", 2.86e-6);
 }
   
-Snow::Snow (const AttributeList& al)
+Snow::Snow (const Frame& al)
   : impl (*new Implementation (al))
 { }
 

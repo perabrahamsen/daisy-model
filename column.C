@@ -77,6 +77,7 @@ static struct ColumnInit : public DeclareComponent
 {
   void load_frame (Frame& frame) const
   { 
+    Model::load_model (frame);
     frame.add ("size", Value::Unknown (), Value::State,
                "Area covered by this column, for use by the 'merge' action.\n\
 The dimension is up to you, as long as all columns use the same unit.");

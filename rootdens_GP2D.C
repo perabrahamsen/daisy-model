@@ -34,7 +34,6 @@
 #include "frame_model.h"
 #include "metalib.h"
 #include "library.h"
-#include "alist.h"
 
 #include <sstream>
 

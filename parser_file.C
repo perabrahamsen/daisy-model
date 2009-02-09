@@ -39,7 +39,6 @@
 #include "librarian.h"
 #include "frame_model.h"
 #include "frame_submodel.h"
-#include "alist.h"
 #include <set>
 #include <memory>
 #include <sstream>
@@ -596,8 +595,10 @@ ParserFile::Implementation::add_derived (Library& lib)
   if ((!frame->ordered () 
        || (frame->lookup (*(frame->order ().begin ())) != Value::String
            && frame->lookup (*(frame->order ().begin ())) != Value::Object)) 
-      && looking_at ('"'))
-    frame->alist ().add ("description", get_string ());
+      && looking_at ('"')
+      && frame->lookup ("description") == Value::String
+      && frame->type_size ("description") == Value::Singleton)
+    frame->add ("description", get_string ());
 
   // Add separate attributes for this object.
   Treelog::Open nest (msg, "Defining " + lib.name () + " '" + name + "'");
@@ -617,7 +618,6 @@ ParserFile::Implementation::load_object (const Library& lib, bool in_sequence,
   bool skipped = false;
 
   static const symbol original_symbol ("original");
-  static const std::string compatibility_symbol ("used_to_be_a_submodel");
 
   symbol type;
   skip ();
@@ -655,11 +655,10 @@ ParserFile::Implementation::load_object (const Library& lib, bool in_sequence,
       c = peek ();
     }
 
-  if (original && original->check (compatibility_symbol) && c == '(')
+  if (original && original->used_to_be_a_submodel () && c == '(')
     {
       // Special hack to allow skipping the "original" keyword for
       // models that used to be submodels.
-      daisy_assert (original->flag (compatibility_symbol));
       const symbol original_type = original->type_name ();
       daisy_assert (lib.check (original_type));
 
@@ -1442,16 +1441,12 @@ ParserFile::load_top ()
   load_nested ();
   
   // Add inputs.
-  impl->metalib.alist ().add ("parser_inputs", impl->inputs);
+  impl->metalib.set_parser_inputs (impl->inputs);
   sequence_delete (impl->inputs.begin (), impl->inputs.end ());
   impl->inputs.erase (impl->inputs.begin (), impl->inputs.end ());
-
+  
   // Remember filename.
-  std::vector<symbol> files;
-  if (impl->metalib.check ("parser_files"))
-    files = impl->metalib.name_sequence ("parser_files");
-  files.push_back (symbol (impl->file));
-  impl->metalib.alist ().add ("parser_files", files);
+  impl->metalib.add_parser_file (impl->file);
 }
 
 int

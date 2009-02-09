@@ -30,7 +30,6 @@
 #include "librarian.h"
 #include "block.h"
 #include "treelog.h"
-#include "alist.h"
 #include <sstream>
 #include <iomanip>
 
@@ -555,16 +554,6 @@ Time::Time (Block& al)
                               al.integer ("second")))
 { }
 
-Time::Time (const AttributeList& al)
-  : impl (new Implementation (al.integer ("year"), 
-                              mday2yday (al.integer ("year"),
-                                         al.integer ("month"),
-                                         al.integer ("mday")),
-                              al.integer ("hour"),
-                              al.integer ("minute"),
-                              al.integer ("second")))
-{ }
-
 Time::Time (const Frame& al)
   : impl (new Implementation (al.integer ("year"), 
                               mday2yday (al.integer ("year"),
@@ -574,7 +563,6 @@ Time::Time (const Frame& al)
                               al.integer ("minute"),
                               al.integer ("second")))
 { }
-
 
 static DeclareSubmodel 
 time_submodel (Time::load_syntax, "Time", "\

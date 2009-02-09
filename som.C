@@ -24,7 +24,6 @@
 #include "librarian.h"
 #include "block.h"
 #include "frame.h"
-#include "alist.h"
 
 const char *const SOM::component = "SOM";
 

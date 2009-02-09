@@ -114,7 +114,6 @@ public:
   // Create.
 public:
   static void load_syntax (Frame&);
-  explicit Time (const AttributeList&);
   explicit Time (const Frame&);
   explicit Time (Block&);
 

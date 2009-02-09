@@ -31,7 +31,6 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include "check.h"
-#include "alist.h"
 #include <sstream>
 
 void
@@ -298,7 +297,7 @@ action of the radition of that day that was received that hour.");
 	      "Development stage at which to restart fixation after a cut.");
 }
 
-CrpN::CrpN (const AttributeList& al)
+CrpN::CrpN (const Frame& al)
   : PtLeafCnc (al.plf ("PtLeafCnc")),
     CrLeafCnc (al.plf ("CrLeafCnc")),
     NfLeafCnc (al.plf ("NfLeafCnc")),

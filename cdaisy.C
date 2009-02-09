@@ -166,9 +166,11 @@ extern "C" daisy_bool EXPORT
 daisy_alist_get_flag (const AttributeList* alist, const char* name)
 { return alist->flag (name); }
 
+#if 0
 extern "C" const AttributeList* EXPORT
 daisy_alist_get_alist (const AttributeList* alist, const char* name)
 { return &alist->alist (name); }
+#endif
 
 extern "C" void EXPORT
 daisy_alist_set_integer (AttributeList* alist, const char* name, int value)
@@ -348,9 +350,11 @@ daisy_library_syntax (const Library* library, const char* name)
 { return &library->syntax (symbol (name)); }
 #endif
 
+#if 0
 extern "C" const AttributeList* EXPORT
 daisy_library_alist (const Library* library, const char* name)
 { return &library->lookup (symbol (name)); }
+#endif
 
 extern "C" const char* EXPORT
 daisy_library_file (const Library* library, const char* name)
@@ -439,11 +443,11 @@ daisy_daisy_parse_file (Toplevel* toplevel, char* filename)
 extern "C" EXPORT const Syntax*
 daisy_daisy_get_program_syntax (Toplevel* toplevel)
 { return &toplevel->program_frame ().syntax (); }
-#endif
 
 extern "C" EXPORT const AttributeList*
 daisy_daisy_get_program_alist (Toplevel* toplevel)
 { return &toplevel->program_frame ().alist (); }
+#endif
 
 extern "C" EXPORT void
 daisy_daisy_initialize (Toplevel* toplevel)
@@ -612,8 +616,9 @@ daisy_column_get_description (const Column* column)
 { 
   daisy_assert (column->frame.get ());
   const FrameModel& frame = *column->frame; 
-  if (frame.check ("description"))
-    return frame.name ("description").name ().c_str ();
+  const symbol d = frame.description ();
+  if (d != Value::None ())
+    return d.name ().c_str ();
   return "";
 }
 

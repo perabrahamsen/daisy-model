@@ -33,7 +33,6 @@
 #include "check.h"
 #include "treelog.h"
 #include "frame.h"
-#include "alist.h"
 #include <sstream>
 #include <map>
 
@@ -67,7 +66,7 @@ struct Surface::Implementation
   // Functions.
   void ridge (const Geometry1D& geo,
               const Soil& soil, const SoilWater& soil_water,
-	      const AttributeList&);
+	      const Frame&);
   void exfiltrate (const Geometry& geo, size_t edge,
                    double water, double dt, Treelog&);
   void update_pond_average (const Geometry& geo);
@@ -81,7 +80,7 @@ struct Surface::Implementation
 
   // Create and Destroy.
   void initialize (const Geometry&);
-  Implementation (const AttributeList& al);
+  Implementation (const Frame& al);
   ~Implementation ();
 };
 
@@ -182,13 +181,13 @@ Surface::update_water (const Geometry1D& geo,
 void 
 Surface::ridge (const Geometry1D& geo,
                 const Soil& soil, const SoilWater& soil_water, 
-		const AttributeList& al)
+		const Frame& al)
 { impl->ridge (geo, soil, soil_water, al); }
 
 void 
 Surface::Implementation::ridge (const Geometry1D& geo,
                                 const Soil& soil, const SoilWater& soil_water,
-				const AttributeList& al)
+				const Frame& al)
 {
   // No permanent ponding.
   daisy_assert (!use_forced_pressure);
@@ -566,11 +565,11 @@ Active ridge system, if any.",
 			Ridge::load_syntax);
 }
 
-Surface::Surface (const AttributeList& al)
+Surface::Surface (const Frame& al)
   : impl (new Implementation (al))
 { }
 
-Surface::Implementation::Implementation (const AttributeList& al)
+Surface::Implementation::Implementation (const Frame& al)
   : EpFactor (al.number ("EpFactor")),
     albedo_wet (al.number ("albedo_wet")),
     albedo_dry (al.number ("albedo_dry")),
@@ -587,7 +586,7 @@ Surface::Implementation::Implementation (const AttributeList& al)
     runoff (0.0),
     runoff_fraction (0.0),
     R_mixing (al.number ("R_mixing")),
-    ridge_ (al.check ("ridge") ? new Ridge (al.alist ("ridge")) : NULL)
+    ridge_ (al.check ("ridge") ? new Ridge (al.frame ("ridge")) : NULL)
 { }
 
 Surface::~Surface ()

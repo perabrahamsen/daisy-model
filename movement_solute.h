@@ -89,9 +89,6 @@ private:
 protected:
   bool check_derived (Treelog&) const;
   MovementSolute (Block& al);
-public:
-  static void load_solute  (Frame& frame,
-                            const AttributeList& prefered_solute);
 };
 
 #endif // MOVEMENT_SOLUTE_H

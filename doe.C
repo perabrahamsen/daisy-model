@@ -29,7 +29,6 @@
 #include "soil_water.h"
 #include "treelog.h"
 #include "assertion.h"
-#include "alist.h"
 #include <string>
 
 void 
@@ -127,7 +126,7 @@ DOE::initialize (const Geometry& geo,
   J_tertiary.insert (J_tertiary.begin (), edge_size, 0.0);
 }
 
-DOE::DOE (const AttributeList& al)
+DOE::DOE (const Frame& al)
   : M (al.number_sequence ("M"))
 { }
 

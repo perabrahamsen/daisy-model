@@ -725,23 +725,20 @@ ProgramDocument::inherited_entries (Metalib& metalib,
 {
   const FrameModel& frame = library.model (name);
 
-  if (frame.check ("base_model"))
-    {
-      const symbol base_model = frame.type_name ();
+  const symbol base_model = frame.base_name ();
           
-      if (base_model != name)
+  if (base_model != Value::None ())
+    {
+      const FrameModel& base_frame = library.model (base_model);
+      base_frame.entries (entries);
+      for (std::set<symbol>::const_iterator i = entries.begin ();
+           i != entries.end (); 
+           i++)
         {
-          const FrameModel& base_frame = library.model (base_model);
-          base_frame.entries (entries);
-          for (std::set<symbol>::const_iterator i = entries.begin ();
-               i != entries.end (); 
-               i++)
-            {
-              const symbol key = *i;
-              if (key != "description" 
-                  && !frame.subset (metalib, base_frame, key))
-                entries.erase (find (entries.begin (), entries.end (), key));
-            }
+          const symbol key = *i;
+          if (key != "description" 
+              && !frame.subset (metalib, base_frame, key))
+            entries.erase (find (entries.begin (), entries.end (), key));
         }
     }
 }

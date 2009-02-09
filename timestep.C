@@ -22,7 +22,6 @@
 
 #include "timestep.h"
 #include "frame.h"
-#include "alist.h"
 #include "block.h"
 #include "assertion.h"
 #include "mathlib.h"
@@ -116,7 +115,7 @@ Timestep::GenCheck::check (Metalib&,
   daisy_assert (!frame.is_log (key));
   daisy_assert (frame.type_size (key) == Value::Singleton);
 
-  Timestep timestep (frame.alist (key));
+  Timestep timestep (frame.frame (key));
   check_dt (timestep.total_hours ());
 }
 
@@ -187,7 +186,7 @@ Timestep::Timestep (Block& al)
                               al.integer ("seconds")))
 { }
 
-Timestep::Timestep (const AttributeList& al)
+Timestep::Timestep (const Frame& al)
   : impl (new Implementation (al.integer ("years"), 
                               al.integer ("days"),
                               al.integer ("hours"),

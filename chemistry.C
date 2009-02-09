@@ -118,6 +118,8 @@ static struct ChemistryInit : public DeclareComponent
     : DeclareComponent (Chemistry::component, "\
 Pesticides and other chemicals.")
   { }
+  void load_frame (Frame& frame) const
+  { Model::load_model (frame); }
 } Chemistry_init;
 
 // chemistry.C ends here.

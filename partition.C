@@ -28,7 +28,6 @@
 #include "check.h"
 #include "mathlib.h"
 #include "treelog.h"
-#include "alist.h"
 #include <sstream>
 
 void
@@ -109,7 +108,7 @@ allocate all assimilate to the storage organ.");
   frame.add ("nitrogen_stress_limit", 1.0);
 }
 
-Partition::Partition (const AttributeList& al)
+Partition::Partition (const Frame& al)
   : Root (al.plf ("Root")),
     Leaf (al.plf ("Leaf")),
     Stem (al.plf ("Stem")),

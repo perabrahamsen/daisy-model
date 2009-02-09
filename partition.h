@@ -25,7 +25,6 @@
 #include "plf.h"
 #include <vector>
 
-class AttributeList;
 class Frame;
 class Log;
 
@@ -50,7 +49,7 @@ public:
   // Create and Destroy.
 public:
   static void load_syntax (Frame&);
-  Partition (const AttributeList&);
+  Partition (const Frame&);
   ~Partition ();
 };
 

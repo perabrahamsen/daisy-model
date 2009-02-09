@@ -23,7 +23,6 @@
 #include "uzmodel.h"
 
 class Frame;
-class AttributeList;
 class Log;
 class SoilWater;
 class Soil;
@@ -61,7 +60,7 @@ public:
   void set_detention_capacity (double);
   void ridge (const Geometry1D& geo,
               const Soil& soil, const SoilWater& soil_water,
-	      const AttributeList&);
+	      const Frame&);
   void unridge ();
 
   // Simulation.
@@ -85,7 +84,7 @@ public:
   // Create.
   void initialize (const Geometry&);
   static void load_syntax (Frame&);
-  Surface (const AttributeList& par);
+  Surface (const Frame& par);
   ~Surface ();
 };
 

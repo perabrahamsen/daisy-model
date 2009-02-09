@@ -27,7 +27,6 @@
 #include <memory>
 
 class Frame;
-class AttributeList;
 class Block;
 
 class Timestep
@@ -77,7 +76,7 @@ public:
   Timestep (const Timestep&);
 private:                    
   explicit Timestep ();
-  explicit Timestep (const AttributeList&);
+  explicit Timestep (const Frame&);
   const Timestep& operator= (const Timestep&);
 };
 

@@ -32,7 +32,6 @@
 #include "soil.h"
 #include "soil_water.h"
 #include "check.h"
-#include "alist.h"
 #include <vector>
 
 struct Ridge::Implementation
@@ -77,7 +76,7 @@ struct Ridge::Implementation
   static void load_syntax (Frame&);
   void initialize (const Geometry1D& geo, const Soil&, const SoilWater&);
   static PLF normalize (PLF plf);
-  Implementation (const AttributeList&);
+  Implementation (const Frame&);
   ~Implementation ();
 };
 
@@ -479,11 +478,11 @@ Ridge::Implementation::normalize (PLF plf)
   return plf;
 }
 
-Ridge::Ridge (const AttributeList& al)
+Ridge::Ridge (const Frame& al)
   : impl (*new Implementation (al))
 { }
 
-Ridge::Implementation::Implementation (const AttributeList& al)
+Ridge::Implementation::Implementation (const Frame& al)
   // The input may be given with an arbitrary origin, typically it
   // will be measured from the bottom of the ridge.  We make sure the
   // integrated value is zero, meaning that the total soil volume (or

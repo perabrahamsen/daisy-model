@@ -27,7 +27,6 @@
 #include "assertion.h"
 #include "librarian.h"
 #include "treelog.h"
-#include "alist.h"
 
 void 
 GnuplotBase::Size::load_syntax (Frame& frame)
@@ -38,20 +37,9 @@ Relative horizontal size of plot.");
 Relative vertical size of plot.");
   frame.order ("x", "y");
 }
-const AttributeList& GnuplotBase::Size::unset ()
-{
-  static AttributeList alist;
-  if (!alist.check ("x"))
-    {
-      alist.add ("x", -42.42e42);
-      alist.add ("y", -42.42e42);
-    }
-  return alist;
-}
-
-GnuplotBase::Size::Size (const AttributeList& al)
-  : x (al.number ("x")),
-     y (al.number ("y"))
+GnuplotBase::Size::Size (const Frame* al)
+  : x (al ? al->number ("x") : -42.42e42),
+    y (al ? al->number ("y") : -42.42e42)
 { }
   
 GnuplotBase::LegendTable::LegendTable ()
@@ -121,9 +109,7 @@ GnuplotBase::GnuplotBase (Block& al)
     device (al.name ("device", file2device (file))),
     extra (al.name_sequence ("extra")),
     title (al.name ("title", "")),
-    size (al.check ("size")
-	  ? al.alist ("size")
-	  : Size::unset ()),
+    size (al.check ("size") ? &al.frame ("size") : NULL),
     legend (al.name ("legend"))
 { }
 

@@ -785,15 +785,15 @@ CropStandard::CropStandard (Block& al)
     root_system (submodel<RootSystem> (al, "Root")),
     canopy (al.frame ("Canopy")),
     harvesting (submodel<Harvesting> (al, "Harvest")),
-    production (al.alist ("Prod")),
+    production (al.frame ("Prod")),
     last_time (al.check ("last_time")
-               ? new Time (al.alist ("last_time"))
+               ? new Time (al.frame ("last_time"))
                : NULL),
     development (Librarian::build_item<Phenology> (al, "Devel")),
-    partition (al.alist ("Partit")),
+    partition (al.frame ("Partit")),
     vernalization (Librarian::build_item<Vernalization> (al, "Vernal")),
     photo (Librarian::build_item<Photo> (al, "LeafPhot")),
-    nitrogen (al.alist ("CrpN")),
+    nitrogen (al.frame ("CrpN")),
     water_stress_effect (find_WSE (al, *photo)),
     enable_N_stress (al.flag ("enable_N_stress", !photo->handle_N_stress ())),
     min_light_fraction (al.number ("min_light_fraction"))
@@ -821,7 +821,6 @@ static struct CropStandardSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    Model::load_model (frame);
     frame.add_object ("Seed", Seed::component, 
                        "Initial crop growth.");
     frame.add ("Seed", "LAI");

@@ -29,7 +29,6 @@ class Soil;
 class SoilWater;
 class Treelog;
 class Frame;
-class AttributeList;
 
 class DOE
 {
@@ -57,7 +56,7 @@ public:
   static void load_syntax (Frame&);
   void initialize (const Geometry&, 
                    const Soil&, const SoilWater&, Treelog&);
-  DOE (const AttributeList& al);
+  DOE (const Frame& al);
   ~DOE ();
 };
 

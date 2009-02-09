@@ -54,7 +54,6 @@
 #include "librarian.h"
 #include "library.h"
 #include "metalib.h"
-#include "alist.h"
 #include <algorithm>
 #include <numeric>
 #include <fstream>
@@ -2927,6 +2926,9 @@ check_alist (Metalib&, const Frame& al, Treelog& err)
 
 static struct OrganicStandardSyntax : DeclareModel
 {
+  bool used_to_be_a_submodel () const
+  { return true; }
+
   Model* make (Block& al) const
   { return new OrganicStandard (al); }
 
@@ -3077,8 +3079,6 @@ If 'SOM_fractions' has been specified, the pools will be initialized\n\
 assuming the SMB pools are in equilibrium.  Otherwise, also SOM pools\n\
 expect the first will be assumed to be in equilibrium as well.",
                          OrganicStandard::Initialization::load_syntax);
-
-    frame.alist ().add ("used_to_be_a_submodel", true);
   }
 } OrganicStandard_syntax;
 

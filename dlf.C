@@ -94,30 +94,24 @@ DLF::finish (std::ostream& out, const Daisy& daisy)
   if (value == None)
     return;
   
-  const Frame& global_alist = daisy.metalib;
+  const Metalib& global_alist = daisy.metalib;
   const FrameModel& daisy_alist = daisy.frame;
 
   // SIMFILE:
-  if (global_alist.check ("parser_files"))
+  const std::vector<symbol>& files = global_alist.parser_files ();
+  if (value == Terse)
     {
-      const std::vector<symbol>& files 
-        = global_alist.name_sequence ("parser_files");
-      if (value == Terse)
-        {
-          out << "SIMFILE:";
-          for (unsigned int i = 0; i < files.size (); i++)
-            out << " " << files[i];
-          out << "\n";
-        }
-      else
-        for (unsigned int i = 0; i < files.size (); i++)
-          out << "SIMFILE: " << files[i] << "\n";
+      out << "SIMFILE:";
+      for (unsigned int i = 0; i < files.size (); i++)
+        out << " " << files[i];
+      out << "\n";
     }
-  else if (value == Terse)
-    out << "SIMFILE:\n";
+  else
+    for (unsigned int i = 0; i < files.size (); i++)
+      out << "SIMFILE: " << files[i] << "\n";
 
   // SIM:
-  const symbol sim_description_s = daisy_alist.name ("description");
+  const symbol sim_description_s = daisy_alist.description ();
   if ((sim_description_s != Daisy::default_description
        && sim_description_s != Toplevel::default_description)
       || value == Terse)

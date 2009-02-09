@@ -296,19 +296,16 @@ TraverseXRef::enter_parameter (const Frame& frame, const Frame& default_frame,
       if (frame.subset (metalib, default_frame, name))
         return false;
     }
-  else if (type == is_model && frame.check ("base_model"))
+  else if (type == is_model && frame.base_name () != Value::None ())
     {
       // Ignore base parameters.
       const Library& library = metalib.library (current_component);
-      const symbol base_model = frame.type_name ();
-      if (base_model != current_model)
+      const symbol base_model = frame.base_name ();
+      const Frame& base_frame = library.model (base_model);
+      if (base_frame.lookup (name) != Value::Error)
         {
-          const Frame& base_frame = library.model (base_model);
-          if (base_frame.lookup (name) != Value::Error)
-            {
-              if (frame.subset (metalib, base_frame, name))
-                return false;
-            }
+          if (frame.subset (metalib, base_frame, name))
+            return false;
         }
     }
   path.push_back (name);

@@ -109,7 +109,7 @@ struct ActionWaitDays : public Action
       end_time (1, 1, 1, 1)
   { 
     if (activated)
-      end_time = Time (al.alist ("end_time"));
+      end_time = Time (al.frame ("end_time"));
   }
 
   ~ActionWaitDays ()

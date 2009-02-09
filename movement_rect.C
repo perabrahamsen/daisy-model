@@ -42,7 +42,6 @@
 #include "tertsmall.h"
 #include "treelog.h"
 #include "mathlib.h"
-#include "alist.h"
 
 struct MovementRect : public MovementSolute
 {
@@ -62,7 +61,7 @@ struct MovementRect : public MovementSolute
   const auto_vector<UZRect*> matrix_water;
 
   // Management.
-  void ridge (Surface&, const Soil&, const SoilWater&, const AttributeList&);
+  void ridge (Surface&, const Soil&, const SoilWater&, const Frame&);
 
   // Heat.
   std::auto_ptr<Heatrect> heatrect;
@@ -135,7 +134,7 @@ struct MovementRect::Point
 
 void
 MovementRect::ridge (Surface&, const Soil&, const SoilWater&, 
-                     const AttributeList&)
+                     const Frame&)
 { throw "Can't make ridges on a rectangular grid"; }
 
 double 

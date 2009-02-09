@@ -38,7 +38,6 @@
 #include "path.h"
 #include "treelog.h"
 #include "frame.h"
-#include "alist.h"
 #include <vector>
 #include <algorithm>
 #include <numeric>
@@ -74,7 +73,7 @@ struct WeatherStandard : public WeatherBase
       // Create and Destroy.
       static bool check_alist (Metalib&, const Frame& al, Treelog&);
       static void load_syntax (Frame&);
-      YearInterval (const AttributeList&);
+      YearInterval (const Frame&);
     };
 
     // Parameters.
@@ -377,7 +376,7 @@ WeatherStandard::YearMap::YearInterval::load_syntax (Frame& frame)
   frame.order ("from", "to");
 }
 
-WeatherStandard::YearMap::YearInterval::YearInterval (const AttributeList& al)
+WeatherStandard::YearMap::YearInterval::YearInterval (const Frame& al)
   : from (al.integer ("from")),
     to (al.integer ("to"))
 { }
@@ -395,8 +394,8 @@ bool
 WeatherStandard::YearMap::check_alist (Metalib&, const Frame& al, Treelog& msg)
 {
   bool ok = true;
-  const YearInterval from (al.alist ("from"));
-  const YearInterval to (al.alist ("to"));
+  const YearInterval from (al.frame ("from"));
+  const YearInterval to (al.frame ("to"));
   
   if (from.size () != to.size ())
     {
@@ -423,8 +422,8 @@ WeatherStandard::YearMap::load_syntax (Frame& frame)
 }
 
 WeatherStandard::YearMap::YearMap (Block& al)
-  : from (al.alist ("from")),
-    to (al.alist ("to"))
+  : from (al.frame ("from")),
+    to (al.frame ("to"))
 { }
 
 int 

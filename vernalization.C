@@ -88,6 +88,7 @@ struct VernalizationStandard : public Vernalization
 
 static struct VernalizationStandardSyntax : public DeclareModel
 {
+  // We can't use "used_to_be_a_submodel" since the default model is "none".
   Model* make (Block& al) const
   { return new VernalizationStandard (al); }
   VernalizationStandardSyntax ()
@@ -96,10 +97,6 @@ Temperature sum dependent vernalization.")
   { }
   void load_frame (Frame& frame) const
   {
-#if 0
-    // We can't use "used_to_be_a_submodel" since the default model is "none".
-    frame.alist ().add ("used_to_be_a_submodel", true);
-#endif
     frame.add ("DSLim", Value::None (), Value::Const,
                "Development stage at vernalization.");
     frame.add ("TaLim", "dg C", Value::Const,

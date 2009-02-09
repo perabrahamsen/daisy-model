@@ -65,6 +65,8 @@ convert between different units representing the same physical\n\
 dimension.  This is done by converting to and from the base (usually\n\
 defined by SI) unit for that dimension.")
   { }
+  void load_frame (Frame& frame) const
+  { Model::load_model (frame); }
 } Unit_init;
 
 // Base model 'SI'.

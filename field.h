@@ -31,6 +31,7 @@
 
 class Column;
 class FrameModel;
+class Frame;
 class Time;
 class IM;
 class Harvest;
@@ -42,7 +43,6 @@ class Block;
 class Metalib;
 class Scope;
 class Volume;
-class AttributeList;
 
 class Field : public Border
 { 
@@ -67,7 +67,7 @@ public:
   void sow (Metalib&, const FrameModel& crop, 
             double row_width, double row_pos, double seed,
             const Time&, double dt, Treelog&);
-  void ridge (const AttributeList& ridge);
+  void ridge (const Frame& ridge);
   void irrigate_overhead (double water, double temp, const IM&, double dt,
 			  Treelog& msg);
   void irrigate_surface (double water, double temp, const IM&, double dt,

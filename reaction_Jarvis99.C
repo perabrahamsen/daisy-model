@@ -33,7 +33,6 @@
 #include "soil.h"
 #include "treelog.h"
 #include "frame.h"
-#include "alist.h"
 
 struct ReactionJarvis99 : public Reaction
 {
@@ -197,7 +196,7 @@ Colloid generation emulating the MACRO model.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.alist ().add_strings ("cite", "macro-colloid");
+    frame.add_strings ("cite", "macro-colloid");
     frame.add ("colloid", Value::String, Value::Const,
 		"Colloid to generate.");
     frame.add ("Mmax", "g/g", Check::non_negative (), Value::Const,

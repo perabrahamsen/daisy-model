@@ -34,7 +34,6 @@
 #include "library.h"
 #include "frame.h"
 #include "frame_model.h"
-#include "alist.h"
 #include <sstream>
 
 struct LogCheckpoint : public LogAList
@@ -44,7 +43,7 @@ struct LogCheckpoint : public LogAList
   const symbol description;	// Comment to go to the start of the file.
   std::auto_ptr<Condition> condition; // Should we print a log now?
   Time time;			// Time of current checkpoint.
-  const Frame* global_frame; // All attributes.
+  const Metalib* global_frame; // All attributes.
 
   // Start and end of time step.
   bool check_leaf (symbol) const;
@@ -149,7 +148,8 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
 
       // Open log file.
       PrinterFile printer (metalib (), filename);
-      printer.print_comment (description);
+      if (description != Value::None ())
+        printer.print_comment (description);
 
       // Print "directory" and "path" before inputs.
       printer.print_entry (*global_frame, "directory");
@@ -157,29 +157,21 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
       FrameModel& daisy = dynamic_cast<FrameModel&> (frame ());
 
       // Print input files.
-      if (global_frame->check ("parser_inputs"))
-	{
-	  const std::vector<const Frame*> inputs 
-	    (global_frame->frame_sequence ("parser_inputs"));
-	  printer.print_comment ("Input files.");
-	  for (unsigned int i = 0; i < inputs.size (); i++)
-	    printer.print_input (*inputs[i]);
-	}
+      const std::vector<const Frame*>& inputs = global_frame->parser_inputs ();
+      printer.print_comment ("Input files.");
+      for (unsigned int i = 0; i < inputs.size (); i++)
+        printer.print_input (*inputs[i]);
 
       // Print included files.
-      if (global_frame->check ("parser_files"))
-	{
-	  const std::vector<symbol> 
-            files (global_frame->name_sequence ("parser_files"));
-	  const std::string lib_start = "From file '";
-	  const std::string lib_end = "':";
-	  for (unsigned int i = 0; i < files.size (); i++)
-	    {
-	      const symbol library = files[i];
-	      printer.print_comment (lib_start + library + lib_end);
-	      printer.print_library_file (library.name ());
-	    }
-	}
+      const std::vector<symbol>& files = global_frame->parser_files ();
+      const std::string lib_start = "From file '";
+      const std::string lib_end = "':";
+      for (unsigned int i = 0; i < files.size (); i++)
+        {
+          const symbol library = files[i];
+          printer.print_comment (lib_start + library + lib_end);
+          printer.print_library_file (library.name ());
+        }
 
       // Print cloned objects.
       printer.print_comment ("Cloned objects:");
@@ -187,7 +179,7 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
 
       // Start checkpoint from next timestep.
       daisy_assert (daisy.check ("time"));
-      Time time (daisy.alist ("time"));
+      Time time (daisy.frame ("time"));
       time.tick_hour ();
       time.set_time (daisy, "time");
 
@@ -230,7 +222,7 @@ LogCheckpoint::initialize (Treelog&)
 LogCheckpoint::LogCheckpoint (Block& al)
   : LogAList (al),
     file (al.name ("where")),
-    description (al.name ("description")),
+    description (al.frame ().description ()),
     condition (Librarian::build_item<Condition> (al, "when")),
     time (1, 1, 1, 1)
 { }
