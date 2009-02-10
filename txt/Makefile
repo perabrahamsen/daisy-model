@@ -10,7 +10,7 @@ DOCS = aba.tex rootdens.plt rootdens.tex geometry.tex \
 
 PRESENTATIONS = esa-2004.tex 
 NOTES = 2DDaisy.txt forced_LAI.txt
-FUTURE = organic.tex
+FUTURE = 
 
 TEXT = $(LIBS) $(FIGS) $(DOCS) $(PRESENTATIONS) $(NOTES) $(FUTURE) Makefile
 
