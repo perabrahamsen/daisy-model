@@ -29,7 +29,6 @@ class FrameSubmodel : public Frame
 protected:
   FrameSubmodel (const FrameSubmodel&, parent_clone_t);
 public:
-  FrameSubmodel (const FrameSubmodel&, parent_copy_t);
   FrameSubmodel (const FrameSubmodel&, parent_link_t);
   explicit FrameSubmodel (load_syntax_t);
   FrameSubmodel& clone () const;
@@ -46,7 +45,6 @@ class FrameSubmodelValue : public FrameSubmodel
   FrameSubmodelValue (const FrameSubmodelValue&, parent_clone_t);
 public:
   FrameSubmodelValue& clone () const;
-  FrameSubmodelValue (const FrameSubmodel&, parent_copy_t);
   FrameSubmodelValue (const FrameSubmodel&, parent_link_t);
   ~FrameSubmodelValue ();
 };

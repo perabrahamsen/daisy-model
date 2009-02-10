@@ -116,7 +116,7 @@ struct NumberByDepth : public Number
     Time time (9999, 1, 1, 0);
     const Library& wlib = al.metalib ().library (Weather::component);
     const double T = 10.0;
-    FrameModel frame (wlib.model ("none"), Frame::parent_copy);
+    FrameModel frame (wlib.model ("none"), Frame::parent_link);
     frame.add ("average", T);
     frame.add ("amplitude", 0.0);
     frame.add ("air_temperature", T);

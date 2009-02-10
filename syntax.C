@@ -62,7 +62,6 @@ struct Syntax::Implementation
   bool check (Metalib&, const Frame& vl, Treelog& err);
   void check (const symbol key, double value) const;
   Value::type lookup (const symbol key) const;
-  int order_number (const symbol name) const;
   void entries (std::set<symbol>& result) const;
   Implementation ()
   { }
@@ -248,15 +247,6 @@ Syntax::Implementation::lookup (const symbol key) const
     return (*i).second;
 }
 
-int
-Syntax::Implementation::order_number (const symbol name) const
-{
-  for (unsigned int j = 0; j < order.size (); j++)
-    if (order[j] == name)
-      return j;
-  return -1;
-}
-
 void
 Syntax::Implementation::entries (std::set<symbol>& result) const
 {
@@ -414,12 +404,6 @@ const std::vector<symbol>&
 Syntax::order () const
 {
   return impl->order;
-}
-
-int
-Syntax::order_index (const symbol name) const
-{
-  return impl->order_number (name);
 }
 
 bool

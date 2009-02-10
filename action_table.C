@@ -161,7 +161,7 @@ ActionTable::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
       && fertilize_events.find (daisy.time) != fertilize_events.end ())
     {
       FrameModel fert (((fertilizers.find (daisy.time) != fertilizers.end ())
-                        ? *fertilizers[daisy.time] : *am), Frame::parent_copy);
+                        ? *fertilizers[daisy.time] : *am), Frame::parent_link);
 
       AM::set_utilized_weight (metalib, fert, fertilize_events[daisy.time]);
       if (irrigate_events.find (daisy.time) != irrigate_events.end ())

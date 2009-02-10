@@ -70,7 +70,6 @@ public:
   symbol description (symbol) const;
   bool ordered () const;
   const std::vector<symbol>& order () const;
-  int order_index (symbol name) const; // Return index in order, or -1
   bool total_order () const;	// True iff all members are ordered.
   const FrameSubmodel& default_frame (symbol) const;
   symbol submodel_name (symbol) const;

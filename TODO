@@ -1,34 +1,6 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-  // Old style access.
-public:
-  AttributeList& alist () const;
-
 * Frame
-
-** Lexer::Position -> position.h
-
-** FrameParsed -> frame_parsed.h
-
-** Erstat "parsed_from_file" og "parsed_sequence" med FrameParsed
-
-am.C er et sted.
-
-** Fjern "type", "base_model"
-
-** Fjern brug af "submodel"
-
-** Fjern brug af "description" og "cite"
-
-** Fjern al brug af alist of udenfor frame
-
-** brug parent_link i stedet for parent_copy
-
-Block skal altid fødes med en parent_link frame, fordi vi bruger 
-parent_clone til at gemme.
-
-Måske skal vi have en attribut der skelner mellem midlertidige og
-permanent frames, så vi altid kloner midlertidige?
 
 ** Fix FRAME_LINK ifdefs i weather
 

@@ -202,7 +202,7 @@ struct ActionExternFertigation : public Action
       {
         Metalib& metalib = daisy.metalib;
         const Library& library = metalib.library (AM::component);
-	FrameModel frame (library.model ("mineral"), Frame::parent_copy);
+	FrameModel frame (library.model ("mineral"), Frame::parent_link);
 	AM::set_mineral (metalib, frame, NH4_value, NO3_value);
         field.fertilize (metalib, frame, daisy.time, dt, msg);
       }

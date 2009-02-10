@@ -416,7 +416,7 @@ Toplevel::initialize ()
             const Library& library = metalib ().library (Program::component);
             const FrameModel& old_frame = library.model ("Daisy");
             std::auto_ptr<FrameModel> frame 
-              (new FrameModel (old_frame, Frame::parent_copy));
+              (new FrameModel (old_frame, Frame::parent_link));
             // Frame::overwrite only gives us the values, not the
             // types.  This means we avoid all the extra crap in
             // metalib, but also that we don't get any user defined

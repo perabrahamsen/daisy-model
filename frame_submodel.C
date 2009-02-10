@@ -35,10 +35,6 @@ FrameSubmodel&
 FrameSubmodel::clone () const
 { return *new FrameSubmodel (*this, parent_clone); }
 
-FrameSubmodel::FrameSubmodel (const FrameSubmodel& frame, const parent_copy_t) 
-  : Frame (frame)
-{ }
-
 FrameSubmodel::FrameSubmodel (const FrameSubmodel& frame, const parent_link_t) 
   : Frame ()
 { }
@@ -66,15 +62,6 @@ FrameSubmodelValue::FrameSubmodelValue (const FrameSubmodelValue& frame,
 FrameSubmodelValue& 
 FrameSubmodelValue::clone () const
 { return *new FrameSubmodelValue (*this, parent_clone); }
-
-FrameSubmodelValue::FrameSubmodelValue (const FrameSubmodel& frame, 
-                                        parent_copy_t)
-  : FrameSubmodel (frame, parent_copy),
-    parent_ (&frame)
-{ 
-  daisy_assert (this->parent ());
-  this->parent ()->register_child (this); 
-}
 
 FrameSubmodelValue::FrameSubmodelValue (const FrameSubmodel& frame,
                                         parent_link_t)

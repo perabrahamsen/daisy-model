@@ -345,7 +345,7 @@ Library::clone () const
        i++)
 #if 1
     lib->impl->frames[(*i).first] = new FrameModel (*(*i).second, 
-                                                    FrameModel::parent_copy);
+                                                    FrameModel::parent_link);
 #else
     lib->impl->frames[(*i).first] = &(*i).second->clone ();
 #endif

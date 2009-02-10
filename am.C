@@ -702,7 +702,7 @@ AM::create (Metalib& metalib, const Geometry& geo, const Time& now,
 	    AM::lock_type lock, Treelog& msg)
 {
   const Library& library = metalib.library (AM::component);
-  FrameModel frame (library.model ("state"), Frame::parent_copy);
+  FrameModel frame (library.model ("state"), Frame::parent_link);
   frame.add ("initialized", true);
   frame.add ("name", sort + "/" + part);
   frame.add ("om", ol);

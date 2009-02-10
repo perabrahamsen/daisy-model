@@ -286,7 +286,7 @@ protected:
   { }
 public:
   explicit FrameDeclared (const Declare& declare)
-    : FrameModel (*declare.parent_model (), parent_copy),
+    : FrameModel (*declare.parent_model (), parent_link),
       declaration (declare)
   { declare.load (*this); }
 };

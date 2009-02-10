@@ -94,16 +94,6 @@ FrameModel::FrameModel (const FrameModel& parent, parent_link_t)
   this->parent ()->register_child (this); 
 }
 
-FrameModel::FrameModel (const FrameModel& parent, parent_copy_t)
-  // For cloning a library.
-  : Frame (parent),
-    // We use parent builder.
-    parent_ (&parent)
-{ 
-  daisy_assert (this->parent ());
-  this->parent ()->register_child (this); 
-}
-
 FrameModel::FrameModel (const FrameModel& parent, parent_clone_t)
   // For cloning a model
   : Frame (parent),

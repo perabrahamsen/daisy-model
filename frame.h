@@ -251,6 +251,7 @@ public:
   const PLF& plf (const symbol) const;
   const Frame& frame (const symbol) const;
   const FrameModel& model (const symbol) const;
+  const FrameSubmodel& submodel (const symbol) const;
   int integer (const symbol) const;
   int integer (const symbol, int default_value) const;
   const std::vector<double>& number_sequence (const symbol) const;
@@ -292,7 +293,6 @@ protected:
 public:
   void overwrite_values (const Frame&); // For using metalib as program frame.
   enum parent_link_t { parent_link };
-  enum parent_copy_t { parent_copy }; // OLD: For cloning a library.
   enum parent_clone_t { parent_clone }; // For temporary models.
   virtual Frame& clone () const = 0;
   typedef void (*load_frame_t) (Frame&);

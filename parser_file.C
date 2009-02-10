@@ -545,7 +545,7 @@ private:
 public:
   FrameParsed (const symbol name_, const FrameModel& model, const int seq_id_,
                const Filepos pos)
-    : FrameModel (model, parent_copy),
+    : FrameModel (model, parent_link),
       name (name_),
       seq_id (seq_id_),
       position_ (pos)
@@ -629,7 +629,7 @@ ParserFile::Implementation::load_object (const Library& lib, bool in_sequence,
       if (lib.name () == symbol (Number::component))
         {
           result.reset (new FrameModel (lib.model ("const"),
-                                        Frame::parent_copy));
+                                        Frame::parent_link));
           const double value = get_number ();
           const symbol dim = get_dimension ();
           result->add ("value", value, dim);
@@ -637,7 +637,7 @@ ParserFile::Implementation::load_object (const Library& lib, bool in_sequence,
       else if (lib.name () == symbol (Integer::component))
         {
           result.reset (new FrameModel (lib.model ("const"), 
-                                        Frame::parent_copy));
+                                        Frame::parent_link));
           result->add ("value", get_integer ());
         }
       else
@@ -692,7 +692,7 @@ ParserFile::Implementation::load_object (const Library& lib, bool in_sequence,
             {
               static const symbol fetch ("fetch");
               result.reset (new FrameModel (lib.model (fetch), 
-                                            Frame::parent_copy));
+                                            Frame::parent_link));
               result->add ("name", type);
               goto skip_it;
             }
@@ -701,7 +701,7 @@ ParserFile::Implementation::load_object (const Library& lib, bool in_sequence,
         }
       else
         {
-          result.reset (new FrameModel (lib.model (type), Frame::parent_copy));
+          result.reset (new FrameModel (lib.model (type), Frame::parent_link));
 	}
       if (skipped || !in_sequence)
 	{
@@ -1135,7 +1135,7 @@ ParserFile::Implementation::load_list (Frame& frame)
                       ? std::auto_ptr<Frame> (&old_sequence[element]->clone ())
                       : std::auto_ptr<Frame> (new FrameSubmodelValue 
                                               (default_frame,
-                                               Frame::parent_copy));
+                                               Frame::parent_link));
 		    load_list (*child);
 		    sequence.push_back (child.release ());
 		  }

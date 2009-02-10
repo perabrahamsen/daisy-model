@@ -486,24 +486,46 @@ Frame::order (const symbol a, const symbol b, const symbol c,
 
 bool 
 Frame::ordered () const
-{ return impl->syntax.ordered (); }
+{ 
+  if (impl->syntax.ordered ())
+    return true;
+  else if (parent ())
+    return parent ()->ordered ();
+  else
+    return false;
+}
 
 const std::vector<symbol>& 
 Frame::order () const
-{ return impl->syntax.order (); }
+{ 
+  if (impl->syntax.ordered ())
+    return impl->syntax.order ();
+  else if (parent ())
+    return parent ()->order ();
+  
+  return impl->syntax.order ();
+}
 
 int 
 Frame::order_index (const symbol key) const
 {
-  if (parent () && impl->syntax.lookup (key) == Value::Error)
-    return parent ()->order_index (key);
-  else
-    return impl->syntax.order_index (key);
+  const std::vector<symbol>& order = this->order ();
+  for (int i = 0; i < order.size (); i++)
+    if (order[i] == key)
+      return i;
+  return -1;
 }
 
 bool 
 Frame::total_order () const
-{ return impl->syntax.total_order (); }
+{ 
+  if (!impl->syntax.total_order ())
+    return false;
+  else if (!parent ())
+    return true;
+  else
+    return parent ()->total_order ();
+}
 
 void 
 Frame::add_check (check_fun fun)
@@ -676,6 +698,13 @@ Frame::model (const symbol key) const
 {
   const Frame& frame = this->frame (key);
   return dynamic_cast<const FrameModel&> (frame);
+}
+
+const FrameSubmodel&
+Frame::submodel (const symbol key) const
+{
+  const Frame& frame = this->frame (key);
+  return dynamic_cast<const FrameSubmodel&> (frame);
 }
 
 int 
