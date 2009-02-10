@@ -1,0 +1,709 @@
+%%!PS-Adobe-3.0 EPSF-3.0
+%%Title: (abiotic30.eps)
+%%Creator: gnuplot 4.0 patchlevel 0
+%%CreationDate: Fri Nov 02 16:31:49 2007
+%%BoundingBox: 72 72 432 288
+%%EndComments
+/Gpdict 100 dict def
+Gpdict begin
+/Color false def
+/Dashed true def
+/Gplinewidth 20.000 def
+/hpt_ 100.000 def
+/vpt_ 100.000 def
+ /hpt hpt_ def  
+ /vpt vpt_ def  
+ /Gppointsize_ 1 def 
+ /Gplinewidth_ 1 def 
+  
+ /ArrowDict 25 dict def  
+  
+ /M /moveto load def  
+ /L /lineto load def  
+ /R /rmoveto load def  
+ /V /rlineto load def  
+ /N {newpath moveto} bind def  
+ /f {rlineto fill} bind def  
+ /ED { exch def} bind def  
+  
+ /Atan {/atan load stopped {pop pop 0} if } def  
+ /Div {dup 0 eq { pop } { div } ifelse } def  
+ /Pyth {dup mul exch dup mul add sqrt} def  
+  
+ %Sizes  
+ /Gpsetlinewidth  
+ { 
+   dup 
+ %  /Gplinewidth_ ED %save 
+   Gplinewidth mul setlinewidth 
+ } def  
+  
+ /Gpsetpointsize   
+ {  
+   dup  
+   /Gppointsize_ ED %save 
+   dup  
+   vpt_ mul /vpt ED 
+   hpt_ mul /hpt ED  
+ } def  
+      
+ %Color  
+ /SetHsbColor { Color {sethsbcolor} {pop pop pop} ifelse } def  
+ /SetCmykColor { Color {setcmykcolor} {pop pop pop pop} ifelse } def  
+ /SimpleSetColor {6 div 1 1 SetHsbColor} def  
+ /Black {0 0 0 0 SetCmykColor} def  
+ /Red {0 SimpleSetColor} def  
+ /Blue {1 1 0 0 SetCmykColor} def  
+ /Cyan {1 0 0 0 SetCmykColor} def  
+ /Magenta {0 1 0 0 SetCmykColor} def 
+  
+ %Stroking  
+ /PathLength@ % z = z + sqrt{(x-xlast)^2 + (y-ylast)^2}  
+  {  
+    /z   
+    z  
+    y ylast sub  
+    x xlast sub  
+    Pyth  
+    add  
+    def   
+    /ylast y def  
+    /xlast x def  
+  } def  
+      
+  /PathLength  
+  {  
+    flattenpath  
+    /z 0 def  
+    { %move  
+      /ystart ED  
+      /xstart ED  
+      /xlast xstart def  
+      /ylast ystart def  
+    }  
+    { %line  
+      /y ED  
+      /x ED  
+      PathLength@  
+    }  
+    { %curve  
+    }  
+    { %close  
+      /x xstart def  
+      /y ystart def  
+      PathLength@   
+    }  
+    /pathforall load  
+    stopped {pop pop pop pop} if  
+    z  
+  } def  
+    
+ %dotsep DotLine  
+ /DotLine   
+ {  
+   PathLength /b ED   
+   /z ED   
+   /y currentlinewidth def   
+   /z y z add def   
+   [ 0 b b z Div round Div dup 0 le { pop 1 } if] 0 setdash   
+   1 setlinecap  
+ } def  
+  
+ /DashLine   
+  {  
+    PathLength /b ED   
+    /x ED   
+    /y ED   
+    /z y x add def   
+    b y sub z Div round z mul y add b exch Div 
+    dup  
+    y mul /y ED   
+    x mul /x ED   
+    x 0 gt y 0 gt and   
+    { [ y x ] 0 }  
+    { [ 1 0 ] 0 }  
+    ifelse  
+    setdash  
+  } def  
+  
+ /DashLineTwo 
+  {  
+    PathLength /b ED   
+    /u ED 
+    /v ED 
+    /x ED   
+    /y ED 
+    /z y x add u add v add def   
+    b y sub z Div round z mul y add b exch Div 
+    dup  
+    y mul /y ED   
+    x mul /x ED   
+    x 0 gt y 0 gt and   
+    { [ y x v u] 0 }  
+    { [ 1 0 ] 0 }  
+    ifelse  
+    setdash  
+  } def  
+      
+  
+ /DotLineStroke   
+ {  
+   gsave  
+     Dashed {currentlinewidth 2 mul DotLine} if  
+     stroke  
+   grestore  
+ } def  
+    
+ /SolidLineStroke  
+ {  
+   gsave  
+     [] 0 setdash  
+     stroke  
+   grestore  
+ } def  
+    
+ /DashLineStroke  
+ {  
+   gsave   
+     Dashed {Gplinewidth 8 mul Gplinewidth 5 mul DashLine} if  
+     stroke  
+   grestore  
+ } def  
+   
+ /DashDotLineStroke  
+ {  
+   gsave   
+     Dashed {Gplinewidth 8 mul Gplinewidth 5 mul 0 Gplinewidth 5 mul DashLineTwo} if  
+     stroke  
+   grestore  
+ } def  
+    
+ /DashShortLineStroke  
+ {  
+   gsave   
+     Dashed {Gplinewidth 4 mul dup DashLine} if  
+     stroke  
+   grestore  
+ } def  
+    
+ /ArrowHead  
+ {   
+   currentlinewidth mul add dup 2 div /w ED  
+   mul dup /h ED  
+   mul /a ED   
+   w neg h moveto   
+   0 0 L   
+   w h L   
+   w neg a neg rlineto   
+   gsave fill grestore   
+ } def  
+    
+  %/DrawArrowHead {1 dup scale 0.2 1.4 50 3 ArrowHead} def  
+  %%%%%  
+  %inset length dim num  
+  %arrowwidth = dim + num*linewidth  
+  %arrowlength = length*arrowwidth  
+  %arrowinset = width * inset  
+    
+  /DrawArrowHead {0.2 1.4 Gplinewidth 3 mul 4 ArrowHead} def  
+    
+  /Arrow  
+  {  
+    currentpoint  
+    4 2 roll  
+    ArrowDict  
+    begin  
+      /@mtrx matrix currentmatrix def  
+      gsave  
+        2 copy translate  
+        2 index sub neg exch  
+        3 index sub exch Atan  
+        rotate  
+        newpath  
+        DrawArrowHead  
+        @mtrx setmatrix  
+        currentpoint  
+      grestore  
+    end %ArrowDicht  
+    lineto  
+    Gpstroke  
+  } def  
+    
+  %axis  
+  /LTa   
+  {  
+    Gpstroke      
+    newpath  
+    0 setgray  
+    /Gpstroke {DotLineStroke newpath} def  
+  } def  
+    
+  %border  
+  /LTb  
+  {  
+    Gpstroke      
+    newpath  
+    0 setgray  
+    /Gpstroke {SolidLineStroke newpath} def  
+  } def  
+    
+  /LT0  
+  {  
+    Gpstroke      
+    newpath  
+    Red  
+    /Gpstroke {SolidLineStroke newpath} def  
+  } def  
+    
+  /LT1  
+  {  
+    Gpstroke      
+    newpath  
+    Blue  
+    /Gpstroke {DashLineStroke newpath} def  
+  } def  
+    
+  /LT2   
+  {  
+    Gpstroke  
+    newpath  
+    Cyan  
+    /Gpstroke {DashShortLineStroke newpath} def  
+  } def  
+  
+  /LT3   
+  {  
+    Gpstroke  
+    newpath  
+    Magenta  
+    /Gpstroke {DashDotLineStroke newpath} def  
+  } def  
+    
+  /Pnt  
+  {  
+    gsave   
+      [] 0 setdash  
+      1 setlinecap   
+      Gplinewidth Gppointsize_ mul setlinewidth 
+      M  
+      0 0 V  
+      stroke  
+    grestore  
+  } def  
+    
+  /DiaPath  
+  {  
+      [] 0 setdash  
+      Gplinewidth setlinewidth  
+      2 copy   
+      newpath  
+      vpt add moveto  
+      hpt neg vpt neg rlineto   
+      hpt vpt neg rlineto  
+      hpt vpt rlineto   
+      hpt neg vpt rlineto  
+      closepath  
+  } def  
+    
+  /Dia   
+  {   
+    gsave  
+      DiaPath  
+      stroke  
+    grestore  
+  } def  
+    
+  /DaF  
+  {  
+    gsave  
+      DiaPath  
+      fill  
+    grestore  
+  } def  
+    
+  /Crc  
+  {  
+    gsave  
+      [] 0 setdash  
+      Gplinewidth setlinewidth  
+      newpath  
+      vpt 0.85 mul 0 360 arc  
+      closepath  
+      stroke  
+    grestore  
+  } def  
+        
+    
+  /Crs  
+  {  
+    gsave  
+      [] 0 setdash  
+      Gplinewidth setlinewidth  
+      0 setlinecap  
+      newpath  
+      vpt sub  
+      moveto  
+      0 vpt 2 mul rlineto  
+      hpt vpt neg rmoveto  
+      hpt 2 mul neg 0 rlineto  
+      stroke  
+    grestore  
+  } def  
+    
+  /CrX  
+  {  
+  gsave  
+   translate  
+   45 rotate  
+   0 0 Crs  
+  grestore  
+  } def  
+    
+  /CcF  
+  {  
+    gsave  
+      [] 0 setdash  
+      Gplinewidth setlinewidth  
+      newpath  
+      vpt 0.85 mul 0 360 arc  
+      closepath  
+      fill  
+    grestore  
+  } def  
+    
+  /Box  
+  {  
+     gsave  
+       translate  
+       45 rotate  
+       0 0 DiaPath  
+       stroke  
+     grestore  
+  } def  
+    
+  /BxF  
+  {  
+     gsave  
+       translate  
+       45 rotate  
+       0 0 DiaPath  
+       fill  
+     grestore  
+  } def  
+    
+  /Gpstroke {stroke} def  
+  1 setlinecap  
+  1 setlinejoin 
+ %
+ % PostScript level 2 pattern fill definitions
+ % Ethan A Merritt April 2003
+ %
+ % Level-1 compatible emulation for rectfill
+  /RF { gsave newpath 4 -2 roll moveto dup 0 exch rlineto
+    exch 0 rlineto neg 0 exch rlineto closepath fill grestore
+  } bind def
+  /BoxFill { gsave RF fill grestore } def 
+  /Blank { 0 0 M 0 8 L 8 8 L 8 0 L 0 0 L
+           1.0 setgray fill 0.0 setgray 0.5 setlinewidth } bind def
+  /Tile8x8 { /PaintType 1 def /PatternType 1 def /TilingType 1 def
+             /BBox [0 0 8 8] def /XStep 8 def /YStep 8 def
+  } bind def
+  /P1D 12 dict def P1D begin
+      Tile8x8 /PaintProc { Blank 0 0 M 8 8 L 0 8 M 8 0 L stroke } def
+  end P1D matrix makepattern
+  /Pattern1 exch def
+  /P2D 12 dict def P2D begin
+      Tile8x8 /PaintProc { Blank 0 0 M 8 8 L 0 8 M 8 0 L stroke
+                           0 4 M 4 8 L 8 4 L 4 0 L 0 4 L stroke } def
+  end P2D matrix makepattern
+  /Pattern2 exch def
+  /P3D 12 dict def P3D begin
+      Tile8x8 /PaintProc { Blank 0 0 M 0 8 L
+                          8 8 L 8 0 L 0 0 L fill } def
+  end P3D matrix makepattern
+  /Pattern3 exch def
+  /P4D 12 dict def P4D begin
+      Tile8x8 /PaintProc { Blank -4 8 M 8 -4 L
+                          0 12 M 12 0 L stroke } def
+  end P4D matrix makepattern
+  /Pattern4 exch def
+  /P5D 12 dict def P5D begin
+      Tile8x8 /PaintProc { Blank -4 0 M 8 12 L
+                          0 -4 M 12 8 L stroke } def
+  end P5D matrix makepattern
+  /Pattern5 exch def
+  /P6D 12 dict def P6D begin
+      Tile8x8 /PaintProc { Blank -2 8 M 4 -4 L
+                          0 12 M 8 -4 L 4 12 M 10 0 L stroke } def
+  end P6D matrix makepattern
+  /Pattern6 exch def
+  /P7D 12 dict def P7D begin
+      Tile8x8 /PaintProc { Blank -2 0 M 4 12 L
+                          0 -4 M 8 12 L 4 -4 M 10 8 L stroke } def
+  end P7D matrix makepattern
+  /Pattern7 exch def
+  /P8D 12 dict def P8D begin
+      Tile8x8 /PaintProc { Blank 8 -2 M -4 4 L
+                          12 0 M -4 8 L 12 4 M 0 10 L stroke } def
+  end P8D matrix makepattern
+  /Pattern8 exch def
+  /P9D 12 dict def P9D begin
+      Tile8x8 /PaintProc { Blank 0 -2 M 12 4 L
+                          -4 0 M 12 8 L -4 4 M 8 10 L stroke } def
+  end P9D matrix makepattern
+  /Pattern9 exch def
+ 
+end
+%%%%EndProlog
+Gpdict begin
+gsave
+72 72 translate
+0.0200 0.0200 scale
+0 setgray
+newpath
+1.000 Gpsetpointsize
+1.000 Gpsetlinewidth
+1.000 Gpsetlinewidth
+LTb
+2475 3300 M
+300 0 V
+Gpstroke
+1.000 Gpsetlinewidth
+LTb
+2475 4458 M
+300 0 V
+Gpstroke
+1.000 Gpsetlinewidth
+LTb
+2475 5617 M
+300 0 V
+Gpstroke
+1.000 Gpsetlinewidth
+LTb
+2475 6775 M
+300 0 V
+Gpstroke
+1.000 Gpsetlinewidth
+LTb
+2475 7933 M
+300 0 V
+Gpstroke
+1.000 Gpsetlinewidth
+LTb
+2475 9092 M
+300 0 V
+Gpstroke
+1.000 Gpsetlinewidth
+LTb
+2475 10250 M
+300 0 V
+Gpstroke
+1.000 Gpsetlinewidth
+LTb
+2475 3300 M
+0 300 V
+Gpstroke
+1.000 Gpsetlinewidth
+LTb
+4926 3300 M
+0 300 V
+Gpstroke
+1.000 Gpsetlinewidth
+LTb
+7376 3300 M
+0 300 V
+Gpstroke
+1.000 Gpsetlinewidth
+LTb
+9826 3300 M
+0 300 V
+Gpstroke
+1.000 Gpsetlinewidth
+LTb
+12276 3300 M
+0 300 V
+Gpstroke
+1.000 Gpsetlinewidth
+LTb
+14726 3300 M
+0 300 V
+Gpstroke
+1.000 Gpsetlinewidth
+LTb
+17175 3300 M
+0 300 V
+Gpstroke
+1.000 Gpsetlinewidth
+LTb
+1.000 Gpsetlinewidth
+LTb
+2475 3300 M
+14700 0 V
+0 6950 V
+-14700 0 V
+0 -6950 V
+Gpstroke
+LTb
+LTb
+1.000 Gpsetpointsize
+1.000 Gpsetpointsize
+1.000 Gpsetlinewidth
+LT0
+LTb
+LT0
+2966 8757 Dia
+3456 7834 Dia
+3945 7952 Dia
+4435 7956 Dia
+4926 8431 Dia
+5415 7859 Dia
+5905 6431 Dia
+6395 7754 Dia
+6886 8297 Dia
+7375 6543 Dia
+7865 6922 Dia
+8355 7914 Dia
+8846 8009 Dia
+9335 8512 Dia
+9825 7397 Dia
+10315 8083 Dia
+10806 7986 Dia
+11295 8118 Dia
+11785 7104 Dia
+12274 8412 Dia
+12765 8221 Dia
+13255 8488 Dia
+13745 7383 Dia
+14234 8061 Dia
+14725 7949 Dia
+15215 7729 Dia
+15705 6146 Dia
+16194 8253 Dia
+16685 8344 Dia
+17175 8221 Dia
+4225 825 Dia
+1.000 Gpsetpointsize
+1.000 Gpsetlinewidth
+LT1
+LTb
+LT1
+2966 7849 DaF
+3456 7623 DaF
+3945 7983 DaF
+4435 7147 DaF
+4926 6963 DaF
+5415 6976 DaF
+5905 5873 DaF
+6395 6793 DaF
+6886 6953 DaF
+7375 6161 DaF
+7865 6352 DaF
+8355 7181 DaF
+8846 7081 DaF
+9335 8274 DaF
+9825 7057 DaF
+10315 7470 DaF
+10806 6462 DaF
+11295 8138 DaF
+11785 6636 DaF
+12274 7322 DaF
+12765 7412 DaF
+13255 8448 DaF
+13745 6870 DaF
+14234 7366 DaF
+14725 7558 DaF
+15215 7265 DaF
+15705 5613 DaF
+16194 7292 DaF
+16685 7959 DaF
+17175 7514 DaF
+4225 275 DaF
+1.000 Gpsetlinewidth
+LT2
+LTb
+LT2
+11975 825 M
+1400 0 V
+Gpstroke
+2966 8757 M
+490 -461 V
+489 -114 V
+490 -56 V
+491 61 V
+489 -55 V
+490 -243 V
+490 -17 V
+491 48 V
+489 -138 V
+490 -78 V
+490 17 V
+491 23 V
+489 54 V
+490 -26 V
+490 19 V
+491 12 V
+489 17 V
+490 -37 V
+489 31 V
+491 19 V
+490 30 V
+490 -21 V
+489 9 V
+491 4 V
+490 -5 V
+490 -63 V
+489 17 V
+491 19 V
+490 13 V
+Gpstroke
+1.000 Gpsetlinewidth
+LT3
+LTb
+LT3
+11975 275 M
+1400 0 V
+Gpstroke
+2966 7849 M
+490 -113 V
+489 83 V
+490 -168 V
+491 -138 V
+489 -90 V
+490 -221 V
+490 -51 V
+491 -22 V
+489 -97 V
+490 -61 V
+490 17 V
+491 7 V
+489 91 V
+490 -1 V
+490 24 V
+491 -38 V
+489 59 V
+490 -26 V
+489 11 V
+491 14 V
+490 60 V
+490 -14 V
+489 8 V
+491 15 V
+490 3 V
+490 -59 V
+489 5 V
+491 28 V
+490 11 V
+Gpstroke
+1.000 Gpsetlinewidth
+LTb
+2475 3300 M
+14700 0 V
+0 6950 V
+-14700 0 V
+0 -6950 V
+1.000 Gpsetpointsize
+Gpstroke
+grestore
+end
+showpage
+%%%%EOF

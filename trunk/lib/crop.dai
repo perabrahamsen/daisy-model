@@ -1,0 +1,29 @@
+;;; crop.dai -*- lisp -*-
+
+(input file "maize.dai")
+(input file "pea.dai")
+(input file "potato.dai")
+(input file "rye.dai")
+(input file "sbarley.dai")
+(input file "sugarbeet.dai")
+(input file "fodderbeet.dai")
+(input file "srape.dai")
+(input file "swheat.dai")
+(input file "wbarley.dai")
+(input file "wrape.dai")
+(input file "wwheat.dai")
+(input file "grass.dai")
+(input file "ryegrass.dai")
+(input file "wclover.dai")
+
+(input file "beetroot.dai")
+(input file "broccoli.dai")
+(input file "brusselssprouts.dai")
+(input file "celeriac.dai")
+(input file "earlypotato.dai")
+(input file "whitecabbage.dai")
+(input file "earlywhitecabbage.dai")
+(input file "onion.dai")
+(input file "onion_plantingofsets.dai")
+
+;;; crop.dai ends here

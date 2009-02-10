@@ -1,0 +1,204 @@
+;;; OpenMI.dai -- Input and output exchange items
+
+;; Common output exchange items
+(deflog OpenMI_output extern
+  (parameter_names column)
+  (declare column String "Name of column to log output")
+  (when (hourly)))
+
+;; Output exchange item of lower boundary
+(deflog Lower_boundary_output OpenMI_output
+  (entries 
+   (flux_bottom (tag "Matrix percolation")
+		(description "\
+Amount of water leaving Daisy through the soil bottom.")
+		(path column "${column}" SoilWater q)
+		(spec fixed SoilWater q)
+		(handle sum)
+		(negate true)) ; positive flux downwards
+   (interval (tag "Drain flow")
+	     (description "\
+Amount of water leaving Daisy through drain pipes.")
+	     (path column "${column}" SoilWater S_drain)
+	     (spec fixed SoilWater S_drain)
+	     (handle sum))
+   (number (tag "Surface water runoff")
+	   (description "\
+Amount of water running of the surface.")
+	   (path column "${column}" Surface runoff)
+	   (spec fixed Surface runoff)
+	   (handle sum)
+	   (dimension "mm/&"))
+   (flux_bottom (tag "NO3 flux")
+		(description "\
+Amount of NO3-N leaving Daisy through the soil bottom.")
+		(path column "${column}" Chemistry "*" trace NO3 J_matrix)
+		(spec chemical default J_matrix)
+		(handle sum)
+		(negate true)) ; positive flux downwards
+   (interval (tag "NO3 drain")
+	     (description "\
+Amount of NO3-N leaving Daisy through drain pipes.")
+	     (path column "${column}" Chemistry "*" trace NO3 S_drain)
+	     (spec chemical default S_drain)
+	     (negate true)
+	     (handle sum))
+   (number (tag "NO3 surface runoff")
+	   (path column "${column}" Chemistry "*" trace NO3 surface_runoff)
+	   (spec chemical default surface_runoff)
+	   (handle sum))
+   (number (tag "NH4 surface runoff")
+	   (path column "${column}" Chemistry "*" trace NH4 surface_runoff)
+	   (spec chemical default surface_runoff)
+	   (handle sum))
+   )
+  )
+
+;; Output exchange items of crop and soil
+(deflog Crop_soil_content OpenMI_output
+  (declare crop String "Crop growth parameters to log output")
+  (crop "*")
+  (entries 
+   (number (tag "DS")
+	   (description "Development stage of crop")
+	   (path column "${column}" Vegetation crops crops "${crop}"
+		 Devel "*" DS)
+	   (dimension "none")
+	   (factor 1.0))        ;Development stage [-1:2]
+   (number (tag "DM leaf")
+	   (description "Dry matter production of leaf")
+	   (path column "${column}" Vegetation crops crops "${crop}" Prod WLeaf)
+	   (dimension "Mg DM/ha")
+	   (factor 0.01))
+   (number (tag "DM dead")
+	   (description "Dry matter production of dead leaves")
+	   (path column "${column}" Vegetation crops crops "${crop}" Prod WDead)
+	   (dimension "Mg DM/ha")
+	   (factor 0.01))
+   (number (tag "DM stem")
+	   (description "Dry matter production of stem")
+	   (path column "${column}" Vegetation crops crops "${crop}" Prod WStem)
+	   (dimension "Mg DM/ha")
+	   (factor 0.01))
+   (number (tag "DM SOrg")
+	   (description "Dry matter production of storage organ")
+	   (path column "${column}" Vegetation crops crops "${crop}" Prod WSOrg)
+	   (dimension "Mg DM/ha")
+	   (factor 0.01))
+   (number (tag "DM root")
+	   (description "Dry matter production of root")
+	   (path column "${column}" Vegetation crops crops "${crop}" Prod WRoot)
+	   (dimension "Mg DM/ha")
+	   (factor 0.01))
+   (number (tag "NCropAct")
+	   (description "Actual content of crop N")
+	   (path column "${column}" Vegetation crops crops "*" Prod NCrop)
+	   (dimension "kg N/ha")
+	   (factor 10.0))
+   (number (tag "NCropCr")
+	   (description "Critical content of crop N")
+	   (path column "${column}" Vegetation crops crops "*" CrpN CrNCnt)
+	   (dimension "kg N/ha")
+	   (factor 10.0))
+   (number (tag "NCropPt")
+	   (description "Potential (optimal) content of crop N")
+	   (path column "${column}" Vegetation crops crops "*" CrpN PtNCnt)
+	   (dimension "kg N/ha")
+	   (factor 10.0))
+   (number (tag "Harvest_N")
+	   (description "Harvest crop N")
+	   (path column "${column}" harvest_N)
+	   (handle sum)
+	   (factor 10); g/m^2 -> kg/ha
+	   (dimension "kg N/ha/&"))
+   (interval (tag "ORG_N")
+	     (description "Soil content of organic N")
+	     (path column "${column}" OrganicMatter "*" total_N)
+	     (spec organic default total_N)
+	     (dimension "kg N/ha"))
+   (interval (tag "RZ NH4")
+	     (description "Root zone content of NH4")
+	     (path column "${column}" Chemistry "*" trace NH4 M)
+	     (spec chemical default M)
+	     (dimension "kg N/ha")
+	     (min_root_density 0.1 [cm/cm^3]))
+   (interval (tag "RZ NO3")
+	     (description "Root zone content of NO3")
+	     (path column "${column}" Chemistry "*" trace NO3 M)
+	     (spec chemical default M)
+	     (dimension "kg N/ha")
+	     (min_root_density 0.1 [cm/cm^3]))
+   (interval (tag "RZ Theta")
+	     (description "Actual water content of the root zone.")
+	     (path column "${column}" SoilWater Theta)
+	     (spec fixed SoilWater Theta)
+	     (dimension "mm")
+	     (min_root_density 0.1 [cm/cm^3]))
+   (water_interval (tag "RZ Theta_fc ")
+		   (h 2 [pF])
+		   (description "Root zone water content at field capacity.")
+		   (path column "${column}" SoilWater Theta)
+		   (spec fixed SoilWater Theta)
+		   (dimension "mm")
+		   (min_root_density 0.1 [cm/cm^3]))
+   (water_interval (tag "RZ Theta_wp ")
+		   (h -15000.0 [cm])
+		   (description "Root zone water content at wilting point.")
+		   (path column "${column}" SoilWater Theta)
+		   (spec fixed SoilWater Theta)
+		   (dimension "mm")
+		   (min_root_density 0.1 [cm/cm^3]))
+   ))
+
+;; Declare input exchange scopes
+(defscope OpenMI_input exchange
+   "An exchange table for a specific column."
+   (declare column String "Name of column to log input.")
+   (column "*");; Using "*" in column parameter value logs all columns
+   (entries (name (name column) (value "${column}")) )
+   )
+
+;; Input exchange items at lower boundary
+(defscope Lower_boundary_input OpenMI_input
+  (entries &old
+   (number (name "GroundWaterTable")
+	   (description "Ground water table. Value zero corresponds to soil surface, negative values are below surface.")
+	   (value -100)
+	   (dimension [cm]))
+   (number (name "NO3 conc. groundwater")
+	   (description "NO3 concentration in groundwater.")
+	   (dimension [g/cm^3]))
+   )
+  )
+
+;; Input exchange items with fertigation
+(defscope fertigation OpenMI_input
+  (entries &old
+   (number (name "Overhead Irrigation")
+	   (description "Irrigation of soil and leaves by sprinkling")
+	   (dimension [mm/h]))
+   (number (name "Surface Irrigation")
+	   (description "Irrigation of surface soil by tubes")
+	   (dimension [mm/h]))
+   (number (name "Subsoil Irrigation")
+	   (description "Irrigation by tubes inside the soil")
+	   (dimension [mm/h]))
+   (number (name "NO3 input")
+	   (description "Amount of NO3-N applied")
+	   (dimension [kg N/ha/h]))
+   (number (name "NH4 input")
+	   (description "Amount of NH4-N applied")
+	   (dimension [kg N/ha/h]))
+   )
+  )
+
+;; A manager using fertigation items
+(defaction OpenMI_fertigation extern_fertigation
+  "Control fertigation through OpenMI."
+  (surface "Surface Irrigation")
+  (overhead "Overhead Irrigation")
+  (subsoil "Subsoil Irrigation")
+  (NO3 "NO3 input")
+  (NH4 "NH4 input"))
+
+;;; OpenMI.dai ends here.

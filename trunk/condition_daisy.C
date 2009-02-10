@@ -1,0 +1,94 @@
+// condition_daisy.C
+// 
+// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
+// Copyright 2000-2001 KVL.
+//
+// This file is part of Daisy.
+// 
+// Daisy is free software; you can redistribute it and/or modify
+// it under the terms of the GNU Lesser Public License as published by
+// the Free Software Foundation; either version 2.1 of the License, or
+// (at your option) any later version.
+// 
+// Daisy is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser Public License
+// along with Daisy; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// Checking daisy state.
+
+#define BUILD_DLL
+
+#include "condition.h"
+#include "daisy.h"
+#include "librarian.h"
+
+struct ConditionRunning : public Condition
+{
+  bool match (const Daisy& daisy, const Scope&, Treelog&) const
+  { return daisy.running; }
+  void output (Log&) const
+  { }
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
+  ConditionRunning (Block& al)
+    : Condition (al)
+  { }
+};
+
+struct ConditionFinished : public Condition
+{
+  bool match (const Daisy& daisy, const Scope&, Treelog&) const
+  { return !daisy.running; }
+  void output (Log&) const
+  { }
+  void tick (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  void initialize (const Daisy&, const Scope&, Treelog&)
+  { }
+
+  bool check (const Daisy&, const Scope&, Treelog&) const
+  { return true; }
+
+  ConditionFinished (Block& al)
+    : Condition (al)
+  { }
+};
+
+static struct ConditionRunningSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new ConditionRunning (al); }
+  
+  ConditionRunningSyntax ()
+    : DeclareModel (Condition::component, "running", 
+                    "True iff the simulation is still running.")
+  { }
+  void load_frame (Frame&) const
+  { }
+} ConditionRunning_syntax;
+
+static struct ConditionFinishedSyntax : public DeclareModel
+{
+  Model* make (Block& al) const
+  { return new ConditionFinished (al); }
+
+  ConditionFinishedSyntax ()
+    : DeclareModel (Condition::component, "finished", 
+                    "True iff the simulation has finished.")
+  { }
+  void load_frame (Frame&) const
+  { }
+} ConditionFinished_syntax;

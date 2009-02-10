@@ -1,0 +1,108 @@
+
+(defAOM Ryegrass-SLOW CROP-SLOW
+  "Slow AOM pool modified for ryegrass."
+  (initial_fraction 0.50)
+  (C_per_N 90.0))
+		  
+(defcrop "Ryegrass" default (description "ryegrass v.27 Henning Høgh Jensen")
+;; This crop module is developed to be grown in association with other crops - clover in particular. 
+
+  (Devel default 
+  	 (EmrTSum 50)
+	 (DS_Emr 0.01)
+	 (DSRate1 0.022) 
+	(TempEff1 (-4 0.02) (6 0.2) (13 0.70) (20 1.00) (29 1.20) (35 1.20))
+	 (PhotEff1 (00 0.005) (11 0.29) (12 0.55) (13 0.75) (15 1.00) (16 1.00)
+		   (17 1.10) (18 1.14) (20 1.18) (28 1.18))
+	 (DSRate2 0.020)
+	 (TempEff2 (-4 0.02) (5 0.2) (14 0.70) (20 1.00) (29 1.20) (35 1.20))
+	 (defined_until_ds 2.))
+  (Vernal default
+          (DSLim 0.33)
+	  (TaLim  5.0)
+	  (TaSum  -50.0))
+  (LeafPhot original 
+            (Qeff 0.0650) ; 0.051; (g/m²/h) / (W/m²) effectivity at low light
+	    (Fm   3.9)	  ;3.5   ; g/m²/h
+	    (TempEff (-20 0.0001) (01 0.01) (4.5 0.5) (7.5 0.875) (8 0.92) (10 0.97) (12 1.00)
+		     (16 1.00) (20 1.00) (23 0.97) (29 0.90) (33 0.8) (35 0.1) (37 0.01) (50 0.0)))      ;°C
+  (Seed LAI (DSLAI05 0.3))
+  (Canopy 
+	  (SpLAI 0.0140)	; ensidet: (m²/m²)/(g/m²) ~140 cm/g
+	  (HvsDS (0 01) (0.20 5) (0.4 8.5) (0.60 20) (1 30) (1.3 35) (2 35))
+;	  (HvsDS (0 001) (0.35 5) (0.5 6)(1.1 18) (1.5 33) (2 48))
+	  (LeafAIMod (0.0 1.0) (1.0 1.0) (2.0 0.7))
+	  (SpStemAI 0.0035)
+	  (StemAIMod (0.0 1.0) (1.0 1.0) (2.0 0.7))
+	  (StemPhotEff 0.70)
+	  (LAIDist0 0.00 0.00 1.00)
+	  (LAIDist1 0.10 0.30 0.80)
+	  (PARref 0.06)
+	  (PARext 0.60)
+	  (EPext 0.50)
+	  (EpFac 1.0)
+	  (IntcpCap 0.5))
+    (Root (DptEmr 2)
+	(PenPar1 0.25)
+	(PenPar2 4.0)
+	(MaxPen 100)                     ; se Høgh-Jensen & Schjoerring 1997
+	(rootdens "Gerwitz+Page74"
+		(SpRtLength 108.0)  	; m/g tørstof Dawson et al 2000 (Tabel 4.2 + 4.4 in Lemaire et al 2000)
+		(DensRtTip 0.1))
+		(Rad 0.010)		; Høgh-Jensen unpublished in solution culture found consistantly 0.12 mm dia
+					; Dawson et al 2000 (in Lemaire et al 2000, Grassland ecophysiology  and grazing ecology) tabel 4.2 
+					; fandt en diameter på 0.25 mm.
+	(h_wp -15000)
+	(Rxylem 10)
+	(MxNH4Up 2.5e-7)
+	(MxNO3Up 2.5e-8))
+  (Partit (RSR  (0.00 0.70) (1.00 0.50) (2.00 0.40))
+	  (Root (0.00 0.80) (0.33 0.60) (0.53 0.45) (1.00 0.45) (2.00 0.35))
+	  (Leaf (0.00 0.90) (0.33 0.85)	(0.53 0.83) (0.73 0.56) (0.95 0.35) (1.14 0.28)(1.45 0.23) (2.00 0.20))
+	  (Stem (0.00 0.10) (0.33 0.15) (0.53 0.17) (0.73 0.44) (0.95 0.65) (1.14 0.68)(1.45 0.77) (2.00 0.80)))
+;  (Partit (RSR  (0.00 0.70) (1.00 0.50) (2.00 0.40)) ;gammel
+;	  (Root (0.00 0.80) (0.33 0.65) (0.53 0.45) (1.00 0.45) (2.00 0.35)) ;gammel
+;	  (Leaf (0.00 0.90) (0.33 0.85)	(0.43 0.83) (0.53 0.56) (0.95 0.35) (1.14 0.28)(1.45 0.23) (2.00 0.20)) ;gammel
+;	  (Stem (0.00 0.10) (0.33 0.15) (0.43 0.17) (0.53 0.44) (0.95 0.65) (1.14 0.68)(1.45 0.77) (2.00 0.80))) ;gammel
+  (Prod (NCrop 0.04)
+	(E_Root 0.69)
+	(E_Leaf 0.68)
+	(E_Stem 0.66)
+	(E_SOrg 0.57)
+	(r_Root 0.010)   ;kropff & Laar, 1993, p.51
+	(r_Leaf 0.030)   ;kropff & Laar, 1993, p.51
+	(r_Stem 0.005)
+	(r_SOrg 0.005)
+	(ShldResC 0.10)			; Capacity of Shielded Reserves
+	(ReMobilDS 1.00)		; Remobilization, Initial DS
+	(ReMobilRt 0.1)			; Remobilization, release rate
+	(LfDR (0.00 0.00) (0.50 0.025)  (2.00 0.05))
+		(RtDR (0.00 0.00) (0.50 0.025)  (2.00 0.03))
+		(Large_RtDR 0.05)
+		(RtDR_T_factor (-5.0 0.0) (5.0 1.0) ) )    ; Gill & Jackson (2000) New Phytol 147:13-31
+   (CrpN (PtRootCnc (0.00 0.020) (1.00 0.020) (2.00 0.020))
+	(CrRootCnc (0.00 0.015) (1.00 0.012) (2.00 0.0075))
+	(NfRootCnc (0.00 0.012) (2.00 0.0010))
+	(PtLeafCnc (0.00 0.040) (1.00 0.030) (2.00 0.025))
+	(CrLeafCnc (0.00 0.020) (1.00 0.015) (2.00 0.012))
+	(NfLeafCnc (0.00 0.015) (2.00 0.010))
+	(PtStemCnc (0.00 0.020) (1.00 0.018) (2.00 0.015))
+	(CrStemCnc (0.00 0.015) (1.00 0.010) (2.00 0.010))
+	(NfStemCnc (0.00 0.010) (2.00 0.008))
+        (PtSOrgCnc (0.00 0.024) (1.00 0.024) (2.00 0.024))
+	(CrSOrgCnc (0.00 0.016) (1.00 0.016) (2.00 0.016))
+	(NfSOrgCnc (0.00 0.014) (2.00 0.014))
+	(TLLeafEff (0.00 0.900) (2.00 0.900))
+	(TLRootEff (0.00 0.600) (2.00 0.600)))
+  (Harvest (Dead "Ryegrass-SLOW" "CROP-FAST")
+	   (Stem "Ryegrass-SLOW" "CROP-FAST")
+	   (Leaf "Ryegrass-SLOW" "CROP-FAST")
+	   (SOrg ("CROP-SLOW" (initial_fraction 0.10) (C_per_N 80.0))
+                 "CROP-FAST")
+	   (Root ("CROP-SLOW" (initial_fraction 0.50) (C_per_N 80.0))
+                 "CROP-FAST")
+	   (DSmax 2.00)
+	   (cut_delay (1500 1) (2000 20) (7000 45))
+		)
+)
+

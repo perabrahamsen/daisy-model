@@ -1,0 +1,50 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage{a4}
+\usepackage{hyperref}
+\input{macro}
+
+\bibliographystyle{apalike}
+
+\begin{document}
+
+\section*{ESA 2004 Daisy Workshop}
+
+\subsection*{Plan for the day}
+
+\begin{enumerate}
+\item Presentation and introduction to the model and tools.
+\item Simulate a crop rotation on a loam with free drainage
+  (pre-defined setup).  See results.
+\item Change lower boundary to pipe drains.
+\item Change to a sandy soil with free drainage.
+\item Add irrigation.
+\item Switch to a soil with estimated hydraulic propererties (using a
+  pedotransfer function).
+\item Try with your own data for soil texture, crops and fertilizer. 
+\end{enumerate}
+
+\subsection*{Materials}
+
+All Daisy releated materials can be downloaded from the web page,
+\url{http://www.dina.kvl.dk/~daisy/}.  These include:
+\begin{itemize}
+\item Old and new versions of the scientific documentation of the
+  physical and mathematic models used.
+\item A complete reference manual for the Daisy program.
+\item A tutorial for writing setup files for Daisy.
+\item Data requirements for running Daisy.
+\item The Daisy executables for both MS Windows and Linux.  
+\item A program for visualizing Daisy output.
+\item A library with standard parameterizations.
+\item Sample setup files.
+\end{itemize}
+
+\nocite{daisy-def,daisy-ems,daisy-fertilizer}
+\bibliography{daisy}
+
+\end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 
