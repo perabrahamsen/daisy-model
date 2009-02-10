@@ -328,24 +328,12 @@ This is not a model, but a list of parameters shared by all weather models.")
   { IM::add_syntax (frame, Value::LogOnly, IM::flux_unit ()); }
   void load_frame (Frame& frame) const
   {
-#ifdef FRAME_LINK
+    // Overwritten in weather_none.C
     frame.add ("air_temperature", "dg C", Value::LogOnly,
                 "Temperature this hour.");
     frame.add ("global_radiation", "W/m^2", Value::LogOnly,
                 "Global radiation this hour.");
-#else // FRAME_LINK
-    // We need to define 'air_temperature' and 'global_radiation'
-    // before calling WeatherOld::load_syntax, as the later will
-    // otherwise define log variables with the same name.  For the
-    // same reason, they need to be Value::State instead of
-    // Value::Const, as WeatherOld::output will try to log them.
-    frame.add ("air_temperature", "dg C", Value::State,
-		"Constant air temperature");
-    frame.add ("air_temperature", 0.0);
-    frame.add ("global_radiation", "W/m^2", Value::State,
-		"Constant global radiation.");
-    frame.add ("global_radiation", 0.0);
-#endif // !FRAME_LINK
+
     // Logs.
     frame.add ("daily_air_temperature", "dg C", Value::LogOnly,
                 "Average temperature this day.");

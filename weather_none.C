@@ -88,11 +88,7 @@ static struct WeatherNoneSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   { 
-#ifdef FRAME_LINK
-    // We need to define 'air_temperature' and 'global_radiation'
-    // before calling WeatherOld::load_syntax, as the later will
-    // otherwise define log variables with the same name.  For the
-    // same reason, they need to be Value::State instead of
+    // These need to be Value::State instead of
     // Value::Const, as WeatherOld::output will try to log them.
     frame.add ("air_temperature", "dg C", Value::State,
 		"Constant air temperature");
@@ -100,7 +96,7 @@ static struct WeatherNoneSyntax : public DeclareModel
     frame.add ("global_radiation", "W/m^2", Value::State,
 		"Constant global radiation.");
     frame.add ("global_radiation", 0.0);
-#endif
+
     // These must be Value::State because they are logged in
     // Weather::output.  Otherwise, we get an error at checkpoins.
     frame.add ("reference_evapotranspiration_value", "mm/h", Value::Const,

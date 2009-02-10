@@ -52,7 +52,7 @@ emission of green house gasses, soil quality, and crop production.
 
 In numeric models, it is common to divide the organic matter in the
 soil into several compartments \citep{orgReviw, CNmodels}, such as
-recentrly added organic matter (\textsc{aom}), soil microbiomass
+recently added organic matter (\textsc{aom}), soil microbial biomass
 (\textsc{smb}), and organic matter that can no longer be traced back
 to its origin (\textsc{som}). These compartments may be further
 divided into smaller pools, where the content of each pool have
@@ -64,7 +64,7 @@ of \textsc{aom} pools depends on the simulating system. For batch
 experiments and some long time scenarios, a single \textsc{aom} pool
 may be enough. However, to simulate input sources from a farming
 system, a fast and a slow \textsc{aom} pools per source are in general
-needed. The dynamics of the modeled system tupically consist of input
+needed. The dynamics of the modeled system typically consist of input
 in form of new added organic matter (fertilizer, manure, crop
 residues) and turnover driven by the soil biomass.
 
@@ -128,7 +128,7 @@ biomass content of the soil matched the levels measured at the
 fields. The change did not affect the long time dynamics of the
 system.
 
-The second change in parameterization is documented in
+The second change in parametrization is documented in
 \citet{daisy-somnew}. This was a complete recalibration that took into
 account the carbon input from rhizodepositions. This change was more
 radical, involving both turnover rates and directions of flow, and
@@ -181,8 +181,8 @@ with its specific parameters.
 The coefficients of the turnover rate and maintenance of the pools is
 affected by abiotic factors as clay content in the soil, soil
 temperature and moisture. The halftimes listed in Figure~\ref{fig:om2}
-corresponds to 0\% clay, 10$^\circ$C and field capacity (defined as 10
-hPa). The halftimes will increase with increasing clay content,
+corresponds to 0\% clay, 10$^\circ$C and field capacity (defined as -10
+kPa). The halftimes will increase with increasing clay content,
 decreasing temperature, or decreasing soil water content. Further
 information of the abiotic factors included in the organic matter
 model in Daisy is given in \citet{daisy-def}.
@@ -225,8 +225,8 @@ the next section.
 \subsection{Initialization of the organic matter pools}
 
 Daisy provides several mechanisms for initialization of the organic
-matter pools, applicable in different situation.  The gratest amount
-of control can be achieved by explicitly specifting the content of
+matter pools, applicable in different situation.  The largest amount
+of control can be achieved by explicitly specifying the content of
 each pool.  However, since this requires far more information of both
 the soil and the model than the user can reasonably be expected to
 possess, this initialization option is almost exclusively used in
@@ -274,15 +274,15 @@ shown in Equation~\ref{eq:generic}.
 \end{equation}
 Here, \textsc{aom}$i$, \textsc{smb}$i$, and \textsc{som}$i$ denote the
 carbon content [M] of the $i$'th \textsc{smb}, \textsc{som}, or
-\textsc{aom} pool, respecitively.  $\Delta\mbox{\textsc{aom}}i$,
+\textsc{aom} pool, respectively.  $\Delta\mbox{\textsc{aom}}i$,
 $\Delta\mbox{\textsc{smb}}i$, and $\Delta\mbox{\textsc{som}}i$ denote
 the change of each pool [M~T$^{-1}$].  
 
 The relationship between the mass of the pools, and the change of the
-pools, is assumed to be linear, and donoted by $a_{i,j}$, $b_{i,j}$,
+pools, is assumed to be linear, and denoted by $a_{i,j}$, $b_{i,j}$,
 $c_{i,j}$, $d_{i,j}$, $e_{i,j}$, $f_{i,j}$ and $g_i$ [T$^{-1}$]
 respectively.  These relationships are calculated on basis of the
-paramtereization of the organic matter turnover model.  For example,
+parametrization of the organic matter turnover model.  For example,
 the formula for finding $a_{1,2}$ can be found in
 Equation~\ref{eq:a12}.
 \begin{equation}
@@ -311,7 +311,7 @@ of the abiotic factors for soil temperature, moisture, and clay,
 respectively. The other relationships in Equation~(\ref{eq:generic}))
 can be described by similar forms.
 
-\subsubsection{Knowns and unknowns}
+\subsubsection{Known and unknowns}
 
 For initialization purposes, we assume known constant temperature and
 soil humidity, which means $a_{i,j}$, $b_{i,j}$, $c_{i,j}$, $d_{i,j}$,
@@ -334,11 +334,11 @@ meaning $\Delta\mbox{\textsc{aom}}i$ are all constant.
   \label{eq:smb-eq}
   \Delta\mbox{\textsc{smb}}i = 0 ;i = 1\ldots\mbox{\#\textsc{smb}}
 \end{equation}
-This is reasonable as the \textsc{smb} pools tend to asjust to input
+This is reasonable as the \textsc{smb} pools tend to adjust to input
 levels relatively fast (a few years at most).  All but one
 initialization option require the user to specify the total organic
 matter in the soil, which allows us to add Equation~\ref{eq:total} to
-the system without incrasing the number of unknowns.
+the system without increasing the number of unknowns.
 \begin{equation}
   \label{eq:total}
   total = \sum_{i=1}^{\mbox{\tiny\#\textsc{smb}}} \mbox{\textsc{smb}}i
@@ -359,9 +359,9 @@ eliminated as unknowns from the equation system.
 Combining all three assumptions, we still lack
 $\mbox{\textsc{\#som}}-1$ equations before we can solve the system.
 
-\subsubsection{Explicit SOM partisioning}
+\subsubsection{Explicit SOM partitioning}
 
-The orginal, and still supported, method of initializing the
+The original, and still supported, method of initializing the
 \textsc{som} pools was to require the user to explicitly specify the
 fraction of the total \textsc{som} in each pool, at in
 Equation~\ref{eq:som-fractions}.
@@ -374,7 +374,7 @@ Equation~\ref{eq:som-fractions}.
 where $f_{\mbox{\scriptsize\textsc{som}}i}$ are user supplied constants.  This
 gives us \mbox{\textsc{\#som}} additional equations, however since
 $\sum_{i=1}^{\mbox{\tiny\#\textsc{som}}} f_{\mbox{\scriptsize\textsc{som}}i} = 1$
-the system is overspecified, and we leave out one of the equations.
+the system is over specified, and we leave out one of the equations.
 Thus, together with \ref{eq:smb-eq}, \ref{eq:total}, and
 \ref{eq:input} this gives us the right number of equations to find a
 solution.
@@ -384,7 +384,7 @@ over the simulation with a manageable number of parameters.  However,
 the \textsc{som} partitioning is model specific, and does not
 correspond to measurable quantities.  After the \citet{daisy-somnew}
 recalibration, we did have problems with users continuing to use the
-no longer applicable \textsc{som} partitioning hueristics developed
+no longer applicable \textsc{som} partitioning heuristics developed
 for the old model.
 
 \subsubsection{Background mineralization}
@@ -404,7 +404,7 @@ is gives us the equation
 \end{equation}
 This gives us one extra equation, which is enough when we only have
 two \textsc{som} pools.  Using background mineralization for
-initializating the system has the advantages of being model
+initializing the system has the advantages of being model
 independent and even indirectly measurable, but requires a good
 understanding of the nitrogen dynamics of the system, and can be
 surprising to users as the short term dynamics tend to dominate the
@@ -429,14 +429,14 @@ assume the active pools are in equilibrium with the input, and let the
 equation system  find the size of the inert pool.
 
 The second equilibrium initialization allows the user to leave out
-Equation~\ref{eq:total}, so the total amound of (active) soil organic
+Equation~\ref{eq:total}, so the total amount of (active) soil organic
 matter is estimated from the input levels.  This is rarely useful, as
 total amount of organic material is easy to measure, but has been used
 in this paper to initialize the organic matter content for long term
 simulations in section~\ref{sec:simulations}, where we examine the
 period from one equilibrium to another.
 
-The last and most common euilibrium initialization is to let the user
+The last and most common equilibrium initialization is to let the user
 specify the size of the inert pool (usually to zero), and leave out
 Equation~\ref{eq:input}.  This is useful for cases where the user have
 no idea of what the input levels for the field used to be.
@@ -448,7 +448,7 @@ to relax the equilibrium, and allow the pool with the lowest
 (non-zero) turnover rate to change.  That is, we remove one of the
 equations added by Equation~\ref{eq:som-eq}, and keep all of Equations
 \ref{eq:smb-eq}, \ref{eq:total}, and \ref{eq:input}.  The idea is that
-all the fast poools will quickly adapt to the input and to the size of
+all the fast pools will quickly adapt to the input and to the size of
 the slow pool.  In the next section, we will examine how well this
 works.
 
