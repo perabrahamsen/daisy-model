@@ -179,7 +179,7 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
 
       // Start checkpoint from next timestep.
       daisy_assert (daisy.check ("time"));
-      Time time (daisy.frame ("time"));
+      Time time (daisy.submodel ("time"));
       time.tick_hour ();
       time.set_time (daisy, "time");
 

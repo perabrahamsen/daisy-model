@@ -554,7 +554,7 @@ Time::Time (Block& al)
                               al.integer ("second")))
 { }
 
-Time::Time (const Frame& al)
+Time::Time (const FrameSubmodel& al)
   : impl (new Implementation (al.integer ("year"), 
                               mday2yday (al.integer ("year"),
                                          al.integer ("month"),

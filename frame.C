@@ -696,6 +696,7 @@ Frame::frame (const symbol key) const
 const FrameModel&
 Frame::model (const symbol key) const
 {
+  verify (key, Value::Object);
   const Frame& frame = this->frame (key);
   return dynamic_cast<const FrameModel&> (frame);
 }
@@ -703,6 +704,7 @@ Frame::model (const symbol key) const
 const FrameSubmodel&
 Frame::submodel (const symbol key) const
 {
+  verify (key, Value::AList);
   const Frame& frame = this->frame (key);
   return dynamic_cast<const FrameSubmodel&> (frame);
 }
@@ -781,7 +783,7 @@ Frame::plf_sequence (const symbol key) const
 
 void 
 Frame::verify (const symbol key, const Value::type want, 
-               const int value_size)
+               const int value_size) const
 { 
   Value::type has = lookup (key);
   if (has != want)

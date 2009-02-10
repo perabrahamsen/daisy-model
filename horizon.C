@@ -24,7 +24,7 @@
 #include "horizon.h"
 #include "library.h"
 #include "block.h"
-#include "frame.h"
+#include "frame_model.h"
 #include "plf.h"
 #include "horheat.h"
 #include "hydraulic.h"
@@ -132,7 +132,7 @@ Horizon::Implementation::Implementation (Block& al)
     dimensions (get_dimensions (al.frame_sequence ("attributes"))),
     nitrification (Librarian::build_item<Nitrification> (al, "Nitrification")),
     secondary (Librarian::build_item<Secondary> (al, "secondary_domain")),
-    hor_heat (al.frame ("HorHeat"))
+    hor_heat (al.submodel ("HorHeat"))
 { }
 
 Horizon::Implementation::Implementation (const Frame& al)
@@ -148,7 +148,7 @@ Horizon::Implementation::Implementation (const Frame& al)
     dimensions (get_dimensions (al.frame_sequence ("attributes"))),
     nitrification (Nitrification::create_default ()),
     secondary (Secondary::create_none ()),
-    hor_heat (al.frame ("HorHeat"))
+    hor_heat (al.submodel ("HorHeat"))
 { }
 
 Horizon::Implementation::~Implementation ()
@@ -349,7 +349,7 @@ properties.")
     bool ok = true;
 
     daisy_assert (al.check ("hydraulic"));
-    const Frame& hydraulic = al.frame ("hydraulic");
+    const FrameModel& hydraulic = al.model ("hydraulic");
     if (hydraulic.type_name () == "hypres"
         && !al.check ("dry_bulk_density"))
       {

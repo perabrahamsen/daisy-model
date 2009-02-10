@@ -66,7 +66,7 @@ struct Surface::Implementation
   // Functions.
   void ridge (const Geometry1D& geo,
               const Soil& soil, const SoilWater& soil_water,
-	      const Frame&);
+	      const FrameSubmodel&);
   void exfiltrate (const Geometry& geo, size_t edge,
                    double water, double dt, Treelog&);
   void update_pond_average (const Geometry& geo);
@@ -181,13 +181,13 @@ Surface::update_water (const Geometry1D& geo,
 void 
 Surface::ridge (const Geometry1D& geo,
                 const Soil& soil, const SoilWater& soil_water, 
-		const Frame& al)
+		const FrameSubmodel& al)
 { impl->ridge (geo, soil, soil_water, al); }
 
 void 
 Surface::Implementation::ridge (const Geometry1D& geo,
                                 const Soil& soil, const SoilWater& soil_water,
-				const Frame& al)
+				const FrameSubmodel& al)
 {
   // No permanent ponding.
   daisy_assert (!use_forced_pressure);
@@ -586,7 +586,7 @@ Surface::Implementation::Implementation (const Frame& al)
     runoff (0.0),
     runoff_fraction (0.0),
     R_mixing (al.number ("R_mixing")),
-    ridge_ (al.check ("ridge") ? new Ridge (al.frame ("ridge")) : NULL)
+    ridge_ (al.check ("ridge") ? new Ridge (al.submodel ("ridge")) : NULL)
 { }
 
 Surface::~Surface ()

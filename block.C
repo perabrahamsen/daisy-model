@@ -429,6 +429,16 @@ Block::model (const symbol key) const
   return frame.model (key); 
 }
 
+const FrameSubmodel& 
+Block::submodel (const symbol key) const
+{ 
+  const Frame& frame = find_frame (key);
+  if (frame.is_reference (key))
+    return this->submodel (impl->expand_reference (key));
+
+  return frame.submodel (key); 
+}
+
 int 
 Block::integer (const symbol key) const
 { 

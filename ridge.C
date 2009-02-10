@@ -26,7 +26,7 @@
 #include "geometry1d.h"
 #include "plf.h"
 #include "librarian.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "mathlib.h"
 #include "log.h"
 #include "soil.h"
@@ -76,7 +76,7 @@ struct Ridge::Implementation
   static void load_syntax (Frame&);
   void initialize (const Geometry1D& geo, const Soil&, const SoilWater&);
   static PLF normalize (PLF plf);
-  Implementation (const Frame&);
+  Implementation (const FrameSubmodel&);
   ~Implementation ();
 };
 
@@ -478,11 +478,11 @@ Ridge::Implementation::normalize (PLF plf)
   return plf;
 }
 
-Ridge::Ridge (const Frame& al)
+Ridge::Ridge (const FrameSubmodel& al)
   : impl (*new Implementation (al))
 { }
 
-Ridge::Implementation::Implementation (const Frame& al)
+Ridge::Implementation::Implementation (const FrameSubmodel& al)
   // The input may be given with an arbitrary origin, typically it
   // will be measured from the bottom of the ridge.  We make sure the
   // integrated value is zero, meaning that the total soil volume (or

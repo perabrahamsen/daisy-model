@@ -104,7 +104,7 @@ struct Movement1D : public MovementSolute
 
   // Management.
   void ridge (Surface& surface, const Soil& soil, const SoilWater& soil_water,
-              const Frame& al);
+              const FrameSubmodel& al);
 
   // Simulation.
   void tick (const Soil& soil, SoilWater& soil_water, const SoilHeat& soil_heat,
@@ -387,7 +387,7 @@ Movement1D::heat (const std::vector<double>& q_water,
 void 
 Movement1D::ridge (Surface& surface, const Soil& soil,
                    const SoilWater& soil_water,
-                   const Frame& al)
+                   const FrameSubmodel& al)
 { surface.ridge (*geo, soil, soil_water, al); }
 
 void 

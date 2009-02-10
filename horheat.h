@@ -26,6 +26,7 @@
 #include <vector>
 
 struct Frame;
+struct FrameSubmodel;
 struct Treelog;
 struct Texture;
 struct Hydraulic;
@@ -66,7 +67,7 @@ struct HorHeat
 
   static const double heat_capacity_table[Constituents_End];
 
-  HorHeat (const Frame& al);
+  HorHeat (const FrameSubmodel& al);
   ~HorHeat ();
 };
 

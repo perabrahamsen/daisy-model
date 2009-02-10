@@ -251,13 +251,13 @@ Daisy::Daisy (Block& al)
     scopesel (Librarian::build_item<Scopesel> (al, "scope")),
     extern_scope (NULL),
     print_time (Librarian::build_item<Condition> (al, "print_time")),
-    time (al.frame ("time")),
+    time (al.submodel ("time")),
     timestep (al.check ("timestep") 
               ? submodel_value<Timestep> (al, "timestep")
               : Timestep::hour ()),
     dt (timestep.total_hours ()),
     stop (al.check ("stop")
-	  ? Time (al.frame ("stop")) 
+	  ? Time (al.submodel ("stop")) 
 	  : Time (9999, 1, 1, 1)),
     duration (al.check ("stop")
               ? Time::hours_between (stop, time)

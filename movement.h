@@ -43,6 +43,7 @@ class Log;
 class Scope;
 class Tertiary;
 class Units;
+class FrameSubmodel;
 
 class Movement : public ModelLogable
 {
@@ -101,7 +102,7 @@ public:
 		     std::vector<double>& T,
 		     const double dt, Treelog&) const = 0;
   virtual void ridge (Surface&, const Soil&, const SoilWater&, 
-                      const Frame&) = 0;
+                      const FrameSubmodel&) = 0;
   void output (Log&) const;
 
   // Heat.

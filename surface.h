@@ -23,6 +23,7 @@
 #include "uzmodel.h"
 
 class Frame;
+class FrameSubmodel;
 class Log;
 class SoilWater;
 class Soil;
@@ -60,7 +61,7 @@ public:
   void set_detention_capacity (double);
   void ridge (const Geometry1D& geo,
               const Soil& soil, const SoilWater& soil_water,
-	      const Frame&);
+	      const FrameSubmodel&);
   void unridge ();
 
   // Simulation.

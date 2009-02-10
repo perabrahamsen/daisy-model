@@ -199,7 +199,7 @@ UIRun::attach (Toplevel& toplevel)
       && frame.type_size ("time") == Value::Singleton
       && frame.check (toplevel.metalib (), "time", Treelog::null ()))
     {
-      Time time (frame.frame ("time"));
+      Time time (frame.submodel ("time"));
       qt_time->set_time (time);
     }
   if (!attach_log ("QtTime", qt_time)

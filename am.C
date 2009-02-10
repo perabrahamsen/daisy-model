@@ -28,6 +28,7 @@
 #include "library.h"
 #include "submodeler.h"
 #include "frame_model.h"
+#include "frame_submodel.h"
 #include "time.h"
 #include "log.h"
 #include "geometry.h"
@@ -173,7 +174,7 @@ struct AM::Implementation::Lock
   // Create and Destroy.
   static void load_syntax (Frame&);
   Lock (symbol c, symbol p);
-  Lock (const Frame& al);
+  Lock (const FrameSubmodel& al);
 };
 
 void 
@@ -197,7 +198,7 @@ AM::Implementation::Lock::Lock (symbol c, symbol p)
     part (p)
 { }
   
-AM::Implementation::Lock::Lock (const Frame& al)
+AM::Implementation::Lock::Lock (const FrameSubmodel& al)
   : crop (al.name ("crop")),
     part (al.name ("part"))
 { }
@@ -932,13 +933,13 @@ AM::AM (Block& al)
     impl (new Implementation 
 	  (al.flag ("initialized"),
            al.check ("creation")
-	   ? Time (al.frame ("creation"))
+	   ? Time (al.submodel ("creation"))
 	   : Time (1, 1, 1, 1),
            al.check ("name") ? al.name ("name") : al.type_name (),
 	   Librarian::build_vector<AOM> (al, "om")))
 {
   if (al.check ("lock"))
-    impl->lock = new AM::Implementation::Lock (al.frame ("lock"));
+    impl->lock = new AM::Implementation::Lock (al.submodel ("lock"));
 }
 
 void
@@ -949,7 +950,7 @@ AM::initialize (const Geometry& geo, const double max_rooting_depth)
 
   daisy_assert (frame.get ());
   if (frame->check ("lock"))
-    impl->lock = new Implementation::Lock (frame->frame ("lock"));
+    impl->lock = new Implementation::Lock (frame->submodel ("lock"));
 
   if (!impl->initialized)
     {

@@ -222,7 +222,7 @@ a subsystem for initialization of the organic matter pools based on a
 static approximation of the dynamic model, which will be explored in
 the next section.
 
-\subsection{Initialization of the organic matter pools}
+\section{Initialization of the organic matter pools}
 
 Daisy provides several mechanisms for initialization of the organic
 matter pools, applicable in different situation.  The largest amount
@@ -251,7 +251,7 @@ earlier history will be less relevant.  However, as shall be
 demonstrated later, the \textsc{som} pools can take centuries to reach
 equilibrium with new input levels.
 
-\subsubsection{Generalized equations}
+\subsection{Generalized equations}
 
 The generalized form for the change of the individual pools is
 shown in Equation~\ref{eq:generic}.
@@ -276,7 +276,9 @@ Here, \textsc{aom}$i$, \textsc{smb}$i$, and \textsc{som}$i$ denote the
 carbon content [M] of the $i$'th \textsc{smb}, \textsc{som}, or
 \textsc{aom} pool, respectively.  $\Delta\mbox{\textsc{aom}}i$,
 $\Delta\mbox{\textsc{smb}}i$, and $\Delta\mbox{\textsc{som}}i$ denote
-the change of each pool [M~T$^{-1}$].  
+the change of each pool [M~T$^{-1}$].  \textsc{\#aom}, \textsc{\#smb},
+and \textsc{\#som} denote the number of \textsc{aom}, \textsc{smb} and
+\textsc{som} pools, respectively.
 
 The relationship between the mass of the pools, and the change of the
 pools, is assumed to be linear, and denoted by $a_{i,j}$, $b_{i,j}$,
@@ -311,7 +313,7 @@ of the abiotic factors for soil temperature, moisture, and clay,
 respectively. The other relationships in Equation~(\ref{eq:generic}))
 can be described by similar forms.
 
-\subsubsection{Known and unknowns}
+\subsection{Known and unknowns}
 
 For initialization purposes, we assume known constant temperature and
 soil humidity, which means $a_{i,j}$, $b_{i,j}$, $c_{i,j}$, $d_{i,j}$,
@@ -332,7 +334,7 @@ meaning $\Delta\mbox{\textsc{aom}}i$ are all constant.
 (Equation~\ref{eq:smb-eq}).
 \begin{equation}
   \label{eq:smb-eq}
-  \Delta\mbox{\textsc{smb}}i = 0 ;i = 1\ldots\mbox{\#\textsc{smb}}
+  \Delta\mbox{\textsc{smb}}i = 0 \hspace{1cm};i = 1\ldots\mbox{\#\textsc{smb}}
 \end{equation}
 This is reasonable as the \textsc{smb} pools tend to adjust to input
 levels relatively fast (a few years at most).  All but one
@@ -349,7 +351,7 @@ The final common assumption is that the carbon input is known, as in
 Equation~\ref{eq:input}.
 \begin{equation}
   \label{eq:input}
-  \Delta\mbox{\textsc{aom}}i = k_i ;i = 1\ldots\mbox{\#\textsc{aom}}
+  \Delta\mbox{\textsc{aom}}i = k_i \hspace{1cm};i = 1\ldots\mbox{\#\textsc{aom}}
 \end{equation}
 Here $k_i$ denote the known carbon input to \textsc{aom}$i$, from
 which the size of \textsc{aom}$i$ can trivially be found given
@@ -359,7 +361,7 @@ eliminated as unknowns from the equation system.
 Combining all three assumptions, we still lack
 $\mbox{\textsc{\#som}}-1$ equations before we can solve the system.
 
-\subsubsection{Explicit SOM partitioning}
+\subsection{Explicit SOM partitioning}
 
 The original, and still supported, method of initializing the
 \textsc{som} pools was to require the user to explicitly specify the
@@ -387,7 +389,7 @@ recalibration, we did have problems with users continuing to use the
 no longer applicable \textsc{som} partitioning heuristics developed
 for the old model.
 
-\subsubsection{Background mineralization}
+\subsection{Background mineralization}
 
 For simulations where our main interest is in the soil organic matter
 as a nitrogen storage, Daisy allow the user to specify desired
@@ -410,23 +412,27 @@ understanding of the nitrogen dynamics of the system, and can be
 surprising to users as the short term dynamics tend to dominate the
 system, so they won't see the expected mineralization in the simulation.
 
-\subsubsection{Equilibrium assumptions}
+\subsection{Equilibrium assumptions}
 
 If the system is in equilibrium, none of the pools will change, so we
 can add Equation~\ref{eq:som-eq}.
 \begin{equation}
   \label{eq:som-eq}
-  \Delta\mbox{\textsc{som}}i = 0 ;i = 1\ldots\mbox{\#\textsc{som}}
+  \Delta\mbox{\textsc{som}}i = 0 \hspace{1cm};i = 1\ldots\mbox{\#\textsc{som}}
 \end{equation}
 Together with \ref{eq:smb-eq}, \ref{eq:total}, and \ref{eq:input} this
 gives us one more equation than needed, so Daisy will allow the user
 to relax some other assumption.
+
+\subsubsection{Size of inert pool}
 
 If we have an inert pool, like \textsc{som3} in Figure~\ref{fig:om2},
 adding an equation stating that it doesn't change is redundant.  This
 is the case for the default initialization of the subsoil, here we
 assume the active pools are in equilibrium with the input, and let the
 equation system  find the size of the inert pool.
+
+\subsubsection{Total organic matter}
 
 The second equilibrium initialization allows the user to leave out
 Equation~\ref{eq:total}, so the total amount of (active) soil organic
@@ -436,12 +442,14 @@ in this paper to initialize the organic matter content for long term
 simulations in section~\ref{sec:simulations}, where we examine the
 period from one equilibrium to another.
 
+\subsubsection{Unknown input}
+
 The last and most common equilibrium initialization is to let the user
 specify the size of the inert pool (usually to zero), and leave out
 Equation~\ref{eq:input}.  This is useful for cases where the user have
 no idea of what the input levels for the field used to be.
 
-\subsubsection{Quasi-equilibrium}
+\subsection{Quasi-equilibrium}
 
 The default initialization for organic matter in the plowing layer is
 to relax the equilibrium, and allow the pool with the lowest
@@ -455,7 +463,12 @@ works.
 \section{Methodology}
 \label{sec:simulations}
 
-Introduction, what we are trying to achieve.
+In this section, we compare the equilibrium and the quasi-equilibrium
+assumption from the previous section, using a dynamic simulation as a
+baseline.  In the dynamic simulations we follow a system that goes
+from equilibrium at one level of carbon input, to equilibrium at
+another input level.  In particular we follow the relative size of the
+two active \textsc{som} pools.
 
 \subsection{Selected soils and management}
 For evaluate the use of assuming quasi-equilibrium in initializing soil organic matter, long-term organic matter simulations have been conducted using Danish management as well as Danish climate and soils. Two standard soils for Danish conditions have been selected, a coarse sandy soil and a sandy loam soil. The particle size distribution of the two soils are listed in Table (\ref{tab:psd}).
@@ -493,7 +506,7 @@ Two management practice of high and low C-input to the simulated systems have be
 \end{table}
 
 \subsection{Initialization of abiotic factors}
-For the initialization we must use constant values. By default the Daisy model use the local average air temperature (which is already specified by the user in the weather file) for $T$, and field capacity (10 hPa) for $\psi$. Since the function $F^T$ is non-linear, using the average is incorrect. In particular, $F^T$ is zero for $T < 0^\circ$C, so for a cold climate like the Danish the significance of frost is overestimated. On the other hand, using pF 2 may be acceptable for the wet climate like in Denmark, but may be unreasonable for a dry climate. The two factors interact, so a low value for $F^T (T)$ is most significant when $F^\psi (\psi)$ is high, and vice-versa. By logging the product of factors in a realistic simulation, Daisy can be used to calculate the combined effect. From that, the user can choose values for $T$ and $\psi$ that give the same effect.
+For the initialization we must use constant values. By default the Daisy model use the local average air temperature (which is already specified by the user in the weather file) for $T$, and field capacity (-10 kPa) for $\psi$. Since the function $F^T$ is non-linear, using the average is incorrect. In particular, $F^T$ is zero for $T < 0^\circ$C, so for a cold climate like the Danish the significance of frost is overestimated. On the other hand, using pF 2 may be acceptable for the wet climate like in Denmark, but may be unreasonable for a dry climate. The two factors interact, so a low value for $F^T (T)$ is most significant when $F^\psi (\psi)$ is high, and vice-versa. By logging the product of factors in a realistic simulation, Daisy can be used to calculate the combined effect. From that, the user can choose values for $T$ and $\psi$ that give the same effect.
 
 \section{Results and Discussion}
 

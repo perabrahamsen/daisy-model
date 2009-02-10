@@ -263,7 +263,7 @@ public:
 
   // Set attribute values.
 private:
-  void verify (symbol key, Value::type want, int size = Value::Singleton);
+  void verify (symbol key, Value::type want, int size = Value::Singleton) const;
 public:
   void add (symbol, double);
   void add (symbol, double, symbol);

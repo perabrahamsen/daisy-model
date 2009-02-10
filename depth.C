@@ -189,11 +189,11 @@ struct DepthPLF : public Depth
   static PLF convert_to_plf (const std::vector<const Frame*>& table)
   {
     daisy_assert (table.size () > 0);
-    const Time start (table[0]->frame ("time"));
+    const Time start (table[0]->submodel ("time"));
     PLF result;
     for (size_t i = 0; i < table.size (); i++)
       {
-        const Time now (table[i]->frame ("time"));
+        const Time now (table[i]->submodel ("time"));
         const double value = table[i]->number ("value");
         result.add (Time::hours_between (start, now), value);
       }
@@ -201,7 +201,7 @@ struct DepthPLF : public Depth
   }
   DepthPLF (Block& al)
     : Depth (al),
-      start (al.frame_sequence ("table")[0]->frame ("time")),
+      start (al.frame_sequence ("table")[0]->submodel ("time")),
       value (convert_to_plf (al.frame_sequence ("table"))),
       current_value (-42.42e42)
   { }
@@ -221,10 +221,10 @@ static const class CheckTable : public VCheck
       = frame.frame_sequence (key); 
     if (table.size () < 2)
       throw std::string ("You must list at least two entries");
-    Time last (table[0]->frame ("time"));
+    Time last (table[0]->submodel ("time"));
     for (size_t i = 1; i < table.size (); i++)
       {
-        Time next ((table[i]->frame ("time")));
+        Time next ((table[i]->submodel ("time")));
         if (next <= last)
           throw std::string ("Time must be increasing");
         last = next;

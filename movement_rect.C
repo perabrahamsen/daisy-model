@@ -61,7 +61,7 @@ struct MovementRect : public MovementSolute
   const auto_vector<UZRect*> matrix_water;
 
   // Management.
-  void ridge (Surface&, const Soil&, const SoilWater&, const Frame&);
+  void ridge (Surface&, const Soil&, const SoilWater&, const FrameSubmodel&);
 
   // Heat.
   std::auto_ptr<Heatrect> heatrect;
@@ -134,7 +134,7 @@ struct MovementRect::Point
 
 void
 MovementRect::ridge (Surface&, const Soil&, const SoilWater&, 
-                     const Frame&)
+                     const FrameSubmodel&)
 { throw "Can't make ridges on a rectangular grid"; }
 
 double 

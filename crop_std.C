@@ -787,7 +787,7 @@ CropStandard::CropStandard (Block& al)
     harvesting (submodel<Harvesting> (al, "Harvest")),
     production (al.frame ("Prod")),
     last_time (al.check ("last_time")
-               ? new Time (al.frame ("last_time"))
+               ? new Time (al.submodel ("last_time"))
                : NULL),
     development (Librarian::build_item<Phenology> (al, "Devel")),
     partition (al.frame ("Partit")),

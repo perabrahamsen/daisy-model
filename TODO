@@ -2,8 +2,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Frame
 
-** Fix FRAME_LINK ifdefs i weather
-
 ** C & OpenMI interface.
 
 ** split Frame::frame -> Frame::model & Frame::submodel

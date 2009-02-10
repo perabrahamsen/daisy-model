@@ -28,6 +28,7 @@
 
 class Frame;
 class FrameModel;
+class FrameSubmodel;
 class Log;
 class Time;
 class Weather;
@@ -73,7 +74,7 @@ public:
   virtual void sow (Metalib&, const FrameModel& crop, 
                     double row_width, double row_width, double seed,
                     const Time&, double dt, Treelog&) = 0;
-  virtual void ridge (const Frame& ridge) = 0;
+  virtual void ridge (const FrameSubmodel& ridge) = 0;
   virtual void irrigate_overhead (double flux, double temp, const IM&, 
                                   double dt, Treelog& msg) = 0;
   virtual void irrigate_surface (double flux, double temp, const IM&,

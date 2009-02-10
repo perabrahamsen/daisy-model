@@ -35,6 +35,7 @@ class Path;
 class Units;
 class Frame;
 class FrameModel;
+class FrameSubmodel;
 class PLF;
 
 #ifdef __unix
@@ -89,6 +90,7 @@ public:
   const PLF& plf (symbol) const;
   const Frame& frame (symbol) const;
   const FrameModel& model (symbol) const;
+  const FrameSubmodel& submodel (symbol) const;
   int integer (symbol) const;
   int integer (symbol, int default_value) const;
   const std::vector<double>& number_sequence (symbol) const;

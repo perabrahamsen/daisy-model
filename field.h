@@ -30,6 +30,7 @@
 #include <memory>
 
 class Column;
+class FrameSubmodel;
 class FrameModel;
 class Frame;
 class Time;
@@ -67,7 +68,7 @@ public:
   void sow (Metalib&, const FrameModel& crop, 
             double row_width, double row_pos, double seed,
             const Time&, double dt, Treelog&);
-  void ridge (const Frame& ridge);
+  void ridge (const FrameSubmodel& ridge);
   void irrigate_overhead (double water, double temp, const IM&, double dt,
 			  Treelog& msg);
   void irrigate_surface (double water, double temp, const IM&, double dt,

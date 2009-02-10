@@ -219,7 +219,7 @@ public:
 
   ConditionAt (Block& al)
     : Condition (al),
-      time (al.frame ("time"))
+      time (al.submodel ("time"))
   { }
   static Model& make (Block& al)
   { return *new ConditionAt (al); }
@@ -245,7 +245,7 @@ public:
 
   ConditionBefore (Block& al)
     : Condition (al),
-      time (al.frame ("time"))
+      time (al.submodel ("time"))
   { }
   static Model& make (Block& al)
   { return *new ConditionBefore (al); }
@@ -271,7 +271,7 @@ public:
 
   ConditionAfter (Block& al)
     : Condition (al),
-      time (al.frame ("time"))
+      time (al.submodel ("time"))
   { }
   static Model& make (Block& al)
   { return *new ConditionAfter (al); }

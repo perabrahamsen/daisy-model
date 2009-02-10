@@ -40,6 +40,7 @@
 
 class AttributeList;
 class Frame;
+class FrameSubmodel;
 class Log;
 class Block;
 
@@ -114,7 +115,7 @@ public:
   // Create.
 public:
   static void load_syntax (Frame&);
-  explicit Time (const Frame&);
+  explicit Time (const FrameSubmodel&);
   explicit Time (Block&);
 
   // Construct.

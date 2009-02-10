@@ -91,7 +91,7 @@ struct ActionRepeat : public Action
   { 
     daisy_assert (frame.get ());
     if (!frame->check ("do"))
-      frame->add ("do", frame->frame ("repeat"));
+      frame->add ("do", frame->model ("repeat"));
   }
   ~ActionRepeat ()
   { }

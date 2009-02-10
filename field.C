@@ -47,7 +47,7 @@ struct Field::Implementation
   void sow (Metalib&, const FrameModel& crop, 
             double row_width, double row_pos, double seed,
             const Time& time, double dt, Treelog&);
-  void ridge (const Frame& ridge);
+  void ridge (const FrameSubmodel& ridge);
   void irrigate_overhead (double flux, double temp, const IM&, double dt, 
 			  Treelog& msg);
   void irrigate_surface (double flux, double temp, const IM&, double dt, 
@@ -179,7 +179,7 @@ Field::Implementation::sow (Metalib& metalib, const FrameModel& crop,
 }
 
 void 
-Field::Implementation::ridge (const Frame& ridge)
+Field::Implementation::ridge (const FrameSubmodel& ridge)
 {
   if (selected)
     selected->ridge (ridge);
@@ -832,7 +832,7 @@ Field::sow (Metalib& metalib, const FrameModel& crop,
 { impl->sow (metalib, crop, row_width, row_pos, seed, time, dt, msg); }
 
 void 
-Field::ridge (const Frame& al)
+Field::ridge (const FrameSubmodel& al)
 { impl->ridge (al); }
 
 void 
