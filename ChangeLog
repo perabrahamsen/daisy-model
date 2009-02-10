@@ -1,3 +1,15 @@
+2009-02-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.58 released.
+
+2009-02-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.58 released.
+
+2009-02-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* all: Use Frame instead of Syntax and AttributeList most places.
+
 2008-12-18  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* all: Reorganized scopes.
