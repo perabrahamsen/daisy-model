@@ -2,6 +2,9 @@
 
 	* Version 4.59 released.
 
+	* log_extern.C: Reanable 'parameter_names'.
+	* cdaisy.C: Replace alist and syntax with frame.
+	
 2009-02-10  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.58 released.

@@ -854,6 +854,16 @@ ParserFile::Implementation::load_list (Frame& frame)
           continue;
 	}
 
+      if (&frame == &metalib
+          && name.name ().substr (0, 3) == "def" 
+          && metalib.exist (name.name ().substr (3)))
+        {
+          const symbol lib_name = name.name ().substr (3);
+          // Handled specially: Put directly in global library.
+          add_derived (metalib.library (lib_name));
+          continue;
+        }
+
       // Duplicate warning.
       if (found.find (name) != found.end ())
 	warning (name + " specified twice, last takes precedence");

@@ -119,7 +119,7 @@ PrinterFile::Implementation::is_complex (const Frame& frame,
       return false;
     case Value::Object:
       return frame.order_index (key) >= 0
-	|| is_complex_object (frame.frame (key), 
+	|| is_complex_object (frame.model (key), 
                               frame.library (metalib, key));
     case Value::AList:
     case Value::PLF:
@@ -230,9 +230,9 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
 	  break;
 	case Value::AList:
 	  if (super.check (key))
-	    print_alist (frame.frame (key), super.frame (key), indent, false); 
+	    print_alist (frame.submodel (key), super.frame (key), indent, false); 
 	  else
-	    print_alist (frame.frame (key), frame.default_frame (key),
+	    print_alist (frame.submodel (key), frame.default_frame (key),
                          indent, false); 
 	  break;
 	case Value::PLF:
@@ -251,10 +251,10 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
           {
             const Library& library = frame.library (metalib, key);
             if (super.check (key))
-              print_object (frame.frame (key), library, 
-                            super.frame (key), indent);
+              print_object (frame.model (key), library, 
+                            super.model (key), indent);
             else
-              print_object (frame.frame (key), library, 
+              print_object (frame.model (key), library, 
                             FrameModel::root (), indent);
           }
 	  break;

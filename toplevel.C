@@ -679,7 +679,7 @@ Toplevel::load_syntax (Frame& frame)
 {
   // Top level Daisy syntax.
   Daisy::load_syntax (frame);
-  Librarian::load_syntax (frame);
+  // Librarian::load_syntax (frame);
   load_frame (frame);
 }
 

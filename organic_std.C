@@ -2901,7 +2901,7 @@ check_alist (Metalib&, const Frame& al, Treelog& err)
       if (!om_ok)
 	ok = false;
     }
-  const Frame& init_alist = al.frame ("init");
+  const FrameSubmodel& init_alist = al.submodel ("init");
   if (init_alist.number_sequence ("SOM_limit_lower").size ()
       != som_alist.size ())
     {
