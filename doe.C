@@ -24,7 +24,7 @@
 #include "log.h"
 #include "geometry.h"
 #include "librarian.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "soil.h"
 #include "soil_water.h"
 #include "treelog.h"
@@ -126,7 +126,7 @@ DOE::initialize (const Geometry& geo,
   J_tertiary.insert (J_tertiary.begin (), edge_size, 0.0);
 }
 
-DOE::DOE (const Frame& al)
+DOE::DOE (const FrameSubmodel& al)
   : M (al.number_sequence ("M"))
 { }
 

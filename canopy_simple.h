@@ -26,6 +26,7 @@
 
 struct Log;
 struct Frame;
+struct FrameSubmodel;
 
 class CanopySimple
 {
@@ -59,7 +60,7 @@ public:
   // Create and Destroy.
 public:
   static void load_syntax (Frame&);
-  CanopySimple (const Frame&);
+  CanopySimple (const FrameSubmodel&);
   ~CanopySimple ();
 };
 

@@ -28,7 +28,7 @@
 #include "plf.h"
 #include "check.h"
 #include "librarian.h"
-#include "frame.h"
+#include "frame_model.h"
 #include "intrinsics.h"
 #include "library.h"
 
@@ -126,7 +126,7 @@ Nitrification::create_default ()
 {
   const Library& library = Librarian::intrinsics ().library (component);
   daisy_assert (library.check ("soil"));
-  const Frame& frame = library.frame ("soil");
+  const FrameModel& frame = library.model ("soil");
   return std::auto_ptr<Nitrification> (new NitrificationSoil (frame));
 }
 

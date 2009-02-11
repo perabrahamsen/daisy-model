@@ -443,7 +443,8 @@ MODELS = program_GP2D.C svat_ssoc.C reaction_Jarvis99.C \
 	pet_makkink.C pet_weather.C svat_none.C action_spray.C pet_PM.C \
 	svat_pmsw.C action_surface.C
 
-DISABLED = crop_old.C crop_sold.C log_clone.C action_merge.C action_divide.C \
+DISABLED = depend.C \
+	crop_old.C crop_sold.C log_clone.C action_merge.C action_divide.C \
 	weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C 
 # A component is a common interface to a number of models.
 # 
@@ -494,7 +495,7 @@ OTHER = filepos.C frame_submodel.C submodeler.C \
 	block.C dlf.C texture.C destination.C symbol.C \
 	fao.C gaussj.C vcheck.C assertion.C xref.C oldunits.C \
 	check.C check_range.C path.C traverse_delete.C \
-	depend.C traverse.C treelog.C \
+	traverse.C treelog.C \
 	lexer_data.C lexer.C daisy.C alist.C syntax.C library.C plf.C \
 	mathlib.C cdaisy.C nrutil.C version.C
 

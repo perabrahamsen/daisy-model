@@ -24,7 +24,7 @@
 #include "crpn.h"
 #include "production.h"
 #include "root_system.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "treelog.h"
 #include "log.h"
 #include "plf.h"
@@ -297,7 +297,7 @@ action of the radition of that day that was received that hour.");
 	      "Development stage at which to restart fixation after a cut.");
 }
 
-CrpN::CrpN (const Frame& al)
+CrpN::CrpN (const FrameSubmodel& al)
   : PtLeafCnc (al.plf ("PtLeafCnc")),
     CrLeafCnc (al.plf ("CrLeafCnc")),
     NfLeafCnc (al.plf ("NfLeafCnc")),

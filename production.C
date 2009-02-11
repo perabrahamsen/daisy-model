@@ -32,7 +32,7 @@
 #include "plf.h"
 #include "treelog.h"
 #include "mathlib.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "librarian.h"
 #include <sstream>
 
@@ -839,7 +839,7 @@ Production::initialize (Metalib& metalib, const symbol name,
   daisy_assert (AM_leaf);
 }
 
-Production::Production (const Frame& al)
+Production::Production (const FrameSubmodel& al)
   : ShldResC (al.number ("ShldResC")),
     ReMobilDS (al.number ("ReMobilDS")),
     ReMobilRt (al.number ("ReMobilRt")),

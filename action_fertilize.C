@@ -35,6 +35,7 @@
 #include "units.h"
 #include "treelog.h"
 #include "frame_model.h"
+#include "frame_submodel.h"
 #include <sstream>
 
 // Base class for fertilize actions.
@@ -56,7 +57,7 @@ struct ActionFertilize : public Action
     // Create and Destroy.
     static bool check_alist (Metalib&, const Frame& al, Treelog& err);
     static void load_syntax (Frame&);
-    Precision (const Frame& al);
+    Precision (const FrameSubmodel& al);
     ~Precision ();
   };
   const std::auto_ptr<Precision> precision;
@@ -121,7 +122,7 @@ Height where you want to end measuring (a negative number).");
 }
 
     
-ActionFertilize::Precision::Precision (const Frame& al)
+ActionFertilize::Precision::Precision (const FrameSubmodel& al)
   : target (al.number ("target")),
     from (al.number ("from")),
     to (al.number ("to"))
@@ -203,7 +204,7 @@ ActionFertilize::ActionFertilize (Block& al)
     second_year_compensation (al.flag ("second_year_compensation")),
     minimum_weight (al.number ("minimum_weight")),
     precision (al.check ("precision") 
-	       ? new Precision (al.frame ("precision"))
+	       ? new Precision (al.submodel ("precision"))
 	       : NULL)
 { 
   if (al.check ("equivalent_weight"))
@@ -224,7 +225,7 @@ static struct ActionFertilizeSyntax : public DeclareBase
     bool second_year_compensation = al.flag ("second_year_compensation");
     bool precision = al.check ("precision");
     bool equivalent_weight = al.check ("equivalent_weight");
-    const FrameModel& am = dynamic_cast <const FrameModel&> (al.frame ("am"));
+    const FrameModel& am = al.model ("am");
     bool fertilizer_weight 
       = (am.check ("weight") && am.number ("weight") > 0.0);
 

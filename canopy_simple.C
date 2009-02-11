@@ -23,7 +23,7 @@
 
 #include "canopy_simple.h"
 #include "log.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "librarian.h"
 
 double
@@ -89,7 +89,7 @@ CanopySimple::load_syntax (Frame& frame)
 	      "Accumulated Leaf Area Index at Height.");
 }
 
-CanopySimple::CanopySimple (const Frame& vl)
+CanopySimple::CanopySimple (const FrameSubmodel& vl)
   : PARref (vl.number ("PARref")),
     PARext (vl.number ("PARext")),
     NIRref (vl.number ("NIRref")),

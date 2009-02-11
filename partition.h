@@ -26,6 +26,7 @@
 #include <vector>
 
 class Frame;
+class FrameSubmodel;
 class Log;
 
 class Partition 
@@ -49,7 +50,7 @@ public:
   // Create and Destroy.
 public:
   static void load_syntax (Frame&);
-  Partition (const Frame&);
+  Partition (const FrameSubmodel&);
   ~Partition ();
 };
 

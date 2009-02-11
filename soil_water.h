@@ -29,6 +29,7 @@ class Groundwater;
 class Log;
 class Soil;
 class Frame;
+class FrameSubmodel;
 class Geometry;
 class SoilHeat;
 class Volume;
@@ -163,7 +164,7 @@ public:
   // Creation.
 public:
   static void load_syntax (Frame&);
-  void initialize (const Frame&, const Geometry&,
+  void initialize (const FrameSubmodel&, const Geometry&,
                    const Soil&, const SoilHeat&, const Groundwater&, Treelog&);
   SoilWater (Block&);
   ~SoilWater ();

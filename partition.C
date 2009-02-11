@@ -24,7 +24,7 @@
 #include "partition.h"
 #include "plf.h"
 #include "librarian.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "check.h"
 #include "mathlib.h"
 #include "treelog.h"
@@ -108,7 +108,7 @@ allocate all assimilate to the storage organ.");
   frame.add ("nitrogen_stress_limit", 1.0);
 }
 
-Partition::Partition (const Frame& al)
+Partition::Partition (const FrameSubmodel& al)
   : Root (al.plf ("Root")),
     Leaf (al.plf ("Leaf")),
     Stem (al.plf ("Stem")),

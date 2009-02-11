@@ -519,7 +519,7 @@ private:
   const symbol name;
   symbol type_name () const
   { return name; }
-  const int seq_id;
+  int seq_id;
   const symbol file;
   Filepos position_;
 public:
@@ -910,7 +910,8 @@ ParserFile::Implementation::load_list (Frame& frame)
 		      skip ("(");
 		    }
 		}
-              std::auto_ptr<Frame> child (&frame.frame (name).clone ());
+              std::auto_ptr<FrameSubmodel> 
+                child (&frame.submodel (name).clone ());
 	      load_list (*child);
 	      frame.add (name, *child);
 	      if (alist_skipped)

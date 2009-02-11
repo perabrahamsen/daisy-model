@@ -40,6 +40,7 @@
 #include "units.h"
 #include "treelog.h"
 #include "frame_model.h"
+#include "frame_submodel.h"
 #include <sstream>
 
 struct ActionCrop : public Action
@@ -58,7 +59,7 @@ struct ActionCrop : public Action
     // Create and Destroy.
     static bool check_alist (Metalib&, const Frame& al, Treelog&);
     static void load_syntax (Frame&);
-    MM_DD (const Frame&);
+    MM_DD (const FrameSubmodel&);
     ~MM_DD ();
   };
 
@@ -78,7 +79,7 @@ struct ActionCrop : public Action
     // Create and Destroy.
     static bool check_alist (Metalib&, const Frame& al, Treelog&);
     static void load_syntax (Frame&);
-    Sow (const Frame&);
+    Sow (const FrameSubmodel&);
     ~Sow ();
   };
   Sow *const primary;
@@ -101,7 +102,7 @@ struct ActionCrop : public Action
     // Create and Destroy.
     static bool check_alist (Metalib&, const Frame& al, Treelog&);
     static void load_syntax (Frame&);
-    Annual (const Frame&);
+    Annual (const FrameSubmodel&);
     ~Annual ();
   };
   Annual *const harvest_annual;
@@ -132,7 +133,7 @@ struct ActionCrop : public Action
     // Create and Destroy.
     static bool check_alist (Metalib&, const Frame& al, Treelog&);
     static void load_syntax (Frame&);
-    Perennial (const Frame&);
+    Perennial (const FrameSubmodel&);
     ~Perennial ();
   };
   Perennial *const harvest_perennial;
@@ -205,7 +206,7 @@ struct ActionCrop : public Action
 
     // Create and Destroy.
     static void load_syntax (Frame&);
-    Irrigation (const Frame&);
+    Irrigation (const FrameSubmodel&);
     ~Irrigation ();
   };
   const Irrigation *const irrigation;
@@ -276,7 +277,7 @@ ActionCrop::MM_DD::load_syntax (Frame& frame)
   frame.order ("month", "day");
 }
 
-ActionCrop::MM_DD::MM_DD (const Frame& al)
+ActionCrop::MM_DD::MM_DD (const FrameSubmodel& al)
   : month (al.integer ("month")),
     day (al.integer ("day")),
     hour (al.integer ("hour"))
@@ -321,8 +322,8 @@ ActionCrop::Sow::load_syntax (Frame& frame)
   frame.add ("done", false);
 }
 
-ActionCrop::Sow::Sow (const Frame& al)
-  : date (al.frame ("date")),
+ActionCrop::Sow::Sow (const FrameSubmodel& al)
+  : date (al.submodel ("date")),
     crop (&al.model ("crop")),
     done (al.flag ("done"))
 { }
@@ -379,8 +380,8 @@ If the crop is ripe before this date, it will be harvested at that point.",
   frame.add ("done", false);
 }
 
-ActionCrop::Annual::Annual (const Frame& al)
-  : latest (al.frame ("latest")),
+ActionCrop::Annual::Annual (const FrameSubmodel& al)
+  : latest (al.submodel ("latest")),
     loss (al.number ("loss")),
     remove_residuals (al.flag ("remove_residuals")),
     done (al.flag ("done"))
@@ -515,9 +516,9 @@ If missing, use the same fertilizer as first season.");
 	      "Year last fertilization was applid.");
 }
 
-ActionCrop::Perennial::Perennial (const Frame& al)
+ActionCrop::Perennial::Perennial (const FrameSubmodel& al)
   : seasons (al.integer ("seasons")),
-    end (al.frame ("end")),
+    end (al.submodel ("end")),
     DS (al.number ("DS")),
     DM (al.number ("DM")),
     year_of_last_harvest (al.check ("year_of_last_harvest")
@@ -743,9 +744,9 @@ ActionCrop::Irrigation::load_syntax (Frame& frame)
 	      "Soil potential at which to irrigate.");
 }
 
-ActionCrop::Irrigation::Irrigation (const Frame& al)
-  : from (al.frame ("from")),
-    to (al.frame ("to")),
+ActionCrop::Irrigation::Irrigation (const FrameSubmodel& al)
+  : from (al.submodel ("from")),
+    to (al.submodel ("to")),
     amount (al.number ("amount")),
     potential (al.number ("potential"))
 { }
@@ -969,15 +970,15 @@ ActionCrop::check (const Daisy& daisy, const Scope& scope, Treelog& msg) const
 
 ActionCrop::ActionCrop (Block& al)
   : Action (al),
-    primary (new Sow (al.frame ("primary"))),
+    primary (new Sow (al.submodel ("primary"))),
     secondary (al.check ("secondary") 
-	       ? new Sow (al.frame ("secondary"))
+	       ? new Sow (al.submodel ("secondary"))
 	       : NULL),
     harvest_annual (al.check ("harvest_annual") 
-	       ? new Annual (al.frame ("harvest_annual"))
+	       ? new Annual (al.submodel ("harvest_annual"))
 	       : NULL),
     harvest_perennial (al.check ("harvest_perennial") 
-		       ? new Perennial (al.frame ("harvest_perennial"))
+		       ? new Perennial (al.submodel ("harvest_perennial"))
 		       : NULL),
     fertilize_at (map_submodel_const<Fertilize> (al, "fertilize_at")),
     fertilize_at_index (al.integer ("fertilize_at_index")),
@@ -987,10 +988,10 @@ ActionCrop::ActionCrop (Block& al)
     spray (map_construct_const<Spray> (al.frame_sequence ("spray"))),
     spray_index (al.integer ("spray_index")),
     irrigation (al.check ("irrigation") 
-	       ? new Irrigation (al.frame ("irrigation"))
+	       ? new Irrigation (al.submodel ("irrigation"))
 	       : NULL),
     irrigation_rest (al.check ("irrigation_rest") 
-		     ? new Irrigation (al.frame ("irrigation_rest"))
+		     ? new Irrigation (al.submodel ("irrigation_rest"))
 		     : NULL),
     irrigation_year (al.check ("irrigation_year")
 		     ? al.integer ("irrigation_year")

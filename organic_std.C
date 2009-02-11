@@ -96,7 +96,7 @@ struct OrganicStandard : public OrganicMatter
     void swap (const Geometry&, double from, double middle, double to);
     static void load_syntax (Frame&);
     void initialize (const Geometry& geo);
-    Buffer (const Frame& al);
+    Buffer (const FrameSubmodel& al);
   } buffer;
   const PLF heat_factor;
   const PLF water_factor;
@@ -148,7 +148,7 @@ struct OrganicStandard : public OrganicMatter
     static bool check_alist (Metalib&, const Frame&, Treelog&);
   public:
     static void load_syntax (Frame&);
-    Initialization (const Frame&, const Geometry& geo,
+    Initialization (const FrameSubmodel&, const Geometry& geo,
                     const Soil& soil, 
                     const Bioincorporation& bioincorporation, 
 		    const std::vector<SOM*>& som, double T_avg);
@@ -585,7 +585,7 @@ OrganicStandard::Initialization::
 }
 
 OrganicStandard::Initialization::
-/**/ Initialization (const Frame& al, const Geometry& geo,
+/**/ Initialization (const FrameSubmodel& al, const Geometry& geo,
                      const Soil& soil, 
                      const Bioincorporation& bioincorporation,
 		     const std::vector<SOM*>& som, double T_avg)
@@ -725,7 +725,7 @@ OrganicStandard::Buffer::initialize (const Geometry& geo)
   daisy_non_negative (C);
 }
 
-OrganicStandard::Buffer::Buffer (const Frame& al)
+OrganicStandard::Buffer::Buffer (const FrameSubmodel& al)
   : C (al.number_sequence ("C")),
     N (al.number_sequence ("N")),
     turnover_rate (al.check ("turnover_halftime")
@@ -2472,7 +2472,8 @@ An 'initial_SOM' layer in OrganicStandard ends below the last cell");
         total_C[lay] = soil.humus_C (lay);
   }
   // Partitioning.
-  Initialization init (al.frame ("init"), geo, soil, bioincorporation, som, T_avg);
+  Initialization init (al.submodel ("init"),
+                       geo, soil, bioincorporation, som, T_avg);
 		       
   double total_delta_C = 0.0;
   double total_delta_N = 0.0;
@@ -2595,7 +2596,7 @@ OrganicStandard::OrganicStandard (Block& al)
     som (Librarian::build_vector<SOM> (al, "som")),
     dom (map_submodel<DOM> (al, "dom")),
     domsorp (Librarian::build_vector<Domsorp> (al, "domsorp")),
-    buffer (al.frame ("buffer")),
+    buffer (al.submodel ("buffer")),
     heat_factor (al.plf ("heat_factor")),
     water_factor (al.plf ("water_factor")),
     clayom (Librarian::build_item<ClayOM> (al, "ClayOM")),
@@ -2603,7 +2604,7 @@ OrganicStandard::OrganicStandard (Block& al)
     som_tillage_factor (al.plf_sequence ("som_tillage_factor")),
     min_AM_C (al.number ("min_AM_C")),
     min_AM_N (al.number ("min_AM_N")),
-    bioincorporation (al.frame ("Bioincorporation")),
+    bioincorporation (al.submodel ("Bioincorporation")),
     fertilized_N (0.0),
     fertilized_C (0.0),
     tillage_N_top (0.0),

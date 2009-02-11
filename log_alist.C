@@ -26,6 +26,7 @@
 #include "log_alist.h"
 #include "library.h"
 #include "frame_submodel.h"
+#include "frame_model.h"
 #include "assertion.h"
 #include <sstream>
 
@@ -176,14 +177,14 @@ LogAList::open (const symbol name)
 		      frame ().default_frame (sname));
 	      else 
 		push (name, 
-		      frame ().frame (sname));
+		      frame ().submodel (sname));
 		      
 	      break;
 	    case Value::Object:
               {
                 const Library& library = frame ().library (metalib (), sname);
                 daisy_assert (size != Value::Singleton);
-                push (name, library, library.frame ("component"));
+                push (name, library, library.model ("component"));
               }
 	      break;
 	    default:
@@ -323,7 +324,7 @@ LogAList::open_derived (const symbol field, const symbol type,
           << ") within library '" << library << "'";
       daisy_panic (tmp.str ());
     }
-  open_object (field, type, frame ().frame (field), library);
+  open_object (field, type, frame ().model (field), library);
 }
 	
 void

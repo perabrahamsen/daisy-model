@@ -85,7 +85,7 @@ public:
   // Create.
   void initialize (const Geometry&);
   static void load_syntax (Frame&);
-  Surface (const Frame& par);
+  Surface (const FrameSubmodel& par);
   ~Surface ();
 };
 

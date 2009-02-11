@@ -851,7 +851,7 @@ ColumnStandard::ColumnStandard (Block& al)
 	     : NULL), 
     vegetation (Librarian::build_item<Vegetation> (al, "Vegetation")),
     bioclimate (Librarian::build_item<Bioclimate> (al, "Bioclimate")),
-    surface (al.frame ("Surface")),
+    surface (al.submodel ("Surface")),
     geometry (movement->geometry ()),
     soil (submodel<Soil> (al, "Soil")),
     soil_water (submodel<SoilWater> (al, "SoilWater")),
@@ -910,11 +910,11 @@ ColumnStandard::initialize (Block& block,
   const Weather& my_weather = weather.get () ? *weather : *global_weather;
   bioclimate->initialize (block, my_weather);
   daisy_assert (frame.get ());
-  soil_heat->initialize (frame->frame ("SoilHeat"), geometry, 
+  soil_heat->initialize (frame->submodel ("SoilHeat"), geometry, 
                          movement->default_heat (*soil, time, my_weather),
                          msg);
 
-  soil_water->initialize (frame->frame ("SoilWater"), 
+  soil_water->initialize (frame->submodel ("SoilWater"), 
                           geometry, *soil, *soil_heat, *groundwater, msg);
   
   // Solutes depends on water and heat.
@@ -923,7 +923,7 @@ ColumnStandard::initialize (Block& block,
   // Organic matter and vegetation.
   const double T_avg = my_weather.average_temperature ();
   organic_matter->initialize (block.metalib (), 
-                              units, frame->frame ("OrganicMatter"), 
+                              units, frame->model ("OrganicMatter"), 
                               geometry, *soil, *soil_water, *soil_heat, 
                               T_avg, msg);
   vegetation->initialize (block.metalib (), 

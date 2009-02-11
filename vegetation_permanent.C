@@ -392,7 +392,7 @@ VegetationPermanent::VegetationPermanent (Block& al)
   : Vegetation (al),
     yearly_LAI (al.frame_sequence ("YearlyLAI")),
     LAIvsDAY (al.plf ("LAIvsDAY")),
-    canopy (al.frame ("Canopy")),
+    canopy (al.submodel ("Canopy")),
     cover_ (-42.42e42),
     N_per_LAI (al.number ("N_per_LAI") * 0.1), // [kg N / ha] -> [g N / m^2]
     DM_per_LAI (al.number ("DM_per_LAI")),
@@ -405,7 +405,7 @@ VegetationPermanent::VegetationPermanent (Block& al)
     root_system (submodel<RootSystem> (al, "Root")),
     WRoot (al.number ("root_DM") * 100.0), // [Mg DM / ha] -> [g DM / m^2]
     albedo_ (al.number ("Albedo")),
-    litter (al.frame ("Litter"))
+    litter (al.submodel ("Litter"))
 {
   canopy.Height = al.number ("Height");
 }

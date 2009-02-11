@@ -23,7 +23,7 @@
 #include "gnuplot_base.h"
 #include "vcheck.h"
 #include "block.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "assertion.h"
 #include "librarian.h"
 #include "treelog.h"
@@ -37,7 +37,7 @@ Relative horizontal size of plot.");
 Relative vertical size of plot.");
   frame.order ("x", "y");
 }
-GnuplotBase::Size::Size (const Frame* al)
+GnuplotBase::Size::Size (const FrameSubmodel* al)
   : x (al ? al->number ("x") : -42.42e42),
     y (al ? al->number ("y") : -42.42e42)
 { }
@@ -109,7 +109,7 @@ GnuplotBase::GnuplotBase (Block& al)
     device (al.name ("device", file2device (file))),
     extra (al.name_sequence ("extra")),
     title (al.name ("title", "")),
-    size (al.check ("size") ? &al.frame ("size") : NULL),
+    size (al.check ("size") ? &al.submodel ("size") : NULL),
     legend (al.name ("legend"))
 { }
 

@@ -32,7 +32,7 @@
 #include "ridge.h"
 #include "check.h"
 #include "treelog.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include <sstream>
 #include <map>
 
@@ -80,7 +80,7 @@ struct Surface::Implementation
 
   // Create and Destroy.
   void initialize (const Geometry&);
-  Implementation (const Frame& al);
+  Implementation (const FrameSubmodel& al);
   ~Implementation ();
 };
 
@@ -565,11 +565,11 @@ Active ridge system, if any.",
 			Ridge::load_syntax);
 }
 
-Surface::Surface (const Frame& al)
+Surface::Surface (const FrameSubmodel& al)
   : impl (new Implementation (al))
 { }
 
-Surface::Implementation::Implementation (const Frame& al)
+Surface::Implementation::Implementation (const FrameSubmodel& al)
   : EpFactor (al.number ("EpFactor")),
     albedo_wet (al.number ("albedo_wet")),
     albedo_dry (al.number ("albedo_dry")),

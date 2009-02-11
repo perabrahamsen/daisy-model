@@ -222,8 +222,8 @@ DOM::initialize (const Geometry& geo,
 }
 
 DOM::DOM (Block& al)
-  : C (*new DOE (al.frame ("C"))),
-    N (*new DOE (al.frame ("N"))),
+  : C (*new DOE (al.submodel ("C"))),
+    N (*new DOE (al.submodel ("N"))),
     diffusion_coefficient (al.number ("diffusion_coefficient")),
     turnover_rate (al.check ("turnover_rate")
 		   ? al.number ("turnover_rate")

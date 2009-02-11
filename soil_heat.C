@@ -28,7 +28,7 @@
 #include "surface.h"
 #include "movement.h"
 #include "weather.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "log.h"
 #include "treelog.h"
 #include "assertion.h"
@@ -699,7 +699,7 @@ SoilHeat::SoilHeat (const Block& al)
 }
 
 void 
-SoilHeat::initialize (const Frame& al, const Geometry& geo,
+SoilHeat::initialize (const FrameSubmodel& al, const Geometry& geo,
                       const std::vector<double>& default_T,
                       Treelog& msg)
 {

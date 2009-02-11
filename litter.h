@@ -24,6 +24,7 @@
 
 class AttributeList;
 class Frame;
+class FrameSubmodel;
 
 class Litter
 {
@@ -36,7 +37,7 @@ public:
   // Create and Destroy.
 public:
   static void load_syntax (Frame&);
-  Litter (const Frame&);
+  Litter (const FrameSubmodel&);
   ~Litter ();
 };
 

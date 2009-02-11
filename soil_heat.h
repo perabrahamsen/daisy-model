@@ -30,6 +30,7 @@ class Weather;
 class Block;
 class Log;
 class Frame;
+class FrameSubmodel;
 class Geometry;
 class Soil;
 class SoilWater;
@@ -134,7 +135,7 @@ public:
   bool check (size_t n, Treelog&) const;
   static void load_syntax (Frame&);
   SoilHeat (const Block&);
-  void initialize (const Frame&, const Geometry& geo, 
+  void initialize (const FrameSubmodel&, const Geometry& geo, 
                    const std::vector<double>& default_T, Treelog&);
   ~SoilHeat ();
 private:                        // Disable.

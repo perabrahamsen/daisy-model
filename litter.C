@@ -22,7 +22,7 @@
 
 #include "litter.h"
 #include "librarian.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "check.h"
 
 void
@@ -39,7 +39,7 @@ Reduction factor for potential evaporation below litter.");
 By default, the surface albedo will be used.");
 }
 
-Litter::Litter (const Frame& al)
+Litter::Litter (const FrameSubmodel& al)
   : vapor_flux_factor (al.number ("vapor_flux_factor")),
     interception_capacity (al.number ("interception_capacity")),
     albedo (al.number ("albedo", -1.0))

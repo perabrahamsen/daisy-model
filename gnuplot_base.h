@@ -26,6 +26,7 @@
 #include <map>
 
 class Frame;
+class FrameSubmodel;
 
 class GnuplotBase : public Gnuplot
 {
@@ -44,7 +45,7 @@ public:
     const double x;
     const double y;
     static void load_syntax (Frame&);
-    explicit Size (const Frame* al);
+    explicit Size (const FrameSubmodel* al);
   };
 private:
   Size size;

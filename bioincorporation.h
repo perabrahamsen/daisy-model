@@ -27,6 +27,7 @@
 #include <memory>
 
 class Frame;
+class FrameSubmodel;
 class Log;
 class AM;
 class Geometry;
@@ -58,7 +59,7 @@ public:
   AM* create_am (Metalib&, const Geometry&, Treelog&);
   void set_am (AM*);
   static void load_syntax (Frame&);
-  Bioincorporation (const Frame&);
+  Bioincorporation (const FrameSubmodel&);
   ~Bioincorporation ();
 };
 

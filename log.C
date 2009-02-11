@@ -28,7 +28,7 @@
 #include "daisy.h"
 #include "assertion.h"
 #include "librarian.h"
-#include "frame.h"
+#include "frame_model.h"
 #include <sstream>
 #include <list>
 #include <string>
@@ -71,7 +71,7 @@ Log::check_entry (symbol name, const char *const component) const
     {
       if (library.check (name))
 	{
-	  const Frame& frame = library.frame (name);
+	  const FrameModel& frame = library.model (name);
           const symbol base = frame.base_name ();
           daisy_assert (base != name);
 	  if (base != Value::None ())

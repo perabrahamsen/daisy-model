@@ -27,7 +27,7 @@
 #include "plf.h"
 #include "log.h"
 #include "check_range.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "block.h"
 #include "treelog.h"
 #include "mathlib.h"
@@ -63,7 +63,7 @@ struct Hydraulic::K_at_h
 		"Water conductivity.");
     frame.order ("h", "K");
   }
-  K_at_h (const Frame& al)
+  K_at_h (const FrameSubmodel& al)
     : h (al.number ("h")),
       K (al.number ("K"))
   { }
@@ -222,7 +222,7 @@ Hydraulic::check (Treelog& msg) const
 Hydraulic::Hydraulic (Block& al)
   : ModelLogable (al.type_name ()),
     K_init (al.check ("K_at_h")
-	    ? new K_at_h (al.frame ("K_at_h"))
+	    ? new K_at_h (al.submodel ("K_at_h"))
 	    : NULL),
     Theta_sat (al.number ("Theta_sat", -42.42e42)),
     Theta_res (al.number ("Theta_res", 0.0)),

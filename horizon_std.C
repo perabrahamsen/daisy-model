@@ -29,7 +29,7 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include "treelog.h"
-#include "frame.h"
+#include "frame_model.h"
 #include "intrinsics.h"
 #include "library.h"
 
@@ -281,7 +281,7 @@ Horizon::create_aquitard (double K_sat)
 {
   const Library& library = Librarian::intrinsics ().library (component);
   daisy_assert (library.check ("aquitard"));
-  const Frame& frame = library.frame ("aquitard");
+  const FrameModel& frame = library.model ("aquitard");
   return std::auto_ptr<Horizon> (new HorizonStandard (frame, K_sat));
 }
 

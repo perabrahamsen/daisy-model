@@ -446,7 +446,7 @@ CropSimple::CropSimple (Block& al)
   : Crop (al),
     LAIvsT (al.check ("LAIvsTS") ? al.plf ("LAIvsTS") : al.plf ("LAIvsDay")),
     forced_LAI (al.number ("forced_LAI")),
-    canopy (*new CanopySimple (al.frame ("Canopy"))),
+    canopy (*new CanopySimple (al.submodel ("Canopy"))),
     height_max (al.number ("height_max")),
     T_sum (al.number ("T_sum")),
     day (al.number ("day")),

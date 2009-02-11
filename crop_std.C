@@ -783,17 +783,17 @@ CropStandard::CropStandard (Block& al)
   : Crop (al),
     seed (Librarian::build_item<Seed> (al, "Seed")),
     root_system (submodel<RootSystem> (al, "Root")),
-    canopy (al.frame ("Canopy")),
+    canopy (al.submodel ("Canopy")),
     harvesting (submodel<Harvesting> (al, "Harvest")),
-    production (al.frame ("Prod")),
+    production (al.submodel ("Prod")),
     last_time (al.check ("last_time")
                ? new Time (al.submodel ("last_time"))
                : NULL),
     development (Librarian::build_item<Phenology> (al, "Devel")),
-    partition (al.frame ("Partit")),
+    partition (al.submodel ("Partit")),
     vernalization (Librarian::build_item<Vernalization> (al, "Vernal")),
     photo (Librarian::build_item<Photo> (al, "LeafPhot")),
-    nitrogen (al.frame ("CrpN")),
+    nitrogen (al.submodel ("CrpN")),
     water_stress_effect (find_WSE (al, *photo)),
     enable_N_stress (al.flag ("enable_N_stress", !photo->handle_N_stress ())),
     min_light_fraction (al.number ("min_light_fraction"))

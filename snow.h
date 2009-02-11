@@ -26,6 +26,7 @@
 struct Weather;
 struct Bioclimate;
 struct Frame;
+struct FrameSubmodel;
 struct Log;
 struct Movement;
 struct Soil;
@@ -56,7 +57,7 @@ public:
   // Create & Destroy.
 public:
   static void load_syntax (Frame&);
-  Snow (const Frame& al);
+  Snow (const FrameSubmodel& al);
   ~Snow ();
 };
 

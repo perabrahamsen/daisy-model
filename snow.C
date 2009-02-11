@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "snow.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "log.h"
 #include "geometry.h"
 #include "soil.h"
@@ -70,10 +70,10 @@ struct Snow::Implementation
              const Soil&, const SoilWater&, const SoilHeat&,
 	     double Si, double q_h, double Prain,
 	     double Psnow, double Pond, double T, double Epot, double dt);
-  Implementation (const Frame& al);
+  Implementation (const FrameSubmodel& al);
 };
 
-Snow::Implementation::Implementation (const Frame& al)
+Snow::Implementation::Implementation (const FrameSubmodel& al)
   : EvapSnowPack (0.0),
     q_s (0.0),
     Ssnow (al.number ("Ssnow")),
@@ -418,7 +418,7 @@ Snow::load_syntax (Frame& frame)
   frame.add ("K_snow_factor", 2.86e-6);
 }
   
-Snow::Snow (const Frame& al)
+Snow::Snow (const FrameSubmodel& al)
   : impl (*new Implementation (al))
 { }
 
@@ -428,3 +428,5 @@ Snow::~Snow ()
 static DeclareSubmodel snow_submodel (Snow::load_syntax, "Snow", "\
 Simulate snow pack on surface.\n\
 _Snow Hydrology_, U.S. Corps of Engineers, 1956.");
+
+// snow.C ends here.

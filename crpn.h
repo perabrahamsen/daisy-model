@@ -29,6 +29,7 @@ class SoilWater;
 class Chemistry;
 class RootSystem;
 class Frame;
+class FrameSubmodel;
 class Log;
 class PLF;
 class Treelog;
@@ -102,7 +103,7 @@ private:
   bool check_alist (Metalib&, const Frame& al, Treelog& err);
 public:
   static void load_syntax (Frame&);
-  CrpN (const Frame&);
+  CrpN (const FrameSubmodel&);
   ~CrpN ();
 };
 

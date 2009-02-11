@@ -29,6 +29,7 @@ class Soil;
 class SoilWater;
 class Treelog;
 class Frame;
+class FrameSubmodel;
 
 class DOE
 {
@@ -56,7 +57,7 @@ public:
   static void load_syntax (Frame&);
   void initialize (const Geometry&, 
                    const Soil&, const SoilWater&, Treelog&);
-  DOE (const Frame& al);
+  DOE (const FrameSubmodel& al);
   ~DOE ();
 };
 
