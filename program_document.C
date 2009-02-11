@@ -219,7 +219,7 @@ ProgramDocument::print_entry_type (const symbol name,
       break;
     case Value::Object:
       {
-	const symbol component = frame.library (metalib, name).name ();
+	const symbol component = frame.component (name);
 	format->bold (component);
 	format->text (" component ");
 	format->see ("chapter", "component",  component);
@@ -411,7 +411,7 @@ ProgramDocument::print_entry_value (const symbol name,
 	      const Frame& object = frame.model (name);
 	      const symbol type = object.type_name ();
 	      format->text (" (default `" + type + "')");
-	      const Library& library = frame.library (metalib, name);
+	      const Library& library = metalib.library (frame.component (name));
 	      const Frame& super = library.model (type);
 	      if (!object.subset (metalib, super))
 		print_default_value = true;

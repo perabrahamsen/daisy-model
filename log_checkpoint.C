@@ -34,6 +34,7 @@
 #include "library.h"
 #include "frame.h"
 #include "frame_model.h"
+#include "path.h"
 #include <sstream>
 
 struct LogCheckpoint : public LogAList
@@ -153,7 +154,8 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
 
       // Print "directory" and "path" before inputs.
       printer.print_entry (*global_frame, "directory");
-      printer.print_entry (*global_frame, "path");
+      if (global_frame->name_sequence ("path") != Path::get_daisy_path ())
+        printer.print_entry (*global_frame, "path");
       FrameModel& daisy = dynamic_cast<FrameModel&> (frame ());
 
       // Print input files.

@@ -223,19 +223,6 @@ Librarian::add_doc_fun (const symbol component, const doc_fun fun)
   daisy_assert (!content->closed);
 } 
 
-void
-Librarian::load_syntax (Frame& frame)
-{
-  const std::string def = "def";
-  for (std::map<symbol, Library*>::const_iterator i = content->all.begin (); 
-       i != content->all.end ();
-       i++)
-    { 
-      const symbol name = (*i).first;
-      frame.add_library (def + name, name);
-    }
-}
-
 void 
 Librarian::declare (const symbol component, const symbol name, 
                     const Declare& declaration)

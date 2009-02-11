@@ -29,7 +29,6 @@
 #include <set>
 #include <memory>
 
-class Library;
 class Metalib;
 class Check;
 class VCheck;
@@ -61,7 +60,6 @@ public:
   bool is_state (symbol) const;
 
   Value::type lookup (symbol) const;
-  ::Library& library (Metalib&, symbol) const;
   symbol component (symbol) const;
   int  size (symbol) const;
   symbol dimension (symbol) const;
@@ -160,8 +158,6 @@ public:
                    Value::category, int size, const symbol description);
   void add_object (symbol, symbol lib,
                    Value::category, int size, const symbol description);
-
-  void add_library (symbol, symbol lib);
 
   void add_check (symbol name, const VCheck& vcheck);
 

@@ -642,7 +642,7 @@ manual was generated.");
 This can affect both where input files are found and where log files\n\
 are generated.");
   frame.add ("path", Value::String,
-              Value::OptionalConst, Value::Sequence,
+              Value::Const, Value::Sequence,
               "List of directories to search for input files in.\n\
 The special value \".\" means the current directory.\n\
 \n\
@@ -652,12 +652,8 @@ be a list of directories to search for input files in, seperated by\n\
 semicolon on MS Windows, or colon on other systems.  If the DAISYPATH\n\
 environment variable is not set, the path will be initialized to the\n\
 working directory followed by the standard parameter libraries.");
-
-  std::vector<symbol> default_path;
-  default_path.push_back (symbol ("."));
-  default_path.push_back (symbol ("${install_directory}/lib"));
-  default_path.push_back (symbol ("${install_directory}/sample"));
-  frame.add ("path", default_path);
+  // Give it a value so people can extend it with &old.
+  frame.add ("path", Path::get_daisy_path ());
 
   frame.add_object ("input", Parser::component,
                      Value::OptionalConst, Value::Singleton,
@@ -679,7 +675,6 @@ Toplevel::load_syntax (Frame& frame)
 {
   // Top level Daisy syntax.
   Daisy::load_syntax (frame);
-  // Librarian::load_syntax (frame);
   load_frame (frame);
 }
 

@@ -304,10 +304,10 @@ struct NumberFetch : public Number
       case Value::Object:
         {
           const Frame& frame = al.find_frame (key);
-          const Library& lib = frame.library (al.metalib (), key);
-          if (lib.name () != Number::component)
+          const symbol component = frame.component (key);
+          if (component != Number::component)
             {
-              al.error ("'" + key + "' is a '" + lib.name ()
+              al.error ("'" + key + "' is a '" + component
                          + "' model, expected a '"
                          + Number::component + "'");
               break;

@@ -120,7 +120,7 @@ PrinterFile::Implementation::is_complex (const Frame& frame,
     case Value::Object:
       return frame.order_index (key) >= 0
 	|| is_complex_object (frame.model (key), 
-                              frame.library (metalib, key));
+                              metalib.library (frame.component (key)));
     case Value::AList:
     case Value::PLF:
       return true;
@@ -249,7 +249,8 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
 	  break;
 	case Value::Object:
           {
-            const Library& library = frame.library (metalib, key);
+            const symbol component = frame.component (key);
+            const Library& library = metalib.library (component);
             if (super.check (key))
               print_object (frame.model (key), library, 
                             super.model (key), indent);
@@ -351,7 +352,8 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
 	  break;
 	case Value::Object:
 	  {
-	    const Library& library = frame.library (metalib, key);
+            const symbol component = frame.component (key);
+            const Library& library = metalib.library (component);
 	    const std::vector<const Frame*>& value = frame.frame_sequence (key);
             // We really should check original value.
             const std::vector<const Frame*>& super_value = super.check (key)
@@ -521,7 +523,7 @@ PrinterFile::Implementation::print_alist (const Frame& frame,
               out << "fixed " << frame.submodel_name (key);
               break;
             case Value::Object:
-              out << frame.library (metalib, key).name ();
+              out << frame.component (key);
               break;
             case Value::PLF: 
             case Value::Library:

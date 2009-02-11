@@ -335,10 +335,6 @@ Syntax::is_log (const symbol key) const
   return impl->status[key] == Value::LogOnly;
 }
 
-::Library&
-Syntax::library (Metalib& metalib, const symbol key) const
-{ return metalib.library (component (key)); }
-
 symbol 
 Syntax::component (const symbol key) const
 {
@@ -523,13 +519,6 @@ Syntax::add_object (const symbol key, const symbol l,
                     Value::category req, int s, const symbol d)
 {
   add (key, Value::Object, req, s, d);
-  impl->libraries[key] = l;
-}
-
-void 
-Syntax::add_library (const symbol key, const symbol l)
-{
-  add (key, Value::Library, Value::OptionalConst, Value::None ());
   impl->libraries[key] = l;
 }
 

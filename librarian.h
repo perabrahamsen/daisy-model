@@ -165,7 +165,6 @@ private:
 public:
   typedef void (*doc_fun) (Format&, Metalib&, Treelog&, symbol name);
   static void add_doc_fun (symbol component, doc_fun);
-  static void load_syntax (Frame&);
 
   // Declarations.
   static void declare (symbol component, symbol name, 

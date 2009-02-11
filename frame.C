@@ -280,15 +280,6 @@ Frame::lookup (const symbol key) const
     return impl->syntax.lookup (key);
 }
 
-::Library& 
-Frame::library (Metalib& metalib, const symbol key) const
-{
-  if (parent () && impl->syntax.lookup (key) == Value::Error)
-    return parent ()->library (metalib, key);
-  else
-    return impl->syntax.library (metalib, key);
-}
-
 symbol
 Frame::component (const symbol key) const
 {
@@ -427,11 +418,6 @@ void
 Frame::add_object (const symbol key, const symbol lib,
                    Value::category cat, int size, const symbol description)
 { impl->syntax.add_object (key, lib, cat, size, description); }
-
-void 
-Frame::add_library (const symbol key, symbol lib)
-{ impl->syntax.add_library (key, lib); }
-
 
 void 
 Frame::add_submodule (const symbol name, 

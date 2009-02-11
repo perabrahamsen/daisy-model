@@ -1,5 +1,7 @@
 2009-02-11  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* toplevel.C (Toplevel::load_frame): Better default for 'path'.
+
 	* Version 4.59 released.
 
 	* log_extern.C: Reanable 'parameter_names'.

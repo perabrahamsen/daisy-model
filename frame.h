@@ -28,7 +28,6 @@ class FrameModel;
 class FrameSubmodel;
 class PLF;
 class Block;
-class Library;
 class Check;
 class VCheck;
 class Treelog;
@@ -98,7 +97,6 @@ public:
   bool is_log (const symbol) const;
   bool is_state (const symbol) const;
   Value::type lookup (const symbol) const;
-  ::Library& library (Metalib&, const symbol) const;
   symbol component (symbol) const;
   int type_size (const symbol) const;
   symbol dimension (const symbol) const;
@@ -184,8 +182,6 @@ public:
   { add_object (key, lib, Value::State, Value::Singleton, description); }
   void add_object (const symbol, symbol lib,
                    Value::category, int size, const symbol description);
-
-  void add_library (const symbol, symbol lib);
 
   typedef void (*load_syntax_t) (Frame&);
   void add_submodule (const symbol name, 

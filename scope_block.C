@@ -60,8 +60,7 @@ ScopeBlock::dimension (symbol tag) const
   // Handle number objects.
   if (type != Value::Object)
     return Value::Unknown ();
-  if (frame.library (block.metalib (), tag).name () 
-      != symbol (Number::component))
+  if (frame.component (tag) != Number::component)
     return Value::Unknown ();
   if (!frame.check (block))
     return Value::Unknown ();
@@ -121,8 +120,7 @@ ScopeBlock::has_number (const symbol tag) const
   // Handle number objects.
   if (type != Value::Object)
     return false;
-  const Library& library = frame.library (block.metalib (), tag);
-  if (library.name () != symbol (Number::component))
+  if (frame.component (tag) != Number::component)
     return false;
   if (!frame.check (block))
     return false;
@@ -153,8 +151,7 @@ ScopeBlock::number (const symbol tag) const
 
   // Handle number objects.
   daisy_assert (type == Value::Object);
-  daisy_assert (frame.library (block.metalib (), tag).name ()
-                == symbol (Number::component));
+  daisy_assert (frame.component (tag) == Number::component);
   daisy_assert (frame.check (block));
   std::auto_ptr<Number> number (Librarian::build_frame<Number> 
                                 (block, frame.model (tag), tag));
@@ -186,8 +183,7 @@ ScopeBlock::has_name (const symbol tag) const
   // Handle stringer objects.
   if (type != Value::Object)
     return false;
-  const Library& library = frame.library (block.metalib (), tag);
-  if (library.name () != symbol (Stringer::component))
+  if (frame.component (tag) != Stringer::component)
     return false;
   if (!frame.check (block))
     return false;
@@ -218,8 +214,7 @@ ScopeBlock::name (const symbol tag) const
 
   // Handle number objects.
   daisy_assert (type == Value::Object);
-  daisy_assert (frame.library (block.metalib (), tag).name ()
-                == symbol (Stringer::component));
+  daisy_assert (frame.component (tag) == Stringer::component);
   daisy_assert (frame.check (block));
   std::auto_ptr<Stringer> stringer (Librarian::build_frame<Stringer> 
                                 (block, frame.model (tag), tag));

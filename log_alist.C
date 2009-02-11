@@ -28,6 +28,7 @@
 #include "frame_submodel.h"
 #include "frame_model.h"
 #include "assertion.h"
+#include "metalib.h"
 #include <sstream>
 
 bool
@@ -182,7 +183,8 @@ LogAList::open (const symbol name)
 	      break;
 	    case Value::Object:
               {
-                const Library& library = frame ().library (metalib (), sname);
+                const symbol component = frame ().component (sname);
+                const Library& library = metalib ().library (component);
                 daisy_assert (size != Value::Singleton);
                 push (name, library, library.model ("component"));
               }
@@ -340,7 +342,8 @@ LogAList::open_object (symbol field, symbol type,
       const std::string& sfield = field.name ();
       daisy_assert (frame ().lookup (sfield) == Value::Object);
       daisy_assert (frame ().type_size (sfield) == Value::Singleton);
-      const Library& library = frame ().library (metalib (), sfield);
+      const symbol component = frame ().component (sfield);
+      const Library& library = metalib ().library (component);
       daisy_assert (library.name () == symbol (lib));
       if (!library.check (type))
         daisy_panic ("Field '" + sfield + "' containing component '"

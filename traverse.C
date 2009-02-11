@@ -272,7 +272,7 @@ Traverse::traverse_parameter (const Frame& frame,
                       = const_cast<Frame&> (frame.frame (parameter));
 		    const symbol type = entry_frame.type_name ();
 		    const Library& library 
-                      = frame.library (metalib, parameter);
+                      = metalib.library (frame.component (parameter));
 		    const Frame& entry_default_frame = library.model (type);
 		
 		    traverse_object (library, entry_frame, entry_default_frame,
@@ -287,7 +287,7 @@ Traverse::traverse_parameter (const Frame& frame,
 			const Frame& entry_frame = *sequence[i];
 			const symbol type = entry_frame.type_name ();
 			const Library& library 
-                          = frame.library (metalib, parameter);
+                          = metalib.library (frame.component (parameter));
 			const Frame& entry_default_frame = library.model (type);
 
 			traverse_object_sequence (library, entry_frame, 

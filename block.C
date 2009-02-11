@@ -159,9 +159,9 @@ Block::Implementation::expand_string (Block& block,
                         Treelog::Open nest (msg, "${" + key + "}");
                         const FrameModel& obj = frame.model (key);
                         const symbol type = obj.type_name ();
-                        const Library& library = frame.library (metalib, key);
+                        const symbol component = frame.component (key);
                         const ScopeBlock scope (block);
-                        if (library.name () == symbol (Stringer::component))
+                        if (component == Stringer::component)
                           {
                             const std::auto_ptr<Stringer> stringer 
                               (Librarian::build_frame<Stringer> (block,
@@ -174,7 +174,7 @@ Block::Implementation::expand_string (Block& block,
                               throw "Bad string: '" + type + "'";
                             result << stringer->value (scope);
                           }
-                        else if (library.name () == symbol (Number::component))
+                        else if (component == Number::component)
                           {
                             const std::auto_ptr<Number> number 
                               (Librarian::build_frame<Number> (block, 
@@ -196,8 +196,8 @@ Block::Implementation::expand_string (Block& block,
                               result << " [" << dim << "]";
                           }
                         else
-                          throw "Unhandled object type '" + library.name ().name ()
-                            + "'";
+                          throw "Unhandled object type '"
+                            + component.name () + "'";
                         break;
                       }
                     default:

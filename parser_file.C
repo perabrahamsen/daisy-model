@@ -869,8 +869,8 @@ ParserFile::Implementation::load_list (Frame& frame)
 	warning (name + " specified twice, last takes precedence");
       else if (frame.lookup (name) != Value::Library // (deffoo ...)
 	       && (frame.lookup (name) != Value::Object
-		   || (frame.library (metalib, name).name () // (input file )
-		       != symbol (Parser::component))))
+                   // (input file )
+		   || (frame.component (name) != Parser::component)))
 	found.insert (name);
 
       // Log variable warning.
@@ -996,14 +996,11 @@ ParserFile::Implementation::load_list (Frame& frame)
 	  case Value::Integer:
 	    frame.add (name, get_integer ());
 	    break;
-	  case Value::Library:
-	    // Handled specially: Put directly in global library.
-	    add_derived (frame.library (metalib, name));
-	    break;
 	  case Value::Object:
 	    {
               std::auto_ptr<FrameModel> child;
-	      const Library& lib = frame.library (metalib, name);
+              const symbol component = frame.component (name);
+	      const Library& lib = metalib.library (component);
               if (frame.check (name))
                 {
                   Treelog::Open nest (msg, "Refining model '" + name + "'");
@@ -1035,6 +1032,7 @@ ParserFile::Implementation::load_list (Frame& frame)
                 frame.add (name, *child);
 	    }
 	    break;
+	  case Value::Library:
 	  case Value::Error:
 	    error (std::string("Unknown singleton '") + name + "'");
 	    skip_to_end ();
@@ -1056,7 +1054,8 @@ ParserFile::Implementation::load_list (Frame& frame)
 	    {
 	    case Value::Object:
 	      {
-		const Library& lib = frame.library (metalib, name);
+		const symbol component = frame.component (name);
+		const Library& lib = metalib.library (component);
 		static const std::vector<const Frame*> no_sequence;
 		auto_vector<const Frame*> sequence;
 		const std::vector<const Frame*>& old_sequence
@@ -1352,8 +1351,10 @@ ParserFile::Implementation::load_list (Frame& frame)
 		// Handle "path" immediately.
 		if (&frame == &metalib && name == "path")
 		  {
+                    // Use block to get references.
+                    Block block (metalib, msg, frame, "path");
 		    const std::vector<symbol>& symbols 
-		      = frame.name_sequence (name);
+		      = block.name_sequence (name);
 		    metalib.path ().set_path (symbols);
 		  }
 		break;
