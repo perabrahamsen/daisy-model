@@ -44,7 +44,6 @@
 #include "assertion.h"
 #include "treelog.h"
 #include "frame_model.h"
-#include "alist.h"
 #include "filepos.h"
 #include <string>
 #include <typeinfo>
@@ -77,36 +76,6 @@
 
 typedef int daisy_bool;
 
-#if 0
-// @ The daisy_syntax Type.
-
-extern "C" Syntax* EXPORT
-daisy_syntax_create ()
-{ return new Syntax (); }
-
-extern "C" void EXPORT		
-daisy_syntax_delete (Syntax* syntax)
-{ delete syntax; }
-
-extern "C" int EXPORT
-daisy_syntax_check (const Syntax* syntax, const AttributeList* alist, 
-		    const char* name, Toplevel* toplevel)
-{ 
-  Treelog::Open nest (toplevel->msg (), name);
-  return syntax->check (toplevel->metalib (), *alist, toplevel->msg ()); 
-}
-
-extern "C" void EXPORT
-daisy_syntax_add (Syntax* syntax, const char* name,
-		  Value::category cat, Value::type type, int size)
-{ syntax->add (name, type, cat, size, "added from C API"); }
-
-extern "C" void EXPORT
-daisy_syntax_add_alist (Syntax* syntax, const char* name,
-			Value::category cat, Syntax* nested, int size)
-{ syntax->add (name, *nested, cat, size, "added from C API"); }
-#endif
-
 extern "C" int EXPORT
 daisy_category_number (const char* name)
 { return Value::category_number (name); }
@@ -131,197 +100,198 @@ extern "C" const char* EXPORT
 daisy_type_name (Value::type number)
 { return Value::type_name (number).name ().c_str (); }
 
-// @ The daisy_alist Type.
+// @ The daisy_frame Type.
 
-extern "C" AttributeList* EXPORT
-daisy_alist_create ()
-{ return new AttributeList (); }
-
-
-extern "C" AttributeList* EXPORT
-daisy_alist_clone (const AttributeList* alist)
-{ return new AttributeList (*alist); }
+extern "C" Frame* EXPORT
+daisy_frame_clone (const Frame* frame)
+{ return &frame->clone (); }
 
 extern "C" void EXPORT
-daisy_alist_delete (AttributeList* alist)
-{ delete alist; }
-
-extern "C" daisy_bool EXPORT
-daisy_alist_check (const AttributeList* alist, const char* name)
-{ return alist->check (name); }
-
-extern "C" int EXPORT
-daisy_alist_get_integer (const AttributeList* alist, const char* name)
-{ return alist->integer (name); }
-
-extern "C" double EXPORT
-daisy_alist_get_number (const AttributeList* alist, const char* name)
-{ return alist->number (name); }
+daisy_frame_delete (Frame* frame)
+{ delete frame; }
 
 extern "C" const char* EXPORT
-daisy_alist_get_string (const AttributeList* alist, const char* name)
-{ return alist->name (name).name ().c_str (); }
+daisy_frame_type_name (const Frame* frame)
+{ return frame->type_name ().name ().c_str (); }
+
+extern "C" const char* EXPORT
+daisy_frame_base_name (const Frame* frame)
+{ return frame->base_name ().name ().c_str (); }
+
+extern "C" const char* EXPORT
+daisy_frame_description (const Frame* frame)
+{ return frame->description ().name ().c_str (); }
 
 extern "C" daisy_bool EXPORT
-daisy_alist_get_flag (const AttributeList* alist, const char* name)
-{ return alist->flag (name); }
+daisy_frame_check (const Frame* frame, const char* name)
+{ return frame->check (name); }
 
-#if 0
-extern "C" const AttributeList* EXPORT
-daisy_alist_get_alist (const AttributeList* alist, const char* name)
-{ return &alist->alist (name); }
-#endif
+extern "C" int EXPORT
+daisy_frame_get_integer (const Frame* frame, const char* name)
+{ return frame->integer (name); }
+
+extern "C" double EXPORT
+daisy_frame_get_number (const Frame* frame, const char* name)
+{ return frame->number (name); }
+
+extern "C" const char* EXPORT
+daisy_frame_get_string (const Frame* frame, const char* name)
+{ return frame->name (name).name ().c_str (); }
+
+extern "C" daisy_bool EXPORT
+daisy_frame_get_flag (const Frame* frame, const char* name)
+{ return frame->flag (name); }
+
+extern "C" const Frame* EXPORT
+daisy_frame_get_frame (const Frame* frame, const char* name)
+{ return &frame->frame (name); }
 
 extern "C" void EXPORT
-daisy_alist_set_integer (AttributeList* alist, const char* name, int value)
-{ alist->add (name, value); }
+daisy_frame_set_integer (Frame* frame, const char* name, int value)
+{ frame->add (name, value); }
 
 extern "C" void EXPORT
-daisy_alist_set_number (AttributeList* alist, const char* name, double value)
-{ alist->add (name, value); }
+daisy_frame_set_number (Frame* frame, const char* name, double value)
+{ frame->add (name, value); }
 
 extern "C" void EXPORT
-daisy_alist_set_string (AttributeList* alist, const char* name, 
+daisy_frame_set_string (Frame* frame, const char* name, 
                         const char* value)
-{ alist->add (name, value); }
+{ frame->add (name, value); }
 
 extern "C" void EXPORT
-daisy_alist_set_flag (AttributeList* alist, const char* name, daisy_bool value)
-{ alist->add (name, bool (value)); }
+daisy_frame_set_flag (Frame* frame, const char* name, daisy_bool value)
+{ frame->add (name, bool (value)); }
 
-#if 0
 extern "C" void EXPORT
-daisy_alist_set_alist (AttributeList* alist, const char* name,
-		       AttributeList* value)
-{ alist->add (name, *value); }
-#endif
+daisy_frame_set_frame (Frame* frame, const char* name,
+		       Frame* value)
+{ frame->add (name, *value); }
 
 #ifdef UNINPLEMENTED
 extern "C" unsigned int EXPORT
-daisy_alist_size_integer (const AttributeList* alist, const char* name)
-{ return alist->integer_sequence (name).size (); }
+daisy_frame_size_integer (const Frame* frame, const char* name)
+{ return frame->integer_sequence (name).size (); }
 
 extern "C" unsigned int EXPORT
-daisy_alist_size_string (const AttributeList* alist, const char* name)
-{ return alist->name_sequence (name).size (); }
+daisy_frame_size_string (const Frame* frame, const char* name)
+{ return frame->name_sequence (name).size (); }
 
 extern "C" unsigned int EXPORT
-daisy_alist_size_flag (const AttributeList* alist, const char* name)
-{ return alist->flag_sequence (name).size (); }
+daisy_frame_size_flag (const Frame* frame, const char* name)
+{ return frame->flag_sequence (name).size (); }
 #endif
 
 extern "C" unsigned int EXPORT
-daisy_alist_size_number (const AttributeList* alist, const char* name)
-{ return alist->number_sequence (name).size (); }
+daisy_frame_size_number (const Frame* frame, const char* name)
+{ return frame->number_sequence (name).size (); }
 
 extern "C" unsigned int EXPORT
-daisy_alist_size_alist (const AttributeList* alist, const char* name)
+daisy_frame_size_frame (const Frame* frame, const char* name)
 {
   // KLUDGE: Work around the use of non-sequence value as the default
   // for each element in the sequence.
-  if (alist->size (name) == Value::Singleton)
+  if (frame->type_size (name) == Value::Singleton)
     return 0;
   
-  return alist->frame_sequence (name).size (); 
+  return frame->value_size (name); 
 }
 
 #ifdef UNINPLEMENTED
 extern "C" int EXPORT
-daisy_alist_get_integer_at (const AttributeList* alist, const char* name,
+daisy_frame_get_integer_at (const Frame* frame, const char* name,
 			    unsigned int index)
-{ return alist->integer_sequence (name)[index]; }
+{ return frame->integer_sequence (name)[index]; }
 
 extern "C" const char* EXPORT
-daisy_alist_get_string_at (const AttributeList* alist, const char* name,
+daisy_frame_get_string_at (const Frame* frame, const char* name,
 			    unsigned int index)
-{ return alist->name_sequence (name)[index].name ().c_str (); }
+{ return frame->name_sequence (name)[index].name ().c_str (); }
 
 extern "C" daisy_bool EXPORT
-daisy_alist_get_flag_at (const AttributeList* alist, const char* name,
+daisy_frame_get_flag_at (const Frame* frame, const char* name,
 			    unsigned int index)
-{ return alist->flag_sequence (name)[index]; }
+{ return frame->flag_sequence (name)[index]; }
 #endif
 
 extern "C" double EXPORT
-daisy_alist_get_number_at (const AttributeList* alist, const char* name,
+daisy_frame_get_number_at (const Frame* frame, const char* name,
 			    unsigned int index)
-{ return alist->number_sequence (name)[index]; }
+{ return frame->number_sequence (name)[index]; }
 
-#if 0
-extern "C" const AttributeList* EXPORT
-daisy_alist_get_alist_at (const AttributeList* alist, const char* name,
+extern "C" const Frame* EXPORT
+daisy_frame_get_frame_at (const Frame* frame, const char* name,
 			  unsigned int index)
-{ return alist->alist_sequence (name)[index]; }
-#endif
+{ return frame->frame_sequence (name)[index]; }
 
 #ifdef UNINPLEMENTED
 extern "C" void EXPORT
-daisy_alist_set_integer_at (AttributeList* alist, const char* name,
+daisy_frame_set_integer_at (Frame* frame, const char* name,
 			    int value, unsigned int index)
 { 
-  vector<int>& v = alist->check (name)
-    ? *new vector<int> (alist->integer_sequence (name))
+  vector<int>& v = frame->check (name)
+    ? *new vector<int> (frame->integer_sequence (name))
     : *new vector<int>;
   if (v.size () <= index)
     while (v.size () <= index)
       v.push_back (value);
   else
     v[index] = value;
-  alist->add (name, v);
+  frame->add (name, v);
 }
 #endif
 
 extern "C" void EXPORT
-daisy_alist_set_string_at (AttributeList* alist, const char* name,
+daisy_frame_set_string_at (Frame* frame, const char* name,
 			   const char* value, unsigned int index)
 {
   std::vector<symbol> v;
-  if (alist->check (name))
-    v = alist->name_sequence (name);
+  if (frame->check (name))
+    v = frame->name_sequence (name);
   if (v.size () <= index)
     while (v.size () <= index)
       v.push_back (symbol (value));
   else
     v[index] = symbol (value);
-  alist->add (name, v);
+  frame->add (name, v);
 }
 
 #ifdef UNINPLEMENTED
 extern "C" void EXPORT
-daisy_alist_set_flag_at (AttributeList* alist, const char* name,
+daisy_frame_set_flag_at (Frame* frame, const char* name,
 			 daisy_bool value, unsigned int index)
 { 
-  vector<bool>& v = alist->check (name)
-    ? *new vector<bool> (alist->flag_sequence (name))
+  vector<bool>& v = frame->check (name)
+    ? *new vector<bool> (frame->flag_sequence (name))
     : *new vector<bool>;
   if (v.size () <= index)
     while (v.size () <= index)
       v.push_back (value);
   else
     v[index] = value;
-  alist->add (name, v);
+  frame->add (name, v);
 }
 #endif
 
 extern "C" void EXPORT
-daisy_alist_set_number_at (AttributeList* alist, const char* name,
+daisy_frame_set_number_at (Frame* frame, const char* name,
 			   double value, unsigned int index)
 {
-  std::vector<double>& v= alist->check (name)
-    ? *new std::vector<double> (alist->number_sequence (name))
+  std::vector<double>& v= frame->check (name)
+    ? *new std::vector<double> (frame->number_sequence (name))
     : *new std::vector<double>;
   if (v.size () <= index)
     while (v.size () <= index)
       v.push_back (value);
   else
     v[index] = value;
-  alist->add (name, v);
+  frame->add (name, v);
 }
 
 /* @ The daisy_library Type.
  * 
  * A library contains a collection of objects, each containing a
- * constructor, a syntax, an alist, an origin, and a name.
+ * constructor, a frame, an origin, and a name.
  */
 
 extern "C" Library* EXPORT
@@ -344,17 +314,9 @@ daisy_library_name (const Library* library, const unsigned int index)
   return entries[index].name ().c_str ();
 }
 
-#if 0
-extern "C" const Syntax* EXPORT
-daisy_library_syntax (const Library* library, const char* name)
-{ return &library->syntax (symbol (name)); }
-#endif
-
-#if 0
-extern "C" const AttributeList* EXPORT
-daisy_library_alist (const Library* library, const char* name)
-{ return &library->lookup (symbol (name)); }
-#endif
+extern "C" const Frame* EXPORT
+daisy_library_frame (const Library* library, const char* name)
+{ return &library->model (symbol (name)); }
 
 extern "C" const char* EXPORT
 daisy_library_file (const Library* library, const char* name)
@@ -380,14 +342,6 @@ daisy_printer_create_file (Toplevel *const toplevel,
 extern "C" void EXPORT
 daisy_printer_comment (Printer* printer, const char* comment)
 { printer->print_comment (comment); }
-
-#if 0
-extern "C" void EXPORT
-daisy_printer_alist (Printer* printer, 
-		     const AttributeList* alist, const Syntax* syntax,
-		     const AttributeList* super)
-{ printer->print_alist (*alist, *syntax, *super); }
-#endif
 
 extern "C" void EXPORT
 daisy_printer_library_file (Printer* printer, const char* filename)
@@ -439,15 +393,9 @@ daisy_daisy_parse_file (Toplevel* toplevel, char* filename)
   toplevel->error ("While parsing '" + std::string (filename) + "'");
 }
 
-#if 0
-extern "C" EXPORT const Syntax*
-daisy_daisy_get_program_syntax (Toplevel* toplevel)
-{ return &toplevel->program_frame ().syntax (); }
-
-extern "C" EXPORT const AttributeList*
-daisy_daisy_get_program_alist (Toplevel* toplevel)
-{ return &toplevel->program_frame ().alist (); }
-#endif
+extern "C" EXPORT const Frame*
+daisy_daisy_get_program_frame (Toplevel* toplevel)
+{ return &toplevel->program_frame (); }
 
 extern "C" EXPORT void
 daisy_daisy_initialize (Toplevel* toplevel)

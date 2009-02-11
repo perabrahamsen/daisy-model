@@ -76,7 +76,7 @@ public:
   // Create.
 public:
   ScopeselName (Block& al)
-    : name (al.name ("name"))
+    : name (al.name ("frame"))
   { }
 };
 

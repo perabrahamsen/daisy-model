@@ -34,8 +34,7 @@ extern "C" {
 #endif
 */
 
-typedef struct daisy_syntax daisy_syntax;
-typedef struct daisy_alist daisy_alist;
+typedef struct daisy_frame daisy_frame;
 typedef struct daisy_library daisy_library;
 typedef struct daisy_daisy daisy_daisy;
 typedef struct daisy_printer daisy_printer;
@@ -58,55 +57,6 @@ typedef struct daisy_scope daisy_scope;
  */
 
 typedef int daisy_bool;
-
-#if 0
-/* @ The daisy_syntax Type.
- * 
- * A syntax describes what attributes that are associated with an
- * object. 
- */
-
-EXPORT daisy_syntax*                   /* Create an empty syntax object. */
-daisy_syntax_create (void);
-
-EXPORT void                            /* Delete syntax object. */
-daisy_syntax_delete (daisy_syntax* syntax);
-
-EXPORT daisy_bool                      /* Check that alist match the syntax. */
-daisy_syntax_check (const daisy_syntax* syntax, 
-                    const daisy_alist* alist,
-                    const char* name,
-                    const daisy_daisy* toplevel);
-
-/* Elements in the syntax table have the following properties.
-   
-   NAME: A string giving the name of the entry.
-   CATEGORY: Specifies whether it is a constant parameter, a state
-   variable, a log variable, or an optional parameter. 
-   TYPE: What kind of values this element will hold in the alist.
-   SIZE: Specifies whether it is an array, and if so its size.
-*/
-
-EXPORT void                            /* Add element to syntax table. */
-daisy_syntax_add (daisy_syntax* syntax, const char* name,
-                  int cat, int type, int size);
-
-EXPORT void                            /* Add alist type to syntax table. */
-daisy_syntax_add_alist (daisy_syntax* syntax, const char* name,
-                        int cat, daisy_syntax* nested, int size);
-
-/* The following functions return "magic" values used by the 'cat',
-   'type', and 'size' arguments to 'daisy_syntax_add'.
-
-   These will not change within a simulation, so you can safely cache
-   the values.  The values may change in future versions of the daisy
-   library, so don't hardcode them. */
-
-/* The currently valid categories are "Const", "State", "Optional",
-   and "LogOnly".  Each have an associated number.  Use the following
-   functions to switch between number and name. */
-
-#endif
 
 EXPORT int                             /* Number used for specific category. */
 daisy_category_number (const char* name);
@@ -133,137 +83,139 @@ daisy_type_number (const char* name);
 EXPORT const char*                     /* Name used for a specific type. */
 daisy_type_name (int number);
 
-/* @ The daisy_alist Type.
+/* @ The daisy_frame Type.
  * 
- * An alist contains the attribute values read by the parser.
+ * A frame contains the attribute types and values.
  */
 
-EXPORT daisy_alist*                    /* Create an empty alist object. */
-daisy_alist_create (void);
+EXPORT daisy_frame*                    /* Clone an existing frame object. */
+daisy_frame_clone (const daisy_frame* frame);
 
-EXPORT daisy_alist*                    /* Clone an existing alist object. */
-daisy_alist_clone (const daisy_alist* alist);
+EXPORT void                            /* Delete frame object. */
+daisy_frame_delete (daisy_frame* frame);
 
-EXPORT void                            /* Delete alist object. */
-daisy_alist_delete (daisy_alist* alist);
+EXPORT const char*                     /* Name of FRAME. */
+daisy_frame_type_name (const daisy_frame* frame);
 
-EXPORT daisy_bool                      /* Check that NAME is defined in ALIST. */
-daisy_alist_check (const daisy_alist* alist, const char* name);
+EXPORT const char*                     /* Name of base frame for FRAME. */
+daisy_frame_base_name (const daisy_frame* frame);
+
+EXPORT const char*                     /* Description of FRAME. */
+daisy_frame_description (const daisy_frame* frame);
+
+EXPORT daisy_bool           /* Check that NAME is defined in FRAME. */
+daisy_frame_check (const daisy_frame* frame, const char* name);
 
 /* The following functions are for manipulating individual members of
    an array.   It is an error to call them if the member is an
    array. */
 
-EXPORT int                             /* Get integer NAME from ALIST. */
-daisy_alist_get_integer (const daisy_alist* alist, const char* name);
+EXPORT int                             /* Get integer NAME from FRAME. */
+daisy_frame_get_integer (const daisy_frame* frame, const char* name);
 
-EXPORT double                          /* Get double NAME from ALIST. */
-daisy_alist_get_number (const daisy_alist* alist, const char* name);
+EXPORT double                          /* Get double NAME from FRAME. */
+daisy_frame_get_number (const daisy_frame* frame, const char* name);
 
-EXPORT const char*                     /* Get char* NAME from ALIST. */
-daisy_alist_get_string (const daisy_alist* alist, const char* name);
+EXPORT const char*                     /* Get char* NAME from FRAME. */
+daisy_frame_get_string (const daisy_frame* frame, const char* name);
 
 
-EXPORT daisy_bool                      /* Get bool NAME from ALIST. */
-daisy_alist_get_flag (const daisy_alist* alist, const char* name);
+EXPORT daisy_bool                      /* Get bool NAME from FRAME. */
+daisy_frame_get_flag (const daisy_frame* frame, const char* name);
 
-#if 0
-EXPORT const daisy_alist*              /* Get alist NAME from ALIST. */
-daisy_alist_get_alist (const daisy_alist* alist, const char* name);
-#endif
+EXPORT const daisy_frame*              /* Get frame NAME from FRAME. */
+daisy_frame_get_frame (const daisy_frame* frame, const char* name);
 
-EXPORT void                            /* Set integer NAME from ALIST to VALUE. */
-daisy_alist_set_integer (daisy_alist* alist, const char* name,
+EXPORT void                            /* Set integer NAME from FRAME to VALUE. */
+daisy_frame_set_integer (daisy_frame* frame, const char* name,
                          int value);
 
-EXPORT void                            /* Set double NAME from ALIST to VALUE. */
-daisy_alist_set_number (daisy_alist* alist, const char* name,
+EXPORT void                            /* Set double NAME from FRAME to VALUE. */
+daisy_frame_set_number (daisy_frame* frame, const char* name,
                         double value);
 
-EXPORT void                            /* Set char* NAME from ALIST to VALUE. */
-daisy_alist_set_string (daisy_alist* alist, const char* name,
+EXPORT void                            /* Set char* NAME from FRAME to VALUE. */
+daisy_frame_set_string (daisy_frame* frame, const char* name,
                         const char* value);
 
-EXPORT void                            /* Set bool NAME from ALIST to VALUE. */
-daisy_alist_set_flag (daisy_alist* alist, const char* name,
+EXPORT void                            /* Set bool NAME from FRAME to VALUE. */
+daisy_frame_set_flag (daisy_frame* frame, const char* name,
                       daisy_bool value);
 
-#if 0
-EXPORT void                            /* Set alist NAME from ALIST to VALUE. */
-daisy_alist_set_alist (daisy_alist* alist, const char* name,
-                       daisy_alist* value);
-#endif
+EXPORT void                            /* Set frame NAME from FRAME to VALUE. */
+daisy_frame_set_frame (daisy_frame* frame, const char* name,
+                       daisy_frame* value);
 
-/* The following functions are for manipulating array members of an alist.
+/* The following functions are for manipulating array members of an frame.
    It is an error to call them if the member is not an array.  The
    array will grow automatically if you 'set' values outside its upper
    bound. The lower array bound is zero. */
 
 #ifdef UNINPLEMENTED
 EXPORT unsigned int                    /* Size of integer array. */
-daisy_alist_size_integer (const daisy_alist* alist, const char* name);
+daisy_frame_size_integer (const daisy_frame* frame, const char* name);
 
 EXPORT unsigned int                    /* Size of string array. */
-daisy_alist_size_string (const daisy_alist* alist, const char* name);
+daisy_frame_size_string (const daisy_frame* frame, const char* name);
 
 EXPORT unsigned int                    /* Size of flag array. */
-daisy_alist_size_flag (const daisy_alist* alist, const char* name);
+daisy_frame_size_flag (const daisy_frame* frame, const char* name);
 #endif
 
 EXPORT unsigned int                    /* Size of number array. */
-daisy_alist_size_number (const daisy_alist* alist, const char* name);
+daisy_frame_size_number (const daisy_frame* frame, const char* name);
 
-EXPORT unsigned int                    /* Size of alist array. */
-daisy_alist_size_alist (const daisy_alist* alist, const char* name);
+EXPORT unsigned int                    /* Size of frame array. */
+daisy_frame_size_frame (const daisy_frame* frame, const char* name);
 
 #ifdef UNINPLEMENTED
-EXPORT unsigned int                    /* Get integer NAME[INDEX] from ALIST. */
-daisy_alist_get_integer_at (const daisy_alist* alist, const char* name,
+EXPORT unsigned int                    /* Get integer NAME[INDEX] from FRAME. */
+daisy_frame_get_integer_at (const daisy_frame* frame, const char* name,
                             unsigned int index);
 
-EXPORT const char*                     /* Get char* NAME[INDEX] from ALIST. */
-daisy_alist_get_string_at (const daisy_alist* alist, const char* name,
+EXPORT const char*                     /* Get char* NAME[INDEX] from FRAME. */
+daisy_frame_get_string_at (const daisy_frame* frame, const char* name,
                            unsigned int index);
 
-EXPORT daisy_bool                      /* Get bool NAME[INDEX] from ALIST. */
-daisy_alist_get_flag_at (const daisy_alist* alist, const char* name,
+EXPORT daisy_bool                      /* Get bool NAME[INDEX] from FRAME. */
+daisy_frame_get_flag_at (const daisy_frame* frame, const char* name,
                          unsigned int index);
 #endif
 
-EXPORT double                          /* Get double NAME[INDEX] from ALIST. */
-daisy_alist_get_number_at (const daisy_alist* alist, const char* name,
+EXPORT double                          /* Get double NAME[INDEX] from FRAME. */
+daisy_frame_get_number_at (const daisy_frame* frame, const char* name,
                            unsigned int index);
 
 #if 0
-EXPORT daisy_alist*                    /* Get alist NAME[INDEX] from ALIST. */
-daisy_alist_get_alist_at (const daisy_alist* alist, const char* name,
+EXPORT daisy_frame*                    /* Get frame NAME[INDEX] from FRAME. */
+daisy_frame_get_frame_at (const daisy_frame* frame, const char* name,
                           unsigned int index);
 #endif
 
 #ifdef UNINPLEMENTED
-EXPORT void                    /* Set integer NAME[INDEX] from ALIST to VALUE. */
-daisy_alist_set_integer_at (daisy_alist* alist, const char* name,
+EXPORT void                    /* Set integer NAME[INDEX] from FRAME to VALUE. */
+daisy_frame_set_integer_at (daisy_frame* frame, const char* name,
                             int value, unsigned int index);
 #endif
 
-EXPORT void                    /* Set char* NAME[INDEX] from ALIST to VALUE. */
-daisy_alist_set_string_at (daisy_alist* alist, const char* name,
+EXPORT void                    /* Set char* NAME[INDEX] from FRAME to VALUE. */
+daisy_frame_set_string_at (daisy_frame* frame, const char* name,
                            const char* value, unsigned int index);
 
 #ifdef UNINPLEMENTED
-EXPORT void                    /* Set bool NAME[INDEX] from ALIST to VALUE. */
-daisy_alist_set_flag_at (daisy_alist* alist, const char* name,
+EXPORT void                    /* Set bool NAME[INDEX] from FRAME to VALUE. */
+daisy_frame_set_flag_at (daisy_frame* frame, const char* name,
                          daisy_bool value, unsigned int index);
 #endif
 
-EXPORT void                    /* Set double NAME[INDEX] from ALIST to VALUE. */
-daisy_alist_set_number_at (daisy_alist* alist, const char* name,
+EXPORT void                    /* Set double NAME[INDEX] from FRAME to VALUE. */
+daisy_frame_set_number_at (daisy_frame* frame, const char* name,
                            double value, unsigned int index);
 
 /* @ The daisy_library Type.
  * 
  * A library contains a collection of objects, each containing a
- * constructor, a syntax, an alist, an origin, and a name.
+ * constructor, a frame, an origin, and a name.
  */
 
 EXPORT daisy_library*                  /* Return the library named NAME. */
@@ -275,19 +227,15 @@ daisy_library_size (const daisy_library* library);
 EXPORT const char*                     /* Name of object number INDEX in LIBRARY. */
 daisy_library_name (const daisy_library* library, const unsigned int index);
 
-#if 0
-EXPORT const daisy_syntax*             /* Syntax for object NAME in LIBRARY. */
-daisy_library_syntax (const daisy_library* library, const char* name);
-EXPORT const daisy_alist*              /* Alist for object NAME in LIBRARY. */
-daisy_library_alist (const daisy_library* library, const char* name);
-#endif
+EXPORT const daisy_frame*              /* Frame for object NAME in LIBRARY. */
+daisy_library_frame (const daisy_library* library, const char* name);
 
 EXPORT const char*                     /* File associated with object NAME in 
                                    LIBRARY, or NULL if none. */
 daisy_library_file (const daisy_library* library, const char* name);
 
 /* Add new element to library.  SUPER is the name of an existing
-   element, from which to inherit the constructor and syntax.  ALIST
+   element, from which to inherit the constructor and syntax.  FRAME
    is the default attributes for the new object.  NAME is the name of
    the new object in the library.  FILENAME is the name of the file to
    eventually save the object. 
@@ -300,7 +248,7 @@ daisy_library_remove (daisy_library* library, const char* name);
 
 /* @ The daisy_printer Type.
  *
- * A printer pretty print the content of alists and library objects.
+ * A printer pretty print the content of frames and library objects.
  */
 
 EXPORT daisy_printer*                  /* Print to FILENAME. */
@@ -308,13 +256,6 @@ daisy_printer_create_file (daisy_daisy* daisy, const char* filename);
 
 EXPORT void                            /* Print COMMENT */
 daisy_printer_comment (daisy_printer* printer, const char* comment);
-
-#if 0
-EXPORT void                            /* Print ALIST. */
-daisy_printer_alist (daisy_printer* printer, 
-                     const daisy_alist* alist, const daisy_syntax* syntax,
-		     const daisy_alist* super);
-#endif
 
 /* Save all elements in all libraries that are associated with FILE. */
 EXPORT void
@@ -348,13 +289,8 @@ daisy_daisy_parse_command_line (daisy_daisy* toplevel,
 EXPORT void                     /* Parse command arguments. */
 daisy_daisy_parse_file (daisy_daisy* toplevel, char* filename);
 
-#if 0
-EXPORT daisy_syntax*            /* Extract program syntax. */
-daisy_daisy_get_program_syntax (daisy_daisy* toplevel);
-
-EXPORT daisy_alist*             /* Extract program alist. */
-daisy_daisy_get_program_alist (daisy_daisy* toplevel);
-#endif
+EXPORT daisy_frame*             /* Extract program frame. */
+daisy_daisy_get_program_frame (daisy_daisy* toplevel);
 
 EXPORT void                     /* Initialize toplevel object. */
 daisy_daisy_initialize (daisy_daisy* toplevel);

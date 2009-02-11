@@ -290,6 +290,7 @@ static struct ScopeExchangeSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
+    Model::load_model (frame);
     frame.add_object ("entries", Exchange::component, 
                        Value::Const, Value::Sequence,
                        "List of items to exchange.");

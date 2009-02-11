@@ -30,7 +30,7 @@
 #include "librarian.h"
 #include "submodeler.h"
 #include "treelog.h"
-#include "frame.h"
+#include "frame_model.h"
 
 void 
 LogExtern::done (const std::vector<Time::component_t>& time_columns,
@@ -65,9 +65,15 @@ LogExtern::output (Log& log) const
 	   item != numbers.end ();
 	   item++)
 	{
+          const symbol key = (*item).first;
+          const type_map::const_iterator i = types.find (key);
+          daisy_assert (i != types.end ());
+          if ((*i).second == Missing)
+            continue;
+          const double value = (*item).second;
 	  Log::Unnamed unnamed (log);
-          output_value ((*item).first, "name", log);
-          output_value ((*item).second, "value", log);
+          output_value (key, "name", log);
+          output_value (value, "value", log);
 	}
     }
 }
@@ -117,25 +123,44 @@ LogExtern::tick (const Scope&, Treelog&)
 void 
 LogExtern::entries (std::set<symbol>& all) const
 {
-  for (size_t i = 0; i < LogSelect::entries.size (); i++)
-    all.insert (LogSelect::entries[i]->tag ());
+  for (type_map::const_iterator i = types.begin ();
+       i != types.end ();
+       i++)
+    all.insert ((*i).first);
 }
 
 Value::type 
-LogExtern:: lookup (const symbol tag) const
+LogExtern::lookup (const symbol tag) const
 {
-  for (size_t i = 0; i < LogSelect::entries.size (); i++)
-    if (LogSelect::entries[i]->tag () == tag)
-      {
-        switch (LogSelect::entries[i]->type ())
+  const type_map::const_iterator i = types.find (tag);
+
+  if (i == types.end ())
+    return Value::Error;
+
+  switch ((*i).second)
+    {
+    case Error:
+      return Value::Error;
+    case Number: 
+    case Array:
+      return Value::Number;
+    case Name:
+      return Value::String;
+    case Missing:
+      for (size_t j = 0; j < LogSelect::entries.size (); j++)
+        if (LogSelect::entries[j]->tag () == tag)
           {
-          case Select::NumberSingleton:
-          case Select::NumberSequence:
-            return Value::Number;
+            switch (LogSelect::entries[j]->type ())
+              {
+              case Select::NumberSingleton:
+              case Select::NumberSequence:
+                return Value::Number;
+              }
+            daisy_notreached ();
           }
-        daisy_notreached ();
-      }
-  return Value::Error;
+      return Value::Error;
+    }
+  daisy_notreached ();
 }
 
 int
@@ -198,22 +223,7 @@ LogExtern::description (const symbol tag) const
     if (LogSelect::entries[i]->tag () == tag)
       return symbol (LogSelect::entries[i]->get_description ());
 
-  const name_map::const_iterator i = descriptions.find (tag);
-  if (i == dimensions.end ())
-    return symbol ("No such tag");
-
-  return (*i).second;
-}
-
-LogExtern::intern_type 
-LogExtern::intern_lookup (symbol tag) const
-{ 
-  const type_map::const_iterator i = types.find (tag);
-
-  if (i == types.end ())
-    return Error;
-
-  return (*i).second;
+  return frame->description (tag);
 }
 
 symbol
@@ -224,14 +234,6 @@ LogExtern::name (symbol tag) const
   return (*i).second;
 }
 
-const std::vector<double>&
-LogExtern::array (symbol tag) const
-{ 
-  const array_map::const_iterator i = arrays.find (tag);
-  daisy_assert (i != arrays.end ());
-  return *(*i).second;
-}
-
 void 
 LogExtern::initialize (Treelog&)
 {
@@ -239,6 +241,7 @@ LogExtern::initialize (Treelog&)
     {
       const symbol tag = LogSelect::entries[i]->tag ();
       sizes[tag] = LogSelect::entries[i]->size ();
+      types[tag] = Missing;
       dimensions[tag] = LogSelect::entries[i]->dimension ();
     }
 }
@@ -276,7 +279,6 @@ LogExtern::LogExtern (Block& al)
         {
           types[id] = Name;
           names[id] = scope_block.name (id);
-          descriptions[id] = scope_block.description (id);
         }
       else
         al.msg ().warning ("Parameter name " + id + " not found"); 
@@ -307,7 +309,7 @@ static struct LogExternSyntax : public DeclareModel
   { return new LogExtern (al); }
 
   LogExternSyntax ()
-    : DeclareModel (Log::component, "extern", "select" "\
+    : DeclareModel (Log::component, "extern", "select", "\
 Log simulation state for extern use.")
   { }
   void load_frame (Frame& frame) const

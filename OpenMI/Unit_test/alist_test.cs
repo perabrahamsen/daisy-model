@@ -7,9 +7,9 @@ using dk.ku.life.Daisy;
 namespace Unit_test
 {
     [TestFixture]
-    public class Alist_test
+    public class Frame_test
     {
-        static AList GetInitAlist()
+        static Frame GetInitFrame()
         {
             Daisy daisy = new Daisy();
             daisy.ParseFile("../../DaisyData/test_check.dai");
@@ -17,39 +17,39 @@ namespace Unit_test
             daisy.Start();
             daisy.TickTime();
 
-            AList alist = daisy.ProgramAList();
-            return alist;
+            Frame frame = daisy.ProgramFrame();
+            return frame;
         }
         [Test]
         public void Check()
         {
-            AList alist = GetInitAlist();
+            Frame frame = GetInitFrame();
             string name = "stop";
-            Assert.AreEqual(true, alist.Check(name));
+            Assert.AreEqual(true, frame.Check(name));
         }
         [Test]
         public void GetInteger()
         {
-            AList alist = GetInitAlist();
+            Frame frame = GetInitFrame();
             string name = "time";
-            Assert.AreEqual(true, alist.Check(name));
-            Assert.AreEqual(1986, alist.GetAList(name).GetInteger("year"));
+            Assert.AreEqual(true, frame.Check(name));
+            Assert.AreEqual(1986, frame.GetFrame(name).GetInteger("year"));
         }
         [Test]
-        public void GetAList()
+        public void GetFrame()
         {
-            AList alist = GetInitAlist();
+            Frame frame = GetInitFrame();
             string name = "stop";
-            Assert.AreEqual(true, alist.Check(name));
-            Assert.AreEqual(1988, alist.GetAList(name).GetInteger("year"));
+            Assert.AreEqual(true, frame.Check(name));
+            Assert.AreEqual(1988, frame.GetFrame(name).GetInteger("year"));
         }
         [Test]
         public void GetString()
         {
-            AList alist = GetInitAlist();
+            Frame frame = GetInitFrame();
             string name = "description";
-            Assert.AreEqual(true, alist.Check(name));
-            Assert.AreEqual("Simulation for use in tutorial.", alist.GetString(name));
+            Assert.AreEqual(true, frame.Check(name));
+            Assert.AreEqual("Simulation for use in tutorial.", frame.GetString(name));
         }
     }
 }

@@ -314,6 +314,7 @@ surface.")
   
   void load_frame (Frame& frame) const
   {
+    Model::load_model (frame);
     frame.add_check (check_alist);	
     frame.add_object ("scope", Scopesel::component, 
                        Value::Const, Value::Singleton, "\

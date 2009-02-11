@@ -25,15 +25,14 @@ namespace Unit_test
         public void Version()
         {
             string version = Daisy.Version();
-            Assert.AreEqual("4.55", version);
+            Assert.AreEqual("4.58", version);
         }
         [Test]
-        public void ProgramAList()
+        public void ProgramFrame()
         {
             Daisy daisy = GetInitDaisy();
-            AList alist = daisy.ProgramAList();
-            Assert.AreEqual(true, alist.Check("type"));
-            Assert.AreEqual("Daisy", alist.GetString("type"));
+            Frame frame = daisy.ProgramFrame();
+            Assert.AreEqual("Simulation for use in tutorial.", frame.GetString ("description"));
         }
         [Test]
         public void GetTime()

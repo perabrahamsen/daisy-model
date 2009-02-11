@@ -65,7 +65,6 @@ private:
   array_map arrays;
   int_map sizes;
   name_map dimensions;
-  name_map descriptions;
 
   // Log.
   symbol last_done;
@@ -99,11 +98,6 @@ public:
   symbol dimension (symbol) const;
   symbol name (symbol tag) const;
   symbol description (symbol) const;
-
-  // Scope to be?
-private:
-  intern_type intern_lookup (symbol tag) const;
-  const std::vector<double>& array (symbol tag) const;
 
   // Create and destroy.
   void initialize (Treelog&);

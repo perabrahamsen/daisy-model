@@ -114,7 +114,7 @@ namespace Unit_test
         {
             DaisyWrapper Daisy = GetInitDaisy();
             Assert.AreEqual("Simulation for use in tutorial.", Daisy.GetModelDescription());
-            Assert.AreEqual("Daisy version 4.55", Daisy.GetComponentDescription());
+            Assert.AreEqual("Daisy version 4.58", Daisy.GetComponentDescription());
             Assert.AreEqual("Simulation for use in tutorial.", Daisy.GetDescription());
         }
         [Test]
@@ -164,16 +164,16 @@ namespace Unit_test
        public void GetOutputExchangeItem()
        {
            DaisyWrapper Daisy = GetInitDaisy();
-           Assert.AreEqual("Water", Daisy.GetOutputExchangeItem(0).Quantity.ID);
-           Assert.AreEqual("mm", Daisy.GetOutputExchangeItem(0).Quantity.Unit.ID);
-           Assert.AreEqual("DS", Daisy.GetOutputExchangeItem(1).Quantity.ID);
-           Assert.AreEqual("<none>", Daisy.GetOutputExchangeItem(1).Quantity.Unit.ID);
+           Assert.AreEqual("Water", Daisy.GetOutputExchangeItem(3).Quantity.ID);
+           Assert.AreEqual("mm", Daisy.GetOutputExchangeItem(3).Quantity.Unit.ID);
+           Assert.AreEqual("DS", Daisy.GetOutputExchangeItem(0).Quantity.ID);
+           Assert.AreEqual("<none>", Daisy.GetOutputExchangeItem(0).Quantity.Unit.ID);
            Assert.AreEqual("Crop AI", Daisy.GetOutputExchangeItem(4).Quantity.ID);
            Assert.AreEqual("m^2/m^2", Daisy.GetOutputExchangeItem(4).Quantity.Unit.ID);
            Assert.AreEqual(-10, Daisy.GetOutputExchangeItem(0).ElementSet.GetXCoordinate(0, 0));
            Assert.AreEqual(100, Daisy.GetOutputExchangeItem(0).ElementSet.GetYCoordinate(0, 0));
-           Assert.AreEqual(-10, Daisy.GetOutputExchangeItem(1).ElementSet.GetXCoordinate(0, 0));
-           Assert.AreEqual(100, Daisy.GetOutputExchangeItem(1).ElementSet.GetYCoordinate(0, 0));
+           Assert.AreEqual(-10, Daisy.GetOutputExchangeItem(3).ElementSet.GetXCoordinate(0, 0));
+           Assert.AreEqual(100, Daisy.GetOutputExchangeItem(3).ElementSet.GetYCoordinate(0, 0));
            Assert.AreEqual(-10, Daisy.GetOutputExchangeItem(4).ElementSet.GetXCoordinate(0, 0));
            Assert.AreEqual(100, Daisy.GetOutputExchangeItem(4).ElementSet.GetYCoordinate(0, 0));
 

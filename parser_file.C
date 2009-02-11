@@ -1384,11 +1384,13 @@ ParserFile::Implementation::load_list (Frame& frame)
 		break;
 	      }
 	    case Value::Error:
-	      error (std::string("Unknown attribute '") + name + "'");
+	      if (name != error_symbol)
+                error (std::string("Unknown attribute '") + name + "'");
 	      skip_to_end ();
 	      break;
 	    default:
-	      error (std::string("Unsupported sequence '") + name + "'");
+              if (name != error_symbol)
+                error (std::string("Unsupported sequence '") + name + "'");
 	      skip_to_end ();
 	    }
 	}

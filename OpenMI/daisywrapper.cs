@@ -37,7 +37,7 @@ namespace dk.ku.life.Daisy.OpenMI
             _daisyEngine.Initialize();
 
             ///* Initialize attribute list. */
-            AList alist = _daisyEngine.ProgramAList();
+            Frame alist = _daisyEngine.ProgramFrame();
 
             if (!alist.Check("description"))
                 description = "No description";
@@ -47,7 +47,7 @@ namespace dk.ku.life.Daisy.OpenMI
             start_time = _daisyEngine.GetTime();
 
             ///* End time.*/
-            AList stop = alist.GetAList("stop");
+            Frame stop = alist.GetFrame("stop");
             int hour = stop.GetInteger("hour");
             int year = stop.GetInteger("year");
             int month = stop.GetInteger("month");

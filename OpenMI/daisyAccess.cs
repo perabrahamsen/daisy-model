@@ -79,27 +79,33 @@ namespace dk.ku.life.Daisy
         [DllImport("daisy")]
         public static extern int daisy_time_get_year(IntPtr daisy_time);
 
-        //AList
+        //Frame
         [DllImport("daisy")]
-        public static extern void daisy_alist_delete(IntPtr alist);
+        public static extern void daisy_frame_delete(IntPtr frame);
 
         [DllImport("daisy")]
-        public static extern IntPtr daisy_alist_create();
+        public static extern IntPtr daisy_daisy_get_program_frame(IntPtr daisy);
 
         [DllImport("daisy")]
-        public static extern IntPtr daisy_daisy_get_program_alist(IntPtr daisy);
+        public static extern string daisy_frame_type_name(IntPtr frame);
 
         [DllImport("daisy")]
-        public static extern bool daisy_alist_check(IntPtr alist, string name);
+        public static extern string daisy_frame_base_name(IntPtr frame);
 
         [DllImport("daisy")]
-        public static extern IntPtr daisy_alist_get_alist(IntPtr alist, string name);  /* Get alist NAME from ALIST. */
+        public static extern string daisy_frame_description(IntPtr frame);
 
         [DllImport("daisy")]
-        public static extern string daisy_alist_get_string(IntPtr alist, string name);
+        public static extern bool daisy_frame_check(IntPtr frame, string name);
 
         [DllImport("daisy")]
-        public static extern int daisy_alist_get_integer(IntPtr alist, string name); /* Get integer NAME from ALIST. */
+        public static extern IntPtr daisy_frame_get_frame(IntPtr frame, string name);  /* Get frame NAME from FRAME. */
+
+        [DllImport("daisy")]
+        public static extern string daisy_frame_get_string(IntPtr frame, string name);
+
+        [DllImport("daisy")]
+        public static extern int daisy_frame_get_integer(IntPtr frame, string name); /* Get integer NAME from FRAME. */
 
         //Scope
 
@@ -138,51 +144,63 @@ namespace dk.ku.life.Daisy
 
     }
 
-    public class AList
+    public class Frame
     {
-        public IntPtr alist;
+        public IntPtr frame;
         private bool own;
 
-        public AList()
+        public Frame(IntPtr al)
         {
-            own = true;
-            alist = DLL.daisy_alist_create();
-        }
-
-        public AList(IntPtr al)
-        {
-            alist = al;
+            frame = al;
             own = false;
         }
-        public bool Check(string name)
-        {
-            Debug.Assert(alist != (IntPtr)0);
-            return DLL.daisy_alist_check(alist, name);
+        public string TypeName ()
+        { 
+            Debug.Assert(frame != (IntPtr)0);
+            return DLL.daisy_frame_type_name (frame); 
         }
 
-        public AList GetAList(string name)
+        public string BaseName ()
+        { 
+            Debug.Assert(frame != (IntPtr)0);
+            return DLL.daisy_frame_base_name (frame); 
+        }
+
+        public string Description ()
+        { 
+            Debug.Assert(frame != (IntPtr)0);
+            return DLL.daisy_frame_description (frame); 
+        }
+
+        public bool Check(string name)
+        {
+            Debug.Assert(frame != (IntPtr)0);
+            return DLL.daisy_frame_check(frame, name);
+        }
+
+        public Frame GetFrame(string name)
         {
             Debug.Assert(Check(name));
-            return new AList(DLL.daisy_alist_get_alist(alist, name));  /* Get alist NAME from ALIST. */
+            return new Frame(DLL.daisy_frame_get_frame(frame, name));  /* Get frame NAME from FRAME. */
         }
 
         public string GetString(string name)
         {
             Debug.Assert(Check(name));
-            return DLL.daisy_alist_get_string(alist, name);
+            return DLL.daisy_frame_get_string(frame, name);
         }
 
         public int GetInteger(string name)
         {
             Debug.Assert(Check(name));
-            return DLL.daisy_alist_get_integer(alist, name);
+            return DLL.daisy_frame_get_integer(frame, name);
         }
 
         public void Dispose()
         {
-            if (own && alist != (IntPtr)0)
-                DLL.daisy_alist_delete(alist);
-            alist = (IntPtr)0;
+            if (own && frame != (IntPtr)0)
+                DLL.daisy_frame_delete(frame);
+            frame = (IntPtr)0;
         }
     }
 
@@ -268,9 +286,9 @@ namespace dk.ku.life.Daisy
             return DLL.daisy_daisy_ok(daisy);
         }
 
-        public AList ProgramAList()
+        public Frame ProgramFrame()
         {
-            return new AList(DLL.daisy_daisy_get_program_alist(daisy));
+            return new Frame(DLL.daisy_daisy_get_program_frame(daisy));
         }
 
         public uint ScopeSize()
