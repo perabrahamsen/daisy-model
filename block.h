@@ -88,7 +88,6 @@ public:
   bool flag (symbol) const;
   bool flag (symbol, bool default_value) const;
   const PLF& plf (symbol) const;
-  const Frame& frame (symbol) const;
   const FrameModel& model (symbol) const;
   const FrameSubmodel& submodel (symbol) const;
   int integer (symbol) const;

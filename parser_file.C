@@ -867,10 +867,8 @@ ParserFile::Implementation::load_list (Frame& frame)
       // Duplicate warning.
       if (found.find (name) != found.end ())
 	warning (name + " specified twice, last takes precedence");
-      else if (frame.lookup (name) != Value::Library // (deffoo ...)
-	       && (frame.lookup (name) != Value::Object
-                   // (input file )
-		   || (frame.component (name) != Parser::component)))
+      else if (frame.lookup (name) != Value::Object // (input file )
+               || frame.component (name) != Parser::component)
 	found.insert (name);
 
       // Log variable warning.
@@ -1032,7 +1030,8 @@ ParserFile::Implementation::load_list (Frame& frame)
                 frame.add (name, *child);
 	    }
 	    break;
-	  case Value::Library:
+	  case Value::Scalar:
+          case Value::Reference:
 	  case Value::Error:
 	    error (std::string("Unknown singleton '") + name + "'");
 	    skip_to_end ();

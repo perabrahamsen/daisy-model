@@ -666,33 +666,29 @@ Frame::plf (const symbol key) const
     return impl->alist.plf (key);
 }
 
-const Frame& 
-Frame::frame (const symbol key) const
-{ 
-  if (type_size (key) != Value::Singleton)
-    return default_frame (key);
-  else if (impl->alist.check (key))
-    return impl->alist.frame (key);
-  else if (parent () && parent ()->check (key))
-    return parent ()->frame (key);
-  else
-    return default_frame (key);
-}
-
 const FrameModel&
 Frame::model (const symbol key) const
 {
   verify (key, Value::Object);
-  const Frame& frame = this->frame (key);
-  return dynamic_cast<const FrameModel&> (frame);
+
+  if (parent () && !impl->alist.check (key))
+    return parent ()->model (key);
+  else
+    return dynamic_cast<const FrameModel&> (impl->alist.frame (key));
 }
 
 const FrameSubmodel&
 Frame::submodel (const symbol key) const
 {
+  if (type_size (key) != Value::Singleton)
+    return default_frame (key);
   verify (key, Value::AList);
-  const Frame& frame = this->frame (key);
-  return dynamic_cast<const FrameSubmodel&> (frame);
+  if (impl->alist.check (key))
+    return dynamic_cast<const FrameSubmodel&> (impl->alist.frame (key));
+  else if (parent () && parent ()->check (key))
+    return parent ()->submodel (key);
+  else
+    return default_frame (key);
 }
 
 int 
@@ -974,7 +970,8 @@ Frame::add_empty (const symbol key)
     case Value::Integer:
       impl->alist.add (key, std::vector<int> ());
       break;
-    case Value::Library:
+    case Value::Scalar:
+    case Value::Reference:
     case Value::Error:
     default:
       daisy_notreached ();

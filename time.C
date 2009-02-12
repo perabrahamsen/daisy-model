@@ -130,7 +130,7 @@ Time::print () const
 void 
 Time::set_time (Frame& parent, const symbol key) const
 {
-  std::auto_ptr<Frame> child (&parent.frame (key).clone ());
+  std::auto_ptr<Frame> child (&parent.submodel (key).clone ());
   child->add ("year", year ());
   child->add ("month", month ());
   child->add ("mday", mday ());

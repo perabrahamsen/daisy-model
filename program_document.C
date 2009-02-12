@@ -225,7 +225,8 @@ ProgramDocument::print_entry_type (const symbol name,
 	format->see ("chapter", "component",  component);
       }
       break;
-    case Value::Library:
+    case Value::Scalar:
+    case Value::Reference:
     case Value::Error:
     default:
       daisy_panic ("Unknown entry '" + name + "'");
@@ -241,7 +242,7 @@ ProgramDocument::print_entry_submodel (const symbol name,
   const Value::type type = frame.lookup (name);
   if (type == Value::AList)
     {
-      const Frame& child = frame.frame (name);
+      const FrameSubmodel& child = frame.submodel (name);
       if (frame.submodel_name (name) == Value::None ())
 	{
 	  print_sample (name, child, false);
@@ -356,8 +357,9 @@ ProgramDocument::print_entry_value (const symbol name,
               const symbol submodel = frame.submodel_name (name);
               if (submodel != Value::None ())
 		{
-		  const Frame& nested = frame.frame (name);
-                  const Frame& frame = Librarian::submodel_frame (submodel);
+		  const FrameSubmodel& nested = frame.submodel (name);
+                  const FrameSubmodel& frame 
+                    = Librarian::submodel_frame (submodel);
 		  if (!nested.subset (metalib, frame))
 		    print_default_value = true;
 		}
@@ -417,7 +419,8 @@ ProgramDocument::print_entry_value (const symbol name,
 		print_default_value = true;
 	    }
 	    break;
-	  case Value::Library:
+	  case Value::Scalar:
+          case Value::Reference:
 	  case Value::Error:
 	    daisy_notreached ();
 	  }
@@ -442,7 +445,8 @@ ProgramDocument::print_entry_value (const symbol name,
 		print_default_value = true;
 	      }
 	    break;
-	  case Value::Library:
+	  case Value::Scalar:
+          case Value::Reference:
 	  case Value::Error:
 	    daisy_notreached ();
 	  }
@@ -602,12 +606,13 @@ ProgramDocument::print_sample_entry (const symbol name,
 	      break;
 	    case Value::Object:
 	      {
-		const Frame& object = frame.frame (name);
+		const FrameModel& object = frame.model (name);
 		const symbol type = object.type_name ();
 		comment = "Default " + type + " value.";
 	      }
 	      break;
-	    case Value::Library:
+	    case Value::Scalar:
+            case Value::Reference:
 	    case Value::Error:
 	      daisy_notreached ();
 	    }
@@ -642,7 +647,8 @@ ProgramDocument::print_sample_entry (const symbol name,
 	    case Value::Integer:
 	    case Value::Object:
 	      break;
-	    case Value::Library:
+	    case Value::Scalar:
+            case Value::Reference:
 	    case Value::Error:
 	      daisy_notreached ();
 	    }
@@ -806,17 +812,13 @@ ProgramDocument::print_sample_entries (const symbol name,
   for (std::set<symbol>::const_iterator i = own_entries.begin (); 
        i != own_entries.end (); 
        i++)
-    if (frame.order_index (*i) < 0
-	&& !frame.is_log (*i)
-	&& frame.lookup (*i) != Value::Library)
+    if (frame.order_index (*i) < 0 && !frame.is_log (*i))
       own.insert (*i);
   std::set<symbol> base;
   for (std::set<symbol>::const_iterator i = base_entries.begin ();
        i != base_entries.end();
        i++)
-    if (frame.order_index (*i) < 0
-	&& !frame.is_log (*i)
-	&& frame.lookup (*i) != Value::Library)
+    if (frame.order_index (*i) < 0 && !frame.is_log (*i))
       base.insert (*i);
 
   // Count entries.
@@ -986,12 +988,6 @@ ProgramDocument::print_submodel_entry (const symbol name, int level,
     first = false;
   else
     format->soft_linebreak ();
-
-  const Value::type type = frame.lookup (name);
-
-  // We ignore libraries.
-  if (type == Value::Library)
-    return;
 
   const int size = frame.type_size (name);
 

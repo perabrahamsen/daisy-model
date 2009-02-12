@@ -409,16 +409,6 @@ Block::plf (const symbol key) const
   return frame.plf (key); 
 }
 
-const Frame& 
-Block::frame (const symbol key) const
-{ 
-  const Frame& frame = find_frame (key);
-  if (frame.is_reference (key))
-    return this->frame (impl->expand_reference (key));
-
-  return frame.frame (key); 
-}
-
 const FrameModel& 
 Block::model (const symbol key) const
 { 

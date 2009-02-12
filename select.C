@@ -233,7 +233,7 @@ Select::Implementation::Spec::check_path (const std::vector<symbol>& path,
             err.warning ("'" + name + "' is a fixed '" 
                          + submodel_name + "' component");
 
-	  frame = &frame->frame (name);
+	  frame = &frame->submodel (name);
         }
       else if (type == Value::Error)
 	{
@@ -292,7 +292,7 @@ Select::Implementation::Spec::check_alist (Metalib& metalib,
 	}
       else
 	{
-	  const Frame& frame = library.frame (model_name);
+	  const FrameModel& frame = library.model (model_name);
 	  if (!check_path (submodels_and_attribute, frame, err))
 	    ok = false;
 	}

@@ -245,7 +245,6 @@ public:
   bool flag (const symbol) const;
   bool flag (const symbol, bool default_value) const;
   const PLF& plf (const symbol) const;
-  const Frame& frame (const symbol) const;
   const FrameModel& model (const symbol) const;
   const FrameSubmodel& submodel (const symbol) const;
   int integer (const symbol) const;

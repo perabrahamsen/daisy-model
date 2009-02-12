@@ -44,6 +44,7 @@
 #include "assertion.h"
 #include "treelog.h"
 #include "frame_model.h"
+#include "frame_submodel.h"
 #include "filepos.h"
 #include <string>
 #include <typeinfo>
@@ -144,7 +145,12 @@ daisy_frame_get_flag (const Frame* frame, const char* name)
 
 extern "C" const Frame* EXPORT
 daisy_frame_get_frame (const Frame* frame, const char* name)
-{ return &frame->frame (name); }
+{ 
+  if (frame->lookup (name) == Value::Object)
+    return &frame->model (name); 
+  else
+    return &frame->submodel (name); 
+}
 
 extern "C" void EXPORT
 daisy_frame_set_integer (Frame* frame, const char* name, int value)

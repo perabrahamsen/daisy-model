@@ -21,11 +21,11 @@
 #define BUILD_DLL
 
 #include "submodeler.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "assertion.h"
 
 BlockSubmodel::BlockSubmodel (Block& parent, const symbol key)
-  : Block (parent, parent.frame (key), key)
+  : Block (parent, parent.submodel (key), key)
 { }
 
 BlockSubmodel::BlockSubmodel (Block& parent, const symbol key, 

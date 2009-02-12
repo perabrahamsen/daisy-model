@@ -216,7 +216,7 @@ const Frame&
 Toplevel::program_frame () const
 {
   if (impl->metalib.check ("run"))
-    return impl->metalib.frame ("run");
+    return impl->metalib.model ("run");
   return impl->metalib;
 }
 

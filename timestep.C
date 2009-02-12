@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "timestep.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "block.h"
 #include "assertion.h"
 #include "mathlib.h"
@@ -115,7 +115,7 @@ Timestep::GenCheck::check (Metalib&,
   daisy_assert (!frame.is_log (key));
   daisy_assert (frame.type_size (key) == Value::Singleton);
 
-  Timestep timestep (frame.frame (key));
+  Timestep timestep (frame.submodel (key));
   check_dt (timestep.total_hours ());
 }
 
@@ -186,7 +186,7 @@ Timestep::Timestep (Block& al)
                               al.integer ("seconds")))
 { }
 
-Timestep::Timestep (const Frame& al)
+Timestep::Timestep (const FrameSubmodel& al)
   : impl (new Implementation (al.integer ("years"), 
                               al.integer ("days"),
                               al.integer ("hours"),

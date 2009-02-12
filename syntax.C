@@ -23,6 +23,7 @@
 
 #include "syntax.h"
 #include "frame_submodel.h"
+#include "frame_model.h"
 #include "library.h"
 #include "metalib.h"
 #include "check.h"
@@ -178,7 +179,7 @@ Syntax::Implementation::check (Metalib& metalib,
 	  }
 	else 
 	  {
-	    const Frame& al = vl.frame (key);
+	    const FrameModel& al = vl.model (key);
             Treelog::Open nest (msg, key + ": " + al.type_name ());
             if (!al.check (metalib, msg))
               error = true;
@@ -206,7 +207,7 @@ Syntax::Implementation::check (Metalib& metalib,
           else 
             {
               Treelog::Open nest (msg, key);
-              const Frame& al = vl.frame (key);
+              const FrameSubmodel& al = vl.submodel (key);
               if (!al.check (metalib, msg))
                 error = true;
             }

@@ -83,7 +83,7 @@ Traverse::traverse_model (const symbol component, const symbol model)
   // Traverse through a specific library member.
 {
   Library& library = metalib.library (component);
-  Frame& frame = library.frame (model);
+  FrameModel& frame = const_cast<FrameModel&> (library.model (model));
 
   if (enter_model (frame, component, model))
     {
@@ -229,13 +229,14 @@ Traverse::traverse_parameter (const Frame& frame,
 	{
 	case Value::AList:
 	  {
-	    Frame& entry_frame = const_cast<Frame&> (frame.frame (parameter));
+	    FrameSubmodel& entry_frame
+              = const_cast<FrameSubmodel&> (frame.submodel (parameter));
             const symbol submodel = frame.submodel_name (parameter);
 	    if (size == Value::Singleton)
 	      {
 		if (has_value && default_frame.check (parameter))
                   traverse_submodel (entry_frame, 
-                                     default_frame.frame (parameter), 
+                                     default_frame.submodel (parameter), 
                                      parameter, submodel);
                 else
                   traverse_submodel (entry_frame,
@@ -268,8 +269,8 @@ Traverse::traverse_parameter (const Frame& frame,
 	      {
 		if (size == Value::Singleton)
 		  {
-		    Frame& entry_frame 
-                      = const_cast<Frame&> (frame.frame (parameter));
+		    FrameModel& entry_frame 
+                      = const_cast<FrameModel&> (frame.model (parameter));
 		    const symbol type = entry_frame.type_name ();
 		    const Library& library 
                       = metalib.library (frame.component (parameter));

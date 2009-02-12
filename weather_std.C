@@ -27,7 +27,6 @@
 #include "lexer_data.h"
 #include "time.h"
 #include "plf.h"
-#include <sstream>
 #include "mathlib.h"
 #include "units.h"
 #include "submodeler.h"
@@ -37,7 +36,8 @@
 #include "librarian.h"
 #include "path.h"
 #include "treelog.h"
-#include "frame.h"
+#include "frame_submodel.h"
+#include <sstream>
 #include <vector>
 #include <algorithm>
 #include <numeric>
@@ -73,7 +73,7 @@ struct WeatherStandard : public WeatherBase
       // Create and Destroy.
       static bool check_alist (Metalib&, const Frame& al, Treelog&);
       static void load_syntax (Frame&);
-      YearInterval (const Frame&);
+      YearInterval (const FrameSubmodel&);
     };
 
     // Parameters.
@@ -376,7 +376,7 @@ WeatherStandard::YearMap::YearInterval::load_syntax (Frame& frame)
   frame.order ("from", "to");
 }
 
-WeatherStandard::YearMap::YearInterval::YearInterval (const Frame& al)
+WeatherStandard::YearMap::YearInterval::YearInterval (const FrameSubmodel& al)
   : from (al.integer ("from")),
     to (al.integer ("to"))
 { }
@@ -394,8 +394,8 @@ bool
 WeatherStandard::YearMap::check_alist (Metalib&, const Frame& al, Treelog& msg)
 {
   bool ok = true;
-  const YearInterval from (al.frame ("from"));
-  const YearInterval to (al.frame ("to"));
+  const YearInterval from (al.submodel ("from"));
+  const YearInterval to (al.submodel ("to"));
   
   if (from.size () != to.size ())
     {
@@ -422,8 +422,8 @@ WeatherStandard::YearMap::load_syntax (Frame& frame)
 }
 
 WeatherStandard::YearMap::YearMap (Block& al)
-  : from (al.frame ("from")),
-    to (al.frame ("to"))
+  : from (al.submodel ("from")),
+    to (al.submodel ("to"))
 { }
 
 int 

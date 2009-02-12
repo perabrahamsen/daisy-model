@@ -124,7 +124,8 @@ PrinterFile::Implementation::is_complex (const Frame& frame,
     case Value::AList:
     case Value::PLF:
       return true;
-    case Value::Library:
+    case Value::Scalar:
+    case Value::Reference:
     case Value::Error:
     default:
       daisy_notreached ();
@@ -230,7 +231,8 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
 	  break;
 	case Value::AList:
 	  if (super.check (key))
-	    print_alist (frame.submodel (key), super.frame (key), indent, false); 
+	    print_alist (frame.submodel (key), super.submodel (key), 
+                         indent, false); 
 	  else
 	    print_alist (frame.submodel (key), frame.default_frame (key),
                          indent, false); 
@@ -259,7 +261,8 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
                             FrameModel::root (), indent);
           }
 	  break;
-	case Value::Library:
+	case Value::Scalar:
+        case Value::Reference:
 	case Value::Error:
 	default:
 	  out << "<Unknown: " << Value::type_name (frame.lookup (key))
@@ -379,7 +382,8 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
 	      }
 	  }
 	  break;
-	case Value::Library:
+	case Value::Scalar:
+        case Value::Reference:
 	case Value::Error:
 	default:
 	  out << "<" << Value::type_name (frame.lookup (key)) 
@@ -526,7 +530,8 @@ PrinterFile::Implementation::print_alist (const Frame& frame,
               out << frame.component (key);
               break;
             case Value::PLF: 
-            case Value::Library:
+            case Value::Scalar:
+            case Value::Reference:
             case Value::Error:
             default:
               out << "<Error>";

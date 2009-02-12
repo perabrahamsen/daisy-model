@@ -78,7 +78,7 @@ struct AValue
   // Variable
   AValue (const symbol v, int)
     : name (new symbol (v)),
-      type (Value::Object),	// A reference.
+      type (Value::Reference),	// A reference.
       is_sequence (false),
       ref_count (new int (1))
     { }
@@ -90,7 +90,7 @@ struct AValue
     { }
   AValue (double v, const symbol s)
     : scalar (new Scalar (v, symbol (s))),
-      type (Value::Library),	// Number with user specified dimension.
+      type (Value::Scalar),	// Number with user specified dimension.
       is_sequence (false),
       ref_count (new int (1))
   { }
@@ -225,10 +225,10 @@ AValue::subset (Metalib& metalib, const AValue& v) const
 	}
       case Value::PLF:
 	return *plf == *v.plf;
-      case Value::Object:
+      case Value::Reference:
       case Value::String:
 	return *name == *v.name;
-      case Value::Library:
+      case Value::Scalar:
         return *scalar == *v.scalar;
       case Value::Error:
       default:
@@ -273,9 +273,9 @@ AValue::subset (Metalib& metalib, const AValue& v) const
 	return *plf_sequence == *v.plf_sequence;
       case Value::String:
 	return *name_sequence == *v.name_sequence;
-      case Value::Object:
+      case Value::Reference:
 	return *name == *v.name;
-      case Value::Library:
+      case Value::Scalar:
       case Value::Error:
       default:
 	daisy_panic ("Not reached");
@@ -339,10 +339,10 @@ AValue::cleanup ()
 	  case Value::PLF:
 	    delete plf;
 	    break;
-	  case Value::Library:
+	  case Value::Scalar:
             delete scalar;
             break;
-	  case Value::Object:
+	  case Value::Reference:
 	  case Value::String:
 	    delete name;
 	    break;
@@ -375,10 +375,10 @@ AValue::cleanup ()
 	  case Value::String:
 	    delete name_sequence;
 	    break;
-	  case Value::Object:
+	  case Value::Reference:
 	    delete name;
 	    break;
-	  case Value::Library:
+	  case Value::Scalar:
 	  case Value::Error:
 	  default:
 	    daisy_notreached ();
@@ -450,11 +450,11 @@ AValue::operator= (const AValue& v)
       case Value::PLF:
 	plf = v.plf;
         break;
-      case Value::Library:
+      case Value::Scalar:
         scalar = v.scalar;
         break;
       case Value::String:
-      case Value::Object:
+      case Value::Reference:
 	name = v.name;
         break;
       case Value::Error:
@@ -482,10 +482,10 @@ AValue::operator= (const AValue& v)
       case Value::String:
 	name_sequence = v.name_sequence;
         break;
-      case Value::Object:
+      case Value::Reference:
 	name = v.name;
         break;
-      case Value::Library:
+      case Value::Scalar:
       case Value::Error:
       default:
 	daisy_notreached ();
@@ -551,7 +551,7 @@ AttributeList::Implementation::clear ()
 bool
 AttributeList::check (const symbol key) const
 {
-  return impl.check (key) && impl.lookup (key).type != Value::Object; 
+  return impl.check (key) && impl.lookup (key).type != Value::Reference; 
 }
 
 bool 
@@ -569,7 +569,7 @@ AttributeList::size (const symbol key)	const
   const AValue& value = impl.lookup (key);
 
   if (!value.is_sequence)
-    return (value.type == Value::Object) ? -1 : Value::Singleton;
+    return (value.type == Value::Reference) ? -1 : Value::Singleton;
   switch (value.type)
     {
     case Value::Number:
@@ -584,9 +584,9 @@ AttributeList::size (const symbol key)	const
       return value.name_sequence->size ();
     case Value::Integer:
       return value.integer_sequence->size ();
-    case Value::Object:
+    case Value::Reference:
       return -1;
-    case Value::Library:
+    case Value::Scalar:
     case Value::Error:
     default:
       daisy_notreached ();
@@ -601,14 +601,14 @@ AttributeList::add_reference (const symbol key, const symbol v)
 
 bool
 AttributeList::is_reference (const symbol key) const
-{ return impl.check (key) && impl.lookup (key).type == Value::Object; }
+{ return impl.check (key) && impl.lookup (key).type == Value::Reference; }
   
 symbol 
 AttributeList::get_reference (const symbol key) const
 {
   daisy_assert (is_reference (key));
   const AValue& value = impl.lookup (key);
-  value.expect (key, Value::Object);
+  value.expect (key, Value::Reference);
   return *value.name;
 }
 
@@ -617,7 +617,7 @@ AttributeList::number (const symbol key) const
 {
   const AValue& value = impl.lookup (key);
   value.singleton (key);
-  if (value.type == Value::Library)
+  if (value.type == Value::Scalar)
     return value.scalar->number;
   value.expect (key, Value::Number);
   return value.number;
@@ -637,7 +637,7 @@ AttributeList::name (const symbol key) const
 {
   const AValue& value = impl.lookup (key);
   value.singleton (key);
-  if (value.type == Value::Library)
+  if (value.type == Value::Scalar)
     return value.scalar->name;
   value.expect (key, Value::String);
   return *value.name;
