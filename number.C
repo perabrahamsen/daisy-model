@@ -53,7 +53,8 @@ Number::tick_value (const Units& units,
   this->tick (units, scope, msg);
   if (this->missing (scope))
     {
-      msg.warning ("Expression '" + name + "' is missing in scope");
+      msg.warning ("Expression '" + name + "' '" 
+                   + title () + "' is not found in scope");
       return false;
     }
 

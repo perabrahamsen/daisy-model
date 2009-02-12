@@ -1,3 +1,14 @@
+2009-02-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.60 released.
+
+2009-02-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log.C (Log::check_entry): Correctly exit loop.
+	* lib/OpenMI.dai (Lower_boundary_input): Give "NO3
+	conc. groundwater" a default value.
+	* all: Remove Value::Library, add Value::Reference and Value::Scalar.
+	
 2009-02-11  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* toplevel.C (Toplevel::load_frame): Better default for 'path'.
