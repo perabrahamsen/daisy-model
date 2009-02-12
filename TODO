@@ -1,12 +1,8 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* OpenMI
-
-Få my_OpenMI_simple.dai til at afslutte.
+* submodeller: fjern "f".
 
 * Frame
-
-** Behandl FrameModel og FrameSubmodel seperat i AttributeList
 
 ** Integrer syntax/alist i frame
 

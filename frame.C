@@ -674,7 +674,7 @@ Frame::model (const symbol key) const
   if (parent () && !impl->alist.check (key))
     return parent ()->model (key);
   else
-    return dynamic_cast<const FrameModel&> (impl->alist.frame (key));
+    return impl->alist.model (key);
 }
 
 const FrameSubmodel&
@@ -684,7 +684,7 @@ Frame::submodel (const symbol key) const
     return default_frame (key);
   verify (key, Value::AList);
   if (impl->alist.check (key))
-    return dynamic_cast<const FrameSubmodel&> (impl->alist.frame (key));
+    return impl->alist.submodel (key);
   else if (parent () && parent ()->check (key))
     return parent ()->submodel (key);
   else
@@ -745,13 +745,22 @@ Frame::integer_sequence (const symbol key) const
     return impl->alist.integer_sequence (key);
 }
 
-const std::vector<const Frame*>& 
-Frame::frame_sequence (const symbol key) const
+const std::vector<const FrameModel*>& 
+Frame::model_sequence (const symbol key) const
 { 
   if (parent () && !impl->alist.check (key))
-    return parent ()->frame_sequence (key);
+    return parent ()->model_sequence (key);
   else
-    return impl->alist.frame_sequence (key);
+    return impl->alist.model_sequence (key);
+}
+
+const std::vector<const FrameSubmodel*>& 
+Frame::submodel_sequence (const symbol key) const
+{ 
+  if (parent () && !impl->alist.check (key))
+    return parent ()->submodel_sequence (key);
+  else
+    return impl->alist.submodel_sequence (key);
 }
 
 const std::vector<const PLF*>& 
@@ -832,13 +841,16 @@ Frame::add (const symbol key, int value)
 }
 
 void 
-Frame::add (const symbol key, const Frame& value)
+Frame::add (const symbol key, const FrameModel& value)
 {
-  if (lookup (key) == Value::Object)
-    verify (key, Value::Object);
-  else
-    verify (key, Value::AList);
-    
+  verify (key, Value::Object);
+  impl->alist.add (key, value);
+}
+
+void 
+Frame::add (const symbol key, const FrameSubmodel& value)
+{
+  verify (key, Value::AList);
   impl->alist.add (key, value);
 }
 
@@ -864,7 +876,7 @@ Frame::add (const symbol key, const std::vector<symbol>& value)
       verify (key, Value::Object, value.size ());
       const symbol component = this->component (key);
       const Intrinsics& intrinsics = Librarian::intrinsics ();
-      auto_vector<const Frame*> frames;
+      auto_vector<const FrameModel*> frames;
       for (size_t i = 0; i < value.size (); i++)
         {
           const symbol name = value[i];
@@ -930,12 +942,16 @@ Frame::add (const symbol key, const std::vector<int>& value)
 }
 
 void 
-Frame::add (const symbol key, const std::vector<const Frame*>& value)
+Frame::add (const symbol key, const std::vector<const FrameModel*>& value)
 {
-  if (lookup (key) == Value::AList)
-    verify (key, Value::AList, value.size ());
-  else
-    verify (key, Value::Object, value.size ());
+  verify (key, Value::Object, value.size ());
+  impl->alist.add (key, value); 
+}
+
+void 
+Frame::add (const symbol key, const std::vector<const FrameSubmodel*>& value)
+{
+  verify (key, Value::AList, value.size ());
   impl->alist.add (key, value); 
 }
 
@@ -954,9 +970,11 @@ Frame::add_empty (const symbol key)
     case Value::Number:
       impl->alist.add (key, std::vector<double> ());
       break;
-    case Value::AList:
     case Value::Object:
-      impl->alist.add (key, std::vector<const Frame*> ());
+      impl->alist.add (key, std::vector<const FrameModel*> ());
+      break;
+    case Value::AList:
+      impl->alist.add (key, std::vector<const FrameSubmodel*> ());
       break;
     case Value::PLF:
       impl->alist.add (key, std::vector<const PLF*> ());

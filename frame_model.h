@@ -31,7 +31,9 @@ class FrameModel : public Frame
   // Inheritance.
 private:
   mutable const FrameModel* parent_;
+public:
   const FrameModel* parent () const;
+private:
   void replace_parent (const Frame* new_parent) const;
 
   // Construct.

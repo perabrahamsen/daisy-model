@@ -933,7 +933,7 @@ OrganicStandard::monthly (Metalib& metalib, const Geometry& geo,
     {
       const Library& library = metalib.library (AOM::component);
       const std::vector<symbol>& names = AM::default_AM ();
-      std::vector<const Frame*> alists;
+      std::vector<const FrameModel*> alists;
       for (size_t i = 0; i < names.size (); i++)
         alists.push_back (&library.model (names[i]));
       remainder = &AM::create (metalib, geo,
@@ -2440,8 +2440,8 @@ Using initial C per N for remaining entries");
   // Initialize C from layers, when available.
   if (al.check ("initial_SOM"))
     {
-      const std::vector<const Frame*>& layers 
-        = al.frame_sequence ("initial_SOM");
+      const std::vector<const FrameSubmodel*>& layers 
+        = al.submodel_sequence ("initial_SOM");
       const double soil_end = geo.bottom ();
       double last = 0.0;
       for (size_t i = 0; i < layers.size (); i++)
@@ -2649,7 +2649,7 @@ OrganicStandard::check_am (const FrameModel& am, Treelog& err) const
   bool ok = true;
   if (ok)
     {
-      const std::vector<const Frame*>& om_alist = am.frame_sequence ("om");
+      const std::vector<const FrameModel*>& om_alist = am.model_sequence ("om");
       
       for (size_t i = 0; i < om_alist.size(); i++)
 	{
@@ -2701,10 +2701,11 @@ check_alist (Metalib&, const Frame& al, Treelog& err)
   if (al.check ("active_groundwater"))
     err.warning ("The 'active_groundwater' parameter is ignored.");
 
-  const std::vector<const Frame*>& am_alist = al.frame_sequence ("am");
-  const std::vector<const Frame*>& smb_alist = al.frame_sequence ("smb");
-  const std::vector<const Frame*>& som_alist = al.frame_sequence ("som");
-  const std::vector<const Frame*>& dom_alist = al.frame_sequence ("dom");
+  const std::vector<const FrameModel*>& am_alist = al.model_sequence ("am");
+  const std::vector<const FrameModel*>& smb_alist = al.model_sequence ("smb");
+  const std::vector<const FrameModel*>& som_alist = al.model_sequence ("som");
+  const std::vector<const FrameSubmodel*>& dom_alist 
+    = al.submodel_sequence ("dom");
 
   for (size_t j = 0; j < am_alist.size(); j++)
     {
@@ -2715,8 +2716,8 @@ check_alist (Metalib&, const Frame& al, Treelog& err)
       if (am_ok)
 	{
 	  bool om_ok = true;
-	  const std::vector<const Frame*>& om_alist
-	    = am_alist[j]->frame_sequence ("om");
+	  const std::vector<const FrameModel*>& om_alist
+	    = am_alist[j]->model_sequence ("om");
 	  for (size_t i = 0; i < om_alist.size(); i++)
 	    {
 	      std::ostringstream tmp;

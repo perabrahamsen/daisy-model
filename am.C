@@ -130,8 +130,8 @@ AM::Implementation::Check_OM_Pools::check (Metalib&, const Frame& frame,
     // No checking checkpoints.
     return;
 
-  const std::vector<const Frame*>& om_frame 
-    = frame.frame_sequence (key);
+  const std::vector<const FrameModel*>& om_frame 
+    = frame.model_sequence (key);
   int missing_initial_fraction = 0;
   int missing_C_per_N = 0;
   double total_fractions = 0.0;
@@ -698,7 +698,7 @@ AM::create (Metalib& metalib, const FrameModel& frame, const Geometry& geo,
 // Crop part.
 AM& 
 AM::create (Metalib& metalib, const Geometry& geo, const Time& now,
-	    const std::vector<const Frame*>& ol,
+	    const std::vector<const FrameModel*>& ol,
 	    const symbol sort, const symbol part,
 	    AM::lock_type lock, Treelog& msg)
 {
@@ -1119,11 +1119,12 @@ struct AMInitial : public AM
   void initialize_derived (const Geometry& geo, const double)
   {
     daisy_assert (frame.get ());
-    const std::vector<const Frame*>& oms
-      = frame->frame_sequence ("om");
+    const std::vector<const FrameModel*>& oms
+      = frame->model_sequence ("om");
     const std::vector<AOM*>& om = impl->om;
 
-    const std::vector<const Frame*>& layers = frame->frame_sequence ("layers");
+    const std::vector<const FrameSubmodel*>& layers 
+      = frame->submodel_sequence ("layers");
 
     double last = 0.0;
     for (size_t i = 0; i < layers.size (); i++)
@@ -1196,7 +1197,7 @@ Initial added organic matter at the start of the simulation.")
 
     // We need exactly one pool with unspecified OM.
     daisy_assert (al.check ("om"));
-    const std::vector<const Frame*>& om = al.frame_sequence ("om");
+    const std::vector<const FrameModel*>& om = al.model_sequence ("om");
     for (size_t i = 0; i < om.size (); i++)
       if (approximate (OM::get_initial_C_per_N (*om[i]), OM::Unspecified))
 	{
@@ -1279,7 +1280,7 @@ Initialization of old root remains.")
     // We need exactly one pool with unspecified OM.
     daisy_assert (al.check ("om"));
     int unspecified = 0;
-    const std::vector<const Frame*>& om = al.frame_sequence ("om");
+    const std::vector<const FrameModel*>& om = al.model_sequence ("om");
     for (size_t i = 0; i < om.size (); i++)
       if (approximate (OM::get_initial_C_per_N (*om[i]), OM::Unspecified))
 	unspecified++;

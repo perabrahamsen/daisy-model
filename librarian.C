@@ -184,12 +184,9 @@ Librarian::build_vector (const symbol component,
                          Block& al, symbol key)
 { 
   std::vector<Model*> t;
-  const std::vector<const Frame*>& f (al.frame_sequence (key));
+  const std::vector<const FrameModel*>& f = al.model_sequence (key);
   for (size_t i = 0; i < f.size (); i++)
-    {
-      const FrameModel& model = dynamic_cast<const FrameModel&> (*f[i]);
-      t.push_back (build_frame (component, al, model, key, i));
-    }
+    t.push_back (build_frame (component, al, *f[i], key, i));
   return t;
 }
 
@@ -198,12 +195,10 @@ Librarian::build_vector_const (const symbol component,
                                Block& al, symbol key)
 { 
   std::vector<const Model*> t;
-  const std::vector<const Frame*>& f (al.frame_sequence (key));
+  const std::vector<const FrameModel*>& f = al.model_sequence (key);
   for (size_t i = 0; i < f.size (); i++)
-    {
-      const FrameModel& model = dynamic_cast<const FrameModel&> (*f[i]);
-      t.push_back (build_frame (component, al, model, key, i));
-    }
+    t.push_back (build_frame (component, al, *f[i], key, i));
+
   return t;
 }
 

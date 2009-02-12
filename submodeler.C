@@ -31,7 +31,7 @@ BlockSubmodel::BlockSubmodel (Block& parent, const symbol key)
 BlockSubmodel::BlockSubmodel (Block& parent, const symbol key, 
                               const size_t index)
   : Block (parent,
-           *parent.frame_sequence (key)[index],
+           *parent.submodel_sequence (key)[index],
            sequence_id (key, index))
 { }
 

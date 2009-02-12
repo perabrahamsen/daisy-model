@@ -280,8 +280,8 @@ LogSelect::document_entries (Format& format, Metalib& metalib,
       if (!frame.check ("entries"))
 	return;
 
-      const std::vector<const Frame*>& entries 
-        = frame.frame_sequence ("entries");
+      const std::vector<const FrameModel*>& entries 
+        = frame.model_sequence ("entries");
       if (entries.size () < 1)
 	return;
 

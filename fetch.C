@@ -23,7 +23,7 @@
 #include "fetch.h"
 #include "select.h"
 #include "treelog.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "mathlib.h"
 #include "librarian.h"
 #include <ostream>
@@ -270,7 +270,7 @@ Name to use for this line.  By default use the tag.");
   frame.order ("tag");
 }
 
-Fetch::Fetch (const Frame& al)
+Fetch::Fetch (const FrameSubmodel& al)
   : tag (al.name ("tag")),
     factor (al.number ("factor")),
     name (al.check ("name") ? al.name ("name") : tag),

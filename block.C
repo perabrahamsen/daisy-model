@@ -494,14 +494,24 @@ Block::integer_sequence (const symbol key) const
   return frame.integer_sequence (key); 
 }
 
-const std::vector<const Frame*>& 
-Block::frame_sequence (const symbol key) const
+const std::vector<const FrameModel*>& 
+Block::model_sequence (const symbol key) const
 { 
   const Frame& frame = find_frame (key);
   if (frame.is_reference (key))
-    return this->frame_sequence (impl->expand_reference (key));
+    return this->model_sequence (impl->expand_reference (key));
 
-  return frame.frame_sequence (key); 
+  return frame.model_sequence (key); 
+}
+
+const std::vector<const FrameSubmodel*>& 
+Block::submodel_sequence (const symbol key) const
+{ 
+  const Frame& frame = find_frame (key);
+  if (frame.is_reference (key))
+    return this->submodel_sequence (impl->expand_reference (key));
+
+  return frame.submodel_sequence (key); 
 }
 
 const std::vector<const PLF*>& 

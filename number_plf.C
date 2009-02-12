@@ -28,7 +28,7 @@
 #include "librarian.h"
 #include "submodeler.h"
 #include "treelog.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include <sstream>
 #include <memory>
 
@@ -49,7 +49,7 @@ struct NumberPLF : public Number
       frame.order ("x", "y");
     }
     
-    Point (const Frame& al)
+    Point (const FrameSubmodel& al)
       : x_value (al.number ("x")),
 	x_dimension (al.name ("x")),
 	y_value (al.number ("y")),
@@ -94,7 +94,7 @@ struct NumberPLF : public Number
     const symbol domain (al.name ("domain"));
     const symbol range (al.name ("range"));
     const auto_vector<const Point*> points 
-      = map_construct_const<Point> (al.frame_sequence ("points"));
+      = map_construct_const<Point> (al.submodel_sequence ("points"));
 
     if (points.size () < 1)
       {
@@ -151,7 +151,7 @@ struct NumberPLF : public Number
     const symbol domain (al.name ("domain"));
     const symbol range (al.name ("range"));
     const auto_vector<const Point*> points 
-      = map_construct_const<Point> (al.frame_sequence ("points"));
+      = map_construct_const<Point> (al.submodel_sequence ("points"));
 
     PLF plf;
 

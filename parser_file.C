@@ -901,8 +901,8 @@ ParserFile::Implementation::load_list (Frame& frame)
 	      const double value = get_number (frame.dimension (name));
               check_value (frame, name, value);
 	      frame.add (name, value);
-	      break;
 	    }
+            break;
 	  case Value::AList: 
 	    {
               Treelog::Open nest (msg, "In submodel '" + name + "'");
@@ -924,8 +924,8 @@ ParserFile::Implementation::load_list (Frame& frame)
 	      frame.add (name, *child);
 	      if (alist_skipped)
 		skip (")");
-	      break;
 	    }
+            break;
 	  case Value::PLF:
 	    {
 	      Parskip skip (*this, in_order);
@@ -1055,11 +1055,11 @@ ParserFile::Implementation::load_list (Frame& frame)
 	      {
 		const symbol component = frame.component (name);
 		const Library& lib = metalib.library (component);
-		static const std::vector<const Frame*> no_sequence;
-		auto_vector<const Frame*> sequence;
-		const std::vector<const Frame*>& old_sequence
+		static const std::vector<const FrameModel*> no_sequence;
+		auto_vector<const FrameModel*> sequence;
+		const std::vector<const FrameModel*>& old_sequence
 		  = frame.check (name) 
-		  ? frame.frame_sequence (name) 
+		  ? frame.model_sequence (name) 
 		  : no_sequence;
 		while (!looking_at (')') && good ())
 		  {
@@ -1085,10 +1085,10 @@ ParserFile::Implementation::load_list (Frame& frame)
                     tmp << "In '" << name << "' model #" << element + 1U;
                     Treelog::Open nest (msg, tmp.str ());
 
-                    std::auto_ptr<Frame> child;
+                    std::auto_ptr<FrameModel> child;
                     if (old_sequence.size () > element)
                       {
-                        const Frame* old_frame = old_sequence[element];
+                        const FrameModel* old_frame = old_sequence[element];
                         const FrameModel* old_model
                           = dynamic_cast<const FrameModel*> (old_frame);
                         daisy_assert (old_model);
@@ -1101,18 +1101,18 @@ ParserFile::Implementation::load_list (Frame& frame)
                       sequence.push_back (child.release ());
 		  }
 		frame.add (name, sequence);
-		break;
 	      }
+              break;
 	    case Value::AList:
 	      {
 		const size_t size = frame.type_size (name);
-		static const std::vector<const Frame*> no_sequence;
+		static const std::vector<const FrameSubmodel*> no_sequence;
 		const FrameSubmodel& default_frame = frame.default_frame (name);
-		const std::vector<const Frame*>& old_sequence
+		const std::vector<const FrameSubmodel*>& old_sequence
 		  = frame.check (name) 
-		  ? frame.frame_sequence (name) 
+		  ? frame.submodel_sequence (name) 
 		  : no_sequence;
-		auto_vector<const Frame*> sequence;
+		auto_vector<const FrameSubmodel*> sequence;
 		bool skipped = false;
 		// We do not force parentheses around the alist if it
 		// is the last member of a fully ordered list.
@@ -1139,12 +1139,13 @@ ParserFile::Implementation::load_list (Frame& frame)
                     std::ostringstream tmp;
                     tmp << "In '" << name << "' submodel #" << element + 1U;
                     Treelog::Open nest (msg, tmp.str ());
-                    std::auto_ptr<Frame> child
+                    std::auto_ptr<FrameSubmodel> child
 		      = old_sequence.size () > element
-                      ? std::auto_ptr<Frame> (&old_sequence[element]->clone ())
-                      : std::auto_ptr<Frame> (new FrameSubmodelValue 
-                                              (default_frame,
-                                               Frame::parent_link));
+                      ? std::auto_ptr<FrameSubmodel>
+                      /**/ (&old_sequence[element]->clone ())
+                      : std::auto_ptr<FrameSubmodel> 
+                      /**/ (new FrameSubmodelValue (default_frame, 
+                                                    Frame::parent_link));
 		    load_list (*child);
 		    sequence.push_back (child.release ());
 		  }
@@ -1158,9 +1159,9 @@ ParserFile::Implementation::load_list (Frame& frame)
 		    error (str.str ());
 		  }
 		frame.add (name, sequence);
-		break;
-	      }
-	    case Value::PLF:
+	      }	
+              break;
+            case Value::PLF:
 	      {
 		std::vector<const PLF*> plfs;
 		int total = 0;

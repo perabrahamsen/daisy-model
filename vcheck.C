@@ -746,7 +746,8 @@ VCheck::unique ()
           break;
 	case Value::Object:
 	  {
-	    std::vector<const Frame*> list = frame.frame_sequence (key);
+	    const std::vector<const FrameModel*>& list 
+              = frame.model_sequence (key);
 	    std::map<symbol, size_t> found;
 	    for (size_t i = 0; i < list.size (); i++)
 	      {

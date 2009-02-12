@@ -115,9 +115,9 @@ struct ActionCrop : public Action
     const double DS;
     const double DM;
     int year_of_last_harvest;
-    const std::vector<const Frame*> *const fertilize;
+    const std::vector<const FrameModel*> *const fertilize;
     int fertilize_index;
-    const std::vector<const Frame*> *const fertilize_rest;
+    const std::vector<const FrameModel*> *const fertilize_rest;
     int fertilize_rest_index;
     int fertilize_year;
 
@@ -525,11 +525,11 @@ ActionCrop::Perennial::Perennial (const FrameSubmodel& al)
 			  ? al.integer ("year_of_last_harvest")
 			  : -1),
     fertilize (al.check ("fertilize")
-	       ? &al.frame_sequence ("fertilize")
+	       ? &al.model_sequence ("fertilize")
 	       : NULL),
     fertilize_index (al.integer ("fertilize_index")),
     fertilize_rest (al.check ("fertilize_rest")
-		    ? &al.frame_sequence ("fertilize_rest")
+		    ? &al.model_sequence ("fertilize_rest")
 		    : NULL),
     fertilize_rest_index (al.integer ("fertilize_rest_index")),
     fertilize_year (al.check ("fertilize_year")
@@ -985,7 +985,7 @@ ActionCrop::ActionCrop (Block& al)
     fertilize_incorporate (al.flag ("fertilize_incorporate")),
     tillage (map_submodel_const<Tillage> (al, "tillage")),
     tillage_index (al.integer ("tillage_index")),
-    spray (map_construct_const<Spray> (al.frame_sequence ("spray"))),
+    spray (map_construct_const<Spray> (al.submodel_sequence ("spray"))),
     spray_index (al.integer ("spray_index")),
     irrigation (al.check ("irrigation") 
 	       ? new Irrigation (al.submodel ("irrigation"))

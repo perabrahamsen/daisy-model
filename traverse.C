@@ -253,8 +253,8 @@ Traverse::traverse_parameter (const Frame& frame,
 		
 		if (has_value)
 		  {
-		    const std::vector<const Frame*> sequence
-		      = frame.frame_sequence (parameter);
+		    const std::vector<const FrameSubmodel*>& sequence
+		      = frame.submodel_sequence (parameter);
 		    for (unsigned int i = 0; i < sequence.size (); i++)
 		      traverse_submodel_sequence (*sequence[i],
 						  nested_default_frame,
@@ -281,16 +281,16 @@ Traverse::traverse_parameter (const Frame& frame,
 		  }
 		else
 		  {
-		    const std::vector<const Frame*> sequence
-		      = frame.frame_sequence (parameter);
+		    const std::vector<const FrameModel*>& sequence
+		      = frame.model_sequence (parameter);
 		    for (unsigned int i = 0; i < sequence.size (); i++)
 		      {
-			const Frame& entry_frame = *sequence[i];
+			const FrameModel& entry_frame = *sequence[i];
 			const symbol type = entry_frame.type_name ();
 			const Library& library 
                           = metalib.library (frame.component (parameter));
-			const Frame& entry_default_frame = library.model (type);
-
+			const FrameModel& entry_default_frame 
+                          = library.model (type);
 			traverse_object_sequence (library, entry_frame, 
                                                   entry_default_frame, 
 						  parameter, i);

@@ -122,7 +122,8 @@ find_unit (Block& parent, const char* key)
 IMvec::IMvec (Block& parent, const char* key)
   : unit_ (find_unit (parent, key))
 {
-  const std::vector<const Frame*>& alists = parent.frame_sequence (key);
+  const std::vector<const FrameSubmodel*>& alists
+    = parent.submodel_sequence (key);
   for (size_t i = 0; i < alists.size (); i++)
     {
       const Frame& al = *alists[i];

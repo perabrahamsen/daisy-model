@@ -1,5 +1,7 @@
 2009-02-12  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* all: Split model and submodel in alist/frame/block.
+	
 	* Version 4.60 released.
 
 2009-02-12  Per Abrahamsen  <abraham@dina.kvl.dk>

@@ -151,16 +151,18 @@ Syntax::Implementation::check (Metalib& metalib,
 	if (size[key] != Value::Singleton)
 	  {
 	    const ::Library& lib = metalib.library (libraries[key]);
-	    const std::vector<const Frame*>& seq = vl.frame_sequence (key);
+	    const std::vector<const FrameModel*>& seq 
+              = vl.model_sequence (key);
 	    int j_index = 0;
-	    for (std::vector<const Frame*>::const_iterator j = seq.begin ();
+	    for (std::vector<const FrameModel*>::const_iterator j
+                   = seq.begin ();
 		 j != seq.end ();
 		 j++)
 	      {
 		std::ostringstream tmp;
 		tmp << key << "[" << j_index << "]: ";
 		j_index++;
-		const Frame& al = **j;
+		const FrameModel& al = **j;
                 if (!lib.check (al.type_name ()))
 		  {
 		    tmp << "Unknown library member '"
@@ -189,9 +191,11 @@ Syntax::Implementation::check (Metalib& metalib,
           if (size[key] != Value::Singleton)
             {
               daisy_assert (vl.type_size (key) != Value::Singleton);
-              const std::vector<const Frame*>& seq = vl.frame_sequence (key);
+              const std::vector<const FrameSubmodel*>& seq 
+                = vl.submodel_sequence (key);
               int j_index = 0;
-              for (std::vector<const Frame*>::const_iterator j = seq.begin ();
+              for (std::vector<const FrameSubmodel*>::const_iterator j
+                     = seq.begin ();
                    j != seq.end ();
                    j++)
                 {
@@ -199,7 +203,7 @@ Syntax::Implementation::check (Metalib& metalib,
                   tmp << key << " [" << j_index << "]";
                   Treelog::Open nest (msg, tmp.str ());
                   j_index++;
-                  const Frame& al = **j;
+                  const FrameSubmodel& al = **j;
                   if (!al.check (metalib, msg))
                     error = true;
                 }

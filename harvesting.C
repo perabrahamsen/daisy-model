@@ -586,11 +586,11 @@ above ground.");
 }
 
 Harvesting::Harvesting (Block& al)
-  : Stem (al.frame_sequence ("Stem")),
-    Leaf (al.frame_sequence ("Leaf")),
-    Dead (al.frame_sequence ("Dead")),
-    SOrg (al.frame_sequence ("SOrg")),
-    Root (al.frame_sequence ("Root")),
+  : Stem (al.model_sequence ("Stem")),
+    Leaf (al.model_sequence ("Leaf")),
+    Dead (al.model_sequence ("Dead")),
+    SOrg (al.model_sequence ("SOrg")),
+    Root (al.model_sequence ("Root")),
     EconomicYield_W (al.number ("EconomicYield_W")),
     EconomicYield_N (al.check ("EconomicYield_N")
                      ? al.number ("EconomicYield_N")

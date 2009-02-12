@@ -37,7 +37,7 @@
 #include "submodeler.h"
 #include "check.h"
 #include "librarian.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include <sstream>
 #include <deque>
 
@@ -55,7 +55,7 @@ struct VegetationPermanent : public Vegetation
     
     // Create;
     static void load_syntax (Frame&);
-    YearlyLAI (const std::vector<const Frame*>& als);
+    YearlyLAI (const std::vector<const FrameSubmodel*>& als);
   } yearly_LAI;
   const PLF LAIvsDAY;		// LAI as a function of time.
   CanopySimple canopy;
@@ -70,7 +70,7 @@ struct VegetationPermanent : public Vegetation
   AM* AM_litter;                // Dead plant matter.
   double N_uptake;		// N uptake this hour. [g N/m^2/h]
   double N_litter;		// N litter this hour. [g N/m^2/h]
-  const std::vector<const Frame*>& litter_am; // Litter AM parameters.
+  const std::vector<const FrameModel*>& litter_am; // Litter AM parameters.
   // Root.
   std::auto_ptr<RootSystem> root_system;
   const double WRoot;		// Root dry matter weight [g DM/m^2]
@@ -245,7 +245,8 @@ whenever 'LAIvsDAY' becomes negative.");
   frame.order ("year", "LAIvsDAY");
 }
 
-VegetationPermanent::YearlyLAI::YearlyLAI (const std::vector<const Frame*>& als)
+VegetationPermanent::YearlyLAI::YearlyLAI
+/**/ (const std::vector<const FrameSubmodel*>& als)
 {
   for (unsigned int i = 0; i < als.size (); i++)
     {
@@ -390,7 +391,7 @@ VegetationPermanent::check (const Units& units, Treelog& msg) const
 
 VegetationPermanent::VegetationPermanent (Block& al)
   : Vegetation (al),
-    yearly_LAI (al.frame_sequence ("YearlyLAI")),
+    yearly_LAI (al.submodel_sequence ("YearlyLAI")),
     LAIvsDAY (al.plf ("LAIvsDAY")),
     canopy (al.submodel ("Canopy")),
     cover_ (-42.42e42),
@@ -401,7 +402,7 @@ VegetationPermanent::VegetationPermanent (Block& al)
     AM_litter (NULL),
     N_uptake (0.0),
     N_litter (0.0),
-    litter_am (al.frame_sequence ("litter_am")),
+    litter_am (al.model_sequence ("litter_am")),
     root_system (submodel<RootSystem> (al, "Root")),
     WRoot (al.number ("root_DM") * 100.0), // [Mg DM / ha] -> [g DM / m^2]
     albedo_ (al.number ("Albedo")),

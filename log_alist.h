@@ -61,7 +61,9 @@ struct LogAList : public Log
 	     const Library& library, const Frame& frame);
   void push (symbol entry, const Frame& frame);
   void push (symbol entry, const Frame& default_frame,
-	     std::vector<const Frame*> frame_sequence);
+	     std::vector<const FrameModel*> frame_sequence);
+  void push (symbol entry, const Frame& default_frame,
+	     std::vector<const FrameSubmodel*> frame_sequence);
   void pop ();
 
   // Nesting.

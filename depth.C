@@ -35,7 +35,7 @@
 #include "librarian.h"
 #include "mathlib.h"
 #include "path.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include <string>
 #include <sstream>
 
@@ -186,7 +186,7 @@ struct DepthPLF : public Depth
   { }
   virtual bool check (const Units&, const Scope&, Treelog&) const
   { return true; }
-  static PLF convert_to_plf (const std::vector<const Frame*>& table)
+  static PLF convert_to_plf (const std::vector<const FrameSubmodel*>& table)
   {
     daisy_assert (table.size () > 0);
     const Time start (table[0]->submodel ("time"));
@@ -201,8 +201,8 @@ struct DepthPLF : public Depth
   }
   DepthPLF (Block& al)
     : Depth (al),
-      start (al.frame_sequence ("table")[0]->submodel ("time")),
-      value (convert_to_plf (al.frame_sequence ("table"))),
+      start (al.submodel_sequence ("table")[0]->submodel ("time")),
+      value (convert_to_plf (al.submodel_sequence ("table"))),
       current_value (-42.42e42)
   { }
   ~DepthPLF ()
@@ -217,8 +217,8 @@ static const class CheckTable : public VCheck
   {
     daisy_assert (frame.check (key));
         
-    const std::vector<const Frame*>& table 
-      = frame.frame_sequence (key); 
+    const std::vector<const FrameSubmodel*>& table 
+      = frame.submodel_sequence (key); 
     if (table.size () < 2)
       throw std::string ("You must list at least two entries");
     Time last (table[0]->submodel ("time"));

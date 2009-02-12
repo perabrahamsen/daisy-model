@@ -34,7 +34,7 @@
 #include "adsorption.h"
 #include "log.h"
 #include "check.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "submodeler.h"
 #include "tertiary.h"
 #include "librarian.h"
@@ -126,7 +126,7 @@ struct MovementRect::Point
 		"Horizontal position.");
     frame.order ("z", "x");
   }
-  Point (const Frame& al)
+  Point (const FrameSubmodel& al)
     : z (al.number ("z")),
       x (al.number ("x"))
   { }
@@ -298,7 +298,8 @@ MovementRect::initialize_derived (const Soil&, const Groundwater&,
 MovementRect::MovementRect (Block& al)
   : MovementSolute (al),
     geo (submodel<GeometryRect> (al, "Geometry")),
-    drain_position (map_construct_const<Point> (al.frame_sequence ("drain"))),
+    drain_position (map_construct_const<Point> 
+                    (al.submodel_sequence ("drain"))),
     matrix_water (Librarian::build_vector<UZRect> (al, "matrix_water")),
     heatrect (Librarian::build_item<Heatrect> (al, "heat")),
     T_bottom (-42.42e42)

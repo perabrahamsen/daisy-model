@@ -31,6 +31,7 @@ class CrpN;
 class Partition;
 class Geometry;
 class Frame;
+class FrameModel;
 class FrameSubmodel;
 class Log;
 class PLF;
@@ -168,8 +169,8 @@ public:
 public:
   void initialize (const double SeedN);
   void initialize (Metalib&, symbol name,
-		   const std::vector<const Frame*>& root,
-		   const std::vector<const Frame*>& dead,
+		   const std::vector<const FrameModel*>& root,
+		   const std::vector<const FrameModel*>& dead,
 		   const Geometry&, OrganicMatter&, Treelog&);
   static void load_syntax (Frame&);
   Production (const FrameSubmodel&);

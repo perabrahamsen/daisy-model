@@ -619,7 +619,8 @@ static struct CheckLayers : public VCheck
     daisy_assert (!frame.is_log (key));
     daisy_assert (frame.type_size (key) == Value::Sequence);
 
-    const std::vector<const Frame*>& layers = frame.frame_sequence (key);
+    const std::vector<const FrameSubmodel*>& layers 
+      = frame.submodel_sequence (key);
 
     double last = 0.0;
     for (unsigned int i = 0; i < layers.size (); i++)
@@ -690,8 +691,8 @@ Geometry::initialize_layer (std::vector<double>& array,
   else if (al.check (initial))
     {
       // Initialize by layers.
-      const std::vector<const Frame*>& layers
-	= al.frame_sequence (initial);
+      const std::vector<const FrameSubmodel*>& layers
+	= al.submodel_sequence (initial);
       const double soil_end = bottom ();
       double last = 0.0;
       for (size_t i = 0; i < layers.size (); i++)

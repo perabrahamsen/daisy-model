@@ -26,9 +26,9 @@
 #include <vector>
 
 class PLF;
-class AttributeList;
 class Metalib;
-class Frame;
+class FrameSubmodel;
+class FrameModel;
 
 #ifdef __unix
 #define EXPORT /* Nothing */
@@ -66,7 +66,8 @@ public:
   bool flag (symbol) const;
   bool flag (symbol, bool default_value) const;
   const PLF& plf (symbol) const;
-  Frame& frame (symbol) const;
+  FrameModel& model (symbol) const;
+  FrameSubmodel& submodel (symbol) const;
   int integer (symbol) const;
   int integer (symbol, int default_value) const;
   const std::vector<double>& number_sequence (symbol) const;
@@ -74,7 +75,8 @@ public:
   const std::vector<bool>& flag_sequence (symbol key) const;
   const std::vector<int>& integer_sequence (symbol key) const;
   const std::vector<const PLF*>& plf_sequence (symbol key) const;
-  const std::vector<const Frame*>& frame_sequence (symbol key) const;
+  const std::vector<const FrameModel*>& model_sequence (symbol key) const;
+  const std::vector<const FrameSubmodel*>& submodel_sequence (symbol key) const;
 
   // Create and Destroy.
   void add (symbol, double);
@@ -85,7 +87,8 @@ public:
   { return add (key, symbol (value)); }
   void add (symbol, bool);
   void add (symbol, int);
-  void add (symbol, const Frame&);
+  void add (symbol, const FrameModel&);
+  void add (symbol, const FrameSubmodel&);
   void add (symbol, const PLF&);
   void add (symbol, const std::vector<double>&);
   void add (symbol, const std::vector<symbol>&);
@@ -98,7 +101,8 @@ public:
                     symbol c);
   void add (symbol, const std::vector<bool>&);
   void add (symbol, const std::vector<int>&);
-  void add (symbol, const std::vector<const Frame*>&);
+  void add (symbol, const std::vector<const FrameModel*>&);
+  void add (symbol, const std::vector<const FrameSubmodel*>&);
   void add (symbol, const std::vector<const PLF*>&);
 
   void remove (symbol);

@@ -96,7 +96,7 @@ public:
                      const Time&, Treelog& msg);
   // Crop part.
   static AM& create (Metalib&, const Geometry&, const Time&,
-		     const std::vector<const Frame*>&,
+		     const std::vector<const FrameModel*>&,
 		     symbol sort, symbol part, lock_type lock, Treelog& msg);
   void initialize (const Geometry&, const double max_rooting_depth);
   virtual void initialize_derived (const Geometry&, 

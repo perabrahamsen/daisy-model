@@ -85,114 +85,114 @@ public:
   bool check (Metalib&, const Frame& frame, Treelog&) const;
   
   // Check that a numeric value is within the allowed range.
-  void check (const symbol key, double value) const;
+  void check (symbol key, double value) const;
 
   // Check than an arbitrary attribute is valid.
-  bool check (Metalib&, const symbol key, Treelog&) const;
-  bool check (Metalib&, const Frame& frame, const symbol key, Treelog&) const;
+  bool check (Metalib&, symbol key, Treelog&) const;
+  bool check (Metalib&, const Frame& frame, symbol key, Treelog&) const;
 
   // Extract type information about a specific attribute.
-  bool is_const (const symbol) const;
-  bool is_optional (const symbol) const;
-  bool is_log (const symbol) const;
-  bool is_state (const symbol) const;
-  Value::type lookup (const symbol) const;
+  bool is_const (symbol) const;
+  bool is_optional (symbol) const;
+  bool is_log (symbol) const;
+  bool is_state (symbol) const;
+  Value::type lookup (symbol) const;
   symbol component (symbol) const;
-  int type_size (const symbol) const;
-  symbol dimension (const symbol) const;
-  symbol domain (const symbol) const;
-  symbol range (const symbol) const;
-  symbol description (const symbol) const;
-  const FrameSubmodel& default_frame (const symbol) const;
-  symbol submodel_name (const symbol) const;
+  int type_size (symbol) const;
+  symbol dimension (symbol) const;
+  symbol domain (symbol) const;
+  symbol range (symbol) const;
+  symbol description (symbol) const;
+  const FrameSubmodel& default_frame (symbol) const;
+  symbol submodel_name (symbol) const;
 
   // Add attribute types.
 public:
-  void add (const symbol key,	// Generic.
+  void add (symbol key,	// Generic.
 	    Value::type t, 
 	    Value::category cat,
 	    int size,
-	    const symbol description);
-  void add (const symbol key,
+	    symbol description);
+  void add (symbol key,
 	    Value::type t, 
 	    Value::category cat,
-	    const symbol description)
+	    symbol description)
   { add (key, t, cat, Value::Singleton, description); }
 
-  void add (const symbol key, // Number.
-	    const symbol dim,
+  void add (symbol key, // Number.
+	    symbol dim,
 	    Value::category cat,
 	    int size,
-	    const symbol description);
-  void add (const symbol key, 
-	    const symbol dim,
+	    symbol description);
+  void add (symbol key, 
+	    symbol dim,
 	    Value::category cat,
-	    const symbol description)
+	    symbol description)
   { add (key, dim, cat, Value::Singleton, description); } 
-  void add (const symbol key,
-	    const symbol dim,
+  void add (symbol key,
+	    symbol dim,
 	    const Check& check,
 	    Value::category cat,
 	    int size,
-	    const symbol description);
-  void add (const symbol key, 
-	    const symbol dim,
+	    symbol description);
+  void add (symbol key, 
+	    symbol dim,
 	    const Check& check,
 	    Value::category cat,
-	    const symbol description)
+	    symbol description)
   { add (key, dim, check, cat, Value::Singleton, description); } 
-  void add_fraction (const symbol key, 
+  void add_fraction (symbol key, 
 		     Value::category cat,
 		     int size,
-		     const symbol description);
-  void add_fraction (const symbol key, 
+		     symbol description);
+  void add_fraction (symbol key, 
 		     Value::category cat,
-		     const symbol description);
+		     symbol description);
 
-  void add (const symbol key, // PLF.
-	    const symbol domain,
-	    const symbol range,
+  void add (symbol key, // PLF.
+	    symbol domain,
+	    symbol range,
 	    Value::category cat,
 	    int size,
-	    const symbol description);
-  void add (const symbol key, 
-	    const symbol domain,
-	    const symbol range,
+	    symbol description);
+  void add (symbol key, 
+	    symbol domain,
+	    symbol range,
 	    Value::category cat,
-	    const symbol description)
+	    symbol description)
   { add (key, domain, range, cat, Value::Singleton, description); } 
-  void add (const symbol key,
-	    const symbol domain,
-	    const symbol range,
+  void add (symbol key,
+	    symbol domain,
+	    symbol range,
 	    const Check& check,
 	    Value::category cat,
 	    int size,
-	    const symbol description);
-  void add (const symbol key, 
-	    const symbol domain,
-	    const symbol range,
+	    symbol description);
+  void add (symbol key, 
+	    symbol domain,
+	    symbol range,
 	    const Check& check,
 	    Value::category cat,
-	    const symbol description)
+	    symbol description)
   { add (key, domain, range, check, cat, Value::Singleton, description); } 
 
-  void add_object (const symbol key,// Object
-                   const symbol lib, 
-                   const symbol description)
+  void add_object (symbol key,// Object
+                   symbol lib, 
+                   symbol description)
   { add_object (key, lib, Value::State, Value::Singleton, description); }
-  void add_object (const symbol, symbol lib,
-                   Value::category, int size, const symbol description);
+  void add_object (symbol, symbol lib,
+                   Value::category, int size, symbol description);
 
   typedef void (*load_syntax_t) (Frame&);
-  void add_submodule (const symbol name, 
-		      Value::category cat, const symbol description,
+  void add_submodule (symbol name, 
+		      Value::category cat, symbol description,
 		      load_syntax_t load_syntax);
-  void add_submodule_sequence (const symbol name, Value::category cat, 
-			       const symbol description,
+  void add_submodule_sequence (symbol name, Value::category cat, 
+			       symbol description,
 			       load_syntax_t load_syntax);
 
   // Additional type constraints for a single attribute value. 
-  void add_check (const symbol name, const VCheck& vcheck);
+  void add_check (symbol name, const VCheck& vcheck);
 
   // It is possible to impose an order on the syntax entries, which
   // will allow the input module to parse the entries without the user
@@ -201,19 +201,19 @@ public:
   // add new entries.
 public:
   void order (const std::vector<symbol>&);
-  void order (const symbol);
-  void order (const symbol, const symbol);
-  void order (const symbol, const symbol, const symbol);
-  void order (const symbol, const symbol, const symbol,
-	      const symbol);
-  void order (const symbol, const symbol, const symbol,
-	      const symbol,
-	      const symbol);
+  void order (symbol);
+  void order (symbol, symbol);
+  void order (symbol, symbol, symbol);
+  void order (symbol, symbol, symbol,
+	      symbol);
+  void order (symbol, symbol, symbol,
+	      symbol,
+	      symbol);
 
   // Extract the imposed order.
   bool ordered () const;
   const std::vector<symbol>& order () const;
-  int order_index (const symbol name) const; // Return index in order, or -1
+  int order_index (symbol name) const; // Return index in order, or -1
   bool total_order () const;	// True iff all members are ordered.
 
   // Additional constraints involving multiple attributes.
@@ -223,7 +223,7 @@ public:
 
 public:
   // Is 'key' an element of this alist?
-  bool check (const symbol key) const;
+  bool check (symbol key) const;
   // Is this frame a subset of 'other'?
   bool subset (Metalib&, const Frame& other) const;
   // Is the element 'key' in this alist a subset of the other entry.
@@ -238,23 +238,24 @@ public:
 
   // Extract attribute values.
 public:
-  double number (const symbol) const;
-  double number (const symbol, double default_value) const;
-  symbol name (const symbol) const;
-  symbol name (const symbol, const symbol default_value) const;
-  bool flag (const symbol) const;
-  bool flag (const symbol, bool default_value) const;
-  const PLF& plf (const symbol) const;
-  const FrameModel& model (const symbol) const;
-  const FrameSubmodel& submodel (const symbol) const;
-  int integer (const symbol) const;
-  int integer (const symbol, int default_value) const;
-  const std::vector<double>& number_sequence (const symbol) const;
-  const std::vector<symbol>& name_sequence (const symbol key) const;
-  const std::vector<bool>& flag_sequence (const symbol key) const;
-  const std::vector<int>& integer_sequence (const symbol key) const;
-  const std::vector<const Frame*>& frame_sequence (const symbol key) const;
-  const std::vector<const PLF*>& plf_sequence (const symbol key) const;
+  double number (symbol) const;
+  double number (symbol, double default_value) const;
+  symbol name (symbol) const;
+  symbol name (symbol, symbol default_value) const;
+  bool flag (symbol) const;
+  bool flag (symbol, bool default_value) const;
+  const PLF& plf (symbol) const;
+  const FrameModel& model (symbol) const;
+  const FrameSubmodel& submodel (symbol) const;
+  int integer (symbol) const;
+  int integer (symbol, int default_value) const;
+  const std::vector<double>& number_sequence (symbol) const;
+  const std::vector<symbol>& name_sequence (symbol key) const;
+  const std::vector<bool>& flag_sequence (symbol key) const;
+  const std::vector<int>& integer_sequence (symbol key) const;
+  const std::vector<const FrameModel*>& model_sequence (symbol key) const;
+  const std::vector<const FrameSubmodel*>& submodel_sequence (symbol key) const;
+  const std::vector<const PLF*>& plf_sequence (symbol key) const;
 
   // Set attribute values.
 private:
@@ -266,7 +267,8 @@ public:
   void add (symbol, const char*); // Avoid matching bool...
   void add (symbol, bool);
   void add (symbol, int);
-  void add (symbol, const Frame&);
+  void add (symbol, const FrameModel&);
+  void add (symbol, const FrameSubmodel&);
   void add (symbol, const PLF&);
   void add (symbol, const std::vector<double>&);
   void add (symbol, const std::vector<symbol>&);
@@ -276,7 +278,8 @@ public:
   void add_strings (symbol key, symbol a, symbol b, symbol c);
   void add (symbol, const std::vector<bool>&);
   void add (symbol, const std::vector<int>&);
-  void add (symbol, const std::vector<const Frame*>&);
+  void add (symbol, const std::vector<const FrameModel*>&);
+  void add (symbol, const std::vector<const FrameSubmodel*>&);
   void add (symbol, const std::vector<const PLF*>&);
   void add_empty (symbol);
 

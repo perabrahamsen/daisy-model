@@ -288,9 +288,9 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
 	  break;
 	case Value::AList:
 	  {
-	    const Frame& other = frame.default_frame (key);
-	    const std::vector<const Frame*>& value 
-              = frame.frame_sequence (key);
+	    const FrameSubmodel& other = frame.default_frame (key);
+	    const std::vector<const FrameSubmodel*>& value 
+              = frame.submodel_sequence (key);
 	    
 	    for (unsigned int i = 0; i < value.size (); i++)
 	      {
@@ -357,11 +357,13 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
 	  {
             const symbol component = frame.component (key);
             const Library& library = metalib.library (component);
-	    const std::vector<const Frame*>& value = frame.frame_sequence (key);
+	    const std::vector<const FrameModel*>& value 
+              = frame.model_sequence (key);
             // We really should check original value.
-            const std::vector<const Frame*>& super_value = super.check (key)
-              ? super.frame_sequence (key)
-              : std::vector<const Frame*> ();
+            const std::vector<const FrameModel*>& super_value
+              = super.check (key)
+              ? super.model_sequence (key)
+              : std::vector<const FrameModel*> ();
 	    for (unsigned int i = 0; i < value.size (); i++)
 	      {
                 const Frame& me = *value[i];

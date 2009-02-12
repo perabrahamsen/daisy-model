@@ -28,7 +28,8 @@
 #include "mathlib.h"
 #include "memutils.h"
 #include "assertion.h"
-#include "frame.h"
+#include "frame_model.h"
+#include "frame_submodel.h"
 #include <map>
 #include <sstream>
 
@@ -56,14 +57,16 @@ struct AValue
     symbol* name;
     bool flag;
     PLF* plf;
-    Frame* frame;
+    FrameModel* model;
+    FrameSubmodel* submodel;
     int integer;
     std::vector<double>* number_sequence;
     std::vector<symbol>* name_sequence;
     std::vector<bool>* flag_sequence;
     std::vector<int>* integer_sequence;
     std::vector<const PLF*>* plf_sequence;
-    std::vector<const Frame*>* frame_sequence;
+    std::vector<const FrameModel*>* model_sequence;
+    std::vector<const FrameSubmodel*>* submodel_sequence;
   };
   Value::type type;
   bool is_sequence;
@@ -112,8 +115,14 @@ struct AValue
       is_sequence (false),
       ref_count (new int (1))
     { }
-  AValue (const Frame& f)
-    : frame (&f.clone ()),
+  AValue (const FrameModel& f)
+    : model (&f.clone ()),
+      type (Value::Object),
+      is_sequence (false),
+      ref_count (new int (1))
+  { }
+  AValue (const FrameSubmodel& f)
+    : submodel (&f.clone ()),
       type (Value::AList),
       is_sequence (false),
       ref_count (new int (1))
@@ -175,14 +184,23 @@ struct AValue
       is_sequence (true),
       ref_count (new int (1))
     { }
-  AValue (const std::vector<const Frame*>& v)
+  AValue (const std::vector<const FrameModel*>& v)
+    : type (Value::Object),
+      is_sequence (true),
+      ref_count (new int (1))
+  { 
+    model_sequence = new std::vector<const FrameModel*> ();
+    for (unsigned int i = 0; i < v.size (); i++)
+      model_sequence->push_back (&v[i]->clone ());
+  }
+  AValue (const std::vector<const FrameSubmodel*>& v)
     : type (Value::AList),
       is_sequence (true),
       ref_count (new int (1))
   { 
-    frame_sequence = new std::vector<const Frame*> ();
+    submodel_sequence = new std::vector<const FrameSubmodel*> ();
     for (unsigned int i = 0; i < v.size (); i++)
-      frame_sequence->push_back (&v[i]->clone ());
+      submodel_sequence->push_back (&v[i]->clone ());
   }
   AValue ()
     : number (-42.42e42),
@@ -217,10 +235,16 @@ AValue::subset (Metalib& metalib, const AValue& v) const
 	return flag == v.flag;
       case Value::Integer:
 	return integer == v.integer;
+      case Value::Object:
+	{
+	  const FrameModel& value = *model;
+	  const FrameModel& other = *v.model;
+          return value.subset (metalib, other);
+	}
       case Value::AList:
 	{
-	  const Frame& value = *frame;
-	  const Frame& other = *v.frame;
+	  const FrameSubmodel& value = *submodel;
+	  const FrameSubmodel& other = *v.submodel;
           return value.subset (metalib, other);
 	}
       case Value::PLF:
@@ -254,10 +278,25 @@ AValue::subset (Metalib& metalib, const AValue& v) const
 	return *flag_sequence == *v.flag_sequence;
       case Value::Integer:
 	return *integer_sequence == *v.integer_sequence;
+      case Value::Object:
+	{
+	  const std::vector<const FrameModel*>& value = *model_sequence;
+	  const std::vector<const FrameModel*>& other = *v.model_sequence;
+
+	  const unsigned int size = value.size ();
+	  if (other.size () != size)
+	    return false;
+
+          for (unsigned int i = 0; i < size; i++)
+            if (!value[i]->subset (metalib, *other[i]))
+              return false;
+
+	  return true;
+	}
       case Value::AList:
 	{
-	  const std::vector<const Frame*>& value = *frame_sequence;
-	  const std::vector<const Frame*>& other = *v.frame_sequence;
+	  const std::vector<const FrameSubmodel*>& value = *submodel_sequence;
+	  const std::vector<const FrameSubmodel*>& other = *v.submodel_sequence;
 
 	  const unsigned int size = value.size ();
 	  if (other.size () != size)
@@ -290,7 +329,7 @@ AValue::expect (const symbol key, Value::type expected) const
     {
       std::ostringstream tmp;
       tmp << "AValue of parameter '" << key << "' is a '" 
-          << Value::type_name (type) << ", expected '"
+          << Value::type_name (type) << "', expected '"
           << Value::type_name (expected) << "'";
       daisy_panic (tmp.str ());
     }
@@ -333,8 +372,11 @@ AValue::cleanup ()
 	  case Value::Integer:
 	    // Primitives, do nothing.
 	    break;
+	  case Value::Object:
+            delete model;
+	    break;
 	  case Value::AList:
-            delete frame;
+            delete submodel;
 	    break;
 	  case Value::PLF:
 	    delete plf;
@@ -364,9 +406,14 @@ AValue::cleanup ()
 	  case Value::Integer:
 	    delete number_sequence;
 	    break;
+	  case Value::Object:
+            sequence_delete (model_sequence->begin (), model_sequence->end ());
+            delete model_sequence;
+	    break;
 	  case Value::AList:
-            sequence_delete (frame_sequence->begin (), frame_sequence->end ());
-            delete frame_sequence;
+            sequence_delete (submodel_sequence->begin (), 
+                             submodel_sequence->end ());
+            delete submodel_sequence;
 	    break;
 	  case Value::PLF:
 	    sequence_delete (plf_sequence->begin (), plf_sequence->end ());
@@ -398,21 +445,40 @@ AValue::operator= (const AValue& v)
     return *this;
 
   // Take care of orphans.
-  if (type == Value::AList)
+  switch (type)
     {
+    case Value::Object:
       if (is_sequence)
         {
-          for (size_t i = 0; i < frame_sequence->size (); i++)
+          for (size_t i = 0; i < model_sequence->size (); i++)
             {
-              const Frame& entry = *(*frame_sequence)[i];
+              const FrameModel& entry = *(*model_sequence)[i];
               entry.reparent_children (entry.parent ());
             }
         }
       else
         {
-          daisy_assert (frame != v.frame);
-          frame->reparent_children (v.frame);
+          daisy_assert (model != v.model);
+          model->reparent_children (v.model);
         }
+      break;
+    case Value::AList:
+      if (is_sequence)
+        {
+          for (size_t i = 0; i < submodel_sequence->size (); i++)
+            {
+              const FrameSubmodel& entry = *(*submodel_sequence)[i];
+              entry.reparent_children (entry.parent ());
+            }
+        }
+      else
+        {
+          daisy_assert (submodel != v.submodel);
+          model->reparent_children (v.submodel);
+        }
+      break;
+    default:
+      /* Do nothing */;
     }
 
   // Delete old value, if necessary.
@@ -444,8 +510,11 @@ AValue::operator= (const AValue& v)
       case Value::Integer:
 	integer = v.integer;
         break;
+      case Value::Object:
+        model = v.model;
+        break;
       case Value::AList:
-        frame = v.frame;
+        submodel= v.submodel;
         break;
       case Value::PLF:
 	plf = v.plf;
@@ -473,8 +542,11 @@ AValue::operator= (const AValue& v)
       case Value::Integer:
 	integer_sequence = v.integer_sequence;
         break;
+      case Value::Object:
+        model_sequence = v.model_sequence;
+        break;
       case Value::AList:
-        frame_sequence = v.frame_sequence;
+        submodel_sequence = v.submodel_sequence;
         break;
       case Value::PLF:
 	plf_sequence = v.plf_sequence;
@@ -574,8 +646,10 @@ AttributeList::size (const symbol key)	const
     {
     case Value::Number:
       return value.number_sequence->size ();
+    case Value::Object:
+      return value.model_sequence->size ();
     case Value::AList:
-      return value.frame_sequence->size ();
+      return value.submodel_sequence->size ();
     case Value::PLF:
       return value.plf_sequence->size ();
     case Value::Boolean:
@@ -694,13 +768,22 @@ AttributeList::plf (const symbol key) const
   return *value.plf;
 }
 
-Frame& 
-AttributeList::frame (const symbol key) const
+FrameModel& 
+AttributeList::model (const symbol key) const
+{
+  const AValue& value = impl.lookup (key);
+  value.expect (key, Value::Object);
+  value.singleton (key);
+  return *value.model;
+}
+
+FrameSubmodel& 
+AttributeList::submodel (const symbol key) const
 {
   const AValue& value = impl.lookup (key);
   value.expect (key, Value::AList);
   value.singleton (key);
-  return *value.frame;
+  return *value.submodel;
 }
 
 const std::vector<double>& 
@@ -748,13 +831,22 @@ AttributeList::plf_sequence (const symbol key) const
   return *value.plf_sequence;
 }
 
-const std::vector<const Frame*>& 
-AttributeList::frame_sequence (const symbol key) const
+const std::vector<const FrameModel*>& 
+AttributeList::model_sequence (const symbol key) const
+{
+  const AValue& value = impl.lookup (key);
+  value.expect (key, Value::Object);
+  value.sequence (key);
+  return *value.model_sequence;
+}
+
+const std::vector<const FrameSubmodel*>& 
+AttributeList::submodel_sequence (const symbol key) const
 {
   const AValue& value = impl.lookup (key);
   value.expect (key, Value::AList);
   value.sequence (key);
-  return *value.frame_sequence;
+  return *value.submodel_sequence;
 }
 
 void 
@@ -778,7 +870,11 @@ AttributeList::add (const symbol key, int v)
 { impl.add (key, AValue (v)); }
 
 void 
-AttributeList::add (const symbol key, const Frame& v)
+AttributeList::add (const symbol key, const FrameModel& v)
+{ impl.add (key, AValue (v)); }
+
+void 
+AttributeList::add (const symbol key, const FrameSubmodel& v)
 { impl.add (key, AValue (v)); }
 
 void 
@@ -840,7 +936,12 @@ AttributeList::add (const symbol key, const std::vector<int>& v)
 
 void 
 AttributeList::add (const symbol key, 
-		    const std::vector<const Frame*>& v)
+		    const std::vector<const FrameModel*>& v)
+{ impl.add (key, AValue (v)); }
+
+void
+AttributeList::add (const symbol key, 
+		    const std::vector<const FrameSubmodel*>& v)
 { impl.add (key, AValue (v)); }
 
 void 

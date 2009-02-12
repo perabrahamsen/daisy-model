@@ -74,7 +74,7 @@ public:
   std::auto_ptr<RootSystem> root_system;
   const double WRoot;		// Root dry matter weight [g DM/m^2]
   const double NRoot;		// Root nitrogen weight [g N/m^2]
-  const std::vector<const Frame*>& root_am; // Root AM parameters.
+  const std::vector<const FrameModel*>& root_am; // Root AM parameters.
 
   // Nitrogen.
   const double N_potential;	// Potential N content at harvest. [g N/m^2]
@@ -462,7 +462,7 @@ CropSimple::CropSimple (Block& al)
     root_system (submodel<RootSystem> (al, "Root")),
     WRoot (al.number ("root_DM") * 100.0), // [Mg DM / ha] -> [g DM / m^2]
     NRoot (al.number ("root_N") * 0.1),	// [kg N / ha] -> [g N / m^2]
-    root_am (al.frame_sequence ("root_am")),
+    root_am (al.model_sequence ("root_am")),
     N_potential (al.number ("potential_N") * 0.1),	// [kg N / ha] -> [g N / m^2]
     N_demand (0.0),
     N_actual (al.number ("N_actual")),

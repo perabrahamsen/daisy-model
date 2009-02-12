@@ -29,7 +29,7 @@
 #include "groundwater.h"
 #include "metalib.h"
 #include "library.h"
-#include "frame.h"
+#include "frame_submodel.h"
 #include "mathlib.h"
 #include "librarian.h"
 #include "submodeler.h"
@@ -486,7 +486,8 @@ check_alist (Metalib&, const Frame& al, Treelog& err)
 {
   bool ok = true;
 
-  const std::vector<const Frame*>& layers = al.frame_sequence ("horizons");
+  const std::vector<const FrameSubmodel*>& layers 
+    = al.submodel_sequence ("horizons");
 
   if (layers.size () < 1U)
     {

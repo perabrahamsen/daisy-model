@@ -25,6 +25,7 @@
 #include "library.h"
 #include "block.h"
 #include "frame_model.h"
+#include "frame_submodel.h"
 #include "plf.h"
 #include "horheat.h"
 #include "hydraulic.h"
@@ -66,8 +67,10 @@ struct Horizon::Implementation
   // Create and Detroy.
   void initialize (const Hydraulic&, const Texture& texture, double quarts, 
                    int som_size, Treelog& msg);
-  static double_map get_attributes (const std::vector<const Frame*>& frames);
-  static symbol_map get_dimensions (const std::vector<const Frame*>& frames);
+  static double_map get_attributes
+  /**/ (const std::vector<const FrameSubmodel*>& frames);
+  static symbol_map get_dimensions 
+  /**/ (const std::vector<const FrameSubmodel*>& frames);
   Implementation (Block& al);
   Implementation (const Frame& al);
   ~Implementation ();
@@ -102,7 +105,8 @@ Horizon::Implementation::initialize (const Hydraulic& hydraulic,
 }
 
 Horizon::Implementation::double_map
-Horizon::Implementation::get_attributes (const std::vector<const Frame*>& frames)
+Horizon::Implementation::get_attributes 
+/**/ (const std::vector<const FrameSubmodel*>& frames)
 { 
   double_map result; 
   for (unsigned int i = 0; i < frames.size (); i++)
@@ -111,7 +115,8 @@ Horizon::Implementation::get_attributes (const std::vector<const Frame*>& frames
 }
 
 Horizon::Implementation::symbol_map
-Horizon::Implementation::get_dimensions (const std::vector<const Frame*>& frames)
+Horizon::Implementation::get_dimensions 
+/**/ (const std::vector<const FrameSubmodel*>& frames)
 { 
   symbol_map result; 
   for (unsigned int i = 0; i < frames.size (); i++)
@@ -128,8 +133,8 @@ Horizon::Implementation::Implementation (Block& al)
 		   : std::vector<double> ()),
     turnover_factor (al.number ("turnover_factor")),
     anisotropy (al.number ("anisotropy")),
-    attributes (get_attributes (al.frame_sequence ("attributes"))),
-    dimensions (get_dimensions (al.frame_sequence ("attributes"))),
+    attributes (get_attributes (al.submodel_sequence ("attributes"))),
+    dimensions (get_dimensions (al.submodel_sequence ("attributes"))),
     nitrification (Librarian::build_item<Nitrification> (al, "Nitrification")),
     secondary (Librarian::build_item<Secondary> (al, "secondary_domain")),
     hor_heat (al.submodel ("HorHeat"))
@@ -144,8 +149,8 @@ Horizon::Implementation::Implementation (const Frame& al)
 		   : std::vector<double> ()),
     turnover_factor (al.number ("turnover_factor")),
     anisotropy (al.number ("anisotropy")),
-    attributes (get_attributes (al.frame_sequence ("attributes"))),
-    dimensions (get_dimensions (al.frame_sequence ("attributes"))),
+    attributes (get_attributes (al.submodel_sequence ("attributes"))),
+    dimensions (get_dimensions (al.submodel_sequence ("attributes"))),
     nitrification (Nitrification::create_default ()),
     secondary (Secondary::create_none ()),
     hor_heat (al.submodel ("HorHeat"))

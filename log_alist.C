@@ -99,12 +99,28 @@ LogAList::push (symbol entry, const Frame& frame)
 void
 LogAList::push (symbol entry, 
 		const Frame& default_frame,
-		std::vector<const Frame*> frame_sequence)
+		std::vector<const FrameModel*> frame_sequence)
 {
   entry_stack.push_front (entry);
   library_stack.push_front (NULL);
   frame_stack.push_front (&default_frame.clone ());
-  frame_sequence_stack.push_front (frame_sequence);
+  std::vector<const Frame*> frames (frame_sequence.begin (), 
+                                    frame_sequence.end ());
+  frame_sequence_stack.push_front (frames);
+  unnamed_stack.push_front (0);
+}
+
+void
+LogAList::push (symbol entry, 
+		const Frame& default_frame,
+		std::vector<const FrameSubmodel*> frame_sequence)
+{
+  entry_stack.push_front (entry);
+  library_stack.push_front (NULL);
+  frame_stack.push_front (&default_frame.clone ());
+  std::vector<const Frame*> frames (frame_sequence.begin (), 
+                                    frame_sequence.end ());
+  frame_sequence_stack.push_front (frames);
   unnamed_stack.push_front (0);
 }
 
@@ -172,7 +188,7 @@ LogAList::open (const symbol name)
 	      if (size != Value::Singleton && has_value)
 		push (name, 
 		      frame ().default_frame (sname),
-		      frame ().frame_sequence (sname));
+		      frame ().submodel_sequence (sname));
 	      else if (size != Value::Singleton || !has_value)
 		push (name, 
 		      frame ().default_frame (sname));
@@ -221,19 +237,33 @@ LogAList::close ()
 	  switch (type)
 	    { 
 	    case Value::Object:
-	      // Object sequence.
-	      daisy_assert (frame ().type_size (sold_entry) != Value::Singleton);
-	      frame ().add (sold_entry, old_frame_sequence);
-	      break;
+              {
+                // Object sequence.
+                daisy_assert (frame ().type_size (sold_entry)
+                              != Value::Singleton);
+                std::vector<const FrameModel*> copy;
+                for (size_t i = 0; i < old_frame_sequence.size (); i++)
+                  copy.push_back (dynamic_cast<const FrameModel*>
+                                  (old_frame_sequence[i]));
+                frame ().add (sold_entry, copy);
+              }
+              break;
 	    case Value::AList:
 	      // AList sequence or singleton.
 	      if (frame ().type_size (sold_entry) == Value::Singleton)
 		{
 		  daisy_assert (old_frame_sequence.size () == 0);
-		  frame ().add (sold_entry, old_frame);
+		  frame ().add (sold_entry, 
+                                dynamic_cast<const FrameSubmodel&> (old_frame));
 		}
 	      else
-		frame ().add (sold_entry, old_frame_sequence);
+                {
+                  std::vector<const FrameSubmodel*> copy;
+                  for (size_t i = 0; i < old_frame_sequence.size (); i++)
+                    copy.push_back (dynamic_cast<const FrameSubmodel*>
+                                    (old_frame_sequence[i]));
+                  frame ().add (sold_entry, copy);
+                }
 	      delete &old_frame;
 	      break;
 	    default:
@@ -309,7 +339,7 @@ LogAList::close_alist ()
       Frame& old_frame = frame ();
       const std::string& old_entry = entry ().name ();
       pop ();
-      frame ().add (old_entry, old_frame);
+      frame ().add (old_entry, dynamic_cast<const FrameSubmodel&> (old_frame));
       delete &old_frame;
     }
   else
@@ -360,9 +390,9 @@ LogAList::close_object ()
   if (is_active)
     {
       Frame& old_frame = frame ();
-      const std::string& old_entry = entry ().name ();
+      const symbol old_entry = entry ();
       pop ();
-      frame ().add (old_entry, old_frame);
+      frame ().add (old_entry, dynamic_cast<const FrameModel&> (old_frame));
       delete &old_frame;
     }
   else

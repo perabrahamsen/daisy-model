@@ -172,7 +172,12 @@ daisy_frame_set_flag (Frame* frame, const char* name, daisy_bool value)
 extern "C" void EXPORT
 daisy_frame_set_frame (Frame* frame, const char* name,
 		       Frame* value)
-{ frame->add (name, *value); }
+{ 
+  if (frame->lookup (name) == Value::AList)
+    frame->add (name, dynamic_cast<const FrameSubmodel&> (*value)); 
+  else
+    frame->add (name, dynamic_cast<const FrameModel&> (*value)); 
+}
 
 #ifdef UNINPLEMENTED
 extern "C" unsigned int EXPORT
@@ -228,7 +233,12 @@ daisy_frame_get_number_at (const Frame* frame, const char* name,
 extern "C" const Frame* EXPORT
 daisy_frame_get_frame_at (const Frame* frame, const char* name,
 			  unsigned int index)
-{ return frame->frame_sequence (name)[index]; }
+{ 
+  if (frame->lookup (name) == Value::Object)
+    return frame->model_sequence (name)[index]; 
+  else
+    return frame->submodel_sequence (name)[index]; 
+}
 
 #ifdef UNINPLEMENTED
 extern "C" void EXPORT
