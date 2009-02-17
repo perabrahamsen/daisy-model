@@ -63,8 +63,8 @@ USE_OPTIMIZE = true
 
 # Set USE_PROFILE if you want to profile the executable
 #
-USE_PROFILE = true
-#USE_PROFILE = false
+#USE_PROFILE = true
+USE_PROFILE = false
 
 # Set COMPILER according to which compiler you use.
 #	sun		Use the unbundled sun compiler.

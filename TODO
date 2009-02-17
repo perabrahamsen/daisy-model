@@ -1,6 +1,14 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* submodeller: fjern "f".
+* ominit
+
+** Prøv tabbing for 4 figurer.
+
+figure*
+
+legend none
+
+** 
 
 * Frame
 

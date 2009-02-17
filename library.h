@@ -71,7 +71,6 @@ public:
   symbol name () const;
   symbol description () const;
   const FrameModel& model (symbol) const;
-  Frame& frame (symbol) const;
   bool check (symbol) const;
   bool complete (Metalib&, symbol) const;
   void add_model (symbol, FrameModel&);

@@ -1,34 +1,106 @@
-%GNUPLOT: LaTeX picture with Postscript
-\begin{picture}(0,0)%
-\includegraphics{abioticYear}%
-\end{picture}%
+% GNUPLOT: LaTeX picture with Postscript
 \begingroup
-\setlength{\unitlength}{0.0200bp}%
-\begin{picture}(18000,10800)(0,0)%
-\put(2200,2750){\makebox(0,0)[r]{\strut{} 0}}%
-\put(2200,3750){\makebox(0,0)[r]{\strut{} 0.2}}%
-\put(2200,4750){\makebox(0,0)[r]{\strut{} 0.4}}%
-\put(2200,5750){\makebox(0,0)[r]{\strut{} 0.6}}%
-\put(2200,6750){\makebox(0,0)[r]{\strut{} 0.8}}%
-\put(2200,7750){\makebox(0,0)[r]{\strut{} 1}}%
-\put(2200,8750){\makebox(0,0)[r]{\strut{} 1.2}}%
-\put(2200,9750){\makebox(0,0)[r]{\strut{} 1.4}}%
-\put(2475,2200){\makebox(0,0){\strut{}01}}%
-\put(3744,2200){\makebox(0,0){\strut{}02}}%
-\put(4933,2200){\makebox(0,0){\strut{}03}}%
-\put(6162,2200){\makebox(0,0){\strut{}04}}%
-\put(7392,2200){\makebox(0,0){\strut{}05}}%
-\put(8620,2200){\makebox(0,0){\strut{}06}}%
-\put(9850,2200){\makebox(0,0){\strut{}07}}%
-\put(11079,2200){\makebox(0,0){\strut{}08}}%
-\put(12349,2200){\makebox(0,0){\strut{}09}}%
-\put(13577,2200){\makebox(0,0){\strut{}10}}%
-\put(14807,2200){\makebox(0,0){\strut{}11}}%
-\put(16036,2200){\makebox(0,0){\strut{}12}}%
-\put(550,6500){\rotatebox{90}{\makebox(0,0){\strut{}Abiotic factor}}}%
-\put(9825,1375){\makebox(0,0){\strut{}Month}}%
-\put(6300,275){\makebox(0,0)[l]{\strut{}JB1}}%
-\put(14750,275){\makebox(0,0)[l]{\strut{}JB6}}%
-\end{picture}%
+  \makeatletter
+  \providecommand\color[2][]{%
+    \GenericError{(gnuplot) \space\space\space\@spaces}{%
+      Package color not loaded in conjunction with
+      terminal option `colourtext'%
+    }{See the gnuplot documentation for explanation.%
+    }{Either use 'blacktext' in gnuplot or load the package
+      color.sty in LaTeX.}%
+    \renewcommand\color[2][]{}%
+  }%
+  \providecommand\includegraphics[2][]{%
+    \GenericError{(gnuplot) \space\space\space\@spaces}{%
+      Package graphicx or graphics not loaded%
+    }{See the gnuplot documentation for explanation.%
+    }{The gnuplot epslatex terminal needs graphicx.sty or graphics.sty.}%
+    \renewcommand\includegraphics[2][]{}%
+  }%
+  \providecommand\rotatebox[2]{#2}%
+  \@ifundefined{ifGPcolor}{%
+    \newif\ifGPcolor
+    \GPcolorfalse
+  }{}%
+  \@ifundefined{ifGPblacktext}{%
+    \newif\ifGPblacktext
+    \GPblacktexttrue
+  }{}%
+  % define a \g@addto@macro without @ in the name:
+  \let\gplgaddtomacro\g@addto@macro
+  % define empty templates for all commands taking text:
+  \gdef\gplbacktext{}%
+  \gdef\gplfronttext{}%
+  \makeatother
+  \ifGPblacktext
+    % no textcolor at all
+    \def\colorrgb#1{}%
+    \def\colorgray#1{}%
+  \else
+    % gray or color?
+    \ifGPcolor
+      \def\colorrgb#1{\color[rgb]{#1}}%
+      \def\colorgray#1{\color[gray]{#1}}%
+      \expandafter\def\csname LTw\endcsname{\color{white}}%
+      \expandafter\def\csname LTb\endcsname{\color{black}}%
+      \expandafter\def\csname LTa\endcsname{\color{black}}%
+      \expandafter\def\csname LT0\endcsname{\color[rgb]{1,0,0}}%
+      \expandafter\def\csname LT1\endcsname{\color[rgb]{0,1,0}}%
+      \expandafter\def\csname LT2\endcsname{\color[rgb]{0,0,1}}%
+      \expandafter\def\csname LT3\endcsname{\color[rgb]{1,0,1}}%
+      \expandafter\def\csname LT4\endcsname{\color[rgb]{0,1,1}}%
+      \expandafter\def\csname LT5\endcsname{\color[rgb]{1,1,0}}%
+      \expandafter\def\csname LT6\endcsname{\color[rgb]{0,0,0}}%
+      \expandafter\def\csname LT7\endcsname{\color[rgb]{1,0.3,0}}%
+      \expandafter\def\csname LT8\endcsname{\color[rgb]{0.5,0.5,0.5}}%
+    \else
+      % gray
+      \def\colorrgb#1{\color{black}}%
+      \def\colorgray#1{\color[gray]{#1}}%
+      \expandafter\def\csname LTw\endcsname{\color{white}}%
+      \expandafter\def\csname LTb\endcsname{\color{black}}%
+      \expandafter\def\csname LTa\endcsname{\color{black}}%
+      \expandafter\def\csname LT0\endcsname{\color{black}}%
+      \expandafter\def\csname LT1\endcsname{\color{black}}%
+      \expandafter\def\csname LT2\endcsname{\color{black}}%
+      \expandafter\def\csname LT3\endcsname{\color{black}}%
+      \expandafter\def\csname LT4\endcsname{\color{black}}%
+      \expandafter\def\csname LT5\endcsname{\color{black}}%
+      \expandafter\def\csname LT6\endcsname{\color{black}}%
+      \expandafter\def\csname LT7\endcsname{\color{black}}%
+      \expandafter\def\csname LT8\endcsname{\color{black}}%
+    \fi
+  \fi
+  \setlength{\unitlength}{0.0500bp}%
+  \begin{picture}(5760.00,3024.00)%
+    \gplgaddtomacro\gplbacktext{%
+      \csname LTb\endcsname%
+      \put(1034,440){\makebox(0,0)[r]{\strut{} 0}}%
+      \put(1034,749){\makebox(0,0)[r]{\strut{} 0.2}}%
+      \put(1034,1059){\makebox(0,0)[r]{\strut{} 0.4}}%
+      \put(1034,1368){\makebox(0,0)[r]{\strut{} 0.6}}%
+      \put(1034,1677){\makebox(0,0)[r]{\strut{} 0.8}}%
+      \put(1034,1987){\makebox(0,0)[r]{\strut{} 1}}%
+      \put(1034,2296){\makebox(0,0)[r]{\strut{} 1.2}}%
+      \put(1034,2605){\makebox(0,0)[r]{\strut{} 1.4}}%
+      \put(1166,220){\makebox(0,0){\strut{}01}}%
+      \put(1542,220){\makebox(0,0){\strut{}02}}%
+      \put(1894,220){\makebox(0,0){\strut{}03}}%
+      \put(2257,220){\makebox(0,0){\strut{}04}}%
+      \put(2622,220){\makebox(0,0){\strut{}05}}%
+      \put(2985,220){\makebox(0,0){\strut{}06}}%
+      \put(3349,220){\makebox(0,0){\strut{}07}}%
+      \put(3713,220){\makebox(0,0){\strut{}08}}%
+      \put(4089,220){\makebox(0,0){\strut{}09}}%
+      \put(4453,220){\makebox(0,0){\strut{}10}}%
+      \put(4817,220){\makebox(0,0){\strut{}11}}%
+      \put(5181,220){\makebox(0,0){\strut{}12}}%
+      \put(484,1600){\rotatebox{90}{\makebox(0,0){\strut{}}}}%
+    }%
+    \gplgaddtomacro\gplfronttext{%
+    }%
+    \gplbacktext
+    \put(0,0){\includegraphics{abioticYear}}%
+    \gplfronttext
+  \end{picture}%
 \endgroup
-\endinput

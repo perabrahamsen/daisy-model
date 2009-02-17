@@ -68,8 +68,8 @@ Library::Implementation::model (const symbol key) const
   frame_map::const_iterator i = frames.find (key);
 
   if (i == frames.end ())
-    daisy_panic ("Model '" + key.name ()
-                 + "' not in library '" + name.name () + "'");
+    daisy_panic ("Model '" + key.name () + "' not in library '" 
+                 + name.name () + "'");
   return *(*i).second;
 }
 
@@ -104,6 +104,10 @@ Library::Implementation::add_ancestors (const symbol key)
 
   while (true)
     {
+      if (all.find (current) != all.end ())
+        daisy_panic ("Cyclic inheritence '" + current 
+                     + "' for '" + key + "' in library '" + name + "'");
+
       all.insert (current);
 
       if (!check (current))
@@ -211,10 +215,6 @@ Library::description () const
 const FrameModel& 
 Library::model (const symbol key) const
 { return impl->model (key); }
-
-Frame& 
-Library::frame (const symbol key) const
-{ return impl->frame (key); }
 
 bool
 Library::check (const symbol key) const

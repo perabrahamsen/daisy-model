@@ -1,0 +1,112 @@
+(defgnuplot ominit time
+  "Plots for the ominit article."
+  (size 0.85 0.6)
+  (legend none)
+  (device epslatex))
+  
+(defgnuplot Humus ominit
+  "Plot humus and SOM1 fraction."
+  (size 0.85 0.6)
+  (declare soil String
+           "Name of soil to plot.")
+  (declare input String
+           "Name of input level to plot.")
+  (ymin 0) (ymax 1.2) (y2min 20) (y2max 80)
+  (extra "set format x \"%Y\"" "set xtics 100 * 365.2425 * 24 *60 * 60 # 100 years" 
+         "set mxtics 0"
+         "unset ylabel"
+         "unset y2label")
+  (begin 2000 1 1 0) (end 2600 1 1 0)
+  (source (arithmetic (file "sim/lang ${soil} Real ${input}/organic-matter.dlf") 
+                      (title "Humus")
+                      (expr (dim (/ (* (/ (+ SOM1-C SOM2-C SOM3-C SMB1-C SMB2-C)
+                                          15300000[kg/ha])
+                                       100[%])
+                                    0.587[])
+                                 [Humus (\%)])
+                            )
+                      )
+	  (arithmetic (file "sim/lang ${soil} Real ${input}/organic-matter.dlf") 
+		      (title "SOM1")
+		      (expr (dim (* (/ (SOM1-C)
+				       (+ SOM1-C SOM2-C SOM3-C))
+				    100[%])
+				 [SOM1 (\%)])
+			    )
+		      )
+	  
+	  (arithmetic (file "sim/lang ${soil} Real ${input}/mappe1.ddf")
+                      (expr (dim "SOM1%" [SOM1 (\%)]))
+                      (title "SOM1 quasi-equilibrium")
+                      (with points)
+                      )))
+ 
+(defgnuplot abioticYear ominit
+  "Plot abiotic factor over a year."
+  (size 0.8 0.6)
+  (ymin 0) (ymax 1.5)
+  (extra "set format x \"%m\"" 
+         ;;"set ylabel \"Abiotic factor\""
+         ;;"set xlabel \"Month\"" 
+         "set mxtics 0" 
+         ;;"set key below Left reverse"
+         )
+   
+  (begin 2000 1 1 0) (end 2000 12 30 0)
+  (source (arithmetic (file "sim/abiotic factor/abioticYear.ddf")
+                      (expr JB1)
+                      (title "JB1")
+                      (with points))
+	(arithmetic (file "sim/abiotic factor/abioticYear.ddf")
+                    (expr JB6)
+                    (title "JB6")
+                    (style 6)
+                    (with points))))  
+
+(defgnuplot abiotic30 ominit
+  "Plot abiotic factor over 30 years."
+  (size 0.8 0.6)
+  (ymin 0.3) (ymax 0.9)
+  ;;(legend below)
+  (extra "set format x \"%Y\"" 
+         "set xtics 5 * 365.2425 * 24 *60 * 60 # 5 years" 
+         ;;"set xlabel \"Year\"" 
+         "set mxtics 0" 
+         ;;"set key below Left reverse"
+         ;;"set ylabel \"Abiotic factor\""
+         )
+   
+  (begin 2000 1 1 0) (end 2030 1 1 0)
+  (source (arithmetic (file "sim/abiotic factor/abiotic30.ddf")
+	  	(expr JB1)
+	  	(title "JB1")
+	  	(with points))
+          (arithmetic (file "sim/abiotic factor/abiotic30.ddf")
+		(expr JB6)
+		(title "JB6")
+		(style 6)
+	  	(with points))
+          (arithmetic (file "sim/abiotic factor/abioticTusind.ddf")
+		(expr JB1)
+	  	(title "JB1-average")
+	  	(with line))
+          (arithmetic (file "sim/abiotic factor/abioticTusind.ddf")
+		(expr JB6)
+		(title "JB6-average")
+		(with line))))
+
+(defgnuplot "All" multi
+  (graph (Humus (soil "JB1") (input "Min") (where "realminJB1.eps"))
+         (Humus (soil "JB1") (input "Org3") (where "realorgJB1.eps"))
+         (Humus (soil "JB6") (input "Min") (where "realminJB6.eps"))
+         (Humus (soil "JB6") (input "Org3") (where "realorgJB6.eps"))
+         (Humus (soil "JB1") (input "medium") (where "realmediumJB1.eps"))
+         (abioticYear (where "abioticYear.eps"))
+         (abiotic30 (where "abiotic30.eps"))
+         ))
+  
+(defprogram "Figure" gnuplot
+  (graph ("All")))
+
+  
+(run (batch (run "Figure")))

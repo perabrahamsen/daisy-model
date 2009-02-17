@@ -1,41 +1,106 @@
-%GNUPLOT: LaTeX picture with Postscript
-\begin{picture}(0,0)%
-\includegraphics{realmediumJB1}%
-\end{picture}%
+% GNUPLOT: LaTeX picture with Postscript
 \begingroup
-\setlength{\unitlength}{0.0200bp}%
-\begin{picture}(18000,10800)(0,0)%
-\put(2200,3300){\makebox(0,0)[r]{\strut{} 0}}%
-\put(2200,4458){\makebox(0,0)[r]{\strut{} 0.2}}%
-\put(2200,5617){\makebox(0,0)[r]{\strut{} 0.4}}%
-\put(2200,6775){\makebox(0,0)[r]{\strut{} 0.6}}%
-\put(2200,7933){\makebox(0,0)[r]{\strut{} 0.8}}%
-\put(2200,9092){\makebox(0,0)[r]{\strut{} 1}}%
-\put(2200,10250){\makebox(0,0)[r]{\strut{} 1.2}}%
-\put(2475,2750){\makebox(0,0){\strut{}2000}}%
-\put(3808,2750){\makebox(0,0){\strut{}2100}}%
-\put(5140,2750){\makebox(0,0){\strut{}2200}}%
-\put(6473,2750){\makebox(0,0){\strut{}2300}}%
-\put(7805,2750){\makebox(0,0){\strut{}2400}}%
-\put(9138,2750){\makebox(0,0){\strut{}2500}}%
-\put(10470,2750){\makebox(0,0){\strut{}2600}}%
-\put(11803,2750){\makebox(0,0){\strut{}2700}}%
-\put(13135,2750){\makebox(0,0){\strut{}2800}}%
-\put(14468,2750){\makebox(0,0){\strut{}2900}}%
-\put(15800,2750){\makebox(0,0){\strut{}3000}}%
-\put(16075,3300){\makebox(0,0)[l]{\strut{} 20}}%
-\put(16075,4458){\makebox(0,0)[l]{\strut{} 30}}%
-\put(16075,5617){\makebox(0,0)[l]{\strut{} 40}}%
-\put(16075,6775){\makebox(0,0)[l]{\strut{} 50}}%
-\put(16075,7933){\makebox(0,0)[l]{\strut{} 60}}%
-\put(16075,9092){\makebox(0,0)[l]{\strut{} 70}}%
-\put(16075,10250){\makebox(0,0)[l]{\strut{} 80}}%
-\put(550,6775){\rotatebox{90}{\makebox(0,0){\strut{}Humus (\%)}}}%
-\put(17449,6775){\rotatebox{90}{\makebox(0,0){\strut{}SOM1 (\%)}}}%
-\put(9137,1925){\makebox(0,0){\strut{}Year}}%
-\put(3687,825){\makebox(0,0)[l]{\strut{}Humus}}%
-\put(3687,275){\makebox(0,0)[l]{\strut{}SOM1}}%
-\put(12137,825){\makebox(0,0)[l]{\strut{}SOM1 quasi-equilibrium}}%
-\end{picture}%
+  \makeatletter
+  \providecommand\color[2][]{%
+    \GenericError{(gnuplot) \space\space\space\@spaces}{%
+      Package color not loaded in conjunction with
+      terminal option `colourtext'%
+    }{See the gnuplot documentation for explanation.%
+    }{Either use 'blacktext' in gnuplot or load the package
+      color.sty in LaTeX.}%
+    \renewcommand\color[2][]{}%
+  }%
+  \providecommand\includegraphics[2][]{%
+    \GenericError{(gnuplot) \space\space\space\@spaces}{%
+      Package graphicx or graphics not loaded%
+    }{See the gnuplot documentation for explanation.%
+    }{The gnuplot epslatex terminal needs graphicx.sty or graphics.sty.}%
+    \renewcommand\includegraphics[2][]{}%
+  }%
+  \providecommand\rotatebox[2]{#2}%
+  \@ifundefined{ifGPcolor}{%
+    \newif\ifGPcolor
+    \GPcolorfalse
+  }{}%
+  \@ifundefined{ifGPblacktext}{%
+    \newif\ifGPblacktext
+    \GPblacktexttrue
+  }{}%
+  % define a \g@addto@macro without @ in the name:
+  \let\gplgaddtomacro\g@addto@macro
+  % define empty templates for all commands taking text:
+  \gdef\gplbacktext{}%
+  \gdef\gplfronttext{}%
+  \makeatother
+  \ifGPblacktext
+    % no textcolor at all
+    \def\colorrgb#1{}%
+    \def\colorgray#1{}%
+  \else
+    % gray or color?
+    \ifGPcolor
+      \def\colorrgb#1{\color[rgb]{#1}}%
+      \def\colorgray#1{\color[gray]{#1}}%
+      \expandafter\def\csname LTw\endcsname{\color{white}}%
+      \expandafter\def\csname LTb\endcsname{\color{black}}%
+      \expandafter\def\csname LTa\endcsname{\color{black}}%
+      \expandafter\def\csname LT0\endcsname{\color[rgb]{1,0,0}}%
+      \expandafter\def\csname LT1\endcsname{\color[rgb]{0,1,0}}%
+      \expandafter\def\csname LT2\endcsname{\color[rgb]{0,0,1}}%
+      \expandafter\def\csname LT3\endcsname{\color[rgb]{1,0,1}}%
+      \expandafter\def\csname LT4\endcsname{\color[rgb]{0,1,1}}%
+      \expandafter\def\csname LT5\endcsname{\color[rgb]{1,1,0}}%
+      \expandafter\def\csname LT6\endcsname{\color[rgb]{0,0,0}}%
+      \expandafter\def\csname LT7\endcsname{\color[rgb]{1,0.3,0}}%
+      \expandafter\def\csname LT8\endcsname{\color[rgb]{0.5,0.5,0.5}}%
+    \else
+      % gray
+      \def\colorrgb#1{\color{black}}%
+      \def\colorgray#1{\color[gray]{#1}}%
+      \expandafter\def\csname LTw\endcsname{\color{white}}%
+      \expandafter\def\csname LTb\endcsname{\color{black}}%
+      \expandafter\def\csname LTa\endcsname{\color{black}}%
+      \expandafter\def\csname LT0\endcsname{\color{black}}%
+      \expandafter\def\csname LT1\endcsname{\color{black}}%
+      \expandafter\def\csname LT2\endcsname{\color{black}}%
+      \expandafter\def\csname LT3\endcsname{\color{black}}%
+      \expandafter\def\csname LT4\endcsname{\color{black}}%
+      \expandafter\def\csname LT5\endcsname{\color{black}}%
+      \expandafter\def\csname LT6\endcsname{\color{black}}%
+      \expandafter\def\csname LT7\endcsname{\color{black}}%
+      \expandafter\def\csname LT8\endcsname{\color{black}}%
+    \fi
+  \fi
+  \setlength{\unitlength}{0.0500bp}%
+  \begin{picture}(6120.00,3024.00)%
+    \gplgaddtomacro\gplbacktext{%
+      \csname LTb\endcsname%
+      \put(1034,440){\makebox(0,0)[r]{\strut{} 0}}%
+      \put(1034,827){\makebox(0,0)[r]{\strut{} 0.2}}%
+      \put(1034,1213){\makebox(0,0)[r]{\strut{} 0.4}}%
+      \put(1034,1600){\makebox(0,0)[r]{\strut{} 0.6}}%
+      \put(1034,1987){\makebox(0,0)[r]{\strut{} 0.8}}%
+      \put(1034,2373){\makebox(0,0)[r]{\strut{} 1}}%
+      \put(1034,2760){\makebox(0,0)[r]{\strut{} 1.2}}%
+      \put(1166,220){\makebox(0,0){\strut{}2000}}%
+      \put(1841,220){\makebox(0,0){\strut{}2100}}%
+      \put(2517,220){\makebox(0,0){\strut{}2200}}%
+      \put(3192,220){\makebox(0,0){\strut{}2300}}%
+      \put(3867,220){\makebox(0,0){\strut{}2400}}%
+      \put(4543,220){\makebox(0,0){\strut{}2500}}%
+      \put(5218,220){\makebox(0,0){\strut{}2600}}%
+      \put(5350,440){\makebox(0,0)[l]{\strut{} 20}}%
+      \put(5350,827){\makebox(0,0)[l]{\strut{} 30}}%
+      \put(5350,1213){\makebox(0,0)[l]{\strut{} 40}}%
+      \put(5350,1600){\makebox(0,0)[l]{\strut{} 50}}%
+      \put(5350,1987){\makebox(0,0)[l]{\strut{} 60}}%
+      \put(5350,2373){\makebox(0,0)[l]{\strut{} 70}}%
+      \put(5350,2760){\makebox(0,0)[l]{\strut{} 80}}%
+    }%
+    \gplgaddtomacro\gplfronttext{%
+    }%
+    \gplbacktext
+    \put(0,0){\includegraphics{realmediumJB1}}%
+    \gplfronttext
+  \end{picture}%
 \endgroup
-\endinput

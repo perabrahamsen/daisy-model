@@ -50,6 +50,10 @@ Gnuplot::~Gnuplot ()
 
 static struct GnuplotInit : public DeclareComponent 
 {
+  void load_frame (Frame& frame) const
+  { 
+    Model::load_model (frame);
+  }
   GnuplotInit ()
     : DeclareComponent (Gnuplot::component, "\
 Plot a graph with gnuplot.")

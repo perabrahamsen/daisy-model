@@ -115,8 +115,8 @@ std::vector<T*>
 map_submodel (Block& parent, const std::string& key)
 { 
   std::vector<T*> t;
-  const std::vector<const FrameSubmodel*> f (parent.submodel_sequence (key));
-  for (size_t i = 0; i < f.size (); i++)
+  const size_t size = parent.value_size (key);
+  for (size_t i = 0; size; i++)
     {
       BlockSubmodel nested (parent, key, i);
       t.push_back (submodel_block<T> (nested));
@@ -129,8 +129,8 @@ std::vector<const T*>
 map_submodel_const (Block& parent, const std::string& key)
 { 
   std::vector<const T*> t;
-  const std::vector<const FrameSubmodel*> f (parent.submodel_sequence (key));
-  for (size_t i = 0; i < f.size (); i++)
+  const size_t size = parent.value_size (key);
+  for (size_t i = 0; i < size; i++)
     {
       BlockSubmodel nested (parent, key, i);
       t.push_back (submodel_block<T> (nested));
