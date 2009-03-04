@@ -637,7 +637,11 @@ ColumnStandard::tick (Metalib& metalib, const Time& time, const double dt,
   chemistry->tick_top (bioclimate->snow_leak_rate (dt), vegetation->cover (),
                        bioclimate->canopy_leak_rate (dt), 
                        surface.runoff_rate (dt),
-                       bioclimate->direct_rain (), dt, msg);
+                       bioclimate->get_snow_storage () + surface.ponding (),
+                       my_weather.rain (),
+                       bioclimate->direct_rain (), 
+                       vegetation->height () * 0.01 /* [m] */,
+                       dt, msg);
 
   // Turnover.
   organic_matter->tick (geometry, *soil_water, *soil_heat, 

@@ -33,9 +33,11 @@ Reaction::library_id () const
   return id;
 }
 
-void
-Reaction::tick_top (const double direct_rain, 
-                    Chemistry&, const double dt, Treelog&)
+void 
+Reaction::tick_top (const double total_rain, const double direct_rain,
+                    const double cover, const double h_veg, 
+                    const double h_pond,
+                    Chemistry& chemistry, const double dt, Treelog&)
 { }
 
 void 

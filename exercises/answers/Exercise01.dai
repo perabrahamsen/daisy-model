@@ -4,7 +4,7 @@
 ;;  If the working directory is set correctly the log-file will be found here
 (directory "C:/DaisySim/Exercise/01")
 ;;  Setting search path for library-files 
-(path "." "C:/Daisy/Lib" "C:/Daisy/Weather")
+;;(path "." "C:/Daisy/Lib" "C:/Daisy/Weather")
 
 ;; Including external library-files
 (input file "tillage.dai")

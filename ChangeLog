@@ -1,3 +1,14 @@
+2009-03-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* ponddamp.h, ponddamp.C: New component.
+	* reaction_Styczen88.C: New model.
+	* Makefile (COMPONENTS, MODELS): Added.
+
+2009-02-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* exercises/Exercise01.dai (SBarley_management): Fix fertilize.
+	* exercises: Remove path.
+
 2009-02-12  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* library.C, library.h (Library::frame): Removed unused function.

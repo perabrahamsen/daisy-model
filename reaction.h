@@ -44,8 +44,10 @@ public:
 
   // Simulation.
 public:
-  virtual void tick_top (const double direct_rain, 
-                         Chemistry&, const double dt, Treelog&);
+  virtual void  tick_top (const double total_rain, const double direct_rain,
+                          const double cover, const double h_veg, 
+                          const double h_pond,
+                          Chemistry& chemistry, const double dt, Treelog&);
   virtual void tick (const Units& units, 
                      const Geometry&, const Soil&, const SoilWater&,
 		     const SoilHeat&, const OrganicMatter&, Chemistry&,

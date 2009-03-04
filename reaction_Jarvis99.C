@@ -59,8 +59,10 @@ struct ReactionJarvis99 : public Reaction
   static const double R_to_E (const double R /* [mm W/h] */); // [J/cm^2/mm]
   void colloid_generation (const double Rain_intensity /* [mm W/h] */,
                            const double dt /* [h] */);
-  void tick_top (const double direct_rain, 
-                 Chemistry& chemistry, const double dt, Treelog&);
+  void tick_top (const double total_rain, const double direct_rain,
+                  const double cover, const double h_veg, 
+                  const double h_pond,
+                  Chemistry& chemistry, const double dt, Treelog&);
                            
   void output (Log& log) const;
 
@@ -100,8 +102,10 @@ ReactionJarvis99::colloid_generation (const double Rain_intensity, // [mm/h]
 }
 
 void 
-ReactionJarvis99::tick_top (const double direct_rain,
-                         Chemistry& chemistry, const double dt, Treelog&)
+ReactionJarvis99::tick_top (const double total_rain, const double direct_rain,
+                            const double cover, const double h_veg, 
+                            const double h_pond,
+                            Chemistry& chemistry, const double dt, Treelog&)
 {
   Chemical& colloid = chemistry.find (colloid_name);
   

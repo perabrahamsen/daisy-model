@@ -70,7 +70,10 @@ struct ChemistryStandard : public Chemistry
                  const double cover, // [],
                  const double canopy_leak_rate, // [h^-1]
                  const double surface_runoff_rate, // [h^-1]
+                 const double surface_water /* [mm] */,
+                 const double total_rain /* [mm/h] */,
                  const double direct_rain, // [mm/h]
+                 const double h_veg /* [m] */,
                  const double dt, // [h]
 		 Treelog&);
   void infiltrate (const Geometry&, 
@@ -223,12 +226,16 @@ ChemistryStandard::tick_top (const double snow_leak_rate, // [h^-1]
                              const double cover, // [],
                              const double canopy_leak_rate, // [h^-1]
                              const double surface_runoff_rate, // [h^-1]
+                             const double surface_water /* [mm] */,
+                             const double total_rain /* [mm/h] */,
                              const double direct_rain, // [mm/h]
+                             const double h_veg /* [m] */,
                              const double dt, // [h]
 			     Treelog& msg) 
 {
   for (size_t r = 0; r < reactions.size (); r++)
-    reactions[r]->tick_top  (direct_rain, *this, dt, msg);
+    reactions[r]->tick_top  (total_rain, direct_rain, cover, h_veg,
+                             surface_water, *this, dt, msg);
 
   for (size_t c = 0; c < chemicals.size (); c++)
     chemicals[c]->tick_top (snow_leak_rate, cover, canopy_leak_rate, 
