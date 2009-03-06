@@ -44,7 +44,7 @@ private:
 public:
   virtual double min_PAR () const; // Minimumm PAR at top of canopy. [W/m^2]
   virtual double assimilate (const Units& units,
-                             const double ABA_xylem, const double rel_hum, 
+                             const double ABA_xylem, const double psi_c, const double rel_hum, 
 			     const double CO2_atm, double Ta, double Tc, double Tl, 
 			     const double cropN,
                              const std::vector<double>& PAR,

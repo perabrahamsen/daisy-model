@@ -101,7 +101,7 @@ private:
 		       const double rd, Treelog& msg) const = 0;
 public:
   double assimilate (const Units&, 
-                     const double ABA_xylem, const double rel_hum, 
+                     const double ABA_xylem, const double psi_c, const double rel_hum, 
 		     const double CO2_atm, double Ta, double Tc, double Tl,
                      const double cropN,
 		     const std::vector<double>& PAR,

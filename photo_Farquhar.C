@@ -170,7 +170,7 @@ PhotoFarquhar::stomata_conductance() const
 
 double
 PhotoFarquhar::assimilate (const Units& units,
-                           const double ABA_xylem, const double rel_hum, 
+                           const double ABA_xylem, const double psi_c, const double rel_hum, 
 			   const double CO2_atm,
 			   const double, const double Tc, const double Tl,
                            const double cropN,
@@ -282,10 +282,9 @@ PhotoFarquhar::assimilate (const Units& units,
 	  const double vmax25 = crop_Vm_total[i]*fraction[i];//[mol/m²leaf/s/fracti.]
 	  daisy_assert (vmax25 >= 0.0);
 
-	  // Photosynthetic effect of Xylem ABA.
-	  ABA_effect = ABAeffect->ABA_effect(ABA_xylem, msg);//[unitless]
-          //daisy_assert (ABA_effect == 1.0);
-
+	  // Photosynthetic effect of Xylem ABA and crown water potential.
+	  ABA_effect = ABAeffect->ABA_effect(ABA_xylem, psi_c,  msg);//[unitless]
+          
 	  // leaf respiration
 	  const double rd = respiration_rate(vmax25, Tl);
 	  daisy_assert (rd >= 0.0);
@@ -467,7 +466,7 @@ Xn = 1.16E-3 mol/mol/s for wheat (de Pury & Farquhar, 1997)");
 
     //log variables
     frame.add ("ABA_effect", Value::None (), Value::LogOnly,
-                "Water stress effect induced by ABA");
+                "Water stress effect induced by ABA and crown water potential");
     frame.add ("ci_vector", "Pa", Value::LogOnly, Value::Sequence, "CO2 pressure in Stomatal in each layer.");
     frame.add ("Vm_vector", "mmol/m^2/s", Value::LogOnly, Value::Sequence, "Photosynthetic capacity in each layer.");
     frame.add ("Jm_vector", "mmol/m^2/s", Value::LogOnly, Value::Sequence, "Potential rate of electron transport in each layer.");

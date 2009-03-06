@@ -65,7 +65,7 @@ StomataCon_SHA::stomata_con (const double wsf /*[]*/,
                              const double, const double intercept /*[mol/m²leaf/s]*/,
                              const double CO2_atm, const double, Treelog&)
 {
-  const double gsw = wsf * (M * pow(hs, alpha) * pow(pz/Amax, lambda))/(cs/CO2_atm) 
+  const double gsw = wsf * (M * pow(hs, alpha) * pow(pz, lambda))/(cs) 
                      + intercept;
   
   daisy_assert (gsw >= 0.0);
@@ -86,17 +86,11 @@ static struct StomataConSHASyntax : public DeclareModel
     frame.add ("lambda", Value::None (), Check::non_negative (), Value::Const,
                 "Coefficient");
     frame.add ("lambda", 1.0);
-
     frame.add ("alpha", Value::None (), Check::non_negative (), Value::Const,
                 "Coefficient");
     frame.add ("alpha", 1.0);
-
-    frame.add ("Amax", "[mol/m²leaf/s]", Check::non_negative (), Value::Const,
-                "Max photosynthesis");
-    frame.add ("Amax", 1.0);
-
     frame.add ("M", "[mol/m²leaf/s]", Check::non_negative (), Value::Const,
-                "Parameter ??");
+	       "Parameter ??");
     frame.add ("M", 1.0);
 
   }

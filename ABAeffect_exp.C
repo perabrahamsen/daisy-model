@@ -33,10 +33,11 @@ struct ABAEffect_exp : public ABAEffect
   // Parameters.
 private:
   const double k;  //Coefficient
+  const double l;  //Coefficient
   const double alpha;  //Coefficient
   
   // Simulation.
-  double ABA_effect (const double ABA_xylem /* [g/cm^3] */,
+  double ABA_effect (const double ABA_xylem /* [g/cm^3] */, const double psi_c /* [cm] */,
 		     Treelog& msg);	    // []
   void output (Log&) const
   { }
@@ -46,19 +47,21 @@ private:
   ABAEffect_exp (Block& al)
     : ABAEffect (al),
       k (al.number ("k")),
+      l (al.number ("l")),
       alpha (al.number ("alpha"))
-
   { }
 };
 
 double
-ABAEffect_exp::ABA_effect (const double ABA_xylem /* [g/cm^3] */, Treelog&)
+ABAEffect_exp::ABA_effect (const double ABA_xylem /* [g/cm^3] */, const double psi_c /* [cm] */, Treelog&)
 {
   daisy_assert (ABA_xylem >= 0.0);
   //  const double Mw = 264.32; //Molecular weight of ABA (Abscisic Acid)[g mol^-1]
   const double ABA_xylem_ = ABA_xylem; // [g/cm^3]
   const double ABAeffect = alpha * exp(-k * ABA_xylem_); //[]
-  return ABAeffect;
+  const double psi_c_effect =  exp(-l * psi_c * 1.0e-4 /*MPa*/); //[]
+  const double WaterStressFactor =ABAeffect * psi_c_effect;
+  return WaterStressFactor;
 }
 
 static struct ABAEffectexpSyntax : public DeclareModel
@@ -70,13 +73,16 @@ static struct ABAEffectexpSyntax : public DeclareModel
     frame.add ("k", "cm^3/g", Check::non_negative (), Value::Const,
                 "Coefficient");
     frame.add ("k", 0.0);
+    frame.add ("l", "MPa^-1", Check::non_negative (), Value::Const,
+                "Coefficient");
+    frame.add ("l", 0.0);
     frame.add ("alpha", Value::None(), Check::non_negative (), Value::Const,
                 "Coefficient");
     frame.add ("alpha", 1.0);
   }  
   ABAEffectexpSyntax ()
     : DeclareModel (ABAEffect::component, "ABA-exp", "\
-Exponential curve for ABA-xylem effect on photosynthesis.")
+Exponential curve for ABA-xylem and crown water potential on photosynthesis.")
   { }
 } ABAEffectexpsyntax;
 

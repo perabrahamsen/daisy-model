@@ -38,7 +38,7 @@ public:
   // Simulation.
 public:
   virtual void output (Log&) const = 0;
-  virtual double ABA_effect (const double ABA_xylem /* [g/cm^3] */,
+  virtual double ABA_effect (const double ABA_xylem /* [g/cm^3] */, const double psi_c /*[cm]*/,
 			     Treelog& msg) = 0;	    // []
   // Create and Destroy.
 protected:
