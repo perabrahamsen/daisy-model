@@ -965,6 +965,8 @@ ui_Qt_run${OBJ}: ui_Qt_run.C ui_Qt_run.h ui_Qt.h ui.h model.h symbol.h \
 ui_Qt${OBJ}: ui_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h librarian.h \
   block.h value.h assertion.h
 main_Qt${OBJ}: main_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h
+rainergy${OBJ}: rainergy.C rainergy.h model.h symbol.h mathlib.h assertion.h \
+  librarian.h block.h value.h frame.h scope.h
 ponddamp${OBJ}: ponddamp.C ponddamp.h model.h symbol.h mathlib.h assertion.h \
   librarian.h block.h value.h frame.h scope.h
 scope_model${OBJ}: scope_model.C scope_model.h scope.h value.h symbol.h \
@@ -1426,7 +1428,7 @@ svat_ssoc${OBJ}: svat_ssoc.C svat.h model.h symbol.h block.h value.h \
 reaction_Jarvis99${OBJ}: reaction_Jarvis99.C reaction.h model.h symbol.h \
   mathlib.h assertion.h check.h block.h value.h librarian.h chemistry.h \
   chemical.h log.h time.h border.h geometry.h soil.h treelog.h frame.h \
-  scope.h
+  scope.h rainergy.h
 reaction_filter${OBJ}: reaction_filter.C reaction.h model.h symbol.h block.h \
   value.h transform.h chemistry.h chemical.h soil.h soil_water.h log.h \
   time.h border.h assertion.h librarian.h check.h mathlib.h treelog.h \

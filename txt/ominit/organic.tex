@@ -6,6 +6,11 @@
 
 \newcommand{\pa}[1]{{\Large PA: #1}}
 
+\newcommand{\nx}[1]{N_{\mbox{\textsc{#1}}}}
+\newcommand{\nsom}{\nx{som}}
+\newcommand{\nsmb}{\nx{smb}}
+\newcommand{\naom}{\nx{aom}}
+
 \begin{document}
 
 \title{Initializing organic matter pools}
@@ -217,6 +222,14 @@ conditions, we can combine this initial estimate with a warmup period,
 to achive a reasonable initial state for the period we are interested
 in simulating.
 
+For typical use of Daisy (agricultural soil with annual crops) this
+works well for the initialization of the \textsc{smb} and \textsc{aom}
+pools.  After one or two years, the \textsc{smb} and \textsc{aom}
+pools will have adjusted to level of input, and the earlier history
+will be less relevant.  However, as shall be demonstrated in
+section~\ref{sec:results}, the \textsc{som} pools can take centuries
+to reach equilibrium with new input levels.
+
 \subsection{Generalized equations}
 
 The generalized form for the change of the individual pools used by
@@ -225,25 +238,25 @@ the dynamic model is shown in Equation~\ref{eq:generic}.
   \label{eq:generic}
   \begin{array}{lcll}
     \Delta\mbox{\textsc{smb}}i &=& \displaystyle
-    \sum_{j=1}^{N_\mbox{\textsc{smb}}} a_{i,j}\,\mbox{\textsc{smb}}j +
-    \sum_{j=1}^{N_\mbox{\textsc{som}}} b_{i,j}\,&\mbox{\textsc{som}}j\\
-    & & + \sum_{j=1}^{N_\mbox{\textsc{aom}}} c_{i,j}\,\mbox{\textsc{aom}}j
-    &;i = 1\ldotsN_\mbox{\textsc{smb}}\\
+    \sum_{j=1}^{\nsom} a_{i,j}\,\mbox{\textsc{smb}}j +
+    \sum_{j=1}^{\nsom} b_{i,j}\,&\mbox{\textsc{som}}j\\
+    & & + \sum_{j=1}^{\naom} c_{i,j}\,\mbox{\textsc{aom}}j
+    &;i = 1\ldots \nsmb\\
     \Delta\mbox{\textsc{som}}i &=& \displaystyle
-    \sum_{j=1}^{N_\mbox{\textsc{smb}}} d_{i,j}\,\mbox{\textsc{smb}}j +
-    \sum_{j=1}^{N_\mbox{\textsc{som}}} e_{i,j}\,&\mbox{\textsc{som}}j\\
-    & & + \sum_{j=1}^{N_\mbox{\textsc{aom}}} f_{i,j}\,\mbox{\textsc{aom}}j
-    &;i = 1\ldotsN_\mbox{\textsc{som}}\\
+    \sum_{j=1}^{\nsmb} d_{i,j}\,\mbox{\textsc{smb}}j +
+    \sum_{j=1}^{\nsom} e_{i,j}\,&\mbox{\textsc{som}}j\\
+    & & + \sum_{j=1}^{\naom} f_{i,j}\,\mbox{\textsc{aom}}j
+    &;i = 1\ldots \nsom\\
     \Delta\mbox{\textsc{aom}}i &=& \displaystyle g_i\,\mbox{\textsc{aom}}i
-    &;i = 1\ldotsN_\mbox{\textsc{aom}}\\
+    &;i = 1\ldots \naom\\
   \end{array}
 \end{equation}
 Here, \textsc{aom}$i$, \textsc{smb}$i$, and \textsc{som}$i$ denote the
 carbon content (mass) of the $i$'th \textsc{smb}, \textsc{som}, or
 \textsc{aom} pool, respectively.  $\Delta\mbox{\textsc{aom}}i$,
 $\Delta\mbox{\textsc{smb}}i$, and $\Delta\mbox{\textsc{som}}i$ denote
-the change of each pool (mass per time).  $N_\mbox{\textsc{aom}}$,
-$N_\mbox{\textsc{smb}}$, and $N_\mbox{\textsc{som}}$ denote the number of
+the change of each pool (mass per time).  $\naom$,
+$\nsmb$, and $\nsom$ denote the number of
 \textsc{aom}, \textsc{smb} and \textsc{som} pools, respectively.
 
 The relationship between the mass of the pools, and the change of the
@@ -300,7 +313,7 @@ equilibrium, meaning $\Delta\mbox{\textsc{smb}}i$ are all zero.
 (Equation~\ref{eq:smb-eq}).
 \begin{equation}
   \label{eq:smb-eq}
-  \Delta\mbox{\textsc{smb}}i = 0 \hspace{1cm};i = 1\ldotsN_\mbox{\textsc{smb}}
+  \Delta\mbox{\textsc{smb}}i = 0 \hspace{1cm};i = 1\ldots \nsmb
 \end{equation}
 This is reasonable as the \textsc{smb} pools tend to adjust to input
 levels relatively fast (a few years at most).  All but one
@@ -309,15 +322,15 @@ matter in the soil, which allows us to add Equation~\ref{eq:total} to
 the system without increasing the number of unknowns.
 \begin{equation}
   \label{eq:total}
-  total = \sum_{i=1}^{N_\mbox{\textsc{smb}}} \mbox{\textsc{smb}}i
-    + \sum_{i=1}^{N_\mbox{\textsc{som}}} \mbox{\textsc{som}}i
-    + \sum_{i=1}^{N_\mbox{\textsc{aom}}} \mbox{\textsc{aom}}i
+  total = \sum_{i=1}^{\nsmb} \mbox{\textsc{smb}}i
+    + \sum_{i=1}^{\nsom} \mbox{\textsc{som}}i
+    + \sum_{i=1}^{\naom} \mbox{\textsc{aom}}i
 \end{equation}
 The final common assumption is that the carbon input is known, as in
 Equation~\ref{eq:input}.
 \begin{equation}
   \label{eq:input}
-  \Delta\mbox{\textsc{aom}}i = k_i \hspace{1cm};i = 1\ldotsN_\mbox{\textsc{aom}}
+  \Delta\mbox{\textsc{aom}}i = k_i \hspace{1cm};i = 1\ldots \naom
 \end{equation}
 Here $k_i$ denote the known carbon input to \textsc{aom}$i$, from
 which the size of \textsc{aom}$i$ can trivially be found given
@@ -325,7 +338,7 @@ Equation~\ref{eq:generic} ($\mbox{\textsc{aom}}i = k_i / g_i$), and
 eliminated as unknowns from the equation system.
 
 Combining all three assumptions, we still lack
-$N_\mbox{\textsc{som}}-1$ equations before we can solve the system.
+$\nsom-1$ equations before we can solve the system.
 
 \subsection{Method 1: Explicit SOM partitioning}
 
@@ -336,12 +349,12 @@ Equation~\ref{eq:som-fractions}.
 \begin{equation}
   \label{eq:som-fractions}
   \mbox{som}i = f_{\mbox{\scriptsize\textsc{som}}i} 
-    \sum_{j=1}^{N_\mbox{\textsc{som}}} \mbox{\textsc{som}}
-    \hspace{1cm};i = 1\ldotsN_\mbox{\textsc{som}}
+    \sum_{j=1}^{\nsom} \mbox{\textsc{som}}
+    \hspace{1cm};i = 1\ldots \nsom
 \end{equation}
 where $f_{\mbox{\scriptsize\textsc{som}}i}$ are user supplied
-constants.  This gives us N_\mbox{\textsc{som}} additional equations,
-however since $\sum_{i=1}^{N_\mbox{\textsc{som}}}
+constants.  This gives us $\nsom$ additional equations,
+however since $\sum_{i=1}^{\nsom}
 f_{\mbox{\scriptsize\textsc{som}}i} = 1$ the system is overspecified,
 and we leave out one of the equations.  Thus,
 Equations~\ref{eq:som-fractions}m \ref{eq:smb-eq}, \ref{eq:total}, and
@@ -363,7 +376,7 @@ defined as the decrease over time of nitrogen stored in the
 is gives us the equation
 \begin{equation}
   \label{eq:cn}
-  background = \sum_{i=1}^{N_\mbox{\textsc{som}}}
+  background = \sum_{i=1}^{\nsom}
   \frac{\Delta\mbox{\textsc{som}}i}
        {\mbox{\textsc{c/n}}_{\mbox{\scriptsize\textsc{som}}i}}
 \end{equation}
@@ -380,7 +393,7 @@ If the system is in equilibrium, none of the pools will change, so we
 can add Equation~\ref{eq:som-eq}.
 \begin{equation}
   \label{eq:som-eq}
-  \Delta\mbox{\textsc{som}}i = 0 \hspace{1cm};i = 1\ldotsN_\mbox{\textsc{som}}
+  \Delta\mbox{\textsc{som}}i = 0 \hspace{1cm};i = 1\ldots \nsom
 \end{equation}
 Together with \ref{eq:smb-eq}, \ref{eq:total}, and \ref{eq:input} this
 gives us one more equation than needed, so Daisy will allow the user
@@ -542,13 +555,7 @@ about effective values, as the variation is so high.
 \end{figure}
 
 \subsection{Results and discussion}
-
-For typical use of Daisy (agricultural soil with annual crops) this
-works well for the initialization of the \textsc{smb} and \textsc{aom}
-pools.  After one or two years, the \textsc{smb} and \textsc{aom}
-pools will have adjusted to level of input, and the earlier history
-will be less relevant.  However, the \textsc{som} pools can take
-centuries to reach equilibrium with new input levels.
+\label{sec:results}
 
 Figure~(\ref{fig:long}) shows the results of switching between low and
 high carbon input for the two soil types.  Full equilibrium always
@@ -581,12 +588,35 @@ A more moderate change is depicted in Figure~(\ref{fig:orgJB1}).
     quasi-equilibrium.}
   \label{fig:orgJB1}
 \end{figure}
-As can be seen, equilibrium is reached after 200 (sandy loam,
-increasing input) to 600 (sand, decreasing output).  When 
 
+After a decrease in input (graphs on top row of
+Figure~(\ref{fig:long})), the organic matter content of the soil will
+also decrease, but the easily degradable \textsc{som} pool
+(\textsc{som2}) decreases faster than the more resistant pool
+(\textsc{som1}), so the relative \textsc{som1} fraction increases
+temporarily.  A similar effect can be seen after an increase of input,
+where the easily degradable \textsc{som} pool build up faster than the
+resistant pool, and relative \textsc{som1} fraction decreases
+temporarily while the total organic content builds up.
 
+Equilibrium is reached after 200 (sandy loam, increasing input) to 600
+(sand, decreasing output) years.  Since the longest experimental trial
+used for validating Daisy is 70 years \citep{smith97-compar}, these
+results must all be viewed as extrapolation.  Equilibrium is reached
+sooner for the sandy loam than for the sand, and sooner for increasing
+input than for decreasing input.  For decreasing input,
+quasi-equilibrium is reached after 150 years (on sand) or 100 years
+(on sandy loam), well before equilibrium.  For increasing input,
+quasi-equilibrium is reached at approximately the same time as
+equilibrium.
 
 \conclusions
+
+As can be seen, the time to reach a new equilibrium after a large
+change in farming practice can be several centuries, which makes it
+safe to assume that Danish farming land is not in equilibrium. At such
+a time scale, not only farming practice but also climate is going to
+change. 
 
 After lowering carbon input, we reach quasi-equilibirum at around a
 third of the time we use to reach full equilinbrium.  For a large
