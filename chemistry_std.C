@@ -73,6 +73,7 @@ struct ChemistryStandard : public Chemistry
                  const double surface_water /* [mm] */,
                  const double total_rain /* [mm/h] */,
                  const double direct_rain, // [mm/h]
+                 const double canopy_drip /* [mm/h] */, 
                  const double h_veg /* [m] */,
                  const double dt, // [h]
 		 Treelog&);
@@ -229,12 +230,13 @@ ChemistryStandard::tick_top (const double snow_leak_rate, // [h^-1]
                              const double surface_water /* [mm] */,
                              const double total_rain /* [mm/h] */,
                              const double direct_rain, // [mm/h]
+                             const double canopy_drip, // [mm/h]
                              const double h_veg /* [m] */,
                              const double dt, // [h]
 			     Treelog& msg) 
 {
   for (size_t r = 0; r < reactions.size (); r++)
-    reactions[r]->tick_top  (total_rain, direct_rain, cover, h_veg,
+    reactions[r]->tick_top  (total_rain, direct_rain, canopy_drip, cover, h_veg,
                              surface_water, *this, dt, msg);
 
   for (size_t c = 0; c < chemicals.size (); c++)

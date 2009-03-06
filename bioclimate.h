@@ -60,6 +60,7 @@ public:
   virtual double get_snow_storage () const = 0; // [mm]
   virtual double snow_leak_rate (double dt) const = 0; // [h^-1]
   virtual double canopy_leak_rate (double dt) const = 0; // [h^-1]
+  virtual double canopy_leak () const = 0;               // [mm/h]
 
   // Canopy.
 public:

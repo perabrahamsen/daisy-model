@@ -640,6 +640,7 @@ ColumnStandard::tick (Metalib& metalib, const Time& time, const double dt,
                        bioclimate->get_snow_storage () + surface.ponding (),
                        my_weather.rain (),
                        bioclimate->direct_rain (), 
+                       bioclimate->canopy_leak (),
                        vegetation->height () * 0.01 /* [m] */,
                        dt, msg);
 

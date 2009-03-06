@@ -391,6 +391,7 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
   const double T_canopy = bioclimate.canopy_temperature ();
   const double T_leaf_sun = bioclimate.sun_leaf_temperature ();
   const double T_leaf_shadow = bioclimate.shadow_leaf_temperature ();
+  const double crown_potential = root_system->crown_potential ();
 
   if (bioclimate.shared_light_fraction () > 1e-10)
     {

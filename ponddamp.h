@@ -26,7 +26,6 @@
 #include <memory>
 
 class Block;
-class AttributeList;
 
 class Ponddamp : public Model
 {

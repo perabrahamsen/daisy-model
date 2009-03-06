@@ -300,6 +300,8 @@ struct BioclimateStandard : public Bioclimate
     
     return canopy_water_out / canopy_water_old;
   }
+  double canopy_leak () const                     // [mm/h]
+  { return canopy_water_out; }
 
   // Create.
   void initialize (Block&, const Weather&);

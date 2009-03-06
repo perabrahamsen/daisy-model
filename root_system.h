@@ -90,6 +90,9 @@ private:
   double NH4Upt;		// NH4-N uptake [g/m2/h]
   double NO3Upt;		// NO3-N uptake [g/m2/h]
 
+public:
+  double crown_potential () const; // [cm]
+
   // Uptake.
 private:
   double potential_water_uptake (double h_x,

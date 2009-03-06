@@ -22,7 +22,6 @@
 
 #include "reaction.h"
 #include "mathlib.h"
-#include <sstream>
 #include "check.h"
 #include "block.h"
 #include "librarian.h"
@@ -33,11 +32,15 @@
 #include "soil.h"
 #include "treelog.h"
 #include "frame.h"
+#include "rainergy.h"
+#include <sstream>
+#include <memory>
 
 struct ReactionJarvis99 : public Reaction
 {
   // Parameters.
   const symbol colloid_name;
+  const std::auto_ptr<Rainergy> rainergy; // Energy in rain [J/cm^2/h]
   const double Mmax;            // Max colloid pool [g C/g S]
   const double kd;              // Depletion rate from pool [g S/J]
   const double kr;              // Replenishment rate to pool [g C/cm^2 S/h] 
@@ -60,9 +63,10 @@ struct ReactionJarvis99 : public Reaction
   void colloid_generation (const double Rain_intensity /* [mm W/h] */,
                            const double dt /* [h] */);
   void tick_top (const double total_rain, const double direct_rain,
-                  const double cover, const double h_veg, 
-                  const double h_pond,
-                  Chemistry& chemistry, const double dt, Treelog&);
+                 const double canopy_drip,
+                 const double cover, const double h_veg, 
+                 const double h_pond,
+                 Chemistry& chemistry, const double dt, Treelog&);
                            
   void output (Log& log) const;
 
@@ -85,7 +89,7 @@ ReactionJarvis99::R_to_E (const double R)
 
 void
 ReactionJarvis99::colloid_generation (const double Rain_intensity, // [mm/h] 
-                                   const double dt) // [h]
+                                      const double dt) // [h]
 {
   // Kinetic energy of rain. [J cm^-2 mm^-1]
   E = R_to_E (Rain_intensity);
@@ -103,6 +107,7 @@ ReactionJarvis99::colloid_generation (const double Rain_intensity, // [mm/h]
 
 void 
 ReactionJarvis99::tick_top (const double total_rain, const double direct_rain,
+                            const double canopy_drip,
                             const double cover, const double h_veg, 
                             const double h_pond,
                             Chemistry& chemistry, const double dt, Treelog&)
@@ -178,6 +183,7 @@ ReactionJarvis99::check (const Units&, const Geometry& geo,
 ReactionJarvis99::ReactionJarvis99 (Block& al)
   : Reaction (al),
     colloid_name (al.name ("colloid")),
+    rainergy (Librarian::build_item<Rainergy> (al, "rainergy")),
     Mmax (al.number ("Mmax")),
     kd (al.number ("kd")),
     kr (al.number ("kr")),
@@ -203,6 +209,10 @@ Colloid generation emulating the MACRO model.")
     frame.add_strings ("cite", "macro-colloid");
     frame.add ("colloid", Value::String, Value::Const,
 		"Colloid to generate.");
+    frame.add_object ("rainergy", Rainergy::component,
+                      Value::Const, Value::Singleton,
+                      "Model for calculating energy in rain.");
+    frame.add ("rainergy", "Brown87");
     frame.add ("Mmax", "g/g", Check::non_negative (), Value::Const,
                 "Maximum amount of detachable particles.");
     // frame.add ("Mmax", 0.165);

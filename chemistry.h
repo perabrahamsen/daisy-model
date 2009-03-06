@@ -94,6 +94,7 @@ public:
                          double surface_water /* [mm] */,
                          double total_rain /* [mm/h] */,
                          double direct_rain /* [mm/h] */,
+                         double canopy_drip /* [mm/h] */, 
                          double h_veg /* [m] */,
                          double dt /* [h] */,
 			 Treelog&) = 0;

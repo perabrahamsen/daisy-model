@@ -41,6 +41,10 @@
 #include <sstream>
 
 double 
+RootSystem::crown_potential () const
+{ return h_x; }
+
+double 
 RootSystem::potential_water_uptake (const double h_x,
                                     const Geometry& geo,
 				    const Soil& soil,

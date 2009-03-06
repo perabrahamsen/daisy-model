@@ -67,6 +67,7 @@ struct ReactionStyczen88 : public Reaction
                            const double h_veg /* [m] */,
                            const double h_pond /* [mm] */);
   void  tick_top (const double total_rain, const double direct_rain,
+                  const double canopy_drip /* [mm/h] */, 
                   const double cover, const double h_veg, 
                   const double h_pond,
                   Chemistry& chemistry, const double dt, Treelog&);
@@ -215,6 +216,7 @@ ReactionStyczen88::colloid_generation (const double P /* [mm/h] */,
 
 void 
 ReactionStyczen88::tick_top (const double total_rain, const double direct_rain,
+                             double canopy_drip /* [mm/h] */, 
                              const double cover, const double h_veg, 
                              const double h_pond,
                              Chemistry& chemistry, const double dt, Treelog&)
@@ -288,11 +290,11 @@ Colloid generation using rainfall momentum.")
     frame.add_strings ("cite", "styczen88");
     frame.add ("colloid", Value::String, Value::Const, "Colloid to generate.");
 
-    frame.add ("Ae", "h^2/g/cm^2", Value::Const, 
+    frame.add ("Ae", "h^2/g/cm^2", Check::positive (), Value::Const, 
                "Soil resistance factor.");
     frame.add ("MA", Value::Fraction (), Value::Const, 
                "Protective cover (mulch factor).");
-    frame.add ("droplet_diameter", "mm", Value::Const, 
+    frame.add ("droplet_diameter", "mm", Check::positive (), Value::Const, 
                "Size of droplets from vegetation.");
     frame.add_object ("ponddamp", Ponddamp::component,
                       Value::Const, Value::Singleton,

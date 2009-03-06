@@ -35,6 +35,7 @@ Reaction::library_id () const
 
 void 
 Reaction::tick_top (const double total_rain, const double direct_rain,
+                    const double canopy_drip,
                     const double cover, const double h_veg, 
                     const double h_pond,
                     Chemistry& chemistry, const double dt, Treelog&)
