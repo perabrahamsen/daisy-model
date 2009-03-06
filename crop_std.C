@@ -397,7 +397,7 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
     {
       // Shared light.
       Ass += photo->assimilate (units,
-                                ABA_xylem, relative_humidity, CO2_atm,
+                                ABA_xylem, crown_potential, relative_humidity, CO2_atm,
                                 bioclimate.daily_air_temperature(), 
                                 T_canopy, T_leaf_shadow,
                                 rubiscoN, shadow_PAR, PAR_height,
@@ -406,7 +406,7 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
         * bioclimate.shared_light_fraction ();
 
       Ass += photo->assimilate (units,
-                                ABA_xylem, relative_humidity, CO2_atm,
+                                ABA_xylem, crown_potential, relative_humidity, CO2_atm,
                                 bioclimate.daily_air_temperature(),
                                 T_canopy, T_leaf_sun,
                                 rubiscoN, sun_PAR,  PAR_height,
@@ -424,7 +424,7 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
         (No, LAI (), PARref (), bioclimate.global_radiation (),
          PARext (), PAR); 
       Ass += photo->assimilate (units,
-                                ABA_xylem, relative_humidity, CO2_atm,
+                                ABA_xylem, crown_potential, relative_humidity, CO2_atm,
                                 bioclimate.daily_air_temperature (), 
                                 T_canopy, bioclimate.canopy_temperature(),
                                 rubiscoN, PAR, PAR_height,

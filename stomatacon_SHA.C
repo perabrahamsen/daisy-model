@@ -33,7 +33,6 @@ struct StomataCon_SHA : public StomataCon
   // Parameters.
 private:
   const double lambda, alpha;  //Coefficients []
-  const double Amax; //Max photosynthesis [mol/m²leaf/s]
   const double M;    //Parameter [mol/m²leaf/s]
 
   
@@ -51,7 +50,6 @@ private:
     : StomataCon (al),
       lambda (al.number ("lambda")),
       alpha (al.number ("alpha")),
-      Amax (al.number ("Amax")),
       M (al.number ("M"))
   { }
 };
