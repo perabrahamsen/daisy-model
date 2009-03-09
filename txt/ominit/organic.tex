@@ -146,7 +146,7 @@ in Daisy, is explained in the next section.
 
 \subsection{Organic matter turnover in Daisy}
 
-The current standard organic matter model is depicted in Figure~(\ref{fig:om2}).
+The current standard organic matter model is depicted in Fig.~(\ref{fig:om2}).
 
 \begin{figure}[htbp]
   \begin{center}
@@ -159,7 +159,7 @@ The current standard organic matter model is depicted in Figure~(\ref{fig:om2}).
 The amount of carbon turned over and decomposed is directly
 proportional with the size of the pool. We call this the
 \emph{turnover rate} by the soil microbial biomass. All the pools in
-Figure~(\ref{fig:om2}) have a fully drawn outgoing line. From the
+Fig.~(\ref{fig:om2}) have a fully drawn outgoing line. From the
 \textsc{som1} pool the outgoing line is marked with the text
 ``44y''. This indicate the turnover rate of this particular pool and
 the number is the corresponding halftime (i.e. 44 years for the
@@ -183,15 +183,22 @@ pools, each set corresponds to a particular fertilizer or residual
 with its specific parameters.
 
 The turnover and maintenance of the pools is affected by abiotic
-factors, namely the clay content in the soil, the soil temperature, and
-the moisture. The halftimes listed in Figure~(\ref{fig:om2}) corresponds to
-0\% clay, 10$^\circ$C, and field capacity (defined as -10 kPa). The
-halftimes will increase with increasing clay content, decreasing
-temperature, and decreasing soil water content. Further information of
-the abiotic factors included in the organic matter model in Daisy is
-given in \citet{daisy-def}.
+factors, namely the clay content in the soil, the soil temperature,
+and the moisture. The halftimes listed in Fig.~(\ref{fig:om2})
+corresponds to 0\% clay, 10$^\circ$C, and field capacity (defined as
+-100 hPa). The halftimes will increase with increasing clay content,
+decreasing temperature, and decreasing soil water content, as seen on
+Fig.~\ref{fig:abiotic}. Further information of the abiotic factors
+included in the organic matter model in Daisy is given in
+\citet{daisy-def}.
 
-\pa{Abiotic figures go here}
+\begin{figure}[htbp]
+  \begin{center}
+  \includegraphics[width=\columnwidth]{abiotic}
+  \end{center}
+  \caption{Effect of abiotic factors on turnover.}
+  \label{fig:abiotic}
+\end{figure}
 
 \section{Initialization of the organic matter pools}
 
@@ -227,13 +234,13 @@ works well for the initialization of the \textsc{smb} and \textsc{aom}
 pools.  After one or two years, the \textsc{smb} and \textsc{aom}
 pools will have adjusted to level of input, and the earlier history
 will be less relevant.  However, as shall be demonstrated in
-section~\ref{sec:results}, the \textsc{som} pools can take centuries
+Sect.~\ref{sec:results}, the \textsc{som} pools can take centuries
 to reach equilibrium with new input levels.
 
 \subsection{Generalized equations}
 
 The generalized form for the change of the individual pools used by
-the dynamic model is shown in Equation~\ref{eq:generic}.
+the dynamic model is shown in Eq.~\ref{eq:generic}.
 \begin{equation}
   \label{eq:generic}
   \begin{array}{lcll}
@@ -265,7 +272,7 @@ $c_{i,j}$, $d_{i,j}$, $e_{i,j}$, $f_{i,j}$ and $g_i$ (fraction per time)
 respectively.  These relationships are calculated on basis of the
 parametrization of the organic matter turnover model.  For example,
 the formula for finding $a_{1,2}$ can be found in
-Equation~\ref{eq:a12}.
+Eq.~\ref{eq:a12}.
 \begin{equation}
   \label{eq:a12}
   \begin{array}{rcl}
@@ -289,7 +296,7 @@ the atmosphere as CO$_2$. $F_{\mbox{\tiny\textsc{smb1}}}^T$,
 $F_{\mbox{\tiny\textsc{smb1}}}^\psi$, and
 $F_{\mbox{\tiny\textsc{smb1}}}^C$ are functions describing the effect
 of the abiotic factors for soil temperature, moisture, and clay,
-respectively. The other relationships in Equation~(\ref{eq:generic})
+respectively. The other relationships in Eq.~(\ref{eq:generic})
 can be described by similar forms.
 
 \subsection{Known and unknowns}
@@ -309,8 +316,8 @@ initialization, each will result in a linear equation system that can
 be solved using a standard technique (Gauss-Jordan elimination is used
 in Daisy). The methods will be listed in the following sections.  All
 the methods rely on the assumtion that the \textsc{smb} pools are in
-equilibrium, meaning $\Delta\mbox{\textsc{smb}}i$ are all zero.
-(Equation~\ref{eq:smb-eq}).
+equilibrium, meaning $\Delta\mbox{\textsc{smb}}i$ are all zero
+(Eq.~\ref{eq:smb-eq}).
 \begin{equation}
   \label{eq:smb-eq}
   \Delta\mbox{\textsc{smb}}i = 0 \hspace{1cm};i = 1\ldots \nsmb
@@ -318,7 +325,7 @@ equilibrium, meaning $\Delta\mbox{\textsc{smb}}i$ are all zero.
 This is reasonable as the \textsc{smb} pools tend to adjust to input
 levels relatively fast (a few years at most).  All but one
 initialization option require the user to specify the total organic
-matter in the soil, which allows us to add Equation~\ref{eq:total} to
+matter in the soil, which allows us to add Eq.~\ref{eq:total} to
 the system without increasing the number of unknowns.
 \begin{equation}
   \label{eq:total}
@@ -327,14 +334,14 @@ the system without increasing the number of unknowns.
     + \sum_{i=1}^{\naom} \mbox{\textsc{aom}}i
 \end{equation}
 The final common assumption is that the carbon input is known, as in
-Equation~\ref{eq:input}.
+Eq.~\ref{eq:input}.
 \begin{equation}
   \label{eq:input}
   \Delta\mbox{\textsc{aom}}i = k_i \hspace{1cm};i = 1\ldots \naom
 \end{equation}
 Here $k_i$ denote the known carbon input to \textsc{aom}$i$, from
 which the size of \textsc{aom}$i$ can trivially be found given
-Equation~\ref{eq:generic} ($\mbox{\textsc{aom}}i = k_i / g_i$), and
+Eq.~\ref{eq:generic} ($\mbox{\textsc{aom}}i = k_i / g_i$), and
 eliminated as unknowns from the equation system.
 
 Combining all three assumptions, we still lack
@@ -345,7 +352,7 @@ $\nsom-1$ equations before we can solve the system.
 The original, and still supported, method of initializing the
 \textsc{som} pools was to require the user to explicitly specify the
 fraction of the total \textsc{som} in each pool, at in
-Equation~\ref{eq:som-fractions}.
+Eq.~\ref{eq:som-fractions}.
 \begin{equation}
   \label{eq:som-fractions}
   \mbox{som}i = f_{\mbox{\scriptsize\textsc{som}}i} 
@@ -390,7 +397,7 @@ system.
 \subsection{Equilibrium assumptions}
 
 If the system is in equilibrium, none of the pools will change, so we
-can add Equation~\ref{eq:som-eq}.
+can add Eq.~\ref{eq:som-eq}.
 \begin{equation}
   \label{eq:som-eq}
   \Delta\mbox{\textsc{som}}i = 0 \hspace{1cm};i = 1\ldots \nsom
@@ -402,7 +409,7 @@ variants. explained in the following.
 
 \subsubsection{Method 3: Size of inert pool}
 
-If we have an inert pool, like \textsc{som3} in Figure~(\ref{fig:om2}),
+If we have an inert pool, like \textsc{som3} in Fig.~(\ref{fig:om2}),
 adding an equation stating that it doesn't change is redundant.  This
 is the case for the default initialization of the subsoil, here we
 assume the active pools are in equilibrium with the input, and let the
@@ -411,7 +418,7 @@ equation system  find the size of the inert pool.
 \subsubsection{Method 4: Total organic matter}
 
 The second equilibrium initialization allows the user to leave out
-Equation~\ref{eq:total}, so the total amount of (active) soil organic
+Eq.~\ref{eq:total}, so the total amount of (active) soil organic
 matter is estimated from the input levels.  This is rarely useful, as
 total amount of organic material is easy to measure, but has been used
 in this paper to initialize the organic matter content for long term
@@ -422,7 +429,7 @@ period from one equilibrium to another.
 
 The last and most common equilibrium initialization is to let the user
 specify the size of the inert pool (usually to zero), and leave out
-Equation~\ref{eq:input}.  This is useful for cases where the user have
+Eq.~\ref{eq:input}.  This is useful for cases where the user have
 no idea of what the input levels for the field used to be.
 
 \subsection{Method 6: Quasi-equilibrium}
@@ -430,7 +437,7 @@ no idea of what the input levels for the field used to be.
 The default initialization for organic matter in the plowing layer is
 to relax the equilibrium assumption, and allow the pool with the
 lowest (non-zero) turnover rate to change.  That is, we remove one of
-the equations added by Equation~\ref{eq:som-eq}, and keep all of
+the equations added by Eq.~\ref{eq:som-eq}, and keep all of
 Equations \ref{eq:smb-eq}, \ref{eq:total}, and \ref{eq:input}.  The
 idea is that all the fast pools will quickly adapt to the input and to
 the size of the slow pool. 
@@ -521,7 +528,7 @@ problem for clay, which varies little within the time frames we are
 concerned with, but problematic for the temperature and hummidity
 effects.  By default the Daisy model use the local average air
 temperature (which is already specified by the user in the weather
-file) for $T$, and field capacity (-10 kPa) for the water potential. A
+file) for $T$, and field capacity (-100 hPa) for the water potential. A
 better estimate can be achieved by logging the product of factors in a
 realistic simulation.
 
@@ -576,7 +583,7 @@ the \textsc{som1} begins and ends in all four graphs.
     estimated by the quasi-equilibrium.}
   \label{fig:long}
 \end{figure*}
-A more moderate change is depicted in Figure~(\ref{fig:orgJB1}).
+A more moderate change is depicted in Fig.~(\ref{fig:orgJB1}).
 \begin{figure}[htbp]
   \hspace{-1.5cm}\input{realmediumJB1}
   \caption{Long term simulation on a sand of organic matter in
@@ -590,7 +597,7 @@ A more moderate change is depicted in Figure~(\ref{fig:orgJB1}).
 \end{figure}
 
 After a decrease in input (graphs on top row of
-Figure~(\ref{fig:long})), the organic matter content of the soil will
+Fig.~(\ref{fig:long})), the organic matter content of the soil will
 also decrease, but the easily degradable \textsc{som} pool
 (\textsc{som2}) decreases faster than the more resistant pool
 (\textsc{som1}), so the relative \textsc{som1} fraction increases
