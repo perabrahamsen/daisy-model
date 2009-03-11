@@ -1227,7 +1227,8 @@ bioincorporation${OBJ}: bioincorporation.C bioincorporation.h \
   model.h geometry.h soil.h am.h im.h librarian.h plf.h aom.h om.h \
   check.h vcheck.h mathlib.h assertion.h
 reaction_colgen${OBJ}: reaction_colgen.C reaction_colgen.h reaction.h model.h \
-  symbol.h librarian.h frame.h scope.h value.h
+  symbol.h librarian.h frame.h scope.h value.h log.h time.h border.h \
+  chemistry.h treelog.h block.h
 weather_base${OBJ}: weather_base.C weather_base.h weather.h model.h symbol.h \
   im.h value.h fao.h assertion.h time.h log.h border.h mathlib.h \
   librarian.h block.h units.h frame.h scope.h
@@ -1417,14 +1418,14 @@ cdaisy${OBJ}: cdaisy.C scope.h value.h symbol.h block.h metalib.h frame.h \
   frame_model.h frame_submodel.h filepos.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
-reaction_Morgan98${OBJ}: reaction_Morgan98.C reaction.h model.h symbol.h \
-  mathlib.h assertion.h check.h block.h value.h librarian.h chemistry.h \
-  chemical.h log.h time.h border.h treelog.h frame.h scope.h ponddamp.h \
-  rainergy.h
-reaction_Styczen88${OBJ}: reaction_Styczen88.C reaction.h model.h symbol.h \
-  mathlib.h assertion.h check.h block.h value.h librarian.h chemistry.h \
-  chemical.h log.h time.h border.h geometry.h soil.h treelog.h frame.h \
-  scope.h plf.h ponddamp.h
+reaction_Morgan98${OBJ}: reaction_Morgan98.C reaction_colgen.h reaction.h \
+  model.h symbol.h mathlib.h assertion.h check.h block.h value.h \
+  librarian.h chemistry.h chemical.h log.h time.h border.h treelog.h \
+  frame.h scope.h ponddamp.h rainergy.h
+reaction_Styczen88${OBJ}: reaction_Styczen88.C reaction_colgen.h reaction.h \
+  model.h symbol.h mathlib.h assertion.h check.h block.h value.h \
+  librarian.h chemistry.h chemical.h log.h time.h border.h geometry.h \
+  soil.h treelog.h frame.h scope.h plf.h ponddamp.h
 program_GP2D${OBJ}: program_GP2D.C program.h model.h symbol.h run.h \
   geometry_rect.h geometry_vert.h geometry.h value.h rootdens.h treelog.h \
   block.h submodeler.h check.h librarian.h assertion.h frame.h scope.h
@@ -1432,10 +1433,10 @@ svat_ssoc${OBJ}: svat_ssoc.C svat.h model.h symbol.h block.h value.h \
   librarian.h resistance.h fao.h soil_heat.h bioclimate.h soil.h \
   geometry.h weather.h im.h vegetation.h assertion.h log.h time.h \
   border.h treelog.h mathlib.h solver.h frame.h scope.h
-reaction_Jarvis99${OBJ}: reaction_Jarvis99.C reaction.h model.h symbol.h \
-  mathlib.h assertion.h check.h block.h value.h librarian.h chemistry.h \
-  chemical.h log.h time.h border.h geometry.h soil.h treelog.h frame.h \
-  scope.h rainergy.h
+reaction_Jarvis99${OBJ}: reaction_Jarvis99.C reaction_colgen.h reaction.h \
+  model.h symbol.h mathlib.h assertion.h check.h block.h value.h \
+  librarian.h chemistry.h chemical.h log.h time.h border.h geometry.h \
+  soil.h treelog.h frame.h scope.h rainergy.h
 reaction_filter${OBJ}: reaction_filter.C reaction.h model.h symbol.h block.h \
   value.h transform.h chemistry.h chemical.h soil.h soil_water.h log.h \
   time.h border.h assertion.h librarian.h check.h mathlib.h treelog.h \

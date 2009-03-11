@@ -1,5 +1,11 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* R2D2
+
+** Kolloider
+
+Lav test.
+
 * Søren
 
 Giv ham seneste version af ominit paper, samt kritik af farmer model.
@@ -7,22 +13,6 @@ Giv ham seneste version af ominit paper, samt kritik af farmer model.
 * Frame
 
 ** Test overskriving af object variabel.
-
-* R2D2
-
-** Kolloider
-
-*** reaction_kolgen.[Ch]
-
-*** rainenergy
-
-Kald den.
-
-*** reaction_Styczen88.C 
-
-**** test setup
-
-*** reaction_Morgan98.C
 
 * Artikler
 

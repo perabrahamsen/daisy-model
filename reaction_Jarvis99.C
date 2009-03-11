@@ -20,7 +20,7 @@
 
 #define BUILD_DLL
 
-#include "reaction.h"
+#include "reaction_colgen.h"
 #include "mathlib.h"
 #include "check.h"
 #include "block.h"
@@ -36,10 +36,9 @@
 #include <sstream>
 #include <memory>
 
-struct ReactionJarvis99 : public Reaction
+struct ReactionJarvis99 : public ReactionColgen
 {
   // Parameters.
-  const symbol colloid_name;
   const std::auto_ptr<Rainergy> rainergy; // Energy in rain [J/cm^2/h]
   const double Mmax;            // Max colloid pool [g C/g S]
   const double kd;              // Depletion rate from pool [g S/J]
@@ -54,7 +53,6 @@ struct ReactionJarvis99 : public Reaction
 
   // Log variable.
   double As;                    // Colloid pool in surface [g C/cm^2]
-  double D;                     // Depletion [g C/cm^2 S/h]
   double P;                     // Replenishment [g C/cm^2 S/h]
   double KE;                    // Energy for colloids [W/cm^2]
   double E;                     // Energy in rain [J/cm^2 S/mm W]
@@ -125,9 +123,9 @@ ReactionJarvis99::tick_top (const double total_rain, const double direct_rain,
 void 
 ReactionJarvis99::output (Log& log) const 
 {
+  ReactionColgen::output (log);
   output_variable (Ms, log); 
   output_variable (As, log); 
-  output_variable (D, log); 
   output_variable (P, log); 
   output_variable (E, log); 
 }
@@ -160,9 +158,10 @@ ReactionJarvis99::initialize (const Units&, const Geometry& geo,
 }
 
 bool 
-ReactionJarvis99::check (const Units&, const Geometry& geo,
-                      const Soil&, const SoilWater&, const SoilHeat&,
-                      const Chemistry& chemistry, Treelog& msg) const
+ReactionJarvis99::check (const Units& units, const Geometry& geo,
+                         const Soil& soil, const SoilWater& soil_water,
+                         const SoilHeat& soil_heat,
+                         const Chemistry& chemistry, Treelog& msg) const
 { 
   bool ok = true;
   if (geo.bottom () > -zi)
@@ -170,17 +169,16 @@ ReactionJarvis99::check (const Units&, const Geometry& geo,
       ok = false;
       msg.error ("'zi' should be wholy within the soil");
     }
-  if (!chemistry.know (colloid_name))
+  if (!ReactionColgen::check (units, geo, soil, soil_water, soil_heat, 
+                              chemistry, msg))
     {
-      msg.error ("'" + colloid_name + "' not traced");
       ok = false;
     }
   return ok;
 }
 
 ReactionJarvis99::ReactionJarvis99 (Block& al)
-  : Reaction (al),
-    colloid_name (al.name ("colloid")),
+  : ReactionColgen (al),
     rainergy (Librarian::build_item<Rainergy> (al, "rainergy")),
     Mmax (al.number ("Mmax")),
     kd (al.number ("kd")),
@@ -189,7 +187,6 @@ ReactionJarvis99::ReactionJarvis99 (Block& al)
     rho_b (-42.42e42),
     Ms (al.number ("Ms", Mmax * 0.1)),
     As (-42.42e42),
-    D (-42.42e42),
     P (-42.42e42),
     E (0.0)
 { }
@@ -199,14 +196,12 @@ static struct ReactionJarvis99Syntax : public DeclareModel
   Model* make (Block& al) const
   { return new ReactionJarvis99 (al); }
   ReactionJarvis99Syntax ()
-    : DeclareModel (Reaction::component, "colgen_Jarvis99", "\
+    : DeclareModel (Reaction::component, "colgen_Jarvis99", "colgen", "\
 Colloid generation emulating the MACRO model.")
   { }
   void load_frame (Frame& frame) const
   {
     frame.add_strings ("cite", "macro-colloid");
-    frame.add ("colloid", Value::String, Value::Const,
-		"Colloid to generate.");
     frame.add_object ("rainergy", Rainergy::component,
                       Value::Const, Value::Singleton,
                       "Model for calculating energy in rain.");
@@ -228,8 +223,6 @@ Colloid generation emulating the MACRO model.")
 By default, 10% of Mmax.");
     frame.add ("As", "g/cm^2", Value::LogOnly, 
                 "Current amount of detachable particles in top soil.");
-    frame.add ("D", "g/cm^2/h", Value::LogOnly, 
-                "Depletion of detachable particles from top soil.");
     frame.add ("P", "g/cm^2/h", Value::LogOnly, 
                 "Replenishment of detachable particles to top soil.");
     frame.add ("KE", "W/cm^2", Value::LogOnly, 

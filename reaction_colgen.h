@@ -26,13 +26,24 @@
 
 class ReactionColgen : public Reaction
 {
+  // Parameters.
+protected:
+  const symbol colloid_name;
+
+  // Log variable.
+protected:
+  double D;                     // Depletion [g/cm^2/h]
+
   // Simulation.
-public:
+protected:
   void output (Log&) const;
 
   // Create and Destroy.
 protected:
-  ReactionColgen (Block& al);
+  bool check (const Units&, const Geometry&,
+              const Soil&, const SoilWater&, const SoilHeat&,
+	      const Chemistry&, Treelog&) const;
+  ReactionColgen (Block&);
   ~ReactionColgen ();
 };
 

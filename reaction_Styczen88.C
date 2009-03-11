@@ -20,7 +20,7 @@
 
 #define BUILD_DLL
 
-#include "reaction.h"
+#include "reaction_colgen.h"
 #include "mathlib.h"
 #include <sstream>
 #include "check.h"
@@ -37,10 +37,9 @@
 #include "ponddamp.h"
 #include <memory>
 
-struct ReactionStyczen88 : public Reaction
+struct ReactionStyczen88 : public ReactionColgen
 {
   // Parameters.
-  const symbol colloid_name;
   const double Ae;              // Soil resitance factor [h^2/g C/cm^2 S]
   const double MA;              // Mulch factor (protective coverage) []
   const double droplet_diameter; // Size of vegetation droplets. [mm]
@@ -51,7 +50,6 @@ struct ReactionStyczen88 : public Reaction
   double DH;                    // Squaret droplet momentum [g^2 C/cm/h]
   double CM;                    // Vegetation factor []
   double MR;                    // Squared direct rainfall momentum [g^2 C/h^3]
-  double D;                     // Depletion [g C/cm^2 S/h]
 
   // Simulation.
   static double find_DH_2_below (const double h_veg, 
@@ -78,9 +76,6 @@ struct ReactionStyczen88 : public Reaction
   void initialize (const Units&, const Geometry& geo,
                    const Soil& soil, const SoilWater&, const SoilHeat&, 
                    Treelog&);
-  bool check (const Units&, const Geometry& geo,
-              const Soil&, const SoilWater&, const SoilHeat&,
-	      const Chemistry& chemistry, Treelog& msg) const;
   ReactionStyczen88 (Block& al);
 };
 
@@ -235,11 +230,11 @@ ReactionStyczen88::tick_top (const double total_rain, const double direct_rain,
 void 
 ReactionStyczen88::output (Log& log) const 
 {
+  ReactionColgen::output (log);
   output_variable (KH, log); 
   output_variable (DH, log); 
   output_variable (CM, log); 
   output_variable (MR, log); 
-  output_variable (D, log); 
 }
 
 
@@ -249,23 +244,8 @@ ReactionStyczen88::initialize (const Units&, const Geometry&,
                                Treelog&)
 {  }
 
-bool 
-ReactionStyczen88::check (const Units&, const Geometry& geo,
-                          const Soil&, const SoilWater&, const SoilHeat&,
-                          const Chemistry& chemistry, Treelog& msg) const
-{ 
-  bool ok = true;
-  if (!chemistry.know (colloid_name))
-    {
-      msg.error ("'" + colloid_name + "' not traced");
-      ok = false;
-    }
-  return ok;
-}
-
 ReactionStyczen88::ReactionStyczen88 (Block& al)
-  : Reaction (al),
-    colloid_name (al.name ("colloid")),
+  : ReactionColgen (al),
     Ae (al.number ("Ae")),
     MA (al.number ("MA")),
     droplet_diameter (al.number ("droplet_diameter")),
@@ -273,8 +253,7 @@ ReactionStyczen88::ReactionStyczen88 (Block& al)
     KH (-42.42e42),
     DH (-42.42e42),
     CM (-42.42e42),
-    MR (-42.42e42),
-    D (-42.42e42)
+    MR (-42.42e42)
 { }
 
 static struct ReactionStyczen88Syntax : public DeclareModel
@@ -282,13 +261,12 @@ static struct ReactionStyczen88Syntax : public DeclareModel
   Model* make (Block& al) const
   { return new ReactionStyczen88 (al); }
   ReactionStyczen88Syntax ()
-    : DeclareModel (Reaction::component, "colgen_Styczen88", "\
+    : DeclareModel (Reaction::component, "colgen_Styczen88", "colgen", "\
 Colloid generation using rainfall momentum.")
   { }
   void load_frame (Frame& frame) const
   {
     frame.add_strings ("cite", "styczen88");
-    frame.add ("colloid", Value::String, Value::Const, "Colloid to generate.");
 
     frame.add ("Ae", "h^2/g/cm^2", Check::positive (), Value::Const, 
                "Soil resistance factor.");
@@ -307,8 +285,6 @@ Colloid generation using rainfall momentum.")
                "Vegetation factor.");
     frame.add ("MR", "g^2/h^3", Value::LogOnly, 
                "Squared direct rainfall momentum.");
-    frame.add ("D", "g/cm^2/h", Value::LogOnly, 
-               "Depletion of detachable particles from top soil.");
   }
 } ReactionStyczen88syntax;
 
