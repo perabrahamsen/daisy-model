@@ -44,7 +44,7 @@ struct ReactionStyczen88 : public Reaction
   const double Ae;              // Soil resitance factor [h^2/g C/cm^2 S]
   const double MA;              // Mulch factor (protective coverage) []
   const double droplet_diameter; // Size of vegetation droplets. [mm]
-  std::auto_ptr<Ponddamp> ponddamp;
+  const std::auto_ptr<Ponddamp> ponddamp;
 
   // Log variable.
   double KH;                    // Ponding factor []
@@ -224,7 +224,7 @@ ReactionStyczen88::tick_top (const double total_rain, const double direct_rain,
   Chemical& colloid = chemistry.find (colloid_name);
   
   const double P = total_rain; // [mm/h]
-  const double LD = total_rain - direct_rain; // [mm/h]
+  const double LD = canopy_drip; // [mm/h]
   const double f_cov = cover;                 // []
 
   colloid_generation (P, LD, f_cov, h_veg, h_pond);
@@ -251,8 +251,8 @@ ReactionStyczen88::initialize (const Units&, const Geometry&,
 
 bool 
 ReactionStyczen88::check (const Units&, const Geometry& geo,
-                      const Soil&, const SoilWater&, const SoilHeat&,
-                      const Chemistry& chemistry, Treelog& msg) const
+                          const Soil&, const SoilWater&, const SoilHeat&,
+                          const Chemistry& chemistry, Treelog& msg) const
 { 
   bool ok = true;
   if (!chemistry.know (colloid_name))

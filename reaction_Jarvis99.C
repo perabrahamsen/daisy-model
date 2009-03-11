@@ -56,11 +56,14 @@ struct ReactionJarvis99 : public Reaction
   double As;                    // Colloid pool in surface [g C/cm^2]
   double D;                     // Depletion [g C/cm^2 S/h]
   double P;                     // Replenishment [g C/cm^2 S/h]
+  double KE;                    // Energy for colloids [W/cm^2]
   double E;                     // Energy in rain [J/cm^2 S/mm W]
 
   // Simulation.
-  static const double R_to_E (const double R /* [mm W/h] */); // [J/cm^2/mm]
-  void colloid_generation (const double Rain_intensity /* [mm W/h] */,
+  void colloid_generation (const double total_rain /* [mm/h] */, 
+                           const double direct_rain /* [mm/h] */,
+                           const double canopy_drip /* [mm/h] */,
+                           const double canopy_height /* [m] */,
                            const double dt /* [h] */);
   void tick_top (const double total_rain, const double direct_rain,
                  const double canopy_drip,
@@ -80,22 +83,21 @@ struct ReactionJarvis99 : public Reaction
   ReactionJarvis99 (Block& al);
 };
 
-const double 
-ReactionJarvis99::R_to_E (const double R)
-{ 
-  const double cm2_per_m2 = (100.0 * 100.0);
-  return  29.0 * (1 - 0.72 * exp (-0.05 * R)) / cm2_per_m2; 
-}
-
 void
-ReactionJarvis99::colloid_generation (const double Rain_intensity, // [mm/h] 
-                                      const double dt) // [h]
+ReactionJarvis99::colloid_generation (const double total_rain /* [mm/h] */, 
+                                      const double direct_rain /* [mm/h] */,
+                                      const double canopy_drip /* [mm/h] */,
+                                      const double canopy_height /* [m] */,
+                                      const double dt /* [h] */)
 {
+  // [J/cm^2/h]
+  KE = rainergy->value (total_rain , direct_rain, canopy_drip, canopy_height);
+
   // Kinetic energy of rain. [J cm^-2 mm^-1]
-  E = R_to_E (Rain_intensity);
+  E = (total_rain > 0) ? KE / total_rain : 0.0;
   
   // Detachment of colloids at the surface. [g cm^-2 h^-1]
-  D = kd * E * Rain_intensity * Ms; 
+  D = kd * KE * dt * Ms; 
 
   // Replenishment of colloids in the surface layer.
   P = kr * (1 - Ms / Mmax);     // [g cm^-2 h^-1]
@@ -114,12 +116,8 @@ ReactionJarvis99::tick_top (const double total_rain, const double direct_rain,
 {
   Chemical& colloid = chemistry.find (colloid_name);
   
-  // Intensity of rain that hit the soil directly, without hitting the
-  // canopy or snow pack on the way.
-  const double R = direct_rain; // [mm/h]
-
   // Generate the colloids.
-  colloid_generation (R, dt);
+  colloid_generation (total_rain, direct_rain, canopy_drip, h_veg, dt);
 
   colloid.add_to_surface_transform_source (D);
 }
@@ -193,7 +191,7 @@ ReactionJarvis99::ReactionJarvis99 (Block& al)
     As (-42.42e42),
     D (-42.42e42),
     P (-42.42e42),
-    E (R_to_E (0.0))
+    E (0.0)
 { }
 
 static struct ReactionJarvis99Syntax : public DeclareModel
@@ -234,6 +232,8 @@ By default, 10% of Mmax.");
                 "Depletion of detachable particles from top soil.");
     frame.add ("P", "g/cm^2/h", Value::LogOnly, 
                 "Replenishment of detachable particles to top soil.");
+    frame.add ("KE", "W/cm^2", Value::LogOnly, 
+               "Kinertic energy avalable for colloid generation.");
     frame.add ("E", "J/cm^2/mm", Value::LogOnly, 
                 "Kinetic energy in rain.");
   }

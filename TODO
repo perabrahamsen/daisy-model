@@ -1,8 +1,18 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* Søren
+
+Giv ham seneste version af ominit paper, samt kritik af farmer model.
+
+* Frame
+
+** Test overskriving af object variabel.
+
 * R2D2
 
 ** Kolloider
+
+*** reaction_kolgen.[Ch]
 
 *** rainenergy
 

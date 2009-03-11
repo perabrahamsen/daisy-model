@@ -6,7 +6,7 @@
 
 \newcommand{\pa}[1]{{\Large PA: #1}}
 
-\newcommand{\nx}[1]{N_{\mbox{\textsc{#1}}}}
+\newcommand{\nx}[1]{N_{\mbox{\tiny\textsc{#1}}}}
 \newcommand{\nsom}{\nx{som}}
 \newcommand{\nsmb}{\nx{smb}}
 \newcommand{\naom}{\nx{aom}}
@@ -53,27 +53,27 @@ Weather-driven simulation modeling has become an important component
 of studies of soil nutrients and carbon balances in relation to soil
 quality, environmental impact, and climate change. In relation to
 carbon balances, organic matter in soil comprises a large storage of
-terrestrial carbon, which may change with change with soil use and
-climate \citep{Levy, modClima, Cclima, CmodClima} affecting the
-emission of green house gasses, soil quality, and crop production.
+terrestrial carbon, which may change with soil use and climate
+\citep{Levy, modClima, Cclima, CmodClima} affecting the emission of
+green house gasses, soil quality, and crop production.
 
-In numeric models, it is common to divide the organic matter in the
-soil into several compartments \citep{orgReviw, CNmodels}, such as
-recently added organic matter (\textsc{aom}), soil microbial biomass
-(\textsc{smb}), and organic matter that can no longer be traced back
-to its origin (\textsc{som}). These compartments may be further
-divided into smaller pools, where the content of each pool have
-uniform properties, such as turnover rate and C/N ratio. In general,
-having two \textsc{som} and two \textsc{smb} pools allows a well
-calibrated model to capture both the short term \citep{twoPoolFast}
-and long term \citep{twoPoolLong} dynamics of the system. The number
-of \textsc{aom} pools depends on the simulating system. For batch
-experiments and some long time scenarios, a single \textsc{aom} pool
-may be enough. However, to simulate input sources from a farming
-system, a fast and a slow \textsc{aom} pools per source are in general
-needed. The dynamics of the modeled system typically consist of input
-in form of new added organic matter (fertilizer, manure, crop
-residues) and biologically driven turnover.
+In numeric models, it is common to divide the total organic matter
+(\textsc{tom}) in the soil into several compartments \citep{orgReviw,
+  CNmodels}, such as recently added organic matter (\textsc{aom}),
+soil microbial biomass (\textsc{smb}), and organic matter that can no
+longer be traced back to its origin (\textsc{som}). These compartments
+may be further divided into smaller pools, where the content of each
+pool have uniform properties, such as turnover rate and C/N ratio. In
+general, having two \textsc{som} and two \textsc{smb} pools allows a
+well calibrated model to capture both the short term
+\citep{twoPoolFast} and long term \citep{twoPoolLong} dynamics of the
+system. The number of \textsc{aom} pools depends on the simulating
+system. For batch experiments and some long time scenarios, a single
+\textsc{aom} pool may be enough. However, to simulate input sources
+from a farming system, a fast and a slow \textsc{aom} pools per source
+are in general needed. The dynamics of the modeled system typically
+consist of input in form of new added organic matter (fertilizer,
+manure, crop residues) and biologically driven turnover.
 
 A major problem in most organic matter models is to estimate the soil
 content of the very slowly decomposing or perhaps even inert organic
@@ -137,16 +137,18 @@ The second change in parametrization was by \citet{daisy-somnew}. This
 was a complete recalibration that took into account the carbon input
 from rhizodepositions. This change was more radical, involving both
 turnover rates and directions of flow, and made the system much more
-adaptable to new levels of input. This effect has also been observed
-empirically \citep{dk-humus-change}. The recalibration also introduced
-a new soil organic matter pool, the \textsc{som3} pool, which
-represents a deactivated, inert \textsc{som} pool of humified organic
-matter. The resulting model, the current standard organic matter model
-in Daisy, is explained in the next section.
+adaptable to new levels of input. This adaptability has also been
+directly observed in the field \citep{dk-humus-change}. The
+recalibration also introduced a new soil organic matter pool, the
+\textsc{som3} pool, which represents a deactivated, inert \textsc{som}
+pool of humified organic matter. The resulting model, the current
+standard organic matter model in Daisy, is explained in the next
+section.
 
 \subsection{Organic matter turnover in Daisy}
+\label{sec:model}
 
-The current standard organic matter model is depicted in Fig.~(\ref{fig:om2}).
+The current standard organic matter model is depicted in Fig.~\ref{fig:om2}.
 
 \begin{figure}[htbp]
   \begin{center}
@@ -159,7 +161,7 @@ The current standard organic matter model is depicted in Fig.~(\ref{fig:om2}).
 The amount of carbon turned over and decomposed is directly
 proportional with the size of the pool. We call this the
 \emph{turnover rate} by the soil microbial biomass. All the pools in
-Fig.~(\ref{fig:om2}) have a fully drawn outgoing line. From the
+Fig.~\ref{fig:om2} have a fully drawn outgoing line. From the
 \textsc{som1} pool the outgoing line is marked with the text
 ``44y''. This indicate the turnover rate of this particular pool and
 the number is the corresponding halftime (i.e. 44 years for the
@@ -184,7 +186,7 @@ with its specific parameters.
 
 The turnover and maintenance of the pools is affected by abiotic
 factors, namely the clay content in the soil, the soil temperature,
-and the moisture. The halftimes listed in Fig.~(\ref{fig:om2})
+and the moisture. The halftimes listed in Fig.~\ref{fig:om2}
 corresponds to 0\% clay, 10$^\circ$C, and field capacity (defined as
 -100 hPa). The halftimes will increase with increasing clay content,
 decreasing temperature, and decreasing soil water content, as seen on
@@ -239,8 +241,8 @@ to reach equilibrium with new input levels.
 
 \subsection{Generalized equations}
 
-The generalized form for the change of the individual pools used by
-the dynamic model is shown in Eq.~\ref{eq:generic}.
+The rate of change of the individual pools in the dynamic model is
+governed by Eq.~\ref{eq:generic}.
 \begin{equation}
   \label{eq:generic}
   \begin{array}{lcll}
@@ -355,16 +357,18 @@ fraction of the total \textsc{som} in each pool, at in
 Eq.~\ref{eq:som-fractions}.
 \begin{equation}
   \label{eq:som-fractions}
-  \mbox{som}i = f_{\mbox{\scriptsize\textsc{som}}i} 
-    \sum_{j=1}^{\nsom} \mbox{\textsc{som}}
+  \mbox{\textsc{som}}i = f_{\mbox{\scriptsize\textsc{som}}i} 
+    \sum_{j=1}^{\nsom} \mbox{\textsc{som}}j
     \hspace{1cm};i = 1\ldots \nsom
 \end{equation}
 where $f_{\mbox{\scriptsize\textsc{som}}i}$ are user supplied
-constants.  This gives us $\nsom$ additional equations,
-however since $\sum_{i=1}^{\nsom}
-f_{\mbox{\scriptsize\textsc{som}}i} = 1$ the system is overspecified,
-and we leave out one of the equations.  Thus,
-Equations~\ref{eq:som-fractions}m \ref{eq:smb-eq}, \ref{eq:total}, and
+constants.  This gives us $\nsom$ additional equations, however since
+$\sum_{i=1}^{\nsom} f_{\mbox{\scriptsize\textsc{som}}i} = 1$ the
+system is overspecified, and we leave out one of the equations.  That
+is, for a system with two \textsc{som} pools, we only specify one
+equation, $\mbox{\textsc{som}}1 = f_{\mbox{\scriptsize\textsc{som}}1}
+(\mbox{\textsc{som}}1 + \mbox{\textsc{som}}2)$.  Thus,
+Eqs.~\ref{eq:som-fractions}, \ref{eq:smb-eq}, \ref{eq:total}, and
 \ref{eq:input} this gives us enough equations to find a solution.
 
 The explicit \textsc{som} partitioning gives the user good control
@@ -379,8 +383,7 @@ as a nitrogen storage, Daisy allow the user to specify desired
 background mineralization levels.  The background mineralization is
 defined as the decrease over time of nitrogen stored in the
 \textsc{som} pools.  Assuming a constant C/N ratio for each pool
-($\mbox{\textsc{c/n}}_{\mbox{\scriptsize\textsc{som}}i}$), this
-is gives us the equation
+($\mbox{\textsc{c/n}}_{\mbox{\scriptsize\textsc{som}}i}$), gives us the equation
 \begin{equation}
   \label{eq:cn}
   background = \sum_{i=1}^{\nsom}
@@ -409,11 +412,14 @@ variants. explained in the following.
 
 \subsubsection{Method 3: Size of inert pool}
 
-If we have an inert pool, like \textsc{som3} in Fig.~(\ref{fig:om2}),
-adding an equation stating that it doesn't change is redundant.  This
-is the case for the default initialization of the subsoil, here we
-assume the active pools are in equilibrium with the input, and let the
-equation system  find the size of the inert pool.
+If we have an inert pool, like \textsc{som3} in Fig.~\ref{fig:om2},
+adding an equation stating that $\Delta\mbox{\textsc{som}}3 = 0$
+doesn't add any additional information (it is already part of
+Eq.~(\ref{eq:generic}), where $d_{3,j}$, $e_{3,j}$, and $f_{3,j}$ will
+be $0$ for all $j$).  This is the case for the default initialization
+of the subsoil, here we assume the active pools are in equilibrium
+with the input, and let the equation system find the size of the inert
+pool.
 
 \subsubsection{Method 4: Total organic matter}
 
@@ -434,13 +440,14 @@ no idea of what the input levels for the field used to be.
 
 \subsection{Method 6: Quasi-equilibrium}
 
-The default initialization for organic matter in the plowing layer is
-to relax the equilibrium assumption, and allow the pool with the
+The default initialization for organic matter in the plough layer is
+to weaken the equilibrium assumption, and allow the pool with the
 lowest (non-zero) turnover rate to change.  That is, we remove one of
-the equations added by Eq.~\ref{eq:som-eq}, and keep all of
-Equations \ref{eq:smb-eq}, \ref{eq:total}, and \ref{eq:input}.  The
-idea is that all the fast pools will quickly adapt to the input and to
-the size of the slow pool. 
+the equations added by Eq.~\ref{eq:som-eq}, namely for the slowest
+active pool, typically \textsc{som1}, and keep all of
+Eqs.~\ref{eq:smb-eq}, \ref{eq:total}, and \ref{eq:input}.  The idea is
+that all the fast pools will quickly adapt to the input and to the
+size of the slow pool.
 
 \section{Simulations}
 \label{sec:simulations}
@@ -452,50 +459,49 @@ simulations we follow a system that goes from equilibrium at one level
 of carbon input, to equilibrium at another input level.  In particular
 we follow the relative size of the two active \textsc{som} pools.
 
-\subsection{Dricing variables and soil parameters}
+\subsection{Driving variables and soil parameters}
 
 Since the organic matter paramterization in Daisy has been developed
 based on Danish soils, we have used Danish data for all simulations.
 
 \subsubsection{Weather}
 
-The weather data are from an agro-meteorological research station in
+The weather data are from an meteorological research station in
 Taastrup, in the Eastern part of Denmark.  A time series from 1970 to
 1999 was used, and was repeated for the entire simulation.  The
-simulations start in year 2000, and seemed to have reached equilibrium
-in all cases after 600 years.
+simulation period was from the year 2000 to 2600.
 
 \subsubsection{Soil}
 
-To show effect of clay content, two standard soils for Danish
-conditions have been selected, a coarse sand typical for the
-Western part of Denmark, and a sandy loam typical for the Eastern
-parts of Denmark.  The particle size distribution of the two soils are
-listed in Table~(\ref{tab:psd}).
+To include the effect of clay content, two standard soils for Danish
+conditions have been selected, a coarse sand typical for the Western
+part of Denmark, and a sandy loam typical for the Eastern parts of
+Denmark.  The particle size distribution of the two soils are listed
+in Table~\ref{tab:psd}.
 \begin{table}[htbp]
   \caption{Particle size distribution of the two standard soils.}
   \label{tab:psd}
-\vspace{0.25cm}
-\begin{tabular}{c c c c}
-  \hline
-  Soil         &  clay  & silt    & sand \\
-               & (<2 $µ$m) & (2-50 $µ$m) & (50-2000 $µ$m)\\\hline
-  Coarse sandy & 3.9    & 6.4     & 89.7\\
-  Sandy loam   & 12.4   & 24.9    & 62.7\\\hline
-\end{tabular}
+  \vspace{0.25cm}
+  \begin{tabular}{c c c c}
+    \hline
+    Soil        &  clay     & silt        & sand \\
+                & (<2 $µ$m) & (2-50 $µ$m) & (50-2000 $µ$m)\\\hline
+    Sand        & 3.9       & 6.4         & 89.7\\
+    Sandy loam  & 12.4      & 24.9        & 62.7\\\hline
+  \end{tabular}
 \end{table}
-The organic content is not listed, as we initialize it to be in
+The total organic matter is not listed, as we initialize it to be in
 equilibrium with the specified input.
 
 \subsubsection{Management}
 
 Two management practice of high and low C-input to the simulated
-systems have been evaluated for each soil. For the coarse sand
-also a medium C-input management was included. All the management
-practices have been taken from \citet{daisy-staabi}. Table
-(\ref{tab:soils}) lists the average C-input together with the average
-and initial abiotic factor and the initial C-input of the different
-management and soil combinations.
+systems have been evaluated for each soil. For the coarse sand also a
+medium C-input management was included. All the management practices
+have been taken from \citet{daisy-staabi}. Table~\ref{tab:soils} lists
+the average C-input together with the average and initial abiotic
+factor and the initial C-input of the different management and soil
+combinations.
 \begin{table}[htbp]
   \caption{Average input of organic C and average abiotic factor (heat
     factor times humidity factor) in simulated management for sandy
@@ -508,13 +514,13 @@ management and soil combinations.
 \vspace{0.25cm}
 \begin{tabular}{c c c c c}
   \hline
-       &            & average & abiotic & initial \\
-  Soil & Manag.     & C input & factor  & C input \\\hline
-  Sandy & Low       & 1817    & 0.680   & 5200\\
-  Sandy & Medium    & 4412    & 0.680   & 5200\\
-  Sandy & High      & 5158    & 0.681   & 1800\\
-  Sandy loam & Low  & 2283    & 0.622   & 6500\\
-  Sandy loam & High & 6525    & 0.623   & 2300\\\hline
+        &            & average & abiotic & initial \\
+  Soil  & Manag.     & C input & factor  & C input \\\hline
+  Sand  & Low        & 1817    & 0.680   & 5200\\
+  Sand  & Medium     & 4412    & 0.680   & 5200\\
+  Sand  & High       & 5158    & 0.681   & 1800\\
+  Sandy loam & Low   & 2283    & 0.622   & 6500\\
+  Sandy loam & High  & 6525    & 0.623   & 2300\\\hline
 \end{tabular}
 \end{table}
 The total C input is higher in the sandy loam soil than in the sandy
@@ -532,106 +538,103 @@ file) for $T$, and field capacity (-100 hPa) for the water potential. A
 better estimate can be achieved by logging the product of factors in a
 realistic simulation.
 
-Figure~(\ref{fig:year}) shows the variation of the product of the heat
-and humidity effects within a specific year for both the sand,
-and the sandy loam.  The two soils are equal during the winther, where
-the humidity is high enough that only the temperature has an effect.
-This is typical for Danish conditions.  During the summer, the sandy
-soil gets dryer than the sandy loam, so the combined factor is also
-lower.
+Figure~\ref{fig:year} shows the variation of the product of the heat
+and humidity effects within a specific year for both the sand, and the
+sandy loam.  The abiotic factors for the two soils are equal during
+the winther, where the humidity is high enough that only the
+temperature has an effect.  This is typical for Danish conditions.
+During the summer, the sand gets dryer than the sandy loam, so the
+combined factor is also lower.
 \begin{figure}[htbp]
-  \hspace{-1.5cm}\input{abioticYear}
-  \caption{The combined heat and humidity effect (y-axes) for a sandy
-    soil ($+$) and sandy loam ($\odot$) as it
-    varies over a year (x-axes).}
+  \begin{tabular}{l}
+    Abiotic factor\\
+    \hspace{-1.5cm}\input{abioticYear}
+  \end{tabular}
+  \caption{The combined heat and humidity effect (y-axes) for a sand
+    ($+$) and sandy loam ($\times$) as it varies over a year (x-axes).}
   \label{fig:year}
 \end{figure}
 
-Figure~(\ref{fig:30}) shows the variation between years of the
-combines heat and hummidity effect over the 30 years of climate used,
+Figure~\ref{fig:30} shows the variation between years of the
+combined heat and hummidity effect over the 30 years of climate used,
 as well as a running average.  As can be seen, at least for Danish
-conditions, you need long time series before it makes sense to talk
-about effective values, as the variation is so high.
+conditions, long time series are required before it makes sense to
+talk about effective values, due to the high variation.
 \begin{figure}[htbp]
-  \hspace{-1.5cm}\input{abiotic30}
-  \caption{The combined heat and humidity effect (y-axes) for a sandy
-    soil ($+$) and sandy loam ($\odot$) as it
-    varies between years (x-axes).  The stippled lines are the running
-    averages for the two soils.}
+  \begin{tabular}{l}
+    Abiotic factor\\
+    \hspace{-1.5cm}\input{abiotic30}
+  \end{tabular}
+  \caption{The combined heat and humidity effect (y-axes) for a sand
+    ($+$) and sandy loam ($\times$) as it varies between years
+    (x-axes).  The stippled lines are the running averages for the two
+    soils.}
   \label{fig:30}
 \end{figure}
 
 \subsection{Results and discussion}
 \label{sec:results}
 
-Figure~(\ref{fig:long}) shows the results of switching between low and
-high carbon input for the two soil types.  Full equilibrium always
+Figure~\ref{fig:long} shows the results of switching between low and
+high carbon input for the two soil types.  With the organic matter
+model described in Sect.~\ref{sec:model}.  Full equilibrium always
 corresponds to 49\% \textsc{som1} \citep{daisy-init}, which is where
 the \textsc{som1} begins and ends in all four graphs.
 \begin{figure*}[htbp]
   \begin{tabular}{ll}
+    \% of soil\hfill{}Sand, low input\hfill{}\% of SOM\hspace{1cm} 
+    & \hspace{-0.5cm}\% of soil\hfill{}Sandy loam, low input\hfill{}\% of SOM\hspace{1.0cm} \\
     \hspace{-1.5cm}\input{realminJB6} & \hspace{-2.1cm}\input{realminJB1}\\
+    \% of soil\hfill{}Sand, high input\hfill{}\% of SOM\hspace{1cm} 
+    & \hspace{-0.5cm}\% of soil\hfill{}Sandy loam, high input\hfill{}\% of SOM\hspace{1.0cm} \\
     \hspace{-1.5cm}\input{realorgJB6} & \hspace{-2.1cm}\input{realorgJB1}
   \end{tabular}
-  \caption{Long term simulation on a sand (left column) and
-    sandy loam soil (right column) of organic matter in percent of
-    soil dry bulk mass (fully drawn line, left axes) and \textsc{som1}
-    in percent of of total \textsc{som} (dotted line, right axes) with
-    management changing from: (top row) high to low C input and
-    (bottom row) low to high C input.  The $+$'s indicate the
-    initialization of \textsc{som1} for the current humus level
-    estimated by the quasi-equilibrium.}
+  \caption{Long term simulation on a sand (left column) and sandy loam
+    soil (right column) of total organic matter (\textsc{tom}) in
+    percent of soil dry bulk mass (fully drawn line, left axes) and
+    \textsc{som1} in percent of of total \textsc{som} (dotted line,
+    right axes) with management changing from: (top row) high to low C
+    input and (bottom row) low to high C input.  The $\times$'s
+    indicate the initialization of \textsc{som1} for the current
+    amount of \textsc{tom} estimated by the quasi-equilibrium.}
   \label{fig:long}
 \end{figure*}
-A more moderate change is depicted in Fig.~(\ref{fig:orgJB1}).
+A more moderate change is depicted in Fig.~\ref{fig:orgJB1}.
 \begin{figure}[htbp]
-  \hspace{-1.5cm}\input{realmediumJB1}
-  \caption{Long term simulation on a sand of organic matter in
-    percent of dry bulk mass (left axis) and \textsc{som1} in percent
-    of toal \textsc{som} (right axis) with management changing from
-    high to medium C input. Simulated values are on the dotted
-    line. The $+$'s indicate the initialization of \textsc{som1} for
-    the current humus level estimated by the proposed
-    quasi-equilibrium.}
+  \begin{tabular}{l}
+    \% of soil\hfill{}Sandy loam, medium input\hfill{}\% of SOM\hspace{1cm} \\
+    \hspace{-1.5cm}\input{realmediumJB1}
+  \end{tabular}
+  \caption{Long term simulation on a sand of total organic matter
+    (\textsc{tom}) in percent of dry bulk mass (left axis) and
+    \textsc{som1} in percent of toal \textsc{som} (right axis) with
+    management changing from high to medium C input. Simulated values
+    are on the dotted line. The $\times$'s indicate the initialization
+    of \textsc{som1} for the current humus level estimated by the
+    proposed quasi-equilibrium.}
   \label{fig:orgJB1}
 \end{figure}
 
-After a decrease in input (graphs on top row of
-Fig.~(\ref{fig:long})), the organic matter content of the soil will
-also decrease, but the easily degradable \textsc{som} pool
-(\textsc{som2}) decreases faster than the more resistant pool
+After a decrease in input (Fig.~\ref{fig:long}, top), the organic
+content of the soil decreases, but the easily degradable \textsc{som}
+pool (\textsc{som2}) decreases faster than the more resistant pool
 (\textsc{som1}), so the relative \textsc{som1} fraction increases
-temporarily.  A similar effect can be seen after an increase of input,
-where the easily degradable \textsc{som} pool build up faster than the
-resistant pool, and relative \textsc{som1} fraction decreases
-temporarily while the total organic content builds up.
+temporarily.  A similar effect can be seen after an increase of input
+(Fig.~\ref{fig:long}, bottom), where the easily degradable
+\textsc{som} pool build up faster than the resistant pool, and
+relative \textsc{som1} fraction decreases temporarily while the total
+organic matter builds up.
 
 Equilibrium is reached after 200 (sandy loam, increasing input) to 600
-(sand, decreasing output) years.  Since the longest experimental trial
-used for validating Daisy is 70 years \citep{smith97-compar}, these
-results must all be viewed as extrapolation.  Equilibrium is reached
-sooner for the sandy loam than for the sand, and sooner for increasing
-input than for decreasing input.  For decreasing input,
-quasi-equilibrium is reached after 150 years (on sand) or 100 years
-(on sandy loam), well before equilibrium.  For increasing input,
-quasi-equilibrium is reached at approximately the same time as
-equilibrium.
-
-\conclusions
-
-As can be seen, the time to reach a new equilibrium after a large
-change in farming practice can be several centuries, which makes it
-safe to assume that Danish farming land is not in equilibrium. At such
-a time scale, not only farming practice but also climate is going to
-change. 
-
-After lowering carbon input, we reach quasi-equilibirum at around a
-third of the time we use to reach full equilinbrium.  For a large
-change, this unfortunetely is not practically useful, as the best case
-(the sandy loam) still takes a century to reach quasi-equilibirum.  In
-the case of raising carbon input, quasi-equilibirum doesn't seem to be
-approached faster than full equilinbrium.  For relatively small
-changes in carbon input, either method works fine.
+(sand, decreasing input) years.  Since the longest experimental trial
+used for validating the organic matter model in Daisy is 70 years
+\citep{smith97-compar}, these results must all be viewed as
+extrapolation.  Equilibrium is reached sooner for the sandy loam than
+for the sand, and sooner for increasing input than for decreasing
+input.  For decreasing input, quasi-equilibrium is reached after 150
+years (on sand) or 100 years (on sandy loam), well before equilibrium.
+For increasing input, quasi-equilibrium is reached at approximately
+the same time as equilibrium.
 
 The initialization method developed here is easy to understand and use
 by the user. The two mandatory numbers are the total content of
@@ -641,21 +644,47 @@ organic matter is directly measurable and the carbon input estimated
 by the user, for example from the use of Daisy simulations. None of
 the these numbers need to be changed when the model itself is changed.
 
-Despite the non-linearity of the abiotic effect functions, using the
-average value seems to work fine, under the conditions examined.  The
-average value can be found with a Daisy simulation.
+As can be seen, the time to reach a new equilibrium after a large
+change in farming practice can be several centuries, which makes it
+safe to assume that Danish farming land is not in equilibrium. At such
+a time scale, not only farming practice but also climate is going to
+change. 
+
+After lowering carbon input, we reach quasi-equilibirum at around a
+third of the time we use to reach full equilinbrium.  For a large
+change, this unfortunetely is not practically useful, as even for the
+scenario where the quasi-equilibirum does best (the sandy loam), it
+still takes a century to reach quasi-equilibirum.  In the case of
+raising carbon input, quasi-equilibirum doesn't seem to be approached
+faster than full equilinbrium.  For relatively small changes in carbon
+input, either method works fine.
+
+In all scenarios, the quasi-equilibirum estimate for \textsc{som1}
+approaches the value predicted for full equilibrium (49\%,
+\citet{daisy-init}) as the dynamic model itself approaches
+equilibrium.  Since the quasi-equilibirum estimate is strongly
+dependent on abiotic factors, this indicates that, despite the
+non-linearity of the abiotic effect functions, using the average value
+work well, under the conditions examined.  The average value can be
+found with a Daisy simulation.
 
 Despite the increased clay content, which should slow down turnover in
 the system, the sandy loam reach both quasi-equilibirum and full
-equilibrium faster than the sand, because of the increased
-humidity of the soil during the summer.  Which indicate that both
-initialization assumptions would work better under climate where
-organic matter turnover is faster due to heat or humidity.
+equilibrium faster than the sand, because of the increased humidity of
+the soil during the summer.  Which indicate that both initialization
+assumptions would result in estimates of the \textsc{som} partitining
+that are closer to the dynamic model, under climate where organic
+matter turnover is faster due to heat or humidity.
 
 Another possible aspect for further study would be other organic
 matter model parametrizations, especially parametrizations where
 difference in the turnover rate between the \textsc{som} pools is
 higher..
+
+\conclusions
+
+The quasi-equilibirum assumption doesn't work under Danish conditions
+with the current organic matter model in Daisy.
 
 \addcontentsline{toc}{section}{\numberline{}References}
 \bibliography{../daisy}

@@ -44,7 +44,7 @@ public:
 
   // Simulation.
 public:
-  virtual void  tick_top (const double total_rain, const double direct_rain,
+  virtual void tick_top (const double total_rain, const double direct_rain,
                           const double canopy_drip,
                           const double cover, const double h_veg, 
                           const double h_pond,

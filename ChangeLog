@@ -1,3 +1,9 @@
+2009-03-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* reaction_Morgan98.C: New model.
+	* reaction_colgen.C, reaction_colgen.h: New base.
+	* Makefile (MODELS, SPECIALS): Added them.
+
 2009-03-05  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* rainergy.C, rainergy.h: New component.

@@ -372,7 +372,8 @@ NOLINK = -c
 # 
 
 LATER = tertiary_instant.C 
-MODELS = reaction_Styczen88.C program_GP2D.C svat_ssoc.C reaction_Jarvis99.C \
+MODELS = reaction_Morgan98.C \
+	reaction_Styczen88.C program_GP2D.C svat_ssoc.C reaction_Jarvis99.C \
 	reaction_filter.C seed_LAI.C seed_release.C \
 	stomatacon_BB.C stomatacon_SHA.C stomatacon_Leuning.C \
 	tertiary_old.C \
@@ -477,7 +478,7 @@ SUBMODELS = toplevel.C timestep.C geometry_rect.C doe.C \
 
 # Special or intermediate models with their own interface.
 #
-SPECIALS = weather_base.C \
+SPECIALS = reaction_colgen.C weather_base.C \
 	volume_box.C movement_solute.C scope_exchange.C photo_Farquhar.C \
 	scope_multi.C scope_id.C geometry_vert.C gnuplot_base.C \
 	source_file.C format_LaTeX.C log_all.C om.C select_value.C \
@@ -1225,6 +1226,8 @@ bioincorporation${OBJ}: bioincorporation.C bioincorporation.h \
   frame_submodel.h frame.h scope.h value.h symbol.h log.h time.h border.h \
   model.h geometry.h soil.h am.h im.h librarian.h plf.h aom.h om.h \
   check.h vcheck.h mathlib.h assertion.h
+reaction_colgen${OBJ}: reaction_colgen.C reaction_colgen.h reaction.h model.h \
+  symbol.h librarian.h frame.h scope.h value.h
 weather_base${OBJ}: weather_base.C weather_base.h weather.h model.h symbol.h \
   im.h value.h fao.h assertion.h time.h log.h border.h mathlib.h \
   librarian.h block.h units.h frame.h scope.h
@@ -1414,6 +1417,10 @@ cdaisy${OBJ}: cdaisy.C scope.h value.h symbol.h block.h metalib.h frame.h \
   frame_model.h frame_submodel.h filepos.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
+reaction_Morgan98${OBJ}: reaction_Morgan98.C reaction.h model.h symbol.h \
+  mathlib.h assertion.h check.h block.h value.h librarian.h chemistry.h \
+  chemical.h log.h time.h border.h treelog.h frame.h scope.h ponddamp.h \
+  rainergy.h
 reaction_Styczen88${OBJ}: reaction_Styczen88.C reaction.h model.h symbol.h \
   mathlib.h assertion.h check.h block.h value.h librarian.h chemistry.h \
   chemical.h log.h time.h border.h geometry.h soil.h treelog.h frame.h \
