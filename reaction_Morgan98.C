@@ -97,6 +97,9 @@ ReactionMorgan98::tick_top (const double total_rain, const double direct_rain,
                             const double h_pond,
                             Chemistry& chemistry, const double dt, Treelog&)
 {
+  // Median raindrop size (for logging)
+  dds = Ponddamp::dds (total_rain);
+
   Chemical& colloid = chemistry.find (colloid_name);
   
   colloid_generation (total_rain, direct_rain, canopy_drip, h_veg,

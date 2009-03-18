@@ -46,6 +46,8 @@ static struct ABAProdInit : public DeclareComponent
     : DeclareComponent (ABAProd::component, "\
 The 'ABAproduction' component calculates the prod of ABA in soil.")
   { }
+  void load_frame (Frame& frame) const
+  { Model::load_model (frame); }
 } ABAProd_init;
 
 struct ABAProdNone : public ABAProd

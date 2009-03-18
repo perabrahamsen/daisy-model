@@ -37,7 +37,7 @@
   a state of equilibrium. Unfortunately, the time to reach equilibrium
   is often measured in centuries. Therefore the use of a warm-up
   period cannot replace the need for a good initial partitioning. In
-  this paper we examine a milder assumption, namely a
+  this paper we examine a weaker assumption, namely a
   quasi-equilibrium where all except for the slowest pool is in
   equilibrium with the amount of carbon input. This assumption allows
   the non-expert user to initialize the model, and is robust with
@@ -92,11 +92,11 @@ non-expert user to initialize the model, and is robust with regard to
 model changes.
 
 Before delving into the equations behind the quasi-equilibrium, we
-will take a look on the Daisy model that will be used for examining
+will take a look at the Daisy model that will be used for examining
 it, and the evolution of the model which will provide further context
 for the initialization problem.
 
-\subsection{Evolution of the Organic Matter model in Daisy}
+\subsection{Development of the Organic Matter model in Daisy}
 \label{sec:daisy-evol}
 
 The organic matter model in Daisy simulates farming practice at
@@ -242,7 +242,7 @@ to reach equilibrium with new input levels.
 \subsection{Generalized equations}
 
 The rate of change of the individual pools in the dynamic model is
-governed by Eq.~\ref{eq:generic}.
+governed by Eq.~(\ref{eq:generic}).
 \begin{equation}
   \label{eq:generic}
   \begin{array}{lcll}
@@ -274,7 +274,7 @@ $c_{i,j}$, $d_{i,j}$, $e_{i,j}$, $f_{i,j}$ and $g_i$ (fraction per time)
 respectively.  These relationships are calculated on basis of the
 parametrization of the organic matter turnover model.  For example,
 the formula for finding $a_{1,2}$ can be found in
-Eq.~\ref{eq:a12}.
+Eq.~(\ref{eq:a12}).
 \begin{equation}
   \label{eq:a12}
   \begin{array}{rcl}
@@ -319,7 +319,7 @@ be solved using a standard technique (Gauss-Jordan elimination is used
 in Daisy). The methods will be listed in the following sections.  All
 the methods rely on the assumtion that the \textsc{smb} pools are in
 equilibrium, meaning $\Delta\mbox{\textsc{smb}}i$ are all zero
-(Eq.~\ref{eq:smb-eq}).
+Eq.~(\ref{eq:smb-eq}).
 \begin{equation}
   \label{eq:smb-eq}
   \Delta\mbox{\textsc{smb}}i = 0 \hspace{1cm};i = 1\ldots \nsmb
@@ -327,23 +327,23 @@ equilibrium, meaning $\Delta\mbox{\textsc{smb}}i$ are all zero
 This is reasonable as the \textsc{smb} pools tend to adjust to input
 levels relatively fast (a few years at most).  All but one
 initialization option require the user to specify the total organic
-matter in the soil, which allows us to add Eq.~\ref{eq:total} to
+matter in the soil, which allows us to add Eq.~(\ref{eq:total}) to
 the system without increasing the number of unknowns.
 \begin{equation}
   \label{eq:total}
-  total = \sum_{i=1}^{\nsmb} \mbox{\textsc{smb}}i
+  \mbox{\textsc{tom}} = \sum_{i=1}^{\nsmb} \mbox{\textsc{smb}}i
     + \sum_{i=1}^{\nsom} \mbox{\textsc{som}}i
     + \sum_{i=1}^{\naom} \mbox{\textsc{aom}}i
 \end{equation}
 The final common assumption is that the carbon input is known, as in
-Eq.~\ref{eq:input}.
+Eq.~(\ref{eq:input}).
 \begin{equation}
   \label{eq:input}
   \Delta\mbox{\textsc{aom}}i = k_i \hspace{1cm};i = 1\ldots \naom
 \end{equation}
 Here $k_i$ denote the known carbon input to \textsc{aom}$i$, from
 which the size of \textsc{aom}$i$ can trivially be found given
-Eq.~\ref{eq:generic} ($\mbox{\textsc{aom}}i = k_i / g_i$), and
+Eq.~(\ref{eq:generic}) ($\mbox{\textsc{aom}}i = k_i / g_i$), and
 eliminated as unknowns from the equation system.
 
 Combining all three assumptions, we still lack
@@ -353,8 +353,8 @@ $\nsom-1$ equations before we can solve the system.
 
 The original, and still supported, method of initializing the
 \textsc{som} pools was to require the user to explicitly specify the
-fraction of the total \textsc{som} in each pool, at in
-Eq.~\ref{eq:som-fractions}.
+fraction of the total \textsc{som} allocated to each pool, at in
+Eq.~(\ref{eq:som-fractions}).
 \begin{equation}
   \label{eq:som-fractions}
   \mbox{\textsc{som}}i = f_{\mbox{\scriptsize\textsc{som}}i} 
@@ -362,14 +362,15 @@ Eq.~\ref{eq:som-fractions}.
     \hspace{1cm};i = 1\ldots \nsom
 \end{equation}
 where $f_{\mbox{\scriptsize\textsc{som}}i}$ are user supplied
-constants.  This gives us $\nsom$ additional equations, however since
+fractions.  This gives us $\nsom$ additional equations, however since
 $\sum_{i=1}^{\nsom} f_{\mbox{\scriptsize\textsc{som}}i} = 1$ the
 system is overspecified, and we leave out one of the equations.  That
 is, for a system with two \textsc{som} pools, we only specify one
 equation, $\mbox{\textsc{som}}1 = f_{\mbox{\scriptsize\textsc{som}}1}
 (\mbox{\textsc{som}}1 + \mbox{\textsc{som}}2)$.  Thus,
-Eqs.~\ref{eq:som-fractions}, \ref{eq:smb-eq}, \ref{eq:total}, and
-\ref{eq:input} this gives us enough equations to find a solution.
+Eqs.~(\ref{eq:som-fractions}), (\ref{eq:smb-eq}), (\ref{eq:total}),
+and (\ref{eq:input}) this gives us enough equations to find a
+solution.
 
 The explicit \textsc{som} partitioning gives the user good control
 over the simulation with a manageable number of parameters.  However,
@@ -400,21 +401,21 @@ system.
 \subsection{Equilibrium assumptions}
 
 If the system is in equilibrium, none of the pools will change, so we
-can add Eq.~\ref{eq:som-eq}.
+can add Eq.~(\ref{eq:som-eq}).
 \begin{equation}
   \label{eq:som-eq}
   \Delta\mbox{\textsc{som}}i = 0 \hspace{1cm};i = 1\ldots \nsom
 \end{equation}
-Together with \ref{eq:smb-eq}, \ref{eq:total}, and \ref{eq:input} this
-gives us one more equation than needed, so Daisy will allow the user
-to relax some other assumption.  This leads to the three different
-variants. explained in the following.
+Together with Eqs.~(\ref{eq:smb-eq}), (\ref{eq:total}), and
+(\ref{eq:input}) this gives us one more equation than needed, so Daisy
+will allow the user to relax some other assumption.  This leads to the
+three different variants explained in the following.
 
 \subsubsection{Method 3: Size of inert pool}
 
 If we have an inert pool, like \textsc{som3} in Fig.~\ref{fig:om2},
 adding an equation stating that $\Delta\mbox{\textsc{som}}3 = 0$
-doesn't add any additional information (it is already part of
+does not add any additional information (it is already part of
 Eq.~(\ref{eq:generic}), where $d_{3,j}$, $e_{3,j}$, and $f_{3,j}$ will
 be $0$ for all $j$).  This is the case for the default initialization
 of the subsoil, here we assume the active pools are in equilibrium
@@ -424,7 +425,7 @@ pool.
 \subsubsection{Method 4: Total organic matter}
 
 The second equilibrium initialization allows the user to leave out
-Eq.~\ref{eq:total}, so the total amount of (active) soil organic
+Eq.~(\ref{eq:total}), so the total amount of (active) soil organic
 matter is estimated from the input levels.  This is rarely useful, as
 total amount of organic material is easy to measure, but has been used
 in this paper to initialize the organic matter content for long term
@@ -435,7 +436,7 @@ period from one equilibrium to another.
 
 The last and most common equilibrium initialization is to let the user
 specify the size of the inert pool (usually to zero), and leave out
-Eq.~\ref{eq:input}.  This is useful for cases where the user have
+Eq.~(\ref{eq:input}).  This is useful for cases where the user have
 no idea of what the input levels for the field used to be.
 
 \subsection{Method 6: Quasi-equilibrium}
@@ -443,9 +444,9 @@ no idea of what the input levels for the field used to be.
 The default initialization for organic matter in the plough layer is
 to weaken the equilibrium assumption, and allow the pool with the
 lowest (non-zero) turnover rate to change.  That is, we remove one of
-the equations added by Eq.~\ref{eq:som-eq}, namely for the slowest
+the equations added by Eq.~(\ref{eq:som-eq}), namely for the slowest
 active pool, typically \textsc{som1}, and keep all of
-Eqs.~\ref{eq:smb-eq}, \ref{eq:total}, and \ref{eq:input}.  The idea is
+Eqs.~(\ref{eq:smb-eq}), (\ref{eq:total}), and (\ref{eq:input}).  The idea is
 that all the fast pools will quickly adapt to the input and to the
 size of the slow pool.
 
@@ -679,7 +680,7 @@ matter turnover is faster due to heat or humidity.
 Another possible aspect for further study would be other organic
 matter model parametrizations, especially parametrizations where
 difference in the turnover rate between the \textsc{som} pools is
-higher..
+higher.
 
 \conclusions
 

@@ -37,7 +37,7 @@ Ponddamp::library_id () const
   return id;
 }
 
-double                          // Median droplet size.
+double                          // Median droplet size [mm].
 Ponddamp::dds (const double P)
 { return std::pow (1.238, 0.182); }
 
@@ -87,7 +87,10 @@ KH = exp (-b h)")
   { 
     frame.add_strings ("cite", "EUROSEM");
     frame.add ("b", "mm^-1", Value::Const, "\
-Exponential degradation coefficient.");
+Exponential degradation coefficient.\n\
+The range of 'b' is from 0.9 to 3.1, a default value of 2 is proposed\n\
+by the EUROSEM project.");
+    frame.add ("b", 2.0);
   }
 } PonddampEUROSEM_syntax;
 
@@ -97,7 +100,7 @@ struct PonddampPark82 : public Ponddamp
 {
   // Simulation.
   double value (const double h, const double P) const
-  { return 2.7183 * std::exp (- h / dds (P)); }
+  { return std::max (1.0, 2.7183 * std::exp (- h / dds (P))); }
 
   // Create and Destroy.
   PonddampPark82 (Block&)
@@ -126,7 +129,12 @@ struct PonddampHairsine91 : public Ponddamp
 {
   // Simulation.
   double value (const double h, const double P) const
-  { return std::pow (h / dds (P), -0.8); }
+  { 
+    if (h < 0.01)
+      return 1.0;
+    
+    return std::max (1.0, std::pow (h / dds (P), -0.8)); 
+  }
 
   // Create and Destroy.
   PonddampHairsine91 (Block&)

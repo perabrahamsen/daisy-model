@@ -1436,7 +1436,7 @@ svat_ssoc${OBJ}: svat_ssoc.C svat.h model.h symbol.h block.h value.h \
 reaction_Jarvis99${OBJ}: reaction_Jarvis99.C reaction_colgen.h reaction.h \
   model.h symbol.h mathlib.h assertion.h check.h block.h value.h \
   librarian.h chemistry.h chemical.h log.h time.h border.h geometry.h \
-  soil.h treelog.h frame.h scope.h rainergy.h
+  soil.h treelog.h frame.h scope.h rainergy.h ponddamp.h
 reaction_filter${OBJ}: reaction_filter.C reaction.h model.h symbol.h block.h \
   value.h transform.h chemistry.h chemical.h soil.h soil_water.h log.h \
   time.h border.h assertion.h librarian.h check.h mathlib.h treelog.h \

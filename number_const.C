@@ -496,6 +496,7 @@ Pass value unchanged.")
   { }
   void load_frame (Frame& frame) const
   {
+    Model::load_model (frame);
     frame.add ("dimension", Value::String, Value::OptionalConst,
 		"Dimension of this value.");
   }

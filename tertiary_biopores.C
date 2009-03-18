@@ -664,7 +664,7 @@ static struct TertiaryBioporesSyntax : public DeclareModel
   { 
 
     frame.add ("enable_solute", Value::Boolean, Value::Const, "\
-fTrue iff solutes should be transport with the water through the biopores.");
+True iff solutes should be transport with the water through the biopores.");
     frame.add ("enable_solute", true);
     frame.add_object ("classes", Biopore::component, 
                        Value::State, Value::Sequence,

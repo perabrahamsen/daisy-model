@@ -326,6 +326,7 @@ setting the parameters.")
   { }
   void load_frame (Frame& frame) const
   {
+    Model::load_model (frame);
     frame.add_object ("bottom", Bound::component, 
                        Value::Const, Value::Singleton,
                        "Lower boundary on the z-axis.");

@@ -1,14 +1,41 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
+* tertiary biopores:  fjern enable_solute
+
+* ominit
+
+Har vi forklaret godt nok hvornår vi kører generelt (vilkårligt antal
+puljer), og hvornår vi kører specifikt (2 + 2 + 3 puljer)?  sjk
+
+* N Balance
+
+Prøv at se om der er massebalance.
+
 * R2D2
 
 ** Kolloider
 
-Lav test.
+*** Excel ark med rainergy og ponddamp
 
-* Søren
+**** rainergy DONE
 
-Giv ham seneste version af ominit paper, samt kritik af farmer model.
+**** ponddamp
+
+*** test setup
+
+Jarvis
+  KE & D
+  rainergy
+
+Styczen
+  ponddamp
+  KE & D
+
+Morgan
+  ponddamp
+  rainergy
+  KH & KE & D
+
 
 * Frame
 

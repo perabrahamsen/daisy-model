@@ -31,6 +31,7 @@
 void 
 ReactionColgen::output (Log& log) const
 {
+  output_variable (dds, log); 
   output_variable (D, log); 
 }
 
@@ -51,6 +52,7 @@ ReactionColgen::check (const Units&, const Geometry& geo,
 ReactionColgen::ReactionColgen (Block& al)
   : Reaction (al),
     colloid_name (al.name ("colloid")),
+    dds (-42.42e42),
     D (-42.42e42)
 { }
  
@@ -66,6 +68,7 @@ Shared parameter and log variable for colloid generation models.")
   void load_frame (Frame& frame) const
   {
     frame.add ("colloid", Value::String, Value::Const, "Colloid to generate.");
+    frame.add ("dds", "mm", Value::LogOnly, "Median raindrop size.");
     frame.add ("D", "g/cm^2/h", Value::LogOnly, 
                "Depletion of detachable particles from top soil.");
   }

@@ -35,9 +35,8 @@ public:
   symbol library_id () const;
 
   // Simulation.
-protected:
-  static double dds (double P /* [mm/h] */);
 public:
+  static double dds (double P /* [mm/h] */);
   virtual double value (double h /* [mm] */, double P /* [mm/h] */) const = 0;
 
   // Create and Destroy.

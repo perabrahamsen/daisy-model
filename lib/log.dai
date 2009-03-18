@@ -801,6 +801,7 @@ soil increases."
 		     (spec chemical default S_drain)
                      (tag "NH4-Drain")
                      (handle sum)
+                     (negate true)
                      (dimension "kg N/ha/&"))
            (number (path column "${column}" 
 			 Vegetation crops crops "*" Root NH4Upt)
@@ -909,6 +910,7 @@ soil increases."
 		     (spec chemical default S_drain)
                      (tag "NO3-Drain")
                      (handle sum)
+                     (negate true)
                      (dimension "kg N/ha/&"))
            (interval (path column "${column}" 
 			   Chemistry "*" trace NO3 S_external)

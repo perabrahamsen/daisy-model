@@ -32,6 +32,7 @@ protected:
 
   // Log variable.
 protected:
+  double dds;                   // Median droplet size [mm]
   double D;                     // Depletion [g/cm^2/h]
 
   // Simulation.
