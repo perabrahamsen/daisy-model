@@ -32,6 +32,7 @@
 #include "memutils.h"
 #include "alist.h"
 #include "filepos.h"
+#include "metalib.h"
 #include <vector>
 #include <set>
 #include <sstream>
@@ -565,6 +566,56 @@ Frame::subset (Metalib& metalib, const Frame& other,
       if (!him)
         // Missing value cannot be a superset of a value.
         return false;
+    }
+
+  // Can only compare same type of attribute.
+  const Value::type my_type = me->lookup (key);
+  const Value::type his_type = him->lookup (key);
+  daisy_assert (my_type == his_type);
+  
+  switch (my_type)
+    {
+    case Value::AList:
+      // TODO: We should test that the submodel is the same.
+      break;
+    case Value::Object:
+      {
+        // Can only compare objects from the same library.
+        const symbol my_component = me->component (key);
+        const symbol his_component = him->component (key);
+        daisy_assert (my_component == his_component);
+        const Library& library = metalib.library (my_component);
+        if (type_size (key) == Value::Singleton)
+          {
+            const symbol my_name = me->model (key).type_name ();
+            const symbol his_name = him->model (key).type_name ();
+            if (!library.is_derived_from (my_name, his_name))
+              // Subsets must be derived from supersets.
+              return false;
+          }
+        else
+          {
+            const int my_size = me->value_size (key);
+            const int his_size = him->value_size (key);
+            const int size = std::min (my_size, his_size);
+            daisy_assert (size >= 0);
+            const std::vector<const FrameModel*>& mine 
+              = me->model_sequence (key);
+            const std::vector<const FrameModel*>& his 
+              = him->model_sequence (key);
+            for (size_t i = 0; i < size; i++)
+              {
+                const symbol my_name = mine[i]->type_name ();
+                const symbol his_name = his[i]->type_name ();
+                if (!library.is_derived_from (my_name, his_name))
+                  // Subsets must be derived from supersets.
+                  return false;
+              }
+          }
+      }
+      break;
+    default:
+      /* Do nothing */;
     }
 
   // Both values exist, perform test.

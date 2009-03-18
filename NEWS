@@ -6,6 +6,32 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.61
+
+** More log models take 'unit' parameter.
+
+"Field chemical", "Soil chemical", "Field nitrogen", and "Soil
+nitrogen" now accept a "unit" parameter.  For exammple
+
+  ("Field chemical" (unit [kg/ha]) (chemical colloid))
+
+to get a summary of colloids in the field using [kg/ha] is the base unit.
+
+** New 'Styczen88' and 'Morgan98' colloid generation models.
+
+The 'Styczen88' model use momentum rather than kinetic energy for
+colloid generation.  'Morgan98' is siimilar to 'Jarvis99' except that
+it takes vegetation into account, but does not have a pool of readily
+available colloids.
+
+** New 'rainergy' and 'ponddamp' components.
+
+These are used by the colloid generation models.  'rainergy' represent
+models for kinetic energy in rain, and 'ponddamp' represent the
+dampening effect of ponding on colloid generation.
+
+** Bug fixes and cleanups.
+
 * 4.60
 
 ** Cleanups and bug fixes.

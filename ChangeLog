@@ -1,5 +1,13 @@
 2009-03-18  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 4.61 released.
+
+2009-03-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* geometry.C (Geometry::set_soil): Made it more numerically robust.
+
+	* frame.C (Frame::subset): Handle object types.
+
 	* production.C (Production::tick): Daily leaf growth was defined
 	in terms of roots.
 

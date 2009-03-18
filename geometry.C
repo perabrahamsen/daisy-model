@@ -504,7 +504,7 @@ Geometry::set_soil (std::vector<double>& v,
 
   for (size_t i = 0; i < cell_size; i++)
     {
-      const double f = fraction_in_z_interval (i, from, to);
+      const double f = frac[i];
       if (f > 0.0)
         {
 	  if (f < 1.0)
@@ -513,7 +513,19 @@ Geometry::set_soil (std::vector<double>& v,
             v[i] = density;
 	}
     }
-  daisy_assert (approximate (old_total - old_amount + amount, total_soil (v)));
+  const double new_total = total_soil (v);
+  const double sum = old_total - old_amount + amount;
+  if (!approximate (sum, new_total)
+      && ! approximate (new_total + old_amount, old_amount + amount))
+    {
+      const double rel = std::fabs (sum) / std::max (std::fabs (old_total),
+                                                     std::fabs (sum));
+      std::ostringstream tmp;
+      tmp << "old_total (" << old_total << ") - old_amount (" << old_amount 
+          << ") + amount (" << amount << ") = " << sum << " != new_total (" << new_total 
+          << "); diff = " << sum - new_total << "; rel = " << rel; 
+      daisy_warning (tmp.str ());
+    }
 }
 
 void 
