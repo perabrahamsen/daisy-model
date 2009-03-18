@@ -198,15 +198,23 @@ ReactionStyczen88::colloid_generation (const double P /* [mm/h] */,
 
   // Droplet momentum.
   DH = find_DH (h_veg, droplet_diameter);
+  daisy_assert (std::isfinite (DH));
 
   // Vegetation modifier.
-  CM = ((1.0 - f_cov) * MR + LD * DH) / MR;
+  CM = (MR > 0.0)
+    ? ((1.0 - f_cov) * MR + LD * DH) / MR
+    : 1.0;
+  daisy_assert (std::isfinite (CM));
 
   // Ponding factor.
   KH = ponddamp->value (h_pond, P);
+  daisy_assert (std::isfinite (KH));
 
   // Detachment of colloids at the surface. [g cm^-2 h^-1]
   D = Ae * (1.0 - MA) * KH * CM * MR; 
+
+  daisy_assert (std::isfinite (D));
+  daisy_assert (D >= 0.0);
 }
 
 void 

@@ -47,7 +47,6 @@
 struct TertiaryBiopores : public Tertiary, public Tertsmall
 {
   // Parameters.
-  const bool enable_solute;
   const auto_vector<Biopore*> classes; // List of biopore classes.
   const double pressure_initiate;// Pressure needed to init pref.flow [cm]
   const double pressure_end;	 // Pressure after pref.flow has been init [cm]
@@ -489,8 +488,6 @@ TertiaryBiopores::solute (const Geometry& geo, const SoilWater& soil_water,
                           const double dt,
                           Chemical& chemical, Treelog& msg)
 {
-  if (!enable_solute)
-    return;
   const symbol chem = chemical.name;
   // Surface infiltration.
   const size_t edge_size = geo.edge_size ();
@@ -627,7 +624,6 @@ TertiaryBiopores::check (const Geometry& geo, Treelog& msg) const
 
 TertiaryBiopores::TertiaryBiopores (Block& al)
   : Tertiary (al),
-    enable_solute (al.flag ("enable_solute")),
     classes (Librarian::build_vector<Biopore> (al, "classes")),
     pressure_initiate (al.number ("pressure_initiate")),
     pressure_end (al.number ("pressure_end")),
@@ -663,9 +659,6 @@ static struct TertiaryBioporesSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   { 
 
-    frame.add ("enable_solute", Value::Boolean, Value::Const, "\
-True iff solutes should be transport with the water through the biopores.");
-    frame.add ("enable_solute", true);
     frame.add_object ("classes", Biopore::component, 
                        Value::State, Value::Sequence,
                        "List of biopore classes.");

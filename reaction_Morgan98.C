@@ -127,6 +127,7 @@ ReactionMorgan98::initialize (const Units&, const Geometry&,
 ReactionMorgan98::ReactionMorgan98 (Block& al)
   : ReactionColgen (al),
     ponddamp (Librarian::build_item<Ponddamp> (al, "ponddamp")),
+    rainergy (Librarian::build_item<Rainergy> (al, "rainergy")),
     kd (al.number ("kd")),
     E (-42.42e42),
     KH (-42.42e42)

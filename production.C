@@ -481,7 +481,7 @@ Production::tick (const double AirT, const double SoilT,
   if (WRoot < 0.0)
     WRoot = 0.0;
   DailyNetRoot += (IncWRoot + DeadWRoot) * dt;
-  DailyNetLeaf += (IncWRoot + DeadWRoot) * dt;
+  DailyNetLeaf += (IncWLeaf + DeadWLeaf) * dt;
 
   const double old_CCrop = CCrop;
   update_carbon ();

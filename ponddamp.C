@@ -39,7 +39,7 @@ Ponddamp::library_id () const
 
 double                          // Median droplet size [mm].
 Ponddamp::dds (const double P)
-{ return std::pow (1.238, 0.182); }
+{ return 1.238 * std::pow (P, 0.182); }
 
 Ponddamp::Ponddamp ()
 { }
@@ -100,7 +100,11 @@ struct PonddampPark82 : public Ponddamp
 {
   // Simulation.
   double value (const double h, const double P) const
-  { return std::max (1.0, 2.7183 * std::exp (- h / dds (P))); }
+  {
+    const double dds = this->dds (P);
+    daisy_assert (dds > 0.9);
+    return std::max (1.0, 2.7183 * std::exp (- h / dds)); 
+  }
 
   // Create and Destroy.
   PonddampPark82 (Block&)

@@ -1,3 +1,13 @@
+2009-03-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* production.C (Production::tick): Daily leaf growth was defined
+	in terms of roots.
+
+	* lib/log-std.dai ("Field nitrogen", "Soil nitrogen")
+	("Field chemical", "Soil chemical"): Take 'unit' parameter.
+
+	* tertiary_biopores.C: Removed 'enable_solute' parameter.
+
 2009-03-11  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* reaction_Morgan98.C: New model.
