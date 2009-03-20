@@ -105,19 +105,19 @@ struct RainergyEUROSEM : public Rainergy
     const double I = std::max (1.0, total_rain); // [mm/h]
 
     // Direct rain energy.
-    const double DT = direct_rain / 3600.0; // [mm/s]
-    const double KE_DT = (8.95 + 8.44 * std::log (I)) * DT; // [J/m^2/s]
+    const double DT = direct_rain; // [mm/h]
+    const double KE_DT = (8.95 + 8.44 * std::log (I)) * DT; // [J/m^2/h]
 
     // Canopy drip energy.
-    const double LD = canopy_drip / 3600.0; // [mm/s]
+    const double LD = canopy_drip; // [mm/h]
     const double PH = canopy_height;        // [m]
-    const double KE_LD = (15.8 * std::sqrt (PH) - 5.87) * LD; // [J/m^2/s]
+    const double KE_LD = (15.8 * std::sqrt (PH) - 5.87) * LD; // [J/m^2/h]
     
     // Total energy.
-    const double KE_T = KE_DT + std::max (KE_LD, 0.0); // [mJ/m^2/s] = [g/s^3]
+    const double KE_T = KE_DT + std::max (KE_LD, 0.0); // [J/m^2/h]
 
     // Convert.
-    return KE_T * 1e-3 * 1e-4 * 3600.0; // [J/cm^2/h]
+    return KE_T * 1e-4; // [J/cm^2/h]
   }
 
   // Create and Destroy.

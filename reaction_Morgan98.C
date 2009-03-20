@@ -31,21 +31,18 @@
 #include "log.h"
 #include "treelog.h"
 #include "frame.h"
-#include "ponddamp.h"
 #include "rainergy.h"
 #include <memory>
 
 struct ReactionMorgan98 : public ReactionColgen
 {
   // Parameters.
-  const std::auto_ptr<Ponddamp> ponddamp;
   const std::auto_ptr<Rainergy> rainergy; // Energy in rain [J/cm^2/h]
   const double kd;                        // Detachment rate coefficient [g/J]
 
   // Log variable.
-  double KE;                    // Energy for colloid generation [W/cm^2]
+  double KE;                    // Energy for colloid generation [J/cm^2/h]
   double E;                     // Energy in rain [J/cm^2/h]
-  double KH;                    // Ponding factor []
 
   // Simulation.
   void colloid_generation (const double total_rain /* [mm/h] */, 
@@ -83,9 +80,6 @@ ReactionMorgan98::colloid_generation (const double total_rain /* [mm/h] */,
   // Kinetic energy of rain. [J cm^-2 mm^-1]
   E = (total_rain > 0) ? KE / total_rain : 0.0;
   
-  // Ponding factor. []
-  KH = ponddamp->value (h_pond, total_rain);
-
   // Detachment of colloids at the surface. [g cm^-2 h^-1]
   D = kd * KH * KE;
 }
@@ -97,8 +91,7 @@ ReactionMorgan98::tick_top (const double total_rain, const double direct_rain,
                             const double h_pond,
                             Chemistry& chemistry, const double dt, Treelog&)
 {
-  // Median raindrop size (for logging)
-  dds = Ponddamp::dds (total_rain);
+  ReactionColgen::tick_colgen (total_rain, h_pond);
 
   Chemical& colloid = chemistry.find (colloid_name);
   
@@ -111,10 +104,9 @@ ReactionMorgan98::tick_top (const double total_rain, const double direct_rain,
 void 
 ReactionMorgan98::output (Log& log) const 
 {
-  ReactionColgen::output (log);
+  ReactionColgen::output_colgen (log);
+  output_variable (KE, log); 
   output_variable (E, log); 
-  output_variable (KH, log); 
-  output_variable (D, log); 
 }
 
 
@@ -126,11 +118,9 @@ ReactionMorgan98::initialize (const Units&, const Geometry&,
 
 ReactionMorgan98::ReactionMorgan98 (Block& al)
   : ReactionColgen (al),
-    ponddamp (Librarian::build_item<Ponddamp> (al, "ponddamp")),
     rainergy (Librarian::build_item<Rainergy> (al, "rainergy")),
     kd (al.number ("kd")),
-    E (-42.42e42),
-    KH (-42.42e42)
+    E (-42.42e42)
 { }
 
 static struct ReactionMorgan98Syntax : public DeclareModel
@@ -147,15 +137,12 @@ Colloid generation using kinetic energy, emulating EUROSEM.")
 
     frame.add ("kd", "g/J", Check::non_negative (), Value::Const,
                 "Detachment rate coefficient.");
-    frame.add_object ("ponddamp", Ponddamp::component,
-                      Value::Const, Value::Singleton,
-                      "Model for calculating 'KH'.");
     frame.add_object ("rainergy", Rainergy::component,
                       Value::Const, Value::Singleton,
                       "Model for calculating energy in rain.");
     frame.add ("rainergy", "EUROSEM");
 
-    frame.add ("KE", "W/cm^2", Value::LogOnly, 
+    frame.add ("KE", "J/cm^2/h", Value::LogOnly, 
                "Kinertic energy avalable for colloid generation.");
     frame.add ("E", "J/cm^2/mm", Value::LogOnly, 
                "Kinetic energy in rain.");

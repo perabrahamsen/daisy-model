@@ -29,9 +29,19 @@
 #include "block.h"
 
 void 
-ReactionColgen::output (Log& log) const
+ReactionColgen::tick_colgen (const double total_rain, const double h_pond)
 {
-  output_variable (dds, log); 
+  dds = Ponddamp::dds (total_rain);
+  KH = ponddamp->value (h_pond, total_rain);
+}
+
+void 
+ReactionColgen::output_colgen (Log& log) const
+{
+  if (dds > -1.0)
+    output_variable (dds, log); 
+  if (KH > -1.0)
+    output_variable (KH, log); 
   output_variable (D, log); 
 }
 
@@ -52,7 +62,9 @@ ReactionColgen::check (const Units&, const Geometry& geo,
 ReactionColgen::ReactionColgen (Block& al)
   : Reaction (al),
     colloid_name (al.name ("colloid")),
+    ponddamp (Librarian::build_item<Ponddamp> (al, "ponddamp")),
     dds (-42.42e42),
+    KH (-42.42e42),
     D (-42.42e42)
 { }
  
@@ -68,7 +80,12 @@ Shared parameter and log variable for colloid generation models.")
   void load_frame (Frame& frame) const
   {
     frame.add ("colloid", Value::String, Value::Const, "Colloid to generate.");
+    frame.add_object ("ponddamp", Ponddamp::component,
+                      Value::Const, Value::Singleton,
+                      "Model for calculating 'KH'.");
     frame.add ("dds", "mm", Value::LogOnly, "Median raindrop size.");
+    frame.add ("KH", Value::Fraction (), Value::LogOnly, 
+               "Ponding factor.");
     frame.add ("D", "g/cm^2/h", Value::LogOnly, 
                "Depletion of detachable particles from top soil.");
   }

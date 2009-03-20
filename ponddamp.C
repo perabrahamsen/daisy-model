@@ -66,7 +66,7 @@ struct PonddampEUROSEM : public Ponddamp
 
   // Simulation.
   double value (const double h, const double /* P */) const
-  { return std::exp (- b * h); }
+  { return std::min (1.0, std::exp (- b * h)); }
   // Create and Destroy.
   PonddampEUROSEM (Block& al)
     : b (al.number ("b"))
@@ -103,7 +103,7 @@ struct PonddampPark82 : public Ponddamp
   {
     const double dds = this->dds (P);
     daisy_assert (dds > 0.9);
-    return std::max (1.0, 2.7183 * std::exp (- h / dds)); 
+    return std::min (1.0, 2.7183 * std::exp (- h / dds)); 
   }
 
   // Create and Destroy.
@@ -137,7 +137,7 @@ struct PonddampHairsine91 : public Ponddamp
     if (h < 0.01)
       return 1.0;
     
-    return std::max (1.0, std::pow (h / dds (P), -0.8)); 
+    return std::min (1.0, std::pow (h / dds (P), -0.8)); 
   }
 
   // Create and Destroy.
@@ -160,5 +160,32 @@ KH = (h / dds)^-0.8")
     frame.add_strings ("cite", "hairsine91");
   }
 } PonddampHairsine91_syntax;
+
+// The 'none' model.
+
+struct PonddampNone : public Ponddamp
+{
+  // Simulation.
+  double value (const double h, const double P) const
+  { return 1.0; }
+
+  // Create and Destroy.
+  PonddampNone (Block&)
+  { }
+  ~PonddampNone ()
+  { }
+};
+
+static struct PonddampNoneSyntax : DeclareModel
+{
+  Model* make (Block& al) const
+  { return new PonddampNone (al); }
+  PonddampNoneSyntax ()
+    : DeclareModel (Ponddamp::component, "None", "\
+KH = 1.0")
+  { }
+  void load_frame (Frame& frame) const
+  { }
+} PonddampNone_syntax;
 
 // ponddamp.C ends here.

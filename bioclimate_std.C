@@ -858,12 +858,10 @@ BioclimateStandard::WaterDistribution (const Units& units,
   daisy_assert (total_ea_ >= 0.0);
 
   // Direct rain, used for colloid generation
-  if (snow.storage () < 0.1)
-    // Snow dampens rain.
-    direct_rain_ = 0.0;
-  else if (snow_water_out < 0.01)
+  if (snow_water_out < 0.01)
     direct_rain_ = 0.0;
   else
+    // We want to ignore irrigation and melting snow here.
     direct_rain_ = canopy_water_bypass * (rain / snow_water_out);
 
   // Reset irrigation

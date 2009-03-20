@@ -626,6 +626,7 @@ ColumnStandard::tick (Metalib& metalib, const Time& time, const double dt,
                            *soil_water, surface, msg);
 
   // Early calculation.
+  const double old_pond = bioclimate->get_snow_storage () + surface.ponding ();
   bioclimate->tick (units, time, surface, my_weather, 
                     *vegetation, *movement,
                     geometry, *soil, *soil_water, *soil_heat, *chemistry,
@@ -637,7 +638,7 @@ ColumnStandard::tick (Metalib& metalib, const Time& time, const double dt,
   chemistry->tick_top (bioclimate->snow_leak_rate (dt), vegetation->cover (),
                        bioclimate->canopy_leak_rate (dt), 
                        surface.runoff_rate (dt),
-                       bioclimate->get_snow_storage () + surface.ponding (),
+                       old_pond,
                        my_weather.rain (),
                        bioclimate->direct_rain (), 
                        bioclimate->canopy_leak (),

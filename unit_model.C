@@ -581,6 +581,10 @@ Connvert to SI base units by multiplying with a factor.")
          "Watt per square meter.");
     add ("W m^-2", 1.0, 0, 1, -3, 0, 0, 0, 0,
          "Watt per square meter.");
+    add ("W/cm^2", 1.0 / p_c_2, 0, 1, -3, 0, 0, 0, 0,
+         "Watt per square centimeter.");
+    add ("J/cm^2/h", 1.0 / p_c_2 / u_h, 0, 1, -3, 0, 0, 0, 0,
+         "Joule per square centimeter per hour.");
     add ("MJ/d/m^2", p_M / u_d,
          0, 1, -3, 0, 0, 0, 0,
          "Megajoule per day per square meter.");

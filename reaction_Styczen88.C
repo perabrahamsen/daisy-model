@@ -34,7 +34,6 @@
 #include "treelog.h"
 #include "frame.h"
 #include "plf.h"
-#include "ponddamp.h"
 #include <memory>
 
 struct ReactionStyczen88 : public ReactionColgen
@@ -43,10 +42,8 @@ struct ReactionStyczen88 : public ReactionColgen
   const double Ae;              // Soil resitance factor [h^2/g C/cm^2 S]
   const double MA;              // Mulch factor (protective coverage) []
   const double droplet_diameter; // Size of vegetation droplets. [mm]
-  const std::auto_ptr<Ponddamp> ponddamp;
 
   // Log variable.
-  double KH;                    // Ponding factor []
   double DH;                    // Squaret droplet momentum [g^2 C/cm/h]
   double CM;                    // Vegetation factor []
   double MR;                    // Squared direct rainfall momentum [g^2 C/h^3]
@@ -185,7 +182,7 @@ ReactionStyczen88::find_DH (const double h_veg, const double droplet_diameter)
 
 void
 ReactionStyczen88::colloid_generation (const double P /* [mm/h] */,
-                                       const double LD /* [mm/h] */,
+                                       const double canopy_leak /* [mm/h] */,
                                        const double f_cov /* [] */,
                                        const double h_veg /* [m] */,
                                        const double h_pond /* [mm] */)
@@ -200,15 +197,13 @@ ReactionStyczen88::colloid_generation (const double P /* [mm/h] */,
   DH = find_DH (h_veg, droplet_diameter);
   daisy_assert (std::isfinite (DH));
 
+  const double LD = canopy_leak / 3600.0 / 1000.0; // [mm/h] -> [m/s]
+  
   // Vegetation modifier.
   CM = (MR > 0.0)
     ? ((1.0 - f_cov) * MR + LD * DH) / MR
     : 1.0;
   daisy_assert (std::isfinite (CM));
-
-  // Ponding factor.
-  KH = ponddamp->value (h_pond, P);
-  daisy_assert (std::isfinite (KH));
 
   // Detachment of colloids at the surface. [g cm^-2 h^-1]
   D = Ae * (1.0 - MA) * KH * CM * MR; 
@@ -224,8 +219,7 @@ ReactionStyczen88::tick_top (const double total_rain, const double direct_rain,
                              const double h_pond,
                              Chemistry& chemistry, const double dt, Treelog&)
 {
-  // Median raindrop size (for logging)
-  dds = Ponddamp::dds (total_rain);
+  ReactionColgen::tick_colgen (total_rain, h_pond);
 
   Chemical& colloid = chemistry.find (colloid_name);
   
@@ -241,8 +235,7 @@ ReactionStyczen88::tick_top (const double total_rain, const double direct_rain,
 void 
 ReactionStyczen88::output (Log& log) const 
 {
-  ReactionColgen::output (log);
-  output_variable (KH, log); 
+  ReactionColgen::output_colgen (log);
   output_variable (DH, log); 
   output_variable (CM, log); 
   output_variable (MR, log); 
@@ -260,8 +253,6 @@ ReactionStyczen88::ReactionStyczen88 (Block& al)
     Ae (al.number ("Ae")),
     MA (al.number ("MA")),
     droplet_diameter (al.number ("droplet_diameter")),
-    ponddamp (Librarian::build_item<Ponddamp> (al, "ponddamp")),
-    KH (-42.42e42),
     DH (-42.42e42),
     CM (-42.42e42),
     MR (-42.42e42)
@@ -285,16 +276,11 @@ Colloid generation using rainfall momentum.")
                "Protective cover (mulch factor).");
     frame.add ("droplet_diameter", "mm", Check::positive (), Value::Const, 
                "Size of droplets from vegetation.");
-    frame.add_object ("ponddamp", Ponddamp::component,
-                      Value::Const, Value::Singleton,
-                      "Model for calculating 'KH'.");
-    frame.add ("KH", Value::Fraction (), Value::LogOnly, 
-               "Ponding factor.");
-    frame.add ("DH", "g^2/cm/h", Value::LogOnly, 
+    frame.add ("DH", "kg^2/m/s^2", Value::LogOnly, 
                "Squared vegetation droplet momentum.");
     frame.add ("CM", Value::Fraction (), Value::LogOnly, 
                "Vegetation factor.");
-    frame.add ("MR", "g^2/h^3", Value::LogOnly, 
+    frame.add ("MR", "(N s)^2/m^2/s", Value::LogOnly, 
                "Squared direct rainfall momentum.");
   }
 } ReactionStyczen88syntax;

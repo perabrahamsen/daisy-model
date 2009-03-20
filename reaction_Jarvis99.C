@@ -33,7 +33,6 @@
 #include "treelog.h"
 #include "frame.h"
 #include "rainergy.h"
-#include "ponddamp.h"
 #include <sstream>
 #include <memory>
 
@@ -55,7 +54,7 @@ struct ReactionJarvis99 : public ReactionColgen
   // Log variable.
   double As;                    // Colloid pool in surface [g C/cm^2]
   double P;                     // Replenishment [g C/cm^2 S/h]
-  double KE;                    // Energy for colloids [W/cm^2]
+  double KE;                    // Energy for colloids [J/cm^2/h]
   double E;                     // Energy in rain [J/cm^2 S/mm W]
 
   // Simulation.
@@ -91,18 +90,25 @@ ReactionJarvis99::colloid_generation (const double total_rain /* [mm/h] */,
 {
   // [J/cm^2/h]
   KE = rainergy->value (total_rain , direct_rain, canopy_drip, canopy_height);
+  daisy_assert (KE >= 0.0);
 
   // Kinetic energy of rain. [J cm^-2 mm^-1]
   E = (total_rain > 0) ? KE / total_rain : 0.0;
   
   // Detachment of colloids at the surface. [g cm^-2 h^-1]
-  D = kd * KE * dt * Ms; 
+  daisy_assert (KH >= 0.0);
+  daisy_assert (KH <= 1.0);
+  daisy_assert (Ms >= 0.0);
+  D = std::min (kd * KE * KH * dt * Ms, As); 
+  daisy_assert (D >= 0.0);
 
   // Replenishment of colloids in the surface layer.
+  daisy_assert (Ms <= Mmax);
   P = kr * (1 - Ms / Mmax);     // [g cm^-2 h^-1]
   
   // Pure forward mass balance.
   As += (-D + P) * dt;  //[g cm^-2]
+  daisy_assert (As >= 0.0);
   Ms = As / (rho_b * zi); // [g C/g S]
 }
 
@@ -113,9 +119,8 @@ ReactionJarvis99::tick_top (const double total_rain, const double direct_rain,
                             const double h_pond,
                             Chemistry& chemistry, const double dt, Treelog&)
 {
-  // Median raindrop size (for logging)
-  dds = Ponddamp::dds (total_rain);
-  
+  ReactionColgen::tick_colgen (total_rain, h_pond);
+
   Chemical& colloid = chemistry.find (colloid_name);
   
   // Generate the colloids.
@@ -127,10 +132,11 @@ ReactionJarvis99::tick_top (const double total_rain, const double direct_rain,
 void 
 ReactionJarvis99::output (Log& log) const 
 {
-  ReactionColgen::output (log);
+  ReactionColgen::output_colgen (log);
   output_variable (Ms, log); 
   output_variable (As, log); 
   output_variable (P, log); 
+  output_variable (KE, log); 
   output_variable (E, log); 
 }
 
@@ -229,7 +235,7 @@ By default, 10% of Mmax.");
                 "Current amount of detachable particles in top soil.");
     frame.add ("P", "g/cm^2/h", Value::LogOnly, 
                 "Replenishment of detachable particles to top soil.");
-    frame.add ("KE", "W/cm^2", Value::LogOnly, 
+    frame.add ("KE", "J/cm^2/h", Value::LogOnly, 
                "Kinertic energy avalable for colloid generation.");
     frame.add ("E", "J/cm^2/mm", Value::LogOnly, 
                 "Kinetic energy in rain.");

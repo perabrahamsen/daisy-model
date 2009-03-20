@@ -23,21 +23,26 @@
 #define REACTION_COLGEN_H
 
 #include "reaction.h"
+#include "ponddamp.h"
+#include <memory>
 
 class ReactionColgen : public Reaction
 {
   // Parameters.
 protected:
   const symbol colloid_name;
+  const std::auto_ptr<Ponddamp> ponddamp;
 
   // Log variable.
 protected:
   double dds;                   // Median droplet size [mm]
+  double KH;                    // Ponding factor []
   double D;                     // Depletion [g/cm^2/h]
 
   // Simulation.
 protected:
-  void output (Log&) const;
+  void tick_colgen (const double total_rain, const double h_pond);
+  void output_colgen (Log&) const;
 
   // Create and Destroy.
 protected:
