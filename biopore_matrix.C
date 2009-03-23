@@ -227,7 +227,7 @@ BioporeMatrix::get_solute (IM& im) const
     {
       const symbol chem = *i;
       const std::vector<double>& array = solute->get_array (chem);
-      daisy_assert (array.size () == col_size);
+      daisy_assert (array.size () <= col_size);
       const double sum = std::accumulate (array.begin (), array.end (), 0.0);
       im.add_value (chem, my_unit, sum);
     }
