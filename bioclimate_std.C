@@ -953,6 +953,7 @@ BioclimateStandard::tick (const Units& units, const Time& time,
 
   const double h = Height[0]/100.0; // [m]
   const double h0 = 0.12; // reference height [m]
+
   if (weather.surface () == Weather::field || h < h0)
     wind_speed_field_ = wind_speed_weather;
   else
@@ -965,7 +966,9 @@ BioclimateStandard::tick (const Units& units, const Time& time,
       daisy_assert (u_star >= 0.0);
       const double d = 0.64 * h;
       const double z = 0.13 * h;
-      wind_speed_field_ = (u_star / k) * log((ScreenHeight - d)/z);
+      // Same height over vegetation.
+      const double ScreenHeight1 = ScreenHeight + h - h0;
+      wind_speed_field_ = (u_star / k) * log((ScreenHeight1 - d)/z);
     }
   daisy_assert (wind_speed_field_ >= 0.0);
 

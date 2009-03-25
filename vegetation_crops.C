@@ -520,7 +520,7 @@ VegetationCrops::reset_canopy_structure (Treelog& msg)
     {
       // Check that we calculated LAIvsH right.
       daisy_assert (iszero (LAIvsH_ (0.0)));
-      daisy_assert (approximate (LAI_, LAIvsH_ (height_)));
+      daisy_approximate (LAI_, LAIvsH_ (height_));
 
       // Find H as a function of LAI.
       HvsLAI_ = LAIvsH_.inverse ();

@@ -189,7 +189,6 @@ CropSimple::CanopyStructure ()
 void
 CropSimple::CropCAI ()
 {
-  double T;
   if (use_T_sum)
     T = T_sum;
   else

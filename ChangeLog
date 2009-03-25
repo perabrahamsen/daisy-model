@@ -1,3 +1,17 @@
+2009-03-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.62 released.
+
+2009-03-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* bioclimate_std.C (BioclimateStandard::tick): Make wind speed
+	correction work for tall vegetation.
+
+2009-03-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Makefile (MODELS): Removed 'crop_simple.C'.
+	(DISABLED): Moved it here.
+
 2009-03-18  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.61 released.
