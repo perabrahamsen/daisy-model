@@ -129,7 +129,7 @@ private:
   double DeadNRoot;		// Root N removed [g N/m2/d]
   double C_Loss;		// C lost from the plant. [g/m2]
   double DailyNetRoot;          // Net root growth this day.
-  double DailyNetLeaf;          // Net root growth this day.
+  double DailyNetShoot;          // Net shoot growth this day.
 
   // Queries.
 private:
@@ -139,7 +139,7 @@ public:
   double total_N () const;	// N content [kg N/ha]
   double total_C () const;	// C content [kg N/ha]
   bool root_growth () const;    // True iff daily ass. covers root resp.
-  bool leaf_growth () const;    // True iff daily ass. covers leaf resp.
+  bool shoot_growth () const;    // True iff daily ass. covers leaf resp.
 
   // Simulation.
 private:

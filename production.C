@@ -109,8 +109,8 @@ Production::root_growth () const
 { return DailyNetRoot > 0.0; }
 
 bool
-Production::leaf_growth () const
-{ return DailyNetLeaf > 0.0; }
+Production::shoot_growth () const
+{ return DailyNetShoot > 0.0; }
 
 double
 Production::maintenance_respiration (double r, double w, double T)
@@ -481,7 +481,7 @@ Production::tick (const double AirT, const double SoilT,
   if (WRoot < 0.0)
     WRoot = 0.0;
   DailyNetRoot += (IncWRoot + DeadWRoot) * dt;
-  DailyNetLeaf += (IncWLeaf + DeadWLeaf) * dt;
+  DailyNetShoot += (IncWLeaf + DeadWLeaf + IncWStem) * dt;
 
   const double old_CCrop = CCrop;
   update_carbon ();
@@ -517,7 +517,7 @@ Production::tick (const double AirT, const double SoilT,
 
 void
 Production::tick_daily ()
-{ DailyNetRoot = DailyNetLeaf = 0.0; }
+{ DailyNetRoot = DailyNetShoot = 0.0; }
 
 void 
 Production::update_carbon ()
@@ -559,7 +559,7 @@ Production::none ()
   DeadNRoot = 0.0;
   C_Loss = 0.0;
   DailyNetRoot = 0.0;
-  DailyNetLeaf = 0.0;
+  DailyNetShoot = 0.0;
 }
 
 void 
@@ -615,7 +615,7 @@ Production::output (Log& log) const
   output_variable (DeadNRoot, log);
   output_variable (C_Loss, log);
   output_variable (DailyNetRoot, log);
-  output_variable (DailyNetLeaf, log);
+  output_variable (DailyNetShoot, log);
 }
 
 void 
@@ -794,9 +794,9 @@ By default, this will start as the amount of N in the seed.");
   frame.add ("DailyNetRoot", "g DM/m^2", Value::State,
 	      "Root growth minus root respiration so far this day.");
   frame.add ("DailyNetRoot", 0.0);
-  frame.add ("DailyNetLeaf", "g DM/m^2", Value::State,
+  frame.add ("DailyNetShoot", "g DM/m^2", Value::State,
 	      "Leaf growth minus leaf respiration so far this day.");
-  frame.add ("DailyNetLeaf", 0.0);
+  frame.add ("DailyNetShoot", 0.0);
 }
 
 void
@@ -917,7 +917,7 @@ Production::Production (const FrameSubmodel& al)
     DeadNRoot (0.0),
     C_Loss (0.0),
     DailyNetRoot  (al.number ("DailyNetRoot")),
-    DailyNetLeaf  (al.number ("DailyNetLeaf"))
+    DailyNetShoot  (al.number ("DailyNetShoot"))
 { }
 
 Production::~Production ()

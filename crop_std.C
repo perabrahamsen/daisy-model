@@ -580,7 +580,7 @@ CropStandard::tick (Metalib& metalib,
                DS, ForcedCAI < 0.0 ? seed_CAI : ForcedCAI);
 
   development->tick_daily (bioclimate.daily_air_temperature (), 
-                           production.leaf_growth (), production, 
+                           production.shoot_growth (), production, 
                            *vernalization, harvesting->cut_stress, msg);
   root_system->tick_daily (geo, soil, 
                            production.WRoot, production.root_growth (),
