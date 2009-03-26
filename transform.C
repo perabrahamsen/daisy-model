@@ -52,6 +52,11 @@ Transform::~Transform ()
 
 static struct TransformInit : public DeclareComponent 
 {
+  void load_frame (Frame& frame) const
+  { 
+    Model::load_model (frame);
+  }
+
   TransformInit ()
     : DeclareComponent (Transform::component, "\
 Generic transformations between soil components.")

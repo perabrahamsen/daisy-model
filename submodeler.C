@@ -33,7 +33,10 @@ BlockSubmodel::BlockSubmodel (Block& parent, const symbol key,
   : Block (parent,
            *parent.submodel_sequence (key)[index],
            sequence_id (key, index))
-{ }
+{ 
+  daisy_assert (parent.submodel_sequence (key).size () > index);
+  daisy_assert (parent.submodel_sequence (key)[index]);
+}
 
 BlockSubmodel::~BlockSubmodel ()
 { }

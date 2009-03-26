@@ -43,6 +43,10 @@ Domsorp::~Domsorp ()
 
 static struct DomsorpInit : public DeclareComponent 
 {
+  void load_frame (Frame& frame) const
+  { 
+    Model::load_model (frame);
+  }
   DomsorpInit ()
     : DeclareComponent (Domsorp::component, "\
 Sorption and desorption of DOM to SOM.")

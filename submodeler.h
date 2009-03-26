@@ -116,7 +116,7 @@ map_submodel (Block& parent, const std::string& key)
 { 
   std::vector<T*> t;
   const size_t size = parent.value_size (key);
-  for (size_t i = 0; size; i++)
+  for (size_t i = 0; i < size; i++)
     {
       BlockSubmodel nested (parent, key, i);
       t.push_back (submodel_block<T> (nested));
