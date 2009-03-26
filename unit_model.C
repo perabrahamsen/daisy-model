@@ -290,6 +290,12 @@ Connvert to SI base units by multiplying with a factor.")
          "Percent.");
     add ("ppm", p_u, 0, 0, 0, 0, 0, 0, 0,
          "Part per million.");
+    add ("mg/g", 0.001, 0, 0, 0, 0, 0, 0, 0,
+         "Milligram per gram.");
+    add ("g/kg", 1000.0, 0, 0, 0, 0, 0, 0, 0,
+         "Gram per kilogram.");
+    add ("m^3/cm^3", 1e-6, 0, 0, 0, 0, 0, 0, 0,
+         "Kilo.");
     add ("mg N/kg dry soil", 1e-6, 0, 0, 0, 0, 0, 0, 0,
          "Nitrogen concentration in dry soil.");
     add ("cm^3/cm^3", p_c_3 / p_c_3,
@@ -568,6 +574,18 @@ Connvert to SI base units by multiplying with a factor.")
     add ("mmol/m^2/s", p_m, -2, 0, -1, 0, 0, 1, 0,
          "Millimole per square meter per second.");
 
+    // Amount of substance per mass.
+    add ("mol/kg", 1.0, 0, -1, 0, 0, 0, 1, 0,
+         "Mole per kilogram.");
+    add ("mmol/kg", p_m, 0, -1, 0, 0, 0, 1, 0,
+         "Millimole per kilogram.");
+
+    // Mass per amount of substance.
+    add ("kg/mol", 1.0, 0, 1, 0, 0, 0, -1, 0,
+         "Kilogram per mole.");
+    add ("g/mol", u_g, 0, 1, 0, 0, 0, -1, 0,
+         "Gram per mole.");
+    
     // Energy.
     add ("J", 1.0, 2, 1, -2, 0, 0, 0, 0,
          "Joule.");
