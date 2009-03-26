@@ -1,5 +1,9 @@
 2009-03-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 4.63 released.
+
+2009-03-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
 	* submodeler.h (template): Bug fix.
 
 2009-03-25  Per Abrahamsen  <abraham@dina.kvl.dk>
