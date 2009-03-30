@@ -286,13 +286,16 @@ struct NumberFetch : public Number
         {
           if (!al.check (key))
             {
+              const Frame& frame = al.find_frame (key);
+              daisy_assert (frame.lookup (key) == Value::Number);
               al.error ("Parameter '" + key 
-                        + "' is declared, but has no value");
+                        + "' is declared in '" + frame.type_name () 
+                        + "' (" + frame.description () 
+                        + ") base '" + frame.base_name () 
+                        + "', but has no value");
               break;
             }
-          const Frame& frame = al.find_frame (key);
-          daisy_assert (frame.lookup (key) == Value::Number);
-          if (frame.type_size (key) != Value::Singleton)
+          if (al.type_size (key) != Value::Singleton)
             {
               al.error ("Parameter '" + key 
                          + "' is a sequence, expected singleton");

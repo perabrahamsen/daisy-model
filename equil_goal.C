@@ -77,7 +77,14 @@ EquilibriumGoal_A::find (const Units& units, const Scope& scope,
   double goal_A = 1.0;
   if (!goal_A_expr->tick_value (units, goal_A, goal_unit, scope, msg))
     msg.error ("Could not evaluate 'goal_A'");
-  daisy_assert (goal_A >= 0.0);
+  daisy_assert (std::isfinite (goal_A));
+  if (goal_A < 0.0)
+    {
+      std::ostringstream tmp;
+      tmp << "Goal A is " << goal_A << ", should be non-negative";
+      msg.error (tmp.str ());
+      goal_A = 0.0;
+    }
   double min_B = 1.0;
   if (!min_B_expr->tick_value (units, min_B, goal_unit, scope, msg))
     msg.error ("Could not evaluate 'min_B'");
