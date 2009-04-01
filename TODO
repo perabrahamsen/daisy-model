@@ -1,16 +1,25 @@
 TODO --- things that needs to be done with Daisy -*- outline -*-
 
-* Frame
+* Regression testing
 
-** Test overskriving af object variabel.
+** Summary
+
+1. Udregn nye værdier
+2. Indlæs gamle værdier
+3. Evt. advarsler
+4. Udskriv nye værdier
+
+dato version værdier
+
+** TODO
+
+A: Kig på summary simple
 
 * Artikler
 
 ** OM init (BGJ)
 
-tegning er forkert.  efficiency kører kun på strøm til smb puljer
-
-
+Tegning er forkert.  Efficiency kører kun på strøm til smb puljer.
 
 ** Managing the farmer (SH)
 

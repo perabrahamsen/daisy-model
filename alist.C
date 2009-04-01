@@ -485,7 +485,9 @@ AValue::operator= (const AValue& v)
   cleanup ();
 
   // Copy the data.
-  if (type == Value::Error)
+  if (type == Value::Error
+      || type == Value::Reference 
+      || v.type == Value::Reference)
     {
       type = v.type;
       is_sequence = v.is_sequence;
