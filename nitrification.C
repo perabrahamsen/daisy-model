@@ -80,9 +80,9 @@ nitrous oxide.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_fraction ("N2O_fraction", Value::Const, 
+    frame.declare_fraction ("N2O_fraction", Value::Const, 
                         "Fraction of ammonium lost as N2O.");
-    frame.add ("N2O_fraction", 0.02);
+    frame.set ("N2O_fraction", 0.02);
   }
 } Nitrification_init;
 

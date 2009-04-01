@@ -117,9 +117,9 @@ struct NumberByDepth : public Number
     const Library& wlib = al.metalib ().library (Weather::component);
     const double T = 10.0;
     FrameModel frame (wlib.model ("none"), Frame::parent_link);
-    frame.add ("average", T);
-    frame.add ("amplitude", 0.0);
-    frame.add ("air_temperature", T);
+    frame.set ("average", T);
+    frame.set ("amplitude", 0.0);
+    frame.set ("air_temperature", T);
     std::auto_ptr<Weather> weather (Librarian::build_frame<Weather>
                                     (al, frame, "initialize"));
     column->initialize (al, output, time, weather.get (), Scope::null ());
@@ -135,11 +135,11 @@ static struct NumberDepthSyntax : public DeclareBase
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_object ("column", Column::component, "\
+    frame.declare_object ("column", Column::component, "\
 The soil column whose properties we want to examine.");
-    frame.add_object ("h", Number::component, "\
+    frame.declare_object ("h", Number::component, "\
 The tension we want to compare with.");
-    frame.add_object ("z", Number::component, "\
+    frame.declare_object ("z", Number::component, "\
 The height we want to compare with.");
   }
 } NumberDepth_syntax;
@@ -266,11 +266,11 @@ static struct NumberHorizonSyntax : public DeclareBase
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_object ("horizon", Horizon::component, "\
+    frame.declare_object ("horizon", Horizon::component, "\
 The soil horizon whose properties we want to examine.");
-    frame.add_object ("h", Number::component, "\
+    frame.declare_object ("h", Number::component, "\
 The tension we want to compare with.");
-    frame.add ("top_soil", Value::Boolean, Value::Const, "\
+    frame.declare ("top_soil", Value::Boolean, Value::Const, "\
 Set this to true for the A horizon.");
   }
 } NumberHorizon_syntax;
@@ -470,11 +470,11 @@ static struct NumberTensionByThetaSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.add_object ("horizon", Horizon::component, "\
+    frame.declare_object ("horizon", Horizon::component, "\
 The soil horizon whose properties we want to examine.");
-    frame.add_object ("Theta", Number::component, "\
+    frame.declare_object ("Theta", Number::component, "\
 The water content we want to compare with.");
-    frame.add ("top_soil", Value::Boolean, Value::Const, "\
+    frame.declare ("top_soil", Value::Boolean, Value::Const, "\
 Set this to true for the A horizon.");
   }
 } NumberTensionByTheta_syntax;

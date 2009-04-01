@@ -55,7 +55,7 @@ ScopeID::description (symbol tag) const
 
   // WScope interface.
 void
-ScopeID::add (symbol, double val)
+ScopeID::set (symbol, double val)
 { value = val; }
 
 void
@@ -93,9 +93,9 @@ static struct ScopeIDSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.add ("name", Value::String, Value::Const, 
+    frame.declare ("name", Value::String, Value::Const, 
                 "Identifier name.");
-    frame.add ("value", Value::User (), Value::Const, 
+    frame.declare ("value", Value::User (), Value::Const, 
                 "Initial value and dimension.");
   }
 } ScopeID_syntax;

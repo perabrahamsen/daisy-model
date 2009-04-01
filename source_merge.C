@@ -216,11 +216,11 @@ same time.")
   { 
     GnuplotUtil::load_style (frame, "\
 By default, let the first source decide.", "");
-    frame.add_object ("source", Source::component, 
+    frame.declare_object ("source", Source::component, 
                        Value::State, Value::Sequence, "\
 List of timeseries to merge.");
-    frame.add_check ("source", VCheck::min_size_1 ());
-    frame.add ("dimension", Value::String, Value::OptionalConst, "\
+    frame.set_check ("source", VCheck::min_size_1 ());
+    frame.declare ("dimension", Value::String, Value::OptionalConst, "\
 Dimension of data to plot.\n\
 By default use the first source with a known dimension.");
 

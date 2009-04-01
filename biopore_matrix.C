@@ -973,40 +973,40 @@ Biopores that ends in the matrix.")
   { IMvec::add_syntax (frame, Value::OptionalState, IM::mass_unit ()); }
   void load_frame (Frame& frame) const
   { 
-    frame.add ("xplus", "cm", Check::positive (), 
+    frame.declare ("xplus", "cm", Check::positive (), 
                 Value::OptionalConst, Value::Sequence,
                 "Right side of each biopore interval.\n\
 Water and chemical content is tracked individually for each interval.\n\
 By default, use intervals as specified by the geometry.");
-    frame.add_check ("xplus", VCheck::increasing ());
-    frame.add ("R_primary", "h", Check::positive (), Value::Const, "\
+    frame.set_check ("xplus", VCheck::increasing ());
+    frame.declare ("R_primary", "h", Check::positive (), Value::Const, "\
 Resistance for water moving from biopore through wall to primary domain.");
-    frame.add ("R_secondary", "h", Check::positive (), 
+    frame.declare ("R_secondary", "h", Check::positive (), 
                 Value::OptionalConst, "\
 Resistance for water moving from biopore through wall to secondary domain.\n\
 If not specified, this will be identical to 'R_primary'.");
-    frame.add ("debug", Value::Integer, Value::Const, "Debug level.\n\
+    frame.declare ("debug", Value::Integer, Value::Const, "Debug level.\n\
 Increase value to get more debug message.");
-    frame.add ("debug", 0);
-    frame.add ("h_bottom", "cm", Value::OptionalState, Value::Sequence,
+    frame.set ("debug", 0);
+    frame.declare ("h_bottom", "cm", Value::OptionalState, Value::Sequence,
                 "Pressure at the bottom of the biopores in each interval.");
-    frame.add_submodule_sequence ("solute", Value::State, "\
+    frame.declare_submodule_sequence ("solute", Value::State, "\
 Chemical concentration in biopore intervals.", load_solute);
-    frame.add_empty ("solute");
-    frame.add ("water", "cm^3", Value::LogOnly, "Water content.");    
-    frame.add ("iterations", Value::Integer, Value::LogOnly, 
+    frame.set_empty ("solute");
+    frame.declare ("water", "cm^3", Value::LogOnly, "Water content.");    
+    frame.declare ("iterations", Value::Integer, Value::LogOnly, 
                 "Number of iterations used for finding a solution.");
-    frame.add ("h3_soil", "cm", Value::LogOnly, Value::Sequence,
+    frame.declare ("h3_soil", "cm", Value::LogOnly, Value::Sequence,
                 "Pressure suggested by the soil for each interval.");
-    frame.add ("max_iterations", Value::Integer, Value::Const, "\
+    frame.declare ("max_iterations", Value::Integer, Value::Const, "\
 Maximum number of iterations when seeking convergence.");
-    frame.add ("max_iterations", 50);
-    frame.add ("max_absolute_difference", "cm", Value::Const, "\
+    frame.set ("max_iterations", 50);
+    frame.declare ("max_absolute_difference", "cm", Value::Const, "\
 Maximum absolute difference in biopore content for convergence.");
-    frame.add ("max_absolute_difference", 0.02);
-    frame.add ("max_relative_difference", Value::None (), Value::Const, "\
+    frame.set ("max_absolute_difference", 0.02);
+    frame.declare ("max_relative_difference", Value::None (), Value::Const, "\
 Maximum relative difference in biopore content for convergence.");
-    frame.add ("max_relative_difference", 0.001);
+    frame.set ("max_relative_difference", 0.001);
   }
 } BioporeMatrix_syntax;
 

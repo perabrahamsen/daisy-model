@@ -45,9 +45,9 @@ struct NumberLet : public Number
       static void load_syntax (Frame& frame)
       {
         // Bind an identifier to an expression.
-        frame.add ("identifier", Value::String, Value::Const, 
+        frame.declare ("identifier", Value::String, Value::Const, 
                     "Identifier to bind.");
-        frame.add_object ("expr", Number::component, 
+        frame.declare_object ("expr", Number::component, 
                            " Value to give it.");
         frame.order ("identifier", "expr");
       }
@@ -144,7 +144,7 @@ struct NumberLet : public Number
     }
     static void load_syntax (Frame& frame)
     {
-      frame.add_submodule_sequence ("clauses", Value::Const, "\
+      frame.declare_submodule_sequence ("clauses", Value::Const, "\
 List of identifiers and values to bind in this scope.", Clause::load_syntax);
     }
     ScopeClause (Block& al)
@@ -213,7 +213,7 @@ Bind symbols in 'clauses' in a new scope, and evaluate 'expr' in that scope.")
   void load_frame (Frame& frame) const
   {
     NumberLet::ScopeClause::load_syntax (frame);
-    frame.add_object ("expr", Number::component, "\
+    frame.declare_object ("expr", Number::component, "\
 Expression to evaluate.");
     frame.order ("clauses", "expr");
   }

@@ -130,9 +130,9 @@ Perform actions on a specific column.")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.add ("column", Value::String, Value::Const, 
+    frame.declare ("column", Value::String, Value::Const, 
 		"Name of column to perform actions on.");
-    frame.add_object ("actions", Action::component, 
+    frame.declare_object ("actions", Action::component, 
                        Value::State, Value::Sequence,
                        "Actions to perform on the specified column.");
     frame.order ("column", "actions");

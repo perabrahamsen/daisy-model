@@ -85,12 +85,12 @@ KH = exp (-b h)")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.add_strings ("cite", "EUROSEM");
-    frame.add ("b", "mm^-1", Value::Const, "\
+    frame.set_strings ("cite", "EUROSEM");
+    frame.declare ("b", "mm^-1", Value::Const, "\
 Exponential degradation coefficient.\n\
 The range of 'b' is from 0.9 to 3.1, a default value of 2 is proposed\n\
 by the EUROSEM project.");
-    frame.add ("b", 2.0);
+    frame.set ("b", 2.0);
   }
 } PonddampEUROSEM_syntax;
 
@@ -123,7 +123,7 @@ KH = 2.7183 * exp (-h / dds)")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.add_strings ("cite", "park82");
+    frame.set_strings ("cite", "park82");
   }
 } PonddampPark82_syntax;
 
@@ -157,7 +157,7 @@ KH = (h / dds)^-0.8")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.add_strings ("cite", "hairsine91");
+    frame.set_strings ("cite", "hairsine91");
   }
 } PonddampHairsine91_syntax;
 

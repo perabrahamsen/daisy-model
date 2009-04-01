@@ -59,9 +59,9 @@ struct Soil::Implementation
     // Create and Destroy.
     static void load_syntax (Frame& frame)
     { 
-      frame.add ("end", "cm", Check::negative (), Value::Const,
+      frame.declare ("end", "cm", Check::negative (), Value::Const,
 		  "End point of this layer (a negative number).");
-      frame.add_object ("horizon", Horizon::component, 
+      frame.declare_object ("horizon", Horizon::component, 
                          "Soil properties of this layer.");
       frame.order ("end", "horizon");
     }
@@ -93,9 +93,9 @@ struct Soil::Implementation
     // Create and Destroy.
     static void load_syntax (Frame& frame)
     { 
-      frame.add_object ("volume", Volume::component, 
+      frame.declare_object ("volume", Volume::component, 
                          "Volume covered by this zone.");
-      frame.add_object ("horizon", Horizon::component, 
+      frame.declare_object ("horizon", Horizon::component, 
                          "Soil properties of this zone.");
       frame.order ("volume", "horizon");
     }
@@ -514,34 +514,34 @@ void
 Soil::load_syntax (Frame& frame)
 { 
   frame.add_check (check_alist);
-  frame.add_submodule_sequence ("horizons", Value::State, "\
+  frame.declare_submodule_sequence ("horizons", Value::State, "\
 Layered description of the soil properties.\n\
 The horizons can be overlapped by the 'zones' parameter.\n\
 Some groundwater models, specifically 'pipe', may cause an extra horizon to\n\
 be added below the one specified here if you do not also specify an explicit\n\
 geometry.",
 				 Implementation::Layer::load_syntax);
-  frame.add_submodule_sequence ("zones", Value::State, "\
+  frame.declare_submodule_sequence ("zones", Value::State, "\
 Zones with special soil properties.\n\
 This overrules the 'horizons' paramter.",
 				 Implementation::Zone::load_syntax);
-  frame.add_empty ("zones");
-  frame.add ("MaxRootingDepth", "cm", Check::positive (), Value::Const,
+  frame.set_empty ("zones");
+  frame.declare ("MaxRootingDepth", "cm", Check::positive (), Value::Const,
 	      "Depth at the end of the root zone (a positive number).");
-  frame.add ("dispersivity", "cm", Check::positive (), 
+  frame.declare ("dispersivity", "cm", Check::positive (), 
 	      Value::Const, "Dispersion length.");
-  frame.add ("dispersivity", 5.0);
-  frame.add ("dispersivity_transversal", "cm", Check::non_negative (), 
+  frame.set ("dispersivity", 5.0);
+  frame.declare ("dispersivity_transversal", "cm", Check::non_negative (), 
 	      Value::OptionalConst, "Transversal dispersion length.\n\
 By default, this is 0.1 times the dispersivity.");
-  frame.add ("border", "cm", Check::negative (), 
+  frame.declare ("border", "cm", Check::negative (), 
               Value::Const, Value::Sequence, "\
 List of flux depths where a mass balance should be possible when logging.\n\
 This attribute is ignored if the geometry is specified explicitly.");
-  frame.add_check ("border", VCheck::decreasing ());
+  frame.set_check ("border", VCheck::decreasing ());
   std::vector<double> default_borders;
   default_borders.push_back (-100.0);
-  frame.add ("border", default_borders);
+  frame.set ("border", default_borders);
 }
   
 Soil::Soil (Block& al)

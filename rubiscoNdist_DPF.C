@@ -98,13 +98,13 @@ static struct rubiscoNdistDPFSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.add ("kn", Value::None (), Check::positive (), Value::Const,
+    frame.declare ("kn", Value::None (), Check::positive (), Value::Const,
                 "Extinction coefficient of nitrogen in the canopy, kn = 0.713 (De Pury &Farquhar, 1997)");
-    frame.add ("kn", 0.713);
+    frame.set ("kn", 0.713);
 
-    frame.add ("f_photo", Value::None (), Check::positive (), Value::Const,
+    frame.declare ("f_photo", Value::None (), Check::positive (), Value::Const,
                 "Fraction of photosynthetically active N in canopy. According to (Boegh et al., 2002) f_photo = 0.75. However, non-functional N is already substracted from leaf-N in the cropN_std module, therefore f_photo = 1.0 as default.");
-    frame.add ("f_photo", 1.00);
+    frame.set ("f_photo", 1.00);
   }
 } rubiscoNdistDPF_syntax;
 

@@ -157,9 +157,9 @@ struct ActionCond : public Action
     }
     static void load_syntax (Frame& frame)
     {
-      frame.add_object ("condition", Condition::component, 
+      frame.declare_object ("condition", Condition::component, 
                   "Condition for performing the actions.");
-      frame.add_object ("actions", Action::component,
+      frame.declare_object ("actions", Action::component,
                          Value::State, Value::Sequence, 
                          "Actions to perform when condition is meet.");
       frame.order ("condition", "actions");
@@ -348,7 +348,7 @@ All the actions will be performed in the same time step.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_object ("actions", Action::component, 
+    frame.declare_object ("actions", Action::component, 
                        Value::State, Value::Sequence,
                        "List of actions to perform.");
     frame.order ("actions");
@@ -365,7 +365,7 @@ Perform the actions associated with the first true condition in the list.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_submodule_sequence ("clauses", Value::State, "\
+    frame.declare_submodule_sequence ("clauses", Value::State, "\
 Each clause consist of a condition and a sequence of actions.\n\
 The first clause whose condition is true, will have its actions activated.",
                                    ActionCond::clause::load_syntax);
@@ -384,14 +384,14 @@ otherwise perform the second action.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_object ("if", Condition::component, 
+    frame.declare_object ("if", Condition::component, 
                        "Condition determining which action to perform.");
-    frame.add_object ("then", Action::component, 
+    frame.declare_object ("then", Action::component, 
                        "Action to perform if the condition is true.");
-    frame.add_object ("else", Action::component, 
+    frame.declare_object ("else", Action::component, 
                        "Action to perform if the condition is false.");
     frame.order ("if", "then", "else");
-    frame.add ("else", "nil");
+    frame.set ("else", "nil");
   }
 } ActionIf_syntax;
 

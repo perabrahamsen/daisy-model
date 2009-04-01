@@ -71,7 +71,7 @@ class WScope : public Scope     // Writable scope.
 {
   // Use.
 public:
-  virtual void add (symbol, double) = 0;
+  virtual void set (symbol, double) = 0;
 };
 
 #endif // SCOPE_H

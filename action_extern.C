@@ -118,10 +118,10 @@ Select an external scope, and perform action.")
   
   void load_frame (Frame& frame) const
   {
-    frame.add_object ("scope", Scopesel::component, 
+    frame.declare_object ("scope", Scopesel::component, 
                        Value::Const, Value::Singleton, "\
 Scope to evaluate expessions in.");
-    frame.add_object ("action", Action::component, 
+    frame.declare_object ("action", Action::component, 
                        "Action to perform if the condition is false.");
     frame.order ("scope", "action");
   }
@@ -316,33 +316,33 @@ surface.")
   {
     Model::load_model (frame);
     frame.add_check (check_alist);	
-    frame.add_object ("scope", Scopesel::component, 
+    frame.declare_object ("scope", Scopesel::component, 
                        Value::Const, Value::Singleton, "\
 Scope to evaluate expessions in.");
-    frame.add ("scope", "null");
+    frame.set ("scope", "null");
 
-    frame.add_object ("surface", Number::component, 
+    frame.declare_object ("surface", Number::component, 
 		       Value::Const, Value::Singleton, 
 "Amount of surface irrigation applied.");
-    frame.add_object ("overhead", Number::component, 
+    frame.declare_object ("overhead", Number::component, 
 		       Value::Const, Value::Singleton, 
 "Amount of overhead irrigation applied.");
-    frame.add_object ("subsoil", Number::component, 
+    frame.declare_object ("subsoil", Number::component, 
 		       Value::Const, Value::Singleton, 
 "Amount of subsoil irrigation applied.");
-    frame.add_object ("NO3", Number::component, 
+    frame.declare_object ("NO3", Number::component, 
 		       Value::Const, Value::Singleton, 
 "Amount of NO3 in irrigation.");
-    frame.add_object ("NH4", Number::component, 
+    frame.declare_object ("NH4", Number::component, 
 		       Value::Const, Value::Singleton, 
 "Amount of NH4 in irrigation.");
 
-    frame.add ("from", "cm", Check::non_positive (), Value::Const, "\
+    frame.declare ("from", "cm", Check::non_positive (), Value::Const, "\
 Height where you want to start the incorporation (a negative number).");
-    frame.add ("from", 0.0);
-    frame.add ("to", "cm", Check::negative (), Value::Const, "\
+    frame.set ("from", 0.0);
+    frame.declare ("to", "cm", Check::negative (), Value::Const, "\
 Height where you want to end the incorporation (a negative number).");
-    frame.add ("from", -10.0);
+    frame.set ("from", -10.0);
   }
 } ActionExternFertigation_syntax;
 

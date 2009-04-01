@@ -109,15 +109,15 @@ ActionFertilize::Precision::check_alist (Metalib&, const Frame& al, Treelog& err
 void 
 ActionFertilize::Precision::load_syntax (Frame& frame)
 {
-  frame.add_check (&check_alist);
-  frame.add ("target", "kg N/ha", Value::Const, 
+  frame.add_check (check_alist);
+  frame.declare ("target", "kg N/ha", Value::Const, 
 	      "How much N you want.");
-  frame.add ("from", "cm", Value::Const, "\
+  frame.declare ("from", "cm", Value::Const, "\
 Height where you want to start measuring (a negative number).");
-  frame.add ("from", 0.0);
-  frame.add ("to", "cm", Value::Const, "\
+  frame.set ("from", 0.0);
+  frame.declare ("to", "cm", Value::Const, "\
 Height where you want to end measuring (a negative number).");
-  frame.add ("to", -100.0);
+  frame.set ("to", -100.0);
   frame.order ("target");
 }
 
@@ -270,30 +270,30 @@ Shared parameters for all fertilize actions.")
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);
-    frame.add_object ("am", AM::component, "\
+    frame.declare_object ("am", AM::component, "\
 The fertilizer you want to apply.");
-    frame.add ("equivalent_weight", "kg N/ha", Check::non_negative (),
+    frame.declare ("equivalent_weight", "kg N/ha", Check::non_negative (),
                 Value::OptionalConst, 
                 "\
 When fertilizing with organic matter, you may let Daisy calculate the\n\
 amount of dry matter that corresponds to the specified amount of\n\
 nitrogen.  This requires that the fertilizer has specified the\n\
 'first_year_utilization' parameter, but not the 'weight' parameter.");
-    frame.add ("minimum_weight", "kg N/ha", Check::non_negative (),
+    frame.declare ("minimum_weight", "kg N/ha", Check::non_negative (),
                 Value::Const,
                 "Minimum amount of nitrogen to fertilize with.");
-    frame.add ("minimum_weight", 0.0);
-    frame.add_submodule ("precision", Value::OptionalConst, "\
+    frame.set ("minimum_weight", 0.0);
+    frame.declare_submodule ("precision", Value::OptionalConst, "\
 Let the amount of fertilizer depend on the inorganic nitrogen in the soil.\n\
 The amount of fertilizer will be the specified 'target', minus the amount\n\
 already present in the soil zone between 'from' and 'to'.",
                           &ActionFertilize::Precision::load_syntax);
-    frame.add ("second_year_compensation", Value::Boolean, Value::Const, "\
+    frame.declare ("second_year_compensation", Value::Boolean, Value::Const, "\
 Compensate for the second year effect of previous fertilizations.\n\
 The second year effect is solely governed by the 'second_year_utilization'\n\
 organic fertilizer parameter.  The second year effect does not fade with\n\
 time, but is zeroed once you fertilize with this flag set.");
-    frame.add ("second_year_compensation", false);
+    frame.set ("second_year_compensation", false);
   }
 } ActionFertilize_init;
 
@@ -376,14 +376,14 @@ Apply fertilizer to the soil surface.")
   { 
     frame.add_check (check_alist);
 
-    frame.add ("from", "cm", Check::non_positive (), Value::Const, "\
+    frame.declare ("from", "cm", Check::non_positive (), Value::Const, "\
 Height where you want to start the incorporation (a negative number)\n\
 OBSOLETE:  Use 'fertilize_incorporate' instead.");
-    frame.add ("from", 0.0);
-    frame.add ("to", "cm", Check::non_positive (), Value::Const, "\
+    frame.set ("from", 0.0);
+    frame.declare ("to", "cm", Check::non_positive (), Value::Const, "\
 Height where you want to end the incorporation (a negative number)\n\
 OBSOLETE:  Use 'fertilize_incorporate' instead.");
-    frame.add ("to", 0.0);
+    frame.set ("to", 0.0);
     frame.order ("am");
   }
 } ActionFertilizeSurface_syntax;
@@ -440,7 +440,7 @@ static struct ActionFertilizeIncorporateSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   { 
     frame.add_check (check_alist);
-    frame.add_object ("volume", Volume::component, 
+    frame.declare_object ("volume", Volume::component, 
                        Value::Const, Value::Singleton,
                        "Soil volume to incorporate fertilizer in.");
     frame.order ("am");

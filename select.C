@@ -304,12 +304,12 @@ void
 Select::Implementation::Spec::load_syntax (Frame& frame)
 { 
   frame.add_check (check_alist);
-  frame.add ("library", Value::String, Value::Const, "\
+  frame.declare ("library", Value::String, Value::Const, "\
 Name of library where the attribute belong.\n\
 Use 'fixed' to denote a fixed component.");
-  frame.add ("model", Value::String, Value::Const, "\
+  frame.declare ("model", Value::String, Value::Const, "\
 Name of model or fixed component where the attribute belongs.");
-  frame.add ("submodels_and_attribute", Value::String, 
+  frame.declare ("submodels_and_attribute", Value::String, 
 	      Value::Const, Value::Sequence, "\
 Name of submodels and attribute.");
   frame.order ("library", "model", "submodels_and_attribute");
@@ -333,7 +333,7 @@ double
 Select::Implementation::convert (double value) const
 { 
 
-  scope.add (x_symbol, value);
+  scope.set (x_symbol, value);
   value = expr->value (scope);
 
   if (spec_conv)
@@ -729,17 +729,17 @@ Set the 'handle' parameter instead.");
   {
     Model::load_model (frame);
     frame.add_check (check_alist);
-    frame.add ("tag", Value::String, Value::OptionalConst,
+    frame.declare ("tag", Value::String, Value::OptionalConst,
                 "Tag to identify the column.\n\
 These will be printed in the first line of the log file.\n\
 The default tag is the last element in the path.");
-    frame.add ("dimension", Value::String, Value::OptionalConst,
+    frame.declare ("dimension", Value::String, Value::OptionalConst,
                 "The unit for numbers in this column.\n\
 These will be printed in the second line of the log file.\n\
 The character '&' will be replaced with the log timestep.\n\
 If you do not specify the dimension explicitly, a value will\n\
 be interfered from 'spec' if available.");
-    frame.add ("path", Value::String, Value::Const, 
+    frame.declare ("path", Value::String, Value::Const, 
                 Value::Sequence, "\
 Sequence of attribute names leading to the variable you want to log in\n\
 this column.  The first name should be one of the attributes of the\n\
@@ -762,8 +762,8 @@ level, for example all crops.  This way the path can specify multiple\n\
 values, they will be added before they are printed in the log file.\n\
 All values that start with a \"$\" will work like \"*\".  They are intended\n\
 to be mapped with the 'set' attribute in the 'table' log model.");
-    frame.add_check ("path", VCheck::min_size_1 ());
-    frame.add_submodule ("spec", Value::OptionalConst, "\
+    frame.set_check ("path", VCheck::min_size_1 ());
+    frame.declare_submodule ("spec", Value::OptionalConst, "\
 Specification for the attribute to be logged of the form\n\
 \n\
   library model submodel* attribute\n\
@@ -773,15 +773,15 @@ simulation, if the model is used at several places.  Also, there is no\n\
 wildcards, so only a single model can be matches.  The spec is used for\n\
 helping Daisy establish a unique dimension and description for the\n\
 attribute.", Select::Implementation::Spec::load_syntax);
-    frame.add_object ("when", Condition::component,
+    frame.declare_object ("when", Condition::component,
                        Value::OptionalConst, Value::Singleton,
                        "\
 OBSOLETE.  If you set this variable, 'flux' will be set to true.\n\
 This overwrites any direct setting of 'flux'.");
-    frame.add ("flux", Value::Boolean, Value::OptionalConst, "\
+    frame.declare ("flux", Value::Boolean, Value::OptionalConst, "\
 OBSOLETE.  This value will be used if 'handle' is not specified.\
 A value of true then means 'sum', and false means 'current'.");
-    frame.add ("handle", Value::String, Value::OptionalConst, "\
+    frame.declare ("handle", Value::String, Value::OptionalConst, "\
 This option determine how the specified variable should be logged.  \n\
 \n\
 min: Log the smallest value seen since last time the variable was logged.\n\
@@ -805,33 +805,33 @@ current: Log the current value for the variable.\n\
 If 'accumulate' is true, the printed values will be accumulated..");
     static VCheck::Enum handle_check ("min", "max", "average", "geometric", 
                                       "sum", "current");
-    frame.add_check ("handle", handle_check);
-    frame.add ("interesting_content", Value::Boolean, Value::Const, "\
+    frame.set_check ("handle", handle_check);
+    frame.declare ("interesting_content", Value::Boolean, Value::Const, "\
 True if the content of this column is interesting enough to warrent an\n\
 initial line in the log file.  This only affects non-flux variables.");
-    frame.add ("interesting_content", true);
-    frame.add_object ("expr", Number::component, 
+    frame.set ("interesting_content", true);
+    frame.declare_object ("expr", Number::component, 
                        Value::OptionalConst, Value::Singleton, "\
 Expression for findig the value for the log file, given the internal\n\
 value 'x'.  For example '(expr (ln x))' will give you the natural\n\
 logarithm of the value.");  
-    frame.add ("factor", Value::Unknown (), Check::none (), Value::Const, "\
+    frame.declare ("factor", Value::Unknown (), Check::none (), Value::Const, "\
 Factor to multiply the calculated value with, before logging.\n\
 OBSOLETE: Use 'expr' instead.");
-    frame.add ("factor", 1.0);
-    frame.add ("offset", Value::Unknown (), Check::none (), Value::Const, "\
+    frame.set ("factor", 1.0);
+    frame.declare ("offset", Value::Unknown (), Check::none (), Value::Const, "\
 Offset to add to the calculated value, before logging.\n\
 OBSOLETE: Use 'expr' instead.");
-    frame.add ("offset", 0.0);
-    frame.add ("negate", Value::Boolean, Value::Const, "\
+    frame.set ("offset", 0.0);
+    frame.declare ("negate", Value::Boolean, Value::Const, "\
 Switch sign of value.  I.e. upward fluxes become downward fluxes.");
-    frame.add ("negate", false);
-    frame.add ("accumulate", Value::Boolean, Value::Const,
+    frame.set ("negate", false);
+    frame.declare ("accumulate", Value::Boolean, Value::Const,
                 "Log accumulated values.");
-    frame.add ("accumulate", false);
-    frame.add ("count", Value::Integer, Value::State, "\
+    frame.set ("accumulate", false);
+    frame.declare ("count", Value::Integer, Value::State, "\
 Number of times the path has matched a variable since the last log entry.");
-    frame.add ("count", 0);
+    frame.set ("count", 0);
   }
 } Select_init;
 

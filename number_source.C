@@ -98,12 +98,12 @@ static struct NumberSourceSyntax : public DeclareBase
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_object ("source", Source::component, "\
+    frame.declare_object ("source", Source::component, "\
 The time series we want to extract a number from.");
-    frame.add_submodule ("begin", Value::OptionalConst,
+    frame.declare_submodule ("begin", Value::OptionalConst,
 			  "Ignore values before or at this date.", 
                           Time::load_syntax);
-    frame.add_submodule ("end", Value::OptionalConst,
+    frame.declare_submodule ("end", Value::OptionalConst,
 			  "Ignore values after this date.", Time::load_syntax);
   }
 } NumberSource_syntax;

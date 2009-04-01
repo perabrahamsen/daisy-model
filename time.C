@@ -131,13 +131,13 @@ void
 Time::set_time (Frame& parent, const symbol key) const
 {
   std::auto_ptr<FrameSubmodel> child (&parent.submodel (key).clone ());
-  child->add ("year", year ());
-  child->add ("month", month ());
-  child->add ("mday", mday ());
-  child->add ("hour", hour ());
-  child->add ("minute", minute ());
-  child->add ("second", second ());
-  parent.add (key, *child);
+  child->set ("year", year ());
+  child->set ("month", month ());
+  child->set ("mday", mday ());
+  child->set ("hour", hour ());
+  child->set ("minute", minute ());
+  child->set ("second", second ());
+  parent.set (key, *child);
 }
 
 int 
@@ -517,30 +517,30 @@ void
 Time::load_syntax (Frame& frame)
 {
   frame.add_check (check_alist);
-  frame.add ("year", Value::Integer, Value::State, "Current year.");
-  frame.add_check ("year", VCheck::valid_year ());
-  frame.add ("month", Value::Integer, Value::State, "Current month.");
+  frame.declare ("year", Value::Integer, Value::State, "Current year.");
+  frame.set_check ("year", VCheck::valid_year ());
+  frame.declare ("month", Value::Integer, Value::State, "Current month.");
   static VCheck::IRange mm (1, 12);
-  frame.add_check ("month", mm);
-  frame.add ("mday", Value::Integer, Value::State, 
+  frame.set_check ("month", mm);
+  frame.declare ("mday", Value::Integer, Value::State, 
 	      "Current day in the month.");
   static VCheck::IRange dd (1, 31);
-  frame.add_check ("mday", dd);
-  frame.add ("hour", Value::Integer, Value::State, "Current hour.");
+  frame.set_check ("mday", dd);
+  frame.declare ("hour", Value::Integer, Value::State, "Current hour.");
   static VCheck::IRange hh (0, 23);
-  frame.add_check ("hour", hh);
-  frame.add ("hour", 0);
+  frame.set_check ("hour", hh);
+  frame.set ("hour", 0);
   frame.order ("year", "month", "mday", "hour");
-  frame.add ("minute", Value::Integer, Value::State, "Current minute.");
+  frame.declare ("minute", Value::Integer, Value::State, "Current minute.");
   static VCheck::IRange ss (0, 59);
-  frame.add_check ("minute", ss);
-  frame.add ("minute", 0);
-  frame.add ("second", Value::Integer, Value::State, "Current second.");
-  frame.add_check ("second", ss);
-  frame.add ("second", 0);
-  frame.add ("week", Value::Integer, Value::LogOnly, "Current week.");
-  frame.add ("yday", Value::Integer, Value::LogOnly, "Current Julian day.");
-  frame.add ("wday", Value::String, Value::LogOnly, "Current weekday.\n\
+  frame.set_check ("minute", ss);
+  frame.set ("minute", 0);
+  frame.declare ("second", Value::Integer, Value::State, "Current second.");
+  frame.set_check ("second", ss);
+  frame.set ("second", 0);
+  frame.declare ("week", Value::Integer, Value::LogOnly, "Current week.");
+  frame.declare ("yday", Value::Integer, Value::LogOnly, "Current Julian day.");
+  frame.declare ("wday", Value::String, Value::LogOnly, "Current weekday.\n\
 Monday is 1, Sunday is 7.");
 }
 

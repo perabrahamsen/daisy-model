@@ -75,13 +75,13 @@ static struct ActionSowSyntax : DeclareModel
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.add_object ("crop", Crop::component, "Crop to sow.");
+    frame.declare_object ("crop", Crop::component, "Crop to sow.");
     frame.order ("crop");
-    frame.add ("row_width", "cm", Check::non_negative (), 
+    frame.declare ("row_width", "cm", Check::non_negative (), 
                 Value::Const, "Distance between rows.\n\
 Specify zero to spread equally over the area (no rows).");
-    frame.add ("row_width", 0.0);
-    frame.add ("plant_distance", "cm", Check::non_negative (),
+    frame.set ("row_width", 0.0);
+    frame.declare ("plant_distance", "cm", Check::non_negative (),
                 Value::OptionalConst, "Distance between plants.\n\
 \n\
 Setting this will overrule 'row_width'.  The only purpose of this\n\
@@ -89,11 +89,11 @@ paramater is to provide the user with a more intuitive name for\n\
 'row_width' for the situation where you have a 2D simulation, where\n\
 the x axis is parallel with the actual rows in the field, rather than\n\
 ortogonal to the rows as is otherwise assumed by Daisy.");
-    frame.add ("row_position", "cm", Check::non_negative (), 
+    frame.declare ("row_position", "cm", Check::non_negative (), 
                 Value::Const, "Position of plant row on x-axes.\n\
 Specify zero to spread equally over the area (no rows).");
-    frame.add ("row_position", 0.0);
-    frame.add ("plant_position", "cm", Check::non_negative (),
+    frame.set ("row_position", 0.0);
+    frame.declare ("plant_position", "cm", Check::non_negative (),
                 Value::OptionalConst, "Position of plant on x-axes.\n\
 \n                                                                      \
 Setting this will overrule 'row_position'.  The only purpose of this\n\
@@ -101,7 +101,7 @@ paramater is to provide the user with a more intuitive name for\n       \
 'row_position' for the situation where you have a 2D simulation, where\n\
 the x axis is parallel with the actual rows in the field, rather than\n\
 ortogonal to the rows as is otherwise assumed by Daisy.");
-    frame.add ("seed", "g w.w./m^2", Check::positive (), Value::OptionalConst,
+    frame.declare ("seed", "g w.w./m^2", Check::positive (), Value::OptionalConst,
                 "Amount of seed applied.\n\
 By default, initial growth will be governed by 'typical' seed amounts.");
   }

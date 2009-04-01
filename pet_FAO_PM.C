@@ -124,7 +124,7 @@ static struct PetFAO_PMSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("reference_evapotranspiration_wet", "mm/h", Value::LogOnly, 
+    frame.declare ("reference_evapotranspiration_wet", "mm/h", Value::LogOnly, 
                 "Reference evapotranspiration for a dry system.");
   }
 } PetFAO_PM_syntax;

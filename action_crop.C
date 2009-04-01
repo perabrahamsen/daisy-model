@@ -267,13 +267,13 @@ void
 ActionCrop::MM_DD::load_syntax (Frame& frame)
 {
   frame.add_check (check_alist);
-  frame.add ("month", Value::Integer, Value::Const, 
+  frame.declare ("month", Value::Integer, Value::Const, 
 	      "Month in the year.");
-  frame.add ("day", Value::Integer, Value::Const, 
+  frame.declare ("day", Value::Integer, Value::Const, 
 	      "Day in the month.");
-  frame.add ("hour", Value::Integer, Value::Const, 
+  frame.declare ("hour", Value::Integer, Value::Const, 
 	      "Hour in the day.");
-  frame.add ("hour", 8);
+  frame.set ("hour", 8);
   frame.order ("month", "day");
 }
 
@@ -314,12 +314,12 @@ void
 ActionCrop::Sow::load_syntax (Frame& frame)
 { 
   frame.add_check (check_alist);
-  frame.add_submodule ("date", Value::Const, "Date to sow.",
+  frame.declare_submodule ("date", Value::Const, "Date to sow.",
                        MM_DD::load_syntax);
-  frame.add_object ("crop", Crop::component, "Crop to sow.");
-  frame.add ("done", Value::Boolean, Value::State, 
+  frame.declare_object ("crop", Crop::component, "Crop to sow.");
+  frame.declare ("done", Value::Boolean, Value::State, 
 	      "True iff the crop has been sowed.");
-  frame.add ("done", false);
+  frame.set ("done", false);
 }
 
 ActionCrop::Sow::Sow (const FrameSubmodel& al)
@@ -368,16 +368,16 @@ void
 ActionCrop::Annual::load_syntax (Frame& frame)
 { 
   frame.add_check (check_alist);
-  frame.add_fraction ("loss", Value::Const, "Fraction lost during harvest.");
-  frame.add ("remove_residuals", Value::Boolean, Value::Const,
+  frame.declare_fraction ("loss", Value::Const, "Fraction lost during harvest.");
+  frame.declare ("remove_residuals", Value::Boolean, Value::Const,
 	      "Remove residuals at harvest.");
-  frame.add_submodule ("latest", Value::Const, 
+  frame.declare_submodule ("latest", Value::Const, 
 			"Latest harvest date.\n\
 If the crop is ripe before this date, it will be harvested at that point.",
 			MM_DD::load_syntax);
-  frame.add ("done", Value::Boolean, Value::State, 
+  frame.declare ("done", Value::Boolean, Value::State, 
 	      "True iff the crop has been sowed.");
-  frame.add ("done", false);
+  frame.set ("done", false);
 }
 
 ActionCrop::Annual::Annual (const FrameSubmodel& al)
@@ -484,35 +484,35 @@ void
 ActionCrop::Perennial::load_syntax (Frame& frame)
 { 
   frame.add_check (check_alist);
-  frame.add ("seasons", Value::Integer, Value::Const, 
+  frame.declare ("seasons", Value::Integer, Value::Const, 
 	      "Number of seasons to harvest crop.\n\
 The crop will be harvested whenever the specified DS or DM are reached.\n\
 The first season is the year the crop management starts.");
-  frame.add_submodule ("end", Value::Const, 
+  frame.declare_submodule ("end", Value::Const, 
 			"End management this date the last season.",
 			MM_DD::load_syntax);
   static RangeEI ds_range (0.0, 2.0);
-  frame.add ("DS", Value::None (), ds_range, Value::Const, 
+  frame.declare ("DS", Value::None (), ds_range, Value::Const, 
 	      "Development stage at or above which to initiate harvest.");
-  frame.add ("DM", "kg DM/ha", Check::positive (), Value::Const, 
+  frame.declare ("DM", "kg DM/ha", Check::positive (), Value::Const, 
 	      "Dry matter at or above which to initiate harvest.");
-  frame.add ("year_of_last_harvest", Value::Integer, Value::OptionalState, 
+  frame.declare ("year_of_last_harvest", Value::Integer, Value::OptionalState, 
 	      "Year of last season.");
-  frame.add_object ("fertilize", AM::component,
+  frame.declare_object ("fertilize", AM::component,
                      Value::OptionalConst, Value::Sequence,"\
 Fertilizer applications after harvest first season.\n\
 First season is defined as the year where the first harvest occurs.");
-  frame.add ("fertilize_index", Value::Integer, Value::State,
+  frame.declare ("fertilize_index", Value::Integer, Value::State,
 	      "Next entry in 'fertilize' to execute.");
-  frame.add ("fertilize_index", 0);
-  frame.add_object ("fertilize_rest", AM::component,
+  frame.set ("fertilize_index", 0);
+  frame.declare_object ("fertilize_rest", AM::component,
                      Value::OptionalConst, Value::Sequence,"\
 Fertilizer applications after harvest remaining seasons.\n\
 If missing, use the same fertilizer as first season.");
-  frame.add ("fertilize_rest_index", Value::Integer, Value::State,
+  frame.declare ("fertilize_rest_index", Value::Integer, Value::State,
 	      "Next entry in 'fertilize_rest' to execute.");
-  frame.add ("fertilize_rest_index", 0);
-  frame.add ("fertilize_year", Value::Integer, Value::OptionalState, 
+  frame.set ("fertilize_rest_index", 0);
+  frame.declare ("fertilize_year", Value::Integer, Value::OptionalState, 
 	      "Year last fertilization was applid.");
 }
 
@@ -567,11 +567,11 @@ void
 ActionCrop::Fertilize::load_syntax (Frame& frame)
 { 
   frame.add_check (check_alist);
-  frame.add ("month", Value::Integer, Value::Const, 
+  frame.declare ("month", Value::Integer, Value::Const, 
 	      "Month in the year.");
-  frame.add ("day", Value::Integer, Value::Const, 
+  frame.declare ("day", Value::Integer, Value::Const, 
 	      "Day in the month.");
-  frame.add_object ("what", AM::component, "Fertilizer to apply.");
+  frame.declare_object ("what", AM::component, "Fertilizer to apply.");
   frame.order ("month", "day", "what");
 }
 
@@ -627,13 +627,13 @@ void
 ActionCrop::Tillage::load_syntax (Frame& frame)
 { 
   frame.add_check (check_alist);
-  frame.add ("month", Value::Integer, Value::Const, 
+  frame.declare ("month", Value::Integer, Value::Const, 
 	      "Month in the year.");
-  frame.add_check ("month", VCheck::valid_month ());
-  frame.add ("day", Value::Integer, Value::Const, 
+  frame.set_check ("month", VCheck::valid_month ());
+  frame.declare ("day", Value::Integer, Value::Const, 
 	      "Day in the month.");
-  frame.add_check ("mday", VCheck::valid_mday ());
-  frame.add_object ("operation", Action::component, 
+  frame.set_check ("mday", VCheck::valid_mday ());
+  frame.declare_object ("operation", Action::component, 
                      "Tillage operation.");
   frame.order ("month", "day", "operation");
 }
@@ -679,13 +679,13 @@ void
 ActionCrop::Spray::load_syntax (Frame& frame)
 { 
   frame.add_check (check_alist);
-  frame.add ("month", Value::Integer, Value::Const, 
+  frame.declare ("month", Value::Integer, Value::Const, 
 	      "Month in the year.");
-  frame.add ("day", Value::Integer, Value::Const, 
+  frame.declare ("day", Value::Integer, Value::Const, 
 	      "Day in the month.");
-  frame.add ("name", Value::String, Value::Const,
+  frame.declare ("name", Value::String, Value::Const,
 	      "Name of chemichal to spray.");
-  frame.add ("amount", "g/ha", Check::non_negative (), Value::Const,
+  frame.declare ("amount", "g/ha", Check::non_negative (), Value::Const,
 	      "Amount of chemichal to spray.");
   frame.order ("month", "day", "name", "amount");
 }
@@ -732,15 +732,15 @@ ActionCrop::Irrigation::doIt (Daisy& daisy, const Scope&, Treelog& msg) const
 void 
 ActionCrop::Irrigation::load_syntax (Frame& frame)
 { 
-  frame.add_submodule ("from", Value::Const, 
+  frame.declare_submodule ("from", Value::Const, 
 			"Start of irrigation period.",
 			MM_DD::load_syntax);
-  frame.add_submodule ("to", Value::Const, 
+  frame.declare_submodule ("to", Value::Const, 
 			"End of irrigation period.",
 			MM_DD::load_syntax);
-  frame.add ("amount", "mm", Check::non_negative (), Value::Const, 
+  frame.declare ("amount", "mm", Check::non_negative (), Value::Const, 
 	      "Amount of water to apply on irrigation.");
-  frame.add ("potential", "cm", Check::negative (), Value::Const, 
+  frame.declare ("potential", "cm", Check::negative (), Value::Const, 
 	      "Soil potential at which to irrigate.");
 }
 
@@ -1052,51 +1052,51 @@ Manage a specific crop or multicrop.")
   { 
     frame.add_check (check_alist);
 
-    frame.add_submodule ("primary", Value::State,
+    frame.declare_submodule ("primary", Value::State,
 			  "Primary crop.", ActionCrop::Sow::load_syntax);
-    frame.add_submodule ("secondary", Value::OptionalState, 
+    frame.declare_submodule ("secondary", Value::OptionalState, 
 			  "Secondary crop, if any.",
 			  ActionCrop::Sow::load_syntax);
-    frame.add_submodule ("harvest_annual",
+    frame.declare_submodule ("harvest_annual",
 			  Value::OptionalState,
 			  "Harvest parameters for annual crops.", 
 			  ActionCrop::Annual::load_syntax);
-    frame.add_submodule ("harvest_perennial",
+    frame.declare_submodule ("harvest_perennial",
 			  Value::OptionalState, "\
 Harvest conditions for perennial crops.",
 			  ActionCrop::Perennial::load_syntax);
-    frame.add_submodule_sequence("fertilize_at", Value::Const, "\
+    frame.declare_submodule_sequence("fertilize_at", Value::Const, "\
 Fertilizer application by date.", ActionCrop::Fertilize::load_syntax);
-    frame.add_empty ("fertilize_at");
-    frame.add ("fertilize_at_index", Value::Integer, Value::State,
+    frame.set_empty ("fertilize_at");
+    frame.declare ("fertilize_at_index", Value::Integer, Value::State,
 		"Next entry in 'fertilize_at' to execute.");
-    frame.add ("fertilize_at_index", 0);
-    frame.add ("fertilize_incorporate", Value::Boolean, Value::Const,
+    frame.set ("fertilize_at_index", 0);
+    frame.declare ("fertilize_incorporate", Value::Boolean, Value::Const,
 		"Incorporate organic fertilizer in plowing zone.");
-    frame.add ("fertilize_incorporate", false);
-    frame.add_submodule_sequence ("tillage", Value::State, "\
+    frame.set ("fertilize_incorporate", false);
+    frame.declare_submodule_sequence ("tillage", Value::State, "\
 List of tillage operations to apply.", ActionCrop::Tillage::load_syntax);
-    frame.add_empty ("tillage");
-    frame.add ("tillage_index", Value::Integer, Value::State,
+    frame.set_empty ("tillage");
+    frame.declare ("tillage_index", Value::Integer, Value::State,
 		"Next entry in 'tillage' to execute.");
-    frame.add ("tillage_index", 0);
-    frame.add_submodule_sequence ("spray", Value::State, "\
+    frame.set ("tillage_index", 0);
+    frame.declare_submodule_sequence ("spray", Value::State, "\
 List of chemicals to apply.", ActionCrop::Spray::load_syntax);
-    frame.add_empty ("spray");
-    frame.add ("spray_index", Value::Integer, Value::State,
+    frame.set_empty ("spray");
+    frame.declare ("spray_index", Value::Integer, Value::State,
 		"Next entry in 'spray' to execute.");
-    frame.add ("spray_index", 0);
-    frame.add_submodule ("irrigation", Value::OptionalConst, "\
+    frame.set ("spray_index", 0);
+    frame.declare_submodule ("irrigation", Value::OptionalConst, "\
 Irrigation model for first season.  If missing, don't irrigate.", 
 			  ActionCrop::Irrigation::load_syntax);
-    frame.add_submodule ("irrigation_rest", Value::OptionalConst, "\
+    frame.declare_submodule ("irrigation_rest", Value::OptionalConst, "\
 Irrigation model for remaining seasons.\n\
 If missing, use the same model as first season.",
 			  ActionCrop::Irrigation::load_syntax);
-    frame.add ("irrigation_year", Value::Integer, Value::OptionalState, 
+    frame.declare ("irrigation_year", Value::Integer, Value::OptionalState, 
 		"Year management started.\n\
 Negative number means it hasn't started yet.");
-    frame.add ("irrigation_delay", Value::Integer, Value::OptionalState, 
+    frame.declare ("irrigation_delay", Value::Integer, Value::OptionalState, 
 		"Hours we test for irrigation again.\n\
 This is set at each irrigation, to avoid multiple applications.");
       

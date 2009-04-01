@@ -79,14 +79,14 @@ Shared parameter and log variable for colloid generation models.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("colloid", Value::String, Value::Const, "Colloid to generate.");
-    frame.add_object ("ponddamp", Ponddamp::component,
+    frame.declare ("colloid", Value::String, Value::Const, "Colloid to generate.");
+    frame.declare_object ("ponddamp", Ponddamp::component,
                       Value::Const, Value::Singleton,
                       "Model for calculating 'KH'.");
-    frame.add ("dds", "mm", Value::LogOnly, "Median raindrop size.");
-    frame.add ("KH", Value::Fraction (), Value::LogOnly, 
+    frame.declare ("dds", "mm", Value::LogOnly, "Median raindrop size.");
+    frame.declare ("KH", Value::Fraction (), Value::LogOnly, 
                "Ponding factor.");
-    frame.add ("D", "g/cm^2/h", Value::LogOnly, 
+    frame.declare ("D", "g/cm^2/h", Value::LogOnly, 
                "Depletion of detachable particles from top soil.");
   }
 } ReactionColgen_syntax;

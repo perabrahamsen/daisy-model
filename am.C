@@ -187,9 +187,9 @@ AM::Implementation::Lock::output (Log& log) const
 void
 AM::Implementation::Lock::load_syntax (Frame& frame)
 {
-  frame.add ("crop", Value::String, Value::State, 
+  frame.declare ("crop", Value::String, Value::State, 
 	      "Crop to which this am is locked");
-  frame.add ("part", Value::String, Value::State, 
+  frame.declare ("part", Value::String, Value::State, 
 	      "Crop part to which this am is locked");
 }
 
@@ -704,9 +704,9 @@ AM::create (Metalib& metalib, const Geometry& geo, const Time& now,
 {
   const Library& library = metalib.library (AM::component);
   FrameModel frame (library.model ("state"), Frame::parent_link);
-  frame.add ("initialized", true);
-  frame.add ("name", sort + "/" + part);
-  frame.add ("om", ol);
+  frame.set ("initialized", true);
+  frame.set ("name", sort + "/" + part);
+  frame.set ("om", ol);
   AM& am = *Librarian::build_frame<AM> (metalib, msg, frame, "crop part");
   am.impl->creation = now;
   for (size_t i = 0; i < am.impl->om.size (); i++)
@@ -847,7 +847,7 @@ AM::set_utilized_weight (Metalib& metalib,
                          FrameModel& am, const double weight)
 {
   if (is_mineral (metalib, am))
-    am.add ("weight", weight);
+    am.set ("weight", weight);
   else
     {
       daisy_assert (is_organic (metalib, am));
@@ -857,7 +857,7 @@ AM::set_utilized_weight (Metalib& metalib,
       const double utilization = am.number ("first_year_utilization", 1.0);
       const double dry_matter_fraction = am.number ("dry_matter_fraction");
       const double kg_per_ton = 1000.0;
-      am.add ("weight", weight 
+      am.set ("weight", weight 
 	      / (dry_matter_fraction *N_fraction * utilization * kg_per_ton));
     }
 }
@@ -905,9 +905,9 @@ void
 AM::set_mineral (Metalib&, FrameModel& am, double NH4, double NO3)
 {
   const double total_N = NH4 + NO3;
-  am.add ("weight", total_N);
-  am.add ("NH4_fraction", (total_N > 0.0) ? NH4 / total_N : 0.0);
-  am.add ("volatilization", 0.0);
+  am.set ("weight", total_N);
+  am.set ("NH4_fraction", (total_N > 0.0) ? NH4 / total_N : 0.0);
+  am.set ("volatilization", 0.0);
 }
 
 bool 
@@ -980,15 +980,15 @@ static struct AMMineralSyntax : public DeclareBase
   void load_frame (Frame& frame) const
   {
     Model::load_model (frame);
-    frame.add ("weight", "kg N/ha", Check::non_negative (), Value::Const,
+    frame.declare ("weight", "kg N/ha", Check::non_negative (), Value::Const,
                 "Amount of fertilizer applied.");
-    frame.add ("weight", 0.0);
-    frame.add_fraction ("NH4_fraction", Value::Const, "\
+    frame.set ("weight", 0.0);
+    frame.declare_fraction ("NH4_fraction", Value::Const, "\
 Ammonium fraction of total N in fertilizer. \n\
 The remaining nitrogen is assumed to be nitrate.");
-    frame.add_fraction ("volatilization", Value::Const, "\
+    frame.declare_fraction ("volatilization", Value::Const, "\
 Fraction of NH4 that evaporates on application.");
-    frame.add ("volatilization", 0.0);
+    frame.set ("volatilization", 0.0);
   }
 } AMMineral_syntax;
 
@@ -1002,18 +1002,18 @@ Common attributes for all added organic matter models.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("initialized", Value::Boolean, Value::State, "\
+    frame.declare ("initialized", Value::Boolean, Value::State, "\
 True if this AM has been initialized.\n\
 It will usually be false in user setup files, but true in checkpoints.");
-    frame.add ("initialized", false);
-    frame.add_submodule ("creation", Value::OptionalState, 
+    frame.set ("initialized", false);
+    frame.declare_submodule ("creation", Value::OptionalState, 
                          "Time this AM was created.", Time::load_syntax);
-    frame.add ("name", Value::String, Value::OptionalState, "\
+    frame.declare ("name", Value::String, Value::OptionalState, "\
 A name given to this AOM so you can identify it in for example log files.");
-    frame.add_submodule ("lock", Value::OptionalState, "\
+    frame.declare_submodule ("lock", Value::OptionalState, "\
 This AM belongs to a still living plant",
                           AM::Implementation::Lock::load_syntax);
-    frame.add_object ("om", AOM::component, 
+    frame.declare_object ("om", AOM::component, 
                       Value::OptionalState, Value::Sequence, "\
 The individual AOM pools.");
   }
@@ -1079,36 +1079,36 @@ Organic fertilizer, typically slurry or manure from animals.")
   void load_frame (Frame& frame) const
   {
     Model::load_model (frame);
-    frame.add ("weight", "Mg w.w./ha", Check::non_negative (),
+    frame.declare ("weight", "Mg w.w./ha", Check::non_negative (),
                 Value::Const,
                 "Amount of fertilizer applied.");
-    frame.add ("weight", 0.0);
-    frame.add_fraction ("first_year_utilization", Value::OptionalConst, 
+    frame.set ("weight", 0.0);
+    frame.declare_fraction ("first_year_utilization", Value::OptionalConst, 
                          "\
 Estimated useful N fraction for the first year.\n\
 In Denmark, this is governed by legalisation.");
-    frame.add_fraction ("second_year_utilization", 
+    frame.declare_fraction ("second_year_utilization", 
                          Value::OptionalConst, "\
 Estimated useful N fraction for the second year.\n\
 In Denmark, this is governed by legalisation.");
-    frame.add_fraction ("dry_matter_fraction", Value::Const,
+    frame.declare_fraction ("dry_matter_fraction", Value::Const,
                          "Dry matter fraction of total (wet) weight.");
-    frame.add_fraction ("total_C_fraction", Value::Const,
+    frame.declare_fraction ("total_C_fraction", Value::Const,
                          "Carbon fraction of dry matter.");
-    frame.add_fraction ("total_N_fraction", Value::Const,
+    frame.declare_fraction ("total_N_fraction", Value::Const,
                          "Nitrogen fraction of dry matter.");
-    frame.add_check ("om", AM::check_om_pools ());
-    frame.add_fraction ("NO3_fraction", Value::Const, 
+    frame.set_check ("om", AM::check_om_pools ());
+    frame.declare_fraction ("NO3_fraction", Value::Const, 
                          "Nitrate fraction of total N in fertilizer. \n\
 The remaining nitrogen is assumed to be ammonium or organic.");
-    frame.add ("NO3_fraction", 0.0);
-    frame.add_fraction ("NH4_fraction", Value::Const, "\
+    frame.set ("NO3_fraction", 0.0);
+    frame.declare_fraction ("NH4_fraction", Value::Const, "\
 Ammonium fraction of total N in fertilizer. \n\
 The remaining nitrogen is assumed to be nitrate or organic.");
-    frame.add ("NH4_fraction", 0.0);
-    frame.add_fraction ("volatilization", Value::Const, "\
+    frame.set ("NH4_fraction", 0.0);
+    frame.declare_fraction ("volatilization", Value::Const, "\
 Fraction of NH4 that evaporates on application.");
-    frame.add ("volatilization", 0.0);
+    frame.set ("volatilization", 0.0);
   }
 } AMOrganic_syntax;
 
@@ -1212,9 +1212,9 @@ Initial added organic matter at the start of the simulation.")
 
   static void load_layer (Frame& frame)
   {
-    frame.add ("end", "cm", Check::negative (), Value::Const, "\
+    frame.declare ("end", "cm", Check::negative (), Value::Const, "\
 Height where this layer ends (a negative number).");
-    frame.add ("weight", "kg C/m^2", Check::non_negative (),
+    frame.declare ("weight", "kg C/m^2", Check::non_negative (),
                Value::Const, "Carbon in this layer.");
     frame.order ("end", "weight");
   }
@@ -1222,7 +1222,7 @@ Height where this layer ends (a negative number).");
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);
-    frame.add_submodule_sequence ("layers", Value::Const, "\
+    frame.declare_submodule_sequence ("layers", Value::Const, "\
 Carbon content in different soil layers.  The carbon is assumed to be\n \
 uniformly distributed in each layer.", load_layer);
   }
@@ -1294,24 +1294,24 @@ Initialization of old root remains.")
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);
-    frame.add ("depth", "cm", Check::negative (), 
+    frame.declare ("depth", "cm", Check::negative (), 
                Value::OptionalConst, "\
 How far down does the old root reach? (a negative number)\n\
 By default, the soils maximal rooting depth will be used.");
-    frame.add ("dist", "cm", Check::positive (), Value::Const, "\
+    frame.declare ("dist", "cm", Check::positive (), Value::Const, "\
 Distance to go down in order to decrease the root density to half the\n\
 original.");
-    frame.add ("dist", 7.0);
-    frame.add ("weight", "Mg DM/ha", Check::non_negative (), Value::Const, 
+    frame.set ("dist", 7.0);
+    frame.declare ("weight", "Mg DM/ha", Check::non_negative (), Value::Const, 
                "Total weight of old root dry matter.");
-    frame.add ("weight", 1.2);
-    frame.add_fraction ("total_C_fraction", Value::Const, 
+    frame.set ("weight", 1.2);
+    frame.declare_fraction ("total_C_fraction", Value::Const, 
                         "Carbon fraction of total root dry matter");
-    frame.add ("total_C_fraction", 0.40);
-    frame.add_fraction ("total_N_fraction", Value::Const, 
+    frame.set ("total_C_fraction", 0.40);
+    frame.declare_fraction ("total_N_fraction", Value::Const, 
                         "Nitrogen fraction of total root dry matter");
-    frame.add ("total_N_fraction", 0.01);
-    frame.add ("om", AM::default_AM ());
+    frame.set ("total_N_fraction", 0.01);
+    frame.set ("om", AM::default_AM ());
   }
 } AMRoot_syntax;
 

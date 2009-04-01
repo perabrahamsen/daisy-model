@@ -101,7 +101,7 @@ static struct ClayOMOldSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.add ("factor", Value::Fraction (), Value::None (),
+    frame.declare ("factor", Value::Fraction (), Value::None (),
 		Value::Const, "\
 Function of clay content, multiplied to the maintenance and turnover rates\n\
 of SMB1 and all SOM pools.");
@@ -109,7 +109,7 @@ of SMB1 and all SOM pools.");
     factor.add (0.00, 1.0);
     factor.add (0.25, 0.5);
     factor.add (1.00, 0.5);
-    frame.add ("factor", factor);
+    frame.set ("factor", factor);
 
   }
 } ClayOMOld_syntax;

@@ -123,7 +123,7 @@ public:
 
   // WScope.
 public:
-  void add (symbol tag, double value);
+  void set (symbol tag, double value);
   
   // Create.
 private:

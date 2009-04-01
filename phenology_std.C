@@ -140,41 +140,41 @@ static struct PhenologyStandardSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
     // Parameters.
-    frame.add ("EmrTSum", "dg C d", Value::Const,
+    frame.declare ("EmrTSum", "dg C d", Value::Const,
 		"Soil temperature sum at emergence.");
-    frame.add ("EmrSMF", "cm", "d", Value::Const,
+    frame.declare ("EmrSMF", "cm", "d", Value::Const,
 		"Soil moisture (h-function) effect on emergense.");
     PLF SMF;
     SMF.add (-1000.0, 1.00);
     SMF.add (-150.0, 1.00);
     SMF.add (-50.00, 1.00);
     SMF.add (-30.00, 1.00);
-    frame.add("EmrSMF",SMF);
-    frame.add ("DS_Emr", "DS", Value::Const,
+    frame.set ("EmrSMF",SMF);
+    frame.declare ("DS_Emr", "DS", Value::Const,
 		"Development stage at emergence.");
-    frame.add ("DS_Emr", 0.01);
-    frame.add ("DSRate1", "DS/d", Value::Const,
+    frame.set ("DS_Emr", 0.01);
+    frame.declare ("DSRate1", "DS/d", Value::Const,
 		"Development rate in the vegetative stage.");
-    frame.add ("DSRate2", "DS/d", Value::Const,
+    frame.declare ("DSRate2", "DS/d", Value::Const,
 		"Development rate in the reproductive stage.");
-    frame.add ("TempEff1", "dg C", Value::None (), Value::Const,
+    frame.declare ("TempEff1", "dg C", Value::None (), Value::Const,
 		"Temperature effect, vegetative stage.");
-    frame.add ("TempEff2", "dg C", Value::None (), Value::Const,
+    frame.declare ("TempEff2", "dg C", Value::None (), Value::Const,
 		"Temperature effect, reproductive stage.");
-    frame.add ("PhotEff1", "h", Value::None (), Value::Const,
+    frame.declare ("PhotEff1", "h", Value::None (), Value::Const,
 		"Photoperiode effect, vegetative stage.");
-    frame.add ("DSMature", "DS", Value::Const,
+    frame.declare ("DSMature", "DS", Value::Const,
 		"Development stage at maturation.");
-    frame.add ("DSMature", 2.0);
-    frame.add ("DSRepeat", "DS", Value::Const,
+    frame.set ("DSMature", 2.0);
+    frame.declare ("DSRepeat", "DS", Value::Const,
 		"Development stage when DS set back is activated.");
-    frame.add ("DSRepeat", 4.0);
-    frame.add ("DSSetBack", "DS", Value::Const,
+    frame.set ("DSRepeat", 4.0);
+    frame.declare ("DSSetBack", "DS", Value::Const,
 		"Development stage set back at DSRepeat.");
-    frame.add ("DSSetBack", 1.7);
-    frame.add ("defined_until_ds", "DS", Value::Const, "\
+    frame.set ("DSSetBack", 1.7);
+    frame.declare ("defined_until_ds", "DS", Value::Const, "\
 This parameterization is only valid until the specified development state.");
-    frame.add ("defined_until_ds", 2.0);
+    frame.set ("defined_until_ds", 2.0);
 
   }
 } PhenologyStandard_syntax;

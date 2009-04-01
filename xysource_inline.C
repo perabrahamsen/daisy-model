@@ -115,12 +115,12 @@ static struct XYSourceInlineSyntax : public DeclareModel
   { 
     GnuplotUtil::load_style (frame, "", "\
 By default the name of the 'x' and 'y' objects.");
-    frame.add ("points", Value::Unknown (), Value::Unknown (), 
+    frame.declare ("points", Value::Unknown (), Value::Unknown (), 
 		Value::Const, Value::Singleton, "\
 List of (x y) pairs.");
-    frame.add ("x_dimension", Value::String, Value::Const, "\
+    frame.declare ("x_dimension", Value::String, Value::Const, "\
 Dimension for x points.");
-    frame.add ("y_dimension", Value::String, Value::Const, "\
+    frame.declare ("y_dimension", Value::String, Value::Const, "\
 Dimension for y points.");
 
   }

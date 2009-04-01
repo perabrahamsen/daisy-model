@@ -180,13 +180,13 @@ Common base for logging flow through a specific plane.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("density", Value::Boolean, Value::Const, 
+    frame.declare ("density", Value::Boolean, Value::Const, 
                "If true, divide value with volume height.");
-    frame.add ("density", false);
-    frame.add_object ("volume", Volume::component, 
+    frame.set ("density", false);
+    frame.declare_object ("volume", Volume::component, 
                       Value::Const, Value::Singleton,
                       "Soil volume to log flow into.");
-    frame.add ("volume", "box");
+    frame.set ("volume", "box");
   }
 } SelectFlow_syntax;
 
@@ -219,7 +219,7 @@ Extract flow from top of specified volume.")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.add ("from", "cm", Value::OptionalConst,
+    frame.declare ("from", "cm", Value::OptionalConst,
 		"Specify height (negative) to measure from.\n\
 By default, measure from the top.\n\
 OBSOLETE: Use (volume box (top FROM)) instead.");
@@ -234,7 +234,7 @@ Flux leaving top of specified volume.\n\
 OBSOLETE: Use '(flow_top (negate true) (density true))' instead.")
   { }
   void load_frame (Frame& frame) const
-  { frame.add ("density", true); }
+  { frame.set ("density", true); }
 } Select_flux_top_syntax;
 
 struct SelectFlowBottom : public SelectFlow
@@ -266,7 +266,7 @@ Extract flow from bottom of specified volume.")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.add ("to", "cm", Value::OptionalConst,
+    frame.declare ("to", "cm", Value::OptionalConst,
 		"Specify height (negative) to measure interval.\n\
 By default, measure to the bottom.\n\
 OBSOLETE: Use (volume box (bottom TO)) instead.");
@@ -283,7 +283,7 @@ OBSOLETE: Use '(flow_bottom (density true))' instead.")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.add ("density", true);
+    frame.set ("density", true);
   }
 } Select_flux_bottom_syntax;
 

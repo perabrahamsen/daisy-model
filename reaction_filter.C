@@ -157,23 +157,23 @@ static struct ReactionFilterSyntax : public DeclareModel
   {
 
 
-    frame.add ("immobile", Value::String, Value::OptionalConst,
+    frame.declare ("immobile", Value::String, Value::OptionalConst,
 		"Immobile colloids in the soil.\n\
 By default, filtered colloids are not tracked.");
-    frame.add ("mobile", Value::String, Value::Const,
+    frame.declare ("mobile", Value::String, Value::Const,
 		"Mobile colloids dissolved in soil water.");
-    frame.add ("F_primary", "g/cm^3/h", Value::LogOnly, Value::Sequence,
+    frame.declare ("F_primary", "g/cm^3/h", Value::LogOnly, Value::Sequence,
 		"Filtration in the primary domain (intra-aggregate pores).");
-    frame.add ("F_secondary", "g/cm^3/h", Value::LogOnly, Value::Sequence,
+    frame.declare ("F_secondary", "g/cm^3/h", Value::LogOnly, Value::Sequence,
 		"Filtration in secondary domain (inter-aggregate pores).");
 
-    frame.add ("fc_primary", "cm^-1", Check::positive (), Value::Const,
+    frame.declare ("fc_primary", "cm^-1", Check::positive (), Value::Const,
                 "Filter coefficient in the primary domain");
-    // frame.add ("fc_primary", 1.0);
+    // frame.set ("fc_primary", 1.0);
    
-    frame.add ("fc_secondary", "cm^-1", Check::positive (), Value::Const,
+    frame.declare ("fc_secondary", "cm^-1", Check::positive (), Value::Const,
                 "Filter coefficient in secondary domain");
-    // frame.add ("fc_secondary", 0.5);
+    // frame.set ("fc_secondary", 0.5);
 
   }
   

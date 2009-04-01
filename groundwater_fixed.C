@@ -75,7 +75,7 @@ Fixed high groundwater level.")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.add ("table", "cm", Check::none (), Value::Const,
+    frame.declare ("table", "cm", Check::none (), Value::Const,
 		"Groundwater level (negative number below surface).");
     frame.order ("table");
   }

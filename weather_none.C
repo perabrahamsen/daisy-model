@@ -90,21 +90,21 @@ static struct WeatherNoneSyntax : public DeclareModel
   { 
     // These need to be Value::State instead of
     // Value::Const, as WeatherOld::output will try to log them.
-    frame.add ("air_temperature", "dg C", Value::State,
+    frame.declare ("air_temperature", "dg C", Value::State,
 		"Constant air temperature");
-    frame.add ("air_temperature", 0.0);
-    frame.add ("global_radiation", "W/m^2", Value::State,
+    frame.set ("air_temperature", 0.0);
+    frame.declare ("global_radiation", "W/m^2", Value::State,
 		"Constant global radiation.");
-    frame.add ("global_radiation", 0.0);
+    frame.set ("global_radiation", 0.0);
 
     // These must be Value::State because they are logged in
     // Weather::output.  Otherwise, we get an error at checkpoins.
-    frame.add ("reference_evapotranspiration_value", "mm/h", Value::Const,
+    frame.declare ("reference_evapotranspiration_value", "mm/h", Value::Const,
 		"Constant reference evapotranspiration.");
-    frame.add ("reference_evapotranspiration_value", 0.0);
-    frame.add ("rain_value", "mm/h", Value::Const, "Constant rain.");
-    frame.add ("rain_value", 0.0);
-    frame.add ("snow_value", "mm/h", Value::Const, "Constant snow.");
-    frame.add ("snow_value", 0.0);
+    frame.set ("reference_evapotranspiration_value", 0.0);
+    frame.declare ("rain_value", "mm/h", Value::Const, "Constant rain.");
+    frame.set ("rain_value", 0.0);
+    frame.declare ("snow_value", "mm/h", Value::Const, "Constant snow.");
+    frame.set ("snow_value", 0.0);
   }
 } WeatherNone_syntax;

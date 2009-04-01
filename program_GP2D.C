@@ -143,25 +143,25 @@ Write root density table using 2D extension to Gerwitz and Page")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_submodule ("Geometry", Value::Const,
+    frame.declare_submodule ("Geometry", Value::Const,
                           "Discretization of the soil.",
                           GeometryRect::load_syntax);
-    frame.add ("row_width", "cm", Check::positive (), Value::Const, "\
+    frame.declare ("row_width", "cm", Check::positive (), Value::Const, "\
 Distance between rows.");
-    frame.add ("row_position", "cm", Check::non_negative (), Value::Const, "\
+    frame.declare ("row_position", "cm", Check::non_negative (), Value::Const, "\
 Position of row on x-axis.");
-    frame.add ("row_position", 0.0);
-    frame.add ("soil_depth", "cm", Check::positive (), Value::Const, "\
+    frame.set ("row_position", 0.0);
+    frame.declare ("soil_depth", "cm", Check::positive (), Value::Const, "\
 Limit on root depth by soil (no crops have roots below this).");
-    frame.add ("crop_depth", "cm", Check::positive (), Value::Const, "\
+    frame.declare ("crop_depth", "cm", Check::positive (), Value::Const, "\
 Limit of root depth by crop (no soil have roots below this).");
-    frame.add ("crop_width", "cm", Check::positive (), Value::Const, "\
+    frame.declare ("crop_width", "cm", Check::positive (), Value::Const, "\
 Maximum horizontal distance of roots from plant.");
-    frame.add ("WRoot", "g DM/m^2", Check::positive (), Value::Const, "\
+    frame.declare ("WRoot", "g DM/m^2", Check::positive (), Value::Const, "\
 Totoal root dry matter.");
-    frame.add ("DS", "DS", Value::Const, "Development stage [0-2].\n\
+    frame.declare ("DS", "DS", Value::Const, "Development stage [0-2].\n\
 Not currently used.");
-    frame.add ("DS", 2.0);
+    frame.set ("DS", 2.0);
   }
 } ProgramGP2D_syntax;
 

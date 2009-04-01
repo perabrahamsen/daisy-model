@@ -374,15 +374,15 @@ Handle chemicals and reactions.")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.add_object ("trace", Chemical::component, 
+    frame.declare_object ("trace", Chemical::component, 
                       Value::State, Value::Sequence, "\
 List of chemicals you want to trace in the simulation.");
-    frame.add_check ("trace", VCheck::unique ());
-    frame.add_empty ("trace");
-    frame.add_object ("reaction", Reaction::component, 
+    frame.set_check ("trace", VCheck::unique ());
+    frame.set_empty ("trace");
+    frame.declare_object ("reaction", Reaction::component, 
                       Value::State, Value::Sequence, "\
 List of chemical reactions you want to simulate.");
-    frame.add_empty ("reaction");
+    frame.set_empty ("reaction");
   }
 } ChemistryStandard_syntax;
 
@@ -394,8 +394,8 @@ Inorganic nitrogen.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_strings ("trace", "NO3", "NH4");
-    frame.add_strings ("reaction", "nitrification", "denitrification");
+    frame.set_strings ("trace", "NO3", "NH4");
+    frame.set_strings ("reaction", "nitrification", "denitrification");
   }
 } ChemistryNitrogen_syntax;
 

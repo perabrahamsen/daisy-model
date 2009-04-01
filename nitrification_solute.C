@@ -100,15 +100,15 @@ with nitrification based on ammonium solute.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("k", "g/cm^3", Check::positive (), Value::Const, 
+    frame.declare ("k", "g/cm^3", Check::positive (), Value::Const, 
 		"Half saturation constant.");
-    frame.add ("k_10", "h^-1", Check::non_negative (),
+    frame.declare ("k_10", "h^-1", Check::non_negative (),
 		Value::Const, "Max rate.");
-    frame.add ("heat_factor", "dg C", Value::None (), Value::Const,
+    frame.declare ("heat_factor", "dg C", Value::None (), Value::Const,
 		"Heat factor.");
-    frame.add ("heat_factor", PLF::empty ());
-    frame.add ("water_factor", "cm", Value::None (), Value::Const,
+    frame.set ("heat_factor", PLF::empty ());
+    frame.declare ("water_factor", "cm", Value::None (), Value::Const,
 		"Water potential factor.");
-    frame.add ("water_factor", PLF::empty ());
+    frame.set ("water_factor", PLF::empty ());
   }
 } NitrificationSolute_syntax;

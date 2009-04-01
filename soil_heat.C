@@ -665,27 +665,27 @@ void
 SoilHeat::load_syntax (Frame& frame)
 { 
   Geometry::add_layer (frame, Value::OptionalState, "T", load_T);
-  frame.add ("S", "erg/cm^3/h", Value::OptionalState, 
+  frame.declare ("S", "erg/cm^3/h", Value::OptionalState, 
               "External heat source, by default zero.");
-  frame.add ("conductivity", "erg/cm/dg C/h", Value::LogOnly, 
+  frame.declare ("conductivity", "erg/cm/dg C/h", Value::LogOnly, 
               "Heat conductivity.");
-  frame.add ("capacity", "erg/cm^3/dg C", Value::LogOnly, 
+  frame.declare ("capacity", "erg/cm^3/dg C", Value::LogOnly, 
               "Heat capacity.");
-  frame.add ("h_frozen", "cm^-1", Value::Const,
+  frame.declare ("h_frozen", "cm^-1", Value::Const,
               "Pressure below which no more water will freeze.");
-  frame.add ("h_frozen", -15000.0);
-  frame.add ("enable_ice", Value::Boolean, Value::Const,
+  frame.set ("h_frozen", -15000.0);
+  frame.declare ("enable_ice", Value::Boolean, Value::Const,
               "Disable this to prevent water from freezing.");
-  frame.add ("enable_ice", false);
-  frame.add ("T_top", "dg C", Value::OptionalState, 
+  frame.set ("enable_ice", false);
+  frame.declare ("T_top", "dg C", Value::OptionalState, 
               "Surface temperature at previous time step.");
-  frame.add ("T_freezing", "dg C", Value::LogOnly, Value::Sequence,
+  frame.declare ("T_freezing", "dg C", Value::LogOnly, Value::Sequence,
               "Freezing point depression for freezing.");
-  frame.add ("T_thawing", "dg C", Value::LogOnly, Value::Sequence,
+  frame.declare ("T_thawing", "dg C", Value::LogOnly, Value::Sequence,
               "Freezing point depression for thawing.");
-  frame.add ("q", "erg/cm^2/h", Value::LogOnly, Value::Sequence,
+  frame.declare ("q", "erg/cm^2/h", Value::LogOnly, Value::Sequence,
               "Heat flux.");
-  frame.add ("state", Value::Unknown (), Value::LogOnly, Value::Sequence,
+  frame.declare ("state", Value::Unknown (), Value::LogOnly, Value::Sequence,
               "Current freezing/melting state.");
 }
 

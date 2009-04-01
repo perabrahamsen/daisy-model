@@ -108,7 +108,7 @@ Base class for boolean expressions involving numbers.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_object ("operands", Number::component, 
+    frame.declare_object ("operands", Number::component, 
                        Value::Const, Value::Sequence, "\
 List of operands to compare.");
     frame.order ("operands");

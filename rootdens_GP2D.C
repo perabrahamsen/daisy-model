@@ -397,9 +397,9 @@ Rootdens::create_row (Metalib& metalib, Treelog& msg,
   const Library& library = metalib.library (Rootdens::component);
   const FrameModel& parent = library.model ("GP2D");
   FrameModel frame (parent, FrameModel::parent_link);
-  frame.add ("row_position", row_position);
-  frame.add ("row_distance", row_width);
-  frame.add ("debug", debug ? 1 : 0);
+  frame.set ("row_position", row_position);
+  frame.set ("row_distance", row_width);
+  frame.set ("debug", debug ? 1 : 0);
   return std::auto_ptr<Rootdens> (Librarian::build_frame<Rootdens> (metalib, msg, frame, "row")); 
 }
 
@@ -420,29 +420,29 @@ as well as depth below row.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_strings ("cite", "gp74");
-    frame.add ("debug", Value::Integer, Value::Const, "\
+    frame.set_strings ("cite", "gp74");
+    frame.declare ("debug", Value::Integer, Value::Const, "\
 Add debug messages if larger than 0.");
-    frame.add ("debug", 0);
-    frame.add ("row_position", "cm", Value::State, "\
+    frame.set ("debug", 0);
+    frame.declare ("row_position", "cm", Value::State, "\
 Horizontal position of row crops.");
-    frame.add ("row_position", 0.0);
-    frame.add ("row_distance", "cm", Value::State, 
+    frame.set ("row_position", 0.0);
+    frame.declare ("row_distance", "cm", Value::State, 
                 "Distance between rows of crops.");
-    frame.add ("DensRtTip", "cm/cm^3", Check::positive (), Value::Const,
+    frame.declare ("DensRtTip", "cm/cm^3", Check::positive (), Value::Const,
                 "Root density at (potential) penetration depth.");
-    frame.add ("DensRtTip", 0.1);
-    frame.add ("DensIgnore", "cm/cm^3", Check::positive (),
+    frame.set ("DensRtTip", 0.1);
+    frame.declare ("DensIgnore", "cm/cm^3", Check::positive (),
                 Value::OptionalConst,
                 "Ignore cells with less than this root density.\n\
 By default, this is the same as DensRtTip.");
-    frame.add ("a_z", "cm^-1", Value::LogOnly, "Form parameter.\n\
+    frame.declare ("a_z", "cm^-1", Value::LogOnly, "Form parameter.\n\
 Calculated from 'DensRtTip'.");
-    frame.add ("a_x", "cm^-1", Value::LogOnly, "Form parameter.\n\
+    frame.declare ("a_x", "cm^-1", Value::LogOnly, "Form parameter.\n\
 Calculated from 'DensRtTip'.");
-    frame.add ("L00", "cm/cm^3", Value::LogOnly,
+    frame.declare ("L00", "cm/cm^3", Value::LogOnly,
                 "Root density at row crop at soil surface.");
-    frame.add ("k", Value::None (), Value::LogOnly,
+    frame.declare ("k", Value::None (), Value::LogOnly,
                 "Scale factor due to soil limit.\n\
 \n\
 Some roots might be below the soil imposed maximum root depth, or in areas\n\

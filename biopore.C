@@ -185,7 +185,7 @@ Biopore::initialize_base (const Units& units,
         density_cell.push_back (0.0);
       else
         {
-          own_scope.add (x_symbol (), geo.cell_x (c));
+          own_scope.set (x_symbol (), geo.cell_x (c));
           if (!density_expr->tick_value (units, value,
                                          per_square_centimeter, scope, msg))
             ok = false;
@@ -253,20 +253,20 @@ A single class of biopores.")
 
   void load_frame (Frame& frame) const
   {
-    frame.add_object ("density", Number::component, 
+    frame.declare_object ("density", Number::component, 
                          Value::Const, Value::Singleton, "\
 Biopore density [cm^-2] as a function of 'x' [cm].");
-    frame.add ("height_start", "cm", Check::non_positive (), Value::Const, 
+    frame.declare ("height_start", "cm", Check::non_positive (), Value::Const, 
                 "Biopores starts at this depth (a negative number).");
-    frame.add ("height_end", "cm", Check::non_positive (), Value::Const, 
+    frame.declare ("height_end", "cm", Check::non_positive (), Value::Const, 
                 "Biopores ends at this depth (a negative number).");
-    frame.add ("diameter", "cm", Check::positive (),
+    frame.declare ("diameter", "cm", Check::positive (),
                 Value::Const, "Biopore diameter.");
-    frame.add ("S", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
+    frame.declare ("S", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
                 "Sink from matrix domain to biopore.");
-    frame.add ("infiltration", "cm/h", Value::LogOnly, "\
+    frame.declare ("infiltration", "cm/h", Value::LogOnly, "\
 Surface infiltration.");
-    frame.add_submodule_sequence ("solute_infiltration", Value::LogOnly, "\
+    frame.declare_submodule_sequence ("solute_infiltration", Value::LogOnly, "\
 Rate of solute infiltration through surface.", load_flux);
   }
 } Biopore_init;

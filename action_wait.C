@@ -160,7 +160,7 @@ Wait until the specified condition is true.")
   { }
   void load_frame (Frame& frame) const
   {
-      frame.add_object ("condition", Condition::component, 
+      frame.declare_object ("condition", Condition::component, 
                          "Condition to wait for.");
       frame.order ("condition");
   }
@@ -191,11 +191,11 @@ Waits the specified period.")
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);	
-    frame.add ("days", Value::Integer, Value::Const, 
+    frame.declare ("days", Value::Integer, Value::Const, 
                 "Wait this number of days.");
-    frame.add ("hours", Value::Integer, Value::Const, 
+    frame.declare ("hours", Value::Integer, Value::Const, 
                 "Wait this number of hours.");
-    frame.add_submodule ("end_time", Value::OptionalState,
+    frame.declare_submodule ("end_time", Value::OptionalState,
                           "Wait until this date.\
 Setting this overrides the 'days' and 'hours' parameters.", Time::load_syntax);
   }
@@ -209,7 +209,7 @@ Waits the specified number of days.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("hours", 0);
+    frame.set ("hours", 0);
     frame.order ("days");
   }
 } ActionWaitDays_syntax;
@@ -222,7 +222,7 @@ Waits the specified number of hours.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("days", 0);
+    frame.set ("days", 0);
     frame.order ("hours");
   }
 } ActionWaitHours_syntax;
@@ -266,13 +266,13 @@ Wait until a specific month and day in the year.")
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);	
-    frame.add ("month", Value::Integer, Value::Const, 
+    frame.declare ("month", Value::Integer, Value::Const, 
                 "Wait until this month.");
-    frame.add ("day", Value::Integer, Value::Const, 
+    frame.declare ("day", Value::Integer, Value::Const, 
 		  "Wait until this day in the month.");
-    frame.add ("hour", Value::Integer, Value::Const, 
+    frame.declare ("hour", Value::Integer, Value::Const, 
                 "Wait until this hour.");
-    frame.add ("hour", 8);
+    frame.set ("hour", 8);
     frame.order ("month", "day");
   }
 } ActionWaitMMDD_syntax;

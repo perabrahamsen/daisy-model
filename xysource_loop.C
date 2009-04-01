@@ -106,9 +106,9 @@ XYSourceLoop::load (const Units& units, Treelog& msg)
 
   // Read data.
   daisy_assert (xs.size () == ys.size ());
-  for (scope.add (tag, begin); 
+  for (scope.set (tag, begin); 
        (step > 0.0) ? (scope.number (tag) < end) : (scope.number (tag) > end); 
-       scope.add (tag, scope.number (tag) + step))
+       scope.set (tag, scope.number (tag) + step))
     {
       // Missing value.
       if (x_expr->missing (scope) || y_expr->missing (scope))
@@ -186,26 +186,26 @@ expressions may refer to the variable.")
   { 
     GnuplotUtil::load_style (frame, "", "\
 By default the name of the 'x' and 'y' objects.");
-    frame.add ("with", "lines");
+    frame.set ("with", "lines");
     
     frame.add_check (check_alist);
-    frame.add_object ("x", Number::component, 
+    frame.declare_object ("x", Number::component, 
                        Value::Const, Value::Singleton, "\
 Expression for calculating the x value.");
-    frame.add ("x", "x");
-    frame.add_object ("y", Number::component, 
+    frame.set ("x", "x");
+    frame.declare_object ("y", Number::component, 
                        Value::Const, Value::Singleton, "\
 Expression for calculating the y value.");
-    frame.add ("begin", Value::User (), Value::Const, "\
+    frame.declare ("begin", Value::User (), Value::Const, "\
 Start of interval.");
-    frame.add ("end", Value::User (), Value::Const, "\
+    frame.declare ("end", Value::User (), Value::Const, "\
 End of interval.");
-    frame.add ("step", Value::User (), Check::non_zero (), Value::Const, "\
+    frame.declare ("step", Value::User (), Check::non_zero (), Value::Const, "\
 Disretization within interval.");
     
-    frame.add ("tag", Value::String, Value::Const, "\
+    frame.declare ("tag", Value::String, Value::Const, "\
 Name of free variable to calculate the 'x' and 'y' expressions from.");
-    frame.add ("tag", "x");
+    frame.set ("tag", "x");
 
   }
 } XYSourceLoop_syntax;

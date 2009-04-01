@@ -53,9 +53,9 @@ Root density calculations.")
   void load_frame (Frame& frame) const
   {
     Model::load_model (frame);
-    frame.add ("SpRtLength", "m/g", Check::positive (), Value::Const,
+    frame.declare ("SpRtLength", "m/g", Check::positive (), Value::Const,
                "Specific root length");
-    frame.add ("SpRtLength", 100.0);
+    frame.set ("SpRtLength", 100.0);
   }
 } Rootdens_init;
 

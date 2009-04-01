@@ -170,20 +170,20 @@ static struct ReactionAdsorptionSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("solute", Value::String, Value::Const,
+    frame.declare ("solute", Value::String, Value::Const,
 		"Name of solute form of chemical.");
-    frame.add ("sorbed", Value::String, Value::Const,
+    frame.declare ("sorbed", Value::String, Value::Const,
 		"Name of sorbed form of chemical.");
-    frame.add_object ("equilibrium", Adsorption::component, "\
+    frame.declare_object ("equilibrium", Adsorption::component, "\
 Function for calculating equilibrium between solute and sorbed form.");
-    frame.add_object ("adsorption_rate", Number::component,
+    frame.declare_object ("adsorption_rate", Number::component,
                        Value::Const, Value::Singleton, 
                        "Tranformation rate from solute to sorbed form.");
-    frame.add_object ("desorption_rate", Number::component,
+    frame.declare_object ("desorption_rate", Number::component,
                        Value::OptionalConst, Value::Singleton,
                        "Tranformation rate from sorbed to solute form.\n\
 By default, this is identical to 'adsorption_rate'.");
-    frame.add ("adsorption_source", "g/cm^3/h", 
+    frame.declare ("adsorption_source", "g/cm^3/h", 
 		Value::LogOnly, Value::Sequence, "\
 Converted from solute to sorbed form this timestep (may be negative).");
 

@@ -1118,16 +1118,16 @@ The default bioclimate model.")
   void load_frame (Frame& frame) const
   {
     // Canopy structure.
-    frame.add ("NoOfIntervals", Value::Integer, Value::Const, "\
+    frame.declare ("NoOfIntervals", Value::Integer, Value::Const, "\
 Number of vertical intervals in which we partition the canopy.");
-    frame.add ("NoOfIntervals", 30);
-    frame.add ("Height", "cm", Value::LogOnly, Value::Sequence, "\
+    frame.set ("NoOfIntervals", 30);
+    frame.declare ("Height", "cm", Value::LogOnly, Value::Sequence, "\
 End points of canopy layers, first entry is top of canopy, last is soil surface.");
     // External water sources and sinks.
-    frame.add_object ("net_radiation", NetRadiation::component,
+    frame.declare_object ("net_radiation", NetRadiation::component,
                        "Net radiation.");
-    frame.add ("net_radiation", "brunt");
-    frame.add_object ("pet", Pet::component, 
+    frame.set ("net_radiation", "brunt");
+    frame.declare_object ("pet", Pet::component, 
                        Value::OptionalState, Value::Singleton, 
                        "Potential Evapotranspiration component.\n\
 \n\
@@ -1142,146 +1142,146 @@ If the timestep is larger than 12, and daily minimum and maximum\n\
 temperature are available,  Samani and Hargreaves (Hargreaves).\n\
 \n\
 As a last resort,  Makkink (makkink) will be used.");
-    frame.add ("total_ep", "mm/h", Value::LogOnly,
+    frame.declare ("total_ep", "mm/h", Value::LogOnly,
                 "Potential evapotranspiration.");
-    frame.add ("total_ea", "mm/h", Value::LogOnly,
+    frame.declare ("total_ea", "mm/h", Value::LogOnly,
                 "Actual evapotranspiration.");
-    frame.add ("direct_rain", "mm/h", Value::LogOnly,
+    frame.declare ("direct_rain", "mm/h", Value::LogOnly,
                 "Rain hitting surface directly.\n\
 This includes rain hitting ponded water or litter, but excludes rain\n\
 hitting canopy or snow, as well as snow and all forms for irrigation.\n\
 The intended use is colloid generation."); 
-    frame.add ("irrigation_overhead", "mm/h", Value::LogOnly,
+    frame.declare ("irrigation_overhead", "mm/h", Value::LogOnly,
                 "Irrigation above canopy.");
-    frame.add ("irrigation_overhead_temperature", "dg C", Value::LogOnly,
+    frame.declare ("irrigation_overhead_temperature", "dg C", Value::LogOnly,
                 "Water temperature.");
-    frame.add ("irrigation_surface", "mm/h", Value::LogOnly,
+    frame.declare ("irrigation_surface", "mm/h", Value::LogOnly,
                 "Irrigation below canopy.");
-    frame.add ("irrigation_surface_temperature", "dg C", Value::LogOnly,
+    frame.declare ("irrigation_surface_temperature", "dg C", Value::LogOnly,
                 "Water temperature.");
-    frame.add ("irrigation_subsoil", "mm/h", Value::LogOnly,
+    frame.declare ("irrigation_subsoil", "mm/h", Value::LogOnly,
                 "Irrigation below soil surface this hour.");
-    frame.add ("irrigation_subsoil_permanent", "mm/h", Value::State,
+    frame.declare ("irrigation_subsoil_permanent", "mm/h", Value::State,
                 "Long term irrigation below soil surface.");
-    frame.add ("irrigation_subsoil_permanent", 0.0);
-    frame.add ("irrigation_total", "mm/h", Value::LogOnly,
+    frame.set ("irrigation_subsoil_permanent", 0.0);
+    frame.declare ("irrigation_total", "mm/h", Value::LogOnly,
                 "Total irrigation above of below the soil surface.");
 
     // Water in snowpack.
-    frame.add_submodule ("Snow", Value::State, 
+    frame.declare_submodule ("Snow", Value::State, 
                           "Surface snow pack.",
                           Snow::load_syntax);
-    frame.add ("snow_ep", "mm/h", Value::LogOnly,
+    frame.declare ("snow_ep", "mm/h", Value::LogOnly,
                 "Potential snow evaporation.");
-    frame.add ("snow_ea", "mm/h", Value::LogOnly,
+    frame.declare ("snow_ea", "mm/h", Value::LogOnly,
                 "Actual snow evaporation.");
-    frame.add ("snow_water_in", "mm/h", Value::LogOnly,
+    frame.declare ("snow_water_in", "mm/h", Value::LogOnly,
                 "Water entering snow pack.");
-    frame.add ("snow_water_in_temperature", "dg C", Value::LogOnly,
+    frame.declare ("snow_water_in_temperature", "dg C", Value::LogOnly,
                 "Temperature of water entering snow pack.");
-    frame.add ("snow_water_out", "mm/h", Value::LogOnly,
+    frame.declare ("snow_water_out", "mm/h", Value::LogOnly,
                 "Water leaving snow pack");
-    frame.add ("snow_water_out_temperature", "dg C", Value::LogOnly,
+    frame.declare ("snow_water_out_temperature", "dg C", Value::LogOnly,
                 "Temperature of water leaving snow pack.");
 
     // Water intercepted on canopy.
-    frame.add ("canopy_ep", "mm/h", Value::LogOnly,
+    frame.declare ("canopy_ep", "mm/h", Value::LogOnly,
                 "Potential canopy evaporation.");
-    frame.add ("canopy_ea", "mm/h", Value::LogOnly,
+    frame.declare ("canopy_ea", "mm/h", Value::LogOnly,
                 "Actual canopy evaporation.");
-    frame.add ("canopy_water_storage", "mm", Value::State,
+    frame.declare ("canopy_water_storage", "mm", Value::State,
                 "Intercepted water on canopy.");
-    frame.add ("canopy_water_storage", 0.0);
-    frame.add ("canopy_water_temperature", "dg C", Value::LogOnly,
+    frame.set ("canopy_water_storage", 0.0);
+    frame.declare ("canopy_water_temperature", "dg C", Value::LogOnly,
                 "Temperature of incoming water.");
-    frame.add ("canopy_water_in", "mm/h", Value::LogOnly,
+    frame.declare ("canopy_water_in", "mm/h", Value::LogOnly,
                 "Water entering canopy.");
-    frame.add ("canopy_water_out", "mm/h", Value::LogOnly,
+    frame.declare ("canopy_water_out", "mm/h", Value::LogOnly,
                 "Canopy drip throughfall.");
-    frame.add ("canopy_water_bypass", "mm/h", Value::LogOnly,
+    frame.declare ("canopy_water_bypass", "mm/h", Value::LogOnly,
                 "Water from above bypassing the canopy.");
 
     // Water intercepted by litter.
-    frame.add ("litter_ep", "mm/h", Value::LogOnly,
+    frame.declare ("litter_ep", "mm/h", Value::LogOnly,
                 "Potential evaporation litter.");
-    frame.add ("litter_ea", "mm/h", Value::LogOnly,
+    frame.declare ("litter_ea", "mm/h", Value::LogOnly,
                 "Actual litter evaporation.");
-    frame.add ("litter_water_storage", "mm", Value::State,
+    frame.declare ("litter_water_storage", "mm", Value::State,
                 "Intercepted water on litter.");
-    frame.add ("litter_water_storage", 0.0);
-    frame.add ("litter_water_temperature", "dg C", Value::LogOnly,
+    frame.set ("litter_water_storage", 0.0);
+    frame.declare ("litter_water_temperature", "dg C", Value::LogOnly,
                 "Temperature of incoming water.");
-    frame.add ("litter_water_in", "mm/h", Value::LogOnly,
+    frame.declare ("litter_water_in", "mm/h", Value::LogOnly,
                 "Water entering litter.");
-    frame.add ("litter_water_out", "mm/h", Value::LogOnly,
+    frame.declare ("litter_water_out", "mm/h", Value::LogOnly,
                 "Litter drip throughfall.");
 
     // Water in pond.
-    frame.add ("pond_ep", "mm/h", Value::LogOnly,
+    frame.declare ("pond_ep", "mm/h", Value::LogOnly,
                 "Potential evaporation from pond.");
-    frame.add ("pond_ea", "mm/h", Value::LogOnly,
+    frame.declare ("pond_ea", "mm/h", Value::LogOnly,
                 "Actual evaporation from pond.");
 
     // Water going through soil surface.
-    frame.add ("max_svat_iterations", Value::Integer, Value::Const, "\
+    frame.declare ("max_svat_iterations", Value::Integer, Value::Const, "\
 Max number of svat iterations before giving up on cobvergence.");
-    frame.add ("max_svat_iterations", 100);  
-    frame.add ("max_svat_absolute_difference", "mm/h", Value::Const, "\
+    frame.set ("max_svat_iterations", 100);  
+    frame.declare ("max_svat_absolute_difference", "mm/h", Value::Const, "\
 Maximum absolute difference in svat ea values for convergence.");
-    frame.add ("max_svat_absolute_difference", 0.01);
+    frame.set ("max_svat_absolute_difference", 0.01);
 
-    frame.add_object ("svat", SVAT::component, 
+    frame.declare_object ("svat", SVAT::component, 
                        "Soil Vegetation Atmosphere component.");
-    frame.add ("svat", "none");
-    frame.add ("soil_ep", "mm/h", Value::LogOnly,
+    frame.set ("svat", "none");
+    frame.declare ("soil_ep", "mm/h", Value::LogOnly,
                 "Potential exfiltration.");
-    frame.add ("soil_ea", "mm/h", Value::LogOnly,
+    frame.declare ("soil_ea", "mm/h", Value::LogOnly,
                 "Actual exfiltration.");
 
     // Water transpirated through plant roots.
-    frame.add ("crop_ep", "mm/h", Value::LogOnly,
+    frame.declare ("crop_ep", "mm/h", Value::LogOnly,
                 "Potential transpiration.\n\
 Transpiration under the assumption that the soil have an unlimited\n\
 water supply.  For a fully irrigated crop, this will be equal to the\n\
 actual transpiration.");
-    frame.add ("crop_ea_soil", "mm/h", Value::LogOnly,
+    frame.declare ("crop_ea_soil", "mm/h", Value::LogOnly,
                 "Soil limited transpiration.\n\
 The part of the potential transpiration that the soil can supply.");
-    frame.add ("crop_ea_svat", "mm/h", Value::LogOnly,
+    frame.declare ("crop_ea_svat", "mm/h", Value::LogOnly,
                 "Transpiration suggested by the SVAT module.\n\
 Under stressed conditions, the soil, vegetation and atmosphere behave\n\
 different than what was assumed when calculating the poterntial\n\
 transpiration.");
-    frame.add ("crop_ea", "mm/h", Value::LogOnly,
+    frame.declare ("crop_ea", "mm/h", Value::LogOnly,
                 "Actual transpiration.\n\
 This is the transpiration limited either by what the soil can deliver, or\n\
 what the SVAT module requires.");
-    frame.add ("production_stress", Value::None (), Value::LogOnly,
+    frame.declare ("production_stress", Value::None (), Value::LogOnly,
                 "SVAT module induced stress, -1 means use water stress.");
 
     // Bioclimate in canopy
-    frame.add ("CanopyTemperature", "dg C", Value::LogOnly,
+    frame.declare ("CanopyTemperature", "dg C", Value::LogOnly,
                 "Actual canopy temperature.");
-    frame.add ("SunLeafTemperature", "dg C", Value::LogOnly,
+    frame.declare ("SunLeafTemperature", "dg C", Value::LogOnly,
                 "Sunlit leaf temperature.");
-    frame.add ("ShadowLeafTemperature", "dg C", Value::LogOnly,
+    frame.declare ("ShadowLeafTemperature", "dg C", Value::LogOnly,
                 "Shadow leaf temperature.");
-    frame.add ("wind_speed_field", "m/s", Value::LogOnly,
+    frame.declare ("wind_speed_field", "m/s", Value::LogOnly,
                 "Wind speed in the field at reference height.");
-    frame.add ("wind_speed_weather", "m/s", Value::LogOnly,
+    frame.declare ("wind_speed_weather", "m/s", Value::LogOnly,
                 "Measured wind speed.");
 
     //Radiation
-    frame.add ("min_sun_angle", "rad", Value::Const, "\
+    frame.declare ("min_sun_angle", "rad", Value::Const, "\
 Minimum sun angle above ground for some 'raddist' and 'svat' models.\n\
 \n\
 The 'DPF' raddist model will zero radiation if the angle is below this,\n\
 and the 'SSOC' svat model will revert to a one leaf description.");
-    frame.add ("min_sun_angle", 3.6 * M_PI / 180.0);
-    frame.add_object ("raddist", Raddist::component, 
+    frame.set ("min_sun_angle", 3.6 * M_PI / 180.0);
+    frame.declare_object ("raddist", Raddist::component, 
                        "Radiation distribution model.");
-    frame.add ("raddist", "default");
-    frame.add_object ("difrad", Difrad::component, 
+    frame.set ("raddist", "default");
+    frame.declare_object ("difrad", Difrad::component, 
                        Value::OptionalState, Value::Singleton, 
                        "Diffuse radiation component.\n\
 \n\
@@ -1289,50 +1289,50 @@ By default, choose depending on available climate date.\n\
 \n\
 If diffuse radiation is available in the climate data, Daisy will\n\
 use these (the weather difrad model). Otherwise Daisy wil use the DPF model.");
-    frame.add ("difrad0", "W/m^2", Value::LogOnly,
+    frame.declare ("difrad0", "W/m^2", Value::LogOnly,
                 "Diffuse radiation above canopy.");
-    frame.add ("Total_PAR", "W/m^2", Value::LogOnly, Value::Sequence,
+    frame.declare ("Total_PAR", "W/m^2", Value::LogOnly, Value::Sequence,
                 "Total PAR between canopy layers.");
-    frame.add ("Sun_PAR", "W/m^2", Value::LogOnly, Value::Sequence,
+    frame.declare ("Sun_PAR", "W/m^2", Value::LogOnly, Value::Sequence,
                 "Sun PAR between canopy layers.");
-    frame.add ("Total_NIR", "W/m^2", Value::LogOnly, Value::Sequence,
+    frame.declare ("Total_NIR", "W/m^2", Value::LogOnly, Value::Sequence,
                 "Total NIR between canopy layers.");
-    frame.add ("Sun_NIR", "W/m^2", Value::LogOnly, Value::Sequence,
+    frame.declare ("Sun_NIR", "W/m^2", Value::LogOnly, Value::Sequence,
                 "Sun NIR between canopy layers.");
-    frame.add ("Sun_LAI_fraction", Value::Fraction (), Value::LogOnly, 
+    frame.declare ("Sun_LAI_fraction", Value::Fraction (), Value::LogOnly, 
                 Value::Sequence, "Sunlit LAI in canopy layers.");
 
-    frame.add ("absorbed_total_PAR_canopy","W/m2", Value::LogOnly,
+    frame.declare ("absorbed_total_PAR_canopy","W/m2", Value::LogOnly,
                 "Canopy absorbed PAR (sun+shade)");
-    frame.add ("absorbed_total_NIR_canopy","W/m2", Value::LogOnly,
+    frame.declare ("absorbed_total_NIR_canopy","W/m2", Value::LogOnly,
                 "Canopy absorbed NIR (sun+shade)");
-    frame.add ("absorbed_total_Long_canopy","W/m2", Value::LogOnly,
+    frame.declare ("absorbed_total_Long_canopy","W/m2", Value::LogOnly,
                 "Canopy absorbed long wave radiation (sun+shade)");
-    frame.add ("absorbed_total_PAR_soil","W/m2", Value::LogOnly,
+    frame.declare ("absorbed_total_PAR_soil","W/m2", Value::LogOnly,
                 "Soil absorbed PAR (sun+shade)");
-    frame.add ("absorbed_total_NIR_soil","W/m2", Value::LogOnly,
+    frame.declare ("absorbed_total_NIR_soil","W/m2", Value::LogOnly,
                 "Soil absorbed NIR (sun+shade)");
-    frame.add ("absorbed_total_Long_soil","W/m2", Value::LogOnly,
+    frame.declare ("absorbed_total_Long_soil","W/m2", Value::LogOnly,
                 "Soil absorbed long wave radiation (sun+shade)");
-    frame.add ("absorbed_sun_PAR_canopy","W/m2", Value::LogOnly,
+    frame.declare ("absorbed_sun_PAR_canopy","W/m2", Value::LogOnly,
                 "Canopy absorbed PAR on sunlit leaves");
-    frame.add ("absorbed_sun_NIR_canopy","W/m2", Value::LogOnly,
+    frame.declare ("absorbed_sun_NIR_canopy","W/m2", Value::LogOnly,
                 "Canopy absorbed NIR on sunlit leaves");
-    frame.add ("absorbed_sun_Long_canopy","W/m2", Value::LogOnly,
+    frame.declare ("absorbed_sun_Long_canopy","W/m2", Value::LogOnly,
                 "Canopy absorbed long wave radiatio on sunlit leaves");
-    frame.add ("absorbed_shadow_PAR_canopy","W/m2", Value::LogOnly,
+    frame.declare ("absorbed_shadow_PAR_canopy","W/m2", Value::LogOnly,
                 "Canopy absorbed PAR on shadow leaves");
-    frame.add ("absorbed_shadow_NIR_canopy","W/m2", Value::LogOnly,
+    frame.declare ("absorbed_shadow_NIR_canopy","W/m2", Value::LogOnly,
                 "Canopy absorbed NIR on shadow leaves");
-    frame.add ("absorbed_shadow_Long_canopy","W/m2", Value::LogOnly,
+    frame.declare ("absorbed_shadow_Long_canopy","W/m2", Value::LogOnly,
                 "Canopy absorbed long wave radiation on shadow leaves");
-    frame.add ("incoming_Long_radiation","W/m2", Value::LogOnly,
+    frame.declare ("incoming_Long_radiation","W/m2", Value::LogOnly,
                 "Incoming longwave radiation");
-    frame.add ("incoming_PAR_radiation","W/m2", Value::LogOnly,
+    frame.declare ("incoming_PAR_radiation","W/m2", Value::LogOnly,
                 "Incoming PAR radiation");
-    frame.add ("incoming_NIR_radiation","W/m2", Value::LogOnly,
+    frame.declare ("incoming_NIR_radiation","W/m2", Value::LogOnly,
                 "Incoming NIR radiation");
-    frame.add ("incoming_Total_radiation","W/m2", Value::LogOnly,
+    frame.declare ("incoming_Total_radiation","W/m2", Value::LogOnly,
                 "Incoming radiation, sum of shortwave and longwave");
   }
 } BioclimateStandard_syntax;

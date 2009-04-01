@@ -154,29 +154,29 @@ daisy_frame_get_frame (const Frame* frame, const char* name)
 
 extern "C" void EXPORT
 daisy_frame_set_integer (Frame* frame, const char* name, int value)
-{ frame->add (name, value); }
+{ frame->set (name, value); }
 
 extern "C" void EXPORT
 daisy_frame_set_number (Frame* frame, const char* name, double value)
-{ frame->add (name, value); }
+{ frame->set (name, value); }
 
 extern "C" void EXPORT
 daisy_frame_set_string (Frame* frame, const char* name, 
                         const char* value)
-{ frame->add (name, value); }
+{ frame->set (name, value); }
 
 extern "C" void EXPORT
 daisy_frame_set_flag (Frame* frame, const char* name, daisy_bool value)
-{ frame->add (name, bool (value)); }
+{ frame->set (name, bool (value)); }
 
 extern "C" void EXPORT
 daisy_frame_set_frame (Frame* frame, const char* name,
 		       Frame* value)
 { 
   if (frame->lookup (name) == Value::AList)
-    frame->add (name, dynamic_cast<const FrameSubmodel&> (*value)); 
+    frame->set (name, dynamic_cast<const FrameSubmodel&> (*value)); 
   else
-    frame->add (name, dynamic_cast<const FrameModel&> (*value)); 
+    frame->set (name, dynamic_cast<const FrameModel&> (*value)); 
 }
 
 #ifdef UNINPLEMENTED
@@ -253,7 +253,7 @@ daisy_frame_set_integer_at (Frame* frame, const char* name,
       v.push_back (value);
   else
     v[index] = value;
-  frame->add (name, v);
+  frame->set (name, v);
 }
 #endif
 
@@ -269,7 +269,7 @@ daisy_frame_set_string_at (Frame* frame, const char* name,
       v.push_back (symbol (value));
   else
     v[index] = symbol (value);
-  frame->add (name, v);
+  frame->set (name, v);
 }
 
 #ifdef UNINPLEMENTED
@@ -285,7 +285,7 @@ daisy_frame_set_flag_at (Frame* frame, const char* name,
       v.push_back (value);
   else
     v[index] = value;
-  frame->add (name, v);
+  frame->set (name, v);
 }
 #endif
 
@@ -301,7 +301,7 @@ daisy_frame_set_number_at (Frame* frame, const char* name,
       v.push_back (value);
   else
     v[index] = value;
-  frame->add (name, v);
+  frame->set (name, v);
 }
 
 /* @ The daisy_library Type.
@@ -741,7 +741,7 @@ daisy_scope_set_number (Scope* scope,
 { 
   WScope* wscope = dynamic_cast<WScope*> (scope);
   daisy_assert (wscope);
-  wscope->add (symbol (name), value);
+  wscope->set (symbol (name), value);
 }
 
 // @ Miscellaneous.

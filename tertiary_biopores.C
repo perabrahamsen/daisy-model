@@ -659,16 +659,16 @@ static struct TertiaryBioporesSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   { 
 
-    frame.add_object ("classes", Biopore::component, 
+    frame.declare_object ("classes", Biopore::component, 
                        Value::State, Value::Sequence,
                        "List of biopore classes.");
-    frame.add ("pressure_initiate", "cm", Value::Const, 
+    frame.declare ("pressure_initiate", "cm", Value::Const, 
                 "Pressure needed to activate biopore flow.");
-    frame.add ("pressure_initiate", -3.0);
-    frame.add ("pressure_end", "cm", Value::Const, 
+    frame.set ("pressure_initiate", -3.0);
+    frame.declare ("pressure_end", "cm", Value::Const, 
                 "Pressure below which biopore flow is deactivated.");
-    frame.add ("pressure_end", -30.0);
-    frame.add ("pressure_limit", "cm", Check::non_positive (),
+    frame.set ("pressure_end", -30.0);
+    frame.declare ("pressure_limit", "cm", Check::non_positive (),
                 Value::OptionalConst, "\
 Limit to pressure difference for moving matrix water gradient to biopores.\n\
 \n\
@@ -678,36 +678,36 @@ to the height of this water column.  The pressure limit is then the\n\
 maximal length of the column, or the point where the column breaks.\n\
 \n\
 By default, this is equal to 'pressure_end'.");
-    frame.add ("pressure_barrier", "cm", Check::non_negative (), Value::Const,
+    frame.declare ("pressure_barrier", "cm", Check::non_negative (), Value::Const,
                 "Pressure barrier between matrix and biopore domain.\n\
 If the pressure difference between the matrix and biopores is below\n\
 this value, no water will tranfer between the domains.  If you specify\n\
 a too small value for this parameter, the solution may be unstable.");
-    frame.add ("pressure_barrier", 5.0);
-    frame.add ("pond_max", "cm", Check::non_negative (), Value::Const, "\
+    frame.set ("pressure_barrier", 5.0);
+    frame.declare ("pond_max", "cm", Check::non_negative (), Value::Const, "\
 Maximum height of ponding before spilling into biopores.\n\
 After macropores are activated pond will have this height.");
-    frame.add ("pond_max", 0.05);
-    frame.add ("use_small_timesteps", Value::Boolean, Value::Const,
+    frame.set ("pond_max", 0.05);
+    frame.declare ("use_small_timesteps", Value::Boolean, Value::Const,
                 "True iff the sink is allowed to change within a timestep.");
-    frame.add ("use_small_timesteps", true);
-    frame.add ("active", Value::Boolean, Value::OptionalState,
+    frame.set ("use_small_timesteps", true);
+    frame.declare ("active", Value::Boolean, Value::OptionalState,
                 Value::Sequence, "Active biopores in cells.");
-    frame.add ("water_volume", "cm^3", Value::LogOnly, "Water volume.");    
-    frame.add ("water_height", "cm", Value::LogOnly,
+    frame.declare ("water_volume", "cm^3", Value::LogOnly, "Water volume.");    
+    frame.declare ("water_height", "cm", Value::LogOnly,
                 "Water volume multiplied with surface area.");
-    frame.add_submodule_sequence ("solute_mass", Value::LogOnly, "\
+    frame.declare_submodule_sequence ("solute_mass", Value::LogOnly, "\
 Total amount of solutes in biopores.", load_mass);
-    frame.add_submodule_sequence ("solute_storage", Value::LogOnly, "\
+    frame.declare_submodule_sequence ("solute_storage", Value::LogOnly, "\
 Total amount of solutes in biopores divided by surface area.", load_storage);
-    frame.add ("ddt", "h", Value::LogOnly, "Emulated timestep.\n\
+    frame.declare ("ddt", "h", Value::LogOnly, "Emulated timestep.\n\
 Timestep scaled for available water.\n\
 Only relevant if 'use_small_timesteps' is false.");    
-    frame.add ("deactivate_steps", Value::Integer, Value::State, 
+    frame.declare ("deactivate_steps", Value::Integer, Value::State, 
                 "No matrix exchange for this number of timesteps.\n\
 Automatically set when matrix pressure is in a disarray, such as after\n\
 tillage operations, or calls to reserve models.");
-    frame.add ("deactivate_steps", 3);
+    frame.set ("deactivate_steps", 3);
   }
 } TertiaryBiopores_syntax;
 

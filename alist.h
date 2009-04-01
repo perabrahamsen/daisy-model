@@ -54,7 +54,7 @@ public:
   int size (symbol key) const;
 
   // References.
-  void add_reference (symbol key, symbol val);
+  void set_reference (symbol key, symbol val);
   bool is_reference (symbol key) const;
   symbol get_reference (symbol key) const;
 
@@ -79,31 +79,31 @@ public:
   const std::vector<const FrameSubmodel*>& submodel_sequence (symbol key) const;
 
   // Create and Destroy.
-  void add (symbol, double);
-  void add (symbol, double, symbol);
-  void add (symbol, symbol);
-  void add (symbol key, const char *const value)
+  void set (symbol, double);
+  void set (symbol, double, symbol);
+  void set (symbol, symbol);
+  void set (symbol key, const char *const value)
   // This one is needed to avoid calling the bool version.
-  { return add (key, symbol (value)); }
-  void add (symbol, bool);
-  void add (symbol, int);
-  void add (symbol, const FrameModel&);
-  void add (symbol, const FrameSubmodel&);
-  void add (symbol, const PLF&);
-  void add (symbol, const std::vector<double>&);
-  void add (symbol, const std::vector<symbol>&);
-  void add_strings (symbol key);
-  void add_strings (symbol key, symbol a);
-  void add_strings (symbol key,
+  { set (key, symbol (value)); }
+  void set (symbol, bool);
+  void set (symbol, int);
+  void set (symbol, const FrameModel&);
+  void set (symbol, const FrameSubmodel&);
+  void set (symbol, const PLF&);
+  void set (symbol, const std::vector<double>&);
+  void set (symbol, const std::vector<symbol>&);
+  void set_strings (symbol key);
+  void set_strings (symbol key, symbol a);
+  void set_strings (symbol key,
                     symbol a, symbol b);
-  void add_strings (symbol key,
+  void set_strings (symbol key,
                     symbol a, symbol b,
                     symbol c);
-  void add (symbol, const std::vector<bool>&);
-  void add (symbol, const std::vector<int>&);
-  void add (symbol, const std::vector<const FrameModel*>&);
-  void add (symbol, const std::vector<const FrameSubmodel*>&);
-  void add (symbol, const std::vector<const PLF*>&);
+  void set (symbol, const std::vector<bool>&);
+  void set (symbol, const std::vector<int>&);
+  void set (symbol, const std::vector<const FrameModel*>&);
+  void set (symbol, const std::vector<const FrameSubmodel*>&);
+  void set (symbol, const std::vector<const PLF*>&);
 
   void remove (symbol);
   void operator += (const AttributeList&);

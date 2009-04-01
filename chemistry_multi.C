@@ -426,16 +426,16 @@ static struct ChemistryMultiSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.add_object ("combine", Chemistry::component, 
+    frame.declare_object ("combine", Chemistry::component, 
                       Value::State, Value::Sequence, "\
 List of chemistry parameterizations you want to combine.");
-    frame.add ("ignore", Value::String, Value::State, Value::Sequence,
+    frame.declare ("ignore", Value::String, Value::State, Value::Sequence,
                "Don't warn when spraying one of these chemicals.\n\
 The first time an untraced chemical not on the list is sprayed on the\n\
 field, Daisy will issue a warning and add the chemical to this list.");
-    frame.add_check ("ignore", VCheck::unique ());
-    frame.add ("ignore", std::vector<symbol> ());
-    frame.add_object ("trace", Chemical::component, 
+    frame.set_check ("ignore", VCheck::unique ());
+    frame.set_empty ("ignore");
+    frame.declare_object ("trace", Chemical::component, 
                       Value::LogOnly, Value::Sequence, "\
 List of chemicals in nested chemistries.");
   }
@@ -448,7 +448,7 @@ static struct ChemistryNutrientSyntax : public DeclareParam
 Include 'N' chemistry so organic matter and plants will work.")
   { }
   void load_frame (Frame& frame) const
-  { frame.add_strings ("combine", "N"); }
+  { frame.set_strings ("combine", "N"); }
 } ChemistryNutrient_syntax;
 
 // chemistry_multi.C ends here

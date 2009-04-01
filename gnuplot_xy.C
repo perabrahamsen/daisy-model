@@ -407,32 +407,32 @@ static struct GnuplotXYSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("xmin", Value::User (), Value::OptionalConst, "\
+    frame.declare ("xmin", Value::User (), Value::OptionalConst, "\
 Fixed lowest value on left x-axis.\n\
 By default determine this from the data.");
-    frame.add ("xmax", Value::User (), Value::OptionalConst, "\
+    frame.declare ("xmax", Value::User (), Value::OptionalConst, "\
 Fixed highest value on right x-axis.\n\
 By default determine this from the data.");
-    frame.add ("x2min", Value::User (), Value::OptionalConst, "\
+    frame.declare ("x2min", Value::User (), Value::OptionalConst, "\
 Fixed lowest value on left x-axis.\n\
 By default determine this from the data.");
-    frame.add ("x2max", Value::User (), Value::OptionalConst, "\
+    frame.declare ("x2max", Value::User (), Value::OptionalConst, "\
 Fixed highest value on right x-axis.\n\
 By default determine this from the data.");
-    frame.add ("ymin", Value::User (), Value::OptionalConst, "\
+    frame.declare ("ymin", Value::User (), Value::OptionalConst, "\
 Fixed lowest value on left y-axis.\n\
 By default determine this from the data.");
-    frame.add ("ymax", Value::User (), Value::OptionalConst, "\
+    frame.declare ("ymax", Value::User (), Value::OptionalConst, "\
 Fixed highest value on right y-axis.\n\
 By default determine this from the data.");
-    frame.add ("y2min", Value::User (), Value::OptionalConst, "\
+    frame.declare ("y2min", Value::User (), Value::OptionalConst, "\
 Fixed lowest value on left y-axis.\n\
 By default determine this from the data.");
-    frame.add ("y2max", Value::User (), Value::OptionalConst, "\
+    frame.declare ("y2max", Value::User (), Value::OptionalConst, "\
 Fixed highest value on right y-axis.\n\
 By default determine this from the data.");
                 
-    frame.add_object ("source", XYSource::component, Value::State, 
+    frame.declare_object ("source", XYSource::component, Value::State, 
                        Value::Sequence, "\
 XY series to plot.");
   }

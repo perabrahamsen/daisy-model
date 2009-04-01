@@ -121,10 +121,10 @@ Initial crop growth is governed by a forced LAI function.")
   void load_frame (Frame& frame) const
   {
     // Parameters.
-    frame.add ("DSLAI05", Value::None (), Value::Const,
+    frame.declare ("DSLAI05", Value::None (), Value::Const,
                 "DS at CAI=0.5; initial phase.");
-    frame.add ("DSLAI05", 0.15);
-    frame.add ("SpLAIfac", "DS", Value::None (), Value::Const, "\
+    frame.set ("DSLAI05", 0.15);
+    frame.declare ("SpLAIfac", "DS", Value::None (), Value::Const, "\
 Factor defining maximum specific leaf weight.\n\
 Only used during the initial phase.");
     PLF SpLf;
@@ -132,12 +132,12 @@ Only used during the initial phase.");
     SpLf.add (0.20, 1.50);
     SpLf.add (0.40, 1.25);
     SpLf.add (0.60, 1.00);
-    frame.add ("SpLAIfac", SpLf);
+    frame.set ("SpLAIfac", SpLf);
 
     // State.
-    frame.add ("InitCAI", Value::Boolean, Value::State,
+    frame.declare ("InitCAI", Value::Boolean, Value::State,
                 "Initial CAI development phase.");
-    frame.add ("InitCAI", true);
+    frame.set ("InitCAI", true);
   }
 } SeedLAI_syntax;
 

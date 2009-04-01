@@ -81,7 +81,7 @@ struct ReactionEquilibrium : public Reaction
     ScopeID scope_id (ScopeSoil::rho_b, ScopeSoil::rho_b_unit);
     if (secondary && !colloid)
       // No soil in secondary domain.
-      scope_id.add (ScopeSoil::rho_b, 0.0);
+      scope_id.set (ScopeSoil::rho_b, 0.0);
     ScopeMulti scope (scope_id, scope_soil);
     for (size_t c = 0; c < cell_size; c++)
       { 
@@ -100,7 +100,7 @@ struct ReactionEquilibrium : public Reaction
                 continue;
               }
             if (colloid)
-              scope_id.add (ScopeSoil::rho_b, 
+              scope_id.set (ScopeSoil::rho_b, 
                             colloid->C_secondary (c) * Theta_old);
             has_A = A.C_secondary (c) * Theta_old;
             has_B = B.C_secondary (c) * Theta_old;
@@ -108,9 +108,9 @@ struct ReactionEquilibrium : public Reaction
         else
           {
             if (colloid)
-              scope_id.add (ScopeSoil::rho_b, colloid->M_primary (c));
+              scope_id.set (ScopeSoil::rho_b, colloid->M_primary (c));
             else
-              scope_id.add (ScopeSoil::rho_b, soil.dry_bulk_density (c));
+              scope_id.set (ScopeSoil::rho_b, soil.dry_bulk_density (c));
 
             has_A = A.M_primary (c);
             has_B = B.M_primary (c);
@@ -227,27 +227,27 @@ static struct ReactionEquilibriumSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.add ("A", Value::String, Value::Const,
+    frame.declare ("A", Value::String, Value::Const,
 		"Name of first soil component in equilibrium.");
-    frame.add ("B", Value::String, Value::Const,
+    frame.declare ("B", Value::String, Value::Const,
 		"Name of second soil component in equilibrium.");
-    frame.add_object ("equilibrium", Equilibrium::component,
+    frame.declare_object ("equilibrium", Equilibrium::component,
                        "Function for calculating equilibrium between A and B.");
-    frame.add_object ("k_AB", Number::component,
+    frame.declare_object ("k_AB", Number::component,
                        Value::Const, Value::Singleton, 
                        "Tranformation rate from soil component 'A' to 'B'.");
-    frame.add_object ("k_BA", Number::component,
+    frame.declare_object ("k_BA", Number::component,
                        Value::OptionalConst, Value::Singleton,
                        "Tranformation rate from soil component 'B' to 'A'.\n\
 By default, this is identical to 'k_AB'.");
-    frame.add ("S_AB", "g/cm^3/h", Value::LogOnly, Value::Sequence,
+    frame.declare ("S_AB", "g/cm^3/h", Value::LogOnly, Value::Sequence,
 		"Converted from A to B this timestep (may be negative).");
-    frame.add ("colloid", Value::String, Value::OptionalConst,
+    frame.declare ("colloid", Value::String, Value::OptionalConst,
 		"Let 'rho_b' denote content of specified chemical.\n\
 This miht affect the evaluation of the 'k_AB' and 'k_BA' parameter\n\
 expressions, as well as the 'equilibrium' model.\n\
 By default, 'rho_b' will be the soil dry bulk density.");
-    frame.add ("secondary", Value::Boolean, Value::Const,
+    frame.declare ("secondary", Value::Boolean, Value::Const,
                 "Equilibrium should happen in the secondary domain.\n\
 There will only be a reaction when there is water in the secondary domain\n\
 (inter-aggregate pores), at both the beginning and end of the timestep.\n\
@@ -255,7 +255,7 @@ By default, only the content of the primary domain (soil-bound and\n\
 intra-aggregate pores), will be included in the reaction.\n\
 There is no way to use this model to specify an equilibrium reaction in\n\
 the tertiary domain (biopores).");
-    frame.add ("secondary", false);
+    frame.set ("secondary", false);
   }
 } ReactionEquilibrium_syntax;
 

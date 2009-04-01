@@ -187,13 +187,13 @@ static struct XYSourceMergeSyntax : public DeclareModel
     GnuplotUtil::load_style (frame, "\
 By default, let the first source decide.", "");
 
-    frame.add_object ("source", XYSource::component,
+    frame.declare_object ("source", XYSource::component,
                        Value::State, Value::Sequence,
                        "XY data series to merge.");
-    frame.add_check ("source", VCheck::min_size_1 ());
-    frame.add ("x_dimension", Value::String, Value::Const, "\
+    frame.set_check ("source", VCheck::min_size_1 ());
+    frame.declare ("x_dimension", Value::String, Value::Const, "\
 Dimension for x points.");
-    frame.add ("y_dimension", Value::String, Value::Const, "\
+    frame.declare ("y_dimension", Value::String, Value::Const, "\
 Dimension for y points.");
 
   }

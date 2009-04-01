@@ -122,10 +122,10 @@ at each time step.")
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);
-    frame.add_object ("actions", Action::component, 
+    frame.declare_object ("actions", Action::component, 
                        Value::State, Value::Sequence,
                        "Sequence of actions to perform.");
-    frame.add_empty ("actions");
+    frame.set_empty ("actions");
     frame.order ("actions");
   }
 } ActionActivity_syntax;

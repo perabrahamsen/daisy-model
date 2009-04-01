@@ -136,9 +136,9 @@ Modified Campbell retention curve model with Burdine theory.")
   { 
     Hydraulic::load_Theta_sat (frame);
     Hydraulic::load_K_sat (frame);
-    frame.add ("h_b", "cm", Check::negative (), Value::Const,
+    frame.declare ("h_b", "cm", Check::negative (), Value::Const,
                 "Bubbling pressure.");
-    frame.add ("b", Value::None (), Check::positive (), Value::Const,
+    frame.declare ("b", Value::None (), Check::positive (), Value::Const,
                 "Campbell parameter.");
 
   }

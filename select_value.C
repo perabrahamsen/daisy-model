@@ -107,9 +107,9 @@ Log a single numeric value.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("value", Value::Unknown (), Value::State,
+    frame.declare ("value", Value::Unknown (), Value::State,
                 "The current accumulated value.");
-    frame.add ("value", 0.0);
+    frame.set ("value", 0.0);
   }
 } SelectValue_syntax;
 

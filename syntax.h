@@ -75,97 +75,97 @@ public:
   // Get a list of all entries.
   void entries (std::set<symbol>&) const;
 
-  // Add syntax entries
-  void add (symbol key,	// Generic.
+  // Declare syntax entries
+  void declare (symbol key,	// Generic.
 	    Value::type t, 
 	    Value::category cat,
 	    int size,
 	    const symbol description);
-  void add (symbol key,
+  void declare (symbol key,
 	    Value::type t, 
 	    Value::category cat,
 	    const symbol description)
-  { add (key, t, cat, Value::Singleton, description); }
+  { declare (key, t, cat, Value::Singleton, description); }
 
-  void add (symbol key, // Number.
+  void declare (symbol key, // Number.
 	    symbol dim,
 	    Value::category cat,
 	    int size,
 	    const symbol description);
-  void add (symbol key, 
+  void declare (symbol key, 
 	    symbol dim,
 	    Value::category cat,
 	    const symbol description)
-  { add (key, dim, cat, Value::Singleton, description); } 
-  void add (symbol key,
+  { declare (key, dim, cat, Value::Singleton, description); } 
+  void declare (symbol key,
 	    symbol dim,
 	    const Check& check,
 	    Value::category cat,
 	    int size,
 	    const symbol description);
-  void add (symbol key, 
+  void declare (symbol key, 
 	    symbol dim,
 	    const Check& check,
 	    Value::category cat,
 	    const symbol description)
-  { add (key, dim, check, cat, Value::Singleton, description); } 
-  void add_fraction (symbol key, 
+  { declare (key, dim, check, cat, Value::Singleton, description); } 
+  void declare_fraction (symbol key, 
 		     Value::category cat,
 		     int size,
 		     const symbol description);
-  void add_fraction (symbol key, 
+  void declare_fraction (symbol key, 
 		     Value::category cat,
 		     const symbol description);
 
-  void add (symbol key, // PLF.
+  void declare (symbol key, // PLF.
 	    symbol domain,
 	    symbol range,
 	    Value::category cat,
 	    int size,
 	    const symbol description);
-  void add (symbol key, 
+  void declare (symbol key, 
 	    symbol domain,
 	    symbol range,
 	    Value::category cat,
 	    const symbol description)
-  { add (key, domain, range, cat, Value::Singleton, description); } 
-  void add (symbol key,
+  { declare (key, domain, range, cat, Value::Singleton, description); } 
+  void declare (symbol key,
 	    symbol domain,
 	    symbol range,
 	    const Check& check,
 	    Value::category cat,
 	    int size,
 	    const symbol description);
-  void add (symbol key, 
+  void declare (symbol key, 
 	    symbol domain,
 	    symbol range,
 	    const Check& check,
 	    Value::category cat,
 	    const symbol description)
-  { add (key, domain, range, check, cat, Value::Singleton, description); } 
+  { declare (key, domain, range, check, cat, Value::Singleton, description); } 
 
   // Submodel.
   typedef void (*load_syntax_t) (Frame&);
-  void add (symbol, load_syntax_t, 
+  void declare (symbol, load_syntax_t, 
 	    Value::category cat, int size, 
 	    const symbol description);
 
-  void add_object (symbol key,// Object
+  void declare_object (symbol key,// Object
                    const char *const lib, 
                    const symbol description)
-  { add_object (key, lib, Value::State, Value::Singleton, description); }
-  void add_object (symbol, const char* lib,
+  { declare_object (key, lib, Value::State, Value::Singleton, description); }
+  void declare_object (symbol, const char* lib,
                    Value::category, int size, const symbol description);
-  void add_object (symbol, symbol lib,
+  void declare_object (symbol, symbol lib,
                    Value::category, int size, const symbol description);
 
-  void add_check (symbol name, const VCheck& vcheck);
+  void set_check (symbol name, const VCheck& vcheck);
 
   // It is possible to impose an order on the syntax entries, which
   // will allow the input module to parse the entries without the user
   // having to specify the names of the entries.  It is recommended
   // *not* to use this in general, as it makes it more difficult to
-  // add new entries.
+  // declare new entries.
   void order (const std::vector<symbol>&);
   void order (symbol);
   void order (symbol, symbol);

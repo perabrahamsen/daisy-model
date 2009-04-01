@@ -41,8 +41,8 @@ Column::library_id () const
 void
 Column::Point::load_syntax (Frame& frame)
 { 
-  frame.add ("x", Value::Unknown (), Value::Const, "X-Coordinate.");
-  frame.add ("y", Value::Unknown (), Value::Const, "Y-Coordinate.");
+  frame.declare ("x", Value::Unknown (), Value::Const, "X-Coordinate.");
+  frame.declare ("y", Value::Unknown (), Value::Const, "Y-Coordinate.");
   frame.order ("x", "y");
 }
 
@@ -78,12 +78,12 @@ static struct ColumnInit : public DeclareComponent
   void load_frame (Frame& frame) const
   { 
     Model::load_model (frame);
-    frame.add ("size", Value::Unknown (), Value::State,
+    frame.declare ("size", Value::Unknown (), Value::State,
                "Area covered by this column, for use by the 'merge' action.\n\
 The dimension is up to you, as long as all columns use the same unit.");
-    frame.add ("size", 1.0);
+    frame.set ("size", 1.0);
 
-    frame.add_submodule_sequence ("location", Value::Const, "\
+    frame.declare_submodule_sequence ("location", Value::Const, "\
 Location of this column.\n\
 \n\
 The meaning depends on the number of point in the sequence.\n\
@@ -91,7 +91,7 @@ The meaning depends on the number of point in the sequence.\n\
 1 point: The column has a location, but no specific area.\n\
 3 or more points: The column represents the area specified by a\n\
 polygon with the specified corner points.", Column::Point::load_syntax);
-    frame.add_empty ("location");
+    frame.set_empty ("location");
   }
   ColumnInit ()
     : DeclareComponent (Column::component, "\

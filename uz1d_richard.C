@@ -300,27 +300,27 @@ A numerical solution to Richard's Equation.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("max_time_step_reductions",
+    frame.declare ("max_time_step_reductions",
                 Value::Integer, Value::Const, "\
 Number of times we may reduce the time step before giving up");
-    frame.add ("max_time_step_reductions", 4);
-    frame.add ("time_step_reduction", Value::Integer, Value::Const, 
+    frame.set ("max_time_step_reductions", 4);
+    frame.declare ("time_step_reduction", Value::Integer, Value::Const, 
                 "Divide the time step with this at each reduction.");
-    frame.add ("time_step_reduction", 4);
-    frame.add ("max_iterations", Value::Integer, Value::Const, "\
+    frame.set ("time_step_reduction", 4);
+    frame.declare ("max_iterations", Value::Integer, Value::Const, "\
 Maximum number of iterations when seeking convergence before reducing\n\
 the time step.");
-    frame.add ("max_iterations", 25);
-    frame.add ("max_absolute_difference", "cm", Value::Const, "\
+    frame.set ("max_iterations", 25);
+    frame.declare ("max_absolute_difference", "cm", Value::Const, "\
 Maximum absolute difference in 'h' values for convergence.");
-    frame.add ("max_absolute_difference", 0.02);
-    frame.add ("max_relative_difference", Value::None (), Value::Const, "\
+    frame.set ("max_absolute_difference", 0.02);
+    frame.declare ("max_relative_difference", Value::None (), Value::Const, "\
 Maximum relative difference in 'h' values for convergence.");
-    frame.add ("max_relative_difference", 0.001);
-    frame.add_object ("K_average", Average::component,
+    frame.set ("max_relative_difference", 0.001);
+    frame.declare_object ("K_average", Average::component,
                        Value::OptionalConst, Value::Singleton,
                        "Model for calculating average K between cells.");
-    frame.add ("K_average", "arithmetic");
+    frame.set ("K_average", "arithmetic");
   }
 } UZ1DRichard_syntax;
 

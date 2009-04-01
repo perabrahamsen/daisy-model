@@ -71,13 +71,13 @@ the interval.")
   { }
   void load_frame (Frame& frame) const
   { 
-      frame.add ("depth", "cm", Check::negative (), Value::Const,
+      frame.declare ("depth", "cm", Check::negative (), Value::Const,
 		  "How far down to mix the soil (a negative number).");
       frame.order ("depth");
-      frame.add_fraction ("penetration", Value::Const, "\
+      frame.declare_fraction ("penetration", Value::Const, "\
 Fraction of organic matter on surface that are incorporated in the soil\n\
 by this operation.");
-      frame.add ("penetration", 1.0);
+      frame.set ("penetration", 1.0);
     }
 } ActionMix_syntax;
 
@@ -138,9 +138,9 @@ be placed on top of what used to be the top layer.")
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);
-    frame.add ("middle", "cm", Check::negative (), Value::Const, "\
+    frame.declare ("middle", "cm", Check::negative (), Value::Const, "\
 The end of the first layer and the start of the second layer to swap.");
-    frame.add ("depth", "cm", Check::negative (), Value::Const, "\
+    frame.declare ("depth", "cm", Check::negative (), Value::Const, "\
 The end of the second layer to swap.");
   }
 } ActionSwap_syntax;
@@ -185,11 +185,11 @@ To get useful results, you need to use a hydraulic model that supports this.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_fraction ("porosity", Value::Const, "\
+    frame.declare_fraction ("porosity", Value::Const, "\
 Non-solid fraction of soil.");
-    frame.add ("depth", "cm", Check::non_positive (), Value::Const, "\
+    frame.declare ("depth", "cm", Check::non_positive (), Value::Const, "\
 A point in the horizon to modify.");
-    frame.add ("depth", 0.0);
+    frame.set ("depth", 0.0);
   }
 } ActionSetPorosity_syntax;
 

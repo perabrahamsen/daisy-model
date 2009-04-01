@@ -68,9 +68,9 @@ it was true.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("period", Value::Integer, Value::Const, 
+    frame.declare ("period", Value::Integer, Value::Const, 
 		"Number of walltime seconds between success.");
-    frame.add ("period", 1);
+    frame.set ("period", 1);
     frame.order ("period");
   }
 } ConditionPeriodic_syntax;

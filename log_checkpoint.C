@@ -199,7 +199,7 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
       library.add_model (name, *program);
       printer.print_parameterization (Program::component, name);
       FrameDummy run_frame (*global_frame, Frame::parent_link);
-      run_frame.add ("run", *program);
+      run_frame.set ("run", *program);
       printer.print_entry (run_frame, "run");
       program.release ();
       library.remove (name);
@@ -245,13 +245,13 @@ hot start.")
   void load_frame (Frame& frame) const
   { 
     Model::load_model (frame);
-    frame.add ("where", Value::String, Value::Const,
+    frame.declare ("where", Value::String, Value::Const,
                 "File name prefix for the generated checkpoint.\n\
 The time will be appended, together with the '.dai' suffix.");
-    frame.add ("where", "checkpoint");
-    frame.add_object ("when", Condition::component,
+    frame.set ("where", "checkpoint");
+    frame.declare_object ("when", Condition::component,
                        "Make a checkpoint every time this condition is true.");
-    frame.add ("when", "finished");
+    frame.set ("when", "finished");
   }
 } LogCheckpoint_syntax;
 

@@ -97,11 +97,11 @@ Temperature sum dependent vernalization.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("DSLim", Value::None (), Value::Const,
+    frame.declare ("DSLim", Value::None (), Value::Const,
                "Development stage at vernalization.");
-    frame.add ("TaLim", "dg C", Value::Const,
+    frame.declare ("TaLim", "dg C", Value::Const,
                "Vernalization temperature threshold.");
-    frame.add ("TaSum", "dg C d", Value::State,
+    frame.declare ("TaSum", "dg C d", Value::State,
                "Vernalization temperature-sum requirement.");
   }
 } standard_vernalization_syntax;

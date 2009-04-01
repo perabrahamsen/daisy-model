@@ -130,9 +130,9 @@ static struct HydraulicM_BaCSyntax : public DeclareModel
   { 
     Hydraulic::load_Theta_res (frame);
     Hydraulic::load_K_sat (frame);
-    frame.add ("lambda", Value::None (), Value::Const,
+    frame.declare ("lambda", Value::None (), Value::Const,
                 "Pore size index.");
-    frame.add ("h_b", "cm", Check::negative (), Value::Const,
+    frame.declare ("h_b", "cm", Check::negative (), Value::Const,
                 "Bubbling pressure.");
 
   }

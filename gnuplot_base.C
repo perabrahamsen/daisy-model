@@ -31,9 +31,9 @@
 void 
 GnuplotBase::Size::load_syntax (Frame& frame)
 {
-  frame.add ("x", Value::None (), Value::Const, "\
+  frame.declare ("x", Value::None (), Value::Const, "\
 Relative horizontal size of plot.");
-  frame.add ("y", Value::None (), Value::Const, "\
+  frame.declare ("y", Value::None (), Value::Const, "\
 Relative vertical size of plot.");
   frame.order ("x", "y");
 }
@@ -124,7 +124,7 @@ static struct GnuplotSyntax : public DeclareBase
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.add ("where", Value::String, Value::OptionalConst, "\
+    frame.declare ("where", Value::String, Value::OptionalConst, "\
 File to store results in.  By default, show them on a window.\n\
 The format is determined from the file name extension:\n\
   *.tex: LaTeX code with PostScript specials.\n\
@@ -148,23 +148,23 @@ the screen instead of being stored in a file.");
           throw std::string ("Unknown file extension '") + file + "'";
       }
     } check_where;
-    frame.add_check ("where", check_where);
-    frame.add ("where", "screen");
-    frame.add ("device", Value::String, Value::OptionalConst, "\
+    frame.set_check ("where", check_where);
+    frame.set ("where", "screen");
+    frame.declare ("device", Value::String, Value::OptionalConst, "\
 Output device.  By default, this is derived from the file extenstion.");
-    frame.add ("extra", Value::String, Value::Const, 
+    frame.declare ("extra", Value::String, Value::Const, 
                 Value::Sequence, "List of extra gnuplot commands.\n\
 The commands will be inserted right before the plot command.\n\
 Note that if you have multiple plots in the same command file,\n\
 The extra commands may affect the subsequence plots.");
-    frame.add ("extra", std::vector<symbol> ());
-    frame.add ("title", Value::String, Value::OptionalConst, "\
+    frame.set_empty ("extra");
+    frame.declare ("title", Value::String, Value::OptionalConst, "\
 Title of the plot, if any.  Set it to an empty string to disable.");
-    frame.add_submodule ("size", Value::OptionalConst, "\
+    frame.declare_submodule ("size", Value::OptionalConst, "\
 Relative to size of plot.\n\
 The standard size is 1.0, specify other numbers to scale accordingly.", 
                           GnuplotBase::Size::load_syntax);
-    frame.add ("legend", Value::String, Value::OptionalConst, "\
+    frame.declare ("legend", Value::String, Value::OptionalConst, "\
 Placement of legend.  This can be one of the four corners, named by\n\
 compas locations (nw, ne, sw, se) to get the legend inside the graph\n\
 in that corner, 'below' to get the legend below the graph, 'outside'\n\
@@ -192,8 +192,8 @@ cross the legend.");
           throw std::string ("Unknown legend placement '") + legend + "'";
       }
     } check_legend;
-    frame.add_check ("legend", check_legend);
-    frame.add ("legend", "auto");
+    frame.set_check ("legend", check_legend);
+    frame.set ("legend", "auto");
   }
 } Gnuplot_syntax;
 

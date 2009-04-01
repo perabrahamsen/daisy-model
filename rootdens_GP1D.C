@@ -301,18 +301,18 @@ to describe plant root systems.  J. Appl. Ecol. 11, 773-781.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("DensRtTip", "cm/cm^3", Check::positive (), Value::Const,
+    frame.declare ("DensRtTip", "cm/cm^3", Check::positive (), Value::Const,
                 "Root density at (potential) penetration depth.");
-    frame.add ("DensRtTip", 0.1);
-    frame.add ("DensIgnore", "cm/cm^3", Check::positive (),
+    frame.set ("DensRtTip", 0.1);
+    frame.declare ("DensIgnore", "cm/cm^3", Check::positive (),
                 Value::OptionalConst,
                 "Ignore cells with less than this root density.\n\
 By default, this is the same as DensRtTip.");
-    frame.add ("a", "cm^-1", Value::LogOnly, "Form parameter.\n\
+    frame.declare ("a", "cm^-1", Value::LogOnly, "Form parameter.\n\
 Calculated from 'DensRtTip'.");
-    frame.add ("L0", "cm/cm^3", Value::LogOnly,
+    frame.declare ("L0", "cm/cm^3", Value::LogOnly,
                 "Root density at soil surface.");
-    frame.add ("k", Value::None (), Value::LogOnly,
+    frame.declare ("k", Value::None (), Value::LogOnly,
                 "Scale factor due to soil limit.\n\
 \n\
 Some roots might be below the soil imposed maximum root depth, or in areas\n\

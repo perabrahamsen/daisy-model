@@ -262,27 +262,27 @@ static struct SummaryBalanceSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
     {
-      frame.add ("where", Value::String, Value::OptionalConst,
+      frame.declare ("where", Value::String, Value::OptionalConst,
                   "File name to store the summary.\n\
 By default, the summary will be stored in daisy.log and the screen.");
-      frame.add ("title", Value::String, Value::OptionalConst,
+      frame.declare ("title", Value::String, Value::OptionalConst,
 		  "Title of this summary.\n\
 By default, use the name of the parameterization.");
-      frame.add ("period", Value::String, Value::OptionalConst, "\
+      frame.declare ("period", Value::String, Value::OptionalConst, "\
 Set this to 'y', 'm', 'w', 'd' or 'h' to get fluxes per time period\n\
 instead of total amount.");
-      frame.add ("precision", Value::Integer, Value::Const,
+      frame.declare ("precision", Value::Integer, Value::Const,
 		  "Number of digits to print after decimal point.");
-      frame.add ("precision", 2);
-      frame.add ("require_top", Value::Boolean, Value::Const, "\
+      frame.set ("precision", 2);
+      frame.declare ("require_top", Value::Boolean, Value::Const, "\
 If the balance only hold true when logging the top of the soil, i.e. the\n\
 `from' parameter of the log model is 0, this flag should be set.");
-      frame.add ("require_top", false);
-      frame.add ("input", Value::String, Value::Const, Value::Sequence,
+      frame.set ("require_top", false);
+      frame.declare ("input", Value::String, Value::Const, Value::Sequence,
                   "Tags of columns in log file representing inputs.");
-      frame.add ("output", Value::String, Value::Const, Value::Sequence,
+      frame.declare ("output", Value::String, Value::Const, Value::Sequence,
                   "Tags of columns in log file representing outputs.");
-      frame.add ("content", Value::String, Value::Const, Value::Sequence,
+      frame.declare ("content", Value::String, Value::Const, Value::Sequence,
                   "Tags of columns in log file representing content.");
     }
 } SummaryBalance_syntax;

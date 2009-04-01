@@ -78,7 +78,7 @@ A named value to exchange with external models.")
   void load_frame (Frame& frame) const
   {
     Model::load_model (frame);
-    frame.add ("name", Value::String, Value::Const, "\
+    frame.declare ("name", Value::String, Value::Const, "\
 Name of value to exchange.");
   }
 } Exchange_init;
@@ -140,9 +140,9 @@ static struct ExchangeNumberSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("dimension", Value::String, Value::Const, "\
+    frame.declare ("dimension", Value::String, Value::Const, "\
 Dimension of value to exchange.");
-    frame.add ("value", Value::Unknown (), Value::OptionalState, "\
+    frame.declare ("value", Value::Unknown (), Value::OptionalState, "\
 Current value to exchange.");
   }
 } ExchangeNumber_syntax;
@@ -178,7 +178,7 @@ static struct ExchangeNameSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("value", Value::String, Value::Const, "\
+    frame.declare ("value", Value::String, Value::Const, "\
 Current value to exchange.");
   }
 } ExchangeName_syntax;
@@ -243,7 +243,7 @@ ScopeExchange::description (symbol tag) const
 }
 
 void 
-ScopeExchange::add (symbol tag, double value)
+ScopeExchange::set (symbol tag, double value)
 { 
   const std::map<symbol, Exchange*>::const_iterator i = named.find (tag);
   daisy_assert (i != named.end ());
@@ -291,7 +291,7 @@ static struct ScopeExchangeSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
     Model::load_model (frame);
-    frame.add_object ("entries", Exchange::component, 
+    frame.declare_object ("entries", Exchange::component, 
                        Value::Const, Value::Sequence,
                        "List of items to exchange.");
   }

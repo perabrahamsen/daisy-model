@@ -253,9 +253,9 @@ struct LogExtern::NumEntry
 
   static void load_syntax (Frame& frame)
   {
-    frame.add ("name", Value::String, Value::State, "\
+    frame.declare ("name", Value::String, Value::State, "\
 Name to refer to number with.");
-    frame.add ("value", Value::Unknown (), Value::State, "\
+    frame.declare ("value", Value::Unknown (), Value::State, "\
 Numeric value.");
   }
 
@@ -314,19 +314,19 @@ Log simulation state for extern use.")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.add_submodule_sequence ("numbers", Value::OptionalState, "\
+    frame.declare_submodule_sequence ("numbers", Value::OptionalState, "\
 Inititial numeric values.  By default, none.", 
                                   LogExtern::NumEntry::load_syntax);
-    frame.add ("where", Value::String, Value::OptionalConst,
+    frame.declare ("where", Value::String, Value::OptionalConst,
                 "Name of the extern log to use.\n\
 By default, use the model name.");
-    frame.add ("parameter_names", Value::String, 
+    frame.declare ("parameter_names", Value::String, 
                 Value::Const, Value::Sequence, "\
 List of parameters to export.\n\
 \n\
 For example, if you have defined 'column' and 'crop' parameters for\n\
 this extern log parameterization, you can export them to through the\n\
 API interface by specifying '(names column crop)'.");
-    frame.add ("parameter_names", std::vector<symbol> ());
+    frame.set_empty ("parameter_names");
   }
 } LogExtern_syntax;

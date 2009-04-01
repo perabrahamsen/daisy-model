@@ -164,13 +164,13 @@ Read a a single column from a Daisy log, weather or data file.")
     SourceFile::load_style (frame, "\
 By default the same as 'tag'.");
 
-    frame.add ("tag", Value::String, Value::Const, "\
+    frame.declare ("tag", Value::String, Value::Const, "\
 Name of column in Daisy log file where data is found.");
-    frame.add ("dimension", Value::String, Value::OptionalConst, "\
+    frame.declare ("dimension", Value::String, Value::OptionalConst, "\
 Dimension of data to plot.\n\
 By default this is the same as 'original'.\n\
 If 'factor' is not specified, Daisy will attempt to convert the data.");
-    frame.add ("factor", Value::Unknown (), Value::OptionalConst, "\
+    frame.declare ("factor", Value::Unknown (), Value::OptionalConst, "\
 Multiply all data by this number.\n\
 By default Daisy will convert from 'original' to 'dimension'.");
 

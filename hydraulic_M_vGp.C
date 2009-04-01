@@ -172,18 +172,18 @@ Water Resources Research 2003.")
   void load_frame (Frame& frame) const
   { 
     Hydraulic::load_Theta_res (frame);
-    frame.add ("K_sat", "cm/h", Check::non_negative (), Value::OptionalConst,
+    frame.declare ("K_sat", "cm/h", Check::non_negative (), Value::OptionalConst,
                 "Water conductivity of saturated soil.");
-    frame.add ("alpha", "cm^-1", Value::Const,
+    frame.declare ("alpha", "cm^-1", Value::Const,
                 "van Genuchten alpha.");
-    frame.add ("n", Value::None (), Value::Const,
+    frame.declare ("n", Value::None (), Value::Const,
                 "van Genuchten n.");
-    frame.add ("l", Value::None (), Value::Const,
+    frame.declare ("l", Value::None (), Value::Const,
                 "tortuosity parameter.");
-    frame.add ("l", 0.5);
-    frame.add ("h_m", "cm", Check::negative (), Value::Const,
+    frame.set ("l", 0.5);
+    frame.declare ("h_m", "cm", Check::negative (), Value::Const,
                 "Pressure point of chance between matrix and macropores.");
-    frame.add ("f", Value::None (), Check::non_negative (), Value::Const,
+    frame.declare ("f", Value::None (), Check::non_negative (), Value::Const,
                 "Macropores conductivity curve shape parameter.");
 
   }

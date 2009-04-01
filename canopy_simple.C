@@ -43,49 +43,49 @@ CanopySimple::load_syntax (Frame& frame)
 {
 
   // Parameters.
-  frame.add ("PARref", Value::None (), Value::Const,
+  frame.declare ("PARref", Value::None (), Value::Const,
 	      "PAR reflectance.");
-  frame.add ("PARref", 0.06);
-  frame.add ("PARext", Value::None (), Value::Const,
+  frame.set ("PARref", 0.06);
+  frame.declare ("PARext", Value::None (), Value::Const,
 	      "PAR extinction coefficient.");
-  frame.add ("PARext", 0.60);
-  frame.add ("NIRref", Value::None (), Value::Const,
+  frame.set ("PARext", 0.60);
+  frame.declare ("NIRref", Value::None (), Value::Const,
 	      "NIR reflectance. NIRref = 0.51 (Ross, 1975)");
-  frame.add ("NIRref", 0.51);
-  frame.add ("NIRext", Value::None (), Value::Const,
+  frame.set ("NIRref", 0.51);
+  frame.declare ("NIRext", Value::None (), Value::Const,
 	      "NIR extinction coefficient. NIRext = 0.18 (Jones, 1983)");
-  frame.add ("NIRext", 0.18);
-  frame.add ("EPext", Value::None (), Value::Const,
+  frame.set ("NIRext", 0.18);
+  frame.declare ("EPext", Value::None (), Value::Const,
 	      "EP extinction coefficient.");
-  frame.add ("EPext", 0.5);
-  frame.add ("IntcpCap", "mm", Value::Const,
+  frame.set ("EPext", 0.5);
+  frame.declare ("IntcpCap", "mm", Value::Const,
 	      "Interception capacity.");
-  frame.add ("IntcpCap", 0.5);
-  frame.add ("EpFac", Value::None (), Value::Const,
+  frame.set ("IntcpCap", 0.5);
+  frame.declare ("EpFac", Value::None (), Value::Const,
 	      "Potential evapotranspiration factor.");
-  frame.add ("EpFac", 1.15);
-  frame.add ("EpFacDS", "DS", Value::None (), Value::Const,
+  frame.set ("EpFac", 1.15);
+  frame.declare ("EpFacDS", "DS", Value::None (), Value::Const,
 	      "DS dependent potential evapotranspiration factor.");
   PLF EpFacDS;
   EpFacDS.add (1.0, 1.0);
-  frame.add ("EpFacDS", EpFacDS);
-  frame.add ("rs_max", "s/m", Value::Const,
+  frame.set ("EpFacDS", EpFacDS);
+  frame.declare ("rs_max", "s/m", Value::Const,
 	      "Maximum transpiration resistance.");
-  frame.add ("rs_max", 1.0e5);
-  frame.add ("rs_min", "s/m", Value::Const,
+  frame.set ("rs_max", 1.0e5);
+  frame.declare ("rs_min", "s/m", Value::Const,
 	      "Minimum transpiration resistance.");
-  frame.add ("rs_min", 100.0);
+  frame.set ("rs_min", 100.0);
 
   // Variables.
-  frame.add ("Height", "cm", Value::State, "Crop height.");
-  frame.add ("Height", 0.0);
+  frame.declare ("Height", "cm", Value::State, "Crop height.");
+  frame.set ("Height", 0.0);
   PLF leaf_width;
   leaf_width.add (0.0, 3.0);
   leaf_width.add (2.0, 3.0);
-  frame.add ("leaf_width", "DS", "cm", Value::Const, "Leaf width.");
-  frame.add ("leaf_width", leaf_width);
-  frame.add ("CAI", "m^2/m^2", Value::LogOnly, "Crop Area Index.");
-  frame.add ("LAIvsH", "cm", "m^2/m^2", Value::LogOnly,
+  frame.declare ("leaf_width", "DS", "cm", Value::Const, "Leaf width.");
+  frame.set ("leaf_width", leaf_width);
+  frame.declare ("CAI", "m^2/m^2", Value::LogOnly, "Crop Area Index.");
+  frame.declare ("LAIvsH", "cm", "m^2/m^2", Value::LogOnly,
 	      "Accumulated Leaf Area Index at Height.");
 }
 

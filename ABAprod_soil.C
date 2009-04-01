@@ -88,9 +88,9 @@ ABAProdSoil::production (const Units& units,
   for (size_t c = 0; c < cell_size; c++)
     {
       // Set up values in scope.
-      scope.add (h_name, soil_water.h (c));
-      scope.add (L_name, L[c]);
-      scope.add (S_name, S[c]);
+      scope.set (h_name, soil_water.h (c));
+      scope.set (L_name, L[c]);
+      scope.set (S_name, S[c]);
 
       // Find expr value.
       double value = 0.0;
@@ -141,7 +141,7 @@ ABA production based on soil location.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_object ("expr", Number::component, 
+    frame.declare_object ("expr", Number::component, 
                       Value::Const, Value::Singleton, "\
 Expression to evaluate to ABA uptake [g/cm^3/h].\n\
 The symbol 'h' will be bound to the water pressure [cm].\n\

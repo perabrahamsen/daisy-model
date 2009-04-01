@@ -76,11 +76,11 @@ from meteorological data, as well as the crop and soil state.")
   { }
   void load_syntax (Frame& frame)
   {
-    frame.add ("wet", "mm/h", Value::LogOnly, 
+    frame.declare ("wet", "mm/h", Value::LogOnly, 
                "Potential evapotranspiration for a wet system.");
-    frame.add ("dry", "mm/h", Value::LogOnly, 
+    frame.declare ("dry", "mm/h", Value::LogOnly, 
                "Potential evapotranspiration for a dry system.");
-    frame.add ("reference_evapotranspiration", "mm/h", Value::LogOnly, 
+    frame.declare ("reference_evapotranspiration", "mm/h", Value::LogOnly, 
                "Reference evapotranspiration for a dry system.");
   }
 } Pet_init;

@@ -367,12 +367,12 @@ void
 WeatherStandard::YearMap::YearInterval::load_syntax (Frame& frame)
 {
   frame.add_check (check_alist);
-  frame.add ("from", Value::Integer, Value::Const,
+  frame.declare ("from", Value::Integer, Value::Const,
 	      "First year of interval.");
-  frame.add_check ("from", VCheck::valid_year ());
-  frame.add ("to", Value::Integer, Value::Const,
+  frame.set_check ("from", VCheck::valid_year ());
+  frame.declare ("to", Value::Integer, Value::Const,
 	      "First year of interval.");
-  frame.add_check ("to", VCheck::valid_year ());
+  frame.set_check ("to", VCheck::valid_year ());
   frame.order ("from", "to");
 }
 
@@ -412,10 +412,10 @@ void
 WeatherStandard::YearMap::load_syntax (Frame& frame)
 { 
   frame.add_check (check_alist);
-  frame.add_submodule ("from", Value::Const, 
+  frame.declare_submodule ("from", Value::Const, 
 			"Interval of years to map from.",
 			YearInterval::load_syntax);
-  frame.add_submodule ("to", Value::Const, 
+  frame.declare_submodule ("to", Value::Const, 
 			"Interval of years to map to.",
 			YearInterval::load_syntax);
   frame.order ("from", "to");
@@ -1442,11 +1442,11 @@ Read a Daisy Weather File.")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.add ("where", Value::String, Value::Const,
+    frame.declare ("where", Value::String, Value::Const,
 		"File to read weather data from.");
     frame.order ("where");
 
-    frame.add_submodule_sequence ("missing_years", Value::Const, "\
+    frame.declare_submodule_sequence ("missing_years", Value::Const, "\
 How to get data for dates outside the range of the weather file.\n\
 \n\
 The value is a list of maps.  Each map consist of two intervals, and\n\
@@ -1463,18 +1463,18 @@ year in the second interval.\n\
 If a given year is covered by multiple intervals in the list, the first\n\
 one will be used.",
 				   WeatherStandard::YearMap::load_syntax);
-    frame.add_empty ("missing_years");
+    frame.set_empty ("missing_years");
 
     // Division between Rain and Snow.
-    frame.add ("T_rain", "dg C", Value::Const, 
+    frame.declare ("T_rain", "dg C", Value::Const, 
 		"Above this air temperature all precipitation is rain.");
-    frame.add ("T_rain", 2.0);
-    frame.add ("T_snow", "dg C", Value::Const,
+    frame.set ("T_rain", 2.0);
+    frame.declare ("T_snow", "dg C", Value::Const,
 		"Below this air temperature all precipitation is snow.");
-    frame.add ("T_snow", -2.0);
+    frame.set ("T_snow", -2.0);
 
     // Scaling.
-    frame.add ("PrecipScale", Value::None (), Check::non_negative (), 
+    frame.declare ("PrecipScale", Value::None (), Check::non_negative (), 
 		Value::Const, 12, "\
 The precipitation listed in the file will be multiplied by the number\n\
 from this list before it is used in the simulation, depending on the\n\
@@ -1493,26 +1493,26 @@ mistakes in the measurement process, while the parameter is used for\n\
 experimenting with different precipitation values and for reusing data\n\
 from one weather station in nearby areas where only average values are\n\
 known.");
-    frame.add ("PrecipScale", std::vector<double> (12, 1.0));
-    frame.add ("TempScale", Value::None (),
+    frame.set ("PrecipScale", std::vector<double> (12, 1.0));
+    frame.declare ("TempScale", Value::None (),
 		Value::Const, 12, "\
 The temperature listed in the file will be multiplied by the number\n\
 from this list before it is used in the simulation, depending on the\n\
 month.  The first number corresponds to January, the second to\n\
 February, etc.");
-    frame.add ("TempScale", std::vector<double> (12, 1.0));
-    frame.add ("TempOffset", "dg C",
+    frame.set ("TempScale", std::vector<double> (12, 1.0));
+    frame.declare ("TempOffset", "dg C",
 		Value::Const, 12, "\
 Anumber from this list will be added to the temperature listed in\n\
 the file before it is used in the simulation, depending on the\n\
 month.  The first number corresponds to January, the second to\n\
 February, etc.");
-    frame.add ("TempOffset", std::vector<double> (12, 0.0));
+    frame.set ("TempOffset", std::vector<double> (12, 0.0));
 
     // C02
-    frame.add ("CO2", "Pa", Value::Const, 
+    frame.declare ("CO2", "Pa", Value::Const, 
                 "Atmostpheric CO2 lavel at station.");
-    frame.add ("CO2", 35.0);
+    frame.set ("CO2", 35.0);
 
   }
 } WeatherStandard_syntax;

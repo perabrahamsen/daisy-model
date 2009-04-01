@@ -445,7 +445,7 @@ Syntax::submodel_name (const symbol key) const
 
 
 void
-Syntax::add (const symbol key, Value::type t, Value::category req, int s, const symbol d)
+Syntax::declare (const symbol key, Value::type t, Value::category req, int s, const symbol d)
 {
   if (impl->size.find (key) != impl->size.end ())
     daisy_panic ("'" + key + "': already defined in syntax");
@@ -457,40 +457,40 @@ Syntax::add (const symbol key, Value::type t, Value::category req, int s, const 
 }
 
 void
-Syntax::add (const symbol key, const symbol dim, Value::category req, int sz,
+Syntax::declare (const symbol key, const symbol dim, Value::category req, int sz,
 	     const symbol d)
 {
-  add (key, Value::Number, req, sz, d);
+  declare (key, Value::Number, req, sz, d);
   if (d != Value::Unknown ())
     impl->dimensions[key] = dim;
 }
 
 void
-Syntax::add (const symbol key, const symbol dim, const Check& check,
+Syntax::declare (const symbol key, const symbol dim, const Check& check,
 	     Value::category req, int sz, const symbol d)
 {
-  add (key, dim, req, sz, d);
+  declare (key, dim, req, sz, d);
   impl->num_checks[key] = &check;
 }
 
 void 
-Syntax::add_fraction (const symbol key, 
+Syntax::declare_fraction (const symbol key, 
 		      Value::category cat,
 		      int size,
 		      const symbol description)
-{ add (key, Value::Fraction (), Check::fraction (), cat, size, description); } 
+{ declare (key, Value::Fraction (), Check::fraction (), cat, size, description); } 
 
 void 
-Syntax::add_fraction (const symbol key, 
+Syntax::declare_fraction (const symbol key, 
 		      Value::category cat,
 		      const symbol description)
-{ add (key, Value::Fraction (), Check::fraction (), cat, Value::Singleton, description); } 
+{ declare (key, Value::Fraction (), Check::fraction (), cat, Value::Singleton, description); } 
 
 void
-Syntax::add (const symbol key, const symbol dom, const symbol ran, 
+Syntax::declare (const symbol key, const symbol dom, const symbol ran, 
 	     Value::category req, int sz, const symbol d)
 {
-  add (key, Value::PLF, req, sz, d);
+  declare (key, Value::PLF, req, sz, d);
   if (dom != Value::Unknown ())
     impl->domains[key] = dom;
   if (ran != Value::Unknown ())
@@ -498,37 +498,37 @@ Syntax::add (const symbol key, const symbol dom, const symbol ran,
 }
 
 void
-Syntax::add (const symbol key, const symbol dom, const symbol ran, 
+Syntax::declare (const symbol key, const symbol dom, const symbol ran, 
 	     const Check& check, Value::category req, int sz, const symbol d)
 {
-  add (key, dom, ran, req, sz, d);
+  declare (key, dom, ran, req, sz, d);
   impl->num_checks[key] = &check;
 }
 
 void 
-Syntax::add (const symbol key, const load_syntax_t load_syntax, 
+Syntax::declare (const symbol key, const load_syntax_t load_syntax, 
              const Value::category cat, const int size, 
              const symbol description)
 {
-  add (key, Value::AList, cat, size, description);
+  declare (key, Value::AList, cat, size, description);
   impl->submodels[key] = load_syntax;
 }
 
 void 
-Syntax::add_object (const symbol key, const char *const l,
+Syntax::declare_object (const symbol key, const char *const l,
                     Value::category req, int s, const symbol d)
-{ add_object (key, symbol (l), req, s, d); }
+{ declare_object (key, symbol (l), req, s, d); }
 
 void 
-Syntax::add_object (const symbol key, const symbol l,
+Syntax::declare_object (const symbol key, const symbol l,
                     Value::category req, int s, const symbol d)
 {
-  add (key, Value::Object, req, s, d);
+  declare (key, Value::Object, req, s, d);
   impl->libraries[key] = l;
 }
 
 void 
-Syntax::add_check (const symbol name, const VCheck& vcheck)
+Syntax::set_check (const symbol name, const VCheck& vcheck)
 { 
   impl->val_checks[name] = &vcheck;
 }

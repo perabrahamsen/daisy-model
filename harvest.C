@@ -65,41 +65,41 @@ Harvest::output (Log& log) const
 void 
 Harvest::load_syntax (Frame& frame)
 {
-  frame.add ("column", Value::String, Value::State,
+  frame.declare ("column", Value::String, Value::State,
 	      "Name of column where the yield were harvested.");
-  frame.add_submodule ("time", Value::State,
+  frame.declare_submodule ("time", Value::State,
 			"Time of the harvest operation.", Time::load_syntax);
-  frame.add ("crop", Value::String, Value::State,
+  frame.declare ("crop", Value::String, Value::State,
 	      "Name of crop that was harvested.");
-  frame.add ("stem_DM", "g/m^2", Value::State,
+  frame.declare ("stem_DM", "g/m^2", Value::State,
 	      "Total stem dry matter in harvest.");
-  frame.add ("stem_N", "g/m^2", Value::State,
+  frame.declare ("stem_N", "g/m^2", Value::State,
 	      "Total stem nitrogen in harvest.");
-  frame.add ("stem_C", "g/m^2", Value::State,
+  frame.declare ("stem_C", "g/m^2", Value::State,
 	      "Total stem carbon in harvest.");
-  frame.add ("dead_DM", "g/m^2", Value::State,
+  frame.declare ("dead_DM", "g/m^2", Value::State,
 	      "Total dead leaf dry matter in harvest.");
-  frame.add ("dead_N", "g/m^2", Value::State,
+  frame.declare ("dead_N", "g/m^2", Value::State,
 	      "Total dead leaf nitrogen in harvest.");
-  frame.add ("dead_C", "g/m^2", Value::State,
+  frame.declare ("dead_C", "g/m^2", Value::State,
 	      "Total dead leaf carbon in harvest.");
-  frame.add ("leaf_DM", "g/m^2", Value::State,
+  frame.declare ("leaf_DM", "g/m^2", Value::State,
 	      "Total leaf dry matter in harvest.");
-  frame.add ("leaf_N", "g/m^2", Value::State,
+  frame.declare ("leaf_N", "g/m^2", Value::State,
 	      "Total leaf nitrogen in harvest.");
-  frame.add ("leaf_C", "g/m^2", Value::State,
+  frame.declare ("leaf_C", "g/m^2", Value::State,
 	      "Total leaf carbon in harvest.");
-  frame.add ("sorg_DM", "g/m^2", Value::State,
+  frame.declare ("sorg_DM", "g/m^2", Value::State,
 	      "Total storage organ dry matter in harvest.");
-  frame.add ("sorg_N", "g/m^2", Value::State,
+  frame.declare ("sorg_N", "g/m^2", Value::State,
 	      "Total storage organ nitrogen in harvest.");
-  frame.add ("sorg_C", "g/m^2", Value::State,
+  frame.declare ("sorg_C", "g/m^2", Value::State,
 	      "Total storage organ carbon in harvest.");
-  frame.add ("water_stress_days", "d", Value::State, 
+  frame.declare ("water_stress_days", "d", Value::State, 
               "Production days lost due to water stress.");
-  frame.add ("nitrogen_stress_days", "d", Value::State, 
+  frame.declare ("nitrogen_stress_days", "d", Value::State, 
               "Production days lost due to water stress.");
-  frame.add ("water_productivity", "kg DM/m^3 H2O", Value::State, 
+  frame.declare ("water_productivity", "kg DM/m^3 H2O", Value::State, 
               "Storage organ harvested per evapotranspiration.");
 }
 

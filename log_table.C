@@ -477,56 +477,56 @@ static struct LogTableSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
     { 
-      frame.add ("parameter_names", Value::String, 
+      frame.declare ("parameter_names", Value::String, 
                   Value::Const, Value::Sequence, "\
 List of string parameters to print to the table header.\n\
 \n\
 For example, if you have defined 'column' and 'crop' parameters for\n\
 this table log parameterization, you can print them to the log file\n\
 header by specifying '(names column crop)'.");
-      frame.add ("parameter_names", std::vector<symbol> ());
-      frame.add ("where", Value::String, Value::Const,
+      frame.set_empty ("parameter_names");
+      frame.declare ("where", Value::String, Value::Const,
 		  "Name of the log file to create.");
-      frame.add ("print_header", Value::String, Value::Const,
+      frame.declare ("print_header", Value::String, Value::Const,
 		  "If this is set to 'false', no header is printed.\n\
 If this is set to 'true', a full header is printer.\n\
 If this is set to 'fixed', a small fixed size header is printed.");
       static VCheck::Enum check_header ("false", "true", "fixed");
-      frame.add_check ("print_header", check_header);
-      frame.add ("print_header", "true");
-      frame.add ("print_tags", Value::Boolean, Value::Const,
+      frame.set_check ("print_header", check_header);
+      frame.set ("print_header", "true");
+      frame.declare ("print_tags", Value::Boolean, Value::Const,
 		  "Print a tag line in the file.");
-      frame.add ("print_tags", true);
-      frame.add ("print_dimension", Value::Boolean, Value::Const,
+      frame.set ("print_tags", true);
+      frame.declare ("print_dimension", Value::Boolean, Value::Const,
 		  "Print a line with units after the tag line.");
-      frame.add ("print_dimension", true);
-      frame.add ("print_initial", Value::Boolean, Value::Const,
+      frame.set ("print_dimension", true);
+      frame.declare ("print_initial", Value::Boolean, Value::Const,
 		  "Print a line with initial values when logging starts.");
-      frame.add ("print_initial", true);
-      frame.add ("flush", Value::Boolean, Value::Const,
+      frame.set ("print_initial", true);
+      frame.declare ("flush", Value::Boolean, Value::Const,
 		  "Flush to disk after each entry (for debugging).");
-      frame.add ("flush", false);
-      frame.add ("record_separator", Value::String, Value::Const, "\
+      frame.set ("flush", false);
+      frame.declare ("record_separator", Value::String, Value::Const, "\
 String to print between records (time steps).");
-      frame.add ("record_separator", "\n");
-      frame.add ("field_separator", Value::String, Value::Const, "\
+      frame.set ("record_separator", "\n");
+      frame.declare ("field_separator", Value::String, Value::Const, "\
 String to print between fields.");
-      frame.add ("field_separator", "\t");
-      frame.add ("error_string", Value::String, Value::Const, "\
+      frame.set ("field_separator", "\t");
+      frame.declare ("error_string", Value::String, Value::Const, "\
 String to print when errors are encountered.");
-      frame.add ("error_string", "!");
-      frame.add ("missing_value", Value::String, Value::Const, "\
+      frame.set ("error_string", "!");
+      frame.declare ("missing_value", Value::String, Value::Const, "\
 String to print when the path doesn't match anything.\n\
 This can be relevant for example if you are logging a crop, and there are\n\
 no crops on the field.");
-      frame.add ("missing_value", "00.00");
-      frame.add ("array_separator", Value::String, Value::Const, "\
+      frame.set ("missing_value", "00.00");
+      frame.declare ("array_separator", Value::String, Value::Const, "\
 String to print between array entries.");
-      frame.add ("array_separator", "\t");
-      frame.add_object ("summary", Summary::component,
+      frame.set ("array_separator", "\t");
+      frame.declare_object ("summary", Summary::component,
                          Value::Const, Value::Sequence,
                          "Summaries for this log file.");
-      frame.add_empty ("summary");
+      frame.set_empty ("summary");
       Librarian::add_doc_fun (LogSelect::component, 
                               LogSelect::document_entries);
     }

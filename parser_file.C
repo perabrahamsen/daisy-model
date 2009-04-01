@@ -598,7 +598,7 @@ ParserFile::Implementation::add_derived (Library& lib)
       && looking_at ('"')
       && frame->lookup ("description") == Value::String
       && frame->type_size ("description") == Value::Singleton)
-    frame->add ("description", get_string ());
+    frame->set ("description", get_string ());
 
   // Add separate attributes for this object.
   Treelog::Open nest (msg, "Defining " + lib.name () + " '" + name + "'");
@@ -632,13 +632,13 @@ ParserFile::Implementation::load_object (const Library& lib, bool in_sequence,
                                         Frame::parent_link));
           const double value = get_number ();
           const symbol dim = get_dimension ();
-          result->add ("value", value, dim);
+          result->set ("value", value, dim);
         }
       else if (lib.name () == symbol (Integer::component))
         {
           result.reset (new FrameModel (lib.model ("const"), 
                                         Frame::parent_link));
-          result->add ("value", get_integer ());
+          result->set ("value", get_integer ());
         }
       else
         {
@@ -693,7 +693,7 @@ ParserFile::Implementation::load_object (const Library& lib, bool in_sequence,
               static const symbol fetch ("fetch");
               result.reset (new FrameModel (lib.model (fetch), 
                                             Frame::parent_link));
-              result->add ("name", type);
+              result->set ("name", type);
               goto skip_it;
             }
           throw (std::string ("Unknown '") + lib.name () + "' model '"
@@ -797,7 +797,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 		if (!looking_at ('('))
 		  doc = get_symbol ();
 		if (ok)
-		  frame.add (var, type, Value::Const, size, doc);
+		  frame.declare (var, type, Value::Const, size, doc);
 		break;
 	      }
 	    case Value::Number:
@@ -808,7 +808,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 		if (!looking_at ('('))
 		  doc = get_symbol ();
 		if (ok)
-		  frame.add (var, dim, Value::Const, size, doc);
+		  frame.declare (var, dim, Value::Const, size, doc);
 		break;
 	      }
 	    case Value::Error:
@@ -824,7 +824,7 @@ ParserFile::Implementation::load_list (Frame& frame)
                           {
                             const Frame::load_syntax_t load
                               = Librarian::submodel_load (submodel);
-                            frame.add_submodule (var, Value::Const, doc, load);
+                            frame.declare_submodule (var, Value::Const, doc, load);
                           }
                         break;
                       }
@@ -838,7 +838,7 @@ ParserFile::Implementation::load_list (Frame& frame)
                         if (!looking_at ('('))
                           doc = get_string ();
                         if (ok)
-                          frame.add_object (var, type_symbol, 
+                          frame.declare_object (var, type_symbol, 
                                              Value::Const, size, doc);
                         break;
                       }
@@ -882,7 +882,7 @@ ParserFile::Implementation::load_list (Frame& frame)
           if (name == var)
             error ("Reference $" + var + " refers to itself");
           else
-            frame.add_reference (name, var);
+            frame.set_reference (name, var);
         }
       else if (frame.type_size (name) == Value::Singleton)
 	switch (frame.lookup (name))
@@ -895,12 +895,12 @@ ParserFile::Implementation::load_list (Frame& frame)
                   const symbol dim = 
 		    looking_at ('[') ? get_dimension () : Value::Unknown ();
                   check_value (frame, name, value);
-                  frame.add (name, value, dim);
+                  frame.set (name, value, dim);
                   break;
                 }
 	      const double value = get_number (frame.dimension (name));
               check_value (frame, name, value);
-	      frame.add (name, value);
+	      frame.set (name, value);
 	    }
             break;
 	  case Value::AList: 
@@ -921,7 +921,7 @@ ParserFile::Implementation::load_list (Frame& frame)
               std::auto_ptr<FrameSubmodel> 
                 child (&frame.submodel (name).clone ());
 	      load_list (*child);
-	      frame.add (name, *child);
+	      frame.set (name, *child);
 	      if (alist_skipped)
 		skip (")");
 	    }
@@ -967,11 +967,11 @@ ParserFile::Implementation::load_list (Frame& frame)
 		  ok = false;
 		}
 	      if (ok)
-		frame.add (name, plf);
+		frame.set (name, plf);
 	      break;
 	    }
 	  case Value::String:
-	    frame.add (name, get_string ());
+	    frame.set (name, get_string ());
 	    // Handle "directory" immediately.
 	    if (&frame == &metalib && name == "directory")
 	      if (!metalib.path ().set_directory (frame.name (name).name ()))
@@ -982,17 +982,17 @@ ParserFile::Implementation::load_list (Frame& frame)
 	      const std::string flag = get_string ();
 
 	      if (flag == "true")
-		frame.add (name, true);
+		frame.set (name, true);
 	      else
 		{
-		  frame.add (name, false);
+		  frame.set (name, false);
 		  if (flag != "false")
 		    error ("Expected 'true' or 'false'");
 		}
 	      break;
 	    }
 	  case Value::Integer:
-	    frame.add (name, get_integer ());
+	    frame.set (name, get_integer ());
 	    break;
 	  case Value::Object:
 	    {
@@ -1027,7 +1027,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 		  inputs.push_back (&child->clone ());
 		}
 	      else
-                frame.add (name, *child);
+                frame.set (name, *child);
 	    }
 	    break;
 	  case Value::Scalar:
@@ -1100,7 +1100,7 @@ ParserFile::Implementation::load_list (Frame& frame)
                     if (child.get ())
                       sequence.push_back (child.release ());
 		  }
-		frame.add (name, sequence);
+		frame.set (name, sequence);
 	      }
               break;
 	    case Value::AList:
@@ -1158,7 +1158,7 @@ ParserFile::Implementation::load_list (Frame& frame)
                         << " array members, expected " << size;
 		    error (str.str ());
 		  }
-		frame.add (name, sequence);
+		frame.set (name, sequence);
 	      }	
               break;
             case Value::PLF:
@@ -1221,7 +1221,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 		    for (;total < size; total++)
 		      plfs.push_back (new PLF ());
 		  }
-		frame.add (name, plfs);
+		frame.set (name, plfs);
 		sequence_delete (plfs.begin (), plfs.end ());
 		break;
 	      }
@@ -1312,7 +1312,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 		    for (;count < size; count++)
 		      array.push_back (-1.0);
 		  }
-		frame.add (name, array);
+		frame.set (name, array);
 		break;
 	      }
 	    case Value::String:
@@ -1347,7 +1347,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 		    for (;count < size; count++)
 		      array.push_back (symbol ("<error>"));
 		  }
-		frame.add (name, array);
+		frame.set (name, array);
 		// Handle "path" immediately.
 		if (&frame == &metalib && name == "path")
 		  {
@@ -1391,7 +1391,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 		    for (;count < size; count++)
 		      array.push_back (-42);
 		  }
-		frame.add (name, array);
+		frame.set (name, array);
 		// Handle "path" immediately.
 		break;
 	      }
@@ -1498,7 +1498,7 @@ static struct ParserFileSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.add ("where", Value::String, Value::Const,
+    frame.declare ("where", Value::String, Value::Const,
 		"File to read from.");
     frame.order ("where");
   }

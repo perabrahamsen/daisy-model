@@ -839,7 +839,7 @@ static struct PrinterFileSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.add ("where", Value::String, Value::Const,
+    frame.declare ("where", Value::String, Value::Const,
                 "File to print in.");
     frame.order ("where");
   }

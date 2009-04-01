@@ -101,10 +101,10 @@ static struct ProgramBatchSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("directory", Value::String, Value::Const, "\
+    frame.declare ("directory", Value::String, Value::Const, "\
 Directory in which to initialize, check and run the programs.");
-    frame.add ("directory", ".");
-    frame.add_object ("run", Program::component, 
+    frame.set ("directory", ".");
+    frame.declare_object ("run", Program::component, 
                        Value::State, Value::Sequence, "\
 List of programs to run.  The programs will be run in the sequence listed.");
    

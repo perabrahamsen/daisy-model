@@ -62,9 +62,9 @@ struct StringerCond : public Stringer
     const symbol  value;
     static void load_syntax (Frame& frame)
     {
-      frame.add_object ("condition", Boolean::component, "\
+      frame.declare_object ("condition", Boolean::component, "\
 Condition to test for.");
-      frame.add ("value", Value::String, Value::Const, "\
+      frame.declare ("value", Value::String, Value::Const, "\
 Value to return.");
       frame.order ("condition", "value");
     }
@@ -137,7 +137,7 @@ Return the value of the first clause whose condition is true.")
   void load_frame (Frame& frame) const
   {
 
-    frame.add_submodule_sequence ("clauses", Value::Const, "\
+    frame.declare_submodule_sequence ("clauses", Value::Const, "\
 List of clauses to match for.",
                                    StringerCond::Clause::load_syntax);
     frame.order ("clauses");
@@ -182,7 +182,7 @@ Extract the value of a number.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_object ("number", Number::component, "\
+    frame.declare_object ("number", Number::component, "\
 Number to manipulate."); 
   }
 } StringerNumber_syntax;
@@ -219,7 +219,7 @@ Extract the value of a number as a string.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("precision", Value::Integer, Value::OptionalConst, "\
+    frame.declare ("precision", Value::Integer, Value::OptionalConst, "\
 Number of decimals after point.  By default, use a floating format.");
   }
 } StringerValue_syntax;
@@ -284,7 +284,7 @@ Return the specified value.")
   void load_frame (Frame& frame) const
   {
 
-    frame.add ("value", Value::String, Value::Const, "\
+    frame.declare ("value", Value::String, Value::Const, "\
 Constant value.");
   }
 } StringerIdentity_syntax;

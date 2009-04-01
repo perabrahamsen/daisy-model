@@ -87,13 +87,13 @@ Horizon::Implementation::initialize (const Hydraulic& hydraulic,
     {
       // Fill out SOM_fractions and SOM_C_per_N.
       if (SOM_C_per_N.size () > 0 && SOM_C_per_N.size () < som_size + 0U)
-	SOM_C_per_N.insert (SOM_C_per_N.end (),
-			    som_size - SOM_C_per_N.size (), 
-			    SOM_C_per_N.back ());
+        SOM_C_per_N.insert (SOM_C_per_N.end (),
+                            som_size - SOM_C_per_N.size (), 
+                            SOM_C_per_N.back ());
       if (SOM_fractions.size () > 0 && SOM_fractions.size () < som_size + 0U)
-	SOM_fractions.insert (SOM_fractions.end (),
-			      som_size - SOM_fractions.size (), 
-			      0.0);
+        SOM_fractions.insert (SOM_fractions.end (),
+                              som_size - SOM_fractions.size (), 
+                              0.0);
     }
 
   // Did we specify 'dry_bulk_density'?  Else calculate it now.
@@ -129,8 +129,8 @@ Horizon::Implementation::Implementation (Block& al)
     SOM_C_per_N (al.number_sequence ("SOM_C_per_N")),
     C_per_N (al.number ("C_per_N", -42.42e42)),
     SOM_fractions (al.check ("SOM_fractions") 
-		   ? al.number_sequence ("SOM_fractions")
-		   : std::vector<double> ()),
+                   ? al.number_sequence ("SOM_fractions")
+                   : std::vector<double> ()),
     turnover_factor (al.number ("turnover_factor")),
     anisotropy (al.number ("anisotropy")),
     attributes (get_attributes (al.submodel_sequence ("attributes"))),
@@ -145,8 +145,8 @@ Horizon::Implementation::Implementation (const Frame& al)
     SOM_C_per_N (al.number_sequence ("SOM_C_per_N")),
     C_per_N (al.number ("C_per_N", -42.42e42)),
     SOM_fractions (al.check ("SOM_fractions") 
-		   ? al.number_sequence ("SOM_fractions")
-		   : std::vector<double> ()),
+                   ? al.number_sequence ("SOM_fractions")
+                   : std::vector<double> ()),
     turnover_factor (al.number ("turnover_factor")),
     anisotropy (al.number ("anisotropy")),
     attributes (get_attributes (al.submodel_sequence ("attributes"))),
@@ -367,43 +367,43 @@ hydraulic model");
   }
   static void load_attributes (Frame& frame)
   {
-    frame.add ("key", Value::String, Value::Const,
+    frame.declare ("key", Value::String, Value::Const,
                    "Name of attribute.");
-    frame.add ("value", Value::User (), Value::Const,
-               "Value of attribute.");
+    frame.declare ("value", Value::User (), Value::Const,
+                   "Value of attribute.");
     frame.order ("key", "value");
   }
   void load_frame (Frame& frame) const
   {
     Model::load_model (frame);
     frame.add_check (check_alist);
-    frame.add_object ("hydraulic", Hydraulic::component, 
-                       "The hydraulic propeties of the soil.");
-    frame.add ("hydraulic", "hypres");
-    frame.add_object ("tortuosity", Tortuosity::component, 
-                       "The soil tortuosity.");
-    frame.add ("tortuosity", "M_Q");
-    frame.add ("anisotropy", Value::None (),
-                Check::non_negative (), Value::Const, "\
+    frame.declare_object ("hydraulic", Hydraulic::component, 
+                          "The hydraulic propeties of the soil.");
+    frame.set ("hydraulic", "hypres");
+    frame.declare_object ("tortuosity", Tortuosity::component, 
+                          "The soil tortuosity.");
+    frame.set ("tortuosity", "M_Q");
+    frame.declare ("anisotropy", Value::None (),
+                   Check::non_negative (), Value::Const, "\
 Horizontal saturated water conductivity relative to vertical saturated\n\
 water conductivity.  The higher this value, the faster the water will\n\
 move towards drain pipes.");
-    frame.add ("anisotropy", 1.0);
-    frame.add ("dry_bulk_density", "g/cm^3", Value::OptionalConst,
-                "The soils dry bulk density.\n\
+    frame.set ("anisotropy", 1.0);
+    frame.declare ("dry_bulk_density", "g/cm^3", Value::OptionalConst,
+                   "The soils dry bulk density.\n\
 By default, this is calculated from the soil constituents.");
-    frame.add ("SOM_C_per_N", "g C/g N", Check::non_negative (), 
-                Value::Const, Value::Sequence,
-                "C/N ratio for each SOM pool in this soil.\n\
+    frame.declare ("SOM_C_per_N", "g C/g N", Check::non_negative (), 
+                   Value::Const, Value::Sequence,
+                   "C/N ratio for each SOM pool in this soil.\n\
 If 'C_per_N' is specified, this is used as a goal only.  If 'C_per_N' is\n\
 unspecified, the SOM pools will be initialized with this value.");
     std::vector<double> SOM_C_per_N;
     SOM_C_per_N.push_back (11.0);
     SOM_C_per_N.push_back (11.0);
     SOM_C_per_N.push_back (11.0);
-    frame.add ("SOM_C_per_N", SOM_C_per_N);
-    frame.add ("C_per_N", "g C/g N", Check::positive (), Value::OptionalConst,
-                "Total C/N ratio for this horizon.\n\
+    frame.set ("SOM_C_per_N", SOM_C_per_N);
+    frame.declare ("C_per_N", "g C/g N", Check::positive (), Value::OptionalConst,
+                   "Total C/N ratio for this horizon.\n\
 This is the combined initial C/N ratio for all organic matter pools in the\n\
 horizon.  The C/N ration of the AOM and SMB pools is assumed to be known,\n\
 given that this number is used to find the common C/N ration for the SOM\n\
@@ -411,37 +411,37 @@ pools.  The C/N ration for the SOM pools will then gradually move towards\n\
 the values specified by 'SOM_C_per_N'.\n\
 By default, the values given by 'SOM_C_per_N' will be used for\n\
 initialization.");
-    frame.add_check ("SOM_C_per_N", VCheck::min_size_1 ());
+    frame.set_check ("SOM_C_per_N", VCheck::min_size_1 ());
 
     static const BelowOrEqual max_1 (1.0);
-    frame.add ("SOM_fractions",  Value::None (), max_1,
-                Value::OptionalConst, Value::Sequence, "\
+    frame.declare ("SOM_fractions",  Value::None (), max_1,
+                   Value::OptionalConst, Value::Sequence, "\
 Fraction of humus in each SOM pool, from slowest to fastest.\n\
 Negative numbers mean unspecified, let Daisy find appropriate values.");
-    frame.add_check ("SOM_fractions", SOM_fractions_check);
+    frame.set_check ("SOM_fractions", SOM_fractions_check);
 
-    frame.add ("turnover_factor", Value::None (), Check::non_negative (),
-                Value::Const, "\
+    frame.declare ("turnover_factor", Value::None (), Check::non_negative (),
+                   Value::Const, "\
 Factor multiplied to the turnover rate for all organic matter pools in\n\
 this horizon.");
-    frame.add ("turnover_factor", 1.0);
-    frame.add_object ("Nitrification", Nitrification::component,
-                       "The soil nitrification process.");
-    frame.add ("Nitrification", "soil");
+    frame.set ("turnover_factor", 1.0);
+    frame.declare_object ("Nitrification", Nitrification::component,
+                          "The soil nitrification process.");
+    frame.set ("Nitrification", "soil");
 
-    frame.add_object ("secondary_domain", Secondary::component,
-                       "Secondary matrix domain for solute movement.");
-    frame.add ("secondary_domain", "none");
+    frame.declare_object ("secondary_domain", Secondary::component,
+                          "Secondary matrix domain for solute movement.");
+    frame.set ("secondary_domain", "none");
 
 
-    frame.add_submodule ("HorHeat", Value::State, 
-                          "Heat capacity and conductivity.",
-                          HorHeat::load_syntax);
+    frame.declare_submodule ("HorHeat", Value::State, 
+                         "Heat capacity and conductivity.",
+                         HorHeat::load_syntax);
 
-    frame.add_submodule_sequence ("attributes", Value::OptionalConst, "\
+    frame.declare_submodule_sequence ("attributes", Value::OptionalConst, "\
 List of additional attributes for this horizon.\n\
 Intended for use with pedotransfer functions.", load_attributes);
-    frame.add_empty ("attributes");
+    frame.set_empty ("attributes");
   }
 } Horizon_init;
 

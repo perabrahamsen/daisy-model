@@ -327,30 +327,30 @@ setting the parameters.")
   void load_frame (Frame& frame) const
   {
     Model::load_model (frame);
-    frame.add_object ("bottom", Bound::component, 
+    frame.declare_object ("bottom", Bound::component, 
                        Value::Const, Value::Singleton,
                        "Lower boundary on the z-axis.");
-    frame.add ("bottom", "none");
-    frame.add_object ("top", Bound::component,
+    frame.set ("bottom", "none");
+    frame.declare_object ("top", Bound::component,
                        Value::Const, Value::Singleton,
                        "Upper boundary on the z-axis.");
-    frame.add ("top", "none");
-    frame.add_object ("left", Bound::component,
+    frame.set ("top", "none");
+    frame.declare_object ("left", Bound::component,
                        Value::Const, Value::Singleton,
                        "Lower boundary on the x-axis.");
-    frame.add ("left", "none");
-    frame.add_object ("right", Bound::component,
+    frame.set ("left", "none");
+    frame.declare_object ("right", Bound::component,
                        Value::Const, Value::Singleton,
                        "Upper boundary on the x-axis.");
-    frame.add ("right", "none");
-    frame.add_object ("front", Bound::component,
+    frame.set ("right", "none");
+    frame.declare_object ("front", Bound::component,
                        Value::Const, Value::Singleton,
                        "Lower boundary on the y-axis.");
-    frame.add ("front", "none");
-    frame.add_object ("back", Bound::component,
+    frame.set ("front", "none");
+    frame.declare_object ("back", Bound::component,
                        Value::Const, Value::Singleton,
                        "Upper boundary on the y-axis.");
-    frame.add ("back", "none");
+    frame.set ("back", "none");
     }
 } VolumeBox_syntax;
 

@@ -135,19 +135,19 @@ M = rho K C^m + Theta C")
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);
-    frame.add ("K_clay", "(g/cm^3)^-m", Check::non_negative (),
+    frame.declare ("K_clay", "(g/cm^3)^-m", Check::non_negative (),
 		Value::OptionalConst, 
 		"Clay dependent distribution parameter.\n\
 It is multiplied with the soil clay fraction to get the clay part of\n\
 the 'K' factor.  If 'K_OC' is specified, 'K_clay' defaults to 0.\n\
 The dimension depends on the 'm' parameter.");
-    frame.add ("K_OC", "(g/cm^3)^-m", Check::non_negative (), 
+    frame.declare ("K_OC", "(g/cm^3)^-m", Check::non_negative (), 
 		Value::OptionalConst, 
 		"Humus dependent distribution parameter.\n\
 It is multiplied with the soil organic carbon fraction to get the\n\
 carbon part of the 'K' factor.  By default, 'K_OC' is equal to 'K_clay'.\n\
 The dimension depends on the 'm' parameter.");
-    frame.add ("m", Value::None (), Check::non_negative (), Value::Const,
+    frame.declare ("m", Value::None (), Check::non_negative (), Value::Const,
 		"Freundlich parameter");
   }
 } AdsorptionFreundlich_syntax;

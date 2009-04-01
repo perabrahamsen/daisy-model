@@ -100,12 +100,12 @@ Steady-state water flow.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("q_x", "cm/h", Value::Const, "\
+    frame.declare ("q_x", "cm/h", Value::Const, "\
 Horizontal flow.");
-    frame.add ("q_x", 0.0);
-    frame.add ("q_z", "cm/h", Value::Const, "\
+    frame.set ("q_x", 0.0);
+    frame.declare ("q_z", "cm/h", Value::Const, "\
 Vertical flow upwards.");
-    frame.add ("q_z", 0.0); 
+    frame.set ("q_z", 0.0); 
   }
 } UZRectConst_syntax;
 

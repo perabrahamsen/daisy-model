@@ -164,21 +164,21 @@ static struct Photo_GLSyntax : public DeclareModel
     DS_null_eff.add (0.0, 1.00);
     DS_null_eff.add (2.0, 1.00);
 
-    frame.add ("Qeff", "(g CO2/m^2/h)/(W/m^2)", Value::Const,
+    frame.declare ("Qeff", "(g CO2/m^2/h)/(W/m^2)", Value::Const,
                 "Quantum efficiency at low light.");
-    frame.add ("Fm", "g CO2/m^2/h", Check::positive (), Value::Const,
+    frame.declare ("Fm", "g CO2/m^2/h", Check::positive (), Value::Const,
                 "Maximum assimilation rate.");
-    frame.add ("TempEff", "dg C", Value::None (), Check::non_negative (),
+    frame.declare ("TempEff", "dg C", Value::None (), Check::non_negative (),
                 Value::Const,
                 "Temperature factor for assimilate production.");
-    frame.add ("DSEff", "DS", Value::None (), Check::non_negative (),
+    frame.declare ("DSEff", "DS", Value::None (), Check::non_negative (),
                 Value::Const, "\
 Development stage factor for assimilate production.");
-    frame.add ("DSEff",DS_null_eff);
-    frame.add ("DAPEff", "d", Value::None (), Check::non_negative (),
+    frame.set ("DSEff",DS_null_eff);
+    frame.declare ("DAPEff", "d", Value::None (), Check::non_negative (),
                 Value::Const, "Age factor for assimilate production.\n\
 Age is given as day after planting.");
-    frame.add ("DAPEff",DS_null_eff);
+    frame.set ("DAPEff",DS_null_eff);
   }
   Photo_GLSyntax () 
     : DeclareModel (Photo::component, "GL", "Goudriaan and Laar, 1978.")

@@ -70,15 +70,15 @@ static struct ABAEffectexpSyntax : public DeclareModel
   { return new ABAEffect_exp (al); }
   void load_frame (Frame& frame) const
   {
-    frame.add ("k", "cm^3/g", Check::non_negative (), Value::Const,
+    frame.declare ("k", "cm^3/g", Check::non_negative (), Value::Const,
                 "Coefficient");
-    frame.add ("k", 0.0);
-    frame.add ("l", "MPa^-1", Check::non_negative (), Value::Const,
+    frame.set ("k", 0.0);
+    frame.declare ("l", "MPa^-1", Check::non_negative (), Value::Const,
                 "Coefficient");
-    frame.add ("l", 0.0);
-    frame.add ("alpha", Value::None(), Check::non_negative (), Value::Const,
+    frame.set ("l", 0.0);
+    frame.declare ("alpha", Value::None(), Check::non_negative (), Value::Const,
                 "Coefficient");
-    frame.add ("alpha", 1.0);
+    frame.set ("alpha", 1.0);
   }  
   ABAEffectexpSyntax ()
     : DeclareModel (ABAEffect::component, "ABA-exp", "\

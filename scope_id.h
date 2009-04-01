@@ -43,7 +43,7 @@ public:
 
   // WScope interface.
 public:
-  void add (symbol, double);
+  void set (symbol, double);
 
   // ScopeID interface.
 public:

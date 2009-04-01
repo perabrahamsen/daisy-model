@@ -1119,46 +1119,46 @@ See Mollerup 2007 for details.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_object ("solver", Solver::component, 
+    frame.declare_object ("solver", Solver::component, 
                        Value::Const, Value::Singleton, "\
 Model used for solving matrix equation system.");
-    frame.add ("solver", "cxsparse");
-    frame.add_object ("K_average", Average::component,
+    frame.set ("solver", "cxsparse");
+    frame.declare_object ("K_average", Average::component,
                        Value::Const, Value::Singleton,
                        "Model for calculating average K between cells.");
-    frame.add ("K_average", "arithmetic");
-    frame.add ("max_time_step_reductions",
+    frame.set ("K_average", "arithmetic");
+    frame.declare ("max_time_step_reductions",
                 Value::Integer, Value::Const, "\
 Number of times we may reduce the time step before giving up");
-    frame.add ("max_time_step_reductions", 4);
-    frame.add ("time_step_reduction", Value::Integer, Value::Const, 
+    frame.set ("max_time_step_reductions", 4);
+    frame.declare ("time_step_reduction", Value::Integer, Value::Const, 
                 "Divide the time step with this at each reduction.");
-    frame.add ("time_step_reduction", 4);
-    frame.add ("max_iterations", Value::Integer, Value::Const, "\
+    frame.set ("time_step_reduction", 4);
+    frame.declare ("max_iterations", Value::Integer, Value::Const, "\
 Maximum number of iterations when seeking convergence before reducing\n\
 the time step.");
-    frame.add ("max_iterations", 12);
-    frame.add ("max_number_of_small_time_steps", Value::Integer, Value::Const, "\
+    frame.set ("max_iterations", 12);
+    frame.declare ("max_number_of_small_time_steps", Value::Integer, Value::Const, "\
 Maximum number of small time steps in a large time step.");
-    frame.add ("max_number_of_small_time_steps", 1000);  
-    frame.add ("msg_number_of_small_time_steps", Value::Integer, Value::Const, "\
+    frame.set ("max_number_of_small_time_steps", 1000);  
+    frame.declare ("msg_number_of_small_time_steps", Value::Integer, Value::Const, "\
 Number of small time steps in a large time step between message.");
-    frame.add ("msg_number_of_small_time_steps", 100);  
-    frame.add ("max_absolute_difference", "cm", Value::Const, "\
+    frame.set ("msg_number_of_small_time_steps", 100);  
+    frame.declare ("max_absolute_difference", "cm", Value::Const, "\
 Maximum absolute difference in 'h' values for convergence.");
-    frame.add ("max_absolute_difference", 0.02);
-    frame.add ("max_relative_difference", Value::None (), Value::Const, "\
+    frame.set ("max_absolute_difference", 0.02);
+    frame.declare ("max_relative_difference", Value::None (), Value::Const, "\
 Maximum relative difference in 'h' values for convergence.");
-    frame.add ("max_relative_difference", 0.001); 
-    frame.add ("max_pressure_potential", Value::None (), Value::Const, "\
+    frame.set ("max_relative_difference", 0.001); 
+    frame.declare ("max_pressure_potential", Value::None (), Value::Const, "\
 Maximum pressure potential for convergence.");
-    frame.add ("max_pressure_potential", 1e9); 
-    frame.add ("min_pressure_potential", Value::None (), Value::Const, "\
+    frame.set ("max_pressure_potential", 1e9); 
+    frame.declare ("min_pressure_potential", Value::None (), Value::Const, "\
 minimum pressure potential for convergence.");
-    frame.add ("min_pressure_potential", -1.0e9); 
-    frame.add ("forced_T", "dg C", Value::OptionalConst, "\
+    frame.set ("min_pressure_potential", -1.0e9); 
+    frame.declare ("forced_T", "dg C", Value::OptionalConst, "\
 Force transport equations to use this water temperature.");
-    frame.add ("debug", Value::Integer, Value::Const, "\
+    frame.declare ("debug", Value::Integer, Value::Const, "\
 Level of debug messages:\n                              \
  \n                                                     \
 = 0: no debug messages.\n                               \
@@ -1167,8 +1167,8 @@ Level of debug messages:\n                              \
 = 3: Upper boundary extra info.\n        \
 = 4: Drain extra info.\n\
 = 5: Remaining water.");
-    frame.add ("debug", 0);
-    frame.add ("Theta_error",
+    frame.set ("debug", 0);
+    frame.declare ("Theta_error",
                 Value::None (), Value::LogOnly, Value::Sequence, "\
 Water mass balance error per cell.");
     }

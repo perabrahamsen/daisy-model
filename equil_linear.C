@@ -106,7 +106,7 @@ static struct EquilibriumLinearSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_object ("K", Number::component, Value::Const, 
+    frame.declare_object ("K", Number::component, Value::Const, 
                        Value::Singleton, "The ratio A/B at equilibrium [].");
 
   }

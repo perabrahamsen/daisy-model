@@ -580,7 +580,7 @@ struct AttributeList::Implementation
   value_map values;
   bool check (const symbol key) const;
   const AValue& lookup (const symbol key) const;
-  void add (const symbol key, const AValue& value);
+  void set (const symbol key, const AValue& value);
   void remove (const symbol key);
   void clear ();
 };    
@@ -603,7 +603,7 @@ AttributeList::Implementation::lookup (const symbol key) const
 }
 
 void
-AttributeList::Implementation::add (const symbol key, const AValue& value)
+AttributeList::Implementation::set (const symbol key, const AValue& value)
 {
   values[key] = value;
 }
@@ -672,8 +672,8 @@ AttributeList::size (const symbol key)	const
 
   // Variables.
 void 
-AttributeList::add_reference (const symbol key, const symbol v)
-{ impl.add (key, AValue (v, -1)); }
+AttributeList::set_reference (const symbol key, const symbol v)
+{ impl.set (key, AValue (v, -1)); }
 
 bool
 AttributeList::is_reference (const symbol key) const
@@ -852,72 +852,72 @@ AttributeList::submodel_sequence (const symbol key) const
 }
 
 void 
-AttributeList::add (const symbol key, double v)
-{ impl.add (key, AValue (v)); }
+AttributeList::set (const symbol key, double v)
+{ impl.set (key, AValue (v)); }
 
 void
-AttributeList::add (const symbol key, double v, const symbol d)
-{ impl.add (key, AValue (v, d)); }
+AttributeList::set (const symbol key, double v, const symbol d)
+{ impl.set (key, AValue (v, d)); }
 
 void 
-AttributeList::add (const symbol key, const symbol v)
-{ impl.add (key, AValue (v)); }
+AttributeList::set (const symbol key, const symbol v)
+{ impl.set (key, AValue (v)); }
 
 void 
-AttributeList::add (const symbol key, bool v)
-{ impl.add (key, AValue (v)); }
+AttributeList::set (const symbol key, bool v)
+{ impl.set (key, AValue (v)); }
 
 void 
-AttributeList::add (const symbol key, int v)
-{ impl.add (key, AValue (v)); }
+AttributeList::set (const symbol key, int v)
+{ impl.set (key, AValue (v)); }
 
 void 
-AttributeList::add (const symbol key, const FrameModel& v)
-{ impl.add (key, AValue (v)); }
+AttributeList::set (const symbol key, const FrameModel& v)
+{ impl.set (key, AValue (v)); }
 
 void 
-AttributeList::add (const symbol key, const FrameSubmodel& v)
-{ impl.add (key, AValue (v)); }
+AttributeList::set (const symbol key, const FrameSubmodel& v)
+{ impl.set (key, AValue (v)); }
 
 void 
-AttributeList::add (const symbol key, const PLF& v)
-{ impl.add (key, AValue (v)); }
+AttributeList::set (const symbol key, const PLF& v)
+{ impl.set (key, AValue (v)); }
 
 void 
-AttributeList::add (const symbol key, const std::vector<double>& v)
-{ impl.add (key, AValue (v)); }
+AttributeList::set (const symbol key, const std::vector<double>& v)
+{ impl.set (key, AValue (v)); }
 
 void 
-AttributeList::add (const symbol key, const std::vector<symbol>& v)
-{ impl.add (key, AValue (v)); }
+AttributeList::set (const symbol key, const std::vector<symbol>& v)
+{ impl.set (key, AValue (v)); }
 
 void 
-AttributeList::add_strings (const symbol key)
+AttributeList::set_strings (const symbol key)
 {
   std::vector<symbol> all;
-  add (key, all);
+  set (key, all);
 }
 
 void 
-AttributeList::add_strings (const symbol key, const symbol a)
+AttributeList::set_strings (const symbol key, const symbol a)
 {
   std::vector<symbol> all;
   all.push_back (symbol (a));
-  add (key, all);
+  set (key, all);
 }
 
 void 
-AttributeList::add_strings (const symbol key,
+AttributeList::set_strings (const symbol key,
                             const symbol a, const symbol b)
 {
   std::vector<symbol> all;
   all.push_back (symbol (a));
   all.push_back (symbol (b));
-  add (key, all);
+  set (key, all);
 }
 
 void 
-AttributeList::add_strings (const symbol key,
+AttributeList::set_strings (const symbol key,
                             const symbol a, const symbol b,
                             const symbol c)
 {
@@ -925,30 +925,30 @@ AttributeList::add_strings (const symbol key,
   all.push_back (symbol (a));
   all.push_back (symbol (b));
   all.push_back (symbol (c));
-  add (key, all);
+  set (key, all);
 }
 
 void 
-AttributeList::add (const symbol key, const std::vector<bool>& v)
-{ impl.add (key, AValue (v)); }
+AttributeList::set (const symbol key, const std::vector<bool>& v)
+{ impl.set (key, AValue (v)); }
 
 void 
-AttributeList::add (const symbol key, const std::vector<int>& v)
-{ impl.add (key, AValue (v)); }
+AttributeList::set (const symbol key, const std::vector<int>& v)
+{ impl.set (key, AValue (v)); }
 
 void 
-AttributeList::add (const symbol key, 
+AttributeList::set (const symbol key, 
 		    const std::vector<const FrameModel*>& v)
-{ impl.add (key, AValue (v)); }
+{ impl.set (key, AValue (v)); }
 
 void
-AttributeList::add (const symbol key, 
+AttributeList::set (const symbol key, 
 		    const std::vector<const FrameSubmodel*>& v)
-{ impl.add (key, AValue (v)); }
+{ impl.set (key, AValue (v)); }
 
 void 
-AttributeList::add (const symbol key, const std::vector<const PLF*>& v)
-{ impl.add (key, AValue (v)); }
+AttributeList::set (const symbol key, const std::vector<const PLF*>& v)
+{ impl.set (key, AValue (v)); }
 
 void 
 AttributeList::remove (const symbol key)
@@ -960,7 +960,7 @@ AttributeList::operator += (const AttributeList& al)
   for (value_map::const_iterator i = al.impl.values.begin ();
        i != al.impl.values.end ();
        i++)
-    impl.add ((*i).first, (*i).second);
+    impl.set ((*i).first, (*i).second);
 }
 
 void

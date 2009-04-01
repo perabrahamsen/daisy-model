@@ -120,9 +120,9 @@ struct MovementRect::Point
   const double x;
   static void load_syntax (Frame& frame)
   {
-    frame.add ("z", "cm", Check::negative (), Value::Const, 
+    frame.declare ("z", "cm", Check::negative (), Value::Const, 
 		"Vertical position.");
-    frame.add ("x", "cm", Check::positive (), Value::Const,
+    frame.declare ("x", "cm", Check::positive (), Value::Const,
 		"Horizontal position.");
     frame.order ("z", "x");
   }
@@ -333,25 +333,25 @@ static struct MovementRectSyntax : DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_strings ("matrix_solute", "Mollerup", "convection", "none");
-    frame.add ("Tertiary", "none");
-    frame.add_submodule ("Geometry", Value::Const,
+    frame.set_strings ("matrix_solute", "Mollerup", "convection", "none");
+    frame.set ("Tertiary", "none");
+    frame.declare_submodule ("Geometry", Value::Const,
                           "Discretization of the soil.",
                           GeometryRect::load_syntax);
-    frame.add_submodule_sequence ("drain", Value::Const,
+    frame.declare_submodule_sequence ("drain", Value::Const,
 				   "Location of cells with drain pipes.",
 				   MovementRect::Point::load_syntax);
-    frame.add_empty ("drain");
-    frame.add_object ("matrix_water", UZRect::component, 
+    frame.set_empty ("drain");
+    frame.declare_object ("matrix_water", UZRect::component, 
                        Value::Const, Value::Sequence,
                        "Matrix water transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends.");
-    frame.add_strings ("matrix_water", "Mollerup", "v+h", "const");
-    frame.add_object ("heat", Heatrect::component, 
+    frame.set_strings ("matrix_water", "Mollerup", "v+h", "const");
+    frame.declare_object ("heat", Heatrect::component, 
                        Value::Const, Value::Singleton, "\
 Heat transport model.");
-    frame.add ("heat", "Mollerup");
+    frame.set ("heat", "Mollerup");
 
   }
 } MovementRect_syntax;

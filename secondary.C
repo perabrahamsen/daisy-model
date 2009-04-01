@@ -139,9 +139,9 @@ what corresponds to the specified pressure. ")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("h_lim", "cm", Value::Const, "\
+    frame.declare ("h_lim", "cm", Value::Const, "\
 Pressure for activating secondary domain.");
-    frame.add ("alpha", "h^-1", Value::Const, "\
+    frame.declare ("alpha", "h^-1", Value::Const, "\
 Exchange rate between primary and secondary water."); 
   }
 } SecondaryPressure_syntax;

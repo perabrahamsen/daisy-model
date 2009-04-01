@@ -52,13 +52,13 @@ class EXPORT Frame : public WScope
 
   // Content.
   struct Implementation;
-public:
+ public:
   std::auto_ptr<Implementation> impl;
   virtual symbol type_name () const;
   symbol base_name () const;
   virtual symbol description () const;
 
-public:
+ public:
   // Parser.
   virtual const Filepos& own_position () const;
   const Filepos& inherited_position () const;
@@ -67,7 +67,7 @@ public:
   virtual bool used_to_be_a_submodel () const;
 
   // Parent.
-public:
+ public:
   virtual const Frame* parent () const;
   void register_child (const Frame* child) const;
   void unregister_child (const Frame* child) const;
@@ -75,7 +75,7 @@ public:
   virtual void replace_parent (const Frame* new_parent) const;
 
   // Common access.
-public:
+ public:
   // Get a list of all entries.
   void entries (std::set<symbol>&) const;
 
@@ -107,99 +107,99 @@ public:
   symbol submodel_name (symbol) const;
 
   // Add attribute types.
-public:
-  void add (symbol key,	// Generic.
-	    Value::type t, 
-	    Value::category cat,
-	    int size,
-	    symbol description);
-  void add (symbol key,
-	    Value::type t, 
-	    Value::category cat,
-	    symbol description)
-  { add (key, t, cat, Value::Singleton, description); }
+ public:
+  void declare (symbol key,	// Generic.
+                Value::type t, 
+                Value::category cat,
+                int size,
+                symbol description);
+  void declare (symbol key,
+                Value::type t, 
+                Value::category cat,
+                symbol description)
+  { declare (key, t, cat, Value::Singleton, description); }
 
-  void add (symbol key, // Number.
-	    symbol dim,
-	    Value::category cat,
-	    int size,
-	    symbol description);
-  void add (symbol key, 
-	    symbol dim,
-	    Value::category cat,
-	    symbol description)
-  { add (key, dim, cat, Value::Singleton, description); } 
-  void add (symbol key,
-	    symbol dim,
-	    const Check& check,
-	    Value::category cat,
-	    int size,
-	    symbol description);
-  void add (symbol key, 
-	    symbol dim,
-	    const Check& check,
-	    Value::category cat,
-	    symbol description)
-  { add (key, dim, check, cat, Value::Singleton, description); } 
-  void add_fraction (symbol key, 
-		     Value::category cat,
-		     int size,
-		     symbol description);
-  void add_fraction (symbol key, 
-		     Value::category cat,
-		     symbol description);
+  void declare (symbol key, // Number.
+                symbol dim,
+                Value::category cat,
+                int size,
+                symbol description);
+  void declare (symbol key, 
+                symbol dim,
+                Value::category cat,
+                symbol description)
+  { declare (key, dim, cat, Value::Singleton, description); } 
+  void declare (symbol key,
+                symbol dim,
+                const Check& check,
+                Value::category cat,
+                int size,
+                symbol description);
+  void declare (symbol key, 
+                symbol dim,
+                const Check& check,
+                Value::category cat,
+                symbol description)
+  { declare (key, dim, check, cat, Value::Singleton, description); } 
+  void declare_fraction (symbol key, 
+                         Value::category cat,
+                         int size,
+                         symbol description);
+  void declare_fraction (symbol key, 
+                         Value::category cat,
+                         symbol description);
 
-  void add (symbol key, // PLF.
-	    symbol domain,
-	    symbol range,
-	    Value::category cat,
-	    int size,
-	    symbol description);
-  void add (symbol key, 
-	    symbol domain,
-	    symbol range,
-	    Value::category cat,
-	    symbol description)
-  { add (key, domain, range, cat, Value::Singleton, description); } 
-  void add (symbol key,
-	    symbol domain,
-	    symbol range,
-	    const Check& check,
-	    Value::category cat,
-	    int size,
-	    symbol description);
-  void add (symbol key, 
-	    symbol domain,
-	    symbol range,
-	    const Check& check,
-	    Value::category cat,
-	    symbol description)
-  { add (key, domain, range, check, cat, Value::Singleton, description); } 
+  void declare (symbol key, // PLF.
+                symbol domain,
+                symbol range,
+                Value::category cat,
+                int size,
+                symbol description);
+  void declare (symbol key, 
+                symbol domain,
+                symbol range,
+                Value::category cat,
+                symbol description)
+  { declare (key, domain, range, cat, Value::Singleton, description); } 
+  void declare (symbol key,
+                symbol domain,
+                symbol range,
+                const Check& check,
+                Value::category cat,
+                int size,
+                symbol description);
+  void declare (symbol key, 
+                symbol domain,
+                symbol range,
+                const Check& check,
+                Value::category cat,
+                symbol description)
+  { declare (key, domain, range, check, cat, Value::Singleton, description); } 
 
-  void add_object (symbol key,// Object
-                   symbol lib, 
-                   symbol description)
-  { add_object (key, lib, Value::State, Value::Singleton, description); }
-  void add_object (symbol, symbol lib,
-                   Value::category, int size, symbol description);
+  void declare_object (symbol key,// Object
+                       symbol lib, 
+                       symbol description)
+  { declare_object (key, lib, Value::State, Value::Singleton, description); }
+  void declare_object (symbol, symbol lib,
+                       Value::category, int size, symbol description);
 
   typedef void (*load_syntax_t) (Frame&);
-  void add_submodule (symbol name, 
-		      Value::category cat, symbol description,
-		      load_syntax_t load_syntax);
-  void add_submodule_sequence (symbol name, Value::category cat, 
-			       symbol description,
-			       load_syntax_t load_syntax);
+  void declare_submodule (symbol name, 
+                          Value::category cat, symbol description,
+                          load_syntax_t load_syntax);
+  void declare_submodule_sequence (symbol name, Value::category cat, 
+                                   symbol description,
+                                   load_syntax_t load_syntax);
 
   // Additional type constraints for a single attribute value. 
-  void add_check (symbol name, const VCheck& vcheck);
+  void set_check (symbol name, const VCheck& vcheck);
 
   // It is possible to impose an order on the syntax entries, which
   // will allow the input module to parse the entries without the user
   // having to specify the names of the entries.  It is recommended
   // *not* to use this in general, as it makes it more difficult to
   // add new entries.
-public:
+ public:
   void order (const std::vector<symbol>&);
   void order (symbol);
   void order (symbol, symbol);
@@ -218,10 +218,10 @@ public:
 
   // Additional constraints involving multiple attributes.
   typedef bool (*check_fun)(Metalib&, const Frame&, Treelog&);
-public:
+ public:
   void add_check (check_fun);
 
-public:
+ public:
   // Is 'key' an element of this alist?
   bool check (symbol key) const;
   // Is this frame a subset of 'other'?
@@ -231,13 +231,13 @@ public:
   int value_size (symbol key) const;
 
   // References.
-public:
-  void add_reference (symbol key, symbol val);
+ public:
+  void set_reference (symbol key, symbol val);
   bool is_reference (symbol key) const;
   symbol get_reference (symbol key) const;
 
   // Extract attribute values.
-public:
+ public:
   double number (symbol) const;
   double number (symbol, double default_value) const;
   symbol name (symbol) const;
@@ -258,37 +258,37 @@ public:
   const std::vector<const PLF*>& plf_sequence (symbol key) const;
 
   // Set attribute values.
-private:
+ private:
   void verify (symbol key, Value::type want, int size = Value::Singleton) const;
-public:
-  void add (symbol, double);
-  void add (symbol, double, symbol);
-  void add (symbol, symbol);
-  void add (symbol, const char*); // Avoid matching bool...
-  void add (symbol, bool);
-  void add (symbol, int);
-  void add (symbol, const FrameModel&);
-  void add (symbol, const FrameSubmodel&);
-  void add (symbol, const PLF&);
-  void add (symbol, const std::vector<double>&);
-  void add (symbol, const std::vector<symbol>&);
-  void add_strings (symbol key);
-  void add_strings (symbol key, symbol a);
-  void add_strings (symbol key, symbol a, symbol b);
-  void add_strings (symbol key, symbol a, symbol b, symbol c);
-  void add (symbol, const std::vector<bool>&);
-  void add (symbol, const std::vector<int>&);
-  void add (symbol, const std::vector<const FrameModel*>&);
-  void add (symbol, const std::vector<const FrameSubmodel*>&);
-  void add (symbol, const std::vector<const PLF*>&);
-  void add_empty (symbol);
+ public:
+  void set (symbol, double);
+  void set (symbol, double, symbol);
+  void set (symbol, symbol);
+  void set (symbol, const char*); // Avoid matching bool...
+  void set (symbol, bool);
+  void set (symbol, int);
+  void set (symbol, const FrameModel&);
+  void set (symbol, const FrameSubmodel&);
+  void set (symbol, const PLF&);
+  void set (symbol, const std::vector<double>&);
+  void set (symbol, const std::vector<symbol>&);
+  void set_strings (symbol key);
+  void set_strings (symbol key, symbol a);
+  void set_strings (symbol key, symbol a, symbol b);
+  void set_strings (symbol key, symbol a, symbol b, symbol c);
+  void set (symbol, const std::vector<bool>&);
+  void set (symbol, const std::vector<int>&);
+  void set (symbol, const std::vector<const FrameModel*>&);
+  void set (symbol, const std::vector<const FrameSubmodel*>&);
+  void set (symbol, const std::vector<const PLF*>&);
+  void set_empty (symbol);
 
   // Create and Destroy.
-protected:
+ protected:
   Frame (const Frame&);
   Frame (const Frame*);
   Frame ();
-public:
+ public:
   void overwrite_values (const Frame&); // For using metalib as program frame.
   enum parent_link_t { parent_link };
   enum parent_clone_t { parent_clone }; // For temporary models.

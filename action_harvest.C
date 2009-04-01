@@ -81,12 +81,12 @@ static struct ActionEmergeSyntax : DeclareModel
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.add ("crop", Value::String, Value::Const, 
+    frame.declare ("crop", Value::String, Value::Const, 
                 "Name of the crop to emerge.\n\
 If you specify 'all', all crops will emerge.\n\
 If there are no crop on the field with the specified name,\n\
 nothing will happen.");
-    frame.add ("crop", Vegetation::all_crops ());
+    frame.set ("crop", Vegetation::all_crops ());
     frame.order ("crop");
   }
 } ActionEmerge_syntax;
@@ -101,29 +101,29 @@ Common parameters for harvest operations.")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.add ("crop", Value::String, Value::Const, 
+    frame.declare ("crop", Value::String, Value::Const, 
                 "Name of the crop to harvest or cut.\n\
 If you specify 'all', all crops will be harvested.\n\
 If there are no crop on the field with the specified name,\n\
 nothing will happen.");
-    frame.add ("crop", Vegetation::all_crops ());
-    frame.add ("stub", "cm", Value::Const, "\
+    frame.set ("crop", Vegetation::all_crops ());
+    frame.declare ("stub", "cm", Value::Const, "\
 Leave stem and leafs below this height on the field.");
-    frame.add ("stub", 0.0);
-    frame.add_fraction ("stem", Value::Const, "\
+    frame.set ("stub", 0.0);
+    frame.declare_fraction ("stem", Value::Const, "\
 Fraction of stem (above stub) to harvest.");
-    frame.add ("stem", 1.0);
-    frame.add_fraction ("leaf", Value::Const, "\
+    frame.set ("stem", 1.0);
+    frame.declare_fraction ("leaf", Value::Const, "\
 Fraction of leafs (above stub) to harvest.");
-    frame.add ("leaf", 1.0);
-    frame.add_fraction ("sorg", Value::Const, "\
+    frame.set ("leaf", 1.0);
+    frame.declare_fraction ("sorg", Value::Const, "\
 Fraction of storage organ to harvest.");
-    frame.add ("sorg", 1.0);
-    frame.add ("combine", Value::Boolean, Value::Const, "\
+    frame.set ("sorg", 1.0);
+    frame.declare ("combine", Value::Boolean, Value::Const, "\
 Set this to 'true' in order to combine all crop parts into stem\n\
 in the harvest log files.\n\
 This is mostly useful for silage.");
-    frame.add ("combine", false);
+    frame.set ("combine", false);
     frame.order ("crop");
   }
 } ActionHarvestBase_syntax;
@@ -299,21 +299,21 @@ It is intended for crops like tomatoes, that are harvested multiple times.")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.add ("crop", Value::String, Value::Const, 
+    frame.declare ("crop", Value::String, Value::Const, 
                 "Name of the crop to pluck.\n\
 If you specify 'all', all crops will be plucked.\n\
 If there are no crop on the field with the specified name,\n\
 nothing will happen.");
-    frame.add ("crop", Vegetation::all_crops ());
-    frame.add_fraction ("stem", Value::Const, "\
+    frame.set ("crop", Vegetation::all_crops ());
+    frame.declare_fraction ("stem", Value::Const, "\
 Fraction of stem to pluck.");
-    frame.add ("stem", 0.0);
-    frame.add_fraction ("leaf", Value::Const, "\
+    frame.set ("stem", 0.0);
+    frame.declare_fraction ("leaf", Value::Const, "\
 Fraction of leaves to pluck.");
-    frame.add ("leaf", 0.0);
-    frame.add_fraction ("sorg", Value::Const, "\
+    frame.set ("leaf", 0.0);
+    frame.declare_fraction ("sorg", Value::Const, "\
 Fraction of storage organ to pluck.");
-    frame.add ("sorg", 1.0);
+    frame.set ("sorg", 1.0);
     frame.order ("crop");
   }
 } ActionPluck_syntax;

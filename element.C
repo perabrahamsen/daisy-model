@@ -81,7 +81,7 @@ static struct ElementAtomSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
     
-    frame.add ("mass", "g/mol", Value::Const, "Atomic mass.");
+    frame.declare ("mass", "g/mol", Value::Const, "Atomic mass.");
 
   }
 } ElementAtom_syntax;

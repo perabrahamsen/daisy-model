@@ -1761,20 +1761,20 @@ See Mollerup 2007 for details.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_object ("solver", Solver::component, 
+    frame.declare_object ("solver", Solver::component, 
                       Value::Const, Value::Singleton, "\
 Model used for solving matrix equation system.");
-    frame.add ("solver", "cxsparse");
-    frame.add ("enable_boundary_diffusion", Value::Boolean, Value::Const, "\
+    frame.set ("solver", "cxsparse");
+    frame.declare ("enable_boundary_diffusion", Value::Boolean, Value::Const, "\
 If this is set, diffusion over boundaries is enabled."); 
-    frame.add ("enable_boundary_diffusion", true);
-    frame.add ("debug", Value::Integer, Value::Const, "\
+    frame.set ("enable_boundary_diffusion", true);
+    frame.declare ("debug", Value::Integer, Value::Const, "\
 Enable additional debug message.\n\
 A value of 0 means no message, higher numbers means more messages.");
-    frame.add ("debug", 0);
-    frame.add ("upstream_weight", Value::Fraction(), Value::Const, "\
+    frame.set ("debug", 0);
+    frame.declare ("upstream_weight", Value::Fraction(), Value::Const, "\
 Upstream weighting factor: 1 = full upstream formulation, 0.5 = equal weight.");
-    frame.add ("upstream_weight", 1.0);
+    frame.set ("upstream_weight", 1.0);
  
   }
 } TransportMollerup_syntax;

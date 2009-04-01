@@ -238,22 +238,22 @@ OBSOLETE: Use the USDA or FAO model instead.")
   void load_frame (Frame& frame) const
   { 
     frame.add_check (check_alist);
-    frame.add ("clay", Value::None (), Check::non_negative (), Value::Const,
+    frame.declare ("clay", Value::None (), Check::non_negative (), Value::Const,
                 "Relative fraction of clay in soil.");
-    frame.add ("silt", Value::None (), Check::non_negative (), Value::Const,
+    frame.declare ("silt", Value::None (), Check::non_negative (), Value::Const,
                 "Relative fraction of silt in soil.");
-    frame.add ("fine_sand", Value::None (), Check::non_negative (), 
+    frame.declare ("fine_sand", Value::None (), Check::non_negative (), 
                 Value::OptionalConst,
                 "Relative fraction of fine sand in soil.\n\
 NOTE: Not a real texture class, use 'sand' instead.");
-    frame.add ("coarse_sand", Value::None (), Check::non_negative (), 
+    frame.declare ("coarse_sand", Value::None (), Check::non_negative (), 
                 Value::OptionalConst,
                 "Relative fraction of coarse sand in soil.\n\
 NOTE: Not a real texture class, use 'sand' instead.");
-    frame.add ("sand", Value::None (), Check::non_negative (), 
+    frame.declare ("sand", Value::None (), Check::non_negative (), 
                 Value::OptionalConst,
                 "Relative fraction of sand in soil.");
-    frame.add ("humus", Value::None (), Check::non_negative (), 
+    frame.declare ("humus", Value::None (), Check::non_negative (), 
                 Value::Const,
                 "Relative fraction of humus in soil.");
 
@@ -268,11 +268,11 @@ Tecture for implicit aquitard horizon.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("clay", 50.0);
-    frame.add ("silt", 20.0);
-    frame.add ("sand", 29.99);
-    frame.add ("humus", 0.01);
-    frame.add ("dry_bulk_density", 2.0);
+    frame.set ("clay", 50.0);
+    frame.set ("silt", 20.0);
+    frame.set ("sand", 29.99);
+    frame.set ("humus", 0.01);
+    frame.set ("dry_bulk_density", 2.0);
   }
 } HorizonAquitard_syntax;
 

@@ -259,13 +259,13 @@ Fetch::initialize (const std::vector<Fetch*>& fetch,
 void
 Fetch::load_syntax (Frame& frame)
 { 
-  frame.add ("tag", Value::String, Value::Const, "\
+  frame.declare ("tag", Value::String, Value::Const, "\
 The tag of a column in the log file to summarize in this line.");
-  frame.add ("factor", Value::None (), Value::Const, "\
+  frame.declare ("factor", Value::None (), Value::Const, "\
 Factor to multiply with to get the sum.\n\
 Typically 1.0 to add this line, or -1.0 to subtract it.");
-  frame.add ("factor", 1.0);
-  frame.add ("name", Value::String, Value::OptionalConst, "\
+  frame.set ("factor", 1.0);
+  frame.declare ("name", Value::String, Value::OptionalConst, "\
 Name to use for this line.  By default use the tag.");
   frame.order ("tag");
 }

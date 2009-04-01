@@ -139,15 +139,15 @@ static struct DomsorpStandardSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_object ("transform", Transform::component,
+    frame.declare_object ("transform", Transform::component,
                        "Tranformation process between DOM and SOM.");
-    frame.add ("dom_pool", Value::Integer, Value::Const,
+    frame.declare ("dom_pool", Value::Integer, Value::Const,
 		"Number of the DOM pool affected by the transformation.");
-    frame.add ("som_pool", Value::Integer, Value::Const,
+    frame.declare ("som_pool", Value::Integer, Value::Const,
 		"Number of the SOM pool affected by the transformation.");
-    frame.add ("S_C", "g C/cm^3/h", Value::LogOnly, Value::Sequence,
+    frame.declare ("S_C", "g C/cm^3/h", Value::LogOnly, Value::Sequence,
 		"Carbon converted from DOM to SOM (may be negative).");
-    frame.add ("S_N", "g N/cm^3/h", Value::LogOnly, Value::Sequence,
+    frame.declare ("S_N", "g N/cm^3/h", Value::LogOnly, Value::Sequence,
 		"Carbon converted from DOM to SOM (may be negative).");
 
   }

@@ -31,13 +31,13 @@
 void 
 Model::load_model (Frame& frame)
 { 
-  frame.add ("description", Value::String, Value::OptionalConst, "\
+  frame.declare ("description", Value::String, Value::OptionalConst, "\
 Description of this model or parameterization.\n\
 The value will appear in the reference manual, and may also appear in some \
 GUI front ends.");
-  frame.add ("cite", Value::String, Value::Const, Value::Sequence, "\
+  frame.declare ("cite", Value::String, Value::Const, Value::Sequence, "\
 BibTeX keys that would be relevant for this model or paramterization.");
-  frame.add ("cite", std::vector<symbol> ());
+  frame.set_empty ("cite");
 }
 
 Model::Model ()

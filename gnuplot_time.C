@@ -349,24 +349,24 @@ static struct GnuplotTimeSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_submodule ("begin", Value::OptionalConst,
+    frame.declare_submodule ("begin", Value::OptionalConst,
 			  "First date at x-axis.", Time::load_syntax);
-    frame.add_submodule ("end", Value::OptionalConst,
+    frame.declare_submodule ("end", Value::OptionalConst,
 			  "Last date at x-axis.", Time::load_syntax);
-    frame.add ("ymin", Value::User (), Value::OptionalConst, "\
+    frame.declare ("ymin", Value::User (), Value::OptionalConst, "\
 Fixed lowest value on left y-axis.\n\
 By default determine this from the data.");
-    frame.add ("ymax", Value::User (), Value::OptionalConst, "\
+    frame.declare ("ymax", Value::User (), Value::OptionalConst, "\
 Fixed highest value on right y-axis.\n\
 By default determine this from the data.");
-    frame.add ("y2min", Value::User (), Value::OptionalConst, "\
+    frame.declare ("y2min", Value::User (), Value::OptionalConst, "\
 Fixed lowest value on left y-axis.\n\
 By default determine this from the data.");
-    frame.add ("y2max", Value::User (), Value::OptionalConst, "\
+    frame.declare ("y2max", Value::User (), Value::OptionalConst, "\
 Fixed highest value on right y-axis.\n\
 By default determine this from the data.");
                 
-    frame.add_object ("source", Source::component, Value::State, 
+    frame.declare_object ("source", Source::component, Value::State, 
                        Value::Sequence, "\
 Time series to plot.");
   }

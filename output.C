@@ -212,19 +212,19 @@ Output::~Output ()
 void
 Output::load_syntax (Frame& frame)
 {
-  frame.add_object ("output", Log::component,
+  frame.declare_object ("output", Log::component,
                      Value::State, Value::Sequence,
                      "List of logs for output during the simulation.");
-  frame.add_object ("activate_output", Condition::component,
+  frame.declare_object ("activate_output", Condition::component,
                      "Activate output logs when this condition is true.\n\
 You can use the 'after' condition to avoid logging during an initialization\n\
 period.");
-  frame.add ("activate_output", "true");
+  frame.set ("activate_output", "true");
 
-  frame.add_object ("exchange", MScope::component,
+  frame.declare_object ("exchange", MScope::component,
                      Value::Const, Value::Sequence, "\
 List of exchange items for communicating with external models.");
-  frame.add_empty ("exchange");
+  frame.set_empty ("exchange");
 
   // The log_time paramater.
   static VCheck::Enum valid_component;
@@ -240,10 +240,10 @@ List of default time components to include in log files. Choose between:\n";
       if (empty_valid)
 	valid_component.add (name);
     }
-  frame.add ("log_time_columns",
+  frame.declare ("log_time_columns",
 	      Value::String, Value::Const, Value::Sequence, 
 	      log_time_doc);
-  frame.add_check ("log_time_columns", valid_component);
+  frame.set_check ("log_time_columns", valid_component);
   std::vector<symbol> default_time;
   default_time.push_back (symbol ("year"));
   default_time.push_back (symbol ("month"));
@@ -253,7 +253,7 @@ List of default time components to include in log files. Choose between:\n";
   default_time.push_back (symbol ("minute"));
   default_time.push_back (symbol ("second"));
 #endif
-  frame.add ("log_time_columns", default_time);
+  frame.set ("log_time_columns", default_time);
 }
 
 // output.C ends here.

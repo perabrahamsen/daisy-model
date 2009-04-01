@@ -243,20 +243,20 @@ static struct Rootdens_G_PSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_strings ("cite", "gp74");
-    frame.add ("DensRtTip", "cm/cm^3", Check::positive (), Value::Const,
+    frame.set_strings ("cite", "gp74");
+    frame.declare ("DensRtTip", "cm/cm^3", Check::positive (), Value::Const,
                 "Root density at (potential) penetration depth.");
-    frame.add ("DensRtTip", 0.1);
-    frame.add ("MinDens", "cm/cm^3", Check::non_negative (), Value::Const,
+    frame.set ("DensRtTip", 0.1);
+    frame.declare ("MinDens", "cm/cm^3", Check::non_negative (), Value::Const,
                 "Minimal root density\n\
 Root density will never be below this, as long as there is enough root mass.\n \
 Extra root mass will be distributed according to Gerwitz and Page.\n\
 If there are too little root mass, the root will have the same density\n\
 all the way down.");
-    frame.add ("MinDens", 0.0);
-    frame.add ("a", "cm^-1", Value::LogOnly, "Form parameter.\n\
+    frame.set ("MinDens", 0.0);
+    frame.declare ("a", "cm^-1", Value::LogOnly, "Form parameter.\n\
 Calculated from 'DensRtTip'.");
-    frame.add ("L0", "cm/cm^3", Value::LogOnly,
+    frame.declare ("L0", "cm/cm^3", Value::LogOnly,
                 "Root density at soil surface.");
   }
 } Rootdens_G_P_syntax;

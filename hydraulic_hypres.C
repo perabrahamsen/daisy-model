@@ -329,7 +329,7 @@ See <http://www.macaulay.ac.uk/hypres/>.")
   { 
     frame.add_check (check_alist);
     Hydraulic::load_K_sat_optional (frame);
-    frame.add ("topsoil", Value::Boolean, Value::OptionalConst, "\
+    frame.declare ("topsoil", Value::Boolean, Value::OptionalConst, "\
 If set true this horizon will be initialized as a topsoil (i.e. the\n\
 plowing layer), if set false it will be initialized as a subsoil.\n\
 By default, the horizon will be initialized as a topsoil if and only if\n\

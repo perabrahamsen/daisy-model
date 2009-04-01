@@ -280,25 +280,25 @@ Shared parameters for volume based logs.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("density", Value::Boolean, Value::Const, 
+    frame.declare ("density", Value::Boolean, Value::Const, 
 		"If true, divide total content with volume.\n\
 Otherwise, obey 'density_z', 'density_x', and 'density_y'.");
-    frame.add ("density", false);
-    frame.add ("density_z", Value::Boolean, Value::Const, 
+    frame.set ("density", false);
+    frame.declare ("density_z", Value::Boolean, Value::Const, 
 		"If true, divide total content with volume height.\n\
 This parameter is ignored if 'density' is true.");
-    frame.add ("density_x", Value::Boolean, Value::Const, 
+    frame.declare ("density_x", Value::Boolean, Value::Const, 
 		"If true, divide total content with volume width.\n\
 This parameter is ignored if 'density' is true.");
-    frame.add ("density_y", Value::Boolean, Value::Const, 
+    frame.declare ("density_y", Value::Boolean, Value::Const, 
 		"If true, divide total content with volume depth.\n\
 This parameter is ignored if 'density' is true.");
-    frame.add_object ("volume", Volume::component, 
+    frame.declare_object ("volume", Volume::component, 
                        Value::Const, Value::Singleton,
                        "Soil volume to log.");
-    frame.add ("volume", "box");
+    frame.set ("volume", "box");
 
-    frame.add ("min_root_density", "cm/cm^3", Value::Const, "\
+    frame.declare ("min_root_density", "cm/cm^3", Value::Const, "\
 Minimum root density in cells.\n\
 \n\
 Set this paramater to a positive amount in order to log only cells\n\
@@ -309,11 +309,11 @@ scaled down accordingly.  That is, if there are no roots, the data for\n\
 the cell will be scaled to zero, while if there is only half the\n\
 specified minimum root density, the data for the cell will be scaled\n\
 to 0.5.");
-    frame.add ("min_root_density", -1.0);
-    frame.add ("min_root_crop", Value::String, Value::Const, "\
+    frame.set ("min_root_density", -1.0);
+    frame.declare ("min_root_crop", Value::String, Value::Const, "\
 Name of crop whose roots scould be used for the root density requirements.\n\
 Set this to \"*\" to use all roots.");
-    frame.add ("min_root_crop", "*"); // Select::wildcard may not be initialized.
+    frame.set ("min_root_crop", "*"); // Select::wildcard may not be initialized.
   }
 } SelectVolume_base;
 
@@ -325,9 +325,9 @@ Summarize specified volume.")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.add ("density_z", false);
-    frame.add ("density_x", false);
-    frame.add ("density_y", false);
+    frame.set ("density_z", false);
+    frame.set ("density_x", false);
+    frame.set ("density_y", false);
   }
 } Select_volume_syntax;
 
@@ -341,14 +341,14 @@ This is similar to 'volume', except for the default values of\n         \
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.add ("density_z", false);
-    frame.add ("density_x", true);
-    frame.add ("density_y", true);
-    frame.add ("from", "cm", Value::OptionalConst,
+    frame.set ("density_z", false);
+    frame.set ("density_x", true);
+    frame.set ("density_y", true);
+    frame.declare ("from", "cm", Value::OptionalConst,
 		"Specify height (negative) to measure from.\n\
 By default, measure from the top.\n\
 OBSOLETE: Use (volume box (top FROM)) instead.");
-    frame.add ("to", "cm", Value::OptionalConst,
+    frame.declare ("to", "cm", Value::OptionalConst,
 		"Specify height (negative) to measure interval.\n\
 By default, measure to the bottom.\n\
 OBSOLETE: Use (volume box (bottom TO)) instead.");
@@ -398,13 +398,13 @@ Shared parameters for water limited volumn logging.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("h", "cm", Check::non_positive (), Value::Const, 
+    frame.declare ("h", "cm", Check::non_positive (), Value::Const, 
                 "Pressure to log water content for.");
-    frame.add ("h_ice", "cm", Check::non_positive (), Value::Const, 
+    frame.declare ("h_ice", "cm", Check::non_positive (), Value::Const, 
 		"Pressure at which all air is out of the matrix.\n\
 When there are no ice, this is 0.0.  When there are ice, the ice is\n\
 presumed to occupy the large pores, so it is h (Theta_sat - X_ice).");
-    frame.add ("h_ice", 0.0);
+    frame.set ("h_ice", 0.0);
   }
 } SelectWater_syntax;
   
@@ -416,9 +416,9 @@ Summarize water content in the specified volume.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("density_z", false);
-    frame.add ("density_x", false);
-    frame.add ("density_y", false);
+    frame.set ("density_z", false);
+    frame.set ("density_x", false);
+    frame.set ("density_y", false);
  }    
 } Select_water_volume_syntax;
 
@@ -426,14 +426,14 @@ static struct SelectWaterIntervalParam : public DeclareParam
 {
   void load_frame (Frame& frame) const
   {
-    frame.add ("density_z", false);
-    frame.add ("density_x", true);
-    frame.add ("density_y", true);
-    frame.add ("from", "cm", Value::OptionalConst,
+    frame.set ("density_z", false);
+    frame.set ("density_x", true);
+    frame.set ("density_y", true);
+    frame.declare ("from", "cm", Value::OptionalConst,
 		"Specify height (negative) to measure from.\n\
 By default, measure from the top.\n\
 OBSOLETE: Use (volume box (top FROM)) instead.");
-    frame.add ("to", "cm", Value::OptionalConst,
+    frame.declare ("to", "cm", Value::OptionalConst,
 		"Specify height (negative) to measure interval.\n\
 By default, measure to the bottom.\n\
 OBSOLETE: Use (volume box (bottom TO)) instead.");

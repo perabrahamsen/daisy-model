@@ -722,15 +722,15 @@ Shared paramaters for handling solutes.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_object ("matrix_solute", Transport::component, 
+    frame.declare_object ("matrix_solute", Transport::component, 
                        Value::State, Value::Sequence,
                        "Matrix solute transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends.");
-    frame.add_object ("matrix_solid", Transport::component, 
+    frame.declare_object ("matrix_solid", Transport::component, 
                        Value::Const, Value::Singleton, "\
 Matrix solute transport model used for fully sorbed constituents.");
-    frame.add ("matrix_solid", "none");
+    frame.set ("matrix_solid", "none");
   }
 } MovementSolute_syntax;
 

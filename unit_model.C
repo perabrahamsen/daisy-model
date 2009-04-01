@@ -141,9 +141,9 @@ Base parameterization for all SI based units.")
       {
         const symbol unit = UnitSI::base_unit[i].unit;
         const symbol dimension = UnitSI::base_unit[i].dimension;
-        frame.add (dimension, Value::Integer, Value::Const, "\
+        frame.declare (dimension, Value::Integer, Value::Const, "\
 Dimension, base unit [" + unit + "].");
-        frame.add (dimension, 0);
+        frame.set (dimension, 0);
       }
   }
 } UnitSI_syntax;
@@ -221,14 +221,14 @@ struct DeclareSIFactor : public DeclareParam
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("length", length);
-    frame.add ("mass", mass);
-    frame.add ("time", time);
-    frame.add ("electric_current", electric_current);
-    frame.add ("thermodynamic_temperature", thermodynamic_temperature);
-    frame.add ("amount_of_substance", amount_of_substance);
-    frame.add ("luminous_intensity", luminous_intensity);
-    frame.add ("factor", factor);
+    frame.set ("length", length);
+    frame.set ("mass", mass);
+    frame.set ("time", time);
+    frame.set ("electric_current", electric_current);
+    frame.set ("thermodynamic_temperature", thermodynamic_temperature);
+    frame.set ("amount_of_substance", amount_of_substance);
+    frame.set ("luminous_intensity", luminous_intensity);
+    frame.set ("factor", factor);
   }
 };
 
@@ -615,7 +615,7 @@ Connvert to SI base units by multiplying with a factor.")
     static const symbol name ("SIfactor");
     
     // Add the 'SIfactor' base model.
-    frame.add ("factor", Value::None (), Check::non_zero (), Value::Const, "\
+    frame.declare ("factor", Value::None (), Check::non_zero (), Value::Const, "\
 Factor to multiply with to get base unit.");
   }
 } UnitSIFactor_syntax;
@@ -736,10 +736,10 @@ Connvert to base units by multiplying with a factor.")
   void load_frame (Frame& frame) const
   {
     // Add the 'factor' factor model.
-    frame.add ("base", Value::String, Value::Const, "\
+    frame.declare ("base", Value::String, Value::Const, "\
 Base unit to convert to and from.");
     // TODO: Should add check that 'base' is indeed a base unit.
-    frame.add ("factor", Value::None (), Check::non_zero (), Value::Const, "\
+    frame.declare ("factor", Value::None (), Check::non_zero (), Value::Const, "\
 Factor to multiply with to get base unit.");
   }
 } UnitFactor_syntax;
@@ -756,8 +756,8 @@ struct DeclareBaseFactor : public DeclareParam
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.add ("base", base);
-    frame.add ("factor", factor);
+    frame.set ("base", base);
+    frame.set ("factor", factor);
   }
 };
 
@@ -808,15 +808,15 @@ Connvert to base units by multiplying factor, then substracting offset.")
   void load_frame (Frame& frame) const
   {
     // Add the 'SIoffset' offset model.
-    frame.add ("base", Value::String, Value::Const, "\
+    frame.declare ("base", Value::String, Value::Const, "\
 Base unit to convert to and from.");
     // TODO: Should add check that 'base' is indeed a base unit.
-    frame.add ("factor", Value::None (), Check::non_zero (), Value::Const, "\
+    frame.declare ("factor", Value::None (), Check::non_zero (), Value::Const, "\
 Factor to multiply with to get base unit.");
-    frame.add ("factor", 1.0);
-    frame.add ("offset", Value::None (), Value::Const, "\
+    frame.set ("factor", 1.0);
+    frame.declare ("offset", Value::None (), Value::Const, "\
 Offset to add after multiplying with factor to get base unit.");
-    frame.add ("offset", 0.0);
+    frame.set ("offset", 0.0);
   }
 } UnitOffset_syntax;
 
@@ -835,9 +835,9 @@ struct DeclareBaseOffset : public DeclareParam
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.add ("base", base);
-    frame.add ("factor", factor);
-    frame.add ("offset", offset);
+    frame.set ("base", base);
+    frame.set ("factor", factor);
+    frame.set ("offset", offset);
   }
 };
 

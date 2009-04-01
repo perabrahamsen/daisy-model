@@ -164,14 +164,14 @@ A weather model with precipitation at regular intervals.")
   { }
   void load_frame (Frame& frame) const
     { 
-      frame.add ("precipitation_value", "mm/h", Value::Const,
+      frame.declare ("precipitation_value", "mm/h", Value::Const,
 		  "Amount of precipitation.");
-      frame.add ("precipitation_value", 0.0);
-      frame.add ("interval", Value::Integer, Value::Const,
+      frame.set ("precipitation_value", 0.0);
+      frame.declare ("interval", Value::Integer, Value::Const,
 		  "Number of hours between each precipitation event.");
-      frame.add ("interval", 1);
-      frame.add ("reference_evapotranspiration_value", "mm/h", Value::Const,
+      frame.set ("interval", 1);
+      frame.declare ("reference_evapotranspiration_value", "mm/h", Value::Const,
 		  "Constant reference evapotranspiration.");
-      frame.add ("reference_evapotranspiration_value", -1.0);
+      frame.set ("reference_evapotranspiration_value", -1.0);
     }
 } WeatherSimple_syntax;

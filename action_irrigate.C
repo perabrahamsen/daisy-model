@@ -176,26 +176,26 @@ Shared parameter for irrigate actions.")
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);	
-    frame.add ("days", Value::Integer, Value::Const, 
+    frame.declare ("days", Value::Integer, Value::Const, 
                 "Irrigate this number of days.");
-    frame.add ("days", 0);
-    frame.add ("hours", Value::Integer, Value::OptionalConst, 
+    frame.set ("days", 0);
+    frame.declare ("hours", Value::Integer, Value::OptionalConst, 
                 "Irrigate this number of hours.\n\
 By default, irrigate 1 hour if days is 0, and 0 hours plus the specified\n\
 number of days else.");
-    frame.add ("remaining_time", "h", Value::OptionalState,
+    frame.declare ("remaining_time", "h", Value::OptionalState,
                 "Irrigate this number of hours.\
 Setting this overrides the 'days' and 'hours' parameters.");
-    frame.add_object ("flux", Number::component, 
+    frame.declare_object ("flux", Number::component, 
                        Value::Const, Value::Singleton, 
 "Amount of irrigation applied.");
     frame.order ("flux");
-    frame.add ("temperature", "dg C", 
+    frame.declare ("temperature", "dg C", 
 		Check::positive (), Value::OptionalConst,
 		"Temperature of irrigation (default: air temperature).");
-    frame.add_submodule_sequence ("solute", Value::Const, "\
+    frame.declare_submodule_sequence ("solute", Value::Const, "\
 Solutes in irrigation water.", load_ppm);
-    frame.add_empty ("solute");
+    frame.set_empty ("solute");
   }
 } ActionIrrigateBase_syntax;
 
@@ -288,7 +288,7 @@ static struct ActionIrrigateTopSyntax : DeclareModel
 OBSOLETE.  Use 'irrigate_overhead' instead.")
   { }
   void load_frame (Frame& frame) const
-  { frame.add_check (&check_alist); }
+  { frame.add_check (check_alist); }
 } ActionIrrigateTop_syntax;
 
 static struct ActionIrrigateSubsoilSyntax : DeclareModel
@@ -322,14 +322,14 @@ Currently, the 'temperature' parameter is ignored.")
   { 
     frame.add_check (check_alist);	
 
-    frame.add_object ("volume", Volume::component, 
+    frame.declare_object ("volume", Volume::component, 
                        Value::Const, Value::Singleton,
                        "Soil volume to add irritaion.");
-    frame.add ("volume", "box");
-    frame.add ("from", "cm", Check::non_positive (), Value::OptionalConst, "\
+    frame.set ("volume", "box");
+    frame.declare ("from", "cm", Check::non_positive (), Value::OptionalConst, "\
 Height where you want to start the incorporation (a negative number).\n\
 OBSOLETE: Use (volume box (top FROM)) instead.");
-    frame.add ("to", "cm", Check::non_positive (), Value::OptionalConst, "\
+    frame.declare ("to", "cm", Check::non_positive (), Value::OptionalConst, "\
 Height where you want to end the incorporation (a negative number).\n\
 OBSOLETE: Use (volume box (bottom TO)) instead.");
   }

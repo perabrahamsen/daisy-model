@@ -329,43 +329,43 @@ This is not a model, but a list of parameters shared by all weather models.")
   void load_frame (Frame& frame) const
   {
     // Overwritten in weather_none.C
-    frame.add ("air_temperature", "dg C", Value::LogOnly,
+    frame.declare ("air_temperature", "dg C", Value::LogOnly,
                 "Temperature this hour.");
-    frame.add ("global_radiation", "W/m^2", Value::LogOnly,
+    frame.declare ("global_radiation", "W/m^2", Value::LogOnly,
                 "Global radiation this hour.");
 
     // Logs.
-    frame.add ("daily_air_temperature", "dg C", Value::LogOnly,
+    frame.declare ("daily_air_temperature", "dg C", Value::LogOnly,
                 "Average temperature this day.");
-    frame.add ("daily_min_air_temperature", "dg C", Value::LogOnly,
+    frame.declare ("daily_min_air_temperature", "dg C", Value::LogOnly,
                 "Minumum temperature this day.");
-    frame.add ("daily_max_air_temperature", "dg C", Value::LogOnly,
+    frame.declare ("daily_max_air_temperature", "dg C", Value::LogOnly,
                 "Maximum temperature this day.");
-    frame.add ("daily_global_radiation", "W/m^2", Value::LogOnly,
+    frame.declare ("daily_global_radiation", "W/m^2", Value::LogOnly,
                 "Average radiation this day.");
-    frame.add ("diffuse_radiation", "W/m^2", Value::LogOnly,
+    frame.declare ("diffuse_radiation", "W/m^2", Value::LogOnly,
                 "Diffuse radiation this hour.");
-    frame.add ("reference_evapotranspiration", "mm/h", Value::LogOnly,
+    frame.declare ("reference_evapotranspiration", "mm/h", Value::LogOnly,
                 "Reference evapotranspiration this hour");
-    frame.add ("daily_extraterrastial_radiation", "W/m^2", Value::LogOnly,
+    frame.declare ("daily_extraterrastial_radiation", "W/m^2", Value::LogOnly,
                 "Extraterrestrial radiation this day.");
-    frame.add ("rain", "mm/h", Value::LogOnly, "Rain this hour.");
-    frame.add ("snow", "mm/h", Value::LogOnly, "Snow this hour.");
-    frame.add ("precipitation", "mm/h", Value::LogOnly, 
+    frame.declare ("rain", "mm/h", Value::LogOnly, "Rain this hour.");
+    frame.declare ("snow", "mm/h", Value::LogOnly, "Snow this hour.");
+    frame.declare ("precipitation", "mm/h", Value::LogOnly, 
                 "Precipitation this hour.");
-    frame.add_fraction ("cloudiness", Value::LogOnly,
+    frame.declare_fraction ("cloudiness", Value::LogOnly,
                 "Fraction of sky covered by clouds [0-1].");
-    frame.add_fraction ("daily_cloudiness", Value::LogOnly,
+    frame.declare_fraction ("daily_cloudiness", Value::LogOnly,
                 "Fraction of sky covered by clouds [0-1].");
-    frame.add ("vapor_pressure", "Pa", Value::LogOnly, "Humidity.");
-    frame.add ("relative_humidity", Value::Fraction (), Value::LogOnly,
+    frame.declare ("vapor_pressure", "Pa", Value::LogOnly, "Humidity.");
+    frame.declare ("relative_humidity", Value::Fraction (), Value::LogOnly,
                 "Relative humidity.");
-    frame.add ("wind", "m/s", Value::LogOnly, "Wind speed.");
-    frame.add ("day_length", "h", Value::LogOnly,
+    frame.declare ("wind", "m/s", Value::LogOnly, "Wind speed.");
+    frame.declare ("day_length", "h", Value::LogOnly,
                 "Number of light hours this day.");
-    frame.add ("day_cycle", Value::None (), Value::LogOnly,
+    frame.declare ("day_cycle", Value::None (), Value::LogOnly,
                 "Fraction of daily radiation received this hour.");
-    frame.add_submodule_sequence ("deposit", Value::LogOnly, "\
+    frame.declare_submodule_sequence ("deposit", Value::LogOnly, "\
 Total atmospheric deposition of nitrogen.", load_flux);
     }
 } WeatherBase_syntax;

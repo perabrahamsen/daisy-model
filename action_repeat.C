@@ -91,7 +91,7 @@ struct ActionRepeat : public Action
   { 
     daisy_assert (frame.get ());
     if (!frame->check ("do"))
-      frame->add ("do", frame->model ("repeat"));
+      frame->set ("do", frame->model ("repeat"));
   }
   ~ActionRepeat ()
   { }
@@ -109,10 +109,10 @@ The action may take several timesteps.")
   { }
   void load_frame (Frame& frame) const
   {
-      frame.add_object ("repeat", Action::component,
+      frame.declare_object ("repeat", Action::component,
                          Value::Const, Value::Singleton,
                          "Action to perform repeatedly.");
-      frame.add_object ("do", Action::component, 
+      frame.declare_object ("do", Action::component, 
                          Value::OptionalState, Value::Singleton,
                          "Action currently being performed.");
       frame.order ("repeat");

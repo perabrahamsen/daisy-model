@@ -44,8 +44,8 @@ struct NumberPLF : public Number
 
     static void load_syntax (Frame& frame)
     {
-      frame.add ("x", Value::User (), Value::Const, "Operand.");
-      frame.add ("y", Value::User (), Value::Const, "Value.");
+      frame.declare ("x", Value::User (), Value::Const, "Operand.");
+      frame.declare ("y", Value::User (), Value::Const, "Value.");
       frame.order ("x", "y");
     }
     
@@ -195,15 +195,15 @@ static struct NumberPLFSyntax : public DeclareModel
   {
     frame.add_check (NumberPLF::check_alist);
 
-    frame.add_object ("operand", Number::component,
+    frame.declare_object ("operand", Number::component,
                        "Operand for this function.");
-    frame.add ("domain", Value::String, Value::Const, "\
+    frame.declare ("domain", Value::String, Value::Const, "\
 Unit for the operand of the function.");
-    frame.add ("domain", Value::Unknown ());
-    frame.add ("range", Value::String, Value::Const, "\
+    frame.set ("domain", Value::Unknown ());
+    frame.declare ("range", Value::String, Value::Const, "\
 Unit for the operand of the function.");
-    frame.add ("range", Value::Unknown ());
-    frame.add_submodule_sequence ("points", Value::Const, "\
+    frame.set ("range", Value::Unknown ());
+    frame.declare_submodule_sequence ("points", Value::Const, "\
 List of points (x y) defining the piecewise linear function.\n\
 The x values must be ordered lowest first.", NumberPLF::Point::load_syntax);
 

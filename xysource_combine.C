@@ -142,18 +142,18 @@ Data from times series are matched by date.")
     GnuplotUtil::load_style (frame, "\
 By default, let the first source decide.", "\
 By default a combination of the x and y objects.");
-    frame.add_object ("source", Source::component, 
+    frame.declare_object ("source", Source::component, 
                        Value::State, Value::Sequence, "\
 List of sources for data.\n\
 The style information for the sources is ignored, but the dates, title\n\
 and value is used as specified by 'expr' to calculate the combined\n\
 date and value pairs.");
-    frame.add_object ("x", Number::component, 
+    frame.declare_object ("x", Number::component, 
                        Value::Const, Value::Singleton, "\
 Expression for calculating the x value for this source for each row.\n\
 A row is any date found in any of the member of 'source'.  The\n\
 expression may refer to the value of each source by its title.");
-    frame.add_object ("y", Number::component, 
+    frame.declare_object ("y", Number::component, 
                        Value::Const, Value::Singleton, "\
 Expression for calculating the y value for this source for each row.\n\
 A row is any date found in any of the member of 'source'.  The\n\

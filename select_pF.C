@@ -119,18 +119,18 @@ The original dimension is assumed to be in cm, no matter what is specified.")
   void load_frame (Frame& frame) const
   { 
     static VCheck::Enum current_only ("current");
-    frame.add_check ("handle", current_only);
+    frame.set_check ("handle", current_only);
     frame.add_check (check_alist);
 
-    frame.add ("max_h", "cm", Check::negative (), Value::Const, 
+    frame.declare ("max_h", "cm", Check::negative (), Value::Const, 
                 "Maximum water pressure in log.\n\
 Pressure above this value will be represented as this value.");
-    frame.add ("max_h", -0.1);
-    frame.add ("value", Value::Unknown (), Value::State, Value::Sequence,
+    frame.set ("max_h", -0.1);
+    frame.declare ("value", Value::Unknown (), Value::State, Value::Sequence,
 		"The current accumulated value.");
     std::vector<double> empty;
-    frame.add ("value", empty);
-    frame.add ("dimension", "pF");
+    frame.set ("value", empty);
+    frame.set ("dimension", "pF");
   }
 } Select_pF_syntax;
 

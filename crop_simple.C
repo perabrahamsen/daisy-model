@@ -520,60 +520,60 @@ static struct CropSimpleSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);
-    frame.add ("LAIvsTS", "dg C d", "m^2/m^2", Value::OptionalConst, 
+    frame.declare ("LAIvsTS", "dg C d", "m^2/m^2", Value::OptionalConst, 
 		"LAI as a function of T_sum");
-    frame.add ("LAIvsDay", "d", "m^2/m^2", Value::OptionalConst, 
+    frame.declare ("LAIvsDay", "d", "m^2/m^2", Value::OptionalConst, 
 		"LAI as a function of number of days since sowing.");
-    frame.add ("forced_LAI", "m^2/m^2", Check::non_negative (), 
+    frame.declare ("forced_LAI", "m^2/m^2", Check::non_negative (), 
 		Value::State, "\
 Minimum LAI, automatically cleared when exceeded by 'LAIvsTS'.");
-    frame.add ("forced_LAI", 0.0);
-    frame.add_submodule("Canopy", Value::State, "Canopy.",
+    frame.set ("forced_LAI", 0.0);
+    frame.declare_submodule("Canopy", Value::State, "Canopy.",
 			 CanopySimple::load_syntax);
-    frame.add ("height_max", "cm", Check::non_negative (), Value::Const, 
+    frame.declare ("height_max", "cm", Check::non_negative (), Value::Const, 
 		"Maximum height of plant, reached when flowering.");
-    frame.add ("height_max", 80.0);
-    frame.add ("T_sum", "dg C d", Check::non_negative (), Value::State, 
+    frame.set ("height_max", 80.0);
+    frame.declare ("T_sum", "dg C d", Check::non_negative (), Value::State, 
 		"Temperature sum since sowing (or spring).");
-    frame.add ("T_sum", 0.0);
-    frame.add ("day", "d", Check::non_negative (), Value::State, 
+    frame.set ("T_sum", 0.0);
+    frame.declare ("day", "d", Check::non_negative (), Value::State, 
 		"Number of days since sowing (or spring).");
-    frame.add ("day", 0.0);
-    frame.add ("spring", Value::Integer, Value::Const, 2,
+    frame.set ("day", 0.0);
+    frame.declare ("spring", Value::Integer, Value::Const, 2,
 		"Zero 'T_sum' at this month and day.");
     std::vector<int> spring_time;
     spring_time.push_back (3);
     spring_time.push_back (1);
-    frame.add ("spring", spring_time);
-    frame.add ("spring_LAI", "m^2/m^2", Check::non_negative (), Value::Const, 
+    frame.set ("spring", spring_time);
+    frame.declare ("spring_LAI", "m^2/m^2", Check::non_negative (), Value::Const, 
 		"Set 'forced_LAI' to this after spring clearence of 'T_sum'.");
-    frame.add ("spring_LAI", 0.1);
-    frame.add_submodule("Root", Value::State, "Root system.",
+    frame.set ("spring_LAI", 0.1);
+    frame.declare_submodule("Root", Value::State, "Root system.",
 			 RootSystem::load_syntax);
-    frame.add ("root_DM", "Mg DM/ha", Check::non_negative (), Value::Const, 
+    frame.declare ("root_DM", "Mg DM/ha", Check::non_negative (), Value::Const, 
 		"Fully developed root drymatter.");
-    frame.add ("root_DM", 2.0);
-    frame.add ("root_N", "kg N/ha", Check::non_negative (), Value::Const,
+    frame.set ("root_DM", 2.0);
+    frame.declare ("root_N", "kg N/ha", Check::non_negative (), Value::Const,
 		"Fully developed root N content.");
-    frame.add ("root_N", 20.0);
-    frame.add_object ("root_am", AOM::component, 
+    frame.set ("root_N", 20.0);
+    frame.declare_object ("root_am", AOM::component, 
                       Value::Const, Value::Sequence, "\
 Root AM parameters.");
-    frame.add_check ("root_am", AM::check_om_pools ());
-    frame.add ("root_am", AM::default_AM ());
-    frame.add ("potential_N", "kg N/ha", Check::non_negative (), Value::Const,
+    frame.set_check ("root_am", AM::check_om_pools ());
+    frame.set ("root_am", AM::default_AM ());
+    frame.declare ("potential_N", "kg N/ha", Check::non_negative (), Value::Const,
 		"Potential N content at harvest.");
-    frame.add ("N_demand", "g N/m^2", Value::LogOnly,
+    frame.declare ("N_demand", "g N/m^2", Value::LogOnly,
 		"Current potential N content.");
-    frame.add ("N_actual", "g N/m^2", Check::non_negative (), Value::State,
+    frame.declare ("N_actual", "g N/m^2", Check::non_negative (), Value::State,
 		"N uptake until now.");
-    frame.add ("N_actual", 0.0);
-    frame.add ("N_b", "kg N/ha", Check::non_negative (), Value::Const,
+    frame.set ("N_actual", 0.0);
+    frame.declare ("N_b", "kg N/ha", Check::non_negative (), Value::Const,
 		"N uptake form parameter.");
-    frame.add ("N_b", 10.0);
-    frame.add_fraction ("N_flowering", Value::Const, "\
+    frame.set ("N_b", 10.0);
+    frame.declare_fraction ("N_flowering", Value::Const, "\
 Fraction of potential N uptake reached at flowering.");
-    frame.add ("N_flowering", 0.9);
+    frame.set ("N_flowering", 0.9);
   }
 } simple_crop_syntax;
 

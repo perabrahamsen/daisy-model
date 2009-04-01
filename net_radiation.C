@@ -277,12 +277,12 @@ FAO recommendation.")
   void load_frame (Frame& frame) const
   {
     // Brunt.
-  frame.add ("a", Value::None (), Value::Const,
+  frame.declare ("a", Value::None (), Value::Const,
               "Brunt 'a' parameter (offset).");
-  frame.add ("a", 0.34);
-  frame.add ("b", "1/sqrt(kPa)", Value::Const,
+  frame.set ("a", 0.34);
+  frame.declare ("b", "1/sqrt(kPa)", Value::Const,
               "Brunt 'b' parameter (vapor pressure factor).");
-  frame.add ("b", 0.14);
+  frame.set ("b", 0.14);
   }
 } NetRadiationBrunt_syntax;
 
@@ -356,17 +356,17 @@ other meteorological data.")
   void load_frame (Frame& frame) const
   {
     // Logs.
-    frame.add ("net_radiation", "W/m^2", Value::LogOnly,
+    frame.declare ("net_radiation", "W/m^2", Value::LogOnly,
                 "The calculated net radiation (positive downwards).");
-    frame.add ("L_n", "W/m^2", Value::LogOnly,
+    frame.declare ("L_n", "W/m^2", Value::LogOnly,
                 "The calculated net longwave radiation (positive downwards).");
-    frame.add ("L_ia", "W/m^2", Value::LogOnly,
+    frame.declare ("L_ia", "W/m^2", Value::LogOnly,
                 "The calculated incoming longwave radiation (positive downwards).");
-    frame.add ("L_i0", "W/m^2", Value::LogOnly,
+    frame.declare ("L_i0", "W/m^2", Value::LogOnly,
                 "The calculated clear sky incoming longwave radiation (positive downwards).");
-    frame.add ("epsilon_0", Value::None(), Value::LogOnly,
+    frame.declare ("epsilon_0", Value::None(), Value::LogOnly,
                 "Atmospheric effective clearsky emmisivity (range 0-1).");
-    frame.add ("black_body_radiation", "W/m^2", Value::LogOnly, "\
+    frame.declare ("black_body_radiation", "W/m^2", Value::LogOnly, "\
 Radiation emitted by black bodies at current air temperature.\n\
 Stefan-Boltzmann's law.");
   }

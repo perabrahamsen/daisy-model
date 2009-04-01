@@ -87,7 +87,7 @@ The energy content in the fraction that hits the canopy is ignored.")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.add_strings ("cite", "brown87");
+    frame.set_strings ("cite", "brown87");
   }
 } RainergyBrown87_syntax;
 
@@ -136,7 +136,7 @@ static struct RainergyEUROSEMSyntax : DeclareModel
 Kinetic energy model taking vegetation into account.")
   { }
   void load_frame (Frame& frame) const
-  { frame.add_strings ("cite", "EUROSEM"); }
+  { frame.set_strings ("cite", "EUROSEM"); }
 } RainergyEUROSEM_syntax;
 
 // rainergy.C ends here.

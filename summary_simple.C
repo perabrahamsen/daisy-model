@@ -150,26 +150,26 @@ static struct SummarySimpleSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("where", Value::String, Value::OptionalConst,
+    frame.declare ("where", Value::String, Value::OptionalConst,
                 "File name to store the summary.\n\
 By default, the summary will be stored in daisy.log and the screen.");
-    frame.add ("title", Value::String, Value::OptionalConst,
+    frame.declare ("title", Value::String, Value::OptionalConst,
                 "Title of this summary.\n\
 By default, use the name of the parameterization.");
-    frame.add ("print_sum", Value::Boolean, Value::Const, 
+    frame.declare ("print_sum", Value::Boolean, Value::Const, 
                 "Print sum of all the summary lines.");
-    frame.add ("print_sum", true);
-    frame.add ("sum_name", Value::String, Value::Const,
+    frame.set ("print_sum", true);
+    frame.declare ("sum_name", Value::String, Value::Const,
                 "Name of the sum of all the entries.");
-    frame.add ("sum_name", "Sum");	
-    frame.add ("period", Value::String, Value::OptionalConst, "\
+    frame.set ("sum_name", "Sum");	
+    frame.declare ("period", Value::String, Value::OptionalConst, "\
 Set this to 'y', 'm', 'w', 'd' or 'h' to get fluxes per time period\n\
 instead of total amount.");
-    frame.add_submodule_sequence ("fetch", Value::Const, "\
+    frame.declare_submodule_sequence ("fetch", Value::Const, "\
 List of columns to fetch for the summary.", Fetch::load_syntax);
-    frame.add ("precision", Value::Integer, Value::Const,
+    frame.declare ("precision", Value::Integer, Value::Const,
                 "Number of digits to print after decimal point.");
-    frame.add ("precision", 2);
+    frame.set ("precision", 2);
   }
 } SummarySimple_syntax;
 

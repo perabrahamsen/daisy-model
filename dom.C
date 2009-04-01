@@ -183,33 +183,33 @@ DOM::load_syntax (Frame& frame)
   // Submodel.
 
   // Content.
-  frame.add_submodule ("C", Value::State,
+  frame.declare_submodule ("C", Value::State,
 			"Carbon content of DOM pool.",
 			DOE::load_syntax);
-  frame.add_submodule ("N", Value::State,
+  frame.declare_submodule ("N", Value::State,
 			"Nitrogen content of DOM pool.",
 			DOE::load_syntax);
 
   // Transport
-  frame.add ("diffusion_coefficient", "cm^2/s", Check::positive (),
+  frame.declare ("diffusion_coefficient", "cm^2/s", Check::positive (),
 	      Value::Const, "Diffusion coefficient.");
 
   // Turnover.
-  frame.add ("heat_factor", "dg C", Value::None (), Value::OptionalConst,
+  frame.declare ("heat_factor", "dg C", Value::None (), Value::OptionalConst,
 	      "Heat factor.  If empty, use default from 'OrganicMatter'.");
-  frame.add ("water_factor", "cm", Value::None (), Value::OptionalConst, "\
+  frame.declare ("water_factor", "cm", Value::None (), Value::OptionalConst, "\
 Water potential factor.  If empty, use default from 'OrganicMatter'.");
-  frame.add ("turnover_rate", "h^-1", Check::fraction (), 
+  frame.declare ("turnover_rate", "h^-1", Check::fraction (), 
 	      Value::OptionalConst,
 	      "Fraction converted to other pools each hour.\n\
 You must specify either this or 'turnover_halftime'.");
-  frame.add ("turnover_halftime", "h", Check::positive (), 
+  frame.declare ("turnover_halftime", "h", Check::positive (), 
 	      Value::OptionalConst,
 	      "Time until half had been converted to other pools.\n\
 You must specify either this or 'turnover_rate'.");
-  frame.add_fraction ("efficiency", Value::Const, Value::Sequence, "\
+  frame.declare_fraction ("efficiency", Value::Const, Value::Sequence, "\
 the efficiency this pool can be digested by each of the SMB pools.");
-  frame.add_fraction ("fractions", Value::Const, Value::Sequence, "\
+  frame.declare_fraction ("fractions", Value::Const, Value::Sequence, "\
 Fraction of this pool that ends up in each SMB pools");
 }
 

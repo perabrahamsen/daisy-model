@@ -433,75 +433,75 @@ stomataconductance model coupled as described by Collatz et al., 1991.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("Xn", "mol/mol/s", Check::positive (), Value::Const,
+    frame.declare ("Xn", "mol/mol/s", Check::positive (), Value::Const,
                 "Slope of relationship between leaf rubisco N and Vmax.\n\
 Xn = 1.16E-3 mol/mol/s for wheat (de Pury & Farquhar, 1997)");
-    frame.add ("Xn", 1.16e-3);
+    frame.set ("Xn", 1.16e-3);
 
-    frame.add ("O2_atm", "Pa", Check::positive (), Value::Const,
+    frame.declare ("O2_atm", "Pa", Check::positive (), Value::Const,
                 "O2 partial pressure of atmosphere");
-    frame.add ("O2_atm", 20500.0);
+    frame.set ("O2_atm", 20500.0);
 
-    frame.add ("Gamma25", "Pa", Check::positive (), Value::Const,
+    frame.declare ("Gamma25", "Pa", Check::positive (), Value::Const,
                 "CO2 compensation point of photosynthesis. Gamma25 = 3.69 Pa for wheat (Collatz et al., 1991)");
-    frame.add ("Gamma25", 3.69);
+    frame.set ("Gamma25", 3.69);
 
-    frame.add ("Ea_Gamma", "J/mol", Check::positive (), Value::Const,
+    frame.declare ("Ea_Gamma", "J/mol", Check::positive (), Value::Const,
                 "Actimation energy for Gamma. Ea_Gamma = 29000 (Jordan & Ogren, 1984)");
-    frame.add ("Ea_Gamma", 29000.);
+    frame.set ("Ea_Gamma", 29000.);
 
-    frame.add ("Ptot", "Pa", Check::positive (), Value::Const,
+    frame.declare ("Ptot", "Pa", Check::positive (), Value::Const,
                 "Atmospheric pressure. Ptot = 100000 Pa");
-    frame.add ("Ptot", 1.0E5);
+    frame.set ("Ptot", 1.0E5);
 
-    frame.add ("m", Value::None (), Check::positive (), Value::Const,
+    frame.declare ("m", Value::None (), Check::positive (), Value::Const,
                 "Stomatal slope factor. Ball and Berry (1982): m = 9 for soyabean. Wang and Leuning(1998): m = 11 for wheat");
 
-    frame.add ("b", "mol/m^2/s", Check::positive (), Value::Const,
+    frame.declare ("b", "mol/m^2/s", Check::positive (), Value::Const,
                 "Stomatal intercept factor, Ball and Berry (1982) & Wang and Leuning(1998): (0.01 mol/m2/s)");
 
-    frame.add ("gbw", "mol/m^2/s", Check::positive (), Value::Const,
+    frame.declare ("gbw", "mol/m^2/s", Check::positive (), Value::Const,
                 "Leaf boundary conductance of water. gbw = 2 mol/m²/s (Collatz et al., 1991");
-    frame.add ("gbw", 2.00);
+    frame.set ("gbw", 2.00);
 
     //log variables
-    frame.add ("ABA_effect", Value::None (), Value::LogOnly,
+    frame.declare ("ABA_effect", Value::None (), Value::LogOnly,
                 "Water stress effect induced by ABA and crown water potential");
-    frame.add ("ci_vector", "Pa", Value::LogOnly, Value::Sequence, "CO2 pressure in Stomatal in each layer.");
-    frame.add ("Vm_vector", "mmol/m^2/s", Value::LogOnly, Value::Sequence, "Photosynthetic capacity in each layer.");
-    frame.add ("Jm_vector", "mmol/m^2/s", Value::LogOnly, Value::Sequence, "Potential rate of electron transport in each layer.");
-    frame.add ("gs_vector", "mol/m^2/s", Value::LogOnly, Value::Sequence, "Stomata cunductance in each layer.");
-    frame.add ("gs_sun_vector", "mol/m^2/s", Value::LogOnly, Value::Sequence, "Stomata cunductance in sunlit fraction of each layer.");
-    frame.add ("Nleaf_vector", "mol N/m^2", Value::LogOnly, Value::Sequence, "Distribution of photosynthetic N-leaf.");
-    frame.add ("Ass_vector", "mol CH2O/m^2/h", Value::LogOnly, Value::Sequence, "Brutto assimilate.");
-    frame.add ("sun_LAI_vector", "mol CH2O/m^2/s", Value::LogOnly, Value::Sequence, "sunlit LAI.");
+    frame.declare ("ci_vector", "Pa", Value::LogOnly, Value::Sequence, "CO2 pressure in Stomatal in each layer.");
+    frame.declare ("Vm_vector", "mmol/m^2/s", Value::LogOnly, Value::Sequence, "Photosynthetic capacity in each layer.");
+    frame.declare ("Jm_vector", "mmol/m^2/s", Value::LogOnly, Value::Sequence, "Potential rate of electron transport in each layer.");
+    frame.declare ("gs_vector", "mol/m^2/s", Value::LogOnly, Value::Sequence, "Stomata cunductance in each layer.");
+    frame.declare ("gs_sun_vector", "mol/m^2/s", Value::LogOnly, Value::Sequence, "Stomata cunductance in sunlit fraction of each layer.");
+    frame.declare ("Nleaf_vector", "mol N/m^2", Value::LogOnly, Value::Sequence, "Distribution of photosynthetic N-leaf.");
+    frame.declare ("Ass_vector", "mol CH2O/m^2/h", Value::LogOnly, Value::Sequence, "Brutto assimilate.");
+    frame.declare ("sun_LAI_vector", "mol CH2O/m^2/s", Value::LogOnly, Value::Sequence, "sunlit LAI.");
 
-    frame.add ("ci_middel", "Pa", Value::LogOnly, "Stomata average CO2 pressure.");
-    frame.add ("gs", "mol/m^2/s", Value::LogOnly, "Stomata conductance.");
-    frame.add ("gs_ms", "m/s", Value::LogOnly, "Stomata conductance.");
-    frame.add ("Ass", "g CH2O/m^2/h", Value::LogOnly, "'Net' leaf assimilate of CO2 (brutto photosynthesis).");
-    frame.add ("Res", "g CH2O/m^2/h", Value::LogOnly, "Farquhar leaf respiration.");
-    frame.add ("LAI", "", Value::LogOnly, "Leaf area index for the canopy used in photosynthesis.");
-    frame.add ("sun_LAI", "", Value::LogOnly, "Leaf area index for the sunlit fraction.");
-    frame.add ("PAR_", "mol/m^2/h", Value::LogOnly, "PAR.");
-    frame.add ("Vmax", "[mmol/m^2/s]", Value::LogOnly, "Photosynthetic Rubisco capacity.");
-    frame.add ("jm", "[mmol/m^2/s]", Value::LogOnly, "Potential rate of electron transport.");
-    frame.add ("leafPhotN", "[mol N/m^2]", Value::LogOnly, "Content of photosynthetic active leaf N.");
-    frame.add ("fraction_sun", "", Value::LogOnly, "Fraction of sunlit in the canopy.");
-    frame.add ("fraction_total", "", Value::LogOnly, "Fraction of leaf contributing to the photosynthesis.");
+    frame.declare ("ci_middel", "Pa", Value::LogOnly, "Stomata average CO2 pressure.");
+    frame.declare ("gs", "mol/m^2/s", Value::LogOnly, "Stomata conductance.");
+    frame.declare ("gs_ms", "m/s", Value::LogOnly, "Stomata conductance.");
+    frame.declare ("Ass", "g CH2O/m^2/h", Value::LogOnly, "'Net' leaf assimilate of CO2 (brutto photosynthesis).");
+    frame.declare ("Res", "g CH2O/m^2/h", Value::LogOnly, "Farquhar leaf respiration.");
+    frame.declare ("LAI", "", Value::LogOnly, "Leaf area index for the canopy used in photosynthesis.");
+    frame.declare ("sun_LAI", "", Value::LogOnly, "Leaf area index for the sunlit fraction.");
+    frame.declare ("PAR_", "mol/m^2/h", Value::LogOnly, "PAR.");
+    frame.declare ("Vmax", "[mmol/m^2/s]", Value::LogOnly, "Photosynthetic Rubisco capacity.");
+    frame.declare ("jm", "[mmol/m^2/s]", Value::LogOnly, "Potential rate of electron transport.");
+    frame.declare ("leafPhotN", "[mol N/m^2]", Value::LogOnly, "Content of photosynthetic active leaf N.");
+    frame.declare ("fraction_sun", "", Value::LogOnly, "Fraction of sunlit in the canopy.");
+    frame.declare ("fraction_total", "", Value::LogOnly, "Fraction of leaf contributing to the photosynthesis.");
 
     // Models
-    frame.add_object ("N-dist", RubiscoNdist::component, 
+    frame.declare_object ("N-dist", RubiscoNdist::component, 
                        "Rubisco N-distribution in the canopy layer.");
-    frame.add ("N-dist", "exp");
+    frame.set ("N-dist", "exp");
 
-    frame.add_object ("ABAeffect", ABAEffect::component, 
+    frame.declare_object ("ABAeffect", ABAEffect::component, 
                        "The effect of xylem ABA on stomata conductivity.");
-    frame.add ("ABAeffect", "ABA-exp");
+    frame.set ("ABAeffect", "ABA-exp");
 
-    frame.add_object ("Stomatacon", StomataCon::component, 
+    frame.declare_object ("Stomatacon", StomataCon::component, 
                        "Stomata conductance of water vapor.");
-    frame.add ("Stomatacon", "Leuning");
+    frame.set ("Stomatacon", "Leuning");
   }
 } PhotoFarquhar_syntax;
 

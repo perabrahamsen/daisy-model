@@ -276,43 +276,43 @@ Daisy::load_syntax (Frame& frame)
   Model::load_model (frame);
   
   Output::load_syntax (frame);
-  frame.add_object ("scope", Scopesel::component, 
+  frame.declare_object ("scope", Scopesel::component, 
 		     Value::Const, Value::Singleton, "\
 Scope to evaluate expessions in.");
-  frame.add ("scope", "null");
-  frame.add_object ("print_time", Condition::component,
+  frame.set ("scope", "null");
+  frame.declare_object ("print_time", Condition::component,
                      "Print simulation time whenever this condition is true.\n\
 The simulation time will also be printed whenever there are any news\n\
 to report, like emergence of crop or various management operations.\n\
 Good values for this parameter would be hourly, daily or monthly.");
-  frame.add ("print_time", "periodic");
+  frame.set ("print_time", "periodic");
 
-  frame.add_object ("manager", Action::component, Value::State,
+  frame.declare_object ("manager", Action::component, Value::State,
                      Value::Singleton,
                      "Specify the management operations to perform during\n\
 the simulation.");
-  frame.add_submodule ("time", Value::State,
+  frame.declare_submodule ("time", Value::State,
 			"Current time in the simulation.", Time::load_syntax);
-  frame.add_submodule ("timestep", Value::OptionalState,
+  frame.declare_submodule ("timestep", Value::OptionalState,
 			"Length of timestep in simlation.\n\
 The default value is 1 hour, anything else is unlikely to work.",
                         Timestep::load_syntax);
-  frame.add_check ("timestep", Timestep::positive ());
-  frame.add_submodule ("stop", Value::OptionalConst,
+  frame.set_check ("timestep", Timestep::positive ());
+  frame.declare_submodule ("stop", Value::OptionalConst,
 			"Latest time where the simulation stops.\n\
 By default, the simulation will run until the manager request it to stop.",
                         Time::load_syntax);
-  frame.add_object ("column", Column::component, 
+  frame.declare_object ("column", Column::component, 
                      Value::State, Value::Sequence,
                      "List of columns to use in this simulation.");
-  frame.add_object ("weather", Weather::component,
+  frame.declare_object ("weather", Weather::component,
                      Value::OptionalState, Value::Singleton,
                      "Weather model for providing climate information during\n\
 the simulation.  Can be overwritten by column specific weather.");
-  frame.add_submodule_sequence ("harvest", Value::State, 
+  frame.declare_submodule_sequence ("harvest", Value::State, 
 				 "Total list of all crop yields.",
 				 Harvest::load_syntax);
-  frame.add_empty ("harvest");
+  frame.set_empty ("harvest");
 }
 
 void
@@ -337,7 +337,7 @@ static struct ProgramDaisySyntax : public DeclareModel
   {
     Daisy::load_syntax (frame);
     
-    frame.add_strings ("cite", "daisy-def", "daisy-new", "daisy-fertilizer");
+    frame.set_strings ("cite", "daisy-def", "daisy-new", "daisy-fertilizer");
   }
 } ProgramDaisy_syntax;
 

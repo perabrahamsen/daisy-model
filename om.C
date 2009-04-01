@@ -383,34 +383,34 @@ OM::load_syntax (Frame& frame, const std::string& frac_desc)
 {
   Model::load_model (frame);
   frame.add_check (check_alist);
-  frame.add ("C", "g C/cm^3", Check::non_negative (),
+  frame.declare ("C", "g C/cm^3", Check::non_negative (),
 	      Value::OptionalState, Value::Sequence,
 	      "Carbon in each soil interval.");
-  frame.add ("C_per_N", "(g C/cm^3)/(g N/cm^3)", Check::none (), 
+  frame.declare ("C_per_N", "(g C/cm^3)/(g N/cm^3)", Check::none (), 
 	      Value::OptionalState, Value::Sequence, 
 	      "The carbon/nitrogen ratio.");
-  frame.add ("N", "g N/cm^3", Check::non_negative (),
+  frame.declare ("N", "g N/cm^3", Check::non_negative (),
 	      Value::OptionalState, Value::Sequence,
 	      "Nitrogen in each soil interval.");
-  frame.add ("turnover_rate", "h^-1", Check::fraction (), 
+  frame.declare ("turnover_rate", "h^-1", Check::fraction (), 
 	      Value::OptionalConst,
 	      "Fraction converted to other pools each hour.\n\
 You must specify either this or 'turnover_halftime'.");
-  frame.add ("turnover_halftime", "h", Check::positive (), 
+  frame.declare ("turnover_halftime", "h", Check::positive (), 
 	      Value::OptionalConst,
 	      "Time until half had been converted to other pools.\n\
 You must specify either this or 'turnover_rate'.");
-  frame.add_fraction ("efficiency", Value::Const, Value::Sequence, "\
+  frame.declare_fraction ("efficiency", Value::Const, Value::Sequence, "\
 The efficiency this pool can be digested by each of the SMB pools.");
-  frame.add_fraction ("fractions", Value::Const, Value::Sequence, "\
+  frame.declare_fraction ("fractions", Value::Const, Value::Sequence, "\
 How this pool is divided into other pools.\n" + frac_desc);
-  frame.add_check ("fractions", VCheck::sum_equal_1 ());
-  frame.add ("initial_C_per_N", "g C/g N", Value::OptionalState, "\
+  frame.set_check ("fractions", VCheck::sum_equal_1 ());
+  frame.declare ("initial_C_per_N", "g C/g N", Value::OptionalState, "\
 The initial C/N ratio when this pool is created.\n\
 Negative numbers mean unspecified.");
-  frame.add ("heat_factor", "dg C", Value::None (), Value::OptionalConst,
+  frame.declare ("heat_factor", "dg C", Value::None (), Value::OptionalConst,
 	      "Heat factor.  If empty, use default from 'OrganicMatter'.");
-  frame.add ("water_factor", "cm", Value::None (), Value::OptionalConst, "\
+  frame.declare ("water_factor", "cm", Value::None (), Value::OptionalConst, "\
 Water potential factor.  If empty, use default from 'OrganicMatter'.");
 }
 

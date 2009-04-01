@@ -474,18 +474,18 @@ One dimensional movement.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("Tertiary", "old");
-    frame.add_strings ("matrix_solute", "Hansen", "convection", "none");
+    frame.set ("Tertiary", "old");
+    frame.set_strings ("matrix_solute", "Hansen", "convection", "none");
 
-    frame.add_submodule ("Geometry", Value::State,
+    frame.declare_submodule ("Geometry", Value::State,
                          "Discretization of the soil.",
                          Geometry1D::load_syntax);
-    frame.add_object ("matrix_water", UZmodel::component, 
+    frame.declare_object ("matrix_water", UZmodel::component, 
                       Value::Const, Value::Sequence,
                       "Vertical matrix water transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends.");
-    frame.add_strings ("matrix_water", "richards", "lr");
+    frame.set_strings ("matrix_water", "richards", "lr");
  
   }
 } Movement1D_syntax;

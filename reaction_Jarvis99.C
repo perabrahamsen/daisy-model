@@ -211,33 +211,33 @@ Colloid generation emulating the MACRO model.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_strings ("cite", "macro-colloid");
-    frame.add_object ("rainergy", Rainergy::component,
+    frame.set_strings ("cite", "macro-colloid");
+    frame.declare_object ("rainergy", Rainergy::component,
                       Value::Const, Value::Singleton,
                       "Model for calculating energy in rain.");
-    frame.add ("rainergy", "Brown87");
-    frame.add ("Mmax", "g/g", Check::non_negative (), Value::Const,
+    frame.set ("rainergy", "Brown87");
+    frame.declare ("Mmax", "g/g", Check::non_negative (), Value::Const,
                 "Maximum amount of detachable particles.");
-    // frame.add ("Mmax", 0.165);
-    frame.add ("kd", "g/J", Check::non_negative (), Value::Const,
+    // frame.set ("Mmax", 0.165);
+    frame.declare ("kd", "g/J", Check::non_negative (), Value::Const,
                 "Detachment rate coefficient.");
-    // frame.add ("kd", 15.0);
-    frame.add ("kr", "g/cm^2/h", Check::non_negative (), Value::Const,
+    // frame.set ("kd", 15.0);
+    frame.declare ("kr", "g/cm^2/h", Check::non_negative (), Value::Const,
                 "Replenishment rate coefficient.");
-    // frame.add ("kr", 0.1 /* [g/m^2/h] */ / (100.0 /* [cm/m] */ * 100.0));
-    frame.add ("zi", "cm", Check::positive (), Value::Const,
+    // frame.declare ("kr", 0.1 /* [g/m^2/h] */ / (100.0 /* [cm/m] */ * 100.0));
+    frame.declare ("zi", "cm", Check::positive (), Value::Const,
                 "Thickness of surface soil layer.");
-    // frame.add ("zi", 0.1);
-    frame.add ("Ms", "g/g", Check::non_negative (), Value::OptionalState,
+    // frame.set ("zi", 0.1);
+    frame.declare ("Ms", "g/g", Check::non_negative (), Value::OptionalState,
                 "Current concentration of detachable particles in top soil.\n\
 By default, 10% of Mmax.");
-    frame.add ("As", "g/cm^2", Value::LogOnly, 
+    frame.declare ("As", "g/cm^2", Value::LogOnly, 
                 "Current amount of detachable particles in top soil.");
-    frame.add ("P", "g/cm^2/h", Value::LogOnly, 
+    frame.declare ("P", "g/cm^2/h", Value::LogOnly, 
                 "Replenishment of detachable particles to top soil.");
-    frame.add ("KE", "J/cm^2/h", Value::LogOnly, 
+    frame.declare ("KE", "J/cm^2/h", Value::LogOnly, 
                "Kinertic energy avalable for colloid generation.");
-    frame.add ("E", "J/cm^2/mm", Value::LogOnly, 
+    frame.declare ("E", "J/cm^2/mm", Value::LogOnly, 
                 "Kinetic energy in rain.");
   }
 } ReactionJarvis99syntax;

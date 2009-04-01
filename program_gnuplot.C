@@ -131,23 +131,23 @@ static struct ProgramGnuplotSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("command_file", Value::String, Value::Const, "\
+    frame.declare ("command_file", Value::String, Value::Const, "\
 File name for gnuplot commands.");
-    frame.add ("command_file", "daisy.gnuplot");
-    frame.add ("cd", Value::Boolean, Value::Const, "\
+    frame.set ("command_file", "daisy.gnuplot");
+    frame.declare ("cd", Value::Boolean, Value::Const, "\
 Set this flag to add a 'cd' command to the current working directory.\n\
 This is useful under MS Windows when dragging the file to a gnuplot icon.");
 #if defined(__unix)
-    frame.add ("cd", false);
+    frame.set ("cd", false);
 #else
-    frame.add ("cd", true);
+    frame.set ("cd", true);
 #endif
-    frame.add ("extra", Value::String, Value::Const, 
+    frame.declare ("extra", Value::String, Value::Const, 
                 Value::Sequence, "List of extra gnuplot commands.\n\
 The commands will be inserted right before the list of graphs.");
-    frame.add ("extra", std::vector<symbol> ());
+    frame.set_empty ("extra");
                 
-    frame.add_object ("graph", Gnuplot::component, Value::State, 
+    frame.declare_object ("graph", Gnuplot::component, Value::State, 
                        Value::Sequence, "Graphs to plot.");
   }
 } ProgramGnuplot_syntax;

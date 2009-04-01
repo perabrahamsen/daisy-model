@@ -87,19 +87,19 @@ DOE::load_syntax (Frame& frame)
   // Submodel.
 
   // Content.
-  frame.add ("M", "g/cm^3", Value::State, Value::Sequence,
+  frame.declare ("M", "g/cm^3", Value::State, Value::Sequence,
 	      "Mass in water and soil.");
-  frame.add ("C", "g/cm^3", Value::LogOnly, Value::Sequence,
+  frame.declare ("C", "g/cm^3", Value::LogOnly, Value::Sequence,
 	      "Concentration in water.");
-  frame.add ("S", "g/cm^3/h", Value::LogOnly, Value::Sequence,
+  frame.declare ("S", "g/cm^3/h", Value::LogOnly, Value::Sequence,
 	      "Combined source term.");
-  frame.add ("S_p", "g/cm^3/h", Value::LogOnly, Value::Sequence,
+  frame.declare ("S_p", "g/cm^3/h", Value::LogOnly, Value::Sequence,
 	      "Source term (macropore transport only).");
-  frame.add ("S_drain", "g/cm^3/h", Value::LogOnly, Value::Sequence,
+  frame.declare ("S_drain", "g/cm^3/h", Value::LogOnly, Value::Sequence,
 	      "Source term (soil drainage only).");
-  frame.add ("J_matrix", "g/cm^2/h", Value::LogOnly, Value::Sequence,
+  frame.declare ("J_matrix", "g/cm^2/h", Value::LogOnly, Value::Sequence,
 	      "Transportation in matrix (positive up).");
-  frame.add ("J_tertiary", "g/cm^2/h", Value::LogOnly, Value::Sequence,
+  frame.declare ("J_tertiary", "g/cm^2/h", Value::LogOnly, Value::Sequence,
 	      "Transportation outside matrix (positive up).");
 }
 

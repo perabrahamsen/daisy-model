@@ -393,33 +393,33 @@ below the last cell, or above the soil surface.")
       // We define our own "height", so don't load from here.
       // Groundwater::load_syntax (syntax, alist);
 
-      frame.add ("L", "cm", Check::positive (), Value::Const,
+      frame.declare ("L", "cm", Check::positive (), Value::Const,
 		  "Distance between pipes.");
-      frame.add ("L", 1800.0);
-      frame.add ("x", "cm", Check::positive (), Value::OptionalConst,
+      frame.set ("L", 1800.0);
+      frame.declare ("x", "cm", Check::positive (), Value::OptionalConst,
 		  "Horizontal distance to nearest pipe.\n\
 By default, this is 1/2 L.");
-      frame.add ("pipe_position", "cm", Check::negative (), Value::Const,
+      frame.declare ("pipe_position", "cm", Check::negative (), Value::Const,
 		  "Height pipes are placed in the soil (a negative number).");
-      frame.add ("pipe_position", -110.0);
-      frame.add ("K_to_pipes", "cm/h", Check::non_negative (), 
+      frame.set ("pipe_position", -110.0);
+      frame.declare ("K_to_pipes", "cm/h", Check::non_negative (), 
                   Value::OptionalConst,
 		  "Horizontal conductivity in saturated soil.\n\
 By default this is calculated from the horizontal conductivity and the\n\
 anisotropy of the horizon.");
-      frame.add ("K_aquitard", "cm/h", Check::non_negative (), Value::Const,
+      frame.declare ("K_aquitard", "cm/h", Check::non_negative (), Value::Const,
 		  "Conductivity of the aquitard.");
-      frame.add ("K_aquitard", 1e-3);
-      frame.add ("Z_aquitard", "cm", Check::positive (), Value::Const,
+      frame.set ("K_aquitard", 1e-3);
+      frame.declare ("Z_aquitard", "cm", Check::positive (), Value::Const,
 		  "Thickness of the aquitard.\n\
 The aquitard begins below the bottommost soil horizon.");
-      frame.add ("Z_aquitard", 200.0);
-      frame.add ("h_aquifer", "cm", Check::positive (), Value::OptionalState,
+      frame.set ("Z_aquitard", 200.0);
+      frame.declare ("h_aquifer", "cm", Check::positive (), Value::OptionalState,
 		  "Pressure potential in the aquifer below the aquitard.\n\
 By default. this is Z_aquitard.\n\
 You can alternatively specify the pressure as a virtual groundwater level.\n\
 See 'pressure_table'.");
-      frame.add_object ("pressure_table", Depth::component,
+      frame.declare_object ("pressure_table", Depth::component,
                          Value::OptionalConst, Value::Singleton, "\
 Height of groundwater the corresponds to the pressure in the aquifer.  \n\
 \n\
@@ -428,18 +428,18 @@ water level in the well would be as height above ground (a negative\n\
 number).  This is different from the actual groundwater table, because\n\
 the aquitart block the water, and the pipes lead the water away.\n\
 You can alternatively specify the pressure directly, with 'h_aquifer'.");
-      frame.add ("height", "cm", Check::non_positive (), 
+      frame.declare ("height", "cm", Check::non_positive (), 
 		  Value::OptionalState,
 		  "Current groundwater level (a negative number).");
-      frame.add ("DrainFlow", "cm/h", Value::LogOnly,
+      frame.declare ("DrainFlow", "cm/h", Value::LogOnly,
 		  "Drain flow to pipes.");
-      frame.add ("EqDrnFlow", "cm/h", Value::LogOnly,
+      frame.declare ("EqDrnFlow", "cm/h", Value::LogOnly,
 		  "Equilibrium drain flow to pipes.");
-      frame.add ("deficit", "cm", Value::LogOnly,
+      frame.declare ("deficit", "cm", Value::LogOnly,
 		  "Deficit.");
-      frame.add ("DeepPercolation", "cm/h", Value::LogOnly,
+      frame.declare ("DeepPercolation", "cm/h", Value::LogOnly,
 		  "Deep percolation to aquifer.");
-      frame.add ("S", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
+      frame.declare ("S", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
 		  "Pipe drainage.");
     }
 } GroundwaterPipe_syntax;

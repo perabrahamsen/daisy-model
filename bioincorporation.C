@@ -47,7 +47,7 @@ Lower C/N ration for bioincorporated matter.")
   {
     std::vector<double> CN;
     CN.push_back (60.0);
-    frame.add ("C_per_N", CN);
+    frame.set ("C_per_N", CN);
   }
 } AOMSlowBioincorporation_syntax;
 
@@ -316,16 +316,16 @@ void
 Bioincorporation::load_syntax (Frame& frame)
 { 
   // Incorporation speed.
-  frame.add ("R_max", "g DM/m^2/h", Check::non_negative (), Value::Const, 
+  frame.declare ("R_max", "g DM/m^2/h", Check::non_negative (), Value::Const, 
 	      "Maximal speed of incorporation.");
-  frame.add ("R_max", 0.5);
-  frame.add ("k_half", "g DM/m^2", Check::positive (), Value::Const,
+  frame.set ("R_max", 0.5);
+  frame.declare ("k_half", "g DM/m^2", Check::positive (), Value::Const,
 	      "Halflife constant.");
-  frame.add ("k_half", 1.0);
-  frame.add ("speed", "g DM/m^2/h", Value::LogOnly, 
+  frame.set ("k_half", 1.0);
+  frame.declare ("speed", "g DM/m^2/h", Value::LogOnly, 
 	      "Fraction of litter incorporated this hour.\n\
 The formula is speed = (R_max * litter) / (k_half + litter).");
-  frame.add ("C_per_N_factor", "(g C/cm^2)/(g N/cm^2)", Value::None (), 
+  frame.declare ("C_per_N_factor", "(g C/cm^2)/(g N/cm^2)", Value::None (), 
 	      Check::non_negative (), Value::Const, 
 	      "Limiting factor for high C/N ratio.");
   PLF C_per_N_factor;
@@ -333,32 +333,32 @@ The formula is speed = (R_max * litter) / (k_half + litter).");
   C_per_N_factor.add (100.0, 0.1);
   C_per_N_factor.add (120.0, 0.01);
   
-  frame.add ("C_per_N_factor", C_per_N_factor);
-  frame.add ("T_factor", "dg C", Value::None (), Check::non_negative (), 
+  frame.set ("C_per_N_factor", C_per_N_factor);
+  frame.declare ("T_factor", "dg C", Value::None (), Check::non_negative (), 
 	      Value::Const, "Limiting factor for low temperature.");
   PLF T_factor;
   T_factor.add (4.0, 0.0);
   T_factor.add (6.0, 1.0);
-  frame.add ("T_factor", T_factor);
+  frame.set ("T_factor", T_factor);
 
   // Incorporation amounts.
-  frame.add_fraction ("respiration", Value::Const,
+  frame.declare_fraction ("respiration", Value::Const,
 		       "Fraction of C lost in respiration.");
-  frame.add ("respiration", 0.5);
-  frame.add ("DM", "g DM/m^2/h", Value::LogOnly, 
+  frame.set ("respiration", 0.5);
+  frame.declare ("DM", "g DM/m^2/h", Value::LogOnly, 
 	      "DM removed from surface.");
-  frame.add ("C_removed", "g C/m^2/h", Value::LogOnly,
+  frame.declare ("C_removed", "g C/m^2/h", Value::LogOnly,
               "C removed from surface.");
-  frame.add ("N_removed", "g N/m^2/h", Value::LogOnly, 
+  frame.declare ("N_removed", "g N/m^2/h", Value::LogOnly, 
               "N removed from surface.");
-  frame.add ("CO2", "g C/m^2/h", Value::LogOnly, "C respirated.");
-  frame.add ("C_added", "g C/cm^3/h", Value::LogOnly, Value::Sequence,
+  frame.declare ("CO2", "g C/m^2/h", Value::LogOnly, "C respirated.");
+  frame.declare ("C_added", "g C/cm^3/h", Value::LogOnly, Value::Sequence,
               "C added to soil.");
-  frame.add ("N_added", "g N/cm^3/h", Value::LogOnly, Value::Sequence,
+  frame.declare ("N_added", "g N/cm^3/h", Value::LogOnly, Value::Sequence,
               "N added to soil.");
 
   // Incorporation location.
-  frame.add ("distribution", "cm", Value::None (), Check::non_negative (),
+  frame.declare ("distribution", "cm", Value::None (), Check::non_negative (),
 	      Value::Const, "\
 Distribution of incorporated matter in the soil.\
 \n(X, Y), where X is the depth (negative numbers), and Y is the relative\n\
@@ -369,12 +369,12 @@ the whole profile.");
   distribution.add (-80.0, 0.0);
   distribution.add (-18.0, 100.0);
   distribution.add (0.0, 100.0);
-  frame.add ("distribution", distribution);
+  frame.set ("distribution", distribution);
 
-  frame.add_object ("AOM", AOM::component, Value::Const, Value::Sequence, "\
+  frame.declare_object ("AOM", AOM::component, Value::Const, Value::Sequence, "\
 Incorporated AM parameters.");
-  frame.add_check ("AOM", AM::check_om_pools ());
-  frame.add_strings ("AOM", "AOM-SLOW-BIOINCORPORATION", "AOM-FAST");
+  frame.set_check ("AOM", AM::check_om_pools ());
+  frame.set_strings ("AOM", "AOM-SLOW-BIOINCORPORATION", "AOM-FAST");
 }
   
 Bioincorporation::Bioincorporation (const FrameSubmodel& al)

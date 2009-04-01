@@ -122,7 +122,7 @@ Toplevel::Implementation::add_daisy_ui (Toplevel& toplevel)
     return;
 
   if (!metalib.check ("ui"))
-    metalib.add ("ui", preferred_ui);
+    metalib.set ("ui", preferred_ui);
 
   Block block (metalib, msg, metalib, "UI");
   ui.reset (Librarian::build_item<UI> (block, "ui"));
@@ -623,7 +623,7 @@ Toplevel::load_frame (Frame& frame)
 {
   Units::load_syntax (frame);
 
-  frame.add ("install_directory", Value::String, Value::Const,
+  frame.declare ("install_directory", Value::String, Value::Const,
               "Directory where Daisy has been installed.\n\
 \n\
 This is used for looking up files that came with the installation, in\n\
@@ -636,12 +636,12 @@ are not running MS Windows), a hardcoded value is used.  This is\n\
 \n\
 The value found in the manual corresponds to the system where the\n\
 manual was generated.");
-  frame.add ("install_directory", Path::get_daisy_home ());
-  frame.add ("directory", Value::String, Value::OptionalConst,
+  frame.set ("install_directory", Path::get_daisy_home ());
+  frame.declare ("directory", Value::String, Value::OptionalConst,
               "Run program in this directory.\n\
 This can affect both where input files are found and where log files\n\
 are generated.");
-  frame.add ("path", Value::String,
+  frame.declare ("path", Value::String,
               Value::Const, Value::Sequence,
               "List of directories to search for input files in.\n\
 The special value \".\" means the current directory.\n\
@@ -653,19 +653,19 @@ semicolon on MS Windows, or colon on other systems.  If the DAISYPATH\n\
 environment variable is not set, the path will be initialized to the\n\
 working directory followed by the standard parameter libraries.");
   // Give it a value so people can extend it with &old.
-  frame.add ("path", Path::get_daisy_path ());
+  frame.set ("path", Path::get_daisy_path ());
 
-  frame.add_object ("input", Parser::component,
+  frame.declare_object ("input", Parser::component,
                      Value::OptionalConst, Value::Singleton,
                      "Command to add more information about the simulation.");
-  frame.add_object ("run", Program::component, 
+  frame.declare_object ("run", Program::component, 
                      Value::OptionalState, Value::Singleton, 
                      "Program to run.\n\
 \n\
 If this option is specified, all the 'Daisy' specific top-level attributes\n\
 will be ignored.  If unspecified, run 'Daisy' on the current top-level\n\
 attributes.");
-  frame.add_object ("ui", UI::component, 
+  frame.declare_object ("ui", UI::component, 
                      Value::OptionalState, Value::Singleton, 
                      "Top level user interface.");
 }

@@ -111,7 +111,7 @@ list is done.")
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);
-    frame.add_object ("actions", Action::component, 
+    frame.declare_object ("actions", Action::component, 
                        Value::State, Value::Sequence,
                        "List of actions to perform.");
     frame.order ("actions");

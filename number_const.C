@@ -92,7 +92,7 @@ static struct NumberConstSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.add ("value", Value::User (), Value::Const,
+    frame.declare ("value", Value::User (), Value::Const,
 		"Fixed value for this number.");
     frame.order ("value");
   }
@@ -191,9 +191,9 @@ static struct NumberGetSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.add ("name", Value::String, Value::Const, 
+    frame.declare ("name", Value::String, Value::Const, 
                 "Name of a the symbol.");
-    frame.add ("dimension", Value::String, Value::Const, 
+    frame.declare ("dimension", Value::String, Value::Const, 
                 "Expected dimension for the symbol.");
     frame.order ("name", "dimension");
   }
@@ -390,7 +390,7 @@ static struct NumberFetchSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.add ("name", Value::String, Value::Const, 
+    frame.declare ("name", Value::String, Value::Const, 
                 "Name of a the symbol.");
     frame.order ("name");
   }
@@ -403,7 +403,7 @@ static struct NumberXSyntax : public DeclareParam
 Fetch the value of 'x' in the current scope.")
   { }
   void load_frame (Frame& frame) const
-  { frame.add ("name", "x"); }
+  { frame.set ("name", "x"); }
 } NumberX_syntax;
 
 struct NumberChild : public Number
@@ -432,7 +432,7 @@ Numbers based on another number.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_object ("value", Number::component,
+    frame.declare_object ("value", Number::component,
                        "Operand for this function.");
   }
 } NumberChild_syntax;
@@ -500,7 +500,7 @@ Pass value unchanged.")
   void load_frame (Frame& frame) const
   {
     Model::load_model (frame);
-    frame.add ("dimension", Value::String, Value::OptionalConst,
+    frame.declare ("dimension", Value::String, Value::OptionalConst,
 		"Dimension of this value.");
   }
 } NumberIdentity_syntax;
@@ -560,7 +560,7 @@ Convert to specified dimension.")
   void load_frame (Frame& frame) const
   {
 
-    frame.add ("dimension", Value::String, Value::Const,
+    frame.declare ("dimension", Value::String, Value::Const,
 		"Dimension to convert to.");
     frame.order ("value", "dimension");
   }
@@ -613,10 +613,10 @@ Specify dimension for number.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("warn_known", Value::Boolean, Value::Const,
+    frame.declare ("warn_known", Value::Boolean, Value::Const,
                 "Issue a warning if the dimensions is already known.");
-    frame.add ("warn_known", true);
-    frame.add ("dimension", Value::String, Value::Const,
+    frame.set ("warn_known", true);
+    frame.declare ("dimension", Value::String, Value::Const,
 		"Dimension to use.");
     frame.order ("value", "dimension");
   }

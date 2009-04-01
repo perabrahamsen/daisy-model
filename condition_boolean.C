@@ -103,7 +103,7 @@ Test if a boolean expression is true.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_object ("expr", Boolean::component, "\
+    frame.declare_object ("expr", Boolean::component, "\
 Expression to evaluate.");
     frame.order ("expr");
   }

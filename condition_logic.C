@@ -294,7 +294,7 @@ or the end of the list is reached.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_object ("operands", Condition::component, 
+    frame.declare_object ("operands", Condition::component, 
                        Value::State, Value::Sequence, "Conditions to test.");
     frame.order ("operands");
   }
@@ -312,7 +312,7 @@ or the end of the list is reached.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_object ("operands", Condition::component, 
+    frame.declare_object ("operands", Condition::component, 
                        Value::State, Value::Sequence, "Conditions to test.");
     frame.order ("operands");
   }
@@ -328,7 +328,7 @@ True iff the operand is not true.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_object ("operand", Condition::component, 
+    frame.declare_object ("operand", Condition::component, 
                        "Condition to test.");
     frame.order ("operand");
   }
@@ -345,11 +345,11 @@ else return the value of the third condition.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_object ("if", Condition::component, 
+    frame.declare_object ("if", Condition::component, 
                        "Condition to test for.");
-    frame.add_object ("then", Condition::component, 
+    frame.declare_object ("then", Condition::component, 
                        "Condition to use of the 'if' test was true.");
-    frame.add_object ("else", Condition::component, 
+    frame.declare_object ("else", Condition::component, 
                        "Condition to use if the 'if' test was false.");
     frame.order ("if", "then", "else");
   }

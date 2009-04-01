@@ -108,20 +108,20 @@ SourceFile::load_style (Frame& frame,
 By default, data from dwf and dlf files will be\n\
 drawn with lines, and data from ddf files will be drawn with points.", 
                            default_title);
-  frame.add ("handle", Value::String, Value::Const, "\
+  frame.declare ("handle", Value::String, Value::Const, "\
 Determine how to handle multiple simultaniously.  Possible values are:\n\
 \n\
 sum: use the sum of the values.\n\
 \n\
 normal: use the arithemetic average of the values, and calculate the\n\
 standard deviation.");
-  frame.add ("default_hour", Value::Integer, Value::Const, "\
+  frame.declare ("default_hour", Value::Integer, Value::Const, "\
 Hour to assume when nothing else is specified;");
-  frame.add ("default_hour", 8);
-  frame.add_check ("default_hour", VCheck::valid_hour ());
+  frame.set ("default_hour", 8);
+  frame.set_check ("default_hour", VCheck::valid_hour ());
   static VCheck::Enum handle_check ("sum", "normal");
-  frame.add_check ("handle", handle_check);
-  frame.add ("handle", "normal");
+  frame.set_check ("handle", handle_check);
+  frame.set ("handle", "normal");
 }
 
 SourceFile::SourceFile (Block& al)

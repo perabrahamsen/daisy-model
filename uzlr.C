@@ -360,14 +360,14 @@ to z_top, where there can be Darcy movement.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("overflow_warn", Value::Boolean, Value::Const, "\
+    frame.declare ("overflow_warn", Value::Boolean, Value::Const, "\
 If true, warn the first time the soil profile is oversaturated.");
-    frame.add ("overflow_warn", true);
-    frame.add ("h_fc", "cm", Value::Const, "Field capacity.");
-    frame.add ("h_fc", -100.0);
-    frame.add ("z_top", "cm", Value::Const, 
+    frame.set ("overflow_warn", true);
+    frame.declare ("h_fc", "cm", Value::Const, "Field capacity.");
+    frame.set ("h_fc", -100.0);
+    frame.declare ("z_top", "cm", Value::Const, 
                "Depth of layer where upward water movement is possible.");
-    frame.add ("z_top", -10.0);
+    frame.set ("z_top", -10.0);
   }
 } UZlr_syntax;
 

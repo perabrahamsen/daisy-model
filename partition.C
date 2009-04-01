@@ -87,25 +87,25 @@ void
 Partition::load_syntax (Frame& frame)
 {
   frame.add_check (check_alist);
-  frame.add ("Root", "DS", Value::Fraction (), Check::fraction (),
+  frame.declare ("Root", "DS", Value::Fraction (), Check::fraction (),
 	      Value::Const, "\
 Fraction of assimilate for growth that goes to the roots, as a function of\n\
 the crop development stage.  The remaining growth assimilate goes to the\n\
 shoot.");
-  frame.add ("Leaf", "DS", Value::Fraction (), Check::fraction (),
+  frame.declare ("Leaf", "DS", Value::Fraction (), Check::fraction (),
 	      Value::Const,
 	      "Fraction of shoot assimilate that goes to the leafs.");
-  frame.add ("Stem", "DS", Value::Fraction (), Check::fraction (),
+  frame.declare ("Stem", "DS", Value::Fraction (), Check::fraction (),
 	      Value::Const,
 	      "Fraction of shoot assimilate that goes to the stem.");
-  frame.add ("RSR", "DS", Value::None (), Check::positive (), Value::Const,
+  frame.declare ("RSR", "DS", Value::None (), Check::positive (), Value::Const,
 	      "Maximal root/shoot ratio as a function of development state.\n\
 If the root/shoot ratio is above this, the roots will start dying.");
-  frame.add ("nitrogen_stress_limit", Value::None (), Check::fraction (), 
+  frame.declare ("nitrogen_stress_limit", Value::None (), Check::fraction (), 
               Value::Const,
 	      "If nitrogen stress is above this number and DS is above 1,\n\
 allocate all assimilate to the storage organ.");
-  frame.add ("nitrogen_stress_limit", 1.0);
+  frame.set ("nitrogen_stress_limit", 1.0);
 }
 
 Partition::Partition (const FrameSubmodel& al)

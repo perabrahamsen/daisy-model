@@ -183,40 +183,40 @@ C4 photosynthesis and stomatal conductance model by Collatz et al., 1992.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("Q10k", Value::Unknown (), Check::positive (), Value::Const,
+    frame.declare ("Q10k", Value::Unknown (), Check::positive (), Value::Const,
                 "Q10k = 1.8 (Collatz et al., 1992)");
-    frame.add ("Q10k", 1.8);
+    frame.set ("Q10k", 1.8);
 
-    frame.add ("Q10vm", Value::Unknown (), Check::positive (), Value::Const,
+    frame.declare ("Q10vm", Value::Unknown (), Check::positive (), Value::Const,
                 "Q10vm = 2.4 (Collatz et al., 1992)");
-    frame.add ("Q10vm", 2.4);
+    frame.set ("Q10vm", 2.4);
 
-    frame.add ("Q10rd", Value::Unknown (), Check::positive (), Value::Const,
+    frame.declare ("Q10rd", Value::Unknown (), Check::positive (), Value::Const,
                 "Q10rd = 2.0 (Collatz et al., 1992)");
-    frame.add ("Q10rd", 2.0);
+    frame.set ("Q10rd", 2.0);
 
-    frame.add ("kj", Value::Unknown (), Check::positive (), Value::Const,
+    frame.declare ("kj", Value::Unknown (), Check::positive (), Value::Const,
                 "Initial slope of photosynthetic CO2 response, kj = 0.6 mol/m²/s (Collatz et al., 1992)");
-    frame.add ("kj", 0.6);
+    frame.set ("kj", 0.6);
 
-    frame.add ("alpha", "mol/mol", Check::positive (), Value::Const,
+    frame.declare ("alpha", "mol/mol", Check::positive (), Value::Const,
                 "Initial slope of photosynthetic light response. alpha = 0.04 (Collatz et al., 1992)");
-    frame.add ("alpha", 0.04);
+    frame.set ("alpha", 0.04);
 
-    frame.add ("paab", Value::Unknown (), Check::positive (), Value::Const,
+    frame.declare ("paab", Value::Unknown (), Check::positive (), Value::Const,
                 "Leaf absorbtivity to PAR. paab = 0.86 (Collatz et al., 1992)");
-    frame.add ("paab", 0.86);
+    frame.set ("paab", 0.86);
 
-    frame.add ("theta", Value::Unknown (), Check::positive (), Value::Const,
+    frame.declare ("theta", Value::Unknown (), Check::positive (), Value::Const,
                 "Curvature parameter");
-    frame.add ("theta", 0.83);
+    frame.set ("theta", 0.83);
     
-    frame.add ("beta", Value::Unknown (), Check::positive (), Value::Const,
+    frame.declare ("beta", Value::Unknown (), Check::positive (), Value::Const,
                 "Curvanture parameter");
-    frame.add ("beta", 0.93);
+    frame.set ("beta", 0.93);
 
-    frame.add ("m", 3.0);
-    frame.add ("b", 0.08);
+    frame.set ("m", 3.0);
+    frame.set ("b", 0.08);
   }
 
 } PhotoFCC4_syntax;

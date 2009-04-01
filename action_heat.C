@@ -68,9 +68,9 @@ Set external point heat source at height to value.")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.add ("height", "cm", Check::non_positive (), Value::Const,
+    frame.declare ("height", "cm", Check::non_positive (), Value::Const,
 		"Height of heat source (a negative number).");
-    frame.add ("value", "W/m^2", Check::non_negative (), Value::Const,
+    frame.declare ("value", "W/m^2", Check::non_negative (), Value::Const,
 		"Value of heat source.");
     frame.order ("height", "value");
   }

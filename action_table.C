@@ -372,24 +372,24 @@ Fertilizer [name]: The type of fertilizer to be applied.")
   void load_frame (Frame& frame) const
   { 
     LexerTable::load_syntax (frame);
-    frame.add_object ("sow", Action::component, 
+    frame.declare_object ("sow", Action::component, 
                        Value::OptionalConst, Value::Singleton, 
                        "Sow action.");
-    frame.add_object ("emerge", Action::component, 
+    frame.declare_object ("emerge", Action::component, 
                        Value::OptionalConst, Value::Singleton, 
                        "Emerge action.");
-    frame.add_object ("harvest", Action::component, 
+    frame.declare_object ("harvest", Action::component, 
                        Value::OptionalConst, Value::Singleton, 
                        "Harvest action.");
-    frame.add_object ("fertilizer", AM::component,
+    frame.declare_object ("fertilizer", AM::component,
                        Value::OptionalConst, Value::Singleton, "\
 The fertilizer you want to apply.");
-    frame.add ("enable_irrigation", Value::Boolean, Value::Const, "\
+    frame.declare ("enable_irrigation", Value::Boolean, Value::Const, "\
 Set this to false to ignore any irrigation information in the file.");
-    frame.add ("enable_irrigation", true);
-    frame.add ("enable_fertilization", Value::Boolean, Value::Const, "\
+    frame.set ("enable_irrigation", true);
+    frame.declare ("enable_fertilization", Value::Boolean, Value::Const, "\
 Set this to false to ignore any fertilization information in the file.");
-    frame.add ("enable_fertilization", true);
+    frame.set ("enable_fertilization", true);
   }
 } ActionTable_syntax;
 

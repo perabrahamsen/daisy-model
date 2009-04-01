@@ -91,11 +91,11 @@ rubiscoNdist_forced::function (const Units& units,
 			       const double relative_distance_from_top,
 			       const double DS, Treelog& msg)
 {
-  scope.add (distance_from_top_symbol, distance_from_top);
-  scope.add (relative_distance_from_top_symbol, relative_distance_from_top);
-  scope.add (LAI_symbol, LAI);
-  scope.add (relative_LAI_symbol, relative_LAI);
-  scope.add (DS_symbol, DS);
+  scope.set (distance_from_top_symbol, distance_from_top);
+  scope.set (relative_distance_from_top_symbol, relative_distance_from_top);
+  scope.set (LAI_symbol, LAI);
+  scope.set (relative_LAI_symbol, relative_LAI);
+  scope.set (DS_symbol, DS);
   double value = -1.0;
   if (!expr->tick_value (units, value, mol_per_area, scope, msg))
     throw "Missing value in rubisco forced expr";
@@ -144,7 +144,7 @@ static struct rubiscoNdist_forcedSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.add_object ("value", Number::component, 
+    frame.declare_object ("value", Number::component, 
                        Value::Const, Value::Singleton, "\
 Expression that evaluates to the relative rubisco capacity where 1 is the value in top of the canopy.");
     frame.order ("value");

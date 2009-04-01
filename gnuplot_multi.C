@@ -98,15 +98,15 @@ static struct GnuplotMultiSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("before", Value::String, Value::Const, 
+    frame.declare ("before", Value::String, Value::Const, 
                 Value::Sequence, "List of extra gnuplot commands.\n\
 The commands will be inserted right before the first graph.");
-    frame.add ("before", std::vector<symbol> ());
-    frame.add ("after", Value::String, Value::Const, 
+    frame.set_empty ("before");
+    frame.declare ("after", Value::String, Value::Const, 
                 Value::Sequence, "List of extra gnuplot commands.\n\
 The commands will be inserted right after the last graph.");
-    frame.add ("after", std::vector<symbol> ());
-    frame.add_object ("graph", Gnuplot::component, Value::State, 
+    frame.set_empty ("after");
+    frame.declare_object ("graph", Gnuplot::component, Value::State, 
                        Value::Sequence, "Graphs to plot.");
 
   }

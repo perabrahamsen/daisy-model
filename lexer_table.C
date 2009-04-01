@@ -64,11 +64,11 @@ public:
 void 
 LexerTable::Filter::load_syntax (Frame& frame)
 {
-  frame.add ("tag", Value::String, Value::Const, "\
+  frame.declare ("tag", Value::String, Value::Const, "\
 Name of column in Daisy log file to filter for.");
-  frame.add ("allowed", Value::String, Value::Const, Value::Sequence, "\
+  frame.declare ("allowed", Value::String, Value::Const, Value::Sequence, "\
 List of allowable values in filter.");
-  frame.add_check ("allowed", VCheck::min_size_1 ());
+  frame.set_check ("allowed", VCheck::min_size_1 ());
   frame.order ("tag", "allowed");
 }
 
@@ -443,19 +443,19 @@ LexerTable::error (const std::string& str) const
 void 
 LexerTable::load_syntax (Frame& frame)
 {
-  frame.add ("file", Value::String, Value::Const, "\
+  frame.declare ("file", Value::String, Value::Const, "\
 Name of Daisy log file where data is found.");
-  frame.add ("missing", Value::String, Value::Const, Value::Sequence, "\
+  frame.declare ("missing", Value::String, Value::Const, Value::Sequence, "\
 List of strings indicating missing values.");
   std::vector<symbol> misses;
   misses.push_back (symbol (""));
   misses.push_back (symbol ("00.00"));
-  frame.add ("missing", misses);
-  frame.add_submodule_sequence ("filter", Value::Const, "\
+  frame.set ("missing", misses);
+  frame.declare_submodule_sequence ("filter", Value::Const, "\
 Only include data from rows that passes all these filters.",
 				 LexerTable::Filter::load_syntax);
-  frame.add_empty ("filter");
-  frame.add ("original", Value::String, Value::OptionalConst, 
+  frame.set_empty ("filter");
+  frame.declare ("original", Value::String, Value::OptionalConst, 
               Value::Sequence, "\
 List of dimensions of the data in the data file.\n\
 \n\
@@ -464,7 +464,7 @@ dimension for all columns in the file.  Otherwise, the list must have\n\
 one element for each column.\n\
 \n\
 By default Daisy will use the names specified in data file.");
-  frame.add ("dim_line", Value::Boolean, Value::OptionalConst, "\
+  frame.declare ("dim_line", Value::Boolean, Value::OptionalConst, "\
 If true, assume the line after the tags contain dimensions.\n\
 By default this will be true iff 'original' is not specified.");
 }

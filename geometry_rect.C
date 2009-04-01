@@ -126,20 +126,20 @@ GeometryRect::check_y_border (const double, Treelog& err) const
 void
 GeometryRect::load_syntax (Frame& frame)
 { 
-  frame.add ("zplus", "cm", Check::negative (), 
+  frame.declare ("zplus", "cm", Check::negative (), 
 	      Value::Const, Value::Sequence,
 	      "Depth of each numeric layer (a negative number).\n\
 The end points are listed descending from the surface to the bottom.");
   static VCheck::All zplus_check (VCheck::decreasing (), 
 				  VCheck::min_size_1 ());
-  frame.add_check ("zplus", zplus_check);
-  frame.add ("xplus", "cm", Check::positive (), 
+  frame.set_check ("zplus", zplus_check);
+  frame.declare ("xplus", "cm", Check::positive (), 
 	      Value::Const, Value::Sequence,
 	      "Horizontal end of each numeric layer (a positive number).\n\
 The end points are listed ascending from left (0.0) to right.");
   static VCheck::All xplus_check (VCheck::increasing (), 
 				  VCheck::min_size_1 ());
-  frame.add_check ("xplus", xplus_check);
+  frame.set_check ("xplus", xplus_check);
 }
   
 GeometryRect::GeometryRect (Block& al)

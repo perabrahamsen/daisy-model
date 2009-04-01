@@ -643,51 +643,51 @@ load_Theta (Frame& frame)
 void
 SoilWater::load_syntax (Frame& frame)
 {
-  frame.add ("max_exfiltration_gradient", "cm/cm", Check::positive (), 
+  frame.declare ("max_exfiltration_gradient", "cm/cm", Check::positive (), 
               Value::OptionalConst,
               "Maximal pressure gradient for calculating exfiltration.\n\
 The gradient is assumed from center of top node to surface of top node.\n\
 By default, there is no maximum.");
   Geometry::add_layer (frame, Value::OptionalState, "h", load_h);
   Geometry::add_layer (frame, Value::OptionalState, "Theta", load_Theta);
-  frame.add ("Theta_primary", "cm^3/cm^3", Value::LogOnly, Value::Sequence,
+  frame.declare ("Theta_primary", "cm^3/cm^3", Value::LogOnly, Value::Sequence,
               "Water content in primary matrix system.\n\
 Conventionally, this is the intra-aggregate pores.");
-  frame.add ("Theta_secondary", "cm^3/cm^3", Value::LogOnly, 
+  frame.declare ("Theta_secondary", "cm^3/cm^3", Value::LogOnly, 
               Value::Sequence,
               "Water content in secondary matrix system.\n\
 Conventionally, this is the inter-aggregate pores.");
-  frame.add ("S_sum", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
+  frame.declare ("S_sum", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
 	      "Total water sink (due to root uptake and macropores).");
-  frame.add ("S_root", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
+  frame.declare ("S_root", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
 	      "Water sink due to root uptake.");
-  frame.add ("S_drain", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
+  frame.declare ("S_drain", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
 	      "Water sink due to soil drainage.");
-  frame.add ("S_incorp", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
+  frame.declare ("S_incorp", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
 	      "Incorporated water sink, typically from subsoil irrigation.");
-  frame.add ("tillage", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
+  frame.declare ("tillage", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
 	      "Changes in water content due to tillage operations.");
-  frame.add ("S_p", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
+  frame.declare ("S_p", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
 	      "Water sink (due to macropores).");
-  frame.add ("S_permanent", "cm^3/cm^3/h", Value::State, Value::Sequence,
+  frame.declare ("S_permanent", "cm^3/cm^3/h", Value::State, Value::Sequence,
 	      "Permanent water sink, e.g. subsoil irrigation.");
-  frame.add ("S_permanent", std::vector<double> ());
-  frame.add ("S_ice", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
+  frame.set_empty ("S_permanent");
+  frame.declare ("S_ice", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
 	      "Ice sink (due to thawing or freezing).");
-  frame.add_fraction ("X_ice", Value::OptionalState, Value::Sequence,
+  frame.declare_fraction ("X_ice", Value::OptionalState, Value::Sequence,
 		       "Ice volume fraction in soil.");
-  frame.add ("X_ice_buffer", Value::None (), 
+  frame.declare ("X_ice_buffer", Value::None (), 
 	      Value::OptionalState, Value::Sequence,
 	      "Ice volume that didn't fit the soil durin freezing.");
-  frame.add ("h_ice", Value::None (), Value::LogOnly, Value::Sequence,
+  frame.declare ("h_ice", Value::None (), Value::LogOnly, Value::Sequence,
 	      "Pressure at which all air is out of the matrix.\n\
 When there are no ice, this is 0.0.  When there are ice, the ice is\n\
 presummed to occupy the large pores, so it is h (Theta_sat - X_ice).");
-  frame.add ("q", "cm/h", Value::LogOnly, Value::Sequence,
+  frame.declare ("q", "cm/h", Value::LogOnly, Value::Sequence,
 	      "Matrix water flux (positive numbers mean upward).");  
-  frame.add ("q_p", "cm/h", Value::LogOnly, Value::Sequence,
+  frame.declare ("q_p", "cm/h", Value::LogOnly, Value::Sequence,
 	      "Water flux in macro pores (positive numbers mean upward).");
-  frame.add ("K", "cm/h", Value::LogOnly, Value::Sequence,
+  frame.declare ("K", "cm/h", Value::LogOnly, Value::Sequence,
 	      "Hydraulic conductivity.");
 }
 

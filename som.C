@@ -64,19 +64,19 @@ Slow SOM pool parameterization by Sander Bruun.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_strings ("cite", "daisy-somnew");
-    frame.add ("turnover_rate", 4.3e-5 / 24.0 /* 1.7916667e-6 */);
+    frame.set_strings ("cite", "daisy-somnew");
+    frame.set ("turnover_rate", 4.3e-5 / 24.0 /* 1.7916667e-6 */);
     std::vector<double> efficiency;
     efficiency.push_back (0.40); // SMB1
     efficiency.push_back (0.40); // SMB2
-    frame.add ("efficiency", efficiency);
+    frame.set ("efficiency", efficiency);
     std::vector<double> fractions;
     fractions.push_back (1.0); // SMB1
     fractions.push_back (0.0); // SMB2
     fractions.push_back (0.0); // SOM1
     fractions.push_back (0.0); // SOM2
     fractions.push_back (0.0); // SOM3
-    frame.add ("fractions", fractions);
+    frame.set ("fractions", fractions);
   }
 } SOMSlow_syntax;
 
@@ -88,8 +88,8 @@ Original parameterization of the slow SOM pool.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_strings ("cite", "mueller-smb");
-    frame.add ("turnover_rate", 2.7e-6 / 24.0 /* 1.125e-7 */);
+    frame.set_strings ("cite", "mueller-smb");
+    frame.set ("turnover_rate", 2.7e-6 / 24.0 /* 1.125e-7 */);
   }
 } SOMSlowOld_syntax;
 
@@ -101,19 +101,19 @@ Fast SOM pool parameterization by Sander Bruun.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_strings ("cite", "daisy-somnew");
-    frame.add ("turnover_rate", 1.4e-4 / 24.0 /* 5.83333333333e-6 */);
+    frame.set_strings ("cite", "daisy-somnew");
+    frame.set ("turnover_rate", 1.4e-4 / 24.0 /* 5.83333333333e-6 */);
     std::vector<double> efficiency;
     efficiency.push_back (0.50); // SMB1
     efficiency.push_back (0.50); // SMB2
-    frame.add ("efficiency", efficiency);
+    frame.set ("efficiency", efficiency);
     std::vector<double> fractions;
     fractions.push_back (0.7); // SMB1
     fractions.push_back (0.0); // SMB2
     fractions.push_back (0.3); // SOM1
     fractions.push_back (0.0); // SOM2
     fractions.push_back (0.0); // SOM3
-    frame.add ("fractions", fractions);
+    frame.set ("fractions", fractions);
   }
 } SOMFast_syntax;
 
@@ -125,14 +125,14 @@ Original parameterization of the fast SOM pool.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_strings ("cite", "mueller-smb");
+    frame.set_strings ("cite", "mueller-smb");
     std::vector<double> fractions;
     fractions.push_back (0.9); // SMB1
     fractions.push_back (0.0); // SMB2
     fractions.push_back (0.1); // SOM1
     fractions.push_back (0.0); // SOM2
     fractions.push_back (0.0); // SOM3
-    frame.add ("fractions", fractions);
+    frame.set ("fractions", fractions);
   }
 } SOMFastOld_syntax;
 
@@ -144,18 +144,18 @@ Inert SOM pool parameterization.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("turnover_rate", 0.0);
+    frame.set ("turnover_rate", 0.0);
     std::vector<double> efficiency;
     efficiency.push_back (0.50); // SMB1
     efficiency.push_back (0.50); // SMB2
-    frame.add ("efficiency", efficiency);
+    frame.set ("efficiency", efficiency);
     std::vector<double> fractions;
     fractions.push_back (0.0); // SMB1
     fractions.push_back (0.0); // SMB2
     fractions.push_back (0.0); // SOM1
     fractions.push_back (0.0); // SOM2
     fractions.push_back (1.0); // SOM3
-    frame.add ("fractions", fractions);
+    frame.set ("fractions", fractions);
   }
 } SOMInert_syntax;
 

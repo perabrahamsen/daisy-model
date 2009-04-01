@@ -28,13 +28,13 @@
 void
 Litter::load_syntax (Frame& frame)
 {
-  frame.add_fraction ("vapor_flux_factor", Value::Const, "\
+  frame.declare_fraction ("vapor_flux_factor", Value::Const, "\
 Reduction factor for potential evaporation below litter.");
-  frame.add ("vapor_flux_factor", 1.0);
-  frame.add ("interception_capacity", "mm", Value::Const,
+  frame.set ("vapor_flux_factor", 1.0);
+  frame.declare ("interception_capacity", "mm", Value::Const,
 	      "Storage capacity of litter.");
-  frame.add ("interception_capacity", 0.0);
-  frame.add ("albedo", Value::None (), Check::positive (),
+  frame.set ("interception_capacity", 0.0);
+  frame.declare ("albedo", Value::None (), Check::positive (),
               Value::OptionalConst, "Reflection factor.\n\
 By default, the surface albedo will be used.");
 }

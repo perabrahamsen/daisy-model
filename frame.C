@@ -354,94 +354,94 @@ Frame::submodel_name (const symbol key) const
 }
 
 void 
-Frame::add (const symbol key,	// Generic.
-	    Value::type t, 
-	    Value::category cat,
-	    int size,
-	    const symbol description)
-{ impl->syntax.add (key, t, cat, size, description); }
+Frame::declare (const symbol key,	// Generic.
+                Value::type t, 
+                Value::category cat,
+                int size,
+                const symbol description)
+{ impl->syntax.declare (key, t, cat, size, description); }
 
 
 void 
-Frame::add (const symbol key, // Number.
+Frame::declare (const symbol key, // Number.
 	    const symbol dim,
 	    Value::category cat,
 	    int size,
 	    const symbol description)
-{ impl->syntax.add (key, dim, cat, size, description); }
+{ impl->syntax.declare (key, dim, cat, size, description); }
 
 
 void 
-Frame::add (const symbol key,
+Frame::declare (const symbol key,
 	    const symbol dim,
 	    const Check& check,
 	    Value::category cat,
 	    int size,
 	    const symbol description)
-{ impl->syntax.add (key, dim, check, cat, size, description); }
+{ impl->syntax.declare (key, dim, check, cat, size, description); }
 
 
 void 
-Frame::add_fraction (const symbol key, 
+Frame::declare_fraction (const symbol key, 
 		     Value::category cat,
 		     int size,
 		     const symbol description)
-{ impl->syntax.add_fraction (key, cat, size, description); }
+{ impl->syntax.declare_fraction (key, cat, size, description); }
 
 
 void 
-Frame::add_fraction (const symbol key, 
+Frame::declare_fraction (const symbol key, 
 		     Value::category cat,
 		     const symbol description)
-{ impl->syntax.add_fraction (key, cat, description); }
+{ impl->syntax.declare_fraction (key, cat, description); }
 
 
 void 
-Frame::add (const symbol key, // PLF.
+Frame::declare (const symbol key, // PLF.
 	    const symbol domain,
 	    const symbol range,
 	    Value::category cat,
 	    int size,
 	    const symbol description)
-{ impl->syntax.add (key, domain, range, cat, size, description); }
+{ impl->syntax.declare (key, domain, range, cat, size, description); }
 
 void 
-Frame::add (const symbol key,
+Frame::declare (const symbol key,
 	    const symbol domain,
 	    const symbol range,
 	    const Check& check,
 	    Value::category cat,
 	    int size,
 	    const symbol description)
-{ impl->syntax.add (key, domain, range, check, cat, size, description); }
+{ impl->syntax.declare (key, domain, range, check, cat, size, description); }
 
 void 
-Frame::add_object (const symbol key, const symbol lib,
+Frame::declare_object (const symbol key, const symbol lib,
                    Value::category cat, int size, const symbol description)
-{ impl->syntax.add_object (key, lib, cat, size, description); }
+{ impl->syntax.declare_object (key, lib, cat, size, description); }
 
 void 
-Frame::add_submodule (const symbol name, 
+Frame::declare_submodule (const symbol name, 
 		      Value::category cat, const symbol description,
 		      load_syntax_t load_syntax)
 {
-  impl->syntax.add (name, load_syntax, cat, Value::Singleton, description);
+  impl->syntax.declare (name, load_syntax, cat, Value::Singleton, description);
   if (cat == Value::Const || cat == Value::State)
     // TODO: Move this to Frame::alist (name) (must return const first).
-    impl->alist.add (name, impl->syntax.default_frame (name));
+    impl->alist.set (name, impl->syntax.default_frame (name));
 }
 
 void 
-Frame::add_submodule_sequence (const symbol name, Value::category cat, 
+Frame::declare_submodule_sequence (const symbol name, Value::category cat, 
 			       const symbol description,
 			       load_syntax_t load_syntax)
 {
-  impl->syntax.add (name, load_syntax, cat, Value::Sequence, description);
+  impl->syntax.declare (name, load_syntax, cat, Value::Sequence, description);
 }
 
 void 
-Frame::add_check (const symbol name, const VCheck& vcheck)
-{ impl->syntax.add_check (name, vcheck); }
+Frame::set_check (const symbol name, const VCheck& vcheck)
+{ impl->syntax.set_check (name, vcheck); }
 
 
 void 
@@ -632,8 +632,8 @@ Frame::value_size (const symbol key) const
 }
 
 void
-Frame::add_reference (const symbol key, const symbol val)
-{ impl->alist.add_reference (key, val); }
+Frame::set_reference (const symbol key, const symbol val)
+{ impl->alist.set_reference (key, val); }
 
 bool 
 Frame::is_reference (const symbol key) const
@@ -842,21 +842,21 @@ Frame::verify (const symbol key, const Value::type want,
 }
 
 void 
-Frame::add (const symbol key, double value)
+Frame::set (const symbol key, double value)
 { 
   verify (key, Value::Number);
-  impl->alist.add (key, value); 
+  impl->alist.set (key, value); 
 }
 
 void 
-Frame::add (const symbol key, double value, const symbol dim)
+Frame::set (const symbol key, double value, const symbol dim)
 {
   verify (key, Value::Number);
-  impl->alist.add (key, value, dim); 
+  impl->alist.set (key, value, dim); 
 }
 
 void 
-Frame::add (const symbol key, const symbol name)
+Frame::set (const symbol key, const symbol name)
 {
   if (lookup (key) == Value::Object)
     {
@@ -866,61 +866,61 @@ Frame::add (const symbol key, const symbol name)
       intrinsics.instantiate (component, name);
       const FrameModel& old = intrinsics.library (component).model (name);
       FrameModel child (old, parent_link);
-      impl->alist.add (key, child);
+      impl->alist.set (key, child);
       return;
     }
   verify (key, Value::String);
-  impl->alist.add (key, name); 
+  impl->alist.set (key, name); 
 }
 
 void 
-Frame::add (const symbol key, const char *const name)
-{ add (key, symbol (name)); }
+Frame::set (const symbol key, const char *const name)
+{ set (key, symbol (name)); }
 
 void 
-Frame::add (const symbol key, bool value)
+Frame::set (const symbol key, bool value)
 {
   verify (key, Value::Boolean);
-  impl->alist.add (key, value); 
+  impl->alist.set (key, value); 
 }
 
 void 
-Frame::add (const symbol key, int value)
+Frame::set (const symbol key, int value)
 {
   verify (key, Value::Integer);
-  impl->alist.add (key, value); 
+  impl->alist.set (key, value); 
 }
 
 void 
-Frame::add (const symbol key, const FrameModel& value)
+Frame::set (const symbol key, const FrameModel& value)
 {
   verify (key, Value::Object);
-  impl->alist.add (key, value);
+  impl->alist.set (key, value);
 }
 
 void 
-Frame::add (const symbol key, const FrameSubmodel& value)
+Frame::set (const symbol key, const FrameSubmodel& value)
 {
   verify (key, Value::AList);
-  impl->alist.add (key, value);
+  impl->alist.set (key, value);
 }
 
 void 
-Frame::add (const symbol key, const PLF& value)
+Frame::set (const symbol key, const PLF& value)
 {
   verify (key, Value::PLF);
-  impl->alist.add (key, value); 
+  impl->alist.set (key, value); 
 }
 
 void 
-Frame::add (const symbol key, const std::vector<double>& value)
+Frame::set (const symbol key, const std::vector<double>& value)
 {
   verify (key, Value::Number, value.size ());
-  impl->alist.add (key, value); 
+  impl->alist.set (key, value); 
 }
 
 void 
-Frame::add (const symbol key, const std::vector<symbol>& value)
+Frame::set (const symbol key, const std::vector<symbol>& value)
 {
   if (lookup (key) == Value::Object)
     {
@@ -935,109 +935,109 @@ Frame::add (const symbol key, const std::vector<symbol>& value)
           const FrameModel& old = intrinsics.library (component).model (name);
           frames.push_back (new FrameModel (old, parent_link));
         }
-      impl->alist.add (key, frames);
+      impl->alist.set (key, frames);
       return;
     }
   verify (key, Value::String, value.size ());
-  impl->alist.add (key, value); 
+  impl->alist.set (key, value); 
 }
 
 void 
-Frame::add_strings (const symbol key)
+Frame::set_strings (const symbol key)
 {
   std::vector<symbol> all;
-  add (key, all);
+  set (key, all);
 }
 
 void 
-Frame::add_strings (const symbol key, const symbol a)
+Frame::set_strings (const symbol key, const symbol a)
 {
   std::vector<symbol> all;
   all.push_back (a);
-  add (key, all);
+  set (key, all);
 }
 
 void 
-Frame::add_strings (const symbol key,
+Frame::set_strings (const symbol key,
                     const symbol a, const symbol b)
 {
   std::vector<symbol> all;
   all.push_back (a);
   all.push_back (b);
-  add (key, all);
+  set (key, all);
 }
 
 void 
-Frame::add_strings (const symbol key,
+Frame::set_strings (const symbol key,
                     const symbol a, const symbol b, const symbol c)
 {
   std::vector<symbol> all;
   all.push_back (a);
   all.push_back (b);
   all.push_back (c);
-  add (key, all);
+  set (key, all);
 }
 
 void 
-Frame::add (const symbol key, const std::vector<bool>& value)
+Frame::set (const symbol key, const std::vector<bool>& value)
 {
   verify (key, Value::Boolean, value.size ());
-  impl->alist.add (key, value); 
+  impl->alist.set (key, value); 
 }
 
 void 
-Frame::add (const symbol key, const std::vector<int>& value)
+Frame::set (const symbol key, const std::vector<int>& value)
 {
   verify (key, Value::Integer, value.size ());
-  impl->alist.add (key, value); 
+  impl->alist.set (key, value); 
 }
 
 void 
-Frame::add (const symbol key, const std::vector<const FrameModel*>& value)
+Frame::set (const symbol key, const std::vector<const FrameModel*>& value)
 {
   verify (key, Value::Object, value.size ());
-  impl->alist.add (key, value); 
+  impl->alist.set (key, value); 
 }
 
 void 
-Frame::add (const symbol key, const std::vector<const FrameSubmodel*>& value)
+Frame::set (const symbol key, const std::vector<const FrameSubmodel*>& value)
 {
   verify (key, Value::AList, value.size ());
-  impl->alist.add (key, value); 
+  impl->alist.set (key, value); 
 }
 
 void 
-Frame::add (const symbol key, const std::vector<const PLF*>& value)
+Frame::set (const symbol key, const std::vector<const PLF*>& value)
 {
   verify (key, Value::PLF, value.size ());
-  impl->alist.add (key, value); 
+  impl->alist.set (key, value); 
 }
 
 void 
-Frame::add_empty (const symbol key)
+Frame::set_empty (const symbol key)
 {
   switch (lookup (key))
     {
     case Value::Number:
-      impl->alist.add (key, std::vector<double> ());
+      impl->alist.set (key, std::vector<double> ());
       break;
     case Value::Object:
-      impl->alist.add (key, std::vector<const FrameModel*> ());
+      impl->alist.set (key, std::vector<const FrameModel*> ());
       break;
     case Value::AList:
-      impl->alist.add (key, std::vector<const FrameSubmodel*> ());
+      impl->alist.set (key, std::vector<const FrameSubmodel*> ());
       break;
     case Value::PLF:
-      impl->alist.add (key, std::vector<const PLF*> ());
+      impl->alist.set (key, std::vector<const PLF*> ());
       break;
     case Value::Boolean:
-      impl->alist.add (key, std::vector<bool> ());
+      impl->alist.set (key, std::vector<bool> ());
       break;
     case Value::String:
-      impl->alist.add (key, std::vector<symbol> ());
+      impl->alist.set (key, std::vector<symbol> ());
       break;
     case Value::Integer:
-      impl->alist.add (key, std::vector<int> ());
+      impl->alist.set (key, std::vector<int> ());
       break;
     case Value::Scalar:
     case Value::Reference:

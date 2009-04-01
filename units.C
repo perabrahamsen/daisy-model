@@ -496,10 +496,10 @@ Units::add_unit (Metalib& metalib, const symbol name)
 void
 Units::load_syntax (Frame& frame)
 {
-  frame.add ("allow_old_units", Value::Boolean, Value::Const, "\
+  frame.declare ("allow_old_units", Value::Boolean, Value::Const, "\
 OBSOLETE: Set this to true to enable the old system of build-in\n\
 unit conversation.");
-  frame.add ("allow_old_units", true);
+  frame.set ("allow_old_units", true);
 }
 
 Units::Units (Metalib& metalib)

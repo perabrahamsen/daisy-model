@@ -374,21 +374,21 @@ horizontal.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_object ("vertical", UZmodel::component, 
+    frame.declare_object ("vertical", UZmodel::component, 
                       Value::Const, Value::Sequence,
                       "Vertical matrix water transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends.");
-    frame.add_strings ("vertical", "richards", "lr");
-    frame.add_object ("horizontal", UZ1D::component,
+    frame.set_strings ("vertical", "richards", "lr");
+    frame.declare_object ("horizontal", UZ1D::component,
                       Value::Const, Value::Sequence,
                       "Horizontal matrix water transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends."); 
 #if 0
-    frame.add_strings ("horizontal", "richards", "none");
+    frame.set_strings ("horizontal", "richards", "none");
 #endif
-    frame.add_strings ("horizontal", "none");
+    frame.set_strings ("horizontal", "none");
   }
 } UZRect2x1_syntax;
 

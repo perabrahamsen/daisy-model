@@ -659,12 +659,12 @@ Geometry::add_layer (Frame& frame, const symbol dimension,
                      const Value::category cat, 
                      const symbol description)
 {
-  frame.add ("end", "cm", Check::negative (), Value::Const, 
+  frame.declare ("end", "cm", Check::negative (), Value::Const, 
 	     "End point of this layer (a negative number).");
   if (dimension == Value::Fraction ())
-    frame.add_fraction ("value", Value::Const, description);
+    frame.declare_fraction ("value", Value::Const, description);
   else
-    frame.add ("value", dimension, Value::Const, description);
+    frame.declare ("value", dimension, Value::Const, description);
   frame.order ("end", "value");
 }
 
@@ -678,17 +678,17 @@ Geometry::add_layer (Frame& frame, const Value::category cat,
   const symbol dimension = child.dimension ("value");
   
   const std::string iname = "initial_" + name;
-  frame.add_submodule_sequence (iname, Value::OptionalConst, "\
+  frame.declare_submodule_sequence (iname, Value::OptionalConst, "\
 Initial value of the '" + name + "' parameter.\n\
 The initial value is given as a sequence of (END VALUE) pairs, starting\n \
 from the top and going down.  The parameter will be initialized to\n\
 VALUE from the END of the previous layer, to the END of the current layer.",
                                 load_syntax);
-  frame.add_check (iname, check_layers);
+  frame.set_check (iname, check_layers);
   if (dimension == Value::Fraction ())
-    frame.add_fraction (name, cat, Value::Sequence, description);
+    frame.declare_fraction (name, cat, Value::Sequence, description);
   else
-    frame.add (name, dimension, cat, Value::Sequence, description);
+    frame.declare (name, dimension, cat, Value::Sequence, description);
 }
 
 void 

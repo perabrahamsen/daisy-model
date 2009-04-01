@@ -81,15 +81,15 @@ static struct StomataConSHASyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.add ("lambda", Value::None (), Check::non_negative (), Value::Const,
+    frame.declare ("lambda", Value::None (), Check::non_negative (), Value::Const,
                 "Coefficient");
-    frame.add ("lambda", 1.0);
-    frame.add ("alpha", Value::None (), Check::non_negative (), Value::Const,
+    frame.set ("lambda", 1.0);
+    frame.declare ("alpha", Value::None (), Check::non_negative (), Value::Const,
                 "Coefficient");
-    frame.add ("alpha", 1.0);
-    frame.add ("M", "[mol/m²leaf/s]", Check::non_negative (), Value::Const,
+    frame.set ("alpha", 1.0);
+    frame.declare ("M", "[mol/m²leaf/s]", Check::non_negative (), Value::Const,
 	       "Parameter ??");
-    frame.add ("M", 1.0);
+    frame.set ("M", 1.0);
 
   }
 } StomataConSHAsyntax;

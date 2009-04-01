@@ -328,24 +328,24 @@ static struct LogSelectSyntax : public DeclareBase
   void load_frame (Frame& frame) const
   {
     Model::load_model (frame);
-    frame.add_object ("when", Condition::component, "\
+    frame.declare_object ("when", Condition::component, "\
 Add entries to the log file when this condition is true.");
-    frame.add_object ("entries", Select::component, 
+    frame.declare_object ("entries", Select::component, 
                        Value::State, Value::Sequence,
                        "What to log in each column.");
-    frame.add ("time_columns", Value::Boolean, Value::OptionalConst, "\
+    frame.declare ("time_columns", Value::Boolean, Value::OptionalConst, "\
 Iff true, add columns for year, month, mday and hour in the begining of\n\
 the lines.  By default, this will be true of you have not specified any\n\
 time entries yourself.");
-    frame.add_object ("volume", Volume::component, 
+    frame.declare_object ("volume", Volume::component, 
                        Value::Const, Value::Singleton,
                        "Soil volume to log.");
-    frame.add ("volume", "box");
-    frame.add ("from", "cm", Value::OptionalConst,
+    frame.set ("volume", "box");
+    frame.declare ("from", "cm", Value::OptionalConst,
                 "Default 'from' value for all entries.\n\
 By default, use the top of the soil.\n\
 OBSOLETE: Use (volume box (top FROM)) instead.");
-    frame.add ("to", "cm", Value::OptionalConst,
+    frame.declare ("to", "cm", Value::OptionalConst,
                 "Default 'to' value for all entries.\n\
 By default, use the bottom of the soil.\n\
 OBSOLETE: Use (volume box (bottom TO)) instead.");

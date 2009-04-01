@@ -120,19 +120,19 @@ Initial crop growth is governed by carbon released from seeds.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("initial_weight", "g w.w./m^2",
+    frame.declare ("initial_weight", "g w.w./m^2",
                 Check::positive (), Value::OptionalConst, "\
 Initial seed weight to use when not specified by the sow operation.\n\
 If not specified here, specifying seed amount when sowing is mandatory.");
-    frame.add ("DM_fraction", Value::Fraction (), Value::Const, "\
+    frame.declare ("DM_fraction", Value::Fraction (), Value::Const, "\
 Dry matter content in seeds.");
-    frame.add ("C_fraction", Value::Fraction (), Value::Const, "\
+    frame.declare ("C_fraction", Value::Fraction (), Value::Const, "\
 Carbon content in seeds.");
-    frame.add ("N_fraction", Value::Fraction (), Value::Const, "\
+    frame.declare ("N_fraction", Value::Fraction (), Value::Const, "\
 Nitrogen content in seeds.");
-    frame.add ("rate", "h^-1", Check::positive (), Value::Const, "\
+    frame.declare ("rate", "h^-1", Check::positive (), Value::Const, "\
 Release rate of seed carbon to assimilate pool.");
-    frame.add ("C", "g C/m^2", Check::non_negative (), Value::OptionalState, "\
+    frame.declare ("C", "g C/m^2", Check::non_negative (), Value::OptionalState, "\
 Unreleased carbon left in seeds.");
   }
 } SeedRelease_syntax;

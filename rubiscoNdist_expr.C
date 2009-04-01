@@ -94,12 +94,12 @@ rubiscoNdist_expr::function (const Units& units,
 			     const double relative_distance_from_top,
                              const double DS)
 {
-  scope.add (distance_from_top_symbol, distance_from_top);
-  scope.add (relative_distance_from_top_symbol,
+  scope.set (distance_from_top_symbol, distance_from_top);
+  scope.set (relative_distance_from_top_symbol,
                     relative_distance_from_top);
-  scope.add (LAI_symbol, LAI);
-  scope.add (relative_LAI_symbol, relative_LAI);
-  scope.add (DS_symbol, DS);
+  scope.set (LAI_symbol, LAI);
+  scope.set (relative_LAI_symbol, relative_LAI);
+  scope.set (DS_symbol, DS);
   double value = -1.0;
   if (!expr->tick_value (units, value, Value::Fraction (), scope,
                          Treelog::null ()))
@@ -182,11 +182,11 @@ static struct rubiscoNdist_exprSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.add ("f_photo", Value::None (), Check::positive (), Value::Const,
+    frame.declare ("f_photo", Value::None (), Check::positive (), Value::Const,
                 "Fraction of photosynthetically active N in canopy. According to (Boegh et al., 2002) f_photo = 0.75. However, non-functional N is already substracted from leaf-N in the cropN_std module, therefore f_photo = 1.0 as default.");
-    frame.add ("f_photo", 1.0);
+    frame.set ("f_photo", 1.0);
 
-    frame.add_object ("value", Number::component, 
+    frame.declare_object ("value", Number::component, 
                        Value::Const, Value::Singleton, "\
 Expression that evaluates to the relative rubisco N intesity where 1 is the value in top of the canopy.");
     frame.order ("value");

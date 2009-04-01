@@ -151,13 +151,13 @@ static struct HydraulicM_vGSyntax : public DeclareModel
   { 
     Hydraulic::load_Theta_res (frame);
     Hydraulic::load_K_sat (frame);
-    frame.add ("alpha", "cm^-1", Value::Const,
+    frame.declare ("alpha", "cm^-1", Value::Const,
                 "van Genuchten alpha.");
-    frame.add ("n", Value::None (), Value::Const,
+    frame.declare ("n", Value::None (), Value::Const,
                 "van Genuchten n.");
-    frame.add ("l", Value::None (), Value::Const,
+    frame.declare ("l", Value::None (), Value::Const,
                 "tortuosity parameter.");
-    frame.add ("l", 0.5);
+    frame.set ("l", 0.5);
 
   }
 } hydraulicM_vG_syntax;

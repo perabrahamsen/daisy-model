@@ -100,7 +100,7 @@ static struct DepthConstSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("value", "cm", Check::non_positive (), Value::Const, 
+    frame.declare ("value", "cm", Check::non_positive (), Value::Const, 
                 "Constant depth.");
     frame.order ("value");
   }
@@ -158,10 +158,10 @@ Look up depth in an scope.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_object ("value", Number::component, 
+    frame.declare_object ("value", Number::component, 
                        Value::Const, Value::Singleton, "\
 Expression that evaluates to a depth.");
-    frame.add ("initial_value", "cm", Check::none (), Value::OptionalConst,
+    frame.declare ("initial_value", "cm", Check::none (), Value::OptionalConst,
 		"Initial depth.");
 
   }
@@ -236,9 +236,9 @@ static struct DepthPLFSyntax : public DeclareModel
 {
   static void entry_syntax (Frame& frame)
   {
-    frame.add_submodule ("time", Value::Const, "Time.",
+    frame.declare_submodule ("time", Value::Const, "Time.",
                           Time::load_syntax);
-    frame.add ("value", "cm", Check::non_positive (), Value::Const, 
+    frame.declare ("value", "cm", Check::non_positive (), Value::Const, 
                 "Depth.");
     frame.order ("time", "value");
   }
@@ -249,14 +249,14 @@ static struct DepthPLFSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_submodule_sequence ("table", Value::Const, 
+    frame.declare_submodule_sequence ("table", Value::Const, 
                           "Height as a function of time.\n\
 This is a list where each element has the form (TIME VALUE).\n\
 The TIME entries must be increasing cronologically.  The corresponding\n\
 VALUE represents the value at that time.  In order to find\n\
 the depth for other times, linear interpolation between the entries\n\
 in the list will be used.", entry_syntax);
-    frame.add_check ("table", check_table);
+    frame.set_check ("table", check_table);
     frame.order ("table");
   }
 } DepthPLF_syntax;
@@ -389,7 +389,7 @@ static struct DepthFileSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("file", Value::String, Value::Const,
+    frame.declare ("file", Value::String, Value::Const,
                 "Name of file to read data from.\n\
 The format of each line in the file is 'YEAR MONTH DAY HEIGHT',\n\
 where HEIGHT should in cm above ground (i.e. a negative number).\n\

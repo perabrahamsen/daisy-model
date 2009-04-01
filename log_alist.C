@@ -245,7 +245,7 @@ LogAList::close ()
                 for (size_t i = 0; i < old_frame_sequence.size (); i++)
                   copy.push_back (dynamic_cast<const FrameModel*>
                                   (old_frame_sequence[i]));
-                frame ().add (sold_entry, copy);
+                frame ().set (sold_entry, copy);
               }
               break;
 	    case Value::AList:
@@ -253,7 +253,7 @@ LogAList::close ()
 	      if (frame ().type_size (sold_entry) == Value::Singleton)
 		{
 		  daisy_assert (old_frame_sequence.size () == 0);
-		  frame ().add (sold_entry, 
+		  frame ().set (sold_entry, 
                                 dynamic_cast<const FrameSubmodel&> (old_frame));
 		}
 	      else
@@ -262,7 +262,7 @@ LogAList::close ()
                   for (size_t i = 0; i < old_frame_sequence.size (); i++)
                     copy.push_back (dynamic_cast<const FrameSubmodel*>
                                     (old_frame_sequence[i]));
-                  frame ().add (sold_entry, copy);
+                  frame ().set (sold_entry, copy);
                 }
 	      delete &old_frame;
 	      break;
@@ -339,7 +339,7 @@ LogAList::close_alist ()
       Frame& old_frame = frame ();
       const std::string& old_entry = entry ().name ();
       pop ();
-      frame ().add (old_entry, dynamic_cast<const FrameSubmodel&> (old_frame));
+      frame ().set (old_entry, dynamic_cast<const FrameSubmodel&> (old_frame));
       delete &old_frame;
     }
   else
@@ -392,7 +392,7 @@ LogAList::close_object ()
       Frame& old_frame = frame ();
       const symbol old_entry = entry ();
       pop ();
-      frame ().add (old_entry, dynamic_cast<const FrameModel&> (old_frame));
+      frame ().set (old_entry, dynamic_cast<const FrameModel&> (old_frame));
       delete &old_frame;
     }
   else
@@ -438,7 +438,7 @@ LogAList::output_entry (symbol name, const bool value)
   const std::string& sname = name.name ();
   daisy_assert (!frame ().is_const (sname));
   if (frame ().is_state (sname))
-    frame ().add (sname, value);
+    frame ().set (sname, value);
 }
 
 void
@@ -449,7 +449,7 @@ LogAList::output_entry (symbol name, const double value)
   const std::string& sname = name.name ();
   daisy_assert (!frame ().is_const (sname));
   if (frame ().is_state (sname))
-    frame ().add (sname, value);
+    frame ().set (sname, value);
 }
 
 void
@@ -460,7 +460,7 @@ LogAList::output_entry (symbol name, const int value)
   const std::string& sname = name.name ();
   daisy_assert (!frame ().is_const (sname));
   if (frame ().is_state (sname))
-    frame ().add (sname, value);
+    frame ().set (sname, value);
 }
 
 void
@@ -471,7 +471,7 @@ LogAList::output_entry (symbol name, symbol value)
   const std::string& sname = name.name ();
   daisy_assert (!frame ().is_const (sname));
   if (frame ().is_state (sname))
-    frame ().add (sname, value);
+    frame ().set (sname, value);
 }
 
 void
@@ -482,7 +482,7 @@ LogAList::output_entry (symbol name, const std::vector<double>& value)
   const std::string& sname = name.name ();
   daisy_assert (!frame ().is_const (sname));
   if (frame ().is_state (sname))
-    frame ().add (sname, value);
+    frame ().set (sname, value);
 }
 
 void
@@ -493,7 +493,7 @@ LogAList::output_entry (symbol name, const PLF& value)
   const std::string& sname = name.name ();
   daisy_assert (!frame ().is_const (sname));
   if (frame ().is_state (sname))
-    frame ().add (sname, value);
+    frame ().set (sname, value);
 }
 
 bool

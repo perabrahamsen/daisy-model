@@ -151,9 +151,9 @@ Test if the soil is warmer than the specified temperature.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("temperature", "dg C", Value::Const, "\
+    frame.declare ("temperature", "dg C", Value::Const, "\
 Lowest soil temperature for which the condition is true.");
-    frame.add ("height", "cm", Check::non_positive (), Value::Const, "\
+    frame.declare ("height", "cm", Check::non_positive (), Value::Const, "\
 Soil depth in which to test the temperature.");
   }
 } ConditionSoilTemperature_syntax;
@@ -168,9 +168,9 @@ Test if the soil is wetter than the specified pressure potential.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add ("potential", "cm", Value::Const, "\
+    frame.declare ("potential", "cm", Value::Const, "\
 The soil should be wetter than this for the condition to be true.");
-    frame.add ("height", "cm", Check::non_positive (), Value::Const, "\
+    frame.declare ("height", "cm", Check::non_positive (), Value::Const, "\
 Depth at which to example the pressure potential.");
   }
 } ConditionSoilPotential_syntax;
@@ -201,12 +201,12 @@ Test if the soil contains more water than the specified amount.")
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_water_content);
-    frame.add ("water", "mm", Check::non_negative (), Value::Const, "\
+    frame.declare ("water", "mm", Check::non_negative (), Value::Const, "\
 The soil should contain more water than this for the condition to be true.");
-    frame.add ("from", "cm", Check::non_positive (), Value::Const, "\
+    frame.declare ("from", "cm", Check::non_positive (), Value::Const, "\
 Top of interval to measure soil water content in.");
-    frame.add ("from", 0.0);
-    frame.add ("to", "cm", Check::non_positive (), Value::Const, "\
+    frame.set ("from", 0.0);
+    frame.declare ("to", "cm", Check::non_positive (), Value::Const, "\
 Bottom of interval to measure soil water content in.");
     frame.order ("water");
   }
@@ -223,14 +223,14 @@ Test if the soil contains more mineral nitrogen than the specified amount.")
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_water_content);
-    frame.add ("amount", "kg N/ha",
+    frame.declare ("amount", "kg N/ha",
                Check::non_negative (), Value::Const, "\
 The soil should contain more inorganic nitrogen than this for\n\
 the condition to be true.");
-    frame.add ("from", "cm", Check::non_positive (), Value::Const, "\
+    frame.declare ("from", "cm", Check::non_positive (), Value::Const, "\
 Top of interval to measure soil content in.");
-    frame.add ("from", 0.0);
-    frame.add ("to", "cm", Check::non_positive (), Value::Const, "\
+    frame.set ("from", 0.0);
+    frame.declare ("to", "cm", Check::non_positive (), Value::Const, "\
 Bottom of interval to measure soil content in.");
     frame.order ("amount");
   }

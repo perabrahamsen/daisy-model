@@ -57,9 +57,9 @@ struct Hydraulic::K_at_h
   // Create and Destroy.
   static void load_syntax (Frame& frame)
   {
-    frame.add ("h", "cm", Check::non_positive (), Value::Const, 
+    frame.declare ("h", "cm", Check::non_positive (), Value::Const, 
 		"Soil water pressure.");
-    frame.add ("K", "cm/h", Check::positive (), Value::Const, 
+    frame.declare ("K", "cm/h", Check::positive (), Value::Const, 
 		"Water conductivity.");
     frame.order ("h", "K");
   }
@@ -139,15 +139,15 @@ check_Theta_res (Metalib&, const Frame& al, Treelog& err)
 
 void
 Hydraulic::load_Theta_sat (Frame& frame)
-{ frame.add_fraction ("Theta_sat",  Value::State, "Saturation point."); }
+{ frame.declare_fraction ("Theta_sat",  Value::State, "Saturation point."); }
 
 void
 Hydraulic::load_Theta_res (Frame& frame)
 { 
   load_Theta_sat (frame);
   frame.add_check (check_Theta_res);
-  frame.add_fraction ("Theta_res", Value::Const, "Soil residual water.");
-  frame.add ("Theta_res", 0.0);
+  frame.declare_fraction ("Theta_res", Value::Const, "Soil residual water.");
+  frame.set ("Theta_res", 0.0);
 }
 
 static bool
@@ -166,9 +166,9 @@ void
 Hydraulic::load_K_sat_optional (Frame& frame)
 {
   frame.add_check (check_K_sat_optional);
-  frame.add ("K_sat", "cm/h", Check::positive (), Value::OptionalConst,
+  frame.declare ("K_sat", "cm/h", Check::positive (), Value::OptionalConst,
 	      "Water conductivity of saturated soil.");
-  frame.add_submodule ("K_at_h", Value::OptionalConst, "\
+  frame.declare_submodule ("K_at_h", Value::OptionalConst, "\
 Water conductivity at specified pressure.", K_at_h::load_syntax);
 }
 
@@ -286,12 +286,12 @@ Generate a table of the rentention curve and hydraulic conductivity.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_object ("hydraulic", Hydraulic::component, 
+    frame.declare_object ("hydraulic", Hydraulic::component, 
                        Value::Const, Value::Singleton, "\
 The hydraulic model to show in the table.");
-    frame.add ("intervals", Value::Integer, Value::Const, "\
+    frame.declare ("intervals", Value::Integer, Value::Const, "\
 Number of intervals in the table.");
-    frame.add ("intervals", 50);
+    frame.set ("intervals", 50);
     frame.order ("hydraulic");
   }
 } ProgramHydraulic_table_syntax;

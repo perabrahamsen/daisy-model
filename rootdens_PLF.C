@@ -76,9 +76,9 @@ static Rootdens_PLF::Check_Indexes check_indexes;
 void 
 Rootdens_PLF::Entry::load_syntax (Frame& frame)
 {
-  frame.add ("index", Value::Unknown (), Check::none (), Value::Const, 
+  frame.declare ("index", Value::Unknown (), Check::none (), Value::Const, 
 	      "Index for specifying root density.");
-  frame.add ("density", Value::Unknown (), Value::None (), Value::Const, "\
+  frame.declare ("density", Value::Unknown (), Value::None (), Value::Const, "\
 Relative root density as a function of root depth .");
   frame.order ("index", "density");
 }
@@ -231,7 +231,7 @@ Specify root density as a function of development stage.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_submodule_sequence("entries", Value::Const, "\
+    frame.declare_submodule_sequence("entries", Value::Const, "\
 A list of pairs, where the first element of each pair is a development\n\
 stage (usually a number between 0 (emergence) and 2 (ripe), and the\n\
 second element is a PLF specifying the relative root density as a\n\
@@ -242,7 +242,7 @@ root density distribution specified for the entries before and after\n\
 the current development stage, and scale them to match the current\n\
 total root mass.",
 				  Rootdens_PLF::Entry::load_syntax);
-    frame.add_check ("entries", check_indexes);
+    frame.set_check ("entries", check_indexes);
   }
 } Rootdens_DS_Depth_syntax;
 
@@ -279,7 +279,7 @@ Specify root density as a function of development stage.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_submodule_sequence("entries", Value::Const, "\
+    frame.declare_submodule_sequence("entries", Value::Const, "\
 A list of pairs, where the first element of each pair is a development\n\
 stage (usually a number between 0 (emergence) and 2 (ripe), and the\n\
 second element is a PLF specifying the relative root density as a\n\
@@ -290,7 +290,7 @@ root density distribution specified for the entries before and after\n\
 the current development stage, and scale them to match the current\n\
 total root mass.",
 				  Rootdens_PLF::Entry::load_syntax);
-    frame.add_check ("entries", check_indexes);
+    frame.set_check ("entries", check_indexes);
 
   }
 } Rootdens_DS_Rel_syntax;
@@ -327,7 +327,7 @@ Specify root density as a function of development stage.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.add_submodule_sequence("entries", Value::Const, "\
+    frame.declare_submodule_sequence("entries", Value::Const, "\
 A list of pairs, where the first element of each pair is the root depth,\
 \n(a positive number), and the second element is a PLF specifying the\n\
 relative root density as a function of soil depth in cm (a positive number).\n\
@@ -337,7 +337,7 @@ root density distribution specified for the entries before and after\n\
 the current development stage, and scale them to match the current\n\
 total root mass.",
 				  Rootdens_PLF::Entry::load_syntax);
-    frame.add_check ("entries", check_indexes);
+    frame.set_check ("entries", check_indexes);
 
   }
 } Rootdens_Depth_Depth_syntax;

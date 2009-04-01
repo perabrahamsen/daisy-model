@@ -95,7 +95,7 @@ static struct NumberLog10Syntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.add_object ("operand", Number::component,
+    frame.declare_object ("operand", Number::component,
                        "Operand for this function.");
     frame.order ("operand");
   }
@@ -128,7 +128,7 @@ static struct NumberLnSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.add_object ("operand", Number::component,
+    frame.declare_object ("operand", Number::component,
                        "Operand for this function.");
     frame.order ("operand");
   }
@@ -160,7 +160,7 @@ static struct NumberExpSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.add_object ("operand", Number::component,
+    frame.declare_object ("operand", Number::component,
                        "Operand for this function.");
     frame.order ("operand");
   }
@@ -193,7 +193,7 @@ static struct NumberSqrtSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.add_object ("operand", Number::component,
+    frame.declare_object ("operand", Number::component,
                        "Operand for this function.");
     frame.order ("operand");
   }
@@ -230,7 +230,7 @@ static struct NumberSqrSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.add_object ("operand", Number::component,
+    frame.declare_object ("operand", Number::component,
                        "Operand for this function.");
     frame.order ("operand");
   }
@@ -299,9 +299,9 @@ static struct NumberPowSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.add_object ("base", Number::component,
+    frame.declare_object ("base", Number::component,
                        "The base operand for this function.");
-    frame.add_object ("exponent", Number::component,
+    frame.declare_object ("exponent", Number::component,
                        "The exponent operand for this function.");
     frame.order ("base", "exponent");
   }
@@ -457,14 +457,14 @@ static struct NumberMaxSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.add_object ("operands", Number::component,
+    frame.declare_object ("operands", Number::component,
                        Value::Const, Value::Sequence,
                        "The operands for this function.");
 #ifdef CHECK_OPERANDS_DIM
     static VCheck::All all (VCheck::min_size_1 (),
                             NumberOperands::unique);
 #endif // CHECK_OPERANDS_DIM
-    frame.add_check ("operands", VCheck::min_size_1 ());
+    frame.set_check ("operands", VCheck::min_size_1 ());
     frame.order ("operands");
   }
 } NumberMax_syntax;
@@ -504,15 +504,15 @@ static struct NumberMinSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.add_object ("operands", Number::component,
+    frame.declare_object ("operands", Number::component,
                        Value::Const, Value::Sequence,
                        "The operands for this function.");
 #ifdef CHECK_OPERANDS_DIM
     static VCheck::All all (VCheck::min_size_1 (), 
                             NumberOperands::unique);
-    frame.add_check ("operands", all);
+    frame.set_check ("operands", all);
 #else // !CHECK_OPERANDS_DIM
-    frame.add_check ("operands", VCheck::min_size_1 ());
+    frame.set_check ("operands", VCheck::min_size_1 ());
 #endif // !CHECK_OPERANDS_DIM
     frame.order ("operands");
   }
@@ -553,7 +553,7 @@ static struct NumberProductSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.add_object ("operands", Number::component,
+    frame.declare_object ("operands", Number::component,
                        Value::Const, Value::Sequence,
                        "The operands for this function.");
     frame.order ("operands");
@@ -590,11 +590,11 @@ static struct NumberSumSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.add_object ("operands", Number::component,
+    frame.declare_object ("operands", Number::component,
                        Value::Const, Value::Sequence,
                        "The operands for this function.");
 #ifdef CHECK_OPERANDS_DIM
-    frame.add_check ("operands", NumberOperands::unique);
+    frame.set_check ("operands", NumberOperands::unique);
 #endif // CHECK_OPERANDS_DIM
     frame.order ("operands");
   }
@@ -635,13 +635,13 @@ subtracts all but the first from the first.")
   void load_frame (Frame& frame) const
   {
 
-    frame.add_object ("operands", Number::component,
+    frame.declare_object ("operands", Number::component,
                        Value::Const, Value::Sequence,
                        "The operands for this function.");
 #ifdef CHECK_OPERANDS_DIM
     static VCheck::All all (VCheck::min_size_1 (), 
                             NumberOperands::unique);
-    frame.add_check ("operands", all);
+    frame.set_check ("operands", all);
 #endif // CHECK_OPERANDS_DIM
     frame.order ("operands");
   }
@@ -678,10 +678,10 @@ static struct NumberDivideSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.add_object ("operands", Number::component,
+    frame.declare_object ("operands", Number::component,
                        Value::Const, Value::Sequence,
                        "The operands for this function.");
-    frame.add_check ("operands", VCheck::min_size_1 ());
+    frame.set_check ("operands", VCheck::min_size_1 ());
     frame.order ("operands");
   }
 } NumberDivide_syntax;

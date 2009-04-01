@@ -154,21 +154,21 @@ Timestep::load_syntax (Frame& frame)
 void 
 Timestep::load_frame (Frame& frame)
 {
-  frame.add ("years", Value::Integer, Value::State, 
+  frame.declare ("years", Value::Integer, Value::State, 
               "Number of years.");
-  frame.add ("years", 0);
-  frame.add ("days", Value::Integer, Value::State, 
+  frame.set ("years", 0);
+  frame.declare ("days", Value::Integer, Value::State, 
               "Number of days.");
-  frame.add ("days", 0);
-  frame.add ("hours", Value::Integer, Value::State, 
+  frame.set ("days", 0);
+  frame.declare ("hours", Value::Integer, Value::State, 
               "Number of hours.");
-  frame.add ("hours", 0);
-  frame.add ("minutes", Value::Integer, Value::State, 
+  frame.set ("hours", 0);
+  frame.declare ("minutes", Value::Integer, Value::State, 
               "Number of minutes.");
-  frame.add ("minutes", 0);
-  frame.add ("seconds", Value::Integer, Value::State, 
+  frame.set ("minutes", 0);
+  frame.declare ("seconds", Value::Integer, Value::State, 
               "Number of seconds.");
-  frame.add ("seconds", 0);
+  frame.set ("seconds", 0);
 }
 
 const Timestep& 
