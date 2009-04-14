@@ -63,7 +63,8 @@ StomataCon_SHA::stomata_con (const double wsf /*[]*/,
                              const double, const double intercept /*[mol/m²leaf/s]*/,
                              const double CO2_atm, const double, Treelog&)
 {
-  const double gsw = wsf * (M * pow(hs, alpha) * pow(pz, lambda))/(cs) 
+  const double cs_ppm = cs /*[Pa]*/ / Ptot /*[Pa]*/ * 1.0e6 /*[ppm]*/;
+  const double gsw = wsf * (M * pow(hs, alpha) * pow(pz, lambda))/(cs_ppm) 
                      + intercept;
   
   daisy_assert (gsw >= 0.0);
