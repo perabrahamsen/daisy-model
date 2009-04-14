@@ -87,7 +87,7 @@ daisy_category_name (Value::category number)
 
 extern "C" int EXPORT
 daisy_size_sequence ()
-{ return Value::Sequence; }
+{ return Value::Variable; }
 
 extern "C" int EXPORT
 daisy_size_singleton ()

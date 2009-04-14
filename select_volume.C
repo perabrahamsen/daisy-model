@@ -61,9 +61,6 @@ struct SelectVolume : public SelectValue
 		     const Geometry* geo, const Soil* soil, const Vegetation*, 
 		     Treelog&);
 
-  // Print result at end of time step.
-  void done (double dt);
-
   // Create and Destroy.
   symbol default_dimension (const symbol spec_dim) const;
   bool initialize (const Units&, const Volume& default_volume, 
@@ -180,38 +177,6 @@ SelectVolume::output_array (const std::vector<double>& array,
       sum += array[cells[i]] * weight[i];
 
   add_result (sum);
-}
-
-// Print result at end of time step.
-void 
-SelectVolume::done (const double dt)
-{
-  if (count == 0)
-    dest.missing ();
-  else 
-    {
-      double result = value;
-      switch (handle)
-        {
-        case Handle::average:
-          result /= (count + 0.0);
-          break;
-        case Handle::geometric:
-          result /= (count + 0.0);
-          result = exp (result);
-          break;
-        case Handle::sum:
-          result *= dt;
-          break;
-        case Handle::min:
-        case Handle::max:
-        case Handle::current:
-          break;
-        }            
-      dest.add (convert (result));
-    }
-  if (!accumulate)
-    count = 0;
 }
 
 // Create and Destroy.

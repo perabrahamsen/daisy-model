@@ -235,7 +235,7 @@ Block::Implementation::expand_reference (const symbol key)
     }
   if (lookup (var) == frame.lookup (key)
       && (find_frame (var).type_size (var) == frame.type_size (key)
-          || (frame.type_size (key) == Value::Sequence
+          || (frame.type_size (key) == Value::Variable
               && find_frame (var).type_size (var) != Value::Singleton)))
     return var;
 
@@ -246,7 +246,19 @@ Block::Implementation::expand_reference (const symbol key)
     {
     case Value::Singleton:
       break;
-    case Value::Sequence:
+    case Value::CanopyCells:
+      tmp << " canopy intervals";
+      break;
+    case Value::CanopyEdges:
+      tmp << " canopy boundaries";
+      break;
+    case Value::SoilCells:
+      tmp << " soil cells";
+      break;
+    case Value::SoilEdges:
+      tmp << " soil edges";
+      break;
+    case Value::Variable:
       tmp << " sequence";
       break;
     default:
@@ -257,7 +269,19 @@ Block::Implementation::expand_reference (const symbol key)
     {
     case Value::Singleton:
       break;
-    case Value::Sequence:
+    case Value::CanopyCells:
+      tmp << " canopy intervals";
+      break;
+    case Value::CanopyEdges:
+      tmp << " canopy boundaries";
+      break;
+    case Value::SoilCells:
+      tmp << " soil cells";
+      break;
+    case Value::SoilEdges:
+      tmp << " soil edges";
+      break;
+    case Value::Variable:
       tmp << " sequence";
       break;
     default:

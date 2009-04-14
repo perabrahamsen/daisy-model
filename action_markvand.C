@@ -312,10 +312,10 @@ Standard MARKVAND crop model.")
   {
     frame.add_check (check_alist);
     frame.declare ("S_F", "dg C d", Check::non_negative (), 
-                Value::Const, Value::Sequence,
-                "Temperature sum for each phase.");
+                   Value::Const, Value::Variable,
+                   "Temperature sum for each phase.");
     frame.set_check ("S_F", VCheck::min_size_1 ());
-    frame.declare ("A_F", Value::Fraction (), Value::Const, Value::Sequence,
+    frame.declare ("A_F", Value::Fraction (), Value::Const, Value::Variable,
                 "Allowable water deficit for each phase before irrigation.");
     frame.set_check ("A_F", VCheck::min_size_1 ());
     frame.declare ("L_gv", Value::None (), Check::non_negative (), Value::Const,

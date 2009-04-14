@@ -1,4 +1,4 @@
-// log_table.C -- Log selected data in tabular format.
+// log_dlf.C -- Log selected data in tabular format.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
@@ -21,98 +21,29 @@
 
 #define BUILD_DLL
 
-#include "log_select.h"
-#include "library.h"
-#include "block.h"
+#include "log_dlf.h"
 #include "select.h"
-#include "summary.h"
 #include "geometry.h"
-#include "dlf.h"
-#include "daisy.h"
-#include "timestep.h"
-#include "vcheck.h"
-#include "memutils.h"
-#include "librarian.h"
-#include "scope_block.h"
-#include "treelog.h"
-#include "frame.h"
-#include "filepos.h"
 #include "assertion.h"
+#include "daisy.h"
+#include "block.h"
+#include "frame.h"
+#include "treelog.h"
+#include "summary.h"
+#include "scope_block.h"
+#include "filepos.h"
+#include "librarian.h"
 #include <sstream>
-#include <fstream>
 
-struct LogTable : public LogSelect, public Destination
-{
-  static const char *const default_description;
-
-  // File Content.
-  const symbol parsed_from_file; // Defined in...
-  const symbol file;       // Filename.
-  std::ofstream out;            // Output stream.
-  const bool flush;             // Flush after each time step.
-  const symbol record_separator; // String to print on records (time steps).
-  const symbol field_separator; // String to print between fields.
-  const symbol error_string; // String to print on errors.
-  const symbol missing_value; // String to print for missing values.
-  const symbol array_separator; // String to print between array entries.
-  DLF print_header;             // How much header should be printed?
-  std::vector<std::pair<symbol, symbol>/**/> parameters;      // Par vals.
-  bool print_tags;              // Set if tags should be printed.
-  bool print_dimension;         // Set if dimensions should be printed.
-  const bool print_initial;     // Set if initial values should be printed.
-  const bool std_time_columns;  // Add year, month, day and hour columns.
-  const std::vector<Summary*> summary; // Summarize this log file.
-  Time begin;                   // First log entry.
-  Time end;                     // Last log entry.
-
-  // destination Content.
-  enum { Error, Missing, Number, Name, Array } type;
-  double dest_number;
-  symbol dest_name;
-  const std::vector<double>* dest_array;
-  
-  // Log.
-  void common_match (const Daisy& daisy, Treelog& out);
-  void common_done (const std::vector<Time::component_t>& time_columns,
-                    const Time& time, double dt);
-
-  // Log.
-  bool match (const Daisy& daisy, Treelog& out);
-  void done (const std::vector<Time::component_t>& time_columns,
-             const Time& time, double dt);
-
-  // Initial line.
-  bool initial_match (const Daisy&, Treelog&);
-  void initial_done (const std::vector<Time::component_t>& time_columns,
-                     const Time& time, const double dt);
-
-  // Select::Destination
-  void error ();
-  void missing ();
-  void add (const std::vector<double>& value);
-  void add (const double value);
-  void add (const symbol value);
-
-  // Create and destroy.
-  bool check (const Border&, Treelog& msg) const;
-  static bool contain_time_columns (const std::vector<Select*>& entries);
-  void initialize (Treelog&);
-  static std::vector<std::pair<symbol, symbol>/**/>
-  /**/ build_parameters (Block& al);
-  explicit LogTable (Block& al);
-  void summarize (Treelog&);
-  ~LogTable ();
-};
-
-const char *const LogTable::default_description = "\
-Each selected variable is represented by a column in the specified log file.";
+const char *const LogDLF::default_description = "\
+Shared base class for log models generating Daisy Log File formatted results.";
 
 void
-LogTable::common_match (const Daisy& daisy, Treelog&)
+LogDLF::common_match (const Daisy& daisy, Treelog&)
 { print_header.finish (out, daisy); }
 
 void 
-LogTable::common_done (const std::vector<Time::component_t>& time_columns,
+LogDLF::common_done (const std::vector<Time::component_t>& time_columns,
                        const Time& time, const double dt)
 { 
   if (print_tags)
@@ -257,13 +188,13 @@ LogTable::common_done (const std::vector<Time::component_t>& time_columns,
 }
 
 bool 
-LogTable::match (const Daisy& daisy, Treelog& msg)
+LogDLF::match (const Daisy& daisy, Treelog& msg)
 {
   common_match (daisy, msg);
   return LogSelect::match (daisy, msg);
 }
 void 
-LogTable::done (const std::vector<Time::component_t>& time_columns,
+LogDLF::done (const std::vector<Time::component_t>& time_columns,
                 const Time& time, const double dt)
 { 
   LogSelect::done (time_columns, time, dt);
@@ -279,7 +210,7 @@ LogTable::done (const std::vector<Time::component_t>& time_columns,
   end = time;
 }
 bool 
-LogTable::initial_match (const Daisy& daisy, Treelog& msg)
+LogDLF::initial_match (const Daisy& daisy, Treelog& msg)
 {
   begin = daisy.time;
 
@@ -290,7 +221,7 @@ LogTable::initial_match (const Daisy& daisy, Treelog& msg)
   return LogSelect::initial_match (daisy, msg);
 }
 void 
-LogTable::initial_done (const std::vector<Time::component_t>& time_columns,
+LogDLF::initial_done (const std::vector<Time::component_t>& time_columns,
                         const Time& time, const double dt)
 { 
   LogSelect::initial_done (time_columns, time, dt);
@@ -312,39 +243,39 @@ LogTable::initial_done (const std::vector<Time::component_t>& time_columns,
 }
 
 void 
-LogTable::error ()
+LogDLF::error ()
 { 
   type = Error;
 }
 
 void 
-LogTable::missing ()
+LogDLF::missing ()
 { 
   type = Missing;
 }
 
 void 
-LogTable::add (const std::vector<double>& value)
+LogDLF::add (const std::vector<double>& value)
 { 
   type = Array;
   dest_array = &value;
 }
 
 void 
-LogTable::add (const double value)
+LogDLF::add (const double value)
 { 
   type = Number;
   dest_number = value;
 }
 
 void 
-LogTable::add (const symbol value)
+LogDLF::add (const symbol value)
 { 
   type = Name;
   dest_name = value;
 }
 
-bool LogTable::check (const Border& border, Treelog& msg) const
+bool LogDLF::check (const Border& border, Treelog& msg) const
 { 
   Treelog::Open nest (msg, name);
   bool ok = LogSelect::check (border, msg);
@@ -359,7 +290,7 @@ bool LogTable::check (const Border& border, Treelog& msg) const
 }
 
 bool 
-LogTable::contain_time_columns (const std::vector<Select*>& entries)
+LogDLF::contain_time_columns (const std::vector<Select*>& entries)
 {
   static const symbol time ("time");
   for (unsigned int i = 0; i < entries.size (); i++)
@@ -369,7 +300,7 @@ LogTable::contain_time_columns (const std::vector<Select*>& entries)
 }
 
 void
-LogTable::initialize (Treelog& msg)
+LogDLF::initialize (Treelog& msg)
 {
   out.open (file.name ().c_str ());
 
@@ -390,7 +321,7 @@ LogTable::initialize (Treelog& msg)
 }
 
 std::vector<std::pair<symbol, symbol>/**/>
-LogTable::build_parameters (Block& al)
+LogDLF::build_parameters (Block& al)
 {
   std::vector<std::pair<symbol, symbol>/**/> result;
   ScopeBlock scope_block (al);
@@ -411,7 +342,7 @@ LogTable::build_parameters (Block& al)
   return result;
 }
 
-LogTable::LogTable (Block& al)
+LogDLF::LogDLF (Block& al)
   : LogSelect (al),
     parsed_from_file (al.frame ().inherited_position ().filename ()),
     file (al.name ("where")),
@@ -442,7 +373,7 @@ LogTable::LogTable (Block& al)
 }
 
 void
-LogTable::summarize (Treelog& msg)
+LogDLF::summarize (Treelog& msg)
 {
   if (summary.size () > 0)
     {
@@ -459,21 +390,18 @@ LogTable::summarize (Treelog& msg)
     }
 }
 
-LogTable::~LogTable ()
+LogDLF::~LogDLF ()
 {
   sequence_delete (summary.begin (), summary.end ());
   if (!out.good ())
     Assertion::error ("Problems writing to '" + file + "'");
 }
 
-static struct LogTableSyntax : public DeclareModel
+static struct LogDLFSyntax : public DeclareBase
 {
-  Model* make (Block& al) const
-  { return new LogTable (al); }
-
-  LogTableSyntax ()
-    : DeclareModel (Log::component, "table", "select", 
-                    LogTable::default_description)
+  LogDLFSyntax ()
+    : DeclareBase (Log::component, "dlf", "select", 
+                   LogDLF::default_description)
   { }
   void load_frame (Frame& frame) const
   { 
@@ -530,6 +458,6 @@ String to print between array entries.");
     Librarian::add_doc_fun (LogSelect::component, 
                             LogSelect::document_entries);
   }
-} LogTable_syntax;
+} LogDLF_syntax;
 
-// log_table.C ends here.
+// log_dlf.C ends here.

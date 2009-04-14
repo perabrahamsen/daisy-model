@@ -66,24 +66,24 @@ public:
   void CanopyStructure ();
   double ActualWaterUptake (const Units&, double Ept, const Geometry& geo,
                             const Soil&, const SoilWater&,
-			    double EvapInterception, 
+                            double EvapInterception, 
                             double dt,
-			    Treelog&);
+                            Treelog&);
   
   // Internal functions.
 protected:
   double PotentialWaterUptake (const double h, 
-			       const Geometry& geo,
+                               const Geometry& geo,
                                const Soil& soil, const SoilWater& soil_water);
   double SoluteUptake (const Geometry& geo,
                        const Soil&,
-		       const SoilWater&,
-		       Chemical&,
-		       double PotNUpt,
-		       std::vector<double>& uptake,
-		       double I_Mx, double Rad, double dt);
+                       const SoilWater&,
+                       Chemical&,
+                       double PotNUpt,
+                       std::vector<double>& uptake,
+                       double I_Mx, double Rad, double dt);
 
-public:				// Used by external development models.
+public:                         // Used by external development models.
   void Vernalization (double Ta);
 protected:
   void Emergence (const Geometry&, const SoilHeat&);
@@ -97,10 +97,10 @@ protected:
   void RootDensity (const Geometry&);
   void NitContent ();
   void NitrogenUptake (int Hour, 
-		       const Geometry& geo,
+                       const Geometry& geo,
                        const Soil& soil,
-		       const SoilWater& soil_water,
-		       Chemistry&,
+                       const SoilWater& soil_water,
+                       Chemistry&,
                        double dt);
   // Sugar production [gCH2O/m2/h] by canopy photosynthesis.
   void AssimilatePartitioning (double DS, double& f_Leaf, double& f_Root);
@@ -114,21 +114,21 @@ public:
              SoilWater&, Chemistry&, 
              OrganicMatter&, double&, double&, double&, 
              std::vector<double>&, std::vector<double>&,
-	     double dt, Treelog&);
+             double dt, Treelog&);
   void emerge ();
   const Harvest& harvest (symbol column_name,
-			  const Time&, const Geometry&,
-			  double stub_length, double stem_harvest,
-			  double leaf_harvest, double sorg_harvest, 
-			  bool kill_off,
-			  std::vector<AM*>& residuals,
-			  double& residuals_DM,
-			  double& residuals_N_top,
-			  double& residuals_C_top,
-			  std::vector<double>& residuals_N_soil,
-			  std::vector<double>& residuals_C_soil,
+                          const Time&, const Geometry&,
+                          double stub_length, double stem_harvest,
+                          double leaf_harvest, double sorg_harvest, 
+                          bool kill_off,
+                          std::vector<AM*>& residuals,
+                          double& residuals_DM,
+                          double& residuals_N_top,
+                          double& residuals_C_top,
+                          std::vector<double>& residuals_N_soil,
+                          std::vector<double>& residuals_C_soil,
                           const bool,
-			  Treelog&);
+                          Treelog&);
   double sorg_height () const 
   { return 100.0; }
   void output (Log&) const;
@@ -159,12 +159,12 @@ struct CropOld::Parameters
 { 
   const struct DevelPar
   {
-    double EmrTSum;		// Soil temp sum at emergence
-    double DS_Emr;		// Development stage (DS) emergence
-    bool DS_reset;		// True for winter crops.
-    double DSRate1;		// Development rate [C-1 or d-1],
+    double EmrTSum;             // Soil temp sum at emergence
+    double DS_Emr;              // Development stage (DS) emergence
+    bool DS_reset;              // True for winter crops.
+    double DSRate1;             // Development rate [C-1 or d-1],
     // the vegetative stage
-    double DSRate2;		// Development rate [C-1 or d-1],
+    double DSRate2;             // Development rate [C-1 or d-1],
     // the reproductive stage
     const PLF& TempEff1;   // Temperature effect, vegetative stage
     const PLF& TempEff2;   // Temperature effect, reproductive stage
@@ -175,101 +175,101 @@ struct CropOld::Parameters
   } Devel;
   const struct VernalPar {
     bool required;
-    double DSLim1;		// DS at beginning of vernalization
-    double DSLim2;		// DS at end of vernalization
-    double TaLim;		// Vernalization temp threshold
-    double TaSum;		// Vernalization T-sum requirement
+    double DSLim1;              // DS at beginning of vernalization
+    double DSLim2;              // DS at end of vernalization
+    double TaLim;               // Vernalization temp threshold
+    double TaSum;               // Vernalization T-sum requirement
   private:
     friend struct CropOld::Parameters;
     VernalPar (const AttributeList&);
   } Vernal;
   const struct LeafPhotPar {
-    double TLim1;		// Lowest temp for photosynthesis
-    double TLim2;		// Lowest temp for unrestricted phot.
+    double TLim1;               // Lowest temp for photosynthesis
+    double TLim2;               // Lowest temp for unrestricted phot.
   private:
     friend struct CropOld::Parameters;
     LeafPhotPar (const AttributeList&);
   } LeafPhot;
   const struct CanopyPar {
-    double InitGrowth;		// Initial growth parameter.
-    double DSinit;		// DS at end of initial LAI-Development
-    double WLfInit;		// WLeaf at end of initial LAI-Development
-    double DS1;			// DS state at start of leaf recession.
-    double alpha;		// Leaf recession parameter.
-    double beta;		// Leaf recession parameter.
-    double SpLAI;		// Specific leaf weight [ (m²/m²) / (g/m²) ]
-    const PLF& HvsDS;	// Crop height as function of DS
+    double InitGrowth;          // Initial growth parameter.
+    double DSinit;              // DS at end of initial LAI-Development
+    double WLfInit;             // WLeaf at end of initial LAI-Development
+    double DS1;                 // DS state at start of leaf recession.
+    double alpha;               // Leaf recession parameter.
+    double beta;                // Leaf recession parameter.
+    double SpLAI;               // Specific leaf weight [ (m²/m²) / (g/m²) ]
+    const PLF& HvsDS;   // Crop height as function of DS
     const std::vector<double>& LAIDist0; // Relative LAI distribution at DS=0
     const std::vector<double>& LAIDist1; // Relative LAI distribution at DS=1
-    double PARref;		// PAR reflectance
-    double PARext;		// PAR extinction coefficient
-    double NIRref;		// NIR reflectance
-    double NIRext;		// NIR extinction coefficient
-    double EPext;		// EP extinction coefficient
+    double PARref;              // PAR reflectance
+    double PARext;              // PAR extinction coefficient
+    double NIRref;              // NIR reflectance
+    double NIRext;              // NIR extinction coefficient
+    double EPext;               // EP extinction coefficient
   private:
     friend struct CropOld::Parameters;
     CanopyPar (const AttributeList&);
   } Canopy;
   const struct RootPar {
-    double DptEmr;		// Penetration at emergence
-    double PenPar1;		// Penetration rate parameter, coefficient
-    double PenPar2;		// Penetration rate parameter, threshold
-    double MaxPen;		// Max penetration depth
-    double SpRtLength;		// Specific root length
-    double DensRtTip;		// Root density at (pot) penetration depth
-    double Rad;			// Root radius [ cm ]
-    double h_wp;		// Matrix potential at wilting
-    double MxNH4Up;		// Max NH4 uptake per unit root length
-    double MxNO3Up;		// Max NO3 uptake per unit root length
-    double Rxylem;		// Transport resistence in xyleme
+    double DptEmr;              // Penetration at emergence
+    double PenPar1;             // Penetration rate parameter, coefficient
+    double PenPar2;             // Penetration rate parameter, threshold
+    double MaxPen;              // Max penetration depth
+    double SpRtLength;          // Specific root length
+    double DensRtTip;           // Root density at (pot) penetration depth
+    double Rad;                 // Root radius [ cm ]
+    double h_wp;                // Matrix potential at wilting
+    double MxNH4Up;             // Max NH4 uptake per unit root length
+    double MxNO3Up;             // Max NO3 uptake per unit root length
+    double Rxylem;              // Transport resistence in xyleme
   private:
     friend struct CropOld::Parameters;
     RootPar (const AttributeList&);
   } Root;
   const struct PartitPar {
-    const PLF& Root;	// Partitioning functions for root
+    const PLF& Root;    // Partitioning functions for root
   private:
     friend struct CropOld::Parameters;
     PartitPar (const AttributeList&);
   } Partit;
   struct RespPar {
-    const PLF& E_Root;		// Conversion efficiency, root
-    const PLF& E_Leaf;		// Conversion efficiency, leaf
-    const PLF& r_Root;		// Maint. resp. coeff., root
-    const PLF& r_Leaf;		// Maint. resp. coeff., leaf
+    const PLF& E_Root;          // Conversion efficiency, root
+    const PLF& E_Leaf;          // Conversion efficiency, leaf
+    const PLF& r_Root;          // Maint. resp. coeff., root
+    const PLF& r_Leaf;          // Maint. resp. coeff., leaf
   private:
     friend struct CropOld::Parameters;
     RespPar (const AttributeList&);
   } Resp;
   struct CrpNPar {
-    double SeedN;		// N-content in seed [ g N/m² ]
-    double DS_fixate;		// Fixation of atmospheric N.
-    const PLF& PtLeafCnc;	// Upper limit for N-conc in leaves
-    const PLF& CrLeafCnc;	// Critical lim f. N-conc in leaves
-    const PLF& NfLeafCnc;	// Non-func lim f. N-conc in leaves
-    const PLF& PtRootCnc;	// Upper limit for N-conc in roots
-    const PLF& CrRootCnc;	// Critical lim f. N-conc in roots
-    const PLF& NfRootCnc;	// Non-func lim f. N-conc in roots
+    double SeedN;               // N-content in seed [ g N/m² ]
+    double DS_fixate;           // Fixation of atmospheric N.
+    const PLF& PtLeafCnc;       // Upper limit for N-conc in leaves
+    const PLF& CrLeafCnc;       // Critical lim f. N-conc in leaves
+    const PLF& NfLeafCnc;       // Non-func lim f. N-conc in leaves
+    const PLF& PtRootCnc;       // Upper limit for N-conc in roots
+    const PLF& CrRootCnc;       // Critical lim f. N-conc in roots
+    const PLF& NfRootCnc;       // Non-func lim f. N-conc in roots
   private:
     friend struct CropOld::Parameters;
     CrpNPar (const AttributeList&);
   } CrpN;
   struct HarvestPar {
-    const double index;		// Partition of leaf that are storage organ.
-    const double beta;		// The root/top concentration relation
-    const double CStem;	// Normal straw concentration
-    const double CSOrg;		// Sorg conc. at the end of the normal range
-    const double alpha;		// Rel. inc. in straw conc. above normal range
+    const double index;         // Partition of leaf that are storage organ.
+    const double beta;          // The root/top concentration relation
+    const double CStem; // Normal straw concentration
+    const double CSOrg;         // Sorg conc. at the end of the normal range
+    const double alpha;         // Rel. inc. in straw conc. above normal range
     const std::vector<const AttributeList*>& Stem; // Stem AM parameters.
     const std::vector<const AttributeList*>& Leaf; // Leaf AM parameters.
     const std::vector<const AttributeList*>& SOrg; // SOrg AM parameters.
     const std::vector<const AttributeList*>& Root; // Root AM parameters.
-    const double C_Stem;	// C fraction of total weight.
-    const double C_SOrg;	// C fraction of total weight.
-    const double C_Root;	// C fraction of total weight.
-    const double DSmax;		// Maximal development stage for which
-				// the crop survives harvest.
-    const double DSnew;		// New development stage after harvest.
+    const double C_Stem;        // C fraction of total weight.
+    const double C_SOrg;        // C fraction of total weight.
+    const double C_Root;        // C fraction of total weight.
+    const double DSmax;         // Maximal development stage for which
+                                // the crop survives harvest.
+    const double DSnew;         // New development stage after harvest.
   private:
     friend struct CropOld::Parameters;
     HarvestPar (const AttributeList&);
@@ -292,8 +292,8 @@ struct CropOld::Variables
   struct RecPhenology
   {
     void output (Log&) const;
-    double DS;		// Development Stage
-    double Vern;		// Vernalization criterium [C d]
+    double DS;          // Development Stage
+    double Vern;                // Vernalization criterium [C d]
   private:
     friend struct CropOld::Variables;
     RecPhenology (const Parameters&, const AttributeList&);
@@ -301,10 +301,10 @@ struct CropOld::Variables
   struct RecCanopy
   {
     void output (Log&) const;
-    double Height;		// Crop height [cm]
-    double LAI;		// Leaf Area Index
-    double LADm;		// Max Leaf Area Density [cm2/cm3]
-    PLF LAIvsH;		// Accumulated Leaf Area Index at Height
+    double Height;              // Crop height [cm]
+    double LAI;         // Leaf Area Index
+    double LADm;                // Max Leaf Area Density [cm2/cm3]
+    PLF LAIvsH;         // Accumulated Leaf Area Index at Height
   private:
     friend struct CropOld::Variables;
     RecCanopy (const Parameters&, const AttributeList&);
@@ -312,20 +312,20 @@ struct CropOld::Variables
   struct RecRootSys
   {
     void output (Log&) const;
-    double Depth;		// Rooting Depth [cm]
-    std::vector<double> Density;	// Root density [cm/cm3] in soil layers
+    double Depth;               // Rooting Depth [cm]
+    std::vector<double> Density;        // Root density [cm/cm3] in soil layers
     std::vector<double> H2OExtraction; // Extraction of H2O in soil layers
     // [cm³/cm³/h]
     std::vector<double> NH4Extraction; // Extraction of NH4-N in soil layers
     // [gN/cm³/h]
     std::vector<double> NO3Extraction; // Extraction of NO3-N in soil layers
     // [gN/cm³/h]
-    double h_x;			// Root extraction at surface.
-    double water_stress;	// Fraction of requested water we got.
-    double ws_up;		// Water stress factor.
-    double ws_down;		// Water stress denominator.
-    double Ept;			// Potential evapotranspiration.
-    double transpiration;	// Total water uptake.
+    double h_x;                 // Root extraction at surface.
+    double water_stress;        // Fraction of requested water we got.
+    double ws_up;               // Water stress factor.
+    double ws_down;             // Water stress denominator.
+    double Ept;                 // Potential evapotranspiration.
+    double transpiration;       // Total water uptake.
   private:
     friend struct CropOld::Variables;
     RecRootSys (const Parameters&, const AttributeList&);
@@ -333,10 +333,10 @@ struct CropOld::Variables
   struct RecProd
   {
     void output (Log&) const;
-    double WLeaf;		// Leaf dry matter weight [g/m2]
-    double WhiteStubble;	// Old dead leftover from harvest.
-    double WRoot;		// Root dry matter weight [g/m2]
-    double NCrop;		// Nitrogen stored in dry matter [g/m2]
+    double WLeaf;               // Leaf dry matter weight [g/m2]
+    double WhiteStubble;        // Old dead leftover from harvest.
+    double WRoot;               // Root dry matter weight [g/m2]
+    double NCrop;               // Nitrogen stored in dry matter [g/m2]
   private:
     friend struct CropOld::Variables;
     RecProd (const Parameters&, const AttributeList&);
@@ -344,22 +344,22 @@ struct CropOld::Variables
   struct RecCrpAux
   {
     void output (Log&) const;
-    bool InitLAI;		// Initial LAI development ?
-    double PotRtDpt;	// Potential Root Penetration Depth [cm]
-    double PtNCnt;		// Potential Nitrogen Content in Crop [g/m2]
-    double CrNCnt;		// Critical Nitrogen Content in Crop [g/m2]
-    double NfNCnt;		// Non-func Nitrogen Content in Crop [g/m2]
-    double PotTransp;	// Potential Transpiration [mm/h]
-    double PotCanopyAss;	// Potential Canopy Assimilation [g CH2O/m2/h]
-    double CanopyAss;	// Canopy Assimilation [g CH2O/m2/h]
-    double LogPotCanopyAss;	// The above is hourly accumulated values 
-    double LogCanopyAss;	// over the day.  This is last days total.
-    double IncWLeaf;	// Leaf growth [g DM/m2/d]
-    double IncWRoot;	// Root growth [g DM/m2/d]
-    double H2OUpt;		// H2O uptake [mm/h]
-    double NH4Upt;		// NH4-N uptake [g/m2/h]
-    double NO3Upt;		// NO3-N uptake [g/m2/h]
-    double Fixated;		// N fixation from air. [g/m2/h]
+    bool InitLAI;               // Initial LAI development ?
+    double PotRtDpt;    // Potential Root Penetration Depth [cm]
+    double PtNCnt;              // Potential Nitrogen Content in Crop [g/m2]
+    double CrNCnt;              // Critical Nitrogen Content in Crop [g/m2]
+    double NfNCnt;              // Non-func Nitrogen Content in Crop [g/m2]
+    double PotTransp;   // Potential Transpiration [mm/h]
+    double PotCanopyAss;        // Potential Canopy Assimilation [g CH2O/m2/h]
+    double CanopyAss;   // Canopy Assimilation [g CH2O/m2/h]
+    double LogPotCanopyAss;     // The above is hourly accumulated values 
+    double LogCanopyAss;        // over the day.  This is last days total.
+    double IncWLeaf;    // Leaf growth [g DM/m2/d]
+    double IncWRoot;    // Root growth [g DM/m2/d]
+    double H2OUpt;              // H2O uptake [mm/h]
+    double NH4Upt;              // NH4-N uptake [g/m2/h]
+    double NO3Upt;              // NO3-N uptake [g/m2/h]
+    double Fixated;             // N fixation from air. [g/m2/h]
   private:
     friend struct CropOld::Variables;
     RecCrpAux (const Parameters&, const AttributeList&);
@@ -408,8 +408,8 @@ CropOld::Parameters::VernalPar::VernalPar (const AttributeList& vl)
 
 CropOld::Parameters::LeafPhotPar::LeafPhotPar (const AttributeList& vl)
   : 
-    TLim1 (vl.number ("TLim1")),
-    TLim2 (vl.number ("TLim2"))
+  TLim1 (vl.number ("TLim1")),
+  TLim2 (vl.number ("TLim2"))
 { }
 
 CropOld::Parameters::CanopyPar::CanopyPar (const AttributeList& vl)
@@ -510,7 +510,7 @@ CropOld::Variables::output (Log& log) const
 }
 
 CropOld::Variables::RecPhenology::RecPhenology (const Parameters& par,
-						     const AttributeList& vl)
+                                                const AttributeList& vl)
   : DS (vl.number ("DS")),
     Vern (vl.number ("Vern", par.Vernal.TaSum))
 { }
@@ -524,7 +524,7 @@ CropOld::Variables::RecPhenology::output (Log& log) const
 }
 
 CropOld::Variables::RecCanopy::RecCanopy (const Parameters&,
-					       const AttributeList& vl)
+                                          const AttributeList& vl)
   : Height (vl.number ("Height")),
     LAI (vl.number ("LAI")),
     LADm (vl.number ("LADm")),
@@ -542,7 +542,7 @@ CropOld::Variables::RecCanopy::output (Log& log) const
 }
 
 CropOld::Variables::RecRootSys::RecRootSys (const Parameters& par,
-						 const AttributeList& vl)
+                                            const AttributeList& vl)
   : Depth (vl.number ("Depth", par.Root.DptEmr)),
     Density (vl.number_sequence ("Density")),
     H2OExtraction (vl.number_sequence ("H2OExtraction")),
@@ -572,7 +572,7 @@ CropOld::Variables::RecRootSys::output (Log& log) const
 }
 
 CropOld::Variables::RecProd::RecProd (const Parameters& par, 
-					   const AttributeList& vl)
+                                      const AttributeList& vl)
   : WLeaf (vl.number ("WLeaf")),
     WhiteStubble (vl.number ("WhiteStubble")),
     WRoot (vl.number ("WRoot")),
@@ -590,7 +590,7 @@ CropOld::Variables::RecProd::output (Log& log) const
 }
 
 CropOld::Variables::RecCrpAux::RecCrpAux (const Parameters& par, 
-					       const AttributeList& vl)
+                                          const AttributeList& vl)
   : InitLAI (vl.flag ("InitLAI")),
     PotRtDpt (vl.number ("PotRtDpt", par.Root.DptEmr)),
     PtNCnt (0.0),
@@ -661,17 +661,17 @@ CropOld::initialize (const Units& units,
 
   // Fill rootsys arrays.
   var.RootSys.Density.insert (var.RootSys.Density.end (),
-			      size - var.RootSys.Density.size (), 
-			      0.0);
+                              size - var.RootSys.Density.size (), 
+                              0.0);
   var.RootSys.H2OExtraction.insert (var.RootSys.H2OExtraction.end (),
-				    size - var.RootSys.H2OExtraction.size (),
-				    0.0);
+                                    size - var.RootSys.H2OExtraction.size (),
+                                    0.0);
   var.RootSys.NH4Extraction.insert (var.RootSys.NH4Extraction.end (),
-				    size - var.RootSys.NH4Extraction.size (),
-				    0.0);
+                                    size - var.RootSys.NH4Extraction.size (),
+                                    0.0);
   var.RootSys.NO3Extraction.insert (var.RootSys.NO3Extraction.end (),
-				    size - var.RootSys.NO3Extraction.size (),
-				    0.0);
+                                    size - var.RootSys.NO3Extraction.size (),
+                                    0.0);
 }
 
 static struct CropOldSyntax : public DeclareModel
@@ -853,16 +853,16 @@ Non-functional lim for N-concentration in roots.");
     Harvest.add ("alpha", Value::None (), Value::Const,
                  "Relative increase in straw concentration above normal range.");
     Harvest.add_submodule_sequence ("Stem", Value::Const, 
-                                   "Stem AM parameters.", AOM::load_syntax);
+                                    "Stem AM parameters.", AOM::load_syntax);
     Harvest.add_check ("Stem", AM::check_om_pools ());
     Harvest.add_submodule_sequence ("Leaf", Value::Const,
-                                   "Leaf AM parameters.", AOM::load_syntax);
+                                    "Leaf AM parameters.", AOM::load_syntax);
     Harvest.add_check ("Leaf", AM::check_om_pools ());
     Harvest.add_submodule_sequence ("SOrg", Value::Const,
-                                   "SOrg AM parameters.", AOM::load_syntax);
+                                    "SOrg AM parameters.", AOM::load_syntax);
     Harvest.add_check ("SOrg", AM::check_om_pools ());
     Harvest.add_submodule_sequence ("Root", Value::Const,
-                                   "Root AM parameters.", AOM::load_syntax);
+                                    "Root AM parameters.", AOM::load_syntax);
     Harvest.add_check ("Root", AM::check_om_pools ());
     Harvest.add ("C_Stem", Value::None (), Value::Const,
                  "C fraction of total weight.");
@@ -899,19 +899,19 @@ Maximal development stage for which the crop survives harvest.");
                 "Accumulated Leaf Area Index at Height.");
     vCanopy.add ("LAIvsH", empty_plf);
 
-      // RootSys
+    // RootSys
     RootSys.add ("Depth", "cm", Value::OptionalState,
                  "Rooting Depth.");
-    RootSys.add ("Density", "cm/cm3", Value::State, Value::Sequence,
+    RootSys.add ("Density", "cm/cm3", Value::State, Value::SoilCells,
                  "Root density in soil layers.");
     vRootSys.add ("Density", empty_array);
-    RootSys.add ("H2OExtraction", "cm^3/cm^3/h", Value::State, Value::Sequence,
+    RootSys.add ("H2OExtraction", "cm^3/cm^3/h", Value::State, Value::SoilCells,
                  "Extraction of H2O in soil layers.");
     vRootSys.add ("H2OExtraction", empty_array);
-    RootSys.add ("NH4Extraction", "g N/cm^3/h", Value::State, Value::Sequence,
+    RootSys.add ("NH4Extraction", "g N/cm^3/h", Value::State, Value::SoilCells,
                  "Extraction of NH4-N in soil layers.");
     vRootSys.add ("NH4Extraction", empty_array);
-    RootSys.add ("NO3Extraction", "g N/cm^3/h", Value::State, Value::Sequence,
+    RootSys.add ("NO3Extraction", "g N/cm^3/h", Value::State, Value::SoilCells,
                  "Extraction of NO3-N in soil layers.");
     vRootSys.add ("NO3Extraction", empty_array);
     RootSys.add ("h_x", "cm", Value::State,
@@ -972,14 +972,14 @@ Maximal development stage for which the crop survives harvest.");
 
     // Model.
     frame.add ("IntcpCap", "mm", Value::Const,
-                "Interception capacity.");
+               "Interception capacity.");
     frame.add ("EpFac", Value::None (), Value::Const,
-                "Potential evapotranspiration factor.");
+               "Potential evapotranspiration factor.");
     frame.add ("enable_water_stress", Value::Boolean, Value::Const,
-                "True, if water stress can limit crop growth.");
+               "True, if water stress can limit crop growth.");
     frame.add ("enable_water_stress", true);
     frame.add ("enable_N_stress", Value::Boolean, Value::Const,
-                "True, if nitrogen stress can limit crop growth.");
+               "True, if nitrogen stress can limit crop growth.");
     frame.add ("enable_N_stress", true);
 
     // Add subcomponents.
@@ -1068,13 +1068,13 @@ CropOld::EpFac () const
 double
 CropOld::SoluteUptake (const Geometry& geo,
                        const Soil& soil,
-		       const SoilWater& soil_water,
-		       Chemical& solute,
-		       double PotNUpt,
-		       std::vector<double>& uptake,
-		       double I_max, double r_root, const double dt)
+                       const SoilWater& soil_water,
+                       Chemical& solute,
+                       double PotNUpt,
+                       std::vector<double>& uptake,
+                       double I_max, double r_root, const double dt)
 {
-  PotNUpt /= 1.0e4;		// gN/m²/h -> gN/cm²/h
+  PotNUpt /= 1.0e4;             // gN/m²/h -> gN/cm²/h
   const std::vector<double>& root_density = var.RootSys.Density;
   const std::vector<double>& S = var.RootSys.H2OExtraction;
   const int size = soil.size ();
@@ -1090,41 +1090,41 @@ CropOld::SoluteUptake (const Geometry& geo,
       const double Theta = soil_water.Theta_old (i);
       const double L = root_density[i];
       if (L > 0 && soil_water.h (i) <= 0.0)
-	{
-	  const double q_r = S[i] / L;
-	  const double D = solute.diffusion_coefficient ()
-	    * soil.tortuosity_factor (i, Theta)
-	    * Theta;
-	  const double alpha = q_r / ( 2 * M_PI * D);
-	  const double beta = 1.0 / (r_root * sqrt (M_PI * L));
-	  const double beta_squared = beta * beta;
-	  if (alpha < 1e-10)
-	    {
-	      B_zero[i] = 4.0 * M_PI * D 
-		/ (beta_squared * log (beta_squared) / (beta_squared - 1.0) - 1.0);
-	      I_zero[i] = B_zero[i] * C_l;
-	    }
-	  else if (approximate (alpha, 2.0, 1e-6))
-	    {
-	      B_zero[i] = q_r * log (beta_squared) 
-		/ ((beta_squared - 1.0) - log (beta_squared));
-	      I_zero[i] = q_r * (beta_squared - 1.0) * C_l 
-		/ ((beta_squared - 1.0) - log (beta_squared));
-	    }
-	  else
-	    {
-	      B_zero[i] = q_r * (pow (beta, 2.0 - alpha) - 1.0)
-		/ ((beta_squared - 1.0) * (1.0 - 0.5 * alpha)
-		   - (pow (beta, 2.0 - alpha) - 1.0));
-	      I_zero[i] = q_r * (beta_squared - 1.0) * (1.0 - 0.5 * alpha) * C_l
-		/ ((beta_squared - 1.0) * (1.0 - 0.5 * alpha)
-		   - (pow (beta, 2.0 - alpha) - 1.0));
-	    }
-	  daisy_assert (std::isfinite (I_zero[i]));
-	  daisy_assert (std::isfinite (B_zero[i]));
-	  B += L * geo.cell_volume (i) * B_zero[i];
-	  U_zero += L * geo.cell_volume (i) * std::min (I_zero[i], I_max);
-	}
+        {
+          const double q_r = S[i] / L;
+          const double D = solute.diffusion_coefficient ()
+            * soil.tortuosity_factor (i, Theta)
+            * Theta;
+          const double alpha = q_r / ( 2 * M_PI * D);
+          const double beta = 1.0 / (r_root * sqrt (M_PI * L));
+          const double beta_squared = beta * beta;
+          if (alpha < 1e-10)
+            {
+              B_zero[i] = 4.0 * M_PI * D 
+                / (beta_squared * log (beta_squared) / (beta_squared - 1.0) - 1.0);
+              I_zero[i] = B_zero[i] * C_l;
+            }
+          else if (approximate (alpha, 2.0, 1e-6))
+            {
+              B_zero[i] = q_r * log (beta_squared) 
+                / ((beta_squared - 1.0) - log (beta_squared));
+              I_zero[i] = q_r * (beta_squared - 1.0) * C_l 
+                / ((beta_squared - 1.0) - log (beta_squared));
+            }
+          else
+            {
+              B_zero[i] = q_r * (pow (beta, 2.0 - alpha) - 1.0)
+                / ((beta_squared - 1.0) * (1.0 - 0.5 * alpha)
+                   - (pow (beta, 2.0 - alpha) - 1.0));
+              I_zero[i] = q_r * (beta_squared - 1.0) * (1.0 - 0.5 * alpha) * C_l
+                / ((beta_squared - 1.0) * (1.0 - 0.5 * alpha)
+                   - (pow (beta, 2.0 - alpha) - 1.0));
+            }
+          daisy_assert (std::isfinite (I_zero[i]));
+          daisy_assert (std::isfinite (B_zero[i]));
+          B += L * geo.cell_volume (i) * B_zero[i];
+          U_zero += L * geo.cell_volume (i) * std::min (I_zero[i], I_max);
+        }
     }
   if (U_zero > PotNUpt)
     c_root = (U_zero - PotNUpt) / B;
@@ -1133,11 +1133,11 @@ CropOld::SoluteUptake (const Geometry& geo,
     {
       const double L = root_density[i];
       if (L > 0 && soil_water.h (i) <= 0.0)
-	uptake[i] = std::max (0.0, 
+        uptake[i] = std::max (0.0, 
                               L * (std::min (I_zero[i], I_max) - B_zero[i]
                                    * c_root));
       else
-	uptake[i] = 0.0;
+        uptake[i] = 0.0;
       daisy_assert (uptake[i] >= 0.0);
     }
   solute.add_to_root_sink (uptake);
@@ -1184,16 +1184,16 @@ CropOld::DevelopmentStage (const Bioclimate& bioclimate)
   if (Phenology.DS < 1)
     {
       Phenology.DS += (Devel.DSRate1
-		       * Devel.TempEff1 (Ta)
-		       * Devel.PhotEff1 (bioclimate.day_length ()));
+                       * Devel.TempEff1 (Ta)
+                       * Devel.PhotEff1 (bioclimate.day_length ()));
       if (Phenology.Vern < 0)
-	Vernalization (Ta);
+        Vernalization (Ta);
     }
   else
     {
       Phenology.DS += Devel.DSRate2 * Devel.TempEff2 (Ta);
       if (Phenology.DS > 2.0)
-	Phenology.DS = 2.0;
+        Phenology.DS = 2.0;
     }
 }
 
@@ -1218,7 +1218,7 @@ CropOld::InitialLAI ()
   if (WLeaf >= Canopy.WLfInit)
     {
       if (DS > Canopy.DSinit)
-	DS = Canopy.DSinit;
+        DS = Canopy.DSinit;
       CropLAI ();
       InitLAI = false;
     }
@@ -1258,10 +1258,10 @@ CropOld::CanopyStructure ()
   // the crop.  The values of z1, z2, and z3 are scaled so the
   // ground height is zero and the top of the crop is 1.
 
-  double z0;			// Height of first leaf [0 - 1].
-  double z1;			// Min height of the MaxLAD area [0 - 1].
-  double z2;			// Max height of the MaxLAD area [0 - 1].
-  double Area;		// Area spanned by z0, z1, and z2.
+  double z0;                    // Height of first leaf [0 - 1].
+  double z1;                    // Min height of the MaxLAD area [0 - 1].
+  double z2;                    // Max height of the MaxLAD area [0 - 1].
+  double Area;          // Area spanned by z0, z1, and z2.
 
   if (DS <= 1)
     {
@@ -1271,11 +1271,11 @@ CropOld::CanopyStructure ()
       // DS 0 and DS 1.
 
       z0 = CanopyPar.LAIDist0[0] +
-	(CanopyPar.LAIDist1[0] - CanopyPar.LAIDist0[0]) * DS;
+        (CanopyPar.LAIDist1[0] - CanopyPar.LAIDist0[0]) * DS;
       z1 = CanopyPar.LAIDist0[1] +
-	(CanopyPar.LAIDist1[1] - CanopyPar.LAIDist0[1]) * DS;
+        (CanopyPar.LAIDist1[1] - CanopyPar.LAIDist0[1]) * DS;
       z2 = CanopyPar.LAIDist0[2] +
-	(CanopyPar.LAIDist1[2] - CanopyPar.LAIDist0[2]) * DS;
+        (CanopyPar.LAIDist1[2] - CanopyPar.LAIDist0[2]) * DS;
       Area = (1 + z2 - z1 - z0) / 2;
       Canopy.LADm = Canopy.LAI / (Area * Canopy.Height);
     }
@@ -1288,64 +1288,64 @@ CropOld::CanopyStructure ()
       z2 = CanopyPar.LAIDist1[2];
       double Area = (1 + z2 - z1 - z0) / 2;
       double MaxLAD = Canopy.LAI / (Area * Canopy.Height);
-	    
+            
       if (MaxLAD > Canopy.LADm)
-	// After DS = 1 LAI may increase for some time, keeping
-	// z0, z1, and z2 constant but adding to MaxLAD.
-	Canopy.LADm = MaxLAD;
+        // After DS = 1 LAI may increase for some time, keeping
+        // z0, z1, and z2 constant but adding to MaxLAD.
+        Canopy.LADm = MaxLAD;
       else
-	{
-	  // Then the crop start eating itself.  This is done by
-	  // keeping MaxLAD, (z1 - z0), and z2 constant but
-	  // increasing z1 and z0.
+        {
+          // Then the crop start eating itself.  This is done by
+          // keeping MaxLAD, (z1 - z0), and z2 constant but
+          // increasing z1 and z0.
 
-	  // Need is the Area we want after moving z1 and z0.
-	  double Need = Canopy.LAI / Canopy.Height / Canopy.LADm;
+          // Need is the Area we want after moving z1 and z0.
+          double Need = Canopy.LAI / Canopy.Height / Canopy.LADm;
 
-	  if (approximate (Area, Need))
-	    Need = Area;
+          if (approximate (Area, Need))
+            Need = Area;
 
-	  daisy_assert (Need <= Area);
+          daisy_assert (Need <= Area);
 
-	  if (Area - Need > z2 - z1)
-	    // We have to move z1 beyond z2.
-	    {
-	      // Let x0 be the height where the canopy starts, x1 the
-	      // height where the canopy top, and y1 the canopy at x1. 
-	      //
-	      // We know the area of the triangle:
-	      // (1):  Need = (1 - x0) * y1 / 2
-	      // 
-	      // We assume that the slope of the canopy increase and
-	      // descrease is unchanged:
-	      // (2):   (1 - x1) / y1 =  (1 - z2) / 1
-	      // (3):  (x1 - x0) / y1 = (z1 - z0) / 1
-	      //
-	      // This gives us three equations with three unknown.  
-	      // We can solve them to get x0, x1, and y1.
+          if (Area - Need > z2 - z1)
+            // We have to move z1 beyond z2.
+            {
+              // Let x0 be the height where the canopy starts, x1 the
+              // height where the canopy top, and y1 the canopy at x1. 
+              //
+              // We know the area of the triangle:
+              // (1):  Need = (1 - x0) * y1 / 2
+              // 
+              // We assume that the slope of the canopy increase and
+              // descrease is unchanged:
+              // (2):   (1 - x1) / y1 =  (1 - z2) / 1
+              // (3):  (x1 - x0) / y1 = (z1 - z0) / 1
+              //
+              // This gives us three equations with three unknown.  
+              // We can solve them to get x0, x1, and y1.
 
-	      double x0 = 1 - sqrt (2 * Need * (z1 - z2 - z0 + 1));
-	      double x1 = 1 + (z2 - 1) * sqrt (2 * Need / (z1 - z2 - z0 + 1));
-	      double y1 = sqrt (2 * Need / (z1 - z2 - z0 + 1));
-			    
-	      // Check the results.
-	      daisy_assert (fabs (Need - (1 - x0) * y1 / 2) < 0.0001);
-	      daisy_assert (fabs ((1 - x1) / y1 - (1 - z2)) < 0.0001);
-	      daisy_assert (fabs ((x1 - x0) / y1 - (z1 - z0)) < 0.0001);
+              double x0 = 1 - sqrt (2 * Need * (z1 - z2 - z0 + 1));
+              double x1 = 1 + (z2 - 1) * sqrt (2 * Need / (z1 - z2 - z0 + 1));
+              double y1 = sqrt (2 * Need / (z1 - z2 - z0 + 1));
+                            
+              // Check the results.
+              daisy_assert (fabs (Need - (1 - x0) * y1 / 2) < 0.0001);
+              daisy_assert (fabs ((1 - x1) / y1 - (1 - z2)) < 0.0001);
+              daisy_assert (fabs ((x1 - x0) / y1 - (z1 - z0)) < 0.0001);
 
-	      // Insert this special distribution, and return.
-	      PLF LADvsH;
-	      LADvsH.add (x0 * Canopy.Height, 0.0);
-	      LADvsH.add (x1 * Canopy.Height, 
-			  y1 * Canopy.LADm);
-	      LADvsH.add (     Canopy.Height, 0.0);
-	      Canopy.LAIvsH = LADvsH.integrate_stupidly ();
-	      return;
-	    }
-	  // It is enough to z1 closer to z2.
-	  z1 += Area - Need;
-	  z0 += Area - Need;
-	}
+              // Insert this special distribution, and return.
+              PLF LADvsH;
+              LADvsH.add (x0 * Canopy.Height, 0.0);
+              LADvsH.add (x1 * Canopy.Height, 
+                          y1 * Canopy.LADm);
+              LADvsH.add (     Canopy.Height, 0.0);
+              Canopy.LAIvsH = LADvsH.integrate_stupidly ();
+              return;
+            }
+          // It is enough to z1 closer to z2.
+          z1 += Area - Need;
+          z0 += Area - Need;
+        }
     }
     
   // Create PLF for standard "z0, z1, z2" distribution.
@@ -1360,9 +1360,9 @@ CropOld::CanopyStructure ()
 double
 CropOld::ActualWaterUptake (const Units&, double Ept,
                             const Geometry& geo,
-			    const Soil& soil, const SoilWater& soil_water,
-			    const double EvapInterception, 
-			    const double /* dt */, 
+                            const Soil& soil, const SoilWater& soil_water,
+                            const double EvapInterception, 
+                            const double /* dt */, 
                             Treelog& out)
 {
   if (Ept < 0)
@@ -1386,20 +1386,20 @@ CropOld::ActualWaterUptake (const Units&, double Ept,
       const double next = PotentialWaterUptake (h_next, geo, soil, soil_water);
       
       if (next < total)
-	// We are past the top of the curve.
-	if (step <= min_step)
-	  // We cannot go any closer to the top, skip it.
-	  {
-	    h_x = h_wp;
-	    total = PotentialWaterUptake (h_x, geo, soil, soil_water);
-	    break;
-	  }
-	else
-	  // Try again a little close.
-	  {
-	    step /= 2;
-	    continue;
-	  }
+        // We are past the top of the curve.
+        if (step <= min_step)
+          // We cannot go any closer to the top, skip it.
+          {
+            h_x = h_wp;
+            total = PotentialWaterUptake (h_x, geo, soil, soil_water);
+            break;
+          }
+        else
+          // Try again a little close.
+          {
+            step /= 2;
+            continue;
+          }
       total = next;
       h_x = h_next;
       step *= 2;
@@ -1416,26 +1416,26 @@ CropOld::ActualWaterUptake (const Units&, double Ept,
       const double next = PotentialWaterUptake (h_next, geo, soil, soil_water);
 
       if (next < Ept)
-	// We went too far.
-	if (step <= min_step)
-	  {
-	    // We can't get any closer.
-	    daisy_assert (next <= total);
-	    if (next >= Ept)
-	      {
-		// total = next;
-		h_x = h_next;
-	      }
-	    else 
-	      
-	    break;
-	  }
-	else
-	  // Try again a little closer.
-	  {
-	    step /= 2;
-	    continue;
-	  }
+        // We went too far.
+        if (step <= min_step)
+          {
+            // We can't get any closer.
+            daisy_assert (next <= total);
+            if (next >= Ept)
+              {
+                // total = next;
+                h_x = h_next;
+              }
+            else 
+              
+              break;
+          }
+        else
+          // Try again a little closer.
+          {
+            step /= 2;
+            continue;
+          }
       
       total = next;
       h_x = h_next;
@@ -1453,7 +1453,7 @@ CropOld::ActualWaterUptake (const Units&, double Ept,
       daisy_assert (total > 0);
       const double factor = Ept / total;
       for (unsigned int i = 0; i < soil.size (); i++)
-	H2OExtraction[i] *= factor;
+        H2OExtraction[i] *= factor;
       total = Ept;
     }
   // Update soil water sink term.
@@ -1489,18 +1489,18 @@ CropOld::PotentialWaterUptake (const double h_x,
   for (unsigned int i = 0; i < soil.size () && L[i] > 0.0; i++)
     {
       if (soil_water.h (i) >= 0.0)
-	{
-	  S[i] = 0.0;
-	  continue;
-	}
+        {
+          S[i] = 0.0;
+          continue;
+        }
       const double h = h_x - (1 + Rxylem) * geo.cell_z (i);
       const double uptake = std::max (2 * M_PI * L[i] 
-				 * (soil_water.Theta_ice (soil, i, h)
-				    / soil_water.Theta_ice (soil, i, 0.0))
-				 * (soil.M (i, soil_water.h (i)) 
-				    - soil.M (i, h))
-				 / (- 0.5 * log (area * L[i])),
-                                 0.0);
+                                      * (soil_water.Theta_ice (soil, i, h)
+                                         / soil_water.Theta_ice (soil, i, 0.0))
+                                      * (soil.M (i, soil_water.h (i)) 
+                                         - soil.M (i, h))
+                                      / (- 0.5 * log (area * L[i])),
+                                      0.0);
       daisy_assert (L[i] >= 0.0);
       daisy_assert (soil_water.Theta_ice (soil, i, h) > 0.0);
       daisy_assert (soil_water.Theta_ice (soil, i, 0.0) > 0.0);
@@ -1551,14 +1551,14 @@ CropOld::RootDensDistPar (double a)
       y2 = exp (x2);
       z2 = 1 + a * x2;
       while ((z1 - y1) * (z2 - y2) > 0)
-	{
-	  x1 = x2;
-	  y1 = y2;
-	  z1 = z2;
-	  x2++;
-	  y2 = exp (x2);
-	  z2 = 1 + a * x2;
-	}
+        {
+          x1 = x2;
+          y1 = y2;
+          z1 = z2;
+          x2++;
+          y2 = exp (x2);
+          z2 = 1 + a * x2;
+        }
     }
   else if (a >= 0.3)
     {
@@ -1579,17 +1579,17 @@ CropOld::RootDensDistPar (double a)
   while (fabs (2 * (z - y) / (z + y)) > 1.0e-5)
     {
       if (z - y > 0)
-	{
-	  x1 = x;
-	  y1 = y;
-	  // z1 = z;
-	}
+        {
+          x1 = x;
+          y1 = y;
+          // z1 = z;
+        }
       else
-	{
-	  x2 = x;
-	  y2 = y;
-	  // z2 = z;
-	}
+        {
+          x2 = x;
+          y2 = y;
+          // z2 = z;
+        }
       x = (y2 * (x2 - 1) - y1 * (x1 - 1)) / (y2 - y1);
       y = exp (x);
       z = 1 + a * x;
@@ -1614,7 +1614,7 @@ CropOld::RootDensity (const Geometry& geo)
     {
       double Lz = L0 * exp (-a * RootSys.Depth);
       a =   RootDensDistPar (LengthPrArea / (RootSys.Depth * Lz))
-	/ RootSys.Depth;
+        / RootSys.Depth;
     }
   
   std::vector<double>& d = var.RootSys.Density;
@@ -1645,10 +1645,10 @@ CropOld::NitContent ()
 
 void
 CropOld::NitrogenUptake (const int Hour, 
-			 const Geometry& geo,
+                         const Geometry& geo,
                          const Soil& soil,
-			 const SoilWater& soil_water,
-			 Chemistry& chemistry,
+                         const SoilWater& soil_water,
+                         Chemistry& chemistry,
                          const double dt)
 {
   const Parameters::RootPar& Root = par.Root;
@@ -1674,8 +1674,8 @@ CropOld::NitrogenUptake (const int Hour,
   if (PotNUpt > 0)
     {
       CrpAux.NH4Upt
-	= SoluteUptake (geo, soil, soil_water, soil_NH4, PotNUpt, 
-			RootSys.NH4Extraction, Root.MxNH4Up, Root.Rad, dt);
+        = SoluteUptake (geo, soil, soil_water, soil_NH4, PotNUpt, 
+                        RootSys.NH4Extraction, Root.MxNH4Up, Root.Rad, dt);
       daisy_assert (CrpAux.NH4Upt >= 0.0);
 
       NCrop += CrpAux.NH4Upt;
@@ -1689,8 +1689,8 @@ CropOld::NitrogenUptake (const int Hour,
   if (PotNUpt > 0)
     {
       CrpAux.NO3Upt
-	= SoluteUptake (geo, soil, soil_water, soil_NO3, PotNUpt,
-			RootSys.NO3Extraction, Root.MxNO3Up, Root.Rad, dt); 
+        = SoluteUptake (geo, soil, soil_water, soil_NO3, PotNUpt,
+                        RootSys.NO3Extraction, Root.MxNO3Up, Root.Rad, dt); 
       daisy_assert (CrpAux.NO3Upt >= 0.0);
       NCrop += CrpAux.NO3Upt;
       PotNUpt -= CrpAux.NO3Upt;
@@ -1723,7 +1723,7 @@ CropOld::MaintenanceRespiration (double r, double w, double T)
 {
   if (w > 0)
     return r * std::max (0.0, 0.4281 * (exp (0.57 - 0.024 * T + 0.0020 * T * T)
-				   - exp (0.57 - 0.042 * T - 0.0051 * T * T)))
+                                        - exp (0.57 - 0.042 * T - 0.0051 * T * T)))
       * w;
   else
     return 0.0;
@@ -1731,7 +1731,7 @@ CropOld::MaintenanceRespiration (double r, double w, double T)
 
 void 
 CropOld::NetProduction (const Bioclimate& bioclimate,
-			const Geometry& geo,
+                        const Geometry& geo,
                         const SoilHeat& soil_heat)
 {
   const Parameters::RespPar& Resp = par.Resp;
@@ -1742,7 +1742,7 @@ CropOld::NetProduction (const Bioclimate& bioclimate,
 
   const double RMLeaf
     = MaintenanceRespiration (Resp.r_Leaf (DS), Prod.WLeaf, 
-			      bioclimate.daily_air_temperature ());
+                              bioclimate.daily_air_temperature ());
   const double T_soil
     = geo.content_height (soil_heat, &SoilHeat::T, -Depth/3.0);
   const double RMRoot
@@ -1752,8 +1752,8 @@ CropOld::NetProduction (const Bioclimate& bioclimate,
   AssG = CrpAux.CanopyAss;
   if (par.enable_N_stress)
     AssG *= bound (0.0, ((Prod.NCrop - CrpAux.NfNCnt) 
-			 / (CrpAux.CrNCnt - CrpAux.NfNCnt)),
-		   1.0);
+                         / (CrpAux.CrNCnt - CrpAux.NfNCnt)),
+                   1.0);
   
   AssimilatePartitioning (DS, f_Leaf, f_Root);
   CrpAux.IncWLeaf = Resp.E_Leaf (DS) * (f_Leaf * AssG - RMLeaf);
@@ -1777,8 +1777,8 @@ void
 CropOld::tick (const Time& time, const Bioclimate& bioclimate, 
                const double ForcedCAI,
                const Geometry& geo, const Soil& soil, const SoilHeat& soil_heat,
-	       SoilWater& soil_water, Chemistry& chemistry,
-	       OrganicMatter&, double&, double&, double&,
+               SoilWater& soil_water, Chemistry& chemistry,
+               OrganicMatter&, double&, double&, double&,
                std::vector<double>&, std::vector<double>&,
                const double dt, Treelog& msg)
 {
@@ -1795,11 +1795,11 @@ CropOld::tick (const Time& time, const Bioclimate& bioclimate,
 
   // Clear log.
   fill (var.RootSys.NO3Extraction.begin (), 
-	var.RootSys.NO3Extraction.end (),
-	0.0);
+        var.RootSys.NO3Extraction.end (),
+        0.0);
   fill (var.RootSys.NH4Extraction.begin (), 
-	var.RootSys.NH4Extraction.end (),
-	0.0);
+        var.RootSys.NH4Extraction.end (),
+        0.0);
 
   // It was a bad winter.
   if (par.Devel.DS_reset 
@@ -1814,14 +1814,14 @@ CropOld::tick (const Time& time, const Bioclimate& bioclimate,
     {
       Emergence (geo, soil_heat);
       if (var.Phenology.DS >= 0)
-	{
-	  InitialLAI ();
-	  var.Canopy.Height = CropHeight ();
-	  NitContent ();
-	  var.CrpAux.PotCanopyAss = 0.0;
-	  var.CrpAux.CanopyAss = 0.0;
-	  RootDensity (geo);
-	}
+        {
+          InitialLAI ();
+          var.Canopy.Height = CropHeight ();
+          NitContent ();
+          var.CrpAux.PotCanopyAss = 0.0;
+          var.CrpAux.CanopyAss = 0.0;
+          RootDensity (geo);
+        }
       return;
     }
   if (var.Phenology.DS <= 0 || var.Phenology.DS >= 2)
@@ -1851,15 +1851,15 @@ CropOld::tick (const Time& time, const Bioclimate& bioclimate,
   else
     {
       if (Ta > par.LeafPhot.TLim2)
-	Teff = 1.0;
+        Teff = 1.0;
       else
-	Teff =   (Ta - par.LeafPhot.TLim1)
-	  / (par.LeafPhot.TLim2 - par.LeafPhot.TLim1);
+        Teff =   (Ta - par.LeafPhot.TLim1)
+          / (par.LeafPhot.TLim2 - par.LeafPhot.TLim1);
     }
 
   // Fraction of Photosynthetically Active Radiation in Shortware
   // incomming radiation. 
-  const double PARinSi = 0.48;	
+  const double PARinSi = 0.48;  
 
   const double beta1 = 0.158;
   const double beta2 = 0.094;
@@ -1870,8 +1870,8 @@ CropOld::tick (const Time& time, const Bioclimate& bioclimate,
     * (1.0 - exp (-par.Canopy.PARext * LAI)) * Si;
   const double epsilon = 0.15 - (beta1 - beta2 * LAI / (LAI + 3.0))
     * Sad / (Sad + 7.8e6);
-  const double C = 15.7;	// [MJ/kg]
-  const double Fcd = epsilon * Sad / C;	// [mg CH2O /m²/d]
+  const double C = 15.7;        // [MJ/kg]
+  const double Fcd = epsilon * Sad / C; // [mg CH2O /m²/d]
   const double Ass = 0.001 * Fcd * Teff; // [g/m²/d]
   
   var.CrpAux.PotCanopyAss += Ass;
@@ -1900,18 +1900,18 @@ CropOld::tick (const Time& time, const Bioclimate& bioclimate,
 
 const Harvest&
 CropOld::harvest (const symbol column_name,
-		  const Time& time, const Geometry& geo, 
-		  double stub_length,
-		  double stem_harvest, double, double sorg_harvest, 
-		  bool kill_off,
-		  std::vector<AM*>& residuals, 
-		  double& residuals_DM,
-		  double& residuals_N_top,
-		  double& residuals_C_top,
-		  std::vector<double>& residuals_N_soil,
-		  std::vector<double>& residuals_C_soil,
+                  const Time& time, const Geometry& geo, 
+                  double stub_length,
+                  double stem_harvest, double, double sorg_harvest, 
+                  bool kill_off,
+                  std::vector<AM*>& residuals, 
+                  double& residuals_DM,
+                  double& residuals_N_top,
+                  double& residuals_C_top,
+                  std::vector<double>& residuals_N_soil,
+                  std::vector<double>& residuals_C_soil,
                   const bool,
-		  Treelog& out)
+                  Treelog& out)
 {
   const Parameters::HarvestPar& Hp = par.Harvest;
   Variables::RecProd& Prod = var.Prod;
@@ -1928,9 +1928,9 @@ CropOld::harvest (const symbol column_name,
   const double NCrop = Prod.NCrop;
 
   const double WStub = (stub_length < height () 
-			? WLeaf * stub_length / height ()
-			: WLeaf);
-			
+                        ? WLeaf * stub_length / height ()
+                        : WLeaf);
+                        
   const double WSOrg = index * (WLeaf - WStub);
   const double WStraw = WLeaf - WSOrg - WStub;
 
@@ -1956,7 +1956,7 @@ CropOld::harvest (const symbol column_name,
   else
     {
       CStem = ((CStem * WSOrg + alpha * (NLeaf - CSOrg * WSOrg))
-		/ (WSOrg + alpha * WStem));
+               / (WSOrg + alpha * WStem));
       CSOrg = (NLeaf - CStem * WStem) / WSOrg;
     }
   const double NStem = WStem * CStem;
@@ -1986,7 +1986,7 @@ CropOld::harvest (const symbol column_name,
       const double DSnew = Hp.DSnew;
 
       if (DS > DSnew)
-	var.Phenology.DS = DSnew;
+        var.Phenology.DS = DSnew;
 
       Prod.WLeaf -= (WStraw * stem_harvest + WSOrg * sorg_harvest);
       Prod.WhiteStubble = 0.6 * Prod.WLeaf;
@@ -2003,49 +2003,49 @@ CropOld::harvest (const symbol column_name,
       
       // Add crop remains to the soil.
       if (stem_harvest < 1.0 && WStem > 0.0)
-	{
-	  static const symbol stem_symbol ("stem");
-	  AM& am = AM::create (geo.cell_size (),
+        {
+          static const symbol stem_symbol ("stem");
+          AM& am = AM::create (geo.cell_size (),
                                time, Stem, name, stem_symbol);
-	  am.add (WStem * C_Stem * m2_per_cm2,
-		  NStem * m2_per_cm2);
-	  residuals.push_back (&am);
-	  residuals_DM += WStem;
-	  residuals_N_top += NStem;
-	  residuals_C_top += WStem * C_Stem;
-	}
+          am.add (WStem * C_Stem * m2_per_cm2,
+                  NStem * m2_per_cm2);
+          residuals.push_back (&am);
+          residuals_DM += WStem;
+          residuals_N_top += NStem;
+          residuals_C_top += WStem * C_Stem;
+        }
       if (sorg_harvest < 1.0 && WSOrg > 0.0)
-	{
-	  static const symbol sorg_symbol ("sorg");
-	  AM& am = AM::create (geo.cell_size (),
+        {
+          static const symbol sorg_symbol ("sorg");
+          AM& am = AM::create (geo.cell_size (),
                                time, SOrg, name, sorg_symbol);
-	  am.add (WSOrg * C_SOrg * (1.0 - sorg_harvest) * m2_per_cm2,
-		  NSOrg * (1.0 - sorg_harvest) * m2_per_cm2);
-	  residuals.push_back (&am);
-	  residuals_DM += WSOrg * (1.0 - sorg_harvest);
-	  residuals_N_top += NSOrg * (1.0 - sorg_harvest);
-	  residuals_C_top += WSOrg * C_SOrg * (1.0 - sorg_harvest);
-	}
+          am.add (WSOrg * C_SOrg * (1.0 - sorg_harvest) * m2_per_cm2,
+                  NSOrg * (1.0 - sorg_harvest) * m2_per_cm2);
+          residuals.push_back (&am);
+          residuals_DM += WSOrg * (1.0 - sorg_harvest);
+          residuals_N_top += NSOrg * (1.0 - sorg_harvest);
+          residuals_C_top += WSOrg * C_SOrg * (1.0 - sorg_harvest);
+        }
       if (WRoot > 0.0)
-	{
-	  static const symbol root_symbol ("root");
-	  AM& am = AM::create (geo.cell_size (),
+        {
+          static const symbol root_symbol ("root");
+          AM& am = AM::create (geo.cell_size (),
                                time, Root, name, root_symbol);
-	  if (geo.total_soil (density) > 0.0)
-	    am.add_surface (geo,
+          if (geo.total_soil (density) > 0.0)
+            am.add_surface (geo,
                             WRoot * C_Root * m2_per_cm2,
                             NRoot * m2_per_cm2,
                             density);
-	  else
-	    am.add (WRoot * C_Root * m2_per_cm2,
-		    NRoot * m2_per_cm2);
-	  residuals.push_back (&am);
-	  residuals_DM += WRoot;
-	  geo.add_surface (residuals_N_soil, density, 
+          else
+            am.add (WRoot * C_Root * m2_per_cm2,
+                    NRoot * m2_per_cm2);
+          residuals.push_back (&am);
+          residuals_DM += WRoot;
+          geo.add_surface (residuals_N_soil, density, 
                            NRoot * m2_per_cm2);
-	  geo.add_surface (residuals_C_soil, density, 
+          geo.add_surface (residuals_C_soil, density, 
                            WRoot * C_Root * m2_per_cm2);
-	}
+        }
     }
   std::ostringstream tmp;
   tmp << "Harvest: " << name 
@@ -2058,10 +2058,10 @@ CropOld::harvest (const symbol column_name,
   double wsd = -1.0;
   double nsd = -1.0;
   return *new Harvest (column_name, time, name, 
-		       WStraw * stem_harvest, NStraw * stem_harvest, 0.0,
-		       0.0, 0.0, 0.0,
-		       0.0, 0.0, 0.0,
-		       WSOrg * sorg_harvest, NSOrg * sorg_harvest, 0.0,
+                       WStraw * stem_harvest, NStraw * stem_harvest, 0.0,
+                       0.0, 0.0, 0.0,
+                       0.0, 0.0, 0.0,
+                       WSOrg * sorg_harvest, NSOrg * sorg_harvest, 0.0,
                        wsd, nsd, -1.0);
 }
 

@@ -143,11 +143,11 @@ This is useful under MS Windows when dragging the file to a gnuplot icon.");
     frame.set ("cd", true);
 #endif
     frame.declare ("extra", Value::String, Value::Const, 
-                Value::Sequence, "List of extra gnuplot commands.\n\
+                Value::Variable, "List of extra gnuplot commands.\n\
 The commands will be inserted right before the list of graphs.");
     frame.set_empty ("extra");
                 
     frame.declare_object ("graph", Gnuplot::component, Value::State, 
-                       Value::Sequence, "Graphs to plot.");
+                       Value::Variable, "Graphs to plot.");
   }
 } ProgramGnuplot_syntax;

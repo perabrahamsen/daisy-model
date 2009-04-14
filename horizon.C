@@ -278,7 +278,7 @@ static const class SOM_fractions_check_type : public VCheck
     daisy_assert (key == "SOM_fractions");
     daisy_assert (frame.check (key));
     daisy_assert (frame.lookup (key) == Value::Number);
-    daisy_assert (frame.type_size (key) == Value::Sequence);
+    daisy_assert (frame.type_size (key) == Value::Variable);
     std::vector<double> fractions = frame.number_sequence ("SOM_fractions");
     bool has_negative = false;
     double sum = 0.0;
@@ -393,7 +393,7 @@ move towards drain pipes.");
                    "The soils dry bulk density.\n\
 By default, this is calculated from the soil constituents.");
     frame.declare ("SOM_C_per_N", "g C/g N", Check::non_negative (), 
-                   Value::Const, Value::Sequence,
+                   Value::Const, Value::Variable,
                    "C/N ratio for each SOM pool in this soil.\n\
 If 'C_per_N' is specified, this is used as a goal only.  If 'C_per_N' is\n\
 unspecified, the SOM pools will be initialized with this value.");
@@ -415,7 +415,7 @@ initialization.");
 
     static const BelowOrEqual max_1 (1.0);
     frame.declare ("SOM_fractions",  Value::None (), max_1,
-                   Value::OptionalConst, Value::Sequence, "\
+                   Value::OptionalConst, Value::Variable, "\
 Fraction of humus in each SOM pool, from slowest to fastest.\n\
 Negative numbers mean unspecified, let Daisy find appropriate values.");
     frame.set_check ("SOM_fractions", SOM_fractions_check);

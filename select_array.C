@@ -230,7 +230,7 @@ static struct SelectArraySyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.declare ("value", Value::Unknown (), Value::State, Value::Sequence,
+    frame.declare ("value", Value::Unknown (), Value::State, Value::Variable,
 		"The current accumulated value.");
     std::vector<double> empty;
     frame.set ("value", empty);

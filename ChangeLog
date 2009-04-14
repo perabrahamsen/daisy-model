@@ -1,3 +1,23 @@
+2009-04-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* value.h (Sequence): Split into 'Variable', 'CanopyCells',
+	'CanopyEdges', 'SoilCells', and 'SoilEdges'.
+	(flexible_size): New function.
+	* all: Update callers.
+
+2009-04-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log_dlf.h, log_dlf.C: New base.
+	* Makefile (SPECIALS): Add it.
+
+2009-04-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log.C, log.h (Log::print_dlf_header): Removed.
+
+	* select_volume.C (SelectVolume::done): Removed.
+
+	* all: Split 'Frame::add' into 'Frame::set' and 'Frame::declare'.
+
 2009-03-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.63 released.

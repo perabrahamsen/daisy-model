@@ -974,7 +974,7 @@ Biopores that ends in the matrix.")
   void load_frame (Frame& frame) const
   { 
     frame.declare ("xplus", "cm", Check::positive (), 
-                Value::OptionalConst, Value::Sequence,
+                Value::OptionalConst, Value::Variable,
                 "Right side of each biopore interval.\n\
 Water and chemical content is tracked individually for each interval.\n\
 By default, use intervals as specified by the geometry.");
@@ -988,7 +988,7 @@ If not specified, this will be identical to 'R_primary'.");
     frame.declare ("debug", Value::Integer, Value::Const, "Debug level.\n\
 Increase value to get more debug message.");
     frame.set ("debug", 0);
-    frame.declare ("h_bottom", "cm", Value::OptionalState, Value::Sequence,
+    frame.declare ("h_bottom", "cm", Value::OptionalState, Value::Variable,
                 "Pressure at the bottom of the biopores in each interval.");
     frame.declare_submodule_sequence ("solute", Value::State, "\
 Chemical concentration in biopore intervals.", load_solute);
@@ -996,7 +996,7 @@ Chemical concentration in biopore intervals.", load_solute);
     frame.declare ("water", "cm^3", Value::LogOnly, "Water content.");    
     frame.declare ("iterations", Value::Integer, Value::LogOnly, 
                 "Number of iterations used for finding a solution.");
-    frame.declare ("h3_soil", "cm", Value::LogOnly, Value::Sequence,
+    frame.declare ("h3_soil", "cm", Value::LogOnly, Value::Variable,
                 "Pressure suggested by the soil for each interval.");
     frame.declare ("max_iterations", Value::Integer, Value::Const, "\
 Maximum number of iterations when seeking convergence.");

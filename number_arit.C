@@ -458,7 +458,7 @@ static struct NumberMaxSyntax : public DeclareModel
   {
 
     frame.declare_object ("operands", Number::component,
-                       Value::Const, Value::Sequence,
+                       Value::Const, Value::Variable,
                        "The operands for this function.");
 #ifdef CHECK_OPERANDS_DIM
     static VCheck::All all (VCheck::min_size_1 (),
@@ -505,7 +505,7 @@ static struct NumberMinSyntax : public DeclareModel
   {
 
     frame.declare_object ("operands", Number::component,
-                       Value::Const, Value::Sequence,
+                       Value::Const, Value::Variable,
                        "The operands for this function.");
 #ifdef CHECK_OPERANDS_DIM
     static VCheck::All all (VCheck::min_size_1 (), 
@@ -554,7 +554,7 @@ static struct NumberProductSyntax : public DeclareModel
   {
 
     frame.declare_object ("operands", Number::component,
-                       Value::Const, Value::Sequence,
+                       Value::Const, Value::Variable,
                        "The operands for this function.");
     frame.order ("operands");
   }
@@ -591,7 +591,7 @@ static struct NumberSumSyntax : public DeclareModel
   {
 
     frame.declare_object ("operands", Number::component,
-                       Value::Const, Value::Sequence,
+                       Value::Const, Value::Variable,
                        "The operands for this function.");
 #ifdef CHECK_OPERANDS_DIM
     frame.set_check ("operands", NumberOperands::unique);
@@ -636,7 +636,7 @@ subtracts all but the first from the first.")
   {
 
     frame.declare_object ("operands", Number::component,
-                       Value::Const, Value::Sequence,
+                       Value::Const, Value::Variable,
                        "The operands for this function.");
 #ifdef CHECK_OPERANDS_DIM
     static VCheck::All all (VCheck::min_size_1 (), 
@@ -679,7 +679,7 @@ static struct NumberDivideSyntax : public DeclareModel
   {
 
     frame.declare_object ("operands", Number::component,
-                       Value::Const, Value::Sequence,
+                       Value::Const, Value::Variable,
                        "The operands for this function.");
     frame.set_check ("operands", VCheck::min_size_1 ());
     frame.order ("operands");

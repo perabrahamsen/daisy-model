@@ -124,7 +124,7 @@ AM::Implementation::Check_OM_Pools::check (Metalib&, const Frame& frame,
   daisy_assert (frame.check (key));
   daisy_assert (frame.lookup (key) == Value::Object);
   daisy_assert (!frame.is_log (key));
-  daisy_assert (frame.type_size (key) == Value::Sequence);
+  daisy_assert (frame.type_size (key) == Value::Variable);
 
   if (frame.flag ("initialized", false))
     // No checking checkpoints.
@@ -1014,7 +1014,7 @@ A name given to this AOM so you can identify it in for example log files.");
 This AM belongs to a still living plant",
                           AM::Implementation::Lock::load_syntax);
     frame.declare_object ("om", AOM::component, 
-                      Value::OptionalState, Value::Sequence, "\
+                      Value::OptionalState, Value::Variable, "\
 The individual AOM pools.");
   }
 } AMBase_syntax;

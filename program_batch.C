@@ -105,7 +105,7 @@ static struct ProgramBatchSyntax : public DeclareModel
 Directory in which to initialize, check and run the programs.");
     frame.set ("directory", ".");
     frame.declare_object ("run", Program::component, 
-                       Value::State, Value::Sequence, "\
+                       Value::State, Value::Variable, "\
 List of programs to run.  The programs will be run in the sequence listed.");
    
   }

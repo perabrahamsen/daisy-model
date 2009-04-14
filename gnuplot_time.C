@@ -367,7 +367,7 @@ Fixed highest value on right y-axis.\n\
 By default determine this from the data.");
                 
     frame.declare_object ("source", Source::component, Value::State, 
-                       Value::Sequence, "\
+                       Value::Variable, "\
 Time series to plot.");
   }
 } GnuplotTime_syntax;

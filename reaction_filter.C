@@ -56,7 +56,7 @@ struct ReactionFilter : public Reaction
   // Simulation.
   void tick (const Units&, const Geometry& geo, const Soil& soil,
              const SoilWater& soil_water, 
-	     const SoilHeat&, const OrganicMatter&,
+             const SoilHeat&, const OrganicMatter&,
              Chemistry& chemistry, const double dt, Treelog& msg)
   { 
     const size_t cell_size = soil.size ();
@@ -67,14 +67,14 @@ struct ReactionFilter : public Reaction
     for (size_t i = 0; i < cell_size; i++)
       {
         // Extract soil and water.
-	const double C_primary = mob.C_primary (i);//[g cm^-3 water]
-	const double C_secondary = mob.C_secondary (i);//[g cm^-3 water]
+        const double C_primary = mob.C_primary (i);//[g cm^-3 water]
+        const double C_secondary = mob.C_secondary (i);//[g cm^-3 water]
         const double Theta_primary 
           = soil_water.Theta_primary (i); //[cm^3 cm^-3]
         const double Theta_secondary
           = soil_water.Theta_secondary (i); //[cm^3 cm^-3]
-	const double M_primary = C_primary * Theta_primary;//[g cm^-3 soil]
-	const double M_secondary
+        const double M_primary = C_primary * Theta_primary;//[g cm^-3 soil]
+        const double M_secondary
           = C_secondary * Theta_secondary;//[g cm^-3 soil]
 
         // Extract pore water velocity.
@@ -112,7 +112,7 @@ struct ReactionFilter : public Reaction
   // Create.
   bool check (const Units&, const Geometry&, 
               const Soil& soil, const SoilWater& soil_water, const SoilHeat&,
-	      const Chemistry& chemistry, Treelog& msg) const
+              const Chemistry& chemistry, Treelog& msg) const
   { 
     bool ok = true;
     if (!chemistry.know (immobile) && immobile != Value::None ())
@@ -151,28 +151,28 @@ static struct ReactionFilterSyntax : public DeclareModel
   { return new ReactionFilter (al); }
   ReactionFilterSyntax ()
     : DeclareModel (Reaction::component, "filter_velocity",
-               "Filtration of soil colloids.")
+                    "Filtration of soil colloids.")
   { }
   void load_frame (Frame& frame) const
   {
 
 
     frame.declare ("immobile", Value::String, Value::OptionalConst,
-		"Immobile colloids in the soil.\n\
+                   "Immobile colloids in the soil.\n\
 By default, filtered colloids are not tracked.");
     frame.declare ("mobile", Value::String, Value::Const,
-		"Mobile colloids dissolved in soil water.");
-    frame.declare ("F_primary", "g/cm^3/h", Value::LogOnly, Value::Sequence,
-		"Filtration in the primary domain (intra-aggregate pores).");
-    frame.declare ("F_secondary", "g/cm^3/h", Value::LogOnly, Value::Sequence,
-		"Filtration in secondary domain (inter-aggregate pores).");
+                   "Mobile colloids dissolved in soil water.");
+    frame.declare ("F_primary", "g/cm^3/h", Value::LogOnly, Value::SoilCells,
+                   "Filtration in the primary domain (intra-aggregate pores).");
+    frame.declare ("F_secondary", "g/cm^3/h", Value::LogOnly, Value::SoilCells,
+                   "Filtration in secondary domain (inter-aggregate pores).");
 
     frame.declare ("fc_primary", "cm^-1", Check::positive (), Value::Const,
-                "Filter coefficient in the primary domain");
+                   "Filter coefficient in the primary domain");
     // frame.set ("fc_primary", 1.0);
    
     frame.declare ("fc_secondary", "cm^-1", Check::positive (), Value::Const,
-                "Filter coefficient in secondary domain");
+                   "Filter coefficient in secondary domain");
     // frame.set ("fc_secondary", 0.5);
 
   }

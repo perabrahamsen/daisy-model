@@ -660,7 +660,7 @@ static struct TertiaryBioporesSyntax : public DeclareModel
   { 
 
     frame.declare_object ("classes", Biopore::component, 
-                       Value::State, Value::Sequence,
+                       Value::State, Value::Variable,
                        "List of biopore classes.");
     frame.declare ("pressure_initiate", "cm", Value::Const, 
                 "Pressure needed to activate biopore flow.");
@@ -692,7 +692,7 @@ After macropores are activated pond will have this height.");
                 "True iff the sink is allowed to change within a timestep.");
     frame.set ("use_small_timesteps", true);
     frame.declare ("active", Value::Boolean, Value::OptionalState,
-                Value::Sequence, "Active biopores in cells.");
+                Value::SoilCells, "Active biopores in cells.");
     frame.declare ("water_volume", "cm^3", Value::LogOnly, "Water volume.");    
     frame.declare ("water_height", "cm", Value::LogOnly,
                 "Water volume multiplied with surface area.");

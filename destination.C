@@ -1,4 +1,4 @@
-// destination.C --- Destrination for a Select variable.
+// destination.C --- Destination for a Select variable.
 // 
 // Copyright 2003 Per Abrahamsen and KVL.
 //

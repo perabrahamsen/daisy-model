@@ -723,7 +723,7 @@ Shared paramaters for handling solutes.")
   void load_frame (Frame& frame) const
   {
     frame.declare_object ("matrix_solute", Transport::component, 
-                       Value::State, Value::Sequence,
+                       Value::State, Value::Variable,
                        "Matrix solute transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends.");

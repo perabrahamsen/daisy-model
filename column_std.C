@@ -98,9 +98,9 @@ public:
             const Time&, double dt, Treelog&);
   void ridge (const FrameSubmodel& al);
   void irrigate_overhead (double flux, double temp, const IM&, double dt,
-			  Treelog& msg);
+                          Treelog& msg);
   void irrigate_surface (double flux, double temp, const IM&, double dt, 
-			 Treelog& msg);
+                         Treelog& msg);
   void irrigate_overhead (double flux, const IM&, double dt, Treelog& msg);
   void irrigate_surface (double flux, const IM&, double dt, Treelog& msg);
   void irrigate_subsoil (double flux, const IM& sm, 
@@ -155,7 +155,7 @@ public:
   // Simulation.
   void clear ();
   void tick (Metalib& metalib, const Time&, const double dt, const Weather*,
-	     const Scope&, Treelog&);
+             const Scope&, Treelog&);
   bool check (bool require_weather,
               const Time& from, const Time& to, 
               const Scope&, Treelog&) const;
@@ -169,7 +169,7 @@ public:
   static Movement* build_vertical (Block& al);
   ColumnStandard (Block& al);
   bool initialize (Block&, const Output&, const Time&, const Weather*,
-		   const Scope& scope);
+                   const Scope& scope);
   void summarize (Treelog& msg) const;
   ~ColumnStandard ();
 };
@@ -466,7 +466,7 @@ ColumnStandard::mix (Metalib& metalib, const double from, const double to,
 void 
 ColumnStandard::swap (Metalib& metalib, 
                       const double from, const double middle, const double to,
-		      const Time& time, const double dt, Treelog& msg)
+                      const Time& time, const double dt, Treelog& msg)
 {
   mix (metalib, from, middle, 1.0, time, dt, msg);
   mix (metalib, middle, to, 0.0, time, dt, msg);
@@ -489,17 +489,17 @@ ColumnStandard::set_porosity (double at, double Theta)
 void 
 ColumnStandard::set_heat_source (double at, double value) // [W/m^2]
 {
- const size_t cell_size = geometry.cell_size ();
- for (size_t i = 0; i < cell_size; i++)
-   if (geometry.contain_z (i, at))
-     {
-       const double V = geometry.cell_volume (i);
-       value *= 10^3;		// [W/m^2] -> [erg/cm^2/s]
-       value *= 3600;		// [erg/cm^2/s] -> [erg/cm^2/h]
-       value /= V;              // [erg/cm^2/h] -> [erg/cm^3/h]
+  const size_t cell_size = geometry.cell_size ();
+  for (size_t i = 0; i < cell_size; i++)
+    if (geometry.contain_z (i, at))
+      {
+        const double V = geometry.cell_volume (i);
+        value *= 10^3;          // [W/m^2] -> [erg/cm^2/s]
+        value *= 3600;          // [erg/cm^2/s] -> [erg/cm^2/h]
+        value /= V;              // [erg/cm^2/h] -> [erg/cm^3/h]
 
-       soil_heat->set_source (i, value);
-     }
+        soil_heat->set_source (i, value);
+      }
 }
 
 void 
@@ -544,7 +544,7 @@ ColumnStandard::soil_water_content (double from, double to) const
   return soil_water->content_surface (geometry, from, to);
 }
 
-double				// [kg N/ha]
+double                          // [kg N/ha]
 ColumnStandard::soil_inorganic_nitrogen (double from, double to) const
 {
   double N = 0.0;
@@ -557,7 +557,7 @@ ColumnStandard::soil_inorganic_nitrogen (double from, double to) const
   return N * 1.0e5; // g N/cm^2 -> kg N/ha
 }  
 
-double				// [kg N/ha]
+double                          // [kg N/ha]
 ColumnStandard::second_year_utilization () const
 { return second_year_utilization_; }
 
@@ -567,12 +567,12 @@ ColumnStandard::crop_ds (const symbol name) const // {[-1:2], Crop::DSremove}
 
 double 
 ColumnStandard::crop_dm (const symbol name, const double height) const
-  //[kg/ha], negative when no crop
+//[kg/ha], negative when no crop
 { return vegetation->DM_by_name (name, height); }
 
 double 
 ColumnStandard::crop_sorg_dm (const symbol name) const
-  //[kg/ha], negative when no crop
+//[kg/ha], negative when no crop
 { return vegetation->SOrg_DM_by_name (name); }
 
 std::string
@@ -610,7 +610,7 @@ ColumnStandard::clear ()
 void
 ColumnStandard::tick (Metalib& metalib, const Time& time, const double dt,
                       const Weather* global_weather, const Scope& parent_scope,
-		      Treelog& msg)
+                      Treelog& msg)
 {
   daisy_assert (extern_scope);
   ScopeMulti scope (*extern_scope, parent_scope);
@@ -632,7 +632,7 @@ ColumnStandard::tick (Metalib& metalib, const Time& time, const double dt,
                     geometry, *soil, *soil_water, *soil_heat, *chemistry,
                     dt, msg);
   vegetation->tick (metalib, time, *bioclimate, geometry, *soil, 
-		    *soil_heat, *soil_water, *chemistry, *organic_matter, 
+                    *soil_heat, *soil_water, *chemistry, *organic_matter, 
                     residuals_DM, residuals_N_top, residuals_C_top, 
                     residuals_N_soil, residuals_C_soil, dt, msg);
   chemistry->tick_top (bioclimate->snow_leak_rate (dt), vegetation->cover (),
@@ -657,7 +657,7 @@ ColumnStandard::tick (Metalib& metalib, const Time& time, const double dt,
                   surface, *groundwater, time, my_weather, 
                   dt, msg);
   soil_heat->tick (geometry, *soil, *soil_water, *movement, 
-		   surface, dt, msg);
+                   surface, dt, msg);
   soil_water->tick_after (geometry, *soil, *soil_heat, false, msg);
   soil_water->mass_balance (geometry, dt, msg);
   soil_heat->tick_after (geometry.cell_size (), *soil, *soil_water, msg);
@@ -685,7 +685,7 @@ ColumnStandard::tick (Metalib& metalib, const Time& time, const double dt,
 bool
 ColumnStandard::check (bool require_weather,
                        const Time& from, const Time& to,
-		       const Scope& parent_scope, Treelog& msg) const
+                       const Scope& parent_scope, Treelog& msg) const
 {
   bool ok = true;
   const int n = geometry.cell_size ();
@@ -696,7 +696,7 @@ ColumnStandard::check (bool require_weather,
       ok = false;
     }
   ScopeMulti scope (extern_scope ? *extern_scope : Scope::null (), 
-		    parent_scope);
+                    parent_scope);
   {
     Treelog::Open nest (msg, "Geometry");
     if (!geometry.check (msg))
@@ -721,16 +721,16 @@ ColumnStandard::check (bool require_weather,
     if (weather.get ())
       {
         Treelog::Open nest (msg, "Weather: " + weather->name);
-	if (!weather->check (from, to, msg))
+        if (!weather->check (from, to, msg))
           // The rest is uninitialized, don't check it!
-	  return false;
+          return false;
       }
 
     else if (require_weather)
       {
-	msg.entry ("Weather unspecified");
-	// The rest is uninitialized, don't check it!
-	return false;
+        msg.entry ("Weather unspecified");
+        // The rest is uninitialized, don't check it!
+        return false;
       }
   }
   {
@@ -853,8 +853,8 @@ ColumnStandard::ColumnStandard (Block& al)
     movement (Librarian::build_item<Movement> (al, "Movement")),
     groundwater (Librarian::build_item<Groundwater> (al, "Groundwater")),
     weather (al.check ("weather") 
-	     ? Librarian::build_item<Weather> (al, "weather")
-	     : NULL), 
+             ? Librarian::build_item<Weather> (al, "weather")
+             : NULL), 
     vegetation (Librarian::build_item<Vegetation> (al, "Vegetation")),
     bioclimate (Librarian::build_item<Bioclimate> (al, "Bioclimate")),
     surface (al.submodel ("Surface")),
@@ -882,15 +882,15 @@ bool
 ColumnStandard::initialize (Block& block, 
                             const Output& output,
                             const Time& time, 
-			    const Weather* global_weather,
-			    const Scope& parent_scope)
+                            const Weather* global_weather,
+                            const Scope& parent_scope)
 {
   bool ok = true;
   Treelog& msg = block.msg ();
   Treelog::Open nest (msg, name);
   extern_scope = scopesel->lookup (output, msg); 
   ScopeMulti scope (extern_scope ? *extern_scope : Scope::null (),
-		    parent_scope);
+                    parent_scope);
   soil->initialize (block, geometry, *groundwater,
                     organic_matter->som_pools ());
   residuals_N_soil.insert (residuals_N_soil.begin (), soil->size (), 0.0);
@@ -962,8 +962,8 @@ static struct ColumnStandardSyntax : public DeclareModel
   {
     SoilWater::load_syntax (frame);
     frame.declare_object ("macro", Macro::component,
-                       Value::OptionalState, Value::Singleton,
-                       "Preferential flow model.\n\
+                          Value::OptionalState, Value::Singleton,
+                          "Preferential flow model.\n\
 By default, preferential flow is enabled if and only if the combined\n\
 amount of humus and clay in the top horizon is above 5%.");
   }
@@ -972,90 +972,90 @@ amount of humus and clay in the top horizon is above 5%.");
   void load_frame (Frame& frame) const
   { 
     frame.declare_object ("scope", Scopesel::component, 
-		       Value::Const, Value::Singleton, "\
+                          Value::Const, Value::Singleton, "\
 Scope to evaluate expessions in.");
     frame.set ("scope", "null");
     frame.declare_submodule ("Soil", Value::State,
-                          "The numeric and physical soil properties.",
-                          Soil::load_syntax);
+                             "The numeric and physical soil properties.",
+                             Soil::load_syntax);
     frame.declare_submodule ("SoilWater", Value::State,
-                         "Soil water content and transportation.",
-                         SoilWater::load_syntax);
+                             "Soil water content and transportation.",
+                             SoilWater::load_syntax);
     frame.declare_submodule ("SoilHeat", Value::State,
-                          "Soil heat capacity and transportation.",
-                          SoilHeat::load_syntax);
+                             "Soil heat capacity and transportation.",
+                             SoilHeat::load_syntax);
     frame.declare_object ("Movement", Movement::component,
-                       Value::State, Value::Singleton, "\
+                          Value::State, Value::Singleton, "\
 Discretization and movement of water, heat and solutes in the soil.");
     frame.set ("Movement", "vertical");
     frame.declare_object ("weather", Weather::component,
-                       Value::OptionalState, Value::Singleton,
-                       "Weather model for providing climate information during\n\
+                          Value::OptionalState, Value::Singleton,
+                          "Weather model for providing climate information during\n\
 the simulation.  If unspecified, used global weather.");
     frame.declare_object ("Vegetation", Vegetation::component,
-                       Value::State, Value::Singleton,
-                       "The crops on the field.");
+                          Value::State, Value::Singleton,
+                          "The crops on the field.");
     frame.set ("Vegetation", "crops");
 
     frame.declare_object ("Bioclimate", Bioclimate::component, 
-                       Value::State, Value::Singleton,
-                       "The water and energy distribution among the crops.");
+                          Value::State, Value::Singleton,
+                          "The water and energy distribution among the crops.");
     frame.set ("Bioclimate", "default");
     frame.declare_submodule ("Surface", Value::State,
-                          "The upper border of the soil.",
-                          Surface::load_syntax);
+                             "The upper border of the soil.",
+                             Surface::load_syntax);
     frame.declare_object ("Groundwater", Groundwater::component,
-                       "The groundwater level.");
+                          "The groundwater level.");
     frame.declare_object ("Chemistry", Chemistry::component, 
-                       Value::State, Value::Singleton,
-                       "Chemical compounds in the system.");
+                          Value::State, Value::Singleton,
+                          "Chemical compounds in the system.");
     frame.set ("Chemistry", "nutrient");
     frame.declare ("harvest_DM", "g/m^2/h", Value::LogOnly, 
-                "Amount of DM removed by harvest this hour.");
+                   "Amount of DM removed by harvest this hour.");
     frame.declare ("harvest_N", "g/m^2/h", Value::LogOnly, 
-                "Amount of nitrogen removed by harvest this hour.");
+                   "Amount of nitrogen removed by harvest this hour.");
     frame.declare ("harvest_C", "g/m^2/h", Value::LogOnly, 
-                "Amount of carbon removed by harvest this hour.");
+                   "Amount of carbon removed by harvest this hour.");
     frame.declare ("residuals_DM", "g/m^2/h", Value::LogOnly, "\
 Amount of dry matter removed from crops to surface and soil this hour.\n\
 This includes loss as harvest, as well as loss of old leaves and roots.");
     frame.declare ("residuals_N_top", "g/m^2/h", Value::LogOnly, 
-                "Amount of nitrogen removed from crops to soil this hour.\n\
+                   "Amount of nitrogen removed from crops to soil this hour.\n\
 This includes loss as harvest, as well as loss of old leaves.");
     frame.declare ("residuals_C_top", "g/m^2/h", Value::LogOnly, 
-                "Amount of carbon removed from crops to surface this hour.\n\
+                   "Amount of carbon removed from crops to surface this hour.\n\
 This includes loss as harvest, as well as loss of old leaves.");
-    frame.declare ("residuals_N_soil", "g/cm^3/h", Value::LogOnly, Value::Sequence, 
-                "Amount of nitrogen removed from crops in soil this hour.\n\
+    frame.declare ("residuals_N_soil", "g/cm^3/h", Value::LogOnly, Value::SoilCells, 
+                   "Amount of nitrogen removed from crops in soil this hour.\n\
 This includes loss as harvest, as well as loss of old roots.");
-    frame.declare ("residuals_C_soil", "g/cm^3/h", Value::LogOnly, Value::Sequence, 
-                "Amount of carbon removed from crops in soil this hour.\n\
+    frame.declare ("residuals_C_soil", "g/cm^3/h", Value::LogOnly, Value::SoilCells, 
+                   "Amount of carbon removed from crops in soil this hour.\n\
 This includes loss as harvest, as well as loss of old roots.");
     frame.declare ("residuals_N_root", "g/m^2/h", Value::LogOnly, 
-                "Amount of nitrogen removed from crops to soil this hour.\n\
+                   "Amount of nitrogen removed from crops to soil this hour.\n\
 This includes loss as harvest, as well as loss of old roots.");
     frame.declare ("residuals_C_root", "g/m^2/h", Value::LogOnly, 
-                "Amount of carbon removed from crops to surface this hour.\n\
+                   "Amount of carbon removed from crops to surface this hour.\n\
 This includes loss as harvest, as well as loss of old roots.");
     frame.declare ("surface_water", "mm", Value::LogOnly, 
-                "Amount of water in the system above ground.\n\
+                   "Amount of water in the system above ground.\n\
 This include ponded water, intercepted water and the snow pack.");
     frame.declare_object ("OrganicMatter", OrganicMatter::component,
-                       Value::State, Value::Singleton, "\
+                          Value::State, Value::Singleton, "\
 The organic matter in the soil and on the surface.");
     frame.set ("OrganicMatter", "default");
     frame.declare ("second_year_utilization", "kg N/ha", Value::State,
-		"Estimated accumulated second year fertilizer effect.");
+                   "Estimated accumulated second year fertilizer effect.");
     frame.set ("second_year_utilization", 0.0);
     frame.declare ("seed_N", "kg N/ha/h", Value::LogOnly,
-		"Amount of nitrogen in seed applied this time step.");
+                   "Amount of nitrogen in seed applied this time step.");
     frame.declare ("seed_C", "kg C/ha/h", Value::LogOnly,
-		"Amount of carbon in seed applied this time step.");
+                   "Amount of carbon in seed applied this time step.");
     frame.declare ("applied_DM", "ton DM/ha/h", Value::LogOnly,
-		"Amount of dry matter applied this time step.\n\
+                   "Amount of dry matter applied this time step.\n\
 This includes dry matter incorporated directly in the soil.");
     frame.declare ("first_year_utilization", "kg N/ha/h", Value::LogOnly,
-		"Estimated first year fertilizer effect.");
+                   "Estimated first year fertilizer effect.");
   }
     
   ColumnStandardSyntax ()

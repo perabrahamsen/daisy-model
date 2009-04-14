@@ -2,19 +2,27 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Regression testing
 
-** Summary
+DONE ** kopier log_table til log_dlf
 
-1. Udregn nye værdier
-2. Indlæs gamle værdier
-3. Evt. advarsler
-4. Udskriv nye værdier
+** fjern table specific fra log_dlf
 
-dato version værdier
+** lad log_table nedarbe fra log_dlf
 
-** TODO
+** kopier log_table til log_regression
 
-A: Kig på summary simple
+** omskriv log_regression til kun at udregne og udskrive en linie
 
+dato version revision værdier
+
+** indlæs gamle værdier
+
+** merge med advarsler  
+
+** opdater "make check"
+
+skal klare filhåntering.
+
+*
 * Artikler
 
 ** OM init (BGJ)

@@ -521,23 +521,23 @@ Harvesting::load_syntax (Frame& frame)
 {
   // Submodel.
 
-  frame.declare_object ("Stem", AOM::component, Value::Const, Value::Sequence, "\
+  frame.declare_object ("Stem", AOM::component, Value::Const, Value::Variable, "\
 Stem AM parameters.");
   frame.set_check ("Stem", AM::check_om_pools ());
   frame.set ("Stem", AM::default_AM ());
-  frame.declare_object ("Leaf", AOM::component, Value::Const, Value::Sequence, "\
+  frame.declare_object ("Leaf", AOM::component, Value::Const, Value::Variable, "\
 Leaf AM parameters.");
   frame.set_check ("Leaf", AM::check_om_pools ());
   frame.set ("Leaf", AM::default_AM ());
-  frame.declare_object ("Dead", AOM::component, Value::Const, Value::Sequence, "\
+  frame.declare_object ("Dead", AOM::component, Value::Const, Value::Variable, "\
 Dead leaves AM parameters.");
   frame.set_check ("Dead", AM::check_om_pools ());
   frame.set ("Dead", AM::default_AM ());
-  frame.declare_object ("SOrg", AOM::component, Value::Const, Value::Sequence, "\
+  frame.declare_object ("SOrg", AOM::component, Value::Const, Value::Variable, "\
 Storage organ AM parameters.");
   frame.set_check ("SOrg", AM::check_om_pools ());
   frame.set ("SOrg", AM::default_AM ());
-  frame.declare_object ("Root", AOM::component, Value::Const, Value::Sequence, "\
+  frame.declare_object ("Root", AOM::component, Value::Const, Value::Variable, "\
 Root AM parameters.");
   frame.set_check ("Root", AM::check_om_pools ());
   frame.set ("Root", AM::default_AM ());

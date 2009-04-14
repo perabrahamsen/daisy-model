@@ -121,7 +121,7 @@ static struct ReactionStandardSyntax : public DeclareModel
 		"Name of first soil component in equilibrium.");
     frame.declare ("B", Value::String, Value::Const,
 		"Name of second soil component in equilibrium.");
-    frame.declare ("S_AB", "g/cm^3/h", Value::LogOnly, Value::Sequence,
+    frame.declare ("S_AB", "g/cm^3/h", Value::LogOnly, Value::SoilCells,
 		"Converted from A to B this timestep (may be negative).");
 
   }

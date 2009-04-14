@@ -455,7 +455,7 @@ Yearly LAI measurements.", VegetationPermanent::YearlyLAI::load_syntax);
     frame.declare ("N_litter", "g N/m^2/h", Value::LogOnly,
 		"Nitrogen in litter this hour.");
     frame.declare_object ("litter_am", AOM::component, 
-                      Value::Const, Value::Sequence, "\
+                      Value::Const, Value::Variable, "\
 Litter AOM parameters.");
     frame.set_check ("litter_am", AM::check_om_pools ());
     frame.set ("litter_am", AM::default_AM ());

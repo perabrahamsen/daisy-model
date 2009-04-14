@@ -126,7 +126,7 @@ The original dimension is assumed to be in cm, no matter what is specified.")
                 "Maximum water pressure in log.\n\
 Pressure above this value will be represented as this value.");
     frame.set ("max_h", -0.1);
-    frame.declare ("value", Value::Unknown (), Value::State, Value::Sequence,
+    frame.declare ("value", Value::Unknown (), Value::State, Value::Variable,
 		"The current accumulated value.");
     std::vector<double> empty;
     frame.set ("value", empty);

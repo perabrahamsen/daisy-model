@@ -467,14 +467,14 @@ Xn = 1.16E-3 mol/mol/s for wheat (de Pury & Farquhar, 1997)");
     //log variables
     frame.declare ("ABA_effect", Value::None (), Value::LogOnly,
                 "Water stress effect induced by ABA and crown water potential");
-    frame.declare ("ci_vector", "Pa", Value::LogOnly, Value::Sequence, "CO2 pressure in Stomatal in each layer.");
-    frame.declare ("Vm_vector", "mmol/m^2/s", Value::LogOnly, Value::Sequence, "Photosynthetic capacity in each layer.");
-    frame.declare ("Jm_vector", "mmol/m^2/s", Value::LogOnly, Value::Sequence, "Potential rate of electron transport in each layer.");
-    frame.declare ("gs_vector", "mol/m^2/s", Value::LogOnly, Value::Sequence, "Stomata cunductance in each layer.");
-    frame.declare ("gs_sun_vector", "mol/m^2/s", Value::LogOnly, Value::Sequence, "Stomata cunductance in sunlit fraction of each layer.");
-    frame.declare ("Nleaf_vector", "mol N/m^2", Value::LogOnly, Value::Sequence, "Distribution of photosynthetic N-leaf.");
-    frame.declare ("Ass_vector", "mol CH2O/m^2/h", Value::LogOnly, Value::Sequence, "Brutto assimilate.");
-    frame.declare ("sun_LAI_vector", "mol CH2O/m^2/s", Value::LogOnly, Value::Sequence, "sunlit LAI.");
+    frame.declare ("ci_vector", "Pa", Value::LogOnly, Value::CanopyCells, "CO2 pressure in Stomatal in each layer.");
+    frame.declare ("Vm_vector", "mmol/m^2/s", Value::LogOnly, Value::CanopyCells, "Photosynthetic capacity in each layer.");
+    frame.declare ("Jm_vector", "mmol/m^2/s", Value::LogOnly, Value::CanopyCells, "Potential rate of electron transport in each layer.");
+    frame.declare ("gs_vector", "mol/m^2/s", Value::LogOnly, Value::CanopyCells, "Stomata cunductance in each layer.");
+    frame.declare ("gs_sun_vector", "mol/m^2/s", Value::LogOnly, Value::CanopyCells, "Stomata cunductance in sunlit fraction of each layer.");
+    frame.declare ("Nleaf_vector", "mol N/m^2", Value::LogOnly, Value::CanopyCells, "Distribution of photosynthetic N-leaf.");
+    frame.declare ("Ass_vector", "mol CH2O/m^2/h", Value::LogOnly, Value::CanopyCells, "Brutto assimilate.");
+    frame.declare ("sun_LAI_vector", "mol CH2O/m^2/s", Value::LogOnly, Value::CanopyCells, "sunlit LAI.");
 
     frame.declare ("ci_middel", "Pa", Value::LogOnly, "Stomata average CO2 pressure.");
     frame.declare ("gs", "mol/m^2/s", Value::LogOnly, "Stomata conductance.");

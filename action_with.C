@@ -133,7 +133,7 @@ Perform actions on a specific column.")
     frame.declare ("column", Value::String, Value::Const, 
 		"Name of column to perform actions on.");
     frame.declare_object ("actions", Action::component, 
-                       Value::State, Value::Sequence,
+                       Value::State, Value::Variable,
                        "Actions to perform on the specified column.");
     frame.order ("column", "actions");
   }

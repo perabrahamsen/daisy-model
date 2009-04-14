@@ -629,7 +629,7 @@ static struct CheckLayers : public VCheck
     daisy_assert (frame.check (key));
     daisy_assert (frame.lookup (key) == Value::AList);
     daisy_assert (!frame.is_log (key));
-    daisy_assert (frame.type_size (key) == Value::Sequence);
+    daisy_assert (frame.type_size (key) == Value::Variable);
 
     const std::vector<const FrameSubmodel*>& layers 
       = frame.submodel_sequence (key);
@@ -686,9 +686,9 @@ VALUE from the END of the previous layer, to the END of the current layer.",
                                 load_syntax);
   frame.set_check (iname, check_layers);
   if (dimension == Value::Fraction ())
-    frame.declare_fraction (name, cat, Value::Sequence, description);
+    frame.declare_fraction (name, cat, Value::SoilCells, description);
   else
-    frame.declare (name, dimension, cat, Value::Sequence, description);
+    frame.declare (name, dimension, cat, Value::SoilCells, description);
 }
 
 void 

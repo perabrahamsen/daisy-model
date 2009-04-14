@@ -478,7 +478,7 @@ SUBMODELS = toplevel.C timestep.C geometry_rect.C doe.C \
 
 # Special or intermediate models with their own interface.
 #
-SPECIALS = reaction_colgen.C weather_base.C \
+SPECIALS = log_dlf.C reaction_colgen.C weather_base.C \
 	volume_box.C movement_solute.C scope_exchange.C photo_Farquhar.C \
 	scope_multi.C scope_id.C geometry_vert.C gnuplot_base.C \
 	source_file.C format_LaTeX.C log_all.C om.C select_value.C \

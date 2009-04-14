@@ -184,7 +184,7 @@ Function for calculating equilibrium between solute and sorbed form.");
                        "Tranformation rate from sorbed to solute form.\n\
 By default, this is identical to 'adsorption_rate'.");
     frame.declare ("adsorption_source", "g/cm^3/h", 
-		Value::LogOnly, Value::Sequence, "\
+		Value::LogOnly, Value::SoilCells, "\
 Converted from solute to sorbed form this timestep (may be negative).");
 
   }

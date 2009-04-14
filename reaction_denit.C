@@ -49,7 +49,7 @@ struct ReactionDenit : public Reaction
   const PLF heat_factor;
   const PLF water_factor;
   const PLF water_factor_fast;
-  const double redox_height;	// Chemical denitrification below this depth.
+  const double redox_height;    // Chemical denitrification below this depth.
   
   // Log variable.
   std::vector<double> converted;
@@ -63,16 +63,16 @@ struct ReactionDenit : public Reaction
 
   // Simulation.
   void tick (const Units&, const Geometry& geo,
-	     const Soil& soil, const SoilWater& soil_water, 
-	     const SoilHeat& soil_heat,
-	     const OrganicMatter& organic_matter, 
+             const Soil& soil, const SoilWater& soil_water, 
+             const SoilHeat& soil_heat,
+             const OrganicMatter& organic_matter, 
              Chemistry& chemistry, const double dt, Treelog& msg);
 
   // Create.
   bool check (const Units&, const Geometry&, 
               const Soil& soil, const SoilWater& soil_water, 
-	      const SoilHeat& soil_heat,
-	      const Chemistry& chemistry, Treelog& msg) const;
+              const SoilHeat& soil_heat,
+              const Chemistry& chemistry, Treelog& msg) const;
   void initialize (const Units&, const Geometry&, 
                    const Soil&, const SoilWater&, const SoilHeat&,
                    Treelog&);
@@ -91,11 +91,11 @@ ReactionDenit::output (Log& log) const
 
 void 
 ReactionDenit::tick (const Units&, const Geometry& geo,
-		     const Soil& soil, const SoilWater& soil_water,
-		     const SoilHeat& soil_heat,
-		     const OrganicMatter& organic_matter, 
-		     Chemistry& chemistry, 
-		     const double dt, Treelog&)
+                     const Soil& soil, const SoilWater& soil_water,
+                     const SoilHeat& soil_heat,
+                     const OrganicMatter& organic_matter, 
+                     Chemistry& chemistry, 
+                     const double dt, Treelog&)
 {
   const size_t cell_size = geo.cell_size ();
   const std::vector<bool> active = organic_matter.active (); 
@@ -118,8 +118,8 @@ ReactionDenit::tick (const Units&, const Geometry& geo,
       const double T = soil_heat.T (i);
       const double height = geo.cell_z (i);
       const double T_factor = (heat_factor.size () < 1)
-	? Abiotic::f_T2 (T)
-	: heat_factor (T);
+        ? Abiotic::f_T2 (T)
+        : heat_factor (T);
       const double pot = T_factor * alpha * CO2_slow;
       const double w_factor = water_factor (Theta_fraction);
       const double rate = w_factor * pot;
@@ -131,15 +131,15 @@ ReactionDenit::tick (const Units&, const Geometry& geo,
       const double M 
         = std::min (rate, K * NO3) + std::min (rate_fast, K_fast * NO3);
       if (redox_height <= 0 && height < redox_height)
-	{
-	  converted[i] = NO3 / dt;
-	  converted_redox[i] = (NO3 - M) / dt;
-	}
+        {
+          converted[i] = NO3 / dt;
+          converted_redox[i] = (NO3 - M) / dt;
+        }
       else
-	{
-	  converted[i] = M / dt;
-	  converted_redox[i] = 0.0;
-	}
+        {
+          converted[i] = M / dt;
+          converted_redox[i] = 0.0;
+        }
       converted_fast[i] = (M / dt > rate ? M / dt - rate : 0.0);
       potential[i] = pot;
       potential_fast[i] = pot_fast;
@@ -150,7 +150,7 @@ ReactionDenit::tick (const Units&, const Geometry& geo,
 bool 
 ReactionDenit::check (const Units&, const Geometry&,
                       const Soil&, const SoilWater&, const SoilHeat&,
-		      const Chemistry& chemistry, Treelog& msg) const
+                      const Chemistry& chemistry, Treelog& msg) const
 { 
   bool ok = true;
   if (!chemistry.require (Chemical::NO3 (), msg))
@@ -180,12 +180,12 @@ ReactionDenit::ReactionDenit (Block& al)
     alpha (al.number ("alpha")),
     alpha_fast (al.number ("alpha_fast", alpha)),
     heat_factor (al.check ("heat_factor") 
-		 ? al.plf ("heat_factor") 
-		 : PLF::empty ()),
+                 ? al.plf ("heat_factor") 
+                 : PLF::empty ()),
     water_factor (al.plf ("water_factor")),
     water_factor_fast (al.check ("water_factor_fast" )
-		       ? al.plf ("water_factor_fast")
-		       : water_factor),
+                       ? al.plf ("water_factor_fast")
+                       : water_factor),
     redox_height (al.number ("redox_height", 1.0))
 { }
 
@@ -205,16 +205,16 @@ This additional denitrification is limited by K_fast.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("converted", "g/cm^3/h", Value::LogOnly, Value::Sequence,
-		"Amount of denitrification.");
-    frame.declare ("converted_fast", "g/cm^3/h", Value::LogOnly, Value::Sequence,
-		"Additional denitrification due to turnover in fast pools.");
-    frame.declare ("converted_redox", "g/cm^3/h", Value::LogOnly, Value::Sequence,
-		"Additional denitrification due to chemical redox processes.");
-    frame.declare ("potential", "g/cm^3/h", Value::LogOnly, Value::Sequence,
-		"Potential amount of denitrification at anarobic conditions.");
-    frame.declare ("potential_fast", "g/cm^3/h", Value::LogOnly, Value::Sequence,
-		"Additional potential due to turnover in fast pools.");
+    frame.declare ("converted", "g/cm^3/h", Value::LogOnly, Value::Variable,
+                   "Amount of denitrification.");
+    frame.declare ("converted_fast", "g/cm^3/h", Value::LogOnly, Value::SoilCells,
+                   "Additional denitrification due to turnover in fast pools.");
+    frame.declare ("converted_redox", "g/cm^3/h", Value::LogOnly, Value::SoilCells,
+                   "Additional denitrification due to chemical redox processes.");
+    frame.declare ("potential", "g/cm^3/h", Value::LogOnly, Value::SoilCells,
+                   "Potential amount of denitrification at anarobic conditions.");
+    frame.declare ("potential_fast", "g/cm^3/h", Value::LogOnly, Value::SoilCells,
+                   "Additional potential due to turnover in fast pools.");
     frame.declare ("K", "h^-1", Check::fraction (), Value::Const, "\
 Maximum fraction of nitrate converted at each time step from slow pools.");
     frame.set ("K", 0.020833);
@@ -222,21 +222,21 @@ Maximum fraction of nitrate converted at each time step from slow pools.");
 Maximum fraction of nitrate converted at each time step from fast pools.\n \
 By default this is identical to 'K'.");
     frame.declare ("alpha", "(g NO3-N/h)/(g CO2-C/h)", Check::non_negative (),
-		Value::Const, "\
+                   Value::Const, "\
 Anaerobic denitrification constant for slow pools.");
     frame.set ("alpha", 0.1);
     frame.declare ("alpha_fast", "(g NO3-N/h)/(g CO2-C/h)", Check::non_negative (),
-		Value::OptionalConst, "\
-Anaerobic denitrification constant for fast pools.\n			\
+                   Value::OptionalConst, "\
+Anaerobic denitrification constant for fast pools.\n                    \
 This applies to the CO2 produced from turnover of fast OM pools.\n\
 By default, this is identical to alpha.");
     frame.declare ("heat_factor", "dg C", Value::None (), Check::non_negative (),
-		Value::OptionalConst, "Heat factor.\n\
+                   Value::OptionalConst, "Heat factor.\n\
 By default, use a build in function valid for temperate climates.");
     frame.declare ("water_factor", Value::Fraction (), Value::None (), 
-		Check::non_negative (),
-		Value::OptionalConst,
-		"Water potential factor for slow pools.\n\
+                   Check::non_negative (),
+                   Value::OptionalConst,
+                   "Water potential factor for slow pools.\n\
 This is a function of the current water content as a fraction of the\n\
 maximal water content.");
     PLF water_factor;
@@ -244,13 +244,13 @@ maximal water content.");
     water_factor.add (1.0, 1.0);
     frame.set ("water_factor", water_factor);
     frame.declare ("water_factor_fast", Value::Fraction (), Value::None (), 
-		Check::non_negative (),
-	      Value::OptionalConst,
-		"Water potential factor for fast pools\n\
+                   Check::non_negative (),
+                   Value::OptionalConst,
+                   "Water potential factor for fast pools\n\
 By default, this is identical to the 'water_factor' parameter.");
     frame.declare  ("redox_height", "cm", Check::non_positive (),
-		 Value::OptionalConst,  "\
-Height (a negative number) blow which redox processes start.\n	\
+                    Value::OptionalConst,  "\
+Height (a negative number) blow which redox processes start.\n  \
 All NO3 below this height will be denitrified immediately.\n\
 By default no redox denitrification occurs.");
   }

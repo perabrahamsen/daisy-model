@@ -499,14 +499,14 @@ The first season is the year the crop management starts.");
   frame.declare ("year_of_last_harvest", Value::Integer, Value::OptionalState, 
 	      "Year of last season.");
   frame.declare_object ("fertilize", AM::component,
-                     Value::OptionalConst, Value::Sequence,"\
+                        Value::OptionalConst, Value::Variable, "\
 Fertilizer applications after harvest first season.\n\
 First season is defined as the year where the first harvest occurs.");
   frame.declare ("fertilize_index", Value::Integer, Value::State,
 	      "Next entry in 'fertilize' to execute.");
   frame.set ("fertilize_index", 0);
   frame.declare_object ("fertilize_rest", AM::component,
-                     Value::OptionalConst, Value::Sequence,"\
+                     Value::OptionalConst, Value::Variable,"\
 Fertilizer applications after harvest remaining seasons.\n\
 If missing, use the same fertilizer as first season.");
   frame.declare ("fertilize_rest_index", Value::Integer, Value::State,

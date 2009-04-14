@@ -972,7 +972,7 @@ emerged.  If no crops have emerged on the field, it will be ignored.",
                                   VegetationCrops::ForcedLAI::load_syntax);
     frame.set_empty ("ForcedLAI");
     frame.declare_object ("crops", Crop::component, 
-                       Value::State, Value::Sequence,
+                       Value::State, Value::Variable,
                        "List of crops growing in the field");
     frame.set_empty ("crops");
     }

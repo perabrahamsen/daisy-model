@@ -68,7 +68,7 @@ static struct BooleanStringEqualSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("values", Value::String, Value::Const, Value::Sequence,
+    frame.declare ("values", Value::String, Value::Const, Value::Variable,
 		"Strings to compare.");
     frame.order ("values");
   }

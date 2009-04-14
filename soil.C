@@ -535,7 +535,7 @@ This overrules the 'horizons' paramter.",
 	      Value::OptionalConst, "Transversal dispersion length.\n\
 By default, this is 0.1 times the dispersivity.");
   frame.declare ("border", "cm", Check::negative (), 
-              Value::Const, Value::Sequence, "\
+              Value::Const, Value::Variable, "\
 List of flux depths where a mass balance should be possible when logging.\n\
 This attribute is ignored if the geometry is specified explicitly.");
   frame.set_check ("border", VCheck::decreasing ());

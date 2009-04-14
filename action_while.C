@@ -112,8 +112,8 @@ list is done.")
   {
     frame.add_check (check_alist);
     frame.declare_object ("actions", Action::component, 
-                       Value::State, Value::Sequence,
-                       "List of actions to perform.");
+                          Value::State, Value::Variable,
+                          "List of actions to perform.");
     frame.order ("actions");
   }
 } ActionWhile_syntax;

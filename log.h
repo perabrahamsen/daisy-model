@@ -289,10 +289,6 @@ public:
   const Soil* soil () const;
   const Vegetation* vegetation () const;
 
-  // Utilities
-public:
-  static void print_dlf_header (std::ostream& out, const Metalib& al);
-
   // Self use.
 public:
   virtual void output (Log&) const;

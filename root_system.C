@@ -47,8 +47,8 @@ RootSystem::crown_potential () const
 double 
 RootSystem::potential_water_uptake (const double h_x,
                                     const Geometry& geo,
-				    const Soil& soil,
-				    const SoilWater& soil_water,
+                                    const Soil& soil,
+                                    const SoilWater& soil_water,
                                     const double dt)
 {
   const std::vector<double>& L = Density;
@@ -60,24 +60,24 @@ RootSystem::potential_water_uptake (const double h_x,
   for (size_t i = 0; i < size; i++)
     {
       if (L[i] <= 0.0 || soil_water.h (i) >= 0.0)
-	{
-	  S[i] = 0.0;
-	  continue;
-	}
+        {
+          S[i] = 0.0;
+          continue;
+        }
       const double h = h_x - (1 + Rxylem) * geo.cell_z (i);
       daisy_assert (soil_water.Theta_ice (soil, i, h_wp) 
                     >= soil.Theta_res (i));
       const double max_uptake
-	= std::max (0.0, (soil_water.Theta (i) 
+        = std::max (0.0, (soil_water.Theta (i) 
                           - soil_water.Theta_ice (soil, i, h_wp)) / dt);
       const double uptake
-	= bound (0.0, 
-		 (2 * M_PI * L[i]
-		    * (soil_water.Theta_ice (soil, i, h) 
-		       / soil_water.Theta_ice (soil, i, 0.0))
-		    * (soil.M (i, soil_water.h (i)) - soil.M (i, h))
-		  / (- 0.5 * log (area * L[i]))),
-		 max_uptake);
+        = bound (0.0, 
+                 (2 * M_PI * L[i]
+                  * (soil_water.Theta_ice (soil, i, h) 
+                     / soil_water.Theta_ice (soil, i, 0.0))
+                  * (soil.M (i, soil_water.h (i)) - soil.M (i, h))
+                  / (- 0.5 * log (area * L[i]))),
+                 max_uptake);
       daisy_assert (soil_water.h (i) > h_wp || iszero (uptake));
       daisy_assert (L[i] >= 0.0);
       daisy_assert (soil_water.Theta_ice (soil, i, h) > 0.0);
@@ -95,11 +95,11 @@ RootSystem::potential_water_uptake (const double h_x,
 double
 RootSystem::water_uptake (const Units& units, double Ept_,
                           const Geometry& geo,
-			  const Soil& soil,
-			  const SoilWater& soil_water,
-			  const double EvapInterception,
+                          const Soil& soil,
+                          const SoilWater& soil_water,
+                          const double EvapInterception,
                           const double dt,
-			  Treelog& msg)
+                          Treelog& msg)
 {
   daisy_assert (EvapInterception >= 0);
   if (Ept_ < 0)
@@ -123,20 +123,20 @@ RootSystem::water_uptake (const Units& units, double Ept_,
                                                   soil, soil_water, dt);
 
       if (next < total)
-	// We are past the top of the curve.
-	if (step <= min_step)
-	  // We cannot go any closer to the top, skip it.
-	  {
-	    h_x = h_wp;
-	    total = potential_water_uptake (h_x, geo, soil, soil_water, dt);
-	    break;
-	  }
-	else
-	  // Try again a little close.
-	  {
-	    step /= 2;
-	    continue;
-	  }
+        // We are past the top of the curve.
+        if (step <= min_step)
+          // We cannot go any closer to the top, skip it.
+          {
+            h_x = h_wp;
+            total = potential_water_uptake (h_x, geo, soil, soil_water, dt);
+            break;
+          }
+        else
+          // Try again a little close.
+          {
+            step /= 2;
+            continue;
+          }
       total = next;
       h_x = h_next;
       step *= 2;
@@ -154,26 +154,26 @@ RootSystem::water_uptake (const Units& units, double Ept_,
                                                   soil, soil_water, dt);
 
       if (next < Ept)
-	// We went too far.
-	if (step <= min_step)
-	  {
-	    // We can't get any closer.
-	    daisy_assert (next <= total);
-	    if (next >= Ept)
-	      {
-		// total = next;
-		h_x = h_next;
-	      }
-	    else
+        // We went too far.
+        if (step <= min_step)
+          {
+            // We can't get any closer.
+            daisy_assert (next <= total);
+            if (next >= Ept)
+              {
+                // total = next;
+                h_x = h_next;
+              }
+            else
 
-	    break;
-	  }
-	else
-	  // Try again a little closer.
-	  {
-	    step /= 2;
-	    continue;
-	  }
+              break;
+          }
+        else
+          // Try again a little closer.
+          {
+            step /= 2;
+            continue;
+          }
 
       total = next;
       h_x = h_next;
@@ -192,7 +192,7 @@ RootSystem::water_uptake (const Units& units, double Ept_,
       daisy_assert (total > 0);
       const double factor = Ept / total;
       for (size_t i = 0; i < soil.size (); i++)
-	H2OExtraction[i] *= factor;
+        H2OExtraction[i] *= factor;
       total = Ept;
     }
   H2OUpt = total;
@@ -220,12 +220,12 @@ RootSystem::water_uptake (const Units& units, double Ept_,
 
 double
 RootSystem::solute_uptake (const Geometry& geo, const Soil& soil,
-			   const SoilWater& soil_water,
-			   Chemical& solute,
-			   double PotNUpt,
-			   std::vector<double>& uptake,
-			   const double I_max,      // [g/cm R/h]
-			   const double C_root_min, // [g/cm^3 W]
+                           const SoilWater& soil_water,
+                           Chemical& solute,
+                           double PotNUpt,
+                           std::vector<double>& uptake,
+                           const double I_max,      // [g/cm R/h]
+                           const double C_root_min, // [g/cm^3 W]
                            const double dt)
 {
   if (PotNUpt <= 0.0)
@@ -235,7 +235,7 @@ RootSystem::solute_uptake (const Geometry& geo, const Soil& soil,
     }
 
   daisy_assert (PotNUpt > 0.0);
-  PotNUpt /= 1.0e4;		// g/m^2/h -> g/cm^2/h
+  PotNUpt /= 1.0e4;             // g/m^2/h -> g/cm^2/h
   PotNUpt *= geo.surface_area (); // [g/h]
   const int size = soil.size ();
   // I: Uptake per root length.
@@ -243,7 +243,7 @@ RootSystem::solute_uptake (const Geometry& geo, const Soil& soil,
   std::vector<double> I_zero (size, 0.0); // [g/cm R/h]
   std::vector<double> B_zero (size, 0.0); // [cm^3 W/cm R/h] 
 
-  double U_zero = 0.0;		// [g/h] Total uptake a C_root_min
+  double U_zero = 0.0;          // [g/h] Total uptake a C_root_min
   double B = 0.0;               // [cm^3 W/h]
 
   for (int i = 0; i < size; i++)
@@ -252,29 +252,29 @@ RootSystem::solute_uptake (const Geometry& geo, const Soil& soil,
       const double Theta = soil_water.Theta_old (i); // [cm^3 W/cm^3 S]
       const double L = Density[i];                   // [cm R/cm^3 S]
       if (L > 0 && soil_water.h (i) <= 0.0)
-	{
+        {
           // [cm^3 W/cm R/h] = [cm^3 W/cm^3 S/h] / [cm R/cm^3 S]
-	  const double q_r = H2OExtraction[i] / L;
+          const double q_r = H2OExtraction[i] / L;
           // [cm^2/h] = [cm^2/h] * [cm^3/cm^3] * [cm^3 W/cm^3 S]
-	  const double D = solute.diffusion_coefficient ()
-	    * soil.tortuosity_factor (i, Theta)
-	    * Theta;
+          const double D = solute.diffusion_coefficient ()
+            * soil.tortuosity_factor (i, Theta)
+            * Theta;
           // [] = [cm^3 W/cm R/h] / [cm^2/h]
-	  const double alpha = q_r / ( 2 * M_PI * D);
+          const double alpha = q_r / ( 2 * M_PI * D);
           // [] = [] / ([cm] * sqrt ([cm^-2]))
-	  const double beta = 1.0 / (Rad * sqrt (M_PI * L));
+          const double beta = 1.0 / (Rad * sqrt (M_PI * L));
           // [] = [] * []
-	  const double beta_squared = beta * beta;
-	  if (alpha < 1e-10)
-	    {
+          const double beta_squared = beta * beta;
+          if (alpha < 1e-10)
+            {
               // [cm^3 W/cm R/h] = [cm^2/h] / ([] * log ([]/[]) - [])
-	      B_zero[i] = 4.0 * M_PI * D
-		/ (beta_squared * log (beta_squared) / (beta_squared - 1.0)
+              B_zero[i] = 4.0 * M_PI * D
+                / (beta_squared * log (beta_squared) / (beta_squared - 1.0)
                    - 1.0);
               // [g/cm R/h] = [cm^3 W/cm R/h] * [g/cm^3 W]
-	      I_zero[i] = B_zero[i] * C_l;
-	    }
-	  else
+              I_zero[i] = B_zero[i] * C_l;
+            }
+          else
             { 
               const double divisor // []
                 = ((beta_squared - 1.0) * (1.0 - 0.5 * alpha)
@@ -301,15 +301,15 @@ RootSystem::solute_uptake (const Geometry& geo, const Soil& soil,
                   I_zero[i] = q_r * (beta_squared - 1.0) * C_l / div2;
                 }
             }
-	  daisy_assert (std::isfinite (I_zero[i]));
-	  daisy_assert (std::isfinite (B_zero[i]));
+          daisy_assert (std::isfinite (I_zero[i]));
+          daisy_assert (std::isfinite (B_zero[i]));
           // [cm^3 W/h] = [cm R/cm^3 S] * [cm^3 S] * [cm^3 W/cm R/h]
-	  B += L * geo.cell_volume (i) * B_zero[i];
+          B += L * geo.cell_volume (i) * B_zero[i];
           // [g/h] = [cm R/cm^3 S] * [cm^3 S]
           //       * ([g/cm R/h] - [cm^3 W/cm R/h] * [g/cm^3 W], [g/cm R/h])
-	  U_zero += L * geo.cell_volume (i) 
-	    * bound (0.0, I_zero[i] - B_zero[i] * C_root_min, I_max);
-	}
+          U_zero += L * geo.cell_volume (i) 
+            * bound (0.0, I_zero[i] - B_zero[i] * C_root_min, I_max);
+        }
     }
   double C_root = C_root_min;   // [g/cm^3 W]
   if (U_zero > PotNUpt)
@@ -322,10 +322,10 @@ RootSystem::solute_uptake (const Geometry& geo, const Soil& soil,
       if (L > 0 && soil_water.h (i) <= 0.0)
         // [g/cm^3 S/h]
         //  = [cm R/cm^3 S] * ([g/cm R/h] - [cm^3 W/cm R/h] * [g/cm^3 W])
-	uptake[i] = std::max (0.0, L * (std::min (I_zero[i], I_max)
+        uptake[i] = std::max (0.0, L * (std::min (I_zero[i], I_max)
                                         - B_zero[i] * C_root));
       else
-	uptake[i] = 0.0;
+        uptake[i] = 0.0;
       daisy_assert (uptake[i] >= 0.0);
     }
   solute.add_to_root_sink (uptake);
@@ -336,13 +336,13 @@ RootSystem::solute_uptake (const Geometry& geo, const Soil& soil,
 
 double
 RootSystem::nitrogen_uptake (const Geometry& geo, const Soil& soil,
-			     const SoilWater& soil_water,
-			     Chemistry& chemistry,
-			     const double NH4_root_min,
-			     const double NO3_root_min,
-			     const double PotNUpt, double dt)
+                             const SoilWater& soil_water,
+                             Chemistry& chemistry,
+                             const double NH4_root_min,
+                             const double NO3_root_min,
+                             const double PotNUpt, double dt)
 {
-  if (PotNUpt <= 0.0)		
+  if (PotNUpt <= 0.0)           
     // No uptake needed.
     {
       NH4Upt = NO3Upt = 0.0;
@@ -350,18 +350,18 @@ RootSystem::nitrogen_uptake (const Geometry& geo, const Soil& soil,
       fill (NO3Extraction.begin (), NO3Extraction.end (), 0.0);
     }
   else if (chemistry.know (Chemical::NH4 ()) 
-	   && chemistry.know (Chemical::NO3 ()))
+           && chemistry.know (Chemical::NO3 ()))
     // Normlal uptake.
     {
       Chemical& soil_NH4 = chemistry.find (Chemical::NH4 ());
       Chemical& soil_NO3 = chemistry.find (Chemical::NO3 ());
 
       NH4Upt = solute_uptake (geo, soil, soil_water, soil_NH4, 
-			      PotNUpt, NH4Extraction,
-			      MxNH4Up, NH4_root_min, dt);
+                              PotNUpt, NH4Extraction,
+                              MxNH4Up, NH4_root_min, dt);
       NO3Upt = solute_uptake (geo, soil, soil_water, soil_NO3, 
-			      PotNUpt - NH4Upt, NO3Extraction, 
-			      MxNO3Up, NO3_root_min, dt);
+                              PotNUpt - NH4Upt, NO3Extraction, 
+                              MxNO3Up, NO3_root_min, dt);
     }
   else 
     // If we don't track inorganic N, assume we have enough.
@@ -401,8 +401,8 @@ RootSystem::tick (const double T, const double day_fraction,
 
 void
 RootSystem::tick_daily (const Geometry& geo, const Soil& soil, 
-			const double WRoot, const bool root_growth,
-			const double DS, Treelog& msg)
+                        const double WRoot, const bool root_growth,
+                        const double DS, Treelog& msg)
 {
   const double SoilLimit = -soil.MaxRootingHeight ();
   // Penetration.
@@ -423,15 +423,15 @@ RootSystem::tick_daily (const Geometry& geo, const Soil& soil,
 
 void
 RootSystem::set_density (const Geometry& geo, const double SoilLimit,
-			 const double WRoot, const double DS, Treelog& msg)
+                         const double WRoot, const double DS, Treelog& msg)
 { rootdens->set_density (geo, SoilLimit, PotRtDpt, 
                          PotRtDpt * (MaxWidth / MaxPen),
-			 WRoot, DS, Density, msg); }
+                         WRoot, DS, Density, msg); }
 
 void
 RootSystem::full_grown (const Geometry& geo, 
                         const double max_rooting_depth,
-			const double WRoot, Treelog& msg)
+                        const double WRoot, Treelog& msg)
 {
   PotRtDpt = MaxPen;
   Depth = std::min (MaxPen, -max_rooting_depth);
@@ -512,103 +512,103 @@ RootSystem::load_syntax (Frame& frame)
 {
 
   frame.declare_object ("rootdens", Rootdens::component, 
-                     Value::OptionalConst, Value::Singleton,
-                     "Root density model.");
+                        Value::OptionalConst, Value::Singleton,
+                        "Root density model.");
 
   frame.declare_object ("ABAprod", ABAProd::component, "ABA production model.");
   frame.set ("ABAprod", "none");
 
   frame.declare ("DptEmr", "cm", Check::non_negative (), Value::Const,
-	    "Penetration at emergence.");
+                 "Penetration at emergence.");
   frame.set ("DptEmr", 10.0);
   frame.declare ("PenPar1", "cm/dg C/d", Check::non_negative (), Value::Const,
-	    "Penetration rate parameter, coefficient.");
+                 "Penetration rate parameter, coefficient.");
   frame.set ("PenPar1", 0.25);
   frame.declare ("PenPar2", "dg C", Check::none (), Value::Const,
-	    "Penetration rate parameter, threshold.");
+                 "Penetration rate parameter, threshold.");
   frame.set ("PenPar2", 4.0);
   frame.declare ("PenClayFac", Value::Fraction (), Value::None (),
-	      Check::non_negative (), Value::Const, 
-	      "Clay dependent factor to multiply 'PenPar1' with.");
+                 Check::non_negative (), Value::Const, 
+                 "Clay dependent factor to multiply 'PenPar1' with.");
   PLF clay;
   clay.add (0.0, 1.0);
   clay.add (1.0, 1.0);
   frame.set ("PenClayFac", clay);
   frame.declare ("MaxPen", "cm", Check::positive (), Value::Const,
-	    "Maximum penetration depth.");
+                 "Maximum penetration depth.");
   frame.set ("MaxPen", 100.0);
   frame.declare ("MaxWidth", "cm", Check::positive (), Value::OptionalConst,
-              "Maximum horizontal distance of roots from plant.");
+                 "Maximum horizontal distance of roots from plant.");
   frame.declare ("Rad", "cm", Check::positive (), Value::Const,
-	    "Root radius.");
+                 "Root radius.");
   frame.set ("Rad", 0.005);
   frame.declare ("h_wp", "cm", Check::none (), Value::Const,
-	    "Matrix potential at wilting point.");
+                 "Matrix potential at wilting point.");
   frame.set ("h_wp",-15000.0);
   frame.declare ("MxNH4Up", "g/cm/h", Check::non_negative (), Value::Const,
-	    "Maximum NH4 uptake per unit root length.");
+                 "Maximum NH4 uptake per unit root length.");
   frame.set ("MxNH4Up", 2.5e-7);
   frame.declare ("MxNO3Up", "g/cm/h", Check::non_negative (), Value::Const,
-	    "Maximum NO3 uptake per unit root length.");
+                 "Maximum NO3 uptake per unit root length.");
   frame.set ("MxNO3Up", 2.5e-7);
   frame.declare ("Rxylem", Value::None (), Check::non_negative (), Value::Const,
-	    "Transport resistence in xyleme.");
+                 "Transport resistence in xyleme.");
   frame.set ("Rxylem", 10.0);
 
   frame.declare ("PotRtDpt", "cm", Check::non_negative (), Value::OptionalState,
-	      "Potential root penetration depth.");
+                 "Potential root penetration depth.");
   frame.declare ("Depth", "cm", Check::non_negative (), Value::OptionalState,
-	      "Rooting Depth.");
+                 "Rooting Depth.");
   frame.declare ("Density", "cm/cm^3", Check::non_negative (),
-	      Value::LogOnly, Value::Sequence,
-	       "Root density in soil layers.");
+                 Value::LogOnly, Value::SoilCells,
+                 "Root density in soil layers.");
   frame.declare ("H2OExtraction", "cm^3/cm^3/h", Check::non_negative (), 
-	      Value::LogOnly, Value::Sequence,
-	       "Extraction of H2O in soil layers.");
+                 Value::LogOnly, Value::SoilCells,
+                 "Extraction of H2O in soil layers.");
   frame.declare ("NH4Extraction", "g N/cm^3/h", Check::non_negative (), 
-	      Value::LogOnly, Value::Sequence,
-	       "Extraction of NH4-N in soil layers.");
+                 Value::LogOnly, Value::SoilCells,
+                 "Extraction of NH4-N in soil layers.");
   frame.declare ("NO3Extraction", "g N/cm^3/h", Check::non_negative (), 
-	      Value::LogOnly, Value::Sequence,
-	       "Extraction of NO3-N in soil layers.");
+                 Value::LogOnly, Value::SoilCells,
+                 "Extraction of NO3-N in soil layers.");
   frame.declare ("ABAExtraction", "g/cm^3/h", Check::non_negative (), 
-	      Value::LogOnly, Value::Sequence,
-	      "Extraction of ABA in soil layers.");
+                 Value::LogOnly, Value::SoilCells,
+                 "Extraction of ABA in soil layers.");
   frame.declare ("ABAConc", "g/cm^3", Check::non_negative (), 
-	      Value::State, "ABA concentration in water uptake.");
+                 Value::State, "ABA concentration in water uptake.");
   frame.set ("ABAConc", 0.0);
   frame.declare ("h_x", "cm", Check::none (), Value::State,
-	       "Root extraction at surface.");
+                 "Root extraction at surface.");
   frame.set ("h_x", 0.0);
   frame.declare ("partial_soil_temperature", "dg C h", Value::State,
-	      "Soil temperature hours this day, so far.");
+                 "Soil temperature hours this day, so far.");
   frame.set ("partial_soil_temperature", 0.0);
   frame.declare ("partial_day", "h", Value::State,
-	      "Hours we have accumulated soil temperature this day.");
+                 "Hours we have accumulated soil temperature this day.");
   frame.set ("partial_day", 0.0);
   frame.declare ("soil_temperature", "dg C", Value::State,
-	      "Average soil temperature yesterday.");
+                 "Average soil temperature yesterday.");
   frame.set ("soil_temperature", 0.0);
   frame.declare ("water_stress", Value::None (), Check::fraction (),
-	      Value::LogOnly,
-	       "Fraction of requested water we didn't get.");
+                 Value::LogOnly,
+                 "Fraction of requested water we didn't get.");
   frame.declare ("water_stress_days", "d", Check::non_negative (),
-	      Value::State,
-	       "Number of days production has halted due to water stress.\n\
+                 Value::State,
+                 "Number of days production has halted due to water stress.\n\
 This is the sum of water stress for each hour, multiplied with the\n\
 fraction of the radition of that day that was received that hour.");
   frame.set ("water_stress_days", 0.0);
   frame.declare ("production_stress", Value::None (), Check::fraction (), 
-	      Value::LogOnly,
-	       "SVAT induced stress, or -1 if not applicable.");
+                 Value::LogOnly,
+                 "SVAT induced stress, or -1 if not applicable.");
   frame.declare ("Ept", "mm/h", Check::none (), Value::LogOnly,
-	       "Potential transpiration.");
+                 "Potential transpiration.");
   frame.declare ("H2OUpt", "mm/h", Check::non_negative (), Value::LogOnly,
-	      "H2O uptake.");
+                 "H2O uptake.");
   frame.declare ("NH4Upt", "g N/m^2/h", Check::non_negative (), Value::LogOnly,
-	      "NH4-N uptake.");
+                 "NH4-N uptake.");
   frame.declare ("NO3Upt", "g N/m^2/h", Check::non_negative (), Value::LogOnly,
-	      "NO3-N uptake.");
+                 "NO3-N uptake.");
 }
 
 static double

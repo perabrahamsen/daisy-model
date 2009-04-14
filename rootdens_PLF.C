@@ -91,7 +91,7 @@ Rootdens_PLF::Check_Indexes::check (Metalib&, const Frame& frame,
   daisy_assert (frame.check (key));
   daisy_assert (frame.lookup (key) == Value::AList);
   daisy_assert (!frame.is_log (key));
-  daisy_assert (frame.type_size (key) == Value::Sequence);
+  daisy_assert (frame.type_size (key) == Value::Variable);
 
   const std::vector<const FrameSubmodel*>& alists 
     = frame.submodel_sequence (key);

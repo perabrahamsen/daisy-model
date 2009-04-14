@@ -66,7 +66,7 @@ LexerTable::Filter::load_syntax (Frame& frame)
 {
   frame.declare ("tag", Value::String, Value::Const, "\
 Name of column in Daisy log file to filter for.");
-  frame.declare ("allowed", Value::String, Value::Const, Value::Sequence, "\
+  frame.declare ("allowed", Value::String, Value::Const, Value::Variable, "\
 List of allowable values in filter.");
   frame.set_check ("allowed", VCheck::min_size_1 ());
   frame.order ("tag", "allowed");
@@ -445,7 +445,7 @@ LexerTable::load_syntax (Frame& frame)
 {
   frame.declare ("file", Value::String, Value::Const, "\
 Name of Daisy log file where data is found.");
-  frame.declare ("missing", Value::String, Value::Const, Value::Sequence, "\
+  frame.declare ("missing", Value::String, Value::Const, Value::Variable, "\
 List of strings indicating missing values.");
   std::vector<symbol> misses;
   misses.push_back (symbol (""));
@@ -456,7 +456,7 @@ Only include data from rows that passes all these filters.",
 				 LexerTable::Filter::load_syntax);
   frame.set_empty ("filter");
   frame.declare ("original", Value::String, Value::OptionalConst, 
-              Value::Sequence, "\
+              Value::Variable, "\
 List of dimensions of the data in the data file.\n\
 \n\
 If the list has only one element, that element is used as the\n\

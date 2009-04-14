@@ -147,29 +147,6 @@ Log::vegetation () const
   return impl->vegetations.back ();
 }
 
-
-void
-Log::print_dlf_header (std::ostream& out, const Metalib& al)
-{
-  const std::vector<symbol>& files = al.parser_files ();
-  for (unsigned int i = 0; i < files.size (); i++)
-    out << "SIMFILE: " << files[i] << "\n";
-
-  const symbol sim_description_s = al.description ();
-  if (sim_description_s != Daisy::default_description)
-    {
-      const std::string sim_description = sim_description_s.name ();
-      out << "SIM: ";
-      for (unsigned int i = 0; i < sim_description.size (); i++)
-	if (sim_description[i] != '\n')
-	  out << sim_description[i];
-	else
-	  out << "\nSIM: ";
-      out << "\n";
-    }
-  out << "\n--------------------\n";
-}
-
 void
 Log::output (Log&) const
 { }

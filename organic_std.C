@@ -340,10 +340,10 @@ OrganicStandard::Buffer::load_syntax (Frame& frame)
 {
   const std::vector<double> empty_vector;
   frame.declare ("C", "g C/cm^3", Check::non_negative (),
-	      Value::State, Value::Sequence,
+	      Value::State, Value::SoilCells,
 	      "Buffer carbon content.");
   frame.set ("C", empty_vector);
-  frame.declare ("N", "g N/cm^3", Check::non_negative (), Value::State, Value::Sequence,
+  frame.declare ("N", "g N/cm^3", Check::non_negative (), Value::State, Value::SoilCells,
 	      "Buffer nitrogen content.");
   frame.set ("N", empty_vector);
   frame.declare ("turnover_rate", "h^-1", Check::fraction (), Value::Const,
@@ -412,7 +412,7 @@ Amount of carbon added to the organic matter system.\n\
 \n\
 If this is unspecifed, the input rate from the inital added matter\n\
 pools will be used instead.");
-  frame.declare_fraction ("fractions", Value::Const, Value::Sequence, "\
+  frame.declare_fraction ("fractions", Value::Const, Value::Variable, "\
 Desitinations for AOM input.  The first numbers corresponds to each\n\
 SMB pool, while the last number correspond to the SOM buffer.\n\
 This is only used if you specify the input parameter.");
@@ -422,7 +422,7 @@ This is only used if you specify the input parameter.");
   fractions.push_back (1.0);
   fractions.push_back (0.0);
   frame.set ("fractions", fractions);
-  frame.declare_fraction ("efficiency", Value::Const, Value::Sequence, "\
+  frame.declare_fraction ("efficiency", Value::Const, Value::Variable, "\
 The efficiency this pool can be digested by each of the SMB pools.\n\
 This is only used if you specify the input parameter.");
   std::vector<double> efficiency;
@@ -491,7 +491,7 @@ This is the SOM pool that must be within the limits specified by\n\
 'SOM_limit_lower' and 'SOM_limit_upper'.  Use negative number to disable.\n\
 Note, the numbering is zero-based, so '0' specifies SOM1.");
   frame.set ("SOM_limit_where", 0);
-  frame.declare_fraction ("SOM_limit_lower", Value::Const, Value::Sequence, "\
+  frame.declare_fraction ("SOM_limit_lower", Value::Const, Value::Variable, "\
 Lower limit for for automatic SOM partitioning.\n\
 \n\
 The SOM pool specified by 'SOM_limit_where' must contain at least the\n\
@@ -510,7 +510,7 @@ for soil layers below 'end'.");
   SOM_limit_lower.push_back (0.7);
   SOM_limit_lower.push_back (0.0);
   frame.set ("SOM_limit_lower", SOM_limit_lower);
-  frame.declare_fraction ("SOM_limit_upper", Value::Const, Value::Sequence, "\
+  frame.declare_fraction ("SOM_limit_upper", Value::Const, Value::Variable, "\
 Upper limit for for automatic SOM partitioning.\n\
 Works like 'SOM_limit_lower'.");
   frame.set_check ("SOM_limit_upper", VCheck::sum_equal_1 ());
@@ -521,7 +521,7 @@ Works like 'SOM_limit_lower'.");
   frame.set ("SOM_limit_upper", SOM_limit_upper);
   
   frame.declare ("debug_equations", Value::Integer, Value::Const, 
-	      Value::Sequence, "\
+	      Value::Variable, "\
 Print equations used for initialization for the specified intervals.");
   frame.set_empty ("debug_equations");
   frame.declare ("debug_rows", Value::Boolean, Value::Const, "\
@@ -2967,9 +2967,9 @@ IGNORED: Use 'water_factor' to disable mineralization.");
     frame.declare_submodule ("Bioincorporation", Value::State, "\
 Biological incorporation of litter.",
                          Bioincorporation::load_syntax);
-    frame.declare ("NO3_source", "g N/cm^3/h", Value::LogOnly, Value::Sequence, "\
+    frame.declare ("NO3_source", "g N/cm^3/h", Value::LogOnly, Value::SoilCells, "\
 Mineralization this time step (negative numbers mean immobilization).");
-    frame.declare ("NH4_source", "g N/cm^3/h", Value::LogOnly, Value::Sequence, "\
+    frame.declare ("NH4_source", "g N/cm^3/h", Value::LogOnly, Value::SoilCells, "\
 Mineralization this time step (negative numbers mean immobilization).");
     frame.declare ("fertilized_N", "g N/cm^2/h", Value::LogOnly,
                "Amount of organic bound nitrogen applied.\n\
@@ -2984,20 +2984,20 @@ This is a negative number.");
                "Amount of carbon added to surface during tillage.\n\
 This is a negative number.");
     frame.declare ("tillage_N_soil", "g N/cm^3/h", 
-               Value::LogOnly, Value::Sequence,
+               Value::LogOnly, Value::SoilCells,
                "Amount of nitrogen added to soil during tillage.");
     frame.declare ("tillage_C_soil", "g C/cm^3/h",
-               Value::LogOnly, Value::Sequence,
+               Value::LogOnly, Value::SoilCells,
                "Amount of carbon added to surface during tillage.");
-    frame.declare ("humus", "g/cm^3", Value::LogOnly, Value::Sequence,
+    frame.declare ("humus", "g/cm^3", Value::LogOnly, Value::SoilCells,
                "Total organic matter in the soil layer.");
-    frame.declare ("total_C", "g C/cm^3", Value::LogOnly, Value::Sequence,
+    frame.declare ("total_C", "g C/cm^3", Value::LogOnly, Value::SoilCells,
                "Total organic C in the soil layer.");
-    frame.declare ("total_N", "g N/cm^3", Value::LogOnly, Value::Sequence,
+    frame.declare ("total_N", "g N/cm^3", Value::LogOnly, Value::SoilCells,
                "Total organic N in the soil layer.");
-    frame.declare ("CO2", "g CO_2-C/cm^3/h", Value::LogOnly, Value::Sequence,
+    frame.declare ("CO2", "g CO_2-C/cm^3/h", Value::LogOnly, Value::SoilCells,
                "CO2 evolution in soil from all pools.");
-    frame.declare ("CO2_fast", "g CO_2-C/cm^3/h", Value::LogOnly, Value::Sequence,
+    frame.declare ("CO2_fast", "g CO_2-C/cm^3/h", Value::LogOnly, Value::SoilCells,
                "CO2 evolution in soil from pools faster than 'CO2_threshold'.");
     frame.declare ("CO2_threshold", "h^-1", Check::fraction (), Value::Const, "\
 Turnover rate above which pools will contribute to 'CO2_fast'.");
@@ -3005,7 +3005,7 @@ Turnover rate above which pools will contribute to 'CO2_fast'.");
     frame.declare ("top_CO2", "g CO_2-C/cm^2/h", Value::LogOnly,
                "CO2 evolution at surface.");
     frame.declare_object ("am", AM::component, 
-                      Value::State, Value::Sequence, 
+                      Value::State, Value::Variable, 
                       "Added organic matter pools.");
     frame.set_strings ("am", "root");
     frame.declare_submodule ("buffer", Value::State,
@@ -3013,11 +3013,11 @@ Turnover rate above which pools will contribute to 'CO2_fast'.");
                          OrganicStandard::Buffer::load_syntax);
 
     // Create defaults for som and smb.
-    frame.declare_object ("smb", SMB::component, Value::State, Value::Sequence, "\
+    frame.declare_object ("smb", SMB::component, Value::State, Value::Variable, "\
 Soil MicroBiomass pools.\n\
 Initial value will be estimated based on equilibrium with AM and SOM pools.");
     frame.set_strings ("smb", "SMB-SLOW", "SMB-FAST");
-    frame.declare_object ("som", SOM::component, Value::State, Value::Sequence,
+    frame.declare_object ("som", SOM::component, Value::State, Value::Variable,
                       "Soil Organic Matter pools.");
     frame.set_strings ("som", "SOM-SLOW", "SOM-FAST", "SOM-INERT");
   
@@ -3029,7 +3029,7 @@ Layered initialization of soil SOM content.", load_layer);
                                   DOM::load_syntax);
     frame.set_empty ("dom");
     frame.declare_object ("domsorp", Domsorp::component, 
-                      Value::State, Value::Sequence, 
+                      Value::State, Value::Variable, 
                       "Interchange between DOM and SOM pools.");
     frame.set_empty ("domsorp");
 
@@ -3044,19 +3044,19 @@ If the PLF is empty, a build-in PLF of pF will be used instead.\n\
 It is 0.6 at pF < 0, 1.0 at 1.5 < pF < 2.5, and 0 at pF > 6.5.");
     frame.set ("water_factor", PLF::empty ());
     frame.declare ("abiotic_factor", Value::None (), 
-               Value::LogOnly, Value::Sequence,
+               Value::LogOnly, Value::SoilCells,
                "Product of current heat and water factors."); 
     frame.declare_object ("ClayOM", ClayOM::component, "Clay effect model.");
     frame.set ("ClayOM", "old");
-    frame.declare ("tillage_age", "d", Value::OptionalState, Value::Sequence,
+    frame.declare ("tillage_age", "d", Value::OptionalState, Value::SoilCells,
                "Time since the latest tillage operation was performed."); 
     frame.declare ("smb_tillage_factor", "d", Value::None (), 
-               Check::non_negative (), Value::Const, Value::Sequence,
+               Check::non_negative (), Value::Const, Value::Variable,
                "Tillage influence on turnover rates for each SMB pool.\n\
 If no value is given, tillage will have no influence.");
     frame.set_empty ("smb_tillage_factor");
     frame.declare ("som_tillage_factor", "d", Value::None (), 
-               Check::non_negative (), Value::Const, Value::Sequence,
+               Check::non_negative (), Value::Const, Value::Variable,
                "Tillage influence on SOM turnover rates for each SOM pool.\n\
 If no value is given, tillage will have no influence.");
     frame.set_empty ("som_tillage_factor");

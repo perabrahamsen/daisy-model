@@ -679,13 +679,13 @@ SoilHeat::load_syntax (Frame& frame)
   frame.set ("enable_ice", false);
   frame.declare ("T_top", "dg C", Value::OptionalState, 
               "Surface temperature at previous time step.");
-  frame.declare ("T_freezing", "dg C", Value::LogOnly, Value::Sequence,
+  frame.declare ("T_freezing", "dg C", Value::LogOnly, Value::SoilCells,
               "Freezing point depression for freezing.");
-  frame.declare ("T_thawing", "dg C", Value::LogOnly, Value::Sequence,
+  frame.declare ("T_thawing", "dg C", Value::LogOnly, Value::SoilCells,
               "Freezing point depression for thawing.");
-  frame.declare ("q", "erg/cm^2/h", Value::LogOnly, Value::Sequence,
+  frame.declare ("q", "erg/cm^2/h", Value::LogOnly, Value::SoilEdges,
               "Heat flux.");
-  frame.declare ("state", Value::Unknown (), Value::LogOnly, Value::Sequence,
+  frame.declare ("state", Value::Unknown (), Value::LogOnly, Value::SoilCells,
               "Current freezing/melting state.");
 }
 

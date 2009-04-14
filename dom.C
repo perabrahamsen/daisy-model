@@ -207,9 +207,9 @@ You must specify either this or 'turnover_halftime'.");
 	      Value::OptionalConst,
 	      "Time until half had been converted to other pools.\n\
 You must specify either this or 'turnover_rate'.");
-  frame.declare_fraction ("efficiency", Value::Const, Value::Sequence, "\
+  frame.declare_fraction ("efficiency", Value::Const, Value::Variable, "\
 the efficiency this pool can be digested by each of the SMB pools.");
-  frame.declare_fraction ("fractions", Value::Const, Value::Sequence, "\
+  frame.declare_fraction ("fractions", Value::Const, Value::Variable, "\
 Fraction of this pool that ends up in each SMB pools");
 }
 

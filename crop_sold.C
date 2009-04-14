@@ -899,16 +899,16 @@ Maximal development stage for which the crop survives harvest.");
       // RootSys
     RootSys.add ("Depth", "cm", Value::OptionalState,
                  "Rooting Depth.");
-    RootSys.add ("Density", "cm/cm3", Value::State, Value::Sequence,
+    RootSys.add ("Density", "cm/cm3", Value::State, Value::SoilCells,
                  "Root density in soil layers.");
     vRootSys.add ("Density", empty_array);
-    RootSys.add ("H2OExtraction", "cm^3/cm^3/h", Value::State, Value::Sequence,
+    RootSys.add ("H2OExtraction", "cm^3/cm^3/h", Value::State, Value::SoilCells,
                  "Extraction of H2O in soil layers.");
     vRootSys.add ("H2OExtraction", empty_array);
-    RootSys.add ("NH4Extraction", "g N/cm^3/h", Value::State, Value::Sequence,
+    RootSys.add ("NH4Extraction", "g N/cm^3/h", Value::State, Value::SoilCells,
                  "Extraction of NH4-N in soil layers.");
     vRootSys.add ("NH4Extraction", empty_array);
-    RootSys.add ("NO3Extraction", "g N/cm^3/h", Value::State, Value::Sequence,
+    RootSys.add ("NO3Extraction", "g N/cm^3/h", Value::State, Value::SoilCells,
                  "Extraction of NO3-N in soil layers.");
     vRootSys.add ("NO3Extraction", empty_array);
     RootSys.add ("h_x", "cm", Value::State,

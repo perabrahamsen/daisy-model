@@ -99,8 +99,8 @@ struct Select::Implementation
 
     // Create and Destroy.
     static bool check_path (const std::vector<symbol>& path,
-			    const Frame& frame,
-			    Treelog& err);
+                            const Frame& frame,
+                            Treelog& err);
     static bool check_alist (Metalib&, const Frame&, Treelog&);
     static void load_syntax (Frame&);
     Spec (Block&);
@@ -117,8 +117,8 @@ struct Select::Implementation
   std::auto_ptr<Number> expr;   // - || -
   const bool negate;            // - || -
   double convert (double) const; // - || -
-  const symbol tag;		// Name of this entry.
-  symbol dimension;		// Physical dimension of this entry.
+  const symbol tag;             // Name of this entry.
+  symbol dimension;             // Physical dimension of this entry.
   const symbol description;
 
   // Create and Destroy.
@@ -207,8 +207,8 @@ Select::Implementation::Spec::refer (Format& format) const
 
 bool 
 Select::Implementation::Spec::check_path (const std::vector<symbol>& path,
-					  const Frame& top_frame,
-					  Treelog& err)
+                                          const Frame& top_frame,
+                                          Treelog& err)
 {
   const Frame* frame = &top_frame;
 
@@ -220,27 +220,27 @@ Select::Implementation::Spec::check_path (const std::vector<symbol>& path,
       const Value::type type = frame->lookup (name);
 
       if (!last)
-	{
-	  if (type != Value::AList)
-	    {
-	      err.error ("'" + name + "': no such submodel (is a " 
+        {
+          if (type != Value::AList)
+            {
+              err.error ("'" + name + "': no such submodel (is a " 
                          + Value::type_name (type) + ")");
-	      ok = false;
-	      break;
-	    }
+              ok = false;
+              break;
+            }
           const symbol submodel_name = frame->submodel_name (name);
           if (submodel_name != Value::None ())
             err.warning ("'" + name + "' is a fixed '" 
                          + submodel_name + "' component");
 
-	  frame = &frame->submodel (name);
+          frame = &frame->submodel (name);
         }
       else if (type == Value::Error)
-	{
-	  err.error ("'" + name + "': no such attribute");
-	  ok = false;
-	  break;
-	}
+        {
+          err.error ("'" + name + "': no such attribute");
+          ok = false;
+          break;
+        }
     }
   return ok;
 }
@@ -248,7 +248,7 @@ Select::Implementation::Spec::check_path (const std::vector<symbol>& path,
 bool 
 Select::Implementation::Spec::check_alist (Metalib& metalib,
                                            const Frame& al,
-					   Treelog& err)
+                                           Treelog& err)
 {
   bool ok = true;
   
@@ -265,16 +265,16 @@ Select::Implementation::Spec::check_alist (Metalib& metalib,
   if (library_name == "fixed")
     {
       if (!Librarian::submodel_registered (model_name))
-	{
-	  err.entry ("'" + model_name + "': no such submodel");
-	  ok = false;
-	}
+        {
+          err.entry ("'" + model_name + "': no such submodel");
+          ok = false;
+        }
       else
-	{
+        {
           const Frame& frame = Librarian::submodel_frame (model_name);
-	  if (!check_path (submodels_and_attribute, frame, err))
-	    ok = false;
-	}
+          if (!check_path (submodels_and_attribute, frame, err))
+            ok = false;
+        }
     }
   else if (!metalib.exist (library_name))
     {
@@ -286,16 +286,16 @@ Select::Implementation::Spec::check_alist (Metalib& metalib,
       const Library& library = metalib.library (library_name);
       
       if (!library.check (model_name))
-	{
-	  err.entry ("'" + model_name + "': no such model");
-	  ok = false;
-	}
+        {
+          err.entry ("'" + model_name + "': no such model");
+          ok = false;
+        }
       else
-	{
-	  const FrameModel& frame = library.model (model_name);
-	  if (!check_path (submodels_and_attribute, frame, err))
-	    ok = false;
-	}
+        {
+          const FrameModel& frame = library.model (model_name);
+          if (!check_path (submodels_and_attribute, frame, err))
+            ok = false;
+        }
     }
   return ok;
 }
@@ -310,7 +310,7 @@ Use 'fixed' to denote a fixed component.");
   frame.declare ("model", Value::String, Value::Const, "\
 Name of model or fixed component where the attribute belongs.");
   frame.declare ("submodels_and_attribute", Value::String, 
-	      Value::Const, Value::Sequence, "\
+                 Value::Const, Value::Variable, "\
 Name of submodels and attribute.");
   frame.order ("library", "model", "submodels_and_attribute");
 }
@@ -320,7 +320,7 @@ Select::Implementation::Spec::Spec (Block& al)
     library_name (al.name ("library")),
     model_name (al.name ("model")),
     submodels_and_attribute (al.name_sequence
-			     ("submodels_and_attribute"))
+                             ("submodels_and_attribute"))
 { }
 
 Select::Implementation::Spec::~Spec ()
@@ -451,8 +451,8 @@ static const symbol flux_top_symbol ("flux_top");
 
 Select::Implementation::Implementation (Block& al)
   : spec (al.check ("spec")
-	  ? submodel<Spec> (al, "spec")
-	  : NULL),
+          ? submodel<Spec> (al, "spec")
+          : NULL),
     scope (x_symbol, Value::Unknown ()),
     spec_conv (NULL),
     expr (get_expr (al)),
@@ -462,7 +462,7 @@ Select::Implementation::Implementation (Block& al)
             /**/ .is_derived_from (al.type_name (), flux_top_symbol)),
     tag (Select::select_get_tag (al.frame ())),
     dimension (al.check ("dimension")
-	       ? al.name ("dimension") : Value::Unknown ()),
+               ? al.name ("dimension") : Value::Unknown ()),
     description (find_description (al.metalib (), al.frame ()))
 { }
   
@@ -537,7 +537,7 @@ Select::output_name (const symbol)
 void 
 Select::output_array (const std::vector<double>&, 
                       const Geometry*, const Soil*, const Vegetation*,
-		      Treelog&)
+                      Treelog&)
 { throw ("This log selection can't log arrays."); }
 
 bool
@@ -561,10 +561,10 @@ Select::document (Format& format) const
   else if (impl->spec.get ())
     {
       if (impl->negate)
-	{
-	  format.special ("nbsp");
-	  format.text ("(reversed)");
-	}
+        {
+          format.special ("nbsp");
+          format.text ("(reversed)");
+        }
       impl->spec->refer (format);
       format.hard_linebreak ();
       format.text (impl->spec->description ().name ());
@@ -586,7 +586,7 @@ Select::add_dest (Destination* d)
 
 bool
 Select::initialize (const Units& units, const Volume&, 
-		    const symbol timestep, Treelog& msg)
+                    const symbol timestep, Treelog& msg)
 { 
   symbol spec_dim;
   if (impl->spec.get ())
@@ -625,20 +625,20 @@ Select::initialize (const Units& units, const Volume&,
   for (unsigned int i = 0; i < impl_dim.length (); i++)
     if (impl_dim[i] == '&')
       {
-	new_dim += timestep.name ();
-	hour_dim += "h";
+        new_dim += timestep.name ();
+        hour_dim += "h";
       }
     else
       {
-	new_dim += impl_dim[i];
-	hour_dim += impl_dim[i];
+        new_dim += impl_dim[i];
+        hour_dim += impl_dim[i];
       }
 
   // Attempt to find convertion with new dimension.
   if (impl->spec.get () && !impl->spec_conv)
     {
       if (units.can_convert (spec_dim, symbol (hour_dim)))
-	impl->spec_conv = &units.get_convertion (spec_dim, symbol (hour_dim));
+        impl->spec_conv = &units.get_convertion (spec_dim, symbol (hour_dim));
     }
 
   // Use new dimension.
@@ -673,7 +673,7 @@ Select::Select (Block& al)
             ? Handle (al.name ("handle"))
             : Handle ((al.check ("when") 
                        ||  (al.check ("flux")
-			    && al.flag ("flux")))
+                            && al.flag ("flux")))
                       ? Handle::sum : Handle::current)),
     interesting_content (al.flag ("interesting_content")),
     count (al.integer ("count")),
@@ -730,17 +730,16 @@ Set the 'handle' parameter instead.");
     Model::load_model (frame);
     frame.add_check (check_alist);
     frame.declare ("tag", Value::String, Value::OptionalConst,
-                "Tag to identify the column.\n\
+                   "Tag to identify the column.\n\
 These will be printed in the first line of the log file.\n\
 The default tag is the last element in the path.");
     frame.declare ("dimension", Value::String, Value::OptionalConst,
-                "The unit for numbers in this column.\n\
+                   "The unit for numbers in this column.\n\
 These will be printed in the second line of the log file.\n\
 The character '&' will be replaced with the log timestep.\n\
 If you do not specify the dimension explicitly, a value will\n\
 be interfered from 'spec' if available.");
-    frame.declare ("path", Value::String, Value::Const, 
-                Value::Sequence, "\
+    frame.declare ("path", Value::String, Value::Const, Value::Variable, "\
 Sequence of attribute names leading to the variable you want to log in\n\
 this column.  The first name should be one of the attributes of the\n\
 daisy component itself.  What to specify as the next name depends on\n\
@@ -774,8 +773,8 @@ wildcards, so only a single model can be matches.  The spec is used for\n\
 helping Daisy establish a unique dimension and description for the\n\
 attribute.", Select::Implementation::Spec::load_syntax);
     frame.declare_object ("when", Condition::component,
-                       Value::OptionalConst, Value::Singleton,
-                       "\
+                          Value::OptionalConst, Value::Singleton,
+                          "\
 OBSOLETE.  If you set this variable, 'flux' will be set to true.\n\
 This overwrites any direct setting of 'flux'.");
     frame.declare ("flux", Value::Boolean, Value::OptionalConst, "\
@@ -811,7 +810,7 @@ True if the content of this column is interesting enough to warrent an\n\
 initial line in the log file.  This only affects non-flux variables.");
     frame.set ("interesting_content", true);
     frame.declare_object ("expr", Number::component, 
-                       Value::OptionalConst, Value::Singleton, "\
+                          Value::OptionalConst, Value::Singleton, "\
 Expression for findig the value for the log file, given the internal\n\
 value 'x'.  For example '(expr (ln x))' will give you the natural\n\
 logarithm of the value.");  
@@ -827,7 +826,7 @@ OBSOLETE: Use 'expr' instead.");
 Switch sign of value.  I.e. upward fluxes become downward fluxes.");
     frame.set ("negate", false);
     frame.declare ("accumulate", Value::Boolean, Value::Const,
-                "Log accumulated values.");
+                   "Log accumulated values.");
     frame.set ("accumulate", false);
     frame.declare ("count", Value::Integer, Value::State, "\
 Number of times the path has matched a variable since the last log entry.");

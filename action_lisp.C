@@ -160,7 +160,7 @@ struct ActionCond : public Action
       frame.declare_object ("condition", Condition::component, 
                   "Condition for performing the actions.");
       frame.declare_object ("actions", Action::component,
-                         Value::State, Value::Sequence, 
+                         Value::State, Value::Variable, 
                          "Actions to perform when condition is meet.");
       frame.order ("condition", "actions");
     }
@@ -349,8 +349,8 @@ All the actions will be performed in the same time step.")
   void load_frame (Frame& frame) const
   {
     frame.declare_object ("actions", Action::component, 
-                       Value::State, Value::Sequence,
-                       "List of actions to perform.");
+                          Value::State, Value::Variable,
+                          "List of actions to perform.");
     frame.order ("actions");
   }
 } ActionProgn_syntax;

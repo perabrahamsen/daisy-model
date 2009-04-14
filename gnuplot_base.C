@@ -153,7 +153,7 @@ the screen instead of being stored in a file.");
     frame.declare ("device", Value::String, Value::OptionalConst, "\
 Output device.  By default, this is derived from the file extenstion.");
     frame.declare ("extra", Value::String, Value::Const, 
-                Value::Sequence, "List of extra gnuplot commands.\n\
+                Value::Variable, "List of extra gnuplot commands.\n\
 The commands will be inserted right before the plot command.\n\
 Note that if you have multiple plots in the same command file,\n\
 The extra commands may affect the subsequence plots.");

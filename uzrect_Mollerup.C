@@ -1169,7 +1169,7 @@ Level of debug messages:\n                              \
 = 5: Remaining water.");
     frame.set ("debug", 0);
     frame.declare ("Theta_error",
-                Value::None (), Value::LogOnly, Value::Sequence, "\
+                Value::None (), Value::LogOnly, Value::SoilCells, "\
 Water mass balance error per cell.");
     }
 } UZRectMollerup_syntax;

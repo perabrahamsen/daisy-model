@@ -143,7 +143,7 @@ Data from times series are matched by date.")
 By default, let the first source decide.", "\
 By default a combination of the x and y objects.");
     frame.declare_object ("source", Source::component, 
-                       Value::State, Value::Sequence, "\
+                       Value::State, Value::Variable, "\
 List of sources for data.\n\
 The style information for the sources is ignored, but the dates, title\n\
 and value is used as specified by 'expr' to calculate the combined\n\

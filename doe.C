@@ -45,8 +45,8 @@ DOE::output (Log& log) const
 
 void 
 DOE::mix (const Geometry& geo, 
-              const Soil& soil, const SoilWater& soil_water, 
-              double from, double to)
+          const Soil& soil, const SoilWater& soil_water, 
+          double from, double to)
 {
   geo.mix (M, from, to);
   for (size_t i = 0; i < C.size (); i++)
@@ -55,8 +55,8 @@ DOE::mix (const Geometry& geo,
 
 void 
 DOE::swap (const Geometry& geo, 
-	   const Soil& soil, const SoilWater& soil_water,
-	   double from, double middle, double to)
+           const Soil& soil, const SoilWater& soil_water,
+           double from, double middle, double to)
 {
   geo.swap (M, from, middle, to);
   for (size_t i = 0; i < C.size (); i++)
@@ -87,26 +87,26 @@ DOE::load_syntax (Frame& frame)
   // Submodel.
 
   // Content.
-  frame.declare ("M", "g/cm^3", Value::State, Value::Sequence,
-	      "Mass in water and soil.");
-  frame.declare ("C", "g/cm^3", Value::LogOnly, Value::Sequence,
-	      "Concentration in water.");
-  frame.declare ("S", "g/cm^3/h", Value::LogOnly, Value::Sequence,
-	      "Combined source term.");
-  frame.declare ("S_p", "g/cm^3/h", Value::LogOnly, Value::Sequence,
-	      "Source term (macropore transport only).");
-  frame.declare ("S_drain", "g/cm^3/h", Value::LogOnly, Value::Sequence,
-	      "Source term (soil drainage only).");
-  frame.declare ("J_matrix", "g/cm^2/h", Value::LogOnly, Value::Sequence,
-	      "Transportation in matrix (positive up).");
-  frame.declare ("J_tertiary", "g/cm^2/h", Value::LogOnly, Value::Sequence,
-	      "Transportation outside matrix (positive up).");
+  frame.declare ("M", "g/cm^3", Value::State, Value::SoilCells,
+                 "Mass in water and soil.");
+  frame.declare ("C", "g/cm^3", Value::LogOnly, Value::SoilCells,
+                 "Concentration in water.");
+  frame.declare ("S", "g/cm^3/h", Value::LogOnly, Value::SoilCells,
+                 "Combined source term.");
+  frame.declare ("S_p", "g/cm^3/h", Value::LogOnly, Value::SoilCells,
+                 "Source term (macropore transport only).");
+  frame.declare ("S_drain", "g/cm^3/h", Value::LogOnly, Value::SoilCells,
+                 "Source term (soil drainage only).");
+  frame.declare ("J_matrix", "g/cm^2/h", Value::LogOnly, Value::SoilEdges,
+                 "Transportation in matrix (positive up).");
+  frame.declare ("J_tertiary", "g/cm^2/h", Value::LogOnly, Value::SoilEdges,
+                 "Transportation outside matrix (positive up).");
 }
 
 void 
 DOE::initialize (const Geometry& geo, 
-		 const Soil& soil, const SoilWater& soil_water,
-		 Treelog& msg)
+                 const Soil& soil, const SoilWater& soil_water,
+                 Treelog& msg)
 {
   const size_t cell_size = geo.cell_size ();
   const size_t edge_size = geo.edge_size ();

@@ -278,11 +278,11 @@ instead of total amount.");
 If the balance only hold true when logging the top of the soil, i.e. the\n\
 `from' parameter of the log model is 0, this flag should be set.");
       frame.set ("require_top", false);
-      frame.declare ("input", Value::String, Value::Const, Value::Sequence,
+      frame.declare ("input", Value::String, Value::Const, Value::Variable,
                   "Tags of columns in log file representing inputs.");
-      frame.declare ("output", Value::String, Value::Const, Value::Sequence,
+      frame.declare ("output", Value::String, Value::Const, Value::Variable,
                   "Tags of columns in log file representing outputs.");
-      frame.declare ("content", Value::String, Value::Const, Value::Sequence,
+      frame.declare ("content", Value::String, Value::Const, Value::Variable,
                   "Tags of columns in log file representing content.");
     }
 } SummaryBalance_syntax;

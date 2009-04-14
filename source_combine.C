@@ -135,7 +135,7 @@ static struct SourceCombineSyntax : public DeclareModel
 By default, let the first source decide.", "\
 By default the name of the 'expr' object.");
     frame.declare_object ("source", Source::component, 
-                       Value::State, Value::Sequence, "\
+                       Value::State, Value::Variable, "\
 List of sources for data.  The style information for the sources is\n\
 ignored, but the dates, title and value is used as specified by\n\
 'expr' to calculate the combines date and value pairs.");

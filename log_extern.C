@@ -321,7 +321,7 @@ Inititial numeric values.  By default, none.",
                 "Name of the extern log to use.\n\
 By default, use the model name.");
     frame.declare ("parameter_names", Value::String, 
-                Value::Const, Value::Sequence, "\
+                Value::Const, Value::Variable, "\
 List of parameters to export.\n\
 \n\
 For example, if you have defined 'column' and 'crop' parameters for\n\

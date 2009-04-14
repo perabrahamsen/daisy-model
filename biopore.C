@@ -262,7 +262,7 @@ Biopore density [cm^-2] as a function of 'x' [cm].");
                 "Biopores ends at this depth (a negative number).");
     frame.declare ("diameter", "cm", Check::positive (),
                 Value::Const, "Biopore diameter.");
-    frame.declare ("S", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
+    frame.declare ("S", "cm^3/cm^3/h", Value::LogOnly, Value::SoilCells,
                 "Sink from matrix domain to biopore.");
     frame.declare ("infiltration", "cm/h", Value::LogOnly, "\
 Surface infiltration.");

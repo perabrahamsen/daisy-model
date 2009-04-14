@@ -178,7 +178,7 @@ Base class for boolean expressions involving multiple boolean operands.")
   void load_frame (Frame& frame) const
   {
     frame.declare_object ("operands", Boolean::component, 
-                       Value::Const, Value::Sequence, "\
+                       Value::Const, Value::Variable, "\
 List of operands to compare.");
     frame.order ("operands");
   }

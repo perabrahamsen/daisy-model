@@ -522,7 +522,7 @@ VCheck::MinSize::check (Metalib&, const Frame& frame,
 {
   daisy_assert (frame.check (key));
   daisy_assert (!frame.is_log (key));
-  daisy_assert (frame.type_size (key) == Value::Sequence);
+  daisy_assert (frame.type_size (key) == Value::Variable);
   if (frame.value_size (key) < min_size)
     {
       std::ostringstream tmp;

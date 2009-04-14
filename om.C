@@ -384,13 +384,13 @@ OM::load_syntax (Frame& frame, const std::string& frac_desc)
   Model::load_model (frame);
   frame.add_check (check_alist);
   frame.declare ("C", "g C/cm^3", Check::non_negative (),
-	      Value::OptionalState, Value::Sequence,
+	      Value::OptionalState, Value::SoilCells,
 	      "Carbon in each soil interval.");
   frame.declare ("C_per_N", "(g C/cm^3)/(g N/cm^3)", Check::none (), 
-	      Value::OptionalState, Value::Sequence, 
+	      Value::OptionalState, Value::SoilCells, 
 	      "The carbon/nitrogen ratio.");
   frame.declare ("N", "g N/cm^3", Check::non_negative (),
-	      Value::OptionalState, Value::Sequence,
+	      Value::OptionalState, Value::SoilCells,
 	      "Nitrogen in each soil interval.");
   frame.declare ("turnover_rate", "h^-1", Check::fraction (), 
 	      Value::OptionalConst,
@@ -400,9 +400,9 @@ You must specify either this or 'turnover_halftime'.");
 	      Value::OptionalConst,
 	      "Time until half had been converted to other pools.\n\
 You must specify either this or 'turnover_rate'.");
-  frame.declare_fraction ("efficiency", Value::Const, Value::Sequence, "\
+  frame.declare_fraction ("efficiency", Value::Const, Value::Variable, "\
 The efficiency this pool can be digested by each of the SMB pools.");
-  frame.declare_fraction ("fractions", Value::Const, Value::Sequence, "\
+  frame.declare_fraction ("fractions", Value::Const, Value::Variable, "\
 How this pool is divided into other pools.\n" + frac_desc);
   frame.set_check ("fractions", VCheck::sum_equal_1 ());
   frame.declare ("initial_C_per_N", "g C/g N", Value::OptionalState, "\

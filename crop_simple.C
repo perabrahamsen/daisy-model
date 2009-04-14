@@ -557,7 +557,7 @@ Minimum LAI, automatically cleared when exceeded by 'LAIvsTS'.");
 		"Fully developed root N content.");
     frame.set ("root_N", 20.0);
     frame.declare_object ("root_am", AOM::component, 
-                      Value::Const, Value::Sequence, "\
+                      Value::Const, Value::Variable, "\
 Root AM parameters.");
     frame.set_check ("root_am", AM::check_om_pools ());
     frame.set ("root_am", AM::default_AM ());

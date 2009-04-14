@@ -253,38 +253,38 @@ SoilWater::tick_before (const Geometry& geo, const Soil& soil,
 #if 0
       // Move extra ice to buffer.
       const double available_space
-	= Theta_sat - Theta_[i] - X_ice_[i] + S_sum_[i] * dt;
+        = Theta_sat - Theta_[i] - X_ice_[i] + S_sum_[i] * dt;
       if (available_space < 0.0)
-	{
-	  X_ice_[i] += available_space;
-	  X_ice_buffer_[i] -= available_space;
-	}
+        {
+          X_ice_[i] += available_space;
+          X_ice_buffer_[i] -= available_space;
+        }
       else if (X_ice_buffer_[i] > 0.0)
-	{
-	  if (X_ice_buffer_[i] < available_space)
-	    { 
-	      X_ice_[i] += X_ice_buffer_[i];
-	      X_ice_buffer_[i] = 0.0;
-	    }
-	  else
-	    {
-	      X_ice_[i] += available_space;
-	      X_ice_buffer_[i] -= available_space;
+        {
+          if (X_ice_buffer_[i] < available_space)
+            { 
+              X_ice_[i] += X_ice_buffer_[i];
+              X_ice_buffer_[i] = 0.0;
             }
-	}
+          else
+            {
+              X_ice_[i] += available_space;
+              X_ice_buffer_[i] -= available_space;
+            }
+        }
 
       if (X_ice_[i] < 0.0)
-	{
-	  if (X_ice_[i] < -1e-13)
-	    {
-	      std::ostringstream tmp;
-	      tmp << "X_ice[" << i << "] = " << X_ice_[i]
+        {
+          if (X_ice_[i] < -1e-13)
+            {
+              std::ostringstream tmp;
+              tmp << "X_ice[" << i << "] = " << X_ice_[i]
                   << " (S_sum[i] = " << S_sum_[i] << ")";
-	      msg.error (tmp.str ());
-	    }
+              msg.error (tmp.str ());
+            }
           X_ice_buffer_[i] += X_ice_[i];
-	  X_ice_[i] = 0.0;
-	}
+          X_ice_[i] = 0.0;
+        }
 #endif 
 
       // Update ice pressure.
@@ -520,13 +520,13 @@ SoilWater::swap (const Geometry& geo, const Soil& soil,
     {
       const double Theta_sat = soil.Theta (i, 0.0, 0.0);
       if (Theta_[i] > Theta_sat)
-	{
-	  std::ostringstream tmp;
-	  tmp << "BUG: Theta[" << i << "] (" << Theta_[i]
+        {
+          std::ostringstream tmp;
+          tmp << "BUG: Theta[" << i << "] (" << Theta_[i]
               << ") > Theta_sat (" << Theta_sat << ")";
-	  msg.error (tmp.str ());
-	  Theta_[i] = Theta_sat;
-	}
+          msg.error (tmp.str ());
+          Theta_[i] = Theta_sat;
+        }
       const double new_h = soil.h (i, Theta_[i]);
       if (h_[i] < 0.0 || new_h < 0)
         h_[i] = new_h;
@@ -644,51 +644,51 @@ void
 SoilWater::load_syntax (Frame& frame)
 {
   frame.declare ("max_exfiltration_gradient", "cm/cm", Check::positive (), 
-              Value::OptionalConst,
-              "Maximal pressure gradient for calculating exfiltration.\n\
+                 Value::OptionalConst,
+                 "Maximal pressure gradient for calculating exfiltration.\n\
 The gradient is assumed from center of top node to surface of top node.\n\
 By default, there is no maximum.");
   Geometry::add_layer (frame, Value::OptionalState, "h", load_h);
   Geometry::add_layer (frame, Value::OptionalState, "Theta", load_Theta);
-  frame.declare ("Theta_primary", "cm^3/cm^3", Value::LogOnly, Value::Sequence,
-              "Water content in primary matrix system.\n\
+  frame.declare ("Theta_primary", "cm^3/cm^3", Value::LogOnly, Value::SoilCells,
+                 "Water content in primary matrix system.\n\
 Conventionally, this is the intra-aggregate pores.");
   frame.declare ("Theta_secondary", "cm^3/cm^3", Value::LogOnly, 
-              Value::Sequence,
-              "Water content in secondary matrix system.\n\
+                 Value::SoilCells,
+                 "Water content in secondary matrix system.\n\
 Conventionally, this is the inter-aggregate pores.");
-  frame.declare ("S_sum", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
-	      "Total water sink (due to root uptake and macropores).");
-  frame.declare ("S_root", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
-	      "Water sink due to root uptake.");
-  frame.declare ("S_drain", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
-	      "Water sink due to soil drainage.");
-  frame.declare ("S_incorp", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
-	      "Incorporated water sink, typically from subsoil irrigation.");
-  frame.declare ("tillage", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
-	      "Changes in water content due to tillage operations.");
-  frame.declare ("S_p", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
-	      "Water sink (due to macropores).");
-  frame.declare ("S_permanent", "cm^3/cm^3/h", Value::State, Value::Sequence,
-	      "Permanent water sink, e.g. subsoil irrigation.");
+  frame.declare ("S_sum", "cm^3/cm^3/h", Value::LogOnly, Value::SoilCells,
+                 "Total water sink (due to root uptake and macropores).");
+  frame.declare ("S_root", "cm^3/cm^3/h", Value::LogOnly, Value::SoilCells,
+                 "Water sink due to root uptake.");
+  frame.declare ("S_drain", "cm^3/cm^3/h", Value::LogOnly, Value::SoilCells,
+                 "Water sink due to soil drainage.");
+  frame.declare ("S_incorp", "cm^3/cm^3/h", Value::LogOnly, Value::SoilCells,
+                 "Incorporated water sink, typically from subsoil irrigation.");
+  frame.declare ("tillage", "cm^3/cm^3/h", Value::LogOnly, Value::SoilCells,
+                 "Changes in water content due to tillage operations.");
+  frame.declare ("S_p", "cm^3/cm^3/h", Value::LogOnly, Value::SoilCells,
+                 "Water sink (due to macropores).");
+  frame.declare ("S_permanent", "cm^3/cm^3/h", Value::State, Value::SoilCells,
+                 "Permanent water sink, e.g. subsoil irrigation.");
   frame.set_empty ("S_permanent");
-  frame.declare ("S_ice", "cm^3/cm^3/h", Value::LogOnly, Value::Sequence,
-	      "Ice sink (due to thawing or freezing).");
-  frame.declare_fraction ("X_ice", Value::OptionalState, Value::Sequence,
-		       "Ice volume fraction in soil.");
+  frame.declare ("S_ice", "cm^3/cm^3/h", Value::LogOnly, Value::SoilCells,
+                 "Ice sink (due to thawing or freezing).");
+  frame.declare_fraction ("X_ice", Value::OptionalState, Value::SoilCells,
+                          "Ice volume fraction in soil.");
   frame.declare ("X_ice_buffer", Value::None (), 
-	      Value::OptionalState, Value::Sequence,
-	      "Ice volume that didn't fit the soil durin freezing.");
-  frame.declare ("h_ice", Value::None (), Value::LogOnly, Value::Sequence,
-	      "Pressure at which all air is out of the matrix.\n\
+                 Value::OptionalState, Value::SoilCells,
+                 "Ice volume that didn't fit the soil durin freezing.");
+  frame.declare ("h_ice", Value::None (), Value::LogOnly, Value::SoilCells,
+                 "Pressure at which all air is out of the matrix.\n\
 When there are no ice, this is 0.0.  When there are ice, the ice is\n\
 presummed to occupy the large pores, so it is h (Theta_sat - X_ice).");
-  frame.declare ("q", "cm/h", Value::LogOnly, Value::Sequence,
-	      "Matrix water flux (positive numbers mean upward).");  
-  frame.declare ("q_p", "cm/h", Value::LogOnly, Value::Sequence,
-	      "Water flux in macro pores (positive numbers mean upward).");
-  frame.declare ("K", "cm/h", Value::LogOnly, Value::Sequence,
-	      "Hydraulic conductivity.");
+  frame.declare ("q", "cm/h", Value::LogOnly, Value::SoilEdges,
+                 "Matrix water flux (positive numbers mean upward).");  
+  frame.declare ("q_p", "cm/h", Value::LogOnly, Value::SoilEdges,
+                 "Water flux in macro pores (positive numbers mean upward).");
+  frame.declare ("K", "cm/h", Value::LogOnly, Value::SoilCells,
+                 "Hydraulic conductivity.");
 }
 
 void
@@ -706,9 +706,9 @@ SoilWater::initialize (const FrameSubmodel& al, const Geometry& geo,
     {
       X_ice_ = al.number_sequence ("X_ice");
       if (X_ice_.size () == 0)
-	X_ice_.push_back (0.0);
+        X_ice_.push_back (0.0);
       while (X_ice_.size () < cell_size)
-	X_ice_.push_back (X_ice_[X_ice_.size () - 1]);
+        X_ice_.push_back (X_ice_[X_ice_.size () - 1]);
     }
   else 
     X_ice_.insert (X_ice_.begin (), cell_size, 0.0);
@@ -717,9 +717,9 @@ SoilWater::initialize (const FrameSubmodel& al, const Geometry& geo,
     {
       X_ice_buffer_ = al.number_sequence ("X_ice_buffer");
       if (X_ice_buffer_.size () == 0)
-	X_ice_buffer_.push_back (0.0);
+        X_ice_buffer_.push_back (0.0);
       while (X_ice_buffer_.size () < cell_size)
-	X_ice_buffer_.push_back (X_ice_buffer_[X_ice_buffer_.size () - 1]);
+        X_ice_buffer_.push_back (X_ice_buffer_[X_ice_buffer_.size () - 1]);
     }
   else 
     X_ice_buffer_.insert (X_ice_buffer_.begin (), cell_size, 0.0);
@@ -739,29 +739,29 @@ SoilWater::initialize (const FrameSubmodel& al, const Geometry& geo,
     {
       const double Theta_h = soil.Theta (i, h_[i], h_ice (i));
       if (!approximate (Theta_[i], Theta_h))
-	{
-	  std::ostringstream tmp;
-	  tmp << "Theta[" << i << "] (" << Theta_[i] << ") != Theta (" 
+        {
+          std::ostringstream tmp;
+          tmp << "Theta[" << i << "] (" << Theta_[i] << ") != Theta (" 
               << h_[i] << ") (" << Theta_h << ")";
-	  msg.error (tmp.str ());
-	}
+          msg.error (tmp.str ());
+        }
       Theta_[i] = Theta_h;
     }
   if (Theta_.size () > 0)
     {
       while (Theta_.size () < cell_size)
-	Theta_.push_back (Theta_[Theta_.size () - 1]);
+        Theta_.push_back (Theta_[Theta_.size () - 1]);
       if (h_.size () == 0)
-	for (size_t i = 0; i < cell_size; i++)
-	  h_.push_back (soil.h (i, Theta_[i]));
+        for (size_t i = 0; i < cell_size; i++)
+          h_.push_back (soil.h (i, Theta_[i]));
     }
   if (h_.size () > 0)
     {
       while (h_.size () < cell_size)
-	h_.push_back (h_[h_.size () - 1]);
+        h_.push_back (h_[h_.size () - 1]);
       if (Theta_.size () == 0)
-	for (size_t i = 0; i < cell_size; i++)
-	  Theta_.push_back (soil.Theta (i, h_[i], h_ice (i)));
+        for (size_t i = 0; i < cell_size; i++)
+          Theta_.push_back (soil.Theta (i, h_[i], h_ice (i)));
     }
   daisy_assert (h_.size () == Theta_.size ());
 
@@ -769,24 +769,24 @@ SoilWater::initialize (const FrameSubmodel& al, const Geometry& geo,
   if (h_.size () == 0)
     {
       if (groundwater.table () > 0.0)
-	{
-	  const double h_pF2 = -100.0; // pF 2.0;
-	  for (size_t i = 0; i < cell_size; i++)
-	    {
-	      h_.push_back (h_pF2);
-	      Theta_.push_back (soil.Theta (i, h_pF2, h_ice_[i]));
-	    }
-	}
+        {
+          const double h_pF2 = -100.0; // pF 2.0;
+          for (size_t i = 0; i < cell_size; i++)
+            {
+              h_.push_back (h_pF2);
+              Theta_.push_back (soil.Theta (i, h_pF2, h_ice_[i]));
+            }
+        }
       else
-	{
-	  const double table = groundwater.table ();
-	  
-	  for (size_t i = 0; i < cell_size; i++)
-	    {
-	      h_.push_back (std::max (-100.0, table - geo.cell_z (i)));
-	      Theta_.push_back (soil.Theta (i, h_[i], h_ice_[i]));
-	    }
-	}
+        {
+          const double table = groundwater.table ();
+          
+          for (size_t i = 0; i < cell_size; i++)
+            {
+              h_.push_back (std::max (-100.0, table - geo.cell_z (i)));
+              Theta_.push_back (soil.Theta (i, h_[i], h_ice_[i]));
+            }
+        }
     }
   daisy_assert (h_.size () == cell_size);
 

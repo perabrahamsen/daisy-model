@@ -292,8 +292,8 @@ static struct ScopeExchangeSyntax : public DeclareModel
   {
     Model::load_model (frame);
     frame.declare_object ("entries", Exchange::component, 
-                       Value::Const, Value::Sequence,
-                       "List of items to exchange.");
+                          Value::Const, Value::Variable,
+                          "List of items to exchange.");
   }
 } ScopeExchange_syntax;
 

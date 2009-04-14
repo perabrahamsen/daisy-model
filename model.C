@@ -35,7 +35,7 @@ Model::load_model (Frame& frame)
 Description of this model or parameterization.\n\
 The value will appear in the reference manual, and may also appear in some \
 GUI front ends.");
-  frame.declare ("cite", Value::String, Value::Const, Value::Sequence, "\
+  frame.declare ("cite", Value::String, Value::Const, Value::Variable, "\
 BibTeX keys that would be relevant for this model or paramterization.");
   frame.set_empty ("cite");
 }

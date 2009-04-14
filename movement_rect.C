@@ -343,7 +343,7 @@ static struct MovementRectSyntax : DeclareModel
 				   MovementRect::Point::load_syntax);
     frame.set_empty ("drain");
     frame.declare_object ("matrix_water", UZRect::component, 
-                       Value::Const, Value::Sequence,
+                       Value::Const, Value::Variable,
                        "Matrix water transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends.");

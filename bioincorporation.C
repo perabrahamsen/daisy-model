@@ -352,9 +352,9 @@ The formula is speed = (R_max * litter) / (k_half + litter).");
   frame.declare ("N_removed", "g N/m^2/h", Value::LogOnly, 
               "N removed from surface.");
   frame.declare ("CO2", "g C/m^2/h", Value::LogOnly, "C respirated.");
-  frame.declare ("C_added", "g C/cm^3/h", Value::LogOnly, Value::Sequence,
+  frame.declare ("C_added", "g C/cm^3/h", Value::LogOnly, Value::SoilCells,
               "C added to soil.");
-  frame.declare ("N_added", "g N/cm^3/h", Value::LogOnly, Value::Sequence,
+  frame.declare ("N_added", "g N/cm^3/h", Value::LogOnly, Value::SoilCells,
               "N added to soil.");
 
   // Incorporation location.
@@ -371,7 +371,7 @@ the whole profile.");
   distribution.add (0.0, 100.0);
   frame.set ("distribution", distribution);
 
-  frame.declare_object ("AOM", AOM::component, Value::Const, Value::Sequence, "\
+  frame.declare_object ("AOM", AOM::component, Value::Const, Value::Variable, "\
 Incorporated AM parameters.");
   frame.set_check ("AOM", AM::check_om_pools ());
   frame.set_strings ("AOM", "AOM-SLOW-BIOINCORPORATION", "AOM-FAST");

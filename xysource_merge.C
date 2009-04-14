@@ -188,7 +188,7 @@ static struct XYSourceMergeSyntax : public DeclareModel
 By default, let the first source decide.", "");
 
     frame.declare_object ("source", XYSource::component,
-                       Value::State, Value::Sequence,
+                       Value::State, Value::Variable,
                        "XY data series to merge.");
     frame.set_check ("source", VCheck::min_size_1 ());
     frame.declare ("x_dimension", Value::String, Value::Const, "\

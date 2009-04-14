@@ -433,7 +433,7 @@ Fixed highest value on right y-axis.\n\
 By default determine this from the data.");
                 
     frame.declare_object ("source", XYSource::component, Value::State, 
-                       Value::Sequence, "\
+                       Value::Variable, "\
 XY series to plot.");
   }
 } GnuplotXY_syntax;

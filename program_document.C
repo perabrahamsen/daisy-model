@@ -1000,15 +1000,32 @@ ProgramDocument::print_submodel_entry (const symbol name, int level,
   print_entry_type (name, frame);
 
   // Print size.
-  if (size == Value::Singleton)
-    /* do nothing */;
-  else if (size == Value::Sequence)
-    format->text (" sequence");
-  else
+  switch (size)
     {
-      std::ostringstream tmp;
-      tmp << " array of length " << size;
-      format->text (tmp.str ());
+    case Value::Singleton:
+      /* do nothing */
+      break;
+    case Value::Variable:
+      format->text (" sequence");
+      break;
+    case Value::CanopyCells:
+      format->text (" canopy intervals");
+      break;
+    case Value::CanopyEdges:
+      format->text (" canopy boundaries");
+      break;
+    case Value::SoilCells:
+      format->text (" soil cells");
+      break;
+    case Value::SoilEdges:
+      format->text (" soil edges");
+      break;
+    default:
+      {
+        std::ostringstream tmp;
+        tmp << " array of length " << size;
+        format->text (tmp.str ());
+      }
     }
 
   if (!frame.is_log (name))

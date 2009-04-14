@@ -642,7 +642,7 @@ manual was generated.");
 This can affect both where input files are found and where log files\n\
 are generated.");
   frame.declare ("path", Value::String,
-              Value::Const, Value::Sequence,
+              Value::Const, Value::Variable,
               "List of directories to search for input files in.\n\
 The special value \".\" means the current directory.\n\
 \n\

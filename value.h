@@ -44,8 +44,17 @@ namespace Value
   // single item of the specified type, while the 'Sequence' used for
   // entries that contain an array of unspecified length. 
   const int Singleton = -117;	
-  const int Sequence = -3212;
+  const int Variable = -3210;
+  const int CanopyCells = -3211;
+  const int CanopyEdges = -3212;
+  const int SoilCells = -3213;
+  const int SoilEdges = -3214;
   const int Unspecified = -666;
+
+  // Size is not known at compile time.
+  inline bool flexible_size (const int size)
+  { return size == Variable || size == CanopyCells || size == CanopyEdges
+      || size == SoilCells || size == SoilEdges; }
 
   // A value may have a dimension associated.
   symbol Unknown ();

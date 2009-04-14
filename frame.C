@@ -436,7 +436,7 @@ Frame::declare_submodule_sequence (const symbol name, Value::category cat,
 			       const symbol description,
 			       load_syntax_t load_syntax)
 {
-  impl->syntax.declare (name, load_syntax, cat, Value::Sequence, description);
+  impl->syntax.declare (name, load_syntax, cat, Value::Variable, description);
 }
 
 void 
@@ -832,7 +832,7 @@ Frame::verify (const symbol key, const Value::type want,
     daisy_panic ("'" + key + "' is " + Value::type_name (has) 
                  + ", should be " + Value::type_name (want));
   int type_size = this->type_size (key);
-  if (type_size == Value::Sequence)
+  if (Value::flexible_size (type_size))
     {
       if (value_size == Value::Singleton)
         daisy_panic ("'" + key + "' is a singleton, should be a sequence");

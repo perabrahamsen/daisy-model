@@ -508,7 +508,7 @@ PrinterFile::Implementation::print_alist (const Frame& frame,
           const int size = frame.type_size (key);
           if (size == Value::Singleton)
             /* do nothing */;
-          else if (size == Value::Sequence)
+          else if (size == Value::Variable)
             out << "[] ";
           else
             out << "[" << size << "] ";

@@ -119,12 +119,12 @@ A horizon using explicit texture classification.")
   { 
     frame.add_check (check_alist);
     frame.declare ("limits", "um", Check::positive (),
-                Value::Const, Value::Sequence, 
+                Value::Const, Value::Variable, 
                 "Numerical limits for particle sizes.");
     static const VCheck::All lim_check (VCheck::increasing (), 
                                         VCheck::min_size_1 ());
     frame.set_check ("limits", lim_check);
-    frame.declare_fraction ("fractions", Value::Const, Value::Sequence, "\
+    frame.declare_fraction ("fractions", Value::Const, Value::Variable, "\
 Fraction of particles between the corresponding numrical limits.");
     frame.set_check ("fractions", VCheck::min_size_1 ());
     

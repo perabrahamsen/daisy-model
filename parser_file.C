@@ -781,7 +781,7 @@ ParserFile::Implementation::load_list (Frame& frame)
             {
               skip ("[");
               if (looking_at (']'))
-                size = Value::Sequence;
+                size = Value::Variable;
               else
                 size = get_integer ();
               skip ("]");
@@ -1151,7 +1151,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 		  }
 		if (skipped)
 		  skip (")");
-		if (size != Value::Sequence && sequence.size () != size)
+		if (!Value::flexible_size (size) && sequence.size () != size)
 		  {
 		    std::ostringstream str;
 		    str << "Got " << sequence.size ()
@@ -1211,7 +1211,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 		    total++;
 		    plfs.push_back (&plf);
 		  }
-		if (size != Value::Sequence && total != size)
+		if (!Value::flexible_size (size) && total != size)
 		  {
 		    std::ostringstream str;
 		    str << "Got " << total
@@ -1302,7 +1302,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 			  error (str.str (), positions[i]);
 			}
 		  }
-		if (size != Value::Sequence && count != size)
+		if (!Value::flexible_size (size) && count != size)
 		  {
 		    std::ostringstream str;
 		    str << "Got " << count 
@@ -1337,7 +1337,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 		    array.push_back (get_symbol ());
 		    count++;
 		  }
-		if (size != Value::Sequence && count != size)
+		if (!Value::flexible_size (size) && count != size)
 		  {
 		    std::ostringstream str;
 		    str << "Got " << count 
@@ -1381,7 +1381,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 		    array.push_back (get_integer ());
 		    count++;
 		  }
-		if (size != Value::Sequence && count != size)
+		if (!Value::flexible_size (size) && count != size)
 		  {
 		    std::ostringstream str;
 		    str << "Got " << count 

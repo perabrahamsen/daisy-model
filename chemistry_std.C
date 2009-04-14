@@ -375,12 +375,12 @@ Handle chemicals and reactions.")
   void load_frame (Frame& frame) const
   { 
     frame.declare_object ("trace", Chemical::component, 
-                      Value::State, Value::Sequence, "\
+                      Value::State, Value::Variable, "\
 List of chemicals you want to trace in the simulation.");
     frame.set_check ("trace", VCheck::unique ());
     frame.set_empty ("trace");
     frame.declare_object ("reaction", Reaction::component, 
-                      Value::State, Value::Sequence, "\
+                      Value::State, Value::Variable, "\
 List of chemical reactions you want to simulate.");
     frame.set_empty ("reaction");
   }

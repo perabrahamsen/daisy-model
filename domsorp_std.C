@@ -51,9 +51,9 @@ struct DomsorpStandard : public Domsorp
 
   // Simulation.
   void tick (const Units& units, const Soil& soil, 
-	     const SoilWater& soil_water, const SoilHeat& soil_heat,
+             const SoilWater& soil_water, const SoilHeat& soil_heat,
              const std::vector<DOM*>& dom, const std::vector<SOM*>& som, 
-	     Treelog& msg)
+             Treelog& msg)
   { 
     daisy_assert (dom.size () > dom_pool);
     daisy_assert (som.size () > som_pool);
@@ -88,8 +88,8 @@ struct DomsorpStandard : public Domsorp
 
   // Create.
   bool check (const Units& units, const Soil& soil, 
-	      const SoilWater& soil_water, const SoilHeat& soil_heat,
-	      const size_t dom_size, const size_t som_size,
+              const SoilWater& soil_water, const SoilHeat& soil_heat,
+              const size_t dom_size, const size_t som_size,
               Treelog& msg) const
   { 
     Treelog::Open nest (msg, "Domsorp: " + name);
@@ -135,20 +135,20 @@ static struct DomsorpStandardSyntax : public DeclareModel
   { return new DomsorpStandard (al); }
   DomsorpStandardSyntax ()
     : DeclareModel (Domsorp::component, "default", 
-	       "Transformation between two soil chemicals.")
+                    "Transformation between two soil chemicals.")
   { }
   void load_frame (Frame& frame) const
   {
     frame.declare_object ("transform", Transform::component,
-                       "Tranformation process between DOM and SOM.");
+                          "Tranformation process between DOM and SOM.");
     frame.declare ("dom_pool", Value::Integer, Value::Const,
-		"Number of the DOM pool affected by the transformation.");
+                   "Number of the DOM pool affected by the transformation.");
     frame.declare ("som_pool", Value::Integer, Value::Const,
-		"Number of the SOM pool affected by the transformation.");
-    frame.declare ("S_C", "g C/cm^3/h", Value::LogOnly, Value::Sequence,
-		"Carbon converted from DOM to SOM (may be negative).");
-    frame.declare ("S_N", "g N/cm^3/h", Value::LogOnly, Value::Sequence,
-		"Carbon converted from DOM to SOM (may be negative).");
+                   "Number of the SOM pool affected by the transformation.");
+    frame.declare ("S_C", "g C/cm^3/h", Value::LogOnly, Value::SoilCells,
+                   "Carbon converted from DOM to SOM (may be negative).");
+    frame.declare ("S_N", "g N/cm^3/h", Value::LogOnly, Value::SoilCells,
+                   "Carbon converted from DOM to SOM (may be negative).");
 
   }
 } DomsorpStandard_syntax;

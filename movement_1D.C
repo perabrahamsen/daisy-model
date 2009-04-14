@@ -481,7 +481,7 @@ One dimensional movement.")
                          "Discretization of the soil.",
                          Geometry1D::load_syntax);
     frame.declare_object ("matrix_water", UZmodel::component, 
-                      Value::Const, Value::Sequence,
+                      Value::Const, Value::Variable,
                       "Vertical matrix water transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends.");

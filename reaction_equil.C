@@ -61,8 +61,8 @@ struct ReactionEquilibrium : public Reaction
 
   // Simulation.
   void tick (const Units& units, const Geometry& geo, 
-	     const Soil& soil, const SoilWater& soil_water, 
-	     const SoilHeat& soil_heat, const OrganicMatter&,
+             const Soil& soil, const SoilWater& soil_water, 
+             const SoilHeat& soil_heat, const OrganicMatter&,
              Chemistry& chemistry, const double dt, Treelog& msg)
   { 
     TREELOG_MODEL (msg);
@@ -85,7 +85,7 @@ struct ReactionEquilibrium : public Reaction
     ScopeMulti scope (scope_id, scope_soil);
     for (size_t c = 0; c < cell_size; c++)
       { 
-	scope_soil.set_cell (c);
+        scope_soil.set_cell (c);
         double has_A;
         double has_B;
 
@@ -116,33 +116,33 @@ struct ReactionEquilibrium : public Reaction
             has_B = B.M_primary (c);
           }
 
-	double want_A;
-	double want_B;
-	equilibrium->find (units, scope, has_A, has_B, want_A, want_B,
-			   msg);
-	daisy_assert (approximate (has_A + has_B, want_A + want_B));
-	
-	double convert = 0.0;
+        double want_A;
+        double want_B;
+        equilibrium->find (units, scope, has_A, has_B, want_A, want_B,
+                           msg);
+        daisy_assert (approximate (has_A + has_B, want_A + want_B));
+        
+        double convert = 0.0;
 
-	if (has_A > want_A)
-	  {
-	    if (!k_AB->tick_value (units, convert, k_unit, scope, msg))
-	      msg.error ("Could not evaluate k_AB");
-	    
-	    convert *= (has_A - want_A);
+        if (has_A > want_A)
+          {
+            if (!k_AB->tick_value (units, convert, k_unit, scope, msg))
+              msg.error ("Could not evaluate k_AB");
+            
+            convert *= (has_A - want_A);
           }
-	else
-	  {
-	    if (!k_BA->tick_value (units, convert, k_unit, scope, msg))
-	      msg.error ("Could not evaluate k_BA");
-	    
-	    convert *= (has_B - want_B);
+        else
+          {
+            if (!k_BA->tick_value (units, convert, k_unit, scope, msg))
+              msg.error ("Could not evaluate k_BA");
+            
+            convert *= (has_B - want_B);
             convert *= -1.0;
-	  }
+          }
       
-      S_AB[c] = convert;
-	
-    }
+        S_AB[c] = convert;
+        
+      }
     A.add_to_transform_sink (S_AB);
     B.add_to_transform_source (S_AB);
   }
@@ -150,8 +150,8 @@ struct ReactionEquilibrium : public Reaction
   // Create.
   bool check (const Units& units, const Geometry& geo, 
               const Soil& soil, const SoilWater& soil_water, 
-	      const SoilHeat& soil_heat,
-	      const Chemistry& chemistry, Treelog& msg) const
+              const SoilHeat& soil_heat,
+              const Chemistry& chemistry, Treelog& msg) const
   { 
     TREELOG_MODEL (msg);
     bool ok = true;
@@ -206,8 +206,8 @@ struct ReactionEquilibrium : public Reaction
       equilibrium (Librarian::build_item<Equilibrium> (al, "equilibrium")),
       k_AB (Librarian::build_item<Number> (al, "k_AB")),
       k_BA (al.check ("k_BA")
-	    ? Librarian::build_item<Number> (al, "k_BA")
-	    : Librarian::build_item<Number> (al, "k_AB")),
+            ? Librarian::build_item<Number> (al, "k_BA")
+            : Librarian::build_item<Number> (al, "k_AB")),
       name_colloid (al.name ("colloid", Value::None ())),
       secondary (al.flag ("secondary"))
   { }
@@ -222,33 +222,33 @@ static struct ReactionEquilibriumSyntax : public DeclareModel
   { return new ReactionEquilibrium (al); }
   ReactionEquilibriumSyntax ()
     : DeclareModel (Reaction::component, "equilibrium", 
-	       "Equilibrium between two soil chemicals.")
+                    "Equilibrium between two soil chemicals.")
   { }
   void load_frame (Frame& frame) const
   {
 
     frame.declare ("A", Value::String, Value::Const,
-		"Name of first soil component in equilibrium.");
+                   "Name of first soil component in equilibrium.");
     frame.declare ("B", Value::String, Value::Const,
-		"Name of second soil component in equilibrium.");
+                   "Name of second soil component in equilibrium.");
     frame.declare_object ("equilibrium", Equilibrium::component,
-                       "Function for calculating equilibrium between A and B.");
+                          "Function for calculating equilibrium between A and B.");
     frame.declare_object ("k_AB", Number::component,
-                       Value::Const, Value::Singleton, 
-                       "Tranformation rate from soil component 'A' to 'B'.");
+                          Value::Const, Value::Singleton, 
+                          "Tranformation rate from soil component 'A' to 'B'.");
     frame.declare_object ("k_BA", Number::component,
-                       Value::OptionalConst, Value::Singleton,
-                       "Tranformation rate from soil component 'B' to 'A'.\n\
+                          Value::OptionalConst, Value::Singleton,
+                          "Tranformation rate from soil component 'B' to 'A'.\n\
 By default, this is identical to 'k_AB'.");
-    frame.declare ("S_AB", "g/cm^3/h", Value::LogOnly, Value::Sequence,
-		"Converted from A to B this timestep (may be negative).");
+    frame.declare ("S_AB", "g/cm^3/h", Value::LogOnly, Value::SoilCells,
+                   "Converted from A to B this timestep (may be negative).");
     frame.declare ("colloid", Value::String, Value::OptionalConst,
-		"Let 'rho_b' denote content of specified chemical.\n\
+                   "Let 'rho_b' denote content of specified chemical.\n\
 This miht affect the evaluation of the 'k_AB' and 'k_BA' parameter\n\
 expressions, as well as the 'equilibrium' model.\n\
 By default, 'rho_b' will be the soil dry bulk density.");
     frame.declare ("secondary", Value::Boolean, Value::Const,
-                "Equilibrium should happen in the secondary domain.\n\
+                   "Equilibrium should happen in the secondary domain.\n\
 There will only be a reaction when there is water in the secondary domain\n\
 (inter-aggregate pores), at both the beginning and end of the timestep.\n\
 By default, only the content of the primary domain (soil-bound and\n\

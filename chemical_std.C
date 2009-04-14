@@ -110,18 +110,18 @@ struct ChemicalStandard : public Chemical
   std::vector<double> C_secondary_;   // Conc. in secondary domain [g/cm^3]
   std::vector<double> C_primary_; // Conc. in primary domain [g/cm^3]
   std::vector<double> M_primary_; // Content in primary domain [g/cm^3]
-  std::vector<double> M_total_;	// Concentration in soil [g/cm^3]
+  std::vector<double> M_total_; // Concentration in soil [g/cm^3]
   std::vector<double> M_error; // Accumulated error [g/cm^3]
   std::vector<double> S_secondary_;  // Secondary domain source term.
   std::vector<double> S_primary_;// Primary domain source term.
-  std::vector<double> S_tertiary_;	// Source term for macropores only.
-  std::vector<double> S_exchange;	// Exchange from primary to secondary.
-  std::vector<double> S_drain;	// Source term for soil drainage only.
+  std::vector<double> S_tertiary_;      // Source term for macropores only.
+  std::vector<double> S_exchange;       // Exchange from primary to secondary.
+  std::vector<double> S_drain;  // Source term for soil drainage only.
   std::vector<double> S_external; // External source term, e.g. incorp. fert.
   std::vector<double> S_permanent; // Permanent external source term.
-  std::vector<double> S_root;	// Root uptake source term (negative).
-  std::vector<double> S_decompose;	// Decompose source term.
-  std::vector<double> S_transform;	// Transform source term.
+  std::vector<double> S_root;   // Root uptake source term (negative).
+  std::vector<double> S_decompose;      // Decompose source term.
+  std::vector<double> S_transform;      // Transform source term.
   std::vector<double> J_primary; // Solute transport in primary matrix water.
   std::vector<double> J_secondary; // Solute transport in secondary matrix.
   std::vector<double> J_matrix;    // Solute transport log in matrix water.
@@ -144,7 +144,7 @@ struct ChemicalStandard : public Chemical
   double M_primary (size_t) const;
   double M_total (size_t) const;
   double total_surface (const Geometry&, 
-			double from, double to) const; // [g/cm^2]
+                        double from, double to) const; // [g/cm^2]
   double S_secondary (size_t) const;
   double S_primary (size_t) const;
   double S_tertiary (size_t) const;
@@ -181,13 +181,13 @@ struct ChemicalStandard : public Chemical
   void dissipate (const double amount, const double dt); // [g/m^2]
   void harvest (const double removed, const double surface, const double dt);
   void incorporate (const Geometry&, double amount, 
-		    double from, double to, double dt);
+                    double from, double to, double dt);
   void incorporate (const Geometry&, double amount, 
-		    const Volume&, double dt);
+                    const Volume&, double dt);
   void mix (const Geometry& geo, const Soil&, const SoilWater&,
-	    double from, double to, double penetration, double dt);
+            double from, double to, double penetration, double dt);
   void swap (const Geometry& geo, const Soil&, const SoilWater&,
-	     double from, double middle, double to, double dt);
+             double from, double middle, double to, double dt);
   
   // Simulation.
   void tick_top (const double snow_leak_rate, // [h^-1]
@@ -195,10 +195,10 @@ struct ChemicalStandard : public Chemical
                  const double canopy_leak_rate, // [h^-1]
                  const double surface_runoff_rate, // [h^-1]
                  const double dt, // [h]
-		 Treelog& msg);
+                 Treelog& msg);
   void tick_soil (const Units&,
                   const Geometry&, const Soil&, const SoilWater&, double dt,
-		  const Scope&, Treelog&);
+                  const Scope&, Treelog&);
   void mixture (const Geometry& geo,
                 const double pond /* [mm] */, 
                 const double rate /* [h/mm] */,
@@ -214,7 +214,7 @@ struct ChemicalStandard : public Chemical
   // Create.
   bool check (const Units&, const Scope&, 
               const Geometry&, const Soil&, const SoilWater&, 
-	      const Chemistry&, Treelog&) const;
+              const Chemistry&, Treelog&) const;
   static void fillup (std::vector<double>& v, const size_t size);
   void initialize (const Units&, const Scope&, const Geometry&,
                    const Soil&, const SoilWater&, const SoilHeat&, Treelog&);
@@ -229,9 +229,9 @@ void
 ChemicalStandard::Product::load_syntax (Frame& frame)
 {
   frame.declare ("fraction", Value::Fraction (), Value::Const,
-	      "Fraction of decomposed matter that become this chemcial.");
+                 "Fraction of decomposed matter that become this chemcial.");
   frame.declare ("chemical", Value::String, Value::Const, 
-	      "Chemical product of decomposed matter.");
+                 "Chemical product of decomposed matter.");
   frame.order ("fraction", "chemical");
 }
 
@@ -288,7 +288,7 @@ ChemicalStandard::M_total (size_t i) const
 
 double
 ChemicalStandard::total_surface (const Geometry& geo, 
-				 const double from, const double to) const
+                                 const double from, const double to) const
 { return geo.total_surface (M_total_, from, to); }
 
 double 
@@ -566,8 +566,8 @@ ChemicalStandard::harvest (const double removed, const double surface,
 
 void 
 ChemicalStandard::incorporate (const Geometry& geo, const double amount,
-			       const double from, const double to,
-			       const double dt)
+                               const double from, const double to,
+                               const double dt)
 { 
   daisy_assert (amount >= 0.0);
   daisy_assert (from <= 0.0);
@@ -587,8 +587,8 @@ ChemicalStandard::incorporate (const Geometry& geo, const double amount,
 
 void 
 ChemicalStandard::mix (const Geometry& geo,
-		       const Soil& soil, const SoilWater& soil_water, 
-		       const double from, const double to,
+                       const Soil& soil, const SoilWater& soil_water, 
+                       const double from, const double to,
                        const double penetration, const double dt)
 { 
   // Removed from surface.
@@ -609,9 +609,9 @@ ChemicalStandard::mix (const Geometry& geo,
 
 void 
 ChemicalStandard::swap (const Geometry& geo,
-			const Soil& soil, const SoilWater& soil_water,
-			const double from, const double middle, const double to,
-			const double dt)
+                        const Soil& soil, const SoilWater& soil_water,
+                        const double from, const double middle, const double to,
+                        const double dt)
 { 
   geo.swap (M_total_, from, middle, to, tillage, dt);
   update_C (soil, soil_water);
@@ -623,7 +623,7 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
                             const double canopy_leak_rate, // [h^-1]
                             const double surface_runoff_rate, // [h^-1]
                             const double dt, // [h]
-			    Treelog& msg)
+                            Treelog& msg)
 {
   const double old_storage = snow_storage + canopy_storage;
 
@@ -679,10 +679,10 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
     {
       std::ostringstream tmp;
       tmp << "Mass balance error: "
-	  << "new_storage - old_storage != (input - output) * dt)\n"
-	  << new_storage << " - " << old_storage << " != (" << input 
-	  << " - " << output << ") * " << dt << "), error = "  
-	  << new_storage - old_storage - (input - output) * dt << " g/ha";
+          << "new_storage - old_storage != (input - output) * dt)\n"
+          << new_storage << " - " << old_storage << " != (" << input 
+          << " - " << output << ") * " << dt << "), error = "  
+          << new_storage - old_storage - (input - output) * dt << " g/ha";
       msg.error (tmp.str ());
     }
 }
@@ -690,10 +690,10 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
 void                            // Called just before solute movement.
 ChemicalStandard::tick_soil (const Units& units, const Geometry& geo,
                              const Soil& soil,
-			     const SoilWater& soil_water,
-			     const double dt,
-			     const Scope& scope,
-			     Treelog& msg)
+                             const SoilWater& soil_water,
+                             const double dt,
+                             const Scope& scope,
+                             Treelog& msg)
 {
   TREELOG_MODEL(msg);
 
@@ -861,7 +861,7 @@ ChemicalStandard::decompose (const Geometry& geo,
                              const SoilWater& soil_water,
                              const SoilHeat& soil_heat,
                              const OrganicMatter& organic_matter,
-			     Chemistry& chemistry, const double dt, Treelog&)
+                             Chemistry& chemistry, const double dt, Treelog&)
 {
   const size_t cell_size = geo.cell_size ();
   std::vector<double> decomposed (cell_size, 0.0);
@@ -873,12 +873,12 @@ ChemicalStandard::decompose (const Geometry& geo,
       lag[c] += this->decompose_lag_increment (C_primary_[c]) * dt;
       
       if (lag[c] >= 1.0)
-	{
-	  lag[c] = 1.0;
-	  found = true;
-	}
+        {
+          lag[c] = 1.0;
+          found = true;
+        }
       else if (lag[c] < 0.0)
-	lag[c] = 0.0;
+        lag[c] = 0.0;
     }
 
   // No decomposition.
@@ -888,18 +888,18 @@ ChemicalStandard::decompose (const Geometry& geo,
   for (size_t c = 0; c < cell_size; c++)
     {
       const double heat_factor 
-	= this->decompose_heat_factor (soil_heat.T (c));
+        = this->decompose_heat_factor (soil_heat.T (c));
       const double water_factor 
-	= this->decompose_water_factor (soil_water.h (c));
+        = this->decompose_water_factor (soil_water.h (c));
       const double CO2_factor 
-	= this->decompose_CO2_factor (organic_matter.CO2 (c));
+        = this->decompose_CO2_factor (organic_matter.CO2 (c));
       const double conc_factor
-	= this->decompose_conc_factor (C_primary_[c]);
+        = this->decompose_conc_factor (C_primary_[c]);
       const double depth_factor
-	= this->decompose_depth_factor (geo.cell_z (c));
+        = this->decompose_depth_factor (geo.cell_z (c));
       const double rate
-	= decompose_rate * heat_factor * water_factor * CO2_factor
-	* conc_factor * depth_factor;
+        = decompose_rate * heat_factor * water_factor * CO2_factor
+        * conc_factor * depth_factor;
       decomposed[c] = M_primary (c) * rate;
     }
 
@@ -909,14 +909,14 @@ ChemicalStandard::decompose (const Geometry& geo,
     {
       const symbol name = product[i]->chemical;
       if (chemistry.know (name))
-	{
-	  Chemical& chemical = chemistry.find (name);
-	  const double fraction = product[i]->fraction;
-	  std::vector<double> created = decomposed;
-	  for (size_t c = 0; c < cell_size; c++)
-	    created[c] *= fraction;
-	  chemical.add_to_transform_source (created);
-	}
+        {
+          Chemical& chemical = chemistry.find (name);
+          const double fraction = product[i]->fraction;
+          std::vector<double> created = decomposed;
+          for (size_t c = 0; c < cell_size; c++)
+            created[c] *= fraction;
+          chemical.add_to_transform_source (created);
+        }
     }
 }
 
@@ -948,10 +948,10 @@ ChemicalStandard::output (Log& log) const
   output_variable (surface_mixture, log);
   output_variable (surface_out, log);
   output_value (snow_storage + canopy_storage + surface_storage,
-		"top_storage", log);
+                "top_storage", log);
   output_value (canopy_dissipate + canopy_harvest + surface_runoff 
                 + surface_decompose - surface_transform,
-		"top_loss", log);
+                "top_loss", log);
   output_value (C_avg_, "C", log);
   output_value (C_secondary_, "C_secondary", log);
   output_value (C_primary_, "C_primary", log);
@@ -979,9 +979,9 @@ ChemicalStandard::output (Log& log) const
 bool 
 ChemicalStandard::check (const Units& units, const Scope& scope, 
                          const Geometry& geo, 
-			 const Soil& soil, const SoilWater& soil_water,
-			 const Chemistry& chemistry,
-			 Treelog& msg) const
+                         const Soil& soil, const SoilWater& soil_water,
+                         const Chemistry& chemistry,
+                         Treelog& msg) const
 {
   const size_t cell_size = geo.cell_size ();
 
@@ -991,10 +991,10 @@ ChemicalStandard::check (const Units& units, const Scope& scope,
   else 
     for (size_t i = 0; i < product.size (); i++)
       {
-	const symbol chemical = product[i]->chemical;
-	if (!chemistry.know (chemical) && !chemistry.ignored (chemical))
-	  msg.warning ("Decompose product '" + chemical.name () 
-		       + "' will not be traced");
+        const symbol chemical = product[i]->chemical;
+        if (!chemistry.know (chemical) && !chemistry.ignored (chemical))
+          msg.warning ("Decompose product '" + chemical.name () 
+                       + "' will not be traced");
       }
 
   bool ok = true;
@@ -1007,11 +1007,11 @@ ChemicalStandard::check (const Units& units, const Scope& scope,
   for (size_t i = 0; i < cell_size; i++)
     {
       try 
-	{   
-	  const double Theta_primary = soil_water.Theta_primary (i);
-	  const double Theta_secondary = soil_water.Theta_secondary (i);
-	  const double M = M_total_[i];
-	  const double M_primary = M_primary_[i];
+        {   
+          const double Theta_primary = soil_water.Theta_primary (i);
+          const double Theta_secondary = soil_water.Theta_secondary (i);
+          const double M = M_total_[i];
+          const double M_primary = M_primary_[i];
           const double C = C_avg_[i];
           const double C_secondary = C_secondary_[i];
           const double C_primary = C_primary_[i];
@@ -1036,29 +1036,29 @@ ChemicalStandard::check (const Units& units, const Scope& scope,
             }
           
           if (iszero (M))
-	    {
-	      if (std::isnormal (C))
-		throw "C & M mismatch in solute";
-	    }
-	  else if (iszero (C))
-	    {
-	      if (std::isnormal (M) && !solid)
-		throw "No solute part";
-	    }
-	  else if (solid)
-	    {
-	      if (std::isnormal (C_avg_[i]))
-		throw "C should be zero for non-solutes";
-	    }
-	}
+            {
+              if (std::isnormal (C))
+                throw "C & M mismatch in solute";
+            }
+          else if (iszero (C))
+            {
+              if (std::isnormal (M) && !solid)
+                throw "No solute part";
+            }
+          else if (solid)
+            {
+              if (std::isnormal (C_avg_[i]))
+                throw "C should be zero for non-solutes";
+            }
+        }
       catch (const char *const error)
-	{
-	  std::stringstream tmp;
-	  tmp << name << "[" << i << "]";
-	  Treelog::Open next (msg, tmp.str ());
-	  msg.error (error);
-	  ok = false;
-	}
+        {
+          std::stringstream tmp;
+          tmp << name << "[" << i << "]";
+          Treelog::Open next (msg, tmp.str ());
+          msg.error (error);
+          ok = false;
+        }
     }
   return ok;
 }
@@ -1070,9 +1070,9 @@ ChemicalStandard::fillup (std::vector<double>& v, const size_t size)
     {
       // Fill it up.
       while (v.size () < size)
-	v.push_back (v[v.size () - 1]);
+        v.push_back (v[v.size () - 1]);
       if (v.size () > size)
-	throw ("To many members of sequence");
+        throw ("To many members of sequence");
     }
 }
 
@@ -1080,7 +1080,7 @@ void
 ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
                               const Geometry& geo,
                               const Soil& soil, const SoilWater& soil_water, 
-			      const SoilHeat& soil_heat,
+                              const SoilHeat& soil_heat,
                               Treelog& msg)
 {
   const size_t cell_size = geo.cell_size ();
@@ -1102,30 +1102,30 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
   if (M_total_.size () == 0 && C_avg_.size () == 0)
     {
       if (Ms.size () != 0)
-	{
-	  daisy_assert (Ms.size () == cell_size);
+        {
+          daisy_assert (Ms.size () == cell_size);
 
-	  for (size_t i = M_total_.size (); i < Ms.size (); i++)
-	    M_total_.push_back (Ms[i] * soil.dry_bulk_density (i));
-	}
+          for (size_t i = M_total_.size (); i < Ms.size (); i++)
+            M_total_.push_back (Ms[i] * soil.dry_bulk_density (i));
+        }
       if (M_total_.size () == 0 && C_avg_.size () == 0)
-	{
-	  ScopeSoil scope_soil (soil, soil_water, soil_heat);
+        {
+          ScopeSoil scope_soil (soil, soil_water, soil_heat);
           ScopeMulti multi (parent_scope, scope_soil);
           daisy_assert (cell_size > 0);
           scope_soil.set_cell (0);
-	  if (!initial_expr->initialize (units, multi, msg))
+          if (!initial_expr->initialize (units, multi, msg))
             msg.error ("Could not initialize 'inital_expr'");
-	  for (size_t c = 0; c < cell_size; c++)
-	    { 
-	      scope_soil.set_cell (c);
-	      double value = 0.0;
-	      if (!initial_expr->tick_value (units,
+          for (size_t c = 0; c < cell_size; c++)
+            { 
+              scope_soil.set_cell (c);
+              double value = 0.0;
+              if (!initial_expr->tick_value (units,
                                              value, g_per_cm3, multi, msg))
-		msg.error ("Could not evaluate 'inital_expr'");
-	      M_total_.push_back (value);
-	    }
-	}
+                msg.error ("Could not evaluate 'inital_expr'");
+              M_total_.push_back (value);
+            }
+        }
     }
 
   for (size_t i = 0; i < cell_size; i++)
@@ -1210,8 +1210,8 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
   S_external.insert (S_external.begin (), cell_size, 0.0);
   if (S_permanent.size () < cell_size)
     S_permanent.insert (S_permanent.end (), 
-			cell_size - S_permanent.size (),
-			0.0);
+                        cell_size - S_permanent.size (),
+                        0.0);
   S_root.insert (S_root.begin (), cell_size, 0.0);
   S_decompose.insert (S_decompose.begin (), cell_size, 0.0);
   S_transform.insert (S_transform.begin (), cell_size, 0.0);
@@ -1287,8 +1287,8 @@ ChemicalStandard::ChemicalStandard (Block& al)
     surface_transform (0.0),
     S_permanent (al.number_sequence ("S_permanent")),
     lag (al.check ("lag")
-	 ? al.number_sequence ("lag")
-	 : std::vector<double> ())
+         ? al.number_sequence ("lag")
+         : std::vector<double> ())
 { }
 
 struct NumberInitialC : public Number
@@ -1463,72 +1463,72 @@ Only for initialization of the 'M' parameter."); }
 How much of the chemical is reflected at crop uptake.");
     frame.set ("crop_uptake_reflection_factor", 1.0);
     frame.declare ("canopy_dissipation_rate", "h^-1", 
-               Check::fraction (), Value::OptionalConst,
-               "How fast does the chemical dissipate on canopy.\n\
+                   Check::fraction (), Value::OptionalConst,
+                   "How fast does the chemical dissipate on canopy.\n\
 You must specify it with either 'canopy_dissipation_halftime' or\n\
 'canopy_dissipation_rate'.");
     frame.declare ("canopy_dissipation_halftime", "h", 
-               Check::positive (), Value::OptionalConst,
-               "How fast does the chemical dissipate on canopy.\n\
+                   Check::positive (), Value::OptionalConst,
+                   "How fast does the chemical dissipate on canopy.\n\
 You must specify it with either 'canopy_dissipation_halftime' or\n\
 'canopy_dissipation_rate'.");
     frame.declare ("canopy_dissipation_rate_coefficient", "h^-1", 
-               Check::fraction (), Value::OptionalConst,
-               "Obsolete alias for 'canopy_dissipation_rate'.");
+                   Check::fraction (), Value::OptionalConst,
+                   "Obsolete alias for 'canopy_dissipation_rate'.");
     frame.declare_fraction ("canopy_washoff_coefficient", Value::Const, "\
 Fraction of the chemical that follows the water off the canopy.");
     frame.declare ("surface_decompose_rate", "h^-1", 
-               Check::fraction (), Value::OptionalConst,
-               "How fast does the chemical decomposee on surface.\n\
+                   Check::fraction (), Value::OptionalConst,
+                   "How fast does the chemical decomposee on surface.\n\
 You must specify it with either 'surface_decompose_halftime' or\n\
 'surface_decompose_rate'.  If neither is specified, 'decompose_rate' is used.");
     frame.declare ("surface_decompose_halftime", "h", 
-               Check::positive (), Value::OptionalConst,
-               "How fast does the chemical decompose on surface.\n\
+                   Check::positive (), Value::OptionalConst,
+                   "How fast does the chemical decompose on surface.\n\
 You must specify it with either 'surface_decompose_halftime' or\n\
 'surface_decompose_rate'.  If neither is specified, 'decompose_rate' is used.");
 
     // Soil parameters.
     frame.declare ("diffusion_coefficient", "cm^2/s", Check::non_negative (),
-               Value::Const, "Diffusion coefficient.");
+                   Value::Const, "Diffusion coefficient.");
     frame.declare ("decompose_rate", "h^-1", Check::fraction (),
-               Value::OptionalConst,
-               "How fast the chemical is being decomposed in the soil.\n\
+                   Value::OptionalConst,
+                   "How fast the chemical is being decomposed in the soil.\n\
 You must specify it with either 'decompose_rate' or 'decompose_halftime'.");
     frame.declare ("decompose_halftime", "h", Check::positive (),
-               Value::OptionalConst,
-               "How fast the chemical is being decomposed in the soil.\n\
+                   Value::OptionalConst,
+                   "How fast the chemical is being decomposed in the soil.\n\
 You must specify it with either 'decompose_rate' or 'decompose_halftime'.");
     frame.declare ("decompose_heat_factor", "dg C", Value::None (),
-               Value::Const, "Heat factor on decomposition.");
+                   Value::Const, "Heat factor on decomposition.");
     frame.set ("decompose_heat_factor", PLF::empty ());
     frame.declare ("decompose_water_factor", "cm", Value::None (),
-               Value::Const,
-               "Water potential factor on decomposition.");
+                   Value::Const,
+                   "Water potential factor on decomposition.");
     frame.set ("decompose_water_factor", PLF::empty ());
     frame.declare ("decompose_CO2_factor", "g CO2-C/cm^3", Value::None (),
-               Value::Const,
-               "CO2 development factor on decomposition.");
+                   Value::Const,
+                   "CO2 development factor on decomposition.");
     PLF no_factor;
     no_factor.add (0.0, 1.0);
     no_factor.add (1.0, 1.0);
     frame.set ("decompose_CO2_factor", no_factor);
     frame.declare ("decompose_conc_factor", "g/cm^3 H2O", Value::None (),
-               Value::Const,
-               "Concentration development factor on decomposition.");
+                   Value::Const,
+                   "Concentration development factor on decomposition.");
     frame.set ("decompose_conc_factor", no_factor);
     frame.declare ("decompose_depth_factor", "cm", Value::None (),
-               Value::Const,
-               "Depth influence on decomposition.");
+                   Value::Const,
+                   "Depth influence on decomposition.");
     frame.set ("decompose_depth_factor", no_factor);
     frame.declare ("decompose_lag_increment", 
-               "g/cm^3/h", Value::Fraction (), Value::Const,
-               "Increment lag with the value of this PLF for the current\n\
+                   "g/cm^3/h", Value::Fraction (), Value::Const,
+                   "Increment lag with the value of this PLF for the current\n\
 concentration each hour.  When lag in any cell reaches 1.0,\n\
 decomposition begins.  It can never be more than 1.0 or less than 0.0.");
     frame.set ("decompose_lag_increment", no_factor);
     frame.declare_object ("C_below", Number::component, 
-                      Value::Const, Value::Singleton, "\
+                          Value::Const, Value::Singleton, "\
 Concentration below the layer of soil being examined.\n\
 Use a negative number to indicate same concentration as in lowest cell.");
     frame.declare_submodule_sequence ("decompose_products", Value::Const, "\
@@ -1536,11 +1536,11 @@ List of products from decomposition.", ChemicalStandard::Product::load_syntax);
     frame.set_empty ("decompose_products");
     frame.set ("C_below", "zero_gradient");
     frame.declare_object ("initial", Number::component, 
-                      Value::Const, Value::Singleton, "\
+                          Value::Const, Value::Singleton, "\
 Initial content if otherwise unspecified. [g/cm^3]");
     frame.set ("initial", "initial_zero");
     frame.declare_object ("adsorption", Adsorption::component, 
-                      Value::Const, Value::Singleton, "\
+                          Value::Const, Value::Singleton, "\
 Instant equilibrium between sorbed and solute phases.\n\
 \n\
 Specify the equilibrium model here for chemicals where the sorbed and\n\
@@ -1552,51 +1552,51 @@ with 'none' adsorption and one with 'full' adsorption, and an\n\
 
     // Management and climate fluxes.
     frame.declare ("deposit", "g/m^2/h", Value::LogOnly,
-               "Amount deposited from the atmosphere.");
+                   "Amount deposited from the atmosphere.");
     frame.declare ("spray", "g/m^2/h", Value::LogOnly,
-               "Amount currently being applied.");
+                   "Amount currently being applied.");
     frame.declare ("surface_tillage", "g/m^2/h", Value::LogOnly, 
-               "Amount removed from surface due to tillage operations.");
+                   "Amount removed from surface due to tillage operations.");
 
     // Surface variables.
     frame.declare ("snow_storage", "g/m^2", Value::State, 
-               "Stored in the snow pack.");
+                   "Stored in the snow pack.");
     frame.set ("snow_storage", 0.0);
     frame.declare ("snow_in", "g/m^2/h", Value::LogOnly, 
-               "Entering snow pack..");
+                   "Entering snow pack..");
     frame.declare ("snow_out", "g/m^2/h", Value::LogOnly, 
-               "Leaking from snow pack.");
+                   "Leaking from snow pack.");
 
     frame.declare ("canopy_storage", "g/m^2", Value::State, 
-               "Stored on the canopy.");
+                   "Stored on the canopy.");
     frame.set ("canopy_storage", 0.0);
     frame.declare ("canopy_in", "g/m^2/h", Value::LogOnly, 
-               "Entering canopy.");
+                   "Entering canopy.");
     frame.declare ("canopy_dissipate", "g/m^2/h", Value::LogOnly, 
-               "Dissipating from canopy.");
+                   "Dissipating from canopy.");
     frame.declare ("canopy_out", "g/m^2/h", Value::LogOnly, 
-               "Falling through or off the canopy.");
+                   "Falling through or off the canopy.");
     frame.declare ("canopy_harvest", "g/m^2/h", Value::LogOnly, 
-               "Amount removed with crop harvest.");
+                   "Amount removed with crop harvest.");
 
     frame.declare ("surface_storage", "g/m^2", Value::State, 
-               "Stored on the soil surface.");
+                   "Stored on the soil surface.");
     frame.set ("surface_storage", 0.0);
     frame.declare ("surface_in", "g/m^2/h", Value::LogOnly, 
-               "Falling on the bare soil surface.");
+                   "Falling on the bare soil surface.");
     frame.declare ("surface_runoff", "g/m^2/h", Value::LogOnly, 
-               "Removed through lateral movement on the soil.");
+                   "Removed through lateral movement on the soil.");
     frame.declare ("surface_decompose", "g/m^2/h", Value::LogOnly, 
-               "Decomposed from the surface.");
+                   "Decomposed from the surface.");
     frame.declare ("surface_transform", "g/m^2/h", Value::LogOnly, 
-               "Added through transformation to surface.");
+                   "Added through transformation to surface.");
     frame.declare ("surface_mixture", "g/m^2/h", Value::LogOnly, 
-               "Entering the soil through mixture with ponded water.");
+                   "Entering the soil through mixture with ponded water.");
     frame.declare ("surface_out", "g/m^2/h", Value::LogOnly, 
-               "Entering the soil with water infiltration.");
+                   "Entering the soil with water infiltration.");
 
     frame.declare ("top_storage", "g/m^2", Value::LogOnly, 
-               "Som of above ground (surface, snow, canopy) storage.");
+                   "Som of above ground (surface, snow, canopy) storage.");
     frame.declare ("top_loss", "g/m^2/h", Value::LogOnly, "\
 Amount lost from the system from the surface.\n\
 This includes runoff, canopy dissipation and harvest, but not soil\n\
@@ -1611,42 +1611,43 @@ which can be negative.");
     Geometry::add_layer (frame, Value::OptionalState, "M", load_M);
     Geometry::add_layer (frame, Value::LogOnly, "M_primary", load_M_primary);
     Geometry::add_layer (frame, Value::OptionalConst, "Ms", load_Ms);
-    frame.declare ("M_error", "g/cm^3", Value::LogOnly, Value::Sequence, 
-               "Mass substracted to avoid negative values.");
-    frame.declare ("S_secondary", "g/cm^3/h", Value::LogOnly, Value::Sequence,
-               "Secondary matrix source term.");
-    frame.declare ("S_primary", "g/cm^3/h", Value::LogOnly, Value::Sequence,
-               "Primary matrix source term.");
-    frame.declare ("S_tertiary", "g/cm^3/h", Value::LogOnly, Value::Sequence,
-               "Source term for tertiary (macropore) domain.");
-    frame.declare ("S_exchange", "g/cm^3/h", Value::LogOnly, Value::Sequence,
-               "Exchange from primary to secondary domain.");
-    frame.declare ("S_drain", "g/cm^3/h", Value::LogOnly, Value::Sequence,
-               "Source term (soil drainage only).");
-    frame.declare ("S_external", "g/cm^3/h", Value::LogOnly, Value::Sequence,
-               "External source, such as incorporated fertilizer.");
-    frame.declare ("S_permanent", "g/cm^3/h", Value::State, Value::Sequence,
-               "Permanent external source, e.g. subsoil irrigation.");
+    frame.declare ("M_error", "g/cm^3", Value::LogOnly, Value::SoilCells, 
+                   "Mass substracted to avoid negative values.");
+    frame.declare ("S_secondary", "g/cm^3/h", Value::LogOnly, Value::SoilCells,
+                   "Secondary matrix source term.");
+    frame.declare ("S_primary", "g/cm^3/h", Value::LogOnly, Value::SoilCells,
+                   "Primary matrix source term.");
+    frame.declare ("S_tertiary", "g/cm^3/h", Value::LogOnly, Value::SoilCells,
+                   "Source term for tertiary (macropore) domain.");
+    frame.declare ("S_exchange", "g/cm^3/h", Value::LogOnly, Value::SoilCells,
+                   "Exchange from primary to secondary domain.");
+    frame.declare ("S_drain", "g/cm^3/h", Value::LogOnly, Value::SoilCells,
+                   "Source term (soil drainage only).");
+    frame.declare ("S_external", "g/cm^3/h", Value::LogOnly, Value::SoilCells,
+                   "External source, such as incorporated fertilizer.");
+    frame.declare ("S_permanent", "g/cm^3/h", Value::State, Value::SoilCells,
+                   "Permanent external source, e.g. subsoil irrigation.");
     std::vector<double> empty;
     frame.set ("S_permanent", empty);
-    frame.declare ("S_root", "g/cm^3/h", Value::LogOnly, Value::Sequence,
-               "Source term (root uptake only, always negative).");
-    frame.declare ("S_decompose", "g/cm^3/h", Value::LogOnly, Value::Sequence,
-               "Source term for decompose, is never positive.");
-    frame.declare ("S_transform", "g/cm^3/h", Value::LogOnly, Value::Sequence,
-               "Source term for transformations other than sorption.");
-    frame.declare ("J_primary", "g/cm^2/h", Value::LogOnly, Value::Sequence,
-               "Transportation in primary matrix water (positive up).");
-    frame.declare ("J_secondary", "g/cm^2/h", Value::LogOnly, Value::Sequence,
-               "Transportation in secondary matrix water (positive up).");
-    frame.declare ("J_matrix", "g/cm^2/h", Value::LogOnly, Value::Sequence,
-               "Transportation in matrix (positive up).");
-    frame.declare ("J_tertiary", "g/cm^2/h", Value::LogOnly, Value::Sequence,
-               "Transportation in tertiary water (positive up).");
-    frame.declare ("tillage", "g/cm^3/h", Value::LogOnly, Value::Sequence,
-               "Changes during tillage.");
-    frame.declare ("lag", Value::None (), Value::OptionalState, Value::Sequence,
-               "This state variable grows with lag_increment (C) each hour.\n\
+    frame.declare ("S_root", "g/cm^3/h", Value::LogOnly, Value::SoilCells,
+                   "Source term (root uptake only, always negative).");
+    frame.declare ("S_decompose", "g/cm^3/h", Value::LogOnly, Value::SoilCells,
+                   "Source term for decompose, is never positive.");
+    frame.declare ("S_transform", "g/cm^3/h", Value::LogOnly, Value::SoilCells,
+                   "Source term for transformations other than sorption.");
+    frame.declare ("J_primary", "g/cm^2/h", Value::LogOnly, Value::SoilEdges,
+                   "Transportation in primary matrix water (positive up).");
+    frame.declare ("J_secondary", "g/cm^2/h", Value::LogOnly, Value::SoilEdges,
+                   "Transportation in secondary matrix water (positive up).");
+    frame.declare ("J_matrix", "g/cm^2/h", Value::LogOnly, Value::SoilEdges,
+                   "Transportation in matrix (positive up).");
+    frame.declare ("J_tertiary", "g/cm^2/h", Value::LogOnly, Value::SoilEdges,
+                   "Transportation in tertiary water (positive up).");
+    frame.declare ("tillage", "g/cm^3/h", Value::LogOnly, Value::SoilCells,
+                   "Changes during tillage.");
+    frame.declare ("lag", Value::None (), Value::OptionalState, 
+                   Value::SoilCells,
+                   "This state variable grows with lag_increment (C) each hour.\n\
 When it reached 1.0, decomposition begins.");
   }
 } ChemicalStandard_syntax;

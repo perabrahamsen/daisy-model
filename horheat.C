@@ -40,8 +40,8 @@ HorHeat::heat_conductivity (double Theta, double Ice) const
   daisy_assert (entry >= 0);
   daisy_assert (entry < intervals);
   return ((K_ice[entry] * Ice + K_water[entry] * Theta) 
-	  / (Theta + Ice))
-    * 3600;			// erg/s / cm / K -> erg/h / cm / K
+          / (Theta + Ice))
+    * 3600;                     // erg/s / cm / K -> erg/h / cm / K
 }
 
 double
@@ -55,29 +55,29 @@ HorHeat::load_syntax (Frame& frame)
 {
 
   frame.declare ("quarts_form_factor", Value::None (), Check::positive (), 
-              Value::Const,
-	      "Gemetry factor used for conductivity calculation.");
+                 Value::Const,
+                 "Gemetry factor used for conductivity calculation.");
   frame.set ("quarts_form_factor", 2.0);
   frame.declare ("mineral_form_factor", Value::None (), Check::positive (), 
-              Value::Const,
-	      "Gemetry factor used for conductivity calculation.");
+                 Value::Const,
+                 "Gemetry factor used for conductivity calculation.");
   frame.set ("mineral_form_factor", 4.0);
   frame.declare ("intervals", Value::Integer, Value::Const, "\
 Number of numeric intervals to use in the heat coductivity table.");
   frame.set ("intervals", 100);
   frame.declare ("C_soil", "erg/cm^3/dg C", Check::positive (), 
-	      Value::OptionalConst,
-	      "The soils heat capacity.\n\
+                 Value::OptionalConst,
+                 "The soils heat capacity.\n\
 By default, this is calculated from the soil constituents.");
   frame.declare ("K_water",
-	      "erg/s/cm/dg C", Check::positive (),
-	      Value::OptionalConst, Value::Sequence,
-	      "Heat conductivity table for water in soil.\n\
+                 "erg/s/cm/dg C", Check::positive (),
+                 Value::OptionalConst, Value::SoilCells,
+                 "Heat conductivity table for water in soil.\n\
 By default, this is calculated from the soil constituents.");
   frame.declare ("K_ice",
-	      "erg/s/cm/dg C", Check::positive (),
-	      Value::OptionalConst, Value::Sequence,
-	      "Heat conductivity table for solid frozen soil.\n\
+                 "erg/s/cm/dg C", Check::positive (),
+                 Value::OptionalConst, Value::SoilCells,
+                 "Heat conductivity table for solid frozen soil.\n\
 By default, this is calculated from the soil constituents.");
 }
 
@@ -141,18 +141,18 @@ HorHeat::initialize (const Hydraulic& hydraulic, const Texture& texture,
       // Calculate termal attributes for this combination.
       const double K_water_wet = ThermalConductivity (hydraulic, Water);
       const double K_water_dry = continuum_correction_factor
-	* ThermalConductivity (hydraulic, Air);
+        * ThermalConductivity (hydraulic, Air);
       
       // Find actual conductivity in combined water and air system.
       if (content[Water] < Theta_pF_high)
-	K_water[i] = K_water_dry;
+        K_water[i] = K_water_dry;
       else if (content[Water] > Theta_pF_low)
-	K_water[i] = K_water_wet;
+        K_water[i] = K_water_wet;
       else
-	K_water[i] = K_water_dry 
-	  + (K_water_wet - K_water_dry)
-	  * (content[Water] - Theta_pF_high)
-	  / (Theta_pF_low - Theta_pF_high);
+        K_water[i] = K_water_dry 
+          + (K_water_wet - K_water_dry)
+          * (content[Water] - Theta_pF_high)
+          / (Theta_pF_low - Theta_pF_high);
       
       // Fill out water, ice, and air for pure ice system.
       content[Water] = std::min (LiquidWater, (i + 0.0) / (intervals + 0.0));
@@ -162,18 +162,18 @@ HorHeat::initialize (const Hydraulic& hydraulic, const Texture& texture,
       // Calculate termal attributes for this combination.
       const double K_ice_wet = ThermalConductivity (hydraulic, Ice);
       const double K_ice_dry = continuum_correction_factor 
-	* ThermalConductivity (hydraulic, Air);
+        * ThermalConductivity (hydraulic, Air);
       
       // Find actual conductivity in combined ice and air system.
       if (content[Water] + content[Ice] < Theta_pF_high)
-	K_ice[i] = K_ice_dry;
+        K_ice[i] = K_ice_dry;
       else if (content[Water] + content[Ice] > Theta_pF_low)
-	K_ice[i] = K_ice_wet;
+        K_ice[i] = K_ice_wet;
       else
-	K_ice[i] = K_ice_dry 
-	  + (K_ice_wet - K_ice_dry)
-	  * (content[Water] + content[Ice] - Theta_pF_high)
-	  / (Theta_pF_low - Theta_pF_high);
+        K_ice[i] = K_ice_dry 
+          + (K_ice_wet - K_ice_dry)
+          * (content[Water] + content[Ice] - Theta_pF_high)
+          / (Theta_pF_low - Theta_pF_high);
     }
   for (int i = to; i < intervals; i++)
     {
@@ -208,7 +208,7 @@ HorHeat::DepolationsFactor (const Hydraulic& hydraulic,
 {
   if (medium == Air)
     return 0.333 - (0.333 - 0.070) * content[Air] / (hydraulic.porosity()
-						     - Theta_pF_high);
+                                                     - Theta_pF_high);
 
   const double a = 1.0 - alfa * alfa;
   
@@ -228,11 +228,11 @@ HorHeat::DepolationsFactor (const Hydraulic& hydraulic,
 
 double 
 HorHeat::ThermalConductivity (const Hydraulic& hydraulic,
-					      constituents medium)
+                              constituents medium)
 {
   // Thermal conductivity of each medium.
   double thermal_conductivity[Constituents_End] =
-  { 0.57e5, 2.2e5, 0.025e5, 8.8e5, 2.9e5, 0.25e5 }; // [erg/s/cm/dg C]
+    { 0.57e5, 2.2e5, 0.025e5, 8.8e5, 2.9e5, 0.25e5 }; // [erg/s/cm/dg C]
 
   // Air conductivity is modified by water vapour.
   const double vapour_conductivity = 0.040e5;
@@ -248,50 +248,50 @@ HorHeat::ThermalConductivity (const Hydraulic& hydraulic,
        i = constituents (i + 1))
     {
       if (i != medium && content[i] > 0.0)
-	{
-	  const double a = thermal_conductivity[i] 
-	    / thermal_conductivity[medium] - 1.0;
-	  double k = -42.42e42;
-	  switch (i)
-	    {
-	    case Water:
-	    case Ice:
-	      k = (1.0 / (1.0 + a)) / 3.0;
-	      break;
-	    case Quarts:
-	    case Minerals:
-	    case Air:
-	      {
-		const double g = DepolationsFactor (hydraulic, i, 
-						    (i == Quarts)
-						    ? quarts_form_factor
-						    : mineral_form_factor);
-		k = (2.0 / (1.0 + a * g)
-		     + 1.0 / (1.0 + a * (1.0 - 2.0 * g)))
-		  / 3.0;
-	      }
-	      break;
-	    case Organic_Matter:
-	      {
-		const double Alfa = -3.0;
-		k = (1.0 / (1.0 + a / (1.0 - Alfa))
-		     + 1.0 / (1.0 - a * Alfa / (1.0 - Alfa))) / 3.0;
-	      }
-	    break;
-	    case Constituents_End:
-	      daisy_notreached ();
-	    }
-	  S1 += k * content[i] * thermal_conductivity[i];
-	  S2 += k * content[i];
-	}
+        {
+          const double a = thermal_conductivity[i] 
+            / thermal_conductivity[medium] - 1.0;
+          double k = -42.42e42;
+          switch (i)
+            {
+            case Water:
+            case Ice:
+              k = (1.0 / (1.0 + a)) / 3.0;
+              break;
+            case Quarts:
+            case Minerals:
+            case Air:
+              {
+                const double g = DepolationsFactor (hydraulic, i, 
+                                                    (i == Quarts)
+                                                    ? quarts_form_factor
+                                                    : mineral_form_factor);
+                k = (2.0 / (1.0 + a * g)
+                     + 1.0 / (1.0 + a * (1.0 - 2.0 * g)))
+                  / 3.0;
+              }
+              break;
+            case Organic_Matter:
+              {
+                const double Alfa = -3.0;
+                k = (1.0 / (1.0 + a / (1.0 - Alfa))
+                     + 1.0 / (1.0 - a * Alfa / (1.0 - Alfa))) / 3.0;
+              }
+              break;
+            case Constituents_End:
+              daisy_notreached ();
+            }
+          S1 += k * content[i] * thermal_conductivity[i];
+          S2 += k * content[i];
+        }
     }
   return S1 / S2;
 }
 
 const double 
 HorHeat::heat_capacity_table[Constituents_End] = // [erg / cm³ / °C]
-// Ice is given as equivalent amount of water.
-{ 4.2e7, 1.9e7 * (1.0 / 0.92), 1.25e4, 2.0e7, 2.0e7, 2.5e7 }; 
+  // Ice is given as equivalent amount of water.
+  { 4.2e7, 1.9e7 * (1.0 / 0.92), 1.25e4, 2.0e7, 2.0e7, 2.5e7 }; 
 
 HorHeat::HorHeat (const FrameSubmodel& al)
   : quarts_form_factor (al.number ("quarts_form_factor")),
