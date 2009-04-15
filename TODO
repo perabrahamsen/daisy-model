@@ -2,12 +2,6 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Regression testing
 
-DONE ** kopier log_table til log_dlf
-
-** fjern table specific fra log_dlf
-
-** lad log_table nedarbe fra log_dlf
-
 ** kopier log_table til log_regression
 
 ** omskriv log_regression til kun at udregne og udskrive en linie

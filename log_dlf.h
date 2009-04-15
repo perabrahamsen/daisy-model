@@ -33,8 +33,6 @@
 
 struct LogDLF : public LogSelect
 {
-  static const char *const default_description;
-
   // File Content.
   const symbol parsed_from_file; // Defined in...
   const symbol file;       // Filename.

@@ -1,3 +1,10 @@
+2009-04-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log_table.C: Inherit from 'log_dlf.C'.
+
+	* log_select.C (description): Only store user value.
+	* dlf.C (log_description): Don't print empty description.
+
 2009-04-14  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* value.h (Sequence): Split into 'Variable', 'CanopyCells',

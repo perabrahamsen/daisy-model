@@ -29,14 +29,10 @@
 #include "block.h"
 #include "frame.h"
 #include "treelog.h"
-#include "summary.h"
 #include "scope_block.h"
 #include "filepos.h"
 #include "librarian.h"
 #include <sstream>
-
-const char *const LogDLF::default_description = "\
-Shared base class for log models generating Daisy Log File formatted results.";
 
 void
 LogDLF::common_match (const Daisy& daisy, Treelog&)
@@ -181,6 +177,7 @@ LogDLF::done (const std::vector<Time::component_t>& time_columns,
   common_done (time_columns, time, dt);
   end = time;
 }
+
 bool 
 LogDLF::initial_match (const Daisy& daisy, Treelog& msg)
 {
@@ -189,6 +186,7 @@ LogDLF::initial_match (const Daisy& daisy, Treelog& msg)
   common_match (daisy, msg);
   return LogSelect::initial_match (daisy, msg);
 }
+
 void 
 LogDLF::initial_done (const std::vector<Time::component_t>& time_columns,
                         const Time& time, const double dt)
@@ -211,7 +209,8 @@ LogDLF::initial_done (const std::vector<Time::component_t>& time_columns,
   begin = time;
 }
 
-bool LogDLF::check (const Border& border, Treelog& msg) const
+bool 
+LogDLF::check (const Border& border, Treelog& msg) const
 { 
   Treelog::Open nest (msg, name);
   bool ok = LogSelect::check (border, msg);
@@ -246,8 +245,7 @@ LogDLF::initialize (Treelog& msg)
     print_header.parameter (out, parameters[i].first, parameters[i].second);
 
   print_header.interval (out, *volume);
-  if (description != default_description)
-    print_header.log_description (out, description);
+  print_header.log_description (out, description);
 
   out.flush ();
 }
@@ -303,8 +301,8 @@ LogDLF::~LogDLF ()
 static struct LogDLFSyntax : public DeclareBase
 {
   LogDLFSyntax ()
-    : DeclareBase (Log::component, "dlf", "select", 
-                   LogDLF::default_description)
+    : DeclareBase (Log::component, "DLF", "select", "\
+Shared base class for log models generating Daisy Log File formatted results.")
   { }
   void load_frame (Frame& frame) const
   { 

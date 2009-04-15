@@ -21,13 +21,12 @@
 
 #define BUILD_DLL
 
-#include "log_select.h"
+#include "log_dlf.h"
 #include "library.h"
 #include "block.h"
 #include "select.h"
 #include "summary.h"
 #include "geometry.h"
-#include "dlf.h"
 #include "daisy.h"
 #include "timestep.h"
 #include "vcheck.h"
@@ -39,31 +38,11 @@
 #include "filepos.h"
 #include "assertion.h"
 #include <sstream>
-#include <fstream>
 
-struct LogTable : public LogSelect, public Destination
+struct LogTable : public LogDLF, public Destination
 {
-  static const char *const default_description;
-
-  // File Content.
-  const symbol parsed_from_file; // Defined in...
-  const symbol file;       // Filename.
-  std::ofstream out;            // Output stream.
-  const bool flush;             // Flush after each time step.
-  const symbol record_separator; // String to print on records (time steps).
-  const symbol field_separator; // String to print between fields.
-  const symbol error_string; // String to print on errors.
-  const symbol missing_value; // String to print for missing values.
-  const symbol array_separator; // String to print between array entries.
-  DLF print_header;             // How much header should be printed?
-  std::vector<std::pair<symbol, symbol>/**/> parameters;      // Par vals.
-  bool print_tags;              // Set if tags should be printed.
-  bool print_dimension;         // Set if dimensions should be printed.
-  const bool print_initial;     // Set if initial values should be printed.
-  const bool std_time_columns;  // Add year, month, day and hour columns.
-  const std::vector<Summary*> summary; // Summarize this log file.
-  Time begin;                   // First log entry.
-  Time end;                     // Last log entry.
+  // Summarize this log file.
+  const auto_vector<Summary*> summary;
 
   // destination Content.
   enum { Error, Missing, Number, Name, Array } type;
@@ -71,20 +50,11 @@ struct LogTable : public LogSelect, public Destination
   symbol dest_name;
   const std::vector<double>* dest_array;
   
-  // Log.
-  void common_match (const Daisy& daisy, Treelog& out);
-  void common_done (const std::vector<Time::component_t>& time_columns,
-                    const Time& time, double dt);
-
-  // Log.
-  bool match (const Daisy& daisy, Treelog& out);
-  void done (const std::vector<Time::component_t>& time_columns,
-             const Time& time, double dt);
+  // LogDLF.
+  void process_entry (size_t i);
 
   // Initial line.
   bool initial_match (const Daisy&, Treelog&);
-  void initial_done (const std::vector<Time::component_t>& time_columns,
-                     const Time& time, const double dt);
 
   // Select::Destination
   void error ();
@@ -94,221 +64,53 @@ struct LogTable : public LogSelect, public Destination
   void add (const symbol value);
 
   // Create and destroy.
-  bool check (const Border&, Treelog& msg) const;
-  static bool contain_time_columns (const std::vector<Select*>& entries);
   void initialize (Treelog&);
-  static std::vector<std::pair<symbol, symbol>/**/>
-  /**/ build_parameters (Block& al);
   explicit LogTable (Block& al);
   void summarize (Treelog&);
   ~LogTable ();
 };
 
-const char *const LogTable::default_description = "\
-Each selected variable is represented by a column in the specified log file.";
-
-void
-LogTable::common_match (const Daisy& daisy, Treelog&)
-{ print_header.finish (out, daisy); }
-
 void 
-LogTable::common_done (const std::vector<Time::component_t>& time_columns,
-                       const Time& time, const double dt)
+LogTable::process_entry (const size_t i)
 { 
-  if (print_tags)
+  switch (type)
     {
-      if (std_time_columns)
-        for (size_t i = 0; i < time_columns.size (); i++)
-          out << Time::component_name (time_columns[i]) << field_separator;
-
-      // Print the entry names in the first line of the log file..
-      for (unsigned int i = 0; i < entries.size (); i++)
-        {
-          if (i != 0)
-            out << field_separator;
-
-          const Geometry *const geo = entries[i]->geometry ();
-          const int size = entries[i]->size ();
-          const symbol tag = entries[i]->tag ();
-          static const symbol empty_symbol ("");
-
-          if (geo && size >= 0)
-            {
-              if (geo->cell_size () == size)
-                {
-                  // Content.
-                  for (unsigned j = 0; j < size; j++)
-                    {
-                      if (j != 0)
-                        out << array_separator;
-                      if (tag != empty_symbol)
-                        out << tag << " @ ";
-                      out << geo->cell_name (j);
-                    }
-                }
-              else if (geo->edge_size () == size)
-                {
-                  // Flux
-                  for (unsigned j = 0; j < size; j++)
-                    {
-                      if (j != 0)
-                        out << array_separator;
-                      if (tag != empty_symbol)
-                        out << tag << " @ ";
-                      out << geo->edge_name (j);
-                    }
-                }
-              else
-                {
-                  // Other arrays (buggy if other array have same size as geo.)
-                  for (unsigned j = 0; j < size; j++)
-                    {
-                      if (j != 0)
-                        out << array_separator;
-                      out << tag << "[" << j << "]";
-                    }
-                }
-            }
-          else
-            out << entries[i]->tag ();
-        }
-      out << record_separator;
-      print_tags = false;
-    }
-  if (print_dimension)
-    {
-      if (std_time_columns)
-        for (size_t i = 0; i < time_columns.size (); i++)
-          out << field_separator;
-
-      // Print the entry names in the first line of the log file..
-      for (unsigned int i = 0; i < entries.size (); i++)
-        {
-          if (i != 0)
-            out << field_separator;
-
-          const int size = entries[i]->size ();
-          symbol dimension = entries[i]->dimension ().name ();
-          if (dimension == Value::None () 
-              || dimension == Value::Unknown ()
-              || dimension == Value::Fraction ())
-            dimension = "";
-
-          if (size >= 0)
-            {
-              for (unsigned j = 0; j < size; j++)
-                {
-                  if (j != 0)
-                    out << array_separator;
-                  out << dimension;
-                }
-            }
-          else
-            out << dimension;
-        }
-      out << record_separator;
-      print_dimension = false;
-    }
-
-  if (std_time_columns)
-    for (size_t i = 0; i < time_columns.size (); i++)
-      out << time.component_value (time_columns[i]) << field_separator;
-
-  for (size_t i = 0; i < entries.size (); i++)
-    {
-      if (i != 0)
-        out << field_separator;
-      
-      entries[i]->done (dt);
-
-      switch (type)
-        {
-        case Error:
-          out << error_string;
-          break;
-        case Missing: 
-          out << missing_value;
-          break;
-        case Number:
-          out << dest_number;
-          break;
-        case Name: 
-          out << dest_name;
-          break;
-        case Array:
+    case Error:
+      out << error_string;
+      break;
+    case Missing: 
+      out << missing_value;
+      break;
+    case Number:
+      out << dest_number;
+      break;
+    case Name: 
+      out << dest_name;
+      break;
+    case Array:
+      {
+        daisy_assert (dest_array);
+        const std::vector<double> array = *dest_array;
+        for (unsigned int i = 0; i < array.size (); i++)
           {
-            daisy_assert (dest_array);
-            const std::vector<double> array = *dest_array;
-            for (unsigned int i = 0; i < array.size (); i++)
-              {
-                if (i != 0)
-                  out << array_separator;
-                out << array[i];
-              }
+            if (i != 0)
+              out << array_separator;
+            out << array[i];
           }
-          break;
-        default:
-          daisy_notreached ();
-        }
+      }
+      break;
+    default:
+      daisy_notreached ();
     }
-  out << record_separator;
-  if (flush)
-    out.flush ();
 }
 
-bool 
-LogTable::match (const Daisy& daisy, Treelog& msg)
-{
-  common_match (daisy, msg);
-  return LogSelect::match (daisy, msg);
-}
-void 
-LogTable::done (const std::vector<Time::component_t>& time_columns,
-                const Time& time, const double dt)
-{ 
-  LogSelect::done (time_columns, time, dt);
-
-  if (!is_printing)
-    return;
-
-  for (unsigned int i = 0; i < entries.size (); i++)
-    if (entries[i]->prevent_printing ())
-      return;
-
-  common_done (time_columns, time, dt);
-  end = time;
-}
 bool 
 LogTable::initial_match (const Daisy& daisy, Treelog& msg)
 {
-  begin = daisy.time;
-
   for (unsigned int i = 0; i < summary.size (); i++)
     summary[i]->clear ();
 
-  common_match (daisy, msg);
-  return LogSelect::initial_match (daisy, msg);
-}
-void 
-LogTable::initial_done (const std::vector<Time::component_t>& time_columns,
-                        const Time& time, const double dt)
-{ 
-  LogSelect::initial_done (time_columns, time, dt);
-
-  bool prevent_printing = !print_initial;
-  for (unsigned int i = 0; i < entries.size (); i++)
-    if (entries[i]->prevent_printing ())
-      prevent_printing = true;
-
-  if (prevent_printing)
-    {
-      for (unsigned int i = 0; i < entries.size (); i++)
-        entries[i]->done (dt);
-      return;
-    }
-      
-  common_done (time_columns, time, dt);
-  begin = time;
+  return LogDLF::initial_match (daisy, msg);
 }
 
 void 
@@ -344,92 +146,20 @@ LogTable::add (const symbol value)
   dest_name = value;
 }
 
-bool LogTable::check (const Border& border, Treelog& msg) const
-{ 
-  Treelog::Open nest (msg, name);
-  bool ok = LogSelect::check (border, msg);
-  if (!out.good ())
-    {
-      std::ostringstream tmp;
-      tmp << "Write error for '" << file << "'";
-      msg.error (tmp.str ());
-      ok = false;
-    }
-  return ok; 
-}
-
-bool 
-LogTable::contain_time_columns (const std::vector<Select*>& entries)
-{
-  static const symbol time ("time");
-  for (unsigned int i = 0; i < entries.size (); i++)
-    if (entries[i]->path[0] == time)
-      return true;
-  return false;
-}
 
 void
 LogTable::initialize (Treelog& msg)
 {
-  out.open (file.name ().c_str ());
-
-  print_header.start (out, name, file, parsed_from_file);
-
-  for (size_t i = 0; i < parameters.size (); i++)
-    print_header.parameter (out, parameters[i].first, parameters[i].second);
-
-  print_header.interval (out, *volume);
-  if (description != default_description)
-    print_header.log_description (out, description);
-
-  out.flush ();
+  LogDLF::initialize (msg);
 
   Treelog::Open nest (msg, name);
   for (unsigned int i = 0; i < summary.size (); i++)
     summary[i]->initialize (entries, msg);
 }
 
-std::vector<std::pair<symbol, symbol>/**/>
-LogTable::build_parameters (Block& al)
-{
-  std::vector<std::pair<symbol, symbol>/**/> result;
-  ScopeBlock scope_block (al);
-  std::vector<symbol> pars = al.name_sequence ("parameter_names");
-  for (size_t i = 0; i < pars.size (); i++)
-    {
-      const symbol key = pars[i];
-      if (scope_block.has_name (key))
-        {
-          const symbol value = scope_block.name (key);
-          std::string id = key.name ();
-          std::transform (id.begin (), id.end (), id.begin (), ::toupper);
-          result.push_back (std::pair<symbol, symbol> (symbol (id), value));
-        }
-      else
-        al.msg ().warning ("Parameter name '" + key + "' not found"); 
-    }
-  return result;
-}
-
 LogTable::LogTable (Block& al)
-  : LogSelect (al),
-    parsed_from_file (al.frame ().inherited_position ().filename ()),
-    file (al.name ("where")),
-    flush (al.flag ("flush")),
-    record_separator (al.name ("record_separator")),
-    field_separator (al.name ("field_separator")),
-    error_string (al.name ("error_string")),
-    missing_value (al.name ("missing_value")),
-    array_separator (al.name ("array_separator")),
-    print_header (al.name ("print_header")),
-    parameters (build_parameters (al)),
-    print_tags (al.flag ("print_tags")),
-    print_dimension (al.flag ("print_dimension")),
-    print_initial (al.flag ("print_initial")),
-    std_time_columns (al.ok () && !contain_time_columns (entries)),
+  : LogDLF (al),
     summary (Librarian::build_vector<Summary> (al, "summary")),
-    begin (1, 1, 1, 1),
-    end (1, 1, 1, 1),
     type (Error),
     dest_number (-42.42e42),
     dest_name ("Daisy bug"),
@@ -437,6 +167,7 @@ LogTable::LogTable (Block& al)
 {
   if (!al.ok ())
     return;
+
   for (unsigned int i = 0; i < entries.size (); i++)
     entries[i]->add_dest (this);
 }
@@ -460,11 +191,7 @@ LogTable::summarize (Treelog& msg)
 }
 
 LogTable::~LogTable ()
-{
-  sequence_delete (summary.begin (), summary.end ());
-  if (!out.good ())
-    Assertion::error ("Problems writing to '" + file + "'");
-}
+{ }
 
 static struct LogTableSyntax : public DeclareModel
 {
@@ -472,63 +199,15 @@ static struct LogTableSyntax : public DeclareModel
   { return new LogTable (al); }
 
   LogTableSyntax ()
-    : DeclareModel (Log::component, "table", "select", 
-                    LogTable::default_description)
+    : DeclareModel (Log::component, "table", "DLF", "\
+Each selected variable is represented by a column in the specified log file.")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.declare ("parameter_names", Value::String, 
-                   Value::Const, Value::Variable, "\
-List of string parameters to print to the table header.\n\
-\n\
-For example, if you have defined 'column' and 'crop' parameters for\n\
-this table log parameterization, you can print them to the log file\n\
-header by specifying '(names column crop)'.");
-    frame.set_empty ("parameter_names");
-    frame.declare ("where", Value::String, Value::Const,
-                   "Name of the log file to create.");
-    frame.declare ("print_header", Value::String, Value::Const,
-                   "If this is set to 'false', no header is printed.\n\
-If this is set to 'true', a full header is printer.\n\
-If this is set to 'fixed', a small fixed size header is printed.");
-    static VCheck::Enum check_header ("false", "true", "fixed");
-    frame.set_check ("print_header", check_header);
-    frame.set ("print_header", "true");
-    frame.declare ("print_tags", Value::Boolean, Value::Const,
-                   "Print a tag line in the file.");
-    frame.set ("print_tags", true);
-    frame.declare ("print_dimension", Value::Boolean, Value::Const,
-                   "Print a line with units after the tag line.");
-    frame.set ("print_dimension", true);
-    frame.declare ("print_initial", Value::Boolean, Value::Const,
-                   "Print a line with initial values when logging starts.");
-    frame.set ("print_initial", true);
-    frame.declare ("flush", Value::Boolean, Value::Const,
-                   "Flush to disk after each entry (for debugging).");
-    frame.set ("flush", false);
-    frame.declare ("record_separator", Value::String, Value::Const, "\
-String to print between records (time steps).");
-    frame.set ("record_separator", "\n");
-    frame.declare ("field_separator", Value::String, Value::Const, "\
-String to print between fields.");
-    frame.set ("field_separator", "\t");
-    frame.declare ("error_string", Value::String, Value::Const, "\
-String to print when errors are encountered.");
-    frame.set ("error_string", "!");
-    frame.declare ("missing_value", Value::String, Value::Const, "\
-String to print when the path doesn't match anything.\n\
-This can be relevant for example if you are logging a crop, and there are\n\
-no crops on the field.");
-    frame.set ("missing_value", "00.00");
-    frame.declare ("array_separator", Value::String, Value::Const, "\
-String to print between array entries.");
-    frame.set ("array_separator", "\t");
     frame.declare_object ("summary", Summary::component,
                           Value::Const, Value::Variable,
                           "Summaries for this log file.");
     frame.set_empty ("summary");
-    Librarian::add_doc_fun (LogSelect::component, 
-                            LogSelect::document_entries);
   }
 } LogTable_syntax;
 

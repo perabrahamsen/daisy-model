@@ -215,7 +215,7 @@ LogSelect::check (const Border& border, Treelog& err) const
 
 LogSelect::LogSelect (Block& al)
   : Log (al),
-    description (al.frame ().description ()),
+    description (al.name ("description", "")),
     condition (Librarian::build_item<Condition> (al, "when")),
     entries (Librarian::build_vector<Select> (al, "entries")),
     volume (Volume::build_obsolete (al))

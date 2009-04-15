@@ -74,6 +74,10 @@ DLF::interval (std::ostream& out, const Volume& volume) const
 void
 DLF::log_description (std::ostream& out, const symbol description_s) const
 {
+  if (description_s == "")
+    // No interesting description.
+    return;
+
   const std::string description = description_s.name ();
   if (value != DLF::Full)
     return;
