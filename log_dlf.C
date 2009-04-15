@@ -152,35 +152,7 @@ LogDLF::common_done (const std::vector<Time::component_t>& time_columns,
       
       entries[i]->done (dt);
 
-      switch (type)
-        {
-        case Error:
-          out << error_string;
-          break;
-        case Missing: 
-          out << missing_value;
-          break;
-        case Number:
-          out << dest_number;
-          break;
-        case Name: 
-          out << dest_name;
-          break;
-        case Array:
-          {
-            daisy_assert (dest_array);
-            const std::vector<double> array = *dest_array;
-            for (unsigned int i = 0; i < array.size (); i++)
-              {
-                if (i != 0)
-                  out << array_separator;
-                out << array[i];
-              }
-          }
-          break;
-        default:
-          daisy_notreached ();
-        }
+      process_entry (i);
     }
   out << record_separator;
   if (flush)
@@ -214,9 +186,6 @@ LogDLF::initial_match (const Daisy& daisy, Treelog& msg)
 {
   begin = daisy.time;
 
-  for (unsigned int i = 0; i < summary.size (); i++)
-    summary[i]->clear ();
-
   common_match (daisy, msg);
   return LogSelect::initial_match (daisy, msg);
 }
@@ -240,39 +209,6 @@ LogDLF::initial_done (const std::vector<Time::component_t>& time_columns,
       
   common_done (time_columns, time, dt);
   begin = time;
-}
-
-void 
-LogDLF::error ()
-{ 
-  type = Error;
-}
-
-void 
-LogDLF::missing ()
-{ 
-  type = Missing;
-}
-
-void 
-LogDLF::add (const std::vector<double>& value)
-{ 
-  type = Array;
-  dest_array = &value;
-}
-
-void 
-LogDLF::add (const double value)
-{ 
-  type = Number;
-  dest_number = value;
-}
-
-void 
-LogDLF::add (const symbol value)
-{ 
-  type = Name;
-  dest_name = value;
 }
 
 bool LogDLF::check (const Border& border, Treelog& msg) const
@@ -314,10 +250,6 @@ LogDLF::initialize (Treelog& msg)
     print_header.log_description (out, description);
 
   out.flush ();
-
-  Treelog::Open nest (msg, name);
-  for (unsigned int i = 0; i < summary.size (); i++)
-    summary[i]->initialize (entries, msg);
 }
 
 std::vector<std::pair<symbol, symbol>/**/>
@@ -358,41 +290,12 @@ LogDLF::LogDLF (Block& al)
     print_dimension (al.flag ("print_dimension")),
     print_initial (al.flag ("print_initial")),
     std_time_columns (al.ok () && !contain_time_columns (entries)),
-    summary (Librarian::build_vector<Summary> (al, "summary")),
     begin (1, 1, 1, 1),
-    end (1, 1, 1, 1),
-    type (Error),
-    dest_number (-42.42e42),
-    dest_name ("Daisy bug"),
-    dest_array (NULL)
-{
-  if (!al.ok ())
-    return;
-  for (unsigned int i = 0; i < entries.size (); i++)
-    entries[i]->add_dest (this);
-}
-
-void
-LogDLF::summarize (Treelog& msg)
-{
-  if (summary.size () > 0)
-    {
-      Treelog::Open nest (msg, name);
-      std::ostringstream tmp;
-
-      tmp << "LOGFILE: " << file  << "\n";
-      tmp << "VOLUME: " << volume->one_line_description () << "\n";
-      tmp << "TIME: " << begin.print () << " to " << end.print ();
-      msg.message (tmp.str ());
-      const Timestep step = end - begin;
-      for (size_t i = 0; i < summary.size (); i++)
-        summary[i]->summarize (Time::hours_between (begin, end), msg);
-    }
-}
+    end (1, 1, 1, 1)
+{ }
 
 LogDLF::~LogDLF ()
 {
-  sequence_delete (summary.begin (), summary.end ());
   if (!out.good ())
     Assertion::error ("Problems writing to '" + file + "'");
 }
@@ -451,10 +354,6 @@ no crops on the field.");
     frame.declare ("array_separator", Value::String, Value::Const, "\
 String to print between array entries.");
     frame.set ("array_separator", "\t");
-    frame.declare_object ("summary", Summary::component,
-                          Value::Const, Value::Variable,
-                          "Summaries for this log file.");
-    frame.set_empty ("summary");
     Librarian::add_doc_fun (LogSelect::component, 
                             LogSelect::document_entries);
   }

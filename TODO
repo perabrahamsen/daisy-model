@@ -22,7 +22,12 @@ dato version revision værdier
 
 skal klare filhåntering.
 
-*
+* C_below læst fra tidsserie
+
+Number::tick skal tage tid some argument.
+
+Number::File (NumberSource)?
+
 * Artikler
 
 ** OM init (BGJ)

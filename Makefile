@@ -1226,9 +1226,14 @@ bioincorporation${OBJ}: bioincorporation.C bioincorporation.h \
   frame_submodel.h frame.h scope.h value.h symbol.h log.h time.h border.h \
   model.h geometry.h soil.h am.h im.h librarian.h plf.h aom.h om.h \
   check.h vcheck.h mathlib.h assertion.h
+log_dlf${OBJ}: log_dlf.C log_dlf.h log_select.h log.h time.h symbol.h \
+  border.h model.h memutils.h destination.h dlf.h select.h units.h \
+  volume.h geometry.h value.h assertion.h daisy.h program.h run.h \
+  timestep.h vcheck.h block.h frame.h scope.h treelog.h summary.h \
+  scope_block.h filepos.h librarian.h
 reaction_colgen${OBJ}: reaction_colgen.C reaction_colgen.h reaction.h model.h \
-  symbol.h librarian.h frame.h scope.h value.h log.h time.h border.h \
-  chemistry.h treelog.h block.h
+  symbol.h ponddamp.h librarian.h frame.h scope.h value.h log.h time.h \
+  border.h chemistry.h treelog.h block.h
 weather_base${OBJ}: weather_base.C weather_base.h weather.h model.h symbol.h \
   im.h value.h fao.h assertion.h time.h log.h border.h mathlib.h \
   librarian.h block.h units.h frame.h scope.h
@@ -1324,7 +1329,7 @@ im${OBJ}: im.C im.h symbol.h value.h chemical.h model.h units.h unit.h am.h \
   assertion.h
 frame${OBJ}: frame.C frame.h scope.h value.h symbol.h frame_model.h \
   frame_submodel.h syntax.h block.h assertion.h librarian.h model.h \
-  intrinsics.h library.h memutils.h alist.h filepos.h
+  intrinsics.h library.h memutils.h alist.h filepos.h metalib.h
 bdconv${OBJ}: bdconv.C bdconv.h convert.h symbol.h geometry.h value.h soil.h \
   volume.h model.h units.h assertion.h
 abiotic${OBJ}: abiotic.C abiotic.h mathlib.h assertion.h
@@ -1419,13 +1424,13 @@ cdaisy${OBJ}: cdaisy.C scope.h value.h symbol.h block.h metalib.h frame.h \
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
 reaction_Morgan98${OBJ}: reaction_Morgan98.C reaction_colgen.h reaction.h \
-  model.h symbol.h mathlib.h assertion.h check.h block.h value.h \
-  librarian.h chemistry.h chemical.h log.h time.h border.h treelog.h \
-  frame.h scope.h ponddamp.h rainergy.h
+  model.h symbol.h ponddamp.h mathlib.h assertion.h check.h block.h \
+  value.h librarian.h chemistry.h chemical.h log.h time.h border.h \
+  treelog.h frame.h scope.h rainergy.h
 reaction_Styczen88${OBJ}: reaction_Styczen88.C reaction_colgen.h reaction.h \
-  model.h symbol.h mathlib.h assertion.h check.h block.h value.h \
-  librarian.h chemistry.h chemical.h log.h time.h border.h geometry.h \
-  soil.h treelog.h frame.h scope.h plf.h ponddamp.h
+  model.h symbol.h ponddamp.h mathlib.h assertion.h check.h block.h \
+  value.h librarian.h chemistry.h chemical.h log.h time.h border.h \
+  geometry.h soil.h treelog.h frame.h scope.h plf.h
 program_GP2D${OBJ}: program_GP2D.C program.h model.h symbol.h run.h \
   geometry_rect.h geometry_vert.h geometry.h value.h rootdens.h treelog.h \
   block.h submodeler.h check.h librarian.h assertion.h frame.h scope.h
@@ -1434,9 +1439,9 @@ svat_ssoc${OBJ}: svat_ssoc.C svat.h model.h symbol.h block.h value.h \
   geometry.h weather.h im.h vegetation.h assertion.h log.h time.h \
   border.h treelog.h mathlib.h solver.h frame.h scope.h
 reaction_Jarvis99${OBJ}: reaction_Jarvis99.C reaction_colgen.h reaction.h \
-  model.h symbol.h mathlib.h assertion.h check.h block.h value.h \
-  librarian.h chemistry.h chemical.h log.h time.h border.h geometry.h \
-  soil.h treelog.h frame.h scope.h rainergy.h ponddamp.h
+  model.h symbol.h ponddamp.h mathlib.h assertion.h check.h block.h \
+  value.h librarian.h chemistry.h chemical.h log.h time.h border.h \
+  geometry.h soil.h treelog.h frame.h scope.h rainergy.h
 reaction_filter${OBJ}: reaction_filter.C reaction.h model.h symbol.h block.h \
   value.h transform.h chemistry.h chemical.h soil.h soil_water.h log.h \
   time.h border.h assertion.h librarian.h check.h mathlib.h treelog.h \
@@ -1933,8 +1938,8 @@ crop_std${OBJ}: crop_std.C crop.h model.h symbol.h time.h chemistry.h seed.h \
   memutils.h check.h treelog.h frame.h scope.h
 action_sow${OBJ}: action_sow.C action.h model.h symbol.h block.h value.h \
   daisy.h program.h run.h time.h timestep.h vcheck.h memutils.h field.h \
-  border.h crop.h librarian.h check.h dlf.h treelog.h frame_model.h \
-  frame.h scope.h
+  border.h crop.h librarian.h check.h treelog.h frame_model.h frame.h \
+  scope.h
 action_stop${OBJ}: action_stop.C action.h model.h symbol.h daisy.h program.h \
   run.h time.h timestep.h vcheck.h memutils.h librarian.h
 condition_time${OBJ}: condition_time.C condition.h model.h symbol.h block.h \

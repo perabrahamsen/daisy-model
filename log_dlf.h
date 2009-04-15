@@ -26,15 +26,12 @@
 #define BUILD_DLL
 
 #include "log_select.h"
-#include "destination.h"
 #include "dlf.h"
 #include "symbol.h"
 #include <fstream>
 #include <vector>
 
-class Summary;
-
-struct LogDLF : public LogSelect, public Destination
+struct LogDLF : public LogSelect
 {
   static const char *const default_description;
 
@@ -54,20 +51,14 @@ struct LogDLF : public LogSelect, public Destination
   bool print_dimension;         // Set if dimensions should be printed.
   const bool print_initial;     // Set if initial values should be printed.
   const bool std_time_columns;  // Add year, month, day and hour columns.
-  const std::vector<Summary*> summary; // Summarize this log file.
   Time begin;                   // First log entry.
   Time end;                     // Last log entry.
 
-  // destination Content.
-  enum { Error, Missing, Number, Name, Array } type;
-  double dest_number;
-  symbol dest_name;
-  const std::vector<double>* dest_array;
-  
   // Log.
   void common_match (const Daisy& daisy, Treelog& out);
   void common_done (const std::vector<Time::component_t>& time_columns,
                     const Time& time, double dt);
+  virtual void process_entry (size_t) = 0;
 
   // Log.
   bool match (const Daisy& daisy, Treelog& out);
@@ -79,13 +70,6 @@ struct LogDLF : public LogSelect, public Destination
   void initial_done (const std::vector<Time::component_t>& time_columns,
                      const Time& time, const double dt);
 
-  // Select::Destination
-  void error ();
-  void missing ();
-  void add (const std::vector<double>& value);
-  void add (const double value);
-  void add (const symbol value);
-
   // Create and destroy.
   bool check (const Border&, Treelog& msg) const;
   static bool contain_time_columns (const std::vector<Select*>& entries);
@@ -93,7 +77,6 @@ struct LogDLF : public LogSelect, public Destination
   static std::vector<std::pair<symbol, symbol>/**/>
   /**/ build_parameters (Block& al);
   explicit LogDLF (Block& al);
-  void summarize (Treelog&);
   ~LogDLF ();
 };
 
