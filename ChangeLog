@@ -1,3 +1,7 @@
+2009-04-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* groundwater_file.C (initialize): Calculate initial groundwater depth.
+
 2009-04-15  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* log_table.C: Inherit from 'log_dlf.C'.

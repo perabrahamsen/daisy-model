@@ -156,6 +156,9 @@ GroundwaterFile::initialize (const Units&,
   owned_stream = path.open_file (file_name);
   daisy_assert (!lex.get ());
   lex.reset (new LexerData (file_name.name (), *owned_stream, msg));
+  Time prev = time;
+  prev.tick_hour (-1);
+  tick (prev, msg); 
   tick (time, msg); 
 }
 
