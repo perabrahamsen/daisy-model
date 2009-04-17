@@ -129,13 +129,17 @@ struct GroundwaterAquitard : public Groundwater
   { return pressure_table->operator()(); }
 
   // Create and Destroy.
-  void initialize (const Units& units, const Geometry& geo, const Time&,
+  void initialize (const Units& units, const Geometry& geo, const Time& time,
                    const Scope& scope, Treelog& msg)
   {
     if (!pressure_table.get ())
       pressure_table.reset (Depth::create ((geo.bottom () - Z_aquitard)
                                            + h_aquifer));
     pressure_table->initialize (units, scope, msg);
+    Time prev = time;
+    prev.tick_hour (-1);
+    pressure_table->tick (units, prev, scope, msg);
+    pressure_table->tick (units, time, scope, msg);
     // Pressure below aquitard.
     if (pressure_table->check (units, scope, msg))
       set_h_aquifer (geo);
