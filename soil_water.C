@@ -768,7 +768,8 @@ SoilWater::initialize (const FrameSubmodel& al, const Geometry& geo,
   // Groundwater based pressure.
   {
     std::ostringstream tmp;
-    tmp << "Groundwater level is " << groundwater.table ();
+    tmp << "Groundwater level is " << groundwater.table () 
+        << ", h size is "  << h_.size ();
     msg.message (tmp.str ());
   }
   if (h_.size () == 0)
