@@ -22,20 +22,17 @@
 #define BUILD_DLL
 
 #include "log_dlf.h"
+#include "destination.h"
+#include "select.h"
 #include "library.h"
 #include "block.h"
-#include "select.h"
 #include "summary.h"
-#include "geometry.h"
-#include "daisy.h"
 #include "timestep.h"
-#include "vcheck.h"
 #include "memutils.h"
 #include "librarian.h"
 #include "scope_block.h"
 #include "treelog.h"
 #include "frame.h"
-#include "filepos.h"
 #include "assertion.h"
 #include <sstream>
 

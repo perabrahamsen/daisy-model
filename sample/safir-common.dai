@@ -88,11 +88,6 @@ Based on data collected by Fulai Liu, 2007."
   ;; is included in this data.     
   (Canopy (LeafAIMod (0.0 2.2) (0.4 1.1)(1.5 1.1)(2.0 0.3))))
 
-;; We don't have a Tomato calibration yet, use Potato.
-
-(defcrop "Tomato; SAFIR" "Potato; Folva; SAFIR"
-  "The Tomato calibrated for SAFIR")
-
 ;;----------------------------------------
 ;; Some additional log files.
 ;;----------------------------------------
