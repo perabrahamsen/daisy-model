@@ -466,7 +466,7 @@ COMPONENTS = rainergy.C ponddamp.C scope_model.C seed.C \
 
 # Submodels are combined models and components.
 #
-SUBMODELS = toplevel.C timestep.C geometry_rect.C doe.C \
+SUBMODELS = fetch_pretty.C toplevel.C timestep.C geometry_rect.C doe.C \
         geometry1d.C fetch.C horheat.C litter.C time.C \
 	som.C smb.C aom.C dom.C crpn.C vernalization.C \
 	partition.C production.C \

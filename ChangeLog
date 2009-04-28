@@ -1,3 +1,8 @@
+2009-04-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* fetch_pretty.C, fetch_pretty.h: New submodel.
+	* Makefile (SUBMODELS): Added it.
+
 2009-04-21  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* log_regress.C: New model.

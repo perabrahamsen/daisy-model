@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "summary.h"
-#include "fetch.h"
+#include "fetch_pretty.h"
 #include "select.h"
 #include "treelog.h"
 #include "memutils.h"
@@ -44,7 +44,7 @@ struct SummarySimple : public Summary
 
   // Content.
   const int precision;
-  const std::vector<Fetch*> fetch;
+  const std::vector<FetchPretty*> fetch;
 
   // Create and Destroy.
   void clear ();
@@ -59,13 +59,13 @@ A simple log file summary model.");
 
 void
 SummarySimple::clear ()
-{ Fetch::clear (fetch); }
+{ FetchPretty::clear (fetch); }
 
 void
 SummarySimple::initialize (std::vector<Select*>& select, Treelog& msg)
 { 
   Treelog::Open nest (msg, name);
-  Fetch::initialize (fetch, select, msg);
+  FetchPretty::initialize (fetch, select, msg);
 }
 
 SummarySimple::SummarySimple (Block& al)
@@ -77,7 +77,7 @@ SummarySimple::SummarySimple (Block& al)
     sum_name (al.name ("sum_name")),
     period (al.check ("period") ? al.name ("period") : symbol ("")),
     precision (al.integer ("precision")),
-    fetch (map_construct<Fetch> (al.submodel_sequence ("fetch")))
+    fetch (map_construct<FetchPretty> (al.submodel_sequence ("fetch")))
 { }
 
 SummarySimple::~SummarySimple ()
@@ -101,7 +101,7 @@ SummarySimple::summarize (const int hours, Treelog& msg) const
   int max_digits = 0;
   for (unsigned int i = 0; i < fetch.size (); i++)
     max_digits = std::max (max_digits, fetch[i]->value_size (total, period, hours));
-  max_digits = std::max (max_digits, Fetch::width (total));
+  max_digits = std::max (max_digits, FetchPretty::width (total));
   const int width = max_digits + (precision > 0 ? 1 : 0) + precision;
   size_t dim_size = 0;
   for (unsigned int i = 0; i < fetch.size (); i++)
@@ -166,7 +166,7 @@ By default, use the name of the parameterization.");
 Set this to 'y', 'm', 'w', 'd' or 'h' to get fluxes per time period\n\
 instead of total amount.");
     frame.declare_submodule_sequence ("fetch", Value::Const, "\
-List of columns to fetch for the summary.", Fetch::load_syntax);
+List of columns to fetch for the summary.", FetchPretty::load_syntax);
     frame.declare ("precision", Value::Integer, Value::Const,
                 "Number of digits to print after decimal point.");
     frame.set ("precision", 2);

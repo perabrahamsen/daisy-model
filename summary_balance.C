@@ -22,7 +22,7 @@
 
 #include "summary.h"
 #include "block.h"
-#include "fetch.h"
+#include "fetch_pretty.h"
 #include "select.h"
 #include "treelog.h"
 #include "memutils.h"
@@ -47,12 +47,12 @@ struct SummaryBalance : public Summary
   const std::vector<symbol> input;
   const std::vector<symbol> output;
   const std::vector<symbol> content;
-  const class ConstructFetch : public std::vector<Fetch*> 
+  const class ConstructFetch : public std::vector<FetchPretty*> 
   {
     void add (const std::vector<symbol>& a)
     {
       for (size_t i = 0; i < a.size (); i++)
-        push_back (new Fetch (a[i]));
+        push_back (new FetchPretty (a[i]));
     }
   public:
     ConstructFetch (const std::vector<symbol>& a, 
@@ -85,13 +85,13 @@ A summary model providing a balance for a log parameterization.";
 
 void
 SummaryBalance::clear ()
-{ Fetch::clear (fetch); }
+{ FetchPretty::clear (fetch); }
 
 void
 SummaryBalance::initialize (std::vector<Select*>& select, Treelog& msg)
 { 
   Treelog::Open nest (msg, name);
-  Fetch::initialize (fetch, select, msg);
+  FetchPretty::initialize (fetch, select, msg);
 }
 
 SummaryBalance::SummaryBalance (Block& al)
@@ -187,10 +187,10 @@ SummaryBalance::summarize (const int hours, Treelog& msg) const
   const double total_output = find_total (output, max_digits, hours);
   const double total_content = find_total (content, max_digits, hours);
   const double total = total_input - total_output - total_content;
-  max_digits = std::max (max_digits, Fetch::width (total_input));
-  max_digits = std::max (max_digits, Fetch::width (total_output));
-  max_digits = std::max (max_digits, Fetch::width (total_content));
-  max_digits = std::max (max_digits, Fetch::width (total));
+  max_digits = std::max (max_digits, FetchPretty::width (total_input));
+  max_digits = std::max (max_digits, FetchPretty::width (total_output));
+  max_digits = std::max (max_digits, FetchPretty::width (total_content));
+  max_digits = std::max (max_digits, FetchPretty::width (total));
 
   // Find total width.
   const int width = max_digits + (precision > 0 ? 1 : 0) + precision;

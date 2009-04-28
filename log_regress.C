@@ -1,7 +1,8 @@
-// log_regress.C -- Log selected data in tabular format.
+// log_regress.C -- Append summary data to a DLF file.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
+// Copyright 2009 Copenhagen University.
 //
 // This file is part of Daisy.
 // 
@@ -26,7 +27,6 @@
 #include "select.h"
 #include "library.h"
 #include "block.h"
-#include "summary.h"
 #include "timestep.h"
 #include "memutils.h"
 #include "librarian.h"
@@ -38,9 +38,6 @@
 
 struct LogRegress : public LogDLF, public Destination
 {
-  // Summarize this log file.
-  const auto_vector<Summary*> summary;
-
   // destination Content.
   enum { Error, Missing, Number, Name, Array } type;
   double dest_number;
@@ -104,9 +101,6 @@ LogRegress::process_entry (const size_t i)
 bool 
 LogRegress::initial_match (const Daisy& daisy, Treelog& msg)
 {
-  for (unsigned int i = 0; i < summary.size (); i++)
-    summary[i]->clear ();
-
   return LogDLF::initial_match (daisy, msg);
 }
 
@@ -148,15 +142,10 @@ void
 LogRegress::initialize (Treelog& msg)
 {
   LogDLF::initialize (msg);
-
-  Treelog::Open nest (msg, name);
-  for (unsigned int i = 0; i < summary.size (); i++)
-    summary[i]->initialize (entries, msg);
 }
 
 LogRegress::LogRegress (Block& al)
   : LogDLF (al),
-    summary (Librarian::build_vector<Summary> (al, "summary")),
     type (Error),
     dest_number (-42.42e42),
     dest_name ("Daisy bug"),
@@ -171,21 +160,7 @@ LogRegress::LogRegress (Block& al)
 
 void
 LogRegress::summarize (Treelog& msg)
-{
-  if (summary.size () > 0)
-    {
-      Treelog::Open nest (msg, name);
-      std::ostringstream tmp;
-
-      tmp << "LOGFILE: " << file  << "\n";
-      tmp << "VOLUME: " << volume->one_line_description () << "\n";
-      tmp << "TIME: " << begin.print () << " to " << end.print ();
-      msg.message (tmp.str ());
-      const Timestep step = end - begin;
-      for (size_t i = 0; i < summary.size (); i++)
-        summary[i]->summarize (Time::hours_between (begin, end), msg);
-    }
-}
+{ }
 
 LogRegress::~LogRegress ()
 { }
@@ -197,15 +172,12 @@ static struct LogRegressSyntax : public DeclareModel
 
   LogRegressSyntax ()
     : DeclareModel (Log::component, "regress", "DLF", "\
-Each selected variable is represented by a column in the specified log file.")
+Maintain a DLF file containing simulation results from multiple runs.\n\
+Warn if result from this run diverge from previous runs.  The intention\n\
+is that model should be used for regression testing.")
   { }
-  void load_frame (Frame& frame) const
-  { 
-    frame.declare_object ("summary", Summary::component,
-                          Value::Const, Value::Variable,
-                          "Summaries for this log file.");
-    frame.set_empty ("summary");
-  }
+  void load_frame (Frame&) const
+  { }
 } LogRegress_syntax;
 
 // log_regress.C ends here.

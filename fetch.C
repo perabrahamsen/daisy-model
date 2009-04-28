@@ -229,31 +229,35 @@ Fetch::initialize (const std::vector<Fetch*>& fetch,
                    std::vector<Select*>& select, Treelog& msg)
 { 
   for (size_t i = 0; i != fetch.size (); i++)
+    fetch[i]->initialize (select, msg);
+}
+
+void
+Fetch::initialize (std::vector<Select*>& select, Treelog& msg)
+{ 
+  Treelog::Open nest (msg, this->tag);
+  bool found = false;
+  
+  for (size_t j = 0; j != select.size (); j++)
     {
-      Treelog::Open nest (msg, fetch[i]->tag);
-      bool found = false;
-      
-      for (size_t j = 0; j != select.size (); j++)
-	{
-	  Treelog::Open nest (msg, select[j]->tag ());
-	  
-	  if (fetch[i]->tag == select[j]->tag ())
-	    if (found)
-	      msg.warning ("Duplicate tag ignored");
-	    else
-	      {	
-		select[j]->add_dest (fetch[i]);
-		fetch[i]->select_dimension = select[j]->dimension ().name ();
-		fetch[i]->type = ((select[j]->handle != Handle::current)
-                                  && !select[j]->accumulate)
-		  ? Fetch::Flux 
-		  : Fetch::NewContent;
-		found = true;
-	      }
-	}
-      if (!found)
-	msg.warning ("No tag found");
+      Treelog::Open nest (msg, select[j]->tag ());
+
+      if (this->tag == select[j]->tag ())
+        if (found)
+          msg.warning ("Duplicate tag ignored");
+        else
+          {	
+            select[j]->add_dest (this);
+            this->select_dimension = select[j]->dimension ().name ();
+            this->type = ((select[j]->handle != Handle::current)
+                              && !select[j]->accumulate)
+              ? Fetch::Flux 
+              : Fetch::NewContent;
+            found = true;
+          }
     }
+  if (!found)
+    msg.warning ("No tag found");
 }
 
 void

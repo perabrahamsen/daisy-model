@@ -2,9 +2,9 @@ TODO --- things that needs to be done with Daisy -*- outline -*-
 
 * Regression testing
 
-** kopier log_table til log_regression
+** Divide fetch in "basic" and "pretty"
 
-** omskriv log_regression til kun at udregne og udskrive en linie
+** omskriv log_regress.C til kun at udregne og udskrive en linie
 
 dato version revision værdier
 

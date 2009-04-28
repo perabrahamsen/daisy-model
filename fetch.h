@@ -75,11 +75,14 @@ public:
   // Create and Destroy.
 public:
   static void clear (const std::vector<Fetch*>& fetch);
-private:
+protected:
   void clear ();
 public:
   static void initialize (const std::vector<Fetch*>& fetch,
                           std::vector<Select*>& select, Treelog& msg);
+protected:
+  void initialize (std::vector<Select*>& select, Treelog& msg);
+public:
   static void load_syntax (Frame&);
   explicit Fetch (const FrameSubmodel& al);
   explicit Fetch (const symbol key);
