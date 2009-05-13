@@ -272,8 +272,8 @@ Horizon::output (Log& log) const
 
 static const class SOM_fractions_check_type : public VCheck
 {
-  void check (Metalib&, const Frame& frame, const symbol key)
-    const throw (std::string)
+  bool verify (Metalib&, const Frame& frame, const symbol key,
+               Treelog& msg) const
   {
     daisy_assert (key == "SOM_fractions");
     daisy_assert (frame.check (key));
@@ -290,9 +290,16 @@ static const class SOM_fractions_check_type : public VCheck
           sum += fractions[i];
       }
     if (!has_negative && !approximate (sum, 1.0))
-      throw std::string ("sum must be 1.0");
+      {
+        msg.error ("sum must be 1.0");
+        return false;
+      }
     if (sum > 1.0 && !approximate (sum, 1.0))
-      throw std::string ("sum must be at most 1.0");
+      {
+        msg.error ("sum must be at most 1.0");
+        return false;
+      }
+    return true;
   };
 } SOM_fractions_check;
 

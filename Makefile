@@ -1128,13 +1128,17 @@ svat${OBJ}: svat.C svat.h model.h symbol.h log.h time.h border.h block.h \
   value.h librarian.h
 vegetation${OBJ}: vegetation.C vegetation.h model.h symbol.h log.h time.h \
   border.h frame.h scope.h value.h block.h librarian.h
+fetch_pretty${OBJ}: fetch_pretty.C fetch_pretty.h fetch.h destination.h \
+  symbol.h librarian.h model.h frame_submodel.h frame.h scope.h value.h \
+  mathlib.h assertion.h
 toplevel${OBJ}: toplevel.C toplevel.h metalib.h symbol.h frame.h scope.h \
   value.h daisy.h program.h model.h run.h time.h timestep.h vcheck.h \
   memutils.h ui.h library.h parser_file.h parser.h block.h path.h \
   version.h assertion.h treelog_text.h treelog.h treelog_store.h \
   librarian.h units.h frame_model.h
 timestep${OBJ}: timestep.C timestep.h time.h symbol.h vcheck.h \
-  frame_submodel.h frame.h scope.h value.h block.h assertion.h mathlib.h
+  frame_submodel.h frame.h scope.h value.h block.h assertion.h mathlib.h \
+  treelog.h
 geometry_rect${OBJ}: geometry_rect.C geometry_rect.h geometry_vert.h \
   geometry.h symbol.h value.h volume.h model.h check.h vcheck.h block.h \
   frame.h scope.h librarian.h treelog.h assertion.h mathlib.h
@@ -1145,8 +1149,7 @@ geometry1d${OBJ}: geometry1d.C geometry1d.h geometry_vert.h geometry.h \
   symbol.h value.h volume.h model.h block.h frame.h scope.h mathlib.h \
   assertion.h check.h vcheck.h librarian.h treelog.h
 fetch${OBJ}: fetch.C fetch.h destination.h symbol.h select.h model.h units.h \
-  volume.h treelog.h frame_submodel.h frame.h scope.h value.h mathlib.h \
-  assertion.h librarian.h
+  volume.h treelog.h frame_submodel.h frame.h scope.h value.h librarian.h
 horheat${OBJ}: horheat.C horheat.h texture.h plf.h hydraulic.h model.h \
   symbol.h frame_submodel.h frame.h scope.h value.h check.h mathlib.h \
   assertion.h librarian.h treelog.h
@@ -1227,10 +1230,10 @@ bioincorporation${OBJ}: bioincorporation.C bioincorporation.h \
   model.h geometry.h soil.h am.h im.h librarian.h plf.h aom.h om.h \
   check.h vcheck.h mathlib.h assertion.h
 log_dlf${OBJ}: log_dlf.C log_dlf.h log_select.h log.h time.h symbol.h \
-  border.h model.h memutils.h destination.h dlf.h select.h units.h \
+  border.h model.h memutils.h dlf.h select.h destination.h units.h \
   volume.h geometry.h value.h assertion.h daisy.h program.h run.h \
-  timestep.h vcheck.h block.h frame.h scope.h treelog.h summary.h \
-  scope_block.h filepos.h librarian.h
+  timestep.h vcheck.h block.h frame.h scope.h treelog.h scope_block.h \
+  filepos.h librarian.h
 reaction_colgen${OBJ}: reaction_colgen.C reaction_colgen.h reaction.h model.h \
   symbol.h ponddamp.h librarian.h frame.h scope.h value.h log.h time.h \
   border.h chemistry.h treelog.h block.h
@@ -1423,6 +1426,10 @@ cdaisy${OBJ}: cdaisy.C scope.h value.h symbol.h block.h metalib.h frame.h \
   frame_model.h frame_submodel.h filepos.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
+log_regress${OBJ}: log_regress.C log_dlf.h log_select.h log.h time.h symbol.h \
+  border.h model.h memutils.h dlf.h destination.h select.h units.h \
+  volume.h library.h block.h value.h timestep.h vcheck.h librarian.h \
+  scope_block.h scope.h treelog.h frame.h assertion.h
 reaction_Morgan98${OBJ}: reaction_Morgan98.C reaction_colgen.h reaction.h \
   model.h symbol.h ponddamp.h mathlib.h assertion.h check.h block.h \
   value.h librarian.h chemistry.h chemical.h log.h time.h border.h \
@@ -1744,8 +1751,8 @@ program_batch${OBJ}: program_batch.C program.h model.h symbol.h run.h block.h \
   value.h treelog.h path.h assertion.h memutils.h librarian.h frame.h \
   scope.h metalib.h
 summary_balance${OBJ}: summary_balance.C summary.h model.h symbol.h block.h \
-  value.h fetch.h destination.h select.h units.h volume.h treelog.h \
-  memutils.h librarian.h frame.h scope.h
+  value.h fetch_pretty.h fetch.h destination.h select.h units.h volume.h \
+  treelog.h memutils.h librarian.h frame.h scope.h
 rootdens_AP${OBJ}: rootdens_AP.C rootdens.h model.h symbol.h block.h value.h \
   geometry.h log.h time.h border.h plf.h check.h mathlib.h assertion.h \
   librarian.h frame.h scope.h
@@ -1772,9 +1779,10 @@ pet_Hargreaves${OBJ}: pet_Hargreaves.C pet.h model.h symbol.h weather.h im.h \
   frame.h scope.h
 hydraulic_M_vGp${OBJ}: hydraulic_M_vGp.C hydraulic.h model.h symbol.h block.h \
   value.h plf.h mathlib.h assertion.h check.h librarian.h frame.h scope.h
-summary_simple${OBJ}: summary_simple.C summary.h model.h symbol.h fetch.h \
-  destination.h select.h units.h volume.h treelog.h memutils.h \
-  submodeler.h block.h value.h librarian.h frame.h scope.h
+summary_simple${OBJ}: summary_simple.C summary.h model.h symbol.h \
+  fetch_pretty.h fetch.h destination.h select.h units.h volume.h \
+  treelog.h memutils.h submodeler.h block.h value.h librarian.h frame.h \
+  scope.h
 phenology_TSum${OBJ}: phenology_TSum.C phenology.h model.h symbol.h block.h \
   value.h production.h vernalization.h plf.h assertion.h librarian.h \
   treelog.h frame.h scope.h
@@ -1798,7 +1806,8 @@ condition_weather${OBJ}: condition_weather.C condition.h model.h symbol.h \
   frame.h scope.h
 rootdens_PLF${OBJ}: rootdens_PLF.C rootdens.h model.h symbol.h geometry.h \
   value.h plf.h submodeler.h block.h check.h vcheck.h mathlib.h \
-  assertion.h memutils.h librarian.h frame_submodel.h frame.h scope.h
+  assertion.h memutils.h librarian.h frame_submodel.h frame.h scope.h \
+  treelog.h
 rootdens_G_P${OBJ}: rootdens_G_P.C rootdens.h model.h symbol.h block.h \
   value.h geometry.h log.h time.h border.h check.h mathlib.h assertion.h \
   librarian.h treelog.h frame.h scope.h
@@ -1869,11 +1878,10 @@ select_number${OBJ}: select_number.C select_value.h select.h destination.h \
 select_array${OBJ}: select_array.C select.h destination.h symbol.h model.h \
   units.h volume.h soil.h bdconv.h convert.h block.h value.h mathlib.h \
   assertion.h librarian.h frame.h scope.h
-log_table${OBJ}: log_table.C log_select.h log.h time.h symbol.h border.h \
-  model.h memutils.h library.h block.h value.h select.h destination.h \
-  units.h volume.h summary.h geometry.h dlf.h daisy.h program.h run.h \
-  timestep.h vcheck.h librarian.h scope_block.h scope.h treelog.h frame.h \
-  filepos.h assertion.h
+log_table${OBJ}: log_table.C log_dlf.h log_select.h log.h time.h symbol.h \
+  border.h model.h memutils.h dlf.h destination.h select.h units.h \
+  volume.h library.h block.h value.h summary.h timestep.h vcheck.h \
+  librarian.h scope_block.h scope.h treelog.h frame.h assertion.h
 log_harvest${OBJ}: log_harvest.C log.h time.h symbol.h border.h model.h \
   daisy.h program.h run.h timestep.h vcheck.h memutils.h harvest.h \
   block.h value.h dlf.h version.h assertion.h librarian.h treelog.h \

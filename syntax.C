@@ -282,17 +282,8 @@ Syntax::check (Metalib& metalib, const Frame& vl,
 
   if (i != impl->val_checks.end ())
     {
-      const VCheck *const vcheck = (*i).second;
-
-      try
-	{
-	  vcheck->check (metalib, vl, key);
-	}
-      catch (const std::string& message)
-	{
-	  err.error (message);
-	  ok = false;;
-	}
+      if (!(*i).second->verify (metalib, vl, key, err))
+        ok = false;;
     }
   return ok;
 }

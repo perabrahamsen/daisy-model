@@ -766,12 +766,6 @@ SoilWater::initialize (const FrameSubmodel& al, const Geometry& geo,
   daisy_assert (h_.size () == Theta_.size ());
 
   // Groundwater based pressure.
-  {
-    std::ostringstream tmp;
-    tmp << "Groundwater level is " << groundwater.table () 
-        << ", h size is "  << h_.size ();
-    msg.message (tmp.str ());
-  }
   if (h_.size () == 0)
     {
       if (groundwater.table () > 0.0)

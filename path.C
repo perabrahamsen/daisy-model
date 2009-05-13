@@ -226,17 +226,18 @@ Path::set_directory (symbol directory_s)
   const bool result 
     = chdir (dir) == 0 || (mkdir (dir, 0777) == 0 && chdir (dir) == 0); 
   
-  // Absolute filename.
-  if (directory[0] == '/'
+  if (!result)
+    /* Do nothing */;
+  else if (directory[0] == '/'
 #ifndef __unix__
-      || directory[0] == '\\' || directory[1] == ':'
+           || directory[0] == '\\' || directory[1] == ':'
 #endif
-      )
+           )
     // Already absolute.
     current_directory = directory;
   else
     // Make it absolute.
-    current_directory = get_cwd () + "/" + directory;
+    current_directory = get_cwd ();
 
   std::ostringstream tmp;
   tmp << "Changing directory to '" << directory << "' " 

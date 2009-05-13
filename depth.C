@@ -212,23 +212,30 @@ struct DepthPLF : public Depth
 // GCC 2.95 can't link if this class is nested.
 static const class CheckTable : public VCheck
 {
-  void check (Metalib&, const Frame& frame, const symbol key)
-    const throw (std::string)
+  bool verify (Metalib&, const Frame& frame, const symbol key, 
+               Treelog& msg) const
   {
     daisy_assert (frame.check (key));
         
     const std::vector<const FrameSubmodel*>& table 
       = frame.submodel_sequence (key); 
     if (table.size () < 2)
-      throw std::string ("You must list at least two entries");
+      {
+        msg.error ("You must list at least two entries");
+        return false;
+      }
     Time last (table[0]->submodel ("time"));
     for (size_t i = 1; i < table.size (); i++)
       {
         Time next ((table[i]->submodel ("time")));
         if (next <= last)
-          throw std::string ("Time must be increasing");
+          {
+            msg.error ("Time must be increasing");
+            return false;
+          }
         last = next;
       }
+    return true;
   }
 } check_table;
 

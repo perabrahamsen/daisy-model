@@ -59,8 +59,7 @@ struct AM::Implementation
   struct Check_OM_Pools : public VCheck
   {
     // Check that the OM pools are correct for organic fertilizer.
-    void check (Metalib&, const Frame& frame, const symbol key)
-      const throw (std::string);
+    bool verify (Metalib&, const Frame&, const symbol key, Treelog&) const;
   };
 
   // Content.
@@ -116,10 +115,10 @@ struct AM::Implementation
   ~Implementation ();
 };
 
-void
-AM::Implementation::Check_OM_Pools::check (Metalib&, const Frame& frame,
-					   const symbol key) 
-  const throw (std::string)
+bool
+AM::Implementation::Check_OM_Pools::verify (Metalib&, const Frame& frame,
+                                            const symbol key,
+                                            Treelog& msg) const
 { 
   daisy_assert (frame.check (key));
   daisy_assert (frame.lookup (key) == Value::Object);
@@ -128,7 +127,7 @@ AM::Implementation::Check_OM_Pools::check (Metalib&, const Frame& frame,
 
   if (frame.flag ("initialized", false))
     // No checking checkpoints.
-    return;
+    return true;
 
   const std::vector<const FrameModel*>& om_frame 
     = frame.model_sequence (key);
@@ -150,16 +149,33 @@ AM::Implementation::Check_OM_Pools::check (Metalib&, const Frame& frame,
 	same_unspecified = true;
     }
   daisy_assert (total_fractions >= 0.0);
+  bool ok = true;
   if (total_fractions < 1e-10 && !same_unspecified)
-    throw std::string ("you should specify at least one non-zero fraction");
+    {
+      msg.error ("you should specify at least one non-zero fraction");
+      ok = false;
+    }
   if (approximate (total_fractions, 1.0))
-    throw std::string ("sum of specified fractions should be < 1.0");
+    {
+      msg.error ("sum of specified fractions should be < 1.0");
+      ok = false;
+    }
   if (total_fractions > 1.0)
-    throw std::string ("sum of fractions should be < 1.0");
+    {
+      msg.error ("sum of fractions should be < 1.0");
+      ok = false;
+    }
   if (missing_initial_fraction != 1)
-    throw std::string ("you should leave initial_fraction in one om unspecified");
+    {
+      msg.error ("you should leave initial_fraction in one om unspecified");
+      ok = false;
+    }
   if (missing_C_per_N != 1)
-    throw std::string ("You must leave C/N unspecified in exactly one pool");
+    {
+      msg.error ("You must leave C/N unspecified in exactly one pool");
+      ok = false;
+    }
+  return ok;
 }
 
 struct AM::Implementation::Lock
@@ -188,9 +204,9 @@ void
 AM::Implementation::Lock::load_syntax (Frame& frame)
 {
   frame.declare ("crop", Value::String, Value::State, 
-	      "Crop to which this am is locked");
+                 "Crop to which this am is locked");
   frame.declare ("part", Value::String, Value::State, 
-	      "Crop part to which this am is locked");
+                 "Crop part to which this am is locked");
 }
 
 AM::Implementation::Lock::Lock (symbol c, symbol p)

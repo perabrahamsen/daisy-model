@@ -32,13 +32,14 @@ class Metalib;
 class Frame;
 class PLF;
 class Units;
+class Treelog;
 
 class VCheck : private boost::noncopyable
 { 
   // Use.
 public:
-  virtual void check (Metalib&, const Frame&, const symbol key)
-    const throw (std::string) = 0;
+  virtual bool verify (Metalib&, const Frame&, const symbol key, Treelog&)
+    const = 0;
 
   // Integer or Integer sequence.
 public:
@@ -103,9 +104,8 @@ private:
 
   // Use.
 private:
-  void validate (int value) const throw (std::string);
-  void check (Metalib&, const Frame&, const symbol key)
-    const throw (std::string);
+  bool valid (int value, Treelog&) const;
+  bool verify (Metalib&, const Frame&, const symbol key, Treelog&) const;
 
   // Create and Destroy.
 public:
@@ -120,10 +120,9 @@ private:
 
   // Use.
 private:
-  void validate (double value) const throw (std::string);
-  void validate (const PLF& value) const throw (std::string);
-  void check (Metalib&, const Frame&, const symbol key)
-    const throw (std::string);
+  bool valid (double value, Treelog&) const;
+  bool valid (const PLF& value, Treelog&) const;
+  bool verify (Metalib&, const Frame&, const symbol key, Treelog&) const;
 
   // Create and Destroy.
 public:
@@ -138,10 +137,9 @@ private:
 
   // Use.
 private:
-  void validate (double value) const throw (std::string);
-  void validate (const PLF& value) const throw (std::string);
-  void check (Metalib&, const Frame&, const symbol key)
-    const throw (std::string);
+  bool valid (double value, Treelog&) const;
+  bool valid (const PLF& value, Treelog&) const;
+  bool verify (Metalib&, const Frame&, const symbol key, Treelog&) const;
 
   // Create and Destroy.
 public:
@@ -156,10 +154,9 @@ private:
 
   // Use.
 private:
-  void validate (double value) const throw (std::string);
-  void validate (const PLF& value) const throw (std::string);
-  void check (Metalib&, const Frame&, const symbol key)
-    const throw (std::string);
+  bool valid (double value, Treelog&) const;
+  bool valid (const PLF& value, Treelog&) const;
+  bool verify (Metalib&, const Frame&, const symbol key, Treelog&) const;
 
   // Create and Destroy.
 public:
@@ -175,9 +172,8 @@ private:
 
   // Use.
 private:
-  void validate (const PLF& value) const throw (std::string);
-  void check (Metalib&, const Frame&, const symbol key)
-    const throw (std::string);
+  bool valid (const PLF& value, Treelog&) const;
+  bool verify (Metalib&, const Frame&, const symbol key, Treelog&) const;
 
   // Create and Destroy.
 public:
@@ -192,8 +188,7 @@ private:
 
   // Use.
 private:
-  void check (Metalib&, const Frame&, const symbol key)
-    const throw (std::string);
+  bool verify (Metalib&, const Frame&, const symbol key, Treelog&) const;
 
   // Create and Destroy.
 public:
@@ -204,9 +199,8 @@ class VCheck::String : public VCheck
 {
   // Use.
 private:
-  virtual void validate (const symbol value) const throw (std::string) = 0;
-  void check (Metalib&, const Frame&, const symbol key)
-    const throw (std::string);
+  virtual bool valid (const symbol value, Treelog&) const = 0;
+  bool verify (Metalib&, const Frame&, const symbol key, Treelog&) const;
 };
 
 class VCheck::Compatible : public VCheck
@@ -217,9 +211,8 @@ private:
 
   // Use.
 private:
-  void validate (const Units&, symbol value) const throw (std::string);
-  void check (Metalib&, const Frame&, const symbol key)
-    const throw (std::string);
+  bool valid (const Units&, symbol value, Treelog&) const;
+  bool verify (Metalib&, const Frame&, const symbol key, Treelog&) const;
 
   // Create and Destroy.
 public:
@@ -234,7 +227,7 @@ private:
 
   // Use.
 private:
-  void validate (const symbol value) const throw (std::string);
+  bool valid (const symbol value, Treelog&) const;
 
   // Create and Destroy.
 public:
@@ -260,9 +253,8 @@ private:
 
   // Use.
 private:
-  void check (Metalib&, const Frame&, const symbol key)
-    const throw (std::string);
-  void validate (Metalib&, const symbol value) const throw (std::string);
+  bool verify (Metalib&, const Frame&, const symbol key, Treelog&) const;
+  bool valid (Metalib&, const symbol value, Treelog&) const;
 
   // Create and Destroy.
 public:
@@ -277,8 +269,7 @@ private:
 
   // Use.
 private:
-  void check (Metalib&, const Frame&, const symbol key)
-    const throw (std::string);
+  bool verify (Metalib&, const Frame&, const symbol key, Treelog&) const;
 
   // Create and Destroy.
 public:

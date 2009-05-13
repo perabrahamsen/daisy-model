@@ -135,17 +135,19 @@ The special name 'screen' indicate that the data should be shown on\n\
 the screen instead of being stored in a file.");
     static struct CheckWhere : public VCheck
     {
-      void check (Metalib&, const Frame& frame, const symbol key)
-        const throw (std::string)
+      bool verify (Metalib&, const Frame& frame, const symbol key, 
+                   Treelog& msg) const
       {
         daisy_assert (key == "where");
         daisy_assert (frame.lookup (key) == Value::String);
         daisy_assert (frame.type_size (key) == Value::Singleton);
         const symbol file = frame.name (key);
         if (file == "screen")
-          return;
-        if (GnuplotBase::file2device (file) == "unknown")
-          throw std::string ("Unknown file extension '") + file + "'";
+          return true;
+        if (GnuplotBase::file2device (file) != "unknown")
+          return true;
+        msg.error ("Unknown file extension '" + file + "'");
+        return false;
       }
     } check_where;
     frame.set_check ("where", check_where);
@@ -178,18 +180,20 @@ a line conncting two datapoints, one of them outside the graph, may\n\
 cross the legend.");
     static struct CheckLegend : public VCheck
     {
-      void check (Metalib&, const Frame& frame, const symbol key) 
-        const throw (std::string)
+      bool verify (Metalib&, const Frame& frame, const symbol key, 
+                   Treelog& msg) const
       {
         daisy_assert (key == "legend");
         daisy_assert (frame.lookup (key) == Value::String);
         daisy_assert (frame.type_size (key) == Value::Singleton);
         const symbol legend = frame.name (key);
         if (legend == "auto")
-          return;
+          return true;
         if (GnuplotBase::legend_table.find (legend) 
-            == GnuplotBase::legend_table.end ())
-          throw std::string ("Unknown legend placement '") + legend + "'";
+            != GnuplotBase::legend_table.end ())
+          return true;
+        msg.error (("Unknown legend placement '") + legend + "'");
+        return false;
       }
     } check_legend;
     frame.set_check ("legend", check_legend);

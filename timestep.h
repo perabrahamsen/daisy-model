@@ -62,9 +62,8 @@ public:
   struct GenCheck : public VCheck
   {
   private:
-    virtual void check_dt (double dt) const throw (std::string) = 0;
-    void check (Metalib&, const Frame& frame, const symbol key)
-      const throw (std::string);
+    virtual bool check_dt (double dt, Treelog&) const = 0;
+    bool verify (Metalib&, const Frame&, const symbol, Treelog&) const;
   };
   static const VCheck& positive ();
   static const VCheck& non_zero ();

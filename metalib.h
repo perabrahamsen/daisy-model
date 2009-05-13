@@ -29,8 +29,6 @@
 
 class Path;
 class Library;
-class Model;
-class Treelog;
 class Units;
 class Unit;
 

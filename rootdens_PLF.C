@@ -31,6 +31,7 @@
 #include "memutils.h"
 #include "librarian.h"
 #include "frame_submodel.h"
+#include "treelog.h"
 
 struct Rootdens_PLF : public Rootdens
 {
@@ -39,8 +40,8 @@ struct Rootdens_PLF : public Rootdens
   struct Check_Indexes : public VCheck
   {
     // Check that the indexes are monotonically increasing.
-    void check (Metalib&, const Frame& frame, const symbol key)
-      const throw (std::string);
+    bool verify (Metalib&, const Frame& frame, const symbol key, 
+                 Treelog& msg) const;
   };
 
   struct Entry
@@ -83,10 +84,9 @@ Relative root density as a function of root depth .");
   frame.order ("index", "density");
 }
 
-void
-Rootdens_PLF::Check_Indexes::check (Metalib&, const Frame& frame, 
-                                    const symbol key)
-  const throw (std::string)
+bool
+Rootdens_PLF::Check_Indexes::verify (Metalib&, const Frame& frame, 
+                                     const symbol key, Treelog& msg) const
 { 
   daisy_assert (frame.check (key));
   daisy_assert (frame.lookup (key) == Value::AList);
@@ -97,22 +97,26 @@ Rootdens_PLF::Check_Indexes::check (Metalib&, const Frame& frame,
     = frame.submodel_sequence (key);
 
   if (alists.size () < 1)
-    throw std::string ("You must specify at least one entry");
-  else
     {
-      double last_index = alists[0]->number ("index");
-      
-      for (unsigned int i = 1; i < alists.size (); i++)
-	{
-	  if (!alists[i]->check ("index"))
-	    continue;
-	  const double new_index = alists[i]->number ("index");
-	  
-	  if (new_index <= last_index)
-	    throw std::string ("Index should be monotonically increasing");
-	  last_index = new_index;
-	}
+      msg.error ("You must specify at least one entry");
+      return false;
     }
+  double last_index = alists[0]->number ("index");
+
+  for (unsigned int i = 1; i < alists.size (); i++)
+    {
+      if (!alists[i]->check ("index"))
+        continue;
+      const double new_index = alists[i]->number ("index");
+
+      if (new_index <= last_index)
+        {
+          msg.error ("Index should be monotonically increasing");
+          return false;
+        }
+      last_index = new_index;
+    }
+  return true;
 }
 
 Rootdens_PLF::Entry::Entry (const FrameSubmodel& al)

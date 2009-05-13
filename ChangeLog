@@ -1,3 +1,18 @@
+2009-05-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* vcheck.h, vcheck.C: Don't use exceptions.
+	* all: Update callers.
+
+2009-05-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* path.C (set_directory): Don't append current directory to
+	currect directory, and don't change it if 'chdir' failed.
+
+2009-04-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* daisy.C (tick_after): Set 'finished' before calling logs, in
+	order to get the 'finished' condition to work.
+
 2009-04-28  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* fetch_pretty.C, fetch_pretty.h: New submodel.

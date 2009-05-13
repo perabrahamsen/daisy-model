@@ -30,6 +30,7 @@
 #include "mathlib.h"
 #include "treelog.h"
 #include "frame_model.h"
+#include "treelog.h"
 #include <sstream>
 #include <algorithm>
 #include <numeric>
@@ -38,66 +39,75 @@
 // GCC 2.95 -O2 dislike declaring these classes local.
 struct ValidYear : public VCheck
 {
-  static void validate (int year) throw (std::string)
+  static bool valid (int year, Treelog& msg)
   {
     if (!Time::valid (year, 1, 1, 1))
       {
 	std::ostringstream tmp;
 	tmp << year << " is not a valid year";
-	throw std::string (tmp.str ());
+        msg.error (tmp.str ());
+        return false;
       }
+    return true;
   }
 
-  void check (Metalib&, const Frame& frame, const symbol key)
-    const throw (std::string)
+  bool verify (Metalib&, const Frame& frame, const symbol key, 
+               Treelog& msg) const
   { 
     daisy_assert (frame.check (key));
     daisy_assert (frame.lookup (key) == Value::Integer);
     daisy_assert (!frame.is_log (key));
-
+    
     if (frame.type_size (key) == Value::Singleton)
-      validate (frame.integer (key));
-    else
-      {
-	const std::vector<int> years = frame.integer_sequence (key);
-	for_each (years.begin (), years.end (), validate);
-      }
+      return valid (frame.integer (key), msg);
+
+    bool ok = true;
+    const std::vector<int> years = frame.integer_sequence (key);
+    for (size_t i = 0; i < years.size (); i++)
+      if (!valid (years[i], msg))
+        ok = false;
+    return ok;
   }
 };
 
-void 
-VCheck::IRange::validate (const int value) const throw (std::string)
+bool
+VCheck::IRange::valid (const int value, Treelog& msg) const
 {
   if (value < min)
     {
       std::ostringstream tmp;
       tmp << "Value is " << value << " but should be >= " << min;
-      throw std::string (tmp.str ());
+      msg.error (tmp.str ());
+      return false;
     }
   if (value > max)
     {
       std::ostringstream tmp;
       tmp << "Value is " << value << " but should be <= " << max;
-      throw std::string (tmp.str ());
+      msg.error (tmp.str ());
+      return false;
     }
+  return true;
 }
 
-void
-VCheck::IRange::check (Metalib&, const Frame& frame, 
-		       const symbol key) const throw (std::string)
+bool
+VCheck::IRange::verify (Metalib&, const Frame& frame, const symbol key, 
+                        Treelog& msg) const
 {
   daisy_assert (frame.check (key));
   daisy_assert (!frame.is_log (key));
   daisy_assert (frame.lookup (key) == Value::Integer);
 
   if (frame.type_size (key) == Value::Singleton)
-    validate (frame.integer (key));
-  else
-    {
-      const std::vector<int> integers = frame.integer_sequence (key);
-      for (unsigned int i = 0; i < integers.size (); i++)
-	validate (integers[i]);
-    }
+    return valid (frame.integer (key), msg);
+
+  bool ok = true;
+  const std::vector<int> integers = frame.integer_sequence (key);
+  for (unsigned int i = 0; i < integers.size (); i++)
+    if (!valid (integers[i], msg))
+      ok = false;
+        
+  return ok;
 }
 
 VCheck::IRange::IRange (const int min_, const int max_)
@@ -107,25 +117,27 @@ VCheck::IRange::IRange (const int min_, const int max_)
 
 struct LocalOrder : public VCheck
 {
-  virtual void validate (double last, double next)
-    const throw (std::string) = 0;
+  virtual bool valid (double last, double next, Treelog&) const = 0;
 
-  void validate_plf (const PLF& plf) const throw (std::string)
+  bool validate_plf (const PLF& plf, Treelog& msg) const
   {
     const int end = plf.size () - 1;
     daisy_assert (end >= 0);
     double last = plf.y (0);
 
+    bool ok = true;
     for (int i = 1; i < end; i++)
       {
 	const double next = plf.y (i);
-	validate (last, next);
+	if (!valid (last, next, msg))
+          ok = false;
 	last = next;
       }
+    return ok;
   }
 
-  void check (Metalib&, const Frame& frame, const symbol key)
-    const throw (std::string)
+  bool verify (Metalib&, const Frame& frame, const symbol key, 
+               Treelog& msg) const
   { 
     daisy_assert (frame.check (key));
     daisy_assert (!frame.is_log (key));
@@ -137,81 +149,88 @@ struct LocalOrder : public VCheck
 	  daisy_assert (frame.type_size (key) != Value::Singleton);
 	  const std::vector<double>& numbers = frame.number_sequence (key);
 	  if (numbers.size () < 2)
-	    return;
+	    return true;
 	  double last = numbers[0];
+          bool ok = true;
 	  for (int i = 1; i < numbers.size (); i++)
 	    {
 	      const double next = numbers[i];
-	      validate (last, next);
+	      if (!valid (last, next, msg))
+                ok = false;
 	      last = next;
 	    }
+          return ok;
 	}
-	break;
       case Value::PLF:
-	if (frame.type_size (key) == Value::Singleton)
-	  validate_plf (frame.plf (key));
-	else
-	  {
-	    const std::vector<const PLF*>& plfs = frame.plf_sequence (key);
-	    for (unsigned int i = 0; i < plfs.size (); i++)
-	      validate_plf (*plfs[i]);
-	  }
-	break;
+        {
+          if (frame.type_size (key) == Value::Singleton)
+            return validate_plf (frame.plf (key), msg);
+          bool ok = true;
+          const std::vector<const PLF*>& plfs = frame.plf_sequence (key);
+          for (unsigned int i = 0; i < plfs.size (); i++)
+          if (!validate_plf (*plfs[i], msg))
+            ok = false;
+          return ok;
+        }
       default:
-	daisy_notreached ();
+        daisy_notreached ();
       }
   }
 };
 
 struct Increasing : public LocalOrder
 {
-  void validate (double last, double next) const throw (std::string)
+  bool valid (double last, double next, Treelog& msg) const
   {
-    if (last >= next)
-      {
-	std::ostringstream tmp;
-	tmp << last << " >= " << next << ", must be increasing";
-	throw std::string (tmp.str ());
-      }
+    if (last < next)
+      return true;
+
+    std::ostringstream tmp;
+    tmp << last << " >= " << next << ", must be increasing";
+    msg.error (tmp.str ());
+    return false;
   }
 };
 
 struct NonDecreasing : public LocalOrder
 {
-  void validate (double last, double next) const throw (std::string)
+  bool valid (double last, double next, Treelog& msg) const
   {
-    if (last > next)
-      {
-	std::ostringstream tmp;
-	tmp << last << " > " << next << ", must be non-decreasing";
-	throw std::string (tmp.str ());
-      }
+    if (last <= next)
+      return true;
+
+    std::ostringstream tmp;
+    tmp << last << " > " << next << ", must be non-decreasing";
+    msg.error (tmp.str ());
+    return false;
   }
 };
 
 struct NonIncreasing : public LocalOrder
 {
-  void validate (double last, double next) const throw (std::string)
+  bool valid (double last, double next, Treelog& msg) const
   {
-    if (last < next)
-      {
-	std::ostringstream tmp;
-	tmp << last << " < " << next << ", must be non-increasing";
-	throw std::string (tmp.str ());
-      }
+    if (last >= next)
+      return true;
+
+    std::ostringstream tmp;
+    tmp << last << " < " << next << ", must be non-increasing";
+    msg.error (tmp.str ());
+    return false;
   }
 };
 
 struct Decreasing : public LocalOrder
 {
-  void validate (double last, double next) const throw (std::string)
+  bool valid (double last, double next, Treelog& msg) const
   {
-    if (last <= next)
-      {
-	std::ostringstream tmp;
-	tmp << last << " <= " << next << ", must be decreasing";
-	throw std::string (tmp.str ());
-      }
+    if (last > next)
+      return true;
+
+    std::ostringstream tmp;
+    tmp << last << " <= " << next << ", must be decreasing";
+    msg.error (tmp.str ());
+    return false;
   }
 };
 
@@ -312,32 +331,43 @@ VCheck::VCheck ()
 VCheck::~VCheck ()
 { }
 
-void 
-VCheck::SumEqual::validate (double value) const throw (std::string)
+bool
+VCheck::SumEqual::valid (double value, Treelog& msg) const
 {
-  if (!approximate (value, sum))
-    {
-      std::ostringstream tmp;
-      tmp << "Sum is " << value << " but should be " << sum;
-      throw std::string (tmp.str ());
-    }
+  if (approximate (value, sum))
+    return true;
+
+  std::ostringstream tmp;
+  tmp << "Sum is " << value << " but should be " << sum;
+  msg.error (tmp.str ());
+  return false;
 }
 
-void 
-VCheck::SumEqual::validate (const PLF& plf) const throw (std::string)
+bool
+VCheck::SumEqual::valid (const PLF& plf, Treelog& msg) const
 {
   const int end = plf.size () - 1;
   daisy_assert (end >= 0);
+  bool ok = true;
   if (std::isnormal (plf.y (0)))
-    throw (std::string ("Value at start of PLF should be 0.0"));
+    {
+      msg.error ("Value at start of PLF should be 0.0");
+      ok = false;
+    }
   if (std::isnormal (plf.y (end)))
-    throw (std::string ("Value at end of PLF should be 0.0"));
-  validate (plf.integrate (plf.x (0), plf.x (end)));
+    {
+      msg.error ("Value at end of PLF should be 0.0");
+      ok = false;
+    }
+  if (!valid (plf.integrate (plf.x (0), plf.x (end)), msg))
+    ok = false;
+
+  return ok;
 }
 
-void
-VCheck::SumEqual::check (Metalib&, const Frame& frame, 
-			 const symbol key) const throw (std::string)
+bool
+VCheck::SumEqual::verify (Metalib&, const Frame& frame, 
+                          const symbol key, Treelog& msg) const
 {
   daisy_assert (frame.check (key));
   daisy_assert (!frame.is_log (key));
@@ -348,17 +378,20 @@ VCheck::SumEqual::check (Metalib&, const Frame& frame,
       {
 	daisy_assert (frame.type_size (key) != Value::Singleton);
 	const std::vector<double>& numbers = frame.number_sequence (key);
-	validate (accumulate (numbers.begin (), numbers.end (), 0.0));
+	return valid (accumulate (numbers.begin (), numbers.end (), 0.0), msg);
       }
       break;
     case Value::PLF:
       if (frame.type_size (key) == Value::Singleton)
-	validate (frame.plf (key));
+	return valid (frame.plf (key), msg);
       else
 	{
+          bool ok = true;
 	  const std::vector<const PLF*> plfs = frame.plf_sequence (key);
 	  for (unsigned int i = 0; i < plfs.size (); i++)
-	    validate (*plfs[i]);
+	    if (!valid (*plfs[i], msg))
+              ok = false;
+          return ok;
 	}
       break;
     default:
@@ -370,24 +403,25 @@ VCheck::SumEqual::SumEqual (double value)
   : sum (value)
 { }
 
-void 
-VCheck::StartValue::validate (double value) const throw (std::string)
+bool
+VCheck::StartValue::valid (double value, Treelog& msg) const
 {
-  if (!approximate (value, fixed))
-    {
-      std::ostringstream tmp;
-      tmp << "Start value is " << value << " but should be " << fixed;
-      throw std::string (tmp.str ());
-    }
+  if (approximate (value, fixed))
+    return true;
+
+  std::ostringstream tmp;
+  tmp << "Start value is " << value << " but should be " << fixed;
+  msg.error (tmp.str ());
+  return false;
 }
 
-void 
-VCheck::StartValue::validate (const PLF& plf) const throw (std::string)
-{ validate (plf.y (0)); }
+bool
+VCheck::StartValue::valid (const PLF& plf, Treelog& msg) const
+{ return valid (plf.y (0), msg); }
 
-void
-VCheck::StartValue::check (Metalib&, const Frame& frame, 
-			   const symbol key) const throw (std::string)
+bool
+VCheck::StartValue::verify (Metalib&, const Frame& frame, 
+                            const symbol key, Treelog& msg) const
 {
   daisy_assert (frame.check (key));
   daisy_assert (!frame.is_log (key));
@@ -399,18 +433,20 @@ VCheck::StartValue::check (Metalib&, const Frame& frame,
 	daisy_assert (frame.type_size (key) != Value::Singleton);
 	const std::vector<double>& numbers = frame.number_sequence (key);
 	if (numbers.size () > 0)
-	  validate (numbers[0]);
+	  return valid (numbers[0], msg);
       }
-      break;
+      return true;
     case Value::PLF:
       if (frame.type_size (key) == Value::Singleton)
-	validate (frame.plf (key));
-      else
-	{
-	  const std::vector<const PLF*> plfs = frame.plf_sequence (key);
-	  for (unsigned int i = 0; i < plfs.size (); i++)
-	    validate (*plfs[i]);
-	}
+	return valid (frame.plf (key), msg);
+      {
+        const std::vector<const PLF*> plfs = frame.plf_sequence (key);
+        bool ok = true;
+        for (unsigned int i = 0; i < plfs.size (); i++)
+          if (!valid (*plfs[i], msg))
+            ok = false;
+        return ok;
+      }
       break;
     default:
       daisy_notreached ();
@@ -421,27 +457,28 @@ VCheck::StartValue::StartValue (double value)
   : fixed (value)
 { }
 
-void 
-VCheck::EndValue::validate (double value) const throw (std::string)
+bool
+VCheck::EndValue::valid (double value, Treelog& msg) const
 {
-  if (!approximate (value, fixed))
-    {
-      std::ostringstream tmp;
-      tmp << "End value is " << value << " but should be " << fixed;
-      throw std::string (tmp.str ());
-    }
+  if (approximate (value, fixed))
+    return true;
+
+  std::ostringstream tmp;
+  tmp << "End value is " << value << " but should be " << fixed;
+  msg.error (tmp.str ());
+  return false;
 }
 
-void 
-VCheck::EndValue::validate (const PLF& plf) const throw (std::string)
+bool
+VCheck::EndValue::valid (const PLF& plf, Treelog& msg) const
 { 
   daisy_assert (plf.size () > 0);
-  validate (plf.y (plf.size () - 1)); 
+  return valid (plf.y (plf.size () - 1), msg); 
 }
 
-void
-VCheck::EndValue::check (Metalib&, const Frame& frame, 
-			   const symbol key) const throw (std::string)
+bool
+VCheck::EndValue::verify (Metalib&, const Frame& frame, 
+                          const symbol key, Treelog& msg) const
 {
   daisy_assert (frame.check (key));
   daisy_assert (!frame.is_log (key));
@@ -453,18 +490,20 @@ VCheck::EndValue::check (Metalib&, const Frame& frame,
 	daisy_assert (frame.type_size (key) != Value::Singleton);
 	const std::vector<double>& numbers = frame.number_sequence (key);
 	if (numbers.size () > 0)
-	  validate (numbers[numbers.size () - 1]);
+	  return valid (numbers[numbers.size () - 1], msg);
       }
-      break;
+      return true;
     case Value::PLF:
       if (frame.type_size (key) == Value::Singleton)
-	validate (frame.plf (key));
-      else
-	{
-	  const std::vector<const PLF*> plfs = frame.plf_sequence (key);
-	  for (unsigned int i = 0; i < plfs.size (); i++)
-	    validate (*plfs[i]);
-	}
+	return valid (frame.plf (key), msg);
+      {
+        const std::vector<const PLF*> plfs = frame.plf_sequence (key);
+        bool ok = true;
+        for (unsigned int i = 0; i < plfs.size (); i++)
+          if (!valid (*plfs[i], msg))
+            ok = false;
+        return ok;
+      }
       break;
     default:
       daisy_notreached ();
@@ -475,21 +514,22 @@ VCheck::EndValue::EndValue (double value)
   : fixed (value)
 { }
 
-void 
-VCheck::FixedPoint::validate (const PLF& plf) const throw (std::string)
+bool
+VCheck::FixedPoint::valid (const PLF& plf, Treelog& msg) const
 { 
-  if (!approximate (plf (fixed_x), fixed_y))
-    {
-      std::ostringstream tmp;
-      tmp << "Value at " << fixed_x << " should be " << fixed_y 
-	     << " but is << " << plf (fixed_x);
-      throw (std::string (tmp.str ()));
-    }
+  if (approximate (plf (fixed_x), fixed_y))
+    return true;
+
+  std::ostringstream tmp;
+  tmp << "Value at " << fixed_x << " should be " << fixed_y 
+      << " but is << " << plf (fixed_x);
+  msg.error (tmp.str ());
+  return false;
 }
 
-void
-VCheck::FixedPoint::check (Metalib&, const Frame& frame, 
-			   const symbol key) const throw (std::string)
+bool
+VCheck::FixedPoint::verify (Metalib&, const Frame& frame, 
+                            const symbol key, Treelog& msg) const
 {
   daisy_assert (frame.check (key));
   daisy_assert (!frame.is_log (key));
@@ -498,13 +538,15 @@ VCheck::FixedPoint::check (Metalib&, const Frame& frame,
     {
     case Value::PLF:
       if (frame.type_size (key) == Value::Singleton)
-	validate (frame.plf (key));
-      else
-	{
-	  const std::vector<const PLF*> plfs = frame.plf_sequence (key);
-	  for (unsigned int i = 0; i < plfs.size (); i++)
-	    validate (*plfs[i]);
-	}
+	return valid (frame.plf (key), msg);
+      {
+        const std::vector<const PLF*> plfs = frame.plf_sequence (key);
+        bool ok = true;
+        for (unsigned int i = 0; i < plfs.size (); i++)
+          if (!valid (*plfs[i], msg))
+            ok = false;
+        return ok;
+      }
       break;
     default:
       daisy_notreached ();
@@ -516,70 +558,72 @@ VCheck::FixedPoint::FixedPoint (double x, double y)
     fixed_y (y)
 { }
 
-void
-VCheck::MinSize::check (Metalib&, const Frame& frame, 
-			const symbol key) const throw (std::string)
+bool
+VCheck::MinSize::verify (Metalib&, const Frame& frame, 
+                         const symbol key, Treelog& msg) const
 {
   daisy_assert (frame.check (key));
   daisy_assert (!frame.is_log (key));
-  daisy_assert (frame.type_size (key) == Value::Variable);
-  if (frame.value_size (key) < min_size)
-    {
-      std::ostringstream tmp;
-      tmp << "Need at least " << min_size << " elements, got " 
-	     << frame.value_size (key);
-      throw std::string (tmp.str ());
-    }
+  daisy_assert (Value::flexible_size (frame.type_size (key)));
+  if (frame.value_size (key) >= min_size)
+    return true;
+  std::ostringstream tmp;
+  tmp << "Need at least " << min_size << " elements, got " 
+      << frame.value_size (key);
+  msg.error (tmp.str ());
+  return false;
 }
 
 VCheck::MinSize::MinSize (unsigned int size)
   : min_size (size)
 { }
 
-void
-VCheck::String::check (Metalib&, const Frame& frame, 
-                       const symbol key) const throw (std::string)
+bool
+VCheck::String::verify (Metalib&, const Frame& frame, 
+                        const symbol key, Treelog& msg) const
 {
   daisy_assert (frame.check (key));
   daisy_assert (!frame.is_log (key));
   if (frame.type_size (key) == Value::Singleton)
-    validate (frame.name (key));
-  else
-    {
-      const std::vector<symbol> names = frame.name_sequence (key);
-      for (size_t i = 0; i < names.size (); i++)
-        validate (names[i].name ());
-    }
+    return valid (frame.name (key), msg);
+  {
+    const std::vector<symbol> names = frame.name_sequence (key);
+    bool ok = true;
+    for (size_t i = 0; i < names.size (); i++)
+      if (!valid (names[i].name (), msg))
+        ok = false;
+    return ok;
+  }
 }
 
-void 
-VCheck::Compatible::validate (const Units& units, symbol value)
-  const throw (std::string)
+bool
+VCheck::Compatible::valid (const Units& units, symbol value, Treelog& msg) const
 {
-  if (!units.can_convert (dimension, value))
-    {
-      std::ostringstream tmp;
-      tmp << "Cannot convert [" << dimension << "] to [" << value << "]";
-      throw std::string (tmp.str ());
-    }
+  if (units.can_convert (dimension, value))
+    return true;
+  
+  std::ostringstream tmp;
+  tmp << "Cannot convert [" << dimension << "] to [" << value << "]";
+  msg.error (tmp.str ());
+  return false;
 }
 
-void
-VCheck::Compatible::check (Metalib& metalib,
-                           const Frame& frame, 
-                           const symbol key) const throw (std::string)
+bool
+VCheck::Compatible::verify (Metalib& metalib, const Frame& frame, 
+                            const symbol key, Treelog& msg) const
 {
   daisy_assert (frame.check (key));
   daisy_assert (!frame.is_log (key));
   const Units& units = metalib.units ();
   if (frame.type_size (key) == Value::Singleton)
-    validate (units, frame.name (key));
-  else
-    {
-      const std::vector<symbol> names = frame.name_sequence (key);
-      for (size_t i = 0; i < names.size (); i++)
-        validate (units, names[i]);
-    }
+    return valid (units, frame.name (key), msg);
+
+  const std::vector<symbol> names = frame.name_sequence (key);
+  bool ok = true;
+  for (size_t i = 0; i < names.size (); i++)
+    if (!valid (units, names[i], msg))
+      ok = false;
+  return ok;
 }
 
 VCheck::Compatible::Compatible (const symbol dim)
@@ -593,11 +637,14 @@ VCheck::fraction ()
   return fraction;
 }
 
-void 
-VCheck::Enum::validate (const symbol value) const throw (std::string)
+bool
+VCheck::Enum::valid (const symbol value, Treelog& msg) const
 {
-  if (ids.find (value) == ids.end ())
-    throw std::string ("Invalid value '" + value + "'");
+  if (ids.find (value) != ids.end ())
+    return true;
+
+  msg.error ("Invalid value '" + value + "'");
+  return false;
 }
 
 VCheck::Enum::Enum ()
@@ -659,36 +706,43 @@ VCheck::Enum::Enum (const symbol a, const symbol b, const symbol c,
   ids.insert (f);
 }
 
-void
-VCheck::InLibrary::check (Metalib& metalib, 
-			  const Frame& frame, 
-			  const symbol key) const throw (std::string)
+bool
+VCheck::InLibrary::verify (Metalib& metalib, const Frame& frame, 
+                           const symbol key, Treelog& msg) const
 {
   daisy_assert (frame.check (key));
   daisy_assert (!frame.is_log (key));
   if (frame.type_size (key) == Value::Singleton)
-    validate (metalib, frame.name (key));
-  else
-    {
-      const std::vector<symbol> names = frame.name_sequence (key);
-      for (size_t i = 0; i < names.size (); i++)
-        validate (metalib, names[i]);
-    }
+    return valid (metalib, frame.name (key), msg);
+
+  const std::vector<symbol> names = frame.name_sequence (key);
+  bool ok = true;
+  for (size_t i = 0; i < names.size (); i++)
+    if (!valid (metalib, names[i], msg))
+      ok = false;
+  return ok;
 }
 
-void
-VCheck::InLibrary::validate (Metalib& metalib,
-			     const symbol type) const throw (std::string)
+bool
+VCheck::InLibrary::valid (Metalib& metalib, const symbol type, 
+                          Treelog& msg) const
 {
   daisy_assert (metalib.exist (lib_name));
   const Library& library = metalib.library (lib_name);
   
   if (!library.check (type))
-    throw "Unknown '" + lib_name + "' type '" + type + "'";
+    {
+      msg.error ("Unknown '" + lib_name + "' type '" + type + "'");
+      return false;
+    }
 
   const FrameModel& frame = library.model (type);
   if (!frame.check (metalib, Treelog::null ()))
-    throw "Incomplete type '" + type + "'";
+    {
+      msg.error ("Incomplete type '" + type + "'");
+      return false;
+    }
+  return true;
 }
 
 VCheck::InLibrary::InLibrary (const symbol lib)
@@ -696,8 +750,9 @@ VCheck::InLibrary::InLibrary (const symbol lib)
 { }
 
 template<class T> 
-void unique_validate (const std::vector<T>& list)
+bool unique_validate (const std::vector<T>& list, Treelog& msg)
 {
+  bool ok = true;
   std::map<T, size_t> found;
   for (size_t i = 0; i < list.size (); i++)
     {
@@ -708,10 +763,12 @@ void unique_validate (const std::vector<T>& list)
 	  std::ostringstream tmp;
 	  tmp << "Entry " << (*f).second << " and " << i 
 	      << " are both '" << v << "'";
-	  throw std::string (tmp.str ());
+	  msg.error (tmp.str ());
+          ok = false;
 	}
       found[v] = i;
     }
+  return ok;
 }
 
 const VCheck& 
@@ -719,9 +776,8 @@ VCheck::unique ()
 {
   static struct Unique : public VCheck
   {
-    void check (Metalib&,
-		const Frame& frame, 
-                const symbol key) const throw (std::string)
+    bool verify (Metalib&, const Frame& frame, const symbol key, 
+                 Treelog& msg) const
     { 
       daisy_assert (frame.check (key));
       daisy_assert (frame.type_size (key) != Value::Singleton);
@@ -730,22 +786,18 @@ VCheck::unique ()
       switch (frame.lookup (key))
         {
         case Value::Number:
-          unique_validate (frame.number_sequence (key));
-          break;
+          return unique_validate (frame.number_sequence (key), msg);
         case Value::PLF:
-          unique_validate (frame.plf_sequence (key));
-          break;
+          return unique_validate (frame.plf_sequence (key), msg);
         case Value::Boolean:
-          unique_validate (frame.flag_sequence (key));
-          break;
+          return unique_validate (frame.flag_sequence (key), msg);
         case Value::String:
-          unique_validate (frame.name_sequence (key));
-          break;
+          return unique_validate (frame.name_sequence (key), msg);
         case Value::Integer:
-          unique_validate (frame.integer_sequence (key));
-          break;
+          return unique_validate (frame.integer_sequence (key), msg);
 	case Value::Object:
 	  {
+            bool ok = true;
 	    const std::vector<const FrameModel*>& list 
               = frame.model_sequence (key);
 	    std::map<symbol, size_t> found;
@@ -758,11 +810,12 @@ VCheck::unique ()
 		    std::ostringstream tmp;
 		    tmp << "Entry " << (*f).second << " and " << i 
 			<< " are both '" << type << "'";
-		    throw std::string (tmp.str ());
+		    msg.error (tmp.str ());
+                    ok = false;
 		  }
 		found[type] = i;
 	      }
-	    break;
+            return ok;
 	  }
         default:
           daisy_panic ("Unhandled list type "
@@ -774,12 +827,15 @@ VCheck::unique ()
   return unique;
 }
 
-void
-VCheck::All::check (Metalib& metalib, const Frame& frame, const symbol key)
-  const throw (std::string)
+bool
+VCheck::All::verify (Metalib& metalib, const Frame& frame, const symbol key,
+                     Treelog& msg) const
 {
+  bool ok = true;
   for (int i = 0; i < checks.size (); i++)
-    checks[i]->check (metalib, frame, key);
+    if (!checks[i]->verify (metalib, frame, key, msg))
+      ok = false;
+  return ok;
 }
 
 VCheck::All::All (const VCheck& a, const VCheck& b)

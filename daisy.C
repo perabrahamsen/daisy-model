@@ -139,13 +139,14 @@ Daisy::tick_column (const size_t col, Treelog& msg)
 void
 Daisy::tick_after (Treelog& msg)
 { 
-  output_log->tick (*this, msg);
-  field->clear ();
-  time += timestep;
-  
-  if (time >= stop)
+  const Time next = time + timestep;
+  if (next >= stop)
     running = false;
 
+  output_log->tick (*this, msg);
+  field->clear ();
+  time = next;
+  
   if (!ui_running ())
     {
       msg.error ("Simulation aborted");

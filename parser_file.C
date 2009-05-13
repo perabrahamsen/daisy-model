@@ -602,6 +602,7 @@ ParserFile::Implementation::add_derived (Library& lib)
 
   // Add separate attributes for this object.
   Treelog::Open nest (msg, "Defining " + lib.name () + " '" + name + "'");
+
   load_list (*frame);
   // Add new object to library.
   lib.add_model (name, *frame.release ());

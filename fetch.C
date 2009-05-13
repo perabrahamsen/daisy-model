@@ -24,9 +24,7 @@
 #include "select.h"
 #include "treelog.h"
 #include "frame_submodel.h"
-#include "mathlib.h"
 #include "librarian.h"
-#include <ostream>
 
 void 
 Fetch::error ()
@@ -79,38 +77,6 @@ void
 Fetch::add (const symbol)
 { type = Error; }
 
-double
-Fetch::period_factor (const symbol period, const int hours)
-{ 
-  if (period.name () == "")
-    return 1.0;
-  if (period.name () == "y")
-    return 365.2425 * 24.0 / hours;
-  if (period.name () == "m")
-    return 30.0 * 24.0 / hours;
-  if (period.name () == "w")
-    return 7.0 * 24.0 / hours;
-  if (period.name () == "d")
-    return 24.0 / hours;
-  if (period.name () == "h")
-    return 1.0 / hours;
-  return -42.42e42;
-}
-    
-int 
-Fetch::width (const double value)
-{
-  if (!std::isnormal (value))
-    return 1;
-
-  const int absolute 
-    = double2int (std::max (0.0, floor (log10 (fabs (value))))) + 1;
-  if (value < 0)
-    return absolute + 1;
-  else
-    return absolute;
-}
-
 symbol
 Fetch::dimension (const symbol period) const
 {
@@ -128,7 +94,7 @@ Fetch::dimension (const symbol period) const
         {
           const std::string strip 
             = select_dimension.name ().substr (0, size - 2);
-          if (period.name () != "")
+          if (period != "")
             return strip + "/" + period;
           else
             return strip;
@@ -136,76 +102,10 @@ Fetch::dimension (const symbol period) const
     }
   if (period == "h")
     return select_dimension;
-  else if (period.name () == "")
+  else if (period == "")
     return select_dimension + "h";
   else
     return select_dimension + "h/" + period;
-}
-
-size_t 
-Fetch::name_size () const
-{ 
-  if (type != Content)
-    return name.name ().size ();
-  else if (add_delta)
-    return name.name ().size () + 6;
-  else
-    return name.name ().size () + 9;
-}
-
-int 
-Fetch::value_size (double& total, const symbol period, const int hours) const
-{
-  double value = 0.0;
-  switch (type)
-    {
-    case Error:
-    case NewContent:
-      break;
-    case Content:
-      value = (last - initial) * factor;
-      break;
-    case Flux:
-      value = sum * factor * period_factor (period, hours);
-      break;
-    }
-  total += value;
-  return width (value);
-}
-
-void 
-Fetch::summarize (std::ostream& out, const int width, 
-                  const symbol period, const int hours) const
-{
-  if (type == Content && add_delta)
-    out << "delta ";
-  out << name;
-  if (type == Content && !add_delta)
-    out << " increase";
-  out << " = ";
-  out.width (width);
-  switch (type)
-    {
-    case NewContent:
-      out << "no data";
-      break;
-    case Content:
-      {
-        const double value = (last - initial) * factor;
-        out << value;
-      }
-      break;
-    case Flux:
-      {
-        const double value = sum * factor * period_factor (period, hours);
-        out << value;
-      }
-      break;
-    case Error:
-      out << "bogus data";
-      break;
-    }
-  out << " " << "[" << dimension (period) << "]\n";
 }
 
 void
@@ -248,7 +148,7 @@ Fetch::initialize (std::vector<Select*>& select, Treelog& msg)
         else
           {	
             select[j]->add_dest (this);
-            this->select_dimension = select[j]->dimension ().name ();
+            this->select_dimension = select[j]->dimension ();
             this->type = ((select[j]->handle != Handle::current)
                               && !select[j]->accumulate)
               ? Fetch::Flux 
@@ -265,20 +165,11 @@ Fetch::load_syntax (Frame& frame)
 { 
   frame.declare ("tag", Value::String, Value::Const, "\
 The tag of a column in the log file to summarize in this line.");
-  frame.declare ("factor", Value::None (), Value::Const, "\
-Factor to multiply with to get the sum.\n\
-Typically 1.0 to add this line, or -1.0 to subtract it.");
-  frame.set ("factor", 1.0);
-  frame.declare ("name", Value::String, Value::OptionalConst, "\
-Name to use for this line.  By default use the tag.");
   frame.order ("tag");
 }
 
 Fetch::Fetch (const FrameSubmodel& al)
   : tag (al.name ("tag")),
-    factor (al.number ("factor")),
-    name (al.check ("name") ? al.name ("name") : tag),
-    add_delta (true),
     type (Error),
     initial (-42.42e42),
     last (-42.42e42),
@@ -287,9 +178,6 @@ Fetch::Fetch (const FrameSubmodel& al)
 
 Fetch::Fetch (const symbol key)
   : tag (key),
-    factor (1.0),
-    name (tag),
-    add_delta (false),
     type (Error),
     initial (-42.42e42),
     last (-42.42e42),

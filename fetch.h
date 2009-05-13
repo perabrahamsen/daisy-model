@@ -38,17 +38,13 @@ class Fetch : public Destination
   // Content.
 public:
   const symbol tag;
-private:
-  const double factor;
-  const symbol name;
-  const bool add_delta;
 public:
   symbol select_dimension;
 
   // State.
 public:
   enum { NewContent, Content, Flux, Error } type;
-private:
+protected:
   double initial;
   double last;
   double sum;
@@ -62,15 +58,8 @@ private:
   void add (const symbol);
 
   // Use.
-private:
-  static double period_factor (symbol period, int hours);
 public:
-  static int width (double value);
   symbol dimension (const symbol period) const;
-  size_t name_size () const;
-  int value_size (double& total, const symbol period, const int hours) const;
-  void summarize (std::ostream& out, const int width, 
-                  const symbol period, const int hours) const;
 
   // Create and Destroy.
 public:

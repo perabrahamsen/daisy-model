@@ -1,8 +1,38 @@
-TODO --- things that needs to be done with Daisy -*- outline -*-
+TODO --- things that needs to be done with Daisy -*- org -*-
+
+* TODO fix zplus
+
+* Serbia DONE
+
+** max exfiltration gradient
+
+** seed + orlean
+
+** shared data between years
+
+** speed up simulation
+
+* Serbia TODO
+
+** hourly data
+
+** biometrics & soil water for full irrigation, three years
+
+** calibrate soil
+
+** calibrate crop (Xn)
+
+** prd setups
+
+** compare rs
 
 * Regression testing
 
+** LogDLF::done skal fortælle fetch om tidsskridt
+
 ** Divide fetch in "basic" and "pretty"
+
+Flyt pretty print til pretty.
 
 ** omskriv log_regress.C til kun at udregne og udskrive en linie
 
@@ -18,7 +48,7 @@ skal klare filhåntering.
 
 * C_below læst fra tidsserie
 
-Number::tick skal tage tid some argument.
+Number::tick skal tage tid some argument.  Eller Daisy?
 
 Number::File (NumberSource)?
 

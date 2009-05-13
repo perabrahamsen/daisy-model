@@ -623,8 +623,8 @@ Geometry::total_surface (const std::vector<double>& v,
 
 static struct CheckLayers : public VCheck
 {
-  void check (Metalib&, const Frame& frame, const symbol key)
-    const throw (std::string)
+  bool verify(Metalib&, const Frame& frame, const symbol key, 
+              Treelog& msg) const
   {
     daisy_assert (frame.check (key));
     daisy_assert (frame.lookup (key) == Value::AList);
@@ -634,6 +634,7 @@ static struct CheckLayers : public VCheck
     const std::vector<const FrameSubmodel*>& layers 
       = frame.submodel_sequence (key);
 
+    bool ok = true;
     double last = 0.0;
     for (unsigned int i = 0; i < layers.size (); i++)
       {
@@ -648,9 +649,11 @@ static struct CheckLayers : public VCheck
 	    std::ostringstream tmp;
 	    tmp << "Layer ending at " << next 
 		   << " should be below " << last;
-	    throw std::string (tmp.str ());
+	    msg.error (tmp.str ());
+            ok = false;
 	  }
       }
+    return ok;
   }
 } check_layers;
 

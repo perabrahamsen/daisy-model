@@ -25,6 +25,7 @@
 #include "block.h"
 #include "assertion.h"
 #include "mathlib.h"
+#include "treelog.h"
 #include <memory>
 
 struct Timestep::Implementation
@@ -105,10 +106,9 @@ Timestep::total_hours () const
     + (minutes () + seconds () / 60.0) / 60.0;
 }
 
-void
-Timestep::GenCheck::check (Metalib&,
-			   const Frame& frame, 
-                           const symbol key) const throw (std::string)
+bool
+Timestep::GenCheck::verify (Metalib&, const Frame& frame, const symbol key, 
+                            Treelog& msg) const
 { 
   daisy_assert (frame.check (key));
   daisy_assert (frame.lookup (key) == Value::AList);
@@ -116,7 +116,7 @@ Timestep::GenCheck::check (Metalib&,
   daisy_assert (frame.type_size (key) == Value::Singleton);
 
   Timestep timestep (frame.submodel (key));
-  check_dt (timestep.total_hours ());
+  return check_dt (timestep.total_hours (), msg);
 }
 
 const VCheck& 
@@ -124,10 +124,13 @@ Timestep::positive ()
 {
   static struct Postive : public GenCheck
   {
-    void check_dt (const double dt) const throw (std::string)
+    bool check_dt (const double dt, Treelog& msg) const
     {
-      if (dt <= 0.0)
-        throw std::string ("Timestep must be positive");
+      if (dt > 0.0)
+        return true;
+
+      msg.error ("Timestep must be positive");
+      return false;
     }
   } positive;
   return positive;
@@ -138,10 +141,13 @@ Timestep::non_zero ()
 {
   static struct NonZero : public GenCheck
   {
-    void check_dt (const double dt) const throw (std::string)
+    bool check_dt (const double dt, Treelog& msg) const
     {
-      if (iszero (dt))
-        throw std::string ("Timestep must be non-zero");
+      if (std::isnormal (dt))
+        return true;
+
+      msg.error ("Timestep must be non-zero");
+      return false;
     }
   } non_zero;
   return non_zero;
