@@ -1389,8 +1389,8 @@ xref${OBJ}: xref.C xref.h symbol.h traverse.h metalib.h frame.h scope.h \
   value.h library.h librarian.h model.h assertion.h frame_model.h
 oldunits${OBJ}: oldunits.C oldunits.h symbol.h mathlib.h assertion.h \
   memutils.h value.h
-check${OBJ}: check.C check.h mathlib.h assertion.h
-check_range${OBJ}: check_range.C check_range.h check.h
+check${OBJ}: check.C check.h mathlib.h assertion.h treelog.h symbol.h
+check_range${OBJ}: check_range.C check_range.h check.h treelog.h symbol.h
 path${OBJ}: path.C path.h symbol.h assertion.h w32reg.h version.h
 traverse_delete${OBJ}: traverse_delete.C traverse_delete.h symbol.h \
   traverse.h metalib.h frame.h scope.h value.h library.h frame_model.h \
@@ -1448,7 +1448,8 @@ svat_ssoc${OBJ}: svat_ssoc.C svat.h model.h symbol.h block.h value.h \
 reaction_Jarvis99${OBJ}: reaction_Jarvis99.C reaction_colgen.h reaction.h \
   model.h symbol.h ponddamp.h mathlib.h assertion.h check.h block.h \
   value.h librarian.h chemistry.h chemical.h log.h time.h border.h \
-  geometry.h soil.h treelog.h frame.h scope.h rainergy.h
+  geometry.h soil.h surface.h uzmodel.h treelog.h frame.h scope.h \
+  rainergy.h
 reaction_filter${OBJ}: reaction_filter.C reaction.h model.h symbol.h block.h \
   value.h transform.h chemistry.h chemical.h soil.h soil_water.h log.h \
   time.h border.h assertion.h librarian.h check.h mathlib.h treelog.h \

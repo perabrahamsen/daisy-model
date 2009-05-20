@@ -75,7 +75,7 @@ struct ReactionDenit : public Reaction
               const Chemistry& chemistry, Treelog& msg) const;
   void initialize (const Units&, const Geometry&, 
                    const Soil&, const SoilWater&, const SoilHeat&,
-                   Treelog&);
+                   const Surface&, Treelog&);
   explicit ReactionDenit (Block& al);
 };
 
@@ -162,7 +162,7 @@ ReactionDenit::check (const Units&, const Geometry&,
 void
 ReactionDenit::initialize (const Units&, const Geometry&,
                            const Soil& soil, const SoilWater&,
-                           const SoilHeat&, Treelog&)
+                           const SoilHeat&, const Surface&, Treelog&)
 {
   const size_t cell_size = soil.size ();
 

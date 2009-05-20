@@ -61,7 +61,7 @@ struct Syntax::Implementation
   string_map descriptions;
 
   bool check (Metalib&, const Frame& vl, Treelog& err);
-  void check (const symbol key, double value) const;
+  bool verify (symbol key, double value, Treelog& msg) const;
   Value::type lookup (const symbol key) const;
   void entries (std::set<symbol>& result) const;
   Implementation ()
@@ -128,23 +128,26 @@ Syntax::Implementation::check (Metalib& metalib,
 		{
 		  const std::vector<double>& array = vl.number_sequence (key);
 		  for (unsigned int i = 0; i < array.size (); i++)
-		    try 
-		      { check->check (array[i]); }
-		    catch (const std::string& message)
-		      {
-			std::ostringstream str;
-			str << key << "[" << i << "]: " << message;
-			msg.error (str.str ());
-			error = true;
-		      }
+                    {
+#if 1
+                      std::ostringstream tmp;
+                      tmp << key << "[" << i << "]";
+                      Treelog::Open nest (msg, tmp.str ());
+#endif
+                      if (!check->verify (array[i], msg))
+                        error = true;
+                    }
 		}
-	      else try 
-		{ check->check (vl.number (key)); }
-	      catch (const std::string& message)
-		{
-		  msg.error (key + ": " + message);
-		  error = true;
-		}
+	      else 
+                {
+#if 1
+                  Treelog::Open nest (msg, key);
+#else
+                  msg.message ("hello");
+#endif
+                  if (!check->verify (vl.number (key), msg))
+                    error = true;
+                }
 	    }
 	}
       else if (types[key] == Value::Object)
@@ -231,13 +234,19 @@ Syntax::Implementation::check (Metalib& metalib,
   return !error;
 }
 
-void
-Syntax::Implementation::check (const symbol key, const double value) const
+bool
+Syntax::Implementation::verify (const symbol key, const double value,
+                                Treelog& msg) const
 {
   check_map::const_iterator i = num_checks.find (key);
+  
+  if (i == num_checks.end ())
+    return true;
 
-  if (i != num_checks.end ())
-    (*i).second->check (value);
+#if 0
+  Treelog::Open nest (msg, key);
+#endif
+  return (*i).second->verify (value, msg);
 }
 
 
@@ -269,9 +278,9 @@ Syntax::check (Metalib& metalib,
                const Frame& vl, Treelog& err) const
 { return impl->check (metalib, vl, err);}
 
-void
-Syntax::check (const symbol key, const double value) const
-{ impl->check (key, value); }
+bool
+Syntax::verify (const symbol key, const double value, Treelog& msg) const
+{ return impl->verify (key, value, msg); }
 
 bool 
 Syntax::check (Metalib& metalib, const Frame& vl, 

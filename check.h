@@ -25,11 +25,13 @@
 #include <string>
 #include <boost/noncopyable.hpp>
 
+class Treelog;
+
 class Check : private boost::noncopyable
 { 
   // Use.
 public:
-  virtual void check (const double value) const throw (std::string) = 0;
+  virtual bool verify (const double value, Treelog&) const = 0;
 
   // Utilities.
 public:

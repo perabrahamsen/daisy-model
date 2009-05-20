@@ -49,7 +49,8 @@ public:
   // Column.
   double runoff_rate (double dt) const; // [h^-1]
   double mixing_resistance () const; // [h/mm]
-
+  double mixing_depth () const; // [cm]
+  
   // Ridge.
   void update_water (const Geometry1D& geo,
                      const Soil&, const std::vector<double>& S_,

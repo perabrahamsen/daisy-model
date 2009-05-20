@@ -212,13 +212,13 @@ Frame::check (Metalib& metalib, const Frame& frame, Treelog& msg) const
   return ok;
 }
 
-void 
-Frame::check (const symbol key, double value) const
+bool
+Frame::verify (const symbol key, double value, Treelog& msg) const
 { 
   if (parent () && impl->syntax.lookup (key) == Value::Error)
-    parent ()->check (key, value); 
+    return parent ()->verify (key, value, msg); 
   else
-    impl->syntax.check (key, value); 
+    return impl->syntax.verify (key, value, msg); 
 }
 
 bool 

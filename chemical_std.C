@@ -195,6 +195,7 @@ struct ChemicalStandard : public Chemical
                  const double canopy_leak_rate, // [h^-1]
                  const double surface_runoff_rate, // [h^-1]
                  const double dt, // [h]
+                 double z_mixing, // [cm]
                  Treelog& msg);
   void tick_soil (const Units&,
                   const Geometry&, const Soil&, const SoilWater&, double dt,
@@ -622,6 +623,7 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
                             const double cover, // [],
                             const double canopy_leak_rate, // [h^-1]
                             const double surface_runoff_rate, // [h^-1]
+                            const double z_mixing, // [cm]
                             const double dt, // [h]
                             Treelog& msg)
 {

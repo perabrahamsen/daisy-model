@@ -91,7 +91,7 @@ struct ReactionStandard : public Reaction
   }
   void initialize (const Units& units, const Geometry&, 
                    const Soil& soil, const SoilWater& soil_water,
-                   const SoilHeat& soil_heat, Treelog& msg)
+                   const SoilHeat& soil_heat, const Surface&, Treelog& msg)
   { 
     transform->initialize (units, soil, soil_water, soil_heat, msg); 
     S_AB.insert (S_AB.begin (), soil.size (), 0.0);

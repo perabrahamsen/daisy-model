@@ -502,14 +502,9 @@ ParserFile::Implementation::check_value (const Frame& frame,
                                          const symbol name,
                                          const double value)
 {
-  try
-    {
-      frame.check (name, value);
-    }
-  catch (const std::string& message)
-    {
-      error (name + ": " + message);
-    }
+  Treelog::Open nest (msg, name);
+  if (!frame.verify (name, value, msg))
+    error (name + ": bad value");
 }
 
 class FrameParsed : public FrameModel
@@ -950,13 +945,10 @@ ParserFile::Implementation::load_list (Frame& frame)
 		    count++;
 		  }
 		  const double y = get_number (range);
-		  try
-		    {
-		      frame.check (name, y);
-		    }
-		  catch (const std::string& message)
-		    {
-		      error (name + ": " + message);
+                  Treelog::Open nest (msg, name);
+                  if (!frame.verify (name, y, msg))
+                    {
+                      error (name + ": bad value");
 		      ok = false;
 		    }
 		  if (ok)
@@ -1197,14 +1189,9 @@ ParserFile::Implementation::load_list (Frame& frame)
 			  count++;
 			}
 			double y = get_number (range);
-			try
-			  {
-			    frame.check (name, y);
-			  }
-			catch (const std::string& message)
-			  {
-			    error (name + ": " + message);
-			  }
+                        Treelog::Open nest (msg, name);
+                        if (!frame.verify (name, y, msg))
+                          error (name + ": bad value");
 			plf.add (x, y);
 		      }
 		    if (count < 2)
@@ -1292,16 +1279,13 @@ ParserFile::Implementation::load_list (Frame& frame)
 		for (unsigned int i = 0; i < array.size (); i++)
 		  {
 		    if (positions[i] != Filepos::none ())
-		      try
-			{
-			  frame.check (name, array[i]);
-			}
-		      catch (const std::string& message)
-			{
-			  std::ostringstream str;
-			  str << name << "[" << i << "]: " << message;
-			  error (str.str (), positions[i]);
-			}
+                      {
+                        std::ostringstream tmp;
+                        tmp << name << "[" << i << "]";
+                        Treelog::Open nest (msg, tmp.str ());
+                        if (!frame.verify (name, array[i], msg))
+                          error (tmp.str () + ": bad value", positions[i]);
+                      }
 		  }
 		if (!Value::flexible_size (size) && count != size)
 		  {

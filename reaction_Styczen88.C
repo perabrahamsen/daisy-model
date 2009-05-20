@@ -72,7 +72,7 @@ struct ReactionStyczen88 : public ReactionColgen
   // Create and Destroy.
   void initialize (const Units&, const Geometry& geo,
                    const Soil& soil, const SoilWater&, const SoilHeat&, 
-                   Treelog&);
+                   const Surface&, Treelog&);
   ReactionStyczen88 (Block& al);
 };
 
@@ -245,7 +245,7 @@ ReactionStyczen88::output (Log& log) const
 void 
 ReactionStyczen88::initialize (const Units&, const Geometry&, 
                                const Soil&, const SoilWater&, const SoilHeat&, 
-                               Treelog&)
+                               const Surface&, Treelog&)
 {  }
 
 ReactionStyczen88::ReactionStyczen88 (Block& al)

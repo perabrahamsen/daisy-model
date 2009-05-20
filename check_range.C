@@ -21,17 +21,20 @@
 #define BUILD_DLL
 
 #include "check_range.h"
+#include "treelog.h"
 #include <sstream>
 
-void
-RangeII::check (const double value) const throw (std::string)
+bool
+RangeII::verify (const double value, Treelog& msg) const
 {
   if (value < lower || value > upper)
     {
       std::ostringstream str;
       str << "Value not in interval [" << lower << "; " << upper << "]";
-      throw std::string (str.str ());
+      msg.error (str.str ());
+      return false;
     }
+    return true;
 }
 
 RangeII::RangeII (const double l, const double u)
@@ -39,15 +42,17 @@ RangeII::RangeII (const double l, const double u)
     upper (u)
 { }
 
-void
-RangeIE::check (const double value) const throw (std::string)
+bool
+RangeIE::verify (const double value, Treelog& msg) const
 {
   if (value < lower || value >= upper)
     {
       std::ostringstream str;
       str << "Value not in interval [" << lower << "; " << upper << "[";
-      throw std::string (str.str ());
+      msg.error (str.str ());
+      return false;
     }
+    return true;
 }
 
 RangeIE::RangeIE (const double l, const double u)
@@ -55,15 +60,17 @@ RangeIE::RangeIE (const double l, const double u)
     upper (u)
 { }
 
-void
-RangeEI::check (const double value) const throw (std::string)
+bool
+RangeEI::verify (const double value, Treelog& msg) const
 {
   if (value <= lower || value > upper)
     {
       std::ostringstream str;
       str << "Value not in interval ]" << lower << "; " << upper << "]";
-      throw std::string (str.str ());
+      msg.error (str.str ());
+      return false;
     }
+    return true;
 }
 
 RangeEI::RangeEI (const double l, const double u)
@@ -71,15 +78,17 @@ RangeEI::RangeEI (const double l, const double u)
     upper (u)
 { }
 
-void
-RangeEE::check (const double value) const throw (std::string)
+bool
+RangeEE::verify (const double value, Treelog& msg) const
 {
   if (value <= lower || value >= upper)
     {
       std::ostringstream str;
       str << "Value not in interval ]" << lower << "; " << upper << "[";
-      throw std::string (str.str ());
+      msg.error (str.str ());
+      return false;
     }
+    return true;
 }
 
 RangeEE::RangeEE (const double l, const double u)
@@ -87,60 +96,68 @@ RangeEE::RangeEE (const double l, const double u)
     upper (u)
 { }
 
-void
-Below::check (const double value) const throw (std::string)
+bool
+Below::verify (const double value, Treelog& msg) const
 {
   if (value >= upper)
     {
       std::ostringstream str;
       str << "Value should be < " << upper;
-      throw std::string (str.str ());
+      msg.error (str.str ());
+      return false;
     }
+    return true;
 }
 
 Below::Below (const double u)
   : upper (u)
 { }
 
-void
-BelowOrEqual::check (const double value) const throw (std::string)
+bool
+BelowOrEqual::verify (const double value, Treelog& msg) const
 {
   if (value > upper)
     {
       std::ostringstream str;
       str << "Value should be <= " << upper;
-      throw std::string (str.str ());
+      msg.error (str.str ());
+      return false;
     }
+    return true;
 }
 
 BelowOrEqual::BelowOrEqual (const double u)
   : upper (u)
 { }
 
-void
-Above::check (const double value) const throw (std::string)
+bool
+Above::verify (const double value, Treelog& msg) const
 {
   if (value <= lower)
     {
       std::ostringstream str;
       str << "Value should be > " << lower;
-      throw std::string (str.str ());
+      msg.error (str.str ());
+      return false;
     }
+    return true;
 }
 
 Above::Above (const double l)
   : lower (l)
 { }
 
-void
-AboveOrEqual::check (const double value) const throw (std::string)
+bool
+AboveOrEqual::verify (const double value, Treelog& msg) const
 {
   if (value < lower)
     {
       std::ostringstream str;
       str << "Value should be >= " << lower;
-      throw std::string (str.str ());
+      msg.error (str.str ());
+      return false;
     }
+    return true;
 }
 
 AboveOrEqual::AboveOrEqual (const double l)
@@ -148,3 +165,5 @@ AboveOrEqual::AboveOrEqual (const double l)
 { }
 
 const AboveOrEqual Temperature (-273.15);
+
+// check_range.C ends here.

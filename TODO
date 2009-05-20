@@ -1,6 +1,52 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* TODO fix zplus
+* R2D2
+
+** Mixing layer?
+
+*** DONE z_mixing
+
+Vi har brug for den til adsorptionsligevægt.
+
+*** DONE Jarvis99 skal bruge z_mixing
+
+*** straksligevægt på overfladen følger Theta & rho_b i øverste lag
+
+z_mixing [cm]
+
+DONE 
+
+surface_storage [g/m^2]
+m2_per_cm2 [m^2/cm^2]
+M = surface_storage * m2_per_cm2 / z_mixing [g/cm^3]
+
+surface_solute = 0
+for each edge
+  cell = other (edge, cell_above)
+  C = M2C (M, cell) [g/cm^3]
+  area = edge->area [cm^2]
+  Theta = cell->Theta []
+  surface_solute += Theta * C * area  [g/cm]
+surface_solute *= z_mixing [g]
+surface_area [m^2]
+surface_solute /= surface_area [g/m^2]
+assert (surface_solute >= 0.0)
+surface_immobile = surface_storage - surface_solute [g/m^2]
+
+*** kun opløst stof infiltrerer og mixture
+
+ChemicalStandard::infiltrate 
+ChemicalStandard::mixture
+
+*** kollodbåret stof følger immobil * frigivelse / reservoir
+
+*** kinetisk ligevægt skal fungere på overfladen
+
+Følger Theta og rho_b for øverste node.
+
+** Drændynamik
+
+** Opfugtning
 
 * Serbia DONE
 

@@ -30,6 +30,7 @@
 #include "log.h"
 #include "geometry.h"
 #include "soil.h"
+#include "surface.h"
 #include "treelog.h"
 #include "frame.h"
 #include "rainergy.h"
@@ -43,7 +44,7 @@ struct ReactionJarvis99 : public ReactionColgen
   const double Mmax;            // Max colloid pool [g C/g S]
   const double kd;              // Depletion rate from pool [g S/J]
   const double kr;              // Replenishment rate to pool [g C/cm^2 S/h] 
-  const double zi;              // Mixing layer thickness [cm S]
+  /* const */ double zi;        // Mixing layer thickness [cm S]
 
   // Initialized.
   /* const */ double rho_b;     // Dry bulk density [g S/cm^3 S]
@@ -74,7 +75,7 @@ struct ReactionJarvis99 : public ReactionColgen
   // Create and Destroy.
   void initialize (const Units&, const Geometry& geo,
                    const Soil& soil, const SoilWater&, const SoilHeat&, 
-                   Treelog&);
+                   const Surface&, Treelog&);
   bool check (const Units&, const Geometry& geo,
               const Soil&, const SoilWater&, const SoilHeat&,
 	      const Chemistry& chemistry, Treelog& msg) const;
@@ -143,9 +144,14 @@ ReactionJarvis99::output (Log& log) const
 
 void 
 ReactionJarvis99::initialize (const Units&, const Geometry& geo,
-                           const Soil& soil, const SoilWater&, const SoilHeat&, 
-                           Treelog&)
+                              const Soil& soil, const SoilWater&, 
+                              const SoilHeat&, const Surface& surface, Treelog&)
 {  
+  // Mixing layer
+  if (zi < 0.0)
+    zi = surface.mixing_depth ();
+  daisy_assert (zi > 0.0);
+
   // Find average dry bulk density for top cells.
   const std::vector<size_t>& edge_above = geo.cell_edges (Geometry::cell_above);
   const size_t edge_above_size = edge_above.size ();
@@ -193,7 +199,7 @@ ReactionJarvis99::ReactionJarvis99 (Block& al)
     Mmax (al.number ("Mmax")),
     kd (al.number ("kd")),
     kr (al.number ("kr")),
-    zi (al.number ("zi")),
+    zi (al.number ("zi", -42.24e42)),
     rho_b (-42.42e42),
     Ms (al.number ("Ms", Mmax * 0.1)),
     As (-42.42e42),
@@ -225,8 +231,9 @@ Colloid generation emulating the MACRO model.")
     frame.declare ("kr", "g/cm^2/h", Check::non_negative (), Value::Const,
                 "Replenishment rate coefficient.");
     // frame.declare ("kr", 0.1 /* [g/m^2/h] */ / (100.0 /* [cm/m] */ * 100.0));
-    frame.declare ("zi", "cm", Check::positive (), Value::Const,
-                "Thickness of surface soil layer.");
+    frame.declare ("zi", "cm", Check::positive (), Value::OptionalConst,
+                   "Thickness of surface soil layer.\n\
+By default, the value of 'z_mixing' from 'Surface' is used.");
     // frame.set ("zi", 0.1);
     frame.declare ("Ms", "g/g", Check::non_negative (), Value::OptionalState,
                 "Current concentration of detachable particles in top soil.\n\

@@ -57,6 +57,7 @@ struct Surface::Implementation
   double runoff;
   double runoff_fraction;
   const double R_mixing;
+  const double z_mixing;
   std::auto_ptr<Ridge> ridge_;
 
   // UZ top.
@@ -244,6 +245,10 @@ Surface::runoff_rate (const double dt) const
 double
 Surface::mixing_resistance () const
 { return impl->R_mixing; }
+
+double
+Surface::mixing_depth () const
+{ return impl->z_mixing; }
 
 double
 Surface::temperature () const
@@ -557,8 +562,13 @@ Fraction of ponding above DetentionCapacity that runoffs each hour.");
   frame.set ("ReservoirConstant", 1.0);
   frame.declare ("runoff", "mm/h", Value::LogOnly, "\
 Amount of water runoff from ponding this hour.");
+  frame.declare ("z_mixing", "cm", Check::non_negative (), Value::Const, "\
+Depth of mixing layer in the top of the soil.\n\
+The mixing layer affect exchange between soil coloids, soil water\n\
+and the surface, especially in connection with intense rainfall.");
+  frame.set ("z_mixing", 0.1);
   frame.declare ("R_mixing", "h/mm", Check::non_negative (), Value::Const, "\
-Resistance to mixing inorganic N between soil and ponding.");
+Resistance to mixing inorganic compounds between soil and ponding.");
   frame.set ("R_mixing", 1.0e9);
   frame.declare_submodule ("ridge", Value::OptionalState, "\
 Active ridge system, if any.",
@@ -586,6 +596,7 @@ Surface::Implementation::Implementation (const FrameSubmodel& al)
     runoff (0.0),
     runoff_fraction (0.0),
     R_mixing (al.number ("R_mixing")),
+    z_mixing (al.number ("z_mixing")),
     ridge_ (al.check ("ridge") ? new Ridge (al.submodel ("ridge")) : NULL)
 { }
 

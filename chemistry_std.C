@@ -75,6 +75,7 @@ struct ChemistryStandard : public Chemistry
                  const double direct_rain, // [mm/h]
                  const double canopy_drip /* [mm/h] */, 
                  const double h_veg /* [m] */,
+                 const double z_mixing, // [cm]
                  const double dt, // [h]
 		 Treelog&);
   void infiltrate (const Geometry&, 
@@ -90,7 +91,8 @@ struct ChemistryStandard : public Chemistry
 
   // Create & Destroy.
   void initialize (const Scope& scope, const Geometry& geo,
-                   const Soil&, const SoilWater&, const SoilHeat&, Treelog&);
+                   const Soil&, const SoilWater&, const SoilHeat&, 
+                   const Surface&, Treelog&);
   bool check (const Scope& scope, const Geometry&,
 	      const Soil&, const SoilWater&, const SoilHeat&, const Chemistry&,
 	      Treelog&) const;
@@ -232,6 +234,7 @@ ChemistryStandard::tick_top (const double snow_leak_rate, // [h^-1]
                              const double direct_rain, // [mm/h]
                              const double canopy_drip, // [mm/h]
                              const double h_veg /* [m] */,
+                             const double z_mixing, // [cm]
                              const double dt, // [h]
 			     Treelog& msg) 
 {
@@ -241,7 +244,7 @@ ChemistryStandard::tick_top (const double snow_leak_rate, // [h^-1]
 
   for (size_t c = 0; c < chemicals.size (); c++)
     chemicals[c]->tick_top (snow_leak_rate, cover, canopy_leak_rate, 
-                            surface_runoff_rate, dt, msg);
+                            surface_runoff_rate, z_mixing, dt, msg);
 }
 
 void 
@@ -321,14 +324,15 @@ ChemistryStandard::initialize (const Scope& scope,
                                const Soil& soil, 
                                const SoilWater& soil_water,
 			       const SoilHeat& soil_heat,
-			       Treelog& msg)
+			       const Surface& surface, Treelog& msg)
 {
   for (size_t c = 0; c < chemicals.size (); c++)
     chemicals[c]->initialize (units, scope, geo, soil, soil_water, soil_heat, 
 			      msg);
 
   for (size_t r = 0; r < reactions.size (); r++)
-    reactions[r]->initialize (units, geo, soil, soil_water, soil_heat, msg);
+    reactions[r]->initialize (units, geo, soil, soil_water, soil_heat, surface, 
+                              msg);
 }
 
 bool 

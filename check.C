@@ -21,12 +21,13 @@
 #define BUILD_DLL
 #include "check.h"
 #include "mathlib.h"
+#include "treelog.h"
 
 // GCC 2.95 -O2 dislike declaring these classes local.
 struct None : public Check
 {
-  void check (const double) const throw (std::string)
-  { }
+  bool verify (const double, Treelog&) const
+  { return true; }
 };
 
 const Check& 
@@ -38,8 +39,8 @@ Check::none ()
 
 struct Unknown : public Check
 {
-  void check (const double) const throw (std::string)
-  { }
+  bool verify (const double, Treelog&) const
+  { return true; }
 };
 
 const Check& 
@@ -51,10 +52,13 @@ Check::unknown ()
 
 struct NonZero : public Check
 {
-  void check (const double value) const throw (std::string)
+  bool verify (const double value, Treelog& msg) const
   {
-    if (iszero (value))
-      throw std::string ("Zero value not permitted");
+    if (std::isnormal (value))
+      return true;
+
+    msg.error ("Zero value not permitted");
+    return false;
   }
 };
 
@@ -67,10 +71,13 @@ Check::non_zero ()
 
 struct NonNegative : public Check
 {
-  void check (const double value) const throw (std::string)
+  bool verify (const double value, Treelog& msg) const
   {
-    if (value < 0.0)
-      throw std::string ("Negative value not permitted");
+    if (value >= 0.0)
+      return true;
+
+    msg.error ("Negative value not permitted");
+    return false;
   }
 };
 
@@ -83,10 +90,13 @@ Check::non_negative ()
 
 struct NonPositive : public Check
 {
-  void check (const double value) const throw (std::string)
+  bool verify (const double value, Treelog& msg) const
   {
-    if (value > 0.0)
-      throw std::string ("Positive value not permitted");
+    if (value <= 0.0)
+      return true;
+    
+    msg.error ("Positive value not permitted");
+    return false;
   }
 };
 
@@ -99,10 +109,13 @@ Check::non_positive ()
 
 struct Negative : public Check
 {
-  void check (const double value) const throw (std::string)
+  bool verify (const double value, Treelog& msg) const
   {
-    if (value >= 0.0)
-      throw std::string ("Value must be negative");
+    if (value < 0.0)
+      return true;
+
+    msg.error ("Value must be negative");
+    return false;
   }
 };
 
@@ -115,10 +128,13 @@ Check::negative ()
 
 struct Positive : public Check
 {
-  void check (const double value) const throw (std::string)
+  bool verify (const double value, Treelog& msg) const
   {
-    if (value <= 0.0)
-      throw std::string ("Value must be positive");
+    if (value > 0.0)
+      return true;
+
+    msg.error ("Value must be positive");
+    return false;
   }
 };
 
@@ -131,10 +147,13 @@ Check::positive ()
 
 struct Fraction : public Check
 {
-  void check (const double value) const throw (std::string)
+  bool verify (const double value, Treelog& msg) const
   {
-    if (value < 0.0 || value > 1.0)
-      throw std::string ("Value must be fraction [0;1]");
+    if (value >= 0.0 && value <= 1.0)
+      return true;
+
+    msg.error ("Value must be a fraction [0;1]");
+    return false;
   }
 };
 
@@ -150,3 +169,6 @@ Check::Check ()
 
 Check::~Check ()
 { }
+
+// check.C ends here.
+

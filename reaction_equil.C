@@ -188,7 +188,7 @@ struct ReactionEquilibrium : public Reaction
   }
   void initialize (const Units& units, const Geometry&, const Soil& soil, 
                    const SoilWater& soil_water, const SoilHeat& soil_heat,
-                   Treelog& msg)
+                   const Surface&, Treelog& msg)
   { 
     TREELOG_MODEL (msg);
     ScopeSoil scope (soil, soil_water, soil_heat);
@@ -244,7 +244,7 @@ By default, this is identical to 'k_AB'.");
                    "Converted from A to B this timestep (may be negative).");
     frame.declare ("colloid", Value::String, Value::OptionalConst,
                    "Let 'rho_b' denote content of specified chemical.\n\
-This miht affect the evaluation of the 'k_AB' and 'k_BA' parameter\n\
+This might affect the evaluation of the 'k_AB' and 'k_BA' parameter\n\
 expressions, as well as the 'equilibrium' model.\n\
 By default, 'rho_b' will be the soil dry bulk density.");
     frame.declare ("secondary", Value::Boolean, Value::Const,

@@ -62,7 +62,7 @@ struct ReactionMorgan98 : public ReactionColgen
   // Create and Destroy.
   void initialize (const Units&, const Geometry& geo,
                    const Soil& soil, const SoilWater&, const SoilHeat&, 
-                   Treelog&);
+                   const Surface&, Treelog&);
   ReactionMorgan98 (Block& al);
 };
 
@@ -113,7 +113,7 @@ ReactionMorgan98::output (Log& log) const
 void 
 ReactionMorgan98::initialize (const Units&, const Geometry&, 
                               const Soil&, const SoilWater&, const SoilHeat&, 
-                              Treelog&)
+                              const Surface&, Treelog&)
 {  }
 
 ReactionMorgan98::ReactionMorgan98 (Block& al)

@@ -85,7 +85,7 @@ class EXPORT Frame : public WScope
   bool check (Metalib&, const Frame& frame, Treelog&) const;
   
   // Check that a numeric value is within the allowed range.
-  void check (symbol key, double value) const;
+  bool verify (symbol key, double value, Treelog&) const;
 
   // Check than an arbitrary attribute is valid.
   bool check (Metalib&, symbol key, Treelog&) const;

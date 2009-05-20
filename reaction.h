@@ -29,6 +29,7 @@ class Geometry;
 class Soil;
 class SoilWater;
 class SoilHeat;
+class Surface;
 class OrganicMatter;
 class Chemistry;
 class Treelog;
@@ -59,7 +60,7 @@ public:
 public:
   virtual void initialize (const Units& units, const Geometry& geo,
                            const Soil&, const SoilWater&, const SoilHeat&, 
-                           Treelog&) = 0;
+                           const Surface&, Treelog&) = 0;
   virtual bool check (const Units& units, const Geometry& geo,
                       const Soil&, const SoilWater&, const SoilHeat&,
 		      const Chemistry&, Treelog&) const = 0;

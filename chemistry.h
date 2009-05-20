@@ -32,6 +32,7 @@ class Soil;
 class SoilWater;
 class SoilHeat;
 class OrganicMatter;
+class Surface;
 class Movement;
 class Chemical;
 class Volume;
@@ -96,6 +97,7 @@ public:
                          double direct_rain /* [mm/h] */,
                          double canopy_drip /* [mm/h] */, 
                          double h_veg /* [m] */,
+                         double z_mixing, // [cm]
                          double dt /* [h] */,
 			 Treelog&) = 0;
   virtual void tick_soil (const Scope&, 
@@ -111,7 +113,7 @@ public:
 public:
   virtual void initialize (const Scope&, const Geometry& geo,
                            const Soil&, const SoilWater&, const SoilHeat&,
-			   Treelog&) = 0;
+			   const Surface&, Treelog&) = 0;
   virtual bool check (const Scope&, const Geometry&,
 		      const Soil&, const SoilWater&, const SoilHeat&,
 		      const Chemistry&, Treelog&) const = 0;

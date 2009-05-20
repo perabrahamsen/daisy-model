@@ -643,7 +643,7 @@ ColumnStandard::tick (Metalib& metalib, const Time& time, const double dt,
                        bioclimate->direct_rain (), 
                        bioclimate->canopy_leak (),
                        vegetation->height () * 0.01 /* [m] */,
-                       dt, msg);
+                       surface.mixing_depth (), dt, msg);
 
   // Turnover.
   organic_matter->tick (geometry, *soil_water, *soil_heat, 
@@ -924,7 +924,8 @@ ColumnStandard::initialize (Block& block,
                           geometry, *soil, *soil_heat, *groundwater, msg);
   
   // Solutes depends on water and heat.
-  chemistry->initialize (scope, geometry, *soil, *soil_water, *soil_heat, msg);
+  chemistry->initialize (scope, geometry, *soil, *soil_water, *soil_heat, 
+                         surface, msg);
   
   // Organic matter and vegetation.
   const double T_avg = my_weather.average_temperature ();

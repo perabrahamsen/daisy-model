@@ -74,8 +74,9 @@ struct ChemistryMulti : public Chemistry
                  const double surface_water /* [mm] */,
                  const double total_rain /* [mm/h] */,
                  const double direct_rain, // [mm/h]
-                 double canopy_drip /* [mm/h] */, 
+                 const double canopy_drip /* [mm/h] */, 
                  const double h_veg /* [m] */,
+                 const double z_mixing, // [cm]
                  const double dt, // [h]
 		 Treelog&);
   void infiltrate (const Geometry&, 
@@ -91,7 +92,8 @@ struct ChemistryMulti : public Chemistry
 
   // Create & Destroy.
   void initialize (const Scope&, const Geometry&,
-                   const Soil&, const SoilWater&, const SoilHeat&, Treelog&);
+                   const Soil&, const SoilWater&, const SoilHeat&, 
+                   const Surface&, Treelog&);
   bool check (const Scope&, const Geometry&, 
 	      const Soil&, const SoilWater&, const SoilHeat&, const Chemistry&,
 	      Treelog&) const;
@@ -301,13 +303,15 @@ ChemistryMulti::tick_top (const double snow_leak_rate, // [h^-1]
                           const double direct_rain, // [mm/h]
                           const double canopy_drip /* [mm/h] */, 
                           const double h_veg /* [m] */,
+                          const double z_mixing, // [cm]
                           const double dt, // [h]
                           Treelog& msg) 
 {
   for (size_t c = 0; c < combine.size (); c++)
     combine[c]->tick_top (snow_leak_rate, cover, canopy_leak_rate, 
 			  surface_runoff_rate, surface_water,
-                          total_rain, direct_rain, canopy_drip, h_veg, dt, msg);
+                          total_rain, direct_rain, canopy_drip, h_veg, 
+                          z_mixing, dt, msg);
 }
 
 void 
@@ -354,10 +358,11 @@ ChemistryMulti::initialize (const Scope& scope,
 			    const Soil& soil, 
 			    const SoilWater& soil_water,
 			    const SoilHeat& soil_heat,
-			    Treelog& msg)
+			    const Surface& surface, Treelog& msg)
 {
   for (size_t c = 0; c < combine.size (); c++)
-    combine[c]->initialize (scope, geo, soil, soil_water, soil_heat, msg);
+    combine[c]->initialize (scope, geo, soil, soil_water, soil_heat, surface, 
+                            msg);
 }
 
 bool 
