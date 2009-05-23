@@ -98,12 +98,15 @@ struct ChemicalStandard : public Chemical
   double canopy_out;
 
   double surface_storage;
+  double surface_solute;
+  double surface_immobile;
   double surface_in;
   double surface_out;
   double surface_mixture;
   double surface_runoff;
   double surface_decompose;
   double surface_transform;
+  double surface_release;
 
   // Soil state and log.
   std::vector<double> C_avg_;   // Concentration in soil solution [g/cm^3]
@@ -195,8 +198,10 @@ struct ChemicalStandard : public Chemical
                  const double canopy_leak_rate, // [h^-1]
                  const double surface_runoff_rate, // [h^-1]
                  const double dt, // [h]
-                 double z_mixing, // [cm]
                  Treelog& msg);
+  void tick_surface (const Geometry& geo, 
+                     const Soil& soil, const SoilWater& soil_water, 
+                     const double z_mixing);
   void tick_soil (const Units&,
                   const Geometry&, const Soil&, const SoilWater&, double dt,
                   const Scope&, Treelog&);
@@ -407,6 +412,7 @@ ChemicalStandard::clear ()
   residuals = 0.0;
   surface_tillage = 0.0;
   surface_transform = 0.0;
+  surface_release = 0.0;
   std::fill (S_secondary_.begin (), S_secondary_.end (), 0.0);
   std::fill (S_primary_.begin (), S_primary_.end (), 0.0);
   std::fill (S_external.begin (), S_external.end (), 0.0);
@@ -593,10 +599,14 @@ ChemicalStandard::mix (const Geometry& geo,
                        const double penetration, const double dt)
 { 
   // Removed from surface.
+  daisy_approximate (surface_storage, surface_solute + surface_immobile);
   const double removed = surface_storage * penetration;
   surface_tillage += removed / dt;
   surface_storage -= removed;
-  
+  surface_solute *= (1.0 - penetration);
+  surface_immobile *= (1.0 - penetration);
+  daisy_approximate (surface_storage, surface_solute + surface_immobile);
+
   // Add to soil.
   const double m2_per_cm2 = 0.01 * 0.01;
   const double penetrated = removed * m2_per_cm2;
@@ -623,7 +633,6 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
                             const double cover, // [],
                             const double canopy_leak_rate, // [h^-1]
                             const double surface_runoff_rate, // [h^-1]
-                            const double z_mixing, // [cm]
                             const double dt, // [h]
                             Treelog& msg)
 {
@@ -687,6 +696,49 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
           << new_storage - old_storage - (input - output) * dt << " g/ha";
       msg.error (tmp.str ());
     }
+}
+
+void
+ChemicalStandard::tick_surface (const Geometry& geo, 
+                                const Soil& soil, const SoilWater& soil_water, 
+                                const double z_mixing)
+// Divide surface storage in immobile and solute mixing layer.void 
+{
+  // Find total concentration in mixing layer.
+  const double m2_per_cm2 = 0.01 * 0.01 ; // [m^2/cm^2]
+  const double M = surface_storage * m2_per_cm2 / z_mixing; // [g/cm^3]
+
+  // Now find the solute.
+  surface_solute = 0.0;
+
+  // We look at each top cell.
+  const std::vector<size_t>& edge_above = geo.cell_edges (Geometry::cell_above);
+  const size_t edge_above_size = edge_above.size ();
+  for (size_t i = 0; i < edge_above_size; i++)
+    {
+      const size_t edge = edge_above[i];
+      const int cell = geo.edge_other (edge, Geometry::cell_above);
+      daisy_assert (geo.cell_is_internal (cell));
+
+      // Concentration in soil water.
+      const double Theta = soil_water.Theta (cell);
+      const double C = adsorption_->M_to_C (soil, Theta, cell, M); // [g/cm^3]
+
+      // Accumulate based on cell surface area.
+      const double area = geo.edge_area (edge); // [cm^2]
+      surface_solute += C * area;               // [g/cm]
+    }
+  
+  // Convert solute back to surface dimensions.
+  const double surface_area = geo.surface_area () / m2_per_cm2; // [m^2/cm^2]
+  surface_solute *= z_mixing;   // [g]
+  surface_solute /= surface_area; // [g/m^2]
+  daisy_assert (surface_solute >= 0.0);
+
+  // The immobile is the rest.
+  surface_immobile = surface_storage - surface_solute;
+  if (surface_immobile < 0.0)
+    daisy_approximate (surface_solute, surface_storage);
 }
 
 void                            // Called just before solute movement.
@@ -812,6 +864,7 @@ ChemicalStandard::mixture (const Geometry& geo,
                            const double rate /* [h/mm] */,
                            const double dt /* [h]*/)
 {
+  daisy_approximate (surface_storage, surface_solute + surface_immobile);
   // Make sure we have something to mix.
   if (pond < 1e-6 || rate < 1e-99)
     {
@@ -824,18 +877,23 @@ ChemicalStandard::mixture (const Geometry& geo,
   const double soil_conc
     = geo.content_hood (chemical, &Chemical::C_secondary, Geometry::cell_above)
     * (100.0 * 100.0) / 10.0; // [g/cm^3/] -> [g/m^2/mm]
-  const double storage_conc = surface_storage / pond;// [g/m^2/mm]
+  const double storage_conc = surface_solute / pond;// [g/m^2/mm]
   
   surface_mixture // [g/m^2/h]
     = std::min (surface_storage / dt, (storage_conc - soil_conc) / rate);
   surface_storage -= surface_mixture * dt;
+  surface_solute -= surface_mixture * dt;
+  daisy_approximate (surface_storage, surface_solute + surface_immobile);
 }
 
 void 
 ChemicalStandard::infiltrate (const double rate, const double dt)
 {
-  surface_out = surface_storage * rate;
+  daisy_approximate (surface_storage, surface_solute + surface_immobile);
+  surface_out = surface_solute * rate;
   surface_storage -= surface_out * dt;
+  surface_solute -= surface_out * dt;
+  daisy_approximate (surface_storage, surface_solute + surface_immobile);
 }
 
 double
@@ -943,10 +1001,13 @@ ChemicalStandard::output (Log& log) const
   output_variable (canopy_harvest, log);
   output_variable (canopy_out, log);
   output_variable (surface_storage, log);
+  output_variable (surface_solute, log);
+  output_variable (surface_immobile, log);
   output_variable (surface_in, log);
   output_variable (surface_runoff, log);
   output_variable (surface_decompose, log);
   output_variable (surface_transform, log);
+  output_variable (surface_release, log);
   output_variable (surface_mixture, log);
   output_variable (surface_out, log);
   output_value (snow_storage + canopy_storage + surface_storage,
@@ -1281,12 +1342,15 @@ ChemicalStandard::ChemicalStandard (Block& al)
     canopy_harvest (0.0),
     canopy_out (0.0),
     surface_storage (al.number ("surface_storage")),
+    surface_solute (0.0),
+    surface_immobile (surface_storage),
     surface_in (0.0),
     surface_out (0.0),
     surface_mixture (0.0),
     surface_runoff (0.0),
     surface_decompose (0.0),
     surface_transform (0.0),
+    surface_release (0.0),
     S_permanent (al.number_sequence ("S_permanent")),
     lag (al.check ("lag")
          ? al.number_sequence ("lag")
@@ -1582,8 +1646,16 @@ with 'none' adsorption and one with 'full' adsorption, and an\n\
                    "Amount removed with crop harvest.");
 
     frame.declare ("surface_storage", "g/m^2", Value::State, 
-                   "Stored on the soil surface.");
+                   "Stored on the soil surface.\n\
+This includes the mixing layer, and constitute 'surface_solute'\n\
+and 'surface_immobile'.");
     frame.set ("surface_storage", 0.0);
+    frame.declare ("surface_solute", "g/m^2", Value::LogOnly, 
+                   "Stored in the soil water of the mixing layer.\n\
+This is part of 'surface_storage'.");
+    frame.declare ("surface_immobile", "g/m^2", Value::LogOnly, 
+                   "Bound to soil particles in the mixing layer.\n\
+This is part of 'surface_storage'.");
     frame.declare ("surface_in", "g/m^2/h", Value::LogOnly, 
                    "Falling on the bare soil surface.");
     frame.declare ("surface_runoff", "g/m^2/h", Value::LogOnly, 
@@ -1596,13 +1668,15 @@ with 'none' adsorption and one with 'full' adsorption, and an\n\
                    "Entering the soil through mixture with ponded water.");
     frame.declare ("surface_out", "g/m^2/h", Value::LogOnly, 
                    "Entering the soil with water infiltration.");
-
+    frame.declare ("surface_release", Value::Fraction (), Value::LogOnly, "\
+Fraction of available soil particles released as colloids this timestep.\n\
+Only relevant for chemicals representing colloids.");
     frame.declare ("top_storage", "g/m^2", Value::LogOnly, 
                    "Som of above ground (surface, snow, canopy) storage.");
     frame.declare ("top_loss", "g/m^2/h", Value::LogOnly, "\
-Amount lost from the system from the surface.\n\
-This includes runoff, canopy dissipation and harvest, but not soil\n\
-infiltration.  It also includes the net loss through transformation,\n\
+Amount lost from the system from the surface.\n                         \
+This includes runoff, canopy dissipation and harvest, but not soil\n    \
+infiltration.  It also includes the net loss through transformation,\n  \
 which can be negative.");
 
     // Soil variables.

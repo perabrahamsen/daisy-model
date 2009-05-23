@@ -75,9 +75,11 @@ struct ChemistryStandard : public Chemistry
                  const double direct_rain, // [mm/h]
                  const double canopy_drip /* [mm/h] */, 
                  const double h_veg /* [m] */,
-                 const double z_mixing, // [cm]
                  const double dt, // [h]
 		 Treelog&);
+  void tick_surface (const Geometry& geo, 
+                     const Soil& soil, const SoilWater& soil_water, 
+                     const double z_mixing);
   void infiltrate (const Geometry&, 
                    double infiltration /* [mm/h] */, double ponding /* [mm] */,
                    double R_mixing /* [h/mm] */, const double dt /* [h] */);
@@ -234,7 +236,6 @@ ChemistryStandard::tick_top (const double snow_leak_rate, // [h^-1]
                              const double direct_rain, // [mm/h]
                              const double canopy_drip, // [mm/h]
                              const double h_veg /* [m] */,
-                             const double z_mixing, // [cm]
                              const double dt, // [h]
 			     Treelog& msg) 
 {
@@ -244,8 +245,18 @@ ChemistryStandard::tick_top (const double snow_leak_rate, // [h^-1]
 
   for (size_t c = 0; c < chemicals.size (); c++)
     chemicals[c]->tick_top (snow_leak_rate, cover, canopy_leak_rate, 
-                            surface_runoff_rate, z_mixing, dt, msg);
+                            surface_runoff_rate, dt, msg);
 }
+
+void
+ChemistryStandard::tick_surface (const Geometry& geo, 
+                                 const Soil& soil, const SoilWater& soil_water, 
+                                 const double z_mixing)
+{
+  for (size_t c = 0; c < chemicals.size (); c++)
+    chemicals[c]->tick_surface (geo, soil, soil_water, z_mixing);
+}
+
 
 void 
 ChemistryStandard::infiltrate (const Geometry& geo,

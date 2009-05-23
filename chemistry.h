@@ -97,9 +97,11 @@ public:
                          double direct_rain /* [mm/h] */,
                          double canopy_drip /* [mm/h] */, 
                          double h_veg /* [m] */,
-                         double z_mixing, // [cm]
                          double dt /* [h] */,
 			 Treelog&) = 0;
+  virtual void tick_surface (const Geometry& geo, 
+                             const Soil& soil, const SoilWater& soil_water, 
+                             const double z_mixing) = 0;
   virtual void tick_soil (const Scope&, 
                           const Geometry& geo, double ponding /* [mm] */,
                           double R_mixing /* [h/mm] */,
