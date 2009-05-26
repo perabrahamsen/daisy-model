@@ -27,12 +27,12 @@ check at surface_storage ikke bruges direkte
 
 *** kollodbåret stof følger immobil * frigivelse / reservoir
 
-**** 'surface_release' log variable i chemical_std
+**** DONE 'surface_release' log variable i chemical_std
 
 Skal blive sat af colgen til den fraction af jord som blev frigivet i
 dette tidsskridt.
 
-**** reaction Jarvis/Morgan/Styczen skal sætte 'surface_release'
+**** DONE reaction Jarvis/Morgan/Styczen skal sætte 'surface_release'
 
 Morgan/Styczen skal basere på total jord i mixing layer (udregnes ved
 initialisering).

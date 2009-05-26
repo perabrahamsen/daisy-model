@@ -36,6 +36,9 @@
 
 struct ReactionMorgan98 : public ReactionColgen
 {
+  // Constants.
+  /* const */ double surface_soil; // Soil on surface layer. [g/m^2]
+
   // Parameters.
   const std::auto_ptr<Rainergy> rainergy; // Energy in rain [J/cm^2/h]
   const double kd;                        // Detachment rate coefficient [g/J]
@@ -82,6 +85,8 @@ ReactionMorgan98::colloid_generation (const double total_rain /* [mm/h] */,
   
   // Detachment of colloids at the surface. [g cm^-2 h^-1]
   D = kd * KH * KE;
+
+  surface_release = D * dt / surface_soil; // []
 }
 
 void 
@@ -99,6 +104,7 @@ ReactionMorgan98::tick_top (const double total_rain, const double direct_rain,
                       h_pond, dt);
 
   colloid.add_to_surface_transform_source (D);
+  colloid.release_surface_colloids (surface_release);
 }
 
 void 
@@ -111,13 +117,15 @@ ReactionMorgan98::output (Log& log) const
 
 
 void 
-ReactionMorgan98::initialize (const Units&, const Geometry&, 
-                              const Soil&, const SoilWater&, const SoilHeat&, 
-                              const Surface&, Treelog&)
-{  }
+ReactionMorgan98::initialize (const Units&, const Geometry& geo, 
+                              const Soil& soil,
+                              const SoilWater&, const SoilHeat&, 
+                              const Surface& surface, Treelog&)
+{ surface_soil = find_surface_soil (geo, soil, surface); }
 
 ReactionMorgan98::ReactionMorgan98 (Block& al)
   : ReactionColgen (al),
+    surface_soil (-42.42e42), 
     rainergy (Librarian::build_item<Rainergy> (al, "rainergy")),
     kd (al.number ("kd")),
     E (-42.42e42)

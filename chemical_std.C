@@ -176,6 +176,7 @@ struct ChemicalStandard : public Chemical
   void add_to_transform_source_secondary (const std::vector<double>&);
   void add_to_transform_sink_secondary (const std::vector<double>&);
   void add_to_surface_transform_source (double amount  /* [g/cm^2/h] */);
+  void release_surface_colloids (double surface_release);
 
   // Management.
   void update_C (const Soil& soil, const SoilWater& soil);
@@ -531,6 +532,14 @@ ChemicalStandard::add_to_surface_transform_source (const double amount /* [g/cm^
 {
   const double m2_per_cm2 = 0.01 * 0.01;
   surface_transform += amount / m2_per_cm2;
+}
+
+void
+ChemicalStandard::release_surface_colloids (const double surface_release_value)
+{
+  if (std::isnormal (surface_release))
+    throw "Multiple reactions setting surface release";
+  surface_release = surface_release_value;
 }
 
 void
@@ -1670,7 +1679,14 @@ This is part of 'surface_storage'.");
                    "Entering the soil with water infiltration.");
     frame.declare ("surface_release", Value::Fraction (), Value::LogOnly, "\
 Fraction of available soil particles released as colloids this timestep.\n\
-Only relevant for chemicals representing colloids.");
+Only relevant for chemicals representing colloids.\n\
+\n\
+The idea behind this is that reactions that generate colloids will set the\n\
+value of this variable, and then reactions that convert immobile chemicals\n\
+into colloid bound chemicals will use it.  For this to work, the reactions\n\
+that set the variable must be listed before the reactions that us it.\n\
+\n\
+Note that the value is relative to the current timestep.");
     frame.declare ("top_storage", "g/m^2", Value::LogOnly, 
                    "Som of above ground (surface, snow, canopy) storage.");
     frame.declare ("top_loss", "g/m^2/h", Value::LogOnly, "\

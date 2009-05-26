@@ -100,8 +100,14 @@ ReactionJarvis99::colloid_generation (const double total_rain /* [mm/h] */,
   daisy_assert (KH >= 0.0);
   daisy_assert (KH <= 1.0);
   daisy_assert (Ms >= 0.0);
-  D = std::min (kd * KE * KH * dt * Ms, As); 
+  D = std::min (kd * KE * KH * dt * Ms, As) / dt; 
   daisy_assert (D >= 0.0);
+
+  // Fraction 
+  if (D > 0.0)
+    surface_release = dt * D / As;
+  else
+    surface_release = 0.0;
 
   // Replenishment of colloids in the surface layer.
   daisy_assert (Ms <= Mmax);
@@ -126,8 +132,9 @@ ReactionJarvis99::tick_top (const double total_rain, const double direct_rain,
   
   // Generate the colloids.
   colloid_generation (total_rain, direct_rain, canopy_drip, h_veg, dt);
-
+  
   colloid.add_to_surface_transform_source (D);
+  colloid.release_surface_colloids (surface_release);
 }
 
 void 

@@ -97,6 +97,7 @@ public:
   virtual void add_to_transform_source_secondary (const std::vector<double>&) = 0;
   virtual void add_to_transform_sink_secondary (const std::vector<double>&) = 0;
   virtual void add_to_surface_transform_source (double amount  /* [g/cm^2/h] */) = 0;
+  virtual void release_surface_colloids (double surface_release) = 0;
 
   // Management.
 public:

@@ -1236,7 +1236,8 @@ log_dlf${OBJ}: log_dlf.C log_dlf.h log_select.h log.h time.h symbol.h \
   filepos.h librarian.h
 reaction_colgen${OBJ}: reaction_colgen.C reaction_colgen.h reaction.h model.h \
   symbol.h ponddamp.h librarian.h frame.h scope.h value.h log.h time.h \
-  border.h chemistry.h treelog.h block.h
+  border.h chemistry.h treelog.h block.h geometry.h soil.h surface.h \
+  uzmodel.h
 weather_base${OBJ}: weather_base.C weather_base.h weather.h model.h symbol.h \
   im.h value.h fao.h assertion.h time.h log.h border.h mathlib.h \
   librarian.h block.h units.h frame.h scope.h

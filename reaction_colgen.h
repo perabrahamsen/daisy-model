@@ -38,9 +38,12 @@ protected:
   double dds;                   // Median droplet size [mm]
   double KH;                    // Ponding factor []
   double D;                     // Depletion [g/cm^2/h]
+  double surface_release;       // Fraction of available colloids released []
 
   // Simulation.
 protected:
+  static double find_surface_soil (const Geometry&, const Soil&, const Surface&)
+    ; // Soil in mixing layer. [g/cm^2] 
   void tick_colgen (const double total_rain, const double h_pond);
   void output_colgen (Log&) const;
 

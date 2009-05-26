@@ -38,6 +38,9 @@
 
 struct ReactionStyczen88 : public ReactionColgen
 {
+  // Constants.
+  /* const */ double surface_soil; // Soil in mixing layer. [g/cm^2]
+
   // Parameters.
   const double Ae;              // Soil resitance factor [h^2/g C/cm^2 S]
   const double MA;              // Mulch factor (protective coverage) []
@@ -60,7 +63,8 @@ struct ReactionStyczen88 : public ReactionColgen
                            const double LD /* [mm/h] */,
                            const double f_cov /* [] */,
                            const double h_veg /* [m] */,
-                           const double h_pond /* [mm] */);
+                           const double h_pond /* [mm] */,
+                           const double dt /* [h] */);
   void  tick_top (const double total_rain, const double direct_rain,
                   const double canopy_drip /* [mm/h] */, 
                   const double cover, const double h_veg, 
@@ -185,7 +189,8 @@ ReactionStyczen88::colloid_generation (const double P /* [mm/h] */,
                                        const double canopy_leak /* [mm/h] */,
                                        const double f_cov /* [] */,
                                        const double h_veg /* [m] */,
-                                       const double h_pond /* [mm] */)
+                                       const double h_pond /* [mm] */,
+                                       const double dt /* [h] */)
 {
   // Direct rainfall momentum
   if (P <= 75)
@@ -210,6 +215,8 @@ ReactionStyczen88::colloid_generation (const double P /* [mm/h] */,
 
   daisy_assert (std::isfinite (D));
   daisy_assert (D >= 0.0);
+
+  surface_release = D * dt / surface_soil;
 }
 
 void 
@@ -227,9 +234,10 @@ ReactionStyczen88::tick_top (const double total_rain, const double direct_rain,
   const double LD = canopy_drip; // [mm/h]
   const double f_cov = cover;                 // []
 
-  colloid_generation (P, LD, f_cov, h_veg, h_pond);
+  colloid_generation (P, LD, f_cov, h_veg, h_pond, dt);
 
   colloid.add_to_surface_transform_source (D);
+  colloid.release_surface_colloids (surface_release);
 }
 
 void 
@@ -243,13 +251,15 @@ ReactionStyczen88::output (Log& log) const
 
 
 void 
-ReactionStyczen88::initialize (const Units&, const Geometry&, 
-                               const Soil&, const SoilWater&, const SoilHeat&, 
-                               const Surface&, Treelog&)
-{  }
+ReactionStyczen88::initialize (const Units&, const Geometry& geo, 
+                              const Soil& soil,
+                              const SoilWater&, const SoilHeat&, 
+                              const Surface& surface, Treelog&)
+{ surface_soil = find_surface_soil (geo, soil, surface); }
 
 ReactionStyczen88::ReactionStyczen88 (Block& al)
   : ReactionColgen (al),
+    surface_soil (-42.42e42),
     Ae (al.number ("Ae")),
     MA (al.number ("MA")),
     droplet_diameter (al.number ("droplet_diameter")),

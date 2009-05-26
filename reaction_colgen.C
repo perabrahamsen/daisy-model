@@ -27,6 +27,20 @@
 #include "chemistry.h"
 #include "treelog.h"
 #include "block.h"
+#include "geometry.h"
+#include "soil.h"
+#include "surface.h"
+
+double
+ReactionColgen::find_surface_soil (const Geometry& geo, const Soil& soil, 
+                                   const Surface& surface)
+{
+  const double z_mixing = surface.mixing_depth (); // [cm]
+  const double rho_b 
+    = geo.content_hood (soil, &Soil::dry_bulk_density, 
+                        Geometry::cell_above); // [g/cm^3]
+  return rho_b * z_mixing;                     // [g/cm^2]
+}
 
 void 
 ReactionColgen::tick_colgen (const double total_rain, const double h_pond)
@@ -43,6 +57,7 @@ ReactionColgen::output_colgen (Log& log) const
   if (KH > -1.0)
     output_variable (KH, log); 
   output_variable (D, log); 
+  output_variable (surface_release, log);
 }
 
 bool 
@@ -65,7 +80,8 @@ ReactionColgen::ReactionColgen (Block& al)
     ponddamp (Librarian::build_item<Ponddamp> (al, "ponddamp")),
     dds (-42.42e42),
     KH (-42.42e42),
-    D (-42.42e42)
+    D (-42.42e42),
+    surface_release (0.0)
 { }
  
 ReactionColgen::~ReactionColgen ()
@@ -81,13 +97,15 @@ Shared parameter and log variable for colloid generation models.")
   {
     frame.declare ("colloid", Value::String, Value::Const, "Colloid to generate.");
     frame.declare_object ("ponddamp", Ponddamp::component,
-                      Value::Const, Value::Singleton,
-                      "Model for calculating 'KH'.");
+                          Value::Const, Value::Singleton,
+                          "Model for calculating 'KH'.");
     frame.declare ("dds", "mm", Value::LogOnly, "Median raindrop size.");
     frame.declare ("KH", Value::Fraction (), Value::LogOnly, 
-               "Ponding factor.");
+                   "Ponding factor.");
     frame.declare ("D", "g/cm^2/h", Value::LogOnly, 
-               "Depletion of detachable particles from top soil.");
+                   "Depletion of detachable particles from top soil.");
+    frame.declare ("surface_release", Value::Fraction (), Value::LogOnly, "\
+Fraction of available soil particles released as colloids this timestep.");
   }
 } ReactionColgen_syntax;
 
