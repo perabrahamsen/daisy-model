@@ -37,7 +37,7 @@ dette tidsskridt.
 Morgan/Styczen skal basere på total jord i mixing layer (udregnes ved
 initialisering).
 
-**** Ny reaction 'bound_release' skal bruge 'surface_release'
+**** DONE Ny reaction 'bound_release' skal bruge 'surface_release'
 
 **** indsæt i test-colloids.dai
 

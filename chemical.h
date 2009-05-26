@@ -63,6 +63,10 @@ public:
   virtual const Adsorption& adsorption () const = 0;
   virtual double diffusion_coefficient () const = 0; // [cm^2/h] in free solute
 
+  // Surface content.
+  virtual double surface_release_fraction () const = 0; // []
+  virtual double surface_immobile_amount () const = 0;  // [g/cm^2]
+  
   // Soil content.
 public:
   virtual double C_below () const = 0; // Concentration in groundwater [g/cm^3]

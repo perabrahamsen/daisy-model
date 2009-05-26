@@ -1,3 +1,15 @@
+2009-05-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* reaction_boundrel.C: New model.
+	* Makefile (MODELS): Add it.
+	* chemical.h, chemical_std.C (surface_release):  New log variable.
+	* reaction_colgen.h, reaction_colgen.C, reaction_Jarvis99.C
+	* reaction_Morgan98.C, reaction_Styczen88.C: Use it.
+	* chemical_std.C (surface_immobile, surface_solute): New log variables.
+	* chemical.h, chemical_std.C, chemisty.h, chemisty_std.C
+	* chemistry_multi.C (tick_surface): New function.
+	* column_std.C (tick): Call it.
+
 2009-05-13  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* vcheck.h, vcheck.C: Don't use exceptions.

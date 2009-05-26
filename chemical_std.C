@@ -140,6 +140,10 @@ struct ChemicalStandard : public Chemical
   const Adsorption& adsorption () const;
   double diffusion_coefficient () const;
 
+  // Surface content.
+  double surface_release_fraction () const; // []
+  double surface_immobile_amount () const;  // [g/cm^2]
+
   // Soil content.
   double C_below () const; // Concentration in groundwater [g/cm^3]
   double C_secondary (size_t) const;
@@ -272,6 +276,14 @@ ChemicalStandard::adsorption () const
 double
 ChemicalStandard::diffusion_coefficient () const
 { return diffusion_coefficient_; }
+
+double
+ChemicalStandard::surface_release_fraction () const
+{ return surface_release; }
+
+double 
+ChemicalStandard::surface_immobile_amount () const
+{ return surface_immobile; }
 
 double 
 ChemicalStandard::C_below () const
