@@ -1,5 +1,9 @@
 2009-05-27  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 4.64 released.
+
+2009-05-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
 	* root_system.C, root_system.h (tick_dynamic): Renamed from 'tick'
 	* crop_simple.C, crop_std.C: Update caller.
 	* vegetation_permanent.C (tick): Call 'RootSystem::tick_dynamic'.
