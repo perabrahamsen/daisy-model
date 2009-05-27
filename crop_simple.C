@@ -253,7 +253,7 @@ CropSimple::tick (Metalib&, const Time& time, const Bioclimate& bioclimate,
   const double day_fraction = bioclimate.day_fraction (dt);
   const double T_soil 
     = geo.content_height (soil_heat, &SoilHeat::T, -root_system->Depth);
-  root_system->tick (T_soil, day_fraction, soil_water, dt);
+  root_system->tick_dynamic (T_soil, day_fraction, soil_water, dt);
   
   // Air temperature based growth.
   const double T_air = bioclimate.daily_air_temperature ();

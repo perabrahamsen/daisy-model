@@ -1830,7 +1830,8 @@ vegetation_permanent${OBJ}: vegetation_permanent.C vegetation.h model.h \
   symbol.h plf.h mathlib.h assertion.h log.h time.h border.h litter.h \
   root_system.h rootdens.h ABAprod.h canopy_simple.h geometry.h value.h \
   soil.h crop.h am.h im.h aom.h om.h organic_matter.h submodeler.h \
-  block.h check.h librarian.h frame_submodel.h frame.h scope.h
+  block.h check.h librarian.h frame_submodel.h frame.h scope.h \
+  bioclimate.h soil_heat.h
 vegetation_crops${OBJ}: vegetation_crops.C vegetation.h model.h symbol.h \
   crop.h time.h organic_matter.h geometry.h value.h soil.h plf.h \
   mathlib.h assertion.h harvest.h block.h log.h border.h librarian.h \

@@ -51,6 +51,12 @@ initialisering).
 
 **** DONE Se resultat i log
 
+**** Balancefejl?
+
+surface-drain mangler
+
+**** ponded vand skal indgå i mixing layer
+
 *** kinetisk ligevægt skal fungere på overfladen
 
 Følger Theta og rho_b for øverste node.

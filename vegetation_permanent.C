@@ -38,6 +38,8 @@
 #include "check.h"
 #include "librarian.h"
 #include "frame_submodel.h"
+#include "bioclimate.h"
+#include "soil_heat.h"
 #include <sstream>
 #include <deque>
 
@@ -271,9 +273,9 @@ VegetationPermanent::reset_canopy_structure (const Time& time)
 }
 void
 VegetationPermanent::tick (Metalib& metalib,
-                           const Time& time, const Bioclimate&, 
+                           const Time& time, const Bioclimate& bioclimate, 
                            const Geometry& geo, const Soil& soil, 
-                           const SoilHeat&,
+                           const SoilHeat& soil_heat,
 			   SoilWater& soil_water, Chemistry& chemistry,
 			   OrganicMatter& organic_matter,
 			   double& residuals_DM,
@@ -285,6 +287,12 @@ VegetationPermanent::tick (Metalib& metalib,
   // Canopy.
   const double old_LAI = canopy.CAI;
   reset_canopy_structure (time);
+
+  // Root system.
+  const double day_fraction = bioclimate.day_fraction (dt);
+  const double T_soil 
+    = geo.content_height (soil_heat, &SoilHeat::T, -root_system->Depth);
+  root_system->tick_dynamic (T_soil, day_fraction, soil_water, dt);
 
   // Nitrogen uptake.
   N_demand = canopy.CAI * N_per_LAI;

@@ -124,7 +124,8 @@ public:
 private:
   static double density_distribution_parameter (double a);
 public:
-  void tick (double T, const double day_fraction, SoilWater&, double dt);
+  void tick_dynamic (double T, const double day_fraction, SoilWater&, 
+                     double dt);
   void tick_daily (const Geometry&, const Soil&, 
 		   double WRoot, bool root_growth, double DS, Treelog&);
   void set_density (const Geometry& geometry, double SoilLimit, 

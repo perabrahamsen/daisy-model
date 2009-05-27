@@ -376,8 +376,8 @@ RootSystem::nitrogen_uptake (const Geometry& geo, const Soil& soil,
 }
 
 void
-RootSystem::tick (const double T, const double day_fraction,
-                  SoilWater& soil_water, const double dt)
+RootSystem::tick_dynamic (const double T, const double day_fraction,
+                          SoilWater& soil_water, const double dt)
 {
   // Update soil water sink term.
   soil_water.root_uptake (H2OExtraction);

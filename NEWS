@@ -8,7 +8,19 @@ release.
 
 * 4.64
 
+** More functionality to the surface mixing layer.
+
+Sorbing chemicals spread on the surface will now sorb to the soil in
+the mixing layer.
+
+** New 'bound_release' reaction.
+
+This allows sorbed chemicals to be released with colloids from the
+mixing layer.  See 'sample/test-colloids.dai' for an example.
+
 ** Code cleanup.
+
+** Bug fix: Permanent vegetation should now work again.
 
 * 4.63
 
@@ -28,7 +40,7 @@ to get a summary of colloids in the field using [kg/ha] is the base unit.
 ** New 'Styczen88' and 'Morgan98' colloid generation models.
 
 The 'Styczen88' model use momentum rather than kinetic energy for
-colloid generation.  'Morgan98' is siimilar to 'Jarvis99' except that
+colloid generation.  'Morgan98' is similar to 'Jarvis99' except that
 it takes vegetation into account, but does not have a pool of readily
 available colloids.
 
