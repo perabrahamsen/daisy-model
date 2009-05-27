@@ -224,6 +224,7 @@ Colloid generation emulating the MACRO model.")
   { }
   void load_frame (Frame& frame) const
   {
+    frame.set ("ponddamp", "none");
     frame.set_strings ("cite", "macro-colloid");
     frame.declare_object ("rainergy", Rainergy::component,
                       Value::Const, Value::Singleton,

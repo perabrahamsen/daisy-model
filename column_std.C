@@ -643,6 +643,7 @@ ColumnStandard::tick (Metalib& metalib, const Time& time, const double dt,
                        bioclimate->direct_rain (), 
                        bioclimate->canopy_leak (),
                        vegetation->height () * 0.01 /* [m] */,
+                       *chemistry,
                        dt, msg);
   chemistry->tick_surface (geometry, *soil, *soil_water, 
                            surface.mixing_depth ());

@@ -122,13 +122,21 @@ carbon part of the 'K' factor.")
   (mobile Pendimethalin-colloid)
   (immobile Pendimethalin-immobile))
 
+(defreaction Pendimethalin-colloid-generation bound_release
+  "Release immobile Pendimethalin as colloids in mixing layer."
+  (colloid colloid)
+  (immobile Pendimethalin-immobile)
+  (bound Pendimethalin-colloid))
+
 (defchemistry Pendimethalin default
   "Pendimethalin in both immobile, solute and colloid form."
   (trace Pendimethalin Pendimethalin-immobile Pendimethalin-colloid)
   (reaction Pendimethalin-immobile-sorption
             Pendimethalin-colloid-sorption
             (Pendimethalin-colloid-sorption (secondary true))
-            Pendimethalin-filter))
+            Pendimethalin-filter 
+            Pendimethalin-colloid-generation
+            ))
 
 ;;; Use in column.
 ;; "colloids" must be listed before bound pesticides.
@@ -146,12 +154,13 @@ carbon part of the 'K' factor.")
   "Balance for all forms of chemical."
   (precision 3)
   (require_top true)
-  (input "Solute-Spray")
-  (output  "Solute-Surface-Loss" 
+  (input "Solute-Spray" "Soil-Spray")
+  (output  "Solute-Surface-Loss" "Colloid-Surface-Loss" "Soil-Surface-Loss" 
            "Solute-Decompose" "Colloid-Decompose" "Soil-Decompose"
            "Solute-Leak" "Colloid-Leak"
            "Solute-Drain" "Colloid-Drain")
-  (content "Solute-Tertiary" "Colloid-Tertiary"
+  (content "Solute-Surface" "Colloid-Surface" "Soil-Surface"
+           "Solute-Tertiary" "Colloid-Tertiary"
            "Solute-Matrix" "Colloid-Matrix" "Soil-Matrix"
            "Solute-Error" "Colloid-Error" "Soil-Error"))
 
@@ -181,12 +190,48 @@ carbon part of the 'K' factor.")
                    (handle sum)
                    (dimension "${unit}/&")
                    (spec chemical default spray))
+           (number (path column "${column}" Chemistry "*" trace "${soil}"
+                         spray)
+                   (tag "Soil-Spray")
+                   (handle sum)
+                   (dimension "${unit}/&")
+                   (spec chemical default spray))
            (number (path column "${column}" Chemistry "*" trace "${solute}"
                          top_loss)
                    (tag "Solute-Surface-Loss")
                    (handle sum)
                    (dimension "g/ha/&")
                    (spec chemical default top_loss))
+           (number (path column "${column}" Chemistry "*" trace "${colloid}"
+                         top_loss)
+                   (tag "Colloid-Surface-Loss")
+                   (handle sum)
+                   (dimension "g/ha/&")
+                   (spec chemical default top_loss))
+           (number (path column "${column}" Chemistry "*" trace "${soil}"
+                         top_loss)
+                   (tag "Soil-Surface-Loss")
+                   (handle sum)
+                   (dimension "g/ha/&")
+                   (spec chemical default top_loss))
+           (number (path column "${column}" Chemistry "*" trace "${solute}"
+                         surface_storage)
+                   (tag "Solute-Surface")
+                   (handle current)
+                   (dimension "${unit}")
+                   (spec chemical default surface_storage))
+           (number (path column "${column}" Chemistry "*" trace "${colloid}"
+                         surface_storage)
+                   (tag "Colloid-Surface")
+                   (handle current)
+                   (dimension "${unit}")
+                   (spec chemical default surface_storage))
+           (number (path column "${column}" Chemistry "*" trace "${soil}"
+                         surface_storage)
+                   (tag "Soil-Surface")
+                   (handle current)
+                   (dimension "${unit}")
+                   (spec chemical default surface_storage))
            (interval (path column "${column}" Chemistry "*" 
                            trace "${solute}" S_transform)
                      (tag "Solute-Sorption")
@@ -359,30 +404,32 @@ carbon part of the 'K' factor.")
 
 (manager activity
   (wait (at 1987 3 20 1))
-  (spray Pendimethalin 1 [kg/ha])
+  (spray Pendimethalin-immobile 1 [kg/ha])
   (plowing)
   (wait (at 1987 4 4 1))
-  (spray Pendimethalin 1 [kg/ha])
+  (spray Pendimethalin-immobile 1 [kg/ha])
   (fertilize (mineral (weight 100.0 [kg N/ha])
                       (NH4_fraction 0.5 [])))
   (wait (at 1987 4 5 1))
-  (spray Pendimethalin 1 [kg/ha])
+  (spray Pendimethalin-immobile 1 [kg/ha])
   (progn
     (sow ("Grass" (water_stress_effect none)))
     (sow ("Spring Barley" (Canopy (EpFac 1.5)))))
   (wait (or (crop_ds_after "Spring Barley" 2.0)
             (at 1987 9 5 1)))
-  (spray Pendimethalin 1 [kg/ha])
+  (spray Pendimethalin-immobile 1 [kg/ha])
   (harvest "Spring Barley")
   (wait (at 1987 9 8 1))
-  (spray Pendimethalin 1 [kg/ha])
+  (spray Pendimethalin-immobile 1 [kg/ha])
   (fertilize (mineral (weight 80.0 [kg N/ha])
                       (NH4_fraction 0.5 [])))
   (wait (at 1987 10 10 1))
-  (spray Pendimethalin 1 [kg/ha])
+  (spray Pendimethalin-immobile 1 [kg/ha])
   (harvest "Grass"
            (stub 8.0 [cm])              ;Leave 8 cm stub.
            (stem 1.00 [])))             ;Harvest everything above stub.
+
+(print_time weekly)
 
 ;; Create these log files.
 (output harvest Failure
@@ -394,6 +441,9 @@ carbon part of the 'K' factor.")
          (where "M-colloids.dlf"))
         ("Colloids")
         ("Field chemical" (chemical Pendimethalin))
+        ("Field chemical" (chemical Pendimethalin-immobile))
+        ("Field chemical" (chemical Pendimethalin-colloid))
+        ("Soil chemical" (chemical Pendimethalin))
         ("Soil chemical" (chemical Pendimethalin-immobile))
         ("Soil chemical" (chemical Pendimethalin-colloid))
         ("Colloid bound" (chemical Pendimethalin))

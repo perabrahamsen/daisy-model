@@ -181,7 +181,7 @@ static struct PonddampNoneSyntax : DeclareModel
   Model* make (Block& al) const
   { return new PonddampNone (al); }
   PonddampNoneSyntax ()
-    : DeclareModel (Ponddamp::component, "None", "\
+    : DeclareModel (Ponddamp::component, "none", "\
 KH = 1.0")
   { }
   void load_frame (Frame& frame) const

@@ -75,6 +75,7 @@ struct ChemistryStandard : public Chemistry
                  const double direct_rain, // [mm/h]
                  const double canopy_drip /* [mm/h] */, 
                  const double h_veg /* [m] */,
+                 Chemistry& chemistry, 
                  const double dt, // [h]
 		 Treelog&);
   void tick_surface (const Geometry& geo, 
@@ -122,7 +123,7 @@ ChemistryStandard::find (symbol chem)
     if (chemicals[c]->name == chem)
       return *chemicals[c];
 
-  daisy_notreached ();
+  daisy_panic ("Can't find chemical '" + chem + "'");
 }
 
 const std::vector<Chemical*>& 
@@ -236,12 +237,13 @@ ChemistryStandard::tick_top (const double snow_leak_rate, // [h^-1]
                              const double direct_rain, // [mm/h]
                              const double canopy_drip, // [mm/h]
                              const double h_veg /* [m] */,
+                             Chemistry& chemistry,
                              const double dt, // [h]
 			     Treelog& msg) 
 {
   for (size_t r = 0; r < reactions.size (); r++)
     reactions[r]->tick_top  (total_rain, direct_rain, canopy_drip, cover, h_veg,
-                             surface_water, *this, dt, msg);
+                             surface_water, chemistry, dt, msg);
 
   for (size_t c = 0; c < chemicals.size (); c++)
     chemicals[c]->tick_top (snow_leak_rate, cover, canopy_leak_rate, 

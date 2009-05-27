@@ -76,6 +76,7 @@ struct ChemistryMulti : public Chemistry
                  const double direct_rain, // [mm/h]
                  const double canopy_drip /* [mm/h] */, 
                  const double h_veg /* [m] */,
+                 Chemistry& chemistry, 
                  const double dt, // [h]
 		 Treelog&);
   void tick_surface (const Geometry& geo, 
@@ -305,6 +306,7 @@ ChemistryMulti::tick_top (const double snow_leak_rate, // [h^-1]
                           const double direct_rain, // [mm/h]
                           const double canopy_drip /* [mm/h] */, 
                           const double h_veg /* [m] */,
+                          Chemistry& chemistry, 
                           const double dt, // [h]
                           Treelog& msg) 
 {
@@ -312,7 +314,7 @@ ChemistryMulti::tick_top (const double snow_leak_rate, // [h^-1]
     combine[c]->tick_top (snow_leak_rate, cover, canopy_leak_rate, 
 			  surface_runoff_rate, surface_water,
                           total_rain, direct_rain, canopy_drip, h_veg, 
-                          dt, msg);
+                          chemistry, dt, msg);
 }
 
 void

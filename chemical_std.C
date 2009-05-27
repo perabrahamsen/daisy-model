@@ -283,7 +283,10 @@ ChemicalStandard::surface_release_fraction () const
 
 double 
 ChemicalStandard::surface_immobile_amount () const
-{ return surface_immobile; }
+{
+  const double m2_per_cm2 = 0.01 * 0.01;
+  return surface_immobile * m2_per_cm2; 
+}
 
 double 
 ChemicalStandard::C_below () const
@@ -621,6 +624,8 @@ ChemicalStandard::mix (const Geometry& geo,
 { 
   // Removed from surface.
   daisy_approximate (surface_storage, surface_solute + surface_immobile);
+  daisy_assert (penetration <= 1.0);
+  daisy_assert (penetration >= 0.0);
   const double removed = surface_storage * penetration;
   surface_tillage += removed / dt;
   surface_storage -= removed;
@@ -731,10 +736,12 @@ ChemicalStandard::tick_surface (const Geometry& geo,
 
   // Now find the solute.
   surface_solute = 0.0;
+  double total_area = 0.0;      // [cm^2]
 
   // We look at each top cell.
   const std::vector<size_t>& edge_above = geo.cell_edges (Geometry::cell_above);
   const size_t edge_above_size = edge_above.size ();
+  daisy_assert (edge_above_size > 0U);
   for (size_t i = 0; i < edge_above_size; i++)
     {
       const size_t edge = edge_above[i];
@@ -747,11 +754,13 @@ ChemicalStandard::tick_surface (const Geometry& geo,
 
       // Accumulate based on cell surface area.
       const double area = geo.edge_area (edge); // [cm^2]
-      surface_solute += C * area;               // [g/cm]
+      total_area += area;
+      surface_solute += C * area * Theta;       // [g/cm]
     }
   
   // Convert solute back to surface dimensions.
-  const double surface_area = geo.surface_area () / m2_per_cm2; // [m^2/cm^2]
+  daisy_assert (total_area == geo.surface_area ());
+  const double surface_area = geo.surface_area () * m2_per_cm2; // [m^2]
   surface_solute *= z_mixing;   // [g]
   surface_solute /= surface_area; // [g/m^2]
   daisy_assert (surface_solute >= 0.0);
@@ -759,7 +768,17 @@ ChemicalStandard::tick_surface (const Geometry& geo,
   // The immobile is the rest.
   surface_immobile = surface_storage - surface_solute;
   if (surface_immobile < 0.0)
-    daisy_approximate (surface_solute, surface_storage);
+    {
+      daisy_approximate (surface_solute, surface_storage);
+      surface_immobile = 0.0;
+      surface_solute = surface_storage;
+    }
+
+  // Check that full and no adsorption is calculated right.
+  if (adsorption_->full ())
+    daisy_approximate (surface_storage, surface_immobile);
+  else if (adsorption_->name == "none")
+    daisy_approximate (surface_storage, surface_solute);
 }
 
 void                            // Called just before solute movement.
@@ -911,10 +930,22 @@ void
 ChemicalStandard::infiltrate (const double rate, const double dt)
 {
   daisy_approximate (surface_storage, surface_solute + surface_immobile);
+  daisy_assert (surface_storage >= 0.0);
+  daisy_assert (surface_solute >= 0.0);
+  daisy_assert (surface_immobile >= 0.0);
+  daisy_assert (surface_storage >= surface_solute);
+  daisy_assert (rate * dt <= 1.0);
+
   surface_out = surface_solute * rate;
-  surface_storage -= surface_out * dt;
-  surface_solute -= surface_out * dt;
-  daisy_approximate (surface_storage, surface_solute + surface_immobile);
+  const double loss = surface_out * dt;
+  if (loss < surface_solute)
+    surface_solute -= loss;
+  else
+    {
+      surface_out = surface_solute / dt;
+      surface_solute = 0.0;
+    }
+  surface_storage = surface_immobile + surface_solute;
 }
 
 double

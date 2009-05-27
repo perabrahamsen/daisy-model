@@ -97,6 +97,7 @@ public:
                          double direct_rain /* [mm/h] */,
                          double canopy_drip /* [mm/h] */, 
                          double h_veg /* [m] */,
+                         Chemistry& chemistry, 
                          double dt /* [h] */,
 			 Treelog&) = 0;
   virtual void tick_surface (const Geometry& geo, 

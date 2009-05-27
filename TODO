@@ -39,13 +39,17 @@ initialisering).
 
 **** DONE Ny reaction 'bound_release' skal bruge 'surface_release'
 
-**** indsæt i test-colloids.dai
+**** DONE indsæt i test-colloids.dai
 
 (defreaction Pendimethalin-colloid-generation bound_release
   "Release immobile Pendimethalin as colloids in mixing layer."
   (colloid colloid)
   (bound Pendimethalin-immobile)
   (mobile Pendimethalin-colloid))
+
+**** DONE Få massebalance i test-colloids.dai
+
+**** DONE Se resultat i log
 
 *** kinetisk ligevægt skal fungere på overfladen
 
