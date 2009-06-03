@@ -59,7 +59,7 @@ public:
   virtual void tick (const Geometry& geo,
 		     const SoilWater&, const SoilHeat&, 
 		     Chemistry&, double dt, Treelog& msg) = 0;
-  virtual void transport (const Units&,
+  virtual void transport (const Units&, const Geometry&, 
                           const Soil&, const SoilWater&, const SoilHeat&,
 			  Treelog&) = 0;
   virtual const std::vector<DOM*>& fetch_dom () const = 0;
@@ -78,7 +78,7 @@ public:
 
   // Create and Destroy.
   virtual int som_pools () const = 0;
-  virtual bool check (const Units&,
+  virtual bool check (const Units&, const Geometry&,
                       const Soil&, const SoilWater&, const SoilHeat&,
 		      const Chemistry&, Treelog&) const = 0;
   virtual bool check_am (const FrameModel& am, Treelog& err) const = 0;

@@ -50,7 +50,7 @@ struct DomsorpStandard : public Domsorp
   }
 
   // Simulation.
-  void tick (const Units& units, const Soil& soil, 
+  void tick (const Units& units, const Geometry& geo, const Soil& soil, 
              const SoilWater& soil_water, const SoilHeat& soil_heat,
              const std::vector<DOM*>& dom, const std::vector<SOM*>& som, 
              Treelog& msg)
@@ -63,7 +63,7 @@ struct DomsorpStandard : public Domsorp
     for (size_t i = 0; i < soil.size (); i++)
       dC.push_back (d.C_at (i));
     daisy_assert (s.C.size () == soil.size ());
-    transform->tick (units, soil, soil_water, soil_heat, dC, s.C, S_C, msg);
+    transform->tick (units, geo, soil, soil_water, soil_heat, dC, s.C, S_C, msg);
 
     for (size_t i = 0; i < soil.size (); i++)
       {
@@ -87,7 +87,7 @@ struct DomsorpStandard : public Domsorp
   }
 
   // Create.
-  bool check (const Units& units, const Soil& soil, 
+  bool check (const Units& units, const Geometry& geo, const Soil& soil, 
               const SoilWater& soil_water, const SoilHeat& soil_heat,
               const size_t dom_size, const size_t som_size,
               Treelog& msg) const
@@ -96,7 +96,7 @@ struct DomsorpStandard : public Domsorp
     bool ok = true;
     {
       Treelog::Open nest (msg, "transform");
-      if (!transform->check (units, soil, soil_water, soil_heat, msg))
+      if (!transform->check (units, geo, soil, soil_water, soil_heat, msg))
         ok = false; 
     }
     if (dom_pool >= dom_size)
@@ -111,11 +111,11 @@ struct DomsorpStandard : public Domsorp
       }
     return ok;
   }
-  void initialize (const Units& units,
+  void initialize (const Units& units, const Geometry& geo,
                    const Soil& soil,  const SoilWater& soil_water, 
                    const SoilHeat& soil_heat, Treelog& msg)
   { 
-    transform->initialize (units, soil, soil_water, soil_heat, msg); 
+    transform->initialize (units, geo, soil, soil_water, soil_heat, msg); 
     S_C.insert (S_C.begin (), soil.size (), 0.0);
     daisy_assert (S_C.size () == soil.size ());
     S_N.insert (S_N.begin (), soil.size (), 0.0);

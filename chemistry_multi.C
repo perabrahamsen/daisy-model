@@ -79,7 +79,8 @@ struct ChemistryMulti : public Chemistry
                  Chemistry& chemistry, 
                  const double dt, // [h]
 		 Treelog&);
-  void tick_surface (const Geometry& geo, 
+  void tick_surface (const double pond /* [cm] */,
+                     const Geometry& geo, 
                      const Soil& soil, const SoilWater& soil_water, 
                      const double z_mixing);
   void infiltrate (const Geometry&, 
@@ -318,12 +319,13 @@ ChemistryMulti::tick_top (const double snow_leak_rate, // [h^-1]
 }
 
 void
-ChemistryMulti::tick_surface (const Geometry& geo, 
+ChemistryMulti::tick_surface (const double pond /* [cm] */,
+                              const Geometry& geo, 
                               const Soil& soil, const SoilWater& soil_water, 
                               const double z_mixing)
 {
   for (size_t c = 0; c < combine.size (); c++)
-    combine[c]->tick_surface (geo, soil, soil_water, z_mixing);
+    combine[c]->tick_surface (pond, geo, soil, soil_water, z_mixing);
 }
 
 

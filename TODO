@@ -5,7 +5,7 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 ** Mixing layer?
 
 *** DONE z_mixing
-
+    
 Vi har brug for den til adsorptionsligevægt.
 
 *** DONE Jarvis99 skal bruge z_mixing
@@ -51,19 +51,31 @@ initialisering).
 
 **** DONE Se resultat i log
 
-**** Balancefejl?
+**** DONE Balancefejl?
 
 surface-drain mangler
 
-**** ponded vand skal indgå i mixing layer
+**** DONE ponded vand skal indgå i mixing layer
 
 *** kinetisk ligevægt skal fungere på overfladen
 
 Følger Theta og rho_b for øverste node.
 
+**** ScopeSoil skal kunne bruge virtuelle noder
+
+** tegninger mikkel
+
 ** Drændynamik
 
 ** Opfugtning
+
+* serbian soil
+
+* installer solver
+
+* bestil windows xfig
+
+* Aflever udlægsblanket
 
 * Serbia DONE
 

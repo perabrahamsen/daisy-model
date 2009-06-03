@@ -34,12 +34,13 @@ Transform::library_id () const
 }
 
 bool
-Transform::check (const Units&, const Soil&, const SoilWater&, const SoilHeat&, 
+Transform::check (const Units&, const Geometry&, 
+                  const Soil&, const SoilWater&, const SoilHeat&, 
 		  Treelog&) const
 { return true; }
 
 void
-Transform::initialize (const Units&,
+Transform::initialize (const Units&, const Geometry&, 
                        const Soil&, const SoilWater&, const SoilHeat&, 
                        Treelog&)
 { }

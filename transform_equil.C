@@ -46,15 +46,16 @@ struct TransformEquilibrium : public Transform
   std::auto_ptr<Number> k_BA_expr;
 
   // Simulation.
-  void tick (const Units&, const Soil&, const SoilWater&, const SoilHeat&,
+  void tick (const Units&, const Geometry&, 
+             const Soil&, const SoilWater&, const SoilHeat&,
              const std::vector<double>& A, const std::vector<double>& B,
              std::vector<double>& S_AB, Treelog&) const;
 
   // Create.
-  void initialize (const Units& units, 
+  void initialize (const Units& units, const Geometry& geo,
                    const Soil&, const SoilWater&, const SoilHeat&,
                    Treelog& msg);
-  bool check (const Units&,
+  bool check (const Units&, const Geometry& geo,
               const Soil&, const SoilWater&, const SoilHeat&, Treelog&) const;
   TransformEquilibrium (Block& al)
     : Transform (al),
@@ -68,6 +69,7 @@ struct TransformEquilibrium : public Transform
 
 void 
 TransformEquilibrium::tick (const Units& units,
+                            const Geometry& geo,
                             const Soil& soil, const SoilWater& soil_water,
 			    const SoilHeat& soil_heat,
 			    const std::vector<double>& A, 
@@ -79,7 +81,7 @@ TransformEquilibrium::tick (const Units& units,
   daisy_assert (B.size () == cell_size);
   daisy_assert (S_AB.size () == cell_size);
 
-  ScopeSoil scope (soil, soil_water, soil_heat);
+  ScopeSoil scope (geo, soil, soil_water, soil_heat);
   for (size_t c = 0; c < cell_size; c++)
     { 
       scope.set_cell (c);
@@ -114,12 +116,13 @@ TransformEquilibrium::tick (const Units& units,
 
 bool
 TransformEquilibrium::check (const Units& units,
+                             const Geometry& geo,
                              const Soil& soil, const SoilWater& soil_water,
 			     const SoilHeat& soil_heat, Treelog& msg) const
 { 
   bool ok = true;
 
-  ScopeSoil scope (soil, soil_water, soil_heat);
+  ScopeSoil scope (geo, soil, soil_water, soil_heat);
   const size_t cell_size = soil.size ();
   for (size_t c = 0; ok && c < cell_size; c++)
     {
@@ -138,12 +141,14 @@ TransformEquilibrium::check (const Units& units,
 }
 
 void
-TransformEquilibrium::initialize (const Units& units, const Soil& soil,
+TransformEquilibrium::initialize (const Units& units, 
+                                  const Geometry& geo,
+                                  const Soil& soil,
                                   const SoilWater& soil_water,
                                   const SoilHeat& soil_heat, Treelog& msg)
 { 
   Treelog::Open nest (msg, "equil");
-  ScopeSoil scope (soil, soil_water, soil_heat);
+  ScopeSoil scope (geo, soil, soil_water, soil_heat);
   const size_t cell_size = soil.size ();
   daisy_assert (cell_size > 0);
   scope.set_cell (0);

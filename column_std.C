@@ -645,7 +645,7 @@ ColumnStandard::tick (Metalib& metalib, const Time& time, const double dt,
                        vegetation->height () * 0.01 /* [m] */,
                        *chemistry,
                        dt, msg);
-  chemistry->tick_surface (geometry, *soil, *soil_water, 
+  chemistry->tick_surface (surface.ponding (), geometry, *soil, *soil_water, 
                            surface.mixing_depth ());
 
   // Turnover.
@@ -668,7 +668,8 @@ ColumnStandard::tick (Metalib& metalib, const Time& time, const double dt,
                         surface.ponding (), surface.mixing_resistance (),
                         *soil, *soil_water, *soil_heat, 
                         *movement, *organic_matter, *chemistry, dt, msg);
-  organic_matter->transport (units, *soil, *soil_water, *soil_heat, msg);
+  organic_matter->transport (units, geometry, 
+                             *soil, *soil_water, *soil_heat, msg);
   const std::vector<DOM*>& dom = organic_matter->fetch_dom ();
   for (size_t i = 0; i < dom.size (); i++)
     {
@@ -752,7 +753,7 @@ ColumnStandard::check (bool require_weather,
     if (!soil->check (organic_matter->som_pools (), geometry, msg))
       ok = false;
   }
-  if (!organic_matter->check (units,
+  if (!organic_matter->check (units, geometry, 
                               *soil, *soil_water, *soil_heat, *chemistry, msg))
     ok = false;
   return ok;

@@ -26,6 +26,7 @@
 #include <vector>
 
 class Log;
+class Geometry;
 class Soil;
 class SoilWater;
 class SoilHeat;
@@ -45,7 +46,7 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Units&,
+  virtual void tick (const Units&, const Geometry&,
                      const Soil&, const SoilWater&, const SoilHeat&,
                      const std::vector<DOM*>&, const std::vector<SOM*>&,
                      Treelog&) = 0;
@@ -53,9 +54,11 @@ public:
 
   // Create and Destroy.
 public:
-  virtual void initialize (const Units&, const Soil&,  const SoilWater&, 
+  virtual void initialize (const Units&, const Geometry&, 
+                           const Soil&,  const SoilWater&, 
                            const SoilHeat& soil_heat, Treelog& msg) = 0;
   virtual bool check (const Units& units,
+                      const Geometry&, 
                       const Soil&, const SoilWater&, const SoilHeat&,
 		      size_t dom_size, size_t som_size, 
                       Treelog&) const = 0;

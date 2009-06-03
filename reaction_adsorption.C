@@ -63,7 +63,7 @@ struct ReactionAdsorption : public Reaction
     Chemical& solute = chemistry.find (name_solute);
     Chemical& sorbed = chemistry.find (name_sorbed);
     
-    ScopeSoil scope (soil, soil_water, soil_heat);
+    ScopeSoil scope (geo, soil, soil_water, soil_heat);
     for (size_t c = 0; c < cell_size; c++)
       { 
 	scope.set_cell (c);
@@ -113,7 +113,7 @@ struct ReactionAdsorption : public Reaction
   }
 
   // Create.
-  bool check (const Units& units, const Geometry&, 
+  bool check (const Units& units, const Geometry& geo, 
               const Soil& soil, const SoilWater& soil_water, 
 	      const SoilHeat& soil_heat,
 	      const Chemistry& chemistry, Treelog& msg) const
@@ -129,7 +129,7 @@ struct ReactionAdsorption : public Reaction
         msg.error ("'" + name_sorbed.name () + "' not traced");
         ok = false;
       }
-    ScopeSoil scope (soil, soil_water, soil_heat);
+    ScopeSoil scope (geo, soil, soil_water, soil_heat);
     if (!adsorption_rate->check_dim (units, scope, Units::per_h (), msg))
       ok = false;
     if (!desorption_rate->check_dim (units, scope, Units::per_h (), msg))
@@ -137,13 +137,13 @@ struct ReactionAdsorption : public Reaction
 
     return ok;
   }
-  void initialize (const Units& units, const Geometry&, 
+  void initialize (const Units& units, const Geometry& geo, 
                    const Soil& soil, const SoilWater& soil_water, 
                    const SoilHeat& soil_heat, const Surface&, Treelog& msg)
   { 
     adsorption_source.insert (adsorption_source.begin (), soil.size (), 0.0);
     daisy_assert (adsorption_source.size () == soil.size ());
-    ScopeSoil scope (soil, soil_water, soil_heat);
+    ScopeSoil scope (geo, soil, soil_water, soil_heat);
     adsorption_rate->initialize (units, scope, msg); 
     desorption_rate->initialize (units, scope, msg); 
   }

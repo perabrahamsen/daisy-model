@@ -73,7 +73,7 @@ struct ReactionEquilibrium : public Reaction
       ? NULL
       : &chemistry.find (name_colloid);
     
-    ScopeSoil scope_soil (soil, soil_water, soil_heat);
+    ScopeSoil scope_soil (geo, soil, soil_water, soil_heat);
     scope_soil.set_old_water (true); // Theta at start of timestep.
     scope_soil.set_domain (secondary
                            ? ScopeSoil::secondary 
@@ -173,7 +173,7 @@ struct ReactionEquilibrium : public Reaction
       }
 
     const size_t cell_size = geo.cell_size ();
-    ScopeSoil scope (soil, soil_water, soil_heat);
+    ScopeSoil scope (geo, soil, soil_water, soil_heat);
     for (size_t c = 0; c < cell_size && ok; c++)
       {
         scope.set_cell (c);
@@ -186,12 +186,12 @@ struct ReactionEquilibrium : public Reaction
       }
     return ok;
   }
-  void initialize (const Units& units, const Geometry&, const Soil& soil, 
+  void initialize (const Units& units, const Geometry& geo, const Soil& soil, 
                    const SoilWater& soil_water, const SoilHeat& soil_heat,
                    const Surface&, Treelog& msg)
   { 
     TREELOG_MODEL (msg);
-    ScopeSoil scope (soil, soil_water, soil_heat);
+    ScopeSoil scope (geo, soil, soil_water, soil_heat);
     scope.set_cell (0);
     equilibrium->initialize (units, scope, msg); 
     S_AB.insert (S_AB.begin (), soil.size (), 0.0);

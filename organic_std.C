@@ -228,7 +228,7 @@ struct OrganicStandard : public OrganicMatter
   void tick (const Geometry& geo,
              const SoilWater&, const SoilHeat&, 
 	     Chemistry&, double dt, Treelog& msg);
-  void transport (const Units&,
+  void transport (const Units&,  const Geometry&,
                   const Soil&, const SoilWater&, const SoilHeat&, Treelog&);
   const std::vector<DOM*>& fetch_dom () const;
   void output (Log&) const;
@@ -246,7 +246,8 @@ struct OrganicStandard : public OrganicMatter
 
   // Create and Destroy.
   int som_pools () const;
-  bool check (const Units&, const Soil&, const SoilWater&, const SoilHeat&,
+  bool check (const Units&, const Geometry&,
+              const Soil&, const SoilWater&, const SoilHeat&,
 	      const Chemistry&, Treelog& err) const;
   bool check_am (const FrameModel& am, Treelog& err) const;
   void add (AM&);
@@ -838,7 +839,8 @@ OrganicStandard::output (Log& log) const
 }
 
 bool
-OrganicStandard::check (const Units& units, const Soil& soil, 
+OrganicStandard::check (const Units& units, const Geometry& geo, 
+                        const Soil& soil, 
 			const SoilWater& soil_water, const SoilHeat& soil_heat, 
 			const Chemistry& chemistry, Treelog& msg) const
 {
@@ -854,7 +856,7 @@ OrganicStandard::check (const Units& units, const Soil& soil,
     if (!am[i]->check (msg))
       ok = false;
   for (size_t i = 0; i < domsorp.size (); i++)
-    if (!domsorp[i]->check (units, soil, soil_water, soil_heat, 
+    if (!domsorp[i]->check (units, geo, soil, soil_water, soil_heat, 
 			    dom.size (), som.size (), msg))
       ok = false;
   if (!clayom->check (smb, msg))
@@ -1274,13 +1276,14 @@ OrganicStandard::tick (const Geometry& geo,
 }
       
 void 
-OrganicStandard::transport (const Units& units, const Soil& soil, 
+OrganicStandard::transport (const Units& units, const Geometry& geo, 
+                            const Soil& soil, 
                             const SoilWater& soil_water, 
 			    const SoilHeat& soil_heat,
                             Treelog& msg)
 {
   for (size_t j = 0; j < domsorp.size (); j++)
-    domsorp[j]->tick (units, soil, soil_water, soil_heat, dom, som, msg);
+    domsorp[j]->tick (units, geo, soil, soil_water, soil_heat, dom, som, msg);
 }
 
 void 
@@ -2536,7 +2539,7 @@ An 'initial_SOM' layer in OrganicStandard ends below the last cell");
 
   // Initialize domsorp
   for (size_t i = 0; i < domsorp.size (); i++)
-    domsorp[i]->initialize (units, soil, soil_water, soil_heat, msg);
+    domsorp[i]->initialize (units, geo, soil, soil_water, soil_heat, msg);
 
   // Summary.
   {

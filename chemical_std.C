@@ -204,7 +204,8 @@ struct ChemicalStandard : public Chemical
                  const double surface_runoff_rate, // [h^-1]
                  const double dt, // [h]
                  Treelog& msg);
-  void tick_surface (const Geometry& geo, 
+  void tick_surface (const double pond,
+                     const Geometry& geo, 
                      const Soil& soil, const SoilWater& soil_water, 
                      const double z_mixing);
   void tick_soil (const Units&,
@@ -725,14 +726,16 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
 }
 
 void
-ChemicalStandard::tick_surface (const Geometry& geo, 
+ChemicalStandard::tick_surface (const double pond /* [cm] */,
+                                const Geometry& geo, 
                                 const Soil& soil, const SoilWater& soil_water, 
-                                const double z_mixing)
+                                const double z_mixing /* [cm] */)
 // Divide surface storage in immobile and solute mixing layer.void 
 {
   // Find total concentration in mixing layer.
   const double m2_per_cm2 = 0.01 * 0.01 ; // [m^2/cm^2]
   const double M = surface_storage * m2_per_cm2 / z_mixing; // [g/cm^3]
+  const double Theta_pond = pond / z_mixing;                // []
 
   // Now find the solute.
   surface_solute = 0.0;
@@ -749,7 +752,7 @@ ChemicalStandard::tick_surface (const Geometry& geo,
       daisy_assert (geo.cell_is_internal (cell));
 
       // Concentration in soil water.
-      const double Theta = soil_water.Theta (cell);
+      const double Theta = soil_water.Theta (cell) + Theta_pond;
       const double C = adsorption_->M_to_C (soil, Theta, cell, M); // [g/cm^3]
 
       // Accumulate based on cell surface area.
@@ -1225,7 +1228,7 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
         }
       if (M_total_.size () == 0 && C_avg_.size () == 0)
         {
-          ScopeSoil scope_soil (soil, soil_water, soil_heat);
+          ScopeSoil scope_soil (geo, soil, soil_water, soil_heat);
           ScopeMulti multi (parent_scope, scope_soil);
           daisy_assert (cell_size > 0);
           scope_soil.set_cell (0);

@@ -26,6 +26,7 @@
 #include "symbol.h"
 #include <vector>
 
+class Geometry;
 class Soil;
 class SoilWater;
 class SoilHeat;
@@ -43,17 +44,20 @@ public:
   // Simulation.
 public:
   virtual void tick (const Units&,
+                     const Geometry&, 
                      const Soil&, const SoilWater&, const SoilHeat&,
                      const std::vector<double>& A,
                      const std::vector<double>& B, 
                      std::vector<double>& S_AB, Treelog&) const = 0;
   virtual bool check (const Units&,
+                      const Geometry& geo,
                       const Soil&, const SoilWater&, const SoilHeat&,
 		      Treelog&) const;
 
   // Create and Destroy.
 public:
   virtual void initialize (const Units&,
+                           const Geometry& geo,
                            const Soil&, const SoilWater&, const SoilHeat&,
                            Treelog&);
 protected:

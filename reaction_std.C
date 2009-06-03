@@ -47,7 +47,7 @@ struct ReactionStandard : public Reaction
 
   // Simulation.
   void tick (const Units& units,
-             const Geometry&,
+             const Geometry& geo,
 	     const Soil& soil, const SoilWater& soil_water, 
 	     const SoilHeat& soil_heat, const OrganicMatter&,
              Chemistry& chemistry, const double dt, Treelog& msg)
@@ -62,13 +62,14 @@ struct ReactionStandard : public Reaction
 	AM[i] = A.M_primary (i);
 	BM[i] = B.M_primary (i);
       }
-    transform->tick (units, soil, soil_water, soil_heat, AM, BM, S_AB, msg);
+    transform->tick (units, geo, 
+                     soil, soil_water, soil_heat, AM, BM, S_AB, msg);
     A.add_to_transform_sink (S_AB);
     B.add_to_transform_source (S_AB);
   }
 
   // Create.
-  bool check (const Units& units, const Geometry&, 
+  bool check (const Units& units, const Geometry& geo, 
               const Soil& soil, const SoilWater& soil_water,
 	      const SoilHeat& soil_heat,
 	      const Chemistry& chemistry, Treelog& msg) const
@@ -84,16 +85,16 @@ struct ReactionStandard : public Reaction
         msg.error ("'" + name_B.name () + "' not traced");
         ok = false;
       }
-    if (!transform->check (units, soil, soil_water, soil_heat, msg))
+    if (!transform->check (units, geo, soil, soil_water, soil_heat, msg))
       ok = false;
 
     return ok;
   }
-  void initialize (const Units& units, const Geometry&, 
+  void initialize (const Units& units, const Geometry& geo, 
                    const Soil& soil, const SoilWater& soil_water,
                    const SoilHeat& soil_heat, const Surface&, Treelog& msg)
   { 
-    transform->initialize (units, soil, soil_water, soil_heat, msg); 
+    transform->initialize (units, geo, soil, soil_water, soil_heat, msg); 
     S_AB.insert (S_AB.begin (), soil.size (), 0.0);
     daisy_assert (S_AB.size () == soil.size ());
   }

@@ -51,7 +51,7 @@ const symbol
 ScopeSoil::T ("T");
 
 void 
-ScopeSoil::set_cell (size_t c)
+ScopeSoil::set_cell (int c)
 { cell = c; }
 
 void 
@@ -198,8 +198,10 @@ ScopeSoil::find_numbers (const Soil&)
   return result;
 }
 
-ScopeSoil::ScopeSoil (const Soil& s, const SoilWater& sw, const SoilHeat& sh)
-  : soil (s),
+ScopeSoil::ScopeSoil (const Geometry& g, 
+                      const Soil& s, const SoilWater& sw, const SoilHeat& sh)
+  : geo (g),
+    soil (s),
     soil_water (sw),
     soil_heat (sh),
     all_numbers_ (find_numbers (soil)),

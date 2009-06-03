@@ -126,9 +126,10 @@ public:
                          double surface_runoff_rate /* [h^-1] */,
                          double dt /* [h] */,
                          Treelog&) = 0;
-  virtual void tick_surface (const Geometry& geo, 
+  virtual void tick_surface (const double pond /* [cm] */,
+                             const Geometry& geo, 
                              const Soil& soil, const SoilWater& soil_water, 
-                             const double z_mixing) = 0;
+                             const double z_mixing /* [cm] */) = 0;
   virtual void tick_soil (const Units&,
                           const Geometry&, const Soil&, const SoilWater&,
                           double dt, const Scope&, Treelog&) = 0;

@@ -25,6 +25,7 @@
 #include "scope.h"
 #include <vector>
 
+class Geometry;
 class Soil;
 class SoilWater;
 class SoilHeat;
@@ -47,6 +48,7 @@ public:
 
   // Content.
 private:
+  const Geometry& geo;
   const Soil& soil;
   const SoilWater& soil_water;
   const SoilHeat& soil_heat;
@@ -59,7 +61,7 @@ private:
 public:                         // Abused for debugging in scope_soil.h
   int cell;			// Current cell.
 public:
-  void set_cell (size_t);
+  void set_cell (int);
   void set_old_water (bool old);
   void set_domain (domain_t);
 
@@ -74,12 +76,11 @@ public:
 
   // Create and Destroy.
 private:
-  ScopeSoil (const ScopeSoil&);
-  ScopeSoil ();
   static std::vector<symbol> 
   /**/ find_numbers (const Soil&);
 public:
-  explicit ScopeSoil (const Soil&, const SoilWater&, const SoilHeat&);
+  explicit ScopeSoil (const Geometry&, 
+                      const Soil&, const SoilWater&, const SoilHeat&);
   ~ScopeSoil ();
 };
 

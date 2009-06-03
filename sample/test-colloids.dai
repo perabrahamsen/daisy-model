@@ -156,6 +156,7 @@ carbon part of the 'K' factor.")
   (require_top true)
   (input "Solute-Spray" "Soil-Spray")
   (output  "Solute-Surface-Loss" "Colloid-Surface-Loss" "Soil-Surface-Loss" 
+           "Solute-Surface-Drain" "Colloid-Surface-Drain"
            "Solute-Decompose" "Colloid-Decompose" "Soil-Decompose"
            "Solute-Leak" "Colloid-Leak"
            "Solute-Drain" "Colloid-Drain")
@@ -200,20 +201,34 @@ carbon part of the 'K' factor.")
                          top_loss)
                    (tag "Solute-Surface-Loss")
                    (handle sum)
-                   (dimension "g/ha/&")
+                   (dimension "${unit}/&")
                    (spec chemical default top_loss))
            (number (path column "${column}" Chemistry "*" trace "${colloid}"
                          top_loss)
                    (tag "Colloid-Surface-Loss")
                    (handle sum)
-                   (dimension "g/ha/&")
+                   (dimension "${unit}/&")
                    (spec chemical default top_loss))
            (number (path column "${column}" Chemistry "*" trace "${soil}"
                          top_loss)
                    (tag "Soil-Surface-Loss")
                    (handle sum)
-                   (dimension "g/ha/&")
+                   (dimension "${unit}/&")
                    (spec chemical default top_loss))
+           (number (path column "${column}" Movement "*" 
+                         Tertiary biopores classes drain 
+                         solute_infiltration "${solute}" value)
+                   (spec biopore drain solute_infiltration value)
+                   (tag "Solute-Surface-Drain")
+                   (handle sum)
+                   (dimension "${unit}/&"))
+           (number (path column "${column}" Movement "*" 
+                         Tertiary biopores classes drain 
+                         solute_infiltration "${colloid}" value)
+                   (spec biopore drain solute_infiltration value)
+                   (tag "Colloid-Surface-Drain")
+                   (handle sum)
+                   (dimension "${unit}/&"))
            (number (path column "${column}" Chemistry "*" trace "${solute}"
                          surface_storage)
                    (tag "Solute-Surface")
