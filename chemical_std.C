@@ -207,7 +207,7 @@ struct ChemicalStandard : public Chemical
   void tick_surface (const double pond,
                      const Geometry& geo, 
                      const Soil& soil, const SoilWater& soil_water, 
-                     const double z_mixing);
+                     const double z_mixing, Treelog&);
   void tick_soil (const Units&,
                   const Geometry&, const Soil&, const SoilWater&, double dt,
                   const Scope&, Treelog&);
@@ -663,6 +663,8 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
                             const double dt, // [h]
                             Treelog& msg)
 {
+  TREELOG_MODEL (msg);
+
   const double old_storage = snow_storage + canopy_storage;
 
   // Snow pack
@@ -729,13 +731,18 @@ void
 ChemicalStandard::tick_surface (const double pond /* [cm] */,
                                 const Geometry& geo, 
                                 const Soil& soil, const SoilWater& soil_water, 
-                                const double z_mixing /* [cm] */)
+                                const double z_mixing /* [cm] */,
+                                Treelog& msg)
 // Divide surface storage in immobile and solute mixing layer.void 
 {
+  TREELOG_MODEL (msg);
+
   // Find total concentration in mixing layer.
   const double m2_per_cm2 = 0.01 * 0.01 ; // [m^2/cm^2]
   const double M = surface_storage * m2_per_cm2 / z_mixing; // [g/cm^3]
-  const double Theta_pond = pond / z_mixing;                // []
+  daisy_assert (M >= 0.0);
+  const double Theta_pond = std::max (pond, 0.0) / z_mixing; // []
+  daisy_assert (Theta_pond >= 0.0);
 
   // Now find the solute.
   surface_solute = 0.0;
@@ -753,17 +760,20 @@ ChemicalStandard::tick_surface (const double pond /* [cm] */,
 
       // Concentration in soil water.
       const double Theta = soil_water.Theta (cell) + Theta_pond;
+      daisy_assert (Theta > 0.0);
       const double C = adsorption_->M_to_C (soil, Theta, cell, M); // [g/cm^3]
-
+      daisy_assert (C >= 0.0);
       // Accumulate based on cell surface area.
       const double area = geo.edge_area (edge); // [cm^2]
       total_area += area;
       surface_solute += C * area * Theta;       // [g/cm]
+      daisy_assert (surface_solute >= 0.0);
     }
   
   // Convert solute back to surface dimensions.
   daisy_assert (total_area == geo.surface_area ());
   const double surface_area = geo.surface_area () * m2_per_cm2; // [m^2]
+  daisy_assert (surface_solute >= 0.0);
   surface_solute *= z_mixing;   // [g]
   surface_solute /= surface_area; // [g/m^2]
   daisy_assert (surface_solute >= 0.0);

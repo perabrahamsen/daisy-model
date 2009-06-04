@@ -1,5 +1,8 @@
 2009-06-03  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* scope_soil.C, scope_soil.h: Allow pseudo-cells.
+	* all: Update callers.
+
 	* chemical_std.C, chemical.h, chemisty.h, chemistry_std.C:
 	* chemistry_multi.C, column_std.C (tick_surface): Add pond argument.
 

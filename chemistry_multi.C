@@ -82,7 +82,7 @@ struct ChemistryMulti : public Chemistry
   void tick_surface (const double pond /* [cm] */,
                      const Geometry& geo, 
                      const Soil& soil, const SoilWater& soil_water, 
-                     const double z_mixing);
+                     const double z_mixing, Treelog&);
   void infiltrate (const Geometry&, 
                    double infiltration /* [mm/h] */, double ponding /* [mm] */,
                    double R_mixing /* [h/mm] */, const double dt /* [h] */);
@@ -322,10 +322,10 @@ void
 ChemistryMulti::tick_surface (const double pond /* [cm] */,
                               const Geometry& geo, 
                               const Soil& soil, const SoilWater& soil_water, 
-                              const double z_mixing)
+                              const double z_mixing, Treelog& msg)
 {
   for (size_t c = 0; c < combine.size (); c++)
-    combine[c]->tick_surface (pond, geo, soil, soil_water, z_mixing);
+    combine[c]->tick_surface (pond, geo, soil, soil_water, z_mixing, msg);
 }
 
 

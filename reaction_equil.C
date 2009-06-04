@@ -52,12 +52,18 @@ struct ReactionEquilibrium : public Reaction
   const std::auto_ptr<Number> k_AB;
   const std::auto_ptr<Number> k_BA;
   const symbol name_colloid;
+  const bool primary;
   const bool secondary;
+  const bool surface;
 
   // Output.
+  double surface_AB;       // [g/cm^2/h]
   std::vector<double> S_AB;
   void output (Log& log) const
-  { output_variable (S_AB, log); }
+  { 
+    output_variable (surface_AB, log); 
+    output_variable (S_AB, log); 
+  }
 
   // Simulation.
   void tick (const Units& units, const Geometry& geo, 
@@ -209,7 +215,10 @@ struct ReactionEquilibrium : public Reaction
             ? Librarian::build_item<Number> (al, "k_BA")
             : Librarian::build_item<Number> (al, "k_AB")),
       name_colloid (al.name ("colloid", Value::None ())),
-      secondary (al.flag ("secondary"))
+      primary (al.flag ("primary", !al.flag ("secondary"))),
+      secondary (al.flag ("secondary")),
+      surface (al.flag ("surface")),
+      surface_AB (0.0)
   { }
 };
 
@@ -240,13 +249,21 @@ static struct ReactionEquilibriumSyntax : public DeclareModel
                           Value::OptionalConst, Value::Singleton,
                           "Tranformation rate from soil component 'B' to 'A'.\n\
 By default, this is identical to 'k_AB'.");
-    frame.declare ("S_AB", "g/cm^3/h", Value::LogOnly, Value::SoilCells,
-                   "Converted from A to B this timestep (may be negative).");
+    frame.declare ("susrface_AB", "g/cm^2/h", Value::LogOnly, "\
+Converted from A to B on surface this timestep (may be negative).");
+    frame.declare ("S_AB", "g/cm^3/h", Value::LogOnly, Value::SoilCells, "\
+Converted from A to B in soil this timestep (may be negative).");
     frame.declare ("colloid", Value::String, Value::OptionalConst,
                    "Let 'rho_b' denote content of specified chemical.\n\
 This might affect the evaluation of the 'k_AB' and 'k_BA' parameter\n\
 expressions, as well as the 'equilibrium' model.\n\
 By default, 'rho_b' will be the soil dry bulk density.");
+    frame.declare ("primary", Value::Boolean, Value::OptionalConst,
+                   "Equilibrium should happen in the primary domain.\n\
+If true, the content of the primary soil domain (soil-bound and\n\
+intra-aggregate pores), will be included in the reaction.\n\
+By default, this will be true if 'secondary' is false, and be false if\n\
+'secondary' is true.");
     frame.declare ("secondary", Value::Boolean, Value::Const,
                    "Equilibrium should happen in the secondary domain.\n\
 There will only be a reaction when there is water in the secondary domain\n\
@@ -256,6 +273,9 @@ intra-aggregate pores), will be included in the reaction.\n\
 There is no way to use this model to specify an equilibrium reaction in\n\
 the tertiary domain (biopores).");
     frame.set ("secondary", false);
+    frame.declare ("surface", Value::Boolean, Value::Const,
+                   "Equilibrium should happen in the surface.");
+    frame.set ("surface", false);
   }
 } ReactionEquilibrium_syntax;
 

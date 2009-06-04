@@ -129,7 +129,8 @@ public:
   virtual void tick_surface (const double pond /* [cm] */,
                              const Geometry& geo, 
                              const Soil& soil, const SoilWater& soil_water, 
-                             const double z_mixing /* [cm] */) = 0;
+                             const double z_mixing /* [cm] */,
+                             Treelog& msg) = 0;
   virtual void tick_soil (const Units&,
                           const Geometry&, const Soil&, const SoilWater&,
                           double dt, const Scope&, Treelog&) = 0;

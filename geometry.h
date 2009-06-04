@@ -43,6 +43,7 @@ public:
   static const int cell_right = -654321;
   static const int cell_front = -9999;
   static const int cell_back = -8888;
+  static const int cell_error = -1;
 
   // Parameters.
 protected:
@@ -61,6 +62,8 @@ public:
   { return size_; }
   inline bool cell_is_internal (int cell) const
   { return cell >= 0; }
+  bool cell_is_external (int cell) const;
+  bool cell_is_valid (int cell) const;
   std::string cell_name (int) const; // For array logging.
   virtual double cell_z (size_t) const = 0; // Cell center depth [cm]
   double z_safe (int) const;    // Same, handles cell_top and cell_bottom.
@@ -146,7 +149,10 @@ public:
 public:
   // The 'Access' class is simply a function object interface.
   struct Access
-  { virtual double operator()(size_t c) const = 0; };
+  { 
+    virtual double operator()(size_t c) const = 0; 
+    virtual ~Access ();
+  };
   // The 'Accessor' template class will implement the 'Access'
   // interface for a given soil container and member function.
   template<class T>
@@ -184,6 +190,16 @@ public:
   // The 'access_content_hood' function does the same, using the
   // 'Access' class instead of a soil container template.
   double access_content_hood (const Access&, int c) const;
+  // The 'content_cell_or_hood' template function will return the value 
+  // for the cell, if internal, or the hood, if external.
+  template<class T> 
+  double content_cell_or_hood (const T& obj, 
+                               double (T::*content) (size_t) const,
+                               const int c) const
+  { return access_content_cell_or_hood (Accessor<T> (obj, content), c); }
+  // The 'access_content_cell_or_hood' function does the same, using the
+  // 'Access' class instead of a soil container template.
+  double access_content_cell_or_hood (const Access&, int c) const;
   // The 'content_interval' template function will calculate an average
   // content for the cells overlapping a specified interval, weighted
   // by the overlapping volume.

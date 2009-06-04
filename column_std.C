@@ -646,7 +646,7 @@ ColumnStandard::tick (Metalib& metalib, const Time& time, const double dt,
                        *chemistry,
                        dt, msg);
   chemistry->tick_surface (surface.ponding (), geometry, *soil, *soil_water, 
-                           surface.mixing_depth ());
+                           surface.mixing_depth (), msg);
 
   // Turnover.
   organic_matter->tick (geometry, *soil_water, *soil_heat, 

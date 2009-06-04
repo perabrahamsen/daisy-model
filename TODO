@@ -2,66 +2,19 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * R2D2
 
-** Mixing layer?
-
-*** DONE z_mixing
-    
-Vi har brug for den til adsorptionsligevægt.
-
-*** DONE Jarvis99 skal bruge z_mixing
-
-*** straksligevægt på overfladen følger Theta & rho_b i øverste lag
-
-**** DONE tick_surface
-
-**** DONE kald tick_surface
-
-**** DONE før surface_solute og surface_immobile til log variable.
-
-*** DONE kun opløst stof infiltrerer og mixture
-
-ChemicalStandard::infiltrate 
-ChemicalStandard::mixture
-
-check at surface_storage ikke bruges direkte
-
-*** kollodbåret stof følger immobil * frigivelse / reservoir
-
-**** DONE 'surface_release' log variable i chemical_std
-
-Skal blive sat af colgen til den fraction af jord som blev frigivet i
-dette tidsskridt.
-
-**** DONE reaction Jarvis/Morgan/Styczen skal sætte 'surface_release'
-
-Morgan/Styczen skal basere på total jord i mixing layer (udregnes ved
-initialisering).
-
-**** DONE Ny reaction 'bound_release' skal bruge 'surface_release'
-
-**** DONE indsæt i test-colloids.dai
-
-(defreaction Pendimethalin-colloid-generation bound_release
-  "Release immobile Pendimethalin as colloids in mixing layer."
-  (colloid colloid)
-  (bound Pendimethalin-immobile)
-  (mobile Pendimethalin-colloid))
-
-**** DONE Få massebalance i test-colloids.dai
-
-**** DONE Se resultat i log
-
-**** DONE Balancefejl?
-
-surface-drain mangler
-
-**** DONE ponded vand skal indgå i mixing layer
+** Mixing layer
 
 *** kinetisk ligevægt skal fungere på overfladen
 
 Følger Theta og rho_b for øverste node.
 
-**** ScopeSoil skal kunne bruge virtuelle noder
+**** reaction_equil.C 
+
+***** tick_primary
+
+***** tick_secondary
+
+***** tick_surface
 
 ** tegninger mikkel
 

@@ -37,6 +37,20 @@ const int Geometry::cell_left;
 const int Geometry::cell_right;
 const int Geometry::cell_front;
 const int Geometry::cell_back;
+const int Geometry::cell_error;
+
+bool 
+Geometry::cell_is_external (int cell) const
+{ return cell == cell_above
+    || cell == cell_below
+    || cell == cell_left
+    || cell == cell_right
+    || cell == cell_front
+    || cell == cell_back; }
+
+bool
+Geometry::cell_is_valid (int cell) const
+{ return cell_is_internal (cell) || cell_is_external (cell); }
 
 std::string
 Geometry::cell_name (int n) const
@@ -149,6 +163,9 @@ Geometry::y_safe (int n) const
     }
 }
 
+Geometry::Access::~Access ()
+{ }
+  
 double 
 Geometry::access_content_height (const Access& access, const double z) const
 {
@@ -192,6 +209,16 @@ Geometry::access_content_hood (const Access& access, const int center) const
     return 0.0;
 
   return total_content / total_area;
+}
+
+double 
+Geometry::access_content_cell_or_hood (const Access& access,
+                                       const int cell) const
+{
+  if (cell_is_internal (cell))
+    return access (cell);
+  
+  return access_content_hood (access, cell);
 }
 
 double 

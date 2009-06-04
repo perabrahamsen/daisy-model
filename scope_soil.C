@@ -21,6 +21,7 @@
 #define BUILD_DLL
 
 #include "scope_soil.h"
+#include "geometry.h"
 #include "soil.h"
 #include "soil_water.h"
 #include "soil_heat.h"
@@ -71,7 +72,45 @@ ScopeSoil::entries (std::set<symbol>& all) const
   all.insert (h);
   all.insert (Theta);
   all.insert (T);
-  soil.append_attributes (cell, all); 
+  if (geo.cell_is_internal (cell))
+    soil.append_attributes (cell, all); 
+  else 
+    {
+      daisy_assert (geo.cell_is_external (cell));
+
+      std::set<symbol> shared;
+      // We look at each neighbor cell.
+      const std::vector<size_t>& edge_around = geo.cell_edges (cell);
+      const size_t edge_around_size = edge_around.size ();
+      daisy_assert (edge_around_size > 0U);
+      for (size_t i = 0; i < edge_around_size; i++)
+        {
+          const size_t edge = edge_around[i];
+          const int c = geo.edge_other (edge, cell);
+          daisy_assert (geo.cell_is_internal (c));
+
+          // Only use common attributes.
+          if (i == 0)
+            soil.append_attributes (c, shared);
+          else
+            {
+              std::set<symbol> mine;
+              soil.append_attributes (c, shared);
+              std::set<symbol> result;
+              std::set_intersection (mine.begin (), mine.end (), 
+                                     shared.begin (), shared.end (),
+                                     std::inserter (result, result.end ()));
+              shared = result;
+            }
+        }
+
+      // Combine with build-in and old tags.
+      std::set<symbol> result;
+      std::set_union (all.begin (), all.end (), 
+                      shared.begin (), shared.end (),
+                      std::inserter (result, result.end ()));
+      all = result;
+    }
 }
 
 Value::type 
@@ -81,18 +120,29 @@ ScopeSoil::lookup (const symbol tag) const
 bool 
 ScopeSoil::check (const symbol tag) const
 {
-  daisy_assert (cell >= 0);
-
   if (tag == rho_b || tag == clay || tag == humus 
       || tag == h || tag == Theta || tag == T)
     return true;
 
-  if (soil.has_attribute (cell, tag))
-    return true;
+  if (geo.cell_is_internal (cell))
+    return soil.has_attribute (cell, tag);
   
-  return false;
+  daisy_assert (geo.cell_is_external (cell));
+  
+  // Must be on all neighbors.
+  const std::vector<size_t>& edge_around = geo.cell_edges (cell);
+  const size_t edge_around_size = edge_around.size ();
+  daisy_assert (edge_around_size > 0U);
+  for (size_t i = 0; i < edge_around_size; i++)
+    {
+      const size_t edge = edge_around[i];
+      const int c = geo.edge_other (edge, cell);
+      daisy_assert (geo.cell_is_internal (c));
+      if (!soil.has_attribute (c, tag))
+        return false;
+    }
+  return true;
 }
-
 
 double
 ScopeSoil::number (const symbol tag) const
@@ -100,39 +150,58 @@ ScopeSoil::number (const symbol tag) const
   daisy_assert (cell >= 0);
 
   if (tag == rho_b)
-    return soil.dry_bulk_density (cell);
+    return geo.content_cell_or_hood (soil, &Soil::dry_bulk_density, cell);
   if (tag == clay)
-    return soil.clay (cell);
+    return geo.content_cell_or_hood (soil, &Soil::clay, cell);
   if (tag == humus)
-    return soil.humus (cell);
+    return geo.content_cell_or_hood (soil, &Soil::humus, cell);
   if (tag == h)
     if (old_water)
-      return soil_water.h_old (cell);
+      return geo.content_cell_or_hood (soil_water, &SoilWater::h_old, cell);
     else 
-      return soil_water.h (cell);
+      return geo.content_cell_or_hood (soil_water, &SoilWater::h, cell);
   if (tag == Theta)
     switch (domain)
       {
       case primary:
         return old_water 
-          ? soil_water.Theta_primary_old (cell)
-          : soil_water.Theta_primary (cell);
+          ? geo.content_cell_or_hood (soil_water, 
+                                      &SoilWater::Theta_primary_old, cell)
+          : geo.content_cell_or_hood (soil_water, 
+                                      &SoilWater::Theta_primary, cell);
       case secondary:
         return old_water 
-          ? soil_water.Theta_secondary_old (cell)
-          : soil_water.Theta_secondary (cell);
+          ? geo.content_cell_or_hood (soil_water,
+                                      &SoilWater::Theta_secondary_old, cell)
+          : geo.content_cell_or_hood (soil_water, 
+                                      &SoilWater::Theta_secondary, cell);
       case matrix:
         return old_water 
-          ? soil_water.Theta_old (cell)
-          : soil_water.Theta (cell);
+          ? geo.content_cell_or_hood (soil_water, 
+                                      &SoilWater::Theta_old, cell)
+          : geo.content_cell_or_hood (soil_water, &SoilWater::Theta, cell);
       default:
         daisy_notreached ();
       }
   if (tag == T)
-    return soil_heat.T (cell);
+    return geo.content_cell_or_hood (soil_heat, &SoilHeat::T, cell);
 
-  return soil.get_attribute (cell, tag);
-}    
+  struct AttAccess : public Geometry::Access
+  {
+    const Soil& soil;
+    const symbol tag;
+
+    double operator()(size_t c) const
+    { return soil.get_attribute (c, tag); }
+    
+    AttAccess (const Soil& s, const symbol t)
+      : soil (s), 
+        tag (t)
+    { }
+  } att_access (soil, tag);
+      
+  return geo.access_content_cell_or_hood (att_access, cell);
+}
 
 symbol 
 ScopeSoil::dimension (const symbol tag) const
@@ -150,8 +219,27 @@ ScopeSoil::dimension (const symbol tag) const
   if (tag == T)
     return T_dim;
 
-  daisy_assert (cell >= 0);
-  return soil.get_dimension (cell, tag);
+  if (geo.cell_is_internal (cell))
+    return soil.get_dimension (cell, tag);
+  
+  // Must be the same for all neighbors.
+  symbol shared = Value::Unknown ();
+  const std::vector<size_t>& edge_around = geo.cell_edges (cell);
+  const size_t edge_around_size = edge_around.size ();
+  daisy_assert (edge_around_size > 0U);
+  for (size_t i = 0; i < edge_around_size; i++)
+    {
+      const size_t edge = edge_around[i];
+      const int c = geo.edge_other (edge, cell);
+      daisy_assert (geo.cell_is_internal (c));
+      
+      const symbol mine = soil.get_dimension (c, tag);
+      if (shared == Value::Unknown ())
+        shared = mine;
+      else if (shared != mine)
+        return Value::Unknown ();
+    }
+  return shared;
 }
 
 symbol
@@ -207,7 +295,7 @@ ScopeSoil::ScopeSoil (const Geometry& g,
     all_numbers_ (find_numbers (soil)),
     old_water (false),
     domain (matrix),
-    cell (-1)
+    cell (Geometry::cell_error)
 { }
 
 ScopeSoil::~ScopeSoil ()
