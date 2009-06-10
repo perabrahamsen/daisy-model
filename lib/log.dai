@@ -1286,8 +1286,10 @@ sum of all chemicals will be logged."
                     (input spray deposit surface_transform)
                     (output canopy_harvest canopy_dissipate
 			    surface_decompose 
-                            surface_runoff surface_out surface_tillage)
-                    (content snow_storage canopy_storage surface_storage)))
+                            surface_runoff surface_out surface_mixture 
+                            surface_tillage)
+                    (content snow_storage canopy_storage 
+                             surface_solute surface_immobile)))
   (when hourly)
   (entries ;; Year Month MDay Hour
            (number (path column "${column}" Chemistry "*" trace "${chemical}"
@@ -1351,10 +1353,25 @@ sum of all chemicals will be logged."
                    (dimension "g/ha")
                    (spec chemical default surface_storage))
            (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         surface_solute)
+                   (handle current)
+                   (dimension "g/ha")
+                   (spec chemical default surface_solute))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         surface_immobile)
+                   (handle current)
+                   (dimension "g/ha")
+                   (spec chemical default surface_immobile))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
                          surface_out)
                    (handle sum)
                    (dimension "g/ha/&")
                    (spec chemical default surface_out))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         surface_mixture)
+                   (handle sum)
+                   (dimension "g/ha/&")
+                   (spec chemical default surface_mixture))
            (number (path column "${column}" Chemistry "*" trace "${chemical}"
                          surface_tillage)
                    (handle sum)
