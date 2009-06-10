@@ -44,11 +44,11 @@ struct ReactionNitrification : public Reaction
   void output (Log& log) const;
 
   // Simulation.
-  void tick (const Units&, const Geometry& geo,
-	     const Soil& soil, const SoilWater& soil_water, 
-	     const SoilHeat& soil_heat,
-	     const OrganicMatter& organic_matter, 
-             Chemistry& chemistry, const double dt, Treelog& msg);
+  void tick_soil (const Units&, const Geometry& geo,
+                  const Soil& soil, const SoilWater& soil_water, 
+                  const SoilHeat& soil_heat,
+                  const OrganicMatter& organic_matter, 
+                  Chemistry& chemistry, const double dt, Treelog& msg);
 
   // Create.
   bool check (const Units&, const Geometry&, 
@@ -70,12 +70,12 @@ ReactionNitrification::output (Log& log) const
 }
 
 void 
-ReactionNitrification::tick (const Units&, const Geometry& geo,
-			     const Soil& soil, const SoilWater& soil_water,
-			     const SoilHeat& soil_heat,
-			     const OrganicMatter& organic_matter, 
-			     Chemistry& chemistry, 
-			     const double dt, Treelog&)
+ReactionNitrification::tick_soil (const Units&, const Geometry& geo,
+                                  const Soil& soil, const SoilWater& soil_water,
+                                  const SoilHeat& soil_heat,
+                                  const OrganicMatter& organic_matter, 
+                                  Chemistry& chemistry, 
+                                  const double dt, Treelog&)
 {
   const size_t cell_size = geo.cell_size ();
   const std::vector<bool> active = organic_matter.active (); 

@@ -1,9 +1,25 @@
+2009-06-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.65 released.
+
+2009-06-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* scope_soil.h (cell): Make it private.
+	* equil_linear.C, equil_langmuir.C, equil_goal.C, equil.h (find): Take cell argument.
+	* transform_equil.C, reaction_equil.C (tick): Update caller.
+'
+	* scope_soil.h, scope_soil.C (set_colloid): New parameter.
+	* reaction_equil.C (tick): Update caller.
+
+	* reaction_equil.C (primary, surface): New flags.
+	(tick_soil, tick_surface): New functions.
+
 2009-06-03  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* scope_soil.C, scope_soil.h: Allow pseudo-cells.
 	* all: Update callers.
 
-	* chemical_std.C, chemical.h, chemisty.h, chemistry_std.C:
+	* chemical_std.C, chemical.h, chemistry.h, chemistry_std.C:
 	* chemistry_multi.C, column_std.C (tick_surface): Add pond argument.
 
 2009-05-27  Per Abrahamsen  <abraham@dina.kvl.dk>

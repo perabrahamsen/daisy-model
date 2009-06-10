@@ -143,6 +143,7 @@ struct ChemicalStandard : public Chemical
   // Surface content.
   double surface_release_fraction () const; // []
   double surface_immobile_amount () const;  // [g/cm^2]
+  double surface_storage_amount () const;  // [g/cm^2]
 
   // Soil content.
   double C_below () const; // Concentration in groundwater [g/cm^3]
@@ -287,6 +288,13 @@ ChemicalStandard::surface_immobile_amount () const
 {
   const double m2_per_cm2 = 0.01 * 0.01;
   return surface_immobile * m2_per_cm2; 
+}
+
+double 
+ChemicalStandard::surface_storage_amount () const
+{
+  const double m2_per_cm2 = 0.01 * 0.01;
+  return surface_storage * m2_per_cm2; 
 }
 
 double 
@@ -733,7 +741,7 @@ ChemicalStandard::tick_surface (const double pond /* [cm] */,
                                 const Soil& soil, const SoilWater& soil_water, 
                                 const double z_mixing /* [cm] */,
                                 Treelog& msg)
-// Divide surface storage in immobile and solute mixing layer.void 
+// Divide surface storage in immobile and solute mixing layer.
 {
   TREELOG_MODEL (msg);
 
@@ -914,12 +922,12 @@ ChemicalStandard::tick_soil (const Units& units, const Geometry& geo,
 void 
 ChemicalStandard::mixture (const Geometry& geo,
                            const double pond /* [mm] */, 
-                           const double rate /* [h/mm] */,
+                           const double R_mixing /* [h/mm] */,
                            const double dt /* [h]*/)
 {
   daisy_approximate (surface_storage, surface_solute + surface_immobile);
   // Make sure we have something to mix.
-  if (pond < 1e-6 || rate < 1e-99)
+  if (pond < 1e-6 || R_mixing < 1e-99)
     {
       surface_mixture = 0.0;
       return;
@@ -933,7 +941,7 @@ ChemicalStandard::mixture (const Geometry& geo,
   const double storage_conc = surface_solute / pond;// [g/m^2/mm]
   
   surface_mixture // [g/m^2/h]
-    = std::min (surface_storage / dt, (storage_conc - soil_conc) / rate);
+    = std::min (surface_storage / dt, (storage_conc - soil_conc) / R_mixing);
   surface_storage -= surface_mixture * dt;
   surface_solute -= surface_mixture * dt;
   daisy_approximate (surface_storage, surface_solute + surface_immobile);

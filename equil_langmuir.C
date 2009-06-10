@@ -40,7 +40,7 @@ struct EquilibriumLangmuir : public Equilibrium
   std::auto_ptr<Number> my_max_expr;
 
   // Simulation.
-  void find (const Units& units, const Scope&, double has_A, double has_B, 
+  void find (const Units& units, const Scope&, int, double has_A, double has_B, 
 	     double& want_A, double& want_B, Treelog&) const;
 
   // Create and Destroy.
@@ -59,7 +59,7 @@ const symbol
 EquilibriumLangmuir::base_unit ("g/cm^3");
 
 void
-EquilibriumLangmuir::find (const Units& units, const Scope& scope,
+EquilibriumLangmuir::find (const Units& units, const Scope& scope, int, 
 			   const double has_A, const double has_B, 
 			   double& want_A, double& want_B, Treelog& msg) const
 {

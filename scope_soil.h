@@ -29,6 +29,7 @@ class Geometry;
 class Soil;
 class SoilWater;
 class SoilHeat;
+class Chemical;
 
 class ScopeSoil : public Scope
 {
@@ -58,12 +59,16 @@ private:
 private:
   bool old_water;
   domain_t domain;
-public:                         // Abused for debugging in scope_soil.h
+  double dry_bulk_density;
+  double Theta_extra;
+
   int cell;			// Current cell.
 public:
   void set_cell (int);
   void set_old_water (bool old);
   void set_domain (domain_t);
+  void set_dry_bulk_density (double rho_b); // Replace rho_b.
+  void set_extra_water (double Theta_extra);
 
   // Scope Interface.
 public:

@@ -44,7 +44,7 @@ struct EquilibriumGoal_A : public Equilibrium
   const int debug_cell;
 
   // Simulation.
-  void find (const Units& units, const Scope&, double has_A, double has_B, 
+  void find (const Units& units, const Scope&, int cell, double has_A, double has_B, 
 	     double& want_A, double& want_B, Treelog&) const;
 
   // Create and Destroy.
@@ -66,7 +66,7 @@ const symbol
 EquilibriumGoal_A::goal_unit ("g/cm^3");
 
 void
-EquilibriumGoal_A::find (const Units& units, const Scope& scope,
+EquilibriumGoal_A::find (const Units& units, const Scope& scope, int cell, 
                          const double has_A, const double has_B, 
                          double& want_A, double& want_B, Treelog& msg) const
 {
@@ -124,10 +124,8 @@ EquilibriumGoal_A::find (const Units& units, const Scope& scope,
     }
   tmp << "\t" << has_A << "\t" << goal_A_dry << "\t" << want_A << "\t"
       << has_B << "\t" << min_B_dry << "\t" << want_B << "\t" << M;
-  if (const ScopeSoil *const scope_soil 
-      = dynamic_cast<const ScopeSoil*> (&scope))
-    if (scope_soil->cell == debug_cell)
-      msg.message (tmp.str ());
+  if (cell == debug_cell)
+    msg.message (tmp.str ());
 
   daisy_assert (want_A >= 0.0);
   daisy_assert (want_B >= 0.0);

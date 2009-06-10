@@ -6,6 +6,15 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.65
+
+** Finished mixing layer.
+
+Most people will see this as NH4 infiltration becomming slower.  You
+can now have an equilibrium reaction on the surface.  The
+'test-colloids.dai' file in the sample folder shows how to use this to
+generate colloid bound chemicals on the surface.
+
 * 4.64
 
 ** More functionality to the surface mixing layer.

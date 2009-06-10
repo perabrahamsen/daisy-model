@@ -36,7 +36,7 @@ struct EquilibriumLinear : public Equilibrium
   std::auto_ptr<Number> K_expr;
 
   // Simulation.
-  void find (const Units& units, const Scope&, double has_A, double has_B, 
+  void find (const Units& units, const Scope&, int, double has_A, double has_B, 
 	     double& want_A, double& want_B, Treelog&) const;
 
   // Create and Destroy.
@@ -51,7 +51,7 @@ struct EquilibriumLinear : public Equilibrium
 };
 
 void
-EquilibriumLinear::find (const Units& units, const Scope& scope,
+EquilibriumLinear::find (const Units& units, const Scope& scope, int, 
                          const double has_A, const double has_B, 
                          double& want_A, double& want_B, Treelog& msg) const
 {
@@ -76,7 +76,11 @@ EquilibriumLinear::find (const Units& units, const Scope& scope,
 
   want_B = M / (1.0 + K);
   want_A = M - want_B;
-  daisy_assert (want_A >= 0.0);
+  if (want_A < 0.0)
+    {
+      want_A = 0.0;
+      want_B = M;
+    }
 }
 
 void

@@ -25,6 +25,7 @@
 #include "soil.h"
 #include "soil_water.h"
 #include "soil_heat.h"
+#include "chemical.h"
 #include "units.h"
 #include "assertion.h"
 #include "librarian.h"
@@ -62,6 +63,14 @@ ScopeSoil::set_old_water (const bool old)
 void 
 ScopeSoil::set_domain (const domain_t d)
 { domain = d; }
+
+void 
+ScopeSoil::set_dry_bulk_density (const double rho_b)
+{ dry_bulk_density = rho_b; }
+
+void
+ScopeSoil::set_extra_water (const double extra)
+{ Theta_extra = extra; }
 
 void 
 ScopeSoil::entries (std::set<symbol>& all) const
@@ -150,7 +159,12 @@ ScopeSoil::number (const symbol tag) const
   daisy_assert (cell >= 0);
 
   if (tag == rho_b)
-    return geo.content_cell_or_hood (soil, &Soil::dry_bulk_density, cell);
+    if (dry_bulk_density > 0.0)
+      return dry_bulk_density;
+    else if (domain == secondary)
+      return 0.0;             // No soil in secondary domain.
+    else
+      return geo.content_cell_or_hood (soil, &Soil::dry_bulk_density, cell);
   if (tag == clay)
     return geo.content_cell_or_hood (soil, &Soil::clay, cell);
   if (tag == humus)
@@ -161,28 +175,35 @@ ScopeSoil::number (const symbol tag) const
     else 
       return geo.content_cell_or_hood (soil_water, &SoilWater::h, cell);
   if (tag == Theta)
-    switch (domain)
-      {
-      case primary:
-        return old_water 
-          ? geo.content_cell_or_hood (soil_water, 
-                                      &SoilWater::Theta_primary_old, cell)
-          : geo.content_cell_or_hood (soil_water, 
-                                      &SoilWater::Theta_primary, cell);
-      case secondary:
-        return old_water 
-          ? geo.content_cell_or_hood (soil_water,
-                                      &SoilWater::Theta_secondary_old, cell)
-          : geo.content_cell_or_hood (soil_water, 
-                                      &SoilWater::Theta_secondary, cell);
-      case matrix:
-        return old_water 
-          ? geo.content_cell_or_hood (soil_water, 
-                                      &SoilWater::Theta_old, cell)
-          : geo.content_cell_or_hood (soil_water, &SoilWater::Theta, cell);
-      default:
-        daisy_notreached ();
-      }
+    {
+      double water;
+      switch (domain)
+        {
+        case primary:
+          water = old_water 
+            ? geo.content_cell_or_hood (soil_water, 
+                                        &SoilWater::Theta_primary_old, cell)
+            : geo.content_cell_or_hood (soil_water, 
+                                        &SoilWater::Theta_primary, cell);
+          break;
+        case secondary:
+          water = old_water 
+            ? geo.content_cell_or_hood (soil_water,
+                                        &SoilWater::Theta_secondary_old, cell)
+            : geo.content_cell_or_hood (soil_water, 
+                                        &SoilWater::Theta_secondary, cell);
+          break;
+        case matrix:
+          water = old_water 
+            ? geo.content_cell_or_hood (soil_water, 
+                                        &SoilWater::Theta_old, cell)
+            : geo.content_cell_or_hood (soil_water, &SoilWater::Theta, cell);
+          break;
+        default:
+          daisy_notreached ();
+        }
+      return water + Theta_extra; 
+    }
   if (tag == T)
     return geo.content_cell_or_hood (soil_heat, &SoilHeat::T, cell);
 
@@ -245,7 +266,8 @@ ScopeSoil::dimension (const symbol tag) const
 symbol
 ScopeSoil::description (symbol tag) const
 {
-  static const symbol rho_b_description ("Dry bulk density.");
+  static const symbol rho_b_description ("Dry bulk density.\n\
+For some uses, this may be replaced with colloids.");
   if (tag == rho_b)
     return rho_b_description;
 
@@ -295,6 +317,8 @@ ScopeSoil::ScopeSoil (const Geometry& g,
     all_numbers_ (find_numbers (soil)),
     old_water (false),
     domain (matrix),
+    dry_bulk_density (-42.42e42),
+    Theta_extra (0.0),
     cell (Geometry::cell_error)
 { }
 

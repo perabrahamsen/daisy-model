@@ -46,11 +46,11 @@ struct ReactionStandard : public Reaction
   { output_variable (S_AB, log); }
 
   // Simulation.
-  void tick (const Units& units,
-             const Geometry& geo,
-	     const Soil& soil, const SoilWater& soil_water, 
-	     const SoilHeat& soil_heat, const OrganicMatter&,
-             Chemistry& chemistry, const double dt, Treelog& msg)
+  void tick_soil (const Units& units,
+                  const Geometry& geo,
+                  const Soil& soil, const SoilWater& soil_water, 
+                  const SoilHeat& soil_heat, const OrganicMatter&,
+                  Chemistry& chemistry, const double dt, Treelog& msg)
   { 
     const size_t cell_size = soil.size ();
     Chemical& A = chemistry.find (name_A);

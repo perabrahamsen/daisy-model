@@ -89,7 +89,7 @@ TransformEquilibrium::tick (const Units& units,
       const double has_B = B[c];
       double want_A;
       double want_B;
-      equilibrium->find (units, scope, has_A, has_B, want_A, want_B, msg);
+      equilibrium->find (units, scope, c, has_A, has_B, want_A, want_B, msg);
 
       daisy_assert (approximate (has_A + has_B, want_A + want_B));
 

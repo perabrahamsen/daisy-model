@@ -635,7 +635,8 @@ ColumnStandard::tick (Metalib& metalib, const Time& time, const double dt,
                     *soil_heat, *soil_water, *chemistry, *organic_matter, 
                     residuals_DM, residuals_N_top, residuals_C_top, 
                     residuals_N_soil, residuals_C_soil, dt, msg);
-  chemistry->tick_top (bioclimate->snow_leak_rate (dt), vegetation->cover (),
+  chemistry->tick_top (units, geometry, *soil, *soil_water, *soil_heat, surface,
+                       bioclimate->snow_leak_rate (dt), vegetation->cover (),
                        bioclimate->canopy_leak_rate (dt), 
                        surface.runoff_rate (dt),
                        old_pond,
@@ -645,9 +646,7 @@ ColumnStandard::tick (Metalib& metalib, const Time& time, const double dt,
                        vegetation->height () * 0.01 /* [m] */,
                        *chemistry,
                        dt, msg);
-  chemistry->tick_surface (surface.ponding (), geometry, *soil, *soil_water, 
-                           surface.mixing_depth (), msg);
-
+  
   // Turnover.
   organic_matter->tick (geometry, *soil_water, *soil_heat, 
                         *chemistry, dt, msg);

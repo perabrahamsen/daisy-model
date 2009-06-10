@@ -26,6 +26,7 @@
 #include "geometry.h"
 #include "soil.h"
 #include "soil_water.h"
+#include "surface.h"
 #include "block.h"
 #include "log.h"
 #include "assertion.h"
@@ -66,7 +67,9 @@ struct ChemistryStandard : public Chemistry
                     const Volume&, const double dt, Treelog& msg);
   
   // Simulation.
-  void tick_top (const double snow_leak_rate, // [h^-1]
+  void tick_top (const Units&, const Geometry&, const Soil&, 
+                 const SoilWater&, const SoilHeat&, const Surface&,
+                 const double snow_leak_rate, // [h^-1]
                  const double cover, // [],
                  const double canopy_leak_rate, // [h^-1]
                  const double surface_runoff_rate, // [h^-1]
@@ -78,10 +81,6 @@ struct ChemistryStandard : public Chemistry
                  Chemistry& chemistry, 
                  const double dt, // [h]
 		 Treelog&);
-  void tick_surface (const double pond /* [cm] */,
-                     const Geometry& geo, 
-                     const Soil& soil, const SoilWater& soil_water, 
-                     const double z_mixing, Treelog&);
   void infiltrate (const Geometry&, 
                    double infiltration /* [mm/h] */, double ponding /* [mm] */,
                    double R_mixing /* [h/mm] */, const double dt /* [h] */);
@@ -229,7 +228,10 @@ ChemistryStandard::incorporate (const Geometry& geo,
 }
 
 void 
-ChemistryStandard::tick_top (const double snow_leak_rate, // [h^-1]
+ChemistryStandard::tick_top (const Units& units, const Geometry& geo, 
+                             const Soil& soil, const SoilWater& soil_water, 
+                             const SoilHeat& soil_heat, const Surface& surface,
+                             const double snow_leak_rate, // [h^-1]
                              const double cover, // [],
                              const double canopy_leak_rate, // [h^-1]
                              const double surface_runoff_rate, // [h^-1]
@@ -243,24 +245,24 @@ ChemistryStandard::tick_top (const double snow_leak_rate, // [h^-1]
 			     Treelog& msg) 
 {
   for (size_t r = 0; r < reactions.size (); r++)
-    reactions[r]->tick_top  (total_rain, direct_rain, canopy_drip, cover, h_veg,
-                             surface_water, chemistry, dt, msg);
+    {
+      reactions[r]->tick_top  (total_rain, direct_rain, canopy_drip, 
+                               cover, h_veg, surface_water, chemistry, dt, msg);
+      reactions[r]->tick_surface  (units, geo, soil, soil_water, soil_heat,
+                                   surface, chemistry,  dt, msg);
+    }
+      
 
+  const double z_mixing = surface.mixing_depth ();
+  const double pond_rain = std::max (surface.ponding (), 0.0);
   for (size_t c = 0; c < chemicals.size (); c++)
-    chemicals[c]->tick_top (snow_leak_rate, cover, canopy_leak_rate, 
-                            surface_runoff_rate, dt, msg);
+    {
+      chemicals[c]->tick_top (snow_leak_rate, cover, canopy_leak_rate, 
+                              surface_runoff_rate, dt, msg);
+      chemicals[c]->tick_surface (pond_rain,
+                                  geo, soil, soil_water, z_mixing, msg);
+    }
 }
-
-void
-ChemistryStandard::tick_surface (const double pond /* [cm] */,
-                                 const Geometry& geo, 
-                                 const Soil& soil, const SoilWater& soil_water, 
-                                 const double z_mixing, Treelog& msg)
-{
-  for (size_t c = 0; c < chemicals.size (); c++)
-    chemicals[c]->tick_surface (pond, geo, soil, soil_water, z_mixing, msg);
-}
-
 
 void 
 ChemistryStandard::infiltrate (const Geometry& geo,
@@ -300,10 +302,10 @@ ChemistryStandard::tick_soil (const Scope& scope,
                              chemistry, dt, msg); 
 
   for (size_t r = 0; r < reactions.size (); r++)
-    reactions[r]->tick (units,
-                        geo, soil, soil_water, soil_heat, organic_matter, 
-			chemistry, dt, msg);
-
+    reactions[r]->tick_soil (units,
+                             geo, soil, soil_water, soil_heat, organic_matter, 
+                             chemistry, dt, msg);
+  
   for (size_t c = 0; c < chemicals.size (); c++)
     chemicals[c]->tick_soil (units, geo, soil, soil_water, dt, scope, msg);
 

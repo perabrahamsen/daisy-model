@@ -54,10 +54,10 @@ struct ReactionFilter : public Reaction
   }
 
   // Simulation.
-  void tick (const Units&, const Geometry& geo, const Soil& soil,
-             const SoilWater& soil_water, 
-             const SoilHeat&, const OrganicMatter&,
-             Chemistry& chemistry, const double dt, Treelog& msg)
+  void tick_soil (const Units&, const Geometry& geo, const Soil& soil,
+                  const SoilWater& soil_water, 
+                  const SoilHeat&, const OrganicMatter&,
+                  Chemistry& chemistry, const double dt, Treelog& msg)
   { 
     const size_t cell_size = soil.size ();
     Chemical& mob = chemistry.find (mobile);  

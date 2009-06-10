@@ -42,10 +42,17 @@ Reaction::tick_top (const double total_rain, const double direct_rain,
 { }
 
 void 
-Reaction::tick (const Units&, 
-                const Geometry&, const Soil&, const SoilWater&,
-                const SoilHeat&, const OrganicMatter&, Chemistry&,
-                const double, Treelog&)
+Reaction::tick_surface (const Units&, const Geometry&, 
+                        const Soil&, const SoilWater&, const SoilHeat&,
+                        const Surface&, Chemistry&, const double dt,
+                        Treelog& msg)
+{ }
+
+void 
+Reaction::tick_soil (const Units&, 
+                     const Geometry&, const Soil&, const SoilWater&,
+                     const SoilHeat&, const OrganicMatter&, Chemistry&,
+                     const double, Treelog&)
 { }
 
 Reaction::Reaction (Block& al)

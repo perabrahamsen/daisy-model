@@ -30,6 +30,7 @@
 #include "soil.h"
 #include "soil_water.h"
 #include "scope_soil.h"
+#include "surface.h"
 #include "log.h"
 #include "assertion.h"
 #include "librarian.h"
@@ -66,91 +67,152 @@ struct ReactionEquilibrium : public Reaction
   }
 
   // Simulation.
-  void tick (const Units& units, const Geometry& geo, 
-             const Soil& soil, const SoilWater& soil_water, 
-             const SoilHeat& soil_heat, const OrganicMatter&,
-             Chemistry& chemistry, const double dt, Treelog& msg)
+  void tick_soil (const Units& units, const Geometry& geo, 
+                  const Soil& soil, const SoilWater& soil_water, 
+                  const SoilHeat& soil_heat, const OrganicMatter&,
+                  Chemistry& chemistry, const double /* dt */, Treelog& msg)
   { 
     TREELOG_MODEL (msg);
-    const size_t cell_size = geo.cell_size ();
+
+    // Find chemicals.
     Chemical& A = chemistry.find (name_A);
     Chemical& B = chemistry.find (name_B);
-    const Chemical *const colloid = (name_colloid == Value::None ())
+    const Chemical *const colloid 
+      =  (name_colloid == Value::None ())
       ? NULL
       : &chemistry.find (name_colloid);
     
-    ScopeSoil scope_soil (geo, soil, soil_water, soil_heat);
-    scope_soil.set_old_water (true); // Theta at start of timestep.
-    scope_soil.set_domain (secondary
-                           ? ScopeSoil::secondary 
-                           : ScopeSoil::primary);
-    ScopeID scope_id (ScopeSoil::rho_b, ScopeSoil::rho_b_unit);
-    if (secondary && !colloid)
-      // No soil in secondary domain.
-      scope_id.set (ScopeSoil::rho_b, 0.0);
-    ScopeMulti scope (scope_id, scope_soil);
-    for (size_t c = 0; c < cell_size; c++)
-      { 
-        scope_soil.set_cell (c);
-        double has_A;
-        double has_B;
+    // Set up scope.
+    ScopeSoil scope (geo, soil, soil_water, soil_heat);
+    scope.set_old_water (true); // Theta at start of timestep.
 
-        if (secondary)
-          {
-            const double Theta_old = soil_water.Theta_secondary_old (c);
-            
-            if (Theta_old < 1e-4 || soil_water.Theta_secondary (c) < 1e-4)
-              // Nothing to do.
-              {
-                S_AB[c] = 0.0;
-                continue;
-              }
-            if (colloid)
-              scope_id.set (ScopeSoil::rho_b, 
-                            colloid->C_secondary (c) * Theta_old);
-            has_A = A.C_secondary (c) * Theta_old;
-            has_B = B.C_secondary (c) * Theta_old;
-          }
-        else
-          {
-            if (colloid)
-              scope_id.set (ScopeSoil::rho_b, colloid->M_primary (c));
-            else
-              scope_id.set (ScopeSoil::rho_b, soil.dry_bulk_density (c));
+    // Clear source/sink term.
+    std::fill (S_AB.begin (), S_AB.end (), 0.0);
 
-            has_A = A.M_primary (c);
-            has_B = B.M_primary (c);
-          }
+    if (primary)
+      // Primary soil domain (intra-aggregate pores).
+      tick_domain (units, scope, colloid, ScopeSoil::primary, A, B, msg);
 
-        double want_A;
-        double want_B;
-        equilibrium->find (units, scope, has_A, has_B, want_A, want_B,
-                           msg);
-        daisy_assert (approximate (has_A + has_B, want_A + want_B));
-        
-        double convert = 0.0;
+    if (secondary)
+      // Secondary soil domain (inter-aggregate pores).
+      tick_domain (units, scope, colloid, ScopeSoil::secondary, A, B, msg);
 
-        if (has_A > want_A)
-          {
-            if (!k_AB->tick_value (units, convert, k_unit, scope, msg))
-              msg.error ("Could not evaluate k_AB");
-            
-            convert *= (has_A - want_A);
-          }
-        else
-          {
-            if (!k_BA->tick_value (units, convert, k_unit, scope, msg))
-              msg.error ("Could not evaluate k_BA");
-            
-            convert *= (has_B - want_B);
-            convert *= -1.0;
-          }
-      
-        S_AB[c] = convert;
-        
-      }
+    // Make the source/sink official.
     A.add_to_transform_sink (S_AB);
     B.add_to_transform_source (S_AB);
+  }
+
+  void tick_domain (const Units& units, ScopeSoil& scope,
+                    const Chemical *const colloid, ScopeSoil::domain_t domain,
+                    const Chemical& A, const Chemical& B, Treelog& msg)
+  { 
+    TREELOG_MODEL (msg);
+
+    scope.set_domain (domain);
+
+    const size_t cell_size = S_AB.size ();
+    for (size_t c = 0; c < cell_size; c++)
+      { 
+        scope.set_cell (c);
+        if (colloid)
+          if (domain == ScopeSoil::primary)
+            scope.set_dry_bulk_density (colloid->M_primary (c));
+          else
+            {
+              daisy_assert (domain == ScopeSoil::secondary);
+              const double M_total = colloid->M_total (c);
+              const double M_primary = colloid->M_primary (c);
+              const double M_secondary = M_total - M_primary;
+              scope.set_dry_bulk_density (M_secondary);
+            }
+                                      
+        // What we have.
+        const double has_A = A.M_primary (c);
+        const double has_B = B.M_primary (c);
+
+        S_AB[c] += find_rate (units, scope, c, has_A, has_B, msg);
+      }
+  }
+
+  double find_rate (const Units& units, ScopeSoil& scope, const int cell,
+                    const double has_A, const double has_B, Treelog& msg) const
+   {
+    // What we want.
+    double want_A;
+    double want_B;
+    equilibrium->find (units, scope, cell, has_A, has_B, want_A, want_B,
+                       msg);
+    daisy_approximate (has_A + has_B, want_A + want_B);
+
+    double convert = 0.0;
+
+    if (has_A > want_A)
+      {
+        if (!k_AB->tick_value (units, convert, k_unit, scope, msg))
+          msg.error ("Could not evaluate k_AB");
+
+        convert *= (has_A - want_A);
+      }
+    else
+      {
+        if (!k_BA->tick_value (units, convert, k_unit, scope, msg))
+          msg.error ("Could not evaluate k_BA");
+
+        convert *= (has_B - want_B);
+        convert *= -1.0;
+      }
+
+    return convert;
+   }
+
+  void tick_surface (const Units& units, const Geometry& geo, 
+                     const Soil& soil, const SoilWater& soil_water, 
+                     const SoilHeat& soil_heat, const Surface& surf,
+                     Chemistry& chemistry, const double dt, Treelog& msg)
+  { 
+    if (!surface)
+      // Nothing to do.
+      return;
+
+    TREELOG_MODEL (msg);
+
+    const double m2_per_cm2 = 0.01 * 0.01 ; // [m^2/cm^2]
+    const double pond = std::max (surf.ponding (), 0.0);
+    const double z_mixing = surf.mixing_depth ();
+    // Find A 
+    Chemical& A = chemistry.find (name_A);
+    const double has_A = A.surface_storage_amount ()
+      * m2_per_cm2 / z_mixing; // [g/cm^3]
+    daisy_assert (has_A >= 0.0);
+
+    // Find B
+    Chemical& B = chemistry.find (name_B);
+    const double has_B = B.surface_storage_amount ()
+      * m2_per_cm2 / z_mixing; // [g/cm^3]
+    daisy_assert (has_B >= 0.0);
+
+    // Set up scope.
+    ScopeSoil scope (geo, soil, soil_water, soil_heat);
+    scope.set_old_water (true); // Theta at start of timestep.
+    const double Theta_pond = std::max (pond, 0.0) / z_mixing; // []
+    daisy_assert (Theta_pond >= 0.0);
+    scope.set_extra_water (Theta_pond);
+    if (name_colloid != Value::None ())
+      {
+        const Chemical& colloid = chemistry.find (name_colloid);
+        const double rho_b = colloid.surface_storage_amount ()
+          * m2_per_cm2 / z_mixing; // [g/cm^3]
+        daisy_assert (rho_b >= 0.0);
+        scope.set_dry_bulk_density (rho_b);
+      }
+    scope.set_domain (ScopeSoil::matrix);
+    scope.set_cell (Geometry::cell_above);
+
+    // Find source/sink term.
+    surface_AB = find_rate (units, scope, Geometry::cell_above,
+                            has_A, has_B, msg) * z_mixing; // [g/cm^2/h]
+    A.add_to_surface_transform_source (-surface_AB);
+    B.add_to_surface_transform_source (surface_AB);
   }
 
   // Create.
@@ -200,8 +262,9 @@ struct ReactionEquilibrium : public Reaction
     ScopeSoil scope (geo, soil, soil_water, soil_heat);
     scope.set_cell (0);
     equilibrium->initialize (units, scope, msg); 
-    S_AB.insert (S_AB.begin (), soil.size (), 0.0);
-    daisy_assert (S_AB.size () == soil.size ());
+    const size_t cell_size = geo.cell_size ();
+    S_AB.insert (S_AB.begin (), cell_size, 0.0);
+    daisy_assert (S_AB.size () == cell_size);
     k_AB->initialize (units, scope, msg); 
     k_BA->initialize (units, scope, msg); 
   }

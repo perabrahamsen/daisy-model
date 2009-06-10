@@ -50,10 +50,14 @@ public:
                           const double cover, const double h_veg, 
                           const double h_pond,
                           Chemistry& chemistry, const double dt, Treelog&);
-  virtual void tick (const Units& units, 
-                     const Geometry&, const Soil&, const SoilWater&,
-		     const SoilHeat&, const OrganicMatter&, Chemistry&,
-		     const double dt, Treelog&);
+  virtual void tick_surface (const Units&, const Geometry&, 
+                             const Soil&, const SoilWater&, const SoilHeat&,
+                             const Surface&, Chemistry&, const double dt,
+                             Treelog& msg);
+  virtual void tick_soil (const Units& units, 
+                          const Geometry&, const Soil&, const SoilWater&,
+                          const SoilHeat&, const OrganicMatter&, Chemistry&,
+                          const double dt, Treelog&);
   virtual void output (Log&) const = 0;
 
   // Create and Destroy.

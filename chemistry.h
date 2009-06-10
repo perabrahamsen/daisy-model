@@ -88,7 +88,9 @@ public:
 
   // Simulation.
 public:
-  virtual void tick_top (double snow_leak_rate /* [h^-1] */,
+  virtual void tick_top (const Units&, const Geometry&, const Soil&, 
+                         const SoilWater&, const SoilHeat&, const Surface&,
+                         double snow_leak_rate /* [h^-1] */,
                          double cover /* [] */,
                          double canopy_leak_rate /* [h^-1] */,
                          double surface_runoff_rate /* [h^-1] */,
@@ -100,11 +102,6 @@ public:
                          Chemistry& chemistry, 
                          double dt /* [h] */,
 			 Treelog&) = 0;
-  virtual void tick_surface (const double pond /* [cm] */,
-                             const Geometry& geo, 
-                             const Soil& soil, const SoilWater& soil_water, 
-                             const double z_mixing /* [cm] */,
-                             Treelog&) = 0;
   virtual void tick_soil (const Scope&, 
                           const Geometry& geo, double ponding /* [mm] */,
                           double R_mixing /* [h/mm] */,

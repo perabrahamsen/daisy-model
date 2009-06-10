@@ -2,19 +2,9 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * R2D2
 
-** Mixing layer
+** Test NH4 gødning på overflade 4.63 vs 4.65
 
-*** kinetisk ligevægt skal fungere på overfladen
-
-Følger Theta og rho_b for øverste node.
-
-**** reaction_equil.C 
-
-***** tick_primary
-
-***** tick_secondary
-
-***** tick_surface
+Evt nitrificering på overflade
 
 ** tegninger mikkel
 

@@ -39,7 +39,7 @@ public:
   
   // Simulation.
 public:
-  virtual void find (const Units& units, const Scope&,
+  virtual void find (const Units& units, const Scope&, int cell,
 		     double has_A, double has_B, 
 		     double& want_A, double& want_B, Treelog&) const = 0;
 
