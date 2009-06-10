@@ -112,6 +112,9 @@ carbon part of the 'K' factor.")
 (defreaction Pendimethalin-colloid-sorption Pendimethalin-immobile-sorption
   "Sorption equilibrium between dissolved and colloid-bound Pendimethalin."
   (colloid colloid)
+  (primary true)
+  (secondary true)
+  (surface true)
   (A Pendimethalin-colloid)
   (k_AB 5.0 [d^-1])                   ;Desorption rate.
   (k_BA 5.0 [d^-1])                   ;Sorption rate.
@@ -132,8 +135,6 @@ carbon part of the 'K' factor.")
   "Pendimethalin in both immobile, solute and colloid form."
   (trace Pendimethalin Pendimethalin-immobile Pendimethalin-colloid)
   (reaction Pendimethalin-immobile-sorption
-            Pendimethalin-colloid-sorption
-            (Pendimethalin-colloid-sorption (secondary true))
             Pendimethalin-filter 
             Pendimethalin-colloid-generation
             ))
