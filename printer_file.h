@@ -60,7 +60,6 @@ public:
 
  // Create and Destroy.
 public:
-  PrinterFile (Metalib&, symbol filename);
   PrinterFile (Metalib&, std::ostream& out);
   ~PrinterFile ();
 };

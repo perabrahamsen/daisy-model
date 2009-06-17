@@ -35,7 +35,6 @@
 #include "frame_submodel.h"
 #include "filepos.h"
 #include <sstream>
-#include <fstream>
 #include <algorithm>
 #include <numeric>
 #include <set>
@@ -44,7 +43,6 @@ struct PrinterFile::Implementation
 {
   // Data.
   Metalib& metalib;
-  const std::auto_ptr<std::ofstream> owned_stream; // If we opened it.
   std::ostream& out;
 
   // String utilities.
@@ -83,7 +81,6 @@ struct PrinterFile::Implementation
   bool good ();
 
   // Creation.
-  Implementation (Metalib&, const symbol name);
   Implementation (Metalib&, std::ostream& stream);
   ~Implementation ();
 };
@@ -722,16 +719,8 @@ PrinterFile::Implementation::good ()
 { return out.good (); }
 
 PrinterFile::Implementation::Implementation (Metalib& mlib,
-                                             const symbol name)
-  : metalib (mlib),
-    owned_stream (new std::ofstream (name.name ().c_str ())),
-    out (*owned_stream)
-{ }
-
-PrinterFile::Implementation::Implementation (Metalib& mlib,
                                              std::ostream& stream)
   : metalib (mlib),
-    owned_stream (NULL),
     out (stream)
 { }
 
@@ -808,11 +797,6 @@ bool
 PrinterFile::good ()
 { return impl->good (); }
   
-PrinterFile::PrinterFile (Metalib& mlib,
-                          const symbol filename)
-  : impl (new Implementation (mlib, filename))
-{ }
-    
 PrinterFile::PrinterFile (Metalib& mlib,
                           std::ostream& stream)
   : impl (new Implementation (mlib, stream))

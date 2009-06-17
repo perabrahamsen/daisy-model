@@ -350,10 +350,22 @@ daisy_library_remove (Library* library, const char* name)
 
 // @ The daisy_printer Type.
 
+#include <fstream>
+
+struct PrinterFileOwned : public PrinterFile
+{
+  std::ofstream out;
+  
+  PrinterFileOwned (Metalib& metalib, const char *const filename)
+    : PrinterFile (metalib, out),
+      out (filename)
+  { }
+};
+
 extern "C" Printer* EXPORT
 daisy_printer_create_file (Toplevel *const toplevel,
                            const char *const filename)
-{ return new PrinterFile (toplevel->metalib (), filename); }
+{ return new PrinterFileOwned (toplevel->metalib (), filename); }
 
 extern "C" void EXPORT
 daisy_printer_comment (Printer* printer, const char* comment)

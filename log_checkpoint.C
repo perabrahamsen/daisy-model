@@ -36,6 +36,7 @@
 #include "frame_model.h"
 #include "path.h"
 #include <sstream>
+#include <fstream>
 
 struct LogCheckpoint : public LogAList
 {
@@ -146,9 +147,10 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
       scratch << file << "-" << time.year () << "-" << time.month () << "-" 
 	      << time.mday () << "+" << time.hour () << ".dai";
       const symbol filename (scratch.str ());
+      std::ofstream out (scratch.str ().c_str ());
 
       // Open log file.
-      PrinterFile printer (metalib (), filename);
+      PrinterFile printer (metalib (), out);
       if (description != Value::None ())
         printer.print_comment (description);
 
