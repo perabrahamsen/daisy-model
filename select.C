@@ -101,7 +101,7 @@ struct Select::Implementation
     static bool check_path (const std::vector<symbol>& path,
                             const Frame& frame,
                             Treelog& err);
-    static bool check_alist (Metalib&, const Frame&, Treelog&);
+    static bool check_alist (const Metalib&, const Frame&, Treelog&);
     static void load_syntax (Frame&);
     Spec (Block&);
     ~Spec ();
@@ -246,7 +246,7 @@ Select::Implementation::Spec::check_path (const std::vector<symbol>& path,
 }
 
 bool 
-Select::Implementation::Spec::check_alist (Metalib& metalib,
+Select::Implementation::Spec::check_alist (const Metalib& metalib,
                                            const Frame& al,
                                            Treelog& err)
 {
@@ -691,7 +691,7 @@ static struct SelectInit : public DeclareComponent
   SelectInit ()
     : DeclareComponent (Select::component, Select::description)
   { }
-  static bool check_alist (Metalib&, const Frame& al, Treelog& err)
+  static bool check_alist (const Metalib&, const Frame& al, Treelog& err)
   {
     bool ok = true;
     if (al.check ("spec"))

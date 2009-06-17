@@ -155,7 +155,7 @@ static struct ActionIrrigateBaseSyntax : public DeclareBase
 Shared parameter for irrigate actions.")
   { }
 
-  static bool check_alist (Metalib&, const Frame& alist, Treelog& err)
+  static bool check_alist (const Metalib&, const Frame& alist, Treelog& err)
   {
     bool ok = true;
 
@@ -274,7 +274,7 @@ static struct ActionIrrigateTopSyntax : DeclareModel
 {
   Model* make (Block& al) const
   { return new ActionIrrigateOverhead (al); }
-  static bool check_alist (Metalib&, const Frame&, Treelog& err)
+  static bool check_alist (const Metalib&, const Frame&, Treelog& err)
   {
     static bool warned = false;
     if (warned)
@@ -296,7 +296,7 @@ static struct ActionIrrigateSubsoilSyntax : DeclareModel
   Model* make (Block& al) const
   { return new ActionIrrigateSubsoil (al); }
 
-  static bool check_alist (Metalib&, const Frame& al, Treelog& err)
+  static bool check_alist (const Metalib&, const Frame& al, Treelog& err)
   { 
     bool ok = true;
     if (al.check ("from") && al.check ("to"))

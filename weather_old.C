@@ -159,7 +159,7 @@ static struct WeatherOldSyntax : public DeclareBase
     : DeclareBase (Weather::component, "old", "base", "\
 Shared parameters for old models.")
   { }
-  static bool check_alist (Metalib&, const Frame& al, Treelog& err)
+  static bool check_alist (const Metalib&, const Frame& al, Treelog& err)
   {
     bool ok = true;
     const double latitude = al.number ("Latitude");

@@ -272,7 +272,7 @@ Horizon::output (Log& log) const
 
 static const class SOM_fractions_check_type : public VCheck
 {
-  bool verify (Metalib&, const Frame& frame, const symbol key,
+  bool verify (const Metalib&, const Frame& frame, const symbol key,
                Treelog& msg) const
   {
     daisy_assert (key == "SOM_fractions");
@@ -356,7 +356,7 @@ A `horizon' is a soil type with specific physical properties.  It is\n\
 the responsibility of the `horizon' component to specify these\n\
 properties.")
   { }
-  static bool check_alist (Metalib&, const Frame& al, Treelog& err)
+  static bool check_alist (const Metalib&, const Frame& al, Treelog& err)
   {
     bool ok = true;
 

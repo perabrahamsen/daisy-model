@@ -83,7 +83,7 @@ static struct ConditionWeatherSyntax : public DeclareModel
   Model* make (Block& al) const
   { return new ConditionTSum (al); }
 
-  static bool check_alist (Metalib&, const Frame& al, Treelog& err)
+  static bool check_alist (const Metalib&, const Frame& al, Treelog& err)
   {
     bool ok = true;
     const int mm = al.integer ("reset_month");

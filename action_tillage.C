@@ -114,7 +114,7 @@ static struct ActionSwapSyntax : DeclareModel
   Model* make (Block& al) const
   { return new ActionSwap (al); }
 
-  static bool check_alist (Metalib&, const Frame& al, Treelog& err)
+  static bool check_alist (const Metalib&, const Frame& al, Treelog& err)
   {
     const double middle (al.number ("middle"));
     const double depth (al.number ("depth"));

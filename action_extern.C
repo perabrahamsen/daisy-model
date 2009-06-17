@@ -286,7 +286,7 @@ ActionExternFertigation::mm_per_h ("mm/h");
 
 static struct ActionExternFertigationSyntax : public DeclareModel
 {
-  static bool check_alist (Metalib&, const Frame& al, Treelog& err)
+  static bool check_alist (const Metalib&, const Frame& al, Treelog& err)
   { 
     bool ok = true;
     const double from = al.number ("from");

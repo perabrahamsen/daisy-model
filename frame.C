@@ -198,11 +198,11 @@ Frame::check (Block& block) const
 { return check (block.metalib (), *this, block.msg ()); }
 
 bool 
-Frame::check (Metalib& metalib, Treelog& msg) const
+Frame::check (const Metalib& metalib, Treelog& msg) const
 { return check (metalib, *this, msg); }
 
 bool 
-Frame::check (Metalib& metalib, const Frame& frame, Treelog& msg) const
+Frame::check (const Metalib& metalib, const Frame& frame, Treelog& msg) const
 { 
   bool ok = true;
   if (!impl->syntax.check (metalib, frame, msg))
@@ -222,12 +222,12 @@ Frame::verify (const symbol key, double value, Treelog& msg) const
 }
 
 bool 
-Frame::check (Metalib& metalib, 
+Frame::check (const Metalib& metalib, 
               const symbol key, Treelog& msg) const
 { return check (metalib, *this, key, msg); }
 
 bool 
-Frame::check (Metalib& metalib, const Frame& frame,
+Frame::check (const Metalib& metalib, const Frame& frame,
               const symbol key, Treelog& msg) const
 { 
   if (parent () && impl->syntax.lookup (key) == Value::Error)

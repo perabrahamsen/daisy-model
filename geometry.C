@@ -650,8 +650,8 @@ Geometry::total_surface (const std::vector<double>& v,
 
 static struct CheckLayers : public VCheck
 {
-  bool verify(Metalib&, const Frame& frame, const symbol key, 
-              Treelog& msg) const
+  bool verify (const Metalib&, const Frame& frame, const symbol key, 
+               Treelog& msg) const
   {
     daisy_assert (frame.check (key));
     daisy_assert (frame.lookup (key) == Value::AList);

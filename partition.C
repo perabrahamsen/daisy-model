@@ -62,7 +62,7 @@ Partition::operator() (double DS, double current_RSR, double nitrogen_stress,
   daisy_assert (0.0 <= f_SOrg && f_SOrg <= 1.0);
 }
 
-static bool check_alist (Metalib&, const Frame& al, Treelog& err)
+static bool check_alist (const Metalib&, const Frame& al, Treelog& err)
 {
   bool ok = true;
 

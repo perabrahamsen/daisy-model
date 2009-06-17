@@ -59,7 +59,7 @@ struct AM::Implementation
   struct Check_OM_Pools : public VCheck
   {
     // Check that the OM pools are correct for organic fertilizer.
-    bool verify (Metalib&, const Frame&, const symbol key, Treelog&) const;
+    bool verify (const Metalib&, const Frame&, const symbol key, Treelog&) const;
   };
 
   // Content.
@@ -116,7 +116,7 @@ struct AM::Implementation
 };
 
 bool
-AM::Implementation::Check_OM_Pools::verify (Metalib&, const Frame& frame,
+AM::Implementation::Check_OM_Pools::verify (const Metalib&, const Frame& frame,
                                             const symbol key,
                                             Treelog& msg) const
 { 
@@ -748,7 +748,7 @@ AM::default_AM ()
 }
 
 double
-AM::get_NO3 (Metalib& metalib, const FrameModel& al)
+AM::get_NO3 (const Metalib& metalib, const FrameModel& al)
 {
   if (al.check ("weight"))
     {
@@ -772,7 +772,7 @@ AM::get_NO3 (Metalib& metalib, const FrameModel& al)
 }
 
 double
-AM::get_NH4 (Metalib& metalib, const FrameModel& al)
+AM::get_NH4 (const Metalib& metalib, const FrameModel& al)
 {
   daisy_assert (IM::storage_unit () == symbol ("g/cm^2"));
 
@@ -802,7 +802,7 @@ AM::get_NH4 (Metalib& metalib, const FrameModel& al)
 }
 
 IM
-AM::get_IM (Metalib& metalib, const Unit& unit, const FrameModel& al)
+AM::get_IM (const Metalib& metalib, const Unit& unit, const FrameModel& al)
 {
   daisy_assert (unit.native_name () == IM::storage_unit ());
   IM result (unit);
@@ -812,7 +812,7 @@ AM::get_IM (Metalib& metalib, const Unit& unit, const FrameModel& al)
 }
 
 double
-AM::get_volatilization (Metalib& metalib, const FrameModel& al)
+AM::get_volatilization (const Metalib& metalib, const FrameModel& al)
 {
   if (al.check ("weight"))
     {
@@ -839,7 +839,7 @@ AM::get_volatilization (Metalib& metalib, const FrameModel& al)
 }
 
 double
-AM::get_DM (Metalib& metalib, const FrameModel& al)	// [Mg DM/ha]
+AM::get_DM (const Metalib& metalib, const FrameModel& al)	// [Mg DM/ha]
 {
   if (al.check ("weight") && is_organic (metalib, al))
     return al.number ("weight") * al.number ("dry_matter_fraction");
@@ -848,7 +848,7 @@ AM::get_DM (Metalib& metalib, const FrameModel& al)	// [Mg DM/ha]
 }
 
 double
-AM::get_water (Metalib& metalib, const FrameModel& al)	// [mm]
+AM::get_water (const Metalib& metalib, const FrameModel& al)	// [mm]
 {
   if (al.check ("weight") && is_organic (metalib, al))
     return al.number ("weight")
@@ -859,7 +859,7 @@ AM::get_water (Metalib& metalib, const FrameModel& al)	// [mm]
 }
 
 void
-AM::set_utilized_weight (Metalib& metalib, 
+AM::set_utilized_weight (const Metalib& metalib, 
                          FrameModel& am, const double weight)
 {
   if (is_mineral (metalib, am))
@@ -879,7 +879,7 @@ AM::set_utilized_weight (Metalib& metalib,
 }
 
 double
-AM::utilized_weight (Metalib& metalib, const FrameModel& am)
+AM::utilized_weight (const Metalib& metalib, const FrameModel& am)
 {
   if (am.check ("first_year_utilization")
       && am.check ("dry_matter_fraction")
@@ -900,7 +900,7 @@ AM::utilized_weight (Metalib& metalib, const FrameModel& am)
 }
 
 double
-AM::second_year_utilization (Metalib&, const FrameModel& am)
+AM::second_year_utilization (const Metalib&, const FrameModel& am)
 {
   if (am.check ("second_year_utilization")
       && am.check ("dry_matter_fraction")
@@ -918,7 +918,7 @@ AM::second_year_utilization (Metalib&, const FrameModel& am)
 }
 
 void
-AM::set_mineral (Metalib&, FrameModel& am, double NH4, double NO3)
+AM::set_mineral (const Metalib&, FrameModel& am, double NH4, double NO3)
 {
   const double total_N = NH4 + NO3;
   am.set ("weight", total_N);
@@ -927,18 +927,18 @@ AM::set_mineral (Metalib&, FrameModel& am, double NH4, double NO3)
 }
 
 bool 
-AM::is_fertilizer (Metalib& metalib, const FrameModel& am) 
+AM::is_fertilizer (const Metalib& metalib, const FrameModel& am) 
 { return is_mineral (metalib, am) || is_organic (metalib, am); }
 
 bool 
-AM::is_mineral (Metalib& metalib, const FrameModel& am)
+AM::is_mineral (const Metalib& metalib, const FrameModel& am)
 { 
   Library& library = metalib.library (component);
   return library.is_derived_from (am.type_name (), "mineral");
 }
 
 bool 
-AM::is_organic (Metalib& metalib, const FrameModel& am)
+AM::is_organic (const Metalib& metalib, const FrameModel& am)
 { 
   Library& library = metalib.library (component);
   return library.is_derived_from (am.type_name (), "organic");
@@ -1203,7 +1203,7 @@ static struct AMInitialSyntax : public DeclareModel
     : DeclareModel (AM::component, "initial", "base", "\
 Initial added organic matter at the start of the simulation.")
   { }
-  static bool check_alist (Metalib&, const Frame& al, Treelog& err)
+  static bool check_alist (const Metalib&, const Frame& al, Treelog& err)
   { 
     if (al.flag ("initialized", false))
       // No checking checkpoints.
@@ -1285,7 +1285,7 @@ static struct AMRootSyntax : public DeclareModel
     : DeclareModel (AM::component, "root", "base", "\
 Initialization of old root remains.")
   { }
-  static bool check_alist (Metalib&, const Frame& al, Treelog& err)
+  static bool check_alist (const Metalib&, const Frame& al, Treelog& err)
   { 
     if (al.flag ("initialized", false))
       // No checking checkpoints.

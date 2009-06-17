@@ -151,7 +151,7 @@ Geometry1D::check_y_border (const double, Treelog& err) const
 }
 
 static bool 
-check_alist (Metalib&, const Frame&, Treelog&)
+check_alist (const Metalib&, const Frame&, Treelog&)
 {
   bool ok = true;
   return ok;

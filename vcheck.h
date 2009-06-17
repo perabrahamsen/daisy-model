@@ -38,7 +38,7 @@ class VCheck : private boost::noncopyable
 { 
   // Use.
 public:
-  virtual bool verify (Metalib&, const Frame&, const symbol key, Treelog&)
+  virtual bool verify (const Metalib&, const Frame&, const symbol key, Treelog&)
     const = 0;
 
   // Integer or Integer sequence.
@@ -105,7 +105,7 @@ private:
   // Use.
 private:
   bool valid (int value, Treelog&) const;
-  bool verify (Metalib&, const Frame&, const symbol key, Treelog&) const;
+  bool verify (const Metalib&, const Frame&, const symbol key, Treelog&) const;
 
   // Create and Destroy.
 public:
@@ -122,7 +122,7 @@ private:
 private:
   bool valid (double value, Treelog&) const;
   bool valid (const PLF& value, Treelog&) const;
-  bool verify (Metalib&, const Frame&, const symbol key, Treelog&) const;
+  bool verify (const Metalib&, const Frame&, const symbol key, Treelog&) const;
 
   // Create and Destroy.
 public:
@@ -139,7 +139,7 @@ private:
 private:
   bool valid (double value, Treelog&) const;
   bool valid (const PLF& value, Treelog&) const;
-  bool verify (Metalib&, const Frame&, const symbol key, Treelog&) const;
+  bool verify (const Metalib&, const Frame&, const symbol key, Treelog&) const;
 
   // Create and Destroy.
 public:
@@ -156,7 +156,7 @@ private:
 private:
   bool valid (double value, Treelog&) const;
   bool valid (const PLF& value, Treelog&) const;
-  bool verify (Metalib&, const Frame&, const symbol key, Treelog&) const;
+  bool verify (const Metalib&, const Frame&, const symbol key, Treelog&) const;
 
   // Create and Destroy.
 public:
@@ -173,7 +173,7 @@ private:
   // Use.
 private:
   bool valid (const PLF& value, Treelog&) const;
-  bool verify (Metalib&, const Frame&, const symbol key, Treelog&) const;
+  bool verify (const Metalib&, const Frame&, const symbol key, Treelog&) const;
 
   // Create and Destroy.
 public:
@@ -188,7 +188,7 @@ private:
 
   // Use.
 private:
-  bool verify (Metalib&, const Frame&, const symbol key, Treelog&) const;
+  bool verify (const Metalib&, const Frame&, const symbol key, Treelog&) const;
 
   // Create and Destroy.
 public:
@@ -200,7 +200,7 @@ class VCheck::String : public VCheck
   // Use.
 private:
   virtual bool valid (const symbol value, Treelog&) const = 0;
-  bool verify (Metalib&, const Frame&, const symbol key, Treelog&) const;
+  bool verify (const Metalib&, const Frame&, const symbol key, Treelog&) const;
 };
 
 class VCheck::Compatible : public VCheck
@@ -212,7 +212,7 @@ private:
   // Use.
 private:
   bool valid (const Units&, symbol value, Treelog&) const;
-  bool verify (Metalib&, const Frame&, const symbol key, Treelog&) const;
+  bool verify (const Metalib&, const Frame&, const symbol key, Treelog&) const;
 
   // Create and Destroy.
 public:
@@ -253,8 +253,8 @@ private:
 
   // Use.
 private:
-  bool verify (Metalib&, const Frame&, const symbol key, Treelog&) const;
-  bool valid (Metalib&, const symbol value, Treelog&) const;
+  bool verify (const Metalib&, const Frame&, const symbol key, Treelog&) const;
+  bool valid (const Metalib&, const symbol value, Treelog&) const;
 
   // Create and Destroy.
 public:
@@ -269,7 +269,7 @@ private:
 
   // Use.
 private:
-  bool verify (Metalib&, const Frame&, const symbol key, Treelog&) const;
+  bool verify (const Metalib&, const Frame&, const symbol key, Treelog&) const;
 
   // Create and Destroy.
 public:

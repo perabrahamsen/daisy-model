@@ -1,5 +1,8 @@
 2009-06-17  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* frame.C, frame.h, alist.C, alist.h (subset): Made Metalib const.
+	* all: Made Metalib const.
+
 	* printer.C, printer.h: Not a component.
 	* printer_file.C, printer_file.h: Not a model.
 	* Makefile: Adjust.

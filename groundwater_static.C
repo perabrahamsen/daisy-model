@@ -94,7 +94,7 @@ static struct GroundwaterStaticSyntax : public DeclareModel
   { 
     return new GroundwaterStatic (al);
   }
-  static bool check_alist (Metalib&, const Frame& al, Treelog& err)
+  static bool check_alist (const Metalib&, const Frame& al, Treelog& err)
   {
     static bool warned = false;
     if (warned)

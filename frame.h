@@ -81,15 +81,15 @@ class EXPORT Frame : public WScope
 
   // This function will check that the alist conform to the syntax.
   bool check (Block&) const;
-  bool check (Metalib&, Treelog&) const;
-  bool check (Metalib&, const Frame& frame, Treelog&) const;
+  bool check (const Metalib&, Treelog&) const;
+  bool check (const Metalib&, const Frame& frame, Treelog&) const;
   
   // Check that a numeric value is within the allowed range.
   bool verify (symbol key, double value, Treelog&) const;
 
   // Check than an arbitrary attribute is valid.
-  bool check (Metalib&, symbol key, Treelog&) const;
-  bool check (Metalib&, const Frame& frame, symbol key, Treelog&) const;
+  bool check (const Metalib&, symbol key, Treelog&) const;
+  bool check (const Metalib&, const Frame& frame, symbol key, Treelog&) const;
 
   // Extract type information about a specific attribute.
   bool is_const (symbol) const;
@@ -217,7 +217,7 @@ class EXPORT Frame : public WScope
   bool total_order () const;	// True iff all members are ordered.
 
   // Additional constraints involving multiple attributes.
-  typedef bool (*check_fun)(Metalib&, const Frame&, Treelog&);
+  typedef bool (*check_fun)(const Metalib&, const Frame&, Treelog&);
  public:
   void add_check (check_fun);
 

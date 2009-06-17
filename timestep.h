@@ -63,7 +63,7 @@ public:
   {
   private:
     virtual bool check_dt (double dt, Treelog&) const = 0;
-    bool verify (Metalib&, const Frame&, const symbol, Treelog&) const;
+    bool verify (const Metalib&, const Frame&, const symbol, Treelog&) const;
   };
   static const VCheck& positive ();
   static const VCheck& non_zero ();

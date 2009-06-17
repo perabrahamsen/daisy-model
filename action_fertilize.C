@@ -55,7 +55,7 @@ struct ActionFertilize : public Action
     const double to;
     
     // Create and Destroy.
-    static bool check_alist (Metalib&, const Frame& al, Treelog& err);
+    static bool check_alist (const Metalib&, const Frame& al, Treelog& err);
     static void load_syntax (Frame&);
     Precision (const FrameSubmodel& al);
     ~Precision ();
@@ -71,7 +71,7 @@ struct ActionFertilize : public Action
   void initialize (const Daisy&, const Scope&, Treelog&)
   { }
   bool check (const Daisy& daisy, const Scope&, Treelog& err) const;
-  static bool check_alist (Metalib&, const Frame& al, Treelog& err);
+  static bool check_alist (const Metalib&, const Frame& al, Treelog& err);
   static void load_syntax (Frame&);
 protected:
   ActionFertilize (Block& al);
@@ -79,7 +79,7 @@ protected:
 };
 
 bool 
-ActionFertilize::Precision::check_alist (Metalib&, const Frame& al, Treelog& err)
+ActionFertilize::Precision::check_alist (const Metalib&, const Frame& al, Treelog& err)
 {
   bool ok = true; 
 
@@ -217,7 +217,7 @@ ActionFertilize::~ActionFertilize ()
 
 static struct ActionFertilizeSyntax : public DeclareBase
 {
-  static bool check_alist (Metalib& metalib, 
+  static bool check_alist (const Metalib& metalib, 
                            const Frame& al, Treelog& err)
   { 
     bool ok = true;
@@ -349,7 +349,7 @@ static struct ActionFertilizeSurfaceSyntax : public DeclareModel
   Model* make (Block& al) const
   { return new ActionFertilizeSurface (al); }
 
-  static bool check_alist (Metalib&, const Frame& al, Treelog& err)
+  static bool check_alist (const Metalib&, const Frame& al, Treelog& err)
   { 
     bool ok = true;
     const double from = al.number ("from");
@@ -427,7 +427,7 @@ static struct ActionFertilizeIncorporateSyntax : public DeclareModel
   Model* make (Block& al) const
   { return new ActionFertilizeIncorporate (al); }
 
-  static bool check_alist (Metalib&, const Frame& al, Treelog& err)
+  static bool check_alist (const Metalib&, const Frame& al, Treelog& err)
   { 
     bool ok = true;
     return ok;

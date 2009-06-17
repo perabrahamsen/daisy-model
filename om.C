@@ -323,7 +323,7 @@ OM::tick (const std::vector<bool>& active, const double* abiotic_factor,
 
 const double OM::Unspecified = -1042.42e42;
 
-static bool check_alist (Metalib&, const Frame& al, Treelog& err)
+static bool check_alist (const Metalib&, const Frame& al, Treelog& err)
 {
   bool ok = true;
 

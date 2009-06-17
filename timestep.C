@@ -107,7 +107,7 @@ Timestep::total_hours () const
 }
 
 bool
-Timestep::GenCheck::verify (Metalib&, const Frame& frame, const symbol key, 
+Timestep::GenCheck::verify (const Metalib&, const Frame& frame, const symbol key, 
                             Treelog& msg) const
 { 
   daisy_assert (frame.check (key));

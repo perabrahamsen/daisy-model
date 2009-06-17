@@ -103,25 +103,25 @@ public:
                                    const double max_rooting_depth) = 0;
   static const std::vector<symbol>& default_AM ();
 
-  static double get_NO3 (Metalib&, const FrameModel&);	// [g N/cm^2]
-  static double get_NH4 (Metalib&, const FrameModel&);	// [g N/cm^2]
-  static IM get_IM (Metalib&, const Unit&, const FrameModel&);
-  static double get_volatilization (Metalib&,
+  static double get_NO3 (const Metalib&, const FrameModel&);	// [g N/cm^2]
+  static double get_NH4 (const Metalib&, const FrameModel&);	// [g N/cm^2]
+  static IM get_IM (const Metalib&, const Unit&, const FrameModel&);
+  static double get_volatilization (const Metalib&,
                                     const FrameModel&);	// [g N/m^2]
-  static double get_DM (Metalib&, const FrameModel&);	// [Mg DM/ha]
-  static double get_water (Metalib&, const FrameModel&);	// [mm]
-  static void set_utilized_weight (Metalib&, FrameModel& am,
+  static double get_DM (const Metalib&, const FrameModel&);	// [Mg DM/ha]
+  static double get_water (const Metalib&, const FrameModel&);	// [mm]
+  static void set_utilized_weight (const Metalib&, FrameModel& am,
 				   const double weight /* [kg N/ha] */);
-  static double utilized_weight (Metalib&,
+  static double utilized_weight (const Metalib&,
                                  const FrameModel& am); // [kg N/ha]
-  static double second_year_utilization (Metalib&,
+  static double second_year_utilization (const Metalib&,
                                          const FrameModel& am); // [kg N/ha]
-  static void set_mineral (Metalib&, FrameModel&, 
+  static void set_mineral (const Metalib&, FrameModel&, 
                            double NH4, double NO3);// [kg N/ha]
 
-  static bool is_fertilizer (Metalib&, const FrameModel&);
-  static bool is_mineral (Metalib&, const FrameModel&);
-  static bool is_organic (Metalib&, const FrameModel&);
+  static bool is_fertilizer (const Metalib&, const FrameModel&);
+  static bool is_mineral (const Metalib&, const FrameModel&);
+  static bool is_organic (const Metalib&, const FrameModel&);
 protected:
   AM (Block&);
 public:

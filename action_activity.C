@@ -101,7 +101,7 @@ static struct ActionActivitySyntax : public DeclareModel
   Model* make (Block& al) const
   { return new ActionActivity (al); }
 
-  static bool check_alist (Metalib& metalib, const Frame& al, Treelog& msg)
+  static bool check_alist (const Metalib& metalib, const Frame& al, Treelog& msg)
   {
     bool ok = true;
 

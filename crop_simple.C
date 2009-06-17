@@ -479,7 +479,7 @@ static struct CropSimpleSyntax : public DeclareModel
   Model* make (Block& al) const
  { return new CropSimple (al); }
 
-  static bool check_alist (Metalib&, const Frame& al, Treelog& err)
+  static bool check_alist (const Metalib&, const Frame& al, Treelog& err)
   { 
     bool ok = true;
     if (!al.check ("LAIvsTS") && !al.check ("LAIvsDay"))

@@ -40,7 +40,7 @@ struct Rootdens_PLF : public Rootdens
   struct Check_Indexes : public VCheck
   {
     // Check that the indexes are monotonically increasing.
-    bool verify (Metalib&, const Frame& frame, const symbol key, 
+    bool verify (const Metalib&, const Frame& frame, const symbol key, 
                  Treelog& msg) const;
   };
 
@@ -85,7 +85,7 @@ Relative root density as a function of root depth .");
 }
 
 bool
-Rootdens_PLF::Check_Indexes::verify (Metalib&, const Frame& frame, 
+Rootdens_PLF::Check_Indexes::verify (const Metalib&, const Frame& frame, 
                                      const symbol key, Treelog& msg) const
 { 
   daisy_assert (frame.check (key));

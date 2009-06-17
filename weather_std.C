@@ -71,7 +71,7 @@ struct WeatherStandard : public WeatherBase
       { return to - from + 1; }
 
       // Create and Destroy.
-      static bool check_alist (Metalib&, const Frame& al, Treelog&);
+      static bool check_alist (const Metalib&, const Frame& al, Treelog&);
       static void load_syntax (Frame&);
       YearInterval (const FrameSubmodel&);
     };
@@ -85,7 +85,7 @@ struct WeatherStandard : public WeatherBase
     void map_time (Time& time) const;
 
     // Create and Destroy.
-    static bool check_alist (Metalib&, const Frame& al, Treelog&);
+    static bool check_alist (const Metalib&, const Frame& al, Treelog&);
     static void load_syntax (Frame&);
     YearMap (Block&);
   };
@@ -325,7 +325,7 @@ struct WeatherStandard : public WeatherBase
 };
 
 bool
-WeatherStandard::YearMap::YearInterval::check_alist (Metalib&, const Frame& al,
+WeatherStandard::YearMap::YearInterval::check_alist (const Metalib&, const Frame& al,
 						     Treelog& err)
 {
   bool ok = true;
@@ -391,7 +391,7 @@ void WeatherStandard::YearMap::map_time (Time& time) const
 { time.tick_year (to.from - from.from); }
 
 bool
-WeatherStandard::YearMap::check_alist (Metalib&, const Frame& al, Treelog& msg)
+WeatherStandard::YearMap::check_alist (const Metalib&, const Frame& al, Treelog& msg)
 {
   bool ok = true;
   const YearInterval from (al.submodel ("from"));

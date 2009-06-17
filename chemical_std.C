@@ -1511,7 +1511,7 @@ static struct ChemicalStandardSyntax : public DeclareModel
     : DeclareModel (Chemical::component, "default", "\
 Read chemical properties as normal Daisy parameters.")
   { }
-  static bool check_alist (Metalib&, const Frame& al, Treelog& msg)
+  static bool check_alist (const Metalib&, const Frame& al, Treelog& msg)
   { 
     bool ok = true;
 

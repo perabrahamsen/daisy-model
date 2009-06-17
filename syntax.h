@@ -44,13 +44,13 @@ class Syntax
 
 public:
   // This function will check that an alist conform to the syntax.
-  bool check (Metalib&, const Frame&, Treelog& err) const;
+  bool check (const Metalib&, const Frame&, Treelog& err) const;
   
   // Check that a numeric value is within the allowed range.
   bool verify (symbol key, double value, Treelog&) const;
 
   // Check than an arbitrary alist member is valid.
-  bool check (Metalib&, const Frame&, symbol key, Treelog&) const;
+  bool check (const Metalib&, const Frame&, symbol key, Treelog&) const;
 
   // These functions will allow you to lookup information about a
   // specific syntax entry. 
@@ -176,7 +176,7 @@ public:
   // Create and Destroy.
 
   // A check_fun is a function used for extra syntax checking.
-  typedef bool (*check_fun)(Metalib&, const Frame&, Treelog&);
+  typedef bool (*check_fun)(const Metalib&, const Frame&, Treelog&);
   void add_check (check_fun);
 
   explicit Syntax ();

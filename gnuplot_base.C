@@ -135,7 +135,7 @@ The special name 'screen' indicate that the data should be shown on\n\
 the screen instead of being stored in a file.");
     static struct CheckWhere : public VCheck
     {
-      bool verify (Metalib&, const Frame& frame, const symbol key, 
+      bool verify (const Metalib&, const Frame& frame, const symbol key, 
                    Treelog& msg) const
       {
         daisy_assert (key == "where");
@@ -180,7 +180,7 @@ a line conncting two datapoints, one of them outside the graph, may\n\
 cross the legend.");
     static struct CheckLegend : public VCheck
     {
-      bool verify (Metalib&, const Frame& frame, const symbol key, 
+      bool verify (const Metalib&, const Frame& frame, const symbol key, 
                    Treelog& msg) const
       {
         daisy_assert (key == "legend");

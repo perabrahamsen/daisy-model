@@ -51,7 +51,7 @@ struct ValidYear : public VCheck
     return true;
   }
 
-  bool verify (Metalib&, const Frame& frame, const symbol key, 
+  bool verify (const Metalib&, const Frame& frame, const symbol key, 
                Treelog& msg) const
   { 
     daisy_assert (frame.check (key));
@@ -91,7 +91,7 @@ VCheck::IRange::valid (const int value, Treelog& msg) const
 }
 
 bool
-VCheck::IRange::verify (Metalib&, const Frame& frame, const symbol key, 
+VCheck::IRange::verify (const Metalib&, const Frame& frame, const symbol key, 
                         Treelog& msg) const
 {
   daisy_assert (frame.check (key));
@@ -136,7 +136,7 @@ struct LocalOrder : public VCheck
     return ok;
   }
 
-  bool verify (Metalib&, const Frame& frame, const symbol key, 
+  bool verify (const Metalib&, const Frame& frame, const symbol key, 
                Treelog& msg) const
   { 
     daisy_assert (frame.check (key));
@@ -366,7 +366,7 @@ VCheck::SumEqual::valid (const PLF& plf, Treelog& msg) const
 }
 
 bool
-VCheck::SumEqual::verify (Metalib&, const Frame& frame, 
+VCheck::SumEqual::verify (const Metalib&, const Frame& frame, 
                           const symbol key, Treelog& msg) const
 {
   daisy_assert (frame.check (key));
@@ -420,7 +420,7 @@ VCheck::StartValue::valid (const PLF& plf, Treelog& msg) const
 { return valid (plf.y (0), msg); }
 
 bool
-VCheck::StartValue::verify (Metalib&, const Frame& frame, 
+VCheck::StartValue::verify (const Metalib&, const Frame& frame, 
                             const symbol key, Treelog& msg) const
 {
   daisy_assert (frame.check (key));
@@ -477,7 +477,7 @@ VCheck::EndValue::valid (const PLF& plf, Treelog& msg) const
 }
 
 bool
-VCheck::EndValue::verify (Metalib&, const Frame& frame, 
+VCheck::EndValue::verify (const Metalib&, const Frame& frame, 
                           const symbol key, Treelog& msg) const
 {
   daisy_assert (frame.check (key));
@@ -528,7 +528,7 @@ VCheck::FixedPoint::valid (const PLF& plf, Treelog& msg) const
 }
 
 bool
-VCheck::FixedPoint::verify (Metalib&, const Frame& frame, 
+VCheck::FixedPoint::verify (const Metalib&, const Frame& frame, 
                             const symbol key, Treelog& msg) const
 {
   daisy_assert (frame.check (key));
@@ -559,7 +559,7 @@ VCheck::FixedPoint::FixedPoint (double x, double y)
 { }
 
 bool
-VCheck::MinSize::verify (Metalib&, const Frame& frame, 
+VCheck::MinSize::verify (const Metalib&, const Frame& frame, 
                          const symbol key, Treelog& msg) const
 {
   daisy_assert (frame.check (key));
@@ -579,7 +579,7 @@ VCheck::MinSize::MinSize (unsigned int size)
 { }
 
 bool
-VCheck::String::verify (Metalib&, const Frame& frame, 
+VCheck::String::verify (const Metalib&, const Frame& frame, 
                         const symbol key, Treelog& msg) const
 {
   daisy_assert (frame.check (key));
@@ -609,7 +609,7 @@ VCheck::Compatible::valid (const Units& units, symbol value, Treelog& msg) const
 }
 
 bool
-VCheck::Compatible::verify (Metalib& metalib, const Frame& frame, 
+VCheck::Compatible::verify (const Metalib& metalib, const Frame& frame, 
                             const symbol key, Treelog& msg) const
 {
   daisy_assert (frame.check (key));
@@ -707,7 +707,7 @@ VCheck::Enum::Enum (const symbol a, const symbol b, const symbol c,
 }
 
 bool
-VCheck::InLibrary::verify (Metalib& metalib, const Frame& frame, 
+VCheck::InLibrary::verify (const Metalib& metalib, const Frame& frame, 
                            const symbol key, Treelog& msg) const
 {
   daisy_assert (frame.check (key));
@@ -724,7 +724,7 @@ VCheck::InLibrary::verify (Metalib& metalib, const Frame& frame,
 }
 
 bool
-VCheck::InLibrary::valid (Metalib& metalib, const symbol type, 
+VCheck::InLibrary::valid (const Metalib& metalib, const symbol type, 
                           Treelog& msg) const
 {
   daisy_assert (metalib.exist (lib_name));
@@ -776,7 +776,7 @@ VCheck::unique ()
 {
   static struct Unique : public VCheck
   {
-    bool verify (Metalib&, const Frame& frame, const symbol key, 
+    bool verify (const Metalib&, const Frame& frame, const symbol key, 
                  Treelog& msg) const
     { 
       daisy_assert (frame.check (key));
@@ -828,7 +828,7 @@ VCheck::unique ()
 }
 
 bool
-VCheck::All::verify (Metalib& metalib, const Frame& frame, const symbol key,
+VCheck::All::verify (const Metalib& metalib, const Frame& frame, const symbol key,
                      Treelog& msg) const
 {
   bool ok = true;

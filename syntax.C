@@ -60,7 +60,7 @@ struct Syntax::Implementation
   vcheck_map val_checks;
   string_map descriptions;
 
-  bool check (Metalib&, const Frame& vl, Treelog& err);
+  bool check (const Metalib&, const Frame& vl, Treelog& err);
   bool verify (symbol key, double value, Treelog& msg) const;
   Value::type lookup (const symbol key) const;
   void entries (std::set<symbol>& result) const;
@@ -85,7 +85,7 @@ struct Syntax::Implementation
 };    
 
 bool 
-Syntax::Implementation::check (Metalib& metalib,
+Syntax::Implementation::check (const Metalib& metalib,
                                const Frame& vl, Treelog& msg)
 {
   bool error = false;
@@ -274,7 +274,7 @@ Syntax::Implementation::entries (std::set<symbol>& result) const
 }
 
 bool
-Syntax::check (Metalib& metalib, 
+Syntax::check (const Metalib& metalib, 
                const Frame& vl, Treelog& err) const
 { return impl->check (metalib, vl, err);}
 
@@ -283,7 +283,7 @@ Syntax::verify (const symbol key, const double value, Treelog& msg) const
 { return impl->verify (key, value, msg); }
 
 bool 
-Syntax::check (Metalib& metalib, const Frame& vl, 
+Syntax::check (const Metalib& metalib, const Frame& vl, 
                const symbol key, Treelog& err) const
 {
   bool ok = true;
