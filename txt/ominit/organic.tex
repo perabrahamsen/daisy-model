@@ -29,22 +29,22 @@
 \maketitle
 
 \begin{abstract}
-  Organic matter models using multiple pools for soil biomass and soil
-  organic matter have proved able to simulate both short term and long
-  term change in humus content of agricultural soil. However, these
-  pools do not correspond to measurable physical quantities, and are
-  therefore difficult for a non-expert to understand and use. To
-  initialize these pools it is often assumed that organic matter is in
-  a state of equilibrium. Unfortunately, the time to reach equilibrium
-  is often measured in centuries. Therefore the use of a warm-up
-  period cannot replace the need for a good initial partitioning. In
-  this paper we examine a weaker assumption, namely a
-  quasi-equilibrium where all except for the slowest pool is in
-  equilibrium with the amount of carbon input. This assumption allows
-  the non-expert user to initialize the model, and is robust with
-  regard to model changes.  We compare the initialization resulting
-  from the equilibrium and the quasi-equilibrium with long term
-  dynamic simulations, and discuss where each method is most
+  Organic matter models using multiple pools for soil microbial
+  biomass and soil organic matter have proved able to simulate both
+  short term and long term change in humus content of agricultural
+  soil. However, these pools do not correspond to measurable physical
+  quantities, and are therefore difficult for a non-expert to
+  understand and use. To initialize these pools it is often assumed
+  that organic matter is in a state of equilibrium. Unfortunately, the
+  time to reach equilibrium is often measured in centuries. Therefore
+  the use of a warm-up period cannot replace the need for a good
+  initial partitioning. In this paper we examine a weaker assumption,
+  namely a quasi-equilibrium where all except for the slowest pool is
+  in equilibrium with the amount of carbon input. This assumption
+  allows the non-expert user to initialize the model, and is robust
+  with regard to model changes.  We compare the initialization
+  resulting from the equilibrium and the quasi-equilibrium with long
+  term dynamic simulations, and discuss where each method is most
   applicable.
 \end{abstract}
 
@@ -112,7 +112,7 @@ processes outside the scope of this article, such as water, heat and
 nitrogen dynamics in the soil, as well as bioclimate, crop development,
 and management.
 
-The organic matter in Daisy comprises three compartments: 1) The
+The organic matter in Daisy comprises three main compartments: 1) The
 \emph{added organic matter} (\textsc{aom}) which for a cultivated soil
 may include organic fertilizer, crop residuals, including
 rhizodeposition and dead leaves incorporated to the soil by
@@ -121,9 +121,10 @@ living part of the organic matter, excluding roots. 3) Soil humus or
 \emph{soil organic matter} (\textsc{som}), which can no longer be
 traced back to its origin.  The Daisy code allows each compartment to
 be divided into a user specified number of pools, as well as adjusting
-the turnover rates, the rates of maintenance (for the \textsc{smb}
-pools), and directions of flow. Thus, Daisy can be useful as a
-framework for experimentation with organic matter models.
+the turnover rates, substrate use efficiency ($\epsilon$), the rates
+of maintenance (for the \textsc{smb} pools), and directions of
+flow. Thus, Daisy can be useful as a framework for experimentation
+with organic matter models.
 
 The original organic matter model in Daisy \citep{daisy-def} defined a
 system with two pools of \textsc{som} and \textsc{smb}, and two pools
@@ -166,9 +167,10 @@ proportional with the size of the pool. We call this the
 Fig.~\ref{fig:om2} have a fully drawn outgoing line. From the
 \textsc{som1} pool the outgoing line is marked with the text
 ``44y''. This indicate the turnover rate of this particular pool and
-the number is the corresponding halftime (i.e. 44 years for the
-\textsc{som1} pool), which means that if there was no input to the
-pool, the pool would be half the original size after 44 years. For
+the number is the corresponding halftime (defined as $\ln 2/k$, where
+$k$ is the turnover rate.  For this model, the halftime is 44 years
+for the \textsc{som1} pool), which means that if there was no input to
+the pool, the pool would be half the original size after 44 years. For
 some pools this time is given in days, e.g.\ the \textsc{smb2} pool
 has a turnover halftime of 69 days.
 
@@ -457,10 +459,12 @@ size of the slow pool.
 
 In this section, we compare the static solutions we get with the
 equilibrium and the quasi-equilibrium assumptions from the previous
-section, using a dynamic simulation as a baseline.  In the dynamic
-simulations we follow a system that goes from equilibrium at one level
-of carbon input, to equilibrium at another input level.  In particular
-we follow the relative size of the two active \textsc{som} pools.
+section, using a dynamic simulation as a baseline, and the model
+described in Sect.~\ref{sec:model} with an empty \textsc{som3} pool. In
+the dynamic simulations we follow a system that goes from equilibrium
+at one level of carbon input, to equilibrium at another input level.
+In particular we follow the relative size of the two active
+\textsc{som} pools.
 
 \subsection{Driving variables and soil parameters}
 
@@ -472,29 +476,31 @@ based on Danish soils, we have used Danish data for all simulations.
 The weather data are from an meteorological research station in
 Taastrup, in the Eastern part of Denmark.  A time series from 1970 to
 1999 was used, and was repeated for the entire simulation.  The
-simulation period was from the year 2000 to 2600.
+simulation period was 600 years.
 
 \subsubsection{Soil}
 
 To include the effect of clay content, two standard soils for Danish
 conditions have been selected, a coarse sand typical for the Western
 part of Denmark, and a sandy loam typical for the Eastern parts of
-Denmark.  The particle size distribution of the two soils are listed
-in Table~\ref{tab:psd}.
+Denmark.  The particle size distribution and dry bulk density $\rho_b$
+of the two soils are listed in Table~\ref{tab:psd}.
 \begin{table}[htbp]
-  \caption{Particle size distribution of the two standard soils.}
+  \caption{Particle size distribution and dry bulk density $\rho_b$ of
+    the two standard soils.} 
   \label{tab:psd}
   \vspace{0.25cm}
-  \begin{tabular}{c c c c}
+  \begin{tabular}{c c c c c}
     \hline
-    Soil        &  clay     & silt        & sand \\
-                & (<2 $µ$m) & (2-50 $µ$m) & (50-2000 $µ$m)\\\hline
-    Sand        & 3.9       & 6.4         & 89.7\\
-    Sandy loam  & 12.4      & 24.9        & 62.7\\\hline
+    Soil        &  clay     & silt        & sand           & $\rho_b$ \\
+                & (<2 $µ$m) & (2-50 $µ$m) & (50-2000 $µ$m) & g/cm$^3$ \\\hline
+    Sand        & 3.9       & 6.4         & 89.7           & 1.45 \\
+    Sandy loam  & 12.4      & 24.9        & 62.7           & 1.53 \\\hline
   \end{tabular}
 \end{table}
 The total organic matter is not listed, as we initialize it to be in
-equilibrium with the specified input.
+equilibrium with the specified input.  Only the plow layer (0--30
+cm) is considred in the simulations.
 
 \subsubsection{Management}
 
@@ -506,24 +512,25 @@ the average C-input together with the average and initial abiotic
 factor and the initial C-input of the different management and soil
 combinations.
 \begin{table}[htbp]
-  \caption{Average input of organic C and average abiotic factor (heat
-    factor times humidity factor) in simulated management for sandy
-    and sandy loam soils. The initial abiotic factor and initial C
-    refers to the initialization of the organic matter module using
-    equilibrium assumptions.  The unit for C input is kg C ha$^{-1}$
-    y$^{-1}$.  The average abiotic factor was also used for
-    initialization, thus only one number is listed in the table.}
+  \caption{Average input of organic C to thw plow layer (0--30 cm) and
+    average abiotic factor (heat factor times humidity factor) in
+    simulated management for sandy and sandy loam soils. The initial
+    abiotic factor and initial C refers to the initialization of the
+    organic matter module using equilibrium assumptions.  The unit for
+    C input is kg C ha$^{-1}$ y$^{-1}$.  The average abiotic factor
+    was also used for initialization, thus only one number is listed
+    in the table.}
   \label{tab:soils}
 \vspace{0.25cm}
-\begin{tabular}{c c c c c}
+\begin{tabular}{c c c c c c}
   \hline
-        &            & average & abiotic & initial \\
-  Soil  & Manag.     & C input & factor  & C input \\\hline
-  Sand  & Low        & 1817    & 0.680   & 5200\\
-  Sand  & Medium     & 4412    & 0.680   & 5200\\
-  Sand  & High       & 5158    & 0.681   & 1800\\
-  Sandy loam & Low   & 2283    & 0.622   & 6500\\
-  Sandy loam & High  & 6525    & 0.623   & 2300\\\hline
+        &            & average & abiotic & initial & initial\\
+  Soil  & Manag.     & C input & factor  & C input & \textsc{tom} \\\hline
+  Sand  & Low        & 1817    & 0.680   & 5200 & ? \\
+  Sand  & Medium     & 4412    & 0.680   & 5200 & ? \\
+  Sand  & High       & 5158    & 0.681   & 1800 & ? \\
+  Sandy loam & Low   & 2283    & 0.622   & 6500 & ? \\
+  Sandy loam & High  & 6525    & 0.623   & 2300 & ?\\\hline
 \end{tabular}
 \end{table}
 The total C input is higher in the sandy loam soil than in the sandy

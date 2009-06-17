@@ -22,34 +22,8 @@
 #define BUILD_DLL
 
 #include "printer.h"
-#include "librarian.h"
-#include "frame.h"
-
-const char *const Printer::component = "printer";
-
-symbol
-Printer::library_id () const
-{
-  static const symbol id (component);
-  return id;
-}
-
-Printer::Printer (const symbol n)
-  : name (n)
-{ }
 
 Printer::~Printer ()
 { }
-
-static struct PrinterInit : public DeclareComponent 
-{
-  PrinterInit ()
-    : DeclareComponent (Printer::component, "\
-The 'printer' component is responsible for converting the internal\n\
-format into various internal format.  I.e., it performs the\n\
-opposite function of the 'parser' component.  This is used for --\n\
-among other things -- creating checkpoints of the state.")
-  { }
-} Printer_init;
 
 // printer.C ends here.

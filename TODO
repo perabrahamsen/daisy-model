@@ -1,20 +1,30 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* R2D2
+* Split PrinterFile -> PrinterFileModel
 
-** Diskuter NH4 med Søren.
+* Regression testing
 
-** tegninger mikkel
+** Log: akkumulerede værdier skal ikke være per tid.
 
-** Drændynamik
+** LogDLF::done skal fortælle fetch om tidsskridt
 
-** Opfugtning
+** Divide fetch in "basic" and "pretty"
 
-* serbian soil
+Flyt pretty print til pretty.
+
+** omskriv log_regress.C til kun at udregne og udskrive en linie
+
+dato version revision værdier
+
+** indlæs gamle værdier
+
+** merge med advarsler  
+
+** opdater "make check"
+
+skal klare filhåntering.
 
 * installer solver
-
-* bestil windows xfig
 
 * Aflever udlægsblanket
 
@@ -42,25 +52,8 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 ** compare rs
 
-* Regression testing
+* serbian soil
 
-** LogDLF::done skal fortælle fetch om tidsskridt
-
-** Divide fetch in "basic" and "pretty"
-
-Flyt pretty print til pretty.
-
-** omskriv log_regress.C til kun at udregne og udskrive en linie
-
-dato version revision værdier
-
-** indlæs gamle værdier
-
-** merge med advarsler  
-
-** opdater "make check"
-
-skal klare filhåntering.
 
 * C_below læst fra tidsserie
 
@@ -70,11 +63,15 @@ Number::File (NumberSource)?
 
 * Artikler
 
-** OM init (BGJ)
+** OMinit
 
-Tegning er forkert.  Efficiency kører kun på strøm til smb puljer.
+*** pløjelag 1 m eller 30 cm?
+
+*** Inkluder SH ændringer 
 
 ** Managing the farmer (SH)
+
+Dropped
 
 ** 2D G&P (SH)
 

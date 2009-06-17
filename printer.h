@@ -23,21 +23,14 @@
 #ifndef PRINTER_H
 #define PRINTER_H
 
-#include "model.h"
 #include "symbol.h"
 #include <string>
+#include <boost/noncopyable.hpp>
 
-class Block;
 class Frame;
 
-class Printer : public Model
+class Printer  : private boost::noncopyable
 {
-  // Content.
-public:
-  const symbol name;
-  static const char *const component;
-  symbol library_id () const;
-
   // Interface.
 public:
   // Print comment.
@@ -53,10 +46,8 @@ public:
   virtual bool good () = 0;
 
   // Create and Destroy.
-protected:
-  Printer (symbol name);
 public:
-  ~Printer ();
+  virtual ~Printer ();
 };
 
 #endif // PRINTER_H

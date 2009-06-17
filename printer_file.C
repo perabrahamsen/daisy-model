@@ -810,37 +810,15 @@ PrinterFile::good ()
   
 PrinterFile::PrinterFile (Metalib& mlib,
                           const symbol filename)
-  : Printer ("file"),
-    impl (new Implementation (mlib, filename))
+  : impl (new Implementation (mlib, filename))
 { }
     
 PrinterFile::PrinterFile (Metalib& mlib,
                           std::ostream& stream)
-  : Printer ("stream"),
-    impl (new Implementation (mlib, stream))
-{ }
-    
-PrinterFile::PrinterFile (Block& al)
-  : Printer (al.type_name ()),
-    impl (new Implementation (al.metalib (), al.name ("where")))
+  : impl (new Implementation (mlib, stream))
 { }
     
 PrinterFile::~PrinterFile ()
 { }
 
-static struct PrinterFileSyntax : public DeclareModel
-{
-  Model* make (Block& al) const
-  { return new PrinterFile (al); }
-
-  PrinterFileSyntax ()
-    : DeclareModel (Printer::component, "file", 
-               "Print internal datastructures with lots of parentheses.")
-  { }
-  void load_frame (Frame& frame) const
-  { 
-    frame.declare ("where", Value::String, Value::Const,
-                "File to print in.");
-    frame.order ("where");
-  }
-} PrinterFile_syntax;
+// printer_file.C ends here.

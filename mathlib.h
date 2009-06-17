@@ -103,12 +103,12 @@ inline char int2char (int x)
 
 inline double pF2h (double pF)
 { 
-  return -pow (10, pF);
+  return -std::pow (10, pF);
 }
 
 inline double h2pF (double h)
 {
-  return log10 (-h);
+  return std::log10 (-h);
 }
 
 extern double halftime_to_rate (double halftime);

@@ -461,7 +461,7 @@ COMPONENTS = rainergy.C ponddamp.C scope_model.C seed.C \
 	parser.C log.C weather.C column.C crop.C \
 	action.C condition.C horizon.C 	uzmodel.C hydraulic.C \
 	bioclimate.C groundwater.C am.C \
-	adsorption.C tortuosity.C printer.C chemical.C \
+	adsorption.C tortuosity.C chemical.C \
 	pet.C net_radiation.C svat.C vegetation.C 
 
 # Submodels are combined models and components.
@@ -483,11 +483,11 @@ SPECIALS = log_dlf.C reaction_colgen.C weather_base.C \
 	scope_multi.C scope_id.C geometry_vert.C gnuplot_base.C \
 	source_file.C format_LaTeX.C log_all.C om.C select_value.C \
 	weather_old.C log_extern.C log_select.C parser_file.C \
-	geometry.C printer_file.C log_alist.C
+	geometry.C log_alist.C
 
 # Various utility code that are neither a component nor a (sub)model.
 # 
-OTHER = filepos.C frame_submodel.C submodeler.C \
+OTHER = printer.C printer_file.C filepos.C frame_submodel.C submodeler.C \
 	frame_model.C scope.C value.C unit.C border.C resistance.C \
 	convert.C units.C tertsmall.C anystate.C imvec.C im.C frame.C \
 	bdconv.C abiotic.C scope_soil.C run.C treelog_text.C treelog_store.C \
@@ -1115,8 +1115,6 @@ adsorption${OBJ}: adsorption.C adsorption.h model.h symbol.h block.h value.h \
   librarian.h mathlib.h assertion.h
 tortuosity${OBJ}: tortuosity.C tortuosity.h model.h symbol.h block.h value.h \
   librarian.h
-printer${OBJ}: printer.C printer.h model.h symbol.h librarian.h frame.h \
-  scope.h value.h
 chemical${OBJ}: chemical.C chemical.h model.h symbol.h block.h value.h \
   librarian.h vcheck.h assertion.h
 pet${OBJ}: pet.C pet.h model.h symbol.h frame.h scope.h value.h block.h log.h \
@@ -1299,13 +1297,14 @@ parser_file${OBJ}: parser_file.C parser_file.h parser.h model.h symbol.h \
 geometry${OBJ}: geometry.C geometry.h symbol.h value.h volume.h model.h \
   check.h vcheck.h treelog.h frame_submodel.h frame.h scope.h assertion.h \
   mathlib.h librarian.h
-printer_file${OBJ}: printer_file.C printer_file.h printer.h model.h symbol.h \
-  metalib.h frame.h scope.h value.h library.h block.h plf.h time.h \
-  parser.h path.h assertion.h librarian.h frame_model.h frame_submodel.h \
-  filepos.h
 log_alist${OBJ}: log_alist.C log_alist.h log.h time.h symbol.h border.h \
   model.h library.h frame_submodel.h frame.h scope.h value.h \
   frame_model.h assertion.h metalib.h
+printer${OBJ}: printer.C printer.h symbol.h
+printer_file${OBJ}: printer_file.C printer_file.h printer.h symbol.h \
+  metalib.h frame.h scope.h value.h library.h block.h plf.h time.h \
+  parser.h model.h path.h assertion.h librarian.h frame_model.h \
+  frame_submodel.h filepos.h
 filepos${OBJ}: filepos.C filepos.h symbol.h value.h
 frame_submodel${OBJ}: frame_submodel.C frame_submodel.h frame.h scope.h \
   value.h symbol.h assertion.h
@@ -1337,8 +1336,9 @@ frame${OBJ}: frame.C frame.h scope.h value.h symbol.h frame_model.h \
 bdconv${OBJ}: bdconv.C bdconv.h convert.h symbol.h geometry.h value.h soil.h \
   volume.h model.h units.h assertion.h
 abiotic${OBJ}: abiotic.C abiotic.h mathlib.h assertion.h
-scope_soil${OBJ}: scope_soil.C scope_soil.h scope.h value.h symbol.h soil.h \
-  soil_water.h soil_heat.h units.h assertion.h librarian.h model.h
+scope_soil${OBJ}: scope_soil.C scope_soil.h scope.h value.h symbol.h \
+  geometry.h soil.h soil_water.h soil_heat.h chemical.h model.h units.h \
+  assertion.h librarian.h
 run${OBJ}: run.C run.h model.h symbol.h
 treelog_text${OBJ}: treelog_text.C treelog_text.h treelog.h symbol.h \
   assertion.h
@@ -1567,9 +1567,9 @@ reaction_adsorption${OBJ}: reaction_adsorption.C reaction.h model.h symbol.h \
   assertion.h librarian.h mathlib.h treelog.h frame.h
 reaction_equil${OBJ}: reaction_equil.C reaction.h model.h symbol.h block.h \
   value.h number.h equil.h chemistry.h chemical.h geometry.h soil.h \
-  soil_water.h scope_soil.h scope.h log.h time.h border.h assertion.h \
-  librarian.h mathlib.h treelog.h scope_id.h scope_multi.h vcheck.h \
-  frame.h
+  soil_water.h scope_soil.h scope.h surface.h uzmodel.h log.h time.h \
+  border.h assertion.h librarian.h mathlib.h treelog.h scope_id.h \
+  scope_multi.h vcheck.h frame.h
 rootdens_GP2D${OBJ}: rootdens_GP2D.C rootdens.h model.h symbol.h block.h \
   value.h geometry.h log.h time.h border.h check.h mathlib.h assertion.h \
   librarian.h iterative.h treelog.h frame_model.h frame.h scope.h \
@@ -1606,9 +1606,9 @@ reaction_std${OBJ}: reaction_std.C reaction.h model.h symbol.h block.h \
   value.h transform.h chemistry.h chemical.h soil.h log.h time.h border.h \
   assertion.h librarian.h treelog.h frame.h scope.h
 chemistry_std${OBJ}: chemistry_std.C chemistry.h model.h symbol.h chemical.h \
-  reaction.h movement.h geometry.h value.h soil.h soil_water.h block.h \
-  log.h time.h border.h assertion.h memutils.h librarian.h vcheck.h \
-  treelog.h frame.h scope.h
+  reaction.h movement.h geometry.h value.h soil.h soil_water.h surface.h \
+  uzmodel.h block.h log.h time.h border.h assertion.h memutils.h \
+  librarian.h vcheck.h treelog.h frame.h scope.h
 groundwater_extern${OBJ}: groundwater_extern.C groundwater.h model.h symbol.h \
   output.h condition.h memutils.h time.h number.h block.h value.h units.h \
   check.h assertion.h librarian.h frame.h scope.h

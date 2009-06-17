@@ -33,7 +33,7 @@ SelectValue::add_result (double result)
     if (count == 0)
       {
         if (handle == Handle::geometric)
-          value = log (result);
+          value = std::log (result);
         else
           value = result;
       }
@@ -54,7 +54,7 @@ SelectValue::add_result (double result)
         value += result;
         break;
       case Handle::geometric:
-        value += log (result);
+        value += std::log (result);
         break;
       }
     count++;
