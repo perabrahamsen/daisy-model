@@ -50,7 +50,7 @@ public:
   // Is 'key' an element of this alist?
   bool check (const symbol key) const;
   // Is the element 'key' in this alist a subset of the other entry.
-  bool subset (Metalib&, const AttributeList& other, symbol key) const;
+  bool subset (const Metalib&, const AttributeList& other, symbol key) const;
   int size (symbol key) const;
 
   // References.

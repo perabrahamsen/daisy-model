@@ -1,7 +1,5 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Split PrinterFile -> PrinterFileModel
-
 * Regression testing
 
 ** Log: akkumulerede værdier skal ikke være per tid.

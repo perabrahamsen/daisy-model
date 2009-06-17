@@ -72,7 +72,7 @@ struct AValue
   bool is_sequence;
   int* ref_count;
 
-  bool subset (Metalib&, const AValue& other) const;
+  bool subset (const Metalib&, const AValue& other) const;
 
   void expect (const symbol key, Value::type expected) const;
   void singleton (const symbol key) const;
@@ -221,7 +221,7 @@ struct AValue
 };
 
 bool
-AValue::subset (Metalib& metalib, const AValue& v) const
+AValue::subset (const Metalib& metalib, const AValue& v) const
 {
   daisy_assert (type == v.type);
   daisy_assert (is_sequence == v.is_sequence);
@@ -629,7 +629,7 @@ AttributeList::check (const symbol key) const
 }
 
 bool 
-AttributeList::subset (Metalib& metalib, 
+AttributeList::subset (const Metalib& metalib, 
                        const AttributeList& other, 
 		       const symbol key) const
 {

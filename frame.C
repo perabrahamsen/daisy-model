@@ -527,7 +527,7 @@ Frame::check (const symbol key) const
 
 // Is this frame a subset of 'other'?
 bool 
-Frame::subset (Metalib& metalib, const Frame& other) const
+Frame::subset (const Metalib& metalib, const Frame& other) const
 {
   // Find syntax entries.
   std::set<symbol> all;
@@ -543,7 +543,7 @@ Frame::subset (Metalib& metalib, const Frame& other) const
 
 // Is the element 'key' in this alist a subset of the corresponding other entry.
 bool 
-Frame::subset (Metalib& metalib, const Frame& other,
+Frame::subset (const Metalib& metalib, const Frame& other,
                const symbol key) const
 {
   // Find frame defining my value of key.
