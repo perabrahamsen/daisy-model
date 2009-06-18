@@ -1,5 +1,9 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* const Metalib& Block::metalib () 
+
+???const???
+
 * Regression testing
 
 ** Log: akkumulerede værdier skal ikke være per tid.

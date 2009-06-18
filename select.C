@@ -85,7 +85,7 @@ struct Select::Implementation
   struct Spec
   {
     // Content.
-    Metalib& metalib;
+    const Metalib& metalib;
     const symbol library_name;
     const symbol model_name;
     const std::vector<symbol> submodels_and_attribute;
@@ -123,7 +123,7 @@ struct Select::Implementation
 
   // Create and Destroy.
   bool check (symbol spec_dim, Treelog& err) const;
-  static symbol find_description (Metalib&, const Frame&);
+  static symbol find_description (const Metalib&, const Frame&);
   static Number* get_expr (Block& al);
   Implementation (Block&);
   ~Implementation ();
@@ -357,7 +357,7 @@ Select::Implementation::check (const symbol spec_dim, Treelog& err) const
 }
   
 symbol
-Select::Implementation::find_description (Metalib& metalib, 
+Select::Implementation::find_description (const Metalib& metalib, 
                                           const Frame& al)
 {
   const Library& library = metalib.library (Select::component);
