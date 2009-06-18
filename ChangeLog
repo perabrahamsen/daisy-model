@@ -1,3 +1,7 @@
+2009-06-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* block.h: Derive from Scope.
+
 2009-06-17  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* frame.C, frame.h, alist.C, alist.h (subset): Made Metalib const.

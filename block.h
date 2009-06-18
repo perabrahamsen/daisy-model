@@ -22,6 +22,7 @@
 #ifndef BLOCK_H
 #define BLOCK_H
 
+#include "scope.h"
 #include "symbol.h"
 #include "value.h"
 #include <string>
@@ -48,7 +49,8 @@ class PLF;
 #define EXPORT __declspec(dllimport)
 #endif
 
-class EXPORT Block : private boost::noncopyable
+
+class EXPORT Block : public Scope // private boost::noncopyable
 {
   struct Implementation;
   std::auto_ptr<Implementation> impl;
@@ -83,6 +85,7 @@ public:
   int value_size (symbol tag) const;
   double number (symbol) const;
   double number (symbol, double default_value) const;
+  using Scope::name;
   symbol name (symbol);
   symbol name (symbol, symbol default_value);
   bool flag (symbol) const;
