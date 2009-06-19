@@ -21,10 +21,16 @@ MAKEFLAGS =
 
 # HOSTTYPE is not defined in the native win32 Emacs.
 #
-ifeq ($(OS),Windows_NT)
+ ifeq ($(OS),Windows_NT)
 #	HOSTTYPE = cygwin
 	HOSTTYPE = mingw
 #	HOSTTYPE = win32
+endif
+
+# HOSTTYPE .
+#
+ ifeq ($(HOSTTYPE),i486-linux)
+	HOSTTYPE = i386-linux
 endif
 
 # Some non-local files and directories.
