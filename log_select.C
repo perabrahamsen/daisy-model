@@ -253,7 +253,7 @@ struct DocSelect : public LogSelect
 };
 
 void
-LogSelect::document_entries (Format& format, Metalib& metalib, 
+LogSelect::document_entries (Format& format, const Metalib& metalib, 
                              Treelog& msg, const symbol name)
 {
   const Library& log_lib = metalib.library (Log::component);

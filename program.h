@@ -30,6 +30,7 @@
 
 class Treelog;
 class Block;
+class Metalib;
 class AttributeList;
 class Log;
 
@@ -58,7 +59,7 @@ protected:
 
   // Create and Destroy.
 public:
-  virtual void initialize (Block&) = 0;
+  virtual void initialize (Metalib&, Block&) = 0;
   virtual bool check (Treelog& err) = 0;
 protected:
   explicit Program (Block&);

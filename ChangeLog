@@ -1,3 +1,7 @@
+2009-06-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* all: Made 'Metalib' const most places.
+
 2009-06-18  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* block.h: Derive from Scope.

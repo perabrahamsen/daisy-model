@@ -228,7 +228,7 @@ Rootdens_G_P::Rootdens_G_P (Block& al)
 { }
 
 std::auto_ptr<Rootdens> 
-Rootdens::create_uniform (Metalib& metalib, Treelog& msg)
+Rootdens::create_uniform (const Metalib& metalib, Treelog& msg)
 { return std::auto_ptr<Rootdens> 
     (Librarian::build_stock<Rootdens> (metalib, msg, "Gerwitz+Page74",
                                        "uniform")); }

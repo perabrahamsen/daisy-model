@@ -223,7 +223,7 @@ struct OrganicStandard : public OrganicMatter
 
   // Simulation.
   void clear ();
-  void monthly (Metalib&, const Geometry&, Treelog&);
+  void monthly (const Metalib&, const Geometry&, Treelog&);
   const std::vector<bool>& active () const;
   void tick (const Geometry& geo,
              const SoilWater&, const SoilHeat&, 
@@ -251,14 +251,14 @@ struct OrganicStandard : public OrganicMatter
 	      const Chemistry&, Treelog& err) const;
   bool check_am (const FrameModel& am, Treelog& err) const;
   void add (AM&);
-  void fertilize (Metalib&, const FrameModel&, const Geometry&, 
+  void fertilize (const Metalib&, const FrameModel&, const Geometry&, 
                   const Time&, double dt, Treelog&);
-  void fertilize (Metalib&, const FrameModel&, const Geometry&,
+  void fertilize (const Metalib&, const FrameModel&, const Geometry&,
                   double from, double to, const Time&, double dt, Treelog&);
-  void fertilize (Metalib&, const FrameModel&, const Geometry&, 
+  void fertilize (const Metalib&, const FrameModel&, const Geometry&, 
                   const Volume&, const Time&, double dt, Treelog&);
   AM* find_am (symbol sort, symbol part) const;
-  void initialize (Metalib&, 
+  void initialize (const Metalib&, 
                    const Units&, const Frame&, const Geometry& geo,
                    const Soil&, const SoilWater&, const SoilHeat&,
 		   double T_avg, Treelog&);
@@ -874,7 +874,7 @@ OrganicStandard::add (AM& om)
 }
 
 void 
-OrganicStandard::fertilize (Metalib& metalib, const FrameModel& frame, 
+OrganicStandard::fertilize (const Metalib& metalib, const FrameModel& frame, 
                             const Geometry& geo, 
                             const Time& now, const double dt, Treelog& msg)
 { 
@@ -885,7 +885,7 @@ OrganicStandard::fertilize (Metalib& metalib, const FrameModel& frame,
 }
 
 void 
-OrganicStandard::fertilize (Metalib& metalib, const FrameModel& frame,
+OrganicStandard::fertilize (const Metalib& metalib, const FrameModel& frame,
                             const Geometry& geo,
                             const double from, const double to,
                             const Time& now, const double dt, Treelog& msg)
@@ -900,7 +900,7 @@ OrganicStandard::fertilize (Metalib& metalib, const FrameModel& frame,
 }
 
 void 
-OrganicStandard::fertilize (Metalib& metalib, const FrameModel& frame,
+OrganicStandard::fertilize (const Metalib& metalib, const FrameModel& frame,
                             const Geometry& geo, const Volume& volume,
                             const Time& now, const double dt, Treelog& msg)
 { 
@@ -925,7 +925,7 @@ OrganicStandard::clear ()
 }
 
 void
-OrganicStandard::monthly (Metalib& metalib, const Geometry& geo,
+OrganicStandard::monthly (const Metalib& metalib, const Geometry& geo,
                           Treelog& msg)
 {
   static const symbol am_symbol ("am");
@@ -2334,7 +2334,7 @@ OrganicStandard::update_pools
 }
 
 void
-OrganicStandard::initialize (Metalib& metalib, 
+OrganicStandard::initialize (const Metalib& metalib, 
                              const Units& units, const Frame& al,
                              const Geometry& geo,
                              const Soil& soil, 

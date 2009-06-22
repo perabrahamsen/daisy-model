@@ -134,7 +134,7 @@ ActionFertilize::Precision::~Precision ()
 void 
 ActionFertilize::common_doIt (Daisy& daisy, double& water, Treelog& msg)
 {
-  Metalib& metalib = daisy.metalib;
+  const Metalib& metalib = daisy.metalib;
   if (precision.get ())
     {
       const double weight 

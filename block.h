@@ -55,7 +55,7 @@ class EXPORT Block : public Scope // private boost::noncopyable
   struct Implementation;
   std::auto_ptr<Implementation> impl;
 public:
-  Metalib& metalib ();
+  const Metalib& metalib ();
   const Units& units ();
   Path& path ();
   const Frame& frame () const;
@@ -110,7 +110,7 @@ private:
   Block ();
 public:
   // Freestanding
-  Block (Metalib&, Treelog& msg, const Frame&, symbol scope_tag);
+  Block (const Metalib&, Treelog& msg, const Frame&, symbol scope_tag);
   // Context
   Block (Block&, const Frame&, symbol scope_tag);
   ~Block ();

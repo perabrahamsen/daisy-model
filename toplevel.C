@@ -95,7 +95,7 @@ Toplevel::Implementation::run_program (const std::string& name_str)
       // Initialize.
       {
         Block block (metalib, msg, metalib, "Initializing");
-        program->initialize (block);
+        program->initialize (metalib, block);
         if (!block.ok ())
           throw EXIT_FAILURE;
       }
@@ -431,7 +431,7 @@ Toplevel::initialize ()
       }
       {
         Block block (metalib (), msg (), metalib (), "Initializing");
-        impl->program->initialize (block);
+        impl->program->initialize (metalib (), block);
         if (!block.ok ())
           throw EXIT_FAILURE;
       }
@@ -598,6 +598,7 @@ Toplevel::parse_system_file (const std::string& filename)
       throw EXIT_FAILURE;
     }
   ParserFile parser (metalib (), filename, msg ());
+  parser.initialize (metalib ());
   if (!parser.check ())
     {
       impl->state = is_error;

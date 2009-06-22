@@ -84,14 +84,13 @@ UIRun::manage_widget_active (QWidget* widget, Toplevel::state_t state)
 }
 
 void
-UIRun::build_log (Block& block, const std::string& name)
+UIRun::build_log (Metalib& metalib, Block& block, const std::string& name)
 {
   const symbol id (name);
   const std::map<symbol, LogQt*>::const_iterator i = logs.find (id);
   if (i != logs.end ())
     return;
 
-  Metalib& metalib = block.metalib ();
   Treelog& msg = block.msg ();
     
   const Library& library = metalib.library (Log::component);
@@ -146,7 +145,7 @@ UIRun::attach (Toplevel& toplevel)
   {
     Block block (toplevel.metalib (), toplevel.msg (),
                  toplevel.metalib (), "UI logs");
-    build_log (block, "QtTime");   
+    build_log (toplevel.metalib (), block, "QtTime");   
   }
 
   // Fetch data.

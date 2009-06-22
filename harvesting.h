@@ -72,7 +72,7 @@ public:
                                 // plant and imply a mix operation.
   // Simulation.
 public:
-  const Harvest& harvest (Metalib&, symbol column_name,
+  const Harvest& harvest (const Metalib&, symbol column_name,
                           symbol crop_name,
                           const std::vector<double>& density,
                           const Time& time,

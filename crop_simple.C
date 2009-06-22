@@ -121,7 +121,7 @@ public:
 
   // Simulation.
 public:
-  void tick (Metalib&, const Time& time, const Bioclimate&, double ForcedCAI,
+  void tick (const Metalib&, const Time& time, const Bioclimate&, double ForcedCAI,
              const Geometry& geo, const Soil&, const SoilHeat&,
              SoilWater&, Chemistry&, OrganicMatter&,
              double& residuals_DM,
@@ -138,7 +138,7 @@ public:
       day = std::max (day, T_emergence - 0.1);
 
   }
-  const Harvest& harvest (Metalib&, 
+  const Harvest& harvest (const Metalib&, 
                           symbol column_name,
 			  const Time&, const Geometry&, 
 			  double stub_length, double stem_harvest,
@@ -165,11 +165,11 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (Metalib& metalib, 
+  void initialize (const Metalib& metalib, 
                    const Units&, const Geometry& geo, 
                    double row_width, double row_pos, double seed,
                    OrganicMatter&, double SoilLimit, const Time&, Treelog&);
-  void initialize (Metalib& metalib, 
+  void initialize (const Metalib& metalib, 
                    const Units&, const Geometry& geo, 
                    OrganicMatter&, double SoilLimit, const Time&, Treelog&);
   bool check (const Units& units, Treelog&) const;
@@ -219,7 +219,7 @@ CropSimple::force_production_stress  (double pstress)
 { root_system->production_stress = pstress; }
 
 void
-CropSimple::tick (Metalib&, const Time& time, const Bioclimate& bioclimate, 
+CropSimple::tick (const Metalib&, const Time& time, const Bioclimate& bioclimate, 
                   const double ForcedCAI,
                   const Geometry& geo, const Soil& soil,
 		  const SoilHeat& soil_heat,
@@ -303,7 +303,7 @@ CropSimple::tick (Metalib&, const Time& time, const Bioclimate& bioclimate,
 }
 
 const Harvest&
-CropSimple::harvest (Metalib& metalib, 
+CropSimple::harvest (const Metalib& metalib, 
                      const symbol column_name,
 		     const Time& time,
 		     const Geometry& geo,
@@ -407,7 +407,7 @@ CropSimple::total_C () const
 }
 
 void
-CropSimple::initialize (Metalib& metalib, 
+CropSimple::initialize (const Metalib& metalib, 
                         const Units& units, const Geometry& geo, 
                         const double row_width, 
                         const double row_pos, 
@@ -423,7 +423,7 @@ CropSimple::initialize (Metalib& metalib,
 }
 
 void
-CropSimple::initialize (Metalib& metalib, 
+CropSimple::initialize (const Metalib& metalib, 
                         const Units& units, const Geometry& geo, 
                         OrganicMatter&, double /* SoilLimit */, 
                         const Time&, Treelog& msg)

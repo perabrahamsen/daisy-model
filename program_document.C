@@ -44,7 +44,7 @@
 struct ProgramDocument : public Program
 {
   // Content.
-  Metalib& metalib;
+  const Metalib& metalib;
   XRef xref;
   std::ofstream out;
   std::auto_ptr<Format> format;
@@ -76,11 +76,11 @@ struct ProgramDocument : public Program
                            bool last);
 
   // Print parts of it.
-  static void own_entries (Metalib&,
+  static void own_entries (const Metalib&,
                            const Library& library, const symbol name, 
                            std::set<symbol>& entries, 
                            bool new_only = false);
-  static void inherited_entries (Metalib&, const Library& library,
+  static void inherited_entries (const Metalib&, const Library& library,
                                  const symbol name, 
                                  std::set<symbol>& entries);
   void print_sample (const symbol name,
@@ -124,7 +124,7 @@ struct ProgramDocument : public Program
   }
 
   // Create and Destroy.
-  void initialize (Block&)
+  void initialize (Metalib&, Block&)
   { };
   bool check (Treelog&)
   { return true; }
@@ -693,7 +693,7 @@ ProgramDocument::print_sample_entry (const symbol name,
 }
 
 void
-ProgramDocument::own_entries (Metalib& metalib,
+ProgramDocument::own_entries (const Metalib& metalib,
                               const Library& library, const symbol name, 
 			      std::set<symbol>& entries,
                               const bool new_only)
@@ -725,7 +725,7 @@ ProgramDocument::own_entries (Metalib& metalib,
 }
 
 void
-ProgramDocument::inherited_entries (Metalib& metalib,
+ProgramDocument::inherited_entries (const Metalib& metalib,
                                     const Library& library, const symbol name, 
 				    std::set<symbol>& entries)
 {

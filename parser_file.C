@@ -48,7 +48,12 @@ static const symbol error_symbol ("__PARSER_FILE_ERROR_MAGIC__");
 struct ParserFile::Implementation
 {
   // Environment.
-  Metalib& metalib;
+  Metalib* mutable_metalib;
+  const Metalib& metalib ()
+  {
+    daisy_assert (mutable_metalib);
+    return *mutable_metalib;
+  }
   Treelog& msg;
 
   // Inputs.
@@ -119,7 +124,7 @@ struct ParserFile::Implementation
 
   // Create and destroy.
   void initialize ();
-  Implementation (Metalib&, symbol, Treelog&);
+  Implementation (const Metalib&, symbol, Treelog&);
   ~Implementation ();
 };
 
@@ -229,7 +234,7 @@ ParserFile::Implementation::get_integer ()
       return atoi (str.c_str ());
     }
   // Then try an integer object.
-  const Library& lib = metalib.library (Integer::component);
+  const Library& lib = metalib ().library (Integer::component);
   std::auto_ptr<FrameModel> frame = load_object (lib, true, NULL);
   if (!frame.get ())
     return -42;
@@ -237,16 +242,16 @@ ParserFile::Implementation::get_integer ()
   // Check for completness.
   TreelogString treelog;
   Treelog::Open nest (treelog, obj);
-  if (!frame->check (metalib, treelog))
+  if (!frame->check (metalib (), treelog))
     {
       error ("Bogus integer '" + obj + "'\n--- details:\n"
              + treelog.str () + "---");
       return -42;
     }
   std::auto_ptr<Integer> integer 
-    (Librarian::build_frame<Integer> (metalib, treelog, *frame, "integer"));
+    (Librarian::build_frame<Integer> (metalib (), treelog, *frame, "integer"));
   if (!integer.get ()
-      || !integer->initialize (metalib.units (), Scope::null (), treelog)
+      || !integer->initialize (metalib ().units (), Scope::null (), treelog)
       || !integer->check (Scope::null (), treelog))
     {
       error ("Bad integer '" + obj + "'\n--- details:\n"
@@ -334,7 +339,7 @@ ParserFile::Implementation::get_number (const symbol syntax_dim)
     }
   
   // Then try a number object.
-  const Library& lib = metalib.library (Number::component);
+  const Library& lib = metalib ().library (Number::component);
   std::auto_ptr<FrameModel> frame = load_object (lib, true, NULL);
   if (!frame.get ())
     return -42.42e42;
@@ -342,23 +347,24 @@ ParserFile::Implementation::get_number (const symbol syntax_dim)
   // Check for completness.
   TreelogString treelog;
   Treelog::Open nest (treelog, obj);
-  if (!frame->check (metalib, treelog))
+  if (!frame->check (metalib (), treelog))
     {
       error ("Bogus number '" + obj + "'\n--- details:\n"
              + treelog.str () + "---");
       return -42.42e42;
     }
   std::auto_ptr<Number> number 
-    (Librarian::build_frame<Number> (metalib, msg, *frame, "number"));
+    (Librarian::build_frame<Number> (metalib (), msg, *frame, "number"));
+  const Units& units = metalib ().units ();
   if (!number.get ()
-      || !number->initialize (metalib.units (), Scope::null (), treelog)
-      || !number->check (metalib.units (), Scope::null (), treelog))
+      || !number->initialize (units, Scope::null (), treelog)
+      || !number->check (units, Scope::null (), treelog))
     {
       error ("Bad number '" + obj + "'\n--- details:\n"
              + treelog.str () + "---");
       return -42.42e42;
     }
-  number->tick (metalib.units (), Scope::null (), treelog);
+  number->tick (units, Scope::null (), treelog);
   if (treelog.str ().length () > 0)
     warning ("Warning for number '" + obj + "'\n--- details:\n"
              + treelog.str () + "---");
@@ -385,8 +391,8 @@ ParserFile::Implementation::check_dimension (const symbol syntax,
 	  if (read.name ().length () == 0 || read.name ()[0] != '?')
 	    warning ("you must use [?<dim>] for entries with unknown syntax");
 	}
-      else if (!metalib.units ().can_convert (symbol (read), symbol (syntax),
-                                              msg))
+      else if (!metalib ().units ().can_convert (symbol (read), symbol (syntax),
+                                                 msg))
 	{
 	  error (std::string ("expected [") 
                  + ((syntax == Value::Fraction ()
@@ -417,8 +423,8 @@ ParserFile::Implementation::convert (double value,
 	if (read == "")
 	  return value;
 	else
-	  return metalib.units ().convert (symbol (read), symbol (""), value);
-      return metalib.units ().convert (symbol (read), symbol (syntax), value);
+	  return metalib ().units ().convert (symbol (read), symbol (""), value);
+      return metalib ().units ().convert (symbol (read), symbol (syntax), value);
     }
   catch (const std::string& message)
     { 
@@ -578,8 +584,10 @@ ParserFile::Implementation::add_derived (Library& lib)
       skip_to_end ();
       return;
     }
+  
+  daisy_assert (mutable_metalib);
   std::auto_ptr<FrameModel> frame (new FrameParsed (name, lib.model (super), 
-                                                    metalib.get_sequence (),
+                                                    mutable_metalib->get_sequence (),
                                                     lexer->position ()));
   if (!frame.get ())
     throw "Failed to derive";
@@ -603,7 +611,8 @@ ParserFile::Implementation::add_derived (Library& lib)
   lib.add_model (name, *frame.release ());
 
   // Inform metalib.
-  metalib.added_object (lib.name (), name);
+  daisy_assert (mutable_metalib);
+  mutable_metalib->added_object (lib.name (), name);
 }
 
 std::auto_ptr<FrameModel>
@@ -829,7 +838,7 @@ ParserFile::Implementation::load_list (Frame& frame)
                 else
                   {
                     const symbol type_symbol (type_name);
-                    if (metalib.exist (type_symbol))
+                    if (metalib ().exist (type_symbol))
                       {
                         if (!looking_at ('('))
                           doc = get_string ();
@@ -850,13 +859,13 @@ ParserFile::Implementation::load_list (Frame& frame)
           continue;
 	}
 
-      if (&frame == &metalib
+      if (&frame == &metalib ()
           && name.name ().substr (0, 3) == "def" 
-          && metalib.exist (name.name ().substr (3)))
+          && metalib ().exist (name.name ().substr (3)))
         {
           const symbol lib_name = name.name ().substr (3);
           // Handled specially: Put directly in global library.
-          add_derived (metalib.library (lib_name));
+          add_derived (metalib ().library (lib_name));
           continue;
         }
 
@@ -966,8 +975,8 @@ ParserFile::Implementation::load_list (Frame& frame)
 	  case Value::String:
 	    frame.set (name, get_string ());
 	    // Handle "directory" immediately.
-	    if (&frame == &metalib && name == "directory")
-	      if (!metalib.path ().set_directory (frame.name (name).name ()))
+	    if (&frame == &metalib () && name == "directory")
+	      if (!metalib ().path ().set_directory (frame.name (name).name ()))
 		error ("Could not set directory '" + frame.name (name) + "'");
 	    break;
 	  case Value::Boolean:
@@ -991,7 +1000,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 	    {
               std::auto_ptr<FrameModel> child;
               const symbol component = frame.component (name);
-	      const Library& lib = metalib.library (component);
+	      const Library& lib = metalib ().library (component);
               if (frame.check (name))
                 {
                   Treelog::Open nest (msg, "Refining model '" + name + "'");
@@ -1007,12 +1016,14 @@ ParserFile::Implementation::load_list (Frame& frame)
 	      else if (lib.name () == symbol (Parser::component))
 		{
 		  std::auto_ptr<Parser> parser 
-                    (Librarian::build_frame<Parser> (metalib, msg, *child,
+                    (Librarian::build_frame<Parser> (metalib (), msg, *child,
                                                      name));
                   if (!parser.get ())
                     error ("file error");
                   else
                     {
+                      daisy_assert (mutable_metalib);
+                      parser->initialize (*mutable_metalib);
                       if (parser->check ())
                         parser->load_nested ();
                       lexer->error_count += parser->error_count ();
@@ -1047,7 +1058,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 	    case Value::Object:
 	      {
 		const symbol component = frame.component (name);
-		const Library& lib = metalib.library (component);
+		const Library& lib = metalib ().library (component);
 		static const std::vector<const FrameModel*> no_sequence;
 		auto_vector<const FrameModel*> sequence;
 		const std::vector<const FrameModel*>& old_sequence
@@ -1334,13 +1345,13 @@ ParserFile::Implementation::load_list (Frame& frame)
 		  }
 		frame.set (name, array);
 		// Handle "path" immediately.
-		if (&frame == &metalib && name == "path")
+		if (&frame == &metalib () && name == "path")
 		  {
                     // Use block to get references.
-                    Block block (metalib, msg, frame, "path");
+                    Block block (metalib (), msg, frame, "path");
 		    const std::vector<symbol>& symbols 
 		      = block.name_sequence (name);
-		    metalib.path ().set_path (symbols);
+		    metalib ().path ().set_path (symbols);
 		  }
 		break;
 	      }
@@ -1396,7 +1407,7 @@ ParserFile::Implementation::load_list (Frame& frame)
       if (frame.check (name))
 	{
 	  Treelog::Open nest (msg, "Checking value of '" + name + "'");
-	  if (!frame.check (metalib, name, msg))
+	  if (!frame.check (metalib (), name, msg))
 	    error ("Invalid value");
 	}
     }
@@ -1409,10 +1420,10 @@ ParserFile::Implementation::initialize ()
     nest.reset (new Treelog::Open (msg, "Parsing file: '" + file + "'"));
 }
 
-ParserFile::Implementation::Implementation (Metalib& mlib,
+ParserFile::Implementation::Implementation (const Metalib& mlib,
                                             const symbol filename,
                                             Treelog& treelog)
-  : metalib (mlib),
+  : mutable_metalib (NULL),
     msg (treelog),
     inputs (std::vector<const Frame*> ()),
     file (filename),
@@ -1429,7 +1440,8 @@ ParserFile::load_nested ()
 {
   impl->initialize ();
   impl->skip ();
-  impl->load_list (impl->metalib);
+  daisy_assert (impl->mutable_metalib);
+  impl->load_list (*impl->mutable_metalib);
   impl->skip ();
   impl->eof ();
 }
@@ -1440,12 +1452,13 @@ ParserFile::load_top ()
   load_nested ();
   
   // Add inputs.
-  impl->metalib.set_parser_inputs (impl->inputs);
+  daisy_assert (impl->mutable_metalib);
+  impl->mutable_metalib->set_parser_inputs (impl->inputs);
   sequence_delete (impl->inputs.begin (), impl->inputs.end ());
   impl->inputs.erase (impl->inputs.begin (), impl->inputs.end ());
   
   // Remember filename.
-  impl->metalib.add_parser_file (impl->file);
+  impl->mutable_metalib->add_parser_file (impl->file);
 }
 
 int
@@ -1454,9 +1467,19 @@ ParserFile::error_count () const
  return impl->lexer->error_count; 
 }
 
+void 
+ParserFile::initialize (Metalib& lib)
+{ 
+  daisy_assert (!impl->mutable_metalib);
+  impl->mutable_metalib = &lib; 
+}
+
 bool
 ParserFile::check () const
-{ return impl->lexer->good (); }
+{ 
+  daisy_assert (impl->mutable_metalib);
+  return impl->lexer->good (); 
+}
 
 ParserFile::ParserFile (Metalib& metalib, 
                         const std::string& filename, Treelog& msg)

@@ -702,7 +702,7 @@ AM::check_om_pools ()
 }
 
 AM& 
-AM::create (Metalib& metalib, const FrameModel& frame, const Geometry& geo, 
+AM::create (const Metalib& metalib, const FrameModel& frame, const Geometry& geo, 
             const Time& now, Treelog& msg)
 { 
   AM& am = *Librarian::build_frame<AM> (metalib, msg, frame, "fertilizer");
@@ -713,7 +713,7 @@ AM::create (Metalib& metalib, const FrameModel& frame, const Geometry& geo,
 
 // Crop part.
 AM& 
-AM::create (Metalib& metalib, const Geometry& geo, const Time& now,
+AM::create (const Metalib& metalib, const Geometry& geo, const Time& now,
 	    const std::vector<const FrameModel*>& ol,
 	    const symbol sort, const symbol part,
 	    AM::lock_type lock, Treelog& msg)
@@ -1379,7 +1379,7 @@ struct ProgramAM_table : public Program
   }
 
   // Create and Destroy.
-  void initialize (Block&)
+  void initialize (Metalib&, Block&)
   { };
   bool check (Treelog&)
   { return true; }

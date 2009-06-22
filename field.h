@@ -65,7 +65,7 @@ public:
 
   // Actions.
 public:
-  void sow (Metalib&, const FrameModel& crop, 
+  void sow (const Metalib&, const FrameModel& crop, 
             double row_width, double row_pos, double seed,
             const Time&, double dt, Treelog&);
   void ridge (const FrameSubmodel& ridge);
@@ -79,29 +79,29 @@ public:
                          double dt, Treelog& msg);
   void irrigate_subsoil (double water, const IM&, const Volume&, 
                          double dt, Treelog& msg);
-  void fertilize (Metalib&, const FrameModel&,
+  void fertilize (const Metalib&, const FrameModel&,
                   double from, double to, 
                   const Time&, double dt, Treelog& msg); // Organic.
-  void fertilize (Metalib&, const FrameModel&, const Volume&,
+  void fertilize (const Metalib&, const FrameModel&, const Volume&,
                   const Time&, double dt, Treelog&); // Organic.
-  void fertilize (Metalib&, const FrameModel&,
+  void fertilize (const Metalib&, const FrameModel&,
                   const Time&, double dt, Treelog& msg);
   void clear_second_year_utilization ();
   void emerge (symbol crop, Treelog&);
-  void harvest (Metalib& metalib, 
+  void harvest (const Metalib& metalib, 
                 const Time&, double dt, symbol name,
 		double stub_length, 
 		double stem_harvest, double leaf_harvest, double sorg_harvest,
                 bool combine,
 		std::vector<const Harvest*>&, Treelog&);
-  void pluck (Metalib& metalib, 
+  void pluck (const Metalib& metalib, 
               const Time&, double dt, symbol name,
               double stem_harvest, double leaf_harvest, double sorg_harvest,
               std::vector<const Harvest*>&, Treelog&);
-  void mix (Metalib& metalib, 
+  void mix (const Metalib& metalib, 
             double from, double to, double penetration, 
             const Time&, double dt, Treelog&);
-  void swap (Metalib& metalib, 
+  void swap (const Metalib& metalib, 
              double from, double middle, double to, 
              const Time&, double dt, Treelog&);
   void set_porosity (double at, double Theta);
@@ -129,10 +129,10 @@ public:
   std::string crop_names () const;
   // Simulation.
   void clear ();
-  void tick_all (Metalib& metalib, 
+  void tick_all (const Metalib& metalib, 
                  const Time&, double dt, const Weather*, 
 		 const Scope&, Treelog&);
-  void tick_one (Metalib& metalib, 
+  void tick_one (const Metalib& metalib, 
                  size_t, const Time&, double dt, const Weather*,
 		 const Scope&, Treelog&);
   void output (Log&) const;

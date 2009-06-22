@@ -34,7 +34,7 @@ struct OrganicNone : public OrganicMatter
   // Simulation.
   void clear ()
   { }
-  void monthly (Metalib&, const Geometry&, Treelog&)
+  void monthly (const Metalib&, const Geometry&, Treelog&)
   { }
   const std::vector<bool>& active () const
   { return active_; }
@@ -78,18 +78,18 @@ struct OrganicNone : public OrganicMatter
   { return true; }
   void add (AM&)
   { }
-  void fertilize (Metalib&, const FrameModel&, const Geometry&,
+  void fertilize (const Metalib&, const FrameModel&, const Geometry&,
                   const Time&, double, Treelog&)
   { }
-  void fertilize (Metalib&, const FrameModel&, const Geometry&, 
+  void fertilize (const Metalib&, const FrameModel&, const Geometry&, 
                   double, double, const Time&, double, Treelog&)
   { }
-  void fertilize (Metalib&, const FrameModel&, const Geometry&, 
+  void fertilize (const Metalib&, const FrameModel&, const Geometry&, 
                   const Volume&, const Time&, double, Treelog&)
   { }
   AM* find_am (symbol, symbol) const
   { return NULL; }
-  void initialize (Metalib&, 
+  void initialize (const Metalib&, 
                    const Units&, const Frame&, const Geometry& geo,
                    const Soil&, const SoilWater&, const SoilHeat&, 
                    double, Treelog&)

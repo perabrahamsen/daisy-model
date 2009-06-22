@@ -47,7 +47,7 @@ static double DM_to_C_factor (double E)
 }
 
 const Harvest&
-Harvesting::harvest (Metalib& metalib, 
+Harvesting::harvest (const Metalib& metalib, 
                      const symbol column_name,
                      const symbol crop_name,
                      const std::vector<double>& density,

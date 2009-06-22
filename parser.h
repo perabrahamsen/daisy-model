@@ -47,6 +47,7 @@ public:
  
   // Create and Destroy.
 public:
+  virtual void initialize (Metalib&) = 0;
   virtual bool check () const = 0;
 protected:
   explicit Parser (symbol id);

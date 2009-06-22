@@ -72,7 +72,7 @@ public:
 
   // Create and Destroy.
 public:
-  XRef (Metalib& mlib);
+  XRef (const Metalib& mlib);
   ~XRef ();
 };
 

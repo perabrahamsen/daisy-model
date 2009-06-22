@@ -133,7 +133,7 @@ Librarian::build_frame (const symbol component,
 }
 
 Model* 
-Librarian::build_frame (const symbol component, Metalib& metalib,
+Librarian::build_frame (const symbol component, const Metalib& metalib,
                         Treelog& msg, const FrameModel& frame,
                         const symbol scope_id)
 {
@@ -157,7 +157,7 @@ Librarian::build_frame (const symbol component, Metalib& metalib,
 }
 
 Model* 
-Librarian::build_stock (const symbol component, Metalib& metalib,
+Librarian::build_stock (const symbol component, const Metalib& metalib,
                         Treelog& msg, const symbol type, 
                         const symbol scope_id)
 {

@@ -71,7 +71,7 @@ public:
 
   // Actions.
 public:
-  virtual void sow (Metalib&, const FrameModel& crop, 
+  virtual void sow (const Metalib&, const FrameModel& crop, 
                     double row_width, double row_width, double seed,
                     const Time&, double dt, Treelog&) = 0;
   virtual void ridge (const FrameSubmodel& ridge) = 0;
@@ -89,32 +89,32 @@ public:
   virtual void irrigate_subsoil (double flux, const IM&, const Volume&,
                                  double dt, 
 				 Treelog& msg) = 0;
-  virtual void fertilize (Metalib&, const FrameModel&,
+  virtual void fertilize (const Metalib&, const FrameModel&,
                           double from, double to, 
                           const Time&, double dt, Treelog& msg) = 0;
-  virtual void fertilize (Metalib&, const FrameModel&, const Volume&, 
+  virtual void fertilize (const Metalib&, const FrameModel&, const Volume&, 
                           const Time&, double dt, Treelog& msg) = 0;
-  virtual void fertilize (Metalib&, const FrameModel&, 
+  virtual void fertilize (const Metalib&, const FrameModel&, 
                           const Time&, double dt, Treelog& msg) = 0;
   virtual void clear_second_year_utilization () = 0;
   virtual void emerge (symbol crop, Treelog&) = 0;
-  virtual void harvest (Metalib&, const Time&, double dt, symbol name,
+  virtual void harvest (const Metalib&, const Time&, double dt, symbol name,
 			double stub_length, 
 			double stem_harvest, 
 			double leaf_harvest, 
 			double sorg_harvest, 
                         const bool combine,
 			std::vector<const Harvest*>& harvest, Treelog&) = 0;
-  virtual void pluck (Metalib&, 
+  virtual void pluck (const Metalib&, 
                       const Time& time, double dt, const symbol crop_name,
                       const double stem_harvest,
                       const double leaf_harvest,
                       const double sorg_harvest,
                       std::vector<const Harvest*>& harvest, 
                       Treelog& msg) = 0;
-  virtual void mix (Metalib&, double from, double to, double penetration, 
+  virtual void mix (const Metalib&, double from, double to, double penetration, 
                     const Time&, double dt, Treelog&) = 0;
-  virtual void swap (Metalib&, double from, double middle, double to, 
+  virtual void swap (const Metalib&, double from, double middle, double to, 
                      const Time&,  double dt, Treelog&) = 0;
   virtual void set_porosity (double at, double Theta) = 0;
   virtual void set_heat_source (double at, double value) = 0; // [W/m^2]
@@ -147,7 +147,7 @@ public:
 
   // Simulation.
   virtual void clear () = 0;
-  virtual void tick (Metalib& metalib, 
+  virtual void tick (const Metalib& metalib, 
                      const Time&, double dt, const Weather*, 
 		     const Scope&, Treelog&) = 0;
 

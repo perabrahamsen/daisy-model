@@ -56,7 +56,7 @@ public:
   // Create and Destroy.
 public:
   void initialize (const Geometry&, const Soil&);
-  AM* create_am (Metalib&, const Geometry&, Treelog&);
+  AM* create_am (const Metalib&, const Geometry&, Treelog&);
   void set_am (AM*);
   static void load_syntax (Frame&);
   Bioincorporation (const FrameSubmodel&);

@@ -44,7 +44,7 @@ struct Field::Implementation
   void unrestrict ();
 
   // Actions.
-  void sow (Metalib&, const FrameModel& crop, 
+  void sow (const Metalib&, const FrameModel& crop, 
             double row_width, double row_pos, double seed,
             const Time& time, double dt, Treelog&);
   void ridge (const FrameSubmodel& ridge);
@@ -58,15 +58,15 @@ struct Field::Implementation
                          double dt, Treelog& msg);
   void irrigate_subsoil (double flux, const IM&, const Volume&,
                          double dt, Treelog& msg);
-  void fertilize (Metalib&, const FrameModel&, const Volume&, 
+  void fertilize (const Metalib&, const FrameModel&, const Volume&, 
                   const Time&, double dt, Treelog& msg);
-  void fertilize (Metalib&, const FrameModel&, double from, double to, 
+  void fertilize (const Metalib&, const FrameModel&, double from, double to, 
                   const Time&, double dt, Treelog& msg);
-  void fertilize (Metalib&, const FrameModel&, 
+  void fertilize (const Metalib&, const FrameModel&, 
                   const Time&, double dt, Treelog& msg);
   void clear_second_year_utilization ();
   void emerge (symbol crop, Treelog&);
-  void harvest (Metalib& metalib, 
+  void harvest (const Metalib& metalib, 
                 const Time&, double dt, symbol name,
 		double stub_length, 
 		double stem_harvest, 
@@ -74,16 +74,16 @@ struct Field::Implementation
 		double sorg_harvest,
                 const bool combine,
 		std::vector<const Harvest*>&, Treelog&);
-  void pluck (Metalib& metalib, 
+  void pluck (const Metalib& metalib, 
               const Time&, double dt, symbol name,
               double stem_harvest, 
               double leaf_harvest, 
               double sorg_harvest,
               std::vector<const Harvest*>&, Treelog&);
-  void mix (Metalib& metalib, 
+  void mix (const Metalib& metalib, 
             double from, double to, double penetration, 
             const Time&, double dt, Treelog&);
-  void swap (Metalib& metalib, 
+  void swap (const Metalib& metalib, 
              double from, double middle, double to, 
              const Time&, double dt, Treelog&);
   void set_porosity (double at, double Theta);
@@ -112,10 +112,10 @@ public:
   std::string crop_names () const;
   // Simulation.
   void clear ();
-  void tick_all (Metalib& metalib, 
+  void tick_all (const Metalib& metalib, 
                  const Time&, double dt, const Weather*,
 		 const Scope&, Treelog&);
-  void tick_one (Metalib& metalib, 
+  void tick_one (const Metalib& metalib, 
                  size_t, const Time&, double dt, const Weather*, 
 		 const Scope&, Treelog&);
   void output (Log&) const;
@@ -156,7 +156,7 @@ Field::Implementation::unrestrict ()
 }
 
 void 
-Field::Implementation::sow (Metalib& metalib, const FrameModel& crop, 
+Field::Implementation::sow (const Metalib& metalib, const FrameModel& crop, 
                             const double row_width, const double row_pos,
                             const double seed,
                             const Time& time, const double dt, Treelog& msg)
@@ -269,7 +269,7 @@ Field::Implementation::irrigate_subsoil (const double flux, const IM& im,
 }
 
 void 
-Field::Implementation::fertilize (Metalib& metalib, const FrameModel& al, 
+Field::Implementation::fertilize (const Metalib& metalib, const FrameModel& al, 
 				  const double from, const double to,
                                   const Time& now, const double dt, 
                                   Treelog& msg)
@@ -283,7 +283,7 @@ Field::Implementation::fertilize (Metalib& metalib, const FrameModel& al,
 }
 
 void 
-Field::Implementation::fertilize (Metalib& metalib, const FrameModel& al, 
+Field::Implementation::fertilize (const Metalib& metalib, const FrameModel& al, 
                                   const Volume& volume,
                                   const Time& now, const double dt,
                                   Treelog& msg)
@@ -297,7 +297,7 @@ Field::Implementation::fertilize (Metalib& metalib, const FrameModel& al,
 }
 
 void 
-Field::Implementation::fertilize (Metalib& metalib, const FrameModel& al, 
+Field::Implementation::fertilize (const Metalib& metalib, const FrameModel& al, 
                                   const Time& now, const double dt, 
                                   Treelog& msg)
 {
@@ -348,7 +348,7 @@ Field::Implementation::emerge (symbol name, Treelog& out)
 }
 
 void
-Field::Implementation::harvest (Metalib& metalib, 
+Field::Implementation::harvest (const Metalib& metalib, 
                                 const Time& time, const double dt,
                                 const symbol name,
 				const double stub_length, 
@@ -383,7 +383,7 @@ Field::Implementation::harvest (Metalib& metalib,
 }
 
 void
-Field::Implementation::pluck (Metalib& metalib, 
+Field::Implementation::pluck (const Metalib& metalib, 
                               const Time& time, const double dt,
                               const symbol name,
                               const double stem_harvest, 
@@ -414,7 +414,7 @@ Field::Implementation::pluck (Metalib& metalib,
 }
 
 void 
-Field::Implementation::mix (Metalib& metalib, 
+Field::Implementation::mix (const Metalib& metalib, 
                             const double from, const double to,
                             double penetration, const Time& time,
 			    const double dt, Treelog& msg)
@@ -434,7 +434,7 @@ Field::Implementation::mix (Metalib& metalib,
 }
 
 void 
-Field::Implementation::swap (Metalib& metalib, 
+Field::Implementation::swap (const Metalib& metalib, 
                              const double from, const double middle, 
                              const double to, 
                              const Time& time, const double dt, Treelog& msg)
@@ -658,7 +658,7 @@ Field::Implementation::clear ()
 }
 
 void 
-Field::Implementation::tick_all (Metalib& metalib, 
+Field::Implementation::tick_all (const Metalib& metalib, 
                                  const Time& time, const double dt, 
                                  const Weather* weather, const Scope& scope,
 				 Treelog& msg)
@@ -670,7 +670,7 @@ Field::Implementation::tick_all (Metalib& metalib,
 }
 
 void 
-Field::Implementation::tick_one (Metalib& metalib, 
+Field::Implementation::tick_one (const Metalib& metalib, 
                                  const size_t col,
                                  const Time& time, const double dt, 
                                  const Weather* weather, 
@@ -826,7 +826,7 @@ Field::Restrict::~Restrict ()
 { field.impl->unrestrict (); }
 
 void 
-Field::sow (Metalib& metalib, const FrameModel& crop,
+Field::sow (const Metalib& metalib, const FrameModel& crop,
             const double row_width, const double row_pos, const double seed,
             const Time& time, const double dt, Treelog& msg)
 { impl->sow (metalib, crop, row_width, row_pos, seed, time, dt, msg); }
@@ -864,19 +864,19 @@ Field::irrigate_subsoil (double water, const IM& im,
 { impl->irrigate_subsoil (water, im, volume, dt, msg); }
 
 void 
-Field::fertilize (Metalib& metalib, const FrameModel& al, 
+Field::fertilize (const Metalib& metalib, const FrameModel& al, 
                   const double from, const double to, 
                   const Time& now, const double dt, Treelog& msg)
 { impl->fertilize (metalib, al, from, to, now, dt, msg); }
 
 void 
-Field::fertilize (Metalib& metalib, const FrameModel& al, 
+Field::fertilize (const Metalib& metalib, const FrameModel& al, 
                   const Volume& volume, 
                   const Time& now, const double dt, Treelog& msg)
 { impl->fertilize (metalib, al, volume, now, dt, msg); }
 
 void 
-Field::fertilize (Metalib& metalib, const FrameModel& al, 
+Field::fertilize (const Metalib& metalib, const FrameModel& al, 
                   const Time& now, const double dt, Treelog& msg)
 { impl->fertilize (metalib, al, now, dt, msg); }
 
@@ -889,7 +889,7 @@ Field::emerge (symbol name, Treelog& msg)
 { impl->emerge (name, msg); }
 
 void
-Field::harvest (Metalib& metalib, 
+Field::harvest (const Metalib& metalib, 
                 const Time& time, const double dt, const symbol name,
 		const double stub_length, 
 		const double stem_harvest, 
@@ -903,7 +903,7 @@ Field::harvest (Metalib& metalib,
                 total, msg); }
 
 void
-Field::pluck (Metalib& metalib, 
+Field::pluck (const Metalib& metalib, 
               const Time& time, const double dt, const symbol name,
               const double stem_harvest, 
               const double leaf_harvest, 
@@ -914,14 +914,14 @@ Field::pluck (Metalib& metalib,
                total, msg); }
 
 void 
-Field::mix (Metalib& metalib, 
+Field::mix (const Metalib& metalib, 
             const double from, const double to, 
             const double penetration, 
             const Time& time, const double dt, Treelog& msg)
 { impl->mix (metalib, from, to, penetration, time, dt, msg); }
 
 void 
-Field::swap (Metalib& metalib, 
+Field::swap (const Metalib& metalib, 
              const double from, const double middle, const double to, 
              const Time& time, const double dt, Treelog& msg)
 { impl->swap (metalib, from, middle, to, time, dt, msg); }
@@ -997,13 +997,13 @@ Field::clear ()
 { impl->clear (); }
 
 void
-Field::tick_all (Metalib& metalib, 
+Field::tick_all (const Metalib& metalib, 
                  const Time& time, const double dt, const Weather* weather, 
                  const Scope& scope, Treelog& msg)
 { impl->tick_all (metalib, time, dt, weather, scope, msg); }
 
 void
-Field::tick_one (Metalib& metalib, 
+Field::tick_one (const Metalib& metalib, 
                  const size_t col,
                  const Time& time, const double dt, const Weather* weather, 
                  const Scope& scope, Treelog& msg)

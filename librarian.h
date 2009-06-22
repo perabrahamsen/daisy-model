@@ -77,10 +77,10 @@ private:
                              Block&, const FrameModel&, 
                              symbol scope_id, size_t index);
   static Model* build_frame (symbol component,
-                             Metalib&, Treelog&, const FrameModel&, 
+                             const Metalib&, Treelog&, const FrameModel&, 
                              symbol scope_id);
   static Model* build_stock (symbol component,
-                             Metalib&, Treelog&, symbol name, symbol scope_id);
+                             const Metalib&, Treelog&, symbol name, symbol scope_id);
   static Model* build_item (symbol component,
                             Block& parent, symbol key);
   static std::vector<Model*> build_vector (symbol component,
@@ -111,13 +111,13 @@ public:
   }
 
   template <class T> static T* 
-  build_frame (Metalib& metalib, Treelog& msg, const FrameModel& frame,
+  build_frame (const Metalib& metalib, Treelog& msg, const FrameModel& frame,
                symbol scope_id)
   { return dynamic_cast<T*> (Librarian::build_frame (T::component, metalib, msg,
                                                      frame, scope_id)); }
 
   template <class T> static T* 
-  build_stock (Metalib& metalib, Treelog& msg, symbol name, symbol scope_id)
+  build_stock (const Metalib& metalib, Treelog& msg, symbol name, symbol scope_id)
   { return dynamic_cast<T*> (Librarian::build_stock (T::component, metalib, msg,
                                                      name, scope_id)); }
 
@@ -163,7 +163,7 @@ public:
 private:
   static Library& library (symbol component);
 public:
-  typedef void (*doc_fun) (Format&, Metalib&, Treelog&, symbol name);
+  typedef void (*doc_fun) (Format&, const Metalib&, Treelog&, symbol name);
   static void add_doc_fun (symbol component, doc_fun);
 
   // Declarations.

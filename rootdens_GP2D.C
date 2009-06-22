@@ -390,7 +390,7 @@ Rootdens_GP2D::Rootdens_GP2D (Block& al)
 { }
 
 std::auto_ptr<Rootdens> 
-Rootdens::create_row (Metalib& metalib, Treelog& msg,
+Rootdens::create_row (const Metalib& metalib, Treelog& msg,
                       const double row_width, const double row_position,
                       const bool debug)
 {

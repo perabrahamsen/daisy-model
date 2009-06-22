@@ -93,7 +93,7 @@ public:
   const Horizon& horizon_at (double z, double x, double y) const;
 
   // Actions.
-  void sow (Metalib&, const FrameModel&, 
+  void sow (const Metalib&, const FrameModel&, 
             double row_width, double row_pos, double seed,
             const Time&, double dt, Treelog&);
   void ridge (const FrameSubmodel& al);
@@ -108,19 +108,19 @@ public:
   void irrigate_subsoil (double flux, const IM& sm, 
                          const Volume& volume, double dt, Treelog& msg);
   void fertilize (const IM&, double dt, Treelog& msg);
-  void fertilize (Metalib&, const FrameModel&,
+  void fertilize (const Metalib&, const FrameModel&,
                   const Time&, double dt, Treelog& msg);
-  void fertilize (Metalib&, const FrameModel&, double from, double to, 
+  void fertilize (const Metalib&, const FrameModel&, double from, double to, 
                   const Time&, double dt, Treelog& msg);
-  void fertilize (Metalib&, const FrameModel&, const Volume&, 
+  void fertilize (const Metalib&, const FrameModel&, const Volume&, 
                   const Time&, double dt, Treelog& msg);
   void clear_second_year_utilization ();
   void emerge (const symbol crop_name, Treelog& msg);
-  void harvest (Metalib&, const Time& time, double dt, const symbol crop_name,
+  void harvest (const Metalib&, const Time& time, double dt, const symbol crop_name,
                 double stub_length, double stem_harvest,
                 double leaf_harvest, double sorg_harvest, const bool combine,
                 std::vector<const Harvest*>& harvest, Treelog& msg);
-  void pluck (Metalib&, const Time& time, double dt, const symbol crop_name,
+  void pluck (const Metalib&, const Time& time, double dt, const symbol crop_name,
               const double stem_harvest,
               const double leaf_harvest,
               const double sorg_harvest,
@@ -128,9 +128,9 @@ public:
               Treelog& msg);
 
   void add_residuals (std::vector<AM*>& residuals);
-  void mix (Metalib&, double from, double to, double penetration, 
+  void mix (const Metalib&, double from, double to, double penetration, 
             const Time&, double dt, Treelog&);
-  void swap (Metalib&, double from, double middle, double to, 
+  void swap (const Metalib&, double from, double middle, double to, 
              const Time&, double dt, Treelog&);
   void set_porosity (double at, double Theta);
   void set_heat_source (double at, double value); // [W/m^2]
@@ -154,7 +154,7 @@ public:
 
   // Simulation.
   void clear ();
-  void tick (Metalib& metalib, const Time&, const double dt, const Weather*,
+  void tick (const Metalib& metalib, const Time&, const double dt, const Weather*,
              const Scope&, Treelog&);
   bool check (bool require_weather,
               const Time& from, const Time& to, 
@@ -186,7 +186,7 @@ ColumnStandard::horizon_at (const double z,
 { return soil->horizon (geometry.cell_at (z, x, y)); }
 
 void 
-ColumnStandard::sow (Metalib& metalib, const FrameModel& al, 
+ColumnStandard::sow (const Metalib& metalib, const FrameModel& al, 
                      const double row_width, const double row_pos,
                      const double seed,
                      const Time& time, const double dt, Treelog& msg)
@@ -290,7 +290,7 @@ ColumnStandard::fertilize (const IM& im, const double dt, Treelog& msg)
 { chemistry->spray (im, dt, msg); }
 
 void
-ColumnStandard::fertilize (Metalib& metalib, const FrameModel& al, 
+ColumnStandard::fertilize (const Metalib& metalib, const FrameModel& al, 
                            const Time& now, const double dt, Treelog& msg)
 {
   // Utilization log.
@@ -311,7 +311,7 @@ ColumnStandard::fertilize (Metalib& metalib, const FrameModel& al,
 }
 
 void 
-ColumnStandard::fertilize (Metalib& metalib, const FrameModel& al, 
+ColumnStandard::fertilize (const Metalib& metalib, const FrameModel& al, 
                            const double from, const double to, 
                            const Time& now, const double dt, Treelog& msg)
 {
@@ -336,7 +336,7 @@ ColumnStandard::fertilize (Metalib& metalib, const FrameModel& al,
 }
 
 void 
-ColumnStandard::fertilize (Metalib& metalib, const FrameModel& al, 
+ColumnStandard::fertilize (const Metalib& metalib, const FrameModel& al, 
                            const Volume& volume,
                            const Time& now, const double dt, Treelog& msg)
 {
@@ -367,7 +367,7 @@ ColumnStandard::emerge (const symbol crop_name, Treelog& msg)
 { vegetation->emerge (crop_name, msg); }
 
 void
-ColumnStandard::harvest (Metalib& metalib, const Time& time, const double dt,
+ColumnStandard::harvest (const Metalib& metalib, const Time& time, const double dt,
                          const symbol crop_name,
                          const double stub_length,
                          const double stem_harvest,
@@ -403,7 +403,7 @@ ColumnStandard::harvest (Metalib& metalib, const Time& time, const double dt,
 }
 
 void 
-ColumnStandard::pluck (Metalib& metalib, 
+ColumnStandard::pluck (const Metalib& metalib, 
                        const Time& time, double dt, const symbol crop_name,
                        const double stem_harvest,
                        const double leaf_harvest,
@@ -442,7 +442,7 @@ ColumnStandard::add_residuals (std::vector<AM*>& residuals)
 }
 
 void 
-ColumnStandard::mix (Metalib& metalib, const double from, const double to,
+ColumnStandard::mix (const Metalib& metalib, const double from, const double to,
                      const double penetration, 
                      const Time& time, const double dt,
                      Treelog& msg)
@@ -464,7 +464,7 @@ ColumnStandard::mix (Metalib& metalib, const double from, const double to,
 }
 
 void 
-ColumnStandard::swap (Metalib& metalib, 
+ColumnStandard::swap (const Metalib& metalib, 
                       const double from, const double middle, const double to,
                       const Time& time, const double dt, Treelog& msg)
 {
@@ -608,7 +608,7 @@ ColumnStandard::clear ()
 }
 
 void
-ColumnStandard::tick (Metalib& metalib, const Time& time, const double dt,
+ColumnStandard::tick (const Metalib& metalib, const Time& time, const double dt,
                       const Weather* global_weather, const Scope& parent_scope,
                       Treelog& msg)
 {

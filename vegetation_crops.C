@@ -152,7 +152,7 @@ struct VegetationCrops : public Vegetation
 			double dt, Treelog&);
   void find_stomata_conductance (const Units&, const Time& time, 
                                  const Bioclimate&, double dt, Treelog&);
-  void tick (Metalib&, const Time& time, const Bioclimate&, 
+  void tick (const Metalib&, const Time& time, const Bioclimate&, 
              const Geometry& geo, const Soil&, const SoilHeat&,
              SoilWater&, Chemistry&, OrganicMatter&,
              double& residuals_DM,
@@ -162,7 +162,7 @@ struct VegetationCrops : public Vegetation
              double dt,
              Treelog&);
   void force_production_stress  (double pstress);
-  void kill_all (Metalib&, symbol, const Time&, const Geometry&,
+  void kill_all (const Metalib&, symbol, const Time&, const Geometry&,
                  std::vector<AM*>& residuals, 			 
 		 double& residuals_DM,
 		 double& residuals_N_top, double& residuals_C_top,
@@ -170,7 +170,7 @@ struct VegetationCrops : public Vegetation
 		 std::vector<double>& residuals_C_soil,
 		 Treelog&);
   void emerge (symbol crop_name, Treelog&);
-  void harvest (Metalib&, symbol column_name, symbol crop_name,
+  void harvest (const Metalib&, symbol column_name, symbol crop_name,
 		const Time&, const Geometry&,
 		double stub_length,
 		double stem_harvest, double leaf_harvest, double sorg_harvest,
@@ -183,7 +183,7 @@ struct VegetationCrops : public Vegetation
 		std::vector<double>& residuals_C_soil,
                 const bool combine,
 		Treelog&);
-  void pluck (Metalib&, symbol column_name,
+  void pluck (const Metalib&, symbol column_name,
               symbol crop_name,
               const Time&, const Geometry&, 
               double stem_harvest,
@@ -200,7 +200,7 @@ struct VegetationCrops : public Vegetation
               std::vector<double>& residuals_C_soil,
               Treelog&);
   void cleanup_canopy (symbol crop_name, Treelog&);
-  void sow (Metalib&, const FrameModel& al, 
+  void sow (const Metalib&, const FrameModel& al, 
             const double row_width /* [cm] */,
             const double row_pos /* [cm] */,
             const double seed /* [kg w.w./ha] */,
@@ -218,7 +218,7 @@ struct VegetationCrops : public Vegetation
   { return -1.0; }
 
   // Create and destroy.
-  void initialize (Metalib& metalib, 
+  void initialize (const Metalib& metalib, 
                    const Units&, const Time&, const Geometry& geo,
                    const Soil& soil, OrganicMatter&,
                    Treelog& msg);
@@ -415,7 +415,7 @@ VegetationCrops::find_stomata_conductance (const Units& units,
 }
 
 void 
-VegetationCrops::tick (Metalib& metalib, 
+VegetationCrops::tick (const Metalib& metalib, 
                        const Time& time, const Bioclimate& bioclimate, 
                        const Geometry& geo, const Soil& soil,
 		       const SoilHeat& soil_heat,
@@ -625,7 +625,7 @@ VegetationCrops::force_production_stress (double pstress)
 }
 
 void
-VegetationCrops::kill_all (Metalib& metalib, 
+VegetationCrops::kill_all (const Metalib& metalib, 
                            symbol name, const Time& time, 
 			   const Geometry& geo, 
 			   std::vector<AM*>& residuals,
@@ -664,7 +664,7 @@ VegetationCrops::emerge (const symbol crop_name, Treelog&)
 
 
 void
-VegetationCrops::harvest (Metalib& metalib,
+VegetationCrops::harvest (const Metalib& metalib,
                           const symbol column_name,
 			  const symbol crop_name,
 			  const Time& time, 
@@ -740,7 +740,7 @@ VegetationCrops::harvest (Metalib& metalib,
 }
 
 void 
-VegetationCrops::pluck (Metalib& metalib, symbol column_name,
+VegetationCrops::pluck (const Metalib& metalib, symbol column_name,
                         symbol crop_name,
                         const Time& time, const Geometry& geo, 
                         double stem_harvest,
@@ -836,7 +836,7 @@ VegetationCrops::cleanup_canopy (const symbol crop_name, Treelog& msg)
 }
 
 void
-VegetationCrops::sow (Metalib& metalib, const FrameModel& al,
+VegetationCrops::sow (const Metalib& metalib, const FrameModel& al,
                       const double row_width,
                       const double row_pos,
                       const double seed,
@@ -883,7 +883,7 @@ VegetationCrops::output (Log& log) const
 }
 
 void
-VegetationCrops::initialize (Metalib& metalib, 
+VegetationCrops::initialize (const Metalib& metalib, 
                              const Units& units, 
                              const Time& time, const Geometry& geo,
                              const Soil& soil, 

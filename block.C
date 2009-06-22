@@ -35,7 +35,7 @@
 
 struct Block::Implementation
 {
-  Metalib& metalib;
+  const Metalib& metalib;
   Block *const context;
   const Frame& frame;
   mutable Treelog& msg;
@@ -51,7 +51,7 @@ struct Block::Implementation
   void error (const std::string& msg);
   void set_error ();
 
-  Implementation (Metalib& lib, Block *const p, Treelog& m,
+  Implementation (const Metalib& lib, Block *const p, Treelog& m,
                   const Frame& f,
 		  const symbol scope_id)
     : metalib (lib),
@@ -306,7 +306,7 @@ Block::Implementation::set_error ()
     context->set_error (); 
 }
 
-Metalib& 
+const Metalib& 
 Block::metalib ()
 { return impl->metalib; }
 
@@ -556,7 +556,7 @@ Block::sequence_id (const symbol key, size_t index)
   return tmp.str ();
 }
 
-Block::Block (Metalib& metalib, Treelog& msg, 
+Block::Block (const Metalib& metalib, Treelog& msg, 
               const Frame& frame,
  	      const symbol scope_id)
   : impl (new Implementation (metalib, NULL, msg, 

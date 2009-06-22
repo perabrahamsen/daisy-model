@@ -36,7 +36,7 @@
 
 struct ProgramGP2D : public Program
 {
-  Metalib& metalib;
+  const Metalib& metalib;
   std::auto_ptr<GeometryRect> geo;
   const double row_width;
   const double row_position;
@@ -99,7 +99,7 @@ struct ProgramGP2D : public Program
   }
 
   // Create and Destroy.
-  void initialize (Block& al)
+  void initialize (Metalib&, Block& al)
   { 
     const bool volatile_bottom = false;
     const std::vector<double> fixed;

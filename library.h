@@ -53,7 +53,7 @@ class EXPORT Library
 {
   // Types.
 public:
-  typedef void (*doc_fun) (Format&, Metalib&, Treelog&, symbol name);
+  typedef void (*doc_fun) (Format&, const Metalib&, Treelog&, symbol name);
   typedef Model& (*builder) (Block&);
 
   // Content.
@@ -72,7 +72,7 @@ public:
   symbol description () const;
   const FrameModel& model (symbol) const;
   bool check (symbol) const;
-  bool complete (Metalib&, symbol) const;
+  bool complete (const Metalib&, symbol) const;
   void add_model (symbol, FrameModel&);
   void entries (std::vector<symbol>&) const;
   const std::set<symbol>& ancestors (symbol) const;

@@ -59,7 +59,7 @@ class UIRun : public QWidget, public UIQt
   bool has_loaded_log_file;
   auto_vector<Log*> all_logs;
   std::map<symbol, LogQt*> logs;
-  void build_log (Block& block, const std::string& log);
+  void build_log (Metalib&, Block& block, const std::string& log);
   bool attach_log (const std::string& log, VisQtLog* object) const;
 
   // The simulation thread.

@@ -46,6 +46,7 @@ public:
 
   // Create and Destroy.
 public:
+  void initialize (Metalib&);
   bool check () const;
   ParserFile (Block&);
   ParserFile (Metalib&, const std::string& filename, Treelog&);

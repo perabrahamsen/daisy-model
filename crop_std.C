@@ -129,7 +129,7 @@ struct CropStandard : public Crop
   // Simulation.
   void find_stomata_conductance (const Units&, const Time& time, 
                                  const Bioclimate&, double dt, Treelog&);
-  void tick (Metalib&, const Time& time, const Bioclimate&, double ForcedCAI,
+  void tick (const Metalib&, const Time& time, const Bioclimate&, double ForcedCAI,
              const Geometry& geo, const Soil&, const SoilHeat&,
              SoilWater&, Chemistry&, OrganicMatter&,
              double& residuals_DM,
@@ -139,7 +139,7 @@ struct CropStandard : public Crop
              double dt, Treelog&);
   void emerge ()
   { development->DS = -1e-10; }
-  const Harvest& harvest (Metalib& metalib, 
+  const Harvest& harvest (const Metalib& metalib, 
                           symbol column_name,
 			  const Time&, const Geometry&,
 			  double stub_length, double stem_harvest,
@@ -152,7 +152,7 @@ struct CropStandard : public Crop
 			  std::vector<double>& residuals_C_soil,
                           const bool combine,
 			  Treelog&);
-  const Harvest& pluck (Metalib& metalib, 
+  const Harvest& pluck (const Metalib& metalib, 
                         const symbol column_name,
                         const Time& time,
                         const Geometry& geometry,
@@ -184,14 +184,14 @@ struct CropStandard : public Crop
   { return root_system->Density; }
 
   // Create and Destroy.
-  void initialize (Metalib& metalib, 
+  void initialize (const Metalib& metalib, 
                    const Units&, const Geometry& geometry, 
                    double row_width, double row_pos, double seed,
                    OrganicMatter&, double SoilLimit, const Time&, Treelog&);
-  void initialize (Metalib& metalib, 
+  void initialize (const Metalib& metalib, 
                    const Units&, const Geometry&, OrganicMatter&, 
                    double SoilLimit, const Time&, Treelog&);
-  void initialize_shared (Metalib& metalib, 
+  void initialize_shared (const Metalib& metalib, 
                           const Geometry&, OrganicMatter&, 
                           double SoilLimit, const Time&, Treelog&);
   bool check (const Units&, Treelog&) const;
@@ -229,7 +229,7 @@ CropStandard::SOrg_DM () const
 { return production.WSOrg * 10.0 /* [g/m^2 -> kg/ha] */;}
 
 void
-CropStandard::initialize (Metalib& metalib, 
+CropStandard::initialize (const Metalib& metalib, 
                           const Units& units, const Geometry& geo, 
                           const double row_width, const double row_pos, 
                           const double seed_w,
@@ -244,7 +244,7 @@ CropStandard::initialize (Metalib& metalib,
 }
 
 void
-CropStandard::initialize (Metalib& metalib,
+CropStandard::initialize (const Metalib& metalib,
                           const Units& units, const Geometry& geo, 
                           OrganicMatter& organic_matter,
                           const double SoilLimit,
@@ -257,7 +257,7 @@ CropStandard::initialize (Metalib& metalib,
 }
 
 void
-CropStandard::initialize_shared (Metalib& metalib, const Geometry& geo, 
+CropStandard::initialize_shared (const Metalib& metalib, const Geometry& geo, 
                                  OrganicMatter& organic_matter,
                                  const double SoilLimit,
                                  const Time& now, Treelog& msg)
@@ -437,7 +437,7 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
 }
 
 void
-CropStandard::tick (Metalib& metalib, 
+CropStandard::tick (const Metalib& metalib, 
                     const Time& time, const Bioclimate& bioclimate, 
                     const double ForcedCAI,
                     const Geometry& geo, const Soil& soil, 
@@ -589,7 +589,7 @@ CropStandard::tick (Metalib& metalib,
 }
 
 const Harvest&
-CropStandard::harvest (Metalib& metalib, 
+CropStandard::harvest (const Metalib& metalib, 
                        const symbol column_name,
 		       const Time& time,
 		       const Geometry& geometry,
@@ -683,7 +683,7 @@ CropStandard::harvest (Metalib& metalib,
 }
 
 const Harvest&
-CropStandard::pluck (Metalib& metalib, 
+CropStandard::pluck (const Metalib& metalib, 
                      const symbol column_name,
                      const Time& time,
                      const Geometry& geometry,

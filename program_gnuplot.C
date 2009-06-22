@@ -47,7 +47,7 @@ struct ProgramGnuplot : public Program
   bool run (Treelog& msg);
   
   // Create and Destroy.
-  void initialize (Block&)
+  void initialize (Metalib&, Block&)
   { }
   bool check (Treelog&)
   { return true; }

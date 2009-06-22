@@ -168,7 +168,7 @@ public:
   // Create and Destroy.
 public:
   void initialize (const double SeedN);
-  void initialize (Metalib&, symbol name,
+  void initialize (const Metalib&, symbol name,
 		   const std::vector<const FrameModel*>& root,
 		   const std::vector<const FrameModel*>& dead,
 		   const Geometry&, OrganicMatter&, Treelog&);

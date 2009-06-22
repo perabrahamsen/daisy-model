@@ -54,11 +54,11 @@ public:
 
   // Create and Destroy.
 public:
-  static std::auto_ptr<Rootdens> create_row (Metalib&, Treelog&,
+  static std::auto_ptr<Rootdens> create_row (const Metalib&, Treelog&,
                                              double row_width, 
                                              double row_position,
                                              bool debug = false);
-  static std::auto_ptr<Rootdens> create_uniform (Metalib&, Treelog&);
+  static std::auto_ptr<Rootdens> create_uniform (const Metalib&, Treelog&);
 public:
   virtual void initialize (const Geometry& geo, 
                            double row_width, double row_position, 

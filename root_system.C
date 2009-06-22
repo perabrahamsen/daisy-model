@@ -465,7 +465,7 @@ RootSystem::output (Log& log) const
 }
 
 void
-RootSystem::initialize (Metalib& metalib, 
+RootSystem::initialize (const Metalib& metalib, 
                         const Geometry& geo, const double row_width, 
                         const double row_pos, Treelog& msg)
 {

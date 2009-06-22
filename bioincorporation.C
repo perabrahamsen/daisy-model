@@ -87,7 +87,7 @@ struct Bioincorporation::Implementation
 
   // Create and destroy.
   void initialize (const Geometry&, const Soil&);
-  AM* create_am (Metalib&, const Geometry& geo, Treelog&);
+  AM* create_am (const Metalib&, const Geometry& geo, Treelog&);
   void set_am (AM*);
   Implementation (const FrameSubmodel& al);
 };
@@ -252,7 +252,7 @@ Bioincorporation::Implementation::initialize (const Geometry& geo,
 }
 
 AM*
-Bioincorporation::Implementation::create_am (Metalib& metalib, 
+Bioincorporation::Implementation::create_am (const Metalib& metalib, 
                                              const Geometry& geo,
                                              Treelog& msg)
 { 
@@ -304,7 +304,7 @@ Bioincorporation::initialize (const Geometry& geo,
 { impl->initialize (geo, soil); }
 
 AM*
-Bioincorporation::create_am (Metalib& metalib, const Geometry& geo,
+Bioincorporation::create_am (const Metalib& metalib, const Geometry& geo,
                              Treelog& msg)
 { return impl->create_am (metalib, geo, msg); }
 

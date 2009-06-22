@@ -323,7 +323,7 @@ QTMOC		= /pack/qt/bin/moc
 endif
 
 ifeq ($(HOSTTYPE),mingw)
-Q4HOME = /cygdrive/c/Qt/4.3.1
+Q4HOME = /cygdrive/c/Qt/4.5.1
 Q4INCLUDE	= -isystem $(Q4HOME)/include
 ifeq (false,true)
 Q4SYS		= -lGDI32 -lole32 -lOleaut32 -luuid -lImm32 -lwinmm \

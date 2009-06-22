@@ -51,7 +51,7 @@ class Daisy : public Program
   // Initial content.
 public:
   static const char *const default_description;
-  Metalib& metalib;
+  const Metalib& metalib;
   const FrameModel& frame;      // For checkpoint.
   const Units& units () const;
 
@@ -95,7 +95,7 @@ private:
   Daisy ();
   Daisy (const Daisy&);
 public:
-  void initialize (Block&);
+  void initialize (Metalib&, Block&);
   bool check (Treelog& err);
   static void load_syntax (Frame&);
   explicit Daisy (Block&);

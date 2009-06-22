@@ -34,7 +34,7 @@
 struct ProgramBatch : public Program
 {
   // Content.
-  Metalib& metalib;
+  Metalib* metalib;
   Path& path;
   const symbol directory;
   std::vector<Program*> program;
@@ -42,7 +42,7 @@ struct ProgramBatch : public Program
   // Use.
   bool run (Treelog& msg)
   { 
-
+    daisy_assert (metalib);
     Path::InDirectory cwd (path, directory.name ());
     if (!cwd.check ())
       {
@@ -58,8 +58,8 @@ struct ProgramBatch : public Program
         Treelog::Open nest (msg, name.name (), i, program[i]->name);
         msg.touch ();
         {
-          Block block (metalib, msg, metalib, "Initializing");
-          program[0]->initialize (block);
+          Block block (*metalib, msg, *metalib, "Initializing");
+          program[0]->initialize (*metalib, block);
           if (!block.ok ())
             throw EXIT_FAILURE;
         }
@@ -75,14 +75,17 @@ struct ProgramBatch : public Program
   }
 
   // Create and Destroy.
-  void initialize (Block&)
-  { }
+  void initialize (Metalib& lib, Block&)
+  { 
+    daisy_assert (!metalib);
+    metalib = &lib;
+  }
   bool check (Treelog&)
   { return true; }
 
   ProgramBatch (Block& al)
     : Program (al),
-      metalib (al.metalib ()),
+      metalib (NULL),
       path (al.path ()),
       directory (al.name ("directory")),
       program (Librarian::build_vector<Program> (al, "run"))

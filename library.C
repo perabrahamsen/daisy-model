@@ -221,7 +221,7 @@ Library::check (const symbol key) const
 { return impl->check (key); }
 
 bool
-Library::complete (Metalib& metalib, const symbol key) const
+Library::complete (const Metalib& metalib, const symbol key) const
 { 
   if (!check (key))
     return false;

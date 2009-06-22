@@ -54,7 +54,7 @@ public:
   // Simulation.
 public:
   virtual void clear () = 0;
-  virtual void monthly (Metalib&, const Geometry&, Treelog&) = 0;
+  virtual void monthly (const Metalib&, const Geometry&, Treelog&) = 0;
   virtual const std::vector<bool>& active () const = 0;
   virtual void tick (const Geometry& geo,
 		     const SoilWater&, const SoilHeat&, 
@@ -83,17 +83,17 @@ public:
 		      const Chemistry&, Treelog&) const = 0;
   virtual bool check_am (const FrameModel& am, Treelog& err) const = 0;
   virtual void add (AM&) = 0;
-  virtual void fertilize (Metalib&, const FrameModel&, 
+  virtual void fertilize (const Metalib&, const FrameModel&, 
                           const Geometry&, 
                           const Time&, double dt, Treelog&) = 0;
-  virtual void fertilize (Metalib&, const FrameModel&, const Geometry&,
+  virtual void fertilize (const Metalib&, const FrameModel&, const Geometry&,
                           double from, double to, const Time&, double dt,
                           Treelog&) = 0;
-  virtual void fertilize (Metalib&, const FrameModel&, const Geometry&,
+  virtual void fertilize (const Metalib&, const FrameModel&, const Geometry&,
                           const Volume&, const Time&, double dt, Treelog&) = 0;
   virtual AM* find_am (symbol sort, symbol part) const = 0;
 public:
-  virtual void initialize (Metalib&, const Units&, 
+  virtual void initialize (const Metalib&, const Units&, 
                            const Frame&, const Geometry& geo,
                            const Soil&, const SoilWater&, const SoilHeat&,
                            double T_avg, Treelog&) = 0;

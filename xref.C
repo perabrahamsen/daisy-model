@@ -49,7 +49,7 @@ private:
 
   // Create & Destroy.
 public:
-  TraverseXRef (Metalib&, XRef&);
+  TraverseXRef (const Metalib&, XRef&);
   ~TraverseXRef ();
 
 private:
@@ -322,7 +322,7 @@ void
 TraverseXRef::leave_parameter ()
 { path.pop_back (); }
 
-TraverseXRef::TraverseXRef (Metalib& mlib, XRef& xr)
+TraverseXRef::TraverseXRef (const Metalib& mlib, XRef& xr)
   : Traverse (mlib),
     xref (xr),
     current_component ("Daisy"),
@@ -379,7 +379,7 @@ XRef::SubmodelUser::SubmodelUser ()
 XRef::Users::Users ()
 { }
 
-XRef::XRef (Metalib& mlib)
+XRef::XRef (const Metalib& mlib)
 { 
   TraverseXRef traverse (mlib, *this);
 }

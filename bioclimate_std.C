@@ -313,7 +313,7 @@ struct BioclimateStandard : public Bioclimate
 void 
 BioclimateStandard::initialize (Block& block, const Weather& weather)
 {
-  Metalib& metalib = block.metalib ();
+  const Metalib& metalib = block.metalib ();
   Treelog& msg = block.msg ();
   Treelog::Open nest (msg, "Bioclimate: " + name);
 

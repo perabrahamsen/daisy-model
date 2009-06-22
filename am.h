@@ -92,10 +92,10 @@ public:
 public:
   static const VCheck& check_om_pools ();
   // Initialization & Fertilizer.
-  static AM& create (Metalib&, const FrameModel&, const Geometry&, 
+  static AM& create (const Metalib&, const FrameModel&, const Geometry&, 
                      const Time&, Treelog& msg);
   // Crop part.
-  static AM& create (Metalib&, const Geometry&, const Time&,
+  static AM& create (const Metalib&, const Geometry&, const Time&,
 		     const std::vector<const FrameModel*>&,
 		     symbol sort, symbol part, lock_type lock, Treelog& msg);
   void initialize (const Geometry&, const double max_rooting_depth);

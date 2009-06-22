@@ -178,7 +178,7 @@ Daisy::output (Log& log) const
 }
 
 void
-Daisy::initialize (Block& block)
+Daisy::initialize (Metalib& metalib, Block& block)
 { 
   Treelog& msg = block.msg ();
   if (weather.get () && !weather->initialize (time, msg))

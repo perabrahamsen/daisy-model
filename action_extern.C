@@ -200,7 +200,7 @@ struct ActionExternFertigation : public Action
       }
     else if (NH4_value + NO3_value > 0.0)
       {
-        Metalib& metalib = daisy.metalib;
+        const Metalib& metalib = daisy.metalib;
         const Library& library = metalib.library (AM::component);
 	FrameModel frame (library.model ("mineral"), Frame::parent_link);
 	AM::set_mineral (metalib, frame, NH4_value, NO3_value);

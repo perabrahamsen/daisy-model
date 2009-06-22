@@ -807,7 +807,7 @@ Production::initialize (const double SeedN)
 }
 
 void
-Production::initialize (Metalib& metalib, const symbol name, 
+Production::initialize (const Metalib& metalib, const symbol name, 
 			const std::vector<const FrameModel*>& root,
 			const std::vector<const FrameModel*>& dead,
 			const Geometry& geo,

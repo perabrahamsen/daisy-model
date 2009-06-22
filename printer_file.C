@@ -42,7 +42,7 @@
 struct PrinterFile::Implementation
 {
   // Data.
-  Metalib& metalib;
+  const Metalib& metalib;
   std::ostream& out;
 
   // String utilities.
@@ -81,7 +81,7 @@ struct PrinterFile::Implementation
   bool good ();
 
   // Creation.
-  Implementation (Metalib&, std::ostream& stream);
+  Implementation (const Metalib&, std::ostream& stream);
   ~Implementation ();
 };
 
@@ -718,7 +718,7 @@ bool
 PrinterFile::Implementation::good ()
 { return out.good (); }
 
-PrinterFile::Implementation::Implementation (Metalib& mlib,
+PrinterFile::Implementation::Implementation (const Metalib& mlib,
                                              std::ostream& stream)
   : metalib (mlib),
     out (stream)
@@ -797,7 +797,7 @@ bool
 PrinterFile::good ()
 { return impl->good (); }
   
-PrinterFile::PrinterFile (Metalib& mlib,
+PrinterFile::PrinterFile (const Metalib& mlib,
                           std::ostream& stream)
   : impl (new Implementation (mlib, stream))
 { }
