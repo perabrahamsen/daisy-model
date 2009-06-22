@@ -242,16 +242,6 @@ LogSelect::LogSelect (const char *const id)
 LogSelect::~LogSelect ()
 { }
 
-// GCC 2.95 doesn't allow classes nested in functions.
-struct DocSelect : public LogSelect 
-{
-  void initialize (Treelog&)
-  { }
-  DocSelect (Block& al)
-    : LogSelect (al)
-  { }
-};
-
 void
 LogSelect::document_entries (Format& format, const Metalib& metalib, 
                              Treelog& msg, const symbol name)
@@ -310,7 +300,14 @@ LogSelect::document_entries (Format& format, const Metalib& metalib,
 
   // Complete log.
   Block block (metalib, msg, frame, "docselect");
-  DocSelect select (block);
+  struct DocSelect : public LogSelect 
+  {
+    void initialize (Treelog&)
+    { }
+    DocSelect (Block& al)
+      : LogSelect (al)
+    { }
+  } select (block);
   daisy_assert (block.ok ());
 
   format.bold ("Table columns:");
