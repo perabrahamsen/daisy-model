@@ -829,7 +829,8 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
             // We pretend that the surface is particlaly saturated.
             const double K_sat = soil.K (cell, 0.0, 0.0, T (cell));
             const double K_cell = K (cell);
-            const double K_edge = K_cell;
+            const double K_edge = 0.5 * (K_cell + K_sat);
+            
             const double dz = geo.edge_length (edge);
             daisy_assert (approximate (dz, -geo.cell_z (cell)));
             double q_in_avail = h_top / ddt;
