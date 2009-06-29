@@ -95,7 +95,7 @@ Shared parameter and log variable for colloid generation models.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("colloid", Value::String, Value::Const, "Colloid to generate.");
+    frame.declare_string ("colloid", Value::Const, "Colloid to generate.");
     frame.declare_object ("ponddamp", Ponddamp::component,
                           Value::Const, Value::Singleton,
                           "Model for calculating 'KH'.");

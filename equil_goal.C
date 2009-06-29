@@ -165,16 +165,16 @@ static struct EquilibriumGoal_ASyntax : public DeclareModel
   {
     frame.declare_object ("goal_A", Number::component, Value::Const, 
                        Value::Singleton, "The desired level of A [g/cm^3].");
-    frame.declare ("A_solute", Value::Boolean, Value::Const, 
+    frame.declare_boolean ("A_solute", Value::Const, 
                 "True iff 'goal_A' is in solute (mass per volume water).\n\
 If false, the unit is assumed to be mass per volume space.");
     frame.declare_object ("min_B", Number::component, Value::Const, 
                        Value::Singleton, "\
 Do not convert B to A if B is smaller than this [g/cm^3].");
-    frame.declare ("B_solute", Value::Boolean, Value::Const, 
+    frame.declare_boolean ("B_solute", Value::Const, 
                 "True iff 'min_B' is in solute (mass per volume water).\n\
 If false, the unit is assumed to be mass per volume space.");
-    frame.declare ("debug_cell", Value::Integer, Value::Const,
+    frame.declare_integer ("debug_cell", Value::Const,
                 "Print debug information for this cell.\n\
 Set it to a negative number to disable it.");
     frame.set ("debug_cell", -1);

@@ -203,9 +203,9 @@ AM::Implementation::Lock::output (Log& log) const
 void
 AM::Implementation::Lock::load_syntax (Frame& frame)
 {
-  frame.declare ("crop", Value::String, Value::State, 
+  frame.declare_string ("crop", Value::State, 
                  "Crop to which this am is locked");
-  frame.declare ("part", Value::String, Value::State, 
+  frame.declare_string ("part", Value::State, 
                  "Crop part to which this am is locked");
 }
 
@@ -1018,13 +1018,13 @@ Common attributes for all added organic matter models.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("initialized", Value::Boolean, Value::State, "\
+    frame.declare_boolean ("initialized", Value::State, "\
 True if this AM has been initialized.\n\
 It will usually be false in user setup files, but true in checkpoints.");
     frame.set ("initialized", false);
     frame.declare_submodule ("creation", Value::OptionalState, 
                          "Time this AM was created.", Time::load_syntax);
-    frame.declare ("name", Value::String, Value::OptionalState, "\
+    frame.declare_string ("name", Value::OptionalState, "\
 A name given to this AOM so you can identify it in for example log files.");
     frame.declare_submodule ("lock", Value::OptionalState, "\
 This AM belongs to a still living plant",

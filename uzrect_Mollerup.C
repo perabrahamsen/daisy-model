@@ -1128,21 +1128,20 @@ Model used for solving matrix equation system.");
                        Value::Const, Value::Singleton,
                        "Model for calculating average K between cells.");
     frame.set ("K_average", "arithmetic");
-    frame.declare ("max_time_step_reductions",
-                Value::Integer, Value::Const, "\
+    frame.declare_integer ("max_time_step_reductions", Value::Const, "\
 Number of times we may reduce the time step before giving up");
     frame.set ("max_time_step_reductions", 4);
-    frame.declare ("time_step_reduction", Value::Integer, Value::Const, 
+    frame.declare_integer ("time_step_reduction", Value::Const, 
                 "Divide the time step with this at each reduction.");
     frame.set ("time_step_reduction", 4);
-    frame.declare ("max_iterations", Value::Integer, Value::Const, "\
+    frame.declare_integer ("max_iterations", Value::Const, "\
 Maximum number of iterations when seeking convergence before reducing\n\
 the time step.");
     frame.set ("max_iterations", 12);
-    frame.declare ("max_number_of_small_time_steps", Value::Integer, Value::Const, "\
+    frame.declare_integer ("max_number_of_small_time_steps", Value::Const, "\
 Maximum number of small time steps in a large time step.");
     frame.set ("max_number_of_small_time_steps", 1000);  
-    frame.declare ("msg_number_of_small_time_steps", Value::Integer, Value::Const, "\
+    frame.declare_integer ("msg_number_of_small_time_steps", Value::Const, "\
 Number of small time steps in a large time step between message.");
     frame.set ("msg_number_of_small_time_steps", 100);  
     frame.declare ("max_absolute_difference", "cm", Value::Const, "\
@@ -1159,7 +1158,7 @@ minimum pressure potential for convergence.");
     frame.set ("min_pressure_potential", -1.0e9); 
     frame.declare ("forced_T", "dg C", Value::OptionalConst, "\
 Force transport equations to use this water temperature.");
-    frame.declare ("debug", Value::Integer, Value::Const, "\
+    frame.declare_integer ("debug", Value::Const, "\
 Level of debug messages:\n                              \
  \n                                                     \
 = 0: no debug messages.\n                               \

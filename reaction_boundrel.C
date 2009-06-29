@@ -126,12 +126,12 @@ the setup file.")
   {
 
 
-    frame.declare ("immobile", Value::String, Value::Const,
+    frame.declare_string ("immobile", Value::Const,
                    "Immobile (or mixed form) chemical in the soil surface.");
-    frame.declare ("bound", Value::String, Value::OptionalConst,
+    frame.declare_string ("bound", Value::OptionalConst,
                    "Chemical bound to colloids.\n\
 If unspecified, the colloid bound form will not be traced.");
-    frame.declare ("colloid", Value::String, Value::OptionalConst,
+    frame.declare_string ("colloid", Value::OptionalConst,
                    "Name of colloid whose release we mimic.");
     frame.set ("colloid", "colloid");
     frame.declare ("release", "g/cm^2/h", Value::LogOnly,

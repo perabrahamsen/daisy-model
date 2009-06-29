@@ -65,11 +65,11 @@ Harvest::output (Log& log) const
 void 
 Harvest::load_syntax (Frame& frame)
 {
-  frame.declare ("column", Value::String, Value::State,
+  frame.declare_string ("column", Value::State,
 	      "Name of column where the yield were harvested.");
   frame.declare_submodule ("time", Value::State,
 			"Time of the harvest operation.", Time::load_syntax);
-  frame.declare ("crop", Value::String, Value::State,
+  frame.declare_string ("crop", Value::State,
 	      "Name of crop that was harvested.");
   frame.declare ("stem_DM", "g/m^2", Value::State,
 	      "Total stem dry matter in harvest.");

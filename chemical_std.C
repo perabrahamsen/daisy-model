@@ -243,7 +243,7 @@ ChemicalStandard::Product::load_syntax (Frame& frame)
 {
   frame.declare ("fraction", Value::Fraction (), Value::Const,
                  "Fraction of decomposed matter that become this chemcial.");
-  frame.declare ("chemical", Value::String, Value::Const, 
+  frame.declare_string ("chemical", Value::Const, 
                  "Chemical product of decomposed matter.");
   frame.order ("fraction", "chemical");
 }

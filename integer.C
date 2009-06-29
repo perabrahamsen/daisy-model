@@ -83,7 +83,7 @@ static struct IntegerConstSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.declare ("value", Value::Integer, Value::Const,
+    frame.declare_integer ("value", Value::Const,
 		"Fixed value for this integer.");
     frame.order ("value");
   }
@@ -100,7 +100,7 @@ struct IntegerCond : public Integer
     {
       frame.declare_object ("condition", Boolean::component, "\
 Condition to test for.");
-      frame.declare ("value", Value::Integer, Value::Const, "\
+      frame.declare_integer ("value", Value::Const, "\
 Value to return.");
       frame.order ("condition", "value");
     }

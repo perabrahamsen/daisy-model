@@ -249,7 +249,7 @@ VegetationCrops::ForcedLAI::operator() (int year, int yday)
     
 void VegetationCrops::ForcedLAI::load_syntax (Frame& frame)
 {
-  frame.declare ("year", Value::Integer, Value::Const, "\
+  frame.declare_integer ("year", Value::Const, "\
 Year for which to use forced LAI.");
   frame.declare ("LAIvsDAY", "m^2/m^2", "yday", Value::OptionalConst, 
 		"LAI as a function of Julian day.\n\

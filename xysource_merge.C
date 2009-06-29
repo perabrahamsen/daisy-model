@@ -191,9 +191,9 @@ By default, let the first source decide.", "");
                        Value::State, Value::Variable,
                        "XY data series to merge.");
     frame.set_check ("source", VCheck::min_size_1 ());
-    frame.declare ("x_dimension", Value::String, Value::Const, "\
+    frame.declare_string ("x_dimension", Value::Const, "\
 Dimension for x points.");
-    frame.declare ("y_dimension", Value::String, Value::Const, "\
+    frame.declare_string ("y_dimension", Value::Const, "\
 Dimension for y points.");
 
   }

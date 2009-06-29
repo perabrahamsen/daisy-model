@@ -464,21 +464,21 @@ Conditions based on month and day.")
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);
-    frame.declare ("month", Value::Integer, Value::Const, 
+    frame.declare_integer ("month", Value::Const, 
                "Month to test for.");
     frame.set_check ("month", VCheck::valid_month ());
-    frame.declare ("day", Value::Integer, Value::Const, 
+    frame.declare_integer ("day", Value::Const, 
                "Day in the month to test for.");
     frame.set_check ("day", VCheck::valid_mday ());
-    frame.declare ("hour", Value::Integer, Value::Const, 
+    frame.declare_integer ("hour", Value::Const, 
                "Hour to test for.");
     frame.set_check ("hour", VCheck::valid_hour ());
     frame.set ("hour", 8);
-    frame.declare ("minute", Value::Integer, Value::Const, 
+    frame.declare_integer ("minute", Value::Const, 
                "Minute to test for.");
     frame.set_check ("hour", VCheck::valid_minute ());
     frame.set ("minute", 0);
-    frame.declare ("second", Value::Integer, Value::Const, 
+    frame.declare_integer ("second", Value::Const, 
                "Second to test for.");
     frame.set_check ("second", VCheck::valid_second ());
     frame.set ("second", 0);
@@ -582,7 +582,7 @@ True, at the specified hour.")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.declare ("at", Value::Integer, Value::Const,
+    frame.declare_integer ("at", Value::Const,
                 "Hour when the condition is true [0-23].");
     frame.set_check ("at", VCheck::valid_hour ());
     frame.order ("at");
@@ -599,7 +599,7 @@ True, at the specified day in the month.")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.declare ("at", Value::Integer, Value::Const,
+    frame.declare_integer ("at", Value::Const,
 		"Day in the month when the condition is true [1-31].");
     frame.set_check ("at", VCheck::valid_mday ());
     frame.order ("at");
@@ -616,7 +616,7 @@ True, at the specified julian day.")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.declare ("at", Value::Integer, Value::Const,
+    frame.declare_integer ("at", Value::Const,
                 "Julian day when the condition is true [1-366].");
     static VCheck::IRange valid_jday (1, 366);
     frame.set_check ("at", valid_jday);
@@ -634,7 +634,7 @@ True, at the specified month.")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.declare ("at", Value::Integer, Value::Const,
+    frame.declare_integer ("at", Value::Const,
                 "Month when the condition is true [1-12].");
     frame.set_check ("at", VCheck::valid_month ());
     frame.order ("at");
@@ -651,7 +651,7 @@ True, at the specified year.")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.declare ("at", Value::Integer, Value::Const,
+    frame.declare_integer ("at", Value::Const,
 		"Year when the condition is true.");
     frame.set_check ("at", VCheck::valid_year ());
     frame.order ("at");
@@ -673,7 +673,7 @@ in log files.")
   { 
     frame.declare_object ("operand", Condition::component, 
                        "Condition to use.");
-    frame.declare ("timestep", Value::String, Value::Const, "\
+    frame.declare_string ("timestep", Value::Const, "\
 Timestep to use.");
     frame.order ("operand", "timestep");
   }

@@ -374,7 +374,7 @@ hydraulic model");
   }
   static void load_attributes (Frame& frame)
   {
-    frame.declare ("key", Value::String, Value::Const,
+    frame.declare_string ("key", Value::Const,
                    "Name of attribute.");
     frame.declare ("value", Value::User (), Value::Const,
                    "Value of attribute.");

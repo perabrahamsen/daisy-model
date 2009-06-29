@@ -304,12 +304,12 @@ void
 Select::Implementation::Spec::load_syntax (Frame& frame)
 { 
   frame.add_check (check_alist);
-  frame.declare ("library", Value::String, Value::Const, "\
+  frame.declare_string ("library", Value::Const, "\
 Name of library where the attribute belong.\n\
 Use 'fixed' to denote a fixed component.");
-  frame.declare ("model", Value::String, Value::Const, "\
+  frame.declare_string ("model", Value::Const, "\
 Name of model or fixed component where the attribute belongs.");
-  frame.declare ("submodels_and_attribute", Value::String, 
+  frame.declare_string ("submodels_and_attribute", 
                  Value::Const, Value::Variable, "\
 Name of submodels and attribute.");
   frame.order ("library", "model", "submodels_and_attribute");
@@ -729,17 +729,17 @@ Set the 'handle' parameter instead.");
   {
     Model::load_model (frame);
     frame.add_check (check_alist);
-    frame.declare ("tag", Value::String, Value::OptionalConst,
+    frame.declare_string ("tag", Value::OptionalConst,
                    "Tag to identify the column.\n\
 These will be printed in the first line of the log file.\n\
 The default tag is the last element in the path.");
-    frame.declare ("dimension", Value::String, Value::OptionalConst,
+    frame.declare_string ("dimension", Value::OptionalConst,
                    "The unit for numbers in this column.\n\
 These will be printed in the second line of the log file.\n\
 The character '&' will be replaced with the log timestep.\n\
 If you do not specify the dimension explicitly, a value will\n\
 be interfered from 'spec' if available.");
-    frame.declare ("path", Value::String, Value::Const, Value::Variable, "\
+    frame.declare_string ("path", Value::Const, Value::Variable, "\
 Sequence of attribute names leading to the variable you want to log in\n\
 this column.  The first name should be one of the attributes of the\n\
 daisy component itself.  What to specify as the next name depends on\n\
@@ -777,10 +777,10 @@ attribute.", Select::Implementation::Spec::load_syntax);
                           "\
 OBSOLETE.  If you set this variable, 'flux' will be set to true.\n\
 This overwrites any direct setting of 'flux'.");
-    frame.declare ("flux", Value::Boolean, Value::OptionalConst, "\
+    frame.declare_boolean ("flux", Value::OptionalConst, "\
 OBSOLETE.  This value will be used if 'handle' is not specified.\
 A value of true then means 'sum', and false means 'current'.");
-    frame.declare ("handle", Value::String, Value::OptionalConst, "\
+    frame.declare_string ("handle", Value::OptionalConst, "\
 This option determine how the specified variable should be logged.  \n\
 \n\
 min: Log the smallest value seen since last time the variable was logged.\n\
@@ -805,7 +805,7 @@ If 'accumulate' is true, the printed values will be accumulated..");
     static VCheck::Enum handle_check ("min", "max", "average", "geometric", 
                                       "sum", "current");
     frame.set_check ("handle", handle_check);
-    frame.declare ("interesting_content", Value::Boolean, Value::Const, "\
+    frame.declare_boolean ("interesting_content", Value::Const, "\
 True if the content of this column is interesting enough to warrent an\n\
 initial line in the log file.  This only affects non-flux variables.");
     frame.set ("interesting_content", true);
@@ -822,13 +822,13 @@ OBSOLETE: Use 'expr' instead.");
 Offset to add to the calculated value, before logging.\n\
 OBSOLETE: Use 'expr' instead.");
     frame.set ("offset", 0.0);
-    frame.declare ("negate", Value::Boolean, Value::Const, "\
+    frame.declare_boolean ("negate", Value::Const, "\
 Switch sign of value.  I.e. upward fluxes become downward fluxes.");
     frame.set ("negate", false);
-    frame.declare ("accumulate", Value::Boolean, Value::Const,
+    frame.declare_boolean ("accumulate", Value::Const,
                    "Log accumulated values.");
     frame.set ("accumulate", false);
-    frame.declare ("count", Value::Integer, Value::State, "\
+    frame.declare_integer ("count", Value::State, "\
 Number of times the path has matched a variable since the last log entry.");
     frame.set ("count", 0);
   }

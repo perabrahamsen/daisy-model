@@ -262,27 +262,27 @@ static struct SummaryBalanceSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
     {
-      frame.declare ("where", Value::String, Value::OptionalConst,
+      frame.declare_string ("where", Value::OptionalConst,
                   "File name to store the summary.\n\
 By default, the summary will be stored in daisy.log and the screen.");
-      frame.declare ("title", Value::String, Value::OptionalConst,
+      frame.declare_string ("title", Value::OptionalConst,
 		  "Title of this summary.\n\
 By default, use the name of the parameterization.");
-      frame.declare ("period", Value::String, Value::OptionalConst, "\
+      frame.declare_string ("period", Value::OptionalConst, "\
 Set this to 'y', 'm', 'w', 'd' or 'h' to get fluxes per time period\n\
 instead of total amount.");
-      frame.declare ("precision", Value::Integer, Value::Const,
+      frame.declare_integer ("precision", Value::Const,
 		  "Number of digits to print after decimal point.");
       frame.set ("precision", 2);
-      frame.declare ("require_top", Value::Boolean, Value::Const, "\
+      frame.declare_boolean ("require_top", Value::Const, "\
 If the balance only hold true when logging the top of the soil, i.e. the\n\
 `from' parameter of the log model is 0, this flag should be set.");
       frame.set ("require_top", false);
-      frame.declare ("input", Value::String, Value::Const, Value::Variable,
+      frame.declare_string ("input", Value::Const, Value::Variable,
                   "Tags of columns in log file representing inputs.");
-      frame.declare ("output", Value::String, Value::Const, Value::Variable,
+      frame.declare_string ("output", Value::Const, Value::Variable,
                   "Tags of columns in log file representing outputs.");
-      frame.declare ("content", Value::String, Value::Const, Value::Variable,
+      frame.declare_string ("content", Value::Const, Value::Variable,
                   "Tags of columns in log file representing content.");
     }
 } SummaryBalance_syntax;

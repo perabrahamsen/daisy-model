@@ -384,10 +384,10 @@ Fertilizer [name]: The type of fertilizer to be applied.")
     frame.declare_object ("fertilizer", AM::component,
                        Value::OptionalConst, Value::Singleton, "\
 The fertilizer you want to apply.");
-    frame.declare ("enable_irrigation", Value::Boolean, Value::Const, "\
+    frame.declare_boolean ("enable_irrigation", Value::Const, "\
 Set this to false to ignore any irrigation information in the file.");
     frame.set ("enable_irrigation", true);
-    frame.declare ("enable_fertilization", Value::Boolean, Value::Const, "\
+    frame.declare_boolean ("enable_fertilization", Value::Const, "\
 Set this to false to ignore any fertilization information in the file.");
     frame.set ("enable_fertilization", true);
   }

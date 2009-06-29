@@ -81,7 +81,7 @@ static struct ActionEmergeSyntax : DeclareModel
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.declare ("crop", Value::String, Value::Const, 
+    frame.declare_string ("crop", Value::Const, 
                 "Name of the crop to emerge.\n\
 If you specify 'all', all crops will emerge.\n\
 If there are no crop on the field with the specified name,\n\
@@ -101,7 +101,7 @@ Common parameters for harvest operations.")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.declare ("crop", Value::String, Value::Const, 
+    frame.declare_string ("crop", Value::Const, 
                 "Name of the crop to harvest or cut.\n\
 If you specify 'all', all crops will be harvested.\n\
 If there are no crop on the field with the specified name,\n\
@@ -119,7 +119,7 @@ Fraction of leafs (above stub) to harvest.");
     frame.declare_fraction ("sorg", Value::Const, "\
 Fraction of storage organ to harvest.");
     frame.set ("sorg", 1.0);
-    frame.declare ("combine", Value::Boolean, Value::Const, "\
+    frame.declare_boolean ("combine", Value::Const, "\
 Set this to 'true' in order to combine all crop parts into stem\n\
 in the harvest log files.\n\
 This is mostly useful for silage.");
@@ -299,7 +299,7 @@ It is intended for crops like tomatoes, that are harvested multiple times.")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.declare ("crop", Value::String, Value::Const, 
+    frame.declare_string ("crop", Value::Const, 
                 "Name of the crop to pluck.\n\
 If you specify 'all', all crops will be plucked.\n\
 If there are no crop on the field with the specified name,\n\

@@ -43,14 +43,15 @@ struct Frame::Implementation
   int count;
   Syntax syntax;
   AttributeList alist;
+  std::vector<symbol> order;
   typedef std::set<const Frame*> child_set;
   mutable child_set children;
 
   Implementation (const Implementation& old)
     : count (counter),
       syntax (old.syntax),
-      alist (old.alist)
-      
+      alist (old.alist),
+      order (old.order)
   { counter++; }
   Implementation (int old_count, child_set old_children)
     : count (old_count),
@@ -354,13 +355,25 @@ Frame::submodel_name (const symbol key) const
 }
 
 void 
-Frame::declare (const symbol key,	// Generic.
-                Value::type t, 
-                Value::category cat,
-                int size,
-                const symbol description)
-{ impl->syntax.declare (key, t, cat, size, description); }
+Frame::declare_boolean (const symbol key,	// Boolean.
+                        Value::category cat,
+                        int size,
+                        const symbol description)
+{ impl->syntax.declare (key, Value::Boolean, cat, size, description); }
 
+void 
+Frame::declare_integer (const symbol key,	// Integer.
+                        Value::category cat,
+                        int size,
+                        const symbol description)
+{ impl->syntax.declare (key, Value::Integer, cat, size, description); }
+
+void 
+Frame::declare_string (const symbol key,	// String.
+                       Value::category cat,
+                       int size,
+                       const symbol description)
+{ impl->syntax.declare (key, Value::String, cat, size, description); }
 
 void 
 Frame::declare (const symbol key, // Number.
@@ -446,35 +459,59 @@ Frame::set_check (const symbol name, const VCheck& vcheck)
 
 void 
 Frame::order (const std::vector<symbol>& v)
-{ impl->syntax.order (v); }
+{ impl->order = v; }
 
 void 
-Frame::order (const symbol a)
-{ impl->syntax.order (a); }
+Frame::order (const symbol one)
+{
+  daisy_assert (impl->order.size () == 0);
+  impl->order.push_back (one);
+}
 
 void 
-Frame::order (const symbol a, const symbol b)
-{ impl->syntax.order (a, b); }
+Frame::order (const symbol one, const symbol two)
+{
+  daisy_assert (impl->order.size () == 0);
+  impl->order.push_back (one);
+  impl->order.push_back (two);
+}
 
 void 
-Frame::order (const symbol a, const symbol b, const symbol c)
-{ impl->syntax.order (a, b, c); }
+Frame::order (const symbol one, const symbol two, const symbol three)
+{
+  daisy_assert (impl->order.size () == 0);
+  impl->order.push_back (one);
+  impl->order.push_back (two);
+  impl->order.push_back (three);
+}
 
 void 
-Frame::order (const symbol a, const symbol b, const symbol c,
-	      const symbol d)
-{ impl->syntax.order (a, b, c, d); }
+Frame::order (const symbol one, const symbol two, const symbol three,
+	       const symbol four)
+{
+  daisy_assert (impl->order.size () == 0);
+  impl->order.push_back (one);
+  impl->order.push_back (two);
+  impl->order.push_back (three);
+  impl->order.push_back (four);
+}
 
 void 
-Frame::order (const symbol a, const symbol b, const symbol c,
-	      const symbol d, const symbol e)
-{ impl->syntax.order (a, b, c, d, e); }
-
+Frame::order (const symbol one, const symbol two, const symbol three,
+	       const symbol four, const symbol five)
+{
+  daisy_assert (impl->order.size () == 0);
+  impl->order.push_back (one);
+  impl->order.push_back (two);
+  impl->order.push_back (three);
+  impl->order.push_back (four);
+  impl->order.push_back (five);
+}
 
 bool 
 Frame::ordered () const
 { 
-  if (impl->syntax.ordered ())
+  if (impl->order.size () > 0)
     return true;
   else if (parent ())
     return parent ()->ordered ();
@@ -485,12 +522,12 @@ Frame::ordered () const
 const std::vector<symbol>& 
 Frame::order () const
 { 
-  if (impl->syntax.ordered ())
-    return impl->syntax.order ();
+  if (impl->order.size () > 0)
+    return impl->order;
   else if (parent ())
     return parent ()->order ();
   
-  return impl->syntax.order ();
+  return impl->order;
 }
 
 int 
@@ -506,12 +543,19 @@ Frame::order_index (const symbol key) const
 bool 
 Frame::total_order () const
 { 
-  if (!impl->syntax.total_order ())
-    return false;
-  else if (!parent ())
-    return true;
-  else
-    return parent ()->total_order ();
+  std::set<symbol> all;
+  entries (all);
+  int non_logs = all.size ();
+  for (std::set<symbol>::const_iterator i = all.begin ();
+       i != all.end ();
+       i++)
+    {
+      const symbol key = *i;
+      if (is_log (key))
+        non_logs--;
+    }
+  daisy_assert (non_logs >= 0);
+  return non_logs == order ().size ();
 }
 
 void 

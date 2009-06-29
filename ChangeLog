@@ -1,3 +1,14 @@
+2009-06-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* syntax.C, syntax.h, frame.C: Implement order in frame only.
+
+	* log_dlf.C (build_parameters): Handle missing
+	'parameter_names' (poorly).
+
+2009-06-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* time.C, time.h (now): New static member function.
+
 2009-06-22  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* all: Made 'Metalib' const most places.

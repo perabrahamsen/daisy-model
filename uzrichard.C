@@ -780,17 +780,16 @@ A numerical solution to Richard's Equation.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("debug", Value::Integer, Value::Const, "\
+    frame.declare_integer ("debug", Value::Const, "\
 Print additional debug messages, higher numbers means more messages.");
     frame.set ("debug", 1);
-    frame.declare ("max_time_step_reductions",
-               Value::Integer, Value::Const, "\
+    frame.declare_integer ("max_time_step_reductions", Value::Const, "\
 Number of times we may reduce the time step before giving up");
     frame.set ("max_time_step_reductions", 4);
-    frame.declare ("time_step_reduction", Value::Integer, Value::Const, 
+    frame.declare_integer ("time_step_reduction", Value::Const, 
                "Divide the time step with this at each reduction.");
     frame.set ("time_step_reduction", 4);
-    frame.declare ("max_iterations", Value::Integer, Value::Const, "\
+    frame.declare_integer ("max_iterations", Value::Const, "\
 Maximum number of iterations when seeking convergence before reducing\n\
 the time step.");
     frame.set ("max_iterations", 25);

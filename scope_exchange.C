@@ -78,7 +78,7 @@ A named value to exchange with external models.")
   void load_frame (Frame& frame) const
   {
     Model::load_model (frame);
-    frame.declare ("name", Value::String, Value::Const, "\
+    frame.declare_string ("name", Value::Const, "\
 Name of value to exchange.");
   }
 } Exchange_init;
@@ -140,7 +140,7 @@ static struct ExchangeNumberSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("dimension", Value::String, Value::Const, "\
+    frame.declare_string ("dimension", Value::Const, "\
 Dimension of value to exchange.");
     frame.declare ("value", Value::Unknown (), Value::OptionalState, "\
 Current value to exchange.");
@@ -178,7 +178,7 @@ static struct ExchangeNameSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("value", Value::String, Value::Const, "\
+    frame.declare_string ("value", Value::Const, "\
 Current value to exchange.");
   }
 } ExchangeName_syntax;

@@ -124,7 +124,7 @@ static struct GnuplotSyntax : public DeclareBase
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.declare ("where", Value::String, Value::OptionalConst, "\
+    frame.declare_string ("where", Value::OptionalConst, "\
 File to store results in.  By default, show them on a window.\n\
 The format is determined from the file name extension:\n\
   *.tex: LaTeX code with PostScript specials.\n\
@@ -152,21 +152,21 @@ the screen instead of being stored in a file.");
     } check_where;
     frame.set_check ("where", check_where);
     frame.set ("where", "screen");
-    frame.declare ("device", Value::String, Value::OptionalConst, "\
+    frame.declare_string ("device", Value::OptionalConst, "\
 Output device.  By default, this is derived from the file extenstion.");
-    frame.declare ("extra", Value::String, Value::Const, 
+    frame.declare_string ("extra", Value::Const, 
                 Value::Variable, "List of extra gnuplot commands.\n\
 The commands will be inserted right before the plot command.\n\
 Note that if you have multiple plots in the same command file,\n\
 The extra commands may affect the subsequence plots.");
     frame.set_empty ("extra");
-    frame.declare ("title", Value::String, Value::OptionalConst, "\
+    frame.declare_string ("title", Value::OptionalConst, "\
 Title of the plot, if any.  Set it to an empty string to disable.");
     frame.declare_submodule ("size", Value::OptionalConst, "\
 Relative to size of plot.\n\
 The standard size is 1.0, specify other numbers to scale accordingly.", 
                           GnuplotBase::Size::load_syntax);
-    frame.declare ("legend", Value::String, Value::OptionalConst, "\
+    frame.declare_string ("legend", Value::OptionalConst, "\
 Placement of legend.  This can be one of the four corners, named by\n\
 compas locations (nw, ne, sw, se) to get the legend inside the graph\n\
 in that corner, 'below' to get the legend below the graph, 'outside'\n\

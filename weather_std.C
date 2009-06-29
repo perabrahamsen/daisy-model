@@ -367,10 +367,10 @@ void
 WeatherStandard::YearMap::YearInterval::load_syntax (Frame& frame)
 {
   frame.add_check (check_alist);
-  frame.declare ("from", Value::Integer, Value::Const,
+  frame.declare_integer ("from", Value::Const,
 	      "First year of interval.");
   frame.set_check ("from", VCheck::valid_year ());
-  frame.declare ("to", Value::Integer, Value::Const,
+  frame.declare_integer ("to", Value::Const,
 	      "First year of interval.");
   frame.set_check ("to", VCheck::valid_year ());
   frame.order ("from", "to");
@@ -1442,7 +1442,7 @@ Read a Daisy Weather File.")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.declare ("where", Value::String, Value::Const,
+    frame.declare_string ("where", Value::Const,
 		"File to read weather data from.");
     frame.order ("where");
 

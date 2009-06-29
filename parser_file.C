@@ -797,12 +797,19 @@ ParserFile::Implementation::load_list (Frame& frame)
 	  switch (type)
 	    {
 	    case Value::String:
+	      {
+		if (!looking_at ('('))
+		  doc = get_symbol ();
+		if (ok)
+		  frame.declare_string (var, Value::Const, size, doc);
+		break;
+	      }
 	    case Value::Integer:
 	      {
 		if (!looking_at ('('))
 		  doc = get_symbol ();
 		if (ok)
-		  frame.declare (var, type, Value::Const, size, doc);
+		  frame.declare_integer (var, Value::Const, size, doc);
 		break;
 	      }
 	    case Value::Number:
@@ -1506,7 +1513,7 @@ static struct ParserFileSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.declare ("where", Value::String, Value::Const,
+    frame.declare_string ("where", Value::Const,
 		"File to read from.");
     frame.order ("where");
   }

@@ -299,9 +299,9 @@ static struct ReactionEquilibriumSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.declare ("A", Value::String, Value::Const,
+    frame.declare_string ("A", Value::Const,
                    "Name of first soil component in equilibrium.");
-    frame.declare ("B", Value::String, Value::Const,
+    frame.declare_string ("B", Value::Const,
                    "Name of second soil component in equilibrium.");
     frame.declare_object ("equilibrium", Equilibrium::component,
                           "Function for calculating equilibrium between A and B.");
@@ -316,18 +316,18 @@ By default, this is identical to 'k_AB'.");
 Converted from A to B on surface this timestep (may be negative).");
     frame.declare ("S_AB", "g/cm^3/h", Value::LogOnly, Value::SoilCells, "\
 Converted from A to B in soil this timestep (may be negative).");
-    frame.declare ("colloid", Value::String, Value::OptionalConst,
+    frame.declare_string ("colloid", Value::OptionalConst,
                    "Let 'rho_b' denote content of specified chemical.\n\
 This might affect the evaluation of the 'k_AB' and 'k_BA' parameter\n\
 expressions, as well as the 'equilibrium' model.\n\
 By default, 'rho_b' will be the soil dry bulk density.");
-    frame.declare ("primary", Value::Boolean, Value::OptionalConst,
+    frame.declare_boolean ("primary", Value::OptionalConst,
                    "Equilibrium should happen in the primary domain.\n\
 If true, the content of the primary soil domain (soil-bound and\n\
 intra-aggregate pores), will be included in the reaction.\n\
 By default, this will be true if 'secondary' is false, and be false if\n\
 'secondary' is true.");
-    frame.declare ("secondary", Value::Boolean, Value::Const,
+    frame.declare_boolean ("secondary", Value::Const,
                    "Equilibrium should happen in the secondary domain.\n\
 There will only be a reaction when there is water in the secondary domain\n\
 (inter-aggregate pores), at both the beginning and end of the timestep.\n\
@@ -336,7 +336,7 @@ intra-aggregate pores), will be included in the reaction.\n\
 There is no way to use this model to specify an equilibrium reaction in\n\
 the tertiary domain (biopores).");
     frame.set ("secondary", false);
-    frame.declare ("surface", Value::Boolean, Value::Const,
+    frame.declare_boolean ("surface", Value::Const,
                    "Equilibrium should happen in the surface.");
     frame.set ("surface", false);
   }

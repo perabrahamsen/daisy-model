@@ -856,7 +856,7 @@ Vernalization.");
                        "Effect of water stress on production.\n\
 By default, this will be 'none' iff the selected photosynthesis model\n\
 does handle water stress implicitly, and 'full' otherwise.");
-    frame.declare ("enable_N_stress", Value::Boolean, Value::OptionalConst,
+    frame.declare_boolean ("enable_N_stress", Value::OptionalConst,
                 "Set this true to let nitrogen stress limit production.\n\
 By default, it will be true iff the selected photosynthesis model does\n \
 handle nitrogen stress implicitly.");

@@ -118,9 +118,9 @@ By default the name of the 'x' and 'y' objects.");
     frame.declare ("points", Value::Unknown (), Value::Unknown (), 
 		Value::Const, Value::Singleton, "\
 List of (x y) pairs.");
-    frame.declare ("x_dimension", Value::String, Value::Const, "\
+    frame.declare_string ("x_dimension", Value::Const, "\
 Dimension for x points.");
-    frame.declare ("y_dimension", Value::String, Value::Const, "\
+    frame.declare_string ("y_dimension", Value::Const, "\
 Dimension for y points.");
 
   }

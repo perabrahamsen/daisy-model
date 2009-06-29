@@ -245,17 +245,17 @@ Shared parameters for volume based logs.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("density", Value::Boolean, Value::Const, 
+    frame.declare_boolean ("density", Value::Const, 
 		"If true, divide total content with volume.\n\
 Otherwise, obey 'density_z', 'density_x', and 'density_y'.");
     frame.set ("density", false);
-    frame.declare ("density_z", Value::Boolean, Value::Const, 
+    frame.declare_boolean ("density_z", Value::Const, 
 		"If true, divide total content with volume height.\n\
 This parameter is ignored if 'density' is true.");
-    frame.declare ("density_x", Value::Boolean, Value::Const, 
+    frame.declare_boolean ("density_x", Value::Const, 
 		"If true, divide total content with volume width.\n\
 This parameter is ignored if 'density' is true.");
-    frame.declare ("density_y", Value::Boolean, Value::Const, 
+    frame.declare_boolean ("density_y", Value::Const, 
 		"If true, divide total content with volume depth.\n\
 This parameter is ignored if 'density' is true.");
     frame.declare_object ("volume", Volume::component, 
@@ -275,7 +275,7 @@ the cell will be scaled to zero, while if there is only half the\n\
 specified minimum root density, the data for the cell will be scaled\n\
 to 0.5.");
     frame.set ("min_root_density", -1.0);
-    frame.declare ("min_root_crop", Value::String, Value::Const, "\
+    frame.declare_string ("min_root_crop", Value::Const, "\
 Name of crop whose roots scould be used for the root density requirements.\n\
 Set this to \"*\" to use all roots.");
     frame.set ("min_root_crop", "*"); // Select::wildcard may not be initialized.

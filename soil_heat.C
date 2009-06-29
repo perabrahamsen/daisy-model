@@ -674,7 +674,7 @@ SoilHeat::load_syntax (Frame& frame)
   frame.declare ("h_frozen", "cm^-1", Value::Const,
               "Pressure below which no more water will freeze.");
   frame.set ("h_frozen", -15000.0);
-  frame.declare ("enable_ice", Value::Boolean, Value::Const,
+  frame.declare_boolean ("enable_ice", Value::Const,
               "Disable this to prevent water from freezing.");
   frame.set ("enable_ice", false);
   frame.declare ("T_top", "dg C", Value::OptionalState, 

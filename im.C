@@ -245,7 +245,7 @@ IM::add_syntax (Frame& frame,
 		Value::category cat, 
 		const symbol dimension)
 {
-  frame.declare ("name", Value::String, cat, "Name of chemical.");
+  frame.declare_string ("name", cat, "Name of chemical.");
   frame.set_check ("name", Chemical::check_library ());
   frame.declare ("value", dimension, Check::non_negative (), cat, 
              "Value for chemical.");

@@ -191,9 +191,9 @@ Waits the specified period.")
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);	
-    frame.declare ("days", Value::Integer, Value::Const, 
+    frame.declare_integer ("days", Value::Const, 
                 "Wait this number of days.");
-    frame.declare ("hours", Value::Integer, Value::Const, 
+    frame.declare_integer ("hours", Value::Const, 
                 "Wait this number of hours.");
     frame.declare_submodule ("end_time", Value::OptionalState,
                           "Wait until this date.\
@@ -266,11 +266,11 @@ Wait until a specific month and day in the year.")
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);	
-    frame.declare ("month", Value::Integer, Value::Const, 
+    frame.declare_integer ("month", Value::Const, 
                 "Wait until this month.");
-    frame.declare ("day", Value::Integer, Value::Const, 
+    frame.declare_integer ("day", Value::Const, 
 		  "Wait until this day in the month.");
-    frame.declare ("hour", Value::Integer, Value::Const, 
+    frame.declare_integer ("hour", Value::Const, 
                 "Wait until this hour.");
     frame.set ("hour", 8);
     frame.order ("month", "day");

@@ -395,7 +395,7 @@ struct ActionMarkvand : public Action
 void 
 ActionMarkvand::crop_map_t::load_syntax (Frame& frame)
 { 
-  frame.declare ("Daisy", Value::String, Value::Const, 
+  frame.declare_string ("Daisy", Value::Const, 
 	      "Name of Daisy crop.");
   frame.declare_object ("MARKVAND", MV_Crop::component, 
                      Value::Const, Value::Singleton,

@@ -64,9 +64,9 @@ public:
 void 
 LexerTable::Filter::load_syntax (Frame& frame)
 {
-  frame.declare ("tag", Value::String, Value::Const, "\
+  frame.declare_string ("tag", Value::Const, "\
 Name of column in Daisy log file to filter for.");
-  frame.declare ("allowed", Value::String, Value::Const, Value::Variable, "\
+  frame.declare_string ("allowed", Value::Const, Value::Variable, "\
 List of allowable values in filter.");
   frame.set_check ("allowed", VCheck::min_size_1 ());
   frame.order ("tag", "allowed");
@@ -443,9 +443,9 @@ LexerTable::error (const std::string& str) const
 void 
 LexerTable::load_syntax (Frame& frame)
 {
-  frame.declare ("file", Value::String, Value::Const, "\
+  frame.declare_string ("file", Value::Const, "\
 Name of Daisy log file where data is found.");
-  frame.declare ("missing", Value::String, Value::Const, Value::Variable, "\
+  frame.declare_string ("missing", Value::Const, Value::Variable, "\
 List of strings indicating missing values.");
   std::vector<symbol> misses;
   misses.push_back (symbol (""));
@@ -455,7 +455,7 @@ List of strings indicating missing values.");
 Only include data from rows that passes all these filters.",
 				 LexerTable::Filter::load_syntax);
   frame.set_empty ("filter");
-  frame.declare ("original", Value::String, Value::OptionalConst, 
+  frame.declare_string ("original", Value::OptionalConst, 
               Value::Variable, "\
 List of dimensions of the data in the data file.\n\
 \n\
@@ -464,7 +464,7 @@ dimension for all columns in the file.  Otherwise, the list must have\n\
 one element for each column.\n\
 \n\
 By default Daisy will use the names specified in data file.");
-  frame.declare ("dim_line", Value::Boolean, Value::OptionalConst, "\
+  frame.declare_boolean ("dim_line", Value::OptionalConst, "\
 If true, assume the line after the tags contain dimensions.\n\
 By default this will be true iff 'original' is not specified.");
 }

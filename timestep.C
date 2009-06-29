@@ -160,19 +160,19 @@ Timestep::load_syntax (Frame& frame)
 void 
 Timestep::load_frame (Frame& frame)
 {
-  frame.declare ("years", Value::Integer, Value::State, 
+  frame.declare_integer ("years", Value::State, 
               "Number of years.");
   frame.set ("years", 0);
-  frame.declare ("days", Value::Integer, Value::State, 
+  frame.declare_integer ("days", Value::State, 
               "Number of days.");
   frame.set ("days", 0);
-  frame.declare ("hours", Value::Integer, Value::State, 
+  frame.declare_integer ("hours", Value::State, 
               "Number of hours.");
   frame.set ("hours", 0);
-  frame.declare ("minutes", Value::Integer, Value::State, 
+  frame.declare_integer ("minutes", Value::State, 
               "Number of minutes.");
   frame.set ("minutes", 0);
-  frame.declare ("seconds", Value::Integer, Value::State, 
+  frame.declare_integer ("seconds", Value::State, 
               "Number of seconds.");
   frame.set ("seconds", 0);
 }

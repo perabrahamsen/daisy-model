@@ -39,7 +39,6 @@
 struct Syntax::Implementation
 {
   std::vector<check_fun> checker;
-  std::vector<symbol> order;
   typedef std::map<symbol, Value::type> type_map;
   typedef std::map<symbol, Value::category> status_map;
   typedef std::map<symbol, Syntax::load_syntax_t> submodel_map;
@@ -68,7 +67,6 @@ struct Syntax::Implementation
   { }
   Implementation (const Implementation& old)
     : checker (old.checker),
-      order (old.order),
       types (old.types),
       status (old.status),
       submodels (old.submodels),
@@ -395,32 +393,6 @@ Syntax::description (const symbol key) const
     return (*i).second;
 }
 
-bool 
-Syntax::ordered () const
-{
-  return impl->order.size () > 0;
-}
-
-const std::vector<symbol>& 
-Syntax::order () const
-{
-  return impl->order;
-}
-
-bool
-Syntax::total_order () const
-{ 
-  size_t non_logs = 0;
-  for (Implementation::status_map::iterator i = impl->status.begin ();
-       i != impl->status.end ();
-       i++)
-    {
-      if ((*i).second != Value::LogOnly)
-	non_logs++;
-    }
-  return impl->order.size () == non_logs; 
-}
-
 const FrameSubmodel& 
 Syntax::default_frame (const symbol key) const
 {
@@ -531,59 +503,6 @@ void
 Syntax::set_check (const symbol name, const VCheck& vcheck)
 { 
   impl->val_checks[name] = &vcheck;
-}
-
-void 
-Syntax::order (const std::vector<symbol>& order)
-{
-  impl->order = order;
-}
-
-void 
-Syntax::order (const symbol one)
-{
-  daisy_assert (impl->order.size () == 0);
-  impl->order.push_back (one);
-}
-
-void 
-Syntax::order (const symbol one, const symbol two)
-{
-  daisy_assert (impl->order.size () == 0);
-  impl->order.push_back (one);
-  impl->order.push_back (two);
-}
-
-void 
-Syntax::order (const symbol one, const symbol two, const symbol three)
-{
-  daisy_assert (impl->order.size () == 0);
-  impl->order.push_back (one);
-  impl->order.push_back (two);
-  impl->order.push_back (three);
-}
-
-void 
-Syntax::order (const symbol one, const symbol two, const symbol three,
-	       const symbol four)
-{
-  daisy_assert (impl->order.size () == 0);
-  impl->order.push_back (one);
-  impl->order.push_back (two);
-  impl->order.push_back (three);
-  impl->order.push_back (four);
-}
-
-void 
-Syntax::order (const symbol one, const symbol two, const symbol three,
-	       const symbol four, const symbol five)
-{
-  daisy_assert (impl->order.size () == 0);
-  impl->order.push_back (one);
-  impl->order.push_back (two);
-  impl->order.push_back (three);
-  impl->order.push_back (four);
-  impl->order.push_back (five);
 }
 
 void

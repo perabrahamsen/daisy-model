@@ -421,7 +421,7 @@ as well as depth below row.")
   void load_frame (Frame& frame) const
   {
     frame.set_strings ("cite", "gp74");
-    frame.declare ("debug", Value::Integer, Value::Const, "\
+    frame.declare_integer ("debug", Value::Const, "\
 Add debug messages if larger than 0.");
     frame.set ("debug", 0);
     frame.declare ("row_position", "cm", Value::State, "\

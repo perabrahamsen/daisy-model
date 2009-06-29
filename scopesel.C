@@ -87,7 +87,7 @@ static struct ScopeselNameSyntax : public DeclareModel
 
   void load_frame (Frame& frame) const
   { 
-    frame.declare ("frame", Value::String, Value::Const,
+    frame.declare_string ("frame", Value::Const,
                "Name of scope to select.");
     frame.order ("frame");
   }

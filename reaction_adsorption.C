@@ -170,9 +170,9 @@ static struct ReactionAdsorptionSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("solute", Value::String, Value::Const,
+    frame.declare_string ("solute", Value::Const,
 		"Name of solute form of chemical.");
-    frame.declare ("sorbed", Value::String, Value::Const,
+    frame.declare_string ("sorbed", Value::Const,
 		"Name of sorbed form of chemical.");
     frame.declare_object ("equilibrium", Adsorption::component, "\
 Function for calculating equilibrium between solute and sorbed form.");

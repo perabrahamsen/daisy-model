@@ -157,10 +157,10 @@ static struct ReactionFilterSyntax : public DeclareModel
   {
 
 
-    frame.declare ("immobile", Value::String, Value::OptionalConst,
+    frame.declare_string ("immobile", Value::OptionalConst,
                    "Immobile colloids in the soil.\n\
 By default, filtered colloids are not tracked.");
-    frame.declare ("mobile", Value::String, Value::Const,
+    frame.declare_string ("mobile", Value::Const,
                    "Mobile colloids dissolved in soil water.");
     frame.declare ("F_primary", "g/cm^3/h", Value::LogOnly, Value::SoilCells,
                    "Filtration in the primary domain (intra-aggregate pores).");

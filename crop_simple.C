@@ -539,7 +539,7 @@ Minimum LAI, automatically cleared when exceeded by 'LAIvsTS'.");
     frame.declare ("day", "d", Check::non_negative (), Value::State, 
 		"Number of days since sowing (or spring).");
     frame.set ("day", 0.0);
-    frame.declare ("spring", Value::Integer, Value::Const, 2,
+    frame.declare_integer ("spring", Value::Const, 2,
 		"Zero 'T_sum' at this month and day.");
     std::vector<int> spring_time;
     spring_time.push_back (3);

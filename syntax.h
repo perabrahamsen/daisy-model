@@ -66,9 +66,6 @@ public:
   symbol domain (symbol) const;
   symbol range (symbol) const;
   symbol description (symbol) const;
-  bool ordered () const;
-  const std::vector<symbol>& order () const;
-  bool total_order () const;	// True iff all members are ordered.
   const FrameSubmodel& default_frame (symbol) const;
   symbol submodel_name (symbol) const;
 
@@ -160,18 +157,6 @@ public:
                    Value::category, int size, const symbol description);
 
   void set_check (symbol name, const VCheck& vcheck);
-
-  // It is possible to impose an order on the syntax entries, which
-  // will allow the input module to parse the entries without the user
-  // having to specify the names of the entries.  It is recommended
-  // *not* to use this in general, as it makes it more difficult to
-  // declare new entries.
-  void order (const std::vector<symbol>&);
-  void order (symbol);
-  void order (symbol, symbol);
-  void order (symbol, symbol, symbol);
-  void order (symbol, symbol, symbol, symbol);
-  void order (symbol, symbol, symbol, symbol, symbol);
 
   // Create and Destroy.
 

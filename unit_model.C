@@ -141,7 +141,7 @@ Base parameterization for all SI based units.")
       {
         const symbol unit = UnitSI::base_unit[i].unit;
         const symbol dimension = UnitSI::base_unit[i].dimension;
-        frame.declare (dimension, Value::Integer, Value::Const, "\
+        frame.declare_integer (dimension, Value::Const, "\
 Dimension, base unit [" + unit + "].");
         frame.set (dimension, 0);
       }
@@ -736,7 +736,7 @@ Connvert to base units by multiplying with a factor.")
   void load_frame (Frame& frame) const
   {
     // Add the 'factor' factor model.
-    frame.declare ("base", Value::String, Value::Const, "\
+    frame.declare_string ("base", Value::Const, "\
 Base unit to convert to and from.");
     // TODO: Should add check that 'base' is indeed a base unit.
     frame.declare ("factor", Value::None (), Check::non_zero (), Value::Const, "\
@@ -808,7 +808,7 @@ Connvert to base units by multiplying factor, then substracting offset.")
   void load_frame (Frame& frame) const
   {
     // Add the 'SIoffset' offset model.
-    frame.declare ("base", Value::String, Value::Const, "\
+    frame.declare_string ("base", Value::Const, "\
 Base unit to convert to and from.");
     // TODO: Should add check that 'base' is indeed a base unit.
     frame.declare ("factor", Value::None (), Check::non_zero (), Value::Const, "\

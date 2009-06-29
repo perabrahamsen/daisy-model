@@ -688,10 +688,10 @@ a too small value for this parameter, the solution may be unstable.");
 Maximum height of ponding before spilling into biopores.\n\
 After macropores are activated pond will have this height.");
     frame.set ("pond_max", 0.05);
-    frame.declare ("use_small_timesteps", Value::Boolean, Value::Const,
+    frame.declare_boolean ("use_small_timesteps", Value::Const,
                 "True iff the sink is allowed to change within a timestep.");
     frame.set ("use_small_timesteps", true);
-    frame.declare ("active", Value::Boolean, Value::OptionalState,
+    frame.declare_boolean ("active", Value::OptionalState,
                 Value::SoilCells, "Active biopores in cells.");
     frame.declare ("water_volume", "cm^3", Value::LogOnly, "Water volume.");    
     frame.declare ("water_height", "cm", Value::LogOnly,
@@ -703,7 +703,7 @@ Total amount of solutes in biopores divided by surface area.", load_storage);
     frame.declare ("ddt", "h", Value::LogOnly, "Emulated timestep.\n\
 Timestep scaled for available water.\n\
 Only relevant if 'use_small_timesteps' is false.");    
-    frame.declare ("deactivate_steps", Value::Integer, Value::State, 
+    frame.declare_integer ("deactivate_steps", Value::State, 
                 "No matrix exchange for this number of timesteps.\n\
 Automatically set when matrix pressure is in a disarray, such as after\n\
 tillage operations, or calls to reserve models.");

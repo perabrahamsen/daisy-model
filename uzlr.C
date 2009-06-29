@@ -360,7 +360,7 @@ to z_top, where there can be Darcy movement.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("overflow_warn", Value::Boolean, Value::Const, "\
+    frame.declare_boolean ("overflow_warn", Value::Const, "\
 If true, warn the first time the soil profile is oversaturated.");
     frame.set ("overflow_warn", true);
     frame.declare ("h_fc", "cm", Value::Const, "Field capacity.");

@@ -220,7 +220,7 @@ By default, let the first source decide.", "");
                        Value::State, Value::Variable, "\
 List of timeseries to merge.");
     frame.set_check ("source", VCheck::min_size_1 ());
-    frame.declare ("dimension", Value::String, Value::OptionalConst, "\
+    frame.declare_string ("dimension", Value::OptionalConst, "\
 Dimension of data to plot.\n\
 By default use the first source with a known dimension.");
 

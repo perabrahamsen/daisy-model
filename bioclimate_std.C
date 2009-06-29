@@ -1118,7 +1118,7 @@ The default bioclimate model.")
   void load_frame (Frame& frame) const
   {
     // Canopy structure.
-    frame.declare ("NoOfIntervals", Value::Integer, Value::Const, "\
+    frame.declare_integer ("NoOfIntervals", Value::Const, "\
 Number of vertical intervals in which we partition the canopy.");
     frame.set ("NoOfIntervals", 30);
     frame.declare ("Height", "cm", Value::LogOnly, Value::CanopyEdges, "\
@@ -1223,7 +1223,7 @@ The intended use is colloid generation.");
                    "Actual evaporation from pond.");
 
     // Water going through soil surface.
-    frame.declare ("max_svat_iterations", Value::Integer, Value::Const, "\
+    frame.declare_integer ("max_svat_iterations", Value::Const, "\
 Max number of svat iterations before giving up on cobvergence.");
     frame.set ("max_svat_iterations", 100);  
     frame.declare ("max_svat_absolute_difference", "mm/h", Value::Const, "\

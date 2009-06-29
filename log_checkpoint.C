@@ -247,7 +247,7 @@ hot start.")
   void load_frame (Frame& frame) const
   { 
     Model::load_model (frame);
-    frame.declare ("where", Value::String, Value::Const,
+    frame.declare_string ("where", Value::Const,
                 "File name prefix for the generated checkpoint.\n\
 The time will be appended, together with the '.dai' suffix.");
     frame.set ("where", "checkpoint");

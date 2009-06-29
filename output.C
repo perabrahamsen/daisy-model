@@ -240,9 +240,8 @@ List of default time components to include in log files. Choose between:\n";
       if (empty_valid)
 	valid_component.add (name);
     }
-  frame.declare ("log_time_columns",
-	      Value::String, Value::Const, Value::Variable, 
-	      log_time_doc);
+  frame.declare_string ("log_time_columns", Value::Const, Value::Variable, 
+                        log_time_doc);
   frame.set_check ("log_time_columns", valid_component);
   std::vector<symbol> default_time;
   default_time.push_back (symbol ("year"));

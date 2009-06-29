@@ -209,7 +209,7 @@ static struct ProgramWSE_tableSyntax : public DeclareModel
     frame.declare_object ("wse", WSE::component, 
                        Value::Const, Value::Singleton, "\
 The water stress effect to show in the table.");
-    frame.declare ("intervals", Value::Integer, Value::Const, "\
+    frame.declare_integer ("intervals", Value::Const, "\
 Number of intervals in the table.");
     frame.set ("intervals", 10);
     frame.order ("wse");

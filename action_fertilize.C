@@ -288,7 +288,7 @@ Let the amount of fertilizer depend on the inorganic nitrogen in the soil.\n\
 The amount of fertilizer will be the specified 'target', minus the amount\n\
 already present in the soil zone between 'from' and 'to'.",
                           &ActionFertilize::Precision::load_syntax);
-    frame.declare ("second_year_compensation", Value::Boolean, Value::Const, "\
+    frame.declare_boolean ("second_year_compensation", Value::Const, "\
 Compensate for the second year effect of previous fertilizations.\n\
 The second year effect is solely governed by the 'second_year_utilization'\n\
 organic fertilizer parameter.  The second year effect does not fade with\n\

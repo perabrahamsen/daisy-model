@@ -985,7 +985,7 @@ Resistance for water moving from biopore through wall to primary domain.");
                 Value::OptionalConst, "\
 Resistance for water moving from biopore through wall to secondary domain.\n\
 If not specified, this will be identical to 'R_primary'.");
-    frame.declare ("debug", Value::Integer, Value::Const, "Debug level.\n\
+    frame.declare_integer ("debug", Value::Const, "Debug level.\n\
 Increase value to get more debug message.");
     frame.set ("debug", 0);
     frame.declare ("h_bottom", "cm", Value::OptionalState, Value::Variable,
@@ -994,11 +994,11 @@ Increase value to get more debug message.");
 Chemical concentration in biopore intervals.", load_solute);
     frame.set_empty ("solute");
     frame.declare ("water", "cm^3", Value::LogOnly, "Water content.");    
-    frame.declare ("iterations", Value::Integer, Value::LogOnly, 
+    frame.declare_integer ("iterations", Value::LogOnly, 
                 "Number of iterations used for finding a solution.");
     frame.declare ("h3_soil", "cm", Value::LogOnly, Value::Variable,
                 "Pressure suggested by the soil for each interval.");
-    frame.declare ("max_iterations", Value::Integer, Value::Const, "\
+    frame.declare_integer ("max_iterations", Value::Const, "\
 Maximum number of iterations when seeking convergence.");
     frame.set ("max_iterations", 50);
     frame.declare ("max_absolute_difference", "cm", Value::Const, "\

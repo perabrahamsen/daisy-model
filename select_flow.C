@@ -180,7 +180,7 @@ Common base for logging flow through a specific plane.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("density", Value::Boolean, Value::Const, 
+    frame.declare_boolean ("density", Value::Const, 
                "If true, divide value with volume height.");
     frame.set ("density", false);
     frame.declare_object ("volume", Volume::component, 

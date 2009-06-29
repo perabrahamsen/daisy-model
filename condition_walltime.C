@@ -68,7 +68,7 @@ it was true.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("period", Value::Integer, Value::Const, 
+    frame.declare_integer ("period", Value::Const, 
 		"Number of walltime seconds between success.");
     frame.set ("period", 1);
     frame.order ("period");

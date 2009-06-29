@@ -253,7 +253,7 @@ struct LogExtern::NumEntry
 
   static void load_syntax (Frame& frame)
   {
-    frame.declare ("name", Value::String, Value::State, "\
+    frame.declare_string ("name", Value::State, "\
 Name to refer to number with.");
     frame.declare ("value", Value::Unknown (), Value::State, "\
 Numeric value.");
@@ -317,10 +317,10 @@ Log simulation state for extern use.")
     frame.declare_submodule_sequence ("numbers", Value::OptionalState, "\
 Inititial numeric values.  By default, none.", 
                                   LogExtern::NumEntry::load_syntax);
-    frame.declare ("where", Value::String, Value::OptionalConst,
+    frame.declare_string ("where", Value::OptionalConst,
                 "Name of the extern log to use.\n\
 By default, use the model name.");
-    frame.declare ("parameter_names", Value::String, 
+    frame.declare_string ("parameter_names", 
                 Value::Const, Value::Variable, "\
 List of parameters to export.\n\
 \n\

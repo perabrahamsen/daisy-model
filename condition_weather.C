@@ -115,13 +115,13 @@ does not count in the sum.")
   {
       frame.add_check (check_alist);
 
-      frame.declare ("check_hour", Value::Integer, Value::Const, 
+      frame.declare_integer ("check_hour", Value::Const, 
 		  "Hour in day to update TSum.");
       frame.set ("check_hour", 6);
-      frame.declare ("reset_mday", Value::Integer, Value::Const, 
+      frame.declare_integer ("reset_mday", Value::Const, 
 		  "Day in month to reset TSum.");
       frame.set ("reset_mday", 1);
-      frame.declare ("reset_month", Value::Integer, Value::Const, 
+      frame.declare_integer ("reset_month", Value::Const, 
 		  "Month in year to reset TSum.");
       frame.set ("reset_month", 3);
       frame.declare ("TSum_limit", "dg C d", Value::Const, "\

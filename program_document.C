@@ -1259,14 +1259,14 @@ Generate the components part of the reference manual.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("where", Value::String, Value::Const, 
+    frame.declare_string ("where", Value::Const, 
                 "Name of file to store results in.");
     frame.set ("where", "components.tex");
     frame.declare_object ("format", Format::component, 
                        Value::Const, Value::Singleton,
                        "Text format used for the document.");
     frame.set ("format", "LaTeX");
-    frame.declare ("print_parameterizations", Value::Boolean, Value::Const,
+    frame.declare_boolean ("print_parameterizations", Value::Const,
 		"Include a copy of all loaded parameterizations in document.");
     frame.set ("print_parameterizations", false);
   }

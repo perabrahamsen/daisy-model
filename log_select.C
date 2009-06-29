@@ -330,7 +330,7 @@ Add entries to the log file when this condition is true.");
     frame.declare_object ("entries", Select::component, 
                        Value::State, Value::Variable,
                        "What to log in each column.");
-    frame.declare ("time_columns", Value::Boolean, Value::OptionalConst, "\
+    frame.declare_boolean ("time_columns", Value::OptionalConst, "\
 Iff true, add columns for year, month, mday and hour in the begining of\n\
 the lines.  By default, this will be true of you have not specified any\n\
 time entries yourself.");

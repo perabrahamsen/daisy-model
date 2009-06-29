@@ -176,10 +176,10 @@ Shared parameter for irrigate actions.")
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);	
-    frame.declare ("days", Value::Integer, Value::Const, 
+    frame.declare_integer ("days", Value::Const, 
                 "Irrigate this number of days.");
     frame.set ("days", 0);
-    frame.declare ("hours", Value::Integer, Value::OptionalConst, 
+    frame.declare_integer ("hours", Value::OptionalConst, 
                 "Irrigate this number of hours.\n\
 By default, irrigate 1 hour if days is 0, and 0 hours plus the specified\n\
 number of days else.");

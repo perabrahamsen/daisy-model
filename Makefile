@@ -1244,8 +1244,8 @@ bioincorporation${OBJ}: bioincorporation.C bioincorporation.h \
 log_dlf${OBJ}: log_dlf.C log_dlf.h log_select.h log.h time.h symbol.h \
   border.h model.h memutils.h dlf.h select.h destination.h units.h \
   volume.h geometry.h value.h assertion.h daisy.h program.h run.h \
-  timestep.h vcheck.h block.h scope.h frame.h treelog.h scope_block.h \
-  filepos.h librarian.h
+  timestep.h vcheck.h block.h scope.h frame_model.h frame.h treelog.h \
+  scope_block.h filepos.h librarian.h metalib.h library.h
 reaction_colgen${OBJ}: reaction_colgen.C reaction_colgen.h reaction.h model.h \
   symbol.h ponddamp.h librarian.h frame.h scope.h value.h log.h time.h \
   border.h chemistry.h treelog.h block.h geometry.h soil.h surface.h \

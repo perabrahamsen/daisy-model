@@ -236,7 +236,7 @@ VegetationPermanent::YearlyLAI::operator() (int year, int yday)
 void 
 VegetationPermanent::YearlyLAI::load_syntax (Frame& frame)
 {
-  frame.declare ("year", Value::Integer, Value::Const, "\
+  frame.declare_integer ("year", Value::Const, "\
 Year for which to use yearly LAI measurements.");
   frame.declare ("LAIvsDAY", "m^2/m^2", "yday", Value::OptionalConst, 
 		"LAI as a function of Julian day.\n\

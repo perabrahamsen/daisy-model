@@ -1765,10 +1765,10 @@ See Mollerup 2007 for details.")
                       Value::Const, Value::Singleton, "\
 Model used for solving matrix equation system.");
     frame.set ("solver", "cxsparse");
-    frame.declare ("enable_boundary_diffusion", Value::Boolean, Value::Const, "\
+    frame.declare_boolean ("enable_boundary_diffusion", Value::Const, "\
 If this is set, diffusion over boundaries is enabled."); 
     frame.set ("enable_boundary_diffusion", true);
-    frame.declare ("debug", Value::Integer, Value::Const, "\
+    frame.declare_integer ("debug", Value::Const, "\
 Enable additional debug message.\n\
 A value of 0 means no message, higher numbers means more messages.");
     frame.set ("debug", 0);

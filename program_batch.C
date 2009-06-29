@@ -104,7 +104,7 @@ static struct ProgramBatchSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("directory", Value::String, Value::Const, "\
+    frame.declare_string ("directory", Value::Const, "\
 Directory in which to initialize, check and run the programs.");
     frame.set ("directory", ".");
     frame.declare_object ("run", Program::component, 

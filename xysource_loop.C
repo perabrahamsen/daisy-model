@@ -203,7 +203,7 @@ End of interval.");
     frame.declare ("step", Value::User (), Check::non_zero (), Value::Const, "\
 Disretization within interval.");
     
-    frame.declare ("tag", Value::String, Value::Const, "\
+    frame.declare_string ("tag", Value::Const, "\
 Name of free variable to calculate the 'x' and 'y' expressions from.");
     frame.set ("tag", "x");
 

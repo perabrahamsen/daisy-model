@@ -440,7 +440,7 @@ static struct ChemistryMultiSyntax : public DeclareModel
     frame.declare_object ("combine", Chemistry::component, 
                       Value::State, Value::Variable, "\
 List of chemistry parameterizations you want to combine.");
-    frame.declare ("ignore", Value::String, Value::State, Value::Variable,
+    frame.declare_string ("ignore", Value::State, Value::Variable,
                "Don't warn when spraying one of these chemicals.\n\
 The first time an untraced chemical not on the list is sprayed on the\n\
 field, Daisy will issue a warning and add the chemical to this list.");

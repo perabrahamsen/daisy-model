@@ -32,6 +32,7 @@
 #include "treelog.h"
 #include <sstream>
 #include <iomanip>
+#include <ctime>
 
 // Content.
 
@@ -517,30 +518,30 @@ void
 Time::load_syntax (Frame& frame)
 {
   frame.add_check (check_alist);
-  frame.declare ("year", Value::Integer, Value::State, "Current year.");
+  frame.declare_integer ("year", Value::State, "Current year.");
   frame.set_check ("year", VCheck::valid_year ());
-  frame.declare ("month", Value::Integer, Value::State, "Current month.");
+  frame.declare_integer ("month", Value::State, "Current month.");
   static VCheck::IRange mm (1, 12);
   frame.set_check ("month", mm);
-  frame.declare ("mday", Value::Integer, Value::State, 
+  frame.declare_integer ("mday", Value::State, 
 	      "Current day in the month.");
   static VCheck::IRange dd (1, 31);
   frame.set_check ("mday", dd);
-  frame.declare ("hour", Value::Integer, Value::State, "Current hour.");
+  frame.declare_integer ("hour", Value::State, "Current hour.");
   static VCheck::IRange hh (0, 23);
   frame.set_check ("hour", hh);
   frame.set ("hour", 0);
   frame.order ("year", "month", "mday", "hour");
-  frame.declare ("minute", Value::Integer, Value::State, "Current minute.");
+  frame.declare_integer ("minute", Value::State, "Current minute.");
   static VCheck::IRange ss (0, 59);
   frame.set_check ("minute", ss);
   frame.set ("minute", 0);
-  frame.declare ("second", Value::Integer, Value::State, "Current second.");
+  frame.declare_integer ("second", Value::State, "Current second.");
   frame.set_check ("second", ss);
   frame.set ("second", 0);
-  frame.declare ("week", Value::Integer, Value::LogOnly, "Current week.");
-  frame.declare ("yday", Value::Integer, Value::LogOnly, "Current Julian day.");
-  frame.declare ("wday", Value::String, Value::LogOnly, "Current weekday.\n\
+  frame.declare_integer ("week", Value::LogOnly, "Current week.");
+  frame.declare_integer ("yday", Value::LogOnly, "Current Julian day.");
+  frame.declare_string ("wday", Value::LogOnly, "Current weekday.\n\
 Monday is 1, Sunday is 7.");
 }
 
@@ -575,6 +576,16 @@ Time::null ()
 {
   static Time no_time;
   return no_time;
+}
+
+Time 
+Time::now ()
+{
+  const std::time_t now_time = std::time (NULL);
+  const std::tm now_tm = *std::localtime (&now_time);
+  Time time (now_tm.tm_year, now_tm.tm_mon + 1, now_tm.tm_mday, 
+             now_tm.tm_hour, now_tm.tm_min, now_tm.tm_sec);
+  return time;
 }
 
 const Time& 
@@ -669,3 +680,5 @@ Time::between (const Time& from, const Time& to) const
     return false;
   return true;
 }
+
+// time.C ends here.

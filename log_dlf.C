@@ -27,11 +27,13 @@
 #include "assertion.h"
 #include "daisy.h"
 #include "block.h"
-#include "frame.h"
+#include "frame_model.h"
 #include "treelog.h"
 #include "scope_block.h"
 #include "filepos.h"
 #include "librarian.h"
+#include "metalib.h"
+#include "library.h"
 #include <sstream>
 
 void
@@ -254,20 +256,53 @@ std::vector<std::pair<symbol, symbol>/**/>
 LogDLF::build_parameters (Block& al)
 {
   std::vector<std::pair<symbol, symbol>/**/> result;
-  ScopeBlock scope_block (al);
-  std::vector<symbol> pars = al.name_sequence ("parameter_names");
-  for (size_t i = 0; i < pars.size (); i++)
+  if (al.check ("parameter_names"))
     {
-      const symbol key = pars[i];
-      if (scope_block.has_name (key))
+      ScopeBlock scope_block (al);
+      std::vector<symbol> pars = al.name_sequence ("parameter_names");
+      for (size_t i = 0; i < pars.size (); i++)
         {
-          const symbol value = scope_block.name (key);
-          std::string id = key.name ();
-          std::transform (id.begin (), id.end (), id.begin (), ::toupper);
-          result.push_back (std::pair<symbol, symbol> (symbol (id), value));
+          const symbol key = pars[i];
+          if (scope_block.has_name (key))
+            {
+              const symbol value = scope_block.name (key);
+              std::string id = key.name ();
+              std::transform (id.begin (), id.end (), id.begin (), ::toupper);
+              result.push_back (std::pair<symbol, symbol> (symbol (id), value));
+            }
+          else
+            al.msg ().warning ("Parameter name '" + key + "' not found"); 
         }
-      else
-        al.msg ().warning ("Parameter name '" + key + "' not found"); 
+    }
+  else
+    {
+      daisy_notreached ();      // 'parameter_names' is not optional.
+      const Metalib& metalib = al.metalib ();
+      const Library& library = metalib.library (Log::component);
+      const FrameModel& dlf_frame = library.model ("DLF");
+      const Frame& my_frame = al.frame ();
+      std::set<symbol> dlf_entries;
+      std::set<symbol> my_entries;
+      std::set<symbol> new_entries;
+      dlf_frame.entries (dlf_entries);
+      my_frame.entries (my_entries);
+      std::set_difference (my_entries.begin (), my_entries.end (),
+                           dlf_entries.begin (), dlf_entries.end (), 
+                           std::inserter (new_entries, new_entries.end ()));
+      std::vector<std::pair<symbol, symbol>/**/> result;
+      std::vector<symbol> pars (new_entries.begin (), new_entries.end ());
+      ScopeBlock scope_block (al);
+      for (size_t i = 0; i < pars.size (); i++)
+        {
+          const symbol key = pars[i];
+          if (scope_block.has_name (key))
+            {
+              const symbol value = scope_block.name (key);
+              std::string id = key.name ();
+              std::transform (id.begin (), id.end (), id.begin (), ::toupper);
+              result.push_back (std::pair<symbol, symbol> (symbol (id), value));
+            }
+        }
     }
   return result;
 }
@@ -306,7 +341,7 @@ Shared base class for log models generating Daisy Log File formatted results.")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.declare ("parameter_names", Value::String, 
+    frame.declare_string ("parameter_names", 
                    Value::Const, Value::Variable, "\
 List of string parameters to print to the table header.\n\
 \n\
@@ -314,45 +349,45 @@ For example, if you have defined 'column' and 'crop' parameters for\n\
 this table log parameterization, you can print them to the log file\n\
 header by specifying '(names column crop)'.");
     frame.set_empty ("parameter_names");
-    frame.declare ("where", Value::String, Value::Const,
+    frame.declare_string ("where", Value::Const,
                    "Name of the log file to create.");
-    frame.declare ("print_header", Value::String, Value::Const,
+    frame.declare_string ("print_header", Value::Const,
                    "If this is set to 'false', no header is printed.\n\
 If this is set to 'true', a full header is printer.\n\
 If this is set to 'fixed', a small fixed size header is printed.");
     static VCheck::Enum check_header ("false", "true", "fixed");
     frame.set_check ("print_header", check_header);
     frame.set ("print_header", "true");
-    frame.declare ("print_tags", Value::Boolean, Value::Const,
+    frame.declare_boolean ("print_tags", Value::Const,
                    "Print a tag line in the file.");
     frame.set ("print_tags", true);
-    frame.declare ("print_dimension", Value::Boolean, Value::Const,
+    frame.declare_boolean ("print_dimension", Value::Const,
                    "Print a line with units after the tag line.");
     frame.set ("print_dimension", true);
-    frame.declare ("print_initial", Value::Boolean, Value::Const,
+    frame.declare_boolean ("print_initial", Value::Const,
                    "Print a line with initial values when logging starts.");
     frame.set ("print_initial", true);
-    frame.declare ("flush", Value::Boolean, Value::Const,
+    frame.declare_boolean ("flush", Value::Const,
                    "Flush to disk after each entry (for debugging).");
     frame.set ("flush", false);
-    frame.declare ("record_separator", Value::String, Value::Const, "\
+    frame.declare_string ("record_separator", Value::Const, "\
 String to print between records (time steps).");
     frame.set ("record_separator", "\n");
-    frame.declare ("field_separator", Value::String, Value::Const, "\
+    frame.declare_string ("field_separator", Value::Const, "\
 String to print between fields.");
     frame.set ("field_separator", "\t");
-    frame.declare ("error_string", Value::String, Value::Const, "\
+    frame.declare_string ("error_string", Value::Const, "\
 String to print when errors are encountered.");
     frame.set ("error_string", "!");
-    frame.declare ("missing_value", Value::String, Value::Const, "\
+    frame.declare_string ("missing_value", Value::Const, "\
 String to print when the path doesn't match anything.\n\
 This can be relevant for example if you are logging a crop, and there are\n\
 no crops on the field.");
     frame.set ("missing_value", "00.00");
-    frame.declare ("array_separator", Value::String, Value::Const, "\
+    frame.declare_string ("array_separator", Value::Const, "\
 String to print between array entries.");
     frame.set ("array_separator", "\t");
-    Librarian::add_doc_fun (LogSelect::component, 
+    Librarian::add_doc_fun (Log::component, 
                             LogSelect::document_entries);
   }
 } LogDLF_syntax;

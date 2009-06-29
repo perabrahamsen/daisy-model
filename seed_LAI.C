@@ -135,7 +135,7 @@ Only used during the initial phase.");
     frame.set ("SpLAIfac", SpLf);
 
     // State.
-    frame.declare ("InitCAI", Value::Boolean, Value::State,
+    frame.declare_boolean ("InitCAI", Value::State,
                 "Initial CAI development phase.");
     frame.set ("InitCAI", true);
   }

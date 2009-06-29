@@ -191,9 +191,9 @@ static struct NumberGetSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.declare ("name", Value::String, Value::Const, 
+    frame.declare_string ("name", Value::Const, 
                 "Name of a the symbol.");
-    frame.declare ("dimension", Value::String, Value::Const, 
+    frame.declare_string ("dimension", Value::Const, 
                 "Expected dimension for the symbol.");
     frame.order ("name", "dimension");
   }
@@ -390,7 +390,7 @@ static struct NumberFetchSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.declare ("name", Value::String, Value::Const, 
+    frame.declare_string ("name", Value::Const, 
                 "Name of a the symbol.");
     frame.order ("name");
   }
@@ -500,7 +500,7 @@ Pass value unchanged.")
   void load_frame (Frame& frame) const
   {
     Model::load_model (frame);
-    frame.declare ("dimension", Value::String, Value::OptionalConst,
+    frame.declare_string ("dimension", Value::OptionalConst,
 		"Dimension of this value.");
   }
 } NumberIdentity_syntax;
@@ -560,7 +560,7 @@ Convert to specified dimension.")
   void load_frame (Frame& frame) const
   {
 
-    frame.declare ("dimension", Value::String, Value::Const,
+    frame.declare_string ("dimension", Value::Const,
 		"Dimension to convert to.");
     frame.order ("value", "dimension");
   }
@@ -613,10 +613,10 @@ Specify dimension for number.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("warn_known", Value::Boolean, Value::Const,
+    frame.declare_boolean ("warn_known", Value::Const,
                 "Issue a warning if the dimensions is already known.");
     frame.set ("warn_known", true);
-    frame.declare ("dimension", Value::String, Value::Const,
+    frame.declare_string ("dimension", Value::Const,
 		"Dimension to use.");
     frame.order ("value", "dimension");
   }

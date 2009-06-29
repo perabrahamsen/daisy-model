@@ -121,10 +121,11 @@ public:
   // Construct.
 public:
   static const Time& null ();
+  static Time now ();
   const Time& operator= (const Time&);
+  Time (const Time&);
   Time (int year, int month, int mday, int hour,
         int minute = 0, int second = 0);
-  Time (const Time&);
   ~Time ();
 private:                    
   explicit Time ();

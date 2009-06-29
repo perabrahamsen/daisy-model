@@ -270,7 +270,7 @@ static struct NumberHorizonSyntax : public DeclareBase
 The soil horizon whose properties we want to examine.");
     frame.declare_object ("h", Number::component, "\
 The tension we want to compare with.");
-    frame.declare ("top_soil", Value::Boolean, Value::Const, "\
+    frame.declare_boolean ("top_soil", Value::Const, "\
 Set this to true for the A horizon.");
   }
 } NumberHorizon_syntax;
@@ -474,7 +474,7 @@ static struct NumberTensionByThetaSyntax : public DeclareModel
 The soil horizon whose properties we want to examine.");
     frame.declare_object ("Theta", Number::component, "\
 The water content we want to compare with.");
-    frame.declare ("top_soil", Value::Boolean, Value::Const, "\
+    frame.declare_boolean ("top_soil", Value::Const, "\
 Set this to true for the A horizon.");
   }
 } NumberTensionByTheta_syntax;

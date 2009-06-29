@@ -62,7 +62,7 @@ HorHeat::load_syntax (Frame& frame)
                  Value::Const,
                  "Gemetry factor used for conductivity calculation.");
   frame.set ("mineral_form_factor", 4.0);
-  frame.declare ("intervals", Value::Integer, Value::Const, "\
+  frame.declare_integer ("intervals", Value::Const, "\
 Number of numeric intervals to use in the heat coductivity table.");
   frame.set ("intervals", 100);
   frame.declare ("C_soil", "erg/cm^3/dg C", Check::positive (), 

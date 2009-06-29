@@ -167,7 +167,7 @@ A weather model with precipitation at regular intervals.")
       frame.declare ("precipitation_value", "mm/h", Value::Const,
 		  "Amount of precipitation.");
       frame.set ("precipitation_value", 0.0);
-      frame.declare ("interval", Value::Integer, Value::Const,
+      frame.declare_integer ("interval", Value::Const,
 		  "Number of hours between each precipitation event.");
       frame.set ("interval", 1);
       frame.declare ("reference_evapotranspiration_value", "mm/h", Value::Const,

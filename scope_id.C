@@ -93,7 +93,7 @@ static struct ScopeIDSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.declare ("name", Value::String, Value::Const, 
+    frame.declare_string ("name", Value::Const, 
                 "Identifier name.");
     frame.declare ("value", Value::User (), Value::Const, 
                 "Initial value and dimension.");

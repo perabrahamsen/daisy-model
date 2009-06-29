@@ -197,10 +197,10 @@ static struct NumberPLFSyntax : public DeclareModel
 
     frame.declare_object ("operand", Number::component,
                        "Operand for this function.");
-    frame.declare ("domain", Value::String, Value::Const, "\
+    frame.declare_string ("domain", Value::Const, "\
 Unit for the operand of the function.");
     frame.set ("domain", Value::Unknown ());
-    frame.declare ("range", Value::String, Value::Const, "\
+    frame.declare_string ("range", Value::Const, "\
 Unit for the operand of the function.");
     frame.set ("range", Value::Unknown ());
     frame.declare_submodule_sequence ("points", Value::Const, "\

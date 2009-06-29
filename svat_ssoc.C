@@ -889,7 +889,7 @@ static struct SVAT_SSOCSyntax : public DeclareModel
                        Value::Const, Value::Singleton, "\
 Model used for solving the energy balance equation system.");
     frame.set ("solver", "cxsparse");
-    frame.declare ("hypostomatous", Value::Boolean, Value::Const,
+    frame.declare_boolean ("hypostomatous", Value::Const,
                 "True for hypostomatous leaves. \n\
 False for amphistomatous leaves (possesing stomata on both surfaces).");
     frame.set ("hypostomatous", true);
@@ -900,7 +900,7 @@ Largest temperature difference for convergence.");
     frame.declare ("maxEdiff", "Pa", Value::Const, "\
 Largest humidity difference for convergence.");
     frame.set ("maxEdiff", 0.01);
-    frame.declare ("max_iteration", Value::Integer, Value::Const, "\
+    frame.declare_integer ("max_iteration", Value::Const, "\
 Largest number of iterations before giving up on convergence.");
     frame.set ("max_iteration", 150);  
 

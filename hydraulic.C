@@ -289,7 +289,7 @@ Generate a table of the rentention curve and hydraulic conductivity.")
     frame.declare_object ("hydraulic", Hydraulic::component, 
                        Value::Const, Value::Singleton, "\
 The hydraulic model to show in the table.");
-    frame.declare ("intervals", Value::Integer, Value::Const, "\
+    frame.declare_integer ("intervals", Value::Const, "\
 Number of intervals in the table.");
     frame.set ("intervals", 50);
     frame.order ("hydraulic");

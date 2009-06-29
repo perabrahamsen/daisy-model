@@ -121,7 +121,7 @@ HorizonSystem::System::load_frame (Frame& frame) const
     }
   frame.declare_fraction ("humus", Value::Const,
                        "Humus content of soil.");
-  frame.declare ("normalize", Value::Boolean, Value::Const, "\
+  frame.declare_boolean ("normalize", Value::Const, "\
 If this is true, normalize the mineral fraction to 1.0.\n\
 Otherwise, give an error if the sum is not 1.0.");
   frame.set ("normalize", false);

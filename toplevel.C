@@ -624,7 +624,7 @@ Toplevel::load_frame (Frame& frame)
 {
   Units::load_syntax (frame);
 
-  frame.declare ("install_directory", Value::String, Value::Const,
+  frame.declare_string ("install_directory", Value::Const,
               "Directory where Daisy has been installed.\n\
 \n\
 This is used for looking up files that came with the installation, in\n\
@@ -638,12 +638,11 @@ are not running MS Windows), a hardcoded value is used.  This is\n\
 The value found in the manual corresponds to the system where the\n\
 manual was generated.");
   frame.set ("install_directory", Path::get_daisy_home ());
-  frame.declare ("directory", Value::String, Value::OptionalConst,
+  frame.declare_string ("directory", Value::OptionalConst,
               "Run program in this directory.\n\
 This can affect both where input files are found and where log files\n\
 are generated.");
-  frame.declare ("path", Value::String,
-              Value::Const, Value::Variable,
+  frame.declare_string ("path", Value::Const, Value::Variable,
               "List of directories to search for input files in.\n\
 The special value \".\" means the current directory.\n\
 \n\

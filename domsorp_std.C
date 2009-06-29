@@ -141,9 +141,9 @@ static struct DomsorpStandardSyntax : public DeclareModel
   {
     frame.declare_object ("transform", Transform::component,
                           "Tranformation process between DOM and SOM.");
-    frame.declare ("dom_pool", Value::Integer, Value::Const,
+    frame.declare_integer ("dom_pool", Value::Const,
                    "Number of the DOM pool affected by the transformation.");
-    frame.declare ("som_pool", Value::Integer, Value::Const,
+    frame.declare_integer ("som_pool", Value::Const,
                    "Number of the SOM pool affected by the transformation.");
     frame.declare ("S_C", "g C/cm^3/h", Value::LogOnly, Value::SoilCells,
                    "Carbon converted from DOM to SOM (may be negative).");

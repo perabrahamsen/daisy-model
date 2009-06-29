@@ -108,16 +108,32 @@ class EXPORT Frame : public WScope
 
   // Add attribute types.
  public:
-  void declare (symbol key,	// Generic.
-                Value::type t, 
-                Value::category cat,
-                int size,
-                symbol description);
-  void declare (symbol key,
-                Value::type t, 
-                Value::category cat,
-                symbol description)
-  { declare (key, t, cat, Value::Singleton, description); }
+  void declare_boolean (symbol key, // Boolean.
+                        Value::category cat,
+                        int size,
+                        symbol description);
+  void declare_boolean (symbol key,
+                        Value::category cat,
+                        symbol description)
+  { declare_boolean (key, cat, Value::Singleton, description); }
+
+  void declare_integer (symbol key, // Integer.
+                        Value::category cat,
+                        int size,
+                        symbol description);
+  void declare_integer (symbol key,
+                        Value::category cat,
+                        symbol description)
+  { declare_integer (key, cat, Value::Singleton, description); }
+
+  void declare_string (symbol key, // String
+                       Value::category cat,
+                       int size,
+                       symbol description);
+  void declare_string (symbol key,
+                       Value::category cat,
+                       symbol description)
+  { declare_string (key, cat, Value::Singleton, description); }
 
   void declare (symbol key, // Number.
                 symbol dim,

@@ -77,7 +77,7 @@ True iff the crop has reached development stage 'ds'.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("crop", Value::String, Value::Const,
+    frame.declare_string ("crop", Value::Const,
                 "Name of crop on the field to test.\n\
 Specify \"all\" to use combined weight of all crops on the field in test.");
     static RangeII ds_range (-1.0, 2.0);
@@ -129,7 +129,7 @@ True iff the crop has reached the specified amount of dry matter.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("crop", Value::String, Value::Const,
+    frame.declare_string ("crop", Value::Const,
                 "Name of crop on the field to test.");
     frame.declare ("weight", "kg DM/ha", Check::non_negative (), Value::Const,
                 "\
@@ -182,7 +182,7 @@ True iff the storage organ has reached the specified amount of dry matter.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("crop", Value::String, Value::Const,
+    frame.declare_string ("crop", Value::Const,
                 "Name of crop on the field to test.");
     frame.declare ("weight", "kg DM/ha", Check::non_negative (), Value::Const,
                 "\

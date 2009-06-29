@@ -355,7 +355,7 @@ Ignored if you specify 'turnover_halftime'.");
 	      Value::OptionalConst, 
 	      "Turnover halftime from buffer into SOM.\n\
 Overrules 'turnover_rate' if specified.");
-  frame.declare ("where", Value::Integer, Value::Const,
+  frame.declare_integer ("where", Value::Const,
 	      "The SOM pool to move the buffer content into.\n\
 The first and slow SOM pool is numbered '0', the second and faster\n\
 is numbered '1'.");
@@ -458,7 +458,7 @@ By default, the yearly average from the weather component will be used.");
   frame.declare ("h", "cm", Check::non_positive (), Value::Const, "\
 Pressure used for equilibrium.");
   frame.set ("h", -100.0);
-  frame.declare ("variable_pool", Value::Integer, Value::OptionalConst, "\
+  frame.declare_integer ("variable_pool", Value::OptionalConst, "\
 If neither the C content nor 'SOM_fractions' are specified, equilibrium is\n\
 assumed for all SOM pools except the one specified by this parameter.\n\
 If you set this to -1 (or any number nor corresponding to a SOM pool),\n\
@@ -466,7 +466,7 @@ equilibrium will be assumed for all pools, and the humus content\n\
 specified by the horizon will be ignored.\n\
 Note, the numbering is zero-based, so '0' specifies SOM1.\n\
 By default, the slowest active pool will be used.");
-  frame.declare ("variable_pool_2", Value::Integer, Value::OptionalConst, "\
+  frame.declare_integer ("variable_pool_2", Value::OptionalConst, "\
 If 'background_mineralization' is specified, this pool is no longer\n\
 assumed to be in equilibrium.\n\
 Note, the numbering is zero-based, so '0' specifies SOM1.\n\
@@ -487,7 +487,7 @@ The subsoil is not affected by this parameter.\n\
 \n\
 If the background mineralization is unspecified, 'variable_pool_2' will be\n\
 assumed to be in equilibrium instead.");
-  frame.declare ("SOM_limit_where", Value::Integer, Value::Const, "\
+  frame.declare_integer ("SOM_limit_where", Value::Const, "\
 This is the SOM pool that must be within the limits specified by\n\
 'SOM_limit_lower' and 'SOM_limit_upper'.  Use negative number to disable.\n\
 Note, the numbering is zero-based, so '0' specifies SOM1.");
@@ -521,17 +521,17 @@ Works like 'SOM_limit_lower'.");
   SOM_limit_upper.push_back (0.0);
   frame.set ("SOM_limit_upper", SOM_limit_upper);
   
-  frame.declare ("debug_equations", Value::Integer, Value::Const, 
+  frame.declare_integer ("debug_equations", Value::Const, 
 	      Value::Variable, "\
 Print equations used for initialization for the specified intervals.");
   frame.set_empty ("debug_equations");
-  frame.declare ("debug_rows", Value::Boolean, Value::Const, "\
+  frame.declare_boolean ("debug_rows", Value::Const, "\
 Print summari information for each row.");
   frame.set ("debug_rows", true);
-  frame.declare ("debug_to_screen", Value::Boolean, Value::Const, "\
+  frame.declare_boolean ("debug_to_screen", Value::Const, "\
 If true, print debug information to screen, else to the 'daisy.log' file.");
   frame.set ("debug_to_screen", false);
-  frame.declare ("top_summary", Value::String, Value::OptionalConst, "\
+  frame.declare_string ("top_summary", Value::OptionalConst, "\
 Name of file to print a summary of the organic carbon and nitrogen\n\
 content in the zone down to the 'end' parameter.\n\
 If unspecified, no such file will be generated, but the summary will\n\
@@ -2956,10 +2956,10 @@ Organic carbon content of this layer.");
     Model::load_model (frame);
     frame.set_strings ("cite", "daisy-fertilizer", "daisy-somnew");
     frame.add_check (check_alist);
-    frame.declare ("active_underground", Value::Boolean, Value::Const, "\
+    frame.declare_boolean ("active_underground", Value::Const, "\
 Set this flag to turn on mineralization below the root zone.");
     frame.set ("active_underground", false);
-    frame.declare ("active_groundwater", Value::Boolean, Value::OptionalConst, "\
+    frame.declare_boolean ("active_groundwater", Value::OptionalConst, "\
 IGNORED: Use 'water_factor' to disable mineralization.");
     frame.declare ("K_NH4", "h^-1", Check::fraction (), Value::Const, 
                "Maximal immobilization rate for ammonium.");

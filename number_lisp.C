@@ -45,7 +45,7 @@ struct NumberLet : public Number
       static void load_syntax (Frame& frame)
       {
         // Bind an identifier to an expression.
-        frame.declare ("identifier", Value::String, Value::Const, 
+        frame.declare_string ("identifier", Value::Const, 
                     "Identifier to bind.");
         frame.declare_object ("expr", Number::component, 
                            " Value to give it.");

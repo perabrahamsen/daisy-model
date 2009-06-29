@@ -159,7 +159,7 @@ void
 FetchPretty::load_syntax (Frame& frame)
 {
   Fetch::load_syntax (frame); 
-  frame.declare ("name", Value::String, Value::OptionalConst, "\
+  frame.declare_string ("name", Value::OptionalConst, "\
 Name to use for this line.  By default use the tag.");
   frame.declare ("factor", Value::None (), Value::Const, "\
 Factor to multiply with to get the sum.\n\
