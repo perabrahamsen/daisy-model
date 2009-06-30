@@ -29,6 +29,7 @@
 #include "submodeler.h"
 #include "treelog.h"
 #include "frame_submodel.h"
+#include "metalib.h"
 #include <sstream>
 #include <memory>
 
@@ -89,8 +90,10 @@ struct NumberPLF : public Number
     Treelog::Open nest (msg, name);
     return operand->check_dim (units, scope, domain, msg); 
   }
-  static bool check_alist (const Metalib&, const Frame& al, Treelog& msg) 
+  static bool check_alist (const Metalib& metalib, 
+                           const Frame& al, Treelog& msg) 
   {
+    const Units& units = metalib.units ();
     const symbol domain (al.name ("domain"));
     const symbol range (al.name ("range"));
     const auto_vector<const Point*> points 
@@ -109,7 +112,6 @@ struct NumberPLF : public Number
 	const Point& point = *points[i];
 
 	double x = point.x_value;
-#ifdef HAS_METALIB
 	const symbol x_dim = point.x_dimension;
 
 	if (domain != Value::Unknown () && x_dim != Value::Unknown ())
@@ -120,7 +122,6 @@ struct NumberPLF : public Number
 	      msg.error (err);
 	      ok = false;
 	    }
-#endif // HAS_METALIB
 	if (ok && i > 0 && x <= last_x)
 	  {
 	    std::ostringstream tmp;
@@ -130,7 +131,6 @@ struct NumberPLF : public Number
 	  }
 	last_x = x;
 
-#ifdef HAS_METALIB
 	const symbol y_dim = point.y_dimension;
 	if (domain != Value::Unknown () && y_dim != Value::Unknown ())
 	  try
@@ -140,7 +140,6 @@ struct NumberPLF : public Number
 	      msg.error (err);
 	      ok = false;
 	    }
-#endif // HAS_METALIB
       }
     return ok;
   }

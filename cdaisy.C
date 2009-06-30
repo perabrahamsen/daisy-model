@@ -765,3 +765,5 @@ daisy_initialize ()
 extern "C" const char* EXPORT
 daisy_version ()
 { return symbol (version).name ().c_str (); }
+
+// cdaisy.C ends here.

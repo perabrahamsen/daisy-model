@@ -302,7 +302,6 @@ class EXPORT Frame : public WScope
   // Create and Destroy.
  protected:
   Frame (const Frame&);
-  Frame (const Frame*);
   Frame ();
  public:
   void overwrite_values (const Frame&); // For using metalib as program frame.

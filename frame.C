@@ -1099,10 +1099,6 @@ Frame::Frame ()
   : impl (new Implementation ())
 { }
 
-Frame::Frame (const Frame *const old)
-  : impl (old ? new Implementation (*old->impl) : new Implementation ())
-{ }
-
 void
 Frame::overwrite_values (const Frame& other)
 { 
