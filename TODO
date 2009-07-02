@@ -7,7 +7,7 @@ clone?  BlockModel?
 
 * Regression testing
 
-** Log: akkumulerede værdier skal ikke være per tid.
+** ? Log: akkumulerede værdier skal ikke være per tid.
 
 ** LogDLF::done skal fortælle fetch om tidsskridt
 
