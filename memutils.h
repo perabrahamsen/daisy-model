@@ -22,6 +22,7 @@
 #define MEMUTILS_H
 
 #include <vector>
+#include <map>
 
 template <class ForwardIterator> // From Mumit's STL newbie guide.
 void sequence_delete (ForwardIterator first, ForwardIterator last) {
@@ -51,6 +52,19 @@ struct auto_vector : public std::vector<T>
   { }
   ~auto_vector ()
   { sequence_delete (this->begin (), this->end ()); }
+};
+
+template <class S, class T>
+struct auto_map : public std::map<S, T>
+{
+  auto_map (const std::map<S, T>& m)
+    : std::map<S, T> (m)
+  { }
+  auto_map ()
+    : std::map<S, T> ()
+  { }
+  ~auto_map ()
+  { map_delete (this->begin (), this->end ()); }
 };
 
 #endif // MEMUTILS_H
