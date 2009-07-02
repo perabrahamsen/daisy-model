@@ -23,7 +23,7 @@
 #ifndef TERTIARY_H
 #define TERTIARY_H
 
-#include "model.h"
+#include "model_framed.h"
 #include <map>
 
 class Block;

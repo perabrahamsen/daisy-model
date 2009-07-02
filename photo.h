@@ -21,7 +21,7 @@
 #ifndef PHOTO_H
 #define PHOTO_H
 
-#include "model.h"
+#include "model_derived.h"
 #include <vector>
 
 class CanopyStandard;
@@ -31,7 +31,7 @@ class Treelog;
 class Block;
 class Units;
 
-class Photo : public ModelLogable
+class Photo : public ModelDerived
 {
   // Content.
 public:

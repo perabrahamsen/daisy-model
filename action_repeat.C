@@ -32,8 +32,12 @@
 
 struct ActionRepeat : public Action
 {
+  FrameModel modified_frame;
   const std::auto_ptr<FrameModel> repeat;
   std::auto_ptr<Action> action;
+
+  const FrameModel& frame () const
+  { return modified_frame; }
 
   void tick (const Daisy& daisy, const Scope& scope, Treelog& msg)
   { 
@@ -65,7 +69,7 @@ struct ActionRepeat : public Action
   void output (Log& log) const
   { 
     if (action.get ())
-      output_derived (action, "do", log);
+      output_object (action, "do", log);
   }
 
   void initialize (const Daisy& daisy, const Scope& scope, Treelog& msg)
@@ -84,14 +88,14 @@ struct ActionRepeat : public Action
 
   ActionRepeat (Block& al)
     : Action (al),
+      modified_frame (Action::frame (), FrameModel::parent_link),
       repeat (&al.model ("repeat").clone ()),
       action (al.check ("do") 
               ? Librarian::build_item<Action> (al, "do")
               : Librarian::build_item<Action> (al, "repeat"))
   { 
-    daisy_assert (frame.get ());
-    if (!frame->check ("do"))
-      frame->set ("do", frame->model ("repeat"));
+    if (!modified_frame.check ("do"))
+      modified_frame.set ("do", *repeat);
   }
   ~ActionRepeat ()
   { }

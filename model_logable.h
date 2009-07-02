@@ -1,6 +1,6 @@
-// scopesel.h -- Select a scope.
+// model_logable.h -- Base class for logable models in Daisy.
 // 
-// Copyright 2007 Per Abrahamsen and KVL.
+// Copyright 2007, 2009 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -18,34 +18,32 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef SCOPESEL_H
-#define SCOPESEL_H
+
+#ifndef MODEL_LOGABLE_H
+#define MODEL_LOGABLE_H
 
 #include "model.h"
 #include "symbol.h"
 
-class Output;
-class Scope;
-class Treelog;
-class AttributeList;
+class Log;
 
-class Scopesel : public Model
+// 'ModelLogable' is the base class for all logable models.
+class ModelLogable : public Model
 {
   // Content.
 public:
-  static const char *const component;
-  symbol library_id () const;
+  const symbol name;            // Remember name for logs.
+  virtual symbol library_id () const = 0;
 
   // Use.
 public:
-  virtual Scope* lookup (const Output&, Treelog& msg) const = 0;
+  virtual void output (Log& log) const = 0;
 
   // Create and Destroy.
 private:
-  Scopesel (const Scopesel&);
-public:
-  explicit Scopesel ();
-  ~Scopesel ();
+  ModelLogable ();
+protected:
+  ModelLogable (symbol);
 };
 
-#endif // SCOPESEL_H
+#endif // MODEL_LOGABLE_H

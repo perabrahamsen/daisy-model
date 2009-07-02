@@ -69,7 +69,7 @@ Groundwater::output (Log& log) const
 }
 
 Groundwater::Groundwater (Block& al)
-  : ModelLogable (al.type_name ())
+  : ModelDerived (al.type_name ())
 { }
 
 Groundwater::~Groundwater ()

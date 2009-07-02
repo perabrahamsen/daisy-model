@@ -23,13 +23,13 @@
 #ifndef NET_RADIATION_H
 #define NET_RADIATION_H
 
-#include "model.h"
+#include "model_derived.h"
 
 class Weather;
 class Block;
 class Treelog;
 
-class NetRadiation : public ModelLogable
+class NetRadiation : public ModelDerived
 {
   // Content.
 public:

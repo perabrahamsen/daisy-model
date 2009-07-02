@@ -817,7 +817,7 @@ ColumnStandard::output (Log& log) const
   output_submodule (*soil, "Soil", log);
   output_submodule (*soil_water, "SoilWater", log);
   output_submodule (*soil_heat, "SoilHeat", log);
-  output_derived (chemistry, "Chemistry", log);
+  output_object (chemistry, "Chemistry", log);
   output_derived (vegetation, "Vegetation", log);
   output_derived (organic_matter, "OrganicMatter", log);
   output_value (second_year_utilization_, "second_year_utilization", log);
@@ -918,12 +918,11 @@ ColumnStandard::initialize (Block& block,
     }
   const Weather& my_weather = weather.get () ? *weather : *global_weather;
   bioclimate->initialize (block, my_weather);
-  daisy_assert (frame.get ());
-  soil_heat->initialize (frame->submodel ("SoilHeat"), geometry, 
+  soil_heat->initialize (frame ().submodel ("SoilHeat"), geometry, 
                          movement->default_heat (*soil, time, my_weather),
                          msg);
 
-  soil_water->initialize (frame->submodel ("SoilWater"), 
+  soil_water->initialize (frame ().submodel ("SoilWater"), 
                           geometry, *soil, *soil_heat, *groundwater, msg);
   
   // Solutes depends on water and heat.
@@ -933,7 +932,7 @@ ColumnStandard::initialize (Block& block,
   // Organic matter and vegetation.
   const double T_avg = my_weather.average_temperature ();
   organic_matter->initialize (block.metalib (), 
-                              units, frame->model ("OrganicMatter"), 
+                              units, frame ().model ("OrganicMatter"), 
                               geometry, *soil, *soil_water, *soil_heat, 
                               T_avg, msg);
   vegetation->initialize (block.metalib (), 

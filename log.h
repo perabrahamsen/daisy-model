@@ -25,7 +25,7 @@
 
 #include "time.h"
 #include "border.h"
-#include "model.h"
+#include "model_framed.h"
 #include "symbol.h"
 #include <iosfwd>
 #include <memory>

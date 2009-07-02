@@ -603,7 +603,7 @@ ActionCrop::fertilize (Daisy& daisy, Treelog& msg,
 void 
 ActionCrop::Tillage::output (Log& log) const
 {
-  output_derived (operation, "operation", log);
+  output_object (operation, "operation", log);
 }
 
 bool 

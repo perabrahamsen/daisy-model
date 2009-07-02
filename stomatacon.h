@@ -21,7 +21,7 @@
 #ifndef STOMATACON_H
 #define STOMATACON_H
 
-#include "model.h"
+#include "model_logable.h"
 #include <vector>
 
 class Log;

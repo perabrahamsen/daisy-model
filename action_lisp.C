@@ -152,7 +152,7 @@ struct ActionCond : public Action
     std::vector<Action*> actions;
     void output (Log& log) const
     { 
-      output_derived (condition, "condition", log);
+      output_object (condition, "condition", log);
       output_list (actions, "actions", log, Action::component);
     }
     static void load_syntax (Frame& frame)
@@ -278,9 +278,9 @@ struct ActionIf : public Action
 
   void output (Log& log) const
   { 
-    output_derived (if_c, "if", log);
-    output_derived (then_a, "then", log);
-    output_derived (else_a, "else", log);
+    output_object (if_c, "if", log);
+    output_object (then_a, "then", log);
+    output_object (else_a, "else", log);
   }
 
   void initialize (const Daisy& daisy, const Scope& scope, Treelog& out)

@@ -52,7 +52,7 @@ struct LogAList : public Log
   // Stack Accessors.
   symbol entry () const;
   const Library& library () const;
-  Frame& frame () const;
+  Frame& frame_entry () const;
   std::vector<const Frame*>& frame_sequence ();
   int unnamed ();
 

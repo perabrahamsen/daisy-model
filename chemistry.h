@@ -22,7 +22,7 @@
 #ifndef CHEMISTRY_H
 #define CHEMISTRY_H
 
-#include "model.h"
+#include "model_framed.h"
 #include "symbol.h"
 #include <vector>
 

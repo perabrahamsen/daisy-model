@@ -22,7 +22,7 @@
 #ifndef BIOPORE_H
 #define BIOPORE_H
 
-#include "model.h"
+#include "model_framed.h"
 #include "symbol.h"
 #include "number.h"
 #include "im.h"

@@ -40,7 +40,7 @@ SVAT::output (Log&) const
 { }
 
 SVAT::SVAT (Block& al)
-  : ModelLogable (al.type_name ())
+  : ModelDerived (al.type_name ())
 { }
 
 SVAT::~SVAT ()

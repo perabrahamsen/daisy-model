@@ -24,7 +24,7 @@
 #ifndef GROUNDWATER_H
 #define GROUNDWATER_H
 
-#include "model.h"
+#include "model_derived.h"
 
 class Frame;
 class Time;
@@ -37,7 +37,7 @@ class Block;
 class Scope;
 class Units;
 
-class Groundwater : public ModelLogable
+class Groundwater : public ModelDerived
 {
   // Content.
 public:

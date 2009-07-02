@@ -174,7 +174,7 @@ Daisy::output (Log& log) const
   if (weather.get ())
     output_derived (weather, "weather", log);
   output_vector (harvest, "harvest", log);
-  output_derived (action, "manager", log);
+  output_object (action, "manager", log);
 }
 
 void

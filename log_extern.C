@@ -223,7 +223,7 @@ LogExtern::description (const symbol tag) const
     if (LogSelect::entries[i]->tag () == tag)
       return symbol (LogSelect::entries[i]->get_description ());
 
-  return frame->description (tag);
+  return frame ().description (tag);
 }
 
 symbol

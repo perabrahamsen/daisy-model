@@ -23,7 +23,7 @@
 #ifndef SVAT_H
 #define SVAT_H
 
-#include "model.h"
+#include "model_derived.h"
 #include "symbol.h"
 
 class Log;
@@ -39,7 +39,7 @@ class Bioclimate;
 class Block;
 class Treelog;
 
-class SVAT : public ModelLogable
+class SVAT : public ModelDerived
 {
   // Content.
 public:

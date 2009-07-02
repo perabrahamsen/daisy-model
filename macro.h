@@ -24,6 +24,8 @@
 #define MACRO_H
 
 #include "model.h"
+#include "symbol.h"
+
 #include <vector>
 
 class Geometry1D;

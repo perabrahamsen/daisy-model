@@ -815,9 +815,8 @@ OrganicStandard::output (Log& log) const
 	  const symbol name = (*item)->real_name ();
 	  if (log.check_entry (name, AM::component))
 	    {
-              daisy_assert ((*item)->frame.get ());
 	      Log::NamedEntry named_entry (log, name, (*item)->name,
-					   *(*item)->frame);
+					   (*item)->frame ());
 	      (*item)->output (log);
 	    }
 	}

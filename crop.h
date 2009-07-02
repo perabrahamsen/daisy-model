@@ -23,7 +23,7 @@
 #ifndef CROP_H
 #define CROP_H
 
-#include "model.h"
+#include "model_framed.h"
 #include "time.h"
 #include <vector>
 

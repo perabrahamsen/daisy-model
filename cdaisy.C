@@ -103,9 +103,11 @@ daisy_type_name (Value::type number)
 
 // @ The daisy_frame Type.
 
+#if 0
 extern "C" Frame* EXPORT
 daisy_frame_clone (const Frame* frame)
 { return &frame->clone (); }
+#endif
 
 extern "C" void EXPORT
 daisy_frame_delete (Frame* frame)
@@ -590,8 +592,7 @@ daisy_column_get_name (const Column* column)
 extern "C" const char* EXPORT
 daisy_column_get_description (const Column* column)
 { 
-  daisy_assert (column->frame.get ());
-  const FrameModel& frame = *column->frame; 
+  const FrameModel& frame = column->frame (); 
   const symbol d = frame.description ();
   if (d != Value::None ())
     return d.name ().c_str ();

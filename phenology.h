@@ -22,7 +22,7 @@
 #ifndef PHENOLOGY_H
 #define PHENOLOGY_H
 
-#include "model.h"
+#include "model_derived.h"
 #include "symbol.h"
 #include <string>
 
@@ -33,7 +33,7 @@ class Vernalization;
 class Treelog;
 class Block;
 
-class Phenology : public ModelLogable
+class Phenology : public ModelDerived
 {
   // Content.
 public:

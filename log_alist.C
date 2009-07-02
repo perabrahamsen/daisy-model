@@ -55,7 +55,7 @@ LogAList::library () const
 }
 
 Frame&
-LogAList::frame () const
+LogAList::frame_entry () const
 {
   daisy_assert (frame_stack.size () > 0U);
   daisy_assert (frame_stack.front ());
@@ -170,7 +170,7 @@ LogAList::open (const symbol name)
   if (is_active)
     {
       const std::string& sname = name.name ();
-      if (frame ().is_const (sname))
+      if (frame_entry ().is_const (sname))
         {
           std::stringstream tmp;
           tmp << "'" << name << "' is const;";
@@ -178,28 +178,28 @@ LogAList::open (const symbol name)
             tmp << " " << entry_stack[i];
           daisy_panic (tmp.str ());
         }
-      if (frame ().is_state (sname))
+      if (frame_entry ().is_state (sname))
 	{
-	  const int size = frame ().type_size (sname);
-	  const bool has_value = frame ().check (sname);
-	  switch (frame ().lookup (sname))
+	  const int size = frame_entry ().type_size (sname);
+	  const bool has_value = frame_entry ().check (sname);
+	  switch (frame_entry ().lookup (sname))
 	    {
 	    case Value::AList:
 	      if (size != Value::Singleton && has_value)
 		push (name, 
-		      frame ().default_frame (sname),
-		      frame ().submodel_sequence (sname));
+		      frame_entry ().default_frame (sname),
+		      frame_entry ().submodel_sequence (sname));
 	      else if (size != Value::Singleton || !has_value)
 		push (name, 
-		      frame ().default_frame (sname));
+		      frame_entry ().default_frame (sname));
 	      else 
 		push (name, 
-		      frame ().submodel (sname));
+		      frame_entry ().submodel (sname));
 		      
 	      break;
 	    case Value::Object:
               {
-                const symbol component = frame ().component (sname);
+                const symbol component = frame_entry ().component (sname);
                 const Library& library = metalib ().library (component);
                 daisy_assert (size != Value::Singleton);
                 push (name, library, library.model ("component"));
@@ -222,7 +222,7 @@ LogAList::close ()
   if (is_active)
     {
       // Remember old values.
-      Frame& old_frame = frame ();
+      Frame& old_frame = frame_entry ();
       std::vector<const Frame*> old_frame_sequence = frame_sequence ();
       const symbol old_entry = entry ();
 
@@ -233,27 +233,27 @@ LogAList::close ()
       if (entry_stack.size () > 0)
 	{
 	  const std::string& sold_entry = old_entry.name ();
-	  const Value::type type = frame ().lookup (sold_entry);
+	  const Value::type type = frame_entry ().lookup (sold_entry);
 	  switch (type)
 	    { 
 	    case Value::Object:
               {
                 // Object sequence.
-                daisy_assert (frame ().type_size (sold_entry)
+                daisy_assert (frame_entry ().type_size (sold_entry)
                               != Value::Singleton);
                 std::vector<const FrameModel*> copy;
                 for (size_t i = 0; i < old_frame_sequence.size (); i++)
                   copy.push_back (dynamic_cast<const FrameModel*>
                                   (old_frame_sequence[i]));
-                frame ().set (sold_entry, copy);
+                frame_entry ().set (sold_entry, copy);
               }
               break;
 	    case Value::AList:
 	      // AList sequence or singleton.
-	      if (frame ().type_size (sold_entry) == Value::Singleton)
+	      if (frame_entry ().type_size (sold_entry) == Value::Singleton)
 		{
 		  daisy_assert (old_frame_sequence.size () == 0);
-		  frame ().set (sold_entry, 
+		  frame_entry ().set (sold_entry, 
                                 dynamic_cast<const FrameSubmodel&> (old_frame));
 		}
 	      else
@@ -262,7 +262,7 @@ LogAList::close ()
                   for (size_t i = 0; i < old_frame_sequence.size (); i++)
                     copy.push_back (dynamic_cast<const FrameSubmodel*>
                                     (old_frame_sequence[i]));
-                  frame ().set (sold_entry, copy);
+                  frame_entry ().set (sold_entry, copy);
                 }
 	      delete &old_frame;
 	      break;
@@ -282,7 +282,7 @@ LogAList::open_unnamed ()
     {
       if (unnamed () < 0 || unnamed () >= frame_sequence ().size ())
 	// Use default frame.
-	push (entry (), frame ());
+	push (entry (), frame_entry ());
       else
 	{
 	  // Use specified frame.
@@ -298,7 +298,7 @@ LogAList::close_unnamed ()
 {
   if (is_active)
     {
-      Frame& old_frame = frame ();
+      Frame& old_frame = frame_entry ();
       pop ();
       if (unnamed () < 0 || unnamed () >= frame_sequence ().size ())
 	// From default frame.
@@ -323,8 +323,8 @@ LogAList::open_alist (symbol name, const Frame& f)
   if (is_active)
     {
       const std::string& sname = name.name ();
-      daisy_assert (frame ().lookup (sname) == Value::AList);
-      daisy_assert (frame ().type_size (sname) == Value::Singleton);
+      daisy_assert (frame_entry ().lookup (sname) == Value::AList);
+      daisy_assert (frame_entry ().type_size (sname) == Value::Singleton);
       push (name, f);
     }
   else
@@ -336,10 +336,10 @@ LogAList::close_alist ()
 { 
   if (is_active)
     {
-      Frame& old_frame = frame ();
+      Frame& old_frame = frame_entry ();
       const std::string& old_entry = entry ().name ();
       pop ();
-      frame ().set (old_entry, dynamic_cast<const FrameSubmodel&> (old_frame));
+      frame_entry ().set (old_entry, dynamic_cast<const FrameSubmodel&> (old_frame));
       delete &old_frame;
     }
   else
@@ -349,14 +349,14 @@ void
 LogAList::open_derived (const symbol field, const symbol type, 
                         const char *const library)
 { 
-  if (!frame ().check (field))
+  if (!frame_entry ().check (field))
     {
       std::ostringstream tmp;
       tmp << "No field '" << field << "' (type " << type
           << ") within library '" << library << "'";
       daisy_panic (tmp.str ());
     }
-  open_object (field, type, frame ().model (field), library);
+  open_object (field, type, frame_entry ().model (field), library);
 }
 	
 void
@@ -370,9 +370,9 @@ LogAList::open_object (symbol field, symbol type,
   if (is_active)
     {
       const std::string& sfield = field.name ();
-      daisy_assert (frame ().lookup (sfield) == Value::Object);
-      daisy_assert (frame ().type_size (sfield) == Value::Singleton);
-      const symbol component = frame ().component (sfield);
+      daisy_assert (frame_entry ().lookup (sfield) == Value::Object);
+      daisy_assert (frame_entry ().type_size (sfield) == Value::Singleton);
+      const symbol component = frame_entry ().component (sfield);
       const Library& library = metalib ().library (component);
       daisy_assert (library.name () == symbol (lib));
       if (!library.check (type))
@@ -389,10 +389,10 @@ LogAList::close_object ()
 { 
   if (is_active)
     {
-      Frame& old_frame = frame ();
+      Frame& old_frame = frame_entry ();
       const symbol old_entry = entry ();
       pop ();
-      frame ().set (old_entry, dynamic_cast<const FrameModel&> (old_frame));
+      frame_entry ().set (old_entry, dynamic_cast<const FrameModel&> (old_frame));
       delete &old_frame;
     }
   else
@@ -413,7 +413,7 @@ LogAList::close_entry ()
 {
   if (is_active)
     {
-      Frame& old_frame = frame ();
+      Frame& old_frame = frame_entry ();
       pop ();
       frame_sequence ().push_back (&old_frame);
     }
@@ -436,9 +436,9 @@ LogAList::output_entry (symbol name, const bool value)
   if (!is_active)
     return;
   const std::string& sname = name.name ();
-  daisy_assert (!frame ().is_const (sname));
-  if (frame ().is_state (sname))
-    frame ().set (sname, value);
+  daisy_assert (!frame_entry ().is_const (sname));
+  if (frame_entry ().is_state (sname))
+    frame_entry ().set (sname, value);
 }
 
 void
@@ -447,9 +447,9 @@ LogAList::output_entry (symbol name, const double value)
   if (!is_active)
     return;
   const std::string& sname = name.name ();
-  daisy_assert (!frame ().is_const (sname));
-  if (frame ().is_state (sname))
-    frame ().set (sname, value);
+  daisy_assert (!frame_entry ().is_const (sname));
+  if (frame_entry ().is_state (sname))
+    frame_entry ().set (sname, value);
 }
 
 void
@@ -458,9 +458,9 @@ LogAList::output_entry (symbol name, const int value)
   if (!is_active)
     return;
   const std::string& sname = name.name ();
-  daisy_assert (!frame ().is_const (sname));
-  if (frame ().is_state (sname))
-    frame ().set (sname, value);
+  daisy_assert (!frame_entry ().is_const (sname));
+  if (frame_entry ().is_state (sname))
+    frame_entry ().set (sname, value);
 }
 
 void
@@ -469,9 +469,9 @@ LogAList::output_entry (symbol name, symbol value)
   if (!is_active)
     return;
   const std::string& sname = name.name ();
-  daisy_assert (!frame ().is_const (sname));
-  if (frame ().is_state (sname))
-    frame ().set (sname, value);
+  daisy_assert (!frame_entry ().is_const (sname));
+  if (frame_entry ().is_state (sname))
+    frame_entry ().set (sname, value);
 }
 
 void
@@ -480,9 +480,9 @@ LogAList::output_entry (symbol name, const std::vector<double>& value)
   if (!is_active)
     return;
   const std::string& sname = name.name ();
-  daisy_assert (!frame ().is_const (sname));
-  if (frame ().is_state (sname))
-    frame ().set (sname, value);
+  daisy_assert (!frame_entry ().is_const (sname));
+  if (frame_entry ().is_state (sname))
+    frame_entry ().set (sname, value);
 }
 
 void
@@ -491,9 +491,9 @@ LogAList::output_entry (symbol name, const PLF& value)
   if (!is_active)
     return;
   const std::string& sname = name.name ();
-  daisy_assert (!frame ().is_const (sname));
-  if (frame ().is_state (sname))
-    frame ().set (sname, value);
+  daisy_assert (!frame_entry ().is_const (sname));
+  if (frame_entry ().is_state (sname))
+    frame_entry ().set (sname, value);
 }
 
 bool

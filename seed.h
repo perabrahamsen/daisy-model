@@ -21,12 +21,12 @@
 #ifndef SEED_H
 #define SEED_H
 
-#include "model.h"
+#include "model_derived.h"
 
 class Block;
 class Treelog;
 
-class Seed : public ModelLogable
+class Seed : public ModelDerived
 {
   // Content.
 public:

@@ -72,7 +72,7 @@ Vegetation::output (Log& log) const
 }
 
 Vegetation::Vegetation (Block& al)
-  : ModelLogable (al.type_name ()),
+  : ModelDerived (al.type_name ()),
     EpInterchange_ (al.number ("EpInterchange"))
 { }
 

@@ -1225,10 +1225,10 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
   C_below_expr->initialize (units, parent_scope, msg);
 
   std::vector<double> Ms;
-  geo.initialize_layer (C_avg_, *frame, "C", msg);
-  geo.initialize_layer (C_secondary_, *frame, "C_secondary", msg);
-  geo.initialize_layer (M_total_, *frame, "M", msg);
-  geo.initialize_layer (Ms, *frame, "Ms", msg);
+  geo.initialize_layer (C_avg_, frame (), "C", msg);
+  geo.initialize_layer (C_secondary_, frame (), "C_secondary", msg);
+  geo.initialize_layer (M_total_, frame (), "M", msg);
+  geo.initialize_layer (Ms, frame (), "Ms", msg);
 
   fillup (C_avg_, cell_size);
   fillup (C_secondary_, cell_size);

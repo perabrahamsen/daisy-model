@@ -23,7 +23,7 @@
 #ifndef WEATHER_H
 #define WEATHER_H
 
-#include "model.h"
+#include "model_derived.h"
 #include "im.h"
 
 class Time;
@@ -31,7 +31,7 @@ class Treelog;
 class Block;
 class Units;
 
-class Weather : public ModelLogable
+class Weather : public ModelDerived
 {
   // Content.
 public: 

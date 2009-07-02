@@ -21,7 +21,7 @@
 #ifndef ABAPROD_H
 #define ABAPROD_H
 
-#include "model.h"
+#include "model_derived.h"
 #include <vector>
 
 class Treelog;
@@ -32,7 +32,7 @@ class Geometry;
 class SoilWater;
 class Units;
 
-class ABAProd : public ModelLogable
+class ABAProd : public ModelDerived
 {
   // Content.
 public:

@@ -24,6 +24,8 @@
 #define AVERAGE_H
 
 #include "model.h"
+#include "symbol.h"
+
 #include <memory>
 
 class Block;

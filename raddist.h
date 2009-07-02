@@ -22,14 +22,14 @@
 #ifndef RADDIST_H
 #define RADDIST_H
 
-#include "model.h"
+#include "model_derived.h"
 #include <vector>
 
 class Vegetation;
 class Treelog;
 class Block;
 
-class Raddist : public ModelLogable
+class Raddist : public ModelDerived
 {
   // Content.
 public:

@@ -47,7 +47,7 @@ struct ActionWait : public Action
   { return condition->match (daisy, scope, msg); }
 
   void output (Log& log) const
-  { output_derived (condition, "condition", log); }
+  { output_object (condition, "condition", log); }
 
   void initialize (const Daisy& daisy, const Scope& scope, Treelog& out)
   { condition->initialize (daisy, scope, out); }

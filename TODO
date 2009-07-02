@@ -1,8 +1,9 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Move stuff fom syntax to frame
+* Move stuff from syntax to frame
 
 ** TypeBoolean etc?
+clone?  BlockModel?
 
 * Regression testing
 

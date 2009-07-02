@@ -23,6 +23,7 @@
 #define TRANSPORT_H
 
 #include "model.h"
+#include "symbol.h"
 #include <vector>
 #include <map>
 
@@ -45,6 +46,7 @@ class Transport : public Model
 {
   // Content.
 public:
+
   static const char *const component;
   symbol library_id () const;
 

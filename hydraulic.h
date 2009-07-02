@@ -23,7 +23,7 @@
 #ifndef HYDRAULIC_H
 #define HYDRAULIC_H
 
-#include "model.h"
+#include "model_derived.h"
 #include <memory>
 
 class Log;
@@ -32,7 +32,7 @@ class Treelog;
 class Texture;
 class Block;
 
-class Hydraulic : public ModelLogable
+class Hydraulic : public ModelDerived
 {
   // Content.
 public:

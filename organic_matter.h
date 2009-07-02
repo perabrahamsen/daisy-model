@@ -24,7 +24,7 @@
 #ifndef ORGANIC_MATTER_H
 #define ORGANIC_MATTER_H
 
-#include "model.h"
+#include "model_derived.h"
 #include <vector>
 
 class AttributeList;
@@ -44,7 +44,7 @@ class Block;
 class Units;
 class Metalib;
 
-class OrganicMatter : public ModelLogable
+class OrganicMatter : public ModelDerived
 {
   // Content.
 public:

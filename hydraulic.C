@@ -220,7 +220,7 @@ Hydraulic::check (Treelog& msg) const
 }
 
 Hydraulic::Hydraulic (Block& al)
-  : ModelLogable (al.type_name ()),
+  : ModelDerived (al.type_name ()),
     K_init (al.check ("K_at_h")
 	    ? new K_at_h (al.submodel ("K_at_h"))
 	    : NULL),
@@ -230,7 +230,7 @@ Hydraulic::Hydraulic (Block& al)
 { }
 
 Hydraulic::Hydraulic (const symbol name_, const double K_sat_)
-  : ModelLogable (name_),
+  : ModelDerived (name_),
     K_init (NULL),
     Theta_sat (-42.42e42),
     Theta_res (0.0),

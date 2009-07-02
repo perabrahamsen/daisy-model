@@ -24,7 +24,7 @@
 #ifndef CHEMICAL_H
 #define CHEMICAL_H
 
-#include "model.h"
+#include "model_framed.h"
 #include <vector>
 
 class Geometry;

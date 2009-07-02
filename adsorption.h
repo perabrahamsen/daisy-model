@@ -23,14 +23,14 @@
 #ifndef ADSORPTION_H
 #define ADSORPTION_H
 
-#include "model.h"
+#include "model_derived.h"
 
 class Log;
 class Soil;
 class Block;
 class AttributeList;
 
-class Adsorption : public ModelLogable
+class Adsorption : public ModelDerived
 {
   // Content.
 public:

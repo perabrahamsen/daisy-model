@@ -23,7 +23,7 @@
 #ifndef VEGETATION_H
 #define VEGETATION_H
 
-#include "model.h"
+#include "model_derived.h"
 #include "symbol.h"
 #include <vector>
 
@@ -46,7 +46,7 @@ class Block;
 class FrameModel;
 class Units;
 
-class Vegetation : public ModelLogable
+class Vegetation : public ModelDerived
 { 
   // Content.
 public:

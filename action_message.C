@@ -45,7 +45,7 @@ struct ActionAssert : public Action
   }
 
   void output (Log& log) const
-  { output_derived (condition, "condition", log); }
+  { output_object (condition, "condition", log); }
 
   void initialize (const Daisy& daisy, const Scope& scope, Treelog& out)
   { condition->initialize (daisy, scope, out); }

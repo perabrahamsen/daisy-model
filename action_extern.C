@@ -66,7 +66,7 @@ struct ActionExtern : public Action
   }
 
   void output (Log& log) const
-  { output_derived (child, "action", log); }
+  { output_object (child, "action", log); }
 
   void initialize (const Daisy& daisy, const Scope& parent_scope, Treelog& msg)
   { 

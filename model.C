@@ -21,10 +21,7 @@
 #define BUILD_DLL
 
 #include "model.h"
-#include "log.h"
-#include "frame_model.h"
-#include "assertion.h"
-#include "block.h"
+#include "frame.h"
 
 // Base class 'Model'
 
@@ -44,64 +41,6 @@ Model::Model ()
 { }
 
 Model::~Model ()
-{ }
-
-// The 'ModelLogable' Class.
-
-void 
-ModelLogable::output_as_derived (const symbol key, Log& log) const
-{
-  const char *const component = library_id ().name ().c_str ();
-  if (log.check_derived (key, name, component))
-    {
-      Log::Derived derived (log, key, name, component);
-      output (log);
-    }
-}
-
-ModelLogable::ModelLogable (const symbol n)
-  : name (n)
-{ }
-
-// The 'ModelFramed' Class.
-
-void 
-ModelFramed::output_as_object (const symbol key, Log& log) const
-{
-  const char *const component = library_id ().name ().c_str ();
-  if (log.check_derived (key, name, component))
-    {
-      daisy_assert (frame.get ());
-      Log::Object object (log, key, name, *frame, component);
-      output (log);
-    }
-}
-
-void 
-ModelFramed::output_as_entry (Log& log) const
-{
-  const char *const component = library_id ().name ().c_str ();
- 
-  if (log.check_entry (name, component))
-    {
-      daisy_assert (frame.get ());
-      Log::Entry entry (log, name, *frame, component);
-      output (log);
-    }
-}
-
-ModelFramed::ModelFramed (Block& al)
-  : ModelLogable (al.type_name ()),
-    // Block is sometimes fed a temporary frame, thus the need for clone.
-    frame (dynamic_cast<FrameModel*> (&(al.frame ().clone ())))
-{ daisy_assert (frame.get ());  }
-
-ModelFramed::ModelFramed (const symbol n)
-  : ModelLogable (n),
-    frame (NULL)
-{ }
-
-ModelFramed::~ModelFramed ()
 { }
 
 // model.C ends here.

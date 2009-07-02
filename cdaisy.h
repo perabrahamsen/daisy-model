@@ -88,9 +88,6 @@ daisy_type_name (int number);
  * A frame contains the attribute types and values.
  */
 
-EXPORT daisy_frame*                    /* Clone an existing frame object. */
-daisy_frame_clone (const daisy_frame* frame);
-
 EXPORT void                            /* Delete frame object. */
 daisy_frame_delete (daisy_frame* frame);
 

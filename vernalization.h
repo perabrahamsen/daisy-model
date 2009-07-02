@@ -22,14 +22,15 @@
 #ifndef VERNALIZATION_H
 #define VERNALIZATION_H
 
-#include "model.h"
+#include "model_derived.h"
 
 class AttributeList;
 class Frame;
 class Log;
 class PLF;
+class Block;
 
-class Vernalization : public ModelLogable
+class Vernalization : public ModelDerived
 {
 public:
   static const char *const component;

@@ -131,7 +131,7 @@ Movement::output (Log& log) const
 { 
   output_variable (water_failure_level, log);
   output_variable (solute_failure_level, log);
-  output_derived (tertiary, "Tertiary", log);
+  output_object (tertiary, "Tertiary", log);
 }
 
 bool 
@@ -169,7 +169,7 @@ Movement::initialize (const Units& units,
 }
 
 Movement::Movement (Block& al)
-  : ModelLogable (al.type_name ()),
+  : ModelDerived (al.type_name ()),
     water_failure_level (-1),
     solute_failure_level (-1),
     tertiary (Librarian::build_item<Tertiary> (al, "Tertiary"))

@@ -23,7 +23,7 @@
 #ifndef OM_H
 #define OM_H
 
-#include "model.h"
+#include "model_framed.h"
 #include "plf.h"
 #include <vector>
 

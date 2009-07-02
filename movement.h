@@ -22,7 +22,7 @@
 #ifndef MOVEMENT_H
 #define MOVEMENT_H
 
-#include "model.h"
+#include "model_derived.h"
 #include <vector>
 #include <memory>
 
@@ -45,7 +45,7 @@ class Tertiary;
 class Units;
 class FrameSubmodel;
 
-class Movement : public ModelLogable
+class Movement : public ModelDerived
 {
   // Content.
 public:

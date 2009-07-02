@@ -158,7 +158,7 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
       printer.print_entry (*global_frame, "directory");
       if (global_frame->name_sequence ("path") != Path::get_daisy_path ())
         printer.print_entry (*global_frame, "path");
-      FrameModel& daisy = dynamic_cast<FrameModel&> (frame ());
+      FrameModel& daisy = dynamic_cast<FrameModel&> (frame_entry ());
 
       // Print input files.
       const std::vector<const Frame*>& inputs = global_frame->parser_inputs ();
@@ -213,7 +213,7 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
 	  Assertion::error (tmp.str ());
 	}
       // Close stack.
-      delete &frame ();
+      delete &frame_entry ();
       pop ();
     }
   daisy_assert (nested == 0);

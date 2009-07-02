@@ -23,7 +23,7 @@
 #ifndef CONDITION_H
 #define CONDITION_H
 
-#include "model.h"
+#include "model_framed.h"
 
 class Daisy;
 class Log;

@@ -23,7 +23,7 @@
 #ifndef HORIZON_H
 #define HORIZON_H
 
-#include "model.h"
+#include "model_derived.h"
 #include "symbol.h"
 #include <vector>
 #include <set>
@@ -37,7 +37,7 @@ class Treelog;
 class Block;
 class Secondary;
 
-class Horizon : public ModelLogable
+class Horizon : public ModelDerived
 {
   // Content.
 private:

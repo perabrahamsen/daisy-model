@@ -1,6 +1,6 @@
-// scopesel.h -- Select a scope.
+// model_derived.h -- Base class for derived models in Daisy.
 // 
-// Copyright 2007 Per Abrahamsen and KVL.
+// Copyright 2007, 2009 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -17,35 +17,25 @@
 // You should have received a copy of the GNU Lesser Public License
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// Derived models which rely on enclsing scope for frame.
 
-#ifndef SCOPESEL_H
-#define SCOPESEL_H
+#ifndef MODEL_DERIVED_H
+#define MODEL_DERIVED_H
 
-#include "model.h"
-#include "symbol.h"
+#include "model_logable.h"
 
-class Output;
-class Scope;
-class Treelog;
-class AttributeList;
-
-class Scopesel : public Model
+class ModelDerived : public ModelLogable
 {
-  // Content.
-public:
-  static const char *const component;
-  symbol library_id () const;
-
   // Use.
 public:
-  virtual Scope* lookup (const Output&, Treelog& msg) const = 0;
+  void output_as_derived (symbol, Log&) const;
 
   // Create and Destroy.
 private:
-  Scopesel (const Scopesel&);
-public:
-  explicit Scopesel ();
-  ~Scopesel ();
+  ModelDerived ();
+protected:
+  ModelDerived (symbol);
 };
 
-#endif // SCOPESEL_H
+#endif // MODEL_DERIVED_H

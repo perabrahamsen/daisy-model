@@ -23,7 +23,7 @@
 #ifndef AM_H
 #define AM_H
 
-#include "model.h"
+#include "model_framed.h"
 #include "im.h"
 #include <vector>
 #include <memory>

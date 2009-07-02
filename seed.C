@@ -34,7 +34,7 @@ Seed::library_id () const
 }
 
 Seed::Seed (Block& al)
-  : ModelLogable (al.type_name ())
+  : ModelDerived (al.type_name ())
 { }
 
 Seed::~Seed ()

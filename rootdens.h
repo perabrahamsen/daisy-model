@@ -23,7 +23,7 @@
 #ifndef ROOTDENS_H
 #define ROOTDENS_H
 
-#include "model.h"
+#include "model_framed.h"
 #include <vector>
 #include <memory>
 

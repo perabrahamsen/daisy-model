@@ -23,7 +23,7 @@
 #ifndef COLUMN_H
 #define COLUMN_H
 
-#include "model.h"
+#include "model_framed.h"
 #include <vector>
 
 class Frame;

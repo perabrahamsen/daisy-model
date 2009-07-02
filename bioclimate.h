@@ -23,7 +23,7 @@
 #ifndef BIOCLIMATE_H
 #define BIOCLIMATE_H
 
-#include "model.h"
+#include "model_framed.h"
 #include <vector>
 
 class Surface;

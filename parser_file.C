@@ -57,7 +57,7 @@ struct ParserFile::Implementation
   Treelog& msg;
 
   // Inputs.
-  auto_vector<const Frame*> inputs;
+  auto_vector<const FrameModel*> inputs;
 
   // Lexer.
   const symbol file;
@@ -1432,7 +1432,7 @@ ParserFile::Implementation::Implementation (const Metalib& mlib,
                                             Treelog& treelog)
   : mutable_metalib (NULL),
     msg (treelog),
-    inputs (std::vector<const Frame*> ()),
+    inputs (std::vector<const FrameModel*> ()),
     file (filename),
     owned_stream (mlib.path ().open_file (filename.name ())),
     lexer (new Lexer (filename.name (), *owned_stream, msg))

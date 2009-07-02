@@ -22,14 +22,10 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include "symbol.h"
-#include <memory>
 #include <boost/noncopyable.hpp>
 
 class Log;
 class Frame;
-class FrameModel;
-class Block;
 
 // 'Model' is the base class for all models.
 // Inheriting from model is needed in order to be put in libraries.
@@ -42,49 +38,6 @@ protected:
   Model ();
 public:
   virtual ~Model ();
-};
-
-// 'ModelLogable' is the base class for all logable models.
-class ModelLogable : public Model
-{
-  // Content.
-public:
-  const symbol name;            // Remember name for logs.
-  virtual symbol library_id () const = 0;
-
-  // Use.
-public:
-  virtual void output (Log& log) const = 0;
-  void output_as_derived (symbol, Log&) const;
-
-  // Create and Destroy.
-private:
-  ModelLogable ();
-protected:
-  ModelLogable (symbol);
-};
-
-// 'ModelFrame' is the base class for models that needs to keep
-// track of its own attributes.  The includes models that are part
-// of a variable length list, or are created ad-hoc.  Other models
-// will not need to maintain their own attribute lists, as the
-// attribute list of the enclosing frame will be sufficient.
-class ModelFramed : public ModelLogable
-{
-  // Content.
-public:
-  std::auto_ptr<FrameModel> frame; // Remember attributes for checkpoint.
-
-  // Use.
-public:
-  void output_as_object (symbol, Log&) const;
-  void output_as_entry (Log&) const;
-  
-  // Create and Destroy.
-protected:
-  ModelFramed (Block&);
-  ModelFramed (symbol);
-  ~ModelFramed ();
 };
 
 #endif // MODEL_H

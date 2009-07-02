@@ -304,7 +304,7 @@ static const class SOM_fractions_check_type : public VCheck
 } SOM_fractions_check;
 
 Horizon::Horizon (Block& al)
-  : ModelLogable (al.type_name ()),
+  : ModelDerived (al.type_name ()),
     impl (new Implementation (al)),
     fast_clay (-42.42e42),
     fast_humus (-42.42e42),
@@ -313,7 +313,7 @@ Horizon::Horizon (Block& al)
 { }
 
 Horizon::Horizon (const Frame& al, const double K_sat)
-  : ModelLogable ("aquitard"),
+  : ModelDerived ("aquitard"),
     impl (new Implementation (al)),
     fast_clay (-42.42e42),
     fast_humus (-42.42e42),

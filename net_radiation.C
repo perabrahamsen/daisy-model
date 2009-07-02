@@ -41,7 +41,7 @@ NetRadiation::library_id () const
 // Interface class.
 
 NetRadiation::NetRadiation (Block& al)
-  : ModelLogable (al.type_name ())
+  : ModelDerived (al.type_name ())
 { }
 
 NetRadiation::~NetRadiation ()

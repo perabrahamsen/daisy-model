@@ -964,9 +964,8 @@ AM::initialize (const Geometry& geo, const double max_rooting_depth)
   for (size_t i = 0; i < impl->om.size (); i++)
     impl->om[i]->initialize (geo.cell_size ());
 
-  daisy_assert (frame.get ());
-  if (frame->check ("lock"))
-    impl->lock = new Implementation::Lock (frame->submodel ("lock"));
+  if (frame ().check ("lock"))
+    impl->lock = new Implementation::Lock (frame ().submodel ("lock"));
 
   if (!impl->initialized)
     {
@@ -1068,15 +1067,14 @@ struct AMOrganic : public AM
   void initialize_derived (const Geometry& geo, const double)
   {
     // Get initialization parameters.
-    daisy_assert (frame.get ());
-    const double weight = frame->number ("weight") 
-      * frame->number ("dry_matter_fraction") 
+    const double weight = frame ().number ("weight") 
+      * frame ().number ("dry_matter_fraction") 
       * 0.01;			// T / ha --> g / cm²
 
-    const double C = weight * frame->number ("total_C_fraction");
-    const double N = weight * frame->number ("total_N_fraction")
-      * (1.0 - (frame->number ("NO3_fraction") 
-                + frame->number ("NH4_fraction")));
+    const double C = weight * frame ().number ("total_C_fraction");
+    const double N = weight * frame ().number ("total_N_fraction")
+      * (1.0 - (frame ().number ("NO3_fraction") 
+                + frame ().number ("NH4_fraction")));
     add (C, N);
   }
   AMOrganic (Block& al)
@@ -1134,13 +1132,12 @@ struct AMInitial : public AM
 {
   void initialize_derived (const Geometry& geo, const double)
   {
-    daisy_assert (frame.get ());
     const std::vector<const FrameModel*>& oms
-      = frame->model_sequence ("om");
+      = frame ().model_sequence ("om");
     const std::vector<AOM*>& om = impl->om;
 
     const std::vector<const FrameSubmodel*>& layers 
-      = frame->submodel_sequence ("layers");
+      = frame ().submodel_sequence ("layers");
 
     double last = 0.0;
     for (size_t i = 0; i < layers.size (); i++)
@@ -1251,16 +1248,15 @@ struct AMRoot : public AM
   void initialize_derived (const Geometry& geo, const double max_rooting_depth)
   {
     // Get paramters.
-    daisy_assert (frame.get ());
-    const double weight = frame->number ("weight"); // T DM / ha
-    const double total_C_fraction = frame->number ("total_C_fraction");
-    const double total_N_fraction = frame->number ("total_N_fraction");
+    const double weight = frame ().number ("weight"); // T DM / ha
+    const double total_C_fraction = frame ().number ("total_C_fraction");
+    const double total_N_fraction = frame ().number ("total_N_fraction");
     const double C = weight * 1000.0*1000.0 / (100.0*100.0*100.0*100.0)
       * total_C_fraction; // g C / cm²;
     const double N = weight * 1000.0*1000.0 / (100.0*100.0*100.0*100.0)
       * total_N_fraction; // g C / cm²;
-    const double k = M_LN2 / frame->number ("dist");
-    const double depth = frame->number ("depth", max_rooting_depth);
+    const double k = M_LN2 / frame ().number ("dist");
+    const double depth = frame ().number ("depth", max_rooting_depth);
     daisy_assert (depth < 0.0);
 
     // Calculate density.
