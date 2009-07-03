@@ -74,14 +74,15 @@ static struct PetInit : public DeclareComponent
 The 'pet' component should calculate the potential evapotranspiration\n\
 from meteorological data, as well as the crop and soil state.")
   { }
-  void load_syntax (Frame& frame)
+  void load_frame (Frame& frame) const
   {
     frame.declare ("wet", "mm/h", Value::LogOnly, 
-               "Potential evapotranspiration for a wet system.");
+                   "Potential evapotranspiration for a wet system.");
     frame.declare ("dry", "mm/h", Value::LogOnly, 
-               "Potential evapotranspiration for a dry system.");
+                   "Potential evapotranspiration for a dry system.");
     frame.declare ("reference_evapotranspiration", "mm/h", Value::LogOnly, 
-               "Reference evapotranspiration for a dry system.");
+                   "Reference evapotranspiration for a dry system.");
   }
 } Pet_init;
 
+// pet.C ends here.

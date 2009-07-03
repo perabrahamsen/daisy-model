@@ -41,6 +41,10 @@ private:
 public:
   virtual Value::type type () const = 0;
   Value::category category () const;
+  bool is_const () const;
+  bool is_optional () const;
+  bool is_log () const;
+  bool is_state () const;
   int size () const;
   symbol description () const;
   virtual symbol dimension () const;

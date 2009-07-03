@@ -1,5 +1,8 @@
 2009-07-03  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* bioclimate_std.C (DeclareModel): Fixed names for some log variables.
+	* pet.C (load_frame): Renamed from 'load_syntax'.
+
 	* type.h, type.C: New utility.
 	* Makefile (OTHER): Add it.
 	* frame.C: Use it.

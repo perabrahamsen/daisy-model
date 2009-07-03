@@ -39,37 +39,39 @@ struct PetWeather : public Pet
 	     const Surface& surface, const Geometry&,
              const Soil&, const SoilHeat&,
 	     const SoilWater&, Treelog&)
-    {
-      reference_evapotranspiration = weather.reference_evapotranspiration ();
-      potential_evapotranspiration 
-	= reference_to_potential (crops, surface, 
-				  reference_evapotranspiration);
-    }
+  {
+    reference_evapotranspiration = weather.reference_evapotranspiration ();
+    potential_evapotranspiration 
+      = reference_to_potential (crops, surface, 
+                                reference_evapotranspiration);
+  }
 
   void output (Log& log) const
-    {
-      Pet::output (log);
-      output_value (reference_evapotranspiration, 
+  {
+    Pet::output (log);
+    output_value (reference_evapotranspiration, 
 		  "reference_evapotranspiration", log);
-    }
+  }
 
   double wet () const
-    { return potential_evapotranspiration; }
+  { return potential_evapotranspiration; }
 
   // Create.
   PetWeather (Block& al)
     : Pet (al)
-    { }
+  { }
 };
 
 static struct PetWeatherSyntax : public DeclareModel
 {
   Model* make (Block& al) const
-    { return new PetWeather (al); }
+  { return new PetWeather (al); }
   PetWeatherSyntax ()
     : DeclareModel (Pet::component, "weather", 
-		 "Potential evopotranspiration using weather data.")
+                    "Potential evopotranspiration using weather data.")
   { }
   void load_frame (Frame&) const
   { }
 } PetWeather_syntax;
+
+// pet_weather.C ends here.

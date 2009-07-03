@@ -2,19 +2,9 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Move stuff from syntax to frame
 
-** declare_fraction
-
-** declare plf
-
-** declare_object
-
-** declare_submodule
-
-** declare_submodule_sequence
+** move lookups
 
 ** set_check
-
-** move lookups
 
 ** move checks.
 

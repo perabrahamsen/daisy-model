@@ -51,6 +51,8 @@ struct Frame::Implementation
   mutable child_set children;
 
   void declare_type (const symbol key, const Type* type);
+  const Type& get_type (symbol key);
+  bool has_type (symbol key);
 
   Implementation (const Implementation& old)
     : count (counter),
@@ -83,6 +85,21 @@ Frame::Implementation::declare_type (const symbol key, const Type* type)
   if (i != types.end ())
     delete (*i).second;
   types[key] = type;
+}
+
+const Type& 
+Frame::Implementation::get_type (const symbol key)
+{
+  auto_map<symbol, const Type*>::const_iterator i = types.find (key);
+  daisy_assert (i != types.end ());
+  return *(*i).second;
+}
+
+bool 
+Frame::Implementation::has_type (const symbol key)
+{
+  auto_map<symbol, const Type*>::const_iterator i = types.find (key);
+  return i != types.end ();
 }
 
 symbol 
@@ -260,37 +277,45 @@ Frame::check (const Metalib& metalib, const Frame& frame,
 bool 
 Frame::is_const (const symbol key) const
 {
-  if (parent () && impl->syntax.lookup (key) == Value::Error)
+  if (impl->has_type (key))
+    return impl->get_type (key).is_const ();
+  if (parent () )
     return parent ()->is_const (key);
-  else
-    return impl->syntax.is_const (key);
+  
+  daisy_panic ("'" + key + "' not found in " + type_name ());
 }
 
 bool 
 Frame::is_optional (const symbol key) const
 {
-  if (parent () && impl->syntax.lookup (key) == Value::Error)
+  if (impl->has_type (key))
+    return impl->get_type (key).is_optional ();
+  if (parent () )
     return parent ()->is_optional (key);
-  else
-    return impl->syntax.is_optional (key);
+ 
+  daisy_panic ("'" + key + "' not found in " + type_name ());
 }
 
 bool 
 Frame::is_log (const symbol key) const
 {
-  if (parent () && impl->syntax.lookup (key) == Value::Error)
+  if (impl->has_type (key))
+    return impl->get_type (key).is_log ();
+  if (parent () )
     return parent ()->is_log (key);
-  else
-    return impl->syntax.is_log (key);
+  
+  daisy_panic ("'" + key + "' not found in " + type_name ());
 }
 
 bool 
 Frame::is_state (const symbol key) const
 {
-  if (parent () && impl->syntax.lookup (key) == Value::Error)
+  if (impl->has_type (key))
+    return impl->get_type (key).is_state ();
+  if (parent () )
     return parent ()->is_state (key);
-  else
-    return impl->syntax.is_state (key);
+  
+  daisy_panic ("'" + key + "' not found in " + type_name ());
 }
 
 Value::type 

@@ -1291,15 +1291,15 @@ If diffuse radiation is available in the climate data, Daisy will\n\
 use these (the weather difrad model). Otherwise Daisy wil use the DPF model.");
     frame.declare ("difrad0", "W/m^2", Value::LogOnly,
                    "Diffuse radiation above canopy.");
-    frame.declare ("Total_PAR", "W/m^2", Value::LogOnly, Value::CanopyEdges,
+    frame.declare ("total_PAR", "W/m^2", Value::LogOnly, Value::CanopyEdges,
                    "Total PAR between canopy layers.");
-    frame.declare ("Sun_PAR", "W/m^2", Value::LogOnly, Value::CanopyEdges,
+    frame.declare ("sun_PAR", "W/m^2", Value::LogOnly, Value::CanopyEdges,
                    "Sun PAR between canopy layers.");
-    frame.declare ("Total_NIR", "W/m^2", Value::LogOnly, Value::CanopyEdges,
+    frame.declare ("total_NIR", "W/m^2", Value::LogOnly, Value::CanopyEdges,
                    "Total NIR between canopy layers.");
-    frame.declare ("Sun_NIR", "W/m^2", Value::LogOnly, Value::CanopyEdges,
+    frame.declare ("sun_NIR", "W/m^2", Value::LogOnly, Value::CanopyEdges,
                    "Sun NIR between canopy layers.");
-    frame.declare ("Sun_LAI_fraction", Value::Fraction (), Value::LogOnly, 
+    frame.declare ("sun_LAI_fraction", Value::Fraction (), Value::LogOnly, 
                    Value::CanopyCells, "Sunlit LAI in canopy layers.");
 
     frame.declare ("absorbed_total_PAR_canopy","W/m2", Value::LogOnly,

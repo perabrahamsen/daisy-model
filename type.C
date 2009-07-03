@@ -29,6 +29,23 @@ Value::category
 Type::category () const 
 { return category_; }
 
+bool 
+Type::is_const () const
+{ return category () == Value::Const || category () == Value::OptionalConst; }
+
+bool 
+Type::is_optional () const
+{ return category () == Value::OptionalState 
+    || category () == Value::OptionalConst; }
+
+bool 
+Type::is_log () const
+{ return category () == Value::LogOnly; }
+
+bool 
+Type::is_state () const
+{ return category () == Value::State || category () == Value::OptionalState; }
+
 int 
 Type::size () const 
 { return size_; }
