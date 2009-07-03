@@ -38,7 +38,7 @@ struct Library::Implementation
   symbol description;
 
   // Types.
-  typedef std::map<symbol, FrameModel*> frame_map;
+  typedef auto_map<symbol, FrameModel*> frame_map;
   typedef std::map<symbol, std::set<symbol>/**/> ancestor_map;
 
   // Data (remember to update Library::clone if you change this).
@@ -191,10 +191,7 @@ Library::Implementation::Implementation (const symbol n)
 { }
 
 Library::Implementation::~Implementation ()
-{ 
-  // Delete frames.
-  map_delete (frames.begin (), frames.end ());
-}
+{ }
 
 void 
 Library::clear_parsed ()

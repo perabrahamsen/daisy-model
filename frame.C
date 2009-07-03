@@ -33,6 +33,8 @@
 #include "alist.h"
 #include "filepos.h"
 #include "metalib.h"
+#include "type.h"
+#include "check.h"
 #include <vector>
 #include <set>
 #include <sstream>
@@ -41,18 +43,27 @@ struct Frame::Implementation
 {
   static int counter;
   int count;
+  auto_map<symbol, const Type*> types;
   Syntax syntax;
   AttributeList alist;
   std::vector<symbol> order;
   typedef std::set<const Frame*> child_set;
   mutable child_set children;
 
+  void declare_type (const symbol key, const Type* type);
+
   Implementation (const Implementation& old)
     : count (counter),
       syntax (old.syntax),
       alist (old.alist),
       order (old.order)
-  { counter++; }
+  { 
+    counter++; 
+    for (auto_map<symbol, const Type*>::const_iterator i = old.types.begin ();
+         i != old.types.end ();
+         i++)
+      types[(*i).first] = (*i).second->clone ();
+  }
   Implementation (int old_count, child_set old_children)
     : count (old_count),
       children (old_children)
@@ -64,6 +75,15 @@ struct Frame::Implementation
 
 int
 Frame::Implementation::counter = 0;
+
+void
+Frame::Implementation::declare_type (const symbol key, const Type* type)
+{
+  auto_map<symbol, const Type*>::const_iterator i = types.find (key);
+  if (i != types.end ())
+    delete (*i).second;
+  types[key] = type;
+}
 
 symbol 
 Frame::type_name () const
@@ -359,102 +379,144 @@ Frame::declare_boolean (const symbol key,	// Boolean.
                         Value::category cat,
                         int size,
                         const symbol description)
-{ impl->syntax.declare (key, Value::Boolean, cat, size, description); }
+{ 
+  impl->declare_type (key, new TypeBoolean (cat, size, description));
+  impl->syntax.declare (key, Value::Boolean, cat, size, description); 
+}
 
 void 
 Frame::declare_integer (const symbol key,	// Integer.
                         Value::category cat,
                         int size,
                         const symbol description)
-{ impl->syntax.declare (key, Value::Integer, cat, size, description); }
+{
+  impl->declare_type (key, new TypeInteger (cat, size, description));
+  impl->syntax.declare (key, Value::Integer, cat, size, description);
+}
 
 void 
 Frame::declare_string (const symbol key,	// String.
                        Value::category cat,
                        int size,
                        const symbol description)
-{ impl->syntax.declare (key, Value::String, cat, size, description); }
+{
+  impl->declare_type (key, new TypeString (cat, size, description));
+  impl->syntax.declare (key, Value::String, cat, size, description); 
+}
 
 void 
 Frame::declare (const symbol key, // Number.
-	    const symbol dim,
-	    Value::category cat,
-	    int size,
-	    const symbol description)
-{ impl->syntax.declare (key, dim, cat, size, description); }
+                const symbol dim,
+                Value::category cat,
+                int size,
+                const symbol description)
+{
+  impl->declare_type (key, new TypeNumber (cat, size, dim, Check::none (),
+                                           description));
+  impl->syntax.declare (key, dim, cat, size, description);
+}
 
 
 void 
 Frame::declare (const symbol key,
-	    const symbol dim,
-	    const Check& check,
-	    Value::category cat,
-	    int size,
-	    const symbol description)
-{ impl->syntax.declare (key, dim, check, cat, size, description); }
+                const symbol dim,
+                const Check& check,
+                Value::category cat,
+                int size,
+                const symbol description)
+{ 
+  impl->declare_type (key, new TypeNumber (cat, size, dim, check, description));
+  impl->syntax.declare (key, dim, check, cat, size, description); 
+}
 
 
 void 
 Frame::declare_fraction (const symbol key, 
-		     Value::category cat,
-		     int size,
-		     const symbol description)
-{ impl->syntax.declare_fraction (key, cat, size, description); }
+                         Value::category cat,
+                         int size,
+                         const symbol description)
+{
+  impl->declare_type (key, new TypeNumber (cat, size, Value::Fraction (), 
+                                           Check::fraction (), description));
+  impl->syntax.declare_fraction (key, cat, size, description); 
+}
 
 
 void 
 Frame::declare_fraction (const symbol key, 
-		     Value::category cat,
-		     const symbol description)
-{ impl->syntax.declare_fraction (key, cat, description); }
+                         Value::category cat,
+                         const symbol description)
+{
+  impl->declare_type (key, new TypeNumber (cat, Value::Singleton,
+                                           Value::Fraction (), 
+                                           Check::fraction (), description));
+  impl->syntax.declare_fraction (key, cat, description); 
+}
 
 
 void 
 Frame::declare (const symbol key, // PLF.
-	    const symbol domain,
-	    const symbol range,
-	    Value::category cat,
-	    int size,
-	    const symbol description)
-{ impl->syntax.declare (key, domain, range, cat, size, description); }
+                const symbol domain,
+                const symbol range,
+                Value::category cat,
+                int size,
+                const symbol description)
+{
+  impl->declare_type (key, new TypePLF (cat, size, domain, range, 
+                                        Check::none (), description));
+  impl->syntax.declare (key, domain, range, cat, size, description); 
+}
 
 void 
 Frame::declare (const symbol key,
-	    const symbol domain,
-	    const symbol range,
-	    const Check& check,
-	    Value::category cat,
-	    int size,
-	    const symbol description)
-{ impl->syntax.declare (key, domain, range, check, cat, size, description); }
+                const symbol domain,
+                const symbol range,
+                const Check& check,
+                Value::category cat,
+                int size,
+                const symbol description)
+{
+  impl->declare_type (key, new TypePLF (cat, size, domain, range, 
+                                        check, description));
+  impl->syntax.declare (key, domain, range, check, cat, size, description); 
+}
 
 void 
 Frame::declare_object (const symbol key, const symbol lib,
-                   Value::category cat, int size, const symbol description)
-{ impl->syntax.declare_object (key, lib, cat, size, description); }
+                       Value::category cat, int size, const symbol description)
+{
+  impl->declare_type (key, new TypeObject (cat, size, lib, description));
+  impl->syntax.declare_object (key, lib, cat, size, description); 
+}
 
 void 
-Frame::declare_submodule (const symbol name, 
-		      Value::category cat, const symbol description,
-		      load_syntax_t load_syntax)
+Frame::declare_submodule (const symbol key, 
+                          Value::category cat, const symbol description,
+                          load_syntax_t load_syntax)
 {
-  impl->syntax.declare (name, load_syntax, cat, Value::Singleton, description);
+  impl->declare_type (key, new TypeAList (cat, Value::Singleton, 
+                                          load_syntax, description));
+  impl->syntax.declare (key, load_syntax, cat, Value::Singleton, description);
+#if 1
   if (cat == Value::Const || cat == Value::State)
     // TODO: Move this to Frame::alist (name) (must return const first).
-    impl->alist.set (name, impl->syntax.default_frame (name));
+    impl->alist.set (key, impl->syntax.default_frame (key));
+#endif
 }
 
 void 
-Frame::declare_submodule_sequence (const symbol name, Value::category cat, 
-			       const symbol description,
-			       load_syntax_t load_syntax)
+Frame::declare_submodule_sequence (const symbol key, Value::category cat, 
+                                   const symbol description,
+                                   load_syntax_t load_syntax)
 {
-  impl->syntax.declare (name, load_syntax, cat, Value::Variable, description);
+  impl->declare_type (key, new TypeAList (cat, Value::Variable, 
+                                          load_syntax, description));
+  impl->syntax.declare (key, load_syntax, cat, Value::Variable, description);
 }
 
 void 
-Frame::set_check (const symbol name, const VCheck& vcheck)
-{ impl->syntax.set_check (name, vcheck); }
+Frame::set_check (const symbol key, const VCheck& vcheck)
+{ impl->syntax.set_check (key, vcheck); }
 
 
 void 
@@ -487,7 +549,7 @@ Frame::order (const symbol one, const symbol two, const symbol three)
 
 void 
 Frame::order (const symbol one, const symbol two, const symbol three,
-	       const symbol four)
+              const symbol four)
 {
   daisy_assert (impl->order.size () == 0);
   impl->order.push_back (one);
@@ -498,7 +560,7 @@ Frame::order (const symbol one, const symbol two, const symbol three,
 
 void 
 Frame::order (const symbol one, const symbol two, const symbol three,
-	       const symbol four, const symbol five)
+              const symbol four, const symbol five)
 {
   daisy_assert (impl->order.size () == 0);
   impl->order.push_back (one);

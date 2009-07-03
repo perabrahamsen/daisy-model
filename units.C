@@ -517,9 +517,6 @@ Units::Units (Metalib& metalib)
 }
 
 Units::~Units ()
-{
-  map_delete (units.begin (), units.end ()); 
-  map_delete (conversions.begin (), conversions.end ()); 
-}
+{ }
 
 // unit.C ends here.

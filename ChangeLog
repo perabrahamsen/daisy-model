@@ -1,3 +1,9 @@
+2009-07-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* type.h, type.C: New utility.
+	* Makefile (OTHER): Add it.
+	* frame.C: Use it.
+
 2009-07-02  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* model.C, model.h: Split into extra files.

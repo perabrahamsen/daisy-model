@@ -1,11 +1,22 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* brug auto_map
-
 * Move stuff from syntax to frame
 
-** TypeBoolean etc?
-clone?  BlockModel?
+** declare_fraction
+
+** declare plf
+
+** declare_object
+
+** declare_submodule
+
+** declare_submodule_sequence
+
+** set_check
+
+** move lookups
+
+** move checks.
 
 * Regression testing
 

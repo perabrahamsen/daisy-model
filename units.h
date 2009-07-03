@@ -21,8 +21,8 @@
 #ifndef UNITS_H
 #define UNITS_H
 
+#include "memutils.h"
 #include "symbol.h"
-#include <map>
 #include <boost/noncopyable.hpp>
 
 class Metalib;
@@ -68,9 +68,9 @@ public:
 
   // Content.
 private:
-  typedef std::map<symbol, const Unit*> unit_map;
+  typedef auto_map<symbol, const Unit*> unit_map;
   unit_map units;
-  typedef std::map<symbol, const Convert*> convert_map;
+  typedef auto_map<symbol, const Convert*> convert_map;
   mutable convert_map conversions;
   const bool allow_old_;
 

@@ -22,9 +22,8 @@
 #ifndef INTRINSICS_H
 #define INTRINSICS_H
 
+#include "memutils.h"
 #include "symbol.h"
-#include <map>
-#include <vector>
 
 class Library;
 class Declare;
@@ -38,7 +37,7 @@ class Intrinsics
   typedef std::map<symbol, declare_lib_map_t> declare_map_t;
   mutable declare_map_t delayed;
 public:
-  std::map<symbol, Library*> all;
+  auto_map<symbol, Library*> all;
   std::map<symbol, Library*> clone () const;
   Library& add (symbol component);
   Library& library (symbol component) const;

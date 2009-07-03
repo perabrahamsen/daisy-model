@@ -268,7 +268,6 @@ Intrinsics::Intrinsics ()
 
 Intrinsics::~Intrinsics ()
 { 
-  map_delete (all.begin (), all.end ());
   daisy_assert (count == 0); 
 }
 
