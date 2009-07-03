@@ -43,7 +43,10 @@ struct Frame::Implementation
 {
   static int counter;
   int count;
-  auto_map<symbol, const Type*> types;
+  typedef auto_map<symbol, const Type*> type_map;
+  type_map types;
+  typedef std::map<symbol, const VCheck*> vcheck_map;
+  vcheck_map val_checks;
   Syntax syntax;
   AttributeList alist;
   std::vector<symbol> order;
@@ -53,15 +56,17 @@ struct Frame::Implementation
   void declare_type (const symbol key, const Type* type);
   const Type& get_type (symbol key);
   bool has_type (symbol key);
+  void entries (std::set<symbol>&) const;
 
   Implementation (const Implementation& old)
     : count (counter),
+      val_checks (old.val_checks),
       syntax (old.syntax),
       alist (old.alist),
       order (old.order)
   { 
     counter++; 
-    for (auto_map<symbol, const Type*>::const_iterator i = old.types.begin ();
+    for (type_map::const_iterator i = old.types.begin ();
          i != old.types.end ();
          i++)
       types[(*i).first] = (*i).second->clone ();
@@ -81,7 +86,7 @@ Frame::Implementation::counter = 0;
 void
 Frame::Implementation::declare_type (const symbol key, const Type* type)
 {
-  auto_map<symbol, const Type*>::const_iterator i = types.find (key);
+  type_map::const_iterator i = types.find (key);
   if (i != types.end ())
     delete (*i).second;
   types[key] = type;
@@ -90,7 +95,7 @@ Frame::Implementation::declare_type (const symbol key, const Type* type)
 const Type& 
 Frame::Implementation::get_type (const symbol key)
 {
-  auto_map<symbol, const Type*>::const_iterator i = types.find (key);
+  type_map::const_iterator i = types.find (key);
   daisy_assert (i != types.end ());
   return *(*i).second;
 }
@@ -98,8 +103,17 @@ Frame::Implementation::get_type (const symbol key)
 bool 
 Frame::Implementation::has_type (const symbol key)
 {
-  auto_map<symbol, const Type*>::const_iterator i = types.find (key);
+  type_map::const_iterator i = types.find (key);
   return i != types.end ();
+}
+
+void 
+Frame::Implementation::entries (std::set<symbol>& all) const
+{
+  for (type_map::const_iterator i = types.begin ();
+       i != types.end ();
+       i++)
+    all.insert ((*i).first);
 }
 
 symbol 
@@ -228,7 +242,7 @@ Frame::entries (std::set<symbol>& e) const
 { 
   if (parent ())
     parent ()->entries (e);
-  impl->syntax.entries (e); 
+  impl->entries (e); 
 }
 
 bool 
@@ -541,8 +555,10 @@ Frame::declare_submodule_sequence (const symbol key, Value::category cat,
 
 void 
 Frame::set_check (const symbol key, const VCheck& vcheck)
-{ impl->syntax.set_check (key, vcheck); }
-
+{
+  impl->val_checks[name] = &vcheck;
+  impl->syntax.set_check (key, vcheck); 
+}
 
 void 
 Frame::order (const std::vector<symbol>& v)

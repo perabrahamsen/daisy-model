@@ -2,10 +2,6 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Move stuff from syntax to frame
 
-** move lookups
-
-** set_check
-
 ** move checks.
 
 * Regression testing

@@ -169,8 +169,7 @@ LogAList::open (const symbol name)
 {
   if (is_active)
     {
-      const std::string& sname = name.name ();
-      if (frame_entry ().is_const (sname))
+      if (frame_entry ().is_const (name))
         {
           std::stringstream tmp;
           tmp << "'" << name << "' is const;";
@@ -178,28 +177,28 @@ LogAList::open (const symbol name)
             tmp << " " << entry_stack[i];
           daisy_panic (tmp.str ());
         }
-      if (frame_entry ().is_state (sname))
+      if (frame_entry ().is_state (name))
 	{
-	  const int size = frame_entry ().type_size (sname);
-	  const bool has_value = frame_entry ().check (sname);
-	  switch (frame_entry ().lookup (sname))
+	  const int size = frame_entry ().type_size (name);
+	  const bool has_value = frame_entry ().check (name);
+	  switch (frame_entry ().lookup (name))
 	    {
 	    case Value::AList:
 	      if (size != Value::Singleton && has_value)
 		push (name, 
-		      frame_entry ().default_frame (sname),
-		      frame_entry ().submodel_sequence (sname));
+		      frame_entry ().default_frame (name),
+		      frame_entry ().submodel_sequence (name));
 	      else if (size != Value::Singleton || !has_value)
 		push (name, 
-		      frame_entry ().default_frame (sname));
+		      frame_entry ().default_frame (name));
 	      else 
 		push (name, 
-		      frame_entry ().submodel (sname));
+		      frame_entry ().submodel (name));
 		      
 	      break;
 	    case Value::Object:
               {
-                const symbol component = frame_entry ().component (sname);
+                const symbol component = frame_entry ().component (name);
                 const Library& library = metalib ().library (component);
                 daisy_assert (size != Value::Singleton);
                 push (name, library, library.model ("component"));
@@ -322,9 +321,8 @@ LogAList::open_alist (symbol name, const Frame& f)
 {
   if (is_active)
     {
-      const std::string& sname = name.name ();
-      daisy_assert (frame_entry ().lookup (sname) == Value::AList);
-      daisy_assert (frame_entry ().type_size (sname) == Value::Singleton);
+      daisy_assert (frame_entry ().lookup (name) == Value::AList);
+      daisy_assert (frame_entry ().type_size (name) == Value::Singleton);
       push (name, f);
     }
   else
@@ -435,10 +433,9 @@ LogAList::output_entry (symbol name, const bool value)
 { 
   if (!is_active)
     return;
-  const std::string& sname = name.name ();
-  daisy_assert (!frame_entry ().is_const (sname));
-  if (frame_entry ().is_state (sname))
-    frame_entry ().set (sname, value);
+  daisy_assert (!frame_entry ().is_const (name));
+  if (frame_entry ().is_state (name))
+    frame_entry ().set (name, value);
 }
 
 void
@@ -446,10 +443,9 @@ LogAList::output_entry (symbol name, const double value)
 { 
   if (!is_active)
     return;
-  const std::string& sname = name.name ();
-  daisy_assert (!frame_entry ().is_const (sname));
-  if (frame_entry ().is_state (sname))
-    frame_entry ().set (sname, value);
+  daisy_assert (!frame_entry ().is_const (name));
+  if (frame_entry ().is_state (name))
+    frame_entry ().set (name, value);
 }
 
 void
@@ -457,10 +453,9 @@ LogAList::output_entry (symbol name, const int value)
 { 
   if (!is_active)
     return;
-  const std::string& sname = name.name ();
-  daisy_assert (!frame_entry ().is_const (sname));
-  if (frame_entry ().is_state (sname))
-    frame_entry ().set (sname, value);
+  daisy_assert (!frame_entry ().is_const (name));
+  if (frame_entry ().is_state (name))
+    frame_entry ().set (name, value);
 }
 
 void
@@ -468,10 +463,9 @@ LogAList::output_entry (symbol name, symbol value)
 { 
   if (!is_active)
     return;
-  const std::string& sname = name.name ();
-  daisy_assert (!frame_entry ().is_const (sname));
-  if (frame_entry ().is_state (sname))
-    frame_entry ().set (sname, value);
+  daisy_assert (!frame_entry ().is_const (name));
+  if (frame_entry ().is_state (name))
+    frame_entry ().set (name, value);
 }
 
 void
@@ -479,10 +473,9 @@ LogAList::output_entry (symbol name, const std::vector<double>& value)
 { 
   if (!is_active)
     return;
-  const std::string& sname = name.name ();
-  daisy_assert (!frame_entry ().is_const (sname));
-  if (frame_entry ().is_state (sname))
-    frame_entry ().set (sname, value);
+  daisy_assert (!frame_entry ().is_const (name));
+  if (frame_entry ().is_state (name))
+    frame_entry ().set (name, value);
 }
 
 void
@@ -490,10 +483,9 @@ LogAList::output_entry (symbol name, const PLF& value)
 { 
   if (!is_active)
     return;
-  const std::string& sname = name.name ();
-  daisy_assert (!frame_entry ().is_const (sname));
-  if (frame_entry ().is_state (sname))
-    frame_entry ().set (sname, value);
+  daisy_assert (!frame_entry ().is_const (name));
+  if (frame_entry ().is_state (name))
+    frame_entry ().set (name, value);
 }
 
 bool
