@@ -91,11 +91,6 @@ symbol
 TypeNumber::dimension () const
 { return dimension_; }
 
-Type* 
-TypeNumber::clone () const
-{ return new TypeNumber (category (), size (), dimension (), check_,
-                         description ()); }
-
 TypeNumber::TypeNumber (const Value::category c, const int s, const symbol dim, 
                         const Check& chk,
                         const symbol desc)
@@ -112,10 +107,6 @@ Frame::load_syntax_t
 TypeAList::load_syntax () const
 { return load_syntax_; }
 
-Type* 
-TypeAList::clone () const
-{ return new TypeAList (category (), size (), load_syntax (), description ()); }
-  
 TypeAList::TypeAList (const Value::category c, const int s,
                       const Frame::load_syntax_t l, const symbol desc)
   : Type (c, s, desc),
@@ -138,11 +129,6 @@ symbol
 TypePLF::range () const
 { return range_; }
 
-Type* 
-TypePLF::clone () const
-{ return new TypePLF (category (), size (), domain (), range (), check_,
-                      description ()); }
-  
 TypePLF::TypePLF (const Value::category c, const int s, const symbol dom,
                   const symbol r, const Check& chk, const symbol desc)
   : Type (c, s, desc),
@@ -155,10 +141,6 @@ Value::type
 TypeBoolean::type () const
 { return Value::Boolean; }
 
-Type* 
-TypeBoolean::clone () const
-{ return new TypeBoolean (category (), size (), description ()); }
-  
 TypeBoolean::TypeBoolean (const Value::category c, const int s,
                           const symbol desc)
   : Type (c, s, desc)
@@ -168,10 +150,6 @@ Value::type
 TypeString::type () const
 { return Value::String; }
 
-Type* 
-TypeString::clone () const
-{ return new TypeString (category (), size (), description ()); }
-  
 TypeString::TypeString (const Value::category c, const int s, const symbol desc)
   : Type (c, s, desc)
 { }
@@ -180,10 +158,6 @@ Value::type
 TypeInteger::type () const
 { return Value::Integer; }
 
-Type* 
-TypeInteger::clone () const
-{ return new TypeInteger (category (), size (), description ()); }
-  
 TypeInteger::TypeInteger (const Value::category c, const int s,
                           const symbol desc)
   : Type (c, s, desc)
@@ -197,10 +171,6 @@ symbol
 TypeObject::component () const
 { return component_; }
 
-Type* 
-TypeObject::clone () const
-{ return new TypeObject (category (), size (), component (), description ()); }
-  
 TypeObject::TypeObject (const Value::category c, const int s, const symbol comp,
                         const symbol desc)
   : Type (c, s, desc),

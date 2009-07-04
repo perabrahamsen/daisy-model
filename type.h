@@ -54,8 +54,6 @@ public:
   virtual symbol component () const;
 
   // Create and Destroy.
-public:
-  virtual Type* clone () const = 0;
 protected:
   Type (const Value::category c, const int s, const symbol d);
 public:
@@ -68,7 +66,6 @@ class TypeNumber : public Type
   const Check& check_;
   Value::type type () const;
   symbol dimension () const;
-  Type* clone () const;
 public:
   TypeNumber (const Value::category c, const int s, const symbol dim, 
               const Check&, const symbol desc);
@@ -79,7 +76,6 @@ class TypeAList : public Type
   const Frame::load_syntax_t load_syntax_;
   Value::type type () const;
   Frame::load_syntax_t  load_syntax () const;
-  Type* clone () const;
 public:
   TypeAList (const Value::category c, const int s, const Frame::load_syntax_t l,
              const symbol desc);
@@ -94,7 +90,6 @@ class TypePLF : public Type
   symbol domain () const;
   symbol range () const;
   symbol dimension () const;
-  Type* clone () const;
 public:
   TypePLF (const Value::category c, const int s, const symbol dom,
            const symbol r, const Check&, const symbol desc);
@@ -103,7 +98,6 @@ public:
 class TypeBoolean : public Type
 {
   Value::type type () const;
-  Type* clone () const;
 public:
   TypeBoolean (const Value::category c, const int s, const symbol desc);
 };
@@ -111,7 +105,6 @@ public:
 class TypeString : public Type
 {
   Value::type type () const;
-  Type* clone () const;
 public:
   TypeString (const Value::category c, const int s, const symbol desc);
 };
@@ -119,7 +112,6 @@ public:
 class TypeInteger : public Type
 {
   Value::type type () const;
-  Type* clone () const;
 public:
   TypeInteger (const Value::category c, const int s, const symbol desc);
 };
@@ -129,7 +121,6 @@ class TypeObject : public Type
   const symbol component_;
   Value::type type () const;
   symbol component () const;
-  Type* clone () const;
 public:
   TypeObject (const Value::category c, const int s, const symbol comp,
               const symbol desc);

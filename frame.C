@@ -38,15 +38,17 @@
 #include <vector>
 #include <set>
 #include <sstream>
+#include <boost/shared_ptr.hpp>
 
 struct Frame::Implementation
 {
   static int counter;
   int count;
-  typedef auto_map<symbol, const Type*> type_map;
+  typedef std::map<symbol, boost::shared_ptr<const Type> > type_map;
   type_map types;
   typedef std::map<symbol, const VCheck*> vcheck_map;
   vcheck_map val_checks;
+  std::vector<check_fun> checker;
   Syntax syntax;
   AttributeList alist;
   std::vector<symbol> order;
@@ -60,17 +62,13 @@ struct Frame::Implementation
 
   Implementation (const Implementation& old)
     : count (counter),
+      types (old.types),
       val_checks (old.val_checks),
+      checker (old.checker),
       syntax (old.syntax),
       alist (old.alist),
       order (old.order)
-  { 
-    counter++; 
-    for (type_map::const_iterator i = old.types.begin ();
-         i != old.types.end ();
-         i++)
-      types[(*i).first] = (*i).second->clone ();
-  }
+  { counter++; }
   Implementation (int old_count, child_set old_children)
     : count (old_count),
       children (old_children)
@@ -86,10 +84,7 @@ Frame::Implementation::counter = 0;
 void
 Frame::Implementation::declare_type (const symbol key, const Type* type)
 {
-  type_map::const_iterator i = types.find (key);
-  if (i != types.end ())
-    delete (*i).second;
-  types[key] = type;
+  types[key].reset (type);
 }
 
 const Type& 
@@ -556,7 +551,7 @@ Frame::declare_submodule_sequence (const symbol key, Value::category cat,
 void 
 Frame::set_check (const symbol key, const VCheck& vcheck)
 {
-  impl->val_checks[name] = &vcheck;
+  impl->val_checks[key] = &vcheck;
   impl->syntax.set_check (key, vcheck); 
 }
 
@@ -663,7 +658,10 @@ Frame::total_order () const
 
 void 
 Frame::add_check (check_fun fun)
-{ impl->syntax.add_check (fun); }
+{ 
+  impl->checker.push_back (fun);
+  impl->syntax.add_check (fun); 
+}
 
 bool 
 Frame::check (const symbol key) const
