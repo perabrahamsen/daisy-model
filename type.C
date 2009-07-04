@@ -174,7 +174,7 @@ TypeObject::component () const
 TypeObject::TypeObject (const Value::category c, const int s, const symbol comp,
                         const symbol desc)
   : Type (c, s, desc),
-    component_ (c)
+    component_ (comp)
 { }
 
 // type.C ends here.

@@ -330,64 +330,78 @@ Frame::is_state (const symbol key) const
 Value::type 
 Frame::lookup (const symbol key) const
 {
-  if (parent () && impl->syntax.lookup (key) == Value::Error)
+  if (impl->has_type (key))
+    return impl->get_type (key).type ();
+  if (parent () )
     return parent ()->lookup (key);
-  else
-    return impl->syntax.lookup (key);
+
+  return Value::Error;
 }
 
 symbol
 Frame::component (const symbol key) const
 {
-  if (parent () && impl->syntax.lookup (key) == Value::Error)
+  if (impl->has_type (key))
+    return impl->get_type (key).component ();
+  if (parent () )
     return parent ()->component (key);
-  else
-    return impl->syntax.component (key);
+
+  daisy_panic ("'" + key + "' not found in " + type_name ());
 }
 
 int  
 Frame::type_size (const symbol key) const
 {
-  if (parent () && impl->syntax.lookup (key) == Value::Error)
+  if (impl->has_type (key))
+    return impl->get_type (key).size ();
+  if (parent () )
     return parent ()->type_size (key);
-  else
-    return impl->syntax.size (key);
+
+  daisy_panic ("'" + key + "' not found in " + type_name ());
 }
 
 symbol 
 Frame::dimension (const symbol key) const
 {
-  if (parent () && impl->syntax.lookup (key) == Value::Error)
+  if (impl->has_type (key))
+    return impl->get_type (key).dimension ();
+  if (parent () )
     return parent ()->dimension (key);
-  else
-    return impl->syntax.dimension (key);
+
+  daisy_panic ("'" + key + "' not found in " + type_name ());
 }
 
 symbol 
 Frame::domain (const symbol key) const
 {
-  if (parent () && impl->syntax.lookup (key) == Value::Error)
+  if (impl->has_type (key))
+    return impl->get_type (key).domain ();
+  if (parent () )
     return parent ()->domain (key);
-  else
-    return impl->syntax.domain (key);
+
+  daisy_panic ("'" + key + "' not found in " + type_name ());
 }
 
 symbol 
 Frame::range (const symbol key) const
 {
-  if (parent () && impl->syntax.lookup (key) == Value::Error)
+  if (impl->has_type (key))
+    return impl->get_type (key).range ();
+  if (parent () )
     return parent ()->range (key);
-  else
-    return impl->syntax.range (key);
+
+  daisy_panic ("'" + key + "' not found in " + type_name ());
 }
 
 symbol 
 Frame::description (const symbol key) const
 {
-  if (parent () && impl->syntax.lookup (key) == Value::Error)
+  if (impl->has_type (key))
+    return impl->get_type (key).description ();
+  if (parent () )
     return parent ()->description (key);
-  else
-    return impl->syntax.description (key);
+
+  daisy_panic ("'" + key + "' not found in " + type_name ());
 }
 
 const FrameSubmodel& 
