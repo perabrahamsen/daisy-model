@@ -43,11 +43,13 @@ public:
   Value::category category () const;
   bool is_const () const;
   bool is_optional () const;
+  bool is_mandatory () const;
   bool is_log () const;
   bool is_state () const;
   int size () const;
   symbol description () const;
   virtual symbol dimension () const;
+  virtual bool verify (double value, Treelog&) const;
   virtual Frame::load_syntax_t  load_syntax () const;
   virtual symbol domain () const;
   virtual symbol range () const;
@@ -63,9 +65,10 @@ public:
 class TypeNumber : public Type
 {
   const symbol dimension_;
-  const Check& check_;
+  const Check& check;
   Value::type type () const;
   symbol dimension () const;
+  bool verify (double value, Treelog&) const;
 public:
   TypeNumber (const Value::category c, const int s, const symbol dim, 
               const Check&, const symbol desc);
@@ -85,11 +88,12 @@ class TypePLF : public Type
 {
   const symbol domain_;
   const symbol range_;
-  const Check& check_;
+  const Check& check;
   Value::type type () const;
   symbol domain () const;
   symbol range () const;
   symbol dimension () const;
+  bool verify (double value, Treelog&) const;
 public:
   TypePLF (const Value::category c, const int s, const symbol dom,
            const symbol r, const Check&, const symbol desc);

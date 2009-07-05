@@ -24,6 +24,7 @@
 
 #include "type.h"
 #include "assertion.h"
+#include "check.h"
 
 Value::category
 Type::category () const 
@@ -37,6 +38,10 @@ bool
 Type::is_optional () const
 { return category () == Value::OptionalState 
     || category () == Value::OptionalConst; }
+
+bool 
+Type::is_mandatory () const
+{ return category () == Value::State || category () == Value::Const; }
 
 bool 
 Type::is_log () const
@@ -56,6 +61,10 @@ Type::description () const
   
 symbol 
 Type::dimension () const
+{ daisy_notreached (); }
+
+bool
+Type::verify (const double value, Treelog& msg) const
 { daisy_notreached (); }
 
 Frame::load_syntax_t  
@@ -91,12 +100,16 @@ symbol
 TypeNumber::dimension () const
 { return dimension_; }
 
+bool
+TypeNumber::verify (const double value, Treelog& msg) const
+{ return check.verify (value, msg); }
+
 TypeNumber::TypeNumber (const Value::category c, const int s, const symbol dim, 
                         const Check& chk,
                         const symbol desc)
   : Type (c, s, desc),
     dimension_ (dim),
-    check_ (chk)
+    check (chk)
 { }
 
 Value::type 
@@ -129,12 +142,16 @@ symbol
 TypePLF::range () const
 { return range_; }
 
+bool
+TypePLF::verify (const double value, Treelog& msg) const
+{ return check.verify (value, msg); }
+
 TypePLF::TypePLF (const Value::category c, const int s, const symbol dom,
                   const symbol r, const Check& chk, const symbol desc)
   : Type (c, s, desc),
     domain_ (dom),
     range_ (r),
-    check_ (chk)
+    check (chk)
 { }
 
 Value::type 

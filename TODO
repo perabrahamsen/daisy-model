@@ -2,8 +2,6 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Move stuff from syntax to frame
 
-** move accessors default_frame, submodel_name
-
 ** move checks.
 
 * Regression testing

@@ -35,6 +35,8 @@
 #include "metalib.h"
 #include "type.h"
 #include "check.h"
+#include "vcheck.h"
+#include "treelog.h"
 #include <vector>
 #include <set>
 #include <sstream>
@@ -44,7 +46,7 @@ struct Frame::Implementation
 {
   static int counter;
   int count;
-  typedef std::map<symbol, boost::shared_ptr<const Type> > type_map;
+  typedef std::map<symbol, boost::shared_ptr<const Type>/**/> type_map;
   type_map types;
   typedef std::map<symbol, const VCheck*> vcheck_map;
   vcheck_map val_checks;
@@ -59,6 +61,7 @@ struct Frame::Implementation
   const Type& get_type (symbol key);
   bool has_type (symbol key);
   void entries (std::set<symbol>&) const;
+  bool check (const Metalib& metalib, const Frame& frame, Treelog& msg) const;
 
   Implementation (const Implementation& old)
     : count (counter),
@@ -109,6 +112,144 @@ Frame::Implementation::entries (std::set<symbol>& all) const
        i != types.end ();
        i++)
     all.insert ((*i).first);
+}
+
+
+bool 
+Frame::Implementation::check (const Metalib& metalib, const Frame& frame,
+                              Treelog& msg) const
+{
+  bool error = false;
+
+  for (type_map::const_iterator i = types.begin ();
+       i != types.end ();
+       i++)
+    {
+      const symbol key = (*i).first;
+      const Type& type = *(*i).second;
+      if (frame.is_reference (key))
+        continue;
+      else if (!frame.check (key))
+	{
+	  if (type.is_mandatory ())
+	    {
+	      msg.error (key + " is missing");
+	      error = true;
+	    }
+	  continue;
+	}
+      // We can't do a generic value check here, because we don't have
+      // the Syntax.  Sigh.
+      // vcheck_map::const_iterator i = val_checks.find (key);
+      
+      // Spcial handling of various types.
+      if (type.type () == Value::Number)
+	{
+	  // This should already be checked by the file parser, but you
+	  // never know... Well, theoretically the alist could come from
+	  // another source (like one of the many other parsers :/), or
+	  // be one of the build in ones.
+          if (type.size () != Value::Singleton)
+            {
+              const std::vector<double>& array = frame.number_sequence (key);
+              for (size_t i = 0; i < array.size (); i++)
+                {
+                  std::ostringstream tmp;
+                  tmp << key << "[" << i << "]";
+                  Treelog::Open nest (msg, tmp.str ());
+                  if (!type.verify (array[i], msg))
+                    error = true;
+                }
+            }
+          else 
+            {
+              Treelog::Open nest (msg, key);
+              if (!type.verify (frame.number (key), msg))
+                error = true;
+            }
+        }
+      else if (type.type () == Value::Object)
+        if (type.size () != Value::Singleton)
+          {
+            const ::Library& lib = metalib.library (type.component ());
+            const std::vector<const FrameModel*>& seq 
+              = frame.model_sequence (key);
+            int j_index = 0;
+            for (std::vector<const FrameModel*>::const_iterator j
+                   = seq.begin ();
+                 j != seq.end ();
+                 j++)
+              {
+                std::ostringstream tmp;
+                tmp << key << "[" << j_index << "]: ";
+                j_index++;
+                const FrameModel& al = **j;
+                if (!lib.check (al.type_name ()))
+                  {
+                    tmp << "Unknown library member '"
+                        << al.type_name () << "'";
+                    msg.error (tmp.str ());
+                    error = true;
+                  }
+                else 
+                  {
+                    tmp << al.type_name ();
+                    Treelog::Open nest (msg, tmp.str ());
+                    if (!al.check (metalib, msg))
+                      error = true;
+                  }
+              }
+          }
+        else 
+          {
+            const FrameModel& al = frame.model (key);
+            Treelog::Open nest (msg, key + ": " + al.type_name ());
+            if (!al.check (metalib, msg))
+              error = true;
+          }
+      else if (type.type () == Value::AList)
+        {
+          if (type.size () != Value::Singleton)
+            {
+              daisy_assert (frame.type_size (key) != Value::Singleton);
+              const std::vector<const FrameSubmodel*>& seq 
+                = frame.submodel_sequence (key);
+              int j_index = 0;
+              for (std::vector<const FrameSubmodel*>::const_iterator j
+                     = seq.begin ();
+                   j != seq.end ();
+                   j++)
+                {
+                  std::ostringstream tmp;
+                  tmp << key << " [" << j_index << "]";
+                  Treelog::Open nest (msg, tmp.str ());
+                  j_index++;
+                  const FrameSubmodel& al = **j;
+                  if (!al.check (metalib, msg))
+                    error = true;
+                }
+            }
+          else 
+            {
+              Treelog::Open nest (msg, key);
+              const FrameSubmodel& al = frame.submodel (key);
+              if (!al.check (metalib, msg))
+                error = true;
+            }
+        }
+    }
+  if (!error)
+    {
+      for (size_t j = 0; j < checker.size (); j++)
+	{
+	  if (!checker[j] (metalib, frame, msg))
+	    {
+	      error = true;
+	      break;
+	    }
+	}
+    }
+  return !error;
 }
 
 symbol 
@@ -252,20 +393,27 @@ bool
 Frame::check (const Metalib& metalib, const Frame& frame, Treelog& msg) const
 { 
   bool ok = true;
+#if 0
   if (!impl->syntax.check (metalib, frame, msg))
     ok = false;
+#else
+  if (!impl->check (metalib, frame, msg))
+    ok = false;
+#endif
   if (parent () && !parent ()->check (metalib, frame, msg))
     ok = false;
   return ok;
 }
 
 bool
-Frame::verify (const symbol key, double value, Treelog& msg) const
+Frame::verify (const symbol key, const double value, Treelog& msg) const
 { 
-  if (parent () && impl->syntax.lookup (key) == Value::Error)
-    return parent ()->verify (key, value, msg); 
-  else
-    return impl->syntax.verify (key, value, msg); 
+  if (impl->has_type (key))
+    return impl->get_type (key).verify (value, msg);
+  if (parent () )
+    return parent ()->verify (key, value, msg);
+  
+  daisy_panic ("'" + key + "' not found in " + type_name ());
 }
 
 bool 
@@ -277,10 +425,18 @@ bool
 Frame::check (const Metalib& metalib, const Frame& frame,
               const symbol key, Treelog& msg) const
 { 
-  if (parent () && impl->syntax.lookup (key) == Value::Error)
-    return parent ()->check (metalib, frame, key, msg);
-  else
-    return impl->syntax.check (metalib, frame, key, msg); 
+  bool ok = true;
+  Implementation::vcheck_map::const_iterator i = impl->val_checks.find (key);
+
+  if (i != impl->val_checks.end ())
+    {
+      if (!(*i).second->verify (metalib, frame, key, msg))
+        ok = false;;
+    }
+  if (parent () && !parent ()->check (metalib, frame, key, msg))
+    ok = false;
+
+  return ok;
 }
 
 bool 
@@ -407,19 +563,29 @@ Frame::description (const symbol key) const
 const FrameSubmodel& 
 Frame::default_frame (const symbol key) const
 {
-  if (parent () && impl->syntax.lookup (key) == Value::Error)
+  if (impl->has_type (key))
+    {
+      const load_syntax_t load_syntax = impl->get_type (key).load_syntax ();
+      return Librarian::submodel_frame (load_syntax);
+    }
+  if (parent () )
     return parent ()->default_frame (key);
-  else
-    return impl->syntax.default_frame (key);
+
+  daisy_panic ("'" + key + "' not found in " + type_name ());
 }
 
 symbol 
 Frame::submodel_name (const symbol key) const
 { 
-  if (parent () && impl->syntax.lookup (key) == Value::Error)
+  if (impl->has_type (key))
+    {
+      const load_syntax_t load_syntax = impl->get_type (key).load_syntax ();
+      return Librarian::submodel_name (load_syntax);
+    }
+  if (parent () )
     return parent ()->submodel_name (key);
-  else
-    return impl->syntax.submodel_name (key);
+
+  daisy_panic ("'" + key + "' not found in " + type_name ());
 }
 
 void 
