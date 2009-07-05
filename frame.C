@@ -23,7 +23,6 @@
 #include "frame.h"
 #include "frame_model.h"
 #include "frame_submodel.h"
-#include "syntax.h"
 #include "block.h"
 #include "assertion.h"
 #include "librarian.h"
@@ -51,7 +50,6 @@ struct Frame::Implementation
   typedef std::map<symbol, const VCheck*> vcheck_map;
   vcheck_map val_checks;
   std::vector<check_fun> checker;
-  Syntax syntax;
   AttributeList alist;
   std::vector<symbol> order;
   typedef std::set<const Frame*> child_set;
@@ -68,7 +66,6 @@ struct Frame::Implementation
       types (old.types),
       val_checks (old.val_checks),
       checker (old.checker),
-      syntax (old.syntax),
       alist (old.alist),
       order (old.order)
   { counter++; }
@@ -393,13 +390,8 @@ bool
 Frame::check (const Metalib& metalib, const Frame& frame, Treelog& msg) const
 { 
   bool ok = true;
-#if 0
-  if (!impl->syntax.check (metalib, frame, msg))
-    ok = false;
-#else
   if (!impl->check (metalib, frame, msg))
     ok = false;
-#endif
   if (parent () && !parent ()->check (metalib, frame, msg))
     ok = false;
   return ok;
@@ -595,7 +587,6 @@ Frame::declare_boolean (const symbol key,	// Boolean.
                         const symbol description)
 { 
   impl->declare_type (key, new TypeBoolean (cat, size, description));
-  impl->syntax.declare (key, Value::Boolean, cat, size, description); 
 }
 
 void 
@@ -605,7 +596,6 @@ Frame::declare_integer (const symbol key,	// Integer.
                         const symbol description)
 {
   impl->declare_type (key, new TypeInteger (cat, size, description));
-  impl->syntax.declare (key, Value::Integer, cat, size, description);
 }
 
 void 
@@ -615,7 +605,6 @@ Frame::declare_string (const symbol key,	// String.
                        const symbol description)
 {
   impl->declare_type (key, new TypeString (cat, size, description));
-  impl->syntax.declare (key, Value::String, cat, size, description); 
 }
 
 void 
@@ -627,7 +616,6 @@ Frame::declare (const symbol key, // Number.
 {
   impl->declare_type (key, new TypeNumber (cat, size, dim, Check::none (),
                                            description));
-  impl->syntax.declare (key, dim, cat, size, description);
 }
 
 
@@ -640,7 +628,6 @@ Frame::declare (const symbol key,
                 const symbol description)
 { 
   impl->declare_type (key, new TypeNumber (cat, size, dim, check, description));
-  impl->syntax.declare (key, dim, check, cat, size, description); 
 }
 
 
@@ -652,7 +639,6 @@ Frame::declare_fraction (const symbol key,
 {
   impl->declare_type (key, new TypeNumber (cat, size, Value::Fraction (), 
                                            Check::fraction (), description));
-  impl->syntax.declare_fraction (key, cat, size, description); 
 }
 
 
@@ -664,7 +650,6 @@ Frame::declare_fraction (const symbol key,
   impl->declare_type (key, new TypeNumber (cat, Value::Singleton,
                                            Value::Fraction (), 
                                            Check::fraction (), description));
-  impl->syntax.declare_fraction (key, cat, description); 
 }
 
 
@@ -678,7 +663,6 @@ Frame::declare (const symbol key, // PLF.
 {
   impl->declare_type (key, new TypePLF (cat, size, domain, range, 
                                         Check::none (), description));
-  impl->syntax.declare (key, domain, range, cat, size, description); 
 }
 
 void 
@@ -692,7 +676,6 @@ Frame::declare (const symbol key,
 {
   impl->declare_type (key, new TypePLF (cat, size, domain, range, 
                                         check, description));
-  impl->syntax.declare (key, domain, range, check, cat, size, description); 
 }
 
 void 
@@ -700,7 +683,6 @@ Frame::declare_object (const symbol key, const symbol lib,
                        Value::category cat, int size, const symbol description)
 {
   impl->declare_type (key, new TypeObject (cat, size, lib, description));
-  impl->syntax.declare_object (key, lib, cat, size, description); 
 }
 
 void 
@@ -710,11 +692,10 @@ Frame::declare_submodule (const symbol key,
 {
   impl->declare_type (key, new TypeAList (cat, Value::Singleton, 
                                           load_syntax, description));
-  impl->syntax.declare (key, load_syntax, cat, Value::Singleton, description);
 #if 1
   if (cat == Value::Const || cat == Value::State)
     // TODO: Move this to Frame::alist (name) (must return const first).
-    impl->alist.set (key, impl->syntax.default_frame (key));
+    impl->alist.set (key, default_frame (key));
 #endif
 }
 
@@ -725,14 +706,12 @@ Frame::declare_submodule_sequence (const symbol key, Value::category cat,
 {
   impl->declare_type (key, new TypeAList (cat, Value::Variable, 
                                           load_syntax, description));
-  impl->syntax.declare (key, load_syntax, cat, Value::Variable, description);
 }
 
 void 
 Frame::set_check (const symbol key, const VCheck& vcheck)
 {
   impl->val_checks[key] = &vcheck;
-  impl->syntax.set_check (key, vcheck); 
 }
 
 void 
@@ -840,7 +819,6 @@ void
 Frame::add_check (check_fun fun)
 { 
   impl->checker.push_back (fun);
-  impl->syntax.add_check (fun); 
 }
 
 bool 

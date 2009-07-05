@@ -504,7 +504,7 @@ OTHER = type.C model_derived.C model_logable.C model_framed.C \
 	fao.C gaussj.C vcheck.C assertion.C xref.C oldunits.C \
 	check.C check_range.C path.C traverse_delete.C \
 	traverse.C treelog.C \
-	lexer_data.C lexer.C daisy.C alist.C syntax.C library.C plf.C \
+	lexer_data.C lexer.C daisy.C alist.C library.C plf.C \
 	mathlib.C cdaisy.C nrutil.C version.C
 
 # Utilities in header or source alone.
@@ -1349,7 +1349,8 @@ geometry${OBJ}: geometry.C geometry.h symbol.h value.h volume.h model.h \
 log_alist${OBJ}: log_alist.C log_alist.h log.h time.h symbol.h border.h \
   model_framed.h model_logable.h model.h library.h frame_submodel.h \
   frame.h scope.h value.h frame_model.h assertion.h metalib.h
-type${OBJ}: type.C type.h value.h symbol.h
+type${OBJ}: type.C type.h value.h symbol.h frame.h scope.h assertion.h \
+  check.h
 model_derived${OBJ}: model_derived.C model_derived.h model_logable.h model.h \
   symbol.h log.h time.h border.h model_framed.h
 model_logable${OBJ}: model_logable.C model_logable.h model.h symbol.h
@@ -1388,8 +1389,9 @@ im${OBJ}: im.C im.h symbol.h value.h chemical.h model_framed.h \
   model_logable.h model.h units.h memutils.h unit.h am.h log.h time.h \
   border.h block.h scope.h frame_submodel.h frame.h check.h assertion.h
 frame${OBJ}: frame.C frame.h scope.h value.h symbol.h frame_model.h \
-  frame_submodel.h syntax.h block.h assertion.h librarian.h model.h \
-  intrinsics.h memutils.h library.h alist.h filepos.h metalib.h type.h
+  frame_submodel.h block.h assertion.h librarian.h model.h intrinsics.h \
+  memutils.h library.h alist.h filepos.h metalib.h type.h check.h \
+  vcheck.h treelog.h
 bdconv${OBJ}: bdconv.C bdconv.h convert.h symbol.h geometry.h value.h soil.h \
   volume.h model.h units.h memutils.h assertion.h
 abiotic${OBJ}: abiotic.C abiotic.h mathlib.h assertion.h
@@ -1470,9 +1472,6 @@ daisy${OBJ}: daisy.C daisy.h program.h model.h symbol.h run.h time.h \
 alist${OBJ}: alist.C plf.h library.h symbol.h alist.h time.h mathlib.h \
   assertion.h memutils.h frame_model.h frame.h scope.h value.h \
   frame_submodel.h
-syntax${OBJ}: syntax.C syntax.h value.h symbol.h frame_submodel.h frame.h \
-  scope.h frame_model.h library.h metalib.h check.h vcheck.h assertion.h \
-  memutils.h treelog.h librarian.h model.h
 library${OBJ}: library.C library.h symbol.h block.h scope.h value.h treelog.h \
   assertion.h memutils.h frame_model.h frame.h filepos.h
 plf${OBJ}: plf.C plf.h assertion.h mathlib.h

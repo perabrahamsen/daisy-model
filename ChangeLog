@@ -1,3 +1,8 @@
+2009-07-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* syntax.C: Removed.
+	* Makefile (OTHER): Updated.
+
 2009-07-03  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* bioclimate_std.C (DeclareModel): Fixed names for some log variables.
@@ -222,7 +227,7 @@
 	unneccesary copy.
 
 	* all: Split model and submodel in alist/frame/block.
-	
+
 	* Version 4.60 released.
 
 2009-02-12  Per Abrahamsen  <abraham@dina.kvl.dk>
@@ -231,7 +236,7 @@
 	* lib/OpenMI.dai (Lower_boundary_input): Give "NO3
 	conc. groundwater" a default value.
 	* all: Remove Value::Library, add Value::Reference and Value::Scalar.
-	
+
 2009-02-11  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* toplevel.C (Toplevel::load_frame): Better default for 'path'.
@@ -240,7 +245,7 @@
 
 	* log_extern.C: Reanable 'parameter_names'.
 	* cdaisy.C: Replace alist and syntax with frame.
-	
+
 2009-02-10  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.58 released.
