@@ -1,9 +1,5 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Move stuff from syntax to frame
-
-** move checks.
-
 * Regression testing
 
 ** ? Log: akkumulerede værdier skal ikke være per tid.
