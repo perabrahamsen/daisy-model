@@ -66,8 +66,8 @@ public:
   bool flag (symbol) const;
   bool flag (symbol, bool default_value) const;
   const PLF& plf (symbol) const;
-  FrameModel& model (symbol) const;
-  FrameSubmodel& submodel (symbol) const;
+  const FrameModel& model (symbol) const;
+  const FrameSubmodel& submodel (symbol) const;
   int integer (symbol) const;
   int integer (symbol, int default_value) const;
   const std::vector<double>& number_sequence (symbol) const;

@@ -1,5 +1,12 @@
 2009-07-05  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* val.C: New utility.
+	* Makefile (OTHER): Added it.
+
+	* avalue.C, avalue.h: New utility.
+	* alist.C: Use it.
+	* Makefile (OTHER): Added it.
+
 	* syntax.C: Removed.
 	* Makefile (OTHER): Updated.
 

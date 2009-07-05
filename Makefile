@@ -493,7 +493,7 @@ SPECIALS = log_dlf.C reaction_colgen.C weather_base.C \
 
 # Various utility code that are neither a component nor a (sub)model.
 # 
-OTHER = type.C model_derived.C model_logable.C model_framed.C \
+OTHER = val.C avalue.C type.C model_derived.C model_logable.C model_framed.C \
 	printer.C printer_file.C filepos.C frame_submodel.C submodeler.C \
 	frame_model.C scope.C value.C unit.C border.C resistance.C \
 	convert.C units.C tertsmall.C anystate.C imvec.C im.C frame.C \
@@ -1349,6 +1349,9 @@ geometry${OBJ}: geometry.C geometry.h symbol.h value.h volume.h model.h \
 log_alist${OBJ}: log_alist.C log_alist.h log.h time.h symbol.h border.h \
   model_framed.h model_logable.h model.h library.h frame_submodel.h \
   frame.h scope.h value.h frame_model.h assertion.h metalib.h
+val${OBJ}: val.C val.h symbol.h assertion.h
+avalue${OBJ}: avalue.C avalue.h symbol.h value.h mathlib.h assertion.h plf.h \
+  frame_model.h frame.h scope.h frame_submodel.h memutils.h
 type${OBJ}: type.C type.h value.h symbol.h frame.h scope.h assertion.h \
   check.h
 model_derived${OBJ}: model_derived.C model_derived.h model_logable.h model.h \
@@ -1469,8 +1472,8 @@ daisy${OBJ}: daisy.C daisy.h program.h model.h symbol.h run.h time.h \
   bioclimate.h hydraulic.h field.h harvest.h block.h scope.h action.h \
   library.h submodeler.h column.h scopesel.h mathlib.h assertion.h \
   librarian.h metalib.h frame.h treelog.h frame_model.h
-alist${OBJ}: alist.C plf.h library.h symbol.h alist.h time.h mathlib.h \
-  assertion.h memutils.h frame_model.h frame.h scope.h value.h \
+alist${OBJ}: alist.C alist.h symbol.h avalue.h value.h plf.h library.h time.h \
+  mathlib.h assertion.h memutils.h frame_model.h frame.h scope.h \
   frame_submodel.h
 library${OBJ}: library.C library.h symbol.h block.h scope.h value.h treelog.h \
   assertion.h memutils.h frame_model.h frame.h filepos.h

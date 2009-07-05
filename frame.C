@@ -33,6 +33,9 @@
 #include "filepos.h"
 #include "metalib.h"
 #include "type.h"
+#ifdef USE_VAL
+#include "val.h"
+#endif
 #include "check.h"
 #include "vcheck.h"
 #include "treelog.h"
@@ -43,17 +46,26 @@
 
 struct Frame::Implementation
 {
+  // Hierarchy.
   static int counter;
   int count;
+  typedef std::set<const Frame*> child_set;
+  mutable child_set children;
+
+  // Syntax.
   typedef std::map<symbol, boost::shared_ptr<const Type>/**/> type_map;
   type_map types;
   typedef std::map<symbol, const VCheck*> vcheck_map;
   vcheck_map val_checks;
   std::vector<check_fun> checker;
-  AttributeList alist;
   std::vector<symbol> order;
-  typedef std::set<const Frame*> child_set;
-  mutable child_set children;
+
+  // Value.
+#ifdef USE_VAL
+  typedef std::map<symbol, boost::shared_ptr<const Val>/**/> val_map;
+  val_map values;
+#endif // USE_VAL
+  AttributeList alist;
 
   void declare_type (const symbol key, const Type* type);
   const Type& get_type (symbol key) const;
@@ -69,8 +81,8 @@ struct Frame::Implementation
       types (old.types),
       val_checks (old.val_checks),
       checker (old.checker),
-      alist (old.alist),
-      order (old.order)
+      order (old.order),
+      alist (old.alist)
   { counter++; }
   Implementation (int old_count, child_set old_children)
     : count (old_count),
