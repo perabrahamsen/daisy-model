@@ -25,6 +25,7 @@
 #include "symbol.h"
 #include "value.h"
 #include <vector>
+#include <boost/shared_ptr.hpp>
 
 class PLF;
 class FrameModel;
@@ -55,9 +56,9 @@ struct AValue
     const std::vector<symbol>* name_sequence;
     const std::vector<bool>* flag_sequence;
     const std::vector<int>* integer_sequence;
-    const std::vector<const PLF*>* plf_sequence;
+    const std::vector<boost::shared_ptr<const PLF>/**/>* plf_sequence;
     std::vector<const FrameModel*>* model_sequence;
-    std::vector<const FrameSubmodel*>* submodel_sequence;
+    std::vector<boost::shared_ptr<const FrameSubmodel>/**/>* submodel_sequence;
   };
   Value::type type;
   bool is_sequence;
@@ -86,11 +87,9 @@ struct AValue
   AValue (const std::vector<std::string>& v);
   AValue (const std::vector<bool>& v);
   AValue (const std::vector<int>& v);
-  static std::vector<const PLF*>* 
-  /**/ copy_plfs (const std::vector<const PLF*>& org);
-  AValue (const std::vector<const PLF*>& v);
+  AValue (const std::vector<boost::shared_ptr<const PLF>/**/>& v);
   AValue (const std::vector<const FrameModel*>& v);
-  AValue (const std::vector<const FrameSubmodel*>& v);
+  AValue (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& v);
   AValue ();
   AValue (const AValue& v);
   AValue& operator = (const AValue& v);

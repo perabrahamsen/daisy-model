@@ -24,6 +24,7 @@
 
 #include "symbol.h"
 #include <vector>
+#include <boost/shared_ptr.hpp>
 
 class PLF;
 class Metalib;
@@ -74,9 +75,9 @@ public:
   const std::vector<symbol>& name_sequence (symbol key) const;
   const std::vector<bool>& flag_sequence (symbol key) const;
   const std::vector<int>& integer_sequence (symbol key) const;
-  const std::vector<const PLF*>& plf_sequence (symbol key) const;
+  const std::vector<boost::shared_ptr<const PLF>/**/>& plf_sequence (symbol key) const;
   const std::vector<const FrameModel*>& model_sequence (symbol key) const;
-  const std::vector<const FrameSubmodel*>& submodel_sequence (symbol key) const;
+  const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& submodel_sequence (symbol key) const;
 
   // Create and Destroy.
   void set (symbol, double);
@@ -102,8 +103,8 @@ public:
   void set (symbol, const std::vector<bool>&);
   void set (symbol, const std::vector<int>&);
   void set (symbol, const std::vector<const FrameModel*>&);
-  void set (symbol, const std::vector<const FrameSubmodel*>&);
-  void set (symbol, const std::vector<const PLF*>&);
+  void set (symbol, const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>&);
+  void set (symbol, const std::vector<boost::shared_ptr<const PLF>/**/>&);
 
   void remove (symbol);
   void operator += (const AttributeList&);

@@ -57,7 +57,7 @@ struct VegetationPermanent : public Vegetation
     
     // Create;
     static void load_syntax (Frame&);
-    YearlyLAI (const std::vector<const FrameSubmodel*>& als);
+    YearlyLAI (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& als);
   } yearly_LAI;
   const PLF LAIvsDAY;		// LAI as a function of time.
   CanopySimple canopy;
@@ -248,7 +248,7 @@ whenever 'LAIvsDAY' becomes negative.");
 }
 
 VegetationPermanent::YearlyLAI::YearlyLAI
-/**/ (const std::vector<const FrameSubmodel*>& als)
+/**/ (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& als)
 {
   for (unsigned int i = 0; i < als.size (); i++)
     {

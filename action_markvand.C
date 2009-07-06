@@ -405,7 +405,7 @@ ActionMarkvand::crop_map_t::load_syntax (Frame& frame)
 
 ActionMarkvand::crop_map_t::crop_map_t (Block& al, const std::string& key)
 {
-  const std::vector<const FrameSubmodel*>& alists = al.submodel_sequence (key);
+  const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& alists = al.submodel_sequence (key);
   for (size_t i = 0; i < alists.size (); i++)
     {
       BlockSubmodel nest (al, key, i);

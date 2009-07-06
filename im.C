@@ -208,7 +208,7 @@ IM::IM (Block& parent, const char *const key)
     return;
 
   // Add content.
-  const std::vector<const FrameSubmodel*>& alists 
+  const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& alists 
     = parent.submodel_sequence (key);
   for (size_t i = 0; i < alists.size (); i++)
     {

@@ -1117,13 +1117,14 @@ ParserFile::Implementation::load_list (Frame& frame)
 	    case Value::AList:
 	      {
 		const size_t size = frame.type_size (name);
-		static const std::vector<const FrameSubmodel*> no_sequence;
+		static const std::vector<boost::shared_ptr<const FrameSubmodel>/**/> no_sequence;
 		const FrameSubmodel& default_frame = frame.default_frame (name);
-		const std::vector<const FrameSubmodel*>& old_sequence
+		const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& old_sequence
 		  = frame.check (name) 
 		  ? frame.submodel_sequence (name) 
 		  : no_sequence;
-		auto_vector<const FrameSubmodel*> sequence;
+                std::vector<boost::shared_ptr<const FrameSubmodel>/**/>
+                  sequence;
 		bool skipped = false;
 		// We do not force parentheses around the alist if it
 		// is the last member of a fully ordered list.
@@ -1142,7 +1143,7 @@ ParserFile::Implementation::load_list (Frame& frame)
                         if (!frame.check (name))
                           error ("No originals available");
                         for (size_t i = 0; i < old_sequence.size (); i++)
-                          sequence.push_back (&old_sequence[i]->clone ());
+                          sequence.push_back (old_sequence[i]);
                         continue;
                       }
 		    Parskip skip (*this);
@@ -1150,15 +1151,14 @@ ParserFile::Implementation::load_list (Frame& frame)
                     std::ostringstream tmp;
                     tmp << "In '" << name << "' submodel #" << element + 1U;
                     Treelog::Open nest (msg, tmp.str ());
-                    std::auto_ptr<FrameSubmodel> child
-		      = old_sequence.size () > element
-                      ? std::auto_ptr<FrameSubmodel>
-                      /**/ (&old_sequence[element]->clone ())
-                      : std::auto_ptr<FrameSubmodel> 
-                      /**/ (new FrameSubmodelValue (default_frame, 
-                                                    Frame::parent_link));
+                    boost::shared_ptr<FrameSubmodel> child;
+                    if (old_sequence.size () > element)
+                      child.reset (&old_sequence[element]->clone ());
+                    else
+                      child.reset (new FrameSubmodelValue (default_frame, 
+                                                           Frame::parent_link));
 		    load_list (*child);
-		    sequence.push_back (child.release ());
+		    sequence.push_back (child);
 		  }
 		if (skipped)
 		  skip (")");
@@ -1174,13 +1174,13 @@ ParserFile::Implementation::load_list (Frame& frame)
               break;
             case Value::PLF:
 	      {
-		std::vector<const PLF*> plfs;
+		std::vector<boost::shared_ptr<const PLF>/**/> plfs;
 		int total = 0;
 		const int size = frame.type_size (name);
 		while (good () && !looking_at (')'))
 		  {
 		    Parskip dummy (*this);
-		    PLF& plf = *new PLF ();
+                    boost::shared_ptr<PLF> plf (new PLF ());
 		    double last_x = -42;
 		    int count = 0;
 		    const symbol domain = frame.domain (name);
@@ -1192,10 +1192,10 @@ ParserFile::Implementation::load_list (Frame& frame)
                             skip ("&old");
                             if (!frame.check (name))
                               error ("No originals available");
-                            const std::vector<const PLF*>& old_sequence
+                            const std::vector<boost::shared_ptr<const PLF>/**/>& old_sequence
                               = frame.plf_sequence (name);
                             for (size_t i = 0; i < old_sequence.size (); i++)
-                              plfs.push_back (new PLF (*old_sequence[i]));
+                              plfs.push_back (old_sequence[i]);
                             continue;
                           }
 			Parskip dummy2 (*this);
@@ -1210,12 +1210,12 @@ ParserFile::Implementation::load_list (Frame& frame)
                         Treelog::Open nest (msg, name);
                         if (!frame.verify (name, y, msg))
                           error (name + ": bad value");
-			plf.add (x, y);
+			plf->add (x, y);
 		      }
 		    if (count < 2)
 		      error ("Need at least 2 points");
 		    total++;
-		    plfs.push_back (&plf);
+		    plfs.push_back (plf);
 		  }
 		if (!Value::flexible_size (size) && total != size)
 		  {
@@ -1224,11 +1224,12 @@ ParserFile::Implementation::load_list (Frame& frame)
                         << " array members, expected " << size;
 		    error (str.str ());
 
+                    boost::shared_ptr<PLF> empty (new PLF ());
 		    for (;total < size; total++)
-		      plfs.push_back (new PLF ());
+                      plfs.push_back (empty);
 		  }
 		frame.set (name, plfs);
-		sequence_delete (plfs.begin (), plfs.end ());
+		// sequence_delete (plfs.begin (), plfs.end ());
 		break;
 	      }
 	    case Value::Number:

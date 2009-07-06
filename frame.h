@@ -22,6 +22,7 @@
 #include <memory>
 #include <vector>
 #include <set>
+#include <boost/shared_ptr.hpp>
 
 class Frame;
 class FrameModel;
@@ -270,8 +271,10 @@ class EXPORT Frame : public WScope
   const std::vector<bool>& flag_sequence (symbol key) const;
   const std::vector<int>& integer_sequence (symbol key) const;
   const std::vector<const FrameModel*>& model_sequence (symbol key) const;
-  const std::vector<const FrameSubmodel*>& submodel_sequence (symbol key) const;
-  const std::vector<const PLF*>& plf_sequence (symbol key) const;
+  const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>&
+    submodel_sequence (symbol key) const;
+  const std::vector<boost::shared_ptr<const PLF>/**/>& 
+    plf_sequence (symbol key) const;
 
   // Set attribute values.
  private:
@@ -295,8 +298,9 @@ class EXPORT Frame : public WScope
   void set (symbol, const std::vector<bool>&);
   void set (symbol, const std::vector<int>&);
   void set (symbol, const std::vector<const FrameModel*>&);
-  void set (symbol, const std::vector<const FrameSubmodel*>&);
-  void set (symbol, const std::vector<const PLF*>&);
+  void set (symbol, 
+            const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>&);
+  void set (symbol, const std::vector<boost::shared_ptr<const PLF>/**/>&);
   void set_empty (symbol);
 
   // Create and Destroy.

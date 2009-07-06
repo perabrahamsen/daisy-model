@@ -113,13 +113,17 @@ LogAList::push (symbol entry,
 void
 LogAList::push (symbol entry, 
 		const Frame& default_frame,
-		std::vector<const FrameSubmodel*> frame_sequence)
+		std::vector<boost::shared_ptr<const FrameSubmodel>/**/> frame_sequence)
 {
   entry_stack.push_front (entry);
   library_stack.push_front (NULL);
   frame_stack.push_front (&default_frame.clone ());
-  std::vector<const Frame*> frames (frame_sequence.begin (), 
-                                    frame_sequence.end ());
+  std::vector<const Frame*> frames;
+
+  for (std::vector<boost::shared_ptr<const FrameSubmodel>/**/>::const_iterator i = frame_sequence.begin ();
+       i != frame_sequence.end ();
+       i++)
+    frames.push_back ((*i).get ());
   frame_sequence_stack.push_front (frames);
   unnamed_stack.push_front (0);
 }
@@ -257,10 +261,14 @@ LogAList::close ()
 		}
 	      else
                 {
-                  std::vector<const FrameSubmodel*> copy;
+                  std::vector<boost::shared_ptr<const FrameSubmodel>/**/> copy;
                   for (size_t i = 0; i < old_frame_sequence.size (); i++)
-                    copy.push_back (dynamic_cast<const FrameSubmodel*>
-                                    (old_frame_sequence[i]));
+                    {
+                      const FrameSubmodel* submodel 
+                        = dynamic_cast<const FrameSubmodel*> (old_frame_sequence[i]);
+                      boost::shared_ptr<const FrameSubmodel> entry (submodel);
+                      copy.push_back (entry);
+                    }
                   frame_entry ().set (sold_entry, copy);
                 }
 	      delete &old_frame;

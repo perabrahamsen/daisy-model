@@ -186,7 +186,7 @@ struct DepthPLF : public Depth
   { }
   virtual bool check (const Units&, const Scope&, Treelog&) const
   { return true; }
-  static PLF convert_to_plf (const std::vector<const FrameSubmodel*>& table)
+  static PLF convert_to_plf (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& table)
   {
     daisy_assert (table.size () > 0);
     const Time start (table[0]->submodel ("time"));
@@ -217,7 +217,7 @@ static const class CheckTable : public VCheck
   {
     daisy_assert (frame.check (key));
         
-    const std::vector<const FrameSubmodel*>& table 
+    const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& table 
       = frame.submodel_sequence (key); 
     if (table.size () < 2)
       {

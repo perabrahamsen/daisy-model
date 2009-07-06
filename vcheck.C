@@ -166,7 +166,8 @@ struct LocalOrder : public VCheck
           if (frame.type_size (key) == Value::Singleton)
             return validate_plf (frame.plf (key), msg);
           bool ok = true;
-          const std::vector<const PLF*>& plfs = frame.plf_sequence (key);
+          const std::vector<boost::shared_ptr<const PLF>/**/>& plfs 
+            = frame.plf_sequence (key);
           for (unsigned int i = 0; i < plfs.size (); i++)
           if (!validate_plf (*plfs[i], msg))
             ok = false;
@@ -387,7 +388,8 @@ VCheck::SumEqual::verify (const Metalib&, const Frame& frame,
       else
 	{
           bool ok = true;
-	  const std::vector<const PLF*> plfs = frame.plf_sequence (key);
+	  const std::vector<boost::shared_ptr<const PLF>/**/> plfs 
+            = frame.plf_sequence (key);
 	  for (unsigned int i = 0; i < plfs.size (); i++)
 	    if (!valid (*plfs[i], msg))
               ok = false;
@@ -440,7 +442,8 @@ VCheck::StartValue::verify (const Metalib&, const Frame& frame,
       if (frame.type_size (key) == Value::Singleton)
 	return valid (frame.plf (key), msg);
       {
-        const std::vector<const PLF*> plfs = frame.plf_sequence (key);
+        const std::vector<boost::shared_ptr<const PLF>/**/> plfs 
+          = frame.plf_sequence (key);
         bool ok = true;
         for (unsigned int i = 0; i < plfs.size (); i++)
           if (!valid (*plfs[i], msg))
@@ -497,7 +500,8 @@ VCheck::EndValue::verify (const Metalib&, const Frame& frame,
       if (frame.type_size (key) == Value::Singleton)
 	return valid (frame.plf (key), msg);
       {
-        const std::vector<const PLF*> plfs = frame.plf_sequence (key);
+        const std::vector<boost::shared_ptr<const PLF>/**/> plfs
+          = frame.plf_sequence (key);
         bool ok = true;
         for (unsigned int i = 0; i < plfs.size (); i++)
           if (!valid (*plfs[i], msg))
@@ -540,7 +544,8 @@ VCheck::FixedPoint::verify (const Metalib&, const Frame& frame,
       if (frame.type_size (key) == Value::Singleton)
 	return valid (frame.plf (key), msg);
       {
-        const std::vector<const PLF*> plfs = frame.plf_sequence (key);
+        const std::vector<boost::shared_ptr<const PLF>/**/> plfs 
+          = frame.plf_sequence (key);
         bool ok = true;
         for (unsigned int i = 0; i < plfs.size (); i++)
           if (!valid (*plfs[i], msg))

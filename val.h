@@ -25,6 +25,7 @@
 #include "symbol.h"
 #include <vector>
 #include <boost/noncopyable.hpp>
+#include <boost/shared_ptr.hpp>
 
 class PLF;
 class FrameModel;
@@ -46,7 +47,7 @@ public:
   virtual const std::vector<int>& integer_sequence () const;
   virtual const std::vector<const PLF*>& plf_sequence () const;
   virtual const std::vector<const FrameModel*>& model_sequence () const;
-  virtual const std::vector<const FrameSubmodel*>& submodel_sequence () const;
+  virtual const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& submodel_sequence () const;
 
 protected:
   Val ();
@@ -177,10 +178,10 @@ public:
 
 class ValAListSeq : public Val
 {
-  const std::vector<const FrameSubmodel*>& value;
-  const std::vector<const FrameSubmodel*>& submodel_sequence () const;
+  const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& value;
+  const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& submodel_sequence () const;
 public:
-  ValAListSeq (const std::vector<const FrameSubmodel*>& v);
+  ValAListSeq (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& v);
 };
 
 #endif // VAL_H

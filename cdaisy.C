@@ -239,7 +239,7 @@ daisy_frame_get_frame_at (const Frame* frame, const char* name,
   if (frame->lookup (name) == Value::Object)
     return frame->model_sequence (name)[index]; 
   else
-    return frame->submodel_sequence (name)[index]; 
+    return frame->submodel_sequence (name)[index].get (); 
 }
 
 #ifdef UNINPLEMENTED

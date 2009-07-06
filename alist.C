@@ -286,7 +286,7 @@ AttributeList::integer_sequence (const symbol key) const
   return *value.integer_sequence;
 }
 
-const std::vector<const PLF*>& 
+const std::vector<boost::shared_ptr<const PLF>/**/>& 
 AttributeList::plf_sequence (const symbol key) const
 {
   const AValue& value = impl.lookup (key);
@@ -304,7 +304,7 @@ AttributeList::model_sequence (const symbol key) const
   return *value.model_sequence;
 }
 
-const std::vector<const FrameSubmodel*>& 
+const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& 
 AttributeList::submodel_sequence (const symbol key) const
 {
   const AValue& value = impl.lookup (key);
@@ -405,11 +405,11 @@ AttributeList::set (const symbol key,
 
 void
 AttributeList::set (const symbol key, 
-		    const std::vector<const FrameSubmodel*>& v)
+		    const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& v)
 { impl.set (key, AValue (v)); }
 
 void 
-AttributeList::set (const symbol key, const std::vector<const PLF*>& v)
+AttributeList::set (const symbol key, const std::vector<boost::shared_ptr<const PLF>/**/>& v)
 { impl.set (key, AValue (v)); }
 
 void 

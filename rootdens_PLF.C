@@ -93,7 +93,7 @@ Rootdens_PLF::Check_Indexes::verify (const Metalib&, const Frame& frame,
   daisy_assert (!frame.is_log (key));
   daisy_assert (frame.type_size (key) == Value::Variable);
 
-  const std::vector<const FrameSubmodel*>& alists 
+  const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& alists 
     = frame.submodel_sequence (key);
 
   if (alists.size () < 1)

@@ -68,9 +68,9 @@ struct Horizon::Implementation
   void initialize (const Hydraulic&, const Texture& texture, double quarts, 
                    int som_size, Treelog& msg);
   static double_map get_attributes
-  /**/ (const std::vector<const FrameSubmodel*>& frames);
+  /**/ (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& frames);
   static symbol_map get_dimensions 
-  /**/ (const std::vector<const FrameSubmodel*>& frames);
+  /**/ (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& frames);
   Implementation (Block& al);
   Implementation (const Frame& al);
   ~Implementation ();
@@ -106,7 +106,7 @@ Horizon::Implementation::initialize (const Hydraulic& hydraulic,
 
 Horizon::Implementation::double_map
 Horizon::Implementation::get_attributes 
-/**/ (const std::vector<const FrameSubmodel*>& frames)
+/**/ (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& frames)
 { 
   double_map result; 
   for (unsigned int i = 0; i < frames.size (); i++)
@@ -116,7 +116,7 @@ Horizon::Implementation::get_attributes
 
 Horizon::Implementation::symbol_map
 Horizon::Implementation::get_dimensions 
-/**/ (const std::vector<const FrameSubmodel*>& frames)
+/**/ (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& frames)
 { 
   symbol_map result; 
   for (unsigned int i = 0; i < frames.size (); i++)

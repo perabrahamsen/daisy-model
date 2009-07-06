@@ -76,7 +76,7 @@ const std::vector<const FrameModel*>&
 Val::model_sequence () const
 { daisy_notreached (); }
 
-const std::vector<const FrameSubmodel*>& 
+const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& 
 Val::submodel_sequence () const
 { daisy_notreached (); }
 
@@ -208,11 +208,11 @@ ValObjectSeq::ValObjectSeq (const std::vector<const FrameModel*>& v)
   : value (v)
 { }
 
-const std::vector<const FrameSubmodel*>& 
+const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& 
 ValAListSeq::submodel_sequence () const
 { return value; }
 
-ValAListSeq::ValAListSeq (const std::vector<const FrameSubmodel*>& v)
+ValAListSeq::ValAListSeq (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& v)
   : value (v)
 { }
 

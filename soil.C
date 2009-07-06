@@ -486,7 +486,7 @@ check_alist (const Metalib&, const Frame& al, Treelog& err)
 {
   bool ok = true;
 
-  const std::vector<const FrameSubmodel*>& layers 
+  const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& layers 
     = al.submodel_sequence ("horizons");
 
   if (layers.size () < 1U)

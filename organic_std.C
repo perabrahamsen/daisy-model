@@ -103,8 +103,8 @@ struct OrganicStandard : public OrganicMatter
   std::vector<double> abiotic_factor;
   std::auto_ptr<ClayOM> clayom;
   std::vector<double> tillage_age;
-  const std::vector<const PLF*> smb_tillage_factor;
-  const std::vector<const PLF*> som_tillage_factor;
+  const std::vector<boost::shared_ptr<const PLF>/**/> smb_tillage_factor;
+  const std::vector<boost::shared_ptr<const PLF>/**/> som_tillage_factor;
   const double min_AM_C;	// Minimal amount of C in an AM. [g/m²]
   const double min_AM_N;	// Minimal amount of N in an AM. [g/m²]
   Bioincorporation bioincorporation;
@@ -178,7 +178,7 @@ struct OrganicStandard : public OrganicMatter
   const double* find_abiotic (const OM& om, // SOM & SMB
 			      const SoilWater& soil_water, 
 			      const SoilHeat& soil_heat,
-			      const std::vector<const PLF*> tillage_factor,
+			      const std::vector<boost::shared_ptr<const PLF>/**/> tillage_factor,
 			      const int pool,
 			      const std::vector<double>& default_value,
 			      bool use_clay,
@@ -1022,8 +1022,7 @@ const double*
 OrganicStandard::find_abiotic (const OM& om,
                                const SoilWater& soil_water, 
                                const SoilHeat& soil_heat,
-                               const std::vector<const PLF*> 
-                               /**/ tillage_factor,
+                               const std::vector<boost::shared_ptr<const PLF>/**/> tillage_factor,
                                const int pool,
                                const std::vector<double>&
                                /**/ default_value,
@@ -2442,7 +2441,7 @@ Using initial C per N for remaining entries");
   // Initialize C from layers, when available.
   if (al.check ("initial_SOM"))
     {
-      const std::vector<const FrameSubmodel*>& layers 
+      const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& layers 
         = al.submodel_sequence ("initial_SOM");
       const double soil_end = geo.bottom ();
       double last = 0.0;
@@ -2706,7 +2705,7 @@ check_alist (const Metalib&, const Frame& al, Treelog& err)
   const std::vector<const FrameModel*>& am_alist = al.model_sequence ("am");
   const std::vector<const FrameModel*>& smb_alist = al.model_sequence ("smb");
   const std::vector<const FrameModel*>& som_alist = al.model_sequence ("som");
-  const std::vector<const FrameSubmodel*>& dom_alist 
+  const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& dom_alist 
     = al.submodel_sequence ("dom");
 
   for (size_t j = 0; j < am_alist.size(); j++)

@@ -286,7 +286,7 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
 	case Value::AList:
 	  {
 	    const FrameSubmodel& other = frame.default_frame (key);
-	    const std::vector<const FrameSubmodel*>& value 
+	    const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& value 
               = frame.submodel_sequence (key);
 	    
 	    for (unsigned int i = 0; i < value.size (); i++)
@@ -301,7 +301,8 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
 	  break;
 	case Value::PLF:
 	  {
-	    const std::vector<const PLF*>& value = frame.plf_sequence (key);
+	    const std::vector<boost::shared_ptr<const PLF>/**/>& value 
+              = frame.plf_sequence (key);
 	    
 	    for (unsigned int i = 0; i < value.size (); i++)
 	      {

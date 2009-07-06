@@ -57,7 +57,7 @@ struct VegetationCrops : public Vegetation
     
     // Create;
     static void load_syntax (Frame&);
-    ForcedLAI (const std::vector<const FrameSubmodel*>& als);
+    ForcedLAI (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& als);
   } forced_LAI;
 
   // Canopy structure.
@@ -261,7 +261,7 @@ whenever 'LAIvsDAY' becomes negative.");
 }
 
 VegetationCrops::ForcedLAI::ForcedLAI
-/**/ (const std::vector<const FrameSubmodel*>& als)
+/**/ (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& als)
 {
   for (unsigned int i = 0; i < als.size (); i++)
     {

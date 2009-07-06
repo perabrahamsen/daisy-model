@@ -237,10 +237,10 @@ Frame::Implementation::check (const Metalib& metalib, const Frame& frame,
       if (type.size () != Value::Singleton)
         {
           daisy_assert (frame.type_size (key) != Value::Singleton);
-          const std::vector<const FrameSubmodel*>& seq 
+          const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& seq 
             = frame.submodel_sequence (key);
           int j_index = 0;
-          for (std::vector<const FrameSubmodel*>::const_iterator j
+          for (std::vector<boost::shared_ptr<const FrameSubmodel>/**/>::const_iterator j
                  = seq.begin ();
                j != seq.end ();
                j++)
@@ -1160,7 +1160,7 @@ Frame::model_sequence (const symbol key) const
     return impl->alist.model_sequence (key);
 }
 
-const std::vector<const FrameSubmodel*>& 
+const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& 
 Frame::submodel_sequence (const symbol key) const
 { 
   if (parent () && !impl->alist.check (key))
@@ -1169,7 +1169,7 @@ Frame::submodel_sequence (const symbol key) const
     return impl->alist.submodel_sequence (key);
 }
 
-const std::vector<const PLF*>& 
+const std::vector<boost::shared_ptr<const PLF>/**/>& 
 Frame::plf_sequence (const symbol key) const
 { 
   if (parent () && !impl->alist.check (key))
@@ -1355,14 +1355,14 @@ Frame::set (const symbol key, const std::vector<const FrameModel*>& value)
 }
 
 void 
-Frame::set (const symbol key, const std::vector<const FrameSubmodel*>& value)
+Frame::set (const symbol key, const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& value)
 {
   verify (key, Value::AList, value.size ());
   impl->alist.set (key, value); 
 }
 
 void 
-Frame::set (const symbol key, const std::vector<const PLF*>& value)
+Frame::set (const symbol key, const std::vector<boost::shared_ptr<const PLF>/**/>& value)
 {
   verify (key, Value::PLF, value.size ());
   impl->alist.set (key, value); 
@@ -1380,10 +1380,10 @@ Frame::set_empty (const symbol key)
       impl->alist.set (key, std::vector<const FrameModel*> ());
       break;
     case Value::AList:
-      impl->alist.set (key, std::vector<const FrameSubmodel*> ());
+      impl->alist.set (key, std::vector<boost::shared_ptr<const FrameSubmodel>/**/> ());
       break;
     case Value::PLF:
-      impl->alist.set (key, std::vector<const PLF*> ());
+      impl->alist.set (key, std::vector<boost::shared_ptr<const PLF>/**/> ());
       break;
     case Value::Boolean:
       impl->alist.set (key, std::vector<bool> ());

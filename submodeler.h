@@ -29,10 +29,10 @@
 // Old style (no block scope).
 template <class T> 
 std::vector<T*>
-map_construct (const std::vector<const FrameSubmodel*>& f)
+map_construct (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& f)
 { 
   std::vector<T*> t;
-  for (std::vector<const FrameSubmodel*>::const_iterator i = f.begin ();
+  for (std::vector<boost::shared_ptr<const FrameSubmodel>/**/>::const_iterator i = f.begin ();
        i != f.end ();
        i++)
     t.push_back (new T (**i));
@@ -41,10 +41,10 @@ map_construct (const std::vector<const FrameSubmodel*>& f)
 
 template <class T> 
 std::vector<const T*>
-map_construct_const (const std::vector<const FrameSubmodel*>& f)
+map_construct_const (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& f)
 { 
   std::vector<const T*> t;
-  for (std::vector<const FrameSubmodel*>::const_iterator i = f.begin ();
+  for (std::vector<boost::shared_ptr<const FrameSubmodel>/**/>::const_iterator i = f.begin ();
        i != f.end ();
        i++)
     t.push_back (new T (**i));

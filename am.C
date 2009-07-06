@@ -1136,7 +1136,7 @@ struct AMInitial : public AM
       = frame ().model_sequence ("om");
     const std::vector<AOM*>& om = impl->om;
 
-    const std::vector<const FrameSubmodel*>& layers 
+    const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& layers 
       = frame ().submodel_sequence ("layers");
 
     double last = 0.0;

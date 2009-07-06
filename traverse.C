@@ -253,7 +253,7 @@ Traverse::traverse_parameter (const Frame& frame,
 		
 		if (has_value)
 		  {
-		    const std::vector<const FrameSubmodel*>& sequence
+		    const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& sequence
 		      = frame.submodel_sequence (parameter);
 		    for (unsigned int i = 0; i < sequence.size (); i++)
 		      traverse_submodel_sequence (*sequence[i],

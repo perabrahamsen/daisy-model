@@ -528,7 +528,7 @@ Block::model_sequence (const symbol key) const
   return frame.model_sequence (key); 
 }
 
-const std::vector<const FrameSubmodel*>& 
+const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& 
 Block::submodel_sequence (const symbol key) const
 { 
   const Frame& frame = find_frame (key);
@@ -538,7 +538,7 @@ Block::submodel_sequence (const symbol key) const
   return frame.submodel_sequence (key); 
 }
 
-const std::vector<const PLF*>& 
+const std::vector<boost::shared_ptr<const PLF>/**/>& 
 Block::plf_sequence (const symbol key) const
 { 
   const Frame& frame = find_frame (key);

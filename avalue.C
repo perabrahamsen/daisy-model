@@ -146,17 +146,8 @@ AValue::AValue (const std::vector<int>& v)
     ref_count (new int (1))
 { }
 
-std::vector<const PLF*>* 
-AValue::copy_plfs (const std::vector<const PLF*>& org)
-{
-  std::vector<const PLF*>* copy = new std::vector<const PLF*> ();
-  for (unsigned int i = 0; i < org.size (); i++)
-    copy->push_back (new PLF (*org[i]));
-  return copy;
-}
-
-AValue::AValue (const std::vector<const PLF*>& v)
-  : plf_sequence (copy_plfs (v)),
+AValue::AValue (const std::vector<boost::shared_ptr<const PLF>/**/>& v)
+  : plf_sequence (new const std::vector<boost::shared_ptr<const PLF>/**/> (v)),
     type (Value::PLF),
     is_sequence (true),
     ref_count (new int (1))
@@ -172,15 +163,12 @@ AValue::AValue (const std::vector<const FrameModel*>& v)
     model_sequence->push_back (&v[i]->clone ());
 }
 
-AValue::AValue (const std::vector<const FrameSubmodel*>& v)
-  : type (Value::AList),
+AValue::AValue (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& v)
+  : submodel_sequence (new std::vector<boost::shared_ptr<const FrameSubmodel>/**/> (v)),
+    type (Value::AList),
     is_sequence (true),
     ref_count (new int (1))
-{ 
-  submodel_sequence = new std::vector<const FrameSubmodel*> ();
-  for (unsigned int i = 0; i < v.size (); i++)
-    submodel_sequence->push_back (&v[i]->clone ());
-}
+{ }
 
 AValue::AValue ()
   : number (-42.42e42),
@@ -274,8 +262,8 @@ AValue::subset (const Metalib& metalib, const AValue& v) const
 	}
       case Value::AList:
 	{
-	  const std::vector<const FrameSubmodel*>& value = *submodel_sequence;
-	  const std::vector<const FrameSubmodel*>& other = *v.submodel_sequence;
+	  const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& value = *submodel_sequence;
+	  const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& other = *v.submodel_sequence;
 
 	  const unsigned int size = value.size ();
 	  if (other.size () != size)
@@ -390,12 +378,11 @@ AValue::cleanup ()
             delete model_sequence;
 	    break;
 	  case Value::AList:
-            sequence_delete (submodel_sequence->begin (), 
-                             submodel_sequence->end ());
+            // sequence_delete (submodel_sequence->begin (), submodel_sequence->end ());
             delete submodel_sequence;
 	    break;
 	  case Value::PLF:
-	    sequence_delete (plf_sequence->begin (), plf_sequence->end ());
+	    // sequence_delete (plf_sequence->begin (), plf_sequence->end ());
 	    delete plf_sequence;
 	    break;
 	  case Value::String:

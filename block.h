@@ -29,6 +29,7 @@
 #include <vector>
 #include <set>
 #include <boost/noncopyable.hpp>
+#include <boost/shared_ptr.hpp>
 
 class Treelog;
 class Metalib;
@@ -100,8 +101,10 @@ public:
   const std::vector<bool>& flag_sequence (symbol key) const;
   const std::vector<int>& integer_sequence (symbol key) const;
   const std::vector<const FrameModel*>& model_sequence (symbol key) const;
-  const std::vector<const FrameSubmodel*>& submodel_sequence (symbol key) const;
-  const std::vector<const PLF*>& plf_sequence (symbol key) const;
+  const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>&
+    submodel_sequence (symbol key) const;
+  const std::vector<boost::shared_ptr<const PLF>/**/>& 
+    plf_sequence (symbol key) const;
 
   // Create and Destroy.
 protected:

@@ -24,6 +24,7 @@
 
 #include "log.h"
 #include <deque>
+#include <boost/shared_ptr.hpp>
 
 class Library;
 class Frame;
@@ -63,7 +64,7 @@ struct LogAList : public Log
   void push (symbol entry, const Frame& default_frame,
 	     std::vector<const FrameModel*> frame_sequence);
   void push (symbol entry, const Frame& default_frame,
-	     std::vector<const FrameSubmodel*> frame_sequence);
+	     std::vector<boost::shared_ptr<const FrameSubmodel>/**/> frame_sequence);
   void pop ();
 
   // Nesting.
