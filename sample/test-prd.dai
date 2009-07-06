@@ -213,7 +213,9 @@ Based on data collected by Fulai Liu, 2007."
   (wait (mm_dd 4  8))
   (seed_bed_preparation)
   (wait (mm_dd 4 11))
-  (sow ("Potato; Exp" (weight 2765 [kg w.w./ha]))(row_width 1 [m]))
+  (sow ("Potato; Exp")
+       (seed 2765 [kg w.w./ha])
+       (row_width 1 [m]))
   ;; Watering left side.
   (wait (mm_dd  5 28))
   (irrigate_subsoil 2 [mm/h] (hours 1) (volume left-drip)
