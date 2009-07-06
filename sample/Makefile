@@ -11,7 +11,7 @@ DATA = dk-foulum.dwf dk-jyndevad.dwf cz-valecov.dwf pl-jadwisin.dwf \
 	sk-bratislava.dwf it-bologna.dwf dk-taastrup.dwf example.gwt it-cer.gwt
 SAFIR = safir-common.dai safir-site.dai
 TEXT	= Makefile README $(SETUPS) $(DATA) $(LIBS)
-REMOVE 	=  NOTHING
+REMOVE 	=  syntax.h syntax.C
 
 DAISY   = /usr/local/daisy/$(HOSTTYPE)/daisy
 

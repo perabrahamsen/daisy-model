@@ -1,6 +1,16 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Prøv at gøre Value til klasse.
+* Cleanup
+
+** fjern alist
+
+** omdøb alist -> submodel & object -> model
+
+** value -> frame
+
+** val -> value
+
+** fjern flere "clone", brug shared_ptr
 
 * Regression testing
 
