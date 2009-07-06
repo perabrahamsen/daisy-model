@@ -68,7 +68,7 @@ const std::vector<int>&
 Val::integer_sequence () const
 { daisy_notreached (); }
 
-const std::vector<const PLF*>& 
+const std::vector<boost::shared_ptr<const PLF>/**/>&
 Val::plf_sequence () const
 { daisy_notreached (); }
 
@@ -130,25 +130,25 @@ ValBoolean::ValBoolean (const bool v)
 
 const PLF& 
 ValPLF::plf () const
-{ return value; }
+{ return *value; }
 
-ValPLF::ValPLF (const PLF& v)
+ValPLF::ValPLF (boost::shared_ptr<const PLF> v)
   : value (v)
 { }
 
 const FrameModel& 
 ValObject::model () const
-{ return value; }
+{ return *value; }
 
-ValObject::ValObject (const FrameModel& v)
+ValObject::ValObject (boost::shared_ptr<const FrameModel> v)
   : value (v)
 { }
 
 const FrameSubmodel& 
 ValAList::submodel () const
-{ return value; }
+{ return *value; }
 
-ValAList::ValAList (const FrameSubmodel& v)
+ValAList::ValAList (boost::shared_ptr<const FrameSubmodel> v)
   : value (v)
 { }
 
@@ -192,11 +192,11 @@ ValIntegerSeq::ValIntegerSeq (const std::vector<int>& v)
   : value (v)
 { }
 
-const std::vector<const PLF*>& 
+const std::vector<boost::shared_ptr<const PLF>/**/>& 
 ValPLFSeq::plf_sequence () const
 { return value; }
 
-ValPLFSeq::ValPLFSeq (const std::vector<const PLF*>& v)
+ValPLFSeq::ValPLFSeq (const std::vector<boost::shared_ptr<const PLF>/**/>& v)
   : value (v)
 { }
 

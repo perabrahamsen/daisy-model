@@ -1,5 +1,7 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* Prøv at gøre Value til klasse.
+
 * Regression testing
 
 ** ? Log: akkumulerede værdier skal ikke være per tid.

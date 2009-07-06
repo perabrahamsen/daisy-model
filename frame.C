@@ -33,12 +33,11 @@
 #include "filepos.h"
 #include "metalib.h"
 #include "type.h"
-#ifdef USE_VAL
 #include "val.h"
-#endif
 #include "check.h"
 #include "vcheck.h"
 #include "treelog.h"
+#include "plf.h"
 #include <vector>
 #include <set>
 #include <sstream>
@@ -61,10 +60,8 @@ struct Frame::Implementation
   std::vector<symbol> order;
 
   // Value.
-#ifdef USE_VAL
   typedef std::map<symbol, boost::shared_ptr<const Val>/**/> val_map;
   val_map values;
-#endif // USE_VAL
   AttributeList alist;
 
   void declare_type (const symbol key, const Type* type);
@@ -82,6 +79,7 @@ struct Frame::Implementation
       val_checks (old.val_checks),
       checker (old.checker),
       order (old.order),
+      values (old.values),
       alist (old.alist)
   { counter++; }
   Implementation (int old_count, child_set old_children)
@@ -746,8 +744,13 @@ Frame::declare_submodule (const symbol key,
                                           load_syntax, description));
 #if 1
   if (cat == Value::Const || cat == Value::State)
-    // TODO: Move this to Frame::alist (name) (must return const first).
-    impl->alist.set (key, default_frame (key));
+    {
+      // TODO: Move this to Frame::alist (name) (must return const first).
+      boost::shared_ptr<const FrameSubmodel> child 
+        (&default_frame (key).clone ());
+      impl->alist.set (key, *child);
+      impl->values[key].reset (new ValAList (child));
+    }
 #endif
 }
 
@@ -988,7 +991,10 @@ Frame::value_size (const symbol key) const
 
 void
 Frame::set_reference (const symbol key, const symbol val)
-{ impl->alist.set_reference (key, val); }
+{ 
+  impl->alist.set_reference (key, val); 
+  impl->values[key].reset (new ValReference (val));
+}
 
 bool 
 Frame::is_reference (const symbol key) const
@@ -1201,6 +1207,7 @@ Frame::set (const symbol key, double value)
 { 
   verify (key, Value::Number);
   impl->alist.set (key, value); 
+  impl->values[key].reset (new ValNumber (value));
 }
 
 void 
@@ -1208,6 +1215,7 @@ Frame::set (const symbol key, double value, const symbol dim)
 {
   verify (key, Value::Number);
   impl->alist.set (key, value, dim); 
+  impl->values[key].reset (new ValScalar (value, dim));
 }
 
 void 
@@ -1220,23 +1228,29 @@ Frame::set (const symbol key, const symbol name)
       const Intrinsics& intrinsics = Librarian::intrinsics ();
       intrinsics.instantiate (component, name);
       const FrameModel& old = intrinsics.library (component).model (name);
-      FrameModel child (old, parent_link);
-      impl->alist.set (key, child);
+      boost::shared_ptr<const FrameModel> child (&old.clone ());
+      impl->alist.set (key, *child);
+      impl->values[key].reset (new ValObject (child));
       return;
     }
   verify (key, Value::String);
   impl->alist.set (key, name); 
+  impl->values[key].reset (new ValString (name));
 }
 
 void 
 Frame::set (const symbol key, const char *const name)
-{ set (key, symbol (name)); }
+{
+  set (key, symbol (name)); 
+  impl->values[key].reset (new ValString (name));
+}
 
 void 
 Frame::set (const symbol key, bool value)
 {
   verify (key, Value::Boolean);
   impl->alist.set (key, value); 
+  impl->values[key].reset (new ValBoolean (value));
 }
 
 void 
@@ -1244,6 +1258,7 @@ Frame::set (const symbol key, int value)
 {
   verify (key, Value::Integer);
   impl->alist.set (key, value); 
+  impl->values[key].reset (new ValInteger (value));
 }
 
 void 
@@ -1251,20 +1266,26 @@ Frame::set (const symbol key, const FrameModel& value)
 {
   verify (key, Value::Object);
   impl->alist.set (key, value);
+  boost::shared_ptr<const FrameModel> child (&value.clone ());
+  impl->values[key].reset (new ValObject (child));
 }
 
 void 
 Frame::set (const symbol key, const FrameSubmodel& value)
 {
   verify (key, Value::AList);
-  impl->alist.set (key, value);
+  boost::shared_ptr<const FrameSubmodel> child (&value.clone ());
+  impl->alist.set (key, *child);
+  impl->values[key].reset (new ValAList (child));
 }
 
 void 
 Frame::set (const symbol key, const PLF& value)
 {
   verify (key, Value::PLF);
-  impl->alist.set (key, value); 
+  boost::shared_ptr<const PLF> child (new PLF (value));
+  impl->alist.set (key, *child); 
+  impl->values[key].reset (new ValPLF (child));
 }
 
 void 
@@ -1272,6 +1293,7 @@ Frame::set (const symbol key, const std::vector<double>& value)
 {
   verify (key, Value::Number, value.size ());
   impl->alist.set (key, value); 
+  impl->values[key].reset (new ValNumberSeq (value));
 }
 
 void 
@@ -1293,10 +1315,12 @@ Frame::set (const symbol key, const std::vector<symbol>& value)
           frames.push_back (link);
         }
       impl->alist.set (key, frames);
+      impl->values[key].reset (new ValObjectSeq (frames));
       return;
     }
   verify (key, Value::String, value.size ());
   impl->alist.set (key, value); 
+  impl->values[key].reset (new ValStringSeq (value));
 }
 
 void 
@@ -1340,6 +1364,7 @@ Frame::set (const symbol key, const std::vector<bool>& value)
 {
   verify (key, Value::Boolean, value.size ());
   impl->alist.set (key, value); 
+  impl->values[key].reset (new ValBooleanSeq (value));
 }
 
 void 
@@ -1347,6 +1372,7 @@ Frame::set (const symbol key, const std::vector<int>& value)
 {
   verify (key, Value::Integer, value.size ());
   impl->alist.set (key, value); 
+  impl->values[key].reset (new ValIntegerSeq (value));
 }
 
 void 
@@ -1354,6 +1380,7 @@ Frame::set (const symbol key, const std::vector<boost::shared_ptr<const FrameMod
 {
   verify (key, Value::Object, value.size ());
   impl->alist.set (key, value); 
+  impl->values[key].reset (new ValObjectSeq (value));
 }
 
 void 
@@ -1361,6 +1388,7 @@ Frame::set (const symbol key, const std::vector<boost::shared_ptr<const FrameSub
 {
   verify (key, Value::AList, value.size ());
   impl->alist.set (key, value); 
+  impl->values[key].reset (new ValAListSeq (value));
 }
 
 void 
@@ -1368,6 +1396,7 @@ Frame::set (const symbol key, const std::vector<boost::shared_ptr<const PLF>/**/
 {
   verify (key, Value::PLF, value.size ());
   impl->alist.set (key, value); 
+  impl->values[key].reset (new ValPLFSeq (value));
 }
 
 void 
@@ -1377,24 +1406,31 @@ Frame::set_empty (const symbol key)
     {
     case Value::Number:
       impl->alist.set (key, std::vector<double> ());
+      impl->values[key].reset (new ValNumberSeq (std::vector<double> ()));
       break;
     case Value::Object:
       impl->alist.set (key, std::vector<boost::shared_ptr<const FrameModel>/**/> ());
+      impl->values[key].reset (new ValObjectSeq (std::vector<boost::shared_ptr<const FrameModel>/**/> ()));
       break;
     case Value::AList:
       impl->alist.set (key, std::vector<boost::shared_ptr<const FrameSubmodel>/**/> ());
+      impl->values[key].reset (new ValAListSeq (std::vector<boost::shared_ptr<const FrameSubmodel>/**/> ()));
       break;
     case Value::PLF:
       impl->alist.set (key, std::vector<boost::shared_ptr<const PLF>/**/> ());
+      impl->values[key].reset (new ValPLFSeq (std::vector<boost::shared_ptr<const PLF>/**/> ()));
       break;
     case Value::Boolean:
       impl->alist.set (key, std::vector<bool> ());
+      impl->values[key].reset (new ValBooleanSeq (std::vector<bool> ()));
       break;
     case Value::String:
       impl->alist.set (key, std::vector<symbol> ());
+      impl->values[key].reset (new ValStringSeq (std::vector<symbol> ()));
       break;
     case Value::Integer:
       impl->alist.set (key, std::vector<int> ());
+      impl->values[key].reset (new ValIntegerSeq (std::vector<int> ()));
       break;
     case Value::Scalar:
     case Value::Reference:
@@ -1419,6 +1455,7 @@ Frame::overwrite_values (const Frame& other)
     return;
 
   impl->alist = other.impl->alist;
+  impl->values = other.impl->values;
 }
 
 void 

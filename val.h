@@ -45,7 +45,7 @@ public:
   virtual const std::vector<symbol>& name_sequence () const;
   virtual const std::vector<bool>& flag_sequence () const;
   virtual const std::vector<int>& integer_sequence () const;
-  virtual const std::vector<const PLF*>& plf_sequence () const;
+  virtual const std::vector<boost::shared_ptr<const PLF>/**/>& plf_sequence () const;
   virtual const std::vector<boost::shared_ptr<const FrameModel>/**/>& model_sequence () const;
   virtual const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& submodel_sequence () const;
 
@@ -98,26 +98,26 @@ public:
 
 class ValPLF : public Val
 {
-  const PLF& value;
+  boost::shared_ptr<const PLF> value;
   const PLF& plf () const;
 public:
-  ValPLF (const PLF& v);
+  ValPLF (boost::shared_ptr<const PLF> v);
 };
 
 class ValObject : public Val
 {
-  const FrameModel& value;
+  boost::shared_ptr<const FrameModel> value;
   const FrameModel& model () const;
 public:
-  ValObject (const FrameModel& f);
+  ValObject (boost::shared_ptr<const FrameModel> f);
 };
 
 class ValAList : public Val
 {
-  const FrameSubmodel& value;
+  boost::shared_ptr<const FrameSubmodel> value;
   const FrameSubmodel& submodel () const;
 public:
-  ValAList (const FrameSubmodel& f);
+  ValAList (boost::shared_ptr<const FrameSubmodel> f);
 };
 
 class ValInteger : public Val
@@ -130,7 +130,7 @@ public:
 
 class ValNumberSeq : public Val
 {
-  const std::vector<double>& value;
+  const std::vector<double> value;
   const std::vector<double>& number_sequence () const;
 public:
   ValNumberSeq (const std::vector<double>& v);
@@ -138,7 +138,7 @@ public:
 
 class ValStringSeq : public Val
 {
-  const std::vector<symbol>& value;
+  const std::vector<symbol> value;
   const std::vector<symbol>& name_sequence () const;
 public:
   ValStringSeq (const std::vector<symbol>& v);
@@ -146,7 +146,7 @@ public:
 
 class ValBooleanSeq : public Val
 {
-  const std::vector<bool>& value;
+  const std::vector<bool> value;
   const std::vector<bool>& flag_sequence () const;
 public:
   ValBooleanSeq (const std::vector<bool>& v);
@@ -154,7 +154,7 @@ public:
 
 class ValIntegerSeq : public Val
 {
-  const std::vector<int>& value;
+  const std::vector<int> value;
   const std::vector<int>& integer_sequence () const;
 public:
   ValIntegerSeq (const std::vector<int>& v);
@@ -162,15 +162,15 @@ public:
 
 class ValPLFSeq : public Val
 {
-  const std::vector<const PLF*>& value;
-  const std::vector<const PLF*>& plf_sequence () const;
+  const std::vector<boost::shared_ptr<const PLF>/**/> value;
+  const std::vector<boost::shared_ptr<const PLF>/**/>& plf_sequence () const;
 public:
-  ValPLFSeq (const std::vector<const PLF*>& v);
+  ValPLFSeq (const std::vector<boost::shared_ptr<const PLF>/**/>& v);
 };
 
 class ValObjectSeq : public Val
 {
-  const std::vector<boost::shared_ptr<const FrameModel>/**/>& value;
+  const std::vector<boost::shared_ptr<const FrameModel>/**/> value;
   const std::vector<boost::shared_ptr<const FrameModel>/**/>& model_sequence () const;
 public:
   ValObjectSeq (const std::vector<boost::shared_ptr<const FrameModel>/**/>& v);
@@ -178,7 +178,7 @@ public:
 
 class ValAListSeq : public Val
 {
-  const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& value;
+  const std::vector<boost::shared_ptr<const FrameSubmodel>/**/> value;
   const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& submodel_sequence () const;
 public:
   ValAListSeq (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& v);

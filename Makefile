@@ -1393,8 +1393,8 @@ im${OBJ}: im.C im.h symbol.h value.h chemical.h model_framed.h \
   border.h block.h scope.h frame_submodel.h frame.h check.h assertion.h
 frame${OBJ}: frame.C frame.h scope.h value.h symbol.h frame_model.h \
   frame_submodel.h block.h assertion.h librarian.h model.h intrinsics.h \
-  memutils.h library.h alist.h filepos.h metalib.h type.h check.h \
-  vcheck.h treelog.h
+  memutils.h library.h alist.h filepos.h metalib.h type.h val.h check.h \
+  vcheck.h treelog.h plf.h
 bdconv${OBJ}: bdconv.C bdconv.h convert.h symbol.h geometry.h value.h soil.h \
   volume.h model.h units.h memutils.h assertion.h
 abiotic${OBJ}: abiotic.C abiotic.h mathlib.h assertion.h
