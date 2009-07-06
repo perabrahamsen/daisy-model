@@ -115,9 +115,9 @@ struct ActionCrop : public Action
     const double DS;
     const double DM;
     int year_of_last_harvest;
-    const std::vector<const FrameModel*> *const fertilize;
+    const std::vector<boost::shared_ptr<const FrameModel>/**/> *const fertilize;
     int fertilize_index;
-    const std::vector<const FrameModel*> *const fertilize_rest;
+    const std::vector<boost::shared_ptr<const FrameModel>/**/> *const fertilize_rest;
     int fertilize_rest_index;
     int fertilize_year;
 

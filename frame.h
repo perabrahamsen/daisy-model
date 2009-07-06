@@ -270,7 +270,7 @@ class EXPORT Frame : public WScope
   const std::vector<symbol>& name_sequence (symbol key) const;
   const std::vector<bool>& flag_sequence (symbol key) const;
   const std::vector<int>& integer_sequence (symbol key) const;
-  const std::vector<const FrameModel*>& model_sequence (symbol key) const;
+  const std::vector<boost::shared_ptr<const FrameModel>/**/>& model_sequence (symbol key) const;
   const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>&
     submodel_sequence (symbol key) const;
   const std::vector<boost::shared_ptr<const PLF>/**/>& 
@@ -297,7 +297,7 @@ class EXPORT Frame : public WScope
   void set_strings (symbol key, symbol a, symbol b, symbol c);
   void set (symbol, const std::vector<bool>&);
   void set (symbol, const std::vector<int>&);
-  void set (symbol, const std::vector<const FrameModel*>&);
+  void set (symbol, const std::vector<boost::shared_ptr<const FrameModel>/**/>&);
   void set (symbol, 
             const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>&);
   void set (symbol, const std::vector<boost::shared_ptr<const PLF>/**/>&);

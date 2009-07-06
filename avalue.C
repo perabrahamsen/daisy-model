@@ -153,15 +153,12 @@ AValue::AValue (const std::vector<boost::shared_ptr<const PLF>/**/>& v)
     ref_count (new int (1))
 { }
 
-AValue::AValue (const std::vector<const FrameModel*>& v)
-  : type (Value::Object),
+AValue::AValue (const std::vector<boost::shared_ptr<const FrameModel>/**/>& v)
+  : model_sequence (new std::vector<boost::shared_ptr<const FrameModel>/**/> (v)),
+    type (Value::Object),
     is_sequence (true),
     ref_count (new int (1))
-{ 
-  model_sequence = new std::vector<const FrameModel*> ();
-  for (unsigned int i = 0; i < v.size (); i++)
-    model_sequence->push_back (&v[i]->clone ());
-}
+{ }
 
 AValue::AValue (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& v)
   : submodel_sequence (new std::vector<boost::shared_ptr<const FrameSubmodel>/**/> (v)),
@@ -247,8 +244,8 @@ AValue::subset (const Metalib& metalib, const AValue& v) const
 	return *integer_sequence == *v.integer_sequence;
       case Value::Object:
 	{
-	  const std::vector<const FrameModel*>& value = *model_sequence;
-	  const std::vector<const FrameModel*>& other = *v.model_sequence;
+	  const std::vector<boost::shared_ptr<const FrameModel>/**/>& value = *model_sequence;
+	  const std::vector<boost::shared_ptr<const FrameModel>/**/>& other = *v.model_sequence;
 
 	  const unsigned int size = value.size ();
 	  if (other.size () != size)
@@ -374,7 +371,7 @@ AValue::cleanup ()
 	    delete number_sequence;
 	    break;
 	  case Value::Object:
-            sequence_delete (model_sequence->begin (), model_sequence->end ());
+            // sequence_delete (model_sequence->begin (), model_sequence->end ());
             delete model_sequence;
 	    break;
 	  case Value::AList:

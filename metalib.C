@@ -146,7 +146,7 @@ Metalib::parser_inputs () const
 { return impl->parser_inputs; }
 
 void 
-Metalib::set_parser_inputs (const std::vector<const FrameModel*>& inputs)
+Metalib::set_parser_inputs (const std::vector<boost::shared_ptr<const FrameModel>/**/>& inputs)
 {
   sequence_delete (impl->parser_inputs.begin (), impl->parser_inputs.end ());
   impl->parser_inputs.erase (impl->parser_inputs.begin (), 

@@ -27,6 +27,7 @@
 #include "im.h"
 #include <vector>
 #include <memory>
+#include <boost/shared_ptr.hpp>
 
 class Log;
 class Geometry;
@@ -96,7 +97,7 @@ public:
                      const Time&, Treelog& msg);
   // Crop part.
   static AM& create (const Metalib&, const Geometry&, const Time&,
-		     const std::vector<const FrameModel*>&,
+		     const std::vector<boost::shared_ptr<const FrameModel>/**/>&,
 		     symbol sort, symbol part, lock_type lock, Treelog& msg);
   void initialize (const Geometry&, const double max_rooting_depth);
   virtual void initialize_derived (const Geometry&, 

@@ -61,7 +61,7 @@ struct Bioincorporation::Implementation
   const double respiration;
   const PLF distribution;
   std::vector<double> density;
-  const std::vector<const FrameModel*>& aom_alists; // Stem AM parameters.
+  const std::vector<boost::shared_ptr<const FrameModel>/**/>& aom_alists; // Stem AM parameters.
   
   // Content.
   AM* aom;

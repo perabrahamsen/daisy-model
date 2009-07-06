@@ -803,7 +803,7 @@ VCheck::unique ()
 	case Value::Object:
 	  {
             bool ok = true;
-	    const std::vector<const FrameModel*>& list 
+	    const std::vector<boost::shared_ptr<const FrameModel>/**/>& list 
               = frame.model_sequence (key);
 	    std::map<symbol, size_t> found;
 	    for (size_t i = 0; i < list.size (); i++)

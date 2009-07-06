@@ -72,7 +72,7 @@ struct VegetationPermanent : public Vegetation
   AM* AM_litter;                // Dead plant matter.
   double N_uptake;		// N uptake this hour. [g N/m^2/h]
   double N_litter;		// N litter this hour. [g N/m^2/h]
-  const std::vector<const FrameModel*>& litter_am; // Litter AM parameters.
+  const std::vector<boost::shared_ptr<const FrameModel>/**/>& litter_am; // Litter AM parameters.
   // Root.
   std::auto_ptr<RootSystem> root_system;
   const double WRoot;		// Root dry matter weight [g DM/m^2]

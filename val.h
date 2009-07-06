@@ -46,7 +46,7 @@ public:
   virtual const std::vector<bool>& flag_sequence () const;
   virtual const std::vector<int>& integer_sequence () const;
   virtual const std::vector<const PLF*>& plf_sequence () const;
-  virtual const std::vector<const FrameModel*>& model_sequence () const;
+  virtual const std::vector<boost::shared_ptr<const FrameModel>/**/>& model_sequence () const;
   virtual const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& submodel_sequence () const;
 
 protected:
@@ -170,10 +170,10 @@ public:
 
 class ValObjectSeq : public Val
 {
-  const std::vector<const FrameModel*>& value;
-  const std::vector<const FrameModel*>& model_sequence () const;
+  const std::vector<boost::shared_ptr<const FrameModel>/**/>& value;
+  const std::vector<boost::shared_ptr<const FrameModel>/**/>& model_sequence () const;
 public:
-  ValObjectSeq (const std::vector<const FrameModel*>& v);
+  ValObjectSeq (const std::vector<boost::shared_ptr<const FrameModel>/**/>& v);
 };
 
 class ValAListSeq : public Val

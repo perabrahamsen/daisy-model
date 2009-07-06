@@ -99,13 +99,17 @@ LogAList::push (symbol entry, const Frame& frame)
 void
 LogAList::push (symbol entry, 
 		const Frame& default_frame,
-		std::vector<const FrameModel*> frame_sequence)
+		std::vector<boost::shared_ptr<const FrameModel>/**/> frame_sequence)
 {
   entry_stack.push_front (entry);
   library_stack.push_front (NULL);
   frame_stack.push_front (&default_frame.clone ());
-  std::vector<const Frame*> frames (frame_sequence.begin (), 
-                                    frame_sequence.end ());
+  std::vector<const Frame*> frames;
+  for (std::vector<boost::shared_ptr<const FrameModel>/**/>::const_iterator i
+         = frame_sequence.begin ();
+       i != frame_sequence.end ();
+       i++)
+    frames.push_back ((*i).get ());
   frame_sequence_stack.push_front (frames);
   unnamed_stack.push_front (0);
 }
@@ -119,8 +123,8 @@ LogAList::push (symbol entry,
   library_stack.push_front (NULL);
   frame_stack.push_front (&default_frame.clone ());
   std::vector<const Frame*> frames;
-
-  for (std::vector<boost::shared_ptr<const FrameSubmodel>/**/>::const_iterator i = frame_sequence.begin ();
+  for (std::vector<boost::shared_ptr<const FrameSubmodel>/**/>::const_iterator i
+         = frame_sequence.begin ();
        i != frame_sequence.end ();
        i++)
     frames.push_back ((*i).get ());
@@ -244,10 +248,14 @@ LogAList::close ()
                 // Object sequence.
                 daisy_assert (frame_entry ().type_size (sold_entry)
                               != Value::Singleton);
-                std::vector<const FrameModel*> copy;
+                std::vector<boost::shared_ptr<const FrameModel>/**/> copy;
                 for (size_t i = 0; i < old_frame_sequence.size (); i++)
-                  copy.push_back (dynamic_cast<const FrameModel*>
-                                  (old_frame_sequence[i]));
+                  {
+                    const FrameModel* model 
+                      = dynamic_cast<const FrameModel*> (old_frame_sequence[i]);
+                    boost::shared_ptr<const FrameModel> entry (model);
+                    copy.push_back (entry);
+                  }
                 frame_entry ().set (sold_entry, copy);
               }
               break;

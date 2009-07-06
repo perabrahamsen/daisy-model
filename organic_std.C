@@ -934,9 +934,12 @@ OrganicStandard::monthly (const Metalib& metalib, const Geometry& geo,
     {
       const Library& library = metalib.library (AOM::component);
       const std::vector<symbol>& names = AM::default_AM ();
-      std::vector<const FrameModel*> alists;
+      std::vector<boost::shared_ptr<const FrameModel>/**/> alists;
       for (size_t i = 0; i < names.size (); i++)
-        alists.push_back (&library.model (names[i]));
+        {
+          boost::shared_ptr<const FrameModel> model (new FrameModel (library.model (names[i]), Frame::parent_link));
+          alists.push_back (model);
+        }
       remainder = &AM::create (metalib, geo,
                                Time (1, 1, 1, 1), alists,
 			       am_symbol, cleanup_symbol, AM::Locked, msg);
@@ -2650,7 +2653,7 @@ OrganicStandard::check_am (const FrameModel& am, Treelog& err) const
   bool ok = true;
   if (ok)
     {
-      const std::vector<const FrameModel*>& om_alist = am.model_sequence ("om");
+      const std::vector<boost::shared_ptr<const FrameModel>/**/>& om_alist = am.model_sequence ("om");
       
       for (size_t i = 0; i < om_alist.size(); i++)
 	{
@@ -2702,9 +2705,9 @@ check_alist (const Metalib&, const Frame& al, Treelog& err)
   if (al.check ("active_groundwater"))
     err.warning ("The 'active_groundwater' parameter is ignored.");
 
-  const std::vector<const FrameModel*>& am_alist = al.model_sequence ("am");
-  const std::vector<const FrameModel*>& smb_alist = al.model_sequence ("smb");
-  const std::vector<const FrameModel*>& som_alist = al.model_sequence ("som");
+  const std::vector<boost::shared_ptr<const FrameModel>/**/>& am_alist = al.model_sequence ("am");
+  const std::vector<boost::shared_ptr<const FrameModel>/**/>& smb_alist = al.model_sequence ("smb");
+  const std::vector<boost::shared_ptr<const FrameModel>/**/>& som_alist = al.model_sequence ("som");
   const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& dom_alist 
     = al.submodel_sequence ("dom");
 
@@ -2717,7 +2720,7 @@ check_alist (const Metalib&, const Frame& al, Treelog& err)
       if (am_ok)
 	{
 	  bool om_ok = true;
-	  const std::vector<const FrameModel*>& om_alist
+	  const std::vector<boost::shared_ptr<const FrameModel>/**/>& om_alist
 	    = am_alist[j]->model_sequence ("om");
 	  for (size_t i = 0; i < om_alist.size(); i++)
 	    {

@@ -64,7 +64,7 @@ public:
   const std::vector<symbol>& parser_files () const;
   void add_parser_file (const symbol file);
   const std::vector<const Frame*>& parser_inputs () const;
-  void set_parser_inputs (const std::vector<const FrameModel*>&);
+  void set_parser_inputs (const std::vector<boost::shared_ptr<const FrameModel>/**/>&);
 
   // Create and Destroy.
 public:

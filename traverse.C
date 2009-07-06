@@ -281,7 +281,7 @@ Traverse::traverse_parameter (const Frame& frame,
 		  }
 		else
 		  {
-		    const std::vector<const FrameModel*>& sequence
+		    const std::vector<boost::shared_ptr<const FrameModel>/**/>& sequence
 		      = frame.model_sequence (parameter);
 		    for (unsigned int i = 0; i < sequence.size (); i++)
 		      {

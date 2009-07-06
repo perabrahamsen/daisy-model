@@ -25,9 +25,9 @@
 #include "time.h"
 #include "plf.h"
 #include "symbol.h"
-
 #include <vector>
 #include <string>
+#include <boost/shared_ptr.hpp>
 
 class Frame;
 class FrameModel;
@@ -43,14 +43,14 @@ class Harvesting
 {
   // Parameters.
 private:
-  const std::vector<const FrameModel*>& Stem; // Stem AM parameters.
-  const std::vector<const FrameModel*>& Leaf; // Leaf AM parameters.
+  const std::vector<boost::shared_ptr<const FrameModel>/**/>& Stem; // Stem AM parameters.
+  const std::vector<boost::shared_ptr<const FrameModel>/**/>& Leaf; // Leaf AM parameters.
 public:
-  const std::vector<const FrameModel*>& Dead; // Dead AM parameters.
+  const std::vector<boost::shared_ptr<const FrameModel>/**/>& Dead; // Dead AM parameters.
 private:
-  const std::vector<const FrameModel*>& SOrg; // SOrg AM parameters.
+  const std::vector<boost::shared_ptr<const FrameModel>/**/>& SOrg; // SOrg AM parameters.
 public:
-  const std::vector<const FrameModel*>& Root; // Root AM parameters.
+  const std::vector<boost::shared_ptr<const FrameModel>/**/>& Root; // Root AM parameters.
 private:
   const double EconomicYield_W; // Frac. of economic yield (DM) in storage org.
   const double EconomicYield_N; // Frac. of economic yield (N) in storage org.

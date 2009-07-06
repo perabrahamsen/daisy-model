@@ -295,7 +295,7 @@ AttributeList::plf_sequence (const symbol key) const
   return *value.plf_sequence;
 }
 
-const std::vector<const FrameModel*>& 
+const std::vector<boost::shared_ptr<const FrameModel>/**/>& 
 AttributeList::model_sequence (const symbol key) const
 {
   const AValue& value = impl.lookup (key);
@@ -400,7 +400,7 @@ AttributeList::set (const symbol key, const std::vector<int>& v)
 
 void 
 AttributeList::set (const symbol key, 
-		    const std::vector<const FrameModel*>& v)
+		    const std::vector<boost::shared_ptr<const FrameModel>/**/>& v)
 { impl.set (key, AValue (v)); }
 
 void

@@ -57,7 +57,7 @@ struct AValue
     const std::vector<bool>* flag_sequence;
     const std::vector<int>* integer_sequence;
     const std::vector<boost::shared_ptr<const PLF>/**/>* plf_sequence;
-    std::vector<const FrameModel*>* model_sequence;
+    std::vector<boost::shared_ptr<const FrameModel>/**/>* model_sequence;
     std::vector<boost::shared_ptr<const FrameSubmodel>/**/>* submodel_sequence;
   };
   Value::type type;
@@ -88,7 +88,7 @@ struct AValue
   AValue (const std::vector<bool>& v);
   AValue (const std::vector<int>& v);
   AValue (const std::vector<boost::shared_ptr<const PLF>/**/>& v);
-  AValue (const std::vector<const FrameModel*>& v);
+  AValue (const std::vector<boost::shared_ptr<const FrameModel>/**/>& v);
   AValue (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& v);
   AValue ();
   AValue (const AValue& v);

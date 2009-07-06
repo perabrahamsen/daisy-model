@@ -355,13 +355,13 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
 	  {
             const symbol component = frame.component (key);
             const Library& library = metalib.library (component);
-	    const std::vector<const FrameModel*>& value 
+	    const std::vector<boost::shared_ptr<const FrameModel>/**/>& value 
               = frame.model_sequence (key);
             // We really should check original value.
-            const std::vector<const FrameModel*>& super_value
+            const std::vector<boost::shared_ptr<const FrameModel>/**/>& super_value
               = super.check (key)
               ? super.model_sequence (key)
-              : std::vector<const FrameModel*> ();
+              : std::vector<boost::shared_ptr<const FrameModel>/**/> ();
 	    for (unsigned int i = 0; i < value.size (); i++)
 	      {
                 const Frame& me = *value[i];

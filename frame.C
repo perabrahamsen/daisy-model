@@ -196,10 +196,10 @@ Frame::Implementation::check (const Metalib& metalib, const Frame& frame,
       if (type.size () != Value::Singleton)
         {
           const ::Library& lib = metalib.library (type.component ());
-          const std::vector<const FrameModel*>& seq 
+          const std::vector<boost::shared_ptr<const FrameModel>/**/>& seq 
             = frame.model_sequence (key);
           int j_index = 0;
-          for (std::vector<const FrameModel*>::const_iterator j
+          for (std::vector<boost::shared_ptr<const FrameModel>/**/>::const_iterator j
                  = seq.begin ();
                j != seq.end ();
                j++)
@@ -954,9 +954,9 @@ Frame::subset (const Metalib& metalib, const Frame& other,
             const int his_size = him->value_size (key);
             const int size = std::min (my_size, his_size);
             daisy_assert (size >= 0);
-            const std::vector<const FrameModel*>& mine 
+            const std::vector<boost::shared_ptr<const FrameModel>/**/>& mine 
               = me->model_sequence (key);
-            const std::vector<const FrameModel*>& his 
+            const std::vector<boost::shared_ptr<const FrameModel>/**/>& his 
               = him->model_sequence (key);
             for (size_t i = 0; i < size; i++)
               {
@@ -1151,7 +1151,7 @@ Frame::integer_sequence (const symbol key) const
     return impl->alist.integer_sequence (key);
 }
 
-const std::vector<const FrameModel*>& 
+const std::vector<boost::shared_ptr<const FrameModel>/**/>& 
 Frame::model_sequence (const symbol key) const
 { 
   if (parent () && !impl->alist.check (key))
@@ -1282,13 +1282,15 @@ Frame::set (const symbol key, const std::vector<symbol>& value)
       verify (key, Value::Object, value.size ());
       const symbol component = this->component (key);
       const Intrinsics& intrinsics = Librarian::intrinsics ();
-      auto_vector<const FrameModel*> frames;
+      std::vector<boost::shared_ptr<const FrameModel>/**/> frames;
       for (size_t i = 0; i < value.size (); i++)
         {
           const symbol name = value[i];
           intrinsics.instantiate (component, name);
           const FrameModel& old = intrinsics.library (component).model (name);
-          frames.push_back (new FrameModel (old, parent_link));
+          boost::shared_ptr<const FrameModel> 
+            link (new FrameModel (old, parent_link));
+          frames.push_back (link);
         }
       impl->alist.set (key, frames);
       return;
@@ -1348,7 +1350,7 @@ Frame::set (const symbol key, const std::vector<int>& value)
 }
 
 void 
-Frame::set (const symbol key, const std::vector<const FrameModel*>& value)
+Frame::set (const symbol key, const std::vector<boost::shared_ptr<const FrameModel>/**/>& value)
 {
   verify (key, Value::Object, value.size ());
   impl->alist.set (key, value); 
@@ -1377,7 +1379,7 @@ Frame::set_empty (const symbol key)
       impl->alist.set (key, std::vector<double> ());
       break;
     case Value::Object:
-      impl->alist.set (key, std::vector<const FrameModel*> ());
+      impl->alist.set (key, std::vector<boost::shared_ptr<const FrameModel>/**/> ());
       break;
     case Value::AList:
       impl->alist.set (key, std::vector<boost::shared_ptr<const FrameSubmodel>/**/> ());

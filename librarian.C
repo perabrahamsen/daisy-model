@@ -184,7 +184,7 @@ Librarian::build_vector (const symbol component,
                          Block& al, symbol key)
 { 
   std::vector<Model*> t;
-  const std::vector<const FrameModel*>& f = al.model_sequence (key);
+  const std::vector<boost::shared_ptr<const FrameModel>/**/>& f = al.model_sequence (key);
   for (size_t i = 0; i < f.size (); i++)
     t.push_back (build_frame (component, al, *f[i], key, i));
   return t;
@@ -195,7 +195,7 @@ Librarian::build_vector_const (const symbol component,
                                Block& al, symbol key)
 { 
   std::vector<const Model*> t;
-  const std::vector<const FrameModel*>& f = al.model_sequence (key);
+  const std::vector<boost::shared_ptr<const FrameModel>/**/>& f = al.model_sequence (key);
   for (size_t i = 0; i < f.size (); i++)
     t.push_back (build_frame (component, al, *f[i], key, i));
 

@@ -57,7 +57,7 @@ struct ParserFile::Implementation
   Treelog& msg;
 
   // Inputs.
-  auto_vector<const FrameModel*> inputs;
+  std::vector<boost::shared_ptr<const FrameModel>/**/> inputs;
 
   // Lexer.
   const symbol file;
@@ -118,8 +118,9 @@ struct ParserFile::Implementation
   // Parser.
   void check_value (const Frame& syntax, const symbol name,  double value);
   void add_derived (Library&);
-  std::auto_ptr<FrameModel> load_object (const Library& lib, bool in_sequence,
-                                         const FrameModel* original);
+  boost::shared_ptr<FrameModel> load_object (const Library& lib,
+                                             bool in_sequence,
+                                             const FrameModel* original);
   void load_list (Frame&);
 
   // Create and destroy.
@@ -235,7 +236,7 @@ ParserFile::Implementation::get_integer ()
     }
   // Then try an integer object.
   const Library& lib = metalib ().library (Integer::component);
-  std::auto_ptr<FrameModel> frame = load_object (lib, true, NULL);
+  boost::shared_ptr<FrameModel> frame = load_object (lib, true, NULL);
   if (!frame.get ())
     return -42;
   const symbol obj = frame->type_name ();
@@ -340,7 +341,7 @@ ParserFile::Implementation::get_number (const symbol syntax_dim)
   
   // Then try a number object.
   const Library& lib = metalib ().library (Number::component);
-  std::auto_ptr<FrameModel> frame = load_object (lib, true, NULL);
+  boost::shared_ptr<FrameModel> frame = load_object (lib, true, NULL);
   if (!frame.get ())
     return -42.42e42;
   const symbol obj = frame->type_name ();
@@ -615,11 +616,11 @@ ParserFile::Implementation::add_derived (Library& lib)
   mutable_metalib->added_object (lib.name (), name);
 }
 
-std::auto_ptr<FrameModel>
+boost::shared_ptr<FrameModel>
 ParserFile::Implementation::load_object (const Library& lib, bool in_sequence,
                                          const FrameModel *const original)
 {
-  std::auto_ptr<FrameModel> result;
+  boost::shared_ptr<FrameModel> result;
   bool skipped = false;
 
   static const symbol original_symbol ("original");
@@ -1005,7 +1006,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 	    break;
 	  case Value::Object:
 	    {
-              std::auto_ptr<FrameModel> child;
+              boost::shared_ptr<FrameModel> child;
               const symbol component = frame.component (name);
 	      const Library& lib = metalib ().library (component);
               if (frame.check (name))
@@ -1035,7 +1036,7 @@ ParserFile::Implementation::load_list (Frame& frame)
                         parser->load_nested ();
                       lexer->error_count += parser->error_count ();
                     }
-		  inputs.push_back (&child->clone ());
+		  inputs.push_back (child);
 		}
 	      else
                 frame.set (name, *child);
@@ -1066,9 +1067,9 @@ ParserFile::Implementation::load_list (Frame& frame)
 	      {
 		const symbol component = frame.component (name);
 		const Library& lib = metalib ().library (component);
-		static const std::vector<const FrameModel*> no_sequence;
-		auto_vector<const FrameModel*> sequence;
-		const std::vector<const FrameModel*>& old_sequence
+		static const std::vector<boost::shared_ptr<const FrameModel>/**/> no_sequence;
+                std::vector<boost::shared_ptr<const FrameModel>/**/> sequence;
+		const std::vector<boost::shared_ptr<const FrameModel>/**/>& old_sequence
 		  = frame.check (name) 
 		  ? frame.model_sequence (name) 
 		  : no_sequence;
@@ -1088,7 +1089,7 @@ ParserFile::Implementation::load_list (Frame& frame)
                         if (!frame.check (name))
                           error ("No originals available");
                         for (size_t i = 0; i < old_sequence.size (); i++)
-                          sequence.push_back (&old_sequence[i]->clone ());
+                          sequence.push_back (old_sequence[i]);
                         continue;
                       }
 		    const size_t element = sequence.size ();
@@ -1096,20 +1097,19 @@ ParserFile::Implementation::load_list (Frame& frame)
                     tmp << "In '" << name << "' model #" << element + 1U;
                     Treelog::Open nest (msg, tmp.str ());
 
-                    std::auto_ptr<FrameModel> child;
+                    boost::shared_ptr<FrameModel> child;
                     if (old_sequence.size () > element)
                       {
-                        const FrameModel* old_frame = old_sequence[element];
-                        const FrameModel* old_model
-                          = dynamic_cast<const FrameModel*> (old_frame);
-                        daisy_assert (old_model);
-                        child = load_object (lib, true, old_model);
+                        boost::shared_ptr<const FrameModel> old_model
+                          = old_sequence[element];
+                        daisy_assert (old_model.get ());
+                        child = load_object (lib, true, old_model.get ());
                       }
                     else
                       child = load_object (lib, true, NULL);
 
                     if (child.get ())
-                      sequence.push_back (child.release ());
+                      sequence.push_back (child);
 		  }
 		frame.set (name, sequence);
 	      }
@@ -1433,7 +1433,7 @@ ParserFile::Implementation::Implementation (const Metalib& mlib,
                                             Treelog& treelog)
   : mutable_metalib (NULL),
     msg (treelog),
-    inputs (std::vector<const FrameModel*> ()),
+    inputs (std::vector<boost::shared_ptr<const FrameModel>/**/> ()),
     file (filename),
     owned_stream (mlib.path ().open_file (filename.name ())),
     lexer (new Lexer (filename.name (), *owned_stream, msg))
@@ -1462,7 +1462,7 @@ ParserFile::load_top ()
   // Add inputs.
   daisy_assert (impl->mutable_metalib);
   impl->mutable_metalib->set_parser_inputs (impl->inputs);
-  sequence_delete (impl->inputs.begin (), impl->inputs.end ());
+  // sequence_delete (impl->inputs.begin (), impl->inputs.end ());
   impl->inputs.erase (impl->inputs.begin (), impl->inputs.end ());
   
   // Remember filename.

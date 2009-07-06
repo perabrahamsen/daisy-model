@@ -25,6 +25,7 @@
 #include "symbol.h"
 #include <string>
 #include <vector>
+#include <boost/shared_ptr.hpp>
 
 class OrganicMatter;
 class CrpN;
@@ -169,8 +170,8 @@ public:
 public:
   void initialize (const double SeedN);
   void initialize (const Metalib&, symbol name,
-		   const std::vector<const FrameModel*>& root,
-		   const std::vector<const FrameModel*>& dead,
+		   const std::vector<boost::shared_ptr<const FrameModel>/**/>& root,
+		   const std::vector<boost::shared_ptr<const FrameModel>/**/>& dead,
 		   const Geometry&, OrganicMatter&, Treelog&);
   static void load_syntax (Frame&);
   Production (const FrameSubmodel&);

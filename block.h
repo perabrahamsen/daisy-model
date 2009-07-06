@@ -100,7 +100,7 @@ public:
   const std::vector<symbol> name_sequence (symbol key);
   const std::vector<bool>& flag_sequence (symbol key) const;
   const std::vector<int>& integer_sequence (symbol key) const;
-  const std::vector<const FrameModel*>& model_sequence (symbol key) const;
+  const std::vector<boost::shared_ptr<const FrameModel>/**/>& model_sequence (symbol key) const;
   const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>&
     submodel_sequence (symbol key) const;
   const std::vector<boost::shared_ptr<const PLF>/**/>& 

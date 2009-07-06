@@ -518,7 +518,7 @@ Block::integer_sequence (const symbol key) const
   return frame.integer_sequence (key); 
 }
 
-const std::vector<const FrameModel*>& 
+const std::vector<boost::shared_ptr<const FrameModel>/**/>& 
 Block::model_sequence (const symbol key) const
 { 
   const Frame& frame = find_frame (key);

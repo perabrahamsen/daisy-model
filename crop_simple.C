@@ -74,7 +74,7 @@ public:
   std::auto_ptr<RootSystem> root_system;
   const double WRoot;		// Root dry matter weight [g DM/m^2]
   const double NRoot;		// Root nitrogen weight [g N/m^2]
-  const std::vector<const FrameModel*>& root_am; // Root AM parameters.
+  const std::vector<boost::shared_ptr<const FrameModel>/**/>& root_am; // Root AM parameters.
 
   // Nitrogen.
   const double N_potential;	// Potential N content at harvest. [g N/m^2]
