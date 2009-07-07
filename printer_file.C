@@ -53,11 +53,11 @@ struct PrinterFile::Implementation
   // Print entry 'key' in alist.
   void print_dimension (const Frame&, const symbol key, 
                         const symbol dim);
-  void print_entry (const Frame& frame, const Frame& super,
+  void print_entry (const Frame& frame, const Frame* super,
                     const symbol key, int indent, bool need_wrapper);
 
   // Check if entry 'key' need a line for itself.
-  bool is_complex (const Frame& frame, const Frame& super,
+  bool is_complex (const Frame& frame, const Frame* super,
                    const symbol key) const;
   bool is_complex_object (const FrameModel&, const Library&) const;
 
@@ -67,10 +67,10 @@ struct PrinterFile::Implementation
   { print_string (value.name ()); }
   void print_bool (bool); 
   void print_plf (const PLF&, int indent); 
-  void print_alist (const Frame& frame, const Frame& super, 
+  void print_alist (const Frame& frame, const Frame* super, 
                     int indent, bool skip);
   void print_object (const FrameModel&, const Library& library,
-                     const FrameModel&, int indent);
+                     const FrameModel*, int indent);
 
   // Top level print functions.
   void print_parameterization (symbol library_name, symbol name,
@@ -87,11 +87,11 @@ struct PrinterFile::Implementation
 
 bool 
 PrinterFile::Implementation::is_complex (const Frame& frame,
-                                         const Frame& super,
+                                         const Frame *const super,
 					 const symbol key) const
 {
   // Subsets are never complex.
-  if (frame.subset (metalib, super, key))
+  if (super && frame.subset (metalib, *super, key))
     return false;
 
   // Sequences are complex...
@@ -203,7 +203,7 @@ PrinterFile::Implementation::print_dimension (const Frame& frame,
 
 void
 PrinterFile::Implementation::print_entry (const Frame& frame, 
-                                          const Frame& super, 
+                                          const Frame *const super, 
 					  const symbol key,
 					  int indent, bool need_wrapper)
 { 
@@ -227,11 +227,11 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
           print_dimension (frame, key, frame.dimension (key));
 	  break;
 	case Value::AList:
-	  if (super.check (key))
-	    print_alist (frame.submodel (key), super.submodel (key), 
+	  if (super && super->check (key))
+	    print_alist (frame.submodel (key), &super->submodel (key), 
                          indent, false); 
 	  else
-	    print_alist (frame.submodel (key), frame.default_frame (key),
+	    print_alist (frame.submodel (key), &frame.default_frame (key),
                          indent, false); 
 	  break;
 	case Value::PLF:
@@ -250,12 +250,12 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
           {
             const symbol component = frame.component (key);
             const Library& library = metalib.library (component);
-            if (super.check (key))
+            if (super && super->check (key))
               print_object (frame.model (key), library, 
-                            super.model (key), indent);
+                            &super->model (key), indent);
             else
               print_object (frame.model (key), library, 
-                            FrameModel::root (), indent);
+                            NULL, indent);
           }
 	  break;
 	case Value::Scalar:
@@ -294,7 +294,7 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
 		if (i > 0) 
 		  out << "\n" << std::string (indent, ' ');
 		out << "(";
-		print_alist (*value[i], other, indent + 1, false); 
+		print_alist (*value[i], &other, indent + 1, false); 
 		out << ")";
 	      }
 	  }
@@ -359,18 +359,18 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
               = frame.model_sequence (key);
             // We really should check original value.
             const std::vector<boost::shared_ptr<const FrameModel>/**/>& super_value
-              = super.check (key)
-              ? super.model_sequence (key)
+              = (super && super->check (key))
+              ? super->model_sequence (key)
               : std::vector<boost::shared_ptr<const FrameModel>/**/> ();
 	    for (unsigned int i = 0; i < value.size (); i++)
 	      {
                 const FrameModel& me = *value[i];
-                const FrameModel& other = super_value.size () > i
-                  ? *super_value[i]
-                  : FrameModel::root ();
+                const FrameModel* other = super_value.size () > i
+                  ? super_value[i].get ()
+                  : NULL;
 		if (i > 0)
 		  out << "\n" << std::string (indent, ' ');
-                if (me.subset (metalib, other)
+                if (other && me.subset (metalib, *other)
                     || !is_complex_object (me, library))
 		  print_object (me, library, other, indent);
 		else 
@@ -438,7 +438,7 @@ PrinterFile::Implementation::print_plf (const PLF& plf, int indent)
 
 void 
 PrinterFile::Implementation::print_alist (const Frame& frame, 
-                                          const Frame& super,
+                                          const Frame *const super,
 					  int indent, bool skip)
 {
   // Always print ordered items.
@@ -481,7 +481,8 @@ PrinterFile::Implementation::print_alist (const Frame& frame,
 
   // Print new declarations.
   std::set<symbol> super_set;
-  super.entries (super_set);
+  if (super)
+    super->entries (super_set);
 
   for (std::set<symbol>::const_iterator i = entries.begin ();
        i != entries.end ();
@@ -542,7 +543,7 @@ PrinterFile::Implementation::print_alist (const Frame& frame,
         }
 
       // Skip subset members.
-      if (frame.subset (metalib, super, key))
+      if (super && frame.subset (metalib, *super, key))
 	continue;
 
       if (!skip)
@@ -561,7 +562,7 @@ PrinterFile::Implementation::print_alist (const Frame& frame,
 void 
 PrinterFile::Implementation::print_object (const FrameModel& value,
                                            const Library& library, 
-                                           const FrameModel& original, 
+                                           const FrameModel *const original, 
                                            int indent)
 {
   const symbol element = value.type_name ();
@@ -572,11 +573,11 @@ PrinterFile::Implementation::print_object (const FrameModel& value,
     }
 
   // Check original.
-  if (original.type_name () == element)
+  if (original && original->type_name () == element)
     {
       out << "original";
       // Check if we added something over the original.
-      if (value.subset (metalib, original))
+      if (value.subset (metalib, *original))
         return;
       out << " ";
       print_alist (value, original, indent + 9, false);
@@ -597,7 +598,7 @@ PrinterFile::Implementation::print_object (const FrameModel& value,
   // Library element with additional attributes.
   print_symbol (element);
   out << " ";
-  print_alist (value, element_frame,
+  print_alist (value, &element_frame,
                indent + 1 + element.name ().length ()
                // Buglet: Wrong indentation for elements with strange chars.
                + (is_identifier (element.name ()) ? 0 : 2),
@@ -634,15 +635,15 @@ PrinterFile::Implementation
       if (!library.check (super))
 	{
 	  out << " ;; unknown superclass\n ";
-	  print_alist (*frame, root, 2, true);
+	  print_alist (*frame, &root, 2, true);
 	}
       else
-        print_alist (*frame, library.model (super), 2, true);
+        print_alist (*frame, &library.model (super), 2, true);
     }
   else
     {
       out << "<unknown>\n  ";
-      print_alist (*frame, root, 2, true);
+      print_alist (*frame, &root, 2, true);
     }
   out << ")\n";
 }
@@ -768,7 +769,7 @@ PrinterFile::print_entry (const Frame& frame,
     {
       impl->out << "(" << key << " ";
       const int indent = 2 + key.name ().length ();
-      impl->print_entry (frame, FrameModel::root (), key, indent, false);
+      impl->print_entry (frame, NULL, key, indent, false);
       impl->out << ")\n";
     }
 }
@@ -790,7 +791,7 @@ PrinterFile::print_input (const Frame& frame)
   const FrameModel& base_frame = library.model (type);
 
   impl->out << "(input " << type << " ";
-  impl->print_alist (frame, base_frame, 7, false);
+  impl->print_alist (frame, &base_frame, 7, false);
   impl->out << ")\n";
 }
 

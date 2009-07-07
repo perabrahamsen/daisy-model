@@ -47,7 +47,6 @@ FrameModel::replace_parent (const Frame* new_parent) const
 bool 
 FrameModel::subset (const Metalib& metalib, const FrameModel& other) const
 {
-#if 0
   // Can only compare objects from the same library.
   const symbol component = this->component ();
   if (component != other.component ())
@@ -68,7 +67,6 @@ FrameModel::subset (const Metalib& metalib, const FrameModel& other) const
   if (!library.is_derived_from (my_name, his_name))
     // Subsets must be derived from supersets.
     return false;
-#endif
 
   return subset_elements (metalib, other);
 }

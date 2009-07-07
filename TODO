@@ -2,16 +2,7 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Cleanup
 
-** frame::subset
-
-*** FrameModel::component ()
-
-Problemet ser ud til at være brug af FrameModel::root i printer_file.C
-
-*** FrameSubmodel::load_syntax ()
-
-Hvor?
-
+** commit
 
 ** fjern alist
 
