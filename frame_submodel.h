@@ -25,6 +25,11 @@
 
 class FrameSubmodel : public Frame
 {
+  // Is this frame a subset of 'other'?
+public: 
+  using Frame::subset;
+  bool subset (const Metalib&, const FrameSubmodel& other) const;
+
   // Create and Destroy.
 protected:
   FrameSubmodel (const FrameSubmodel&, parent_clone_t);

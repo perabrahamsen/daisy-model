@@ -25,6 +25,8 @@
 #include "assertion.h"
 #include "treelog.h"
 #include "librarian.h"
+#include "metalib.h"
+#include "library.h"
 
 const FrameModel* 
 FrameModel::parent () const
@@ -40,6 +42,46 @@ FrameModel::replace_parent (const Frame* new_parent) const
     }
   else
     parent_ = NULL;
+}
+
+bool 
+FrameModel::subset (const Metalib& metalib, const FrameModel& other) const
+{
+#if 0
+  // Can only compare objects from the same library.
+  const symbol component = this->component ();
+  if (component != other.component ())
+    {
+      daisy_warning ("'" + component + "' != '" + other.component ()
+                     + "' in '" + type_name () + "'");
+      return false;
+    }
+  if (!metalib.exist (component))
+    {
+      daisy_warning ("'" + component + "' no such library in '"
+                     + type_name () + "'");
+      return false;
+    }
+  const Library& library = metalib.library (component);
+  const symbol my_name = this->type_name ();
+  const symbol his_name = other.type_name ();
+  if (!library.is_derived_from (my_name, his_name))
+    // Subsets must be derived from supersets.
+    return false;
+#endif
+
+  return subset_elements (metalib, other);
+}
+
+symbol
+FrameModel::component () const
+{ 
+  if (!parent ())
+    {
+      daisy_warning ("No parent '" + type_name () + "'");
+      return Value::Unknown ();
+    }
+  return parent ()->component ();
 }
 
 bool 

@@ -59,7 +59,7 @@ struct PrinterFile::Implementation
   // Check if entry 'key' need a line for itself.
   bool is_complex (const Frame& frame, const Frame& super,
                    const symbol key) const;
-  bool is_complex_object (const Frame&, const Library&) const;
+  bool is_complex_object (const FrameModel&, const Library&) const;
 
   // Print support for specific types.
   void print_string (const std::string& value); 
@@ -69,8 +69,8 @@ struct PrinterFile::Implementation
   void print_plf (const PLF&, int indent); 
   void print_alist (const Frame& frame, const Frame& super, 
                     int indent, bool skip);
-  void print_object (const Frame&, const Library& library,
-                     const Frame&, int indent);
+  void print_object (const FrameModel&, const Library& library,
+                     const FrameModel&, int indent);
 
   // Top level print functions.
   void print_parameterization (symbol library_name, symbol name,
@@ -130,7 +130,7 @@ PrinterFile::Implementation::is_complex (const Frame& frame,
 }
 
 bool 
-PrinterFile::Implementation::is_complex_object (const Frame& value, 
+PrinterFile::Implementation::is_complex_object (const FrameModel& value, 
 						const Library& library) const
 {
   const symbol element = value.type_name ();
@@ -364,8 +364,8 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
               : std::vector<boost::shared_ptr<const FrameModel>/**/> ();
 	    for (unsigned int i = 0; i < value.size (); i++)
 	      {
-                const Frame& me = *value[i];
-                const Frame& other = super_value.size () > i
+                const FrameModel& me = *value[i];
+                const FrameModel& other = super_value.size () > i
                   ? *super_value[i]
                   : FrameModel::root ();
 		if (i > 0)
@@ -559,9 +559,9 @@ PrinterFile::Implementation::print_alist (const Frame& frame,
 }
 
 void 
-PrinterFile::Implementation::print_object (const Frame& value,
+PrinterFile::Implementation::print_object (const FrameModel& value,
                                            const Library& library, 
-                                           const Frame& original, 
+                                           const FrameModel& original, 
                                            int indent)
 {
   const symbol element = value.type_name ();

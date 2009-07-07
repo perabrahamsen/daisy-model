@@ -36,6 +36,14 @@ public:
 private:
   void replace_parent (const Frame* new_parent) const;
 
+  // Use.
+public:
+  using Frame::subset;
+  bool subset (const Metalib&, const FrameModel& other) const;
+private:
+  using Frame::component;
+  virtual symbol component () const;
+
   // Construct.
 public:
   virtual bool buildable () const;

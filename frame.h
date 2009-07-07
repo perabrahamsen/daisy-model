@@ -241,8 +241,8 @@ class EXPORT Frame : public WScope
  public:
   // Is 'key' an element of this alist?
   bool check (symbol key) const;
-  // Is this frame a subset of 'other'?
-  bool subset (const Metalib&, const Frame& other) const;
+  // Are elements of this frame a subset of elements of 'other'?
+  bool subset_elements (const Metalib&, const Frame& other) const;
   // Is the element 'key' in this alist a subset of the other entry.
   bool subset (const Metalib&, const Frame& other, symbol key) const;
   int value_size (symbol key) const;

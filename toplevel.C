@@ -420,7 +420,7 @@ Toplevel::initialize ()
             // Frame::overwrite only gives us the values, not the
             // types.  This means we avoid all the extra crap in
             // metalib, but also that we don't get any user defined
-            // types.  Solute:  Use "run".
+            // types.  Solution:  Use "run".
             frame->overwrite_values (metalib ());
             impl->program.reset (Librarian::build_frame<Program> (block, *frame,
                                                                   "toplevel"));

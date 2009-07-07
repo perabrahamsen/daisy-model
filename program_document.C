@@ -410,11 +410,11 @@ ProgramDocument::print_entry_value (const symbol name,
 	    break;
 	  case Value::Object:
 	    {
-	      const Frame& object = frame.model (name);
+	      const FrameModel& object = frame.model (name);
 	      const symbol type = object.type_name ();
 	      format->text (" (default `" + type + "')");
 	      const Library& library = metalib.library (frame.component (name));
-	      const Frame& super = library.model (type);
+	      const FrameModel& super = library.model (type);
 	      if (!object.subset (metalib, super))
 		print_default_value = true;
 	    }

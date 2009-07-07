@@ -916,7 +916,7 @@ Frame::check (const symbol key) const
 
 // Is this frame a subset of 'other'?
 bool 
-Frame::subset (const Metalib& metalib, const Frame& other) const
+Frame::subset_elements (const Metalib& metalib, const Frame& other) const
 {
   // Find syntax entries.
   std::set<symbol> all;
@@ -935,6 +935,104 @@ bool
 Frame::subset (const Metalib& metalib, const Frame& other,
                const symbol key) const
 {
+#if 0
+  if (!this->check (key))
+    // Missing value is always a subset.
+    return true;
+
+  if (!other->check (key))
+    // Missing value cannot be a superset of a value.
+    return false;
+
+  const Value::type type = this->lookup (key);
+  if (type != other.lookup (key))
+    // Subsets must be same type.
+    return false;
+  
+  // Find values.
+  const Val& mine = impl->get_value (key);
+  const Val& his = other->impl->get_value (key);
+  
+  const int size = mine.size ();
+  if (size != his.size ())
+    // Subsets must be same size.
+    return false;
+
+  if (size == Value::Singleton)
+    switch (type)
+      {
+      case Value::Number:
+	return iszero (mine->number () - his.number ());
+      case Value::Boolean:
+	return mine.flag () == his.flag ();
+      case Value::Integer:
+	return mine.integer () == his.integer ();
+      case Value::Object:
+        return mine.model ().subset (metalib, his.model ());
+      case Value::AList:
+        return mine.submodel ().subset (metalib, his.submodel ());
+      case Value::PLF:
+	return mine.plf () == his.plf ();
+      case Value::Reference:
+      case Value::String:
+	return mine.name () == his.name ();
+      case Value::Scalar:
+        return iszero (mine->number () - his.number ())
+          && mine.name () == his.name ();
+      case Value::Error:
+      default:
+	daisy_notreached ();
+      }
+  else
+    switch (type)
+      {
+      case Value::Number:
+        for (size_t i = 0; i < size; i++)
+          if (!iszero (mine.number_sequence ()[i] - his.number_sequence ()[i]))
+            return false;
+        return true;
+      case Value::Boolean:
+	return mine.flag_sequence () == his.flag_sequence ();
+      case Value::Integer:
+	return mine.integer_sequence () == his.integer_sequence ();
+      case Value::Object:
+	{
+	  const std::vector<boost::shared_ptr<const FrameModel>/**/>& value 
+            = mine.model_sequence ();
+	  const std::vector<boost::shared_ptr<const FrameModel>/**/>& other 
+            = his.model_sequence;
+
+          for (size_t i = 0; i < size; i++)
+            if (!value[i]->subset (metalib, *other[i]))
+              return false;
+
+	  return true;
+	}
+      case Value::AList:
+	{
+	  const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& value
+            = mine.submodel_sequence ();
+	  const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& other 
+            = his.submodel_sequence ();
+
+          for (size_t i = 0; i < size; i++)
+            if (!value[i]->subset (metalib, *other[i]))
+              return false;
+
+	  return true;
+	}
+      case Value::PLF:
+	return mine.plf_sequence () == his.plf_sequence ();
+      case Value::String:
+	return mine.name_sequence () == his.name_sequence ();
+      case Value::Reference:
+	return mine.name () == his.name ();
+      case Value::Scalar:
+      case Value::Error:
+      default:
+	daisy_notreached ();
+      }
+#else
   // Find frame defining my value of key.
   const Frame* me = this;
   while (!me->impl->alist.check (key))
@@ -1009,6 +1107,7 @@ Frame::subset (const Metalib& metalib, const Frame& other,
 
   // Both values exist, perform test.
   return me->impl->alist.subset (metalib, him->impl->alist, key);
+#endif
 }
 
 int 

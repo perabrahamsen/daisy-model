@@ -251,6 +251,8 @@ Librarian::~Librarian ()
 class FrameDeclared : public FrameModel
 {
   const Declare& declaration;
+  symbol component () const
+  { return declaration.component; }
   symbol type_name () const
   { return declaration.name; }
   using Frame::description;
