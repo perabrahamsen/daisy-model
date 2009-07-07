@@ -1,10 +1,8 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Få Daisy til at virke
-
-* Få Adriano opsætning til at virke.
-
 * Cleanup
+
+** submodel -> frame
 
 ** fjern alist
 

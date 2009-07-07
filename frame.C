@@ -1193,55 +1193,67 @@ Frame::number_sequence (const symbol key) const
 const std::vector<symbol>&
 Frame::name_sequence (const symbol key) const
 { 
-  if (parent () && !impl->alist.check (key))
+  if (impl->has_value (key))
+    return impl->get_value (key).name_sequence ();
+  if (parent ())
     return parent ()->name_sequence (key);
-  else
-    return impl->alist.name_sequence (key);
+
+  daisy_panic ("'" + key + "' not found in " + type_name ());
 }
 
 const std::vector<bool>& 
 Frame::flag_sequence (const symbol key) const
 { 
-  if (parent () && !impl->alist.check (key))
+  if (impl->has_value (key))
+    return impl->get_value (key).flag_sequence ();
+  if (parent ())
     return parent ()->flag_sequence (key);
-  else
-    return impl->alist.flag_sequence (key);
+
+  daisy_panic ("'" + key + "' not found in " + type_name ());
 }
 
 const std::vector<int>& 
 Frame::integer_sequence (const symbol key) const
 { 
-  if (parent () && !impl->alist.check (key))
+  if (impl->has_value (key))
+    return impl->get_value (key).integer_sequence ();
+  if (parent ())
     return parent ()->integer_sequence (key);
-  else
-    return impl->alist.integer_sequence (key);
+
+  daisy_panic ("'" + key + "' not found in " + type_name ());
 }
 
 const std::vector<boost::shared_ptr<const FrameModel>/**/>& 
 Frame::model_sequence (const symbol key) const
 { 
-  if (parent () && !impl->alist.check (key))
+  if (impl->has_value (key))
+    return impl->get_value (key).model_sequence ();
+  if (parent ())
     return parent ()->model_sequence (key);
-  else
-    return impl->alist.model_sequence (key);
+
+  daisy_panic ("'" + key + "' not found in " + type_name ());
 }
 
 const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& 
 Frame::submodel_sequence (const symbol key) const
 { 
-  if (parent () && !impl->alist.check (key))
+  if (impl->has_value (key))
+    return impl->get_value (key).submodel_sequence ();
+  if (parent ())
     return parent ()->submodel_sequence (key);
-  else
-    return impl->alist.submodel_sequence (key);
+
+  daisy_panic ("'" + key + "' not found in " + type_name ());
 }
 
 const std::vector<boost::shared_ptr<const PLF>/**/>& 
 Frame::plf_sequence (const symbol key) const
 { 
-  if (parent () && !impl->alist.check (key))
+  if (impl->has_value (key))
+    return impl->get_value (key).plf_sequence ();
+  if (parent ())
     return parent ()->plf_sequence (key);
-  else
-    return impl->alist.plf_sequence (key);
+
+  daisy_panic ("'" + key + "' not found in " + type_name ());
 }
 
 void 
