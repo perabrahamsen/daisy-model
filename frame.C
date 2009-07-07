@@ -38,6 +38,7 @@
 #include "vcheck.h"
 #include "treelog.h"
 #include "plf.h"
+#include "mathlib.h"
 #include <vector>
 #include <set>
 #include <sstream>
@@ -71,6 +72,7 @@ struct Frame::Implementation
   void set_value (const symbol key, const Val* value);
   const Val& get_value (symbol key) const;
   bool has_value (symbol key) const;
+  const Val& find_value (const Frame&, symbol key) const;
 
   // Check.
   bool check (const Metalib& metalib, const Frame& frame,
@@ -148,7 +150,8 @@ const Val&
 Frame::Implementation::get_value (const symbol key) const
 {
   value_map::const_iterator i = values.find (key);
-  daisy_assert (i != values.end ());
+  if (i == values.end ())
+    daisy_panic ("'" + key + "': no value");
   return *(*i).second;
 }
 
@@ -157,6 +160,16 @@ Frame::Implementation::has_value (const symbol key) const
 {
   value_map::const_iterator i = values.find (key);
   return i != values.end ();
+}
+
+const Val& 
+Frame::Implementation::find_value (const Frame& frame, const symbol key) const
+{
+  if (has_value (key))
+    return get_value (key);
+  daisy_assert (frame.parent ());
+  const Frame& parent = *frame.parent ();
+  return parent.impl->find_value (parent, key);
 }
 
 bool 
@@ -935,12 +948,12 @@ bool
 Frame::subset (const Metalib& metalib, const Frame& other,
                const symbol key) const
 {
-#if 0
+#if 1
   if (!this->check (key))
     // Missing value is always a subset.
     return true;
 
-  if (!other->check (key))
+  if (!other.check (key))
     // Missing value cannot be a superset of a value.
     return false;
 
@@ -950,8 +963,8 @@ Frame::subset (const Metalib& metalib, const Frame& other,
     return false;
   
   // Find values.
-  const Val& mine = impl->get_value (key);
-  const Val& his = other->impl->get_value (key);
+  const Val& mine = impl->find_value (*this, key);
+  const Val& his = other.impl->find_value (other, key);
   
   const int size = mine.size ();
   if (size != his.size ())
@@ -962,7 +975,7 @@ Frame::subset (const Metalib& metalib, const Frame& other,
     switch (type)
       {
       case Value::Number:
-	return iszero (mine->number () - his.number ());
+	return iszero (mine.number () - his.number ());
       case Value::Boolean:
 	return mine.flag () == his.flag ();
       case Value::Integer:
@@ -977,7 +990,7 @@ Frame::subset (const Metalib& metalib, const Frame& other,
       case Value::String:
 	return mine.name () == his.name ();
       case Value::Scalar:
-        return iszero (mine->number () - his.number ())
+        return iszero (mine.number () - his.number ())
           && mine.name () == his.name ();
       case Value::Error:
       default:
@@ -1000,7 +1013,7 @@ Frame::subset (const Metalib& metalib, const Frame& other,
 	  const std::vector<boost::shared_ptr<const FrameModel>/**/>& value 
             = mine.model_sequence ();
 	  const std::vector<boost::shared_ptr<const FrameModel>/**/>& other 
-            = his.model_sequence;
+            = his.model_sequence ();
 
           for (size_t i = 0; i < size; i++)
             if (!value[i]->subset (metalib, *other[i]))
