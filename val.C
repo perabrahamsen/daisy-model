@@ -85,6 +85,10 @@ const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>&
 Val::submodel_sequence () const
 { daisy_notreached (); }
 
+bool 
+Val::is_reference () const
+{ return false; }
+
 Val::Val ()
 { }
 
@@ -94,6 +98,14 @@ Val::~Val ()
 int
 ValReference::size () const
 { return -1; }
+
+symbol 
+ValReference::name () const
+{ return value; }
+
+bool 
+ValReference::is_reference () const
+{ return true; }
 
 ValReference::ValReference (const symbol v)
   : value (v)

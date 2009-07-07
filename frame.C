@@ -513,7 +513,8 @@ Frame::is_const (const symbol key) const
   if (parent () )
     return parent ()->is_const (key);
   
-  daisy_panic ("'" + key + "' not found in " + type_name ());
+  daisy_warning ("'" + key + "' not found in " + type_name ());
+  return false;
 }
 
 bool 
@@ -524,7 +525,8 @@ Frame::is_optional (const symbol key) const
   if (parent () )
     return parent ()->is_optional (key);
  
-  daisy_panic ("'" + key + "' not found in " + type_name ());
+  daisy_warning ("'" + key + "' not found in " + type_name ());
+  return false;
 }
 
 bool 
@@ -535,7 +537,8 @@ Frame::is_log (const symbol key) const
   if (parent () )
     return parent ()->is_log (key);
   
-  daisy_panic ("'" + key + "' not found in " + type_name ());
+  daisy_warning ("'" + key + "' not found in " + type_name ());
+  return false;
 }
 
 bool 
@@ -546,7 +549,8 @@ Frame::is_state (const symbol key) const
   if (parent () )
     return parent ()->is_state (key);
   
-  daisy_panic ("'" + key + "' not found in " + type_name ());
+  daisy_warning ("'" + key + "' not found in " + type_name ());
+  return false;
 }
 
 Value::type 
@@ -903,8 +907,11 @@ Frame::add_check (check_fun fun)
 bool 
 Frame::check (const symbol key) const
 { 
-  return impl->alist.check (key)
-    || (parent () && parent ()->check (key));
+  if (impl->has_value (key))
+    return !impl->get_value (key).is_reference ();
+  if (parent ())
+    return parent ()->check (key);
+  return false;
 }
 
 // Is this frame a subset of 'other'?
@@ -1007,10 +1014,13 @@ Frame::subset (const Metalib& metalib, const Frame& other,
 int 
 Frame::value_size (const symbol key) const
 {
-  if (parent () && !impl->alist.check (key))
+  if (impl->has_value (key))
+    return impl->get_value (key).size ();
+  if (parent ())
     return parent ()->value_size (key);
-  else
-    return impl->alist.size (key);
+
+  daisy_warning ("'" + key + "' has no value in '" + type_name () + "'");
+  return -1;
 }
 
 void
@@ -1023,83 +1033,101 @@ Frame::set_reference (const symbol key, const symbol val)
 bool 
 Frame::is_reference (const symbol key) const
 { 
-  if (parent () && !impl->alist.check (key))
+  if (impl->has_value (key))
+    return impl->get_value (key).is_reference ();
+  if (parent ())
     return parent ()->is_reference (key);
-  else
-    return impl->alist.is_reference (key);
+
+  return false;
 }
 
 symbol
 Frame::get_reference (const symbol key) const
 {
-  if (parent () && !impl->alist.check (key))
+  if (impl->has_value (key))
+    return impl->get_value (key).name ();
+  if (parent ())
     return parent ()->get_reference (key);
-  else
-    return impl->alist.get_reference (key);
+
+  daisy_panic ("'" + key + "' not found in " + type_name ());
 }
 
 double 
 Frame::number (const symbol key) const
 { 
-  if (parent () && !impl->alist.check (key))
+  if (impl->has_value (key))
+    return impl->get_value (key).number ();
+  if (parent ())
     return parent ()->number (key);
-  else
-    return impl->alist.number (key);
+
+  daisy_panic ("'" + key + "' not found in " + type_name ());
 }
 
 double 
 Frame::number (const symbol key, double default_value) const
 { 
-  if (parent () && !impl->alist.check (key))
+  if (impl->has_value (key))
+    return impl->get_value (key).number ();
+  if (parent ())
     return parent ()->number (key, default_value);
-  else
-    return impl->alist.number (key, default_value);
+
+  return default_value;
 }
 
 symbol
 Frame::name (const symbol key) const
 { 
-  if (parent () && !impl->alist.check (key))
+  if (impl->has_value (key))
+    return impl->get_value (key).name ();
+  if (parent ())
     return parent ()->name (key);
-  else
-    return impl->alist.name (key);
+
+  daisy_panic ("'" + key + "' not found in " + type_name ());
 }
 
 symbol
 Frame::name (const symbol key, 
              const symbol default_value) const
 { 
-  if (parent () && !impl->alist.check (key))
+  if (impl->has_value (key))
+    return impl->get_value (key).name ();
+  if (parent ())
     return parent ()->name (key, default_value);
-  else
-    return impl->alist.name (key, default_value);
+
+  return default_value;
 }
 
 bool 
 Frame::flag (const symbol key) const
 { 
-  if (parent () && !impl->alist.check (key))
+  if (impl->has_value (key))
+    return impl->get_value (key).flag ();
+  if (parent ())
     return parent ()->flag (key);
-  else
-    return impl->alist.flag (key);
+
+  daisy_panic ("'" + key + "' not found in " + type_name ());
 }
 
 bool 
 Frame::flag (const symbol key, bool default_value) const
 { 
-  if (parent () && !impl->alist.check (key))
+  if (impl->has_value (key))
+    return impl->get_value (key).flag ();
+  if (parent ())
     return parent ()->flag (key, default_value);
-  else
-    return impl->alist.flag (key, default_value);
+
+  return default_value;
 }
 
 const PLF& 
 Frame::plf (const symbol key) const
 { 
-  if (parent () && !impl->alist.check (key))
+  if (impl->has_value (key))
+    return impl->get_value (key).plf ();
+  if (parent ())
     return parent ()->plf (key);
-  else
-    return impl->alist.plf (key);
+
+  daisy_panic ("'" + key + "' not found in " + type_name ());
 }
 
 const FrameModel&
@@ -1107,10 +1135,12 @@ Frame::model (const symbol key) const
 {
   verify (key, Value::Object);
 
-  if (parent () && !impl->alist.check (key))
+  if (impl->has_value (key))
+    return impl->get_value (key).model ();
+  if (parent ())
     return parent ()->model (key);
-  else
-    return impl->alist.model (key);
+
+  daisy_panic ("'" + key + "' not found in " + type_name ());
 }
 
 const FrameSubmodel&
@@ -1119,8 +1149,8 @@ Frame::submodel (const symbol key) const
   if (type_size (key) != Value::Singleton)
     return default_frame (key);
   verify (key, Value::AList);
-  if (impl->alist.check (key))
-    return impl->alist.submodel (key);
+  if (impl->has_value (key))
+    return impl->get_value (key).submodel ();
   else if (parent () && parent ()->check (key))
     return parent ()->submodel (key);
   else
@@ -1130,28 +1160,34 @@ Frame::submodel (const symbol key) const
 int 
 Frame::integer (const symbol key) const
 { 
-  if (parent () && !impl->alist.check (key))
+  if (impl->has_value (key))
+    return impl->get_value (key).integer ();
+  if (parent ())
     return parent ()->integer (key);
-  else
-    return impl->alist.integer (key);
+
+  daisy_panic ("'" + key + "' not found in " + type_name ());
 }
 
 int 
 Frame::integer (const symbol key, int default_value) const
 { 
-  if (parent () && !impl->alist.check (key))
+  if (impl->has_value (key))
+    return impl->get_value (key).integer ();
+  if (parent ())
     return parent ()->integer (key, default_value);
-  else
-    return impl->alist.integer (key, default_value);
+
+  return default_value;
 }
 
 const std::vector<double>& 
 Frame::number_sequence (const symbol key) const
 { 
-  if (parent () && !impl->alist.check (key))
+  if (impl->has_value (key))
+    return impl->get_value (key).number_sequence ();
+  if (parent ())
     return parent ()->number_sequence (key);
-  else
-    return impl->alist.number_sequence (key);
+
+  daisy_panic ("'" + key + "' not found in " + type_name ());
 }
 
 const std::vector<symbol>&
@@ -1264,10 +1300,7 @@ Frame::set (const symbol key, const symbol name)
 
 void 
 Frame::set (const symbol key, const char *const name)
-{
-  set (key, symbol (name)); 
-  impl->set_value (key, new ValString (name));
-}
+{ set (key, symbol (name)); } 
 
 void 
 Frame::set (const symbol key, bool value)

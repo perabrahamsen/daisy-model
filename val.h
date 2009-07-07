@@ -49,7 +49,7 @@ public:
   virtual const std::vector<boost::shared_ptr<const PLF>/**/>& plf_sequence () const;
   virtual const std::vector<boost::shared_ptr<const FrameModel>/**/>& model_sequence () const;
   virtual const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& submodel_sequence () const;
-
+  virtual bool is_reference () const;
 protected:
   Val ();
 public: 
@@ -68,6 +68,8 @@ class ValReference : public Val
 {
   const symbol value;
   int size () const;
+  symbol name () const;
+  bool is_reference () const;
 public:
   ValReference (const symbol v);
 };
