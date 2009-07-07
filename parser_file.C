@@ -884,11 +884,18 @@ ParserFile::Implementation::load_list (Frame& frame)
                || frame.component (name) != Parser::component)
 	found.insert (name);
 
+      Value::type type = frame.lookup (name);
+
       // Log variable warning.
-      if (frame.is_log (name))
+      if (type != Value::Error && frame.is_log (name))
         warning (name + " is a log only variable, value will be ignored");
 
-      if (looking_at ('$'))
+      if (type == Value::Error)
+        {
+          error (std::string("Unknown attribute '") + name + "'");
+          skip_to_end ();
+        }
+      else if (looking_at ('$'))
         {
           skip ("$");
           const std::string var = get_string ();
@@ -898,7 +905,7 @@ ParserFile::Implementation::load_list (Frame& frame)
             frame.set_reference (name, var);
         }
       else if (frame.type_size (name) == Value::Singleton)
-	switch (frame.lookup (name))
+	switch (type)
 	  {
 	  case Value::Number:
 	    {
@@ -1061,7 +1068,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 	    // Unordered, we already skipped this one
 	    daisy_assert (skipped);
 	  // Support for sequences not really finished yet.
-	  switch (frame.lookup (name))
+	  switch (type)
 	    {
 	    case Value::Object:
 	      {
