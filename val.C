@@ -22,7 +22,12 @@
 #define BUILD_DLL
 
 #include "val.h"
+#include "value.h"
 #include "assertion.h"
+
+int
+Val::size () const
+{ return Value::Singleton; }
 
 double 
 Val::number () const
@@ -85,6 +90,10 @@ Val::Val ()
 
 Val::~Val ()
 { }
+
+int
+ValReference::size () const
+{ return -1; }
 
 ValReference::ValReference (const symbol v)
   : value (v)
@@ -160,6 +169,10 @@ ValInteger::ValInteger (const int v)
   : value (v)
 { }
 
+int
+ValNumberSeq::size () const
+{ return value.size (); }
+
 const std::vector<double>& 
 ValNumberSeq::number_sequence () const
 { return value; }
@@ -167,6 +180,10 @@ ValNumberSeq::number_sequence () const
 ValNumberSeq::ValNumberSeq (const std::vector<double>& v)
   : value (v)
 { }
+
+int
+ValStringSeq::size () const
+{ return value.size (); }
 
 const std::vector<symbol>& 
 ValStringSeq::name_sequence () const
@@ -176,6 +193,10 @@ ValStringSeq::ValStringSeq (const std::vector<symbol>& v)
   : value (v)
 { }
 
+int
+ValBooleanSeq::size () const
+{ return value.size (); }
+
 const std::vector<bool>& 
 ValBooleanSeq::flag_sequence () const
 { return value; }
@@ -183,6 +204,10 @@ ValBooleanSeq::flag_sequence () const
 ValBooleanSeq::ValBooleanSeq (const std::vector<bool>& v)
   : value (v)
 { }
+
+int
+ValIntegerSeq::size () const
+{ return value.size (); }
 
 const std::vector<int>& 
 ValIntegerSeq::integer_sequence () const
@@ -192,6 +217,10 @@ ValIntegerSeq::ValIntegerSeq (const std::vector<int>& v)
   : value (v)
 { }
 
+int
+ValPLFSeq::size () const
+{ return value.size (); }
+
 const std::vector<boost::shared_ptr<const PLF>/**/>& 
 ValPLFSeq::plf_sequence () const
 { return value; }
@@ -200,6 +229,10 @@ ValPLFSeq::ValPLFSeq (const std::vector<boost::shared_ptr<const PLF>/**/>& v)
   : value (v)
 { }
 
+int
+ValObjectSeq::size () const
+{ return value.size (); }
+
 const std::vector<boost::shared_ptr<const FrameModel>/**/>& 
 ValObjectSeq::model_sequence () const
 { return value; }
@@ -207,6 +240,10 @@ ValObjectSeq::model_sequence () const
 ValObjectSeq::ValObjectSeq (const std::vector<boost::shared_ptr<const FrameModel>/**/>& v)
   : value (v)
 { }
+
+int
+ValAListSeq::size () const
+{ return value.size (); }
 
 const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& 
 ValAListSeq::submodel_sequence () const

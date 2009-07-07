@@ -1349,7 +1349,7 @@ geometry${OBJ}: geometry.C geometry.h symbol.h value.h volume.h model.h \
 log_alist${OBJ}: log_alist.C log_alist.h log.h time.h symbol.h border.h \
   model_framed.h model_logable.h model.h library.h frame_submodel.h \
   frame.h scope.h value.h frame_model.h assertion.h metalib.h
-val${OBJ}: val.C val.h symbol.h assertion.h
+val${OBJ}: val.C val.h symbol.h value.h assertion.h
 avalue${OBJ}: avalue.C avalue.h symbol.h value.h mathlib.h assertion.h plf.h \
   frame_model.h frame.h scope.h frame_submodel.h memutils.h
 type${OBJ}: type.C type.h value.h symbol.h frame.h scope.h assertion.h \
