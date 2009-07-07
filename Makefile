@@ -493,7 +493,7 @@ SPECIALS = log_dlf.C reaction_colgen.C weather_base.C \
 
 # Various utility code that are neither a component nor a (sub)model.
 # 
-OTHER = val.C avalue.C type.C model_derived.C model_logable.C model_framed.C \
+OTHER = val.C type.C model_derived.C model_logable.C model_framed.C \
 	printer.C printer_file.C filepos.C frame_submodel.C submodeler.C \
 	frame_model.C scope.C value.C unit.C border.C resistance.C \
 	convert.C units.C tertsmall.C anystate.C imvec.C im.C frame.C \
@@ -504,7 +504,7 @@ OTHER = val.C avalue.C type.C model_derived.C model_logable.C model_framed.C \
 	fao.C gaussj.C vcheck.C assertion.C xref.C oldunits.C \
 	check.C check_range.C path.C traverse_delete.C \
 	traverse.C treelog.C \
-	lexer_data.C lexer.C daisy.C alist.C library.C plf.C \
+	lexer_data.C lexer.C daisy.C library.C plf.C \
 	mathlib.C cdaisy.C nrutil.C version.C
 
 # Utilities in header or source alone.
@@ -581,7 +581,7 @@ EXECUTABLES = daisy${EXE} tkdaisy${EXE} cdaisy${EXE} gdaisy${EXE}
 
 # Select files to be removed by the next svn update.
 #
-REMOVE = submodel.h
+REMOVE = avalue.C alist.C avalue.h alist.h syntax.h syntax.C
 
 REMOVED = msoltranrect_2x1.C msoltranrect_forward.C\
 	select_soil.C adsorption_none.C adsorption_full.C ABAprod_expr.C \
@@ -1350,8 +1350,6 @@ log_alist${OBJ}: log_alist.C log_alist.h log.h time.h symbol.h border.h \
   model_framed.h model_logable.h model.h library.h frame_submodel.h \
   frame.h scope.h value.h frame_model.h assertion.h metalib.h
 val${OBJ}: val.C val.h symbol.h value.h assertion.h
-avalue${OBJ}: avalue.C avalue.h symbol.h value.h mathlib.h assertion.h plf.h \
-  frame_model.h frame.h scope.h frame_submodel.h memutils.h
 type${OBJ}: type.C type.h value.h symbol.h frame.h scope.h assertion.h \
   check.h
 model_derived${OBJ}: model_derived.C model_derived.h model_logable.h model.h \
@@ -1371,7 +1369,8 @@ frame_submodel${OBJ}: frame_submodel.C frame_submodel.h frame.h scope.h \
 submodeler${OBJ}: submodeler.C submodeler.h block.h scope.h value.h symbol.h \
   frame_submodel.h frame.h assertion.h
 frame_model${OBJ}: frame_model.C frame_model.h frame.h scope.h value.h \
-  symbol.h block.h assertion.h treelog.h librarian.h model.h
+  symbol.h block.h assertion.h treelog.h librarian.h model.h metalib.h \
+  library.h
 scope${OBJ}: scope.C scope.h value.h symbol.h assertion.h
 value${OBJ}: value.C value.h symbol.h assertion.h
 unit${OBJ}: unit.C unit.h symbol.h
@@ -1393,8 +1392,8 @@ im${OBJ}: im.C im.h symbol.h value.h chemical.h model_framed.h \
   border.h block.h scope.h frame_submodel.h frame.h check.h assertion.h
 frame${OBJ}: frame.C frame.h scope.h value.h symbol.h frame_model.h \
   frame_submodel.h block.h assertion.h librarian.h model.h intrinsics.h \
-  memutils.h library.h alist.h filepos.h metalib.h type.h val.h check.h \
-  vcheck.h treelog.h plf.h
+  memutils.h library.h filepos.h metalib.h type.h val.h check.h vcheck.h \
+  treelog.h plf.h mathlib.h
 bdconv${OBJ}: bdconv.C bdconv.h convert.h symbol.h geometry.h value.h soil.h \
   volume.h model.h units.h memutils.h assertion.h
 abiotic${OBJ}: abiotic.C abiotic.h mathlib.h assertion.h
@@ -1472,9 +1471,6 @@ daisy${OBJ}: daisy.C daisy.h program.h model.h symbol.h run.h time.h \
   bioclimate.h hydraulic.h field.h harvest.h block.h scope.h action.h \
   library.h submodeler.h column.h scopesel.h mathlib.h assertion.h \
   librarian.h metalib.h frame.h treelog.h frame_model.h
-alist${OBJ}: alist.C alist.h symbol.h avalue.h value.h plf.h library.h time.h \
-  mathlib.h assertion.h memutils.h frame_model.h frame.h scope.h \
-  frame_submodel.h
 library${OBJ}: library.C library.h symbol.h block.h scope.h value.h treelog.h \
   assertion.h memutils.h frame_model.h frame.h filepos.h
 plf${OBJ}: plf.C plf.h assertion.h mathlib.h
