@@ -194,7 +194,7 @@ UIRun::attach (Toplevel& toplevel)
   VisQtTime *const qt_time = new VisQtTime;
   qt_time->setToolTip ("The simulation time.");
   if (frame.check ("time")
-      && frame.lookup ("time") == Value::AList
+      && frame.lookup ("time") == Value::Submodel
       && frame.type_size ("time") == Value::Singleton
       && frame.check (toplevel.metalib (), "time", Treelog::null ()))
     {

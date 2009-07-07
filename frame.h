@@ -193,7 +193,7 @@ class EXPORT Frame : public WScope
                 symbol description)
   { declare (key, domain, range, check, cat, Value::Singleton, description); } 
 
-  void declare_object (symbol key,// Object
+  void declare_object (symbol key,// Model
                        symbol lib, 
                        symbol description)
   { declare_object (key, lib, Value::State, Value::Singleton, description); }

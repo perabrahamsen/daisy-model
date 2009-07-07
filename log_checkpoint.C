@@ -38,7 +38,7 @@
 #include <sstream>
 #include <fstream>
 
-struct LogCheckpoint : public LogAList
+struct LogCheckpoint : public LogSubmodel
 {
   // Content.
   const symbol file;		// Name of file to write checkpoint in.
@@ -224,7 +224,7 @@ LogCheckpoint::initialize (Treelog&)
 { }
 
 LogCheckpoint::LogCheckpoint (Block& al)
-  : LogAList (al),
+  : LogSubmodel (al),
     file (al.name ("where")),
     description (al.frame ().description ()),
     condition (Librarian::build_item<Condition> (al, "when")),

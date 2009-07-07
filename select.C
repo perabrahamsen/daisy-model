@@ -221,7 +221,7 @@ Select::Implementation::Spec::check_path (const std::vector<symbol>& path,
 
       if (!last)
         {
-          if (type != Value::AList)
+          if (type != Value::Submodel)
             {
               err.error ("'" + name + "': no such submodel (is a " 
                          + Value::type_name (type) + ")");

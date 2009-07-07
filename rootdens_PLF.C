@@ -89,7 +89,7 @@ Rootdens_PLF::Check_Indexes::verify (const Metalib&, const Frame& frame,
                                      const symbol key, Treelog& msg) const
 { 
   daisy_assert (frame.check (key));
-  daisy_assert (frame.lookup (key) == Value::AList);
+  daisy_assert (frame.lookup (key) == Value::Submodel);
   daisy_assert (!frame.is_log (key));
   daisy_assert (frame.type_size (key) == Value::Variable);
 

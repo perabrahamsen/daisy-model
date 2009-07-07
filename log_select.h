@@ -93,7 +93,7 @@ struct EXPORT LogSelect : public Log
   void open_derived (symbol field, symbol type, const char* library);
   void close_derived ();
 
-  // Object singletons with alist.
+  // Model singletons with alist.
   void open_object (symbol field, symbol type, const Frame&,
 		    const char* library); 
   void close_object ();

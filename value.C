@@ -31,8 +31,8 @@ symbol
 Value::type_name (type t)
 {
   static const symbol names[] = 
-    { "Number", "AList", "PLF", "Boolean", "String",
-      "Integer", "Object", "Library", "Error" };
+    { "Number", "Submodel", "PLF", "Boolean", "String",
+      "Integer", "Model", "Library", "Error" };
   daisy_assert (t >= 0);
   daisy_assert (t < sizeof (names) / sizeof (symbol));
   return names[t];

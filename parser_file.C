@@ -598,7 +598,7 @@ ParserFile::Implementation::add_derived (Library& lib)
                 || frame->order ().begin () != frame->order ().end ());
   if ((!frame->ordered () 
        || (frame->lookup (*(frame->order ().begin ())) != Value::String
-           && frame->lookup (*(frame->order ().begin ())) != Value::Object)) 
+           && frame->lookup (*(frame->order ().begin ())) != Value::Model)) 
       && looking_at ('"')
       && frame->lookup ("description") == Value::String
       && frame->type_size ("description") == Value::Singleton)
@@ -880,7 +880,7 @@ ParserFile::Implementation::load_list (Frame& frame)
       // Duplicate warning.
       if (found.find (name) != found.end ())
 	warning (name + " specified twice, last takes precedence");
-      else if (frame.lookup (name) != Value::Object // (input file )
+      else if (frame.lookup (name) != Value::Model // (input file )
                || frame.component (name) != Parser::component)
 	found.insert (name);
 
@@ -923,7 +923,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 	      frame.set (name, value);
 	    }
             break;
-	  case Value::AList: 
+	  case Value::Submodel: 
 	    {
               Treelog::Open nest (msg, "In submodel '" + name + "'");
 	      bool alist_skipped = false;
@@ -1011,7 +1011,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 	  case Value::Integer:
 	    frame.set (name, get_integer ());
 	    break;
-	  case Value::Object:
+	  case Value::Model:
 	    {
               boost::shared_ptr<FrameModel> child;
               const symbol component = frame.component (name);
@@ -1070,7 +1070,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 	  // Support for sequences not really finished yet.
 	  switch (type)
 	    {
-	    case Value::Object:
+	    case Value::Model:
 	      {
 		const symbol component = frame.component (name);
 		const Library& lib = metalib ().library (component);
@@ -1121,7 +1121,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 		frame.set (name, sequence);
 	      }
               break;
-	    case Value::AList:
+	    case Value::Submodel:
 	      {
 		const size_t size = frame.type_size (name);
 		static const std::vector<boost::shared_ptr<const FrameSubmodel>/**/> no_sequence;

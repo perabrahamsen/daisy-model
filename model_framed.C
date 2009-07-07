@@ -39,7 +39,7 @@ ModelFramed::output_as_object (const symbol key, Log& log) const
   const char *const component = library_id ().name ().c_str ();
   if (log.check_derived (key, name, component))
     {
-      Log::Object object (log, key, name, frame (), component);
+      Log::Model object (log, key, name, frame (), component);
       output (log);
     }
 }

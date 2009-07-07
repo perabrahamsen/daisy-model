@@ -227,7 +227,7 @@ Traverse::traverse_parameter (const Frame& frame,
       // Children.
       switch (type)
 	{
-	case Value::AList:
+	case Value::Submodel:
 	  {
 	    FrameSubmodel& entry_frame
               = const_cast<FrameSubmodel&> (frame.submodel (parameter));
@@ -263,7 +263,7 @@ Traverse::traverse_parameter (const Frame& frame,
 	      }
 	  }
 	  break;
-	case Value::Object:
+	case Value::Model:
 	  {
 	    if (has_value)
 	      {

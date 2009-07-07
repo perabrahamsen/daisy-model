@@ -32,22 +32,22 @@
 #include <sstream>
 
 bool
-LogAList::check_entry (symbol, const char*) const
+LogSubmodel::check_entry (symbol, const char*) const
 { return is_active; }
 
 bool
-LogAList::check_derived (symbol, symbol, const char*) const
+LogSubmodel::check_derived (symbol, symbol, const char*) const
 { return is_active; }
 
 symbol
-LogAList::entry () const
+LogSubmodel::entry () const
 { 
   daisy_assert (entry_stack.size () > 0U);
   return entry_stack.front ();
 }
 
 const Library&
-LogAList::library () const
+LogSubmodel::library () const
 { 
   daisy_assert (library_stack.size () > 0U);
   daisy_assert (library_stack.front ());
@@ -55,7 +55,7 @@ LogAList::library () const
 }
 
 Frame&
-LogAList::frame_entry () const
+LogSubmodel::frame_entry () const
 {
   daisy_assert (frame_stack.size () > 0U);
   daisy_assert (frame_stack.front ());
@@ -63,21 +63,21 @@ LogAList::frame_entry () const
 }
 
 std::vector<const Frame*>&
-LogAList::frame_sequence ()
+LogSubmodel::frame_sequence ()
 {
   daisy_assert (frame_sequence_stack.size () > 0U);
   return frame_sequence_stack.front ();
 }
 
 int
-LogAList::unnamed ()
+LogSubmodel::unnamed ()
 {
   daisy_assert (unnamed_stack.size () > 0U);
   return unnamed_stack.front ();
 }
 
 void
-LogAList::push (symbol entry, const Library& library, const Frame& frame)
+LogSubmodel::push (symbol entry, const Library& library, const Frame& frame)
 {
   entry_stack.push_front (entry);
   library_stack.push_front (&library);
@@ -87,7 +87,7 @@ LogAList::push (symbol entry, const Library& library, const Frame& frame)
 }
 
 void
-LogAList::push (symbol entry, const Frame& frame)
+LogSubmodel::push (symbol entry, const Frame& frame)
 {
   entry_stack.push_front (entry);
   library_stack.push_front (NULL);
@@ -97,7 +97,7 @@ LogAList::push (symbol entry, const Frame& frame)
 }
 
 void
-LogAList::push (symbol entry, 
+LogSubmodel::push (symbol entry, 
 		const Frame& default_frame,
 		std::vector<boost::shared_ptr<const FrameModel>/**/> frame_sequence)
 {
@@ -115,7 +115,7 @@ LogAList::push (symbol entry,
 }
 
 void
-LogAList::push (symbol entry, 
+LogSubmodel::push (symbol entry, 
 		const Frame& default_frame,
 		std::vector<boost::shared_ptr<const FrameSubmodel>/**/> frame_sequence)
 {
@@ -133,7 +133,7 @@ LogAList::push (symbol entry,
 }
 
 void
-LogAList::pop ()
+LogSubmodel::pop ()
 {
   // Check.
   daisy_assert (entry_stack.size () > 0);
@@ -152,7 +152,7 @@ LogAList::pop ()
 }
 
 void
-LogAList::open_ignore ()
+LogSubmodel::open_ignore ()
 { 
   if (nested > 0 || is_active)
     {
@@ -162,7 +162,7 @@ LogAList::open_ignore ()
 }
 
 void
-LogAList::close_ignore ()
+LogSubmodel::close_ignore ()
 { 
   if (nested > 0)
     {
@@ -173,7 +173,7 @@ LogAList::close_ignore ()
 
 
 void
-LogAList::open (const symbol name)
+LogSubmodel::open (const symbol name)
 {
   if (is_active)
     {
@@ -191,7 +191,7 @@ LogAList::open (const symbol name)
 	  const bool has_value = frame_entry ().check (name);
 	  switch (frame_entry ().lookup (name))
 	    {
-	    case Value::AList:
+	    case Value::Submodel:
 	      if (size != Value::Singleton && has_value)
 		push (name, 
 		      frame_entry ().default_frame (name),
@@ -204,7 +204,7 @@ LogAList::open (const symbol name)
 		      frame_entry ().submodel (name));
 		      
 	      break;
-	    case Value::Object:
+	    case Value::Model:
               {
                 const symbol component = frame_entry ().component (name);
                 const Library& library = metalib ().library (component);
@@ -224,7 +224,7 @@ LogAList::open (const symbol name)
 }
 
 void
-LogAList::close ()
+LogSubmodel::close ()
 { 
   if (is_active)
     {
@@ -243,9 +243,9 @@ LogAList::close ()
 	  const Value::type type = frame_entry ().lookup (sold_entry);
 	  switch (type)
 	    { 
-	    case Value::Object:
+	    case Value::Model:
               {
-                // Object sequence.
+                // Model sequence.
                 daisy_assert (frame_entry ().type_size (sold_entry)
                               != Value::Singleton);
                 std::vector<boost::shared_ptr<const FrameModel>/**/> copy;
@@ -259,8 +259,8 @@ LogAList::close ()
                 frame_entry ().set (sold_entry, copy);
               }
               break;
-	    case Value::AList:
-	      // AList sequence or singleton.
+	    case Value::Submodel:
+	      // Submodel sequence or singleton.
 	      if (frame_entry ().type_size (sold_entry) == Value::Singleton)
 		{
 		  daisy_assert (old_frame_sequence.size () == 0);
@@ -291,7 +291,7 @@ LogAList::close ()
 }
 
 void
-LogAList::open_unnamed ()	
+LogSubmodel::open_unnamed ()	
 { 
   if (is_active)
     {
@@ -309,7 +309,7 @@ LogAList::open_unnamed ()
 }
 
 void
-LogAList::close_unnamed ()	
+LogSubmodel::close_unnamed ()	
 {
   if (is_active)
     {
@@ -325,7 +325,7 @@ LogAList::close_unnamed ()
       if (unnamed () >= 0)
 	unnamed_stack[0]++;
       const std::string& sentry = entry ().name ();
-      daisy_assert (frame_stack[1]->lookup (sentry) == Value::AList);
+      daisy_assert (frame_stack[1]->lookup (sentry) == Value::Submodel);
       daisy_assert (frame_stack[1]->type_size (sentry) != Value::Singleton);
     }
   else
@@ -333,11 +333,11 @@ LogAList::close_unnamed ()
 }
 
 void 
-LogAList::open_alist (symbol name, const Frame& f)
+LogSubmodel::open_alist (symbol name, const Frame& f)
 {
   if (is_active)
     {
-      daisy_assert (frame_entry ().lookup (name) == Value::AList);
+      daisy_assert (frame_entry ().lookup (name) == Value::Submodel);
       daisy_assert (frame_entry ().type_size (name) == Value::Singleton);
       push (name, f);
     }
@@ -346,7 +346,7 @@ LogAList::open_alist (symbol name, const Frame& f)
 }
 
 void
-LogAList::close_alist ()
+LogSubmodel::close_alist ()
 { 
   if (is_active)
     {
@@ -360,7 +360,7 @@ LogAList::close_alist ()
     close_ignore (); 
 }
 void
-LogAList::open_derived (const symbol field, const symbol type, 
+LogSubmodel::open_derived (const symbol field, const symbol type, 
                         const char *const library)
 { 
   if (!frame_entry ().check (field))
@@ -374,17 +374,17 @@ LogAList::open_derived (const symbol field, const symbol type,
 }
 	
 void
-LogAList::close_derived ()
+LogSubmodel::close_derived ()
 { close_object (); }
 
 void
-LogAList::open_object (symbol field, symbol type, 
+LogSubmodel::open_object (symbol field, symbol type, 
                        const Frame& f, const char* lib)
 { 
   if (is_active)
     {
       const std::string& sfield = field.name ();
-      daisy_assert (frame_entry ().lookup (sfield) == Value::Object);
+      daisy_assert (frame_entry ().lookup (sfield) == Value::Model);
       daisy_assert (frame_entry ().type_size (sfield) == Value::Singleton);
       const symbol component = frame_entry ().component (sfield);
       const Library& library = metalib ().library (component);
@@ -399,7 +399,7 @@ LogAList::open_object (symbol field, symbol type,
 }
 	
 void
-LogAList::close_object ()
+LogSubmodel::close_object ()
 { 
   if (is_active)
     {
@@ -414,7 +414,7 @@ LogAList::close_object ()
 }
 
 void
-LogAList::open_entry (symbol type, const Frame& frame, const char*)
+LogSubmodel::open_entry (symbol type, const Frame& frame, const char*)
 {
   if (is_active)
     push (type, frame);
@@ -423,7 +423,7 @@ LogAList::open_entry (symbol type, const Frame& frame, const char*)
 }
 
 void
-LogAList::close_entry ()
+LogSubmodel::close_entry ()
 {
   if (is_active)
     {
@@ -436,16 +436,16 @@ LogAList::close_entry ()
 }
 
 void
-LogAList::open_named_entry (const symbol, const symbol type,
+LogSubmodel::open_named_entry (const symbol, const symbol type,
 			    const Frame& frame)
 { open_entry (type, frame, NULL); }
 
 void
-LogAList::close_named_entry ()
+LogSubmodel::close_named_entry ()
 { close_entry (); }
 
 void
-LogAList::output_entry (symbol name, const bool value)
+LogSubmodel::output_entry (symbol name, const bool value)
 { 
   if (!is_active)
     return;
@@ -455,7 +455,7 @@ LogAList::output_entry (symbol name, const bool value)
 }
 
 void
-LogAList::output_entry (symbol name, const double value)
+LogSubmodel::output_entry (symbol name, const double value)
 { 
   if (!is_active)
     return;
@@ -465,7 +465,7 @@ LogAList::output_entry (symbol name, const double value)
 }
 
 void
-LogAList::output_entry (symbol name, const int value)
+LogSubmodel::output_entry (symbol name, const int value)
 { 
   if (!is_active)
     return;
@@ -475,7 +475,7 @@ LogAList::output_entry (symbol name, const int value)
 }
 
 void
-LogAList::output_entry (symbol name, symbol value)
+LogSubmodel::output_entry (symbol name, symbol value)
 { 
   if (!is_active)
     return;
@@ -485,7 +485,7 @@ LogAList::output_entry (symbol name, symbol value)
 }
 
 void
-LogAList::output_entry (symbol name, const std::vector<double>& value)
+LogSubmodel::output_entry (symbol name, const std::vector<double>& value)
 { 
   if (!is_active)
     return;
@@ -495,7 +495,7 @@ LogAList::output_entry (symbol name, const std::vector<double>& value)
 }
 
 void
-LogAList::output_entry (symbol name, const PLF& value)
+LogSubmodel::output_entry (symbol name, const PLF& value)
 { 
   if (!is_active)
     return;
@@ -505,16 +505,16 @@ LogAList::output_entry (symbol name, const PLF& value)
 }
 
 bool
-LogAList::check (const Border&, Treelog&) const
+LogSubmodel::check (const Border&, Treelog&) const
 { return true; }
 
-LogAList::LogAList (Block& al)
+LogSubmodel::LogSubmodel (Block& al)
   : Log (al),
     is_active (false),
     nested (0)
 { }
 
-LogAList::~LogAList ()
+LogSubmodel::~LogSubmodel ()
 { }
 
 // log_alist.C ends here.

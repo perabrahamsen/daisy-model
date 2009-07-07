@@ -154,7 +154,7 @@ Block::Implementation::expand_string (Block& block,
                     case Value::Number:
                       result << frame.number (key); 
                       break;
-                    case Value::Object:
+                    case Value::Model:
                       {
                         Treelog::Open nest (msg, "${" + key + "}");
                         const FrameModel& obj = frame.model (key);

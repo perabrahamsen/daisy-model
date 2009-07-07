@@ -157,23 +157,23 @@ private:
   virtual void close_ordered ();
   friend struct Log::Ordered;
 
-  // AList singletons variant.
+  // Submodel singletons variant.
 public:
-  struct AList
+  struct Submodel
   {
   private:
     Log& ll;
   public:
-    AList (Log& l, symbol name, const Frame& alist)
+    Submodel (Log& l, symbol name, const Frame& alist)
       : ll (l)
     { ll.open_alist (name, alist); }
-    ~AList ()
+    ~Submodel ()
     { ll.close_alist (); }
   };
 private:
   virtual void open_alist (symbol name, const Frame& alist);
   virtual void close_alist ();
-  friend struct Log::AList;
+  friend struct Log::Submodel;
 
   // Derived objects.
 public:
@@ -197,16 +197,16 @@ private:
 
   // Derived objects with their own alist.
 public:
-  struct Object
+  struct Model
   {
   private:
     Log& ll;
   public:
-    Object (Log& l, const symbol field, const symbol type, 
+    Model (Log& l, const symbol field, const symbol type, 
             const Frame& alist, const char *const library)
       : ll (l)
     { ll.open_object (field, type, alist, library); }
-    ~Object ()
+    ~Model ()
     { ll.close_object (); }
   };
 private:
@@ -214,7 +214,7 @@ private:
 			    const Frame& alist, 
 			    const char* library) = 0;
   virtual void close_object () = 0;
-  friend struct Log::Object;
+  friend struct Log::Model;
 
   // Derived objects in a variable length list.
 public:

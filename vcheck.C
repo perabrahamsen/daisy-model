@@ -800,7 +800,7 @@ VCheck::unique ()
           return unique_validate (frame.name_sequence (key), msg);
         case Value::Integer:
           return unique_validate (frame.integer_sequence (key), msg);
-	case Value::Object:
+	case Value::Model:
 	  {
             bool ok = true;
 	    const std::vector<boost::shared_ptr<const FrameModel>/**/>& list 

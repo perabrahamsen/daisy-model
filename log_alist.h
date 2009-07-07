@@ -29,7 +29,7 @@
 class Library;
 class Frame;
 
-struct LogAList : public Log
+struct LogSubmodel : public Log
 {
   // Filter functions.
   bool check_entry (symbol, const char* component) const;
@@ -70,21 +70,21 @@ struct LogAList : public Log
   // Nesting.
   void open_ignore ();		// Ignored items.
   void close_ignore ();
-  void open (symbol name); // AList singletons. 
+  void open (symbol name); // Submodel singletons. 
   void close ();
-  void open_unnamed ();		// Items in a AList sequence.
+  void open_unnamed ();		// Items in a Submodel sequence.
   void close_unnamed ();	
-  void open_alist (symbol name, // AList singletons variant.
+  void open_alist (symbol name, // Submodel singletons variant.
 		   const Frame& frame);
   void close_alist ();
 
-  void open_derived (symbol field, // Object singletons.
+  void open_derived (symbol field, // Model singletons.
 		     symbol type, const char* library); 
   void close_derived ();
-  void open_object (symbol field, // Object singletons with alist.
+  void open_object (symbol field, // Model singletons with alist.
 		    symbol type, const Frame&, const char* library); 
   void close_object ();
-  void open_entry (symbol type,   // Items in an Object sequence.
+  void open_entry (symbol type,   // Items in an Model sequence.
 		   const Frame& frame, const char *const library);
   void close_entry ();
   void open_named_entry (symbol name,   // Named items in an Obj seq.
@@ -102,8 +102,8 @@ struct LogAList : public Log
 
   // Create and Destroy.
   bool check (const Border&, Treelog& err) const;
-  LogAList (Block&);
-  ~LogAList ();
+  LogSubmodel (Block&);
+  ~LogSubmodel ();
 };
 
 #endif // LOG_ALIST_H

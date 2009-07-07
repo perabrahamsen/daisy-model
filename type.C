@@ -113,14 +113,14 @@ TypeNumber::TypeNumber (const Value::category c, const int s, const symbol dim,
 { }
 
 Value::type 
-TypeAList::type () const
-{ return Value::AList; }
+TypeSubmodel::type () const
+{ return Value::Submodel; }
 
 Frame::load_syntax_t  
-TypeAList::load_syntax () const
+TypeSubmodel::load_syntax () const
 { return load_syntax_; }
 
-TypeAList::TypeAList (const Value::category c, const int s,
+TypeSubmodel::TypeSubmodel (const Value::category c, const int s,
                       const Frame::load_syntax_t l, const symbol desc)
   : Type (c, s, desc),
     load_syntax_ (l)
@@ -181,14 +181,14 @@ TypeInteger::TypeInteger (const Value::category c, const int s,
 { }
 
 Value::type 
-TypeObject::type () const
-{ return Value::Object; }
+TypeModel::type () const
+{ return Value::Model; }
 
 symbol 
-TypeObject::component () const
+TypeModel::component () const
 { return component_; }
 
-TypeObject::TypeObject (const Value::category c, const int s, const symbol comp,
+TypeModel::TypeModel (const Value::category c, const int s, const symbol comp,
                         const symbol desc)
   : Type (c, s, desc),
     component_ (comp)

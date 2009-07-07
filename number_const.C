@@ -304,7 +304,7 @@ struct NumberFetch : public Number
           result.reset (new NumberConst (al, key));
         }
         break;
-      case Value::Object:
+      case Value::Model:
         {
           const Frame& frame = al.find_frame (key);
           const symbol component = frame.component (key);

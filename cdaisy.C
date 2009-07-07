@@ -148,7 +148,7 @@ daisy_frame_get_flag (const Frame* frame, const char* name)
 extern "C" const Frame* EXPORT
 daisy_frame_get_frame (const Frame* frame, const char* name)
 { 
-  if (frame->lookup (name) == Value::Object)
+  if (frame->lookup (name) == Value::Model)
     return &frame->model (name); 
   else
     return &frame->submodel (name); 
@@ -175,7 +175,7 @@ extern "C" void EXPORT
 daisy_frame_set_frame (Frame* frame, const char* name,
 		       Frame* value)
 { 
-  if (frame->lookup (name) == Value::AList)
+  if (frame->lookup (name) == Value::Submodel)
     frame->set (name, dynamic_cast<const FrameSubmodel&> (*value)); 
   else
     frame->set (name, dynamic_cast<const FrameModel&> (*value)); 
@@ -236,7 +236,7 @@ extern "C" const Frame* EXPORT
 daisy_frame_get_frame_at (const Frame* frame, const char* name,
 			  unsigned int index)
 { 
-  if (frame->lookup (name) == Value::Object)
+  if (frame->lookup (name) == Value::Model)
     return frame->model_sequence (name)[index].get (); 
   else
     return frame->submodel_sequence (name)[index].get (); 

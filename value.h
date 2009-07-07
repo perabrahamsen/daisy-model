@@ -64,8 +64,8 @@ namespace Value
 
   // Each value entry should have an associated type.
   enum type 
-  { Number, AList, PLF, Boolean, String,
-    Integer, Object, Scalar, Reference, Error };
+  { Number, Submodel, PLF, Boolean, String,
+    Integer, Model, Scalar, Reference, Error };
   symbol type_name (type);
   type type_number (symbol name);
     

@@ -121,7 +121,7 @@ AM::Implementation::Check_OM_Pools::verify (const Metalib&, const Frame& frame,
                                             Treelog& msg) const
 { 
   daisy_assert (frame.check (key));
-  daisy_assert (frame.lookup (key) == Value::Object);
+  daisy_assert (frame.lookup (key) == Value::Model);
   daisy_assert (!frame.is_log (key));
   daisy_assert (frame.type_size (key) == Value::Variable);
 

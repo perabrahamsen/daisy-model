@@ -80,7 +80,7 @@ public:
   symbol dimension (symbol) const;
   symbol description (symbol) const;
 
-  // AList emulation.
+  // Submodel emulation.
 public:
   bool check (const symbol key) const;
   int value_size (symbol tag) const;

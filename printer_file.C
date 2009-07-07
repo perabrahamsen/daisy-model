@@ -114,11 +114,11 @@ PrinterFile::Implementation::is_complex (const Frame& frame,
     case Value::Boolean:
     case Value::String:
       return false;
-    case Value::Object:
+    case Value::Model:
       return frame.order_index (key) >= 0
 	|| is_complex_object (frame.model (key), 
                               metalib.library (frame.component (key)));
-    case Value::AList:
+    case Value::Submodel:
     case Value::PLF:
       return true;
     case Value::Scalar:
@@ -226,7 +226,7 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
 	  out << frame.number (key);
           print_dimension (frame, key, frame.dimension (key));
 	  break;
-	case Value::AList:
+	case Value::Submodel:
 	  if (super && super->check (key))
 	    print_alist (frame.submodel (key), &super->submodel (key), 
                          indent, false); 
@@ -246,7 +246,7 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
 	case Value::Integer:
 	  out << frame.integer (key);
 	  break;
-	case Value::Object:
+	case Value::Model:
           {
             const symbol component = frame.component (key);
             const Library& library = metalib.library (component);
@@ -283,7 +283,7 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
             print_dimension (frame, key, frame.dimension (key));
 	  }
 	  break;
-	case Value::AList:
+	case Value::Submodel:
 	  {
 	    const FrameSubmodel& other = frame.default_frame (key);
 	    const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& value 
@@ -351,7 +351,7 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
 	      }
 	  }
 	  break;
-	case Value::Object:
+	case Value::Model:
 	  {
             const symbol component = frame.component (key);
             const Library& library = metalib.library (component);
@@ -464,7 +464,7 @@ PrinterFile::Implementation::print_alist (const Frame& frame,
 	  // ordered complex values.  However, the parser doesn't
 	  // expect these for alist sequences, so we don't print them
 	  // either. 
-	  if (frame.lookup (key) == Value::AList
+	  if (frame.lookup (key) == Value::Submodel
 	      && frame.type_size (key) != Value::Singleton)
 	    print_entry (frame, super, key, indent, false);
 	  else
@@ -524,10 +524,10 @@ PrinterFile::Implementation::print_alist (const Frame& frame,
               out << Value::type_name (type) << " ";
               print_dimension (frame, key, frame.dimension (key));
               break;
-            case Value::AList:
+            case Value::Submodel:
               out << "fixed " << frame.submodel_name (key);
               break;
-            case Value::Object:
+            case Value::Model:
               out << frame.component (key);
               break;
             case Value::PLF: 

@@ -74,13 +74,13 @@ public:
               const Check&, const symbol desc);
 };
 
-class TypeAList : public Type
+class TypeSubmodel : public Type
 {
   const Frame::load_syntax_t load_syntax_;
   Value::type type () const;
   Frame::load_syntax_t  load_syntax () const;
 public:
-  TypeAList (const Value::category c, const int s, const Frame::load_syntax_t l,
+  TypeSubmodel (const Value::category c, const int s, const Frame::load_syntax_t l,
              const symbol desc);
 };
 
@@ -120,13 +120,13 @@ public:
   TypeInteger (const Value::category c, const int s, const symbol desc);
 };
 
-class TypeObject : public Type
+class TypeModel : public Type
 {
   const symbol component_;
   Value::type type () const;
   symbol component () const;
 public:
-  TypeObject (const Value::category c, const int s, const symbol comp,
+  TypeModel (const Value::category c, const int s, const symbol comp,
               const symbol desc);
 };
 

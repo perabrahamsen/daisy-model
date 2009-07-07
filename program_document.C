@@ -176,7 +176,7 @@ ProgramDocument::print_entry_type (const symbol name,
 	  format->bold ("[" + dimension + "]");
       }
       break;
-    case Value::AList:
+    case Value::Submodel:
       {
         const symbol submodel_name = frame.submodel_name (name);
 	if (submodel_name != Value::None ())
@@ -217,7 +217,7 @@ ProgramDocument::print_entry_type (const symbol name,
     case Value::Integer:
       format->text ("integer");
       break;
-    case Value::Object:
+    case Value::Model:
       {
 	const symbol component = frame.component (name);
 	format->bold (component);
@@ -240,7 +240,7 @@ ProgramDocument::print_entry_submodel (const symbol name,
 				       const symbol aref)
 {
   const Value::type type = frame.lookup (name);
-  if (type == Value::AList)
+  if (type == Value::Submodel)
     {
       const FrameSubmodel& child = frame.submodel (name);
       if (frame.submodel_name (name) == Value::None ())
@@ -257,7 +257,7 @@ ProgramDocument::print_entry_category (const symbol name,
 {
   const Value::type type = frame.lookup (name);
 
-  if (type == Value::Object)	// Objects and ALists don't have categories.
+  if (type == Value::Model)	// Models and Submodels don't have categories.
     {
       if (frame.is_optional (name))
 	{
@@ -270,7 +270,7 @@ ProgramDocument::print_entry_category (const symbol name,
 	  format->text ("Component");
 	}
     }
-  else if (type == Value::AList)
+  else if (type == Value::Submodel)
     {
       if (frame.is_optional (name))
 	{
@@ -346,7 +346,7 @@ ProgramDocument::print_entry_value (const symbol name,
 	      format->text (tmp.str ());
 	    }
 	    break;
-	  case Value::AList:
+	  case Value::Submodel:
 	    {
 	      const bool has_errors 
                 = !frame.check (metalib, name, Treelog::null ());
@@ -408,7 +408,7 @@ ProgramDocument::print_entry_value (const symbol name,
 	      format->text (tmp.str ());
 	    }
 	    break;
-	  case Value::Object:
+	  case Value::Model:
 	    {
 	      const FrameModel& object = frame.model (name);
 	      const symbol type = object.type_name ();
@@ -428,12 +428,12 @@ ProgramDocument::print_entry_value (const symbol name,
 	switch (type)
 	  {
 	  case Value::Number:
-	  case Value::AList:
+	  case Value::Submodel:
 	  case Value::PLF:
 	  case Value::Boolean:
 	  case Value::String:
 	  case Value::Integer:
-	  case Value::Object:
+	  case Value::Model:
 	    if (frame.value_size (name) == 0)
 	      format->text (" (default: an empty sequence)");
 	    else
@@ -567,7 +567,7 @@ ProgramDocument::print_sample_entry (const symbol name,
 		print_name = false;
 	      }
 	      break;
-	    case Value::AList:
+	    case Value::Submodel:
 	      {
 		const bool has_errors 
                   = !frame.check (metalib, name, Treelog::null ());
@@ -604,7 +604,7 @@ ProgramDocument::print_sample_entry (const symbol name,
 		print_name = false;
 	      }
 	      break;
-	    case Value::Object:
+	    case Value::Model:
 	      {
 		const FrameModel& object = frame.model (name);
 		const symbol type = object.type_name ();
@@ -640,12 +640,12 @@ ProgramDocument::print_sample_entry (const symbol name,
 		  print_name = false;
 		}
 	      break;
-	    case Value::AList:
+	    case Value::Submodel:
 	    case Value::PLF:
 	    case Value::Boolean:
 	    case Value::String:
 	    case Value::Integer:
-	    case Value::Object:
+	    case Value::Model:
 	      break;
 	    case Value::Scalar:
             case Value::Reference:

@@ -310,7 +310,7 @@ TraverseXRef::enter_parameter (const Frame& frame, const Frame& default_frame,
     }
   path.push_back (name);
 
-  if (frame.lookup (name) == Value::Object)
+  if (frame.lookup (name) == Value::Model)
     // We always use the component, even if it has no value, or a
     // value that is an empty sequence.
     use_component (metalib.library (frame.component (name)));

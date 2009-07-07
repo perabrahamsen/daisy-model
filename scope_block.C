@@ -58,7 +58,7 @@ ScopeBlock::dimension (symbol tag) const
     }
 
   // Handle number objects.
-  if (type != Value::Object)
+  if (type != Value::Model)
     return Value::Unknown ();
   if (frame.component (tag) != Number::component)
     return Value::Unknown ();
@@ -118,7 +118,7 @@ ScopeBlock::has_number (const symbol tag) const
     return true;
   
   // Handle number objects.
-  if (type != Value::Object)
+  if (type != Value::Model)
     return false;
   if (frame.component (tag) != Number::component)
     return false;
@@ -150,7 +150,7 @@ ScopeBlock::number (const symbol tag) const
     return frame.number (tag);
 
   // Handle number objects.
-  daisy_assert (type == Value::Object);
+  daisy_assert (type == Value::Model);
   daisy_assert (frame.component (tag) == Number::component);
   daisy_assert (frame.check (block));
   std::auto_ptr<Number> number (Librarian::build_frame<Number> 
@@ -181,7 +181,7 @@ ScopeBlock::has_name (const symbol tag) const
     return true;
   
   // Handle stringer objects.
-  if (type != Value::Object)
+  if (type != Value::Model)
     return false;
   if (frame.component (tag) != Stringer::component)
     return false;
@@ -213,7 +213,7 @@ ScopeBlock::name (const symbol tag) const
     return frame.name (tag);
 
   // Handle number objects.
-  daisy_assert (type == Value::Object);
+  daisy_assert (type == Value::Model);
   daisy_assert (frame.component (tag) == Stringer::component);
   daisy_assert (frame.check (block));
   std::auto_ptr<Stringer> stringer (Librarian::build_frame<Stringer> 

@@ -73,8 +73,8 @@ daisy_size_sequence ();
 EXPORT int                             /* Not an array. */
 daisy_size_singleton ();
 
-/* The following types are currently supported: "Number", "AList",
-   "PLF", "Boolean", "String", "Date", "Integer", "Object",
+/* The following types are currently supported: "Number", "Submodel",
+   "PLF", "Boolean", "String", "Date", "Integer", "Model",
    "Library", and "Error". */
 
 EXPORT int                             /* Number used for specific type. */
