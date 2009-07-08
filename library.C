@@ -30,6 +30,7 @@
 #include "filepos.h"
 #include <map>
 #include <sstream>
+#include <boost/shared_ptr.hpp>
 
 struct Library::Implementation
 {
@@ -38,7 +39,7 @@ struct Library::Implementation
   symbol description;
 
   // Types.
-  typedef auto_map<symbol, FrameModel*> frame_map;
+  typedef std::map<symbol, boost::shared_ptr<FrameModel>/**/> frame_map;
   typedef std::map<symbol, std::set<symbol>/**/> ancestor_map;
 
   // Data (remember to update Library::clone if you change this).
@@ -120,7 +121,7 @@ Library::Implementation::add_model (const symbol key, FrameModel& frame)
   if (frame.type_name () != key)
     daisy_panic ("Adding frame named " + frame.type_name () + " under the name "
                  + key + ", type " + typeid (frame).name ());
-  frames[key] = &frame;
+  frames[key].reset (&frame);
   add_ancestors (key);
 }
 
@@ -139,7 +140,6 @@ void
 Library::Implementation::remove (const symbol key)
 { 
   const frame_map::iterator i = frames.find (key);
-  delete (*i).second;
   frames.erase (i); 
 }
 
@@ -324,15 +324,7 @@ Library::clone () const
 { 
   Library *const lib = new Library (impl->name.name ().c_str ());
   lib->set_description (impl->description);
-  for (Implementation::frame_map::const_iterator i = impl->frames.begin ();
-       i != impl->frames.end ();
-       i++)
-#if 1
-    lib->impl->frames[(*i).first] = new FrameModel (*(*i).second, 
-                                                    FrameModel::parent_link);
-#else
-    lib->impl->frames[(*i).first] = &(*i).second->clone ();
-#endif
+  lib->impl->frames = impl->frames;
   lib->impl->doc_funs = impl->doc_funs;
   lib->impl->ancestors = impl->ancestors;
   return lib;
