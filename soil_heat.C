@@ -659,33 +659,33 @@ SoilHeat::check (const size_t n, Treelog& err) const
 
 static void
 load_T (Frame& frame)
-{ Geometry::add_layer (frame, "dg C", Value::Const, "Soil temperature."); }
+{ Geometry::add_layer (frame, "dg C", Attribute::Const, "Soil temperature."); }
 
 void
 SoilHeat::load_syntax (Frame& frame)
 { 
-  Geometry::add_layer (frame, Value::OptionalState, "T", load_T);
-  frame.declare ("S", "erg/cm^3/h", Value::OptionalState, 
+  Geometry::add_layer (frame, Attribute::OptionalState, "T", load_T);
+  frame.declare ("S", "erg/cm^3/h", Attribute::OptionalState, 
               "External heat source, by default zero.");
-  frame.declare ("conductivity", "erg/cm/dg C/h", Value::LogOnly, 
+  frame.declare ("conductivity", "erg/cm/dg C/h", Attribute::LogOnly, 
               "Heat conductivity.");
-  frame.declare ("capacity", "erg/cm^3/dg C", Value::LogOnly, 
+  frame.declare ("capacity", "erg/cm^3/dg C", Attribute::LogOnly, 
               "Heat capacity.");
-  frame.declare ("h_frozen", "cm^-1", Value::Const,
+  frame.declare ("h_frozen", "cm^-1", Attribute::Const,
               "Pressure below which no more water will freeze.");
   frame.set ("h_frozen", -15000.0);
-  frame.declare_boolean ("enable_ice", Value::Const,
+  frame.declare_boolean ("enable_ice", Attribute::Const,
               "Disable this to prevent water from freezing.");
   frame.set ("enable_ice", false);
-  frame.declare ("T_top", "dg C", Value::OptionalState, 
+  frame.declare ("T_top", "dg C", Attribute::OptionalState, 
               "Surface temperature at previous time step.");
-  frame.declare ("T_freezing", "dg C", Value::LogOnly, Value::SoilCells,
+  frame.declare ("T_freezing", "dg C", Attribute::LogOnly, Attribute::SoilCells,
               "Freezing point depression for freezing.");
-  frame.declare ("T_thawing", "dg C", Value::LogOnly, Value::SoilCells,
+  frame.declare ("T_thawing", "dg C", Attribute::LogOnly, Attribute::SoilCells,
               "Freezing point depression for thawing.");
-  frame.declare ("q", "erg/cm^2/h", Value::LogOnly, Value::SoilEdges,
+  frame.declare ("q", "erg/cm^2/h", Attribute::LogOnly, Attribute::SoilEdges,
               "Heat flux.");
-  frame.declare ("state", Value::Unknown (), Value::LogOnly, Value::SoilCells,
+  frame.declare ("state", Attribute::Unknown (), Attribute::LogOnly, Attribute::SoilCells,
               "Current freezing/melting state.");
 }
 

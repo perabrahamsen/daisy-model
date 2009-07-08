@@ -119,7 +119,7 @@ Select an external scope, and perform action.")
   void load_frame (Frame& frame) const
   {
     frame.declare_object ("scope", Scopesel::component, 
-                       Value::Const, Value::Singleton, "\
+                       Attribute::Const, Attribute::Singleton, "\
 Scope to evaluate expessions in.");
     frame.declare_object ("action", Action::component, 
                        "Action to perform if the condition is false.");
@@ -317,30 +317,30 @@ surface.")
     Model::load_model (frame);
     frame.add_check (check_alist);	
     frame.declare_object ("scope", Scopesel::component, 
-                       Value::Const, Value::Singleton, "\
+                       Attribute::Const, Attribute::Singleton, "\
 Scope to evaluate expessions in.");
     frame.set ("scope", "null");
 
     frame.declare_object ("surface", Number::component, 
-		       Value::Const, Value::Singleton, 
+		       Attribute::Const, Attribute::Singleton, 
 "Amount of surface irrigation applied.");
     frame.declare_object ("overhead", Number::component, 
-		       Value::Const, Value::Singleton, 
+		       Attribute::Const, Attribute::Singleton, 
 "Amount of overhead irrigation applied.");
     frame.declare_object ("subsoil", Number::component, 
-		       Value::Const, Value::Singleton, 
+		       Attribute::Const, Attribute::Singleton, 
 "Amount of subsoil irrigation applied.");
     frame.declare_object ("NO3", Number::component, 
-		       Value::Const, Value::Singleton, 
+		       Attribute::Const, Attribute::Singleton, 
 "Amount of NO3 in irrigation.");
     frame.declare_object ("NH4", Number::component, 
-		       Value::Const, Value::Singleton, 
+		       Attribute::Const, Attribute::Singleton, 
 "Amount of NH4 in irrigation.");
 
-    frame.declare ("from", "cm", Check::non_positive (), Value::Const, "\
+    frame.declare ("from", "cm", Check::non_positive (), Attribute::Const, "\
 Height where you want to start the incorporation (a negative number).");
     frame.set ("from", 0.0);
-    frame.declare ("to", "cm", Check::negative (), Value::Const, "\
+    frame.declare ("to", "cm", Check::negative (), Attribute::Const, "\
 Height where you want to end the incorporation (a negative number).");
     frame.set ("from", -10.0);
   }

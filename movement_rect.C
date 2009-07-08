@@ -120,9 +120,9 @@ struct MovementRect::Point
   const double x;
   static void load_syntax (Frame& frame)
   {
-    frame.declare ("z", "cm", Check::negative (), Value::Const, 
+    frame.declare ("z", "cm", Check::negative (), Attribute::Const, 
 		"Vertical position.");
-    frame.declare ("x", "cm", Check::positive (), Value::Const,
+    frame.declare ("x", "cm", Check::positive (), Attribute::Const,
 		"Horizontal position.");
     frame.order ("z", "x");
   }
@@ -335,21 +335,21 @@ static struct MovementRectSyntax : DeclareModel
   {
     frame.set_strings ("matrix_solute", "Mollerup", "convection", "none");
     frame.set ("Tertiary", "none");
-    frame.declare_submodule ("Geometry", Value::Const,
+    frame.declare_submodule ("Geometry", Attribute::Const,
                           "Discretization of the soil.",
                           GeometryRect::load_syntax);
-    frame.declare_submodule_sequence ("drain", Value::Const,
+    frame.declare_submodule_sequence ("drain", Attribute::Const,
 				   "Location of cells with drain pipes.",
 				   MovementRect::Point::load_syntax);
     frame.set_empty ("drain");
     frame.declare_object ("matrix_water", UZRect::component, 
-                       Value::Const, Value::Variable,
+                       Attribute::Const, Attribute::Variable,
                        "Matrix water transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends.");
     frame.set_strings ("matrix_water", "Mollerup", "v+h", "const");
     frame.declare_object ("heat", Heatrect::component, 
-                       Value::Const, Value::Singleton, "\
+                       Attribute::Const, Attribute::Singleton, "\
 Heat transport model.");
     frame.set ("heat", "Mollerup");
 

@@ -965,7 +965,7 @@ static struct ColumnStandardSyntax : public DeclareModel
   {
     SoilWater::load_syntax (frame);
     frame.declare_object ("macro", Macro::component,
-                          Value::OptionalState, Value::Singleton,
+                          Attribute::OptionalState, Attribute::Singleton,
                           "Preferential flow model.\n\
 By default, preferential flow is enabled if and only if the combined\n\
 amount of humus and clay in the top horizon is above 5%.");
@@ -975,89 +975,89 @@ amount of humus and clay in the top horizon is above 5%.");
   void load_frame (Frame& frame) const
   { 
     frame.declare_object ("scope", Scopesel::component, 
-                          Value::Const, Value::Singleton, "\
+                          Attribute::Const, Attribute::Singleton, "\
 Scope to evaluate expessions in.");
     frame.set ("scope", "null");
-    frame.declare_submodule ("Soil", Value::State,
+    frame.declare_submodule ("Soil", Attribute::State,
                              "The numeric and physical soil properties.",
                              Soil::load_syntax);
-    frame.declare_submodule ("SoilWater", Value::State,
+    frame.declare_submodule ("SoilWater", Attribute::State,
                              "Soil water content and transportation.",
                              SoilWater::load_syntax);
-    frame.declare_submodule ("SoilHeat", Value::State,
+    frame.declare_submodule ("SoilHeat", Attribute::State,
                              "Soil heat capacity and transportation.",
                              SoilHeat::load_syntax);
     frame.declare_object ("Movement", Movement::component,
-                          Value::State, Value::Singleton, "\
+                          Attribute::State, Attribute::Singleton, "\
 Discretization and movement of water, heat and solutes in the soil.");
     frame.set ("Movement", "vertical");
     frame.declare_object ("weather", Weather::component,
-                          Value::OptionalState, Value::Singleton,
+                          Attribute::OptionalState, Attribute::Singleton,
                           "Weather model for providing climate information during\n\
 the simulation.  If unspecified, used global weather.");
     frame.declare_object ("Vegetation", Vegetation::component,
-                          Value::State, Value::Singleton,
+                          Attribute::State, Attribute::Singleton,
                           "The crops on the field.");
     frame.set ("Vegetation", "crops");
 
     frame.declare_object ("Bioclimate", Bioclimate::component, 
-                          Value::State, Value::Singleton,
+                          Attribute::State, Attribute::Singleton,
                           "The water and energy distribution among the crops.");
     frame.set ("Bioclimate", "default");
-    frame.declare_submodule ("Surface", Value::State,
+    frame.declare_submodule ("Surface", Attribute::State,
                              "The upper border of the soil.",
                              Surface::load_syntax);
     frame.declare_object ("Groundwater", Groundwater::component,
                           "The groundwater level.");
     frame.declare_object ("Chemistry", Chemistry::component, 
-                          Value::State, Value::Singleton,
+                          Attribute::State, Attribute::Singleton,
                           "Chemical compounds in the system.");
     frame.set ("Chemistry", "nutrient");
-    frame.declare ("harvest_DM", "g/m^2/h", Value::LogOnly, 
+    frame.declare ("harvest_DM", "g/m^2/h", Attribute::LogOnly, 
                    "Amount of DM removed by harvest this hour.");
-    frame.declare ("harvest_N", "g/m^2/h", Value::LogOnly, 
+    frame.declare ("harvest_N", "g/m^2/h", Attribute::LogOnly, 
                    "Amount of nitrogen removed by harvest this hour.");
-    frame.declare ("harvest_C", "g/m^2/h", Value::LogOnly, 
+    frame.declare ("harvest_C", "g/m^2/h", Attribute::LogOnly, 
                    "Amount of carbon removed by harvest this hour.");
-    frame.declare ("residuals_DM", "g/m^2/h", Value::LogOnly, "\
+    frame.declare ("residuals_DM", "g/m^2/h", Attribute::LogOnly, "\
 Amount of dry matter removed from crops to surface and soil this hour.\n\
 This includes loss as harvest, as well as loss of old leaves and roots.");
-    frame.declare ("residuals_N_top", "g/m^2/h", Value::LogOnly, 
+    frame.declare ("residuals_N_top", "g/m^2/h", Attribute::LogOnly, 
                    "Amount of nitrogen removed from crops to soil this hour.\n\
 This includes loss as harvest, as well as loss of old leaves.");
-    frame.declare ("residuals_C_top", "g/m^2/h", Value::LogOnly, 
+    frame.declare ("residuals_C_top", "g/m^2/h", Attribute::LogOnly, 
                    "Amount of carbon removed from crops to surface this hour.\n\
 This includes loss as harvest, as well as loss of old leaves.");
-    frame.declare ("residuals_N_soil", "g/cm^3/h", Value::LogOnly, Value::SoilCells, 
+    frame.declare ("residuals_N_soil", "g/cm^3/h", Attribute::LogOnly, Attribute::SoilCells, 
                    "Amount of nitrogen removed from crops in soil this hour.\n\
 This includes loss as harvest, as well as loss of old roots.");
-    frame.declare ("residuals_C_soil", "g/cm^3/h", Value::LogOnly, Value::SoilCells, 
+    frame.declare ("residuals_C_soil", "g/cm^3/h", Attribute::LogOnly, Attribute::SoilCells, 
                    "Amount of carbon removed from crops in soil this hour.\n\
 This includes loss as harvest, as well as loss of old roots.");
-    frame.declare ("residuals_N_root", "g/m^2/h", Value::LogOnly, 
+    frame.declare ("residuals_N_root", "g/m^2/h", Attribute::LogOnly, 
                    "Amount of nitrogen removed from crops to soil this hour.\n\
 This includes loss as harvest, as well as loss of old roots.");
-    frame.declare ("residuals_C_root", "g/m^2/h", Value::LogOnly, 
+    frame.declare ("residuals_C_root", "g/m^2/h", Attribute::LogOnly, 
                    "Amount of carbon removed from crops to surface this hour.\n\
 This includes loss as harvest, as well as loss of old roots.");
-    frame.declare ("surface_water", "mm", Value::LogOnly, 
+    frame.declare ("surface_water", "mm", Attribute::LogOnly, 
                    "Amount of water in the system above ground.\n\
 This include ponded water, intercepted water and the snow pack.");
     frame.declare_object ("OrganicMatter", OrganicMatter::component,
-                          Value::State, Value::Singleton, "\
+                          Attribute::State, Attribute::Singleton, "\
 The organic matter in the soil and on the surface.");
     frame.set ("OrganicMatter", "default");
-    frame.declare ("second_year_utilization", "kg N/ha", Value::State,
+    frame.declare ("second_year_utilization", "kg N/ha", Attribute::State,
                    "Estimated accumulated second year fertilizer effect.");
     frame.set ("second_year_utilization", 0.0);
-    frame.declare ("seed_N", "kg N/ha/h", Value::LogOnly,
+    frame.declare ("seed_N", "kg N/ha/h", Attribute::LogOnly,
                    "Amount of nitrogen in seed applied this time step.");
-    frame.declare ("seed_C", "kg C/ha/h", Value::LogOnly,
+    frame.declare ("seed_C", "kg C/ha/h", Attribute::LogOnly,
                    "Amount of carbon in seed applied this time step.");
-    frame.declare ("applied_DM", "ton DM/ha/h", Value::LogOnly,
+    frame.declare ("applied_DM", "ton DM/ha/h", Attribute::LogOnly,
                    "Amount of dry matter applied this time step.\n\
 This includes dry matter incorporated directly in the soil.");
-    frame.declare ("first_year_utilization", "kg N/ha/h", Value::LogOnly,
+    frame.declare ("first_year_utilization", "kg N/ha/h", Attribute::LogOnly,
                    "Estimated first year fertilizer effect.");
   }
     

@@ -242,7 +242,7 @@ IM::~IM ()
 
 void
 IM::add_syntax (Frame& frame,
-		Value::category cat, 
+		Attribute::category cat, 
 		const symbol dimension)
 {
   frame.declare_string ("name", cat, "Name of chemical.");

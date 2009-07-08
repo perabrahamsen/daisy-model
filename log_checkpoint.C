@@ -151,7 +151,7 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
 
       // Open log file.
       PrinterFile printer (metalib (), out);
-      if (description != Value::None ())
+      if (description != Attribute::None ())
         printer.print_comment (description);
 
       // Print "directory" and "path" before inputs.
@@ -247,7 +247,7 @@ hot start.")
   void load_frame (Frame& frame) const
   { 
     Model::load_model (frame);
-    frame.declare_string ("where", Value::Const,
+    frame.declare_string ("where", Attribute::Const,
                 "File name prefix for the generated checkpoint.\n\
 The time will be appended, together with the '.dai' suffix.");
     frame.set ("where", "checkpoint");

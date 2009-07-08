@@ -129,31 +129,31 @@ static struct MV_SoilSyntax : DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("z_o", "mm", Check::positive (), Value::Const,
+    frame.declare ("z_o", "mm", Check::positive (), Attribute::Const,
                 "Depth of top soil.");
-    frame.declare ("z_xJ", "mm", Check::positive (), Value::Const,
+    frame.declare ("z_xJ", "mm", Check::positive (), Attribute::Const,
                 "Max rooting depth.");
-    frame.declare ("Theta_fo", Value::Fraction (), Check::positive (), 
-                Value::Const, "Field capacity, topsoil.");
-    frame.declare ("Theta_wo", Value::Fraction (), Check::positive (), 
-                Value::Const,
+    frame.declare ("Theta_fo", Attribute::Fraction (), Check::positive (), 
+                Attribute::Const, "Field capacity, topsoil.");
+    frame.declare ("Theta_wo", Attribute::Fraction (), Check::positive (), 
+                Attribute::Const,
                 "Wielding point, topsoil.");
-    frame.declare ("Theta_fu", Value::Fraction (), Check::positive (), 
-                Value::Const,
+    frame.declare ("Theta_fu", Attribute::Fraction (), Check::positive (), 
+                Attribute::Const,
                 "Field capacity, subsoil.");
-    frame.declare ("Theta_wu", Value::Fraction (), Check::positive (), 
-                Value::Const,
+    frame.declare ("Theta_wu", Attribute::Fraction (), Check::positive (), 
+                Attribute::Const,
                 "Wielting point, subsoil.");
-    frame.declare ("C_e", "mm", Check::non_negative (), Value::Const,
+    frame.declare ("C_e", "mm", Check::non_negative (), Attribute::Const,
                 "Capacity of evaporation reservoir.");
-    frame.declare ("c_e", Value::Fraction (), Check::non_negative (), 
-                Value::Const,
+    frame.declare ("c_e", Attribute::Fraction (), Check::non_negative (), 
+                Attribute::Const,
                 "Basic evaporation factor.");
-    frame.declare ("c_T", "mm", Value::Const,
+    frame.declare ("c_T", "mm", Attribute::Const,
                 "Transpiration constant.");
-    frame.declare ("k_qr", Value::None (), Value::Const,
+    frame.declare ("k_qr", Attribute::None (), Attribute::Const,
                 "Drainage constant root zone.");
-    frame.declare ("k_qb", Value::None (), Value::Const,
+    frame.declare ("k_qb", Attribute::None (), Attribute::Const,
                 "Drainage constant subsone.");
   }
 } MV_Soil_syntax;
@@ -312,40 +312,40 @@ Standard MARKVAND crop model.")
   {
     frame.add_check (check_alist);
     frame.declare ("S_F", "dg C d", Check::non_negative (), 
-                   Value::Const, Value::Variable,
+                   Attribute::Const, Attribute::Variable,
                    "Temperature sum for each phase.");
     frame.set_check ("S_F", VCheck::min_size_1 ());
-    frame.declare ("A_F", Value::Fraction (), Value::Const, Value::Variable,
+    frame.declare ("A_F", Attribute::Fraction (), Attribute::Const, Attribute::Variable,
                 "Allowable water deficit for each phase before irrigation.");
     frame.set_check ("A_F", VCheck::min_size_1 ());
-    frame.declare ("L_gv", Value::None (), Check::non_negative (), Value::Const,
+    frame.declare ("L_gv", Attribute::None (), Check::non_negative (), Attribute::Const,
                 "Green leaf area index at emergence / growth start.");
-    frame.declare ("L_ge", Value::None (), Check::non_negative (),
-                Value::Const, "\
+    frame.declare ("L_ge", Attribute::None (), Check::non_negative (),
+                Attribute::Const, "\
 Green leaf area index at the time where growth rate become exponential.");
-    frame.declare ("L_gx", Value::None (), Check::non_negative (), Value::Const,
+    frame.declare ("L_gx", Attribute::None (), Check::non_negative (), Attribute::Const,
                 "Maximum green leaf area index.");
-    frame.declare ("L_gm", Value::None (), Check::non_negative (), Value::Const,
+    frame.declare ("L_gm", Attribute::None (), Check::non_negative (), Attribute::Const,
                 "Green leaf area index at maturity.");
-    frame.declare ("L_ym", Value::None (), Check::non_negative (), Value::Const,
+    frame.declare ("L_ym", Attribute::None (), Check::non_negative (), Attribute::Const,
                 "Yellow leaf area index at maturity.");
-    frame.declare ("S_Le", "dg C d", Check::non_negative (), Value::Const,
+    frame.declare ("S_Le", "dg C d", Check::non_negative (), Attribute::Const,
                 "Temperature sum when green LAI growth turn exponential.");
-    frame.declare ("S_Lx", "dg C d", Check::non_negative (), Value::Const,
+    frame.declare ("S_Lx", "dg C d", Check::non_negative (), Attribute::Const,
                 "Temperature sum maximum green LAI.");
-    frame.declare ("S_Lr", "dg C d", Check::non_negative (), Value::Const,
+    frame.declare ("S_Lr", "dg C d", Check::non_negative (), Attribute::Const,
                 "Temperature sum for start of yellow leaves.");
-    frame.declare ("S_Lm", "dg C d", Check::non_negative (), Value::Const,
+    frame.declare ("S_Lm", "dg C d", Check::non_negative (), Attribute::Const,
                 "Temperature sum at maturity.");
-    frame.declare ("z_0", "mm", Check::non_negative (), Value::Const,
+    frame.declare ("z_0", "mm", Check::non_negative (), Attribute::Const,
                 "Root depth before emergence (growth start).");
-    frame.declare ("z_v", "mm", Check::non_negative (), Value::Const,
+    frame.declare ("z_v", "mm", Check::non_negative (), Attribute::Const,
                 "Root depth at emergence (growth start).");
-    frame.declare ("z_xA", "mm", Check::non_negative (), Value::Const,
+    frame.declare ("z_xA", "mm", Check::non_negative (), Attribute::Const,
                 "Maximum root depth for this crop.");
-    frame.declare ("z_m", "mm", Check::non_negative (), Value::Const,
+    frame.declare ("z_m", "mm", Check::non_negative (), Attribute::Const,
                 "Root depth at maturity.");
-    frame.declare ("c_r", "mm/d", Check::non_negative (), Value::Const,
+    frame.declare ("c_r", "mm/d", Check::non_negative (), Attribute::Const,
                 "Root penetration rate.");
   }
 } MV_Crop_syntax;
@@ -395,10 +395,10 @@ struct ActionMarkvand : public Action
 void 
 ActionMarkvand::crop_map_t::load_syntax (Frame& frame)
 { 
-  frame.declare_string ("Daisy", Value::Const, 
+  frame.declare_string ("Daisy", Attribute::Const, 
 	      "Name of Daisy crop.");
   frame.declare_object ("MARKVAND", MV_Crop::component, 
-                     Value::Const, Value::Singleton,
+                     Attribute::Const, Attribute::Singleton,
                      "MARKVAND crop description.");
   frame.order ("Daisy", "MARKVAND");
 }
@@ -686,35 +686,35 @@ Irrigate the field according to MARKVAND scheduling.")
   void load_frame (Frame& frame) const
   { 
     frame.add_check (check_alist);	
-    frame.declare_object ("soil", MV_Soil::component, Value::Const, 
-                       Value::Singleton,
+    frame.declare_object ("soil", MV_Soil::component, Attribute::Const, 
+                       Attribute::Singleton,
                        "Soil type to schedule irrigation on.");
-    frame.declare_submodule_sequence ("map", Value::Const, "\
+    frame.declare_submodule_sequence ("map", Attribute::Const, "\
 Map of Daisy crop names into MARKVAND crop descriptions.",
 				   &ActionMarkvand::crop_map_t::load_syntax);
-    frame.declare ("T_sum", "dg C d", Value::OptionalState, 
+    frame.declare ("T_sum", "dg C d", Attribute::OptionalState, 
                 "Temperature sum since emergence.");
-    frame.declare ("dt", "d", Value::OptionalState, 
+    frame.declare ("dt", "d", Attribute::OptionalState, 
                 "Days since emergence.");
-    frame.declare ("V_I", "mm", Value::OptionalState, 
+    frame.declare ("V_I", "mm", Attribute::OptionalState, 
                 "Amount of water intercepter by leaves.");
     frame.set ("V_I", 0.0);
-    frame.declare ("V_r", "mm", Value::OptionalState, 
+    frame.declare ("V_r", "mm", Attribute::OptionalState, 
                 "Amount of available water in root zone.\n\
 By default, the reservoir will be full at plant emergence.");
-    frame.declare ("V_e", "mm", Value::OptionalState, 
+    frame.declare ("V_e", "mm", Attribute::OptionalState, 
                 "Amount of available water in top soil reservoir.\n\
 This is the water that can be extracted by soil evaporation.\n\
 Included in 'V_r'.\n\
 By default, the reservoir will be full at plant emergence.");
-    frame.declare ("C_u", "mm", Value::OptionalState, 
+    frame.declare ("C_u", "mm", Attribute::OptionalState, 
                 "Capacity of available water in upper root zone.");
     frame.set ("C_u", 0.0);
-    frame.declare ("V_u", "mm", Value::OptionalState, 
+    frame.declare ("V_u", "mm", Attribute::OptionalState, 
                 "Amount of available water in upper root zone.\n\
 Included in 'V_r'.");
     frame.set ("V_u", 0.0);
-    frame.declare ("V_b", "mm", Value::OptionalState, 
+    frame.declare ("V_b", "mm", Attribute::OptionalState, 
                 "Amount of water between current and max root depth.\n\
 By default, the reservoir will be full at plant emergence.");
   }

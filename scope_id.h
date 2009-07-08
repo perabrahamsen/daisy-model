@@ -35,7 +35,7 @@ class ScopeID : public WScope
   // Scope interface.
 public:
   void entries (std::set<symbol>&) const;
-  Value::type lookup (symbol) const;
+  Attribute::type lookup (symbol) const;
   bool check (symbol) const;
   double number (symbol) const;
   symbol dimension (symbol) const;

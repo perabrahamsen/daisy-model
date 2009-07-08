@@ -25,7 +25,7 @@
 #define IMVEC_H
 
 #include "symbol.h"
-#include "value.h"
+#include "attribute.h"
 #include <map>
 #include <vector>
 #include <boost/noncopyable.hpp>
@@ -82,7 +82,7 @@ public:
   // Create and Destroy. 
 public:
   static void add_syntax (Frame& parent,
-			  Value::category cat, 
+			  Attribute::category cat, 
 			  const symbol dimension);
   explicit IMvec (Block&, const char*);
   ~IMvec ();

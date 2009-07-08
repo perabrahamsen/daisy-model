@@ -67,7 +67,7 @@ BD_convert::set_bulk (const Geometry& geo,
 BD_convert::BD_convert (const Units& units, const symbol has, const symbol want,
                         const symbol bulk_unit)
   : in (units.get_convertion (has, bulk_unit)),
-    out (units.get_convertion (Value::Fraction (), want)),
+    out (units.get_convertion (Attribute::Fraction (), want)),
     bulk (-42.42e42)
 { }
 

@@ -192,12 +192,12 @@ By default, data from dwf and dlf files will be\n\
 drawn with lines, and data from ddf files will be drawn with points.", "\
 By default the name of the 'x' and 'y' objects.");
     frame.declare_object ("x", Number::component, 
-                       Value::Const, Value::Singleton, "\
+                       Attribute::Const, Attribute::Singleton, "\
 Expression for calculating the x value for this source for each row.\n\
 The expression can refer to the value in a specific column by the tag\n\
 for that column.");
     frame.declare_object ("y", Number::component, 
-                       Value::Const, Value::Singleton, "\
+                       Attribute::Const, Attribute::Singleton, "\
 Expression for calculating the y value for this source for each row.\n\
 The expression can refer to the value in a specific column by the tag\n\
 for that column.");

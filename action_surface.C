@@ -66,7 +66,7 @@ Set amount of ponding the surface can retain.")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.declare ("height", "cm", Check::non_negative (), Value::Const,
+    frame.declare ("height", "cm", Check::non_negative (), Attribute::Const,
 		"Max ponding height before runoff.");
     frame.order ("height");
   }

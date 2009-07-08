@@ -23,7 +23,7 @@
 #define BUILD_DLL
 
 #include "filepos.h"
-#include "value.h"
+#include "attribute.h"
 
 symbol
 Filepos::filename () const
@@ -67,7 +67,7 @@ Filepos::Filepos (const symbol f, int l, int c)
 { }
   
 Filepos::Filepos ()
-  : file_ (Value::None ()),
+  : file_ (Attribute::None ()),
     line_ (-42),
     column_ (-42)
 { }

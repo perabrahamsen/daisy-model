@@ -33,9 +33,9 @@ void
 ScopeID::entries (std::set<symbol>& all) const
 { all.insert (tag); }
 
-Value::type 
+Attribute::type 
 ScopeID::lookup (const symbol name) const
-{ return (name == tag) ? Value::Number : Value::Error; }
+{ return (name == tag) ? Attribute::Number : Attribute::Error; }
 
 bool 
 ScopeID::check (const symbol name) const
@@ -93,9 +93,9 @@ static struct ScopeIDSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.declare_string ("name", Value::Const, 
+    frame.declare_string ("name", Attribute::Const, 
                 "Identifier name.");
-    frame.declare ("value", Value::User (), Value::Const, 
+    frame.declare ("value", Attribute::User (), Attribute::Const, 
                 "Initial value and dimension.");
   }
 } ScopeID_syntax;

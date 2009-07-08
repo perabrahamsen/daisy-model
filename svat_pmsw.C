@@ -1889,200 +1889,200 @@ static struct SVAT_PMSWSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("netrad_brunt", "W/m^2", Value::LogOnly,
+    frame.declare ("netrad_brunt", "W/m^2", Attribute::LogOnly,
                 "Net radiation by Brunt");
-    frame.declare ("netlong_brunt", "W/m^2", Value::LogOnly,
+    frame.declare ("netlong_brunt", "W/m^2", Attribute::LogOnly,
                 "Net long radiation by Brunt");
-    frame.declare ("r_a", "s/m", Value::LogOnly,
+    frame.declare ("r_a", "s/m", Attribute::LogOnly,
                 "bulk aerodynamic resistance, neutral conditions");
-    frame.declare ("r_astab", "s/m", Value::LogOnly,
+    frame.declare ("r_astab", "s/m", Attribute::LogOnly,
                 "bulk aerodynamic resistance, stability corrected");
-    frame.declare ("r_aa", "s/m", Value::LogOnly,
+    frame.declare ("r_aa", "s/m", Attribute::LogOnly,
                 "aerodynamic resistance mean source-ref, uncorrected");
-    frame.declare ("r_aastab1", "s/m", Value::LogOnly,
+    frame.declare ("r_aastab1", "s/m", Attribute::LogOnly,
                 "aerodynamic resistance mean source-ref, corrected 'method 1'");
-    frame.declare ("r_aastab2", "s/m", Value::LogOnly,
+    frame.declare ("r_aastab2", "s/m", Attribute::LogOnly,
                 "aerodynamic resistance mean source-ref, corrected,'method 2'");
-    frame.declare ("r_as", "s/m", Value::LogOnly,
+    frame.declare ("r_as", "s/m", Attribute::LogOnly,
                 "aerodynamic resistance from soil to mean source");
-    frame.declare ("r_ac", "s/m", Value::LogOnly,
+    frame.declare ("r_ac", "s/m", Attribute::LogOnly,
                 "aerodynamic resistance from leaf to mean source");
-    frame.declare ("r_sc_1", "s/m", Value::LogOnly,
+    frame.declare ("r_sc_1", "s/m", Attribute::LogOnly,
                 "Bulk canopy resistance (Noilhan et al., 1991)");
-    frame.declare ("r_sc_2", "s/m", Value::LogOnly,
+    frame.declare ("r_sc_2", "s/m", Attribute::LogOnly,
                 "Bulk canopy resistance (Verma et al., 1993)");
-    frame.declare ("tskin", "dg C", Value::LogOnly,
+    frame.declare ("tskin", "dg C", Attribute::LogOnly,
                 "soil/skin temperature");
-    frame.declare ("tcan", "dg C", Value::LogOnly,
+    frame.declare ("tcan", "dg C", Attribute::LogOnly,
                 "canopy temperature at mean source");
-    frame.declare ("tleaf", "dg C", Value::LogOnly,
+    frame.declare ("tleaf", "dg C", Attribute::LogOnly,
                 "Leaf temperature");
-    frame.declare ("e_c_abs", "Pa", Value::LogOnly,
+    frame.declare ("e_c_abs", "Pa", Attribute::LogOnly,
                 "vapor pressure at mean source height");
-    frame.declare ("e_sl_abs", "Pa", Value::LogOnly,
+    frame.declare ("e_sl_abs", "Pa", Attribute::LogOnly,
                 "saturated vapor pressure at leaf surface");
-    frame.declare ("ha", "W/m^2", Value::LogOnly,
+    frame.declare ("ha", "W/m^2", Attribute::LogOnly,
                 "Sensible heat flux from source- to screen height");
-    frame.declare ("hl", "W/m^2", Value::LogOnly,
+    frame.declare ("hl", "W/m^2", Attribute::LogOnly,
                 "Sensible heat flux from leaf to mean source");
-    frame.declare ("hs", "W/m^2", Value::LogOnly,
+    frame.declare ("hs", "W/m^2", Attribute::LogOnly,
                 "Sensible heat flux from soil to mean source");
-    frame.declare ("lea", "W/m^2", Value::LogOnly,
+    frame.declare ("lea", "W/m^2", Attribute::LogOnly,
                 "Latent heat flux from source- to screen height");
-    frame.declare ("lel", "W/m^2", Value::LogOnly,
+    frame.declare ("lel", "W/m^2", Attribute::LogOnly,
                 "Latent heat flux from leaf to mean source");
-    frame.declare ("gflux", "W/m^2", Value::LogOnly,
+    frame.declare ("gflux", "W/m^2", Attribute::LogOnly,
                 "Ground heat flux");
-    frame.declare ("dtcta", "dg C", Value::LogOnly,
+    frame.declare ("dtcta", "dg C", Attribute::LogOnly,
                 "Temperature gradient between mean source og screen height");
-    frame.declare ("dtltc", "dg C", Value::LogOnly,
+    frame.declare ("dtltc", "dg C", Attribute::LogOnly,
                 "Temperature gradient between leaf and mean source");
-    frame.declare ("dtstc", "dg C", Value::LogOnly,
+    frame.declare ("dtstc", "dg C", Attribute::LogOnly,
                 "Temperature gradient between soil and mean source");
-    frame.declare ("dtcta_star", "dg C", Value::LogOnly,
+    frame.declare ("dtcta_star", "dg C", Attribute::LogOnly,
                 "corrected temp gradient between mean source og screen height");
-    frame.declare ("dtltc_star", "dg C", Value::LogOnly,
+    frame.declare ("dtltc_star", "dg C", Attribute::LogOnly,
                 "corrected temperature gradient between leaf and mean source");
-    frame.declare ("dtstc_star", "dg C", Value::LogOnly,
+    frame.declare ("dtstc_star", "dg C", Attribute::LogOnly,
                 "corrected temperature gradient between soil and mean source");
-    frame.declare ("theta_0_20", "cm^3/cm^3", Value::LogOnly,
+    frame.declare ("theta_0_20", "cm^3/cm^3", Attribute::LogOnly,
                 "Averaged soil water content in upper 20 cm");
-    frame.declare ("f_1", Value::None (), Value::LogOnly,
+    frame.declare ("f_1", Attribute::None (), Attribute::LogOnly,
                 "Constraint function (Noilhan) related to solar radiation");
-    frame.declare ("f1_dolman", Value::None (), Value::LogOnly,
+    frame.declare ("f1_dolman", Attribute::None (), Attribute::LogOnly,
                 "???");
-    frame.declare ("f_2", Value::None (), Value::LogOnly,
+    frame.declare ("f_2", Attribute::None (), Attribute::LogOnly,
                 "Constraint function (Noilhan) related to vapor pressure");
-    frame.declare ("f_3", Value::None (), Value::LogOnly,
+    frame.declare ("f_3", Attribute::None (), Attribute::LogOnly,
                 "Constraint function (Noilhan) related to air temperature");
-    frame.declare ("f_4", Value::None (), Value::LogOnly,
+    frame.declare ("f_4", Attribute::None (), Attribute::LogOnly,
                 "Constraint function (Noilhan) related to soil water content");
-    frame.declare ("f_temp", Value::None (), Value::LogOnly,
+    frame.declare ("f_temp", Attribute::None (), Attribute::LogOnly,
                 "Constraint function (Verma) related to air temperature");
-    frame.declare ("f_def", Value::None (), Value::LogOnly,
+    frame.declare ("f_def", Attribute::None (), Attribute::LogOnly,
                 "Constraint function (Verma) related to vapor pressure");
-    frame.declare ("f_theta", Value::None (), Value::LogOnly,
+    frame.declare ("f_theta", Attribute::None (), Attribute::LogOnly,
                 "Constraint function (Steward) related to soil water content");
-    frame.declare ("f_etep", Value::None (), Value::LogOnly,
+    frame.declare ("f_etep", Attribute::None (), Attribute::LogOnly,
                 "Constraint function defined by crop_ea/crop_ep");
-    frame.declare ("r_sc_js", "s/m", Value::LogOnly,
+    frame.declare ("r_sc_js", "s/m", Attribute::LogOnly,
                 "Bulk canopy resistance: f1_dolman*f_def*f3*f4");
-    frame.declare ("r_sc", "s/m", Value::LogOnly,
+    frame.declare ("r_sc", "s/m", Attribute::LogOnly,
                 "Bulk canopy resistance: f1_dolman*f_def*f3*f_etep");
-    frame.declare ("rcmin_star", "s/m", Value::LogOnly,
+    frame.declare ("rcmin_star", "s/m", Attribute::LogOnly,
                 "minimum canopy resistance");
-    frame.declare ("pstress", Value::None (), Value::LogOnly,
+    frame.declare ("pstress", Attribute::None (), Attribute::LogOnly,
                 "crop production stress");
-    frame.declare ("ustar_raa", Value::None (), Value::LogOnly,
+    frame.declare ("ustar_raa", Attribute::None (), Attribute::LogOnly,
                 "friction velocity from RAA()");
-    frame.declare ("ustar_raastab1", Value::None (), Value::LogOnly,
+    frame.declare ("ustar_raastab1", Attribute::None (), Attribute::LogOnly,
                 "friction velocity from RAASTAB1()");
-    frame.declare ("ustar_raastab2", Value::None (), Value::LogOnly,
+    frame.declare ("ustar_raastab2", Attribute::None (), Attribute::LogOnly,
                 "friction velocity from RAASTAB2()");
-    frame.declare ("env_lai_factor", Value::None (), Value::LogOnly,
+    frame.declare ("env_lai_factor", Attribute::None (), Attribute::LogOnly,
                 "LAI*F_i");
-    frame.declare ("e_pa","Pa", Value::LogOnly,
+    frame.declare ("e_pa","Pa", Attribute::LogOnly,
                 "vapor pressure at 2 m");
-    frame.declare ("e_abs", "kg/m^3", Value::LogOnly,
+    frame.declare ("e_abs", "kg/m^3", Attribute::LogOnly,
                 "absolute vapor pressure");
-    frame.declare ("tair", "degr.C", Value::LogOnly,
+    frame.declare ("tair", "degr.C", Attribute::LogOnly,
                 "air temperature");
-    frame.declare ("srad", "W/m^2", Value::LogOnly,
+    frame.declare ("srad", "W/m^2", Attribute::LogOnly,
                 "global radiation");
-    frame.declare ("u_ref", "m/s", Value::LogOnly,
+    frame.declare ("u_ref", "m/s", Attribute::LogOnly,
                 "friction velocity from ??");
-    frame.declare ("prec", "mm", Value::LogOnly,
+    frame.declare ("prec", "mm", Attribute::LogOnly,
                 "precipitation");
-    frame.declare ("albedo", Value::None (), Value::Const,
+    frame.declare ("albedo", Attribute::None (), Attribute::Const,
                 "Bulk albedo");
     frame.set ("albedo", 0.2);
-    frame.declare ("b1", Value::None (), Value::Const,
+    frame.declare ("b1", Attribute::None (), Attribute::Const,
                 "Brunt coefficient 1");
     frame.set ("b1", 0.53);
-    frame.declare ("b2", Value::None (), Value::Const,
+    frame.declare ("b2", Attribute::None (), Attribute::Const,
                 "Brunt coefficient 2");
     frame.set ("b2", 0.0065);
-    frame.declare ("b3", Value::None (), Value::Const,
+    frame.declare ("b3", Attribute::None (), Attribute::Const,
                 "Brunt coefficient 3");
     frame.set ("b3", 0.1);
-    frame.declare ("b4", Value::None (), Value::Const,
+    frame.declare ("b4", Attribute::None (), Attribute::Const,
                 "Brunt coefficient 4");
     frame.set ("b4", 0.9);
-    frame.declare ("ndif", Value::None (), Value::Const,
+    frame.declare ("ndif", Attribute::None (), Attribute::Const,
                 "Eddy diffusivity decay constant in crop");
     frame.set ("ndif", 2.5);
-    frame.declare ("c_d", Value::None (), Value::Const,
+    frame.declare ("c_d", Attribute::None (), Attribute::Const,
                 "Mean drag coefficient for a leaf");
     frame.set ("c_d", 0.05);
-    frame.declare ("z_0s", "m", Value::Const,
+    frame.declare ("z_0s", "m", Attribute::Const,
                 "Roughness length for soil surface, SG (1990)");
     frame.set ("z_0s", 0.01);
-    frame.declare ("z0_def", "m", Value::Const,
+    frame.declare ("z0_def", "m", Attribute::Const,
                 "Roughness length for soil surface, Oke");
     frame.set ("z0_def", 0.005);
-    frame.declare ("w", "m", Value::Const,
+    frame.declare ("w", "m", Attribute::Const,
                 "average leaf width");
     frame.set ("w", 0.0025);
-    frame.declare ("alpha_u", Value::None (), Value::Const,
+    frame.declare ("alpha_u", Attribute::None (), Attribute::Const,
                 "attenuation coefficient for wind speed");
     frame.set ("alpha_u", 3.0);
-    frame.declare ("arac", Value::None (), Value::Const,
+    frame.declare ("arac", Attribute::None (), Attribute::Const,
                 "leaf boundary layer resistance coefficient");
     frame.set ("arac", 0.00662);
-    frame.declare ("alpha_k", Value::None (), Value::Const,
+    frame.declare ("alpha_k", Attribute::None (), Attribute::Const,
                 "Att. coefficient of eddy diffusivity through sparse canopy");
     frame.set ("alpha_k", 2.0);
 
-    frame.declare ("alpha_r", Value::None (), Value::Const,
+    frame.declare ("alpha_r", Attribute::None (), Attribute::Const,
                 "Att. coefficient for vegetation in ACOEFF()");
     frame.set ("alpha_r", 0.5);
-    frame.declare ("theta_w", "cm^3/cm^3", Value::Const,
+    frame.declare ("theta_w", "cm^3/cm^3", Attribute::Const,
                 "Soil water content at 'wilting point'");
     frame.set ("theta_w", 0.05);
-    frame.declare ("theta_c", "cm^3/cm^3", Value::Const,
+    frame.declare ("theta_c", "cm^3/cm^3", Attribute::Const,
                 "Soil water content at 'field capacity'");
     frame.set ("theta_c", 0.25);
-    frame.declare ("rcmin_const", "s/m", Value::Const,
+    frame.declare ("rcmin_const", "s/m", Attribute::Const,
                 "Constant minimum canopy resistance");
     frame.set ("rcmin_const", 30.0);
-    frame.declare ("rcmax", Value::None (), Value::Const,
+    frame.declare ("rcmax", Attribute::None (), Attribute::Const,
                 "Maximum canopy resistance");
     frame.set ("rcmax", 1000.0);
-    frame.declare ("tref", Value::None (), Value::Const,
+    frame.declare ("tref", Attribute::None (), Attribute::Const,
                 "Reference/optimum temperature in temperature dependent "
                 "constraint function");
     frame.set ("tref", 298.0);
-    frame.declare ("zeta", Value::None (), Value::Const,
+    frame.declare ("zeta", Attribute::None (), Attribute::Const,
                 "Coefficient in vapor pressure dependent constraint function");
     frame.set ("zeta", 0.0002);
-    frame.declare ("f3const", Value::None (), Value::Const,
+    frame.declare ("f3const", Attribute::None (), Attribute::Const,
                 "Coefficient in temperature dependent constraint function");
     frame.set ("f3const", 0.0016);
-    frame.declare ("spar", Value::None (), Value::Const,
+    frame.declare ("spar", Attribute::None (), Attribute::Const,
                 "Reference value of photosynthetically active part of Si");
     frame.set ("spar", 100.0);
-    frame.declare ("tmin", "dg C", Value::Const,
+    frame.declare ("tmin", "dg C", Attribute::Const,
                 "Minimum temperature for canopy conductance");
     frame.set ("tmin", 0.0);
-    frame.declare ("tmax", "dg C", Value::Const,
+    frame.declare ("tmax", "dg C", Attribute::Const,
                 "Maximum temperature for canopy conductance");
     frame.set ("tmax", 55.0);
-    frame.declare ("nu_1", Value::None (), Value::Const,
+    frame.declare ("nu_1", Attribute::None (), Attribute::Const,
                 "coefficient in Jarvis (1976) constraint function f_temp");
     frame.set ("nu_1", 26.5);
-    frame.declare ("nu_2", Value::None (), Value::Const,
+    frame.declare ("nu_2", Attribute::None (), Attribute::Const,
                 "coefficient in Lohammar (1980) constraint function f_def");
     frame.set ("nu_2", 0.57);
-    frame.declare ("nu_3", Value::None (), Value::Const,
+    frame.declare ("nu_3", Attribute::None (), Attribute::Const,
                 "coefficient in Steward (1988) constraint function f_theta");
     frame.set ("nu_3", 0.008);
-    frame.declare ("dt1", "dg C", Value::Const,
+    frame.declare ("dt1", "dg C", Attribute::Const,
                 "lower solution limit in Newton-Raphson method");
     frame.set ("dt1", -5.0);
-    frame.declare ("dt2", "dg C", Value::Const,
+    frame.declare ("dt2", "dg C", Attribute::Const,
                 "upper solution limit in Newton-Raphson method");
     frame.set ("dt2", 5.0);
-    frame.declare ("acc", Value::None (), Value::Const,
+    frame.declare ("acc", Attribute::None (), Attribute::Const,
                 "iteration accuracy in Newton-Raphson method");
     frame.set ("acc", 0.01);
   }

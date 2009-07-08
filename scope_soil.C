@@ -122,9 +122,9 @@ ScopeSoil::entries (std::set<symbol>& all) const
     }
 }
 
-Value::type 
+Attribute::type 
 ScopeSoil::lookup (const symbol tag) const
-{ return check (tag) ? Value::Number : Value::Error; }
+{ return check (tag) ? Attribute::Number : Attribute::Error; }
 
 bool 
 ScopeSoil::check (const symbol tag) const
@@ -230,11 +230,11 @@ ScopeSoil::dimension (const symbol tag) const
   if (tag == rho_b)
     return rho_b_unit;
   if (tag == humus || tag == clay)
-    return Value::Fraction ();
+    return Attribute::Fraction ();
   if (tag == h)
     return Units::cm ();
   if (tag == Theta)
-    return Value::None ();
+    return Attribute::None ();
 
   static const symbol T_dim ("dg C");
   if (tag == T)
@@ -244,7 +244,7 @@ ScopeSoil::dimension (const symbol tag) const
     return soil.get_dimension (cell, tag);
   
   // Must be the same for all neighbors.
-  symbol shared = Value::Unknown ();
+  symbol shared = Attribute::Unknown ();
   const std::vector<size_t>& edge_around = geo.cell_edges (cell);
   const size_t edge_around_size = edge_around.size ();
   daisy_assert (edge_around_size > 0U);
@@ -255,10 +255,10 @@ ScopeSoil::dimension (const symbol tag) const
       daisy_assert (geo.cell_is_internal (c));
       
       const symbol mine = soil.get_dimension (c, tag);
-      if (shared == Value::Unknown ())
+      if (shared == Attribute::Unknown ())
         shared = mine;
       else if (shared != mine)
-        return Value::Unknown ();
+        return Attribute::Unknown ();
     }
   return shared;
 }

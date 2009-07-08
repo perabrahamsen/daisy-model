@@ -100,7 +100,7 @@ static struct DepthConstSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("value", "cm", Check::non_positive (), Value::Const, 
+    frame.declare ("value", "cm", Check::non_positive (), Attribute::Const, 
                 "Constant depth.");
     frame.order ("value");
   }
@@ -159,9 +159,9 @@ Look up depth in an scope.")
   void load_frame (Frame& frame) const
   {
     frame.declare_object ("value", Number::component, 
-                       Value::Const, Value::Singleton, "\
+                       Attribute::Const, Attribute::Singleton, "\
 Expression that evaluates to a depth.");
-    frame.declare ("initial_value", "cm", Check::none (), Value::OptionalConst,
+    frame.declare ("initial_value", "cm", Check::none (), Attribute::OptionalConst,
 		"Initial depth.");
 
   }
@@ -243,9 +243,9 @@ static struct DepthPLFSyntax : public DeclareModel
 {
   static void entry_syntax (Frame& frame)
   {
-    frame.declare_submodule ("time", Value::Const, "Time.",
+    frame.declare_submodule ("time", Attribute::Const, "Time.",
                           Time::load_syntax);
-    frame.declare ("value", "cm", Check::non_positive (), Value::Const, 
+    frame.declare ("value", "cm", Check::non_positive (), Attribute::Const, 
                 "Depth.");
     frame.order ("time", "value");
   }
@@ -256,7 +256,7 @@ static struct DepthPLFSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare_submodule_sequence ("table", Value::Const, 
+    frame.declare_submodule_sequence ("table", Attribute::Const, 
                           "Height as a function of time.\n\
 This is a list where each element has the form (TIME VALUE).\n\
 The TIME entries must be increasing cronologically.  The corresponding\n\
@@ -396,7 +396,7 @@ static struct DepthFileSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare_string ("file", Value::Const,
+    frame.declare_string ("file", Attribute::Const,
                 "Name of file to read data from.\n\
 The format of each line in the file is 'YEAR MONTH DAY HEIGHT',\n\
 where HEIGHT should in cm above ground (i.e. a negative number).\n\

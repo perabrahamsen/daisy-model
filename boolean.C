@@ -178,7 +178,7 @@ Base class for boolean expressions involving multiple boolean operands.")
   void load_frame (Frame& frame) const
   {
     frame.declare_object ("operands", Boolean::component, 
-                       Value::Const, Value::Variable, "\
+                       Attribute::Const, Attribute::Variable, "\
 List of operands to compare.");
     frame.order ("operands");
   }
@@ -260,7 +260,7 @@ static struct BooleanXOrSyntax : DeclareModel
   void load_frame (Frame& frame) const
   {
     frame.declare_object ("operands", Boolean::component, 
-                       Value::Const, 2, "\
+                       Attribute::Const, 2, "\
 The two operands to compare.");
     frame.order ("operands");
   }
@@ -289,7 +289,7 @@ static struct BooleanNotSyntax : DeclareModel
   void load_frame (Frame& frame) const
   {
     frame.declare_object ("operands", Boolean::component, 
-                       Value::Const, 1, "\
+                       Attribute::Const, 1, "\
 The operand to check.");
     frame.order ("operands");
   }

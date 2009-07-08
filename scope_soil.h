@@ -73,7 +73,7 @@ public:
   // Scope Interface.
 public:
   void entries (std::set<symbol>&) const;
-  Value::type lookup (symbol tag) const;
+  Attribute::type lookup (symbol tag) const;
   bool check (symbol tag) const;
   double number (symbol tag) const;
   symbol dimension (symbol tag) const;

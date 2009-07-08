@@ -117,11 +117,11 @@ HorizonSystem::System::load_frame (Frame& frame) const
         tmp << "between " << limits[i-1] << " [um] and";
       tmp << " " << limits[i] << " [um].";
 
-      frame.declare_fraction (names[i], Value::Const, tmp.str ());
+      frame.declare_fraction (names[i], Attribute::Const, tmp.str ());
     }
-  frame.declare_fraction ("humus", Value::Const,
+  frame.declare_fraction ("humus", Attribute::Const,
                        "Humus content of soil.");
-  frame.declare_boolean ("normalize", Value::Const, "\
+  frame.declare_boolean ("normalize", Attribute::Const, "\
 If this is true, normalize the mineral fraction to 1.0.\n\
 Otherwise, give an error if the sum is not 1.0.");
   frame.set ("normalize", false);

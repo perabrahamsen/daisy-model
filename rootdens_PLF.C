@@ -77,9 +77,9 @@ static Rootdens_PLF::Check_Indexes check_indexes;
 void 
 Rootdens_PLF::Entry::load_syntax (Frame& frame)
 {
-  frame.declare ("index", Value::Unknown (), Check::none (), Value::Const, 
+  frame.declare ("index", Attribute::Unknown (), Check::none (), Attribute::Const, 
 	      "Index for specifying root density.");
-  frame.declare ("density", Value::Unknown (), Value::None (), Value::Const, "\
+  frame.declare ("density", Attribute::Unknown (), Attribute::None (), Attribute::Const, "\
 Relative root density as a function of root depth .");
   frame.order ("index", "density");
 }
@@ -89,9 +89,9 @@ Rootdens_PLF::Check_Indexes::verify (const Metalib&, const Frame& frame,
                                      const symbol key, Treelog& msg) const
 { 
   daisy_assert (frame.check (key));
-  daisy_assert (frame.lookup (key) == Value::Submodel);
+  daisy_assert (frame.lookup (key) == Attribute::Submodel);
   daisy_assert (!frame.is_log (key));
-  daisy_assert (frame.type_size (key) == Value::Variable);
+  daisy_assert (frame.type_size (key) == Attribute::Variable);
 
   const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& alists 
     = frame.submodel_sequence (key);
@@ -235,7 +235,7 @@ Specify root density as a function of development stage.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare_submodule_sequence("entries", Value::Const, "\
+    frame.declare_submodule_sequence("entries", Attribute::Const, "\
 A list of pairs, where the first element of each pair is a development\n\
 stage (usually a number between 0 (emergence) and 2 (ripe), and the\n\
 second element is a PLF specifying the relative root density as a\n\
@@ -283,7 +283,7 @@ Specify root density as a function of development stage.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare_submodule_sequence("entries", Value::Const, "\
+    frame.declare_submodule_sequence("entries", Attribute::Const, "\
 A list of pairs, where the first element of each pair is a development\n\
 stage (usually a number between 0 (emergence) and 2 (ripe), and the\n\
 second element is a PLF specifying the relative root density as a\n\
@@ -331,7 +331,7 @@ Specify root density as a function of development stage.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare_submodule_sequence("entries", Value::Const, "\
+    frame.declare_submodule_sequence("entries", Attribute::Const, "\
 A list of pairs, where the first element of each pair is the root depth,\
 \n(a positive number), and the second element is a PLF specifying the\n\
 relative root density as a function of soil depth in cm (a positive number).\n\

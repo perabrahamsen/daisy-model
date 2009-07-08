@@ -278,7 +278,7 @@ Daisy::load_syntax (Frame& frame)
   
   Output::load_syntax (frame);
   frame.declare_object ("scope", Scopesel::component, 
-		     Value::Const, Value::Singleton, "\
+		     Attribute::Const, Attribute::Singleton, "\
 Scope to evaluate expessions in.");
   frame.set ("scope", "null");
   frame.declare_object ("print_time", Condition::component,
@@ -288,29 +288,29 @@ to report, like emergence of crop or various management operations.\n\
 Good values for this parameter would be hourly, daily or monthly.");
   frame.set ("print_time", "periodic");
 
-  frame.declare_object ("manager", Action::component, Value::State,
-                     Value::Singleton,
+  frame.declare_object ("manager", Action::component, Attribute::State,
+                     Attribute::Singleton,
                      "Specify the management operations to perform during\n\
 the simulation.");
-  frame.declare_submodule ("time", Value::State,
+  frame.declare_submodule ("time", Attribute::State,
 			"Current time in the simulation.", Time::load_syntax);
-  frame.declare_submodule ("timestep", Value::OptionalState,
+  frame.declare_submodule ("timestep", Attribute::OptionalState,
 			"Length of timestep in simlation.\n\
 The default value is 1 hour, anything else is unlikely to work.",
                         Timestep::load_syntax);
   frame.set_check ("timestep", Timestep::positive ());
-  frame.declare_submodule ("stop", Value::OptionalConst,
+  frame.declare_submodule ("stop", Attribute::OptionalConst,
 			"Latest time where the simulation stops.\n\
 By default, the simulation will run until the manager request it to stop.",
                         Time::load_syntax);
   frame.declare_object ("column", Column::component, 
-                     Value::State, Value::Variable,
+                     Attribute::State, Attribute::Variable,
                      "List of columns to use in this simulation.");
   frame.declare_object ("weather", Weather::component,
-                     Value::OptionalState, Value::Singleton,
+                     Attribute::OptionalState, Attribute::Singleton,
                      "Weather model for providing climate information during\n\
 the simulation.  Can be overwritten by column specific weather.");
-  frame.declare_submodule_sequence ("harvest", Value::State, 
+  frame.declare_submodule_sequence ("harvest", Attribute::State, 
 				 "Total list of all crop yields.",
 				 Harvest::load_syntax);
   frame.set_empty ("harvest");

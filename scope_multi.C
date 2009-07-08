@@ -31,16 +31,16 @@ ScopeMulti::entries (std::set<symbol>& all) const
     scopes[i]->entries (all);
 }
 
-Value::type 
+Attribute::type 
 ScopeMulti::lookup (const symbol name) const
 {
   for (size_t i = 0; i < scopes.size (); i++)
     {
-      Value::type type = scopes[i]->lookup (name);
-      if (type != Value::Error)
+      Attribute::type type = scopes[i]->lookup (name);
+      if (type != Attribute::Error)
         return type;
     }
-  return Value::Error;
+  return Attribute::Error;
 }
 
 bool 
@@ -58,21 +58,21 @@ ScopeMulti::number (const symbol tag) const
 {
   for (size_t i = 0; i < scopes.size (); i++)
     {
-      Value::type type = scopes[i]->lookup (tag);
+      Attribute::type type = scopes[i]->lookup (tag);
       switch (type)
         {
-        case Value::Error:
+        case Attribute::Error:
           // Not here, try next scope.
           continue;
-        case Value::Number:
+        case Attribute::Number:
           // Yeah!
           daisy_assert (scopes[i]->check (tag));
           return scopes[i]->number (tag);
         default:
           // Wrong type.
           daisy_panic ("'" + tag + "' should be a " 
-                       + Value::type_name (Value::Number) + ", is a "
-                       + Value::type_name (type));
+                       + Attribute::type_name (Attribute::Number) + ", is a "
+                       + Attribute::type_name (type));
         }
     }
   daisy_panic ("'" + tag + "' not found in any scope");
@@ -82,7 +82,7 @@ symbol
 ScopeMulti::dimension (const symbol tag) const
 {
   for (size_t i = 0; i < scopes.size (); i++)
-    if (scopes[i]->lookup (tag) == Value::Number)
+    if (scopes[i]->lookup (tag) == Attribute::Number)
       return scopes[i]->dimension (tag);
   
   daisy_panic ("'" + tag + "' not found in any scope");
@@ -92,7 +92,7 @@ symbol
 ScopeMulti::description (symbol tag) const
 {
   for (size_t i = 0; i < scopes.size (); i++)
-    if (scopes[i]->lookup (tag) != Value::Error)
+    if (scopes[i]->lookup (tag) != Attribute::Error)
       return scopes[i]->description (tag);
   
   daisy_panic ("'" + tag + "' not found in any scope");

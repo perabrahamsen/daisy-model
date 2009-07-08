@@ -390,14 +390,14 @@ to the 'distribution' parameter.")
     frame.add_check (check_alist);
 
     frame.declare ("height_start", "cm", Check::non_positive (), 
-               Value::OptionalConst, 
+               Attribute::OptionalConst, 
                "Macropores starts at this depth (a negative number).\n\
 If not specified, use the last point in 'distribution'.");
     frame.declare ("height_end", "cm", Check::non_positive (),
-               Value::OptionalConst, 
+               Attribute::OptionalConst, 
                "Macropores ends at this depth (a negative number).\n\
 If not specified, use the first point in 'distribution'.");
-    frame.declare ("distribution", "cm", Value::Fraction (), Value::Const, "\
+    frame.declare ("distribution", "cm", Attribute::Fraction (), Attribute::Const, "\
 Distribution of macropore end points as a function of height.\n\
 The function should start with '1' at 'height_end', and then decrease to\n\
 '0' at 'height_start'.  It can be constant, but may never increase.\n\
@@ -409,15 +409,15 @@ where all macropores is assumed to start at the top.");
     static VCheck::All distcheck (start, end, fixpoint, 
                                   VCheck::non_increasing ());
     frame.set_check ("distribution", distcheck);
-    frame.declare ("pressure_initiate", "cm", Value::Const, 
+    frame.declare ("pressure_initiate", "cm", Attribute::Const, 
                "Pressure needed to init pref.flow");
     frame.set ("pressure_initiate", MacroStandard::default_pressure_initiate);
-    frame.declare ("pressure_end", "cm", Value::Const, 
+    frame.declare ("pressure_end", "cm", Attribute::Const, 
                "Pressure after pref.flow has been init");
     frame.set ("pressure_end", MacroStandard::default_pressure_end);
-    frame.declare ("S_p", "h^-1", Value::LogOnly,
+    frame.declare ("S_p", "h^-1", Attribute::LogOnly,
                "Macropore sink term.");
-    frame.declare ("pond_max", "mm", Check::non_negative (), Value::Const, "\
+    frame.declare ("pond_max", "mm", Check::non_negative (), Attribute::Const, "\
 Maximum height of ponding before spilling into macropores.\n\
 After macropores are activated pond will have this height.");
     frame.set ("pond_max", MacroStandard::default_pond_max);

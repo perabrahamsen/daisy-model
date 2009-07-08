@@ -364,56 +364,56 @@ Snow::load_syntax (Frame& frame)
 
   static const double hours_per_day = 24.0; // [h/d]
 
-  frame.declare ("EvapSnowPack", "mm", Value::LogOnly, 
+  frame.declare ("EvapSnowPack", "mm", Attribute::LogOnly, 
 	      "Evaporation from snowpack.");
-  frame.declare ("q_s", "mm", Value::LogOnly,
+  frame.declare ("q_s", "mm", Attribute::LogOnly,
 	      "Leaking water.");
-  frame.declare ("Ssnow", "mm", Value::State,
+  frame.declare ("Ssnow", "mm", Attribute::State,
 	      "Snow storage expressed as water.");
   frame.set ("Ssnow", 0.0);
-  frame.declare ("Swater", "mm", Value::State, 
+  frame.declare ("Swater", "mm", Attribute::State, 
 	      "Water in snow storage.");
   frame.set ("Swater", 0.0);
-  frame.declare ("age", "h", Value::State,
+  frame.declare ("age", "h", Attribute::State,
 	      "Time since last snow.");
   frame.set ("age", 0.0);
-  frame.declare ("dZs", "m", Value::State,
+  frame.declare ("dZs", "m", Attribute::State,
 	      "Depth of snow layer.");
   frame.set ("dZs", 0.0);
-  frame.declare ("mf", "m^-1", Value::Const,
+  frame.declare ("mf", "m^-1", Attribute::Const,
 	      "Snow pack depth melting factor.");
   frame.set ("mf", 10.0);
-  frame.declare ("mtprime", "kg/m^2/h C", Value::Const,
+  frame.declare ("mtprime", "kg/m^2/h C", Attribute::Const,
 	      "Air temperature melting factor.");
   frame.set ("mtprime", 2.0 / hours_per_day);
-  frame.declare ("mrprime", "kg/J", Value::Const,
+  frame.declare ("mrprime", "kg/J", Attribute::Const,
 	      "Radiation melting factor.");
   frame.set ("mrprime", 1.5e-7);
-  frame.declare ("m1", "kg/J", Value::Const,
+  frame.declare ("m1", "kg/J", Attribute::Const,
 	      "Radiation melting linear.");
   frame.set ("m1", 2.0);
-  frame.declare ("m2", "h^-1", Value::Const, 
+  frame.declare ("m2", "h^-1", Attribute::Const, 
 	      "Radiation melting exponential factor.");
   frame.set ("m2", 0.1 / hours_per_day);
-  frame.declare ("rho_s", "kg/m^3", Value::Const,
+  frame.declare ("rho_s", "kg/m^3", Attribute::Const,
 	      "Density of newly fallen snow.");
   frame.set ("rho_s", 100.0);
-  frame.declare ("f_c", Value::None (), Value::Const,
+  frame.declare ("f_c", Attribute::None (), Attribute::Const,
 	      "Water capacity in snow factor.");
   frame.set ("f_c", 0.07);
-  frame.declare ("rho_1", "kg/m^3", Value::Const,
+  frame.declare ("rho_1", "kg/m^3", Attribute::Const,
 	      "Water collapse factor.");
   frame.set ("rho_1", 200.0);
-  frame.declare ("rho_2", "m^-1", Value::Const, 
+  frame.declare ("rho_2", "m^-1", Attribute::Const, 
 	      "Snow collapse factor.");
   frame.set ("rho_2", 0.5);
-  frame.declare ("Psa", "mm", Value::Const, 
+  frame.declare ("Psa", "mm", Attribute::Const, 
 	      "Absolute amount of snow required for snow to become new.");
   frame.set ("Psa", 5.0 / hours_per_day);
-  frame.declare ("fsa", Value::None (), Value::Const, 
+  frame.declare ("fsa", Attribute::None (), Attribute::Const, 
 	      "Relative amount of snow required for snow to become new.");
   frame.set ("fsa", 0.9);
-  frame.declare ("K_snow_factor", "W m^5/kg^2/dg C", Value::Const,
+  frame.declare ("K_snow_factor", "W m^5/kg^2/dg C", Attribute::Const,
 	      "Factor related to thermal conductivity for snow water mix.");
   frame.set ("K_snow_factor", 2.86e-6);
 }

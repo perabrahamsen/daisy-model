@@ -183,13 +183,13 @@ static struct MovementInit : public DeclareComponent
   void load_frame (Frame& frame) const
   {
     frame.declare_object ("Tertiary", Tertiary::component, 
-                       Value::OptionalState, Value::Singleton, "\
+                       Attribute::OptionalState, Attribute::Singleton, "\
 Tertiary (that is, non-matrix) transport method.");
-    frame.declare_integer ("water_failure_level", Value::LogOnly, "\
+    frame.declare_integer ("water_failure_level", Attribute::LogOnly, "\
 The number of the last water transport model to fail.\n\
 It is -1 if the first model succeded, and 0 if the first model failed but\n\
 the second succeded.");
-    frame.declare_integer ("solute_failure_level", Value::LogOnly, "\
+    frame.declare_integer ("solute_failure_level", Attribute::LogOnly, "\
 The number of the last solute transport model to fail.\n                \
 It is -1 if the first model succeded, and 0 if the first model failed but\n\
 the second succeded.");

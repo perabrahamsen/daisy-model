@@ -22,12 +22,12 @@
 #define BUILD_DLL
 
 #include "val.h"
-#include "value.h"
+#include "attribute.h"
 #include "assertion.h"
 
 int
 Val::size () const
-{ return Value::Singleton; }
+{ return Attribute::Singleton; }
 
 double 
 Val::number () const

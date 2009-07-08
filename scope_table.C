@@ -32,9 +32,9 @@ ScopeTable::entries (std::set<symbol>& all) const
     all.insert (tags[i]);
 }
 
-Value::type 
+Attribute::type 
 ScopeTable::lookup (const symbol tag) const
-{ return lex.find_tag (tag) < 0 ? Value::Error : Value::Number; }
+{ return lex.find_tag (tag) < 0 ? Attribute::Error : Attribute::Number; }
 
 bool 
 ScopeTable::check (const symbol tag) const

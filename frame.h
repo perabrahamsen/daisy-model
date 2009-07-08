@@ -97,7 +97,7 @@ class EXPORT Frame : public WScope
   bool is_optional (symbol) const;
   bool is_log (symbol) const;
   bool is_state (symbol) const;
-  Value::type lookup (symbol) const;
+  Attribute::type lookup (symbol) const;
   symbol component (symbol) const;
   int type_size (symbol) const;
   symbol dimension (symbol) const;
@@ -110,101 +110,101 @@ class EXPORT Frame : public WScope
   // Add attribute types.
  public:
   void declare_boolean (symbol key, // Boolean.
-                        Value::category cat,
+                        Attribute::category cat,
                         int size,
                         symbol description);
   void declare_boolean (symbol key,
-                        Value::category cat,
+                        Attribute::category cat,
                         symbol description)
-  { declare_boolean (key, cat, Value::Singleton, description); }
+  { declare_boolean (key, cat, Attribute::Singleton, description); }
 
   void declare_integer (symbol key, // Integer.
-                        Value::category cat,
+                        Attribute::category cat,
                         int size,
                         symbol description);
   void declare_integer (symbol key,
-                        Value::category cat,
+                        Attribute::category cat,
                         symbol description)
-  { declare_integer (key, cat, Value::Singleton, description); }
+  { declare_integer (key, cat, Attribute::Singleton, description); }
 
   void declare_string (symbol key, // String
-                       Value::category cat,
+                       Attribute::category cat,
                        int size,
                        symbol description);
   void declare_string (symbol key,
-                       Value::category cat,
+                       Attribute::category cat,
                        symbol description)
-  { declare_string (key, cat, Value::Singleton, description); }
+  { declare_string (key, cat, Attribute::Singleton, description); }
 
   void declare (symbol key, // Number.
                 symbol dim,
-                Value::category cat,
+                Attribute::category cat,
                 int size,
                 symbol description);
   void declare (symbol key, 
                 symbol dim,
-                Value::category cat,
+                Attribute::category cat,
                 symbol description)
-  { declare (key, dim, cat, Value::Singleton, description); } 
+  { declare (key, dim, cat, Attribute::Singleton, description); } 
   void declare (symbol key,
                 symbol dim,
                 const Check& check,
-                Value::category cat,
+                Attribute::category cat,
                 int size,
                 symbol description);
   void declare (symbol key, 
                 symbol dim,
                 const Check& check,
-                Value::category cat,
+                Attribute::category cat,
                 symbol description)
-  { declare (key, dim, check, cat, Value::Singleton, description); } 
+  { declare (key, dim, check, cat, Attribute::Singleton, description); } 
   void declare_fraction (symbol key, 
-                         Value::category cat,
+                         Attribute::category cat,
                          int size,
                          symbol description);
   void declare_fraction (symbol key, 
-                         Value::category cat,
+                         Attribute::category cat,
                          symbol description);
 
   void declare (symbol key, // PLF.
                 symbol domain,
                 symbol range,
-                Value::category cat,
+                Attribute::category cat,
                 int size,
                 symbol description);
   void declare (symbol key, 
                 symbol domain,
                 symbol range,
-                Value::category cat,
+                Attribute::category cat,
                 symbol description)
-  { declare (key, domain, range, cat, Value::Singleton, description); } 
+  { declare (key, domain, range, cat, Attribute::Singleton, description); } 
   void declare (symbol key,
                 symbol domain,
                 symbol range,
                 const Check& check,
-                Value::category cat,
+                Attribute::category cat,
                 int size,
                 symbol description);
   void declare (symbol key, 
                 symbol domain,
                 symbol range,
                 const Check& check,
-                Value::category cat,
+                Attribute::category cat,
                 symbol description)
-  { declare (key, domain, range, check, cat, Value::Singleton, description); } 
+  { declare (key, domain, range, check, cat, Attribute::Singleton, description); } 
 
   void declare_object (symbol key,// Model
                        symbol lib, 
                        symbol description)
-  { declare_object (key, lib, Value::State, Value::Singleton, description); }
+  { declare_object (key, lib, Attribute::State, Attribute::Singleton, description); }
   void declare_object (symbol, symbol lib,
-                       Value::category, int size, symbol description);
+                       Attribute::category, int size, symbol description);
 
   typedef void (*load_syntax_t) (Frame&);
   void declare_submodule (symbol name, 
-                          Value::category cat, symbol description,
+                          Attribute::category cat, symbol description,
                           load_syntax_t load_syntax);
-  void declare_submodule_sequence (symbol name, Value::category cat, 
+  void declare_submodule_sequence (symbol name, Attribute::category cat, 
                                    symbol description,
                                    load_syntax_t load_syntax);
 
@@ -278,7 +278,7 @@ class EXPORT Frame : public WScope
 
   // Set attribute values.
  private:
-  void verify (symbol key, Value::type want, int size = Value::Singleton) const;
+  void verify (symbol key, Attribute::type want, int size = Attribute::Singleton) const;
  public:
   void set (symbol, double);
   void set (symbol, double, symbol);

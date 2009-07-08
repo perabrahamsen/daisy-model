@@ -183,20 +183,20 @@ Aquitard groundwater, free drainage.")
   { }
   void load_frame (Frame& frame) const
     { 
-      frame.declare ("K_aquitard", "cm/h", Check::non_negative (), Value::Const,
+      frame.declare ("K_aquitard", "cm/h", Check::non_negative (), Attribute::Const,
 		  "Conductivity of the aquitard.");
       frame.set ("K_aquitard", 1e-3);
-      frame.declare ("Z_aquitard", "cm", Check::positive (), Value::Const,
+      frame.declare ("Z_aquitard", "cm", Check::positive (), Attribute::Const,
 		  "Thickness of the aquitard.\n\
 The aquitard begins below the bottommost soil horizon.");
       frame.set ("Z_aquitard", 200.0);
-      frame.declare ("h_aquifer", "cm", Check::positive (), Value::OptionalState,
+      frame.declare ("h_aquifer", "cm", Check::positive (), Attribute::OptionalState,
 		  "Pressure potential in the aquifer below the aquitard.\n\
 By default. this is Z_aquitard.\n\
 You can alternatively specify the pressure as a virtual groundwater level.\n\
 See 'pressure_table'.");
       frame.declare_object ("pressure_table", Depth::component,
-                         Value::OptionalConst, Value::Singleton, "\
+                         Attribute::OptionalConst, Attribute::Singleton, "\
 Height of groundwater the corresponds to the pressure in the aquifer.  \n\
 \n\
 If you drilled a well down to the aquifer, this is number what the\n\

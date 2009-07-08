@@ -24,7 +24,7 @@
 #define IM_H
 
 #include "symbol.h"
-#include "value.h"
+#include "attribute.h"
 #include <map>
 #include <boost/noncopyable.hpp>
 
@@ -121,7 +121,7 @@ public:
 
   // Create. 
 public:
-  static void add_syntax (Frame&, Value::category cat, 
+  static void add_syntax (Frame&, Attribute::category cat, 
 			  const symbol dimension);
   explicit IM (Block&, const char* key);
   explicit IM ();

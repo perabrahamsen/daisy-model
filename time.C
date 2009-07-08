@@ -518,30 +518,30 @@ void
 Time::load_syntax (Frame& frame)
 {
   frame.add_check (check_alist);
-  frame.declare_integer ("year", Value::State, "Current year.");
+  frame.declare_integer ("year", Attribute::State, "Current year.");
   frame.set_check ("year", VCheck::valid_year ());
-  frame.declare_integer ("month", Value::State, "Current month.");
+  frame.declare_integer ("month", Attribute::State, "Current month.");
   static VCheck::IRange mm (1, 12);
   frame.set_check ("month", mm);
-  frame.declare_integer ("mday", Value::State, 
+  frame.declare_integer ("mday", Attribute::State, 
 	      "Current day in the month.");
   static VCheck::IRange dd (1, 31);
   frame.set_check ("mday", dd);
-  frame.declare_integer ("hour", Value::State, "Current hour.");
+  frame.declare_integer ("hour", Attribute::State, "Current hour.");
   static VCheck::IRange hh (0, 23);
   frame.set_check ("hour", hh);
   frame.set ("hour", 0);
   frame.order ("year", "month", "mday", "hour");
-  frame.declare_integer ("minute", Value::State, "Current minute.");
+  frame.declare_integer ("minute", Attribute::State, "Current minute.");
   static VCheck::IRange ss (0, 59);
   frame.set_check ("minute", ss);
   frame.set ("minute", 0);
-  frame.declare_integer ("second", Value::State, "Current second.");
+  frame.declare_integer ("second", Attribute::State, "Current second.");
   frame.set_check ("second", ss);
   frame.set ("second", 0);
-  frame.declare_integer ("week", Value::LogOnly, "Current week.");
-  frame.declare_integer ("yday", Value::LogOnly, "Current Julian day.");
-  frame.declare_string ("wday", Value::LogOnly, "Current weekday.\n\
+  frame.declare_integer ("week", Attribute::LogOnly, "Current week.");
+  frame.declare_integer ("yday", Attribute::LogOnly, "Current Julian day.");
+  frame.declare_string ("wday", Attribute::LogOnly, "Current weekday.\n\
 Monday is 1, Sunday is 7.");
 }
 

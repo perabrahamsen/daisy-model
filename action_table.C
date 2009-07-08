@@ -373,21 +373,21 @@ Fertilizer [name]: The type of fertilizer to be applied.")
   { 
     LexerTable::load_syntax (frame);
     frame.declare_object ("sow", Action::component, 
-                       Value::OptionalConst, Value::Singleton, 
+                       Attribute::OptionalConst, Attribute::Singleton, 
                        "Sow action.");
     frame.declare_object ("emerge", Action::component, 
-                       Value::OptionalConst, Value::Singleton, 
+                       Attribute::OptionalConst, Attribute::Singleton, 
                        "Emerge action.");
     frame.declare_object ("harvest", Action::component, 
-                       Value::OptionalConst, Value::Singleton, 
+                       Attribute::OptionalConst, Attribute::Singleton, 
                        "Harvest action.");
     frame.declare_object ("fertilizer", AM::component,
-                       Value::OptionalConst, Value::Singleton, "\
+                       Attribute::OptionalConst, Attribute::Singleton, "\
 The fertilizer you want to apply.");
-    frame.declare_boolean ("enable_irrigation", Value::Const, "\
+    frame.declare_boolean ("enable_irrigation", Attribute::Const, "\
 Set this to false to ignore any irrigation information in the file.");
     frame.set ("enable_irrigation", true);
-    frame.declare_boolean ("enable_fertilization", Value::Const, "\
+    frame.declare_boolean ("enable_fertilization", Attribute::Const, "\
 Set this to false to ignore any fertilization information in the file.");
     frame.set ("enable_fertilization", true);
   }

@@ -23,7 +23,7 @@
 #define GEOMETRY_H
 
 #include "symbol.h"
-#include "value.h"
+#include "attribute.h"
 #include <vector>
 #include <string>
 
@@ -274,9 +274,9 @@ public:
   // Layers -- Support initializing soil arrays layer by layer.
   typedef void (*load_syntax_t) (Frame&);
 public:
-  static void add_layer (Frame&, symbol dimension, Value::category, 
+  static void add_layer (Frame&, symbol dimension, Attribute::category, 
                          symbol description);
-  static void add_layer (Frame& frame, Value::category, 
+  static void add_layer (Frame& frame, Attribute::category, 
                          symbol name,
                          load_syntax_t load_syntax);
   void initialize_layer (std::vector<double>& value, 

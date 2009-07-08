@@ -65,15 +65,15 @@ public:
       expr (Librarian::build_item<Number> (al, "value")),
       scope (__FUNCTION__)
   {
-    scope.add_item (new ExchangeNumber (LAI_symbol, Value::None(),
+    scope.add_item (new ExchangeNumber (LAI_symbol, Attribute::None(),
 					"Leaf area index"));
     scope.add_item (new ExchangeNumber (distance_from_top_symbol, "cm",
 					"Distance_From_Top of canopy"));
-    scope.add_item (new ExchangeNumber (relative_LAI_symbol, Value::None(),
+    scope.add_item (new ExchangeNumber (relative_LAI_symbol, Attribute::None(),
 					"Relative leaf area index"));
-    scope.add_item (new ExchangeNumber (relative_distance_from_top_symbol, Value::None(),
+    scope.add_item (new ExchangeNumber (relative_distance_from_top_symbol, Attribute::None(),
 					"Relative distance_from_top of canopy"));
-    scope.add_item (new ExchangeNumber (DS_symbol, Value::None(),
+    scope.add_item (new ExchangeNumber (DS_symbol, Attribute::None(),
 					"Development stage"));
     scope.done ();
     expr->initialize (al.units (), scope, al.msg());
@@ -145,7 +145,7 @@ static struct rubiscoNdist_forcedSyntax : public DeclareModel
   {
 
     frame.declare_object ("value", Number::component, 
-                       Value::Const, Value::Singleton, "\
+                       Attribute::Const, Attribute::Singleton, "\
 Expression that evaluates to the relative rubisco capacity where 1 is the value in top of the canopy.");
     frame.order ("value");
 

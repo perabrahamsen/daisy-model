@@ -97,13 +97,13 @@ Diffuse radiation calculated using the model of De Pury and Farquhar, 1997.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("fa", Value::Fraction (), Check::positive (), Value::Const, "\
+    frame.declare ("fa", Attribute::Fraction (), Check::positive (), Attribute::Const, "\
 Diffuse radiation proportion.\n\
 Proportion of attenuated radiation that reaches the surface as diffuse\n\
 radiation.");
     frame.set ("fa", 0.5);
 
-    frame.declare ("a", Value::None (), Check::positive (), Value::Const, "\
+    frame.declare ("a", Attribute::None (), Check::positive (), Attribute::Const, "\
 Atmospheric transmission coefficient of PAR.\n\
 Value around 0.6-0.9 depending on dust particles.");
     frame.set ("a", 0.84);

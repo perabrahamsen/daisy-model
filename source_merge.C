@@ -115,7 +115,7 @@ SourceMerge::load (Treelog& msg)
         }
       
       // Set or check dimension.
-      if (dimension_ == Value::Unknown ())
+      if (dimension_ == Attribute::Unknown ())
         dimension_ = source[i]->dimension ();
       else if (!units.can_convert (source[i]->dimension (), dimension_))
         {
@@ -195,7 +195,7 @@ SourceMerge::SourceMerge (Block& al)
     units (al.units ()),
     source (Librarian::build_vector<Source> (al, "source")),
     title_ (al.name ("title")),
-    dimension_ (al.name ("dimension", Value::Unknown ())),
+    dimension_ (al.name ("dimension", Attribute::Unknown ())),
     with_ (al.name ("with", "")),
     style_ (al.integer ("style", -1))
 { }
@@ -217,10 +217,10 @@ same time.")
     GnuplotUtil::load_style (frame, "\
 By default, let the first source decide.", "");
     frame.declare_object ("source", Source::component, 
-                       Value::State, Value::Variable, "\
+                       Attribute::State, Attribute::Variable, "\
 List of timeseries to merge.");
     frame.set_check ("source", VCheck::min_size_1 ());
-    frame.declare_string ("dimension", Value::OptionalConst, "\
+    frame.declare_string ("dimension", Attribute::OptionalConst, "\
 Dimension of data to plot.\n\
 By default use the first source with a known dimension.");
 

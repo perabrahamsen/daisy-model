@@ -238,23 +238,23 @@ OBSOLETE: Use the USDA or FAO model instead.")
   void load_frame (Frame& frame) const
   { 
     frame.add_check (check_alist);
-    frame.declare ("clay", Value::None (), Check::non_negative (), Value::Const,
+    frame.declare ("clay", Attribute::None (), Check::non_negative (), Attribute::Const,
                 "Relative fraction of clay in soil.");
-    frame.declare ("silt", Value::None (), Check::non_negative (), Value::Const,
+    frame.declare ("silt", Attribute::None (), Check::non_negative (), Attribute::Const,
                 "Relative fraction of silt in soil.");
-    frame.declare ("fine_sand", Value::None (), Check::non_negative (), 
-                Value::OptionalConst,
+    frame.declare ("fine_sand", Attribute::None (), Check::non_negative (), 
+                Attribute::OptionalConst,
                 "Relative fraction of fine sand in soil.\n\
 NOTE: Not a real texture class, use 'sand' instead.");
-    frame.declare ("coarse_sand", Value::None (), Check::non_negative (), 
-                Value::OptionalConst,
+    frame.declare ("coarse_sand", Attribute::None (), Check::non_negative (), 
+                Attribute::OptionalConst,
                 "Relative fraction of coarse sand in soil.\n\
 NOTE: Not a real texture class, use 'sand' instead.");
-    frame.declare ("sand", Value::None (), Check::non_negative (), 
-                Value::OptionalConst,
+    frame.declare ("sand", Attribute::None (), Check::non_negative (), 
+                Attribute::OptionalConst,
                 "Relative fraction of sand in soil.");
-    frame.declare ("humus", Value::None (), Check::non_negative (), 
-                Value::Const,
+    frame.declare ("humus", Attribute::None (), Check::non_negative (), 
+                Attribute::Const,
                 "Relative fraction of humus in soil.");
 
   }

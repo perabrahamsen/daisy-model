@@ -316,17 +316,17 @@ void
 Bioincorporation::load_syntax (Frame& frame)
 { 
   // Incorporation speed.
-  frame.declare ("R_max", "g DM/m^2/h", Check::non_negative (), Value::Const, 
+  frame.declare ("R_max", "g DM/m^2/h", Check::non_negative (), Attribute::Const, 
 	      "Maximal speed of incorporation.");
   frame.set ("R_max", 0.5);
-  frame.declare ("k_half", "g DM/m^2", Check::positive (), Value::Const,
+  frame.declare ("k_half", "g DM/m^2", Check::positive (), Attribute::Const,
 	      "Halflife constant.");
   frame.set ("k_half", 1.0);
-  frame.declare ("speed", "g DM/m^2/h", Value::LogOnly, 
+  frame.declare ("speed", "g DM/m^2/h", Attribute::LogOnly, 
 	      "Fraction of litter incorporated this hour.\n\
 The formula is speed = (R_max * litter) / (k_half + litter).");
-  frame.declare ("C_per_N_factor", "(g C/cm^2)/(g N/cm^2)", Value::None (), 
-	      Check::non_negative (), Value::Const, 
+  frame.declare ("C_per_N_factor", "(g C/cm^2)/(g N/cm^2)", Attribute::None (), 
+	      Check::non_negative (), Attribute::Const, 
 	      "Limiting factor for high C/N ratio.");
   PLF C_per_N_factor;
   C_per_N_factor.add (50.0, 1.0);
@@ -334,32 +334,32 @@ The formula is speed = (R_max * litter) / (k_half + litter).");
   C_per_N_factor.add (120.0, 0.01);
   
   frame.set ("C_per_N_factor", C_per_N_factor);
-  frame.declare ("T_factor", "dg C", Value::None (), Check::non_negative (), 
-	      Value::Const, "Limiting factor for low temperature.");
+  frame.declare ("T_factor", "dg C", Attribute::None (), Check::non_negative (), 
+	      Attribute::Const, "Limiting factor for low temperature.");
   PLF T_factor;
   T_factor.add (4.0, 0.0);
   T_factor.add (6.0, 1.0);
   frame.set ("T_factor", T_factor);
 
   // Incorporation amounts.
-  frame.declare_fraction ("respiration", Value::Const,
+  frame.declare_fraction ("respiration", Attribute::Const,
 		       "Fraction of C lost in respiration.");
   frame.set ("respiration", 0.5);
-  frame.declare ("DM", "g DM/m^2/h", Value::LogOnly, 
+  frame.declare ("DM", "g DM/m^2/h", Attribute::LogOnly, 
 	      "DM removed from surface.");
-  frame.declare ("C_removed", "g C/m^2/h", Value::LogOnly,
+  frame.declare ("C_removed", "g C/m^2/h", Attribute::LogOnly,
               "C removed from surface.");
-  frame.declare ("N_removed", "g N/m^2/h", Value::LogOnly, 
+  frame.declare ("N_removed", "g N/m^2/h", Attribute::LogOnly, 
               "N removed from surface.");
-  frame.declare ("CO2", "g C/m^2/h", Value::LogOnly, "C respirated.");
-  frame.declare ("C_added", "g C/cm^3/h", Value::LogOnly, Value::SoilCells,
+  frame.declare ("CO2", "g C/m^2/h", Attribute::LogOnly, "C respirated.");
+  frame.declare ("C_added", "g C/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
               "C added to soil.");
-  frame.declare ("N_added", "g N/cm^3/h", Value::LogOnly, Value::SoilCells,
+  frame.declare ("N_added", "g N/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
               "N added to soil.");
 
   // Incorporation location.
-  frame.declare ("distribution", "cm", Value::None (), Check::non_negative (),
-	      Value::Const, "\
+  frame.declare ("distribution", "cm", Attribute::None (), Check::non_negative (),
+	      Attribute::Const, "\
 Distribution of incorporated matter in the soil.\
 \n(X, Y), where X is the depth (negative numbers), and Y is the relative\n\
 weight in that depth.  To get the fraction in a specific interval [a:b], we\n\
@@ -371,7 +371,7 @@ the whole profile.");
   distribution.add (0.0, 100.0);
   frame.set ("distribution", distribution);
 
-  frame.declare_object ("AOM", AOM::component, Value::Const, Value::Variable, "\
+  frame.declare_object ("AOM", AOM::component, Attribute::Const, Attribute::Variable, "\
 Incorporated AM parameters.");
   frame.set_check ("AOM", AM::check_om_pools ());
   frame.set_strings ("AOM", "AOM-SLOW-BIOINCORPORATION", "AOM-FAST");

@@ -112,7 +112,7 @@ list is done.")
   {
     frame.add_check (check_alist);
     frame.declare_object ("actions", Action::component, 
-                          Value::State, Value::Variable,
+                          Attribute::State, Attribute::Variable,
                           "List of actions to perform.");
     frame.order ("actions");
   }

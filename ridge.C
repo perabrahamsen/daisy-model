@@ -439,35 +439,35 @@ Ridge::load_syntax (Frame& frame)
 {
   
   // Parameters.
-  frame.declare ("z", Value::Fraction (), "cm", Check::none (), Value::Const, "\
+  frame.declare ("z", Attribute::Fraction (), "cm", Check::none (), Attribute::Const, "\
 The basic ridge parameter is the height, formulated as z (x),\n\
 where x is the relative distance from the middle of the ridge.\n\
 x = 0.0 is in the middle of a ridge, while x = 1.0 is at the\n\
 maximal distance.  The ridge is assumed to be symmetric.\n\
 z (x) is measured in centimeter above the unridged soil surface, which\n\
 means it is in the same reference system as the rest of the model.");
-  frame.declare ("R_crust", "h", Check::non_negative (), Value::Const,
+  frame.declare ("R_crust", "h", Check::non_negative (), Attribute::Const,
 	      "Resistance in crust.");
-  frame.declare_fraction ("switch", Value::Const, "\
+  frame.declare_fraction ("switch", Attribute::Const, "\
 Fraction of ridge height where we switch from bottom regime to wall regime.");
   frame.set ("switch", 1.0/3.0);
 
   // Content.
-  frame.declare ("Theta", "cm^3/cm^3", Value::LogOnly, "Soil water content.");
-  frame.declare ("Theta_pre", "cm^3/cm^3", Value::LogOnly, 
+  frame.declare ("Theta", "cm^3/cm^3", Attribute::LogOnly, "Soil water content.");
+  frame.declare ("Theta_pre", "cm^3/cm^3", Attribute::LogOnly, 
 	      "Soil water content before transport.");
-  frame.declare ("h", "cm", Value::LogOnly, "Soil water pressure.");
-  frame.declare ("z_pond", "cm", Value::LogOnly, "Internal free water height.");
-  frame.declare ("x_pond", "", Value::LogOnly, "Water to soil point.");
-  frame.declare ("internal_ponding", "cm", Value::LogOnly, 
+  frame.declare ("h", "cm", Attribute::LogOnly, "Soil water pressure.");
+  frame.declare ("z_pond", "cm", Attribute::LogOnly, "Internal free water height.");
+  frame.declare ("x_pond", "", Attribute::LogOnly, "Water to soil point.");
+  frame.declare ("internal_ponding", "cm", Attribute::LogOnly, 
 	      "Distance from ridge bottom to water surface.");
-  frame.declare ("R_bottom", "h", Value::LogOnly, "Resistance in ridge bottom.");
-  frame.declare ("R_wall", "h", Value::LogOnly, "Resistance in ridge wall.");
-  frame.declare ("I_bottom", "cm/h", Value::LogOnly, 
+  frame.declare ("R_bottom", "h", Attribute::LogOnly, "Resistance in ridge bottom.");
+  frame.declare ("R_wall", "h", Attribute::LogOnly, "Resistance in ridge wall.");
+  frame.declare ("I_bottom", "cm/h", Attribute::LogOnly, 
 	      "Infiltration through ridge bottom.");
-  frame.declare ("I_wall", "cm/h", Value::LogOnly,
+  frame.declare ("I_wall", "cm/h", Attribute::LogOnly,
 	      "Infiltration through ridge wall.");
-  frame.declare ("I", "cm/h", Value::LogOnly, "Total infiltration.");
+  frame.declare ("I", "cm/h", Attribute::LogOnly, "Total infiltration.");
 }
 
 PLF 

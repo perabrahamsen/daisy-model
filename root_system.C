@@ -512,102 +512,102 @@ RootSystem::load_syntax (Frame& frame)
 {
 
   frame.declare_object ("rootdens", Rootdens::component, 
-                        Value::OptionalConst, Value::Singleton,
+                        Attribute::OptionalConst, Attribute::Singleton,
                         "Root density model.");
 
   frame.declare_object ("ABAprod", ABAProd::component, "ABA production model.");
   frame.set ("ABAprod", "none");
 
-  frame.declare ("DptEmr", "cm", Check::non_negative (), Value::Const,
+  frame.declare ("DptEmr", "cm", Check::non_negative (), Attribute::Const,
                  "Penetration at emergence.");
   frame.set ("DptEmr", 10.0);
-  frame.declare ("PenPar1", "cm/dg C/d", Check::non_negative (), Value::Const,
+  frame.declare ("PenPar1", "cm/dg C/d", Check::non_negative (), Attribute::Const,
                  "Penetration rate parameter, coefficient.");
   frame.set ("PenPar1", 0.25);
-  frame.declare ("PenPar2", "dg C", Check::none (), Value::Const,
+  frame.declare ("PenPar2", "dg C", Check::none (), Attribute::Const,
                  "Penetration rate parameter, threshold.");
   frame.set ("PenPar2", 4.0);
-  frame.declare ("PenClayFac", Value::Fraction (), Value::None (),
-                 Check::non_negative (), Value::Const, 
+  frame.declare ("PenClayFac", Attribute::Fraction (), Attribute::None (),
+                 Check::non_negative (), Attribute::Const, 
                  "Clay dependent factor to multiply 'PenPar1' with.");
   PLF clay;
   clay.add (0.0, 1.0);
   clay.add (1.0, 1.0);
   frame.set ("PenClayFac", clay);
-  frame.declare ("MaxPen", "cm", Check::positive (), Value::Const,
+  frame.declare ("MaxPen", "cm", Check::positive (), Attribute::Const,
                  "Maximum penetration depth.");
   frame.set ("MaxPen", 100.0);
-  frame.declare ("MaxWidth", "cm", Check::positive (), Value::OptionalConst,
+  frame.declare ("MaxWidth", "cm", Check::positive (), Attribute::OptionalConst,
                  "Maximum horizontal distance of roots from plant.");
-  frame.declare ("Rad", "cm", Check::positive (), Value::Const,
+  frame.declare ("Rad", "cm", Check::positive (), Attribute::Const,
                  "Root radius.");
   frame.set ("Rad", 0.005);
-  frame.declare ("h_wp", "cm", Check::none (), Value::Const,
+  frame.declare ("h_wp", "cm", Check::none (), Attribute::Const,
                  "Matrix potential at wilting point.");
   frame.set ("h_wp",-15000.0);
-  frame.declare ("MxNH4Up", "g/cm/h", Check::non_negative (), Value::Const,
+  frame.declare ("MxNH4Up", "g/cm/h", Check::non_negative (), Attribute::Const,
                  "Maximum NH4 uptake per unit root length.");
   frame.set ("MxNH4Up", 2.5e-7);
-  frame.declare ("MxNO3Up", "g/cm/h", Check::non_negative (), Value::Const,
+  frame.declare ("MxNO3Up", "g/cm/h", Check::non_negative (), Attribute::Const,
                  "Maximum NO3 uptake per unit root length.");
   frame.set ("MxNO3Up", 2.5e-7);
-  frame.declare ("Rxylem", Value::None (), Check::non_negative (), Value::Const,
+  frame.declare ("Rxylem", Attribute::None (), Check::non_negative (), Attribute::Const,
                  "Transport resistence in xyleme.");
   frame.set ("Rxylem", 10.0);
 
-  frame.declare ("PotRtDpt", "cm", Check::non_negative (), Value::OptionalState,
+  frame.declare ("PotRtDpt", "cm", Check::non_negative (), Attribute::OptionalState,
                  "Potential root penetration depth.");
-  frame.declare ("Depth", "cm", Check::non_negative (), Value::OptionalState,
+  frame.declare ("Depth", "cm", Check::non_negative (), Attribute::OptionalState,
                  "Rooting Depth.");
   frame.declare ("Density", "cm/cm^3", Check::non_negative (),
-                 Value::LogOnly, Value::SoilCells,
+                 Attribute::LogOnly, Attribute::SoilCells,
                  "Root density in soil layers.");
   frame.declare ("H2OExtraction", "cm^3/cm^3/h", Check::non_negative (), 
-                 Value::LogOnly, Value::SoilCells,
+                 Attribute::LogOnly, Attribute::SoilCells,
                  "Extraction of H2O in soil layers.");
   frame.declare ("NH4Extraction", "g N/cm^3/h", Check::non_negative (), 
-                 Value::LogOnly, Value::SoilCells,
+                 Attribute::LogOnly, Attribute::SoilCells,
                  "Extraction of NH4-N in soil layers.");
   frame.declare ("NO3Extraction", "g N/cm^3/h", Check::non_negative (), 
-                 Value::LogOnly, Value::SoilCells,
+                 Attribute::LogOnly, Attribute::SoilCells,
                  "Extraction of NO3-N in soil layers.");
   frame.declare ("ABAExtraction", "g/cm^3/h", Check::non_negative (), 
-                 Value::LogOnly, Value::SoilCells,
+                 Attribute::LogOnly, Attribute::SoilCells,
                  "Extraction of ABA in soil layers.");
   frame.declare ("ABAConc", "g/cm^3", Check::non_negative (), 
-                 Value::State, "ABA concentration in water uptake.");
+                 Attribute::State, "ABA concentration in water uptake.");
   frame.set ("ABAConc", 0.0);
-  frame.declare ("h_x", "cm", Check::none (), Value::State,
+  frame.declare ("h_x", "cm", Check::none (), Attribute::State,
                  "Root extraction at surface.");
   frame.set ("h_x", 0.0);
-  frame.declare ("partial_soil_temperature", "dg C h", Value::State,
+  frame.declare ("partial_soil_temperature", "dg C h", Attribute::State,
                  "Soil temperature hours this day, so far.");
   frame.set ("partial_soil_temperature", 0.0);
-  frame.declare ("partial_day", "h", Value::State,
+  frame.declare ("partial_day", "h", Attribute::State,
                  "Hours we have accumulated soil temperature this day.");
   frame.set ("partial_day", 0.0);
-  frame.declare ("soil_temperature", "dg C", Value::State,
+  frame.declare ("soil_temperature", "dg C", Attribute::State,
                  "Average soil temperature yesterday.");
   frame.set ("soil_temperature", 0.0);
-  frame.declare ("water_stress", Value::None (), Check::fraction (),
-                 Value::LogOnly,
+  frame.declare ("water_stress", Attribute::None (), Check::fraction (),
+                 Attribute::LogOnly,
                  "Fraction of requested water we didn't get.");
   frame.declare ("water_stress_days", "d", Check::non_negative (),
-                 Value::State,
+                 Attribute::State,
                  "Number of days production has halted due to water stress.\n\
 This is the sum of water stress for each hour, multiplied with the\n\
 fraction of the radition of that day that was received that hour.");
   frame.set ("water_stress_days", 0.0);
-  frame.declare ("production_stress", Value::None (), Check::fraction (), 
-                 Value::LogOnly,
+  frame.declare ("production_stress", Attribute::None (), Check::fraction (), 
+                 Attribute::LogOnly,
                  "SVAT induced stress, or -1 if not applicable.");
-  frame.declare ("Ept", "mm/h", Check::none (), Value::LogOnly,
+  frame.declare ("Ept", "mm/h", Check::none (), Attribute::LogOnly,
                  "Potential transpiration.");
-  frame.declare ("H2OUpt", "mm/h", Check::non_negative (), Value::LogOnly,
+  frame.declare ("H2OUpt", "mm/h", Check::non_negative (), Attribute::LogOnly,
                  "H2O uptake.");
-  frame.declare ("NH4Upt", "g N/m^2/h", Check::non_negative (), Value::LogOnly,
+  frame.declare ("NH4Upt", "g N/m^2/h", Check::non_negative (), Attribute::LogOnly,
                  "NH4-N uptake.");
-  frame.declare ("NO3Upt", "g N/m^2/h", Check::non_negative (), Value::LogOnly,
+  frame.declare ("NO3Upt", "g N/m^2/h", Check::non_negative (), Attribute::LogOnly,
                  "NO3-N uptake.");
 }
 

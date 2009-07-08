@@ -1762,17 +1762,17 @@ See Mollerup 2007 for details.")
   void load_frame (Frame& frame) const
   {
     frame.declare_object ("solver", Solver::component, 
-                      Value::Const, Value::Singleton, "\
+                      Attribute::Const, Attribute::Singleton, "\
 Model used for solving matrix equation system.");
     frame.set ("solver", "cxsparse");
-    frame.declare_boolean ("enable_boundary_diffusion", Value::Const, "\
+    frame.declare_boolean ("enable_boundary_diffusion", Attribute::Const, "\
 If this is set, diffusion over boundaries is enabled."); 
     frame.set ("enable_boundary_diffusion", true);
-    frame.declare_integer ("debug", Value::Const, "\
+    frame.declare_integer ("debug", Attribute::Const, "\
 Enable additional debug message.\n\
 A value of 0 means no message, higher numbers means more messages.");
     frame.set ("debug", 0);
-    frame.declare ("upstream_weight", Value::Fraction(), Value::Const, "\
+    frame.declare ("upstream_weight", Attribute::Fraction(), Attribute::Const, "\
 Upstream weighting factor: 1 = full upstream formulation, 0.5 = equal weight.");
     frame.set ("upstream_weight", 1.0);
  

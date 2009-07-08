@@ -146,11 +146,11 @@ reaction just applies the models and logs the result. ")
   void load_frame (Frame& frame) const
   {
 
-    frame.declare ("NH4", "g/cm^3/h", Value::LogOnly, Value::SoilCells, 
+    frame.declare ("NH4", "g/cm^3/h", Attribute::LogOnly, Attribute::SoilCells, 
 		"Amount of ammonium consumed this hour.");
-    frame.declare ("NO3", "g/cm^3/h", Value::LogOnly, Value::SoilCells, 
+    frame.declare ("NO3", "g/cm^3/h", Attribute::LogOnly, Attribute::SoilCells, 
 		"Amount of nitrate generated this hour.");
-    frame.declare ("N2O", "g/cm^3/h", Value::LogOnly, Value::SoilCells, 
+    frame.declare ("N2O", "g/cm^3/h", Attribute::LogOnly, Attribute::SoilCells, 
 		"Amount of nitrous oxide generated this hour.");
 
 

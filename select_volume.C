@@ -84,7 +84,7 @@ SelectVolume::special_convert (const Units& units,
   static const symbol bulk_density ("g/cm^3");
   const symbol bulk_dim = default_dimension (bulk_density);
   if (units.can_convert (has, bulk_dim)
-      && units.can_convert (Value::Fraction (), want))
+      && units.can_convert (Attribute::Fraction (), want))
     bd_convert.reset (new BD_convert (units, has, want, bulk_dim));
   return bd_convert.get ();
 }
@@ -245,25 +245,25 @@ Shared parameters for volume based logs.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare_boolean ("density", Value::Const, 
+    frame.declare_boolean ("density", Attribute::Const, 
 		"If true, divide total content with volume.\n\
 Otherwise, obey 'density_z', 'density_x', and 'density_y'.");
     frame.set ("density", false);
-    frame.declare_boolean ("density_z", Value::Const, 
+    frame.declare_boolean ("density_z", Attribute::Const, 
 		"If true, divide total content with volume height.\n\
 This parameter is ignored if 'density' is true.");
-    frame.declare_boolean ("density_x", Value::Const, 
+    frame.declare_boolean ("density_x", Attribute::Const, 
 		"If true, divide total content with volume width.\n\
 This parameter is ignored if 'density' is true.");
-    frame.declare_boolean ("density_y", Value::Const, 
+    frame.declare_boolean ("density_y", Attribute::Const, 
 		"If true, divide total content with volume depth.\n\
 This parameter is ignored if 'density' is true.");
     frame.declare_object ("volume", Volume::component, 
-                       Value::Const, Value::Singleton,
+                       Attribute::Const, Attribute::Singleton,
                        "Soil volume to log.");
     frame.set ("volume", "box");
 
-    frame.declare ("min_root_density", "cm/cm^3", Value::Const, "\
+    frame.declare ("min_root_density", "cm/cm^3", Attribute::Const, "\
 Minimum root density in cells.\n\
 \n\
 Set this paramater to a positive amount in order to log only cells\n\
@@ -275,7 +275,7 @@ the cell will be scaled to zero, while if there is only half the\n\
 specified minimum root density, the data for the cell will be scaled\n\
 to 0.5.");
     frame.set ("min_root_density", -1.0);
-    frame.declare_string ("min_root_crop", Value::Const, "\
+    frame.declare_string ("min_root_crop", Attribute::Const, "\
 Name of crop whose roots scould be used for the root density requirements.\n\
 Set this to \"*\" to use all roots.");
     frame.set ("min_root_crop", "*"); // Select::wildcard may not be initialized.
@@ -309,11 +309,11 @@ This is similar to 'volume', except for the default values of\n         \
     frame.set ("density_z", false);
     frame.set ("density_x", true);
     frame.set ("density_y", true);
-    frame.declare ("from", "cm", Value::OptionalConst,
+    frame.declare ("from", "cm", Attribute::OptionalConst,
 		"Specify height (negative) to measure from.\n\
 By default, measure from the top.\n\
 OBSOLETE: Use (volume box (top FROM)) instead.");
-    frame.declare ("to", "cm", Value::OptionalConst,
+    frame.declare ("to", "cm", Attribute::OptionalConst,
 		"Specify height (negative) to measure interval.\n\
 By default, measure to the bottom.\n\
 OBSOLETE: Use (volume box (bottom TO)) instead.");
@@ -363,9 +363,9 @@ Shared parameters for water limited volumn logging.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("h", "cm", Check::non_positive (), Value::Const, 
+    frame.declare ("h", "cm", Check::non_positive (), Attribute::Const, 
                 "Pressure to log water content for.");
-    frame.declare ("h_ice", "cm", Check::non_positive (), Value::Const, 
+    frame.declare ("h_ice", "cm", Check::non_positive (), Attribute::Const, 
 		"Pressure at which all air is out of the matrix.\n\
 When there are no ice, this is 0.0.  When there are ice, the ice is\n\
 presumed to occupy the large pores, so it is h (Theta_sat - X_ice).");
@@ -394,11 +394,11 @@ static struct SelectWaterIntervalParam : public DeclareParam
     frame.set ("density_z", false);
     frame.set ("density_x", true);
     frame.set ("density_y", true);
-    frame.declare ("from", "cm", Value::OptionalConst,
+    frame.declare ("from", "cm", Attribute::OptionalConst,
 		"Specify height (negative) to measure from.\n\
 By default, measure from the top.\n\
 OBSOLETE: Use (volume box (top FROM)) instead.");
-    frame.declare ("to", "cm", Value::OptionalConst,
+    frame.declare ("to", "cm", Attribute::OptionalConst,
 		"Specify height (negative) to measure interval.\n\
 By default, measure to the bottom.\n\
 OBSOLETE: Use (volume box (bottom TO)) instead.");

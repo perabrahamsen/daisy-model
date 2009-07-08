@@ -88,7 +88,7 @@ Traverse::traverse_model (const symbol component, const symbol model)
   if (enter_model (frame, component, model))
     {
       const symbol super = frame.base_name ();
-      if (super != Value::None ())
+      if (super != Attribute::None ())
 	{
 	  // Derived parameterization, has default values.
 	  const Frame& default_frame = library.model (super);
@@ -220,19 +220,19 @@ Traverse::traverse_parameter (const Frame& frame,
 {
   if (enter_parameter (frame, default_frame, name, parameter))
     {
-      const Value::type type = frame.lookup (parameter);
+      const Attribute::type type = frame.lookup (parameter);
       const int size = frame.type_size (parameter);
       const bool has_value = frame.check (parameter);
 
       // Children.
       switch (type)
 	{
-	case Value::Submodel:
+	case Attribute::Submodel:
 	  {
 	    FrameSubmodel& entry_frame
               = const_cast<FrameSubmodel&> (frame.submodel (parameter));
             const symbol submodel = frame.submodel_name (parameter);
-	    if (size == Value::Singleton)
+	    if (size == Attribute::Singleton)
 	      {
 		if (has_value && default_frame.check (parameter))
                   traverse_submodel (entry_frame, 
@@ -263,11 +263,11 @@ Traverse::traverse_parameter (const Frame& frame,
 	      }
 	  }
 	  break;
-	case Value::Model:
+	case Attribute::Model:
 	  {
 	    if (has_value)
 	      {
-		if (size == Value::Singleton)
+		if (size == Attribute::Singleton)
 		  {
 		    FrameModel& entry_frame 
                       = const_cast<FrameModel&> (frame.model (parameter));

@@ -100,10 +100,10 @@ Steady-state water flow.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("q_x", "cm/h", Value::Const, "\
+    frame.declare ("q_x", "cm/h", Attribute::Const, "\
 Horizontal flow.");
     frame.set ("q_x", 0.0);
-    frame.declare ("q_z", "cm/h", Value::Const, "\
+    frame.declare ("q_z", "cm/h", Attribute::Const, "\
 Vertical flow upwards.");
     frame.set ("q_z", 0.0); 
   }

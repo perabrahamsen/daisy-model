@@ -180,11 +180,11 @@ Common base for logging flow through a specific plane.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare_boolean ("density", Value::Const, 
+    frame.declare_boolean ("density", Attribute::Const, 
                "If true, divide value with volume height.");
     frame.set ("density", false);
     frame.declare_object ("volume", Volume::component, 
-                      Value::Const, Value::Singleton,
+                      Attribute::Const, Attribute::Singleton,
                       "Soil volume to log flow into.");
     frame.set ("volume", "box");
   }
@@ -219,7 +219,7 @@ Extract flow from top of specified volume.")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.declare ("from", "cm", Value::OptionalConst,
+    frame.declare ("from", "cm", Attribute::OptionalConst,
 		"Specify height (negative) to measure from.\n\
 By default, measure from the top.\n\
 OBSOLETE: Use (volume box (top FROM)) instead.");
@@ -266,7 +266,7 @@ Extract flow from bottom of specified volume.")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.declare ("to", "cm", Value::OptionalConst,
+    frame.declare ("to", "cm", Attribute::OptionalConst,
 		"Specify height (negative) to measure interval.\n\
 By default, measure to the bottom.\n\
 OBSOLETE: Use (volume box (bottom TO)) instead.");

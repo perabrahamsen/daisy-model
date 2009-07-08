@@ -77,7 +77,7 @@ FrameModel::component () const
   if (!parent ())
     {
       daisy_warning ("No parent '" + type_name () + "'");
-      return Value::Unknown ();
+      return Attribute::Unknown ();
     }
   return parent ()->component ();
 }

@@ -202,7 +202,7 @@ Each selected variable is represented by a column in the specified log file.")
   void load_frame (Frame& frame) const
   { 
     frame.declare_object ("summary", Summary::component,
-                          Value::Const, Value::Variable,
+                          Attribute::Const, Attribute::Variable,
                           "Summaries for this log file.");
     frame.set_empty ("summary");
   }

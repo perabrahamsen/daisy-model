@@ -78,16 +78,16 @@ A named value to exchange with external models.")
   void load_frame (Frame& frame) const
   {
     Model::load_model (frame);
-    frame.declare_string ("name", Value::Const, "\
+    frame.declare_string ("name", Attribute::Const, "\
 Name of value to exchange.");
   }
 } Exchange_init;
 
 // Exchanging a number.
 
-Value::type 
+Attribute::type 
 ExchangeNumber::lookup () const
-{ return Value::Number; }
+{ return Attribute::Number; }
 
 bool
 ExchangeNumber::check () const
@@ -140,18 +140,18 @@ static struct ExchangeNumberSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare_string ("dimension", Value::Const, "\
+    frame.declare_string ("dimension", Attribute::Const, "\
 Dimension of value to exchange.");
-    frame.declare ("value", Value::Unknown (), Value::OptionalState, "\
+    frame.declare ("value", Attribute::Unknown (), Attribute::OptionalState, "\
 Current value to exchange.");
   }
 } ExchangeNumber_syntax;
 
 // Exchanging a name (or string).
 
-Value::type 
+Attribute::type 
 ExchangeName::lookup () const
-{ return Value::String; }
+{ return Attribute::String; }
 
 bool
 ExchangeName::check () const
@@ -178,7 +178,7 @@ static struct ExchangeNameSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare_string ("value", Value::Const, "\
+    frame.declare_string ("value", Attribute::Const, "\
 Current value to exchange.");
   }
 } ExchangeName_syntax;
@@ -192,12 +192,12 @@ ScopeExchange::entries (std::set<symbol>& result) const
     result.insert (all[i]->tag ());
 }
 
-Value::type 
+Attribute::type 
 ScopeExchange::lookup (const symbol tag) const
 {
   const std::map<symbol, Exchange*>::const_iterator i = named.find (tag);
   if (i == named.end ())
-    return Value::Error;
+    return Attribute::Error;
   return (*i).second->lookup (); 
 }
 
@@ -292,7 +292,7 @@ static struct ScopeExchangeSyntax : public DeclareModel
   {
     Model::load_model (frame);
     frame.declare_object ("entries", Exchange::component, 
-                          Value::Const, Value::Variable,
+                          Attribute::Const, Attribute::Variable,
                           "List of items to exchange.");
   }
 } ScopeExchange_syntax;

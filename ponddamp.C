@@ -86,7 +86,7 @@ KH = exp (-b h)")
   void load_frame (Frame& frame) const
   { 
     frame.set_strings ("cite", "EUROSEM");
-    frame.declare ("b", "mm^-1", Value::Const, "\
+    frame.declare ("b", "mm^-1", Attribute::Const, "\
 Exponential degradation coefficient.\n\
 The range of 'b' is from 0.9 to 3.1, a default value of 2 is proposed\n\
 by the EUROSEM project.");

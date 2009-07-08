@@ -69,7 +69,7 @@ SourceStandard::load (Treelog& msg)
 
   // Read dimensions.
   const symbol original (lex.dimension (tag_c));
-  if (original != Value::Unknown () && dimension_ == Value::Unknown ())
+  if (original != Attribute::Unknown () && dimension_ == Attribute::Unknown ())
     dimension_ = original;
   else if (!has_factor && !units.can_convert (original, dimension_))
     {
@@ -141,7 +141,7 @@ SourceStandard::SourceStandard (Block& al)
     units (al.units ()),
     tag (al.name ("tag")),
     title_ (al.name ("title", tag)),
-    dimension_ (al.name ("dimension", Value::Unknown ())),
+    dimension_ (al.name ("dimension", Attribute::Unknown ())),
     has_factor (al.check ("factor")),
     factor (al.number ("factor", 1.0))
 { }
@@ -164,13 +164,13 @@ Read a a single column from a Daisy log, weather or data file.")
     SourceFile::load_style (frame, "\
 By default the same as 'tag'.");
 
-    frame.declare_string ("tag", Value::Const, "\
+    frame.declare_string ("tag", Attribute::Const, "\
 Name of column in Daisy log file where data is found.");
-    frame.declare_string ("dimension", Value::OptionalConst, "\
+    frame.declare_string ("dimension", Attribute::OptionalConst, "\
 Dimension of data to plot.\n\
 By default this is the same as 'original'.\n\
 If 'factor' is not specified, Daisy will attempt to convert the data.");
-    frame.declare ("factor", Value::Unknown (), Value::OptionalConst, "\
+    frame.declare ("factor", Attribute::Unknown (), Attribute::OptionalConst, "\
 Multiply all data by this number.\n\
 By default Daisy will convert from 'original' to 'dimension'.");
 

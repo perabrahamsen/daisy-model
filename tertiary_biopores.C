@@ -652,24 +652,24 @@ static struct TertiaryBioporesSyntax : public DeclareModel
     : DeclareModel (Tertiary::component, "biopores", "Tertiary domain divided into biopore classes.")
   { }
   static void load_mass (Frame& frame)
-  { IM::add_syntax (frame, Value::LogOnly, IM::mass_unit ()); }
+  { IM::add_syntax (frame, Attribute::LogOnly, IM::mass_unit ()); }
   static void load_storage (Frame& frame)
-  { IM::add_syntax (frame, Value::LogOnly, IM::storage_unit ()); }
+  { IM::add_syntax (frame, Attribute::LogOnly, IM::storage_unit ()); }
 
   void load_frame (Frame& frame) const
   { 
 
     frame.declare_object ("classes", Biopore::component, 
-                       Value::State, Value::Variable,
+                       Attribute::State, Attribute::Variable,
                        "List of biopore classes.");
-    frame.declare ("pressure_initiate", "cm", Value::Const, 
+    frame.declare ("pressure_initiate", "cm", Attribute::Const, 
                 "Pressure needed to activate biopore flow.");
     frame.set ("pressure_initiate", -3.0);
-    frame.declare ("pressure_end", "cm", Value::Const, 
+    frame.declare ("pressure_end", "cm", Attribute::Const, 
                 "Pressure below which biopore flow is deactivated.");
     frame.set ("pressure_end", -30.0);
     frame.declare ("pressure_limit", "cm", Check::non_positive (),
-                Value::OptionalConst, "\
+                Attribute::OptionalConst, "\
 Limit to pressure difference for moving matrix water gradient to biopores.\n\
 \n\
 The idea is that the water is extracted from the matrix by a\n\
@@ -678,32 +678,32 @@ to the height of this water column.  The pressure limit is then the\n\
 maximal length of the column, or the point where the column breaks.\n\
 \n\
 By default, this is equal to 'pressure_end'.");
-    frame.declare ("pressure_barrier", "cm", Check::non_negative (), Value::Const,
+    frame.declare ("pressure_barrier", "cm", Check::non_negative (), Attribute::Const,
                 "Pressure barrier between matrix and biopore domain.\n\
 If the pressure difference between the matrix and biopores is below\n\
 this value, no water will tranfer between the domains.  If you specify\n\
 a too small value for this parameter, the solution may be unstable.");
     frame.set ("pressure_barrier", 5.0);
-    frame.declare ("pond_max", "cm", Check::non_negative (), Value::Const, "\
+    frame.declare ("pond_max", "cm", Check::non_negative (), Attribute::Const, "\
 Maximum height of ponding before spilling into biopores.\n\
 After macropores are activated pond will have this height.");
     frame.set ("pond_max", 0.05);
-    frame.declare_boolean ("use_small_timesteps", Value::Const,
+    frame.declare_boolean ("use_small_timesteps", Attribute::Const,
                 "True iff the sink is allowed to change within a timestep.");
     frame.set ("use_small_timesteps", true);
-    frame.declare_boolean ("active", Value::OptionalState,
-                Value::SoilCells, "Active biopores in cells.");
-    frame.declare ("water_volume", "cm^3", Value::LogOnly, "Water volume.");    
-    frame.declare ("water_height", "cm", Value::LogOnly,
+    frame.declare_boolean ("active", Attribute::OptionalState,
+                Attribute::SoilCells, "Active biopores in cells.");
+    frame.declare ("water_volume", "cm^3", Attribute::LogOnly, "Water volume.");    
+    frame.declare ("water_height", "cm", Attribute::LogOnly,
                 "Water volume multiplied with surface area.");
-    frame.declare_submodule_sequence ("solute_mass", Value::LogOnly, "\
+    frame.declare_submodule_sequence ("solute_mass", Attribute::LogOnly, "\
 Total amount of solutes in biopores.", load_mass);
-    frame.declare_submodule_sequence ("solute_storage", Value::LogOnly, "\
+    frame.declare_submodule_sequence ("solute_storage", Attribute::LogOnly, "\
 Total amount of solutes in biopores divided by surface area.", load_storage);
-    frame.declare ("ddt", "h", Value::LogOnly, "Emulated timestep.\n\
+    frame.declare ("ddt", "h", Attribute::LogOnly, "Emulated timestep.\n\
 Timestep scaled for available water.\n\
 Only relevant if 'use_small_timesteps' is false.");    
-    frame.declare_integer ("deactivate_steps", Value::State, 
+    frame.declare_integer ("deactivate_steps", Attribute::State, 
                 "No matrix exchange for this number of timesteps.\n\
 Automatically set when matrix pressure is in a disarray, such as after\n\
 tillage operations, or calls to reserve models.");

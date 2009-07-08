@@ -54,29 +54,29 @@ void
 HorHeat::load_syntax (Frame& frame)
 {
 
-  frame.declare ("quarts_form_factor", Value::None (), Check::positive (), 
-                 Value::Const,
+  frame.declare ("quarts_form_factor", Attribute::None (), Check::positive (), 
+                 Attribute::Const,
                  "Gemetry factor used for conductivity calculation.");
   frame.set ("quarts_form_factor", 2.0);
-  frame.declare ("mineral_form_factor", Value::None (), Check::positive (), 
-                 Value::Const,
+  frame.declare ("mineral_form_factor", Attribute::None (), Check::positive (), 
+                 Attribute::Const,
                  "Gemetry factor used for conductivity calculation.");
   frame.set ("mineral_form_factor", 4.0);
-  frame.declare_integer ("intervals", Value::Const, "\
+  frame.declare_integer ("intervals", Attribute::Const, "\
 Number of numeric intervals to use in the heat coductivity table.");
   frame.set ("intervals", 100);
   frame.declare ("C_soil", "erg/cm^3/dg C", Check::positive (), 
-                 Value::OptionalConst,
+                 Attribute::OptionalConst,
                  "The soils heat capacity.\n\
 By default, this is calculated from the soil constituents.");
   frame.declare ("K_water",
                  "erg/s/cm/dg C", Check::positive (),
-                 Value::OptionalConst, Value::SoilCells,
+                 Attribute::OptionalConst, Attribute::SoilCells,
                  "Heat conductivity table for water in soil.\n\
 By default, this is calculated from the soil constituents.");
   frame.declare ("K_ice",
                  "erg/s/cm/dg C", Check::positive (),
-                 Value::OptionalConst, Value::SoilCells,
+                 Attribute::OptionalConst, Attribute::SoilCells,
                  "Heat conductivity table for solid frozen soil.\n\
 By default, this is calculated from the soil constituents.");
 }

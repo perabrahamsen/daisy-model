@@ -45,10 +45,10 @@ struct NumberOperand : public Number
   { return operand->missing (scope); }
   symbol dimension (const Scope& scope) const
   {
-    if (operand->dimension (scope) == Value::None ())
-      return Value::None ();
+    if (operand->dimension (scope) == Attribute::None ())
+      return Attribute::None ();
 
-    return Value::Unknown (); 
+    return Attribute::Unknown (); 
   }
 
   // Create.
@@ -258,7 +258,7 @@ struct NumberPow : public Number
     return pow (x, y); 
   }
   symbol dimension (const Scope&) const 
-  { return Value::Unknown (); }
+  { return Attribute::Unknown (); }
 
   // Create.
   bool initialize (const Units& units, const Scope& scope, Treelog& err)
@@ -324,10 +324,10 @@ struct NumberOperands : public Number
         else
           {
             if (operands[i]->dimension (scope) != found)
-              return Value::Unknown ();
+              return Attribute::Unknown ();
           }
     
-    return found != unspecified ? found : Value::Unknown ();
+    return found != unspecified ? found : Attribute::Unknown ();
   }
 
   // Use.
@@ -458,7 +458,7 @@ static struct NumberMaxSyntax : public DeclareModel
   {
 
     frame.declare_object ("operands", Number::component,
-                       Value::Const, Value::Variable,
+                       Attribute::Const, Attribute::Variable,
                        "The operands for this function.");
 #ifdef CHECK_OPERANDS_DIM
     static VCheck::All all (VCheck::min_size_1 (),
@@ -505,7 +505,7 @@ static struct NumberMinSyntax : public DeclareModel
   {
 
     frame.declare_object ("operands", Number::component,
-                       Value::Const, Value::Variable,
+                       Attribute::Const, Attribute::Variable,
                        "The operands for this function.");
 #ifdef CHECK_OPERANDS_DIM
     static VCheck::All all (VCheck::min_size_1 (), 
@@ -530,7 +530,7 @@ struct NumberProduct : public NumberOperands
   }
   symbol dimension (const Scope& scope) const 
   { 
-    symbol dim = Value::None ();
+    symbol dim = Attribute::None ();
     for (size_t i = 0; i < operands.size (); i++)
       dim = Units::multiply (dim, operands[i]->dimension (scope));
     return dim;
@@ -554,7 +554,7 @@ static struct NumberProductSyntax : public DeclareModel
   {
 
     frame.declare_object ("operands", Number::component,
-                       Value::Const, Value::Variable,
+                       Attribute::Const, Attribute::Variable,
                        "The operands for this function.");
     frame.order ("operands");
   }
@@ -591,7 +591,7 @@ static struct NumberSumSyntax : public DeclareModel
   {
 
     frame.declare_object ("operands", Number::component,
-                       Value::Const, Value::Variable,
+                       Attribute::Const, Attribute::Variable,
                        "The operands for this function.");
 #ifdef CHECK_OPERANDS_DIM
     frame.set_check ("operands", NumberOperands::unique);
@@ -636,7 +636,7 @@ subtracts all but the first from the first.")
   {
 
     frame.declare_object ("operands", Number::component,
-                       Value::Const, Value::Variable,
+                       Attribute::Const, Attribute::Variable,
                        "The operands for this function.");
 #ifdef CHECK_OPERANDS_DIM
     static VCheck::All all (VCheck::min_size_1 (), 
@@ -659,7 +659,7 @@ struct NumberDivide : public NumberOperands
     return val;
   }
   symbol dimension (const Scope&) const 
-  { return Value::Unknown (); }
+  { return Attribute::Unknown (); }
 
   // Create.
   NumberDivide (Block& al)
@@ -679,7 +679,7 @@ static struct NumberDivideSyntax : public DeclareModel
   {
 
     frame.declare_object ("operands", Number::component,
-                       Value::Const, Value::Variable,
+                       Attribute::Const, Attribute::Variable,
                        "The operands for this function.");
     frame.set_check ("operands", VCheck::min_size_1 ());
     frame.order ("operands");

@@ -121,7 +121,7 @@ See SH:REFERENCE for more explanation.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare_fraction ("y_half", Value::Const, "\
+    frame.declare_fraction ("y_half", Attribute::Const, "\
 Effect on assimilate production of water stress.\n\
 This parameter specifies the effect on assimilate production\n(\
 compared to potential) when the amount of available soil water is\n\
@@ -207,9 +207,9 @@ static struct ProgramWSE_tableSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
     frame.declare_object ("wse", WSE::component, 
-                       Value::Const, Value::Singleton, "\
+                       Attribute::Const, Attribute::Singleton, "\
 The water stress effect to show in the table.");
-    frame.declare_integer ("intervals", Value::Const, "\
+    frame.declare_integer ("intervals", Attribute::Const, "\
 Number of intervals in the table.");
     frame.set ("intervals", 10);
     frame.order ("wse");

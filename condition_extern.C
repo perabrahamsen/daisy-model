@@ -107,7 +107,7 @@ Test if a boolean expression is true,using extern log.")
   void load_frame (Frame& frame) const
   {
       frame.declare_object ("scope", Scopesel::component, 
-                         Value::Const, Value::Singleton, "\
+                         Attribute::Const, Attribute::Singleton, "\
 Scope to evaluate expession in.");
       frame.declare_object ("expr", Boolean::component, "\
 Expression to evaluate.");

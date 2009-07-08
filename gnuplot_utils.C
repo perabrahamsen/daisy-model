@@ -28,7 +28,7 @@ GnuplotUtil::load_style (Frame& frame,
                          const symbol default_with, 
                          const symbol default_title)
 {
-  Value::category with_cat = Value::Const;
+  Attribute::category with_cat = Attribute::Const;
   
   // With
   std::string with_doc = "\
@@ -37,13 +37,13 @@ use 'points' to plot each point individually, or 'lines' to draw\n\
 lines between them.";
   if (default_with.name ().size () > 1)
     {
-      with_cat = Value::OptionalConst;
+      with_cat = Attribute::OptionalConst;
       with_doc += "\n\n" + default_with;
     }
   frame.declare_string ("with", with_cat, with_doc);
 
   // Style
-  frame.declare_integer ("style", Value::OptionalConst, "\
+  frame.declare_integer ("style", Attribute::OptionalConst, "\
 Style to use for this dataset.\n\
 \n\
 By default, gnuplot will use style 1 for the first source to plot with\n\
@@ -58,12 +58,12 @@ negative number to explicitly request the default behaviour.\n\
 The 'style' parameter is only used if 'with' is either 'points' or 'lines'.");
 
   // Title.
-  Value::category title_cat = Value::Const;
+  Attribute::category title_cat = Attribute::Const;
   std::string title_doc = "\
 Name of data series for the legend on the graph.";
   if (default_title.name ().size () > 1)
     {
-      title_cat = Value::OptionalConst;
+      title_cat = Attribute::OptionalConst;
       title_doc += "\n\n" + default_title;
     }
   frame.declare_string ("title", title_cat, title_doc);

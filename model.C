@@ -28,11 +28,11 @@
 void 
 Model::load_model (Frame& frame)
 { 
-  frame.declare_string ("description", Value::OptionalConst, "\
+  frame.declare_string ("description", Attribute::OptionalConst, "\
 Description of this model or parameterization.\n\
 The value will appear in the reference manual, and may also appear in some \
 GUI front ends.");
-  frame.declare_string ("cite", Value::Const, Value::Variable, "\
+  frame.declare_string ("cite", Attribute::Const, Attribute::Variable, "\
 BibTeX keys that would be relevant for this model or paramterization.");
   frame.set_empty ("cite");
 }

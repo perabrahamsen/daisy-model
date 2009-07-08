@@ -45,7 +45,7 @@ struct NumberLet : public Number
       static void load_syntax (Frame& frame)
       {
         // Bind an identifier to an expression.
-        frame.declare_string ("identifier", Value::Const, 
+        frame.declare_string ("identifier", Attribute::Const, 
                     "Identifier to bind.");
         frame.declare_object ("expr", Number::component, 
                            " Value to give it.");
@@ -91,8 +91,8 @@ struct NumberLet : public Number
         all.insert ((*i).first);
     }
 
-    Value::type lookup (const symbol id) const
-    { return check (id) ? Value::Number : Value::Error; }
+    Attribute::type lookup (const symbol id) const
+    { return check (id) ? Attribute::Number : Attribute::Error; }
 
     bool check (symbol id) const
     {
@@ -144,7 +144,7 @@ struct NumberLet : public Number
     }
     static void load_syntax (Frame& frame)
     {
-      frame.declare_submodule_sequence ("clauses", Value::Const, "\
+      frame.declare_submodule_sequence ("clauses", Attribute::Const, "\
 List of identifiers and values to bind in this scope.", Clause::load_syntax);
     }
     ScopeClause (Block& al)

@@ -249,9 +249,9 @@ VegetationCrops::ForcedLAI::operator() (int year, int yday)
     
 void VegetationCrops::ForcedLAI::load_syntax (Frame& frame)
 {
-  frame.declare_integer ("year", Value::Const, "\
+  frame.declare_integer ("year", Attribute::Const, "\
 Year for which to use forced LAI.");
-  frame.declare ("LAIvsDAY", "m^2/m^2", "yday", Value::OptionalConst, 
+  frame.declare ("LAIvsDAY", "m^2/m^2", "yday", Attribute::OptionalConst, 
 		"LAI as a function of Julian day.\n\
 \n\
 The simulated LAI will be used before the first day you specify and\n\
@@ -957,7 +957,7 @@ static struct VegetationCropsSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare_submodule_sequence("ForcedLAI", Value::Const, "\
+    frame.declare_submodule_sequence("ForcedLAI", Attribute::Const, "\
 By default, the total LAI for the vegetation will be the sum of the\n\
 simulated LAI for the individual crops.  However, you can force the\n\
 model to use a different values for LAI by setting this attribute.\n\
@@ -972,7 +972,7 @@ emerged.  If no crops have emerged on the field, it will be ignored.",
                                   VegetationCrops::ForcedLAI::load_syntax);
     frame.set_empty ("ForcedLAI");
     frame.declare_object ("crops", Crop::component, 
-                       Value::State, Value::Variable,
+                       Attribute::State, Attribute::Variable,
                        "List of crops growing in the field");
     frame.set_empty ("crops");
     }

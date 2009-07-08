@@ -286,13 +286,13 @@ The first numbers corresponds to each of the SMB pools, the next\n\
 number to the SOM buffer, and any remaining numbers to each of\n\
 the DOM pools.  The length of the sequence should thus be the number\n\
 of SMB pools plus 1 plus optionally the number of DOM pools."); 
-    frame.declare_fraction ("initial_fraction", Value::OptionalConst, "\
+    frame.declare_fraction ("initial_fraction", Attribute::OptionalConst, "\
 The initial fraction of the total available carbon\n\
 allocated to this pool for AOM.  One pool should be left unspecified.");
-    frame.declare ("top_C", "g C/cm^2", Check::non_negative (), Value::State,
+    frame.declare ("top_C", "g C/cm^2", Check::non_negative (), Attribute::State,
                 "Carbon on top of soil.");
     frame.set ("top_C", 0.0);
-    frame.declare ("top_N", "g N/cm^2", Check::non_negative (), Value::State,
+    frame.declare ("top_N", "g N/cm^2", Check::non_negative (), Attribute::State,
                 "Nitrogen on top of soil.");
     frame.set ("top_N", 0.0);
   }

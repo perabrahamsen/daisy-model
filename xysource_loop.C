@@ -190,20 +190,20 @@ By default the name of the 'x' and 'y' objects.");
     
     frame.add_check (check_alist);
     frame.declare_object ("x", Number::component, 
-                       Value::Const, Value::Singleton, "\
+                       Attribute::Const, Attribute::Singleton, "\
 Expression for calculating the x value.");
     frame.set ("x", "x");
     frame.declare_object ("y", Number::component, 
-                       Value::Const, Value::Singleton, "\
+                       Attribute::Const, Attribute::Singleton, "\
 Expression for calculating the y value.");
-    frame.declare ("begin", Value::User (), Value::Const, "\
+    frame.declare ("begin", Attribute::User (), Attribute::Const, "\
 Start of interval.");
-    frame.declare ("end", Value::User (), Value::Const, "\
+    frame.declare ("end", Attribute::User (), Attribute::Const, "\
 End of interval.");
-    frame.declare ("step", Value::User (), Check::non_zero (), Value::Const, "\
+    frame.declare ("step", Attribute::User (), Check::non_zero (), Attribute::Const, "\
 Disretization within interval.");
     
-    frame.declare_string ("tag", Value::Const, "\
+    frame.declare_string ("tag", Attribute::Const, "\
 Name of free variable to calculate the 'x' and 'y' expressions from.");
     frame.set ("tag", "x");
 

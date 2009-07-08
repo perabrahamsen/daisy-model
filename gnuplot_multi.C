@@ -98,16 +98,16 @@ static struct GnuplotMultiSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare_string ("before", Value::Const, 
-                Value::Variable, "List of extra gnuplot commands.\n\
+    frame.declare_string ("before", Attribute::Const, 
+                Attribute::Variable, "List of extra gnuplot commands.\n\
 The commands will be inserted right before the first graph.");
     frame.set_empty ("before");
-    frame.declare_string ("after", Value::Const, 
-                Value::Variable, "List of extra gnuplot commands.\n\
+    frame.declare_string ("after", Attribute::Const, 
+                Attribute::Variable, "List of extra gnuplot commands.\n\
 The commands will be inserted right after the last graph.");
     frame.set_empty ("after");
-    frame.declare_object ("graph", Gnuplot::component, Value::State, 
-                       Value::Variable, "Graphs to plot.");
+    frame.declare_object ("graph", Gnuplot::component, Attribute::State, 
+                       Attribute::Variable, "Graphs to plot.");
 
   }
 } GnuplotMulti_syntax;

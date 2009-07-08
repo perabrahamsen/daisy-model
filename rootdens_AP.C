@@ -141,15 +141,15 @@ development stage.")
   {
     frame.set_strings ("cite", "gp74");
 
-    frame.declare ("a_DS", "DS", "cm^-1", Value::Const, 
+    frame.declare ("a_DS", "DS", "cm^-1", Attribute::Const, 
                 "Form parameter as a function of development stage.");
-    frame.declare ("q", "cm", Check::non_negative (), Value::Const, 
+    frame.declare ("q", "cm", Check::non_negative (), Attribute::Const, 
                 "Extra root length below max rooting depth.\n\
 Root density will decrease linearly from the GP calculated amount\n\
 at max rooting depth to zero 'q' further down.");
-    frame.declare ("a", "cm^-1", Value::LogOnly, "Form parameter.\n\
+    frame.declare ("a", "cm^-1", Attribute::LogOnly, "Form parameter.\n\
 Calculated from 'a_DS'.");
-    frame.declare ("L0", "cm/cm^3", Value::LogOnly,
+    frame.declare ("L0", "cm/cm^3", Attribute::LogOnly,
                 "Root density at soil surface.");
   }
 } Rootdens_AP_syntax;

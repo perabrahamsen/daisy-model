@@ -115,7 +115,7 @@ struct ReactionFilter : public Reaction
               const Chemistry& chemistry, Treelog& msg) const
   { 
     bool ok = true;
-    if (!chemistry.know (immobile) && immobile != Value::None ())
+    if (!chemistry.know (immobile) && immobile != Attribute::None ())
       {
         msg.error ("'" + immobile.name () + "' not traced");
         ok = false;
@@ -138,7 +138,7 @@ struct ReactionFilter : public Reaction
   }
   explicit ReactionFilter (Block& al)
     : Reaction (al),
-      immobile (al.name ("immobile", Value::None ())),
+      immobile (al.name ("immobile", Attribute::None ())),
       mobile (al.name ("mobile")),
       fc_primary (al.number ("fc_primary")),
       fc_secondary (al.number ("fc_secondary"))
@@ -157,21 +157,21 @@ static struct ReactionFilterSyntax : public DeclareModel
   {
 
 
-    frame.declare_string ("immobile", Value::OptionalConst,
+    frame.declare_string ("immobile", Attribute::OptionalConst,
                    "Immobile colloids in the soil.\n\
 By default, filtered colloids are not tracked.");
-    frame.declare_string ("mobile", Value::Const,
+    frame.declare_string ("mobile", Attribute::Const,
                    "Mobile colloids dissolved in soil water.");
-    frame.declare ("F_primary", "g/cm^3/h", Value::LogOnly, Value::SoilCells,
+    frame.declare ("F_primary", "g/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                    "Filtration in the primary domain (intra-aggregate pores).");
-    frame.declare ("F_secondary", "g/cm^3/h", Value::LogOnly, Value::SoilCells,
+    frame.declare ("F_secondary", "g/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                    "Filtration in secondary domain (inter-aggregate pores).");
 
-    frame.declare ("fc_primary", "cm^-1", Check::positive (), Value::Const,
+    frame.declare ("fc_primary", "cm^-1", Check::positive (), Attribute::Const,
                    "Filter coefficient in the primary domain");
     // frame.set ("fc_primary", 1.0);
    
-    frame.declare ("fc_secondary", "cm^-1", Check::positive (), Value::Const,
+    frame.declare ("fc_secondary", "cm^-1", Check::positive (), Attribute::Const,
                    "Filter coefficient in secondary domain");
     // frame.set ("fc_secondary", 0.5);
 

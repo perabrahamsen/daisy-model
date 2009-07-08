@@ -101,8 +101,8 @@ static struct ClayOMOldSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.declare ("factor", Value::Fraction (), Value::None (),
-		Value::Const, "\
+    frame.declare ("factor", Attribute::Fraction (), Attribute::None (),
+		Attribute::Const, "\
 Function of clay content, multiplied to the maintenance and turnover rates\n\
 of SMB1 and all SOM pools.");
     PLF factor;

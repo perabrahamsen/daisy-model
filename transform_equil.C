@@ -170,10 +170,10 @@ static struct TransformEquilibriumSyntax : public DeclareModel
     frame.declare_object ("equilibrium", Equilibrium::component,
                        "Function for calculating equilibrium between A and B.");
     frame.declare_object ("k_AB", Number::component,
-                       Value::Const, Value::Singleton, "\
+                       Attribute::Const, Attribute::Singleton, "\
 Tranformation rate from soil component 'A' to 'B' [h^-1].");
     frame.declare_object ("k_BA", Number::component,
-                       Value::OptionalConst, Value::Singleton, "\
+                       Attribute::OptionalConst, Attribute::Singleton, "\
 Tranformation rate from soil component 'B' to 'A' [h^-1].\n\
 By default, this is identical to 'k_AB'.");
   }

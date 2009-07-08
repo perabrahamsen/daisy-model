@@ -114,7 +114,7 @@ Provided for backward compatibility, use 'deep' or 'fixed' instead.")
   void load_frame (Frame& frame) const
   { 
     frame.add_check (check_alist);
-    frame.declare ("table", "cm", Value::Const,
+    frame.declare ("table", "cm", Attribute::Const,
 		"Groundwater level.\n\
 Positive numbers indicate free drainage.");
     frame.set ("table", 1.0);

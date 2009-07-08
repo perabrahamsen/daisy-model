@@ -130,7 +130,7 @@ in the various columns.")
     SourceFile::load_style (frame, "\
 By default the name of the 'expr' object.");
     frame.declare_object ("expr", Number::component, 
-                       Value::Const, Value::Singleton, "\
+                       Attribute::Const, Attribute::Singleton, "\
 Expression for calculating the value for this source for each row.\n\
 The expression can refer to the value in a specific column by the tag\n\
 for that column.");

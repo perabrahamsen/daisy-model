@@ -633,61 +633,61 @@ SoilWater::check (const size_t n, Treelog& msg) const
 
 static void
 load_h (Frame& frame)
-{ Geometry::add_layer (frame, "cm", Value::Const, "Soil water pressure."); }
+{ Geometry::add_layer (frame, "cm", Attribute::Const, "Soil water pressure."); }
 
 static void
 load_Theta (Frame& frame)
-{ Geometry::add_layer (frame, Value::Fraction (), Value::Const, 
+{ Geometry::add_layer (frame, Attribute::Fraction (), Attribute::Const, 
                        "Soil water content."); }
 
 void
 SoilWater::load_syntax (Frame& frame)
 {
   frame.declare ("max_exfiltration_gradient", "cm/cm", Check::positive (), 
-                 Value::OptionalConst,
+                 Attribute::OptionalConst,
                  "Maximal pressure gradient for calculating exfiltration.\n\
 The gradient is assumed from center of top node to surface of top node.\n\
 By default, there is no maximum.");
-  Geometry::add_layer (frame, Value::OptionalState, "h", load_h);
-  Geometry::add_layer (frame, Value::OptionalState, "Theta", load_Theta);
-  frame.declare ("Theta_primary", "cm^3/cm^3", Value::LogOnly, Value::SoilCells,
+  Geometry::add_layer (frame, Attribute::OptionalState, "h", load_h);
+  Geometry::add_layer (frame, Attribute::OptionalState, "Theta", load_Theta);
+  frame.declare ("Theta_primary", "cm^3/cm^3", Attribute::LogOnly, Attribute::SoilCells,
                  "Water content in primary matrix system.\n\
 Conventionally, this is the intra-aggregate pores.");
-  frame.declare ("Theta_secondary", "cm^3/cm^3", Value::LogOnly, 
-                 Value::SoilCells,
+  frame.declare ("Theta_secondary", "cm^3/cm^3", Attribute::LogOnly, 
+                 Attribute::SoilCells,
                  "Water content in secondary matrix system.\n\
 Conventionally, this is the inter-aggregate pores.");
-  frame.declare ("S_sum", "cm^3/cm^3/h", Value::LogOnly, Value::SoilCells,
+  frame.declare ("S_sum", "cm^3/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                  "Total water sink (due to root uptake and macropores).");
-  frame.declare ("S_root", "cm^3/cm^3/h", Value::LogOnly, Value::SoilCells,
+  frame.declare ("S_root", "cm^3/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                  "Water sink due to root uptake.");
-  frame.declare ("S_drain", "cm^3/cm^3/h", Value::LogOnly, Value::SoilCells,
+  frame.declare ("S_drain", "cm^3/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                  "Water sink due to soil drainage.");
-  frame.declare ("S_incorp", "cm^3/cm^3/h", Value::LogOnly, Value::SoilCells,
+  frame.declare ("S_incorp", "cm^3/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                  "Incorporated water sink, typically from subsoil irrigation.");
-  frame.declare ("tillage", "cm^3/cm^3/h", Value::LogOnly, Value::SoilCells,
+  frame.declare ("tillage", "cm^3/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                  "Changes in water content due to tillage operations.");
-  frame.declare ("S_p", "cm^3/cm^3/h", Value::LogOnly, Value::SoilCells,
+  frame.declare ("S_p", "cm^3/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                  "Water sink (due to macropores).");
-  frame.declare ("S_permanent", "cm^3/cm^3/h", Value::State, Value::SoilCells,
+  frame.declare ("S_permanent", "cm^3/cm^3/h", Attribute::State, Attribute::SoilCells,
                  "Permanent water sink, e.g. subsoil irrigation.");
   frame.set_empty ("S_permanent");
-  frame.declare ("S_ice", "cm^3/cm^3/h", Value::LogOnly, Value::SoilCells,
+  frame.declare ("S_ice", "cm^3/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                  "Ice sink (due to thawing or freezing).");
-  frame.declare_fraction ("X_ice", Value::OptionalState, Value::SoilCells,
+  frame.declare_fraction ("X_ice", Attribute::OptionalState, Attribute::SoilCells,
                           "Ice volume fraction in soil.");
-  frame.declare ("X_ice_buffer", Value::None (), 
-                 Value::OptionalState, Value::SoilCells,
+  frame.declare ("X_ice_buffer", Attribute::None (), 
+                 Attribute::OptionalState, Attribute::SoilCells,
                  "Ice volume that didn't fit the soil durin freezing.");
-  frame.declare ("h_ice", Value::None (), Value::LogOnly, Value::SoilCells,
+  frame.declare ("h_ice", Attribute::None (), Attribute::LogOnly, Attribute::SoilCells,
                  "Pressure at which all air is out of the matrix.\n\
 When there are no ice, this is 0.0.  When there are ice, the ice is\n\
 presummed to occupy the large pores, so it is h (Theta_sat - X_ice).");
-  frame.declare ("q", "cm/h", Value::LogOnly, Value::SoilEdges,
+  frame.declare ("q", "cm/h", Attribute::LogOnly, Attribute::SoilEdges,
                  "Matrix water flux (positive numbers mean upward).");  
-  frame.declare ("q_p", "cm/h", Value::LogOnly, Value::SoilEdges,
+  frame.declare ("q_p", "cm/h", Attribute::LogOnly, Attribute::SoilEdges,
                  "Water flux in macro pores (positive numbers mean upward).");
-  frame.declare ("K", "cm/h", Value::LogOnly, Value::SoilCells,
+  frame.declare ("K", "cm/h", Attribute::LogOnly, Attribute::SoilCells,
                  "Hydraulic conductivity.");
 }
 

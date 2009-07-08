@@ -277,8 +277,8 @@ static const class SOM_fractions_check_type : public VCheck
   {
     daisy_assert (key == "SOM_fractions");
     daisy_assert (frame.check (key));
-    daisy_assert (frame.lookup (key) == Value::Number);
-    daisy_assert (frame.type_size (key) == Value::Variable);
+    daisy_assert (frame.lookup (key) == Attribute::Number);
+    daisy_assert (frame.type_size (key) == Attribute::Variable);
     std::vector<double> fractions = frame.number_sequence ("SOM_fractions");
     bool has_negative = false;
     double sum = 0.0;
@@ -374,9 +374,9 @@ hydraulic model");
   }
   static void load_attributes (Frame& frame)
   {
-    frame.declare_string ("key", Value::Const,
+    frame.declare_string ("key", Attribute::Const,
                    "Name of attribute.");
-    frame.declare ("value", Value::User (), Value::Const,
+    frame.declare ("value", Attribute::User (), Attribute::Const,
                    "Value of attribute.");
     frame.order ("key", "value");
   }
@@ -390,17 +390,17 @@ hydraulic model");
     frame.declare_object ("tortuosity", Tortuosity::component, 
                           "The soil tortuosity.");
     frame.set ("tortuosity", "M_Q");
-    frame.declare ("anisotropy", Value::None (),
-                   Check::non_negative (), Value::Const, "\
+    frame.declare ("anisotropy", Attribute::None (),
+                   Check::non_negative (), Attribute::Const, "\
 Horizontal saturated water conductivity relative to vertical saturated\n\
 water conductivity.  The higher this value, the faster the water will\n\
 move towards drain pipes.");
     frame.set ("anisotropy", 1.0);
-    frame.declare ("dry_bulk_density", "g/cm^3", Value::OptionalConst,
+    frame.declare ("dry_bulk_density", "g/cm^3", Attribute::OptionalConst,
                    "The soils dry bulk density.\n\
 By default, this is calculated from the soil constituents.");
     frame.declare ("SOM_C_per_N", "g C/g N", Check::non_negative (), 
-                   Value::Const, Value::Variable,
+                   Attribute::Const, Attribute::Variable,
                    "C/N ratio for each SOM pool in this soil.\n\
 If 'C_per_N' is specified, this is used as a goal only.  If 'C_per_N' is\n\
 unspecified, the SOM pools will be initialized with this value.");
@@ -409,7 +409,7 @@ unspecified, the SOM pools will be initialized with this value.");
     SOM_C_per_N.push_back (11.0);
     SOM_C_per_N.push_back (11.0);
     frame.set ("SOM_C_per_N", SOM_C_per_N);
-    frame.declare ("C_per_N", "g C/g N", Check::positive (), Value::OptionalConst,
+    frame.declare ("C_per_N", "g C/g N", Check::positive (), Attribute::OptionalConst,
                    "Total C/N ratio for this horizon.\n\
 This is the combined initial C/N ratio for all organic matter pools in the\n\
 horizon.  The C/N ration of the AOM and SMB pools is assumed to be known,\n\
@@ -421,14 +421,14 @@ initialization.");
     frame.set_check ("SOM_C_per_N", VCheck::min_size_1 ());
 
     static const BelowOrEqual max_1 (1.0);
-    frame.declare ("SOM_fractions",  Value::None (), max_1,
-                   Value::OptionalConst, Value::Variable, "\
+    frame.declare ("SOM_fractions",  Attribute::None (), max_1,
+                   Attribute::OptionalConst, Attribute::Variable, "\
 Fraction of humus in each SOM pool, from slowest to fastest.\n\
 Negative numbers mean unspecified, let Daisy find appropriate values.");
     frame.set_check ("SOM_fractions", SOM_fractions_check);
 
-    frame.declare ("turnover_factor", Value::None (), Check::non_negative (),
-                   Value::Const, "\
+    frame.declare ("turnover_factor", Attribute::None (), Check::non_negative (),
+                   Attribute::Const, "\
 Factor multiplied to the turnover rate for all organic matter pools in\n\
 this horizon.");
     frame.set ("turnover_factor", 1.0);
@@ -441,11 +441,11 @@ this horizon.");
     frame.set ("secondary_domain", "none");
 
 
-    frame.declare_submodule ("HorHeat", Value::State, 
+    frame.declare_submodule ("HorHeat", Attribute::State, 
                          "Heat capacity and conductivity.",
                          HorHeat::load_syntax);
 
-    frame.declare_submodule_sequence ("attributes", Value::OptionalConst, "\
+    frame.declare_submodule_sequence ("attributes", Attribute::OptionalConst, "\
 List of additional attributes for this horizon.\n\
 Intended for use with pedotransfer functions.", load_attributes);
     frame.set_empty ("attributes");

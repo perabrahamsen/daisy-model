@@ -177,7 +177,7 @@ Assert that condition is true, if not, stop the simulation.")
       frame.declare_object ("condition", Condition::component, 
                          "Condition to check.");
       frame.order ("condition");
-      frame.declare_string ("message", Value::Const,
+      frame.declare_string ("message", Attribute::Const,
 		  "Error message to give iff assertion fails.");
       frame.set ("message", "Required condition not fulfilled");
   }
@@ -193,7 +193,7 @@ Write a message to the user.")
   { }
   void load_frame (Frame& frame) const
   {
-      frame.declare_string ("message", Value::Const,
+      frame.declare_string ("message", Attribute::Const,
 		  "Message to give to the user.");
       frame.order ("message");
   }
@@ -209,7 +209,7 @@ Write a warning to the user.")
   { }
   void load_frame (Frame& frame) const
   {
-      frame.declare_string ("message", Value::Const,
+      frame.declare_string ("message", Attribute::Const,
 		  "Warning to give to the user.");
       frame.order ("message");
   }
@@ -225,7 +225,7 @@ Write a error message to the user.")
   { }
   void load_frame (Frame& frame) const
   {
-      frame.declare_string ("message", Value::Const,
+      frame.declare_string ("message", Attribute::Const,
 		  "Error message to give.");
       frame.order ("message");
   }
@@ -241,7 +241,7 @@ Write a error message to the user and stop the simulation.")
   { }
   void load_frame (Frame& frame) const
   {
-      frame.declare_string ("message", Value::Const,
+      frame.declare_string ("message", Attribute::Const,
 		  "Error message to give.");
       frame.order ("message");
   }

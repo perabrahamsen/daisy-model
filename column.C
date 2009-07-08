@@ -41,8 +41,8 @@ Column::library_id () const
 void
 Column::Point::load_syntax (Frame& frame)
 { 
-  frame.declare ("x", Value::Unknown (), Value::Const, "X-Coordinate.");
-  frame.declare ("y", Value::Unknown (), Value::Const, "Y-Coordinate.");
+  frame.declare ("x", Attribute::Unknown (), Attribute::Const, "X-Coordinate.");
+  frame.declare ("y", Attribute::Unknown (), Attribute::Const, "Y-Coordinate.");
   frame.order ("x", "y");
 }
 
@@ -78,12 +78,12 @@ static struct ColumnInit : public DeclareComponent
   void load_frame (Frame& frame) const
   { 
     Model::load_model (frame);
-    frame.declare ("size", Value::Unknown (), Value::State,
+    frame.declare ("size", Attribute::Unknown (), Attribute::State,
                "Area covered by this column, for use by the 'merge' action.\n\
 The dimension is up to you, as long as all columns use the same unit.");
     frame.set ("size", 1.0);
 
-    frame.declare_submodule_sequence ("location", Value::Const, "\
+    frame.declare_submodule_sequence ("location", Attribute::Const, "\
 Location of this column.\n\
 \n\
 The meaning depends on the number of point in the sequence.\n\

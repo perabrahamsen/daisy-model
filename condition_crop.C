@@ -77,11 +77,11 @@ True iff the crop has reached development stage 'ds'.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare_string ("crop", Value::Const,
+    frame.declare_string ("crop", Attribute::Const,
                 "Name of crop on the field to test.\n\
 Specify \"all\" to use combined weight of all crops on the field in test.");
     static RangeII ds_range (-1.0, 2.0);
-    frame.declare ("ds", Value::None (), ds_range, Value::Const,
+    frame.declare ("ds", Attribute::None (), ds_range, Attribute::Const,
                 "Development stage [-1.0:2.0].");
     frame.order ("crop", "ds");
   }
@@ -129,12 +129,12 @@ True iff the crop has reached the specified amount of dry matter.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare_string ("crop", Value::Const,
+    frame.declare_string ("crop", Attribute::Const,
                 "Name of crop on the field to test.");
-    frame.declare ("weight", "kg DM/ha", Check::non_negative (), Value::Const,
+    frame.declare ("weight", "kg DM/ha", Check::non_negative (), Attribute::Const,
                 "\
 Amount of non-root dry-matter required for the condition to be true.");
-    frame.declare ("height", "cm", Check::non_negative (), Value::Const,
+    frame.declare ("height", "cm", Check::non_negative (), Attribute::Const,
                 "\
 Height above which we measure the DM weight.");
     frame.set ("height", 0.0);
@@ -182,9 +182,9 @@ True iff the storage organ has reached the specified amount of dry matter.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare_string ("crop", Value::Const,
+    frame.declare_string ("crop", Attribute::Const,
                 "Name of crop on the field to test.");
-    frame.declare ("weight", "kg DM/ha", Check::non_negative (), Value::Const,
+    frame.declare ("weight", "kg DM/ha", Check::non_negative (), Attribute::Const,
                 "\
 Amount of non-root dry-matter required for the condition to be true.");
     frame.order ("crop", "weight");

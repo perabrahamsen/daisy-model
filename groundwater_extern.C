@@ -93,9 +93,9 @@ Look up groundwater table in an scope.  ")
   void load_frame (Frame& frame) const
   { 
     frame.declare_object ("table", Number::component, 
-                       Value::Const, Value::Singleton, "\
+                       Attribute::Const, Attribute::Singleton, "\
 Expression that evaluates to groundwate table in.");
-    frame.declare ("initial_table", "cm", Check::none (), Value::OptionalConst,
+    frame.declare ("initial_table", "cm", Check::none (), Attribute::OptionalConst,
 		"Groundwater level for initialization of soil water.");
   }
 } GroundwaterExtern_syntax;

@@ -53,7 +53,7 @@ Root density calculations.")
   void load_frame (Frame& frame) const
   {
     Model::load_model (frame);
-    frame.declare ("SpRtLength", "m/g", Check::positive (), Value::Const,
+    frame.declare ("SpRtLength", "m/g", Check::positive (), Attribute::Const,
                "Specific root length");
     frame.set ("SpRtLength", 100.0);
   }

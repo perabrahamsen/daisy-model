@@ -106,16 +106,16 @@ with nitrification based on total ammonium content.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("k", "g N/cm^3", Check::positive (), Value::Const, 
+    frame.declare ("k", "g N/cm^3", Check::positive (), Attribute::Const, 
                 "Half saturation constant.");
     frame.set ("k", 5.0e-5); // [g N/cm^3]
-    frame.declare ("k_10", "g N/cm^3/h", Check::non_negative (), Value::Const,
+    frame.declare ("k_10", "g N/cm^3/h", Check::non_negative (), Attribute::Const,
                 "Max rate.");
     frame.set ("k_10", 2.08333333333e-7); // 5e-6/24 [1/h]
-    frame.declare ("heat_factor", "dg C", Value::None (), Value::Const,
+    frame.declare ("heat_factor", "dg C", Attribute::None (), Attribute::Const,
                 "Heat factor.");
     frame.set ("heat_factor", PLF::empty ());
-    frame.declare ("water_factor", "cm", Value::None (), Value::Const,
+    frame.declare ("water_factor", "cm", Attribute::None (), Attribute::Const,
                 "Water potential factor.");
     frame.set ("water_factor", PLF::empty ());
   }

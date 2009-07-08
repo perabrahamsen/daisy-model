@@ -175,57 +175,57 @@ Shared parameters for old models.")
     return ok;
   }
   static void load_dry (Frame& frame)
-  { IM::add_syntax (frame, Value::Const, Weather::dry_deposit_unit ()); }
+  { IM::add_syntax (frame, Attribute::Const, Weather::dry_deposit_unit ()); }
 
   static void load_ppm (Frame& frame)
-  { IM::add_syntax (frame, Value::Const, Units::ppm ()); }
+  { IM::add_syntax (frame, Attribute::Const, Units::ppm ()); }
 
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);
     // Where in the world are we?
-    frame.declare ("Latitude", "dg North", Value::Const,
+    frame.declare ("Latitude", "dg North", Attribute::Const,
                 "The position of the weather station on the globe.");
     frame.set ("Latitude", 56.0);
-    frame.declare ("Longitude", "dg East", Value::Const,
+    frame.declare ("Longitude", "dg East", Attribute::Const,
                 "The position of the weather station on the globe.");
     frame.set ("Longitude", 10.0);
-    frame.declare ("Elevation", "m", Value::Const,
+    frame.declare ("Elevation", "m", Attribute::Const,
                 "Height above sea level.");
     frame.set ("Elevation", 0.0);
-    frame.declare ("TimeZone", "dg East", Value::Const,
+    frame.declare ("TimeZone", "dg East", Attribute::Const,
                 "Time zone in effect (no DST).");
     frame.set ("TimeZone", 15.0);
-    frame.declare ("ScreenHeight", "m", Value::Const,
+    frame.declare ("ScreenHeight", "m", Attribute::Const,
                 "Measurement height above ground.");
     frame.set ("ScreenHeight", 2.0);
-    frame.declare ("UTM_x", Value::Unknown (), Value::OptionalConst,
+    frame.declare ("UTM_x", Attribute::Unknown (), Attribute::OptionalConst,
                 "X position of weather station."); // Unused.
-    frame.declare ("UTM_y", Value::Unknown (), Value::OptionalConst,
+    frame.declare ("UTM_y", Attribute::Unknown (), Attribute::OptionalConst,
                 "Y position of weather station."); // Unused.
-    frame.declare_submodule_sequence ("DryDeposit", Value::Const, "\
+    frame.declare_submodule_sequence ("DryDeposit", Attribute::Const, "\
 Atmospheric deposition.", load_dry);
     frame.set_empty ("DryDeposit");
-    frame.declare_submodule_sequence ("WetDeposit", Value::Const, "\
+    frame.declare_submodule_sequence ("WetDeposit", Attribute::Const, "\
 Deposition of solutes with precipitation.", load_ppm);
     frame.set_empty ("WetDeposit");
 
     // Division between Rain and Snow.
-    frame.declare ("T_rain", "dg C", Value::Const, 
+    frame.declare ("T_rain", "dg C", Attribute::Const, 
                 "Above this air temperature all precipitation is rain.");
     frame.set ("T_rain", 2.0);
-    frame.declare ("T_snow", "dg C", Value::Const,
+    frame.declare ("T_snow", "dg C", Attribute::Const,
                 "Below this air temperature all precipitation is snow.");
     frame.set ("T_snow", -2.0);
 
     // Yearly average temperatures.
-    frame.declare ("average", "dg C", Value::Const,
+    frame.declare ("average", "dg C", Attribute::Const,
                 "Average temperature at this location.");
     frame.set ("average", 7.8);
-    frame.declare ("amplitude", "dg C", Value::Const,
+    frame.declare ("amplitude", "dg C", Attribute::Const,
                 "How much the temperature change during the year.");
     frame.set ("amplitude", 8.5);
-    frame.declare ("max_Ta_yday", "d", Value::Const,
+    frame.declare ("max_Ta_yday", "d", Attribute::Const,
                 "Julian day where the highest temperature is expected.");
     frame.set ("max_Ta_yday", 209.0);
   }

@@ -250,7 +250,7 @@ LogSelect::document_entries (Format& format, const Metalib& metalib,
   const FrameModel& frame = log_lib.model (name);
 
   // We need a type.
-  if (frame.type_name () == Value::None ())
+  if (frame.type_name () == Attribute::None ())
     {
       msg.warning ("bug: Orphan log parameterisation.");
       return;
@@ -328,21 +328,21 @@ static struct LogSelectSyntax : public DeclareBase
     frame.declare_object ("when", Condition::component, "\
 Add entries to the log file when this condition is true.");
     frame.declare_object ("entries", Select::component, 
-                       Value::State, Value::Variable,
+                       Attribute::State, Attribute::Variable,
                        "What to log in each column.");
-    frame.declare_boolean ("time_columns", Value::OptionalConst, "\
+    frame.declare_boolean ("time_columns", Attribute::OptionalConst, "\
 Iff true, add columns for year, month, mday and hour in the begining of\n\
 the lines.  By default, this will be true of you have not specified any\n\
 time entries yourself.");
     frame.declare_object ("volume", Volume::component, 
-                       Value::Const, Value::Singleton,
+                       Attribute::Const, Attribute::Singleton,
                        "Soil volume to log.");
     frame.set ("volume", "box");
-    frame.declare ("from", "cm", Value::OptionalConst,
+    frame.declare ("from", "cm", Attribute::OptionalConst,
                 "Default 'from' value for all entries.\n\
 By default, use the top of the soil.\n\
 OBSOLETE: Use (volume box (top FROM)) instead.");
-    frame.declare ("to", "cm", Value::OptionalConst,
+    frame.declare ("to", "cm", Attribute::OptionalConst,
                 "Default 'to' value for all entries.\n\
 By default, use the bottom of the soil.\n\
 OBSOLETE: Use (volume box (bottom TO)) instead.");

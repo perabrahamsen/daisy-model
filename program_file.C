@@ -68,7 +68,7 @@ static struct ProgramCDSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare_string ("directory", Value::Const, "\
+    frame.declare_string ("directory", Attribute::Const, "\
 Name of directory to change into.");
     frame.order ("directory");
   }
@@ -121,9 +121,9 @@ static struct ProgramWriteSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare_string ("what", Value::Const, "\
+    frame.declare_string ("what", Attribute::Const, "\
 String to write.");
-    frame.declare_string ("where", Value::Const, "\
+    frame.declare_string ("where", Attribute::Const, "\
 File to write it in.\n\
 If the value is 'screen', write the string to the screen.");
     frame.set ("where", "screen");

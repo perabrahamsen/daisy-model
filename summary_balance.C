@@ -129,16 +129,16 @@ SummaryBalance::print_entries (std::ostream& out, const std::vector<symbol>& nam
                                const int max_size, const int width, 
                                const int hours) const
 {
-  symbol dim = Value::User ();
+  symbol dim = Attribute::User ();
   for (unsigned int i = 0; i < fetch.size (); i++)
     {
       if (!in_list (i, names))
         continue;
           
-      if (dim == Value::User ())
+      if (dim == Attribute::User ())
         dim = fetch[i]->dimension (period);
       else if (fetch[i]->dimension (period) != dim)
-        dim = Value::Unknown ();
+        dim = Attribute::Unknown ();
 
       out << std::string (max_size - fetch[i]->name_size (), ' ');
       fetch[i]->summarize (out, width, period, hours);
@@ -157,7 +157,7 @@ SummaryBalance::print_balance (std::ostream& out,
       << std::string (max_size - title.name ().size (), ' ') << title << " = ";
   out.width (width);
   out << total;
-  if (dim != Value::Unknown ())
+  if (dim != Attribute::Unknown ())
     out << " [" << dim << "]";
   out << "\n";
 }
@@ -202,7 +202,7 @@ SummaryBalance::summarize (const int hours, Treelog& msg) const
                          fetch[i]->dimension (period).name ().size ());
 
   // Print all entries.
-  symbol shared_dim = Value::User ();
+  symbol shared_dim = Attribute::User ();
   if (input.size () > 0)
     {
       const symbol dim = print_entries (tmp, input, max_size, width, hours);
@@ -217,10 +217,10 @@ SummaryBalance::summarize (const int hours, Treelog& msg) const
       const symbol dim = print_entries (tmp, output, max_size, width, hours);
       print_balance (tmp, "Total output", total_output, dim,
                      dim_size, max_size, width);
-      if (shared_dim == Value::User ()) 
+      if (shared_dim == Attribute::User ()) 
         shared_dim = dim;
       else if (dim != shared_dim)
-        shared_dim = Value::Unknown ();
+        shared_dim = Attribute::Unknown ();
       tmp << "\n";
     }
 
@@ -229,10 +229,10 @@ SummaryBalance::summarize (const int hours, Treelog& msg) const
       const symbol dim = print_entries (tmp, content, max_size, width, hours);
       print_balance (tmp, content_title, total_content, dim,
                      dim_size, max_size, width);
-      if (shared_dim == Value::User ()) 
+      if (shared_dim == Attribute::User ()) 
         shared_dim = dim;
       else if (dim != shared_dim)
-        shared_dim = Value::Unknown ();
+        shared_dim = Attribute::Unknown ();
       tmp << "\n";
     }
 
@@ -262,27 +262,27 @@ static struct SummaryBalanceSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
     {
-      frame.declare_string ("where", Value::OptionalConst,
+      frame.declare_string ("where", Attribute::OptionalConst,
                   "File name to store the summary.\n\
 By default, the summary will be stored in daisy.log and the screen.");
-      frame.declare_string ("title", Value::OptionalConst,
+      frame.declare_string ("title", Attribute::OptionalConst,
 		  "Title of this summary.\n\
 By default, use the name of the parameterization.");
-      frame.declare_string ("period", Value::OptionalConst, "\
+      frame.declare_string ("period", Attribute::OptionalConst, "\
 Set this to 'y', 'm', 'w', 'd' or 'h' to get fluxes per time period\n\
 instead of total amount.");
-      frame.declare_integer ("precision", Value::Const,
+      frame.declare_integer ("precision", Attribute::Const,
 		  "Number of digits to print after decimal point.");
       frame.set ("precision", 2);
-      frame.declare_boolean ("require_top", Value::Const, "\
+      frame.declare_boolean ("require_top", Attribute::Const, "\
 If the balance only hold true when logging the top of the soil, i.e. the\n\
 `from' parameter of the log model is 0, this flag should be set.");
       frame.set ("require_top", false);
-      frame.declare_string ("input", Value::Const, Value::Variable,
+      frame.declare_string ("input", Attribute::Const, Attribute::Variable,
                   "Tags of columns in log file representing inputs.");
-      frame.declare_string ("output", Value::Const, Value::Variable,
+      frame.declare_string ("output", Attribute::Const, Attribute::Variable,
                   "Tags of columns in log file representing outputs.");
-      frame.declare_string ("content", Value::Const, Value::Variable,
+      frame.declare_string ("content", Attribute::Const, Attribute::Variable,
                   "Tags of columns in log file representing content.");
     }
 } SummaryBalance_syntax;

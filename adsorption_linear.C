@@ -93,12 +93,12 @@ static struct AdsorptionLinearOldSyntax : DeclareModel
   {
     frame.add_check (check_alist);
     frame.declare ("K_clay", "cm^3/g", Check::non_negative (), 
-		Value::OptionalConst, 
+		Attribute::OptionalConst, 
 		"Clay dependent distribution parameter.\n\
 It is multiplied with the soil clay fraction to get the clay part of\n\
 the 'K' factor.  If 'K_OC' is specified, 'K_clay' defaults to 0.");
     frame.declare ("K_OC", "cm^3/g", Check::non_negative (), 
-		Value::OptionalConst, 
+		Attribute::OptionalConst, 
 		"Humus dependent distribution parameter.\n\
 It is multiplied with the soil organic carbon fraction to get the\n\
 carbon part of the 'K' factor.  By default, 'K_OC' is equal to 'K_clay'.");

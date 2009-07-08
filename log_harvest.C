@@ -223,25 +223,25 @@ static struct LogHarvestSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {  
-    frame.declare_string ("where", Value::Const,
+    frame.declare_string ("where", Attribute::Const,
 		"Name of the log file to create.");
     frame.set ("where", "harvest.dlf");
-    frame.declare_string ("print_header", Value::Const,
+    frame.declare_string ("print_header", Attribute::Const,
                 "If this is set to 'false', no header is printed.\n\
 If this is set to 'true', a full header is printer.\n\
 If this is set to 'fixed', a small fixed size header is printed.");
     static VCheck::Enum check_header ("false", "true", "fixed");
     frame.set_check ("print_header", check_header);
     frame.set ("print_header", "true");
-    frame.declare_boolean ("print_tags", Value::Const,
+    frame.declare_boolean ("print_tags", Attribute::Const,
 		"Print a tag line in the file.");
     frame.set ("print_tags", true);
-    frame.declare_boolean ("print_dimension", Value::Const,
+    frame.declare_boolean ("print_dimension", Attribute::Const,
 		"Print a line with units after the tag line.");
-    frame.declare_boolean ("print_N", Value::Const,
+    frame.declare_boolean ("print_N", Attribute::Const,
 		"Print nitrogen content of harvest.");
     frame.set ("print_N", true);
-    frame.declare_boolean ("print_C", Value::Const,
+    frame.declare_boolean ("print_C", Attribute::Const,
 		"Print carbon content of harvest.");
     frame.set ("print_C", false);
     frame.set ("print_dimension", true);

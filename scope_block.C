@@ -32,45 +32,45 @@ void
 ScopeBlock::entries (std::set<symbol>& all) const
 { block.entries (all); }
 
-Value::type 
+Attribute::type 
 ScopeBlock::lookup (const symbol tag) const
 { return block.lookup (tag); }
 
 symbol
 ScopeBlock::dimension (symbol tag) const
 { 
-  Value::type type = block.lookup (tag);
-  if (type == Value::Error)
-    return Value::Unknown ();
+  Attribute::type type = block.lookup (tag);
+  if (type == Attribute::Error)
+    return Attribute::Unknown ();
   const Frame& frame = block.find_frame (tag);
-  if (frame.type_size (tag) != Value::Singleton)
-    return Value::Unknown ();
+  if (frame.type_size (tag) != Attribute::Singleton)
+    return Attribute::Unknown ();
 
   //Handle primitive numbers.
-  if (type == Value::Number)
+  if (type == Attribute::Number)
     {
       const symbol dim = frame.dimension (tag); 
-      if (dim != Value::User ())
+      if (dim != Attribute::User ())
         return symbol (dim);
       if (!frame.check (tag))
-        return Value::Unknown ();
+        return Attribute::Unknown ();
       return frame.name (tag);
     }
 
   // Handle number objects.
-  if (type != Value::Model)
-    return Value::Unknown ();
+  if (type != Attribute::Model)
+    return Attribute::Unknown ();
   if (frame.component (tag) != Number::component)
-    return Value::Unknown ();
+    return Attribute::Unknown ();
   if (!frame.check (block))
-    return Value::Unknown ();
+    return Attribute::Unknown ();
     
   std::auto_ptr<Number> number (Librarian::build_frame<Number>
                                 (block, frame.model (tag), tag));
   if (!number.get ())
-    return Value::Unknown ();
+    return Attribute::Unknown ();
   if (!number->initialize (block.units (), *this, block.msg ()))
-    return Value::Unknown ();
+    return Attribute::Unknown ();
   
   return number->dimension (*this);
 }
@@ -80,8 +80,8 @@ ScopeBlock::description (symbol tag) const
 { 
   static const symbol no_symbol ("No such symbol");
   
-  Value::type type = block.lookup (tag);
-  if (type == Value::Error)
+  Attribute::type type = block.lookup (tag);
+  if (type == Attribute::Error)
     return no_symbol;
 
   const Frame& frame = block.find_frame (tag);
@@ -103,22 +103,22 @@ ScopeBlock::value_size (const symbol tag) const
 bool 
 ScopeBlock::has_number (const symbol tag) const
 {
-  Value::type type = block.lookup (tag);
-  if (type == Value::Error)
+  Attribute::type type = block.lookup (tag);
+  if (type == Attribute::Error)
     return false;
 
   const Frame& frame = block.find_frame (tag);
-  if (frame.type_size (tag) != Value::Singleton)
+  if (frame.type_size (tag) != Attribute::Singleton)
     return false;
   if (!frame.check (tag))
     return false;
 
   //Handle primitive numbers.
-  if (type == Value::Number)
+  if (type == Attribute::Number)
     return true;
   
   // Handle number objects.
-  if (type != Value::Model)
+  if (type != Attribute::Model)
     return false;
   if (frame.component (tag) != Number::component)
     return false;
@@ -139,18 +139,18 @@ ScopeBlock::has_number (const symbol tag) const
 double 
 ScopeBlock::number (const symbol tag) const
 { 
-  Value::type type = block.lookup (tag);
-  daisy_assert (type != Value::Error);
+  Attribute::type type = block.lookup (tag);
+  daisy_assert (type != Attribute::Error);
   const Frame& frame = block.find_frame (tag);
-  daisy_assert (frame.type_size (tag) == Value::Singleton);
+  daisy_assert (frame.type_size (tag) == Attribute::Singleton);
   daisy_assert (frame.check (tag));
 
   //Handle primitive numbers.
-  if (type == Value::Number)
+  if (type == Attribute::Number)
     return frame.number (tag);
 
   // Handle number objects.
-  daisy_assert (type == Value::Model);
+  daisy_assert (type == Attribute::Model);
   daisy_assert (frame.component (tag) == Number::component);
   daisy_assert (frame.check (block));
   std::auto_ptr<Number> number (Librarian::build_frame<Number> 
@@ -166,22 +166,22 @@ ScopeBlock::number (const symbol tag) const
 bool 
 ScopeBlock::has_name (const symbol tag) const
 {
-  Value::type type = block.lookup (tag);
-  if (type == Value::Error)
+  Attribute::type type = block.lookup (tag);
+  if (type == Attribute::Error)
     return false;
 
   const Frame& frame = block.find_frame (tag);
-  if (frame.type_size (tag) != Value::Singleton)
+  if (frame.type_size (tag) != Attribute::Singleton)
     return false;
   if (!frame.check (tag))
     return false;
 
   //Handle primitive names.
-  if (type == Value::String)
+  if (type == Attribute::String)
     return true;
   
   // Handle stringer objects.
-  if (type != Value::Model)
+  if (type != Attribute::Model)
     return false;
   if (frame.component (tag) != Stringer::component)
     return false;
@@ -202,18 +202,18 @@ ScopeBlock::has_name (const symbol tag) const
 symbol
 ScopeBlock::name (const symbol tag) const
 { 
-  Value::type type = block.lookup (tag);
-  daisy_assert (type != Value::Error);
+  Attribute::type type = block.lookup (tag);
+  daisy_assert (type != Attribute::Error);
   const Frame& frame = block.find_frame (tag);
-  daisy_assert (frame.type_size (tag) == Value::Singleton);
+  daisy_assert (frame.type_size (tag) == Attribute::Singleton);
   daisy_assert (frame.check (tag));
 
   //Handle primitive names.
-  if (type == Value::String)
+  if (type == Attribute::String)
     return frame.name (tag);
 
   // Handle number objects.
-  daisy_assert (type == Value::Model);
+  daisy_assert (type == Attribute::Model);
   daisy_assert (frame.component (tag) == Stringer::component);
   daisy_assert (frame.check (block));
   std::auto_ptr<Stringer> stringer (Librarian::build_frame<Stringer> 

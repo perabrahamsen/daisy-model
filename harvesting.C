@@ -521,49 +521,49 @@ Harvesting::load_syntax (Frame& frame)
 {
   // Submodel.
 
-  frame.declare_object ("Stem", AOM::component, Value::Const, Value::Variable, "\
+  frame.declare_object ("Stem", AOM::component, Attribute::Const, Attribute::Variable, "\
 Stem AM parameters.");
   frame.set_check ("Stem", AM::check_om_pools ());
   frame.set ("Stem", AM::default_AM ());
-  frame.declare_object ("Leaf", AOM::component, Value::Const, Value::Variable, "\
+  frame.declare_object ("Leaf", AOM::component, Attribute::Const, Attribute::Variable, "\
 Leaf AM parameters.");
   frame.set_check ("Leaf", AM::check_om_pools ());
   frame.set ("Leaf", AM::default_AM ());
-  frame.declare_object ("Dead", AOM::component, Value::Const, Value::Variable, "\
+  frame.declare_object ("Dead", AOM::component, Attribute::Const, Attribute::Variable, "\
 Dead leaves AM parameters.");
   frame.set_check ("Dead", AM::check_om_pools ());
   frame.set ("Dead", AM::default_AM ());
-  frame.declare_object ("SOrg", AOM::component, Value::Const, Value::Variable, "\
+  frame.declare_object ("SOrg", AOM::component, Attribute::Const, Attribute::Variable, "\
 Storage organ AM parameters.");
   frame.set_check ("SOrg", AM::check_om_pools ());
   frame.set ("SOrg", AM::default_AM ());
-  frame.declare_object ("Root", AOM::component, Value::Const, Value::Variable, "\
+  frame.declare_object ("Root", AOM::component, Attribute::Const, Attribute::Variable, "\
 Root AM parameters.");
   frame.set_check ("Root", AM::check_om_pools ());
   frame.set ("Root", AM::default_AM ());
-  frame.declare ("EconomicYield_W", Value::None (), Value::Const, "\
+  frame.declare ("EconomicYield_W", Attribute::None (), Attribute::Const, "\
 Valuable fraction of storage organ (DM), e.g. grain or tuber.");
   frame.set ("EconomicYield_W", 1.00);
-  frame.declare ("EconomicYield_N", Value::None (), Value::OptionalConst,
+  frame.declare ("EconomicYield_N", Attribute::None (), Attribute::OptionalConst,
                "Valuable fraction of storage organ (N).\n\
 By default the value for DM is used.");
-  frame.declare ("DSmax", Value::None (), Check::non_negative (), 
-	      Value::Const, "\
+  frame.declare ("DSmax", Attribute::None (), Check::non_negative (), 
+	      Attribute::Const, "\
 Maximal development stage for which the crop survives harvest.");
   frame.set ("DSmax", 0.80);
-  frame.declare ("DSnew", Value::None (), Check::non_negative (),
-              Value::OptionalConst,
+  frame.declare ("DSnew", Attribute::None (), Check::non_negative (),
+              Attribute::OptionalConst,
 	      "New development stage after harvest.\n\
 If not specified, use the DS where an uncut crop would first reach the\n\
 height it now has after the cut.  I.e. it uses the inverse function of\n\
 the HvsDS Canopy parameter to find the new DS.");
-  frame.declare_submodule ("last_cut", Value::OptionalState,
+  frame.declare_submodule ("last_cut", Attribute::OptionalState,
 			"Date of last cut.  Used for calculating cut delay.",
 			Time::load_syntax);
-  frame.declare ("production_delay", "d", Value::State,
+  frame.declare ("production_delay", "d", Attribute::State,
 	      "production delay caused by last cut");
   frame.set ("production_delay", 0.0);
-  frame.declare ("cut_delay", "kg DM/ha", "d", Value::Const,
+  frame.declare ("cut_delay", "kg DM/ha", "d", Attribute::Const,
 	      "\
 Production and development delay in days as a function of the shoot DM\n\
 removed by harvest.  By default, there is no delay.");
@@ -571,13 +571,13 @@ removed by harvest.  By default, there is no delay.");
   no_delay.add (0.0, 0.0);
   no_delay.add (1.0, 0.0);
   frame.set ("cut_delay", no_delay);
-  frame.declare_fraction ("cut_stress", Value::LogOnly, 
+  frame.declare_fraction ("cut_stress", Attribute::LogOnly, 
 		       "Stress induced due to last cut.");
   frame.declare ("total_water_use", "kg H2O", Check::non_negative (), 
-              Value::State, "\
+              Attribute::State, "\
 Total evapotranspiration since emergence.");
   frame.set ("total_water_use", 0.0);
-  frame.declare ("sorg_height", "cm", Value::OptionalConst, 
+  frame.declare ("sorg_height", "cm", Attribute::OptionalConst, 
               "Vertical location of storage organ.\n\
 Set this to a negative number for root fruits, this will cause harvesting\n\
 to imply a suitable tillage operation, and guarentee that harvest will kill\n\

@@ -141,7 +141,7 @@ Base parameterization for all SI based units.")
       {
         const symbol unit = UnitSI::base_unit[i].unit;
         const symbol dimension = UnitSI::base_unit[i].dimension;
-        frame.declare_integer (dimension, Value::Const, "\
+        frame.declare_integer (dimension, Attribute::Const, "\
 Dimension, base unit [" + unit + "].");
         frame.set (dimension, 0);
       }
@@ -278,9 +278,9 @@ Connvert to SI base units by multiplying with a factor.")
     static const double u_g = 1.0 / p_k;         // Gram.
 
     // Unitless.
-    add (Value::None (), 1.0, 0, 0, 0, 0, 0, 0, 0,
+    add (Attribute::None (), 1.0, 0, 0, 0, 0, 0, 0, 0,
          "Unitless.");
-    add (Value::Fraction (), 1.0, 0, 0, 0, 0, 0, 0, 0,
+    add (Attribute::Fraction (), 1.0, 0, 0, 0, 0, 0, 0, 0,
          "Unitless.");
     add ("", 1.0, 0, 0, 0, 0, 0, 0, 0,
          "Unitless.");
@@ -615,7 +615,7 @@ Connvert to SI base units by multiplying with a factor.")
     static const symbol name ("SIfactor");
     
     // Add the 'SIfactor' base model.
-    frame.declare ("factor", Value::None (), Check::non_zero (), Value::Const, "\
+    frame.declare ("factor", Attribute::None (), Check::non_zero (), Attribute::Const, "\
 Factor to multiply with to get base unit.");
   }
 } UnitSIFactor_syntax;
@@ -700,7 +700,7 @@ static DeclareBaseUnit Base_dgEast ("dgEast", "Degrees East of Greenwich.");
 static DeclareBaseUnit Base_dgNorth ("dgNorth", "Degrees North of Equator.");
 
 // Unknown unit.
-static DeclareBaseUnit Base_unknown (Value::Unknown (), "\
+static DeclareBaseUnit Base_unknown (Attribute::Unknown (), "\
 Nothing is known about the dimension of this unit.");
 static DeclareBaseUnit Base_error (Units::error_symbol (), "Bogus unit.");
 
@@ -736,10 +736,10 @@ Connvert to base units by multiplying with a factor.")
   void load_frame (Frame& frame) const
   {
     // Add the 'factor' factor model.
-    frame.declare_string ("base", Value::Const, "\
+    frame.declare_string ("base", Attribute::Const, "\
 Base unit to convert to and from.");
     // TODO: Should add check that 'base' is indeed a base unit.
-    frame.declare ("factor", Value::None (), Check::non_zero (), Value::Const, "\
+    frame.declare ("factor", Attribute::None (), Check::non_zero (), Attribute::Const, "\
 Factor to multiply with to get base unit.");
   }
 } UnitFactor_syntax;
@@ -808,13 +808,13 @@ Connvert to base units by multiplying factor, then substracting offset.")
   void load_frame (Frame& frame) const
   {
     // Add the 'SIoffset' offset model.
-    frame.declare_string ("base", Value::Const, "\
+    frame.declare_string ("base", Attribute::Const, "\
 Base unit to convert to and from.");
     // TODO: Should add check that 'base' is indeed a base unit.
-    frame.declare ("factor", Value::None (), Check::non_zero (), Value::Const, "\
+    frame.declare ("factor", Attribute::None (), Check::non_zero (), Attribute::Const, "\
 Factor to multiply with to get base unit.");
     frame.set ("factor", 1.0);
-    frame.declare ("offset", Value::None (), Value::Const, "\
+    frame.declare ("offset", Attribute::None (), Attribute::Const, "\
 Offset to add after multiplying with factor to get base unit.");
     frame.set ("offset", 0.0);
   }

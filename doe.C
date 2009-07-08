@@ -87,19 +87,19 @@ DOE::load_syntax (Frame& frame)
   // Submodel.
 
   // Content.
-  frame.declare ("M", "g/cm^3", Value::State, Value::SoilCells,
+  frame.declare ("M", "g/cm^3", Attribute::State, Attribute::SoilCells,
                  "Mass in water and soil.");
-  frame.declare ("C", "g/cm^3", Value::LogOnly, Value::SoilCells,
+  frame.declare ("C", "g/cm^3", Attribute::LogOnly, Attribute::SoilCells,
                  "Concentration in water.");
-  frame.declare ("S", "g/cm^3/h", Value::LogOnly, Value::SoilCells,
+  frame.declare ("S", "g/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                  "Combined source term.");
-  frame.declare ("S_p", "g/cm^3/h", Value::LogOnly, Value::SoilCells,
+  frame.declare ("S_p", "g/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                  "Source term (macropore transport only).");
-  frame.declare ("S_drain", "g/cm^3/h", Value::LogOnly, Value::SoilCells,
+  frame.declare ("S_drain", "g/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                  "Source term (soil drainage only).");
-  frame.declare ("J_matrix", "g/cm^2/h", Value::LogOnly, Value::SoilEdges,
+  frame.declare ("J_matrix", "g/cm^2/h", Attribute::LogOnly, Attribute::SoilEdges,
                  "Transportation in matrix (positive up).");
-  frame.declare ("J_tertiary", "g/cm^2/h", Value::LogOnly, Value::SoilEdges,
+  frame.declare ("J_tertiary", "g/cm^2/h", Attribute::LogOnly, Attribute::SoilEdges,
                  "Transportation outside matrix (positive up).");
 }
 

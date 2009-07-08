@@ -160,26 +160,26 @@ void
 ProgramDocument::print_entry_type (const symbol name,
 				   const Frame& frame)
 {
-  const Value::type type = frame.lookup (name);
+  const Attribute::type type = frame.lookup (name);
 
   switch (type)
     {
-    case Value::Number:
+    case Attribute::Number:
       {
 	format->text ("number ");
 	const symbol dimension = frame.dimension (name);
-	if (dimension == Value::None ())
+	if (dimension == Attribute::None ())
 	  format->text ("(dimensionless)");
-	else if (dimension == Value::Unknown ())
+	else if (dimension == Attribute::Unknown ())
 	  format->text ("(dimension not specified)");
 	else
 	  format->bold ("[" + dimension + "]");
       }
       break;
-    case Value::Submodel:
+    case Attribute::Submodel:
       {
         const symbol submodel_name = frame.submodel_name (name);
-	if (submodel_name != Value::None ())
+	if (submodel_name != Attribute::None ())
 	  {
 	    format->bold (submodel_name);
 	    format->text (" fixed component ");
@@ -192,7 +192,7 @@ ProgramDocument::print_entry_type (const symbol name,
 	  }
       }
       break;
-    case Value::PLF:
+    case Attribute::PLF:
       {
 	format->text ("plf ");
 	const symbol domain = frame.domain (name);
@@ -206,18 +206,18 @@ ProgramDocument::print_entry_type (const symbol name,
 	format->bold (range + "]");
       }
       break;
-    case Value::Boolean:
+    case Attribute::Boolean:
       format->text ("boolean ");
       format->see ("section", "type", "boolean");
       break;
-    case Value::String:
+    case Attribute::String:
       format->text ("string ");
       format->see ("section", "type", "string");
       break;
-    case Value::Integer:
+    case Attribute::Integer:
       format->text ("integer");
       break;
-    case Value::Model:
+    case Attribute::Model:
       {
 	const symbol component = frame.component (name);
 	format->bold (component);
@@ -225,9 +225,9 @@ ProgramDocument::print_entry_type (const symbol name,
 	format->see ("chapter", "component",  component);
       }
       break;
-    case Value::Scalar:
-    case Value::Reference:
-    case Value::Error:
+    case Attribute::Scalar:
+    case Attribute::Reference:
+    case Attribute::Error:
     default:
       daisy_panic ("Unknown entry '" + name + "'");
     };
@@ -239,11 +239,11 @@ ProgramDocument::print_entry_submodel (const symbol name,
 				       const Frame& frame,
 				       const symbol aref)
 {
-  const Value::type type = frame.lookup (name);
-  if (type == Value::Submodel)
+  const Attribute::type type = frame.lookup (name);
+  if (type == Attribute::Submodel)
     {
       const FrameSubmodel& child = frame.submodel (name);
-      if (frame.submodel_name (name) == Value::None ())
+      if (frame.submodel_name (name) == Attribute::None ())
 	{
 	  print_sample (name, child, false);
 	  print_submodel (name, level, child, aref);
@@ -255,9 +255,9 @@ void
 ProgramDocument::print_entry_category (const symbol name, 
 				       const Frame& frame)
 {
-  const Value::type type = frame.lookup (name);
+  const Attribute::type type = frame.lookup (name);
 
-  if (type == Value::Model)	// Models and Submodels don't have categories.
+  if (type == Attribute::Model)	// Models and Submodels don't have categories.
     {
       if (frame.is_optional (name))
 	{
@@ -270,7 +270,7 @@ ProgramDocument::print_entry_category (const symbol name,
 	  format->text ("Component");
 	}
     }
-  else if (type == Value::Submodel)
+  else if (type == Attribute::Submodel)
     {
       if (frame.is_optional (name))
 	{
@@ -331,22 +331,22 @@ ProgramDocument::print_entry_value (const symbol name,
 {
   if (frame.check (name))
     {
-      const Value::type type = frame.lookup (name);
+      const Attribute::type type = frame.lookup (name);
       const int size = frame.type_size (name);
 
       bool print_default_value = false;
       
-      if (size == Value::Singleton)
+      if (size == Attribute::Singleton)
 	switch (type)
 	  {
-	  case Value::Number:
+	  case Attribute::Number:
 	    {
 	      std::ostringstream tmp;
 	      tmp << " (default " << frame.number (name) << ")";
 	      format->text (tmp.str ());
 	    }
 	    break;
-	  case Value::Submodel:
+	  case Attribute::Submodel:
 	    {
 	      const bool has_errors 
                 = !frame.check (metalib, name, Treelog::null ());
@@ -355,7 +355,7 @@ ProgramDocument::print_entry_value (const symbol name,
 	      else 
 		format->text (" (has fully specified default value)");
               const symbol submodel = frame.submodel_name (name);
-              if (submodel != Value::None ())
+              if (submodel != Attribute::None ())
 		{
 		  const FrameSubmodel& nested = frame.submodel (name);
                   const FrameSubmodel& frame 
@@ -367,7 +367,7 @@ ProgramDocument::print_entry_value (const symbol name,
 		print_default_value = true;
 	    }
 	    break;
-	  case Value::PLF:
+	  case Attribute::PLF:
 	    {
 	      std::ostringstream tmp;
 	      tmp << " (has default value with " 
@@ -378,7 +378,7 @@ ProgramDocument::print_entry_value (const symbol name,
 		print_default_value = true;
 	    }
 	    break;
-	  case Value::Boolean:
+	  case Attribute::Boolean:
 	    format->text (" (default ");
 	    if (frame.flag (name))
 	      format->text ("true");
@@ -386,7 +386,7 @@ ProgramDocument::print_entry_value (const symbol name,
 	      format->text ("false");
 	    format->text (")");
 	    break;
-	  case Value::String:
+	  case Attribute::String:
 	    {
 	      const std::string value = frame.name (name).name ();
 	      if (value.length () < 30)
@@ -401,14 +401,14 @@ ProgramDocument::print_entry_value (const symbol name,
 		}
 	    }
 	    break;
-	  case Value::Integer:
+	  case Attribute::Integer:
 	    {
 	      std::ostringstream tmp;
 	      tmp << " (default " << frame.integer (name) << ")";
 	      format->text (tmp.str ());
 	    }
 	    break;
-	  case Value::Model:
+	  case Attribute::Model:
 	    {
 	      const FrameModel& object = frame.model (name);
 	      const symbol type = object.type_name ();
@@ -419,21 +419,21 @@ ProgramDocument::print_entry_value (const symbol name,
 		print_default_value = true;
 	    }
 	    break;
-	  case Value::Scalar:
-          case Value::Reference:
-	  case Value::Error:
+	  case Attribute::Scalar:
+          case Attribute::Reference:
+	  case Attribute::Error:
 	    daisy_notreached ();
 	  }
       else
 	switch (type)
 	  {
-	  case Value::Number:
-	  case Value::Submodel:
-	  case Value::PLF:
-	  case Value::Boolean:
-	  case Value::String:
-	  case Value::Integer:
-	  case Value::Model:
+	  case Attribute::Number:
+	  case Attribute::Submodel:
+	  case Attribute::PLF:
+	  case Attribute::Boolean:
+	  case Attribute::String:
+	  case Attribute::Integer:
+	  case Attribute::Model:
 	    if (frame.value_size (name) == 0)
 	      format->text (" (default: an empty sequence)");
 	    else
@@ -445,9 +445,9 @@ ProgramDocument::print_entry_value (const symbol name,
 		print_default_value = true;
 	      }
 	    break;
-	  case Value::Scalar:
-          case Value::Reference:
-	  case Value::Error:
+	  case Attribute::Scalar:
+          case Attribute::Reference:
+	  case Attribute::Error:
 	    daisy_notreached ();
 	  }
 
@@ -541,24 +541,24 @@ ProgramDocument::print_sample_entry (const symbol name,
 
     if (frame.check (name))
       {
-	const Value::type type = frame.lookup (name);
+	const Attribute::type type = frame.lookup (name);
 	const int size = frame.type_size (name);
 
 	bool print_name = true;
 	comment = "Has default value.";
 
-	if (size == Value::Singleton)
+	if (size == Attribute::Singleton)
 	  switch (type)
 	    {
-	    case Value::Number:
+	    case Attribute::Number:
 	      {
 		format->special ("nbsp");
 		std::ostringstream tmp;
 		tmp << frame.number (name);
                 const symbol dimension = frame.dimension (name);
-                if (dimension == Value::None ())
+                if (dimension == Attribute::None ())
                   tmp << " []";
-                else if (dimension == Value::Unknown ())
+                else if (dimension == Attribute::Unknown ())
                   tmp << " [?]";
                 else
                   tmp << " [" << dimension << "]";
@@ -567,7 +567,7 @@ ProgramDocument::print_sample_entry (const symbol name,
 		print_name = false;
 	      }
 	      break;
-	    case Value::Submodel:
+	    case Attribute::Submodel:
 	      {
 		const bool has_errors 
                   = !frame.check (metalib, name, Treelog::null ());
@@ -575,15 +575,15 @@ ProgramDocument::print_sample_entry (const symbol name,
 		  comment = "Has partial value.";
 	      }
 	      break;
-	    case Value::PLF:
+	    case Attribute::PLF:
 	      break;
-	    case Value::Boolean:
+	    case Attribute::Boolean:
 	      format->special ("nbsp");
 	      format->text (frame.flag (name) ? "true" : "false");
 	      format->text (")");
 	      print_name = false;
 	      break;
-	    case Value::String:
+	    case Attribute::String:
 	      {
 		const std::string value = frame.name (name).name ();
 		if (value.length () < 20)
@@ -595,7 +595,7 @@ ProgramDocument::print_sample_entry (const symbol name,
 		  }
 	      }
 	      break;
-	    case Value::Integer:
+	    case Attribute::Integer:
 	      {
 		format->special ("nbsp");
 		std::ostringstream tmp;
@@ -604,16 +604,16 @@ ProgramDocument::print_sample_entry (const symbol name,
 		print_name = false;
 	      }
 	      break;
-	    case Value::Model:
+	    case Attribute::Model:
 	      {
 		const FrameModel& object = frame.model (name);
 		const symbol type = object.type_name ();
 		comment = "Default " + type + " value.";
 	      }
 	      break;
-	    case Value::Scalar:
-            case Value::Reference:
-	    case Value::Error:
+	    case Attribute::Scalar:
+            case Attribute::Reference:
+	    case Attribute::Error:
 	      daisy_notreached ();
 	    }
 	else if (frame.value_size (name) == 0)
@@ -624,7 +624,7 @@ ProgramDocument::print_sample_entry (const symbol name,
 	else
 	  switch (type)
 	    {
-	    case Value::Number:
+	    case Attribute::Number:
 	      if (frame.value_size (name) < 5)
 		{
 		  const std::vector<double>& numbers
@@ -640,23 +640,23 @@ ProgramDocument::print_sample_entry (const symbol name,
 		  print_name = false;
 		}
 	      break;
-	    case Value::Submodel:
-	    case Value::PLF:
-	    case Value::Boolean:
-	    case Value::String:
-	    case Value::Integer:
-	    case Value::Model:
+	    case Attribute::Submodel:
+	    case Attribute::PLF:
+	    case Attribute::Boolean:
+	    case Attribute::String:
+	    case Attribute::Integer:
+	    case Attribute::Model:
 	      break;
-	    case Value::Scalar:
-            case Value::Reference:
-	    case Value::Error:
+	    case Attribute::Scalar:
+            case Attribute::Reference:
+	    case Attribute::Error:
 	      daisy_notreached ();
 	    }
 	if (print_name)
 	  {
 	    format->special ("nbsp");
 	    format->italic (name);
-	    if (frame.type_size (name) != Value::Singleton)
+	    if (frame.type_size (name) != Attribute::Singleton)
 	      {
 		format->special ("nbsp");
 		format->special ("...");
@@ -670,7 +670,7 @@ ProgramDocument::print_sample_entry (const symbol name,
       {
 	format->special ("nbsp");
 	format->italic (name);
-	if (frame.type_size (name) != Value::Singleton)
+	if (frame.type_size (name) != Attribute::Singleton)
 	  {
 	    format->special ("nbsp");
 	    format->special ("...");
@@ -704,7 +704,7 @@ ProgramDocument::own_entries (const Metalib& metalib,
 
   // Remove base entries.
   const symbol base_model = frame.base_name ();
-  if (base_model != Value::None ())
+  if (base_model != Attribute::None ())
     {
       daisy_assert (base_model != name);
 
@@ -733,7 +733,7 @@ ProgramDocument::inherited_entries (const Metalib& metalib,
 
   const symbol base_model = frame.base_name ();
           
-  if (base_model != Value::None ())
+  if (base_model != Attribute::None ())
     {
       const FrameModel& base_frame = library.model (base_model);
       base_frame.entries (entries);
@@ -848,7 +848,7 @@ ProgramDocument::print_sample_entries (const symbol name,
       for (unsigned int i = 0; i < order.size (); i++)
 	{ 
 	  format->italic (order[i]);
-	  if (frame.type_size (order[i]) != Value::Singleton)
+	  if (frame.type_size (order[i]) != Attribute::Singleton)
 	    format->special ("...");
 	  format->special ("nbsp");
 	  left--;
@@ -1002,22 +1002,22 @@ ProgramDocument::print_submodel_entry (const symbol name, int level,
   // Print size.
   switch (size)
     {
-    case Value::Singleton:
+    case Attribute::Singleton:
       /* do nothing */
       break;
-    case Value::Variable:
+    case Attribute::Variable:
       format->text (" sequence");
       break;
-    case Value::CanopyCells:
+    case Attribute::CanopyCells:
       format->text (" canopy intervals");
       break;
-    case Value::CanopyEdges:
+    case Attribute::CanopyEdges:
       format->text (" canopy boundaries");
       break;
-    case Value::SoilCells:
+    case Attribute::SoilCells:
       format->text (" soil cells");
       break;
-    case Value::SoilEdges:
+    case Attribute::SoilEdges:
       format->text (" soil edges");
       break;
     default:
@@ -1040,7 +1040,7 @@ ProgramDocument::print_submodel_entry (const symbol name, int level,
 
   // Print description line.
   const symbol description = frame.description (name);
-  if (description != Value::Unknown ())
+  if (description != Attribute::Unknown ())
     {
       format->hard_linebreak ();
       format->text (description);
@@ -1060,7 +1060,7 @@ ProgramDocument::print_model (const symbol name, const Library& library,
 
   const XRef::ModelUsed used (library.name (), name);
   const symbol type = frame.base_name ();
-  if (type != Value::None ())
+  if (type != Attribute::None ())
     {
       // This is a parameterization.
       format->soft_linebreak ();
@@ -1259,14 +1259,14 @@ Generate the components part of the reference manual.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare_string ("where", Value::Const, 
+    frame.declare_string ("where", Attribute::Const, 
                 "Name of file to store results in.");
     frame.set ("where", "components.tex");
     frame.declare_object ("format", Format::component, 
-                       Value::Const, Value::Singleton,
+                       Attribute::Const, Attribute::Singleton,
                        "Text format used for the document.");
     frame.set ("format", "LaTeX");
-    frame.declare_boolean ("print_parameterizations", Value::Const,
+    frame.declare_boolean ("print_parameterizations", Attribute::Const,
 		"Include a copy of all loaded parameterizations in document.");
     frame.set ("print_parameterizations", false);
   }

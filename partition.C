@@ -87,22 +87,22 @@ void
 Partition::load_syntax (Frame& frame)
 {
   frame.add_check (check_alist);
-  frame.declare ("Root", "DS", Value::Fraction (), Check::fraction (),
-	      Value::Const, "\
+  frame.declare ("Root", "DS", Attribute::Fraction (), Check::fraction (),
+	      Attribute::Const, "\
 Fraction of assimilate for growth that goes to the roots, as a function of\n\
 the crop development stage.  The remaining growth assimilate goes to the\n\
 shoot.");
-  frame.declare ("Leaf", "DS", Value::Fraction (), Check::fraction (),
-	      Value::Const,
+  frame.declare ("Leaf", "DS", Attribute::Fraction (), Check::fraction (),
+	      Attribute::Const,
 	      "Fraction of shoot assimilate that goes to the leafs.");
-  frame.declare ("Stem", "DS", Value::Fraction (), Check::fraction (),
-	      Value::Const,
+  frame.declare ("Stem", "DS", Attribute::Fraction (), Check::fraction (),
+	      Attribute::Const,
 	      "Fraction of shoot assimilate that goes to the stem.");
-  frame.declare ("RSR", "DS", Value::None (), Check::positive (), Value::Const,
+  frame.declare ("RSR", "DS", Attribute::None (), Check::positive (), Attribute::Const,
 	      "Maximal root/shoot ratio as a function of development state.\n\
 If the root/shoot ratio is above this, the roots will start dying.");
-  frame.declare ("nitrogen_stress_limit", Value::None (), Check::fraction (), 
-              Value::Const,
+  frame.declare ("nitrogen_stress_limit", Attribute::None (), Check::fraction (), 
+              Attribute::Const,
 	      "If nitrogen stress is above this number and DS is above 1,\n\
 allocate all assimilate to the storage organ.");
   frame.set ("nitrogen_stress_limit", 1.0);

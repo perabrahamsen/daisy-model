@@ -105,14 +105,14 @@ M = rho (my_max C) / (K + C) + Theta C")
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);
-    frame.declare ("K", "g/cm^3", Check::non_negative (), Value::Const, "Half saturation constant.");
+    frame.declare ("K", "g/cm^3", Check::non_negative (), Attribute::Const, "Half saturation constant.");
     frame.declare ("my_max_clay", "g/cm^3", Check::non_negative (), 
-		Value::OptionalConst,
+		Attribute::OptionalConst,
 		"Max adsorption capacity (clay).\n\
 It is multiplied with the soil clay fraction to get the clay part of\n\
 'my_max'.  If 'my_max_OC' is specified, 'my_max_clay' defaults to 0.");
     frame.declare ("my_max_OC", "g/cm^3", Check::non_negative (), 
-		Value::OptionalConst,
+		Attribute::OptionalConst,
 		"Max adsorption capacity (humus).\n\
 It is multiplied with the soil organic carbon fraction to get the\n\
 carbon part of 'my_max'.  By default, 'my_max_OC' is equal to 'my_max_clay'.");

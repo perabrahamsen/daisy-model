@@ -183,35 +183,35 @@ C4 photosynthesis and stomatal conductance model by Collatz et al., 1992.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("Q10k", Value::Unknown (), Check::positive (), Value::Const,
+    frame.declare ("Q10k", Attribute::Unknown (), Check::positive (), Attribute::Const,
                 "Q10k = 1.8 (Collatz et al., 1992)");
     frame.set ("Q10k", 1.8);
 
-    frame.declare ("Q10vm", Value::Unknown (), Check::positive (), Value::Const,
+    frame.declare ("Q10vm", Attribute::Unknown (), Check::positive (), Attribute::Const,
                 "Q10vm = 2.4 (Collatz et al., 1992)");
     frame.set ("Q10vm", 2.4);
 
-    frame.declare ("Q10rd", Value::Unknown (), Check::positive (), Value::Const,
+    frame.declare ("Q10rd", Attribute::Unknown (), Check::positive (), Attribute::Const,
                 "Q10rd = 2.0 (Collatz et al., 1992)");
     frame.set ("Q10rd", 2.0);
 
-    frame.declare ("kj", Value::Unknown (), Check::positive (), Value::Const,
+    frame.declare ("kj", Attribute::Unknown (), Check::positive (), Attribute::Const,
                 "Initial slope of photosynthetic CO2 response, kj = 0.6 mol/m²/s (Collatz et al., 1992)");
     frame.set ("kj", 0.6);
 
-    frame.declare ("alpha", "mol/mol", Check::positive (), Value::Const,
+    frame.declare ("alpha", "mol/mol", Check::positive (), Attribute::Const,
                 "Initial slope of photosynthetic light response. alpha = 0.04 (Collatz et al., 1992)");
     frame.set ("alpha", 0.04);
 
-    frame.declare ("paab", Value::Unknown (), Check::positive (), Value::Const,
+    frame.declare ("paab", Attribute::Unknown (), Check::positive (), Attribute::Const,
                 "Leaf absorbtivity to PAR. paab = 0.86 (Collatz et al., 1992)");
     frame.set ("paab", 0.86);
 
-    frame.declare ("theta", Value::Unknown (), Check::positive (), Value::Const,
+    frame.declare ("theta", Attribute::Unknown (), Check::positive (), Attribute::Const,
                 "Curvature parameter");
     frame.set ("theta", 0.83);
     
-    frame.declare ("beta", Value::Unknown (), Check::positive (), Value::Const,
+    frame.declare ("beta", Attribute::Unknown (), Check::positive (), Attribute::Const,
                 "Curvanture parameter");
     frame.set ("beta", 0.93);
 

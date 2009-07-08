@@ -1,4 +1,4 @@
-// value.C - A type system for values.
+// attribute.C - A type system for attributes.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
@@ -22,13 +22,13 @@
 
 #define BUILD_DLL
 
-#include "value.h"
+#include "attribute.h"
 #include "assertion.h"
 
-// Each value should have an associated type.
+// Each attribute should have an associated type.
 
 symbol
-Value::type_name (type t)
+Attribute::type_name (type t)
 {
   static const symbol names[] = 
     { "Number", "Submodel", "PLF", "Boolean", "String",
@@ -38,14 +38,14 @@ Value::type_name (type t)
   return names[t];
 }
 
-Value::type operator++ (Value::type& t)
+Attribute::type operator++ (Attribute::type& t)
 { 
-  t = static_cast<Value::type> (static_cast<int> (t) + 1);
+  t = static_cast<Attribute::type> (static_cast<int> (t) + 1);
   return t;
 }
 
-Value::type
-Value::type_number (const symbol name)
+Attribute::type
+Attribute::type_number (const symbol name)
 { 
   for (type i = Number; i != Error; ++i)
     if (name == type_name (i))
@@ -54,35 +54,35 @@ Value::type_number (const symbol name)
 }
 
 symbol
-Value::Unknown ()
+Attribute::Unknown ()
 {
   static const symbol unknown ("<unknown>");
   return unknown; 
 }
 
 symbol
-Value::None ()
+Attribute::None ()
 {
   static const symbol unit ("<none>");
   return unit;
 }
 
 symbol
-Value::Fraction ()
+Attribute::Fraction ()
 {
   static const symbol unit ("<fraction>");
   return unit; 
 }
 
 symbol
-Value::User ()
+Attribute::User ()
 {
   static const symbol unit ("<user>");
   return unit; 
 }
 
 symbol 
-Value::category_name (category c)
+Attribute::category_name (category c)
 { 
   static const symbol names[] = 
     { "Const", "State", "OptionalState", "OptionalConst", "LogOnly"};
@@ -93,7 +93,7 @@ Value::category_name (category c)
 }
 
 int
-Value::category_number (const symbol name)
+Attribute::category_number (const symbol name)
 { 
   static const symbol category_end ("LogOnly");
 
@@ -107,4 +107,4 @@ Value::category_number (const symbol name)
     }
 }
 
-// value.C ends her.
+// attribute.C ends her.

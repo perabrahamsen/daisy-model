@@ -74,7 +74,7 @@ Log::check_entry (symbol name, const char *const component) const
 	  const FrameModel& frame = library.model (name);
           const symbol base = frame.base_name ();
           daisy_assert (base != name);
-	  if (base != Value::None ())
+	  if (base != Attribute::None ())
 	    name = base;
 	  else
 	    looking = false;

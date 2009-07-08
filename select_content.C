@@ -130,17 +130,17 @@ parameters are left out.  In that case, the weighted average is used.")
   { 
     frame.add_check (check_alist);
 
-    frame.declare ("height", "cm", Check::non_positive (), Value::OptionalConst,
+    frame.declare ("height", "cm", Check::non_positive (), Attribute::OptionalConst,
 		"OBSOLETE: Use 'z' instead.");
-    frame.declare ("z", "cm", Value::OptionalConst,
+    frame.declare ("z", "cm", Attribute::OptionalConst,
 		"Specify height (negative below surface) to measure content.\n\
 The value will be a weighted average of all cells containing height.\n\
 By default, cell in all heights will be included.");
-    frame.declare ("x", "cm", Value::OptionalConst,
+    frame.declare ("x", "cm", Attribute::OptionalConst,
 		"Specify width (distance from left side) to measure content.\n\
 The value will be a weighted average of all cells containing width.\n\
 By default, cell in all widths will be included.");
-    frame.declare ("y", "cm", Value::OptionalConst,
+    frame.declare ("y", "cm", Attribute::OptionalConst,
 		"Specify length (distance from front) to measure content.\n\
 The value will be a weighted average of all cells containing length.\n\
 By default, cell in all lengths will be included.");

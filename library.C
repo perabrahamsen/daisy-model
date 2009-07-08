@@ -117,7 +117,7 @@ Library::Implementation::add_ancestors (const symbol key)
 
       symbol next = frame.base_name ();
       
-      if (next == Value::None ())
+      if (next == Attribute::None ())
 	break;
 
       daisy_assert (next != current);
@@ -261,7 +261,7 @@ Library::is_derived_from (const symbol a, const symbol b) const
 
   const symbol type = frame.base_name ();
 
-  if (type == Value::None ())
+  if (type == Attribute::None ())
     return false;
 
   if (type == b)
@@ -284,7 +284,7 @@ Library::base_model (const symbol parameterization) const
 
   const symbol base = al.base_name ();
   daisy_assert (base != parameterization);
-  if (base != Value::None ())
+  if (base != Attribute::None ())
     return base_model (base);
   
   return parameterization;
@@ -295,12 +295,12 @@ Library::has_interesting_description (const Frame& frame) const
 {
   // A missing description is boring.
   const symbol my_d = frame.description ();
-  if (my_d == Value::None ())
+  if (my_d == Attribute::None ())
     return false;
   
   // Top level description are always interesting.
   const symbol base_name = frame.base_name ();
-  if (base_name == Value::None ())
+  if (base_name == Attribute::None ())
     return true;
   
   // If the model has no description, this one is interesting.

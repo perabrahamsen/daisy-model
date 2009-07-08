@@ -163,7 +163,7 @@ Fetch::initialize (std::vector<Select*>& select, Treelog& msg)
 void
 Fetch::load_syntax (Frame& frame)
 { 
-  frame.declare_string ("tag", Value::Const, "\
+  frame.declare_string ("tag", Attribute::Const, "\
 The tag of a column in the log file to summarize in this line.");
   frame.order ("tag");
 }

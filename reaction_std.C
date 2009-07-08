@@ -118,11 +118,11 @@ static struct ReactionStandardSyntax : public DeclareModel
   {
     frame.declare_object ("transform", Transform::component,
                        "Tranformation process between 'A' to 'B'.");
-    frame.declare_string ("A", Value::Const,
+    frame.declare_string ("A", Attribute::Const,
 		"Name of first soil component in equilibrium.");
-    frame.declare_string ("B", Value::Const,
+    frame.declare_string ("B", Attribute::Const,
 		"Name of second soil component in equilibrium.");
-    frame.declare ("S_AB", "g/cm^3/h", Value::LogOnly, Value::SoilCells,
+    frame.declare ("S_AB", "g/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
 		"Converted from A to B this timestep (may be negative).");
 
   }

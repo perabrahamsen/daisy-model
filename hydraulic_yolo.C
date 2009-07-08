@@ -112,7 +112,7 @@ static struct HydraulicYoloSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.declare_integer ("M_intervals", Value::Const,
+    frame.declare_integer ("M_intervals", Attribute::Const,
                 "Number of intervals for numeric integration of K.");
     frame.set ("M_intervals", 500);
   }

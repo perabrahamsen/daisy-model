@@ -160,7 +160,7 @@ struct ActionCond : public Action
       frame.declare_object ("condition", Condition::component, 
                   "Condition for performing the actions.");
       frame.declare_object ("actions", Action::component,
-                         Value::State, Value::Variable, 
+                         Attribute::State, Attribute::Variable, 
                          "Actions to perform when condition is meet.");
       frame.order ("condition", "actions");
     }
@@ -349,7 +349,7 @@ All the actions will be performed in the same time step.")
   void load_frame (Frame& frame) const
   {
     frame.declare_object ("actions", Action::component, 
-                          Value::State, Value::Variable,
+                          Attribute::State, Attribute::Variable,
                           "List of actions to perform.");
     frame.order ("actions");
   }
@@ -365,7 +365,7 @@ Perform the actions associated with the first true condition in the list.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare_submodule_sequence ("clauses", Value::State, "\
+    frame.declare_submodule_sequence ("clauses", Attribute::State, "\
 Each clause consist of a condition and a sequence of actions.\n\
 The first clause whose condition is true, will have its actions activated.",
                                    ActionCond::clause::load_syntax);

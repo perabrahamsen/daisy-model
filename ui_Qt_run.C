@@ -183,7 +183,7 @@ UIRun::attach (Toplevel& toplevel)
   font.setBold (true);
   qt_name->setFont (font);
   const symbol type_name = frame.type_name ();
-  if (type_name != Value::None ())
+  if (type_name != Attribute::None ())
     qt_name->setText (type_name.name ().c_str ());
   else
     qt_name->setText ("No program");
@@ -194,8 +194,8 @@ UIRun::attach (Toplevel& toplevel)
   VisQtTime *const qt_time = new VisQtTime;
   qt_time->setToolTip ("The simulation time.");
   if (frame.check ("time")
-      && frame.lookup ("time") == Value::Submodel
-      && frame.type_size ("time") == Value::Singleton
+      && frame.lookup ("time") == Attribute::Submodel
+      && frame.type_size ("time") == Attribute::Singleton
       && frame.check (toplevel.metalib (), "time", Treelog::null ()))
     {
       Time time (frame.submodel ("time"));
@@ -228,7 +228,7 @@ UIRun::attach (Toplevel& toplevel)
 
   // The program description.
   qt_description->setToolTip ("The description of the selected program.");
-  if (frame.description () != Value::None ()
+  if (frame.description () != Attribute::None ()
       && frame.description () != Toplevel::default_description)
     qt_description->setText (frame.description ().name ().c_str ());
   else
@@ -372,7 +372,7 @@ UIRun::reset ()
 
   // The program name.
   const symbol type_name = frame.type_name ();
-  if (type_name != Value::None ())
+  if (type_name != Attribute::None ())
     qt_name->setText (type_name.name ().c_str ());
   else
     qt_name->setText ("No program");
@@ -394,7 +394,7 @@ UIRun::reset ()
     }
 
   // The program description.
-  if (frame.description () != Value::None ()
+  if (frame.description () != Attribute::None ()
       && frame.description () != Toplevel::default_description)
     qt_description->setText (frame.description ().name ().c_str ());
   else

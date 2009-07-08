@@ -53,7 +53,7 @@ Extract content at specified array index.")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.declare_integer ("index", Value::Const,
+    frame.declare_integer ("index", Attribute::Const,
                "Specify array index to select.");
   }
 } SelectIndex_syntax;

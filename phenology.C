@@ -74,15 +74,15 @@ The development process.")
   void load_frame (Frame& frame) const
   {
     // Variables.
-    frame.declare ("DAP", "d", Value::State, "Days after planting.");
+    frame.declare ("DAP", "d", Attribute::State, "Days after planting.");
     frame.set ("DAP", 0.0);
-    frame.declare ("DS", Value::None (), Value::State,
+    frame.declare ("DS", Attribute::None (), Attribute::State,
                 "Development Stage.");
     frame.set ("DS", -1.0);
-    frame.declare ("partial_day_length", "h", Value::State,
+    frame.declare ("partial_day_length", "h", Attribute::State,
                 "Number of light hours this day, so far.");
     frame.set ("partial_day_length", 0.0);
-    frame.declare ("day_length", "h", Value::State,
+    frame.declare ("day_length", "h", Attribute::State,
                 "Number of light hours yesterday.");
     frame.set ("day_length", 0.0);
   }

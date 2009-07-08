@@ -358,35 +358,35 @@ static struct RaddistDPFSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.declare ("sigma_PAR", Value::None (), Check::positive (), Value::Const,
+    frame.declare ("sigma_PAR", Attribute::None (), Check::positive (), Attribute::Const,
                 "Leaf scattering coefficient of PAR. sigma_PAR=0,15 (Houborg, 2006)");
     frame.set ("sigma_PAR", 0.15);
 
-    frame.declare ("sigma_NIR", Value::None (), Check::positive (), Value::Const,
+    frame.declare ("sigma_NIR", Attribute::None (), Check::positive (), Attribute::Const,
                 "Leaf scattering coefficient of NIR. sigma_NIR=0,83 (Houborg, 2006)");
     frame.set ("sigma_NIR", 0.83);
 
-    frame.declare ("Ps_PAR", Value::None (), Check::positive (), Value::Const,
+    frame.declare ("Ps_PAR", Attribute::None (), Check::positive (), Attribute::Const,
                 "Soil reflection coefficient of PAR, Ps_PAR = 0.1 (Houborg, 2006)");
     frame.set ("Ps_PAR", 0.1); 
 
-    frame.declare ("Ps_NIR", Value::None (), Check::positive (), Value::Const,
+    frame.declare ("Ps_NIR", Attribute::None (), Check::positive (), Attribute::Const,
                 "Soil reflection coefficient of NIR, Ps_NIR = 0.18 (Houborg, 2006)");
     frame.set ("Ps_NIR", 0.18);
  
-    frame.declare ("IRb0", "W m^-2", Value::LogOnly, "Beam radiation above the canopy");
-    frame.declare ("IRd0", "W m^-2", Value::LogOnly,
+    frame.declare ("IRb0", "W m^-2", Attribute::LogOnly, "Beam radiation above the canopy");
+    frame.declare ("IRd0", "W m^-2", Attribute::LogOnly,
                 "Diffuse radiation above the canopy ");
-    frame.declare ("Ph_PAR", "", Value::LogOnly, 
+    frame.declare ("Ph_PAR", "", Attribute::LogOnly, 
                 "Canopy reflection coefficeint of beam PAR for horizontal leaves");
-    frame.declare ("Pcb_PAR", "", Value::LogOnly, "Canopy reflection coefficeint of beam PAR for uniform leaf-angel distribution");
-    frame.declare ("Pscb_PAR", "", Value::LogOnly, "Canopy-soil reflection coefficeint of beam PAR for uniform leaf-angel distribution");
-    frame.declare ("Pscd_PAR", "", Value::LogOnly, "Canopy-soil reflection coefficeint of diffuse PAR for uniform leaf-angel distribution");
-    frame.declare ("Ph_NIR", "", Value::LogOnly, 
+    frame.declare ("Pcb_PAR", "", Attribute::LogOnly, "Canopy reflection coefficeint of beam PAR for uniform leaf-angel distribution");
+    frame.declare ("Pscb_PAR", "", Attribute::LogOnly, "Canopy-soil reflection coefficeint of beam PAR for uniform leaf-angel distribution");
+    frame.declare ("Pscd_PAR", "", Attribute::LogOnly, "Canopy-soil reflection coefficeint of diffuse PAR for uniform leaf-angel distribution");
+    frame.declare ("Ph_NIR", "", Attribute::LogOnly, 
                 "Canopy reflection coefficeint of beam NIR for horizontal leaves");
-    frame.declare ("Pcb_NIR", "", Value::LogOnly, "Canopy reflection coefficeint of beam NIR for uniform leaf-angel distribution");
-    frame.declare ("Pscb_NIR", "", Value::LogOnly, "Canopy-soil reflection coefficeint of beam NIR for uniform leaf-angel distribution");
-    frame.declare ("Pscd_NIR", "", Value::LogOnly, "Canopy-soil reflection coefficeint of diffuse NIR for uniform leaf-angel distribution");
+    frame.declare ("Pcb_NIR", "", Attribute::LogOnly, "Canopy reflection coefficeint of beam NIR for uniform leaf-angel distribution");
+    frame.declare ("Pscb_NIR", "", Attribute::LogOnly, "Canopy-soil reflection coefficeint of beam NIR for uniform leaf-angel distribution");
+    frame.declare ("Pscd_NIR", "", Attribute::LogOnly, "Canopy-soil reflection coefficeint of diffuse NIR for uniform leaf-angel distribution");
   }
 } RaddistDPF_syntax;
 

@@ -80,7 +80,7 @@ struct ReactionBoundrel : public Reaction
         msg.error ("'" + immobile + "' not traced");
         ok = false;
       }
-    if (!chemistry.know (bound) && bound != Value::None ())
+    if (!chemistry.know (bound) && bound != Attribute::None ())
       {
         msg.error ("'" + bound + "' not traced");
         ok = false;
@@ -98,7 +98,7 @@ struct ReactionBoundrel : public Reaction
   explicit ReactionBoundrel (Block& al)
     : Reaction (al),
       immobile (al.name ("immobile")),
-      bound (al.name ("bound", Value::None ())),
+      bound (al.name ("bound", Attribute::None ())),
       colloid (al.name ("colloid")),
       release (0.0)
   { }
@@ -126,15 +126,15 @@ the setup file.")
   {
 
 
-    frame.declare_string ("immobile", Value::Const,
+    frame.declare_string ("immobile", Attribute::Const,
                    "Immobile (or mixed form) chemical in the soil surface.");
-    frame.declare_string ("bound", Value::OptionalConst,
+    frame.declare_string ("bound", Attribute::OptionalConst,
                    "Chemical bound to colloids.\n\
 If unspecified, the colloid bound form will not be traced.");
-    frame.declare_string ("colloid", Value::OptionalConst,
+    frame.declare_string ("colloid", Attribute::OptionalConst,
                    "Name of colloid whose release we mimic.");
     frame.set ("colloid", "colloid");
-    frame.declare ("release", "g/cm^2/h", Value::LogOnly,
+    frame.declare ("release", "g/cm^2/h", Attribute::LogOnly,
                    "Release rate of immobile chemical as colloids.");
   }
   

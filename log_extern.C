@@ -129,23 +129,23 @@ LogExtern::entries (std::set<symbol>& all) const
     all.insert ((*i).first);
 }
 
-Value::type 
+Attribute::type 
 LogExtern::lookup (const symbol tag) const
 {
   const type_map::const_iterator i = types.find (tag);
 
   if (i == types.end ())
-    return Value::Error;
+    return Attribute::Error;
 
   switch ((*i).second)
     {
     case Error:
-      return Value::Error;
+      return Attribute::Error;
     case Number: 
     case Array:
-      return Value::Number;
+      return Attribute::Number;
     case Name:
-      return Value::String;
+      return Attribute::String;
     case Missing:
       for (size_t j = 0; j < LogSelect::entries.size (); j++)
         if (LogSelect::entries[j]->tag () == tag)
@@ -154,11 +154,11 @@ LogExtern::lookup (const symbol tag) const
               {
               case Select::NumberSingleton:
               case Select::NumberSequence:
-                return Value::Number;
+                return Attribute::Number;
               }
             daisy_notreached ();
           }
-      return Value::Error;
+      return Attribute::Error;
     }
   daisy_notreached ();
 }
@@ -168,7 +168,7 @@ LogExtern::type_size (symbol tag) const
 {
   const int_map::const_iterator i = sizes.find (tag);
   if (i == sizes.end ())
-    return Value::Singleton;
+    return Attribute::Singleton;
   return (*i).second;
 }
 
@@ -253,9 +253,9 @@ struct LogExtern::NumEntry
 
   static void load_syntax (Frame& frame)
   {
-    frame.declare_string ("name", Value::State, "\
+    frame.declare_string ("name", Attribute::State, "\
 Name to refer to number with.");
-    frame.declare ("value", Value::Unknown (), Value::State, "\
+    frame.declare ("value", Attribute::Unknown (), Attribute::State, "\
 Numeric value.");
   }
 
@@ -314,14 +314,14 @@ Log simulation state for extern use.")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.declare_submodule_sequence ("numbers", Value::OptionalState, "\
+    frame.declare_submodule_sequence ("numbers", Attribute::OptionalState, "\
 Inititial numeric values.  By default, none.", 
                                   LogExtern::NumEntry::load_syntax);
-    frame.declare_string ("where", Value::OptionalConst,
+    frame.declare_string ("where", Attribute::OptionalConst,
                 "Name of the extern log to use.\n\
 By default, use the model name.");
     frame.declare_string ("parameter_names", 
-                Value::Const, Value::Variable, "\
+                Attribute::Const, Attribute::Variable, "\
 List of parameters to export.\n\
 \n\
 For example, if you have defined 'column' and 'crop' parameters for\n\

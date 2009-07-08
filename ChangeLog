@@ -1,3 +1,8 @@
+2009-07-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* attribute.C, attribute.h: Renamed from value.
+	* Makefile (OTHER): Update.
+
 2009-07-07  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* alist.C, alist.h, avalue.C, avalue.h: Removed.

@@ -74,7 +74,7 @@ Flux groundwater, free drainage.")
   { }
   void load_frame (Frame& frame) const
     { 
-      frame.declare ("flux", "cm/h", Check::none (), Value::Const,
+      frame.declare ("flux", "cm/h", Check::none (), Attribute::Const,
 		  "Constant flux to groundwater.");
       frame.order ("flux");
     }

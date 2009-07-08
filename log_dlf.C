@@ -118,9 +118,9 @@ LogDLF::common_done (const std::vector<Time::component_t>& time_columns,
 
           const int size = entries[i]->size ();
           symbol dimension = entries[i]->dimension ().name ();
-          if (dimension == Value::None () 
-              || dimension == Value::Unknown ()
-              || dimension == Value::Fraction ())
+          if (dimension == Attribute::None () 
+              || dimension == Attribute::Unknown ()
+              || dimension == Attribute::Fraction ())
             dimension = "";
 
           if (size >= 0)
@@ -342,49 +342,49 @@ Shared base class for log models generating Daisy Log File formatted results.")
   void load_frame (Frame& frame) const
   { 
     frame.declare_string ("parameter_names", 
-                   Value::Const, Value::Variable, "\
+                   Attribute::Const, Attribute::Variable, "\
 List of string parameters to print to the table header.\n\
 \n\
 For example, if you have defined 'column' and 'crop' parameters for\n\
 this table log parameterization, you can print them to the log file\n\
 header by specifying '(names column crop)'.");
     frame.set_empty ("parameter_names");
-    frame.declare_string ("where", Value::Const,
+    frame.declare_string ("where", Attribute::Const,
                    "Name of the log file to create.");
-    frame.declare_string ("print_header", Value::Const,
+    frame.declare_string ("print_header", Attribute::Const,
                    "If this is set to 'false', no header is printed.\n\
 If this is set to 'true', a full header is printer.\n\
 If this is set to 'fixed', a small fixed size header is printed.");
     static VCheck::Enum check_header ("false", "true", "fixed");
     frame.set_check ("print_header", check_header);
     frame.set ("print_header", "true");
-    frame.declare_boolean ("print_tags", Value::Const,
+    frame.declare_boolean ("print_tags", Attribute::Const,
                    "Print a tag line in the file.");
     frame.set ("print_tags", true);
-    frame.declare_boolean ("print_dimension", Value::Const,
+    frame.declare_boolean ("print_dimension", Attribute::Const,
                    "Print a line with units after the tag line.");
     frame.set ("print_dimension", true);
-    frame.declare_boolean ("print_initial", Value::Const,
+    frame.declare_boolean ("print_initial", Attribute::Const,
                    "Print a line with initial values when logging starts.");
     frame.set ("print_initial", true);
-    frame.declare_boolean ("flush", Value::Const,
+    frame.declare_boolean ("flush", Attribute::Const,
                    "Flush to disk after each entry (for debugging).");
     frame.set ("flush", false);
-    frame.declare_string ("record_separator", Value::Const, "\
+    frame.declare_string ("record_separator", Attribute::Const, "\
 String to print between records (time steps).");
     frame.set ("record_separator", "\n");
-    frame.declare_string ("field_separator", Value::Const, "\
+    frame.declare_string ("field_separator", Attribute::Const, "\
 String to print between fields.");
     frame.set ("field_separator", "\t");
-    frame.declare_string ("error_string", Value::Const, "\
+    frame.declare_string ("error_string", Attribute::Const, "\
 String to print when errors are encountered.");
     frame.set ("error_string", "!");
-    frame.declare_string ("missing_value", Value::Const, "\
+    frame.declare_string ("missing_value", Attribute::Const, "\
 String to print when the path doesn't match anything.\n\
 This can be relevant for example if you are logging a crop, and there are\n\
 no crops on the field.");
     frame.set ("missing_value", "00.00");
-    frame.declare_string ("array_separator", Value::Const, "\
+    frame.declare_string ("array_separator", Attribute::Const, "\
 String to print between array entries.");
     frame.set ("array_separator", "\t");
     Librarian::add_doc_fun (Log::component, 

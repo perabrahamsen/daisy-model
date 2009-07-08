@@ -183,7 +183,7 @@ TraverseXRef::enter_model (Frame& frame,
   daisy_assert (component == current_component);
   daisy_assert (type == is_invalid);
   current_model = name;
-  if (frame.base_name () != Value::None ())
+  if (frame.base_name () != Attribute::None ())
     type = is_parameterization;
   else
     type = is_model;
@@ -221,7 +221,7 @@ TraverseXRef::enter_submodel_default (const Frame& default_frame,
       current_submodel = name;
       return true;
     }
-  if (registered != Value::None ())
+  if (registered != Attribute::None ())
     {
       // Nested submodel.  Register and stop.
       use_submodel (registered);
@@ -296,13 +296,13 @@ TraverseXRef::enter_parameter (const Frame& frame, const Frame& default_frame,
       if (frame.subset (metalib, default_frame, name))
         return false;
     }
-  else if (type == is_model && frame.base_name () != Value::None ())
+  else if (type == is_model && frame.base_name () != Attribute::None ())
     {
       // Ignore base parameters.
       const Library& library = metalib.library (current_component);
       const symbol base_model = frame.base_name ();
       const Frame& base_frame = library.model (base_model);
-      if (base_frame.lookup (name) != Value::Error)
+      if (base_frame.lookup (name) != Attribute::Error)
         {
           if (frame.subset (metalib, base_frame, name))
             return false;
@@ -310,7 +310,7 @@ TraverseXRef::enter_parameter (const Frame& frame, const Frame& default_frame,
     }
   path.push_back (name);
 
-  if (frame.lookup (name) == Value::Model)
+  if (frame.lookup (name) == Attribute::Model)
     // We always use the component, even if it has no value, or a
     // value that is an empty sequence.
     use_component (metalib.library (frame.component (name)));

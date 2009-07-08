@@ -654,9 +654,9 @@ static struct CheckLayers : public VCheck
                Treelog& msg) const
   {
     daisy_assert (frame.check (key));
-    daisy_assert (frame.lookup (key) == Value::Submodel);
+    daisy_assert (frame.lookup (key) == Attribute::Submodel);
     daisy_assert (!frame.is_log (key));
-    daisy_assert (frame.type_size (key) == Value::Variable);
+    daisy_assert (frame.type_size (key) == Attribute::Variable);
 
     const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& layers 
       = frame.submodel_sequence (key);
@@ -686,20 +686,20 @@ static struct CheckLayers : public VCheck
 
 void 
 Geometry::add_layer (Frame& frame, const symbol dimension,
-                     const Value::category cat, 
+                     const Attribute::category cat, 
                      const symbol description)
 {
-  frame.declare ("end", "cm", Check::negative (), Value::Const, 
+  frame.declare ("end", "cm", Check::negative (), Attribute::Const, 
 	     "End point of this layer (a negative number).");
-  if (dimension == Value::Fraction ())
-    frame.declare_fraction ("value", Value::Const, description);
+  if (dimension == Attribute::Fraction ())
+    frame.declare_fraction ("value", Attribute::Const, description);
   else
-    frame.declare ("value", dimension, Value::Const, description);
+    frame.declare ("value", dimension, Attribute::Const, description);
   frame.order ("end", "value");
 }
 
 void 
-Geometry::add_layer (Frame& frame, const Value::category cat, 
+Geometry::add_layer (Frame& frame, const Attribute::category cat, 
                      const symbol name,
                      load_syntax_t load_syntax)
 {
@@ -708,17 +708,17 @@ Geometry::add_layer (Frame& frame, const Value::category cat,
   const symbol dimension = child.dimension ("value");
   
   const std::string iname = "initial_" + name;
-  frame.declare_submodule_sequence (iname, Value::OptionalConst, "\
+  frame.declare_submodule_sequence (iname, Attribute::OptionalConst, "\
 Initial value of the '" + name + "' parameter.\n\
 The initial value is given as a sequence of (END VALUE) pairs, starting\n \
 from the top and going down.  The parameter will be initialized to\n\
 VALUE from the END of the previous layer, to the END of the current layer.",
                                 load_syntax);
   frame.set_check (iname, check_layers);
-  if (dimension == Value::Fraction ())
-    frame.declare_fraction (name, cat, Value::SoilCells, description);
+  if (dimension == Attribute::Fraction ())
+    frame.declare_fraction (name, cat, Attribute::SoilCells, description);
   else
-    frame.declare (name, dimension, cat, Value::SoilCells, description);
+    frame.declare (name, dimension, cat, Attribute::SoilCells, description);
 }
 
 void 

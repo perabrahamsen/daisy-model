@@ -70,13 +70,13 @@ static struct ABAEffectexpSyntax : public DeclareModel
   { return new ABAEffect_exp (al); }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("k", "cm^3/g", Check::non_negative (), Value::Const,
+    frame.declare ("k", "cm^3/g", Check::non_negative (), Attribute::Const,
                 "Coefficient");
     frame.set ("k", 0.0);
-    frame.declare ("l", "MPa^-1", Check::non_negative (), Value::Const,
+    frame.declare ("l", "MPa^-1", Check::non_negative (), Attribute::Const,
                 "Coefficient");
     frame.set ("l", 0.0);
-    frame.declare ("alpha", Value::None(), Check::non_negative (), Value::Const,
+    frame.declare ("alpha", Attribute::None(), Check::non_negative (), Attribute::Const,
                 "Coefficient");
     frame.set ("alpha", 1.0);
   }  

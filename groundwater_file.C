@@ -188,7 +188,7 @@ Read groundwater table from a file.")
   { }
   void load_frame (Frame& frame) const
     { 
-      frame.declare_string ("file", Value::Const,
+      frame.declare_string ("file", Attribute::Const,
 		  "Name of file to read data from.\n\
 The format of each line in the file is 'YEAR MONTH DAY HEIGHT',\n\
 where HEIGHT should in cm above ground (i.e. a negative number).\n\

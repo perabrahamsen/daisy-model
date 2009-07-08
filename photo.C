@@ -56,7 +56,7 @@ static struct PhotoInit : public DeclareComponent
   void load_frame (Frame& frame) const
   { 
     Model::load_model (frame);
-    frame.declare ("min_PAR", "W/m^2", Check::non_negative (), Value::Const,
+    frame.declare ("min_PAR", "W/m^2", Check::non_negative (), Attribute::Const,
                "Minimum PAR at top of canopy for photosynthesis.\n\
 If radiation is below this amount, photosynthesis will be disabled.");
     frame.set ("min_PAR", 0.1);

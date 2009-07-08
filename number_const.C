@@ -92,7 +92,7 @@ static struct NumberConstSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.declare ("value", Value::User (), Value::Const,
+    frame.declare ("value", Attribute::User (), Attribute::Const,
 		"Fixed value for this number.");
     frame.order ("value");
   }
@@ -129,7 +129,7 @@ struct NumberGet : public Number
   // Create.
   bool initialize (const Units& units, const Scope& scope, Treelog& msg)
   { 
-    if (scope.lookup (name) != Value::Number)
+    if (scope.lookup (name) != Attribute::Number)
       {
         msg.error ("'" + name + "' is not a number");
         return false;
@@ -155,7 +155,7 @@ struct NumberGet : public Number
       }
     else if (units.is_error (*scope_unit))
       {
-        daisy_assert (scope.lookup (name) == Value::Number);
+        daisy_assert (scope.lookup (name) == Attribute::Number);
         const symbol got_dim = scope.dimension (name);
         msg.error ("'" + name + "' has unknown dimension [" + got_dim + "]");
         ok = false;
@@ -191,9 +191,9 @@ static struct NumberGetSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.declare_string ("name", Value::Const, 
+    frame.declare_string ("name", Attribute::Const, 
                 "Name of a the symbol.");
-    frame.declare_string ("dimension", Value::Const, 
+    frame.declare_string ("dimension", Attribute::Const, 
                 "Expected dimension for the symbol.");
     frame.order ("name", "dimension");
   }
@@ -233,7 +233,7 @@ struct NumberFetchGet : public Number
   // Create.
   bool initialize (const Units& units, const Scope& scope, Treelog& msg)
   { 
-    if (scope.lookup (name) != Value::Number)
+    if (scope.lookup (name) != Attribute::Number)
       {
         msg.error ("'" + name + "' is not a number");
         return false;
@@ -254,7 +254,7 @@ struct NumberFetchGet : public Number
       }
     else if (units.is_error (*scope_unit))
       {
-        daisy_assert (scope.lookup (name) == Value::Number);
+        daisy_assert (scope.lookup (name) == Attribute::Number);
         const symbol got_dim = scope.dimension (name);
         msg.error ("'" + name + "' has unknown dimension [" + got_dim + "]");
         ok = false;
@@ -279,15 +279,15 @@ struct NumberFetch : public Number
   static std::auto_ptr<Number> fetch_child (Block& al, const symbol key)
   {
     std::auto_ptr<Number> result;
-    Value::type type = al.lookup (key);
+    Attribute::type type = al.lookup (key);
     switch (type)
       {
-      case Value::Number:
+      case Attribute::Number:
         {
           if (!al.check (key))
             {
               const Frame& frame = al.find_frame (key);
-              daisy_assert (frame.lookup (key) == Value::Number);
+              daisy_assert (frame.lookup (key) == Attribute::Number);
               al.error ("Parameter '" + key 
                         + "' is declared in '" + frame.type_name () 
                         + "' (" + frame.description () 
@@ -295,7 +295,7 @@ struct NumberFetch : public Number
                         + "', but has no value");
               break;
             }
-          if (al.type_size (key) != Value::Singleton)
+          if (al.type_size (key) != Attribute::Singleton)
             {
               al.error ("Parameter '" + key 
                          + "' is a sequence, expected singleton");
@@ -304,7 +304,7 @@ struct NumberFetch : public Number
           result.reset (new NumberConst (al, key));
         }
         break;
-      case Value::Model:
+      case Attribute::Model:
         {
           const Frame& frame = al.find_frame (key);
           const symbol component = frame.component (key);
@@ -315,7 +315,7 @@ struct NumberFetch : public Number
                          + Number::component + "'");
               break;
             }
-          if (frame.type_size (key) != Value::Singleton)
+          if (frame.type_size (key) != Attribute::Singleton)
             {
               al.error ("Parameter '" + key 
                         + "' is a model sequence, expected singleton");
@@ -331,11 +331,11 @@ struct NumberFetch : public Number
           result.reset (Librarian::build_item<Number> (al, key));
         }
         break;
-      case Value::Error:
+      case Attribute::Error:
         result.reset (new NumberFetchGet (al, key));
         break;
       default:
-        al.error ("'" + key + "' is a " + Value::type_name (type)
+        al.error ("'" + key + "' is a " + Attribute::type_name (type)
                   + ", expected a number");
       }
     return result;
@@ -390,7 +390,7 @@ static struct NumberFetchSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.declare_string ("name", Value::Const, 
+    frame.declare_string ("name", Attribute::Const, 
                 "Name of a the symbol.");
     frame.order ("name");
   }
@@ -485,7 +485,7 @@ struct NumberIdentity : public NumberChild
   NumberIdentity (Block& al)
     : NumberChild (al),
       units (al.units ()),
-      dim (al.name ("dimension", Value::Unknown ()))
+      dim (al.name ("dimension", Attribute::Unknown ()))
   { }
 };
 
@@ -500,7 +500,7 @@ Pass value unchanged.")
   void load_frame (Frame& frame) const
   {
     Model::load_model (frame);
-    frame.declare_string ("dimension", Value::OptionalConst,
+    frame.declare_string ("dimension", Attribute::OptionalConst,
 		"Dimension of this value.");
   }
 } NumberIdentity_syntax;
@@ -560,7 +560,7 @@ Convert to specified dimension.")
   void load_frame (Frame& frame) const
   {
 
-    frame.declare_string ("dimension", Value::Const,
+    frame.declare_string ("dimension", Attribute::Const,
 		"Dimension to convert to.");
     frame.order ("value", "dimension");
   }
@@ -613,10 +613,10 @@ Specify dimension for number.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare_boolean ("warn_known", Value::Const,
+    frame.declare_boolean ("warn_known", Attribute::Const,
                 "Issue a warning if the dimensions is already known.");
     frame.set ("warn_known", true);
-    frame.declare_string ("dimension", Value::Const,
+    frame.declare_string ("dimension", Attribute::Const,
 		"Dimension to use.");
     frame.order ("value", "dimension");
   }

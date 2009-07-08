@@ -100,10 +100,10 @@ static struct NumberSourceSyntax : public DeclareBase
   {
     frame.declare_object ("source", Source::component, "\
 The time series we want to extract a number from.");
-    frame.declare_submodule ("begin", Value::OptionalConst,
+    frame.declare_submodule ("begin", Attribute::OptionalConst,
 			  "Ignore values before or at this date.", 
                           Time::load_syntax);
-    frame.declare_submodule ("end", Value::OptionalConst,
+    frame.declare_submodule ("end", Attribute::OptionalConst,
 			  "Ignore values after this date.", Time::load_syntax);
   }
 } NumberSource_syntax;

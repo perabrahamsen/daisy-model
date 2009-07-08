@@ -23,7 +23,7 @@
 #include "oldunits.h"
 #include "mathlib.h"
 #include "memutils.h"
-#include "value.h"
+#include "attribute.h"
 #include <map>
 
 struct Oldunits::Content
@@ -348,12 +348,12 @@ Oldunits::get_convertion (const symbol from, const symbol to)
 symbol
 Oldunits::multiply (const symbol one, const symbol two)
 { 
-  if (one == Value::None () || one == Value::Fraction ())
+  if (one == Attribute::None () || one == Attribute::Fraction ())
     return two;
-  if (two == Value::None () || two == Value::Fraction ())
+  if (two == Attribute::None () || two == Attribute::Fraction ())
     return one;
-  if (one == Value::Unknown () || two == Value::Unknown ())
-    return Value::Unknown ();
+  if (one == Attribute::Unknown () || two == Attribute::Unknown ())
+    return Attribute::Unknown ();
 
   static const struct multiply_table
   { 
@@ -402,9 +402,9 @@ Oldunits::multiply (const symbol one, const symbol two)
 
   const std::string inv = "^-1";
   if (one.name () == two + inv || one + inv == two.name ())
-    return Value::None ();
+    return Attribute::None ();
 
-  return Value::Unknown ();
+  return Attribute::Unknown ();
 }
 
 // GCC 2.95 requires these to be defined outside a function.
@@ -480,19 +480,19 @@ Oldunits::standard_conversions ()
   add ("g/cm^3", "kg/m^3", (100.0 * 100.0 * 100.0) / 1000.0);
   add ("g/cm^3", "mg/l", 1e6);
   add ("mol/m^2", "mmol/m^2", 1e3);
-  add (Value::Fraction (), "mg N/kg dry soil", 1000000.0);
-  add (Value::Fraction (), "ppm", 1000000.0);
-  add (Value::Fraction (), "%", 100.0);
-  add (Value::Fraction (), "", 1.0);
+  add (Attribute::Fraction (), "mg N/kg dry soil", 1000000.0);
+  add (Attribute::Fraction (), "ppm", 1000000.0);
+  add (Attribute::Fraction (), "%", 100.0);
+  add (Attribute::Fraction (), "", 1.0);
   add ("", "ppm", 1000000.0);
   add ("", "%", 100.0);
   add ("none", "", 1.0);
-  add (Value::None (), "", 1.0);
-  add ("cm^3/cm^3", Value::Fraction (), 1.0);
+  add (Attribute::None (), "", 1.0);
+  add ("cm^3/cm^3", Attribute::Fraction (), 1.0);
   add ("cm^3/cm^3", "", 1.0);
-  add ("cm^3 H2O/cm^3", Value::Fraction (), 1.0);
+  add ("cm^3 H2O/cm^3", Attribute::Fraction (), 1.0);
   add ("cm^3 H2O/cm^3", "", 1.0);
-  add ("g/cm^3", Value::Fraction (), 1.0);
+  add ("g/cm^3", Attribute::Fraction (), 1.0);
   add ("kg/ha/y", "g/cm^2/h",
        (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0))) / (365.2425 * 24.0));
   add ("g/cm^2/h", "g/ha/h", ((100.0 * 100.0) * (100.0 * 100.0)));
@@ -542,7 +542,7 @@ Oldunits::standard_conversions ()
   add ("g/cm^2", "kg C/ha", 1e5); // DOM.
   add ("g N/cm^2", "kg N/ha", 1e5); // Organic N.
   add ("g C/cm^2", "kg C/ha", 1e5);
-  add (Value::Fraction (), "mg/l", 1e6);
+  add (Attribute::Fraction (), "mg/l", 1e6);
   add ("g C/cm^2", "g/cm^2", 1.0);	// For "per dry matter" logging.
   add ("g N/cm^2", "g/cm^2", 1.0);	// For "per dry matter" logging.
   add ("g C/cm^3", "g/cm^3", 1.0);	// For "per dry matter" logging.

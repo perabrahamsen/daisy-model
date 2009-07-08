@@ -205,37 +205,37 @@ This additional denitrification is limited by K_fast.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("converted", "g/cm^3/h", Value::LogOnly, Value::Variable,
+    frame.declare ("converted", "g/cm^3/h", Attribute::LogOnly, Attribute::Variable,
                    "Amount of denitrification.");
-    frame.declare ("converted_fast", "g/cm^3/h", Value::LogOnly, Value::SoilCells,
+    frame.declare ("converted_fast", "g/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                    "Additional denitrification due to turnover in fast pools.");
-    frame.declare ("converted_redox", "g/cm^3/h", Value::LogOnly, Value::SoilCells,
+    frame.declare ("converted_redox", "g/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                    "Additional denitrification due to chemical redox processes.");
-    frame.declare ("potential", "g/cm^3/h", Value::LogOnly, Value::SoilCells,
+    frame.declare ("potential", "g/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                    "Potential amount of denitrification at anarobic conditions.");
-    frame.declare ("potential_fast", "g/cm^3/h", Value::LogOnly, Value::SoilCells,
+    frame.declare ("potential_fast", "g/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                    "Additional potential due to turnover in fast pools.");
-    frame.declare ("K", "h^-1", Check::fraction (), Value::Const, "\
+    frame.declare ("K", "h^-1", Check::fraction (), Attribute::Const, "\
 Maximum fraction of nitrate converted at each time step from slow pools.");
     frame.set ("K", 0.020833);
-    frame.declare ("K_fast", "h^-1", Check::fraction (), Value::OptionalConst, "\
+    frame.declare ("K_fast", "h^-1", Check::fraction (), Attribute::OptionalConst, "\
 Maximum fraction of nitrate converted at each time step from fast pools.\n \
 By default this is identical to 'K'.");
     frame.declare ("alpha", "(g NO3-N/h)/(g CO2-C/h)", Check::non_negative (),
-                   Value::Const, "\
+                   Attribute::Const, "\
 Anaerobic denitrification constant for slow pools.");
     frame.set ("alpha", 0.1);
     frame.declare ("alpha_fast", "(g NO3-N/h)/(g CO2-C/h)", Check::non_negative (),
-                   Value::OptionalConst, "\
+                   Attribute::OptionalConst, "\
 Anaerobic denitrification constant for fast pools.\n                    \
 This applies to the CO2 produced from turnover of fast OM pools.\n\
 By default, this is identical to alpha.");
-    frame.declare ("heat_factor", "dg C", Value::None (), Check::non_negative (),
-                   Value::OptionalConst, "Heat factor.\n\
+    frame.declare ("heat_factor", "dg C", Attribute::None (), Check::non_negative (),
+                   Attribute::OptionalConst, "Heat factor.\n\
 By default, use a build in function valid for temperate climates.");
-    frame.declare ("water_factor", Value::Fraction (), Value::None (), 
+    frame.declare ("water_factor", Attribute::Fraction (), Attribute::None (), 
                    Check::non_negative (),
-                   Value::OptionalConst,
+                   Attribute::OptionalConst,
                    "Water potential factor for slow pools.\n\
 This is a function of the current water content as a fraction of the\n\
 maximal water content.");
@@ -243,13 +243,13 @@ maximal water content.");
     water_factor.add (0.7, 0.0);
     water_factor.add (1.0, 1.0);
     frame.set ("water_factor", water_factor);
-    frame.declare ("water_factor_fast", Value::Fraction (), Value::None (), 
+    frame.declare ("water_factor_fast", Attribute::Fraction (), Attribute::None (), 
                    Check::non_negative (),
-                   Value::OptionalConst,
+                   Attribute::OptionalConst,
                    "Water potential factor for fast pools\n\
 By default, this is identical to the 'water_factor' parameter.");
     frame.declare  ("redox_height", "cm", Check::non_positive (),
-                    Value::OptionalConst,  "\
+                    Attribute::OptionalConst,  "\
 Height (a negative number) blow which redox processes start.\n  \
 All NO3 below this height will be denitrified immediately.\n\
 By default no redox denitrification occurs.");

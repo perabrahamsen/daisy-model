@@ -213,7 +213,7 @@ void
 Output::load_syntax (Frame& frame)
 {
   frame.declare_object ("output", Log::component,
-                     Value::State, Value::Variable,
+                     Attribute::State, Attribute::Variable,
                      "List of logs for output during the simulation.");
   frame.declare_object ("activate_output", Condition::component,
                      "Activate output logs when this condition is true.\n\
@@ -222,7 +222,7 @@ period.");
   frame.set ("activate_output", "true");
 
   frame.declare_object ("exchange", MScope::component,
-                     Value::Const, Value::Variable, "\
+                     Attribute::Const, Attribute::Variable, "\
 List of exchange items for communicating with external models.");
   frame.set_empty ("exchange");
 
@@ -240,7 +240,7 @@ List of default time components to include in log files. Choose between:\n";
       if (empty_valid)
 	valid_component.add (name);
     }
-  frame.declare_string ("log_time_columns", Value::Const, Value::Variable, 
+  frame.declare_string ("log_time_columns", Attribute::Const, Attribute::Variable, 
                         log_time_doc);
   frame.set_check ("log_time_columns", valid_component);
   std::vector<symbol> default_time;

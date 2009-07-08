@@ -159,10 +159,10 @@ symbol
 Select::Implementation::Spec::dimension () const
 {
   const Frame& frame = leaf_frame ();
-  if (frame.lookup (leaf_name ()) == Value::Number)
+  if (frame.lookup (leaf_name ()) == Attribute::Number)
     return frame.dimension (leaf_name ());
   else
-    return Value::Unknown ();
+    return Attribute::Unknown ();
 }
 
 symbol
@@ -217,25 +217,25 @@ Select::Implementation::Spec::check_path (const std::vector<symbol>& path,
     {
       const std::string name = path[i].name ();
       bool last = (i + 1 == path.size ());
-      const Value::type type = frame->lookup (name);
+      const Attribute::type type = frame->lookup (name);
 
       if (!last)
         {
-          if (type != Value::Submodel)
+          if (type != Attribute::Submodel)
             {
               err.error ("'" + name + "': no such submodel (is a " 
-                         + Value::type_name (type) + ")");
+                         + Attribute::type_name (type) + ")");
               ok = false;
               break;
             }
           const symbol submodel_name = frame->submodel_name (name);
-          if (submodel_name != Value::None ())
+          if (submodel_name != Attribute::None ())
             err.warning ("'" + name + "' is a fixed '" 
                          + submodel_name + "' component");
 
           frame = &frame->submodel (name);
         }
-      else if (type == Value::Error)
+      else if (type == Attribute::Error)
         {
           err.error ("'" + name + "': no such attribute");
           ok = false;
@@ -304,13 +304,13 @@ void
 Select::Implementation::Spec::load_syntax (Frame& frame)
 { 
   frame.add_check (check_alist);
-  frame.declare_string ("library", Value::Const, "\
+  frame.declare_string ("library", Attribute::Const, "\
 Name of library where the attribute belong.\n\
 Use 'fixed' to denote a fixed component.");
-  frame.declare_string ("model", Value::Const, "\
+  frame.declare_string ("model", Attribute::Const, "\
 Name of model or fixed component where the attribute belongs.");
   frame.declare_string ("submodels_and_attribute", 
-                 Value::Const, Value::Variable, "\
+                 Attribute::Const, Attribute::Variable, "\
 Name of submodels and attribute.");
   frame.order ("library", "model", "submodels_and_attribute");
 }
@@ -350,7 +350,7 @@ bool
 Select::Implementation::check (const symbol spec_dim, Treelog& err) const
 {
   bool ok = true;
-  if (spec.get () && !spec_conv && spec->dimension () != Value::Unknown ())
+  if (spec.get () && !spec_conv && spec->dimension () != Attribute::Unknown ())
     err.warning ("Don't know how to convert [" + spec_dim
                  + "] to [" + dimension + "]");
   return ok;
@@ -453,7 +453,7 @@ Select::Implementation::Implementation (Block& al)
   : spec (al.check ("spec")
           ? submodel<Spec> (al, "spec")
           : NULL),
-    scope (x_symbol, Value::Unknown ()),
+    scope (x_symbol, Attribute::Unknown ()),
     spec_conv (NULL),
     expr (get_expr (al)),
     negate (al.flag ("negate")
@@ -462,7 +462,7 @@ Select::Implementation::Implementation (Block& al)
             /**/ .is_derived_from (al.type_name (), flux_top_symbol)),
     tag (Select::select_get_tag (al.frame ())),
     dimension (al.check ("dimension")
-               ? al.name ("dimension") : Value::Unknown ()),
+               ? al.name ("dimension") : Attribute::Unknown ()),
     description (find_description (al.metalib (), al.frame ()))
 { }
   
@@ -502,7 +502,7 @@ Select::geometry () const
 
 int 
 Select::size () const
-{ return Value::Singleton; }
+{ return Attribute::Singleton; }
 
 symbol
 Select::select_get_tag (const Frame& al)
@@ -592,7 +592,7 @@ Select::initialize (const Units& units, const Volume&,
   if (impl->spec.get ())
     spec_dim = default_dimension (impl->spec->dimension ());
   else
-    spec_dim = Value::Unknown ();
+    spec_dim = Attribute::Unknown ();
 
   // Let the expression modify the dimension.
   impl->scope.set_dimension (Implementation::x_symbol, spec_dim);
@@ -608,7 +608,7 @@ Select::initialize (const Units& units, const Volume&,
       spec_dim = impl->expr->dimension (impl->scope);
     }
 
-  if (impl->dimension == Value::Unknown ())
+  if (impl->dimension == Attribute::Unknown ())
     impl->dimension = spec_dim;
 
   // Attempt to find convertion with original dimension.
@@ -729,17 +729,17 @@ Set the 'handle' parameter instead.");
   {
     Model::load_model (frame);
     frame.add_check (check_alist);
-    frame.declare_string ("tag", Value::OptionalConst,
+    frame.declare_string ("tag", Attribute::OptionalConst,
                    "Tag to identify the column.\n\
 These will be printed in the first line of the log file.\n\
 The default tag is the last element in the path.");
-    frame.declare_string ("dimension", Value::OptionalConst,
+    frame.declare_string ("dimension", Attribute::OptionalConst,
                    "The unit for numbers in this column.\n\
 These will be printed in the second line of the log file.\n\
 The character '&' will be replaced with the log timestep.\n\
 If you do not specify the dimension explicitly, a value will\n\
 be interfered from 'spec' if available.");
-    frame.declare_string ("path", Value::Const, Value::Variable, "\
+    frame.declare_string ("path", Attribute::Const, Attribute::Variable, "\
 Sequence of attribute names leading to the variable you want to log in\n\
 this column.  The first name should be one of the attributes of the\n\
 daisy component itself.  What to specify as the next name depends on\n\
@@ -762,7 +762,7 @@ values, they will be added before they are printed in the log file.\n\
 All values that start with a \"$\" will work like \"*\".  They are intended\n\
 to be mapped with the 'set' attribute in the 'table' log model.");
     frame.set_check ("path", VCheck::min_size_1 ());
-    frame.declare_submodule ("spec", Value::OptionalConst, "\
+    frame.declare_submodule ("spec", Attribute::OptionalConst, "\
 Specification for the attribute to be logged of the form\n\
 \n\
   library model submodel* attribute\n\
@@ -773,14 +773,14 @@ wildcards, so only a single model can be matches.  The spec is used for\n\
 helping Daisy establish a unique dimension and description for the\n\
 attribute.", Select::Implementation::Spec::load_syntax);
     frame.declare_object ("when", Condition::component,
-                          Value::OptionalConst, Value::Singleton,
+                          Attribute::OptionalConst, Attribute::Singleton,
                           "\
 OBSOLETE.  If you set this variable, 'flux' will be set to true.\n\
 This overwrites any direct setting of 'flux'.");
-    frame.declare_boolean ("flux", Value::OptionalConst, "\
+    frame.declare_boolean ("flux", Attribute::OptionalConst, "\
 OBSOLETE.  This value will be used if 'handle' is not specified.\
 A value of true then means 'sum', and false means 'current'.");
-    frame.declare_string ("handle", Value::OptionalConst, "\
+    frame.declare_string ("handle", Attribute::OptionalConst, "\
 This option determine how the specified variable should be logged.  \n\
 \n\
 min: Log the smallest value seen since last time the variable was logged.\n\
@@ -805,30 +805,30 @@ If 'accumulate' is true, the printed values will be accumulated..");
     static VCheck::Enum handle_check ("min", "max", "average", "geometric", 
                                       "sum", "current");
     frame.set_check ("handle", handle_check);
-    frame.declare_boolean ("interesting_content", Value::Const, "\
+    frame.declare_boolean ("interesting_content", Attribute::Const, "\
 True if the content of this column is interesting enough to warrent an\n\
 initial line in the log file.  This only affects non-flux variables.");
     frame.set ("interesting_content", true);
     frame.declare_object ("expr", Number::component, 
-                          Value::OptionalConst, Value::Singleton, "\
+                          Attribute::OptionalConst, Attribute::Singleton, "\
 Expression for findig the value for the log file, given the internal\n\
 value 'x'.  For example '(expr (ln x))' will give you the natural\n\
 logarithm of the value.");  
-    frame.declare ("factor", Value::Unknown (), Check::none (), Value::Const, "\
+    frame.declare ("factor", Attribute::Unknown (), Check::none (), Attribute::Const, "\
 Factor to multiply the calculated value with, before logging.\n\
 OBSOLETE: Use 'expr' instead.");
     frame.set ("factor", 1.0);
-    frame.declare ("offset", Value::Unknown (), Check::none (), Value::Const, "\
+    frame.declare ("offset", Attribute::Unknown (), Check::none (), Attribute::Const, "\
 Offset to add to the calculated value, before logging.\n\
 OBSOLETE: Use 'expr' instead.");
     frame.set ("offset", 0.0);
-    frame.declare_boolean ("negate", Value::Const, "\
+    frame.declare_boolean ("negate", Attribute::Const, "\
 Switch sign of value.  I.e. upward fluxes become downward fluxes.");
     frame.set ("negate", false);
-    frame.declare_boolean ("accumulate", Value::Const,
+    frame.declare_boolean ("accumulate", Attribute::Const,
                    "Log accumulated values.");
     frame.set ("accumulate", false);
-    frame.declare_integer ("count", Value::State, "\
+    frame.declare_integer ("count", Attribute::State, "\
 Number of times the path has matched a variable since the last log entry.");
     frame.set ("count", 0);
   }

@@ -27,15 +27,15 @@
 
 symbol 
 Scope::title () const
-{ return Value::Unknown (); }
+{ return Attribute::Unknown (); }
 
 int 
 Scope::type_size (const symbol tag) const
-{ return Value::Singleton; }
+{ return Attribute::Singleton; }
 
 int 
 Scope::value_size (const symbol tag) const
-{ return Value::Singleton; }
+{ return Attribute::Singleton; }
 
 symbol
 Scope::name (symbol) const
@@ -53,8 +53,8 @@ Scope::null ()
     // Use.
     void entries (std::set<symbol>&) const
     { }
-    Value::type lookup (symbol) const
-    { return Value::Error; }
+    Attribute::type lookup (symbol) const
+    { return Attribute::Error; }
     bool check (symbol) const
     { return false; }
     double number (symbol) const

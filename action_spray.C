@@ -71,10 +71,10 @@ Spray a chemical (typically a pesticide) on the field.")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.declare_string ("chemical", Value::Const,
+    frame.declare_string ("chemical", Attribute::Const,
 		"Name of pesticide to spray.");
     frame.set_check ("chemical", Chemical::check_library ());
-    frame.declare ("amount", "g/ha", Check::non_negative (), Value::Const,
+    frame.declare ("amount", "g/ha", Check::non_negative (), Attribute::Const,
 		"Amount of pesticide to spray.");
     frame.order ("chemical", "amount");
   }

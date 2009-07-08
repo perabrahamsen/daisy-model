@@ -172,19 +172,19 @@ and compaction.")
   void load_frame (Frame& frame) const
   { 
     Hydraulic::load_Theta_res (frame);
-    frame.declare ("ref_alpha", "cm^-1", Value::Const,
+    frame.declare ("ref_alpha", "cm^-1", Attribute::Const,
 		"Reference van Genuchten alpha.");
-    frame.declare ("ref_n", Value::None (), Value::Const,
+    frame.declare ("ref_n", Attribute::None (), Attribute::Const,
 		"Reference van Genuchten n.");
-    frame.declare ("ref_K_sat", "cm/h", Value::Const,
+    frame.declare ("ref_K_sat", "cm/h", Attribute::Const,
 		"Reference water conductivity of saturated soil.");
-    frame.declare ("mod_alpha", Value::Fraction (), Value::None (), 
-		Value::Const,
+    frame.declare ("mod_alpha", Attribute::Fraction (), Attribute::None (), 
+		Attribute::Const,
 		"Porosity modifier for van Genuchten alpha.");
-    frame.declare ("mod_n", Value::Fraction (), Value::None (), Value::Const,
+    frame.declare ("mod_n", Attribute::Fraction (), Attribute::None (), Attribute::Const,
 		"Porosity modifier for van Genuchten n.");
-    frame.declare ("mod_K_sat", Value::Fraction (), Value::None (),
-		Value::Const,
+    frame.declare ("mod_K_sat", Attribute::Fraction (), Attribute::None (),
+		Attribute::Const,
 		"Porosity modifier for water conductivity of saturated soil.");
 
   }

@@ -64,9 +64,9 @@ public:
 void 
 LexerTable::Filter::load_syntax (Frame& frame)
 {
-  frame.declare_string ("tag", Value::Const, "\
+  frame.declare_string ("tag", Attribute::Const, "\
 Name of column in Daisy log file to filter for.");
-  frame.declare_string ("allowed", Value::Const, Value::Variable, "\
+  frame.declare_string ("allowed", Attribute::Const, Attribute::Variable, "\
 List of allowable values in filter.");
   frame.set_check ("allowed", VCheck::min_size_1 ());
   frame.order ("tag", "allowed");
@@ -175,7 +175,7 @@ LexerTable::read_header (Treelog& msg)
     {
     case 0:
       dim_names.insert (dim_names.end (), tag_names.size (), 
-                        Value::Unknown ());
+                        Attribute::Unknown ());
       break;
     case 1:
       dim_names.insert (dim_names.end (), tag_names.size (),
@@ -443,20 +443,20 @@ LexerTable::error (const std::string& str) const
 void 
 LexerTable::load_syntax (Frame& frame)
 {
-  frame.declare_string ("file", Value::Const, "\
+  frame.declare_string ("file", Attribute::Const, "\
 Name of Daisy log file where data is found.");
-  frame.declare_string ("missing", Value::Const, Value::Variable, "\
+  frame.declare_string ("missing", Attribute::Const, Attribute::Variable, "\
 List of strings indicating missing values.");
   std::vector<symbol> misses;
   misses.push_back (symbol (""));
   misses.push_back (symbol ("00.00"));
   frame.set ("missing", misses);
-  frame.declare_submodule_sequence ("filter", Value::Const, "\
+  frame.declare_submodule_sequence ("filter", Attribute::Const, "\
 Only include data from rows that passes all these filters.",
 				 LexerTable::Filter::load_syntax);
   frame.set_empty ("filter");
-  frame.declare_string ("original", Value::OptionalConst, 
-              Value::Variable, "\
+  frame.declare_string ("original", Attribute::OptionalConst, 
+              Attribute::Variable, "\
 List of dimensions of the data in the data file.\n\
 \n\
 If the list has only one element, that element is used as the\n\
@@ -464,7 +464,7 @@ dimension for all columns in the file.  Otherwise, the list must have\n\
 one element for each column.\n\
 \n\
 By default Daisy will use the names specified in data file.");
-  frame.declare_boolean ("dim_line", Value::OptionalConst, "\
+  frame.declare_boolean ("dim_line", Attribute::OptionalConst, "\
 If true, assume the line after the tags contain dimensions.\n\
 By default this will be true iff 'original' is not specified.");
 }

@@ -70,19 +70,19 @@ private:
       expr (Librarian::build_item<Number> (al, "value")),
       scope (__FUNCTION__)
   {
-    scope.add_item (new ExchangeNumber (LAI_symbol, Value::None(),
+    scope.add_item (new ExchangeNumber (LAI_symbol, Attribute::None(),
 					"Leaf area index"));
     scope.add_item (new ExchangeNumber (distance_from_top_symbol, "cm",
 					"Distance from top of canopy"));
-    scope.add_item (new ExchangeNumber (relative_LAI_symbol, Value::None(),
+    scope.add_item (new ExchangeNumber (relative_LAI_symbol, Attribute::None(),
 					"Relative leaf area index"));
-    scope.add_item (new ExchangeNumber (relative_distance_from_top_symbol, Value::None(),
+    scope.add_item (new ExchangeNumber (relative_distance_from_top_symbol, Attribute::None(),
 					"Relative distance from top of canopy"));
-    scope.add_item (new ExchangeNumber (DS_symbol, Value::None(),
+    scope.add_item (new ExchangeNumber (DS_symbol, Attribute::None(),
 					"Development stage"));
     scope.done ();
     expr->initialize (al.units (), scope, al.msg());
-    if (!expr->check_dim (al.units (), scope, Value::Fraction (), al.msg()))
+    if (!expr->check_dim (al.units (), scope, Attribute::Fraction (), al.msg()))
       al.error("Invalid expression of rubisco expr");
   }
 };
@@ -101,7 +101,7 @@ rubiscoNdist_expr::function (const Units& units,
   scope.set (relative_LAI_symbol, relative_LAI);
   scope.set (DS_symbol, DS);
   double value = -1.0;
-  if (!expr->tick_value (units, value, Value::Fraction (), scope,
+  if (!expr->tick_value (units, value, Attribute::Fraction (), scope,
                          Treelog::null ()))
     throw "Missing value in rubisco expr";
   return value; 
@@ -182,12 +182,12 @@ static struct rubiscoNdist_exprSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.declare ("f_photo", Value::None (), Check::positive (), Value::Const,
+    frame.declare ("f_photo", Attribute::None (), Check::positive (), Attribute::Const,
                 "Fraction of photosynthetically active N in canopy. According to (Boegh et al., 2002) f_photo = 0.75. However, non-functional N is already substracted from leaf-N in the cropN_std module, therefore f_photo = 1.0 as default.");
     frame.set ("f_photo", 1.0);
 
     frame.declare_object ("value", Number::component, 
-                       Value::Const, Value::Singleton, "\
+                       Attribute::Const, Attribute::Singleton, "\
 Expression that evaluates to the relative rubisco N intesity where 1 is the value in top of the canopy.");
     frame.order ("value");
 

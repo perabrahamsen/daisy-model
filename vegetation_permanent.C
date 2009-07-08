@@ -236,9 +236,9 @@ VegetationPermanent::YearlyLAI::operator() (int year, int yday)
 void 
 VegetationPermanent::YearlyLAI::load_syntax (Frame& frame)
 {
-  frame.declare_integer ("year", Value::Const, "\
+  frame.declare_integer ("year", Attribute::Const, "\
 Year for which to use yearly LAI measurements.");
-  frame.declare ("LAIvsDAY", "m^2/m^2", "yday", Value::OptionalConst, 
+  frame.declare ("LAIvsDAY", "m^2/m^2", "yday", Attribute::OptionalConst, 
 		"LAI as a function of Julian day.\n\
 \n\
 The default LAI will be used before the first day you specify and\n\
@@ -434,48 +434,48 @@ Permanent (non-crop) vegetation.")
   void load_frame (Frame& frame) const
   {
     frame.declare ("LAIvsDAY", "m^2/m^2", "yday", Check::non_negative (),
-                Value::Const, 
+                Attribute::Const, 
 		"LAI as a function of Julian day.\n\
 These numbers are used when there are no yearly numbers (YearlyLAI).");
-    frame.declare_submodule_sequence("YearlyLAI", Value::Const, "\
+    frame.declare_submodule_sequence("YearlyLAI", Attribute::Const, "\
 Yearly LAI measurements.", VegetationPermanent::YearlyLAI::load_syntax);
     frame.set_empty ("YearlyLAI");
 
 
-    frame.declare_submodule("Canopy", Value::State, "Canopy.",
+    frame.declare_submodule("Canopy", Attribute::State, "Canopy.",
 			 CanopySimple::load_syntax);
-    frame.declare ("Height", "cm", Check::positive (), Value::Const, 
+    frame.declare ("Height", "cm", Check::positive (), Attribute::Const, 
 		"permanent height of vegetation.");
     frame.set ("Height", 80.0);
-    frame.declare ("N_per_LAI", "kg N/ha/LAI", Check::positive (), Value::Const,
+    frame.declare ("N_per_LAI", "kg N/ha/LAI", Check::positive (), Attribute::Const,
 		"N content as function of LAI.");
     frame.set ("N_per_LAI", 10.0);
     frame.declare ("DM_per_LAI", "Mg DM/ha/LAI", Check::positive (), 
-                Value::Const,
+                Attribute::Const,
 		"DM as function of LAI.");
     frame.set ("DM_per_LAI", 0.5);
-    frame.declare ("N_demand", "g N/m^2", Value::LogOnly,
+    frame.declare ("N_demand", "g N/m^2", Attribute::LogOnly,
 		"Current potential N content.");
-    frame.declare ("N_actual", "g N/m^2", Value::OptionalState,
+    frame.declare ("N_actual", "g N/m^2", Attribute::OptionalState,
 		"N uptake until now (default: 'N_demand').");
-    frame.declare ("N_uptake", "g N/m^2/h", Value::LogOnly,
+    frame.declare ("N_uptake", "g N/m^2/h", Attribute::LogOnly,
 		"Nitrogen uptake this hour.");
-    frame.declare ("N_litter", "g N/m^2/h", Value::LogOnly,
+    frame.declare ("N_litter", "g N/m^2/h", Attribute::LogOnly,
 		"Nitrogen in litter this hour.");
     frame.declare_object ("litter_am", AOM::component, 
-                      Value::Const, Value::Variable, "\
+                      Attribute::Const, Attribute::Variable, "\
 Litter AOM parameters.");
     frame.set_check ("litter_am", AM::check_om_pools ());
     frame.set ("litter_am", AM::default_AM ());
-    frame.declare_submodule("Root", Value::State, "Root system.",
+    frame.declare_submodule("Root", Attribute::State, "Root system.",
 			 RootSystem::load_syntax);
-    frame.declare ("root_DM", "Mg DM/ha", Check::positive (), Value::Const, 
+    frame.declare ("root_DM", "Mg DM/ha", Check::positive (), Attribute::Const, 
 		"Permanent root drymatter.");
     frame.set ("root_DM", 2.0);
-    frame.declare ("Albedo", Value::None (), Check::positive (), Value::Const, 
+    frame.declare ("Albedo", Attribute::None (), Check::positive (), Attribute::Const, 
 		"Reflection factor.");
     frame.set ("Albedo", 0.2);
-    frame.declare_submodule("Litter", Value::State, "Dead stuff.",
+    frame.declare_submodule("Litter", Attribute::State, "Dead stuff.",
 			 Litter::load_syntax);
   }
 } VegetationPermanent_syntax;

@@ -191,12 +191,12 @@ LogSubmodel::open (const symbol name)
 	  const bool has_value = frame_entry ().check (name);
 	  switch (frame_entry ().lookup (name))
 	    {
-	    case Value::Submodel:
-	      if (size != Value::Singleton && has_value)
+	    case Attribute::Submodel:
+	      if (size != Attribute::Singleton && has_value)
 		push (name, 
 		      frame_entry ().default_frame (name),
 		      frame_entry ().submodel_sequence (name));
-	      else if (size != Value::Singleton || !has_value)
+	      else if (size != Attribute::Singleton || !has_value)
 		push (name, 
 		      frame_entry ().default_frame (name));
 	      else 
@@ -204,11 +204,11 @@ LogSubmodel::open (const symbol name)
 		      frame_entry ().submodel (name));
 		      
 	      break;
-	    case Value::Model:
+	    case Attribute::Model:
               {
                 const symbol component = frame_entry ().component (name);
                 const Library& library = metalib ().library (component);
-                daisy_assert (size != Value::Singleton);
+                daisy_assert (size != Attribute::Singleton);
                 push (name, library, library.model ("component"));
               }
 	      break;
@@ -240,14 +240,14 @@ LogSubmodel::close ()
       if (entry_stack.size () > 0)
 	{
 	  const std::string& sold_entry = old_entry.name ();
-	  const Value::type type = frame_entry ().lookup (sold_entry);
+	  const Attribute::type type = frame_entry ().lookup (sold_entry);
 	  switch (type)
 	    { 
-	    case Value::Model:
+	    case Attribute::Model:
               {
                 // Model sequence.
                 daisy_assert (frame_entry ().type_size (sold_entry)
-                              != Value::Singleton);
+                              != Attribute::Singleton);
                 std::vector<boost::shared_ptr<const FrameModel>/**/> copy;
                 for (size_t i = 0; i < old_frame_sequence.size (); i++)
                   {
@@ -259,9 +259,9 @@ LogSubmodel::close ()
                 frame_entry ().set (sold_entry, copy);
               }
               break;
-	    case Value::Submodel:
+	    case Attribute::Submodel:
 	      // Submodel sequence or singleton.
-	      if (frame_entry ().type_size (sold_entry) == Value::Singleton)
+	      if (frame_entry ().type_size (sold_entry) == Attribute::Singleton)
 		{
 		  daisy_assert (old_frame_sequence.size () == 0);
 		  frame_entry ().set (sold_entry, 
@@ -325,8 +325,8 @@ LogSubmodel::close_unnamed ()
       if (unnamed () >= 0)
 	unnamed_stack[0]++;
       const std::string& sentry = entry ().name ();
-      daisy_assert (frame_stack[1]->lookup (sentry) == Value::Submodel);
-      daisy_assert (frame_stack[1]->type_size (sentry) != Value::Singleton);
+      daisy_assert (frame_stack[1]->lookup (sentry) == Attribute::Submodel);
+      daisy_assert (frame_stack[1]->type_size (sentry) != Attribute::Singleton);
     }
   else
     close_ignore ();
@@ -337,8 +337,8 @@ LogSubmodel::open_alist (symbol name, const Frame& f)
 {
   if (is_active)
     {
-      daisy_assert (frame_entry ().lookup (name) == Value::Submodel);
-      daisy_assert (frame_entry ().type_size (name) == Value::Singleton);
+      daisy_assert (frame_entry ().lookup (name) == Attribute::Submodel);
+      daisy_assert (frame_entry ().type_size (name) == Attribute::Singleton);
       push (name, f);
     }
   else
@@ -384,8 +384,8 @@ LogSubmodel::open_object (symbol field, symbol type,
   if (is_active)
     {
       const std::string& sfield = field.name ();
-      daisy_assert (frame_entry ().lookup (sfield) == Value::Model);
-      daisy_assert (frame_entry ().type_size (sfield) == Value::Singleton);
+      daisy_assert (frame_entry ().lookup (sfield) == Attribute::Model);
+      daisy_assert (frame_entry ().type_size (sfield) == Attribute::Singleton);
       const symbol component = frame_entry ().component (sfield);
       const Library& library = metalib ().library (component);
       daisy_assert (library.name () == symbol (lib));

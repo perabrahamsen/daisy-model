@@ -199,12 +199,12 @@ Frame::Implementation::check (const Metalib& metalib, const Frame& frame,
   // Spcial handling of various types.
   switch (type.type ())
     {
-    case Value::Number:
+    case Attribute::Number:
       // This should already be checked by the file parser, but you
       // never know... Well, theoretically the alist could come from
       // another source (like one of the many other parsers :/), or
       // be one of the build in ones.
-      if (type.size () != Value::Singleton)
+      if (type.size () != Attribute::Singleton)
         {
           const std::vector<double>& array = frame.number_sequence (key);
           for (size_t i = 0; i < array.size (); i++)
@@ -224,8 +224,8 @@ Frame::Implementation::check (const Metalib& metalib, const Frame& frame,
         }
       break;
 
-    case Value::Model:
-      if (type.size () != Value::Singleton)
+    case Attribute::Model:
+      if (type.size () != Attribute::Singleton)
         {
           const ::Library& lib = metalib.library (type.component ());
           const std::vector<boost::shared_ptr<const FrameModel>/**/>& seq 
@@ -265,10 +265,10 @@ Frame::Implementation::check (const Metalib& metalib, const Frame& frame,
         }
       break;
 
-    case Value::Submodel:
-      if (type.size () != Value::Singleton)
+    case Attribute::Submodel:
+      if (type.size () != Attribute::Singleton)
         {
-          daisy_assert (frame.type_size (key) != Value::Singleton);
+          daisy_assert (frame.type_size (key) != Attribute::Singleton);
           const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& seq 
             = frame.submodel_sequence (key);
           int j_index = 0;
@@ -334,7 +334,7 @@ Frame::type_name () const
   if (parent ())
     return parent ()->type_name ();
 
-  return Value::None ();
+  return Attribute::None ();
 }
 
 symbol 
@@ -348,7 +348,7 @@ Frame::base_name () const
       if (base_name != my_name)
         return base_name;
     }
-  return Value::None ();
+  return Attribute::None ();
 }
 
 symbol 
@@ -356,14 +356,14 @@ Frame::description () const
 {
   static const symbol desc ("description");
 
-  if (check (desc) && lookup (desc) == Value::String 
-      && type_size (desc) == Value::Singleton)
+  if (check (desc) && lookup (desc) == Attribute::String 
+      && type_size (desc) == Attribute::Singleton)
     return name (desc);
 
   if (parent ())
     return parent ()->description ();
 
-  return Value::None ();
+  return Attribute::None ();
 }
 
 const Filepos& 
@@ -496,7 +496,7 @@ bool
 Frame::check (const Metalib& metalib, const Frame& frame,
               const symbol key, Treelog& msg) const
 { 
-  if (lookup (key) == Value::Error)
+  if (lookup (key) == Attribute::Error)
     {
       msg.error ("'" + key + "': not defined");
       return false;
@@ -508,7 +508,7 @@ Frame::check (const Metalib& metalib, const Frame& frame,
   if (!impl->check (metalib, frame, type, key, msg))
     ok = false;
   else if (parent ()
-      && parent ()->lookup (key) != Value::Error
+      && parent ()->lookup (key) != Attribute::Error
       && !parent ()->check (metalib, frame, key, msg))
     ok = false;
 
@@ -563,7 +563,7 @@ Frame::is_state (const symbol key) const
   return false;
 }
 
-Value::type 
+Attribute::type 
 Frame::lookup (const symbol key) const
 {
   if (impl->has_type (key))
@@ -571,7 +571,7 @@ Frame::lookup (const symbol key) const
   if (parent () )
     return parent ()->lookup (key);
 
-  return Value::Error;
+  return Attribute::Error;
 }
 
 symbol
@@ -670,7 +670,7 @@ Frame::submodel_name (const symbol key) const
 
 void 
 Frame::declare_boolean (const symbol key,	// Boolean.
-                        Value::category cat,
+                        Attribute::category cat,
                         int size,
                         const symbol description)
 { 
@@ -679,7 +679,7 @@ Frame::declare_boolean (const symbol key,	// Boolean.
 
 void 
 Frame::declare_integer (const symbol key,	// Integer.
-                        Value::category cat,
+                        Attribute::category cat,
                         int size,
                         const symbol description)
 {
@@ -688,7 +688,7 @@ Frame::declare_integer (const symbol key,	// Integer.
 
 void 
 Frame::declare_string (const symbol key,	// String.
-                       Value::category cat,
+                       Attribute::category cat,
                        int size,
                        const symbol description)
 {
@@ -698,7 +698,7 @@ Frame::declare_string (const symbol key,	// String.
 void 
 Frame::declare (const symbol key, // Number.
                 const symbol dim,
-                Value::category cat,
+                Attribute::category cat,
                 int size,
                 const symbol description)
 {
@@ -711,7 +711,7 @@ void
 Frame::declare (const symbol key,
                 const symbol dim,
                 const Check& check,
-                Value::category cat,
+                Attribute::category cat,
                 int size,
                 const symbol description)
 { 
@@ -721,22 +721,22 @@ Frame::declare (const symbol key,
 
 void 
 Frame::declare_fraction (const symbol key, 
-                         Value::category cat,
+                         Attribute::category cat,
                          int size,
                          const symbol description)
 {
-  impl->declare_type (key, new TypeNumber (cat, size, Value::Fraction (), 
+  impl->declare_type (key, new TypeNumber (cat, size, Attribute::Fraction (), 
                                            Check::fraction (), description));
 }
 
 
 void 
 Frame::declare_fraction (const symbol key, 
-                         Value::category cat,
+                         Attribute::category cat,
                          const symbol description)
 {
-  impl->declare_type (key, new TypeNumber (cat, Value::Singleton,
-                                           Value::Fraction (), 
+  impl->declare_type (key, new TypeNumber (cat, Attribute::Singleton,
+                                           Attribute::Fraction (), 
                                            Check::fraction (), description));
 }
 
@@ -745,7 +745,7 @@ void
 Frame::declare (const symbol key, // PLF.
                 const symbol domain,
                 const symbol range,
-                Value::category cat,
+                Attribute::category cat,
                 int size,
                 const symbol description)
 {
@@ -758,7 +758,7 @@ Frame::declare (const symbol key,
                 const symbol domain,
                 const symbol range,
                 const Check& check,
-                Value::category cat,
+                Attribute::category cat,
                 int size,
                 const symbol description)
 {
@@ -768,20 +768,20 @@ Frame::declare (const symbol key,
 
 void 
 Frame::declare_object (const symbol key, const symbol lib,
-                       Value::category cat, int size, const symbol description)
+                       Attribute::category cat, int size, const symbol description)
 {
   impl->declare_type (key, new TypeModel (cat, size, lib, description));
 }
 
 void 
 Frame::declare_submodule (const symbol key, 
-                          Value::category cat, const symbol description,
+                          Attribute::category cat, const symbol description,
                           load_syntax_t load_syntax)
 {
-  impl->declare_type (key, new TypeSubmodel (cat, Value::Singleton, 
+  impl->declare_type (key, new TypeSubmodel (cat, Attribute::Singleton, 
                                           load_syntax, description));
 #if 1
-  if (cat == Value::Const || cat == Value::State)
+  if (cat == Attribute::Const || cat == Attribute::State)
     {
       // TODO: Move this to Frame::alist (name) (must return const first).
       boost::shared_ptr<const FrameSubmodel> child 
@@ -792,11 +792,11 @@ Frame::declare_submodule (const symbol key,
 }
 
 void 
-Frame::declare_submodule_sequence (const symbol key, Value::category cat, 
+Frame::declare_submodule_sequence (const symbol key, Attribute::category cat, 
                                    const symbol description,
                                    load_syntax_t load_syntax)
 {
-  impl->declare_type (key, new TypeSubmodel (cat, Value::Variable, 
+  impl->declare_type (key, new TypeSubmodel (cat, Attribute::Variable, 
                                           load_syntax, description));
 }
 
@@ -952,7 +952,7 @@ Frame::subset (const Metalib& metalib, const Frame& other,
     // Missing value cannot be a superset of a value.
     return false;
 
-  const Value::type type = this->lookup (key);
+  const Attribute::type type = this->lookup (key);
   if (type != other.lookup (key))
     // Subsets must be same type.
     return false;
@@ -966,44 +966,44 @@ Frame::subset (const Metalib& metalib, const Frame& other,
     // Subsets must be same size.
     return false;
 
-  if (size == Value::Singleton)
+  if (size == Attribute::Singleton)
     switch (type)
       {
-      case Value::Number:
+      case Attribute::Number:
 	return iszero (mine.number () - his.number ());
-      case Value::Boolean:
+      case Attribute::Boolean:
 	return mine.flag () == his.flag ();
-      case Value::Integer:
+      case Attribute::Integer:
 	return mine.integer () == his.integer ();
-      case Value::Model:
+      case Attribute::Model:
         return mine.model ().subset (metalib, his.model ());
-      case Value::Submodel:
+      case Attribute::Submodel:
         return mine.submodel ().subset (metalib, his.submodel ());
-      case Value::PLF:
+      case Attribute::PLF:
 	return mine.plf () == his.plf ();
-      case Value::Reference:
-      case Value::String:
+      case Attribute::Reference:
+      case Attribute::String:
 	return mine.name () == his.name ();
-      case Value::Scalar:
+      case Attribute::Scalar:
         return iszero (mine.number () - his.number ())
           && mine.name () == his.name ();
-      case Value::Error:
+      case Attribute::Error:
       default:
 	daisy_notreached ();
       }
   else
     switch (type)
       {
-      case Value::Number:
+      case Attribute::Number:
         for (size_t i = 0; i < size; i++)
           if (!iszero (mine.number_sequence ()[i] - his.number_sequence ()[i]))
             return false;
         return true;
-      case Value::Boolean:
+      case Attribute::Boolean:
 	return mine.flag_sequence () == his.flag_sequence ();
-      case Value::Integer:
+      case Attribute::Integer:
 	return mine.integer_sequence () == his.integer_sequence ();
-      case Value::Model:
+      case Attribute::Model:
 	{
 	  const std::vector<boost::shared_ptr<const FrameModel>/**/>& value 
             = mine.model_sequence ();
@@ -1016,7 +1016,7 @@ Frame::subset (const Metalib& metalib, const Frame& other,
 
 	  return true;
 	}
-      case Value::Submodel:
+      case Attribute::Submodel:
 	{
 	  const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& value
             = mine.submodel_sequence ();
@@ -1029,14 +1029,14 @@ Frame::subset (const Metalib& metalib, const Frame& other,
 
 	  return true;
 	}
-      case Value::PLF:
+      case Attribute::PLF:
 	return mine.plf_sequence () == his.plf_sequence ();
-      case Value::String:
+      case Attribute::String:
 	return mine.name_sequence () == his.name_sequence ();
-      case Value::Reference:
+      case Attribute::Reference:
 	return mine.name () == his.name ();
-      case Value::Scalar:
-      case Value::Error:
+      case Attribute::Scalar:
+      case Attribute::Error:
       default:
 	daisy_notreached ();
       }
@@ -1163,7 +1163,7 @@ Frame::plf (const symbol key) const
 const FrameModel&
 Frame::model (const symbol key) const
 {
-  verify (key, Value::Model);
+  verify (key, Attribute::Model);
 
   if (impl->has_value (key))
     return impl->get_value (key).model ();
@@ -1176,9 +1176,9 @@ Frame::model (const symbol key) const
 const FrameSubmodel&
 Frame::submodel (const symbol key) const
 {
-  if (type_size (key) != Value::Singleton)
+  if (type_size (key) != Attribute::Singleton)
     return default_frame (key);
-  verify (key, Value::Submodel);
+  verify (key, Attribute::Submodel);
   if (impl->has_value (key))
     return impl->get_value (key).submodel ();
   else if (parent () && parent ()->check (key))
@@ -1287,17 +1287,17 @@ Frame::plf_sequence (const symbol key) const
 }
 
 void 
-Frame::verify (const symbol key, const Value::type want, 
+Frame::verify (const symbol key, const Attribute::type want, 
                const int value_size) const
 { 
-  Value::type has = lookup (key);
+  Attribute::type has = lookup (key);
   if (has != want)
-    daisy_panic ("'" + key + "' is " + Value::type_name (has) 
-                 + ", should be " + Value::type_name (want));
+    daisy_panic ("'" + key + "' is " + Attribute::type_name (has) 
+                 + ", should be " + Attribute::type_name (want));
   int type_size = this->type_size (key);
-  if (Value::flexible_size (type_size))
+  if (Attribute::flexible_size (type_size))
     {
-      if (value_size == Value::Singleton)
+      if (value_size == Attribute::Singleton)
         daisy_panic ("'" + key + "' is a singleton, should be a sequence");
     }
   else if (type_size != value_size)
@@ -1307,23 +1307,23 @@ Frame::verify (const symbol key, const Value::type want,
 void 
 Frame::set (const symbol key, double value)
 { 
-  verify (key, Value::Number);
+  verify (key, Attribute::Number);
   impl->set_value (key, new ValNumber (value));
 }
 
 void 
 Frame::set (const symbol key, double value, const symbol dim)
 {
-  verify (key, Value::Number);
+  verify (key, Attribute::Number);
   impl->set_value (key, new ValScalar (value, dim));
 }
 
 void 
 Frame::set (const symbol key, const symbol name)
 {
-  if (lookup (key) == Value::Model)
+  if (lookup (key) == Attribute::Model)
     {
-      verify (key, Value::Model);
+      verify (key, Attribute::Model);
       const symbol component = this->component (key);
       const Intrinsics& intrinsics = Librarian::intrinsics ();
       intrinsics.instantiate (component, name);
@@ -1332,7 +1332,7 @@ Frame::set (const symbol key, const symbol name)
       impl->set_value (key, new ValModel (child));
       return;
     }
-  verify (key, Value::String);
+  verify (key, Attribute::String);
   impl->set_value (key, new ValString (name));
 }
 
@@ -1343,21 +1343,21 @@ Frame::set (const symbol key, const char *const name)
 void 
 Frame::set (const symbol key, bool value)
 {
-  verify (key, Value::Boolean);
+  verify (key, Attribute::Boolean);
   impl->set_value (key, new ValBoolean (value));
 }
 
 void 
 Frame::set (const symbol key, int value)
 {
-  verify (key, Value::Integer);
+  verify (key, Attribute::Integer);
   impl->set_value (key, new ValInteger (value));
 }
 
 void 
 Frame::set (const symbol key, const FrameModel& value)
 {
-  verify (key, Value::Model);
+  verify (key, Attribute::Model);
   boost::shared_ptr<const FrameModel> child (&value.clone ());
   impl->set_value (key, new ValModel (child));
 }
@@ -1365,7 +1365,7 @@ Frame::set (const symbol key, const FrameModel& value)
 void 
 Frame::set (const symbol key, const FrameSubmodel& value)
 {
-  verify (key, Value::Submodel);
+  verify (key, Attribute::Submodel);
   boost::shared_ptr<const FrameSubmodel> child (&value.clone ());
   impl->set_value (key, new ValSubmodel (child));
 }
@@ -1373,7 +1373,7 @@ Frame::set (const symbol key, const FrameSubmodel& value)
 void 
 Frame::set (const symbol key, const PLF& value)
 {
-  verify (key, Value::PLF);
+  verify (key, Attribute::PLF);
   boost::shared_ptr<const PLF> child (new PLF (value));
   impl->set_value (key, new ValPLF (child));
 }
@@ -1381,16 +1381,16 @@ Frame::set (const symbol key, const PLF& value)
 void 
 Frame::set (const symbol key, const std::vector<double>& value)
 {
-  verify (key, Value::Number, value.size ());
+  verify (key, Attribute::Number, value.size ());
   impl->set_value (key, new ValNumberSeq (value));
 }
 
 void 
 Frame::set (const symbol key, const std::vector<symbol>& value)
 {
-  if (lookup (key) == Value::Model)
+  if (lookup (key) == Attribute::Model)
     {
-      verify (key, Value::Model, value.size ());
+      verify (key, Attribute::Model, value.size ());
       const symbol component = this->component (key);
       const Intrinsics& intrinsics = Librarian::intrinsics ();
       std::vector<boost::shared_ptr<const FrameModel>/**/> frames;
@@ -1406,7 +1406,7 @@ Frame::set (const symbol key, const std::vector<symbol>& value)
       impl->set_value (key, new ValModelSeq (frames));
       return;
     }
-  verify (key, Value::String, value.size ());
+  verify (key, Attribute::String, value.size ());
   impl->set_value (key, new ValStringSeq (value));
 }
 
@@ -1449,35 +1449,35 @@ Frame::set_strings (const symbol key,
 void 
 Frame::set (const symbol key, const std::vector<bool>& value)
 {
-  verify (key, Value::Boolean, value.size ());
+  verify (key, Attribute::Boolean, value.size ());
   impl->set_value (key, new ValBooleanSeq (value));
 }
 
 void 
 Frame::set (const symbol key, const std::vector<int>& value)
 {
-  verify (key, Value::Integer, value.size ());
+  verify (key, Attribute::Integer, value.size ());
   impl->set_value (key, new ValIntegerSeq (value));
 }
 
 void 
 Frame::set (const symbol key, const std::vector<boost::shared_ptr<const FrameModel>/**/>& value)
 {
-  verify (key, Value::Model, value.size ());
+  verify (key, Attribute::Model, value.size ());
   impl->set_value (key, new ValModelSeq (value));
 }
 
 void 
 Frame::set (const symbol key, const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& value)
 {
-  verify (key, Value::Submodel, value.size ());
+  verify (key, Attribute::Submodel, value.size ());
   impl->set_value (key, new ValSubmodelSeq (value));
 }
 
 void 
 Frame::set (const symbol key, const std::vector<boost::shared_ptr<const PLF>/**/>& value)
 {
-  verify (key, Value::PLF, value.size ());
+  verify (key, Attribute::PLF, value.size ());
   impl->set_value (key, new ValPLFSeq (value));
 }
 
@@ -1486,30 +1486,30 @@ Frame::set_empty (const symbol key)
 {
   switch (lookup (key))
     {
-    case Value::Number:
+    case Attribute::Number:
       impl->set_value (key, new ValNumberSeq (std::vector<double> ()));
       break;
-    case Value::Model:
+    case Attribute::Model:
       impl->set_value (key, new ValModelSeq (std::vector<boost::shared_ptr<const FrameModel>/**/> ()));
       break;
-    case Value::Submodel:
+    case Attribute::Submodel:
       impl->set_value (key, new ValSubmodelSeq (std::vector<boost::shared_ptr<const FrameSubmodel>/**/> ()));
       break;
-    case Value::PLF:
+    case Attribute::PLF:
       impl->set_value (key, new ValPLFSeq (std::vector<boost::shared_ptr<const PLF>/**/> ()));
       break;
-    case Value::Boolean:
+    case Attribute::Boolean:
       impl->set_value (key, new ValBooleanSeq (std::vector<bool> ()));
       break;
-    case Value::String:
+    case Attribute::String:
       impl->set_value (key, new ValStringSeq (std::vector<symbol> ()));
       break;
-    case Value::Integer:
+    case Attribute::Integer:
       impl->set_value (key, new ValIntegerSeq (std::vector<int> ()));
       break;
-    case Value::Scalar:
-    case Value::Reference:
-    case Value::Error:
+    case Attribute::Scalar:
+    case Attribute::Reference:
+    case Attribute::Error:
     default:
       daisy_notreached ();
     }

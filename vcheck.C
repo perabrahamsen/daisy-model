@@ -55,10 +55,10 @@ struct ValidYear : public VCheck
                Treelog& msg) const
   { 
     daisy_assert (frame.check (key));
-    daisy_assert (frame.lookup (key) == Value::Integer);
+    daisy_assert (frame.lookup (key) == Attribute::Integer);
     daisy_assert (!frame.is_log (key));
     
-    if (frame.type_size (key) == Value::Singleton)
+    if (frame.type_size (key) == Attribute::Singleton)
       return valid (frame.integer (key), msg);
 
     bool ok = true;
@@ -96,9 +96,9 @@ VCheck::IRange::verify (const Metalib&, const Frame& frame, const symbol key,
 {
   daisy_assert (frame.check (key));
   daisy_assert (!frame.is_log (key));
-  daisy_assert (frame.lookup (key) == Value::Integer);
+  daisy_assert (frame.lookup (key) == Attribute::Integer);
 
-  if (frame.type_size (key) == Value::Singleton)
+  if (frame.type_size (key) == Attribute::Singleton)
     return valid (frame.integer (key), msg);
 
   bool ok = true;
@@ -144,9 +144,9 @@ struct LocalOrder : public VCheck
   
     switch (frame.lookup (key))
       {
-      case Value::Number:
+      case Attribute::Number:
 	{
-	  daisy_assert (frame.type_size (key) != Value::Singleton);
+	  daisy_assert (frame.type_size (key) != Attribute::Singleton);
 	  const std::vector<double>& numbers = frame.number_sequence (key);
 	  if (numbers.size () < 2)
 	    return true;
@@ -161,9 +161,9 @@ struct LocalOrder : public VCheck
 	    }
           return ok;
 	}
-      case Value::PLF:
+      case Attribute::PLF:
         {
-          if (frame.type_size (key) == Value::Singleton)
+          if (frame.type_size (key) == Attribute::Singleton)
             return validate_plf (frame.plf (key), msg);
           bool ok = true;
           const std::vector<boost::shared_ptr<const PLF>/**/>& plfs 
@@ -375,15 +375,15 @@ VCheck::SumEqual::verify (const Metalib&, const Frame& frame,
   
   switch (frame.lookup (key))
     {
-    case Value::Number:
+    case Attribute::Number:
       {
-	daisy_assert (frame.type_size (key) != Value::Singleton);
+	daisy_assert (frame.type_size (key) != Attribute::Singleton);
 	const std::vector<double>& numbers = frame.number_sequence (key);
 	return valid (accumulate (numbers.begin (), numbers.end (), 0.0), msg);
       }
       break;
-    case Value::PLF:
-      if (frame.type_size (key) == Value::Singleton)
+    case Attribute::PLF:
+      if (frame.type_size (key) == Attribute::Singleton)
 	return valid (frame.plf (key), msg);
       else
 	{
@@ -430,16 +430,16 @@ VCheck::StartValue::verify (const Metalib&, const Frame& frame,
   
   switch (frame.lookup (key))
     {
-    case Value::Number:
+    case Attribute::Number:
       {
-	daisy_assert (frame.type_size (key) != Value::Singleton);
+	daisy_assert (frame.type_size (key) != Attribute::Singleton);
 	const std::vector<double>& numbers = frame.number_sequence (key);
 	if (numbers.size () > 0)
 	  return valid (numbers[0], msg);
       }
       return true;
-    case Value::PLF:
-      if (frame.type_size (key) == Value::Singleton)
+    case Attribute::PLF:
+      if (frame.type_size (key) == Attribute::Singleton)
 	return valid (frame.plf (key), msg);
       {
         const std::vector<boost::shared_ptr<const PLF>/**/> plfs 
@@ -488,16 +488,16 @@ VCheck::EndValue::verify (const Metalib&, const Frame& frame,
   
   switch (frame.lookup (key))
     {
-    case Value::Number:
+    case Attribute::Number:
       {
-	daisy_assert (frame.type_size (key) != Value::Singleton);
+	daisy_assert (frame.type_size (key) != Attribute::Singleton);
 	const std::vector<double>& numbers = frame.number_sequence (key);
 	if (numbers.size () > 0)
 	  return valid (numbers[numbers.size () - 1], msg);
       }
       return true;
-    case Value::PLF:
-      if (frame.type_size (key) == Value::Singleton)
+    case Attribute::PLF:
+      if (frame.type_size (key) == Attribute::Singleton)
 	return valid (frame.plf (key), msg);
       {
         const std::vector<boost::shared_ptr<const PLF>/**/> plfs
@@ -540,8 +540,8 @@ VCheck::FixedPoint::verify (const Metalib&, const Frame& frame,
   
   switch (frame.lookup (key))
     {
-    case Value::PLF:
-      if (frame.type_size (key) == Value::Singleton)
+    case Attribute::PLF:
+      if (frame.type_size (key) == Attribute::Singleton)
 	return valid (frame.plf (key), msg);
       {
         const std::vector<boost::shared_ptr<const PLF>/**/> plfs 
@@ -569,7 +569,7 @@ VCheck::MinSize::verify (const Metalib&, const Frame& frame,
 {
   daisy_assert (frame.check (key));
   daisy_assert (!frame.is_log (key));
-  daisy_assert (Value::flexible_size (frame.type_size (key)));
+  daisy_assert (Attribute::flexible_size (frame.type_size (key)));
   if (frame.value_size (key) >= min_size)
     return true;
   std::ostringstream tmp;
@@ -589,7 +589,7 @@ VCheck::String::verify (const Metalib&, const Frame& frame,
 {
   daisy_assert (frame.check (key));
   daisy_assert (!frame.is_log (key));
-  if (frame.type_size (key) == Value::Singleton)
+  if (frame.type_size (key) == Attribute::Singleton)
     return valid (frame.name (key), msg);
   {
     const std::vector<symbol> names = frame.name_sequence (key);
@@ -620,7 +620,7 @@ VCheck::Compatible::verify (const Metalib& metalib, const Frame& frame,
   daisy_assert (frame.check (key));
   daisy_assert (!frame.is_log (key));
   const Units& units = metalib.units ();
-  if (frame.type_size (key) == Value::Singleton)
+  if (frame.type_size (key) == Attribute::Singleton)
     return valid (units, frame.name (key), msg);
 
   const std::vector<symbol> names = frame.name_sequence (key);
@@ -638,7 +638,7 @@ VCheck::Compatible::Compatible (const symbol dim)
 const VCheck& 
 VCheck::fraction ()
 {
-  static Compatible fraction (Value::Fraction ());
+  static Compatible fraction (Attribute::Fraction ());
   return fraction;
 }
 
@@ -717,7 +717,7 @@ VCheck::InLibrary::verify (const Metalib& metalib, const Frame& frame,
 {
   daisy_assert (frame.check (key));
   daisy_assert (!frame.is_log (key));
-  if (frame.type_size (key) == Value::Singleton)
+  if (frame.type_size (key) == Attribute::Singleton)
     return valid (metalib, frame.name (key), msg);
 
   const std::vector<symbol> names = frame.name_sequence (key);
@@ -785,22 +785,22 @@ VCheck::unique ()
                  Treelog& msg) const
     { 
       daisy_assert (frame.check (key));
-      daisy_assert (frame.type_size (key) != Value::Singleton);
+      daisy_assert (frame.type_size (key) != Attribute::Singleton);
       daisy_assert (!frame.is_log (key));
       
       switch (frame.lookup (key))
         {
-        case Value::Number:
+        case Attribute::Number:
           return unique_validate (frame.number_sequence (key), msg);
-        case Value::PLF:
+        case Attribute::PLF:
           return unique_validate (frame.plf_sequence (key), msg);
-        case Value::Boolean:
+        case Attribute::Boolean:
           return unique_validate (frame.flag_sequence (key), msg);
-        case Value::String:
+        case Attribute::String:
           return unique_validate (frame.name_sequence (key), msg);
-        case Value::Integer:
+        case Attribute::Integer:
           return unique_validate (frame.integer_sequence (key), msg);
-	case Value::Model:
+	case Attribute::Model:
 	  {
             bool ok = true;
 	    const std::vector<boost::shared_ptr<const FrameModel>/**/>& list 
@@ -824,7 +824,7 @@ VCheck::unique ()
 	  }
         default:
           daisy_panic ("Unhandled list type "
-                       + Value::type_name (frame.lookup (key)));
+                       + Attribute::type_name (frame.lookup (key)));
         }
     }      
   } unique;

@@ -61,7 +61,7 @@ EquilibriumLinear::find (const Units& units, const Scope& scope, int,
   const double M = has_A + has_B;
 
   double K = 1.0;
-  if (!K_expr->tick_value (units, K, Value::None (), scope, msg))
+  if (!K_expr->tick_value (units, K, Attribute::None (), scope, msg))
     msg.error ("Could not evaluate 'K'");
 
   // We need to solve the following equation w.r.t. B
@@ -95,7 +95,7 @@ EquilibriumLinear::check (const Units& units, const Scope& scope, Treelog& msg) 
 {
   Treelog::Open nest (msg, "equil:linear:check");
   bool ok = true;
-  if (!K_expr->check_dim (units, scope, Value::None (), msg))
+  if (!K_expr->check_dim (units, scope, Attribute::None (), msg))
     ok = false;
   return ok;
 }
@@ -110,8 +110,8 @@ static struct EquilibriumLinearSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare_object ("K", Number::component, Value::Const, 
-                       Value::Singleton, "The ratio A/B at equilibrium [].");
+    frame.declare_object ("K", Number::component, Attribute::Const, 
+                       Attribute::Singleton, "The ratio A/B at equilibrium [].");
 
   }
 } EquilibriumLinear_syntax;

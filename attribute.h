@@ -1,4 +1,4 @@
-// value.h -- Type system for values.
+// attribute.h -- Type system for attributes.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
@@ -21,8 +21,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef VALUE_H
-#define VALUE_H
+#ifndef ATTRIBUTE_H
+#define ATTRIBUTE_H
 
 #include "symbol.h"
 
@@ -36,11 +36,11 @@
 #define EXPORT __declspec(dllimport)
 #endif
 
-namespace Value
+namespace Attribute
 { 
-  // A value entry has an associated size.  If the size is a positive
-  // integer, the value entry specifies an array of that size.  The
-  // default size 'Singleton' indicating that the value entry match a
+  // A attribute entry has an associated size.  If the size is a positive
+  // integer, the attribute entry specifies an array of that size.  The
+  // default size 'Singleton' indicating that the attribute entry match a
   // single item of the specified type, while the 'Sequence' used for
   // entries that contain an array of unspecified length. 
   const int Singleton = -117;	
@@ -56,13 +56,13 @@ namespace Value
   { return size == Variable || size == CanopyCells || size == CanopyEdges
       || size == SoilCells || size == SoilEdges; }
 
-  // A value may have a dimension associated.
+  // A attribute may have a dimension associated.
   symbol Unknown ();
   symbol None () EXPORT;
   symbol Fraction ();
   symbol User ();
 
-  // Each value entry should have an associated type.
+  // Each attribute entry should have an associated type.
   enum type 
   { Number, Submodel, PLF, Boolean, String,
     Integer, Model, Scalar, Reference, Error };
@@ -70,10 +70,10 @@ namespace Value
   type type_number (symbol name);
     
   // The requirements with regard to input and output varies with each
-  // value entry.
+  // attribute entry.
   enum category
   {
-    // This is a parameter, i.e. its value doesn't change during the
+    // This is a parameter, i.e. its attribute doesn't change during the
     // compilation, and it cannot be written to the log.
     Const,
     // This a state variable, it must be provided at initialization
@@ -95,4 +95,4 @@ namespace Value
   int category_number (symbol name);
 }
 
-#endif // VALUE_H
+#endif // ATTRIBUTE_H

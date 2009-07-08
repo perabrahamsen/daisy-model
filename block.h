@@ -24,7 +24,7 @@
 
 #include "scope.h"
 #include "symbol.h"
-#include "value.h"
+#include "attribute.h"
 #include <string>
 #include <vector>
 #include <set>
@@ -74,7 +74,7 @@ public:
 
   // Syntax emulation.
 public:
-  Value::type lookup (symbol) const;
+  Attribute::type lookup (symbol) const;
   void entries (std::set<symbol>&) const;
   int type_size (symbol tag) const;
   symbol dimension (symbol) const;

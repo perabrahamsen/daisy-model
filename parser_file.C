@@ -387,7 +387,7 @@ ParserFile::Implementation::check_dimension (const symbol syntax,
 {
   if (syntax != read)
     {
-      if (syntax == Value::Unknown ())
+      if (syntax == Attribute::Unknown ())
 	{
 	  if (read.name ().length () == 0 || read.name ()[0] != '?')
 	    warning ("you must use [?<dim>] for entries with unknown syntax");
@@ -396,8 +396,8 @@ ParserFile::Implementation::check_dimension (const symbol syntax,
                                                  msg))
 	{
 	  error (std::string ("expected [") 
-                 + ((syntax == Value::Fraction ()
-                     || syntax == Value::None ())
+                 + ((syntax == Attribute::Fraction ()
+                     || syntax == Attribute::None ())
                     ? "" : syntax) + "] got [" + read + "]");
 	  return false; 
 	}
@@ -411,16 +411,16 @@ ParserFile::Implementation::convert (double value,
 				     const symbol read, 
 				     const Filepos& pos)
 { 
-  if (syntax == Value::Unknown ())
+  if (syntax == Attribute::Unknown ())
     return value; 
   if (syntax == read)
     return value;
-  if (syntax == Value::Fraction () && read == "%")
+  if (syntax == Attribute::Fraction () && read == "%")
     return value * 0.01;
   
   try
     {
-      if (syntax == Value::None () || syntax == Value::Fraction ())
+      if (syntax == Attribute::None () || syntax == Attribute::Fraction ())
 	if (read == "")
 	  return value;
 	else
@@ -597,11 +597,11 @@ ParserFile::Implementation::add_derived (Library& lib)
   daisy_assert (!frame->ordered () 
                 || frame->order ().begin () != frame->order ().end ());
   if ((!frame->ordered () 
-       || (frame->lookup (*(frame->order ().begin ())) != Value::String
-           && frame->lookup (*(frame->order ().begin ())) != Value::Model)) 
+       || (frame->lookup (*(frame->order ().begin ())) != Attribute::String
+           && frame->lookup (*(frame->order ().begin ())) != Attribute::Model)) 
       && looking_at ('"')
-      && frame->lookup ("description") == Value::String
-      && frame->type_size ("description") == Value::Singleton)
+      && frame->lookup ("description") == Attribute::String
+      && frame->type_size ("description") == Attribute::Singleton)
     frame->set ("description", get_string ());
 
   // Add separate attributes for this object.
@@ -777,54 +777,54 @@ ParserFile::Implementation::load_list (Frame& frame)
 	  bool ok = true;
 	  // Special handling of block local parameters.
 	  const std::string var = get_string ();
-	  if (frame.lookup (var) != Value::Error)
+	  if (frame.lookup (var) != Attribute::Error)
 	    {
 	      error ("'" + var + "' already exists");
 	      ok = false;
 	    }
-          int size = Value::Singleton;
+          int size = Attribute::Singleton;
           if (looking_at ('['))
             {
               skip ("[");
               if (looking_at (']'))
-                size = Value::Variable;
+                size = Attribute::Variable;
               else
                 size = get_integer ();
               skip ("]");
             }
 	  const std::string type_name = get_string ();
 	  symbol doc = "User defined " + type_name + ".";
-	  const Value::type type = Value::type_number (type_name);
+	  const Attribute::type type = Attribute::type_number (type_name);
 	  switch (type)
 	    {
-	    case Value::String:
+	    case Attribute::String:
 	      {
 		if (!looking_at ('('))
 		  doc = get_symbol ();
 		if (ok)
-		  frame.declare_string (var, Value::Const, size, doc);
+		  frame.declare_string (var, Attribute::Const, size, doc);
 		break;
 	      }
-	    case Value::Integer:
+	    case Attribute::Integer:
 	      {
 		if (!looking_at ('('))
 		  doc = get_symbol ();
 		if (ok)
-		  frame.declare_integer (var, Value::Const, size, doc);
+		  frame.declare_integer (var, Attribute::Const, size, doc);
 		break;
 	      }
-	    case Value::Number:
+	    case Attribute::Number:
 	      {
-		symbol dim = Value::Unknown ();
+		symbol dim = Attribute::Unknown ();
 		if (looking_at ('['))
 		  dim = get_symbol ();
 		if (!looking_at ('('))
 		  doc = get_symbol ();
 		if (ok)
-		  frame.declare (var, dim, Value::Const, size, doc);
+		  frame.declare (var, dim, Attribute::Const, size, doc);
 		break;
 	      }
-	    case Value::Error:
+	    case Attribute::Error:
 	      {
                 if (type_name == "fixed")
                   {
@@ -837,7 +837,7 @@ ParserFile::Implementation::load_list (Frame& frame)
                           {
                             const Frame::load_syntax_t load
                               = Librarian::submodel_load (submodel);
-                            frame.declare_submodule (var, Value::Const, doc, load);
+                            frame.declare_submodule (var, Attribute::Const, doc, load);
                           }
                         break;
                       }
@@ -852,7 +852,7 @@ ParserFile::Implementation::load_list (Frame& frame)
                           doc = get_string ();
                         if (ok)
                           frame.declare_object (var, type_symbol, 
-                                             Value::Const, size, doc);
+                                             Attribute::Const, size, doc);
                         break;
                       }
                     /* else fallthrough to error handling. */
@@ -880,17 +880,17 @@ ParserFile::Implementation::load_list (Frame& frame)
       // Duplicate warning.
       if (found.find (name) != found.end ())
 	warning (name + " specified twice, last takes precedence");
-      else if (frame.lookup (name) != Value::Model // (input file )
+      else if (frame.lookup (name) != Attribute::Model // (input file )
                || frame.component (name) != Parser::component)
 	found.insert (name);
 
-      Value::type type = frame.lookup (name);
+      Attribute::type type = frame.lookup (name);
 
       // Log variable warning.
-      if (type != Value::Error && frame.is_log (name))
+      if (type != Attribute::Error && frame.is_log (name))
         warning (name + " is a log only variable, value will be ignored");
 
-      if (type == Value::Error)
+      if (type == Attribute::Error)
         {
           error (std::string("Unknown attribute '") + name + "'");
           skip_to_end ();
@@ -904,16 +904,16 @@ ParserFile::Implementation::load_list (Frame& frame)
           else
             frame.set_reference (name, var);
         }
-      else if (frame.type_size (name) == Value::Singleton)
+      else if (frame.type_size (name) == Attribute::Singleton)
 	switch (type)
 	  {
-	  case Value::Number:
+	  case Attribute::Number:
 	    {
-              if (frame.dimension (name) == Value::User ())
+              if (frame.dimension (name) == Attribute::User ())
                 {
                   const double value = get_number ();
                   const symbol dim = 
-		    looking_at ('[') ? get_dimension () : Value::Unknown ();
+		    looking_at ('[') ? get_dimension () : Attribute::Unknown ();
                   check_value (frame, name, value);
                   frame.set (name, value, dim);
                   break;
@@ -923,7 +923,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 	      frame.set (name, value);
 	    }
             break;
-	  case Value::Submodel: 
+	  case Attribute::Submodel: 
 	    {
               Treelog::Open nest (msg, "In submodel '" + name + "'");
 	      bool alist_skipped = false;
@@ -946,7 +946,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 		skip (")");
 	    }
             break;
-	  case Value::PLF:
+	  case Attribute::PLF:
 	    {
 	      Parskip skip (*this, in_order);
 	      PLF plf;
@@ -987,14 +987,14 @@ ParserFile::Implementation::load_list (Frame& frame)
 		frame.set (name, plf);
 	      break;
 	    }
-	  case Value::String:
+	  case Attribute::String:
 	    frame.set (name, get_string ());
 	    // Handle "directory" immediately.
 	    if (&frame == &metalib () && name == "directory")
 	      if (!metalib ().path ().set_directory (frame.name (name).name ()))
 		error ("Could not set directory '" + frame.name (name) + "'");
 	    break;
-	  case Value::Boolean:
+	  case Attribute::Boolean:
 	    {
 	      const std::string flag = get_string ();
 
@@ -1008,10 +1008,10 @@ ParserFile::Implementation::load_list (Frame& frame)
 		}
 	      break;
 	    }
-	  case Value::Integer:
+	  case Attribute::Integer:
 	    frame.set (name, get_integer ());
 	    break;
-	  case Value::Model:
+	  case Attribute::Model:
 	    {
               boost::shared_ptr<FrameModel> child;
               const symbol component = frame.component (name);
@@ -1049,9 +1049,9 @@ ParserFile::Implementation::load_list (Frame& frame)
                 frame.set (name, *child);
 	    }
 	    break;
-	  case Value::Scalar:
-          case Value::Reference:
-	  case Value::Error:
+	  case Attribute::Scalar:
+          case Attribute::Reference:
+	  case Attribute::Error:
 	    error (std::string("Unknown singleton '") + name + "'");
 	    skip_to_end ();
 	    break;
@@ -1070,7 +1070,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 	  // Support for sequences not really finished yet.
 	  switch (type)
 	    {
-	    case Value::Model:
+	    case Attribute::Model:
 	      {
 		const symbol component = frame.component (name);
 		const Library& lib = metalib ().library (component);
@@ -1121,7 +1121,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 		frame.set (name, sequence);
 	      }
               break;
-	    case Value::Submodel:
+	    case Attribute::Submodel:
 	      {
 		const size_t size = frame.type_size (name);
 		static const std::vector<boost::shared_ptr<const FrameSubmodel>/**/> no_sequence;
@@ -1169,7 +1169,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 		  }
 		if (skipped)
 		  skip (")");
-		if (!Value::flexible_size (size) && sequence.size () != size)
+		if (!Attribute::flexible_size (size) && sequence.size () != size)
 		  {
 		    std::ostringstream str;
 		    str << "Got " << sequence.size ()
@@ -1179,7 +1179,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 		frame.set (name, sequence);
 	      }	
               break;
-            case Value::PLF:
+            case Attribute::PLF:
 	      {
 		std::vector<boost::shared_ptr<const PLF>/**/> plfs;
 		int total = 0;
@@ -1224,7 +1224,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 		    total++;
 		    plfs.push_back (plf);
 		  }
-		if (!Value::flexible_size (size) && total != size)
+		if (!Attribute::flexible_size (size) && total != size)
 		  {
 		    std::ostringstream str;
 		    str << "Got " << total
@@ -1239,7 +1239,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 		// sequence_delete (plfs.begin (), plfs.end ());
 		break;
 	      }
-	    case Value::Number:
+	    case Attribute::Number:
 	      {
 		std::vector<double> array;
 		std::vector<Filepos> positions;
@@ -1313,7 +1313,7 @@ ParserFile::Implementation::load_list (Frame& frame)
                           error (tmp.str () + ": bad value", positions[i]);
                       }
 		  }
-		if (!Value::flexible_size (size) && count != size)
+		if (!Attribute::flexible_size (size) && count != size)
 		  {
 		    std::ostringstream str;
 		    str << "Got " << count 
@@ -1326,7 +1326,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 		frame.set (name, array);
 		break;
 	      }
-	    case Value::String:
+	    case Attribute::String:
 	      {
 		std::vector<symbol> array;
 		int count = 0;
@@ -1348,7 +1348,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 		    array.push_back (get_symbol ());
 		    count++;
 		  }
-		if (!Value::flexible_size (size) && count != size)
+		if (!Attribute::flexible_size (size) && count != size)
 		  {
 		    std::ostringstream str;
 		    str << "Got " << count 
@@ -1370,7 +1370,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 		  }
 		break;
 	      }
-	    case Value::Integer:
+	    case Attribute::Integer:
 	      {
 		std::vector<int> array;
 		int count = 0;
@@ -1392,7 +1392,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 		    array.push_back (get_integer ());
 		    count++;
 		  }
-		if (!Value::flexible_size (size) && count != size)
+		if (!Attribute::flexible_size (size) && count != size)
 		  {
 		    std::ostringstream str;
 		    str << "Got " << count 
@@ -1406,7 +1406,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 		// Handle "path" immediately.
 		break;
 	      }
-	    case Value::Error:
+	    case Attribute::Error:
 	      if (name != error_symbol)
                 error (std::string("Unknown attribute '") + name + "'");
 	      skip_to_end ();
@@ -1521,7 +1521,7 @@ static struct ParserFileSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.declare_string ("where", Value::Const,
+    frame.declare_string ("where", Attribute::Const,
 		"File to read from.");
     frame.order ("where");
   }

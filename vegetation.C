@@ -88,39 +88,39 @@ That green stuff.")
   void load_frame (Frame& frame) const
   {
     Model::load_model (frame);
-    frame.declare ("LAI", "m^2/m^2", Value::LogOnly,
+    frame.declare ("LAI", "m^2/m^2", Attribute::LogOnly,
                 "Total LAI of all crops on this column");
-    frame.declare ("height", "cm", Value::LogOnly,
+    frame.declare ("height", "cm", Attribute::LogOnly,
                 "Max crop height in canopy");
-    frame.declare ("cover", "m^2/m^2", Value::LogOnly,
+    frame.declare ("cover", "m^2/m^2", Attribute::LogOnly,
                 "Fraction of soil covered by crops");
-    frame.declare ("LAIvsH", "m^2/m^2", "cm", Value::LogOnly,
+    frame.declare ("LAIvsH", "m^2/m^2", "cm", Attribute::LogOnly,
                 "Total canopy LAI below given height");
-    frame.declare ("HvsLAI", "cm", "m^2/m^2", Value::LogOnly, "\
+    frame.declare ("HvsLAI", "cm", "m^2/m^2", Attribute::LogOnly, "\
 Height in which there is a given LAI below in total canopy");
-    frame.declare ("ACExt_PAR", Value::None (), Value::LogOnly,
+    frame.declare ("ACExt_PAR", Attribute::None (), Attribute::LogOnly,
                 "Canopy extinction coefficient of PAR\
 \n(how fast the light dim as a function of LAI passed)");
-    frame.declare ("ACRef_PAR", Value::None (), Value::LogOnly,
+    frame.declare ("ACRef_PAR", Attribute::None (), Attribute::LogOnly,
                 "Canopy reflection coefficient of PAR");
-    frame.declare ("ACExt_NIR", Value::None (), Value::LogOnly,
+    frame.declare ("ACExt_NIR", Attribute::None (), Attribute::LogOnly,
                 "Canopy extinction coefficient of NIR\
 \n(how fast the light dim as a function of LAI passed)");
-     frame.declare ("ACRef_NIR", Value::None (), Value::LogOnly,
+     frame.declare ("ACRef_NIR", Attribute::None (), Attribute::LogOnly,
                 "Canopy reflection coefficient of NIR");
-    frame.declare ("ARExt", Value::None (), Value::LogOnly,
+    frame.declare ("ARExt", Attribute::None (), Attribute::LogOnly,
                 "Radiation Extinction coefficient\
 \n(like ACExt, but for all radiation, not just light)");
-    frame.declare ("EpFactor", Value::None (), Value::LogOnly,
+    frame.declare ("EpFactor", Attribute::None (), Attribute::LogOnly,
                 "Reference to potential evapotranspiration");
-    frame.declare_fraction ("EpInterchange", Value::Const, "\
+    frame.declare_fraction ("EpInterchange", Attribute::Const, "\
 Canopy adsorbtion fraction of unreached potential soil evaporation.");
     frame.set ("EpInterchange", 0.6);
-    frame.declare ("albedo", Value::None (), Value::LogOnly,
+    frame.declare ("albedo", Attribute::None (), Attribute::LogOnly,
                 "Another reflection factor");
-    frame.declare ("interception_capacity", "mm", Value::LogOnly,
+    frame.declare ("interception_capacity", "mm", Attribute::LogOnly,
                 "Canopy water storage capacity");
-    frame.declare ("stomata_conductance", "m/s", Value::LogOnly,
+    frame.declare ("stomata_conductance", "m/s", Attribute::LogOnly,
                 "Stomata´conductance");
   }
 } Vegetation_init;

@@ -255,7 +255,7 @@ and 'mactrans' components.  Provided for backward compatibility.")
   void load_frame (Frame& frame) const
   {
     frame.declare_object ("macro", Macro::component,
-                      Value::OptionalState, Value::Singleton,
+                      Attribute::OptionalState, Attribute::Singleton,
                       "Preferential flow model.\n\
 By default, preferential flow is enabled if and only if the combined\n\
 amount of humus and clay in the top horizon is above 5%.");

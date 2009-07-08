@@ -477,11 +477,11 @@ One dimensional movement.")
     frame.set ("Tertiary", "old");
     frame.set_strings ("matrix_solute", "Hansen", "convection", "none");
 
-    frame.declare_submodule ("Geometry", Value::State,
+    frame.declare_submodule ("Geometry", Attribute::State,
                          "Discretization of the soil.",
                          Geometry1D::load_syntax);
     frame.declare_object ("matrix_water", UZmodel::component, 
-                      Value::Const, Value::Variable,
+                      Attribute::Const, Attribute::Variable,
                       "Vertical matrix water transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends.");

@@ -111,9 +111,9 @@ Timestep::GenCheck::verify (const Metalib&, const Frame& frame, const symbol key
                             Treelog& msg) const
 { 
   daisy_assert (frame.check (key));
-  daisy_assert (frame.lookup (key) == Value::Submodel);
+  daisy_assert (frame.lookup (key) == Attribute::Submodel);
   daisy_assert (!frame.is_log (key));
-  daisy_assert (frame.type_size (key) == Value::Singleton);
+  daisy_assert (frame.type_size (key) == Attribute::Singleton);
 
   Timestep timestep (frame.submodel (key));
   return check_dt (timestep.total_hours (), msg);
@@ -160,19 +160,19 @@ Timestep::load_syntax (Frame& frame)
 void 
 Timestep::load_frame (Frame& frame)
 {
-  frame.declare_integer ("years", Value::State, 
+  frame.declare_integer ("years", Attribute::State, 
               "Number of years.");
   frame.set ("years", 0);
-  frame.declare_integer ("days", Value::State, 
+  frame.declare_integer ("days", Attribute::State, 
               "Number of days.");
   frame.set ("days", 0);
-  frame.declare_integer ("hours", Value::State, 
+  frame.declare_integer ("hours", Attribute::State, 
               "Number of hours.");
   frame.set ("hours", 0);
-  frame.declare_integer ("minutes", Value::State, 
+  frame.declare_integer ("minutes", Attribute::State, 
               "Number of minutes.");
   frame.set ("minutes", 0);
-  frame.declare_integer ("seconds", Value::State, 
+  frame.declare_integer ("seconds", Attribute::State, 
               "Number of seconds.");
   frame.set ("seconds", 0);
 }

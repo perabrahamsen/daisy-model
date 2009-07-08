@@ -26,30 +26,30 @@
 #include "assertion.h"
 #include "check.h"
 
-Value::category
+Attribute::category
 Type::category () const 
 { return category_; }
 
 bool 
 Type::is_const () const
-{ return category () == Value::Const || category () == Value::OptionalConst; }
+{ return category () == Attribute::Const || category () == Attribute::OptionalConst; }
 
 bool 
 Type::is_optional () const
-{ return category () == Value::OptionalState 
-    || category () == Value::OptionalConst; }
+{ return category () == Attribute::OptionalState 
+    || category () == Attribute::OptionalConst; }
 
 bool 
 Type::is_mandatory () const
-{ return category () == Value::State || category () == Value::Const; }
+{ return category () == Attribute::State || category () == Attribute::Const; }
 
 bool 
 Type::is_log () const
-{ return category () == Value::LogOnly; }
+{ return category () == Attribute::LogOnly; }
 
 bool 
 Type::is_state () const
-{ return category () == Value::State || category () == Value::OptionalState; }
+{ return category () == Attribute::State || category () == Attribute::OptionalState; }
 
 int 
 Type::size () const 
@@ -83,7 +83,7 @@ symbol
 Type::component () const
 { daisy_notreached (); }
 
-Type::Type (const Value::category c, const int s, const symbol d)
+Type::Type (const Attribute::category c, const int s, const symbol d)
   : category_ (c),
     size_ (s),
     description_ (d)
@@ -92,9 +92,9 @@ Type::Type (const Value::category c, const int s, const symbol d)
 Type::~Type ()
 { }
 
-Value::type 
+Attribute::type 
 TypeNumber::type () const
-{ return Value::Number; }
+{ return Attribute::Number; }
 
 symbol 
 TypeNumber::dimension () const
@@ -104,7 +104,7 @@ bool
 TypeNumber::verify (const double value, Treelog& msg) const
 { return check.verify (value, msg); }
 
-TypeNumber::TypeNumber (const Value::category c, const int s, const symbol dim, 
+TypeNumber::TypeNumber (const Attribute::category c, const int s, const symbol dim, 
                         const Check& chk,
                         const symbol desc)
   : Type (c, s, desc),
@@ -112,23 +112,23 @@ TypeNumber::TypeNumber (const Value::category c, const int s, const symbol dim,
     check (chk)
 { }
 
-Value::type 
+Attribute::type 
 TypeSubmodel::type () const
-{ return Value::Submodel; }
+{ return Attribute::Submodel; }
 
 Frame::load_syntax_t  
 TypeSubmodel::load_syntax () const
 { return load_syntax_; }
 
-TypeSubmodel::TypeSubmodel (const Value::category c, const int s,
+TypeSubmodel::TypeSubmodel (const Attribute::category c, const int s,
                       const Frame::load_syntax_t l, const symbol desc)
   : Type (c, s, desc),
     load_syntax_ (l)
 { }
 
-Value::type 
+Attribute::type 
 TypePLF::type () const
-{ return Value::PLF; }
+{ return Attribute::PLF; }
 
 symbol 
 TypePLF::dimension () const
@@ -146,7 +146,7 @@ bool
 TypePLF::verify (const double value, Treelog& msg) const
 { return check.verify (value, msg); }
 
-TypePLF::TypePLF (const Value::category c, const int s, const symbol dom,
+TypePLF::TypePLF (const Attribute::category c, const int s, const symbol dom,
                   const symbol r, const Check& chk, const symbol desc)
   : Type (c, s, desc),
     domain_ (dom),
@@ -154,41 +154,41 @@ TypePLF::TypePLF (const Value::category c, const int s, const symbol dom,
     check (chk)
 { }
 
-Value::type 
+Attribute::type 
 TypeBoolean::type () const
-{ return Value::Boolean; }
+{ return Attribute::Boolean; }
 
-TypeBoolean::TypeBoolean (const Value::category c, const int s,
+TypeBoolean::TypeBoolean (const Attribute::category c, const int s,
                           const symbol desc)
   : Type (c, s, desc)
 { }
 
-Value::type 
+Attribute::type 
 TypeString::type () const
-{ return Value::String; }
+{ return Attribute::String; }
 
-TypeString::TypeString (const Value::category c, const int s, const symbol desc)
+TypeString::TypeString (const Attribute::category c, const int s, const symbol desc)
   : Type (c, s, desc)
 { }
 
-Value::type 
+Attribute::type 
 TypeInteger::type () const
-{ return Value::Integer; }
+{ return Attribute::Integer; }
 
-TypeInteger::TypeInteger (const Value::category c, const int s,
+TypeInteger::TypeInteger (const Attribute::category c, const int s,
                           const symbol desc)
   : Type (c, s, desc)
 { }
 
-Value::type 
+Attribute::type 
 TypeModel::type () const
-{ return Value::Model; }
+{ return Attribute::Model; }
 
 symbol 
 TypeModel::component () const
 { return component_; }
 
-TypeModel::TypeModel (const Value::category c, const int s, const symbol comp,
+TypeModel::TypeModel (const Attribute::category c, const int s, const symbol comp,
                         const symbol desc)
   : Type (c, s, desc),
     component_ (comp)

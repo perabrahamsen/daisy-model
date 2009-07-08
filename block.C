@@ -43,7 +43,7 @@ struct Block::Implementation
   bool is_ok;
 
   // Use.
-  Value::type lookup (symbol) const;
+  Attribute::type lookup (symbol) const;
   const Frame& find_frame (const symbol key) const;
   bool check (const symbol key) const;
   symbol expand_string (Block&, symbol);
@@ -63,11 +63,11 @@ struct Block::Implementation
   { }
 };
 
-Value::type 
+Attribute::type 
 Block::Implementation::lookup (const symbol key) const
 {
-  Value::type type = frame.lookup (key);
-  if (type == Value::Error && context)
+  Attribute::type type = frame.lookup (key);
+  if (type == Attribute::Error && context)
     return context->impl->lookup (key);
   return type;
 }
@@ -75,7 +75,7 @@ Block::Implementation::lookup (const symbol key) const
 const Frame& 
 Block::Implementation::find_frame (const symbol key) const
 {
-  if (frame.check (key) || frame.lookup (key) != Value::Error)
+  if (frame.check (key) || frame.lookup (key) != Attribute::Error)
     return frame;
   if (context == NULL)
     daisy_panic ("Couldn't find '" + key + "' in this block or its context");
@@ -85,8 +85,8 @@ Block::Implementation::find_frame (const symbol key) const
 bool
 Block::Implementation::check (const symbol key) const
 {
-  Value::type type = frame.lookup (key);
-  if (type != Value::Error)
+  Attribute::type type = frame.lookup (key);
+  if (type != Attribute::Error)
     return frame.check (key);
   if (context == NULL)
     return false;
@@ -134,27 +134,27 @@ Block::Implementation::expand_string (Block& block,
             {
               try 
                 {
-                  const Value::type type = lookup (key);
-                  if (type == Value::Error)
+                  const Attribute::type type = lookup (key);
+                  if (type == Attribute::Error)
                     throw "Unknown expansion: '" + key + "'";
                   const Frame& frame = find_frame (key);
-                  if (frame.type_size (key) != Value::Singleton)
+                  if (frame.type_size (key) != Attribute::Singleton)
                     throw "'" + key 
                       + "' is a sequence, can only expand singletons";
                   if (!frame.check (key))
                     throw "'" + key + "' has no value";
                   switch (type)
                     {
-                    case Value::String:
+                    case Attribute::String:
                       result << frame.name (key); 
                       break;
-                    case Value::Integer:
+                    case Attribute::Integer:
                       result << frame.integer (key); 
                       break;
-                    case Value::Number:
+                    case Attribute::Number:
                       result << frame.number (key); 
                       break;
-                    case Value::Model:
+                    case Attribute::Model:
                       {
                         Treelog::Open nest (msg, "${" + key + "}");
                         const FrameModel& obj = frame.model (key);
@@ -189,10 +189,10 @@ Block::Implementation::expand_string (Block& block,
                               throw "Bad number: '"+ type + "'";
                             result << number->value (scope);
                             const symbol dim = number->dimension (scope);
-                            if (dim == Value::Fraction ()
-                                || dim == Value::None ())
+                            if (dim == Attribute::Fraction ()
+                                || dim == Attribute::None ())
                               result << " []";
-                            else if (dim != Value::Unknown ())
+                            else if (dim != Attribute::Unknown ())
                               result << " [" << dim << "]";
                           }
                         else
@@ -235,53 +235,53 @@ Block::Implementation::expand_reference (const symbol key)
     }
   if (lookup (var) == frame.lookup (key)
       && (find_frame (var).type_size (var) == frame.type_size (key)
-          || (frame.type_size (key) == Value::Variable
-              && find_frame (var).type_size (var) != Value::Singleton)))
+          || (frame.type_size (key) == Attribute::Variable
+              && find_frame (var).type_size (var) != Attribute::Singleton)))
     return var;
 
   std::ostringstream tmp;
   tmp << "Value of '" << key << "' is $" << var
-      << ", which is a " << Value::type_name (lookup (var));
+      << ", which is a " << Attribute::type_name (lookup (var));
   switch (find_frame (var).type_size (var))
     {
-    case Value::Singleton:
+    case Attribute::Singleton:
       break;
-    case Value::CanopyCells:
+    case Attribute::CanopyCells:
       tmp << " canopy intervals";
       break;
-    case Value::CanopyEdges:
+    case Attribute::CanopyEdges:
       tmp << " canopy boundaries";
       break;
-    case Value::SoilCells:
+    case Attribute::SoilCells:
       tmp << " soil cells";
       break;
-    case Value::SoilEdges:
+    case Attribute::SoilEdges:
       tmp << " soil edges";
       break;
-    case Value::Variable:
+    case Attribute::Variable:
       tmp << " sequence";
       break;
     default:
       tmp << "[" << find_frame (var).type_size (var) << "]";
     }
-  tmp << ", should be a " << Value::type_name (frame.lookup (key));
+  tmp << ", should be a " << Attribute::type_name (frame.lookup (key));
   switch (frame.type_size (key))
     {
-    case Value::Singleton:
+    case Attribute::Singleton:
       break;
-    case Value::CanopyCells:
+    case Attribute::CanopyCells:
       tmp << " canopy intervals";
       break;
-    case Value::CanopyEdges:
+    case Attribute::CanopyEdges:
       tmp << " canopy boundaries";
       break;
-    case Value::SoilCells:
+    case Attribute::SoilCells:
       tmp << " soil cells";
       break;
-    case Value::SoilEdges:
+    case Attribute::SoilEdges:
       tmp << " soil edges";
       break;
-    case Value::Variable:
+    case Attribute::Variable:
       tmp << " sequence";
       break;
     default:
@@ -346,7 +346,7 @@ const Frame&
 Block::find_frame (const symbol key) const
 { return impl->find_frame (key); }
 
-Value::type 
+Attribute::type 
 Block::lookup (const symbol key) const
 { return impl->lookup (key); }
 

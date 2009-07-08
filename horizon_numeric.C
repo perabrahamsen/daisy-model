@@ -119,18 +119,18 @@ A horizon using explicit texture classification.")
   { 
     frame.add_check (check_alist);
     frame.declare ("limits", "um", Check::positive (),
-                Value::Const, Value::Variable, 
+                Attribute::Const, Attribute::Variable, 
                 "Numerical limits for particle sizes.");
     static const VCheck::All lim_check (VCheck::increasing (), 
                                         VCheck::min_size_1 ());
     frame.set_check ("limits", lim_check);
-    frame.declare_fraction ("fractions", Value::Const, Value::Variable, "\
+    frame.declare_fraction ("fractions", Attribute::Const, Attribute::Variable, "\
 Fraction of particles between the corresponding numrical limits.");
     frame.set_check ("fractions", VCheck::min_size_1 ());
     
-    frame.declare_fraction ("humus", Value::Const,
+    frame.declare_fraction ("humus", Attribute::Const,
                          "Humus content of soil.");
-    frame.declare_boolean ("normalize", Value::Const, "\
+    frame.declare_boolean ("normalize", Attribute::Const, "\
 If this is true, normalize the mineral fraction to 1.0.\n\
 Otherwise, give an error if the sum is not 1.0.");
     frame.set ("normalize", false);

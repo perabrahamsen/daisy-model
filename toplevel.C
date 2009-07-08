@@ -624,7 +624,7 @@ Toplevel::load_frame (Frame& frame)
 {
   Units::load_syntax (frame);
 
-  frame.declare_string ("install_directory", Value::Const,
+  frame.declare_string ("install_directory", Attribute::Const,
               "Directory where Daisy has been installed.\n\
 \n\
 This is used for looking up files that came with the installation, in\n\
@@ -638,11 +638,11 @@ are not running MS Windows), a hardcoded value is used.  This is\n\
 The value found in the manual corresponds to the system where the\n\
 manual was generated.");
   frame.set ("install_directory", Path::get_daisy_home ());
-  frame.declare_string ("directory", Value::OptionalConst,
+  frame.declare_string ("directory", Attribute::OptionalConst,
               "Run program in this directory.\n\
 This can affect both where input files are found and where log files\n\
 are generated.");
-  frame.declare_string ("path", Value::Const, Value::Variable,
+  frame.declare_string ("path", Attribute::Const, Attribute::Variable,
               "List of directories to search for input files in.\n\
 The special value \".\" means the current directory.\n\
 \n\
@@ -656,17 +656,17 @@ working directory followed by the standard parameter libraries.");
   frame.set ("path", Path::get_daisy_path ());
 
   frame.declare_object ("input", Parser::component,
-                     Value::OptionalConst, Value::Singleton,
+                     Attribute::OptionalConst, Attribute::Singleton,
                      "Command to add more information about the simulation.");
   frame.declare_object ("run", Program::component, 
-                     Value::OptionalState, Value::Singleton, 
+                     Attribute::OptionalState, Attribute::Singleton, 
                      "Program to run.\n\
 \n\
 If this option is specified, all the 'Daisy' specific top-level attributes\n\
 will be ignored.  If unspecified, run 'Daisy' on the current top-level\n\
 attributes.");
   frame.declare_object ("ui", UI::component, 
-                     Value::OptionalState, Value::Singleton, 
+                     Attribute::OptionalState, Attribute::Singleton, 
                      "Top level user interface.");
 }
 

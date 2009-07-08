@@ -149,7 +149,7 @@ The first numbers corresponds to each of the SMB pools, the next\n\
 numbers corresponds to the SOM pools, and the last numbers to each of\n\
 the DOM pools.  The length of the sequence should thus be the number\n\
 of SMB pools plus the number of SOM pools plus the number of DOM pools."); 
-    frame.declare ("maintenance", "h^-1", Check::fraction (), Value::Const, "\
+    frame.declare ("maintenance", "h^-1", Check::fraction (), Attribute::Const, "\
 The fraction used for staying alive each hour.");
   }
   SMBInit ()

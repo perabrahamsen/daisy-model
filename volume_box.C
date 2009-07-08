@@ -328,27 +328,27 @@ setting the parameters.")
   {
     Model::load_model (frame);
     frame.declare_object ("bottom", Bound::component, 
-                       Value::Const, Value::Singleton,
+                       Attribute::Const, Attribute::Singleton,
                        "Lower boundary on the z-axis.");
     frame.set ("bottom", "none");
     frame.declare_object ("top", Bound::component,
-                       Value::Const, Value::Singleton,
+                       Attribute::Const, Attribute::Singleton,
                        "Upper boundary on the z-axis.");
     frame.set ("top", "none");
     frame.declare_object ("left", Bound::component,
-                       Value::Const, Value::Singleton,
+                       Attribute::Const, Attribute::Singleton,
                        "Lower boundary on the x-axis.");
     frame.set ("left", "none");
     frame.declare_object ("right", Bound::component,
-                       Value::Const, Value::Singleton,
+                       Attribute::Const, Attribute::Singleton,
                        "Upper boundary on the x-axis.");
     frame.set ("right", "none");
     frame.declare_object ("front", Bound::component,
-                       Value::Const, Value::Singleton,
+                       Attribute::Const, Attribute::Singleton,
                        "Lower boundary on the y-axis.");
     frame.set ("front", "none");
     frame.declare_object ("back", Bound::component,
-                       Value::Const, Value::Singleton,
+                       Attribute::Const, Attribute::Singleton,
                        "Upper boundary on the y-axis.");
     frame.set ("back", "none");
     }

@@ -526,51 +526,51 @@ void
 Surface::load_syntax (Frame& frame)
 {
   frame.add_check (check_alist);
-  frame.declare ("EpFactor", Value::None (), Check::non_negative (), 
-	      Value::Const,
+  frame.declare ("EpFactor", Attribute::None (), Check::non_negative (), 
+	      Attribute::Const,
 	      "Convertion of reference evapotranspiration to\n\
 potential evaporation for bare soil.");
   frame.set ("EpFactor", 1.0);
-  frame.declare ("albedo_dry", Value::None (), Check::non_negative (),
-	      Value::Const,
+  frame.declare ("albedo_dry", Attribute::None (), Check::non_negative (),
+	      Attribute::Const,
 	      "Albedo of dry soil (pF >= 3)");
   frame.set ("albedo_dry", 0.15);
-  frame.declare ("albedo_wet", Value::None (), Check::non_negative (),
-	      Value::Const,
+  frame.declare ("albedo_wet", Attribute::None (), Check::non_negative (),
+	      Attribute::Const,
 	      "Albedo of wet soil (pf <= 1.7)");
   frame.set ("albedo_wet", 0.08);
-    frame.declare ("forced_pressure", "mm", Value::OptionalConst, "\
+    frame.declare ("forced_pressure", "mm", Attribute::OptionalConst, "\
 Set this to force a permanent pressure top.");
-  frame.declare ("forced_flux", "mm/h", Value::OptionalConst, "\
+  frame.declare ("forced_flux", "mm/h", Attribute::OptionalConst, "\
 Set this to force a permanent flux top.  Positive upwards (exfiltration).");
-  frame.declare ("pond", "mm", Value::State, "\
+  frame.declare ("pond", "mm", Attribute::State, "\
 Amount of ponding on the surface.\n\
 Negative numbers indicate soil exfiltration.");
   frame.set ("pond", 0.0);
-  frame.declare ("EvapSoilSurface", "mm/h", Value::LogOnly, "\
+  frame.declare ("EvapSoilSurface", "mm/h", Attribute::LogOnly, "\
 Water evaporated from the surface, including the pond and exfiltration.");
-  frame.declare ("Eps", "mm/h", Value::LogOnly, "\
+  frame.declare ("Eps", "mm/h", Attribute::LogOnly, "\
 Potential evaporation from the surface.");
-  frame.declare ("T", "dg C", Value::LogOnly, "\
+  frame.declare ("T", "dg C", Attribute::LogOnly, "\
 Temperature of water or air directly above the surface.");
   frame.declare ("DetentionCapacity", "mm", Check::non_negative (),
-	      Value::State, "Amount of ponding the surface can retain.");
+	      Attribute::State, "Amount of ponding the surface can retain.");
   frame.set ("DetentionCapacity", 1000.0);
   frame.declare ("ReservoirConstant", "h^-1", Check::fraction (), 
-	      Value::Const, "\
+	      Attribute::Const, "\
 Fraction of ponding above DetentionCapacity that runoffs each hour.");
   frame.set ("ReservoirConstant", 1.0);
-  frame.declare ("runoff", "mm/h", Value::LogOnly, "\
+  frame.declare ("runoff", "mm/h", Attribute::LogOnly, "\
 Amount of water runoff from ponding this hour.");
-  frame.declare ("z_mixing", "cm", Check::non_negative (), Value::Const, "\
+  frame.declare ("z_mixing", "cm", Check::non_negative (), Attribute::Const, "\
 Depth of mixing layer in the top of the soil.\n\
 The mixing layer affect exchange between soil coloids, soil water\n\
 and the surface, especially in connection with intense rainfall.");
   frame.set ("z_mixing", 0.1);
-  frame.declare ("R_mixing", "h/mm", Check::non_negative (), Value::Const, "\
+  frame.declare ("R_mixing", "h/mm", Check::non_negative (), Attribute::Const, "\
 Resistance to mixing inorganic compounds between soil and ponding.");
   frame.set ("R_mixing", 1.0e9);
-  frame.declare_submodule ("ridge", Value::OptionalState, "\
+  frame.declare_submodule ("ridge", Attribute::OptionalState, "\
 Active ridge system, if any.",
 			Ridge::load_syntax);
 }

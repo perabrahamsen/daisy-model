@@ -300,24 +300,24 @@ A numerical solution to Richard's Equation.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare_integer ("max_time_step_reductions", Value::Const, "\
+    frame.declare_integer ("max_time_step_reductions", Attribute::Const, "\
 Number of times we may reduce the time step before giving up");
     frame.set ("max_time_step_reductions", 4);
-    frame.declare_integer ("time_step_reduction", Value::Const, 
+    frame.declare_integer ("time_step_reduction", Attribute::Const, 
                 "Divide the time step with this at each reduction.");
     frame.set ("time_step_reduction", 4);
-    frame.declare_integer ("max_iterations", Value::Const, "\
+    frame.declare_integer ("max_iterations", Attribute::Const, "\
 Maximum number of iterations when seeking convergence before reducing\n\
 the time step.");
     frame.set ("max_iterations", 25);
-    frame.declare ("max_absolute_difference", "cm", Value::Const, "\
+    frame.declare ("max_absolute_difference", "cm", Attribute::Const, "\
 Maximum absolute difference in 'h' values for convergence.");
     frame.set ("max_absolute_difference", 0.02);
-    frame.declare ("max_relative_difference", Value::None (), Value::Const, "\
+    frame.declare ("max_relative_difference", Attribute::None (), Attribute::Const, "\
 Maximum relative difference in 'h' values for convergence.");
     frame.set ("max_relative_difference", 0.001);
     frame.declare_object ("K_average", Average::component,
-                       Value::OptionalConst, Value::Singleton,
+                       Attribute::OptionalConst, Attribute::Singleton,
                        "Model for calculating average K between cells.");
     frame.set ("K_average", "arithmetic");
   }

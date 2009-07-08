@@ -44,7 +44,7 @@ public:
 
   // Use.
 public:
-  virtual Value::type lookup () const = 0;
+  virtual Attribute::type lookup () const = 0;
   virtual bool check () const = 0;
   virtual double number () const;
   virtual symbol dimension () const;
@@ -71,7 +71,7 @@ private:
 
   // Use 
 public:
-  Value::type lookup () const;
+  Attribute::type lookup () const;
   bool check () const;
   double number () const;
   symbol dimension () const;
@@ -94,7 +94,7 @@ private:
 
   // Use
 public: 
-  Value::type lookup () const;
+  Attribute::type lookup () const;
   bool check () const;
   symbol name () const;
 
@@ -114,7 +114,7 @@ private:
   // Scope.
 public:
   void entries (std::set<symbol>&) const;
-  Value::type lookup (symbol tag) const;
+  Attribute::type lookup (symbol tag) const;
   bool check (symbol tag) const;
   double number (symbol tag) const;
   symbol dimension (symbol tag) const;

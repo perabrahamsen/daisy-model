@@ -45,8 +45,8 @@ struct NumberPLF : public Number
 
     static void load_syntax (Frame& frame)
     {
-      frame.declare ("x", Value::User (), Value::Const, "Operand.");
-      frame.declare ("y", Value::User (), Value::Const, "Value.");
+      frame.declare ("x", Attribute::User (), Attribute::Const, "Operand.");
+      frame.declare ("y", Attribute::User (), Attribute::Const, "Value.");
       frame.order ("x", "y");
     }
     
@@ -114,7 +114,7 @@ struct NumberPLF : public Number
 	double x = point.x_value;
 	const symbol x_dim = point.x_dimension;
 
-	if (domain != Value::Unknown () && x_dim != Value::Unknown ())
+	if (domain != Attribute::Unknown () && x_dim != Attribute::Unknown ())
 	  try
 	    { x = units.convert (x_dim, domain, x); }
 	  catch (const std::string& err)
@@ -132,7 +132,7 @@ struct NumberPLF : public Number
 	last_x = x;
 
 	const symbol y_dim = point.y_dimension;
-	if (domain != Value::Unknown () && y_dim != Value::Unknown ())
+	if (domain != Attribute::Unknown () && y_dim != Attribute::Unknown ())
 	  try
 	    { (void) units.convert (x_dim, domain, x); }
 	  catch (const std::string& err)
@@ -160,11 +160,11 @@ struct NumberPLF : public Number
 
 	double x = point.x_value;
 	const symbol x_dim = point.x_dimension;
-	if (domain != Value::Unknown () && x_dim != Value::Unknown ())
+	if (domain != Attribute::Unknown () && x_dim != Attribute::Unknown ())
 	  x = units.convert (x_dim, domain, x);
 	double y = point.y_value;
 	const symbol y_dim = point.y_dimension;
-	if (range != Value::Unknown () && y_dim != Value::Unknown ())
+	if (range != Attribute::Unknown () && y_dim != Attribute::Unknown ())
 	  y = units.convert (y_dim, range, y);
 	
 	plf.add (x, y);
@@ -196,13 +196,13 @@ static struct NumberPLFSyntax : public DeclareModel
 
     frame.declare_object ("operand", Number::component,
                        "Operand for this function.");
-    frame.declare_string ("domain", Value::Const, "\
+    frame.declare_string ("domain", Attribute::Const, "\
 Unit for the operand of the function.");
-    frame.set ("domain", Value::Unknown ());
-    frame.declare_string ("range", Value::Const, "\
+    frame.set ("domain", Attribute::Unknown ());
+    frame.declare_string ("range", Attribute::Const, "\
 Unit for the operand of the function.");
-    frame.set ("range", Value::Unknown ());
-    frame.declare_submodule_sequence ("points", Value::Const, "\
+    frame.set ("range", Attribute::Unknown ());
+    frame.declare_submodule_sequence ("points", Attribute::Const, "\
 List of points (x y) defining the piecewise linear function.\n\
 The x values must be ordered lowest first.", NumberPLF::Point::load_syntax);
 

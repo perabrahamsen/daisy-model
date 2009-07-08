@@ -110,12 +110,12 @@ void
 ActionFertilize::Precision::load_syntax (Frame& frame)
 {
   frame.add_check (check_alist);
-  frame.declare ("target", "kg N/ha", Value::Const, 
+  frame.declare ("target", "kg N/ha", Attribute::Const, 
 	      "How much N you want.");
-  frame.declare ("from", "cm", Value::Const, "\
+  frame.declare ("from", "cm", Attribute::Const, "\
 Height where you want to start measuring (a negative number).");
   frame.set ("from", 0.0);
-  frame.declare ("to", "cm", Value::Const, "\
+  frame.declare ("to", "cm", Attribute::Const, "\
 Height where you want to end measuring (a negative number).");
   frame.set ("to", -100.0);
   frame.order ("target");
@@ -273,22 +273,22 @@ Shared parameters for all fertilize actions.")
     frame.declare_object ("am", AM::component, "\
 The fertilizer you want to apply.");
     frame.declare ("equivalent_weight", "kg N/ha", Check::non_negative (),
-                Value::OptionalConst, 
+                Attribute::OptionalConst, 
                 "\
 When fertilizing with organic matter, you may let Daisy calculate the\n\
 amount of dry matter that corresponds to the specified amount of\n\
 nitrogen.  This requires that the fertilizer has specified the\n\
 'first_year_utilization' parameter, but not the 'weight' parameter.");
     frame.declare ("minimum_weight", "kg N/ha", Check::non_negative (),
-                Value::Const,
+                Attribute::Const,
                 "Minimum amount of nitrogen to fertilize with.");
     frame.set ("minimum_weight", 0.0);
-    frame.declare_submodule ("precision", Value::OptionalConst, "\
+    frame.declare_submodule ("precision", Attribute::OptionalConst, "\
 Let the amount of fertilizer depend on the inorganic nitrogen in the soil.\n\
 The amount of fertilizer will be the specified 'target', minus the amount\n\
 already present in the soil zone between 'from' and 'to'.",
                           &ActionFertilize::Precision::load_syntax);
-    frame.declare_boolean ("second_year_compensation", Value::Const, "\
+    frame.declare_boolean ("second_year_compensation", Attribute::Const, "\
 Compensate for the second year effect of previous fertilizations.\n\
 The second year effect is solely governed by the 'second_year_utilization'\n\
 organic fertilizer parameter.  The second year effect does not fade with\n\
@@ -376,11 +376,11 @@ Apply fertilizer to the soil surface.")
   { 
     frame.add_check (check_alist);
 
-    frame.declare ("from", "cm", Check::non_positive (), Value::Const, "\
+    frame.declare ("from", "cm", Check::non_positive (), Attribute::Const, "\
 Height where you want to start the incorporation (a negative number)\n\
 OBSOLETE:  Use 'fertilize_incorporate' instead.");
     frame.set ("from", 0.0);
-    frame.declare ("to", "cm", Check::non_positive (), Value::Const, "\
+    frame.declare ("to", "cm", Check::non_positive (), Attribute::Const, "\
 Height where you want to end the incorporation (a negative number)\n\
 OBSOLETE:  Use 'fertilize_incorporate' instead.");
     frame.set ("to", 0.0);
@@ -441,7 +441,7 @@ static struct ActionFertilizeIncorporateSyntax : public DeclareModel
   { 
     frame.add_check (check_alist);
     frame.declare_object ("volume", Volume::component, 
-                       Value::Const, Value::Singleton,
+                       Attribute::Const, Attribute::Singleton,
                        "Soil volume to incorporate fertilizer in.");
     frame.order ("am");
   }

@@ -213,14 +213,14 @@ Units::multiply (const symbol a, const symbol b)
 const Unit&
 Units::unknown () const
 { 
-  const unit_map::const_iterator i = units.find (Value::Unknown ()); 
+  const unit_map::const_iterator i = units.find (Attribute::Unknown ()); 
   daisy_assert (i != units.end () && (*i).second);
   return *(*i).second;
 }
 
 bool
 Units::is_known (const Unit& unit) const
-{ return unit.native_name () != Value::Unknown (); }
+{ return unit.native_name () != Attribute::Unknown (); }
 
 const Unit&
 Units::error () const
@@ -496,7 +496,7 @@ Units::add_unit (Metalib& metalib, const symbol name)
 void
 Units::load_syntax (Frame& frame)
 {
-  frame.declare_boolean ("allow_old_units", Value::Const, "\
+  frame.declare_boolean ("allow_old_units", Attribute::Const, "\
 OBSOLETE: Set this to true to enable the old system of build-in\n\
 unit conversation.");
   frame.set ("allow_old_units", true);

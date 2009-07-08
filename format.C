@@ -202,7 +202,7 @@ Format::frame_description (const Frame& frame)
       return;
     }
   const symbol d = frame.description ();
-  if (d != Value::None ())
+  if (d != Attribute::None ())
     {
       soft_linebreak ();
       text (d);

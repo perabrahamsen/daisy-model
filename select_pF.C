@@ -122,11 +122,11 @@ The original dimension is assumed to be in cm, no matter what is specified.")
     frame.set_check ("handle", current_only);
     frame.add_check (check_alist);
 
-    frame.declare ("max_h", "cm", Check::negative (), Value::Const, 
+    frame.declare ("max_h", "cm", Check::negative (), Attribute::Const, 
                 "Maximum water pressure in log.\n\
 Pressure above this value will be represented as this value.");
     frame.set ("max_h", -0.1);
-    frame.declare ("value", Value::Unknown (), Value::State, Value::Variable,
+    frame.declare ("value", Attribute::Unknown (), Attribute::State, Attribute::Variable,
 		"The current accumulated value.");
     std::vector<double> empty;
     frame.set ("value", empty);

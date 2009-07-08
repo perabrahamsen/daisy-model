@@ -95,7 +95,7 @@ PrinterFile::Implementation::is_complex (const Frame& frame,
     return false;
 
   // Sequences are complex...
-  if (frame.type_size (key) != Value::Singleton)
+  if (frame.type_size (key) != Attribute::Singleton)
     {
       // when they are not part of a total order...
       if (!frame.total_order ())
@@ -109,21 +109,21 @@ PrinterFile::Implementation::is_complex (const Frame& frame,
 
   switch (frame.lookup (key))
     {
-    case Value::Number:
-    case Value::Integer:
-    case Value::Boolean:
-    case Value::String:
+    case Attribute::Number:
+    case Attribute::Integer:
+    case Attribute::Boolean:
+    case Attribute::String:
       return false;
-    case Value::Model:
+    case Attribute::Model:
       return frame.order_index (key) >= 0
 	|| is_complex_object (frame.model (key), 
                               metalib.library (frame.component (key)));
-    case Value::Submodel:
-    case Value::PLF:
+    case Attribute::Submodel:
+    case Attribute::PLF:
       return true;
-    case Value::Scalar:
-    case Value::Reference:
-    case Value::Error:
+    case Attribute::Scalar:
+    case Attribute::Reference:
+    case Attribute::Error:
     default:
       daisy_notreached ();
     } 
@@ -134,7 +134,7 @@ PrinterFile::Implementation::is_complex_object (const FrameModel& value,
 						const Library& library) const
 {
   const symbol element = value.type_name ();
-  daisy_assert (element != Value::None ());
+  daisy_assert (element != Attribute::None ());
   if (!library.check (element))
     return false;
 
@@ -191,11 +191,11 @@ PrinterFile::Implementation::print_dimension (const Frame& frame,
                                               const symbol key,
                                               const symbol dim)
 {
-  if (dim == Value::Unknown ())
+  if (dim == Attribute::Unknown ())
     /* do nothing */;
-  else if (dim == Value::None () || dim == Value::Fraction ())
+  else if (dim == Attribute::None () || dim == Attribute::Fraction ())
     out << " []";
-  else if (dim == Value::User ())
+  else if (dim == Attribute::User ())
     out << " [" << frame.name (key) << "]";
   else
     out << " [" << dim << "]";
@@ -208,7 +208,7 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
 					  int indent, bool need_wrapper)
 { 
   daisy_assert (frame.check (key));
-  Value::type type = frame.lookup (key);
+  Attribute::type type = frame.lookup (key);
 
   const bool do_wrap 
     = (need_wrapper && is_complex (frame, super, key));
@@ -218,15 +218,15 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
       indent++;
     }
 
-  if (frame.type_size (key) == Value::Singleton)
+  if (frame.type_size (key) == Attribute::Singleton)
     {
       switch (type)
 	{
-	case Value::Number:
+	case Attribute::Number:
 	  out << frame.number (key);
           print_dimension (frame, key, frame.dimension (key));
 	  break;
-	case Value::Submodel:
+	case Attribute::Submodel:
 	  if (super && super->check (key))
 	    print_alist (frame.submodel (key), &super->submodel (key), 
                          indent, false); 
@@ -234,19 +234,19 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
 	    print_alist (frame.submodel (key), &frame.default_frame (key),
                          indent, false); 
 	  break;
-	case Value::PLF:
+	case Attribute::PLF:
 	  print_plf (frame.plf (key), indent);
 	  break;
-	case Value::Boolean:
+	case Attribute::Boolean:
 	  print_bool (frame.flag (key));
 	  break;
-	case Value::String:
+	case Attribute::String:
 	  print_symbol (frame.name (key));
 	  break;
-	case Value::Integer:
+	case Attribute::Integer:
 	  out << frame.integer (key);
 	  break;
-	case Value::Model:
+	case Attribute::Model:
           {
             const symbol component = frame.component (key);
             const Library& library = metalib.library (component);
@@ -258,11 +258,11 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
                             NULL, indent);
           }
 	  break;
-	case Value::Scalar:
-        case Value::Reference:
-	case Value::Error:
+	case Attribute::Scalar:
+        case Attribute::Reference:
+	case Attribute::Error:
 	default:
-	  out << "<Unknown: " << Value::type_name (frame.lookup (key))
+	  out << "<Unknown: " << Attribute::type_name (frame.lookup (key))
 	      << ">";
 	}
     }
@@ -270,7 +270,7 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
     {
       switch (type)
 	{
-	case Value::Number:
+	case Attribute::Number:
 	  {
 	    const std::vector<double>& value = frame.number_sequence (key);
 	    
@@ -283,7 +283,7 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
             print_dimension (frame, key, frame.dimension (key));
 	  }
 	  break;
-	case Value::Submodel:
+	case Attribute::Submodel:
 	  {
 	    const FrameSubmodel& other = frame.default_frame (key);
 	    const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& value 
@@ -299,7 +299,7 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
 	      }
 	  }
 	  break;
-	case Value::PLF:
+	case Attribute::PLF:
 	  {
 	    const std::vector<boost::shared_ptr<const PLF>/**/>& value 
               = frame.plf_sequence (key);
@@ -314,7 +314,7 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
 	      }
 	  }
 	  break;
-	case Value::Boolean:
+	case Attribute::Boolean:
 	  {
 	    const std::vector<bool>& value = frame.flag_sequence (key);
 	    
@@ -326,7 +326,7 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
 	      }
 	  }
 	  break;
-	case Value::String:
+	case Attribute::String:
 	  {
 	    const std::vector<symbol>& value 
 	      = frame.name_sequence (key);
@@ -339,7 +339,7 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
 	      }
 	  }
 	  break;
-	case Value::Integer:
+	case Attribute::Integer:
 	  {
 	    const std::vector<int>& value = frame.integer_sequence (key);
 	    
@@ -351,7 +351,7 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
 	      }
 	  }
 	  break;
-	case Value::Model:
+	case Attribute::Model:
 	  {
             const symbol component = frame.component (key);
             const Library& library = metalib.library (component);
@@ -382,11 +382,11 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
 	      }
 	  }
 	  break;
-	case Value::Scalar:
-        case Value::Reference:
-	case Value::Error:
+	case Attribute::Scalar:
+        case Attribute::Reference:
+	case Attribute::Error:
 	default:
-	  out << "<" << Value::type_name (frame.lookup (key)) 
+	  out << "<" << Attribute::type_name (frame.lookup (key)) 
 	      << " sequence>";
 	}
     }
@@ -464,8 +464,8 @@ PrinterFile::Implementation::print_alist (const Frame& frame,
 	  // ordered complex values.  However, the parser doesn't
 	  // expect these for alist sequences, so we don't print them
 	  // either. 
-	  if (frame.lookup (key) == Value::Submodel
-	      && frame.type_size (key) != Value::Singleton)
+	  if (frame.lookup (key) == Attribute::Submodel
+	      && frame.type_size (key) != Attribute::Singleton)
 	    print_entry (frame, super, key, indent, false);
 	  else
 #endif
@@ -505,35 +505,35 @@ PrinterFile::Implementation::print_alist (const Frame& frame,
           out << "(declare " << key << " ";
 
           const int size = frame.type_size (key);
-          if (size == Value::Singleton)
+          if (size == Attribute::Singleton)
             /* do nothing */;
-          else if (size == Value::Variable)
+          else if (size == Attribute::Variable)
             out << "[] ";
           else
             out << "[" << size << "] ";
           
-          const Value::type type = frame.lookup (key);
+          const Attribute::type type = frame.lookup (key);
           switch (type)
             {
-            case Value::Boolean:
-            case Value::String:
-            case Value::Integer:
-              out << Value::type_name (type);
+            case Attribute::Boolean:
+            case Attribute::String:
+            case Attribute::Integer:
+              out << Attribute::type_name (type);
               break;
-            case Value::Number:
-              out << Value::type_name (type) << " ";
+            case Attribute::Number:
+              out << Attribute::type_name (type) << " ";
               print_dimension (frame, key, frame.dimension (key));
               break;
-            case Value::Submodel:
+            case Attribute::Submodel:
               out << "fixed " << frame.submodel_name (key);
               break;
-            case Value::Model:
+            case Attribute::Model:
               out << frame.component (key);
               break;
-            case Value::PLF: 
-            case Value::Scalar:
-            case Value::Reference:
-            case Value::Error:
+            case Attribute::PLF: 
+            case Attribute::Scalar:
+            case Attribute::Reference:
+            case Attribute::Error:
             default:
               out << "<Error>";
             }
@@ -629,7 +629,7 @@ PrinterFile::Implementation
   print_symbol (name);
   out << " ";
   const symbol super = frame->base_name ();
-  if (super != Value::None ())
+  if (super != Attribute::None ())
     {
       print_symbol (super);
       if (!library.check (super))

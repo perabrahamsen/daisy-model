@@ -825,42 +825,42 @@ static struct CropStandardSyntax : public DeclareModel
     frame.declare_object ("Seed", Seed::component, 
                        "Initial crop growth.");
     frame.set ("Seed", "LAI");
-    frame.declare_submodule ("Root", Value::State, 
+    frame.declare_submodule ("Root", Attribute::State, 
                           "Root system.", RootSystem::load_syntax);
-    frame.declare_submodule ("Canopy", Value::State,
+    frame.declare_submodule ("Canopy", Attribute::State,
                           "Canopy.", CanopyStandard::load_syntax);
-    frame.declare_submodule ("Harvest", Value::State,
+    frame.declare_submodule ("Harvest", Attribute::State,
                           "Harvest parameters.", Harvesting::load_syntax);
-    frame.declare_submodule ("Prod", Value::State,
+    frame.declare_submodule ("Prod", Attribute::State,
                           "Production.", Production::load_syntax);
-    frame.declare_submodule ("last_time", Value::OptionalState,
+    frame.declare_submodule ("last_time", Attribute::OptionalState,
                           "The time of the previous timestep.",
                           Time::load_syntax);
     frame.declare_object ("Devel", Phenology::component, 
                        "Development and phenology.");
-    frame.declare_submodule ("Partit", Value::Const,
+    frame.declare_submodule ("Partit", Attribute::Const,
                           "Assimilate partitioning.", Partition::load_syntax);
     frame.declare_object ("Vernal", Vernalization::component, 
-                      Value::State, Value::Singleton, "\
+                      Attribute::State, Attribute::Singleton, "\
 Vernalization.");
     frame.set ("Vernal", "none");
     frame.declare_object ("LeafPhot", Photo::component,
-                       Value::Const, Value::Singleton,
+                       Attribute::Const, Attribute::Singleton,
                        "Leaf photosynthesis.");
     frame.set ("LeafPhot", "GL");
-    frame.declare_submodule ("CrpN", Value::State,
+    frame.declare_submodule ("CrpN", Attribute::State,
                           "Nitrogen parameters.", CrpN::load_syntax);
 
     frame.declare_object ("water_stress_effect", WSE::component, 
-                       Value::OptionalConst, Value::Singleton,
+                       Attribute::OptionalConst, Attribute::Singleton,
                        "Effect of water stress on production.\n\
 By default, this will be 'none' iff the selected photosynthesis model\n\
 does handle water stress implicitly, and 'full' otherwise.");
-    frame.declare_boolean ("enable_N_stress", Value::OptionalConst,
+    frame.declare_boolean ("enable_N_stress", Attribute::OptionalConst,
                 "Set this true to let nitrogen stress limit production.\n\
 By default, it will be true iff the selected photosynthesis model does\n \
 handle nitrogen stress implicitly.");
-    frame.declare_fraction ("min_light_fraction", Value::Const, "\n\
+    frame.declare_fraction ("min_light_fraction", Attribute::Const, "\n\
 When multiple crops are competing for light, this parameter specifies\n\
 a minumum amount of the light this crop will receive.  The idea is\n\
 that the field has patches where one crop is dominating, as specified\n\

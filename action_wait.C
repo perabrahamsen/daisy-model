@@ -191,11 +191,11 @@ Waits the specified period.")
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);	
-    frame.declare_integer ("days", Value::Const, 
+    frame.declare_integer ("days", Attribute::Const, 
                 "Wait this number of days.");
-    frame.declare_integer ("hours", Value::Const, 
+    frame.declare_integer ("hours", Attribute::Const, 
                 "Wait this number of hours.");
-    frame.declare_submodule ("end_time", Value::OptionalState,
+    frame.declare_submodule ("end_time", Attribute::OptionalState,
                           "Wait until this date.\
 Setting this overrides the 'days' and 'hours' parameters.", Time::load_syntax);
   }
@@ -266,11 +266,11 @@ Wait until a specific month and day in the year.")
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);	
-    frame.declare_integer ("month", Value::Const, 
+    frame.declare_integer ("month", Attribute::Const, 
                 "Wait until this month.");
-    frame.declare_integer ("day", Value::Const, 
+    frame.declare_integer ("day", Attribute::Const, 
 		  "Wait until this day in the month.");
-    frame.declare_integer ("hour", Value::Const, 
+    frame.declare_integer ("hour", Attribute::Const, 
                 "Wait until this hour.");
     frame.set ("hour", 8);
     frame.order ("month", "day");

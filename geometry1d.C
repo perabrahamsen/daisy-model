@@ -183,7 +183,7 @@ Geometry1D::load_syntax (Frame& frame)
 { 
   frame.add_check (check_alist);
   frame.declare ("zplus", "cm", Check::negative (), 
-                 Value::OptionalConst, Value::SoilCells,
+                 Attribute::OptionalConst, Attribute::SoilCells,
                  "Depth of each numeric layer (a negative number).\n\
 The end points are listed descending from the surface to the bottom.");
   static VCheck::All zplus_check (VCheck::decreasing (), 

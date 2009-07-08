@@ -173,7 +173,7 @@ static struct IntegerMaxSyntax : public DeclareModel
   {
 
     frame.declare_object ("operands", Integer::component,
-                       Value::Const, Value::Variable,
+                       Attribute::Const, Attribute::Variable,
                        "The operands for this function.");
     frame.set_check ("operands", VCheck::min_size_1 ());
     frame.order ("operands");
@@ -214,7 +214,7 @@ static struct IntegerMinSyntax : public DeclareModel
   {
 
     frame.declare_object ("operands", Integer::component,
-                       Value::Const, Value::Variable,
+                       Attribute::Const, Attribute::Variable,
                        "The operands for this function.");
     frame.set_check ("operands", VCheck::min_size_1 ());
     frame.order ("operands");
@@ -250,7 +250,7 @@ static struct IntegerProductSyntax : public DeclareModel
   {
 
     frame.declare_object ("operands", Integer::component,
-                       Value::Const, Value::Variable,
+                       Attribute::Const, Attribute::Variable,
                        "The operands for this function.");
     frame.order ("operands");
   }
@@ -285,7 +285,7 @@ static struct IntegerSumSyntax : public DeclareModel
   {
 
     frame.declare_object ("operands", Integer::component,
-                       Value::Const, Value::Variable,
+                       Attribute::Const, Attribute::Variable,
                        "The operands for this function.");
 #ifdef CHECK_OPERANDS_DIM
     frame.set_check ("operands", IntegerOperands::unique);
@@ -328,7 +328,7 @@ subtracts all but the first from the first.")
   {
 
     frame.declare_object ("operands", Integer::component,
-                       Value::Const, Value::Variable,
+                       Attribute::Const, Attribute::Variable,
                        "The operands for this function.");
     frame.order ("operands");
   }
@@ -403,7 +403,7 @@ static struct IntegerModuloSyntax : public DeclareModel
   {
 
       frame.declare_object ("operands", Integer::component,
-                         Value::Const, 2,
+                         Attribute::Const, 2,
                          "The operands for this function.");
       frame.order ("operands");
   }
@@ -421,7 +421,7 @@ static struct IntegerDivideSyntax : public DeclareModel
   {
 
       frame.declare_object ("operands", Integer::component,
-                         Value::Const, 2,
+                         Attribute::Const, 2,
                          "The operands for this function.");
       frame.order ("operands");
   }

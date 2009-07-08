@@ -130,10 +130,10 @@ static struct EquilibriumLangmuirSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
     frame.declare_object ("K", Number::component, 
-                       Value::Const, Value::Singleton,
+                       Attribute::Const, Attribute::Singleton,
                        "Half saturation constant [g/cm^3].");
     frame.declare_object ("my_max", Number::component, 
-                       Value::Const, Value::Singleton,
+                       Attribute::Const, Attribute::Singleton,
                        "Max equilibrium capacity [g/cm^3].");
   }
 } EquilibriumLangmuir_syntax;

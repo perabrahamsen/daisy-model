@@ -22,7 +22,7 @@
 #ifndef SCOPE_H
 #define SCOPE_H
 
-#include "value.h"
+#include "attribute.h"
 #include "symbol.h"
 #include <set>
 #include <boost/noncopyable.hpp>
@@ -46,7 +46,7 @@ public:
   // Type.
 public:
   virtual void entries (std::set<symbol>&) const = 0;
-  virtual Value::type lookup (symbol) const = 0;
+  virtual Attribute::type lookup (symbol) const = 0;
   virtual symbol dimension (symbol) const = 0;
   virtual symbol description (symbol) const = 0;
   virtual int type_size (symbol tag) const;

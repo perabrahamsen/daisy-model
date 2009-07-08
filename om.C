@@ -384,33 +384,33 @@ OM::load_syntax (Frame& frame, const std::string& frac_desc)
   Model::load_model (frame);
   frame.add_check (check_alist);
   frame.declare ("C", "g C/cm^3", Check::non_negative (),
-	      Value::OptionalState, Value::SoilCells,
+	      Attribute::OptionalState, Attribute::SoilCells,
 	      "Carbon in each soil interval.");
   frame.declare ("C_per_N", "(g C/cm^3)/(g N/cm^3)", Check::none (), 
-	      Value::OptionalState, Value::SoilCells, 
+	      Attribute::OptionalState, Attribute::SoilCells, 
 	      "The carbon/nitrogen ratio.");
   frame.declare ("N", "g N/cm^3", Check::non_negative (),
-	      Value::OptionalState, Value::SoilCells,
+	      Attribute::OptionalState, Attribute::SoilCells,
 	      "Nitrogen in each soil interval.");
   frame.declare ("turnover_rate", "h^-1", Check::fraction (), 
-	      Value::OptionalConst,
+	      Attribute::OptionalConst,
 	      "Fraction converted to other pools each hour.\n\
 You must specify either this or 'turnover_halftime'.");
   frame.declare ("turnover_halftime", "h", Check::positive (), 
-	      Value::OptionalConst,
+	      Attribute::OptionalConst,
 	      "Time until half had been converted to other pools.\n\
 You must specify either this or 'turnover_rate'.");
-  frame.declare_fraction ("efficiency", Value::Const, Value::Variable, "\
+  frame.declare_fraction ("efficiency", Attribute::Const, Attribute::Variable, "\
 The efficiency this pool can be digested by each of the SMB pools.");
-  frame.declare_fraction ("fractions", Value::Const, Value::Variable, "\
+  frame.declare_fraction ("fractions", Attribute::Const, Attribute::Variable, "\
 How this pool is divided into other pools.\n" + frac_desc);
   frame.set_check ("fractions", VCheck::sum_equal_1 ());
-  frame.declare ("initial_C_per_N", "g C/g N", Value::OptionalState, "\
+  frame.declare ("initial_C_per_N", "g C/g N", Attribute::OptionalState, "\
 The initial C/N ratio when this pool is created.\n\
 Negative numbers mean unspecified.");
-  frame.declare ("heat_factor", "dg C", Value::None (), Value::OptionalConst,
+  frame.declare ("heat_factor", "dg C", Attribute::None (), Attribute::OptionalConst,
 	      "Heat factor.  If empty, use default from 'OrganicMatter'.");
-  frame.declare ("water_factor", "cm", Value::None (), Value::OptionalConst, "\
+  frame.declare ("water_factor", "cm", Attribute::None (), Attribute::OptionalConst, "\
 Water potential factor.  If empty, use default from 'OrganicMatter'.");
 }
 

@@ -212,7 +212,7 @@ Intrinsics::submodel_name (const load_syntax_t load_syntax)
   const submodel_load_name_t::const_iterator i 
     = submodel_load_name.find (load_syntax);
   if (i == submodel_load_name.end ())
-    return Value::None ();
+    return Attribute::None ();
   return (*i).second;
 }
   

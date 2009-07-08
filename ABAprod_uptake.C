@@ -144,7 +144,7 @@ water pressure in that region.")
   void load_frame (Frame& frame) const
   {
     frame.declare_object ("expr", Number::component, 
-                      Value::Const, Value::Singleton, "\
+                      Attribute::Const, Attribute::Singleton, "\
 Expression to evaluate to ABA concentration in water uptake [g/cm^3].\n\
 The symbol 'h' will be bound to the water pressure [cm].");
   }

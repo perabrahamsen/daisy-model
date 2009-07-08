@@ -280,17 +280,17 @@ Colloid generation using rainfall momentum.")
   {
     frame.set_strings ("cite", "styczen88");
 
-    frame.declare ("Ae", "h^2/g/cm^2", Check::positive (), Value::Const, 
+    frame.declare ("Ae", "h^2/g/cm^2", Check::positive (), Attribute::Const, 
                "Soil resistance factor.");
-    frame.declare ("MA", Value::Fraction (), Value::Const, 
+    frame.declare ("MA", Attribute::Fraction (), Attribute::Const, 
                "Protective cover (mulch factor).");
-    frame.declare ("droplet_diameter", "mm", Check::positive (), Value::Const, 
+    frame.declare ("droplet_diameter", "mm", Check::positive (), Attribute::Const, 
                "Size of droplets from vegetation.");
-    frame.declare ("DH", "kg^2/m/s^2", Value::LogOnly, 
+    frame.declare ("DH", "kg^2/m/s^2", Attribute::LogOnly, 
                "Squared vegetation droplet momentum.");
-    frame.declare ("CM", Value::Fraction (), Value::LogOnly, 
+    frame.declare ("CM", Attribute::Fraction (), Attribute::LogOnly, 
                "Vegetation factor.");
-    frame.declare ("MR", "(N s)^2/m^2/s", Value::LogOnly, 
+    frame.declare ("MR", "(N s)^2/m^2/s", Attribute::LogOnly, 
                "Squared direct rainfall momentum.");
   }
 } ReactionStyczen88syntax;

@@ -43,7 +43,7 @@ Number::title () const
 
 bool 
 Number::known (symbol dim)
-{ return dim != Value::Unknown (); }
+{ return dim != Attribute::Unknown (); }
 
 bool 
 Number::tick_value (const Units& units,

@@ -64,7 +64,7 @@ static struct ActionRidgeSyntax : DeclareModel
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.declare_submodule ("ridge", Value::Const,
+    frame.declare_submodule ("ridge", Attribute::Const,
 			  "Ridge parameters",
 			  Ridge::load_syntax);
     frame.order ("ridge");

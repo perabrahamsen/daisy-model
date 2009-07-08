@@ -92,7 +92,7 @@ All groundwater models can log height.")
   { }
   void load_frame (Frame& frame) const
   {
-   frame.declare ("height", "cm", Value::LogOnly,
+   frame.declare ("height", "cm", Attribute::LogOnly,
               "Groundwater level.  Positive numbers indicate free drainage.");
   }
 } GroundwaterBase_syntax;

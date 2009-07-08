@@ -295,7 +295,7 @@ or the end of the list is reached.")
   void load_frame (Frame& frame) const
   {
     frame.declare_object ("operands", Condition::component, 
-                       Value::State, Value::Variable, "Conditions to test.");
+                       Attribute::State, Attribute::Variable, "Conditions to test.");
     frame.order ("operands");
   }
 } ConditionOr_syntax;
@@ -313,7 +313,7 @@ or the end of the list is reached.")
   void load_frame (Frame& frame) const
   {
     frame.declare_object ("operands", Condition::component, 
-                       Value::State, Value::Variable, "Conditions to test.");
+                       Attribute::State, Attribute::Variable, "Conditions to test.");
     frame.order ("operands");
   }
 } ConditionAnd_syntax;

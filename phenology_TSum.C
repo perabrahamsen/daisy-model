@@ -125,21 +125,21 @@ Cut stress and leaf respiration does not affect this phenology model.")
   void load_frame (Frame& frame) const
   {
     // Parameters.
-    frame.declare ("EmrTSum", "dg C d", Value::Const,
+    frame.declare ("EmrTSum", "dg C d", Attribute::Const,
 		"Soil temperature sum at emergence.");
-    frame.declare ("EmrThrs", "dg C", Value::Const,
+    frame.declare ("EmrThrs", "dg C", Attribute::Const,
 		"Minimum soil temperature for emergence.\n\
 Temperature below this will not count in the sum.");
     frame.set ("EmrThrs", 0.0);
-    frame.declare ("VegTSum", "dg C d", Value::Const,
+    frame.declare ("VegTSum", "dg C d", Attribute::Const,
 		"Air temperature sum for vegetative fase.");
-    frame.declare ("VegThrs", "dg C", Value::Const,
+    frame.declare ("VegThrs", "dg C", Attribute::Const,
 		"Minimum air temperature for development in vegetative fase.\n\
 Temperature below this will not count in the sum.");
     frame.set ("VegThrs", 0.0);
-    frame.declare ("RepTSum", "dg C d", Value::Const,
+    frame.declare ("RepTSum", "dg C d", Attribute::Const,
 		"Air temperature sum for vegetative fase.");
-    frame.declare ("RepThrs", "dg C", Value::Const,
+    frame.declare ("RepThrs", "dg C", Attribute::Const,
 		"Minimum air temperature for development in vegetative fase.\n\
 Temperature below this will not count in the sum.");
     frame.set ("RepThrs", 0.0);

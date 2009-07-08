@@ -31,9 +31,9 @@
 void 
 GnuplotBase::Size::load_syntax (Frame& frame)
 {
-  frame.declare ("x", Value::None (), Value::Const, "\
+  frame.declare ("x", Attribute::None (), Attribute::Const, "\
 Relative horizontal size of plot.");
-  frame.declare ("y", Value::None (), Value::Const, "\
+  frame.declare ("y", Attribute::None (), Attribute::Const, "\
 Relative vertical size of plot.");
   frame.order ("x", "y");
 }
@@ -124,7 +124,7 @@ static struct GnuplotSyntax : public DeclareBase
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.declare_string ("where", Value::OptionalConst, "\
+    frame.declare_string ("where", Attribute::OptionalConst, "\
 File to store results in.  By default, show them on a window.\n\
 The format is determined from the file name extension:\n\
   *.tex: LaTeX code with PostScript specials.\n\
@@ -139,8 +139,8 @@ the screen instead of being stored in a file.");
                    Treelog& msg) const
       {
         daisy_assert (key == "where");
-        daisy_assert (frame.lookup (key) == Value::String);
-        daisy_assert (frame.type_size (key) == Value::Singleton);
+        daisy_assert (frame.lookup (key) == Attribute::String);
+        daisy_assert (frame.type_size (key) == Attribute::Singleton);
         const symbol file = frame.name (key);
         if (file == "screen")
           return true;
@@ -152,21 +152,21 @@ the screen instead of being stored in a file.");
     } check_where;
     frame.set_check ("where", check_where);
     frame.set ("where", "screen");
-    frame.declare_string ("device", Value::OptionalConst, "\
+    frame.declare_string ("device", Attribute::OptionalConst, "\
 Output device.  By default, this is derived from the file extenstion.");
-    frame.declare_string ("extra", Value::Const, 
-                Value::Variable, "List of extra gnuplot commands.\n\
+    frame.declare_string ("extra", Attribute::Const, 
+                Attribute::Variable, "List of extra gnuplot commands.\n\
 The commands will be inserted right before the plot command.\n\
 Note that if you have multiple plots in the same command file,\n\
 The extra commands may affect the subsequence plots.");
     frame.set_empty ("extra");
-    frame.declare_string ("title", Value::OptionalConst, "\
+    frame.declare_string ("title", Attribute::OptionalConst, "\
 Title of the plot, if any.  Set it to an empty string to disable.");
-    frame.declare_submodule ("size", Value::OptionalConst, "\
+    frame.declare_submodule ("size", Attribute::OptionalConst, "\
 Relative to size of plot.\n\
 The standard size is 1.0, specify other numbers to scale accordingly.", 
                           GnuplotBase::Size::load_syntax);
-    frame.declare_string ("legend", Value::OptionalConst, "\
+    frame.declare_string ("legend", Attribute::OptionalConst, "\
 Placement of legend.  This can be one of the four corners, named by\n\
 compas locations (nw, ne, sw, se) to get the legend inside the graph\n\
 in that corner, 'below' to get the legend below the graph, 'outside'\n\
@@ -184,8 +184,8 @@ cross the legend.");
                    Treelog& msg) const
       {
         daisy_assert (key == "legend");
-        daisy_assert (frame.lookup (key) == Value::String);
-        daisy_assert (frame.type_size (key) == Value::Singleton);
+        daisy_assert (frame.lookup (key) == Attribute::String);
+        daisy_assert (frame.type_size (key) == Attribute::Singleton);
         const symbol legend = frame.name (key);
         if (legend == "auto")
           return true;

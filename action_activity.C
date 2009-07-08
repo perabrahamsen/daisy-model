@@ -123,7 +123,7 @@ at each time step.")
   {
     frame.add_check (check_alist);
     frame.declare_object ("actions", Action::component, 
-                       Value::State, Value::Variable,
+                       Attribute::State, Attribute::Variable,
                        "Sequence of actions to perform.");
     frame.set_empty ("actions");
     frame.order ("actions");

@@ -216,76 +216,76 @@ CanopyStandard::load_syntax (Frame& frame)
   CanopySimple::load_syntax (frame);
 
   // Parameters.
-  frame.declare ("SpLAI", "(m^2/m^2)/(g DM/m^2)", Value::Const,
+  frame.declare ("SpLAI", "(m^2/m^2)/(g DM/m^2)", Attribute::Const,
 	      " Specific leaf weight.");
-  frame.declare ("LeafAIMod", "DS", Value::None (), Value::Const,
+  frame.declare ("LeafAIMod", "DS", Attribute::None (), Attribute::Const,
 	      "Specific leaf weight modifier.\n\
 Used only after the intital phase.");
   PLF AIDef;
   AIDef.add (0.00, 1.00);
   AIDef.add (2.00, 1.00);
   frame.set ("LeafAIMod", AIDef);
-  frame.declare ("SpSOrgAI", "(m^2/m^2)/(g DM/m^2)", Value::Const,
+  frame.declare ("SpSOrgAI", "(m^2/m^2)/(g DM/m^2)", Attribute::Const,
 	      "Specific storage organ weight.\n\
 Used only after the intital phase.");
   frame.set ("SpSOrgAI", 0.0);
-  frame.declare ("SOrgAIMod", "DS", Value::None (), Value::Const,
+  frame.declare ("SOrgAIMod", "DS", Attribute::None (), Attribute::Const,
 	      "Specific storage organ weight modifier.\n\
 Used only after the intital phase.");
   frame.set ("SOrgAIMod", AIDef);
-  frame.declare ("SOrgPhotEff", Value::None (), Value::Const,
+  frame.declare ("SOrgPhotEff", Attribute::None (), Attribute::Const,
 	      "Relative photosynthetic efficiency of storage organ.\n\
 Used only after the intital phase.");
   frame.set ("SOrgPhotEff", 1.0);
-  frame.declare ("SpStemAI", "(m^2/m^2)/(g DM/m^2)", Value::Const,
+  frame.declare ("SpStemAI", "(m^2/m^2)/(g DM/m^2)", Attribute::Const,
 	      "Specific stem weight.\n\
 Used only after the intital phase.");
   frame.set ("SpStemAI", 0.0);
-  frame.declare ("StemAIMod", "DS", Value::None (), Value::Const,
+  frame.declare ("StemAIMod", "DS", Attribute::None (), Attribute::Const,
 	      "Specific stem weight modifier.\n\
 Used only after the intital phase.");
   frame.set ("StemAIMod", AIDef);
-  frame.declare ("StemPhotEff", Value::None (), Value::Const,
+  frame.declare ("StemPhotEff", Attribute::None (), Attribute::Const,
 	      "Relative photosynthetic efficiency of stem.\n\
 Used only after the intital phase.");
   frame.set ("StemPhotEff", 1.0);
-  frame.declare ("HvsDS", Value::None (), "cm", Value::Const,
+  frame.declare ("HvsDS", Attribute::None (), "cm", Attribute::Const,
 	      "Crop height as function of DS.");
   PLF HvsStem;
   HvsStem.add (0.00 , 0.10);
   HvsStem.add (200.0, 1.00);
-  frame.declare ("HvsWStem", "g DM/m^2", Value::Fraction (), Value::Const,
+  frame.declare ("HvsWStem", "g DM/m^2", Attribute::Fraction (), Attribute::Const,
 	      "Relative crop height as function of stem weight.\n\
 By default, it needs 200 g DM/m^2 to reach full height.");
   frame.set ("HvsWStem", HvsStem);
-  frame.declare ("LAIDist0", Value::None (), Value::Const, 3,
+  frame.declare ("LAIDist0", Attribute::None (), Attribute::Const, 3,
 	      "Relative CAI distribution at DS=0.");
-  frame.declare ("LAIDist1", Value::None (), Value::Const, 3,
+  frame.declare ("LAIDist1", Attribute::None (), Attribute::Const, 3,
 	      "Relative CAI distribution at DS=1.");
-  frame.declare ("PARrel", Value::None (), Value::Const,
+  frame.declare ("PARrel", Attribute::None (), Attribute::Const,
 	      "Relative PAR below the canopy.\n\
 If the relative PAR get below this, the bottom leaves will start dying.");
   frame.set ("PARrel", 0.05);
 
   // Variables.
-  frame.declare ("Offset", "cm", Value::State, "Extra height after harvest.");
+  frame.declare ("Offset", "cm", Attribute::State, "Extra height after harvest.");
   frame.set ("Offset", 0.0);
-  frame.declare ("LeafAI", "m^2/m^2", Value::State, "Leaf Area Index.");
+  frame.declare ("LeafAI", "m^2/m^2", Attribute::State, "Leaf Area Index.");
   frame.set ("LeafAI", 0.0);
-  frame.declare ("StemAI", "m^2/m^2", Value::State, "Stem Area Index.");
+  frame.declare ("StemAI", "m^2/m^2", Attribute::State, "Stem Area Index.");
   frame.set ("StemAI", 0.0);
-  frame.declare ("SOrgAI", "m^2/m^2", Value::State, "Storage Organ Area Index.");
+  frame.declare ("SOrgAI", "m^2/m^2", Attribute::State, "Storage Organ Area Index.");
   frame.set ("SOrgAI", 0.0);
-  frame.declare ("LADm", "cm^2/cm^3", Value::State,
+  frame.declare ("LADm", "cm^2/cm^3", Attribute::State,
 	      "Maximal Leaf Area Density.");
   frame.set ("LADm", -9999.99);
 
   // Log Variables.
-  frame.declare ("ForcedCAI", "m^2/m^2", Value::LogOnly,
+  frame.declare ("ForcedCAI", "m^2/m^2", Attribute::LogOnly,
 	      "CAI forced upon us by vegetation module.");
-  frame.declare ("SimCAI", "m^2/m^2", Value::LogOnly,
+  frame.declare ("SimCAI", "m^2/m^2", Attribute::LogOnly,
 	      "CAI simulated by crop model.");
-  frame.declare ("CAImRat", Value::None (), Value::LogOnly,
+  frame.declare ("CAImRat", Attribute::None (), Attribute::LogOnly,
 	      "(CAIm - CAI) / CAIm.");
 }
 

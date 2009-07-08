@@ -19,16 +19,16 @@ TEST (ScopeExchange, All)
   std::set<symbol> entries;
   scope.entries (entries);
   EXPECT_EQ (entries.size (), 2);
-  EXPECT_EQ (scope.lookup (y_symbol), Value::Number);
+  EXPECT_EQ (scope.lookup (y_symbol), Attribute::Number);
   EXPECT_TRUE (scope.check (y_symbol));
   EXPECT_EQ (scope.number (y_symbol), 42.0);
-  EXPECT_EQ (scope.lookup (x_symbol), Value::Number);
+  EXPECT_EQ (scope.lookup (x_symbol), Attribute::Number);
   EXPECT_FALSE (scope.check (x_symbol));
   scope.set (x_symbol, 43.0);
   EXPECT_TRUE (scope.check (x_symbol));
   EXPECT_EQ (scope.number (x_symbol), 43.0);
   EXPECT_EQ (scope.dimension (x_symbol), x_dim);
   EXPECT_EQ (scope.description (x_symbol), x_desc);
-  EXPECT_EQ (scope.lookup ("no such number"), Value::Error);
+  EXPECT_EQ (scope.lookup ("no such number"), Attribute::Error);
   EXPECT_FALSE (scope.check ("no such number"));
 }

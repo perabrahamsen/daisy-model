@@ -143,18 +143,18 @@ Colloid generation using kinetic energy, emulating EUROSEM.")
   {
     frame.set_strings ("cite", "morgan98");
 
-    frame.declare ("kd", "g/J", Check::non_negative (), Value::Const,
+    frame.declare ("kd", "g/J", Check::non_negative (), Attribute::Const,
                 "Detachment rate coefficient.\n\
 The EUROSEM user manual list values between 0.8 and 6.0 [g/J] for various\n\
 soils in Table A9.1.");
     frame.declare_object ("rainergy", Rainergy::component,
-                      Value::Const, Value::Singleton,
+                      Attribute::Const, Attribute::Singleton,
                       "Model for calculating energy in rain.");
     frame.set ("rainergy", "EUROSEM");
 
-    frame.declare ("KE", "J/cm^2/h", Value::LogOnly, 
+    frame.declare ("KE", "J/cm^2/h", Attribute::LogOnly, 
                "Kinertic energy avalable for colloid generation.");
-    frame.declare ("E", "J/cm^2/mm", Value::LogOnly, 
+    frame.declare ("E", "J/cm^2/mm", Attribute::LogOnly, 
                "Kinetic energy in rain.");
   }
 } ReactionMorgan98syntax;

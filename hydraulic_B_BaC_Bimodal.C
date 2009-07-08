@@ -143,15 +143,15 @@ Bimodal hydraulic conductivity curve.")
   void load_frame (Frame& frame) const
   {
     Hydraulic::load_Theta_res (frame);
-    frame.declare ("K_sat", "cm/h", Check::non_negative (), Value::OptionalConst,
+    frame.declare ("K_sat", "cm/h", Check::non_negative (), Attribute::OptionalConst,
                 "Water conductivity of saturated soil.");
-    frame.declare ("lambda", Value::None (), Value::Const,
+    frame.declare ("lambda", Attribute::None (), Attribute::Const,
                 "Pore size index.");
-    frame.declare ("h_b", "cm", Value::Const,
+    frame.declare ("h_b", "cm", Attribute::Const,
                 "Bubbling pressure.");
-    frame.declare ("Theta_b", Value::None (), Value::Const,
+    frame.declare ("Theta_b", Attribute::None (), Attribute::Const,
                 "Water content at 'h_b'.");
-    frame.declare ("K_b", "cm/h", Value::Const,
+    frame.declare ("K_b", "cm/h", Attribute::Const,
                 "Water conductivity at 'h_b'.");
 
   }

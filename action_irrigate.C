@@ -171,29 +171,29 @@ Shared parameter for irrigate actions.")
   }
 
   static void load_ppm (Frame& frame)
-  { IM::add_syntax (frame, Value::Const, Units::ppm ()); }
+  { IM::add_syntax (frame, Attribute::Const, Units::ppm ()); }
 
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);	
-    frame.declare_integer ("days", Value::Const, 
+    frame.declare_integer ("days", Attribute::Const, 
                 "Irrigate this number of days.");
     frame.set ("days", 0);
-    frame.declare_integer ("hours", Value::OptionalConst, 
+    frame.declare_integer ("hours", Attribute::OptionalConst, 
                 "Irrigate this number of hours.\n\
 By default, irrigate 1 hour if days is 0, and 0 hours plus the specified\n\
 number of days else.");
-    frame.declare ("remaining_time", "h", Value::OptionalState,
+    frame.declare ("remaining_time", "h", Attribute::OptionalState,
                 "Irrigate this number of hours.\
 Setting this overrides the 'days' and 'hours' parameters.");
     frame.declare_object ("flux", Number::component, 
-                       Value::Const, Value::Singleton, 
+                       Attribute::Const, Attribute::Singleton, 
 "Amount of irrigation applied.");
     frame.order ("flux");
     frame.declare ("temperature", "dg C", 
-		Check::positive (), Value::OptionalConst,
+		Check::positive (), Attribute::OptionalConst,
 		"Temperature of irrigation (default: air temperature).");
-    frame.declare_submodule_sequence ("solute", Value::Const, "\
+    frame.declare_submodule_sequence ("solute", Attribute::Const, "\
 Solutes in irrigation water.", load_ppm);
     frame.set_empty ("solute");
   }
@@ -323,13 +323,13 @@ Currently, the 'temperature' parameter is ignored.")
     frame.add_check (check_alist);	
 
     frame.declare_object ("volume", Volume::component, 
-                       Value::Const, Value::Singleton,
+                       Attribute::Const, Attribute::Singleton,
                        "Soil volume to add irritaion.");
     frame.set ("volume", "box");
-    frame.declare ("from", "cm", Check::non_positive (), Value::OptionalConst, "\
+    frame.declare ("from", "cm", Check::non_positive (), Attribute::OptionalConst, "\
 Height where you want to start the incorporation (a negative number).\n\
 OBSOLETE: Use (volume box (top FROM)) instead.");
-    frame.declare ("to", "cm", Check::non_positive (), Value::OptionalConst, "\
+    frame.declare ("to", "cm", Check::non_positive (), Attribute::OptionalConst, "\
 Height where you want to end the incorporation (a negative number).\n\
 OBSOLETE: Use (volume box (bottom TO)) instead.");
   }

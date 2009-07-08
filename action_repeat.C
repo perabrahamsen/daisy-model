@@ -114,10 +114,10 @@ The action may take several timesteps.")
   void load_frame (Frame& frame) const
   {
       frame.declare_object ("repeat", Action::component,
-                         Value::Const, Value::Singleton,
+                         Attribute::Const, Attribute::Singleton,
                          "Action to perform repeatedly.");
       frame.declare_object ("do", Action::component, 
-                         Value::OptionalState, Value::Singleton,
+                         Attribute::OptionalState, Attribute::Singleton,
                          "Action currently being performed.");
       frame.order ("repeat");
     }

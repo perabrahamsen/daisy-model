@@ -294,68 +294,68 @@ Photosynthesis for C3 crops described by Faquhar et al. (1980).")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("TempEff", "dg C", Value::None (),
-               Check::non_negative (), Value::Const,
+    frame.declare ("TempEff", "dg C", Attribute::None (),
+               Check::non_negative (), Attribute::Const,
                 "Temperature factor for assimilate production.");
 
-    frame.declare ("Kc25", "Pa", Check::positive (), Value::Const,
+    frame.declare ("Kc25", "Pa", Check::positive (), Attribute::Const,
                 "Micahyaelis-Menten constant of Rubisco for CO2. Kc25 = 40.4 Pa for wheat (Collatz et al.,1991) ");
 
     frame.set ("Kc25", 40.4);
 
-    frame.declare ("Ko25", "Pa", Check::positive (), Value::Const,
+    frame.declare ("Ko25", "Pa", Check::positive (), Attribute::Const,
                 "Micahaelis-Menten constant of Rubisco for O2 at 25 degrees. Ko25 = 24800 Pa for wheat (Collatz et al., 1991)");
     frame.set ("Ko25", 24800.);
 
-    frame.declare ("S", "J/mol/K", Check::positive (), Value::Const,
+    frame.declare ("S", "J/mol/K", Check::positive (), Attribute::Const,
                 "Electron transport temperature response parameter,(De Pury & Farquhar, 1997)");
     frame.set ("S", 710.);
     
-    frame.declare ("H", "J/mol", Check::positive (), Value::Const,
+    frame.declare ("H", "J/mol", Check::positive (), Attribute::Const,
                 "Curvature parameter of Jm, (De Pury & Farquhar, 1997)");
     frame.set ("H", 220000.);
     
-    frame.declare ("c_Vm", Value::Unknown (), Check::positive (), Value::Const,
+    frame.declare ("c_Vm", Attribute::Unknown (), Check::positive (), Attribute::Const,
                 "Temperature scaling constant for Vmax. c_Vm, = 26.35 (Bernacchi et al., 2001)");
     frame.set ("c_Vm", 26.35);
     
-    frame.declare ("Ea_Vm", "J/mol", Check::positive (), Value::Const,
+    frame.declare ("Ea_Vm", "J/mol", Check::positive (), Attribute::Const,
                 "Activation energy for Vmax. Ea_Vm = 65330 J/mol (Ball, 1988)");
     frame.set ("Ea_Vm", 65330.);
 
-    frame.declare ("Eda_Vm", "J/mol", Check::positive (), Value::Const,
+    frame.declare ("Eda_Vm", "J/mol", Check::positive (), Attribute::Const,
                 "Deactimation energy for Vmax. Eda_Vm = 202900 J/mol");
     frame.set ("Eda_Vm", 202900.);
    
-    frame.declare ("Ea_Jm", "J/mol", Check::positive (), Value::Const,
+    frame.declare ("Ea_Jm", "J/mol", Check::positive (), Attribute::Const,
                 "Actimation energy for Jm. Ea_Jm = 37000 J/mol (Farquhar et al., 1980).");
     frame.set ("Ea_Jm", 37000.);
 
-    frame.declare ("Ea_ko", "J/mol", Check::positive (), Value::Const,
+    frame.declare ("Ea_ko", "J/mol", Check::positive (), Attribute::Const,
                 "Actimation energy for ko. Ea_ko 0 36000 J/mol (Badger & Collatz, 1977).");
     frame.set ("Ea_ko", 36000.);
 
-    frame.declare ("Ea_kc", "J/mol", Check::positive (), Value::Const,
+    frame.declare ("Ea_kc", "J/mol", Check::positive (), Attribute::Const,
                 "Actimation energy for kc. Ea_kc = 59400 J/mol (Badger & Collatz, 1977)");
     frame.set ("Ea_kc", 59400.);
 
-    frame.declare ("Ea_rd", "J/mol", Check::positive (), Value::Const,
+    frame.declare ("Ea_rd", "J/mol", Check::positive (), Attribute::Const,
                 "Actimation energy for rd. Ea_rd = 66400 J/mol (Farquhar et al., 1980)");
     frame.set ("Ea_rd", 66400.);
 
-    frame.declare ("Sv", "J/mol/K", Check::positive (), Value::Const,
+    frame.declare ("Sv", "J/mol/K", Check::positive (), Attribute::Const,
                 "Entropy term. Sv = 650 J/mol/K");
     frame.set ("Sv", 650.);
   
-    frame.declare ("theta", Value::Unknown (), Check::positive (), Value::Const,
+    frame.declare ("theta", Attribute::Unknown (), Check::positive (), Attribute::Const,
                 "Curvature of leaf response of electron transport to irradiance, (De Pury & Farquhar, 1997");
     frame.set ("theta", 0.7);
     
-    frame.declare ("beta", Value::Unknown (), Check::positive (), Value::Const,
+    frame.declare ("beta", Attribute::Unknown (), Check::positive (), Attribute::Const,
                 "Curvature, Collatz et al., 1991");
     frame.set ("beta", 0.95);
 
-    frame.declare ("alfa", "mol/mol", Check::positive (), Value::Const,
+    frame.declare ("alfa", "mol/mol", Check::positive (), Attribute::Const,
                 "Fraction of PAR effectively absorbed by PSII, ");
     frame.set ("alfa", 0.08);
 

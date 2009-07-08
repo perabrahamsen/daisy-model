@@ -79,27 +79,27 @@ typedef int daisy_bool;
 
 extern "C" int EXPORT
 daisy_category_number (const char* name)
-{ return Value::category_number (name); }
+{ return Attribute::category_number (name); }
 
 extern "C" const char* EXPORT
-daisy_category_name (Value::category number)
-{ return Value::category_name (number).name ().c_str (); }
+daisy_category_name (Attribute::category number)
+{ return Attribute::category_name (number).name ().c_str (); }
 
 extern "C" int EXPORT
 daisy_size_sequence ()
-{ return Value::Variable; }
+{ return Attribute::Variable; }
 
 extern "C" int EXPORT
 daisy_size_singleton ()
-{ return Value::Singleton; }
+{ return Attribute::Singleton; }
 
 extern "C" int EXPORT
 daisy_type_number (const char* name)
-{ return Value::type_number (name); }
+{ return Attribute::type_number (name); }
 
 extern "C" const char* EXPORT
-daisy_type_name (Value::type number)
-{ return Value::type_name (number).name ().c_str (); }
+daisy_type_name (Attribute::type number)
+{ return Attribute::type_name (number).name ().c_str (); }
 
 // @ The daisy_frame Type.
 
@@ -148,7 +148,7 @@ daisy_frame_get_flag (const Frame* frame, const char* name)
 extern "C" const Frame* EXPORT
 daisy_frame_get_frame (const Frame* frame, const char* name)
 { 
-  if (frame->lookup (name) == Value::Model)
+  if (frame->lookup (name) == Attribute::Model)
     return &frame->model (name); 
   else
     return &frame->submodel (name); 
@@ -175,7 +175,7 @@ extern "C" void EXPORT
 daisy_frame_set_frame (Frame* frame, const char* name,
 		       Frame* value)
 { 
-  if (frame->lookup (name) == Value::Submodel)
+  if (frame->lookup (name) == Attribute::Submodel)
     frame->set (name, dynamic_cast<const FrameSubmodel&> (*value)); 
   else
     frame->set (name, dynamic_cast<const FrameModel&> (*value)); 
@@ -204,7 +204,7 @@ daisy_frame_size_frame (const Frame* frame, const char* name)
 {
   // KLUDGE: Work around the use of non-sequence value as the default
   // for each element in the sequence.
-  if (frame->type_size (name) == Value::Singleton)
+  if (frame->type_size (name) == Attribute::Singleton)
     return 0;
   
   return frame->value_size (name); 
@@ -236,7 +236,7 @@ extern "C" const Frame* EXPORT
 daisy_frame_get_frame_at (const Frame* frame, const char* name,
 			  unsigned int index)
 { 
-  if (frame->lookup (name) == Value::Model)
+  if (frame->lookup (name) == Attribute::Model)
     return frame->model_sequence (name)[index].get (); 
   else
     return frame->submodel_sequence (name)[index].get (); 
@@ -594,7 +594,7 @@ daisy_column_get_description (const Column* column)
 { 
   const FrameModel& frame = column->frame (); 
   const symbol d = frame.description ();
-  if (d != Value::None ())
+  if (d != Attribute::None ())
     return d.name ().c_str ();
   return "";
 }
@@ -672,7 +672,7 @@ daisy_scope_number_size (const Scope *const scope)
   scope->entries (all);
   size_t count = 0;
   for (std::set<symbol>::const_iterator i = all.begin (); i != all.end (); i++)
-    if (scope->lookup (*i) == Value::Number)
+    if (scope->lookup (*i) == Attribute::Number)
       count++;
   return count; 
 }
@@ -686,7 +686,7 @@ daisy_scope_number_name (const Scope *const scope, const unsigned int index)
   for (std::set<symbol>::const_iterator i = all.begin (); i != all.end (); i++)
     {
       const symbol name = *i;
-      if (scope->lookup (name) == Value::Number)
+      if (scope->lookup (name) == Attribute::Number)
         if (count == index)
           return name.name ().c_str ();
         else
@@ -698,8 +698,8 @@ daisy_scope_number_name (const Scope *const scope, const unsigned int index)
 extern "C" const int EXPORT	// check if NAME is defined in SCOPE.
 daisy_scope_has_number (const Scope* scope, const char* name)
 { 
-  if (scope->lookup (name) == Value::Number 
-      && scope->type_size (name) == Value::Singleton
+  if (scope->lookup (name) == Attribute::Number 
+      && scope->type_size (name) == Attribute::Singleton
       && scope->check (name))
     return 1;
   else 
@@ -721,8 +721,8 @@ daisy_scope_dimension (const Scope* scope, const char* name)
 extern "C" const int EXPORT	// check if NAME is defined in SCOPE.
 daisy_scope_has_string (const Scope* scope, const char* name)
 { 
-  if (scope->lookup (name) == Value::String 
-      && scope->type_size (name) == Value::Singleton
+  if (scope->lookup (name) == Attribute::String 
+      && scope->type_size (name) == Attribute::Singleton
       && scope->check (name))
     return 1;
   else 

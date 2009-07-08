@@ -126,9 +126,9 @@ static struct HydraulicM_CSyntax : public DeclareModel
   { 
     Hydraulic::load_Theta_sat (frame);
     Hydraulic::load_K_sat (frame);
-    frame.declare ("h_b", "cm", Check::negative (), Value::Const,
+    frame.declare ("h_b", "cm", Check::negative (), Attribute::Const,
 		"Bubbling pressure.");
-    frame.declare ("b", Value::None (), Check::positive (), Value::Const,
+    frame.declare ("b", Attribute::None (), Check::positive (), Attribute::Const,
 		"Campbell parameter.");
 
   }

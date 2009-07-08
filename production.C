@@ -623,178 +623,178 @@ Production::load_syntax (Frame& frame)
 {
 
   // Remobilization.
-  frame.declare ("ShldResC", Value::Fraction (), Value::Const,
+  frame.declare ("ShldResC", Attribute::Fraction (), Attribute::Const,
 	      "Capacity of shielded reserves (fraction of stem DM).");
   frame.set ("ShldResC", 0.0);
-  frame.declare ("ReMobilDS", Value::None (), Value::Const,
+  frame.declare ("ReMobilDS", Attribute::None (), Attribute::Const,
 	      "Remobilization, Initial DS.");
   frame.set ("ReMobilDS", 1.20);
-  frame.declare ("ReMobilRt", "d^-1", Value::Const,
+  frame.declare ("ReMobilRt", "d^-1", Attribute::Const,
 	      "Remobilization, release rate.");
   frame.set ("ReMobilRt", 0.1);
-  frame.declare ("StemRes", "g DM/m^2", Value::State,
+  frame.declare ("StemRes", "g DM/m^2", Attribute::State,
 	      "Shielded reserves in stems.");
   frame.set ("StemRes", 0.0);
 
   // Parameters.
-  frame.declare ("CH2OReleaseRate", "h^-1", Value::Const,
+  frame.declare ("CH2OReleaseRate", "h^-1", Attribute::Const,
 	      "CH2O Release Rate constant.");
   frame.set ("CH2OReleaseRate", 0.04);
-  frame.declare ("E_Root", Value::None (), Value::Const,
+  frame.declare ("E_Root", Attribute::None (), Attribute::Const,
 	      "Conversion efficiency, root.");
   frame.set ("E_Root", 0.69);
-  frame.declare ("E_Leaf", Value::None (), Value::Const,
+  frame.declare ("E_Leaf", Attribute::None (), Attribute::Const,
 	      "Conversion efficiency, leaf.");
   frame.set ("E_Leaf", 0.68);
-  frame.declare ("E_Stem", Value::None (), Value::Const,
+  frame.declare ("E_Stem", Attribute::None (), Attribute::Const,
 	      "Conversion efficiency, stem.");
   frame.set ("E_Stem", 0.66);
-  frame.declare ("E_SOrg", Value::None (), Value::Const,
+  frame.declare ("E_SOrg", Attribute::None (), Attribute::Const,
 	      "Conversion efficiency, storage organ.");
-  frame.declare ("r_Root", Value::None (), Value::Const,
+  frame.declare ("r_Root", Attribute::None (), Attribute::Const,
 	      "Maintenance respiration coefficient, root.");
   frame.set ("r_Root", 0.015);
-  frame.declare ("r_Leaf", "d^-1", Value::Const,
+  frame.declare ("r_Leaf", "d^-1", Attribute::Const,
 	      "Maintenance respiration coefficient, leaf.");
-  frame.declare ("r_Stem", "d^-1", Value::Const,
+  frame.declare ("r_Stem", "d^-1", Attribute::Const,
 	      "Maintenance respiration coefficient, stem.");
-  frame.declare ("r_SOrg", "d^-1", Value::Const,
+  frame.declare ("r_SOrg", "d^-1", Attribute::Const,
 	      "Maintenance respiration coefficient, storage organ.");
-  frame.declare ("ExfoliationFac", Value::None (), Value::Const,
+  frame.declare ("ExfoliationFac", Attribute::None (), Attribute::Const,
 	      "Exfoliation factor, 0-1.");
   frame.set ("ExfoliationFac", 1.0);
-  frame.declare ("LfDR", "DS", " d^-1", Value::Const,
+  frame.declare ("LfDR", "DS", " d^-1", Attribute::Const,
 	      "Death rate of Leafs.");
-  frame.declare ("RtDR", "DS", " d^-1", Value::Const,
+  frame.declare ("RtDR", "DS", " d^-1", Attribute::Const,
 	      "Death rate of Roots.");
-  frame.declare ("Large_RtDR", "d^-1", Value::Const,
+  frame.declare ("Large_RtDR", "d^-1", Attribute::Const,
 	      "Extra death rate for large root/shoot.");
   frame.set ("Large_RtDR", 0.05);
-  frame.declare ("RtDR_T_factor", "dg C", Value::None (), Value::Const,
+  frame.declare ("RtDR_T_factor", "dg C", Attribute::None (), Attribute::Const,
 	      "Temperature dependent factor for root death rate.");
   PLF none;
   none.add (  0.0, 1.0);
   none.add (100.0, 1.0);
   frame.set ("RtDR_T_factor", none);
-  frame.declare ("IntDSRelRtRes", Value::None (), Value::Const,
+  frame.declare ("IntDSRelRtRes", Attribute::None (), Attribute::Const,
 	      "Initial DS for the release of root reserves.");
   frame.set ("IntDSRelRtRes", 0.80);
-  frame.declare ("EndDSRelRtRes", Value::None (), Value::Const,
+  frame.declare ("EndDSRelRtRes", Attribute::None (), Attribute::Const,
 	      "End DS for the release of root reserves.");
   frame.set ("EndDSRelRtRes", 0.80);
-  frame.declare ("RelRateRtRes", "d^-1", Value::Const,
+  frame.declare ("RelRateRtRes", "d^-1", Attribute::Const,
 	      "Release rate of root reserves.");
   frame.set ("RelRateRtRes", 0.05);
-  frame.declare ("LfRtRelRtRes", Value::None (), Value::Const,
+  frame.declare ("LfRtRelRtRes", Attribute::None (), Attribute::Const,
 	      "Max Leaf:Root for the release of root res.");
   frame.set ("LfRtRelRtRes", 0.80);
 
   // Variables.
-  frame.declare ("CH2OPool", "g CH2O/m^2", Value::State, "CH2O Pool.");
+  frame.declare ("CH2OPool", "g CH2O/m^2", Attribute::State, "CH2O Pool.");
   frame.set ("CH2OPool", 0.001);
-  frame.declare ("WLeaf", "g DM/m^2", Value::State, "Leaf dry matter weight.");
+  frame.declare ("WLeaf", "g DM/m^2", Attribute::State, "Leaf dry matter weight.");
   frame.set ("WLeaf", 0.001);
-  frame.declare ("WStem", "g DM/m^2", Value::State, "Stem dry matter weight.");
+  frame.declare ("WStem", "g DM/m^2", Attribute::State, "Stem dry matter weight.");
   frame.set ("WStem", 0.000);
-  frame.declare ("WRoot", "g DM/m^2", Value::State, "Root dry matter weight.");
+  frame.declare ("WRoot", "g DM/m^2", Attribute::State, "Root dry matter weight.");
   frame.set ("WRoot", 0.001);
-  frame.declare ("WSOrg", "g DM/m^2", Value::State,
+  frame.declare ("WSOrg", "g DM/m^2", Attribute::State,
 	      "Storage organ dry matter weight.");
   frame.set ("WSOrg", 0.000);
-  frame.declare ("WDead", "g DM/m^2", Value::State,
+  frame.declare ("WDead", "g DM/m^2", Attribute::State,
 	      "Dead leaves dry matter weight.");
   frame.set ("WDead", 0.000);
-  frame.declare ("CLeaf", "g C/m^2", Value::LogOnly, "Leaf C weight.");
-  frame.declare ("CStem", "g C/m^2", Value::LogOnly, "Stem C weight.");
-  frame.declare ("CRoot", "g C/m^2", Value::LogOnly, "Root C weight.");
-  frame.declare ("CSOrg", "g C/m^2", Value::LogOnly, "Storage organ C weight.");
-  frame.declare ("CDead", "g C/m^2", Value::LogOnly, "Dead leaves C weight.");
-  frame.declare ("CCrop", "g C/m^2", Value::LogOnly, "Crop C weight.");
-  frame.declare ("NLeaf", "g N/m^2", Value::State,
+  frame.declare ("CLeaf", "g C/m^2", Attribute::LogOnly, "Leaf C weight.");
+  frame.declare ("CStem", "g C/m^2", Attribute::LogOnly, "Stem C weight.");
+  frame.declare ("CRoot", "g C/m^2", Attribute::LogOnly, "Root C weight.");
+  frame.declare ("CSOrg", "g C/m^2", Attribute::LogOnly, "Storage organ C weight.");
+  frame.declare ("CDead", "g C/m^2", Attribute::LogOnly, "Dead leaves C weight.");
+  frame.declare ("CCrop", "g C/m^2", Attribute::LogOnly, "Crop C weight.");
+  frame.declare ("NLeaf", "g N/m^2", Attribute::State,
 	      "Nitrogen stored in the leaves.");
   frame.set ("NLeaf", 0.000);
-  frame.declare ("NStem", "g N/m^2", Value::State,
+  frame.declare ("NStem", "g N/m^2", Attribute::State,
 	      "Nitrogen stored in the stem.");
   frame.set ("NStem", 0.000);
-  frame.declare ("NRoot", "g N/m^2", Value::State,
+  frame.declare ("NRoot", "g N/m^2", Attribute::State,
 	      "Nitrogen stored in the roots.");
   frame.set ("NRoot", 0.000);
-  frame.declare ("NSOrg", "g N/m^2", Value::State,
+  frame.declare ("NSOrg", "g N/m^2", Attribute::State,
 	      "Nitrogen stored in the storage organ.");
   frame.set ("NSOrg", 0.000);
-  frame.declare ("NDead", "g N/m^2", Value::State,
+  frame.declare ("NDead", "g N/m^2", Attribute::State,
 	      "Nitrogen stored in dead leaves.");
   frame.set ("NDead", 0.000);
-  frame.declare ("NCrop", "g N/m^2", Value::OptionalState,
+  frame.declare ("NCrop", "g N/m^2", Attribute::OptionalState,
 	      "Total crop nitrogen content.\n\
 By default, this will start as the amount of N in the seed.");
-  frame.declare ("C_AM", "g C/m^2", Value::State,
+  frame.declare ("C_AM", "g C/m^2", Attribute::State,
 	      "Added C in plant material.");
   frame.set ("C_AM", 0.000);
-  frame.declare ("N_AM", "g N/m^2", Value::State,
+  frame.declare ("N_AM", "g N/m^2", Attribute::State,
 	      "Added N in plant material.");
   frame.set ("N_AM", 0.000);
   
   // Auxiliary.
-  frame.declare ("PotCanopyAss", "g CH2O/m^2/h", Value::LogOnly,
+  frame.declare ("PotCanopyAss", "g CH2O/m^2/h", Attribute::LogOnly,
 	      "Potential canopy assimilation, i.e. stressfree production.");
-  frame.declare ("CanopyAss", "g CH2O/m^2/h", Value::LogOnly,
+  frame.declare ("CanopyAss", "g CH2O/m^2/h", Attribute::LogOnly,
 	      "Canopy assimilation.");
-  frame.declare ("NetPhotosynthesis", "g CO2/m^2/h", Value::LogOnly,
+  frame.declare ("NetPhotosynthesis", "g CO2/m^2/h", Attribute::LogOnly,
 	      "Net Photosynthesis.");
-  frame.declare ("AccNetPhotosynthesis", "g CO2/m^2", Value::LogOnly,
+  frame.declare ("AccNetPhotosynthesis", "g CO2/m^2", Attribute::LogOnly,
 	      "Accumulated Net Photosynthesis.");
-  frame.declare ("Respiration", "g CH2O/m^2/h", Value::LogOnly,
+  frame.declare ("Respiration", "g CH2O/m^2/h", Attribute::LogOnly,
 	      "Crop Respiration.");
-  frame.declare ("MaintRespiration", "g CH2O/m^2/h", Value::LogOnly,
+  frame.declare ("MaintRespiration", "g CH2O/m^2/h", Attribute::LogOnly,
 	      "Maintenance Respiration.");
-  frame.declare ("GrowthRespiration", "g CH2O/m^2/h", Value::LogOnly,
+  frame.declare ("GrowthRespiration", "g CH2O/m^2/h", Attribute::LogOnly,
 	      "Growth Respiration.");
-  frame.declare ("LeafRespiration", "g CO2/m^2/h", Value::LogOnly,
+  frame.declare ("LeafRespiration", "g CO2/m^2/h", Attribute::LogOnly,
 	      "Total Leaf Respiration.");
-  frame.declare ("StemRespiration", "g CO2/m^2/h", Value::LogOnly,
+  frame.declare ("StemRespiration", "g CO2/m^2/h", Attribute::LogOnly,
 	      "Total Stem Respiration.");
-  frame.declare ("SOrgRespiration", "g CO2/m^2/h", Value::LogOnly,
+  frame.declare ("SOrgRespiration", "g CO2/m^2/h", Attribute::LogOnly,
 	      "Total SOrg Respiration.");
-  frame.declare ("RootRespiration", "g CO2/m^2/h", Value::LogOnly,
+  frame.declare ("RootRespiration", "g CO2/m^2/h", Attribute::LogOnly,
 	      "Total Root Respiration.");
-  frame.declare ("LeafMaintRespiration", "g CO2/m^2/h", Value::LogOnly,
+  frame.declare ("LeafMaintRespiration", "g CO2/m^2/h", Attribute::LogOnly,
 	      "Leaf Maintenance Respiration.");
-  frame.declare ("StemMaintRespiration", "g CO2/m^2/h", Value::LogOnly,
+  frame.declare ("StemMaintRespiration", "g CO2/m^2/h", Attribute::LogOnly,
 	      "Stem Maintenance Respiration.");
-  frame.declare ("SOrgMaintRespiration", "g CO2/m^2/h", Value::LogOnly,
+  frame.declare ("SOrgMaintRespiration", "g CO2/m^2/h", Attribute::LogOnly,
 	      "SOrg Maintenance Respiration.");
-  frame.declare ("RootMaintRespiration", "g CO2/m^2/h", Value::LogOnly,
+  frame.declare ("RootMaintRespiration", "g CO2/m^2/h", Attribute::LogOnly,
 	      "Root Maintenance Respiration.");
-  frame.declare ("LeafGrowthRespiration", "g CO2/m^2/h", Value::LogOnly,
+  frame.declare ("LeafGrowthRespiration", "g CO2/m^2/h", Attribute::LogOnly,
 	      "Leaf Growth Respiration.");
-  frame.declare ("StemGrowthRespiration", "g CO2/m^2/h", Value::LogOnly,
+  frame.declare ("StemGrowthRespiration", "g CO2/m^2/h", Attribute::LogOnly,
 	      "Stem Growth Respiration.");
-  frame.declare ("SOrgGrowthRespiration", "g CO2/m^2/h", Value::LogOnly,
+  frame.declare ("SOrgGrowthRespiration", "g CO2/m^2/h", Attribute::LogOnly,
 	      "SOrg Growth Respiration.");
-  frame.declare ("RootGrowthRespiration", "g CO2/m^2/h", Value::LogOnly,
+  frame.declare ("RootGrowthRespiration", "g CO2/m^2/h", Attribute::LogOnly,
 	      "Root Growth Respiration.");
-  frame.declare ("IncWLeaf", "g DM/m^2/h", Value::LogOnly,
+  frame.declare ("IncWLeaf", "g DM/m^2/h", Attribute::LogOnly,
 	      "Leaf growth.");
-  frame.declare ("IncWStem", "g DM/m^2/h", Value::LogOnly,
+  frame.declare ("IncWStem", "g DM/m^2/h", Attribute::LogOnly,
 	      "Stem growth.");
-  frame.declare ("IncWSOrg", "g DM/m^2/h", Value::LogOnly,
+  frame.declare ("IncWSOrg", "g DM/m^2/h", Attribute::LogOnly,
 	      "Storage organ growth.");
-  frame.declare ("IncWRoot", "g DM/m^2/h", Value::LogOnly,
+  frame.declare ("IncWRoot", "g DM/m^2/h", Attribute::LogOnly,
 	      "Root growth.");
-  frame.declare ("DeadWLeaf", "g DM/m^2/h", Value::LogOnly,
+  frame.declare ("DeadWLeaf", "g DM/m^2/h", Attribute::LogOnly,
 	      "Leaf DM removed.");
-  frame.declare ("DeadNLeaf", "g N/m2/h", Value::LogOnly,
+  frame.declare ("DeadNLeaf", "g N/m2/h", Attribute::LogOnly,
 	      "Leaf N removed.");
-  frame.declare ("DeadWRoot", "g DM/m^2/h", Value::LogOnly,
+  frame.declare ("DeadWRoot", "g DM/m^2/h", Attribute::LogOnly,
 	      "Root DM removed.");
-  frame.declare ("DeadNRoot", "g N/m2/h", Value::LogOnly,
+  frame.declare ("DeadNRoot", "g N/m2/h", Attribute::LogOnly,
 	      "Root N removed.");
-  frame.declare ("C_Loss", "g C/m^2/h", Value::LogOnly,"C lost from the crop");
-  frame.declare ("DailyNetRoot", "g DM/m^2", Value::State,
+  frame.declare ("C_Loss", "g C/m^2/h", Attribute::LogOnly,"C lost from the crop");
+  frame.declare ("DailyNetRoot", "g DM/m^2", Attribute::State,
 	      "Root growth minus root respiration so far this day.");
   frame.set ("DailyNetRoot", 0.0);
-  frame.declare ("DailyNetShoot", "g DM/m^2", Value::State,
+  frame.declare ("DailyNetShoot", "g DM/m^2", Attribute::State,
 	      "Leaf growth minus leaf respiration so far this day.");
   frame.set ("DailyNetShoot", 0.0);
 }

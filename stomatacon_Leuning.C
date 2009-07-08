@@ -91,7 +91,7 @@ static struct StomataConLeuningSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.declare ("Do", "[Pa]", Check::non_negative (), Value::Const,
+    frame.declare ("Do", "[Pa]", Check::non_negative (), Attribute::Const,
                 "Coefficient, value after Leuning (1995)");
     frame.set ("Do", 1500.);
 

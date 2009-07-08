@@ -99,13 +99,13 @@ IMvec::output (Log& log) const
 
 void 
 IMvec::add_syntax (Frame& frame,
-                   Value::category cat, 
+                   Attribute::category cat, 
                    const symbol dimension)
 {
   frame.declare_string ("name", cat, "Name of chemical.");
   frame.set_check ("name", Chemical::check_library ());
   frame.declare ("value", dimension, Check::non_negative (), cat,
-             Value::Variable, "Value for chemical.");
+             Attribute::Variable, "Value for chemical.");
   frame.order ("name", "value");
 }
 

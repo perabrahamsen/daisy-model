@@ -115,18 +115,18 @@ does not count in the sum.")
   {
       frame.add_check (check_alist);
 
-      frame.declare_integer ("check_hour", Value::Const, 
+      frame.declare_integer ("check_hour", Attribute::Const, 
 		  "Hour in day to update TSum.");
       frame.set ("check_hour", 6);
-      frame.declare_integer ("reset_mday", Value::Const, 
+      frame.declare_integer ("reset_mday", Attribute::Const, 
 		  "Day in month to reset TSum.");
       frame.set ("reset_mday", 1);
-      frame.declare_integer ("reset_month", Value::Const, 
+      frame.declare_integer ("reset_month", Attribute::Const, 
 		  "Month in year to reset TSum.");
       frame.set ("reset_month", 3);
-      frame.declare ("TSum_limit", "dg C d", Value::Const, "\
+      frame.declare ("TSum_limit", "dg C d", Attribute::Const, "\
 Temeperature sum above which the condition becomes true.");
-      frame.declare ("TSum_now", "dg C d", Value::OptionalState, "\
+      frame.declare ("TSum_now", "dg C d", Attribute::OptionalState, "\
 Current temeprature sum since last reset.");
       frame.order ("TSum_limit");
   }

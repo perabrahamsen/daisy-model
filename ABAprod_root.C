@@ -131,7 +131,7 @@ and that all the ABA will be included in the water uptake.")
   void load_frame (Frame& frame) const
   {
     frame.declare_object ("expr", Number::component, 
-                      Value::Const, Value::Singleton, "\
+                      Attribute::Const, Attribute::Singleton, "\
 Expression to evaluate to ABA production per root length [g/cm/h].\n\
 The symbol 'h' will be bound to the water pressure [cm].");
   }

@@ -24,7 +24,7 @@
 #ifndef TYPE_H
 #define TYPE_H
 
-#include "value.h"
+#include "attribute.h"
 #include "symbol.h"
 #include "frame.h"
 #include <boost/noncopyable.hpp>
@@ -35,12 +35,12 @@ class Type : boost::noncopyable
 {
   // Content.
 private:
-  const Value::category category_;
+  const Attribute::category category_;
   const int size_;
   const symbol description_;
 public:
-  virtual Value::type type () const = 0;
-  Value::category category () const;
+  virtual Attribute::type type () const = 0;
+  Attribute::category category () const;
   bool is_const () const;
   bool is_optional () const;
   bool is_mandatory () const;
@@ -57,7 +57,7 @@ public:
 
   // Create and Destroy.
 protected:
-  Type (const Value::category c, const int s, const symbol d);
+  Type (const Attribute::category c, const int s, const symbol d);
 public:
   virtual ~Type ();
 };
@@ -66,21 +66,21 @@ class TypeNumber : public Type
 {
   const symbol dimension_;
   const Check& check;
-  Value::type type () const;
+  Attribute::type type () const;
   symbol dimension () const;
   bool verify (double value, Treelog&) const;
 public:
-  TypeNumber (const Value::category c, const int s, const symbol dim, 
+  TypeNumber (const Attribute::category c, const int s, const symbol dim, 
               const Check&, const symbol desc);
 };
 
 class TypeSubmodel : public Type
 {
   const Frame::load_syntax_t load_syntax_;
-  Value::type type () const;
+  Attribute::type type () const;
   Frame::load_syntax_t  load_syntax () const;
 public:
-  TypeSubmodel (const Value::category c, const int s, const Frame::load_syntax_t l,
+  TypeSubmodel (const Attribute::category c, const int s, const Frame::load_syntax_t l,
              const symbol desc);
 };
 
@@ -89,44 +89,44 @@ class TypePLF : public Type
   const symbol domain_;
   const symbol range_;
   const Check& check;
-  Value::type type () const;
+  Attribute::type type () const;
   symbol domain () const;
   symbol range () const;
   symbol dimension () const;
   bool verify (double value, Treelog&) const;
 public:
-  TypePLF (const Value::category c, const int s, const symbol dom,
+  TypePLF (const Attribute::category c, const int s, const symbol dom,
            const symbol r, const Check&, const symbol desc);
 };
 
 class TypeBoolean : public Type
 {
-  Value::type type () const;
+  Attribute::type type () const;
 public:
-  TypeBoolean (const Value::category c, const int s, const symbol desc);
+  TypeBoolean (const Attribute::category c, const int s, const symbol desc);
 };
 
 class TypeString : public Type
 {
-  Value::type type () const;
+  Attribute::type type () const;
 public:
-  TypeString (const Value::category c, const int s, const symbol desc);
+  TypeString (const Attribute::category c, const int s, const symbol desc);
 };
 
 class TypeInteger : public Type
 {
-  Value::type type () const;
+  Attribute::type type () const;
 public:
-  TypeInteger (const Value::category c, const int s, const symbol desc);
+  TypeInteger (const Attribute::category c, const int s, const symbol desc);
 };
 
 class TypeModel : public Type
 {
   const symbol component_;
-  Value::type type () const;
+  Attribute::type type () const;
   symbol component () const;
 public:
-  TypeModel (const Value::category c, const int s, const symbol comp,
+  TypeModel (const Attribute::category c, const int s, const symbol comp,
               const symbol desc);
 };
 

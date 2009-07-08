@@ -723,12 +723,12 @@ Shared paramaters for handling solutes.")
   void load_frame (Frame& frame) const
   {
     frame.declare_object ("matrix_solute", Transport::component, 
-                       Value::State, Value::Variable,
+                       Attribute::State, Attribute::Variable,
                        "Matrix solute transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends.");
     frame.declare_object ("matrix_solid", Transport::component, 
-                       Value::Const, Value::Singleton, "\
+                       Attribute::Const, Attribute::Singleton, "\
 Matrix solute transport model used for fully sorbed constituents.");
     frame.set ("matrix_solid", "none");
   }

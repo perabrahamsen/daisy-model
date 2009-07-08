@@ -134,7 +134,7 @@ static struct BoundFiniteSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
     
-    frame.declare ("bound", "cm", Value::Const, "Interval bound to use.");
+    frame.declare ("bound", "cm", Attribute::Const, "Interval bound to use.");
     frame.order ("bound");
 
   }

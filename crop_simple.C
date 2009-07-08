@@ -520,58 +520,58 @@ static struct CropSimpleSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
     frame.add_check (check_alist);
-    frame.declare ("LAIvsTS", "dg C d", "m^2/m^2", Value::OptionalConst, 
+    frame.declare ("LAIvsTS", "dg C d", "m^2/m^2", Attribute::OptionalConst, 
 		"LAI as a function of T_sum");
-    frame.declare ("LAIvsDay", "d", "m^2/m^2", Value::OptionalConst, 
+    frame.declare ("LAIvsDay", "d", "m^2/m^2", Attribute::OptionalConst, 
 		"LAI as a function of number of days since sowing.");
     frame.declare ("forced_LAI", "m^2/m^2", Check::non_negative (), 
-		Value::State, "\
+		Attribute::State, "\
 Minimum LAI, automatically cleared when exceeded by 'LAIvsTS'.");
     frame.set ("forced_LAI", 0.0);
-    frame.declare_submodule("Canopy", Value::State, "Canopy.",
+    frame.declare_submodule("Canopy", Attribute::State, "Canopy.",
 			 CanopySimple::load_syntax);
-    frame.declare ("height_max", "cm", Check::non_negative (), Value::Const, 
+    frame.declare ("height_max", "cm", Check::non_negative (), Attribute::Const, 
 		"Maximum height of plant, reached when flowering.");
     frame.set ("height_max", 80.0);
-    frame.declare ("T_sum", "dg C d", Check::non_negative (), Value::State, 
+    frame.declare ("T_sum", "dg C d", Check::non_negative (), Attribute::State, 
 		"Temperature sum since sowing (or spring).");
     frame.set ("T_sum", 0.0);
-    frame.declare ("day", "d", Check::non_negative (), Value::State, 
+    frame.declare ("day", "d", Check::non_negative (), Attribute::State, 
 		"Number of days since sowing (or spring).");
     frame.set ("day", 0.0);
-    frame.declare_integer ("spring", Value::Const, 2,
+    frame.declare_integer ("spring", Attribute::Const, 2,
 		"Zero 'T_sum' at this month and day.");
     std::vector<int> spring_time;
     spring_time.push_back (3);
     spring_time.push_back (1);
     frame.set ("spring", spring_time);
-    frame.declare ("spring_LAI", "m^2/m^2", Check::non_negative (), Value::Const, 
+    frame.declare ("spring_LAI", "m^2/m^2", Check::non_negative (), Attribute::Const, 
 		"Set 'forced_LAI' to this after spring clearence of 'T_sum'.");
     frame.set ("spring_LAI", 0.1);
-    frame.declare_submodule("Root", Value::State, "Root system.",
+    frame.declare_submodule("Root", Attribute::State, "Root system.",
 			 RootSystem::load_syntax);
-    frame.declare ("root_DM", "Mg DM/ha", Check::non_negative (), Value::Const, 
+    frame.declare ("root_DM", "Mg DM/ha", Check::non_negative (), Attribute::Const, 
 		"Fully developed root drymatter.");
     frame.set ("root_DM", 2.0);
-    frame.declare ("root_N", "kg N/ha", Check::non_negative (), Value::Const,
+    frame.declare ("root_N", "kg N/ha", Check::non_negative (), Attribute::Const,
 		"Fully developed root N content.");
     frame.set ("root_N", 20.0);
     frame.declare_object ("root_am", AOM::component, 
-                      Value::Const, Value::Variable, "\
+                      Attribute::Const, Attribute::Variable, "\
 Root AM parameters.");
     frame.set_check ("root_am", AM::check_om_pools ());
     frame.set ("root_am", AM::default_AM ());
-    frame.declare ("potential_N", "kg N/ha", Check::non_negative (), Value::Const,
+    frame.declare ("potential_N", "kg N/ha", Check::non_negative (), Attribute::Const,
 		"Potential N content at harvest.");
-    frame.declare ("N_demand", "g N/m^2", Value::LogOnly,
+    frame.declare ("N_demand", "g N/m^2", Attribute::LogOnly,
 		"Current potential N content.");
-    frame.declare ("N_actual", "g N/m^2", Check::non_negative (), Value::State,
+    frame.declare ("N_actual", "g N/m^2", Check::non_negative (), Attribute::State,
 		"N uptake until now.");
     frame.set ("N_actual", 0.0);
-    frame.declare ("N_b", "kg N/ha", Check::non_negative (), Value::Const,
+    frame.declare ("N_b", "kg N/ha", Check::non_negative (), Attribute::Const,
 		"N uptake form parameter.");
     frame.set ("N_b", 10.0);
-    frame.declare_fraction ("N_flowering", Value::Const, "\
+    frame.declare_fraction ("N_flowering", Attribute::Const, "\
 Fraction of potential N uptake reached at flowering.");
     frame.set ("N_flowering", 0.9);
   }

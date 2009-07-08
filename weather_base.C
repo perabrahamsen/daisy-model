@@ -325,47 +325,47 @@ static struct WeatherBaseSyntax : public DeclareBase
 This is not a model, but a list of parameters shared by all weather models.")
   { }
   static void load_flux (Frame& frame)
-  { IM::add_syntax (frame, Value::LogOnly, IM::flux_unit ()); }
+  { IM::add_syntax (frame, Attribute::LogOnly, IM::flux_unit ()); }
   void load_frame (Frame& frame) const
   {
     // Overwritten in weather_none.C
-    frame.declare ("air_temperature", "dg C", Value::LogOnly,
+    frame.declare ("air_temperature", "dg C", Attribute::LogOnly,
                 "Temperature this hour.");
-    frame.declare ("global_radiation", "W/m^2", Value::LogOnly,
+    frame.declare ("global_radiation", "W/m^2", Attribute::LogOnly,
                 "Global radiation this hour.");
 
     // Logs.
-    frame.declare ("daily_air_temperature", "dg C", Value::LogOnly,
+    frame.declare ("daily_air_temperature", "dg C", Attribute::LogOnly,
                 "Average temperature this day.");
-    frame.declare ("daily_min_air_temperature", "dg C", Value::LogOnly,
+    frame.declare ("daily_min_air_temperature", "dg C", Attribute::LogOnly,
                 "Minumum temperature this day.");
-    frame.declare ("daily_max_air_temperature", "dg C", Value::LogOnly,
+    frame.declare ("daily_max_air_temperature", "dg C", Attribute::LogOnly,
                 "Maximum temperature this day.");
-    frame.declare ("daily_global_radiation", "W/m^2", Value::LogOnly,
+    frame.declare ("daily_global_radiation", "W/m^2", Attribute::LogOnly,
                 "Average radiation this day.");
-    frame.declare ("diffuse_radiation", "W/m^2", Value::LogOnly,
+    frame.declare ("diffuse_radiation", "W/m^2", Attribute::LogOnly,
                 "Diffuse radiation this hour.");
-    frame.declare ("reference_evapotranspiration", "mm/h", Value::LogOnly,
+    frame.declare ("reference_evapotranspiration", "mm/h", Attribute::LogOnly,
                 "Reference evapotranspiration this hour");
-    frame.declare ("daily_extraterrastial_radiation", "W/m^2", Value::LogOnly,
+    frame.declare ("daily_extraterrastial_radiation", "W/m^2", Attribute::LogOnly,
                 "Extraterrestrial radiation this day.");
-    frame.declare ("rain", "mm/h", Value::LogOnly, "Rain this hour.");
-    frame.declare ("snow", "mm/h", Value::LogOnly, "Snow this hour.");
-    frame.declare ("precipitation", "mm/h", Value::LogOnly, 
+    frame.declare ("rain", "mm/h", Attribute::LogOnly, "Rain this hour.");
+    frame.declare ("snow", "mm/h", Attribute::LogOnly, "Snow this hour.");
+    frame.declare ("precipitation", "mm/h", Attribute::LogOnly, 
                 "Precipitation this hour.");
-    frame.declare_fraction ("cloudiness", Value::LogOnly,
+    frame.declare_fraction ("cloudiness", Attribute::LogOnly,
                 "Fraction of sky covered by clouds [0-1].");
-    frame.declare_fraction ("daily_cloudiness", Value::LogOnly,
+    frame.declare_fraction ("daily_cloudiness", Attribute::LogOnly,
                 "Fraction of sky covered by clouds [0-1].");
-    frame.declare ("vapor_pressure", "Pa", Value::LogOnly, "Humidity.");
-    frame.declare ("relative_humidity", Value::Fraction (), Value::LogOnly,
+    frame.declare ("vapor_pressure", "Pa", Attribute::LogOnly, "Humidity.");
+    frame.declare ("relative_humidity", Attribute::Fraction (), Attribute::LogOnly,
                 "Relative humidity.");
-    frame.declare ("wind", "m/s", Value::LogOnly, "Wind speed.");
-    frame.declare ("day_length", "h", Value::LogOnly,
+    frame.declare ("wind", "m/s", Attribute::LogOnly, "Wind speed.");
+    frame.declare ("day_length", "h", Attribute::LogOnly,
                 "Number of light hours this day.");
-    frame.declare ("day_cycle", Value::None (), Value::LogOnly,
+    frame.declare ("day_cycle", Attribute::None (), Attribute::LogOnly,
                 "Fraction of daily radiation received this hour.");
-    frame.declare_submodule_sequence ("deposit", Value::LogOnly, "\
+    frame.declare_submodule_sequence ("deposit", Attribute::LogOnly, "\
 Total atmospheric deposition of nitrogen.", load_flux);
     }
 } WeatherBase_syntax;

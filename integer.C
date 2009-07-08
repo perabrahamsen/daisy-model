@@ -83,7 +83,7 @@ static struct IntegerConstSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.declare_integer ("value", Value::Const,
+    frame.declare_integer ("value", Attribute::Const,
 		"Fixed value for this integer.");
     frame.order ("value");
   }
@@ -100,7 +100,7 @@ struct IntegerCond : public Integer
     {
       frame.declare_object ("condition", Boolean::component, "\
 Condition to test for.");
-      frame.declare_integer ("value", Value::Const, "\
+      frame.declare_integer ("value", Attribute::Const, "\
 Value to return.");
       frame.order ("condition", "value");
     }
@@ -168,7 +168,7 @@ Return the value of the first clause whose condition is true.")
   void load_frame (Frame& frame) const
   {
 
-    frame.declare_submodule_sequence ("clauses", Value::Const, "\
+    frame.declare_submodule_sequence ("clauses", Attribute::Const, "\
 List of clauses to match for.",
                                    IntegerCond::Clause::load_syntax);
     frame.order ("clauses");

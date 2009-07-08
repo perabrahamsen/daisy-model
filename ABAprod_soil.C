@@ -142,7 +142,7 @@ ABA production based on soil location.")
   void load_frame (Frame& frame) const
   {
     frame.declare_object ("expr", Number::component, 
-                      Value::Const, Value::Singleton, "\
+                      Attribute::Const, Attribute::Singleton, "\
 Expression to evaluate to ABA uptake [g/cm^3/h].\n\
 The symbol 'h' will be bound to the water pressure [cm].\n\
 The symbol 'L' will be bound to the root density [cm/cm^3].\n\

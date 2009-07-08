@@ -34,7 +34,7 @@ private:
   // Scope interface.
 public:
   void entries (std::set<symbol>&) const;
-  Value::type lookup (symbol) const;
+  Attribute::type lookup (symbol) const;
   symbol dimension (symbol tag) const;
   symbol description (symbol) const;
   int type_size (symbol tag) const;

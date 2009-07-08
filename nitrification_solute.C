@@ -100,14 +100,14 @@ with nitrification based on ammonium solute.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("k", "g/cm^3", Check::positive (), Value::Const, 
+    frame.declare ("k", "g/cm^3", Check::positive (), Attribute::Const, 
 		"Half saturation constant.");
     frame.declare ("k_10", "h^-1", Check::non_negative (),
-		Value::Const, "Max rate.");
-    frame.declare ("heat_factor", "dg C", Value::None (), Value::Const,
+		Attribute::Const, "Max rate.");
+    frame.declare ("heat_factor", "dg C", Attribute::None (), Attribute::Const,
 		"Heat factor.");
     frame.set ("heat_factor", PLF::empty ());
-    frame.declare ("water_factor", "cm", Value::None (), Value::Const,
+    frame.declare ("water_factor", "cm", Attribute::None (), Attribute::Const,
 		"Water potential factor.");
     frame.set ("water_factor", PLF::empty ());
   }

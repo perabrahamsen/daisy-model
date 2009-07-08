@@ -249,24 +249,24 @@ static struct BioporeInit : public DeclareComponent
 A single class of biopores.")
   { }
   static void load_flux (Frame& frame)
-  { IM::add_syntax (frame, Value::LogOnly, IM::flux_unit ()); }
+  { IM::add_syntax (frame, Attribute::LogOnly, IM::flux_unit ()); }
 
   void load_frame (Frame& frame) const
   {
     frame.declare_object ("density", Number::component, 
-                         Value::Const, Value::Singleton, "\
+                         Attribute::Const, Attribute::Singleton, "\
 Biopore density [cm^-2] as a function of 'x' [cm].");
-    frame.declare ("height_start", "cm", Check::non_positive (), Value::Const, 
+    frame.declare ("height_start", "cm", Check::non_positive (), Attribute::Const, 
                 "Biopores starts at this depth (a negative number).");
-    frame.declare ("height_end", "cm", Check::non_positive (), Value::Const, 
+    frame.declare ("height_end", "cm", Check::non_positive (), Attribute::Const, 
                 "Biopores ends at this depth (a negative number).");
     frame.declare ("diameter", "cm", Check::positive (),
-                Value::Const, "Biopore diameter.");
-    frame.declare ("S", "cm^3/cm^3/h", Value::LogOnly, Value::SoilCells,
+                Attribute::Const, "Biopore diameter.");
+    frame.declare ("S", "cm^3/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                 "Sink from matrix domain to biopore.");
-    frame.declare ("infiltration", "cm/h", Value::LogOnly, "\
+    frame.declare ("infiltration", "cm/h", Attribute::LogOnly, "\
 Surface infiltration.");
-    frame.declare_submodule_sequence ("solute_infiltration", Value::LogOnly, "\
+    frame.declare_submodule_sequence ("solute_infiltration", Attribute::LogOnly, "\
 Rate of solute infiltration through surface.", load_flux);
   }
 } Biopore_init;

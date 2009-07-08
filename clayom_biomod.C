@@ -255,14 +255,14 @@ ration between maintenance and turnover is also clay dependent.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("a", Value::None (), Check::positive (), Value::Const,
+    frame.declare ("a", Attribute::None (), Check::positive (), Attribute::Const,
 		"Maintenance parameter.");
 #ifdef OLD_VERSION
-    frame.declare ("alpha", Value::None (), Check::positive (), Value::Const,
+    frame.declare ("alpha", Attribute::None (), Check::positive (), Attribute::Const,
 		"Speed parameter.");
 #else // !OLD_VERSION
-    frame.declare ("factor", Value::Fraction (), Value::None (),
-		Value::Const, "\
+    frame.declare ("factor", Attribute::Fraction (), Attribute::None (),
+		Attribute::Const, "\
 Function of clay content, multiplied to the maintenance and turnover rates\n\
 of the SMB pools.");
     PLF factor;
@@ -271,11 +271,11 @@ of the SMB pools.");
     factor.add (1.00, 0.5);
     frame.set ("factor", factor);
 #endif // !OLD_VERSION
-    frame.declare_fraction ("E_SMB", Value::Const,
+    frame.declare_fraction ("E_SMB", Attribute::Const,
 			 "SMB efficiency in processing organic matter.\n\
 Note that you must set the 'efficiency' parameter for all OM pools to\n\
 this number for the BIOMOD clay response model to work correctly.");
-    frame.declare_fraction ("f_SMB1", Value::Const,
+    frame.declare_fraction ("f_SMB1", Attribute::Const,
 			 "Fraction of AOM pools goind to SMB1.\n\
 Only the fraction of AOM going to a SMB pool count, so this is really\n\
 a fraction of the fraction coing to the SMB pools.\n\

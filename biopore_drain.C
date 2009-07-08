@@ -205,7 +205,7 @@ Biopores that ends in the drain pipes.")
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.declare ("pipe_position", "cm", Check::negative (), Value::Const,
+    frame.declare ("pipe_position", "cm", Check::negative (), Attribute::Const,
                 "Height pipes are placed in the soil (a negative number).\n\
 By default, use the height specified for pipes in the column.");
   }

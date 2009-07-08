@@ -52,7 +52,7 @@ struct SelectArray : public Select
     static const symbol bulk_density ("g/cm^3");
     const symbol bulk_dim = default_dimension (bulk_density);
     if (units.can_convert (has, bulk_dim)
-        && units.can_convert (Value::Fraction (), want))
+        && units.can_convert (Attribute::Fraction (), want))
       bd_convert.reset (new BD_convert (units, has, want, bulk_dim));
     return bd_convert.get ();
   }
@@ -230,7 +230,7 @@ static struct SelectArraySyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   { 
-    frame.declare ("value", Value::Unknown (), Value::State, Value::Variable,
+    frame.declare ("value", Attribute::Unknown (), Attribute::State, Attribute::Variable,
 		"The current accumulated value.");
     std::vector<double> empty;
     frame.set ("value", empty);

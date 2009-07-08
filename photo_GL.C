@@ -164,19 +164,19 @@ static struct Photo_GLSyntax : public DeclareModel
     DS_null_eff.add (0.0, 1.00);
     DS_null_eff.add (2.0, 1.00);
 
-    frame.declare ("Qeff", "(g CO2/m^2/h)/(W/m^2)", Value::Const,
+    frame.declare ("Qeff", "(g CO2/m^2/h)/(W/m^2)", Attribute::Const,
                 "Quantum efficiency at low light.");
-    frame.declare ("Fm", "g CO2/m^2/h", Check::positive (), Value::Const,
+    frame.declare ("Fm", "g CO2/m^2/h", Check::positive (), Attribute::Const,
                 "Maximum assimilation rate.");
-    frame.declare ("TempEff", "dg C", Value::None (), Check::non_negative (),
-                Value::Const,
+    frame.declare ("TempEff", "dg C", Attribute::None (), Check::non_negative (),
+                Attribute::Const,
                 "Temperature factor for assimilate production.");
-    frame.declare ("DSEff", "DS", Value::None (), Check::non_negative (),
-                Value::Const, "\
+    frame.declare ("DSEff", "DS", Attribute::None (), Check::non_negative (),
+                Attribute::Const, "\
 Development stage factor for assimilate production.");
     frame.set ("DSEff",DS_null_eff);
-    frame.declare ("DAPEff", "d", Value::None (), Check::non_negative (),
-                Value::Const, "Age factor for assimilate production.\n\
+    frame.declare ("DAPEff", "d", Attribute::None (), Check::non_negative (),
+                Attribute::Const, "Age factor for assimilate production.\n\
 Age is given as day after planting.");
     frame.set ("DAPEff",DS_null_eff);
   }

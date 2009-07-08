@@ -35,14 +35,14 @@ ScopeSources::entries (std::set<symbol>& all) const
     all.insert (source[i]->title ());
 }
 
-Value::type 
+Attribute::type 
 ScopeSources::lookup (const symbol tag) const
 {
   for (size_t i = 0; i < source.size (); i++)
     if (source[i]->title () == tag)
-      return Value::Number;
+      return Attribute::Number;
 
-  return Value::Error;
+  return Attribute::Error;
 }
 
 bool 
