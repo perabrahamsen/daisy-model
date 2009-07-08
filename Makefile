@@ -493,7 +493,7 @@ SPECIALS = log_dlf.C reaction_colgen.C weather_base.C \
 
 # Various utility code that are neither a component nor a (sub)model.
 # 
-OTHER = val.C type.C model_derived.C model_logable.C model_framed.C \
+OTHER = value.C type.C model_derived.C model_logable.C model_framed.C \
 	printer.C printer_file.C filepos.C frame_submodel.C submodeler.C \
 	frame_model.C scope.C attribute.C unit.C border.C resistance.C \
 	convert.C units.C tertsmall.C anystate.C imvec.C im.C frame.C \
@@ -1357,7 +1357,7 @@ geometry${OBJ}: geometry.C geometry.h symbol.h attribute.h volume.h model.h \
 log_alist${OBJ}: log_alist.C log_alist.h log.h time.h symbol.h border.h \
   model_framed.h model_logable.h model.h library.h frame_submodel.h \
   frame.h scope.h attribute.h frame_model.h assertion.h metalib.h
-val${OBJ}: val.C val.h symbol.h attribute.h assertion.h
+value${OBJ}: value.C value.h symbol.h attribute.h assertion.h
 type${OBJ}: type.C type.h attribute.h symbol.h frame.h scope.h assertion.h \
   check.h
 model_derived${OBJ}: model_derived.C model_derived.h model_logable.h model.h \
@@ -1400,8 +1400,8 @@ im${OBJ}: im.C im.h symbol.h attribute.h chemical.h model_framed.h \
   border.h block.h scope.h frame_submodel.h frame.h check.h assertion.h
 frame${OBJ}: frame.C frame.h scope.h attribute.h symbol.h frame_model.h \
   frame_submodel.h block.h assertion.h librarian.h model.h intrinsics.h \
-  memutils.h library.h filepos.h metalib.h type.h val.h check.h vcheck.h \
-  treelog.h plf.h mathlib.h
+  memutils.h library.h filepos.h metalib.h type.h value.h check.h \
+  vcheck.h treelog.h plf.h mathlib.h
 bdconv${OBJ}: bdconv.C bdconv.h convert.h symbol.h geometry.h attribute.h \
   soil.h volume.h model.h units.h memutils.h assertion.h
 abiotic${OBJ}: abiotic.C abiotic.h mathlib.h assertion.h

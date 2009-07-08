@@ -2,13 +2,7 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Cleanup
 
-** Value -> Attribute
-
-** Val -> Value
-
-** fjern value.h value.C
-
-** omdøb val value
+** commit
 
 ** fjern flere "clone", brug shared_ptr
 

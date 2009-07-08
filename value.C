@@ -1,4 +1,4 @@
-// val.C -- Attribute values.
+// value.C -- Attribute values.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
@@ -21,248 +21,248 @@
 
 #define BUILD_DLL
 
-#include "val.h"
+#include "value.h"
 #include "attribute.h"
 #include "assertion.h"
 
 int
-Val::size () const
+Value::size () const
 { return Attribute::Singleton; }
 
 double 
-Val::number () const
+Value::number () const
 { daisy_notreached (); }
 
 symbol 
-Val::name () const
+Value::name () const
 { daisy_notreached (); }
 
 bool 
-Val::flag () const
+Value::flag () const
 { daisy_notreached (); }
 
 const PLF& 
-Val::plf () const
+Value::plf () const
 { daisy_notreached (); }
 
 const FrameModel& 
-Val::model () const
+Value::model () const
 { daisy_notreached (); }
 
 const FrameSubmodel& 
-Val::submodel () const
+Value::submodel () const
 { daisy_notreached (); }
 
 int 
-Val::integer () const
+Value::integer () const
 { daisy_notreached (); }
 
 const std::vector<double>& 
-Val::number_sequence () const
+Value::number_sequence () const
 { daisy_notreached (); }
 
 const std::vector<symbol>& 
-Val::name_sequence () const
+Value::name_sequence () const
 { daisy_notreached (); }
 
 const std::vector<bool>& 
-Val::flag_sequence () const
+Value::flag_sequence () const
 { daisy_notreached (); }
 
 const std::vector<int>& 
-Val::integer_sequence () const
+Value::integer_sequence () const
 { daisy_notreached (); }
 
 const std::vector<boost::shared_ptr<const PLF>/**/>&
-Val::plf_sequence () const
+Value::plf_sequence () const
 { daisy_notreached (); }
 
 const std::vector<boost::shared_ptr<const FrameModel>/**/>& 
-Val::model_sequence () const
+Value::model_sequence () const
 { daisy_notreached (); }
 
 const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& 
-Val::submodel_sequence () const
+Value::submodel_sequence () const
 { daisy_notreached (); }
 
 bool 
-Val::is_reference () const
+Value::is_reference () const
 { return false; }
 
-Val::Val ()
+Value::Value ()
 { }
 
-Val::~Val ()
+Value::~Value ()
 { }
 
 int
-ValReference::size () const
+ValueReference::size () const
 { return -1; }
 
 symbol 
-ValReference::name () const
+ValueReference::name () const
 { return value; }
 
 bool 
-ValReference::is_reference () const
+ValueReference::is_reference () const
 { return true; }
 
-ValReference::ValReference (const symbol v)
+ValueReference::ValueReference (const symbol v)
   : value (v)
 { }
 
 double 
-ValNumber::number () const
+ValueNumber::number () const
 { return value; }
 
-ValNumber::ValNumber (double v)
-  : Val (),
+ValueNumber::ValueNumber (double v)
+  : Value (),
     value (v)
 { }
 
 double 
-ValScalar::number () const
+ValueScalar::number () const
 { return number_; }
 
 symbol
-ValScalar::name () const
+ValueScalar::name () const
 { return name_; }
 
-ValScalar::ValScalar (double v, const symbol s)
+ValueScalar::ValueScalar (double v, const symbol s)
   : number_ (v),
     name_ (s)
 { }
 
 symbol
-ValString::name () const
+ValueString::name () const
 { return value; }
 
-ValString::ValString (const symbol v)
+ValueString::ValueString (const symbol v)
   : value (v)
 { }
 
 bool 
-ValBoolean::flag () const
+ValueBoolean::flag () const
 { return value; }
 
-ValBoolean::ValBoolean (const bool v)
+ValueBoolean::ValueBoolean (const bool v)
   : value (v)
 { }
 
 const PLF& 
-ValPLF::plf () const
+ValuePLF::plf () const
 { return *value; }
 
-ValPLF::ValPLF (boost::shared_ptr<const PLF> v)
+ValuePLF::ValuePLF (boost::shared_ptr<const PLF> v)
   : value (v)
 { }
 
 const FrameModel& 
-ValModel::model () const
+ValueModel::model () const
 { return *value; }
 
-ValModel::ValModel (boost::shared_ptr<const FrameModel> v)
+ValueModel::ValueModel (boost::shared_ptr<const FrameModel> v)
   : value (v)
 { }
 
 const FrameSubmodel& 
-ValSubmodel::submodel () const
+ValueSubmodel::submodel () const
 { return *value; }
 
-ValSubmodel::ValSubmodel (boost::shared_ptr<const FrameSubmodel> v)
+ValueSubmodel::ValueSubmodel (boost::shared_ptr<const FrameSubmodel> v)
   : value (v)
 { }
 
 int 
-ValInteger::integer () const
+ValueInteger::integer () const
 { return value; }
 
-ValInteger::ValInteger (const int v)
+ValueInteger::ValueInteger (const int v)
   : value (v)
 { }
 
 int
-ValNumberSeq::size () const
+ValueNumberSeq::size () const
 { return value.size (); }
 
 const std::vector<double>& 
-ValNumberSeq::number_sequence () const
+ValueNumberSeq::number_sequence () const
 { return value; }
 
-ValNumberSeq::ValNumberSeq (const std::vector<double>& v)
+ValueNumberSeq::ValueNumberSeq (const std::vector<double>& v)
   : value (v)
 { }
 
 int
-ValStringSeq::size () const
+ValueStringSeq::size () const
 { return value.size (); }
 
 const std::vector<symbol>& 
-ValStringSeq::name_sequence () const
+ValueStringSeq::name_sequence () const
 { return value; }
 
-ValStringSeq::ValStringSeq (const std::vector<symbol>& v)
+ValueStringSeq::ValueStringSeq (const std::vector<symbol>& v)
   : value (v)
 { }
 
 int
-ValBooleanSeq::size () const
+ValueBooleanSeq::size () const
 { return value.size (); }
 
 const std::vector<bool>& 
-ValBooleanSeq::flag_sequence () const
+ValueBooleanSeq::flag_sequence () const
 { return value; }
 
-ValBooleanSeq::ValBooleanSeq (const std::vector<bool>& v)
+ValueBooleanSeq::ValueBooleanSeq (const std::vector<bool>& v)
   : value (v)
 { }
 
 int
-ValIntegerSeq::size () const
+ValueIntegerSeq::size () const
 { return value.size (); }
 
 const std::vector<int>& 
-ValIntegerSeq::integer_sequence () const
+ValueIntegerSeq::integer_sequence () const
 { return value; }
 
-ValIntegerSeq::ValIntegerSeq (const std::vector<int>& v)
+ValueIntegerSeq::ValueIntegerSeq (const std::vector<int>& v)
   : value (v)
 { }
 
 int
-ValPLFSeq::size () const
+ValuePLFSeq::size () const
 { return value.size (); }
 
 const std::vector<boost::shared_ptr<const PLF>/**/>& 
-ValPLFSeq::plf_sequence () const
+ValuePLFSeq::plf_sequence () const
 { return value; }
 
-ValPLFSeq::ValPLFSeq (const std::vector<boost::shared_ptr<const PLF>/**/>& v)
+ValuePLFSeq::ValuePLFSeq (const std::vector<boost::shared_ptr<const PLF>/**/>& v)
   : value (v)
 { }
 
 int
-ValModelSeq::size () const
+ValueModelSeq::size () const
 { return value.size (); }
 
 const std::vector<boost::shared_ptr<const FrameModel>/**/>& 
-ValModelSeq::model_sequence () const
+ValueModelSeq::model_sequence () const
 { return value; }
 
-ValModelSeq::ValModelSeq (const std::vector<boost::shared_ptr<const FrameModel>/**/>& v)
+ValueModelSeq::ValueModelSeq (const std::vector<boost::shared_ptr<const FrameModel>/**/>& v)
   : value (v)
 { }
 
 int
-ValSubmodelSeq::size () const
+ValueSubmodelSeq::size () const
 { return value.size (); }
 
 const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& 
-ValSubmodelSeq::submodel_sequence () const
+ValueSubmodelSeq::submodel_sequence () const
 { return value; }
 
-ValSubmodelSeq::ValSubmodelSeq (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& v)
+ValueSubmodelSeq::ValueSubmodelSeq (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& v)
   : value (v)
 { }
 
-// val.C ends here.
+// value.C ends here.

@@ -1,4 +1,4 @@
-// val.h -- Attribute values.
+// value.h -- Attribute values.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
@@ -19,8 +19,8 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef VAL_H
-#define VAL_H
+#ifndef VALUE_H
+#define VALUE_H
 
 #include "symbol.h"
 #include <vector>
@@ -31,7 +31,7 @@ class PLF;
 class FrameModel;
 class FrameSubmodel;
 
-class Val : public boost::noncopyable
+class Value : public boost::noncopyable
 {
 public:
   virtual int size () const;
@@ -51,148 +51,148 @@ public:
   virtual const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& submodel_sequence () const;
   virtual bool is_reference () const;
 protected:
-  Val ();
+  Value ();
 public: 
-  virtual ~Val ();
+  virtual ~Value ();
 };
 
-class ValNumber : public Val
+class ValueNumber : public Value
 {
   const double value;
   double number () const;
 public:
-  ValNumber (const double v);
+  ValueNumber (const double v);
 };
 
-class ValReference : public Val
+class ValueReference : public Value
 {
   const symbol value;
   int size () const;
   symbol name () const;
   bool is_reference () const;
 public:
-  ValReference (const symbol v);
+  ValueReference (const symbol v);
 };
 
-class ValScalar : public Val
+class ValueScalar : public Value
 {
   const double number_;
   const symbol name_;
   double number () const;
   symbol name () const;
 public:
-  ValScalar (const double v, const symbol s);
+  ValueScalar (const double v, const symbol s);
 };
 
-class ValString : public Val
+class ValueString : public Value
 {
   const symbol value;
   symbol name () const;
 public:
-  ValString (const symbol v);
+  ValueString (const symbol v);
 };
 
-class ValBoolean : public Val
+class ValueBoolean : public Value
 {
   const bool value;
   bool flag () const;
 public:
-  ValBoolean (const bool v);
+  ValueBoolean (const bool v);
 };
 
-class ValPLF : public Val
+class ValuePLF : public Value
 {
   boost::shared_ptr<const PLF> value;
   const PLF& plf () const;
 public:
-  ValPLF (boost::shared_ptr<const PLF> v);
+  ValuePLF (boost::shared_ptr<const PLF> v);
 };
 
-class ValModel : public Val
+class ValueModel : public Value
 {
   boost::shared_ptr<const FrameModel> value;
   const FrameModel& model () const;
 public:
-  ValModel (boost::shared_ptr<const FrameModel> f);
+  ValueModel (boost::shared_ptr<const FrameModel> f);
 };
 
-class ValSubmodel : public Val
+class ValueSubmodel : public Value
 {
   boost::shared_ptr<const FrameSubmodel> value;
   const FrameSubmodel& submodel () const;
 public:
-  ValSubmodel (boost::shared_ptr<const FrameSubmodel> f);
+  ValueSubmodel (boost::shared_ptr<const FrameSubmodel> f);
 };
 
-class ValInteger : public Val
+class ValueInteger : public Value
 {
   const int value;
   int integer () const;
 public:
-  ValInteger (const int v);
+  ValueInteger (const int v);
 };
 
-class ValNumberSeq : public Val
+class ValueNumberSeq : public Value
 {
   const std::vector<double> value;
   int size () const;
   const std::vector<double>& number_sequence () const;
 public:
-  ValNumberSeq (const std::vector<double>& v);
+  ValueNumberSeq (const std::vector<double>& v);
 };
 
-class ValStringSeq : public Val
+class ValueStringSeq : public Value
 {
   const std::vector<symbol> value;
   int size () const;
   const std::vector<symbol>& name_sequence () const;
 public:
-  ValStringSeq (const std::vector<symbol>& v);
+  ValueStringSeq (const std::vector<symbol>& v);
 };
 
-class ValBooleanSeq : public Val
+class ValueBooleanSeq : public Value
 {
   const std::vector<bool> value;
   int size () const;
   const std::vector<bool>& flag_sequence () const;
 public:
-  ValBooleanSeq (const std::vector<bool>& v);
+  ValueBooleanSeq (const std::vector<bool>& v);
 };
 
-class ValIntegerSeq : public Val
+class ValueIntegerSeq : public Value
 {
   const std::vector<int> value;
   int size () const;
   const std::vector<int>& integer_sequence () const;
 public:
-  ValIntegerSeq (const std::vector<int>& v);
+  ValueIntegerSeq (const std::vector<int>& v);
 };
 
-class ValPLFSeq : public Val
+class ValuePLFSeq : public Value
 {
   const std::vector<boost::shared_ptr<const PLF>/**/> value;
   int size () const;
   const std::vector<boost::shared_ptr<const PLF>/**/>& plf_sequence () const;
 public:
-  ValPLFSeq (const std::vector<boost::shared_ptr<const PLF>/**/>& v);
+  ValuePLFSeq (const std::vector<boost::shared_ptr<const PLF>/**/>& v);
 };
 
-class ValModelSeq : public Val
+class ValueModelSeq : public Value
 {
   const std::vector<boost::shared_ptr<const FrameModel>/**/> value;
   int size () const;
   const std::vector<boost::shared_ptr<const FrameModel>/**/>& model_sequence () const;
 public:
-  ValModelSeq (const std::vector<boost::shared_ptr<const FrameModel>/**/>& v);
+  ValueModelSeq (const std::vector<boost::shared_ptr<const FrameModel>/**/>& v);
 };
 
-class ValSubmodelSeq : public Val
+class ValueSubmodelSeq : public Value
 {
   const std::vector<boost::shared_ptr<const FrameSubmodel>/**/> value;
   int size () const;
   const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& submodel_sequence () const;
 public:
-  ValSubmodelSeq (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& v);
+  ValueSubmodelSeq (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& v);
 };
 
-#endif // VAL_H
+#endif // VALUE_H
