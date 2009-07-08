@@ -78,7 +78,6 @@ struct Rootdens_GP1D : public Rootdens
   void initialize (const Geometry&, double row_width, double row_pos, 
                    Treelog& msg);
   explicit Rootdens_GP1D (Block&);
-  explicit Rootdens_GP1D (const AttributeList&);
 };
 
 void

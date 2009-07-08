@@ -30,7 +30,6 @@ class Treelog;
 class Unit;
 class Convert;
 class Frame;
-class AttributeList;
 
 class Units : private boost::noncopyable
 {

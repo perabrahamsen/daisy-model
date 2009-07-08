@@ -28,7 +28,6 @@
 
 class Surface;
 class Weather;
-class AttributeList;
 class Vegetation;
 class Movement; 
 class Geometry;

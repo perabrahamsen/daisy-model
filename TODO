@@ -2,9 +2,9 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Cleanup
 
-** commit
-
 ** fjern flere "clone", brug shared_ptr
+
+*** Brug shared_ptr i Library
 
 * Regression testing
 

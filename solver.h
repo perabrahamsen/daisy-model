@@ -35,7 +35,6 @@ typedef boost::numeric::ublas::compressed_matrix<double> SMatrix_type;
 #endif // compressed matrix
 
 class Block;
-class AttributeList;
 
 class Solver : public Model 
 {

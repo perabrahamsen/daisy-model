@@ -29,7 +29,6 @@
 #include <memory>
 
 class Block;
-class AttributeList;
 
 class Average : public Model
 {

@@ -24,7 +24,6 @@
 
 #include "model_derived.h"
 
-class AttributeList;
 class Frame;
 class Log;
 class PLF;

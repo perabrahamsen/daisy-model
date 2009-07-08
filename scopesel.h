@@ -27,7 +27,6 @@
 class Output;
 class Scope;
 class Treelog;
-class AttributeList;
 
 class Scopesel : public Model
 {

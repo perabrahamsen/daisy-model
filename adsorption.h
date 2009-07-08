@@ -28,7 +28,6 @@
 class Log;
 class Soil;
 class Block;
-class AttributeList;
 
 class Adsorption : public ModelDerived
 {

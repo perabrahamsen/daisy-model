@@ -34,7 +34,6 @@ class SoilWater;
 class Log;
 class Treelog;
 class Block;
-class AttributeList;
 
 class Mactrans : public Model
 {

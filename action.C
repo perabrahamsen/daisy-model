@@ -58,12 +58,6 @@ Action::Action (Block& al)
   : ModelFramed (al)
 { }
 
-#if 0
-Action::Action (Block&, const AttributeList& al)
-  : ModelFramed (al)
-{ }
-#endif
-
 Action::~Action ()
 { }
 

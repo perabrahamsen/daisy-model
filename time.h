@@ -38,7 +38,6 @@
 #define EXPORT __declspec(dllimport)
 #endif
 
-class AttributeList;
 class Frame;
 class FrameSubmodel;
 class Log;

@@ -33,7 +33,6 @@ class Geometry;
 class Border;
 class Treelog;
 class Block;
-class AttributeList;
 
 class Volume : public Model 
 {

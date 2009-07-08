@@ -31,7 +31,6 @@
 class Treelog;
 class Block;
 class Metalib;
-class AttributeList;
 class Log;
 
 class Program : public Model

@@ -28,7 +28,6 @@
 #include <stack>
 
 class Block;
-class AttributeList;
 
 class Format : public Model
 {

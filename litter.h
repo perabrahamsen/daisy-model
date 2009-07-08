@@ -22,7 +22,6 @@
 #ifndef LITTER_H
 #define LITTER_H
 
-class AttributeList;
 class Frame;
 class FrameSubmodel;
 

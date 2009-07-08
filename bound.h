@@ -26,7 +26,6 @@
 #include "symbol.h"
 
 class Block;
-class AttributeList;
 
 class Bound : public Model
 {

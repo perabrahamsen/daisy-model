@@ -30,7 +30,6 @@ class Daisy;
 class Treelog;
 class Block;
 class Scope;
-class AttributeList;
 
 class Action : public ModelFramed
 {
@@ -51,9 +50,6 @@ public:
   virtual void initialize (const Daisy&, const Scope&, Treelog&) = 0;
   virtual bool check (const Daisy&, const Scope&, Treelog&) const = 0;
 protected:
-#if 0
-  explicit Action (Block&, const AttributeList& al);
-#endif
   explicit Action (Block& al);
 public:
   ~Action ();

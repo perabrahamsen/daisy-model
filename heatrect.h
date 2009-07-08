@@ -27,7 +27,6 @@
 #include <vector>
 
 class GeometryRect;
-class AttributeList;
 class Block;
 class Treelog;
 

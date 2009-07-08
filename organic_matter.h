@@ -27,7 +27,6 @@
 #include "model_derived.h"
 #include <vector>
 
-class AttributeList;
 class FrameModel;
 class Log;
 class AM;

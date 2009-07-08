@@ -27,7 +27,6 @@
 #include <vector>
 #include <iosfwd>
 
-class AttributeList;
 class Frame;
 class FrameSubmodel;
 class Treelog;

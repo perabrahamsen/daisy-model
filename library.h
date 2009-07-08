@@ -31,7 +31,6 @@
 
 class Metalib;
 class Block;
-class AttributeList;
 class Treelog;
 class Format;
 class Model;

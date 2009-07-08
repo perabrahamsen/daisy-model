@@ -29,7 +29,6 @@
 
 class Frame;
 class Block;
-class AttributeList;
 class Treelog;
 
 class Geometry1D : public GeometryVert

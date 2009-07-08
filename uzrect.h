@@ -33,7 +33,6 @@ struct Surface;
 struct Groundwater;
 struct Treelog;
 class Block;
-class AttributeList;
 class Tertsmall;
 
 class UZRect : public Model

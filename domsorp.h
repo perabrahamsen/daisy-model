@@ -32,7 +32,6 @@ class SoilWater;
 class SoilHeat;
 class SOM;
 class DOM;
-class AttributeList;
 class Block;
 class Treelog;
 class Units;

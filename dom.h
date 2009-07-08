@@ -27,7 +27,6 @@
 
 struct Log;
 struct Frame;
-struct AttributeList;
 struct Geometry;
 struct Soil;
 struct SoilWater;

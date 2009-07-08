@@ -27,7 +27,6 @@
 #include "plf.h"
 #include <vector>
 
-class AttributeList;
 class Frame;
 class Log;
 class Geometry;

@@ -47,9 +47,7 @@ struct Library::Implementation
   ancestor_map ancestors;
 
   // Accessors.
-  AttributeList& lookup (symbol) const;
   const FrameModel& model (symbol) const;
-  Frame& frame (symbol) const;
   bool check (symbol) const;
   void add_ancestors (symbol);
   void add_model (symbol, FrameModel&);
@@ -70,17 +68,6 @@ Library::Implementation::model (const symbol key) const
   if (i == frames.end ())
     daisy_panic ("Model '" + key.name () + "' not in library '" 
                  + name.name () + "'");
-  return *(*i).second;
-}
-
-Frame&
-Library::Implementation::frame (const symbol key) const
-{ 
-  frame_map::const_iterator i = frames.find (key);
-
-  if (i == frames.end ())
-    daisy_panic ("Frame '" + key.name ()
-                 + "' not in library '" + name.name () + "'");
   return *(*i).second;
 }
 
@@ -113,7 +100,7 @@ Library::Implementation::add_ancestors (const symbol key)
       if (!check (current))
 	break;
 
-      const Frame& frame = this->frame (current);
+      const Frame& frame = this->model (current);
 
       symbol next = frame.base_name ();
       

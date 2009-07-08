@@ -28,7 +28,6 @@
 #include <set>
 #include <memory>
 
-class AttributeList;
 class Horizon;
 class Log;
 class Geometry;

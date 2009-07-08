@@ -26,7 +26,6 @@
 #include <string>
 #include <vector>
 
-class AttributeList;
 class Daisy;
 class Volume;
 

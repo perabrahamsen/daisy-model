@@ -27,7 +27,6 @@
 class Treelog;
 class Block;
 class Log;
-class AttributeList;
 class Geometry;
 class SoilWater;
 class Units;
