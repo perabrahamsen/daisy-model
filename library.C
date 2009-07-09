@@ -30,7 +30,6 @@
 #include "filepos.h"
 #include <map>
 #include <sstream>
-#include <boost/shared_ptr.hpp>
 
 struct Library::Implementation
 {
@@ -39,7 +38,7 @@ struct Library::Implementation
   symbol description;
 
   // Types.
-  typedef std::map<symbol, boost::shared_ptr<FrameModel>/**/> frame_map;
+  typedef std::map<symbol, boost::shared_ptr<const FrameModel>/**/> frame_map;
   typedef std::map<symbol, std::set<symbol>/**/> ancestor_map;
 
   // Data (remember to update Library::clone if you change this).
@@ -51,7 +50,7 @@ struct Library::Implementation
   const FrameModel& model (symbol) const;
   bool check (symbol) const;
   void add_ancestors (symbol);
-  void add_model (symbol, FrameModel&);
+  void add_model (symbol, boost::shared_ptr<const FrameModel>);
   void entries (std::vector<symbol>&) const;
   void remove (symbol);
   void clear_parsed ();
@@ -116,12 +115,14 @@ Library::Implementation::add_ancestors (const symbol key)
 }
 
 void
-Library::Implementation::add_model (const symbol key, FrameModel& frame)
+Library::Implementation::add_model (const symbol key, 
+                                    boost::shared_ptr<const FrameModel> frame)
 {
-  if (frame.type_name () != key)
-    daisy_panic ("Adding frame named " + frame.type_name () + " under the name "
-                 + key + ", type " + typeid (frame).name ());
-  frames[key].reset (&frame);
+  if (frame->type_name () != key)
+    daisy_panic ("Adding frame named " 
+                 + frame->type_name () + " under the name "
+                 + key + ", type " + typeid (*frame).name ());
+  frames[key] = frame;
   add_ancestors (key);
 }
 
@@ -149,29 +150,30 @@ Library::Implementation::clear_parsed ()
  retry:
   for (frame_map::iterator i = frames.begin (); i != frames.end (); i++)
     {
-      Frame& frame = *((*i).second);
+      const Frame& frame = *((*i).second);
       if (frame.own_position () != Filepos::none ())
 	{
 	  const symbol key = (*i).first;
 	  frames.erase (i);
-	  delete &frame;
 	  goto retry;
 	}
     }
 }
 
+#if 0
 void
 Library::Implementation::refile_parsed (const std::string& from, const std::string& to)
 {
   daisy_assert (from != to);
   for (frame_map::iterator i = frames.begin (); i != frames.end (); i++)
     {
-      Frame& frame = *((*i).second);
+      const Frame& frame = *((*i).second);
       const Filepos& pos = frame.own_position ();
       if (pos.filename () == from)
         frame.reposition (Filepos (to, pos.line (), pos.column ()));
     }
 }
+#endif
 
 Library::Implementation::Implementation (const symbol n) 
   : name (symbol (n))
@@ -184,9 +186,11 @@ void
 Library::clear_parsed ()
 { impl->clear_parsed (); }
 
+#if 0
 void 
 Library::refile_parsed (const std::string& from, const std::string& to)
 { impl->refile_parsed (from, to); }
+#endif
 
 symbol
 Library::name () const
@@ -222,7 +226,7 @@ Library::complete (const Metalib& metalib, const symbol key) const
 }
 
 void
-Library::add_model (const symbol key, FrameModel& frame)
+Library::add_model (const symbol key, boost::shared_ptr<const FrameModel> frame)
 { impl->add_model (key, frame); }
 
 void

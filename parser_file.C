@@ -587,9 +587,9 @@ ParserFile::Implementation::add_derived (Library& lib)
     }
   
   daisy_assert (mutable_metalib);
-  std::auto_ptr<FrameModel> frame (new FrameParsed (name, lib.model (super), 
-                                                    mutable_metalib->get_sequence (),
-                                                    lexer->position ()));
+  boost::shared_ptr<FrameModel> frame
+    (new FrameParsed (name, lib.model (super), mutable_metalib->get_sequence (),
+                      lexer->position ()));
   if (!frame.get ())
     throw "Failed to derive";
 
@@ -609,7 +609,7 @@ ParserFile::Implementation::add_derived (Library& lib)
 
   load_list (*frame);
   // Add new object to library.
-  lib.add_model (name, *frame.release ());
+  lib.add_model (name, frame);
 
   // Inform metalib.
   daisy_assert (mutable_metalib);

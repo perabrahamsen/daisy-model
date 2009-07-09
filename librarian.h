@@ -27,6 +27,7 @@
 #include "model.h"
 #include "symbol.h"
 #include <vector>
+#include <boost/shared_ptr.hpp>
 
 class Block;
 class Treelog;
@@ -187,7 +188,7 @@ public:
 
 public:
   virtual bool used_to_be_a_submodel () const;
-  virtual FrameModel& create_frame () const;
+  virtual boost::shared_ptr<const FrameModel> create_frame () const;
   virtual void load (Frame&) const = 0;
 protected:
   virtual void load_frame (Frame&) const = 0;
@@ -213,7 +214,7 @@ public:
 
 class DeclareSolo : public DeclareComponent, public Declare::Builder
 {
-  FrameModel& create_frame () const;
+  boost::shared_ptr<const FrameModel> create_frame () const;
 public:
   DeclareSolo (symbol component, symbol description);
 };
@@ -236,7 +237,7 @@ public:
 
 class EXPORT DeclareModel : public DeclareSuper, public Declare::Builder
 {
-  FrameModel& create_frame () const;
+  boost::shared_ptr<const FrameModel> create_frame () const;
   void load (Frame&) const;
 protected:
   DeclareModel (symbol component, symbol name, symbol super, 

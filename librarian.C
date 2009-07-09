@@ -330,9 +330,12 @@ bool
 Declare::used_to_be_a_submodel () const
 { return false; }
 
-FrameModel& 
+boost::shared_ptr<const FrameModel>
 Declare::create_frame () const 
-{ return *new FrameDeclared (*this); }
+{ 
+  boost::shared_ptr<const FrameModel> share (new FrameDeclared (*this));
+  return share; 
+}
 
 void 
 DeclareComponent::load (Frame& frame) const
@@ -352,9 +355,12 @@ DeclareComponent::DeclareComponent (const symbol component,
     librarian (component, description)
 { }
 
-FrameModel& 
+boost::shared_ptr<const FrameModel>
 DeclareSolo::create_frame () const
-{ return *new FrameBuildable (*this, *this); }
+{ 
+  boost::shared_ptr<const FrameModel> share (new FrameBuildable (*this, *this));
+  return share; 
+}
 
 DeclareSolo::DeclareSolo (const symbol component, const symbol description)
   : DeclareComponent (component, description)
@@ -394,9 +400,12 @@ DeclareBase::DeclareBase (const symbol component,
   : DeclareSuper (component, name, root_name (), description)
 { }
 
-FrameModel& 
+boost::shared_ptr<const FrameModel>
 DeclareModel::create_frame () const 
-{ return *new FrameBuildable (*this, *this); }
+{
+  boost::shared_ptr<const FrameModel> share (new FrameBuildable (*this, *this));
+  return share; 
+}
 
 void 
 DeclareModel::load (Frame& frame) const

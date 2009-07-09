@@ -28,6 +28,7 @@
 #include <vector>
 #include <set>
 #include <memory>
+#include <boost/shared_ptr.hpp>
 
 class Metalib;
 class Block;
@@ -63,7 +64,9 @@ private:
   // Metalib
 public:
   void clear_parsed ();
+#if 0
   void refile_parsed (const std::string& from, const std::string& to);
+#endif
 
   // Use.
 public:
@@ -72,7 +75,7 @@ public:
   const FrameModel& model (symbol) const;
   bool check (symbol) const;
   bool complete (const Metalib&, symbol) const;
-  void add_model (symbol, FrameModel&);
+  void add_model (symbol, boost::shared_ptr<const FrameModel>);
   void entries (std::vector<symbol>&) const;
   const std::set<symbol>& ancestors (symbol) const;
   bool is_derived_from (symbol a, symbol b) const;

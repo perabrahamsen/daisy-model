@@ -59,7 +59,9 @@ public:
   void all (std::vector<symbol>& libraries) const;
   int get_sequence ();
   void clear_all_parsed ();
+#if 0
   void refile_parsed (const std::string& from, const std::string& to);
+#endif
   void added_object (symbol library, symbol object);
   const std::vector<symbol>& parser_files () const;
   void add_parser_file (const symbol file);
