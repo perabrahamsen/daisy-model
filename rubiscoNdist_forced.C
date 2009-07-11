@@ -60,7 +60,7 @@ private:
 
   // Create.
 public:
-  rubiscoNdist_forced (Block& al)
+  rubiscoNdist_forced (const Block& al)
     : RubiscoNdist (al),
       expr (Librarian::build_item<Number> (al, "value")),
       scope (__FUNCTION__)
@@ -134,7 +134,7 @@ rubiscoNdist_forced
 
 static struct rubiscoNdist_forcedSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new rubiscoNdist_forced (al); }
 
   rubiscoNdist_forcedSyntax ()

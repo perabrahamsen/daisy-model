@@ -49,7 +49,7 @@ private:
 public:
   explicit ScopeMulti (const Scope& first, const Scope& second);
 #if 0
-  explicit ScopeMulti (Block&);
+  explicit ScopeMulti (const Block&);
 #endif
   ~ScopeMulti ();
 };

@@ -86,7 +86,7 @@ struct SelectPF : public Select
   { return value.size (); }
 
   // Create and Destroy.
-  SelectPF (Block& al)
+  SelectPF (const Block& al)
     : Select (al),
       max_h (al.number ("max_h")),
       value (al.number_sequence ("value")),
@@ -96,7 +96,7 @@ struct SelectPF : public Select
 
 static struct SelectPFSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new SelectPF (al); }
 
   static bool check_alist (const Metalib&, const Frame& al, Treelog& err)

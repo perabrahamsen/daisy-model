@@ -226,7 +226,7 @@ ScopeBlock::name (const symbol tag) const
   return symbol (stringer->value (*this));
 }
 
-ScopeBlock::ScopeBlock (Block& b)
+ScopeBlock::ScopeBlock (const Block& b)
   : block (b)
 { }
 

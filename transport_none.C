@@ -47,7 +47,7 @@ struct TransportNone : public Transport
 
   // Create.
   static void load_syntax (Frame&);
-  TransportNone (Block& al);
+  TransportNone (const Block& al);
   ~TransportNone ();
 };
 
@@ -102,7 +102,7 @@ TransportNone::flow (const Geometry& geo,
     C[c] = M[c] / Theta_new[c];
 }
 
-TransportNone::TransportNone (Block& al)
+TransportNone::TransportNone (const Block& al)
   : Transport (al)
 { }
 
@@ -111,7 +111,7 @@ TransportNone::~TransportNone ()
 
 static struct TransportNoneSyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new TransportNone (al); }
   TransportNoneSyntax ()
     : DeclareModel (Transport::component, "none", 

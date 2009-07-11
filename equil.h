@@ -51,7 +51,7 @@ private:
   Equilibrium ();
   Equilibrium (const Equilibrium&);
 protected:
-  explicit Equilibrium (Block& al);
+  explicit Equilibrium (const Block& al);
 public:
   ~Equilibrium ();
 };

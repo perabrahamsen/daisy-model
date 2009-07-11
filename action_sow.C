@@ -52,7 +52,7 @@ struct ActionSow : public Action
   bool check (const Daisy&, const Scope&, Treelog& err) const
   { return true; }
 
-  ActionSow (Block& al)
+  ActionSow (const Block& al)
     : Action (al),
       crop (&al.model ("crop").clone ()),
       // Use 'plant_distance' if set, otherwise use 'row_width'.
@@ -66,7 +66,7 @@ struct ActionSow : public Action
 // Add the ActionSow syntax to the syntax table.
 static struct ActionSowSyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ActionSow (al); }
 
   ActionSowSyntax ()

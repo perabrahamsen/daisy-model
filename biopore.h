@@ -127,7 +127,7 @@ public:
                            Treelog&) = 0;
   virtual bool check (const Geometry&, Treelog& msg) const = 0;
 protected:
-  explicit Biopore (Block& al);
+  explicit Biopore (const Block& al);
 public:
   ~Biopore ();
 };

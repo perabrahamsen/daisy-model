@@ -458,7 +458,7 @@ Frame::entries (std::set<symbol>& e) const
 }
 
 bool 
-Frame::check (Block& block) const
+Frame::check (const Block& block) const
 { return check (block.metalib (), *this, block.msg ()); }
 
 bool 

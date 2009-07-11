@@ -57,7 +57,7 @@ struct GnuplotXY : public GnuplotBase
   bool plot (std::ostream& out, Treelog& msg);
   
   // Create and Destroy.
-  explicit GnuplotXY (Block& al);
+  explicit GnuplotXY (const Block& al);
   ~GnuplotXY ();
 };
 
@@ -373,7 +373,7 @@ set style data lines\n";
   return true;
 }
 
-GnuplotXY::GnuplotXY (Block& al)
+GnuplotXY::GnuplotXY (const Block& al)
   : GnuplotBase (al),
     xmin_flag (al.check ("xmin")),
     xmin (al.number ("xmin", 42.42e42)),
@@ -399,7 +399,7 @@ GnuplotXY::~GnuplotXY ()
 
 static struct GnuplotXYSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new GnuplotXY (al); }
   GnuplotXYSyntax ()
     : DeclareModel (Gnuplot::component, "xy", "common",

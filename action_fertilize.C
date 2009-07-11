@@ -74,7 +74,7 @@ struct ActionFertilize : public Action
   static bool check_alist (const Metalib&, const Frame& al, Treelog& err);
   static void load_syntax (Frame&);
 protected:
-  ActionFertilize (Block& al);
+  ActionFertilize (const Block& al);
   ~ActionFertilize ();
 };
 
@@ -198,7 +198,7 @@ ActionFertilize::check (const Daisy& daisy, const Scope&, Treelog& err) const
   return ok;
 }
 
-ActionFertilize::ActionFertilize (Block& al)
+ActionFertilize::ActionFertilize (const Block& al)
   : Action (al),
     am (&al.model ("am").clone ()),
     second_year_compensation (al.flag ("second_year_compensation")),
@@ -309,7 +309,7 @@ struct ActionFertilizeSurface : public ActionFertilize
   void doIt (Daisy& daisy, const Scope&, Treelog&);
 
   // Create and destroy.
-  ActionFertilizeSurface (Block& al)
+  ActionFertilizeSurface (const Block& al)
     : ActionFertilize (al),
       from (al.number ("from")),
       to (al.number ("to"))
@@ -346,7 +346,7 @@ ActionFertilizeSurface::doIt (Daisy& daisy, const Scope&, Treelog& msg)
 
 static struct ActionFertilizeSurfaceSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ActionFertilizeSurface (al); }
 
   static bool check_alist (const Metalib&, const Frame& al, Treelog& err)
@@ -399,7 +399,7 @@ struct ActionFertilizeIncorporate : public ActionFertilize
   void doIt (Daisy& daisy, const Scope&, Treelog&);
 
   // Create and destroy.
-  ActionFertilizeIncorporate (Block& al)
+  ActionFertilizeIncorporate (const Block& al)
     : ActionFertilize (al),
       volume (Librarian::build_item<Volume> (al, "volume"))
   {  }
@@ -424,7 +424,7 @@ ActionFertilizeIncorporate::doIt (Daisy& daisy, const Scope&, Treelog& msg)
 
 static struct ActionFertilizeIncorporateSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ActionFertilizeIncorporate (al); }
 
   static bool check_alist (const Metalib&, const Frame& al, Treelog& err)

@@ -75,7 +75,7 @@ struct UZRect2x1 : public UZRect
 
   // Create and Destroy.
   void has_macropores (bool);
-  UZRect2x1 (Block& al);
+  UZRect2x1 (const Block& al);
   ~UZRect2x1 ();
 };
 
@@ -351,7 +351,7 @@ UZRect2x1::has_macropores (const bool has_them)
     vertical[i]->has_macropores (has_them);
 }
 
-UZRect2x1::UZRect2x1 (Block& al)
+UZRect2x1::UZRect2x1 (const Block& al)
   : UZRect (al),
     vertical (Librarian::build_vector<UZmodel> (al, "vertical")),
     horizontal (Librarian::build_vector<UZ1D> (al, "horizontal"))
@@ -365,7 +365,7 @@ UZRect2x1::~UZRect2x1 ()
 
 static struct UZRect2x1Syntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new UZRect2x1 (al); }
   UZRect2x1Syntax ()
     : DeclareModel (UZRect::component, "v+h", "\

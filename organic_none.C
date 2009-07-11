@@ -94,7 +94,7 @@ struct OrganicNone : public OrganicMatter
                    const Soil&, const SoilWater&, const SoilHeat&, 
                    double, Treelog&)
   { active_.insert (active_.end (), geo.cell_size (), false); }
-  explicit OrganicNone (Block& al)
+  explicit OrganicNone (const Block& al)
     : OrganicMatter (al)
   { }
   ~OrganicNone ()
@@ -103,7 +103,7 @@ struct OrganicNone : public OrganicMatter
 
 static struct OrganicNoneSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new OrganicNone (al); }
 
   OrganicNoneSyntax ()

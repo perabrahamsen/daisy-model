@@ -92,7 +92,7 @@ struct BooleanNumbers : public Boolean
         }
     return ok;
   }
-  BooleanNumbers (Block& al)
+  BooleanNumbers (const Block& al)
     : Boolean (al),
       operand (Librarian::build_vector<Number> (al, "operands"))
   { }
@@ -132,14 +132,14 @@ struct BooleanNumGT : public BooleanNumbers
       }
     return true;
   }
-  BooleanNumGT (Block& al)
+  BooleanNumGT (const Block& al)
     : BooleanNumbers (al)
   { }
 };
 
 static struct BooleanNumGTSyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new BooleanNumGT (al); }
   BooleanNumGTSyntax ()
     : DeclareModel (Boolean::component, ">", "numbers",
@@ -166,14 +166,14 @@ struct BooleanNumGTE : public BooleanNumbers
       }
     return true;
   }
-  BooleanNumGTE (Block& al)
+  BooleanNumGTE (const Block& al)
     : BooleanNumbers (al)
   { }
 };
 
 static struct BooleanNumGTESyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new BooleanNumGTE (al); }
   BooleanNumGTESyntax ()
     : DeclareModel (Boolean::component, ">=", "numbers", "\
@@ -200,14 +200,14 @@ struct BooleanNumLT : public BooleanNumbers
       }
     return true;
   }
-  BooleanNumLT (Block& al)
+  BooleanNumLT (const Block& al)
     : BooleanNumbers (al)
   { }
 };
 
 static struct BooleanNumLTSyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new BooleanNumLT (al); }
   BooleanNumLTSyntax ()
     : DeclareModel (Boolean::component, "<", "numbers",
@@ -234,14 +234,14 @@ struct BooleanNumLTE : public BooleanNumbers
       }
     return true;
   }
-  BooleanNumLTE (Block& al)
+  BooleanNumLTE (const Block& al)
     : BooleanNumbers (al)
   { }
 };
 
 static struct BooleanNumLTESyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new BooleanNumLTE (al); }
   BooleanNumLTESyntax ()
     : DeclareModel (Boolean::component, "<=", "numbers", "\

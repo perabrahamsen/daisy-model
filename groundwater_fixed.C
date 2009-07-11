@@ -57,7 +57,7 @@ public:
   { }
   bool check (const Units&, const Geometry&, const Scope&, Treelog&) const
   { return true; }
-  GroundwaterFixed (Block& al)
+  GroundwaterFixed (const Block& al)
     : Groundwater (al),
       depth (al.number ("table"))
   { }
@@ -67,7 +67,7 @@ public:
 
 static struct GroundwaterFixedSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new GroundwaterFixed (al); }
   GroundwaterFixedSyntax ()
     : DeclareModel (Groundwater::component, "fixed", "common", "\

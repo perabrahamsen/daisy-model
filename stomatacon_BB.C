@@ -43,7 +43,7 @@ private:
 
   // Create.
   public:
-  StomataCon_BB (Block& al)
+  StomataCon_BB (const Block& al)
     : StomataCon (al)
   { }
 };
@@ -64,7 +64,7 @@ StomataCon_BB::stomata_con (const double wsf /*[]*/, const double m /*[]*/,
 
 static struct StomataConBBSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new StomataCon_BB (al); }
   StomataConBBSyntax ()
     : DeclareModel (StomataCon::component, "BB", 

@@ -64,7 +64,7 @@ protected:
 public:
   static void load_style (Frame&, const symbol default_title);
 protected:
-  explicit SourceFile (Block&);
+  explicit SourceFile (const Block&);
 public:
   ~SourceFile ();
 };

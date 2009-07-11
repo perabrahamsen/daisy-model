@@ -35,7 +35,7 @@ Equilibrium::library_id () const
   return id;
 }
 
-Equilibrium::Equilibrium (Block& al)
+Equilibrium::Equilibrium (const Block& al)
 { }
 
 Equilibrium::~Equilibrium ()

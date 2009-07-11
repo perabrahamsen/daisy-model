@@ -44,10 +44,10 @@ struct HorizonSystem : public Horizon
     std::vector<symbol> names;
     
     // Utilities. 
-    const std::vector<double> get_fractions (Block& al) const;
+    const std::vector<double> get_fractions (const Block& al) const;
 
     // DeclareModel interface.
-    Model* make (Block& al) const;
+    Model* make (const Block& al) const;
     void load_frame (Frame& frame) const;
 
     // Create and destroy.
@@ -67,7 +67,7 @@ struct HorizonSystem : public Horizon
   // Create and Destroy.
   void initialize (bool top_soil, int som_size, Treelog& msg)
   { initialize_base (top_soil, som_size, texture, msg); }
-  HorizonSystem (const System& system, Block& al)
+  HorizonSystem (const System& system, const Block& al)
     : Horizon (al),
       texture (system.limits, system.get_fractions (al), 
                al.number ("humus"), 0.0)
@@ -77,7 +77,7 @@ struct HorizonSystem : public Horizon
 };
 
 const std::vector<double>
-HorizonSystem::System::get_fractions (Block& al) const
+HorizonSystem::System::get_fractions (const Block& al) const
 {
   std::vector<double> result;
   for (unsigned int i = 0; i < names.size (); i++)
@@ -99,7 +99,7 @@ HorizonSystem::System::get_fractions (Block& al) const
 }
 
 Model* 
-HorizonSystem::System::make (Block& al) const
+HorizonSystem::System::make (const Block& al) const
 { return new HorizonSystem (*this, al); }
 
 void 

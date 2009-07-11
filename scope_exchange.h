@@ -79,7 +79,7 @@ public:
 
   // Create and Destroy.
 public:
-  explicit ExchangeNumber (Block& al);
+  explicit ExchangeNumber (const Block& al);
   explicit ExchangeNumber (symbol name, symbol dimension, symbol description);
   explicit ExchangeNumber (symbol name, double value, 
                            symbol dimension, symbol description);
@@ -100,7 +100,7 @@ public:
 
   // Create and Destroy.
 public:
-  explicit ExchangeName (Block& al);
+  explicit ExchangeName (const Block& al);
   ~ExchangeName ();
 };
 
@@ -133,7 +133,7 @@ public:
   void add_item (Exchange* item);
   void done ();
   explicit ScopeExchange (symbol title);
-  explicit ScopeExchange (Block& al);
+  explicit ScopeExchange (const Block& al);
   ~ScopeExchange ();
 private:
   ScopeExchange ();

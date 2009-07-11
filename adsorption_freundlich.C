@@ -46,7 +46,7 @@ public:
 
   // Create.
 public:
-  AdsorptionFreundlich (Block& al)
+  AdsorptionFreundlich (const Block& al)
     : Adsorption (al),
       K_clay (al.number ("K_clay", 0.0)),
       K_OC (al.number ("K_OC", K_clay)),
@@ -112,7 +112,7 @@ AdsorptionFreundlich::M_to_C (const Soil& soil,
 
 static struct AdsorptionFreundlichSyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new AdsorptionFreundlich (al); }
   static bool check_alist (const Metalib&, const Frame& al, Treelog& err)
   {

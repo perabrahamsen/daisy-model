@@ -81,7 +81,7 @@ class EXPORT Frame : public WScope
   void entries (std::set<symbol>&) const;
 
   // This function will check that the alist conform to the syntax.
-  bool check (Block&) const;
+  bool check (const Block&) const;
   bool check (const Metalib&, Treelog&) const;
   bool check (const Metalib&, const Frame& frame, Treelog&) const;
   

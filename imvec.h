@@ -84,7 +84,7 @@ public:
   static void add_syntax (Frame& parent,
 			  Attribute::category cat, 
 			  const symbol dimension);
-  explicit IMvec (Block&, const char*);
+  explicit IMvec (const Block&, const char*);
   ~IMvec ();
 };
 

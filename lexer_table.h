@@ -105,7 +105,7 @@ private:
   LexerTable (const LexerTable&);
   LexerTable ();
 public:
-  explicit LexerTable (Block&);
+  explicit LexerTable (const Block&);
   ~LexerTable ();
 };
 

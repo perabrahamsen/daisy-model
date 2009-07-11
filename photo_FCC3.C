@@ -68,7 +68,7 @@ public:
 
   // Create and Destroy.
 public:
-  PhotoFCC3 (Block& al)
+  PhotoFCC3 (const Block& al)
     : PhotoFarquhar (al),
       TempEff (al.plf ("TempEff")),
       S (al.number ("S")),
@@ -286,7 +286,7 @@ PhotoFCC3::respiration_rate (const double Vm_25, const double Tl) const
 
 static struct Photo_FCC3Syntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new PhotoFCC3 (al); }
   Photo_FCC3Syntax () 
     : DeclareModel (Photo::component, "FC_C3", "Farquhar", "\

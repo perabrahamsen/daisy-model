@@ -105,7 +105,7 @@ struct NumberByDepth : public Number
       }
     return ok;
   }
-  NumberByDepth (Block& al)
+  NumberByDepth (const Block& al)
     : Number (al),
       units (al.units ()),
       column (Librarian::build_item<Column> (al, "column")),
@@ -161,14 +161,14 @@ struct NumberDepthTheta : public NumberByDepth
   { return Attribute::Fraction (); }
 
   // Create.
-  NumberDepthTheta (Block& al)
+  NumberDepthTheta (const Block& al)
     : NumberByDepth (al)
   { }
 };
 
 static struct NumberDepthThetaSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new NumberDepthTheta (al); }
   NumberDepthThetaSyntax ()
     : DeclareModel (Number::component, "depth_Theta", "depth",
@@ -195,14 +195,14 @@ struct NumberDepthK : public NumberByDepth
   { return units.cm_per_h (); }
 
   // Create.
-  NumberDepthK (Block& al)
+  NumberDepthK (const Block& al)
     : NumberByDepth (al)
   { }
 };
 
 static struct NumberDepthKSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new NumberDepthK (al); }
   NumberDepthKSyntax ()
     : DeclareModel (Number::component, "depth_K", "depth", 
@@ -250,7 +250,7 @@ struct NumberByTension : public Number
       }
     return true;
   }
-  NumberByTension (Block& al)
+  NumberByTension (const Block& al)
     : Number (al),
       units (al.units ()),
       horizon (Librarian::build_item<Horizon> (al, "horizon")),
@@ -291,14 +291,14 @@ struct NumberSoilTheta : public NumberByTension
   { return Attribute::Fraction (); }
 
   // Create.
-  NumberSoilTheta (Block& al)
+  NumberSoilTheta (const Block& al)
     : NumberByTension (al)
   { }
 };
 
 static struct NumberSoilThetaSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new NumberSoilTheta (al); }
   NumberSoilThetaSyntax ()
     : DeclareModel (Number::component, "soil_Theta", "horizon",
@@ -321,14 +321,14 @@ struct NumberSoilK : public NumberByTension
   { return units.cm_per_h (); }
 
   // Create.
-  NumberSoilK (Block& al)
+  NumberSoilK (const Block& al)
     : NumberByTension (al)
   { }
 };
 
 static struct NumberSoilKSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new NumberSoilK (al); }
   NumberSoilKSyntax ()
     : DeclareModel (Number::component, "soil_K", "horizon",
@@ -356,14 +356,14 @@ struct NumberSoilHeatCapacity : public NumberByTension
   }
 
   // Create.
-  NumberSoilHeatCapacity (Block& al)
+  NumberSoilHeatCapacity (const Block& al)
     : NumberByTension (al)
   { }
 };
 
 static struct NumberSoilHeatCapacitySyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new NumberSoilHeatCapacity (al); }
   NumberSoilHeatCapacitySyntax ()
     : DeclareModel (Number::component, "soil_heat_capacity", "horizon",
@@ -391,14 +391,14 @@ struct NumberSoilHeatConductivity : public NumberByTension
   }
 
   // Create.
-  NumberSoilHeatConductivity (Block& al)
+  NumberSoilHeatConductivity (const Block& al)
     : NumberByTension (al)
   { }
 };
 
 static struct NumberSoilHeatConductivitySyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new NumberSoilHeatConductivity (al); }
   NumberSoilHeatConductivitySyntax ()
     : DeclareModel (Number::component, "soil_heat_conductivity", "horizon",
@@ -451,7 +451,7 @@ struct NumberTensionByTheta : public Number
       }
     return true;
   }
-  NumberTensionByTheta (Block& al)
+  NumberTensionByTheta (const Block& al)
     : Number (al),
       units (al.units ()),
       horizon (Librarian::build_item<Horizon> (al, "horizon")),
@@ -461,7 +461,7 @@ struct NumberTensionByTheta : public Number
 
 static struct NumberTensionByThetaSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new NumberTensionByTheta (al); }
   NumberTensionByThetaSyntax()
     : DeclareModel (Number::component, "soil_h", 

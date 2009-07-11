@@ -69,7 +69,7 @@ public:
                       const Soil&, const SoilWater&, const SoilHeat&,
 		      const Chemistry&, Treelog&) const = 0;
 protected:
-  Reaction (Block& al);
+  Reaction (const Block& al);
 public:
   ~Reaction ();
 };

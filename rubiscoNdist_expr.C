@@ -64,7 +64,7 @@ private:
 
   // Create.
   public:
-  rubiscoNdist_expr (Block& al)
+  rubiscoNdist_expr (const Block& al)
     : RubiscoNdist (al),
       f_photo (al.number ("f_photo")),
       expr (Librarian::build_item<Number> (al, "value")),
@@ -172,7 +172,7 @@ rubiscoNdist_expr
 
 static struct rubiscoNdist_exprSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new rubiscoNdist_expr (al); }
 
   rubiscoNdist_exprSyntax ()

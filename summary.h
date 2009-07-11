@@ -43,7 +43,7 @@ public:
   virtual void clear () = 0;
   virtual void initialize (std::vector<Select*>&, Treelog&) = 0;
 protected:
-  Summary (Block& al);
+  Summary (const Block& al);
 public:
   virtual void summarize (int hours, Treelog&) const = 0;
   ~Summary ();

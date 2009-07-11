@@ -708,7 +708,7 @@ MovementSolute::check_derived (Treelog& msg) const
   return ok;
 }
 
-MovementSolute::MovementSolute (Block& al)
+MovementSolute::MovementSolute (const Block& al)
   : Movement (al),
     matrix_solute (Librarian::build_vector<Transport> (al, "matrix_solute")),
     matrix_solid (Librarian::build_item<Transport> (al, "matrix_solid"))

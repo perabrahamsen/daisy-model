@@ -50,7 +50,7 @@ struct ActionSetHeatSource : public Action
   bool check (const Daisy&, const Scope&, Treelog& err) const
   { return true; }
 
-  ActionSetHeatSource (Block& al)
+  ActionSetHeatSource (const Block& al)
     : Action (al),
       height (al.number ("height")),
       value (al.number ("value"))
@@ -59,7 +59,7 @@ struct ActionSetHeatSource : public Action
 
 static struct ActionHeatSyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ActionSetHeatSource (al); }
   
   ActionHeatSyntax ()

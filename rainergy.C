@@ -70,7 +70,7 @@ struct RainergyBrown87 : public Rainergy
     return KE_DT * 1e-4;                  // [J/cm^2/h]
   }
   // Create and Destroy.
-  RainergyBrown87 (Block&)
+  RainergyBrown87 (const Block&)
   { }
   ~RainergyBrown87 ()
   { }
@@ -78,7 +78,7 @@ struct RainergyBrown87 : public Rainergy
 
 static struct RainergyBrown87Syntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new RainergyBrown87 (al); }
   RainergyBrown87Syntax ()
     : DeclareModel (Rainergy::component, "Brown87", "\
@@ -121,7 +121,7 @@ struct RainergyEUROSEM : public Rainergy
   }
 
   // Create and Destroy.
-  RainergyEUROSEM (Block&)
+  RainergyEUROSEM (const Block&)
   { }
   ~RainergyEUROSEM ()
   { }
@@ -129,7 +129,7 @@ struct RainergyEUROSEM : public Rainergy
 
 static struct RainergyEUROSEMSyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new RainergyEUROSEM (al); }
   RainergyEUROSEMSyntax ()
     : DeclareModel (Rainergy::component, "EUROSEM", "\

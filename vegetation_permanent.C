@@ -210,7 +210,7 @@ struct VegetationPermanent : public Vegetation
                    const Soil& soil, OrganicMatter&, 
                    Treelog&);
   bool check (const Units&, Treelog&) const;
-  VegetationPermanent (Block&);
+  VegetationPermanent (const Block&);
   ~VegetationPermanent ();
 };
 
@@ -397,7 +397,7 @@ VegetationPermanent::check (const Units& units, Treelog& msg) const
   return ok;
 }
 
-VegetationPermanent::VegetationPermanent (Block& al)
+VegetationPermanent::VegetationPermanent (const Block& al)
   : Vegetation (al),
     yearly_LAI (al.submodel_sequence ("YearlyLAI")),
     LAIvsDAY (al.plf ("LAIvsDAY")),
@@ -424,7 +424,7 @@ VegetationPermanent::~VegetationPermanent ()
 
 static struct VegetationPermanentSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new VegetationPermanent (al); }
 
   VegetationPermanentSyntax ()

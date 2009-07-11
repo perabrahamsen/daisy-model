@@ -103,7 +103,7 @@ Harvest::load_syntax (Frame& frame)
               "Storage organ harvested per evapotranspiration.");
 }
 
-Harvest::Harvest (Block& alist)
+Harvest::Harvest (const Block& alist)
   : column (alist.name ("column")),
     time (alist.submodel ("time")),
     crop (alist.name ("crop")),

@@ -56,7 +56,7 @@ public:
   bool check (const Units&, const Geometry&, const Scope&, Treelog&) const
   { return true; }
 
-  GroundwaterLysimeter (Block& al)
+  GroundwaterLysimeter (const Block& al)
     : Groundwater (al),
       location (-42.42e42)
   { }
@@ -66,7 +66,7 @@ public:
 
 static struct GroundwaterLysimeterSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new GroundwaterLysimeter (al); }
 
   GroundwaterLysimeterSyntax ()

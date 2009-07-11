@@ -213,7 +213,7 @@ LogSelect::check (const Border& border, Treelog& err) const
   return ok; 
 }
 
-LogSelect::LogSelect (Block& al)
+LogSelect::LogSelect (const Block& al)
   : Log (al),
     description (al.name ("description", "")),
     condition (Librarian::build_item<Condition> (al, "when")),
@@ -304,7 +304,7 @@ LogSelect::document_entries (Format& format, const Metalib& metalib,
   {
     void initialize (Treelog&)
     { }
-    DocSelect (Block& al)
+    DocSelect (const Block& al)
       : LogSelect (al)
     { }
   } select (block);

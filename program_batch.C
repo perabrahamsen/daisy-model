@@ -83,7 +83,7 @@ struct ProgramBatch : public Program
   bool check (Treelog&)
   { return true; }
 
-  ProgramBatch (Block& al)
+  ProgramBatch (const Block& al)
     : Program (al),
       metalib (NULL),
       path (al.path ()),
@@ -97,7 +97,7 @@ struct ProgramBatch : public Program
 
 static struct ProgramBatchSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ProgramBatch (al); }
   ProgramBatchSyntax ()
     : DeclareModel (Program::component, "batch", "Run a sequence of programs.")

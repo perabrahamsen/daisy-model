@@ -33,7 +33,7 @@ ClayOM::library_id () const
   return id;
 }
 
-ClayOM::ClayOM (Block& al)
+ClayOM::ClayOM (const Block& al)
   : name (al.type_name ())
 { }
 

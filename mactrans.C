@@ -34,7 +34,7 @@ Mactrans::library_id () const
   return id;
 }
 
-Mactrans::Mactrans (Block& al)
+Mactrans::Mactrans (const Block& al)
   : name (al.type_name ())
 { }
 

@@ -42,7 +42,7 @@ public:
 
   // Create and Destroy.
 public:
-  HydraulicYolo (Block&);
+  HydraulicYolo (const Block&);
   virtual ~HydraulicYolo ();
 };
 
@@ -92,7 +92,7 @@ HydraulicYolo::M (double h) const
   return M_ (h);
 }
 
-HydraulicYolo::HydraulicYolo (Block& al)
+HydraulicYolo::HydraulicYolo (const Block& al)
   : Hydraulic (al),
     M_intervals (al.integer ("M_intervals")),
     M_ ()
@@ -105,7 +105,7 @@ HydraulicYolo::~HydraulicYolo ()
 
 static struct HydraulicYoloSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new HydraulicYolo (al); }
   HydraulicYoloSyntax ()
     : DeclareModel (Hydraulic::component, "yolo", "Yolo soil.  Haverkamp et.al., 1977.")

@@ -49,7 +49,7 @@ UIQt::application_name () const
   return app->applicationName (); 
 }
 
-UIQt::UIQt (Block& al)
+UIQt::UIQt (const Block& al)
   : UI (al)
 { }
 

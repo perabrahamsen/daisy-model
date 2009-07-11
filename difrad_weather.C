@@ -55,14 +55,14 @@ struct DifradWeather : public Difrad
   }
 
   // Create.
-  DifradWeather (Block& al)
+  DifradWeather (const Block& al)
     : Difrad (al)
   { }
 };
 
 static struct DifradWeatherSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new DifradWeather (al); }
   DifradWeatherSyntax ()
     : DeclareModel (Difrad::component, "weather", 

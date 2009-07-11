@@ -29,7 +29,7 @@ class ScopeBlock : public Scope
 {
   // Content.
 private:
-  Block& block;
+  const Block& block;
 
   // Scope interface.
 public:
@@ -55,7 +55,7 @@ private:
   ScopeBlock (const ScopeBlock&);
   ScopeBlock ();
 public:
-  explicit ScopeBlock (Block&);
+  explicit ScopeBlock (const Block&);
   ~ScopeBlock ();
 };
 

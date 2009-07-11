@@ -58,7 +58,7 @@ public:
   
   // Create and Destroy.
 protected:
-  explicit Source (Block&);
+  explicit Source (const Block&);
 private:
   Source (const Source&);
 public:

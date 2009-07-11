@@ -271,7 +271,7 @@ VolumeBox::contain_point (double z, double x, double y) const
     && in_interval (y, *front, *back);
 }
 
-VolumeBox::VolumeBox (Block& al)
+VolumeBox::VolumeBox (const Block& al)
   : Volume (al),
     bottom (Librarian::build_item<Bound> (al, "bottom")),
     top (Librarian::build_item<Bound> (al, "top")),
@@ -317,7 +317,7 @@ Volume::build_none ()
 
 static struct Volume_BoxSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new VolumeBox (al); }
   Volume_BoxSyntax ()
     : DeclareModel (Volume::component, "box", "A volume defined by intervals on each axis.\n\

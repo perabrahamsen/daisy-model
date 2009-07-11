@@ -48,9 +48,9 @@ private:
 public:
   virtual bool buildable () const;
 protected:
-  virtual Model* construct (Block&, const symbol, const FrameModel&) const;
+  virtual Model* construct (const Block&, const symbol, const FrameModel&) const;
 public:
-  Model* construct (Block& context, const symbol key) const;
+  Model* construct (const Block& context, const symbol key) const;
 
   // Create and Destroy.
 private:

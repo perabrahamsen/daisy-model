@@ -72,7 +72,7 @@ public:
   void output(Log& log) const;
 
   // Create.
-  RaddistDPF (Block& al)
+  RaddistDPF (const Block& al)
     : Raddist (al),
       sigma_PAR (al.number ("sigma_PAR")),
       sigma_NIR (al.number ("sigma_NIR")),
@@ -349,7 +349,7 @@ RaddistDPF::output(Log& log) const
 
 static struct RaddistDPFSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new RaddistDPF (al); }
   RaddistDPFSyntax ()
     : DeclareModel (Raddist::component, "sun-shade", 

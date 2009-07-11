@@ -108,7 +108,7 @@ public:
   void initialize (const Units&,
                    const Geometry&, const Time&, const Scope&, Treelog&);
   bool check (const Units&, const Geometry&, const Scope&, Treelog&) const;
-  GroundwaterPipe (Block&);
+  GroundwaterPipe (const Block&);
   ~GroundwaterPipe ()
   { }
 };
@@ -353,7 +353,7 @@ GroundwaterPipe::check (const Units& units,
   return ok;
 }
  
-GroundwaterPipe::GroundwaterPipe (Block& al)
+GroundwaterPipe::GroundwaterPipe (const Block& al)
   : Groundwater (al),
     L (al.number ("L")),
     x (al.number ("x", L / 2.0)),
@@ -375,7 +375,7 @@ GroundwaterPipe::GroundwaterPipe (Block& al)
 
 static struct GroundwaterPipeSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   {
     return new GroundwaterPipe (al);
   }

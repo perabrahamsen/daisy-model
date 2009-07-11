@@ -187,7 +187,7 @@ Output::find_time_columns (const std::vector<symbol>& names)
   return result;
 }
 
-Output::Output (Block& al)
+Output::Output (const Block& al)
   : logging (false),
     exchanges (Librarian::build_vector<MScope> (al, "exchange")),
     logs (Librarian::build_vector<Log> (al, "output")),

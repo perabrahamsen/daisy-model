@@ -76,7 +76,7 @@ struct ReactionDenit : public Reaction
   void initialize (const Units&, const Geometry&, 
                    const Soil&, const SoilWater&, const SoilHeat&,
                    const Surface&, Treelog&);
-  explicit ReactionDenit (Block& al);
+  explicit ReactionDenit (const Block& al);
 };
 
 void
@@ -173,7 +173,7 @@ ReactionDenit::initialize (const Units&, const Geometry&,
   potential_fast.insert (potential_fast.begin (), cell_size, 0.0);
 }
 
-ReactionDenit::ReactionDenit (Block& al)
+ReactionDenit::ReactionDenit (const Block& al)
   : Reaction (al),
     K (al.number ("K")),
     K_fast (al.number ("K_fast", K)),
@@ -191,7 +191,7 @@ ReactionDenit::ReactionDenit (Block& al)
 
 static struct ReactionDenitSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ReactionDenit (al); }
   ReactionDenitSyntax ()
     : DeclareModel (Reaction::component, "denitrification", "Denitrification in soil (conversion\n\

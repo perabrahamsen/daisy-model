@@ -57,7 +57,7 @@ struct TransformEquilibrium : public Transform
                    Treelog& msg);
   bool check (const Units&, const Geometry& geo,
               const Soil&, const SoilWater&, const SoilHeat&, Treelog&) const;
-  TransformEquilibrium (Block& al)
+  TransformEquilibrium (const Block& al)
     : Transform (al),
       equilibrium (Librarian::build_item<Equilibrium> (al, "equilibrium")),
       k_AB_expr (Librarian::build_item<Number> (al, "k_AB")),
@@ -159,7 +159,7 @@ TransformEquilibrium::initialize (const Units& units,
 
 static struct TransformEquilibriumSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new TransformEquilibrium (al); }
   TransformEquilibriumSyntax ()
     : DeclareModel (Transform::component, "equilibrium", 

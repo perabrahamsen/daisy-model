@@ -73,7 +73,7 @@ struct FormatLaTeX : public Format
   void frame_description (const Frame& frame);
 
   // Create and Destroy.
-  explicit FormatLaTeX (Block&);
+  explicit FormatLaTeX (const Block&);
 };
 
 // format_LaTeX.h ends here.

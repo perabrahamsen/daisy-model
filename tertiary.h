@@ -77,7 +77,7 @@ public:
                            const Groundwater&, Treelog&) = 0;
   virtual bool check (const Geometry&, Treelog&) const = 0;
 protected:
-  explicit Tertiary (Block& al);
+  explicit Tertiary (const Block& al);
 public:
   ~Tertiary ();
 };

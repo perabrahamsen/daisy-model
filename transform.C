@@ -45,7 +45,7 @@ Transform::initialize (const Units&, const Geometry&,
                        Treelog&)
 { }
 
-Transform::Transform (Block&)
+Transform::Transform (const Block&)
 { }
 
 Transform::~Transform ()

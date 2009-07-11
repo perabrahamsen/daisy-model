@@ -76,7 +76,7 @@ public:
   virtual bool check (const Units&, 
                       const Geometry&, const Scope&, Treelog&) const = 0;
 protected:
-  Groundwater (Block& al);
+  Groundwater (const Block& al);
 public:
   ~Groundwater ();
 };

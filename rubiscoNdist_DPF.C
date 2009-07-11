@@ -50,7 +50,7 @@ private:
 
   // Create.
   public:
-  rubiscoNdistDPF (Block& al)
+  rubiscoNdistDPF (const Block& al)
     : RubiscoNdist (al),
        kn (al.number ("kn")),
        f_photo (al.number ("f_photo"))
@@ -88,7 +88,7 @@ rubiscoNdistDPF::rubiscoN_distribution (const Units&,
 
 static struct rubiscoNdistDPFSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new rubiscoNdistDPF (al); }
 
   rubiscoNdistDPFSyntax ()

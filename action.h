@@ -50,7 +50,7 @@ public:
   virtual void initialize (const Daisy&, const Scope&, Treelog&) = 0;
   virtual bool check (const Daisy&, const Scope&, Treelog&) const = 0;
 protected:
-  explicit Action (Block& al);
+  explicit Action (const Block& al);
 public:
   ~Action ();
 };

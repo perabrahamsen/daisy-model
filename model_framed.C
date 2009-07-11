@@ -56,7 +56,7 @@ ModelFramed::output_as_entry (Log& log) const
     }
 }
 
-ModelFramed::ModelFramed (Block& al)
+ModelFramed::ModelFramed (const Block& al)
   : ModelLogable (al.type_name ()),
     // Block is sometimes fed a temporary frame, thus the need for clone.
     my_frame (dynamic_cast<const FrameModel*> (&(al.frame ().clone ())))

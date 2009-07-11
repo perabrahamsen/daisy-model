@@ -44,7 +44,7 @@ public:
 
   // Create and Destroy.
 protected:
-  explicit Tortuosity (Block&);
+  explicit Tortuosity (const Block&);
   explicit Tortuosity (const symbol name);
 public:
   static std::auto_ptr<Tortuosity> create_default ();

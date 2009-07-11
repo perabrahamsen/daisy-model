@@ -68,7 +68,7 @@ Groundwater::output (Log& log) const
   output_value (table (), "height", log);
 }
 
-Groundwater::Groundwater (Block& al)
+Groundwater::Groundwater (const Block& al)
   : ModelDerived (al.type_name ())
 { }
 

@@ -55,7 +55,7 @@ struct ActionWait : public Action
   bool check (const Daisy& daisy, const Scope& scope, Treelog& out) const
   { return condition->check (daisy, scope, out); }
 
-  ActionWait (Block& al)
+  ActionWait (const Block& al)
     : Action (al),
       condition (Librarian::build_item<Condition> (al, "condition"))
   { }
@@ -101,7 +101,7 @@ struct ActionWaitDays : public Action
   bool check (const Daisy&, const Scope&, Treelog& err) const
   { return true; }
 
-  ActionWaitDays (Block& al)
+  ActionWaitDays (const Block& al)
     : Action (al),
       days (al.integer ("days")),
       hours (al.integer ("hours")),
@@ -139,7 +139,7 @@ struct ActionWaitMMDD : public Action
   bool check (const Daisy&, const Scope&, Treelog& err) const
   { return true; }
 
-  ActionWaitMMDD (Block& al)
+  ActionWaitMMDD (const Block& al)
     : Action (al),
       month (al.integer ("month")),
       day (al.integer ("day")),
@@ -152,7 +152,7 @@ struct ActionWaitMMDD : public Action
 
 static struct ActionWaitSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ActionWait (al); }
   ActionWaitSyntax ()
     : DeclareModel (Action::component, "wait", "\
@@ -168,7 +168,7 @@ Wait until the specified condition is true.")
 
 static struct ActionWaitPeriodSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ActionWaitDays (al); }
   ActionWaitPeriodSyntax ()
     : DeclareModel (Action::component, "wait_period", "\
@@ -229,7 +229,7 @@ Waits the specified number of hours.")
 
 static struct ActionWaitMMDDSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ActionWaitMMDD (al); }
   ActionWaitMMDDSyntax ()
     : DeclareModel (Action::component, "wait_mm_dd", "\

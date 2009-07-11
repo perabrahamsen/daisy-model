@@ -44,7 +44,7 @@ private:
 
   // Create.
   public:
-  ABAEffect_exp (Block& al)
+  ABAEffect_exp (const Block& al)
     : ABAEffect (al),
       k (al.number ("k")),
       l (al.number ("l")),
@@ -66,7 +66,7 @@ ABAEffect_exp::ABA_effect (const double ABA_xylem /* [g/cm^3] */, const double p
 
 static struct ABAEffectexpSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ABAEffect_exp (al); }
   void load_frame (Frame& frame) const
   {

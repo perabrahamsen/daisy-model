@@ -62,7 +62,7 @@ private:
 
   // Create.
 public:
-  PhenologyStandard (Block&);
+  PhenologyStandard (const Block&);
 };
 
 void
@@ -112,7 +112,7 @@ PhenologyStandard::emergence (const double h, const double T, const double dt)
     DS = DS_Emr;
 }
 
-PhenologyStandard::PhenologyStandard (Block& al)
+PhenologyStandard::PhenologyStandard (const Block& al)
   : Phenology (al),
     EmrTSum (al.number ("EmrTSum")),
     EmrSMF (al.plf ("EmrSMF")),
@@ -130,7 +130,7 @@ PhenologyStandard::PhenologyStandard (Block& al)
 
 static struct PhenologyStandardSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new PhenologyStandard (al); }
 
   PhenologyStandardSyntax ()

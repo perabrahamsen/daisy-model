@@ -45,7 +45,7 @@ private:
   
   // Create and Destroy.
 public:
-  HydraulicB_C (Block&);
+  HydraulicB_C (const Block&);
   ~HydraulicB_C ();
 };
 
@@ -97,7 +97,7 @@ HydraulicB_C::Sr (double h) const
     return 1;
 }
 
-HydraulicB_C::HydraulicB_C (Block& al)
+HydraulicB_C::HydraulicB_C (const Block& al)
   : Hydraulic (al),
     h_b (al.number ("h_b")),
     b (al.number ("b"))
@@ -110,7 +110,7 @@ HydraulicB_C::~HydraulicB_C ()
 
 static struct HydraulicB_CSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
     {
       return new HydraulicB_C (al);
     }

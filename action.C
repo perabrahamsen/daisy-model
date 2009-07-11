@@ -54,7 +54,7 @@ bool
 Action::check (const Daisy&, const Scope&, Treelog&) const
 { return true; }
 
-Action::Action (Block& al)
+Action::Action (const Block& al)
   : ModelFramed (al)
 { }
 

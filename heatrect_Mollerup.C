@@ -330,7 +330,7 @@ struct HeatrectMollerup : public Heatrect
               std::vector<double>& T,
               const double dt, Treelog&) const;
   // Create.
-  HeatrectMollerup (Block& al)
+  HeatrectMollerup (const Block& al)
     : Heatrect (al),
       solver (Librarian::build_item<Solver> (al, "solver")),
       debug (al.integer ("debug"))
@@ -494,7 +494,7 @@ HeatrectMollerup::solve (const GeometryRect& geo,
 
 static struct HeatrectMollerupSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new HeatrectMollerup (al); }
 
   HeatrectMollerupSyntax ()

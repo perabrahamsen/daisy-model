@@ -74,7 +74,7 @@ struct ActionWhile : public Action
     return ok;
   }
 
-  ActionWhile (Block& al)
+  ActionWhile (const Block& al)
     : Action (al),
       actions (Librarian::build_vector<Action> (al, "actions"))
   { }
@@ -87,7 +87,7 @@ struct ActionWhile : public Action
 
 static struct ActionWhileSyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ActionWhile (al); }
 
   static bool check_alist (const Metalib&, const Frame& al, Treelog& err)

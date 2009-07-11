@@ -37,7 +37,7 @@ struct SelectIndex : public SelectValue
   { add_result (array[index]); }
 
   // Create and Destroy.
-  SelectIndex (Block& al)
+  SelectIndex (const Block& al)
     : SelectValue (al),
       index (al.integer ("index"))
   { }
@@ -45,7 +45,7 @@ struct SelectIndex : public SelectValue
 
 static struct SelectIndexSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new SelectIndex (al); }
   SelectIndexSyntax ()
     : DeclareModel (Select::component, "index", "value", "\

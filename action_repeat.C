@@ -86,7 +86,7 @@ struct ActionRepeat : public Action
       return true;
   }
 
-  ActionRepeat (Block& al)
+  ActionRepeat (const Block& al)
     : Action (al),
       modified_frame (Action::frame (), FrameModel::parent_link),
       repeat (&al.model ("repeat").clone ()),
@@ -103,7 +103,7 @@ struct ActionRepeat : public Action
 
 static struct ActionRepeatSyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ActionRepeat (al); }
 
   ActionRepeatSyntax ()

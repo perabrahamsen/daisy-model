@@ -58,7 +58,7 @@ struct ReactionNitrification : public Reaction
   void initialize (const Units&, const Geometry&, 
                    const Soil&, const SoilWater&, const SoilHeat&, 
                    const Surface&, Treelog&);
-  explicit ReactionNitrification (Block& al);
+  explicit ReactionNitrification (const Block& al);
 };
 
 void
@@ -130,13 +130,13 @@ ReactionNitrification::initialize (const Units&, const Geometry&,
   N2O = std::vector<double> (cell_size, 0.0);
 }
 
-ReactionNitrification::ReactionNitrification (Block& al)
+ReactionNitrification::ReactionNitrification (const Block& al)
   : Reaction (al)
 { }
 
 static struct ReactionNitrificationSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ReactionNitrification (al); }
   ReactionNitrificationSyntax ()
     : DeclareModel (Reaction::component, "nitrification", "Nitrification.\n\

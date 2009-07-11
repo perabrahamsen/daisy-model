@@ -63,7 +63,7 @@ public:
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ConditionMMDD (Block& al)
+  ConditionMMDD (const Block& al)
     : Condition (al),
       month (al.integer ("month")),
       day (al.integer ("day")),
@@ -71,7 +71,7 @@ public:
       minute (al.integer ("minute")),
       second (al.integer ("second"))
   { }
-  static Model& make (Block& al)
+  static Model& make (const Block& al)
   { return *new ConditionMMDD (al); }
 };
 
@@ -125,7 +125,7 @@ public:
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ConditionBeforeMMDD (Block& al)
+  ConditionBeforeMMDD (const Block& al)
     : Condition (al),
       month (al.integer ("month")),
       day (al.integer ("day")),
@@ -133,7 +133,7 @@ public:
       minute (al.integer ("minute")),
       second (al.integer ("second"))
   { }
-  static Model& make (Block& al)
+  static Model& make (const Block& al)
   { return *new ConditionBeforeMMDD (al); }
 };
 
@@ -187,7 +187,7 @@ public:
 
   void output (Log&) const
   { }
-  ConditionAfterMMDD (Block& al)
+  ConditionAfterMMDD (const Block& al)
     : Condition (al),
       month (al.integer ("month")),
       day (al.integer ("day")),
@@ -195,7 +195,7 @@ public:
       minute (al.integer ("minute")),
       second (al.integer ("second"))
   { }
-  static Model& make (Block& al)
+  static Model& make (const Block& al)
   { return *new ConditionAfterMMDD (al); }
 };
 
@@ -217,11 +217,11 @@ public:
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ConditionAt (Block& al)
+  ConditionAt (const Block& al)
     : Condition (al),
       time (al.submodel ("time"))
   { }
-  static Model& make (Block& al)
+  static Model& make (const Block& al)
   { return *new ConditionAt (al); }
 };
 
@@ -243,11 +243,11 @@ public:
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ConditionBefore (Block& al)
+  ConditionBefore (const Block& al)
     : Condition (al),
       time (al.submodel ("time"))
   { }
-  static Model& make (Block& al)
+  static Model& make (const Block& al)
   { return *new ConditionBefore (al); }
 };
 
@@ -269,11 +269,11 @@ public:
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ConditionAfter (Block& al)
+  ConditionAfter (const Block& al)
     : Condition (al),
       time (al.submodel ("time"))
   { }
-  static Model& make (Block& al)
+  static Model& make (const Block& al)
   { return *new ConditionAfter (al); }
 };
 
@@ -295,11 +295,11 @@ struct ConditionHour : public Condition
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ConditionHour (Block& al)
+  ConditionHour (const Block& al)
     : Condition (al),
       at (al.integer ("at"))
   { }
-  static Model& make (Block& al)
+  static Model& make (const Block& al)
   { return *new ConditionHour (al); }
 };
 
@@ -321,11 +321,11 @@ struct ConditionMDay : public Condition
   { return true; }
 
 
-  ConditionMDay (Block& al)
+  ConditionMDay (const Block& al)
     : Condition (al),
       at (al.integer ("at"))
   { }
-  static Model& make (Block& al)
+  static Model& make (const Block& al)
   { return *new ConditionMDay (al); }
 };
 
@@ -346,11 +346,11 @@ public:
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ConditionYDay (Block& al)
+  ConditionYDay (const Block& al)
     : Condition (al),
       at (al.integer ("at"))
   { }
-  static Model& make (Block& al)
+  static Model& make (const Block& al)
   { return *new ConditionYDay (al); }
 };
 
@@ -372,11 +372,11 @@ public:
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ConditionMonth (Block& al)
+  ConditionMonth (const Block& al)
     : Condition (al),
       at (al.integer ("at"))
   { }
-  static Model& make (Block& al)
+  static Model& make (const Block& al)
   { return *new ConditionMonth (al); }
 };
 
@@ -397,11 +397,11 @@ public:
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ConditionYear (Block& al)
+  ConditionYear (const Block& al)
     : Condition (al),
       at (al.integer ("at"))
   { }
-  static Model& make (Block& al)
+  static Model& make (const Block& al)
   { return *new ConditionYear (al); }
 };
 
@@ -428,14 +428,14 @@ struct ConditionTimestep : public Condition
   bool check (const Daisy& daisy, const Scope& scope, Treelog& msg) const
   { return condition->check (daisy, scope, msg); }
 
-  ConditionTimestep (Block& al)
+  ConditionTimestep (const Block& al)
     : Condition (al),
       condition (Librarian::build_item<Condition> (al, "operand")),
       dt (al.name ("timestep"))
   { }
   ~ConditionTimestep ()
   { }
-  static Model& make (Block& al)
+  static Model& make (const Block& al)
   { return *new ConditionTimestep (al); }
 };
 
@@ -488,7 +488,7 @@ Conditions based on month and day.")
 
 static struct ConditionMMDDSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ConditionMMDD (al); }
   ConditionMMDDSyntax ()
     : DeclareModel (Condition::component, "mm_dd", "mm_dd_base", "\
@@ -500,7 +500,7 @@ True a specific month, day and hour in the year.")
 
 static struct ConditionBeforeMMDDSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ConditionBeforeMMDD (al); }
   ConditionBeforeMMDDSyntax ()
     : DeclareModel (Condition::component, "before_mm_dd", "mm_dd_base", "\
@@ -512,7 +512,7 @@ True before specific month, day and hour in the year.")
 
 static struct ConditionAfterMMDDSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ConditionAfterMMDD (al); }
   ConditionAfterMMDDSyntax ()
     : DeclareModel (Condition::component, "after_mm_dd", "mm_dd_base", "\
@@ -538,7 +538,7 @@ Conditions based on a specific time.")
 
 static struct ConditionAtSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ConditionAt (al); }
   ConditionAtSyntax ()
     : DeclareModel (Condition::component, "at", "time", "\
@@ -550,7 +550,7 @@ True, iff the simulation time is at the specified time.")
 
 static struct ConditionBeforeSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ConditionBefore (al); }
   ConditionBeforeSyntax ()
     : DeclareModel (Condition::component, "before", "time", "\
@@ -562,7 +562,7 @@ True, iff the simulation time is before the specified time.")
 
 static struct ConditionAfterSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ConditionAfter (al); }
   ConditionAfterSyntax ()
     : DeclareModel (Condition::component, "after", "time", "\
@@ -574,7 +574,7 @@ True, iff the simulation time is after the specified time.")
 
 static struct ConditionHourSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ConditionHour (al); }
   ConditionHourSyntax ()
     : DeclareModel (Condition::component, "hour", "\
@@ -591,7 +591,7 @@ True, at the specified hour.")
 
 static struct ConditionMDaySyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ConditionMDay (al); }
   ConditionMDaySyntax ()
     : DeclareModel (Condition::component, "mday", "\
@@ -608,7 +608,7 @@ True, at the specified day in the month.")
 
 static struct ConditionYDaySyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ConditionYDay (al); }
   ConditionYDaySyntax ()
     : DeclareModel (Condition::component, "yday", "\
@@ -626,7 +626,7 @@ True, at the specified julian day.")
 
 static struct ConditionMonthSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ConditionMonth (al); }
   ConditionMonthSyntax ()
     : DeclareModel (Condition::component, "month", "\
@@ -643,7 +643,7 @@ True, at the specified month.")
 
 static struct ConditionYearSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ConditionYear (al); }
   ConditionYearSyntax ()
     : DeclareModel (Condition::component, "year", "\
@@ -660,7 +660,7 @@ True, at the specified year.")
 
 static struct ConditionTimestepSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ConditionTimestep (al); }
   ConditionTimestepSyntax ()
     : DeclareModel (Condition::component, "timestep", "\
@@ -704,7 +704,7 @@ struct ConditionEnd : public Condition
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ConditionEnd (Block& al, const symbol tstep, entry_type e)
+  ConditionEnd (const Block& al, const symbol tstep, entry_type e)
     : Condition (al),
       timestep_name (tstep),
       entry (e)
@@ -715,7 +715,7 @@ struct ConditionEnd : public Condition
 
 static struct ConditionHourlySyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ConditionEnd (al, "h", &Time::hour); }
 
   ConditionHourlySyntax ()
@@ -730,7 +730,7 @@ static struct ConditionHourlySyntax : public DeclareModel
 
 static struct ConditionSecondlySyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ConditionEnd (al, "s", &Time::second); }
 
   ConditionSecondlySyntax ()
@@ -745,7 +745,7 @@ static struct ConditionSecondlySyntax : public DeclareModel
 
 static struct ConditionMinutelySyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ConditionEnd (al, "min", &Time::minute); }
 
   ConditionMinutelySyntax ()
@@ -760,7 +760,7 @@ static struct ConditionMinutelySyntax : public DeclareModel
 
 static struct ConditionDailySyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ConditionEnd (al, "d", &Time::mday); }
 
   ConditionDailySyntax ()
@@ -775,7 +775,7 @@ static struct ConditionDailySyntax : public DeclareModel
 
 static struct ConditionWeeklySyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ConditionEnd (al, "w", &Time::week); }
 
   ConditionWeeklySyntax ()
@@ -790,7 +790,7 @@ static struct ConditionWeeklySyntax : public DeclareModel
 
 static struct ConditionMonthlySyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ConditionEnd (al, "m", &Time::month); }
 
   ConditionMonthlySyntax ()
@@ -805,7 +805,7 @@ static struct ConditionMonthlySyntax : public DeclareModel
 
 static struct ConditionYearlySyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ConditionEnd (al, "y", &Time::year); }
 
   ConditionYearlySyntax ()
@@ -870,7 +870,7 @@ private:
     return "dt";
   }
 public:
-  ConditionInterval (Block& al, const Timestep tstep)
+  ConditionInterval (const Block& al, const Timestep tstep)
     : Condition (al),
       interval (tstep),
       step (find_timestep (tstep)),
@@ -885,7 +885,7 @@ public:
 
 static struct ConditionEverySyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ConditionInterval (al, submodel_value_block<Timestep> (al)); }
 
   ConditionEverySyntax ()

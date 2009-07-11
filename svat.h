@@ -63,7 +63,7 @@ public:
 
   // Create and Destroy.
 protected:
-  SVAT (Block&);
+  SVAT (const Block&);
 public:
   virtual void summarize (Treelog& msg) const = 0;
   ~SVAT ();

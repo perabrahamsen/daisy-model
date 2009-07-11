@@ -61,7 +61,7 @@ public:
 private:
   Solver ();			// Disable
 public:
-  Solver (Block& al);
+  Solver (const Block& al);
   ~Solver ();
 };
 

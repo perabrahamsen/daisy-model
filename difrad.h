@@ -44,7 +44,7 @@ public:
 
   // Create and Destroy.
 protected:
-  Difrad (Block&);
+  Difrad (const Block&);
 public:
   ~Difrad ();
 };

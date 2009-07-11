@@ -63,7 +63,7 @@ public:
 public:
   virtual bool handle_N_stress () const = 0;
   virtual bool handle_water_stress () const = 0;
-  Photo (Block&);
+  Photo (const Block&);
   ~Photo ();
 };
 

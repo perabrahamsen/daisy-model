@@ -38,7 +38,7 @@ Vernalization::library_id () const
   return id;
 }
 
-Vernalization::Vernalization (Block& al)
+Vernalization::Vernalization (const Block& al)
   : ModelDerived (al.type_name ())
 { }
 
@@ -78,7 +78,7 @@ struct VernalizationStandard : public Vernalization
   { output_variable (TaSum, log); }
 
   // Create and Destroy.
-  VernalizationStandard (Block& al)
+  VernalizationStandard (const Block& al)
     : Vernalization (al),
       DSLim (al.number ("DSLim")),
       TaLim (al.number ("TaLim")),
@@ -89,7 +89,7 @@ struct VernalizationStandard : public Vernalization
 static struct VernalizationStandardSyntax : public DeclareModel
 {
   // We can't use "used_to_be_a_submodel" since the default model is "none".
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new VernalizationStandard (al); }
   VernalizationStandardSyntax ()
     : DeclareModel (Vernalization::component, "default", "\
@@ -118,14 +118,14 @@ struct VernalizationNone : public Vernalization
   { }
 
   // Create and Destroy.
-  VernalizationNone (Block& al)
+  VernalizationNone (const Block& al)
     : Vernalization (al)
   { }
 };
 
 static struct VernalizationNoneSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new VernalizationNone (al); }
   VernalizationNoneSyntax ()
     : DeclareModel (Vernalization::component, "none", "\

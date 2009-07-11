@@ -87,7 +87,7 @@ struct WeatherStandard : public WeatherBase
     // Create and Destroy.
     static bool check_alist (const Metalib&, const Frame& al, Treelog&);
     static void load_syntax (Frame&);
-    YearMap (Block&);
+    YearMap (const Block&);
   };
   const auto_vector<const YearMap*> missing_years;
   int active_map;
@@ -319,7 +319,7 @@ struct WeatherStandard : public WeatherBase
 
   // Create and Destroy.
   bool initialize (const Time& time, Treelog& err);
-  WeatherStandard (Block&);
+  WeatherStandard (const Block&);
   ~WeatherStandard ();
   bool check (const Time& from, const Time& to, Treelog& err) const;
 };
@@ -421,7 +421,7 @@ WeatherStandard::YearMap::load_syntax (Frame& frame)
   frame.order ("from", "to");
 }
 
-WeatherStandard::YearMap::YearMap (Block& al)
+WeatherStandard::YearMap::YearMap (const Block& al)
   : from (al.submodel ("from")),
     to (al.submodel ("to"))
 { }
@@ -1296,7 +1296,7 @@ NO3DryDep: " << DryDeposit.get_value (Chemical::NO3 (), u_dpu)
   return true;
 }
 
-WeatherStandard::WeatherStandard (Block& al)
+WeatherStandard::WeatherStandard (const Block& al)
   : WeatherBase (al),
     path (al.path ()),
     T_rain (al.number ("T_rain")),
@@ -1433,7 +1433,7 @@ WeatherStandard::check (const Time& from, const Time& to, Treelog& err) const
 
 static struct WeatherStandardSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new WeatherStandard (al); }
 
   WeatherStandardSyntax ()

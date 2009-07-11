@@ -35,7 +35,7 @@ ABAEffect::library_id () const
   return id;
 }
 
-ABAEffect::ABAEffect (Block& al)
+ABAEffect::ABAEffect (const Block& al)
   : ModelLogable (al.type_name ())
 { }
 

@@ -41,7 +41,7 @@ Condition::timestep ()
   return name; 
 } 
 
-Condition::Condition (Block& al)
+Condition::Condition (const Block& al)
   : ModelFramed (al)
 { }
 

@@ -56,7 +56,7 @@ public:
 public:
   virtual bool check (const Geometry&, Treelog&) const = 0;
 protected:
-  Mactrans (Block& al);
+  Mactrans (const Block& al);
   Mactrans (const symbol name);
 public:
   ~Mactrans ();

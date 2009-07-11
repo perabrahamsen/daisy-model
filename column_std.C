@@ -166,9 +166,9 @@ public:
   void output (Log&) const;
 
   // Create and Destroy.
-  static Movement* build_vertical (Block& al);
-  ColumnStandard (Block& al);
-  bool initialize (Block&, const Output&, const Time&, const Weather*,
+  static Movement* build_vertical (const Block& al);
+  ColumnStandard (const Block& al);
+  bool initialize (const Block&, const Output&, const Time&, const Weather*,
                    const Scope& scope);
   void summarize (Treelog& msg) const;
   ~ColumnStandard ();
@@ -848,7 +848,7 @@ ColumnStandard::output (Log& log) const
   output_derived (groundwater, "Groundwater", log);
 }
 
-ColumnStandard::ColumnStandard (Block& al)
+ColumnStandard::ColumnStandard (const Block& al)
   : Column (al),
     units (al.units ()),
     scopesel (Librarian::build_item<Scopesel> (al, "scope")),
@@ -882,7 +882,7 @@ ColumnStandard::ColumnStandard (Block& al)
 { }
 
 bool
-ColumnStandard::initialize (Block& block, 
+ColumnStandard::initialize (const Block& block, 
                             const Output& output,
                             const Time& time, 
                             const Weather* global_weather,
@@ -957,7 +957,7 @@ ColumnStandard::~ColumnStandard ()
 
 static struct ColumnStandardSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ColumnStandard (al); }
 
 #if 0

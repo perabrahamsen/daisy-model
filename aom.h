@@ -79,7 +79,7 @@ private:
 
   // Create & Destroy.
 public:
-  AOM (Block& al);
+  AOM (const Block& al);
 };
 
 #endif // AOM_H

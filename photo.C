@@ -43,7 +43,7 @@ void
 Photo::clear ()
 { }
 
-Photo::Photo (Block& al)
+Photo::Photo (const Block& al)
   : ModelDerived (al.type_name ()),
     min_PAR_ (al.number ("min_PAR"))
 { }

@@ -92,7 +92,7 @@ FrameModel::buildable () const
 }
 
 Model*
-FrameModel::construct (Block& context, const symbol key, 
+FrameModel::construct (const Block& context, const symbol key, 
                        const FrameModel& frame) const
 { 
   if (!parent ())
@@ -104,7 +104,7 @@ FrameModel::construct (Block& context, const symbol key,
 }
 
 Model*
-FrameModel::construct (Block& context, const symbol key) const
+FrameModel::construct (const Block& context, const symbol key) const
 { return construct (context, key, *this); }
 
 FrameModel::FrameModel ()

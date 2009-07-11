@@ -53,7 +53,7 @@ struct ABAProdRoot : public ABAProd
   // Create and Destroy.
   void initialize (const Units&, Treelog&);
   bool check (const Units&, Treelog&) const;
-  ABAProdRoot (Block& al);
+  ABAProdRoot (const Block& al);
   ~ABAProdRoot ();
 };
 
@@ -107,7 +107,7 @@ ABAProdRoot::check (const Units& units, Treelog& msg) const
   return ok;
 }
 
-ABAProdRoot::ABAProdRoot (Block& al)
+ABAProdRoot::ABAProdRoot (const Block& al)
   : ABAProd (al),
     scope (h_name, Units::cm ()),
     expr (Librarian::build_item<Number> (al, "expr"))
@@ -118,7 +118,7 @@ ABAProdRoot::~ABAProdRoot ()
 
 static struct ABAProdRootSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ABAProdRoot (al); }
   ABAProdRootSyntax ()
     : DeclareModel (ABAProd::component, "root", "\

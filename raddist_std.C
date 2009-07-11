@@ -40,7 +40,7 @@ struct RaddistStandard : public Raddist
   {}
 
   // Create.
-  RaddistStandard (Block& al)
+  RaddistStandard (const Block& al)
     : Raddist (al)
   { }
 };
@@ -98,7 +98,7 @@ void RaddistStandard::tick (std::vector <double>& sun_LAI_fraction,
 
 static struct RaddistStandardSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new RaddistStandard (al); }
   RaddistStandardSyntax ()
     : DeclareModel (Raddist::component, "default", 

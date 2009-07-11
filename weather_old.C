@@ -44,7 +44,7 @@ struct WeatherOld::Implementation
   Time time;
 
   // Create and Destroy.
-  Implementation (Block& al)
+  Implementation (const Block& al)
     : T_rain (al.number ("T_rain")),
       T_snow (al.number ("T_snow")),
       daily_global_radiation (-42.42e42),
@@ -132,7 +132,7 @@ double
 WeatherOld::wind () const
 { return 3.0; }
 
-WeatherOld::WeatherOld (Block& al)
+WeatherOld::WeatherOld (const Block& al)
   : WeatherBase (al),
     impl (*new Implementation (al))
 { 

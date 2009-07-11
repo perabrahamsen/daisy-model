@@ -49,7 +49,7 @@ struct ActionSetSurfaceDetentionCapacity : public Action
   bool check (const Daisy&, const Scope&, Treelog& err) const
   { return true; }
 
-  ActionSetSurfaceDetentionCapacity (Block& al)
+  ActionSetSurfaceDetentionCapacity (const Block& al)
     : Action (al),
       height (al.number ("height"))
   { }
@@ -57,7 +57,7 @@ struct ActionSetSurfaceDetentionCapacity : public Action
 
 static struct ActionSurfaceSyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ActionSetSurfaceDetentionCapacity (al); }
   
   ActionSurfaceSyntax ()

@@ -62,7 +62,7 @@ public:
 		      size_t dom_size, size_t som_size, 
                       Treelog&) const = 0;
 protected:
-  Domsorp (Block& al);
+  Domsorp (const Block& al);
 public:
   ~Domsorp ();
 };

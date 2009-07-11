@@ -47,7 +47,7 @@ struct ActionRidge : public Action
   bool check (const Daisy&, const Scope&, Treelog& err) const
   { return true; }
 
-  ActionRidge (Block& al)
+  ActionRidge (const Block& al)
     : Action (al),
       ridge (al.submodel ("ridge"))
     { }
@@ -56,7 +56,7 @@ struct ActionRidge : public Action
 // Add the ActionRidge syntax to the syntax table.
 static struct ActionRidgeSyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ActionRidge (al); }
 
   ActionRidgeSyntax ()

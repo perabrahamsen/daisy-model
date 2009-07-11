@@ -44,7 +44,7 @@ public:
   // Create and Destroy.
 public:
   explicit MScope (symbol title);
-  explicit MScope (Block&);
+  explicit MScope (const Block&);
   ~MScope ();
 };
 

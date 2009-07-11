@@ -43,7 +43,7 @@ UZRect::obey_surface ()
 { return true; }
 
 
-UZRect::UZRect (Block& al)
+UZRect::UZRect (const Block& al)
   : name (al.type_name ())
 { }
 

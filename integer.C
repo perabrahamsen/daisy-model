@@ -43,7 +43,7 @@ const std::string&
 Integer::title () const
 { return name.name (); }
 
-Integer::Integer (Block& al)
+Integer::Integer (const Block& al)
   : name (al.type_name ())
 { }
 
@@ -66,7 +66,7 @@ struct IntegerConst : public Integer
   { return true; }
   bool check (const Scope&, Treelog&) const
   { return true; }
-  IntegerConst (Block& al)
+  IntegerConst (const Block& al)
     : Integer (al),
       val (al.integer ("value"))
   { }
@@ -74,7 +74,7 @@ struct IntegerConst : public Integer
 
 static struct IntegerConstSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new IntegerConst (al); }
   IntegerConstSyntax ()
     : DeclareModel (Integer::component, "const", 
@@ -104,7 +104,7 @@ Condition to test for.");
 Value to return.");
       frame.order ("condition", "value");
     }
-    Clause (Block& al)
+    Clause (const Block& al)
       : condition (Librarian::build_item<Boolean> (al, "condition")),
         value (al.integer ("value"))
     { }
@@ -144,7 +144,7 @@ Value to return.");
     msg.error ("No clause matches");
     return false; 
   }
-  IntegerCond (Block& al)
+  IntegerCond (const Block& al)
     : Integer (al),
       clauses (map_submodel_const<Clause> (al, "clauses"))
   { }
@@ -159,7 +159,7 @@ If condition is true, return value.");
 
 static struct IntegerCondSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new IntegerCond (al); }
   IntegerCondSyntax ()
     : DeclareModel (Integer::component, "cond", "\

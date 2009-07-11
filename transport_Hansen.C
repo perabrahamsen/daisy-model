@@ -53,7 +53,7 @@ struct TransportHansen : public Transport
   // Create.
   // Create.
   bool check (const Geometry&, Treelog&) const;
-  TransportHansen (Block& al)
+  TransportHansen (const Block& al)
     : Transport (al)
   { }
 };
@@ -336,7 +336,7 @@ This primary solute transport model only works with 'vertical' movement");
 
 static struct TransportHansenSyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   {
     return new TransportHansen (al);
   }

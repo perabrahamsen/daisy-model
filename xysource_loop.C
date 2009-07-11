@@ -73,7 +73,7 @@ public:
 
   // Create.
 public:
-  explicit XYSourceLoop (Block&);
+  explicit XYSourceLoop (const Block&);
 private:
   XYSourceLoop (const XYSourceLoop&);
   XYSourceLoop& operator= (const XYSourceLoop&);
@@ -124,7 +124,7 @@ XYSourceLoop::load (const Units& units, Treelog& msg)
   return true;
 }
 
-XYSourceLoop::XYSourceLoop (Block& al)
+XYSourceLoop::XYSourceLoop (const Block& al)
   : XYSource (al),
     with_ (al.name ("with")),
     style_ (al.integer ("style", -1)),
@@ -146,7 +146,7 @@ XYSourceLoop::~XYSourceLoop ()
 
 static struct XYSourceLoopSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new XYSourceLoop (al); }
 
   static bool check_alist (const Metalib&, const Frame& alist, Treelog& msg)

@@ -61,7 +61,7 @@ public:
   virtual void initialize (Metalib&, Block&) = 0;
   virtual bool check (Treelog& err) = 0;
 protected:
-  explicit Program (Block&);
+  explicit Program (const Block&);
 public:
   ~Program ();
 };

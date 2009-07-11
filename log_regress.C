@@ -59,7 +59,7 @@ struct LogRegress : public LogDLF, public Destination
 
   // Create and destroy.
   void initialize (Treelog&);
-  explicit LogRegress (Block& al);
+  explicit LogRegress (const Block& al);
   void summarize (Treelog&);
   ~LogRegress ();
 };
@@ -144,7 +144,7 @@ LogRegress::initialize (Treelog& msg)
   LogDLF::initialize (msg);
 }
 
-LogRegress::LogRegress (Block& al)
+LogRegress::LogRegress (const Block& al)
   : LogDLF (al),
     type (Error),
     dest_number (-42.42e42),
@@ -167,7 +167,7 @@ LogRegress::~LogRegress ()
 
 static struct LogRegressSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new LogRegress (al); }
 
   LogRegressSyntax ()

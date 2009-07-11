@@ -75,14 +75,14 @@ struct PetHargreaves : public Pet
     { return potential_evapotranspiration; }
 
   // Create.
-  PetHargreaves (Block& al)
+  PetHargreaves (const Block& al)
     : Pet (al)
     { }
 };
 
 static struct PetHargreavesSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
     { return new PetHargreaves (al); }
   PetHargreavesSyntax ()
     : DeclareModel (Pet::component, "Hargreaves", 

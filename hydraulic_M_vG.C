@@ -52,7 +52,7 @@ private:
   
   // Create and Destroy.
 public:
-  HydraulicM_vG (Block&);
+  HydraulicM_vG (const Block&);
   ~HydraulicM_vG ();
 };
 
@@ -122,7 +122,7 @@ HydraulicM_vG::Se (double h) const
     return 1.0;
 }
 
-HydraulicM_vG::HydraulicM_vG (Block& al)
+HydraulicM_vG::HydraulicM_vG (const Block& al)
   : Hydraulic (al),
     alpha (al.number ("alpha")),
     a (-alpha),
@@ -139,7 +139,7 @@ HydraulicM_vG::~HydraulicM_vG ()
 
 static struct HydraulicM_vGSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new HydraulicM_vG (al); }
 
 

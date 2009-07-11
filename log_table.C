@@ -62,7 +62,7 @@ struct LogTable : public LogDLF, public Destination
 
   // Create and destroy.
   void initialize (Treelog&);
-  explicit LogTable (Block& al);
+  explicit LogTable (const Block& al);
   void summarize (Treelog&);
   ~LogTable ();
 };
@@ -154,7 +154,7 @@ LogTable::initialize (Treelog& msg)
     summary[i]->initialize (entries, msg);
 }
 
-LogTable::LogTable (Block& al)
+LogTable::LogTable (const Block& al)
   : LogDLF (al),
     summary (Librarian::build_vector<Summary> (al, "summary")),
     type (Error),
@@ -192,7 +192,7 @@ LogTable::~LogTable ()
 
 static struct LogTableSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new LogTable (al); }
 
   LogTableSyntax ()

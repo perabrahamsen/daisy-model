@@ -133,14 +133,14 @@ SMB::turnover_dom (const std::vector<bool>& active, const double* factor,
     }
 }
 
-SMB::SMB (Block& al)
+SMB::SMB (const Block& al)
   : OM (al),
     maintenance (al.number ("maintenance"))
 { }
 
 static struct SMBInit : public DeclareSolo
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new SMB (al); }
   void load_frame (Frame& frame) const
   {

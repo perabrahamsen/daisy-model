@@ -40,7 +40,7 @@
 #include "frame.h"
 #include <sstream>
 
-PhotoFarquhar::PhotoFarquhar (Block& al)
+PhotoFarquhar::PhotoFarquhar (const Block& al)
   : Photo (al),
     Xn (al.number ("Xn")),
     O2_atm (al.number ("O2_atm")),

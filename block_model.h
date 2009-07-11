@@ -30,7 +30,7 @@ class BlockModel : public Block
   const FrameModel& frame_;
   const FrameModel& frame () const;
 public:
-  BlockModel (Block&, const FrameModel&, symbol scope_tag);
+  BlockModel (const Block&, const FrameModel&, symbol scope_tag);
   ~BlockModel ();
 };
 

@@ -49,7 +49,7 @@ public:
 private:
   UI ();                        // Disable.
 protected:
-  explicit UI (Block&);
+  explicit UI (const Block&);
 public:
   explicit UI (const char*);
   ~UI ();
@@ -70,7 +70,7 @@ private:
   // Create.
 public:
   explicit UIProgress ();
-  explicit UIProgress (Block&);
+  explicit UIProgress (const Block&);
   ~UIProgress ();
 };
 
@@ -89,7 +89,7 @@ private:
   // Create.
 public:
   explicit UINone ();
-  explicit UINone (Block&);
+  explicit UINone (const Block&);
   ~UINone ();
 };
 

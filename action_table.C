@@ -67,7 +67,7 @@ struct ActionTable : public Action
   void tick (const Daisy&, const Scope&, Treelog&);
   void initialize (const Daisy&, const Scope&, Treelog&);
   bool check (const Daisy&, const Scope&, Treelog& err) const;
-  ActionTable (Block& al);
+  ActionTable (const Block& al);
 };
 
 void 
@@ -261,7 +261,7 @@ ActionTable::check (const Daisy& daisy, const Scope& scope, Treelog& msg) const
   return ok;
 }
 
-ActionTable::ActionTable (Block& al)
+ActionTable::ActionTable (const Block& al)
   : Action (al),
     sow (al.check ("sow") 
          ? Librarian::build_item<Action> (al, "sow")
@@ -335,7 +335,7 @@ ActionTable::ActionTable (Block& al)
 // Add the ActionTable syntax to the syntax table.
 static struct ActionTableSyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ActionTable (al); }
 
   ActionTableSyntax ()

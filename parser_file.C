@@ -1502,7 +1502,7 @@ ParserFile::ParserFile (Metalib& metalib,
     impl (new Implementation (metalib, filename, msg))
 { }
 
-ParserFile::ParserFile (Block& al)
+ParserFile::ParserFile (const Block& al)
   : Parser (al),
     impl (new Implementation (al.metalib (), al.name ("where"), al.msg ()))
 {  }
@@ -1512,7 +1512,7 @@ ParserFile::~ParserFile ()
 
 static struct ParserFileSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ParserFile (al); }
 
   ParserFileSyntax ()

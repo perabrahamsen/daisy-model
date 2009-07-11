@@ -50,7 +50,7 @@ public:
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ConditionPeriodic (Block& al)
+  ConditionPeriodic (const Block& al)
     : Condition (al),
       period (al.integer ("period")),
       last (0)
@@ -59,7 +59,7 @@ public:
 
 static struct ConditionPeriodicSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ConditionPeriodic (al); }
   ConditionPeriodicSyntax ()
     : DeclareModel (Condition::component, "periodic", "\

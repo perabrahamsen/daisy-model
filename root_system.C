@@ -612,7 +612,7 @@ fraction of the radition of that day that was received that hour.");
 }
 
 static double
-get_PotRtDpt (Block& al)
+get_PotRtDpt (const Block& al)
 {
   if (al.check ("PotRtDpt"))
     return al.number ("PotRtDpt");
@@ -621,7 +621,7 @@ get_PotRtDpt (Block& al)
   return al.number ("DptEmr");
 }
 
-RootSystem::RootSystem (Block& al)
+RootSystem::RootSystem (const Block& al)
   : rootdens (al.check ("rootdens") 
               ? Librarian::build_item<Rootdens> (al, "rootdens")
               : NULL),

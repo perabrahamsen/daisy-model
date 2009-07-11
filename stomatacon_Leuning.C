@@ -45,7 +45,7 @@ private:
 
   // Create.
   public:
-  StomataCon_Leuning (Block& al)
+  StomataCon_Leuning (const Block& al)
     : StomataCon (al),
       Do (al.number ("Do"))
   { }
@@ -82,7 +82,7 @@ StomataCon_Leuning::stomata_con (double wsf /*[]*/, const double m /*[]*/,
 
 static struct StomataConLeuningSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new StomataCon_Leuning (al); }
   StomataConLeuningSyntax ()
     : DeclareModel (StomataCon::component, "Leuning", 

@@ -51,7 +51,7 @@ struct ProgramGnuplot : public Program
   { }
   bool check (Treelog&)
   { return true; }
-  explicit ProgramGnuplot (Block& al);
+  explicit ProgramGnuplot (const Block& al);
   ~ProgramGnuplot ();
 };
 
@@ -108,7 +108,7 @@ ProgramGnuplot::run (Treelog& msg)
   return true;
 }
 
-ProgramGnuplot::ProgramGnuplot (Block& al)
+ProgramGnuplot::ProgramGnuplot (const Block& al)
   : Program (al),
     units (al.units ()),
     path (al.path ()),
@@ -123,7 +123,7 @@ ProgramGnuplot::~ProgramGnuplot ()
 
 static struct ProgramGnuplotSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ProgramGnuplot (al); }
   ProgramGnuplotSyntax ()
     : DeclareModel (Program::component, "gnuplot",

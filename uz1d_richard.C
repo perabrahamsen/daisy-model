@@ -54,7 +54,7 @@ struct UZ1DRichard : public UZ1D
                          double max_relative_difference);
 
   // Create and Destroy.
-  UZ1DRichard (Block& al);
+  UZ1DRichard (const Block& al);
   ~UZ1DRichard ();
 };
 
@@ -277,7 +277,7 @@ UZ1DRichard::converges (const std::vector<double>& previous,
   return true;
 }
 
-UZ1DRichard::UZ1DRichard (Block& al)
+UZ1DRichard::UZ1DRichard (const Block& al)
   : UZ1D (al),
     max_time_step_reductions (al.integer ("max_time_step_reductions")),
     time_step_reduction (al.integer ("time_step_reduction")),
@@ -292,7 +292,7 @@ UZ1DRichard::~UZ1DRichard ()
 
 static struct UZ1DRichardSyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new UZ1DRichard (al); }
   UZ1DRichardSyntax ()
     : DeclareModel (UZ1D::component, "richards", "\

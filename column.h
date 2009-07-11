@@ -162,9 +162,9 @@ public:
 
   // Create and Destroy.
 protected:
-  explicit Column (Block&);
+  explicit Column (const Block&);
 public:
-  virtual bool initialize (Block&, const Output&, const Time&,
+  virtual bool initialize (const Block&, const Output&, const Time&,
                            const Weather*, const Scope&) = 0;
   virtual void summarize (Treelog& msg) const = 0;
   ~Column ();

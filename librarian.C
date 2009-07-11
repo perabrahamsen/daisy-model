@@ -34,7 +34,7 @@
 #include <map>
 
 void 
-Librarian::non_null (Block& block, const void *const p)
+Librarian::non_null (const Block& block, const void *const p)
 { 
   if (!p)
     block.error ("Build failed");
@@ -119,13 +119,13 @@ Librarian::submodel_all (std::vector<symbol>& all)
   
 Model*
 Librarian::build_frame (const symbol component,
-                        Block& parent, const FrameModel& frame, 
+                        const Block& parent, const FrameModel& frame, 
                         symbol scope_id)
 { return frame.construct (parent, scope_id); }
 
 Model*
 Librarian::build_frame (const symbol component,
-                        Block& parent, const FrameModel& frame, 
+                        const Block& parent, const FrameModel& frame, 
                         symbol scope_id, size_t index)
 {
   std::ostringstream tmp;
@@ -177,12 +177,12 @@ Librarian::build_stock (const symbol component, const Metalib& metalib,
 
 Model* 
 Librarian::build_item (const symbol component,
-                       Block& parent, symbol key)
+                       const Block& parent, symbol key)
 { return build_frame (component, parent, parent.model (key), key); }
 
 std::vector<Model*> 
 Librarian::build_vector (const symbol component,
-                         Block& al, symbol key)
+                         const Block& al, symbol key)
 { 
   std::vector<Model*> t;
   const std::vector<boost::shared_ptr<const FrameModel>/**/>& f = al.model_sequence (key);
@@ -193,7 +193,7 @@ Librarian::build_vector (const symbol component,
 
 std::vector<const Model*> 
 Librarian::build_vector_const (const symbol component,
-                               Block& al, symbol key)
+                               const Block& al, symbol key)
 { 
   std::vector<const Model*> t;
   const std::vector<boost::shared_ptr<const FrameModel>/**/>& f = al.model_sequence (key);
@@ -281,7 +281,7 @@ class FrameBuildable : public FrameDeclared
   const Declare::Builder& builder;
   bool buildable () const
   { return true; }
-  Model* construct (Block& context, const symbol key, 
+  Model* construct (const Block& context, const symbol key, 
                     const FrameModel& frame) const
   {
     BlockModel block (context, frame, key);

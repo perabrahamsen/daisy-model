@@ -159,7 +159,7 @@ Log::initialize_common (Metalib& metalib, Treelog& msg)
   initialize (msg);
 }
 
-Log::Log (Block& al)
+Log::Log (const Block& al)
   : ModelFramed (al),
     impl (new Implementation ())
 { }

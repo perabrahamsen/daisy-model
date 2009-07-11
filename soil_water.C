@@ -819,7 +819,7 @@ SoilWater::initialize (const FrameSubmodel& al, const Geometry& geo,
   Theta_old_ = Theta_;
 }
 
-SoilWater::SoilWater (Block& al)
+SoilWater::SoilWater (const Block& al)
   : max_exfiltration_gradient (al.number ("max_exfiltration_gradient", -1.0)),
     S_permanent_ (al.number_sequence ("S_permanent"))
 { }

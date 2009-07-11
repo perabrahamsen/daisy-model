@@ -52,7 +52,7 @@ struct BooleanStringEqual : public Boolean
   { return true; }
   bool check (const Units&, const Scope&, Treelog&) const
   { return true; }
-  BooleanStringEqual (Block& al)
+  BooleanStringEqual (const Block& al)
     : Boolean (al),
       values (al.name_sequence ("values"))
   { }
@@ -60,7 +60,7 @@ struct BooleanStringEqual : public Boolean
 
 static struct BooleanStringEqualSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new BooleanStringEqual (al); }
   BooleanStringEqualSyntax ()
     : DeclareModel (Boolean::component, "string-equal", 

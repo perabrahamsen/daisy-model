@@ -73,8 +73,8 @@ struct LogDLF : public LogSelect
   static bool contain_time_columns (const std::vector<Select*>& entries);
   void initialize (Treelog&);
   static std::vector<std::pair<symbol, symbol>/**/>
-  /**/ build_parameters (Block& al);
-  explicit LogDLF (Block& al);
+  /**/ build_parameters (const Block& al);
+  explicit LogDLF (const Block& al);
   ~LogDLF ();
 };
 

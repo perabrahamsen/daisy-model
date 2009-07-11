@@ -52,7 +52,7 @@ struct GnuplotTime : public GnuplotBase
   bool plot (std::ostream& out, Treelog& msg);
   
   // Create and Destroy.
-  explicit GnuplotTime (Block& al);
+  explicit GnuplotTime (const Block& al);
   ~GnuplotTime ();
 };
 
@@ -315,7 +315,7 @@ set style data lines\n";
   return true;
 }
 
-GnuplotTime::GnuplotTime (Block& al)
+GnuplotTime::GnuplotTime (const Block& al)
   : GnuplotBase (al),
     begin (al.check ("begin") 
 	   ? new Time (al.submodel ("begin")) 
@@ -341,7 +341,7 @@ GnuplotTime::~GnuplotTime ()
 
 static struct GnuplotTimeSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new GnuplotTime (al); }
   GnuplotTimeSyntax ()
     : DeclareModel (Gnuplot::component, "time", "common",

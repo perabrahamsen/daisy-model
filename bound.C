@@ -85,7 +85,7 @@ Bound::set_full ()
   value_ = 68.68e68;
 }
 
-Bound::Bound (Block& al, const type_t type, const double value)
+Bound::Bound (const Block& al, const type_t type, const double value)
   : type_ (type),
     value_ (value)
 { }
@@ -101,7 +101,7 @@ Bound::~Bound ()
 // "none" model.
 static struct BoundNoneSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new Bound (al, Bound::none, -42.42e42); }
   BoundNoneSyntax ()
     : DeclareModel (Bound::component, "none", "No boundary specified.")
@@ -113,7 +113,7 @@ static struct BoundNoneSyntax : public DeclareModel
 // "full" model.
 static struct BoundFullSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new Bound (al, Bound::full, 69.69e69); }
   BoundFullSyntax ()
     : DeclareModel (Bound::component, "full", "\
@@ -126,7 +126,7 @@ Maximum value for the interval boundary.")
 // finite model.
 static struct BoundFiniteSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new Bound (al, Bound::finite, al.number ("bound")); }
   BoundFiniteSyntax ()
     : DeclareModel (Bound::component, "finite", "Finite interval bound.")

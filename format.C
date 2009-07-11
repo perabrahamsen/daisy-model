@@ -217,7 +217,7 @@ Format::initialize (std::ostream& o)
   output = &o;
 }
 
-Format::Format (Block& al)
+Format::Format (const Block& al)
   : output (NULL)
 { }
 

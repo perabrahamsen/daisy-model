@@ -151,7 +151,7 @@ struct UZRectMollerup : public UZRect
 
   // Create and Destroy.
   void has_macropores (bool);
-  UZRectMollerup (Block& al);
+  UZRectMollerup (const Block& al);
   ~UZRectMollerup ();
 };
 
@@ -1088,7 +1088,7 @@ void
 UZRectMollerup::has_macropores (const bool)
 { /* Ignore for now. */ }
 
-UZRectMollerup::UZRectMollerup (Block& al)
+UZRectMollerup::UZRectMollerup (const Block& al)
   : UZRect (al),
     solver (Librarian::build_item<Solver> (al, "solver")),
     K_average (Librarian::build_item<Average> (al, "K_average")),
@@ -1111,7 +1111,7 @@ UZRectMollerup::~UZRectMollerup ()
 
 static struct UZRectMollerupSyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new UZRectMollerup (al); }
   UZRectMollerupSyntax ()
     : DeclareModel (UZRect::component, "Mollerup", "\

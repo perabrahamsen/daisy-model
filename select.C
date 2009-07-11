@@ -103,7 +103,7 @@ struct Select::Implementation
                             Treelog& err);
     static bool check_alist (const Metalib&, const Frame&, Treelog&);
     static void load_syntax (Frame&);
-    Spec (Block&);
+    Spec (const Block&);
     ~Spec ();
   };
   std::auto_ptr<Spec> spec;
@@ -124,8 +124,8 @@ struct Select::Implementation
   // Create and Destroy.
   bool check (symbol spec_dim, Treelog& err) const;
   static symbol find_description (const Metalib&, const Frame&);
-  static Number* get_expr (Block& al);
-  Implementation (Block&);
+  static Number* get_expr (const Block& al);
+  Implementation (const Block&);
   ~Implementation ();
 };
 
@@ -315,7 +315,7 @@ Name of submodels and attribute.");
   frame.order ("library", "model", "submodels_and_attribute");
 }
 
-Select::Implementation::Spec::Spec (Block& al)
+Select::Implementation::Spec::Spec (const Block& al)
   : metalib (al.metalib ()),
     library_name (al.name ("library")),
     model_name (al.name ("model")),
@@ -367,7 +367,7 @@ Select::Implementation::find_description (const Metalib& metalib,
 }
 
 Number*
-Select::Implementation::get_expr (Block& al)
+Select::Implementation::get_expr (const Block& al)
 {
   if (al.check ("expr"))
     return Librarian::build_item<Number> (al, "expr");
@@ -388,7 +388,7 @@ Select::Implementation::get_expr (Block& al)
     { return true; }
     bool check (const Units&, const Scope&, Treelog&) const
     { return true; }
-    explicit NumberFactor (Block& al, const double f)
+    explicit NumberFactor (const Block& al, const double f)
       : Number (al),
         factor (f)
     { }
@@ -410,7 +410,7 @@ Select::Implementation::get_expr (Block& al)
     { return true; }
     bool check (const Units&, const Scope&, Treelog&) const
     { return true; }
-    explicit NumberLinear (Block& al, const double f, const double o)
+    explicit NumberLinear (const Block& al, const double f, const double o)
       : Number (al),
         factor (f),
         offset (o)
@@ -440,7 +440,7 @@ Select::Implementation::get_expr (Block& al)
     { return true; }
     bool check (const Units&, const Scope&, Treelog&) const
     { return true; }
-    explicit NumberX (Block& al)
+    explicit NumberX (const Block& al)
       : Number (al)
     { }
   };
@@ -449,7 +449,7 @@ Select::Implementation::get_expr (Block& al)
 
 static const symbol flux_top_symbol ("flux_top");
 
-Select::Implementation::Implementation (Block& al)
+Select::Implementation::Implementation (const Block& al)
   : spec (al.check ("spec")
           ? submodel<Spec> (al, "spec")
           : NULL),
@@ -665,7 +665,7 @@ Select::check_border (const Border&,
                       Treelog&) const
 { return true; }
 
-Select::Select (Block& al)
+Select::Select (const Block& al)
   : name (al.type_name ()),
     impl (new Implementation (al)),
     accumulate (al.flag ("accumulate")),

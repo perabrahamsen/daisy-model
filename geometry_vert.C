@@ -49,7 +49,7 @@ GeometryVert::check_z_border (const double value, Treelog& err) const
   return ok;
 }
 
-GeometryVert::GeometryVert (Block& al)
+GeometryVert::GeometryVert (const Block& al)
   : Geometry (al)
 { }
 

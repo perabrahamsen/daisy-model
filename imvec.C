@@ -110,7 +110,7 @@ IMvec::add_syntax (Frame& frame,
 }
 
 const Unit&
-find_unit (Block& parent, const char* key)
+find_unit (const Block& parent, const char* key)
 {
   const Units& units = parent.units ();
   const Frame& parent_frame = parent.find_frame (key);
@@ -119,7 +119,7 @@ find_unit (Block& parent, const char* key)
   return units.get_unit (dim);
 }
 
-IMvec::IMvec (Block& parent, const char* key)
+IMvec::IMvec (const Block& parent, const char* key)
   : unit_ (find_unit (parent, key))
 {
   const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& alists

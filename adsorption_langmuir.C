@@ -70,7 +70,7 @@ public:
     }
   // Create.
 public:
-  AdsorptionLangmuir (Block& al)
+  AdsorptionLangmuir (const Block& al)
     : Adsorption (al),
       K (al.number ("K")),
       my_max_clay (al.number ("my_max_clay", 0.0)),
@@ -82,7 +82,7 @@ public:
 
 static struct AdsorptionLangmuirSyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new AdsorptionLangmuir (al); }
   static bool check_alist (const Metalib&, const Frame& al, Treelog& err)
   {

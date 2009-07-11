@@ -46,7 +46,7 @@ private:
 
   // Create.
   public:
-  rubiscoNdistUniform (Block& al)
+  rubiscoNdistUniform (const Block& al)
     : RubiscoNdist (al),
        f_photo (al.number ("f_photo"))
   { }
@@ -78,7 +78,7 @@ rubiscoNdistUniform::rubiscoN_distribution (const Units&,
 
 static struct rubiscoNdistUniformSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new rubiscoNdistUniform (al); }
   rubiscoNdistUniformSyntax ()
     : DeclareModel (RubiscoNdist::component, "uniform", 

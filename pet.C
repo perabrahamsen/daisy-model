@@ -60,7 +60,7 @@ Pet::output (Log& log) const
   output_value (dry (), "dry", log);
 }
 
-Pet::Pet (Block& al)
+Pet::Pet (const Block& al)
   : ModelFramed (al)
 { }
 

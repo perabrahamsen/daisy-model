@@ -60,7 +60,7 @@ Nitrification::f_h (double h)
   return 0.0;
 }
 
-Nitrification::Nitrification (Block& al)
+Nitrification::Nitrification (const Block& al)
   : N2O_fraction (al.number ("N2O_fraction"))
 { }
 

@@ -46,14 +46,14 @@ struct SolverUBLAS : public Solver
     x = b; 			// x should contain b as a start.
     ublas::lu_substitute (A, piv, x);
   }
-  SolverUBLAS (Block& al)
+  SolverUBLAS (const Block& al)
     : Solver (al)
   { }
 };
 
 static struct SolverUBLASSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new SolverUBLAS (al); }
   SolverUBLASSyntax ()
     : DeclareModel (Solver::component, "ublas", "Solve equation using UBLAS lu functions.")

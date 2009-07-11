@@ -101,7 +101,7 @@ struct ChemistryMulti : public Chemistry
 	      Treelog&) const;
   static const std::vector<Chemical*> 
   /**/ find_chemicals (const std::vector<Chemistry*>& combine);
-  explicit ChemistryMulti (Block& al);
+  explicit ChemistryMulti (const Block& al);
 };
 
 bool 
@@ -420,7 +420,7 @@ ChemistryMulti::find_chemicals (const std::vector<Chemistry*>& combine)
   return result;
 }
 
-ChemistryMulti::ChemistryMulti (Block& al)
+ChemistryMulti::ChemistryMulti (const Block& al)
   : Chemistry (al),
     combine (Librarian::build_vector<Chemistry> (al, "combine")),
     ignore (al.name_sequence ("ignore")),
@@ -429,7 +429,7 @@ ChemistryMulti::ChemistryMulti (Block& al)
 
 static struct ChemistryMultiSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ChemistryMulti (al); }
   ChemistryMultiSyntax ()
     : DeclareModel (Chemistry::component, "multi", "Handle multile chemistries.")

@@ -52,7 +52,7 @@ public:
 
   // Create and Destroy.
 protected:
-  MUnit (Block& al, symbol base);
+  MUnit (const Block& al, symbol base);
 public:
   virtual ~MUnit ();
 };

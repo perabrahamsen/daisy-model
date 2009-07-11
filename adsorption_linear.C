@@ -58,7 +58,7 @@ public:
   }
   // Create.
 public:
-  AdsorptionLinearOld (Block& al)
+  AdsorptionLinearOld (const Block& al)
     : AdsorptionLinear (al),
       K_clay (al.number ("K_clay", 0.0)),
       K_OC (al.check ("K_OC") ? al.number ("K_OC") : al.number ("K_clay"))
@@ -67,7 +67,7 @@ public:
 
 static struct AdsorptionLinearOldSyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   {
     return new AdsorptionLinearOld (al);
   }

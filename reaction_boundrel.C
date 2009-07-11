@@ -95,7 +95,7 @@ struct ReactionBoundrel : public Reaction
   void initialize (const Units&, const Geometry&, const Soil&, 
                    const SoilWater&, const SoilHeat&, const Surface&, Treelog&)
   { }
-  explicit ReactionBoundrel (Block& al)
+  explicit ReactionBoundrel (const Block& al)
     : Reaction (al),
       immobile (al.name ("immobile")),
       bound (al.name ("bound", Attribute::None ())),
@@ -106,7 +106,7 @@ struct ReactionBoundrel : public Reaction
 
 static struct ReactionBoundrelSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ReactionBoundrel (al); }
   ReactionBoundrelSyntax ()
     : DeclareModel (Reaction::component, "bound_release", "\

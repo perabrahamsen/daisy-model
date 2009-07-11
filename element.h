@@ -42,7 +42,7 @@ public:
 
   // Create and Destroy.
 public:
-  Element (Block& al);
+  Element (const Block& al);
   ~Element ();
 };
 

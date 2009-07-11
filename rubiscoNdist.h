@@ -47,7 +47,7 @@ public:
 				      const double cropN, Treelog& msg)=0;
   // Create and Destroy.
 protected:
-  RubiscoNdist (Block&);
+  RubiscoNdist (const Block&);
 
 public:
   ~RubiscoNdist ();

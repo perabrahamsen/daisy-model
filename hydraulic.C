@@ -219,7 +219,7 @@ Hydraulic::check (Treelog& msg) const
   return ok;
 }
 
-Hydraulic::Hydraulic (Block& al)
+Hydraulic::Hydraulic (const Block& al)
   : ModelDerived (al.type_name ()),
     K_init (al.check ("K_at_h")
 	    ? new K_at_h (al.submodel ("K_at_h"))
@@ -267,7 +267,7 @@ struct ProgramHydraulic_table : public Program
   { };
   bool check (Treelog& msg)
   { return hydraulic->check (msg); }
-  ProgramHydraulic_table (Block& al)
+  ProgramHydraulic_table (const Block& al)
     : Program (al),
       hydraulic (Librarian::build_item<Hydraulic> (al, "hydraulic")),
       intervals (al.integer ("intervals"))
@@ -278,7 +278,7 @@ struct ProgramHydraulic_table : public Program
 
 static struct ProgramHydraulic_tableSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ProgramHydraulic_table (al); }
   ProgramHydraulic_tableSyntax ()
     : DeclareModel (Program::component, "hydraulic", "\

@@ -34,7 +34,7 @@ Domsorp::library_id () const
   return id;
 }
 
-Domsorp::Domsorp (Block& al)
+Domsorp::Domsorp (const Block& al)
   : ModelFramed (al)
 { }
 

@@ -71,7 +71,7 @@ private:
 
   // Create and Destroy.
 protected:
-  Raddist (Block&);
+  Raddist (const Block&);
 
 public:
   ~Raddist ();

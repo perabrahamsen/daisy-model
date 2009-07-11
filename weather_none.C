@@ -61,11 +61,11 @@ public:
 
   // Create and Destroy.
 public:
-  WeatherNone (Block&);
+  WeatherNone (const Block&);
   ~WeatherNone ();
 };
 
-WeatherNone::WeatherNone (Block& al)
+WeatherNone::WeatherNone (const Block& al)
   : WeatherOld (al),
     air_temperature_ (al.number ("air_temperature")),
     global_radiation_ (al.number ("global_radiation")),
@@ -80,7 +80,7 @@ WeatherNone::~WeatherNone ()
 // Add the WeatherNone syntax to the syntax table.
 static struct WeatherNoneSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new WeatherNone (al); }
   WeatherNoneSyntax ()
     : DeclareModel (Weather::component, "none", "old",

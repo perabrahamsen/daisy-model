@@ -55,7 +55,7 @@ public:
 
   // Create and Destroy.
 protected:
-  Heatrect (Block&);
+  Heatrect (const Block&);
 public:
   ~Heatrect ();
 };

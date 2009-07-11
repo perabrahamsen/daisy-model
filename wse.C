@@ -52,7 +52,7 @@ struct WSE_full : public WSE
 
   WSE_full ()
   { }
-  WSE_full (Block&)
+  WSE_full (const Block&)
   { }
   ~WSE_full ()
   { }
@@ -67,7 +67,7 @@ WSE::create_full ()
 
 static struct WSE_fullSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new WSE_full (al); }
   WSE_fullSyntax ()
     : DeclareModel (WSE::component, "full", "\
@@ -97,7 +97,7 @@ struct WSE_partial : public WSE
     return 1.0 + factor * (1.0 - y_half) / (2.0 * y_half - 1.0); 
   }
 
-  WSE_partial (Block& al)
+  WSE_partial (const Block& al)
     : y_half (al.number ("y_half"))
   { }
   ~WSE_partial ()
@@ -106,7 +106,7 @@ struct WSE_partial : public WSE
 
 static struct WSE_partialSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new WSE_partial (al); }
   WSE_partialSyntax ()
     : DeclareModel (WSE::component, "partial", "\
@@ -136,7 +136,7 @@ struct WSE_none : public WSE
 
   WSE_none ()
   { }
-  WSE_none (Block&)
+  WSE_none (const Block&)
   { }
   ~WSE_none ()
   { }
@@ -151,7 +151,7 @@ WSE::create_none ()
 
 static struct WSE_noneSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new WSE_none (al); }
   WSE_noneSyntax ()
     : DeclareModel (WSE::component, "none", 
@@ -188,7 +188,7 @@ struct ProgramWSE_table : public Program
   { };
   bool check (Treelog&)
   { return true; }
-  ProgramWSE_table (Block& al)
+  ProgramWSE_table (const Block& al)
     : Program (al),
       wse (Librarian::build_item<WSE> (al, "wse")),
       intervals (al.integer ("intervals"))
@@ -199,7 +199,7 @@ struct ProgramWSE_table : public Program
 
 static struct ProgramWSE_tableSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ProgramWSE_table (al); }
   ProgramWSE_tableSyntax ()
     : DeclareModel (Program::component, "wse", "Generate a table of the water stress effect.")

@@ -46,7 +46,7 @@ struct UZRectConst : public UZRect
  
   // Create and Destroy.
   void has_macropores (bool);
-  UZRectConst (Block& al);
+  UZRectConst (const Block& al);
   ~UZRectConst ();
 };
 
@@ -81,7 +81,7 @@ void
 UZRectConst::has_macropores (const bool)
 { /* Ignore for now. */ }
 
-UZRectConst::UZRectConst (Block& al)
+UZRectConst::UZRectConst (const Block& al)
   : UZRect (al),
     q_x (al.number ("q_x")),
     q_z (al.number ("q_z"))
@@ -92,7 +92,7 @@ UZRectConst::~UZRectConst ()
 
 static struct UZRectConstSyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new UZRectConst (al); }
   UZRectConstSyntax ()
     : DeclareModel (UZRect::component, "const", "\

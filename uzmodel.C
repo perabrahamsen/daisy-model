@@ -25,7 +25,7 @@
 #include "block.h"
 #include "librarian.h"
 
-UZmodel::UZmodel (Block& al)
+UZmodel::UZmodel (const Block& al)
   : name (al.type_name ())
 { }
 

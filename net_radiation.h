@@ -50,7 +50,7 @@ public:
 
   // Create and Destroy.
 protected:
-  NetRadiation (Block&);
+  NetRadiation (const Block&);
 public:
   ~NetRadiation ();
 };

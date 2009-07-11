@@ -38,7 +38,7 @@ Element::library_id () const
   return id;
 }
 
-Element::Element (Block& al)
+Element::Element (const Block& al)
   : name (al.type_name ())
 { }
 
@@ -65,7 +65,7 @@ struct Atom : public Element
     static const symbol dim = symbol ("g/mol");
     return dim; 
   }
-  Atom (Block& al)
+  Atom (const Block& al)
     : Element (al),
       mass (al.number ("mass"))
   { }
@@ -73,7 +73,7 @@ struct Atom : public Element
 
 static struct ElementAtomSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new Atom (al); }
   ElementAtomSyntax ()
     : DeclareModel (Element::component, "atom", "An atom.")

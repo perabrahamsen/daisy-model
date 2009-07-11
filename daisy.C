@@ -243,7 +243,7 @@ Daisy::check (Treelog& msg)
   return ok;
 }
 
-Daisy::Daisy (Block& al)
+Daisy::Daisy (const Block& al)
   : Program (al),
     metalib (al.metalib ()),
     frame (dynamic_cast<const FrameModel&> (al.frame ())),
@@ -328,7 +328,7 @@ Daisy::~Daisy ()
 
 static struct ProgramDaisySyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new Daisy (al); }
   ProgramDaisySyntax ()
     : DeclareModel (Program::component, "Daisy", Daisy::default_description)

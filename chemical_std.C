@@ -69,7 +69,7 @@ struct ChemicalStandard : public Chemical
     const double fraction;
     const symbol chemical;
     static void load_syntax (Frame&);
-    Product (Block&);
+    Product (const Block&);
   };
   const auto_vector<const Product*> product;
   
@@ -231,8 +231,8 @@ struct ChemicalStandard : public Chemical
   static void fillup (std::vector<double>& v, const size_t size);
   void initialize (const Units&, const Scope&, const Geometry&,
                    const Soil&, const SoilWater&, const SoilHeat&, Treelog&);
-  static double find_surface_decompose_rate (Block& al);
-  ChemicalStandard (Block&);
+  static double find_surface_decompose_rate (const Block& al);
+  ChemicalStandard (const Block&);
 };
 
 const symbol 
@@ -248,7 +248,7 @@ ChemicalStandard::Product::load_syntax (Frame& frame)
   frame.order ("fraction", "chemical");
 }
 
-ChemicalStandard::Product::Product (Block& al)
+ChemicalStandard::Product::Product (const Block& al)
   : fraction (al.number ("fraction")),
     chemical (al.name ("chemical"))
 { }
@@ -1361,7 +1361,7 @@ ChemicalStandard::initialize (const Units& units, const Scope& parent_scope,
 }
 
 double
-ChemicalStandard::find_surface_decompose_rate (Block& al)
+ChemicalStandard::find_surface_decompose_rate (const Block& al)
 {
   if (al.check ("surface_decompose_rate"))
     return al.number ("surface_decompose_rate");
@@ -1373,7 +1373,7 @@ ChemicalStandard::find_surface_decompose_rate (Block& al)
   return halftime_to_rate (al.number ("decompose_halftime"));
 }
 
-ChemicalStandard::ChemicalStandard (Block& al)
+ChemicalStandard::ChemicalStandard (const Block& al)
   : Chemical (al),
     crop_uptake_reflection_factor 
     /**/ (al.number ("crop_uptake_reflection_factor")),
@@ -1456,7 +1456,7 @@ struct NumberInitialC : public Number
   bool check (const Units&, const Scope&, Treelog&) const
   { return true; }
 
-  NumberInitialC (Block& al)
+  NumberInitialC (const Block& al)
     : Number (al),
       C (al.number ("C"))
   { }
@@ -1464,7 +1464,7 @@ struct NumberInitialC : public Number
 
 static struct NumberInitialCSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new NumberInitialC (al); }
   NumberInitialCSyntax ()
     : DeclareModel (Number::component, "initial_C", "\
@@ -1505,7 +1505,7 @@ Assume same concentration in groundwater as in the bottom of the soil profile.")
 
 static struct ChemicalStandardSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ChemicalStandard (al); }
   ChemicalStandardSyntax ()
     : DeclareModel (Chemical::component, "default", "\

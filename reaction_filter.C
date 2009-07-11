@@ -136,7 +136,7 @@ struct ReactionFilter : public Reaction
     F_secondary.insert (F_secondary.begin (), soil.size (), 0.0);
     daisy_assert (F_secondary.size () == soil.size ());
   }
-  explicit ReactionFilter (Block& al)
+  explicit ReactionFilter (const Block& al)
     : Reaction (al),
       immobile (al.name ("immobile", Attribute::None ())),
       mobile (al.name ("mobile")),
@@ -147,7 +147,7 @@ struct ReactionFilter : public Reaction
 
 static struct ReactionFilterSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ReactionFilter (al); }
   ReactionFilterSyntax ()
     : DeclareModel (Reaction::component, "filter_velocity",

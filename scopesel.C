@@ -75,14 +75,14 @@ public:
 
   // Create.
 public:
-  ScopeselName (Block& al)
+  ScopeselName (const Block& al)
     : name (al.name ("frame"))
   { }
 };
 
 static struct ScopeselNameSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ScopeselName (al); }
 
   void load_frame (Frame& frame) const
@@ -106,13 +106,13 @@ public:
 
   // Create.
 public:
-  ScopeselNull (Block&)
+  ScopeselNull (const Block&)
   { }
 };
 
 static struct ScopeselNullSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ScopeselNull (al); }
 
   void load_frame (Frame&) const

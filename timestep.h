@@ -70,7 +70,7 @@ public:
   static void load_syntax (Frame&);
   static void load_frame (Frame&);
   static const Timestep& null ();
-  explicit Timestep (Block&);
+  explicit Timestep (const Block&);
   Timestep (int years, int days, int hours, int minutes, int seconds);
   ~Timestep ();
   Timestep (const Timestep&);

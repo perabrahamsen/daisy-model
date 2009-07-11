@@ -51,7 +51,7 @@ public:
   virtual bool check () const = 0;
 protected:
   explicit Parser (symbol id);
-  explicit Parser (Block&);
+  explicit Parser (const Block&);
 public:
   ~Parser ();
 };

@@ -85,7 +85,7 @@ struct ConditionBoolean : public Condition
     return false;
   }
 
-  ConditionBoolean (Block& al)
+  ConditionBoolean (const Block& al)
     : Condition (al),
       expr (Librarian::build_item<Boolean> (al, "expr")),
       state (uninitialized)
@@ -94,7 +94,7 @@ struct ConditionBoolean : public Condition
 
 static struct ConditionBooleanSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ConditionBoolean (al); }
 
   ConditionBooleanSyntax ()

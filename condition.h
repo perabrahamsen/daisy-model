@@ -52,7 +52,7 @@ public:
   virtual bool check (const Daisy&, const Scope&, Treelog&) const = 0;
   static std::auto_ptr<Condition> create_true ();
 protected:
-  Condition (Block& al);
+  Condition (const Block& al);
   Condition (const char* id);
 public:
   ~Condition ();

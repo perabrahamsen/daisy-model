@@ -42,7 +42,7 @@ struct ConditionRunning : public Condition
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ConditionRunning (Block& al)
+  ConditionRunning (const Block& al)
     : Condition (al)
   { }
 };
@@ -62,14 +62,14 @@ struct ConditionFinished : public Condition
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ConditionFinished (Block& al)
+  ConditionFinished (const Block& al)
     : Condition (al)
   { }
 };
 
 static struct ConditionRunningSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ConditionRunning (al); }
   
   ConditionRunningSyntax ()
@@ -82,7 +82,7 @@ static struct ConditionRunningSyntax : public DeclareModel
 
 static struct ConditionFinishedSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ConditionFinished (al); }
 
   ConditionFinishedSyntax ()

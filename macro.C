@@ -38,7 +38,7 @@ bool
 Macro::none () const 
 { return false; }
 
-Macro::Macro (Block& al)
+Macro::Macro (const Block& al)
   : name (al.type_name ())
 { }
 

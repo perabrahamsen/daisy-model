@@ -78,7 +78,7 @@ struct DifradDPF : public Difrad
 
 // Create and Destroy.
   public:
-  DifradDPF (Block& al)
+  DifradDPF (const Block& al)
     : Difrad (al),
        fa (al.number ("fa")),
        a (al.number ("a"))
@@ -89,7 +89,7 @@ struct DifradDPF : public Difrad
 
 static struct DifradDPFSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new DifradDPF (al); }
   DifradDPFSyntax ()
     : DeclareModel (Difrad::component, "DPF", "\

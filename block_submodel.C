@@ -29,12 +29,12 @@ const FrameSubmodel&
 BlockSubmodel::frame () const
 { return frame_; }
 
-BlockSubmodel::BlockSubmodel (Block& parent, const symbol key)
+BlockSubmodel::BlockSubmodel (const Block& parent, const symbol key)
   : Block (parent, parent.submodel (key), key),
     frame_ (parent.submodel (key))
 { }
 
-BlockSubmodel::BlockSubmodel (Block& parent, const symbol key, 
+BlockSubmodel::BlockSubmodel (const Block& parent, const symbol key, 
                               const size_t index)
   : Block (parent,
            *parent.submodel_sequence (key)[index],

@@ -39,7 +39,7 @@ public:
 
   // Create.
 public:
-  TortuosityM_Q (Block& al)
+  TortuosityM_Q (const Block& al)
     : Tortuosity (al)
   { }
   TortuosityM_Q ()
@@ -53,7 +53,7 @@ Tortuosity::create_default ()
 
 static struct TortuosityM_QSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new TortuosityM_Q (al); }
   TortuosityM_QSyntax ()
     : DeclareModel (Tortuosity::component, "M_Q", "\

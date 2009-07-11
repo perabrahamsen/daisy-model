@@ -48,7 +48,7 @@ public:
                               Treelog&) = 0;//[]
   // Create and Destroy.
 protected:
-  StomataCon (Block&);
+  StomataCon (const Block&);
 
 public:
   ~StomataCon ();

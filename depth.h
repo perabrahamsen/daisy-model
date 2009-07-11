@@ -52,7 +52,7 @@ public:
   static Depth* create (double height);
 protected:
   Depth (symbol name);
-  Depth (Block& al);
+  Depth (const Block& al);
 public:
   ~Depth ();
 };

@@ -54,7 +54,7 @@ Volume::density (const Geometry& geo) const
 }
 
 std::auto_ptr<Volume>
-Volume::build_obsolete (Block& al)
+Volume::build_obsolete (const Block& al)
 {
   Volume *const vol = Librarian::build_item<Volume> (al, "volume");
   daisy_assert (vol);
@@ -73,7 +73,7 @@ Volume::build_obsolete (Block& al)
   return std::auto_ptr<Volume> (vol);
 }
 
-Volume::Volume (Block& al)
+Volume::Volume (const Block& al)
   : name (al.type_name ())
 { }
 

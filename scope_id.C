@@ -69,7 +69,7 @@ ScopeID::ScopeID (const symbol name, const symbol d)
 { }
 
 #if 0
-ScopeID::ScopeID (Block& al)
+ScopeID::ScopeID (const Block& al)
   : WScope (al),
     tag (al.name ("name")), 
     value (al.number ("value")),
@@ -83,7 +83,7 @@ ScopeID::~ScopeID ()
 #if 0
 static struct ScopeIDSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ScopeID (al); }
 
   ScopeIDSyntax ()

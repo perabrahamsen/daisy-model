@@ -33,7 +33,7 @@ Summary::library_id () const
   return id;
 }
 
-Summary::Summary (Block& al)
+Summary::Summary (const Block& al)
   : name (al.type_name ())
 { }
 

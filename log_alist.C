@@ -508,7 +508,7 @@ bool
 LogSubmodel::check (const Border&, Treelog&) const
 { return true; }
 
-LogSubmodel::LogSubmodel (Block& al)
+LogSubmodel::LogSubmodel (const Block& al)
   : Log (al),
     is_active (false),
     nested (0)

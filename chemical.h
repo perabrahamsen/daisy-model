@@ -160,7 +160,7 @@ public:
 private:
   Chemical ();
 protected:
-  explicit Chemical (Block&);
+  explicit Chemical (const Block&);
 public:
   ~Chemical ();
 };

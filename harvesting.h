@@ -102,7 +102,7 @@ public:
   // Create and Destroy.
 public:
   static void load_syntax (Frame&);
-  Harvesting (Block&);
+  Harvesting (const Block&);
   ~Harvesting ();
 };
 

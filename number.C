@@ -93,7 +93,7 @@ Number::check_dim (const Units& units,
   return false;
 }
 
-Number::Number (Block& al)
+Number::Number (const Block& al)
   : name (al.type_name ())
 { }
 

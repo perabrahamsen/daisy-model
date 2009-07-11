@@ -585,7 +585,7 @@ the plant.  By default, the storage organ is assumed to be located far\n\
 above ground.");
 }
 
-Harvesting::Harvesting (Block& al)
+Harvesting::Harvesting (const Block& al)
   : Stem (al.model_sequence ("Stem")),
     Leaf (al.model_sequence ("Leaf")),
     Dead (al.model_sequence ("Dead")),

@@ -55,7 +55,7 @@ Reaction::tick_soil (const Units&,
                      const double, Treelog&)
 { }
 
-Reaction::Reaction (Block& al)
+Reaction::Reaction (const Block& al)
   : ModelFramed (al)
 { }
 

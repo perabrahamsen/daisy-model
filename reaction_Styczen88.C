@@ -77,7 +77,7 @@ struct ReactionStyczen88 : public ReactionColgen
   void initialize (const Units&, const Geometry& geo,
                    const Soil& soil, const SoilWater&, const SoilHeat&, 
                    const Surface&, Treelog&);
-  ReactionStyczen88 (Block& al);
+  ReactionStyczen88 (const Block& al);
 };
 
 double
@@ -257,7 +257,7 @@ ReactionStyczen88::initialize (const Units&, const Geometry& geo,
                               const Surface& surface, Treelog&)
 { surface_soil = find_surface_soil (geo, soil, surface); }
 
-ReactionStyczen88::ReactionStyczen88 (Block& al)
+ReactionStyczen88::ReactionStyczen88 (const Block& al)
   : ReactionColgen (al),
     surface_soil (-42.42e42),
     Ae (al.number ("Ae")),
@@ -270,7 +270,7 @@ ReactionStyczen88::ReactionStyczen88 (Block& al)
 
 static struct ReactionStyczen88Syntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ReactionStyczen88 (al); }
   ReactionStyczen88Syntax ()
     : DeclareModel (Reaction::component, "colgen_Styczen88", "colgen", "\

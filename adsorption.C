@@ -50,7 +50,7 @@ Adsorption::Adsorption (const char *const type)
   : ModelDerived (symbol (type))
 { }
 
-Adsorption::Adsorption (Block& al)
+Adsorption::Adsorption (const Block& al)
   : ModelDerived (al.type_name ())
 { }
 
@@ -69,7 +69,7 @@ transported with the water.")
 
 // "linear" special.
 
-AdsorptionLinear::AdsorptionLinear (Block& al)
+AdsorptionLinear::AdsorptionLinear (const Block& al)
   : Adsorption (al)
 { }
 
@@ -89,7 +89,7 @@ public:
   AdsorptionNone ()
     : Adsorption ("none")
   { }
-  AdsorptionNone (Block& al)
+  AdsorptionNone (const Block& al)
     : Adsorption (al)
   { }
 };
@@ -103,7 +103,7 @@ Adsorption::none ()
 
 static struct AdsorptionNoneSyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new AdsorptionNone (al); }
   AdsorptionNoneSyntax ()
     : DeclareModel (Adsorption::component, "none", "No adsorption.\n\
@@ -135,14 +135,14 @@ public:
 
   // Create.
 public:
-  AdsorptionFull (Block& al)
+  AdsorptionFull (const Block& al)
     : Adsorption (al)
   { }
 };
 
 static struct AdsorptionFullSyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new AdsorptionFull (al); }
   AdsorptionFullSyntax ()
     : DeclareModel (Adsorption::component, "full", "Full adsorption.\n\

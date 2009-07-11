@@ -93,7 +93,7 @@ XYSource::distance (const double xmin, const double xmax,
     }
 }
 
-XYSource::XYSource (Block& al)
+XYSource::XYSource (const Block& al)
   : name (al.type_name ())
 { }
 

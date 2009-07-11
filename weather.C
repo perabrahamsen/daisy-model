@@ -41,7 +41,7 @@ Weather::dry_deposit_unit ()
   return unit;
 }
 
-Weather::Weather (Block& al)
+Weather::Weather (const Block& al)
   : ModelDerived (al.type_name ())
 { }
 

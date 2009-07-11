@@ -58,7 +58,7 @@ private:
 
   // Create & Destroy.
 public:
-  SMB (Block& al);
+  SMB (const Block& al);
 };
 
 #endif // SMB_H

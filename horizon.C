@@ -71,7 +71,7 @@ struct Horizon::Implementation
   /**/ (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& frames);
   static symbol_map get_dimensions 
   /**/ (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& frames);
-  Implementation (Block& al);
+  Implementation (const Block& al);
   Implementation (const Frame& al);
   ~Implementation ();
 };
@@ -124,7 +124,7 @@ Horizon::Implementation::get_dimensions
   return result;
 }
 
-Horizon::Implementation::Implementation (Block& al)
+Horizon::Implementation::Implementation (const Block& al)
   : dry_bulk_density (al.number ("dry_bulk_density", -42.42e42)),
     SOM_C_per_N (al.number_sequence ("SOM_C_per_N")),
     C_per_N (al.number ("C_per_N", -42.42e42)),
@@ -303,7 +303,7 @@ static const class SOM_fractions_check_type : public VCheck
   };
 } SOM_fractions_check;
 
-Horizon::Horizon (Block& al)
+Horizon::Horizon (const Block& al)
   : ModelDerived (al.type_name ()),
     impl (new Implementation (al)),
     fast_clay (-42.42e42),

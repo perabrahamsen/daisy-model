@@ -49,7 +49,7 @@ public:
 
   // Create.
 public:
-  NitrificationSoil (Block&);
+  NitrificationSoil (const Block&);
   NitrificationSoil (const Frame&);
 };
 
@@ -79,7 +79,7 @@ NitrificationSoil::tick (const double M, const double /* C */,
     NH4 = N2O = NO3 = 0.0;
 }
 
-NitrificationSoil::NitrificationSoil (Block& al)
+NitrificationSoil::NitrificationSoil (const Block& al)
   : Nitrification (al),
     k (al.number ("k")),
     k_10 (al.number ("k_10")),
@@ -97,7 +97,7 @@ NitrificationSoil::NitrificationSoil (const Frame& al)
 
 static struct NitrificationSoilSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new NitrificationSoil (al); }
   NitrificationSoilSyntax ()
     : DeclareModel (Nitrification::component, "soil", 

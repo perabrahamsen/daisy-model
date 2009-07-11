@@ -126,9 +126,9 @@ private:
 
   // Create.
 public:
-  virtual void initialize (Block&, const Weather&) = 0;
+  virtual void initialize (const Block&, const Weather&) = 0;
 protected:
-  explicit Bioclimate (Block&);
+  explicit Bioclimate (const Block&);
 public:
   virtual void summarize (Treelog& msg) const = 0;
   ~Bioclimate ();

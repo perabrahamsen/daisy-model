@@ -53,7 +53,7 @@ bool
 Phenology::mature () const
 { return DS >= 2.0; }
 
-Phenology::Phenology (Block& al)
+Phenology::Phenology (const Block& al)
   : ModelDerived (al.type_name ()),
     // State.
     DAP (al.number ("DAP")),

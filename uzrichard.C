@@ -100,7 +100,7 @@ public:
   // Create and Destroy.
 public:
   void has_macropores (bool); // Tell UZ that there is macropores.
-  UZRichard (Block& par);
+  UZRichard (const Block& par);
   ~UZRichard ();
 };
 
@@ -751,7 +751,7 @@ UZRichard::has_macropores (const bool has_them)
   daisy_assert (K_average.get ());
 }
 
-UZRichard::UZRichard (Block& al)
+UZRichard::UZRichard (const Block& al)
   : UZmodel (al),
     // Parameters.
     debug (al.integer ("debug")),
@@ -771,7 +771,7 @@ UZRichard::~UZRichard ()
 // Add the UZRichard syntax to the syntax table.
 static struct UZRichardSyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new UZRichard (al); }
 
   UZRichardSyntax ()

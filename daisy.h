@@ -98,7 +98,7 @@ public:
   void initialize (Metalib&, Block&);
   bool check (Treelog& err);
   static void load_syntax (Frame&);
-  explicit Daisy (Block&);
+  explicit Daisy (const Block&);
 private:
   void summarize (Treelog&) const;
   ~Daisy ();

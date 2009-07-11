@@ -98,7 +98,7 @@ struct ReactionStandard : public Reaction
     S_AB.insert (S_AB.begin (), soil.size (), 0.0);
     daisy_assert (S_AB.size () == soil.size ());
   }
-  explicit ReactionStandard (Block& al)
+  explicit ReactionStandard (const Block& al)
     : Reaction (al),
       name_A (al.name ("A")),
       name_B (al.name ("B")),
@@ -108,7 +108,7 @@ struct ReactionStandard : public Reaction
 
 static struct ReactionStandardSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ReactionStandard (al); }
   ReactionStandardSyntax ()
     : DeclareModel (Reaction::component, "default", 

@@ -49,7 +49,7 @@ public:
 
   // Create and Destroy.
 protected:
-  explicit Gnuplot (Block&);
+  explicit Gnuplot (const Block&);
 private:
   explicit Gnuplot ();
   explicit Gnuplot (const Gnuplot&);

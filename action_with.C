@@ -109,7 +109,7 @@ public:
     return ok;
   }
 
-  ActionWithColumn (Block& al)
+  ActionWithColumn (const Block& al)
     : Action (al),
       column (al.name ("column")),
       actions (Librarian::build_vector<Action> (al, "actions"))
@@ -121,7 +121,7 @@ public:
 
 static struct ActionWithColumnSyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ActionWithColumn (al); }
 
   ActionWithColumnSyntax ()

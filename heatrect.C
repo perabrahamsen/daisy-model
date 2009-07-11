@@ -33,7 +33,7 @@ Heatrect::library_id () const
   return id;
 }
 
-Heatrect::Heatrect (Block& al)
+Heatrect::Heatrect (const Block& al)
   : name (al.type_name ())
 { }
 

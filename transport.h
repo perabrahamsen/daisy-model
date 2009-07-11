@@ -72,7 +72,7 @@ public:
 public:
   virtual bool check (const Geometry&, Treelog&) const;
 protected:
-  Transport (Block&);
+  Transport (const Block&);
 public:
   ~Transport ();
 };

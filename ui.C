@@ -51,7 +51,7 @@ UI::set_low_priority () const
 #endif // win32 API
 }
 
-UI::UI (Block& al)
+UI::UI (const Block& al)
   : name (al.type_name ())
 { }
 
@@ -115,7 +115,7 @@ UIProgress::UIProgress ()
   : UI ("progress")
 { }
 
-UIProgress::UIProgress (Block& al)
+UIProgress::UIProgress (const Block& al)
   : UI (al)
 { }
 
@@ -124,7 +124,7 @@ UIProgress::~UIProgress ()
 
 static struct UIProgressSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new UIProgress (al); }
 
   UIProgressSyntax ()
@@ -162,7 +162,7 @@ UINone::UINone ()
   : UI ("none")
 { }
 
-UINone::UINone (Block& al)
+UINone::UINone (const Block& al)
   : UI (al)
 { }
 
@@ -171,7 +171,7 @@ UINone::~UINone ()
 
 static struct UINoneSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new UINone (al); }
 
   UINoneSyntax ()

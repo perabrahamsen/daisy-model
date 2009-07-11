@@ -115,7 +115,7 @@ public:
 public:
   static void load_syntax (Frame&);
   explicit Time (const FrameSubmodel&);
-  explicit Time (Block&);
+  explicit Time (const Block&);
 
   // Construct.
 public:

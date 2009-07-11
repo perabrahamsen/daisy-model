@@ -94,7 +94,7 @@ struct MovementRect : public MovementSolute
   // Create.
   void initialize_derived (const Soil&, const Groundwater&, 
                            bool has_macropores, Treelog&);
-  MovementRect (Block& al);
+  MovementRect (const Block& al);
   ~MovementRect ();
 };
 
@@ -295,7 +295,7 @@ MovementRect::initialize_derived (const Soil&, const Groundwater&,
     matrix_water[i]->has_macropores (has_macropores);
 }
 
-MovementRect::MovementRect (Block& al)
+MovementRect::MovementRect (const Block& al)
   : MovementSolute (al),
     geo (submodel<GeometryRect> (al, "Geometry")),
     drain_position (map_construct_const<Point> 
@@ -324,7 +324,7 @@ MovementRect::~MovementRect ()
 
 static struct MovementRectSyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new MovementRect (al); }
 
   MovementRectSyntax ()

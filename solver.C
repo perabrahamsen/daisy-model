@@ -41,7 +41,7 @@ Solver::Matrix::Matrix (const size_t size)
 #endif // USE_DENSE_MATRIX
 }
 
-Solver::Solver (Block& al)
+Solver::Solver (const Block& al)
   : name (al.type_name ())
 { }
 

@@ -42,7 +42,7 @@ public:
 			     Treelog& msg) = 0;	    // []
   // Create and Destroy.
 protected:
-  ABAEffect (Block&);
+  ABAEffect (const Block&);
 
 public:
   ~ABAEffect ();

@@ -69,7 +69,7 @@ public:
 
   // Create and Destroy.
 public:
-  explicit SourceMerge (Block& al);
+  explicit SourceMerge (const Block& al);
   ~SourceMerge ()
   { sequence_delete (source.begin (), source.end ()); }
 };
@@ -190,7 +190,7 @@ SourceMerge::load (Treelog& msg)
   return true;
 }
 
-SourceMerge::SourceMerge (Block& al)
+SourceMerge::SourceMerge (const Block& al)
   : Source (al),
     units (al.units ()),
     source (Librarian::build_vector<Source> (al, "source")),
@@ -202,7 +202,7 @@ SourceMerge::SourceMerge (Block& al)
 
 static struct SourceMergeSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new SourceMerge (al); }
 
   SourceMergeSyntax ()

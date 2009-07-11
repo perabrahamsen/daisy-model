@@ -191,7 +191,7 @@ The end points are listed descending from the surface to the bottom.");
   frame.set_check ("zplus", zplus_check);
 }
   
-Geometry1D::Geometry1D (Block& al)
+Geometry1D::Geometry1D (const Block& al)
   : GeometryVert (al)
 { 
   if (al.check ("zplus"))

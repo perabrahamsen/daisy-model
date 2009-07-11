@@ -57,14 +57,14 @@ struct PetWeather : public Pet
   { return potential_evapotranspiration; }
 
   // Create.
-  PetWeather (Block& al)
+  PetWeather (const Block& al)
     : Pet (al)
   { }
 };
 
 static struct PetWeatherSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new PetWeather (al); }
   PetWeatherSyntax ()
     : DeclareModel (Pet::component, "weather", 

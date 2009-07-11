@@ -78,7 +78,7 @@ public:
   virtual void initialize (const Texture&, double rho_b, bool top_soil,
 			   Treelog&);
   virtual bool check (Treelog&) const;
-  Hydraulic (Block&);
+  Hydraulic (const Block&);
   static std::auto_ptr<Hydraulic> create_aquitard (const double K_sat);
   Hydraulic (symbol name, double K_sat);
   ~Hydraulic ();

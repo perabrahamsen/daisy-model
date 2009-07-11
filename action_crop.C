@@ -146,7 +146,7 @@ struct ActionCrop : public Action
     
     static bool check_alist (const Metalib&, const Frame& al, Treelog&);
     static void load_syntax (Frame&);
-    Fertilize (Block&);
+    Fertilize (const Block&);
     ~Fertilize ();
   };
   const std::vector <const Fertilize*> fertilize_at;
@@ -167,7 +167,7 @@ struct ActionCrop : public Action
     // Create and Destroy.
     static bool check_alist (const Metalib&, const Frame& al, Treelog&);
     static void load_syntax (Frame&);
-    Tillage (Block&);
+    Tillage (const Block&);
     ~Tillage ();
   };
   const std::vector<const Tillage*> tillage;
@@ -223,7 +223,7 @@ struct ActionCrop : public Action
   // Create and Destroy.
   void initialize (const Daisy&, const Scope&, Treelog&);
   bool check (const Daisy&, const Scope&, Treelog& err) const;
-  ActionCrop (Block& al);
+  ActionCrop (const Block& al);
   ~ActionCrop ();
 };
 
@@ -575,7 +575,7 @@ ActionCrop::Fertilize::load_syntax (Frame& frame)
   frame.order ("month", "day", "what");
 }
 
-ActionCrop::Fertilize::Fertilize (Block& al)
+ActionCrop::Fertilize::Fertilize (const Block& al)
   : month (al.integer ("month")),
     day (al.integer ("day")),
     what (&al.model ("what"))
@@ -638,7 +638,7 @@ ActionCrop::Tillage::load_syntax (Frame& frame)
   frame.order ("month", "day", "operation");
 }
 
-ActionCrop::Tillage::Tillage (Block& al)
+ActionCrop::Tillage::Tillage (const Block& al)
   : month (al.integer ("month")),
     day (al.integer ("day")),
     operation (Librarian::build_item<Action> (al, "operation"))
@@ -968,7 +968,7 @@ ActionCrop::check (const Daisy& daisy, const Scope& scope, Treelog& msg) const
   return ok;
 }
 
-ActionCrop::ActionCrop (Block& al)
+ActionCrop::ActionCrop (const Block& al)
   : Action (al),
     primary (new Sow (al.submodel ("primary"))),
     secondary (al.check ("secondary") 
@@ -1017,7 +1017,7 @@ ActionCrop::~ActionCrop ()
 // Add the ActionCrop syntax to the syntax table.
 static struct ActionCropSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ActionCrop (al); }
 
   static bool check_alist (const Metalib&, const Frame& al, Treelog& err)

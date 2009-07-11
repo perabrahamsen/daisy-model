@@ -391,14 +391,14 @@ FormatLaTeX::frame_description (const Frame& frame)
   soft_linebreak ();
 }
 
-FormatLaTeX::FormatLaTeX (Block& al)
+FormatLaTeX::FormatLaTeX (const Block& al)
   : Format (al),
     list_level (0)
 { }
 
 static struct FormatLaTeXSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new FormatLaTeX (al); }
   FormatLaTeXSyntax ()
     : DeclareModel (Format::component, "LaTeX", "Format text as LaTeX.")

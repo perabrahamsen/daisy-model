@@ -103,7 +103,7 @@ GnuplotBase::file2device (const symbol file_s)
  return "unknown";
 }
 
-GnuplotBase::GnuplotBase (Block& al)
+GnuplotBase::GnuplotBase (const Block& al)
   : Gnuplot (al),
     file (al.name ("where")),
     device (al.name ("device", file2device (file))),

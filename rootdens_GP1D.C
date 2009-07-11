@@ -77,7 +77,7 @@ struct Rootdens_GP1D : public Rootdens
   // Create.
   void initialize (const Geometry&, double row_width, double row_pos, 
                    Treelog& msg);
-  explicit Rootdens_GP1D (Block&);
+  explicit Rootdens_GP1D (const Block&);
 };
 
 void
@@ -278,7 +278,7 @@ Rootdens_GP1D::initialize (const Geometry&, double row_width, double,
                  + "' root density model");
 }
 
-Rootdens_GP1D::Rootdens_GP1D (Block& al)
+Rootdens_GP1D::Rootdens_GP1D (const Block& al)
   : Rootdens (al),
     DensRtTip (al.number ("DensRtTip")),
     DensIgnore (al.number ("DensIgnore", DensRtTip)),
@@ -289,7 +289,7 @@ Rootdens_GP1D::Rootdens_GP1D (Block& al)
 
 static struct Rootdens_GP1DSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new Rootdens_GP1D (al); }
   Rootdens_GP1DSyntax ()
     : DeclareModel (Rootdens::component, "GP1D", 

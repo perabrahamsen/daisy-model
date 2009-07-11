@@ -51,7 +51,7 @@ struct ActionMix : public Action
   bool check (const Daisy&, const Scope&, Treelog& err) const
   { return true; }
 
-  ActionMix (Block& al)
+  ActionMix (const Block& al)
     : Action (al),
       depth (al.number ("depth")),
       penetration (al.number ("penetration"))
@@ -60,7 +60,7 @@ struct ActionMix : public Action
 
 static struct ActionMixSyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
     { return new ActionMix (al); }
 
   ActionMixSyntax ()
@@ -102,7 +102,7 @@ struct ActionSwap : public Action
   bool check (const Daisy&, const Scope&, Treelog& err) const
   { return true; }
 
-  ActionSwap (Block& al)
+  ActionSwap (const Block& al)
     : Action (al),
       middle (al.number ("middle")),
       depth (al.number ("depth"))
@@ -111,7 +111,7 @@ struct ActionSwap : public Action
 
 static struct ActionSwapSyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ActionSwap (al); }
 
   static bool check_alist (const Metalib&, const Frame& al, Treelog& err)
@@ -166,7 +166,7 @@ struct ActionSetPorosity : public Action
   bool check (const Daisy&, const Scope&, Treelog& err) const
   { return true; }
 
-  ActionSetPorosity (Block& al)
+  ActionSetPorosity (const Block& al)
     : Action (al),
       porosity (al.number ("porosity")),
       depth (al.number ("depth"))
@@ -175,7 +175,7 @@ struct ActionSetPorosity : public Action
 
 static struct ActionSetPorositySyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ActionSetPorosity (al); }
 
   ActionSetPorositySyntax ()

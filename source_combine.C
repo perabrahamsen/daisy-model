@@ -67,7 +67,7 @@ public:
 
   // Create and Destroy.
 public:
-  explicit SourceCombine (Block& al);
+  explicit SourceCombine (const Block& al);
   ~SourceCombine ()
   { }
 };
@@ -109,7 +109,7 @@ SourceCombine::load (Treelog& msg)
   return true;
 }
 
-SourceCombine::SourceCombine (Block& al)
+SourceCombine::SourceCombine (const Block& al)
   : Source (al),
     units (al.units ()),
     scope (Librarian::build_vector<Source> (al, "source")),
@@ -122,7 +122,7 @@ SourceCombine::SourceCombine (Block& al)
 
 static struct SourceCombineSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new SourceCombine (al); }
 
   SourceCombineSyntax ()

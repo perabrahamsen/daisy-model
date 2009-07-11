@@ -169,7 +169,7 @@ public:
   virtual bool check_border (const Border&, const Volume& volume,
                              Treelog&) const;
 protected:
-  Select (Block& al);
+  Select (const Block& al);
 public:
   ~Select ();
 };

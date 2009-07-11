@@ -38,7 +38,7 @@ Difrad::output (Log&) const
 { }
 
 
-Difrad::Difrad (Block& al)
+Difrad::Difrad (const Block& al)
   : ModelFramed (al)
 { }
 

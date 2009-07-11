@@ -47,7 +47,7 @@ public:
 
   // Create.
 public:
-  TortuosityLinear (Block& al)
+  TortuosityLinear (const Block& al)
     : Tortuosity (al),
       a_maybe (al.number ("a", -42.0)),
       b (al.number ("b"))
@@ -56,7 +56,7 @@ public:
 
 static struct TortuosityLinearSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   {
     return new TortuosityLinear (al);
   }

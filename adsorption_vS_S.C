@@ -58,7 +58,7 @@ public:
 
   // Create.
 public:
-  Adsorption_vS_S (Block& al)
+  Adsorption_vS_S (const Block& al)
     : Adsorption (al)
     { }
 };
@@ -105,7 +105,7 @@ Adsorption_vS_S::M_to_C (const Soil& soil, double Theta, int i, double M) const
 
 static struct Adsorption_vS_SSyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new Adsorption_vS_S (al); }
   Adsorption_vS_SSyntax ()
     : DeclareModel (Adsorption::component, "vS_S", "\

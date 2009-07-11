@@ -72,7 +72,7 @@ public:
                    const Geometry&, const Soil&, const Scope& parent_scope, 
                    const Groundwater&, Treelog& msg);
   bool check (const Geometry&, Treelog& msg) const;
-  TertiaryOld (Block& al);
+  TertiaryOld (const Block& al);
 };
 
 void
@@ -234,7 +234,7 @@ This tertiary water transport model only works with the 'vertical' movement mode
   return ok;
 }
 
-TertiaryOld::TertiaryOld (Block& al)
+TertiaryOld::TertiaryOld (const Block& al)
   : Tertiary (al),
     macro (al.check ("macro")
 	   ? Librarian::build_item<Macro> (al, "macro")
@@ -244,7 +244,7 @@ TertiaryOld::TertiaryOld (Block& al)
 
 static struct TertiaryOldSyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new TertiaryOld (al); }
 
   TertiaryOldSyntax ()

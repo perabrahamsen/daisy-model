@@ -83,7 +83,7 @@ struct Rootdens_GP2D : public Rootdens
   // Create.
   void initialize (const Geometry&, 
                    double row_width, double row_pos, Treelog&);
-  explicit Rootdens_GP2D (Block&);
+  explicit Rootdens_GP2D (const Block&);
 };
 
 void
@@ -376,7 +376,7 @@ Rootdens_GP2D::initialize (const Geometry& geo,
     }
 }
 
-Rootdens_GP2D::Rootdens_GP2D (Block& al)
+Rootdens_GP2D::Rootdens_GP2D (const Block& al)
   : Rootdens (al),
     debug (al.integer ("debug")),
     row_position (al.number ("row_position")),
@@ -405,7 +405,7 @@ Rootdens::create_row (const Metalib& metalib, Treelog& msg,
 
 static struct Rootdens_GP2DSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new Rootdens_GP2D (al); }
   Rootdens_GP2DSyntax ()
     : DeclareModel (Rootdens::component, "GP2D", 

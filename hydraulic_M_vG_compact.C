@@ -62,7 +62,7 @@ private:
   
   // Create and Destroy.
 public:
-  HydraulicM_vG_compact (Block&);
+  HydraulicM_vG_compact (const Block&);
   ~HydraulicM_vG_compact ();
 };
 
@@ -144,7 +144,7 @@ HydraulicM_vG_compact::Se (double h) const
     return 1.0;
 }
 
-HydraulicM_vG_compact::HydraulicM_vG_compact (Block& al)
+HydraulicM_vG_compact::HydraulicM_vG_compact (const Block& al)
   : Hydraulic (al),
     ref_alpha (al.number ("ref_alpha")),
     ref_n (al.number ("ref_n")),
@@ -161,7 +161,7 @@ HydraulicM_vG_compact::~HydraulicM_vG_compact ()
 // Register the HydraulicM_vG_compact syntax.
 static struct HydraulicM_vG_compactSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new HydraulicM_vG_compact (al); }
 
   HydraulicM_vG_compactSyntax ()

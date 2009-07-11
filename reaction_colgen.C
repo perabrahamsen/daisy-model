@@ -74,7 +74,7 @@ ReactionColgen::check (const Units&, const Geometry& geo,
   return ok;
 }
 
-ReactionColgen::ReactionColgen (Block& al)
+ReactionColgen::ReactionColgen (const Block& al)
   : Reaction (al),
     colloid_name (al.name ("colloid")),
     ponddamp (Librarian::build_item<Ponddamp> (al, "ponddamp")),

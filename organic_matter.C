@@ -33,7 +33,7 @@ OrganicMatter::library_id () const
   return id;
 }
 
-OrganicMatter::OrganicMatter (Block& al)
+OrganicMatter::OrganicMatter (const Block& al)
   : ModelDerived (al.type_name ())
 { }
 

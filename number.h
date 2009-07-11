@@ -59,7 +59,7 @@ public:
   virtual bool check (const Units&, const Scope&, Treelog&) const = 0;
   bool check_dim (const Units&, const Scope&, symbol dim, Treelog&) const;
 protected:
-  explicit Number (Block&);
+  explicit Number (const Block&);
 public:
   ~Number ();
 };

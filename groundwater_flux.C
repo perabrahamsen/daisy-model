@@ -55,7 +55,7 @@ public:
   { }
   bool check (const Units&, const Geometry&, const Scope&, Treelog&) const
   { return true; }
-  GroundwaterFlux (Block& al)
+  GroundwaterFlux (const Block& al)
     : Groundwater (al),
       flux (al.number ("flux"))
   { }
@@ -65,7 +65,7 @@ public:
 
 static struct GroundwaterFluxSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new GroundwaterFlux (al); }
 
   GroundwaterFluxSyntax ()

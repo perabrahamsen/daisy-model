@@ -99,7 +99,7 @@ public:
 private:
   OrganicMatter ();
 public:
-  explicit OrganicMatter (Block&);
+  explicit OrganicMatter (const Block&);
   ~OrganicMatter ();
 };
 

@@ -159,7 +159,7 @@ struct GroundwaterAquitard : public Groundwater
       ok = false;
     return ok;
   }
-  GroundwaterAquitard (Block& al)
+  GroundwaterAquitard (const Block& al)
     : Groundwater (al),
       K_aquitard (al.number ("K_aquitard")),
       Z_aquitard (al.number ("Z_aquitard")),
@@ -174,7 +174,7 @@ struct GroundwaterAquitard : public Groundwater
 
 static struct GroundwaterAquitardSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new GroundwaterAquitard (al); }
 
   GroundwaterAquitardSyntax ()

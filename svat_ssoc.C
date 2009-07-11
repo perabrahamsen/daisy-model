@@ -194,7 +194,7 @@ struct SVAT_SSOC : public SVAT
   void output(Log& log) const;
 
   // Create.
-  SVAT_SSOC (Block& al);
+  SVAT_SSOC (const Block& al);
   void summarize (Treelog& msg) const
   { 
     if (converge_fail > 0)
@@ -803,7 +803,7 @@ SVAT_SSOC::output(Log& log) const
     }
 }
 
-SVAT_SSOC::SVAT_SSOC (Block& al)
+SVAT_SSOC::SVAT_SSOC (const Block& al)
   : SVAT (al), 
     solver (Librarian::build_item<Solver> (al, "solver")),
     hypostomatous (al.flag ("hypostomatous")),
@@ -878,7 +878,7 @@ SVAT_SSOC::SVAT_SSOC (Block& al)
 
 static struct SVAT_SSOCSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new SVAT_SSOC (al); }
   SVAT_SSOCSyntax ()
     : DeclareModel (SVAT::component, "SSOC", "Sun-Shade Open Canopy.")

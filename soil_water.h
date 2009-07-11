@@ -166,7 +166,7 @@ public:
   static void load_syntax (Frame&);
   void initialize (const FrameSubmodel&, const Geometry&,
                    const Soil&, const SoilHeat&, const Groundwater&, Treelog&);
-  SoilWater (Block&);
+  SoilWater (const Block&);
   ~SoilWater ();
 };
 

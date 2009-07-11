@@ -56,7 +56,7 @@ public:
   
   // Create and Destroy.
 protected:
-  explicit XYSource (Block&);
+  explicit XYSource (const Block&);
 private:
   XYSource (const XYSource&);
 public:

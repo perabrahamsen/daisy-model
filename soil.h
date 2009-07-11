@@ -113,10 +113,10 @@ public:
 private:
   Soil (const Soil&);
 public:
-  explicit Soil (Block&);
-  double initialize_aquitard (Block&,
+  explicit Soil (const Block&);
+  double initialize_aquitard (const Block&,
                               double Z_aquitard, double K_aquitard);
-  void initialize (Block&, Geometry&, Groundwater&, int som_size);
+  void initialize (const Block&, Geometry&, Groundwater&, int som_size);
   ~Soil ();
 };
 

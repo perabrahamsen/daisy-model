@@ -144,7 +144,7 @@ struct NumberPLF : public Number
     return ok;
   }
 
-  static const PLF build_plf (Block& al) 
+  static const PLF build_plf (const Block& al) 
   {
     const Units& units = al.units ();
     const symbol domain (al.name ("domain"));
@@ -172,7 +172,7 @@ struct NumberPLF : public Number
     return plf;
   }
 
-  NumberPLF (Block& al)
+  NumberPLF (const Block& al)
     : Number (al),
       operand (Librarian::build_item<Number> (al, "operand")),
       domain (al.name ("domain")),
@@ -183,7 +183,7 @@ struct NumberPLF : public Number
 
 static struct NumberPLFSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new NumberPLF (al); }
 
   NumberPLFSyntax ()

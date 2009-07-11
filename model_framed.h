@@ -33,13 +33,23 @@
 class FrameModel;
 class Block;
 
+#ifdef __unix
+#define EXPORT /* Nothing */
+#elif defined (BUILD_DLL)
+/* DLL export */
+#define EXPORT __declspec(dllexport)
+#else
+/* EXE import */
+#define EXPORT __declspec(dllimport)
+#endif
+
 class ModelFramed : public ModelLogable
 {
   // Content.
 private:
   std::auto_ptr<const FrameModel> my_frame; // Remember for checkpoint.
 public:
-  virtual const FrameModel& frame () const;
+  virtual const FrameModel& frame () const EXPORT;
 
   // Use.
 public:
@@ -48,7 +58,7 @@ public:
   
   // Create and Destroy.
 protected:
-  ModelFramed (Block&);
+  ModelFramed (const Block&);
   ModelFramed (symbol);
   ~ModelFramed ();
 };

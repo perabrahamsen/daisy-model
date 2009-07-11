@@ -301,7 +301,7 @@ protected:
 public:
   void initialize_common (Metalib&, Treelog& out);
 protected:
-  Log (Block& al);
+  Log (const Block& al);
   Log (const char* id);
 public:
   virtual void summarize (Treelog& out);

@@ -171,7 +171,7 @@ public:
                            const Soil& soil, OrganicMatter&,
                            Treelog&) = 0;
   virtual bool check (const Units&, Treelog& msg) const = 0;
-  explicit Vegetation (Block&);
+  explicit Vegetation (const Block&);
   ~Vegetation ();
 };
 

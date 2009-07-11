@@ -142,7 +142,7 @@ The end points are listed ascending from left (0.0) to right.");
   frame.set_check ("xplus", xplus_check);
 }
   
-GeometryRect::GeometryRect (Block& al)
+GeometryRect::GeometryRect (const Block& al)
   : GeometryVert (al), 
     cell_rows_ (al.number_sequence ("zplus").size ()),
     cell_columns_ (al.number_sequence ("xplus").size ())

@@ -212,7 +212,7 @@ struct SelectArray : public Select
   { return value.size (); }
 
   // Create and Destroy.
-  SelectArray (Block& al)
+  SelectArray (const Block& al)
     : Select (al),
       value (al.number_sequence ("value")),
       last_geo (NULL),
@@ -223,7 +223,7 @@ struct SelectArray : public Select
 
 static struct SelectArraySyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new SelectArray (al); }
   SelectArraySyntax ()
     : DeclareModel (Select::component, "array", "Log all members of an array.")

@@ -51,7 +51,7 @@ public:
   { }
   bool check (const Units&, const Geometry&, const Scope&, Treelog&) const
   { return true; }
-  GroundwaterDeep (Block& al)
+  GroundwaterDeep (const Block& al)
     : Groundwater (al)
   { }
   ~GroundwaterDeep ()
@@ -60,7 +60,7 @@ public:
 
 static struct GroundwaterDeepSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new GroundwaterDeep (al); }
 
   GroundwaterDeepSyntax ()

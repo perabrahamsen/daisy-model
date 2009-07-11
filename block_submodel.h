@@ -29,8 +29,8 @@ class BlockSubmodel : public Block
   const FrameSubmodel& frame_;
   const FrameSubmodel& frame () const;
 public:
-  BlockSubmodel (Block& parent, const symbol key);
-  BlockSubmodel (Block& parent, const symbol key, const size_t index);
+  BlockSubmodel (const Block& parent, const symbol key);
+  BlockSubmodel (const Block& parent, const symbol key, const size_t index);
   ~BlockSubmodel ();
 };
 

@@ -99,7 +99,7 @@ struct ChemistryStandard : public Chemistry
   bool check (const Scope& scope, const Geometry&,
 	      const Soil&, const SoilWater&, const SoilHeat&, const Chemistry&,
 	      Treelog&) const;
-  explicit ChemistryStandard (Block& al);
+  explicit ChemistryStandard (const Block& al);
 };
 
 bool
@@ -379,7 +379,7 @@ ChemistryStandard::check (const Scope& scope,
   return ok;
 }
 
-ChemistryStandard::ChemistryStandard (Block& al)
+ChemistryStandard::ChemistryStandard (const Block& al)
   : Chemistry (al),
     chemicals (Librarian::build_vector<Chemical> (al, "trace")),
     reactions (Librarian::build_vector<Reaction> (al, "reaction"))
@@ -387,7 +387,7 @@ ChemistryStandard::ChemistryStandard (Block& al)
 
 static struct ChemistryStandardSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ChemistryStandard (al); }
   ChemistryStandardSyntax ()
     : DeclareModel (Chemistry::component, "default", "\

@@ -53,7 +53,7 @@ struct ActionAssert : public Action
   bool check (const Daisy& daisy, const Scope& scope, Treelog& out) const
   { return condition->check (daisy, scope, out); }
 
-  ActionAssert (Block& al)
+  ActionAssert (const Block& al)
     : Action (al),
       condition (Librarian::build_item<Condition> (al, "condition")),
       message (al.name ("message"))
@@ -79,7 +79,7 @@ struct ActionMessage : public Action
   bool check (const Daisy&, const Scope&, Treelog& err) const
   { return true; }
 
-  ActionMessage (Block& al)
+  ActionMessage (const Block& al)
     : Action (al),
       message (al.name ("message"))
   { }
@@ -104,7 +104,7 @@ struct ActionWarning : public Action
   bool check (const Daisy&, const Scope&, Treelog& err) const
   { return true; }
 
-  ActionWarning (Block& al)
+  ActionWarning (const Block& al)
     : Action (al),
       message (al.name ("message"))
   { }
@@ -129,7 +129,7 @@ struct ActionError : public Action
   bool check (const Daisy&, const Scope&, Treelog& err) const
   { return true; }
 
-  ActionError (Block& al)
+  ActionError (const Block& al)
     : Action (al),
       message (al.name ("message"))
   { }
@@ -155,7 +155,7 @@ struct ActionPanic : public Action
   bool check (const Daisy&, const Scope&, Treelog& err) const
   { return true; }
 
-  ActionPanic (Block& al)
+  ActionPanic (const Block& al)
     : Action (al),
       message (al.name ("message"))
   { }
@@ -166,7 +166,7 @@ struct ActionPanic : public Action
 
 static struct ActionAssertSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ActionAssert (al); }
   ActionAssertSyntax ()
     : DeclareModel (Action::component, "assert", "\
@@ -185,7 +185,7 @@ Assert that condition is true, if not, stop the simulation.")
 
 static struct ActionMessageSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ActionMessage (al); }
   ActionMessageSyntax ()
     : DeclareModel (Action::component, "message", "\
@@ -201,7 +201,7 @@ Write a message to the user.")
 
 static struct ActionWarningSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ActionWarning (al); }
   ActionWarningSyntax ()
     : DeclareModel (Action::component, "warning", "\
@@ -217,7 +217,7 @@ Write a warning to the user.")
 
 static struct ActionErrorSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ActionError (al); }
   ActionErrorSyntax ()
     : DeclareModel (Action::component, "error", "\
@@ -233,7 +233,7 @@ Write a error message to the user.")
 
 static struct ActionPanicSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ActionPanic (al); }
   ActionPanicSyntax ()
     : DeclareModel (Action::component, "panic", "\

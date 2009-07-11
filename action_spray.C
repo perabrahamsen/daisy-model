@@ -52,7 +52,7 @@ struct ActionSpray : public Action
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ActionSpray (Block& al)
+  ActionSpray (const Block& al)
     : Action (al),
       chemical (al.name ("chemical")),
       amount (al.number ("amount"))
@@ -62,7 +62,7 @@ struct ActionSpray : public Action
 // Add the ActionSpray syntax to the syntax table.
 static struct ActionSpraySyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ActionSpray (al); }
 
   ActionSpraySyntax ()

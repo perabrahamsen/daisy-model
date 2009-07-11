@@ -195,7 +195,7 @@ struct CropStandard : public Crop
                           const Geometry&, OrganicMatter&, 
                           double SoilLimit, const Time&, Treelog&);
   bool check (const Units&, Treelog&) const;
-  CropStandard (Block& vl);
+  CropStandard (const Block& vl);
   ~CropStandard ();
 };
 
@@ -765,7 +765,7 @@ CropStandard::output (Log& log) const
 }
 
 static std::auto_ptr<WSE> 
-find_WSE (Block& al, Photo& photo)
+find_WSE (const Block& al, Photo& photo)
 {
   if (al.check ("water_stress_effect"))
     return std::auto_ptr<WSE> 
@@ -780,7 +780,7 @@ find_WSE (Block& al, Photo& photo)
   return WSE::create_full ();
 }
 
-CropStandard::CropStandard (Block& al)
+CropStandard::CropStandard (const Block& al)
   : Crop (al),
     seed (Librarian::build_item<Seed> (al, "Seed")),
     root_system (submodel<RootSystem> (al, "Root")),
@@ -814,7 +814,7 @@ CropStandard::~CropStandard ()
 
 static struct CropStandardSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new CropStandard (al); }
   CropStandardSyntax ()
     : DeclareModel (Crop::component, "default",

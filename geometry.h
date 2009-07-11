@@ -300,7 +300,7 @@ public:
                                  Treelog& msg) = 0;
 protected:
   void build_common ();
-  Geometry (Block&);
+  Geometry (const Block&);
   virtual ~Geometry ();
 };
 

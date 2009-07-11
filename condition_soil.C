@@ -52,7 +52,7 @@ struct ConditionSoilTemperature : public Condition
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ConditionSoilTemperature (Block& al)
+  ConditionSoilTemperature (const Block& al)
     : Condition (al),
       temperature (al.number ("temperature")),
       height (al.number ("height"))
@@ -78,7 +78,7 @@ struct ConditionSoilPotential : public Condition
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ConditionSoilPotential (Block& al)
+  ConditionSoilPotential (const Block& al)
     : Condition (al),
       potential (al.number ("potential")),
       height (al.number ("height"))
@@ -105,7 +105,7 @@ struct ConditionSoilWater : public Condition
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ConditionSoilWater (Block& al)
+  ConditionSoilWater (const Block& al)
     : Condition (al),
       water (al.number ("water")),
       from (al.number ("from")),
@@ -133,7 +133,7 @@ struct ConditionSoilN_min : public Condition
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ConditionSoilN_min (Block& al)
+  ConditionSoilN_min (const Block& al)
     : Condition (al),
       amount (al.number ("amount")),
       from (al.number ("from")),
@@ -143,7 +143,7 @@ struct ConditionSoilN_min : public Condition
 
 static struct ConditionSoilTemperatureSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ConditionSoilTemperature (al); }
   ConditionSoilTemperatureSyntax ()
     : DeclareModel (Condition::component, "soil_temperature_above", "\
@@ -160,7 +160,7 @@ Soil depth in which to test the temperature.");
 
 static struct ConditionSoilPotentialSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ConditionSoilPotential (al); }
   ConditionSoilPotentialSyntax ()
     : DeclareModel (Condition::component, "soil_water_pressure_above", "\
@@ -192,7 +192,7 @@ static bool check_water_content (const Metalib&, const Frame& al, Treelog& err)
 
 static struct ConditionSoilWaterSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ConditionSoilWater (al); }
   ConditionSoilWaterSyntax ()
     : DeclareModel (Condition::component, "soil_water_content_above", "\
@@ -214,7 +214,7 @@ Bottom of interval to measure soil water content in.");
 
 static struct ConditionSoilN_minSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ConditionSoilN_min (al); }
   ConditionSoilN_minSyntax ()
     : DeclareModel (Condition::component, "soil_inorganic_N_above", "\

@@ -39,7 +39,7 @@ struct GnuplotMulti : public Gnuplot
   bool plot (std::ostream& out, Treelog& msg);
   
   // Create and Destroy.
-  explicit GnuplotMulti (Block& al);
+  explicit GnuplotMulti (const Block& al);
   ~GnuplotMulti ();
 };
 
@@ -78,7 +78,7 @@ GnuplotMulti::plot (std::ostream& out, Treelog& msg)
   return ok;
 }
 
-GnuplotMulti::GnuplotMulti (Block& al)
+GnuplotMulti::GnuplotMulti (const Block& al)
   : Gnuplot (al),
     before (al.name_sequence ("before")),
     after (al.name_sequence ("after")),
@@ -90,7 +90,7 @@ GnuplotMulti::~GnuplotMulti ()
 
 static struct GnuplotMultiSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new GnuplotMulti (al); }
   GnuplotMultiSyntax ()
     : DeclareModel (Gnuplot::component, "multi",

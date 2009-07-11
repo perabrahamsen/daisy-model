@@ -61,7 +61,7 @@ public:
 
   // Create and Destroy.
 protected:
-  Pet (Block&);
+  Pet (const Block&);
 public:
   ~Pet ();
 };

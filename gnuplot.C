@@ -41,7 +41,7 @@ std::string
 Gnuplot::quote (const symbol value)
 { return quote (value.name ()); }
 
-Gnuplot::Gnuplot (Block& al)
+Gnuplot::Gnuplot (const Block& al)
   : name (al.type_name ())
 { }
 

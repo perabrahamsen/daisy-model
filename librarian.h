@@ -69,13 +69,13 @@ public:
 
   // Build.
 private:
-  typedef Model& (*builder) (Block&);
-  static void non_null (Block&, const void*);
+  typedef Model& (*builder) (const Block&);
+  static void non_null (const Block&, const void*);
   static Model* build_frame (symbol component,
-                             Block&, const FrameModel&, 
+                             const Block&, const FrameModel&, 
                              symbol scope_id);
   static Model* build_frame (symbol component,
-                             Block&, const FrameModel&, 
+                             const Block&, const FrameModel&, 
                              symbol scope_id, size_t index);
   static Model* build_frame (symbol component,
                              const Metalib&, Treelog&, const FrameModel&, 
@@ -83,17 +83,17 @@ private:
   static Model* build_stock (symbol component,
                              const Metalib&, Treelog&, symbol name, symbol scope_id);
   static Model* build_item (symbol component,
-                            Block& parent, symbol key);
+                            const Block& parent, symbol key);
   static std::vector<Model*> build_vector (symbol component,
-                                           Block& al, 
+                                           const Block& al, 
                                            symbol key);
   static std::vector<const Model*>
   /**/ build_vector_const (symbol component,
-                           Block& al, symbol key);
+                           const Block& al, symbol key);
 
 public:
   template <class T> static T* 
-  build_frame (Block& block, const FrameModel& frame, symbol scope_id)
+  build_frame (const Block& block, const FrameModel& frame, symbol scope_id)
   { 
     T* x = dynamic_cast<T*> (Librarian::build_frame (T::component, block,
                                                      frame, scope_id)); 
@@ -102,7 +102,7 @@ public:
 }
 
   template <class T> static T* 
-  build_frame (Block& block, const FrameModel& frame, const symbol scope_id, 
+  build_frame (const Block& block, const FrameModel& frame, const symbol scope_id, 
                const size_t index)
   { 
     T* x = dynamic_cast<T*> (Librarian::build_frame (T::component, block,
@@ -123,7 +123,7 @@ public:
                                                      name, scope_id)); }
 
   template <class T> static T* 
-  build_item (Block& parent, symbol key)
+  build_item (const Block& parent, symbol key)
   { 
     T* x = dynamic_cast<T*> (Librarian::build_item (T::component, 
                                                     parent, key)); 
@@ -132,7 +132,7 @@ public:
   }
 
   template <class T> static std::vector<T*> 
-  build_vector (Block& al, symbol key)
+  build_vector (const Block& al, symbol key)
   {  
     const std::vector<Model*> c 
       = Librarian::build_vector (T::component, al, key);
@@ -146,7 +146,7 @@ public:
     return t;
   }
   template <class T> static std::vector<const T*> 
-  build_vector_const (Block& al, symbol key)
+  build_vector_const (const Block& al, symbol key)
   {  
     const std::vector<const Model*> c
       = Librarian::build_vector_const (T::component, al, key);
@@ -184,7 +184,7 @@ public:
   const symbol name;
   const symbol description_;
   class Builder
-  { public: virtual Model* make (Block&) const = 0; };
+  { public: virtual Model* make (const Block&) const = 0; };
 
 public:
   virtual bool used_to_be_a_submodel () const;

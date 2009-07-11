@@ -130,9 +130,9 @@ public:
   bool check_z_border (double, Treelog& err) const;
   bool check_x_border (double, Treelog& err) const;
   bool check_y_border (double, Treelog& err) const;
-  bool initialize (Block&, const Output&, const Time&, const Weather*, 
+  bool initialize (const Block&, const Output&, const Time&, const Weather*, 
 		   const Scope&);
-  Implementation (Block& parent, const std::string& key);
+  Implementation (const Block& parent, const std::string& key);
   void summarize (Treelog& msg) const;
   ~Implementation ();
 };
@@ -780,7 +780,7 @@ Field::Implementation::check_y_border (const double value, Treelog& err) const
 }
 
 bool
-Field::Implementation::initialize (Block& block, const Output& output,
+Field::Implementation::initialize (const Block& block, const Output& output,
                                    const Time& time, const Weather* weather,
 				   const Scope& scope)
 {
@@ -793,7 +793,7 @@ Field::Implementation::initialize (Block& block, const Output& output,
   return ok;
 }
 
-Field::Implementation::Implementation (Block& parent, 
+Field::Implementation::Implementation (const Block& parent, 
 				       const std::string& key)
   : columns (Librarian::build_vector<Column> (parent, key)),
     selected (NULL)
@@ -1046,11 +1046,11 @@ Field::check_y_border (const double value, Treelog& err) const
 { return impl->check_y_border (value, err); }
 
 bool
-Field::initialize (Block& block, const Output& output,
+Field::initialize (const Block& block, const Output& output,
                    const Time& time, const Weather* weather, const Scope& scope)
 { return impl->initialize (block, output, time, weather, scope); }
 
-Field::Field (Block& parent, const std::string& key)
+Field::Field (const Block& parent, const std::string& key)
   : impl (new Implementation (parent, key))
 { }
 

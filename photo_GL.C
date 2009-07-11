@@ -70,7 +70,7 @@ public:
   bool handle_water_stress () const
   { return false; }
   static void load_syntax (Frame&);
-  PhotoGL (Block& al)
+  PhotoGL (const Block& al)
     : Photo (al),
       Qeff (al.number ("Qeff")),
       Fm (al.number ("Fm")),
@@ -156,7 +156,7 @@ PhotoGL::assimilate (const Units&, const double, const double, const double, con
 
 static struct Photo_GLSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new PhotoGL (al); }
   void load_frame (Frame& frame) const
   { 

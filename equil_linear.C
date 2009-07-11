@@ -42,7 +42,7 @@ struct EquilibriumLinear : public Equilibrium
   // Create and Destroy.
   void initialize (const Units& units, const Scope&, Treelog&);
   bool check (const Units& units, const Scope&, Treelog&) const;
-  EquilibriumLinear (Block& al)
+  EquilibriumLinear (const Block& al)
     : Equilibrium (al),
       K_expr (Librarian::build_item<Number> (al, "K"))
   { }
@@ -102,7 +102,7 @@ EquilibriumLinear::check (const Units& units, const Scope& scope, Treelog& msg) 
 
 static struct EquilibriumLinearSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new EquilibriumLinear (al); }
 
   EquilibriumLinearSyntax ()

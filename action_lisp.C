@@ -45,7 +45,7 @@ struct ActionNil : public Action
   bool check (const Daisy&, const Scope&, Treelog& err) const
   { return true; }
 
-  ActionNil (Block& al)
+  ActionNil (const Block& al)
     : Action (al)
   { }
 };
@@ -65,7 +65,7 @@ struct ActionT : public Action
   bool check (const Daisy&, const Scope&, Treelog& err) const
   { return true; }
 
-  ActionT (Block& al)
+  ActionT (const Block& al)
     : Action (al)
   { }
 };
@@ -134,7 +134,7 @@ struct ActionProgn : public Action
     return ok;
   }
 
-  ActionProgn (Block& al)
+  ActionProgn (const Block& al)
     : Action (al),
       actions (Librarian::build_vector<Action> (al, "actions"))
   { }
@@ -164,7 +164,7 @@ struct ActionCond : public Action
                          "Actions to perform when condition is meet.");
       frame.order ("condition", "actions");
     }
-    clause (Block& al) 
+    clause (const Block& al) 
       : condition (Librarian::build_item<Condition> (al, "condition")),
         actions (Librarian::build_vector<Action> (al, "actions"))
     { }
@@ -246,7 +246,7 @@ struct ActionCond : public Action
     return ok;
   }
 
-  ActionCond (Block& al)
+  ActionCond (const Block& al)
     : Action (al),
       clauses (map_submodel<clause> (al, "clauses"))
   { }
@@ -302,7 +302,7 @@ struct ActionIf : public Action
     return ok;
   }
 
-  ActionIf (Block& al)
+  ActionIf (const Block& al)
     : Action (al),
       if_c (Librarian::build_item<Condition> (al, "if")),
       then_a (Librarian::build_item<Action> (al, "then")),
@@ -315,7 +315,7 @@ struct ActionIf : public Action
 
 static struct ActionNilSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ActionNil (al); }
   ActionNilSyntax ()
     : DeclareModel (Action::component, "nil", "\
@@ -327,7 +327,7 @@ This action does nothing, always done.")
 
 static struct ActionTSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ActionT (al); }
   ActionTSyntax ()
     : DeclareModel (Action::component, "t", "\
@@ -339,7 +339,7 @@ This action does nothing, never done.")
 
 static struct ActionPrognSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ActionProgn (al); }
   ActionPrognSyntax ()
     : DeclareModel (Action::component, "progn", "\
@@ -357,7 +357,7 @@ All the actions will be performed in the same time step.")
 
 static struct ActionCondSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ActionCond (al); }
   ActionCondSyntax ()
     : DeclareModel (Action::component, "cond", "\
@@ -375,7 +375,7 @@ The first clause whose condition is true, will have its actions activated.",
 
 static struct ActionIfSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ActionIf (al); }
   ActionIfSyntax ()
     : DeclareModel (Action::component, "if", "\

@@ -75,7 +75,7 @@ Raddist::intensity_distribution (const int No, const double LAI,
     Rad[i] = Rad0 * exp (- Ext * dLAI * i);
 }
 
-Raddist::Raddist (Block& al)
+Raddist::Raddist (const Block& al)
   : ModelDerived (al.type_name ())
 { }
 

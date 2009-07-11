@@ -138,7 +138,7 @@ public:
                          const double, const double, Treelog&)
   { }
   static void load_syntax (Frame&);
-  GeometryRect (Block&);
+  GeometryRect (const Block&);
   ~GeometryRect ();
 };
 

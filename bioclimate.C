@@ -72,7 +72,7 @@ Bioclimate::intensity_distribution (const int No, const double LAI,
     Rad[i] = Rad0 * exp (- Ext * dLAI * i);
 }
 
-Bioclimate::Bioclimate (Block& al)
+Bioclimate::Bioclimate (const Block& al)
   : ModelFramed (al)
 { }
 

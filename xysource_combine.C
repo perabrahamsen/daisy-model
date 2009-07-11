@@ -66,7 +66,7 @@ public:
 
   // Create and Destroy.
 public:
-  explicit XYSourceCombine (Block& al);
+  explicit XYSourceCombine (const Block& al);
   ~XYSourceCombine ()
   { }
 };
@@ -115,7 +115,7 @@ XYSourceCombine::load (const Units& units, Treelog& msg)
   return true;
 }
 
-XYSourceCombine::XYSourceCombine (Block& al)
+XYSourceCombine::XYSourceCombine (const Block& al)
   : XYSource (al),
     scope (Librarian::build_vector<Source> (al, "source")),
     x_expr (Librarian::build_item<Number> (al, "x")),
@@ -129,7 +129,7 @@ XYSourceCombine::XYSourceCombine (Block& al)
 
 static struct XYSourceCombineSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new XYSourceCombine (al); }
 
   XYSourceCombineSyntax ()

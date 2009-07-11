@@ -62,7 +62,7 @@ struct LogCheckpoint : public LogSubmodel
 
   // Create and Destroy.
   void initialize (Treelog&);
-  LogCheckpoint (Block& al);
+  LogCheckpoint (const Block& al);
   ~LogCheckpoint ();
 };
 
@@ -222,7 +222,7 @@ void
 LogCheckpoint::initialize (Treelog&)
 { }
 
-LogCheckpoint::LogCheckpoint (Block& al)
+LogCheckpoint::LogCheckpoint (const Block& al)
   : LogSubmodel (al),
     file (al.name ("where")),
     description (al.frame ().description ()),
@@ -235,7 +235,7 @@ LogCheckpoint::~LogCheckpoint ()
 
 static struct LogCheckpointSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new LogCheckpoint (al); }
 
   LogCheckpointSyntax ()

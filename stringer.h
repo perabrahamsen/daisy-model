@@ -50,7 +50,7 @@ public:
   virtual bool initialize (const Units&, const Scope&, Treelog& msg) = 0;
   virtual bool check (const Units&, const Scope&, Treelog&) const = 0;
 protected:
-  explicit Stringer (Block&);
+  explicit Stringer (const Block&);
 public:
   ~Stringer ();
 };

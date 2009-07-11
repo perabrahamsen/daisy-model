@@ -184,7 +184,7 @@ Timestep::null ()
   return none;
 }
 
-Timestep::Timestep (Block& al)
+Timestep::Timestep (const Block& al)
   : impl (new Implementation (al.integer ("years"), 
                               al.integer ("days"),
                               al.integer ("hours"),

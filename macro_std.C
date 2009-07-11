@@ -66,7 +66,7 @@ struct MacroStandard : public Macro
   { }
 
   // Create and Destroy.
-  MacroStandard (Block& al)
+  MacroStandard (const Block& al)
     : Macro (al),
       distribution (al.plf ("distribution")),
       height_start (al.check ("height_start") 
@@ -320,7 +320,7 @@ Macro::create (const double depth)
 
 static struct MacroStandardSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new MacroStandard (al); }
 
   static bool check_alist (const Metalib&, const Frame& al, Treelog& err)

@@ -65,7 +65,7 @@ struct Soil::Implementation
                          "Soil properties of this layer.");
       frame.order ("end", "horizon");
     }
-    Layer (Block& al)
+    Layer (const Block& al)
       : end (al.number ("end")),
 	horizon (Librarian::build_item<Horizon> (al, "horizon"))
     { }
@@ -99,7 +99,7 @@ struct Soil::Implementation
                          "Soil properties of this zone.");
       frame.order ("volume", "horizon");
     }
-    Zone (Block& al)
+    Zone (const Block& al)
       : volume (Librarian::build_item<Volume> (al, "volume")),
 	horizon (Librarian::build_item<Horizon> (al, "horizon"))
     { }
@@ -149,7 +149,7 @@ struct Soil::Implementation
   }
   
   // Create and Destroy.
-  Implementation (Block& al)
+  Implementation (const Block& al)
     : layers (map_submodel_const<Layer> (al, "horizons")),
       original_layer_size (layers.size ()),
       zones (map_submodel_const<Zone> (al, "zones")),
@@ -544,12 +544,12 @@ This attribute is ignored if the geometry is specified explicitly.");
   frame.set ("border", default_borders);
 }
   
-Soil::Soil (Block& al)
+Soil::Soil (const Block& al)
   : impl (new Implementation (al))
 { }
 
 double
-Soil::initialize_aquitard (Block& top,
+Soil::initialize_aquitard (const Block& top,
                            const double Z_aquitard, const double K_aquitard)
 {
   const double old_end = impl->layers[impl->layers.size () - 1]->end;
@@ -564,7 +564,7 @@ Soil::initialize_aquitard (Block& top,
 }
 
 void
-Soil::initialize (Block& block, Geometry& geo,
+Soil::initialize (const Block& block, Geometry& geo,
                   Groundwater& groundwater,
                   const int som_size)
 {

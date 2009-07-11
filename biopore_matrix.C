@@ -151,7 +151,7 @@ struct BioporeMatrix : public Biopore
                    Treelog& msg);
   bool check (const Geometry& geo, Treelog& msg) const
   { return check_base (geo, msg); }
-  BioporeMatrix (Block& al);
+  BioporeMatrix (const Block& al);
 };
 
 Anystate
@@ -943,7 +943,7 @@ BioporeMatrix::initialize (const Units& units,
   return ok;
 }
 
-BioporeMatrix::BioporeMatrix (Block& al)
+BioporeMatrix::BioporeMatrix (const Block& al)
   : Biopore (al),
     xplus (al.check ("xplus") 
            ? al.number_sequence ("xplus") 
@@ -962,7 +962,7 @@ BioporeMatrix::BioporeMatrix (Block& al)
 
 static struct BioporeMatrixSyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new BioporeMatrix (al); }
 
   BioporeMatrixSyntax ()

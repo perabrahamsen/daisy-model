@@ -72,7 +72,7 @@ public:
     return ok;
   }
       
-  GroundwaterExtern (Block& al)
+  GroundwaterExtern (const Block& al)
     : Groundwater (al),
       expr (Librarian::build_item<Number> (al, "table")),
       has_table (al.check ("initial_table")),
@@ -84,7 +84,7 @@ public:
 
 static struct GroundwaterExternSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new GroundwaterExtern (al); }
   GroundwaterExternSyntax ()
     : DeclareModel (Groundwater::component, "extern", "common", "\

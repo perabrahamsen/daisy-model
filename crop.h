@@ -158,7 +158,7 @@ public:
                            double SoilLimit, const Time& now, Treelog&) = 0;
   virtual bool check (const Units&, Treelog& msg) const = 0;
 protected:
-  Crop (Block&);
+  Crop (const Block&);
 public:
   ~Crop ();
 };

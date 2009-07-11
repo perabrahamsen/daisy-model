@@ -64,7 +64,7 @@ public:
 
   // Create.
 public:
-  explicit XYSourceInline (Block&);
+  explicit XYSourceInline (const Block&);
 private:
   XYSourceInline (const XYSourceInline&);
   XYSourceInline& operator= (const XYSourceInline&);
@@ -88,7 +88,7 @@ XYSourceInline::load (const Units&, Treelog&)
   return true;
 }
 
-XYSourceInline::XYSourceInline (Block& al)
+XYSourceInline::XYSourceInline (const Block& al)
   : XYSource (al),
     with_ (al.name ("with")),
     style_ (al.integer ("style", -1)),
@@ -104,7 +104,7 @@ XYSourceInline::~XYSourceInline ()
 
 static struct XYSourceInlineSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new XYSourceInline (al); }
 
   XYSourceInlineSyntax ()

@@ -62,7 +62,7 @@ public:
   
   // Create and Destroy.
 public:
-  PhotoFCC4 (Block& al)
+  PhotoFCC4 (const Block& al)
     : PhotoFarquhar (al),
       Q10k (al.number ("Q10k")),
       Q10vm (al.number ("Q10vm")),
@@ -175,7 +175,7 @@ PhotoFCC4::respiration_rate (const double Vm_25, const double Tl) const
 
 static struct Photo_FCC4Syntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new PhotoFCC4 (al); }
   Photo_FCC4Syntax ()
     : DeclareModel (Photo::component, "FC_C4", "Farquhar", "\

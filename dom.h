@@ -88,7 +88,7 @@ public:
   static void load_syntax (Frame&);
   void initialize (const Geometry& geo, 
                    const Soil&, const SoilWater&, Treelog&);
-  DOM (Block& al);
+  DOM (const Block& al);
   ~DOM ();
 };
 

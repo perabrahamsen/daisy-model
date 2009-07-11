@@ -51,7 +51,7 @@ public:
 
   // Create and Destroy.
 public:
-  Bound (Block& al, type_t type_, double val);
+  Bound (const Block& al, type_t type_, double val);
   Bound (const char* is, type_t type_, double val);
   ~Bound ();
 };

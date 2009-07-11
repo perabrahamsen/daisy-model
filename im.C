@@ -195,7 +195,7 @@ IM::clear ()
     (*i).second = 0.0;
 }
 
-IM::IM (Block& parent, const char *const key)
+IM::IM (const Block& parent, const char *const key)
 {
   // Find dimension.
   const Frame& parent_frame = parent.find_frame (key);

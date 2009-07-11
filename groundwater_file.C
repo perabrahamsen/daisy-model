@@ -68,7 +68,7 @@ public:
                    const Geometry&, const Time& time, const Scope&, Treelog&);
   bool check (const Units&, const Geometry&, const Scope&, Treelog&) const
   { return true; }
-  GroundwaterFile (Block&);
+  GroundwaterFile (const Block&);
   ~GroundwaterFile ();
 };
 
@@ -162,7 +162,7 @@ GroundwaterFile::initialize (const Units&,
   tick (time, msg); 
 }
 
-GroundwaterFile::GroundwaterFile (Block& al)
+GroundwaterFile::GroundwaterFile (const Block& al)
   : Groundwater (al),
     path (al.path ()),
     previous_time (42, 1, 1, 0),
@@ -180,7 +180,7 @@ GroundwaterFile::~GroundwaterFile ()
 
 static struct GroundwaterFileSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
     { return new GroundwaterFile (al); }
   GroundwaterFileSyntax ()
     : DeclareModel (Groundwater::component, "file", "common", "\

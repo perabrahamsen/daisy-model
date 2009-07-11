@@ -66,7 +66,7 @@ Chemical::check_library ()
   return in_library;
 }
 
-Chemical::Chemical (Block& al)
+Chemical::Chemical (const Block& al)
   : ModelFramed (al)
 { }
 

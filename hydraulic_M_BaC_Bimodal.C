@@ -51,7 +51,7 @@ private:
 
   // Create and Destroy.
 public:
-  HydraulicM_BaC_Bimodal (Block&);
+  HydraulicM_BaC_Bimodal (const Block&);
   ~HydraulicM_BaC_Bimodal ();
 };
 
@@ -116,7 +116,7 @@ HydraulicM_BaC_Bimodal::Se (double h) const
     return 1;
 }
 
-HydraulicM_BaC_Bimodal::HydraulicM_BaC_Bimodal (Block& al)
+HydraulicM_BaC_Bimodal::HydraulicM_BaC_Bimodal (const Block& al)
   : Hydraulic (al),
     lambda (al.number ("lambda")),
     h_b (al.number ("h_b")),
@@ -131,7 +131,7 @@ HydraulicM_BaC_Bimodal::~HydraulicM_BaC_Bimodal ()
 
 static struct HydraulicM_BaC_BimodalSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new HydraulicM_BaC_Bimodal (al); }
 
   HydraulicM_BaC_BimodalSyntax ()

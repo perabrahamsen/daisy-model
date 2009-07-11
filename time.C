@@ -545,7 +545,7 @@ Time::load_syntax (Frame& frame)
 Monday is 1, Sunday is 7.");
 }
 
-Time::Time (Block& al)
+Time::Time (const Block& al)
   : impl (new Implementation (al.integer ("year"), 
                               mday2yday (al.integer ("year"),
                                          al.integer ("month"),

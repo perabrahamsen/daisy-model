@@ -64,7 +64,7 @@ public:
                            double row_width, double row_position, 
                            Treelog& msg) = 0;
 protected:
-  explicit Rootdens (Block&);
+  explicit Rootdens (const Block&);
 public:
   ~Rootdens ();
 };

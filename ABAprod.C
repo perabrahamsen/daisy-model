@@ -33,7 +33,7 @@ ABAProd::library_id () const
   return id;
 }
 
-ABAProd::ABAProd (Block& al)
+ABAProd::ABAProd (const Block& al)
   : ModelDerived (al.type_name ())
 { }
 
@@ -67,7 +67,7 @@ struct ABAProdNone : public ABAProd
   { }
   bool check (const Units&, Treelog&) const
   { return true; }
-  ABAProdNone (Block& al)
+  ABAProdNone (const Block& al)
     : ABAProd (al)
   { }
   ~ABAProdNone ()
@@ -76,7 +76,7 @@ struct ABAProdNone : public ABAProd
 
 static struct ABAProdNoneSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ABAProdNone (al); }
   ABAProdNoneSyntax ()
     : DeclareModel (ABAProd::component, "none", "No ABA production.")

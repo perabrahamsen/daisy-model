@@ -123,7 +123,7 @@ public:
 public:
   static void add_syntax (Frame&, Attribute::category cat, 
 			  const symbol dimension);
-  explicit IM (Block&, const char* key);
+  explicit IM (const Block&, const char* key);
   explicit IM ();
   IM (const IM& im);
   explicit IM (const Unit&);

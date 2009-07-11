@@ -141,7 +141,7 @@ public:
   void initialize (const Units&, const Geometry& geo, Treelog& msg);
   bool check (const Units&, Treelog& msg) const;
   static void load_syntax (Frame&);
-  RootSystem (Block& al);
+  RootSystem (const Block& al);
   ~RootSystem ();
 };
 

@@ -51,7 +51,7 @@ struct NumberLet : public Number
                            " Value to give it.");
         frame.order ("identifier", "expr");
       }
-      Clause (Block& al)
+      Clause (const Block& al)
         : id (al.name ("identifier")),
           expr (Librarian::build_item<Number> (al, "expr"))
       { }
@@ -147,7 +147,7 @@ struct NumberLet : public Number
       frame.declare_submodule_sequence ("clauses", Attribute::Const, "\
 List of identifiers and values to bind in this scope.", Clause::load_syntax);
     }
-    ScopeClause (Block& al)
+    ScopeClause (const Block& al)
       : clause (map_submodel<Clause> (al, "clauses"))
     { }
     ~ScopeClause ()
@@ -195,7 +195,7 @@ List of identifiers and values to bind in this scope.", Clause::load_syntax);
     ScopeMulti scope (scope_clause, inherit_scope);
     return expr->check (units, scope, msg);
   }
-  NumberLet (Block& al)
+  NumberLet (const Block& al)
     : Number (al),
       scope_clause (al),
       expr (Librarian::build_item<Number> (al, "expr"))
@@ -204,7 +204,7 @@ List of identifiers and values to bind in this scope.", Clause::load_syntax);
 
 static struct NumberLetSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new NumberLet (al); }
   NumberLetSyntax ()
     : DeclareModel (Number::component, "let", "\

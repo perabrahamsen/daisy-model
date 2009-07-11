@@ -55,7 +55,7 @@ public:
   // Create and Destroy.
 public:
   bool check (const std::vector<SMB*>& smb, Treelog& err) const;
-  ClayOMBiomod (Block& al);
+  ClayOMBiomod (const Block& al);
   ~ClayOMBiomod ();
 };
 
@@ -227,7 +227,7 @@ and SMB[" << pool << "].efficiency[" << target << "] is "
   return true;
 }
 
-ClayOMBiomod::ClayOMBiomod (Block& al)
+ClayOMBiomod::ClayOMBiomod (const Block& al)
   : ClayOM (al),
     a (al.number ("a")),
 #ifdef OLD_VERSION
@@ -244,7 +244,7 @@ ClayOMBiomod::~ClayOMBiomod ()
 
 static struct ClayOMBiomodSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ClayOMBiomod (al); }
 
   ClayOMBiomodSyntax ()

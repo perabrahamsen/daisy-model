@@ -147,7 +147,7 @@ struct ReactionAdsorption : public Reaction
     adsorption_rate->initialize (units, scope, msg); 
     desorption_rate->initialize (units, scope, msg); 
   }
-  explicit ReactionAdsorption (Block& al)
+  explicit ReactionAdsorption (const Block& al)
     : Reaction (al),
       name_solute (al.name ("solute")),
       name_sorbed (al.name ("sorbed")),
@@ -161,7 +161,7 @@ struct ReactionAdsorption : public Reaction
 
 static struct ReactionAdsorptionSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ReactionAdsorption (al); }
 
   ReactionAdsorptionSyntax ()

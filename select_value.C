@@ -94,7 +94,7 @@ SelectValue::done (const double dt)
 }
 
 // Create and Destroy.
-SelectValue::SelectValue (Block& al)
+SelectValue::SelectValue (const Block& al)
   : Select (al),
     value (al.number ("value"))
 { }

@@ -207,7 +207,7 @@ struct TransportMollerup : public Transport
   
   // Create.
   bool check (const Geometry&, Treelog&) const;
-  TransportMollerup (Block& al);
+  TransportMollerup (const Block& al);
   ~TransportMollerup ();
 };
 
@@ -1739,7 +1739,7 @@ This primary solute transport model only works with 'rectangle' movement");
   return ok;
 }
 
-TransportMollerup::TransportMollerup (Block& al)
+TransportMollerup::TransportMollerup (const Block& al)
   : Transport (al),
     solver (Librarian::build_item<Solver> (al, "solver")),
     enable_boundary_diffusion (al.flag ("enable_boundary_diffusion")),
@@ -1752,7 +1752,7 @@ TransportMollerup::~TransportMollerup ()
 
 static struct TransportMollerupSyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new TransportMollerup (al); }
   TransportMollerupSyntax ()
     : DeclareModel (Transport::component, "Mollerup", "\

@@ -304,14 +304,14 @@ struct BioclimateStandard : public Bioclimate
   { return canopy_water_out; }
 
   // Create.
-  void initialize (Block&, const Weather&);
-  BioclimateStandard (Block&);
+  void initialize (const Block&, const Weather&);
+  BioclimateStandard (const Block&);
   void summarize (Treelog& msg) const;
   ~BioclimateStandard ();
 };
 
 void 
-BioclimateStandard::initialize (Block& block, const Weather& weather)
+BioclimateStandard::initialize (const Block& block, const Weather& weather)
 {
   const Metalib& metalib = block.metalib ();
   Treelog& msg = block.msg ();
@@ -355,7 +355,7 @@ BioclimateStandard::initialize (Block& block, const Weather& weather)
     }
 }
 
-BioclimateStandard::BioclimateStandard (Block& al)
+BioclimateStandard::BioclimateStandard (const Block& al)
   : Bioclimate (al),
     No (al.integer ("NoOfIntervals")),
     LAI_ (0.0),
@@ -1108,7 +1108,7 @@ BioclimateStandard::set_subsoil_irrigation (double flux)
 
 static struct BioclimateStandardSyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new BioclimateStandard (al); }
   
   BioclimateStandardSyntax ()

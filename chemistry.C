@@ -104,7 +104,7 @@ void
 Chemistry::output (Log&) const
 { }
 
-Chemistry::Chemistry (Block& al)
+Chemistry::Chemistry (const Block& al)
   : ModelFramed (al),
     units (al.units ())
 { }

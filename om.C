@@ -453,7 +453,7 @@ OM::initialize (size_t size)
     N.insert (N.end (), extra_N, 0.0);
 }
 
-OM::OM (Block& al)
+OM::OM (const Block& al)
   : ModelFramed (al),
     initial_C_per_N (get_initial_C_per_N (al.frame ())),
     turnover_rate (al.check ("turnover_rate")

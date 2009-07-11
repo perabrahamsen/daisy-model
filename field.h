@@ -152,9 +152,9 @@ public:
   bool check_x_border (double, Treelog&) const;
   bool check_y_border (double, Treelog&) const;
 
-  bool initialize (Block&, const Output&, const Time&, const Weather*,
+  bool initialize (const Block&, const Output&, const Time&, const Weather*,
 		   const Scope&);
-  Field (Block&, const std::string& key);
+  Field (const Block&, const std::string& key);
   void summarize (Treelog& msg) const;
   ~Field ();
 };

@@ -57,7 +57,7 @@ struct SeedLAI : public Seed
   }
   bool check (Treelog&) const
   { return true; }
-  SeedLAI (Block& al)
+  SeedLAI (const Block& al)
     : Seed (al),
       DSLAI05 (al.number ("DSLAI05")),
       SpLAIfac (al.plf ("SpLAIfac")),
@@ -112,7 +112,7 @@ SeedLAI::forced_CAI (const double WLeaf, const double SpLAI, const double DS)
 
 static struct Seed_LAISyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new SeedLAI (al); }
   Seed_LAISyntax ()
     : DeclareModel (Seed::component, "LAI", "\

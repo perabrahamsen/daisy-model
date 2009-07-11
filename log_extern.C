@@ -259,13 +259,13 @@ Name to refer to number with.");
 Numeric value.");
   }
 
-  NumEntry (Block& al)
+  NumEntry (const Block& al)
     : name (al.name ("name")),
       value (al.number ("value"))
   { }
 };
 
-LogExtern::LogExtern (Block& al)
+LogExtern::LogExtern (const Block& al)
   : LogSelect (al),
     title_ (al.name ("where", al.type_name ()))
 { 
@@ -305,7 +305,7 @@ LogExtern::~LogExtern ()
 
 static struct LogExternSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new LogExtern (al); }
 
   LogExternSyntax ()

@@ -128,7 +128,7 @@ struct ProgramDocument : public Program
   { };
   bool check (Treelog&)
   { return true; }
-  ProgramDocument (Block& al)
+  ProgramDocument (const Block& al)
     : Program (al),
       metalib (al.metalib ()),
       xref (metalib),
@@ -1251,7 +1251,7 @@ standard parameterizations for the model.");
 
 static struct ProgramDocumentSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ProgramDocument (al); }
   ProgramDocumentSyntax ()
     : DeclareModel (Program::component, "document", "\

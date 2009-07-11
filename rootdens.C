@@ -36,7 +36,7 @@ Rootdens::library_id () const
   return id;
 }
 
-Rootdens::Rootdens (Block& al)
+Rootdens::Rootdens (const Block& al)
   : ModelFramed (al),
     SpRtLength (al.number ("SpRtLength"))
 { }

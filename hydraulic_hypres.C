@@ -64,7 +64,7 @@ private:
   
   // Create and Destroy.
 public:
-  HydraulicHypres (Block&);
+  HydraulicHypres (const Block&);
   HydraulicHypres (symbol name, double K_sat);
   void initialize (const Texture&, double rho_b, bool top_soil,
 		   Treelog& msg);
@@ -276,7 +276,7 @@ pedotransfer function");
 }
 
 
-HydraulicHypres::HydraulicHypres (Block& al)
+HydraulicHypres::HydraulicHypres (const Block& al)
   : Hydraulic (al),
     soil_type (al.check ("topsoil") 
 	       ? (al.flag ("topsoil") ? top : bottom)
@@ -311,7 +311,7 @@ Hydraulic::create_aquitard (const double K_sat)
 
 static struct HydraulicHypresSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new HydraulicHypres (al); }
 
   static bool check_alist (const Metalib&, const Frame&, Treelog&)

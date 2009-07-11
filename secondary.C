@@ -37,7 +37,7 @@ Secondary::library_id () const
   return id;
 }
 
-Secondary::Secondary (Block& al)
+Secondary::Secondary (const Block& al)
   : name (al.type_name ())
 { }
 
@@ -79,7 +79,7 @@ struct SecondaryNone : public Secondary
   double alpha () const         // The value of the 'alpha' parameter.
   { daisy_notreached (); }
 
-  explicit SecondaryNone (Block& al)
+  explicit SecondaryNone (const Block& al)
     : Secondary (al)
   {}
   SecondaryNone ()
@@ -93,7 +93,7 @@ Secondary::create_none ()
 
 static struct SecondaryNoneSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new SecondaryNone (al); }
   SecondaryNoneSyntax ()
     : DeclareModel (Secondary::component, "none", "No secondary domain.\n\
@@ -120,7 +120,7 @@ struct SecondaryPressure : public Secondary
   double alpha () const         // The value of the 'alpha' parameter.
   { return alpha_; }
   
-  SecondaryPressure (Block& al)
+  SecondaryPressure (const Block& al)
     : Secondary (al),
       h_lim_ (al.number ("h_lim")),
       alpha_ (al.number ("alpha"))    
@@ -129,7 +129,7 @@ struct SecondaryPressure : public Secondary
 
 static struct SecondaryPressureSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new SecondaryPressure (al); }
   SecondaryPressureSyntax ()
     : DeclareModel (Secondary::component, "pressure", "Horizon has secondary domain.\n\

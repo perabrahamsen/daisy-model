@@ -297,7 +297,7 @@ WeatherBase::check (const Time&, const Time&, Treelog&) const
 { return true; }
 
 
-WeatherBase::WeatherBase (Block& al)
+WeatherBase::WeatherBase (const Block& al)
   : Weather (al),
     units (al.units ()),
     latitude_ (-42.42e42),

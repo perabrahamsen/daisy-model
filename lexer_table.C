@@ -58,7 +58,7 @@ public:
     return false;
   }
   static void load_syntax (Frame&);
-  explicit Filter (Block&);
+  explicit Filter (const Block&);
 };
 
 void 
@@ -72,7 +72,7 @@ List of allowable values in filter.");
   frame.order ("tag", "allowed");
 }
 
-LexerTable::Filter::Filter (Block& al)
+LexerTable::Filter::Filter (const Block& al)
   : tag (al.name ("tag")),
     allowed (al.name_sequence ("allowed"))
 { }
@@ -469,7 +469,7 @@ If true, assume the line after the tags contain dimensions.\n\
 By default this will be true iff 'original' is not specified.");
 }
 
-LexerTable::LexerTable (Block& al)
+LexerTable::LexerTable (const Block& al)
   : path (al.path ()),
     filename (al.name ("file")),
     owned_stream (NULL),

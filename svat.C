@@ -39,7 +39,7 @@ void
 SVAT::output (Log&) const
 { }
 
-SVAT::SVAT (Block& al)
+SVAT::SVAT (const Block& al)
   : ModelDerived (al.type_name ())
 { }
 

@@ -50,7 +50,7 @@ struct EquilibriumGoal_A : public Equilibrium
   // Create and Destroy.
   void initialize (const Units&, const Scope&, Treelog&);
   bool check (const Units& units, const Scope&, Treelog&) const;
-  EquilibriumGoal_A (Block& al)
+  EquilibriumGoal_A (const Block& al)
     : Equilibrium (al),
       goal_A_expr (Librarian::build_item<Number> (al, "goal_A")),
       min_B_expr (Librarian::build_item<Number> (al, "min_B")),
@@ -155,7 +155,7 @@ EquilibriumGoal_A::check (const Units& units,
 
 static struct EquilibriumGoal_ASyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new EquilibriumGoal_A (al); }
 
   EquilibriumGoal_ASyntax ()

@@ -54,7 +54,7 @@ struct Rootdens_AP : public Rootdens
   // Create.
   void initialize (const Geometry&, double /* row_width */, double, Treelog&)
   { }
-  Rootdens_AP (Block&);
+  Rootdens_AP (const Block&);
 };
 
 void
@@ -118,7 +118,7 @@ Rootdens_AP::output (Log& log) const
   output_variable (L0, log); 
 }
 
-Rootdens_AP::Rootdens_AP (Block& al)
+Rootdens_AP::Rootdens_AP (const Block& al)
   : Rootdens (al),
     a_DS (al.plf ("a_DS")),
     q (al.number ("q")),
@@ -129,7 +129,7 @@ Rootdens_AP::Rootdens_AP (Block& al)
 
 static struct Rootdens_APSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new Rootdens_AP (al); }
   Rootdens_APSyntax ()
     : DeclareModel (Rootdens::component, "Anders Pedersen", 

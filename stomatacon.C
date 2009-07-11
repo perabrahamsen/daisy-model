@@ -35,7 +35,7 @@ StomataCon::library_id () const
   return id;
 }
 
-StomataCon::StomataCon (Block& al)
+StomataCon::StomataCon (const Block& al)
   : ModelLogable (al.type_name ())
 { }
 

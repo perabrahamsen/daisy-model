@@ -48,7 +48,7 @@ public:
   static const Adsorption& none ();
 protected:
   Adsorption (const char* name);
-  Adsorption (Block& al);
+  Adsorption (const Block& al);
 public:
   ~Adsorption ();
 };
@@ -58,7 +58,7 @@ struct AdsorptionLinear : public Adsorption
 {
   virtual double K (const Soil& soil, size_t c) const = 0;
 protected:
-  AdsorptionLinear (Block&);
+  AdsorptionLinear (const Block&);
 };
 
 #endif // ADSORPTION_H

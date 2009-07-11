@@ -68,7 +68,7 @@ public:
 
   // Create and Destroy.
 public:
-  explicit XYSourceMerge (Block& al);
+  explicit XYSourceMerge (const Block& al);
   ~XYSourceMerge ()
   { sequence_delete (source.begin (), source.end ()); }
 };
@@ -163,7 +163,7 @@ XYSourceMerge::load (const Units& units, Treelog& msg)
   return true;
 }
 
-XYSourceMerge::XYSourceMerge (Block& al)
+XYSourceMerge::XYSourceMerge (const Block& al)
   : XYSource (al),
     source (Librarian::build_vector<XYSource> (al, "source")),
     title_ (al.name ("title")),
@@ -175,7 +175,7 @@ XYSourceMerge::XYSourceMerge (Block& al)
 
 static struct XYSourceMergeSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new XYSourceMerge (al); }
 
   XYSourceMergeSyntax ()

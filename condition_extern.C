@@ -87,7 +87,7 @@ struct ConditionExtern : public Condition
     return expr->check (daisy.units (), multi, msg);
   }
 
-  ConditionExtern (Block& al)
+  ConditionExtern (const Block& al)
     : Condition (al),
       scopesel (Librarian::build_item<Scopesel> (al, "scope")),
       extern_scope (NULL),
@@ -97,7 +97,7 @@ struct ConditionExtern : public Condition
 
 static struct ConditionExternSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ConditionExtern (al); }
 
   ConditionExternSyntax ()

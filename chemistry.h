@@ -120,7 +120,7 @@ public:
 		      const Soil&, const SoilWater&, const SoilHeat&,
 		      const Chemistry&, Treelog&) const = 0;
 protected:
-  explicit Chemistry (Block& al);
+  explicit Chemistry (const Block& al);
 public:
   ~Chemistry ();
 };

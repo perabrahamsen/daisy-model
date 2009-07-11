@@ -36,7 +36,7 @@
 struct Block::Implementation
 {
   const Metalib& metalib;
-  Block *const context;
+  const Block *const context;
   const Frame& frame;
   mutable Treelog& msg;
   Treelog::Open msg_nest;
@@ -44,14 +44,11 @@ struct Block::Implementation
 
   // Use.
   Attribute::type lookup (symbol) const;
-  const Frame& find_frame (const symbol key) const;
   bool check (const symbol key) const;
-  symbol expand_string (Block&, symbol);
-  symbol expand_reference (const symbol key);
   void error (const std::string& msg);
   void set_error ();
 
-  Implementation (const Metalib& lib, Block *const p, Treelog& m,
+  Implementation (const Metalib& lib, const Block *const p, Treelog& m,
                   const Frame& f,
 		  const symbol scope_id)
     : metalib (lib),
@@ -72,16 +69,6 @@ Block::Implementation::lookup (const symbol key) const
   return type;
 }
 
-const Frame& 
-Block::Implementation::find_frame (const symbol key) const
-{
-  if (frame.check (key) || frame.lookup (key) != Attribute::Error)
-    return frame;
-  if (context == NULL)
-    daisy_panic ("Couldn't find '" + key + "' in this block or its context");
-  return context->find_frame (key);
-}
-
 bool
 Block::Implementation::check (const symbol key) const
 {
@@ -93,9 +80,23 @@ Block::Implementation::check (const symbol key) const
   return context->impl->check (key);
 }
 
+void
+Block::Implementation::error (const std::string& str)
+{ 
+  set_error (); 
+  msg.error (str); 
+}
+
+void
+Block::Implementation::set_error ()
+{ 
+  is_ok = false; 
+  if (context) 
+    context->set_error (); 
+}
+
 symbol
-Block::Implementation::expand_string (Block& block,
-				      const symbol value_s)
+Block::expand_string (const symbol value_s) const
 {
   const std::string value = value_s.name ();
   std::ostringstream result;
@@ -123,8 +124,8 @@ Block::Implementation::expand_string (Block& block,
 	  else
 	    {
 	      // BUG: We still have too many $col and $crop around to throw.
-	      msg.warning (std::string ("Unknown $ escape '") 
-			   + c + "', ignored");
+	      impl->msg.warning (std::string ("Unknown $ escape '") 
+                                 + c + "', ignored");
 	      result << '$' << c;
 	      mode = normal;
 	    }
@@ -137,7 +138,7 @@ Block::Implementation::expand_string (Block& block,
                   const Attribute::type type = lookup (key);
                   if (type == Attribute::Error)
                     throw "Unknown expansion: '" + key + "'";
-                  const Frame& frame = find_frame (key);
+                  const Frame& frame = this->find_frame (key);
                   if (frame.type_size (key) != Attribute::Singleton)
                     throw "'" + key 
                       + "' is a sequence, can only expand singletons";
@@ -156,20 +157,21 @@ Block::Implementation::expand_string (Block& block,
                       break;
                     case Attribute::Model:
                       {
-                        Treelog::Open nest (msg, "${" + key + "}");
+                        Treelog::Open nest (impl->msg, "${" + key + "}");
                         const FrameModel& obj = frame.model (key);
                         const symbol type = obj.type_name ();
                         const symbol component = frame.component (key);
-                        const ScopeBlock scope (block);
+                        const ScopeBlock scope (*this);
                         if (component == Stringer::component)
                           {
                             const std::auto_ptr<Stringer> stringer 
-                              (Librarian::build_frame<Stringer> (block,
+                              (Librarian::build_frame<Stringer> (*this,
                                                                  obj, key));
-                            if (!block.ok () 
-                                || !stringer->initialize (block.units (),
-                                                          scope, msg)
-                                || !stringer->check (block.units (), scope, msg)
+                            if (!this->ok () 
+                                || !stringer->initialize (this->units (),
+                                                          scope, impl->msg)
+                                || !stringer->check (this->units (), scope,
+                                                     impl->msg)
                                 || stringer->missing (scope))
                               throw "Bad string: '" + type + "'";
                             result << stringer->value (scope);
@@ -177,14 +179,14 @@ Block::Implementation::expand_string (Block& block,
                         else if (component == Number::component)
                           {
                             const std::auto_ptr<Number> number 
-                              (Librarian::build_frame<Number> (block, 
+                              (Librarian::build_frame<Number> (*this, 
                                                                obj, key));
-                            if (!block.ok () 
-                                || !number->initialize (block.units (), scope, 
-                                                        msg)
-                                || !number->check (block.units (), scope, msg))
+                            if (!this->ok () 
+                                || !number->initialize (units (), scope, 
+                                                        msg ())
+                                || !number->check (units (), scope, msg ()))
                               throw "Bad number: '"+ type + "'";
-                            number->tick (block.units (), scope, msg);
+                            number->tick (units (), scope, msg ());
                             if (number->missing (scope))
                               throw "Bad number: '"+ type + "'";
                             result << number->value (scope);
@@ -207,7 +209,7 @@ Block::Implementation::expand_string (Block& block,
               catch (const std::string& error)
                 {
                   result << "${" << key << "}";
-                  msg.warning (error); 
+                  msg ().warning (error); 
                 }
               mode = normal;
               key = "";
@@ -222,27 +224,28 @@ Block::Implementation::expand_string (Block& block,
 }
 
 symbol
-Block::Implementation::expand_reference (const symbol key)
+Block::expand_reference (const symbol key) const
 {
-  if (!frame.is_reference (key))
+  if (!frame ().is_reference (key))
     return key;
   
-  const symbol var = frame.get_reference (key);
+  const symbol var = frame ().get_reference (key);
   if (var == key)
     {
       error ("Value of '" + key + "' refers to itself");
       throw "Reference loop";
     }
-  if (lookup (var) == frame.lookup (key)
-      && (find_frame (var).type_size (var) == frame.type_size (key)
-          || (frame.type_size (key) == Attribute::Variable
-              && find_frame (var).type_size (var) != Attribute::Singleton)))
+  if (lookup (var) == frame ().lookup (key)
+      && (this->find_frame (var).type_size (var) == frame ().type_size (key)
+          || (frame ().type_size (key) == Attribute::Variable
+              && (this->find_frame (var).type_size (var) 
+                  != Attribute::Singleton))))
     return var;
 
   std::ostringstream tmp;
   tmp << "Value of '" << key << "' is $" << var
       << ", which is a " << Attribute::type_name (lookup (var));
-  switch (find_frame (var).type_size (var))
+  switch (this->find_frame (var).type_size (var))
     {
     case Attribute::Singleton:
       break;
@@ -262,10 +265,10 @@ Block::Implementation::expand_reference (const symbol key)
       tmp << " sequence";
       break;
     default:
-      tmp << "[" << find_frame (var).type_size (var) << "]";
+      tmp << "[" << this->find_frame (var).type_size (var) << "]";
     }
-  tmp << ", should be a " << Attribute::type_name (frame.lookup (key));
-  switch (frame.type_size (key))
+  tmp << ", should be a " << Attribute::type_name (frame ().lookup (key));
+  switch (frame ().type_size (key))
     {
     case Attribute::Singleton:
       break;
@@ -285,37 +288,22 @@ Block::Implementation::expand_reference (const symbol key)
       tmp << " sequence";
       break;
     default:
-      tmp << "[" << frame.type_size (key) << "]";
+      tmp << "[" << frame ().type_size (key) << "]";
     }
   error (tmp.str ());
   throw ("Bad reference");
 }
 
-void
-Block::Implementation::error (const std::string& str)
-{ 
-  set_error (); 
-  msg.error (str); 
-}
-
-void
-Block::Implementation::set_error ()
-{ 
-  is_ok = false; 
-  if (context) 
-    context->set_error (); 
-}
-
 const Metalib& 
-Block::metalib ()
+Block::metalib () const
 { return impl->metalib; }
 
 const Units& 
-Block::units ()
+Block::units ()const
 { return impl->metalib.units (); }
 
 Path& 
-Block::path ()
+Block::path () const
 { return impl->metalib.path (); }
 
 Treelog&
@@ -327,7 +315,7 @@ Block::type_name () const
 { return impl->frame.type_name (); }
 
 void
-Block::error (const std::string& msg)
+Block::error (const std::string& msg) const
 { impl->error (msg); }
 
 bool
@@ -335,12 +323,18 @@ Block::ok () const
 { return impl->is_ok; }
 
 void
-Block::set_error ()
+Block::set_error () const
 { impl->set_error (); }
 
 const Frame& 
 Block::find_frame (const symbol key) const
-{ return impl->find_frame (key); }
+{
+  if (frame ().check (key) || frame ().lookup (key) != Attribute::Error)
+    return frame ();
+  if (impl->context == NULL)
+    daisy_panic ("Couldn't find '" + key + "' in this block or its context");
+  return impl->context->find_frame (key);
+}
 
 Attribute::type 
 Block::lookup (const symbol key) const
@@ -382,7 +376,7 @@ Block::number (const symbol key) const
 { 
   const Frame& frame = find_frame (key);
   if (frame.is_reference (key))
-    return this->number (impl->expand_reference (key));
+    return number (expand_reference (key));
 
   return frame.number (key); 
 }
@@ -392,17 +386,17 @@ Block::number (const symbol key, double default_value) const
 { return check (key) ?  number (key) : default_value; }
 
 symbol
-Block::name (const symbol key)
+Block::name (const symbol key) const
 { 
   const Frame& frame = find_frame (key);
   if (frame.is_reference (key))
-    return this->name (impl->expand_reference (key));
+    return name (expand_reference (key));
 
-  return impl->expand_string (*this, frame.name (key)); 
+  return expand_string (frame.name (key)); 
 }
 
 symbol
-Block::name (const symbol key, const symbol default_value)
+Block::name (const symbol key, const symbol default_value) const
 { return check (key) ? name (key) : default_value; }
 
 bool 
@@ -410,7 +404,7 @@ Block::flag (const symbol key) const
 { 
   const Frame& frame = find_frame (key);
   if (frame.is_reference (key))
-    return this->flag (impl->expand_reference (key));
+    return flag (expand_reference (key));
 
   return frame.flag (key); 
 }
@@ -424,7 +418,7 @@ Block::plf (const symbol key) const
 { 
   const Frame& frame = find_frame (key);
   if (frame.is_reference (key))
-    return this->plf (impl->expand_reference (key));
+    return plf (expand_reference (key));
 
   return frame.plf (key); 
 }
@@ -434,7 +428,7 @@ Block::model (const symbol key) const
 { 
   const Frame& frame = find_frame (key);
   if (frame.is_reference (key))
-    return this->model (impl->expand_reference (key));
+    return model (expand_reference (key));
 
   return frame.model (key); 
 }
@@ -444,7 +438,7 @@ Block::submodel (const symbol key) const
 { 
   const Frame& frame = find_frame (key);
   if (frame.is_reference (key))
-    return this->submodel (impl->expand_reference (key));
+    return submodel (expand_reference (key));
 
   return frame.submodel (key); 
 }
@@ -454,7 +448,7 @@ Block::integer (const symbol key) const
 { 
   const Frame& frame = find_frame (key);
   if (frame.is_reference (key))
-    return this->integer (impl->expand_reference (key));
+    return integer (expand_reference (key));
 
   return frame.integer (key); 
 }
@@ -468,29 +462,29 @@ Block::number_sequence (const symbol key) const
 { 
   const Frame& frame = find_frame (key);
   if (frame.is_reference (key))
-    return this->number_sequence (impl->expand_reference (key));
+    return number_sequence (expand_reference (key));
 
   return frame.number_sequence (key); 
 }
 
 const std::vector<symbol>
-Block::name_sequence (const symbol key)
+Block::name_sequence (const symbol key) const
 { 
-  if (!impl->frame.is_reference (key))
+  if (!frame ().is_reference (key))
     {
       const std::vector<symbol>& value 
-        = impl->frame.name_sequence (impl->expand_reference (key));
+        = frame ().name_sequence (expand_reference (key));
       std::vector<symbol> result;
       for (size_t i = 0; i < value.size (); i++)
-        result.push_back (impl->expand_string (*this, value[i]));
+        result.push_back (expand_string (value[i]));
       return result;
     }
-  const symbol var = impl->expand_reference (key);
+  const symbol var = expand_reference (key);
   const std::vector<symbol>& value
-    = impl->find_frame (var).name_sequence (var); 
+    = find_frame (var).name_sequence (var); 
   std::vector<symbol> result;
   for (size_t i = 0; i < value.size (); i++)
-    result.push_back (impl->expand_string (*this, value[i]));
+    result.push_back (expand_string (value[i]));
   return result;
 }
 
@@ -499,7 +493,7 @@ Block::flag_sequence (const symbol key) const
 { 
   const Frame& frame = find_frame (key);
   if (frame.is_reference (key))
-    return this->flag_sequence (impl->expand_reference (key));
+    return this->flag_sequence (expand_reference (key));
 
   return frame.flag_sequence (key); 
 }
@@ -509,7 +503,7 @@ Block::integer_sequence (const symbol key) const
 { 
   const Frame& frame = find_frame (key);
   if (frame.is_reference (key))
-    return this->integer_sequence (impl->expand_reference (key));
+    return this->integer_sequence (expand_reference (key));
 
   return frame.integer_sequence (key); 
 }
@@ -519,7 +513,7 @@ Block::model_sequence (const symbol key) const
 { 
   const Frame& frame = find_frame (key);
   if (frame.is_reference (key))
-    return this->model_sequence (impl->expand_reference (key));
+    return this->model_sequence (expand_reference (key));
 
   return frame.model_sequence (key); 
 }
@@ -529,7 +523,7 @@ Block::submodel_sequence (const symbol key) const
 { 
   const Frame& frame = find_frame (key);
   if (frame.is_reference (key))
-    return this->submodel_sequence (impl->expand_reference (key));
+    return this->submodel_sequence (expand_reference (key));
 
   return frame.submodel_sequence (key); 
 }
@@ -539,7 +533,7 @@ Block::plf_sequence (const symbol key) const
 { 
   const Frame& frame = find_frame (key);
   if (frame.is_reference (key))
-    return this->plf_sequence (impl->expand_reference (key));
+    return this->plf_sequence (expand_reference (key));
 
   return frame.plf_sequence (key); 
 }
@@ -559,7 +553,7 @@ Block::Block (const Metalib& metalib, Treelog& msg,
                               frame, scope_id))
 { }
 
-Block::Block (Block& block, const Frame& frame, symbol scope_tag)
+Block::Block (const Block& block, const Frame& frame, symbol scope_tag)
   : impl (new Implementation (block.metalib (), &block, block.msg (),
                               frame, scope_tag))
 { }

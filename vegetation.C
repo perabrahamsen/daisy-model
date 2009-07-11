@@ -71,7 +71,7 @@ Vegetation::output (Log& log) const
   output_value (stomata_conductance (), "stomata_conductance", log);
 }
 
-Vegetation::Vegetation (Block& al)
+Vegetation::Vegetation (const Block& al)
   : ModelDerived (al.type_name ()),
     EpInterchange_ (al.number ("EpInterchange"))
 { }

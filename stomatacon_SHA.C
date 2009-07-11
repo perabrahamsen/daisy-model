@@ -46,7 +46,7 @@ private:
 
   // Create.
   public:
-  StomataCon_SHA (Block& al)
+  StomataCon_SHA (const Block& al)
     : StomataCon (al),
       lambda (al.number ("lambda")),
       alpha (al.number ("alpha")),
@@ -73,7 +73,7 @@ StomataCon_SHA::stomata_con (const double wsf /*[]*/,
 
 static struct StomataConSHASyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new StomataCon_SHA (al); }
   StomataConSHASyntax ()
     : DeclareModel (StomataCon::component, "SHA", 

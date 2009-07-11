@@ -218,7 +218,7 @@ public:
 public:
   void initialize (std::ostream&);
 protected:
-  Format (Block& al);
+  Format (const Block& al);
 public:
   ~Format ();
 };

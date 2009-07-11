@@ -41,7 +41,7 @@ public:
 
   // Create and Destroy.
 public:
-  SelectValue (Block& al);
+  SelectValue (const Block& al);
 };
 
 #endif /* SELECT_VALUE_H */

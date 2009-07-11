@@ -56,17 +56,23 @@ class EXPORT Block : public Scope // private boost::noncopyable
   struct Implementation;
   std::auto_ptr<Implementation> impl;
 public:
-  const Metalib& metalib ();
-  const Units& units ();
-  Path& path ();
+  const Metalib& metalib () const;
+  const Units& units () const;
+  Path& path () const;
   virtual const Frame& frame () const = 0;
   Treelog& msg () const;
   symbol type_name () const;
 
+  // Variables.
+private:
+  symbol expand_string (symbol) const;
+  symbol expand_reference (const symbol key) const;
+
   // Error handling.
-  void error (const std::string&);
+public:  
+  void error (const std::string&) const;
   bool ok () const;
-  void set_error ();
+  void set_error () const;
 
   // Nested scope handling.
 public:
@@ -87,8 +93,8 @@ public:
   double number (symbol) const;
   double number (symbol, double default_value) const;
   using Scope::name;
-  symbol name (symbol);
-  symbol name (symbol, symbol default_value);
+  symbol name (symbol) const;
+  symbol name (symbol, symbol default_value) const;
   bool flag (symbol) const;
   bool flag (symbol, bool default_value) const;
   const PLF& plf (symbol) const;
@@ -97,7 +103,7 @@ public:
   int integer (symbol) const;
   int integer (symbol, int default_value) const;
   const std::vector<double>& number_sequence (symbol) const;
-  const std::vector<symbol> name_sequence (symbol key);
+  const std::vector<symbol> name_sequence (symbol key) const;
   const std::vector<bool>& flag_sequence (symbol key) const;
   const std::vector<int>& integer_sequence (symbol key) const;
   const std::vector<boost::shared_ptr<const FrameModel>/**/>& model_sequence (symbol key) const;
@@ -113,7 +119,7 @@ public:
   // Freestanding
   // Context
 protected:  
-  Block (Block&, const Frame&, symbol scope_tag);
+  Block (const Block&, const Frame&, symbol scope_tag);
   Block (const Metalib&, Treelog& msg, const Frame&, symbol scope_tag);
 public:
   ~Block ();

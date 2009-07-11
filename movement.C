@@ -168,7 +168,7 @@ Movement::initialize (const Units& units,
   return ok;
 }
 
-Movement::Movement (Block& al)
+Movement::Movement (const Block& al)
   : ModelDerived (al.type_name ()),
     water_failure_level (-1),
     solute_failure_level (-1),

@@ -140,7 +140,7 @@ public:
                    const Geometry&, const Soil&, const Scope& parent_scope, 
                    const Groundwater&, Treelog& msg);
   bool check (const Geometry&, Treelog& msg) const;
-  explicit TertiaryBiopores (Block& al);
+  explicit TertiaryBiopores (const Block& al);
 };
 
 Anystate
@@ -622,7 +622,7 @@ TertiaryBiopores::check (const Geometry& geo, Treelog& msg) const
   return ok;
 }
 
-TertiaryBiopores::TertiaryBiopores (Block& al)
+TertiaryBiopores::TertiaryBiopores (const Block& al)
   : Tertiary (al),
     classes (Librarian::build_vector<Biopore> (al, "classes")),
     pressure_initiate (al.number ("pressure_initiate")),
@@ -645,7 +645,7 @@ TertiaryBiopores::TertiaryBiopores (Block& al)
 
 static struct TertiaryBioporesSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new TertiaryBiopores (al); }
 
   TertiaryBioporesSyntax ()

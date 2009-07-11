@@ -68,7 +68,7 @@ struct SelectVolume : public SelectValue
   bool check_border (const Border& border, 
                      const Volume& default_volume,
                      Treelog& msg) const;
-  SelectVolume (Block& al);
+  SelectVolume (const Block& al);
   ~SelectVolume ();
 };
 
@@ -219,7 +219,7 @@ SelectVolume::check_border (const Border& border,
                             Treelog& msg) const
 { return volume->check_border (border, default_volume, msg); }
   
-SelectVolume::SelectVolume (Block& al)
+SelectVolume::SelectVolume (const Block& al)
   : SelectValue (al),
     density_z (al.flag ("density") || al.flag ("density_z")),
     density_x (al.flag ("density") || al.flag ("density_x")),
@@ -237,7 +237,7 @@ SelectVolume::~SelectVolume ()
 
 static struct SelectVolumeBase : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new SelectVolume (al); }
   SelectVolumeBase ()
     : DeclareModel (Select::component, "volume_base", "value", "\
@@ -345,7 +345,7 @@ struct SelectWater : public SelectVolume
     SelectVolume::output_array (water, geo, soil, veg, msg);
   }
 
-  SelectWater (Block& al)
+  SelectWater (const Block& al)
     : SelectVolume (al),
       h (al.number ("h")),
       h_ice (al.number ("h_ice"))
@@ -354,7 +354,7 @@ struct SelectWater : public SelectVolume
 
 static struct SelectWaterSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new SelectWater (al); }
 
   SelectWaterSyntax ()

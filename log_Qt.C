@@ -32,7 +32,7 @@ LogQt::done (const std::vector<Time::component_t>& time_columns,
   emit ready ();
 }
 
-LogQt::LogQt (Block& block)
+LogQt::LogQt (const Block& block)
   : LogExtern (block)
 { }
 
@@ -41,7 +41,7 @@ LogQt::~LogQt ()
 
 static struct LogQtSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new LogQt (al); }
 
   LogQtSyntax ()

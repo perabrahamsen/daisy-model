@@ -427,7 +427,7 @@ UIRun::open_setup ()
     }
 }
 
-UIRun::UIRun (Block& al)
+UIRun::UIRun (const Block& al)
   : UIQt (al),
     qt_main (application_name ()),
     qt_name (new QLabel),
@@ -442,7 +442,7 @@ UIRun::~UIRun ()
 
 static struct UIRunSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new UIRun (al); }
 
   UIRunSyntax ()

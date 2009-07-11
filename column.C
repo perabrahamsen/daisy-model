@@ -64,7 +64,7 @@ Column::output (Log& log) const
   output_variable (size, log);
 }
 
-Column::Column (Block& al)
+Column::Column (const Block& al)
   : ModelFramed (al),
     size (al.number ("size")),
     location_ (map_submodel_const<Point> (al, "location"))

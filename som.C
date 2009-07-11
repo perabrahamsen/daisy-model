@@ -34,13 +34,13 @@ SOM::library_id () const
   return id;
 }
 
-SOM::SOM (Block& al)
+SOM::SOM (const Block& al)
   : OM (al)
 { }
 
 static struct SOMInit : public DeclareSolo
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new SOM (al); }
   void load_frame (Frame& frame) const
   {

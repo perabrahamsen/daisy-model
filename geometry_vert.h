@@ -54,7 +54,7 @@ public:
   // Creation.
   bool check_z_border (const double value, Treelog& err) const;
 public:
-  GeometryVert (Block&);
+  GeometryVert (const Block&);
   ~GeometryVert ();
 };
 

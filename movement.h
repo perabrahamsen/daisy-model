@@ -123,9 +123,9 @@ public:
   bool initialize (const Units&,
                    const Soil&, const Groundwater&, const Scope& scope,
                    Treelog& msg);
-  static Movement* build_vertical (Block& al);
+  static Movement* build_vertical (const Block& al);
 protected:
-  Movement (Block&);
+  Movement (const Block&);
 public:
   ~Movement ();
 };

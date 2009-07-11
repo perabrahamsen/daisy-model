@@ -34,7 +34,7 @@ Tortuosity::library_id () const
   return id;
 }
 
-Tortuosity::Tortuosity (Block& al)
+Tortuosity::Tortuosity (const Block& al)
   : name (al.type_name ())
 { }
 

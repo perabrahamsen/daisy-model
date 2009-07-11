@@ -115,7 +115,7 @@ private:
 public:
   virtual bool initialize (const Time& time, Treelog& err) = 0;
 protected:
-  Weather (Block&);
+  Weather (const Block&);
 public:
   virtual bool check (const Time& from, const Time& to, Treelog&) const = 0;
   virtual ~Weather ();

@@ -118,7 +118,7 @@ public:
 private:
   UZ1D ();
 protected:
-  explicit UZ1D (Block&);
+  explicit UZ1D (const Block&);
 public:
   ~UZ1D ();
 };

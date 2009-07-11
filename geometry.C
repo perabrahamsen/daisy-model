@@ -808,7 +808,7 @@ Geometry::build_common ()
     }
 }
 
-Geometry::Geometry (Block&)
+Geometry::Geometry (const Block&)
   : size_ (0)
 { }
 

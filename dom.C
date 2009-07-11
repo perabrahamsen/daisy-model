@@ -221,7 +221,7 @@ DOM::initialize (const Geometry& geo,
   N.initialize (geo, soil, soil_water, msg);
 }
 
-DOM::DOM (Block& al)
+DOM::DOM (const Block& al)
   : C (*new DOE (al.submodel ("C"))),
     N (*new DOE (al.submodel ("N"))),
     diffusion_coefficient (al.number ("diffusion_coefficient")),

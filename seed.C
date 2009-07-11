@@ -33,7 +33,7 @@ Seed::library_id () const
   return id;
 }
 
-Seed::Seed (Block& al)
+Seed::Seed (const Block& al)
   : ModelDerived (al.type_name ())
 { }
 

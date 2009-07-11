@@ -97,7 +97,7 @@ struct ActionExtern : public Action
     return ok;
   }
 
-  ActionExtern (Block& al)
+  ActionExtern (const Block& al)
     : Action (al),
       scopesel (Librarian::build_item<Scopesel> (al, "scope")),
       extern_scope (NULL),
@@ -109,7 +109,7 @@ struct ActionExtern : public Action
 
 static struct ActionExternSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ActionExtern (al); }
   ActionExternSyntax ()
     : DeclareModel (Action::component, "extern", "\
@@ -256,7 +256,7 @@ struct ActionExternFertigation : public Action
     return ok;
   }
 
-  ActionExternFertigation (Block& al)
+  ActionExternFertigation (const Block& al)
     : Action (al),
       scopesel (Librarian::build_item<Scopesel> (al, "scope")),
       extern_scope (NULL),
@@ -300,7 +300,7 @@ static struct ActionExternFertigationSyntax : public DeclareModel
     return ok;
   }
 
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ActionExternFertigation (al); }
 
   ActionExternFertigationSyntax ()

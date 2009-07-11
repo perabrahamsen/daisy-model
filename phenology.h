@@ -59,7 +59,7 @@ public:
 
   // Create and Destroy.
 public:
-  Phenology (Block&);
+  Phenology (const Block&);
   ~Phenology ();
 };
 

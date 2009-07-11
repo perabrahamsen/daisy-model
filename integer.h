@@ -51,7 +51,7 @@ public:
   virtual bool initialize (const Units&, const Scope&, Treelog&) = 0;
   virtual bool check (const Scope&, Treelog&) const = 0;
 protected:
-  explicit Integer (Block&);
+  explicit Integer (const Block&);
 public:
   ~Integer ();
 };

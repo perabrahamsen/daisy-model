@@ -266,7 +266,7 @@ AOM::tick (const std::vector<bool>& active, const double* abiotic_factor,
     }
 }
 
-AOM::AOM (Block& al)
+AOM::AOM (const Block& al)
   : OM (al),
     initial_fraction (al.number ("initial_fraction", Unspecified)),
     top_C (al.number ("top_C")),
@@ -277,7 +277,7 @@ static struct AOMInit : public DeclareSolo
 {
   bool used_to_be_a_submodel () const
   { return true; }
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new AOM (al); }
   void load_frame (Frame& frame) const
   {

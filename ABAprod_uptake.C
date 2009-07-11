@@ -55,7 +55,7 @@ struct ABAProdUptake : public ABAProd
   // Create and Destroy.
   void initialize (const Units&, Treelog&);
   bool check (const Units&, Treelog&) const;
-  ABAProdUptake (Block& al);
+  ABAProdUptake (const Block& al);
   ~ABAProdUptake ();
 };
 
@@ -120,7 +120,7 @@ ABAProdUptake::check (const Units& units, Treelog& msg) const
   return ok;
 }
 
-ABAProdUptake::ABAProdUptake (Block& al)
+ABAProdUptake::ABAProdUptake (const Block& al)
   : ABAProd (al),
     scope (h_name, Units::cm ()),
     expr (Librarian::build_item<Number> (al, "expr"))
@@ -131,7 +131,7 @@ ABAProdUptake::~ABAProdUptake ()
 
 static struct ABAProdUptakeSyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ABAProdUptake (al); }
   ABAProdUptakeSyntax ()
     : DeclareModel (ABAProd::component, "uptake", "\

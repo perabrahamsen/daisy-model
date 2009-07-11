@@ -39,7 +39,7 @@ Tertiary::library_id () const
   return id;
 }
 
-Tertiary::Tertiary (Block& al)
+Tertiary::Tertiary (const Block& al)
   : ModelFramed (al)
 { }
 
@@ -85,14 +85,14 @@ class TertiaryNone : public Tertiary
   bool check (const Geometry&, Treelog&) const
   { return true; }
 public:
-  TertiaryNone (Block& al)
+  TertiaryNone (const Block& al)
     : Tertiary (al)
   { }
 };
 
 static struct TertiaryNoneSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new TertiaryNone (al); }
   TertiaryNoneSyntax ()
     : DeclareModel (Tertiary::component, "none", "No tertiary transport.")

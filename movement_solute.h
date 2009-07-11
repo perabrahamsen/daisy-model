@@ -88,7 +88,7 @@ private:
   // Create.
 protected:
   bool check_derived (Treelog&) const;
-  MovementSolute (Block& al);
+  MovementSolute (const Block& al);
 };
 
 #endif // MOVEMENT_SOLUTE_H

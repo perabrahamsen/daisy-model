@@ -40,7 +40,7 @@ struct HeatrectLinear : public Heatrect
               std::vector<double>& T,
               const double dt, Treelog&) const;
   // Create.
-  HeatrectLinear (Block& al)
+  HeatrectLinear (const Block& al)
     : Heatrect (al)
   { }
   ~HeatrectLinear ()
@@ -75,7 +75,7 @@ HeatrectLinear::solve (const GeometryRect& geo,
 
 static struct HeatrectLinearSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new HeatrectLinear (al); }
 
   HeatrectLinearSyntax ()

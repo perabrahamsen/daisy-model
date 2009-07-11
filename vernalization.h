@@ -41,7 +41,7 @@ public:
 
   // Create and Destroy.
 public:
-  Vernalization (Block&);
+  Vernalization (const Block&);
   ~Vernalization ();
 };
 

@@ -42,7 +42,7 @@ MScope::MScope (const symbol title)
   : title_ (title)
 { }
 
-MScope::MScope (Block& al)
+MScope::MScope (const Block& al)
   : title_ (al.name ("where", al.type_name ()))
 { }
 

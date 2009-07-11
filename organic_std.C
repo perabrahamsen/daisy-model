@@ -265,7 +265,7 @@ struct OrganicStandard : public OrganicMatter
   OrganicStandard ();
   OrganicStandard (const OrganicStandard&);
   OrganicStandard& operator= (const OrganicStandard&);
-  explicit OrganicStandard (Block&);
+  explicit OrganicStandard (const Block&);
   ~OrganicStandard ();
 };
 
@@ -2588,7 +2588,7 @@ An 'initial_SOM' layer in OrganicStandard ends below the last cell");
   tillage_C_soil.insert (tillage_C_soil.end (), cell_size, 0.0);
 }
 
-OrganicStandard::OrganicStandard (Block& al)
+OrganicStandard::OrganicStandard (const Block& al)
   : OrganicMatter (al),
     active_underground (al.flag ("active_underground")),
     K_NH4 (al.number ("K_NH4")),
@@ -2935,7 +2935,7 @@ static struct OrganicStandardSyntax : DeclareModel
   bool used_to_be_a_submodel () const
   { return true; }
 
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new OrganicStandard (al); }
 
   OrganicStandardSyntax () 

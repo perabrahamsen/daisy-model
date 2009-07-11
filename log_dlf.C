@@ -253,7 +253,7 @@ LogDLF::initialize (Treelog& msg)
 }
 
 std::vector<std::pair<symbol, symbol>/**/>
-LogDLF::build_parameters (Block& al)
+LogDLF::build_parameters (const Block& al)
 {
   std::vector<std::pair<symbol, symbol>/**/> result;
   if (al.check ("parameter_names"))
@@ -307,7 +307,7 @@ LogDLF::build_parameters (Block& al)
   return result;
 }
 
-LogDLF::LogDLF (Block& al)
+LogDLF::LogDLF (const Block& al)
   : LogSelect (al),
     parsed_from_file (al.frame ().inherited_position ().filename ()),
     file (al.name ("where")),

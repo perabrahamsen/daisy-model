@@ -61,7 +61,7 @@ public:
                            const Soil&, const SoilWater&, const SoilHeat&,
                            Treelog&);
 protected:
-  explicit Transform (Block&);
+  explicit Transform (const Block&);
 public:
   ~Transform ();
 };

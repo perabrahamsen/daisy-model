@@ -268,7 +268,7 @@ struct ReactionEquilibrium : public Reaction
     k_AB->initialize (units, scope, msg); 
     k_BA->initialize (units, scope, msg); 
   }
-  explicit ReactionEquilibrium (Block& al)
+  explicit ReactionEquilibrium (const Block& al)
     : Reaction (al),
       name_A (al.name ("A")),
       name_B (al.name ("B")),
@@ -290,7 +290,7 @@ ReactionEquilibrium::k_unit ("h^-1");
 
 static struct ReactionEquilibriumSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ReactionEquilibrium (al); }
   ReactionEquilibriumSyntax ()
     : DeclareModel (Reaction::component, "equilibrium", 

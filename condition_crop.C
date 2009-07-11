@@ -59,7 +59,7 @@ struct ConditionDSAfter : public Condition
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ConditionDSAfter (Block& al)
+  ConditionDSAfter (const Block& al)
     : Condition (al),
       crop (al.name ("crop")),
       ds (al.number ("ds"))
@@ -68,7 +68,7 @@ struct ConditionDSAfter : public Condition
 
 static struct ConditionCropDSSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ConditionDSAfter (al); }
 
   ConditionCropDSSyntax ()
@@ -110,7 +110,7 @@ struct ConditionDMOver : public Condition
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ConditionDMOver (Block& al)
+  ConditionDMOver (const Block& al)
     : Condition (al),
       crop (al.name ("crop")),
       weight (al.number ("weight")),
@@ -120,7 +120,7 @@ struct ConditionDMOver : public Condition
 
 static struct ConditionCropDMSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ConditionDMOver (al); }
 
   ConditionCropDMSyntax ()
@@ -164,7 +164,7 @@ struct ConditionDMSOrgOver : public Condition
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ConditionDMSOrgOver (Block& al)
+  ConditionDMSOrgOver (const Block& al)
     : Condition (al),
       crop (al.name ("crop")),
       weight (al.number ("weight"))
@@ -173,7 +173,7 @@ struct ConditionDMSOrgOver : public Condition
 
 static struct ConditionCropDMSorgSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ConditionDMSOrgOver (al); }
 
   ConditionCropDMSorgSyntax ()

@@ -116,7 +116,7 @@ struct Movement1D : public MovementSolute
   void initialize_derived (const Soil& soil, const Groundwater& groundwater,
                            bool has_macropores, 
                            Treelog&);
-  Movement1D (Block& al);
+  Movement1D (const Block& al);
   ~Movement1D ();
 };
 
@@ -449,7 +449,7 @@ Movement1D::initialize_derived (const Soil& soil,
     matrix_water[i]->has_macropores (has_macropores);
 }
 
-Movement1D::Movement1D (Block& al)
+Movement1D::Movement1D (const Block& al)
   : MovementSolute (al),
     geo (submodel<Geometry1D> (al, "Geometry")),
     matrix_water (Librarian::build_vector<UZmodel> (al, "matrix_water")),
@@ -460,12 +460,12 @@ Movement1D::~Movement1D ()
 { }
 
 Movement*
-Movement::build_vertical (Block& al)
+Movement::build_vertical (const Block& al)
 { return new Movement1D (al); }
 
 static struct Movement1DSyntax : DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new Movement1D (al); }
 
   Movement1DSyntax ()

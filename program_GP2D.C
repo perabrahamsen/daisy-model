@@ -117,7 +117,7 @@ struct ProgramGP2D : public Program
     return ok; 
   }
 
-  ProgramGP2D (Block& al)
+  ProgramGP2D (const Block& al)
     : Program (al),
       metalib (al.metalib ()),
       geo (submodel<GeometryRect> (al, "Geometry")),
@@ -135,7 +135,7 @@ struct ProgramGP2D : public Program
 
 static struct ProgramGP2DSyntax : public DeclareModel
 {
-  Model* make (Block& al) const
+  Model* make (const Block& al) const
   { return new ProgramGP2D (al); }
   ProgramGP2DSyntax ()
     : DeclareModel (Program::component, "GP2D", "\

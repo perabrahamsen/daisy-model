@@ -44,7 +44,7 @@ public:
   virtual double initial_N () const = 0;
   virtual void initialize (double weight, Treelog& msg) = 0;
   virtual bool check (Treelog& msg) const = 0;
-  Seed (Block&);
+  Seed (const Block&);
   ~Seed ();
 };
 

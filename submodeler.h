@@ -55,7 +55,7 @@ map_construct_const (const std::vector<boost::shared_ptr<const FrameSubmodel>/**
 
 template <class T> 
 T
-submodel_value_block (Block& nested)
+submodel_value_block (const Block& nested)
 { 
   try
     { return T (nested); }
@@ -68,7 +68,7 @@ submodel_value_block (Block& nested)
 
 template <class T> 
 T
-submodel_value (Block& parent, const std::string& key)
+submodel_value (const Block& parent, const std::string& key)
 { 
   BlockSubmodel nested (parent, key);
   try
@@ -82,7 +82,7 @@ submodel_value (Block& parent, const std::string& key)
 
 template <class T> 
 T*
-submodel_block (Block& nested)
+submodel_block (const Block& nested)
 { 
   try
     { return new T (nested); }
@@ -95,7 +95,7 @@ submodel_block (Block& nested)
 
 template <class T> 
 T*
-submodel (Block& parent, const std::string& key)
+submodel (const Block& parent, const std::string& key)
 { 
   BlockSubmodel nested (parent, key);
   return submodel_block<T> (nested);
@@ -104,7 +104,7 @@ submodel (Block& parent, const std::string& key)
 // Sequences
 template <class T> 
 std::vector<T*>
-map_submodel (Block& parent, const std::string& key)
+map_submodel (const Block& parent, const std::string& key)
 { 
   std::vector<T*> t;
   const size_t size = parent.value_size (key);
@@ -118,7 +118,7 @@ map_submodel (Block& parent, const std::string& key)
 
 template <class T> 
 std::vector<const T*>
-map_submodel_const (Block& parent, const std::string& key)
+map_submodel_const (const Block& parent, const std::string& key)
 { 
   std::vector<const T*> t;
   const size_t size = parent.value_size (key);

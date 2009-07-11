@@ -44,7 +44,7 @@ public:
 
   // Create and Destroy.
 protected:
-  explicit Secondary (Block& al);
+  explicit Secondary (const Block& al);
   explicit Secondary (const symbol name);
 public:
   static std::auto_ptr<Secondary> create_none ();
