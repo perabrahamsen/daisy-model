@@ -23,11 +23,13 @@
 #include "library.h"
 #include "metalib.h"
 #include "intrinsics.h"
-#include "block.h"
+#include "block_top.h"
 #include "treelog_text.h"
 #include "assertion.h"
 #include "librarian.h"
 #include "frame_model.h"
+#include "block_model.h"
+#include "block_top.h"
 #include <sstream>
 #include <map>
 
@@ -147,7 +149,7 @@ Librarian::build_frame (const symbol component, const Metalib& metalib,
   }
   
   // Build.
-  Block parent (metalib, msg, frame, scope_id);
+  BlockTop parent (metalib, msg, frame, scope_id);
   const symbol type = frame.type_name ();
   std::auto_ptr<Model> m (frame.construct (parent, type)); 
   if (!parent.ok ())
@@ -282,7 +284,7 @@ class FrameBuildable : public FrameDeclared
   Model* construct (Block& context, const symbol key, 
                     const FrameModel& frame) const
   {
-    Block block (context, frame, key);
+    BlockModel block (context, frame, key);
 
     if (!frame.check (context))
       return NULL;

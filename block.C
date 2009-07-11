@@ -318,10 +318,6 @@ Path&
 Block::path ()
 { return impl->metalib.path (); }
 
-const Frame&
-Block::frame () const
-{ return impl->frame; }
-
 Treelog&
 Block::msg () const
 { return impl->msg; }

@@ -1,6 +1,6 @@
-// submodeler.C  --- Utilities for handling submodels.
+// block_submodel.h -- FrameSubmodel with context.
 // 
-// Copyright 2009 Per Abrahamsen and KVL.
+// Copyright 2005, 2009 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -18,27 +18,20 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#define BUILD_DLL
+#ifndef BLOCK_SUBMODEL_H
+#define BLOCK_SUBMODEL_H
 
-#include "submodeler.h"
+#include "block.h"
 #include "frame_submodel.h"
-#include "assertion.h"
 
-BlockSubmodel::BlockSubmodel (Block& parent, const symbol key)
-  : Block (parent, parent.submodel (key), key)
-{ }
+class BlockSubmodel : public Block
+{
+  const FrameSubmodel& frame_;
+  const FrameSubmodel& frame () const;
+public:
+  BlockSubmodel (Block& parent, const symbol key);
+  BlockSubmodel (Block& parent, const symbol key, const size_t index);
+  ~BlockSubmodel ();
+};
 
-BlockSubmodel::BlockSubmodel (Block& parent, const symbol key, 
-                              const size_t index)
-  : Block (parent,
-           *parent.submodel_sequence (key)[index],
-           sequence_id (key, index))
-{ 
-  daisy_assert (parent.submodel_sequence (key).size () > index);
-  daisy_assert (parent.submodel_sequence (key)[index]);
-}
-
-BlockSubmodel::~BlockSubmodel ()
-{ }
-
-// submodeler.C ends here.
+#endif // BLOCK_SUBMODEL_H

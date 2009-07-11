@@ -1,5 +1,17 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* Block
+
+toplevel.C
+librarian.C
+log_select.C
+parser_file.C
+program_batch.C
+ui_Qt_run.C
+
+  // Context
+  Block (Block&, const Frame&, symbol scope_tag);
+
 * Cleanup
 
 ** fjern flere "clone", brug shared_ptr

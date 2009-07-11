@@ -27,7 +27,7 @@
 #include "metalib.h"
 #include "library.h"
 #include "librarian.h"
-#include "block.h"
+#include "block_top.h"
 #include "assertion.h"
 #include "path.h"
 #include "treelog.h"
@@ -143,8 +143,8 @@ UIRun::attach (Toplevel& toplevel)
 
   // Build log.
   {
-    Block block (toplevel.metalib (), toplevel.msg (),
-                 toplevel.metalib (), "UI logs");
+    BlockTop block (toplevel.metalib (), toplevel.msg (),
+                    toplevel.metalib (), "UI logs");
     build_log (toplevel.metalib (), block, "QtTime");   
   }
 

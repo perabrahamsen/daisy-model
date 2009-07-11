@@ -22,7 +22,7 @@
 #ifndef SUBMODELER_H
 #define SUBMODELER_H
 
-#include "block.h"
+#include "block_submodel.h"
 #include <vector>
 #include <memory>
 
@@ -52,14 +52,6 @@ map_construct_const (const std::vector<boost::shared_ptr<const FrameSubmodel>/**
 }
 
 // New style (block scope).
-
-class BlockSubmodel : public Block
-{
-public:
-  BlockSubmodel (Block& parent, const symbol key);
-  BlockSubmodel (Block& parent, const symbol key, const size_t index);
-  ~BlockSubmodel ();
-};
 
 template <class T> 
 T

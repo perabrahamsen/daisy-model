@@ -26,7 +26,7 @@
 #include "condition.h"
 #include "metalib.h"
 #include "library.h"
-#include "block.h"
+#include "block_top.h"
 #include "field.h"
 #include "format.h"
 #include "volume.h"
@@ -299,7 +299,7 @@ LogSelect::document_entries (Format& format, const Metalib& metalib,
     }
 
   // Complete log.
-  Block block (metalib, msg, frame, "docselect");
+  BlockTop block (metalib, msg, frame, "docselect");
   struct DocSelect : public LogSelect 
   {
     void initialize (Treelog&)

@@ -59,7 +59,7 @@ public:
   const Metalib& metalib ();
   const Units& units ();
   Path& path ();
-  const Frame& frame () const;
+  virtual const Frame& frame () const = 0;
   Treelog& msg () const;
   symbol type_name () const;
 
@@ -109,13 +109,13 @@ public:
   // Create and Destroy.
 protected:
   static symbol sequence_id (symbol key, size_t index);
-private:
-  Block ();
 public:
   // Freestanding
-  Block (const Metalib&, Treelog& msg, const Frame&, symbol scope_tag);
   // Context
+protected:  
   Block (Block&, const Frame&, symbol scope_tag);
+  Block (const Metalib&, Treelog& msg, const Frame&, symbol scope_tag);
+public:
   ~Block ();
 };
 

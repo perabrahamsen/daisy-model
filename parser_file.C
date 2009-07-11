@@ -24,7 +24,7 @@
 #include "parser_file.h"
 #include "metalib.h"
 #include "library.h"
-#include "block.h"
+#include "block_top.h"
 #include "lexer.h"
 #include "scope.h"
 #include "number.h"
@@ -1363,7 +1363,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 		if (&frame == &metalib () && name == "path")
 		  {
                     // Use block to get references.
-                    Block block (metalib (), msg, frame, "path");
+                    BlockTop block (metalib (), msg, frame, "path");
 		    const std::vector<symbol>& symbols 
 		      = block.name_sequence (name);
 		    metalib ().path ().set_path (symbols);

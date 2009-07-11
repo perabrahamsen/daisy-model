@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "program.h"
-#include "block.h"
+#include "block_top.h"
 #include "treelog.h"
 #include "path.h"
 #include "assertion.h"
@@ -58,7 +58,7 @@ struct ProgramBatch : public Program
         Treelog::Open nest (msg, name.name (), i, program[i]->name);
         msg.touch ();
         {
-          Block block (*metalib, msg, *metalib, "Initializing");
+          BlockTop block (*metalib, msg, *metalib, "Initializing");
           program[0]->initialize (*metalib, block);
           if (!block.ok ())
             throw EXIT_FAILURE;
