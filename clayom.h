@@ -29,7 +29,7 @@
 class SMB;
 class Soil;
 class Treelog;
-class Block;
+class BlockModel;
 
 class ClayOM : public Model
 {
@@ -52,7 +52,7 @@ public:
 public:
   virtual bool check (const std::vector<SMB*>& smb, Treelog& err) const = 0;
 protected:
-  ClayOM (const Block& al);
+  ClayOM (const BlockModel& al);
 public:
   ~ClayOM ();
 };

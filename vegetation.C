@@ -24,7 +24,7 @@
 #include "vegetation.h"
 #include "log.h"
 #include "frame.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 
 const char *const Vegetation::component = "vegetation";
@@ -71,7 +71,7 @@ Vegetation::output (Log& log) const
   output_value (stomata_conductance (), "stomata_conductance", log);
 }
 
-Vegetation::Vegetation (const Block& al)
+Vegetation::Vegetation (const BlockModel& al)
   : ModelDerived (al.type_name ()),
     EpInterchange_ (al.number ("EpInterchange"))
 { }

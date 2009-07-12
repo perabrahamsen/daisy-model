@@ -26,7 +26,7 @@
 #include "destination.h"
 #include "select.h"
 #include "library.h"
-#include "block.h"
+#include "block_model.h"
 #include "timestep.h"
 #include "memutils.h"
 #include "librarian.h"
@@ -59,7 +59,7 @@ struct LogRegress : public LogDLF, public Destination
 
   // Create and destroy.
   void initialize (Treelog&);
-  explicit LogRegress (const Block& al);
+  explicit LogRegress (const BlockModel& al);
   void summarize (Treelog&);
   ~LogRegress ();
 };
@@ -144,7 +144,7 @@ LogRegress::initialize (Treelog& msg)
   LogDLF::initialize (msg);
 }
 
-LogRegress::LogRegress (const Block& al)
+LogRegress::LogRegress (const BlockModel& al)
   : LogDLF (al),
     type (Error),
     dest_number (-42.42e42),
@@ -167,7 +167,7 @@ LogRegress::~LogRegress ()
 
 static struct LogRegressSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new LogRegress (al); }
 
   LogRegressSyntax ()

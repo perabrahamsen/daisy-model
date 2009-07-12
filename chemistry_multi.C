@@ -22,7 +22,7 @@
 #include "chemistry.h"
 #include "chemical.h"
 #include "log.h"
-#include "block.h"
+#include "block_model.h"
 #include "treelog.h"
 #include "assertion.h"
 #include "memutils.h"
@@ -101,7 +101,7 @@ struct ChemistryMulti : public Chemistry
 	      Treelog&) const;
   static const std::vector<Chemical*> 
   /**/ find_chemicals (const std::vector<Chemistry*>& combine);
-  explicit ChemistryMulti (const Block& al);
+  explicit ChemistryMulti (const BlockModel& al);
 };
 
 bool 
@@ -420,7 +420,7 @@ ChemistryMulti::find_chemicals (const std::vector<Chemistry*>& combine)
   return result;
 }
 
-ChemistryMulti::ChemistryMulti (const Block& al)
+ChemistryMulti::ChemistryMulti (const BlockModel& al)
   : Chemistry (al),
     combine (Librarian::build_vector<Chemistry> (al, "combine")),
     ignore (al.name_sequence ("ignore")),
@@ -429,7 +429,7 @@ ChemistryMulti::ChemistryMulti (const Block& al)
 
 static struct ChemistryMultiSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ChemistryMulti (al); }
   ChemistryMultiSyntax ()
     : DeclareModel (Chemistry::component, "multi", "Handle multile chemistries.")

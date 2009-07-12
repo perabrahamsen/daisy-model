@@ -223,7 +223,7 @@ struct ActionCrop : public Action
   // Create and Destroy.
   void initialize (const Daisy&, const Scope&, Treelog&);
   bool check (const Daisy&, const Scope&, Treelog& err) const;
-  ActionCrop (const Block& al);
+  ActionCrop (const BlockModel& al);
   ~ActionCrop ();
 };
 
@@ -966,7 +966,7 @@ ActionCrop::check (const Daisy& daisy, const Scope& scope, Treelog& msg) const
   return ok;
 }
 
-ActionCrop::ActionCrop (const Block& al)
+ActionCrop::ActionCrop (const BlockModel& al)
   : Action (al),
     primary (new Sow (al.submodel ("primary"))),
     secondary (al.check ("secondary") 
@@ -1015,7 +1015,7 @@ ActionCrop::~ActionCrop ()
 // Add the ActionCrop syntax to the syntax table.
 static struct ActionCropSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ActionCrop (al); }
 
   static bool check_alist (const Metalib&, const Frame& al, Treelog& err)

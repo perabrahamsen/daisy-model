@@ -20,7 +20,7 @@
 
 #define BUILD_DLL
 #include "source.h"
-#include "block.h"
+#include "block_model.h"
 #include "gnuplot_utils.h"
 #include "units.h"
 #include "vcheck.h"
@@ -69,7 +69,7 @@ public:
 
   // Create and Destroy.
 public:
-  explicit SourceMerge (const Block& al);
+  explicit SourceMerge (const BlockModel& al);
   ~SourceMerge ()
   { sequence_delete (source.begin (), source.end ()); }
 };
@@ -190,7 +190,7 @@ SourceMerge::load (Treelog& msg)
   return true;
 }
 
-SourceMerge::SourceMerge (const Block& al)
+SourceMerge::SourceMerge (const BlockModel& al)
   : Source (al),
     units (al.units ()),
     source (Librarian::build_vector<Source> (al, "source")),
@@ -202,7 +202,7 @@ SourceMerge::SourceMerge (const Block& al)
 
 static struct SourceMergeSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new SourceMerge (al); }
 
   SourceMergeSyntax ()

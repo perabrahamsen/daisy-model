@@ -23,7 +23,7 @@
 
 #include "action.h"
 #include "daisy.h"
-#include "block.h"
+#include "block_model.h"
 #include "log.h"
 #include "librarian.h"
 #include "frame_model.h"
@@ -86,7 +86,7 @@ struct ActionRepeat : public Action
       return true;
   }
 
-  ActionRepeat (const Block& al)
+  ActionRepeat (const BlockModel& al)
     : Action (al),
       modified_frame (Action::frame (), FrameModel::parent_link),
       repeat (&al.model ("repeat").clone ()),
@@ -103,7 +103,7 @@ struct ActionRepeat : public Action
 
 static struct ActionRepeatSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ActionRepeat (al); }
 
   ActionRepeatSyntax ()

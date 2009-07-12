@@ -28,6 +28,7 @@
 #include "submodeler.h"
 #include "librarian.h"
 #include "frame.h"
+#include "block_model.h"
 #include <sstream>
 #include <fstream>
 #include <string>
@@ -49,7 +50,7 @@ struct SummarySimple : public Summary
   // Create and Destroy.
   void clear ();
   void initialize (std::vector<Select*>&, Treelog&);
-  explicit SummarySimple (const Block&);
+  explicit SummarySimple (const BlockModel&);
   ~SummarySimple ();
   void summarize (int hours, Treelog&) const;
 };
@@ -68,7 +69,7 @@ SummarySimple::initialize (std::vector<Select*>& select, Treelog& msg)
   FetchPretty::initialize (fetch, select, msg);
 }
 
-SummarySimple::SummarySimple (const Block& al)
+SummarySimple::SummarySimple (const BlockModel& al)
   : Summary (al),
     description (al.frame ().description ()),
     file (al.name ("where", "")),
@@ -142,7 +143,7 @@ SummarySimple::summarize (const int hours, Treelog& msg) const
 
 static struct SummarySimpleSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new SummarySimple (al); }
   SummarySimpleSyntax ()
     : DeclareModel (Summary::component, "simple",

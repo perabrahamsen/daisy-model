@@ -26,7 +26,7 @@
 #include "geometry_rect.h"
 #include "rootdens.h"
 #include "treelog.h"
-#include "block.h"
+#include "block_model.h"
 #include "submodeler.h"
 #include "check.h"
 #include "librarian.h"
@@ -117,7 +117,7 @@ struct ProgramGP2D : public Program
     return ok; 
   }
 
-  ProgramGP2D (const Block& al)
+  ProgramGP2D (const BlockModel& al)
     : Program (al),
       metalib (al.metalib ()),
       geo (submodel<GeometryRect> (al, "Geometry")),
@@ -135,7 +135,7 @@ struct ProgramGP2D : public Program
 
 static struct ProgramGP2DSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ProgramGP2D (al); }
   ProgramGP2DSyntax ()
     : DeclareModel (Program::component, "GP2D", "\

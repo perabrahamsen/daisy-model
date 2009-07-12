@@ -27,7 +27,7 @@ BlockModel::frame () const
 { return frame_; }
 
 BlockModel::BlockModel (const Block& b, const FrameModel& f, const symbol id)
-  : Block (b, f, id),
+  : BlockNested (b, id),
     frame_ (f)
 { }
 

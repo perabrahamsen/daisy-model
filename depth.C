@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "depth.h"
-#include "block.h"
+#include "block_model.h"
 #include "time.h"
 #include "plf.h"
 #include "lexer_data.h"
@@ -50,7 +50,7 @@ Depth::library_id () const
   return id;
 }
 
-Depth::Depth (const Block& al)
+Depth::Depth (const BlockModel& al)
   : name (al.type_name ())
 { }
 
@@ -75,7 +75,7 @@ struct DepthConst : public Depth
   { }
   virtual bool check (const Units&, const Scope&, Treelog&) const
   { return true; }
-  DepthConst (const Block& al)
+  DepthConst (const BlockModel& al)
     : Depth (al),
       value (al.number ("value"))
   { }
@@ -93,7 +93,7 @@ Depth::create (const double height)
 
 static struct DepthConstSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new DepthConst (al); }
   DepthConstSyntax ()
     : DeclareModel (Depth::component, "const", "Constant depth.")
@@ -139,7 +139,7 @@ struct DepthExtern : public Depth
       ok = false;
     return ok;
   }
-  DepthExtern (const Block& al)
+  DepthExtern (const BlockModel& al)
     : Depth (al),
       expr (Librarian::build_item<Number> (al, "value")),
       value (al.number ("initial_value", -42.42e42))
@@ -150,7 +150,7 @@ struct DepthExtern : public Depth
 
 static struct DepthExternSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new DepthExtern (al); }
   DepthExternSyntax ()
     : DeclareModel (Depth::component, "extern", "\
@@ -199,7 +199,7 @@ struct DepthPLF : public Depth
       }
     return result;
   }
-  DepthPLF (const Block& al)
+  DepthPLF (const BlockModel& al)
     : Depth (al),
       start (al.submodel_sequence ("table")[0]->submodel ("time")),
       value (convert_to_plf (al.submodel_sequence ("table"))),
@@ -249,7 +249,7 @@ static struct DepthPLFSyntax : public DeclareModel
                 "Depth.");
     frame.order ("time", "value");
   }
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new DepthPLF (al); }
   DepthPLFSyntax ()
     : DeclareModel (Depth::component, "PLF", "Linear interpolation of depth.")
@@ -374,7 +374,7 @@ struct DepthFile : public Depth
   }
   virtual bool check (const Units&, const Scope&, Treelog&) const
   { return state == State::ok; }
-  DepthFile (const Block& al)
+  DepthFile (const BlockModel& al)
     : Depth (al),
       path (al.path ()),
       file (al.name ("file")),
@@ -388,7 +388,7 @@ struct DepthFile : public Depth
 
 static struct DepthFileSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new DepthFile (al); }
 
   DepthFileSyntax ()

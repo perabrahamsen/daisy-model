@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "action.h"
-#include "block.h"
+#include "block_model.h"
 #include "daisy.h"
 #include "frame.h"
 #include "field.h"
@@ -109,7 +109,7 @@ public:
     return ok;
   }
 
-  ActionWithColumn (const Block& al)
+  ActionWithColumn (const BlockModel& al)
     : Action (al),
       column (al.name ("column")),
       actions (Librarian::build_vector<Action> (al, "actions"))
@@ -121,7 +121,7 @@ public:
 
 static struct ActionWithColumnSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ActionWithColumn (al); }
 
   ActionWithColumnSyntax ()

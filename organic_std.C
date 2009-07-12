@@ -54,6 +54,7 @@
 #include "librarian.h"
 #include "library.h"
 #include "metalib.h"
+#include "block_model.h"
 #include <algorithm>
 #include <numeric>
 #include <fstream>
@@ -265,7 +266,7 @@ struct OrganicStandard : public OrganicMatter
   OrganicStandard ();
   OrganicStandard (const OrganicStandard&);
   OrganicStandard& operator= (const OrganicStandard&);
-  explicit OrganicStandard (const Block&);
+  explicit OrganicStandard (const BlockModel&);
   ~OrganicStandard ();
 };
 
@@ -2588,7 +2589,7 @@ An 'initial_SOM' layer in OrganicStandard ends below the last cell");
   tillage_C_soil.insert (tillage_C_soil.end (), cell_size, 0.0);
 }
 
-OrganicStandard::OrganicStandard (const Block& al)
+OrganicStandard::OrganicStandard (const BlockModel& al)
   : OrganicMatter (al),
     active_underground (al.flag ("active_underground")),
     K_NH4 (al.number ("K_NH4")),
@@ -2935,7 +2936,7 @@ static struct OrganicStandardSyntax : DeclareModel
   bool used_to_be_a_submodel () const
   { return true; }
 
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new OrganicStandard (al); }
 
   OrganicStandardSyntax () 

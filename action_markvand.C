@@ -20,7 +20,7 @@
 
 #define BUILD_DLL
 #include "action.h"
-#include "block.h"
+#include "block_model.h"
 #include "daisy.h"
 #include "field.h"
 #include "crop.h"
@@ -79,7 +79,7 @@ struct MV_Soil : public Model
   { return max_capacity - C_r (z_r); }
 
   // Create and Destroy.
-  MV_Soil (const Block& al)
+  MV_Soil (const BlockModel& al)
     : z_o (al.number ("z_o")),
       z_xJ (al.number ("z_xJ")),
       Theta_fo (al.number ("Theta_fo")),
@@ -121,7 +121,7 @@ MV_Soil::library_id () const
 
 static struct MV_SoilSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new MV_Soil (al); }
   MV_SoilSyntax ()
     : DeclareModel (MV_Soil::component, "default", 
@@ -246,7 +246,7 @@ struct MV_Crop : public Model
   }
 
   // Create and Destroy.
-  MV_Crop (const Block& al)
+  MV_Crop (const BlockModel& al)
     : S_F (accumulated (al.number_sequence ("S_F"))),
       A_F (al.number_sequence ("A_F")),
       L_gv (al.number ("L_gv")),
@@ -289,7 +289,7 @@ MV_Crop::library_id () const
 
 static struct MV_CropSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new MV_Crop (al); }
 
   static bool check_alist (const Metalib&, const Frame& al, Treelog& msg)
@@ -357,7 +357,7 @@ struct ActionMarkvand : public Action
   const struct crop_map_t : public std::map<symbol, const MV_Crop*>
   {
     static void load_syntax (Frame&);
-    crop_map_t (const Block&, const std::string& key);
+    crop_map_t (const BlockModel&, const std::string& key);
     ~crop_map_t ();
   } crop_map;
 
@@ -388,7 +388,7 @@ struct ActionMarkvand : public Action
   { return true; }
 
   // Create and destroy.
-  ActionMarkvand (const Block& al);
+  ActionMarkvand (const BlockModel& al);
   ~ActionMarkvand ();
 };
 
@@ -403,7 +403,7 @@ ActionMarkvand::crop_map_t::load_syntax (Frame& frame)
   frame.order ("Daisy", "MARKVAND");
 }
 
-ActionMarkvand::crop_map_t::crop_map_t (const Block& al, const std::string& key)
+ActionMarkvand::crop_map_t::crop_map_t (const BlockModel& al, const std::string& key)
 {
   const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& alists = al.submodel_sequence (key);
   for (size_t i = 0; i < alists.size (); i++)
@@ -653,7 +653,7 @@ ActionMarkvand::output (Log& log) const
     output_variable (V_b, log);
 }
 
-ActionMarkvand::ActionMarkvand (const Block& al)
+ActionMarkvand::ActionMarkvand (const BlockModel& al)
   : Action (al),
     soil (Librarian::build_item<MV_Soil> (al, "soil")),
     crop_map (al, "map"),
@@ -672,7 +672,7 @@ ActionMarkvand::~ActionMarkvand ()
 
 static struct ActionMarkvandSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ActionMarkvand (al); }
   static bool check_alist (const Metalib&, const Frame&, Treelog&)
   {

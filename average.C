@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "average.h"
-#include "block.h"
+#include "block_model.h"
 #include "mathlib.h"
 #include "librarian.h"
 
@@ -51,7 +51,7 @@ struct AverageArithmetic : public Average
   double operator()(double a, double b) const
   { return (a + b) / 2.0; }
   // Create and Destroy.
-  AverageArithmetic (const Block&)
+  AverageArithmetic (const BlockModel&)
   { }
   AverageArithmetic (const char *const)
   { }
@@ -61,7 +61,7 @@ struct AverageArithmetic : public Average
 
 static struct AverageArithmeticSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new AverageArithmetic (al); }
   AverageArithmeticSyntax ()
     : DeclareModel (Average::component, "arithmetic", "\
@@ -84,7 +84,7 @@ struct AverageHarmonic : public Average
   double operator()(double a, double b) const
   { return 2.0 * a * b / (a + b); }
   // Create and Destroy.
-  AverageHarmonic (const Block&)
+  AverageHarmonic (const BlockModel&)
   { }
   ~AverageHarmonic ()
   { }
@@ -92,7 +92,7 @@ struct AverageHarmonic : public Average
 
 static struct AverageHarmonicSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new AverageHarmonic (al); }
   AverageHarmonicSyntax ()
     : DeclareModel (Average::component, "harmonic", "\
@@ -110,7 +110,7 @@ struct AverageGeometric : public Average
   double operator()(double a, double b) const
   { return sqrt (a * b); }
   // Create and Destroy.
-  AverageGeometric (const Block&)
+  AverageGeometric (const BlockModel&)
   { }
   AverageGeometric (const char *const)
   { }
@@ -120,7 +120,7 @@ struct AverageGeometric : public Average
 
 static struct AverageGeometricSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new AverageGeometric (al); }
   AverageGeometricSyntax ()
     : DeclareModel (Average::component, "geometric", "\

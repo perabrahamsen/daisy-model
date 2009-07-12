@@ -22,7 +22,7 @@
 #include "uzrect.h"
 #include "geometry_rect.h"
 #include "soil_water.h"
-#include "block.h"
+#include "block_model.h"
 #include "frame.h"
 #include "mathlib.h"
 #include "assertion.h"
@@ -46,7 +46,7 @@ struct UZRectConst : public UZRect
  
   // Create and Destroy.
   void has_macropores (bool);
-  UZRectConst (const Block& al);
+  UZRectConst (const BlockModel& al);
   ~UZRectConst ();
 };
 
@@ -81,7 +81,7 @@ void
 UZRectConst::has_macropores (const bool)
 { /* Ignore for now. */ }
 
-UZRectConst::UZRectConst (const Block& al)
+UZRectConst::UZRectConst (const BlockModel& al)
   : UZRect (al),
     q_x (al.number ("q_x")),
     q_z (al.number ("q_z"))
@@ -92,7 +92,7 @@ UZRectConst::~UZRectConst ()
 
 static struct UZRectConstSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new UZRectConst (al); }
   UZRectConstSyntax ()
     : DeclareModel (UZRect::component, "const", "\

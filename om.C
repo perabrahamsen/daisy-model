@@ -33,7 +33,7 @@
 #include "mathlib.h"
 #include "assertion.h"
 #include "treelog.h"
-#include "block.h"
+#include "block_model.h"
 #include <sstream>
 #include <numeric>
 
@@ -453,7 +453,7 @@ OM::initialize (size_t size)
     N.insert (N.end (), extra_N, 0.0);
 }
 
-OM::OM (const Block& al)
+OM::OM (const BlockModel& al)
   : ModelFramed (al),
     initial_C_per_N (get_initial_C_per_N (al.frame ())),
     turnover_rate (al.check ("turnover_rate")

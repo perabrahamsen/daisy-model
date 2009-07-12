@@ -22,7 +22,7 @@
 
 #include "crop.h"
 #include "om.h"
-#include "block.h"
+#include "block_model.h"
 #include "mathlib.h"
 #include "librarian.h"
 
@@ -109,7 +109,7 @@ bool
 Crop::ds_remove (const Crop* crop)
 { return approximate (crop->DS (), Crop::DSremove); }
 
-Crop::Crop (const Block& al)
+Crop::Crop (const BlockModel& al)
   : ModelFramed (al)
 { }
 

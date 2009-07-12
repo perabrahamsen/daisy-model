@@ -26,6 +26,7 @@
 #include "librarian.h"
 #include "treelog.h"
 #include "frame.h"
+#include "block_model.h"
 #include <sstream>
 
 const VolumeBox::bounds_t 
@@ -271,7 +272,7 @@ VolumeBox::contain_point (double z, double x, double y) const
     && in_interval (y, *front, *back);
 }
 
-VolumeBox::VolumeBox (const Block& al)
+VolumeBox::VolumeBox (const BlockModel& al)
   : Volume (al),
     bottom (Librarian::build_item<Bound> (al, "bottom")),
     top (Librarian::build_item<Bound> (al, "top")),
@@ -317,7 +318,7 @@ Volume::build_none ()
 
 static struct Volume_BoxSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new VolumeBox (al); }
   Volume_BoxSyntax ()
     : DeclareModel (Volume::component, "box", "A volume defined by intervals on each axis.\n\

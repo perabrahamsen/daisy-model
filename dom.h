@@ -25,14 +25,14 @@
 #include "plf.h"
 #include <memory>
 
-struct Log;
-struct Frame;
-struct Geometry;
-struct Soil;
-struct SoilWater;
-struct DOE;
-struct SMB;
-struct OM;
+class Log;
+class Frame;
+class Geometry;
+class Soil;
+class SoilWater;
+class DOE;
+class SMB;
+class OM;
 class Treelog;
 class Block;
 

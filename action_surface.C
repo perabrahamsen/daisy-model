@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "action.h"
-#include "block.h"
+#include "block_model.h"
 #include "daisy.h"
 #include "field.h"
 #include "check.h"
@@ -49,7 +49,7 @@ struct ActionSetSurfaceDetentionCapacity : public Action
   bool check (const Daisy&, const Scope&, Treelog& err) const
   { return true; }
 
-  ActionSetSurfaceDetentionCapacity (const Block& al)
+  ActionSetSurfaceDetentionCapacity (const BlockModel& al)
     : Action (al),
       height (al.number ("height"))
   { }
@@ -57,7 +57,7 @@ struct ActionSetSurfaceDetentionCapacity : public Action
 
 static struct ActionSurfaceSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ActionSetSurfaceDetentionCapacity (al); }
   
   ActionSurfaceSyntax ()

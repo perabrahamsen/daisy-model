@@ -23,7 +23,7 @@
 
 #include "ABAeffect.h"
 #include "mathlib.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 
 const char *const ABAEffect::component = "ABAeffect";
@@ -35,7 +35,7 @@ ABAEffect::library_id () const
   return id;
 }
 
-ABAEffect::ABAEffect (const Block& al)
+ABAEffect::ABAEffect (const BlockModel& al)
   : ModelLogable (al.type_name ())
 { }
 

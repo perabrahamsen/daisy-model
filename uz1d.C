@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "uz1d.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 #include "assertion.h"
 #include "mathlib.h"
@@ -168,7 +168,7 @@ UZ1D::library_id () const
   return id;
 }
 
-UZ1D::UZ1D (const Block& al)
+UZ1D::UZ1D (const BlockModel& al)
   : name (al.type_name ())
 { }
 

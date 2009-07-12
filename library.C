@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "library.h"
-#include "block.h"
+#include "block_model.h"
 #include "treelog.h"
 #include "assertion.h"
 #include "memutils.h"

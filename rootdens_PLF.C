@@ -32,6 +32,7 @@
 #include "librarian.h"
 #include "frame_submodel.h"
 #include "treelog.h"
+#include "block_model.h"
 
 struct Rootdens_PLF : public Rootdens
 {
@@ -68,7 +69,7 @@ struct Rootdens_PLF : public Rootdens
   // Create.
   void initialize (const Geometry&, double /* row_width */, double, Treelog&)
   { }
-  Rootdens_PLF (const Block&);
+  Rootdens_PLF (const BlockModel&);
   ~Rootdens_PLF ();
 };
 
@@ -198,7 +199,7 @@ Rootdens_PLF::get_density (Treelog&, std::vector<double>& abs_dens,
   daisy_assert (approximate (LengthPrArea, geo.total_soil (abs_dens)));
 }
 
-Rootdens_PLF::Rootdens_PLF (const Block& al)
+Rootdens_PLF::Rootdens_PLF (const BlockModel& al)
   : Rootdens (al),
     entries (map_construct_const<Entry> (al.submodel_sequence ("entries")))
 { }
@@ -217,7 +218,7 @@ struct Rootdens_DS_Depth : public Rootdens_PLF
   { get_density (msg, abs_dens, geo, WRoot, DS, -1.0); }
   
   // Create.
-  Rootdens_DS_Depth (const Block& al)
+  Rootdens_DS_Depth (const BlockModel& al)
     : Rootdens_PLF (al)
   { }
   ~Rootdens_DS_Depth ()
@@ -226,7 +227,7 @@ struct Rootdens_DS_Depth : public Rootdens_PLF
 
 static struct Rootdens_DS_Depth_Syntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new Rootdens_DS_Depth (al); }
 
   Rootdens_DS_Depth_Syntax ()
@@ -265,7 +266,7 @@ struct Rootdens_DS_Rel : public Rootdens_PLF
   }
 
   // Create.
-  Rootdens_DS_Rel (const Block& al)
+  Rootdens_DS_Rel (const BlockModel& al)
     : Rootdens_PLF (al)
   { }
   ~Rootdens_DS_Rel ()
@@ -274,7 +275,7 @@ struct Rootdens_DS_Rel : public Rootdens_PLF
 
 static struct Rootdens_DS_Rel_Syntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new Rootdens_DS_Rel (al); }
 
   Rootdens_DS_Rel_Syntax ()
@@ -313,7 +314,7 @@ struct Rootdens_Depth_Depth : public Rootdens_PLF
   }
 
   // Create.
-  Rootdens_Depth_Depth (const Block& al)
+  Rootdens_Depth_Depth (const BlockModel& al)
     : Rootdens_PLF (al)
   { }
   ~Rootdens_Depth_Depth ()
@@ -322,7 +323,7 @@ struct Rootdens_Depth_Depth : public Rootdens_PLF
 
 static struct Rootdens_Depth_Depth_Syntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new Rootdens_Depth_Depth (al); }
 
   Rootdens_Depth_Depth_Syntax ()

@@ -20,7 +20,7 @@
 
 #define BUILD_DLL
 #include "scope_exchange.h"
-#include "block.h"
+#include "block_model.h"
 #include "assertion.h"
 #include "librarian.h"
 #include "frame.h"
@@ -105,7 +105,7 @@ void
 ExchangeNumber::set_number (const double val) 
 { value = val; has_value = true; }
 
-ExchangeNumber::ExchangeNumber (const Block& al)
+ExchangeNumber::ExchangeNumber (const BlockModel& al)
   : Exchange (al.name ("name"), al.frame ().description ()),
     dimension_ (al.name ("dimension")),
     has_value (al.check ("value")),
@@ -133,7 +133,7 @@ ExchangeNumber::~ExchangeNumber ()
 
 static struct ExchangeNumberSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ExchangeNumber (al); }
   ExchangeNumberSyntax ()
     : DeclareModel (Exchange::component, "number", "Exchange a numeric value.")
@@ -161,7 +161,7 @@ symbol
 ExchangeName::name () const
 { return value; }
 
-ExchangeName::ExchangeName (const Block& al)
+ExchangeName::ExchangeName (const BlockModel& al)
   : Exchange (al.name ("name"), al.frame ().description ()),
     value (al.name ("value"))
 { }
@@ -171,7 +171,7 @@ ExchangeName::~ExchangeName ()
 
 static struct ExchangeNameSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ExchangeName (al); }
   ExchangeNameSyntax ()
     : DeclareModel (Exchange::component, "name", "Exchange a string value.")
@@ -271,7 +271,7 @@ ScopeExchange::ScopeExchange (const symbol title)
   : MScope (title)
 { }
 
-ScopeExchange::ScopeExchange (const Block& al)
+ScopeExchange::ScopeExchange (const BlockModel& al)
   : MScope (al),
     all (Librarian::build_vector<Exchange> (al, "entries")),
     named (find_named (all))
@@ -282,7 +282,7 @@ ScopeExchange::~ScopeExchange ()
 
 static struct ScopeExchangeSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ScopeExchange (al); }
   ScopeExchangeSyntax ()
     : DeclareModel (MScope::component, "exchange", 

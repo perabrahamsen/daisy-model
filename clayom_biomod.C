@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "clayom.h"
-#include "block.h"
+#include "block_model.h"
 #include "check.h"
 #include "smb.h"
 #include "soil.h"
@@ -55,7 +55,7 @@ public:
   // Create and Destroy.
 public:
   bool check (const std::vector<SMB*>& smb, Treelog& err) const;
-  ClayOMBiomod (const Block& al);
+  ClayOMBiomod (const BlockModel& al);
   ~ClayOMBiomod ();
 };
 
@@ -227,7 +227,7 @@ and SMB[" << pool << "].efficiency[" << target << "] is "
   return true;
 }
 
-ClayOMBiomod::ClayOMBiomod (const Block& al)
+ClayOMBiomod::ClayOMBiomod (const BlockModel& al)
   : ClayOM (al),
     a (al.number ("a")),
 #ifdef OLD_VERSION
@@ -244,7 +244,7 @@ ClayOMBiomod::~ClayOMBiomod ()
 
 static struct ClayOMBiomodSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ClayOMBiomod (al); }
 
   ClayOMBiomodSyntax ()

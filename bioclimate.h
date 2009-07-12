@@ -39,6 +39,7 @@ class Log;
 class Time;
 class Treelog;
 class Block;
+class BlockModel;
 class Units;
 
 class Bioclimate : public ModelFramed
@@ -128,7 +129,7 @@ private:
 public:
   virtual void initialize (const Block&, const Weather&) = 0;
 protected:
-  explicit Bioclimate (const Block&);
+  explicit Bioclimate (const BlockModel&);
 public:
   virtual void summarize (Treelog& msg) const = 0;
   ~Bioclimate ();

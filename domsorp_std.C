@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "domsorp.h"
-#include "block.h"
+#include "block_model.h"
 #include "transform.h"
 #include "dom.h"
 #include "som.h"
@@ -121,7 +121,7 @@ struct DomsorpStandard : public Domsorp
     S_N.insert (S_N.begin (), soil.size (), 0.0);
     daisy_assert (S_N.size () == soil.size ());
   }
-  DomsorpStandard (const Block& al)
+  DomsorpStandard (const BlockModel& al)
     : Domsorp (al),
       dom_pool (al.integer ("dom_pool") - 1),
       som_pool (al.integer ("som_pool") - 1),
@@ -131,7 +131,7 @@ struct DomsorpStandard : public Domsorp
 
 static struct DomsorpStandardSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new DomsorpStandard (al); }
   DomsorpStandardSyntax ()
     : DeclareModel (Domsorp::component, "default", 

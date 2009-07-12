@@ -41,7 +41,7 @@ protected:
 
   // Create.
 protected:
-  explicit UIQt (const Block&);
+  explicit UIQt (const BlockModel&);
   ~UIQt ();
 };
 

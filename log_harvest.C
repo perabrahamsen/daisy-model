@@ -195,7 +195,7 @@ struct LogHarvest : public Log
     return ok; 
   }
 
-  LogHarvest (const Block& al)
+  LogHarvest (const BlockModel& al)
     : Log (al),
       last_size (0),
       file (al.name ("where")),
@@ -215,7 +215,7 @@ struct LogHarvest : public Log
 
 static struct LogHarvestSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new LogHarvest (al); }
 
   LogHarvestSyntax ()

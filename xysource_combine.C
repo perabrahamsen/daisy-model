@@ -20,7 +20,7 @@
 
 #define BUILD_DLL
 #include "xysource.h"
-#include "block.h"
+#include "block_model.h"
 #include "gnuplot_utils.h"
 #include "number.h"
 #include "scope_sources.h"
@@ -66,7 +66,7 @@ public:
 
   // Create and Destroy.
 public:
-  explicit XYSourceCombine (const Block& al);
+  explicit XYSourceCombine (const BlockModel& al);
   ~XYSourceCombine ()
   { }
 };
@@ -115,7 +115,7 @@ XYSourceCombine::load (const Units& units, Treelog& msg)
   return true;
 }
 
-XYSourceCombine::XYSourceCombine (const Block& al)
+XYSourceCombine::XYSourceCombine (const BlockModel& al)
   : XYSource (al),
     scope (Librarian::build_vector<Source> (al, "source")),
     x_expr (Librarian::build_item<Number> (al, "x")),
@@ -129,7 +129,7 @@ XYSourceCombine::XYSourceCombine (const Block& al)
 
 static struct XYSourceCombineSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new XYSourceCombine (al); }
 
   XYSourceCombineSyntax ()

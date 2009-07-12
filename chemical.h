@@ -38,7 +38,7 @@ class Volume;
 class VCheck;
 class Treelog;
 class Log;
-class Block;
+class BlockModel;
 class Scope;
 class Units;
 
@@ -160,7 +160,7 @@ public:
 private:
   Chemical ();
 protected:
-  explicit Chemical (const Block&);
+  explicit Chemical (const BlockModel&);
 public:
   ~Chemical ();
 };

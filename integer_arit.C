@@ -27,6 +27,7 @@
 #include "librarian.h"
 #include "treelog.h"
 #include "frame.h"
+#include "block_model.h"
 #include <sstream>
 #include <memory>
 
@@ -50,7 +51,7 @@ struct IntegerOperand : public Integer
     Treelog::Open nest (err, name);
     return operand->check (scope, err); 
   }
-  IntegerOperand (const Block& al)
+  IntegerOperand (const BlockModel& al)
     : Integer (al),
       operand (Librarian::build_item<Integer> (al, "operand"))
   { }
@@ -66,14 +67,14 @@ struct IntegerSqr : public IntegerOperand
   }
 
   // Create.
-  IntegerSqr (const Block& al)
+  IntegerSqr (const BlockModel& al)
     : IntegerOperand (al)
   { }
 };
 
 static struct IntegerSqrSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new IntegerSqr (al); }
   IntegerSqrSyntax ()
     : DeclareModel (Integer::component, "sqr", 
@@ -132,7 +133,7 @@ struct IntegerOperands : public Integer
       }
     return ok;
   }
-  IntegerOperands (const Block& al)
+  IntegerOperands (const BlockModel& al)
     : Integer (al),
       operands (Librarian::build_vector<Integer> (al, "operands"))
   { }
@@ -156,14 +157,14 @@ struct IntegerMax : public IntegerOperands
     return max;
   }
   // Create.
-  IntegerMax (const Block& al)
+  IntegerMax (const BlockModel& al)
     : IntegerOperands (al)
   { }
 };
 
 static struct IntegerMaxSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new IntegerMax (al); }
   IntegerMaxSyntax ()
     : DeclareModel (Integer::component, "max", 
@@ -197,14 +198,14 @@ struct IntegerMin : public IntegerOperands
   }
 
   // Create.
-  IntegerMin (const Block& al)
+  IntegerMin (const BlockModel& al)
     : IntegerOperands (al)
   { }
 };
 
 static struct IntegerMinSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new IntegerMin (al); }
   IntegerMinSyntax ()
     : DeclareModel (Integer::component, "min", 
@@ -233,14 +234,14 @@ struct IntegerProduct : public IntegerOperands
   }
 
   // Create.
-  IntegerProduct (const Block& al)
+  IntegerProduct (const BlockModel& al)
     : IntegerOperands (al)
   { }
 };
 
 static struct IntegerProductSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new IntegerProduct (al); }
   IntegerProductSyntax ()
     : DeclareModel (Integer::component, "*", 
@@ -268,14 +269,14 @@ struct IntegerSum : public IntegerOperands
   }
 
   // Create.
-  IntegerSum (const Block& al)
+  IntegerSum (const BlockModel& al)
     : IntegerOperands (al)
   { }
 };
 
 static struct IntegerSumSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new IntegerSum (al); }
   IntegerSumSyntax ()
     : DeclareModel (Integer::component, "+", 
@@ -309,14 +310,14 @@ struct IntegerSubtract : public IntegerOperands
   }
 
   // Create.
-  IntegerSubtract (const Block& al)
+  IntegerSubtract (const BlockModel& al)
     : IntegerOperands (al)
   { }
 };
 
 static struct IntegerSubtractSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new IntegerSubtract (al); }
   IntegerSubtractSyntax ()
     : DeclareModel (Integer::component, "-", 
@@ -367,7 +368,7 @@ struct IntegerDivide : public IntegerOperands
       }
     return ok;
   }
-  IntegerDivide (const Block& al)
+  IntegerDivide (const BlockModel& al)
     : IntegerOperands (al)
   { }
 };
@@ -386,14 +387,14 @@ struct IntegerModulo : public IntegerDivide
   }
 
   // Create.
-  IntegerModulo (const Block& al)
+  IntegerModulo (const BlockModel& al)
     : IntegerDivide (al)
   { }
 };
 
 static struct IntegerModuloSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new IntegerModulo (al); }
   IntegerModuloSyntax ()
     : DeclareModel (Integer::component, "mod", 
@@ -411,7 +412,7 @@ static struct IntegerModuloSyntax : public DeclareModel
 
 static struct IntegerDivideSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new IntegerDivide (al); }
   IntegerDivideSyntax ()
     : DeclareModel (Integer::component, "div", 

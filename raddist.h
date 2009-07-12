@@ -27,7 +27,7 @@
 
 class Vegetation;
 class Treelog;
-class Block;
+class BlockModel;
 
 class Raddist : public ModelDerived
 {
@@ -71,7 +71,7 @@ private:
 
   // Create and Destroy.
 protected:
-  Raddist (const Block&);
+  Raddist (const BlockModel&);
 
 public:
   ~Raddist ();

@@ -27,7 +27,7 @@
 #include "treelog.h"
 #include "time.h"
 #include "timestep.h"
-#include "block.h"
+#include "block_model.h"
 #include "frame.h"
 #include "assertion.h"
 #include "librarian.h"
@@ -187,7 +187,7 @@ Output::find_time_columns (const std::vector<symbol>& names)
   return result;
 }
 
-Output::Output (const Block& al)
+Output::Output (const BlockModel& al)
   : logging (false),
     exchanges (Librarian::build_vector<MScope> (al, "exchange")),
     logs (Librarian::build_vector<Log> (al, "output")),

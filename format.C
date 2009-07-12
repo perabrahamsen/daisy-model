@@ -22,7 +22,7 @@
 
 #include "format.h"
 #include "assertion.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 #include "frame.h"
 
@@ -217,7 +217,7 @@ Format::initialize (std::ostream& o)
   output = &o;
 }
 
-Format::Format (const Block& al)
+Format::Format (const BlockModel& al)
   : output (NULL)
 { }
 

@@ -23,7 +23,7 @@
 #include "integer.h"
 #include "boolean.h"
 #include "submodeler.h"
-#include "block.h"
+#include "block_model.h"
 #include "memutils.h"
 #include "librarian.h"
 #include "treelog.h"
@@ -43,7 +43,7 @@ const std::string&
 Integer::title () const
 { return name.name (); }
 
-Integer::Integer (const Block& al)
+Integer::Integer (const BlockModel& al)
   : name (al.type_name ())
 { }
 
@@ -66,7 +66,7 @@ struct IntegerConst : public Integer
   { return true; }
   bool check (const Scope&, Treelog&) const
   { return true; }
-  IntegerConst (const Block& al)
+  IntegerConst (const BlockModel& al)
     : Integer (al),
       val (al.integer ("value"))
   { }
@@ -74,7 +74,7 @@ struct IntegerConst : public Integer
 
 static struct IntegerConstSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new IntegerConst (al); }
   IntegerConstSyntax ()
     : DeclareModel (Integer::component, "const", 
@@ -144,7 +144,7 @@ Value to return.");
     msg.error ("No clause matches");
     return false; 
   }
-  IntegerCond (const Block& al)
+  IntegerCond (const BlockModel& al)
     : Integer (al),
       clauses (map_submodel_const<Clause> (al, "clauses"))
   { }
@@ -159,7 +159,7 @@ If condition is true, return value.");
 
 static struct IntegerCondSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new IntegerCond (al); }
   IntegerCondSyntax ()
     : DeclareModel (Integer::component, "cond", "\

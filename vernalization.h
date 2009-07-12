@@ -27,7 +27,7 @@
 class Frame;
 class Log;
 class PLF;
-class Block;
+class BlockModel;
 
 class Vernalization : public ModelDerived
 {
@@ -41,7 +41,7 @@ public:
 
   // Create and Destroy.
 public:
-  Vernalization (const Block&);
+  Vernalization (const BlockModel&);
   ~Vernalization ();
 };
 

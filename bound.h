@@ -25,7 +25,7 @@
 #include "model.h"
 #include "symbol.h"
 
-class Block;
+class BlockModel;
 
 class Bound : public Model
 {
@@ -51,7 +51,7 @@ public:
 
   // Create and Destroy.
 public:
-  Bound (const Block& al, type_t type_, double val);
+  Bound (const BlockModel& al, type_t type_, double val);
   Bound (const char* is, type_t type_, double val);
   ~Bound ();
 };

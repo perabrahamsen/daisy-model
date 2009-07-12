@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "raddist.h"
-#include "block.h"
+#include "block_model.h"
 #include "vegetation.h"
 #include "weather.h"
 #include "mathlib.h"
@@ -72,7 +72,7 @@ public:
   void output(Log& log) const;
 
   // Create.
-  RaddistDPF (const Block& al)
+  RaddistDPF (const BlockModel& al)
     : Raddist (al),
       sigma_PAR (al.number ("sigma_PAR")),
       sigma_NIR (al.number ("sigma_NIR")),
@@ -349,7 +349,7 @@ RaddistDPF::output(Log& log) const
 
 static struct RaddistDPFSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new RaddistDPF (al); }
   RaddistDPFSyntax ()
     : DeclareModel (Raddist::component, "sun-shade", 

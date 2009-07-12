@@ -35,7 +35,7 @@ class SoilHeat;
 class Library;
 class Log;
 class Treelog;
-class Block;
+class BlockModel;
 
 class UZmodel : public Model
 {
@@ -67,7 +67,7 @@ public:
 public:
   virtual void has_macropores (bool) = 0; // Tell UZ about macropores.
 protected:
-  UZmodel (const Block&);
+  UZmodel (const BlockModel&);
 public:
   ~UZmodel ();
 };

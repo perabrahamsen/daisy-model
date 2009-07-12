@@ -39,7 +39,7 @@ struct HeatrectNone : public Heatrect
               const double dt, Treelog&) const
   { }
   // Create.
-  HeatrectNone (const Block& al)
+  HeatrectNone (const BlockModel& al)
     : Heatrect (al)
   { }
   ~HeatrectNone ()
@@ -48,7 +48,7 @@ struct HeatrectNone : public Heatrect
 
 static struct HeatrectNoneSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new HeatrectNone (al); }
 
   HeatrectNoneSyntax ()

@@ -23,7 +23,7 @@
 
 #include "model_derived.h"
 
-class Block;
+class BlockModel;
 class Treelog;
 
 class Seed : public ModelDerived
@@ -44,7 +44,7 @@ public:
   virtual double initial_N () const = 0;
   virtual void initialize (double weight, Treelog& msg) = 0;
   virtual bool check (Treelog& msg) const = 0;
-  Seed (const Block&);
+  Seed (const BlockModel&);
   ~Seed ();
 };
 

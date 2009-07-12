@@ -28,7 +28,7 @@
 class Log;
 class Daisy;
 class Treelog;
-class Block;
+class BlockModel;
 class Scope;
 
 class Action : public ModelFramed
@@ -50,7 +50,7 @@ public:
   virtual void initialize (const Daisy&, const Scope&, Treelog&) = 0;
   virtual bool check (const Daisy&, const Scope&, Treelog&) const = 0;
 protected:
-  explicit Action (const Block& al);
+  explicit Action (const BlockModel& al);
 public:
   ~Action ();
 };

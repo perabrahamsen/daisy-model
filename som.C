@@ -22,7 +22,7 @@
 
 #include "som.h"
 #include "librarian.h"
-#include "block.h"
+#include "block_model.h"
 #include "frame.h"
 
 const char *const SOM::component = "SOM";
@@ -34,13 +34,13 @@ SOM::library_id () const
   return id;
 }
 
-SOM::SOM (const Block& al)
+SOM::SOM (const BlockModel& al)
   : OM (al)
 { }
 
 static struct SOMInit : public DeclareSolo
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new SOM (al); }
   void load_frame (Frame& frame) const
   {

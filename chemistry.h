@@ -37,7 +37,7 @@ class Movement;
 class Chemical;
 class Volume;
 class Treelog;
-class Block;
+class BlockModel;
 class Scope;
 class IM;
 class Units;
@@ -120,7 +120,7 @@ public:
 		      const Soil&, const SoilWater&, const SoilHeat&,
 		      const Chemistry&, Treelog&) const = 0;
 protected:
-  explicit Chemistry (const Block& al);
+  explicit Chemistry (const BlockModel& al);
 public:
   ~Chemistry ();
 };

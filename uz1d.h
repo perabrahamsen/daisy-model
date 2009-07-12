@@ -28,6 +28,8 @@
 #include "soil_heat.h"
 #include <vector>
 
+class BlockModel;
+
 class SMM1D
 {
   // Content.
@@ -118,7 +120,7 @@ public:
 private:
   UZ1D ();
 protected:
-  explicit UZ1D (const Block&);
+  explicit UZ1D (const BlockModel&);
 public:
   ~UZ1D ();
 };

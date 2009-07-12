@@ -24,7 +24,7 @@
 #include "im.h"
 #include "chemical.h"
 #include "treelog.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 #include "vcheck.h"
 #include "units.h"
@@ -104,7 +104,7 @@ void
 Chemistry::output (Log&) const
 { }
 
-Chemistry::Chemistry (const Block& al)
+Chemistry::Chemistry (const BlockModel& al)
   : ModelFramed (al),
     units (al.units ())
 { }

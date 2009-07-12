@@ -58,7 +58,7 @@ struct SVAT_none : public SVAT
   { return T_a; }  // [dg C]
 
   // Create.
-  SVAT_none (const Block& al)
+  SVAT_none (const BlockModel& al)
     : SVAT (al)
   { }
   void summarize (Treelog&) const
@@ -67,7 +67,7 @@ struct SVAT_none : public SVAT
 
 static struct SVAT_NoneSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new SVAT_none (al); }
   SVAT_NoneSyntax ()
     : DeclareModel (SVAT::component, "none", "No SVAT in effect.")

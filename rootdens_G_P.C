@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "rootdens.h"
-#include "block.h"
+#include "block_model.h"
 #include "geometry.h"
 #include "log.h"
 #include "check.h"
@@ -54,7 +54,7 @@ struct Rootdens_G_P : public Rootdens
   // Create.
   void initialize (const Geometry&, double /* row_width */, double, Treelog&)
   { }
-  Rootdens_G_P (const Block&);
+  Rootdens_G_P (const BlockModel&);
 };
 
 double
@@ -219,7 +219,7 @@ Rootdens_G_P::output (Log& log) const
   output_variable (L0, log); 
 }
 
-Rootdens_G_P::Rootdens_G_P (const Block& al)
+Rootdens_G_P::Rootdens_G_P (const BlockModel& al)
   : Rootdens (al),
     DensRtTip (al.number ("DensRtTip")),
     MinDens (al.number ("MinDens")),
@@ -235,7 +235,7 @@ Rootdens::create_uniform (const Metalib& metalib, Treelog& msg)
 
 static struct Rootdens_G_PSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new Rootdens_G_P (al); }
   Rootdens_G_PSyntax ()
     : DeclareModel (Rootdens::component, "Gerwitz+Page74", 

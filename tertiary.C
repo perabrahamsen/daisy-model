@@ -24,7 +24,7 @@
 #include "tertsmall.h"
 #include "geometry.h"
 #include "soil_water.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 #include "frame.h"
 
@@ -39,7 +39,7 @@ Tertiary::library_id () const
   return id;
 }
 
-Tertiary::Tertiary (const Block& al)
+Tertiary::Tertiary (const BlockModel& al)
   : ModelFramed (al)
 { }
 
@@ -85,14 +85,14 @@ class TertiaryNone : public Tertiary
   bool check (const Geometry&, Treelog&) const
   { return true; }
 public:
-  TertiaryNone (const Block& al)
+  TertiaryNone (const BlockModel& al)
     : Tertiary (al)
   { }
 };
 
 static struct TertiaryNoneSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new TertiaryNone (al); }
   TertiaryNoneSyntax ()
     : DeclareModel (Tertiary::component, "none", "No tertiary transport.")

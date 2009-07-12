@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "adsorption.h"
-#include "block.h"
+#include "block_model.h"
 #include "soil.h"
 #include "check.h"
 #include "mathlib.h"
@@ -46,7 +46,7 @@ public:
 
   // Create.
 public:
-  AdsorptionFreundlich (const Block& al)
+  AdsorptionFreundlich (const BlockModel& al)
     : Adsorption (al),
       K_clay (al.number ("K_clay", 0.0)),
       K_OC (al.number ("K_OC", K_clay)),
@@ -112,7 +112,7 @@ AdsorptionFreundlich::M_to_C (const Soil& soil,
 
 static struct AdsorptionFreundlichSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new AdsorptionFreundlich (al); }
   static bool check_alist (const Metalib&, const Frame& al, Treelog& err)
   {

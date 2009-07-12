@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "tortuosity.h"
-#include "block.h"
+#include "block_model.h"
 #include "hydraulic.h"
 #include "librarian.h"
 #include "frame.h"
@@ -47,7 +47,7 @@ public:
 
   // Create.
 public:
-  TortuosityLinear (const Block& al)
+  TortuosityLinear (const BlockModel& al)
     : Tortuosity (al),
       a_maybe (al.number ("a", -42.0)),
       b (al.number ("b"))
@@ -56,7 +56,7 @@ public:
 
 static struct TortuosityLinearSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   {
     return new TortuosityLinear (al);
   }

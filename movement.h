@@ -38,7 +38,7 @@ class Groundwater;
 class Weather;
 class Time;
 class Treelog;
-class Block;
+class BlockModel;
 class Log;
 class Scope;
 class Tertiary;
@@ -123,9 +123,9 @@ public:
   bool initialize (const Units&,
                    const Soil&, const Groundwater&, const Scope& scope,
                    Treelog& msg);
-  static Movement* build_vertical (const Block& al);
+  static Movement* build_vertical (const BlockModel& al);
 protected:
-  Movement (const Block&);
+  Movement (const BlockModel&);
 public:
   ~Movement ();
 };

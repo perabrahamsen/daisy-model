@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "bioclimate.h"
-#include "block.h"
+#include "block_model.h"
 #include "surface.h"
 #include "weather.h"
 #include "plf.h"
@@ -305,7 +305,7 @@ struct BioclimateStandard : public Bioclimate
 
   // Create.
   void initialize (const Block&, const Weather&);
-  BioclimateStandard (const Block&);
+  BioclimateStandard (const BlockModel&);
   void summarize (Treelog& msg) const;
   ~BioclimateStandard ();
 };
@@ -355,7 +355,7 @@ BioclimateStandard::initialize (const Block& block, const Weather& weather)
     }
 }
 
-BioclimateStandard::BioclimateStandard (const Block& al)
+BioclimateStandard::BioclimateStandard (const BlockModel& al)
   : Bioclimate (al),
     No (al.integer ("NoOfIntervals")),
     LAI_ (0.0),
@@ -1108,7 +1108,7 @@ BioclimateStandard::set_subsoil_irrigation (double flux)
 
 static struct BioclimateStandardSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new BioclimateStandard (al); }
   
   BioclimateStandardSyntax ()

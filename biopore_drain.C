@@ -20,7 +20,7 @@
 #define BUILD_DLL
 
 #include "biopore.h"
-#include "block.h"
+#include "block_model.h"
 #include "vcheck.h"
 #include "librarian.h"
 #include "submodeler.h"
@@ -112,7 +112,7 @@ struct BioporeDrain : public Biopore
   }
   bool check (const Geometry& geo, Treelog& msg) const
   { return check_base (geo, msg); }
-  BioporeDrain (const Block& al);
+  BioporeDrain (const BlockModel& al);
 };
 
 double 
@@ -189,14 +189,14 @@ BioporeDrain::update_matrix_sink (const Geometry& geo,
     }
 }
 
-BioporeDrain::BioporeDrain (const Block& al)
+BioporeDrain::BioporeDrain (const BlockModel& al)
   : Biopore (al),
     pipe_position (al.number ("pipe_position", 42.42e42))
 { }
 
 static struct BioporeDrainSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new BioporeDrain (al); }
 
   BioporeDrainSyntax ()

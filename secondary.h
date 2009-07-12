@@ -26,7 +26,7 @@
 #include "symbol.h"
 #include <memory>
 
-class Block;
+class BlockModel;
 
 class Secondary : public Model
 {
@@ -44,7 +44,7 @@ public:
 
   // Create and Destroy.
 protected:
-  explicit Secondary (const Block& al);
+  explicit Secondary (const BlockModel& al);
   explicit Secondary (const symbol name);
 public:
   static std::auto_ptr<Secondary> create_none ();

@@ -24,7 +24,7 @@
 #include "check.h"
 #include "librarian.h"
 #include "frame.h"
-#include "block.h"
+#include "block_model.h"
 #include "mathlib.h"
 #include "convert.h"
 #include "units.h"
@@ -46,7 +46,7 @@ const Convert*
 MUnit::create_convertion (const Unit&) const
 { return NULL; }
 
-MUnit::MUnit (const Block& al, const symbol base)
+MUnit::MUnit (const BlockModel& al, const symbol base)
   : name (al.type_name ()),
     base_name_ (base)
 { }
@@ -82,8 +82,8 @@ struct UnitSI : public MUnit
   static const size_t base_unit_size;
 
   // Create and destroy.
-  static symbol find_base (const Block&);
-  UnitSI (const Block& al)
+  static symbol find_base (const BlockModel&);
+  UnitSI (const BlockModel& al)
     : MUnit (al, find_base (al))
   { }
   ~UnitSI ()
@@ -107,7 +107,7 @@ UnitSI::base_unit_size
   
 
 symbol
-UnitSI::find_base (const Block& al)
+UnitSI::find_base (const BlockModel& al)
 {
   std::ostringstream tmp;
   bool found = false;
@@ -184,7 +184,7 @@ struct UnitSIFactor : public UnitSI
     return new ConvertFactor (this->factor / to_si_factor->factor);
   }
 
-  UnitSIFactor (const Block& al)
+  UnitSIFactor (const BlockModel& al)
     : UnitSI (al),
       factor (al.number ("factor"))
   { }
@@ -236,7 +236,7 @@ static struct UnitSIFactorSyntax : public DeclareModel
 {
   auto_vector<const DeclareSIFactor*> declarations;
 
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new UnitSIFactor (al); }
 
   void add (const symbol name, const double factor,
@@ -633,14 +633,14 @@ struct UnitpF : public MUnit
   bool in_base (double value) const
   { return value < 0.0; }
 
-  UnitpF (const Block& al)
+  UnitpF (const BlockModel& al)
     : MUnit (al, Unit::pressure ())
   { }
 };
 
 static struct UnitpFSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new UnitpF (al); }
 
   UnitpFSyntax ()
@@ -665,7 +665,7 @@ struct UnitBase : public MUnit
   bool in_base (double value) const
   { return true; }
 
-  UnitBase (const Block& al)
+  UnitBase (const BlockModel& al)
     : MUnit (al, al.type_name ())
   { }
 };
@@ -673,7 +673,7 @@ struct UnitBase : public MUnit
 
 static struct UnitBaseSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new UnitBase (al); }
   
   UnitBaseSyntax ()
@@ -719,7 +719,7 @@ struct UnitFactor : public MUnit
   bool in_base (double value) const
   { return true; }
 
-  UnitFactor (const Block& al)
+  UnitFactor (const BlockModel& al)
     : MUnit (al, al.name ("base")),
       factor (al.number ("factor"))
   { }
@@ -727,7 +727,7 @@ struct UnitFactor : public MUnit
 
 static struct UnitFactorSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new UnitFactor (al); }
   UnitFactorSyntax ()
     : DeclareModel (MUnit::component, "factor", "\
@@ -789,7 +789,7 @@ struct UnitOffset : public MUnit
   bool in_base (double value) const
   { return true; }
 
-  UnitOffset (const Block& al)
+  UnitOffset (const BlockModel& al)
     : MUnit (al, al.name ("base")),
       factor (al.number ("factor")),
       offset (al.number ("offset"))
@@ -798,7 +798,7 @@ struct UnitOffset : public MUnit
 
 static struct UnitOffsetSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new UnitOffset (al); }
 
   UnitOffsetSyntax ()

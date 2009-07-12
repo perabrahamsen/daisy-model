@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "clayom.h"
-#include "block.h"
+#include "block_model.h"
 #include "plf.h"
 #include "smb.h"
 #include "soil.h"
@@ -43,7 +43,7 @@ public:
 
   // Create and Destroy.
   bool check (const std::vector<SMB*>& smb, Treelog& err) const;
-  ClayOMOld (const Block& al);
+  ClayOMOld (const BlockModel& al);
   ~ClayOMOld ();
 };
 
@@ -81,7 +81,7 @@ bool
 ClayOMOld::check (const std::vector<SMB*>&, Treelog&) const
 { return true; }
 
-ClayOMOld::ClayOMOld (const Block& al)
+ClayOMOld::ClayOMOld (const BlockModel& al)
   : ClayOM (al),
     factor_ (al.plf ("factor"))
 { }
@@ -91,7 +91,7 @@ ClayOMOld::~ClayOMOld ()
 
 static struct ClayOMOldSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ClayOMOld (al); }
 
   ClayOMOldSyntax ()

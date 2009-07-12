@@ -39,7 +39,7 @@ class Groundwater;
 class Weather;
 class Time;
 class Treelog;
-class Block;
+class BlockModel;
 class Scope;
 
 class Transport : public Model
@@ -72,7 +72,7 @@ public:
 public:
   virtual bool check (const Geometry&, Treelog&) const;
 protected:
-  Transport (const Block&);
+  Transport (const BlockModel&);
 public:
   ~Transport ();
 };

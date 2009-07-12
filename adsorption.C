@@ -23,7 +23,7 @@
 #define BUILD_DLL
 
 #include "adsorption.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 #include "mathlib.h"
 
@@ -50,7 +50,7 @@ Adsorption::Adsorption (const char *const type)
   : ModelDerived (symbol (type))
 { }
 
-Adsorption::Adsorption (const Block& al)
+Adsorption::Adsorption (const BlockModel& al)
   : ModelDerived (al.type_name ())
 { }
 
@@ -69,7 +69,7 @@ transported with the water.")
 
 // "linear" special.
 
-AdsorptionLinear::AdsorptionLinear (const Block& al)
+AdsorptionLinear::AdsorptionLinear (const BlockModel& al)
   : Adsorption (al)
 { }
 
@@ -89,7 +89,7 @@ public:
   AdsorptionNone ()
     : Adsorption ("none")
   { }
-  AdsorptionNone (const Block& al)
+  AdsorptionNone (const BlockModel& al)
     : Adsorption (al)
   { }
 };
@@ -103,7 +103,7 @@ Adsorption::none ()
 
 static struct AdsorptionNoneSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new AdsorptionNone (al); }
   AdsorptionNoneSyntax ()
     : DeclareModel (Adsorption::component, "none", "No adsorption.\n\
@@ -135,14 +135,14 @@ public:
 
   // Create.
 public:
-  AdsorptionFull (const Block& al)
+  AdsorptionFull (const BlockModel& al)
     : Adsorption (al)
   { }
 };
 
 static struct AdsorptionFullSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new AdsorptionFull (al); }
   AdsorptionFullSyntax ()
     : DeclareModel (Adsorption::component, "full", "Full adsorption.\n\

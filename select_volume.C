@@ -24,7 +24,7 @@
 
 #include "select_value.h"
 #include "bdconv.h"
-#include "block.h"
+#include "block_model.h"
 #include "volume.h"
 #include "geometry.h"
 #include "soil.h"
@@ -68,7 +68,7 @@ struct SelectVolume : public SelectValue
   bool check_border (const Border& border, 
                      const Volume& default_volume,
                      Treelog& msg) const;
-  SelectVolume (const Block& al);
+  SelectVolume (const BlockModel& al);
   ~SelectVolume ();
 };
 
@@ -219,7 +219,7 @@ SelectVolume::check_border (const Border& border,
                             Treelog& msg) const
 { return volume->check_border (border, default_volume, msg); }
   
-SelectVolume::SelectVolume (const Block& al)
+SelectVolume::SelectVolume (const BlockModel& al)
   : SelectValue (al),
     density_z (al.flag ("density") || al.flag ("density_z")),
     density_x (al.flag ("density") || al.flag ("density_x")),
@@ -237,7 +237,7 @@ SelectVolume::~SelectVolume ()
 
 static struct SelectVolumeBase : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new SelectVolume (al); }
   SelectVolumeBase ()
     : DeclareModel (Select::component, "volume_base", "value", "\
@@ -345,7 +345,7 @@ struct SelectWater : public SelectVolume
     SelectVolume::output_array (water, geo, soil, veg, msg);
   }
 
-  SelectWater (const Block& al)
+  SelectWater (const BlockModel& al)
     : SelectVolume (al),
       h (al.number ("h")),
       h_ice (al.number ("h_ice"))
@@ -354,7 +354,7 @@ struct SelectWater : public SelectVolume
 
 static struct SelectWaterSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new SelectWater (al); }
 
   SelectWaterSyntax ()

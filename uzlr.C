@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "uzmodel.h"
-#include "block.h"
+#include "block_model.h"
 #include "frame.h"
 #include "surface.h"
 #include "groundwater.h"
@@ -61,7 +61,7 @@ struct UZlr : public UZmodel
   // Create and Destroy.
   void has_macropores (bool)
   { }
-  UZlr (const Block& par);
+  UZlr (const BlockModel& par);
   ~UZlr ();
 };
 
@@ -337,7 +337,7 @@ UZlr::tick (Treelog& msg, const GeometryVert& geo,
   daisy_balance (total_old, total_new, (-q_up + q_down - total_S) * dt);
 }
 
-UZlr::UZlr (const Block& al)
+UZlr::UZlr (const BlockModel& al)
   : UZmodel (al),
     overflow_warn (al.flag ("overflow_warn")),
     h_fc (al.number ("h_fc")),
@@ -349,7 +349,7 @@ UZlr::~UZlr ()
 
 static struct UZlrSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new UZlr (al); }
 
   UZlrSyntax ()

@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "boolean.h"
-#include "block.h"
+#include "block_model.h"
 #include "frame.h"
 #include "librarian.h"
 #include <vector>
@@ -52,7 +52,7 @@ struct BooleanStringEqual : public Boolean
   { return true; }
   bool check (const Units&, const Scope&, Treelog&) const
   { return true; }
-  BooleanStringEqual (const Block& al)
+  BooleanStringEqual (const BlockModel& al)
     : Boolean (al),
       values (al.name_sequence ("values"))
   { }
@@ -60,7 +60,7 @@ struct BooleanStringEqual : public Boolean
 
 static struct BooleanStringEqualSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new BooleanStringEqual (al); }
   BooleanStringEqualSyntax ()
     : DeclareModel (Boolean::component, "string-equal", 

@@ -35,7 +35,7 @@ class Vegetation;
 class Surface;
 class Time;
 class Treelog;
-class Block;
+class BlockModel;
 
 class Pet : public ModelFramed
 {
@@ -61,7 +61,7 @@ public:
 
   // Create and Destroy.
 protected:
-  Pet (const Block&);
+  Pet (const BlockModel&);
 public:
   ~Pet ();
 };

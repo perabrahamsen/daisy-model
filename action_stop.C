@@ -37,14 +37,14 @@ struct ActionStop : public Action
   bool check (const Daisy&, const Scope&, Treelog& err) const
   { return true; }
 
-  ActionStop (const Block& al)
+  ActionStop (const BlockModel& al)
     : Action (al)
     { }
 };
 
 static struct ActionStopSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ActionStop (al); }
   ActionStopSyntax ()
     : DeclareModel  (Action::component, "stop", "Stop the simulation.")

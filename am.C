@@ -41,6 +41,7 @@
 #include "unit.h"
 #include "treelog.h"
 #include "filepos.h"
+#include "block_model.h"
 #include <numeric>
 #include <sstream>
 
@@ -944,7 +945,7 @@ AM::is_organic (const Metalib& metalib, const FrameModel& am)
   return library.is_derived_from (am.type_name (), "organic");
 }
 
-AM::AM (const Block& al)
+AM::AM (const BlockModel& al)
   : ModelFramed (al),
     impl (new Implementation 
 	  (al.flag ("initialized"),
@@ -1040,14 +1041,14 @@ struct AMState : public AM
 {
   void initialize_derived (const Geometry&, const double)
   { }
-  AMState (const Block& al)
+  AMState (const BlockModel& al)
     : AM (al)
   { }
 };
 
 static struct AMStateSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new AMState (al); }
   AMStateSyntax ()
     : DeclareModel (AM::component, "state", "base", "\
@@ -1077,14 +1078,14 @@ struct AMOrganic : public AM
                 + frame ().number ("NH4_fraction")));
     add (C, N);
   }
-  AMOrganic (const Block& al)
+  AMOrganic (const BlockModel& al)
     : AM (al)
   { }
 };
 
 static struct AMOrganicSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new AMOrganic (al); }
   AMOrganicSyntax ()
     : DeclareModel (AM::component, "organic", "base", "\
@@ -1187,14 +1188,14 @@ struct AMInitial : public AM
                               / om[i]->initial_C_per_N);
       }
   }
-  AMInitial (const Block& al)
+  AMInitial (const BlockModel& al)
     : AM (al)
   { }
 };
 
 static struct AMInitialSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new AMInitial (al); }
   AMInitialSyntax ()
     : DeclareModel (AM::component, "initial", "base", "\
@@ -1268,14 +1269,14 @@ struct AMRoot : public AM
     // Add it.
     impl->add_surface (geo, C, N, density);
   }
-  AMRoot (const Block& al)
+  AMRoot (const BlockModel& al)
     : AM (al)
   { }
 };
 
 static struct AMRootSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new AMRoot (al); }
   AMRootSyntax ()
     : DeclareModel (AM::component, "root", "base", "\
@@ -1379,7 +1380,7 @@ struct ProgramAM_table : public Program
   { };
   bool check (Treelog&)
   { return true; }
-  ProgramAM_table (const Block& al)
+  ProgramAM_table (const BlockModel& al)
     : Program (al),
       library (al.metalib ().library (AM::component))
   { }
@@ -1389,7 +1390,7 @@ struct ProgramAM_table : public Program
 
 static struct ProgramAM_tableSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ProgramAM_table (al); }
   ProgramAM_tableSyntax ()
     : DeclareModel (Program::component, "AM_table", "\

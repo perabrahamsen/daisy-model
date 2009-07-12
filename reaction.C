@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "reaction.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 
 const char *const Reaction::component = "reaction";
@@ -55,7 +55,7 @@ Reaction::tick_soil (const Units&,
                      const double, Treelog&)
 { }
 
-Reaction::Reaction (const Block& al)
+Reaction::Reaction (const BlockModel& al)
   : ModelFramed (al)
 { }
 

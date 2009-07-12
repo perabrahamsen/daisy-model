@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "reaction.h"
-#include "block.h"
+#include "block_model.h"
 #include "number.h"
 #include "adsorption.h"
 #include "chemistry.h"
@@ -147,7 +147,7 @@ struct ReactionAdsorption : public Reaction
     adsorption_rate->initialize (units, scope, msg); 
     desorption_rate->initialize (units, scope, msg); 
   }
-  explicit ReactionAdsorption (const Block& al)
+  explicit ReactionAdsorption (const BlockModel& al)
     : Reaction (al),
       name_solute (al.name ("solute")),
       name_sorbed (al.name ("sorbed")),
@@ -161,7 +161,7 @@ struct ReactionAdsorption : public Reaction
 
 static struct ReactionAdsorptionSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ReactionAdsorption (al); }
 
   ReactionAdsorptionSyntax ()

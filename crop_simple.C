@@ -173,7 +173,7 @@ public:
                    const Units&, const Geometry& geo, 
                    OrganicMatter&, double SoilLimit, const Time&, Treelog&);
   bool check (const Units& units, Treelog&) const;
-  CropSimple (const Block& vl);
+  CropSimple (const BlockModel& vl);
   ~CropSimple ();
 };
 
@@ -441,7 +441,7 @@ CropSimple::check (const Units& units, Treelog& msg) const
   return ok;
 }
 
-CropSimple::CropSimple (const Block& al)
+CropSimple::CropSimple (const BlockModel& al)
   : Crop (al),
     LAIvsT (al.check ("LAIvsTS") ? al.plf ("LAIvsTS") : al.plf ("LAIvsDay")),
     forced_LAI (al.number ("forced_LAI")),
@@ -476,7 +476,7 @@ CropSimple::~CropSimple ()
 
 static struct CropSimpleSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
  { return new CropSimple (al); }
 
   static bool check_alist (const Metalib&, const Frame& al, Treelog& err)

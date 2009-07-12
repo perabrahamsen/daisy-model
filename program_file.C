@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "program.h"
-#include "block.h"
+#include "block_model.h"
 #include "path.h"
 #include "treelog.h"
 #include "librarian.h"
@@ -50,7 +50,7 @@ struct ProgramCD : public Program
   bool check (Treelog&)
   { return true; }
 
-  ProgramCD (const Block& al)
+  ProgramCD (const BlockModel& al)
     : Program (al),
       path (al.path ()),
       dir (al.name ("directory"))
@@ -61,7 +61,7 @@ struct ProgramCD : public Program
 
 static struct ProgramCDSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ProgramCD (al); }
   ProgramCDSyntax ()
     : DeclareModel (Program::component, "cd", "Change working directory.")
@@ -103,7 +103,7 @@ struct ProgramWrite : public Program
   bool check (Treelog&)
   { return true; }
 
-  ProgramWrite (const Block& al)
+  ProgramWrite (const BlockModel& al)
     : Program (al),
       what (al.name ("what")),
       where (al.name ("where"))
@@ -114,7 +114,7 @@ struct ProgramWrite : public Program
 
 static struct ProgramWriteSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ProgramWrite (al); }
   ProgramWriteSyntax ()
     : DeclareModel (Program::component, "write", "Write string to file.")

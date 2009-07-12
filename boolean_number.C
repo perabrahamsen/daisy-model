@@ -26,6 +26,7 @@
 #include "memutils.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "block_model.h"
 #include <sstream>
 #include <vector>
 
@@ -92,7 +93,7 @@ struct BooleanNumbers : public Boolean
         }
     return ok;
   }
-  BooleanNumbers (const Block& al)
+  BooleanNumbers (const BlockModel& al)
     : Boolean (al),
       operand (Librarian::build_vector<Number> (al, "operands"))
   { }
@@ -132,14 +133,14 @@ struct BooleanNumGT : public BooleanNumbers
       }
     return true;
   }
-  BooleanNumGT (const Block& al)
+  BooleanNumGT (const BlockModel& al)
     : BooleanNumbers (al)
   { }
 };
 
 static struct BooleanNumGTSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new BooleanNumGT (al); }
   BooleanNumGTSyntax ()
     : DeclareModel (Boolean::component, ">", "numbers",
@@ -166,14 +167,14 @@ struct BooleanNumGTE : public BooleanNumbers
       }
     return true;
   }
-  BooleanNumGTE (const Block& al)
+  BooleanNumGTE (const BlockModel& al)
     : BooleanNumbers (al)
   { }
 };
 
 static struct BooleanNumGTESyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new BooleanNumGTE (al); }
   BooleanNumGTESyntax ()
     : DeclareModel (Boolean::component, ">=", "numbers", "\
@@ -200,14 +201,14 @@ struct BooleanNumLT : public BooleanNumbers
       }
     return true;
   }
-  BooleanNumLT (const Block& al)
+  BooleanNumLT (const BlockModel& al)
     : BooleanNumbers (al)
   { }
 };
 
 static struct BooleanNumLTSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new BooleanNumLT (al); }
   BooleanNumLTSyntax ()
     : DeclareModel (Boolean::component, "<", "numbers",
@@ -234,14 +235,14 @@ struct BooleanNumLTE : public BooleanNumbers
       }
     return true;
   }
-  BooleanNumLTE (const Block& al)
+  BooleanNumLTE (const BlockModel& al)
     : BooleanNumbers (al)
   { }
 };
 
 static struct BooleanNumLTESyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new BooleanNumLTE (al); }
   BooleanNumLTESyntax ()
     : DeclareModel (Boolean::component, "<=", "numbers", "\

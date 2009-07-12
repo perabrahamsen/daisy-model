@@ -25,7 +25,7 @@
 #define BUILD_DLL
 
 #include "hydraulic.h"
-#include "block.h"
+#include "block_model.h"
 #include "check.h"
 #include "mathlib.h"
 #include "librarian.h"
@@ -51,7 +51,7 @@ private:
 
   // Create and Destroy.
 public:
-  HydraulicM_BaC_Bimodal (const Block&);
+  HydraulicM_BaC_Bimodal (const BlockModel&);
   ~HydraulicM_BaC_Bimodal ();
 };
 
@@ -116,7 +116,7 @@ HydraulicM_BaC_Bimodal::Se (double h) const
     return 1;
 }
 
-HydraulicM_BaC_Bimodal::HydraulicM_BaC_Bimodal (const Block& al)
+HydraulicM_BaC_Bimodal::HydraulicM_BaC_Bimodal (const BlockModel& al)
   : Hydraulic (al),
     lambda (al.number ("lambda")),
     h_b (al.number ("h_b")),
@@ -131,7 +131,7 @@ HydraulicM_BaC_Bimodal::~HydraulicM_BaC_Bimodal ()
 
 static struct HydraulicM_BaC_BimodalSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new HydraulicM_BaC_Bimodal (al); }
 
   HydraulicM_BaC_BimodalSyntax ()

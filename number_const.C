@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "number.h"
-#include "block.h"
+#include "block_model.h"
 #include "scope.h"
 #include "units.h"
 #include "unit.h"
@@ -63,7 +63,7 @@ struct NumberConst : public Number
       }
     return ok;
   }
-  explicit NumberConst (const Block& al)
+  explicit NumberConst (const BlockModel& al)
     : Number (al),
       val (al.number ("value")),
       unit_ (al.units ().get_unit (al.name ("value")))
@@ -71,7 +71,7 @@ struct NumberConst : public Number
     if (al.units ().is_error (unit_))
       al.msg ().warning ("Unknown unit '" + al.name ("value") + "'");
   }
-  explicit NumberConst (const Block& al, const symbol key)
+  explicit NumberConst (const BlockModel& al, const symbol key)
     : Number (al),
       val (al.number (key)),
       unit_ (al.units ().get_unit (al.find_frame (key).dimension (key)))
@@ -83,7 +83,7 @@ struct NumberConst : public Number
 
 static struct NumberConstSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NumberConst (al); }
   NumberConstSyntax ()
     : DeclareModel (Number::component, "const", 
@@ -163,7 +163,7 @@ struct NumberGet : public Number
     return ok;
   }
 
-  NumberGet (const Block& al)
+  NumberGet (const BlockModel& al)
     : Number (al),
       unit_ (al.units ().get_unit (al.name ("dimension"))),
       scope_unit (NULL),
@@ -172,7 +172,7 @@ struct NumberGet : public Number
     if (al.units ().is_error (unit_))
       al.msg ().warning ("Unknown unit '" + al.name ("dimension") + "'");
   }
-  NumberGet (const Block& al, const symbol key)
+  NumberGet (const BlockModel& al, const symbol key)
     : Number (al),
       unit_ (al.units ().get_unit (al.name ("dimension"))),
       scope_unit (NULL),
@@ -182,7 +182,7 @@ struct NumberGet : public Number
 
 static struct NumberGetSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NumberGet (al); }
   NumberGetSyntax ()
     : DeclareModel (Number::component, "get", 
@@ -262,7 +262,7 @@ struct NumberFetchGet : public Number
     return ok;
   }
 
-  NumberFetchGet (const Block& al, const symbol key)
+  NumberFetchGet (const BlockModel& al, const symbol key)
     : Number (al),
       scope_unit (NULL),
       name (key)
@@ -276,7 +276,7 @@ struct NumberFetch : public Number
   symbol title () const
   { return child->title (); }
 
-  static std::auto_ptr<Number> fetch_child (const Block& al, const symbol key)
+  static std::auto_ptr<Number> fetch_child (const BlockModel& al, const symbol key)
   {
     std::auto_ptr<Number> result;
     Attribute::type type = al.lookup (key);
@@ -371,7 +371,7 @@ struct NumberFetch : public Number
       ok = false;
     return ok;
   }
-  NumberFetch (const Block& al)
+  NumberFetch (const BlockModel& al)
     : Number (al),
       child (fetch_child (al, al.name ("name")))
   { }
@@ -381,7 +381,7 @@ struct NumberFetch : public Number
 
 static struct NumberFetchSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NumberFetch (al); }
   NumberFetchSyntax ()
     : DeclareModel (Number::component, "fetch", 
@@ -418,7 +418,7 @@ struct NumberChild : public Number
   // Create.
   bool initialize (const Units& units, const Scope& scope, Treelog& msg)
   { return child->initialize (units, scope, msg); }
-  NumberChild (const Block& al)
+  NumberChild (const BlockModel& al)
     : Number (al),
       child (Librarian::build_item<Number> (al, "value"))
   { }
@@ -482,7 +482,7 @@ struct NumberIdentity : public NumberChild
       }
     return ok;
   }
-  NumberIdentity (const Block& al)
+  NumberIdentity (const BlockModel& al)
     : NumberChild (al),
       units (al.units ()),
       dim (al.name ("dimension", Attribute::Unknown ()))
@@ -491,7 +491,7 @@ struct NumberIdentity : public NumberChild
 
 static struct NumberIdentitySyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NumberIdentity (al); }
   NumberIdentitySyntax ()
     : DeclareModel (Number::component, "identity", "child", "\
@@ -542,7 +542,7 @@ struct NumberConvert : public NumberChild
       }
     return ok;
   }
-  NumberConvert (const Block& al)
+  NumberConvert (const BlockModel& al)
     : NumberChild (al),
       units (al.units ()),
       dim (al.name ("dimension"))
@@ -551,7 +551,7 @@ struct NumberConvert : public NumberChild
 
 static struct NumberConvertSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NumberConvert (al); }
   NumberConvertSyntax ()
     : DeclareModel (Number::component, "convert", "child", "\
@@ -596,7 +596,7 @@ struct NumberDim : public NumberChild
 
     return ok;
   }
-  NumberDim (const Block& al)
+  NumberDim (const BlockModel& al)
     : NumberChild (al),
       dim (al.name ("dimension")),
       warn_known (al.flag ("warn_known"))
@@ -605,7 +605,7 @@ struct NumberDim : public NumberChild
 
 static struct NumberDimSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NumberDim (al); }
   NumberDimSyntax ()
     : DeclareModel (Number::component, "dim", "child", "\

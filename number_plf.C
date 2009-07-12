@@ -24,7 +24,7 @@
 #include "plf.h"
 #include "units.h"
 #include "memutils.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 #include "submodeler.h"
 #include "treelog.h"
@@ -144,7 +144,7 @@ struct NumberPLF : public Number
     return ok;
   }
 
-  static const PLF build_plf (const Block& al) 
+  static const PLF build_plf (const BlockModel& al) 
   {
     const Units& units = al.units ();
     const symbol domain (al.name ("domain"));
@@ -172,7 +172,7 @@ struct NumberPLF : public Number
     return plf;
   }
 
-  NumberPLF (const Block& al)
+  NumberPLF (const BlockModel& al)
     : Number (al),
       operand (Librarian::build_item<Number> (al, "operand")),
       domain (al.name ("domain")),
@@ -183,7 +183,7 @@ struct NumberPLF : public Number
 
 static struct NumberPLFSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NumberPLF (al); }
 
   NumberPLFSyntax ()

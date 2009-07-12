@@ -25,7 +25,7 @@
 #include "destination.h"
 #include "select.h"
 #include "library.h"
-#include "block.h"
+#include "block_model.h"
 #include "summary.h"
 #include "timestep.h"
 #include "memutils.h"
@@ -62,7 +62,7 @@ struct LogTable : public LogDLF, public Destination
 
   // Create and destroy.
   void initialize (Treelog&);
-  explicit LogTable (const Block& al);
+  explicit LogTable (const BlockModel& al);
   void summarize (Treelog&);
   ~LogTable ();
 };
@@ -154,7 +154,7 @@ LogTable::initialize (Treelog& msg)
     summary[i]->initialize (entries, msg);
 }
 
-LogTable::LogTable (const Block& al)
+LogTable::LogTable (const BlockModel& al)
   : LogDLF (al),
     summary (Librarian::build_vector<Summary> (al, "summary")),
     type (Error),
@@ -192,7 +192,7 @@ LogTable::~LogTable ()
 
 static struct LogTableSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new LogTable (al); }
 
   LogTableSyntax ()

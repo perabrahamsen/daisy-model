@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "xysource.h"
-#include "block.h"
+#include "block_model.h"
 #include "gnuplot_utils.h"
 #include "number.h"
 #include "scope_sources.h"
@@ -68,7 +68,7 @@ public:
 
   // Create and Destroy.
 public:
-  explicit XYSourceMerge (const Block& al);
+  explicit XYSourceMerge (const BlockModel& al);
   ~XYSourceMerge ()
   { sequence_delete (source.begin (), source.end ()); }
 };
@@ -163,7 +163,7 @@ XYSourceMerge::load (const Units& units, Treelog& msg)
   return true;
 }
 
-XYSourceMerge::XYSourceMerge (const Block& al)
+XYSourceMerge::XYSourceMerge (const BlockModel& al)
   : XYSource (al),
     source (Librarian::build_vector<XYSource> (al, "source")),
     title_ (al.name ("title")),
@@ -175,7 +175,7 @@ XYSourceMerge::XYSourceMerge (const Block& al)
 
 static struct XYSourceMergeSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new XYSourceMerge (al); }
 
   XYSourceMergeSyntax ()

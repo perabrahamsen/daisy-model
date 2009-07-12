@@ -24,7 +24,7 @@
 #define BUILD_DLL
 
 #include "hydraulic.h"
-#include "block.h"
+#include "block_model.h"
 #include "mathlib.h"
 #include "librarian.h"
 #include "frame.h"
@@ -47,7 +47,7 @@ private:
   
   // Create and Destroy.
 public:
-  HydraulicB_BaC (const Block&);
+  HydraulicB_BaC (const BlockModel&);
   ~HydraulicB_BaC ();
 };
 
@@ -100,7 +100,7 @@ HydraulicB_BaC::Se (double h) const
     return 1;
 }
 
-HydraulicB_BaC::HydraulicB_BaC (const Block& al)
+HydraulicB_BaC::HydraulicB_BaC (const BlockModel& al)
   : Hydraulic (al),
     lambda (al.number ("lambda")),
     h_b (al.number ("h_b"))
@@ -113,7 +113,7 @@ HydraulicB_BaC::~HydraulicB_BaC ()
 
 static struct HydraulicB_BaCSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const 
+  Model* make (const BlockModel& al) const 
   { return new HydraulicB_BaC (al); }
 
   HydraulicB_BaCSyntax ()

@@ -102,7 +102,7 @@ public:
   // Create and destroy.
   void initialize (Treelog&);
 public:
-  LogExtern (const Block&);
+  LogExtern (const BlockModel&);
   ~LogExtern ();
 };
 

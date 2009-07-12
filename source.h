@@ -28,7 +28,7 @@
 
 #include <vector>
 
-class Block;
+class BlockModel;
 class Treelog;
 
 class Source : public Model
@@ -58,7 +58,7 @@ public:
   
   // Create and Destroy.
 protected:
-  explicit Source (const Block&);
+  explicit Source (const BlockModel&);
 private:
   Source (const Source&);
 public:

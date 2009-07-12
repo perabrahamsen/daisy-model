@@ -52,6 +52,7 @@
 #include "librarian.h"
 #include "assertion.h"
 #include "frame_model.h"
+#include "block_model.h"
 
 struct ColumnStandard : public Column
 {
@@ -166,8 +167,8 @@ public:
   void output (Log&) const;
 
   // Create and Destroy.
-  static Movement* build_vertical (const Block& al);
-  ColumnStandard (const Block& al);
+  static Movement* build_vertical (const BlockModel& al);
+  ColumnStandard (const BlockModel& al);
   bool initialize (const Block&, const Output&, const Time&, const Weather*,
                    const Scope& scope);
   void summarize (Treelog& msg) const;
@@ -848,7 +849,7 @@ ColumnStandard::output (Log& log) const
   output_derived (groundwater, "Groundwater", log);
 }
 
-ColumnStandard::ColumnStandard (const Block& al)
+ColumnStandard::ColumnStandard (const BlockModel& al)
   : Column (al),
     units (al.units ()),
     scopesel (Librarian::build_item<Scopesel> (al, "scope")),
@@ -957,7 +958,7 @@ ColumnStandard::~ColumnStandard ()
 
 static struct ColumnStandardSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ColumnStandard (al); }
 
 #if 0

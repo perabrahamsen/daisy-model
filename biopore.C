@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "biopore.h"
-#include "block.h"
+#include "block_model.h"
 #include "frame.h"
 #include "librarian.h"
 #include "scope_multi.h"
@@ -229,7 +229,7 @@ Biopore::check_base (const Geometry& geo, Treelog& msg) const
   return ok;
 }
 
-Biopore::Biopore (const Block& al)
+Biopore::Biopore (const BlockModel& al)
   : ModelFramed (al),
     density_expr (Librarian::build_item<Number> (al, "density")),
     height_start (al.number ("height_start")),

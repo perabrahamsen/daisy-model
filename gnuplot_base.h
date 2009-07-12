@@ -67,7 +67,7 @@ protected:
 public:
   static symbol file2device (symbol file);
 protected:
-  explicit GnuplotBase (const Block& al);
+  explicit GnuplotBase (const BlockModel& al);
   ~GnuplotBase ();
 };
 

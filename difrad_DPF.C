@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "difrad.h"
-#include "block.h"
+#include "block_model.h"
 #include "weather.h"
 #include "fao.h"
 #include "mathlib.h"
@@ -78,7 +78,7 @@ struct DifradDPF : public Difrad
 
 // Create and Destroy.
   public:
-  DifradDPF (const Block& al)
+  DifradDPF (const BlockModel& al)
     : Difrad (al),
        fa (al.number ("fa")),
        a (al.number ("a"))
@@ -89,7 +89,7 @@ struct DifradDPF : public Difrad
 
 static struct DifradDPFSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new DifradDPF (al); }
   DifradDPFSyntax ()
     : DeclareModel (Difrad::component, "DPF", "\

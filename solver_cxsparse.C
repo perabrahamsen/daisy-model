@@ -56,14 +56,14 @@ struct SolverCXSparse : public Solver
     // free
     CS::cs_lu_free (cs_lu);
   }
-  SolverCXSparse (const Block& al)
+  SolverCXSparse (const BlockModel& al)
     : Solver (al)
   { }
 };
 
 static struct SolverCXSparseSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new SolverCXSparse (al); }
   SolverCXSparseSyntax ()
     : DeclareModel (Solver::component, "cxsparse", "\

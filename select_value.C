@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "select_value.h"
-#include "block.h"
+#include "block_model.h"
 #include "frame.h"
 #include "librarian.h"
 #include "mathlib.h"
@@ -94,7 +94,7 @@ SelectValue::done (const double dt)
 }
 
 // Create and Destroy.
-SelectValue::SelectValue (const Block& al)
+SelectValue::SelectValue (const BlockModel& al)
   : Select (al),
     value (al.number ("value"))
 { }

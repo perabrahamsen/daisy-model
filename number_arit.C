@@ -25,7 +25,7 @@
 #include "vcheck.h"
 #include "mathlib.h"
 #include "memutils.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 #include "submodeler.h"
 #include "treelog.h"
@@ -62,7 +62,7 @@ struct NumberOperand : public Number
     Treelog::Open nest (err, name);
     return operand->check (units, scope, err); 
   }
-  NumberOperand (const Block& al)
+  NumberOperand (const BlockModel& al)
     : Number (al),
       operand (Librarian::build_item<Number> (al, "operand"))
   { }
@@ -79,14 +79,14 @@ struct NumberLog10 : public NumberOperand
   }
 
   // Create.
-  NumberLog10 (const Block& al)
+  NumberLog10 (const BlockModel& al)
     : NumberOperand (al)
   { }
 };
 
 static struct NumberLog10Syntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NumberLog10 (al); }
   NumberLog10Syntax ()
     : DeclareModel (Number::component, "log10", 
@@ -112,14 +112,14 @@ struct NumberLn : public NumberOperand
   }
 
   // Create.
-  NumberLn (const Block& al)
+  NumberLn (const BlockModel& al)
     : NumberOperand (al)
   { }
 };
 
 static struct NumberLnSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NumberLn (al); }
   NumberLnSyntax ()
     : DeclareModel (Number::component, "ln", 
@@ -144,14 +144,14 @@ struct NumberExp : public NumberOperand
   }
 
   // Create.
-  NumberExp (const Block& al)
+  NumberExp (const BlockModel& al)
     : NumberOperand (al)
   { }
 };
 
 static struct NumberExpSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NumberExp (al); }
   NumberExpSyntax ()
     : DeclareModel (Number::component, "exp", 
@@ -177,14 +177,14 @@ struct NumberSqrt : public NumberOperand
   }
 
   // Create.
-  NumberSqrt (const Block& al)
+  NumberSqrt (const BlockModel& al)
     : NumberOperand (al)
   { }
 };
 
 static struct NumberSqrtSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NumberSqrt (al); }
   NumberSqrtSyntax ()
     : DeclareModel (Number::component, "sqrt", 
@@ -214,14 +214,14 @@ struct NumberSqr : public NumberOperand
   }
 
   // Create.
-  NumberSqr (const Block& al)
+  NumberSqr (const BlockModel& al)
     : NumberOperand (al)
   { }
 };
 
 static struct NumberSqrSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NumberSqr (al); }
   NumberSqrSyntax ()
     : DeclareModel (Number::component, "sqr", 
@@ -281,7 +281,7 @@ struct NumberPow : public Number
       ok = false;
     return ok;
   }
-  NumberPow (const Block& al)
+  NumberPow (const BlockModel& al)
     : Number (al),
       base (Librarian::build_item<Number> (al, "base")),
       exponent (Librarian::build_item<Number> (al, "exponent"))
@@ -290,7 +290,7 @@ struct NumberPow : public Number
 
 static struct NumberPowSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NumberPow (al); }
   NumberPowSyntax ()
     : DeclareModel (Number::component, "pow", 
@@ -369,7 +369,7 @@ struct NumberOperands : public Number
 
       const struct Operands : public  op_x
       {
-        Operands (const Block& Block, const std::vector<const Frame*>& as)
+        Operands (const BlockModel& Block, const std::vector<const Frame*>& as)
           : op_x (Librarian:build_vector_const<Number> (as))
         { }
         ~Operands ()
@@ -410,7 +410,7 @@ struct NumberOperands : public Number
       }
     return ok;
   }
-  NumberOperands (const Block& al)
+  NumberOperands (const BlockModel& al)
     : Number (al),
       operands (Librarian::build_vector<Number> (al, "operands"))
   { }
@@ -441,14 +441,14 @@ struct NumberMax : public NumberOperands
   { return unique_dimension (scope); }
 
   // Create.
-  NumberMax (const Block& al)
+  NumberMax (const BlockModel& al)
     : NumberOperands (al)
   { }
 };
 
 static struct NumberMaxSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NumberMax (al); }
   NumberMaxSyntax ()
     : DeclareModel (Number::component, "max", 
@@ -488,14 +488,14 @@ struct NumberMin : public NumberOperands
   { return unique_dimension (scope); }
 
   // Create.
-  NumberMin (const Block& al)
+  NumberMin (const BlockModel& al)
     : NumberOperands (al)
   { }
 };
 
 static struct NumberMinSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NumberMin (al); }
   NumberMinSyntax ()
     : DeclareModel (Number::component, "min", 
@@ -537,14 +537,14 @@ struct NumberProduct : public NumberOperands
   }
 
   // Create.
-  NumberProduct (const Block& al)
+  NumberProduct (const BlockModel& al)
     : NumberOperands (al)
   { }
 };
 
 static struct NumberProductSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NumberProduct (al); }
   NumberProductSyntax ()
     : DeclareModel (Number::component, "*", 
@@ -574,14 +574,14 @@ struct NumberSum : public NumberOperands
   { return unique_dimension (scope); }
 
   // Create.
-  NumberSum (const Block& al)
+  NumberSum (const BlockModel& al)
     : NumberOperands (al)
   { }
 };
 
 static struct NumberSumSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NumberSum (al); }
   NumberSumSyntax ()
     : DeclareModel (Number::component, "+", 
@@ -617,14 +617,14 @@ struct NumberSubtract : public NumberOperands
   { return unique_dimension (scope); }
 
   // Create.
-  NumberSubtract (const Block& al)
+  NumberSubtract (const BlockModel& al)
     : NumberOperands (al)
   { }
 };
 
 static struct NumberSubtractSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NumberSubtract (al); }
   NumberSubtractSyntax ()
     : DeclareModel (Number::component, "-", 
@@ -662,14 +662,14 @@ struct NumberDivide : public NumberOperands
   { return Attribute::Unknown (); }
 
   // Create.
-  NumberDivide (const Block& al)
+  NumberDivide (const BlockModel& al)
     : NumberOperands (al)
   { }
 };
 
 static struct NumberDivideSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NumberDivide (al); }
   NumberDivideSyntax ()
     : DeclareModel (Number::component, "/", 

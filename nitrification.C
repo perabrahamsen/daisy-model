@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "nitrification.h"
-#include "block.h"
+#include "block_model.h"
 #include "frame.h"
 #include "soil.h"
 #include "soil_water.h"
@@ -60,7 +60,7 @@ Nitrification::f_h (double h)
   return 0.0;
 }
 
-Nitrification::Nitrification (const Block& al)
+Nitrification::Nitrification (const BlockModel& al)
   : N2O_fraction (al.number ("N2O_fraction"))
 { }
 

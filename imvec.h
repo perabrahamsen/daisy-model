@@ -31,7 +31,7 @@
 #include <boost/noncopyable.hpp>
 
 class Log;
-class Block;
+class BlockModel;
 class Unit;
 class Frame;
 
@@ -84,7 +84,7 @@ public:
   static void add_syntax (Frame& parent,
 			  Attribute::category cat, 
 			  const symbol dimension);
-  explicit IMvec (const Block&, const char*);
+  explicit IMvec (const BlockModel&, const char*);
   ~IMvec ();
 };
 

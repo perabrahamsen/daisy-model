@@ -59,7 +59,7 @@ public:
   void has_macropores (bool)
   { }
 public:
-  UZNone (const Block& al)
+  UZNone (const BlockModel& al)
     : UZmodel (al)
     { }
   ~UZNone ()
@@ -69,7 +69,7 @@ public:
 // Add the UZNone syntax to the syntax table.
 static struct UZNoneSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
     {
       return new UZNone (al);
     }

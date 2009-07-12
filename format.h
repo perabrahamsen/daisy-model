@@ -27,7 +27,7 @@
 #include <iosfwd>
 #include <stack>
 
-class Block;
+class BlockModel;
 
 class Format : public Model
 {
@@ -218,7 +218,7 @@ public:
 public:
   void initialize (std::ostream&);
 protected:
-  Format (const Block& al);
+  Format (const BlockModel& al);
 public:
   ~Format ();
 };

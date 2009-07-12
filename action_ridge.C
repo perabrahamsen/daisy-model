@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "action.h"
-#include "block.h"
+#include "block_model.h"
 #include "daisy.h"
 #include "field.h"
 #include "ridge.h"
@@ -47,7 +47,7 @@ struct ActionRidge : public Action
   bool check (const Daisy&, const Scope&, Treelog& err) const
   { return true; }
 
-  ActionRidge (const Block& al)
+  ActionRidge (const BlockModel& al)
     : Action (al),
       ridge (al.submodel ("ridge"))
     { }
@@ -56,7 +56,7 @@ struct ActionRidge : public Action
 // Add the ActionRidge syntax to the syntax table.
 static struct ActionRidgeSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ActionRidge (al); }
 
   ActionRidgeSyntax ()

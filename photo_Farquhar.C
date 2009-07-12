@@ -23,7 +23,7 @@
 #define BUILD_DLL
 
 #include "photo_Farquhar.h"
-#include "block.h"
+#include "block_model.h"
 #include "rubiscoNdist.h"
 #include "resistance.h"
 #include "ABAeffect.h"
@@ -40,7 +40,7 @@
 #include "frame.h"
 #include <sstream>
 
-PhotoFarquhar::PhotoFarquhar (const Block& al)
+PhotoFarquhar::PhotoFarquhar (const BlockModel& al)
   : Photo (al),
     Xn (al.number ("Xn")),
     O2_atm (al.number ("O2_atm")),

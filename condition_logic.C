@@ -28,6 +28,7 @@
 #include "frame.h"
 #include "memutils.h"
 #include "librarian.h"
+#include "block_model.h"
 #include <memory>
 
 struct ConditionFalse : public Condition
@@ -46,7 +47,7 @@ struct ConditionFalse : public Condition
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ConditionFalse (const Block& al)
+  ConditionFalse (const BlockModel& al)
     : Condition (al)
   { }
 
@@ -70,7 +71,7 @@ struct ConditionTrue : public Condition
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ConditionTrue (const Block& al)
+  ConditionTrue (const BlockModel& al)
     : Condition (al)
   { }
 
@@ -126,7 +127,7 @@ struct ConditionOperands : public Condition
   }
 
 
-  ConditionOperands (const Block& al)
+  ConditionOperands (const BlockModel& al)
     : Condition (al),
       conditions (Librarian::build_vector<Condition> (al, "operands"))
   { }
@@ -150,7 +151,7 @@ struct ConditionOr : public ConditionOperands
   }
 
 
-  ConditionOr (const Block& al)
+  ConditionOr (const BlockModel& al)
     : ConditionOperands (al)
   { }
 
@@ -172,7 +173,7 @@ struct ConditionAnd : public ConditionOperands
     return true;
   }
 
-  ConditionAnd (const Block& al)
+  ConditionAnd (const BlockModel& al)
     : ConditionOperands (al)
   { }
 
@@ -197,7 +198,7 @@ struct ConditionNot : public Condition
   bool check (const Daisy& daisy, const Scope& scope, Treelog& msg) const
   { return condition->check (daisy, scope, msg); }
 
-  ConditionNot (const Block& al)
+  ConditionNot (const BlockModel& al)
     : Condition (al),
       condition (Librarian::build_item<Condition> (al, "operand"))
   { }
@@ -249,7 +250,7 @@ struct ConditionIf : public Condition
     return ok;
   }
 
-  ConditionIf (const Block& al)
+  ConditionIf (const BlockModel& al)
     : Condition (al),
       if_c (Librarian::build_item<Condition> (al, "if")),
       then_c (Librarian::build_item<Condition> (al, "then")),
@@ -262,7 +263,7 @@ struct ConditionIf : public Condition
 
 static struct ConditionFalseSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ConditionFalse (al); }
   ConditionFalseSyntax ()
     : DeclareModel (Condition::component, "false", "Always false.")
@@ -273,7 +274,7 @@ static struct ConditionFalseSyntax : public DeclareModel
 
 static struct ConditionTrueSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ConditionTrue (al); }
   ConditionTrueSyntax ()
     : DeclareModel (Condition::component, "true", "Always true.")
@@ -284,7 +285,7 @@ static struct ConditionTrueSyntax : public DeclareModel
 
 static struct ConditionOrSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ConditionOr (al); }
   ConditionOrSyntax ()
     : DeclareModel (Condition::component, "or", "\
@@ -302,7 +303,7 @@ or the end of the list is reached.")
 
 static struct ConditionAndSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ConditionAnd (al); }
   ConditionAndSyntax ()
     : DeclareModel (Condition::component, "and", "\
@@ -320,7 +321,7 @@ or the end of the list is reached.")
 
 static struct ConditionNotSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ConditionNot (al); }
   ConditionNotSyntax ()
     : DeclareModel (Condition::component, "not", "\
@@ -336,7 +337,7 @@ True iff the operand is not true.")
 
 static struct ConditionIfSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ConditionIf (al); }
   ConditionIfSyntax ()
     : DeclareModel (Condition::component, "if", "\

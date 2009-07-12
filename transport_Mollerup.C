@@ -30,6 +30,7 @@
 #include "librarian.h"
 #include "mathlib.h"
 #include "treelog.h"
+#include "block_model.h"
 #include <sstream>
 
 // Uncomment for fast code that does not catches bugs.
@@ -207,7 +208,7 @@ struct TransportMollerup : public Transport
   
   // Create.
   bool check (const Geometry&, Treelog&) const;
-  TransportMollerup (const Block& al);
+  TransportMollerup (const BlockModel& al);
   ~TransportMollerup ();
 };
 
@@ -1739,7 +1740,7 @@ This primary solute transport model only works with 'rectangle' movement");
   return ok;
 }
 
-TransportMollerup::TransportMollerup (const Block& al)
+TransportMollerup::TransportMollerup (const BlockModel& al)
   : Transport (al),
     solver (Librarian::build_item<Solver> (al, "solver")),
     enable_boundary_diffusion (al.flag ("enable_boundary_diffusion")),
@@ -1752,7 +1753,7 @@ TransportMollerup::~TransportMollerup ()
 
 static struct TransportMollerupSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new TransportMollerup (al); }
   TransportMollerupSyntax ()
     : DeclareModel (Transport::component, "Mollerup", "\

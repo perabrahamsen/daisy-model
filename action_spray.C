@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "action.h"
-#include "block.h"
+#include "block_model.h"
 #include "daisy.h"
 #include "field.h"
 #include "chemical.h"
@@ -52,7 +52,7 @@ struct ActionSpray : public Action
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ActionSpray (const Block& al)
+  ActionSpray (const BlockModel& al)
     : Action (al),
       chemical (al.name ("chemical")),
       amount (al.number ("amount"))
@@ -62,7 +62,7 @@ struct ActionSpray : public Action
 // Add the ActionSpray syntax to the syntax table.
 static struct ActionSpraySyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ActionSpray (al); }
 
   ActionSpraySyntax ()

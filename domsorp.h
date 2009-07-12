@@ -32,7 +32,7 @@ class SoilWater;
 class SoilHeat;
 class SOM;
 class DOM;
-class Block;
+class BlockModel;
 class Treelog;
 class Units;
 
@@ -62,7 +62,7 @@ public:
 		      size_t dom_size, size_t som_size, 
                       Treelog&) const = 0;
 protected:
-  Domsorp (const Block& al);
+  Domsorp (const BlockModel& al);
 public:
   ~Domsorp ();
 };

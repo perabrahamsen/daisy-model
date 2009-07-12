@@ -1,7 +1,6 @@
-// parser.h
+// block_nested.h -- Support for blocks nested in other blocks.
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 2005, 2009 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -20,40 +19,30 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef PARSER_H
-#define PARSER_H
+#ifndef BLOCK_NESTED_H
+#define BLOCK_NESTED_H
 
-#include "model.h"
-#include "symbol.h"
+#include "block.h"
+#include "treelog.h"
 
-class Treelog;
-class Frame;
-class Metalib;
-class BlockModel;
-
-class Parser : public Model
+class BlockNested : public Block
 {
-  // Content.
+  const Block& context;
+  Treelog::Open msg_nest;
 public:
-  const symbol name;
-  static const char *const component;
-  symbol library_id () const;
+  const Metalib& metalib () const;
+  Treelog& msg () const;
+  void set_error () const;
+  const Frame& find_frame (const symbol key) const;
+  Attribute::type lookup (symbol) const;
+  void entries (std::set<symbol>&) const;
+  bool check (const symbol key) const;
 
-  // Interface.
+  // Context
+protected:  
+  BlockNested (const Block&, symbol scope_tag);
 public:
-  virtual void load_nested () = 0;
-  virtual void load_top () = 0;
-  virtual int error_count () const = 0;
- 
-  // Create and Destroy.
-public:
-  virtual void initialize (Metalib&) = 0;
-  virtual bool check () const = 0;
-protected:
-  explicit Parser (symbol id);
-  explicit Parser (const BlockModel&);
-public:
-  ~Parser ();
+  ~BlockNested ();
 };
 
-#endif // PARSER_H
+#endif // BLOCK_NESTED_H

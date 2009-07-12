@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "groundwater.h"
-#include "block.h"
+#include "block_model.h"
 #include "assertion.h"
 #include "librarian.h"
 #include "treelog.h"
@@ -55,7 +55,7 @@ public:
   bool check (const Units&, const Geometry&, const Scope&, Treelog&) const
   { return true; }
 
-  GroundwaterStatic (const Block&);
+  GroundwaterStatic (const BlockModel&);
   ~GroundwaterStatic ();
 };
 
@@ -80,7 +80,7 @@ GroundwaterStatic::table () const
   return depth;
 }
 
-GroundwaterStatic::GroundwaterStatic (const Block& al)
+GroundwaterStatic::GroundwaterStatic (const BlockModel& al)
   : Groundwater (al),
     depth (al.number ("table"))
 { }
@@ -90,7 +90,7 @@ GroundwaterStatic::~GroundwaterStatic ()
 
 static struct GroundwaterStaticSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { 
     return new GroundwaterStatic (al);
   }

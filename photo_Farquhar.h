@@ -116,7 +116,7 @@ public:
   bool handle_N_stress () const;
   bool handle_water_stress () const;
 public:
-  PhotoFarquhar (const Block& al);
+  PhotoFarquhar (const BlockModel& al);
   ~PhotoFarquhar ();
 };
 

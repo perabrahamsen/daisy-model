@@ -26,7 +26,7 @@
 #include "model_derived.h"
 
 class Weather;
-class Block;
+class BlockModel;
 class Treelog;
 
 class NetRadiation : public ModelDerived
@@ -50,7 +50,7 @@ public:
 
   // Create and Destroy.
 protected:
-  NetRadiation (const Block&);
+  NetRadiation (const BlockModel&);
 public:
   ~NetRadiation ();
 };

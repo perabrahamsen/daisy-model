@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "parser.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 
 const char *const Parser::component = "parser";
@@ -38,7 +38,7 @@ Parser::Parser (const symbol id)
   : name (id)
 { }
 
-Parser::Parser (const Block& al)
+Parser::Parser (const BlockModel& al)
   : name (al.type_name ())
 { }
 

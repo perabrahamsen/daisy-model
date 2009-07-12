@@ -28,7 +28,7 @@ class CanopyStandard;
 class Phenology;
 class Log;
 class Treelog;
-class Block;
+class BlockModel;
 class Units;
 
 class Photo : public ModelDerived
@@ -63,7 +63,7 @@ public:
 public:
   virtual bool handle_N_stress () const = 0;
   virtual bool handle_water_stress () const = 0;
-  Photo (const Block&);
+  Photo (const BlockModel&);
   ~Photo ();
 };
 

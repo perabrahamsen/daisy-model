@@ -30,6 +30,7 @@
 #include "librarian.h"
 #include "frame.h"
 #include "treelog.h"
+#include "block_model.h"
 
 struct ABAProdRoot : public ABAProd
 {
@@ -53,7 +54,7 @@ struct ABAProdRoot : public ABAProd
   // Create and Destroy.
   void initialize (const Units&, Treelog&);
   bool check (const Units&, Treelog&) const;
-  ABAProdRoot (const Block& al);
+  ABAProdRoot (const BlockModel& al);
   ~ABAProdRoot ();
 };
 
@@ -107,7 +108,7 @@ ABAProdRoot::check (const Units& units, Treelog& msg) const
   return ok;
 }
 
-ABAProdRoot::ABAProdRoot (const Block& al)
+ABAProdRoot::ABAProdRoot (const BlockModel& al)
   : ABAProd (al),
     scope (h_name, Units::cm ()),
     expr (Librarian::build_item<Number> (al, "expr"))
@@ -118,7 +119,7 @@ ABAProdRoot::~ABAProdRoot ()
 
 static struct ABAProdRootSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ABAProdRoot (al); }
   ABAProdRootSyntax ()
     : DeclareModel (ABAProd::component, "root", "\

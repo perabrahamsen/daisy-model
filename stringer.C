@@ -29,6 +29,7 @@
 #include "librarian.h"
 #include "treelog.h"
 #include "frame.h"
+#include "block_model.h"
 #include <sstream>
 #include <vector>
 #include <memory>
@@ -46,7 +47,7 @@ const std::string&
 Stringer::title () const
 { return name.name (); }
 
-Stringer::Stringer (const Block& al)
+Stringer::Stringer (const BlockModel& al)
   : name (al.type_name ())
 { }
 
@@ -113,7 +114,7 @@ Value to return.");
     msg.error ("No clause matches");
     return false; 
   }
-  StringerCond (const Block& al)
+  StringerCond (const BlockModel& al)
     : Stringer (al),
       clauses (map_submodel_const<Clause> (al, "clauses"))
   { }
@@ -128,7 +129,7 @@ If condition is true, return value.");
 
 static struct StringerCondSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new StringerCond (al); }
   StringerCondSyntax ()
     : DeclareModel (Stringer::component, "cond", "\
@@ -166,7 +167,7 @@ struct StringerNumber : public Stringer
     Treelog::Open nest (msg, name);
     return number->check (units, scope, msg); 
   }
-  StringerNumber (const Block& al)
+  StringerNumber (const BlockModel& al)
     : Stringer (al),
       number (Librarian::build_item<Number> (al, "number"))
   { }
@@ -203,7 +204,7 @@ struct StringerValue : public StringerNumber
     return tmp.str ();
   }
 
-  StringerValue (const Block& al)
+  StringerValue (const BlockModel& al)
     : StringerNumber (al),
       precision (al.integer ("precision", -1))
   { }
@@ -211,7 +212,7 @@ struct StringerValue : public StringerNumber
 
 static struct StringerValueSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new StringerValue (al); }
   StringerValueSyntax ()
     : DeclareModel (Stringer::component, "value", "number", "\
@@ -229,14 +230,14 @@ struct StringerDimension : public StringerNumber
   symbol value (const Scope& scope) const
   { return number->dimension (scope); }
 
-  StringerDimension (const Block& al)
+  StringerDimension (const BlockModel& al)
     : StringerNumber (al)
   { }
 };
 
 static struct StringerDimensionSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new StringerDimension (al); }
   StringerDimensionSyntax ()
     : DeclareModel (Stringer::component, "dimension", "number", "\
@@ -265,7 +266,7 @@ struct StringerIdentity : public Stringer
 
   bool check (const Units&, const Scope&, Treelog&) const
   { return true; }
-  StringerIdentity (const Block& al)
+  StringerIdentity (const BlockModel& al)
     : Stringer (al),
       val (al.name ("value"))
   { }
@@ -275,7 +276,7 @@ struct StringerIdentity : public Stringer
 
 static struct StringerIdentitySyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new StringerIdentity (al); }
   StringerIdentitySyntax ()
     : DeclareModel (Stringer::component, "identity", "\

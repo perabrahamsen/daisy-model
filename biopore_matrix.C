@@ -23,7 +23,7 @@
 #include "biopore.h"
 #include "imvec.h"
 #include "im.h"
-#include "block.h"
+#include "block_model.h"
 #include "vcheck.h"
 #include "librarian.h"
 #include "submodeler.h"
@@ -151,7 +151,7 @@ struct BioporeMatrix : public Biopore
                    Treelog& msg);
   bool check (const Geometry& geo, Treelog& msg) const
   { return check_base (geo, msg); }
-  BioporeMatrix (const Block& al);
+  BioporeMatrix (const BlockModel& al);
 };
 
 Anystate
@@ -943,7 +943,7 @@ BioporeMatrix::initialize (const Units& units,
   return ok;
 }
 
-BioporeMatrix::BioporeMatrix (const Block& al)
+BioporeMatrix::BioporeMatrix (const BlockModel& al)
   : Biopore (al),
     xplus (al.check ("xplus") 
            ? al.number_sequence ("xplus") 
@@ -962,7 +962,7 @@ BioporeMatrix::BioporeMatrix (const Block& al)
 
 static struct BioporeMatrixSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new BioporeMatrix (al); }
 
   BioporeMatrixSyntax ()

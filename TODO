@@ -1,16 +1,17 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* frame + lib
-
-** define_model
-
-** 
-
 * Cleanup
+
+** Genetabler DocSelect
 
 ** fjern flere "clone", brug shared_ptr
 
 *** Brug shared_ptr i Library
+
+
+* frame + lib
+
+** define_model
 
 * Regression testing
 

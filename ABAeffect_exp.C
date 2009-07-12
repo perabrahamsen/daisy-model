@@ -24,7 +24,7 @@
 #include "mathlib.h"
 #include <sstream>
 #include "check.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 #include "frame.h"
 
@@ -44,7 +44,7 @@ private:
 
   // Create.
   public:
-  ABAEffect_exp (const Block& al)
+  ABAEffect_exp (const BlockModel& al)
     : ABAEffect (al),
       k (al.number ("k")),
       l (al.number ("l")),
@@ -66,7 +66,7 @@ ABAEffect_exp::ABA_effect (const double ABA_xylem /* [g/cm^3] */, const double p
 
 static struct ABAEffectexpSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ABAEffect_exp (al); }
   void load_frame (Frame& frame) const
   {

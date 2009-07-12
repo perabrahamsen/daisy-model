@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "macro.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 
 const char *const Macro::component = "macro";
@@ -38,7 +38,7 @@ bool
 Macro::none () const 
 { return false; }
 
-Macro::Macro (const Block& al)
+Macro::Macro (const BlockModel& al)
   : name (al.type_name ())
 { }
 

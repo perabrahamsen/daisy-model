@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "geometry_vert.h"
-#include "block.h"
+#include "block_model.h"
 #include "treelog.h"
 #include "mathlib.h"
 #include <sstream>

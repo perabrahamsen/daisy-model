@@ -25,7 +25,7 @@
 #include "biopore.h"
 #include "memutils.h"
 #include "librarian.h"
-#include "block.h"
+#include "block_model.h"
 #include "check.h"
 #include "geometry.h"
 #include "soil.h"
@@ -140,7 +140,7 @@ public:
                    const Geometry&, const Soil&, const Scope& parent_scope, 
                    const Groundwater&, Treelog& msg);
   bool check (const Geometry&, Treelog& msg) const;
-  explicit TertiaryBiopores (const Block& al);
+  explicit TertiaryBiopores (const BlockModel& al);
 };
 
 Anystate
@@ -622,7 +622,7 @@ TertiaryBiopores::check (const Geometry& geo, Treelog& msg) const
   return ok;
 }
 
-TertiaryBiopores::TertiaryBiopores (const Block& al)
+TertiaryBiopores::TertiaryBiopores (const BlockModel& al)
   : Tertiary (al),
     classes (Librarian::build_vector<Biopore> (al, "classes")),
     pressure_initiate (al.number ("pressure_initiate")),
@@ -645,7 +645,7 @@ TertiaryBiopores::TertiaryBiopores (const Block& al)
 
 static struct TertiaryBioporesSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new TertiaryBiopores (al); }
 
   TertiaryBioporesSyntax ()

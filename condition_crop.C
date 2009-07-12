@@ -24,7 +24,7 @@
 #define BUILD_DLL
 
 #include "condition.h"
-#include "block.h"
+#include "block_model.h"
 #include "crop.h"
 #include "field.h"
 #include "daisy.h"
@@ -59,7 +59,7 @@ struct ConditionDSAfter : public Condition
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ConditionDSAfter (const Block& al)
+  ConditionDSAfter (const BlockModel& al)
     : Condition (al),
       crop (al.name ("crop")),
       ds (al.number ("ds"))
@@ -68,7 +68,7 @@ struct ConditionDSAfter : public Condition
 
 static struct ConditionCropDSSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ConditionDSAfter (al); }
 
   ConditionCropDSSyntax ()
@@ -110,7 +110,7 @@ struct ConditionDMOver : public Condition
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ConditionDMOver (const Block& al)
+  ConditionDMOver (const BlockModel& al)
     : Condition (al),
       crop (al.name ("crop")),
       weight (al.number ("weight")),
@@ -120,7 +120,7 @@ struct ConditionDMOver : public Condition
 
 static struct ConditionCropDMSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ConditionDMOver (al); }
 
   ConditionCropDMSyntax ()
@@ -164,7 +164,7 @@ struct ConditionDMSOrgOver : public Condition
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ConditionDMSOrgOver (const Block& al)
+  ConditionDMSOrgOver (const BlockModel& al)
     : Condition (al),
       crop (al.name ("crop")),
       weight (al.number ("weight"))
@@ -173,7 +173,7 @@ struct ConditionDMSOrgOver : public Condition
 
 static struct ConditionCropDMSorgSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ConditionDMSOrgOver (al); }
 
   ConditionCropDMSorgSyntax ()

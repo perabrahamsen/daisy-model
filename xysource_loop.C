@@ -20,7 +20,7 @@
 
 #define BUILD_DLL
 #include "xysource.h"
-#include "block.h"
+#include "block_model.h"
 #include "gnuplot_utils.h"
 #include "scope_id.h"
 #include "number.h"
@@ -73,7 +73,7 @@ public:
 
   // Create.
 public:
-  explicit XYSourceLoop (const Block&);
+  explicit XYSourceLoop (const BlockModel&);
 private:
   XYSourceLoop (const XYSourceLoop&);
   XYSourceLoop& operator= (const XYSourceLoop&);
@@ -124,7 +124,7 @@ XYSourceLoop::load (const Units& units, Treelog& msg)
   return true;
 }
 
-XYSourceLoop::XYSourceLoop (const Block& al)
+XYSourceLoop::XYSourceLoop (const BlockModel& al)
   : XYSource (al),
     with_ (al.name ("with")),
     style_ (al.integer ("style", -1)),
@@ -146,7 +146,7 @@ XYSourceLoop::~XYSourceLoop ()
 
 static struct XYSourceLoopSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new XYSourceLoop (al); }
 
   static bool check_alist (const Metalib&, const Frame& alist, Treelog& msg)

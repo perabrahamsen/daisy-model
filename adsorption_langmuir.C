@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "adsorption.h"
-#include "block.h"
+#include "block_model.h"
 #include "soil.h"
 #include "check.h"
 #include "mathlib.h"
@@ -70,7 +70,7 @@ public:
     }
   // Create.
 public:
-  AdsorptionLangmuir (const Block& al)
+  AdsorptionLangmuir (const BlockModel& al)
     : Adsorption (al),
       K (al.number ("K")),
       my_max_clay (al.number ("my_max_clay", 0.0)),
@@ -82,7 +82,7 @@ public:
 
 static struct AdsorptionLangmuirSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new AdsorptionLangmuir (al); }
   static bool check_alist (const Metalib&, const Frame& al, Treelog& err)
   {

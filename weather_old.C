@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "weather_old.h"
-#include "block.h"
+#include "block_model.h"
 #include "frame.h"
 #include "librarian.h"
 #include "fao.h"
@@ -44,7 +44,7 @@ struct WeatherOld::Implementation
   Time time;
 
   // Create and Destroy.
-  Implementation (const Block& al)
+  Implementation (const BlockModel& al)
     : T_rain (al.number ("T_rain")),
       T_snow (al.number ("T_snow")),
       daily_global_radiation (-42.42e42),
@@ -132,7 +132,7 @@ double
 WeatherOld::wind () const
 { return 3.0; }
 
-WeatherOld::WeatherOld (const Block& al)
+WeatherOld::WeatherOld (const BlockModel& al)
   : WeatherBase (al),
     impl (*new Implementation (al))
 { 

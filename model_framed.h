@@ -31,7 +31,7 @@
 #include <memory>
 
 class FrameModel;
-class Block;
+class BlockModel;
 
 #ifdef __unix
 #define EXPORT /* Nothing */
@@ -58,7 +58,7 @@ public:
   
   // Create and Destroy.
 protected:
-  ModelFramed (const Block&);
+  ModelFramed (const BlockModel&);
   ModelFramed (symbol);
   ~ModelFramed ();
 };

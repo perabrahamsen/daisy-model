@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "phenology.h"
-#include "block.h"
+#include "block_model.h"
 #include "production.h"
 #include "vernalization.h"
 #include "plf.h"
@@ -50,7 +50,7 @@ private:
 
   // Create.
 public:
-  PhenologyTSum (const Block&);
+  PhenologyTSum (const BlockModel&);
 };
 
 void
@@ -99,7 +99,7 @@ PhenologyTSum::emergence (const double /*h*/, const double T, const double dt)
     DS = 0.01;
 }
 
-PhenologyTSum::PhenologyTSum (const Block& al)
+PhenologyTSum::PhenologyTSum (const BlockModel& al)
   : Phenology (al),
     EmrTSum (al.number ("EmrTSum")),
     EmrThrs (al.number ("EmrThrs")),
@@ -111,7 +111,7 @@ PhenologyTSum::PhenologyTSum (const Block& al)
 
 static struct PhenologyTSumSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new PhenologyTSum (al); }
 
   PhenologyTSumSyntax ()

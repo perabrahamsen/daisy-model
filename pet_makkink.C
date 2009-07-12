@@ -59,14 +59,14 @@ struct PetMakkink : public Pet
     { return potential_evapotranspiration; }
 
   // Create.
-  PetMakkink (const Block& al)
+  PetMakkink (const BlockModel& al)
     : Pet (al)
     { }
 };
 
 static struct PetMakkinkSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
     { return new PetMakkink (al); }
   PetMakkinkSyntax ()
     : DeclareModel (Pet::component, "makkink", 

@@ -22,15 +22,23 @@
 
 #include "block_top.h"
 
+const Metalib&
+BlockTop::metalib () const
+{ return metalib_; }
+
 const Frame& 
 BlockTop::frame () const
 { return frame_; }
 
+Treelog&
+BlockTop::msg () const
+{ return msg_; }
+
 BlockTop::BlockTop (const Metalib& metalib, Treelog& msg, 
-                    const Frame& frame,
-                    const symbol scope_id)
-  : Block (metalib, msg, frame, scope_id),
-    frame_ (frame)
+                    const Frame& frame)
+  : metalib_ (metalib),
+    frame_ (frame),
+    msg_ (msg)
 { }
 
 BlockTop::~BlockTop ()

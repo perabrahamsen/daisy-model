@@ -22,7 +22,7 @@
 
 #include "gnuplot_base.h"
 #include "vcheck.h"
-#include "block.h"
+#include "block_model.h"
 #include "frame_submodel.h"
 #include "assertion.h"
 #include "librarian.h"
@@ -103,7 +103,7 @@ GnuplotBase::file2device (const symbol file_s)
  return "unknown";
 }
 
-GnuplotBase::GnuplotBase (const Block& al)
+GnuplotBase::GnuplotBase (const BlockModel& al)
   : Gnuplot (al),
     file (al.name ("where")),
     device (al.name ("device", file2device (file))),

@@ -24,7 +24,7 @@
 #include "volume.h"
 #include "check.h"
 #include "vcheck.h"
-#include "block.h"
+#include "block_model.h"
 #include "frame.h"
 #include "librarian.h"
 #include "treelog.h"

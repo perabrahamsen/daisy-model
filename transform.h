@@ -31,7 +31,7 @@ class Soil;
 class SoilWater;
 class SoilHeat;
 class Treelog;
-class Block;
+class BlockModel;
 class Units;
 
 class Transform : public Model
@@ -61,7 +61,7 @@ public:
                            const Soil&, const SoilWater&, const SoilHeat&,
                            Treelog&);
 protected:
-  explicit Transform (const Block&);
+  explicit Transform (const BlockModel&);
 public:
   ~Transform ();
 };

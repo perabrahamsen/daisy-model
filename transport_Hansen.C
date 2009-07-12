@@ -23,7 +23,7 @@
 #define BUILD_DLL
 
 #include "transport.h"
-#include "block.h"
+#include "block_model.h"
 #include "geometry1d.h"
 #include "soil.h"
 #include "adsorption.h"
@@ -53,7 +53,7 @@ struct TransportHansen : public Transport
   // Create.
   // Create.
   bool check (const Geometry&, Treelog&) const;
-  TransportHansen (const Block& al)
+  TransportHansen (const BlockModel& al)
     : Transport (al)
   { }
 };
@@ -336,7 +336,7 @@ This primary solute transport model only works with 'vertical' movement");
 
 static struct TransportHansenSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   {
     return new TransportHansen (al);
   }

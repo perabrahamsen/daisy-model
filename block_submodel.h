@@ -21,10 +21,10 @@
 #ifndef BLOCK_SUBMODEL_H
 #define BLOCK_SUBMODEL_H
 
-#include "block.h"
+#include "block_nested.h"
 #include "frame_submodel.h"
 
-class BlockSubmodel : public Block
+class BlockSubmodel : public BlockNested
 {
   const FrameSubmodel& frame_;
   const FrameSubmodel& frame () const;

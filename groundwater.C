@@ -24,7 +24,7 @@
 #include "groundwater.h"
 #include "geometry.h"
 #include "log.h"
-#include "block.h"
+#include "block_model.h"
 #include "assertion.h"
 #include "librarian.h"
 #include "frame.h"
@@ -68,7 +68,7 @@ Groundwater::output (Log& log) const
   output_value (table (), "height", log);
 }
 
-Groundwater::Groundwater (const Block& al)
+Groundwater::Groundwater (const BlockModel& al)
   : ModelDerived (al.type_name ())
 { }
 

@@ -71,7 +71,7 @@ public:
   { return potential_evapotranspiration_dry; }
 
   // Create & Destroy.
-  PetFAO_PM (const Block& al)
+  PetFAO_PM (const BlockModel& al)
     : Pet (al)
   { }
   ~PetFAO_PM ()
@@ -116,7 +116,7 @@ PetFAO_PM::tick (const Time&, const Weather& weather, const double Rn,
 
 static struct PetFAO_PMSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new PetFAO_PM (al); }
   PetFAO_PMSyntax ()
     : DeclareModel (Pet::component, "FAO_PM",

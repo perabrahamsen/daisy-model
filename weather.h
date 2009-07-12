@@ -28,7 +28,7 @@
 
 class Time;
 class Treelog;
-class Block;
+class BlockModel;
 class Units;
 
 class Weather : public ModelDerived
@@ -115,7 +115,7 @@ private:
 public:
   virtual bool initialize (const Time& time, Treelog& err) = 0;
 protected:
-  Weather (const Block&);
+  Weather (const BlockModel&);
 public:
   virtual bool check (const Time& from, const Time& to, Treelog&) const = 0;
   virtual ~Weather ();

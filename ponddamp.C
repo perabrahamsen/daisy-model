@@ -23,7 +23,7 @@
 #include "ponddamp.h"
 #include "mathlib.h"
 #include "librarian.h"
-#include "block.h"
+#include "block_model.h"
 #include "frame.h"
 
 // The 'ponddamp' component.
@@ -68,7 +68,7 @@ struct PonddampEUROSEM : public Ponddamp
   double value (const double h, const double /* P */) const
   { return std::min (1.0, std::exp (- b * h)); }
   // Create and Destroy.
-  PonddampEUROSEM (const Block& al)
+  PonddampEUROSEM (const BlockModel& al)
     : b (al.number ("b"))
   { }
   ~PonddampEUROSEM ()
@@ -77,7 +77,7 @@ struct PonddampEUROSEM : public Ponddamp
 
 static struct PonddampEUROSEMSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new PonddampEUROSEM (al); }
   PonddampEUROSEMSyntax ()
     : DeclareModel (Ponddamp::component, "EUROSEM", "\
@@ -107,7 +107,7 @@ struct PonddampPark82 : public Ponddamp
   }
 
   // Create and Destroy.
-  PonddampPark82 (const Block&)
+  PonddampPark82 (const BlockModel&)
   { }
   ~PonddampPark82 ()
   { }
@@ -115,7 +115,7 @@ struct PonddampPark82 : public Ponddamp
 
 static struct PonddampPark82Syntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new PonddampPark82 (al); }
   PonddampPark82Syntax ()
     : DeclareModel (Ponddamp::component, "Park82", "\
@@ -141,7 +141,7 @@ struct PonddampHairsine91 : public Ponddamp
   }
 
   // Create and Destroy.
-  PonddampHairsine91 (const Block&)
+  PonddampHairsine91 (const BlockModel&)
   { }
   ~PonddampHairsine91 ()
   { }
@@ -149,7 +149,7 @@ struct PonddampHairsine91 : public Ponddamp
 
 static struct PonddampHairsine91Syntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new PonddampHairsine91 (al); }
   PonddampHairsine91Syntax ()
     : DeclareModel (Ponddamp::component, "Hairsine91", "\
@@ -170,7 +170,7 @@ struct PonddampNone : public Ponddamp
   { return 1.0; }
 
   // Create and Destroy.
-  PonddampNone (const Block&)
+  PonddampNone (const BlockModel&)
   { }
   ~PonddampNone ()
   { }
@@ -178,7 +178,7 @@ struct PonddampNone : public Ponddamp
 
 static struct PonddampNoneSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new PonddampNone (al); }
   PonddampNoneSyntax ()
     : DeclareModel (Ponddamp::component, "none", "\

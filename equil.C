@@ -22,7 +22,7 @@
 
 
 #include "equil.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 #include "frame.h"
 
@@ -35,7 +35,7 @@ Equilibrium::library_id () const
   return id;
 }
 
-Equilibrium::Equilibrium (const Block& al)
+Equilibrium::Equilibrium (const BlockModel& al)
 { }
 
 Equilibrium::~Equilibrium ()

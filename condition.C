@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "condition.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 
 const char *const Condition::component = "condition";
@@ -41,7 +41,7 @@ Condition::timestep ()
   return name; 
 } 
 
-Condition::Condition (const Block& al)
+Condition::Condition (const BlockModel& al)
   : ModelFramed (al)
 { }
 

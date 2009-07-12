@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "action.h"
-#include "block.h"
+#include "block_model.h"
 #include "daisy.h"
 #include "field.h"
 #include "crop.h"
@@ -52,7 +52,7 @@ struct ActionSow : public Action
   bool check (const Daisy&, const Scope&, Treelog& err) const
   { return true; }
 
-  ActionSow (const Block& al)
+  ActionSow (const BlockModel& al)
     : Action (al),
       crop (&al.model ("crop").clone ()),
       // Use 'plant_distance' if set, otherwise use 'row_width'.
@@ -66,7 +66,7 @@ struct ActionSow : public Action
 // Add the ActionSow syntax to the syntax table.
 static struct ActionSowSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ActionSow (al); }
 
   ActionSowSyntax ()

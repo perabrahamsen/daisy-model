@@ -27,7 +27,7 @@
 #include "soil.h"
 #include "soil_water.h"
 #include "surface.h"
-#include "block.h"
+#include "block_model.h"
 #include "log.h"
 #include "assertion.h"
 #include "memutils.h"
@@ -99,7 +99,7 @@ struct ChemistryStandard : public Chemistry
   bool check (const Scope& scope, const Geometry&,
 	      const Soil&, const SoilWater&, const SoilHeat&, const Chemistry&,
 	      Treelog&) const;
-  explicit ChemistryStandard (const Block& al);
+  explicit ChemistryStandard (const BlockModel& al);
 };
 
 bool
@@ -379,7 +379,7 @@ ChemistryStandard::check (const Scope& scope,
   return ok;
 }
 
-ChemistryStandard::ChemistryStandard (const Block& al)
+ChemistryStandard::ChemistryStandard (const BlockModel& al)
   : Chemistry (al),
     chemicals (Librarian::build_vector<Chemical> (al, "trace")),
     reactions (Librarian::build_vector<Reaction> (al, "reaction"))
@@ -387,7 +387,7 @@ ChemistryStandard::ChemistryStandard (const Block& al)
 
 static struct ChemistryStandardSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ChemistryStandard (al); }
   ChemistryStandardSyntax ()
     : DeclareModel (Chemistry::component, "default", "\

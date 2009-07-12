@@ -24,7 +24,7 @@
 #define BUILD_DLL
 
 #include "scope.h"
-#include "block.h"
+#include "block_model.h"
 #include "metalib.h"
 #include "library.h"
 #include "daisy.h"

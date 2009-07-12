@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "reaction.h"
-#include "block.h"
+#include "block_model.h"
 #include "transform.h"
 #include "chemistry.h"
 #include "chemical.h"
@@ -98,7 +98,7 @@ struct ReactionStandard : public Reaction
     S_AB.insert (S_AB.begin (), soil.size (), 0.0);
     daisy_assert (S_AB.size () == soil.size ());
   }
-  explicit ReactionStandard (const Block& al)
+  explicit ReactionStandard (const BlockModel& al)
     : Reaction (al),
       name_A (al.name ("A")),
       name_B (al.name ("B")),
@@ -108,7 +108,7 @@ struct ReactionStandard : public Reaction
 
 static struct ReactionStandardSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ReactionStandard (al); }
   ReactionStandardSyntax ()
     : DeclareModel (Reaction::component, "default", 

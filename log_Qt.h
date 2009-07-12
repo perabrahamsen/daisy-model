@@ -44,7 +44,7 @@ private:
 
   // Create and destroy.
 public:
-  LogQt (const Block& block);
+  LogQt (const BlockModel& block);
   ~LogQt ();
 };
 

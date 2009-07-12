@@ -24,7 +24,7 @@
 #define BUILD_DLL
 
 #include "hydraulic.h"
-#include "block.h"
+#include "block_model.h"
 #include "check.h"
 #include "mathlib.h"
 #include "librarian.h"
@@ -48,7 +48,7 @@ private:
   
   // Create and Destroy.
 public:
-  HydraulicM_C (const Block&);
+  HydraulicM_C (const BlockModel&);
   ~HydraulicM_C ();
 };
 
@@ -100,7 +100,7 @@ HydraulicM_C::Sr (double h) const
     return 1;
 }
 
-HydraulicM_C::HydraulicM_C (const Block& al)
+HydraulicM_C::HydraulicM_C (const BlockModel& al)
   : Hydraulic (al),
     h_b (al.number ("h_b")),
     b (al.number ("b"))
@@ -113,7 +113,7 @@ HydraulicM_C::~HydraulicM_C ()
 
 static struct HydraulicM_CSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   {
     return new HydraulicM_C (al);
   }

@@ -27,7 +27,7 @@
 #include "log.h"
 #include "chemical.h"
 #include "check.h"
-#include "block.h"
+#include "block_model.h"
 #include "units.h"
 #include "frame_submodel.h"
 
@@ -110,7 +110,7 @@ IMvec::add_syntax (Frame& frame,
 }
 
 const Unit&
-find_unit (const Block& parent, const char* key)
+find_unit (const BlockModel& parent, const char* key)
 {
   const Units& units = parent.units ();
   const Frame& parent_frame = parent.find_frame (key);
@@ -119,7 +119,7 @@ find_unit (const Block& parent, const char* key)
   return units.get_unit (dim);
 }
 
-IMvec::IMvec (const Block& parent, const char* key)
+IMvec::IMvec (const BlockModel& parent, const char* key)
   : unit_ (find_unit (parent, key))
 {
   const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& alists

@@ -27,7 +27,7 @@
 
 class Time;
 class Treelog;
-class Block;
+class BlockModel;
 class Scope;
 class Units;
 
@@ -52,7 +52,7 @@ public:
   static Depth* create (double height);
 protected:
   Depth (symbol name);
-  Depth (const Block& al);
+  Depth (const BlockModel& al);
 public:
   ~Depth ();
 };

@@ -102,7 +102,7 @@ struct LogSubmodel : public Log
 
   // Create and Destroy.
   bool check (const Border&, Treelog& err) const;
-  LogSubmodel (const Block&);
+  LogSubmodel (const BlockModel&);
   ~LogSubmodel ();
 };
 

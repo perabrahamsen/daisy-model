@@ -20,7 +20,7 @@
 
 #define BUILD_DLL
 #include "gnuplot.h"
-#include "block.h"
+#include "block_model.h"
 #include "source.h"
 #include "treelog.h"
 #include "memutils.h"
@@ -39,7 +39,7 @@ struct GnuplotMulti : public Gnuplot
   bool plot (std::ostream& out, Treelog& msg);
   
   // Create and Destroy.
-  explicit GnuplotMulti (const Block& al);
+  explicit GnuplotMulti (const BlockModel& al);
   ~GnuplotMulti ();
 };
 
@@ -78,7 +78,7 @@ GnuplotMulti::plot (std::ostream& out, Treelog& msg)
   return ok;
 }
 
-GnuplotMulti::GnuplotMulti (const Block& al)
+GnuplotMulti::GnuplotMulti (const BlockModel& al)
   : Gnuplot (al),
     before (al.name_sequence ("before")),
     after (al.name_sequence ("after")),
@@ -90,7 +90,7 @@ GnuplotMulti::~GnuplotMulti ()
 
 static struct GnuplotMultiSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new GnuplotMulti (al); }
   GnuplotMultiSyntax ()
     : DeclareModel (Gnuplot::component, "multi",

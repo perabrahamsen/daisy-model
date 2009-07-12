@@ -27,7 +27,7 @@
 #include <vector>
 
 class GeometryRect;
-class Block;
+class BlockModel;
 class Treelog;
 
 class Heatrect : public Model
@@ -55,7 +55,7 @@ public:
 
   // Create and Destroy.
 protected:
-  Heatrect (const Block&);
+  Heatrect (const BlockModel&);
 public:
   ~Heatrect ();
 };

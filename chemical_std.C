@@ -30,7 +30,7 @@
 #include "adsorption.h"
 #include "chemistry.h"
 #include "log.h"
-#include "block.h"
+#include "block_model.h"
 #include "frame_model.h"
 #include "mathlib.h"
 #include "plf.h"
@@ -232,7 +232,7 @@ struct ChemicalStandard : public Chemical
   void initialize (const Units&, const Scope&, const Geometry&,
                    const Soil&, const SoilWater&, const SoilHeat&, Treelog&);
   static double find_surface_decompose_rate (const Block& al);
-  ChemicalStandard (const Block&);
+  ChemicalStandard (const BlockModel&);
 };
 
 const symbol 
@@ -1373,7 +1373,7 @@ ChemicalStandard::find_surface_decompose_rate (const Block& al)
   return halftime_to_rate (al.number ("decompose_halftime"));
 }
 
-ChemicalStandard::ChemicalStandard (const Block& al)
+ChemicalStandard::ChemicalStandard (const BlockModel& al)
   : Chemical (al),
     crop_uptake_reflection_factor 
     /**/ (al.number ("crop_uptake_reflection_factor")),
@@ -1456,7 +1456,7 @@ struct NumberInitialC : public Number
   bool check (const Units&, const Scope&, Treelog&) const
   { return true; }
 
-  NumberInitialC (const Block& al)
+  NumberInitialC (const BlockModel& al)
     : Number (al),
       C (al.number ("C"))
   { }
@@ -1464,7 +1464,7 @@ struct NumberInitialC : public Number
 
 static struct NumberInitialCSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NumberInitialC (al); }
   NumberInitialCSyntax ()
     : DeclareModel (Number::component, "initial_C", "\
@@ -1505,7 +1505,7 @@ Assume same concentration in groundwater as in the bottom of the soil profile.")
 
 static struct ChemicalStandardSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ChemicalStandard (al); }
   ChemicalStandardSyntax ()
     : DeclareModel (Chemical::component, "default", "\

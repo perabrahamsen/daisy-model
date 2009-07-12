@@ -20,7 +20,7 @@
 
 #define BUILD_DLL
 #include "program.h"
-#include "block.h"
+#include "block_model.h"
 #include "gnuplot.h"
 #include "treelog.h"
 #include "path.h"
@@ -51,7 +51,7 @@ struct ProgramGnuplot : public Program
   { }
   bool check (Treelog&)
   { return true; }
-  explicit ProgramGnuplot (const Block& al);
+  explicit ProgramGnuplot (const BlockModel& al);
   ~ProgramGnuplot ();
 };
 
@@ -108,7 +108,7 @@ ProgramGnuplot::run (Treelog& msg)
   return true;
 }
 
-ProgramGnuplot::ProgramGnuplot (const Block& al)
+ProgramGnuplot::ProgramGnuplot (const BlockModel& al)
   : Program (al),
     units (al.units ()),
     path (al.path ()),
@@ -123,7 +123,7 @@ ProgramGnuplot::~ProgramGnuplot ()
 
 static struct ProgramGnuplotSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ProgramGnuplot (al); }
   ProgramGnuplotSyntax ()
     : DeclareModel (Program::component, "gnuplot",

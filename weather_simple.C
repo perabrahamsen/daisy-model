@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "weather_old.h"
-#include "block.h"
+#include "block_model.h"
 #include "time.h"
 #include "log.h"
 #include "mathlib.h"
@@ -56,7 +56,7 @@ public:
 
   // Create and Destroy.
 public:
-  WeatherSimple (const Block&);
+  WeatherSimple (const BlockModel&);
   ~WeatherSimple ();
 };
 
@@ -138,7 +138,7 @@ WeatherSimple::Precipitation () const
     return 0.0;
 }
 
-WeatherSimple::WeatherSimple (const Block& al)
+WeatherSimple::WeatherSimple (const BlockModel& al)
   : WeatherOld (al),
     precipitation (al.number ("precipitation_value")),
     interval (al.integer ("interval")),
@@ -153,7 +153,7 @@ WeatherSimple::~WeatherSimple ()
 // Add the WeatherSimple syntax to the syntax table.
 static struct WeatherSimpleSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
     {
       return new WeatherSimple (al);
     }

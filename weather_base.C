@@ -27,7 +27,7 @@
 #include "log.h"
 #include "mathlib.h"
 #include "librarian.h"
-#include "block.h"
+#include "block_model.h"
 #include "units.h"
 #include "frame.h"
 
@@ -297,7 +297,7 @@ WeatherBase::check (const Time&, const Time&, Treelog&) const
 { return true; }
 
 
-WeatherBase::WeatherBase (const Block& al)
+WeatherBase::WeatherBase (const BlockModel& al)
   : Weather (al),
     units (al.units ()),
     latitude_ (-42.42e42),

@@ -33,7 +33,7 @@ class Soil;
 class Log;
 class Surface;
 class Treelog;
-class Block;
+class BlockModel;
 
 class Macro : public Model
 {
@@ -62,7 +62,7 @@ public:
 public:
   static std::auto_ptr<Macro> create (double depth); // Defined in macro_std.C.
 protected:
-  Macro (const Block& al);
+  Macro (const BlockModel& al);
   Macro (symbol id);
 public:
   ~Macro ();

@@ -34,7 +34,7 @@ struct UZ1DNone : public UZ1D
   { }
 
   // Create and Destroy.
-  UZ1DNone (const Block& al)
+  UZ1DNone (const BlockModel& al)
     : UZ1D (al)
   { }
   ~UZ1DNone ()
@@ -43,7 +43,7 @@ struct UZ1DNone : public UZ1D
 
 static struct UZ1DNoneSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new UZ1DNone (al); }
   UZ1DNoneSyntax ()
     : DeclareModel (UZ1D::component, "none", "Disable transport")

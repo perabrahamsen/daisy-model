@@ -33,7 +33,7 @@ class Geometry1D;
 class SoilWater;
 class Log;
 class Treelog;
-class Block;
+class BlockModel;
 
 class Mactrans : public Model
 {
@@ -56,7 +56,7 @@ public:
 public:
   virtual bool check (const Geometry&, Treelog&) const = 0;
 protected:
-  Mactrans (const Block& al);
+  Mactrans (const BlockModel& al);
   Mactrans (const symbol name);
 public:
   ~Mactrans ();

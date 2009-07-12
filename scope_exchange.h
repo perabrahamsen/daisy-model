@@ -26,7 +26,7 @@
 #include <vector>
 
 class Frame;
-class Block;
+class BlockModel;
 
 class Exchange : public Model
 {
@@ -79,7 +79,7 @@ public:
 
   // Create and Destroy.
 public:
-  explicit ExchangeNumber (const Block& al);
+  explicit ExchangeNumber (const BlockModel& al);
   explicit ExchangeNumber (symbol name, symbol dimension, symbol description);
   explicit ExchangeNumber (symbol name, double value, 
                            symbol dimension, symbol description);
@@ -100,7 +100,7 @@ public:
 
   // Create and Destroy.
 public:
-  explicit ExchangeName (const Block& al);
+  explicit ExchangeName (const BlockModel& al);
   ~ExchangeName ();
 };
 
@@ -133,7 +133,7 @@ public:
   void add_item (Exchange* item);
   void done ();
   explicit ScopeExchange (symbol title);
-  explicit ScopeExchange (const Block& al);
+  explicit ScopeExchange (const BlockModel& al);
   ~ScopeExchange ();
 private:
   ScopeExchange ();

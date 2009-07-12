@@ -23,7 +23,7 @@
 #include "rainergy.h"
 #include "mathlib.h"
 #include "librarian.h"
-#include "block.h"
+#include "block_model.h"
 #include "frame.h"
 
 // The 'rainergy' component.
@@ -70,7 +70,7 @@ struct RainergyBrown87 : public Rainergy
     return KE_DT * 1e-4;                  // [J/cm^2/h]
   }
   // Create and Destroy.
-  RainergyBrown87 (const Block&)
+  RainergyBrown87 (const BlockModel&)
   { }
   ~RainergyBrown87 ()
   { }
@@ -78,7 +78,7 @@ struct RainergyBrown87 : public Rainergy
 
 static struct RainergyBrown87Syntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new RainergyBrown87 (al); }
   RainergyBrown87Syntax ()
     : DeclareModel (Rainergy::component, "Brown87", "\
@@ -121,7 +121,7 @@ struct RainergyEUROSEM : public Rainergy
   }
 
   // Create and Destroy.
-  RainergyEUROSEM (const Block&)
+  RainergyEUROSEM (const BlockModel&)
   { }
   ~RainergyEUROSEM ()
   { }
@@ -129,7 +129,7 @@ struct RainergyEUROSEM : public Rainergy
 
 static struct RainergyEUROSEMSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new RainergyEUROSEM (al); }
   RainergyEUROSEMSyntax ()
     : DeclareModel (Rainergy::component, "EUROSEM", "\

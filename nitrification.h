@@ -32,7 +32,7 @@ class SoilWater;
 class SoilHeat;
 class SoilNO3;
 class SoilNH4;
-class Block;
+class BlockModel;
 
 class Nitrification : public Model
 {
@@ -58,7 +58,7 @@ public:
 
   // Create and Destroy.
 public:
-  Nitrification (const Block& al);
+  Nitrification (const BlockModel& al);
   Nitrification (const Frame& al);
   static std::auto_ptr<Nitrification> create_default ();
 public:

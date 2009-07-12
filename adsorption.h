@@ -27,7 +27,7 @@
 
 class Log;
 class Soil;
-class Block;
+class BlockModel;
 
 class Adsorption : public ModelDerived
 {
@@ -48,7 +48,7 @@ public:
   static const Adsorption& none ();
 protected:
   Adsorption (const char* name);
-  Adsorption (const Block& al);
+  Adsorption (const BlockModel& al);
 public:
   ~Adsorption ();
 };
@@ -58,7 +58,7 @@ struct AdsorptionLinear : public Adsorption
 {
   virtual double K (const Soil& soil, size_t c) const = 0;
 protected:
-  AdsorptionLinear (const Block&);
+  AdsorptionLinear (const BlockModel&);
 };
 
 #endif // ADSORPTION_H

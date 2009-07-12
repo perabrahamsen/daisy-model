@@ -28,7 +28,7 @@
 #include "tertiary.h"
 #include "frame.h"
 #include "librarian.h"
-#include "block.h"
+#include "block_model.h"
 #include "treelog.h"
 #include "assertion.h"
 #include "mathlib.h"
@@ -708,7 +708,7 @@ MovementSolute::check_derived (Treelog& msg) const
   return ok;
 }
 
-MovementSolute::MovementSolute (const Block& al)
+MovementSolute::MovementSolute (const BlockModel& al)
   : Movement (al),
     matrix_solute (Librarian::build_vector<Transport> (al, "matrix_solute")),
     matrix_solid (Librarian::build_item<Transport> (al, "matrix_solid"))

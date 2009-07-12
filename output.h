@@ -72,7 +72,7 @@ private:
   /**/ find_time_columns (const std::vector<symbol>& names);
 public:
   static void load_syntax (Frame& frame);
-  explicit Output (const Block&);
+  explicit Output (const BlockModel&);
   ~Output ();
   Output ();
 private:

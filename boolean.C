@@ -22,7 +22,7 @@
 
 
 #include "boolean.h"
-#include "block.h"
+#include "block_model.h"
 #include "frame.h"
 #include "assertion.h"
 #include "memutils.h"
@@ -44,7 +44,7 @@ const std::string&
 Boolean::title () const
 { return name.name (); }
 
-Boolean::Boolean (const Block& al)
+Boolean::Boolean (const BlockModel& al)
   : name (al.type_name ())
 { }
 
@@ -66,14 +66,14 @@ struct BooleanTrue : public Boolean
   { return true; }
   bool check (const Units&, const Scope&, Treelog&) const
   { return true; }
-  BooleanTrue (const Block& al)
+  BooleanTrue (const BlockModel& al)
     : Boolean (al)
   { }
 };
 
 static struct BooleanTrueSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new BooleanTrue (al); }
   BooleanTrueSyntax ()
     : DeclareModel (Boolean::component, "true", 
@@ -99,14 +99,14 @@ struct BooleanFalse : public Boolean
   { return true; }
   bool check (const Units&, const Scope&, Treelog&) const
   { return true; }
-  BooleanFalse (const Block& al)
+  BooleanFalse (const BlockModel& al)
     : Boolean (al)
   { }
 };
 
 static struct BooleanFalseSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new BooleanFalse (al); }
   BooleanFalseSyntax ()
     : DeclareModel (Boolean::component, "false", 
@@ -161,7 +161,7 @@ struct BooleanOperands : public Boolean
 
     return ok;
   }
-  BooleanOperands (const Block& al)
+  BooleanOperands (const BlockModel& al)
     : Boolean (al),
       operand (Librarian::build_vector<Boolean> (al, "operands"))
   { }
@@ -193,14 +193,14 @@ struct BooleanAnd : public BooleanOperands
         return false;
     return true;
   }
-  BooleanAnd (const Block& al)
+  BooleanAnd (const BlockModel& al)
     : BooleanOperands (al)
   { }
 };
 
 static struct BooleanAndSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new BooleanAnd (al); }
   BooleanAndSyntax ()
     : DeclareModel (Boolean::component, "and", "operands",
@@ -220,14 +220,14 @@ struct BooleanOr : public BooleanOperands
         return true;
     return false;
   }
-  BooleanOr (const Block& al)
+  BooleanOr (const BlockModel& al)
     : BooleanOperands (al)
   { }
 };
 
 static struct BooleanOrSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new BooleanOr (al); }
   BooleanOrSyntax ()
     : DeclareModel (Boolean::component, "or", "operands",
@@ -244,14 +244,14 @@ struct BooleanXOr : public BooleanOperands
     daisy_assert (operand.size () == 2);
     return operand[0]->value (scope) != operand[1]->value (scope);
   }
-  BooleanXOr (const Block& al)
+  BooleanXOr (const BlockModel& al)
     : BooleanOperands (al)
   { }
 };
 
 static struct BooleanXOrSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new BooleanXOr (al); }
   BooleanXOrSyntax ()
     : DeclareModel (Boolean::component, "xor", 
@@ -273,14 +273,14 @@ struct BooleanNot : public BooleanOperands
     daisy_assert (operand.size () == 1);
     return !operand[0]->value (scope);
   }
-  BooleanNot (const Block& al)
+  BooleanNot (const BlockModel& al)
     : BooleanOperands (al)
   { }
 };
 
 static struct BooleanNotSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new BooleanNot (al); }
   BooleanNotSyntax ()
     : DeclareModel (Boolean::component, "not", 

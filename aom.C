@@ -30,7 +30,7 @@
 #include "log.h"
 #include "geometry.h"
 #include "mathlib.h"
-#include "block.h"
+#include "block_model.h"
 
 const char *const AOM::component = "AOM";
 
@@ -266,7 +266,7 @@ AOM::tick (const std::vector<bool>& active, const double* abiotic_factor,
     }
 }
 
-AOM::AOM (const Block& al)
+AOM::AOM (const BlockModel& al)
   : OM (al),
     initial_fraction (al.number ("initial_fraction", Unspecified)),
     top_C (al.number ("top_C")),
@@ -277,7 +277,7 @@ static struct AOMInit : public DeclareSolo
 {
   bool used_to_be_a_submodel () const
   { return true; }
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new AOM (al); }
   void load_frame (Frame& frame) const
   {

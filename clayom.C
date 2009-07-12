@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "clayom.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 
 const char *const ClayOM::component = "ClayOM";
@@ -33,7 +33,7 @@ ClayOM::library_id () const
   return id;
 }
 
-ClayOM::ClayOM (const Block& al)
+ClayOM::ClayOM (const BlockModel& al)
   : name (al.type_name ())
 { }
 

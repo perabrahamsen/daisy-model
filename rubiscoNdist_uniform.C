@@ -23,7 +23,7 @@
 #include "mathlib.h"
 #include <sstream>
 #include "check.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 #include "frame.h"
 
@@ -46,7 +46,7 @@ private:
 
   // Create.
   public:
-  rubiscoNdistUniform (const Block& al)
+  rubiscoNdistUniform (const BlockModel& al)
     : RubiscoNdist (al),
        f_photo (al.number ("f_photo"))
   { }
@@ -78,7 +78,7 @@ rubiscoNdistUniform::rubiscoN_distribution (const Units&,
 
 static struct rubiscoNdistUniformSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new rubiscoNdistUniform (al); }
   rubiscoNdistUniformSyntax ()
     : DeclareModel (RubiscoNdist::component, "uniform", 

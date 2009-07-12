@@ -23,7 +23,7 @@
 #include "frame.h"
 #include "frame_model.h"
 #include "frame_submodel.h"
-#include "block.h"
+#include "block_model.h"
 #include "assertion.h"
 #include "librarian.h"
 #include "intrinsics.h"

@@ -39,7 +39,7 @@ class Treelog;
 class Format;
 class Border;
 class Volume;
-class Block;
+class BlockModel;
 
 struct Handle
 {
@@ -169,7 +169,7 @@ public:
   virtual bool check_border (const Border&, const Volume& volume,
                              Treelog&) const;
 protected:
-  Select (const Block& al);
+  Select (const BlockModel& al);
 public:
   ~Select ();
 };

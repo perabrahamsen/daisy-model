@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "hydraulic.h"
-#include "block.h"
+#include "block_model.h"
 #include "plf.h"
 #include "mathlib.h"
 #include "librarian.h"
@@ -42,7 +42,7 @@ public:
 
   // Create and Destroy.
 public:
-  HydraulicYolo (const Block&);
+  HydraulicYolo (const BlockModel&);
   virtual ~HydraulicYolo ();
 };
 
@@ -92,7 +92,7 @@ HydraulicYolo::M (double h) const
   return M_ (h);
 }
 
-HydraulicYolo::HydraulicYolo (const Block& al)
+HydraulicYolo::HydraulicYolo (const BlockModel& al)
   : Hydraulic (al),
     M_intervals (al.integer ("M_intervals")),
     M_ ()
@@ -105,7 +105,7 @@ HydraulicYolo::~HydraulicYolo ()
 
 static struct HydraulicYoloSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new HydraulicYolo (al); }
   HydraulicYoloSyntax ()
     : DeclareModel (Hydraulic::component, "yolo", "Yolo soil.  Haverkamp et.al., 1977.")

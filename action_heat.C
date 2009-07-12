@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "action.h"
-#include "block.h"
+#include "block_model.h"
 #include "daisy.h"
 #include "field.h"
 #include "check.h"
@@ -50,7 +50,7 @@ struct ActionSetHeatSource : public Action
   bool check (const Daisy&, const Scope&, Treelog& err) const
   { return true; }
 
-  ActionSetHeatSource (const Block& al)
+  ActionSetHeatSource (const BlockModel& al)
     : Action (al),
       height (al.number ("height")),
       value (al.number ("value"))
@@ -59,7 +59,7 @@ struct ActionSetHeatSource : public Action
 
 static struct ActionHeatSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ActionSetHeatSource (al); }
   
   ActionHeatSyntax ()

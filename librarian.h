@@ -30,6 +30,7 @@
 #include <boost/shared_ptr.hpp>
 
 class Block;
+class BlockModel;
 class Treelog;
 class Library;
 class Metalib;
@@ -69,7 +70,7 @@ public:
 
   // Build.
 private:
-  typedef Model& (*builder) (const Block&);
+  typedef Model& (*builder) (const BlockModel&);
   static void non_null (const Block&, const void*);
   static Model* build_frame (symbol component,
                              const Block&, const FrameModel&, 
@@ -184,7 +185,7 @@ public:
   const symbol name;
   const symbol description_;
   class Builder
-  { public: virtual Model* make (const Block&) const = 0; };
+  { public: virtual Model* make (const BlockModel&) const = 0; };
 
 public:
   virtual bool used_to_be_a_submodel () const;

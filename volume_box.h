@@ -72,7 +72,7 @@ private:
 
   // Create and Destroy.
 public:
-  VolumeBox (const Block& al);
+  VolumeBox (const BlockModel& al);
   VolumeBox (const char *const id);
   VolumeBox (const char *const id, 
              const double zm, const double zp, 

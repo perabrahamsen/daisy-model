@@ -26,7 +26,7 @@
 
 class Log;
 class Treelog;
-class Block;
+class BlockModel;
 
 class StomataCon : public ModelLogable
 {
@@ -48,7 +48,7 @@ public:
                               Treelog&) = 0;//[]
   // Create and Destroy.
 protected:
-  StomataCon (const Block&);
+  StomataCon (const BlockModel&);
 
 public:
   ~StomataCon ();

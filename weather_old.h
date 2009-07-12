@@ -54,7 +54,7 @@ public:
 
   // Create and Destroy.
 protected:
-  WeatherOld (const Block&);
+  WeatherOld (const BlockModel&);
 public:
   ~WeatherOld ();
 };

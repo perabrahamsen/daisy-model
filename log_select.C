@@ -27,6 +27,7 @@
 #include "metalib.h"
 #include "library.h"
 #include "block_top.h"
+#include "block_model.h"
 #include "field.h"
 #include "format.h"
 #include "volume.h"
@@ -213,7 +214,7 @@ LogSelect::check (const Border& border, Treelog& err) const
   return ok; 
 }
 
-LogSelect::LogSelect (const Block& al)
+LogSelect::LogSelect (const BlockModel& al)
   : Log (al),
     description (al.name ("description", "")),
     condition (Librarian::build_item<Condition> (al, "when")),
@@ -298,6 +299,7 @@ LogSelect::document_entries (Format& format, const Metalib& metalib,
       return;
     }
 
+#if 0
   // Complete log.
   BlockTop block (metalib, msg, frame, "docselect");
   struct DocSelect : public LogSelect 
@@ -315,6 +317,7 @@ LogSelect::document_entries (Format& format, const Metalib& metalib,
 
   for (size_t i = 0; i < select.entries.size (); i++)
     select.entries[i]->document (format);
+#endif
 }
 
 static struct LogSelectSyntax : public DeclareBase

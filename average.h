@@ -28,7 +28,7 @@
 
 #include <memory>
 
-class Block;
+class BlockModel;
 
 class Average : public Model
 {

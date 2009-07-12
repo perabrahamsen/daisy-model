@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "raddist.h"
-#include "block.h"
+#include "block_model.h"
 #include "mathlib.h"
 #include "librarian.h"
 
@@ -75,7 +75,7 @@ Raddist::intensity_distribution (const int No, const double LAI,
     Rad[i] = Rad0 * exp (- Ext * dLAI * i);
 }
 
-Raddist::Raddist (const Block& al)
+Raddist::Raddist (const BlockModel& al)
   : ModelDerived (al.type_name ())
 { }
 

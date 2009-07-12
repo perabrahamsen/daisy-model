@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "equil.h"
-#include "block.h"
+#include "block_model.h"
 #include "scope_soil.h"
 #include "number.h"
 #include "treelog.h"
@@ -50,7 +50,7 @@ struct EquilibriumGoal_A : public Equilibrium
   // Create and Destroy.
   void initialize (const Units&, const Scope&, Treelog&);
   bool check (const Units& units, const Scope&, Treelog&) const;
-  EquilibriumGoal_A (const Block& al)
+  EquilibriumGoal_A (const BlockModel& al)
     : Equilibrium (al),
       goal_A_expr (Librarian::build_item<Number> (al, "goal_A")),
       min_B_expr (Librarian::build_item<Number> (al, "min_B")),
@@ -155,7 +155,7 @@ EquilibriumGoal_A::check (const Units& units,
 
 static struct EquilibriumGoal_ASyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new EquilibriumGoal_A (al); }
 
   EquilibriumGoal_ASyntax ()

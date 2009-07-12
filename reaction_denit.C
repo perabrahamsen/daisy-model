@@ -25,7 +25,7 @@
 #include "reaction.h"
 #include "abiotic.h"
 #include "librarian.h"
-#include "block.h"
+#include "block_model.h"
 #include "geometry.h"
 #include "soil.h"
 #include "soil_water.h"
@@ -76,7 +76,7 @@ struct ReactionDenit : public Reaction
   void initialize (const Units&, const Geometry&, 
                    const Soil&, const SoilWater&, const SoilHeat&,
                    const Surface&, Treelog&);
-  explicit ReactionDenit (const Block& al);
+  explicit ReactionDenit (const BlockModel& al);
 };
 
 void
@@ -173,7 +173,7 @@ ReactionDenit::initialize (const Units&, const Geometry&,
   potential_fast.insert (potential_fast.begin (), cell_size, 0.0);
 }
 
-ReactionDenit::ReactionDenit (const Block& al)
+ReactionDenit::ReactionDenit (const BlockModel& al)
   : Reaction (al),
     K (al.number ("K")),
     K_fast (al.number ("K_fast", K)),
@@ -191,7 +191,7 @@ ReactionDenit::ReactionDenit (const Block& al)
 
 static struct ReactionDenitSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ReactionDenit (al); }
   ReactionDenitSyntax ()
     : DeclareModel (Reaction::component, "denitrification", "Denitrification in soil (conversion\n\

@@ -24,7 +24,7 @@
 #include "net_radiation.h"
 #include "log.h"
 #include "weather.h"
-#include "block.h"
+#include "block_model.h"
 #include "mathlib.h"
 #include "librarian.h"
 #include "frame.h"
@@ -40,7 +40,7 @@ NetRadiation::library_id () const
 
 // Interface class.
 
-NetRadiation::NetRadiation (const Block& al)
+NetRadiation::NetRadiation (const BlockModel& al)
   : ModelDerived (al.type_name ())
 { }
 
@@ -98,7 +98,7 @@ struct NetRadiationParent : public NetRadiation
   }
 
   // Create & Destroy.
-  NetRadiationParent (const Block& al)
+  NetRadiationParent (const BlockModel& al)
     : NetRadiation (al),
       net_radiation_ (0.0),
       L_n (0.0),
@@ -150,7 +150,7 @@ struct NetRadiationBrunt : public NetRadiationParent
     return A + B * sqrt (ea); 
   }
 
-  NetRadiationBrunt (const Block& al)
+  NetRadiationBrunt (const BlockModel& al)
     : NetRadiationParent (al),
       a (al.number ("a")),
       b (al.number ("b"))
@@ -174,7 +174,7 @@ struct NetRadiationIdsoJackson : public NetRadiationParent
     return (1 - A * exp(B * sqr (273.15 - Ta)));
   }
   
-  NetRadiationIdsoJackson (const Block& al)
+  NetRadiationIdsoJackson (const BlockModel& al)
     : NetRadiationParent (al)
   { }
 };
@@ -197,7 +197,7 @@ struct NetRadiationBrutsaert : public NetRadiationParent
     return (A * pow(ea/Ta, 1./7.));
   }
 
-  NetRadiationBrutsaert (const Block& al)
+  NetRadiationBrutsaert (const BlockModel& al)
     : NetRadiationParent (al)
   { }
 };
@@ -218,7 +218,7 @@ struct NetRadiationSwinbank : public NetRadiationParent
     return (A * sqr (Ta));
   }
 
-  NetRadiationSwinbank (const Block& al)
+  NetRadiationSwinbank (const BlockModel& al)
     : NetRadiationParent (al)
   { }
 };
@@ -242,7 +242,7 @@ struct NetRadiationSatterlund : public NetRadiationParent
     return (A * (1 - exp(- pow(ea, Ta/B))));
   }
 
-  NetRadiationSatterlund (const Block& al)
+  NetRadiationSatterlund (const BlockModel& al)
     : NetRadiationParent (al)
   { }
 };
@@ -257,7 +257,7 @@ struct NetRadiationPrata : public NetRadiationParent
     return (1 - (1 + w) * exp ( - sqrt( A + B * w)));
   }
 
-  NetRadiationPrata (const Block& al)
+  NetRadiationPrata (const BlockModel& al)
     : NetRadiationParent (al)
   { }
 };
@@ -266,7 +266,7 @@ struct NetRadiationPrata : public NetRadiationParent
 
 static struct NetRadiationBruntSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NetRadiationBrunt (al); }
 
   NetRadiationBruntSyntax ()
@@ -288,7 +288,7 @@ FAO recommendation.")
 
 static struct NetRadiationIJSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NetRadiationIdsoJackson (al); }
 
   NetRadiationIJSyntax ()
@@ -300,7 +300,7 @@ static struct NetRadiationIJSyntax : public DeclareModel
 
 static struct NetRadiationBrutsaertSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NetRadiationBrutsaert (al); }
 
   NetRadiationBrutsaertSyntax ()
@@ -312,7 +312,7 @@ static struct NetRadiationBrutsaertSyntax : public DeclareModel
 
 static struct NetRadiationSwinbankSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NetRadiationSwinbank (al); }
 
   NetRadiationSwinbankSyntax ()
@@ -324,7 +324,7 @@ static struct NetRadiationSwinbankSyntax : public DeclareModel
 
 static struct NetRadiationSatterlundSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NetRadiationSatterlund (al); }
 
   NetRadiationSatterlundSyntax ()
@@ -336,7 +336,7 @@ static struct NetRadiationSatterlundSyntax : public DeclareModel
 
 static struct NetRadiationPrataSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NetRadiationPrata (al); }
 
   NetRadiationPrataSyntax ()

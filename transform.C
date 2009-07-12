@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "transform.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 
 const char *const Transform::component = "transform";
@@ -45,7 +45,7 @@ Transform::initialize (const Units&, const Geometry&,
                        Treelog&)
 { }
 
-Transform::Transform (const Block&)
+Transform::Transform (const BlockModel&)
 { }
 
 Transform::~Transform ()

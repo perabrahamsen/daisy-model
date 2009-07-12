@@ -23,7 +23,7 @@
 
 #include "bioclimate.h"
 #include "weather.h"
-#include "block.h"
+#include "block_model.h"
 #include "mathlib.h"
 #include "librarian.h"
 
@@ -72,7 +72,7 @@ Bioclimate::intensity_distribution (const int No, const double LAI,
     Rad[i] = Rad0 * exp (- Ext * dLAI * i);
 }
 
-Bioclimate::Bioclimate (const Block& al)
+Bioclimate::Bioclimate (const BlockModel& al)
   : ModelFramed (al)
 { }
 

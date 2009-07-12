@@ -66,7 +66,7 @@ struct ActionEmerge : public Action
   bool check (const Daisy&, const Scope&, Treelog& err) const
   { return true; }
 
-  ActionEmerge (const Block& al)
+  ActionEmerge (const BlockModel& al)
     : Action (al),
       crop (al.name ("crop"))
   { }
@@ -74,7 +74,7 @@ struct ActionEmerge : public Action
 
 static struct ActionEmergeSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ActionEmerge (al); }
   ActionEmergeSyntax ()
     : DeclareModel (Action::component, "emerge", "Force a crop to emerge.")
@@ -182,7 +182,7 @@ If this was intended, you should use the 'cut' action instead to avoid this mess
   bool check (const Daisy&, const Scope&, Treelog& err) const
   { return true; }
 
-  ActionHarvest (const Block& al)
+  ActionHarvest (const BlockModel& al)
     : Action (al),
       crop (al.name ("crop")), 
       stub (al.number ("stub")),
@@ -195,7 +195,7 @@ If this was intended, you should use the 'cut' action instead to avoid this mess
 
 static struct ActionHarvestSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ActionHarvest (al); }
   ActionHarvestSyntax ()
     : DeclareModel (Action::component, "harvest", "harvest_base", "\
@@ -216,14 +216,14 @@ struct ActionCut : public ActionHarvest
 If this was intended, you should use the 'harvest' action instead to avoid this message");
   }
 
-  ActionCut (const Block& al)
+  ActionCut (const BlockModel& al)
     : ActionHarvest (al)
   { }
 };
 
 static struct ActionCutSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ActionCut (al); }
   ActionCutSyntax ()
     : DeclareModel (Action::component, "cut", "harvest_base", "Cut a crop.")
@@ -278,7 +278,7 @@ If this was intended, you should use the 'harvest' action instead to avoid this 
   bool check (const Daisy&, const Scope&, Treelog& err) const
   { return true; }
 
-  ActionPluck (const Block& al)
+  ActionPluck (const BlockModel& al)
     : Action (al),
       crop (al.name ("crop")), 
       stem (al.number ("stem")),
@@ -289,7 +289,7 @@ If this was intended, you should use the 'harvest' action instead to avoid this 
 
 static struct ActionPluckSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ActionPluck (al); }
   ActionPluckSyntax ()
     : DeclareModel (Action::component, "pluck", "Pluck a crop.\n\

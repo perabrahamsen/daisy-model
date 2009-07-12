@@ -23,7 +23,7 @@
 
 #include "stomatacon.h"
 #include "mathlib.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 
 const char *const StomataCon::component = "Stomatacon";
@@ -35,7 +35,7 @@ StomataCon::library_id () const
   return id;
 }
 
-StomataCon::StomataCon (const Block& al)
+StomataCon::StomataCon (const BlockModel& al)
   : ModelLogable (al.type_name ())
 { }
 

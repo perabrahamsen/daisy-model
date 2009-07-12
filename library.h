@@ -31,7 +31,7 @@
 #include <boost/shared_ptr.hpp>
 
 class Metalib;
-class Block;
+class BlockModel;
 class Treelog;
 class Format;
 class Model;
@@ -54,7 +54,7 @@ class EXPORT Library
   // Types.
 public:
   typedef void (*doc_fun) (Format&, const Metalib&, Treelog&, symbol name);
-  typedef Model& (*builder) (const Block&);
+  typedef Model& (*builder) (const BlockModel&);
 
   // Content.
 private:

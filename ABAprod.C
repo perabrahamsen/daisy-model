@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "ABAprod.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 
 const char *const ABAProd::component = "ABAproduction";
@@ -33,7 +33,7 @@ ABAProd::library_id () const
   return id;
 }
 
-ABAProd::ABAProd (const Block& al)
+ABAProd::ABAProd (const BlockModel& al)
   : ModelDerived (al.type_name ())
 { }
 
@@ -67,7 +67,7 @@ struct ABAProdNone : public ABAProd
   { }
   bool check (const Units&, Treelog&) const
   { return true; }
-  ABAProdNone (const Block& al)
+  ABAProdNone (const BlockModel& al)
     : ABAProd (al)
   { }
   ~ABAProdNone ()
@@ -76,7 +76,7 @@ struct ABAProdNone : public ABAProd
 
 static struct ABAProdNoneSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ABAProdNone (al); }
   ABAProdNoneSyntax ()
     : DeclareModel (ABAProd::component, "none", "No ABA production.")

@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "equil.h"
-#include "block.h"
+#include "block_model.h"
 #include "number.h"
 #include "treelog.h"
 #include "check.h"
@@ -42,7 +42,7 @@ struct EquilibriumLinear : public Equilibrium
   // Create and Destroy.
   void initialize (const Units& units, const Scope&, Treelog&);
   bool check (const Units& units, const Scope&, Treelog&) const;
-  EquilibriumLinear (const Block& al)
+  EquilibriumLinear (const BlockModel& al)
     : Equilibrium (al),
       K_expr (Librarian::build_item<Number> (al, "K"))
   { }
@@ -102,7 +102,7 @@ EquilibriumLinear::check (const Units& units, const Scope& scope, Treelog& msg) 
 
 static struct EquilibriumLinearSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new EquilibriumLinear (al); }
 
   EquilibriumLinearSyntax ()

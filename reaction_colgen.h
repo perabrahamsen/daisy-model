@@ -52,7 +52,7 @@ protected:
   bool check (const Units&, const Geometry&,
               const Soil&, const SoilWater&, const SoilHeat&,
 	      const Chemistry&, Treelog&) const;
-  ReactionColgen (const Block&);
+  ReactionColgen (const BlockModel&);
   ~ReactionColgen ();
 };
 

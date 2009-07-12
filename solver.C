@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "solver.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 
 const char *const Solver::component = "solver";
@@ -41,7 +41,7 @@ Solver::Matrix::Matrix (const size_t size)
 #endif // USE_DENSE_MATRIX
 }
 
-Solver::Solver (const Block& al)
+Solver::Solver (const BlockModel& al)
   : name (al.type_name ())
 { }
 

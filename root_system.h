@@ -37,6 +37,7 @@ class Chemistry;
 class Log;
 class Metalib;
 class Units;
+class Block;
 
 class RootSystem
 {

@@ -21,7 +21,7 @@
 
 #define BUILD_DLL
 #include "adsorption.h"
-#include "block.h"
+#include "block_model.h"
 #include "check.h"
 #include "soil.h"
 #include "librarian.h"
@@ -58,7 +58,7 @@ public:
   }
   // Create.
 public:
-  AdsorptionLinearOld (const Block& al)
+  AdsorptionLinearOld (const BlockModel& al)
     : AdsorptionLinear (al),
       K_clay (al.number ("K_clay", 0.0)),
       K_OC (al.check ("K_OC") ? al.number ("K_OC") : al.number ("K_clay"))
@@ -67,7 +67,7 @@ public:
 
 static struct AdsorptionLinearOldSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   {
     return new AdsorptionLinearOld (al);
   }

@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "photo.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 #include "check.h"
 #include "frame.h"
@@ -43,7 +43,7 @@ void
 Photo::clear ()
 { }
 
-Photo::Photo (const Block& al)
+Photo::Photo (const BlockModel& al)
   : ModelDerived (al.type_name ()),
     min_PAR_ (al.number ("min_PAR"))
 { }

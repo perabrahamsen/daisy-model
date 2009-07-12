@@ -100,7 +100,7 @@ public:
   void initialize (size_t);
   static void load_syntax (Frame&, const std::string& frac_desc);
 protected:
-  OM (const Block&);
+  OM (const BlockModel&);
   virtual ~OM ();
 };
 

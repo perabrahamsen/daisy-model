@@ -25,7 +25,7 @@
 #include "log_extern.h"
 #include "select.h"
 #include "scope_block.h"
-#include "block.h"
+#include "block_model.h"
 #include "assertion.h"
 #include "librarian.h"
 #include "submodeler.h"
@@ -265,7 +265,7 @@ Numeric value.");
   { }
 };
 
-LogExtern::LogExtern (const Block& al)
+LogExtern::LogExtern (const BlockModel& al)
   : LogSelect (al),
     title_ (al.name ("where", al.type_name ()))
 { 
@@ -305,7 +305,7 @@ LogExtern::~LogExtern ()
 
 static struct LogExternSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new LogExtern (al); }
 
   LogExternSyntax ()

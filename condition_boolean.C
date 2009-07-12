@@ -30,6 +30,7 @@
 #include "daisy.h"
 #include "treelog.h"
 #include "frame.h"
+#include "block_model.h"
 #include <memory>
 
 struct ConditionBoolean : public Condition
@@ -85,7 +86,7 @@ struct ConditionBoolean : public Condition
     return false;
   }
 
-  ConditionBoolean (const Block& al)
+  ConditionBoolean (const BlockModel& al)
     : Condition (al),
       expr (Librarian::build_item<Boolean> (al, "expr")),
       state (uninitialized)
@@ -94,7 +95,7 @@ struct ConditionBoolean : public Condition
 
 static struct ConditionBooleanSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ConditionBoolean (al); }
 
   ConditionBooleanSyntax ()

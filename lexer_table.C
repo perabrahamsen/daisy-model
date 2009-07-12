@@ -469,7 +469,7 @@ If true, assume the line after the tags contain dimensions.\n\
 By default this will be true iff 'original' is not specified.");
 }
 
-LexerTable::LexerTable (const Block& al)
+LexerTable::LexerTable (const BlockModel& al)
   : path (al.path ()),
     filename (al.name ("file")),
     owned_stream (NULL),

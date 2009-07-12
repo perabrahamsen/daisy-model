@@ -23,7 +23,7 @@
 
 #include "select.h"
 #include "condition.h"
-#include "block.h"
+#include "block_model.h"
 #include "geometry.h"
 #include "number.h"
 #include "scope_id.h"
@@ -124,8 +124,8 @@ struct Select::Implementation
   // Create and Destroy.
   bool check (symbol spec_dim, Treelog& err) const;
   static symbol find_description (const Metalib&, const Frame&);
-  static Number* get_expr (const Block& al);
-  Implementation (const Block&);
+  static Number* get_expr (const BlockModel& al);
+  Implementation (const BlockModel&);
   ~Implementation ();
 };
 
@@ -367,7 +367,7 @@ Select::Implementation::find_description (const Metalib& metalib,
 }
 
 Number*
-Select::Implementation::get_expr (const Block& al)
+Select::Implementation::get_expr (const BlockModel& al)
 {
   if (al.check ("expr"))
     return Librarian::build_item<Number> (al, "expr");
@@ -388,7 +388,7 @@ Select::Implementation::get_expr (const Block& al)
     { return true; }
     bool check (const Units&, const Scope&, Treelog&) const
     { return true; }
-    explicit NumberFactor (const Block& al, const double f)
+    explicit NumberFactor (const BlockModel& al, const double f)
       : Number (al),
         factor (f)
     { }
@@ -410,7 +410,7 @@ Select::Implementation::get_expr (const Block& al)
     { return true; }
     bool check (const Units&, const Scope&, Treelog&) const
     { return true; }
-    explicit NumberLinear (const Block& al, const double f, const double o)
+    explicit NumberLinear (const BlockModel& al, const double f, const double o)
       : Number (al),
         factor (f),
         offset (o)
@@ -440,7 +440,7 @@ Select::Implementation::get_expr (const Block& al)
     { return true; }
     bool check (const Units&, const Scope&, Treelog&) const
     { return true; }
-    explicit NumberX (const Block& al)
+    explicit NumberX (const BlockModel& al)
       : Number (al)
     { }
   };
@@ -449,7 +449,7 @@ Select::Implementation::get_expr (const Block& al)
 
 static const symbol flux_top_symbol ("flux_top");
 
-Select::Implementation::Implementation (const Block& al)
+Select::Implementation::Implementation (const BlockModel& al)
   : spec (al.check ("spec")
           ? submodel<Spec> (al, "spec")
           : NULL),
@@ -665,7 +665,7 @@ Select::check_border (const Border&,
                       Treelog&) const
 { return true; }
 
-Select::Select (const Block& al)
+Select::Select (const BlockModel& al)
   : name (al.type_name ()),
     impl (new Implementation (al)),
     accumulate (al.flag ("accumulate")),

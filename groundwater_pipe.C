@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "groundwater.h"
-#include "block.h"
+#include "block_model.h"
 #include "log.h"
 #include "geometry.h"
 #include "soil.h"
@@ -108,7 +108,7 @@ public:
   void initialize (const Units&,
                    const Geometry&, const Time&, const Scope&, Treelog&);
   bool check (const Units&, const Geometry&, const Scope&, Treelog&) const;
-  GroundwaterPipe (const Block&);
+  GroundwaterPipe (const BlockModel&);
   ~GroundwaterPipe ()
   { }
 };
@@ -353,7 +353,7 @@ GroundwaterPipe::check (const Units& units,
   return ok;
 }
  
-GroundwaterPipe::GroundwaterPipe (const Block& al)
+GroundwaterPipe::GroundwaterPipe (const BlockModel& al)
   : Groundwater (al),
     L (al.number ("L")),
     x (al.number ("x", L / 2.0)),
@@ -375,7 +375,7 @@ GroundwaterPipe::GroundwaterPipe (const Block& al)
 
 static struct GroundwaterPipeSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   {
     return new GroundwaterPipe (al);
   }

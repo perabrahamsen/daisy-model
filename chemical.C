@@ -23,7 +23,7 @@
 
 
 #include "chemical.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 #include "vcheck.h"
 #include "assertion.h"
@@ -66,7 +66,7 @@ Chemical::check_library ()
   return in_library;
 }
 
-Chemical::Chemical (const Block& al)
+Chemical::Chemical (const BlockModel& al)
   : ModelFramed (al)
 { }
 

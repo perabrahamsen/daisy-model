@@ -31,7 +31,7 @@ class PLF;
 class Production;
 class Vernalization;
 class Treelog;
-class Block;
+class BlockModel;
 
 class Phenology : public ModelDerived
 {
@@ -59,7 +59,7 @@ public:
 
   // Create and Destroy.
 public:
-  Phenology (const Block&);
+  Phenology (const BlockModel&);
   ~Phenology ();
 };
 

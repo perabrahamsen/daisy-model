@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "horizon.h"
-#include "block.h"
+#include "block_model.h"
 #include "texture.h"
 #include "hydraulic.h"
 #include "check.h"
@@ -44,12 +44,12 @@ struct HorizonStandard : public Horizon
 
   // Create and Destroy.
   static const std::vector<double>& get_limits ();
-  static const std::vector<double> get_fractions (const Block& al);
+  static const std::vector<double> get_fractions (const BlockModel& al);
   static const std::vector<double> get_fractions (const Frame& al);
-  static double get_humus (const Block& al);
+  static double get_humus (const BlockModel& al);
   static double get_humus (const Frame& al);
   void initialize (bool top_soil, int som_size, Treelog& msg);
-  HorizonStandard (const Block& al);
+  HorizonStandard (const BlockModel& al);
   HorizonStandard (const Frame& al, const double K_sat);
   ~HorizonStandard ();
 };
@@ -68,7 +68,7 @@ HorizonStandard::get_limits ()
 }
 
 const std::vector<double>
-HorizonStandard::get_fractions (const Block& al)
+HorizonStandard::get_fractions (const BlockModel& al)
 {
   daisy_assert (al.check ("sand") || 
 		(al.check ("fine_sand") && al.check ("coarse_sand")));
@@ -114,7 +114,7 @@ HorizonStandard::get_fractions (const Frame& al)
 }
 
 double
-HorizonStandard::get_humus (const Block& al)
+HorizonStandard::get_humus (const BlockModel& al)
 {
   daisy_assert (al.check ("sand") || 
 		(al.check ("fine_sand") && al.check ("coarse_sand")));
@@ -149,7 +149,7 @@ void
 HorizonStandard::initialize (bool top_soil, int som_size, Treelog& msg)
 { initialize_base (top_soil, som_size, texture, msg); }
 
-HorizonStandard::HorizonStandard (const Block& al)
+HorizonStandard::HorizonStandard (const BlockModel& al)
   : Horizon (al),
     texture (get_limits (), get_fractions (al), 
              get_humus (al), 0.0)
@@ -166,7 +166,7 @@ HorizonStandard::~HorizonStandard ()
 
 static struct HorizonStandardSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new HorizonStandard (al); }
 
   static bool check_alist (const Metalib&, const Frame& al, Treelog& err)

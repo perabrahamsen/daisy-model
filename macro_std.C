@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "macro.h"
-#include "block.h"
+#include "block_model.h"
 #include "geometry1d.h"
 #include "soil.h"
 #include "surface.h"
@@ -66,7 +66,7 @@ struct MacroStandard : public Macro
   { }
 
   // Create and Destroy.
-  MacroStandard (const Block& al)
+  MacroStandard (const BlockModel& al)
     : Macro (al),
       distribution (al.plf ("distribution")),
       height_start (al.check ("height_start") 
@@ -320,7 +320,7 @@ Macro::create (const double depth)
 
 static struct MacroStandardSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new MacroStandard (al); }
 
   static bool check_alist (const Metalib&, const Frame& al, Treelog& err)

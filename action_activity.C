@@ -30,6 +30,7 @@
 #include "metalib.h"
 #include "library.h"
 #include "treelog.h"
+#include "block_model.h"
 
 struct ActionActivity : public Action
 {
@@ -87,7 +88,7 @@ struct ActionActivity : public Action
     return ok;
   }
 
-  ActionActivity (const Block& al)
+  ActionActivity (const BlockModel& al)
     : Action (al),
       actions (Librarian::build_vector<Action> (al, "actions"))
   { }
@@ -98,7 +99,7 @@ struct ActionActivity : public Action
 
 static struct ActionActivitySyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ActionActivity (al); }
 
   static bool check_alist (const Metalib& metalib, const Frame& al, Treelog& msg)

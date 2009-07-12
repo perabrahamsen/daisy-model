@@ -32,7 +32,7 @@
 class Geometry;
 class Border;
 class Treelog;
-class Block;
+class BlockModel;
 
 class Volume : public Model 
 {
@@ -69,9 +69,9 @@ public:
 
   // Create and Destroy.
 public:
-  static std::auto_ptr<Volume> build_obsolete (const Block&);
+  static std::auto_ptr<Volume> build_obsolete (const BlockModel&);
   static std::auto_ptr<Volume> build_none ();
-  Volume (const Block&);
+  Volume (const BlockModel&);
   Volume (const char* id);
   ~Volume ();
 };

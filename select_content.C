@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "select_value.h"
-#include "block.h"
+#include "block_model.h"
 #include "geometry.h"
 #include "soil.h"
 #include "check.h"
@@ -94,7 +94,7 @@ struct SelectContent : public SelectValue
   }
 
   // Create and Destroy.
-  SelectContent (const Block& al)
+  SelectContent (const BlockModel& al)
     : SelectValue (al),
       has_z (al.check ("z") || al.check ("height")),
       z (al.number ("z", al.number ("height", -42.42e42))),
@@ -111,7 +111,7 @@ struct SelectContent : public SelectValue
 
 static struct SelectContentSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new SelectContent (al); }
   static bool check_alist (const Metalib&, const Frame& al, Treelog& msg)
   {

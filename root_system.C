@@ -32,7 +32,7 @@
 #include "chemistry.h"
 #include "log.h"
 #include "check.h"
-#include "block.h"
+#include "block_model.h"
 #include "mathlib.h"
 #include "librarian.h"
 #include "treelog.h"

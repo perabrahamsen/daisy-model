@@ -28,7 +28,7 @@
 
 class Scope;
 class Treelog;
-class Block;
+class BlockModel;
 class Units;
 
 class Integer : public Model
@@ -51,7 +51,7 @@ public:
   virtual bool initialize (const Units&, const Scope&, Treelog&) = 0;
   virtual bool check (const Scope&, Treelog&) const = 0;
 protected:
-  explicit Integer (const Block&);
+  explicit Integer (const BlockModel&);
 public:
   ~Integer ();
 };

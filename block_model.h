@@ -22,10 +22,10 @@
 #ifndef BLOCK_MODEL_H
 #define BLOCK_MODEL_H
 
-#include "block.h"
+#include "block_nested.h"
 #include "frame_model.h"
 
-class BlockModel : public Block
+class BlockModel : public BlockNested
 {
   const FrameModel& frame_;
 public:

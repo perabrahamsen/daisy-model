@@ -28,7 +28,7 @@
 #include <memory>
 
 class Hydraulic;
-class Block;
+class BlockModel;
 
 class Tortuosity : public Model
 {
@@ -44,7 +44,7 @@ public:
 
   // Create and Destroy.
 protected:
-  explicit Tortuosity (const Block&);
+  explicit Tortuosity (const BlockModel&);
   explicit Tortuosity (const symbol name);
 public:
   static std::auto_ptr<Tortuosity> create_default ();

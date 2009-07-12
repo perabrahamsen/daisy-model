@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "weather.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 
 const char *const Weather::component = "weather";
@@ -41,7 +41,7 @@ Weather::dry_deposit_unit ()
   return unit;
 }
 
-Weather::Weather (const Block& al)
+Weather::Weather (const BlockModel& al)
   : ModelDerived (al.type_name ())
 { }
 

@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "groundwater.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 #include "check.h"
 #include "assertion.h"
@@ -159,7 +159,7 @@ struct GroundwaterAquitard : public Groundwater
       ok = false;
     return ok;
   }
-  GroundwaterAquitard (const Block& al)
+  GroundwaterAquitard (const BlockModel& al)
     : Groundwater (al),
       K_aquitard (al.number ("K_aquitard")),
       Z_aquitard (al.number ("Z_aquitard")),
@@ -174,7 +174,7 @@ struct GroundwaterAquitard : public Groundwater
 
 static struct GroundwaterAquitardSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new GroundwaterAquitard (al); }
 
   GroundwaterAquitardSyntax ()

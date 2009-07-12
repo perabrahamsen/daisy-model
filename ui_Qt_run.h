@@ -88,7 +88,7 @@ private slots:
 private:
   explicit UIRun ();            // Disable.
 public:
-  explicit UIRun (const Block& al);
+  explicit UIRun (const BlockModel& al);
 private:
   ~UIRun ();
 };

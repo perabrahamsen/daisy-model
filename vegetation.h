@@ -42,7 +42,7 @@ class Harvest;
 class AM;
 class Metalib;
 class Treelog;
-class Block;
+class BlockModel;
 class FrameModel;
 class Units;
 
@@ -171,7 +171,7 @@ public:
                            const Soil& soil, OrganicMatter&,
                            Treelog&) = 0;
   virtual bool check (const Units&, Treelog& msg) const = 0;
-  explicit Vegetation (const Block&);
+  explicit Vegetation (const BlockModel&);
   ~Vegetation ();
 };
 

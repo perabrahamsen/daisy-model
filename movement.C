@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "movement.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 #include "tertiary.h"
 #include "log.h"
@@ -168,7 +168,7 @@ Movement::initialize (const Units& units,
   return ok;
 }
 
-Movement::Movement (const Block& al)
+Movement::Movement (const BlockModel& al)
   : ModelDerived (al.type_name ()),
     water_failure_level (-1),
     solute_failure_level (-1),

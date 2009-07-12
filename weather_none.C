@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "weather_old.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 #include "frame.h"
 
@@ -61,11 +61,11 @@ public:
 
   // Create and Destroy.
 public:
-  WeatherNone (const Block&);
+  WeatherNone (const BlockModel&);
   ~WeatherNone ();
 };
 
-WeatherNone::WeatherNone (const Block& al)
+WeatherNone::WeatherNone (const BlockModel& al)
   : WeatherOld (al),
     air_temperature_ (al.number ("air_temperature")),
     global_radiation_ (al.number ("global_radiation")),
@@ -80,7 +80,7 @@ WeatherNone::~WeatherNone ()
 // Add the WeatherNone syntax to the syntax table.
 static struct WeatherNoneSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new WeatherNone (al); }
   WeatherNoneSyntax ()
     : DeclareModel (Weather::component, "none", "old",

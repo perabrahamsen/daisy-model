@@ -30,15 +30,13 @@ BlockSubmodel::frame () const
 { return frame_; }
 
 BlockSubmodel::BlockSubmodel (const Block& parent, const symbol key)
-  : Block (parent, parent.submodel (key), key),
+  : BlockNested (parent, key),
     frame_ (parent.submodel (key))
 { }
 
 BlockSubmodel::BlockSubmodel (const Block& parent, const symbol key, 
                               const size_t index)
-  : Block (parent,
-           *parent.submodel_sequence (key)[index],
-           sequence_id (key, index)),
+  : BlockNested (parent, sequence_id (key, index)),
     frame_ (*parent.submodel_sequence (key)[index])
 { 
   daisy_assert (parent.submodel_sequence (key).size () > index);

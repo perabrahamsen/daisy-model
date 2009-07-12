@@ -33,7 +33,7 @@
 #include "solver.h"
 #include "log.h"
 #include "frame.h"
-#include "block.h"
+#include "block_model.h"
 #include "mathlib.h"
 #include "assertion.h"
 #include "librarian.h"
@@ -151,7 +151,7 @@ struct UZRectMollerup : public UZRect
 
   // Create and Destroy.
   void has_macropores (bool);
-  UZRectMollerup (const Block& al);
+  UZRectMollerup (const BlockModel& al);
   ~UZRectMollerup ();
 };
 
@@ -1088,7 +1088,7 @@ void
 UZRectMollerup::has_macropores (const bool)
 { /* Ignore for now. */ }
 
-UZRectMollerup::UZRectMollerup (const Block& al)
+UZRectMollerup::UZRectMollerup (const BlockModel& al)
   : UZRect (al),
     solver (Librarian::build_item<Solver> (al, "solver")),
     K_average (Librarian::build_item<Average> (al, "K_average")),
@@ -1111,7 +1111,7 @@ UZRectMollerup::~UZRectMollerup ()
 
 static struct UZRectMollerupSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new UZRectMollerup (al); }
   UZRectMollerupSyntax ()
     : DeclareModel (UZRect::component, "Mollerup", "\

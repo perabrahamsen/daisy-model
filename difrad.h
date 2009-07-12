@@ -28,7 +28,7 @@ class Log;
 class Weather;
 class Time;
 class Treelog;
-class Block;
+class BlockModel;
 
 class Difrad : public ModelFramed
 {
@@ -44,7 +44,7 @@ public:
 
   // Create and Destroy.
 protected:
-  Difrad (const Block&);
+  Difrad (const BlockModel&);
 public:
   ~Difrad ();
 };

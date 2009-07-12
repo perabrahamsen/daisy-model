@@ -27,7 +27,7 @@
 
 class Log;
 class Treelog;
-class Block;
+class BlockModel;
 class Units;
 
 class RubiscoNdist : public ModelLogable
@@ -47,7 +47,7 @@ public:
 				      const double cropN, Treelog& msg)=0;
   // Create and Destroy.
 protected:
-  RubiscoNdist (const Block&);
+  RubiscoNdist (const BlockModel&);
 
 public:
   ~RubiscoNdist ();

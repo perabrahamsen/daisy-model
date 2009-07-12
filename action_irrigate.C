@@ -23,7 +23,7 @@
 
 #include "action.h"
 #include "scope.h"
-#include "block.h"
+#include "block_model.h"
 #include "daisy.h"
 #include "chemical.h"
 #include "number.h"
@@ -133,7 +133,7 @@ struct ActionIrrigate : public Action
     return remaining_time < daisy.dt * 0.0001; 
   }
 
-  ActionIrrigate (const Block& al)
+  ActionIrrigate (const BlockModel& al)
     : Action (al),
       days (al.integer ("days")),
       hours (al.integer ("hours", (days > 0) ? 0 : 1)),
@@ -213,7 +213,7 @@ struct ActionIrrigateOverhead : public ActionIrrigate
     else
       f.irrigate_overhead (flux, temp, im, dt, msg); 
   }
-  ActionIrrigateOverhead (const Block& al)
+  ActionIrrigateOverhead (const BlockModel& al)
     : ActionIrrigate (al)
   { }
 };
@@ -228,7 +228,7 @@ struct ActionIrrigateSurface : public ActionIrrigate
     else
       f.irrigate_surface (flux, temp, im, dt, msg); 
   }
-  ActionIrrigateSurface (const Block& al)
+  ActionIrrigateSurface (const BlockModel& al)
     : ActionIrrigate (al)
   { }
 };
@@ -240,7 +240,7 @@ struct ActionIrrigateSubsoil : public ActionIrrigate
   void irrigate (Field& f, const double flux, const double /* temp */, 
                  const IM& im, const double dt, Treelog& msg) const
   { f.irrigate_subsoil (flux, im, *volume, dt, msg); }
-  ActionIrrigateSubsoil (const Block& al)
+  ActionIrrigateSubsoil (const BlockModel& al)
     : ActionIrrigate (al),
       volume (Volume::build_obsolete (al))
   { }
@@ -248,7 +248,7 @@ struct ActionIrrigateSubsoil : public ActionIrrigate
 
 static struct ActionIrrigateOverheadSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ActionIrrigateOverhead (al); }
   ActionIrrigateOverheadSyntax ()
     : DeclareModel (Action::component, "irrigate_overhead", "irrigate_base", "\
@@ -260,7 +260,7 @@ Irrigate the field from above.")
 
 static struct ActionIrrigateSurfaceSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ActionIrrigateSurface (al); }
   ActionIrrigateSurfaceSyntax ()
     : DeclareModel (Action::component, "irrigate_surface", "irrigate_base", "\
@@ -272,7 +272,7 @@ Irrigate the field directly on the soil surface, bypassing the canopy.")
 
 static struct ActionIrrigateTopSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ActionIrrigateOverhead (al); }
   static bool check_alist (const Metalib&, const Frame&, Treelog& err)
   {
@@ -293,7 +293,7 @@ OBSOLETE.  Use 'irrigate_overhead' instead.")
 
 static struct ActionIrrigateSubsoilSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ActionIrrigateSubsoil (al); }
 
   static bool check_alist (const Metalib&, const Frame& al, Treelog& err)

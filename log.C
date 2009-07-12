@@ -24,7 +24,7 @@
 #include "log.h"
 #include "library.h"
 #include "metalib.h"
-#include "block.h"
+#include "block_model.h"
 #include "daisy.h"
 #include "assertion.h"
 #include "librarian.h"
@@ -159,7 +159,7 @@ Log::initialize_common (Metalib& metalib, Treelog& msg)
   initialize (msg);
 }
 
-Log::Log (const Block& al)
+Log::Log (const BlockModel& al)
   : ModelFramed (al),
     impl (new Implementation ())
 { }

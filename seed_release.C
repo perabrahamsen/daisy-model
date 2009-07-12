@@ -20,7 +20,7 @@
 
 #define BUILD_DLL
 #include "seed.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 #include "log.h"
 #include "check.h"
@@ -50,7 +50,7 @@ struct SeedRelease : public Seed
   double initial_N () const; // [g N/m^2]
   void initialize (double seed_w, Treelog& msg);
   bool check (Treelog& msg) const;
-  SeedRelease (const Block& al);
+  SeedRelease (const BlockModel& al);
   ~SeedRelease ();
 };
 
@@ -97,7 +97,7 @@ SeedRelease::check (Treelog& msg) const
   return ok;
 }
 
-SeedRelease::SeedRelease (const Block& al)
+SeedRelease::SeedRelease (const BlockModel& al)
   : Seed (al),
     initial_weight (al.number ("initial_weight", -42.42e42)),
     DM_fraction (al.number ("DM_fraction")),
@@ -112,7 +112,7 @@ SeedRelease::~SeedRelease ()
 
 static struct Seed_ReleaseSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new SeedRelease (al); }
   Seed_ReleaseSyntax ()
     : DeclareModel (Seed::component, "release", "\

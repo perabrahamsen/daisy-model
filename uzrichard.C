@@ -23,7 +23,7 @@
 #define BUILD_DLL
 
 #include "uzmodel.h"
-#include "block.h"
+#include "block_model.h"
 #include "groundwater.h"
 #include "surface.h"
 #include "geometry_vert.h"
@@ -100,7 +100,7 @@ public:
   // Create and Destroy.
 public:
   void has_macropores (bool); // Tell UZ that there is macropores.
-  UZRichard (const Block& par);
+  UZRichard (const BlockModel& par);
   ~UZRichard ();
 };
 
@@ -751,7 +751,7 @@ UZRichard::has_macropores (const bool has_them)
   daisy_assert (K_average.get ());
 }
 
-UZRichard::UZRichard (const Block& al)
+UZRichard::UZRichard (const BlockModel& al)
   : UZmodel (al),
     // Parameters.
     debug (al.integer ("debug")),
@@ -771,7 +771,7 @@ UZRichard::~UZRichard ()
 // Add the UZRichard syntax to the syntax table.
 static struct UZRichardSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new UZRichard (al); }
 
   UZRichardSyntax ()

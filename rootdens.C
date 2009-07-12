@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "rootdens.h"
-#include "block.h"
+#include "block_model.h"
 #include "frame.h"
 #include "check.h"
 #include "librarian.h"
@@ -36,7 +36,7 @@ Rootdens::library_id () const
   return id;
 }
 
-Rootdens::Rootdens (const Block& al)
+Rootdens::Rootdens (const BlockModel& al)
   : ModelFramed (al),
     SpRtLength (al.number ("SpRtLength"))
 { }

@@ -24,6 +24,7 @@
 #include "parser_file.h"
 #include "metalib.h"
 #include "library.h"
+#include "block_model.h"
 #include "block_top.h"
 #include "lexer.h"
 #include "scope.h"
@@ -1363,7 +1364,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 		if (&frame == &metalib () && name == "path")
 		  {
                     // Use block to get references.
-                    BlockTop block (metalib (), msg, frame, "path");
+                    BlockTop block (metalib (), msg, frame);
 		    const std::vector<symbol>& symbols 
 		      = block.name_sequence (name);
 		    metalib ().path ().set_path (symbols);
@@ -1502,7 +1503,7 @@ ParserFile::ParserFile (Metalib& metalib,
     impl (new Implementation (metalib, filename, msg))
 { }
 
-ParserFile::ParserFile (const Block& al)
+ParserFile::ParserFile (const BlockModel& al)
   : Parser (al),
     impl (new Implementation (al.metalib (), al.name ("where"), al.msg ()))
 {  }
@@ -1512,7 +1513,7 @@ ParserFile::~ParserFile ()
 
 static struct ParserFileSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ParserFile (al); }
 
   ParserFileSyntax ()

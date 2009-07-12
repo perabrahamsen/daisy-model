@@ -24,7 +24,7 @@
 #include "model.h"
 #include "symbol.h"
 
-class Block;
+class BlockModel;
 class Toplevel;
 
 class EXPORT UI : public Model
@@ -49,7 +49,7 @@ public:
 private:
   UI ();                        // Disable.
 protected:
-  explicit UI (const Block&);
+  explicit UI (const BlockModel&);
 public:
   explicit UI (const char*);
   ~UI ();
@@ -70,7 +70,7 @@ private:
   // Create.
 public:
   explicit UIProgress ();
-  explicit UIProgress (const Block&);
+  explicit UIProgress (const BlockModel&);
   ~UIProgress ();
 };
 
@@ -89,7 +89,7 @@ private:
   // Create.
 public:
   explicit UINone ();
-  explicit UINone (const Block&);
+  explicit UINone (const BlockModel&);
   ~UINone ();
 };
 

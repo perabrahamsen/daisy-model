@@ -42,7 +42,7 @@ struct MactransStandard : public Mactrans
 
   // Create and Destroy.
   bool check (const Geometry&, Treelog&) const;
-  MactransStandard (const Block& al)
+  MactransStandard (const BlockModel& al)
     : Mactrans (al)
     { }
   MactransStandard (const symbol n)
@@ -197,7 +197,7 @@ This tertiary solute transport model only works with vertical geometries");
 
 static struct MactransStandardSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
     { return new MactransStandard (al); }
   MactransStandardSyntax ()
     : DeclareModel (Mactrans::component, "default", "Solute follows water.")

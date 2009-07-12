@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "phenology.h"
-#include "block.h"
+#include "block_model.h"
 #include "log.h"
 #include "frame.h"
 #include "librarian.h"
@@ -53,7 +53,7 @@ bool
 Phenology::mature () const
 { return DS >= 2.0; }
 
-Phenology::Phenology (const Block& al)
+Phenology::Phenology (const BlockModel& al)
   : ModelDerived (al.type_name ()),
     // State.
     DAP (al.number ("DAP")),

@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "gnuplot.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 
 const char *const Gnuplot::component = "gnuplot";
@@ -41,7 +41,7 @@ std::string
 Gnuplot::quote (const symbol value)
 { return quote (value.name ()); }
 
-Gnuplot::Gnuplot (const Block& al)
+Gnuplot::Gnuplot (const BlockModel& al)
   : name (al.type_name ())
 { }
 

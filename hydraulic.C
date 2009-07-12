@@ -23,19 +23,19 @@
 
 #include "hydraulic.h"
 #include "library.h"
-#include "block.h"
+#include "block_model.h"
 #include "plf.h"
 #include "log.h"
 #include "check_range.h"
 #include "frame_submodel.h"
-#include "block.h"
+#include "block_model.h"
 #include "treelog.h"
 #include "mathlib.h"
 #include "program.h"
 #include "vcheck.h"
 #include "librarian.h"
 #include "frame.h"
-#include "block.h"
+#include "block_model.h"
 #include <memory>
 #include <sstream>
 
@@ -219,7 +219,7 @@ Hydraulic::check (Treelog& msg) const
   return ok;
 }
 
-Hydraulic::Hydraulic (const Block& al)
+Hydraulic::Hydraulic (const BlockModel& al)
   : ModelDerived (al.type_name ()),
     K_init (al.check ("K_at_h")
 	    ? new K_at_h (al.submodel ("K_at_h"))
@@ -267,7 +267,7 @@ struct ProgramHydraulic_table : public Program
   { };
   bool check (Treelog& msg)
   { return hydraulic->check (msg); }
-  ProgramHydraulic_table (const Block& al)
+  ProgramHydraulic_table (const BlockModel& al)
     : Program (al),
       hydraulic (Librarian::build_item<Hydraulic> (al, "hydraulic")),
       intervals (al.integer ("intervals"))
@@ -278,7 +278,7 @@ struct ProgramHydraulic_table : public Program
 
 static struct ProgramHydraulic_tableSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ProgramHydraulic_table (al); }
   ProgramHydraulic_tableSyntax ()
     : DeclareModel (Program::component, "hydraulic", "\

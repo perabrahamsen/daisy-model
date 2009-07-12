@@ -36,7 +36,7 @@ class Vegetation;
 class Surface;
 class Pet;
 class Bioclimate;
-class Block;
+class BlockModel;
 class Treelog;
 
 class SVAT : public ModelDerived
@@ -63,7 +63,7 @@ public:
 
   // Create and Destroy.
 protected:
-  SVAT (const Block&);
+  SVAT (const BlockModel&);
 public:
   virtual void summarize (Treelog& msg) const = 0;
   ~SVAT ();

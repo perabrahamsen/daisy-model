@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "horizon.h"
-#include "block.h"
+#include "block_model.h"
 #include "texture.h"
 #include "hydraulic.h"
 #include "check.h"
@@ -47,7 +47,7 @@ struct HorizonNumeric : public Horizon
   void initialize (bool top_soil, int som_size, Treelog& msg)
   { initialize_base (top_soil, som_size, texture, msg); }
   static const std::vector<double> normalize (const std::vector<double>& original);
-  HorizonNumeric (const Block& al)
+  HorizonNumeric (const BlockModel& al)
     : Horizon (al),
       texture (al.number_sequence ("limits"),
                normalize (al.number_sequence ("fractions")),
@@ -82,7 +82,7 @@ HorizonNumeric::normalize (const std::vector<double>& original)
 
 static struct HorizonNumericSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new HorizonNumeric (al); }
 
   static bool check_alist (const Metalib&, const Frame& al, Treelog& err)

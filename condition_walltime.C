@@ -22,7 +22,7 @@
 
 #define BUILD_DLL
 #include "condition.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 #include "frame.h"
 
@@ -50,7 +50,7 @@ public:
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ConditionPeriodic (const Block& al)
+  ConditionPeriodic (const BlockModel& al)
     : Condition (al),
       period (al.integer ("period")),
       last (0)
@@ -59,7 +59,7 @@ public:
 
 static struct ConditionPeriodicSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ConditionPeriodic (al); }
   ConditionPeriodicSyntax ()
     : DeclareModel (Condition::component, "periodic", "\

@@ -28,6 +28,7 @@
 #include "assertion.h"
 #include "librarian.h"
 #include "frame.h"
+#include "block_model.h"
 #include "treelog.h"
 
 struct ABAProdSoil : public ABAProd
@@ -54,7 +55,7 @@ struct ABAProdSoil : public ABAProd
   // Create and Destroy.
   void initialize (const Units&, Treelog&);
   bool check (const Units&, Treelog&) const;
-  ABAProdSoil (const Block& al);
+  ABAProdSoil (const BlockModel& al);
   ~ABAProdSoil ();
 };
 
@@ -117,7 +118,7 @@ ABAProdSoil::check (const Units& units, Treelog& msg) const
   return ok;
 }
 
-ABAProdSoil::ABAProdSoil (const Block& al)
+ABAProdSoil::ABAProdSoil (const BlockModel& al)
   : ABAProd (al),
     scope (__FUNCTION__),
     expr (Librarian::build_item<Number> (al, "expr"))
@@ -133,7 +134,7 @@ ABAProdSoil::~ABAProdSoil ()
 
 static struct ABAProdSoilSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ABAProdSoil (al); }
   ABAProdSoilSyntax ()
     : DeclareModel (ABAProd::component, "soil", "\

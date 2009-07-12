@@ -20,7 +20,7 @@
 
 #define BUILD_DLL
 #include "select_value.h"
-#include "block.h"
+#include "block_model.h"
 #include "volume.h"
 #include "border.h"
 #include "geometry.h"
@@ -63,7 +63,7 @@ private:
                      const Volume& default_volume,
                      Treelog& msg) const;
 public:
-  SelectFlow (const Block&);
+  SelectFlow (const BlockModel&);
 };
 
 symbol 
@@ -165,7 +165,7 @@ SelectFlow::output_array (const std::vector<double>& array,
   add_result (sum);
 }
 
-SelectFlow::SelectFlow (const Block& al)
+SelectFlow::SelectFlow (const BlockModel& al)
   : SelectValue (al),
     density (al.flag ("density")),
     volume (Volume::build_obsolete (al)),
@@ -203,14 +203,14 @@ struct SelectFlowTop : public SelectFlow
   }
 
   // Create and Destroy.
-  SelectFlowTop (const Block& al)
+  SelectFlowTop (const BlockModel& al)
     : SelectFlow (al)
   { }
 };
 
 static struct SelectFlowTopSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new SelectFlowTop (al); }
 
   SelectFlowTopSyntax ()
@@ -250,14 +250,14 @@ struct SelectFlowBottom : public SelectFlow
   }
 
   // Create and Destroy.
-  SelectFlowBottom (const Block& al)
+  SelectFlowBottom (const BlockModel& al)
     : SelectFlow (al)
   { }
 };
 
 static struct SelectFlowBottomSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new SelectFlowBottom (al); }
 
   SelectFlowBottomSyntax ()
@@ -300,14 +300,14 @@ struct SelectFlowLeft : public SelectFlow
   }
 
   // Create and Destroy.
-  SelectFlowLeft (const Block& al)
+  SelectFlowLeft (const BlockModel& al)
     : SelectFlow (al)
   { }
 };
 
 static struct SelectFlowLeftSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new SelectFlowLeft (al); }
 
   SelectFlowLeftSyntax ()
@@ -331,14 +331,14 @@ struct SelectFlowRight : public SelectFlow
   }
 
   // Create and Destroy.
-  SelectFlowRight (const Block& al)
+  SelectFlowRight (const BlockModel& al)
     : SelectFlow (al)
   { }
 };
 
 static struct SelectFlowRightSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new SelectFlowRight (al); }
 
   SelectFlowRightSyntax ()
@@ -362,14 +362,14 @@ struct SelectFlowFront : public SelectFlow
   }
 
   // Create and Destroy.
-  SelectFlowFront (const Block& al)
+  SelectFlowFront (const BlockModel& al)
     : SelectFlow (al)
   { }
 };
 
 static struct SelectFlowFrontSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new SelectFlowFront (al); }
 
   SelectFlowFrontSyntax ()
@@ -393,14 +393,14 @@ struct SelectFlowBack : public SelectFlow
   }
 
   // Create and Destroy.
-  SelectFlowBack (const Block& al)
+  SelectFlowBack (const BlockModel& al)
     : SelectFlow (al)
   { }
 };
 
 static struct SelectFlowBackSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new SelectFlowBack (al); }
 
   SelectFlowBackSyntax ()

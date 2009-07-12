@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "seed.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 
 const char *const Seed::component = "seed";
@@ -33,7 +33,7 @@ Seed::library_id () const
   return id;
 }
 
-Seed::Seed (const Block& al)
+Seed::Seed (const BlockModel& al)
   : ModelDerived (al.type_name ())
 { }
 

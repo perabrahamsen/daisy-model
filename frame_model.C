@@ -21,7 +21,6 @@
 #define BUILD_DLL
 
 #include "frame_model.h"
-#include "block.h"
 #include "assertion.h"
 #include "treelog.h"
 #include "librarian.h"

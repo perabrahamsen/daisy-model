@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "organic_matter.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 
 const char *const OrganicMatter::component = "organic";
@@ -33,7 +33,7 @@ OrganicMatter::library_id () const
   return id;
 }
 
-OrganicMatter::OrganicMatter (const Block& al)
+OrganicMatter::OrganicMatter (const BlockModel& al)
   : ModelDerived (al.type_name ())
 { }
 

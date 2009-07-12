@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "mactrans.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 
 const char *const Mactrans::component = "mactrans";
@@ -34,7 +34,7 @@ Mactrans::library_id () const
   return id;
 }
 
-Mactrans::Mactrans (const Block& al)
+Mactrans::Mactrans (const BlockModel& al)
   : name (al.type_name ())
 { }
 

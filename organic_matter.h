@@ -39,7 +39,7 @@ class Chemistry;
 class Time;
 class Volume;
 class Treelog;
-class Block;
+class BlockModel;
 class Units;
 class Metalib;
 
@@ -99,7 +99,7 @@ public:
 private:
   OrganicMatter ();
 public:
-  explicit OrganicMatter (const Block&);
+  explicit OrganicMatter (const BlockModel&);
   ~OrganicMatter ();
 };
 

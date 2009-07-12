@@ -223,8 +223,8 @@ struct VegetationCrops : public Vegetation
                    const Soil& soil, OrganicMatter&,
                    Treelog& msg);
   bool check (const Units& units, Treelog& msg) const;
-  static CropList build_crops (const Block& block, const std::string& key);
-  VegetationCrops (const Block&);
+  static CropList build_crops (const BlockModel& block, const std::string& key);
+  VegetationCrops (const BlockModel&);
   ~VegetationCrops ();
 };
 
@@ -911,13 +911,13 @@ VegetationCrops::check (const Units& units, Treelog& msg) const
 }
 
 VegetationCrops::CropList
-VegetationCrops::build_crops (const Block& al, const std::string& key)
+VegetationCrops::build_crops (const BlockModel& al, const std::string& key)
 {
   const std::vector<Crop*> v = Librarian::build_vector<Crop> (al, key);
   return CropList (v.begin (), v.end ());
 }
 
-VegetationCrops::VegetationCrops (const Block& al)
+VegetationCrops::VegetationCrops (const BlockModel& al)
   : Vegetation (al),
     crops (build_crops (al, "crops")),
     // deque, so we can't use build_vector.
@@ -949,7 +949,7 @@ VegetationCrops::~VegetationCrops ()
 
 static struct VegetationCropsSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new VegetationCrops (al); }
 
   VegetationCropsSyntax ()

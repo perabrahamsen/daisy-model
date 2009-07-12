@@ -48,7 +48,7 @@ struct TransportConvection : public Transport
              Treelog& msg) const;
 
   // Create.
-  TransportConvection (const Block& al);
+  TransportConvection (const BlockModel& al);
   ~TransportConvection ();
 };
 
@@ -207,7 +207,7 @@ TransportConvection::flow (const Geometry& geo,
     }
 }
 
-TransportConvection::TransportConvection (const Block& al)
+TransportConvection::TransportConvection (const BlockModel& al)
   : Transport (al)
 { }
 
@@ -216,7 +216,7 @@ TransportConvection::~TransportConvection ()
 
 static struct TransportConvectionSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new TransportConvection (al); }
 
   TransportConvectionSyntax ()

@@ -22,10 +22,10 @@
 #define BUILD_DLL
 
 #include "uzmodel.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 
-UZmodel::UZmodel (const Block& al)
+UZmodel::UZmodel (const BlockModel& al)
   : name (al.type_name ())
 { }
 

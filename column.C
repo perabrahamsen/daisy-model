@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "column.h"
-#include "block.h"
+#include "block_model.h"
 #include "log.h"
 #include "librarian.h"
 #include "frame.h"
@@ -64,7 +64,7 @@ Column::output (Log& log) const
   output_variable (size, log);
 }
 
-Column::Column (const Block& al)
+Column::Column (const BlockModel& al)
   : ModelFramed (al),
     size (al.number ("size")),
     location_ (map_submodel_const<Point> (al, "location"))

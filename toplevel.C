@@ -94,7 +94,7 @@ Toplevel::Implementation::run_program (const std::string& name_str)
 
       // Initialize.
       {
-        BlockTop block (metalib, msg, metalib, "Initializing");
+        BlockTop block (metalib, msg, metalib);
         program->initialize (metalib, block);
         if (!block.ok ())
           throw EXIT_FAILURE;
@@ -124,7 +124,7 @@ Toplevel::Implementation::add_daisy_ui (Toplevel& toplevel)
   if (!metalib.check ("ui"))
     metalib.set ("ui", preferred_ui);
 
-  BlockTop block (metalib, msg, metalib, "UI");
+  BlockTop block (metalib, msg, metalib);
   ui.reset (Librarian::build_item<UI> (block, "ui"));
   if (!ui.get ())
     throw "Could not create UI";
@@ -408,7 +408,7 @@ Toplevel::initialize ()
       if (!program_frame ().check (metalib (), msg ()))
         throw EXIT_FAILURE;
       {                             // Limit lifetime of block.
-        BlockTop block (metalib (), msg (), metalib (), "Building");
+        BlockTop block (metalib (), msg (), metalib ());
         if (metalib ().check ("run"))
           impl->program.reset (Librarian::build_item<Program> (block, "run"));
         else
@@ -430,7 +430,7 @@ Toplevel::initialize ()
           throw EXIT_FAILURE;
       }
       {
-        BlockTop block (metalib (), msg (), metalib (), "Initializing");
+        BlockTop block (metalib (), msg (), metalib ());
         impl->program->initialize (metalib (), block);
         if (!block.ok ())
           throw EXIT_FAILURE;

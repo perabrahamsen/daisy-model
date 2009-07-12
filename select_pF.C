@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "select.h"
-#include "block.h"
+#include "block_model.h"
 #include "mathlib.h"
 #include "check.h"
 #include "vcheck.h"
@@ -86,7 +86,7 @@ struct SelectPF : public Select
   { return value.size (); }
 
   // Create and Destroy.
-  SelectPF (const Block& al)
+  SelectPF (const BlockModel& al)
     : Select (al),
       max_h (al.number ("max_h")),
       value (al.number_sequence ("value")),
@@ -96,7 +96,7 @@ struct SelectPF : public Select
 
 static struct SelectPFSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new SelectPF (al); }
 
   static bool check_alist (const Metalib&, const Frame& al, Treelog& err)

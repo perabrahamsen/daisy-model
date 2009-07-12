@@ -28,7 +28,6 @@
 #include <string>
 #include <vector>
 #include <set>
-#include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 
 class Treelog;
@@ -51,16 +50,14 @@ class PLF;
 #endif
 
 
-class EXPORT Block : public Scope // private boost::noncopyable
+class EXPORT Block : public Scope 
 {
-  struct Implementation;
-  std::auto_ptr<Implementation> impl;
 public:
-  const Metalib& metalib () const;
+  virtual const Metalib& metalib () const = 0;
   const Units& units () const;
   Path& path () const;
   virtual const Frame& frame () const = 0;
-  Treelog& msg () const;
+  virtual Treelog& msg () const = 0;
   symbol type_name () const;
 
   // Variables.
@@ -69,26 +66,28 @@ private:
   symbol expand_reference (const symbol key) const;
 
   // Error handling.
+private:
+  mutable bool is_ok;
 public:  
   void error (const std::string&) const;
   bool ok () const;
-  void set_error () const;
+  virtual void set_error () const;
 
   // Nested scope handling.
 public:
-  const Frame& find_frame (const symbol key) const;
+  virtual const Frame& find_frame (const symbol key) const;
 
   // Syntax emulation.
 public:
-  Attribute::type lookup (symbol) const;
-  void entries (std::set<symbol>&) const;
+  virtual Attribute::type lookup (symbol) const;
+  virtual void entries (std::set<symbol>&) const;
   int type_size (symbol tag) const;
   symbol dimension (symbol) const;
   symbol description (symbol) const;
 
   // Submodel emulation.
 public:
-  bool check (const symbol key) const;
+  virtual bool check (const symbol key) const;
   int value_size (symbol tag) const;
   double number (symbol) const;
   double number (symbol, double default_value) const;
@@ -115,12 +114,7 @@ public:
   // Create and Destroy.
 protected:
   static symbol sequence_id (symbol key, size_t index);
-public:
-  // Freestanding
-  // Context
-protected:  
-  Block (const Block&, const Frame&, symbol scope_tag);
-  Block (const Metalib&, Treelog& msg, const Frame&, symbol scope_tag);
+  Block ();
 public:
   ~Block ();
 };

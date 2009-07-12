@@ -26,7 +26,7 @@
 #include <ostream>
 
 class Treelog;
-class Block;
+class BlockModel;
 class Units;
 
 class Gnuplot : public Model
@@ -49,7 +49,7 @@ public:
 
   // Create and Destroy.
 protected:
-  explicit Gnuplot (const Block&);
+  explicit Gnuplot (const BlockModel&);
 private:
   explicit Gnuplot ();
   explicit Gnuplot (const Gnuplot&);

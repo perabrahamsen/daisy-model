@@ -26,7 +26,7 @@
 
 class Log;
 class Treelog;
-class Block;
+class BlockModel;
 
 class ABAEffect : public ModelLogable
 {
@@ -42,7 +42,7 @@ public:
 			     Treelog& msg) = 0;	    // []
   // Create and Destroy.
 protected:
-  ABAEffect (const Block&);
+  ABAEffect (const BlockModel&);
 
 public:
   ~ABAEffect ();

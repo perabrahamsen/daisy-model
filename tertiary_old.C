@@ -29,7 +29,7 @@
 #include "macro.h"
 #include "mactrans.h"
 #include "librarian.h"
-#include "block.h"
+#include "block_model.h"
 #include "surface.h"
 #include "groundwater.h"
 #include "treelog.h"
@@ -72,7 +72,7 @@ public:
                    const Geometry&, const Soil&, const Scope& parent_scope, 
                    const Groundwater&, Treelog& msg);
   bool check (const Geometry&, Treelog& msg) const;
-  TertiaryOld (const Block& al);
+  TertiaryOld (const BlockModel& al);
 };
 
 void
@@ -234,7 +234,7 @@ This tertiary water transport model only works with the 'vertical' movement mode
   return ok;
 }
 
-TertiaryOld::TertiaryOld (const Block& al)
+TertiaryOld::TertiaryOld (const BlockModel& al)
   : Tertiary (al),
     macro (al.check ("macro")
 	   ? Librarian::build_item<Macro> (al, "macro")
@@ -244,7 +244,7 @@ TertiaryOld::TertiaryOld (const Block& al)
 
 static struct TertiaryOldSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new TertiaryOld (al); }
 
   TertiaryOldSyntax ()

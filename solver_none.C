@@ -32,14 +32,14 @@ struct SolverNone : public Solver
 { 
   void solve (Matrix&, const Vector&, Vector&) const
   { }
-  SolverNone (const Block& al)
+  SolverNone (const BlockModel& al)
     : Solver (al)
   { }
 };
 
 static struct SolverNoneSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new SolverNone (al); }
   SolverNoneSyntax ()
     : DeclareModel (Solver::component, "none", "Don't solve the equation.")

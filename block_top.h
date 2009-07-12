@@ -36,10 +36,14 @@
 
 class EXPORT BlockTop : public Block
 {
+  const Metalib& metalib_;
   const Frame& frame_;
+  Treelog& msg_;
+  const Metalib& metalib () const;
   const Frame& frame () const;
+  Treelog& msg () const;
 public:
-  BlockTop (const Metalib&, Treelog& msg, const Frame&, symbol scope_tag);
+  BlockTop (const Metalib&, Treelog& msg, const Frame&);
   ~BlockTop ();
 };
 

@@ -138,6 +138,8 @@ Librarian::build_frame (const symbol component, const Metalib& metalib,
                         Treelog& msg, const FrameModel& frame,
                         const symbol scope_id)
 {
+  Treelog::Open nest (msg, scope_id);
+
   // Check.
   {
     TreelogString tlog;
@@ -149,7 +151,7 @@ Librarian::build_frame (const symbol component, const Metalib& metalib,
   }
   
   // Build.
-  BlockTop parent (metalib, msg, frame, scope_id);
+  BlockTop parent (metalib, msg, frame);
   const symbol type = frame.type_name ();
   std::auto_ptr<Model> m (frame.construct (parent, type)); 
   if (!parent.ok ())

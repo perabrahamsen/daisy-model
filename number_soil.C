@@ -23,7 +23,7 @@
 #include "number.h"
 #include "metalib.h"
 #include "library.h"
-#include "block.h"
+#include "block_model.h"
 #include "column.h"
 #include "horizon.h"
 #include "hydraulic.h"
@@ -105,7 +105,7 @@ struct NumberByDepth : public Number
       }
     return ok;
   }
-  NumberByDepth (const Block& al)
+  NumberByDepth (const BlockModel& al)
     : Number (al),
       units (al.units ()),
       column (Librarian::build_item<Column> (al, "column")),
@@ -161,14 +161,14 @@ struct NumberDepthTheta : public NumberByDepth
   { return Attribute::Fraction (); }
 
   // Create.
-  NumberDepthTheta (const Block& al)
+  NumberDepthTheta (const BlockModel& al)
     : NumberByDepth (al)
   { }
 };
 
 static struct NumberDepthThetaSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NumberDepthTheta (al); }
   NumberDepthThetaSyntax ()
     : DeclareModel (Number::component, "depth_Theta", "depth",
@@ -195,14 +195,14 @@ struct NumberDepthK : public NumberByDepth
   { return units.cm_per_h (); }
 
   // Create.
-  NumberDepthK (const Block& al)
+  NumberDepthK (const BlockModel& al)
     : NumberByDepth (al)
   { }
 };
 
 static struct NumberDepthKSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NumberDepthK (al); }
   NumberDepthKSyntax ()
     : DeclareModel (Number::component, "depth_K", "depth", 
@@ -250,7 +250,7 @@ struct NumberByTension : public Number
       }
     return true;
   }
-  NumberByTension (const Block& al)
+  NumberByTension (const BlockModel& al)
     : Number (al),
       units (al.units ()),
       horizon (Librarian::build_item<Horizon> (al, "horizon")),
@@ -291,14 +291,14 @@ struct NumberSoilTheta : public NumberByTension
   { return Attribute::Fraction (); }
 
   // Create.
-  NumberSoilTheta (const Block& al)
+  NumberSoilTheta (const BlockModel& al)
     : NumberByTension (al)
   { }
 };
 
 static struct NumberSoilThetaSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NumberSoilTheta (al); }
   NumberSoilThetaSyntax ()
     : DeclareModel (Number::component, "soil_Theta", "horizon",
@@ -321,14 +321,14 @@ struct NumberSoilK : public NumberByTension
   { return units.cm_per_h (); }
 
   // Create.
-  NumberSoilK (const Block& al)
+  NumberSoilK (const BlockModel& al)
     : NumberByTension (al)
   { }
 };
 
 static struct NumberSoilKSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NumberSoilK (al); }
   NumberSoilKSyntax ()
     : DeclareModel (Number::component, "soil_K", "horizon",
@@ -356,14 +356,14 @@ struct NumberSoilHeatCapacity : public NumberByTension
   }
 
   // Create.
-  NumberSoilHeatCapacity (const Block& al)
+  NumberSoilHeatCapacity (const BlockModel& al)
     : NumberByTension (al)
   { }
 };
 
 static struct NumberSoilHeatCapacitySyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NumberSoilHeatCapacity (al); }
   NumberSoilHeatCapacitySyntax ()
     : DeclareModel (Number::component, "soil_heat_capacity", "horizon",
@@ -391,14 +391,14 @@ struct NumberSoilHeatConductivity : public NumberByTension
   }
 
   // Create.
-  NumberSoilHeatConductivity (const Block& al)
+  NumberSoilHeatConductivity (const BlockModel& al)
     : NumberByTension (al)
   { }
 };
 
 static struct NumberSoilHeatConductivitySyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NumberSoilHeatConductivity (al); }
   NumberSoilHeatConductivitySyntax ()
     : DeclareModel (Number::component, "soil_heat_conductivity", "horizon",
@@ -451,7 +451,7 @@ struct NumberTensionByTheta : public Number
       }
     return true;
   }
-  NumberTensionByTheta (const Block& al)
+  NumberTensionByTheta (const BlockModel& al)
     : Number (al),
       units (al.units ()),
       horizon (Librarian::build_item<Horizon> (al, "horizon")),
@@ -461,7 +461,7 @@ struct NumberTensionByTheta : public Number
 
 static struct NumberTensionByThetaSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NumberTensionByTheta (al); }
   NumberTensionByThetaSyntax()
     : DeclareModel (Number::component, "soil_h", 

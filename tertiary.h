@@ -26,7 +26,7 @@
 #include "model_framed.h"
 #include <map>
 
-class Block;
+class BlockModel;
 class Geometry;
 class Soil;
 class SoilWater;
@@ -77,7 +77,7 @@ public:
                            const Groundwater&, Treelog&) = 0;
   virtual bool check (const Geometry&, Treelog&) const = 0;
 protected:
-  explicit Tertiary (const Block& al);
+  explicit Tertiary (const BlockModel& al);
 public:
   ~Tertiary ();
 };

@@ -20,7 +20,7 @@
 
 #define BUILD_DLL
 #include "xysource.h"
-#include "block.h"
+#include "block_model.h"
 #include "gnuplot_utils.h"
 #include "number.h"
 #include "vcheck.h"
@@ -64,7 +64,7 @@ public:
 
   // Create.
 public:
-  explicit XYSourceInline (const Block&);
+  explicit XYSourceInline (const BlockModel&);
 private:
   XYSourceInline (const XYSourceInline&);
   XYSourceInline& operator= (const XYSourceInline&);
@@ -88,7 +88,7 @@ XYSourceInline::load (const Units&, Treelog&)
   return true;
 }
 
-XYSourceInline::XYSourceInline (const Block& al)
+XYSourceInline::XYSourceInline (const BlockModel& al)
   : XYSource (al),
     with_ (al.name ("with")),
     style_ (al.integer ("style", -1)),
@@ -104,7 +104,7 @@ XYSourceInline::~XYSourceInline ()
 
 static struct XYSourceInlineSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new XYSourceInline (al); }
 
   XYSourceInlineSyntax ()

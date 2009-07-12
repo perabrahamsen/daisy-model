@@ -29,7 +29,7 @@
 #include <memory>
 #include <vector>
 
-class Block;
+class BlockModel;
 class Geometry;
 class Soil;
 class SoilHeat;
@@ -127,7 +127,7 @@ public:
                            Treelog&) = 0;
   virtual bool check (const Geometry&, Treelog& msg) const = 0;
 protected:
-  explicit Biopore (const Block& al);
+  explicit Biopore (const BlockModel& al);
 public:
   ~Biopore ();
 };

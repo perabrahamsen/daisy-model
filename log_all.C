@@ -24,7 +24,7 @@
 #include "select.h"
 #include "metalib.h"
 #include "library.h"
-#include "block.h"
+#include "block_model.h"
 #include "treelog.h"
 #include "assertion.h"
 

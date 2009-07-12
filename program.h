@@ -29,6 +29,7 @@
 #include <vector>
 
 class Treelog;
+class BlockModel;
 class Block;
 class Metalib;
 class Log;
@@ -61,7 +62,7 @@ public:
   virtual void initialize (Metalib&, Block&) = 0;
   virtual bool check (Treelog& err) = 0;
 protected:
-  explicit Program (const Block&);
+  explicit Program (const BlockModel&);
 public:
   ~Program ();
 };

@@ -24,7 +24,7 @@
 #include "printer_file.h"
 #include "metalib.h"
 #include "library.h"
-#include "block.h"
+#include "block_model.h"
 #include "plf.h"
 #include "time.h"
 #include "parser.h"

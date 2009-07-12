@@ -20,7 +20,7 @@
 
 #define BUILD_DLL
 #include "source.h"
-#include "block.h"
+#include "block_model.h"
 #include "number.h"
 #include "scope_sources.h"
 #include "gnuplot_utils.h"
@@ -67,7 +67,7 @@ public:
 
   // Create and Destroy.
 public:
-  explicit SourceCombine (const Block& al);
+  explicit SourceCombine (const BlockModel& al);
   ~SourceCombine ()
   { }
 };
@@ -109,7 +109,7 @@ SourceCombine::load (Treelog& msg)
   return true;
 }
 
-SourceCombine::SourceCombine (const Block& al)
+SourceCombine::SourceCombine (const BlockModel& al)
   : Source (al),
     units (al.units ()),
     scope (Librarian::build_vector<Source> (al, "source")),
@@ -122,7 +122,7 @@ SourceCombine::SourceCombine (const Block& al)
 
 static struct SourceCombineSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new SourceCombine (al); }
 
   SourceCombineSyntax ()

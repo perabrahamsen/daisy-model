@@ -42,6 +42,7 @@
 #include "tertsmall.h"
 #include "treelog.h"
 #include "mathlib.h"
+#include "block_model.h"
 
 struct MovementRect : public MovementSolute
 {
@@ -94,7 +95,7 @@ struct MovementRect : public MovementSolute
   // Create.
   void initialize_derived (const Soil&, const Groundwater&, 
                            bool has_macropores, Treelog&);
-  MovementRect (const Block& al);
+  MovementRect (const BlockModel& al);
   ~MovementRect ();
 };
 
@@ -295,7 +296,7 @@ MovementRect::initialize_derived (const Soil&, const Groundwater&,
     matrix_water[i]->has_macropores (has_macropores);
 }
 
-MovementRect::MovementRect (const Block& al)
+MovementRect::MovementRect (const BlockModel& al)
   : MovementSolute (al),
     geo (submodel<GeometryRect> (al, "Geometry")),
     drain_position (map_construct_const<Point> 
@@ -324,7 +325,7 @@ MovementRect::~MovementRect ()
 
 static struct MovementRectSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new MovementRect (al); }
 
   MovementRectSyntax ()

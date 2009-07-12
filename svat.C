@@ -23,7 +23,7 @@
 
 #include "svat.h"
 #include "log.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 
 const char *const SVAT::component = "svat";
@@ -39,7 +39,7 @@ void
 SVAT::output (Log&) const
 { }
 
-SVAT::SVAT (const Block& al)
+SVAT::SVAT (const BlockModel& al)
   : ModelDerived (al.type_name ())
 { }
 

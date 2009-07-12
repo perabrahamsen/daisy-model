@@ -28,7 +28,7 @@
 
 class Scope;
 class Treelog;
-class Block;
+class BlockModel;
 class Units;
 class Unit;
 
@@ -59,7 +59,7 @@ public:
   virtual bool check (const Units&, const Scope&, Treelog&) const = 0;
   bool check_dim (const Units&, const Scope&, symbol dim, Treelog&) const;
 protected:
-  explicit Number (const Block&);
+  explicit Number (const BlockModel&);
 public:
   ~Number ();
 };

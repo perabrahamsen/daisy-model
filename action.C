@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "action.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 
 const char *const Action::component = "action";
@@ -54,7 +54,7 @@ bool
 Action::check (const Daisy&, const Scope&, Treelog&) const
 { return true; }
 
-Action::Action (const Block& al)
+Action::Action (const BlockModel& al)
   : ModelFramed (al)
 { }
 

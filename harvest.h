@@ -25,7 +25,7 @@
 
 #include "time.h"
 #include "symbol.h"
-#include "block.h"
+#include "block_model.h"
 
 class Frame;
 class Log;

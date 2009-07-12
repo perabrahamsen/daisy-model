@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "secondary.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 #include "assertion.h"
 #include "frame.h"
@@ -37,7 +37,7 @@ Secondary::library_id () const
   return id;
 }
 
-Secondary::Secondary (const Block& al)
+Secondary::Secondary (const BlockModel& al)
   : name (al.type_name ())
 { }
 
@@ -79,7 +79,7 @@ struct SecondaryNone : public Secondary
   double alpha () const         // The value of the 'alpha' parameter.
   { daisy_notreached (); }
 
-  explicit SecondaryNone (const Block& al)
+  explicit SecondaryNone (const BlockModel& al)
     : Secondary (al)
   {}
   SecondaryNone ()
@@ -93,7 +93,7 @@ Secondary::create_none ()
 
 static struct SecondaryNoneSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new SecondaryNone (al); }
   SecondaryNoneSyntax ()
     : DeclareModel (Secondary::component, "none", "No secondary domain.\n\
@@ -120,7 +120,7 @@ struct SecondaryPressure : public Secondary
   double alpha () const         // The value of the 'alpha' parameter.
   { return alpha_; }
   
-  SecondaryPressure (const Block& al)
+  SecondaryPressure (const BlockModel& al)
     : Secondary (al),
       h_lim_ (al.number ("h_lim")),
       alpha_ (al.number ("alpha"))    
@@ -129,7 +129,7 @@ struct SecondaryPressure : public Secondary
 
 static struct SecondaryPressureSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new SecondaryPressure (al); }
   SecondaryPressureSyntax ()
     : DeclareModel (Secondary::component, "pressure", "Horizon has secondary domain.\n\

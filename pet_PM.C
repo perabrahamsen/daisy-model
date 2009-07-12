@@ -69,7 +69,7 @@ public:
     }
 
   // Create & Destroy.
-  PetPM (const Block& al)
+  PetPM (const BlockModel& al)
     : Pet (al)
     { }
   ~PetPM ()
@@ -141,7 +141,7 @@ PetPM::tick (const Time&, const Weather& weather, const double Rn,
 
 static struct PetPMSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new PetPM (al); }
   PetPMSyntax ()
     : DeclareModel (Pet::component, "PM",

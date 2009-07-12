@@ -69,7 +69,7 @@ public:
 
   // Create.
 public:
-  explicit XYSourceExpr (const Block&);
+  explicit XYSourceExpr (const BlockModel&);
 private:
   XYSourceExpr (const XYSourceExpr&);
   XYSourceExpr& operator= (const XYSourceExpr&);
@@ -156,7 +156,7 @@ XYSourceExpr::load (const Units& units, Treelog& msg)
   return true;
 }
 
-XYSourceExpr::XYSourceExpr (const Block& al)
+XYSourceExpr::XYSourceExpr (const BlockModel& al)
   : XYSource (al),
     lex (al),
     with_ (al.name ("with", "")),
@@ -175,7 +175,7 @@ XYSourceExpr::~XYSourceExpr ()
 
 static struct XYSourceExprSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new XYSourceExpr (al); }
 
   XYSourceExprSyntax ()

@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "rubiscoNdist.h"
-#include "block.h"
+#include "block_model.h"
 #include "mathlib.h"
 #include "librarian.h"
 
@@ -34,7 +34,7 @@ RubiscoNdist::library_id () const
   return id;
 }
 
-RubiscoNdist::RubiscoNdist (const Block& al)
+RubiscoNdist::RubiscoNdist (const BlockModel& al)
   : ModelLogable (al.type_name ())
 { }
 

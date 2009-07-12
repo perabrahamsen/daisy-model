@@ -33,7 +33,7 @@ class Surface;
 class OrganicMatter;
 class Chemistry;
 class Treelog;
-class Block;
+class BlockModel;
 class Units;
 
 class Reaction : public ModelFramed
@@ -69,7 +69,7 @@ public:
                       const Soil&, const SoilWater&, const SoilHeat&,
 		      const Chemistry&, Treelog&) const = 0;
 protected:
-  Reaction (const Block& al);
+  Reaction (const BlockModel& al);
 public:
   ~Reaction ();
 };

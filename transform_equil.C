@@ -23,7 +23,7 @@
 #define BUILD_DLL
 
 #include "transform.h"
-#include "block.h"
+#include "block_model.h"
 #include "soil.h"
 #include "soil_water.h"
 #include "equil.h"
@@ -57,7 +57,7 @@ struct TransformEquilibrium : public Transform
                    Treelog& msg);
   bool check (const Units&, const Geometry& geo,
               const Soil&, const SoilWater&, const SoilHeat&, Treelog&) const;
-  TransformEquilibrium (const Block& al)
+  TransformEquilibrium (const BlockModel& al)
     : Transform (al),
       equilibrium (Librarian::build_item<Equilibrium> (al, "equilibrium")),
       k_AB_expr (Librarian::build_item<Number> (al, "k_AB")),
@@ -159,7 +159,7 @@ TransformEquilibrium::initialize (const Units& units,
 
 static struct TransformEquilibriumSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new TransformEquilibrium (al); }
   TransformEquilibriumSyntax ()
     : DeclareModel (Transform::component, "equilibrium", 

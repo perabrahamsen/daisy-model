@@ -28,6 +28,7 @@
 #include "memutils.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "block_model.h"
 
 struct ActionWhile : public Action
 {
@@ -74,7 +75,7 @@ struct ActionWhile : public Action
     return ok;
   }
 
-  ActionWhile (const Block& al)
+  ActionWhile (const BlockModel& al)
     : Action (al),
       actions (Librarian::build_vector<Action> (al, "actions"))
   { }
@@ -87,7 +88,7 @@ struct ActionWhile : public Action
 
 static struct ActionWhileSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ActionWhile (al); }
 
   static bool check_alist (const Metalib&, const Frame& al, Treelog& err)

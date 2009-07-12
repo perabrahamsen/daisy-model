@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "groundwater.h"
-#include "block.h"
+#include "block_model.h"
 #include "lexer_data.h"
 #include "assertion.h"
 #include "time.h"
@@ -68,7 +68,7 @@ public:
                    const Geometry&, const Time& time, const Scope&, Treelog&);
   bool check (const Units&, const Geometry&, const Scope&, Treelog&) const
   { return true; }
-  GroundwaterFile (const Block&);
+  GroundwaterFile (const BlockModel&);
   ~GroundwaterFile ();
 };
 
@@ -162,7 +162,7 @@ GroundwaterFile::initialize (const Units&,
   tick (time, msg); 
 }
 
-GroundwaterFile::GroundwaterFile (const Block& al)
+GroundwaterFile::GroundwaterFile (const BlockModel& al)
   : Groundwater (al),
     path (al.path ()),
     previous_time (42, 1, 1, 0),
@@ -180,7 +180,7 @@ GroundwaterFile::~GroundwaterFile ()
 
 static struct GroundwaterFileSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
     { return new GroundwaterFile (al); }
   GroundwaterFileSyntax ()
     : DeclareModel (Groundwater::component, "file", "common", "\

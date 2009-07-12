@@ -1,4 +1,4 @@
-// scope_block.h -- Treat a block as a scope.
+// scope_block_model.h -- Treat a block as a scope.
 // 
 // Copyright 2006 Per Abrahamsen and KVL.
 //

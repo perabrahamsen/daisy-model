@@ -26,7 +26,7 @@
 #include "symbol.h"
 #include <memory>
 
-class Block;
+class BlockModel;
 
 class Ponddamp : public Model
 {

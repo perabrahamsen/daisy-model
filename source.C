@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "source.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 
 const char *const Source::component = "source";
@@ -91,7 +91,7 @@ Source::distance (const Time begin, const Time end,
     }
 }
 
-Source::Source (const Block& al)
+Source::Source (const BlockModel& al)
   : name (al.type_name ())
 { }
 

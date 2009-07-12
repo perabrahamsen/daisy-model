@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "xysource.h"
-#include "block.h"
+#include "block_model.h"
 #include "assertion.h"
 #include "librarian.h"
 
@@ -93,7 +93,7 @@ XYSource::distance (const double xmin, const double xmax,
     }
 }
 
-XYSource::XYSource (const Block& al)
+XYSource::XYSource (const BlockModel& al)
   : name (al.type_name ())
 { }
 

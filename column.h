@@ -42,6 +42,7 @@ class Output;
 class Treelog;
 class Metalib;
 class Block;
+class BlockModel;
 class Scope;
 
 class Column : public ModelFramed
@@ -162,7 +163,7 @@ public:
 
   // Create and Destroy.
 protected:
-  explicit Column (const Block&);
+  explicit Column (const BlockModel&);
 public:
   virtual bool initialize (const Block&, const Output&, const Time&,
                            const Weather*, const Scope&) = 0;

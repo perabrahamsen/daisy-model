@@ -27,7 +27,7 @@
 
 class Scope;
 class Treelog;
-class Block;
+class BlockModel;
 class Units;
 
 class Boolean : public Model
@@ -51,7 +51,7 @@ public:
                            Treelog& msg) = 0;
   virtual bool check (const Units&, const Scope&, Treelog&) const = 0;
 protected:
-  explicit Boolean (const Block&);
+  explicit Boolean (const BlockModel&);
 public:
   ~Boolean ();
 };

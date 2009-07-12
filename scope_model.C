@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "scope_model.h"
-#include "block.h"
+#include "block_model.h"
 #include "assertion.h"
 #include "librarian.h"
 
@@ -42,7 +42,7 @@ MScope::MScope (const symbol title)
   : title_ (title)
 { }
 
-MScope::MScope (const Block& al)
+MScope::MScope (const BlockModel& al)
   : title_ (al.name ("where", al.type_name ()))
 { }
 

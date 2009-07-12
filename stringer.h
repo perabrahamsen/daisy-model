@@ -26,7 +26,7 @@
 #include "symbol.h"
 
 class Scope;
-class Block;
+class BlockModel;
 class Treelog;
 class Units;
 
@@ -50,7 +50,7 @@ public:
   virtual bool initialize (const Units&, const Scope&, Treelog& msg) = 0;
   virtual bool check (const Units&, const Scope&, Treelog&) const = 0;
 protected:
-  explicit Stringer (const Block&);
+  explicit Stringer (const BlockModel&);
 public:
   ~Stringer ();
 };

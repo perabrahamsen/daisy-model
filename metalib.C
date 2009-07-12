@@ -24,7 +24,7 @@
 #include "intrinsics.h"
 #include "librarian.h"
 #include "library.h"
-#include "block.h"
+#include "block_model.h"
 #include "assertion.h"
 #include "memutils.h"
 #include "librarian.h"

@@ -29,7 +29,7 @@
 
 # include "svat.h"
 #include "mathlib.h"
-#include "block.h"
+#include "block_model.h"
 # include "weather.h"
 #include "geometry.h"
 # include "soil.h"
@@ -1332,7 +1332,7 @@ public:
   void output (Log& log) const;
 
   // Create and Destroy.
-  SVAT_PMSW (const Block& al);
+  SVAT_PMSW (const BlockModel& al);
   void summarize (Treelog&) const
   { }
   ~SVAT_PMSW();
@@ -1801,7 +1801,7 @@ SVAT_PMSW::output (Log& log) const
   output_variable (prec, log);                    // var 55
 }
 
-SVAT_PMSW::SVAT_PMSW (const Block& al)
+SVAT_PMSW::SVAT_PMSW (const BlockModel& al)
   : SVAT (al),
     rcmin (1.0),		// BUG!  Totally bogus.  
     // We use rcmin in RSCSTAR without ever setting it. abraham 11-03-2002.
@@ -1882,7 +1882,7 @@ SVAT_PMSW::~SVAT_PMSW() // destructor
 
 static struct SVAT_PMSWSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new SVAT_PMSW (al); }
   SVAT_PMSWSyntax ()
     : DeclareModel (SVAT::component, "PMSW", "Peter van der Keur's SVAT model.")

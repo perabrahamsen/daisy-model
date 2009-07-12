@@ -121,7 +121,7 @@ public:
   bool initialize (const Time& time, Treelog& err);
   bool check (const Time& from, const Time& to, Treelog& err) const;
 protected:
-  WeatherBase (const Block&);
+  WeatherBase (const BlockModel&);
 };
 
 #endif // WEATHER_BASE_H

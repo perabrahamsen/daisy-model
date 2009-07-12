@@ -34,7 +34,7 @@ class Hydraulic;
 class Tortuosity;
 class Texture;
 class Treelog;
-class Block;
+class BlockModel;
 class Secondary;
 
 class Horizon : public ModelDerived
@@ -89,7 +89,7 @@ void output (Log&) const;
 
   // Create and Destroy.
 public:
-  explicit Horizon (const Block&);
+  explicit Horizon (const BlockModel&);
   Horizon (const Frame&, double K_sat);
   static std::auto_ptr<Horizon> create_aquitard (double K_sat);
   virtual void initialize (bool top_soil, int som_size, Treelog&) = 0;

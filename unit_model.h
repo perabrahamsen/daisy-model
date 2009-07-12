@@ -24,7 +24,7 @@
 #include "unit.h"
 #include "model.h"
 
-class Block;
+class BlockModel;
 
 // Component 'unit'.
 
@@ -52,7 +52,7 @@ public:
 
   // Create and Destroy.
 protected:
-  MUnit (const Block& al, symbol base);
+  MUnit (const BlockModel& al, symbol base);
 public:
   virtual ~MUnit ();
 };

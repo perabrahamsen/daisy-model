@@ -25,7 +25,7 @@
 #include <vector>
 
 class Treelog;
-class Block;
+class BlockModel;
 class Log;
 class Geometry;
 class SoilWater;
@@ -52,7 +52,7 @@ public:
   virtual void initialize (const Units&, Treelog&) = 0;
   virtual bool check (const Units&, Treelog&) const = 0;
 protected:
-  ABAProd (const Block&);
+  ABAProd (const BlockModel&);
 
 public:
   ~ABAProd ();

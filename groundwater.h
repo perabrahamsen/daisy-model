@@ -33,7 +33,7 @@ class Geometry;
 class Soil;
 class SoilWater;
 class SoilHeat;
-class Block;
+class BlockModel;
 class Scope;
 class Units;
 
@@ -76,7 +76,7 @@ public:
   virtual bool check (const Units&, 
                       const Geometry&, const Scope&, Treelog&) const = 0;
 protected:
-  Groundwater (const Block& al);
+  Groundwater (const BlockModel& al);
 public:
   ~Groundwater ();
 };

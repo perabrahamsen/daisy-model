@@ -24,7 +24,7 @@
 #include "assertion.h"
 #include "mathlib.h"
 #if 0
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 #include "frame.h"
 #endif
@@ -69,7 +69,7 @@ ScopeID::ScopeID (const symbol name, const symbol d)
 { }
 
 #if 0
-ScopeID::ScopeID (const Block& al)
+ScopeID::ScopeID (const BlockModel& al)
   : WScope (al),
     tag (al.name ("name")), 
     value (al.number ("value")),
@@ -83,7 +83,7 @@ ScopeID::~ScopeID ()
 #if 0
 static struct ScopeIDSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ScopeID (al); }
 
   ScopeIDSyntax ()

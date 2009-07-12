@@ -23,7 +23,7 @@
 
 #include "pet.h"
 #include "frame.h"
-#include "block.h"
+#include "block_model.h"
 #include "log.h"
 #include "vegetation.h"
 #include "surface.h"
@@ -60,7 +60,7 @@ Pet::output (Log& log) const
   output_value (dry (), "dry", log);
 }
 
-Pet::Pet (const Block& al)
+Pet::Pet (const BlockModel& al)
   : ModelFramed (al)
 { }
 

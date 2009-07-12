@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "select_value.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 #include "frame.h"
 
@@ -37,7 +37,7 @@ struct SelectIndex : public SelectValue
   { add_result (array[index]); }
 
   // Create and Destroy.
-  SelectIndex (const Block& al)
+  SelectIndex (const BlockModel& al)
     : SelectValue (al),
       index (al.integer ("index"))
   { }
@@ -45,7 +45,7 @@ struct SelectIndex : public SelectValue
 
 static struct SelectIndexSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new SelectIndex (al); }
   SelectIndexSyntax ()
     : DeclareModel (Select::component, "index", "value", "\

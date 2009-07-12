@@ -31,6 +31,7 @@
 #include "frame.h"
 #include "treelog.h"
 #include "mathlib.h"
+#include "block_model.h"
 #include <sstream>
 
 struct ABAProdUptake : public ABAProd
@@ -55,7 +56,7 @@ struct ABAProdUptake : public ABAProd
   // Create and Destroy.
   void initialize (const Units&, Treelog&);
   bool check (const Units&, Treelog&) const;
-  ABAProdUptake (const Block& al);
+  ABAProdUptake (const BlockModel& al);
   ~ABAProdUptake ();
 };
 
@@ -120,7 +121,7 @@ ABAProdUptake::check (const Units& units, Treelog& msg) const
   return ok;
 }
 
-ABAProdUptake::ABAProdUptake (const Block& al)
+ABAProdUptake::ABAProdUptake (const BlockModel& al)
   : ABAProd (al),
     scope (h_name, Units::cm ()),
     expr (Librarian::build_item<Number> (al, "expr"))
@@ -131,7 +132,7 @@ ABAProdUptake::~ABAProdUptake ()
 
 static struct ABAProdUptakeSyntax : DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ABAProdUptake (al); }
   ABAProdUptakeSyntax ()
     : DeclareModel (ABAProd::component, "uptake", "\

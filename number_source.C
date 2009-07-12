@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "number.h"
-#include "block.h"
+#include "block_model.h"
 #include "source.h"
 #include "assertion.h"
 #include "librarian.h"
@@ -80,7 +80,7 @@ struct NumberSource : public Number
     daisy_assert (state != uninitialized);
     return state != error; 
   }
-  NumberSource (const Block& al)
+  NumberSource (const BlockModel& al)
     : Number (al),
       source (Librarian::build_item<Source> (al, "source")),
       begin (al.check ("begin") ? new Time (al.submodel ("begin")) : NULL),
@@ -139,14 +139,14 @@ struct NumberSourceUnique : public NumberSource
         state = error;
       }
   }
-  NumberSourceUnique (const Block& al)
+  NumberSourceUnique (const BlockModel& al)
     : NumberSource (al)
   { }
 };
 
 static struct NumberSourceUniqueSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NumberSourceUnique (al); }
   NumberSourceUniqueSyntax ()
     : DeclareModel (Number::component, "source_unique", "source",
@@ -183,14 +183,14 @@ struct NumberSourceAverage : public NumberSource
         state = has_value;
       }
   }
-  NumberSourceAverage (const Block& al)
+  NumberSourceAverage (const BlockModel& al)
     : NumberSource (al)
   { }
 };
 
 static struct NumberSourceAverageSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NumberSourceAverage (al); }
   NumberSourceAverageSyntax ()
     : DeclareModel (Number::component, "source_average", "source",
@@ -213,14 +213,14 @@ struct NumberSourceSum : public NumberSource
           && (!end.get () || time[i] <= *end))
         val += source->value ()[i];
   }
-  NumberSourceSum (const Block& al)
+  NumberSourceSum (const BlockModel& al)
     : NumberSource (al)
   { }
 };
 
 static struct NumberSourceSumSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NumberSourceSum (al); }
   NumberSourceSumSyntax ()
     : DeclareModel (Number::component, "source_sum", "source", 
@@ -256,14 +256,14 @@ struct NumberSourceIncrease : public NumberSource
       }
     val = last - first;
   }
-  NumberSourceIncrease (const Block& al)
+  NumberSourceIncrease (const BlockModel& al)
     : NumberSource (al)
   { }
 };
 
 static struct NumberSourceIncreaseSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NumberSourceIncrease (al); }
   NumberSourceIncreaseSyntax ()
     : DeclareModel (Number::component, "source_increase", "source",

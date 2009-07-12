@@ -24,7 +24,7 @@
 
 #include "condition.h"
 #include "daisy.h"
-#include "block.h"
+#include "block_model.h"
 #include "boolean.h"
 #include "output.h"
 #include "scope_multi.h"
@@ -87,7 +87,7 @@ struct ConditionExtern : public Condition
     return expr->check (daisy.units (), multi, msg);
   }
 
-  ConditionExtern (const Block& al)
+  ConditionExtern (const BlockModel& al)
     : Condition (al),
       scopesel (Librarian::build_item<Scopesel> (al, "scope")),
       extern_scope (NULL),
@@ -97,7 +97,7 @@ struct ConditionExtern : public Condition
 
 static struct ConditionExternSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ConditionExtern (al); }
 
   ConditionExternSyntax ()

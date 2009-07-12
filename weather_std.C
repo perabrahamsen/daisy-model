@@ -37,6 +37,7 @@
 #include "path.h"
 #include "treelog.h"
 #include "frame_submodel.h"
+#include "block_model.h"
 #include <sstream>
 #include <vector>
 #include <algorithm>
@@ -319,13 +320,14 @@ struct WeatherStandard : public WeatherBase
 
   // Create and Destroy.
   bool initialize (const Time& time, Treelog& err);
-  WeatherStandard (const Block&);
+  WeatherStandard (const BlockModel&);
   ~WeatherStandard ();
   bool check (const Time& from, const Time& to, Treelog& err) const;
 };
 
 bool
-WeatherStandard::YearMap::YearInterval::check_alist (const Metalib&, const Frame& al,
+WeatherStandard::YearMap::YearInterval::check_alist (const Metalib&,
+                                                     const Frame& al,
 						     Treelog& err)
 {
   bool ok = true;
@@ -1296,7 +1298,7 @@ NO3DryDep: " << DryDeposit.get_value (Chemical::NO3 (), u_dpu)
   return true;
 }
 
-WeatherStandard::WeatherStandard (const Block& al)
+WeatherStandard::WeatherStandard (const BlockModel& al)
   : WeatherBase (al),
     path (al.path ()),
     T_rain (al.number ("T_rain")),
@@ -1433,7 +1435,7 @@ WeatherStandard::check (const Time& from, const Time& to, Treelog& err) const
 
 static struct WeatherStandardSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new WeatherStandard (al); }
 
   WeatherStandardSyntax ()

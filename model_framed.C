@@ -24,7 +24,7 @@
 #include "log.h"
 #include "frame_model.h"
 #include "assertion.h"
-#include "block.h"
+#include "block_model.h"
 
 const FrameModel& 
 ModelFramed::frame () const
@@ -56,10 +56,10 @@ ModelFramed::output_as_entry (Log& log) const
     }
 }
 
-ModelFramed::ModelFramed (const Block& al)
+ModelFramed::ModelFramed (const BlockModel& al)
   : ModelLogable (al.type_name ()),
     // Block is sometimes fed a temporary frame, thus the need for clone.
-    my_frame (dynamic_cast<const FrameModel*> (&(al.frame ().clone ())))
+    my_frame (&(al.frame ().clone ()))
 { daisy_assert (my_frame.get ());  }
 
 ModelFramed::ModelFramed (const symbol n)

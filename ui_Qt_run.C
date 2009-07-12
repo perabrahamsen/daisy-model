@@ -144,7 +144,7 @@ UIRun::attach (Toplevel& toplevel)
   // Build log.
   {
     BlockTop block (toplevel.metalib (), toplevel.msg (),
-                    toplevel.metalib (), "UI logs");
+                    toplevel.metalib ());
     build_log (toplevel.metalib (), block, "QtTime");   
   }
 
@@ -427,7 +427,7 @@ UIRun::open_setup ()
     }
 }
 
-UIRun::UIRun (const Block& al)
+UIRun::UIRun (const BlockModel& al)
   : UIQt (al),
     qt_main (application_name ()),
     qt_name (new QLabel),
@@ -442,7 +442,7 @@ UIRun::~UIRun ()
 
 static struct UIRunSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new UIRun (al); }
 
   UIRunSyntax ()

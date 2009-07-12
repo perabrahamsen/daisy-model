@@ -32,7 +32,7 @@
 #include "log.h"
 #include "treelog.h"
 #include "librarian.h"
-#include "block.h"
+#include "block_model.h"
 #include "check.h"
 #include "assertion.h"
 #include "units.h"
@@ -97,7 +97,7 @@ struct ActionExtern : public Action
     return ok;
   }
 
-  ActionExtern (const Block& al)
+  ActionExtern (const BlockModel& al)
     : Action (al),
       scopesel (Librarian::build_item<Scopesel> (al, "scope")),
       extern_scope (NULL),
@@ -109,7 +109,7 @@ struct ActionExtern : public Action
 
 static struct ActionExternSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ActionExtern (al); }
   ActionExternSyntax ()
     : DeclareModel (Action::component, "extern", "\
@@ -256,7 +256,7 @@ struct ActionExternFertigation : public Action
     return ok;
   }
 
-  ActionExternFertigation (const Block& al)
+  ActionExternFertigation (const BlockModel& al)
     : Action (al),
       scopesel (Librarian::build_item<Scopesel> (al, "scope")),
       extern_scope (NULL),
@@ -300,7 +300,7 @@ static struct ActionExternFertigationSyntax : public DeclareModel
     return ok;
   }
 
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ActionExternFertigation (al); }
 
   ActionExternFertigationSyntax ()

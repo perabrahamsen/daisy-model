@@ -124,7 +124,7 @@ Hour to assume when nothing else is specified;");
   frame.set ("handle", "normal");
 }
 
-SourceFile::SourceFile (const Block& al)
+SourceFile::SourceFile (const BlockModel& al)
   : Source (al),
     lex (al),
     with_ (al.name ("with", "")),

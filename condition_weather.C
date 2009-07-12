@@ -24,7 +24,7 @@
 #define BUILD_DLL
 
 #include "condition.h"
-#include "block.h"
+#include "block_model.h"
 #include "field.h"
 #include "daisy.h"
 #include "check.h"
@@ -69,7 +69,7 @@ struct ConditionTSum : public Condition
   bool check (const Daisy&, const Scope&, Treelog&) const
   { return true; }
 
-  ConditionTSum (const Block& al)
+  ConditionTSum (const BlockModel& al)
     : Condition (al),
       check_hour (al.integer ("check_hour")),
       reset_mday (al.integer ("reset_mday")),
@@ -80,7 +80,7 @@ struct ConditionTSum : public Condition
 };
 static struct ConditionWeatherSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ConditionTSum (al); }
 
   static bool check_alist (const Metalib&, const Frame& al, Treelog& err)

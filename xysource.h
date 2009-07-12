@@ -25,7 +25,7 @@
 #include "symbol.h"
 #include <vector>
 
-class Block;
+class BlockModel;
 class Treelog;
 class Units;
 
@@ -56,7 +56,7 @@ public:
   
   // Create and Destroy.
 protected:
-  explicit XYSource (const Block&);
+  explicit XYSource (const BlockModel&);
 private:
   XYSource (const XYSource&);
 public:

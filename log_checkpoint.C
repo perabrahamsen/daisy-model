@@ -23,7 +23,7 @@
 
 #include "log_alist.h"
 #include "metalib.h"
-#include "block.h"
+#include "block_model.h"
 #include "condition.h"
 #include "daisy.h"
 #include "printer_file.h"
@@ -62,7 +62,7 @@ struct LogCheckpoint : public LogSubmodel
 
   // Create and Destroy.
   void initialize (Treelog&);
-  LogCheckpoint (const Block& al);
+  LogCheckpoint (const BlockModel& al);
   ~LogCheckpoint ();
 };
 
@@ -222,7 +222,7 @@ void
 LogCheckpoint::initialize (Treelog&)
 { }
 
-LogCheckpoint::LogCheckpoint (const Block& al)
+LogCheckpoint::LogCheckpoint (const BlockModel& al)
   : LogSubmodel (al),
     file (al.name ("where")),
     description (al.frame ().description ()),
@@ -235,7 +235,7 @@ LogCheckpoint::~LogCheckpoint ()
 
 static struct LogCheckpointSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new LogCheckpoint (al); }
 
   LogCheckpointSyntax ()

@@ -22,7 +22,7 @@
 #define BUILD_DLL
 
 #include "tortuosity.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 
 const char *const Tortuosity::component = "tortuosity";
@@ -34,7 +34,7 @@ Tortuosity::library_id () const
   return id;
 }
 
-Tortuosity::Tortuosity (const Block& al)
+Tortuosity::Tortuosity (const BlockModel& al)
   : name (al.type_name ())
 { }
 

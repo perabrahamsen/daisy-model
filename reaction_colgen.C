@@ -26,7 +26,7 @@
 #include "log.h"
 #include "chemistry.h"
 #include "treelog.h"
-#include "block.h"
+#include "block_model.h"
 #include "geometry.h"
 #include "soil.h"
 #include "surface.h"
@@ -74,7 +74,7 @@ ReactionColgen::check (const Units&, const Geometry& geo,
   return ok;
 }
 
-ReactionColgen::ReactionColgen (const Block& al)
+ReactionColgen::ReactionColgen (const BlockModel& al)
   : Reaction (al),
     colloid_name (al.name ("colloid")),
     ponddamp (Librarian::build_item<Ponddamp> (al, "ponddamp")),

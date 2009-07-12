@@ -23,7 +23,7 @@
 
 #include "nitrification.h"
 #include "abiotic.h"
-#include "block.h"
+#include "block_model.h"
 #include "soil.h"
 #include "soil_water.h"
 #include "soil_heat.h"
@@ -49,7 +49,7 @@ public:
 
   // Create.
 public:
-  NitrificationSolute (const Block&);
+  NitrificationSolute (const BlockModel&);
 };
 
 void 
@@ -78,7 +78,7 @@ NitrificationSolute::tick (const double /* M */, const double C,
     NH4 = N2O = NO3 = 0.0;
 }
 
-NitrificationSolute::NitrificationSolute (const Block& al)
+NitrificationSolute::NitrificationSolute (const BlockModel& al)
   : Nitrification (al),
     k (al.number ("k")),
     k_10 (al.number ("k_10")),
@@ -88,7 +88,7 @@ NitrificationSolute::NitrificationSolute (const Block& al)
 
 static struct NitrificationSoluteSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   {
     return new NitrificationSolute (al);
   }

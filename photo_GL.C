@@ -21,7 +21,7 @@
 
 #define BUILD_DLL
 #include "photo.h"
-#include "block.h"
+#include "block_model.h"
 #include "canopy_std.h"
 #include "phenology.h"
 #include "plf.h"
@@ -70,7 +70,7 @@ public:
   bool handle_water_stress () const
   { return false; }
   static void load_syntax (Frame&);
-  PhotoGL (const Block& al)
+  PhotoGL (const BlockModel& al)
     : Photo (al),
       Qeff (al.number ("Qeff")),
       Fm (al.number ("Fm")),
@@ -156,7 +156,7 @@ PhotoGL::assimilate (const Units&, const double, const double, const double, con
 
 static struct Photo_GLSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new PhotoGL (al); }
   void load_frame (Frame& frame) const
   { 

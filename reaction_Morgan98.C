@@ -24,7 +24,7 @@
 #include "mathlib.h"
 #include <sstream>
 #include "check.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 #include "chemistry.h"
 #include "chemical.h"
@@ -66,7 +66,7 @@ struct ReactionMorgan98 : public ReactionColgen
   void initialize (const Units&, const Geometry& geo,
                    const Soil& soil, const SoilWater&, const SoilHeat&, 
                    const Surface&, Treelog&);
-  ReactionMorgan98 (const Block& al);
+  ReactionMorgan98 (const BlockModel& al);
 };
 
 void
@@ -123,7 +123,7 @@ ReactionMorgan98::initialize (const Units&, const Geometry& geo,
                               const Surface& surface, Treelog&)
 { surface_soil = find_surface_soil (geo, soil, surface); }
 
-ReactionMorgan98::ReactionMorgan98 (const Block& al)
+ReactionMorgan98::ReactionMorgan98 (const BlockModel& al)
   : ReactionColgen (al),
     surface_soil (-42.42e42), 
     rainergy (Librarian::build_item<Rainergy> (al, "rainergy")),
@@ -133,7 +133,7 @@ ReactionMorgan98::ReactionMorgan98 (const Block& al)
 
 static struct ReactionMorgan98Syntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ReactionMorgan98 (al); }
   ReactionMorgan98Syntax ()
     : DeclareModel (Reaction::component, "colgen_Morgan98", "colgen", "\

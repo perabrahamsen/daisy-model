@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "difrad.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 
 const char *const Difrad::component = "difrad";
@@ -38,7 +38,7 @@ Difrad::output (Log&) const
 { }
 
 
-Difrad::Difrad (const Block& al)
+Difrad::Difrad (const BlockModel& al)
   : ModelFramed (al)
 { }
 

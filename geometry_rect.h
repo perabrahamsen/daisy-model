@@ -25,6 +25,7 @@
 #include "geometry_vert.h"
 
 class Frame;
+class Block;
 
 class GeometryRect : public GeometryVert
 {

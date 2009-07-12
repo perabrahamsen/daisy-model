@@ -27,7 +27,7 @@
 #include "assertion.h"
 #include "check.h"
 #include "mathlib.h"
-#include "block.h"
+#include "block_model.h"
 
 const char *const SMB::component = "SMB";
 
@@ -133,14 +133,14 @@ SMB::turnover_dom (const std::vector<bool>& active, const double* factor,
     }
 }
 
-SMB::SMB (const Block& al)
+SMB::SMB (const BlockModel& al)
   : OM (al),
     maintenance (al.number ("maintenance"))
 { }
 
 static struct SMBInit : public DeclareSolo
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new SMB (al); }
   void load_frame (Frame& frame) const
   {

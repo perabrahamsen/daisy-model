@@ -22,7 +22,7 @@
 #ifndef LEXER_TABLE_H
 #define LEXER_TABLE_H
 
-#include "block.h"
+#include "block_model.h"
 #include "symbol.h"
 #include <string>
 #include <vector>
@@ -105,7 +105,7 @@ private:
   LexerTable (const LexerTable&);
   LexerTable ();
 public:
-  explicit LexerTable (const Block&);
+  explicit LexerTable (const BlockModel&);
   ~LexerTable ();
 };
 

@@ -25,7 +25,7 @@
 #include "doe.h"
 #include "geometry.h"
 #include "adsorption.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 #include "soil_water.h"
 #include "soil.h"
@@ -94,7 +94,7 @@ bool
 Transport::check (const Geometry&, Treelog&) const
 { return true; }
 
-Transport::Transport (const Block& al)
+Transport::Transport (const BlockModel& al)
   : Model ()
 { }
 

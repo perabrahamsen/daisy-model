@@ -22,7 +22,7 @@
 
 
 #include "domsorp.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 
 const char *const Domsorp::component = "domsorp";
@@ -34,7 +34,7 @@ Domsorp::library_id () const
   return id;
 }
 
-Domsorp::Domsorp (const Block& al)
+Domsorp::Domsorp (const BlockModel& al)
   : ModelFramed (al)
 { }
 

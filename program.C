@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "program.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 
 const char *const Program::component = "program";
@@ -57,7 +57,7 @@ Program::ui_set_progress (const double value)
   ui->set_progress (value); 
 }
 
-Program::Program (const Block& al)
+Program::Program (const BlockModel& al)
   : name (al.type_name ()),
     ui (NULL)
 { }

@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "uzrect.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 
 const char *const UZRect::component = "uzrect";
@@ -43,7 +43,7 @@ UZRect::obey_surface ()
 { return true; }
 
 
-UZRect::UZRect (const Block& al)
+UZRect::UZRect (const BlockModel& al)
   : name (al.type_name ())
 { }
 

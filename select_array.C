@@ -25,7 +25,7 @@
 #include "select.h"
 #include "soil.h"
 #include "bdconv.h"
-#include "block.h"
+#include "block_model.h"
 #include "mathlib.h"
 #include "librarian.h"
 #include "frame.h"
@@ -212,7 +212,7 @@ struct SelectArray : public Select
   { return value.size (); }
 
   // Create and Destroy.
-  SelectArray (const Block& al)
+  SelectArray (const BlockModel& al)
     : Select (al),
       value (al.number_sequence ("value")),
       last_geo (NULL),
@@ -223,7 +223,7 @@ struct SelectArray : public Select
 
 static struct SelectArraySyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new SelectArray (al); }
   SelectArraySyntax ()
     : DeclareModel (Select::component, "array", "Log all members of an array.")

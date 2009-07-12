@@ -26,7 +26,7 @@
 #include "geometry.h"
 #include "assertion.h"
 #include "daisy.h"
-#include "block.h"
+#include "block_model.h"
 #include "frame_model.h"
 #include "treelog.h"
 #include "scope_block.h"
@@ -253,7 +253,7 @@ LogDLF::initialize (Treelog& msg)
 }
 
 std::vector<std::pair<symbol, symbol>/**/>
-LogDLF::build_parameters (const Block& al)
+LogDLF::build_parameters (const BlockModel& al)
 {
   std::vector<std::pair<symbol, symbol>/**/> result;
   if (al.check ("parameter_names"))
@@ -307,7 +307,7 @@ LogDLF::build_parameters (const Block& al)
   return result;
 }
 
-LogDLF::LogDLF (const Block& al)
+LogDLF::LogDLF (const BlockModel& al)
   : LogSelect (al),
     parsed_from_file (al.frame ().inherited_position ().filename ()),
     file (al.name ("where")),

@@ -26,7 +26,7 @@
 #include "model.h"
 #include <vector>
 
-class Block;
+class BlockModel;
 
 class MScope : public Model, public WScope
 {
@@ -44,7 +44,7 @@ public:
   // Create and Destroy.
 public:
   explicit MScope (symbol title);
-  explicit MScope (const Block&);
+  explicit MScope (const BlockModel&);
   ~MScope ();
 };
 

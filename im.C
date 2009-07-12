@@ -28,7 +28,7 @@
 #include "unit.h"
 #include "am.h"
 #include "log.h"
-#include "block.h"
+#include "block_model.h"
 #include "frame_submodel.h"
 #include "check.h"
 #include "assertion.h"
@@ -195,7 +195,7 @@ IM::clear ()
     (*i).second = 0.0;
 }
 
-IM::IM (const Block& parent, const char *const key)
+IM::IM (const BlockModel& parent, const char *const key)
 {
   // Find dimension.
   const Frame& parent_frame = parent.find_frame (key);

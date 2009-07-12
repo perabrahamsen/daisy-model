@@ -32,7 +32,7 @@ struct SoilHeat;
 struct Surface;
 struct Groundwater;
 struct Treelog;
-class Block;
+class BlockModel;
 class Tertsmall;
 
 class UZRect : public Model
@@ -57,7 +57,7 @@ public:
 private:
   UZRect ();
 protected:
-  explicit UZRect (const Block&);
+  explicit UZRect (const BlockModel&);
 public:
   virtual void summarize (Treelog& msg) const;
   ~UZRect ();

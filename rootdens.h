@@ -29,7 +29,7 @@
 
 class Log;
 class Geometry;
-class Block;
+class BlockModel;
 class Treelog;
 class Metalib;
 
@@ -64,7 +64,7 @@ public:
                            double row_width, double row_position, 
                            Treelog& msg) = 0;
 protected:
-  explicit Rootdens (const Block&);
+  explicit Rootdens (const BlockModel&);
 public:
   ~Rootdens ();
 };

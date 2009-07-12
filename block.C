@@ -20,7 +20,7 @@
 
 #define BUILD_DLL
 
-#include "block.h"
+#include "block_model.h"
 #include "metalib.h"
 #include "library.h"
 #include "librarian.h"
@@ -32,68 +32,6 @@
 #include "treelog.h"
 #include "frame_model.h"
 #include <sstream>
-
-struct Block::Implementation
-{
-  const Metalib& metalib;
-  const Block *const context;
-  const Frame& frame;
-  Treelog& msg;
-  Treelog::Open msg_nest;
-  bool is_ok;
-
-  // Use.
-  Attribute::type lookup (symbol) const;
-  bool check (const symbol key) const;
-  void error (const std::string& msg);
-  void set_error ();
-
-  Implementation (const Metalib& lib, const Block *const p, Treelog& m,
-                  const Frame& f,
-		  const symbol scope_id)
-    : metalib (lib),
-      context (p),
-      frame (f),
-      msg (m),
-      msg_nest (msg, scope_id),
-      is_ok (true)
-  { }
-};
-
-Attribute::type 
-Block::Implementation::lookup (const symbol key) const
-{
-  Attribute::type type = frame.lookup (key);
-  if (type == Attribute::Error && context)
-    return context->impl->lookup (key);
-  return type;
-}
-
-bool
-Block::Implementation::check (const symbol key) const
-{
-  Attribute::type type = frame.lookup (key);
-  if (type != Attribute::Error)
-    return frame.check (key);
-  if (context == NULL)
-    return false;
-  return context->impl->check (key);
-}
-
-void
-Block::Implementation::error (const std::string& str)
-{ 
-  set_error (); 
-  msg.error (str); 
-}
-
-void
-Block::Implementation::set_error ()
-{ 
-  is_ok = false; 
-  if (context) 
-    context->set_error (); 
-}
 
 symbol
 Block::expand_string (const symbol value_s) const
@@ -124,7 +62,7 @@ Block::expand_string (const symbol value_s) const
 	  else
 	    {
 	      // BUG: We still have too many $col and $crop around to throw.
-	      impl->msg.warning (std::string ("Unknown $ escape '") 
+	      msg ().warning (std::string ("Unknown $ escape '") 
                                  + c + "', ignored");
 	      result << '$' << c;
 	      mode = normal;
@@ -157,7 +95,7 @@ Block::expand_string (const symbol value_s) const
                       break;
                     case Attribute::Model:
                       {
-                        Treelog::Open nest (impl->msg, "${" + key + "}");
+                        Treelog::Open nest (msg (), "${" + key + "}");
                         const FrameModel& obj = frame.model (key);
                         const symbol type = obj.type_name ();
                         const symbol component = frame.component (key);
@@ -169,9 +107,9 @@ Block::expand_string (const symbol value_s) const
                                                                  obj, key));
                             if (!this->ok () 
                                 || !stringer->initialize (this->units (),
-                                                          scope, impl->msg)
+                                                          scope, msg ())
                                 || !stringer->check (this->units (), scope,
-                                                     impl->msg)
+                                                     msg ())
                                 || stringer->missing (scope))
                               throw "Bad string: '" + type + "'";
                             result << stringer->value (scope);
@@ -294,61 +232,44 @@ Block::expand_reference (const symbol key) const
   throw ("Bad reference");
 }
 
-const Metalib& 
-Block::metalib () const
-{ return impl->metalib; }
-
 const Units& 
 Block::units ()const
-{ return impl->metalib.units (); }
+{ return metalib ().units (); }
 
 Path& 
 Block::path () const
-{ return impl->metalib.path (); }
-
-Treelog&
-Block::msg () const
-{ return impl->msg; }
+{ return metalib ().path (); }
 
 symbol
 Block::type_name () const
-{ return impl->frame.type_name (); }
+{ return frame ().type_name (); }
 
 void
-Block::error (const std::string& msg) const
-{ impl->error (msg); }
+Block::error (const std::string& value) const
+{ 
+  set_error (); 
+  msg ().error (value); 
+}
 
 bool
 Block::ok () const
-{ return impl->is_ok; }
+{ return is_ok; }
 
 void
 Block::set_error () const
-{ impl->set_error (); }
+{ is_ok = false; }
 
 const Frame& 
 Block::find_frame (const symbol key) const
-{
-  if (frame ().check (key) || frame ().lookup (key) != Attribute::Error)
-    return frame ();
-  if (impl->context == NULL)
-    daisy_panic ("Couldn't find '" + key + "' in this block or its context");
-  return impl->context->find_frame (key);
-}
+{ return frame (); }
 
 Attribute::type 
 Block::lookup (const symbol key) const
-{ return impl->lookup (key); }
+{ return frame ().lookup (key); }
 
 void
 Block::entries (std::set<symbol>& all) const
-{
-  // Own entries.
-  impl->frame.entries (all);
-  // Context entries.
-  if (impl->context)
-    impl->context->entries (all);
-}
+{ frame ().entries (all); }
 
 int 
 Block::type_size (const symbol tag) const
@@ -365,7 +286,13 @@ Block::description (const symbol tag) const
 
 bool 
 Block::check (const symbol key) const
-{ return impl->check (key); }
+{
+  Attribute::type type = frame ().lookup (key);
+  if (type != Attribute::Error)
+    return frame ().check (key);
+
+  return false;
+}
 
 int 
 Block::value_size (const symbol tag) const
@@ -546,16 +473,8 @@ Block::sequence_id (const symbol key, size_t index)
   return tmp.str ();
 }
 
-Block::Block (const Metalib& metalib, Treelog& msg, 
-              const Frame& frame,
- 	      const symbol scope_id)
-  : impl (new Implementation (metalib, NULL, msg, 
-                              frame, scope_id))
-{ }
-
-Block::Block (const Block& block, const Frame& frame, symbol scope_tag)
-  : impl (new Implementation (block.metalib (), &block, block.msg (),
-                              frame, scope_tag))
+Block::Block ()
+  : is_ok (true)
 { }
 
 Block::~Block ()

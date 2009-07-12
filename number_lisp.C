@@ -28,6 +28,7 @@
 #include "treelog.h"
 #include "assertion.h"
 #include "frame.h"
+#include "block_model.h"
 #include <sstream>
 #include <memory>
 #include <map>
@@ -147,7 +148,7 @@ struct NumberLet : public Number
       frame.declare_submodule_sequence ("clauses", Attribute::Const, "\
 List of identifiers and values to bind in this scope.", Clause::load_syntax);
     }
-    ScopeClause (const Block& al)
+    ScopeClause (const BlockModel& al)
       : clause (map_submodel<Clause> (al, "clauses"))
     { }
     ~ScopeClause ()
@@ -195,7 +196,7 @@ List of identifiers and values to bind in this scope.", Clause::load_syntax);
     ScopeMulti scope (scope_clause, inherit_scope);
     return expr->check (units, scope, msg);
   }
-  NumberLet (const Block& al)
+  NumberLet (const BlockModel& al)
     : Number (al),
       scope_clause (al),
       expr (Librarian::build_item<Number> (al, "expr"))
@@ -204,7 +205,7 @@ List of identifiers and values to bind in this scope.", Clause::load_syntax);
 
 static struct NumberLetSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new NumberLet (al); }
   NumberLetSyntax ()
     : DeclareModel (Number::component, "let", "\

@@ -23,7 +23,7 @@
 #include "reaction_colgen.h"
 #include "mathlib.h"
 #include "check.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 #include "chemistry.h"
 #include "chemical.h"
@@ -79,7 +79,7 @@ struct ReactionJarvis99 : public ReactionColgen
   bool check (const Units&, const Geometry& geo,
               const Soil&, const SoilWater&, const SoilHeat&,
 	      const Chemistry& chemistry, Treelog& msg) const;
-  ReactionJarvis99 (const Block& al);
+  ReactionJarvis99 (const BlockModel& al);
 };
 
 void
@@ -200,7 +200,7 @@ ReactionJarvis99::check (const Units& units, const Geometry& geo,
   return ok;
 }
 
-ReactionJarvis99::ReactionJarvis99 (const Block& al)
+ReactionJarvis99::ReactionJarvis99 (const BlockModel& al)
   : ReactionColgen (al),
     rainergy (Librarian::build_item<Rainergy> (al, "rainergy")),
     Mmax (al.number ("Mmax")),
@@ -216,7 +216,7 @@ ReactionJarvis99::ReactionJarvis99 (const Block& al)
 
 static struct ReactionJarvis99Syntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ReactionJarvis99 (al); }
   ReactionJarvis99Syntax ()
     : DeclareModel (Reaction::component, "colgen_Jarvis99", "colgen", "\

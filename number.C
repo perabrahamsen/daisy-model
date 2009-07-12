@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "number.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 #include "units.h"
 #include "assertion.h"
@@ -93,7 +93,7 @@ Number::check_dim (const Units& units,
   return false;
 }
 
-Number::Number (const Block& al)
+Number::Number (const BlockModel& al)
   : name (al.type_name ())
 { }
 

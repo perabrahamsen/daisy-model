@@ -41,14 +41,14 @@ struct SelectNumber : public SelectValue
   }
 
   // Create and Destroy.
-  SelectNumber (const Block& al)
+  SelectNumber (const BlockModel& al)
     : SelectValue (al)
   { }
 };
 
 static struct SelectNumberSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new SelectNumber (al); }
 
   SelectNumberSyntax ()

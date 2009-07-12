@@ -25,7 +25,7 @@
 #include "program.h"
 #include "library.h"
 #include "metalib.h"
-#include "block.h"
+#include "block_model.h"
 #include "printer_file.h"
 #include "xref.h"
 #include "plf.h"
@@ -128,7 +128,7 @@ struct ProgramDocument : public Program
   { };
   bool check (Treelog&)
   { return true; }
-  ProgramDocument (const Block& al)
+  ProgramDocument (const BlockModel& al)
     : Program (al),
       metalib (al.metalib ()),
       xref (metalib),
@@ -1251,7 +1251,7 @@ standard parameterizations for the model.");
 
 static struct ProgramDocumentSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ProgramDocument (al); }
   ProgramDocumentSyntax ()
     : DeclareModel (Program::component, "document", "\

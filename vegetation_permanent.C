@@ -40,6 +40,7 @@
 #include "frame_submodel.h"
 #include "bioclimate.h"
 #include "soil_heat.h"
+#include "block_model.h"
 #include <sstream>
 #include <deque>
 
@@ -210,7 +211,7 @@ struct VegetationPermanent : public Vegetation
                    const Soil& soil, OrganicMatter&, 
                    Treelog&);
   bool check (const Units&, Treelog&) const;
-  VegetationPermanent (const Block&);
+  VegetationPermanent (const BlockModel&);
   ~VegetationPermanent ();
 };
 
@@ -397,7 +398,7 @@ VegetationPermanent::check (const Units& units, Treelog& msg) const
   return ok;
 }
 
-VegetationPermanent::VegetationPermanent (const Block& al)
+VegetationPermanent::VegetationPermanent (const BlockModel& al)
   : Vegetation (al),
     yearly_LAI (al.submodel_sequence ("YearlyLAI")),
     LAIvsDAY (al.plf ("LAIvsDAY")),
@@ -424,7 +425,7 @@ VegetationPermanent::~VegetationPermanent ()
 
 static struct VegetationPermanentSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new VegetationPermanent (al); }
 
   VegetationPermanentSyntax ()

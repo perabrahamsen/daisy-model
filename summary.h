@@ -28,7 +28,7 @@
 
 struct Select;
 struct Treelog;
-class Block;
+class BlockModel;
 
 class Summary : public Model
 {
@@ -43,7 +43,7 @@ public:
   virtual void clear () = 0;
   virtual void initialize (std::vector<Select*>&, Treelog&) = 0;
 protected:
-  Summary (const Block& al);
+  Summary (const BlockModel& al);
 public:
   virtual void summarize (int hours, Treelog&) const = 0;
   ~Summary ();

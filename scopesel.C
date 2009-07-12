@@ -24,7 +24,7 @@
 #include "scope.h"
 #include "assertion.h"
 #include "output.h"
-#include "block.h"
+#include "block_model.h"
 #include "treelog.h"
 #include "librarian.h"
 #include "frame.h"
@@ -75,14 +75,14 @@ public:
 
   // Create.
 public:
-  ScopeselName (const Block& al)
+  ScopeselName (const BlockModel& al)
     : name (al.name ("frame"))
   { }
 };
 
 static struct ScopeselNameSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ScopeselName (al); }
 
   void load_frame (Frame& frame) const
@@ -106,13 +106,13 @@ public:
 
   // Create.
 public:
-  ScopeselNull (const Block&)
+  ScopeselNull (const BlockModel&)
   { }
 };
 
 static struct ScopeselNullSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ScopeselNull (al); }
 
   void load_frame (Frame&) const

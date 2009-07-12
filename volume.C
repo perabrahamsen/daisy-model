@@ -22,7 +22,7 @@
 
 #include "volume.h"
 #include "geometry.h"
-#include "block.h"
+#include "block_model.h"
 #include "assertion.h"
 #include "librarian.h"
 
@@ -54,7 +54,7 @@ Volume::density (const Geometry& geo) const
 }
 
 std::auto_ptr<Volume>
-Volume::build_obsolete (const Block& al)
+Volume::build_obsolete (const BlockModel& al)
 {
   Volume *const vol = Librarian::build_item<Volume> (al, "volume");
   daisy_assert (vol);
@@ -73,7 +73,7 @@ Volume::build_obsolete (const Block& al)
   return std::auto_ptr<Volume> (vol);
 }
 
-Volume::Volume (const Block& al)
+Volume::Volume (const BlockModel& al)
   : name (al.type_name ())
 { }
 

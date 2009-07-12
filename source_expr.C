@@ -47,7 +47,7 @@ public:
 
   // Create and Destroy.
 public:
-  explicit SourceExpr (const Block& al);
+  explicit SourceExpr (const BlockModel& al);
   ~SourceExpr ();
 };
 
@@ -102,7 +102,7 @@ SourceExpr::load (Treelog& msg)
   return true;
 }
 
-SourceExpr::SourceExpr (const Block& al)
+SourceExpr::SourceExpr (const BlockModel& al)
   : SourceFile (al),
     units (al.units ()),
     expr (Librarian::build_item<Number> (al, "expr")),
@@ -116,7 +116,7 @@ SourceExpr::~SourceExpr ()
 
 static struct SourceExprSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new SourceExpr (al); }
 
   SourceExprSyntax ()

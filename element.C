@@ -21,7 +21,7 @@
 #define BUILD_DLL
 
 #include "element.h"
-#include "block.h"
+#include "block_model.h"
 #include "mathlib.h"
 #include "librarian.h"
 #include "frame.h"
@@ -38,7 +38,7 @@ Element::library_id () const
   return id;
 }
 
-Element::Element (const Block& al)
+Element::Element (const BlockModel& al)
   : name (al.type_name ())
 { }
 
@@ -65,7 +65,7 @@ struct Atom : public Element
     static const symbol dim = symbol ("g/mol");
     return dim; 
   }
-  Atom (const Block& al)
+  Atom (const BlockModel& al)
     : Element (al),
       mass (al.number ("mass"))
   { }
@@ -73,7 +73,7 @@ struct Atom : public Element
 
 static struct ElementAtomSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new Atom (al); }
   ElementAtomSyntax ()
     : DeclareModel (Element::component, "atom", "An atom.")

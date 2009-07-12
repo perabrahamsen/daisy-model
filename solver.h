@@ -34,7 +34,7 @@ typedef boost::numeric::ublas::matrix<double> SMatrix_type;
 typedef boost::numeric::ublas::compressed_matrix<double> SMatrix_type;
 #endif // compressed matrix
 
-class Block;
+class BlockModel;
 
 class Solver : public Model 
 {
@@ -61,7 +61,7 @@ public:
 private:
   Solver ();			// Disable
 public:
-  Solver (const Block& al);
+  Solver (const BlockModel& al);
   ~Solver ();
 };
 

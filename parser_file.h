@@ -48,7 +48,7 @@ public:
 public:
   void initialize (Metalib&);
   bool check () const;
-  ParserFile (const Block&);
+  ParserFile (const BlockModel&);
   ParserFile (Metalib&, const std::string& filename, Treelog&);
   ~ParserFile ();
 };

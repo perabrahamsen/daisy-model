@@ -25,7 +25,7 @@
 #define BUILD_DLL
 
 #include "hydraulic.h"
-#include "block.h"
+#include "block_model.h"
 #include "texture.h"
 #include "plf.h"
 #include "treelog.h"
@@ -64,7 +64,7 @@ private:
   
   // Create and Destroy.
 public:
-  HydraulicHypres (const Block&);
+  HydraulicHypres (const BlockModel&);
   HydraulicHypres (symbol name, double K_sat);
   void initialize (const Texture&, double rho_b, bool top_soil,
 		   Treelog& msg);
@@ -276,7 +276,7 @@ pedotransfer function");
 }
 
 
-HydraulicHypres::HydraulicHypres (const Block& al)
+HydraulicHypres::HydraulicHypres (const BlockModel& al)
   : Hydraulic (al),
     soil_type (al.check ("topsoil") 
 	       ? (al.flag ("topsoil") ? top : bottom)
@@ -311,7 +311,7 @@ Hydraulic::create_aquitard (const double K_sat)
 
 static struct HydraulicHypresSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new HydraulicHypres (al); }
 
   static bool check_alist (const Metalib&, const Frame&, Treelog&)

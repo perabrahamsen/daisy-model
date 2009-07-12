@@ -124,7 +124,7 @@ public:
   static bool is_mineral (const Metalib&, const FrameModel&);
   static bool is_organic (const Metalib&, const FrameModel&);
 protected:
-  AM (const Block&);
+  AM (const BlockModel&);
 public:
   virtual ~AM ();
 };

@@ -22,7 +22,7 @@
 
 #define BUILD_DLL
 #include "photo_Farquhar.h"
-#include "block.h"
+#include "block_model.h"
 #include "rubiscoNdist.h"
 #include "ABAeffect.h"
 #include "bioclimate.h"
@@ -68,7 +68,7 @@ public:
 
   // Create and Destroy.
 public:
-  PhotoFCC3 (const Block& al)
+  PhotoFCC3 (const BlockModel& al)
     : PhotoFarquhar (al),
       TempEff (al.plf ("TempEff")),
       S (al.number ("S")),
@@ -286,7 +286,7 @@ PhotoFCC3::respiration_rate (const double Vm_25, const double Tl) const
 
 static struct Photo_FCC3Syntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new PhotoFCC3 (al); }
   Photo_FCC3Syntax () 
     : DeclareModel (Photo::component, "FC_C3", "Farquhar", "\

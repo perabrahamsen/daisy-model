@@ -24,7 +24,7 @@
 #include "mathlib.h"
 #include <sstream>
 #include "check.h"
-#include "block.h"
+#include "block_model.h"
 #include "librarian.h"
 #include "frame.h"
 
@@ -43,7 +43,7 @@ private:
 
   // Create.
   public:
-  StomataCon_BB (const Block& al)
+  StomataCon_BB (const BlockModel& al)
     : StomataCon (al)
   { }
 };
@@ -64,7 +64,7 @@ StomataCon_BB::stomata_con (const double wsf /*[]*/, const double m /*[]*/,
 
 static struct StomataConBBSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new StomataCon_BB (al); }
   StomataConBBSyntax ()
     : DeclareModel (StomataCon::component, "BB", 

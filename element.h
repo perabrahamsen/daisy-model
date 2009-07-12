@@ -25,7 +25,7 @@
 #include "model.h"
 #include "symbol.h"
 
-class Block;
+class BlockModel;
 
 class Element : public Model
 {
@@ -42,7 +42,7 @@ public:
 
   // Create and Destroy.
 public:
-  Element (const Block& al);
+  Element (const BlockModel& al);
   ~Element ();
 };
 

@@ -21,7 +21,7 @@
 #define BUILD_DLL
 #include "rubiscoNdist.h"
 #include "mathlib.h"
-#include "block.h"
+#include "block_model.h"
 #include <sstream>
 #include "check.h"
 #include "librarian.h"
@@ -60,7 +60,7 @@ private:
 
   // Create.
 public:
-  rubiscoNdist_forced (const Block& al)
+  rubiscoNdist_forced (const BlockModel& al)
     : RubiscoNdist (al),
       expr (Librarian::build_item<Number> (al, "value")),
       scope (__FUNCTION__)
@@ -134,7 +134,7 @@ rubiscoNdist_forced
 
 static struct rubiscoNdist_forcedSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new rubiscoNdist_forced (al); }
 
   rubiscoNdist_forcedSyntax ()

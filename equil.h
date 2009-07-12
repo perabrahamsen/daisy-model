@@ -25,7 +25,7 @@
 #include "model.h"
 #include "symbol.h"
 
-class Block;
+class BlockModel;
 class Treelog;
 class Scope;
 class Units;
@@ -51,7 +51,7 @@ private:
   Equilibrium ();
   Equilibrium (const Equilibrium&);
 protected:
-  explicit Equilibrium (const Block& al);
+  explicit Equilibrium (const BlockModel& al);
 public:
   ~Equilibrium ();
 };

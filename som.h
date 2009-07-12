@@ -37,7 +37,7 @@ public:
 
   // Create & Destroy.
 public:
-  SOM (const Block&);
+  SOM (const BlockModel&);
 };
 
 #endif // SOM_H

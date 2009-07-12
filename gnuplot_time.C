@@ -20,7 +20,7 @@
 
 #define BUILD_DLL
 #include "gnuplot_base.h"
-#include "block.h"
+#include "block_model.h"
 #include "source.h"
 #include "treelog.h"
 #include "mathlib.h"
@@ -52,7 +52,7 @@ struct GnuplotTime : public GnuplotBase
   bool plot (std::ostream& out, Treelog& msg);
   
   // Create and Destroy.
-  explicit GnuplotTime (const Block& al);
+  explicit GnuplotTime (const BlockModel& al);
   ~GnuplotTime ();
 };
 
@@ -315,7 +315,7 @@ set style data lines\n";
   return true;
 }
 
-GnuplotTime::GnuplotTime (const Block& al)
+GnuplotTime::GnuplotTime (const BlockModel& al)
   : GnuplotBase (al),
     begin (al.check ("begin") 
 	   ? new Time (al.submodel ("begin")) 
@@ -341,7 +341,7 @@ GnuplotTime::~GnuplotTime ()
 
 static struct GnuplotTimeSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new GnuplotTime (al); }
   GnuplotTimeSyntax ()
     : DeclareModel (Gnuplot::component, "time", "common",

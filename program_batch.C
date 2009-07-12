@@ -22,6 +22,7 @@
 
 #include "program.h"
 #include "block_top.h"
+#include "block_model.h"
 #include "treelog.h"
 #include "path.h"
 #include "assertion.h"
@@ -58,7 +59,7 @@ struct ProgramBatch : public Program
         Treelog::Open nest (msg, name.name (), i, program[i]->name);
         msg.touch ();
         {
-          BlockTop block (*metalib, msg, *metalib, "Initializing");
+          BlockTop block (*metalib, msg, *metalib);
           program[0]->initialize (*metalib, block);
           if (!block.ok ())
             throw EXIT_FAILURE;
@@ -83,7 +84,7 @@ struct ProgramBatch : public Program
   bool check (Treelog&)
   { return true; }
 
-  ProgramBatch (const Block& al)
+  ProgramBatch (const BlockModel& al)
     : Program (al),
       metalib (NULL),
       path (al.path ()),
@@ -97,7 +98,7 @@ struct ProgramBatch : public Program
 
 static struct ProgramBatchSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
   { return new ProgramBatch (al); }
   ProgramBatchSyntax ()
     : DeclareModel (Program::component, "batch", "Run a sequence of programs.")

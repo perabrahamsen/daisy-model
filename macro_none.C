@@ -47,7 +47,7 @@ struct MacroNone : public Macro
     { }
 
   // Create and Destroy.
-  MacroNone (const Block& al)
+  MacroNone (const BlockModel& al)
     : Macro (al)
     { }
   ~MacroNone ()
@@ -56,7 +56,7 @@ struct MacroNone : public Macro
 
 static struct MacroNoneSyntax : public DeclareModel
 {
-  Model* make (const Block& al) const
+  Model* make (const BlockModel& al) const
     { return new MacroNone (al); }
   MacroNoneSyntax ()
     : DeclareModel (Macro::component, "none", "No macropores.")

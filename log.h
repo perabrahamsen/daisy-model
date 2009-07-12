@@ -47,7 +47,7 @@ class Soil;
 class Vegetation;
 class Metalib;
 class Treelog;
-class Block;
+class BlockModel;
 class Frame;
 
 class EXPORT Log : public ModelFramed
@@ -301,7 +301,7 @@ protected:
 public:
   void initialize_common (Metalib&, Treelog& out);
 protected:
-  Log (const Block& al);
+  Log (const BlockModel& al);
   Log (const char* id);
 public:
   virtual void summarize (Treelog& out);
