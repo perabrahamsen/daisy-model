@@ -1,16 +1,10 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Block
+* frame + lib
 
-toplevel.C
-librarian.C
-log_select.C
-parser_file.C
-program_batch.C
-ui_Qt_run.C
+** define_model
 
-  // Context
-  Block (Block&, const Frame&, symbol scope_tag);
+** 
 
 * Cleanup
 

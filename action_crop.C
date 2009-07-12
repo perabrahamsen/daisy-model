@@ -851,9 +851,8 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
 	  < harvest_perennial->fertilize->size ())
 	{
 	  // If 'fertilize' is active, use it.
-          const Frame& frame = *(*harvest_perennial->fertilize) 
+          const FrameModel& model = *(*harvest_perennial->fertilize) 
             [harvest_perennial->fertilize_index];
-          const FrameModel& model = dynamic_cast<const FrameModel&> (frame);
 	  fertilize (daisy, msg, model);
 	  harvest_perennial->fertilize_index++;
 	}
@@ -862,9 +861,8 @@ ActionCrop::doIt (Daisy& daisy, const Scope& scope, Treelog& msg)
 		   < harvest_perennial->fertilize_rest->size ()))
 	{
 	  // Else, if 'fertilize_rest' is active, us that.
-          const Frame& frame = *(*harvest_perennial->fertilize_rest)
+          const FrameModel& model = *(*harvest_perennial->fertilize_rest)
             [harvest_perennial->fertilize_rest_index];
-          const FrameModel& model = dynamic_cast<const FrameModel&> (frame);
           fertilize (daisy, msg, model);
 	  harvest_perennial->fertilize_rest_index++;
 	}

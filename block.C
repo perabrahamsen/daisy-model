@@ -38,7 +38,7 @@ struct Block::Implementation
   const Metalib& metalib;
   const Block *const context;
   const Frame& frame;
-  mutable Treelog& msg;
+  Treelog& msg;
   Treelog::Open msg_nest;
   bool is_ok;
 
