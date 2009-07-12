@@ -76,7 +76,7 @@ Block::expand_string (const symbol value_s) const
                   const Attribute::type type = lookup (key);
                   if (type == Attribute::Error)
                     throw "Unknown expansion: '" + key + "'";
-                  const Frame& frame = this->find_frame (key);
+                  const Frame& frame = find_frame (key);
                   if (frame.type_size (key) != Attribute::Singleton)
                     throw "'" + key 
                       + "' is a sequence, can only expand singletons";
@@ -105,10 +105,10 @@ Block::expand_string (const symbol value_s) const
                             const std::auto_ptr<Stringer> stringer 
                               (Librarian::build_frame<Stringer> (*this,
                                                                  obj, key));
-                            if (!this->ok () 
-                                || !stringer->initialize (this->units (),
+                            if (!ok () 
+                                || !stringer->initialize (units (),
                                                           scope, msg ())
-                                || !stringer->check (this->units (), scope,
+                                || !stringer->check (units (), scope,
                                                      msg ())
                                 || stringer->missing (scope))
                               throw "Bad string: '" + type + "'";
@@ -119,7 +119,7 @@ Block::expand_string (const symbol value_s) const
                             const std::auto_ptr<Number> number 
                               (Librarian::build_frame<Number> (*this, 
                                                                obj, key));
-                            if (!this->ok () 
+                            if (!ok () 
                                 || !number->initialize (units (), scope, 
                                                         msg ())
                                 || !number->check (units (), scope, msg ()))
@@ -174,16 +174,16 @@ Block::expand_reference (const symbol key) const
       throw "Reference loop";
     }
   if (lookup (var) == frame ().lookup (key)
-      && (this->find_frame (var).type_size (var) == frame ().type_size (key)
+      && (find_frame (var).type_size (var) == frame ().type_size (key)
           || (frame ().type_size (key) == Attribute::Variable
-              && (this->find_frame (var).type_size (var) 
+              && (find_frame (var).type_size (var) 
                   != Attribute::Singleton))))
     return var;
 
   std::ostringstream tmp;
   tmp << "Value of '" << key << "' is $" << var
       << ", which is a " << Attribute::type_name (lookup (var));
-  switch (this->find_frame (var).type_size (var))
+  switch (find_frame (var).type_size (var))
     {
     case Attribute::Singleton:
       break;
@@ -203,7 +203,7 @@ Block::expand_reference (const symbol key) const
       tmp << " sequence";
       break;
     default:
-      tmp << "[" << this->find_frame (var).type_size (var) << "]";
+      tmp << "[" << find_frame (var).type_size (var) << "]";
     }
   tmp << ", should be a " << Attribute::type_name (frame ().lookup (key));
   switch (frame ().type_size (key))
@@ -258,10 +258,6 @@ Block::ok () const
 void
 Block::set_error () const
 { is_ok = false; }
-
-const Frame& 
-Block::find_frame (const symbol key) const
-{ return frame (); }
 
 Attribute::type 
 Block::lookup (const symbol key) const
@@ -420,7 +416,7 @@ Block::flag_sequence (const symbol key) const
 { 
   const Frame& frame = find_frame (key);
   if (frame.is_reference (key))
-    return this->flag_sequence (expand_reference (key));
+    return flag_sequence (expand_reference (key));
 
   return frame.flag_sequence (key); 
 }
@@ -430,7 +426,7 @@ Block::integer_sequence (const symbol key) const
 { 
   const Frame& frame = find_frame (key);
   if (frame.is_reference (key))
-    return this->integer_sequence (expand_reference (key));
+    return integer_sequence (expand_reference (key));
 
   return frame.integer_sequence (key); 
 }
@@ -440,7 +436,7 @@ Block::model_sequence (const symbol key) const
 { 
   const Frame& frame = find_frame (key);
   if (frame.is_reference (key))
-    return this->model_sequence (expand_reference (key));
+    return model_sequence (expand_reference (key));
 
   return frame.model_sequence (key); 
 }
@@ -450,7 +446,7 @@ Block::submodel_sequence (const symbol key) const
 { 
   const Frame& frame = find_frame (key);
   if (frame.is_reference (key))
-    return this->submodel_sequence (expand_reference (key));
+    return submodel_sequence (expand_reference (key));
 
   return frame.submodel_sequence (key); 
 }
@@ -460,7 +456,7 @@ Block::plf_sequence (const symbol key) const
 { 
   const Frame& frame = find_frame (key);
   if (frame.is_reference (key))
-    return this->plf_sequence (expand_reference (key));
+    return plf_sequence (expand_reference (key));
 
   return frame.plf_sequence (key); 
 }

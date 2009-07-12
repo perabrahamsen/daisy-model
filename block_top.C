@@ -34,6 +34,10 @@ Treelog&
 BlockTop::msg () const
 { return msg_; }
 
+const Frame& 
+BlockTop::find_frame (const symbol key) const
+{ return frame (); }
+
 BlockTop::BlockTop (const Metalib& metalib, Treelog& msg, 
                     const Frame& frame)
   : metalib_ (metalib),

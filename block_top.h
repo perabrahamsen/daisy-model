@@ -42,6 +42,7 @@ class EXPORT BlockTop : public Block
   const Metalib& metalib () const;
   const Frame& frame () const;
   Treelog& msg () const;
+  const Frame& find_frame (const symbol key) const;
 public:
   BlockTop (const Metalib&, Treelog& msg, const Frame&);
   ~BlockTop ();

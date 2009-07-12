@@ -75,7 +75,7 @@ public:
 
   // Nested scope handling.
 public:
-  virtual const Frame& find_frame (const symbol key) const;
+  virtual const Frame& find_frame (const symbol key) const = 0;
 
   // Syntax emulation.
 public:

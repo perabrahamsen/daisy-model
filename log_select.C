@@ -299,25 +299,17 @@ LogSelect::document_entries (Format& format, const Metalib& metalib,
       return;
     }
 
-#if 0
   // Complete log.
-  BlockTop block (metalib, msg, frame, "docselect");
-  struct DocSelect : public LogSelect 
-  {
-    void initialize (Treelog&)
-    { }
-    DocSelect (const Block& al)
-      : LogSelect (al)
-    { }
-  } select (block);
+  BlockTop block (metalib, msg, frame);
+  auto_vector<Select*> entries (Librarian::build_vector<Select> (block,
+                                                                 "entries")); 
   daisy_assert (block.ok ());
 
   format.bold ("Table columns:");
   Format::List dummy (format);
 
-  for (size_t i = 0; i < select.entries.size (); i++)
-    select.entries[i]->document (format);
-#endif
+  for (size_t i = 0; i < entries.size (); i++)
+    entries[i]->document (format);
 }
 
 static struct LogSelectSyntax : public DeclareBase
