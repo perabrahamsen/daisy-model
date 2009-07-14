@@ -44,12 +44,14 @@ public:
 public:
   double DAP;	        	// Dayes after planting [d]
   double DS;	        	// Development Stage
+  bool new_timestep;            // True before this has been maked as a light
   double partial_day_length;	// Light hours this day until now [0-24 h]
   double day_length;		// Light hours previous day. [0-24 h]
 
   // Simulation.
 public:
   void light_time (double dt);
+  void tick ();
   virtual void tick_daily (double Ta, bool leaf_growth, 
                            Production&, Vernalization&, 
 			   double cut_stress, Treelog&) = 0;

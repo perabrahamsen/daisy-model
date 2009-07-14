@@ -38,7 +38,18 @@ Phenology::library_id () const
 
 void
 Phenology::light_time (const double dt)
-{ partial_day_length += dt; }
+{ 
+  if (new_timestep)
+    // Avoid multiple additions when finding stomata conduictance.
+    {
+      new_timestep = false;
+      partial_day_length += dt; 
+    }
+}
+
+void
+Phenology::tick () 
+{ new_timestep = true; }
 
 void 
 Phenology::output (Log& log) const
@@ -58,6 +69,7 @@ Phenology::Phenology (const BlockModel& al)
     // State.
     DAP (al.number ("DAP")),
     DS (al.number ("DS")),
+    new_timestep (true),
     partial_day_length (al.number ("partial_day_length")),
     day_length (al.number ("day_length"))
 { }

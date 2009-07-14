@@ -453,6 +453,9 @@ CropStandard::tick (const Metalib& metalib,
 {
   TREELOG_MODEL (msg);
 
+  // For summarizing light hours.
+  development->tick ();
+
   // Update cut stress.
   harvesting->tick (time);
 
