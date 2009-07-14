@@ -131,14 +131,14 @@ Time::print () const
 void 
 Time::set_time (Frame& parent, const symbol key) const
 {
-  std::auto_ptr<FrameSubmodel> child (&parent.submodel (key).clone ());
+  boost::shared_ptr<FrameSubmodel> child (&parent.submodel (key).clone ());
   child->set ("year", year ());
   child->set ("month", month ());
   child->set ("mday", mday ());
   child->set ("hour", hour ());
   child->set ("minute", minute ());
   child->set ("second", second ());
-  parent.set (key, *child);
+  parent.set (key, child);
 }
 
 int 

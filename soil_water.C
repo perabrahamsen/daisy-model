@@ -458,12 +458,17 @@ SoilWater::mass_balance (const Geometry& geo, double dt, Treelog& msg)
       const double total_expected 
         = total_old - total_sink + total_boundary_input;
       const double total_diff = total_new - total_old;
+      const double total_error = total_expected - total_new;
+      static double accumulated_error = 0.0;
+      accumulated_error += total_error;
       std::ostringstream tmp;
       tmp << "Water balance: old (" << total_old
           << ") - sink (" << total_sink 
           << ") + boundary input (" << total_boundary_input
           << ") != " << total_expected << " mm, got " << total_new 
-          << " mm, difference is " << total_diff << " mm";
+          << " mm, difference is " << total_diff 
+          << " mm, error is " << (total_expected - total_new) 
+          << " mm, accumulated " << accumulated_error << " mm";
       for (size_t e = 0; e < edge_size; e++)
         {
           if (geo.edge_is_internal (e))

@@ -60,8 +60,8 @@ public:
   typedef void (*load_syntax_t) (Frame&);
   static void submodel_instantiate (load_syntax_t);
   static bool submodel_registered (symbol);
-  static const FrameSubmodel& submodel_frame (symbol);
-  static const FrameSubmodel& submodel_frame (load_syntax_t);
+  static boost::shared_ptr<const FrameSubmodel> submodel_frame (symbol);
+  static boost::shared_ptr<const FrameSubmodel> submodel_frame (load_syntax_t);
   static symbol submodel_name (load_syntax_t);
   static load_syntax_t submodel_load (symbol);
   static symbol submodel_description (symbol);

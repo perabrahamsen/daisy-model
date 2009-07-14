@@ -53,7 +53,7 @@ Traverse::traverse_all_submodels ()
   for (unsigned int i = 0; i < submodels.size (); i++)
     {
       const symbol submodel = submodels[i];
-      const Frame& frame = Librarian::submodel_frame (submodel);
+      const Frame& frame = *Librarian::submodel_frame (submodel).get ();
       traverse_submodel_default (frame, submodel, submodel);
     }
 }

@@ -764,6 +764,13 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
                            K (cell), h (cell),
                            value, pressure, dq, Dm_mat, Dm_vec, Gm);
               }
+            else
+              // Indsat af pa@life.ku.dk Fri Jul 10 11:21:14     2009
+              {
+                const double flux = 0.0;
+                Neumann (edge, cell, area, in_sign, flux, dq, B);
+              }
+
           }
           break;
           

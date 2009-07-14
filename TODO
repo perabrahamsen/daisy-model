@@ -1,11 +1,22 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* irrigate
+
+frame.order ("value")
+
+value type is Attribute::User ()
+
+skal være enten [mm] eller [mm/h]
+
+udregn flux og remaining_time hvis ikke angivet
+
+* crop_std: phenology_light bliver kaldt flere gange (== mere end 24 timer lys).
+
 * Cleanup
 
 ** fjern flere "clone", brug shared_ptr
 
 *** Brug shared_ptr i Library
-
 
 * frame + lib
 

@@ -65,14 +65,16 @@ Librarian::submodel_registered (const symbol name)
   return content->submodel_registered (name); 
 }
 
-const FrameSubmodel& 
+
+boost::shared_ptr<const FrameSubmodel> 
 Librarian::submodel_frame (const symbol name)
 {
   daisy_assert (content);
   return content->submodel_frame (name); 
 }
 
-const FrameSubmodel& 
+
+boost::shared_ptr<const FrameSubmodel> 
 Librarian::submodel_frame (const load_syntax_t load_syntax)
 {
   daisy_assert (content);

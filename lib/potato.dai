@@ -46,6 +46,7 @@
           (PARref   0.06)
           (PARext   0.60)
           (EPext    0.50)
+          (HvsWStem (0 1) (1 1)); Disable
           (HvsDS   (0.00 1) (1.00 40) (2.00  40)))
   (Root (DptEmr     10)
         (PenPar1    0.20)
@@ -122,6 +123,7 @@ It is based on experimental data from SCRI from 1983 and 1984."
           (PARref   0.06)
           (PARext   0.50)
           (EPext    0.50)
+          (HvsWStem (0 1) (1 1)); Disable
           (HvsDS   (0.00 1) (1.00 20) (1.25 35)))
 
   (Root (DptEmr     20 [cm])

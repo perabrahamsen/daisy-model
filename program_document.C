@@ -359,7 +359,7 @@ ProgramDocument::print_entry_value (const symbol name,
 		{
 		  const FrameSubmodel& nested = frame.submodel (name);
                   const FrameSubmodel& frame 
-                    = Librarian::submodel_frame (submodel);
+                    = *Librarian::submodel_frame (submodel).get ();
 		  if (!nested.subset (metalib, frame))
 		    print_default_value = true;
 		}
@@ -1243,7 +1243,7 @@ standard parameterizations for the model.");
   for (unsigned int i = 0; i < fixed.size (); i++)
     {
       const symbol name = fixed[i];
-      const Frame& frame = Librarian::submodel_frame (name);
+      const Frame& frame = *Librarian::submodel_frame (name).get ();
       const symbol description = Librarian::submodel_description (name);
       print_fixed (name, frame, description);
   }

@@ -39,6 +39,7 @@
 #include "librarian.h"
 #include "secondary.h"
 #include "treelog.h"
+#include <sstream>
 #include <vector>
 #include <map>
 
@@ -333,6 +334,34 @@ Horizon::initialize_base (bool top_soil,
   hydraulic->initialize (texture, impl->dry_bulk_density, top_soil, msg);
   impl->initialize (*hydraulic, texture, quartz () * texture.mineral (),
                     som_size, msg); 
+
+  std::ostringstream tmp;
+  tmp << "h\th\tTheta\tK\n"
+      << "cm\tpF\t\tcm/h\n";
+  const double h_Sat = 0;
+  tmp << h_Sat << "\t" << "\t" << hydraulic->Theta (h_Sat) 
+      << "\t" << hydraulic->K (h_Sat) << "\n";
+  const double pF_Zero = 0;
+  const double h_Zero = pF2h (pF_Zero);
+  tmp << h_Zero << "\t" << pF_Zero << "\t" << hydraulic->Theta (h_Zero) 
+      << "\t" << hydraulic->K (h_Zero) << "\n";
+  const double pF_One = 1;
+  const double h_One = pF2h (pF_One);
+  tmp << h_One << "\t" << pF_One << "\t" << hydraulic->Theta (h_One) 
+      << "\t" << hydraulic->K (h_One) << "\n";
+  const double pF_FC = 2.0;
+  const double h_FC = pF2h (pF_FC);
+  tmp << h_FC << "\t" << pF_FC << "\t" << hydraulic->Theta (h_FC) 
+      << "\t" << hydraulic->K (h_FC) << "\n";
+  const double pF_Three = 3;
+  const double h_Three = pF2h (pF_Three);
+  tmp << h_Three << "\t" << pF_Three << "\t" << hydraulic->Theta (h_Three) 
+      << "\t" << hydraulic->K (h_Three) << "\n";
+  const double pF_WP = 4.2;
+  const double h_WP = pF2h (pF_WP);
+  tmp << h_WP << "\t" << pF_WP << "\t" << hydraulic->Theta (h_WP) 
+      << "\t" << hydraulic->K (h_WP);
+  msg.debug (tmp.str ());
 }
   
 Horizon::~Horizon ()

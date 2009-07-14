@@ -86,7 +86,7 @@ struct CropStandard : public Crop
     // Stomata conductance
     const double gs = photo->stomata_conductance();//[m s^-1]
     if(gs < 0)
-      return 1.0/rs_max(); // Photo_GL have no stomata conductance.
+      return 1.0/rs_min(); // Photo_GL have no stomata conductance.
     return gs; 
   }                     
   double leaf_width () const

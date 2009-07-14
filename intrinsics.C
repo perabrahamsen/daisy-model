@@ -148,14 +148,14 @@ void
 Intrinsics::submodel_instantiate (const load_syntax_t load_syntax)
 {
   if (submodel_load_frame.find (load_syntax) == submodel_load_frame.end ())
-    submodel_load_frame[load_syntax] = NULL;
+    submodel_load_frame[load_syntax].reset ();
 }
 
 bool 
 Intrinsics::submodel_registered (const symbol name) const
 { return submodel_name_load.find (name) != submodel_name_load.end (); }
 
-const FrameSubmodel& 
+boost::shared_ptr<const FrameSubmodel> 
 Intrinsics::submodel_frame (const symbol name)
 {
   const submodel_name_load_t::const_iterator i = submodel_name_load.find (name);
@@ -185,7 +185,7 @@ struct FrameSubmodelDeclared : public FrameSubmodel
   { }
 };
 
-const FrameSubmodel& 
+boost::shared_ptr<const FrameSubmodel> 
 Intrinsics::submodel_frame (const load_syntax_t load_syntax)
 {
   submodel_instantiate (load_syntax);
@@ -193,17 +193,15 @@ Intrinsics::submodel_frame (const load_syntax_t load_syntax)
     = submodel_load_frame.find (load_syntax);
   daisy_assert (i != submodel_load_frame.end ());
 
-  if ((*i).second)
-    // Already created.
-    return *(*i).second;
-  
-  // Create it.
-  FrameSubmodel *const frame = new FrameSubmodelDeclared (load_syntax);
-  daisy_assert (frame);
-  (*i).second = frame;
+  if (!(*i).second.get ())
+    {
+      boost::shared_ptr<const FrameSubmodel> 
+        frame (new FrameSubmodelDeclared (load_syntax));
+      (*i).second = frame;
+    }
 
-  // All done.
-  return *frame;
+  return (*i).second;
+  
 }
 
 symbol
@@ -270,6 +268,5 @@ Intrinsics::~Intrinsics ()
 { 
   daisy_assert (count == 0); 
 }
-
 
 // intrinsics.C ends here

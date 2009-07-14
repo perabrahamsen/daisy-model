@@ -135,7 +135,7 @@ Select::Implementation::Spec::leaf_frame () const
   const Frame* frame;
 
   if (library_name == "fixed")
-    frame = &Librarian::submodel_frame (model_name);
+    frame = Librarian::submodel_frame (model_name).get ();
   else
     {
       const Library& library = metalib.library (library_name);
@@ -271,7 +271,7 @@ Select::Implementation::Spec::check_alist (const Metalib& metalib,
         }
       else
         {
-          const Frame& frame = Librarian::submodel_frame (model_name);
+          const Frame& frame = *Librarian::submodel_frame (model_name).get ();
           if (!check_path (submodels_and_attribute, frame, err))
             ok = false;
         }

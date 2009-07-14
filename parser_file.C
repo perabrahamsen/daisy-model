@@ -939,10 +939,9 @@ ParserFile::Implementation::load_list (Frame& frame)
 		      skip ("(");
 		    }
 		}
-              std::auto_ptr<FrameSubmodel> 
-                child (&frame.submodel (name).clone ());
+              boost::shared_ptr<FrameSubmodel> child (&frame.submodel (name).clone ());
 	      load_list (*child);
-	      frame.set (name, *child);
+	      frame.set (name, child);
 	      if (alist_skipped)
 		skip (")");
 	    }
@@ -1047,7 +1046,7 @@ ParserFile::Implementation::load_list (Frame& frame)
 		  inputs.push_back (child);
 		}
 	      else
-                frame.set (name, *child);
+                frame.set (name, child);
 	    }
 	    break;
 	  case Attribute::Scalar:

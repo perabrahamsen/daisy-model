@@ -703,7 +703,7 @@ Geometry::add_layer (Frame& frame, const Attribute::category cat,
                      const symbol name,
                      load_syntax_t load_syntax)
 {
-  const FrameSubmodel& child = Librarian::submodel_frame (load_syntax);
+  const FrameSubmodel& child = *Librarian::submodel_frame (load_syntax).get ();
   const symbol description = child.description ("value");
   const symbol dimension = child.dimension ("value");
   

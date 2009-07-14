@@ -197,11 +197,11 @@ LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
       while (library.check (name))
         name += "+";
       daisy_assert (library.check (super));
-      boost::shared_ptr<FrameNamed> program (new FrameNamed (name, daisy));
+      boost::shared_ptr<FrameModel> program (new FrameNamed (name, daisy));
       library.add_model (name, program);
       printer.print_parameterization (Program::component, name);
       FrameDummy run_frame (*global_frame, Frame::parent_link);
-      run_frame.set ("run", *program);
+      run_frame.set ("run", program);
       printer.print_entry (run_frame, "run");
       library.remove (name);
 

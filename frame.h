@@ -287,7 +287,11 @@ class EXPORT Frame : public WScope
   void set (symbol, bool);
   void set (symbol, int);
   void set (symbol, const FrameModel&);
+  void set (symbol, boost::shared_ptr<FrameModel>);
+  void set (symbol, boost::shared_ptr<const FrameModel>);
   void set (symbol, const FrameSubmodel&);
+  void set (symbol, boost::shared_ptr<FrameSubmodel>);
+  void set (symbol, boost::shared_ptr<const FrameSubmodel>);
   void set (symbol, const PLF&);
   void set (symbol, const std::vector<double>&);
   void set (symbol, const std::vector<symbol>&);

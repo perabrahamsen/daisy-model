@@ -646,7 +646,7 @@ Frame::default_frame (const symbol key) const
   if (impl->has_type (key))
     {
       const load_syntax_t load_syntax = impl->get_type (key).load_syntax ();
-      return Librarian::submodel_frame (load_syntax);
+      return *Librarian::submodel_frame (load_syntax).get ();
     }
   if (parent () )
     return parent ()->default_frame (key);
@@ -780,15 +780,10 @@ Frame::declare_submodule (const symbol key,
 {
   impl->declare_type (key, new TypeSubmodel (cat, Attribute::Singleton, 
                                           load_syntax, description));
-#if 1
+
   if (cat == Attribute::Const || cat == Attribute::State)
-    {
-      // TODO: Move this to Frame::alist (name) (must return const first).
-      boost::shared_ptr<const FrameSubmodel> child 
-        (&default_frame (key).clone ());
-      impl->set_value (key, new ValueSubmodel (child));
-    }
-#endif
+    impl->set_value (key, new ValueSubmodel 
+                     (Librarian::submodel_frame (load_syntax)));
 }
 
 void 
@@ -1357,17 +1352,44 @@ Frame::set (const symbol key, int value)
 void 
 Frame::set (const symbol key, const FrameModel& value)
 {
-  verify (key, Attribute::Model);
   boost::shared_ptr<const FrameModel> child (&value.clone ());
+  set (key, child);
+}
+
+void 
+Frame::set (const symbol key, boost::shared_ptr<FrameModel> value)
+{
+
+  boost::shared_ptr<const FrameModel> child (value);
   impl->set_value (key, new ValueModel (child));
+}
+
+void 
+Frame::set (const symbol key, boost::shared_ptr<const FrameModel> value)
+{
+  verify (key, Attribute::Model);
+  impl->set_value (key, new ValueModel (value));
 }
 
 void 
 Frame::set (const symbol key, const FrameSubmodel& value)
 {
-  verify (key, Attribute::Submodel);
   boost::shared_ptr<const FrameSubmodel> child (&value.clone ());
-  impl->set_value (key, new ValueSubmodel (child));
+  set (key, child);
+}
+
+void 
+Frame::set (const symbol key, boost::shared_ptr<FrameSubmodel> value)
+{
+  boost::shared_ptr<const FrameSubmodel> child (value);
+  set (key, child);
+}
+
+void 
+Frame::set (const symbol key, boost::shared_ptr<const FrameSubmodel> value)
+{
+  verify (key, Attribute::Submodel);
+  impl->set_value (key, new ValueSubmodel (value));
 }
 
 void 

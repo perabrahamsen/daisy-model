@@ -18,12 +18,12 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-
 #ifndef INTRINSICS_H
 #define INTRINSICS_H
 
 #include "memutils.h"
 #include "symbol.h"
+#include <boost/shared_ptr.hpp>
 
 class Library;
 class Declare;
@@ -47,7 +47,7 @@ public:
   // Submodels.
 private:
   typedef void (*load_syntax_t) (Frame&);
-  typedef std::map<load_syntax_t, FrameSubmodel*> submodel_load_frame_t;
+  typedef std::map<load_syntax_t, boost::shared_ptr<const FrameSubmodel>/**/> submodel_load_frame_t;
   typedef std::map<symbol, load_syntax_t> submodel_name_load_t;
   typedef std::map<load_syntax_t, symbol> submodel_load_name_t;
   typedef std::map<symbol, symbol> submodel_name_desc_t;
@@ -58,8 +58,8 @@ private:
 public:
   void submodel_instantiate (load_syntax_t);
   bool submodel_registered (symbol) const;
-  const FrameSubmodel& submodel_frame (symbol);
-  const FrameSubmodel& submodel_frame (load_syntax_t);
+  boost::shared_ptr<const FrameSubmodel> submodel_frame (symbol);
+  boost::shared_ptr<const FrameSubmodel> submodel_frame (load_syntax_t);
   symbol submodel_name (load_syntax_t);
   symbol submodel_description (symbol) const;
   load_syntax_t submodel_load (symbol) const;
