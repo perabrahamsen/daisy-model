@@ -204,7 +204,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
   const size_t edge_above_size = edge_above.size ();
   ublas::vector<double> remaining_water (edge_above_size);
   std::vector<bool> drain_cell_on (drain_cell.size (),false); 
-
+  
 
   for (size_t i = 0; i < edge_above_size; i++)
     {
@@ -422,7 +422,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	  // Force active drains to zero h.
           drain (geo, drain_cell, h, Theta_previous, Theta, S_vol, S_macro,
                  dq, ddt, drain_cell_on, A, b, debug, msg);  
-
+          
           try {
             solver->solve (A, b, h); // Solve Ah=b with regard to h.
           } catch (const char *const error) {
@@ -462,8 +462,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
             }
         }
 
-      while (!converges (h_conv, h)
-	     && iterations_used <= max_iterations);
+      while (!converges (h_conv, h) && iterations_used <= max_iterations);
       
 
       if (iterations_used > max_iterations)
@@ -937,7 +936,7 @@ UZRectMollerup::drain (const GeometryRect& geo,
                 drain_sink  += flux / geo.cell_volume (cell); 
             }
           if (drain_sink <= 0.0)
-            drain_cell_on[d] == false;
+            drain_cell_on[d] = false;
         }
       else   // drain off
         if (h (cell) > 0.0)
@@ -964,6 +963,8 @@ UZRectMollerup::drain (const GeometryRect& geo,
         }
     }
 }
+
+
 
 
 #if 0
