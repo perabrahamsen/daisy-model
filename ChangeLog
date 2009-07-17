@@ -1,9 +1,5 @@
 2009-07-17  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* Version 4.66 released.
-
-2009-07-17  Per Abrahamsen  <abraham@dina.kvl.dk>
-
 	* svat_ssoc.C (z_0b): New parameter.
 	* resistance.C (z_0): Use it.
 	(default_z_0b): Renamed from 'z_0b'.
