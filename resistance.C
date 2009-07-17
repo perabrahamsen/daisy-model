@@ -200,7 +200,8 @@ Resistance::z_0h (const double z_0 /*roughness lenght [m]*/)
 
 // Roughness lenght for momentum transport (F2)
 double 
-Resistance::z_0 (const double h_veg /* vegetation height [m]*/, 
+Resistance::z_0 (const double z_0b /* Bare soil roughness height for momentum [m] */,
+                 const double h_veg /* vegetation height [m]*/, 
                  const double c_drag /* drag force [m^2 m^-2]*/,
                  const double d /* zero-plane displacement height [m]*/,
                  const double LAI /*[m^2 m^-2]*/)
@@ -209,7 +210,7 @@ Resistance::z_0 (const double h_veg /* vegetation height [m]*/,
   if (LAI < 3.)
     z_0 = z_0b + 0.3 * h_veg * sqrt(c_drag * LAI);
   else 
-    z_0 = 0.3 * (h_veg - d);
+    z_0 = z_0b + 0.3 * (h_veg - d);
   return z_0; // [m]
 }
 

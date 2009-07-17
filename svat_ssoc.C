@@ -51,12 +51,12 @@ struct SVAT_SSOC : public SVAT
   static const double sigma;   // Stefan Boltzman constant [W m^-2 K^-4]
   static const double TK;      // Conversion from dg C to K.
   static const double c_p;     // Specific heat of air [J kg^-1 K^-1]
-
   //Parameters
   const bool hypostomatous;    // True for hypostomatous leaves;
   const double maxTdiff;        // Largest temperature difference for conv. [K]
   const double maxEdiff;        // Largest humidity difference for converg. [Pa]
   const double max_iteration;   // Max number of iterations before giving up c.
+  const double z_0b;     //Bare soil roughness height for momentum [m]
 
   // Driving variables.
   // - Upper boundary
@@ -307,7 +307,7 @@ SVAT_SSOC::calculate_conductances (const double g_s /* stomata cond. [m/s]*/, Tr
   const double N = Resistance::N (z_r, d, T_c - TK, T_a - TK, U_z);
   // const double N = Resistance::N (z_r, d, T_0 - TK, T_a - TK, U_z);
   // Roughness lenght for momentum transport (F2)
-  const double z_0 = Resistance::z_0 (h_veg, c_drag, d, LAI);
+  const double z_0 = Resistance::z_0 (z_0b, h_veg, c_drag, d, LAI);
   // Roughness lenght for sensible heat transfer (F1)
   const double z_0h = Resistance::z_0h (z_0);
 
@@ -810,6 +810,7 @@ SVAT_SSOC::SVAT_SSOC (const BlockModel& al)
     maxTdiff (al.number ("maxTdiff")),
     maxEdiff (al.number ("maxEdiff")),
     max_iteration (al.integer ("max_iteration")),
+    z_0b (al.number ("z_0b")),
     T_a (-42.42e42),
     z_r (-42.42e42),
     RH (-42.42e42),
@@ -903,6 +904,9 @@ Largest humidity difference for convergence.");
     frame.declare_integer ("max_iteration", Attribute::Const, "\
 Largest number of iterations before giving up on convergence.");
     frame.set ("max_iteration", 150);  
+    frame.declare ("z_0b", "m", Attribute::Const, "\
+Bare soil roughness height for momentum.");
+    frame.set ("z_0b", Resistance::default_z_0b);
 
     // For log.
     frame.declare ("lambda", "J kg^-1", Attribute::LogOnly, "Latent heat of vaporization in atmosphere.");
