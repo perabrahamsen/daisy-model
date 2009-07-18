@@ -1,0 +1,293 @@
+\documentclass[a4paper,11pt,twoside]{article}
+\usepackage{a4}
+\usepackage[T1]{fontenc}
+\usepackage[latin1]{inputenc}
+\usepackage{hyperref}
+%\usepackage{times}
+\usepackage{palatino}
+
+% Larger pages.
+\addtolength{\textwidth}{4cm}
+\addtolength{\hoffset}{-2cm}
+\addtolength{\oddsidemargin}{1cm}
+\addtolength{\evensidemargin}{-1cm}
+
+\bibliographystyle{apalike}
+\input{macro}
+
+% External references.
+\usepackage{xr}
+\externaldocument[tut-]{tutorial}
+\externaldocument[ref-]{reference}
+
+% Constant references.
+\newcommand{\daisytut}{\textit{\Daisy{} Tutorial}}
+\newcommand{\daisyref}{\textit{\Daisy{} Program Reference Manual}}
+
+% Easy of edit more important than ease of reading.
+\sloppy
+
+\begin{document}
+
+\section*{Data Requirements for the \Daisy{} model}
+
+\Daisy{} requires data about the climate, the management and the soil
+in order to run a simulation.  \Daisy{} is to some degree able to
+adjust to the available data, either by using simpler models
+internally when less data is available, or by trying to synthesize the
+missing data from what is available.  In the following, we will
+describe the minimum data requirements for running \daisy{} at all,
+the data we recommend for reasonable simulation results, and finally
+list some of the optional data that you can feed the model for an even
+more detailed simulation.
+
+\section{Minimal amount of data needed}
+\label{sec:minimum}
+
+\subsection{Climate requirement}
+
+\Daisy{} will as a minimum need daily values for the following item
+for the entire simulation period, including the initialization period
+(see section~\ref{sec:warmup}).
+\begin{itemize}
+\item Average air temperature.
+\item Precipitation.
+\item Global radiation.
+\end{itemize}
+\Daisy{} will also need information about the station itself, in
+particular the name, elevation, location in longitude and latitude,
+information about the whether the data is recorded at the field or on
+a reference surface, the screen height, wet and dry deposition of
+NH$_4$ and NO$_3$, average temperature for the location, the average
+amplitude of the temperature variation over the year, and the average
+day where the maximum temperature is reached.
+
+All of this information should be supplied in a special climate file,
+whose format is described in Appendix~\ref{ref-cha:dwf} of
+\daisyref{}.
+
+\subsubsection{Missing data}
+
+All the above data must be supplied to the program in order for the
+simulation to run.  Use the best data available, which means data from
+the closest available climate station.  In some case you will have to
+supplement local recordings with regional records, precipitation is
+the most important to get local numbers for.
+
+\subsubsection{Predictions}
+
+If you are using \daisy{} for making predictions, you won't have any
+climate data.  In that case, we recommend that you run the simulation
+with old data from a number of different years.  Be sure to permute
+the years, as the results are very sensitive to variations not only in
+the weather, but in the sequence the years appear.  Do not use
+``average'' weather data, as that tend to give unrealistically high
+yields.  For the same reason, be sure that the years you use contain
+some examples of extreme weather, not just weather from ``normal''
+years.
+
+\subsection{Management}
+
+\Daisy{} will need to know the exact date of the following management
+operations:
+\begin{description}
+\item[Fertilizing] In addition to the date, we need to know the amount
+  and type of the fertilizer used, and whether it was incorporated or
+  not.
+\item[Irrigation] We need also to know the amount of water applied,
+  how it was applied (surface, overhead or subsoil), as well as the
+  amount of mineral fertilizer in the water, if any.
+\item[Tillage operations] We need to know the type of operation, e.g.\ 
+  plowing or seed bed preparation.
+\item[Sowing]  We need to know the name of the crop.
+\item[Harvesting] We need to know whether residuals are removed or
+  left on the field.
+\end{description}
+
+All this information should be given in the \daisy{} setup files, or
+\texttt{.dai} files, in the format described in \daisytut{},
+especially section~\ref{tut-sec:management}.
+
+\subsubsection{Missing data}
+
+Again, \daisy{} need this information in order to run.  If you don't
+have it, you must make estimates.  The dates can be essential, for
+example, if the irrigation date does not match the time the crop need
+the water the most, the yield may be much worse.  You may then
+actually want to use the techniques for predictions described in the
+next section instead.
+\begin{description}
+\item[Fertilizing] If you are interested in nitrogen harvest or
+  leaching, it is essential to get the input right.  The same is true
+  for yield and to a lesser degree water balance if the crop growth
+  is nitrogen limited.  For organic fertilizer types, use the closest
+  match from the `\texttt{fertilizer.dai}' file.
+\item[Irrigation] Get it right.
+\item[Tillage operations]  Use the closest match from the
+  `\texttt{tillage.dai}' file.
+\item[Sowing] \Daisy{} need a lot of information about the crop, this
+  information have been assembled for a number of crops, which can be
+  found in the `\texttt{crops.dai}' file.  If the actual crop is not
+  found there, you may try to substitute with another crop with a
+  similar development cycle and yield, if any such crop exists.
+\item[Harvesting] Use your best estimate.
+\end{description}
+
+\subsubsection{Predictions}
+\label{sec:predict}
+
+\Daisy{} allows the manager to ``be smart'' about the state of the
+simulation, so instead of using fixed dates it can harvest when the
+crop is ripe and irrigate when the crop needs water.  You can use these
+techniques to implement your management plan in the simulation.  As
+hinted earlier, this is also useful when you don't have information
+about exact dates.  This is particular useful when you analyze large
+areas, where you do not has information from individual field.  From
+statistical information about preferred crop types and knowledge about
+common praxis in the area, you can create representative crop
+rotations and run these under various climate conditions, and on the
+soil types found in the area.
+
+\subsection{Soil}
+
+\Daisy{} will need the following information about the soil.
+\begin{itemize}
+\item The soil texture, i.e.\ the clay, silt and sand fractions of the
+  soil.  Daisy need this information for all horizons in the profile,
+  not just the top horizon.
+\item The humus content in each horizon.
+\item The maximum root depth of the soil.
+\item The location of the groundwater and whether soil is drained.
+  There are the following possibilities:
+  \begin{enumerate}
+  \item The soil is drained.  Then we need to know the position of the
+    drains.  We also need the drainage period or the amount of drain
+    water, preferably both.  This will be needed to calibrate the
+    drainage information.
+  \item The groundwater is located below 4 meter.  If so, we don't
+    need to know more.
+  \item The groundwater is located above 4 meter.  If so, we need to
+    know where it is located.
+  \end{enumerate}
+\end{itemize}
+This information is also placed in the \texttt{.dai} files, and has
+been described in \daisytut{}, in particular
+section~\ref{tut-sec:column}. 
+
+\subsubsection{Missing data}
+
+The texture is very important for water transport, if you can't measure
+it, you must use your best estimate.  The B and C horizons may in fact
+be even more important than the Ap horizon, and more difficult to get
+information on.  Sometimes regional maps are available, or
+measurements from nearby sites.
+
+Good numbers for the humus content of the top horizon is essential for
+a reasonable nitrogen balance, the lower horizons are much less
+important.
+
+The maximum root depth can usually be estimated from knowledge from
+similar soil profiles.
+
+\section{Recommended data}
+\label{sec:recommended}
+
+In section~\ref{sec:minimum} we listed the minimum data required in
+order for \daisy{} to run.  In this section we will list additional
+data you should acquire in order for the simulation result to be
+reliable.
+
+\subsection{Climate requirement}
+
+You should supply your own data for reference evaporation.  If you do
+not, \daisy{} will attempt to estimate it based on the conditions at
+Taastrup, Denmark.  These may be incorrect for other locations.
+
+\subsection{Management}
+\label{sec:warmup}
+
+We recommend that you run with a warmup period of at least 5 years
+before the period you are interested in.  You don't need exact dates
+for management operations for the warmup period (although having them
+helps), but can use the techniques described in
+section~\ref{sec:predict}.
+
+For fertilization, you should specify the amount of carbon, nitrogen
+and ammonium directly, rather than rely on the values from
+\texttt{fertilizer.dai}
+
+\subsection{Soil}
+
+\begin{itemize}
+\item An estimate for the average yearly carbon input to the soil in
+  the decades before the simulation period.  The yearly carbon input
+  is rarely available, you can use numbers from a predefined table of
+  input from various farm types if someone have created such a table
+  for your area, or better yet run a simulation with a ``typical''
+  historical crop rotation to let \daisy{} calculate the input.
+\item You should measure the C/N ratio for the humus in at least the
+  Ap horizon.
+\item You should measure the hydraulic properties of the soil.
+\end{itemize}
+
+\section{Extra data to be used when available}
+
+Most \daisy{} simulation has ran with just the data recommended in
+section~\ref{sec:recommended}, so that part of the model is the most
+well-tested.  However, some test have been performed with more data
+available, and we know this will improve the precision of the
+simulation results further.  Here are some examples.
+
+\subsection{Climate requirement}
+
+Supplying hourly values in the climate file will enable a much more
+detailed simulation.  If you furthermore supply information about
+vapor pressure, relative humidity and wind speed, \daisy{} will be
+able to use a more advanced bioclimate models.
+
+If you have measured LAI during the simulation period, \daisy{} can
+use this instead of the simulated LAI, giving more accurate simulation
+results.  The crop development will tend to adjust to fit the measured
+LAI\@.  How to do this is described in \daisytut{},
+section~\ref{tut-sec:forced-lai}.
+
+\subsection{Management}
+
+You can supply information about application of pesticides.
+Pesticides does not affect the rest of the model (as pests are not
+part of the model), but \daisy{} will simulate the fate of the
+pesticides.
+
+You can get better information from most management operations by not
+relying on the parameterizations in the standard library.
+\begin{description}
+\item[Fertilizing] You can examine the exact content of organic
+  fertilizer, which tend to vary a lot between farms, and you can
+  estimate the turnover rate with laboratory experiments.
+\item[Tillage operations] You can fit the tillage operations to the
+  machinery used at the actual farm, and make sure e.g.\ the plowing
+  depth is right.
+\item[Sowing] You can parameterize new crop sorts by running fields
+  experiments with various levels of irrigation and fertilization, and
+  measure nitrogen and dry matter content of the individual crop parts
+  (leafs, stem, storage organ, and if you are ambitious, roots), as
+  well as measuring the leaf area index.  All of these measurements
+  must be done throughout the growth season, just having harvest data
+  is not enough.
+\item[Harvesting] Measure or estimate for how large a fraction of the
+  various crop parts are left on the field, rather than assume all or
+  nothing.
+\end{description}
+
+\subsection{Soil}
+
+If possible, you should measure the nitrogen yield from a low
+fertilized crop, and use this data to calibrate the background
+mineralization as described in \daisytut{}~\ref{tut-sec:background}.
+
+\end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

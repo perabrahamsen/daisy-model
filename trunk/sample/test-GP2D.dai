@@ -1,0 +1,28 @@
+;; test-GP2D.dai -- Demonstration of the GP2D root density program.
+
+(run GP2D
+  ;; Desired discretization defined as cell boundaries.  Daisy will
+  ;; print out the density in the middle of each cell.
+  (Geometry (xplus 5 10 15 20 25 30 35 [cm])
+            (zplus -10 -20 -45 -60 -75 -90 -105 -120 -135 -150 [cm]))
+  ;; Distance between rows.  If you are interested in the root
+  ;; distribution between plants in a row, you should specify the
+  ;; distance between plants in a row here instead.
+  (row_width 70 [cm])
+  ;; By default, the row is located at x=0.  For PRD irrigation, you
+  ;; may want to locate the row at the center of the x-axes.
+  (row_position 0 [cm])
+  ;; Vertical distance from the top where the root density would be
+  ;; 0.1 [cm/cm^3] in a soil with no additional limits.
+  (crop_depth 1.5 [m])
+  ;; Horizontal distance from the top where the root density from this
+  ;; row would be 0.1 [cm/cm^3], ignoring conributions from other rows.
+  (crop_width 0.75 [m])
+  ;; Maximal root zone imposed by the soil.  No roots will be found
+  ;; below this, and the root density above will be scaled
+  ;; accordingly.
+  (soil_depth 2 [m])
+  ;; Total root mass from all rows.
+  (WRoot 1500 [kg/ha]))
+
+;; test-GP2D.dai ends here.

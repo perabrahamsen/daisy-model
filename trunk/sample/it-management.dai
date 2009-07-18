@@ -1,0 +1,153 @@
+;; it-management.dai -- Sample italian management for 1996 to 2004.
+;;
+;; This is from the CER institute, near Bologna.
+;; The original parameterization was by 
+;;  "A. Battilani" <battilani@consorziocer.it>
+;; Some modification has been made by Per Abrahamsen <abraham@dina.kvl.dk>.
+;;
+;; Permission for redistribution is granted as long as the original
+;; author is mentioned.
+
+(defaction it_irrigate_crop activity
+  (wait (and (after_mm_dd 5 10)
+             (before_mm_dd 7 15)))
+  (irrigate_overhead 25)
+  (wait_days 15))   
+
+(defcrop "Potato; CER" "Potato; Agria")
+
+(defaction "WP1 IT 2005 warmup"  activity
+  ;;StartTime 96
+      (wait (mm_dd 10 25))
+      (sow "Winter Wheat")
+  
+  ;;Grano Standard 97
+      (wait (mm_dd 3 31))
+      (fertilize (AmmoniumNitrate (weight 75.0 [kg N/ha])))
+      (wait (mm_dd 7 10))
+      (harvest "Winter Wheat" (stem 0.00)(leaf 0.00)(sorg 0.95))
+      (wait (mm_dd 8 15))
+      (plowing)
+      (wait (mm_dd 10 15))
+      (disk_harrowing)
+      (wait (mm_dd 10 25))
+      (sow "Winter Wheat") 
+  
+  ;;Grano Standard 98
+    (wait (mm_dd 3 31))
+    (fertilize (AmmoniumNitrate (weight 75.0 [kg N/ha])))
+    (wait (mm_dd 7 10))
+    (harvest "Winter Wheat" (stem 0.00)(leaf 0.00)(sorg 0.95))
+    (wait (mm_dd 8 15))
+    (plowing)
+    (wait (mm_dd 10 15))
+    (disk_harrowing)
+    (wait (mm_dd 11 15))
+    (disk_harrowing)
+  
+  ;;Patata Modified (Tomato 99)
+    (wait (mm_dd 4 15))
+    (seed_bed_preparation)
+    (wait (mm_dd 5 15))
+    (sow "Potato; CER")
+    (fertilize (Nitrate (weight 40.0 [kg N/ha])))
+    (wait (mm_dd 5 30))
+    (fertilize (Nitrate (weight 40.0 [kg N/ha])))
+    (wait (mm_dd 6 15))
+    (fertilize (Nitrate (weight 40.0 [kg N/ha])))
+    (while (wait (mm_dd 7 15))
+      (activity it_irrigate_crop it_irrigate_crop it_irrigate_crop it_irrigate_crop it_irrigate_crop it_irrigate_crop))
+    (wait (mm_dd 8 25))
+    (harvest "Potato; CER" (stem 0.00)(leaf 0.00)(sorg 0.95))
+    (wait (mm_dd 8 30))
+    (plowing)
+    (wait (mm_dd 10 15))
+    (disk_harrowing)
+    (wait (mm_dd 10 20))
+  (seed_bed_preparation)
+  
+  ;;Bietola Standard (00)
+  (wait (mm_dd 2 5))
+  (seed_bed_preparation)
+  (wait (mm_dd 2 20))
+  (sow "Sugar Beet")
+  (wait (mm_dd 2 21))
+  (fertilize (AmmoniumNitrate (weight 75.0 [kg N/ha])))
+  (wait (mm_dd 4 15))
+  (fertilize (AmmoniumNitrate (weight 75.0 [kg N/ha])))
+  (wait (mm_dd 7 10))
+  (irrigate_overhead 50)
+  (wait (mm_dd 9 25))
+  (harvest "Sugar Beet" (stem 0)(leaf 0)(sorg 0.95))
+  (wait (mm_dd 9 30))
+  (wait trafficable)
+  (plowing)
+  (wait (mm_dd 10 15))
+  (disk_harrowing)
+  (wait (mm_dd 10 20))
+  (seed_bed_preparation)
+  (wait (mm_dd 10 25))
+  (sow "Winter Wheat")
+  
+  ;;Grano Standard 01
+      (wait (mm_dd 3 31))
+      (fertilize (AmmoniumNitrate (weight 75.0 [kg N/ha])))
+      (wait (mm_dd 7 10))
+      (harvest "Winter Wheat" (stem 0.00)(leaf 0.00)(sorg 0.95))
+      (wait (mm_dd 8 15))
+      (plowing)
+      (wait (mm_dd 10 15))
+      (disk_harrowing)
+      (wait (mm_dd 11 15))
+    (disk_harrowing)
+      
+ ;;Pea Modified (Sojabeen) 02
+    (wait (mm_dd 5 1))
+    (sow "Pea")
+    (fertilize (Nitrate (weight 60.0 [kg N/ha])))
+    (wait (mm_dd 9 20))
+    (harvest "Pea" (stem 0.00)(leaf 0.00)(sorg 0.95))
+    (wait (mm_dd 9 30))
+    (plowing)
+    (wait (mm_dd 10 15))
+    (disk_harrowing)
+    (wait (mm_dd 11 15))
+  (disk_harrowing)
+  
+  ;;Patata Standard 03
+  (wait (mm_dd 2 15))
+  (seed_bed_preparation)
+  (wait (mm_dd 3 1))
+  (sow "Potato; CER")
+  ;;(wait (mm_dd 3 1))
+  ;;(ridge (R_crust 0 [h])
+         ;;(switch 0.333)
+         ;;(z (30) [cm]))
+  (wait (mm_dd 3 15))
+  (fertilize (AmmoniumNitrate (weight 100.0 [kg N/ha])))
+  (wait (mm_dd 4 15))
+  (fertilize (AmmoniumNitrate (weight 100.0 [kg N/ha])))
+  (while (wait (mm_dd 7 15))
+    (activity it_irrigate_crop it_irrigate_crop it_irrigate_crop it_irrigate_crop it_irrigate_crop it_irrigate_crop))
+  (wait (mm_dd 7 25))
+  (harvest "Potato; CER" (stem 0.00)(leaf 0.00)(sorg 0.95))
+  (wait (mm_dd 8 30))
+  (plowing)
+  (wait (mm_dd 10 15))
+  (disk_harrowing)
+  (wait (mm_dd 10 20))
+  (seed_bed_preparation)
+  (wait (mm_dd 10 25))
+  (sow "Winter Wheat") 
+  
+  ;;Grano Standard 04
+  (wait (mm_dd 3 31))
+  (fertilize (AmmoniumNitrate (weight 75.0)))
+  (wait (mm_dd 7 10))
+  (harvest "Winter Wheat" (stem 0.00)(leaf 0.00)(sorg 0.95))
+  (wait (mm_dd 8 15))
+  (plowing)
+  (wait (mm_dd 10 15))
+  (disk_harrowing))
+
+;;; it-manegement.dai ends here.

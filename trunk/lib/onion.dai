@@ -1,0 +1,101 @@
+;Mikkel Mollerup, KVL
+;for AArhus County, 2004/2005
+;$Revision 1.0, 2005/16/11: "LeafPhot" -> "LeafPhot original"
+;
+;Documentation in "Parameteriseringer af grønsager til Daisy, 2005"
+ 
+
+
+(defcrop "Onion" default
+   (description "For AArhus County - Samsoe Project")
+   
+   
+   (Devel default (defined_until_ds 1.0)    
+        (EmrTSum 270)				 
+        (DSRate1 0.01625)				 			  
+        (TempEff1 (0.0 0.0) (5.0 0.0) (25 1.0))	    	
+        (PhotEff1 (0.0 0.0) (12.0 0.0) (15 1.0) (24.0 1.0))             							 
+        (DSRate2 0.010)						
+        (TempEff2 (0.0 1.00) (30 1.00)))			
+ 
+ 
+   (LeafPhot original (Fm 3.3)				  						      
+        (Qeff 0.045) 							 
+        (TempEff (0 0.01) (6 0.01) (20 1.00)	
+	         (25 1.00)(31 0.01))) 
+ 
+   (Seed LAI (DSLAI05 0.25) 
+         (SpLAIfac (0.0 1.0)(1 1.0)))
+   (Canopy 
+        (SpLAI  0.10)	
+        (LeafAIMod (0.00 1)(0.07 1)(0.12 0.405)(0.25 0.2775)(0.90 0.15))   
+        (LAIDist0 0.00 0.00 1.00)				
+        (LAIDist1 0.00 0.00 1.00)				
+        (PARref 0.06)											
+        (PARext 0.50)				
+        (EPext 0.50) 
+        (HvsWStem (0 0.1) (1 1))
+        (HvsDS (0.0 0.0) (0.4 50.0) (1.0 50.0)))
+ 
+ 
+   (Root (DptEmr 5)				
+        (PenPar1 0.02)									 
+        (PenPar2 0.0)										 
+        (MaxPen 30)      				 						 
+        (Rad 0.05) 						
+        (h_wp -15000)				 		
+        (MxNH4Up 2.5E-0007)								 
+        (MxNO3Up 2.5E-0008))			  
+
+
+   (Partit (Root (0.0 0.50)(0.2 0.30)(0.4 0.10)
+                 (0.6 0.05)(0.8 0.05)(1.0 0.00))  
+        (Leaf    (0.0 0.75)(0.2 0.55)(0.4 0.40)
+                 (0.6 0.00)(0.8 0.00)(1.0 0.00))  
+        (Stem    (0.0 0.20)(0.2 0.15)(0.4 0.05)
+                 (0.6 0.00)(0.8 0.00)(1.0 0.00))     
+        (RSR     (0.0 0.50)(1.0 0.50)(2.0 0.25)))
+
+   
+   (Prod 
+         (NCrop     0.20)
+         (E_Root    0.69)								
+        (E_Leaf     0.68)								
+        (E_Stem     0.66)								
+        (E_SOrg     0.70)								
+        (r_SOrg     0.0025)			 					 
+       	(r_Root     0.0150)			 					
+        (r_Leaf     0.0300)			  					 
+        (r_Stem     0.0100)			  					 
+        (ShldResC   0.30) 					
+        (ReMobilDS  1.10)						
+        (ReMobilRt  0.10)					
+        (Large_RtDR 0.05) 					
+        (LfDR (0.20 0.00) (0.60 0.00) (0.80 0.03) (1.00 0.10))         
+        (RtDR (0.20 0.00) (0.60 0.00) (0.80 0.01) (1.00 0.02)))	
+
+   
+   (CrpN 
+        (PtRootCnc (0.00 0.0240) (0.25 0.0220) (1.00 0.0200))
+        (CrRootCnc (0.00 0.0120) (0.25 0.0110) (1.00 0.0100))
+        (NfRootCnc (0.00 0.0090) (0.25 0.0080) (1.00 0.0070))                    
+        (PtLeafCnc (0.00 0.0500) (0.25 0.0375) (1.00 0.0250))
+        (CrLeafCnc (0.00 0.0300) (0.25 0.0210) (1.00 0.0120))
+        (NfLeafCnc (0.00 0.0200) (0.25 0.0135) (1.00 0.0070))                  
+        (PtStemCnc (0.00 0.0500) (0.25 0.0375) (1.00 0.0250))
+        (CrStemCnc (0.00 0.0300) (0.25 0.0210) (1.00 0.0120))
+        (NfStemCnc (0.00 0.0200) (0.25 0.0135) (1.00 0.0070))                 
+        (PtSOrgCnc (0.00 0.0450) (0.25 0.0325) (1.00 0.0200))
+        (CrSOrgCnc (0.00 0.0300) (0.25 0.0225) (1.00 0.0150))
+        (NfSOrgCnc (0.00 0.0150) (0.25 0.0110) (1.00 0.0070)))      
+
+          
+   (Harvest (DSmax 0.0)
+        (sorg_height -5 [cm]))          
+)
+
+
+
+
+
+
