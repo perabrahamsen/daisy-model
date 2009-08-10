@@ -4,11 +4,9 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * SAFIR
 
-** Indsæt "ruhed" parameter 
+** Opdater årsrapport
 
-Resistance::z_0b skal gøres til parameter
-
-z_0b skal også bruges hvis LAI > 3 i Resistance::z_0
+** Find ud af møde
 
 * R2D2
 

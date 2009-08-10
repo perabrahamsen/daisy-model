@@ -189,7 +189,8 @@ struct ActionExternFertigation : public Action
 	IM im (u_mg_per_square_m);
 	im.set_value (Chemical::NH4 (), u_kg_per_ha, NH4_value * dt);
 	im.set_value (Chemical::NO3 (), u_kg_per_ha, NO3_value * dt);
-	im.multiply_assign (Scalar (total_flux * dt, u_per_mm), u_ppm);
+        const double water = total_flux * dt; // [mm]
+	im.multiply_assign (Scalar (1.0 / water, u_per_mm), u_ppm);
         
 	if (surface_value > 0)
 	  field.irrigate_surface (surface_value, im, dt, msg); 

@@ -1,3 +1,11 @@
+2009-08-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.67 released.
+
+2009-08-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_extern.C (Action::doIt): Divide by water instead of multiply.
+
 2009-07-18  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.66 released.
