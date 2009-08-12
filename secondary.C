@@ -26,6 +26,7 @@
 #include "assertion.h"
 #include "frame.h"
 #include "soil.h"
+#include "check.h"
 
 // secondary component.
 
@@ -174,9 +175,9 @@ what corresponds to the specified pressure. ")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("h_lim", "cm", Attribute::Const, "\
+    frame.declare ("h_lim", "cm", Check::positive (), Attribute::Const, "\
 Minimal pressure needed for activating secondary domain.");
-    frame.declare ("K", "cm/h", Attribute::Const, "\
+    frame.declare ("K", "cm/h", Check::non_negative (), Attribute::Const, "\
 Water conductivity when secondary domain is active.\n\
 If the secondary domain is already included in the normal conductivity\n\
 curve, specify 0.0 use that value instead.");
@@ -232,11 +233,24 @@ static struct SecondaryCracksSyntax : public DeclareModel
     : DeclareModel (Secondary::component, "aperture", "alpha", "\
 Secondary domain specified by aperture and density of soil cracks.")
   { }
+  static bool check_alist (const Metalib&, const Frame& al, Treelog& msg)
+  { 
+    bool ok = true;
+
+    const double Theta = al.number ("aperture") * al.number ("density");
+    if (Theta >= 1.0)
+      {
+        ok = false;
+        msg.error ("Volume fraction of cracks exceed 1.0");
+      }
+    return ok;
+  }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("aperture", "m", Attribute::Const, "\
+    frame.add_check (check_alist);
+    frame.declare ("aperture", "m", Check::positive (), Attribute::Const, "\
 Average distance between walls in cracks.");
-    frame.declare ("density", "m^-1", Attribute::Const, "\
+    frame.declare ("density", "m^-1", Check::positive (), Attribute::Const, "\
 Density of cracks.");
   }
 } SecondaryCracks_syntax;
