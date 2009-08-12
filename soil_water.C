@@ -29,7 +29,6 @@
 #include "log.h"
 #include "librarian.h"
 #include "block.h"
-#include "secondary.h"
 #include "check.h"
 #include "treelog.h"
 #include "assertion.h"
@@ -330,30 +329,19 @@ SoilWater::tick_after (const Geometry& geo,
     {
       K_[c] = soil.K (c, h_[c], h_ice_[c], soil_heat.T (c));
       
-      const Secondary& secondary = soil.secondary_domain (c);
-      if (secondary.none ())
+      const double h_lim = soil.h_secondary (c);
+      if (h_lim >= 0.0 || h_[c] <= h_lim)
         {
-          // Only one domain in this horizon.
+          // No active secondary domain.
           Theta_primary_[c] = Theta_[c];
           Theta_secondary_[c] = 0.0;
         }
-      else  
+      else 
         {
-          // Two matrix domains.
-          const double h_lim = secondary.h_lim ();
-          if (h_[c] <= h_lim)
-            {
-              // Sedondary domain not activated.
-              Theta_primary_[c] = Theta_[c];
-              Theta_secondary_[c] = 0.0;
-            }
-          else 
-            {
-              // Secondary domain activated.
-              const double Theta_lim = soil.Theta (c, h_lim, h_ice_[c]);
-              Theta_primary_[c] = Theta_lim;
-              Theta_secondary_[c] = Theta_[c] - Theta_lim;
-            }
+          // Secondary domain activated.
+          const double Theta_lim = soil.Theta (c, h_lim, h_ice_[c]);
+          Theta_primary_[c] = Theta_lim;
+          Theta_secondary_[c] = Theta_[c] - Theta_lim;
         }
     }
 
@@ -394,10 +382,7 @@ SoilWater::tick_after (const Geometry& geo,
               iszero (Theta_secondary (to)))
             continue;
           K_edge += 0.5 * (K_old[to] + K (to));
-
-          const Secondary& secondary = soil.secondary_domain (to);
-          daisy_assert (!secondary.none ());
-          const double h_lim = secondary.h_lim ();
+          const double h_lim = soil.h_secondary (to);
           K_lim += soil.K (to, h_lim, h_ice (to), soil_heat.T (to));
         }
       
@@ -410,10 +395,7 @@ SoilWater::tick_after (const Geometry& geo,
               iszero (Theta_secondary (from)))
             continue;
           K_edge += 0.5 * (K_old[from] + K (from));
-
-          const Secondary& secondary = soil.secondary_domain (from);
-          daisy_assert (!secondary.none ());
-          const double h_lim = secondary.h_lim ();
+          const double h_lim = soil.h_secondary (from);
           K_lim += soil.K (from, h_lim, h_ice (from), soil_heat.T (from));
         }
       

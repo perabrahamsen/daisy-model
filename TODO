@@ -6,14 +6,21 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 ** Opdater årsrapport
 
-** Find ud af møde
+** book hotel og fly 22-26 brussel
+
+Spørg Jens Ørum
 
 * R2D2
 
 ** Soil::K skal tage hensyn tiol sprækekr
 
 I stedet for at bruge en særlig powerfunktion, skal Soil::K bruge 
-max (Hydraulic::K, Apperatur::K).
+max (Hydraulic::K, Aperatur::K).
+
+"aperture" 
+
+  aperture [mm]
+  density [m^-1]
 
 * irrigate
 

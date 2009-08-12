@@ -42,7 +42,6 @@
 #include "vcheck.h"
 #include "memutils.h"
 #include "submodeler.h"
-#include "secondary.h"
 #include "treelog.h"
 #include <sstream>
 
@@ -857,9 +856,7 @@ ChemicalStandard::tick_soil (const Units& units, const Geometry& geo,
         }
       
       // Find alpha.
-      const Secondary& secondary = soil.secondary_domain (c);
-      daisy_assert (!secondary.none ());
-      const double alpha = secondary.alpha ();
+      const double alpha = soil.alpha (c);
 
       // The exchange rate based on concentration gradient.
       const double C_prim = C_primary (c);

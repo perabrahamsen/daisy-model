@@ -40,6 +40,7 @@
 #include "treelog.h"
 #include "memutils.h"
 #include "mathlib.h"
+#include "secondary.h"
 #include "volume.h"
 #include <sstream>
 
@@ -201,10 +202,13 @@ Soil::K (size_t i, double h, double h_ice, double T) const
   } viscosity_factor;
 
   const double T_factor = viscosity_factor (T);
-  if (h < h_ice)
-    return horizon_[i]->hydraulic->K (h) * T_factor; 
-  else
-    return horizon_[i]->hydraulic->K (h_ice) * T_factor; 
+  const double h_water = std::min (h, h_ice);
+  const Horizon& horizon = *horizon_[i];
+  const double K_primary = horizon.hydraulic->K (h_water); 
+  const Secondary& secondary = horizon.secondary_domain ();
+  const double K_secondary = secondary.K (i, *this, h_water);
+  const double K_total = K_primary + K_secondary;
+  return K_total * T_factor;
 }
 
 double 
@@ -253,9 +257,13 @@ void
 Soil::set_porosity (size_t i, double Theta)
 { horizon_[i]->hydraulic->set_porosity (Theta); }
 
-const Secondary& 
-Soil::secondary_domain (size_t cell) const
-{ return horizon_[cell]->secondary_domain ();}
+double              // Activation pressure for secondary domain. [cm] 
+Soil::h_secondary (size_t i) const
+{ return horizon_[i]->secondary_domain ().h_lim (i, *this); }
+
+double  // Exchange rate between primary and secondary water.  [h^-1] 
+Soil::alpha (size_t i) const
+{ return horizon_[i]->secondary_domain ().alpha (); }
 
 double 
 Soil::tortuosity_factor (size_t i, double Theta) const

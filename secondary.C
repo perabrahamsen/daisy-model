@@ -25,6 +25,7 @@
 #include "librarian.h"
 #include "assertion.h"
 #include "frame.h"
+#include "soil.h"
 
 // secondary component.
 
@@ -72,12 +73,14 @@ washed out with fast moving new water.")
 
 struct SecondaryNone : public Secondary
 {
-  bool none () const            // True iff all water is in primary domain.
-  { return true; }
-  double h_lim () const         // The value of the 'h_lim' parameter.
-  { daisy_notreached (); }
-  double alpha () const         // The value of the 'alpha' parameter.
-  { daisy_notreached (); }
+  double h_lim (const size_t, const Soil&) const 
+  // Pressure act. secondary domain. [cm]
+  { return 0.0; }
+  double K (const size_t, const Soil&, const double h) const 
+  // Conductivity in sec. dom. [cm/h]
+  { return 0.0; }
+  double alpha () const         // Exchange rate between domain [h^-1]
+  { return 0.0; }
 
   explicit SecondaryNone (const BlockModel& al)
     : Secondary (al)
@@ -106,24 +109,55 @@ matrix pores.")
   }
 } SecondaryNone_syntax;
 
-// "pressure" model.
+// "alpha" model.
 
-struct SecondaryPressure : public Secondary
+struct SecondaryAlpha : public Secondary
 {
-  const double h_lim_;
   const double alpha_;
 
-  bool none () const            // True iff all water is in primary domain.
-  { return false; }
-  double h_lim () const         // The value of the 'h_lim' parameter.
-  { return h_lim_; }
   double alpha () const         // The value of the 'alpha' parameter.
   { return alpha_; }
   
-  SecondaryPressure (const BlockModel& al)
+  SecondaryAlpha (const BlockModel& al)
     : Secondary (al),
-      h_lim_ (al.number ("h_lim")),
       alpha_ (al.number ("alpha"))    
+  {}
+};
+
+static struct SecondaryAlphaSyntax : public DeclareBase
+{
+  SecondaryAlphaSyntax ()
+    : DeclareBase (Secondary::component, "alpha", 
+                   "Shared base class for non-empty secondary domains.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.declare ("alpha", "h^-1", Attribute::Const, "\
+Exchange rate between primary and secondary water."); 
+  }
+} SecondaryAlpha_syntax;
+
+// "pressure" model.
+
+struct SecondaryPressure : public SecondaryAlpha
+{
+  const double h_lim_;
+  const double K_;
+
+  double h_lim (const size_t, const Soil&) const
+  // The value of the 'h_lim' parameter.
+  { return h_lim_; }
+  double K (const size_t cell, const Soil& soil, const double h) const
+  { 
+    if (h < h_lim (cell, soil))
+      return 0.0;
+    else
+      return K_; 
+  }
+  SecondaryPressure (const BlockModel& al)
+    : SecondaryAlpha (al),
+      h_lim_ (al.number ("h_lim")),
+      K_ (al.number ("K"))
   {}
 };
 
@@ -132,7 +166,8 @@ static struct SecondaryPressureSyntax : public DeclareModel
   Model* make (const BlockModel& al) const
   { return new SecondaryPressure (al); }
   SecondaryPressureSyntax ()
-    : DeclareModel (Secondary::component, "pressure", "Horizon has secondary domain.\n\
+    : DeclareModel (Secondary::component, "pressure", "alpha", "\
+Horizon has secondary domain specifyed by pressure thresshold.\n\
 \n\
 The secondary domain consist of water in matrix pores larger than\n\
 what corresponds to the specified pressure. ")
@@ -140,10 +175,70 @@ what corresponds to the specified pressure. ")
   void load_frame (Frame& frame) const
   {
     frame.declare ("h_lim", "cm", Attribute::Const, "\
-Pressure for activating secondary domain.");
-    frame.declare ("alpha", "h^-1", Attribute::Const, "\
-Exchange rate between primary and secondary water."); 
+Minimal pressure needed for activating secondary domain.");
+    frame.declare ("K", "cm/h", Attribute::Const, "\
+Water conductivity when secondary domain is active.\n\
+If the secondary domain is already included in the normal conductivity\n\
+curve, specify 0.0 use that value instead.");
+    frame.set ("K", 0.0);
   }
 } SecondaryPressure_syntax;
+
+// "cracks" model.
+
+struct SecondaryCracks : public SecondaryAlpha
+{
+  const double aperture;       // [m]
+  const double density;         // [m^-1]
+  const double Theta_crack;     // []
+  const double K_crack;              // [cm/h]
+
+  double h_lim (const size_t cell, const Soil& soil) const 
+  { 
+    const double Theta_sat = soil.Theta (cell, 0.0, 0.0);
+    if (Theta_crack >= Theta_sat)
+      throw "Space occupied by cracks larger than soil porosity";
+    const double Theta_lim = Theta_sat - Theta_crack;
+    daisy_assert (Theta_lim > 0.0);
+    return soil.h (cell, Theta_lim); 
+  }
+  double K (const size_t cell, const Soil& soil, const double h) const
+  { 
+    if (h < h_lim (cell, soil))
+      return 0.0;
+    else
+      return K_crack; 
+  }
+
+  static double find_K (const double aperture, const double density)
+  { return -42.42e42; }
+  SecondaryCracks (const BlockModel& al)
+    : SecondaryAlpha (al),
+      aperture (al.number ("h_aperture")),
+      density (al.number ("density")),
+      Theta_crack (aperture * density),
+      K_crack (find_K (aperture, density))    
+  { 
+    daisy_assert (Theta_crack >= 0.0);
+    daisy_assert (Theta_crack <= 1.0);
+  }
+};
+
+static struct SecondaryCracksSyntax : public DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new SecondaryCracks (al); }
+  SecondaryCracksSyntax ()
+    : DeclareModel (Secondary::component, "aperture", "alpha", "\
+Secondary domain specified by aperture and density of soil cracks.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.declare ("aperture", "m", Attribute::Const, "\
+Average distance between walls in cracks.");
+    frame.declare ("density", "m^-1", Attribute::Const, "\
+Density of cracks.");
+  }
+} SecondaryCracks_syntax;
 
 // secondary.C ends here.

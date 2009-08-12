@@ -1,3 +1,18 @@
+2009-08-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* secondary.C (cracks): New model.
+
+2009-08-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* secondary.h, secondary.C (K): New virtual member function.
+	Also, new parameter in the 'pressure' model.
+	(none): Removed.
+	* soil.h, soil.C (alpha, h_secondary): New member functions.
+	(secondary): Removed.
+	* chemical_std.C (tick_soil): Update caller.
+	* biopore_matrix.C (matrix_biopore_matrix): Ditto.
+	* soil_water.C (tick_after): Ditto.
+
 2009-08-10  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.67 released.

@@ -1002,7 +1002,7 @@ biopore${OBJ}: biopore.C biopore.h model_framed.h model_logable.h model.h \
   assertion.h mathlib.h
 secondary${OBJ}: secondary.C secondary.h model.h symbol.h block_model.h \
   block_nested.h block.h scope.h attribute.h treelog.h frame_model.h \
-  frame.h librarian.h assertion.h
+  frame.h librarian.h assertion.h soil.h
 heatrect${OBJ}: heatrect.C heatrect.h model.h symbol.h block_model.h \
   block_nested.h block.h scope.h attribute.h treelog.h frame_model.h \
   frame.h librarian.h
@@ -1312,7 +1312,7 @@ soil${OBJ}: soil.C soil.h symbol.h horizon.h model_derived.h model_logable.h \
   metalib.h frame.h scope.h library.h frame_submodel.h mathlib.h \
   assertion.h librarian.h submodeler.h block_submodel.h block_nested.h \
   block.h treelog.h log.h time.h border.h model_framed.h check.h vcheck.h \
-  plf.h memutils.h volume.h
+  plf.h memutils.h secondary.h volume.h
 surface${OBJ}: surface.C surface.h uzmodel.h model.h symbol.h geometry1d.h \
   geometry_vert.h geometry.h attribute.h soil.h soil_water.h log.h time.h \
   border.h model_framed.h model_logable.h mathlib.h assertion.h \
@@ -1321,8 +1321,8 @@ surface${OBJ}: surface.C surface.h uzmodel.h model.h symbol.h geometry1d.h \
 soil_water${OBJ}: soil_water.C soil_water.h geometry.h symbol.h attribute.h \
   soil.h soil_heat.h groundwater.h model_derived.h model_logable.h \
   model.h log.h time.h border.h model_framed.h librarian.h block.h \
-  scope.h secondary.h check.h treelog.h assertion.h mathlib.h \
-  frame_submodel.h frame.h
+  scope.h check.h treelog.h assertion.h mathlib.h frame_submodel.h \
+  frame.h
 soil_heat${OBJ}: soil_heat.C soil_heat.h block.h scope.h attribute.h symbol.h \
   geometry.h soil.h soil_water.h surface.h uzmodel.h model.h movement.h \
   model_derived.h model_logable.h weather.h im.h frame_submodel.h frame.h \
@@ -1665,9 +1665,9 @@ biopore_matrix${OBJ}: biopore_matrix.C biopore.h model_framed.h \
   model_logable.h model.h symbol.h number.h im.h attribute.h imvec.h \
   block_model.h block_nested.h block.h scope.h treelog.h frame_model.h \
   frame.h vcheck.h librarian.h submodeler.h block_submodel.h \
-  frame_submodel.h geometry.h soil.h soil_heat.h secondary.h volume_box.h \
-  volume.h log.h time.h border.h check.h anystate.h chemical.h \
-  groundwater.h model_derived.h mathlib.h assertion.h
+  frame_submodel.h geometry.h soil.h soil_heat.h volume_box.h volume.h \
+  log.h time.h border.h check.h anystate.h chemical.h groundwater.h \
+  model_derived.h mathlib.h assertion.h
 transport_Mollerup${OBJ}: transport_Mollerup.C transport.h model.h symbol.h \
   geometry_rect.h geometry_vert.h geometry.h attribute.h soil.h solver.h \
   log.h time.h border.h model_framed.h model_logable.h frame.h scope.h \
@@ -2411,7 +2411,7 @@ chemical_std${OBJ}: chemical_std.C chemical.h model_framed.h model_logable.h \
   chemistry.h log.h time.h border.h block_model.h block_nested.h block.h \
   scope.h treelog.h frame_model.h frame.h mathlib.h assertion.h plf.h \
   check.h librarian.h number.h scope_soil.h scope_multi.h vcheck.h \
-  memutils.h submodeler.h block_submodel.h frame_submodel.h secondary.h
+  memutils.h submodeler.h block_submodel.h frame_submodel.h
 hydraulic_M_BaC_Bimodal${OBJ}: hydraulic_M_BaC_Bimodal.C hydraulic.h \
   model_derived.h model_logable.h model.h symbol.h block_model.h \
   block_nested.h block.h scope.h attribute.h treelog.h frame_model.h \

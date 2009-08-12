@@ -30,7 +30,6 @@
 #include "geometry.h"
 #include "soil.h"
 #include "soil_heat.h"
-#include "secondary.h"
 #include "volume_box.h"
 #include "log.h"
 #include "check.h"
@@ -310,8 +309,7 @@ BioporeMatrix::matrix_biopore_matrix (size_t c, const Geometry& geo,
   // The secondary domain consists of small continious cracks with a
   // high condutivity compared to the rest of the matrix domain.  Not
   // all soil types have such a domain.
-  const Secondary& secondary = soil.secondary_domain (c);
-  const bool use_primary = secondary.none ();
+  const bool use_primary = soil.h_secondary (c) >= 0.0;
 
   // The resistence to be overcome for water leaving the biopore is
   // different in the primary and secondary domain, in general we

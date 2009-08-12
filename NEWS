@@ -6,6 +6,30 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.68
+
+** New 'K' parameter in the 'pressure' secondary domain model.
+
+The value of this paramater will be added to the soils hydraulic
+conductivity, whenever the soil water pressure is above the limit
+specified by the 'h_lim' parameter.  Using this parameter is an
+alternative to using a conventional bipolar hydraulic conductivity
+model.  The default value of 0.0 is appropriate if you have already
+specified a bipilar hydraulic conductivity model.
+
+* 4.67 
+
+** Bug fix affecting OpenMI interface.
+
+* 4.66
+
+** New 'z_0b' parameter in SSOC SVAT model.
+
+Increase surface roughness to force more turbulence and decrease canopy
+temperature, especially useful for very low wind situations.
+
+** Cleanup and bug fixes.
+
 * 4.65
 
 ** Finished mixing layer.

@@ -27,6 +27,7 @@
 #include <memory>
 
 class BlockModel;
+class Soil;
 
 class Secondary : public Model
 {
@@ -38,9 +39,11 @@ public:
  
   // Content.
 public:
-  virtual bool none () const = 0;    // True iff all water is in primary domain.
-  virtual double h_lim () const = 0; // The value of the 'h_lim' parameter.
-  virtual double alpha () const = 0; // The value of the 'alpha' parameter.
+  // Pressure thresshold for sec. domain. [cm]
+  virtual double h_lim (const size_t cell, const Soil&) const = 0; 
+  // Conductivity of water in sec. dom. [cm/h]
+  virtual double K (const size_t, const Soil&, double h) const = 0; 
+  virtual double alpha () const = 0; // Solute exchange between 1 & 2 domain.
 
   // Create and Destroy.
 protected:

@@ -35,7 +35,6 @@ class Groundwater;
 class Frame;
 class Block;
 class Treelog;
-class Secondary;
 
 class Soil
 {
@@ -63,8 +62,11 @@ public:
   double dispersivity (size_t) const;
   double dispersivity_transversal (size_t) const;  
   void set_porosity (size_t i, double Theta);
-  const Secondary& secondary_domain (size_t cell) const;
-  
+  // Activation pressure for secondary domain. [cm] 
+  double h_secondary (size_t i) const;
+  // Exchange rate between primary and secondary water.  [h^-1] 
+  double alpha (size_t i) const; 
+
   // Texture.
   double tortuosity_factor (size_t i, double Theta) const; // [cm^3/cm^3]
   double anisotropy (size_t i) const;
