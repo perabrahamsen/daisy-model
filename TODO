@@ -6,21 +6,31 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 ** Opdater årsrapport
 
+*** WP3 
+
+Hosting visits fram Adrianno, Finn and Gordana.
+
+Hjælp til modellører, mindre modelændringer til tilpasning til
+forskellige sites.
+
+Internal changes in Daisy to better integrate the new features
+developed the previous years.
+
+*** WP7 
+
+Support for use of OpenMI in DSS.
+
+*** Partner 3
+
 ** book hotel og fly 22-26 brussel
 
 Spørg Jens Ørum
 
 * R2D2
 
-** Soil::K skal tage hensyn tiol sprækekr
+** test secondary domain
 
-I stedet for at bruge en særlig powerfunktion, skal Soil::K bruge 
-max (Hydraulic::K, Aperatur::K).
-
-"aperture" 
-
-  aperture [mm]
-  density [m^-1]
+** cracks::find_K
 
 * irrigate
 
