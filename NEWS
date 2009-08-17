@@ -10,12 +10,19 @@ release.
 
 ** New 'K' parameter in the 'pressure' secondary domain model.
 
-The value of this paramater will be added to the soils hydraulic
+The value of this paramater will be used as the soils hydraulic
 conductivity, whenever the soil water pressure is above the limit
-specified by the 'h_lim' parameter.  Using this parameter is an
-alternative to using a conventional bipolar hydraulic conductivity
+specified by the 'h_lim' parameter and the hydraulic conductivity
+specified by the hydraulic model is lower.  Using this parameter is an
+alternative to using a conventional bimodal hydraulic conductivity
 model.  The default value of 0.0 is appropriate if you have already
-specified a bipilar hydraulic conductivity model.
+specified a bimodal hydraulic conductivity model.
+
+** New 'cracks' secondary domain model.
+
+This is similar to the 'pressure' model, except that both 'h_lim' and
+'K' are calculated from two new parameters, 'aperture' and 'density',
+describing the median aperture and density of the soil fissures.
 
 * 4.67 
 

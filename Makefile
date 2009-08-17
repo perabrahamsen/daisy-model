@@ -493,7 +493,7 @@ SPECIALS = log_dlf.C reaction_colgen.C weather_base.C \
 
 # Various utility code that are neither a component nor a (sub)model.
 # 
-OTHER = block_nested.C block_submodel.C block_top.C block_model.C \
+OTHER = water.C block_nested.C block_submodel.C block_top.C block_model.C \
 	value.C type.C model_derived.C model_logable.C model_framed.C \
 	printer.C printer_file.C filepos.C frame_submodel.C \
 	frame_model.C scope.C attribute.C unit.C border.C resistance.C \

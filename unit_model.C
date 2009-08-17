@@ -312,6 +312,8 @@ Connvert to SI base units by multiplying with a factor.")
          "Centimeter.");
     add ("mm", p_m, 1, 0, 0, 0, 0, 0, 0,
          "Millimeter.");
+    add ("um", p_u, 1, 0, 0, 0, 0, 0, 0,
+         "Micrometer.");
 
     add ("m^2", 1.0, 2, 0, 0, 0, 0, 0, 0,
          "Square meter.");

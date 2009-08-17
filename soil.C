@@ -42,6 +42,7 @@
 #include "mathlib.h"
 #include "secondary.h"
 #include "volume.h"
+#include "water.h"
 #include <sstream>
 
 struct Soil::Implementation
@@ -189,15 +190,16 @@ Soil::K (size_t i, double h, double h_ice, double T) const
   {
     ViscosityFactor ()
     {
-      add ( 0.0, 1002.0 / 1786.0);
-      add ( 5.0, 1002.0 / 1519.0);
-      add (10.0, 1002.0 / 1307.0);
-      add (15.0, 1002.0 / 1139.0);
-      add (20.0, 1002.0 / 1002.0);
-      add (25.0, 1002.0 /  890.0);
-      add (30.0, 1002.0 /  798.0);
-      add (35.0, 1002.0 /  719.0);
-      add (40.0, 1002.0 /  658.0);
+      const double v20 = Water::viscosity (20.0);
+      add ( 0.0, v20 / Water::viscosity (0.0));
+      add ( 5.0, v20 / Water::viscosity (5.0));
+      add (10.0, v20 / Water::viscosity (10.0));
+      add (15.0, v20 / Water::viscosity (15.0));
+      add (20.0, v20 / Water::viscosity (20.0));
+      add (25.0, v20 / Water::viscosity (25.0));
+      add (30.0, v20 / Water::viscosity (30.0));
+      add (35.0, v20 / Water::viscosity (35.0));
+      add (40.0, v20 / Water::viscosity (40.0));
     }
   } viscosity_factor;
 
@@ -207,7 +209,7 @@ Soil::K (size_t i, double h, double h_ice, double T) const
   const double K_primary = horizon.hydraulic->K (h_water); 
   const Secondary& secondary = horizon.secondary_domain ();
   const double K_secondary = secondary.K (i, *this, h_water);
-  const double K_total = K_primary + K_secondary;
+  const double K_total = std::max (K_primary, K_secondary);
   return K_total * T_factor;
 }
 

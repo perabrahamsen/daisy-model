@@ -27,6 +27,9 @@
 #include "frame.h"
 #include "soil.h"
 #include "check.h"
+#include "water.h"
+#include <cmath>
+#include <sstream>
 
 // secondary component.
 
@@ -175,7 +178,7 @@ what corresponds to the specified pressure. ")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("h_lim", "cm", Check::positive (), Attribute::Const, "\
+    frame.declare ("h_lim", "cm", Check::negative (), Attribute::Const, "\
 Minimal pressure needed for activating secondary domain.");
     frame.declare ("K", "cm/h", Check::non_negative (), Attribute::Const, "\
 Water conductivity when secondary domain is active.\n\
@@ -191,18 +194,11 @@ struct SecondaryCracks : public SecondaryAlpha
 {
   const double aperture;       // [m]
   const double density;         // [m^-1]
-  const double Theta_crack;     // []
   const double K_crack;              // [cm/h]
+  const double h_crack;              // [cm]
 
-  double h_lim (const size_t cell, const Soil& soil) const 
-  { 
-    const double Theta_sat = soil.Theta (cell, 0.0, 0.0);
-    if (Theta_crack >= Theta_sat)
-      throw "Space occupied by cracks larger than soil porosity";
-    const double Theta_lim = Theta_sat - Theta_crack;
-    daisy_assert (Theta_lim > 0.0);
-    return soil.h (cell, Theta_lim); 
-  }
+  double h_lim (const size_t, const Soil&) const 
+  { return h_crack; }
   double K (const size_t cell, const Soil& soil, const double h) const
   { 
     if (h < h_lim (cell, soil))
@@ -212,16 +208,58 @@ struct SecondaryCracks : public SecondaryAlpha
   }
 
   static double find_K (const double aperture, const double density)
-  { return -42.42e42; }
+  { 
+    const double a = aperture;  // [m]
+    const double B = 1.0 / density;   // [m]
+    const double g = 9.82;      // [m s^-2] Gravitational acceleration.
+    const double rho_w = Water::density;   // [kg m^-3] 
+    const double T = 20.0;                 // [dg C]
+    const double eta_w = Water::viscosity (T); // [N s m^-2]
+
+    // Poiseuille's law.
+    const double K_f = (rho_w * g     *    a     * a * a)
+                     / (12.0 * eta_w  *    B);
+    //   ([kg m^-3] * [m ^ s^-2] * [m] * [m] * [m])
+    // / ([N s m^-2] * [m])
+    // = [kg m^2 N^-1 s^-3]
+    // = [kg m^2 s^-3 s^2 kg^-1 m^-1] 
+    // = [m/s]
+    
+    // Convert to Daisy units.
+    return K_f /* [m/s] */ * 100.0 /* [cm/m] */ * 3600.0 /* [s/h] */; // [cm/h]
+  }
+
+  static double find_h_lim (const double aperture)
+  {
+    const double a = aperture;  // [m]
+    const double g = 9.82;      // [m s^-2] Gravitational acceleration.
+    const double rho_w = Water::density;   // [kg m^-3] 
+    const double gamma_w = 7.28e-2;        // [N m^-1] Surface tension.
+    const double alpha = 0.0;   // [rad] Water angle with surface.
+    
+    const double h_c = (   2.0 * gamma_w * std::cos (alpha)
+                        / (rho_w * g * a)); // [Pa]
+    //   [N m^-1] [kg^-1 m^3] [m^-1 s^2] [m^-1]
+    // = [N kg^-1 s^2]
+    // = [kg m s^-2 kg^-1 s^2]
+    // = [m]
+
+    return h_c * -100.0;        // [cm H2O/m]
+  }
+
   SecondaryCracks (const BlockModel& al)
     : SecondaryAlpha (al),
-      aperture (al.number ("h_aperture")),
+      aperture (al.number ("aperture")),
       density (al.number ("density")),
-      Theta_crack (aperture * density),
-      K_crack (find_K (aperture, density))    
+      K_crack (find_K (aperture, density)),
+      h_crack (find_h_lim (aperture))
   { 
-    daisy_assert (Theta_crack >= 0.0);
-    daisy_assert (Theta_crack <= 1.0);
+    Treelog& msg = al.msg ();
+    TREELOG_MODEL (msg);
+    std::ostringstream tmp;
+    tmp << "K = " << K_crack << " [cm/h]\n"
+        << "h = " << h_crack << " [cm]";
+    msg.debug (tmp.str ());
   }
 };
 
@@ -230,7 +268,7 @@ static struct SecondaryCracksSyntax : public DeclareModel
   Model* make (const BlockModel& al) const
   { return new SecondaryCracks (al); }
   SecondaryCracksSyntax ()
-    : DeclareModel (Secondary::component, "aperture", "alpha", "\
+    : DeclareModel (Secondary::component, "cracks", "alpha", "\
 Secondary domain specified by aperture and density of soil cracks.")
   { }
   static bool check_alist (const Metalib&, const Frame& al, Treelog& msg)
