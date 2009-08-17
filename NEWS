@@ -24,6 +24,14 @@ This is similar to the 'pressure' model, except that both 'h_lim' and
 'K' are calculated from two new parameters, 'aperture' and 'density',
 describing the median aperture and density of the soil fissures.
 
+  (defhorizon C Ap
+    "Andeby C horizon with cracks."
+    (secondary_domain cracks
+                      (aperture 100 [um])
+                      (density 10 [m^-1])
+                      (alpha 0.001 [h^-1]))
+    (humus 0.12 [%]))
+
 * 4.67 
 
 ** Bug fix affecting OpenMI interface.
