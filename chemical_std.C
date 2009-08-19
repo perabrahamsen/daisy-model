@@ -1090,6 +1090,15 @@ ChemicalStandard::output (Log& log) const
   output_value (C_primary_, "C_primary", log);
   output_value (M_total_, "M", log);
   output_value (M_primary_, "M_primary", log);
+  static const symbol M_secondary_symbol ("M_secondary");
+  if (log.check_leaf (M_secondary_symbol))
+    {
+      std::vector<double> M_secondary = M_total_;
+      daisy_assert (M_primary_.size () == M_secondary.size ());
+      for (size_t i = 0; i < M_primary_.size (); i++)
+        M_secondary[i] -= M_primary_[i];
+      log.output_entry (M_secondary_symbol, M_secondary);
+    }
   output_value (M_error, "M_error", log);
   output_value (S_secondary_, "S_secondary", log);
   output_value (S_primary_, "S_primary", log);
@@ -1764,6 +1773,9 @@ which can be negative.");
     Geometry::add_layer (frame, Attribute::OptionalState, "M", load_M);
     Geometry::add_layer (frame, Attribute::LogOnly, "M_primary", load_M_primary);
     Geometry::add_layer (frame, Attribute::OptionalConst, "Ms", load_Ms);
+    frame.declare ("M_secondary", "g/cm^3", 
+                   Attribute::LogOnly, Attribute::SoilCells, 
+                   "Mass in secondary domain.");
     frame.declare ("M_error", "g/cm^3", Attribute::LogOnly, Attribute::SoilCells, 
                    "Mass substracted to avoid negative values.");
     frame.declare ("S_secondary", "g/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,

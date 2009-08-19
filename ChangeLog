@@ -1,3 +1,7 @@
+2009-08-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* chemical_std.C (M_secondary): New log variable.
+
 2009-08-17  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* unit_model.C (um): New unit.
