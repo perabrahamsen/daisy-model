@@ -954,8 +954,13 @@ TransportMollerup::fluxes (const GeometryRect& geo,
             dJ[e] = alpha * q_edge[e] * C[from] + (1.0-alpha) * C[to];
             
             //--- Diffusive part - xx_zz --- 
-            const double gradient = geo.edge_area_per_length (e) *
-              (C[to] - C[from]);
+            
+            //mmo divide with area???
+            //const double gradient = geo.edge_area_per_length (e) *
+            //  (C[to] - C[from]);
+            
+            const double gradient = (C[to] - C[from])
+              / geo.edge_length (e);
             dJ[e] -= ThetaD_xx_zz[e]*gradient;  //xx_zz diffusion
               
             //--- Diffusive part - xz_zx ---
