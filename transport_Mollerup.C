@@ -832,7 +832,7 @@ TransportMollerup::fluxes (const GeometryRect& geo,
             const double alpha = (q_edge[e] >= 0) 
               ? upstream_weight 
               : 1.0 - upstream_weight;
-            dJ[e] = alpha * q_edge[e] * C[from] + (1.0-alpha) * C[to];
+            dJ[e] = q_edge[e] * (alpha * C[from] + (1.0-alpha) * C[to]);
             
             //--- Diffusive part - xx_zz --- 
             //const double gradient = geo.edge_area_per_length (e) *
