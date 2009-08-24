@@ -127,19 +127,6 @@ struct TransportMollerup : public Transport
                              const bool enable_boundary_diffusion,
                              ublas::vector<double>& B_dir_vec);
 
-#ifdef OLD_BORDER
-  static void lowerboundary (const Geometry& geo,
-                             const bool isflux,
-                             const double C_border,
-                             const ublas::vector<double>& q_edge,
-                             const ublas::vector<double>& ThetaD_xx_zz,
-                             const ublas::vector<double>& C,
-                             const bool enable_boundary_diffusion,
-                             std::vector<edge_type_t>& edge_type,      
-                             ublas::banded_matrix<double>& B_mat,
-                             ublas::vector<double>& B_vec,
-                             ublas::vector<double>& B_dir_vec);
-#else // !OLD_BORDER
   static void lowerboundary (const Geometry& geo,
                              const std::map <size_t, double>& C_border,
                              const ublas::vector<double>& q_edge,
@@ -150,36 +137,17 @@ struct TransportMollerup : public Transport
                              ublas::banded_matrix<double>& B_mat,
                              ublas::vector<double>& B_vec,
                              ublas::vector<double>& B_dir_vec);
-#endif // !OLD_BORDER                             
+
   static double Dirichlet_timestep (const Geometry& geo,
                                     const ublas::vector<double>& ThetaD_xx_zz,
                                     const double dt);
 
-#ifdef OLD_BORDER
-  static void upperboundary (const Geometry& geo,
-                             std::vector<edge_type_t>& edge_type,
-                             const std::vector<double>& J,
-                             ublas::vector<double>& B_vec,
-                             Treelog& msg);
-#else // !OLD_BORDER
   static void forced_flux (const Geometry& geo,
                            const std::map<size_t, double>& J_forced,
                            std::vector<edge_type_t>& edge_type,
                            ublas::vector<double>& B_vec,
                            Treelog& msg);
-#endif // !OLD_BORDER
 
-#ifdef OLD_BORDER
-  void fluxes (const GeometryRect& geo,
-               const std::vector<edge_type_t>& edge_type,
-               const ublas::vector<double>& q_edge,
-               const ublas::vector<double>& ThetaD_xx_zz,
-               const ublas::vector<double>& ThetaD_xz_zx,
-               const ublas::vector<double>& C,
-               const double C_below,
-               const ublas::vector<double>& B_dir_vec,
-               ublas::vector<double>& dJ) const; 
-#else // !OLD_BORDER
   void fluxes (const GeometryRect& geo,
                const std::vector<edge_type_t>& edge_type,
                const ublas::vector<double>& q_edge,
@@ -190,7 +158,6 @@ struct TransportMollerup : public Transport
                const std::map<size_t, double>& C_border,
                const ublas::vector<double>& B_dir_vec,
                ublas::vector<double>& dJ) const; 
-#endif // !OLD_BORDER
   // Solute.
   void flow (const Geometry& geo, 
              const Soil& soil, 
@@ -705,63 +672,6 @@ TransportMollerup::Dirichlet_expl(const size_t cell,
   B_dir_vec (cell) = Q_out;
 }
 
-
-#ifdef OLD_BORDER
-void 
-TransportMollerup::lowerboundary
-/**/ (const Geometry& geo,
-      const bool isflux,
-      const double C_border,
-      const ublas::vector<double>& q_edge,
-      const ublas::vector<double>& ThetaD_xx_zz,
-      const ublas::vector<double>& C,
-      const bool enable_boundary_diffusion,
-      std::vector<edge_type_t>& edge_type,      
-      ublas::banded_matrix<double>& B_mat,
-      ublas::vector<double>& B_vec,
-      ublas::vector<double>& B_dir_vec)
-{
-  const std::vector<size_t>& edge_below = geo.cell_edges (Geometry::cell_below);
-  const size_t edge_below_size = edge_below.size ();
-  
-  for (size_t i = 0; i < edge_below_size; i++)
-    {
-      const size_t edge = edge_below[i];
-      const int cell = geo.edge_other (edge, Geometry::cell_below);
-      daisy_assert (geo.cell_is_internal (cell));
-      const double in_sign 
-        = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
-      daisy_assert (in_sign > 0);
-      const double area = geo.edge_area (edge);
-      const double area_per_length = geo.edge_area_per_length (edge);
-      
-      if (isflux)               // Flux BC
-        {
-          const bool influx = in_sign * q_edge (edge) > 0;
-          if (influx)
-            {
-              edge_type[edge] = Neumann_explicit_lower;
-              const double J_in = C_border * q_edge (edge); 
-              Neumann_expl (cell, area, in_sign, J_in, B_vec);
-            }
-          else
-            {
-              edge_type[edge] = Neumann_implicit;
-              Neumann_impl (cell, area, in_sign, q_edge (edge), B_mat);
-            }
-        }
-      else                      // C_Border. BC
-        {
-          edge_type[edge] = Dirichlet;
-          // write something
-          double C_cell = C (cell);
-          Dirichlet_expl (cell, area, area_per_length, in_sign, 
-                          ThetaD_xx_zz (edge), C_border, C_cell, 
-                          q_edge (edge), enable_boundary_diffusion, B_dir_vec); 
-        }
-    }
-}
-#else // !OLD_BORDER
 void 
 TransportMollerup::lowerboundary (const Geometry& geo,
                                      const std::map <size_t, double>& C_border,
@@ -807,7 +717,6 @@ TransportMollerup::lowerboundary (const Geometry& geo,
         }
     }
 }
-#endif //!OLD_BORDER
 
 double 
 TransportMollerup::Dirichlet_timestep 
@@ -856,33 +765,6 @@ TransportMollerup::Dirichlet_timestep
   return ddt_dir;
 }
 
-
-
-#ifdef OLD_BORDER
-void 
-TransportMollerup::upperboundary (const Geometry& geo,
-                                     std::vector<edge_type_t>& edge_type,
-                                     const std::vector<double>& J,
-                                     ublas::vector<double>& B_vec,
-                                     Treelog& msg)
-{
-  const std::vector<size_t>& edge_above = geo.cell_edges (Geometry::cell_above);
-  const size_t edge_above_size = edge_above.size ();
-
-  for (size_t i = 0; i < edge_above_size; i++)
-    {
-      const size_t edge = edge_above[i];
-      const int cell = geo.edge_other (edge, Geometry::cell_above);
-      daisy_assert (geo.cell_is_internal (cell));
-      const double in_sign 
-        = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
-      daisy_assert (in_sign < 0);
-      const double area = geo.edge_area (edge);
-      Neumann_expl (cell, area, in_sign, J[edge], B_vec);
-      edge_type[edge] = Neumann_explicit_upper;
-    }
-}
-#else //!OLD_BORDER
 void 
 TransportMollerup::forced_flux (const Geometry& geo,
                                    const std::map<size_t, double>& J_forced,
@@ -908,180 +790,7 @@ TransportMollerup::forced_flux (const Geometry& geo,
       edge_type[edge] = Neumann_explicit_upper;
     }
 }
-#endif // !OLD_BORDER
 
-#ifdef OLD_BORDER
-void 
-TransportMollerup::fluxes (const GeometryRect& geo,
-                              const std::vector<edge_type_t>& edge_type, 
-                              const ublas::vector<double>& q_edge,
-                              const ublas::vector<double>& ThetaD_xx_zz,
-                              const ublas::vector<double>& ThetaD_xz_zx,
-                              const ublas::vector<double>& C,
-                              const double C_below,
-                              const ublas::vector<double>& B_dir_vec,
-                              ublas::vector<double>& dJ) const
-{
-  const size_t edge_size = geo.edge_size (); // number of edges  
-
-  daisy_assert (edge_type.size () == edge_size);
-  daisy_assert (q_edge.size () == edge_size);
-  daisy_assert (ThetaD_xx_zz.size () == edge_size);
-  daisy_assert (ThetaD_xz_zx.size () == edge_size);
-  daisy_assert (dJ.size () == edge_size);
-
-  for (size_t e = 0; e < edge_size; e++)
-    {
-      const int from = geo.edge_from (e);
-      const int to = geo.edge_to (e);  
-
-      switch (edge_type[e])
-        {
-        case Unhandled:
-          dJ[e] = 0.0;
-          break;
-        case Internal:
-          {
-            daisy_assert (from >= 0);
-            daisy_assert (to >= 0);
-            daisy_assert (from < C.size ());
-            daisy_assert (to < C.size ());
-            
-            //--- Advective part ---
-            const double alpha = (q_edge[e] >= 0) 
-              ? upstream_weight 
-              : 1.0 - upstream_weight;
-            dJ[e] = alpha * q_edge[e] * C[from] + (1.0-alpha) * C[to];
-            
-            //--- Diffusive part - xx_zz --- 
-            
-            //mmo divide with area???
-            //const double gradient = geo.edge_area_per_length (e) *
-            //  (C[to] - C[from]);
-            
-            const double gradient = (C[to] - C[from])
-              / geo.edge_length (e);
-            dJ[e] -= ThetaD_xx_zz[e]*gradient;  //xx_zz diffusion
-              
-            //--- Diffusive part - xz_zx ---
-            const std::vector<int>& corners = geo.edge_corners (e);
-            daisy_assert (corners.size () == 2);
-            const int A = corners[0];
-            const int B = corners[1];
-            const std::vector<int>& A_cells = geo.corner_cells (A);
-            const std::vector<int>& B_cells = geo.corner_cells (B);
-            const bool A_is_border = A_cells.size () == 2;
-            daisy_assert (A_is_border || A_cells.size () == 4);
-            const bool B_is_border = B_cells.size () == 2;
-            daisy_assert (B_is_border || B_cells.size () == 4);
-          
-            if (A_is_border && B_is_border)
-              // Both corners of the edge touches the border.
-              continue;
-            
-            // We use the fact that the geometry is rectangular and
-            // alligned with our coordinate system to ignore whether
-            // we are looking at the z or the x dimension.
-            const double dkz = geo.corner_z (B) - geo.corner_z (A);
-            const double dkx = geo.corner_x (B) - geo.corner_x (A);
-            const double area = geo.edge_area (e);
-            daisy_assert (approximate (fabs (dkz + dkx), area));
-            double magnitude = -ThetaD_xz_zx (e) * area / (dkz + dkx);
-
-            // On a border we calculate from edge center, rather than corner.
-            if (A_is_border || B_is_border)
-              magnitude *= 2.0;
-
-            const double dcz = geo.cell_z (to) - geo.cell_z (from);
-            const double dcx = geo.cell_x (to) - geo.cell_x (from);
-            const double length = geo.edge_length (e);
-            daisy_assert (approximate (fabs (dcz + dcx), length));
-            //const double sign =  length / (dcz + dcx);
-            
-            double Sum_C_A = 0.0;
-            for (size_t i = 0; i < A_cells.size (); i++)
-              Sum_C_A += C[A_cells[i]];
-            const double C_A = A_is_border
-              ? Sum_C_A / 4.0
-              : Sum_C_A / 2.0;
-
-            double Sum_C_B = 0.0;
-            for (size_t i = 0; i < B_cells.size (); i++)
-              Sum_C_B += C[B_cells[i]];
-            const double C_B = B_is_border
-              ? Sum_C_B / 4.0
-              : Sum_C_B / 2.0;
-            
-            dJ[e] -= ThetaD_xz_zx (e) * (C_B-C_A)/(dcz + dcx);  
-          }
-          break;
-
-        case Neumann_explicit_upper:
-          dJ[e] = 0.0; // use existing J 
-          break;
-
-        case Neumann_explicit_lower:
-          dJ[e] = q_edge[e] * C_below; 
-          break;
-          
-        case Neumann_implicit:
-          {
-            const int cell = geo.cell_is_internal (to) ? to : from;
-            daisy_assert (cell >= 0);
-            daisy_assert (cell < C.size ());
-            dJ[e] = q_edge[e] * C[cell];
-          }
-          break;
-          
-        case Dirichlet:      //Only lower boundary 
-          {
-            const int cell = geo.cell_is_internal (to) ? to : from;
-            daisy_assert (cell >= 0);
-            daisy_assert (cell < C.size ());
-            
-            const double in_sign 
-              = geo.cell_is_internal (geo.edge_to (e)) ? 1.0 : -1.0;
-
-            dJ[e] = -in_sign * B_dir_vec (cell) / geo.edge_area (e); 
-
-            // std::cout << "Dirichlet flux: \n";
-            // std::cout << "in_sign: " << in_sign << '\n';
-            // std::cout << "B_dir_vec (cell):" << B_dir_vec (cell) << '\n';  
-            // std::cout << "dJ[e]: " << dJ[e] << '\n';
-            
-            
-            
-            /*
-            //Advective transport
-            const double in_sign 
-              = geo.cell_is_internal (geo.edge_to (e)) ? 1.0 : -1.0;
-
-            if (q_edge[e] * in_sign >= 0)       //Inflow
-              dJ[e] = q_edge[e] * C_below;
-            else                                //Outflow
-              dJ[e] = q_edge[e] * C[cell];
-            
-            //Diffusive transport - xx_zz diffusion  
-            const double gradient = geo.edge_area_per_length (e) *
-              (C[cell]-C_below)*in_sign;
-            dJ[e] -= ThetaD_xx_zz[e]*gradient;
-         
-            std::cout << "cell: " << cell << '\n';
-            std::cout << "in_sign:" << in_sign << '\n';
-            std::cout << "C[cell]:" << C[cell] << '\n';
-            std::cout << "C_below" << C_below << '\n';
-            std::cout << "gradient" << gradient << '\n';
-
-            //Diffusive transport - xz_zx diffusion
-            //Constant values along border direction ->
-            //no flux
-            */
-          }
-          break;
-        }
-    }
-}
-#else // !OLD_BORDER
 void 
 TransportMollerup::fluxes (const GeometryRect& geo,
                               const std::vector<edge_type_t>& edge_type, 
@@ -1126,8 +835,10 @@ TransportMollerup::fluxes (const GeometryRect& geo,
             dJ[e] = alpha * q_edge[e] * C[from] + (1.0-alpha) * C[to];
             
             //--- Diffusive part - xx_zz --- 
-            const double gradient = geo.edge_area_per_length (e) *
-              (C[to] - C[from]);
+            //const double gradient = geo.edge_area_per_length (e) *
+            //  (C[to] - C[from]);
+            const double gradient = (C[to] - C[from]) 
+              / geo.edge_length (e);
             dJ[e] -= ThetaD_xx_zz[e]*gradient;  //xx_zz diffusion
               
             //--- Diffusive part - xz_zx ---
@@ -1262,7 +973,6 @@ TransportMollerup::fluxes (const GeometryRect& geo,
         }
     }
 }
-#endif // !OLD_BORDER
 
 static void
 add_to (const Solver::Matrix& from, ublas::coordinate_matrix<double>& to)
@@ -1548,12 +1258,7 @@ TransportMollerup::flow (const Geometry& geo_base,
     if (geo.edge_is_internal (e))
       edge_type[e] = Internal;
 
-
-#ifdef OLD_BORDER
-  upperboundary (geo, edge_type, J, B_vec, msg);
-#else // !OLD_BORDER
   forced_flux (geo, J_forced, edge_type, B_vec, msg);
-#endif // !OLD_BORDER
   
 
   // Solver parameter , gamma
@@ -1620,15 +1325,9 @@ TransportMollerup::flow (const Geometry& geo_base,
       for (int c = 0; c < cell_size; c++)
         QTheta_mat_np1 (c, c) = geo.cell_volume (c) * Theta_cell_np1 (c);
 
-#ifdef OLD_BORDER
-      lowerboundary (geo, flux_below, C_below, q_edge, ThetaD_xx_zz_avg,
-                     C_n, enable_boundary_diffusion, edge_type, B_mat,
-                     B_vec, B_dir_vec);
-#else // !OLD_BORDER
       lowerboundary (geo, C_border, q_edge, ThetaD_xx_zz_avg,
                      C_n, enable_boundary_diffusion, edge_type, B_mat,
                      B_vec, B_dir_vec);
-#endif // !OLD_BORDER      
      
       if (simple_dcthetadt)
         {
@@ -1694,13 +1393,8 @@ TransportMollerup::flow (const Geometry& geo_base,
       
       //Update fluxes 
       ublas::vector<double> dJ = ublas::zero_vector<double> (edge_size);
-#ifdef OLD_BORDER
-      fluxes (geo, edge_type, q_edge, ThetaD_xx_zz_avg, ThetaD_xz_zx_avg,
-              C_n, C_below, B_dir_vec, dJ); 
-#else // !OLD_BORDER
       fluxes (geo, edge_type, q_edge, ThetaD_xx_zz_avg, ThetaD_xz_zx_avg,
               C_n, J_forced, C_border, B_dir_vec, dJ); 
-#endif // !OLD_BORDER
       
       for (int e=0; e<edge_size; e++)
         J[e] += dJ[e] * ddt/dt;
