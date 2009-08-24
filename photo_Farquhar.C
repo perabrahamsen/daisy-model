@@ -428,7 +428,7 @@ static struct PhotoFarquharSyntax : DeclareBase
     : DeclareBase (Photo::component, "Farquhar", "\
 Base parameterization for Farquhar derived photosynthesis models.\n\
 \n\
-Faquhar et al. (1980) photosynthesis and Ball et al. (1987)\n\
+Farquhar et al. (1980) photosynthesis and Ball et al. (1987)\n\
 stomataconductance model coupled as described by Collatz et al., 1991.")
   { }
   void load_frame (Frame& frame) const

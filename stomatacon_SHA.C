@@ -88,7 +88,7 @@ static struct StomataConSHASyntax : public DeclareModel
     frame.declare ("alpha", Attribute::None (), Check::non_negative (), Attribute::Const,
                 "Coefficient");
     frame.set ("alpha", 1.0);
-    frame.declare ("M", "[mol/m²leaf/s]", Check::non_negative (), Attribute::Const,
+    frame.declare ("M", "mol/m^2 leaf/s", Check::non_negative (), Attribute::Const,
 	       "Parameter ??");
     frame.set ("M", 1.0);
 
