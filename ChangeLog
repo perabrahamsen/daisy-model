@@ -1,3 +1,11 @@
+2009-08-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.68 released.
+
+2009-08-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_extern.C (extern_subsoil): New model.
+
 2009-08-20  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* photo_Farquhar.C: Spelling.

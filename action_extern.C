@@ -39,7 +39,10 @@
 #include "frame_model.h"
 #include "metalib.h"
 #include "library.h"
+#include "volume.h"
 #include <memory>
+
+// The 'extern' action.
 
 struct ActionExtern : public Action
 {
@@ -127,6 +130,8 @@ Scope to evaluate expessions in.");
   }
 } ActionExtern_syntax;
 
+// The 'extern_fertigation' action.
+
 struct ActionExternFertigation : public Action
 {
   const std::auto_ptr<Scopesel> scopesel;
@@ -146,19 +151,18 @@ struct ActionExternFertigation : public Action
   const double to;
 
   static const symbol kg_N_per_ha_per_h;
-  static const symbol mm_per_h;
 
   void tick (const Daisy& daisy, const Scope& parent_scope, Treelog& msg)
   {
     daisy_assert (extern_scope)       ;
     ScopeMulti multi (*extern_scope, parent_scope);
     const Units& units = daisy.units ();
-    if (!surface_expr->tick_value (units, surface_value, mm_per_h, multi, msg))
+    if (!surface_expr->tick_value (units, surface_value, Units::mm_per_h (), multi, msg))
       surface_value = 0.0;
-    if (!subsoil_expr->tick_value (units, subsoil_value, mm_per_h, multi, msg))
+    if (!subsoil_expr->tick_value (units, subsoil_value, Units::mm_per_h (), multi, msg))
       subsoil_value = 0.0;
     if (!overhead_expr->tick_value (units, overhead_value,
-                                    mm_per_h, multi, msg))
+                                    Units::mm_per_h (), multi, msg))
       overhead_value = 0.0;
     if (!NO3_expr->tick_value (units, NO3_value, kg_N_per_ha_per_h, multi, msg))
       NO3_value = 0.0;
@@ -243,11 +247,11 @@ struct ActionExternFertigation : public Action
 
     ScopeMulti multi (*extern_scope, parent_scope);
     const Units& units = daisy.units ();
-    if (!surface_expr->check_dim (units, multi, mm_per_h, msg))
+    if (!surface_expr->check_dim (units, multi, Units::mm_per_h (), msg))
       ok = false;
-    if (!subsoil_expr->check_dim (units, multi, mm_per_h, msg))
+    if (!subsoil_expr->check_dim (units, multi, Units::mm_per_h (), msg))
       ok = false;
-    if (!overhead_expr->check_dim (units, multi, mm_per_h, msg))
+    if (!overhead_expr->check_dim (units, multi, Units::mm_per_h (), msg))
       ok = false;
     if (!NH4_expr->check_dim (units, multi, kg_N_per_ha_per_h, msg))
       ok = false;
@@ -280,10 +284,6 @@ struct ActionExternFertigation : public Action
 
 const symbol 
 ActionExternFertigation::kg_N_per_ha_per_h ("kg N/ha/h");
-
-const symbol
-ActionExternFertigation::mm_per_h ("mm/h");
-
 
 static struct ActionExternFertigationSyntax : public DeclareModel
 {
@@ -346,5 +346,180 @@ Height where you want to end the incorporation (a negative number).");
     frame.set ("from", -10.0);
   }
 } ActionExternFertigation_syntax;
+
+// The 'extern_subsoil' action.
+
+struct ActionExternSubsoil : public Action
+{
+  const std::auto_ptr<Scopesel> scopesel;
+  mutable const Scope* extern_scope;
+
+  const std::auto_ptr<Number> expr_flux;
+  double flux;
+  
+  const std::vector<symbol> constituents;
+  IM sm;
+
+  std::auto_ptr<Volume> volume;
+
+  void tick (const Daisy& daisy, const Scope& parent_scope, Treelog& msg)
+  {
+    daisy_assert (extern_scope);
+    ScopeMulti multi (*extern_scope, parent_scope);
+    const Units& units = daisy.units ();
+    if (expr_flux->tick_value (units, flux, Units::mm_per_h (), multi, msg))
+      {
+        for (size_t i = 0; i < constituents.size (); i++)
+          {
+            const symbol name = constituents[i];
+            daisy_assert (multi.lookup (name) == Attribute::Number);
+            daisy_assert (multi.type_size (name) == Attribute::Singleton);
+            daisy_assert (multi.check (name));
+            const double value = multi.number (name);
+            const symbol dim = multi.dimension (name);
+            daisy_assert (units.has_unit (dim));
+            const Unit& unit = units.get_unit (dim);
+            sm.set_value (name, unit, value);
+          }
+      }
+    else
+      flux = 0.0;
+  }
+
+  void doIt (Daisy& daisy, const Scope& parent_scope, Treelog& msg)
+  { 
+    if (flux < 1e-100)
+      return;
+
+    daisy.field->irrigate_subsoil (flux, sm, *volume, daisy.dt, msg); 
+  }
+
+  bool done (const Daisy&, const Scope&, Treelog&) const
+  { return false; }
+
+  void output (Log&) const
+  { }
+
+  void initialize (const Daisy& daisy, const Scope& parent_scope, Treelog& msg)
+  { 
+    extern_scope = scopesel->lookup (*daisy.output_log, msg); 
+    if (!extern_scope)
+      return;
+
+    ScopeMulti multi (*extern_scope, parent_scope);
+    const Units& units = daisy.units ();
+    expr_flux->initialize (units, multi, msg);
+  }
+
+  bool check (const Daisy& daisy, const Scope& parent_scope, 
+              Treelog& msg) const
+  { 
+    bool ok = true; 
+
+    if (!extern_scope)
+      {
+        msg.error ("Extern scope not found");
+        return false;
+      }
+
+    ScopeMulti multi (*extern_scope, parent_scope);
+    const Units& units = daisy.units ();
+    if (!expr_flux->check_dim (units, multi, Units::mm_per_h (), msg))
+      ok = false;
+    
+    for (size_t i = 0; i < constituents.size (); i++)
+      {
+        const symbol name = constituents[i];
+        if (multi.lookup (name) != Attribute::Number)
+          {
+            msg.error ("'" + name + "': No such number");
+            ok = false;
+            continue;
+          }
+        if (multi.type_size (name) != Attribute::Singleton)
+          {
+            msg.error ("'" + name + "': Not a singleton");
+            ok = false;
+            continue;
+          }
+        const symbol dim = multi.dimension (name);
+        if (!units.can_convert (dim, Units::ppm ()))
+          ok = false;
+      }
+
+    return ok;
+  }
+
+  ActionExternSubsoil (const BlockModel& al)
+    : Action (al),
+      scopesel (Librarian::build_item<Scopesel> (al, "scope")),
+      extern_scope (NULL),
+      expr_flux (Librarian::build_item<Number> (al, "flux")),
+      flux (-42.42e42),
+      constituents (al.name_sequence ("constituents")),
+      sm (al.units ().get_unit (Units::ppm ())),
+      volume (Volume::build_obsolete (al))
+  { }
+  ~ActionExternSubsoil ()
+  { }
+};
+
+static struct ActionExternSubsoilSyntax : public DeclareModel
+{
+  static bool check_alist (const Metalib&, const Frame& al, Treelog& err)
+  { 
+    bool ok = true;
+    if (al.check ("from") && al.check ("to"))
+      {
+        const double from = al.number ("from");
+        const double to = al.number ("to");
+        if (from <= to)
+          {
+            err.entry ("'from' must be higher than 'to' in"
+                       " the subsoil irrigation zone");
+            ok = false;
+          }
+      }
+    return ok;
+  }
+
+  Model* make (const BlockModel& al) const
+  { return new ActionExternSubsoil (al); }
+
+  ActionExternSubsoilSyntax ()
+    : DeclareModel (Action::component, "extern_subsoil", "\
+Subsoil irrigation controlled externally.")
+  { }
+  
+  void load_frame (Frame& frame) const
+  {
+    Model::load_model (frame);
+    frame.add_check (check_alist);	
+    frame.declare_object ("scope", Scopesel::component, 
+                       Attribute::Const, Attribute::Singleton, "\
+Scope to evaluate expessions in.");
+
+    frame.declare_object ("flux", Number::component, 
+                          Attribute::Const, Attribute::Singleton, 
+"Amount of irrigation applied.");
+
+    frame.declare_string ("constituents", 
+                          Attribute::Const, Attribute::Variable, "\
+List of solutes to add to the irrigation water.\n\
+The values are taken from the external scope, dimensions must be\n      \
+convertible to ppm.");
+
+    frame.declare_object ("volume", Volume::component, 
+                       Attribute::Const, Attribute::Singleton,
+                       "Soil volume to add irritaion.");
+    frame.set ("volume", "box");
+    frame.declare ("from", "cm", Check::non_positive (), Attribute::OptionalConst, "\
+Height where you want to start the incorporation (a negative number).\n\
+OBSOLETE: Use (volume box (top FROM)) instead.");
+    frame.declare ("to", "cm", Check::non_positive (), Attribute::OptionalConst, "\
+Height where you want to end the incorporation (a negative number).\n\
+OBSOLETE: Use (volume box (bottom TO)) instead.");
+  }
+} ActionExternSubsoil_syntax;
 
 // action_extern.C ends here.

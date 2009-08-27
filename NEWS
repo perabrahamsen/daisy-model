@@ -32,6 +32,11 @@ describing the median aperture and density of the soil fissures.
                       (alpha 0.001 [h^-1]))
     (humus 0.12 [%]))
 
+** New 'extern_subsoil' action model.
+
+This allows an exteral model to control subsoil irrigation containing
+arbitrary solutes.
+
 * 4.67 
 
 ** Bug fix affecting OpenMI interface.
