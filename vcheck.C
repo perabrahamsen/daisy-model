@@ -71,6 +71,29 @@ struct ValidYear : public VCheck
 };
 
 bool
+VCheck::Integer::verify (const Metalib&, const Frame& frame, const symbol key, 
+                        Treelog& msg) const
+{
+  daisy_assert (frame.check (key));
+  daisy_assert (!frame.is_log (key));
+  daisy_assert (frame.lookup (key) == Attribute::Integer);
+
+  if (frame.type_size (key) == Attribute::Singleton)
+    return valid (frame.integer (key), msg);
+
+  bool ok = true;
+  const std::vector<int> integers = frame.integer_sequence (key);
+  for (unsigned int i = 0; i < integers.size (); i++)
+    if (!valid (integers[i], msg))
+      ok = false;
+        
+  return ok;
+}
+
+VCheck::Integer::Integer ()
+{ }
+
+bool
 VCheck::IRange::valid (const int value, Treelog& msg) const
 {
   if (value < min)
@@ -90,29 +113,43 @@ VCheck::IRange::valid (const int value, Treelog& msg) const
   return true;
 }
 
-bool
-VCheck::IRange::verify (const Metalib&, const Frame& frame, const symbol key, 
-                        Treelog& msg) const
-{
-  daisy_assert (frame.check (key));
-  daisy_assert (!frame.is_log (key));
-  daisy_assert (frame.lookup (key) == Attribute::Integer);
-
-  if (frame.type_size (key) == Attribute::Singleton)
-    return valid (frame.integer (key), msg);
-
-  bool ok = true;
-  const std::vector<int> integers = frame.integer_sequence (key);
-  for (unsigned int i = 0; i < integers.size (); i++)
-    if (!valid (integers[i], msg))
-      ok = false;
-        
-  return ok;
-}
-
 VCheck::IRange::IRange (const int min_, const int max_)
   : min (min_),
     max (max_)
+{ }
+
+bool
+VCheck::LargerThan::valid (const int value, Treelog& msg) const
+{
+  if (value <= below)
+    {
+      std::ostringstream tmp;
+      tmp << "Value is " << value << " but should be > " << below;
+      msg.error (tmp.str ());
+      return false;
+    }
+  return true;
+}
+
+VCheck::LargerThan::LargerThan (const int below_)
+  : below (below_)
+{ }
+
+bool
+VCheck::SmallerThan::valid (const int value, Treelog& msg) const
+{
+  if (value >= above)
+    {
+      std::ostringstream tmp;
+      tmp << "Value is " << value << " but should be < " << above;
+      msg.error (tmp.str ());
+      return false;
+    }
+  return true;
+}
+
+VCheck::SmallerThan::SmallerThan (const int above_)
+  : above (above_)
 { }
 
 struct LocalOrder : public VCheck
@@ -275,6 +312,35 @@ VCheck::valid_second ()
 {
   static IRange valid_second (0, 59);
   return valid_second;
+}
+
+const VCheck& 
+VCheck::negative ()
+{
+  static SmallerThan check (0);
+  return check;
+}
+
+const VCheck& 
+VCheck::non_negative ()
+{
+  static LargerThan check (-1);
+  return check;
+}
+
+const VCheck& 
+VCheck::non_positive ()
+{
+  static SmallerThan check (1);
+  return check;
+}
+
+
+const VCheck& 
+VCheck::positive ()
+{
+  static LargerThan check (0);
+  return check;
 }
 
 const VCheck& 

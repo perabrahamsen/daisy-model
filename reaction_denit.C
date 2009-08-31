@@ -194,43 +194,53 @@ static struct ReactionDenitSyntax : public DeclareModel
   Model* make (const BlockModel& al) const
   { return new ReactionDenit (al); }
   ReactionDenitSyntax ()
-    : DeclareModel (Reaction::component, "denitrification", "Denitrification in soil (conversion\n\
-of nitrate to atmospheric nitrogen).  In this model, it is made\n\
-proportional to the CO2 development, as specified by the parameter\n\
-alpha, with a maximum rate specified by the parameter 'K'.  The\n\
-denitrification is also affected by temperature and water pressure.\n\
-Additional denitrification from CO2 produced from fast OM pools can\n\
-be triggered by setting alpha_fast or water_factor_fast different.\n\
-This additional denitrification is limited by K_fast.")
+    : DeclareModel (Reaction::component, "denitrification", "\
+Denitrification in soil, (conversion of nitrate to atmospheric nitrogen).\n\
+\n\
+In this model, it is made proportional to the CO2 development, as\n\
+specified by the parameter alpha, with a maximum rate specified by the\n\
+parameter 'K'.  The denitrification is also affected by temperature\n\
+and water pressure.  Additional denitrification from CO2 produced from\n\
+fast OM pools can be triggered by setting alpha_fast or\n\
+water_factor_fast different.  This additional denitrification is\n\
+limited by K_fast.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("converted", "g/cm^3/h", Attribute::LogOnly, Attribute::Variable,
+    frame.declare ("converted", "g/cm^3/h",
+                   Attribute::LogOnly, Attribute::Variable,
                    "Amount of denitrification.");
-    frame.declare ("converted_fast", "g/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
+    frame.declare ("converted_fast", "g/cm^3/h",
+                   Attribute::LogOnly, Attribute::SoilCells,
                    "Additional denitrification due to turnover in fast pools.");
-    frame.declare ("converted_redox", "g/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
-                   "Additional denitrification due to chemical redox processes.");
-    frame.declare ("potential", "g/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
-                   "Potential amount of denitrification at anarobic conditions.");
-    frame.declare ("potential_fast", "g/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
+    frame.declare ("converted_redox", "g/cm^3/h",
+                   Attribute::LogOnly, Attribute::SoilCells, "\
+Additional denitrification due to chemical redox processes.");
+    frame.declare ("potential", "g/cm^3/h",
+                   Attribute::LogOnly, Attribute::SoilCells, "\
+Potential amount of denitrification at anarobic conditions.");
+    frame.declare ("potential_fast", "g/cm^3/h",
+                   Attribute::LogOnly, Attribute::SoilCells,
                    "Additional potential due to turnover in fast pools.");
     frame.declare ("K", "h^-1", Check::fraction (), Attribute::Const, "\
 Maximum fraction of nitrate converted at each time step from slow pools.");
     frame.set ("K", 0.020833);
-    frame.declare ("K_fast", "h^-1", Check::fraction (), Attribute::OptionalConst, "\
+    frame.declare ("K_fast", "h^-1", Check::fraction (),
+                   Attribute::OptionalConst, "\
 Maximum fraction of nitrate converted at each time step from fast pools.\n \
 By default this is identical to 'K'.");
     frame.declare ("alpha", "(g NO3-N/h)/(g CO2-C/h)", Check::non_negative (),
                    Attribute::Const, "\
 Anaerobic denitrification constant for slow pools.");
     frame.set ("alpha", 0.1);
-    frame.declare ("alpha_fast", "(g NO3-N/h)/(g CO2-C/h)", Check::non_negative (),
+    frame.declare ("alpha_fast",
+                   "(g NO3-N/h)/(g CO2-C/h)", Check::non_negative (),
                    Attribute::OptionalConst, "\
 Anaerobic denitrification constant for fast pools.\n                    \
 This applies to the CO2 produced from turnover of fast OM pools.\n\
 By default, this is identical to alpha.");
-    frame.declare ("heat_factor", "dg C", Attribute::None (), Check::non_negative (),
+    frame.declare ("heat_factor", "dg C", Attribute::None (),
+                   Check::non_negative (),
                    Attribute::OptionalConst, "Heat factor.\n\
 By default, use a build in function valid for temperate climates.");
     frame.declare ("water_factor", Attribute::Fraction (), Attribute::None (), 
@@ -243,7 +253,8 @@ maximal water content.");
     water_factor.add (0.7, 0.0);
     water_factor.add (1.0, 1.0);
     frame.set ("water_factor", water_factor);
-    frame.declare ("water_factor_fast", Attribute::Fraction (), Attribute::None (), 
+    frame.declare ("water_factor_fast",
+                   Attribute::Fraction (), Attribute::None (), 
                    Check::non_negative (),
                    Attribute::OptionalConst,
                    "Water potential factor for fast pools\n\

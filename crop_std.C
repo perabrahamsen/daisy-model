@@ -67,7 +67,9 @@ struct CropStandard : public Crop
   std::auto_ptr<Phenology> development;
   const Partition partition;
   std::auto_ptr<Vernalization> vernalization;
-  const std::auto_ptr<Photo> photo;
+  const std::auto_ptr<Photo> shadow;
+  const std::auto_ptr<Photo> sunlit;
+  const std::auto_ptr<Photo> reserved;
   CrpN nitrogen;
   const std::auto_ptr<WSE> water_stress_effect;
   const bool enable_N_stress;
@@ -84,7 +86,9 @@ struct CropStandard : public Crop
   double stomata_conductance () const // Current stomata_conductance [m/s].
   {
     // Stomata conductance
-    const double gs = photo->stomata_conductance();//[m s^-1]
+    const double gs = shadow->stomata_conductance ()
+      + sunlit->stomata_conductance () 
+      + reserved->stomata_conductance ();//[m s^-1]
     if(gs < 0)
       return 1.0/rs_min(); // Photo_GL have no stomata conductance.
     return gs; 
@@ -322,8 +326,10 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
     return;
   
   // Clear data from previous iteration.
-  photo->clear ();
-
+  shadow->clear ();
+  sunlit->clear ();
+  reserved->clear ();
+  
   // Boundary conditions.
   const double relative_humidity = bioclimate.atmospheric_relative_humidity ();
   const double CO2_atm = bioclimate.atmospheric_CO2 ();
@@ -336,7 +342,7 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
   const std::vector<double>& PAR_height = bioclimate.height ();
 
   // Anything do do?
-  if (total_PAR[0] < photo->min_PAR ())
+  if (total_PAR[0] < shadow->min_PAR ())
     return;
 
   // Calculate shadow PAR.
@@ -397,8 +403,8 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
   if (bioclimate.shared_light_fraction () > 1e-10)
     {
       // Shared light.
-      Ass += photo->assimilate (units,
-                                ABA_xylem, crown_potential, relative_humidity, CO2_atm,
+      Ass += shadow->assimilate (units,
+                                 ABA_xylem, crown_potential, relative_humidity, CO2_atm,
                                 bioclimate.daily_air_temperature(), 
                                 T_canopy, T_leaf_shadow,
                                 rubiscoN, shadow_PAR, PAR_height,
@@ -406,7 +412,7 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
                                 canopy, *development, msg)
         * bioclimate.shared_light_fraction ();
 
-      Ass += photo->assimilate (units,
+      Ass += sunlit->assimilate (units,
                                 ABA_xylem, crown_potential, relative_humidity, CO2_atm,
                                 bioclimate.daily_air_temperature(),
                                 T_canopy, T_leaf_sun,
@@ -424,13 +430,13 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
       Bioclimate::radiation_distribution 
         (No, LAI (), PARref (), bioclimate.global_radiation (),
          PARext (), PAR); 
-      Ass += photo->assimilate (units,
-                                ABA_xylem, crown_potential, relative_humidity, CO2_atm,
-                                bioclimate.daily_air_temperature (), 
-                                T_canopy, bioclimate.canopy_temperature(),
-                                rubiscoN, PAR, PAR_height,
-                                bioclimate.LAI (), fraction_total_LAI, dt,
-                                canopy, *development, msg)
+      Ass += reserved->assimilate (units,
+                                   ABA_xylem, crown_potential, relative_humidity, CO2_atm,
+                                   bioclimate.daily_air_temperature (), 
+                                   T_canopy, bioclimate.canopy_temperature(),
+                                   rubiscoN, PAR, PAR_height,
+                                   bioclimate.LAI (), fraction_total_LAI, dt,
+                                   canopy, *development, msg)
         * min_light_fraction;
     }
   daisy_assert (std::isfinite (Ass));
@@ -764,7 +770,9 @@ CropStandard::output (Log& log) const
   output_submodule (*last_time, "last_time", log);
   output_derived (development, "Devel", log);
   output_derived (vernalization, "Vernal", log);
-  output_derived (photo, "LeafPhot", log);
+  output_derived (shadow, "LeafPhot", log);
+  output_derived (sunlit, "sunlit", log);
+  output_derived (reserved, "reserved", log);
   output_submodule (nitrogen, "CrpN", log);
 }
 
@@ -797,16 +805,18 @@ CropStandard::CropStandard (const BlockModel& al)
     development (Librarian::build_item<Phenology> (al, "Devel")),
     partition (al.submodel ("Partit")),
     vernalization (Librarian::build_item<Vernalization> (al, "Vernal")),
-    photo (Librarian::build_item<Photo> (al, "LeafPhot")),
+    shadow (Librarian::build_item<Photo> (al, "LeafPhot")),
+    sunlit (Librarian::build_item<Photo> (al, "LeafPhot")),
+    reserved (Librarian::build_item<Photo> (al, "LeafPhot")),
     nitrogen (al.submodel ("CrpN")),
-    water_stress_effect (find_WSE (al, *photo)),
-    enable_N_stress (al.flag ("enable_N_stress", !photo->handle_N_stress ())),
+    water_stress_effect (find_WSE (al, *shadow)),
+    enable_N_stress (al.flag ("enable_N_stress", !shadow->handle_N_stress ())),
     min_light_fraction (al.number ("min_light_fraction"))
 { 
   if (!al.check ("enable_N_stress"))
     {
       Treelog& msg = al.msg ();
-      if (photo->handle_N_stress ())
+      if (shadow->handle_N_stress ())
         msg.debug ("Nitrogen stress handled by photosynthesis module");
       else
         msg.debug ("Nitrogen stress handled by crop nitrogen module");
@@ -849,9 +859,22 @@ static struct CropStandardSyntax : public DeclareModel
 Vernalization.");
     frame.set ("Vernal", "none");
     frame.declare_object ("LeafPhot", Photo::component,
-                       Attribute::Const, Attribute::Singleton,
-                       "Leaf photosynthesis.");
+                          Attribute::Const, Attribute::Singleton,
+                          "Leaf photosynthesis.\n\
+Note that if the selected radiation distribution model distinguishes\n\
+between sunlit and shadow leaves, only the shadow leaves will be ");
     frame.set ("LeafPhot", "GL");
+    frame.declare_object ("sunlit", Photo::component,
+                          Attribute::LogOnly, Attribute::Singleton,
+                          "Leaf photosynthesis for sunlit leaves.\n\
+This will be zero if the selected radiation distribution model does not\n\
+distinguish between sunlit and shadow leafs.");
+    frame.declare_object ("reserved", Photo::component,
+                          Attribute::LogOnly, Attribute::Singleton,
+                          "Leaf photosynthesis for reserved leaves.\n\
+This is used for simulating \"patches\" in multi-crop systems, such as\n\
+a clover-grass mixture.  This is controled by the 'min_light_fraction'\n\
+parameter.");
     frame.declare_submodule ("CrpN", Attribute::State,
                           "Nitrogen parameters.", CrpN::load_syntax);
 

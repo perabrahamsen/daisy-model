@@ -49,8 +49,15 @@ public:
   static const VCheck& valid_hour ();
   static const VCheck& valid_minute ();
   static const VCheck& valid_second ();
+  static const VCheck& negative ();
+  static const VCheck& non_negative ();
+  static const VCheck& non_positive ();
+  static const VCheck& positive ();
 
+  class Integer;
   class IRange;
+  class LargerThan;
+  class SmallerThan;
 
   // PLF or Number sequence.
 public:
@@ -95,7 +102,18 @@ public:
   virtual ~VCheck ();
 };
 
-class VCheck::IRange : public VCheck
+class VCheck::Integer : public VCheck
+{
+private:
+  virtual bool valid (int value, Treelog&) const = 0;
+  bool verify (const Metalib&, const Frame&, const symbol key, Treelog&) const;
+
+  // Create and Destroy.
+protected:
+  Integer ();
+};
+
+class VCheck::IRange : public VCheck::Integer
 {
   // Parameters.
 private:
@@ -105,11 +123,40 @@ private:
   // Use.
 private:
   bool valid (int value, Treelog&) const;
-  bool verify (const Metalib&, const Frame&, const symbol key, Treelog&) const;
 
   // Create and Destroy.
 public:
   IRange (int min, int max);
+};
+
+class VCheck::LargerThan : public VCheck::Integer
+{
+  // Parameters.
+private:
+  const int below;
+
+  // Use.
+private:
+  bool valid (int value, Treelog&) const;
+
+  // Create and Destroy.
+public:
+  LargerThan (int below);
+};
+
+class VCheck::SmallerThan : public VCheck::Integer
+{
+  // Parameters.
+private:
+  const int above;
+
+  // Use.
+private:
+  bool valid (int value, Treelog&) const;
+
+  // Create and Destroy.
+public:
+  SmallerThan (int above);
 };
 
 class VCheck::SumEqual : public VCheck

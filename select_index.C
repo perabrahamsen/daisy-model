@@ -25,6 +25,8 @@
 #include "block_model.h"
 #include "librarian.h"
 #include "frame.h"
+#include "vcheck.h"
+#include <sstream>
 
 struct SelectIndex : public SelectValue
 {
@@ -33,8 +35,13 @@ struct SelectIndex : public SelectValue
 
   // Output routines.
   void output_array (const std::vector<double>& array,
-                     const Geometry*, const Soil*, const Vegetation*, Treelog&)
-  { add_result (array[index]); }
+                     const Geometry*, const Soil*, const Vegetation*,
+                     Treelog& msg)
+  { 
+    if (index < array.size ())
+      // Indexes outside the array is treated like missing values.
+      add_result (array[index]); 
+  }
 
   // Create and Destroy.
   SelectIndex (const BlockModel& al)
@@ -54,7 +61,8 @@ Extract content at specified array index.")
   void load_frame (Frame& frame) const
   { 
     frame.declare_integer ("index", Attribute::Const,
-               "Specify array index to select.");
+                           "Specify array index to select.");
+    frame.set_check ("index", VCheck::non_negative ());
   }
 } SelectIndex_syntax;
 
