@@ -1,12 +1,16 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Kolloid skrift
-
 * m og M
 
 Brug gammel version af hs til udregning af gs
 
 Find Leuning 1995 for forklaring.
+
+log photo
+
+(deflog Farquhar
+  (component shadow)
+  (layer 0)
 
 * q_primary? 25
 
@@ -17,10 +21,6 @@ Det er den ikke, snak med MMO
 * Rejseforsikring?
 
 * SAFIR
-
-** D3_2
-
-Få Sørens godkendelse.  Send til Ragab.
 
 ** Opdater årsrapport
 
