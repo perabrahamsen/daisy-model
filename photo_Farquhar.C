@@ -209,10 +209,6 @@ PhotoFarquhar::assimilate (const Units& units,
   double Ass_ = 0.0;
   double pn = 0.0;
 
-  //only the sunlit fraction is logged.
-  fraction_sun = 0.0;
-  sun_LAI = 0.0;
-
   // Accumulated CAI, for testing purposes.
   double accCAI =0.0;
 
@@ -237,9 +233,9 @@ PhotoFarquhar::assimilate (const Units& units,
   // Brutto assimilate production (for logging)
   while (Ass_vector.size () < No)
     Ass_vector.push_back (0.0);
-  // sunlit LAI (for logging)
-  while (sun_LAI_vector.size () < No)
-    sun_LAI_vector.push_back (0.0);
+  // LAI (for logging)
+  while (LAI_vector.size () < No)
+    LAI_vector.push_back (0.0);
 
   rubiscoNdist->rubiscoN_distribution (units,
                                        PAR_height, prevLA, DS,
@@ -253,10 +249,8 @@ PhotoFarquhar::assimilate (const Units& units,
     ci_vector.push_back (0.0);//[Pa]
 
   // Stomata conductance (for logging)
-  while (gs_vector.size () < No)         //total (sun+shade)
+  while (gs_vector.size () < No)
     gs_vector.push_back (0.0);//[m/s]
-  while (gs_sun_vector.size () < No)     //sunlit  
-    gs_sun_vector.push_back (0.0);//[m/s]
      
   // CAI in each interval.
   const double dCAI = PAR_LAI / No;
@@ -334,22 +328,19 @@ PhotoFarquhar::assimilate (const Units& units,
 	  Ass_vector[i]+= pn_* (molWeightCH2O / molWeightCO2) * LA;//[g CH2O/m²area/h]
 	  Nleaf_vector[i]+= rubisco_Ndist[i] * LA * fraction[i]; //[mol N/m²area]OK
 	  gs_vector[i]+= gsw * LA * fraction[i];     //[mol/m² area/s]
-	  gs_sun_vector[i]= gsw * LA * fraction[i]; //[mol/m² area/s]
 	  ci_vector[i]+= ci * fraction[i];  //[Pa] OK
 	  Vm_vector[i]+= Vm_ * 1000.0 * LA * fraction[i]; //[mmol/m² area/s]OK
 	  Jm_vector[i]+= Jm_ * 1000.0 * LA * fraction[i]; //[mmol/m² area/s]OK
-	  sun_LAI_vector[i] = LA * fraction[i];//OK
+	  LAI_vector[i] += LA * fraction[i];//OK
 	  
 	  ci_middel += ci * fraction[i]/(No + 0.0);// [Pa]   OK
 	  gs += LA * gsw * fraction[i]; 
 	  Ass += LA * pn_ * (molWeightCH2O / molWeightCO2);//[g CH2O/m2 area/h] OK
-	  sun_LAI += LA * fraction[i];//OK
 	  LAI += LA * fraction[i];//OK
 	  Vmax += 1000.0 * LA * fraction[i] * Vm_;   //[mmol/m² area/s]
 	  jm += 1000.0 * LA * fraction[i] * Jm_;     //[mmol/m² area/s]
 	  leafPhotN += rubisco_Ndist[i] * LA *fraction[i]; //[mol N/m²area]; 
 	  fraction_total += fraction[i]/(No + 0.0);
-	  fraction_sun += fraction[i]/(No + 0.0);
 	}
     }
   daisy_assert (approximate (accCAI, canopy.CAI));
@@ -366,25 +357,22 @@ void
 PhotoFarquhar::clear ()
 {
   std::fill(gs_vector.begin (), gs_vector.end (), 0.0);
-  std::fill(gs_sun_vector.begin (), gs_sun_vector.end (), 0.0);
   std::fill(ci_vector.begin (), ci_vector.end (), 0.0);
   std::fill(Vm_vector.begin (), Vm_vector.end (), 0.0);
   std::fill(Jm_vector.begin (), Jm_vector.end (), 0.0);
   std::fill(Nleaf_vector.begin (), Nleaf_vector.end (), 0.0);
   std::fill(Ass_vector.begin (), Ass_vector.end (), 0.0);
-  std::fill(sun_LAI_vector.begin (), sun_LAI_vector.end (), 0.0);
+  std::fill(LAI_vector.begin (), LAI_vector.end (), 0.0);
   ci_middel = 0.0;
   gs = 0.0;
   gs_ms = 0.0;
   Ass = 0.0;
   Res = 0.0;
   PAR_ = 0.0;
-  sun_LAI = 0.0;
   LAI = 0.0;
   Vmax = 0.0;
   jm = 0.0;
   leafPhotN = 0.0;
-  fraction_sun = 0.0;
   fraction_total = 0.0;
   ABA_effect = 1.0;
 }
@@ -395,7 +383,6 @@ PhotoFarquhar::output(Log& log) const
   output_variable (Ass_vector, log);
   output_variable (Nleaf_vector, log);
   output_variable (gs_vector, log);
-  output_variable (gs_sun_vector, log);
   output_variable (ci_vector, log);
   output_variable (Vm_vector, log);
   output_variable (Jm_vector, log);
@@ -405,13 +392,11 @@ PhotoFarquhar::output(Log& log) const
   output_variable (Ass, log);
   output_variable (Res, log);
   output_variable (LAI, log);
-  output_variable (sun_LAI, log);
-  output_variable (sun_LAI_vector, log);
+  output_variable (LAI_vector, log);
   output_variable (PAR_, log);
   output_variable (Vmax, log);
   output_variable (jm, log);
   output_variable (leafPhotN, log);
-  output_variable (fraction_sun, log);
   output_variable (fraction_total, log);
   output_variable (ABA_effect, log);
 }
@@ -445,7 +430,8 @@ Xn = 1.16E-3 mol/mol/s for wheat (de Pury & Farquhar, 1997)");
     frame.set ("O2_atm", 20500.0);
 
     frame.declare ("Gamma25", "Pa", Check::positive (), Attribute::Const,
-                "CO2 compensation point of photosynthesis. Gamma25 = 3.69 Pa for wheat (Collatz et al., 1991)");
+                   "CO2 compensation point of photosynthesis.\n\ 
+Gamma25 = 3.69 Pa for wheat (Collatz et al., 1991)");
     frame.set ("Gamma25", 3.69);
 
     frame.declare ("Ea_Gamma", "J/mol", Check::positive (), Attribute::Const,
@@ -473,10 +459,9 @@ Xn = 1.16E-3 mol/mol/s for wheat (de Pury & Farquhar, 1997)");
     frame.declare ("Vm_vector", "mmol/m^2/s", Attribute::LogOnly, Attribute::CanopyCells, "Photosynthetic capacity in each layer.");
     frame.declare ("Jm_vector", "mmol/m^2/s", Attribute::LogOnly, Attribute::CanopyCells, "Potential rate of electron transport in each layer.");
     frame.declare ("gs_vector", "mol/m^2/s", Attribute::LogOnly, Attribute::CanopyCells, "Stomata cunductance in each layer.");
-    frame.declare ("gs_sun_vector", "mol/m^2/s", Attribute::LogOnly, Attribute::CanopyCells, "Stomata cunductance in sunlit fraction of each layer.");
     frame.declare ("Nleaf_vector", "mol N/m^2", Attribute::LogOnly, Attribute::CanopyCells, "Distribution of photosynthetic N-leaf.");
     frame.declare ("Ass_vector", "mol CH2O/m^2/h", Attribute::LogOnly, Attribute::CanopyCells, "Brutto assimilate.");
-    frame.declare ("sun_LAI_vector", "mol CH2O/m^2/s", Attribute::LogOnly, Attribute::CanopyCells, "sunlit LAI.");
+    frame.declare ("LAI_vector", "mol CH2O/m^2/s", Attribute::LogOnly, Attribute::CanopyCells, "LAI.");
 
     frame.declare ("ci_middel", "Pa", Attribute::LogOnly, "Stomata average CO2 pressure.");
     frame.declare ("gs", "mol/m^2/s", Attribute::LogOnly, "Stomata conductance.");
@@ -484,12 +469,10 @@ Xn = 1.16E-3 mol/mol/s for wheat (de Pury & Farquhar, 1997)");
     frame.declare ("Ass", "g CH2O/m^2/h", Attribute::LogOnly, "'Net' leaf assimilate of CO2 (brutto photosynthesis).");
     frame.declare ("Res", "g CH2O/m^2/h", Attribute::LogOnly, "Farquhar leaf respiration.");
     frame.declare ("LAI", "", Attribute::LogOnly, "Leaf area index for the canopy used in photosynthesis.");
-    frame.declare ("sun_LAI", "", Attribute::LogOnly, "Leaf area index for the sunlit fraction.");
     frame.declare ("PAR_", "mol/m^2/h", Attribute::LogOnly, "PAR.");
     frame.declare ("Vmax", "[mmol/m^2/s]", Attribute::LogOnly, "Photosynthetic Rubisco capacity.");
     frame.declare ("jm", "[mmol/m^2/s]", Attribute::LogOnly, "Potential rate of electron transport.");
     frame.declare ("leafPhotN", "[mol N/m^2]", Attribute::LogOnly, "Content of photosynthetic active leaf N.");
-    frame.declare ("fraction_sun", "", Attribute::LogOnly, "Fraction of sunlit in the canopy.");
     frame.declare ("fraction_total", "", Attribute::LogOnly, "Fraction of leaf contributing to the photosynthesis.");
 
     // Models

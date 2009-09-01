@@ -1,3 +1,10 @@
+2009-09-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_std.C (sunlit, reserved): Split out from 'LeafPhot' for
+	logging purposes.
+	* photo_Farquhar.C (sun_LAI, sun_LAI_vector, fraction_sun)
+	(gs_sun_vector): Removed.
+
 2009-08-27  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.68 released.
