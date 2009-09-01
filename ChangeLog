@@ -1,9 +1,16 @@
 2009-09-01  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 4.69 released.
+
+2009-09-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
 	* crop_std.C (sunlit, reserved): Split out from 'LeafPhot' for
 	logging purposes.
 	* photo_Farquhar.C (sun_LAI, sun_LAI_vector, fraction_sun)
 	(gs_sun_vector): Removed.
+
+	* photo_Farquhar.C (assimilate): Use absolute difference for
+	convergence.
 
 2009-08-27  Per Abrahamsen  <abraham@dina.kvl.dk>
 

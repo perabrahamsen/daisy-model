@@ -311,7 +311,8 @@ PhotoFarquhar::assimilate (const Units& units,
 		  break;
 		}
 	    }
-	  while ((lastci-ci)> 0.01);
+	  // while (std::fabs (lastci-ci)> 0.01);
+          while (std::fabs (lastci-ci)> 0.01);
 
 	  // Leaf brutto photosynthesis [gCO2/m2/h] 
 	  const double pn_ = (pn+rd) * molWeightCO2 * 3600.0;//mol CO2/m²leaf/s->g CO2/m²leaf/h
@@ -430,7 +431,7 @@ Xn = 1.16E-3 mol/mol/s for wheat (de Pury & Farquhar, 1997)");
     frame.set ("O2_atm", 20500.0);
 
     frame.declare ("Gamma25", "Pa", Check::positive (), Attribute::Const,
-                   "CO2 compensation point of photosynthesis.\n\ 
+                   "CO2 compensation point of photosynthesis.\n\
 Gamma25 = 3.69 Pa for wheat (Collatz et al., 1991)");
     frame.set ("Gamma25", 3.69);
 

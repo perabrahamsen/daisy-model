@@ -65,20 +65,17 @@ protected:
   std::vector<double> Ass_vector; // Brutto assimilate  
   std::vector<double> Jm_vector; // Potential rate of electron transport
   std::vector<double> gs_vector; // Stomata cunductance
-  std::vector<double> gs_sun_vector; // Stomata cunductance in sunlit leaves 
-  std::vector<double> sun_LAI_vector; // sunlit LAI
+  std::vector<double> LAI_vector; // LAI
   double ci_middel;              // Average stomata CO2 pressure per LAI units
   double Ass;                    // 'Netto' assimilate of CO2 
   double Res;                    // Leaf respiration of CO2 
   double LAI;                    // Leaf Area index for the canopy
-  double sun_LAI;                // Leaf Area index for the sunlit fraction
   double PAR_;                   // Photosynthetic active radiation
   double gs;                     // Stomata conductance [mol m^-2 s^-1]
   double gs_ms;                  // Stomata conductance [m s^-1]
   double Vmax;                   // Photosynthetic Rubisco capacity
   double jm;                     // Potential rate of electron transport 
   double leafPhotN;              // Content of photosynthetic active leaf N
-  double fraction_sun;           // fraction of sunlit in the canopy.
   double fraction_total;         // total fraction of leaf active in photosynthesis.
   double ABA_effect;
     
