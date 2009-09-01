@@ -109,9 +109,11 @@ PhotoFarquhar:: Sat_vapor_pressure (const double T /*[degree C]*/) const
 }
 
 double
-PhotoFarquhar:: GSTModel(const double CO2_atm, double ABA_effect, double pn, double rel_hum /*[unitless]*/, 
-			 double LA, double fraction, double gbw/*[mol/m2 leaf/s]*/, 
-			 const double Tc, const double Tl, Treelog& msg) 
+PhotoFarquhar::GSTModel (const double CO2_atm, double ABA_effect, double pn,
+                         double rel_hum /*[unitless]*/, 
+                         double LA, double fraction,
+                         double gbw/*[mol/m2 leaf/s]*/, 
+                         const double Tc, const double Tl, Treelog& msg) 
 {
 
   const double wsf = ABA_effect; //water stress function []
