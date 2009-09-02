@@ -1,5 +1,11 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* (index index)
+
+check cycliske refererence.
+
+Vi skal have et "set" i block, og en add/remove class.
+
 * m og M
 
 Brug gammel version af hs til udregning af gs
