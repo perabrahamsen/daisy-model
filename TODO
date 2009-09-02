@@ -12,6 +12,12 @@ log photo
   (component shadow)
   (layer 0)
 
+cs_vector
+hs_vector
+Gamma
+
+skal gs_vector være per LAI?
+
 * q_primary? 25
 
 Find ud af om J er ok for indre knuder.

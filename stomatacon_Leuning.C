@@ -53,18 +53,20 @@ private:
 
 double
 StomataCon_Leuning::stomata_con (double wsf /*[]*/, const double m /*[]*/,
-                            const double , const double pz /*[mol/m²leaf/s]*/,
-                            const double Ptot /*[Pa]*/, const double cs /*[Pa]*/,
-                            const double Gamma /*[Pa]*/, 
-                            const double intercept /*[mol/m²leaf/s]*/, const double,
-                            const double Ds /*[Pa]*/, Treelog& msg)
+                                 const double,
+                                 const double pz /*[mol/m²leaf/s]*/,
+                                 const double Ptot /*[Pa]*/,
+                                 const double cs /*[Pa]*/,
+                                 const double Gamma /*[Pa]*/, 
+                                 const double intercept /*[mol/m²leaf/s]*/,
+                                 const double,
+                                 const double Ds /*[Pa]*/, Treelog& msg)
 {
   daisy_assert (cs > Gamma);
   daisy_assert (cs > 0.0);
   daisy_assert (Gamma >= 0.0);
   daisy_assert (pz > 0.0);
   daisy_assert (Ds > 0.0);
-  daisy_assert (Do > 0.0);
  
   if (!(wsf > 0.0))
     {
@@ -91,7 +93,7 @@ static struct StomataConLeuningSyntax : public DeclareModel
   void load_frame (Frame& frame) const
   {
 
-    frame.declare ("Do", "[Pa]", Check::non_negative (), Attribute::Const,
+    frame.declare ("Do", "[Pa]", Check::positive (), Attribute::Const,
                 "Coefficient, value after Leuning (1995)");
     frame.set ("Do", 1500.);
 

@@ -64,13 +64,17 @@ protected:
   std::vector<double> Nleaf_vector; // Distribution of photosynthetic N-leaf  
   std::vector<double> Ass_vector; // Brutto assimilate  
   std::vector<double> Jm_vector; // Potential rate of electron transport
+  std::vector<double> cs_vector; // Leaf surface CO2
+  std::vector<double> hs_vector; // Relative humidity at leaf surface
   std::vector<double> gs_vector; // Stomata cunductance
+  
   std::vector<double> LAI_vector; // LAI
   double ci_middel;              // Average stomata CO2 pressure per LAI units
   double Ass;                    // 'Netto' assimilate of CO2 
   double Res;                    // Leaf respiration of CO2 
   double LAI;                    // Leaf Area index for the canopy
   double PAR_;                   // Photosynthetic active radiation
+  double Gamma;
   double gs;                     // Stomata conductance [mol m^-2 s^-1]
   double gs_ms;                  // Stomata conductance [m s^-1]
   double Vmax;                   // Photosynthetic Rubisco capacity
@@ -88,7 +92,8 @@ public:
   double Sat_vapor_pressure (const double T) const;
   double GSTModel(const double CO2_atm, double ABA, double pn, double vp_ref, 
 		  const double LA, const double fraction, const double Ta, 
-		  const double Tl, double gb, Treelog& msg);
+		  const double Tl, double gb, double& hs, double& cs,
+                  Treelog& msg);
   double stomata_conductance() const; // [m s^-1]
 private:
   virtual double respiration_rate (const double Vm_25, const double Tl) const = 0;

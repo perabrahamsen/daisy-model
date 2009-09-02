@@ -6,6 +6,15 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.69
+
+** Better logging for Farquhar photosynthesis.
+
+You can now log photosynthesis for shadow, sunlit and resereved leaves
+seperately.
+
+** Fixed bug in Farquhar photosynthesis.
+
 * 4.68
 
 ** New 'K' parameter in the 'pressure' secondary domain model.
