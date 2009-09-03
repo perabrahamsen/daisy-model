@@ -64,6 +64,7 @@ protected:
   std::vector<double> Nleaf_vector; // Distribution of photosynthetic N-leaf  
   std::vector<double> Ass_vector; // Brutto assimilate  
   std::vector<double> Jm_vector; // Potential rate of electron transport
+  std::vector<double> pn_vector; // Net photosynthesis
   std::vector<double> cs_vector; // Leaf surface CO2
   std::vector<double> hs_vector; // Relative humidity at leaf surface
   std::vector<double> gs_vector; // Stomata cunductance

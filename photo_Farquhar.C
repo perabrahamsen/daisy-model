@@ -109,17 +109,21 @@ PhotoFarquhar:: Sat_vapor_pressure (const double T /*[degree C]*/) const
 }
 
 double
-PhotoFarquhar::GSTModel (const double CO2_atm, double ABA_effect, double pn,
-                         double rel_hum /*[unitless]*/, 
-                         double LA, double fraction,
-                         double gbw/*[mol/m2 leaf/s]*/, 
-                         const double Tc, const double Tl, double& hs,
-                         double& cs, Treelog& msg) 
+PhotoFarquhar::GSTModel (const double CO2_atm,
+                         const double ABA_effect, 
+                         const double pn,
+                         const double rel_hum /*[unitless]*/, 
+                         const double LA, 
+                         const double fraction,
+                         const double gbw /*[mol/m2 leaf/s]*/, 
+                         const double Tc, 
+                         const double Tl, 
+                         double& hs, double& cs, Treelog& msg) 
 {
 
   const double wsf = ABA_effect; //water stress function []
 
-  const double intercept = b * LA * fraction; // min conductance 
+  const double intercept = b /* * LA * fraction */; // min conductance 
   daisy_assert (gbw >0.0);
   const double rbw = 1./gbw;   //[s*m2 leaf/mol]
 
@@ -207,7 +211,6 @@ PhotoFarquhar::assimilate (const Units& units,
 
   // Assimilate produced by canopy photosynthesis
   double Ass_ = 0.0;
-  double pn = 0.0;
 
   // Accumulated CAI, for testing purposes.
   double accCAI =0.0;
@@ -244,13 +247,17 @@ PhotoFarquhar::assimilate (const Units& units,
   crop_Vmax_total (rubisco_Ndist, crop_Vm_total);  
 
 
+  // Net photosynthesis (for logging)
+  while (pn_vector.size () < No)
+    pn_vector.push_back (0.0);//
+
   // Stomata CO2 pressure (for logging)
   while (ci_vector.size () < No)
     ci_vector.push_back (0.0);//[Pa]
 
   // Leaf surface CO2 pressure  (for logging)
   while (cs_vector.size () < No)
-    cs_vector.push_back (0.0);//[Pa]
+    cs_vector.push_back (0.0);//
 
   // Leaf surface relative humidity (for logging)
   while (hs_vector.size () < No)
@@ -296,6 +303,7 @@ PhotoFarquhar::assimilate (const Units& units,
 	  daisy_assert (rd >= 0.0);
 
 	  //solving photosynthesis and stomatacondctance model for each layer
+          double& pn = pn_vector[i];
 	  double ci  = 0.5 * CO2_atm;//first guess for ci, [Pa]
           double& hs = hs_vector[i];
           hs = 0.5;              // first guess of hs []
@@ -342,8 +350,8 @@ PhotoFarquhar::assimilate (const Units& units,
 	  //log variables:
 	  Ass_vector[i]+= pn_* (molWeightCH2O / molWeightCO2) * LA;//[g CH2O/m²area/h]
 	  Nleaf_vector[i]+= rubisco_Ndist[i] * LA * fraction[i]; //[mol N/m²area]OK
-	  gs_vector[i]+= gsw * LA * fraction[i];     //[mol/m² area/s]
-	  ci_vector[i]+= ci * fraction[i];  //[Pa] OK
+	  gs_vector[i]+= gsw /* * LA * fraction[i] */;     //[mol/m² area/s]
+	  ci_vector[i]+= ci /* * fraction[i] */;  //[Pa] OK
 	  Vm_vector[i]+= Vm_ * 1000.0 * LA * fraction[i]; //[mmol/m² area/s]OK
 	  Jm_vector[i]+= Jm_ * 1000.0 * LA * fraction[i]; //[mmol/m² area/s]OK
 	  LAI_vector[i] += LA * fraction[i];//OK
@@ -397,6 +405,7 @@ PhotoFarquhar::output(Log& log) const
 {
   output_variable (Ass_vector, log);
   output_variable (Nleaf_vector, log);
+  output_variable (pn_vector, log);
   output_variable (cs_vector, log);
   output_variable (hs_vector, log);
   output_variable (gs_vector, log);
@@ -475,11 +484,16 @@ Gamma25 = 3.69 Pa for wheat (Collatz et al., 1991)");
     frame.declare ("ci_vector", "Pa", Attribute::LogOnly, Attribute::CanopyCells, "CO2 pressure in Stomatal in each layer.");
     frame.declare ("Vm_vector", "mmol/m^2/s", Attribute::LogOnly, Attribute::CanopyCells, "Photosynthetic capacity in each layer.");
     frame.declare ("Jm_vector", "mmol/m^2/s", Attribute::LogOnly, Attribute::CanopyCells, "Potential rate of electron transport in each layer.");
-    frame.declare ("cs_vector", "Pa", Attribute::LogOnly, Attribute::CanopyCells, "CO2 pressure at leaf surface.");
+    frame.declare ("pn_vector", "mol/m^2 leaf/s",
+                   Attribute::LogOnly, Attribute::CanopyCells, "\
+Net photosynthesis.");
+    frame.declare ("cs_vector", "Pa", 
+                   Attribute::LogOnly, Attribute::CanopyCells, "\
+CO2 pressure at leaf surface.");
     frame.declare_fraction ("hs_vector", 
                             Attribute::LogOnly, Attribute::CanopyCells, "\
 Relative humidity at leaf surface.");
-    frame.declare ("gs_vector", "mol/m^2/s", Attribute::LogOnly, Attribute::CanopyCells, "Stomata cunductance in each layer.");
+    frame.declare ("gs_vector", "mol/m^2 leaf/s", Attribute::LogOnly, Attribute::CanopyCells, "Stomata cunductance in each layer.");
     frame.declare ("Nleaf_vector", "mol N/m^2", Attribute::LogOnly, Attribute::CanopyCells, "Distribution of photosynthetic N-leaf.");
     frame.declare ("Ass_vector", "mol CH2O/m^2/h", Attribute::LogOnly, Attribute::CanopyCells, "Brutto assimilate.");
     frame.declare ("LAI_vector", "mol CH2O/m^2/s", Attribute::LogOnly, Attribute::CanopyCells, "LAI.");
