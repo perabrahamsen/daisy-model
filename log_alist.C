@@ -361,16 +361,19 @@ LogSubmodel::close_alist ()
 }
 void
 LogSubmodel::open_derived (const symbol field, const symbol type, 
-                        const char *const library)
+                           const char *const library)
 { 
-  if (!frame_entry ().check (field))
+  if (frame_entry ().is_log (field))
+    open_ignore ();
+  else if (frame_entry ().check (field))
+    open_object (field, type, frame_entry ().model (field), library);
+  else
     {
       std::ostringstream tmp;
       tmp << "No field '" << field << "' (type " << type
           << ") within library '" << library << "'";
       daisy_panic (tmp.str ());
     }
-  open_object (field, type, frame_entry ().model (field), library);
 }
 	
 void

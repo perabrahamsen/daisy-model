@@ -1,3 +1,15 @@
+2009-09-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.70 released.
+
+2009-09-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* photo_Farquhar.C (GSTModel): Don't multiply b with LA.
+	(gs_vector): Don't multiply with LA.
+	(pn_vector, hs_vector, cs_vector, Gamma): New log variables.
+
+	* log_alist.C (open_derived): Ignore LogOnly objects.
+
 2009-09-01  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.69 released.

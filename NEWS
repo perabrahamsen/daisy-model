@@ -6,6 +6,8 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+** More Farquhar photosynthesis logging.
+
 * 4.69
 
 ** Better logging for Farquhar photosynthesis.
