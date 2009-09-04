@@ -3550,4 +3550,66 @@ nowhere go to.  For typical setups, this value will be zero.")
                    (spec movement vertical solute_failure_level)
                    (handle max))))
 
+(deflog LeafPhot crop
+  "Select a fraction and layer for leaf photosynthesis."
+  (declare fraction String
+	   "Leaf fraction to log.  Either 'LeafPhot', 'sunlit', or 'reserved'.
+If the light distribution model distinguish between sunlit and show leaves,
+the 'LeafPhot' will give you shadow leaves.  Otherwise, 'LeafPhot' will 
+cover all non-reserved leaves, and 'sunlit' will be empty.  The 'reserved'
+fraction will always give you leaves reserved to this crop in a multi-crop 
+system, and never distinguish between sunlit and shadow leaves.")
+  (fraction "LeafPhot")
+  (declare layer Integer
+           "Layer to log.  Layer 0 is the top of the vegetation.
+The bottom of the vegetation is the value of the 'NoOfIntervals' 
+parameter in the 'default' bioclimate model.  By default, 30."))
+
+(deflog Stomatacon LeafPhot
+  "Stomata conductivity related state."
+  (where "sc-${fraction}-${layer}.dlf")
+  (when hourly)
+  (entries (index (path column "${column}" Vegetation crops crops "${crop}"
+                        "${fraction}" "*" LAI_vector)
+                  (index $layer)
+                  (spec photosynthesis Farquhar LAI_vector)
+                  (handle current))
+           (index (path column "${column}" Vegetation crops crops "${crop}"
+                        "${fraction}" "*" gs_vector)
+                  (index $layer)
+                  (spec photosynthesis Farquhar gs_vector)
+                  (handle current))
+           (index (path column "${column}" Vegetation crops crops "${crop}"
+                        "${fraction}" "*" hs_vector)
+                  (index $layer)
+                  (spec photosynthesis Farquhar hs_vector)
+                  (handle current))
+           (index (path column "${column}" Vegetation crops crops "${crop}"
+                        "${fraction}" "*" pn_vector)
+                  (index $layer)
+                  (spec photosynthesis Farquhar pn_vector)
+                  (handle current))
+           (index (path column "${column}" Vegetation crops crops "${crop}"
+                        "${fraction}" "*" cs_vector)
+                  (index $layer)
+                  (spec photosynthesis Farquhar cs_vector)
+                  (handle current))
+           (number (dimension "ng/cm^3")
+		   (path column "${column}" 
+			 Vegetation crops crops "${crop}" Root ABAConc)
+		   (spec fixed RootSystem ABAConc)
+                   (handle current))
+           (number (path column "${column}" 
+			 Vegetation crops crops "${crop}" Root h_x)
+		   (spec fixed RootSystem h_x)
+                   (handle current))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         "${fraction}" "*" ABA_effect)
+                   (spec photosynthesis Farquhar ABA_effect)
+                   (handle current))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         "${fraction}" "*" Gamma)
+                   (spec photosynthesis Farquhar Gamma)
+                   (handle current))))
+
 ;;; log.dai ends here
