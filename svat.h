@@ -60,6 +60,7 @@ public:
   virtual double CanopyTemperature () const = 0; // [dg C]
   virtual double SunLeafTemperature () const = 0; // [dg C]
   virtual double ShadowLeafTemperature () const = 0; // [dg C]
+  virtual double CanopyVapourPressure () const = 0;  // [Pa]
 
   // Create and Destroy.
 protected:

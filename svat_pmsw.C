@@ -1322,6 +1322,7 @@ public:
   double CanopyTemperature () const; // [dg C]
   double SunLeafTemperature () const; // [dg C]
   double ShadowLeafTemperature () const; // [dg C]
+  double CanopyVapourPressure () const;  // [Pa]
 
   void solve (const double /* stomata cond. [mol/m^2/s]*/, Treelog&);
 
@@ -1358,6 +1359,10 @@ SVAT_PMSW::SunLeafTemperature () const
 double 
 SVAT_PMSW::ShadowLeafTemperature () const
 { return tleaf; }  // [dg C]
+
+double 
+SVAT_PMSW::CanopyVapourPressure () const
+{ return e_c; }  // [Pa]
 
 void 
 SVAT_PMSW::solve (const double /* stomata cond. [mol/m^2/s]*/, Treelog&) 

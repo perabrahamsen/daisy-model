@@ -25,19 +25,22 @@
 #include "bioclimate.h"
 #include "librarian.h"
 #include "frame.h"
+#include "weather.h"
 
 struct SVAT_none : public SVAT
 {
   double crop_ea;
   double T_a;
+  double e_c;
 
   // Simulation.
-  void tick (const Weather&, const Vegetation&,
+  void tick (const Weather& weather, const Vegetation&,
 	     const Geometry&, const Soil&, const SoilHeat&,
 	     const SoilWater&, const Bioclimate& bio, Treelog&)
   { 
     crop_ea = bio.crop_ea();
     T_a = bio.daily_air_temperature ();
+    e_c = weather.vapor_pressure ();
   }
   double production_stress () const
   { return -1; }
@@ -56,6 +59,9 @@ struct SVAT_none : public SVAT
 
   double ShadowLeafTemperature () const
   { return T_a; }  // [dg C]
+
+  double CanopyVapourPressure () const
+  { return e_c; }               // [Pa]
 
   // Create.
   SVAT_none (const BlockModel& al)

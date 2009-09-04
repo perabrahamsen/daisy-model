@@ -1,28 +1,22 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* (index index)
+* photo Farquhar
 
-check cycliske refererence.
+** Erstat Farquhar e_sat med FAO_e_sat
 
-Vi skal have et "set" i block, og en add/remove class.
+** Ptot and O2_atm should be read from weather/bioclimate.
 
-* m og M
+** gbw should come from svat
 
-Brug gammel version af hs til udregning af gs
+** find hs from 
 
-Find Leuning 1995 for forklaring.
+     gs  * estar + gb * ec
+es = ---------------------
+       g_b + g_s
 
-log photo
+should be calculated in svat
 
-(deflog Farquhar
-  (component shadow)
-  (layer 0)
-
-cs_vector
-hs_vector
-Gamma
-
-skal gs_vector være per LAI?
+maybe converted to hs?
 
 * q_primary? 25
 

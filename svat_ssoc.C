@@ -191,6 +191,9 @@ struct SVAT_SSOC : public SVAT
   double ShadowLeafTemperature () const
   { return T_shadow - TK; }  // [dg C]
 
+  double CanopyVapourPressure () const
+  { return e_c; }               // [Pa]
+
   void output(Log& log) const;
 
   // Create.

@@ -127,7 +127,11 @@ PhotoFarquhar::GSTModel (const double CO2_atm,
   daisy_assert (gbw >0.0);
   const double rbw = 1./gbw;   //[s*m2 leaf/mol]
 
-  //leaf surface CO2
+  //leaf surface CO2 
+  // We really should use CO2_canopy instead of CO2_atm below.  Adding
+  // the resitence from canopy point to atmostphere is not a good
+  // workaround, as it will ignore sources such as the soil and stored
+  // CO2 from night respiration.
   cs = CO2_atm - (1.4 * pn * Ptot * rbw); //[Pa] 
   daisy_assert (cs > 0.0);
 
@@ -138,6 +142,8 @@ PhotoFarquhar::GSTModel (const double CO2_atm,
   else 
     pz = pn;
 
+#define LEUNING_HS
+#ifdef LEUNING_HS
   // Saturated vapor pressure in the air
   const double va = rel_hum * Sat_vapor_pressure (Tc);
   const double wa = va / Ptot;    //[unitless] 
@@ -155,6 +161,9 @@ PhotoFarquhar::GSTModel (const double CO2_atm,
     hs = 0.9;
 
   const double Ds = wi * (1.0 - hs) * Ptot; 
+#else
+  
+#endif
 
   //stomatal conductance
   double gsw; 
@@ -413,6 +422,7 @@ PhotoFarquhar::output(Log& log) const
   output_variable (Vm_vector, log);
   output_variable (Jm_vector, log);
   output_variable (ci_middel, log);
+  output_variable (Gamma, log);
   output_variable (gs, log);
   output_variable (gs_ms, log);
   output_variable (Ass, log);
@@ -496,7 +506,7 @@ Relative humidity at leaf surface.");
     frame.declare ("gs_vector", "mol/m^2 leaf/s", Attribute::LogOnly, Attribute::CanopyCells, "Stomata cunductance in each layer.");
     frame.declare ("Nleaf_vector", "mol N/m^2", Attribute::LogOnly, Attribute::CanopyCells, "Distribution of photosynthetic N-leaf.");
     frame.declare ("Ass_vector", "mol CH2O/m^2/h", Attribute::LogOnly, Attribute::CanopyCells, "Brutto assimilate.");
-    frame.declare ("LAI_vector", "mol CH2O/m^2/s", Attribute::LogOnly, Attribute::CanopyCells, "LAI.");
+    frame.declare ("LAI_vector", "m^2 leaf/m^2 field", Attribute::LogOnly, Attribute::CanopyCells, "LAI.");
 
     frame.declare ("ci_middel", "Pa", Attribute::LogOnly, "Stomata average CO2 pressure.");
     frame.declare ("Gamma", "Pa", Attribute::LogOnly, "\
