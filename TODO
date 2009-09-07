@@ -2,21 +2,13 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * photo Farquhar
 
-** Erstat Farquhar e_sat med FAO_e_sat
-
 ** Ptot and O2_atm should be read from weather/bioclimate.
 
 ** gbw should come from svat
 
-** find hs from 
+** Fjern (inlejr) GSTModel
 
-     gs  * estar + gb * ec
-es = ---------------------
-       g_b + g_s
-
-should be calculated in svat
-
-maybe converted to hs?
+** Flyt "m" til stomatacon
 
 * q_primary? 25
 
