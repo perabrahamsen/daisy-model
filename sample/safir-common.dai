@@ -48,8 +48,10 @@ Based on data collected by Fulai Liu, 2007."
   (ABAeffect ABA-exp 
        (alpha 0.7368)
        ;; k = 0.0062 cm^3 nmol^-1 
-       ;; k = (0.0062 * 1.0e-9 / 264.32) cm^3 g^-1 = 23456e-9 cm^3 g^-1
-       (k 23456e-9 [cm^3/g]))
+       ;; OLD: k = (0.0062 * 1.0e-9 / 264.32) cm^3 g^-1 = 23456e-9 cm^3 g^-1
+       ;; NEW: k = (0.0062 / (1.0e-9 * 264.32)) cm^3 g^-1 = 23456 cm^3 g^-1
+       
+       (k 23456 [cm^3/g]))
   ;; Minimal stomatal conductance for potatos (Fuilai et al., 2005)
   (b 0.1074 [mol/m^2/s])
   ;; Slope coefficient in Ball model for potatoes (Fuilai, personal comm.)

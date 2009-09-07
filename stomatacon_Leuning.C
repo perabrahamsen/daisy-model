@@ -66,7 +66,7 @@ StomataCon_Leuning::stomata_con (double wsf /*[]*/, const double m /*[]*/,
   daisy_assert (cs > 0.0);
   daisy_assert (Gamma >= 0.0);
   daisy_assert (pz > 0.0);
-  daisy_assert (Ds > 0.0);
+  daisy_assert (Ds >= 0.0);
  
   if (!(wsf > 0.0))
     {

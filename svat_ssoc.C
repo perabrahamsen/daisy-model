@@ -377,12 +377,12 @@ SVAT_SSOC::calculate_conductances (const double g_s /* stomata cond. [m/s]*/, Tr
     {
       //Sunlit fraction --------------------------------------------------
       const double LAI_sun = LAI * sun_LAI_fraction_total;
-      const double gbu_sun_heat = Resistance::gbu_sun(gbu_heat, LAI, kb);
+      const double gbu_sun_heat = Resistance::gbu_sun(gbu_heat, kb, LAI);
       const double gbf_sun_heat = Resistance::gbf_sun(gbf_heat, LAI_sun);
       // Heat cunductance from sunlit leaves to canopy point
       g_H_sun_c = gbu_sun_heat + gbf_sun_heat; 
       
-      const double gbu_sun_H2O = Resistance::gbu_sun (gbu_H2O, LAI, kb);
+      const double gbu_sun_H2O = Resistance::gbu_sun (gbu_H2O, kb, LAI);
       const double gbf_sun_H2O = Resistance::gbf_sun(gbf_H2O, LAI_sun);
       // Water conductance from sunlit leaves to canopy point
       // - sum of boundary and stomata
@@ -392,12 +392,12 @@ SVAT_SSOC::calculate_conductances (const double g_s /* stomata cond. [m/s]*/, Tr
       
       //Shadow fraction --------------------------------------------------
       const double LAI_shadow = LAI * (1. - sun_LAI_fraction_total);
-      const double gbu_shadow_heat = Resistance::gbu_shadow (gbu_heat, LAI, kb);
+      const double gbu_shadow_heat = Resistance::gbu_shadow (gbu_heat, kb, LAI);
       const double gbf_shadow_heat = Resistance::gbf_shadow (gbf_heat, LAI_shadow);
       // Heat conductance from shadow leaves to canopy point
       g_H_shadow_c = gbu_shadow_heat + gbf_shadow_heat;
       
-      const double gbu_shadow_H2O = Resistance::gbu_shadow (gbu_H2O, LAI, kb);
+      const double gbu_shadow_H2O = Resistance::gbu_shadow (gbu_H2O, kb, LAI);
       const double gbf_shadow_H2O = Resistance::gbf_shadow (gbf_H2O, LAI_shadow);
       // Water conductance from shadow leaves to canopy point 
       // - sum of boundary and stomata
@@ -405,16 +405,15 @@ SVAT_SSOC::calculate_conductances (const double g_s /* stomata cond. [m/s]*/, Tr
         + 1./(g_s * (1.-sun_LAI_fraction_total));
       g_W_shadow_c =1./r_W_shadow_c;
     }
-
-  if(!has_light)
+  else
     {
       //Only one (shadow) fraction --------------------------------------------------
-      const double gbu_leaf_heat = Resistance::gbu_shadow(gbu_heat, LAI, kb);
+      const double gbu_leaf_heat = Resistance::gbu_shadow(gbu_heat, kb, LAI);
       const double gbf_leaf_heat = Resistance::gbf_shadow(gbf_heat, LAI);
       // Heat cunductance from sunlit leaves to canopy point
       g_H_leaf_c = gbu_leaf_heat + gbf_leaf_heat; 
       
-      const double gbu_leaf_H2O = Resistance::gbu_shadow (gbu_H2O, LAI, kb);
+      const double gbu_leaf_H2O = Resistance::gbu_shadow (gbu_H2O, kb, LAI);
       const double gbf_leaf_H2O = Resistance::gbf_shadow(gbf_H2O, LAI);
       // Water conductance from leaves to canopy point
       // - sum of boundary and stomata

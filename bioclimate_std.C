@@ -128,9 +128,6 @@ struct BioclimateStandard : public Bioclimate
   double production_stress;     // Stress calculated by SVAT module.
 
   // Bioclimate canopy
-  double CanopyTemperature;     // Canopy temperature
-  double SunLeafTemperature;    // Sunlit leaf temperature
-  double ShadowLeafTemperature; // Shadow leaf temperature
   double wind_speed_field_;     // wind speed at screen height above the canopy [m/s]
   double wind_speed_weather;    // measured wind speed [m/s]
 
@@ -180,7 +177,6 @@ struct BioclimateStandard : public Bioclimate
   double daily_global_radiation_; // From weather [W/m2]
   double global_radiation_; // From weather [W/m2]
   double atmospheric_CO2_;         // From weather [Pa]
-  double atmospheric_relative_humidity_; // From weather []
 
   // Simulation
   void tick (const Units&, const Time&, Surface&, const Weather&, 
@@ -225,11 +221,13 @@ struct BioclimateStandard : public Bioclimate
   double daily_air_temperature () const
   { return daily_air_temperature_; }
   double canopy_temperature () const
-  { return CanopyTemperature; }
+  { return svat->CanopyTemperature (); }
+  double canopy_vapour_pressure () const
+  { return svat->CanopyVapourPressure (); }
   double sun_leaf_temperature () const
-  { return SunLeafTemperature; }
+  { return svat->SunLeafTemperature (); }
   double shadow_leaf_temperature () const
-  { return ShadowLeafTemperature; }
+  { return svat->ShadowLeafTemperature (); }
   double daily_precipitation () const
   { return daily_precipitation_; }
   double day_length () const
@@ -242,8 +240,6 @@ struct BioclimateStandard : public Bioclimate
   { return direct_rain_; }
   double atmospheric_CO2 () const
   { return atmospheric_CO2_; }
-  double atmospheric_relative_humidity () const
-  { return atmospheric_relative_humidity_; }
 
   // Manager.
   void irrigate_overhead (double flux, double temp);
@@ -433,8 +429,7 @@ BioclimateStandard::BioclimateStandard (const BlockModel& al)
     day_length_ (0.0),
     daily_global_radiation_ (0.0),
     global_radiation_ (0.0),
-    atmospheric_CO2_ (-42.42e42),
-    atmospheric_relative_humidity_ (-42.42e42)
+    atmospheric_CO2_ (-42.42e42)
 { }
 
 void 
@@ -897,7 +892,6 @@ BioclimateStandard::tick (const Units& units, const Time& time,
   daily_precipitation_ = weather.daily_precipitation ();
   day_length_ = weather.day_length ();
   atmospheric_CO2_ = weather.CO2 ();
-  atmospheric_relative_humidity_ = weather.relative_humidity ();
 
   // Add deposition. 
   const Unit& u_h = units.get_unit (Units::h ());
@@ -971,10 +965,6 @@ BioclimateStandard::tick (const Units& units, const Time& time,
       wind_speed_field_ = (u_star / k) * log((ScreenHeight1 - d)/z);
     }
   daisy_assert (wind_speed_field_ >= 0.0);
-
-  CanopyTemperature = svat->CanopyTemperature();  //[dg C]
-  SunLeafTemperature = svat->SunLeafTemperature();  //[dg C]
-  ShadowLeafTemperature = svat->ShadowLeafTemperature();  //[dg C]
 }
 
 void 
@@ -1032,9 +1022,6 @@ BioclimateStandard::output (Log& log) const
   output_value (crop_ea_, "crop_ea", log);
   output_variable (production_stress, log);
 
-  output_variable (CanopyTemperature, log);
-  output_variable (SunLeafTemperature, log);
-  output_variable (ShadowLeafTemperature, log);
   output_value (wind_speed_field_, "wind_speed_field", log);  
   output_variable (wind_speed_weather, log);
 

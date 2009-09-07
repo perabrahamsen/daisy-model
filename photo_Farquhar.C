@@ -38,6 +38,7 @@
 #include "check.h"
 #include "librarian.h"
 #include "frame.h"
+#include "fao.h"
 #include <sstream>
 
 PhotoFarquhar::PhotoFarquhar (const BlockModel& al)
@@ -110,60 +111,14 @@ PhotoFarquhar:: Sat_vapor_pressure (const double T /*[degree C]*/) const
 
 double
 PhotoFarquhar::GSTModel (const double CO2_atm,
-                         const double ABA_effect, 
+                         const double wsf /* [] */,
                          const double pn,
-                         const double rel_hum /*[unitless]*/, 
-                         const double LA, 
-                         const double fraction,
-                         const double gbw /*[mol/m2 leaf/s]*/, 
-                         const double Tc, 
-                         const double Tl, 
-                         double& hs, double& cs, Treelog& msg) 
+                         const double hs /* [] */, 
+                         const double Ds /* [Pa] */,
+                         const double cs /* [Pa] */,
+                         Treelog& msg) 
 {
-
-  const double wsf = ABA_effect; //water stress function []
-
   const double intercept = b /* * LA * fraction */; // min conductance 
-  daisy_assert (gbw >0.0);
-  const double rbw = 1./gbw;   //[s*m2 leaf/mol]
-
-  //leaf surface CO2 
-  // We really should use CO2_canopy instead of CO2_atm below.  Adding
-  // the resitence from canopy point to atmostphere is not a good
-  // workaround, as it will ignore sources such as the soil and stored
-  // CO2 from night respiration.
-  cs = CO2_atm - (1.4 * pn * Ptot * rbw); //[Pa] 
-  daisy_assert (cs > 0.0);
-
-  //Net photosynthesis
-  double pz; //[mol/m²leaf/s]
-  if(pn <= 0.) 
-    pz = 1.0e-12;
-  else 
-    pz = pn;
-
-#define LEUNING_HS
-#ifdef LEUNING_HS
-  // Saturated vapor pressure in the air
-  const double va = rel_hum * Sat_vapor_pressure (Tc);
-  const double wa = va / Ptot;    //[unitless] 
-  // Relative saturated vapor pressure at the leaf surface
-  const double wi = Sat_vapor_pressure (Tl) / Ptot;
-
-  // Interpolation between limiting factors.
-  const double aa = wsf * m * pz * Ptot /(cs-Gamma); //[mol/m2/s]
-  const double bb = intercept + (1./rbw)-(wsf * m * pz * Ptot/(cs-Gamma));//[mol/m2/s]
-  const double cc = (- wa /(wi * rbw)) - intercept;//[mol/m2/s]
-  daisy_assert (aa > 0.0);
-  // Relative humidity at leaf surface
-  hs = second_root_of_square_equation(aa, bb, cc); //[]
-  if(hs >= 1.)
-    hs = 0.9;
-
-  const double Ds = wi * (1.0 - hs) * Ptot; 
-#else
-  
-#endif
 
   //stomatal conductance
   double gsw; 
@@ -171,10 +126,11 @@ PhotoFarquhar::GSTModel (const double CO2_atm,
     gsw = intercept;//[mol/m²leaf/s]
   else 
     gsw = Stomatacon->stomata_con (wsf /*[]*/, m /*[]*/, hs /*[]*/,
-                                   pz /*[mol/m²leaf/s]*/, Ptot /*[Pa]*/, 
+                                   pn /*[mol/m²leaf/s]*/, Ptot /*[Pa]*/, 
                                    cs /*[Pa]*/, Gamma /*[Pa]*/, 
                                    intercept /*[mol/m²leaf/s]*/, 
-                                   CO2_atm /*[Pa]*/, Ds/*[Pa]*/, msg);//[mol/m²leaf/s] 
+                                   CO2_atm /*[Pa]*/, Ds/*[Pa]*/,
+                                   msg);//[mol/m²leaf/s] 
 
   return gsw; //stomatal conductance [mol/m²leaf/s]
 }
@@ -185,7 +141,8 @@ PhotoFarquhar::stomata_conductance() const
 
 double
 PhotoFarquhar::assimilate (const Units& units,
-                           const double ABA_xylem, const double psi_c, const double rel_hum, 
+                           const double ABA_xylem, const double psi_c,
+                           const double ec /* Canopy Vapour Pressure [Pa] */, 
 			   const double CO2_atm,
 			   const double, const double Tc, const double Tl,
                            const double cropN,
@@ -276,7 +233,8 @@ PhotoFarquhar::assimilate (const Units& units,
   while (gs_vector.size () < No)
     gs_vector.push_back (0.0);//[m/s]
      
-  Gamma = Arrhenius (Gamma25, Ea_Gamma, Tl);//Pa
+  Gamma = Arrhenius (Gamma25, Ea_Gamma, Tl); // [Pa]
+  const double estar = FAO::SaturationVapourPressure (Tl); // [Pa]
 
   // CAI in each interval.
   const double dCAI = PAR_LAI / No;
@@ -329,9 +287,30 @@ PhotoFarquhar::assimilate (const Units& units,
 	      //Calculating ci and "net"photosynthesis
 	      CxModel(CO2_atm, pn, ci, dPAR /*[mol/m²leaf/s]*/, 
                       gsw, Tl, vmax25, rd, msg);//[mol/m²leaf/s/fraction]
-	      gsw = GSTModel(CO2_atm, ABA_effect, pn, rel_hum, LA, 
-                             fraction[i], gbw, Tc, Tl, hs, cs,
-                             msg);//[mol/s/m²leaf/fraction]
+
+              // Vapour pressure at leaf surface. [Pa]
+              const double es = (gsw * estar + gbw * ec) / (gsw + gbw);
+              // Vapour defecit at leaf surface. [Pa]
+              const double Ds = bound (0.0, estar - es, estar);
+              // Relative humidity at leaf surface. []
+              hs = bound (0.0, es / estar, 1.0);
+
+              // Boundary layer resistance. [s*m2 leaf/mol]
+              daisy_assert (gbw >0.0);
+              const double rbw = 1./gbw;   //[s*m2 leaf/mol]
+  
+              // leaf surface CO2 [Pa]
+
+              // We really should use CO2_canopy instead of CO2_atm
+              // below.  Adding the resitence from canopy point to
+              // atmostphere is not a good workaround, as it will
+              // ignore sources such as the soil and stored CO2 from
+              // night respiration.
+              cs = CO2_atm - (1.4 * pn * Ptot * rbw); //[Pa] 
+              daisy_assert (cs > 0.0);
+
+	      gsw = GSTModel (CO2_atm, ABA_effect, pn, hs, Ds, cs, 
+                              msg);//[mol/s/m²leaf/fraction]
 
 	      iter++;
 	      if(iter > maxiter)

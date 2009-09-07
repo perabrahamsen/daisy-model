@@ -91,10 +91,9 @@ public:
   double Arrhenius (const double k25, const double Ea, double Tl) const;  
   virtual double V_m (const double Vm_25, double Tl) const = 0;
   double Sat_vapor_pressure (const double T) const;
-  double GSTModel(const double CO2_atm, double ABA, double pn, double vp_ref, 
-		  const double LA, const double fraction, const double Ta, 
-		  const double Tl, double gb, double& hs, double& cs,
-                  Treelog& msg);
+  double GSTModel(const double CO2_atm, double ABA, double pn,
+                  const double hs, const double Ds,
+		  const double cs, Treelog& msg);
   double stomata_conductance() const; // [m s^-1]
 private:
   virtual double respiration_rate (const double Vm_25, const double Tl) const = 0;

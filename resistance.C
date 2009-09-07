@@ -129,8 +129,9 @@ Resistance::gbf_fraction (const double gbf_j /*[m s¯1]*/,
 // Boundary conductance of the sunlit canopy fraction due to forced
 // convection for heat, H2O, and CO2 (j = heat, H2O, and CO2) (G9)
 double 
-Resistance::gbu_sun (const double gbu_j /*[m s¯1]*/, const double LAI /*[]*/,
-                     const double kb /*extinction coefficient []*/)
+Resistance::gbu_sun (const double gbu_j /*[m s¯1]*/,
+                     const double kb /*extinction coefficient []*/,
+                     const double LAI /*[]*/)
 {
   const double gbu_sun = gbu_j 
     * (1. - exp( - (0.5 * ku + kb) * LAI))/(0.5 * ku + kb);
@@ -140,7 +141,8 @@ Resistance::gbu_sun (const double gbu_j /*[m s¯1]*/, const double LAI /*[]*/,
 // Boundary conductance of the shadow canopy fraction due to forced
 // convection for heat, H2O, and CO2 (j = heat, H2O, and CO2) (G9)
 double 
-Resistance::gbu_shadow (const double gbu_j /*[m s¯1]*/, const double kb,  
+Resistance::gbu_shadow (const double gbu_j /*[m s¯1]*/,
+                        const double kb,  
                         const double LAI /*[m^2 m^-2]*/)
 {
   const double gbu_shadow = gbu_j 
@@ -166,6 +168,7 @@ Resistance::gbf_shadow (const double gbf_j /*[m s¯1]*/,
   const double gbf_shadow = gbf_j * LAI_shadow;
   return gbf_shadow; // [m s¯1]
 }
+
 // Boundary conductance of the sunlit and shadow canopy fraction for 
 // heat, H2O, and CO2 (j = heat, H2O, and CO2) (G10)
 double 

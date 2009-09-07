@@ -81,6 +81,7 @@ public:
   // Weather.
   virtual double daily_air_temperature () const = 0;
   virtual double canopy_temperature () const =0;
+  virtual double canopy_vapour_pressure () const = 0; // [Pa]
   virtual double sun_leaf_temperature () const =0;
   virtual double shadow_leaf_temperature () const =0;
   virtual double daily_precipitation () const = 0;
@@ -90,7 +91,6 @@ public:
   double day_fraction (double dt) const;   
   virtual double direct_rain () const = 0;
   virtual double atmospheric_CO2 () const = 0;
-  virtual double atmospheric_relative_humidity () const = 0;
 
   // Manager.
 public:
