@@ -32,10 +32,11 @@
 #include "frame.h"
 #include "block_model.h"
 #include "mathlib.h"
-#include <sstream>
 #include "check.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "resistance.h"
+#include <sstream>
 
 class PhotoFCC4 : public PhotoFarquhar
 {
@@ -55,8 +56,10 @@ public:
   double V_m (const double Vm_25, double Tl) const;
   double J_m (const double vmax25, const double T) const;
   double Qt (const double k, const double Tl, const double Qtk) const;
-  void CxModel (const double CO2_atm, double& pn, double& ci, const double Q, 
-		const double gsw, const double T, const double vmax, 
+  void CxModel (const double CO2_atm, const double Ptot, 
+                double& pn, double& ci, const double Q, 
+		const double gsw, const double gbw,
+                const double T, const double vmax, 
 		const double rd, Treelog& msg) const ;
   double respiration_rate(const double Vm_25, const double Tl) const;
   
@@ -99,9 +102,12 @@ PhotoFCC4::Qt (const double k, const double Tl, const double Qtk) const
 }
 
 void 
-PhotoFCC4::CxModel (const double CO2_atm, double& pn, double& ci/*[Pa]*/, 
+PhotoFCC4::CxModel (const double CO2_atm, 
+                    const double Ptot, double& pn, double& ci/*[Pa]*/, 
 		    const double PAR /*[mol/m²leaf/s/fraction]*/, 
-		    const double gsw /*[mol/m²/s]*/, const double T, 
+		    const double gsw /*[mol/m²/s]*/, 
+		    const double gbw /*[mol/m²/s]*/, 
+                    const double T, 
 		    const double vmax25 /*[mol/m² leaf/s/fraction]*/, 
 		    const double rd /*[mol/m² leaf/s]*/, Treelog& msg) const  
 {
@@ -111,7 +117,6 @@ PhotoFCC4::CxModel (const double CO2_atm, double& pn, double& ci/*[Pa]*/,
   daisy_assert (Vm >=0.0);
   const double kjc = Qt(kj, T, Q10k); //[mol/Pa/m²leaf/s/fraction]
 
-  daisy_assert (gbw > 0.0);
   daisy_assert (gsw > 0.0);
   double rsw = 1./gsw; // stomatal resistance to water [m²leaf*s/mol]
   
@@ -137,7 +142,7 @@ PhotoFCC4::CxModel (const double CO2_atm, double& pn, double& ci/*[Pa]*/,
 	  break;
 	}
       // Gross CO2 uptake limited by Rubisco
-      const double wc = kjc * ci /Ptot;           //[mol/m² leaf/s]
+      const double wc = kjc * ci / Ptot; //[mol/m² leaf/s]
       const double we = alpha * paab * PAR; //[mol/m²leaf/s/fraction]
       const double a = first_root_of_square_equation(theta, -(Vm+we), we*Vm); //[mol/m² leaf/s/fraction]
       const double p = first_root_of_square_equation(beta, -(a+wc), a*wc);    //[mol/m² leaf/s/fraction]

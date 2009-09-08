@@ -106,8 +106,10 @@ struct SVAT_SSOC : public SVAT
   double g_a;          // Heat conductance of atmosphere [m s^-1]
   double g_H_s_c;      // Heat conductance from soil surface to canopy point [m s^-1]
   double g_H_sun_c;    // Heat conductance from sunlit leaves to canopy point [m s^-1]
+  double gb_W_sun;     // Boundary layer water conductance for sunlit leaves [m s^-1]
   double g_W_sun_c;    // Water conductance from sunlit leaves to canopy point [m s^-1]
   double g_H_shadow_c; // Heat conductance from shadow leaves to canopy point [m s^-1]
+  double gb_W_shadow;     // Boundary layer water conductance for shadow leaves [m s^-1]
   double g_W_shadow_c; // Water conductance from shadow leaves to canopy point [m s^-1]
   double g_H_leaf_c; // Heat conductance from leaves to canopy point (night time)
   double g_W_leaf_c; // Water conductance from leaves to canopy point (night time)
@@ -194,6 +196,12 @@ struct SVAT_SSOC : public SVAT
   double CanopyVapourPressure () const
   { return e_c; }               // [Pa]
 
+  double SunBoundaryLayerWaterConductivity () const
+  { return gb_W_sun; }
+
+  double ShadowBoundaryLayerWaterConductivity () const
+  { return gb_W_shadow; }
+
   void output(Log& log) const;
 
   // Create.
@@ -231,6 +239,7 @@ SVAT_SSOC::tick (const Weather& weather, const Vegetation& vegetation,
 {
   TREELOG_MODEL (msg);
 
+  const double Ptot = weather.air_pressure (); // [Pa]
   RH = weather.relative_humidity (); // []
   T_a = weather.air_temperature () + TK; // [K]
   z_r = weather.screen_height (); // [m]
@@ -242,7 +251,7 @@ SVAT_SSOC::tick (const Weather& weather, const Vegetation& vegetation,
   h_veg = vegetation.height () / 100.; // [m]  
   w_l = vegetation.leaf_width () / 100.; // [m] 
   rho_a = Resistance:: rho_a(T_a - TK); //[kg m^-3]
-  gamma = FAO::PsychrometricConstant (Resistance::P_surf, T_a - TK); // [Pa/K]
+  gamma = FAO::PsychrometricConstant (Ptot, T_a - TK); // [Pa/K]
   e_sat_air = FAO::SaturationVapourPressure (T_a - TK); // [Pa]
   e_a = e_sat_air * RH;             // [Pa]; 
   s = FAO::SlopeVapourPressureCurve (T_a - TK); // [Pa/K]
@@ -293,6 +302,7 @@ SVAT_SSOC::tick (const Weather& weather, const Vegetation& vegetation,
   T_c = T_a; //[K]
   T_sun = T_shadow = T_s = T_0 = T_c;
   e_c = e_a;
+  gb_W_sun = gb_W_shadow = Resistance::molly2ms (T_a - TK, Ptot, 2.0);
 #endif
 }
 
@@ -383,25 +393,36 @@ SVAT_SSOC::calculate_conductances (const double g_s /* stomata cond. [m/s]*/, Tr
       g_H_sun_c = gbu_sun_heat + gbf_sun_heat; 
       
       const double gbu_sun_H2O = Resistance::gbu_sun (gbu_H2O, kb, LAI);
+      daisy_assert (gbu_sun_H2O >= 0);
       const double gbf_sun_H2O = Resistance::gbf_sun(gbf_H2O, LAI_sun);
+      daisy_assert (gbf_sun_H2O >= 0);
+      gb_W_sun = gbu_sun_H2O + gbf_sun_H2O;
+
       // Water conductance from sunlit leaves to canopy point
       // - sum of boundary and stomata
-      const double r_W_sun_c = 1./(gbu_sun_H2O + gbf_sun_H2O) 
+      const double r_W_sun_c = 1./gb_W_sun 
         + 1./(g_s * sun_LAI_fraction_total); 
       g_W_sun_c = 1./r_W_sun_c;
       
       //Shadow fraction --------------------------------------------------
       const double LAI_shadow = LAI * (1. - sun_LAI_fraction_total);
       const double gbu_shadow_heat = Resistance::gbu_shadow (gbu_heat, kb, LAI);
-      const double gbf_shadow_heat = Resistance::gbf_shadow (gbf_heat, LAI_shadow);
+      const double gbf_shadow_heat
+        = Resistance::gbf_shadow (gbf_heat, LAI_shadow);
+
       // Heat conductance from shadow leaves to canopy point
       g_H_shadow_c = gbu_shadow_heat + gbf_shadow_heat;
       
       const double gbu_shadow_H2O = Resistance::gbu_shadow (gbu_H2O, kb, LAI);
-      const double gbf_shadow_H2O = Resistance::gbf_shadow (gbf_H2O, LAI_shadow);
+      daisy_assert (gbu_shadow_H2O >= 0.0);
+      const double gbf_shadow_H2O 
+        = Resistance::gbf_shadow (gbf_H2O, LAI_shadow);
+      daisy_assert (gbf_shadow_H2O >= 0.0);
+      gb_W_shadow = gbu_shadow_H2O + gbf_shadow_H2O;
+
       // Water conductance from shadow leaves to canopy point 
       // - sum of boundary and stomata
-      const double r_W_shadow_c = 1./(gbu_shadow_H2O + gbf_shadow_H2O)
+      const double r_W_shadow_c = 1./gb_W_shadow
         + 1./(g_s * (1.-sun_LAI_fraction_total));
       g_W_shadow_c =1./r_W_shadow_c;
     }
@@ -782,9 +803,11 @@ SVAT_SSOC::output(Log& log) const
       output_variable (T_c, log);
       output_variable (g_H_s_c, log); 
       output_variable (g_H_sun_c, log);  
+      output_variable (gb_W_sun, log);
       output_variable (g_W_sun_c, log);
       output_variable (G_W_sun_c, log);
       output_variable (g_H_shadow_c, log);
+      output_variable (gb_W_shadow, log);
       output_variable (g_W_shadow_c, log);      
       output_variable (R_abs_sun, log);
       output_variable (R_abs_shadow, log);
@@ -843,8 +866,10 @@ SVAT_SSOC::SVAT_SSOC (const BlockModel& al)
     g_a (-42.42e42),
     g_H_s_c (-42.42e42),
     g_H_sun_c (-42.42e42),
+    gb_W_sun (-42.42e42),
     g_W_sun_c (-42.42e42),
     g_H_shadow_c (-42.42e42),
+    gb_W_shadow (-42.42e42),
     g_W_shadow_c (-42.42e42),
     g_H_leaf_c (-42.42e42),
     g_W_leaf_c (-42.42e42),
@@ -926,12 +951,16 @@ to reference height (screen height).");
                 "Heat conductance from soil surface to canopy point.");
     frame.declare ("g_H_sun_c", "m s^-1", Attribute::LogOnly, 
                 "Heat conductance from sunlit leaves to canopy point.");
+    frame.declare ("gb_W_sun", "m s^-1", Attribute::LogOnly, 
+                "Water conductance for sunlit leaves boundary layer.");
     frame.declare ("g_W_sun_c", "m s^-1", Attribute::LogOnly, 
                 "Water conductance from sunlit leaves to canopy point.");
     frame.declare ("G_W_sun_c", "W m^-2 K^-1", Attribute::LogOnly, 
                 "Scaled water conductance from sunlit leaves to canopy point.");
     frame.declare ("g_H_shadow_c", "m s^-1", Attribute::LogOnly,
                 "Heat conductance from shadow leaves to canopy point.");
+    frame.declare ("gb_W_shadow", "m s^-1", Attribute::LogOnly, 
+                   "Water conductance for shadow leaves boundary layer.");
     frame.declare ("g_W_shadow_c", "m s^-1", Attribute::LogOnly,
                 "Water conductance from shadow leaves to canopy point.");
     frame.declare ("e_a", "Pa", Attribute::LogOnly, 

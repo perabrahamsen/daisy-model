@@ -84,6 +84,8 @@ public:
   virtual double canopy_vapour_pressure () const = 0; // [Pa]
   virtual double sun_leaf_temperature () const =0;
   virtual double shadow_leaf_temperature () const =0;
+  virtual double sun_boundary_layer_water_conductivity () const = 0; // [m/s]
+  virtual double shadow_boundary_layer_water_conductivity () const = 0; // [m/s]
   virtual double daily_precipitation () const = 0;
   virtual double day_length () const = 0;
   virtual double daily_global_radiation () const = 0;
@@ -91,6 +93,7 @@ public:
   double day_fraction (double dt) const;   
   virtual double direct_rain () const = 0;
   virtual double atmospheric_CO2 () const = 0;
+  virtual double air_pressure () const = 0;
 
   // Manager.
 public:

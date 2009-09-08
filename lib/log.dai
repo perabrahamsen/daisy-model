@@ -3610,6 +3610,10 @@ parameter in the 'default' bioclimate model.  By default, 30."))
            (number (path column "${column}" Vegetation crops crops "${crop}"
                          "${fraction}" "*" Gamma)
                    (spec photosynthesis Farquhar Gamma)
+                   (handle current))
+           (number (path column "${column}" Vegetation crops crops "${crop}"
+                         "${fraction}" "*" gbw)
+                   (spec photosynthesis Farquhar gbw)
                    (handle current))))
 
 ;;; log.dai ends here

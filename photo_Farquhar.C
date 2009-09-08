@@ -47,10 +47,8 @@ PhotoFarquhar::PhotoFarquhar (const BlockModel& al)
     O2_atm (al.number ("O2_atm")),
     Gamma25 (al.number ("Gamma25")),
     Ea_Gamma (al.number ("Ea_Gamma")),
-    Ptot (al.number("Ptot")),
     m (al.number("m")),
     b (al.number("b")),
-    gbw (al.number("gbw")),
     rubiscoNdist (Librarian::build_item<RubiscoNdist> (al, "N-dist")),
     ABAeffect (Librarian::build_item<ABAEffect> (al, "ABAeffect")),
     Stomatacon (Librarian::build_item<StomataCon> (al, "Stomatacon"))
@@ -109,32 +107,6 @@ PhotoFarquhar:: Sat_vapor_pressure (const double T /*[degree C]*/) const
   return Vp;
 }
 
-double
-PhotoFarquhar::GSTModel (const double CO2_atm,
-                         const double wsf /* [] */,
-                         const double pn,
-                         const double hs /* [] */, 
-                         const double Ds /* [Pa] */,
-                         const double cs /* [Pa] */,
-                         Treelog& msg) 
-{
-  const double intercept = b /* * LA * fraction */; // min conductance 
-
-  //stomatal conductance
-  double gsw; 
-  if(pn <= 0.0)
-    gsw = intercept;//[mol/m²leaf/s]
-  else 
-    gsw = Stomatacon->stomata_con (wsf /*[]*/, m /*[]*/, hs /*[]*/,
-                                   pn /*[mol/m²leaf/s]*/, Ptot /*[Pa]*/, 
-                                   cs /*[Pa]*/, Gamma /*[Pa]*/, 
-                                   intercept /*[mol/m²leaf/s]*/, 
-                                   CO2_atm /*[Pa]*/, Ds/*[Pa]*/,
-                                   msg);//[mol/m²leaf/s] 
-
-  return gsw; //stomatal conductance [mol/m²leaf/s]
-}
-
 double 
 PhotoFarquhar::stomata_conductance() const
 { return gs_ms; } // [m s^-1]
@@ -143,7 +115,8 @@ double
 PhotoFarquhar::assimilate (const Units& units,
                            const double ABA_xylem, const double psi_c,
                            const double ec /* Canopy Vapour Pressure [Pa] */, 
-			   const double CO2_atm,
+                           const double gbw_ms /* Boundary layer [m/s] */,
+			   const double CO2_atm, const double Ptot /* [Pa] */,
 			   const double, const double Tc, const double Tl,
                            const double cropN,
 			   const std::vector<double>& PAR, 
@@ -233,9 +206,14 @@ PhotoFarquhar::assimilate (const Units& units,
   while (gs_vector.size () < No)
     gs_vector.push_back (0.0);//[m/s]
      
+  // Photosynthetic effect of Xylem ABA and crown water potential.
+  ABA_effect = ABAeffect->ABA_effect(ABA_xylem, psi_c,  msg);//[unitless]
+          
   Gamma = Arrhenius (Gamma25, Ea_Gamma, Tl); // [Pa]
   const double estar = FAO::SaturationVapourPressure (Tl); // [Pa]
-
+  daisy_assert (gbw_ms >= 0.0);
+  gbw = Resistance::ms2molly (Tl, Ptot, gbw_ms);
+  daisy_assert (gbw >= 0.0);
   // CAI in each interval.
   const double dCAI = PAR_LAI / No;
   
@@ -262,9 +240,6 @@ PhotoFarquhar::assimilate (const Units& units,
 	  const double vmax25 = crop_Vm_total[i]*fraction[i];//[mol/m²leaf/s/fracti.]
 	  daisy_assert (vmax25 >= 0.0);
 
-	  // Photosynthetic effect of Xylem ABA and crown water potential.
-	  ABA_effect = ABAeffect->ABA_effect(ABA_xylem, psi_c,  msg);//[unitless]
-          
 	  // leaf respiration
 	  const double rd = respiration_rate(vmax25, Tl);
 	  daisy_assert (rd >= 0.0);
@@ -275,7 +250,7 @@ PhotoFarquhar::assimilate (const Units& units,
           double& hs = hs_vector[i];
           hs = 0.5;              // first guess of hs []
           double& cs = cs_vector[i];
-	  double gsw = LA / 5.0; //first gues for stomatal cond,[mol/s/m²leaf]
+	  double gsw = b * 2; //first gues for stomatal cond,[mol/s/m²leaf]
 	  const int maxiter = 150;
 	  int iter = 0;
 	  double lastci;
@@ -285,8 +260,9 @@ PhotoFarquhar::assimilate (const Units& units,
 	      lastci = ci; //Stomata CO2 pressure 
 
 	      //Calculating ci and "net"photosynthesis
-	      CxModel(CO2_atm, pn, ci, dPAR /*[mol/m²leaf/s]*/, 
-                      gsw, Tl, vmax25, rd, msg);//[mol/m²leaf/s/fraction]
+	      CxModel(CO2_atm, Ptot, 
+                      pn, ci, dPAR /*[mol/m²leaf/s]*/, 
+                      gsw, gbw, Tl, vmax25, rd, msg);//[mol/m²leaf/s/fraction]
 
               // Vapour pressure at leaf surface. [Pa]
               const double es = (gsw * estar + gbw * ec) / (gsw + gbw);
@@ -309,14 +285,28 @@ PhotoFarquhar::assimilate (const Units& units,
               cs = CO2_atm - (1.4 * pn * Ptot * rbw); //[Pa] 
               daisy_assert (cs > 0.0);
 
-	      gsw = GSTModel (CO2_atm, ABA_effect, pn, hs, Ds, cs, 
-                              msg);//[mol/s/m²leaf/fraction]
+              // min conductance 
+              const double intercept = b; 
+
+              //stomatal conductance
+              if(pn <= 0.0)
+                gsw = intercept;//[mol/m²leaf/s]
+              else 
+                gsw = Stomatacon->stomata_con (ABA_effect /*[]*/, 
+                                               m /*[]*/, hs /*[]*/,
+                                               pn /*[mol/m²leaf/s]*/, 
+                                               Ptot /*[Pa]*/, 
+                                               cs /*[Pa]*/, Gamma /*[Pa]*/, 
+                                               intercept /*[mol/m²leaf/s]*/, 
+                                               CO2_atm /*[Pa]*/, Ds/*[Pa]*/,
+                                               msg); //[mol/m²leaf/s] 
 
 	      iter++;
 	      if(iter > maxiter)
 		{
 		  std::ostringstream tmp;
-		  tmp << "total iterations in assimilation model exceed " << maxiter;
+		  tmp << "total iterations in assimilation model exceed "
+                      << maxiter;
 		  msg.warning (tmp.str ());
 		  break;
 		}
@@ -359,8 +349,7 @@ PhotoFarquhar::assimilate (const Units& units,
 
   // Omregning af gs(mol/(m2s)) til gs_ms (m/s) foretages ved 
   // gs_ms = gs * (R * T)/P:
-  gs_ms = gs * (Resistance::R * (Tl + Resistance::TK)) / Resistance::P_surf; //[m s^-1] 
-
+  gs_ms = Resistance::molly2ms (Tl, Ptot, gs);
   return (molWeightCH2O / molWeightCO2)* Ass_;    // Assimilate [g CH2O/m2/h]
 }
 
@@ -375,6 +364,7 @@ PhotoFarquhar::clear ()
   std::fill(Ass_vector.begin (), Ass_vector.end (), 0.0);
   std::fill(LAI_vector.begin (), LAI_vector.end (), 0.0);
   ci_middel = 0.0;
+  gbw = 0.0;
   gs = 0.0;
   gs_ms = 0.0;
   Ass = 0.0;
@@ -402,6 +392,7 @@ PhotoFarquhar::output(Log& log) const
   output_variable (Jm_vector, log);
   output_variable (ci_middel, log);
   output_variable (Gamma, log);
+  output_variable (gbw, log);
   output_variable (gs, log);
   output_variable (gs_ms, log);
   output_variable (Ass, log);
@@ -453,19 +444,11 @@ Gamma25 = 3.69 Pa for wheat (Collatz et al., 1991)");
                 "Actimation energy for Gamma. Ea_Gamma = 29000 (Jordan & Ogren, 1984)");
     frame.set ("Ea_Gamma", 29000.);
 
-    frame.declare ("Ptot", "Pa", Check::positive (), Attribute::Const,
-                "Atmospheric pressure. Ptot = 100000 Pa");
-    frame.set ("Ptot", 1.0E5);
-
     frame.declare ("m", Attribute::None (), Check::positive (), Attribute::Const,
                 "Stomatal slope factor. Ball and Berry (1982): m = 9 for soyabean. Wang and Leuning(1998): m = 11 for wheat");
 
     frame.declare ("b", "mol/m^2/s", Check::positive (), Attribute::Const,
                 "Stomatal intercept factor, Ball and Berry (1982) & Wang and Leuning(1998): (0.01 mol/m2/s)");
-
-    frame.declare ("gbw", "mol/m^2/s", Check::positive (), Attribute::Const,
-                "Leaf boundary conductance of water. gbw = 2 mol/m²/s (Collatz et al., 1991");
-    frame.set ("gbw", 2.00);
 
     //log variables
     frame.declare ("ABA_effect", Attribute::None (), Attribute::LogOnly,
@@ -490,7 +473,8 @@ Relative humidity at leaf surface.");
     frame.declare ("ci_middel", "Pa", Attribute::LogOnly, "Stomata average CO2 pressure.");
     frame.declare ("Gamma", "Pa", Attribute::LogOnly, "\
 CO2 compensation point of photosynthesis.");
-    frame.declare ("gs", "mol/m^2/s", Attribute::LogOnly, "Stomata conductance.");
+    frame.declare ("gbw", "mol/m^2 leaf/s", Attribute::LogOnly, "Boundary lauer conductance.");
+    frame.declare ("gs", "mol/m^2 field/s", Attribute::LogOnly, "Stomata conductance.");
     frame.declare ("gs_ms", "m/s", Attribute::LogOnly, "Stomata conductance.");
     frame.declare ("Ass", "g CH2O/m^2/h", Attribute::LogOnly, "'Net' leaf assimilate of CO2 (brutto photosynthesis).");
     frame.declare ("Res", "g CH2O/m^2/h", Attribute::LogOnly, "Farquhar leaf respiration.");

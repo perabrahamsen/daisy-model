@@ -78,6 +78,7 @@ public:
   virtual double relative_humidity () const = 0; // []
   virtual double wind () const = 0;	// [m/s]
   virtual double CO2 () const = 0; //[Pa]
+  virtual double air_pressure () const = 0; //[Pa]
 
   // Initializing bioclimate.
 public:

@@ -140,6 +140,10 @@ double
 WeatherBase::CO2 () const // [Pa]
 { return 35.0; }
 
+double
+WeatherBase::air_pressure () const // [Pa]
+{ return FAO::AtmosphericPressure (elevation ()); }
+
 bool 
 WeatherBase::has_reference_evapotranspiration () const
 { return false; }

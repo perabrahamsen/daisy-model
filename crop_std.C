@@ -340,6 +340,7 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
   const double total_LAI = bioclimate.LAI ();
   const std::vector<double>& fraction_sun_LAI = bioclimate.sun_LAI_fraction ();
   const std::vector<double>& PAR_height = bioclimate.height ();
+  const double sun_LAI_fraction_total = bioclimate.sun_LAI_fraction_total ();
 
   // Anything do do?
   if (total_PAR[0] < shadow->min_PAR ())
@@ -398,30 +399,47 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
   const double T_canopy = bioclimate.canopy_temperature ();
   const double T_leaf_sun = bioclimate.sun_leaf_temperature ();
   const double T_leaf_shadow = bioclimate.shadow_leaf_temperature ();
+  const double Ptot = bioclimate.air_pressure ();
+  daisy_assert (sun_LAI_fraction_total < 1.0);
   const double crown_potential = root_system->crown_potential ();
 
   if (bioclimate.shared_light_fraction () > 1e-10)
     {
       // Shared light.
-      Ass += shadow->assimilate (units,
-                                 ABA_xylem, crown_potential, 
-                                 canopy_vapour_pressure, CO2_atm,
-                                 bioclimate.daily_air_temperature(), 
-                                 T_canopy, T_leaf_shadow,
-                                 rubiscoN, shadow_PAR, PAR_height,
-                                 total_LAI, fraction_shadow_LAI, dt,
-                                 canopy, *development, msg)
-        * bioclimate.shared_light_fraction ();
+      if (sun_LAI_fraction_total < 1.0)
+        {
+          const double gbw_shadow       // [m/s leaf]
+            = bioclimate.shadow_boundary_layer_water_conductivity ()
+            / (total_LAI * (1.0 - sun_LAI_fraction_total));
+          
+          Ass += shadow->assimilate (units,
+                                     ABA_xylem, crown_potential, 
+                                     canopy_vapour_pressure, gbw_shadow,
+                                     CO2_atm, Ptot,
+                                     bioclimate.daily_air_temperature(), 
+                                     T_canopy, T_leaf_shadow,
+                                     rubiscoN, shadow_PAR, PAR_height,
+                                     total_LAI, fraction_shadow_LAI, dt,
+                                     canopy, *development, msg)
+          * bioclimate.shared_light_fraction ();
+        }
 
-      Ass += sunlit->assimilate (units,
-                                 ABA_xylem, crown_potential, 
-                                 canopy_vapour_pressure, CO2_atm,
-                                 bioclimate.daily_air_temperature(),
-                                 T_canopy, T_leaf_sun,
-                                 rubiscoN, sun_PAR,  PAR_height,
-                                 total_LAI, fraction_sun_LAI, dt,
-                                 canopy, *development, msg)
-        * bioclimate.shared_light_fraction ();
+      if (sun_LAI_fraction_total > 0.0)
+        {
+          const double gbw_sun          // [m/s leaf]
+            = bioclimate.sun_boundary_layer_water_conductivity ()
+            / (total_LAI * sun_LAI_fraction_total);
+          Ass += sunlit->assimilate (units,
+                                     ABA_xylem, crown_potential, 
+                                     canopy_vapour_pressure, gbw_sun, 
+                                     CO2_atm, Ptot,
+                                     bioclimate.daily_air_temperature(),
+                                     T_canopy, T_leaf_sun,
+                                     rubiscoN, sun_PAR,  PAR_height,
+                                     total_LAI, fraction_sun_LAI, dt,
+                                     canopy, *development, msg)
+            * bioclimate.shared_light_fraction ();
+        }
     }
 
   if (min_light_fraction > 1e-10)// Only total PAR, not sun shadow
@@ -432,9 +450,14 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
       Bioclimate::radiation_distribution 
         (No, LAI (), PARref (), bioclimate.global_radiation (),
          PARext (), PAR); 
+      const double gbw_total       // [m/s leaf]
+        = (bioclimate.shadow_boundary_layer_water_conductivity ()
+           + bioclimate.sun_boundary_layer_water_conductivity ())
+        / total_LAI;
       Ass += reserved->assimilate (units,
                                    ABA_xylem, crown_potential, 
-                                   canopy_vapour_pressure, CO2_atm,
+                                   canopy_vapour_pressure, gbw_total,
+                                   CO2_atm, Ptot,
                                    bioclimate.daily_air_temperature (), 
                                    T_canopy, bioclimate.canopy_temperature(),
                                    rubiscoN, PAR, PAR_height,
@@ -443,8 +466,8 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
         * min_light_fraction;
     }
   daisy_assert (std::isfinite (Ass));
-  production.PotCanopyAss = Ass;
-}
+  production.PotCanopyAss = Ass;}
+    
 
 void
 CropStandard::tick (const Metalib& metalib, 

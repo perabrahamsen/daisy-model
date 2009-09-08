@@ -45,7 +45,7 @@
 #include <sstream>
 #endif
 # include "assertion.h"
-
+#include "resistance.h"
 
 # define NRANSI // from xgaussj
 #define vector _my_vector
@@ -1323,6 +1323,9 @@ public:
   double SunLeafTemperature () const; // [dg C]
   double ShadowLeafTemperature () const; // [dg C]
   double CanopyVapourPressure () const;  // [Pa]
+  double SunBoundaryLayerWaterConductivity () const; // [m/s]
+  double ShadowBoundaryLayerWaterConductivity () const; // [m/s]
+
 
   void solve (const double /* stomata cond. [mol/m^2/s]*/, Treelog&);
 
@@ -1363,6 +1366,22 @@ SVAT_PMSW::ShadowLeafTemperature () const
 double 
 SVAT_PMSW::CanopyVapourPressure () const
 { return e_c; }  // [Pa]
+
+double 
+SVAT_PMSW::SunBoundaryLayerWaterConductivity () const
+{
+  // It seems we should use something called 'r_b', which
+  // unfortunately only exists in comments.  Instead we use the
+  // default solution, as also used by the 'none' model.
+
+  // Collatz et al., 1991
+  const double gbw = 2.0;     // [mol/m^2/s]
+  return Resistance::molly2ms (tleaf, Resistance::P_surf, gbw);
+}
+
+double 
+SVAT_PMSW::ShadowBoundaryLayerWaterConductivity () const
+{ return SunBoundaryLayerWaterConductivity (); }
 
 void 
 SVAT_PMSW::solve (const double /* stomata cond. [mol/m^2/s]*/, Treelog&) 

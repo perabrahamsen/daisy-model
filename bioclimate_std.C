@@ -177,6 +177,7 @@ struct BioclimateStandard : public Bioclimate
   double daily_global_radiation_; // From weather [W/m2]
   double global_radiation_; // From weather [W/m2]
   double atmospheric_CO2_;         // From weather [Pa]
+  double air_pressure_;         // From weather [Pa]
 
   // Simulation
   void tick (const Units&, const Time&, Surface&, const Weather&, 
@@ -228,6 +229,10 @@ struct BioclimateStandard : public Bioclimate
   { return svat->SunLeafTemperature (); }
   double shadow_leaf_temperature () const
   { return svat->ShadowLeafTemperature (); }
+  double sun_boundary_layer_water_conductivity () const 
+  { return svat->SunBoundaryLayerWaterConductivity (); }
+  double shadow_boundary_layer_water_conductivity () const
+  { return svat->ShadowBoundaryLayerWaterConductivity (); }
   double daily_precipitation () const
   { return daily_precipitation_; }
   double day_length () const
@@ -240,6 +245,8 @@ struct BioclimateStandard : public Bioclimate
   { return direct_rain_; }
   double atmospheric_CO2 () const
   { return atmospheric_CO2_; }
+  double air_pressure () const
+  { return air_pressure_; }
 
   // Manager.
   void irrigate_overhead (double flux, double temp);
@@ -429,7 +436,8 @@ BioclimateStandard::BioclimateStandard (const BlockModel& al)
     day_length_ (0.0),
     daily_global_radiation_ (0.0),
     global_radiation_ (0.0),
-    atmospheric_CO2_ (-42.42e42)
+    atmospheric_CO2_ (-42.42e42),
+    air_pressure_ (-42.42e42)
 { }
 
 void 
@@ -517,10 +525,9 @@ BioclimateStandard::RadiationDistribution (const Vegetation& vegetation,
   incoming_Long_radiation = net_radiation->incoming_longwave_radiation();
 
   sun_LAI_fraction_total_ = 0.0;
-  for (int i = 0; i <= No - 1; i++)
-    {
-      sun_LAI_fraction_total_ += sun_LAI_fraction_[i] / No;
-    }
+  for (int i = 0; i < No; i++)
+    sun_LAI_fraction_total_ += sun_LAI_fraction_[i] / No;
+  daisy_assert (sun_LAI_fraction_total_ <= 1.0);
   
   absorbed_total_Long_soil = incoming_Long_radiation * (1-cover ());
   absorbed_total_Long_canopy = incoming_Long_radiation * (cover ());
@@ -892,6 +899,7 @@ BioclimateStandard::tick (const Units& units, const Time& time,
   daily_precipitation_ = weather.daily_precipitation ();
   day_length_ = weather.day_length ();
   atmospheric_CO2_ = weather.CO2 ();
+  air_pressure_ = weather.air_pressure ();
 
   // Add deposition. 
   const Unit& u_h = units.get_unit (Units::h ());

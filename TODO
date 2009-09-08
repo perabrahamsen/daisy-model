@@ -1,14 +1,22 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* photo Farquhar
+* photo_Farquhar.C
 
-** Ptot and O2_atm should be read from weather/bioclimate.
+** Fjern Resistance::P_surf
 
-** gbw should come from svat
+** Hvad er galt med Fulai ABA effect? 
 
-** Fjern (inlejr) GSTModel
+** Flere konvergenskriterier end blot ci?
+
+** StomtaconSHA14
+
+** intercept som min i StomtaconSHA
+
+** dist + finn m.m. brev
 
 ** Flyt "m" til stomatacon
+
+** rs_min / rs_max i pet_PM
 
 * q_primary? 25
 

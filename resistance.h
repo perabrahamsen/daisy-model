@@ -48,6 +48,9 @@ namespace Resistance
   const double m_a = 29.0;       // Molecular weight of air [g mol^-1]
   const double R = 8.3143;       // Universal molecular gass constant [J mol^-1 K^-1]
 
+  // Unit convertsions.  [mol/m^2/s] <-> [m/s]
+  double molly2ms (const double T, const double P, const double value);
+  double ms2molly (const double T, const double P, const double value);
 
   // Function to correct diffusivities for temperature and pressure
   double Cl(double T_air /*[dg C]*/);// []  

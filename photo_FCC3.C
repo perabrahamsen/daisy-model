@@ -61,8 +61,10 @@ private:
 public:
   double V_m (const double Vm_25m, double T) const;
   double J_m (const double vmax25, const double T) const;
-  void CxModel (const double CO2_atm, double& pn, double& ci, 
-                const double Q, const double gsw, const double T,
+  void CxModel (const double CO2_atm, const double Ptot, 
+                double& pn, double& ci, 
+                const double Q, const double gsw, const double gbw,
+                const double T,
                 const double vmax, const double rd, Treelog& msg)const;
   double respiration_rate(const double Vm_25, const double Tl) const;
 
@@ -118,9 +120,12 @@ PhotoFCC3::J_m (const double vmax25, const double T/*[degree C]*/) const
 }
 
 void 
-PhotoFCC3::CxModel (const double CO2_atm, double& pn, double& ci, 
+PhotoFCC3::CxModel (const double CO2_atm, const double Ptot, 
+                    double& pn, double& ci, 
                     const double PAR /*[mol/m²leaf/s]*/, 
-                    const double gsw /*[mol/m²leaf/s]*/, const double T, 
+                    const double gsw /*[mol/m²leaf/s]*/, 
+                    const double gbw /*[mol/m²leaf/s]*/, 
+                    const double T, 
                     const double vmax25 /*[mol/m² leaf/s]*/, 
                     const double rd /*[mol/m² leaf/s]*/, Treelog& msg) const  
 {

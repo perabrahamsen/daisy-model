@@ -168,7 +168,7 @@ struct CropSold::Parameters
     // the reproductive stage
     const PLF& TempEff1;   // Temperature effect, vegetative stage
     const PLF& TempEff2;   // Temperature effect, reproductive stage
-    const PLF& PhotEff1;   // Ptotoperiode effect, vegetative stage
+    const PLF& PhotEff1;   // Photoperiode effect, vegetative stage
   private:
     friend struct CropSold::Parameters;
     DevelPar (const AttributeList&);

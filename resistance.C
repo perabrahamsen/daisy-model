@@ -28,6 +28,19 @@
 #include "librarian.h"
 #include <sstream>
 
+  // Unit convertsions.  [mol/m^2/s] <-> [m/s]
+double 
+Resistance::molly2ms (const double T, const double P, const double value)
+{
+  return value * (R * (T + TK)) / P; //[m s^-1] 
+}
+
+double 
+Resistance::ms2molly (const double T, const double P, const double value)
+{                
+  return value * P / (R * (T + TK));
+}
+
 //----------------------------------------------------
 // Boundary layer conductance
 //----------------------------------------------------
