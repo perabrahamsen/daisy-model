@@ -254,10 +254,13 @@ PhotoFarquhar::assimilate (const Units& units,
 	  const int maxiter = 150;
 	  int iter = 0;
 	  double lastci;
-
+          double lasths;
+          double lastgs;
 	  do
 	    {
 	      lastci = ci; //Stomata CO2 pressure 
+              lasths = hs;
+              lastgs = gs;
 
 	      //Calculating ci and "net"photosynthesis
 	      CxModel(CO2_atm, Ptot, 
@@ -312,7 +315,9 @@ PhotoFarquhar::assimilate (const Units& units,
 		}
 	    }
 	  // while (std::fabs (lastci-ci)> 0.01);
-          while (std::fabs (lastci-ci)> 0.01);
+          while (std::fabs (lastci-ci)> 0.01
+                 || std::fabs (lasths-hs)> 0.01
+                 || std::fabs (lastgs-gs)> 0.01);
 
 	  // Leaf brutto photosynthesis [gCO2/m2/h] 
 	  const double pn_ = (pn+rd) * molWeightCO2 * 3600.0;//mol CO2/m²leaf/s->g CO2/m²leaf/h

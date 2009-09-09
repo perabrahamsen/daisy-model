@@ -2,21 +2,21 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * photo_Farquhar.C
 
-** Fjern Resistance::P_surf
+** Check enheder i SHA og SHA14:  Specielt A og cs
 
-** Hvad er galt med Fulai ABA effect? 
-
-** Flere konvergenskriterier end blot ci?
-
-** StomtaconSHA14
-
-** intercept som min i StomtaconSHA
+** Fulai Farquhar pars
 
 ** dist + finn m.m. brev
 
 ** Flyt "m" til stomatacon
 
 ** rs_min / rs_max i pet_PM
+
+* Erstat FAO::AirDensity med Resistence::rho_a
+
+Enable PetFAO_PM::wet
+
+test resultater
 
 * q_primary? 25
 

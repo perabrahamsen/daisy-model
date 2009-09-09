@@ -49,7 +49,7 @@ FAO::RoughnessHeight_Momentum (double CropHeight)
 { return (0.123 * CropHeight / 100.0); }
 
 double
-FAO:: RoughnessHeight_Heat (double CropHeight)
+FAO::RoughnessHeight_Heat (double CropHeight)
 { return (0.0123 * CropHeight / 100.0); }
 
 double 

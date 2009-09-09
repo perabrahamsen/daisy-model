@@ -60,6 +60,7 @@ struct SVAT_SSOC : public SVAT
 
   // Driving variables.
   // - Upper boundary
+  double Ptot;
   double T_a;            // Air surface temperature [K]
   double z_r;            // Reference height above canopy == screen height [m]
   double RH;             // Relative humidity []
@@ -239,7 +240,7 @@ SVAT_SSOC::tick (const Weather& weather, const Vegetation& vegetation,
 {
   TREELOG_MODEL (msg);
 
-  const double Ptot = weather.air_pressure (); // [Pa]
+  Ptot = weather.air_pressure (); // [Pa]
   RH = weather.relative_humidity (); // []
   T_a = weather.air_temperature () + TK; // [K]
   z_r = weather.screen_height (); // [m]
@@ -250,7 +251,7 @@ SVAT_SSOC::tick (const Weather& weather, const Vegetation& vegetation,
   has_LAI = (LAI > 0.0);
   h_veg = vegetation.height () / 100.; // [m]  
   w_l = vegetation.leaf_width () / 100.; // [m] 
-  rho_a = Resistance:: rho_a(T_a - TK); //[kg m^-3]
+  rho_a = Resistance::rho_a (T_a - TK, Ptot); //[kg m^-3]
   gamma = FAO::PsychrometricConstant (Ptot, T_a - TK); // [Pa/K]
   e_sat_air = FAO::SaturationVapourPressure (T_a - TK); // [Pa]
   e_a = e_sat_air * RH;             // [Pa]; 
@@ -310,7 +311,7 @@ void
 SVAT_SSOC::calculate_conductances (const double g_s /* stomata cond. [m/s]*/, Treelog& msg)
 {
   // Function to correct diffusivities for temperature and pressure
-  const double Cl = Resistance::Cl(T_a - TK);
+  const double Cl = Resistance::Cl(T_a - TK, Ptot);
   // Mean leaf size
   const double l_m = Resistance::l_m (w_l);
   // Zero-plane displacement height [m] (F3)
@@ -836,6 +837,7 @@ SVAT_SSOC::SVAT_SSOC (const BlockModel& al)
     maxEdiff (al.number ("maxEdiff")),
     max_iteration (al.integer ("max_iteration")),
     z_0b (al.number ("z_0b")),
+    Ptot (-42.42e42),
     T_a (-42.42e42),
     z_r (-42.42e42),
     RH (-42.42e42),

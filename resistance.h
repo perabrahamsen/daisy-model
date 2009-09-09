@@ -32,7 +32,6 @@ namespace Resistance
   //             Using Terra and Agua MODIS and Weather Prediction Data.
   //             Institute of Geography, University of Copenhagen.
   
-  const double P_surf = 101300.0;  //Surface atmospheric pressure [Pa]
   const double TK = 273.15;      //Constant to convert celcius to Kelvin []
   const double v = 0.00001327;   // Molecular viscosity [m^2 s^-1]
   const double d_heat = 0.00001869; // Diffusivity of heat [m^2 s^-1]
@@ -53,7 +52,7 @@ namespace Resistance
   double ms2molly (const double T, const double P, const double value);
 
   // Function to correct diffusivities for temperature and pressure
-  double Cl(double T_air /*[dg C]*/);// []  
+  double Cl(double T_air /*[dg C]*/, const double Ptot /* [Pa] */);// []  
                      
   // Boundary conductance for a leaf due to free convection 
   double gbf_heat (const double C1/*[]*/, const double T_air /*[dg C]*/, 
@@ -181,7 +180,7 @@ namespace Resistance
 //--------------------------------------
 
 // air density 
-  double rho_a (const double T_a); // [kg m^-3]
+  double rho_a (const double T_a, const double Ptot); // [kg m^-3]
 
 }
 #endif // RESISTANCE_H

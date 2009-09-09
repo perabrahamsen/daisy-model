@@ -48,6 +48,8 @@ static struct StomataConInit : public DeclareComponent
     : DeclareComponent (StomataCon::component, "\
 The 'Stomatacon' component calculates the stomata conductance of water vapour.")
   { }
+  void load_frame (Frame& frame) const
+  { Model::load_model (frame); }
 } StomataCon_init;
 
 // StomataCon.C ends here.

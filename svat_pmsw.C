@@ -45,7 +45,6 @@
 #include <sstream>
 #endif
 # include "assertion.h"
-#include "resistance.h"
 
 # define NRANSI // from xgaussj
 #define vector _my_vector
@@ -1315,6 +1314,9 @@ public:
   int n_hr; // auxiliary variable for facilitating PG
   // initial value for rcmin_star
 
+  // Collatz boundary layer.
+  double Collatz_gbw_sun;       // [mol/m^2/s FIELD]
+  double Collatz_gbw_shadow;    // [mol/m^2/s FIELD]
 
   // Simulation.
   double production_stress () const;
@@ -1370,18 +1372,16 @@ SVAT_PMSW::CanopyVapourPressure () const
 double 
 SVAT_PMSW::SunBoundaryLayerWaterConductivity () const
 {
-  // It seems we should use something called 'r_b', which
-  // unfortunately only exists in comments.  Instead we use the
-  // default solution, as also used by the 'none' model.
-
-  // Collatz et al., 1991
-  const double gbw = 2.0;     // [mol/m^2/s]
-  return Resistance::molly2ms (tleaf, Resistance::P_surf, gbw);
+  // Leave it to the bioclimate module.
+  return -1.0; 
 }
 
 double 
 SVAT_PMSW::ShadowBoundaryLayerWaterConductivity () const
-{ return SunBoundaryLayerWaterConductivity (); }
+{ 
+  // Leave it to the bioclimate module.
+  return -1.0; 
+}
 
 void 
 SVAT_PMSW::solve (const double /* stomata cond. [mol/m^2/s]*/, Treelog&) 
@@ -1410,6 +1410,7 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
 	     << z_ref << " [m])";
       throw (std::string (tmp.str ()));
     }
+
 
   //cout << "LAI is\t" << LAI << "\n";
 

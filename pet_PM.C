@@ -27,7 +27,6 @@
 #include "soil.h"
 #include "surface.h"
 #include "soil_heat.h"
-#include "fao.h"
 #include "vegetation.h"
 #include "log.h"
 #include "librarian.h"

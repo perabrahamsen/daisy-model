@@ -46,9 +46,9 @@ Resistance::ms2molly (const double T, const double P, const double value)
 //----------------------------------------------------
 // Function to correct diffusivities for temperature and pressure (G1)
 double 
-Resistance::Cl (const double T_a)
+Resistance::Cl (const double T_a, const double Ptot)
 { 
-  const double Cl = (1013.0 /(0.01 * P_surf)) 
+  const double Cl = (1013.0 /(0.01 * Ptot)) 
     * pow(((T_a + TK)/(TK + 0.01)), 1.81); 
   return Cl; // []
 }
@@ -430,9 +430,9 @@ Resistance::T_c (const double T_l_sun /* leaf sun temperature [dg C]*/,
 //--------------------------------------
 // air density 
 double
-Resistance:: rho_a (const double T_a /*[dg C]*/)
+Resistance:: rho_a (const double T_a /*[dg C]*/, const double Ptot)
 {
-  const double rho_a = (P_surf * 1.0E-3 * m_a)/(R * (T_a + TK));
+  const double rho_a = (Ptot * 1.0E-3 * m_a)/(R * (T_a + TK));
   return rho_a; // [kg m^-3]
 }
 

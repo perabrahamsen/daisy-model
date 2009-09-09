@@ -47,6 +47,7 @@
 #include "fao.h"
 #include "librarian.h"
 #include "treelog.h"
+#include "resistance.h"
 #include <sstream>
 
 struct BioclimateStandard : public Bioclimate
@@ -218,6 +219,18 @@ struct BioclimateStandard : public Bioclimate
   double shared_light_fraction () const
   { return shared_light_fraction_; }
 
+  // Utils.
+  double LAI_sun () const       // [area LEAF/FIELD]
+  { return LAI () * sun_LAI_fraction_total (); }
+  double LAI_shadow () const    // [area LEAF/FIELD]
+  { return LAI () - LAI_sun (); }
+  double Collatz_gbw (const double tleaf) const   // [m/s LEAF]
+  {
+    const double Ptot = air_pressure (); // [Pa]
+    const double gbw_molly = 2.0;     // [mol/m^2/s LEAF]
+    return Resistance::molly2ms (tleaf, Ptot, gbw_molly); // [m/s LEAF]
+  }
+
   // Weather.
   double daily_air_temperature () const
   { return daily_air_temperature_; }
@@ -230,9 +243,19 @@ struct BioclimateStandard : public Bioclimate
   double shadow_leaf_temperature () const
   { return svat->ShadowLeafTemperature (); }
   double sun_boundary_layer_water_conductivity () const 
-  { return svat->SunBoundaryLayerWaterConductivity (); }
+  { 
+    double gbw = svat->SunBoundaryLayerWaterConductivity (); 
+    if (gbw > 0.0)
+      return gbw;
+    return Collatz_gbw (sun_leaf_temperature ()) * LAI_sun ();
+  }
   double shadow_boundary_layer_water_conductivity () const
-  { return svat->ShadowBoundaryLayerWaterConductivity (); }
+  { 
+    double gbw = svat->ShadowBoundaryLayerWaterConductivity (); 
+    if (gbw > 0.0)
+      return gbw;
+    return Collatz_gbw (shadow_leaf_temperature ()) * LAI_shadow ();
+  }
   double daily_precipitation () const
   { return daily_precipitation_; }
   double day_length () const
@@ -922,31 +945,6 @@ BioclimateStandard::tick (const Units& units, const Time& time,
   // Distribute water among canopy, snow, and soil.
   WaterDistribution (units, time, surface, weather, vegetation, 
                      movement, geo, soil, soil_water, soil_heat, dt, msg);
-
-#if 0
-  // Calculate temperature of canopy
-  //  static const double rho_water = 1.0; // [kg/dm^3]
-  // const double AirTemperature = weather.air_temperature ();//[dg C]
-  // const double LatentHeatVapor 
-  //  = FAO::LatentHeatVaporization (AirTemperature); //[J/kg]
-  const double CanopyTranspirationRate = 
-    crop_ea_ /*[mm/h]*/* rho_water * LatentHeatVapor / 3600. /*[s/h]*/; //[W/m^2] 
-
-  const double CanopyNetRadiation = net_radiation->net_radiation () 
-    * cover ();
-  const double SensibleHeatFlux 
-    = CanopyNetRadiation - CanopyTranspirationRate;//[W/m^2] 
-  
-  // const double AirPressure 
-  //  = FAO::AtmosphericPressure (weather.elevation ());//[Pa]
-  const double rho_a = FAO::AirDensity(AirPressure, AirTemperature);//[kg/m3]
-  const double gamma
-    = FAO::PsychrometricConstant (AirPressure, AirTemperature);//[Pa/dgC]
-  const double epsilon 
-    = 0.622; // Ration molecular weight of water vapor / dry air []
-  const double c_p 
-    = gamma * epsilon * LatentHeatVapor / AirPressure;//[J/kg/dg C]
-#endif 
 
   // Convert wind speed to field conditions.
   const double ScreenHeight = weather.screen_height (); //[m]

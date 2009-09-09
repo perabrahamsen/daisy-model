@@ -26,7 +26,6 @@
 #include "librarian.h"
 #include "frame.h"
 #include "weather.h"
-#include "resistance.h"
 
 struct SVAT_none : public SVAT
 {
@@ -66,13 +65,15 @@ struct SVAT_none : public SVAT
 
   double SunBoundaryLayerWaterConductivity () const
   {
-    // Collatz et al., 1991
-    const double gbw = 2.0;     // [mol/m^2/s]
-    return Resistance::molly2ms (T_a, Resistance::P_surf, gbw);
+    // Leave it to the bioclimate module.
+    return -1.0; 
   }
 
   double ShadowBoundaryLayerWaterConductivity () const
-  { return SunBoundaryLayerWaterConductivity (); }
+  { 
+    // Leave it to the bioclimate module.
+    return -1.0; 
+  }
 
   // Create.
   SVAT_none (const BlockModel& al)
