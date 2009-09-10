@@ -64,7 +64,8 @@ StomataCon_SHA::stomata_con (const double wsf /*[]*/,
                              const double CO2_atm, const double, Treelog&)
 {
   const double cs_ppm = cs /*[Pa]*/ / Ptot /*[Pa]*/ * 1.0e6 /*[ppm]*/;
-  const double gsw = std::max (wsf * (M * pow(hs, alpha) * pow(pz, lambda))
+  const double A = pz * 1e6;    // [umol/m^2 LEAF/s]
+  const double gsw = std::max (wsf * (M * pow(hs, alpha) * pow(A, lambda))
                                /(cs_ppm),
                                intercept);
   daisy_assert (gsw >= 0.0);
@@ -136,7 +137,8 @@ StomataCon_SHA14::stomata_con (const double wsf /*[]*/,
                                const double CO2_atm, const double, Treelog&)
 {
   const double cs_ppm = cs /*[Pa]*/ / Ptot /*[Pa]*/ * 1.0e6 /*[ppm]*/;
-  const double gsw = wsf * M * exp (hs * alpha) * exp (pz * lambda) / cs_ppm;
+  const double A = pz * 1e6;    // [umol/m^2 LEAF/s]
+  const double gsw = wsf * M * exp (hs * alpha) * exp (A * lambda) / cs_ppm;
   daisy_assert (gsw >= 0.0);
   return gsw;
 }
@@ -156,7 +158,7 @@ Stomata conductance calculated by the model given by Eq. 14.")
     frame.declare ("alpha", Attribute::None (), Check::non_negative (),
                    Attribute::Const,
                    "Humidity effect");
-    frame.declare ("lambda", "m^2 leaf s/mol CO2", Check::non_negative (),
+    frame.declare ("lambda", "m^2 leaf s/umol CO2", Check::non_negative (),
                    Attribute::Const,
                    "Net photosyhtesis effect");
     frame.declare ("M", "mol H2O/m^2 leaf/s", 
