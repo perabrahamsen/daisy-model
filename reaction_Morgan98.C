@@ -141,7 +141,7 @@ Colloid generation using kinetic energy, emulating EUROSEM.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.set_strings ("cite", "morgan98");
+    frame.set_strings ("cite", "EUROSEM");
 
     frame.declare ("kd", "g/J", Check::non_negative (), Attribute::Const,
                 "Detachment rate coefficient.\n\

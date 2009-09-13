@@ -47,7 +47,6 @@ class PhotoFarquhar : public Photo
   // Parameters.
 protected:
   const double Xn; //Slope of relationship between leaf N and Vm [mmol/mol/s]
-  const double O2_atm;// Oxygen partial pressure of the atmosphere
   const double Gamma25;//CO2 compensation point of photosynthesis
   const double Ea_Gamma; // Activation energy for Gamma
   const double m;     // Stomatal slope factor, Ball and Berry model
@@ -94,7 +93,8 @@ public:
 private:
   virtual double respiration_rate (const double Vm_25, const double Tl) const = 0;
   virtual double J_m(const double Vm_25, const double Tl) const = 0;
-  virtual void CxModel(const double CO2_atm, const double Ptot, 
+  virtual void CxModel(const double CO2_atm, const double O2_atm, 
+                       const double Ptot, 
                        double& pn, double& ci, const double dPAR,
 		       const double gsw, const double gbw, 
                        const double Tl, const double Vm_25, 
@@ -103,7 +103,8 @@ public:
   double assimilate (const Units&, 
                      const double ABA_xylem, const double psi_c,
                      const double ec, const double gbw_ms /* [m/s] */, 
-		     const double CO2_atm, const double Ptot /* [Pa] */, 
+		     const double CO2_atm, const double O2_atm, 
+                     const double Ptot /* [Pa] */, 
                      double Ta, double Tc, double Tl,
                      const double cropN,
 		     const std::vector<double>& PAR,

@@ -138,7 +138,25 @@ WeatherBase::deposit () const // [g [stuff] /cm²/h]
 
 double
 WeatherBase::CO2 () const // [Pa]
-{ return 35.0; }
+{ 
+#if 1
+  const double standard_pressure = FAO::AtmosphericPressure (0.0);
+  return 35.0 * air_pressure () / standard_pressure; 
+#else
+  return 35.0;
+#endif
+}
+
+double
+WeatherBase::O2 () const // [Pa]
+{
+#if 1
+  const double standard_pressure = FAO::AtmosphericPressure (0.0);
+  return 20500.0 * air_pressure () / standard_pressure; 
+#else
+  return 20500.0;
+#endif
+}
 
 double
 WeatherBase::air_pressure () const // [Pa]

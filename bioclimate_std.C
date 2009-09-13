@@ -178,6 +178,7 @@ struct BioclimateStandard : public Bioclimate
   double daily_global_radiation_; // From weather [W/m2]
   double global_radiation_; // From weather [W/m2]
   double atmospheric_CO2_;         // From weather [Pa]
+  double atmospheric_O2_;         // From weather [Pa]
   double air_pressure_;         // From weather [Pa]
 
   // Simulation
@@ -268,6 +269,8 @@ struct BioclimateStandard : public Bioclimate
   { return direct_rain_; }
   double atmospheric_CO2 () const
   { return atmospheric_CO2_; }
+  double atmospheric_O2 () const
+  { return atmospheric_O2_; }
   double air_pressure () const
   { return air_pressure_; }
 
@@ -460,6 +463,7 @@ BioclimateStandard::BioclimateStandard (const BlockModel& al)
     daily_global_radiation_ (0.0),
     global_radiation_ (0.0),
     atmospheric_CO2_ (-42.42e42),
+    atmospheric_O2_ (-42.42e42),
     air_pressure_ (-42.42e42)
 { }
 
@@ -922,6 +926,7 @@ BioclimateStandard::tick (const Units& units, const Time& time,
   daily_precipitation_ = weather.daily_precipitation ();
   day_length_ = weather.day_length ();
   atmospheric_CO2_ = weather.CO2 ();
+  atmospheric_O2_ = weather.O2 ();
   air_pressure_ = weather.air_pressure ();
 
   // Add deposition. 

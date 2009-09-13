@@ -333,6 +333,7 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
   // Boundary conditions.
   const double canopy_vapour_pressure = bioclimate.canopy_vapour_pressure ();
   const double CO2_atm = bioclimate.atmospheric_CO2 ();
+  const double O2_atm = bioclimate.atmospheric_O2 ();
   const std::vector<double>& total_PAR = bioclimate.PAR (); 
   const std::vector<double>& sun_PAR = bioclimate.sun_PAR ();
   daisy_assert (sun_PAR.size () > 1);
@@ -415,7 +416,7 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
           Ass += shadow->assimilate (units,
                                      ABA_xylem, crown_potential, 
                                      canopy_vapour_pressure, gbw_shadow,
-                                     CO2_atm, Ptot,
+                                     CO2_atm, O2_atm, Ptot,
                                      bioclimate.daily_air_temperature(), 
                                      T_canopy, T_leaf_shadow,
                                      rubiscoN, shadow_PAR, PAR_height,
@@ -432,7 +433,7 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
           Ass += sunlit->assimilate (units,
                                      ABA_xylem, crown_potential, 
                                      canopy_vapour_pressure, gbw_sun, 
-                                     CO2_atm, Ptot,
+                                     CO2_atm, O2_atm, Ptot,
                                      bioclimate.daily_air_temperature(),
                                      T_canopy, T_leaf_sun,
                                      rubiscoN, sun_PAR,  PAR_height,
@@ -457,7 +458,7 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
       Ass += reserved->assimilate (units,
                                    ABA_xylem, crown_potential, 
                                    canopy_vapour_pressure, gbw_total,
-                                   CO2_atm, Ptot,
+                                   CO2_atm, O2_atm, Ptot,
                                    bioclimate.daily_air_temperature (), 
                                    T_canopy, bioclimate.canopy_temperature(),
                                    rubiscoN, PAR, PAR_height,

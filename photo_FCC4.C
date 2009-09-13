@@ -56,7 +56,7 @@ public:
   double V_m (const double Vm_25, double Tl) const;
   double J_m (const double vmax25, const double T) const;
   double Qt (const double k, const double Tl, const double Qtk) const;
-  void CxModel (const double CO2_atm, const double Ptot, 
+  void CxModel (const double CO2_atm, const double O2_atm, const double Ptot, 
                 double& pn, double& ci, const double Q, 
 		const double gsw, const double gbw,
                 const double T, const double vmax, 
@@ -102,7 +102,7 @@ PhotoFCC4::Qt (const double k, const double Tl, const double Qtk) const
 }
 
 void 
-PhotoFCC4::CxModel (const double CO2_atm, 
+PhotoFCC4::CxModel (const double CO2_atm, const double,
                     const double Ptot, double& pn, double& ci/*[Pa]*/, 
 		    const double PAR /*[mol/m²leaf/s/fraction]*/, 
 		    const double gsw /*[mol/m²/s]*/, 

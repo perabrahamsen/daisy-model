@@ -78,6 +78,7 @@ public:
   // Communication with Bioclimate.
 public:
   double CO2 () const; //[Pa]
+  double O2 () const; //[Pa]
   double air_pressure () const; //[Pa]
 
   // Initializing bioclimate.

@@ -61,7 +61,7 @@ private:
 public:
   double V_m (const double Vm_25m, double T) const;
   double J_m (const double vmax25, const double T) const;
-  void CxModel (const double CO2_atm, const double Ptot, 
+  void CxModel (const double CO2_atm, const double O2_atm, const double Ptot, 
                 double& pn, double& ci, 
                 const double Q, const double gsw, const double gbw,
                 const double T,
@@ -120,7 +120,8 @@ PhotoFCC3::J_m (const double vmax25, const double T/*[degree C]*/) const
 }
 
 void 
-PhotoFCC3::CxModel (const double CO2_atm, const double Ptot, 
+PhotoFCC3::CxModel (const double CO2_atm, 
+                    const double O2_atm, const double Ptot, 
                     double& pn, double& ci, 
                     const double PAR /*[mol/m²leaf/s]*/, 
                     const double gsw /*[mol/m²leaf/s]*/, 

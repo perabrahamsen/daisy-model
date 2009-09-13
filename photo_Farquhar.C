@@ -44,7 +44,6 @@
 PhotoFarquhar::PhotoFarquhar (const BlockModel& al)
   : Photo (al),
     Xn (al.number ("Xn")),
-    O2_atm (al.number ("O2_atm")),
     Gamma25 (al.number ("Gamma25")),
     Ea_Gamma (al.number ("Ea_Gamma")),
     m (al.number("m")),
@@ -116,7 +115,8 @@ PhotoFarquhar::assimilate (const Units& units,
                            const double ABA_xylem, const double psi_c,
                            const double ec /* Canopy Vapour Pressure [Pa] */, 
                            const double gbw_ms /* Boundary layer [m/s] */,
-			   const double CO2_atm, const double Ptot /* [Pa] */,
+			   const double CO2_atm, const double O2_atm, 
+                           const double Ptot /* [Pa] */,
 			   const double, const double Tc, const double Tl,
                            const double cropN,
 			   const std::vector<double>& PAR, 
@@ -263,7 +263,7 @@ PhotoFarquhar::assimilate (const Units& units,
               lastgs = gs;
 
 	      //Calculating ci and "net"photosynthesis
-	      CxModel(CO2_atm, Ptot, 
+	      CxModel(CO2_atm, O2_atm, Ptot, 
                       pn, ci, dPAR /*[mol/m²leaf/s]*/, 
                       gsw, gbw, Tl, vmax25, rd, msg);//[mol/m²leaf/s/fraction]
 
@@ -272,7 +272,8 @@ PhotoFarquhar::assimilate (const Units& units,
               // Vapour defecit at leaf surface. [Pa]
               const double Ds = bound (0.0, estar - es, estar);
               // Relative humidity at leaf surface. []
-              hs = bound (0.0, es / estar, 1.0);
+              hs = es / estar;
+              const double hs_use = bound (0.0, hs, 1.0);
 
               // Boundary layer resistance. [s*m2 leaf/mol]
               daisy_assert (gbw >0.0);
@@ -296,7 +297,7 @@ PhotoFarquhar::assimilate (const Units& units,
                 gsw = intercept;//[mol/m²leaf/s]
               else 
                 gsw = Stomatacon->stomata_con (ABA_effect /*[]*/, 
-                                               m /*[]*/, hs /*[]*/,
+                                               m /*[]*/, hs_use /*[]*/,
                                                pn /*[mol/m²leaf/s]*/, 
                                                Ptot /*[Pa]*/, 
                                                cs /*[Pa]*/, Gamma /*[Pa]*/, 
@@ -363,6 +364,9 @@ PhotoFarquhar::clear ()
 {
   std::fill(gs_vector.begin (), gs_vector.end (), 0.0);
   std::fill(ci_vector.begin (), ci_vector.end (), 0.0);
+  std::fill(hs_vector.begin (), hs_vector.end (), 0.0);
+  std::fill(pn_vector.begin (), pn_vector.end (), 0.0);
+  std::fill(cs_vector.begin (), cs_vector.end (), 0.0);
   std::fill(Vm_vector.begin (), Vm_vector.end (), 0.0);
   std::fill(Jm_vector.begin (), Jm_vector.end (), 0.0);
   std::fill(Nleaf_vector.begin (), Nleaf_vector.end (), 0.0);
@@ -381,35 +385,39 @@ PhotoFarquhar::clear ()
   leafPhotN = 0.0;
   fraction_total = 0.0;
   ABA_effect = 1.0;
+  Gamma = 0.0;
 }
 
 void
 PhotoFarquhar::output(Log& log) const
 {
-  output_variable (Ass_vector, log);
-  output_variable (Nleaf_vector, log);
-  output_variable (pn_vector, log);
-  output_variable (cs_vector, log);
-  output_variable (hs_vector, log);
-  output_variable (gs_vector, log);
-  output_variable (ci_vector, log);
-  output_variable (Vm_vector, log);
-  output_variable (Jm_vector, log);
-  output_variable (ci_middel, log);
-  output_variable (Gamma, log);
-  output_variable (gbw, log);
-  output_variable (gs, log);
-  output_variable (gs_ms, log);
-  output_variable (Ass, log);
-  output_variable (Res, log);
-  output_variable (LAI, log);
-  output_variable (LAI_vector, log);
-  output_variable (PAR_, log);
-  output_variable (Vmax, log);
-  output_variable (jm, log);
-  output_variable (leafPhotN, log);
-  output_variable (fraction_total, log);
-  output_variable (ABA_effect, log);
+  if (Gamma > 0.0)
+    {
+      output_variable (Ass_vector, log);
+      output_variable (Nleaf_vector, log);
+      output_variable (pn_vector, log);
+      output_variable (cs_vector, log);
+      output_variable (hs_vector, log);
+      output_variable (gs_vector, log);
+      output_variable (ci_vector, log);
+      output_variable (Vm_vector, log);
+      output_variable (Jm_vector, log);
+      output_variable (ci_middel, log);
+      output_variable (Gamma, log);
+      output_variable (gbw, log);
+      output_variable (gs, log);
+      output_variable (gs_ms, log);
+      output_variable (Ass, log);
+      output_variable (Res, log);
+      output_variable (LAI, log);
+      output_variable (LAI_vector, log);
+      output_variable (PAR_, log);
+      output_variable (Vmax, log);
+      output_variable (jm, log);
+      output_variable (leafPhotN, log);
+      output_variable (fraction_total, log);
+      output_variable (ABA_effect, log);
+    }
 }
 
 bool 
@@ -435,10 +443,6 @@ stomataconductance model coupled as described by Collatz et al., 1991.")
                 "Slope of relationship between leaf rubisco N and Vmax.\n\
 Xn = 1.16E-3 mol/mol/s for wheat (de Pury & Farquhar, 1997)");
     frame.set ("Xn", 1.16e-3);
-
-    frame.declare ("O2_atm", "Pa", Check::positive (), Attribute::Const,
-                "O2 partial pressure of atmosphere");
-    frame.set ("O2_atm", 20500.0);
 
     frame.declare ("Gamma25", "Pa", Check::positive (), Attribute::Const,
                    "CO2 compensation point of photosynthesis.\n\

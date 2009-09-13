@@ -310,7 +310,7 @@ Slow AOM pool parameterization by Sander Bruun.")
   { }
   void load_frame (Frame& frame) const
   {
-    frame.set_strings ("cite", "daisy-aomnew");
+    frame.set_strings ("cite", "daisy-somnew");
     frame.set ("initial_fraction", 0.80);
     std::vector<double> CN;
     CN.push_back (90.0);

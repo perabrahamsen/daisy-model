@@ -93,6 +93,7 @@ public:
   double day_fraction (double dt) const;   
   virtual double direct_rain () const = 0;
   virtual double atmospheric_CO2 () const = 0;
+  virtual double atmospheric_O2 () const = 0;
   virtual double air_pressure () const = 0;
 
   // Manager.

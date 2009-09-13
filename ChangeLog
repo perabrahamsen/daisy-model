@@ -1,3 +1,12 @@
+2009-09-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* all: Read O2 from weather. Made CO2 relative to atmospheric pressure.
+
+2009-09-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* reaction_Morgan98.C (DeclareModel): Fix BibTex citation.
+	* aom.C (DeclareParam): ditto.
+
 2009-09-10  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.71 released.
