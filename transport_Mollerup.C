@@ -225,7 +225,6 @@ TransportMollerup::cell_based_flux (const Geometry& geo,
 
   for (int c = 0; c < cell_size; c++)
     {
-      
       if (wx_cell[c] > 0.0)
         qx_cell[c] /= wx_cell[c];
       if (wz_cell[c] > 0.0)
@@ -346,9 +345,7 @@ TransportMollerup::thetadiff_xx_zz_xz_zx
     {
       const int from = geo.edge_from (e);
       const int to = geo.edge_to (e);
-      //Debug
-      //std::cout << "e" << e << '\n';
-      
+            
       if (geo.edge_is_internal (e))
         {  
           const double ThetaD_xx_zz_from = Theta[from] 
@@ -378,8 +375,8 @@ TransportMollerup::thetadiff_xx_zz_xz_zx
 
 void 
 TransportMollerup::diffusion_xx_zz (const Geometry& geo,
-                                       const ublas::vector<double>& ThetaD_xx_zz,
-                                       Solver::Matrix& diff_xx_zz)
+                                    const ublas::vector<double>& ThetaD_xx_zz,
+                                    Solver::Matrix& diff_xx_zz)
 {
   const size_t edge_size = geo.edge_size (); // number of edges  
   
@@ -402,12 +399,12 @@ TransportMollerup::diffusion_xx_zz (const Geometry& geo,
 
 void 
 TransportMollerup::diffusion_xz_zx (const GeometryRect& geo,
-                                       const ublas::vector<double>& ThetaD_xz_zx,
-                                       Solver::Matrix& diff_xz_zx)
+                                    const ublas::vector<double>& ThetaD_xz_zx,
+                                    Solver::Matrix& diff_xz_zx)
 {
-
+  
   const size_t edge_size = geo.edge_size (); // number of edges  
-    
+  
   for (size_t e = 0; e < edge_size; e++)
     {
       if (geo.edge_is_internal (e))
@@ -439,13 +436,14 @@ TransportMollerup::diffusion_xz_zx (const GeometryRect& geo,
           daisy_assert (approximate (fabs (dkz + dkx), area));
           double magnitude = -ThetaD_xz_zx (e) * area / (dkz + dkx);
 
+
           // On a border we calculate from edge center, rather than corner.
           if (A_is_border || B_is_border)
-            magnitude *= 2.0;
+            magnitude *= 2.0;    //partial C/partial S is 0.5*(dkz + dkx)
 
           const double dcz = geo.cell_z (to) - geo.cell_z (from);
           const double dcx = geo.cell_x (to) - geo.cell_x (from);
-          const double length = geo.edge_length (e);
+          const double length = geo.edge_length (e);   //dist between nodal points
           daisy_assert (approximate (fabs (dcz + dcx), length));
           const double sign =  length / (dcz + dcx);
 
@@ -572,7 +570,6 @@ TransportMollerup::Dirichlet_expl(const size_t cell,
        const double gradient =  area_per_length * (C_border - C_cell);
        Q_diff_out = -ThetaD_xx_zz * gradient;
        
-
        /*
        //the best until now ...
        Q_diff_out = -ThetaD_xx_zz * gradient;
@@ -588,15 +585,10 @@ TransportMollerup::Dirichlet_expl(const size_t cell,
          Q_diff_out = 0.5 * V_cell * C_cell/ddt;
        //Q_diff_out *= 0.5;   //svingende  */
        
-      
-
       /*
       // Doesnt works well
       const double gradient_max = area_per_length * C_border; // Depending on in or outflow
       const double gradient =  area_per_length * (C_border - C_cell);
-      
-      std::cout << "gradient_max: " << gradient_max << '\n';
-      std::cout << "gradient: " << gradient << '\n';
       
       double sign;
       if (gradient >= 0.0)
@@ -618,7 +610,6 @@ TransportMollerup::Dirichlet_expl(const size_t cell,
         Q_diff_out -= ThetaD_xx_zz * gradient;
       */
 
-
        /* Not only diffusion very stable but too low diffusion
        Q_diff_out -= ThetaD_xx_zz * gradient;
        
@@ -629,9 +620,6 @@ TransportMollerup::Dirichlet_expl(const size_t cell,
          Q_diff_out = 0.0;
        */ 
        
-       //
-       
-       
        /*
        //New one - elendig!
        Q_diff_out = -ThetaD_xx_zz * gradient;
@@ -640,16 +628,6 @@ TransportMollerup::Dirichlet_expl(const size_t cell,
        double V_cell = 0.1;
        double newC =  C_cell - (Q_diff_out+Q_advec_out)*ddt/V_cell;
        
-       std::cout << "C_cell" << C_cell << '\n';
-       std::cout << "V_cell = " << V_cell << '\n';
-       std::cout << "ddt = " << ddt << '\n';
-       std::cout << "newC = " << newC << '\n';
-       std::cout << "gradient = " << gradient << '\n';
-       std::cout << "ThetaD_xx_zz = " << ThetaD_xx_zz << '\n';
-       std::cout << "Q_diff_out = " << Q_diff_out << '\n';
-       std::cout << "Q_advec_out = " << Q_advec_out << '\n';
-
-
        if (newC > C_border)    
        Q_tot_out = V_cell * (C_cell-C_border)/ddt;  //almost stable - not best for only diff
        
@@ -663,7 +641,6 @@ TransportMollerup::Dirichlet_expl(const size_t cell,
     }
   else 
     Q_diff_out = 0.0; 
-  
   
   // Boundary flux by advection and diffusion
   Q_out = Q_advec_out + Q_diff_out;
@@ -746,14 +723,7 @@ TransportMollerup::Dirichlet_timestep
       daisy_assert (geo.cell_is_internal (cell));
       const double area_per_length = geo.edge_area_per_length (edge);
       const double V_cell = geo.cell_volume (cell);
-      
-      //const double gradient =  area_per_length * (C_border - C_cell);
-      //const double Q_diff_out = -ThetaD_xx_zz (edge) * gradient;
-      //if  (Q_diff_out < 0) //Diff into cell
-      //  ddt_dir_new = 0.5 * V_cell *  (C_cell-C_border) / Q_diff_out; 
-      //else if  (Q_diff_out < 0) //Diff into cell
-      //  ddt_dir_new = -0.5 * V_cell * (C_border-C_cell) / Q_diff_out; 
-    
+                
       if (ThetaD_xx_zz (edge) > 0)    //No diffusive transport if zero diff
         ddt_dir_new = 0.5 * V_cell / (ThetaD_xx_zz (edge) * area_per_length); 
       else 
@@ -793,15 +763,15 @@ TransportMollerup::forced_flux (const Geometry& geo,
 
 void 
 TransportMollerup::fluxes (const GeometryRect& geo,
-                              const std::vector<edge_type_t>& edge_type, 
-                              const ublas::vector<double>& q_edge,
-                              const ublas::vector<double>& ThetaD_xx_zz,
-                              const ublas::vector<double>& ThetaD_xz_zx,
-                              const ublas::vector<double>& C,
-                              const std::map<size_t, double>& J_forced,
-                              const std::map<size_t, double>& C_border,
-                              const ublas::vector<double>& B_dir_vec,
-                              ublas::vector<double>& dJ) const
+                           const std::vector<edge_type_t>& edge_type, 
+                           const ublas::vector<double>& q_edge,
+                           const ublas::vector<double>& ThetaD_xx_zz,
+                           const ublas::vector<double>& ThetaD_xz_zx,
+                           const ublas::vector<double>& C,
+                           const std::map<size_t, double>& J_forced,
+                           const std::map<size_t, double>& C_border,
+                           const ublas::vector<double>& B_dir_vec,
+                           ublas::vector<double>& dJ) const
 {
   const size_t edge_size = geo.edge_size (); // number of edges  
 
@@ -815,7 +785,7 @@ TransportMollerup::fluxes (const GeometryRect& geo,
     {
       const int from = geo.edge_from (e);
       const int to = geo.edge_to (e);  
-
+      
       switch (edge_type[e])
         {
         case Unhandled:
@@ -833,6 +803,7 @@ TransportMollerup::fluxes (const GeometryRect& geo,
               ? upstream_weight 
               : 1.0 - upstream_weight;
             dJ[e] = q_edge[e] * (alpha * C[from] + (1.0-alpha) * C[to]);
+            //mmo1 dJ[e] = 0.0;
 
             //--- Diffusive part - xx_zz --- 
             //const double gradient = geo.edge_area_per_length (e) *
@@ -841,7 +812,7 @@ TransportMollerup::fluxes (const GeometryRect& geo,
               / geo.edge_length (e);
 
             dJ[e] -= ThetaD_xx_zz[e]*gradient;  //xx_zz diffusion
-              
+                      
             //--- Diffusive part - xz_zx ---
             const std::vector<int>& corners = geo.edge_corners (e);
             daisy_assert (corners.size () == 2);
@@ -865,7 +836,7 @@ TransportMollerup::fluxes (const GeometryRect& geo,
             const double dkx = geo.corner_x (B) - geo.corner_x (A);
             const double area = geo.edge_area (e);
             daisy_assert (approximate (fabs (dkz + dkx), area));
-            double magnitude = -ThetaD_xz_zx (e) * area / (dkz + dkx);
+            double magnitude = -ThetaD_xz_zx (e) / (dkz + dkx);
 
             // On a border we calculate from edge center, rather than corner.
             if (A_is_border || B_is_border)
@@ -875,23 +846,23 @@ TransportMollerup::fluxes (const GeometryRect& geo,
             const double dcx = geo.cell_x (to) - geo.cell_x (from);
             const double length = geo.edge_length (e);
             daisy_assert (approximate (fabs (dcz + dcx), length));
-            //const double sign =  length / (dcz + dcx);
+            const double sign =  length / (dcz + dcx);
             
             double Sum_C_A = 0.0;
             for (size_t i = 0; i < A_cells.size (); i++)
               Sum_C_A += C[A_cells[i]];
             const double C_A = A_is_border
-              ? Sum_C_A / 4.0
-              : Sum_C_A / 2.0;
-
+              ? Sum_C_A / 2.0
+              : Sum_C_A / 4.0;
+            
             double Sum_C_B = 0.0;
             for (size_t i = 0; i < B_cells.size (); i++)
               Sum_C_B += C[B_cells[i]];
             const double C_B = B_is_border
-              ? Sum_C_B / 4.0
-              : Sum_C_B / 2.0;
-            
-            dJ[e] -= ThetaD_xz_zx (e) * (C_B-C_A)/(dcz + dcx);  
+              ? Sum_C_B / 2.0
+              : Sum_C_B / 4.0;
+           
+            dJ[e] += magnitude * (C_B-C_A) * sign;
           }
           break;
 
@@ -937,13 +908,6 @@ TransportMollerup::fluxes (const GeometryRect& geo,
 
             dJ[e] = -in_sign * B_dir_vec (cell) / geo.edge_area (e); 
 
-            // std::cout << "Dirichlet flux: \n";
-            // std::cout << "in_sign: " << in_sign << '\n';
-            // std::cout << "B_dir_vec (cell):" << B_dir_vec (cell) << '\n';  
-            // std::cout << "dJ[e]: " << dJ[e] << '\n';
-            
-            
-            
             /*
             //Advective transport
             const double in_sign 
@@ -959,12 +923,6 @@ TransportMollerup::fluxes (const GeometryRect& geo,
               (C[cell]-C_below)*in_sign;
             dJ[e] -= ThetaD_xx_zz[e]*gradient;
          
-            std::cout << "cell: " << cell << '\n';
-            std::cout << "in_sign:" << in_sign << '\n';
-            std::cout << "C[cell]:" << C[cell] << '\n';
-            std::cout << "C_below" << C_below << '\n';
-            std::cout << "gradient" << gradient << '\n';
-
             //Diffusive transport - xz_zx diffusion
             //Constant values along border direction ->
             //no flux
@@ -1022,7 +980,7 @@ TransportMollerup::flow (const Geometry& geo_base,
 
   // Solution old
   ublas::vector<double> C_old (cell_size);
-  for (int c = 0; c < cell_size; c++)
+  for (int c = 0; c < cell_size; c++)  
     C_old (c) = C[c];
   
   // Water content old and new 
@@ -1042,7 +1000,6 @@ TransportMollerup::flow (const Geometry& geo_base,
   for (int e = 0; e < edge_size; e++)
     q_edge (e) = q[e];
   
-  
   //Cell diffusion tensor
   ublas::vector<double> Dxx_cell (cell_size);
   ublas::vector<double> Dzz_cell (cell_size);
@@ -1052,37 +1009,19 @@ TransportMollerup::flow (const Geometry& geo_base,
   diffusion_tensor (geo, soil, q_edge, Theta_cell_avg, diffusion_coefficient,
                     Dxx_cell, Dzz_cell, Dxz_cell, msg);
   
-  //Theta * D - old and new and average 
-  //ublas::vector<double> ThetaD_xx_zz_old (edge_size);                       //mmo 20071102 
-  //ublas::vector<double> ThetaD_xz_zx_old (edge_size);                       //mmo 20071102
-  //thetadiff_xx_zz_xz_zx (geo, Theta_cell_old, Dxx_cell, Dzz_cell, Dxz_cell, //mmo 20071102
-  //                  ThetaD_xx_zz_old, ThetaD_xz_zx_old);                    //mmo 20071102
-  //ublas::vector<double> ThetaD_xx_zz (edge_size);                           //mmo 20071102
-  //ublas::vector<double> ThetaD_xz_zx (edge_size);                           //mmo 20071102
-  //thetadiff_xx_zz_xz_zx (geo, Theta_cell, Dxx_cell, Dzz_cell, Dxz_cell,     //mmo 20071102
-  //                  ThetaD_xx_zz, ThetaD_xz_zx);                            //mmo 20071102
-  
   ublas::vector<double> ThetaD_xx_zz_avg (edge_size); 
   ublas::vector<double> ThetaD_xz_zx_avg (edge_size);
   thetadiff_xx_zz_xz_zx (geo, Theta_cell_avg, Dxx_cell, Dzz_cell, Dxz_cell,
                          ThetaD_xx_zz_avg, ThetaD_xz_zx_avg);
 
   std::ostringstream tmp_mmo;
-  //ZZZZZZZZZZZZZZZZZ
-  //tmp_mmo << "Dxx_cell: " << Dxx_cell << '\n';
-  //tmp_mmo << "Dzz_cell: " << Dzz_cell << '\n';
-  //tmp_mmo << "Dxz_cell: " << Dxz_cell << '\n';
-  //tmp_mmo << "ThetaD_xx_zz_avg: " << ThetaD_xx_zz_avg << '\n';
-  //tmp_mmo << "ThetaD_xz_zx_avg: " << ThetaD_xz_zx_avg << '\n'; 
-  //XXXX---OOOO---XXXX
-  
  
-    
+      
   //Begin small timestep stuff  
   enum stabilizing_method_t { None, Timestep_reduction, Streamline_diffusion };
-  const stabilizing_method_t stabilizing_method = Streamline_diffusion;
+  // const stabilizing_method_t stabilizing_method = Streamline_diffusion;
   //const stabilizing_method_t stabilizing_method = Timestep_reduction;
-  //const stabilizing_method_t stabilizing_method = None;
+  const stabilizing_method_t stabilizing_method = None;
   const double ddt_min = 1e-10;
   const double gamma_stabilization = 2;
 
@@ -1097,19 +1036,15 @@ TransportMollerup::flow (const Geometry& geo_base,
     case None:
       {
         //No stabilization!!!
-        tmp_mmo << "No stabilization\n";
         ddt = dt;
         
-        //msg.message(tmp_mmo.str ());
-        //std::cout << "No stabilization\n";
         break;
       }
 
     case Timestep_reduction:
       {
         //Use smaller time steps
-        tmp_mmo << "Smaller timesteps\n";      
-        
+                
         ublas::vector<double> Theta_edge 
           = ublas::zero_vector<double> (edge_size);
         edge_water_content (geo, Theta_cell_avg, Theta_edge);      
@@ -1131,27 +1066,20 @@ TransportMollerup::flow (const Geometry& geo_base,
         if (ddt_PeCr_min < ddt_max)
           ddt_max = ddt_PeCr_min;
         
-        tmp_mmo << "ddt_PeCr_min: " << ddt_PeCr_min << '\n';
-        
         if (!C_border.size () > 0 && enable_boundary_diffusion)
           {
             double ddt_dir 
               = Dirichlet_timestep (geo, ThetaD_xx_zz_avg, ddt_max);
-            tmp_mmo << "ddt_dir: " << ddt_dir << '\n';
-            
+                        
             if (ddt_dir < ddt_max)
               ddt_max = ddt_dir;
           }
                      
-        tmp_mmo << "ddt_max: " << ddt_max << '\n'; 
-         
         if (ddt_max < ddt_min)
           ddt = ddt_min; // No timesteps smaller than ddt_min
         else 
           ddt = ddt_max; // Else use the maximum allowable timestep
               
-        //tmp_mmo << "ddt: " << ddt << '\n';
-
        
         //Number of small timesteps 
         const int divres = double2int(dt/ddt);
@@ -1171,13 +1099,12 @@ TransportMollerup::flow (const Geometry& geo_base,
     case Streamline_diffusion:
       {
         //Add some ekstra diffusion in the streamline 
-        tmp_mmo << "Streamline diffusion\n";      
         ddt = dt;
-    
+        
         ublas::vector<double> Theta_edge 
           = ublas::zero_vector<double> (edge_size);
         edge_water_content (geo, Theta_cell_avg, Theta_edge);
-      
+        
         for (size_t e = 0; e < edge_size; e++)
           {
             const double ThetaD_PeCr = q_edge[e]*q_edge[e] * dt
@@ -1195,12 +1122,6 @@ TransportMollerup::flow (const Geometry& geo_base,
   //--- For moving in/out of tick loop ---
   //--------------------------------------
 
-  //Initialize xx_zz diffusion matrix - old and new
-  //Solver::Matrix diff_xx_zz_old (cell_size);     //mmo 20071102
-  //diffusion_xx_zz (geo, ThetaD_xx_zz_old, diff_xx_zz_old);   //mmo 20071102      
-  //Solver::Matrix diff_xx_zz (cell_size);     //mmo 20071102
-  //diffusion_xx_zz (geo, ThetaD_xx_zz, diff_xx_zz);           //mmo 20071102 
-
   //Initialize xx_zz diffusion - average
   Solver::Matrix diff_xx_zz_avg (cell_size);
   diffusion_xx_zz (geo, ThetaD_xx_zz_avg, diff_xx_zz_avg);    
@@ -1209,9 +1130,6 @@ TransportMollerup::flow (const Geometry& geo_base,
   Solver::Matrix diff_xz_zx_avg (cell_size);
   diffusion_xz_zx (geo, ThetaD_xz_zx_avg, diff_xz_zx_avg); 
   
-  //tmp_mmo << "diff_xx_zz_avg" << diff_xx_zz_avg << '\n';
-  //tmp_mmo << "diff_xz_zx_avg" << diff_xz_zx_avg << '\n';
-
 
 
   //--- Things that not changes in smal timesteps --- 
@@ -1246,13 +1164,6 @@ TransportMollerup::flow (const Geometry& geo_base,
   ublas::vector<double> advecm_vec (cell_size);
   advecm_vec = ublas::zero_vector<double> (cell_size);  
 
-  //Debug - flow c ndition!!!
-  //J[0] = -0.5;       //mmoxxx 
-  //J[101] = -0.5;     //mmoxxx
-  //xxxxxxxxx
-  //Neumann_expl (0, 5.0, 1, 0.5, B_vec);  
-  //Neumann_expl (1, 5.0, 1, 0.5, B_vec);  
-  
 
   std::vector<edge_type_t> edge_type (edge_size, Unhandled);
   for (size_t e = 0; e < edge_size; e++)
@@ -1260,17 +1171,17 @@ TransportMollerup::flow (const Geometry& geo_base,
       edge_type[e] = Internal;
 
   forced_flux (geo, J_forced, edge_type, B_vec, msg);
-  
+
 
   // Solver parameter , gamma
   // gamma = 0      : Backward Euler 
   // gamma = 0.5    : Crank - Nicholson
   const double gamma = 0.5;
-   
+  //const double gamma = 0.0;
+
   //solver type for dc
   const bool simple_dcthetadt = true;
-     
-
+ 
   //Initialize A-matrix (left hand side)
   Solver::Matrix A (cell_size);  
   
@@ -1313,10 +1224,6 @@ TransportMollerup::flow (const Geometry& geo_base,
         // This should prevent orphans.
         ddt = time_left / 2.0;
       
-            
-      tmp_mmo << "ddt: " << ddt << '\n';
-
-
       time_left -= ddt;
       dtime += ddt;       //update time 
       
@@ -1390,16 +1297,27 @@ TransportMollerup::flow (const Geometry& geo_base,
           // b = ;      
         }
       
+      //mmotest------
+      //A (0, 0) = 1.0;
+      //A (0, 1) = 0.0;
+      //b (0) = 1.0;
+      //----------
+
+      ublas::vector<double> C_nm1 = C_n; //save results from old small timestep for flux est.
+            
       solver->solve (A, b, C_n); // Solve A C_n = b with regard to C_n.
       
       //Update fluxes 
+      ublas::vector<double> C_gamma (cell_size);
+      C_gamma = gamma * C_nm1 + (1-gamma) * C_n;
+    
       ublas::vector<double> dJ = ublas::zero_vector<double> (edge_size);
       fluxes (geo, edge_type, q_edge, ThetaD_xx_zz_avg, ThetaD_xz_zx_avg,
-              C_n, J_forced, C_border, B_dir_vec, dJ); 
-      
+              C_gamma, J_forced, C_border, B_dir_vec, dJ); 
+            
       for (int e=0; e<edge_size; e++)
         J[e] += dJ[e] * ddt/dt;
-      
+            
       //Update Theta and QTheta
       Theta_cell_n = Theta_cell_np1;
       QTheta_mat_n = QTheta_mat_np1;
@@ -1408,10 +1326,7 @@ TransportMollerup::flow (const Geometry& geo_base,
   
   ublas::vector<double> S_ublas (S.size ());
   copy (S.begin (), S.end (), S_ublas.begin ());
-  tmp_mmo << "C_n" << C_n << "\nS" << S_ublas << "\nS_vol" << S_vol;
-  //tmp_mmo << "C_n" << C_n << "\n";
-
-
+   
   //debug Print new solution
   //std::ostringstream tmp;
   // tmp << "C_n" << C_n;
