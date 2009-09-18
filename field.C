@@ -124,7 +124,7 @@ public:
   Column* find (symbol name) const;
 
   // Create and destroy.
-  bool check (bool require_weather, const Time& from, const Time& to, 
+  bool check (const Weather* global_weather, const Time& from, const Time& to, 
 	      const Scope& scope, Treelog&) const;
   bool check_am (const FrameModel& am, Treelog& err) const;
   bool check_z_border (double, Treelog& err) const;
@@ -710,7 +710,7 @@ Field::Implementation::find (symbol name) const
 }
 
 bool 
-Field::Implementation::check (bool require_weather,
+Field::Implementation::check (const Weather *const global_weather,
 			      const Time& from, const Time& to, 
 			      const Scope& scope, Treelog& err) const
 { 
@@ -720,7 +720,7 @@ Field::Implementation::check (bool require_weather,
        i++)
     {
       Treelog::Open nest (err, (*i) ? (*i)->name.name ().c_str () : "error");
-      if ((*i) == NULL || !(*i)->check (require_weather, from, to, scope, err))
+      if ((*i) == NULL || !(*i)->check (global_weather, from, to, scope, err))
 	ok = false;
     }
   return ok;
@@ -1025,9 +1025,10 @@ Field::size () const
 { return impl->columns.size (); }
 
 bool 
-Field::check (bool require_weather, const Time& from, const Time& to, 
+Field::check (const Weather *const global_weather, 
+              const Time& from, const Time& to, 
 	      const Scope& scope, Treelog& err) const
-{ return impl->check (require_weather, from, to, scope, err); }
+{ return impl->check (global_weather, from, to, scope, err); }
 
 bool 
 Field::check_am (const FrameModel& am, Treelog& err) const

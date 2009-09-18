@@ -157,7 +157,7 @@ public:
   void clear ();
   void tick (const Metalib& metalib, const Time&, const double dt, const Weather*,
              const Scope&, Treelog&);
-  bool check (bool require_weather,
+  bool check (const Weather* global_weather,
               const Time& from, const Time& to, 
               const Scope&, Treelog&) const;
   bool check_am (const FrameModel& am, Treelog&) const;
@@ -687,7 +687,7 @@ ColumnStandard::tick (const Metalib& metalib, const Time& time, const double dt,
 }
 
 bool
-ColumnStandard::check (bool require_weather,
+ColumnStandard::check (const Weather* global_weather,
                        const Time& from, const Time& to,
                        const Scope& parent_scope, Treelog& msg) const
 {
@@ -730,12 +730,18 @@ ColumnStandard::check (bool require_weather,
           return false;
       }
 
-    else if (require_weather)
+    else if (!global_weather)
       {
         msg.entry ("Weather unspecified");
         // The rest is uninitialized, don't check it!
         return false;
       }
+  }
+  const Weather& my_weather = weather.get () ? *weather : *global_weather;
+  {
+    Treelog::Open nest (msg, "Bioclimate");
+    if (!bioclimate->check (my_weather, msg))
+      ok = false;
   }
   {
     Treelog::Open nest (msg, "Chemistry");

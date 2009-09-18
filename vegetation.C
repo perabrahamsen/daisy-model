@@ -68,7 +68,10 @@ Vegetation::output (Log& log) const
   output_value (EpFactor (), "EpFactor", log);
   output_value (albedo (), "albedo", log);
   output_value (interception_capacity (), "interception_capacity", log);
-  output_value (stomata_conductance (), "stomata_conductance", log);
+  output_value (shadow_stomata_conductance (), 
+                "shadow_stomata_conductance", log);
+  output_value (sunlit_stomata_conductance (),
+                "sunlit_stomata_conductance", log);
 }
 
 Vegetation::Vegetation (const BlockModel& al)
@@ -120,8 +123,10 @@ Canopy adsorbtion fraction of unreached potential soil evaporation.");
                 "Another reflection factor");
     frame.declare ("interception_capacity", "mm", Attribute::LogOnly,
                 "Canopy water storage capacity");
-    frame.declare ("stomata_conductance", "m/s", Attribute::LogOnly,
-                "Stomata´conductance");
+    frame.declare ("shadow_stomata_conductance", "m/s", Attribute::LogOnly,
+                   "Field based stomata´conductance of shadow leaves.");
+    frame.declare ("sunlit_stomata_conductance", "m/s", Attribute::LogOnly,
+                   "Field based stomata´conductance of sunlit leaves.");
   }
 } Vegetation_init;
 

@@ -82,6 +82,7 @@ ABAProdUptake::production (const Units& units,
   // For all cells.
   for (size_t c = 0; c < cell_size; c++)
     {
+      const double h = soil_water.h (c);
       // Set up 'h' in scope.
       scope.set (h_name, soil_water.h (c));
 
@@ -91,10 +92,13 @@ ABAProdUptake::production (const Units& units,
 	msg.error ("No ABA production value found");
       if (!std::isfinite (value) || value < 0.0)
         {
-          std::ostringstream tmp;
-          tmp << "ABA in cell " << c << " with h = " << soil_water.h (c)
-              << " was " << value << " [" << ABA_unit << "], using 0 instead";
-          msg.warning (tmp.str ());
+          if (h > -14000) // We are not concerned with ABA below wilting point.
+            {
+              std::ostringstream tmp;
+              tmp << "ABA in cell " << c << " with h = " << h
+                  << " was " << value << " [" << ABA_unit << "], using 0 instead";
+              msg.warning (tmp.str ());
+            }
           value = 0.0;
         }
       daisy_assert (std::isfinite (S[c]));

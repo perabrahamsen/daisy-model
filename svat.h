@@ -55,7 +55,9 @@ public:
                      const Bioclimate&, Treelog&) = 0;
   virtual void output (Log&) const;
   virtual double production_stress () const = 0; // []
-  virtual void solve (const double /* stomata cond. [m/s]*/, Treelog&) = 0;
+  virtual void solve (const double /* shadow stomata cond. [m/s]*/, 
+                      const double /* sunlit stomata cond. [m/s]*/, 
+                      Treelog&) = 0;
   virtual double transpiration () const = 0; // [mm/h]
   virtual double CanopyTemperature () const = 0; // [dg C]
   virtual double SunLeafTemperature () const = 0; // [dg C]
@@ -65,6 +67,8 @@ public:
   virtual double ShadowBoundaryLayerWaterConductivity () const = 0; // [m/s]
 
   // Create and Destroy.
+public:
+  virtual bool check (const Weather& weather, Treelog& msg) const = 0;
 protected:
   SVAT (const BlockModel&);
 public:

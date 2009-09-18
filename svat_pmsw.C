@@ -1329,7 +1329,8 @@ public:
   double ShadowBoundaryLayerWaterConductivity () const; // [m/s]
 
 
-  void solve (const double /* stomata cond. [mol/m^2/s]*/, Treelog&);
+  void solve (const double gs_shadow /* stomata cond. [m/s]*/, 
+              const double gs_sunlit /* stomata cond. [m/s]*/, Treelog&);
 
   void tick (const Weather& weather, const Vegetation& crops,
              const Geometry&, const Soil& soil,
@@ -1338,6 +1339,16 @@ public:
   void output (Log& log) const;
 
   // Create and Destroy.
+  bool check (const Weather& weather, Treelog& msg) const
+  {
+    TREELOG_MODEL (msg);
+    bool ok = true;
+    if (!weather.has_wind ())
+      msg.error ("This model requires information about wind");
+    if (!weather.has_vapor_pressure ())
+      msg.warning ("This model requires information about humidity");
+    return ok;
+  }
   SVAT_PMSW (const BlockModel& al);
   void summarize (Treelog&) const
   { }
@@ -1384,7 +1395,7 @@ SVAT_PMSW::ShadowBoundaryLayerWaterConductivity () const
 }
 
 void 
-SVAT_PMSW::solve (const double /* stomata cond. [mol/m^2/s]*/, Treelog&) 
+SVAT_PMSW::solve (double, double, Treelog&) 
 { }
 
 void

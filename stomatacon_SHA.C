@@ -107,6 +107,7 @@ private:
   const double lambda; // Net photosynthesis effect [m^2 leaf s/mol CO2]
   const double alpha;  // Humidity effect []
   const double M;      // Conductivity factor [mol H2O/m^2 leaf/s]
+  const double gs_max; // Maximum gs [mol/m^2 leaf/s]
 
   // Simulation.
   double stomata_con (const double wsf, const double m, const double hs, 
@@ -122,7 +123,8 @@ private:
     : StomataCon (al),
       lambda (al.number ("lambda")),
       alpha (al.number ("alpha")),
-      M (al.number ("M"))
+      M (al.number ("M")),
+      gs_max (al.number ("max", -42.42e42))
   { }
 };
 
@@ -140,7 +142,10 @@ StomataCon_SHA14::stomata_con (const double wsf /*[]*/,
   const double A = pz * 1e6;    // [umol/m^2 LEAF/s]
   const double gsw = wsf * M * exp (hs * alpha) * exp (A * lambda) / cs_ppm;
   daisy_assert (gsw >= 0.0);
-  return gsw;
+  if (gs_max < 0.0)
+    return gsw;
+  
+  return std::min (gsw, gs_max);
 }
 
 static struct StomataConSHA14Syntax : public DeclareModel
@@ -164,7 +169,86 @@ Stomata conductance calculated by the model given by Eq. 14.")
     frame.declare ("M", "mol H2O/m^2 leaf/s", 
                    Check::non_negative (), Attribute::Const,
                    "Conductivity factor.");
+    frame.declare ("max", "mol H2O/m^2 leaf/s", 
+                   Check::none (), Attribute::OptionalConst,
+                   "Maximal conductivity.\n\
+By default, stere is no maixum.");
   }
 } StomataConSHA14syntax;
+
+struct StomataCon_MNA : public StomataCon
+{
+  // Parameters.
+private:
+  const double lambda; // Net photosynthesis effect [m^2 leaf s/mol CO2]
+  const double alpha;  // Humidity effect []
+  const double M;      // Conductivity factor [mol H2O/m^2 leaf/s]
+  const double gs_max; // Maximum gs [mol/m^2 leaf/s]
+
+  // Simulation.
+  double stomata_con (const double wsf, const double m, const double hs, 
+                      const double pz, const double Ptot, const double cs,
+                      const double Gamma, const double intercept,
+                      const double CO2_atm, const double Ds, Treelog&);
+  void output (Log&) const
+  { }
+
+  // Create.
+  public:
+  StomataCon_MNA (const BlockModel& al)
+    : StomataCon (al),
+      lambda (al.number ("lambda")),
+      alpha (al.number ("alpha")),
+      M (al.number ("M")),
+      gs_max (al.number ("max", -42.42e42))
+  { }
+};
+
+double
+StomataCon_MNA::stomata_con (const double wsf /*[]*/, 
+                               const double,
+                               const double hs /*[]*/, 
+                               const double pz /*[mol/m²leaf/s]*/,
+                               const double Ptot /*[Pa]*/, 
+                               const double cs /*[Pa]*/,
+                               const double, const double intercept,
+                               const double CO2_atm, const double, Treelog&)
+{
+  const double cs_ppm = cs /*[Pa]*/ / Ptot /*[Pa]*/ * 1.0e6 /*[ppm]*/;
+  const double A = pz * 1e6;    // [umol/m^2 LEAF/s]
+  daisy_assert (A > 0.0);
+  const double gsw = intercept 
+    + wsf * M * exp (hs * alpha) * exp (lambda / A) / cs_ppm;
+  daisy_assert (gsw >= 0.0);
+  if (gs_max < 0.0)
+    return gsw;
+  return std::min (gsw, gs_max);
+}
+
+static struct StomataConMNASyntax : public DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new StomataCon_MNA (al); }
+  StomataConMNASyntax ()
+    : DeclareModel (StomataCon::component, "MNA", "\
+Stomata conductance calculated by the model given by Eq. 14.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.declare ("alpha", Attribute::None (), Check::non_negative (),
+                   Attribute::Const,
+                   "Humidity effect");
+    frame.declare ("lambda", "umol CO2/m^2 leaf/s", Check::non_positive (),
+                   Attribute::Const,
+                   "Net photosyhtesis effect");
+    frame.declare ("M", "mol H2O/m^2 leaf/s", 
+                   Check::non_negative (), Attribute::Const,
+                   "Conductivity factor.");
+    frame.declare ("max", "mol H2O/m^2 leaf/s", 
+                   Check::none (), Attribute::OptionalConst,
+                   "Maximal conductivity.\n\
+By default, stere is no maixum.");
+  }
+} StomataConMNAsyntax;
 
 // stomatacon_SHA.C ends here.

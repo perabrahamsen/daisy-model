@@ -145,7 +145,7 @@ public:
   unsigned int size () const;
 
   // Create and destroy.
-  bool check (bool require_weather, const Time& from, const Time& to, 
+  bool check (const Weather* global_weather, const Time& from, const Time& to, 
 	      const Scope&, Treelog&) const;
   bool check_am (const FrameModel& am, Treelog&) const;
   bool check_z_border (double, Treelog&) const;

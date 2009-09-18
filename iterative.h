@@ -23,6 +23,10 @@
 
 #include <cmath>
 #include <iostream>
+#include <boost/noncopyable.hpp>
+#include <vector>
+
+class Treelog;
 
 template<class T>
 const double
@@ -100,5 +104,45 @@ Newton (double guess, F& f, D& d, std::ostream *const dbg = NULL)
       abs_value = new_abs_value;
     }
 }
+
+// The Fixpoint class will find a fixpoint of an multivariable (or
+// vector) function.  To use it, create a subclass that provides the
+// following three functions: 'initial_guess' for the initial guess;
+// 'f' for the function itself; and finaly 'max_distance' for the
+// convergence criteria.
+// 
+// The class define the distance between two values as the Euclidian
+// distance between two vectors created by dividing each parameter in
+// each value by the corresponding max_distance component.  
+//
+// A fixpoint will be found if the function always point in the right
+// direction (right hemisphere) in this vector space.
+
+struct Fixpoint : boost::noncopyable
+{
+  // Our value type.
+  typedef std::vector<double> Value;
+
+  // Paramaters.
+  const int max_iteration;
+
+  // Our initial guess for a solution.
+  virtual Value initial_guess () const = 0;
+
+  // The function we want to find a fixpoint for.
+  virtual Value f (const Value& x, Treelog& msg) = 0;
+  
+  // Distance
+  double find_epsilon () const;
+  virtual const Value& max_distance () const = 0;
+  double diff (const Value& A, const Value& B) const;
+  Value average (const Value& A, const Value& B) const;
+
+  // Solve
+  Value solve (Treelog&);
+
+  Fixpoint (const int max_iter);
+  virtual ~Fixpoint ();
+};
 
 #endif // ITERATIVE_H

@@ -334,6 +334,7 @@ struct BioclimateStandard : public Bioclimate
 
   // Create.
   void initialize (const Block&, const Weather&);
+  bool check (const Weather& weather, Treelog& msg) const;
   BioclimateStandard (const BlockModel&);
   void summarize (Treelog& msg) const;
   ~BioclimateStandard ();
@@ -382,6 +383,16 @@ BioclimateStandard::initialize (const Block& block, const Weather& weather)
       difrad.reset (Librarian::build_stock<Difrad> (metalib, msg, type, 
                                                     "difrad"));
     }
+}
+
+bool 
+BioclimateStandard::check (const Weather& weather, Treelog& msg) const
+{
+  TREELOG_MODEL (msg);
+  bool ok = true;
+  if (!svat->check (weather, msg))
+    ok = false;
+  return ok;
 }
 
 BioclimateStandard::BioclimateStandard (const BlockModel& al)
@@ -842,30 +853,91 @@ BioclimateStandard::WaterDistribution (const Units& units,
 
   // Our initial guess for transpiration is based on remaining energy.
   double crop_ea_svat_old = crop_ea_soil;
-  
+  std::ostringstream lout;
+
+  // Use relaxation faction for gs
+  double gs_shadow_sum = 0.0;
+  double gs_sunlit_sum = 0.0;
+
   for (int iteration = 0; iteration < max_svat_iterations; iteration++)
     {
       std::ostringstream tmp;
       tmp << "svat iteration " << iteration;
       Treelog::Open nest (msg, tmp.str ());
 
+      // Old values
+      const double old_CanopyTemperature     // [dg C]
+        = svat->CanopyTemperature ();
+      const double old_SunLeafTemperature  // [dg C]
+        = svat->SunLeafTemperature ();
+      const double old_ShadowLeafTemperature  // [dg C]
+        = svat->ShadowLeafTemperature ();
+      const double old_CanopyVapourPressure   // [Pa]
+        = svat->CanopyVapourPressure ();
+      const double old_SunBoundaryLayerWaterConductivity // [m/s]
+        = svat->SunBoundaryLayerWaterConductivity ();
+      const double old_ShadowBoundaryLayerWaterConductivity  // [m/s]
+        = svat->ShadowBoundaryLayerWaterConductivity ();
+
       // Find stomata conductance based on ABA and crown potential
       // from last attempt at crop transpiration.
       vegetation.find_stomata_conductance (units, time, *this, dt, msg);
-      const double gs = vegetation.stomata_conductance ();
+      const double new_weight = 0.0;
+      const double gs_shadow_new = vegetation.shadow_stomata_conductance ();
+      gs_shadow_sum += gs_shadow_new;
+      const double gs_shadow 
+        = (1.0 - new_weight) * gs_shadow_sum / (iteration + 1.0)
+        + new_weight * gs_shadow_new;
+      const double gs_sunlit_new = vegetation.sunlit_stomata_conductance ();
+      gs_sunlit_sum += gs_sunlit_new;
+      const double gs_sunlit 
+        = (1.0 - new_weight) * gs_sunlit_sum / (iteration + 1.0)
+        + new_weight * gs_sunlit_new;
 
       // Find expected transpiration from stomate conductance.
-      svat->solve (gs, msg);
+      svat->solve (gs_shadow, gs_sunlit, msg);
       
       const double crop_ea_svat = svat->transpiration ();
 
-      if (std::fabs (crop_ea_svat - crop_ea_svat_old) 
-          < max_svat_absolute_difference)
+      const double max_T = 0.1;     // [dg C]
+      const double max_gs = 0.001; // [m/s]
+      const double max_ec = 1;  // [Pa]
+      if ((std::fabs (old_CanopyTemperature - svat->CanopyTemperature ())
+           < max_T)
+          && (std::fabs (old_SunLeafTemperature - svat->SunLeafTemperature ())
+              < max_T)
+          && (std::fabs (old_ShadowLeafTemperature
+                         - svat->ShadowLeafTemperature ())
+              < max_T)
+          && (std::fabs (old_CanopyVapourPressure 
+                         - svat->CanopyVapourPressure ())
+              < max_ec)
+          && (std::fabs (old_SunBoundaryLayerWaterConductivity 
+                         - svat->SunBoundaryLayerWaterConductivity ())
+              < max_gs)
+          && (std::fabs (old_ShadowBoundaryLayerWaterConductivity 
+                         - svat->ShadowBoundaryLayerWaterConductivity ())
+              < max_gs)
+          && (std::fabs (crop_ea_svat - crop_ea_svat_old) 
+              < max_svat_absolute_difference)
+          && (std::fabs (gs_shadow_new - gs_shadow) < max_gs)
+          && (std::fabs (gs_sunlit_new - gs_sunlit) < max_gs))
         {
           // Stomate may limit transpiration, not increase it.
           //  daisy_assert (crop_ea_ < crop_ea_soil + 0.01);
           goto success;
         }
+      lout << "\niteration " << iteration 
+           << ", Tc = " << old_CanopyTemperature 
+           << ", Tsun = " << old_SunLeafTemperature
+           << ", Tshadow = " << old_ShadowLeafTemperature
+           << ", ec = " << old_CanopyVapourPressure
+           << ", gb_sun = " << old_SunBoundaryLayerWaterConductivity
+           << ", gb_shadow = " << old_ShadowBoundaryLayerWaterConductivity
+           << ", gs_shadow = " << gs_shadow
+           << ", gs_sun = " << gs_sunlit
+           << ", T = " << crop_ea_svat_old;
+
       crop_ea_svat_old = crop_ea_svat;
 
       // Calculate new crop transpiration based on latest SVAT guess.
@@ -876,6 +948,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
     }
   msg.error ("SVAT transpiration and stomata conductance"
              " loop did not converge");
+  msg.debug (lout.str ());
  success:;
 
   // Stress calculated by the SVAT model.

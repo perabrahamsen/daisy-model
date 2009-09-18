@@ -39,13 +39,13 @@
 #include "librarian.h"
 #include "solver.h"
 #include "frame.h"
+#include "weather.h"
+#include "iterative.h"
 #include <memory>
 #include <sstream>
 
 struct SVAT_SSOC : public SVAT
 {
-  const std::auto_ptr<Solver> solver;
-
   // Constants.
   static const double epsilon; // Emmision of Longwave rad == SurEmiss [] 
   static const double sigma;   // Stefan Boltzman constant [W m^-2 K^-4]
@@ -53,9 +53,6 @@ struct SVAT_SSOC : public SVAT
   static const double c_p;     // Specific heat of air [J kg^-1 K^-1]
   //Parameters
   const bool hypostomatous;    // True for hypostomatous leaves;
-  const double maxTdiff;        // Largest temperature difference for conv. [K]
-  const double maxEdiff;        // Largest humidity difference for converg. [Pa]
-  const double max_iteration;   // Max number of iterations before giving up c.
   const double z_0b;     //Bare soil roughness height for momentum [m]
 
   // Driving variables.
@@ -158,6 +155,82 @@ struct SVAT_SSOC : public SVAT
   double R_eq_abs_shadow; // Equilibrium net-radiation absorbed by the shadow leaves
                           // [W m^-2]
 
+  // Numeric solvers.
+  struct FixpointSSOC : public Fixpoint
+  {
+    // Content.
+    SVAT_SSOC& ssoc;
+    Value initial;
+    double gs_shadow;
+    double gs_sunlit;
+    const Value max;
+
+    // Extra.
+    void set_initial ()
+    { initial = get_value (); }
+    void set_gs (const double gs_shadow_ /* stomata cond. [m/s]*/, 
+                 const double gs_sunlit_ /* stomata cond. [m/s]*/)
+    {
+      gs_shadow = gs_shadow_;
+      gs_sunlit = gs_sunlit_;
+    }
+    void set_value (const Value& x)
+    { 
+      daisy_assert (x.size () == 5);
+      ssoc.T_c = x[0];
+      ssoc.T_s = x[1];
+      ssoc.T_sun = x[2];
+      ssoc.T_shadow = x[3];
+      ssoc.e_c = x[4];
+    }
+    Value get_value () const
+    {
+      Value x (5);
+      x[0] = ssoc.T_c;
+      x[1] = ssoc.T_s;
+      x[2] = ssoc.T_sun;
+      x[3] = ssoc.T_shadow;
+      x[4] = ssoc.e_c;;
+      return x;
+    }
+
+    // Fixpoint.
+    Value initial_guess () const
+    { return initial; }
+    Value f (const Value& x, Treelog& msg)
+    { 
+      set_value (x);
+      ssoc.calculate_conductances (gs_shadow, gs_sunlit, msg);
+      ssoc.calculate_temperatures (msg);
+      return get_value ();
+    }
+    const Value& max_distance () const
+    { return max; }
+
+    // Create and destroy.
+    Value create_max (const double T, const double e)
+    {
+      Value result (4, T);
+      result.push_back (e);
+      return result;
+    }
+    FixpointSSOC (SVAT_SSOC& svat, 
+                  const int max_iteration, 
+                  const double max_T, 
+                  const double max_E)
+      : Fixpoint (max_iteration),
+        ssoc (svat),
+        initial (5, -42.42e42),
+        gs_shadow (-42.42e42),
+        gs_sunlit (-42.42e42),
+        max (create_max (max_T, max_E))
+    { }
+    ~FixpointSSOC ()
+    { }
+  };
+  FixpointSSOC fix;
+  const std::auto_ptr<Solver> solver;
+
   bool initialized_soil; 
   bool initialized_canopy;
   size_t converge_fail;
@@ -168,13 +241,17 @@ struct SVAT_SSOC : public SVAT
 	     const Geometry&, const Soil&, const SoilHeat&,
 	     const SoilWater&, const Bioclimate&, Treelog&); 
 
-  void calculate_conductances (const double gs /* stomata cond. [m/s]*/, Treelog& msg);
+  void calculate_conductances (const double gs_shadow /* stomata cond. [m/s]*/, 
+                               const double gs_sunlit /* stomata cond. [m/s]*/, 
+                               Treelog& msg);
   
   void calculate_temperatures (Treelog& msg);
 
   void calculate_fluxes ();
 
-  void solve(const double gs /* stomata cond. [m/s]*/, Treelog& msg);
+  void solve (const double gs_shadow /* stomata cond. [m/s]*/, 
+              const double gs_sunlit /* stomata cond. [m/s]*/, 
+              Treelog& msg);
 
   double production_stress () const
   { return -1; }
@@ -206,6 +283,16 @@ struct SVAT_SSOC : public SVAT
   void output(Log& log) const;
 
   // Create.
+  bool check (const Weather& weather, Treelog& msg) const
+  {
+    TREELOG_MODEL (msg);
+    bool ok = true;
+    if (!weather.has_wind ())
+      msg.error ("This model requires information about wind");
+    if (!weather.has_vapor_pressure ())
+      msg.warning ("This model requires information about humidity");
+    return ok;
+  }
   SVAT_SSOC (const BlockModel& al);
   void summarize (Treelog& msg) const
   { 
@@ -297,18 +384,25 @@ SVAT_SSOC::tick (const Weather& weather, const Vegetation& vegetation,
           e_c = e_a;
         }
     }
-  else initialized_canopy = false;
+  else 
+    initialized_canopy = false;
 
-#if 1 // PACHANGES
+#if 1
   T_c = T_a; //[K]
   T_sun = T_shadow = T_s = T_0 = T_c;
   e_c = e_a;
-  gb_W_sun = gb_W_shadow = Resistance::molly2ms (T_a - TK, Ptot, 2.0);
 #endif
+
+  gb_W_sun = gb_W_shadow = Resistance::molly2ms (T_a - TK, Ptot, 2.0);
+
+  // Remember initial conditions before solve is called multiple times.
+  fix.set_initial ();
 }
 
 void 
-SVAT_SSOC::calculate_conductances (const double g_s /* stomata cond. [m/s]*/, Treelog& msg)
+SVAT_SSOC::calculate_conductances (const double g_s_sun /* stom cond. [m/s]*/, 
+                                   const double g_s_shadow /* stomc. [m/s]*/, 
+                                   Treelog& msg)
 {
   // Function to correct diffusivities for temperature and pressure
   const double Cl = Resistance::Cl(T_a - TK, Ptot);
@@ -401,8 +495,7 @@ SVAT_SSOC::calculate_conductances (const double g_s /* stomata cond. [m/s]*/, Tr
 
       // Water conductance from sunlit leaves to canopy point
       // - sum of boundary and stomata
-      const double r_W_sun_c = 1./gb_W_sun 
-        + 1./(g_s * sun_LAI_fraction_total); 
+      const double r_W_sun_c = 1./gb_W_sun + 1./g_s_sun; 
       g_W_sun_c = 1./r_W_sun_c;
       
       //Shadow fraction --------------------------------------------------
@@ -423,8 +516,7 @@ SVAT_SSOC::calculate_conductances (const double g_s /* stomata cond. [m/s]*/, Tr
 
       // Water conductance from shadow leaves to canopy point 
       // - sum of boundary and stomata
-      const double r_W_shadow_c = 1./gb_W_shadow
-        + 1./(g_s * (1.-sun_LAI_fraction_total));
+      const double r_W_shadow_c = 1./gb_W_shadow + 1./g_s_shadow;
       g_W_shadow_c =1./r_W_shadow_c;
     }
   else
@@ -744,12 +836,44 @@ SVAT_SSOC:: calculate_fluxes()
     }
 }
 
-
+#if 1
 void
-SVAT_SSOC::solve(const double gs /* stomata cond. [m/s]*/, Treelog& msg )
+SVAT_SSOC::solve (const double gs_shadow /* stomata cond. [m/s]*/, 
+                  const double gs_sunlit /* stomata cond. [m/s]*/, 
+                  Treelog& msg)
+{
+  fix.set_gs (gs_shadow, gs_sunlit);
+  try 
+    {
+      Fixpoint::Value solution = fix.solve (msg);
+      fix.set_value (solution);
+    }
+  catch (const char *const error)
+    {
+      msg.error (error);
+      initialized_soil = has_LAI = false; // Prevent log.
+      fix.set_value (fix.initial_guess ());
+      calculate_conductances (gs_shadow, gs_sunlit, msg);
+      converge_fail++;
+    }
+  converge_total++;
+  calculate_fluxes ();
+}
+
+#else
+void
+SVAT_SSOC::solve (const double gs_shadow /* stomata cond. [m/s]*/, 
+                  const double gs_sunlit /* stomata cond. [m/s]*/, 
+                  Treelog& msg )
 {
   TREELOG_MODEL (msg);
   std::ostringstream tmp;
+  tmp << "Too many iterations.";
+  double sum_T_c = 0.0;
+  double sum_T_s = 0.0;
+  double sum_T_sun = 0.0;
+  double sum_T_shadow = 0.0;
+  double sum_e_c = 0.0;
 
   for (int i = 0; i<max_iteration; i++)
     {    
@@ -759,7 +883,7 @@ SVAT_SSOC::solve(const double gs /* stomata cond. [m/s]*/, Treelog& msg )
       const double old_T_shadow = T_shadow;
       const double old_e_c = e_c; 
 
-      calculate_conductances(gs, msg);
+      calculate_conductances(gs_shadow, gs_sunlit, msg);
       calculate_temperatures(msg);
       
       if(std::fabs(old_T_c - T_c) < maxTdiff 
@@ -768,16 +892,54 @@ SVAT_SSOC::solve(const double gs /* stomata cond. [m/s]*/, Treelog& msg )
          && std::fabs(old_T_shadow - T_shadow) < maxTdiff 
          && std::fabs( old_e_c - e_c) < maxEdiff)
         goto success;
+      tmp << "\ni = " << i
+          << ", T_c = " << T_c
+          << ", T_s = " << T_s
+          << ", T_sun = " << T_sun
+          << ", T_shadow = " << T_shadow
+          << ", e_c = " << e_c;
+      tmp << "\nold"
+          << ", T_c = " << old_T_c
+          << ", T_s = " << old_T_s
+          << ", T_sun = " << old_T_sun
+          << ", T_shadow = " << old_T_shadow
+          << ", e_c = " << old_e_c;
+
+      // Use history of guesses for more robust convergence.
+      sum_T_c += T_c;
+      sum_T_s += T_s;
+      sum_T_sun += T_sun;
+      sum_T_shadow += T_shadow;
+      sum_e_c += e_c;
+#define USE_SUM
+#ifdef USE_SUM
+      T_c = sum_T_c / (i + 1.0);
+      T_s = sum_T_s / (i + 1.0);
+      T_sun = sum_T_sun / (i + 1.0);
+      T_shadow = sum_T_shadow / (i + 1.0);
+      e_c = sum_e_c  / (i + 1.0);
+#elif defined (USE_OLD)
+      const double weight = 0.5;
+      T_c = old_T_c * (1 - weight) + T_c * weight;
+      T_s = old_T_s * (1 - weight) + T_s * weight;
+      T_sun = old_T_sun * (1 - weight) + T_sun * weight;
+      T_shadow = old_T_shadow * (1 - weight) + T_shadow * weight;
+      e_c = old_e_c * (1 - weight) + e_c * weight;
+#endif // USE_OLD
     } 
-  msg.debug ("Too many iterations.");
+
+  msg.warning ("Convergence failed");
+  msg.debug (tmp.str ());
   initialized_soil = has_LAI = false; // Prevent log.
   T_c = T_sun = T_shadow = T_s = T_a;
-  calculate_conductances(gs, msg);
+  calculate_conductances(gs_shadow, gs_sunlit, msg);
   converge_fail++;
  success:
   converge_total++;
   calculate_fluxes();
 }
+
+#endif
 
 void
 SVAT_SSOC::output(Log& log) const
@@ -831,11 +993,7 @@ SVAT_SSOC::output(Log& log) const
 
 SVAT_SSOC::SVAT_SSOC (const BlockModel& al)
   : SVAT (al), 
-    solver (Librarian::build_item<Solver> (al, "solver")),
     hypostomatous (al.flag ("hypostomatous")),
-    maxTdiff (al.number ("maxTdiff")),
-    maxEdiff (al.number ("maxEdiff")),
-    max_iteration (al.integer ("max_iteration")),
     z_0b (al.number ("z_0b")),
     Ptot (-42.42e42),
     T_a (-42.42e42),
@@ -900,6 +1058,9 @@ SVAT_SSOC::SVAT_SSOC (const BlockModel& al)
     R_eq_abs_soil (-42.42e42),
     R_eq_abs_sun (-42.42e42),
     R_eq_abs_shadow (-42.42e42),
+    fix (*this, al.integer ("max_iteration"),
+         al.number ("maxTdiff"), al.number ("maxEdiff")),
+    solver (Librarian::build_item<Solver> (al, "solver")),
     initialized_soil (false), 
     initialized_canopy (false),
     converge_fail (0),
@@ -926,13 +1087,13 @@ False for amphistomatous leaves (possesing stomata on both surfaces).");
 
     frame.declare ("maxTdiff", "K", Attribute::Const, "\
 Largest temperature difference for convergence.");
-    frame.set ("maxTdiff", 0.001);
+    frame.set ("maxTdiff", 0.05);
     frame.declare ("maxEdiff", "Pa", Attribute::Const, "\
 Largest humidity difference for convergence.");
-    frame.set ("maxEdiff", 0.01);
+    frame.set ("maxEdiff", 0.5);
     frame.declare_integer ("max_iteration", Attribute::Const, "\
 Largest number of iterations before giving up on convergence.");
-    frame.set ("max_iteration", 150);  
+    frame.set ("max_iteration", 1500);  
     frame.declare ("z_0b", "m", Attribute::Const, "\
 Bare soil roughness height for momentum.");
     frame.set ("z_0b", Resistance::default_z_0b);

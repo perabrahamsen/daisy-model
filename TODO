@@ -1,5 +1,12 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* svat_ssoc.C convergence
+
+max_error skal blive mindre
+error = diff / max_diff
+
+generel solver?
+
 * photo_Farquhar.C
 
 ** Check enhed på "m" i gsmodeller.
@@ -8,17 +15,13 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 ** rs_min / rs_max i pet_PM
 
+* gs_expr
+
 * Erstat FAO::AirDensity med Resistence::rho_a
 
 Enable PetFAO_PM::wet
 
 test resultater
-
-* q_primary? 25
-
-Find ud af om J er ok for indre knuder.
-
-Det er den ikke, snak med MMO
 
 * Rejseforsikring?
 

@@ -83,16 +83,24 @@ struct CropStandard : public Crop
   { return canopy.rs_min; }
   double rs_max () const	// Maximum transpiration resistance.
   { return canopy.rs_max; }
-  double stomata_conductance () const // Current stomata_conductance [m/s].
+  double shadow_stomata_conductance () const // Current gs [m/s FIELD].
   {
+    
     // Stomata conductance
-    const double gs = shadow->stomata_conductance ()
-      + sunlit->stomata_conductance () 
-      + reserved->stomata_conductance ();//[m s^-1]
+    const double gs = shadow->stomata_conductance ();//[m s^-1]
     if(gs < 0)
       return 1.0/rs_min(); // Photo_GL have no stomata conductance.
     return gs; 
   }                     
+  double sunlit_stomata_conductance () const // Current gs [m/s FIELD].
+  {
+    
+    // Stomata conductance
+    const double gs = sunlit->stomata_conductance ();//[m s^-1]
+    if(gs < 0)
+      return 1.0/rs_min(); // Photo_GL have no stomata conductance.
+    return gs; 
+  }
   double leaf_width () const
   { return canopy.leaf_width (DS ()); }
 

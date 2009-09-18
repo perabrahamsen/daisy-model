@@ -152,7 +152,7 @@ public:
                      const Time&, double dt, const Weather*, 
 		     const Scope&, Treelog&) = 0;
 
-  virtual bool check (bool require_weather,
+  virtual bool check (const Weather* global_weather,
 		      const Time& from, const Time& to, 
 		      const Scope&, Treelog&) const = 0;
   virtual bool check_am (const FrameModel& am, Treelog&) const = 0;

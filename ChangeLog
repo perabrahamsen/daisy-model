@@ -1,3 +1,12 @@
+2009-09-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* bioclimate_std.C (WaterDistribution): More convergense criteria, stabilise gs.
+
+	* ABAprod_uptake.C (production): Don't warn about ABA when h is below WP.
+
+	* crop, vegetation, bioclimate, svat: Divide stomata conductance
+	into shadow and sunlit leaves.
+
 2009-09-13  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* all: Read O2 from weather. Made CO2 relative to atmospheric pressure.

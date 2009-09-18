@@ -50,7 +50,11 @@ Crop::rs_max () const
 { return 1.0e5; }
 
 double 
-Crop::stomata_conductance () const
+Crop::shadow_stomata_conductance () const
+{ return LAI () / rs_max(); }
+
+double 
+Crop::sunlit_stomata_conductance () const
 { return LAI () / rs_max(); }
 
 double 

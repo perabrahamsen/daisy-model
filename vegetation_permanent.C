@@ -89,7 +89,9 @@ struct VegetationPermanent : public Vegetation
   { return canopy.rs_min; }
   double rs_max () const	// Maximum transpiration resistance.
   { return canopy.rs_max; }
-  double stomata_conductance () const
+  double shadow_stomata_conductance () const
+  { return 1.0 / rs_min (); }
+  double sunlit_stomata_conductance () const
   { return 1.0 / rs_min (); }
   double LAI () const
   { return canopy.CAI; }

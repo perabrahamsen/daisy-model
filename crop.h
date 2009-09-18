@@ -60,7 +60,8 @@ public:
   virtual double minimum_light_fraction () const;
   virtual double rs_min () const; // Minimum transpiration resistance [s/m].
   virtual double rs_max () const; // Maximum transpiration resistance [s/m].
-  virtual double stomata_conductance () const; // Actual conductance [m/s].
+  virtual double shadow_stomata_conductance () const; // [m/s FIELD]
+  virtual double sunlit_stomata_conductance () const; // [m/s FIELD]
   virtual double leaf_width () const; // Leaf width 
   virtual double height () const = 0;
   virtual double LAI () const = 0;

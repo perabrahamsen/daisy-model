@@ -83,7 +83,8 @@ struct VegetationCrops : public Vegetation
 
   // Water.
   double interception_capacity_;// Canopy water storage capacity [mm]
-  double stomata_conductance_;  // Canopy stomata conductance. [m/s]
+  double shadow_stomata_conductance_;  // Canopy stomata conductance. [m/s]
+  double sunlit_stomata_conductance_;  // Canopy stomata conductance. [m/s]
 
   // Queries.
   double shared_light_fraction () const
@@ -96,8 +97,10 @@ struct VegetationCrops : public Vegetation
   { 
     return CanopyHarmonic (&Crop::rs_max) ; 
   }
-  double stomata_conductance () const	// Stomata conductance [m/s]
-  { return stomata_conductance_; }
+  double shadow_stomata_conductance () const	// Stomata conductance [m/s]
+  { return shadow_stomata_conductance_; }
+  double sunlit_stomata_conductance () const	// Stomata conductance [m/s]
+  { return sunlit_stomata_conductance_; }
   double LAI () const
   { return LAI_; }
   double height () const
@@ -400,7 +403,8 @@ VegetationCrops::find_stomata_conductance (const Units& units,
                                            const Bioclimate& bioclimate,
                                            double dt, Treelog& msg)
 {
-  stomata_conductance_ = 0.0;
+  shadow_stomata_conductance_ = 0.0;
+  sunlit_stomata_conductance_ = 0.0;
 
   if (LAI () < 1e-9)
     return;
@@ -410,7 +414,8 @@ VegetationCrops::find_stomata_conductance (const Units& units,
        crop++)
     {
       (*crop)->find_stomata_conductance (units, time, bioclimate, dt, msg);
-      stomata_conductance_ += (*crop)->stomata_conductance ();
+      shadow_stomata_conductance_ += (*crop)->shadow_stomata_conductance ();
+      sunlit_stomata_conductance_ += (*crop)->sunlit_stomata_conductance ();
     }
 }
 
@@ -937,7 +942,8 @@ VegetationCrops::VegetationCrops (const BlockModel& al)
     EpFactor_ (0.0),
     albedo_ (0.0),
     interception_capacity_ (0.0),
-    stomata_conductance_ (0.0)
+    shadow_stomata_conductance_ (0.0),
+    sunlit_stomata_conductance_ (0.0)
 { }
 
 VegetationCrops::~VegetationCrops ()
