@@ -1,3 +1,7 @@
+2009-09-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.72 released.
+
 2009-09-16  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* bioclimate_std.C (WaterDistribution): More convergense criteria, stabilise gs.
