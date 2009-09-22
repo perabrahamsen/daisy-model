@@ -57,6 +57,8 @@ public:
     output_value (reference_evapotranspiration_dry,
                   "reference_evapotranspiration", log);
     output_variable (reference_evapotranspiration_wet, log);
+    output_variable (potential_evapotranspiration_dry, log);
+    output_variable (potential_evapotranspiration_wet, log);
   }
 
   double wet () const
@@ -124,7 +126,11 @@ static struct PetFAO_PMSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-    frame.declare ("reference_evapotranspiration_wet", "mm/h", Attribute::LogOnly, 
-                "Reference evapotranspiration for a dry system.");
+    frame.declare ("reference_evapotranspiration_wet",
+                   "mm/h", Attribute::LogOnly, 
+                   "Reference evapotranspiration for a wet system.");
+    frame.declare ("potential_evapotranspiration_wet", 
+                   "mm/h", Attribute::LogOnly, 
+                   "Potential evapotranspiration for a wet system.");
   }
 } PetFAO_PM_syntax;

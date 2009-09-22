@@ -1,31 +1,67 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* svat_ssoc.C convergence
+* FAO_PM
 
-max_error skal blive mindre
-error = diff / max_diff
-
-generel solver?
-
-* photo_Farquhar.C
-
-** Check enhed på "m" i gsmodeller.
-
-** Flyt "m" til stomatacon
-
-** rs_min / rs_max i pet_PM
-
-* gs_expr
-
-* Erstat FAO::AirDensity med Resistence::rho_a
-
-Enable PetFAO_PM::wet
-
-test resultater
-
-* Rejseforsikring?
+Er det dry/wet opdeling i bioclimate den er gal med.
 
 * SAFIR
+
+** Brussel
+
+*** WP7 præsentation
+
+**** OpenMI
+
+Interpolate, aggregate, time & space
+Input & output hooks
+unit convertions
+
+**** Space
+
+MIKE SHE grid (tegning), variable timesteps
+Daisy columns (tegning), hourly timesteps
+
+Being tested by DHI.
+ 
+**** Daisy exchange items
+
+***** Output exchange items
+
+(col) -> (out) \
+                >--> OpenMi
+(col) -> (out) /
+
+***** Input exchange items
+
+(col) <- (in) \
+               --< OpenMI
+(col) <- (in) /
+
+**** Example: Lower boundary 
+
+In: pressure table
+In: NO3 conc
+
+Out: Water flux
+Out: NO3 flux
+
+User: MIKE SHE
+
+**** Example: Subsoil irrigation
+
+OpenMI irrigate command
+
+In: flux
+In: ([compound] concentration)*
+
+Not placement, fixed tubes
+
+Out: development stage
+Out: N status crop (Act, Cr, Pot)
+Out: NO3 & NH4 in root zone 
+Out: Water in root zone (Act, WP, FC)
+
+User: SAFIR management module
 
 ** Opdater årsrapport
 
@@ -42,8 +78,22 @@ developed the previous years.
 *** WP7 
 
 Support for use of OpenMI in DSS.
+Support heavy metals and bacteria.
+Geometric interpolation.
 
-*** Partner 3
+* Hvad er der galt med dk-taastrup-hourly.dwf
+
+Sammenlign med RS-Weather.dwf
+
+* photo_Farquhar.C
+
+** Check enhed på "m" i gsmodeller.
+
+** Flyt "m" til stomatacon
+
+** rs_min / rs_max i pet_PM
+
+** gs_expr
 
 * irrigate
 

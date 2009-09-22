@@ -96,8 +96,13 @@ FAO::PsychrometricConstant (double AtmPressure, double Temp) // [Pa/K]
 double
 FAO::AirDensity (double AtmPressure, double Temp) // [kg/m3]
 {
+#if 1
+  // Unit problem, gives approximately same density as water.
   const double Tvirtuel = 1.01 * (Temp + 273);
-  return (3.486 * AtmPressure / Tvirtuel);
+  return (3.486 * AtmPressure * 1e-3 /* [Pa->kPa] */ / Tvirtuel);
+#else
+  return Resistance::rho_a (Temp, AtmPressure);
+#endif
 }
 
 double
@@ -164,13 +169,34 @@ double
 FAO::ETaero (double AtmPressure, double Temp, double ea, double ra,
 	     double rc)
 {
+  // Specific heat at constant pressure.
+  const double c_p = 1.013e3;   // [J/kg/K]
+
+  // [Pa/K] = [Pa/K] + [Pa/K]
   const double x1 = SlopeVapourPressureCurve (Temp) +
     PsychrometricConstant (AtmPressure, Temp) * (1 + rc / ra);
-  const double x2 = AirDensity (AtmPressure, Temp) * 1.013 /
-    LatentHeatVaporization (Temp);
+  // [kg/m^3/K] = [kg/m^3] [J/kg/K] / [J/kg]
+  const double x2 = AirDensity (AtmPressure, Temp) * c_p /
+    LatentHeatVaporization (Temp); 
+  // [Pa s/m] = ([Pa] - [Pa]) / [s/m]
   const double x3 = (SaturationVapourPressure (Temp) - ea) / ra;
+  // [kg/m^2/s] = [K/Pa] * [kg/m^3/K] * [Pa m/s]
   return (1.0 / x1) * x2 * x3;   // [kg/m2/s]
 }
+
+// [kg/m^2/s] = [K/Pa] * [J/m^3/K] * [Pa s/m]
+// [kg/m^2/s] = [K/Pa] * [kg m^2/s^2] * [/m^3/K] * [Pa s/m]
+// [kg/m^2/s]
+
+// Rad:
+// [J/kg] * [kg/m^2/s] = [Pa/K] * [W/m^2] / [Pa/K]
+
+// Aero:
+// [J/kg] * [kg/m^2/s] = [kg/m^3] * [J/kg/K] * ([Pa] / [s/m]) / [Pa/K]
+// [J/kg] * [kg/m^2/s] = [kg/m^3] * [J/kg/K] * [Pa] * [m/s] * [K/Pa]
+
+// [J] = [kg m^2/s^2]
+// [Pa] = [kg/m/s^2]
 
 double
 FAO::RefETaero (double AtmPressure, double Temp, double ea, double U2)
@@ -240,6 +266,15 @@ FAO::RefPenmanMonteithWet (double Rn, double G, double Temp, double ea,
   const double E1 = ETrad (AtmPressure, Temp, Rn, G, ra, rc);
   const double E2 = ETaero (AtmPressure, Temp, ea, ra, rc);
   //const double E2 = RefETaero (AtmPressure, Temp, ea, U2);
+
+#if 1
+  std::ostringstream tmp;
+  tmp << "Rn = " << Rn << ", G = " << G << ", Temp = " << Temp
+      << ", ea = " << ea << ", U2 = " << U2 << ", AtmPressure = " << AtmPressure
+      << ", ra  = " << ra << ", E1 = " << E1 << ", E2 = " << E2;
+  Assertion::message (tmp.str ());
+#endif
+
   return (E1 + E2);
 }
 

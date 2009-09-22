@@ -338,7 +338,7 @@ SVAT_SSOC::tick (const Weather& weather, const Vegetation& vegetation,
   has_LAI = (LAI > 0.0);
   h_veg = vegetation.height () / 100.; // [m]  
   w_l = vegetation.leaf_width () / 100.; // [m] 
-  rho_a = Resistance::rho_a (T_a - TK, Ptot); //[kg m^-3]
+  rho_a = FAO::AirDensity (T_a - TK, Ptot); //[kg m^-3]
   gamma = FAO::PsychrometricConstant (Ptot, T_a - TK); // [Pa/K]
   e_sat_air = FAO::SaturationVapourPressure (T_a - TK); // [Pa]
   e_a = e_sat_air * RH;             // [Pa]; 
