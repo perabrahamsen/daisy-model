@@ -32,11 +32,16 @@
 #include "log.h"
 #include "librarian.h"
 #include "frame.h"
+#include "block_model.h"
 #include <sstream>
 #include <memory>
 
 class PetFAO_PM : public Pet
 {
+  // Parameters.
+  const bool use_wet;
+  const double rb;
+
 public:
   // State.
   double reference_evapotranspiration_wet;
@@ -63,10 +68,10 @@ public:
 
   double wet () const
   { 
-    // BUG!!!!! should be WET.
-    // But FAO::RefPenmanMonteithWet might be wrong!
-    return dry ();
-    // return potential_evapotranspiration_wet; 
+    if (use_wet)
+      return potential_evapotranspiration_wet; 
+    else
+      return dry ();
 }
 
   double dry () const
@@ -74,7 +79,9 @@ public:
 
   // Create & Destroy.
   PetFAO_PM (const BlockModel& al)
-    : Pet (al)
+    : Pet (al),
+      use_wet (al.flag ("use_wet")),
+      rb (al.number ("rb"))
   { }
   ~PetFAO_PM ()
   { }
@@ -109,28 +116,39 @@ PetFAO_PM::tick (const Time&, const Weather& weather, const double Rn,
 
   reference_evapotranspiration_wet
     = FAO::RefPenmanMonteithWet (Rn, G, Temp, VaporPressure, U2,
-                              AtmPressure)
+                                 AtmPressure, rb)
     * 3600;
   potential_evapotranspiration_wet
-    = reference_to_potential (crops, surface,
-                              reference_evapotranspiration_wet);
-}
+     = reference_to_potential (crops, surface,
+                               reference_evapotranspiration_wet);
+ }
 
-static struct PetFAO_PMSyntax : public DeclareModel
-{
-  Model* make (const BlockModel& al) const
-  { return new PetFAO_PM (al); }
-  PetFAO_PMSyntax ()
-    : DeclareModel (Pet::component, "FAO_PM",
-	       "Potential evopotranspiration using Penman-Monteith.")
-  { }
-  void load_frame (Frame& frame) const
-  {
-    frame.declare ("reference_evapotranspiration_wet",
-                   "mm/h", Attribute::LogOnly, 
-                   "Reference evapotranspiration for a wet system.");
-    frame.declare ("potential_evapotranspiration_wet", 
-                   "mm/h", Attribute::LogOnly, 
-                   "Potential evapotranspiration for a wet system.");
-  }
+ static struct PetFAO_PMSyntax : public DeclareModel
+ {
+   Model* make (const BlockModel& al) const
+   { return new PetFAO_PM (al); }
+   PetFAO_PMSyntax ()
+     : DeclareModel (Pet::component, "FAO_PM",
+                "Potential evopotranspiration using Penman-Monteith.")
+   { }
+   void load_frame (Frame& frame) const
+   {
+     frame.declare ("reference_evapotranspiration_wet",
+                    "mm/h", Attribute::LogOnly, 
+                    "Reference evapotranspiration for a wet system.");
+     frame.declare ("potential_evapotranspiration_wet", 
+                    "mm/h", Attribute::LogOnly, 
+                    "Potential evapotranspiration for a wet system.");
+     frame.declare ("potential_evapotranspiration_dry", 
+                    "mm/h", Attribute::LogOnly, 
+                    "Potential evapotranspiration for a dry system.");
+     frame.declare_boolean ("use_wet", Attribute::Const,
+                            "Use PM for wet surface.");
+     frame.set ("use_wet", false);
+     frame.declare ("rb", "s/m", Attribute::Const, 
+                    "Boundary layer resistance for wet surface.");
+     frame.set ("rb", 20.0);
+   }
 } PetFAO_PM_syntax;
+
+// pet_FAO_PM.C ends here.

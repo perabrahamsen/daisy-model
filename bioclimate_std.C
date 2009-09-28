@@ -46,7 +46,7 @@
 #include "check.h"
 #include "fao.h"
 #include "librarian.h"
-#include "treelog.h"
+#include "treelog_store.h"
 #include "resistance.h"
 #include <sstream>
 
@@ -121,7 +121,11 @@ struct BioclimateStandard : public Bioclimate
   // Water transpirated through plant roots.
   const int max_svat_iterations; // Max number of iterations with SVAT model.
   const double max_svat_absolute_difference; // Max difference. [mm/h]
+  const double maxTdiff;                     // Max temperature diff. [dg C]
+  const double maxEdiff;                     // Max pressure diff [Pa]
   std::auto_ptr<SVAT> svat;     // Soil Vegetation Atmosphere model.
+  size_t svat_fail;             // Number of times the svat loop failed.
+  size_t svat_total;            // Total number of times the swat loop entered.
   double crop_ep_;              // Potential transpiration. [mm/h]
   double crop_ea_soil;          // Crop limited transpiration. [mm/h]
   double crop_ea_svat;          // SVAT limited transpiration. [mm/h]
@@ -450,7 +454,11 @@ BioclimateStandard::BioclimateStandard (const BlockModel& al)
     soil_ea_ (0.0),
     max_svat_iterations (al.integer ("max_svat_iterations")),
     max_svat_absolute_difference (al.number ("max_svat_absolute_difference")),
+    maxTdiff (al.number ("maxTdiff")),
+    maxEdiff (al.number ("maxEdiff")),
     svat (Librarian::build_item<SVAT> (al, "svat")),
+    svat_fail (0),
+    svat_total (0),
     crop_ep_ (0.0),
     crop_ea_soil (0.0),
     crop_ea_svat (0.0),
@@ -482,6 +490,18 @@ void
 BioclimateStandard::summarize (Treelog& msg) const
 {
   TREELOG_MODEL (msg);
+  if (svat_fail > 0)
+    {
+      TREELOG_MODEL (msg);
+      daisy_assert (svat_total > 0);
+      std::ostringstream tmp;
+      tmp << "Convergence of svat loop failed " << svat_fail 
+          << " times out of " << svat_total << "; or "
+          << (100.0 * svat_fail / (svat_total + 0.0)) << "%";
+      msg.warning (tmp.str ());
+      msg.message ("See 'daisy.log' for details");
+    }
+
   svat->summarize (msg);
 }
 
@@ -861,9 +881,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
 
   for (int iteration = 0; iteration < max_svat_iterations; iteration++)
     {
-      std::ostringstream tmp;
-      tmp << "svat iteration " << iteration;
-      Treelog::Open nest (msg, tmp.str ());
+      TreelogStore svat_msg;
 
       // Old values
       const double old_CanopyTemperature     // [dg C]
@@ -881,7 +899,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
 
       // Find stomata conductance based on ABA and crown potential
       // from last attempt at crop transpiration.
-      vegetation.find_stomata_conductance (units, time, *this, dt, msg);
+      vegetation.find_stomata_conductance (units, time, *this, dt, svat_msg);
       const double new_weight = 0.0;
       const double gs_shadow_new = vegetation.shadow_stomata_conductance ();
       gs_shadow_sum += gs_shadow_new;
@@ -895,23 +913,22 @@ BioclimateStandard::WaterDistribution (const Units& units,
         + new_weight * gs_sunlit_new;
 
       // Find expected transpiration from stomate conductance.
-      svat->solve (gs_shadow, gs_sunlit, msg);
+      const double max_gs = 0.001; // [m/s]
+      svat->solve (gs_shadow, gs_sunlit,
+                   maxTdiff * 0.5, maxEdiff * 0.5, svat_msg);
       
       const double crop_ea_svat = svat->transpiration ();
 
-      const double max_T = 0.1;     // [dg C]
-      const double max_gs = 0.001; // [m/s]
-      const double max_ec = 1;  // [Pa]
       if ((std::fabs (old_CanopyTemperature - svat->CanopyTemperature ())
-           < max_T)
+           < maxTdiff)
           && (std::fabs (old_SunLeafTemperature - svat->SunLeafTemperature ())
-              < max_T)
+              < maxTdiff)
           && (std::fabs (old_ShadowLeafTemperature
                          - svat->ShadowLeafTemperature ())
-              < max_T)
+              < maxTdiff)
           && (std::fabs (old_CanopyVapourPressure 
                          - svat->CanopyVapourPressure ())
-              < max_ec)
+              < maxEdiff)
           && (std::fabs (old_SunBoundaryLayerWaterConductivity 
                          - svat->SunBoundaryLayerWaterConductivity ())
               < max_gs)
@@ -925,6 +942,14 @@ BioclimateStandard::WaterDistribution (const Units& units,
         {
           // Stomate may limit transpiration, not increase it.
           //  daisy_assert (crop_ea_ < crop_ea_soil + 0.01);
+          if (!svat->stable ())
+            {
+              std::ostringstream tmp;
+              tmp << "svat iteration " << iteration;
+              Treelog::Open nest (msg, tmp.str ());
+              svat_fail++;
+              svat_msg.propagate (msg);
+            }
           goto success;
         }
       lout << "\niteration " << iteration 
@@ -949,7 +974,9 @@ BioclimateStandard::WaterDistribution (const Units& units,
   msg.error ("SVAT transpiration and stomata conductance"
              " loop did not converge");
   msg.debug (lout.str ());
+  svat_fail++;
  success:;
+  svat_total++;
 
   // Stress calculated by the SVAT model.
   production_stress = svat->production_stress ();
@@ -1202,7 +1229,11 @@ End points of canopy layers, first entry is top of canopy, last is soil surface.
                           Attribute::OptionalState, Attribute::Singleton, 
                           "Potential Evapotranspiration component.\n\
 \n\
-By default, choose depending on available climate date.\n\
+Some pet models provide answers for both dry and wet surface.  For\n\
+those, the wet answer will limit total evapotranspiration, while the\n\
+dry answer will further limit transpiration.\n\
+\n\
+The default model depends on available climate date.\n\
 \n\
 If reference evaporation is available in the climate data, Daisy will\n\
 use these (the weather pet model).\n\
@@ -1300,6 +1331,12 @@ Max number of svat iterations before giving up on cobvergence.");
     frame.declare ("max_svat_absolute_difference", "mm/h", Attribute::Const, "\
 Maximum absolute difference in svat ea values for convergence.");
     frame.set ("max_svat_absolute_difference", 0.01);
+    frame.declare ("maxTdiff", "K", Attribute::Const, "\
+Largest temperature difference for convergence.");
+    frame.set ("maxTdiff", 1.0);
+    frame.declare ("maxEdiff", "Pa", Attribute::Const, "\
+Largest humidity difference for convergence.");
+    frame.set ("maxEdiff", 5.0);
 
     frame.declare_object ("svat", SVAT::component, 
                           "Soil Vegetation Atmosphere component.");
@@ -1373,37 +1410,37 @@ use these (the weather difrad model). Otherwise Daisy wil use the DPF model.");
     frame.declare ("sun_LAI_fraction", Attribute::Fraction (), Attribute::LogOnly, 
                    Attribute::CanopyCells, "Sunlit LAI in canopy layers.");
 
-    frame.declare ("absorbed_total_PAR_canopy","W/m2", Attribute::LogOnly,
+    frame.declare ("absorbed_total_PAR_canopy","W/m^2", Attribute::LogOnly,
                    "Canopy absorbed PAR (sun+shade)");
-    frame.declare ("absorbed_total_NIR_canopy","W/m2", Attribute::LogOnly,
+    frame.declare ("absorbed_total_NIR_canopy","W/m^2", Attribute::LogOnly,
                    "Canopy absorbed NIR (sun+shade)");
-    frame.declare ("absorbed_total_Long_canopy","W/m2", Attribute::LogOnly,
+    frame.declare ("absorbed_total_Long_canopy","W/m^2", Attribute::LogOnly,
                    "Canopy absorbed long wave radiation (sun+shade)");
-    frame.declare ("absorbed_total_PAR_soil","W/m2", Attribute::LogOnly,
+    frame.declare ("absorbed_total_PAR_soil","W/m^2", Attribute::LogOnly,
                    "Soil absorbed PAR (sun+shade)");
-    frame.declare ("absorbed_total_NIR_soil","W/m2", Attribute::LogOnly,
+    frame.declare ("absorbed_total_NIR_soil","W/m^2", Attribute::LogOnly,
                    "Soil absorbed NIR (sun+shade)");
-    frame.declare ("absorbed_total_Long_soil","W/m2", Attribute::LogOnly,
+    frame.declare ("absorbed_total_Long_soil","W/m^2", Attribute::LogOnly,
                    "Soil absorbed long wave radiation (sun+shade)");
-    frame.declare ("absorbed_sun_PAR_canopy","W/m2", Attribute::LogOnly,
+    frame.declare ("absorbed_sun_PAR_canopy","W/m^2", Attribute::LogOnly,
                    "Canopy absorbed PAR on sunlit leaves");
-    frame.declare ("absorbed_sun_NIR_canopy","W/m2", Attribute::LogOnly,
+    frame.declare ("absorbed_sun_NIR_canopy","W/m^2", Attribute::LogOnly,
                    "Canopy absorbed NIR on sunlit leaves");
-    frame.declare ("absorbed_sun_Long_canopy","W/m2", Attribute::LogOnly,
+    frame.declare ("absorbed_sun_Long_canopy","W/m^2", Attribute::LogOnly,
                    "Canopy absorbed long wave radiatio on sunlit leaves");
-    frame.declare ("absorbed_shadow_PAR_canopy","W/m2", Attribute::LogOnly,
+    frame.declare ("absorbed_shadow_PAR_canopy","W/m^2", Attribute::LogOnly,
                    "Canopy absorbed PAR on shadow leaves");
-    frame.declare ("absorbed_shadow_NIR_canopy","W/m2", Attribute::LogOnly,
+    frame.declare ("absorbed_shadow_NIR_canopy","W/m^2", Attribute::LogOnly,
                    "Canopy absorbed NIR on shadow leaves");
-    frame.declare ("absorbed_shadow_Long_canopy","W/m2", Attribute::LogOnly,
+    frame.declare ("absorbed_shadow_Long_canopy","W/m^2", Attribute::LogOnly,
                    "Canopy absorbed long wave radiation on shadow leaves");
-    frame.declare ("incoming_Long_radiation","W/m2", Attribute::LogOnly,
+    frame.declare ("incoming_Long_radiation","W/m^2", Attribute::LogOnly,
                    "Incoming longwave radiation");
-    frame.declare ("incoming_PAR_radiation","W/m2", Attribute::LogOnly,
+    frame.declare ("incoming_PAR_radiation","W/m^2", Attribute::LogOnly,
                    "Incoming PAR radiation");
-    frame.declare ("incoming_NIR_radiation","W/m2", Attribute::LogOnly,
+    frame.declare ("incoming_NIR_radiation","W/m^2", Attribute::LogOnly,
                    "Incoming NIR radiation");
-    frame.declare ("incoming_Total_radiation","W/m2", Attribute::LogOnly,
+    frame.declare ("incoming_Total_radiation","W/m^2", Attribute::LogOnly,
                    "Incoming radiation, sum of shortwave and longwave");
   }
 } BioclimateStandard_syntax;

@@ -45,7 +45,7 @@ struct SVAT_none : public SVAT
   double production_stress () const
   { return -1; }
   
-  void solve(const double, const double, Treelog&)  
+  void solve(const double, const double, const double, const double, Treelog&)  
   { }
 
   double transpiration() const 

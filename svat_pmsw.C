@@ -1330,7 +1330,10 @@ public:
 
 
   void solve (const double gs_shadow /* stomata cond. [m/s]*/, 
-              const double gs_sunlit /* stomata cond. [m/s]*/, Treelog&);
+              const double gs_sunlit /* stomata cond. [m/s]*/,
+              const double max_T /* [dg C] */, 
+              const double max_ec /* [Pa] */,
+              Treelog&);
 
   void tick (const Weather& weather, const Vegetation& crops,
              const Geometry&, const Soil& soil,
@@ -1395,7 +1398,7 @@ SVAT_PMSW::ShadowBoundaryLayerWaterConductivity () const
 }
 
 void 
-SVAT_PMSW::solve (double, double, Treelog&) 
+SVAT_PMSW::solve (double, double, double, double, Treelog&) 
 { }
 
 void

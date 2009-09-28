@@ -57,7 +57,10 @@ public:
   virtual double production_stress () const = 0; // []
   virtual void solve (const double /* shadow stomata cond. [m/s]*/, 
                       const double /* sunlit stomata cond. [m/s]*/, 
+                      const double max_T /* [dg C] */, 
+                      const double max_ec /* [Pa] */,
                       Treelog&) = 0;
+  virtual bool stable () const;                      // Stable solution found?
   virtual double transpiration () const = 0; // [mm/h]
   virtual double CanopyTemperature () const = 0; // [dg C]
   virtual double SunLeafTemperature () const = 0; // [dg C]

@@ -22,14 +22,12 @@
 
 #include "treelog_store.h"
 #include "assertion.h"
-#include "memutils.h"
 #include "treelog_text.h"
 #include <vector>
 
-class TreelogStore::Implementation
+struct TreelogStore::Implementation
 {
   // Type.
-private:
   static const int is_unknown = -1;
   static const int is_debug = -2;
   static const int is_plain = -3;
@@ -40,8 +38,7 @@ private:
   static const int is_flush = -9;
 
   // Clients.
-private:
-  auto_vector<Treelog*> client;
+  std::vector<boost::shared_ptr<Treelog>/**/> client;
   bool closed;
   void propagate (int nest, const std::string& text)
   {
@@ -82,13 +79,18 @@ private:
   }
 
 public:
-  void add_client (Treelog *const msg)
+  void add_client (boost::shared_ptr<Treelog> msg)
   {
-    daisy_assert (!closed);
     daisy_assert (msg);
     client.push_back (msg);
+    propagate (*msg);
+  }
+
+  void propagate (Treelog& msg) const
+  {
+    daisy_assert (!closed);
     for (size_t i = 0; i < entries.size (); i++)
-      propagate (*msg, entries[i].nest, entries[i].text);
+      propagate (msg, entries[i].nest, entries[i].text);
   }
 
   void no_more_clients ()
@@ -159,10 +161,6 @@ public:
   { }
   ~Implementation ()
   { 
-    // Handle case where no log has been attached yet.
-    if (!closed && client.size () == 0)
-      add_client (new TreelogProgress ());
-      
     // Close all.
     while (level > 0)
       close (); 
@@ -206,12 +204,20 @@ TreelogStore::flush ()
 { impl->flush (); }
 
 void 
-TreelogStore::add_client (Treelog *const msg)
+TreelogStore::add_client (boost::shared_ptr<Treelog> msg)
 { impl->add_client (msg); }
+
+void 
+TreelogStore::propagate (Treelog& msg) const
+{ impl->propagate (msg); }
 
 void 
 TreelogStore::no_more_clients ()
 { impl->no_more_clients (); }
+
+bool 
+TreelogStore::has_unhandled_events () const
+{ return !impl->closed && impl->client.size () == 0; }
 
 TreelogStore::TreelogStore ()
   : impl (new Implementation ())
@@ -219,5 +225,18 @@ TreelogStore::TreelogStore ()
 
 TreelogStore::~TreelogStore ()
 { }
+
+TreelogServer::TreelogServer ()
+{ }
+
+TreelogServer::~TreelogServer ()
+{
+  // Handle case where no log has been attached yet.
+  if (has_unhandled_events ())
+    {
+      boost::shared_ptr<Treelog> progress (new TreelogProgress ());
+      add_client (progress);
+    }
+}  
 
 // treelog_store.C ends here.

@@ -94,13 +94,14 @@ namespace FAO
 			    double Temp /* [dg C] */,
 			    double ea /* [Pa] */,
 			    double U2 /* [m/s] */,
-			    double AtmPressure); // [kg/m2/s]
+			    double AtmPressure /* [Pa] */); // [kg/m2/s]
   double RefPenmanMonteithWet (double Rn /* [W/m2] */,
 			       double G /* [W/m2] */,
 			       double Temp /* [dg C] */,
 			       double ea /* [Pa] */,
 			       double U2 /* [m/s] */,
-			       double AtmPressure); // [kg/m2/s]
+			       double AtmPressure /* [Pa] */,
+                               double rb /* [s/m] */); // [kg/m2/s]
 
 
 }

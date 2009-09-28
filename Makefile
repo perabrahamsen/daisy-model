@@ -1500,7 +1500,7 @@ run${OBJ}: run.C run.h model.h
 treelog_text${OBJ}: treelog_text.C treelog_text.h treelog.h symbol.h \
   assertion.h
 treelog_store${OBJ}: treelog_store.C treelog_store.h treelog.h symbol.h \
-  assertion.h memutils.h treelog_text.h
+  assertion.h treelog_text.h
 intrinsics${OBJ}: intrinsics.C intrinsics.h memutils.h symbol.h assertion.h \
   library.h frame_submodel.h frame.h scope.h attribute.h librarian.h \
   model.h
@@ -2052,7 +2052,8 @@ select_pF${OBJ}: select_pF.C select.h destination.h symbol.h model.h units.h \
 pet_FAO_PM${OBJ}: pet_FAO_PM.C pet.h model_framed.h model_logable.h model.h \
   symbol.h fao.h weather.h model_derived.h im.h attribute.h soil.h \
   surface.h uzmodel.h soil_heat.h vegetation.h log.h time.h border.h \
-  librarian.h frame.h scope.h
+  librarian.h frame.h scope.h block_model.h block_nested.h block.h \
+  treelog.h frame_model.h
 pet_Hargreaves${OBJ}: pet_Hargreaves.C pet.h model_framed.h model_logable.h \
   model.h symbol.h weather.h model_derived.h im.h attribute.h fao.h log.h \
   time.h border.h mathlib.h assertion.h librarian.h frame.h scope.h
@@ -2387,7 +2388,8 @@ bioclimate_std${OBJ}: bioclimate_std.C bioclimate.h model_framed.h \
   weather.h model_derived.h im.h plf.h geometry.h soil.h soil_heat.h \
   chemistry.h chemical.h snow.h log.h time.h border.h mathlib.h \
   assertion.h net_radiation.h pet.h difrad.h raddist.h svat.h \
-  vegetation.h units.h memutils.h check.h fao.h librarian.h resistance.h
+  vegetation.h units.h memutils.h check.h fao.h librarian.h \
+  treelog_store.h resistance.h
 condition_crop${OBJ}: condition_crop.C condition.h model_framed.h \
   model_logable.h model.h symbol.h block_model.h block_nested.h block.h \
   scope.h attribute.h treelog.h frame_model.h frame.h crop.h time.h \

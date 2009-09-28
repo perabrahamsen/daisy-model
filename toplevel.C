@@ -48,7 +48,9 @@ struct Toplevel::Implementation : boost::noncopyable
   const std::string program_name;
   std::auto_ptr<Program> program;
   std::auto_ptr<FrameModel> program_frame_owner;
-  TreelogStore msg;
+
+  TreelogServer msg;
+  
   Assertion::Register reg;
   Metalib metalib;
   std::time_t start_time;
@@ -137,7 +139,8 @@ Toplevel::Implementation::add_daisy_log ()
   if (!has_daisy_log)
     {
       has_daisy_log = true;
-      msg.add_client (new TreelogFile ("daisy.log"));
+      boost::shared_ptr<Treelog> daisy_log (new TreelogFile ("daisy.log"));
+      msg.add_client (daisy_log);
       msg.message ("Storing 'daisy.log' in '" 
 		   + metalib.path ().get_directory () + "'");
     }
@@ -250,7 +253,7 @@ Toplevel::files_found () const
 { return impl->files_found; }
 
 void
-Toplevel::add_treelog (Treelog* client)
+Toplevel::add_treelog (boost::shared_ptr<Treelog> client)
 { impl->msg.add_client (client); }
 
 void 

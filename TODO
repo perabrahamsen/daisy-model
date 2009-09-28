@@ -1,8 +1,25 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* FAO_PM
+* Article
 
-Er det dry/wet opdeling i bioclimate den er gal med.
+Title: A physical based approach to integration of ABA production
+under heterogenious moisture conditions
+
+Abrahamsen et al
+
+* RR MMO
+
+225 £/d
+
+** Introduction
+
+* Agrcultural Water Management
+
+5-6 pages, SAFIR, end of year
+Title to Carinna.
+
+Framework for testing stomata models
+Integrating ABA production in the root zone (Fulai + Finn/Bo)
 
 * SAFIR
 
@@ -74,6 +91,8 @@ adjustments of the model for site specific issues.
 
 Internal changes in Daisy to better integrate the new features
 developed the previous years.
+
+Testing gs models.
 
 *** WP7 
 

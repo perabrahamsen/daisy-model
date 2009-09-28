@@ -6,6 +6,23 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.73
+
+** More work on solving SVAT loops
+
+The 'MaxTdiff' and 'MaxEdiff' parameters moved form the SSOC svat
+model to the default bioclimate model.
+
+** FAO_PM pet model can now calculate evapotranspiration for wet surface.
+
+Set 'use_wet' to true, and 'rb' to desired boundary layer resistance.
+The 'wet' surface value will be used as a maximal evapotranpiration,
+while the 'dry' surface value will be used as a maximal transpiration.
+
+* 4.72
+
+** More Farquhar and SSOC work.
+
 * 4.71
 
 ** More Farquhar and SSOC work.

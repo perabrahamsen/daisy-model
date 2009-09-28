@@ -125,7 +125,6 @@ private:
   // Create and Destroy.
 public:
   TreelogQtText ();
-private:
   ~TreelogQtText ();
 };
 

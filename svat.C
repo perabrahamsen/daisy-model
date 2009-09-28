@@ -39,6 +39,10 @@ void
 SVAT::output (Log&) const
 { }
 
+bool
+SVAT::stable () const
+{ return true; }
+
 SVAT::SVAT (const BlockModel& al)
   : ModelDerived (al.type_name ())
 { }

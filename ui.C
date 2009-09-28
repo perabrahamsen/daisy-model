@@ -74,7 +74,10 @@ Top level user interface.")
 
 void 
 UIProgress::attach (Toplevel& toplevel)
-{ toplevel.add_treelog (new TreelogProgress); }
+{ 
+  boost::shared_ptr<Treelog> progress (new TreelogProgress);
+  toplevel.add_treelog (progress); 
+}
 
 void 
 UIProgress::run (Toplevel& toplevel)

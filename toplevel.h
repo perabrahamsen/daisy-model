@@ -26,6 +26,7 @@
 #include <string>
 #include <memory>
 #include <boost/noncopyable.hpp>
+#include <boost/shared_ptr.hpp>
 
 class Frame;
 class Metalib;
@@ -69,7 +70,7 @@ public:
   Metalib& metalib ();
   Treelog& msg ();
   const std::vector<std::string>& files_found () const;
-  void add_treelog (Treelog*);
+  void add_treelog (boost::shared_ptr<Treelog>);
   void set_ui_progress ();
   void set_ui_none ();
 

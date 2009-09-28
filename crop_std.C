@@ -475,8 +475,8 @@ CropStandard::find_stomata_conductance (const Units& units, const Time& time,
         * min_light_fraction;
     }
   daisy_assert (std::isfinite (Ass));
-  production.PotCanopyAss = Ass;}
-    
+  production.PotCanopyAss = Ass;
+}
 
 void
 CropStandard::tick (const Metalib& metalib, 

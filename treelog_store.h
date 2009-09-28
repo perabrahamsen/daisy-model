@@ -23,6 +23,7 @@
 #define TREELOG_STORE_H
 
 #include "treelog.h"
+#include <boost/shared_ptr.hpp>
 #include <memory>
 
 class TreelogStore : public Treelog
@@ -52,13 +53,22 @@ public:
 
   // Clients.
 public:
-  void add_client (Treelog*);
+  void add_client (boost::shared_ptr<Treelog>);
+  void propagate (Treelog&) const;
   void no_more_clients ();
+  bool has_unhandled_events () const;
 
   // Create and Destroy.
 public:
   TreelogStore ();
   ~TreelogStore ();
+};
+
+class TreelogServer : public TreelogStore
+{ 
+public:
+  TreelogServer ();
+  ~TreelogServer ();
 };
 
 #endif // TREELOG_STORE_H

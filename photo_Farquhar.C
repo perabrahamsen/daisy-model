@@ -321,12 +321,24 @@ PhotoFarquhar::assimilate (const Units& units,
                  || std::fabs (lastgs-gs)> 0.01);
 
 	  // Leaf brutto photosynthesis [gCO2/m2/h] 
-	  const double pn_ = (pn+rd) * molWeightCO2 * 3600.0;//mol CO2/m²leaf/s->g CO2/m²leaf/h
+	  /*const*/ double pn_ = (pn+rd) * molWeightCO2 * 3600.0;//mol CO2/m²leaf/s->g CO2/m²leaf/h
 	  const double rd_ = (rd) * molWeightCO2 * 3600.0;   //mol CO2/m²/s->g CO2/m²/h
 	  const double Vm_ = V_m(vmax25, Tl); //[mol/m² leaf/s/fraction]
 	  const double Jm_ = J_m(vmax25, Tl); //[mol/m² leaf/s/fraction]
 
-	  daisy_assert (pn_>= 0.0);
+	  if (pn_ < 0.0)
+            {
+              std::stringstream tmp;
+              tmp << "Negative brutto photosynthesis (" << pn_ 
+                  << " [g CO2/m²leaf/h])" << " pn " << pn << " rd " << rd
+                  << " CO2_atm " << CO2_atm << "  O2_atm " <<  O2_atm 
+                  << "  Ptot " <<  Ptot << "  pn " <<  pn << "  ci " <<  ci 
+                  << "  dPAR " <<  dPAR << "  gsw " <<  gsw 
+                  << "  gbw " <<  gbw << "  Tl " <<  Tl 
+                  << "  vmax25 " <<  vmax25 << "  rd " <<  rd; 
+              Assertion::message (tmp.str ());
+              pn_ = 0.0;
+            }
 	  Ass_ += LA * pn_; // [g/m²area/h] 
 	  Res += LA * rd_;  // [g/m²area/h] 
 	  daisy_assert (Ass_ >= 0.0);

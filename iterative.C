@@ -89,21 +89,23 @@ Fixpoint::solve (Treelog& msg)
         {
           C = f (B, msg);
           err_B = diff (B, C);
+          
+          std::ostringstream tmp;
+          tmp << iterations_used
+              << ": err_A = " << err_A << ", err_B = " << err_B;
+          const size_t size = A.size ();
+          for (size_t i = 0; i < size; i++)
+            tmp << "; " << i << ": A " << A[i] << " B " << B[i]
+                << " C " << C[i];
+          msg.debug (tmp.str ());
+
           iterations_used++;
-          if ((iterations_used % 100) == 0)
-            {
-              std::ostringstream tmp;
-              tmp << iterations_used << " iterations used";
-              const size_t size = A.size ();
-              tmp << ", err_A = " << err_A << ", err_B = " << err_B;
-              for (size_t i = 0; i < size; i++)
-                tmp << "; " << i << ": A " << A[i] << " B " << B[i]
-                    << " C " << C[i];
-              msg.message (tmp.str ());
-              if (iterations_used > max_iteration)
-                throw "Too many iterations";
-            }
-          if (err_B < err_A)
+          if (iterations_used > max_iteration)
+            throw "Too many iterations";
+
+          // If diff (A, C) < diff (A, B) we are likely flip-flopping.
+          const double err_X = diff (A, C);
+          if (err_B < err_A && err_B < 0.9 * err_X)
             // New guess is better, use it.
             {
               A = B;
@@ -131,6 +133,7 @@ Fixpoint::solve (Treelog& msg)
                     tmp << "; " << i << ": A " << A[i] << " B " << B[i]
                         << " C " << C[i];
                   msg.debug (tmp.str ());
+                  throw "Unstable solution";
                 }
               return A;
             }
