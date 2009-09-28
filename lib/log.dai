@@ -2249,6 +2249,10 @@ sum of all chemicals will be logged."
                    (spec svat SSOC g_H_sun_c)
                    (dimension "${g_unit}")
                    (handle current))
+           (number (path column "${column}" Bioclimate "*" svat SSOC gb_W_sun)
+                   (spec svat SSOC gb_W_sun)
+                   (dimension "${g_unit}")
+                   (handle current))
            (number (path column "${column}" Bioclimate "*" svat SSOC g_W_sun_c)
                    (spec svat SSOC g_W_sun_c)
                    (dimension "${g_unit}")
@@ -2256,6 +2260,11 @@ sum of all chemicals will be logged."
            (number (path column "${column}" Bioclimate "*" svat SSOC
                          g_H_shadow_c)
                    (spec svat SSOC g_H_shadow_c)
+                   (dimension "${g_unit}")
+                   (handle current))
+           (number (path column "${column}" Bioclimate "*" svat SSOC 
+                         gb_W_shadow)
+                   (spec svat SSOC gb_W_shadow)
                    (dimension "${g_unit}")
                    (handle current))
            (number (path column "${column}" Bioclimate "*" svat SSOC 
