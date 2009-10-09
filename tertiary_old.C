@@ -1,4 +1,4 @@
-// biopore_old.C --- Instant movement in vertical geometry.
+// tertiary_old.C --- Instant movement in vertical geometry.
 // 
 // Copyright 2008 Per Abrahamsen and KU.
 //

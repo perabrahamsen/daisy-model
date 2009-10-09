@@ -435,8 +435,6 @@ You can alternatively specify the pressure directly, with 'h_aquifer'.");
                    "Drain flow to pipes.");
     frame.declare ("EqDrnFlow", "cm/h", Attribute::LogOnly,
                    "Equilibrium drain flow to pipes.");
-    frame.declare ("deficit", "cm", Attribute::LogOnly,
-                   "Deficit.");
     frame.declare ("DeepPercolation", "cm/h", Attribute::LogOnly,
                    "Deep percolation to aquifer.");
     frame.declare ("S", "cm^3/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,

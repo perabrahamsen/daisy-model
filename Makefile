@@ -378,7 +378,8 @@ NOLINK = -c
 # 
 
 LATER = tertiary_instant.C 
-MODELS = reaction_boundrel.C log_regress.C reaction_Morgan98.C \
+MODELS = tertiary_pipes.C \
+	reaction_boundrel.C log_regress.C reaction_Morgan98.C \
 	reaction_Styczen88.C program_GP2D.C svat_ssoc.C reaction_Jarvis99.C \
 	reaction_filter.C seed_LAI.C seed_release.C \
 	stomatacon_BB.C stomatacon_SHA.C stomatacon_Leuning.C \
@@ -1588,6 +1589,11 @@ cdaisy${OBJ}: cdaisy.C scope.h attribute.h symbol.h block_model.h \
   version.h chemical.h assertion.h frame_submodel.h filepos.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
+tertiary_pipes${OBJ}: tertiary_pipes.C tertiary.h model_framed.h \
+  model_logable.h model.h symbol.h tertsmall.h geometry.h attribute.h \
+  soil.h soil_water.h soil_heat.h surface.h uzmodel.h librarian.h \
+  block_model.h block_nested.h block.h scope.h treelog.h frame_model.h \
+  frame.h mathlib.h assertion.h log.h time.h border.h check.h
 reaction_boundrel${OBJ}: reaction_boundrel.C reaction.h model_framed.h \
   model_logable.h model.h symbol.h log.h time.h border.h geometry.h \
   attribute.h chemical.h chemistry.h treelog.h block_model.h \

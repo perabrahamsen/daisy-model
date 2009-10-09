@@ -226,6 +226,7 @@ Resistance::z_0 (const double z_0b /* Bare soil roughness height for momentum [m
   if (LAI < 3.)
     z_0 = z_0b + 0.3 * h_veg * sqrt(c_drag * LAI);
   else 
+    // z_0b added for LAI >= 3 by pa 2009-07-17
     z_0 = z_0b + 0.3 * (h_veg - d);
   return z_0; // [m]
 }
