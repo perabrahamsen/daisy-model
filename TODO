@@ -1,110 +1,36 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Tertiary pipes
+* Oversigt 
 
 * Article
+
+** Carsten data i timeværdier
+
+** Artikel om ABA integration
+
+SHA: Verificering 
+
+** Artikel om 2D rødder
+
+SHA: Vent på Seyed artikel.
+
+** Jyndevad simulering
+
+Vent på den bliver færdig
+
+** Test dk-taastrup-hourly.dwf mod RS-Weather.dwf
+
+* Agrcultural Water Management
+
+5-6 pages, SAFIR, end of year
+
+Framework for testing stomata models
+Integrating ABA production in the root zone (Fulai + Finn/Bo)
 
 Title: A physical based approach to integration of ABA production
 under heterogenious moisture conditions
 
 Abrahamsen et al
-
-* RR MMO
-
-225 £/d
-
-** Introduction
-
-* Agrcultural Water Management
-
-5-6 pages, SAFIR, end of year
-Title to Carinna.
-
-Framework for testing stomata models
-Integrating ABA production in the root zone (Fulai + Finn/Bo)
-
-* SAFIR
-
-** Brussel
-
-*** WP7 præsentation
-
-**** OpenMI
-
-Interpolate, aggregate, time & space
-Input & output hooks
-unit convertions
-
-**** Space
-
-MIKE SHE grid (tegning), variable timesteps
-Daisy columns (tegning), hourly timesteps
-
-Being tested by DHI.
- 
-**** Daisy exchange items
-
-***** Output exchange items
-
-(col) -> (out) \
-                >--> OpenMi
-(col) -> (out) /
-
-***** Input exchange items
-
-(col) <- (in) \
-               --< OpenMI
-(col) <- (in) /
-
-**** Example: Lower boundary 
-
-In: pressure table
-In: NO3 conc
-
-Out: Water flux
-Out: NO3 flux
-
-User: MIKE SHE
-
-**** Example: Subsoil irrigation
-
-OpenMI irrigate command
-
-In: flux
-In: ([compound] concentration)*
-
-Not placement, fixed tubes
-
-Out: development stage
-Out: N status crop (Act, Cr, Pot)
-Out: NO3 & NH4 in root zone 
-Out: Water in root zone (Act, WP, FC)
-
-User: SAFIR management module
-
-** Opdater årsrapport
-
-*** WP3 
-
-Hosting visits fram Adrianno, Finn and Gordana.
-
-Help people responsible for modelling the field sites, including minor
-adjustments of the model for site specific issues.
-
-Internal changes in Daisy to better integrate the new features
-developed the previous years.
-
-Testing gs models.
-
-*** WP7 
-
-Support for use of OpenMI in DSS.
-Support heavy metals and bacteria.
-Geometric interpolation.
-
-* Hvad er der galt med dk-taastrup-hourly.dwf
-
-Sammenlign med RS-Weather.dwf
 
 * photo_Farquhar.C
 
@@ -129,8 +55,6 @@ udregn flux og remaining_time hvis ikke angivet
 * Cleanup
 
 ** fjern flere "clone", brug shared_ptr
-
-*** Brug shared_ptr i Library
 
 * frame + lib
 
@@ -1133,4 +1057,47 @@ This will allow us to ship Condition and Action as part of the Daisy
 independent library.
 
 * Flyt astronomic utilities til seperat fil.
+
+* IM
+
+Brugerfladen vil bestå af standardiserede opsætninger af Daisy for
+konkrete typer af anvendelser.  For hver anvendelsestype vil der være
+Excel ark der på baggrund af information fra brugeren tilpasser disse
+standard opsætninger til den specifikke situation, samt integrerer og
+fortolker de af Daisy beregnede resulater for den valgte
+anvendelsestype.
+
+1. Idenfikation af et antal kontrete anvendelsestyper hvor brug af
+   modellering med Daisy vil resultere i højere værdi for LR's
+   kunder.
+
+2. Opstilling af en testopsætning for den valgte anvendelsestype.
+
+3. Identifikation af de områder hvor opsætningen må forventes at
+   variere mellem specikke anvendelser indenfor den givne anvendelsestype.
+
+4. Udvikling af Excel ark hvor brugeren kan indtaste de specifikke
+   data for den givne anvendelsestype, og som vil generere en
+   modificeret opsætningsfil for Daisy for den specifikke anvendelse.
+
+5. Udvikling af Excel ark som vil tage de af Daisy genererede
+   resultater og opsumere hvad der er relevant for den givne
+   anvendelsestype.
+
+Arbejdet vil blive delt mellem LR (2/3) og KU (1/3), hvor LR vil være
+hovedansvarlig for identifikation af anvendelsestype, identifikation
+af områder der varierer, udviklingen af Excel ark, og KU
+hovedansvarlig for udviklingen af standardopsætninger.  Men begge
+organisationer vil bidrage til alle delopgaver.
+
+
+
+Identify key areas where modelling could help LR
+
+For each area
+
+- Create a sample setup
+- Identify constants, variable, and desired results
+- Create a generic setup
+- Create an Excel spreadsheet to allow user to enter variables and extract results.
 

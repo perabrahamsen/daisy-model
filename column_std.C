@@ -25,7 +25,6 @@
 #include "library.h"
 #include "surface.h"
 #include "soil_heat.h"
-#include "macro.h"
 #include "movement.h"
 #include "groundwater.h"
 #include "geometry.h"
@@ -966,18 +965,6 @@ static struct ColumnStandardSyntax : public DeclareModel
 {
   Model* make (const BlockModel& al) const
   { return new ColumnStandard (al); }
-
-#if 0
-  static void load_water_and_macro (Frame& frame)
-  {
-    SoilWater::load_syntax (frame);
-    frame.declare_object ("macro", Macro::component,
-                          Attribute::OptionalState, Attribute::Singleton,
-                          "Preferential flow model.\n\
-By default, preferential flow is enabled if and only if the combined\n\
-amount of humus and clay in the top horizon is above 5%.");
-  }
-#endif
 
   void load_frame (Frame& frame) const
   { 

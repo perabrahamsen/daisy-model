@@ -57,6 +57,7 @@ struct UZRectMollerup : public UZRect
   // Parameters.  
   const std::auto_ptr<Solver> solver;
   std::auto_ptr<const Average> K_average;  
+  std::auto_ptr<const Average> K_average_horizontal;  
   const int max_time_step_reductions;
   const int time_step_reduction;
   const int max_iterations; 
@@ -173,6 +174,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 
 {
   daisy_assert (K_average.get ());
+  daisy_assert (K_average_horizontal.get ());
 
   const size_t edge_size = geo.edge_size (); // number of edges 
   const size_t cell_size = geo.cell_size (); // number of cells 
@@ -340,7 +342,13 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 		  const double K_to
 		    = K[to] * anisotropy_factor (geo, e, soil, to);
                     
-                  Kedge[e] = (*K_average)(K_from, K_to); //use right average method 
+                  const double sin_edge = std::fabs (geo.edge_sin_angle (e));
+                  const double cos_edge = std::fabs (geo.edge_cos_angle (e));
+                  const double K_hor
+                    = cos_edge * (*K_average_horizontal)(K_from, K_to);
+                  const double K_ver = sin_edge * (*K_average)(K_from, K_to);
+
+                  Kedge[e] = (K_hor + K_ver) / (sin_edge + cos_edge);
 		} 
 	    }
 
@@ -1098,6 +1106,10 @@ UZRectMollerup::UZRectMollerup (const BlockModel& al)
   : UZRect (al),
     solver (Librarian::build_item<Solver> (al, "solver")),
     K_average (Librarian::build_item<Average> (al, "K_average")),
+    K_average_horizontal 
+    /**/ (al.check ("K_average_horizontal")
+          ? Librarian::build_item<Average> (al, "K_average_horizontal")
+          : Librarian::build_item<Average> (al, "K_average")),
     max_time_step_reductions (al.integer ("max_time_step_reductions")),
     time_step_reduction (al.integer ("time_step_reduction")),
     max_iterations (al.integer ("max_iterations")),
@@ -1131,9 +1143,13 @@ See Mollerup 2007 for details.")
 Model used for solving matrix equation system.");
     frame.set ("solver", "cxsparse");
     frame.declare_object ("K_average", Average::component,
-                       Attribute::Const, Attribute::Singleton,
-                       "Model for calculating average K between cells.");
+                       Attribute::Const, Attribute::Singleton, "\
+Model for calculating average vertical K between cells.");
     frame.set ("K_average", "arithmetic");
+    frame.declare_object ("K_average_horizontal", Average::component,
+                          Attribute::OptionalConst, Attribute::Singleton, "\
+Model for calculating average horizontal K between cells.\n        \
+By default, the same as 'K_average'.");
     frame.declare_integer ("max_time_step_reductions", Attribute::Const, "\
 Number of times we may reduce the time step before giving up");
     frame.set ("max_time_step_reductions", 4);

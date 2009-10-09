@@ -765,7 +765,8 @@ SVAT_SSOC:: calculate_temperatures(Treelog& msg)
              + k_h / z0 * (T_z0 - T_a) - (lambda * E_soil))
             / (G_R_soil + G_H_a +  k_h / z0))
         + T_a;  //[K]
-      T_c = T_s;
+      T_sun = T_shadow = T_c = T_a;
+      e_c = e_a;
     }
 } 
 

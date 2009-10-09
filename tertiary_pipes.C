@@ -109,7 +109,7 @@ TertiaryPipes::tick (const Units&, const Geometry& geo, const Soil& soil,
       if (h >= 0)
         continue;
       // as low as possible.
-      const double z = geo.cell_z (i);
+      const double z = geo.cell_top (i);
       if (approximate (z, lowest))
         {
           const double new_height = z + h;
