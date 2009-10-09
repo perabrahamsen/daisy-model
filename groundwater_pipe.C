@@ -130,8 +130,6 @@ GroundwaterPipe::tick (const Units& units, const Geometry& geo,
   set_h_aquifer (geo);
 
   // Find groundwater height.
-#if 1                           // This works with any geometry, 
-                                // but is less precise.
   const double old_height = height;
   height = 1.0;
   double lowest = 0.0;
@@ -142,7 +140,7 @@ GroundwaterPipe::tick (const Units& units, const Geometry& geo,
       if (h >= 0)
         continue;
       // as low as possible.
-      const double z = geo.cell_z (i);
+      const double z = geo.cell_top (i);
       if (approximate (z, lowest))
         {
           const double new_height = z + h;
@@ -161,26 +159,7 @@ GroundwaterPipe::tick (const Units& units, const Geometry& geo,
     }    
   if (height > 0.0)
     height = h_surface;
-#else  // This only works with Geometry1D.
-  height = h_surface;
-  for (int i = size - 1; i >= 0; i--)
-    {
-      const double h = soil_water.h (i);
-      if (h < 0)
-        {
-          const double zplus = geo.zplus (i);
-          const double z = (i == 0) ? 0.0 : geo.zplus (i-1);
-          const double zx = z - zplus; 
-          if (h + zx > 0)
-            // Groundwater in this cell.
-            height = zplus + h + zx;
-          else
-            // Groundwater between cells.
-            height = zplus;
-          break;
-        }
-    }
-#endif
+
   // Find sink term.
   EqDrnFlow = EquilibriumDrainFlow (geo, soil, soil_heat);
   DrainFlow= geo.total_surface (S);
@@ -240,29 +219,52 @@ GroundwaterPipe::EquilibriumDrainFlow (const Geometry& geo,
     
   for (size_t i = 0; i < cell_size; i++)
     {
-      const double z = geo.cell_z (i);
+      const double z_bottom = geo.cell_bottom (i);
 
-      // No contribution from cells above the groundwater table.
-      if (z >= height)
+      // No contribution from cells wholy above the groundwater table.
+      if (z_bottom >= height)
         continue;
 
+      // Do not count part of cell above groundwater level.
+      const double z_top = std::min (geo.cell_top (i), height);
+      
+      // Ignore insignificant intervals.
+      if (approximate (z_top, z_bottom))
+        continue;
+
+      // Sanity check.
+      daisy_assert (z_top > z_bottom);
+
+      // Find fraction above and below pipes.
+      const double f_above = 
+        (z_top > pipe_position)
+        ? geo.fraction_in_z_interval (i, z_top, pipe_position)
+        : 0.0;
+      const double f_below =
+        (z_bottom < pipe_position)
+        ? geo.fraction_in_z_interval (i, pipe_position, z_bottom)
+        : 0.0;
+
+#if 1
       const double volume = geo.cell_volume (i);
-
-      if (z >= pipe_position)
-        {
-          Ha += volume;
-          Ka += volume * K_to_pipes (i, soil, soil_heat);
-        }
-      else
-        {
-          Hb += volume;
-          Kb += volume * K_to_pipes (i, soil, soil_heat);
-        }
+#else
+      const double volume = geo.cell_bottom (i) - geo.cell_top (i);
+#endif
+      const double K = K_to_pipes (i, soil, soil_heat);
+      Ha += f_above * volume;
+      Ka += f_above * volume * K;
+      Hb += f_below * volume;
+      Kb += f_below * volume * K;
     }
-
+  
   // There may be no nodes with pipe_position < z < height.
   if (iszero (Ha))
     return 0.0;
+
+  // Make it 1D.  Only works for rectangular domain.
+  const double soil_width = geo.right () - geo.left ();
+  Ha /= soil_width;
+  Hb /= soil_width;
 
   // Average conductivity.
   Ka /= Ha;
@@ -272,11 +274,13 @@ GroundwaterPipe::EquilibriumDrainFlow (const Geometry& geo,
   const double Flow = (4*Ka*Ha*Ha + 2*Kb*Hb*Ha) / (L*x - x*x);
 
   // Distribution of drain flow among numeric soil layers
+  const double soil_bottom = geo.bottom ();
   const double a = Flow / (Ka*Ha + Kb*Hb);
   for (size_t i = 0; i < cell_size; i++)
-    if (geo.cell_z (i) < height)
-      S[i] = a * K_to_pipes (i, soil, soil_heat);
-
+    {
+      const double f = geo.fraction_in_z_interval (i, height, soil_bottom);
+      S[i] = f * a * K_to_pipes (i, soil, soil_heat);
+    }
   daisy_assert (std::isfinite (Flow));
   return Flow;
 }
