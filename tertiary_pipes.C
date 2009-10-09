@@ -193,24 +193,38 @@ TertiaryPipes::EquilibriumDrainFlow (const Geometry& geo,
     
   for (size_t i = 0; i < cell_size; i++)
     {
-      const double z = geo.cell_z (i);
+      const double z_bottom = geo.cell_bottom (i);
 
-      // No contribution from cells above the groundwater table.
-      if (z >= height)
+      // No contribution from cells wholy above the groundwater table.
+      if (z_bottom >= height)
         continue;
 
-      const double volume = geo.cell_volume (i);
+      // Do not count part of cell above groundwater level.
+      const double z_top = std::min (geo.cell_top (i), height);
+      
+      // Ignore insignificant intervals.
+      if (approximate (z_top, z_bottom))
+        continue;
 
-      if (z >= pipe_position)
-        {
-          Ha += volume;
-          Ka += volume * K_to_pipes (i, soil, soil_heat);
-        }
-      else
-        {
-          Hb += volume;
-          Kb += volume * K_to_pipes (i, soil, soil_heat);
-        }
+      // Sanity check.
+      daisy_assert (z_top > z_bottom);
+
+      // Find fraction above and below pipes.
+      const double f_above = 
+        (z_top > pipe_position)
+        ? geo.fraction_in_z_interval (i, z_top, pipe_position)
+        : 0.0;
+      const double f_below =
+        (z_bottom < pipe_position)
+        ? geo.fraction_in_z_interval (i, pipe_position, z_bottom)
+        : 0.0;
+
+      const double volume = geo.cell_volume (i);
+      const double K = K_to_pipes (i, soil, soil_heat);
+      Ha += f_above * volume;
+      Ka += f_above * volume * K;
+      Hb += f_below * volume;
+      Kb += f_below * volume * K;
     }
 
   // There may be no nodes with pipe_position < z < height.
