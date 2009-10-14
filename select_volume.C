@@ -58,7 +58,7 @@ struct SelectVolume : public SelectValue
                                   const symbol has, const symbol want);
 
   // Output routines.
-  void output_array (const std::vector<double>& array, 
+  void output_array (const double weight, const std::vector<double>& array, 
                      const Column* col, 
                      Treelog&);
 
@@ -92,7 +92,8 @@ SelectVolume::special_convert (const Units& units,
 
 // Output routines.
 void 
-SelectVolume::output_array (const std::vector<double>& array, 
+SelectVolume::output_array (const double rel, 
+                            const std::vector<double>& array, 
                             const Column *const column, Treelog& msg)
 { 
   const Geometry *const geo = column ? &column->get_geometry () : NULL;
@@ -181,7 +182,7 @@ SelectVolume::output_array (const std::vector<double>& array,
     for (size_t i = 0; i < cells.size (); i++)
       sum += array[cells[i]] * weight[i];
 
-  add_result (sum);
+  add_result (sum * rel);
 }
 
 // Create and Destroy.
@@ -333,7 +334,8 @@ struct SelectWater : public SelectVolume
   const double h;
   const double h_ice;
 
-  void output_array (const std::vector<double>&, 
+  void output_array (const double rel, 
+                     const std::vector<double>&, 
                      const Column *const column,
                      Treelog& msg)
   {
@@ -349,7 +351,7 @@ struct SelectWater : public SelectVolume
 	while (water.size () < soil->size ())
 	  water.push_back (soil->Theta (water.size (), h, h_ice));
       }
-    SelectVolume::output_array (water, column, msg);
+    SelectVolume::output_array (rel, water, column, msg);
   }
 
   SelectWater (const BlockModel& al)

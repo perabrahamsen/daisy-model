@@ -52,7 +52,7 @@ protected:
 
   // Output routines.
 private:
-  void output_array (const std::vector<double>&, const Column*, Treelog&);
+  void output_array (const double weight, const std::vector<double>&, const Column*, Treelog&);
 
   // Create and Destroy.
 private:
@@ -96,7 +96,8 @@ SelectFlow::check_border (const Border& border, const Volume& default_volume,
 { return volume->check_border (border, default_volume, msg); }
 
 void
-SelectFlow::output_array (const std::vector<double>& array, 
+SelectFlow::output_array (const double rel, 
+                          const std::vector<double>& array, 
                           const Column *const column, 
                           Treelog& msg)
 { 
@@ -164,7 +165,7 @@ SelectFlow::output_array (const std::vector<double>& array,
   for (size_t i = 0; i < edges.size (); i++)
     sum += array[edges[i]] * weight[i];
   
-  add_result (sum);
+  add_result (sum * rel);
 }
 
 SelectFlow::SelectFlow (const BlockModel& al)

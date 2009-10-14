@@ -47,7 +47,7 @@ struct SelectContent : public SelectValue
   std::vector<double> weight;   // Relative volume for cell.
 
   // Output routines.
-  void output_array (const std::vector<double>& array, 
+  void output_array (const double rel, const std::vector<double>& array, 
                      const Column *const column, 
                      Treelog&)
   { 
@@ -94,7 +94,7 @@ struct SelectContent : public SelectValue
     double result = 0.0;
     for (size_t i = 0; i < cell_size; i++)
       result += array[cell[i]] * weight[i];
-    add_result (result); 
+    add_result (result * rel); 
   }
 
   // Create and Destroy.

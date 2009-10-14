@@ -45,7 +45,8 @@ struct SelectPF : public Select
   { return h2pF (std::min (cm, max_h)); }
     
   // Output routines.
-  void output_array (const std::vector<double>& array, 
+  void output_array (const double rel, 
+                     const std::vector<double>& array, 
                      const Column *const column,
                      Treelog&)
   { 
@@ -58,10 +59,10 @@ struct SelectPF : public Select
 		    0.0);
     if (count == 0)
       for (unsigned int i = 0; i < array.size (); i++)
-	value[i] = cm2pF (array[i]);
+	value[i] = cm2pF (array[i]) * rel;
     else
       for (unsigned int i = 0; i < array.size (); i++)
-	value[i] += cm2pF (array[i]);
+	value[i] += cm2pF (array[i]) * rel;
     count++;
   }
 

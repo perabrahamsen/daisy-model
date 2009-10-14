@@ -239,7 +239,7 @@ LogAll::output_entry (symbol name, const double value)
        i != sels.end ();
        i++)
     if (name == (*i)->current_name)
-      (*i)->output_number (value);
+      (*i)->output_number (weight (), value);
 }
 
 void 
@@ -251,7 +251,7 @@ LogAll::output_entry (symbol name, const int value)
        i != sels.end ();
        i++)
     if (name == (*i)->current_name)
-      (*i)->output_integer (value);
+      (*i)->output_integer (weight (), value);
 }
 
 void 
@@ -263,7 +263,7 @@ LogAll::output_entry (symbol name, const symbol value)
        i != sels.end ();
        i++)
     if (name == (*i)->current_name)
-      (*i)->output_name (value);
+      (*i)->output_name (weight (), value);
 }
 
 void 
@@ -275,7 +275,7 @@ LogAll::output_entry (symbol name, const std::vector<double>& value)
        i != sels.end ();
        i++)
     if (name == (*i)->current_name)
-      (*i)->output_array (value, column (), *msg);
+      (*i)->output_array (weight (), value, column (), *msg);
 }
 
 void 

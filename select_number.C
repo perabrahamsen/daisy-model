@@ -28,16 +28,16 @@
 struct SelectNumber : public SelectValue
 {
   // Output routines.
-  void output_number (double number)
-  { add_result (number); }
-  void output_integer (int integer)
-  { output_number (integer); }
-  void output_array (const std::vector<double>& array,
+  void output_number (const double rel, const double number)
+  { add_result (number * rel); }
+  void output_integer (const double rel, const int integer)
+  { output_number (rel, integer); }
+  void output_array (const double rel, const std::vector<double>& array,
                      const Column*, Treelog&)
   { 
     const size_t size = array.size ();
     for (size_t i = 0; i < size; i++)
-      add_result (array[i]); 
+      add_result (array[i] * rel); 
   }
 
   // Create and Destroy.

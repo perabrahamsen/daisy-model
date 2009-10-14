@@ -59,7 +59,7 @@ struct SelectArray : public Select
   }
 
   // Output routines.
-  void output_array (const std::vector<double>& array, 
+  void output_array (const double rel, const std::vector<double>& array, 
                      const Column *const column,
                      Treelog&)
   { 
@@ -95,20 +95,20 @@ struct SelectArray : public Select
       {
         if (handle == Handle::geometric)
           for (unsigned int i = 0; i < array.size (); i++)
-            value[i] = log (array[i]);
+            value[i] = log (array[i] * rel);
         else
           for (unsigned int i = 0; i < array.size (); i++)
-            value[i] = array[i];
+            value[i] = array[i] * rel;
       }
     else switch (handle)
       {
       case Handle::min:
         for (unsigned int i = 0; i < array.size (); i++)
-          value[i] = std::min (value[i], array[i]);
+          value[i] = std::min (value[i], array[i] * rel);
         break;
       case Handle::max:
         for (unsigned int i = 0; i < array.size (); i++)
-          value[i] = std::max (value[i], array[i]);
+          value[i] = std::max (value[i], array[i] * rel);
         break;
       case Handle::current:    
         // We may have count > 0 && Handle::current when selecting
@@ -117,11 +117,11 @@ struct SelectArray : public Select
       case Handle::average:
       case Handle::sum:
         for (unsigned int i = 0; i < array.size (); i++)
-          value[i] += array[i];
+          value[i] += array[i] *rel;
         break;
       case Handle::geometric:
         for (unsigned int i = 0; i < array.size (); i++)
-          value[i] += log (array[i]);
+          value[i] += log (array[i] * rel);
         break;
       }
     count++;

@@ -535,19 +535,19 @@ const symbol Select::wildcard ("*");
 
 // Output routines.
 void 
-Select::output_number (const double)
+Select::output_number (double, const double)
 { throw ("This log selection can't log numbers."); }
 
 void 
-Select::output_integer (const int)
+Select::output_integer (double, const int)
 { throw ("This log selection can't log integers."); }
 
 void 
-Select::output_name (const symbol)
+Select::output_name (double, const symbol)
 { throw ("This log selection can't log names."); }
 
 void 
-Select::output_array (const std::vector<double>&,
+Select::output_array (double, const std::vector<double>&,
                       const Column*,
                       Treelog&)
 { throw ("This log selection can't log arrays."); }

@@ -133,10 +133,10 @@ public:
   }
 
   // Output routines.
-  virtual void output_number (double);
-  virtual void output_integer (int);
-  virtual void output_name (symbol);
-  virtual void output_array (const std::vector<double>&, 
+  virtual void output_number (double weight, double);
+  virtual void output_integer (double weight, int);
+  virtual void output_name (double weight, symbol);
+  virtual void output_array (double weight, const std::vector<double>&, 
                              const Column*, Treelog&);
 
   // Reset at start of time step.
