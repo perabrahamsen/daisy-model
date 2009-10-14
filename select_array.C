@@ -29,11 +29,12 @@
 #include "mathlib.h"
 #include "librarian.h"
 #include "frame.h"
+#include "column.h"
 
 struct SelectArray : public Select
 {
-  type_t type () const
-  { return NumberSequence; }
+  int type_size () const
+  { return original_size (); }
 
   // Content.
   std::vector<double> value;		// Total array.
@@ -59,9 +60,12 @@ struct SelectArray : public Select
 
   // Output routines.
   void output_array (const std::vector<double>& array, 
-		     const Geometry* geo, const Soil* soil, const Vegetation*, 
-		     Treelog&)
+                     const Column *const column,
+                     Treelog&)
   { 
+    const Geometry *const geo = column ? &column->get_geometry () : NULL;
+    const Soil *const soil = column ? &column->get_soil () : NULL;
+                       
     if (geo != last_geo)
       last_geo = geo;
 

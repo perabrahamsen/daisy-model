@@ -55,18 +55,18 @@ struct LogDLF : public LogSelect
   // Log.
   void common_match (const Daisy& daisy, Treelog& out);
   void common_done (const std::vector<Time::component_t>& time_columns,
-                    const Time& time, double dt);
+                    const Time& time, const Daisy&, Treelog&);
   virtual void process_entry (size_t) = 0;
 
   // Log.
   bool match (const Daisy& daisy, Treelog& out);
   void done (const std::vector<Time::component_t>& time_columns,
-             const Time& time, double dt);
+             const Daisy&, Treelog&);
 
   // Initial line.
   bool initial_match (const Daisy&, Treelog&);
   void initial_done (const std::vector<Time::component_t>& time_columns,
-                     const Time& time, const double dt);
+                     const Daisy&, Treelog&);
 
   // Create and destroy.
   bool check (const Border&, Treelog& msg) const;

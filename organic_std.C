@@ -55,6 +55,7 @@
 #include "library.h"
 #include "metalib.h"
 #include "block_model.h"
+#include "column.h"
 #include <algorithm>
 #include <numeric>
 #include <fstream>
@@ -762,8 +763,10 @@ OrganicStandard::output (Log& log) const
       || log.check_leaf (total_C_symbol)
       || log.check_leaf (humus_symbol))
     {
-      daisy_assert (log.geometry ());
-      const int size = log.geometry ()->cell_size ();
+      const Column *const column = log.column ();
+      daisy_assert (column);
+      const Geometry& geo = column->get_geometry ();
+      const int size = geo.cell_size ();
 
       std::vector<double> total_N (size, 0.0);
       std::vector<double> total_C (size, 0.0);

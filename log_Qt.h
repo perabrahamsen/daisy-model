@@ -40,7 +40,7 @@ signals:
   // Use.
 private:
   void done (const std::vector<Time::component_t>& time_columns,
-	     const Time&, double dt);
+	     const Daisy&, Treelog&);
 
   // Create and destroy.
 public:

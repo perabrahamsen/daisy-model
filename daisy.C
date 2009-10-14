@@ -304,8 +304,8 @@ The default value is 1 hour, anything else is unlikely to work.",
 By default, the simulation will run until the manager request it to stop.",
                         Time::load_syntax);
   frame.declare_object ("column", Column::component, 
-                     Attribute::State, Attribute::Variable,
-                     "List of columns to use in this simulation.");
+                        Attribute::State, Attribute::Variable,
+                        "List of columns to use in this simulation.");
   frame.declare_object ("weather", Weather::component,
                      Attribute::OptionalState, Attribute::Singleton,
                      "Weather model for providing climate information during\n\

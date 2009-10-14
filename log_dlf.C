@@ -42,7 +42,7 @@ LogDLF::common_match (const Daisy& daisy, Treelog&)
 
 void 
 LogDLF::common_done (const std::vector<Time::component_t>& time_columns,
-                       const Time& time, const double dt)
+                     const Time& time, const Daisy& daisy, Treelog&)
 { 
   if (print_tags)
     {
@@ -143,6 +143,7 @@ LogDLF::common_done (const std::vector<Time::component_t>& time_columns,
     for (size_t i = 0; i < time_columns.size (); i++)
       out << time.component_value (time_columns[i]) << field_separator;
 
+  const double dt = daisy.dt;
   for (size_t i = 0; i < entries.size (); i++)
     {
       if (i != 0)
@@ -165,9 +166,9 @@ LogDLF::match (const Daisy& daisy, Treelog& msg)
 }
 void 
 LogDLF::done (const std::vector<Time::component_t>& time_columns,
-                const Time& time, const double dt)
+              const Daisy& daisy, Treelog& msg)
 { 
-  LogSelect::done (time_columns, time, dt);
+  LogSelect::done (time_columns, daisy, msg);
 
   if (!is_printing)
     return;
@@ -176,8 +177,8 @@ LogDLF::done (const std::vector<Time::component_t>& time_columns,
     if (entries[i]->prevent_printing ())
       return;
 
-  common_done (time_columns, time, dt);
-  end = time;
+  common_done (time_columns, daisy.time, daisy, msg);
+  end = daisy.time;
 }
 
 bool 
@@ -191,9 +192,10 @@ LogDLF::initial_match (const Daisy& daisy, Treelog& msg)
 
 void 
 LogDLF::initial_done (const std::vector<Time::component_t>& time_columns,
-                        const Time& time, const double dt)
+                      const Daisy& daisy, Treelog& msg)
 { 
-  LogSelect::initial_done (time_columns, time, dt);
+  const Time previous = daisy.time - daisy.timestep;
+  LogSelect::initial_done (time_columns, daisy, msg);
 
   bool prevent_printing = !print_initial;
   for (unsigned int i = 0; i < entries.size (); i++)
@@ -202,13 +204,14 @@ LogDLF::initial_done (const std::vector<Time::component_t>& time_columns,
 
   if (prevent_printing)
     {
+      const double dt = daisy.dt;
       for (unsigned int i = 0; i < entries.size (); i++)
         entries[i]->done (dt);
       return;
     }
       
-  common_done (time_columns, time, dt);
-  begin = time;
+  common_done (time_columns, previous, daisy, msg);
+  begin = previous;
 }
 
 bool 

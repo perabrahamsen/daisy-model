@@ -1,3 +1,8 @@
+2009-10-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* sample/dk-soil.dai ("Jyndevad Ap", "Jyndevad C"): Use B_BaC
+	instead of M_vG.
+
 2009-10-09  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* tertiary_pipes.C: New model.

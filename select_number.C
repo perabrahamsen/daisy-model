@@ -33,7 +33,7 @@ struct SelectNumber : public SelectValue
   void output_integer (int integer)
   { output_number (integer); }
   void output_array (const std::vector<double>& array,
-                     const Geometry*, const Soil*, const Vegetation*, Treelog&)
+                     const Column*, Treelog&)
   { 
     const size_t size = array.size ();
     for (size_t i = 0; i < size; i++)

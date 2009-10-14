@@ -34,6 +34,7 @@
 #include "frame.h"
 #include "assertion.h"
 #include "mathlib.h"
+#include "column.h"
 #include <memory>
 
 struct SelectVolume : public SelectValue
@@ -58,8 +59,8 @@ struct SelectVolume : public SelectValue
 
   // Output routines.
   void output_array (const std::vector<double>& array, 
-		     const Geometry* geo, const Soil* soil, const Vegetation*, 
-		     Treelog&);
+                     const Column* col, 
+                     Treelog&);
 
   // Create and Destroy.
   symbol default_dimension (const symbol spec_dim) const;
@@ -92,9 +93,11 @@ SelectVolume::special_convert (const Units& units,
 // Output routines.
 void 
 SelectVolume::output_array (const std::vector<double>& array, 
-                            const Geometry* geo, const Soil* soil, 
-			    const Vegetation* vegetation, Treelog& msg)
+                            const Column *const column, Treelog& msg)
 { 
+  const Geometry *const geo = column ? &column->get_geometry () : NULL;
+  const Soil *const soil = column ? &column->get_soil () : NULL;
+                       
   if (soil != last_soil)
     {
       last_soil = soil;
@@ -147,6 +150,8 @@ SelectVolume::output_array (const std::vector<double>& array,
 
   if (min_root_density > 0.0)
     {
+      daisy_assert (column);
+      const Vegetation *const vegetation = &column->get_vegetation ();
       const std::vector<double>& root_density 
 	= (min_root_crop == wildcard)
 	? vegetation->root_density ()
@@ -329,10 +334,12 @@ struct SelectWater : public SelectVolume
   const double h_ice;
 
   void output_array (const std::vector<double>&, 
-		     const Geometry* geo, const Soil* soil,
-		     const Vegetation* veg, 
-		     Treelog& msg)
+                     const Column *const column,
+                     Treelog& msg)
   {
+    const Geometry *const geo = column ? &column->get_geometry () : NULL;
+    const Soil *const soil = column ? &column->get_soil () : NULL;
+                       
     if (soil != last_soil || geo != last_geo)
       {
 	if (!soil)
@@ -342,7 +349,7 @@ struct SelectWater : public SelectVolume
 	while (water.size () < soil->size ())
 	  water.push_back (soil->Theta (water.size (), h, h_ice));
       }
-    SelectVolume::output_array (water, geo, soil, veg, msg);
+    SelectVolume::output_array (water, column, msg);
   }
 
   SelectWater (const BlockModel& al)

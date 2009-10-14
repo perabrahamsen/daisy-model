@@ -35,7 +35,7 @@ struct SelectIndex : public SelectValue
 
   // Output routines.
   void output_array (const std::vector<double>& array,
-                     const Geometry*, const Soil*, const Vegetation*,
+                     const Column*,
                      Treelog& msg)
   { 
     if (index < array.size ())

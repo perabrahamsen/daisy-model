@@ -63,12 +63,12 @@ struct EXPORT LogSelect : public Log
   // Checking to see if we should log this time step.
   bool match (const Daisy& daisy, Treelog&);
   void done (const std::vector<Time::component_t>& time_columns,
-	     const Time&, double dt);
+	     const Daisy&, Treelog& msg);
 
   // Initial line.
   bool initial_match (const Daisy&, Treelog&);
   void initial_done (const std::vector<Time::component_t>& time_columns,
-		     const Time& time, double dt);
+		     const Daisy&, Treelog&);
 
   // Open a derived type (for LogAll to overwrite).
   virtual void open_derived_type (symbol type, const char* library);

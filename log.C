@@ -44,12 +44,14 @@ Log::library_id () const
 
 struct Log::Implementation
 {
-  std::list<const Soil*> soils;
-  std::list<const Geometry*> geometries;
-  std::list<const Vegetation*> vegetations;
   Metalib* metalib;
+  const Column* column;
+  double weight;
+
   Implementation ()
-    : metalib (NULL)
+    : metalib (NULL),
+      column (NULL),
+      weight (1.0)
   { }
 };
 
@@ -111,41 +113,28 @@ Log::close_alist ()
 { close (); }
 
 void 
-Log::open_soil (const Geometry& g, const Soil& s, const Vegetation& v)
+Log::open_column (const Column& column, const double weight)
 { 
-  impl->geometries.push_back (&g);
-  impl->soils.push_back (&s);
-  impl->vegetations.push_back (&v);
+  daisy_assert (!impl->column);
+  impl->column = &column;
+  impl->weight = weight;
 }
 
 void 
-Log::close_soil ()
+Log::close_column ()
 {
-  impl->geometries.pop_back ();
-  impl->soils.pop_back ();
-  impl->vegetations.pop_back ();
+  daisy_assert (impl->column);
+  impl->column = NULL;
+  impl->weight = 1.0;
 }
 
-const Geometry*
-Log::geometry () const
-{
-  daisy_assert (!impl->geometries.empty ());
-  return impl->geometries.back ();
-}
+const Column*
+Log::column () const
+{ return impl->column; }
 
-const Soil*
-Log::soil () const
-{
-  daisy_assert (!impl->soils.empty ());
-  return impl->soils.back ();
-}
-
-const Vegetation*
-Log::vegetation () const
-{
-  daisy_assert (!impl->vegetations.empty ());
-  return impl->vegetations.back ();
-}
+double
+Log::weight () const
+{ return impl->weight; }
 
 void
 Log::output (Log&) const

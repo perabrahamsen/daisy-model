@@ -70,7 +70,7 @@ private:
   symbol last_done;
 protected:
   void done (const std::vector<Time::component_t>& time_columns,
-	     const Time&, double dt);
+	     const Daisy&, Treelog&);
 private:
   bool initial_match (const Daisy&, Treelog&);
 

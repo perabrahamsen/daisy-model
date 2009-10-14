@@ -50,14 +50,14 @@ struct LogCheckpoint : public LogSubmodel
   // Start and end of time step.
   bool check_leaf (symbol) const;
   bool check_interior (symbol) const;
-  bool match (const Daisy& daisy, Treelog& out);
+  bool match (const Daisy&, Treelog&);
   void done (const std::vector<Time::component_t>& time_columns,
-	     const Time& time, double dt);
+	     const Daisy&, Treelog&);
 
   bool initial_match (const Daisy&, Treelog&)
   { return false; }
   void initial_done (const std::vector<Time::component_t>& time_columns,
-		     const Time&, double)
+		     const Daisy&, Treelog&)
   { daisy_notreached (); }
 
   // Create and Destroy.
@@ -132,7 +132,7 @@ public:
 
 void
 LogCheckpoint::done (const std::vector<Time::component_t>& time_columns,
-		     const Time&, double)
+		     const Daisy&, Treelog&)
 {
   if (is_active)
     {

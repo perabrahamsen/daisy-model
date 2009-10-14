@@ -135,7 +135,7 @@
      (activity "Barley no stress")
    )
    ;; Selecting output files
-   (output &old Harvest
+   (output &old harvest
                 "Crop Production"))
 
 

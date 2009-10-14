@@ -31,6 +31,7 @@
 #include "assertion.h"
 #include "librarian.h"
 #include "frame_model.h"
+#include "mathlib.h"
 
 struct Field::Implementation
 {
@@ -683,15 +684,30 @@ Field::Implementation::tick_one (const Metalib& metalib,
 void 
 Field::Implementation::output (Log& log) const
 {
+  double total_weight = 0.0;
   for (ColumnList::const_iterator i = columns.begin ();
        i != columns.end ();
        i++)
     {
-      if (log.check_entry ((*i)->name, Column::component))
+      const Column& column = **i;
+      if (log.check_entry (column.name, Column::component))
+        total_weight += column.weight;
+    }
+
+  if (iszero (total_weight))
+    return;
+  
+  for (ColumnList::const_iterator i = columns.begin ();
+       i != columns.end ();
+       i++)
+    {
+      const Column& column = **i;
+      if (log.check_entry (column.name, Column::component))
 	{
-	  Log::Entry open_entry (log, symbol ((*i)->name), (*i)->frame (),
+	  Log::Entry open_entry (log, column.name, column.frame (),
 				 Column::component);
-	  (*i)->output (log);
+          Log::Col col (log, column, column.weight / total_weight);
+	  column.output (log);
 	}
     }
 }

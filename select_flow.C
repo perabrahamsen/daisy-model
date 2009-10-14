@@ -23,6 +23,7 @@
 #include "block_model.h"
 #include "volume.h"
 #include "border.h"
+#include "column.h"
 #include "geometry.h"
 #include "treelog.h"
 #include "librarian.h"
@@ -51,8 +52,7 @@ protected:
 
   // Output routines.
 private:
-  void output_array (const std::vector<double>&, 
-                     const Geometry*, const Soil*, const Vegetation*, Treelog&);
+  void output_array (const std::vector<double>&, const Column*, Treelog&);
 
   // Create and Destroy.
 private:
@@ -97,9 +97,11 @@ SelectFlow::check_border (const Border& border, const Volume& default_volume,
 
 void
 SelectFlow::output_array (const std::vector<double>& array, 
-                          const Geometry* geo, const Soil*, const Vegetation*, 
-			  Treelog& msg)
+                          const Column *const column, 
+                          Treelog& msg)
 { 
+  const Geometry *const geo = column ? &column->get_geometry () : NULL;
+                       
   if (geo != last_geo)
     {
       Treelog::Open nest (msg, name);

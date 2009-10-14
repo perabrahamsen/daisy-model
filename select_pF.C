@@ -29,11 +29,12 @@
 #include "treelog.h"
 #include "librarian.h"
 #include "frame.h"
+#include "column.h"
 
 struct SelectPF : public Select
 {
-  type_t type () const
-  { return NumberSequence; }
+  int type_size () const
+  { return original_size (); }
 
   // Content.
   const double max_h;
@@ -45,11 +46,11 @@ struct SelectPF : public Select
     
   // Output routines.
   void output_array (const std::vector<double>& array, 
-		     const Geometry* geo, const Soil*, const Vegetation*, 
-		     Treelog&)
+                     const Column *const column,
+                     Treelog&)
   { 
-    if (geo)
-      last_geo = geo;
+    if (column)
+      last_geo = &column->get_geometry ();
 
     if (array.size () > value.size ())
       value.insert (value.end (), 

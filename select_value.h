@@ -28,8 +28,8 @@ class SelectValue : public Select
 {
   // Content.
 private:
-  type_t type () const
-  { return NumberSingleton; }
+  int type_size () const
+  { return Attribute::Singleton; }
 
 protected:
   double value;	

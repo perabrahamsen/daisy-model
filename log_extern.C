@@ -31,18 +31,20 @@
 #include "submodeler.h"
 #include "treelog.h"
 #include "frame_model.h"
+#include "daisy.h"
 
 void 
 LogExtern::done (const std::vector<Time::component_t>& time_columns,
-		 const Time& time, const double dt)
+		 const Daisy& daisy, Treelog& msg)
 { 
-  LogSelect::done (time_columns, time, dt);
+  LogSelect::done (time_columns, daisy, msg);
 
   if (!is_printing)
     return;
 
   for (size_t i = 0; i < LogSelect::entries.size (); i++)
     {
+      const double dt = daisy.dt;
       last_done = LogSelect::entries[i]->tag ();
       LogSelect::entries[i]->done (dt);
     }
@@ -150,6 +152,7 @@ LogExtern::lookup (const symbol tag) const
       for (size_t j = 0; j < LogSelect::entries.size (); j++)
         if (LogSelect::entries[j]->tag () == tag)
           {
+#if 0
             switch (LogSelect::entries[j]->type ())
               {
               case Select::NumberSingleton:
@@ -157,6 +160,9 @@ LogExtern::lookup (const symbol tag) const
                 return Attribute::Number;
               }
             daisy_notreached ();
+#else
+            return LogSelect::entries[j]->type ();
+#endif
           }
       return Attribute::Error;
     }

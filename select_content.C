@@ -30,6 +30,7 @@
 #include "librarian.h"
 #include "treelog.h"
 #include "frame.h"
+#include "column.h"
 
 struct SelectContent : public SelectValue
 {
@@ -47,11 +48,14 @@ struct SelectContent : public SelectValue
 
   // Output routines.
   void output_array (const std::vector<double>& array, 
-		     const Geometry* geo, const Soil* soil, const Vegetation*, 
-		     Treelog&)
+                     const Column *const column, 
+                     Treelog&)
   { 
+    const Geometry *const geo = column ? &column->get_geometry () : NULL;
+    const Soil *const soil = column ? &column->get_soil () : NULL;
+                       
     if (soil != old_soil)
-        old_soil = soil;
+      old_soil = soil;
 
     if (geo != old_geo)
       {

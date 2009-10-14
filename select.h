@@ -28,9 +28,11 @@
 #include "symbol.h"
 #include "units.h"
 #include "volume.h"
+#include "attribute.h"
 #include <vector>
 #include <set>
 
+class Column;
 class Geometry;
 class Soil;
 class Vegetation;
@@ -81,8 +83,10 @@ public:
   static const char *const component;
   symbol library_id () const;
   symbol get_description () const;
-  enum type_t { NumberSingleton, NumberSequence };
-  virtual type_t type () const = 0;
+  Attribute::type type () const
+  { return Attribute::Number; }
+  virtual int type_size () const = 0;
+  int original_size () const;
   virtual symbol dimension () const;
   virtual symbol tag () const;
   virtual const Geometry* geometry () const; // For array tags.
@@ -132,9 +136,8 @@ public:
   virtual void output_number (double);
   virtual void output_integer (int);
   virtual void output_name (symbol);
-  virtual void output_array (const std::vector<double>&,
-                             const Geometry*, const Soil*, const Vegetation*,
-			     Treelog&);
+  virtual void output_array (const std::vector<double>&, 
+                             const Column*, Treelog&);
 
   // Reset at start of time step.
 public:

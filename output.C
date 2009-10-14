@@ -57,7 +57,7 @@ Output::initial_logs (const Daisy& daisy, Treelog& msg)
 		  output_submodule (previous, "time", log);
                   daisy.output (log);
                   output_list (logs, "output", log, Log::component);
-		  log.initial_done (time_columns, previous, daisy.dt);
+		  log.initial_done (time_columns, daisy, msg);
 		}
 	    }
 	}
@@ -83,7 +83,7 @@ Output::tick (const Daisy& daisy, Treelog& msg)
 	      output_submodule (daisy.time, "time", log);
               daisy.output (log);
               output_list (logs, "output", log, Log::component);
-	      log.done (time_columns, daisy.time, daisy.dt);
+	      log.done (time_columns, daisy, msg);
 	    }
 	}
     }

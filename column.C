@@ -61,12 +61,12 @@ Column::location () const
 void
 Column::output (Log& log) const
 {
-  output_variable (size, log);
+  output_variable (weight, log);
 }
 
 Column::Column (const BlockModel& al)
   : ModelFramed (al),
-    size (al.number ("size")),
+    weight (al.number ("weight")),
     location_ (map_submodel_const<Point> (al, "location"))
 { }
 
@@ -78,10 +78,9 @@ static struct ColumnInit : public DeclareComponent
   void load_frame (Frame& frame) const
   { 
     Model::load_model (frame);
-    frame.declare ("size", Attribute::Unknown (), Attribute::State,
-               "Area covered by this column, for use by the 'merge' action.\n\
-The dimension is up to you, as long as all columns use the same unit.");
-    frame.set ("size", 1.0);
+    frame.declare ("weight", Attribute::Unknown (),  Attribute::State, "\
+Relative area covered by this column.");
+    frame.set ("weight", 1.0);
 
     frame.declare_submodule_sequence ("location", Attribute::Const, "\
 Location of this column.\n\

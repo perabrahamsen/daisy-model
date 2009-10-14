@@ -36,22 +36,25 @@ hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S
                   ( -250.00 "Askov C"))))
 
 (defhorizon "Jyndevad Ap" default
-  "Jyndevad 10 & 30 cm soil. Data from O.H. Jacobsen (1989): Umættet
+  "Jyndevad 15 cm soil. Data from O.H. Jacobsen (1989): Umættet
 hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S
 2030. Statens Planteavlsforsøg."
   (clay 0.038)  (silt 0.072) (fine_sand 0.183) (coarse_sand 0.684)
   (humus 0.023) (C_per_N 13)
-  (hydraulic M_vG (Theta_res 0.061) (Theta_sat 0.439) 
-  	(alpha 0.057) (n 1.754) (K_sat 24.3 [cm/h])))
+  (hydraulic "B_BaC"
+             (Theta_res 0.036 []) (Theta_sat 0.435 []) 
+             (lambda 0.446 []) (h_b -8.4 [cm]) (K_sat 6.76e-5 [m/s])))
+
 
 (defhorizon "Jyndevad C" default
-  "Jyndevad 50 & 90 cm soil. Data from O.H. Jacobsen (1989): Umættet
+  "Jyndevad 50 cm soil. Data from O.H. Jacobsen (1989): Umættet
 hydraulisk ledningsevne i nogle danske jorde .Beretning nr. S
 2030. Statens Planteavlsforsøg."
   (clay 0.028)  (silt 0.023) (fine_sand 0.096) (coarse_sand 0.849)
   (humus 0.004) (C_per_N 13)
-  (hydraulic M_vG (Theta_res 0.030)(Theta_sat 0.418)
-  	(alpha 0.054)(n 2.816)(K_sat 92.52 [cm/h])))
+  (hydraulic "B_BaC"
+             (Theta_res 0.017 []) (Theta_sat 0.443 []) 
+             (lambda 0.687 []) (h_b -8.7 [cm]) (K_sat 1.78e-4 [m/s])))
 
 (defcolumn Jyndevad default
   "This is a JB1 soil with free drainage"

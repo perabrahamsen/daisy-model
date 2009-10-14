@@ -24,6 +24,7 @@
 #include "select.h"
 #include "condition.h"
 #include "block_model.h"
+#include "column.h"
 #include "geometry.h"
 #include "number.h"
 #include "scope_id.h"
@@ -488,6 +489,17 @@ Select::get_description () const
   return description;
 }
 
+int
+Select::original_size () const
+{ 
+  if (!impl->spec.get ())
+    return Attribute::Unspecified;
+
+  const Frame& frame = impl->spec->leaf_frame ();
+  const symbol name = impl->spec->leaf_name ();
+  return frame.type_size (name);
+}
+
 symbol
 Select::dimension () const
 { return impl->dimension; }
@@ -535,8 +547,8 @@ Select::output_name (const symbol)
 { throw ("This log selection can't log names."); }
 
 void 
-Select::output_array (const std::vector<double>&, 
-                      const Geometry*, const Soil*, const Vegetation*,
+Select::output_array (const std::vector<double>&,
+                      const Column*,
                       Treelog&)
 { throw ("This log selection can't log arrays."); }
 

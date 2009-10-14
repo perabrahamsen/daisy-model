@@ -44,11 +44,14 @@ class Metalib;
 class Block;
 class BlockModel;
 class Scope;
+class Geometry;
+class Vegetation;
+class Soil;
 
 class Column : public ModelFramed
 {
 public:
-  double size;
+  double weight;
   static const char *const component;
   symbol library_id () const;
 
@@ -69,6 +72,12 @@ public:
   const std::vector<const Point*>& location () const;
 
   virtual const Horizon& horizon_at (double z, double x, double y) const = 0;
+
+  // Log.
+public:
+  virtual const Geometry& get_geometry () const = 0;
+  virtual const Soil& get_soil () const = 0;
+  virtual const Vegetation& get_vegetation () const = 0;
 
   // Actions.
 public:

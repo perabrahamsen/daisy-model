@@ -42,13 +42,11 @@
 
 class Daisy;
 class PLF;
-class Geometry;
-class Soil;
-class Vegetation;
 class Metalib;
 class Treelog;
 class BlockModel;
 class Frame;
+class Column;
 
 class EXPORT Log : public ModelFramed
 {
@@ -75,13 +73,13 @@ public:
   virtual bool match (const Daisy&, Treelog&) = 0;
   // Called at the end of each time step.
   virtual void done (const std::vector<Time::component_t>& time_columns,
-		     const Time& time, double dt) = 0;
+		     const Daisy&, Treelog&) = 0;
 
   // Initial line.
 public:
   virtual bool initial_match (const Daisy&, Treelog&) = 0;
   virtual void initial_done (const std::vector<Time::component_t>& time_columns,
-			     const Time& time, double dt) = 0;
+			     const Daisy&, Treelog&) = 0;
 
   // Normal items.
 public:
@@ -267,27 +265,26 @@ public:
 
   // Keep track of geometry for logging arrays.
 public:
-  struct Geo
+  struct Col
   {
   private:
     Log& ll;
   public:
-    Geo (Log& l, const Geometry& geo, const Soil& soil, const Vegetation& veg)
+    Col (Log& l, const Column& column, const double weight)
       : ll (l)
-    { ll.open_soil (geo, soil, veg); }
-    ~Geo ()
-    { ll.close_soil (); }
+    { ll.open_column (column, weight); }
+    ~Col ()
+    { ll.close_column (); }
   private:
-    Geo (const Geo&);
+    Col (const Col&);
   };
 private:
-  void open_soil (const Geometry&, const Soil&, const Vegetation&);
-  void close_soil ();
-  friend struct Log::Geo;
+  void open_column (const Column& column, const double weight);
+  void close_column ();
+  friend struct Log::Col;
 public:
-  const Geometry* geometry () const;
-  const Soil* soil () const;
-  const Vegetation* vegetation () const;
+  const Column* column () const;
+  double weight () const;
 
   // Self use.
 public:

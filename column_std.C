@@ -89,6 +89,14 @@ struct ColumnStandard : public Column
   double applied_DM;
   double first_year_utilization;
 
+  // Log interface.
+  const Geometry& get_geometry () const 
+  { return geometry; }
+  const Soil& get_soil () const 
+  { return *soil; }
+  const Vegetation& get_vegetation () const 
+  { return *vegetation; }
+
 public:
   const Horizon& horizon_at (double z, double x, double y) const;
 
@@ -813,7 +821,6 @@ ColumnStandard::check_y_border (const double value, Treelog& msg) const
 void
 ColumnStandard::output (Log& log) const
 {
-  Log::Geo geo (log, geometry, *soil, *vegetation);
   Column::output (log);
   if (weather.get ())
     output_derived (weather, "weather", log);

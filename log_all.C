@@ -28,6 +28,8 @@
 #include "treelog.h"
 #include "assertion.h"
 
+#include "column.h"
+
 bool 
 LogAll::check_leaf (symbol name) const
 { 
@@ -105,14 +107,14 @@ LogAll::match (const Daisy& daisy, Treelog& out)
 
 void 
 LogAll::done (const std::vector<Time::component_t>& time_columns,
-	      const Time& time, double dt)
+	      const Daisy& daisy, Treelog& out)
 {
   msg = NULL;
   for (std::vector<LogSelect*>::const_iterator i = slaves.begin (); 
        i != slaves.end (); 
        i++)
     if ((*i)->is_active)
-      (*i)->done (time_columns, time, dt);
+      (*i)->done (time_columns, daisy, out);
 
   active_leafs.pop ();
   active_interiors.pop ();
@@ -137,14 +139,14 @@ LogAll::initial_match (const Daisy& daisy, Treelog& out)
 
 void 
 LogAll::initial_done (const std::vector<Time::component_t>& time_columns,
-		      const Time& time, const double dt)
+		      const Daisy& daisy, Treelog& out)
 {
   msg = NULL;
   for (std::vector<LogSelect*>::const_iterator i = slaves.begin (); 
        i != slaves.end (); 
        i++)
     if ((*i)->is_active)
-      (*i)->initial_done (time_columns, time, dt);
+      (*i)->initial_done (time_columns, daisy, out);
 
   active_leafs.pop ();
   active_interiors.pop ();
@@ -273,7 +275,7 @@ LogAll::output_entry (symbol name, const std::vector<double>& value)
        i != sels.end ();
        i++)
     if (name == (*i)->current_name)
-      (*i)->output_array (value, geometry (), soil (), vegetation (), *msg);
+      (*i)->output_array (value, column (), *msg);
 }
 
 void 
