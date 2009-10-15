@@ -32,6 +32,7 @@
 #include "librarian.h"
 #include "frame_model.h"
 #include "mathlib.h"
+#include "crop.h"
 
 struct Field::Implementation
 {
@@ -595,10 +596,25 @@ Field::Implementation::crop_ds (symbol crop) const
 { 
   if (selected)
     return selected->crop_ds (crop);
-  if (columns.size () != 1)
-    throw ("Cannot find crop development state of multiple columns");
+  
+  double DS = 0.0;
+  double total_area = 0.0;
+  for (ColumnList::const_iterator i = columns.begin ();
+       i != columns.end ();
+       i++)
+    {
+      const double area = (*i)->area;
+      const double this_DS = (*i)->crop_ds (crop);
+      if (this_DS != Crop::DSremove)
+        {
+          total_area += area;
+          DS += this_DS;
+        }
+    }
+  if (total_area > 0.0)
+    return DS / total_area;
 
-  return columns[0]->crop_ds (crop); 
+  return Crop::DSremove;
 } 
 
 double 
@@ -609,11 +625,16 @@ Field::Implementation::crop_dm (const symbol crop, const double height) const
   
   // We find the total DM for all the columns.
   double DM = 0.0;
+  double total_area = 0.0;
   for (ColumnList::const_iterator i = columns.begin ();
        i != columns.end ();
        i++)
-    DM += (*i)->crop_dm (crop, height);
-  return DM;
+    {
+      const double area = (*i)->area;
+      total_area += area;
+      DM += (*i)->crop_dm (crop, height) * area;
+    }
+  return DM / total_area;
 }
   
 double 
@@ -664,10 +685,16 @@ Field::Implementation::tick_all (const Metalib& metalib,
                                  const Weather* weather, const Scope& scope,
 				 Treelog& msg)
 {
-  for (ColumnList::const_iterator i = columns.begin ();
-       i != columns.end ();
-       i++)
-    (*i)->tick (metalib, time, dt, weather, scope, msg);
+  if (columns.size () == 1)
+    (*(columns.begin ()))->tick (metalib, time, dt, weather, scope, msg);
+  else
+    for (ColumnList::const_iterator i = columns.begin ();
+         i != columns.end ();
+         i++)
+      {
+        Treelog::Open nest (msg, "Column " + (*i)->name);
+        (*i)->tick (metalib, time, dt, weather, scope, msg);
+      }
 }
 
 void 
@@ -684,17 +711,17 @@ Field::Implementation::tick_one (const Metalib& metalib,
 void 
 Field::Implementation::output (Log& log) const
 {
-  double total_weight = 0.0;
+  double total_area = 0.0;
   for (ColumnList::const_iterator i = columns.begin ();
        i != columns.end ();
        i++)
     {
       const Column& column = **i;
       if (log.check_entry (column.name, Column::component))
-        total_weight += column.weight;
+        total_area += column.area;
     }
 
-  if (iszero (total_weight))
+  if (iszero (total_area))
     return;
   
   for (ColumnList::const_iterator i = columns.begin ();
@@ -706,7 +733,7 @@ Field::Implementation::output (Log& log) const
 	{
 	  Log::Entry open_entry (log, column.name, column.frame (),
 				 Column::component);
-          Log::Col col (log, column, column.weight / total_weight);
+          Log::Col col (log, column, column.area / total_area);
 	  column.output (log);
 	}
     }

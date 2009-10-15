@@ -51,7 +51,7 @@ class Soil;
 class Column : public ModelFramed
 {
 public:
-  double weight;
+  double area;
   static const char *const component;
   symbol library_id () const;
 

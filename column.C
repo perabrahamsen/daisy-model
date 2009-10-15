@@ -27,6 +27,7 @@
 #include "librarian.h"
 #include "frame.h"
 #include "submodeler.h"
+#include "check.h"
 #include <map>
 
 const char *const Column::component = "column";
@@ -61,12 +62,12 @@ Column::location () const
 void
 Column::output (Log& log) const
 {
-  output_variable (weight, log);
+  output_variable (area, log);
 }
 
 Column::Column (const BlockModel& al)
   : ModelFramed (al),
-    weight (al.number ("weight")),
+    area (al.number ("area")),
     location_ (map_submodel_const<Point> (al, "location"))
 { }
 
@@ -78,9 +79,10 @@ static struct ColumnInit : public DeclareComponent
   void load_frame (Frame& frame) const
   { 
     Model::load_model (frame);
-    frame.declare ("weight", Attribute::Unknown (),  Attribute::State, "\
-Relative area covered by this column.");
-    frame.set ("weight", 1.0);
+    frame.declare ("area", "m^2", Check::positive (), Attribute::State, "\
+Area covered by this column.\n\
+When logging multiple columns, the values are weighted by relative area.");
+    frame.set ("area", 1.0);
 
     frame.declare_submodule_sequence ("location", Attribute::Const, "\
 Location of this column.\n\
