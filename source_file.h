@@ -33,6 +33,7 @@ protected:
   const bool explicit_with;
   const int style_;
 private:
+  bool accumulate_;
   bool use_sum;
   int default_hour;
 protected:
@@ -48,6 +49,8 @@ public:
   { return with_; }
   int style () const 
   { return style_; }
+  bool accumulate () const
+  { return accumulate_; }
   const std::vector<Time>& time () const
   { return times; }
   const std::vector<double>& value () const

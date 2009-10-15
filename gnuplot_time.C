@@ -296,11 +296,33 @@ set style data lines\n";
       const bool use_ebars = source[i]->with () == "errorbars";
       const size_t size = source[i]->time ().size ();
       daisy_assert (size == source[i]->value ().size ());
+      bool begun = (begin.get () == NULL);
+      double last = 0.0;
+      const bool accumulate = source[i]->accumulate ();
       for (size_t j = 0; j < size; j++)
         {
+          // 
           const Time time = source[i]->time ()[j];
+          if (!begun)
+            {
+              if (time >= *begin)
+                // Begin logging.
+                begun = true;
+              else 
+                // To early, skip entry.
+                continue;
+            }
+          else if (end.get () && time > *end)
+            // Finished.
+            break;
+
+          const double value = source[i]->value ()[j];
+          if (accumulate)
+            last += value;
+          else
+            last = value;
           out << time.year () << "-" << time.month () << "-" << time.mday ()
-              << "T" << time.hour () << "\t" << source[i]->value ()[j];
+              << "T" << time.hour () << "\t" << last;
 	  if (use_ebars)
 	    out << "\t" << source[i]->ebar ()[j];
 	  out << "\n";

@@ -41,6 +41,7 @@ struct SourceCombine : public Source
   symbol dimension_;
   symbol with_;
   const int style_;
+  const bool accumulate_;
   std::vector<Time> times;
   std::vector<double> values;
 
@@ -50,6 +51,8 @@ public:
   { return with_; }
   int style () const 
   { return style_; }
+  bool accumulate () const
+  { return accumulate_; }
   const std::vector<Time>& time () const
   { return times; }
   const std::vector<double>& value () const
@@ -117,7 +120,8 @@ SourceCombine::SourceCombine (const BlockModel& al)
     title_ (al.name ("title", expr->title ())),
     dimension_ ("UNINITIALIZED"),
     with_ (al.name ("with", "")),
-    style_ (al.integer ("style", -1))
+    style_ (al.integer ("style", -1)),
+    accumulate_ (al.flag ("accumulate"))
 { }
 
 static struct SourceCombineSyntax : public DeclareModel

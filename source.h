@@ -45,6 +45,7 @@ public:
   virtual symbol dimension () const = 0;
   virtual symbol with () const = 0;
   virtual int style () const = 0;
+  virtual bool accumulate () const = 0;
   virtual const std::vector<Time>& time () const = 0;
   virtual const std::vector<double>& value () const = 0;
   virtual const std::vector<double>& ebar () const = 0;

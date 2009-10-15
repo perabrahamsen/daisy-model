@@ -56,6 +56,9 @@ Set style to 0 to reuse the style of the previous series, or to a\n\
 negative number to explicitly request the default behaviour.\n\
 \n\
 The 'style' parameter is only used if 'with' is either 'points' or 'lines'.");
+  frame.declare_boolean ("accumulate", Attribute::Const, "\
+Accumulate values.");
+  frame.set ("accumulate", false);
 
   // Title.
   Attribute::category title_cat = Attribute::Const;

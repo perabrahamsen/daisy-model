@@ -32,7 +32,6 @@ void
 SourceFile::add_entry (const Time& time, std::vector<double>& vals)
 {
   const double total = std::accumulate (vals.begin (), vals.end (), 0.0);
-  
   if (use_sum)
     {
       values.push_back (total);
@@ -130,6 +129,7 @@ SourceFile::SourceFile (const BlockModel& al)
     with_ (al.name ("with", "")),
     explicit_with (al.check ("with")),
     style_ (al.integer ("style", -1)),
+    accumulate_ (al.flag ("accumulate")),
     use_sum (al.name ("handle") == "sum"),
     default_hour (al.integer ("default_hour"))
 { }
