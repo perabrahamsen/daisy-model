@@ -1,3 +1,16 @@
+2009-10-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* unit_model.C ([kg/Pa], [ng/kPa], [ng/MPa]): New units.
+
+2009-10-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* gnuplot_utils.C, source.h, source_combine.C, source_file.C:
+	* source_file.h, source_merge.C:
+	* gnuplot_time.C (accumulate): New parameter.
+
+	* all: The new 'area' column parameter replace 'size', and affects
+	logging multiple columns.
+
 2009-10-12  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* sample/dk-soil.dai ("Jyndevad Ap", "Jyndevad C"): Use B_BaC

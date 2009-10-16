@@ -564,6 +564,14 @@ Connvert to SI base units by multiplying with a factor.")
     add ("MPa^-1", 1e0 / p_M, 1, -1, 2, 0, 0, 0, 0,
          "Inverse pressure.");
 
+    // Mass per pressure.
+    add ("kg/Pa", 1.0, 1, 0, 2, 0, 0, 0, 0,
+         "Base mass per pressure.");
+    add ("ng/kPa", p_n * u_g / p_k, 1, 0, 2, 0, 0, 0, 0,
+         "Nanogram per kilopascal.");
+    add ("ng/MPa", p_n * u_g / p_M, 1, 0, 2, 0, 0, 0, 0,
+         "Nanogram per megapascal.");
+    
     // Amount of substance per area.
     add ("mol/m^2", 1.0, -2, 0, 0, 0, 0, 1, 0,
          "Mole per square meter.");
