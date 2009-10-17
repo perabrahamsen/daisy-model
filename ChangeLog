@@ -1,3 +1,7 @@
+2009-10-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* source_expr.C (valid): New parameter.
+
 2009-10-16  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* unit_model.C ([kg/Pa], [ng/kPa], [ng/MPa]): New units.

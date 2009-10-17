@@ -28,6 +28,7 @@
 #include "assertion.h"
 #include "time.h"
 #include "timestep.h"
+#include "mathlib.h"
 #include <sstream>
 
 namespace 
@@ -73,11 +74,13 @@ struct ProgramCPEData : public Program
   const Time origin;
   const symbol day_tag;
   const symbol value_tag;
+  const symbol weight_tag;
   const double factor;
   const Handle handle;
   LexerTable lex;
   int day_c;
   int value_c;
+  int weight_c;
 
   // Use.
   bool run (Treelog& msg)
@@ -91,7 +94,7 @@ struct ProgramCPEData : public Program
     double last_value = 0.0;
     double printed_value = 0.0;
     double sum_value = 0.0;
-    double count_value = 0.0;
+    double sum_weight = 0.0;
     Time next = start;
     next.tick_hour (1);
 
@@ -112,14 +115,26 @@ struct ProgramCPEData : public Program
             msg.warning ("missing day");
             continue;
           }
+        const double day = lex.convert_to_double (d);
 
         daisy_assert (value_c < entries.size ());
         const std::string val = entries[value_c];
         if (lex.is_missing (val))
           continue;
-
         const double next_value = lex.convert_to_double (val);
-        const double day = lex.convert_to_double (d);
+
+        double weight_value = 1.0;
+        if (weight_c >= 0)
+          {
+            daisy_assert (weight_c < entries.size ());
+            const std::string weight = entries[weight_c];
+            if (lex.is_missing (weight))
+              {
+                msg.warning ("missing weight");
+                continue;
+              }
+            weight_value = lex.convert_to_double (weight);
+          }
 
         const Timestep diff = next - start;
         double next_hour = diff.total_hours () / 24.0;
@@ -134,13 +149,18 @@ struct ProgramCPEData : public Program
                 printed_value = last_value;
                 break;
               case Handle::average:
-                daisy_assert (count_value > 0);
-                value = sum_value / count_value;
-                sum_value = count_value = 0.0;
+                if (sum_weight > 0)
+                  value = sum_value / sum_weight;
+                else
+                  {
+                    daisy_assert (iszero (sum_value));
+                    value = 0.0;
+                  }
+                sum_value = sum_weight = 0.0;
                 break;
               case Handle::sum:
                 value = sum_value;
-                sum_value = count_value = 0.0;
+                sum_value = 0.0;
                 break;
               default:
                 daisy_notreached ();
@@ -160,8 +180,8 @@ struct ProgramCPEData : public Program
               }
           }
         last_value = next_value;
-        sum_value += next_value;
-        count_value += 1.0;
+        sum_value += next_value * weight_value;
+        sum_weight += weight_value;
       }
     msg.message (tmp.str ());
     return true;
@@ -211,11 +231,13 @@ struct ProgramCPEData : public Program
       origin (al.submodel ("origin")),
       day_tag (al.name ("day")),
       value_tag (al.name ("value")),
+      weight_tag (al.name ("weight", Attribute::None ())),
       factor (al.number ("factor")),
       handle (al.name ("handle")),
       lex (al),
       day_c (-42),
-      value_c (-42)
+      value_c (-42),
+      weight_c (-42)
   { }
   ~ProgramCPEData ()
   { }
@@ -238,6 +260,9 @@ Manipulate data from Agrovand.")
 Tag used for day.");
     frame.declare_string ("value", Attribute::Const, "\
 Tag used for value.");
+    frame.declare_string ("weight", Attribute::OptionalConst, "\
+Tag used for weight.\n\
+If you specify this, 'value' will be given this weight.");
     frame.declare ("factor", Attribute::None (), Attribute::Const, "\
 Multiply printed value with this number.");
     frame.set ("factor", 1.0);

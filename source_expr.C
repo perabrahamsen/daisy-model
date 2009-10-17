@@ -21,6 +21,7 @@
 #define BUILD_DLL
 #include "source_file.h"
 #include "scope_table.h"
+#include "boolean.h"
 #include "number.h"
 #include "librarian.h"
 #include "frame.h"
@@ -31,6 +32,7 @@ struct SourceExpr : public SourceFile
 
   // Content.
   const std::auto_ptr<Number> expr;
+  const std::auto_ptr<Boolean> valid;
   const symbol title_;
   symbol dimension_;
 
@@ -68,6 +70,15 @@ SourceExpr::load (Treelog& msg)
   expr->tick (units, scope, msg);
   dimension_ = expr->dimension (scope);
 
+  if (!valid->initialize (units, scope, msg)
+      || !valid->check (units, scope, msg))
+    {
+      lex.error ("Invalid expression");
+      return false;
+    }
+  valid->tick (units, scope, msg);
+
+
   // Read data.
   Time last_time (9999, 12, 31, 23);
   std::vector<double> vals;
@@ -82,9 +93,13 @@ SourceExpr::load (Treelog& msg)
       // Set it.
       scope.set (entries);
 
-      // Missing value.
+      // Missing or invalid value.
       if (expr->missing (scope))
 	continue;
+      if (valid->missing (scope))
+	continue;
+      if (!valid->value (scope))
+        continue;
 
       // Store it.
       if (time != last_time)
@@ -106,6 +121,7 @@ SourceExpr::SourceExpr (const BlockModel& al)
   : SourceFile (al),
     units (al.units ()),
     expr (Librarian::build_item<Number> (al, "expr")),
+    valid (Librarian::build_item<Boolean> (al, "valid")),
     title_ (al.name ("title", expr->title ())),
     dimension_ ("UNINITIALIZED")
 { }
@@ -130,11 +146,14 @@ in the various columns.")
     SourceFile::load_style (frame, "\
 By default the name of the 'expr' object.");
     frame.declare_object ("expr", Number::component, 
-                       Attribute::Const, Attribute::Singleton, "\
+                          Attribute::Const, Attribute::Singleton, "\
 Expression for calculating the value for this source for each row.\n\
 The expression can refer to the value in a specific column by the tag\n\
 for that column.");
-
+    frame.declare_object ("valid", Boolean::component, 
+                          Attribute::Const, Attribute::Singleton, "\
+Ignore entries if this boolean expression is false.");
+    frame.set ("valid", "true");
   }
 } SourceExpr_syntax;
 

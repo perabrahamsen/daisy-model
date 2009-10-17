@@ -21,6 +21,7 @@
 #define BUILD_DLL
 
 #include "number.h"
+#include "boolean.h"
 #include "scope_multi.h"
 #include "submodeler.h"
 #include "memutils.h"
@@ -32,6 +33,8 @@
 #include <sstream>
 #include <memory>
 #include <map>
+
+// The 'let' model.
 
 struct NumberLet : public Number
 {
@@ -219,5 +222,95 @@ Expression to evaluate.");
     frame.order ("clauses", "expr");
   }
 } NumberLet_syntax;
+
+// The 'if' model.
+
+struct NumberIf : public Number
+{
+  std::auto_ptr<Boolean> if_b;
+  std::auto_ptr<Number> then_n;
+  std::auto_ptr<Number> else_n;
+
+  bool missing (const Scope& scope) const 
+  { 
+    return if_b->missing (scope)
+      || then_n->missing (scope)
+      || else_n->missing (scope);
+  }
+  double value (const Scope& scope) const
+  { 
+    return if_b->value (scope)
+      ? then_n->value (scope)
+      : else_n->value (scope);
+  }
+  symbol dimension (const Scope& scope) const 
+  {     
+    const symbol then_dim = then_n->dimension (scope);
+    const symbol else_dim = else_n->dimension (scope);
+    if (then_dim == else_dim)
+      return then_dim;
+    
+    return Attribute::Unknown ();
+  }
+
+  // Create.
+  void tick (const Units& units, const Scope& scope, Treelog& msg)
+  { 
+    Treelog::Open nest (msg, name);
+    if_b->tick (units, scope, msg);
+    then_n->tick (units, scope, msg);
+    else_n->tick (units, scope, msg);
+  }
+  bool initialize (const Units& units, const Scope& scope, Treelog& msg)
+  {
+    Treelog::Open nest (msg, name);
+    bool ok = true;
+    if (!if_b->initialize (units, scope, msg))
+      ok = false;
+    if (!then_n->initialize (units, scope, msg))
+      ok = false;
+    if (!else_n->initialize (units, scope, msg))
+      ok = false;
+    return ok;
+  }
+  bool check (const Units& units, const Scope& scope, Treelog& msg) const
+  { 
+    Treelog::Open nest (msg, name);
+    bool ok = true;
+    if (!if_b->check (units, scope, msg))
+      ok = false;
+    if (!then_n->check (units, scope, msg))
+      ok = false;
+    if (!else_n->check (units, scope, msg))
+      ok = false;
+    return ok;
+  }
+  NumberIf (const BlockModel& al)
+    : Number (al),
+      if_b (Librarian::build_item<Boolean> (al, "if")),
+      then_n (Librarian::build_item<Number> (al, "then")),
+      else_n (Librarian::build_item<Number> (al, "else"))
+  { }
+};
+
+static struct NumberIfSyntax : public DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new NumberIf (al); }
+  NumberIfSyntax ()
+    : DeclareModel (Number::component, "if", "\
+Select between two numbers depending on a boolean expression.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.declare_object ("if", Boolean::component, 
+                          "Select which number to use.");
+    frame.declare_object ("then", Number::component, 
+                          "Use this if true.");
+    frame.declare_object ("else", Number::component, 
+                          "Use this if false.");
+    frame.order ("if", "then", "else");
+  }
+} NumberIf_syntax;
 
 // number_lisp.C ends here

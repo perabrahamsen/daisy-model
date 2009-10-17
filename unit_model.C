@@ -507,9 +507,12 @@ Connvert to SI base units by multiplying with a factor.")
     // Mass per volume.
     add ("kg/m^3", p_k * u_g, -3, 1, 0, 0, 0, 0, 0,
          "Base mass per volume.");
-    add ("ng/l", p_n * u_g / u_l,
+    add ("ug/l", p_u * u_g / u_l,
          -3, 1, 0, 0, 0, 0, 0,
          "Low solute concentration.");
+    add ("ng/l", p_n * u_g / u_l,
+         -3, 1, 0, 0, 0, 0, 0,
+         "Lower solute concentration.");
     add ("ng/cm^3", p_n * u_g / p_c_3,
          -3, 1, 0, 0, 0, 0, 0,
          "Low solute concentration.");
