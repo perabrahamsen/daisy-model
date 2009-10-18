@@ -1594,7 +1594,7 @@ version${OBJ}: version.C
 program_cpedata${OBJ}: program_cpedata.C program.h model.h symbol.h run.h \
   lexer_table.h block_model.h block_nested.h block.h scope.h attribute.h \
   treelog.h frame_model.h frame.h librarian.h assertion.h time.h \
-  timestep.h vcheck.h
+  timestep.h vcheck.h mathlib.h
 tertiary_pipes${OBJ}: tertiary_pipes.C tertiary.h model_framed.h \
   model_logable.h model.h symbol.h tertsmall.h geometry.h attribute.h \
   soil.h soil_water.h soil_heat.h surface.h uzmodel.h librarian.h \
@@ -1914,10 +1914,10 @@ difrad_DPF${OBJ}: difrad_DPF.C difrad.h model_framed.h model_logable.h \
 difrad_weather${OBJ}: difrad_weather.C difrad.h model_framed.h \
   model_logable.h model.h symbol.h weather.h model_derived.h im.h \
   attribute.h mathlib.h assertion.h librarian.h treelog.h
-number_lisp${OBJ}: number_lisp.C number.h symbol.h model.h scope_multi.h \
-  scope.h attribute.h submodeler.h block_submodel.h block_nested.h \
-  block.h treelog.h frame_submodel.h frame.h memutils.h librarian.h \
-  assertion.h block_model.h frame_model.h
+number_lisp${OBJ}: number_lisp.C number.h symbol.h model.h boolean.h \
+  scope_multi.h scope.h attribute.h submodeler.h block_submodel.h \
+  block_nested.h block.h treelog.h frame_submodel.h frame.h memutils.h \
+  librarian.h assertion.h block_model.h frame_model.h
 condition_extern${OBJ}: condition_extern.C condition.h model_framed.h \
   model_logable.h model.h symbol.h daisy.h program.h run.h time.h \
   timestep.h vcheck.h memutils.h block_model.h block_nested.h block.h \
@@ -2009,8 +2009,8 @@ number_arit${OBJ}: number_arit.C number.h symbol.h model.h units.h memutils.h \
   submodeler.h block_submodel.h frame_submodel.h
 source_expr${OBJ}: source_expr.C source_file.h source.h model.h time.h \
   symbol.h lexer_table.h block_model.h block_nested.h block.h scope.h \
-  attribute.h treelog.h frame_model.h frame.h scope_table.h number.h \
-  librarian.h
+  attribute.h treelog.h frame_model.h frame.h scope_table.h boolean.h \
+  number.h librarian.h units.h memutils.h
 source_std${OBJ}: source_std.C source_file.h source.h model.h time.h symbol.h \
   lexer_table.h block_model.h block_nested.h block.h scope.h attribute.h \
   treelog.h frame_model.h frame.h units.h memutils.h librarian.h

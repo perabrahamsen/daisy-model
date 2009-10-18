@@ -68,7 +68,13 @@ SourceStandard::load (Treelog& msg)
     }
 
   // Read dimensions.
-  const symbol original (lex.dimension (tag_c));
+  symbol original (lex.dimension (tag_c));
+  if (accumulate ())
+    {
+      const symbol accumulated = Units::multiply (original, "h");
+      if (accumulated != Attribute::Unknown ())
+        original = accumulated;
+    }
   if (original != Attribute::Unknown () && dimension_ == Attribute::Unknown ())
     dimension_ = original;
   else if (!has_factor && !units.can_convert (original, dimension_))

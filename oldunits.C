@@ -404,6 +404,16 @@ Oldunits::multiply (const symbol one, const symbol two)
   if (one.name () == two + inv || one + inv == two.name ())
     return Attribute::None ();
 
+  const int size_diff = one.name ().size () - two.name ().size ();
+  if (size_diff != 0)
+    {
+      const std::string full = size_diff > 0 ? one.name () : two.name ();
+      const std::string suffix
+        = "/" + (size_diff > 0 ? two.name () : one.name ());
+      const int index = full.size () - suffix.size ();
+      if (full.substr (index) == suffix)
+        return full.substr (0, index);
+    }
   return Attribute::Unknown ();
 }
 

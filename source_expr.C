@@ -25,6 +25,7 @@
 #include "number.h"
 #include "librarian.h"
 #include "frame.h"
+#include "units.h"
 
 struct SourceExpr : public SourceFile
 {
@@ -69,6 +70,12 @@ SourceExpr::load (Treelog& msg)
     }
   expr->tick (units, scope, msg);
   dimension_ = expr->dimension (scope);
+  if (accumulate ())
+    {
+      const symbol accumulated = Units::multiply (dimension_, "h");
+      if (accumulated != Attribute::Unknown ())
+        dimension_ = accumulated;
+    }
 
   if (!valid->initialize (units, scope, msg)
       || !valid->check (units, scope, msg))

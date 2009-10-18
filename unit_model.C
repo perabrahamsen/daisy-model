@@ -503,6 +503,9 @@ Connvert to SI base units by multiplying with a factor.")
     add ("Mg DM/ha/h", p_M * u_g / u_ha / u_h,
          -2, 1, -1, 0, 0, 0, 0,
          "Harvest and fertilizing.");
+    add ("ug/m^2/h", p_u * u_g / u_h,
+         -2, 1, -1, 0, 0, 0, 0,
+         "Microgram per square meter per hour.");
 
     // Mass per volume.
     add ("kg/m^3", p_k * u_g, -3, 1, 0, 0, 0, 0, 0,

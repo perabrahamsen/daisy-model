@@ -1,4 +1,16 @@
+2009-10-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* source_expr.C, source_std.C (load): Modify dimension for
+	accumulated values.
+
+	* oldunits.C (multiply): Handle case where one unit is "per" the
+	other unit.
+
 2009-10-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* number_lisp.C (if): New model.
+
+	* unit_model.C ([ug/l]): New unit.
 
 	* source_expr.C (valid): New parameter.
 
