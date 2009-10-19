@@ -1,0 +1,291 @@
+(defgnuplot plotformat time 
+   "Common for weather and water cotent plots"
+   (begin 1998 05 01)(end 2000 08 15)
+   (size 1 0.20)  ;;For A4
+   (extra "set pointsize 0.5"  
+          [set format x " "]       
+          "unset ylabel"
+          "set lmargin 0"
+          "set rmargin 0"
+          "set tmargin 0.5"
+          "set bmargin 0"
+          "set size ratio 0.15 "))
+       
+(defgnuplot plotweather plotformat  
+   "Plot precipitation."
+   (where "weather.eps")
+   (extra &old "unset xtics"
+               "set ytics 10"
+               "set y2tics 10"
+               "unset y2label")   
+   (source (column (file "GenAverage.dwf")
+                   (tag "Precip")
+                   (style 1)
+                   (title "Precipitation")
+                   (with impulses))
+           (column (file "GenAverage.dwf")
+                   (tag "AirTemp")
+                   (style 3)
+                   ;;(with [lines linetype "blue"])
+                   (title "Air temperature")
+                   )))
+
+(defgnuplot plotZcm plotformat
+   "Plot theta at Z cm."
+   (declare z String "Soil depth to plot.") 
+   (ymin 0.00)(ymax 0.40)
+   (where "theta${z}cm.eps")
+   (extra &old "set xtics 24 * 60 * 60 *30 nomirror"  ;; &old keep other existing properties else it would be deleted
+               "unset mxtics"
+               "set ytics 0.1")
+   (source (column (file "interval_water_content2.dlf") 
+                   (tag "${z} cm, 400 cm")
+                   (style 1)
+                   (title "${z} cm")
+                   )
+           (column (file "theta_${z}cm.ddf") 
+                   (tag "Water content")
+                   (style 3)
+                   (title "TDR")
+                   (with points))))  ;points instead of error bars
+                                      
+(defgnuplot plotinfiltration plotformat
+   (where "infiltration.eps")
+   ;(ymin -5)(ymax 20)
+   (extra &old "set ytics 5"
+               "unset ylabel"
+               "set xtics 24 * 60 * 60 *30 nomirror"  ;; &old keep other existing properties else it would be deleted
+               "unset mxtics")
+               ;;"set xtics 24 * 60 * 60 *30 rotate")        
+               ;;"set format x \"%y-%m-%d\"")    
+   (source (column (file "infiltration.dlf") 
+                   (tag "Surface2Matrix")
+                   (style 1)
+                   (title "Surf2Mat, mm/d"))
+           (column (file "infiltration.dlf") 
+                   (tag "Surface2Bio2Matrix")
+                   (style 2)
+                   (title "Surf2Bio2Mat, mm/d"))
+           (column (file "infiltration.dlf") 
+                   (tag "Surface2Bio2Drain")
+                   (style 3)
+                   (title "Surf2Bio2Drain, mm/d"))))
+
+(defgnuplot plotpondingdepth plotformat
+   (where "pondingdepth.eps")
+   ;(ymin -5)(ymax 20)
+   ;;(extra &old "set ytics 5"
+   ;;            "unset ylabel"
+   ;;            "set xtics 24 * 60 * 60 *30 rotate"        
+   ;;            "set format x \"%y-%m-%d\"")    
+   (extra &old "unset xtics")
+   (source (column (file "ponding_depth.dlf") 
+                   (tag "Surface Ponding")
+                   (style 1)
+                   (title "Surface Ponding, mm"))))
+            
+(defgnuplot brom-output plotformat
+  "Total bromide output in specified interval."
+   (declare top String "Top of interval.") 
+   (declare bottom String "Bottom of interval.") 
+   (declare acc-prefix String "Prefix to get accumulated values")
+   (acc-prefix "")  ;;for accumulated stuff
+   (declare title-prefix String "Prefix to title")
+   (title-prefix "Out, ")
+   (where "brom-${top}-${bottom}-output.eps")   
+   ;;(ymin -3000)(ymax 3000)
+   ;;(ymin -100)(ymax 100)
+   (ymin -150)(ymax 150)
+   (extra &old "set xtics 24 * 60 * 60 *30 nomirror"  ;; &old keep other existing properties else it would be deleted
+               "unset mxtics"
+               "set ytics 50")   
+   ;;(extra &old "unset ytics")   
+   (source (column (file "Bromide-25.dlf")
+                   (tag "${acc-prefix}Primary ${bottom} cm")
+                   ;;(title "Output, Primary"))
+                   (title "${title-prefix}Primary"))
+                   (column (file "Bromide-25.dlf")
+                   (tag "${acc-prefix}Secondary ${bottom} cm")
+                   (title "${title-prefix}Secondary"))
+           (column (file "Bromide-25.dlf")
+                   (tag "${acc-prefix}Tertiary ${top}-${bottom} cm")
+                   (title "${title-prefix}Tertiary"))
+           (column (file "Bromide-25.dlf")
+                   (tag "${acc-prefix}Drain ${top}-${bottom} cm")
+                   (title "${title-prefix}Drain"))))
+
+(defgnuplot brom-total plotformat
+  "Total bromide content in 25 cm intervals."
+  (where "brom-total.eps")
+  (ymin 0)(ymax 35000)
+  (extra &old "set xtics 24 * 60 * 60 *30 nomirror"  ;; &old keep other existing properties else it would be deleted
+              "unset mxtics"
+              "set ytics 5000")   
+  (source (arithmetic (file "Bromide-25.dlf")
+                      (expr (+ "Primary 0-25 cm" "Secondary 0-25 cm"))
+                      (title "Total, 0-25 cm"))
+          (column     (file "Bromide-25.ddf")
+                      (tag "0-25cm")
+                      ;;(style 3)
+                      (title "0-25 cm, obs")
+                      )                   
+          (arithmetic (file "Bromide-25.dlf")
+                      (expr (+ "Primary 25-50 cm" "Secondary 25-50 cm"))
+                      (title "Total, 25-50 cm"))
+          (column     (file "Bromide-25.ddf")
+                      (tag "25-50cm")
+                      ;;(style 3)
+                      (title "25-50 cm, obs")
+                      )
+          (arithmetic (file "Bromide-25.dlf")
+                      (expr (+ "Primary 50-75 cm" "Secondary 50-75 cm"))
+                      (title "Total, 50-75 cm"))
+          (column     (file "Bromide-25.ddf")
+                      (tag "50-75cm")
+                      ;;(style 3)
+                      (title "50-75 cm, obs")
+                      )
+          (arithmetic (file "Bromide-25.dlf")
+                      (expr (+ "Primary 75-105 cm" "Secondary 75-105 cm"))
+                      (title "Total, 75-105 cm"))
+          (column     (file "Bromide-25.ddf")
+                      (tag "75-100cm")
+                      ;;(style 3)
+                      (title "75-100 cm, obs")
+                      )))
+
+(defgnuplot brom-primary plotformat
+  "Bromide content in 25 cm intervals in primary domain."
+  (where "brom-primary.eps")
+  (ymin 0)(ymax 35000)
+  (extra &old "set xtics 24 * 60 * 60 *30 nomirror"  ;; &old keep other existing properties else it would be deleted
+              "unset mxtics"
+              "set ytics 5000")   
+  (source (arithmetic (file "Bromide-25.dlf")
+                      (expr (+ "Primary 0-25 cm"))
+                      (title "Primary, 0-25 cm"))
+          (arithmetic (file "Bromide-25.dlf")
+                      (expr (+ "Primary 25-50 cm"))
+                      (title "Primary, 25-50 cm"))
+          (arithmetic (file "Bromide-25.dlf")
+                      (expr (+ "Primary 50-75 cm"))
+                      (title "Primary, 50-75 cm"))
+          (arithmetic (file "Bromide-25.dlf")
+                      (expr (+ "Primary 75-105 cm"))
+                      (title "Primary, 75-105 cm"))))
+
+(defgnuplot brom-secondary plotformat
+  "Bromide content in 25 cm intervals in secondary domain."
+  (where "brom-secondary.eps")
+  (ymin 0)(ymax 35000)
+  (extra &old "set xtics 24 * 60 * 60 *30 nomirror"  ;; &old keep other existing properties else it would be deleted
+                "unset mxtics"
+                "set ytics 5000")   
+  (source (arithmetic (file "Bromide-25.dlf")
+                      (expr (+ "Secondary 0-25 cm"))
+                      (title "Secondary, 0-25 cm"))
+          (arithmetic (file "Bromide-25.dlf")
+                      (expr (+ "Secondary 25-50 cm"))
+                      (title "Secondary, 25-50 cm"))
+          (arithmetic (file "Bromide-25.dlf")
+                      (expr (+ "Secondary 50-75 cm"))
+                      (title "Secondary, 50-75 cm"))
+          (arithmetic (file "Bromide-25.dlf")
+                      (expr (+ "Secondary 75-105 cm"))
+                      (title "Secondary, 75-105 cm"))))
+
+(defgnuplot brom-accumulated brom-output
+  "Accumulated output in each interval."
+  (where "brom-${top}-${bottom}-acc.eps")
+  (ymin -10000)(ymax 30000)
+  (extra &old "set xtics 24 * 60 * 60 *30 nomirror"  ;; &old keep other existing properties else it would be deleted
+              "unset mxtics"
+              "set ytics 10000")
+  (acc-prefix "Acc ")
+  (title-prefix "Acc, "))
+
+
+(defgnuplot shortplotZcm plotZcm
+   (begin 1998 05 01)(end 1998 08 15)
+   (where "theta_short${z}cm.eps")
+   (extra &old "set xtics 24 * 60 * 60 * 7"
+               "unset mxtics"))
+      
+(defgnuplot shortplotweather plotweather
+   (begin 1998 05 01)(end 1998 08 15)
+   (where "weather_short.eps"))
+   
+(defgnuplot shortplotinfiltration plotinfiltration
+   (begin 1998 05 01)(end 1998 08 15)
+   (where "infiltration_short.eps")   
+   (extra &old "set xtics 24 * 60 * 60 *7 nomirror"))        
+                  
+(defgnuplot shortplotpondingdepth plotpondingdepth 
+   (begin 1998 05 01)(end 1998 08 15)
+   (where "pondingdepth_short.eps")
+   ;;(extra &old "set xtics 24 * 60 * 60 * 76 rotate"   
+   ;;       "set mxtics 7"
+   ;;       "set format x \"%y-%m-%d\""))       
+   ;;                   (extra &old "set xtics 24 * 60 * 60 * 7 rotate"   
+   ;;                               "set mxtics 7"
+   ;;                            "set format x \"%y-%m-%d\"")) 
+   ;;
+   ;;
+   ;;(extra &old "set xtics 24 * 60 * 60 *7 rotate"        
+   ;;            "set format x \"%y-%m-%d\""))   
+)
+
+(defprogram "Rorrende Graphs" gnuplot 
+   (graph (plotweather) 
+          (plotZcm (z "4"))
+          (plotZcm (z "8"))
+          (plotZcm (z "12"))
+          (plotZcm (z "16"))
+          (plotZcm (z "20"))
+          (plotZcm (z "24"))
+          (plotZcm (z "36"))     
+          (plotZcm (z "60")
+                   (extra &old "set xtics 24 * 60 * 60 *30 rotate"  ;; &old keep other existing properties else it would be deleted 
+                               "set mxtics 3"
+                               "set format x \"%y-%m-%d\""))   
+          (plotinfiltration)
+          (plotpondingdepth)         
+          (brom-output (top "0") (bottom "25"))
+          (brom-output (top "25") (bottom "50"))
+          (brom-output (top "50") (bottom "75"))
+          (brom-output (top "75") (bottom "105")
+                       (extra &old "set xtics 24 * 60 * 60 *30 rotate"  ;; &old keep other existing properties else it would be deleted 
+                                   "set mxtics 3"
+                                   "set format x \"%y-%m-%d\""))            
+          (brom-total) 
+          (brom-primary) 
+          (brom-secondary) 
+          (brom-accumulated (top "0") (bottom "25"))
+          (brom-accumulated (top "25") (bottom "50"))
+          (brom-accumulated (top "50") (bottom "75"))
+          (brom-accumulated (top "75") (bottom "105")
+                            (extra &old "set xtics 24 * 60 * 60 *30 rotate"  ;; &old keep other existing properties else it would be deleted 
+                                        "set mxtics 3"
+                                        "set format x \"%y-%m-%d\""))       
+          (shortplotweather)      
+          (shortplotZcm (z "4"))
+          (shortplotZcm (z "8"))
+          (shortplotZcm (z "12"))
+          (shortplotZcm (z "16"))
+          (shortplotZcm (z "20"))
+          (shortplotZcm (z "24"))
+          (shortplotZcm (z "36"))
+          (shortplotZcm (z "60")
+                   (extra &old "set xtics 24 * 60 * 60 * 7 rotate"   
+                               "set mxtics 7"
+                               "set format x \"%y-%m-%d\""))      
+          (shortplotinfiltration)
+          (shortplotpondingdepth
+                   (extra &old "set xtics 24 * 60 * 60 * 7 rotate"   
+                               "set mxtics 7"
+                               "set format x \"%y-%m-%d\""))   
+   ))
+   
+(run "Rorrende Graphs")
+
+
