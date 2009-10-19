@@ -1,0 +1,64 @@
+(defprogram Agrovand cpedata
+  (origin 1998 1 1)
+  (missing "-1")
+  (day "Tid")
+  (file "df-99-00.ddf"))
+
+(defprogram flow Agrovand
+  (handle difference)
+  (value "Afstr"))
+
+(defprogram flow-00-01 flow
+  (file "df-00-01.ddf"))
+
+(defprogram flow-01-02 flow
+  (file "df-01-02.ddf"))
+
+(defprogram bromine Agrovand
+  (factor 79.904)
+  (handle average)
+  (value "Bromine"))
+
+(defprogram bromine-98-99 bromine
+  (file "bromine-98-99.ddf"))
+
+(defprogram bromine-99-00 bromine
+  (file "bromine-99-00.ddf"))
+
+(defprogram particles Agrovand
+  (missing "-999")
+  (handle difference)
+  (value Particles))
+
+(defprogram particles-98-99 particles
+  (file "particles-98-99.ddf"))
+
+(defprogram particles-99-00 particles
+  (file "particles-99-00.ddf"))
+
+(defprogram particles-00-01 particles
+  (handle sum)
+  (file "particles-00-01.ddf"))
+
+(defprogram particles-01-02 particles
+  (file "particles-01-02.ddf"))
+
+(defprogram pesticides Agrovand
+  (handle average))
+
+(defprogram pendimethalin pesticides
+  (value "Pendimethalin"))
+
+(defprogram ioxynil pesticides
+  (value Ioxynil))
+
+(defprogram pend-99-00 pendimethalin
+  (file "pend-99-00.ddf"))
+
+(defprogram pend-00-01 pendimethalin
+  (file "pest-00-01.ddf"))
+
+(defprogram ioxynil-00-01 ioxynil
+  (file "pest-00-01.ddf"))
+
+(run ioxynil-00-01)
