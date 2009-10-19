@@ -1,3 +1,7 @@
+2009-10-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* im.C (output): Allow base names.
+
 2009-10-18  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* source_expr.C, source_std.C (load): Modify dimension for

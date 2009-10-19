@@ -117,7 +117,7 @@ IM::output (Log& log) const
        i++)
     {
       const symbol name = (*i).first;
-      if (!log.check_interior (name))
+      if (!log.check_entry (name, Chemical::component))
 	continue;
 
       Log::Named named (log, name);
