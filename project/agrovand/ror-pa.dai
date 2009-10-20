@@ -1,0 +1,7 @@
+;;; ror-pa.dai -- Setup files with pa specific information.
+
+(input file "ror-setup.dai")
+
+(run Rorrende)
+
+;;; ror-pa.dai ends here.

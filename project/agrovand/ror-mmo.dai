@@ -1,0 +1,11 @@
+;;; ror-mmo.dai -- Setup files with mmo specific information.
+
+(path "."
+       "c:/cygwin/home/mmo/daisy/lib"
+       "c:/cygwin/home/mmo/daisy/sample")
+
+(input file "ror-setup.dai")
+
+(run Rorrende)
+
+;;; ror-mmo.dai ends here.
