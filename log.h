@@ -254,6 +254,24 @@ private:
   virtual void close_named_entry () = 0;
   friend struct Log::NamedEntry;
 
+  // Object names in a variable length list.
+public:
+  struct Shallow
+  {
+  private:
+    Log& ll;
+  public:
+    Shallow (Log& l, const symbol type, const char *const library)
+      : ll (l)
+    { ll.open_shallow (type, library); }
+    ~Shallow ()
+    { ll.close_shallow (); }
+  };
+private:
+  virtual void open_shallow (symbol type, const char* library) = 0;
+  virtual void close_shallow () = 0;
+  friend struct Log::Shallow;
+
   // The data.
 public:
   virtual void output_entry (symbol, bool) = 0;

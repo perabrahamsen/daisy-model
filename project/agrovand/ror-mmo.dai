@@ -5,7 +5,11 @@
        "c:/cygwin/home/mmo/daisy/sample")
 
 (input file "ror-setup.dai")
+(input file "plotstuff.dai")
 
-(run Rorrende)
+(run batch
+     (run Rorrende
+          plotall
+          ))
 
 ;;; ror-mmo.dai ends here.

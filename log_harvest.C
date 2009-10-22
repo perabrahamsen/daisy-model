@@ -158,6 +158,12 @@ struct LogHarvest : public Log
   void close_named_entry ()
   { daisy_notreached (); }
 
+  // Named object
+  void open_shallow (symbol, const char *const)
+  { daisy_notreached (); }
+  void close_shallow ()
+  { daisy_notreached (); }
+
   void output_entry (symbol, bool)
   { }
   void output_entry (symbol, double)

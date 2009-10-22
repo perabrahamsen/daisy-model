@@ -357,6 +357,7 @@
   "Bromide concentration flow."
   (ymin 0) (ymax 25)
   (source (arithmetic (file "Rorrende_AllChem.dlf")
+                      (missing "none")
                       (valid (not (> 0.000 [mm/h]
                                      (+ "Surface drain flow" "Soil drain flow")
                                      0.0001 [mm/h])))
@@ -390,6 +391,7 @@
   "Bromide mass in drain."
   (ymin 0) (ymax 25)
   (source (arithmetic (file "Rorrende_AllChem.dlf")
+                      (missing "none")
                       (expr (+ "Surface-Drain, Br" "Soil-Drain, Br"))
                       (title "Bromide"))
           (combine (source (column (file "bromide.ddf")
@@ -486,6 +488,7 @@
   "Pendimethalin concentration flow."
   (ymin 0)(ymax 15)
   (source (arithmetic (file "Rorrende_AllChem.dlf")
+                      (missing "none")
                       (valid (not (> 0.000 [mm/h]
                                      (+ "Surface drain flow" "Soil drain flow")
                                      0.0001 [mm/h])))
@@ -520,6 +523,7 @@
          "set mxtics 7"
          "set format x \"%y-%m-%d\"") 
   (source (arithmetic (file "Rorrende_AllChem.dlf")
+                      (missing "none")
                       (expr (convert (+ "Surface-Drain, Pend" 
                                         "Soil-Drain, Pend")
                                      [mg/ha/h]))
@@ -547,6 +551,7 @@
 (defgnuplot ioxconc draincommon
   "Ioxynil concentration flow."
   (source (arithmetic (file "Rorrende_AllChem.dlf")
+                      (missing "none")
                       (valid (not (> 0.000 [mm/h]
                                      (+ "Surface drain flow" "Soil drain flow")
                                      0.0001 [mm/h])))
@@ -574,6 +579,7 @@
 (defgnuplot ioxmass draincommon
   "Ioxynil mass in drain."
   (source (arithmetic (file "Rorrende_AllChem.dlf")
+                      (missing "none")
                       (expr (convert (+ "Surface-Drain, Iox" "Soil-Drain, Iox")
                                      [mg/ha/h]))
                       (title "Ioxynil"))
@@ -679,8 +685,7 @@
           season-00-01 season-00-01-zoom
           season-01-02))
 
-(defprogram all gnuplot
+(defprogram plotall gnuplot
   (graph drainplots "Rorrende Graphs"))
 
-(run all)
   

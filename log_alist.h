@@ -92,6 +92,10 @@ struct LogSubmodel : public Log
 			 const Frame& frame);
   void close_named_entry ();
 
+  void open_shallow (symbol type, // Object names.
+                     const char* library);
+  void close_shallow ();
+
   // Logging.
   void output_entry (symbol name, bool value);
   void output_entry (symbol name, double value);

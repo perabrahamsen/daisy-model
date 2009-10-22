@@ -1,7 +1,12 @@
 ;;; ror-pa.dai -- Setup files with pa specific information.
 
 (input file "ror-setup.dai")
+(input file "plotstuff.dai")
 
-(run Rorrende)
+(run batch
+     (run 
+      ;; Rorrende
+      plotall
+      ))
 
 ;;; ror-pa.dai ends here.

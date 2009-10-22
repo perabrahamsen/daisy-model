@@ -140,7 +140,7 @@ LogSubmodel::pop ()
   daisy_assert (library_stack.size () > 0);
   daisy_assert (frame_stack.size () > 0);
   daisy_assert (frame_sequence_stack.size () > 0);
-  daisy_assert (unnamed_stack.size () > 0);
+   daisy_assert (unnamed_stack.size () > 0);
   daisy_assert (unnamed () < 0 || unnamed () == frame_sequence ().size ());
 
       // Clear old values.
@@ -445,7 +445,15 @@ LogSubmodel::open_named_entry (const symbol, const symbol type,
 
 void
 LogSubmodel::close_named_entry ()
-{ close_entry (); }
+{ }
+
+void
+LogSubmodel::open_shallow (const symbol, const char *const)
+{ open_unnamed (); }
+
+void
+LogSubmodel::close_shallow ()
+{ close_unnamed (); }
 
 void
 LogSubmodel::output_entry (symbol name, const bool value)

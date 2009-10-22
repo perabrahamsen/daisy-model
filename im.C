@@ -120,7 +120,7 @@ IM::output (Log& log) const
       if (!log.check_entry (name, Chemical::component))
 	continue;
 
-      Log::Named named (log, name);
+      Log::Shallow named (log, name, Chemical::component);
       output_variable (name, log);
       const double value = (*i).second;
       output_variable (value, log);

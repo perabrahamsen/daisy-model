@@ -107,6 +107,10 @@ struct EXPORT LogSelect : public Log
 			 const Frame&);
   void close_named_entry ();
 
+  // Object names.
+  void open_shallow (symbol type, const char* library);
+  void close_shallow ();
+
   void output_entry (symbol name, bool);
   void output_entry (symbol name, double);
   void output_entry (symbol name, int);

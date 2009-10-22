@@ -170,6 +170,14 @@ LogSelect::close_named_entry ()
 { close (); }
 
 void 
+LogSelect::open_shallow (symbol type, const char* library)
+{ open_derived_type (type, library); }
+
+void 
+LogSelect::close_shallow ()
+{ close (); }
+
+void 
 LogSelect::output_entry (symbol, const bool)
 { daisy_notreached (); }
 

@@ -1,3 +1,10 @@
+2009-10-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log.h, log_harvest.C, log_select.h, log_select.C:
+	* log_alist.h, log_alist.C (open_shallow, close_shallow): New
+	member functions.
+	* im.C (output): Use it.
+
 2009-10-19  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* im.C (output): Allow base names.
