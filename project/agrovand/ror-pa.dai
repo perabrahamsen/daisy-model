@@ -3,6 +3,14 @@
 (input file "ror-setup.dai")
 (input file "plotstuff.dai")
 
+(defgeometry R_medium Rorrende
+  (Geometry (zplus -3 -6 -10 -14 -18 -22 -25 -33 -50 -75 -105 -115 -120 -140
+                   -200)
+            (xplus -20 -100 -800)))
+
+(defcolumn R_medium Rorrende
+  (Movement R_medium))
+
 (run batch
      (run 
       ;; Rorrende

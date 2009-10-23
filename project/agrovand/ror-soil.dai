@@ -157,6 +157,25 @@
                            (points (20 15)
                                    (30 0))))))
 
+(defmovement Rorrende rectangle
+  (matrix_solute Mollerup convection none)
+  (matrix_water (Mollerup (max_time_step_reductions 16)
+                          (max_number_of_small_time_steps 1000000))
+                (v+h))
+  (drain (-112.5 [cm] 1 [cm]))
+  (Geometry 
+   ;;(zplus -1.5 -3 -5 -9 -13 -20 -25 -30 -35 -40 -50 -60 -75 -100 -110 -115 -120 -130 -140 -160 -180 -190 -200)
+   (zplus -1.5 -3 -5 -7 -9 -11 -13 -15 -17 -19 -21 -23 -25 -27 -29 -31 -33 -35 -37 -41 -45 -50 -55 -65 -75
+          -90 -105 -120 -140 -160 -180 -200)                    
+   (xplus 5 10 15 25 35 40 50 75 125 200 275 350 450 550 650 800 [cm]))
+  (Tertiary (biopores 
+             (use_small_timesteps false)
+             (classes ("matrix_0cm") 
+                      ("matrix_2cm")
+                      ("drain_2cm")
+                      ("matrix_30cm")
+                      ("drain_30cm")))))
+
 (defcolumn Rorrende default
   "This is a Rorrende soil with pipe drains."
   (OrganicMatter none)
@@ -170,24 +189,7 @@
         (zones ((box  (top finite -35 [cm]) (bottom finite -115 [cm])
                        (left finite 0 [cm]) (right finite 25 [cm]))
                         Drain_canyon)))
-  (Movement rectangle
-        (matrix_solute Mollerup convection none)
-        (matrix_water (Mollerup (max_time_step_reductions 16)
-                                (max_number_of_small_time_steps 1000000))
-                      (v+h))
-        (drain (-112.5 [cm] 1 [cm]))
-        (Geometry 
-             ;;(zplus -1.5 -3 -5 -9 -13 -20 -25 -30 -35 -40 -50 -60 -75 -100 -110 -115 -120 -130 -140 -160 -180 -190 -200)
-               (zplus -1.5 -3 -5 -7 -9 -11 -13 -15 -17 -19 -21 -23 -25 -27 -29 -31 -33 -35 -37 -41 -45 -50 -55 -65 -75
-                      -90 -105 -120 -140 -160 -180 -200)                    
-               (xplus 5 10 15 25 35 40 50 75 125 200 275 350 450 550 650 800 [cm]))
-        (Tertiary (biopores 
-                     (use_small_timesteps false)
-                     (classes ("matrix_0cm") 
-                              ("matrix_2cm")
-                              ("drain_2cm")
-                              ("matrix_30cm")
-                              ("drain_30cm"))))))
+  (Movement Rorrende))
 
 
 (defcolumn Rorrende_aq Rorrende

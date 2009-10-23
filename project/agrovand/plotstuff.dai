@@ -687,5 +687,3 @@
 
 (defprogram plotall gnuplot
   (graph drainplots "Rorrende Graphs"))
-
-  
