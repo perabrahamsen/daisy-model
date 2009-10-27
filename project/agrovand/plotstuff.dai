@@ -323,6 +323,7 @@
 (defgnuplot drainflowacc draincommon
   "Accumulated drain flow."
   (ymin 0)(ymax 70)
+  (legend nw)
   (source (arithmetic (file "Rorrende_AllChem.dlf")
                       (accumulate true)
                       (expr (+ "Surface drain flow" "Soil drain flow"))
@@ -450,6 +451,7 @@
 
 (defgnuplot particlesacc draincommon
   "Particles in drain."
+  (legend se)
   (source (arithmetic (file "Rorrende_AllChem.dlf")
                       (expr (convert (+ "Soil-Drain, Col") [kg/ha/h]))
                       (accumulate true)
@@ -662,7 +664,8 @@
                              (end 2000 12 18))
          (particles-00-01 (where "particles-00-01-zoom.eps")
                           (end 2000 12 18))
-         (particlesacc-00-01 (where "particlesacc-00-01-zoom.eps")
+         (particlesacc-00-01 (legend nw)
+                             (where "particlesacc-00-01-zoom.eps")
                              (end 2000 12 18))
          (pendconc-00-01 (where "pendconc-00-01-zoom.eps")
                          (end 2000 12 18))
