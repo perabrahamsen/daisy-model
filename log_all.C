@@ -245,7 +245,7 @@ LogAll::open_column (const Column& column, const Field& field)
       select.set_column (column, *msg);
       select.relative_weight
         = field.relative_weight (metalib (), column, select);
-#if 1
+#if 0
       std::ostringstream tmp;
       tmp << "Column " << column.name << " matched by " 
           << select.current_name << " has relative weight " 
