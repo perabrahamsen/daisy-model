@@ -1,53 +1,15 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Carsten data i timeværdier
+* Now
 
-** Ret grafer til
+** Svar til Bo
 
-** Zoom
+** Ny condavg komponent
 
-* Ret opsætning
+** ???? (agrovand)
 
-** Kør onsdag
+**
 
-
-* svn?
-
-** project/agrovand
-
-*** setup (svn)
-
-weather file
-groundwater file
-soil.dai
-management.dai
-numeric.dai
-logs.dai
-setup.dai
-[ run-mmo.dai ]
-
-*** obs (svn)
-
-drain-flow.ddf
-bromide.ddf
-particles.ddf
-ioxynil.ddf
-pendimethalin.ddf
-
-*** sim
-
-*.dlf
-
-*** figs
-
-*.eps
-
-*** text (svn)
-
-plotstuff.dai
-allgraphs.tex
-
-***
 
 * Now
 

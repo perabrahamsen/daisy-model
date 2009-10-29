@@ -32,8 +32,8 @@
 
           ;; The following log model are used by the gnuplot graphs.
           ("Sample water content 2" (column Rorrende_aq))
-          ("Infiltration" (column Rorrende_aq))
-          ("Ponding depth" (column Rorrende_aq))
+          ("Infiltration" (column Rorrende_aq) (where "infiltration.dlf"))
+          ("Ponding depth" (column Rorrende_aq) (where "ponding_depth.dlf"))
           ("Rorrende all chemicals")
           ("Chemical 25" (chemical Bromide))
 

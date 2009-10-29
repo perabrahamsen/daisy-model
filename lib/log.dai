@@ -194,8 +194,9 @@ This include only nitrogen atoms of the ammonium."
   (where "${colfid}soil_water_pF.dlf")
   (when hourly)
   (entries ;; Year Month MDay Hour
-           (pF (path column "${column}" SoilWater h)
-               (spec fixed SoilWater h))))
+           (array (path column "${column}" SoilWater h)
+                  (dimension [pF])
+                  (spec fixed SoilWater h))))
 
 (deflog "Soil Water Sink" column
   "The water sink in all numeric soil layers.

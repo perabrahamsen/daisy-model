@@ -417,7 +417,7 @@ MODELS = program_cpedata.C tertiary_pipes.C \
 	program_document.C program_batch.C summary_balance.C \
 	rootdens_AP.C number_const.C \
 	domsorp_std.C \
-	horizon_numeric.C horizon_system.C select_pF.C pet_FAO_PM.C \
+	horizon_numeric.C horizon_system.C pet_FAO_PM.C \
 	pet_Hargreaves.C hydraulic_M_vGp.C summary_simple.C \
 	phenology_TSum.C phenology_std.C hydraulic_hypres.C clayom_biomod.C \
         clayom_old.C hydraulic_Cosby.C \
@@ -584,9 +584,10 @@ EXECUTABLES = daisy${EXE} tkdaisy${EXE} cdaisy${EXE} gdaisy${EXE}
 
 # Select files to be removed by the next svn update.
 #
-REMOVE = avalue.C alist.C avalue.h alist.h syntax.h syntax.C
+REMOVE = select_pF.C 
 
-REMOVED = msoltranrect_2x1.C msoltranrect_forward.C\
+REMOVED = avalue.C alist.C avalue.h alist.h syntax.h syntax.C \
+	msoltranrect_2x1.C msoltranrect_forward.C\
 	select_soil.C adsorption_none.C adsorption_full.C ABAprod_expr.C \
 	solute.C solute.h pedo.C pedo.h pedo_arit.C pedo_const.C \
 	denitrification.C soil_NH4.C soil_NO3.C \
@@ -1338,9 +1339,10 @@ harvest${OBJ}: harvest.C harvest.h time.h symbol.h block_model.h \
   frame.h log.h border.h model_framed.h model_logable.h model.h \
   librarian.h
 field${OBJ}: field.C field.h border.h symbol.h column.h model_framed.h \
-  model_logable.h model.h log.h time.h treelog.h library.h block.h \
-  scope.h attribute.h memutils.h assertion.h librarian.h frame_model.h \
-  frame.h mathlib.h crop.h
+  model_logable.h model.h log.h time.h select.h destination.h units.h \
+  memutils.h volume.h attribute.h treelog.h library.h block.h scope.h \
+  assertion.h librarian.h frame_model.h frame.h mathlib.h crop.h \
+  metalib.h
 bioincorporation${OBJ}: bioincorporation.C bioincorporation.h \
   frame_submodel.h frame.h scope.h attribute.h symbol.h log.h time.h \
   border.h model_framed.h model_logable.h model.h geometry.h soil.h am.h \
@@ -1402,7 +1404,7 @@ log_all${OBJ}: log_all.C log_all.h log_select.h log.h time.h symbol.h \
   border.h model_framed.h model_logable.h model.h memutils.h select.h \
   destination.h units.h volume.h attribute.h metalib.h frame.h scope.h \
   library.h block_model.h block_nested.h block.h treelog.h frame_model.h \
-  assertion.h column.h
+  assertion.h field.h column.h
 om${OBJ}: om.C om.h model_framed.h model_logable.h model.h symbol.h plf.h \
   som.h smb.h dom.h frame.h scope.h attribute.h check.h vcheck.h \
   geometry.h log.h time.h border.h mathlib.h assertion.h treelog.h \
@@ -2059,10 +2061,6 @@ horizon_system${OBJ}: horizon_system.C horizon.h model_derived.h \
   model_logable.h model.h symbol.h library.h block_model.h block_nested.h \
   block.h scope.h attribute.h treelog.h frame_model.h frame.h texture.h \
   plf.h hydraulic.h check.h mathlib.h assertion.h librarian.h
-select_pF${OBJ}: select_pF.C select.h destination.h symbol.h model.h units.h \
-  memutils.h volume.h attribute.h block_model.h block_nested.h block.h \
-  scope.h treelog.h frame_model.h frame.h mathlib.h assertion.h check.h \
-  vcheck.h librarian.h column.h model_framed.h model_logable.h
 pet_FAO_PM${OBJ}: pet_FAO_PM.C pet.h model_framed.h model_logable.h model.h \
   symbol.h fao.h weather.h model_derived.h im.h attribute.h soil.h \
   surface.h uzmodel.h soil_heat.h vegetation.h log.h time.h border.h \

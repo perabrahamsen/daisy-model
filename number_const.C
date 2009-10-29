@@ -77,7 +77,8 @@ struct NumberConst : public Number
       unit_ (al.units ().get_unit (al.find_frame (key).dimension (key)))
   { 
     if (al.units ().is_error (unit_))
-      al.msg ().warning ("Unknown unit '" + al.name ("value") + "'");
+      al.msg ().warning ("Unknown unit '"
+                         + al.find_frame (key).dimension (key) + "'");
   }
 };
 

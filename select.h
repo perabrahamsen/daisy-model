@@ -99,10 +99,14 @@ public:
   const unsigned int last_index;	// Index of last member in path.
   symbol current_name;
   static const symbol wildcard;
-  
+  double relative_weight;
+
 public:
   bool valid (const symbol name) const
   { return current_name == wildcard || name == current_name; }
+  bool valid (const std::set<symbol>& ancestors) const
+  { return current_name == wildcard 
+      || ancestors.find (current_name) != ancestors.end (); }
   bool open (const symbol name, const int depth)	// Open one leaf level.
   { 
     // Check if next level is also in path.
@@ -117,8 +121,7 @@ public:
   // Derived object.
   { 
     // Check if next level is also in path.
-    if (current_name != wildcard
-	&& ancestors.find (current_name) == ancestors.end ())
+    if (!valid (ancestors))
       return false;
 
     // Direct acces to new head of path.
@@ -132,12 +135,13 @@ public:
     current_name = path[depth];
   }
 
+  
   // Output routines.
-  virtual void output_number (double weight, double);
-  virtual void output_integer (double weight, int);
-  virtual void output_name (double weight, symbol);
-  virtual void output_array (double weight, const std::vector<double>&, 
-                             const Column*, Treelog&);
+  virtual void set_column (const Column&, Treelog&);
+  virtual void output_number (double);
+  virtual void output_integer (int);
+  virtual void output_name (symbol);
+  virtual void output_array (const std::vector<double>&);
 
   // Reset at start of time step.
 public:

@@ -47,6 +47,7 @@ class Treelog;
 class BlockModel;
 class Frame;
 class Column;
+class Field;
 
 class EXPORT Log : public ModelFramed
 {
@@ -288,21 +289,18 @@ public:
   private:
     Log& ll;
   public:
-    Col (Log& l, const Column& column, const double weight)
+    Col (Log& l, const Column& column, const Field& field)
       : ll (l)
-    { ll.open_column (column, weight); }
+    { ll.open_column (column, field); }
     ~Col ()
     { ll.close_column (); }
   private:
     Col (const Col&);
   };
 private:
-  void open_column (const Column& column, const double weight);
-  void close_column ();
+  virtual void open_column (const Column& column, const Field& field);
+  virtual void close_column ();
   friend struct Log::Col;
-public:
-  const Column* column () const;
-  double weight () const;
 
   // Self use.
 public:

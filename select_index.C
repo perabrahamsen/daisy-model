@@ -34,13 +34,11 @@ struct SelectIndex : public SelectValue
   const int index;
 
   // Output routines.
-  void output_array (const double rel, const std::vector<double>& array,
-                     const Column*,
-                     Treelog& msg)
+  void output_array (const std::vector<double>& array)
   { 
     if (index < array.size ())
       // Indexes outside the array is treated like missing values.
-      add_result (array[index] * rel); 
+      add_result (array[index]); 
   }
 
   // Create and Destroy.

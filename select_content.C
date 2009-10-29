@@ -41,42 +41,34 @@ struct SelectContent : public SelectValue
   const double x;
   const bool has_y;
   const double y;
-  const Geometry* old_geo;
-  const Soil* old_soil;
+  const Column* old_column;
   std::vector<size_t> cell;     // Cells at height.
   std::vector<double> weight;   // Relative volume for cell.
 
   // Output routines.
-  void output_array (const double rel, const std::vector<double>& array, 
-                     const Column *const column, 
-                     Treelog&)
+  void set_column (const Column& column, Treelog&)
   { 
-    const Geometry *const geo = column ? &column->get_geometry () : NULL;
-    const Soil *const soil = column ? &column->get_soil () : NULL;
-                       
-    if (soil != old_soil)
-      old_soil = soil;
-
-    if (geo != old_geo)
+    if (&column != old_column)
       {
-        old_geo = geo;
+        old_column = &column;
+        const Geometry& geo = column.get_geometry ();
 
         cell.erase (cell.begin (), cell.end ());
         double total_volume = 0.0;
-        const size_t cell_size = geo->cell_size ();
+        const size_t cell_size = geo.cell_size ();
         for (size_t i = 0; i < cell_size; i++)
 	  {
 	    bool include_cell = true;
-	    if (has_z && !geo->contain_z (i, z))
+	    if (has_z && !geo.contain_z (i, z))
 	      include_cell = false;
-	    else if (has_x && !geo->contain_x (i, x))
+	    else if (has_x && !geo.contain_x (i, x))
 	      include_cell = false;
-	    else if (has_y && !geo->contain_y (i, y))
+	    else if (has_y && !geo.contain_y (i, y))
 	      include_cell = false;
 	    
 	    if (include_cell)
 	      {
-		const double volume = geo->cell_volume (i);
+		const double volume = geo.cell_volume (i);
 		total_volume += volume;
 		weight.push_back (volume);
 		cell.push_back (i);
@@ -86,6 +78,10 @@ struct SelectContent : public SelectValue
         for (size_t i = 0; i < cell.size (); i++)
           weight[i] /= total_volume;
       }
+  }
+
+  void output_array (const std::vector<double>& array)
+  { 
     const size_t cell_size = cell.size ();
     if (cell_size < 1)
       // No matching cells => missing value.
@@ -94,7 +90,7 @@ struct SelectContent : public SelectValue
     double result = 0.0;
     for (size_t i = 0; i < cell_size; i++)
       result += array[cell[i]] * weight[i];
-    add_result (result * rel); 
+    add_result (result); 
   }
 
   // Create and Destroy.
@@ -106,12 +102,9 @@ struct SelectContent : public SelectValue
       x (al.number ("x", -42.42e42)),
       has_y (al.check ("y")),
       y (al.number ("y", -42.42e42)),
-      old_geo (NULL),
-      old_soil (NULL)
+      old_column (NULL)
   { }
 };
-
-#include <sstream>
 
 static struct SelectContentSyntax : public DeclareModel
 {

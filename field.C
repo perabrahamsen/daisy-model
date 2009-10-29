@@ -24,6 +24,7 @@
 #include "field.h"
 #include "column.h"
 #include "log.h"
+#include "select.h"
 #include "treelog.h"
 #include "library.h"
 #include "block.h"
@@ -33,6 +34,7 @@
 #include "frame_model.h"
 #include "mathlib.h"
 #include "crop.h"
+#include "metalib.h"
 
 struct Field::Implementation
 {
@@ -120,7 +122,6 @@ public:
   void tick_one (const Metalib& metalib, 
                  size_t, const Time&, double dt, const Weather*, 
 		 const Scope&, Treelog&);
-  void output (Log&) const;
 
   // Find a specific column.
   Column* find (symbol name) const;
@@ -708,37 +709,6 @@ Field::Implementation::tick_one (const Metalib& metalib,
   columns[col]->tick (metalib, time, dt, weather, scope, msg);
 }
 
-void 
-Field::Implementation::output (Log& log) const
-{
-  double total_area = 0.0;
-  for (ColumnList::const_iterator i = columns.begin ();
-       i != columns.end ();
-       i++)
-    {
-      const Column& column = **i;
-      if (log.check_entry (column.name, Column::component))
-        total_area += column.area;
-    }
-
-  if (iszero (total_area))
-    return;
-  
-  for (ColumnList::const_iterator i = columns.begin ();
-       i != columns.end ();
-       i++)
-    {
-      const Column& column = **i;
-      if (log.check_entry (column.name, Column::component))
-	{
-	  Log::Entry open_entry (log, column.name, column.frame (),
-				 Column::component);
-          Log::Col col (log, column, column.area / total_area);
-	  column.output (log);
-	}
-    }
-}
-
 Column* 
 Field::Implementation::find (symbol name) const
 {
@@ -1053,7 +1023,44 @@ Field::tick_one (const Metalib& metalib,
 
 void 
 Field::output (Log& log) const
-{ impl->output (log); }
+{
+  for (Implementation::ColumnList::const_iterator i = impl->columns.begin ();
+       i != impl->columns.end ();
+       i++)
+    {
+      const Column& column = **i;
+      if (log.check_entry (column.name, Column::component))
+	{
+          // Log::Col must be declared before Log::Entry
+          Log::Col col (log, column, *this); 
+	  Log::Entry open_entry (log, column.name, column.frame (),
+				 Column::component);
+	  column.output (log);
+	}
+    }
+}
+
+double 
+Field::relative_weight (const Metalib& metalib, 
+                        const Column& column, const Select& select) const
+// Relative area of COLUMN compared to all columns matched by SELECT.
+{
+  const Library& library = metalib.library (Column::component);
+
+  double total_area = 0.0;
+  for (Implementation::ColumnList::const_iterator i = impl->columns.begin ();
+       i != impl->columns.end ();
+       i++)
+    {
+      const Column& col = **i;
+      if (select.valid (library.ancestors (col.name)))
+        total_area += col.area;
+    }
+  if (total_area > 0.0)
+    return column.area / total_area;
+
+  return -42.42e42;
+}
 
 const Column* 
 Field::find (symbol name) const

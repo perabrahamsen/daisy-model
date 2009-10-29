@@ -30,6 +30,10 @@
 void 
 SelectValue::add_result (double result)
 {
+  result *= relative_weight;
+
+  
+
     if (count == 0)
       {
         if (handle == Handle::geometric)

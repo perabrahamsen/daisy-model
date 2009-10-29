@@ -27,7 +27,8 @@
 #include "block_model.h"
 #include "treelog.h"
 #include "assertion.h"
-
+#include "field.h"
+#include <sstream>
 #include "column.h"
 
 bool 
@@ -226,6 +227,38 @@ LogAll::close ()
   active_interiors.pop ();
 }
 
+
+void 
+LogAll::open_column (const Column& column, const Field& field)
+{
+  const Library& library = metalib ().library (Column::component);
+  const std::set<symbol>& ancestors = library.ancestors (column.name);
+  
+  const std::vector<Select*>& interiors = active_interiors.top ();
+  for (std::vector<Select*>::const_iterator i = interiors.begin (); 
+       i != interiors.end (); 
+       i++)
+    {
+      Select& select = **i;
+      if (!select.valid (ancestors))
+        continue;
+      select.set_column (column, *msg);
+      select.relative_weight
+        = field.relative_weight (metalib (), column, select);
+#if 1
+      std::ostringstream tmp;
+      tmp << "Column " << column.name << " matched by " 
+          << select.current_name << " has relative weight " 
+          << select.relative_weight << " for " << select.tag ();
+      msg->message (tmp.str ());
+#endif
+    }
+}
+
+void 
+LogAll::close_column ()
+{ }
+
 void 
 LogAll::output_entry (symbol, const bool)
 { }
@@ -239,7 +272,7 @@ LogAll::output_entry (symbol name, const double value)
        i != sels.end ();
        i++)
     if (name == (*i)->current_name)
-      (*i)->output_number (weight (), value);
+      (*i)->output_number (value);
 }
 
 void 
@@ -251,7 +284,7 @@ LogAll::output_entry (symbol name, const int value)
        i != sels.end ();
        i++)
     if (name == (*i)->current_name)
-      (*i)->output_integer (weight (), value);
+      (*i)->output_integer (value);
 }
 
 void 
@@ -263,7 +296,7 @@ LogAll::output_entry (symbol name, const symbol value)
        i != sels.end ();
        i++)
     if (name == (*i)->current_name)
-      (*i)->output_name (weight (), value);
+      (*i)->output_name (value);
 }
 
 void 
@@ -275,7 +308,7 @@ LogAll::output_entry (symbol name, const std::vector<double>& value)
        i != sels.end ();
        i++)
     if (name == (*i)->current_name)
-      (*i)->output_array (weight (), value, column (), *msg);
+      (*i)->output_array (value);
 }
 
 void 

@@ -45,8 +45,7 @@ struct SelectVolume : public SelectValue
   const bool density_y;
   int dimensions () const;
   std::auto_ptr<Volume> volume;
-  const Geometry* last_geo;
-  const Soil* last_soil;
+  const Column* last_column;
   std::vector<int> cells;
   std::vector<double> weight;
   const double min_root_density;
@@ -58,9 +57,8 @@ struct SelectVolume : public SelectValue
                                   const symbol has, const symbol want);
 
   // Output routines.
-  void output_array (const double weight, const std::vector<double>& array, 
-                     const Column* col, 
-                     Treelog&);
+  void set_column (const Column&, Treelog&);
+  void output_array (const std::vector<double>&);
 
   // Create and Destroy.
   symbol default_dimension (const symbol spec_dim) const;
@@ -92,37 +90,31 @@ SelectVolume::special_convert (const Units& units,
 
 // Output routines.
 void 
-SelectVolume::output_array (const double rel, 
-                            const std::vector<double>& array, 
-                            const Column *const column, Treelog& msg)
+SelectVolume::set_column (const Column& column, Treelog& msg)
 { 
-  const Geometry *const geo = column ? &column->get_geometry () : NULL;
-  const Soil *const soil = column ? &column->get_soil () : NULL;
-                       
-  if (soil != last_soil)
+  if (&column != last_column)
     {
-      last_soil = soil;
-
+      last_column = &column;
+      
+      const Geometry& geo = column.get_geometry ();
+      const Soil& soil = column.get_soil ();
+      
       if (bd_convert.get ())
-        bd_convert->set_bulk (*geo, *soil, *volume, 
+        bd_convert->set_bulk (geo, soil, *volume, 
                               density_z, density_x, density_y);
-    }
 
-  if (geo != last_geo)
-    {
-      last_geo = geo;
-      const size_t cell_size = geo->cell_size ();
+      const size_t cell_size = geo.cell_size ();
       cells.clear ();
       weight.clear ();
       double total_volume = 0.0;
       for (size_t n = 0; n < cell_size; n++)
         {
           const double f 
-            = geo->fraction_in_volume (n, *volume);
+            = geo.fraction_in_volume (n, *volume);
           if (f > 1e-10)
             {
               cells.push_back (n);
-              const double vol = geo->cell_volume (n) * f;
+              const double vol = geo.cell_volume (n) * f;
               weight.push_back (vol);
               total_volume += vol;
             }
@@ -134,29 +126,35 @@ SelectVolume::output_array (const double rel,
           if (dimensions () > 0)
             {
               if (!density_z)
-                total_volume /= volume->height (geo->bottom (), geo->top ());
+                total_volume /= volume->height (geo.bottom (), geo.top ());
               if (!density_x)
-                total_volume /= volume->width (geo->left (), geo->right ());
+                total_volume /= volume->width (geo.left (), geo.right ());
               if (!density_y)
-                total_volume /= volume->depth (geo->front (), geo->back ());
+                total_volume /= volume->depth (geo.front (), geo.back ());
               for (size_t i = 0; i < cells.size (); i++)
                 weight[i] /= total_volume;
             }
         }
       daisy_assert (cells.size () == weight.size ());
     }
-  daisy_assert (cells.size () <= array.size ());
+}
+
+void 
+SelectVolume::output_array (const std::vector<double>& array)
+{
+  if (!last_column)
+    throw "Needs soil to log volume";
 
   double sum = 0.0;
 
   if (min_root_density > 0.0)
     {
-      daisy_assert (column);
-      const Vegetation *const vegetation = &column->get_vegetation ();
+      daisy_assert (last_column);
+      const Vegetation& vegetation = last_column->get_vegetation ();
       const std::vector<double>& root_density 
 	= (min_root_crop == wildcard)
-	? vegetation->root_density ()
-	: vegetation->root_density (min_root_crop);
+	? vegetation.root_density ()
+	: vegetation.root_density (min_root_crop);
 
       for (size_t i = 0; i < cells.size (); i++)
 	{
@@ -182,7 +180,7 @@ SelectVolume::output_array (const double rel,
     for (size_t i = 0; i < cells.size (); i++)
       sum += array[cells[i]] * weight[i];
 
-  add_result (sum * rel);
+  add_result (sum);
 }
 
 // Create and Destroy.
@@ -231,8 +229,7 @@ SelectVolume::SelectVolume (const BlockModel& al)
     density_x (al.flag ("density") || al.flag ("density_x")),
     density_y (al.flag ("density") || al.flag ("density_y")),
     volume (Volume::build_obsolete (al)),
-    last_geo (NULL),
-    last_soil (NULL),
+    last_column (NULL),
     min_root_density (al.number ("min_root_density")),
     min_root_crop (al.name ("min_root_crop")),
     bd_convert (NULL)
@@ -334,25 +331,20 @@ struct SelectWater : public SelectVolume
   const double h;
   const double h_ice;
 
-  void output_array (const double rel, 
-                     const std::vector<double>&, 
-                     const Column *const column,
-                     Treelog& msg)
+  void set_column (const Column& column, Treelog& msg)
   {
-    const Geometry *const geo = column ? &column->get_geometry () : NULL;
-    const Soil *const soil = column ? &column->get_soil () : NULL;
-                       
-    if (soil != last_soil || geo != last_geo)
+    if (&column != last_column)
       {
-	if (!soil)
-	  throw "Needs soil to log water at fixed pressure";
-
+        SelectVolume::set_column (column, msg);
+        const Soil& soil = column.get_soil ();
+        
 	water.clear ();
-	while (water.size () < soil->size ())
-	  water.push_back (soil->Theta (water.size (), h, h_ice));
+	while (water.size () < soil.size ())
+	  water.push_back (soil.Theta (water.size (), h, h_ice));
       }
-    SelectVolume::output_array (rel, water, column, msg);
   }
+  void output_array (const std::vector<double>&)
+  { SelectVolume::output_array (water); }
 
   SelectWater (const BlockModel& al)
     : SelectVolume (al),

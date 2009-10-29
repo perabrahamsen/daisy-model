@@ -239,14 +239,13 @@ LogSubmodel::close ()
       // Assign new value to entry.
       if (entry_stack.size () > 0)
 	{
-	  const std::string& sold_entry = old_entry.name ();
-	  const Attribute::type type = frame_entry ().lookup (sold_entry);
+	  const Attribute::type type = frame_entry ().lookup (old_entry);
 	  switch (type)
 	    { 
 	    case Attribute::Model:
               {
                 // Model sequence.
-                daisy_assert (frame_entry ().type_size (sold_entry)
+                daisy_assert (frame_entry ().type_size (old_entry)
                               != Attribute::Singleton);
                 std::vector<boost::shared_ptr<const FrameModel>/**/> copy;
                 for (size_t i = 0; i < old_frame_sequence.size (); i++)
@@ -256,15 +255,15 @@ LogSubmodel::close ()
                     boost::shared_ptr<const FrameModel> entry (model);
                     copy.push_back (entry);
                   }
-                frame_entry ().set (sold_entry, copy);
+                frame_entry ().set (old_entry, copy);
               }
               break;
 	    case Attribute::Submodel:
 	      // Submodel sequence or singleton.
-	      if (frame_entry ().type_size (sold_entry) == Attribute::Singleton)
+	      if (frame_entry ().type_size (old_entry) == Attribute::Singleton)
 		{
 		  daisy_assert (old_frame_sequence.size () == 0);
-		  frame_entry ().set (sold_entry, 
+		  frame_entry ().set (old_entry, 
                                 dynamic_cast<const FrameSubmodel&> (old_frame));
 		}
 	      else
@@ -277,12 +276,22 @@ LogSubmodel::close ()
                       boost::shared_ptr<const FrameSubmodel> entry (submodel);
                       copy.push_back (entry);
                     }
-                  frame_entry ().set (sold_entry, copy);
+                  frame_entry ().set (old_entry, copy);
                 }
 	      delete &old_frame;
 	      break;
 	    default:
-	      daisy_notreached ();
+              {
+                std::ostringstream tmp;
+                tmp << "Can't close " << old_entry << ", which is a " 
+                    << Attribute::type_name (type) << "\nStack:";
+                for (std::deque<symbol>::const_iterator i 
+                       = entry_stack.begin ();
+                     i != entry_stack.end ();
+                     i++)
+                  tmp << " " << *i;
+                daisy_panic (tmp.str ());
+              }
 	    }
 	}
     }
@@ -445,7 +454,7 @@ LogSubmodel::open_named_entry (const symbol, const symbol type,
 
 void
 LogSubmodel::close_named_entry ()
-{ }
+{ close_entry (); }
 
 void
 LogSubmodel::open_shallow (const symbol, const char *const)

@@ -1,3 +1,16 @@
+2009-10-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* all: Tried once again to make relative area logging work.
+
+	* attribute.C (type_name): Fix names.
+
+	* log_alist.C (close_named_entry): Close entry.
+
+2009-10-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* parser_file.C (load_list): Make [] equal 'Attribute::None ()'
+	when declaring an 'Attribute::Number'.
+
 2009-10-23  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.74 released.

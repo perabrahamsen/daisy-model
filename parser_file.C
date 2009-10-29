@@ -818,7 +818,11 @@ ParserFile::Implementation::load_list (Frame& frame)
 	      {
 		symbol dim = Attribute::Unknown ();
 		if (looking_at ('['))
-		  dim = get_symbol ();
+                  {
+                    dim = get_symbol ();
+                    if (dim.name ().size () == 0)
+                      dim = Attribute::None ();
+                  }
 		if (!looking_at ('('))
 		  doc = get_symbol ();
 		if (ok)

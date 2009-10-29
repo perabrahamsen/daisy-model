@@ -45,13 +45,9 @@ Log::library_id () const
 struct Log::Implementation
 {
   Metalib* metalib;
-  const Column* column;
-  double weight;
 
   Implementation ()
-    : metalib (NULL),
-      column (NULL),
-      weight (1.0)
+    : metalib (NULL)
   { }
 };
 
@@ -113,28 +109,12 @@ Log::close_alist ()
 { close (); }
 
 void 
-Log::open_column (const Column& column, const double weight)
-{ 
-  daisy_assert (!impl->column);
-  impl->column = &column;
-  impl->weight = weight;
-}
+Log::open_column (const Column&, const Field&)
+{ }
 
 void 
 Log::close_column ()
-{
-  daisy_assert (impl->column);
-  impl->column = NULL;
-  impl->weight = 1.0;
-}
-
-const Column*
-Log::column () const
-{ return impl->column; }
-
-double
-Log::weight () const
-{ return impl->weight; }
+{ }
 
 void
 Log::output (Log&) const

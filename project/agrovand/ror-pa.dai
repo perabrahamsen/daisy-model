@@ -4,12 +4,12 @@
 (input file "plotstuff-9899.dai")
 
 (defprogram Sim9899 Rorrende
-  (stop 1999 4 1))
+  (stop 1997 6 6))
 
 (run batch
      (run 
       Sim9899
-      plotall
+      ;; plotall
       ))
 
 ;;; ror-pa.dai ends here.

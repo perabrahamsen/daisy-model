@@ -72,6 +72,7 @@ static const double kg_per_ha_per_y_to_g_per_cm2_per_h
 struct OrganicStandard : public OrganicMatter
 {
   // Content.
+  const Geometry* log_geo;      // We do some optional work when logging;
   const bool active_underground; // True, iff turnover happens below rootzone.
   std::vector<bool> active_;     // Active cells.
   const double K_NH4;		// Immobilization rate of NH4.
@@ -763,9 +764,8 @@ OrganicStandard::output (Log& log) const
       || log.check_leaf (total_C_symbol)
       || log.check_leaf (humus_symbol))
     {
-      const Column *const column = log.column ();
-      daisy_assert (column);
-      const Geometry& geo = column->get_geometry ();
+      daisy_assert (log_geo);
+      const Geometry& geo = *log_geo;
       const int size = geo.cell_size ();
 
       std::vector<double> total_N (size, 0.0);
@@ -2349,6 +2349,10 @@ OrganicStandard::initialize (const Metalib& metalib,
 { 
   Treelog::Open nest (msg, "OrganicStandard");
 
+  // Save geometry for logging.
+  daisy_assert (!log_geo);
+  log_geo = &geo;
+
   // Sizes.
   const size_t cell_size = geo.cell_size ();
   const size_t smb_size = smb.size ();
@@ -2396,7 +2400,6 @@ OrganicStandard::initialize (const Metalib& metalib,
     }
 
   abiotic_factor.insert (abiotic_factor.end (), cell_size, 1.0);
-    
 
   // Tillage.
   tillage_age.insert (tillage_age.end (), 
@@ -2594,6 +2597,7 @@ An 'initial_SOM' layer in OrganicStandard ends below the last cell");
 
 OrganicStandard::OrganicStandard (const BlockModel& al)
   : OrganicMatter (al),
+    log_geo (NULL),
     active_underground (al.flag ("active_underground")),
     K_NH4 (al.number ("K_NH4")),
     K_NO3 (al.number ("K_NO3")),

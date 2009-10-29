@@ -41,8 +41,7 @@ struct SelectArray : public Select
   std::vector<double> result;        // For logging (needs to be persistent!).
   std::vector<double> bulk;     // Soil dry bulk density.
   
-  const Geometry* last_geo;     // For printing dimensions;
-  const Soil* last_soil;        // For dry bulk density;
+  const Column* last_column;
 
   // Bulk density convertions.
   std::auto_ptr<BD_convert> bd_convert;
@@ -59,34 +58,25 @@ struct SelectArray : public Select
   }
 
   // Output routines.
-  void output_array (const double rel, const std::vector<double>& array, 
-                     const Column *const column,
-                     Treelog&)
+  void set_column (const Column& column, Treelog&)
   { 
-    const Geometry *const geo = column ? &column->get_geometry () : NULL;
-    const Soil *const soil = column ? &column->get_soil () : NULL;
-                       
-    if (geo != last_geo)
-      last_geo = geo;
-
-    if (soil != last_soil)
+    if (&column != last_column)
       {
-        last_soil = soil;       // Remember it.
+        last_column = &column;
 
-        if (bd_convert.get ())
-          if (!soil)
-            throw "Soil required for this use of 'array' select model";
-          else
-            {
-              // Make room.
-              if (soil->size () > bulk.size ())
-                bulk.insert (bulk.end (), soil->size () - bulk.size (), 0.0);
+        const Soil& soil = column.get_soil ();
 
-              for (size_t c = 0; c < soil->size (); c++)
-                bulk[c] = soil->dry_bulk_density (c);
-            }
+        // Make room.
+        if (soil.size () > bulk.size ())
+          bulk.insert (bulk.end (), soil.size () - bulk.size (), 0.0);
+        
+        for (size_t c = 0; c < soil.size (); c++)
+          bulk[c] = soil.dry_bulk_density (c);
       }
+  }
 
+  void output_array (const std::vector<double>& array)
+  { 
     if (array.size () > value.size ())
       value.insert (value.end (), 
 		    array.size () - value.size (),
@@ -95,20 +85,20 @@ struct SelectArray : public Select
       {
         if (handle == Handle::geometric)
           for (unsigned int i = 0; i < array.size (); i++)
-            value[i] = log (array[i] * rel);
+            value[i] = log (array[i] * relative_weight);
         else
           for (unsigned int i = 0; i < array.size (); i++)
-            value[i] = array[i] * rel;
+            value[i] = array[i] * relative_weight;
       }
     else switch (handle)
       {
       case Handle::min:
         for (unsigned int i = 0; i < array.size (); i++)
-          value[i] = std::min (value[i], array[i] * rel);
+          value[i] = std::min (value[i], array[i] * relative_weight);
         break;
       case Handle::max:
         for (unsigned int i = 0; i < array.size (); i++)
-          value[i] = std::max (value[i], array[i] * rel);
+          value[i] = std::max (value[i], array[i] * relative_weight);
         break;
       case Handle::current:    
         // We may have count > 0 && Handle::current when selecting
@@ -117,11 +107,11 @@ struct SelectArray : public Select
       case Handle::average:
       case Handle::sum:
         for (unsigned int i = 0; i < array.size (); i++)
-          value[i] += array[i] *rel;
+          value[i] += array[i] * relative_weight;
         break;
       case Handle::geometric:
         for (unsigned int i = 0; i < array.size (); i++)
-          value[i] += log (array[i] * rel);
+          value[i] += log (array[i] * relative_weight);
         break;
       }
     count++;
@@ -210,7 +200,11 @@ struct SelectArray : public Select
   { return count == 0; }
 
   const Geometry* geometry () const
-  { return last_geo; }
+  { 
+    if (last_column)
+      return &last_column->get_geometry ();
+    return NULL;
+  }
 
   int size () const
   { return value.size (); }
@@ -219,8 +213,7 @@ struct SelectArray : public Select
   SelectArray (const BlockModel& al)
     : Select (al),
       value (al.number_sequence ("value")),
-      last_geo (NULL),
-      last_soil (NULL),
+      last_column (NULL),
       bd_convert (NULL)
   { }
 };

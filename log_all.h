@@ -59,6 +59,10 @@ public:
   void open (symbol name);
   void close ();
 
+  // Columns.
+  void open_column (const Column& column, const Field& field);
+  void close_column ();
+
   void output_entry (symbol name, bool);
   void output_entry (symbol name, double);
   void output_entry (symbol name, int);

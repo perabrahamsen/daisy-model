@@ -533,23 +533,25 @@ Select::select_get_tag (const Frame& al)
 
 const symbol Select::wildcard ("*");
 
+void 
+Select::set_column (const Column&, Treelog&)
+{ }
+
 // Output routines.
 void 
-Select::output_number (double, const double)
+Select::output_number (const double)
 { throw ("This log selection can't log numbers."); }
 
 void 
-Select::output_integer (double, const int)
+Select::output_integer (const int)
 { throw ("This log selection can't log integers."); }
 
 void 
-Select::output_name (double, const symbol)
+Select::output_name (const symbol)
 { throw ("This log selection can't log names."); }
 
 void 
-Select::output_array (double, const std::vector<double>&,
-                      const Column*,
-                      Treelog&)
+Select::output_array (const std::vector<double>&)
 { throw ("This log selection can't log arrays."); }
 
 bool
@@ -692,6 +694,7 @@ Select::Select (const BlockModel& al)
     path (al.name_sequence ("path")),
     last_index (path.size () - 1),
     current_name (path[0]),
+    relative_weight (1.0),
     is_active (false)
 { }
 

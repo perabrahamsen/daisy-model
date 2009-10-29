@@ -42,7 +42,7 @@ private:
   
   const bool density;
   std::auto_ptr<Volume> volume;
-  const Geometry* last_geo;
+  const Column* last_column;
   std::vector<size_t> edges;
   std::vector<double> weight;
 
@@ -52,7 +52,8 @@ protected:
 
   // Output routines.
 private:
-  void output_array (const double weight, const std::vector<double>&, const Column*, Treelog&);
+  void set_column (const Column&, Treelog&);
+  void output_array (const std::vector<double>&);
 
   // Create and Destroy.
 private:
@@ -96,33 +97,29 @@ SelectFlow::check_border (const Border& border, const Volume& default_volume,
 { return volume->check_border (border, default_volume, msg); }
 
 void
-SelectFlow::output_array (const double rel, 
-                          const std::vector<double>& array, 
-                          const Column *const column, 
-                          Treelog& msg)
-{ 
-  const Geometry *const geo = column ? &column->get_geometry () : NULL;
-                       
-  if (geo != last_geo)
+SelectFlow::set_column (const Column& column, Treelog& msg)
+{
+  if (&column != last_column)
     {
+      last_column = &column;
       Treelog::Open nest (msg, name);
-      last_geo = geo;
-      const size_t size = geo->edge_size ();
+      const Geometry& geo = column.get_geometry ();
+      const size_t size = geo.edge_size ();
       edges.clear ();
       weight.clear ();
       double total_area = 0.0;
       for (size_t e = 0; e < size; e++)
         {
-          const int from = geo->edge_from (e);
-          const bool from_inside = geo->cell_center_in_volume (from, *volume);
-          const int to = geo->edge_to (e);
-          const bool to_inside = geo->cell_center_in_volume (to, *volume);
+          const int from = geo.edge_from (e);
+          const bool from_inside = geo.cell_center_in_volume (from, *volume);
+          const int to = geo.edge_to (e);
+          const bool to_inside = geo.cell_center_in_volume (to, *volume);
           if (from_inside)
             {
               if (to_inside)
                 // Both inside volume, don't use.
                 continue;
-              if (!use_edge (*geo, to, from))
+              if (!use_edge (geo, to, from))
                 continue;
             }
           else
@@ -130,11 +127,11 @@ SelectFlow::output_array (const double rel,
               if (!to_inside)
                 // Both outside volume, don't use.
                 continue;
-              if (!use_edge (*geo, from, to))
+              if (!use_edge (geo, from, to))
                 continue;
             }
           edges.push_back (e);
-          double area = geo->edge_area (e);
+          double area = geo.edge_area (e);
           total_area += area;
           if (from_inside)
             // Positive inwards.
@@ -154,25 +151,32 @@ SelectFlow::output_array (const double rel,
       tmp << "Total area: " << total_area << ", density = " << density
           << ", #edges = " << edges.size ();
       for (size_t i = 0; i < edges.size (); i++)
-        tmp << "\n" << geo->edge_name (edges[i]) << ": weigth " << weight[i];
+        tmp << "\n" << geo.edge_name (edges[i]) << ": weigth " << weight[i];
       msg.message (tmp.str ());
 #endif
       daisy_assert (edges.size () == weight.size ());
     }
-  daisy_assert (edges.size () <= array.size ());
+}
 
+void
+SelectFlow::output_array (const std::vector<double>& array)
+{ 
+  if (!last_column)
+    throw "Needs soil to log flow";
+  
+  daisy_assert (edges.size () <= array.size ());
   double sum = 0.0;
   for (size_t i = 0; i < edges.size (); i++)
     sum += array[edges[i]] * weight[i];
   
-  add_result (sum * rel);
+  add_result (sum);
 }
 
 SelectFlow::SelectFlow (const BlockModel& al)
   : SelectValue (al),
     density (al.flag ("density")),
     volume (Volume::build_obsolete (al)),
-    last_geo (NULL)
+    last_column (NULL)
 { }
 
 static struct SelectFlowSyntax : public DeclareBase
