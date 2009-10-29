@@ -1,3 +1,7 @@
+2009-10-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* condedge.C, condedge.h: New component.
+
 2009-10-28  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* all: Tried once again to make relative area logging work.
