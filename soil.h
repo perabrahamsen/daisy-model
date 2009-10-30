@@ -69,7 +69,8 @@ public:
 
   // Texture.
   double tortuosity_factor (size_t i, double Theta) const; // [cm^3/cm^3]
-  double anisotropy (size_t i) const;
+  double anisotropy_cell (const Geometry&, size_t c) const;
+  double anisotropy_edge (const Geometry&, size_t e) const;
   double dry_bulk_density (size_t i) const;
   double clay (size_t i) const;
   double texture_below (size_t i, double size /* [um] */) const;

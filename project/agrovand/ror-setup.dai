@@ -37,6 +37,10 @@
           ("Rorrende all chemicals")
           ("Chemical 25" (chemical Bromide))
 
+          ;; These two should give an overall water balance.
+          ("Field water")
+          ("Field water" (column Rorrende_aq))
+
           ;; Log models below are optional. 
           ;; ("Chemical Concentration" 
           ;;  (chemical Bromide) 

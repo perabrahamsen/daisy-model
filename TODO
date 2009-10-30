@@ -2,13 +2,17 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * Now
 
-** Ny condavg komponent
+** Ny condedge komponent
 
-*** Afprøv.
+*** anisotropy
+
+*** implementer i Mollerup
+
+*** Afprøv på Jyn
 
 ** ???? (agrovand)
 
-**
+** Mmax * tillage_factor (time_since_last_tillage)
 
 * Now
 

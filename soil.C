@@ -272,8 +272,24 @@ Soil::tortuosity_factor (size_t i, double Theta) const
 { return horizon_[i]->tortuosity->factor (*horizon_[i]->hydraulic, Theta); }
 
 double 
-Soil::anisotropy (size_t i) const
-{ return horizon_[i]->anisotropy (); }
+Soil::anisotropy_cell (const Geometry&, size_t c) const
+{ return horizon_[c]->anisotropy (); }
+
+double 
+Soil::anisotropy_edge (const Geometry& geo, size_t e) const
+{ 
+#if 1
+  daisy_notreached ();
+#else
+  if (geo.edge_is_internal (e))
+    {
+      const size_t from = geo.edge_from (e);
+      const size_t to = geo.edge_to (e);
+      
+    }
+  return horizon_[i]->anisotropy (); 
+#endif
+}
 
 double 
 Soil::dry_bulk_density (size_t i) const
