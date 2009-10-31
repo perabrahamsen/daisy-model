@@ -197,7 +197,7 @@ GroundwaterPipe::K_to_pipes (const unsigned int i,
 {
   if (K_to_pipes_ < 0)
     return soil.K (i, 0.0, 0.0, soil_heat.T (i))
-      * soil.anisotropy (i);
+      * soil.anisotropy_cell (i);
   return K_to_pipes_;
 }
 

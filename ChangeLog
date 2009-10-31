@@ -104,7 +104,7 @@
 
 2009-09-11  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* reaction_Morgan98.C (DeclareModel): Fix BibTex citation.
+	* reaction_Morgan98.C (DeclareModel): Fix BibTeX citation.
 	* aom.C (DeclareParam): ditto.
 
 2009-09-10  Per Abrahamsen  <abraham@dina.kvl.dk>

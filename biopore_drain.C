@@ -183,7 +183,7 @@ BioporeDrain::update_matrix_sink (const Geometry& geo,
       const double T = soil_heat.T (c);
       const double h_ice = 0.0;    //ice ignored 
       const double K_zz = soil.K (c, h_cond, h_ice, T);
-      const double K_xx = K_zz * soil.anisotropy (c);
+      const double K_xx = K_zz * soil.anisotropy_cell (c);
       S[c] = matrix_biopore_drain (c, geo, soil, active[c], h_barrier, 
                                    pressure_limit, K_xx, h[c]);
     }

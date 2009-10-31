@@ -159,7 +159,7 @@ static double anisotropy_factor (const Geometry& geo, size_t edge,
 {
   const double sin_angle = geo.edge_sin_angle (edge);
   const double cos_angle = geo.edge_cos_angle (edge);
-  const double factor = soil.anisotropy (cell);
+  const double factor = soil.anisotropy_cell (cell);
 
   return sqrt (sqr (sin_angle) + sqr (factor * cos_angle));
 }

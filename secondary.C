@@ -183,7 +183,7 @@ Minimal pressure needed for activating secondary domain.");
     frame.declare ("K", "cm/h", Check::non_negative (), Attribute::Const, "\
 Water conductivity when secondary domain is active.\n\
 If the secondary domain is already included in the normal conductivity\n\
-curve, specify 0.0 use that value instead.");
+curve, specify 0.0 to use that value instead.");
     frame.set ("K", 0.0);
   }
 } SecondaryPressure_syntax;

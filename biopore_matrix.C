@@ -390,7 +390,7 @@ BioporeMatrix::find_matrix_sink (const Geometry& geo,
       const double T = soil_heat.T (c);
       const double h_ice = 0.0;    //ice ignored 
       const double K_zz = soil.K (c, h_cond, h_ice, T);
-      const double K_xx = K_zz * soil.anisotropy (c);
+      const double K_xx = K_zz * soil.anisotropy_cell (c);
       const size_t col = column[c];
       const double M_c = density_column[col]; // [cm^-2]
       S3[c] = matrix_biopore_matrix (c, geo, soil, active[c], h_barrier, M_c,

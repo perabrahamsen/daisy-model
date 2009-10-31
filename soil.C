@@ -272,7 +272,7 @@ Soil::tortuosity_factor (size_t i, double Theta) const
 { return horizon_[i]->tortuosity->factor (*horizon_[i]->hydraulic, Theta); }
 
 double 
-Soil::anisotropy_cell (const Geometry&, size_t c) const
+Soil::anisotropy_cell (size_t c) const
 { return horizon_[c]->anisotropy (); }
 
 double 
