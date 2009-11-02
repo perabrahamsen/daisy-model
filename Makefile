@@ -979,6 +979,9 @@ ui_Qt_run${OBJ}: ui_Qt_run.C ui_Qt_run.h ui_Qt.h ui.h model.h symbol.h \
 ui_Qt${OBJ}: ui_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h librarian.h \
   block.h scope.h attribute.h assertion.h
 main_Qt${OBJ}: main_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h
+condedge${OBJ}: condedge.C condedge.h model.h symbol.h block_model.h \
+  block_nested.h block.h scope.h attribute.h treelog.h frame_model.h \
+  frame.h mathlib.h assertion.h librarian.h soil.h geometry.h
 rainergy${OBJ}: rainergy.C rainergy.h model.h symbol.h mathlib.h assertion.h \
   librarian.h block_model.h block_nested.h block.h scope.h attribute.h \
   treelog.h frame_model.h frame.h
