@@ -1,3 +1,14 @@
+2009-11-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil.C, soil.h (anisotropy_edge): New function.
+	(anisotropy_cell): Renamed from anisotropy.
+	* uzrect_Mollerup.C (anisotropy_factor):
+	* uz1d.h (K):
+	* tertiary_pipes.C (K_to_pipes):
+	* groundwater_pipe.C (K_to_pipes):
+	* biopore_matrix.C (find_matrix_sink):
+	* biopore_drain.C (update_matrix_sink): Update caller.
+
 2009-10-29  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* condedge.C, condedge.h: New component.

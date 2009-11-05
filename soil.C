@@ -116,6 +116,9 @@ struct Soil::Implementation
   const double dispersivity_transversal;
   const std::vector<double> border;
 
+  // Cache.
+  std::vector<double> anisotropy_edge;
+  
   bool has_attribute (const symbol name, Treelog& msg) const
   { 
     bool missing = false;
@@ -276,19 +279,10 @@ Soil::anisotropy_cell (size_t c) const
 { return horizon_[c]->anisotropy (); }
 
 double 
-Soil::anisotropy_edge (const Geometry& geo, size_t e) const
+Soil::anisotropy_edge (size_t e) const
 { 
-#if 1
-  daisy_notreached ();
-#else
-  if (geo.edge_is_internal (e))
-    {
-      const size_t from = geo.edge_from (e);
-      const size_t to = geo.edge_to (e);
-      
-    }
-  return horizon_[i]->anisotropy (); 
-#endif
+  daisy_assert (impl->anisotropy_edge.size () > e);
+  return impl->anisotropy_edge[e];
 }
 
 double 
@@ -701,6 +695,42 @@ Soil::initialize (const Block& block, Geometry& geo,
       Treelog::Open nest (block.msg (), tmp.str ());
       daisy_assert (horizon_[i] != NULL);
     }
+
+  // anisotropy_edge.
+  const size_t edge_size = geo.edge_size ();
+  for (size_t e = 0; e < edge_size; e++)
+    {
+      const int from = geo.edge_from (e);
+      const int to = geo.edge_to (e);
+  
+      // External edges.
+      if (!geo.cell_is_internal (from))
+        {
+          daisy_assert (geo.cell_is_internal (to));
+          impl->anisotropy_edge.push_back (anisotropy_cell (to));
+          continue;
+        }
+      if (!geo.cell_is_internal (to))
+        {
+          daisy_assert (geo.cell_is_internal (from));
+          impl->anisotropy_edge.push_back (anisotropy_cell (from));
+          continue;
+        }
+
+      // Internal edges.
+      const double sin_angle = geo.edge_sin_angle (e);
+      const double cos_angle = geo.edge_cos_angle (e);
+      const double a_from = anisotropy_cell (from);
+      const double a_to = anisotropy_cell (to);
+
+      // Arithmetic average.  Because we don't know.
+      const double factor = (a_from + a_to) / 2.0;
+
+      // Geometric average.  Because it is a geometric problem.
+      const double aniso = sqrt (sqr (sin_angle) + sqr (factor * cos_angle));
+      impl->anisotropy_edge.push_back (aniso);
+    }
+  daisy_assert (impl->anisotropy_edge.size () == edge_size);
 }
 
 Soil::~Soil ()

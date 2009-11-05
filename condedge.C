@@ -58,8 +58,8 @@ struct CondedgeArithmetic : public Condedge
 {
   // Simulation.
   double average (const Soil&, const Geometry&, size_t, 
-                  double, double K1, double, double, 
-                  double, double K2, double, double) const
+                  double K1, double, double, double, 
+                  double K2, double, double, double) const
   { return (K1 + K2) / 2.0; }
   // Create and Destroy.
   CondedgeArithmetic (const BlockModel&)
@@ -93,8 +93,8 @@ struct CondedgeHarmonic : public Condedge
 {
   // Simulation.
   double average (const Soil&, const Geometry&, size_t, 
-                  double, double K1, double, double, 
-                  double, double K2, double, double) const
+                  double K1, double, double, double, 
+                  double K2, double, double, double) const
   { return 2.0 * K1 * K2 / (K1 + K2); }
   // Create and Destroy.
   CondedgeHarmonic (const BlockModel&)
@@ -122,9 +122,10 @@ struct CondedgeGeometric : public Condedge
 {
   // Simulation.
   double average (const Soil&, const Geometry&, size_t, 
-                  double, double K1, double, double, 
-                  double, double K2, double, double) const
+                  double K1, double, double, double, 
+                  double K2, double, double, double) const
   { return std::sqrt (K1 * K2); }
+
   // Create and Destroy.
   CondedgeGeometric (const BlockModel&)
   { }
@@ -158,8 +159,8 @@ struct CondedgePressure : public Condedge
 
   // Simulation.
   double average (const Soil& soil, const Geometry& geo, const size_t edge,
-                  double h1, double K1, double h1_ice, double T1,
-                  double h2, double K2, double h2_ice, double T2) const
+                  double K1, double h1, double h1_ice, double T1,
+                  double K2, double h2, double h2_ice, double T2) const
   {
     const double K_harmonic = 2.0 * K1 * K2 / (K1 + K2);
 
@@ -303,7 +304,8 @@ static struct CondedgePressureSyntax : DeclareModel
   { return new CondedgePressure (al); }
   CondedgePressureSyntax ()
     : DeclareModel (Condedge::component, "pressure", "\
-Use harmonic average of the conductivity of the two cells.\n\
+Pressure dependent average of the two cells.\n\
+Use harmonic average of the conductivity of unsaturated cells.\n\
 This corresponds to using the average hydraulic resistence.  For\n\
 saturated cells, water may stream into unsaturated neigbor cells with\n\
 saturated conductivity.  For cells where pressure is above 'h_lim',\n\
@@ -313,8 +315,7 @@ corresponding to 'h_lim'.")
   void load_frame (Frame& frame) const
   { 
     frame.declare ("h_lim", "cm", Attribute::Const, "\
-Pressure limit allow fast downward flow.");
-    
+Lower pressure limit for fast downward flow.");    
   }
 } CondedgePressure_syntax;
 

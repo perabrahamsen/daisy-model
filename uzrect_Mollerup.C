@@ -21,6 +21,8 @@
 #define BOOST_UBLAS_NDEBUG
 #define NDEBUG
 
+// #define USE_CONDEDGE
+
 #include "uzrect.h"
 #include "geometry_rect.h"
 #include "soil.h"
@@ -37,7 +39,11 @@
 #include "librarian.h"
 #include "tertsmall.h"
 #include "anystate.h"
+#ifdef USE_CONDEDGE
+#include "condedge.h"
+#else
 #include "average.h"
+#endif
 #include "treelog.h"
 
 #include <boost/numeric/ublas/vector.hpp>
@@ -56,8 +62,13 @@ struct UZRectMollerup : public UZRect
 
   // Parameters.  
   const std::auto_ptr<Solver> solver;
+#ifdef USE_CONDEDGE
+  std::auto_ptr<const Condedge> K_average;  
+#else
   std::auto_ptr<const Average> K_average;  
   std::auto_ptr<const Average> K_average_horizontal;  
+#endif
+
   const int max_time_step_reductions;
   const int time_step_reduction;
   const int max_iterations; 
@@ -82,6 +93,13 @@ struct UZRectMollerup : public UZRect
   void output (Log&) const;
   
   // Internal functions.
+#ifdef USE_CONDEDGE
+  double find_K_edge (const Soil& soil, const Geometry& geo, 
+                      const size_t e,
+                      const ublas::vector<double>& h, 
+                      const ublas::vector<double>& h_ice, 
+                      const ublas::vector<double>& T) const;
+#endif
   bool converges (const ublas::vector<double>& previous,
 		  const ublas::vector<double>& current) const;
   static void Neumann (const size_t edge, const size_t cell, 
@@ -154,6 +172,7 @@ struct UZRectMollerup : public UZRect
   ~UZRectMollerup ();
 };
 
+#ifndef USE_CONDEDGE
 static double anisotropy_factor (const Geometry& geo, size_t edge, 
 				 const Soil& soil, size_t cell)
 {
@@ -163,6 +182,7 @@ static double anisotropy_factor (const Geometry& geo, size_t edge,
 
   return sqrt (sqr (sin_angle) + sqr (factor * cos_angle));
 }
+#endif
 
 void 
 UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
@@ -174,8 +194,9 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 
 {
   daisy_assert (K_average.get ());
+#ifndef USE_CONDEDGE
   daisy_assert (K_average_horizontal.get ());
-
+#endif
   const size_t edge_size = geo.edge_size (); // number of edges 
   const size_t cell_size = geo.cell_size (); // number of cells 
 
@@ -194,9 +215,14 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
   std::vector<double> S_matrix (cell_size, 0.0);  // matrix -> macro 
   std::vector<double> S_matrix_sum (cell_size, 0.0); // for large timestep   
   ublas::vector<double> T (cell_size); // temperature 
+#ifdef USE_CONDEDGE
+  ublas::vector<double> Kold (edge_size); // old hydraulic conductivity
+  ublas::vector<double> Ksum (edge_size); // Hansen hydraulic conductivity
+#else
   ublas::vector<double> K (cell_size); // hydraulic conductivity
   ublas::vector<double> Kold (cell_size); // old hydraulic conductivity
   ublas::vector<double> Ksum (cell_size); // Hansen hydraulic conductivity
+#endif
   ublas::vector<double> Kedge (edge_size); // edge (inter cell) conductivity
   ublas::vector<double> h_lysimeter (cell_size);
   std::vector<bool> active_lysimeter (cell_size);
@@ -299,14 +325,22 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 
       ublas::vector<double> h_conv;
 
-      
+      for (size_t cell = 0; cell != cell_size ; ++cell)
+        active_lysimeter[cell] = h (cell) > h_lysimeter (cell);
+
+#ifdef USE_CONDEDGE
+      for (size_t edge = 0; edge != edge_size ; ++edge)
+        {
+          Kold[edge] = find_K_edge (soil, geo, edge, h, h_ice, T);
+          Ksum [edge] = 0.0;
+        }
+#else
       for (size_t cell = 0; cell != cell_size ; ++cell)
         {
-          active_lysimeter[cell] = h (cell) > h_lysimeter (cell);
           Kold [cell] = soil.K (cell, h (cell), h_ice (cell), T (cell));
           Ksum [cell] = 0.0;
         }
-      
+#endif      
 
       std::vector<top_state> state (edge_above.size (), top_undecided);
       
@@ -324,14 +358,20 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
             msg.touch ();
 
 	  // Calculate conductivity - The Hansen method
+#ifndef USE_CONDEDGE
 	  for (size_t cell = 0; cell !=cell_size ; ++cell)
             {  
               Ksum[cell] += soil.K (cell, h (cell), h_ice (cell), T (cell));
               K[cell] = (Ksum[cell] / iterations_used + Kold[cell]) / 2.0;
 	    }
+#endif
 
 	  for (size_t e = 0; e < edge_size; e++)
 	    {
+#ifdef USE_CONDEDGE
+              Ksum[e] += find_K_edge (soil, geo, e, h, h_ice, T);
+              Kedge[e] = (Ksum[e] / iterations_used + Kold[e]) / 2.0;
+#else
 	      if (geo.edge_is_internal (e))
 		{
 		  const int from = geo.edge_from (e);
@@ -349,7 +389,10 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
                   const double K_ver = sin_edge * (*K_average)(K_from, K_to);
 
                   Kedge[e] = (K_hor + K_ver) / (sin_edge + cos_edge);
-		} 
+                } 
+              else              // External edge.
+                Kedge[e] = -42.42e42; // Posison value.
+#endif
 	    }
 
 	  //Initialize diffusive matrix
@@ -374,9 +417,19 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	  B = ublas::zero_vector<double> (cell_size);
 
 	  lowerboundary (geo, groundwater, active_lysimeter, h,
-			 K, dq, Dm_mat, Dm_vec, Gm, B, msg);
+#ifdef USE_CONDEDGE
+                         Kedge,
+#else
+			 K,
+#endif
+                         dq, Dm_mat, Dm_vec, Gm, B, msg);
 	  upperboundary (geo, soil, T, surface, state, remaining_water, h,
-			 K, dq, Dm_mat, Dm_vec, Gm, B, ddt, debug, msg, dt);
+#ifdef USE_CONDEDGE
+                         Kedge,
+#else
+			 K,
+#endif
+                         dq, Dm_mat, Dm_vec, Gm, B, ddt, debug, msg, dt);
           Darcy (geo, Kedge, h, dq); //for calculating drain fluxes 
 
 
@@ -500,9 +553,19 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	  ublas::vector<double> B (cell_size); // Neu bc 
 	  B = ublas::zero_vector<double> (cell_size);
 	  lowerboundary (geo, groundwater, active_lysimeter, h,
-			 K, dq, Dm_mat, Dm_vec, Gm, B, msg);
+#ifdef USE_CONDEDGE
+                         Kedge,
+#else
+			 K,
+#endif
+                         dq, Dm_mat, Dm_vec, Gm, B, msg);
 	  upperboundary (geo, soil, T, surface, state, remaining_water, h,
-			 K, dq, Dm_mat, Dm_vec, Gm, B, ddt, debug, msg, dt);
+#ifdef USE_CONDEDGE
+                         Kedge,
+#else
+			 K,
+#endif
+                         dq, Dm_mat, Dm_vec, Gm, B, ddt, debug, msg, dt);
           Darcy (geo, Kedge, h, dq);
 
           // update macropore flow components 
@@ -640,6 +703,34 @@ UZRectMollerup::output (Log& log) const
   output_variable ("Theta_error", log);
 }
 
+#ifdef USE_CONDEDGE
+double 
+UZRectMollerup::find_K_edge (const Soil& soil, const Geometry& geo, 
+                             const size_t e,
+                             const ublas::vector<double>& h, 
+                             const ublas::vector<double>& h_ice, 
+                             const ublas::vector<double>& T) const
+{
+  const double anisotropy = soil.anisotropy_edge (e);
+  const int from = geo.edge_from (e);
+  const int to = geo.edge_to (e);
+
+  // External edges.
+  if (!geo.cell_is_internal (from))
+    return soil.K (to, h (to), h_ice (to), T (to)) * anisotropy;
+
+  if (!geo.cell_is_internal (to))
+    return soil.K (from, h (from), h_ice (from), T (from)) * anisotropy;
+  
+  // Internal edges.
+  const double K_from = soil.K (from, h (from), h_ice (from), T (from));
+  const double K_to = soil.K (to, h (to), h_ice (to), T (to));
+  return  K_average->average (soil, geo, e, 
+                              K_from, h (from), h_ice (from), T (from),
+                              K_to, h (to), h_ice (to), T (to)) * anisotropy;
+}
+#endif
+
 bool
 UZRectMollerup::converges (const ublas::vector<double>& previous,
 			   const ublas::vector<double>& current) const
@@ -704,7 +795,11 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
 			       const Groundwater& groundwater,
 			       const std::vector<bool>& active_lysimeter,
 			       const ublas::vector<double>& h,
-			       const ublas::vector<double>& K,
+#ifdef USE_CONDEDGE
+			       const ublas::vector<double>& Kedge,
+#else
+			       const ublas::vector<double>& Kcell,
+#endif
 			       ublas::vector<double>& dq,
 			       ublas::banded_matrix<double>& Dm_mat, 
 			       ublas::vector<double>& Dm_vec, 
@@ -731,7 +826,11 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
           {
             const double sin_angle = geo.edge_sin_angle (edge);
             //const double flux = -in_sign * sin_angle * K (cell) * area; //old
-            const double flux = -in_sign * sin_angle * K (cell);
+#ifdef USE_CONDEDGE
+            const double flux = -in_sign * sin_angle * Kedge (edge);
+#else
+            const double flux = -in_sign * sin_angle * Kcell (cell);
+#endif
             Neumann (edge, cell, area, in_sign, flux, dq, B);
           }
           break;
@@ -745,11 +844,22 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
         
         case Groundwater::pressure:
           {
-            const double value = -K (cell) * geo.edge_area_per_length (edge);
+#ifdef USE_CONDEDGE
+            const double value 
+              = -Kedge (edge) * geo.edge_area_per_length (edge);
+#else
+            const double value 
+              = -Kcell (cell) * geo.edge_area_per_length (edge);
+#endif
             const double pressure =  groundwater.table () - geo.zplus (cell);
             
             Dirichlet (edge, cell, area, in_sign, sin_angle, 
-                       K (cell), h (cell),
+#ifdef USE_CONDEDGE
+                       Kedge (edge), 
+#else
+                       Kcell (cell), 
+#endif
+                       h (cell),
                        value, pressure,
                        dq, Dm_mat, Dm_vec, Gm);
           }
@@ -763,10 +873,22 @@ UZRectMollerup::lowerboundary (const GeometryRect& geo,
                 //const double flux = -in_sign * sin_angle * K (cell);
                 //Neumann (edge, cell, area, in_sign, flux, dq, B);
                 //Dirichlet - better
-                const double value = -K (cell) * geo.edge_area_per_length (edge);
+#ifdef USE_CONDEDGE
+                const double value 
+                  = -Kedge (edge) * geo.edge_area_per_length (edge);
+#else
+                const double value 
+                  = -Kcell (cell) * geo.edge_area_per_length (edge);
+#endif
+
                 const double pressure =  0.0;
                 Dirichlet (edge, cell, area, in_sign, sin_angle,
-                           K (cell), h (cell),
+#ifdef USE_CONDEDGE
+                           Kedge (edge), 
+#else
+                           Kcell (cell), 
+#endif
+                           h (cell),
                            value, pressure, dq, Dm_mat, Dm_vec, Gm);
               }
             else
@@ -794,7 +916,11 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
                                std::vector<top_state>& state,
 			       const ublas::vector<double>& remaining_water,
 			       const ublas::vector<double>& h,
-			       const ublas::vector<double>& K,
+#ifdef USE_CONDEDGE
+			       const ublas::vector<double>& Kedge,
+#else
+			       const ublas::vector<double>& Kcell,
+#endif
 			       ublas::vector<double>& dq,
 			       ublas::banded_matrix<double>& Dm_mat, 
 			       ublas::vector<double>& Dm_vec, 
@@ -828,9 +954,20 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
 	  break;
 	case Surface::forced_pressure:
           {
-            const double value = -K (cell) * geo.edge_area_per_length (edge);
+#ifdef USE_CONDEDGE
+            const double value 
+              = -Kedge (edge) * geo.edge_area_per_length (edge);
+#else
+            const double value 
+              = -Kcell (cell) * geo.edge_area_per_length (edge);
+#endif
             const double pressure = surface.h_top (geo, edge);
-            Dirichlet (edge, cell, area, in_sign, sin_angle, K (cell),
+            Dirichlet (edge, cell, area, in_sign, sin_angle, 
+#ifdef USE_CONDEDGE
+                       Kedge (edge), 
+#else
+                       Kcell (cell), 
+#endif
                        h (cell), value, pressure, dq, Dm_mat, Dm_vec, Gm);
           }
 	  break;
@@ -840,7 +977,11 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
 
             // We pretend that the surface is particlaly saturated.
             const double K_sat = soil.K (cell, 0.0, 0.0, T (cell));
-            const double K_cell = K (cell);
+#ifdef USE_CONDEDGE
+            const double K_cell = Kedge (edge);
+#else
+            const double K_cell = Kcell (cell);
+#endif
             const double K_edge = 0.5 * (K_cell + K_sat);
             
             const double dz = geo.edge_length (edge);
@@ -864,8 +1005,13 @@ UZRectMollerup::upperboundary (const GeometryRect& geo,
                     std::ostringstream tmp;
                     tmp << "q_in_pot = " << q_in_pot << ", q_avail = " 
                         << q_in_avail << ", h_top = " << h_top 
-                        << ", h (cell) = " << h (cell) << " K (cell) = " 
-                        << K (cell) << ", K_sat = " << K_sat << ", K_edge = "
+                        << ", h (cell) = " << h (cell) 
+#ifdef USE_CONDEDGE
+                        << " K (edge) = " << Kedge (edge) 
+#else
+                        << " K (cell) = " << Kcell (cell) 
+#endif
+                        << ", K_sat = " << K_sat << ", K_edge = "
                         << K_edge <<", dz = " << dz << ", ddt = " << ddt
                         << ", is_flux = " << is_flux << "\n";
                     msg.message (tmp.str ());
@@ -1105,11 +1251,15 @@ UZRectMollerup::has_macropores (const bool)
 UZRectMollerup::UZRectMollerup (const BlockModel& al)
   : UZRect (al),
     solver (Librarian::build_item<Solver> (al, "solver")),
+#ifdef USE_CONDEDGE
+    K_average (Librarian::build_item<Condedge> (al, "K_average")),
+#else
     K_average (Librarian::build_item<Average> (al, "K_average")),
     K_average_horizontal 
     /**/ (al.check ("K_average_horizontal")
           ? Librarian::build_item<Average> (al, "K_average_horizontal")
           : Librarian::build_item<Average> (al, "K_average")),
+#endif
     max_time_step_reductions (al.integer ("max_time_step_reductions")),
     time_step_reduction (al.integer ("time_step_reduction")),
     max_iterations (al.integer ("max_iterations")),
@@ -1142,14 +1292,21 @@ See Mollerup 2007 for details.")
                        Attribute::Const, Attribute::Singleton, "\
 Model used for solving matrix equation system.");
     frame.set ("solver", "cxsparse");
+#ifdef USE_CONDEDGE
+    frame.declare_object ("K_average", Condedge::component,
+                          Attribute::Const, Attribute::Singleton, "\
+Model for calculating average vertical K between cells.");
+    frame.set ("K_average", "arithmetic");
+#else
     frame.declare_object ("K_average", Average::component,
                        Attribute::Const, Attribute::Singleton, "\
-Model for calculating average vertical K between cells.");
+ Model for calculating average vertical K between cells.");
     frame.set ("K_average", "arithmetic");
     frame.declare_object ("K_average_horizontal", Average::component,
                           Attribute::OptionalConst, Attribute::Singleton, "\
 Model for calculating average horizontal K between cells.\n        \
 By default, the same as 'K_average'.");
+#endif
     frame.declare_integer ("max_time_step_reductions", Attribute::Const, "\
 Number of times we may reduce the time step before giving up");
     frame.set ("max_time_step_reductions", 4);
