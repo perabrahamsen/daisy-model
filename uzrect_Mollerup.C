@@ -362,7 +362,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	  for (size_t cell = 0; cell !=cell_size ; ++cell)
             {  
               Ksum[cell] += soil.K (cell, h (cell), h_ice (cell), T (cell));
-              K[cell] = (Ksum[cell] / iterations_used + Kold[cell]) / 2.0;
+              K[cell] = (Ksum[cell] / (iterations_used + 0.0) + Kold[cell]) / 2.0;
 	    }
 #endif
 
@@ -370,7 +370,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	    {
 #ifdef USE_CONDEDGE
               Ksum[e] += find_K_edge (soil, geo, e, h, h_ice, T);
-              Kedge[e] = (Ksum[e] / iterations_used + Kold[e]) / 2.0;
+              Kedge[e] = (Ksum[e] / (iterations_used  + 0.0)+ Kold[e]) / 2.0;
 #else
 	      if (geo.edge_is_internal (e))
 		{
