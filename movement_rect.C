@@ -91,6 +91,7 @@ struct MovementRect : public MovementSolute
   void tick (const Soil& soil, SoilWater& soil_water, const SoilHeat& soil_heat,
              Surface& surface, Groundwater& groundwater, const Time&,
              const Weather&, double dt, Treelog& msg);
+  void output (Log& log) const;
 
   // Create.
   void initialize_derived (const Soil&, const Groundwater&, 
@@ -289,11 +290,19 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
 }
 
 void 
+MovementRect::output (Log& log) const
+{ 
+  output_solute (log);
+  output_list (matrix_water, "matrix_water", log, UZRect::component);
+  // output_submodule (*geo, "Geometry", log);
+}
+
+void 
 MovementRect::initialize_derived (const Soil&, const Groundwater&, 
                                   const bool has_macropores, Treelog&)
 {
   for (size_t i = 0; i < matrix_water.size (); i++)
-    matrix_water[i]->has_macropores (has_macropores);
+    matrix_water[i]->initialize (geometry (), has_macropores);
 }
 
 MovementRect::MovementRect (const BlockModel& al)

@@ -45,7 +45,7 @@ struct UZRectConst : public UZRect
   
  
   // Create and Destroy.
-  void has_macropores (bool);
+  void initialize (const Geometry& geo, const bool has_macropores);
   UZRectConst (const BlockModel& al);
   ~UZRectConst ();
 };
@@ -77,9 +77,10 @@ void
 UZRectConst::output (Log&) const 
 { }
 
+
 void 
-UZRectConst::has_macropores (const bool)
-{ /* Ignore for now. */ }
+UZRectConst::initialize (const Geometry&, const bool)
+{ }
 
 UZRectConst::UZRectConst (const BlockModel& al)
   : UZRect (al),

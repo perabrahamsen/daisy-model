@@ -103,7 +103,10 @@ public:
 		     const double dt, Treelog&) const = 0;
   virtual void ridge (Surface&, const Soil&, const SoilWater&, 
                       const FrameSubmodel&) = 0;
-  void output (Log&) const;
+protected:
+  void output_base (Log&) const;
+public:
+  void output (Log&) const = 0;
 
   // Heat.
   virtual double surface_snow_T (const Soil&, const SoilWater&, const SoilHeat&,

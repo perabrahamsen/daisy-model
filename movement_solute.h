@@ -84,6 +84,8 @@ private:
   void element (const Soil& soil, const SoilWater& soil_water,
                 DOE& element, 
 		double diffusion_coefficient, double dt, Treelog& msg);
+protected:
+  void output_solute (Log&) const;
 
   // Create.
 protected:

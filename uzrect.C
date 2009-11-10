@@ -44,7 +44,7 @@ UZRect::obey_surface ()
 
 
 UZRect::UZRect (const BlockModel& al)
-  : name (al.type_name ())
+  : ModelFramed (al)
 { }
 
 UZRect::~UZRect ()

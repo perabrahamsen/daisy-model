@@ -1,4 +1,3 @@
-
 // uzrichard.C --- Using Richard's Equation to calculate water flow.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen

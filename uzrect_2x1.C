@@ -57,6 +57,7 @@ struct UZRect2x1 : public UZRect
 	     const Soil&, SoilWater&, 
              const SoilHeat&, const Surface&, const Groundwater&, 
              Tertsmall& tertiary, double dt, Treelog&);
+  void output (Log&) const;
 
   // Internal function.
   void water_column (const GeometryRect&, const Soil& soil,
@@ -75,7 +76,7 @@ struct UZRect2x1 : public UZRect
                      double dt, Treelog& msg);
 
   // Create and Destroy.
-  void has_macropores (bool);
+  void initialize (const Geometry& geo, const bool has_macropores);
   UZRect2x1 (const BlockModel& al);
   ~UZRect2x1 ();
 };
@@ -149,6 +150,10 @@ UZRect2x1::summarize (Treelog& msg) const
   if (found)
     msg.message ("See 'daisy.log' for details.");
 }
+
+void 
+UZRect2x1::output (Log&) const
+{ }
 
 void 
 UZRect2x1::tick (const GeometryRect& geo, std::vector<size_t>&, 
@@ -346,10 +351,10 @@ UZRect2x1::water_column (const GeometryRect& geo, const Soil& soil,
 }
 
 void 
-UZRect2x1::has_macropores (const bool has_them)
+UZRect2x1::initialize (const Geometry&, const bool has_macropores)
 {
   for (size_t i = 0; i < vertical.size (); i++)
-    vertical[i]->has_macropores (has_them);
+    vertical[i]->has_macropores (has_macropores);
 }
 
 UZRect2x1::UZRect2x1 (const BlockModel& al)

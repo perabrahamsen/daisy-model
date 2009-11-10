@@ -127,7 +127,7 @@ Movement::clear ()
 }
 
 void 
-Movement::output (Log& log) const
+Movement::output_base (Log& log) const
 { 
   output_variable (water_failure_level, log);
   output_variable (solute_failure_level, log);

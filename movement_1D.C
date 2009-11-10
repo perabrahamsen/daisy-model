@@ -112,6 +112,7 @@ struct Movement1D : public MovementSolute
              Surface& surface, Groundwater& groundwater,
              const Time& time, const Weather& weather, double dt, 
              Treelog& msg);
+  void output (Log&) const;
 
   // Create.
   void initialize_derived (const Soil& soil, const Groundwater& groundwater,
@@ -440,6 +441,14 @@ Movement1D::tick (const Soil& soil, SoilWater& soil_water,
 }
 
 void 
+Movement1D::output (Log& log) const
+{ 
+  output_solute (log);
+  // output_list (matrix_water, "matrix_water", log, UZmodel::component);
+  // output_submodule (*geo, "Geometry", log);
+}
+
+void 
 Movement1D::initialize_derived (const Soil& soil,
                                 const Groundwater& groundwater,
                                 bool has_macropores, Treelog& msg)
@@ -478,7 +487,7 @@ One dimensional movement.")
     frame.set ("Tertiary", "old");
     frame.set_strings ("matrix_solute", "Hansen", "convection", "none");
 
-    frame.declare_submodule ("Geometry", Attribute::State,
+    frame.declare_submodule ("Geometry", Attribute::Const,
                          "Discretization of the soil.",
                          Geometry1D::load_syntax);
     frame.declare_object ("matrix_water", UZmodel::component, 

@@ -88,7 +88,7 @@ struct GroundwaterAquitard : public Groundwater
         // Multiplied with 2 because it is a boundary cell...
         const double Dz_i = 2 * geo.edge_length (edge);  
     
-        const double K_i = soil_water.K (cell);   //Conductivity in cell
+        const double K_i = soil_water.K_cell (cell);   //Conductivity in cell
         const double h_i = soil_water.h (cell);   //Pressure in cell
         
 

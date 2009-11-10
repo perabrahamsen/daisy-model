@@ -313,11 +313,11 @@ SoilWater::tick_after (const Geometry& geo,
   TREELOG_SUBMODEL (msg, "SoilWater");
 
   // We need old K for primary/secondary flux division.
-  std::vector<double> K_old = K_;
+  std::vector<double> K_old = K_cell_;
 
   // Update cells.
   const size_t cell_size = geo.cell_size ();
-  daisy_assert (K_.size () == cell_size);
+  daisy_assert (K_cell_.size () == cell_size);
   daisy_assert (h_.size () == cell_size);
   daisy_assert (h_ice_.size () == cell_size);
   daisy_assert (K_old.size () == cell_size);
@@ -327,7 +327,7 @@ SoilWater::tick_after (const Geometry& geo,
 
   for (size_t c = 0; c < cell_size; c++)
     {
-      K_[c] = soil.K (c, h_[c], h_ice_[c], soil_heat.T (c));
+      K_cell_[c] = soil.K (c, h_[c], h_ice_[c], soil_heat.T (c));
       
       const double h_lim = soil.h_secondary (c);
       if (h_lim >= 0.0 || h_[c] <= h_lim)
@@ -348,7 +348,7 @@ SoilWater::tick_after (const Geometry& geo,
   // Initialize
   if (initial)
     {
-      K_old = K_;
+      K_old = K_cell_;
       Theta_primary_old_ = Theta_primary_;
       Theta_secondary_old_ = Theta_secondary_;
     }
@@ -381,7 +381,7 @@ SoilWater::tick_after (const Geometry& geo,
           if (iszero (Theta_secondary_old (to)) || 
               iszero (Theta_secondary (to)))
             continue;
-          K_edge += 0.5 * (K_old[to] + K (to));
+          K_edge += 0.5 * (K_old[to] + K_cell (to));
           const double h_lim = soil.h_secondary (to);
           K_lim += soil.K (to, h_lim, h_ice (to), soil_heat.T (to));
         }
@@ -394,7 +394,7 @@ SoilWater::tick_after (const Geometry& geo,
           if (iszero (Theta_secondary_old (from)) || 
               iszero (Theta_secondary (from)))
             continue;
-          K_edge += 0.5 * (K_old[from] + K (from));
+          K_edge += 0.5 * (K_old[from] + K_cell (from));
           const double h_lim = soil.h_secondary (from);
           K_lim += soil.K (from, h_lim, h_ice (from), soil_heat.T (from));
         }
@@ -541,7 +541,7 @@ SoilWater::output (Log& log) const
   output_value (h_ice_, "h_ice", log);
   output_value (q_matrix_, "q", log);
   output_value (q_tertiary_, "q_p", log);
-  output_value (K_, "K", log);
+  output_value (K_cell_, "K_cell", log);
 }
 
 double
@@ -798,7 +798,7 @@ SoilWater::initialize (const FrameSubmodel& al, const Geometry& geo,
   // Update conductivity and primary/secondary water.
   Theta_primary_.insert (Theta_primary_.begin (), cell_size, -42.42e42);
   Theta_secondary_.insert (Theta_secondary_.begin (), cell_size, -42.42e42);
-  K_.insert (K_.begin (), cell_size, 0.0);
+  K_cell_.insert (K_cell_.begin (), cell_size, 0.0);
   tick_after (geo, soil,  soil_heat, true, msg);
 
   // We just assume no changes.

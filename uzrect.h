@@ -21,10 +21,11 @@
 #ifndef UZRect_H
 #define UZRect_H
 
-#include "model.h"
+#include "model_framed.h"
 #include "symbol.h"
 #include <vector>
 
+struct Geometry;
 struct GeometryRect;
 struct Soil;
 struct SoilWater;
@@ -35,11 +36,10 @@ struct Treelog;
 class BlockModel;
 class Tertsmall;
 
-class UZRect : public Model
+class UZRect : public ModelFramed
 {
   // Content.
 public: 
-  const symbol name;
   static const char *const component;
   symbol library_id () const;
 
@@ -53,7 +53,7 @@ public:
 
   // Create and Destroy.
 public:
-  virtual void has_macropores (bool) = 0;
+  virtual void initialize (const Geometry& geo, const bool has_macropores) = 0;
 private:
   UZRect ();
 protected:

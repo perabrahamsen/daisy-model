@@ -32,6 +32,7 @@
 #include "treelog.h"
 #include "assertion.h"
 #include "mathlib.h"
+#include "log.h"
 #include <sstream>
 
 void 
@@ -686,6 +687,13 @@ MovementSolute::element (const Soil& soil, const SoilWater& soil_water,
   throw "Matrix element transport failed";
 }
 
+void 
+MovementSolute::output_solute (Log& log) const
+{ 
+  output_base (log);
+  // output_list (matrix_solute, "matrix_solute", log, Transport::component);
+}
+
 bool
 MovementSolute::check_derived (Treelog& msg) const
 {
@@ -723,7 +731,7 @@ Shared paramaters for handling solutes.")
   void load_frame (Frame& frame) const
   {
     frame.declare_object ("matrix_solute", Transport::component, 
-                       Attribute::State, Attribute::Variable,
+                       Attribute::Const, Attribute::Variable,
                        "Matrix solute transport models.\n\
 Each model will be tried in turn, until one succeeds.\n\
 If none succeeds, the simulation ends.");

@@ -70,6 +70,7 @@ Geometry::cell_name (int n) const
     case cell_back:
       return "back";
     default:
+      daisy_assert (cell_is_internal (n));
       std::ostringstream tmp;
       switch (dimensions ())
         {

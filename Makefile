@@ -1041,8 +1041,9 @@ transport${OBJ}: transport.C transport.h model.h symbol.h chemical.h \
   model_framed.h model_logable.h doe.h geometry.h attribute.h \
   adsorption.h model_derived.h block_model.h block_nested.h block.h \
   scope.h treelog.h frame_model.h frame.h librarian.h soil_water.h soil.h
-uzrect${OBJ}: uzrect.C uzrect.h model.h symbol.h block_model.h block_nested.h \
-  block.h scope.h attribute.h treelog.h frame_model.h frame.h librarian.h
+uzrect${OBJ}: uzrect.C uzrect.h model_framed.h model_logable.h model.h \
+  symbol.h block_model.h block_nested.h block.h scope.h attribute.h \
+  treelog.h frame_model.h frame.h librarian.h
 bound${OBJ}: bound.C bound.h model.h symbol.h block_model.h block_nested.h \
   block.h scope.h attribute.h treelog.h frame_model.h frame.h mathlib.h \
   assertion.h librarian.h
@@ -1374,7 +1375,8 @@ movement_solute${OBJ}: movement_solute.C movement_solute.h movement.h \
   model_derived.h model_logable.h model.h symbol.h memutils.h geometry.h \
   attribute.h soil_water.h transport.h chemical.h model_framed.h \
   adsorption.h tertiary.h frame.h scope.h librarian.h block_model.h \
-  block_nested.h block.h treelog.h frame_model.h assertion.h mathlib.h
+  block_nested.h block.h treelog.h frame_model.h assertion.h mathlib.h \
+  log.h time.h border.h
 scope_exchange${OBJ}: scope_exchange.C scope_exchange.h model.h symbol.h \
   scope_model.h scope.h attribute.h memutils.h block_model.h \
   block_nested.h block.h treelog.h frame_model.h frame.h assertion.h \
@@ -1822,10 +1824,10 @@ rubiscoNdist_expr${OBJ}: rubiscoNdist_expr.C rubiscoNdist.h model_logable.h \
   model.h symbol.h mathlib.h assertion.h block_model.h block_nested.h \
   block.h scope.h attribute.h treelog.h frame_model.h frame.h check.h \
   librarian.h number.h scope_exchange.h scope_model.h memutils.h
-uzrect_const${OBJ}: uzrect_const.C uzrect.h model.h symbol.h geometry_rect.h \
-  geometry_vert.h geometry.h attribute.h soil_water.h block_model.h \
-  block_nested.h block.h scope.h treelog.h frame_model.h frame.h \
-  mathlib.h assertion.h librarian.h
+uzrect_const${OBJ}: uzrect_const.C uzrect.h model_framed.h model_logable.h \
+  model.h symbol.h geometry_rect.h geometry_vert.h geometry.h attribute.h \
+  soil_water.h block_model.h block_nested.h block.h scope.h treelog.h \
+  frame_model.h frame.h mathlib.h assertion.h librarian.h
 photo_FCC3${OBJ}: photo_FCC3.C photo_Farquhar.h photo.h model_derived.h \
   model_logable.h model.h symbol.h block_model.h block_nested.h block.h \
   scope.h attribute.h treelog.h frame_model.h frame.h rubiscoNdist.h \
@@ -1857,13 +1859,13 @@ transport_none${OBJ}: transport_none.C transport.h model.h symbol.h \
   geometry.h attribute.h soil.h adsorption.h model_derived.h \
   model_logable.h submodeler.h block_submodel.h block_nested.h block.h \
   scope.h treelog.h frame_submodel.h frame.h memutils.h librarian.h
-uzrect_Mollerup${OBJ}: uzrect_Mollerup.C uzrect.h model.h symbol.h \
-  geometry_rect.h geometry_vert.h geometry.h attribute.h soil.h \
-  soil_water.h soil_heat.h groundwater.h model_derived.h model_logable.h \
-  surface.h uzmodel.h solver.h log.h time.h border.h model_framed.h \
+uzrect_Mollerup${OBJ}: uzrect_Mollerup.C uzrect.h model_framed.h \
+  model_logable.h model.h symbol.h geometry_rect.h geometry_vert.h \
+  geometry.h attribute.h soil.h soil_water.h soil_heat.h groundwater.h \
+  model_derived.h surface.h uzmodel.h solver.h log.h time.h border.h \
   frame.h scope.h block_model.h block_nested.h block.h treelog.h \
   frame_model.h mathlib.h assertion.h librarian.h tertsmall.h anystate.h \
-  average.h
+  condedge.h
 groundwater_flux${OBJ}: groundwater_flux.C groundwater.h model_derived.h \
   model_logable.h model.h symbol.h block_model.h block_nested.h block.h \
   scope.h attribute.h treelog.h frame_model.h frame.h check.h librarian.h
@@ -1874,11 +1876,12 @@ rubiscoNdist_uniform${OBJ}: rubiscoNdist_uniform.C rubiscoNdist.h \
   model_logable.h model.h symbol.h mathlib.h assertion.h check.h \
   block_model.h block_nested.h block.h scope.h attribute.h treelog.h \
   frame_model.h frame.h librarian.h
-uzrect_2x1${OBJ}: uzrect_2x1.C uzrect.h model.h symbol.h uzmodel.h uz1d.h \
-  geometry_rect.h geometry_vert.h geometry.h attribute.h soil.h \
-  soil_water.h soil_heat.h groundwater.h model_derived.h model_logable.h \
-  surface.h frame.h scope.h mathlib.h assertion.h memutils.h librarian.h \
-  treelog.h block_model.h block_nested.h block.h frame_model.h
+uzrect_2x1${OBJ}: uzrect_2x1.C uzrect.h model_framed.h model_logable.h \
+  model.h symbol.h uzmodel.h uz1d.h geometry_rect.h geometry_vert.h \
+  geometry.h attribute.h soil.h soil_water.h soil_heat.h groundwater.h \
+  model_derived.h surface.h frame.h scope.h mathlib.h assertion.h \
+  memutils.h librarian.h treelog.h block_model.h block_nested.h block.h \
+  frame_model.h
 select_flow${OBJ}: select_flow.C select_value.h select.h destination.h \
   symbol.h model.h units.h memutils.h volume.h attribute.h block_model.h \
   block_nested.h block.h scope.h treelog.h frame_model.h frame.h border.h \

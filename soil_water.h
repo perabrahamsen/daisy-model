@@ -69,7 +69,8 @@ private:
   std::vector<double> q_primary_;
   std::vector<double> q_secondary_;
   std::vector<double> q_tertiary_;
-  std::vector<double> K_;
+  std::vector<double> K_cell_;
+  std::vector<double> K_edge_;
 
   // Sink.
 public:
@@ -123,8 +124,8 @@ public:
   double velocity_cell_primary (const Geometry& geo, size_t i) const;
   double velocity_cell_secondary (const Geometry& geo, size_t i) const;
   double Theta_ice (const Soil&, size_t i, double h) const;
-  double K (size_t i) const
-  { return K_[i]; }
+  double K_cell (size_t i) const
+  { return K_cell_[i]; }
 
   // Modify.
 public:
