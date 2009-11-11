@@ -54,6 +54,7 @@ struct BioporeMatrix : public Biopore
   const int max_iterations;     // Convergence.
   const double max_absolute_difference; // [cm]
   const double max_relative_difference; // []
+  const bool allow_upward_flow;
 
   // State.
   std::vector<double> h_bottom; // [cm]
@@ -76,6 +77,7 @@ struct BioporeMatrix : public Biopore
   // Log variable.
   int iterations;
   std::vector<double> h3_soil;
+  std::vector<double> z3_lowest;
 
   // Utilities.
   /* const */ double dy;                    // [cm]
@@ -109,7 +111,7 @@ struct BioporeMatrix : public Biopore
                                 const Soil& soil, bool active, 
                                 const double h_barrier, double M_c,
                                 double pressure_limit, 
-                                double K_xx, double h3_bottom, double h) const;
+                                double K_xx, double z3_lowest, double h3_bottom, double h) const;
   double matrix_biopore_drain (size_t c, const Geometry& geo, 
                                const Soil& soil, bool active, 
                                double K_xx, double h) const
@@ -299,6 +301,7 @@ BioporeMatrix::matrix_biopore_matrix (size_t c, const Geometry& geo,
                                       const double h_barrier, double M_c,
                                       const double pressure_limit,
                                       const double K_xx, 
+                                      const double z3_lowest,
                                       const double h3_bottom, 
                                       const double h) const
 {
@@ -356,7 +359,7 @@ BioporeMatrix::matrix_biopore_matrix (size_t c, const Geometry& geo,
         = (wall_top - low_point) / (cell_top - cell_bottom);
       S = - wall_fraction * biopore_to_matrix (R_wall, M_c, r_c, h, h3_cell);
     }
-  else if (active && h>h3_cell + h_barrier)
+  else if ((allow_upward_flow || cell_z > z3_lowest) && active && h>h3_cell + h_barrier)
     {
       // The largest pressure gradient between the domains are
       // pressure_limit, above that we claim air will disrupt the suction.
@@ -394,7 +397,7 @@ BioporeMatrix::find_matrix_sink (const Geometry& geo,
       const size_t col = column[c];
       const double M_c = density_column[col]; // [cm^-2]
       S3[c] = matrix_biopore_matrix (c, geo, soil, active[c], h_barrier, M_c,
-                                     pressure_limit, K_xx, h3_bottom[col], h[c]);
+                                     pressure_limit, K_xx, z3_lowest[col], h3_bottom[col], h[c]);
     }
 }
 
@@ -427,6 +430,21 @@ BioporeMatrix::update_matrix_sink (const Geometry& geo,
       const size_t col = column[c];
       const double soil_cell = geo.cell_z (c) + h[c];
       h3_soil[col] = bound (h3_soil[col], soil_cell - height_end, h_capacity);
+    }
+  
+  // Find lowest unsaturated cell in each column.
+  daisy_assert (z3_lowest.size () == col_size);
+  std::fill (z3_lowest.begin (), z3_lowest.end (), 0.0);
+  for (size_t c = 0; c < cell_size; c++)
+    {
+      if (h[c] > -0.01)
+        // Saturated.
+        continue;
+
+      const size_t col = column[c];
+      const double z = geo.cell_z (c);
+      if (z < z3_lowest[col])
+        z3_lowest[col] = z;
     }
   
   // Initial guess and interval.
@@ -835,6 +853,7 @@ BioporeMatrix::output (Log& log) const
   output_lazy (total_water (), "water", log);
   output_variable (iterations, log);
   output_variable (h3_soil, log);
+  output_variable (z3_lowest, log);
 }
 
 bool 
@@ -889,6 +908,10 @@ BioporeMatrix::initialize (const Units& units,
   // h3_soil.
   h3_soil.insert (h3_soil.end (), column_size, 0.0);
   daisy_assert (h3_soil.size () == column_size);
+
+  // z3_lowest.
+  z3_lowest.insert (z3_lowest.end (), column_size, 0.0);
+  daisy_assert (z3_lowest.size () == column_size);
 
   // dy.
   dy = geo.back () - geo.front ();
@@ -952,6 +975,7 @@ BioporeMatrix::BioporeMatrix (const BlockModel& al)
     max_iterations (al.integer ("max_iterations")),
     max_absolute_difference (al.number ("max_absolute_difference")),
     max_relative_difference (al.number ("max_relative_difference")),
+    allow_upward_flow (al.flag ("allow_upward_flow")),
     h_bottom (al.check ("h_bottom") 
               ? al.number_sequence ("h_bottom") 
               : std::vector<double> ()),
@@ -996,6 +1020,9 @@ Chemical concentration in biopore intervals.", load_solute);
                 "Number of iterations used for finding a solution.");
     frame.declare ("h3_soil", "cm", Attribute::LogOnly, Attribute::Variable,
                 "Pressure suggested by the soil for each interval.");
+    frame.declare ("z3_lowest", "cm", Attribute::LogOnly, Attribute::Variable,
+                   "Depth of lowest unsaturated cell in each interval.\n\
+Water may not enter the macropore below this depth.");
     frame.declare_integer ("max_iterations", Attribute::Const, "\
 Maximum number of iterations when seeking convergence.");
     frame.set ("max_iterations", 50);
@@ -1005,6 +1032,10 @@ Maximum absolute difference in biopore content for convergence.");
     frame.declare ("max_relative_difference", Attribute::None (), Attribute::Const, "\
 Maximum relative difference in biopore content for convergence.");
     frame.set ("max_relative_difference", 0.001);
+    frame.declare_boolean ("allow_upward_flow", Attribute::Const, "\
+Allow water to enter from saturated soil at the bottom of the biopore\n\
+and leave in unsaturated soil above.");
+    frame.set ("allow_upward_flow", false);
   }
 } BioporeMatrix_syntax;
 
