@@ -60,6 +60,7 @@ struct UZRectMollerup : public UZRect
   const int max_time_step_reductions;
   const int time_step_reduction;
   const int max_iterations; 
+  const int max_iterations_timestep_reduction_factor;
   const int max_number_of_small_time_steps;
   const int msg_number_of_small_time_steps;
   const double max_absolute_difference;
@@ -86,6 +87,7 @@ struct UZRectMollerup : public UZRect
                       const size_t e,
                       const ublas::vector<double>& h, 
                       const ublas::vector<double>& h_ice, 
+                      const ublas::vector<double>& h_old, 
                       const ublas::vector<double>& T) const;
   bool converges (const ublas::vector<double>& previous,
 		  const ublas::vector<double>& current) const;
@@ -298,13 +300,16 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 
       for (size_t edge = 0; edge != edge_size ; ++edge)
         {
-          Kold[edge] = find_K_edge (soil, geo, edge, h, h_ice, T);
+          Kold[edge] = find_K_edge (soil, geo, edge, h, h_ice, h_previous, T);
           Ksum [edge] = 0.0;
         }
 
       std::vector<top_state> state (edge_above.size (), top_undecided);
       
-      
+      // We try harder with smaller timesteps.
+      const int max_loop_iter 
+        = max_iterations * (number_of_time_step_reductions 
+                            * max_iterations_timestep_reduction_factor + 1);
       do // Start iteration loop
 	{
 	  h_conv = h;
@@ -320,7 +325,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
 	  // Calculate conductivity - The Hansen method
 	  for (size_t e = 0; e < edge_size; e++)
 	    {
-              Ksum[e] += find_K_edge (soil, geo, e, h, h_ice, T);
+              Ksum[e] += find_K_edge (soil, geo, e, h, h_ice, h_previous, T);
               Kedge[e] = (Ksum[e] / (iterations_used  + 0.0)+ Kold[e]) / 2.0;
 	    }
 
@@ -410,7 +415,7 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
               tmp << "Could not solve equation sysmem: " << error;
               msg.warning (tmp.str ());
               // Try smaller timestep.
-              iterations_used = max_iterations + 100;
+              iterations_used = max_loop_iter + 100;
               break;
           }
 
@@ -436,16 +441,16 @@ UZRectMollerup::tick (const GeometryRect& geo, std::vector<size_t>& drain_cell,
                   tmp << "Pressure potential out of realistic range, h[" 
                       << c << "] = " << h (c);
                   msg.debug (tmp.str ());
-                  iterations_used = max_iterations + 100;
+                  iterations_used = max_loop_iter + 100;
                   break;
                 } 
             }
         }
 
-      while (!converges (h_conv, h) && iterations_used <= max_iterations);
+      while (!converges (h_conv, h) && iterations_used <= max_loop_iter);
       
 
-      if (iterations_used > max_iterations)
+      if (iterations_used > max_loop_iter)
 	{
           number_of_time_step_reductions++;
           
@@ -624,6 +629,7 @@ UZRectMollerup::find_K_edge (const Soil& soil, const Geometry& geo,
                              const size_t e,
                              const ublas::vector<double>& h, 
                              const ublas::vector<double>& h_ice, 
+                             const ublas::vector<double>& h_old, 
                              const ublas::vector<double>& T) const
 {
   const double anisotropy = soil.anisotropy_edge (e);
@@ -641,8 +647,8 @@ UZRectMollerup::find_K_edge (const Soil& soil, const Geometry& geo,
   const double K_from = soil.K (from, h (from), h_ice (from), T (from));
   const double K_to = soil.K (to, h (to), h_ice (to), T (to));
   return  K_average->average (soil, geo, e, 
-                              K_from, h (from), h_ice (from), T (from),
-                              K_to, h (to), h_ice (to), T (to)) * anisotropy;
+                              K_from, h (from), h_ice (from), h_old (from), T (from),
+                              K_to, h (to), h_ice (to), h_old (from), T (to)) * anisotropy;
 }
 
 bool
@@ -1121,6 +1127,7 @@ UZRectMollerup::UZRectMollerup (const BlockModel& al)
     max_time_step_reductions (al.integer ("max_time_step_reductions")),
     time_step_reduction (al.integer ("time_step_reduction")),
     max_iterations (al.integer ("max_iterations")),
+    max_iterations_timestep_reduction_factor (al.integer ("max_iterations_timestep_reduction_factor")),
     max_number_of_small_time_steps (al.integer ("max_number_of_small_time_steps")),
     msg_number_of_small_time_steps (al.integer ("msg_number_of_small_time_steps")),
     max_absolute_difference (al.number ("max_absolute_difference")),
@@ -1164,6 +1171,10 @@ Number of times we may reduce the time step before giving up");
 Maximum number of iterations when seeking convergence before reducing\n\
 the time step.");
     frame.set ("max_iterations", 12);
+    frame.declare_integer ("max_iterations_timestep_reduction_factor",
+                           Attribute::Const, "\
+Multiply 'max_iterations' with this factor for each timestep reduction.");
+    frame.set ("max_iterations_timestep_reduction_factor", 0);
     frame.declare_integer ("max_number_of_small_time_steps", Attribute::Const, "\
 Maximum number of small time steps in a large time step.");
     frame.set ("max_number_of_small_time_steps", 1000);  

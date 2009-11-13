@@ -41,8 +41,8 @@ public:
   // Simulation.
 public:
   virtual double average (const Soil& soil, const Geometry& geo, size_t edge,
-                          double K1, double h1, double h1_ice, double T1,
-                          double K2, double h2, double h2_ice, double T2)
+                          double K1, double h1, double h1_ice, double h1_old, double T1,
+                          double K2, double h2, double h2_ice, double h2_old, double T2)
     const = 0;
   
   // Create and Destroy.

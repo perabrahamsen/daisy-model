@@ -1033,9 +1033,9 @@ Maximum absolute difference in biopore content for convergence.");
 Maximum relative difference in biopore content for convergence.");
     frame.set ("max_relative_difference", 0.001);
     frame.declare_boolean ("allow_upward_flow", Attribute::Const, "\
-Allow water to enter from saturated soil at the bottom of the biopore\n\
-and leave in unsaturated soil above.");
-    frame.set ("allow_upward_flow", false);
+Allow water to enter from saturated soil at the bottom of the biopore.\n\
+And leave in unsaturated soil above.");
+    frame.set ("allow_upward_flow", true);
   }
 } BioporeMatrix_syntax;
 

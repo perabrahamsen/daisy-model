@@ -1,3 +1,12 @@
+2009-11-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* uzrect_Mollerup.C (tick): Allow more iterations for converegnce
+	for smaller timesteps.
+
+2009-11-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* biopore_matrix.C (allow_upward_flow): New flag.
+
 2009-11-10  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* uzrect_Mollerup.C: Use new 'condedge' component.
