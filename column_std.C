@@ -1087,7 +1087,9 @@ The organic matter in the soil and on the surface.");
                    Attribute::OptionalState, Attribute::SoilCells, "\
 Time since the latest tillage operation was performed.\n\
 By default, the top 25 cm will have an initial tillage age of 100 days,\n\
-while the soil below that will have an initial tillage age of 100 years."); 
+while the soil below that will have an initial tillage age of 100 years.\n\
+If you specify fewer values than there are soil cells, the last specified\n\
+value will be used for the remaining cells."); 
     frame.declare ("seed_N", "kg N/ha/h", Attribute::LogOnly,
                    "Amount of nitrogen in seed applied this time step.");
     frame.declare ("seed_C", "kg C/ha/h", Attribute::LogOnly,
