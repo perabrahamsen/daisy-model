@@ -74,6 +74,7 @@ struct ColumnStandard : public Column
   std::auto_ptr<Chemistry> chemistry;
   std::auto_ptr<OrganicMatter> organic_matter;
   double second_year_utilization_;
+  std::vector<double> tillage_age;
 
   // Log variables.
   double harvest_DM;
@@ -469,6 +470,14 @@ ColumnStandard::mix (const Metalib& metalib, const double from, const double to,
   surface.unridge ();
   organic_matter->mix (geometry, *soil, *soil_water, from, to, penetration, 
                        time, dt);
+
+  // Reset tillage age.
+  for (size_t i = 0; i < tillage_age.size (); i++)
+    {
+      const double z = geometry.cell_z (i);
+      if (z > to && z < from)
+	tillage_age[i] = 0.0;
+    }
 }
 
 void 
@@ -655,6 +664,11 @@ ColumnStandard::tick (const Metalib& metalib, const Time& time, const double dt,
                        *chemistry,
                        dt, msg);
   
+  // Tillage time.
+  const size_t cell_size = geometry.cell_size ();
+  for (size_t i = 0; i < cell_size; i++)
+    tillage_age[i] += 1.0/24.0;
+
   // Turnover.
   organic_matter->tick (geometry, *soil_water, *soil_heat, 
                         *chemistry, dt, msg);
@@ -834,6 +848,7 @@ ColumnStandard::output (Log& log) const
   output_derived (vegetation, "Vegetation", log);
   output_derived (organic_matter, "OrganicMatter", log);
   output_value (second_year_utilization_, "second_year_utilization", log);
+  output_variable (tillage_age, log);
   output_variable (seed_N, log);
   output_variable (seed_C, log);
   output_variable (applied_DM, log);
@@ -892,7 +907,10 @@ ColumnStandard::ColumnStandard (const BlockModel& al)
     seed_C (0.0),
     applied_DM (0.0),
     first_year_utilization (0.0)
-{ }
+{ 
+  if (al.check ("tillage_age"))
+    tillage_age = al.number_sequence ("tillage_age");
+}
 
 bool
 ColumnStandard::initialize (const Block& block, 
@@ -909,10 +927,24 @@ ColumnStandard::initialize (const Block& block,
                     parent_scope);
   soil->initialize (block, geometry, *groundwater,
                     organic_matter->som_pools ());
-  residuals_N_soil.insert (residuals_N_soil.begin (), soil->size (), 0.0);
-  daisy_assert (residuals_N_soil.size () == soil->size ());
-  residuals_C_soil.insert (residuals_C_soil.begin (), soil->size (), 0.0);
-  daisy_assert (residuals_C_soil.size () == soil->size ());
+  const size_t cell_size = geometry.cell_size ();
+  residuals_N_soil.insert (residuals_N_soil.begin (), cell_size, 0.0);
+  daisy_assert (residuals_N_soil.size () == cell_size);
+  residuals_C_soil.insert (residuals_C_soil.begin (), cell_size, 0.0);
+  daisy_assert (residuals_C_soil.size () == cell_size);
+
+  // Tillage age.
+  if (tillage_age.size () == 0)
+    {
+      tillage_age.insert (tillage_age.end (), cell_size, 365.2425 * 100);
+      for (size_t i = 0; i < cell_size; i++)
+        if (geometry.cell_z (i) > -25)
+          tillage_age[i] = 100.0;
+    }
+  else if (tillage_age.size () < cell_size)
+    tillage_age.insert (tillage_age.end (), 
+                        cell_size - tillage_age.size (), 
+                        tillage_age.back ());
 
   groundwater->initialize (units, geometry, time, scope, msg);
 
@@ -1051,6 +1083,11 @@ The organic matter in the soil and on the surface.");
     frame.declare ("second_year_utilization", "kg N/ha", Attribute::State,
                    "Estimated accumulated second year fertilizer effect.");
     frame.set ("second_year_utilization", 0.0);
+    frame.declare ("tillage_age", "d",
+                   Attribute::OptionalState, Attribute::SoilCells, "\
+Time since the latest tillage operation was performed.\n\
+By default, the top 25 cm will have an initial tillage age of 100 days,\n\
+while the soil below that will have an initial tillage age of 100 years."); 
     frame.declare ("seed_N", "kg N/ha/h", Attribute::LogOnly,
                    "Amount of nitrogen in seed applied this time step.");
     frame.declare ("seed_C", "kg C/ha/h", Attribute::LogOnly,

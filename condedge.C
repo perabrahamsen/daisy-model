@@ -251,7 +251,7 @@ struct CondedgePressure : public Condedge
 
     if (h1_old < h_sat && h2_old < h_sat)
       // Harmonic average for unsaturated soil.
-      return 2.0 * K1 * K2 / (K1 + K2);
+      return K_harmonic;
 
     // Then we test for saturated pressure induced flow.
     size_t c_max;
