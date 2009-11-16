@@ -54,7 +54,8 @@ struct ReactionMorgan98 : public ReactionColgen
                            const double canopy_height /* [m] */,
                            const double h_pond /* [mm] */,
                            const double dt /* [h] */);
-  void  tick_top (const double total_rain, const double direct_rain,
+  void  tick_top (const double tillage_age /* [d] */,
+                  const double total_rain, const double direct_rain,
                   const double canopy_drip /* [mm/h] */, 
                   const double cover, const double h_veg, 
                   const double h_pond,
@@ -90,7 +91,8 @@ ReactionMorgan98::colloid_generation (const double total_rain /* [mm/h] */,
 }
 
 void 
-ReactionMorgan98::tick_top (const double total_rain, const double direct_rain,
+ReactionMorgan98::tick_top (const double /* tillage_age */,
+                            const double total_rain, const double direct_rain,
                             double canopy_drip /* [mm/h] */, 
                             const double cover, const double h_veg, 
                             const double h_pond,

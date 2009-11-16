@@ -34,6 +34,7 @@
 #include "treelog.h"
 #include "frame.h"
 #include "rainergy.h"
+#include "plf.h"
 #include <sstream>
 #include <memory>
 
@@ -42,6 +43,7 @@ struct ReactionJarvis99 : public ReactionColgen
   // Parameters.
   const std::auto_ptr<Rainergy> rainergy; // Energy in rain [J/cm^2/h]
   const double Mmax;            // Max colloid pool [g C/g S]
+  const PLF Mmax_tillage_factor; // Modification factor for tillage age.
   const double kd;              // Depletion rate from pool [g S/J]
   const double kr;              // Replenishment rate to pool [g C/cm^2 S/h] 
   /* const */ double zi;        // Mixing layer thickness [cm S]
@@ -59,12 +61,14 @@ struct ReactionJarvis99 : public ReactionColgen
   double E;                     // Energy in rain [J/cm^2 S/mm W]
 
   // Simulation.
-  void colloid_generation (const double total_rain /* [mm/h] */, 
+  void colloid_generation (const double tillage_age /* [d] */,
+                           const double total_rain /* [mm/h] */, 
                            const double direct_rain /* [mm/h] */,
                            const double canopy_drip /* [mm/h] */,
                            const double canopy_height /* [m] */,
                            const double dt /* [h] */);
-  void tick_top (const double total_rain, const double direct_rain,
+  void tick_top (const double tillage_age /* [d] */,
+                 const double total_rain, const double direct_rain,
                  const double canopy_drip,
                  const double cover, const double h_veg, 
                  const double h_pond,
@@ -83,7 +87,8 @@ struct ReactionJarvis99 : public ReactionColgen
 };
 
 void
-ReactionJarvis99::colloid_generation (const double total_rain /* [mm/h] */, 
+ReactionJarvis99::colloid_generation (const double tillage_age /* [d] */,
+                                      const double total_rain /* [mm/h] */, 
                                       const double direct_rain /* [mm/h] */,
                                       const double canopy_drip /* [mm/h] */,
                                       const double canopy_height /* [m] */,
@@ -110,8 +115,11 @@ ReactionJarvis99::colloid_generation (const double total_rain /* [mm/h] */,
     surface_release = 0.0;
 
   // Replenishment of colloids in the surface layer.
-  daisy_assert (Ms <= Mmax);
-  P = kr * (1 - Ms / Mmax);     // [g cm^-2 h^-1]
+  const double Mmax_t = Mmax * Mmax_tillage_factor (tillage_age);
+  if (Ms <= Mmax_t)
+    P = kr * (1 - Ms / Mmax_t);     // [g cm^-2 h^-1]
+  else
+    P = 0.0;
   
   // Pure forward mass balance.
   As += (-D + P) * dt;  //[g cm^-2]
@@ -120,7 +128,8 @@ ReactionJarvis99::colloid_generation (const double total_rain /* [mm/h] */,
 }
 
 void 
-ReactionJarvis99::tick_top (const double total_rain, const double direct_rain,
+ReactionJarvis99::tick_top (const double tillage_age /* [d] */,
+                            const double total_rain, const double direct_rain,
                             const double canopy_drip,
                             const double cover, const double h_veg, 
                             const double h_pond,
@@ -131,7 +140,8 @@ ReactionJarvis99::tick_top (const double total_rain, const double direct_rain,
   Chemical& colloid = chemistry.find (colloid_name);
   
   // Generate the colloids.
-  colloid_generation (total_rain, direct_rain, canopy_drip, h_veg, dt);
+  colloid_generation (tillage_age, 
+                      total_rain, direct_rain, canopy_drip, h_veg, dt);
   
   colloid.add_to_surface_transform_source (D);
   colloid.release_surface_colloids (surface_release);
@@ -204,6 +214,7 @@ ReactionJarvis99::ReactionJarvis99 (const BlockModel& al)
   : ReactionColgen (al),
     rainergy (Librarian::build_item<Rainergy> (al, "rainergy")),
     Mmax (al.number ("Mmax")),
+    Mmax_tillage_factor (al.plf ("Mmax_tillage_factor")),
     kd (al.number ("kd")),
     kr (al.number ("kr")),
     zi (al.number ("zi", -42.24e42)),
@@ -233,6 +244,11 @@ Colloid generation emulating the MACRO model.")
     frame.declare ("Mmax", "g/g", Check::non_negative (), Attribute::Const,
                 "Maximum amount of detachable particles.");
     // frame.set ("Mmax", 0.165);
+    frame.declare ("Mmax_tillage_factor", "d", Attribute::None (), 
+                   Check::non_negative (), Attribute::Const, "\
+Factor to modify Mmax with as a fuction of days after tillage.");
+    frame.set ("Mmax_tillage_factor", PLF::always_1 ());
+
     frame.declare ("kd", "g/J", Check::non_negative (), Attribute::Const,
                 "Detachment rate coefficient.");
     // frame.set ("kd", 15.0);

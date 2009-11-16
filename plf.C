@@ -432,11 +432,26 @@ PLF::operator += (const PLF& plf)
   // We now store the result in this plf.
   impl = result.impl;
 }
+
 const PLF& 
 PLF::empty ()			// An empty PLF.
 { 
   static const PLF none;
   return none;
+}
+
+const PLF& 
+PLF::always_1 ()
+{ 
+  static const struct PLF_one : public PLF
+  {
+    PLF_one ()
+    {
+      add (0.0, 1.0);
+      add (1.0, 1.0);
+    }
+  } one;
+  return one;
 }
 
 void

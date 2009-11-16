@@ -1642,7 +1642,7 @@ reaction_Jarvis99${OBJ}: reaction_Jarvis99.C reaction_colgen.h reaction.h \
   assertion.h check.h block_model.h block_nested.h block.h scope.h \
   attribute.h treelog.h frame_model.h frame.h librarian.h chemistry.h \
   chemical.h log.h time.h border.h geometry.h soil.h surface.h uzmodel.h \
-  rainergy.h
+  rainergy.h plf.h
 reaction_filter${OBJ}: reaction_filter.C reaction.h model_framed.h \
   model_logable.h model.h symbol.h block_model.h block_nested.h block.h \
   scope.h attribute.h treelog.h frame_model.h frame.h transform.h \

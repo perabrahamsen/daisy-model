@@ -68,7 +68,9 @@ struct ChemistryStandard : public Chemistry
   
   // Simulation.
   void tick_top (const Units&, const Geometry&, const Soil&, 
-                 const SoilWater&, const SoilHeat&, const Surface&,
+                 const SoilWater&, const SoilHeat&, 
+                 const double tillage_age /* [d] */,
+                 const Surface&,
                  const double snow_leak_rate, // [h^-1]
                  const double cover, // [],
                  const double canopy_leak_rate, // [h^-1]
@@ -230,7 +232,9 @@ ChemistryStandard::incorporate (const Geometry& geo,
 void 
 ChemistryStandard::tick_top (const Units& units, const Geometry& geo, 
                              const Soil& soil, const SoilWater& soil_water, 
-                             const SoilHeat& soil_heat, const Surface& surface,
+                             const SoilHeat& soil_heat, 
+                             const double tillage_age /* [d] */,
+                             const Surface& surface,
                              const double snow_leak_rate, // [h^-1]
                              const double cover, // [],
                              const double canopy_leak_rate, // [h^-1]
@@ -246,7 +250,8 @@ ChemistryStandard::tick_top (const Units& units, const Geometry& geo,
 {
   for (size_t r = 0; r < reactions.size (); r++)
     {
-      reactions[r]->tick_top  (total_rain, direct_rain, canopy_drip, 
+      reactions[r]->tick_top  (tillage_age, 
+                               total_rain, direct_rain, canopy_drip, 
                                cover, h_veg, surface_water, chemistry, dt, msg);
       reactions[r]->tick_surface  (units, geo, soil, soil_water, soil_heat,
                                    surface, chemistry,  dt, msg);

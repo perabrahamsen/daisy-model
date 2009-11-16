@@ -89,7 +89,9 @@ public:
   // Simulation.
 public:
   virtual void tick_top (const Units&, const Geometry&, const Soil&, 
-                         const SoilWater&, const SoilHeat&, const Surface&,
+                         const SoilWater&, const SoilHeat&, 
+                         const double tillage_age /* [d] */,
+                         const Surface&,
                          double snow_leak_rate /* [h^-1] */,
                          double cover /* [] */,
                          double canopy_leak_rate /* [h^-1] */,

@@ -57,6 +57,7 @@ public:
   virtual const std::vector<bool>& active () const = 0;
   virtual void tick (const Geometry& geo,
 		     const SoilWater&, const SoilHeat&, 
+                     const std::vector<double>& tillage_age,
 		     Chemistry&, double dt, Treelog& msg) = 0;
   virtual void transport (const Units&, const Geometry&, 
                           const Soil&, const SoilWater&, const SoilHeat&,

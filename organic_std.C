@@ -105,7 +105,6 @@ struct OrganicStandard : public OrganicMatter
   const PLF water_factor;
   std::vector<double> abiotic_factor;
   std::auto_ptr<ClayOM> clayom;
-  std::vector<double> tillage_age;
   const std::vector<boost::shared_ptr<const PLF>/**/> smb_tillage_factor;
   const std::vector<boost::shared_ptr<const PLF>/**/> som_tillage_factor;
   const double min_AM_C;	// Minimal amount of C in an AM. [g/m²]
@@ -182,6 +181,7 @@ struct OrganicStandard : public OrganicMatter
 			      const SoilWater& soil_water, 
 			      const SoilHeat& soil_heat,
 			      const std::vector<boost::shared_ptr<const PLF>/**/> tillage_factor,
+                              const std::vector<double>& tillage_age,
 			      const int pool,
 			      const std::vector<double>& default_value,
 			      bool use_clay,
@@ -230,6 +230,7 @@ struct OrganicStandard : public OrganicMatter
   const std::vector<bool>& active () const;
   void tick (const Geometry& geo,
              const SoilWater&, const SoilHeat&, 
+             const std::vector<double>& tillage_age,
 	     Chemistry&, double dt, Treelog& msg);
   void transport (const Units&,  const Geometry&,
                   const Soil&, const SoilWater&, const SoilHeat&, Treelog&);
@@ -807,7 +808,6 @@ OrganicStandard::output (Log& log) const
         }
     }
   output_variable (abiotic_factor, log);
-  output_variable (tillage_age, log);
   static const symbol am_symbol ("am");
   if (log.check_interior (am_symbol))
     {
@@ -1030,6 +1030,7 @@ OrganicStandard::find_abiotic (const OM& om,
                                const SoilWater& soil_water, 
                                const SoilHeat& soil_heat,
                                const std::vector<boost::shared_ptr<const PLF>/**/> tillage_factor,
+                               const std::vector<double>& tillage_age,
                                const int pool,
                                const std::vector<double>&
                                /**/ default_value,
@@ -1084,6 +1085,7 @@ void
 OrganicStandard::tick (const Geometry& geo,
                        const SoilWater& soil_water, 
                        const SoilHeat& soil_heat,
+                       const std::vector<double>& tillage_age,
 		       Chemistry& chemistry,
                        const double dt,
                        Treelog& msg)
@@ -1158,7 +1160,7 @@ OrganicStandard::tick (const Geometry& geo,
 	use_clay ? clay_factor : soil_factor;
       const double *const abiotic 
 	= find_abiotic (*smb[j], soil_water, soil_heat,
-			smb_tillage_factor, j,
+			smb_tillage_factor, tillage_age, j,
 			default_factor, use_clay, tillage_factor);
       double *const CO2 = smb[j]->turnover_rate > CO2_threshold 
 	? &CO2_fast_[0] 
@@ -1174,7 +1176,7 @@ OrganicStandard::tick (const Geometry& geo,
 	use_clay ? clay_factor : soil_factor;
       const double *const abiotic 
 	= find_abiotic (*som[j], soil_water, soil_heat,
-			som_tillage_factor, j,
+			som_tillage_factor, tillage_age, j,
 			default_factor, use_clay, tillage_factor);
       double *const CO2 = som[j]->turnover_rate > CO2_threshold 
 	? &CO2_fast_[0] 
@@ -1231,11 +1233,6 @@ OrganicStandard::tick (const Geometry& geo,
   const double soil_T 
     = geo.content_hood (soil_heat, &SoilHeat::T, Geometry::cell_above);
   bioincorporation.tick (geo, am, soil_T, top_CO2, dt);
-
-  // Tillage time.
-  for (size_t i = 0; i < cell_size; i++)
-    if (active_[i])
-      tillage_age[i] += 1.0/24.0;
 
   // Mass balance.
   double N_to_DOM = 0.0;
@@ -1313,14 +1310,6 @@ OrganicStandard::mix (const Geometry& geo, const Soil& soil,
     dom[i]->mix (geo, soil, soil_water, from, to);
 
   // Leave CO2 alone.
-
-  // Reset tillage age.
-  for (size_t i = 0; i < tillage_age.size (); i++)
-    {
-      const double z = geo.cell_z (i);
-      if (z > to && z < from)
-	tillage_age[i] = 0.0;
-    }
 }
 
 double 
@@ -2401,10 +2390,6 @@ OrganicStandard::initialize (const Metalib& metalib,
 
   abiotic_factor.insert (abiotic_factor.end (), cell_size, 1.0);
 
-  // Tillage.
-  tillage_age.insert (tillage_age.end (), 
-		      cell_size - tillage_age.size (), 1000000.0);
-
   // Initialize AM.
   for (size_t i = 0; i < am.size (); i++)
     am[i]->initialize (geo, soil.MaxRootingHeight ());
@@ -2621,10 +2606,7 @@ OrganicStandard::OrganicStandard (const BlockModel& al)
     fertilized_C (0.0),
     tillage_N_top (0.0),
     tillage_C_top (0.0)
-{ 
-  if (al.check ("tillage_age"))
-    tillage_age = al.number_sequence ("tillage_age");
-}
+{ }
 
 OrganicStandard::~OrganicStandard ()
 {
@@ -3060,8 +3042,6 @@ It is 0.6 at pF < 0, 1.0 at 1.5 < pF < 2.5, and 0 at pF > 6.5.");
                "Product of current heat and water factors."); 
     frame.declare_object ("ClayOM", ClayOM::component, "Clay effect model.");
     frame.set ("ClayOM", "old");
-    frame.declare ("tillage_age", "d", Attribute::OptionalState, Attribute::SoilCells,
-               "Time since the latest tillage operation was performed."); 
     frame.declare ("smb_tillage_factor", "d", Attribute::None (), 
                Check::non_negative (), Attribute::Const, Attribute::Variable,
                "Tillage influence on turnover rates for each SMB pool.\n\

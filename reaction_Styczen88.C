@@ -65,7 +65,8 @@ struct ReactionStyczen88 : public ReactionColgen
                            const double h_veg /* [m] */,
                            const double h_pond /* [mm] */,
                            const double dt /* [h] */);
-  void  tick_top (const double total_rain, const double direct_rain,
+  void  tick_top (const double tillage_age /* [d] */,
+                  const double total_rain, const double direct_rain,
                   const double canopy_drip /* [mm/h] */, 
                   const double cover, const double h_veg, 
                   const double h_pond,
@@ -220,7 +221,8 @@ ReactionStyczen88::colloid_generation (const double P /* [mm/h] */,
 }
 
 void 
-ReactionStyczen88::tick_top (const double total_rain, const double direct_rain,
+ReactionStyczen88::tick_top (const double /* tillage_age */,
+                             const double total_rain, const double direct_rain,
                              double canopy_drip /* [mm/h] */, 
                              const double cover, const double h_veg, 
                              const double h_pond,

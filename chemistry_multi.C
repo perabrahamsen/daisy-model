@@ -68,7 +68,9 @@ struct ChemistryMulti : public Chemistry
   
   // Simulation.
   void tick_top (const Units&, const Geometry&, const Soil&, 
-                 const SoilWater&, const SoilHeat&, const Surface&,
+                 const SoilWater&, const SoilHeat&, 
+                 const double tillage_age /* [d] */,
+                 const Surface&,
                  const double snow_leak_rate, // [h^-1]
                  const double cover, // [],
                  const double canopy_leak_rate, // [h^-1]
@@ -298,7 +300,9 @@ ChemistryMulti::incorporate (const Geometry& geo,
 void 
 ChemistryMulti::tick_top (const Units& units, const Geometry& geo, 
                           const Soil& soil, const SoilWater& soil_water, 
-                          const SoilHeat& soil_heat, const Surface& surface,
+                          const SoilHeat& soil_heat, 
+                          const double tillage_age /* [d] */,
+                          const Surface& surface,
                           const double snow_leak_rate, // [h^-1]
                           const double cover, // [],
                           const double canopy_leak_rate, // [h^-1]
@@ -313,7 +317,8 @@ ChemistryMulti::tick_top (const Units& units, const Geometry& geo,
                           Treelog& msg) 
 {
   for (size_t c = 0; c < combine.size (); c++)
-    combine[c]->tick_top (units, geo, soil, soil_water, soil_heat, surface, 
+    combine[c]->tick_top (units, geo, soil, soil_water, soil_heat,
+                          tillage_age, surface, 
                           snow_leak_rate, cover, canopy_leak_rate, 
 			  surface_runoff_rate, surface_water,
                           total_rain, direct_rain, canopy_drip, h_veg, 

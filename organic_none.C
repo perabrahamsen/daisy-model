@@ -40,6 +40,7 @@ struct OrganicNone : public OrganicMatter
   { return active_; }
   void tick (const Geometry&,
              const SoilWater&, const SoilHeat&, 
+             const std::vector<double>& /* tillage_age */,
 	     Chemistry&, double, Treelog&)
   { }
   void transport (const Units&, const Geometry&,
