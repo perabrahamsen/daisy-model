@@ -31,32 +31,40 @@
 struct StomataCon_BB : public StomataCon
 {
   // Parameters.
-private:
+  const double m;     // Stomatal slope factor.
+  const double b;     // Stomatal intercept.
+  
   // Simulation.
-  double stomata_con (const double wsf, const double m, const double hs, 
+  double minimum () const
+  { return b; }
+  double stomata_con (const double wsf, const double hs, 
                       const double pz, const double Ptot, const double cs,
-                      const double Gamma, const double intercept,
-                      const double, const double,  Treelog&);
+                      const double Gamma, 
+                      const double,  Treelog&);
 
   void output (Log&) const
   { }
 
   // Create.
-  public:
   StomataCon_BB (const BlockModel& al)
-    : StomataCon (al)
+    : StomataCon (al),
+      m (al.number("m")),
+      b (al.number("b"))
   { }
 };
 
 double
-StomataCon_BB::stomata_con (const double wsf /*[]*/, const double m /*[]*/,
-                            const double hs /*[]*/, const double pz /*[mol/m²leaf/s]*/,
-                            const double Ptot /*[Pa]*/, const double cs /*[Pa]*/,
+StomataCon_BB::stomata_con (const double wsf /*[]*/, 
+                            const double hs /*[]*/, 
+                            const double pz /*[mol/m²leaf/s]*/,
+                            const double Ptot /*[Pa]*/,
+                            const double cs /*[Pa]*/,
                             const double, 
-                            const double intercept /*[mol/m²leaf/s]*/, const double, 
                             const double, Treelog&)
 {
-  const double gsw = wsf * (m * hs * pz * Ptot)/cs + intercept;
+  if (pz <= 0.0)
+    return b;
+  const double gsw = wsf * (m * hs * pz * Ptot)/cs + b;
 
   daisy_assert (gsw >= 0.0);
   return gsw;
@@ -72,9 +80,15 @@ static struct StomataConBBSyntax : public DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
-
-
+    frame.declare ("m", Attribute::None (), Check::positive (),
+                   Attribute::Const, "\
+Stomatal slope factor.\n\
+Ball and Berry (1982): m = 9 for soyabean.\n\
+Wang and Leuning(1998): m = 11 for wheat");
+    frame.declare ("b", "mol/m^2/s", Check::positive (), Attribute::Const, "\
+Stomatal intercept.\n\
+Ball and Berry (1982) & Wang and Leuning(1998): (0.01 mol/m2/s)");
   }
 } StomataConBBsyntax;
 
-
+// stomatacon_BB.C ends here.

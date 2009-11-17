@@ -32,36 +32,41 @@
 struct StomataCon_Leuning : public StomataCon
 {
   // Parameters.
+  const double m;     // Stomatal slope factor.
+  const double b;     // Stomatal intercept.
   const double Do;
-private:
+
   // Simulation.
-  double stomata_con (const double wsf, const double m, const double hs, 
+  double minimum () const
+  { return b; }
+  double stomata_con (const double wsf, const double hs, 
                       const double pz, const double Ptot, const double cs,
-                      const double Gamma, const double intercept,
-                      const double CO2_atm, const double Ds, Treelog&);
+                      const double Gamma, const double Ds, Treelog&);
 
   void output (Log&) const
   { }
 
   // Create.
-  public:
   StomataCon_Leuning (const BlockModel& al)
     : StomataCon (al),
+      m (al.number ("m")),
+      b (al.number("b")),
       Do (al.number ("Do"))
   { }
 };
 
 double
-StomataCon_Leuning::stomata_con (double wsf /*[]*/, const double m /*[]*/,
+StomataCon_Leuning::stomata_con (double wsf /*[]*/,
                                  const double,
                                  const double pz /*[mol/m²leaf/s]*/,
                                  const double Ptot /*[Pa]*/,
                                  const double cs /*[Pa]*/,
                                  const double Gamma /*[Pa]*/, 
-                                 const double intercept /*[mol/m²leaf/s]*/,
-                                 const double,
                                  const double Ds /*[Pa]*/, Treelog& msg)
 {
+  if (pz <= 0.0)
+    return b;
+
   daisy_assert (cs > Gamma);
   daisy_assert (cs > 0.0);
   daisy_assert (Gamma >= 0.0);
@@ -76,7 +81,7 @@ StomataCon_Leuning::stomata_con (double wsf /*[]*/, const double m /*[]*/,
       wsf = 1.0;
     }
   daisy_assert (((cs - Gamma)*(1 + Ds/Do)) > 0.0);
-  const double gsw = (wsf * m * pz * Ptot)/((cs - Gamma)*(1 + Ds/Do)) + intercept;
+  const double gsw = (wsf * m * pz * Ptot)/((cs - Gamma)*(1 + Ds/Do)) + b;
   daisy_assert (gsw >= 0.0);
 
   return gsw;
@@ -87,19 +92,24 @@ static struct StomataConLeuningSyntax : public DeclareModel
   Model* make (const BlockModel& al) const
   { return new StomataCon_Leuning (al); }
   StomataConLeuningSyntax ()
-    : DeclareModel (StomataCon::component, "Leuning", 
-	       "Stomata conductance calculated by the Ball & Berry model.")
+    : DeclareModel (StomataCon::component, "Leuning", "\
+Stomata conductance calculated by the Ball & Berry model.")
   { }
   void load_frame (Frame& frame) const
   {
-
+    frame.declare ("m", Attribute::None (), Check::positive (),
+                   Attribute::Const, "\
+Stomatal slope factor.\n\
+Ball and Berry (1982): m = 9 for soyabean.\n\
+Wang and Leuning(1998): m = 11 for wheat");
+    frame.declare ("b", "mol/m^2/s", Check::positive (), Attribute::Const, "\
+Stomatal intercept.\n                                                   \
+Ball and Berry (1982) & Wang and Leuning(1998): (0.01 mol/m2/s)");
     frame.declare ("Do", "[Pa]", Check::positive (), Attribute::Const,
-                "Coefficient, value after Leuning (1995)");
+                   "Coefficient, value after Leuning (1995)");
     frame.set ("Do", 1500.);
-
-
-
   }
 } StomataConLeuningsyntax;
 
+// stomatacon_leuning.C ends here.
 

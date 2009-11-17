@@ -213,6 +213,33 @@ Geometry::access_content_hood (const Access& access, const int center) const
 }
 
 double 
+Geometry::content_hood (const std::vector<double>& content, 
+                        const int center) const
+{
+  double total_area = 0.0;
+  double total_content = 0.0;
+
+  const std::vector<size_t>& hood = this->cell_edges (center);
+  const size_t hood_size = hood.size ();
+  
+  for (size_t i = 0; i < hood_size; i++)
+    {
+      const int edge = hood[i];
+      const int neighbor = this->edge_other (edge, center);
+      if (this->cell_is_internal (neighbor))
+        {
+          const double area = this->edge_area (edge);
+          total_area += area;
+          total_content += content[neighbor] * area;
+        }
+    }
+  if (iszero (total_area))
+    return 0.0;
+
+  return total_content / total_area;
+}
+
+double 
 Geometry::access_content_cell_or_hood (const Access& access,
                                        const int cell) const
 {

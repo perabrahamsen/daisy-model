@@ -220,8 +220,9 @@ C4 photosynthesis and stomatal conductance model by Collatz et al., 1992.")
                 "Curvanture parameter");
     frame.set ("beta", 0.93);
 
-    frame.set ("m", 3.0);
-    frame.set ("b", 0.08);
+    // Ball & Berry parameters:
+    // frame.set ("m", 3.0);
+    // frame.set ("b", 0.08);
   }
 
 } PhotoFCC4_syntax;

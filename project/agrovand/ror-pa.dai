@@ -3,7 +3,22 @@
 (input file "ror-setup.dai")
 (input file "plotstuff-9899.dai")
 
+(defmovement pressure Rorrende 
+  (matrix_water (Mollerup (max_time_step_reductions 16)
+                          (max_number_of_small_time_steps 1000000)
+                          (K_average pressure (h_lim -1 [cm])))
+                (v+h)))
+
+(defcolumn Rorrende_aq_pres Rorrende_aq
+  (Movement pressure))
+
+(defcolumn Rorrende_fd_pres Rorrende_fd
+  (Movement pressure))
+
 (defprogram Sim9899 Rorrende
+  "Use special pressure avg."
+  (column (Rorrende_aq_pres (area 1.0 [ha]))
+          (Rorrende_fd_pres (area 2.0 [ha])))
   (stop 1999 3 1))
 
 (run batch

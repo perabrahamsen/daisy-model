@@ -1,17 +1,5 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Ny condedge komponent
-
-SH: Fortolk resultat.  diskuter use_h_old
-
-* Mmax * tillage_factor (time_since_last_tillage)
-
-** Indfør tillage age i column_std.C
-
-** Brug i organic_std.C
-
-** Brug i reaction_Jarvis.C
-
 * Now
 
 ** Artikel om ABA integration

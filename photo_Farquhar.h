@@ -49,8 +49,6 @@ protected:
   const double Xn; //Slope of relationship between leaf N and Vm [mmol/mol/s]
   const double Gamma25;//CO2 compensation point of photosynthesis
   const double Ea_Gamma; // Activation energy for Gamma
-  const double m;     // Stomatal slope factor, Ball and Berry model
-  const double b;     // Stomatal intercept factor, Ball and Berry model
   std::auto_ptr<RubiscoNdist> rubiscoNdist;// Crop N distribution model.
   std::auto_ptr<ABAEffect> ABAeffect;// ABA-xylem effect on photosynthesis.
   std::auto_ptr<StomataCon> Stomatacon;// Stomata conductance.

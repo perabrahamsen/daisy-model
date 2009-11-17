@@ -46,8 +46,6 @@ PhotoFarquhar::PhotoFarquhar (const BlockModel& al)
     Xn (al.number ("Xn")),
     Gamma25 (al.number ("Gamma25")),
     Ea_Gamma (al.number ("Ea_Gamma")),
-    m (al.number("m")),
-    b (al.number("b")),
     rubiscoNdist (Librarian::build_item<RubiscoNdist> (al, "N-dist")),
     ABAeffect (Librarian::build_item<ABAEffect> (al, "ABAeffect")),
     Stomatacon (Librarian::build_item<StomataCon> (al, "Stomatacon"))
@@ -250,7 +248,9 @@ PhotoFarquhar::assimilate (const Units& units,
           double& hs = hs_vector[i];
           hs = 0.5;              // first guess of hs []
           double& cs = cs_vector[i];
-	  double gsw = b * 2; //first gues for stomatal cond,[mol/s/m²leaf]
+          //first gues for stomatal cond,[mol/s/m²leaf]
+	  double gsw = Stomatacon->minimum () * 2.0;
+	  // double gsw = 2 * b; // old value
 	  const int maxiter = 150;
 	  int iter = 0;
 	  double lastci;
@@ -289,21 +289,14 @@ PhotoFarquhar::assimilate (const Units& units,
               cs = CO2_atm - (1.4 * pn * Ptot * rbw); //[Pa] 
               daisy_assert (cs > 0.0);
 
-              // min conductance 
-              const double intercept = b; 
-
               //stomatal conductance
-              if(pn <= 0.0)
-                gsw = intercept;//[mol/m²leaf/s]
-              else 
-                gsw = Stomatacon->stomata_con (ABA_effect /*[]*/, 
-                                               m /*[]*/, hs_use /*[]*/,
-                                               pn /*[mol/m²leaf/s]*/, 
-                                               Ptot /*[Pa]*/, 
-                                               cs /*[Pa]*/, Gamma /*[Pa]*/, 
-                                               intercept /*[mol/m²leaf/s]*/, 
-                                               CO2_atm /*[Pa]*/, Ds/*[Pa]*/,
-                                               msg); //[mol/m²leaf/s] 
+              gsw = Stomatacon->stomata_con (ABA_effect /*[]*/, 
+                                             hs_use /*[]*/,
+                                             pn /*[mol/m²leaf/s]*/, 
+                                             Ptot /*[Pa]*/, 
+                                             cs /*[Pa]*/, Gamma /*[Pa]*/, 
+                                             Ds/*[Pa]*/,
+                                             msg); //[mol/m²leaf/s] 
 
 	      iter++;
 	      if(iter > maxiter)
@@ -464,12 +457,6 @@ Gamma25 = 3.69 Pa for wheat (Collatz et al., 1991)");
     frame.declare ("Ea_Gamma", "J/mol", Check::positive (), Attribute::Const,
                 "Actimation energy for Gamma. Ea_Gamma = 29000 (Jordan & Ogren, 1984)");
     frame.set ("Ea_Gamma", 29000.);
-
-    frame.declare ("m", Attribute::None (), Check::positive (), Attribute::Const,
-                "Stomatal slope factor. Ball and Berry (1982): m = 9 for soyabean. Wang and Leuning(1998): m = 11 for wheat");
-
-    frame.declare ("b", "mol/m^2/s", Check::positive (), Attribute::Const,
-                "Stomatal intercept factor, Ball and Berry (1982) & Wang and Leuning(1998): (0.01 mol/m2/s)");
 
     //log variables
     frame.declare ("ABA_effect", Attribute::None (), Attribute::LogOnly,

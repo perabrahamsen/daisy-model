@@ -365,8 +365,9 @@ Photosynthesis for C3 crops described by Faquhar et al. (1980).")
                 "Fraction of PAR effectively absorbed by PSII, ");
     frame.set ("alfa", 0.08);
 
-    frame.set ("m", 11.0);
-    frame.set ("b", 0.01);
+    // Ball & Berry parameters:
+    // frame.set ("m", 11.0);
+    // frame.set ("b", 0.01);
   }
 
 } PhotoFCC3_syntax;

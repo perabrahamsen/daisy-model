@@ -6,6 +6,19 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.75
+
+** The 'Jarvis99' colloid generation reaction can now depend on tillage.
+
+The new 'Mmax_tillage_factor' allows tillage age to affect Mmax.
+
+** New 'pressure' model for finding average conductivity.
+
+In the Mollerup uzrect model, the K_average parameter can now take a
+'pressure' value, which allows fast transport away from saturated and
+near soil, even if the surrounding soil is very dry.  The
+K_average_horizontal parameter has been removed.
+
 * 4.74
 
 ** New 'area' column parameter.

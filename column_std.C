@@ -653,26 +653,8 @@ ColumnStandard::tick (const Metalib& metalib, const Time& time, const double dt,
                     residuals_DM, residuals_N_top, residuals_C_top, 
                     residuals_N_soil, residuals_C_soil, dt, msg);
 
-  // Find average surface tillage age.  Geometry::content_hood doesn't work.
-  double total_area = 0.0;
-  double total_age = 0.0;
-
-  const std::vector<size_t>& hood = geometry.cell_edges (Geometry::cell_above);
-  const size_t hood_size = hood.size ();
-  
-  for (size_t i = 0; i < hood_size; i++)
-    {
-      const int edge = hood[i];
-      const int neighbor = geometry.edge_other (edge, Geometry::cell_above);
-      if (geometry.cell_is_internal (neighbor))
-        {
-          const double area = geometry.edge_area (edge);
-          total_area += area;
-          total_age += tillage_age[neighbor] * area;
-        }
-    }
-  daisy_assert (total_area > 0.0);
-  const double tillage_top = total_age / total_area;
+  const double tillage_top 
+    = geometry.content_hood (tillage_age, Geometry::cell_above);
   
   chemistry->tick_top (units, geometry, *soil, *soil_water, *soil_heat, 
                        tillage_top, surface,

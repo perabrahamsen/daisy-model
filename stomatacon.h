@@ -38,13 +38,13 @@ public:
   // Simulation.
 public:
   virtual void output (Log&) const = 0;
-  virtual double stomata_con (const double wsf /*[]*/, const double m /*[]*/,
+  virtual double minimum () const = 0;
+  virtual double stomata_con (const double wsf /*[]*/,
                               const double hs /*[]*/, 
                               const double pz /*[mol/m²leaf/s]*/,
                               const double Ptot /*[Pa]*/, const double cs /*[Pa]*/,
                               const double Gamma /*[Pa]*/, 
-                              const double intercept /*[mol/m²leaf/s]*/, 
-                              const double CO2_atm /*[Pa]*/, const double Ds /*[Pa]*/,
+                              const double Ds /*[Pa]*/,
                               Treelog&) = 0;//[]
   // Create and Destroy.
 protected:

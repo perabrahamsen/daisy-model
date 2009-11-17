@@ -26,6 +26,7 @@
 #include "attribute.h"
 #include <vector>
 #include <string>
+#include <boost/noncopyable.hpp>
 
 class Block;
 class Treelog;
@@ -148,7 +149,7 @@ public:
   // Generic access.
 public:
   // The 'Access' class is simply a function object interface.
-  struct Access
+  struct Access : private boost::noncopyable
   { 
     virtual double operator()(size_t c) const = 0; 
     virtual ~Access ();
@@ -174,7 +175,10 @@ public:
   template<class T> 
   double content_height (const T& obj, double (T::*content) (size_t) const,
                          const double z) const
-  { return access_content_height (Accessor<T> (obj, content), z); }
+  { 
+    const Accessor<T> accessor (obj, content);
+    return access_content_height (accessor, z); 
+  }
   // The 'access_content_height' function does the same, using the
   // 'Access' class instead of a soil container template.
   double access_content_height (const Access& access, double z) const;
@@ -186,17 +190,25 @@ public:
   template<class T> 
   double content_hood (const T& obj, double (T::*content) (size_t) const,
                        const int c) const
-  { return access_content_hood (Accessor<T> (obj, content), c); }
+  { 
+    const Accessor<T> accessor (obj, content);
+    return access_content_hood (accessor, c);
+  }
   // The 'access_content_hood' function does the same, using the
   // 'Access' class instead of a soil container template.
   double access_content_hood (const Access&, int c) const;
+  // The 'content_hood' function does the same, for a vector.
+  double content_hood (const std::vector<double>&, int c) const;
   // The 'content_cell_or_hood' template function will return the value 
   // for the cell, if internal, or the hood, if external.
   template<class T> 
   double content_cell_or_hood (const T& obj, 
                                double (T::*content) (size_t) const,
                                const int c) const
-  { return access_content_cell_or_hood (Accessor<T> (obj, content), c); }
+  { 
+    const Accessor<T> accessor (obj, content);
+    return access_content_cell_or_hood (accessor, c);
+  }
   // The 'access_content_cell_or_hood' function does the same, using the
   // 'Access' class instead of a soil container template.
   double access_content_cell_or_hood (const Access&, int c) const;
@@ -206,7 +218,10 @@ public:
   template<class T> 
   double content_interval (const T& obj, double (T::*content) (size_t) const,
                            const double from, const double to) const
-  { return access_content_interval (Accessor<T> (obj, content), from, to); }
+  { 
+    const Accessor<T> accessor (obj, content);
+    return access_content_interval (accessor, from, to); 
+  }
   // The 'access_content_interval' function does the same, using the
   // 'Access' class instead of a soil container template.
   double access_content_interval (const Access&, double from, double to) const;
@@ -216,7 +231,10 @@ public:
   template<class T> 
   double content_volume (const T& obj, double (T::*content) (size_t) const,
                          const Volume& vol) const
-  { return access_content_interval (Accessor<T> (obj, content), vol); }
+  { 
+    const Accessor<T> accessor (obj, content);
+    return access_content_interval (accessor, vol); 
+  }
   // The 'access_content_volume' function does the same, using the
   // 'Access' class instead of a soil container template.
   double access_content_volume (const Access&, const Volume&) const;

@@ -28,62 +28,63 @@
 #include "librarian.h"
 #include "frame.h"
 
-struct StomataCon_SHA : public StomataCon
+struct StomataCon_SHA12 : public StomataCon
 {
   // Parameters.
 private:
-  const double lambda, alpha;  // Coefficients []
-  const double M;              // [?]
-
+  const double lambda;          // Assimilate exponent. []
+  const double alpha;           // Humidity exponent. []
+  const double m;               // Conductivity factor. [?]
+  const double gs_min;          // Minimal gs value. [mol H2O/m^2 leaf/s]
   
   // Simulation.
-  double stomata_con (const double wsf, const double m, const double hs, 
+  double minimum () const
+  { return gs_min; }
+  double stomata_con (const double wsf, const double hs, 
                       const double pz, const double Ptot, const double cs,
-                      const double Gamma, const double intercept,
-                      const double CO2_atm, const double Ds, Treelog&);
+                      const double Gamma, const double Ds, Treelog&);
   void output (Log&) const
   { }
 
   // Create.
   public:
-  StomataCon_SHA (const BlockModel& al)
+  StomataCon_SHA12 (const BlockModel& al)
     : StomataCon (al),
       lambda (al.number ("lambda")),
       alpha (al.number ("alpha")),
-      M (al.number ("M"))
+      m (al.number ("m")),
+      gs_min (al.number ("min"))
   { }
 };
 
 double
-StomataCon_SHA::stomata_con (const double wsf /*[]*/, 
-                             const double,
+StomataCon_SHA12::stomata_con (const double wsf /*[]*/, 
                              const double hs /*[]*/, 
                              const double pz /*[mol/m²leaf/s]*/,
-                             const double Ptot /*[Pa]*/, const double cs /*[Pa]*/,
-                             const double, const double intercept /*[mol/m²leaf/s]*/,
-                             const double CO2_atm, const double, Treelog&)
+                             const double Ptot /*[Pa]*/,
+                             const double cs /*[Pa]*/,
+                             const double, const double, Treelog&)
 {
+  if (pz <= 0.0)
+    return gs_min;
   const double cs_ppm = cs /*[Pa]*/ / Ptot /*[Pa]*/ * 1.0e6 /*[ppm]*/;
   const double A = pz * 1e6;    // [umol/m^2 LEAF/s]
-  const double gsw = std::max (wsf * (M * pow(hs, alpha) * pow(A, lambda))
-                               /(cs_ppm),
-                               intercept);
-  daisy_assert (gsw >= 0.0);
-  return gsw;
+  return std::max (wsf * (m * pow(hs, alpha) * pow(A, lambda)) /(cs_ppm),
+                   gs_min);
 }
 
-static struct StomataConSHASyntax : public DeclareModel
+static struct StomataConSHA12Syntax : public DeclareModel
 {
   Model* make (const BlockModel& al) const
-  { return new StomataCon_SHA (al); }
-  StomataConSHASyntax ()
-    : DeclareModel (StomataCon::component, "SHA", "\
+  { return new StomataCon_SHA12 (al); }
+  StomataConSHA12Syntax ()
+    : DeclareModel (StomataCon::component, "SHA12", "\
 Stomata conductance calculated by the model given by Eq. 12.")
   { }
   void load_frame (Frame& frame) const
   {
     frame.set_strings ("cite", "Ahmadi20091541");
-
+    
     frame.declare ("alpha", Attribute::None (), Check::non_negative (),
                    Attribute::Const,
                    "Humidity effect");
@@ -92,12 +93,14 @@ Stomata conductance calculated by the model given by Eq. 12.")
                    Attribute::Const,
                    "Net photosyhtesis effect");
     frame.set ("lambda", 1.0);
-    frame.declare ("M", Attribute::Unknown (), 
+    frame.declare ("m", Attribute::Unknown (), 
                    Check::non_negative (), Attribute::Const,
-                   "Parameter ??");
-    frame.set ("M", 1.0);
+                   "Slope parameter, dimension depends on alpha and lambda.");
+    frame.declare ("min", "mol H2O/m^2 leaf/s", 
+                   Check::positive (), Attribute::OptionalConst,
+                   "Minimal conductivity.");
   }
-} StomataConSHAsyntax;
+} StomataConSHA12syntax;
 
 
 struct StomataCon_SHA14 : public StomataCon
@@ -106,14 +109,20 @@ struct StomataCon_SHA14 : public StomataCon
 private:
   const double lambda; // Net photosynthesis effect [m^2 leaf s/mol CO2]
   const double alpha;  // Humidity effect []
-  const double M;      // Conductivity factor [mol H2O/m^2 leaf/s]
+  const double m;      // Conductivity factor [mol H2O/m^2 leaf/s]
   const double gs_max; // Maximum gs [mol/m^2 leaf/s]
 
   // Simulation.
-  double stomata_con (const double wsf, const double m, const double hs, 
+  double minimum () const
+  { 
+    // Assuming wsf = 1.0, A = 0, hs = 0.0.
+    const double cs_min = 2.0;  // [ppm]
+    return m / cs_min; 
+  }
+  double stomata_con (const double wsf, const double hs, 
                       const double pz, const double Ptot, const double cs,
-                      const double Gamma, const double intercept,
-                      const double CO2_atm, const double Ds, Treelog&);
+                      const double Gamma, 
+                      const double Ds, Treelog&);
   void output (Log&) const
   { }
 
@@ -123,28 +132,27 @@ private:
     : StomataCon (al),
       lambda (al.number ("lambda")),
       alpha (al.number ("alpha")),
-      M (al.number ("M")),
+      m (al.number ("m")),
       gs_max (al.number ("max", -42.42e42))
   { }
 };
 
 double
 StomataCon_SHA14::stomata_con (const double wsf /*[]*/, 
-                               const double,
                                const double hs /*[]*/, 
                                const double pz /*[mol/m²leaf/s]*/,
                                const double Ptot /*[Pa]*/, 
                                const double cs /*[Pa]*/,
-                               const double, const double,
-                               const double CO2_atm, const double, Treelog&)
+                               const double,
+                               const double, Treelog&)
 {
   const double cs_ppm = cs /*[Pa]*/ / Ptot /*[Pa]*/ * 1.0e6 /*[ppm]*/;
-  const double A = pz * 1e6;    // [umol/m^2 LEAF/s]
-  const double gsw = wsf * M * exp (hs * alpha) * exp (A * lambda) / cs_ppm;
+  const double A = std::max (pz, 0.0) * 1e6;    // [umol/m^2 LEAF/s]
+  const double gsw = wsf * m * exp (hs * alpha) * exp (A * lambda) / cs_ppm;
   daisy_assert (gsw >= 0.0);
+
   if (gs_max < 0.0)
     return gsw;
-  
   return std::min (gsw, gs_max);
 }
 
@@ -166,13 +174,13 @@ Stomata conductance calculated by the model given by Eq. 14.")
     frame.declare ("lambda", "m^2 leaf s/umol CO2", Check::non_negative (),
                    Attribute::Const,
                    "Net photosyhtesis effect");
-    frame.declare ("M", "mol H2O/m^2 leaf/s", 
+    frame.declare ("m", "mol H2O/m^2 leaf/s", 
                    Check::non_negative (), Attribute::Const,
                    "Conductivity factor.");
     frame.declare ("max", "mol H2O/m^2 leaf/s", 
                    Check::none (), Attribute::OptionalConst,
                    "Maximal conductivity.\n\
-By default, stere is no maixum.");
+By default, there is no maxium.");
   }
 } StomataConSHA14syntax;
 
@@ -182,14 +190,17 @@ struct StomataCon_MNA : public StomataCon
 private:
   const double lambda; // Net photosynthesis effect [m^2 leaf s/mol CO2]
   const double alpha;  // Humidity effect []
-  const double M;      // Conductivity factor [mol H2O/m^2 leaf/s]
+  const double m;      // Conductivity factor [mol H2O/m^2 leaf/s]
+  const double b;     // Stomatal intercept.
   const double gs_max; // Maximum gs [mol/m^2 leaf/s]
 
   // Simulation.
-  double stomata_con (const double wsf, const double m, const double hs, 
+  double minimum () const
+  { return b; }
+  double stomata_con (const double wsf, const double hs, 
                       const double pz, const double Ptot, const double cs,
-                      const double Gamma, const double intercept,
-                      const double CO2_atm, const double Ds, Treelog&);
+                      const double Gamma, 
+                      const double Ds, Treelog&);
   void output (Log&) const
   { }
 
@@ -199,26 +210,29 @@ private:
     : StomataCon (al),
       lambda (al.number ("lambda")),
       alpha (al.number ("alpha")),
-      M (al.number ("M")),
+      m (al.number ("m")),
+      b (al.number ("b")),
       gs_max (al.number ("max", -42.42e42))
   { }
 };
 
 double
 StomataCon_MNA::stomata_con (const double wsf /*[]*/, 
-                               const double,
                                const double hs /*[]*/, 
                                const double pz /*[mol/m²leaf/s]*/,
                                const double Ptot /*[Pa]*/, 
                                const double cs /*[Pa]*/,
-                               const double, const double intercept,
-                               const double CO2_atm, const double, Treelog&)
+                               const double, 
+                               const double, Treelog&)
 {
+  if (pz <= 0.0)
+    return b;
+
   const double cs_ppm = cs /*[Pa]*/ / Ptot /*[Pa]*/ * 1.0e6 /*[ppm]*/;
   const double A = pz * 1e6;    // [umol/m^2 LEAF/s]
   daisy_assert (A > 0.0);
-  const double gsw = intercept 
-    + wsf * M * exp (hs * alpha) * exp (lambda / A) / cs_ppm;
+  const double gsw = b 
+    + wsf * m * exp (hs * alpha) * exp (lambda / A) / cs_ppm;
   daisy_assert (gsw >= 0.0);
   if (gs_max < 0.0)
     return gsw;
@@ -241,13 +255,16 @@ Stomata conductance calculated by the model given by Eq. 14.")
     frame.declare ("lambda", "umol CO2/m^2 leaf/s", Check::non_positive (),
                    Attribute::Const,
                    "Net photosyhtesis effect");
-    frame.declare ("M", "mol H2O/m^2 leaf/s", 
+    frame.declare ("m", "mol H2O/m^2 leaf/s", 
                    Check::non_negative (), Attribute::Const,
                    "Conductivity factor.");
+    frame.declare ("b", "mol/m^2/s", Check::positive (), Attribute::Const, "\
+Stomatal intercept.\n\
+Ball and Berry (1982) & Wang and Leuning(1998): (0.01 mol/m2/s)");
     frame.declare ("max", "mol H2O/m^2 leaf/s", 
                    Check::none (), Attribute::OptionalConst,
                    "Maximal conductivity.\n\
-By default, stere is no maixum.");
+By default, there is no maixum.");
   }
 } StomataConMNAsyntax;
 

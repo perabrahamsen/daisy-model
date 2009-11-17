@@ -1,3 +1,9 @@
+2009-11-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* photo_Farquhar.C (b, m): Removed parameters.
+	* stomatacon_BB.C, stomatacon_Leuning.C (b, m): Added.
+	* stomatacon_SHA.C, stomatacon.h: Adjusted.
+
 2009-11-16  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* reaction_Jarvis99.C (Mmax_tillage_factor): New parameter.
