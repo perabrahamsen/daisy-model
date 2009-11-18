@@ -1,6 +1,7 @@
 ;;; ror-setup.dai main setup file for Agrovand simulations.
 
-(input file "rorrendechemicals.dai") 	
+;;(input file "rorrendechemicals.dai") 	
+(input file "rorrendechemicals_2.dai") 
 (input file "ror-soil.dai")
 (input file "ror-manager.dai")
 (input file "ror-log.dai")                
@@ -32,20 +33,21 @@
 
           ;; The following log model are used by the gnuplot graphs.
           ("Sample water content 2" (column Rorrende_aq))
-          ("Infiltration" (column Rorrende_aq) (where "infiltration.dlf"))
-          ("Ponding depth" (column Rorrende_aq) (where "ponding_depth.dlf"))
+          ("Infiltration" (column Rorrende_aq))
+          ("Ponding depth" (column Rorrende_aq))
           ("Rorrende all chemicals")
           ("Chemical 25" (chemical Bromide))
-
-          ;; These two should give an overall water balance.
-          ("Field water")
-          ("Field water" (column Rorrende_aq))
-
+      
           ;; Log models below are optional. 
-          ;; ("Chemical Concentration" 
-          ;;  (chemical Bromide) 
-          ;;  (when daily)
-          ;;  (where "SWC_Bromide.dlf"))
+          ("Field water" (column Rorrende_aq))
+          ("Field water" (column Rorrende_fd))        
+          ("Chemical Concentration" 
+             (chemical Bromide) 
+             (column Rorrende_aq)
+             (when daily)
+             (where "SWC_Bromide.dlf"))
+          ("Tertiary water sink drain")
+          
           ;; ("Chemical Concentration" 
           ;;  (chemical Pendimethalin-base) 
           ;;  ;;(when hourly)

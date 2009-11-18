@@ -883,4 +883,16 @@
                      (spec chemical default S_drain))
            ))
 
+
+(deflog "Tertiary water sink drain" biopore
+  "Tertiary water sink term."
+  (where "${colfid}tertiary-water-sink-${biopore}.dlf")
+  (when hourly)
+  (biopore drain)
+  (entries (array (path column "${column}" Movement "*" 
+                        Tertiary biopores classes "${biopore}" S)
+                  (handle sum)
+                  (spec biopore component S))))
+
+
 ;;; ror-log.dai ends here.
