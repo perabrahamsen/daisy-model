@@ -28,7 +28,7 @@
 #include "librarian.h"
 #include "frame.h"
 
-struct StomataCon_SHA12 : public StomataCon
+struct StomataCon_SHA12 : public StomataCon_WSF_base
 {
   // Parameters.
 private:
@@ -40,7 +40,9 @@ private:
   // Simulation.
   double minimum () const
   { return gs_min; }
-  double stomata_con (const double wsf, const double hs, 
+  double stomata_con (const double ABA,  // [g/cm^3]
+                      const double h_x,  // [MPa]
+                      const double hs, 
                       const double pz, const double Ptot, const double cs,
                       const double Gamma, const double Ds, Treelog&);
   void output (Log&) const
@@ -49,7 +51,7 @@ private:
   // Create.
   public:
   StomataCon_SHA12 (const BlockModel& al)
-    : StomataCon (al),
+    : StomataCon_WSF_base (al),
       lambda (al.number ("lambda")),
       alpha (al.number ("alpha")),
       m (al.number ("m")),
@@ -58,18 +60,20 @@ private:
 };
 
 double
-StomataCon_SHA12::stomata_con (const double wsf /*[]*/, 
-                             const double hs /*[]*/, 
-                             const double pz /*[mol/m²leaf/s]*/,
-                             const double Ptot /*[Pa]*/,
-                             const double cs /*[Pa]*/,
-                             const double, const double, Treelog&)
+StomataCon_SHA12::stomata_con (const double ABA,  // [g/cm^3]
+                               const double h_x,  // [MPa]
+                               const double hs /*[]*/, 
+                               const double pz /*[mol/m²leaf/s]*/,
+                               const double Ptot /*[Pa]*/,
+                               const double cs /*[Pa]*/,
+                               const double, const double, Treelog&)
 {
   if (pz <= 0.0)
     return gs_min;
   const double cs_ppm = cs /*[Pa]*/ / Ptot /*[Pa]*/ * 1.0e6 /*[ppm]*/;
   const double A = pz * 1e6;    // [umol/m^2 LEAF/s]
-  return std::max (wsf * (m * pow(hs, alpha) * pow(A, lambda)) /(cs_ppm),
+  return std::max (wsf (ABA, h_x) 
+                   * (m * pow(hs, alpha) * pow(A, lambda)) /(cs_ppm),
                    gs_min);
 }
 
@@ -78,13 +82,13 @@ static struct StomataConSHA12Syntax : public DeclareModel
   Model* make (const BlockModel& al) const
   { return new StomataCon_SHA12 (al); }
   StomataConSHA12Syntax ()
-    : DeclareModel (StomataCon::component, "SHA12", "\
+    : DeclareModel (StomataCon::component, "SHA12", "WSF", "\
 Stomata conductance calculated by the model given by Eq. 12.")
   { }
   void load_frame (Frame& frame) const
   {
     frame.set_strings ("cite", "Ahmadi20091541");
-    
+
     frame.declare ("alpha", Attribute::None (), Check::non_negative (),
                    Attribute::Const,
                    "Humidity effect");
@@ -103,7 +107,7 @@ Stomata conductance calculated by the model given by Eq. 12.")
 } StomataConSHA12syntax;
 
 
-struct StomataCon_SHA14 : public StomataCon
+struct StomataCon_SHA14 : public StomataCon_WSF_base
 {
   // Parameters.
 private:
@@ -119,7 +123,9 @@ private:
     const double cs_min = 2.0;  // [ppm]
     return m / cs_min; 
   }
-  double stomata_con (const double wsf, const double hs, 
+  double stomata_con (const double ABA,  // [g/cm^3]
+                      const double h_x,  // [MPa]
+                      const double hs, 
                       const double pz, const double Ptot, const double cs,
                       const double Gamma, 
                       const double Ds, Treelog&);
@@ -129,7 +135,7 @@ private:
   // Create.
   public:
   StomataCon_SHA14 (const BlockModel& al)
-    : StomataCon (al),
+    : StomataCon_WSF_base (al),
       lambda (al.number ("lambda")),
       alpha (al.number ("alpha")),
       m (al.number ("m")),
@@ -138,7 +144,8 @@ private:
 };
 
 double
-StomataCon_SHA14::stomata_con (const double wsf /*[]*/, 
+StomataCon_SHA14::stomata_con (const double ABA,  // [g/cm^3]
+                               const double h_x,  // [MPa]
                                const double hs /*[]*/, 
                                const double pz /*[mol/m²leaf/s]*/,
                                const double Ptot /*[Pa]*/, 
@@ -148,7 +155,8 @@ StomataCon_SHA14::stomata_con (const double wsf /*[]*/,
 {
   const double cs_ppm = cs /*[Pa]*/ / Ptot /*[Pa]*/ * 1.0e6 /*[ppm]*/;
   const double A = std::max (pz, 0.0) * 1e6;    // [umol/m^2 LEAF/s]
-  const double gsw = wsf * m * exp (hs * alpha) * exp (A * lambda) / cs_ppm;
+  const double gsw = wsf (ABA, h_x) 
+    * m * exp (hs * alpha) * exp (A * lambda) / cs_ppm;
   daisy_assert (gsw >= 0.0);
 
   if (gs_max < 0.0)
@@ -161,7 +169,7 @@ static struct StomataConSHA14Syntax : public DeclareModel
   Model* make (const BlockModel& al) const
   { return new StomataCon_SHA14 (al); }
   StomataConSHA14Syntax ()
-    : DeclareModel (StomataCon::component, "SHA14", "\
+    : DeclareModel (StomataCon::component, "SHA14", "WSF", "\
 Stomata conductance calculated by the model given by Eq. 14.")
   { }
   void load_frame (Frame& frame) const
@@ -184,7 +192,7 @@ By default, there is no maxium.");
   }
 } StomataConSHA14syntax;
 
-struct StomataCon_MNA : public StomataCon
+struct StomataCon_MNA : public StomataCon_WSF_base
 {
   // Parameters.
 private:
@@ -197,7 +205,9 @@ private:
   // Simulation.
   double minimum () const
   { return b; }
-  double stomata_con (const double wsf, const double hs, 
+  double stomata_con (const double ABA,  // [g/cm^3]
+                      const double h_x,  // [MPa]
+                      const double hs, 
                       const double pz, const double Ptot, const double cs,
                       const double Gamma, 
                       const double Ds, Treelog&);
@@ -207,7 +217,7 @@ private:
   // Create.
   public:
   StomataCon_MNA (const BlockModel& al)
-    : StomataCon (al),
+    : StomataCon_WSF_base (al),
       lambda (al.number ("lambda")),
       alpha (al.number ("alpha")),
       m (al.number ("m")),
@@ -217,13 +227,14 @@ private:
 };
 
 double
-StomataCon_MNA::stomata_con (const double wsf /*[]*/, 
-                               const double hs /*[]*/, 
-                               const double pz /*[mol/m²leaf/s]*/,
-                               const double Ptot /*[Pa]*/, 
-                               const double cs /*[Pa]*/,
-                               const double, 
-                               const double, Treelog&)
+StomataCon_MNA::stomata_con (const double ABA,  // [g/cm^3]
+                             const double h_x,  // [MPa]
+                             const double hs /*[]*/, 
+                             const double pz /*[mol/m²leaf/s]*/,
+                             const double Ptot /*[Pa]*/, 
+                             const double cs /*[Pa]*/,
+                             const double, 
+                             const double, Treelog&)
 {
   if (pz <= 0.0)
     return b;
@@ -232,7 +243,7 @@ StomataCon_MNA::stomata_con (const double wsf /*[]*/,
   const double A = pz * 1e6;    // [umol/m^2 LEAF/s]
   daisy_assert (A > 0.0);
   const double gsw = b 
-    + wsf * m * exp (hs * alpha) * exp (lambda / A) / cs_ppm;
+    + wsf (ABA, h_x) * m * exp (hs * alpha) * exp (lambda / A) / cs_ppm;
   daisy_assert (gsw >= 0.0);
   if (gs_max < 0.0)
     return gsw;
@@ -244,7 +255,7 @@ static struct StomataConMNASyntax : public DeclareModel
   Model* make (const BlockModel& al) const
   { return new StomataCon_MNA (al); }
   StomataConMNASyntax ()
-    : DeclareModel (StomataCon::component, "MNA", "\
+    : DeclareModel (StomataCon::component, "MNA", "WSF", "\
 Stomata conductance calculated by the model given by Eq. 14.")
   { }
   void load_frame (Frame& frame) const

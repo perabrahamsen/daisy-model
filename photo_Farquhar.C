@@ -26,7 +26,6 @@
 #include "block_model.h"
 #include "rubiscoNdist.h"
 #include "resistance.h"
-#include "ABAeffect.h"
 #include "stomatacon.h"
 #include "bioclimate.h"
 #include "canopy_std.h"
@@ -47,7 +46,6 @@ PhotoFarquhar::PhotoFarquhar (const BlockModel& al)
     Gamma25 (al.number ("Gamma25")),
     Ea_Gamma (al.number ("Ea_Gamma")),
     rubiscoNdist (Librarian::build_item<RubiscoNdist> (al, "N-dist")),
-    ABAeffect (Librarian::build_item<ABAEffect> (al, "ABAeffect")),
     Stomatacon (Librarian::build_item<StomataCon> (al, "Stomatacon"))
 { }
 
@@ -110,7 +108,7 @@ PhotoFarquhar::stomata_conductance() const
 
 double
 PhotoFarquhar::assimilate (const Units& units,
-                           const double ABA_xylem, const double psi_c,
+                           const double ABA, const double psi_c,
                            const double ec /* Canopy Vapour Pressure [Pa] */, 
                            const double gbw_ms /* Boundary layer [m/s] */,
 			   const double CO2_atm, const double O2_atm, 
@@ -126,6 +124,7 @@ PhotoFarquhar::assimilate (const Units& units,
 			   Phenology& development,
 			   Treelog& msg) 
 {
+  const double h_x = std::fabs (psi_c) * 1.0e-4  /* [MPa/cm] */; // MPa
   // sugar production [gCH2O/m2/h] by canopy photosynthesis.
   const PLF& LAIvsH = canopy.LAIvsH;
   const double DS = development.DS;
@@ -205,8 +204,6 @@ PhotoFarquhar::assimilate (const Units& units,
     gs_vector.push_back (0.0);//[m/s]
      
   // Photosynthetic effect of Xylem ABA and crown water potential.
-  ABA_effect = ABAeffect->ABA_effect(ABA_xylem, psi_c,  msg);//[unitless]
-          
   Gamma = Arrhenius (Gamma25, Ea_Gamma, Tl); // [Pa]
   const double estar = FAO::SaturationVapourPressure (Tl); // [Pa]
   daisy_assert (gbw_ms >= 0.0);
@@ -290,7 +287,8 @@ PhotoFarquhar::assimilate (const Units& units,
               daisy_assert (cs > 0.0);
 
               //stomatal conductance
-              gsw = Stomatacon->stomata_con (ABA_effect /*[]*/, 
+              gsw = Stomatacon->stomata_con (ABA /*g/cm^3*/,
+                                             h_x /* MPa */, 
                                              hs_use /*[]*/,
                                              pn /*[mol/m²leaf/s]*/, 
                                              Ptot /*[Pa]*/, 
@@ -497,10 +495,6 @@ CO2 compensation point of photosynthesis.");
     frame.declare_object ("N-dist", RubiscoNdist::component, 
                        "Rubisco N-distribution in the canopy layer.");
     frame.set ("N-dist", "exp");
-
-    frame.declare_object ("ABAeffect", ABAEffect::component, 
-                       "The effect of xylem ABA on stomata conductivity.");
-    frame.set ("ABAeffect", "ABA-exp");
 
     frame.declare_object ("Stomatacon", StomataCon::component, 
                        "Stomata conductance of water vapor.");

@@ -50,7 +50,6 @@ protected:
   const double Gamma25;//CO2 compensation point of photosynthesis
   const double Ea_Gamma; // Activation energy for Gamma
   std::auto_ptr<RubiscoNdist> rubiscoNdist;// Crop N distribution model.
-  std::auto_ptr<ABAEffect> ABAeffect;// ABA-xylem effect on photosynthesis.
   std::auto_ptr<StomataCon> Stomatacon;// Stomata conductance.
 
   // Log variable.

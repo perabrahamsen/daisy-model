@@ -39,10 +39,12 @@ public:
 public:
   virtual void output (Log&) const = 0;
   virtual double minimum () const = 0;
-  virtual double stomata_con (const double wsf /*[]*/,
+  virtual double stomata_con (const double ABA,  // [g/cm^3]
+                              const double h_x,  // [MPa]
                               const double hs /*[]*/, 
                               const double pz /*[mol/m²leaf/s]*/,
-                              const double Ptot /*[Pa]*/, const double cs /*[Pa]*/,
+                              const double Ptot /*[Pa]*/,
+                              const double cs /*[Pa]*/,
                               const double Gamma /*[Pa]*/, 
                               const double Ds /*[Pa]*/,
                               Treelog&) = 0;//[]
@@ -52,6 +54,19 @@ protected:
 
 public:
   ~StomataCon ();
+};
+
+struct StomataCon_WSF_base : public StomataCon
+{
+  // Parameters.
+  const double beta;  // ABA coefficient.
+  const double ABA_min;         // Unstressed ABA.
+  const double delta; // Psi coefficient.
+
+  double wsf (const double ABA /* g/cm^3 */, const double h_x /* MPa */) const;
+
+  // Create.
+  StomataCon_WSF_base (const BlockModel&);
 };
 
 #endif // STOMATACON_H

@@ -1,3 +1,15 @@
+2009-11-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* ABAeffect_exp.C, ABAeffect.C, ABAeffect.h: Integrate into stomatacon.
+	* Stomata.h, stomatacon.C, stomatacon_SHA.C: Integrated ABA effect.
+	* photo_Farquhar.C, photo_Farquhar.h: Update caller.
+
+2009-11-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* stomatacon.h, stomatacon.C (BB_base) New base model.
+	* stomatacon_Leuning.C, stomatacon_BB.C, stomatacon.C: Merged.
+	* Makefile (MODELS): Updated.
+
 2009-11-17  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* photo_Farquhar.C (b, m): Removed parameters.

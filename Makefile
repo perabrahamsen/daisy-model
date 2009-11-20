@@ -382,7 +382,7 @@ MODELS = program_cpedata.C tertiary_pipes.C \
 	reaction_boundrel.C log_regress.C reaction_Morgan98.C \
 	reaction_Styczen88.C program_GP2D.C svat_ssoc.C reaction_Jarvis99.C \
 	reaction_filter.C seed_LAI.C seed_release.C \
-	stomatacon_BB.C stomatacon_SHA.C stomatacon_Leuning.C \
+	stomatacon_SHA.C \
 	tertiary_old.C \
 	biopore_drain.C tertiary_biopores.C \
 	biopore_matrix.C transport_Mollerup.C transport_Hansen.C \
@@ -584,9 +584,9 @@ EXECUTABLES = daisy${EXE} tkdaisy${EXE} cdaisy${EXE} gdaisy${EXE}
 
 # Select files to be removed by the next svn update.
 #
-REMOVE = select_pF.C 
+REMOVE = stomatacon_Leuning.C stomatacon_BB.C 
 
-REMOVED = avalue.C alist.C avalue.h alist.h syntax.h syntax.C \
+REMOVED = select_pF.C avalue.C alist.C avalue.h alist.h syntax.h syntax.C \
 	msoltranrect_2x1.C msoltranrect_forward.C\
 	select_soil.C adsorption_none.C adsorption_full.C ABAprod_expr.C \
 	solute.C solute.h pedo.C pedo.h pedo_arit.C pedo_const.C \
@@ -996,7 +996,7 @@ seed${OBJ}: seed.C seed.h model_derived.h model_logable.h model.h symbol.h \
   frame_model.h frame.h librarian.h
 stomatacon${OBJ}: stomatacon.C stomatacon.h model_logable.h model.h symbol.h \
   mathlib.h assertion.h block_model.h block_nested.h block.h scope.h \
-  attribute.h treelog.h frame_model.h frame.h librarian.h
+  attribute.h treelog.h frame_model.h frame.h librarian.h check.h
 tertiary${OBJ}: tertiary.C tertiary.h model_framed.h model_logable.h model.h \
   symbol.h tertsmall.h geometry.h attribute.h soil_water.h block_model.h \
   block_nested.h block.h scope.h treelog.h frame_model.h frame.h \
@@ -1384,10 +1384,9 @@ scope_exchange${OBJ}: scope_exchange.C scope_exchange.h model.h symbol.h \
 photo_Farquhar${OBJ}: photo_Farquhar.C photo_Farquhar.h photo.h \
   model_derived.h model_logable.h model.h symbol.h block_model.h \
   block_nested.h block.h scope.h attribute.h treelog.h frame_model.h \
-  frame.h rubiscoNdist.h resistance.h ABAeffect.h stomatacon.h \
-  bioclimate.h model_framed.h canopy_std.h canopy_simple.h plf.h \
-  phenology.h log.h time.h border.h mathlib.h assertion.h check.h \
-  librarian.h fao.h
+  frame.h rubiscoNdist.h resistance.h stomatacon.h bioclimate.h \
+  model_framed.h canopy_std.h canopy_simple.h plf.h phenology.h log.h \
+  time.h border.h mathlib.h assertion.h check.h librarian.h fao.h
 scope_multi${OBJ}: scope_multi.C scope_multi.h scope.h attribute.h symbol.h \
   assertion.h librarian.h model.h
 scope_id${OBJ}: scope_id.C scope_id.h scope.h attribute.h symbol.h \
@@ -1656,16 +1655,9 @@ seed_release${OBJ}: seed_release.C seed.h model_derived.h model_logable.h \
   model.h symbol.h block_model.h block_nested.h block.h scope.h \
   attribute.h treelog.h frame_model.h frame.h librarian.h log.h time.h \
   border.h model_framed.h check.h
-stomatacon_BB${OBJ}: stomatacon_BB.C stomatacon.h model_logable.h model.h \
-  symbol.h mathlib.h assertion.h check.h block_model.h block_nested.h \
-  block.h scope.h attribute.h treelog.h frame_model.h frame.h librarian.h
 stomatacon_SHA${OBJ}: stomatacon_SHA.C stomatacon.h model_logable.h model.h \
   symbol.h mathlib.h assertion.h check.h block_model.h block_nested.h \
   block.h scope.h attribute.h treelog.h frame_model.h frame.h librarian.h
-stomatacon_Leuning${OBJ}: stomatacon_Leuning.C stomatacon.h model_logable.h \
-  model.h symbol.h mathlib.h assertion.h check.h block_model.h \
-  block_nested.h block.h scope.h attribute.h treelog.h frame_model.h \
-  frame.h librarian.h
 tertiary_old${OBJ}: tertiary_old.C tertiary.h model_framed.h model_logable.h \
   model.h symbol.h tertsmall.h geometry1d.h geometry_vert.h geometry.h \
   attribute.h soil.h soil_water.h chemical.h macro.h mactrans.h \

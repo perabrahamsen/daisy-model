@@ -19,6 +19,13 @@ In the Mollerup uzrect model, the K_average parameter can now take a
 near soil, even if the surrounding soil is very dry.  The
 K_average_horizontal parameter has been removed.
 
+** Changes to stomatacon models.
+
+Water stress effect is now part of the stomatacon models, rather than
+a seperate parameter of the Farquhar photosynthesis model.  And the
+water stress parameters have been renamed to beta and delta (from k
+and l), to match convetional names.
+
 * 4.74
 
 ** New 'area' column parameter.

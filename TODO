@@ -1,5 +1,13 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* svar annette
+
+* gs
+
+** gs_expr
+
+** rs_min / rs_max i pet_PM
+
 * Now
 
 ** Artikel om ABA integration
@@ -12,7 +20,7 @@ SHA: Vent på Seyed artikel.
 
 ** Test dk-taastrup-hourly.dwf mod RS-Weather.dwf
 
-* Agrcultural Water Management
+* Agricultural Water Management
 
 5-6 pages, SAFIR, end of year
 
@@ -23,16 +31,6 @@ Title: A physical based approach to integration of ABA production
 under heterogenious moisture conditions
 
 Abrahamsen et al
-
-* photo_Farquhar.C
-
-** Check enhed på "m" i gsmodeller.
-
-** Flyt "m" til stomatacon
-
-** rs_min / rs_max i pet_PM
-
-** gs_expr
 
 * irrigate
 
