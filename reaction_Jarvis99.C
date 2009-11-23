@@ -42,6 +42,7 @@ struct ReactionJarvis99 : public ReactionColgen
 {
   // Parameters.
   const std::auto_ptr<Rainergy> rainergy; // Energy in rain [J/cm^2/h]
+  const bool tillage_replenish_all;       // Ms = Mmax after tillage.
   const double Mmax;            // Max colloid pool [g C/g S]
   const PLF Mmax_tillage_factor; // Modification factor for tillage age.
   const double kd;              // Depletion rate from pool [g S/J]
@@ -116,10 +117,12 @@ ReactionJarvis99::colloid_generation (const double tillage_age /* [d] */,
 
   // Replenishment of colloids in the surface layer.
   const double Mmax_t = Mmax * Mmax_tillage_factor (tillage_age);
-  if (Ms <= Mmax_t)
-    P = kr * (1 - Ms / Mmax_t);     // [g cm^-2 h^-1]
+  if (Ms >= Mmax_t)
+    P = 0.0;                    // [g cm^-2 h^-1]
+  else if (tillage_replenish_all && tillage_age < dt * 2)
+    P = (Mmax_t - Ms) * (rho_b * zi) / dt; // [g cm^-2 h^-1]
   else
-    P = 0.0;
+    P = kr * (1 - Ms / Mmax_t); // [g cm^-2 h^-1]
   
   // Pure forward mass balance.
   As += (-D + P) * dt;  //[g cm^-2]
@@ -213,6 +216,7 @@ ReactionJarvis99::check (const Units& units, const Geometry& geo,
 ReactionJarvis99::ReactionJarvis99 (const BlockModel& al)
   : ReactionColgen (al),
     rainergy (Librarian::build_item<Rainergy> (al, "rainergy")),
+    tillage_replenish_all (al.flag ("tillage_replenish_all")),
     Mmax (al.number ("Mmax")),
     Mmax_tillage_factor (al.plf ("Mmax_tillage_factor")),
     kd (al.number ("kd")),
@@ -241,6 +245,9 @@ Colloid generation emulating the MACRO model.")
                       Attribute::Const, Attribute::Singleton,
                       "Model for calculating energy in rain.");
     frame.set ("rainergy", "Brown87");
+    frame.declare_boolean ("tillage_replenish_all", Attribute::Const, "\
+Set Ms = Mmax after tillage.");
+    frame.set ("tillage_replenish_all", true);
     frame.declare ("Mmax", "g/g", Check::non_negative (), Attribute::Const,
                 "Maximum amount of detachable particles.");
     // frame.set ("Mmax", 0.165);
