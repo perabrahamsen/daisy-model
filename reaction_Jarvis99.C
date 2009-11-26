@@ -43,7 +43,7 @@ struct ReactionJarvis99 : public ReactionColgen
   // Parameters.
   const std::auto_ptr<Rainergy> rainergy; // Energy in rain [J/cm^2/h]
   const bool tillage_replenish_all;       // Ms = Mmax after tillage.
-  const double Mmax;            // Max colloid pool [g C/g S]
+  /* const */ double Mmax;            // Max colloid pool [g C/g S]
   const PLF Mmax_tillage_factor; // Modification factor for tillage age.
   const double kd;              // Depletion rate from pool [g S/J]
   const double kr;              // Replenishment rate to pool [g C/cm^2 S/h] 
@@ -165,14 +165,18 @@ ReactionJarvis99::output (Log& log) const
 void 
 ReactionJarvis99::initialize (const Units&, const Geometry& geo,
                               const Soil& soil, const SoilWater&, 
-                              const SoilHeat&, const Surface& surface, Treelog&)
+                              const SoilHeat&, const Surface& surface, 
+                              Treelog& msg)
 {  
+  TREELOG_MODEL (msg);
+
   // Mixing layer
   if (zi < 0.0)
     zi = surface.mixing_depth ();
   daisy_assert (zi > 0.0);
 
   // Find average dry bulk density for top cells.
+#if 0
   const std::vector<size_t>& edge_above = geo.cell_edges (Geometry::cell_above);
   const size_t edge_above_size = edge_above.size ();
   double total_area = 0.0;
@@ -188,6 +192,26 @@ ReactionJarvis99::initialize (const Units&, const Geometry& geo,
     }
   daisy_assert (total_area > 0.0);
   rho_b /= total_area;
+#endif
+  rho_b = geo.content_hood (soil, &Soil::dry_bulk_density, 
+                            Geometry::cell_above);
+  if (Mmax < 0.0)
+    {
+      const double clay 
+        = geo.content_hood (soil, &Soil::clay, Geometry::cell_above);
+
+      // Brubaker et at, 1992
+      Mmax = 0.362 * clay - 0.00518;
+      if (Mmax <= 0.0)
+        { 
+          msg.warning ("Too little clay to initialize Mmax, using 0.01");
+          Mmax = 0.01;
+        }
+    }
+
+  if (Ms < 0.0)
+    // Initialize to 10% of max.
+    Ms = Mmax * 0.1;
 
   // [g C/cm^2 S] = [g C/g S] * [g S/cm^3 S] * [cm S]
   As = Ms * rho_b * zi; 
@@ -217,13 +241,13 @@ ReactionJarvis99::ReactionJarvis99 (const BlockModel& al)
   : ReactionColgen (al),
     rainergy (Librarian::build_item<Rainergy> (al, "rainergy")),
     tillage_replenish_all (al.flag ("tillage_replenish_all")),
-    Mmax (al.number ("Mmax")),
+    Mmax (al.number ("Mmax", -42.42e42)),
     Mmax_tillage_factor (al.plf ("Mmax_tillage_factor")),
     kd (al.number ("kd")),
     kr (al.number ("kr")),
     zi (al.number ("zi", -42.24e42)),
     rho_b (-42.42e42),
-    Ms (al.number ("Ms", Mmax * 0.1)),
+    Ms (al.number ("Ms", -42.42e42)),
     As (-42.42e42),
     P (-42.42e42),
     E (0.0)
@@ -240,7 +264,7 @@ Colloid generation emulating the MACRO model.")
   void load_frame (Frame& frame) const
   {
     frame.set ("ponddamp", "none");
-    frame.set_strings ("cite", "macro-colloid");
+    frame.set_strings ("cite", "macro-colloid", "mmax");
     frame.declare_object ("rainergy", Rainergy::component,
                       Attribute::Const, Attribute::Singleton,
                       "Model for calculating energy in rain.");
@@ -248,8 +272,10 @@ Colloid generation emulating the MACRO model.")
     frame.declare_boolean ("tillage_replenish_all", Attribute::Const, "\
 Set Ms = Mmax after tillage.");
     frame.set ("tillage_replenish_all", true);
-    frame.declare ("Mmax", "g/g", Check::non_negative (), Attribute::Const,
-                "Maximum amount of detachable particles.");
+    frame.declare ("Mmax", "g/g", Check::non_negative (), 
+                   Attribute::OptionalConst, "\
+Maximum amount of detachable particles.\n\
+By default, method 1 of Brubaker et al, 1992, will be used.");
     // frame.set ("Mmax", 0.165);
     frame.declare ("Mmax_tillage_factor", "d", Attribute::None (), 
                    Check::non_negative (), Attribute::Const, "\

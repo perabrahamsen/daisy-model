@@ -60,7 +60,7 @@ carbon part of the 'K' factor.")
 
 (defreaction colloid-generation colgen_Jarvis99
   "Release of colloids in soil surface from heavy rain."
-  (Mmax 0.165 [g/g])                    ;Max detachable.
+  ;; (Mmax 0.165 [g/g])                    ;Max detachable.
   (kd 15.0 [g/J])                       ;Detachment rate coefficient.
   (kr 0.1 [g/m^2/h])                    ;Replenishment rate coefficient.
   (zi 0.1 [cm])                         ;Surface layer thickness.

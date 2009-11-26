@@ -61,4 +61,13 @@
 (defprogram ioxynil-00-01 ioxynil
   (file "pest-00-01.ddf"))
 
-(run ioxynil-00-01)
+(defprogram rain Agrovand
+  (handle sum)
+  (every_hour true)
+  (factor 24)
+  (value Regn))
+
+(defprogram rain-00-01 rain
+  (file "rain-00-01.ddf"))
+
+(run rain-00-01)

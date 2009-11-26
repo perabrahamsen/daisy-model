@@ -77,6 +77,7 @@ struct ProgramCPEData : public Program
   const symbol weight_tag;
   const double factor;
   const Handle handle;
+  const bool every_hour;
   LexerTable lex;
   int day_c;
   int value_c;
@@ -172,11 +173,22 @@ struct ProgramCPEData : public Program
                 << "\t" << value * factor
                 << "\n";
             
-            while (day > next_hour)
+            while (true)
               {
                 next.tick_hour ();
                 const Timestep diff = next - start;
                 next_hour = diff.total_hours () / 24.0;
+
+                if (day <= next_hour)
+                  break;
+
+                if (every_hour)
+                  tmp << next.year () 
+                      << "\t" << next.month ()
+                      << "\t" << next.mday ()
+                      << "\t" << next.hour ()
+                      << "\t" << 0.0
+                      << "\n";
               }
           }
         last_value = next_value;
@@ -234,6 +246,7 @@ struct ProgramCPEData : public Program
       weight_tag (al.name ("weight", Attribute::None ())),
       factor (al.number ("factor")),
       handle (al.name ("handle")),
+      every_hour (al.flag ("every_hour")),
       lex (al),
       day_c (-42),
       value_c (-42),
@@ -277,6 +290,8 @@ last value in the previous timestep.\n\
 sum: print sum of all values within current timestep.");
     static VCheck::Enum handle_check ("average", "difference", "sum");
     frame.set_check ("handle", handle_check);
+    frame.declare_boolean ("every_hour", Attribute::Const, "\
+If true, print zeroes for hours with no data.");
   }
 } ProgramCPEData_syntax;
 
