@@ -72,6 +72,7 @@ Handle::symbol2handle (symbol s)
 struct ProgramCPEData : public Program
 {
   const Time origin;
+  const Time begin;
   const symbol day_tag;
   const symbol value_tag;
   const symbol weight_tag;
@@ -166,12 +167,13 @@ struct ProgramCPEData : public Program
               default:
                 daisy_notreached ();
               }
-            tmp << next.year () 
-                << "\t" << next.month ()
-                << "\t" << next.mday ()
-                << "\t" << next.hour ()
-                << "\t" << value * factor
-                << "\n";
+            if (next >= begin)
+              tmp << next.year () 
+                  << "\t" << next.month ()
+                  << "\t" << next.mday ()
+                  << "\t" << next.hour ()
+                  << "\t" << value * factor
+                  << "\n";
             
             while (true)
               {
@@ -182,7 +184,7 @@ struct ProgramCPEData : public Program
                 if (day <= next_hour)
                   break;
 
-                if (every_hour)
+                if (every_hour && next >= begin)
                   tmp << next.year () 
                       << "\t" << next.month ()
                       << "\t" << next.mday ()
@@ -238,9 +240,16 @@ struct ProgramCPEData : public Program
   return ok; 
   }
 
+  static const Time create_begin (const BlockModel& al)
+  {
+    if (al.check ("begin"))
+      return Time (al.submodel ("begin"));
+    return Time (1, 1, 1, 0);
+  }
   ProgramCPEData (const BlockModel& al)
     : Program (al),
       origin (al.submodel ("origin")),
+      begin (create_begin (al)),
       day_tag (al.name ("day")),
       value_tag (al.name ("value")),
       weight_tag (al.name ("weight", Attribute::None ())),
@@ -268,6 +277,9 @@ Manipulate data from Agrovand.")
   { 
     LexerTable::load_syntax (frame);
     frame.declare_submodule ("origin", Attribute::Const, "Day 1.", 
+                             Time::load_syntax);
+    frame.declare_submodule ("begin", Attribute::OptionalConst, "\
+If specified, only print entries after this date.", 
                              Time::load_syntax);
     frame.declare_string ("day", Attribute::Const, "\
 Tag used for day.");

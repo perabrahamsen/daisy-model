@@ -1,8 +1,16 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* 29 februar 2000 cpe data + regn
+* cpedata
 
-* Jarvis parametre: litteratur
+** lav korrektiontabel ved at sammenligne med højbakkegård
+
+** gendan datafiler
+
+Evt. ny "output" parameter i cpedata
+
+** korriger vejrfil
+
+weatherfile multiple?
 
 * gs
 
