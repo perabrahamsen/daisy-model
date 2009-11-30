@@ -851,6 +851,7 @@ svnci: $(TEXT)
 
 add:
 	(cd sample && make add)
+	(cd project && make add)
 	svn add $(TEXT)
 	-svn remove $(REMOVE)
 
