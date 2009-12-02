@@ -1,3 +1,9 @@
+2009-12-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lexer_table.C (read_header): Let 'original' overwrite dimension
+	line.
+	(get_entries_raw): Skip data lines beginning with '#'.
+
 2009-12-01  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* timestep.h, timestep.C (year): Removed.

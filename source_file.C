@@ -25,6 +25,7 @@
 #include "gnuplot_utils.h"
 #include "vcheck.h"
 #include "mathlib.h"
+#include "submodeler.h"
 #include <algorithm>
 #include <numeric>
 
@@ -56,7 +57,8 @@ SourceFile::add_entry (const Time& time, std::vector<double>& vals)
       values.push_back (mean);
       ebars.push_back (std_deviation);
     }
-  times.push_back (time);
+  const Time modified = time + time_offset;
+  times.push_back (modified);
   daisy_assert (times.size () == values.size ());
   daisy_assert (values.size () == ebars.size ());
   vals.clear ();
@@ -118,6 +120,10 @@ standard deviation.");
 Hour to assume when nothing else is specified;");
   frame.set ("default_hour", 8);
   frame.set_check ("default_hour", VCheck::valid_hour ());
+  frame.declare_submodule ("time_offset", Attribute::Const, "\
+Add this to time from sources.\n\
+By default, use unmodified times.",
+                           Timestep::load_syntax);
   static VCheck::Enum handle_check ("sum", "normal");
   frame.set_check ("handle", handle_check);
   frame.set ("handle", "normal");
@@ -131,7 +137,8 @@ SourceFile::SourceFile (const BlockModel& al)
     style_ (al.integer ("style", -1)),
     accumulate_ (al.flag ("accumulate")),
     use_sum (al.name ("handle") == "sum"),
-    default_hour (al.integer ("default_hour"))
+    default_hour (al.integer ("default_hour")),
+    time_offset (submodel_value<Timestep> (al, "time_offset"))
 { }
 
 SourceFile::~SourceFile ()

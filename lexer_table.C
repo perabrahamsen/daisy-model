@@ -171,13 +171,15 @@ LexerTable::read_header (Treelog& msg)
         dim_names.push_back (symbol (dim_names_raw[i]));
       daisy_assert (dim_names_raw.size () == dim_names.size ());
     }
-  else switch (original.size ())
+  switch (original.size ())
     {
     case 0:
-      dim_names.insert (dim_names.end (), tag_names.size (), 
-                        Attribute::Unknown ());
+      if (!dim_line)
+        dim_names.insert (dim_names.end (), tag_names.size (), 
+                          Attribute::Unknown ());
       break;
     case 1:
+      dim_names.clear ();
       dim_names.insert (dim_names.end (), tag_names.size (),
                         original[0]);
       break;
@@ -262,6 +264,11 @@ LexerTable::get_entries_raw (std::vector<std::string>& entries) const
 {
   entries.clear ();
   lex->skip ("\n");
+  while (lex->good () && lex->peek () == '#')
+    {
+      lex->skip_line ();
+      lex->skip ("\n");
+    }
   while (lex->good ())
     {
       entries.push_back (get_entry ());

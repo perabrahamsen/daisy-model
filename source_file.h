@@ -23,6 +23,7 @@
 
 #include "source.h"
 #include "lexer_table.h"
+#include "timestep.h"
 
 class SourceFile : public Source
 {
@@ -36,6 +37,7 @@ private:
   bool accumulate_;
   bool use_sum;
   int default_hour;
+  const Timestep time_offset;
 protected:
   void add_entry (const Time& time, std::vector<double>& vals);
 private:
