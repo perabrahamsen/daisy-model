@@ -30,14 +30,12 @@
 
 struct Timestep::Implementation
 { 
-  int years;
   int days;
   int hours;
   int minutes;
   int seconds;
-  Implementation (int y, int d, int h, int m, int s)
-    : years (y),
-      days (d),
+  Implementation (int d, int h, int m, int s)
+    : days (d),
       hours (h),
       minutes (m),
       seconds (s)
@@ -45,43 +43,32 @@ struct Timestep::Implementation
 };
 
 const Timestep& 
-Timestep::year ()
-{
-  static const Timestep value (1, 0, 0, 0, 0);
-  return value;
-}
-
-const Timestep& 
 Timestep::day ()
 {
-  static const Timestep value (0, 1, 0, 0, 0);
+  static const Timestep value (1, 0, 0, 0);
   return value;
 }
 
 const Timestep& 
 Timestep::hour ()
 {
-  static const Timestep value (0, 0, 1, 0, 0);
+  static const Timestep value (0, 1, 0, 0);
   return value;
 }
 
 const Timestep& 
 Timestep::minute ()
 {
-  static const Timestep value (0, 0, 0, 1, 0);
+  static const Timestep value (0, 0, 1, 0);
   return value;
 }
 
 const Timestep& 
 Timestep::second ()
 {
-  static const Timestep value (0, 0, 0, 0, 1);
+  static const Timestep value (0, 0, 0, 1);
   return value;
 }
-
-int
-Timestep::years () const
-{ return impl->years; }
 
 int
 Timestep::days () const
@@ -102,8 +89,7 @@ Timestep::seconds () const
 double 
 Timestep::total_hours () const
 {
-  return (365.2425 * years () + days ()) * 24.0 + hours ()
-    + (minutes () + seconds () / 60.0) / 60.0;
+  return (days ()) * 24.0 + hours () + (minutes () + seconds () / 60.0) / 60.0;
 }
 
 bool
@@ -160,9 +146,6 @@ Timestep::load_syntax (Frame& frame)
 void 
 Timestep::load_frame (Frame& frame)
 {
-  frame.declare_integer ("years", Attribute::State, 
-              "Number of years.");
-  frame.set ("years", 0);
   frame.declare_integer ("days", Attribute::State, 
               "Number of days.");
   frame.set ("days", 0);
@@ -180,32 +163,30 @@ Timestep::load_frame (Frame& frame)
 const Timestep& 
 Timestep::null ()
 {
-  static Timestep none (0, 0, 0, 0, 0);
+  static Timestep none (0, 0, 0, 0);
   return none;
 }
 
 Timestep::Timestep (const Block& al)
-  : impl (new Implementation (al.integer ("years"), 
-                              al.integer ("days"),
+  : impl (new Implementation (al.integer ("days"),
                               al.integer ("hours"),
                               al.integer ("minutes"),
                               al.integer ("seconds")))
 { }
 
 Timestep::Timestep (const FrameSubmodel& al)
-  : impl (new Implementation (al.integer ("years"), 
-                              al.integer ("days"),
+  : impl (new Implementation (al.integer ("days"),
                               al.integer ("hours"),
                               al.integer ("minutes"),
                               al.integer ("seconds")))
 { }
 
-Timestep::Timestep (int y, int d, int h, int m, int s)
-  : impl (new Implementation (y, d, h, m, s))
+Timestep::Timestep (int d, int h, int m, int s)
+  : impl (new Implementation (d, h, m, s))
 { }
 
 Timestep::Timestep (const Timestep& other)
-  : impl (new Implementation (other.years (), other.days (), other.hours (),
+  : impl (new Implementation (other.days (), other.hours (),
                               other.minutes (), other.seconds ()))
 { }
 
@@ -214,7 +195,6 @@ Timestep::~Timestep ()
 
 void operator+= (Time& time, const Timestep& step)
 {
-  time.tick_year (step.years ());
   time.tick_day (step.days ());
   time.tick_hour (step.hours ());
   time.tick_minute (step.minutes ());
@@ -236,14 +216,13 @@ Time operator- (const Time& old, const Timestep& step)
 }
 
 Timestep operator+ (const Timestep& a, const Timestep& b)
-{ return Timestep (a.years () + b.years (),
-                   a.days () + b.days (),
+{ return Timestep (a.days () + b.days (),
                    a.hours () + b.hours (),
                    a.minutes () + b.minutes (),
                    a.seconds () + b.seconds ()); }
 
 Timestep operator- (const Timestep& step)
-{ return Timestep (-step.years (), -step.days (), -step.hours (), 
+{ return Timestep (-step.days (), -step.hours (), 
                    -step.minutes (), -step.seconds ()); }
 
 Timestep operator- (const Time& a, const Time& b)
@@ -254,8 +233,9 @@ Timestep operator- (const Time& a, const Time& b)
   int seconds = a.second () - b.second ();
   int minutes = a.minute () - b.minute ();
   int hours = a.hour () - b.hour ();
-  int days = a.yday () - b.yday ();
-  int years = a.year () - b.year ();
+  const Time a_day (a.year (), a.month (), a.mday (), 0, 0, 0);
+  const Time b_day (b.year (), b.month (), b.mday (), 0, 0, 0);
+  int days = Time::days_between (b_day, a_day);
   if (seconds < 0)
     {
       seconds += 60;
@@ -271,15 +251,7 @@ Timestep operator- (const Time& a, const Time& b)
       hours += 24;
       days -= 1;
     }
-  if (days < 0)
-    { 
-      days += 365;
-      if (Time::leap (a.year ()))
-        days += 1;
-      years -= 1;
-    }
-  daisy_assert (years >= 0);
-  return Timestep (years, days, hours, minutes, seconds);
+  return Timestep (days, hours, minutes, seconds);
 }
 
 bool 

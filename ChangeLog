@@ -1,3 +1,8 @@
+2009-12-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* timestep.h, timestep.C (year): Removed.
+	* condition_time.C (Condition): Update caller.
+
 2009-11-20  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* ABAeffect_exp.C, ABAeffect.C, ABAeffect.h: Integrate into stomatacon.

@@ -861,11 +861,9 @@ private:
       return "h";
     if (tstep == Timestep::day ())
       return "d";
-    static Timestep week (0, 7, 0, 0, 0);
+    static Timestep week (7, 0, 0, 0);
     if (tstep == week)
       return "w";
-    if (tstep == Timestep::year ())
-      return "y";
     
     return "dt";
   }

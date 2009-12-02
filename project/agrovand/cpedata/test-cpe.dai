@@ -1,12 +1,19 @@
+;;; test-cpe.dai --- convert Agrovand data to ddf format.
+
 (defprogram Agrovand cpedata
   (origin 1998 1 1 0)
   (missing "-1")
-  (day "Tid")
-  (file "df-99-00.ddf"))
+  (day "Tid"))
 
 (defprogram flow Agrovand
   (handle difference)
   (value "Afstr"))
+
+(defprogram flow-98-99 flow
+  (file "df-98-99.ddf"))
+
+(defprogram flow-99-00 flow
+  (file "df-99-00.ddf"))
 
 (defprogram flow-00-01 flow
   (file "df-00-01.ddf"))
@@ -15,7 +22,6 @@
   (file "df-01-02.ddf"))
 
 (defprogram bromine Agrovand
-  (factor 79.904)
   (handle average)
   (value "Bromine"))
 
@@ -66,14 +72,46 @@
   (every_hour true)
   (value Regn))
 
-(defprogram rain-00-01 rain
-  ;;(origin 1997 12 31 17)
-  (begin 2001 1 1 0)
-  (file "rain-00-01.ddf"))
-
 (defprogram rain-98-99 rain
-  ;;(origin 1997 12 31 17)
   (begin 1998 10 1 0)
   (file "rain-98-99.ddf"))
 
-(run rain-98-99)
+(defprogram rain-99-00 rain
+  (begin 1999 10 1 0)
+  (file "rain-99-00.ddf"))
+
+(defprogram rain-00-01 rain
+  (begin 2000 10 1 0)
+  (file "rain-00-01.ddf"))
+
+(defprogram rain-01-02 rain
+  (begin 2001 10 1 0)
+  (file "rain-01-02.ddf"))
+
+(run batch
+     (run (write (what "File: drain-flow.ddf"))
+;;          flow-98-99
+;;          flow-99-00
+;;          flow-00-01
+;;          flow-01-02
+;;          (write (what "File: particles.ddf"))
+;;          particles-98-99
+;;          particles-99-00
+;;          particles-00-01
+;;          particles-01-02
+;;          (write (what "File: bromine.ddf"))
+;;          bromine-98-99
+;;          bromine-99-00
+;;          (write (what "File: pendimethalin.ddf"))
+;;          pend-99-00
+;;          pend-00-01
+;;          (write (what "File: ioxynil.ddf"))
+;;          ioxynil-00-01
+          (write (what "File: rain.ddf"))
+          rain-98-99
+          rain-99-00
+          rain-00-01
+          rain-01-02
+     ))
+
+;; test-cpe.dai ends here

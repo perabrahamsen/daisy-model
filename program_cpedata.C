@@ -79,6 +79,7 @@ struct ProgramCPEData : public Program
   const double factor;
   const Handle handle;
   const bool every_hour;
+  const int debug;
   LexerTable lex;
   int day_c;
   int value_c;
@@ -140,6 +141,9 @@ struct ProgramCPEData : public Program
 
         const Timestep diff = next - start;
         double next_hour = diff.total_hours () / 24.0;
+
+        if (debug > 0)
+          tmp << "(" << day << " " << next_value << " " << next_hour << ")\n";
 
         if (day > next_hour)
           {
@@ -256,6 +260,7 @@ struct ProgramCPEData : public Program
       factor (al.number ("factor")),
       handle (al.name ("handle")),
       every_hour (al.flag ("every_hour")),
+      debug (al.integer ("debug")),
       lex (al),
       day_c (-42),
       value_c (-42),
@@ -304,6 +309,10 @@ sum: print sum of all values within current timestep.");
     frame.set_check ("handle", handle_check);
     frame.declare_boolean ("every_hour", Attribute::Const, "\
 If true, print zeroes for hours with no data.");
+    frame.set ("every_hour", false);
+    frame.declare_integer ("debug", Attribute::Const, "\
+Debug level, 0 means no debug information.");
+    frame.set ("debug", 0);
   }
 } ProgramCPEData_syntax;
 

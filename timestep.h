@@ -39,7 +39,6 @@ private:
 
   // Prebuild values.
 public:
-  static const Timestep& year ();
   static const Timestep& day ();
   static const Timestep& hour ();
   static const Timestep& minute ();
@@ -47,7 +46,6 @@ public:
 
   // Extract elements.
 public:
-  int years () const;
   int days () const;
   int hours () const;
   int minutes () const;
@@ -71,7 +69,7 @@ public:
   static void load_frame (Frame&);
   static const Timestep& null ();
   explicit Timestep (const Block&);
-  Timestep (int years, int days, int hours, int minutes, int seconds);
+  Timestep (int days, int hours, int minutes, int seconds);
   ~Timestep ();
   Timestep (const Timestep&);
 private:                    
