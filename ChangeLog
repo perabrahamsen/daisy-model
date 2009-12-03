@@ -1,3 +1,8 @@
+2009-12-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* gnuplot_time.C (plot): Improve error message for more than 2
+	dimensions.
+
 2009-12-02  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* lexer_table.C (read_header): Let 'original' overwrite dimension

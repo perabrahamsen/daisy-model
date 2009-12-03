@@ -133,7 +133,13 @@ set style data lines\n";
       out << "set ylabel " << quote (dims[0]) << "\n";
       break;
     default:
-      msg.error ("Can only plot one or two units at a time");
+      {
+        std::ostringstream tmp;
+        tmp << "Can only plot one or two units at a time, got";
+        for (size_t i = 0; i < dims.size (); i++)
+          tmp << " [" << dims[i] << "]";
+        msg.error (tmp.str ());
+      }
       return false;
     }
 
