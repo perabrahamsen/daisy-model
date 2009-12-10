@@ -456,7 +456,7 @@ DISABLED = depend.C \
 	weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C 
 # A component is a common interface to a number of models.
 # 
-COMPONENTS = condedge.C rainergy.C ponddamp.C scope_model.C seed.C \
+COMPONENTS = draineqd.C condedge.C rainergy.C ponddamp.C scope_model.C seed.C \
 	stomatacon.C tertiary.C biopore.C secondary.C heatrect.C unit_model.C \
 	ABAprod.C solver.C element.C ui.C reaction.C scopesel.C \
 	ABAeffect.C transport.C uzrect.C bound.C volume.C uz1d.C \

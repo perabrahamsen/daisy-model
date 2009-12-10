@@ -2,7 +2,6 @@
 // 
 // Copyright 2008 and 2009 Per Abrahamsen and KU.
 //
-// This file is part of Daisy.
 // 
 // Daisy is free software; you can redistribute it and/or modify
 // it under the terms of the GNU Lesser Public License as published by
@@ -33,11 +32,15 @@
 #include "mathlib.h"
 #include "log.h"
 #include "check.h"
+#include "draineqd.h"
+
 
 struct TertiaryPipes : public Tertiary
 {
   // Parameters
+  std::auto_ptr<const Draineqd> eq_depth; 
   const double L;               // Distance between pipes. [cm]
+  const double rad;             // Inner radius of drain pipes. [cm]
   const double x;               // Distance to nearest pipe. [cm]
   const double pipe_position;   // Height pipes are placed above surface. [cm]
   const double K_to_pipes_;     // Horizontal sat. conductivity. [cm h^-1]
@@ -72,7 +75,7 @@ struct TertiaryPipes : public Tertiary
                      const SoilHeat& soil_heat) const;
   double EquilibriumDrainFlow (const Geometry& geo,
                                const Soil&, const SoilHeat&);
-
+    
   // Create and Destroy.
 public:
   bool initialize (const Units&, 
@@ -128,7 +131,7 @@ TertiaryPipes::tick (const Units&, const Geometry& geo, const Soil& soil,
     height = h_surface;
 
   // Find sink term.
-  EqDrnFlow = EquilibriumDrainFlow (geo, soil, soil_heat);
+  EqDrnFlow = EquilibriumDrainFlow (geo, soil, soil_heat);   
   DrainFlow= geo.total_surface (S);
   soil_water.drain (S);
 }
@@ -153,17 +156,19 @@ TertiaryPipes::K_to_pipes (const unsigned int i,
   return K_to_pipes_;
 }
 
+
 double
 TertiaryPipes::EquilibriumDrainFlow (const Geometry& geo,
                                      const Soil& soil, 
                                      const SoilHeat& soil_heat)
 {
+  
   // If groundwater table is below pipes, there is no flow.
   if (height <= pipe_position)
     return 0.0;
 
   const size_t cell_size = geo.cell_size ();
-
+  
   double Ha = 0.0;            // Volume above pipes.
   double Ka = 0.0;            // Conductivity above pipes.
   double Hb = 0.0;            // Volume below pipes.
@@ -219,23 +224,76 @@ TertiaryPipes::EquilibriumDrainFlow (const Geometry& geo,
   Hb /= soil_width;
 
   // Average conductivity.
-  Ka /= Ha;
+  Ka /= (Ha*soil_width);
   daisy_assert (std::isnormal (Hb));
-  Kb /= Hb;
+  Kb /= (Hb*soil_width);
   
-  const double Flow = (4*Ka*Ha*Ha + 2*Kb*Hb*Ha) / (L*x - x*x);
 
-  // Distribution of drain flow among numeric soil layers
-  const double soil_bottom = geo.bottom ();
+  //--- Calculate equivalent depth ---
+  double De;
+  if (Hb<=0)
+    De = 0.0;
+  else 
+    De = eq_depth->value (L, rad, Hb); 
+  //----------------------------------
+
+
+  //const double Flow = (4*Ka*Ha*Ha + 2*Kb*Hb*Ha) / (L*x - x*x); //original
+  // const double Flow = (Ka*Ha*Ha + 2*Kb*Hb*Ha) / (L*x - x*x);  //corrected
+  const double Flow_a = Ka*Ha*Ha / (L*x - x*x);   //Flow above drainpipes
+  const double Flow_b = 2*Kb*De*Ha / (L*x - x*x); //Flow below drainpipes 
+  const double Flow = Flow_a + Flow_b;
+
+  
+
+  //-------old-----
+  //// Distribution of drain flow among numeric soil layers 
+#if 0
   const double a = Flow / (Ka*Ha + Kb*Hb);
   for (size_t i = 0; i < cell_size; i++)
     {
+      const double soil_bottom = geo.bottom ();
       const double f = geo.fraction_in_z_interval (i, height, soil_bottom);
       S[i] = f * a * K_to_pipes (i, soil, soil_heat);
     }
+#endif
+  //---------------
+
+
+#if 1
+  // New Distribution of drain flow among numeric soil layers  
+  for (size_t i = 0; i < cell_size; i++)
+    {   
+      // Find fraction above and below pipes.
+      double z_bottom = geo.cell_bottom (i);
+      double z_top = std::min (geo.cell_top (i), height); 
+      // double Deltaz = z_top - z_bottom;
+   
+      double f_above = 
+        (z_top > pipe_position)
+        ? geo.fraction_in_z_interval (i, z_top, pipe_position)
+        : 0.0;
+      double f_below =
+        (z_bottom < pipe_position)
+        ? geo.fraction_in_z_interval (i, pipe_position, z_bottom)
+        : 0.0;
+            
+      S[i] = Flow_a * f_above *  K_to_pipes (i, soil, soil_heat) / (Ka*Ha);
+      S[i] += Flow_b * f_below * K_to_pipes (i, soil, soil_heat) / (Kb*Hb);    
+    }
+#endif  
+
   daisy_assert (std::isfinite (Flow));
   return Flow;
+ 
 }
+
+//---------------------------------------------
+
+
+
+
+
 
 bool 
 TertiaryPipes::initialize (const Units&,
@@ -250,7 +308,9 @@ TertiaryPipes::initialize (const Units&,
 
 TertiaryPipes::TertiaryPipes (const BlockModel& al)
   : Tertiary (al),
+    eq_depth (Librarian::build_item<Draineqd> (al, "eq_depth")),
     L (al.number ("L")),
+    rad (al.number ("rad")),
     x (al.number ("x", L / 2.0)),
     pipe_position (al.number ("pipe_position")),
     K_to_pipes_ (al.number ("K_to_pipes", -1.0)),
@@ -267,9 +327,16 @@ static struct TertiaryPipesSyntax : DeclareModel
   { }
   void load_frame (Frame& frame) const
   {
+    frame.declare_object ("eq_depth", Draineqd::component,
+                          Attribute::Const, Attribute::Singleton, "\
+Model for calculating equivalent depth for drains.");
+    frame.set ("eq_depth", "none");
     frame.declare ("L", "cm", Check::positive (), Attribute::Const,
                    "Distance between pipes.");
     frame.set ("L", 1800.0);
+    frame.declare ("rad", "cm", Check::positive (), Attribute::Const,
+                   "Inner radius of drain pipes.");
+    frame.set ("rad", 3.5);
     frame.declare ("x", "cm", Check::positive (), Attribute::OptionalConst,
                    "Horizontal distance to nearest pipe.\n\
 By default, this is 1/2 L.");
