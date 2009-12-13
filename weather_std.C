@@ -626,7 +626,7 @@ WeatherStandard::read_line ()
 	  if (next_time != Time (year, month, mday, hour))
 	    {
               if (timestep > 0)
-                lex->error ("Bad timestep");
+                lex->warning ("Bad timestep");
 	      next_time = Time (year, month, mday, hour);
 	    }
 	}

@@ -72,7 +72,7 @@ SourceExpr::load (Treelog& msg)
   dimension_ = expr->dimension (scope);
   if (accumulate ())
     {
-      const symbol accumulated = Units::multiply (dimension_, "h");
+      const symbol accumulated = Units::multiply (dimension_, timestep);
       if (accumulated != Attribute::Unknown ())
         dimension_ = accumulated;
     }

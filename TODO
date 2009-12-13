@@ -1,24 +1,34 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* rørrende rain?
-
-** plot rørrende.dwf med og uden korrektur
-
-** weather source
-
-initialize & rain
-
-** test mod højbakke
-
-* gs
-
-** gs_expr
-
-** rs_min / rs_max i pet_PM
-
 * VAP data 
 
-* Now
+** Silstrup
+
+*** retention curves
+
+Se gnuplot_hydraulic.dai i fertorganic
+
+*** Spørg SH om kabilær. stigning
+
+*** Spørg SH/CPE om koncentrationer.
+
+Skal vi plotte de tids- og flowspecifikke serier?
+
+*** Find pesticider i database.
+
+** Macropores 
+
+Flere "Tertiary" models?
+
+** pesticide application 
+
+New model?  "apply"?
+
+** Estrup
+
+** 2D
+
+* Artikler
 
 ** Artikel om ABA integration
 
@@ -33,7 +43,7 @@ SHA: Vent på Seyed artikel.
 * Agricultural Water Management
 
 5-6 pages, SAFIR, end of year
-
+1
 Framework for testing stomata models
 Integrating ABA production in the root zone (Fulai + Finn/Bo)
 
@@ -41,6 +51,12 @@ Title: A physical based approach to integration of ABA production
 under heterogenious moisture conditions
 
 Abrahamsen et al
+
+* gs
+
+** gs_expr
+
+** rs_min / rs_max i pet_PM
 
 * irrigate
 

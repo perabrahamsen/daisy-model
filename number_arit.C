@@ -658,8 +658,25 @@ struct NumberDivide : public NumberOperands
       val /= operands[i]->value (scope);
     return val;
   }
-  symbol dimension (const Scope&) const 
-  { return Attribute::Unknown (); }
+  symbol dimension (const Scope& scope) const 
+  {
+    daisy_assert (operands.size () > 0);
+    std::string name = operands[0]->dimension (scope).name ();
+    for (size_t i = 1; i < operands.size (); i++)
+      {
+        const symbol dim = operands[i]->dimension (scope);
+        if (dim == Attribute::None () || dim == Attribute::Fraction ())
+          continue;
+        if (dim == Attribute::Unknown ())
+          return Attribute::Unknown ();
+        const std::string dimstr = dim.name ();
+        if (dimstr.find_first_of ('/') != std::string::npos)
+          name += "/(" + dimstr + ")";
+        else
+          name += "/" + dimstr;
+      }
+    return symbol (name);
+  }
 
   // Create.
   NumberDivide (const BlockModel& al)

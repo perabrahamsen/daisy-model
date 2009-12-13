@@ -1,0 +1,520 @@
+;;; Silstrup VAP area -- data from GEUS.
+
+(input file "tillage.dai")
+(input file "crop.dai")
+(input file "fertilizer.dai")
+(input file "chemistry.dai")
+(input file "log-std.dai")
+
+;; Chemistry
+
+(defchemical "Bromide" common
+  (diffusion_coefficient 2.0e-5 [cm^2/s])
+  (crop_uptake_reflection_factor 1 [])
+  (canopy_dissipation_rate 0 [h^-1])
+  (decompose_rate 0 [h^-1]))
+
+(defchemical Fenpropimorph fungicide
+  (cite "lindhardt2001")
+  (decompose_halftime 67 [d])
+  (adsorption linear (K_OC 3700 [l/kg])))
+
+(defchemical Dimethoate insecticide
+  (cite "lindhardt2001")
+  (decompose_halftime 16 [d])
+  (adsorption linear (K_OC 30 [l/kg])))
+
+(defchemical Glyphosate herbicide
+  (cite "lindhardt2001")
+  (decompose_halftime 16 [d])
+  (adsorption linear (K_OC 3400 [l/kg])))
+
+(defchemical Metamitron herbicide
+  (cite "lindhardt2001")
+  (decompose_halftime 14 [d])
+  (adsorption linear (K_OC 207 [l/kg])))
+
+(defchemistry Silstrup default
+  (trace Bromide Dimethoate Fenpropimorph Glyphosate Metamitron))
+
+(defchemistry Estrup default
+  (trace Bromide Dimethoate Fenpropimorph Glyphosate))
+
+;; Soil 
+
+(defnumber C2OM identity
+  ;; Paramaters.
+  (declare C Number [] "Organic C content.")
+  ;; MACRO uses C content, while Daisy uses total humus content.
+  (declare C_in_humus Number [] "C fraction in humus.")
+  (C_in_humus 0.587 [])
+  (value (/ C C_in_humus)))
+
+(defhorizon Silstrup_Ap FAO3
+  (clay 22.45 [%]) (silt 27.7 [%])(sand 49.85 [%])
+  (humus (C2OM (C 1.798 [%]))) (dry_bulk_density 1.48 [g/cm^3])
+  (hydraulic M_vG
+             (Theta_sat 44 [%]) (Theta_res 0 [%])
+             (n 1.1 []) (K_sat 306 [mm/h])
+             (l 0.5 []) (alpha 0.01 [cm^-1])))
+
+(defhorizon Silstrup_B FAO3
+  (clay 27.97 [%]) (silt 26.17 [%]) (sand 45.86 [%])
+  (humus (C2OM (C 0.47 [%]))) (dry_bulk_density 1.61 [g/cm^3])
+  (hydraulic M_vG
+             (Theta_sat 39 [%]) (Theta_res 0 [%])
+             (n 1.13 []) (K_sat 36 [mm/h])
+             (l 0.5 []) (alpha 0.012 [cm^-1])))
+
+(defhorizon Silstrup_C FAO3
+  (clay 26.28 [%]) (silt 20.86 [%]) (sand 52.86 [%])
+  (humus (C2OM (C 0.116 [%]))) (dry_bulk_density 1.75 [g/cm^3])
+  (hydraulic M_vG
+             (Theta_sat 34 [%]) (Theta_res 0 [%])
+             (n 1.1 []) (K_sat 19 [mm/h])
+             (l 0.5 []) (alpha 0.012 [cm^-1])))
+
+(defcolumn Silstrup default
+  (Movement original 
+            (Tertiary pipes
+                      (L 18 [m])
+                      (pipe_position -110.0 [cm])))
+  (Groundwater file "dk-silstrup.gwt"
+               ;; GWT is measured at top of terrain.
+               ;; Offset is calibrated based on drainage measurments.
+               (offset 5 [cm]))
+  (Chemistry multi (combine Silstrup))
+  (OrganicMatter none)
+  (Soil (horizons ( -31.00 Silstrup_Ap)
+                  (-113.00 Silstrup_B)
+                  (-500.00 Silstrup_C))
+        (MaxRootingDepth 40 [cm])))
+
+;; Management.
+
+(defaction Silstrup activity
+  (wait (at 1999 11 01))
+    (stubble_cultivation -7 [cm])
+  (wait (at 2000 04 19))
+    ;; Cattle slurry 36.5 t/ha -  150 total-N, 36 P and 162 K,  kg/ha
+    (fertilize (cattle_slurry (weight 36.5 [Mg w.w./ha])))
+    (plowing (depth -22 [cm]))
+  (wait (at 2000 05 01))
+    (disk_harrowing -2 [cm])
+    (disk_harrowing -2 [cm])
+  (wait (at 2000 05 03))
+    (seed_bed_preparation -5 [cm])
+  (wait (at 2000 05 04))	
+    ;; Sowing fodderbeat cultivare Kyros. depth 3 cm 
+    ;; rowdistance 50 cm plantdistance 19 cm. 
+    ;; seeding rate 3.0 kg/ha. Final plantnumber 5.7/m2			
+    (sow "Fodder Beet")
+  (wait (at 2000 05 15))	
+    ;; Fertilization -  103 N, 26 P, 78 K, kg/ha			
+    (fertilize (NPK01 (weight 103 [kg/ha])))
+  (wait (at 2000 05 19)) 
+    ;; Emergence BBCH stage 9 ( between 12/5 and 25/5)			
+  (wait (at 2000 05 22))
+    ;; BBCH stage 11			
+    ;; Goltix WG+Betanal Optima 
+    ;; (metamitron + phenmedipham + desmedipham + ethofumesat) - weeds 
+    ;; 1.0 l + 1.0 l/ha			
+    ;; Goltix WG: 700  g/kg  metamitron
+    (spray Metamitron 700 [g/ha]) ;  (assume 1 kg = 1 l)
+    ;; Potassium bromide molar mass 119.002 g/mol
+    ;; Bromine atomic weight 79.904 g/mol
+    ;; 30 kg potassium bromide = 30 * (79.904 / 119.002) = 20.14 kg bromine
+    (spray Bromide 20.14 [kg/ha])
+  (wait (at 2000 06 15))
+    ;; BBCH stage 11-15			
+    ;; Goltix WG+Betanal Optima 
+    ;; (metamitron + phenmedipham + desmedipham + ethofumesat) - weeds
+    ;; 1.0 l + 1.0 l/ha
+    ;; Goltix WG: 700  g/kg  metamitron
+    (spray Metamitron 700 [g/ha]) ;  (assume 1 kg = 1 l)
+  (wait (at 2000 06 28))
+    ;; BBCH stage 19
+    ;; Fusilade X-tra (fluazifop-P-butyl) - weeds - 1.5 l/ha
+  (wait (at 2000 06 28))
+    ;; BBCH stage 31
+    ;; Biomass. Root + top:  213 g/10 m row - 100% DM
+    ;; Pirimor G (pirimicarb) - pests - 0.3 kg/ha
+  (wait (at 2000 07 11))
+    ;; BBCH stage 33
+  (wait (at 2000 07 12))
+    ;; Goltix WG+Betanal Optima 
+    ;; (B231 + phenmedipham + desmedipham + ethofumesat) - weeds 
+    ;; 1.0 l + 1.0 l/ha
+    ;; Goltix WG: 700  g/kg  metamitron		
+    (spray Metamitron 700 [g/ha])       ;  (assume 1 kg = 1 l)
+  (wait (at 2000 11 15))
+    ;; Yield of root 13.45 t/ha 100% DM. Yield of top: 2.63 t/ha 100% DM
+    (harvest "Fodder Beet")
+  (wait (at 2001 04 01))
+    (plowing (depth -18 [cm]))
+  (wait (at 2001 05 07))
+    (seed_bed_preparation -3 [cm])
+  (wait (at 2001 05 08))
+    ;; Fertilization 91 N, 13 P, 34 K, kg/ha
+    (fertilize (NPK01 (weight 91 [kg/ha])))
+    (seed_bed_preparation -6.5 [cm])
+  (wait (at 2001 05 09))	
+    (seed_bed_preparation -4.0 [cm])
+    ;; Sowing spring barley Cultivare Otira. depth 3.5 cm 
+    ;; rowdistance 12 cm seeding rate 155 kg/ha. Final plantnumber 298/m2
+    (sow "Spring Barley")
+  (wait (at 2001 05 20))
+    ;; Emergence-  BBCH stage 9 (between 17/5 and 23/5)
+  (wait (at 2001 05 22))
+    ;; BBCH stage 10			
+    ;; Fertilization 27 N, 4 P, 10 K, kg/ha
+    (fertilize (NPK01 (weight 27 [kg/ha])))
+  ;; 28-05-01 00:00	BBCH stage 12			
+  ;; 09-06-01 00:00	Express (tribenuron-methyl) - weeds - 2 tablets/ha
+  ;; 11-06-01 00:00	BBCH stage 24
+  ;; 11-06-01 00:00	Biomass  34.7 g/m2 - 100% DM
+  ;; 19-06-01 00:00	BBCH stage 31
+  (wait (at 2001 6 21))
+    ;; BBCH stage 32
+    ;; Barnon Plus 3 - (flamprop-M-isopropyl) - weeds- 3.0 l/ha
+    ;; Tilt Top (propiconazol + fenpropimorph) - fungi - 0.5 l pr. ha
+    ;; Tilt Top: 375  g/l  fenpropimorph
+    (spray Fenpropimorph 187.5 [g/ha])
+  ;; 02-07-01 00:00	Biomass  51.1 g/m2 - 100% DM
+  (wait (at 2001 07 04))
+    ;; Tilt Top (propiconazol + fenpropimorph) - fungi - 0.5 l pr. ha
+    ;; Tilt Top: 375  g/l  fenpropimorph
+    (spray Fenpropimorph 187.5 [g/ha])
+  (wait (at 2001 07 16))
+    ;; Perfektion 500 (dimethoat) - pests - 0.6 l/ha
+    ;; Perfekthion 500 S: 500  g/l  dimethoat
+    (spray Dimethoate 300 [g/ha])
+  (wait (at 2001 09 05))
+    ;; Harvest of spring barley. ;; Stubbleheight 12 cm, 
+    ;; grain yield 74.77 hkg/ha 85% DM, straw yield 28.62 hkg/ha 100% DM
+    (harvest "Spring Barley")
+  (wait (at 2001 10 25))
+     ;; Roundup Bio (glyphosate) - weeds - 4.0 l/ha			
+     ;; 360 g/l ^* 4.0 l/ha = 1440 g/ha
+    (spray Glyphosate 1440 [g/ha])
+  (wait (at 2001 12 18))
+    (plowing (depth -22 [cm]))
+  (wait (at 2002 04 03))
+    (seed_bed_preparation -3 [cm])
+  (wait (at 2002 04 17))	
+    (seed_bed_preparation -5 [cm])
+  (wait (at 2002 04 22))
+    ;; Cattle slurry application 40.3 t/ha
+    ;; 194.0 total-N, 93.1 NH4-N, 42.9 P, 194.8 K, 1696.7 C, kg/ha
+    (fertilize ("cattle_slurry" (weight 40.3 [Mg w.w./ha])))
+    (seed_bed_preparation -7.5 [cm])
+  (wait (at 2002 04 23))	
+    ;; Fertilization 46.5 N, kg/ha
+    (fertilize (AmmoniumNitrate (weight 46.5 [kg/ha])))
+  (wait (at 2002 04 25))	
+    (seed_bed_preparation -8 [cm])
+    ;; Sowing maiz cv. Loft, depth 6 cm, rowdistance 75 cm, 
+    ;; seeddistance 17 cm seeding rate 7.9 m2. final plantnumber 7.4 m2
+    (sow Maize)
+    ;; Fertilization 23.4 N, 13.1 P, kg/ha			
+    (fertilize (NP (weight 23.4 [kg/ha]))))
+
+;; Output
+
+(deflog "Silstrup Content" column
+  (where "silstrup-content.dlf")
+  (when daily)
+  (entries (content (z -1 [m])
+                    (path column "${column}" Chemistry "*" 
+                          trace "Bromide" C)
+                    (tag Bromide)
+                    (dimension "mg/L")
+                    (spec chemical default C))
+           (content (z -3.5 [m])
+                    (path column "${column}" Chemistry "*" 
+                          trace "Dimethoate" C)
+                    (tag Dimethoate)
+                    (dimension "mg/L")
+                    (spec chemical default C))
+           (content (z -3.5 [m])
+                    (path column "${column}" Chemistry "*" 
+                          trace "Fenpropimorph" C)
+                    (tag Fenpropimorph)
+                    (dimension "mg/L")
+                    (spec chemical default C))
+           (content (z -3.5 [m])
+                    (path column "${column}" Chemistry "*" 
+                          trace "Glyphosate" C)
+                    (tag Glyphosate)
+                    (dimension "mg/L")
+                    (spec chemical default C))
+           (content (z -3.5 [m])
+                    (path column "${column}" Chemistry "*" 
+                          trace "Metamitron" C)
+                    (tag Metamitron)
+                    (dimension "mg/L")
+                    (spec chemical default C))
+           (content (z -0.25 [m])
+                    (path column "${column}" SoilWater Theta)
+                    (tag "SW025cm")
+                    (dimension "%")
+                    (spec fixed SoilWater Theta))
+           (content (z -0.60 [m])
+                    (path column "${column}" SoilWater Theta)
+                    (tag "SW060cm")
+                    (dimension "%")
+                    (spec fixed SoilWater Theta))
+           (content (z -1.10 [m])
+                    (path column "${column}" SoilWater Theta)
+                    (tag "SW110cm")
+                    (dimension "%")
+                    (spec fixed SoilWater Theta))
+           (number (path column "${column}" Movement vertical
+                         Tertiary pipes height)
+                   (tag "GWT")
+                   (spec tertiary pipes height))
+           ))
+
+;; Program
+
+(defprogram Silstrup Daisy
+  "Simulation for the Silstrup PLAP station."
+  (column Silstrup)
+  (manager Silstrup)
+  (weather default "dk-silstrup-hourly.dwf"
+           (PrecipScale 1.41 1.42 1.35 1.24 1.13 1.11
+                        1.10 1.10 1.11 1.14 1.23 1.37 []))
+  
+  (time 1999 9 1)
+  (stop 2002 3 10)
+
+  (output (harvest (where "silstrup-harvest.dlf"))
+          ("Field chemical" 
+           (chemical "Bromide")
+           (where "silstrup-field-Bromide.dlf"))
+          ("Field chemical" 
+           (chemical "Glyphosate")
+           (where "silstrup-field-Glyphosate.dlf"))
+          ("Field chemical" 
+           (chemical "Fenpropimorph")
+           (where "silstrup-field-Fenpropimorph.dlf"))
+          ("Field chemical" 
+           (chemical "Dimethoate")
+           (where "silstrup-field-Dimethoate.dlf"))
+          ("Field chemical" 
+           (chemical "Metamitron")
+           (where "silstrup-field-Metamitron.dlf"))
+          ("Field chemical" (when weekly)
+           (chemical "Bromide")
+           (where "silstrup-field-Bromide-weekly.dlf"))
+          ("Field chemical"  (when weekly)
+           (chemical "Glyphosate")
+           (where "silstrup-field-Glyphosate-weekly.dlf"))
+          ("Field chemical"  (when weekly)
+           (chemical "Fenpropimorph")
+           (where "silstrup-field-Fenpropimorph-weekly.dlf"))
+          ("Field chemical"  (when weekly)
+           (chemical "Dimethoate")
+           (where "silstrup-field-Dimethoate-weekly.dlf"))
+          ("Field chemical"  (when weekly)
+           (chemical "Metamitron")
+           (where "silstrup-field-Metamitron-weekly.dlf"))
+          ("Field water" (when daily)
+           (where "silstrup-field-water-daily.dlf"))
+          ("Field water" (when hourly) 
+           (where "silstrup-field-water-hourly.dlf"))
+          ("Silstrup Content")))
+
+;; Plots
+
+(defunit [w] [s] (factor 604800))
+(defunit [g/ha/w] [kg/m^2/s] (factor 1.653e-13))
+
+(defgnuplot plottime time
+  (device "pdf size 12cm, 6cm")
+  (extra [set format x "%y-%m-%d"]))
+
+(defgnuplot silstrup-weather plottime
+  (begin 2000 04 29) (end 2002 6 30)
+  (where "silstrup-weather.pdf")
+  (title "Weather")
+  (source (column (file "silstrup-field-water-hourly.dlf")
+                  (tag "Precipitation")
+                  (accumulate true))
+          (column (file "silstrup-field-water-hourly.dlf")
+                  (tag "Potential evapotranspiration")
+                  (accumulate true))
+          (column (file "silstrup-field-water-hourly.dlf")
+                  (tag "Actual evapotranspiration")
+                  (accumulate true))
+          (column (file "dk-silstrup-hourly.dwf")
+                  (tag AirTemp))))
+
+(defgnuplot silstrup-gw plottime
+  (begin 2000 04 29) (end 2002 6 30)
+  (where "silstrup-gw.pdf")
+  (title "Groundwater")
+  (source (column (file "silstrup-content.dlf")
+                  (tag "GWT")
+                  (title "Sim"))
+          (column (file "dk-silstrup.ddf")
+                  (tag "Level")
+                  (style 2)
+                  (title "Obs"))))
+
+(defgnuplot silstrup-theta plottime
+  (device "pdf size 12cm, 4cm")
+  (begin 1999 9 1) (end 2002 7 1)
+  (declare depth String "Soil depth to plot.") 
+  (where "silstrup-theta-${depth}.pdf")
+  (title "${depth}")
+  (source (column (file "silstrup-content.dlf")
+                  (tag "${depth}")
+                  (title "Sim"))
+          (column (file "silstrup-theta.ddf")
+                  (style 2)
+                  (with lines)
+                  (missing missing)
+                  (tag "${depth}")
+                  (title "Obs"))))
+
+(defgnuplot silstrup-sc-bromide plottime
+  (device "pdf size 12cm, 4cm")
+  (begin 2000 06 01) (end 2002 6 1)
+  (where "silstrup-sc-bromide.pdf")
+  (title Bromide)
+  (source (column (file "silstrup-content.dlf")
+                  (tag "Bromide")
+                  (title "Sim"))
+          (column (file "silstrup-sc-bromide.ddf")
+                  (missing missing)
+                  (tag "S1")
+                  (style 2))
+          (column (file "silstrup-sc-bromide.ddf")
+                  (missing missing)
+                  (tag "S2")
+                  (style 3))))
+
+(defgnuplot silstrup-horizontal plottime
+  ;; (device "pdf size 12cm, 4cm")
+  (begin 2000 06 01) (end 2002 6 1)
+  (where "silstrup-horizontal.pdf")
+  (title "Horizontal screen")
+  (source (column (file "silstrup-content.dlf")
+                  (tag "Dimethoate"))
+          (column (file "silstrup-content.dlf")
+                  (tag "Fenpropimorph"))
+          (column (file "silstrup-content.dlf")
+                  (tag "Glyphosate"))
+          (column (file "silstrup-content.dlf")
+                  (tag "Metamitron"))))
+
+(defgnuplot silstrup-drain plottime
+  (begin 2000 04 29) (end 2002 6 30)
+  (where "silstrup-drain.pdf")
+  (title "Drain flow")
+  (source (arithmetic (missing "none")
+                      (file "silstrup-field-water-daily.dlf")
+                      (expr (+ "Soil drain flow" "Surface drain flow"))
+                      (title "Sim"))
+          (column (file "silstrup-drainflow.ddf")
+                  (tag "drain")
+                  (style 2)
+                  (title "Obs"))))
+
+(defgnuplot silstrup-drain-acc plottime
+  (begin 2000 04 29) (end 2002 6 30)
+  (where "silstrup-drain-acc.pdf")
+  (title "Accumulated drain flow")
+  (source (arithmetic (missing "none")
+                      (file "silstrup-field-water-daily.dlf")
+                      (expr (+ "Soil drain flow" "Surface drain flow"))
+                      (accumulate true)
+                      (timestep d)
+                      (title "Sim"))
+          (column (file "silstrup-drainflow.ddf")
+                  (accumulate true)
+                  (timestep d)
+                  (tag "drain")
+                  (style 2)
+                  (with lines)
+                  (title "Obs"))
+          (arithmetic (file "silstrup-field-water-daily.dlf")
+                      (expr (- "Precipitation" "Actual evapotranspiration"))
+                      (accumulate true)
+                      (timestep d)
+                      (style 3)
+                      (with lines)
+                      (title "Net precip"))
+          (column (file "silstrup-field-water-daily.dlf")
+                  (tag "Matrix percolation")
+                  (accumulate true)
+                  (timestep d)
+                  (style 4)
+                  (with lines))))
+
+(defgnuplot silstrup-drainmass plottime
+  (device "pdf size 12cm, 4cm")
+  (declare chemical String "Name of chemical to plot")
+  (begin 2000 10 1) (end 2002 4 1)
+  (where "silstrup-${chemical}-weekly.pdf")
+  (title "${chemical}")
+  (source (arithmetic (missing "none")
+                      (file "silstrup-field-${chemical}-weekly.dlf")
+                      (expr (+ "Soil-Drain" "Surface-Drain"))
+                      (with lines)
+                      (title "Sim"))
+          (arithmetic (file "silstrup-drainmass.ddf")
+                      (missing missing)
+                      (expr (/ (convert (/ "${chemical}" 1.69 [ha]) [g/ha])
+                               1 [w]))
+                      (with points)
+                      (style 2)
+                      (title "Obs"))))
+
+(defgnuplot silstrup-drainmass-acc plottime
+  (device "pdf size 12cm, 4cm")
+  (declare chemical String "Name of chemical to plot")
+  (begin 2000 10 1) (end 2002 4 1)
+  (where "silstrup-${chemical}-acc.pdf")
+  (title "${chemical}")
+  (source (arithmetic (missing "none")
+                      (file "silstrup-field-${chemical}.dlf")
+                      (expr (+ "Soil-Drain" "Surface-Drain"))
+                      (with lines)
+                      (accumulate true)
+                      (title "Sim"))
+          (arithmetic (file "silstrup-drainmass.ddf")
+                      (missing missing)
+                      (accumulate true)
+                      (expr (convert (/ "${chemical}" 1.69 [ha]) [g/ha]))
+                      (with points)
+                      (style 2)
+                      (title "Obs"))))
+
+(defprogram plotall gnuplot
+  (graph silstrup-weather silstrup-gw
+         (silstrup-theta (depth "SW025cm"))
+         (silstrup-theta (depth "SW060cm"))
+         (silstrup-theta (depth "SW110cm"))
+         silstrup-sc-bromide silstrup-horizontal
+         silstrup-drain silstrup-drain-acc 
+         (silstrup-drainmass (chemical Bromide))
+         (silstrup-drainmass (chemical Dimethoate))
+         (silstrup-drainmass (chemical Fenpropimorph))
+         (silstrup-drainmass (chemical Glyphosate))
+         (silstrup-drainmass (chemical Metamitron))
+         (silstrup-drainmass-acc (chemical Bromide))
+         (silstrup-drainmass-acc (chemical Dimethoate))
+         (silstrup-drainmass-acc (chemical Fenpropimorph))
+         (silstrup-drainmass-acc (chemical Glyphosate))
+         (silstrup-drainmass-acc (chemical Metamitron))
+         ))
+         
+
+(run batch
+     (run Silstrup
+          plotall
+          ))
+         
+;;; silstrup.dai ends here.

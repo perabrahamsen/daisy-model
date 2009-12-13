@@ -36,6 +36,7 @@ class GroundwaterFile : public Groundwater
   // Data.
 private:
   Path& path;
+  const double offset;
   Time previous_time;
   Time next_time;
   double previous_depth;
@@ -144,7 +145,7 @@ GroundwaterFile::tick (const Time& time, Treelog&)
 double
 GroundwaterFile::table () const
 {
-  return depth;
+  return depth + offset;
 }
 
 void
@@ -165,6 +166,7 @@ GroundwaterFile::initialize (const Units&,
 GroundwaterFile::GroundwaterFile (const BlockModel& al)
   : Groundwater (al),
     path (al.path ()),
+    offset (al.number ("offset")),
     previous_time (42, 1, 1, 0),
     next_time (42, 1, 1, 0),
     previous_depth (-42.42e42),
@@ -194,6 +196,9 @@ The format of each line in the file is 'YEAR MONTH DAY HEIGHT',\n\
 where HEIGHT should in cm above ground (i.e. a negative number).\n\
 Linear interpolation is used between the datapoints.");
       frame.order ("file");
+      frame.declare ("offset", "cm", Attribute::Const,
+                     "Add this to depth from file.");
+      frame.set ("offset", 0.0);
     }
 } GroundwaterFile_syntax;
 

@@ -269,7 +269,7 @@ pedotransfer function");
   tmp << "(l " << l << ")\n";
   tmp << ";; (m " << m << ")\n";
   tmp << "(n " << n << ")\n";
-  tmp << "(alpha " << alpha << ")\n";
+  tmp << "(alpha " << alpha << " [cm^-1])\n";
   tmp << "(K_sat " << K_sat << " [cm/h])\n";
   tmp << "(Theta_sat " << Theta_sat << ")";
   msg.debug (tmp.str ());

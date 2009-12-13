@@ -344,6 +344,10 @@ Connvert to SI base units by multiplying with a factor.")
          "Kilogram.");
     add ("g", u_g, 0, 1, 0, 0, 0, 0, 0,
          "Gram.");
+    add ("mg", p_m * u_g, 0, 1, 0, 0, 0, 0, 0,
+         "Miligram.");
+    add ("ug", p_u * u_g, 0, 1, 0, 0, 0, 0, 0,
+         "Microgram.");
 
     // Time.
     add ("s", 1.0, 0, 0, 1, 0, 0, 0, 0,
@@ -429,6 +433,10 @@ Connvert to SI base units by multiplying with a factor.")
          "Crop scale carbon per area.");
     add ("g/ha", u_g / u_ha, -2, 1, 0, 0, 0, 0, 0,
          "Field scale pesticide mass per area.");
+    add ("mg/ha", p_m * u_g / u_ha, -2, 1, 0, 0, 0, 0, 0,
+         "Miligram per hectare");
+    add ("ug/ha", p_u * u_g / u_ha, -2, 1, 0, 0, 0, 0, 0,
+         "Microgram per hectare");
     add ("g w.w./m^2", u_g, -2, 1, 0, 0, 0, 0, 0,
          "Wet weight per area.");
     add ("kg/ha", p_k * u_g / u_ha, -2, 1, 0, 0, 0, 0, 0,
@@ -525,6 +533,8 @@ Connvert to SI base units by multiplying with a factor.")
     add ("ug/m^3", p_k * u_g, -3, 1, 0, 0, 0, 0, 0,
          "Mass per volume.");
     add ("mg/l", p_m * u_g / u_l, -3, 1, 0, 0, 0, 0, 0,
+         "Concentration.");
+    add ("mg/L", p_m * u_g / u_l, -3, 1, 0, 0, 0, 0, 0,
          "Concentration.");
     add ("mg N/l", p_m * u_g / u_l, -3, 1, 0, 0, 0, 0, 0,
          "Nitrogen concentration.");

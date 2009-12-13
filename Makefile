@@ -981,6 +981,9 @@ ui_Qt_run${OBJ}: ui_Qt_run.C ui_Qt_run.h ui_Qt.h ui.h model.h symbol.h \
 ui_Qt${OBJ}: ui_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h librarian.h \
   block.h scope.h attribute.h assertion.h
 main_Qt${OBJ}: main_Qt.C ui_Qt.h ui.h model.h symbol.h toplevel.h
+draineqd${OBJ}: draineqd.C draineqd.h model.h symbol.h block_model.h \
+  block_nested.h block.h scope.h attribute.h treelog.h frame_model.h \
+  frame.h mathlib.h assertion.h librarian.h
 condedge${OBJ}: condedge.C condedge.h model.h symbol.h block_model.h \
   block_nested.h block.h scope.h attribute.h treelog.h frame_model.h \
   frame.h mathlib.h assertion.h librarian.h soil.h geometry.h
@@ -1402,8 +1405,9 @@ gnuplot_base${OBJ}: gnuplot_base.C gnuplot_base.h gnuplot.h model.h symbol.h \
   librarian.h
 source_file${OBJ}: source_file.C source_file.h source.h model.h time.h \
   symbol.h lexer_table.h block_model.h block_nested.h block.h scope.h \
-  attribute.h treelog.h frame_model.h frame.h gnuplot_utils.h vcheck.h \
-  mathlib.h assertion.h
+  attribute.h treelog.h frame_model.h frame.h timestep.h vcheck.h \
+  gnuplot_utils.h mathlib.h assertion.h submodeler.h block_submodel.h \
+  frame_submodel.h
 format_LaTeX${OBJ}: format_LaTeX.C format_LaTeX.h format.h model.h symbol.h \
   version.h assertion.h librarian.h frame.h scope.h attribute.h
 log_all${OBJ}: log_all.C log_all.h log_select.h log.h time.h symbol.h \
@@ -1607,7 +1611,7 @@ tertiary_pipes${OBJ}: tertiary_pipes.C tertiary.h model_framed.h \
   model_logable.h model.h symbol.h tertsmall.h geometry.h attribute.h \
   soil.h soil_water.h soil_heat.h surface.h uzmodel.h librarian.h \
   block_model.h block_nested.h block.h scope.h treelog.h frame_model.h \
-  frame.h mathlib.h assertion.h log.h time.h border.h check.h
+  frame.h mathlib.h assertion.h log.h time.h border.h check.h draineqd.h
 reaction_boundrel${OBJ}: reaction_boundrel.C reaction.h model_framed.h \
   model_logable.h model.h symbol.h log.h time.h border.h geometry.h \
   attribute.h chemical.h chemistry.h treelog.h block_model.h \
@@ -2011,11 +2015,12 @@ number_arit${OBJ}: number_arit.C number.h symbol.h model.h units.h memutils.h \
   submodeler.h block_submodel.h frame_submodel.h
 source_expr${OBJ}: source_expr.C source_file.h source.h model.h time.h \
   symbol.h lexer_table.h block_model.h block_nested.h block.h scope.h \
-  attribute.h treelog.h frame_model.h frame.h scope_table.h boolean.h \
-  number.h librarian.h units.h memutils.h
+  attribute.h treelog.h frame_model.h frame.h timestep.h vcheck.h \
+  scope_table.h boolean.h number.h librarian.h units.h memutils.h
 source_std${OBJ}: source_std.C source_file.h source.h model.h time.h symbol.h \
   lexer_table.h block_model.h block_nested.h block.h scope.h attribute.h \
-  treelog.h frame_model.h frame.h units.h memutils.h librarian.h
+  treelog.h frame_model.h frame.h timestep.h vcheck.h units.h memutils.h \
+  librarian.h
 action_markvand${OBJ}: action_markvand.C action.h model_framed.h \
   model_logable.h model.h symbol.h block_model.h block_nested.h block.h \
   scope.h attribute.h treelog.h frame_model.h frame.h daisy.h program.h \

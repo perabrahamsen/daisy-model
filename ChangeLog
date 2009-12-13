@@ -1,3 +1,18 @@
+2009-12-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* geometry.C (swap): Fix case where 'middle' is not actually in
+	the middle.
+
+2009-12-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* groundwater_file.C (offset): New parameter.
+
+2009-12-10  Mikkel Mollerup  <mmo@life.ku.dk>
+
+	* draineqd.h, draineqd.C: New component.
+	* Makefile (COMPONENTS): Add it.
+	* tertiary_pipes.C: Use it.
+
 2009-12-03  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* gnuplot_time.C (plot): Improve error message for more than 2
@@ -1271,9 +1286,9 @@
 2008-03-13  Mikkel Mollerup  <mmo@life.ku.dk>
 
 	* soil_water.h, soil_water.C, chemical.h, chemical_std.C: Prepare
-	for mobile/immobile solute support.  
+	for mobile/immobile solute support.
 	* column_std.C: Update caller.
-	
+
 2008-03-12  Mikkel Mollerup  <mmo@life.ku.dk>
 
 	* Makefile (COMPONENTS): Added it.

@@ -127,6 +127,9 @@ By default, use unmodified times.",
   static VCheck::Enum handle_check ("sum", "normal");
   frame.set_check ("handle", handle_check);
   frame.set ("handle", "normal");
+  frame.declare_string ("timestep", Attribute::Const, "\
+Multiple with this dimension when accumulating.");
+  frame.set ("timestep", "h");
 }
 
 SourceFile::SourceFile (const BlockModel& al)
@@ -136,6 +139,7 @@ SourceFile::SourceFile (const BlockModel& al)
     explicit_with (al.check ("with")),
     style_ (al.integer ("style", -1)),
     accumulate_ (al.flag ("accumulate")),
+    timestep (al.name ("timestep")),
     use_sum (al.name ("handle") == "sum"),
     default_hour (al.integer ("default_hour")),
     time_offset (submodel_value<Timestep> (al, "time_offset"))

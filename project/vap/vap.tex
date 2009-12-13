@@ -1,0 +1,432 @@
+\documentclass[a4paper]{article}
+
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[danish]{babel}
+\usepackage{natbib}
+\bibliographystyle{apalike}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+\begin{document}
+
+\section*{Daisy simuleringer for Silstrup og Estrup}
+
+\section{Data}
+
+GEUS leverede et regneark med data anvendt i forbindelde med MACRO
+simuleringerne.  Arket indeholdt oplysninger om jorden, samt udvalgte
+målinger af vand og bromid.  Data for både Estrup og Silstrup var
+inkluderet.  GEUS leverede yderligere regneark med både flow og
+tidspropertionalle målinger af glyphosat og bromid i dræn, samt
+punktmålinger for fenpropimorph, dimethoate samt metamitron i dræn.
+GEUS data er for størstedelens vedkommende tidligere blevet
+præsenteret i \cite{vap2009}, med yderligere information in
+\cite{lindhardt2001}.
+
+DJF leverede klimatal for Silstrup, Tylstrup, samt Askov.  Både time
+og døgnværdier.  Ideen var at Tylstrup data kunne udfylde evt. huller
+i Silstrup vejr.  Timeværdierne består af lufttemperatur,
+vindhastighed, vindretning, relativ luftfugtighed, nedbør,
+globalstråling, lufttryk´, samt middelværdier (også hver time) for
+lufttemperatur, vindhastighed, vindretning, og relativ luftfugtighed.
+Døgnværdierne består af døgnmiddeltemperatur, nedbør, ``MakkEpot''
+(antageligvis potentiel fordampning udregned fra Makkinks formel),
+middelvindhastighed, relativ fugtighed, damptryksunderskud, samt
+globalstråling.  Luftfugtighed (for både time og døgntal) og
+temperatur (for timetal) er målt i 2 meters højde, vindhastigheden i
+10 meters højde.  For de øvrige tal er det ikke opgivet.
+
+Adsorptions- og nedbrydningsegenskaber for pesticider er taget fra
+tabel 6.2 i \cite{lindhardt2001}.  Eksempel:
+\begin{verbatim}
+  (defchemical Metamitron herbicide
+    (cite "lindhardt2001")
+    (decompose_halftime 14 [d])
+    (adsorption linear (K_OC 207 [l/kg])))
+\end{verbatim}
+GEUS oplyser at de har haft interne kørsler med data fra
+\href{http://sitem.herts.ac.uk/aeru/footprint/}{PPDB} uden godt
+sammenfald med observationer.  Annette Rosenbom oplyser at Glyphosat
+bør bruge en Kf (Freundlich --Per) parameter da bindingen er kemisk.
+Carsten Petersen at den i hvert fald ikke bør bruge en ``OC''
+parameter, da den binder til ler.
+
+\section{Silstrup}
+
+En oversigt over Silstrup site kan ses på figur~15, side 30 i
+\cite{vap2009}.
+
+\subsection{Forvaltning}
+
+Forvaltningsdata fra GEUS består af jordbehandling, gødning, såning og
+høst af afgrøder, pesticidanvendelse.  Desuden er der informationerne
+om afgrødernes udviklingstrin, biomasse på udvalgte tidspunkter, samt
+høstudbytte.
+
+Da vores fokus ikke er på planter eller kvælstof, har vi valgt at køre
+Daisy uden organisk stof, som angives således:
+\begin{verbatim}
+  (Chemistry multi (combine Silstrup))
+  (OrganicMatter none)
+\end{verbatim}
+Parameteren \texttt{combine}i \texttt{Chemistry} skulle have
+inkluderet \texttt{N} hvis Daisy skulle holde regnskab med NO$_3^-$ og
+NH$_4^+$ i jorden.  \verb|(OrganicMatter none)| betyder at Daisy ikke
+vil holde rede på det organiske stof i jorden, tilført organisk stof i
+form af afgrøderester og gødning vil simpelthen blive ignoreret.  De
+samme gælder tilført mineralsk kvælstof.
+
+Vi gøder stadig med de rette mængder og typer, selvom det ikke længere
+har betydning for simuleringerne.  Vi har ikke forsøgt at sikre at
+kvælstofmængden i organisk gødning stemmer med målingerne.  Eksempel:
+\begin{verbatim}
+  (wait (at 2000 04 19))
+    ;; Cattle slurry 36.5 t/ha -  150 total-N, 36 P and 162 K,  kg/ha
+    (fertilize (cattle_slurry (weight 36.5 [Mg w.w./ha])))
+\end{verbatim}
+Den eneste effekt af denne handling vil være at der tilføres godt 3 mm
+vand, da kvæggylde består af ca. 95\% vand.
+
+Afgrøden vil stadig optage kvælstof, jorden vil levere alt det
+kvælstof planten beder om.  Det betyder at plantevækst ikke vil blive
+udsat for kvælstofstress.  For planterne er vi primært interesseret i
+LAI og rodnet, som ikke er målt.  Vi har derfor ikke forsøgt at ramme
+den præcise biomasse og udvikling, men blot konstatere at både
+målinger og simuleringer falder fint indenfor normalområdet.  For
+såning bruger vi såtidspunkt men ikke mængden af såsæd, da det
+muliggør brug af ældre, mere robuste plantemodeller i Daisy.
+Eksempel:
+\begin{verbatim}
+    ;; Sowing fodderbeat cultivare Kyros. depth 3 cm 
+    ;; rowdistance 50 cm plantdistance 19 cm. 
+    ;; seeding rate 3.0 kg/ha. Final plantnumber 5.7/m2                 
+    (sow "Fodder Beet")
+\end{verbatim}
+
+For jordbehandling bruger vi dato, type og dybde, som alle indgår i
+Daisy opsætningen.  Jordbehandling er vigtig for udvaskning af
+pesticider, specielt i forbindelse med for kolloidbåren transport, men
+den mekanistiske sammenhæng er endnu ikke inde i modellen, og Daisy
+benytter sig i lighed med MACRO af empiriske faktorer baseret på
+typisk jordbehandling.  Eksempel:
+\begin{verbatim}
+  (wait (at 1999 11 01))
+    (stubble_cultivation -7 [cm])
+\end{verbatim}
+
+Pesticidapplikationen er angivet med handelsnavne, disse er omsat til
+aktivstoffer ud fra
+\href{http://www.lr.dk/applikationer/kate/viskategori.asp?ID=ka00400012000100000200}{bekæmpelsesmiddeldatabasen}.
+Eksempel:
+\begin{verbatim}
+  (wait (at 2000 05 22))
+    ;; BBCH stage 11                    
+    ;; Goltix WG+Betanal Optima 
+    ;; (metamitron + phenmedipham + desmedipham + ethofumesat) - weeds 
+    ;; 1.0 l + 1.0 l/ha                 
+    ;; Goltix WG: 700  g/kg  metamitron
+    (spray Metamitron 700 [g/ha]) ;  (assume 1 kg = 1 l)
+\end{verbatim}
+
+\subsection{Vejr}
+
+Der var sammenhængende timeværdier for perioden 1999-1-1 til
+2002-3-11, hvor der manglede data for i alt 8 timer spredt over
+perioden.  Selvom vi gerne ville have haft data til 2002-4-1 for at få
+et helt hydraulisk år med, valgte vi at nøjes med at se på denne
+periode for at kunne have alle data fra samme kilde.  De rå data blev
+konverteret til Daisy format i filen \texttt{dk-siltrup-hourly.dwf}.
+Daisy vil automatisk bruge data fra forrige time når der mangler data.
+Der er inkluderet relativ fugtighed, nedbør, lufttemperatur,
+globalstråling, samt vind i Daisy vejrfilen.  Middelværdier for
+temperatur, luftfugtighed, og vind indenfor hver time er anvendt.  I
+Daisy vejrfilen angives det således:
+\begin{verbatim}
+  Year  Month   Day     Hour    RelHum  Precip  GlobRad AirTemp Wind
+  year  month   mday    hour    %       mm/h    W/m^2   dgC     m/s
+  1999  1       1       0       94      0       0       2.2     3.2
+  1999  1       1       1       94      0       0       2.1     4.2
+\end{verbatim}
+
+Med disse data vil Daisy bruge FAO Penman-Monteith\cite{FAO-PM} til
+udregning af en referencefordampning.  Potentiel fordampning er
+udregnet fra referencefordampning med en afgrødefaktor afhængig af det
+aktuelle simulerede bladsække.  Aktuel fordampning er yderligere
+begrænset af jordens evne til at levere vand, med det aktuelle
+simulerede rodnet.  En oversigt over udvalgte data kan ses på
+figur~\ref{fig:silstrup-weather}.
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=\columnwidth]{silstrup-weather}
+  \end{center}
+  \caption{Akkumuleret nedbør og fordampning, samt timeværdier for
+    temperatur for målestationen i Silstrup.  Potentiel og aktuel
+    fordamppning er identiske når der ikke er vandstress.}
+  \label{fig:silstrup-weather}
+\end{figure}
+
+Derudover er der en række data som knytter sig til selve
+målestationen.  Temperaturgennemsnit og kvælstofdeposition er tager
+fra Taastrup:
+\begin{verbatim}
+  TAverage: 7.8 dgC
+  TAmplitude: 8.5 dgC
+  MaxTDay: 209 yday
+
+  NH4WetDep: 0.9 ppm
+  NH4DryDep: 2.2 kgN/ha/year
+  NO3WetDep: 0.6 ppm
+  NO3DryDep: 1.1 kgN/ha/year
+\end{verbatim}
+Højde og geografiske koordinater for målestation er aflæst fra kort:
+\begin{verbatim}
+  Station: Silstrup
+  Elevation: 43 m
+  Longitude: 9 dgEast 
+  Latitude: 57 dgNorth
+  TimeZone: 15 dgEast
+\end{verbatim}
+
+Målehøjden (ScreenHeight) er sat til 10m for at matche vindmåleren, og
+vi regner med at underlaget er kort klippet græs:
+\begin{verbatim}
+Surface: reference
+ScreenHeight: 10.0 m
+\end{verbatim}
+
+Nedbørstal er korrigeret efter DMI standard.  I Daisy opæstningfilen
+ser det således ud:
+\begin{verbatim}
+  (weather default "dk-silstrup-hourly.dwf"
+           (PrecipScale 1.41 1.42 1.35 1.24 1.13 1.11
+                        1.10 1.10 1.11 1.14 1.23 1.37 []))
+\end{verbatim}
+
+\subsection{Jord}
+
+Jordopsætning er baseret på jordfysiske parametre fra GEUS opsætning
+af MACRO.  Der er anvendt tre jordhorizonter, som I Daisy opsætningen
+set der således ud:
+\begin{verbatim}
+(defhorizon Silstrup_Ap FAO3
+  (clay 22.45 [%]) (silt 27.7 [%])(sand 49.85 [%])
+  (humus (C2OM (C 1.798 [%]))) (dry_bulk_density 1.48 [g/cm^3])
+  (hydraulic M_vG
+             (Theta_sat 44 [%]) (Theta_res 0 [%])
+             (n 1.1 []) (K_sat 306 [mm/h])
+             (l 0.5 []) (alpha 0.01 [cm^-1])))
+
+(defhorizon Silstrup_B FAO3
+  (clay 27.97 [%]) (silt 26.17 [%]) (sand 45.86 [%])
+  (humus (C2OM (C 0.47 [%]))) (dry_bulk_density 1.61 [g/cm^3])
+  (hydraulic M_vG
+             (Theta_sat 39 [%]) (Theta_res 0 [%])
+             (n 1.13 []) (K_sat 36 [mm/h])
+             (l 0.5 []) (alpha 0.012 [cm^-1])))
+
+(defhorizon Silstrup_C FAO3
+  (clay 26.28 [%]) (silt 20.86 [%]) (sand 52.86 [%])
+  (humus (C2OM (C 0.116 [%]))) (dry_bulk_density 1.75 [g/cm^3])
+  (hydraulic M_vG
+             (Theta_sat 34 [%]) (Theta_res 0 [%])
+             (n 1.1 []) (K_sat 19 [mm/h])
+             (l 0.5 []) (alpha 0.012 [cm^-1])))
+\end{verbatim}
+Alle ovenstående tal er fra GEUS.  MACRO bruger organisk kulstof som
+input, hvor Daisy bruger humus.  Funktionen C2OM omregner ved at
+dividere kulstofprocenten med 0.578.
+
+GEUS oplysser at der ingen pløjesål er observeret, men den kan godt
+eksistere alligevel.
+
+Jorprofilen angives sammen med den maksimale roddybde, som GEUS har
+oplyst til 50 cm.
+\begin{verbatim}
+  (Soil (horizons ( -31.00 Silstrup_Ap)
+                  (-113.00 Silstrup_B)
+                  (-500.00 Silstrup_C))
+        (MaxRootingDepth 50 [cm]))
+\end{verbatim}
+
+\subsection{Grundvand}
+
+GEUS har leveret grundvandsdata fra piezometer placeret i P3, med et
+filter placeret i 5.5 til 6 meters dybde.  Dat det er tæt på den dybde
+hvortil jorden er beskrevet (5 meter) har vi valgt at bruge trykket
+fra piezometeret som nedre rand for vores system.  Der er en meget
+klar sammenhæng disse måletal, og hvornår drænene er aktive.  Da
+piezometeret er placeret på toppen af skråningen, og da drænmålingerne
+viser at drænene bliver aktiveret før den målte grundvandsdybde når
+drænrørene, har vi valgt at tilføje et fast offset til det målte tryk.
+Vi regner denne (offset) parameter for at være den primære
+kalibreringsparameter for at få mængde og periode for dræn til at
+passe med målingerne.  I Daisy ser det sådan ud:
+\begin{verbatim}
+    (Groundwater file "dk-silstrup.gwt" (offset 5 [cm]))
+\end{verbatim}
+Simuleret og observeret (uden offset) grundvandstand kan ses på
+figur~\ref{fig:silstrup-gw}.
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=\columnwidth]{silstrup-gw}
+  \end{center}
+  \caption{Grundvandsstand for Silstrup.}
+  \label{fig:silstrup-gw}
+\end{figure}
+Den simulerede grundvandstsand bygger på antagelse om at den nederste
+umættede numeriske celle er i ligevægt med grundvandet.
+
+\subsection{Jordvand}
+
+Jordvand er målt med TDR to steder (S1 og S2) samt i tre dybder (25,
+60 og 110 cm under jordoverfladen).  Vi har fået data fra S1, der er
+placeret i bunden af arealet.  Resultaterne er vist på
+figur~\ref{fig:silstrup-theta}.
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=\columnwidth]{silstrup-theta-SW025cm}\\
+    \includegraphics[width=\columnwidth]{silstrup-theta-SW060cm}\\
+    \includegraphics[width=\columnwidth]{silstrup-theta-SW110cm}
+  \end{center}
+  \caption{Jordvand for målepunkt S1 i Silstrup.}
+  \label{fig:silstrup-theta}
+\end{figure}
+Umiddelbart kan man se at der tilsynladende er dårlig overenstemmelse
+mellem porøsister ved S1 og den porøsitet der er målt for jorden som
+helhed, da målingerne viser et vandindhold over porøsiteten i lange
+perioder.  Desuden tyder den manglende sæsonvariation for de to dybe
+prober (60 og 110 cm) på at der ikke er mange rødder dernede.  Det
+passer med oplysninger fra GEUS om at marken har en maksimal roddybde
+på 50 cm.  Vi har valgt ikke at hæfte stor vægt disse målinger da der
+er en god chance for at de ikke er representative for marken.
+
+\subsection{Koncentration i jord}
+
+Der er målt bromid med sugekopper ved S1 og S2 i 1 og 2 meters dybde,
+vi har fået data fra S1 i en meters dybde.  Da variationen mellem S1
+og S2 vist i \cite{vap2009} er stor på trods af at de to målepunkter
+ligger tæt, har vi valgt ikke at kalibrere efter disse punktdata, vist
+ipå figur~\ref{fig:silstrup-sc-bromide}.
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=\columnwidth]{silstrup-sc-bromide}
+  \end{center}
+  \caption{Bromid i jorden i en meters dybde ved S1 i Silstrup.}
+  \label{fig:silstrup-sc-bromide}
+\end{figure}
+
+Der er desuden målt på pesticider i to vandrette skærme beliggende i
+3,5 meters dybde.  Disse er på sin vis mere interessante, da de omgår
+problemet med Ingen af disse målinger har dog vist koncentrationer
+over detektionsgrænsen.  De simulerede værdier kan ses på
+figur~\ref{fig:silstrup-horizontal}.
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=1.1\columnwidth]{silstrup-horizontal}
+  \end{center}
+  \caption{Pesticider i jorden i 3,5 meters dybde i Silstrup.}
+  \label{fig:silstrup-horizontal}
+\end{figure}
+
+\subsection{Dræn og drænvand}
+
+Dræn er placeret 1.10 meter under jordoverfladen, og med 18 meters
+mellemrum.  I Daisy 1D kan det angives som:
+\begin{verbatim}
+  (Tertiary pipes (L 18 [m]) (pipe_position -110.0 [cm])))
+\end{verbatim}
+Drænafstrømning er vist i figur~\ref{fig:silstrup-drain}.
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=\columnwidth]{silstrup-drain}
+  \end{center}
+  \caption{Drænafstrøming i Silstrup.}
+  \label{fig:silstrup-drain}
+\end{figure}
+Akkumuleret drænafstrømning er vist i figur~\ref{fig:silstrup-drain-acc}
+sammen med perkolation og nettonedbør.
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=\columnwidth]{silstrup-drain-acc}
+  \end{center}
+  \caption{Akkumuleret drænafstrømning i Silstrup.}
+  \label{fig:silstrup-drain-acc}
+\end{figure}
+
+\subsection{Drænkoncentrationer}
+
+GEUS har leveret både tidsproportionelle måleserier af koncentration
+på ugebasis, og flowproportionelle måletal af koncentration med
+varierende tidsintervaller.  Desuden har de levereret et estimat af
+samlet udvaskning i ugeintervaller baseret på de flowpropertionelle
+måletal når der er en drænhæmndelse, og de tidsproportionelle måletal
+ellers.  Vi har valgt at plotte mod den sidste serie, da den
+representerer GEUS bedste bud på udvaskning.  Måletal på 0 indikerer
+at indholdet har været under Detektiongrænsen, som er på 0.01 $\mu$g/l
+for pesticider og 0.1 mg/l for bromid.  Ingen af målingerne af
+Fenpropimorph har været over detektionsgrændsen.  Når Daisy kører uden
+makroporer, sker der ingen udvaskning af pesticider.
+
+Sammenligning af ugentlige udvaskninger kan ses på
+figur~\ref{fig:silstrup-weekly}.
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=\columnwidth]{silstrup-Bromide-weekly}\\
+    \includegraphics[width=\columnwidth]{silstrup-Dimethoate-weekly}\\
+    \includegraphics[width=\columnwidth]{silstrup-Fenpropimorph-weekly}\\
+    \includegraphics[width=\columnwidth]{silstrup-Glyphosate-weekly}\\
+    \includegraphics[width=\columnwidth]{silstrup-Metamitron-weekly}
+  \end{center}
+  \caption{Weekly drain flow of Bromide and selected pesticides.}
+  \label{fig:silstrup-weekly}
+\end{figure}
+GEUS tal er gjort arealrelative ved at dividere med drænarealet for
+Silstrup. Den akkumulerede udvaskning kan ses på
+figur~\ref{fig:silstrup-acc}.
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=\columnwidth]{silstrup-Bromide-acc}\\
+    \includegraphics[width=\columnwidth]{silstrup-Dimethoate-acc}\\
+    \includegraphics[width=\columnwidth]{silstrup-Fenpropimorph-acc}\\
+    \includegraphics[width=\columnwidth]{silstrup-Glyphosate-acc}\\
+    \includegraphics[width=\columnwidth]{silstrup-Metamitron-acc}
+  \end{center}
+  \caption{Accumulated drain flow of Bromide and selected pesticides.}
+  \label{fig:silstrup-acc}
+\end{figure}
+
+\section{Estrup}
+
+\subsection{Forvaltning}
+
+\subsection{Vejr}
+
+\subsection{Jord}
+
+GEUS: Variabel roddybde, rødder observeret ned til 2 meters dybde.
+
+Ingen pløjesål observeret, men den kan godt eksistere alligevel.
+
+\subsection{Grundvand}
+
+Grundvandsstand taget fra P1 i filter 4.5 til 5 meters dybde.
+
+\subsection{Jordvand}
+
+Jordvandsmålinger fra S1.
+
+\subsection{Sugekopper}
+
+\subsection{Dræn og drænvand}
+
+Dræn er placeret 1.10 meter under jhordoverfladen, og med variabel
+afstand (mellem 9 og 20 meter).  Den typiske afstand er dog ca. 13
+meter, hvilket er blevet brugt i Daisy opsætningen.
+
+\subsection{Drænkoncentrationer}
+
+\addcontentsline{toc}{section}{\numberline{}References}
+\bibliography{../../txt/daisy}
+
+\end{document}

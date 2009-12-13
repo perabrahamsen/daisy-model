@@ -601,8 +601,11 @@ Geometry::swap (std::vector<double>& v,
   const double top = total_soil (v, from, middle);
   const double bottom = total_soil (v, middle, to);
   set_soil (v, from, to, 0.0);
-  add_soil (v, from, middle, bottom);
-  add_soil (v, middle, to, top);
+  const double new_middle = to + (from - middle);
+  daisy_assert (new_middle < from);
+  daisy_assert (new_middle > to);
+  add_soil (v, from, new_middle, bottom);
+  add_soil (v, new_middle, to, top);
 
   daisy_assert (approximate (old_total, total_soil (v)));
 }

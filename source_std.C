@@ -71,7 +71,7 @@ SourceStandard::load (Treelog& msg)
   symbol original (lex.dimension (tag_c));
   if (accumulate ())
     {
-      const symbol accumulated = Units::multiply (original, "h");
+      const symbol accumulated = Units::multiply (original, timestep);
       if (accumulated != Attribute::Unknown ())
         original = accumulated;
     }

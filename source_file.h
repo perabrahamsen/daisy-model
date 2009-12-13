@@ -35,6 +35,9 @@ protected:
   const int style_;
 private:
   bool accumulate_;
+public:
+  const symbol timestep;
+private:
   bool use_sum;
   int default_hour;
   const Timestep time_offset;
