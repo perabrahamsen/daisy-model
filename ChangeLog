@@ -1,3 +1,7 @@
+2009-12-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* number_const.C (x): Made it a top level model.
+
 2009-12-13  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* geometry.C (swap): Fix case where 'middle' is not actually in

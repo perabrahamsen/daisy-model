@@ -100,6 +100,8 @@ Source::~Source ()
 
 static struct SourceInit : public DeclareComponent 
 {
+  void load_frame (Frame& frame) const
+  { Model::load_model (frame); }
   SourceInit ()
     : DeclareComponent (Source::component, "\
 Time series, with possible error bars and formatting information.")

@@ -1,0 +1,73 @@
+;;; vap-2d.dai -- 2D specific information for VAP setups
+
+(defbiopore common matrix
+  (R_primary 1 [h])
+  (R_secondary 0.01 [h])
+  (allow_upward_flow true))
+
+
+(defbiopore "matrix_0cm"
+   (common (height_start 0 [cm])
+           (height_end -25 [cm])
+           ;;(density 179 [m^-2])
+           ;;; ca 95% af 190 [m^-2]
+           (density 100 [m^-2])
+           (diameter 2 [mm])))
+           
+(defbiopore "matrix_2cm"
+   (common ;;(height_start  -1.5 [cm])
+           (height_start 0 [cm])
+           (height_end -120 [cm])
+           (diameter 4 [mm])
+           (density (plf x (range [m^-2])
+                           (domain [cm])
+                           (points (20 0)
+                                   (30 45))))))       
+           ; 5% af 190
+                   
+(defbiopore "drain_2cm"
+   (drain  ;;(height_start -1.5 [cm])
+           (height_start 0 [cm])
+           (height_end -115 [cm])
+           (diameter 4 [mm])
+           (pipe_position -112.5 [cm])
+           (density (plf x (range [m^-2])
+                           (domain [cm])
+                           (points (20 45)
+                                   (30 0))))))
+          ;; 5% af 190
+
+(defbiopore "matrix_30cm"
+   (common (height_start -30 [cm])
+           (height_end -120 [cm])
+           (diameter 4 [mm])
+           (density (plf x (range [m^-2])
+                           (domain [cm])
+                           (points (20 0)
+             	 (30 15))))))      
+           
+(defbiopore "drain_30cm"
+   (drain  (height_start -30 [cm])
+           (height_end -115 [cm])
+           (diameter 4 [mm])
+           (pipe_position -112.5 [cm])
+           (density (plf x (range [m^-2])
+                           (domain [cm])
+                           (points (20 15)
+                                   (30 0))))))
+
+(defmovement Rorrende rectangle
+;;;  (matrix_solute Mollerup convection none)
+;;;  (matrix_water (Mollerup (max_time_step_reductions 16)
+;;;                          (max_number_of_small_time_steps 1000000))
+;;;                (v+h))
+  (drain (-110 [cm] 1 [cm]))
+  (Tertiary (biopores 
+             (use_small_timesteps false)
+             (classes ("matrix_0cm") 
+                      ("matrix_2cm")
+                      ("drain_2cm")
+                      ("matrix_30cm")
+                      ("drain_30cm")))))
+
+;;; vap-2d.dai

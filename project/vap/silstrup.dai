@@ -1,54 +1,11 @@
-;;; Silstrup VAP area -- data from GEUS.
-
-(input file "tillage.dai")
-(input file "crop.dai")
-(input file "fertilizer.dai")
-(input file "chemistry.dai")
-(input file "log-std.dai")
+;;; silstrup.dai -- Silstrup VAP area -- data from GEUS.
 
 ;; Chemistry
-
-(defchemical "Bromide" common
-  (diffusion_coefficient 2.0e-5 [cm^2/s])
-  (crop_uptake_reflection_factor 1 [])
-  (canopy_dissipation_rate 0 [h^-1])
-  (decompose_rate 0 [h^-1]))
-
-(defchemical Fenpropimorph fungicide
-  (cite "lindhardt2001")
-  (decompose_halftime 67 [d])
-  (adsorption linear (K_OC 3700 [l/kg])))
-
-(defchemical Dimethoate insecticide
-  (cite "lindhardt2001")
-  (decompose_halftime 16 [d])
-  (adsorption linear (K_OC 30 [l/kg])))
-
-(defchemical Glyphosate herbicide
-  (cite "lindhardt2001")
-  (decompose_halftime 16 [d])
-  (adsorption linear (K_OC 3400 [l/kg])))
-
-(defchemical Metamitron herbicide
-  (cite "lindhardt2001")
-  (decompose_halftime 14 [d])
-  (adsorption linear (K_OC 207 [l/kg])))
 
 (defchemistry Silstrup default
   (trace Bromide Dimethoate Fenpropimorph Glyphosate Metamitron))
 
-(defchemistry Estrup default
-  (trace Bromide Dimethoate Fenpropimorph Glyphosate))
-
 ;; Soil 
-
-(defnumber C2OM identity
-  ;; Paramaters.
-  (declare C Number [] "Organic C content.")
-  ;; MACRO uses C content, while Daisy uses total humus content.
-  (declare C_in_humus Number [] "C fraction in humus.")
-  (C_in_humus 0.587 [])
-  (value (/ C C_in_humus)))
 
 (defhorizon Silstrup_Ap FAO3
   (clay 22.45 [%]) (silt 27.7 [%])(sand 49.85 [%])
@@ -75,10 +32,17 @@
              (l 0.5 []) (alpha 0.012 [cm^-1])))
 
 (defcolumn Silstrup default
-  (Movement original 
-            (Tertiary pipes
-                      (L 18 [m])
-                      (pipe_position -110.0 [cm])))
+  ;; 1D
+  ;; (Movement original 
+  ;;           (Tertiary pipes
+  ;;                     (L 18 [m])
+  ;;                     (pipe_position -110.0 [cm])))
+  ;; 2D
+  (Movement Rorrende
+            (Geometry (zplus -2 -10 -25 -31
+                             -50 -100 -113 
+                             -120 -180 -300 -500 [cm])
+                      (xplus 10 25 50 100 200 400 900 [cm])))
   (Groundwater file "dk-silstrup.gwt"
                ;; GWT is measured at top of terrain.
                ;; Offset is calibrated based on drainage measurments.
@@ -135,7 +99,6 @@
   (wait (at 2000 06 28))
     ;; BBCH stage 19
     ;; Fusilade X-tra (fluazifop-P-butyl) - weeds - 1.5 l/ha
-  (wait (at 2000 06 28))
     ;; BBCH stage 31
     ;; Biomass. Root + top:  213 g/10 m row - 100% DM
     ;; Pirimor G (pirimicarb) - pests - 0.3 kg/ha
@@ -192,10 +155,10 @@
   (wait (at 2001 09 05))
     ;; Harvest of spring barley. ;; Stubbleheight 12 cm, 
     ;; grain yield 74.77 hkg/ha 85% DM, straw yield 28.62 hkg/ha 100% DM
-    (harvest "Spring Barley")
+    (harvest "Spring Barley" (stub 12 [cm]))
   (wait (at 2001 10 25))
      ;; Roundup Bio (glyphosate) - weeds - 4.0 l/ha			
-     ;; 360 g/l ^* 4.0 l/ha = 1440 g/ha
+     ;; 360 g/l * 4.0 l/ha = 1440 g/ha
     (spray Glyphosate 1440 [g/ha])
   (wait (at 2001 12 18))
     (plowing (depth -22 [cm]))
@@ -218,47 +181,19 @@
     (sow Maize)
     ;; Fertilization 23.4 N, 13.1 P, kg/ha			
     (fertilize (NP (weight 23.4 [kg/ha]))))
-
+         
 ;; Output
 
-(deflog "Silstrup Content" column
-  (where "silstrup-content.dlf")
+(deflog "Silstrup Content" "VAP Content"
+  (where "Silstrup-content.dlf")
   (when daily)
-  (entries (content (z -1 [m])
-                    (path column "${column}" Chemistry "*" 
-                          trace "Bromide" C)
-                    (tag Bromide)
-                    (dimension "mg/L")
-                    (spec chemical default C))
-           (content (z -3.5 [m])
-                    (path column "${column}" Chemistry "*" 
-                          trace "Dimethoate" C)
-                    (tag Dimethoate)
-                    (dimension "mg/L")
-                    (spec chemical default C))
-           (content (z -3.5 [m])
-                    (path column "${column}" Chemistry "*" 
-                          trace "Fenpropimorph" C)
-                    (tag Fenpropimorph)
-                    (dimension "mg/L")
-                    (spec chemical default C))
-           (content (z -3.5 [m])
-                    (path column "${column}" Chemistry "*" 
-                          trace "Glyphosate" C)
-                    (tag Glyphosate)
-                    (dimension "mg/L")
-                    (spec chemical default C))
+  (entries &old 
            (content (z -3.5 [m])
                     (path column "${column}" Chemistry "*" 
                           trace "Metamitron" C)
                     (tag Metamitron)
                     (dimension "mg/L")
                     (spec chemical default C))
-           (content (z -0.25 [m])
-                    (path column "${column}" SoilWater Theta)
-                    (tag "SW025cm")
-                    (dimension "%")
-                    (spec fixed SoilWater Theta))
            (content (z -0.60 [m])
                     (path column "${column}" SoilWater Theta)
                     (tag "SW060cm")
@@ -269,16 +204,13 @@
                     (tag "SW110cm")
                     (dimension "%")
                     (spec fixed SoilWater Theta))
-           (number (path column "${column}" Movement vertical
-                         Tertiary pipes height)
-                   (tag "GWT")
-                   (spec tertiary pipes height))
            ))
 
 ;; Program
 
-(defprogram Silstrup Daisy
+(defprogram Silstrup VAP
   "Simulation for the Silstrup PLAP station."
+  (station "Silstrup")
   (column Silstrup)
   (manager Silstrup)
   (weather default "dk-silstrup-hourly.dwf"
@@ -288,233 +220,134 @@
   (time 1999 9 1)
   (stop 2002 3 10)
 
-  (output (harvest (where "silstrup-harvest.dlf"))
-          ("Field chemical" 
-           (chemical "Bromide")
-           (where "silstrup-field-Bromide.dlf"))
-          ("Field chemical" 
-           (chemical "Glyphosate")
-           (where "silstrup-field-Glyphosate.dlf"))
-          ("Field chemical" 
-           (chemical "Fenpropimorph")
-           (where "silstrup-field-Fenpropimorph.dlf"))
-          ("Field chemical" 
-           (chemical "Dimethoate")
-           (where "silstrup-field-Dimethoate.dlf"))
+  (output &old
           ("Field chemical" 
            (chemical "Metamitron")
-           (where "silstrup-field-Metamitron.dlf"))
-          ("Field chemical" (when weekly)
-           (chemical "Bromide")
-           (where "silstrup-field-Bromide-weekly.dlf"))
-          ("Field chemical"  (when weekly)
-           (chemical "Glyphosate")
-           (where "silstrup-field-Glyphosate-weekly.dlf"))
-          ("Field chemical"  (when weekly)
-           (chemical "Fenpropimorph")
-           (where "silstrup-field-Fenpropimorph-weekly.dlf"))
-          ("Field chemical"  (when weekly)
-           (chemical "Dimethoate")
-           (where "silstrup-field-Dimethoate-weekly.dlf"))
+           (where "${station}-field-Metamitron.dlf"))
           ("Field chemical"  (when weekly)
            (chemical "Metamitron")
-           (where "silstrup-field-Metamitron-weekly.dlf"))
-          ("Field water" (when daily)
-           (where "silstrup-field-water-daily.dlf"))
-          ("Field water" (when hourly) 
-           (where "silstrup-field-water-hourly.dlf"))
+           (where "${station}-field-Metamitron-weekly.dlf"))
           ("Silstrup Content")))
 
 ;; Plots
 
-(defunit [w] [s] (factor 604800))
-(defunit [g/ha/w] [kg/m^2/s] (factor 1.653e-13))
+(defxysource "Retension Ap Silstrup GEUS" "Retension GEUS" 
+  (y (convert (soil_Theta (horizon "Silstrup_Ap")
+                          (top_soil true)
+                          (h x))
+              [])))
 
-(defgnuplot plottime time
-  (device "pdf size 12cm, 6cm")
-  (extra [set format x "%y-%m-%d"]))
+(defxysource "Retension Ap Silstrup HYPRES" "Retension HYPRES"
+  (y (convert (soil_Theta (horizon ("Silstrup_Ap" (hydraulic hypres)))
+                          (top_soil true)
+                          (h x))
+              [])))
 
-(defgnuplot silstrup-weather plottime
-  (begin 2000 04 29) (end 2002 6 30)
-  (where "silstrup-weather.pdf")
-  (title "Weather")
-  (source (column (file "silstrup-field-water-hourly.dlf")
-                  (tag "Precipitation")
-                  (accumulate true))
-          (column (file "silstrup-field-water-hourly.dlf")
-                  (tag "Potential evapotranspiration")
-                  (accumulate true))
-          (column (file "silstrup-field-water-hourly.dlf")
-                  (tag "Actual evapotranspiration")
-                  (accumulate true))
-          (column (file "dk-silstrup-hourly.dwf")
-                  (tag AirTemp))))
+(defxysource "Conductivity Ap Silstrup GEUS" "Conductivity GEUS" 
+  (y (convert (soil_K (horizon "Silstrup_Ap")
+                      (top_soil true)
+                      (h x))
+              [cm/d])))
 
-(defgnuplot silstrup-gw plottime
-  (begin 2000 04 29) (end 2002 6 30)
-  (where "silstrup-gw.pdf")
-  (title "Groundwater")
-  (source (column (file "silstrup-content.dlf")
-                  (tag "GWT")
-                  (title "Sim"))
-          (column (file "dk-silstrup.ddf")
-                  (tag "Level")
-                  (style 2)
-                  (title "Obs"))))
+(defxysource "Conductivity Ap Silstrup HYPRES" "Conductivity HYPRES"
+  (y (convert (soil_K (horizon ("Silstrup_Ap" (hydraulic hypres)))
+                      (top_soil true)
+                      (h x))
+              [cm/d])))
 
-(defgnuplot silstrup-theta plottime
-  (device "pdf size 12cm, 4cm")
-  (begin 1999 9 1) (end 2002 7 1)
-  (declare depth String "Soil depth to plot.") 
-  (where "silstrup-theta-${depth}.pdf")
-  (title "${depth}")
-  (source (column (file "silstrup-content.dlf")
-                  (tag "${depth}")
-                  (title "Sim"))
-          (column (file "silstrup-theta.ddf")
-                  (style 2)
-                  (with lines)
-                  (missing missing)
-                  (tag "${depth}")
-                  (title "Obs"))))
+(defgnuplot "Hydraulic Ap Silstrup" "Hydraulic All"
+  (hor "Ap")
+  (source "Retension Ap Silstrup HYPRES"
+          "Retension Ap Silstrup GEUS"
+          "Conductivity Ap Silstrup HYPRES"
+          "Conductivity Ap Silstrup GEUS"))
 
-(defgnuplot silstrup-sc-bromide plottime
-  (device "pdf size 12cm, 4cm")
-  (begin 2000 06 01) (end 2002 6 1)
-  (where "silstrup-sc-bromide.pdf")
-  (title Bromide)
-  (source (column (file "silstrup-content.dlf")
-                  (tag "Bromide")
-                  (title "Sim"))
-          (column (file "silstrup-sc-bromide.ddf")
-                  (missing missing)
-                  (tag "S1")
-                  (style 2))
-          (column (file "silstrup-sc-bromide.ddf")
-                  (missing missing)
-                  (tag "S2")
-                  (style 3))))
+(defxysource "Retension B Silstrup GEUS" "Retension GEUS" 
+  (y (convert (soil_Theta (horizon "Silstrup_B")
+                          (top_soil false)
+                          (h x))
+              [])))
 
-(defgnuplot silstrup-horizontal plottime
-  ;; (device "pdf size 12cm, 4cm")
-  (begin 2000 06 01) (end 2002 6 1)
-  (where "silstrup-horizontal.pdf")
-  (title "Horizontal screen")
-  (source (column (file "silstrup-content.dlf")
-                  (tag "Dimethoate"))
-          (column (file "silstrup-content.dlf")
-                  (tag "Fenpropimorph"))
-          (column (file "silstrup-content.dlf")
-                  (tag "Glyphosate"))
-          (column (file "silstrup-content.dlf")
-                  (tag "Metamitron"))))
+(defxysource "Retension B Silstrup HYPRES" "Retension HYPRES"
+  (y (convert (soil_Theta (horizon ("Silstrup_B" (hydraulic hypres)))
+                          (top_soil false)
+                          (h x))
+              [])))
 
-(defgnuplot silstrup-drain plottime
-  (begin 2000 04 29) (end 2002 6 30)
-  (where "silstrup-drain.pdf")
-  (title "Drain flow")
-  (source (arithmetic (missing "none")
-                      (file "silstrup-field-water-daily.dlf")
-                      (expr (+ "Soil drain flow" "Surface drain flow"))
-                      (title "Sim"))
-          (column (file "silstrup-drainflow.ddf")
-                  (tag "drain")
-                  (style 2)
-                  (title "Obs"))))
+(defxysource "Conductivity B Silstrup GEUS" "Conductivity GEUS" 
+  (y (convert (soil_K (horizon "Silstrup_B")
+                      (top_soil false)
+                      (h x))
+              [cm/d])))
 
-(defgnuplot silstrup-drain-acc plottime
-  (begin 2000 04 29) (end 2002 6 30)
-  (where "silstrup-drain-acc.pdf")
-  (title "Accumulated drain flow")
-  (source (arithmetic (missing "none")
-                      (file "silstrup-field-water-daily.dlf")
-                      (expr (+ "Soil drain flow" "Surface drain flow"))
-                      (accumulate true)
-                      (timestep d)
-                      (title "Sim"))
-          (column (file "silstrup-drainflow.ddf")
-                  (accumulate true)
-                  (timestep d)
-                  (tag "drain")
-                  (style 2)
-                  (with lines)
-                  (title "Obs"))
-          (arithmetic (file "silstrup-field-water-daily.dlf")
-                      (expr (- "Precipitation" "Actual evapotranspiration"))
-                      (accumulate true)
-                      (timestep d)
-                      (style 3)
-                      (with lines)
-                      (title "Net precip"))
-          (column (file "silstrup-field-water-daily.dlf")
-                  (tag "Matrix percolation")
-                  (accumulate true)
-                  (timestep d)
-                  (style 4)
-                  (with lines))))
+(defxysource "Conductivity B Silstrup HYPRES" "Conductivity HYPRES"
+  (y (convert (soil_K (horizon ("Silstrup_B" (hydraulic hypres)))
+                      (top_soil false)
+                      (h x))
+              [cm/d])))
 
-(defgnuplot silstrup-drainmass plottime
-  (device "pdf size 12cm, 4cm")
-  (declare chemical String "Name of chemical to plot")
-  (begin 2000 10 1) (end 2002 4 1)
-  (where "silstrup-${chemical}-weekly.pdf")
-  (title "${chemical}")
-  (source (arithmetic (missing "none")
-                      (file "silstrup-field-${chemical}-weekly.dlf")
-                      (expr (+ "Soil-Drain" "Surface-Drain"))
-                      (with lines)
-                      (title "Sim"))
-          (arithmetic (file "silstrup-drainmass.ddf")
-                      (missing missing)
-                      (expr (/ (convert (/ "${chemical}" 1.69 [ha]) [g/ha])
-                               1 [w]))
-                      (with points)
-                      (style 2)
-                      (title "Obs"))))
+(defgnuplot "Hydraulic B Silstrup" "Hydraulic All"
+  (hor "B")
+  (source "Retension B Silstrup HYPRES"
+          "Retension B Silstrup GEUS"
+          "Conductivity B Silstrup HYPRES"
+          "Conductivity B Silstrup GEUS"))
 
-(defgnuplot silstrup-drainmass-acc plottime
-  (device "pdf size 12cm, 4cm")
-  (declare chemical String "Name of chemical to plot")
-  (begin 2000 10 1) (end 2002 4 1)
-  (where "silstrup-${chemical}-acc.pdf")
-  (title "${chemical}")
-  (source (arithmetic (missing "none")
-                      (file "silstrup-field-${chemical}.dlf")
-                      (expr (+ "Soil-Drain" "Surface-Drain"))
-                      (with lines)
-                      (accumulate true)
-                      (title "Sim"))
-          (arithmetic (file "silstrup-drainmass.ddf")
-                      (missing missing)
-                      (accumulate true)
-                      (expr (convert (/ "${chemical}" 1.69 [ha]) [g/ha]))
-                      (with points)
-                      (style 2)
-                      (title "Obs"))))
+(defxysource "Retension C Silstrup GEUS" "Retension GEUS" 
+  (y (convert (soil_Theta (horizon "Silstrup_C")
+                          (top_soil false)
+                          (h x))
+              [])))
 
-(defprogram plotall gnuplot
-  (graph silstrup-weather silstrup-gw
-         (silstrup-theta (depth "SW025cm"))
-         (silstrup-theta (depth "SW060cm"))
-         (silstrup-theta (depth "SW110cm"))
-         silstrup-sc-bromide silstrup-horizontal
-         silstrup-drain silstrup-drain-acc 
-         (silstrup-drainmass (chemical Bromide))
-         (silstrup-drainmass (chemical Dimethoate))
-         (silstrup-drainmass (chemical Fenpropimorph))
-         (silstrup-drainmass (chemical Glyphosate))
-         (silstrup-drainmass (chemical Metamitron))
-         (silstrup-drainmass-acc (chemical Bromide))
-         (silstrup-drainmass-acc (chemical Dimethoate))
-         (silstrup-drainmass-acc (chemical Fenpropimorph))
-         (silstrup-drainmass-acc (chemical Glyphosate))
-         (silstrup-drainmass-acc (chemical Metamitron))
+(defxysource "Retension C Silstrup HYPRES" "Retension HYPRES"
+  (y (convert (soil_Theta (horizon ("Silstrup_C" (hydraulic hypres)))
+                          (top_soil false)
+                          (h x))
+              [])))
+
+(defxysource "Conductivity C Silstrup GEUS" "Conductivity GEUS" 
+  (y (convert (soil_K (horizon "Silstrup_C")
+                      (top_soil false)
+                      (h x))
+              [cm/d])))
+
+(defxysource "Conductivity C Silstrup HYPRES" "Conductivity HYPRES"
+  (y (convert (soil_K (horizon ("Silstrup_C" (hydraulic hypres)))
+                      (top_soil false)
+                      (h x))
+              [cm/d])))
+
+(defgnuplot "Hydraulic C Silstrup" "Hydraulic All"
+  (hor "C")
+  (source "Retension C Silstrup HYPRES"
+          "Retension C Silstrup GEUS"
+          "Conductivity C Silstrup HYPRES"
+          "Conductivity C Silstrup GEUS"))
+
+(defgnuplot sil-drainmass drainmass (area 1.69 [ha]))
+(defgnuplot sil-drainmass-acc drainmass-acc (area 1.69 [ha]))
+
+(defgnuplot Silstrup Station
+  (station Silstrup)
+  (graph &old 
+         "Hydraulic Ap Silstrup"
+         "Hydraulic B Silstrup"
+         "Hydraulic C Silstrup"
+         (horizontal (source &old 
+                             (column (file "${station}-content.dlf")
+                                     (tag "Metamitron"))))
+         (theta (depth "SW060cm"))
+         (theta (depth "SW110cm"))
+         (sil-drainmass (chemical Bromide))
+         (sil-drainmass (chemical Dimethoate))
+         (sil-drainmass (chemical Fenpropimorph))
+         (sil-drainmass (chemical Glyphosate))
+         (sil-drainmass (chemical Metamitron))
+         (sil-drainmass-acc (chemical Bromide))
+         (sil-drainmass-acc (chemical Dimethoate))
+         (sil-drainmass-acc (chemical Fenpropimorph))
+         (sil-drainmass-acc (chemical Glyphosate))
+         (sil-drainmass-acc (chemical Metamitron))
          ))
-         
 
-(run batch
-     (run Silstrup
-          plotall
-          ))
-         
 ;;; silstrup.dai ends here.

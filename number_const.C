@@ -99,6 +99,68 @@ static struct NumberConstSyntax : public DeclareModel
   }
 } NumberConst_syntax;
 
+// The 'x' model.
+
+struct NumberX : public Number
+{
+  static const symbol name;
+
+  // Parameters.
+  symbol title () const
+  { return name; }
+
+  // Simulation.
+  void tick (const Units&, const Scope&, Treelog&)
+  { }
+  symbol dimension (const Scope& scope) const
+  { 
+    return scope.dimension (name); 
+  }
+  bool missing (const Scope& scope) const
+  { return !scope.check (name); }
+  double value (const Scope& scope) const
+  {  return scope.number ( name); }
+
+  // Create.
+  bool initialize (const Units& units, const Scope& scope, Treelog& msg)
+  { 
+    if (scope.lookup (name) != Attribute::Number)
+      {
+        msg.error ("'" + name + "' is not a number");
+        return false;
+      }
+    return true;
+  }
+  bool check (const Units& units, const Scope& scope, Treelog& msg) const
+  {
+    bool ok = true;
+    if (scope.lookup (name) != Attribute::Number)
+      {
+        msg.error ("'x' is not a number");
+        ok = false;
+      }
+    return ok;
+  }
+
+  NumberX (const BlockModel& al)
+    : Number (al)
+  { }
+};
+
+const symbol NumberX::name ("x");
+
+static struct NumberXSyntax : public DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new NumberX (al); }
+  NumberXSyntax ()
+    : DeclareModel (Number::component, "x", "\
+The value of the symbol 'x' in the current scope.")
+  { }
+  void load_frame (Frame& frame) const
+  { }
+} NumberX_syntax;
+
 struct NumberGet : public Number
 {
   // Data.
@@ -396,16 +458,6 @@ static struct NumberFetchSyntax : public DeclareModel
     frame.order ("name");
   }
 } NumberFetch_syntax;
-
-static struct NumberXSyntax : public DeclareParam
-{ 
-  NumberXSyntax ()
-    : DeclareParam (Number::component, "x", "fetch", "\
-Fetch the value of 'x' in the current scope.")
-  { }
-  void load_frame (Frame& frame) const
-  { frame.set ("name", "x"); }
-} NumberX_syntax;
 
 struct NumberChild : public Number
 {

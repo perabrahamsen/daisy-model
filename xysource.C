@@ -102,6 +102,8 @@ XYSource::~XYSource ()
 
 static struct XYSourceInit : public DeclareComponent 
 {
+  void load_frame (Frame& frame) const
+  { Model::load_model (frame); }
   XYSourceInit ()
     : DeclareComponent (XYSource::component, "\
 XY data series.")

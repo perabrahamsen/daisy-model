@@ -2,31 +2,15 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * VAP data 
 
-** Silstrup
-
-*** retention curves
-
-Se gnuplot_hydraulic.dai i fertorganic
-
-*** Spørg SH om kabilær. stigning
-
-*** Spørg SH/CPE om koncentrationer.
-
-Skal vi plotte de tids- og flowspecifikke serier?
-
-*** Find pesticider i database.
-
-** Macropores 
-
-Flere "Tertiary" models?
-
-** pesticide application 
-
-New model?  "apply"?
-
 ** Estrup
 
+drainmass plots
+
+** svn add & commit
+
 ** 2D
+
+** Better pesticides.
 
 * Artikler
 
