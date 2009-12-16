@@ -330,7 +330,7 @@ static struct TertiaryPipesSyntax : DeclareModel
     frame.declare_object ("eq_depth", Draineqd::component,
                           Attribute::Const, Attribute::Singleton, "\
 Model for calculating equivalent depth for drains.");
-    frame.set ("eq_depth", "none");
+    frame.set ("eq_depth", "MolenWesseling");
     frame.declare ("L", "cm", Check::positive (), Attribute::Const,
                    "Distance between pipes.");
     frame.set ("L", 1800.0);
