@@ -60,10 +60,14 @@ carbon part of the 'K' factor.")
 
 (defreaction colloid-generation colgen_Jarvis99
   "Release of colloids in soil surface from heavy rain."
-  ;; (Mmax 0.165 [g/g])                    ;Max detachable.
-  (kd 15.0 [g/J])                       ;Detachment rate coefficient.
-  (kr 0.1 [g/m^2/h])                    ;Replenishment rate coefficient.
-  (zi 0.1 [cm])                         ;Surface layer thickness.
+  ;;(Mmax 0.165 [g/g])                    ;Max detachable.
+  (Mmax 0.075 [g/g])                    ;Max detachable.
+  ;;(kd 15.0 [g/J])                       ;Detachment rate coefficient.
+  (kd 7.5 [g/J])                       ;Detachment rate coefficient.
+  ;;(kr 0.1 [g/m^2/h])                    ;Replenishment rate coefficient.
+  (kr 0.05 [g/m^2/h])                    ;Replenishment rate coefficient.
+  ;;(zi 0.1 [cm])                         ;Surface layer thickness.
+  (zi 0.05 [cm])                         ;Surface layer thickness.
   (colloid colloid))
 
 (defchemistry colloids default
@@ -81,7 +85,8 @@ carbon part of the 'K' factor.")
     ;;(solute (adsorption none))
     (crop_uptake_reflection_factor 1 [])
     (canopy_dissipation_rate 0 [h^-1])
-    (decompose_rate 0 [h^-1]))
+    (decompose_rate 0 [h^-1])
+    (C_below const 0 [g/cm^3]))
 
 (defchemistry Bromide default
   "Bromide everywhere"
