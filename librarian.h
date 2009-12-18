@@ -184,8 +184,11 @@ public:
   const symbol component;
   const symbol name;
   const symbol description_;
-  class Builder
-  { public: virtual Model* make (const BlockModel&) const = 0; };
+  struct Builder
+  { 
+    virtual Model* make (const BlockModel&) const = 0; 
+    virtual ~Builder ();
+  };
 
 public:
   virtual bool used_to_be_a_submodel () const;

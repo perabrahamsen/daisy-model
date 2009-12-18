@@ -6,38 +6,7 @@
 (input file "chemistry.dai")
 (input file "log-std.dai")
 
-;; Chemistry
-
-(defchemical "Bromide" common
-  (diffusion_coefficient 2.0e-5 [cm^2/s])
-  (crop_uptake_reflection_factor 1 [])
-  (canopy_dissipation_rate 0 [h^-1])
-  (decompose_rate 0 [h^-1]))
-
-(defchemical Fenpropimorph fungicide
-  (cite "lindhardt2001")
-  (decompose_halftime 67 [d])
-  (adsorption linear (K_OC 3700 [l/kg])))
-
-(defchemical Dimethoate insecticide
-  (cite "lindhardt2001")
-  (decompose_halftime 16 [d])
-  (adsorption linear (K_OC 30 [l/kg])))
-
-(defchemical Glyphosate herbicide
-  (cite "lindhardt2001" ;; decompose_halftime
-        "gjetterman2009"                ;K_clay
-        )
-  (decompose_halftime 16 [d]); lindhardt2001
-  ;; (adsorption linear (K_OC 3400 [l/kg])) ; lindhardt2001
-  ;; Kd = 503 [l/kg], f_clay = 0.12 []; K_clay = 503 / 0.12 = 4192 [l/kg]
-  (adsorption linear (K_clay 4192 [l/kg])) ;gjetterman2009
-  )
-
-(defchemical Metamitron herbicide
-  (cite "lindhardt2001")
-  (decompose_halftime 14 [d])
-  (adsorption linear (K_OC 207 [l/kg])))
+(input file "colloid-bound.dai")
 
 ;; Soil 
 
@@ -93,35 +62,46 @@
 (defprogram VAP Daisy
   "Simulation for the PLAP stations."
   (declare station String "Name of station")
-  (output (harvest (where "${station}-harvest.dlf"))
+  (output (harvest (where "log/${station}-harvest.dlf"))
+          ("Colloid bound" (chemical "Glyphosate-colloid")
+           (where "log/${station}-bound-Glyphosate.dlf"))
+          ("Soil chemical" (chemical colloid)
+           (where "log/${station}-soil-colloid.dlf"))
+          ("Field chemical" (chemical colloid)
+           (where "log/${station}-field-colloid.dlf"))
+          ("Soil chemical" (chemical "Glyphosate")
+           (where "log/${station}-solute-Glyphosate.dlf"))
+          ("Soil chemical" 
+           (chemical "Glyphosate-colloid")
+           (where "log/${station}-colloid-Glyphosate.dlf"))
           ("Field chemical" 
            (chemical "Bromide")
-           (where "${station}-field-Bromide.dlf"))
+           (where "log/${station}-field-Bromide.dlf"))
           ("Field chemical" 
-           (chemical "Glyphosate")
-           (where "${station}-field-Glyphosate.dlf"))
+           (chemical "Glyphosate-base")
+           (where "log/${station}-field-Glyphosate.dlf"))
           ("Field chemical" 
-           (chemical "Fenpropimorph")
-           (where "${station}-field-Fenpropimorph.dlf"))
+           (chemical "Fenpropimorph-base")
+           (where "log/${station}-field-Fenpropimorph.dlf"))
           ("Field chemical" 
-           (chemical "Dimethoate")
-           (where "${station}-field-Dimethoate.dlf"))
+           (chemical "Dimethoate-base")
+           (where "log/${station}-field-Dimethoate.dlf"))
           ("Field chemical" (when weekly)
            (chemical "Bromide")
-           (where "${station}-field-Bromide-weekly.dlf"))
+           (where "log/${station}-field-Bromide-weekly.dlf"))
           ("Field chemical"  (when weekly)
-           (chemical "Glyphosate")
-           (where "${station}-field-Glyphosate-weekly.dlf"))
+           (chemical "Glyphosate-base")
+           (where "log/${station}-field-Glyphosate-weekly.dlf"))
           ("Field chemical"  (when weekly)
-           (chemical "Fenpropimorph")
-           (where "${station}-field-Fenpropimorph-weekly.dlf"))
+           (chemical "Fenpropimorph-base")
+           (where "log/${station}-field-Fenpropimorph-weekly.dlf"))
           ("Field chemical"  (when weekly)
-           (chemical "Dimethoate")
-           (where "${station}-field-Dimethoate-weekly.dlf"))
+           (chemical "Dimethoate-base")
+           (where "log/${station}-field-Dimethoate-weekly.dlf"))
           ("Field water" (when daily)
-           (where "${station}-field-water-daily.dlf"))
+           (where "log/${station}-field-water-daily.dlf"))
           ("Field water" (when hourly) 
-           (where "${station}-field-water-hourly.dlf"))))
+           (where "log/${station}-field-water-hourly.dlf"))))
 
 ;; Plots
 
@@ -175,13 +155,13 @@
   ;; (begin 2000 04 29) (end 2002 6 30)
   (where "fig/${station}-weather.pdf")
   (title "Weather")
-  (source (column (file "${station}-field-water-hourly.dlf")
+  (source (column (file "log/${station}-field-water-hourly.dlf")
                   (tag "Precipitation")
                   (accumulate true))
-          (column (file "${station}-field-water-hourly.dlf")
+          (column (file "log/${station}-field-water-hourly.dlf")
                   (tag "Potential evapotranspiration")
                   (accumulate true))
-          (column (file "${station}-field-water-hourly.dlf")
+          (column (file "log/${station}-field-water-hourly.dlf")
                   (tag "Actual evapotranspiration")
                   (accumulate true))
           (column (file "dk-${station}-hourly.dwf")
@@ -191,7 +171,7 @@
   ;; (begin 2000 04 29) (end 2002 6 30)
   (where "fig/${station}-gw.pdf")
   (title "Groundwater")
-  (source (column (file "${station}-content.dlf")
+  (source (column (file "log/${station}-content.dlf")
                   (tag "GWT")
                   (title "Sim"))
           (column (file "dk-${station}.ddf")
@@ -205,7 +185,7 @@
   (declare depth String "Soil depth to plot.") 
   (where "fig/${station}-theta-${depth}.pdf")
   (title "${depth}")
-  (source (column (file "${station}-content.dlf")
+  (source (column (file "log/${station}-content.dlf")
                   (tag "${depth}")
                   (title "Sim"))
           (column (file "${station}-theta.ddf")
@@ -220,7 +200,7 @@
   ;; (begin 2000 06 01) (end 2002 6 1)
   (where "fig/${station}-sc-bromide.pdf")
   (title Bromide)
-  (source (column (file "${station}-content.dlf")
+  (source (column (file "log/${station}-content.dlf")
                   (tag "Bromide")
                   (title "Sim"))
           (column (file "${station}-sc-bromide.ddf")
@@ -234,22 +214,23 @@
 
 (defgnuplot horizontal plottime
   ;; (device "pdf size 12cm, 4cm")
-  (begin 2000 06 01) (end 2002 6 1)
+  ;; (begin 2000 06 01) (end 2002 6 1)
   (where "fig/${station}-horizontal.pdf")
   (title "Horizontal screen")
-  (source (column (file "${station}-content.dlf")
+  (source (column (file "log/${station}-content.dlf")
                   (tag "Dimethoate"))
-          (column (file "${station}-content.dlf")
+          (column (file "log/${station}-content.dlf")
                   (tag "Fenpropimorph"))
-          (column (file "${station}-content.dlf")
+          (column (file "log/${station}-content.dlf")
                   (tag "Glyphosate"))))
 
 (defgnuplot drain plottime
-  (begin 2000 04 29) (end 2002 6 30)
+  ;; (begin 2000 04 29) (end 2002 6 30)
   (where "fig/${station}-drain.pdf")
   (title "Drain flow")
+  (ymin 0)
   (source (arithmetic (missing "none")
-                      (file "${station}-field-water-daily.dlf")
+                      (file "log/${station}-field-water-daily.dlf")
                       (expr (+ "Soil drain flow" "Surface drain flow"))
                       (title "Sim"))
           (column (file "${station}-drainflow.ddf")
@@ -258,11 +239,11 @@
                   (title "Obs"))))
 
 (defgnuplot drain-acc plottime
-  (begin 2000 04 29) (end 2002 6 30)
+  ;; (begin 2000 04 29) (end 2002 6 30)
   (where "fig/${station}-drain-acc.pdf")
   (title "Accumulated drain flow")
   (source (arithmetic (missing "none")
-                      (file "${station}-field-water-daily.dlf")
+                      (file "log/${station}-field-water-daily.dlf")
                       (expr (+ "Soil drain flow" "Surface drain flow"))
                       (accumulate true)
                       (timestep d)
@@ -274,14 +255,14 @@
                   (style 2)
                   (with lines)
                   (title "Obs"))
-          (arithmetic (file "${station}-field-water-daily.dlf")
+          (arithmetic (file "log/${station}-field-water-daily.dlf")
                       (expr (- "Precipitation" "Actual evapotranspiration"))
                       (accumulate true)
                       (timestep d)
                       (style 3)
                       (with lines)
                       (title "Net precip"))
-          (column (file "${station}-field-water-daily.dlf")
+          (column (file "log/${station}-field-water-daily.dlf")
                   (tag "Matrix percolation")
                   (accumulate true)
                   (timestep d)
@@ -291,11 +272,12 @@
 (defgnuplot drainmass-sim plottime
   (device "pdf size 12cm, 4cm")
   (declare chemical String "Name of chemical to plot")
-  (begin 2000 10 1) (end 2002 4 1)
+  ;; (begin 2000 10 1) (end 2002 4 1)
   (where "fig/${station}-${chemical}-weekly.pdf")
   (title "${chemical}")
+  (ymin 0) 
   (source (arithmetic (missing "none")
-                      (file "${station}-field-${chemical}-weekly.dlf")
+                      (file "log/${station}-field-${chemical}-weekly.dlf")
                       (expr (+ "Soil-Drain" "Surface-Drain"))
                       (with lines)
                       (title "Sim"))))
@@ -303,11 +285,12 @@
 (defgnuplot drainmass-acc-sim plottime
   (device "pdf size 12cm, 4cm")
   (declare chemical String "Name of chemical to plot")
-  (begin 2000 10 1) (end 2002 4 1)
+  ;; (begin 2000 10 1) (end 2002 4 1)
   (where "fig/${station}-${chemical}-acc.pdf")
   (title "${chemical}")
+  (ymin 0)
   (source (arithmetic (missing "none")
-                      (file "${station}-field-${chemical}.dlf")
+                      (file "log/${station}-field-${chemical}.dlf")
                       (expr (+ "Soil-Drain" "Surface-Drain"))
                       (with lines)
                       (accumulate true)
@@ -335,6 +318,26 @@
                       (style 2)
                       (title "Obs"))))
 
+(defgnuplot colloids plottime
+  (device "pdf size 12cm, 4cm")
+  (declare chemical String "Name of chemical to plot")
+  (chemical colloid)
+  ;; (begin 2000 10 1) (end 2002 4 1)
+  (where "fig/${station}-${chemical}.pdf")
+  (title "${station} - ${chemical}")
+  (ymin 0)
+  (source (column (missing "none")
+                  (file "log/${station}-soil-${chemical}.dlf")
+                  (tag Drain)
+                  (with points)
+                  (title "Hourly"))
+          (column (missing "none")
+                  (file "log/${station}-soil-${chemical}.dlf")
+                  (tag Drain)
+                  (with lines)
+                  (accumulate true)
+                  (title "Accumulated"))))
+
 (defgnuplot Station multi
   (declare station String "Name of station to plot.")
   (declare area Number [ha] "Area to plot.")
@@ -342,7 +345,7 @@
   (graph weather gw
          (theta (depth "SW025cm"))
          sc-bromide 
-         drain drain-acc 
+         drain drain-acc colloids
          ))
 
 ;; Sites

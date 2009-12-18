@@ -82,7 +82,7 @@ public:
   // Actions.
 public:
   virtual void sow (const Metalib&, const FrameModel& crop, 
-                    double row_width, double row_width, double seed,
+                    double row_width, double row_pos, double seed,
                     const Time&, double dt, Treelog&) = 0;
   virtual void ridge (const FrameSubmodel& ridge) = 0;
   virtual void irrigate_overhead (double flux, double temp, const IM&, 

@@ -2,8 +2,8 @@
 
 ;; Chemistry
 
-(defchemistry Silstrup default
-  (trace Bromide Dimethoate Fenpropimorph Glyphosate Metamitron))
+(defchemistry Silstrup multi
+  (combine colloids Bromide Dimethoate Fenpropimorph Glyphosate Metamitron))
 
 ;; Soil 
 
@@ -39,17 +39,19 @@
   ;;                     (pipe_position -110.0 [cm])))
   ;; 2D
   (Movement Rorrende
-            (Geometry (zplus -2 -10 -25 -31
-                             -50 -100 -113 
-                             -120 -180 -300 -500 [cm])
-                      (xplus 10 25 50 100 200 400 900 [cm])))
+            (Geometry (zplus -2 -5 -10 -20 -25 -31
+                             -35 -39
+                             -50 -75 -100 -113 
+                             -120 -180 -220 -300 -400 -500 [cm])
+                      (xplus 10 25 50 100 150 200 300 400 600 900 [cm])))
   (Groundwater file "dk-silstrup.gwt"
                ;; GWT is measured at top of terrain.
                ;; Offset is calibrated based on drainage measurments.
-               (offset 5 [cm]))
-  (Chemistry multi (combine Silstrup))
+               (offset 20 [cm]))
+  (Chemistry Silstrup)
   (OrganicMatter none)
   (Soil (horizons ( -31.00 Silstrup_Ap)
+                  ( -39.00 "Rorrende Bplow layer")
                   (-113.00 Silstrup_B)
                   (-500.00 Silstrup_C))
         (MaxRootingDepth 40 [cm])))
@@ -185,7 +187,7 @@
 ;; Output
 
 (deflog "Silstrup Content" "VAP Content"
-  (where "Silstrup-content.dlf")
+  (where "log/Silstrup-content.dlf")
   (when daily)
   (entries &old 
            (content (z -3.5 [m])
@@ -222,11 +224,11 @@
 
   (output &old
           ("Field chemical" 
-           (chemical "Metamitron")
-           (where "${station}-field-Metamitron.dlf"))
+           (chemical "Metamitron-base")
+           (where "log/${station}-field-Metamitron.dlf"))
           ("Field chemical"  (when weekly)
-           (chemical "Metamitron")
-           (where "${station}-field-Metamitron-weekly.dlf"))
+           (chemical "Metamitron-base")
+           (where "log/${station}-field-Metamitron-weekly.dlf"))
           ("Silstrup Content")))
 
 ;; Plots
@@ -334,20 +336,24 @@
          "Hydraulic B Silstrup"
          "Hydraulic C Silstrup"
          (horizontal (source &old 
-                             (column (file "${station}-content.dlf")
+                             (column (file "log/${station}-content.dlf")
                                      (tag "Metamitron"))))
          (theta (depth "SW060cm"))
          (theta (depth "SW110cm"))
-         (sil-drainmass (chemical Bromide))
-         (sil-drainmass (chemical Dimethoate))
-         (sil-drainmass (chemical Fenpropimorph))
-         (sil-drainmass (chemical Glyphosate))
-         (sil-drainmass (chemical Metamitron))
-         (sil-drainmass-acc (chemical Bromide))
-         (sil-drainmass-acc (chemical Dimethoate))
-         (sil-drainmass-acc (chemical Fenpropimorph))
-         (sil-drainmass-acc (chemical Glyphosate))
-         (sil-drainmass-acc (chemical Metamitron))
+         ;; Metamitron and Bromide first applied 2000-05-22.
+         (sil-drainmass (begin 2000 05 01) (chemical Metamitron))
+         (sil-drainmass-acc (begin 2000 05 01) (chemical Metamitron))
+         (sil-drainmass (begin 2000 05 01) (chemical Bromide))
+         (sil-drainmass-acc (begin 2000 05 01) (chemical Bromide))
+         ;; Dimethoate first applied 2001-07-16
+         ;; Fenpropimorph first applied 2001-06-21
+         ;; Glyphosate first applied 2001-10-25
+         (sil-drainmass (begin 2001 06 01) (chemical Dimethoate))
+         (sil-drainmass (begin 2001 06 01) (chemical Fenpropimorph))
+         (sil-drainmass (begin 2001 06 01) (chemical Glyphosate))
+         (sil-drainmass-acc (begin 2001 06 01)  (chemical Dimethoate))
+         (sil-drainmass-acc (begin 2001 06 01) (chemical Fenpropimorph))
+         (sil-drainmass-acc (begin 2001 06 01) (chemical Glyphosate))
          ))
 
 ;;; silstrup.dai ends here.

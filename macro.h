@@ -27,6 +27,7 @@
 #include "symbol.h"
 
 #include <vector>
+#include <memory>
 
 class Geometry1D;
 class Soil;

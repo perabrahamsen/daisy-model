@@ -315,6 +315,9 @@ public:
   { return *new FrameBuildable (*this, parent_clone); }
 };
 
+Declare::Builder::~Builder ()
+{ }
+
 symbol 
 Declare::root_name ()
 {

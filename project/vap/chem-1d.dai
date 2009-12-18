@@ -1,0 +1,34 @@
+;; chem-1d.dai -- One domain description of chemicals.
+
+(defchemical "Bromide" common
+  (diffusion_coefficient 2.0e-5 [cm^2/s])
+  (crop_uptake_reflection_factor 1 [])
+  (canopy_dissipation_rate 0 [h^-1])
+  (decompose_rate 0 [h^-1]))
+
+(defchemical Fenpropimorph fungicide
+  (cite "lindhardt2001")
+  (decompose_halftime 67 [d])
+  (adsorption linear (K_OC 3700 [l/kg])))
+
+(defchemical Dimethoate insecticide
+  (cite "lindhardt2001")
+  (decompose_halftime 16 [d])
+  (adsorption linear (K_OC 30 [l/kg])))
+
+(defchemical Glyphosate herbicide
+  (cite "lindhardt2001" ;; decompose_halftime
+        "gjetterman2009"                ;K_clay
+        )
+  (decompose_halftime 16 [d]); lindhardt2001
+  ;; (adsorption linear (K_OC 3400 [l/kg])) ; lindhardt2001
+  ;; Kd = 503 [l/kg], f_clay = 0.12 []; K_clay = 503 / 0.12 = 4192 [l/kg]
+  (adsorption linear (K_clay 4192 [l/kg])) ;gjetterman2009
+  )
+
+(defchemical Metamitron herbicide
+  (cite "lindhardt2001")
+  (decompose_halftime 14 [d])
+  (adsorption linear (K_OC 207 [l/kg])))
+
+;;; end chem-1d.dai

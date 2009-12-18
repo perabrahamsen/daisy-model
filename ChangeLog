@@ -1,3 +1,13 @@
+2009-12-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* macro.h: Include <memory>
+	Reported by Xujun Han.
+
+	* librarian.C, librarian.h (Declare::~Builder): Defined.
+
+	* column.h (sow): Fixed formal parameter name.
+	Reported by Xujun Han.
+
 2009-12-14  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* number_const.C (x): Made it a top level model.

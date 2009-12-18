@@ -7,12 +7,15 @@
 \bibliographystyle{apalike}
 \usepackage{graphicx}
 \usepackage{hyperref}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\rhead{\today}
 
 \begin{document}
 
 \section*{Daisy simulation for Silstrup og Estrup}
 
-\section{Data}
+\section{Data og opsætning}
 
 GEUS leverede et regneark med data anvendt i forbindelse med MACRO
 simuleringerne.  Arket indeholdt oplysninger om jorden, samt udvalgte
@@ -22,7 +25,12 @@ tidsproportionelle målinger af glyphosat og bromid i dræn, samt
 punktmålinger for fenpropimorph, dimethoate samt metamitron i dræn.
 GEUS data er for størstedelens vedkommende tidligere blevet
 præsenteret i \citet{vap2009}, med yderligere information in
-\citet{lindhardt2001}.
+\citet{lindhardt2001}.  De fleste måletal er omformet til
+\texttt{.ddf} format, som er et format Daisy kan forstå, om som
+muliggør at de bliver plottet sammen Daisys dimuleringsresultater (der
+ligger i \texttt{.dlf} format).  De fleste grafer i dette kapitel er
+genereret automatisk af Daisy med hjælp fra \texttt{gnuplot} ud fra
+\texttt{.ddf} og \texttt{.dlf} filer.
 
 DJF leverede klimatal for Silstrup, Tylstrup, samt Askov.  Både time
 og døgnværdier.  Ideen var at Tylstrup data kunne udfylde evt. huller
@@ -37,8 +45,48 @@ globalstråling.  Luftfugtighed (for både time og døgntal) og
 temperatur (for timetal) er målt i 2 meters højde, vindhastigheden i
 10 meters højde.  For de øvrige tal er det ikke opgivet.
 
-Adsorptions- og nedbrydningsegenskaber for pesticider er taget fra
-tabel 6.2 i \citet{lindhardt2001}.  Eksempel:
+Den overordnede opsætning af Daisy for begge oplande kan findes i
+filen \texttt{vap.dai}.
+
+\subsection{Kolloider, bioporer og diskretisering}
+
+Vi har ikke fået nogen data om bioporer eller kolloider for de berørte
+arealer, og har derfor valgt at bruge den opsætning vi har fra
+arbejdet med data fra agrovand projektet.  Disse kan findes i
+opsætningsfilen \texttt{vap-2d.dai}.  I opæstningsfilerne for de
+enkelte vap områder indgår de sammen med diskretiseringen i
+beskrivelsen af den enkelte søjle, for eksempel.
+\begin{verbatim}
+  (Movement Rorrende
+            (Geometry (zplus -2 -10 -25 -31
+                             -50 -100 -113 
+                             -120 -180 -300 -500 [cm])
+                      (xplus 10 25 50 100 200 400 900 [cm])))
+\end{verbatim}
+
+Diskretiseringen er et grid bestemt af vandrette og lodrette
+indelinger.  Parametrene \texttt{zplus} og \texttt{xplus}.  (0,0)
+svarer til jordoverfladen lige over drænet.  I z retningen (lodret)
+skal vi angive intervaller ned til den dybde vi ønsker at regne på.  I
+x retningen (vandret) skal vi angive intervaller indtil midtpunktet
+mellem to dræn.  
+
+Vand, varme og stof vil hver blive beskrevet af en enkelt værdi
+indenfor hver celle (for stof skelnes der dog mellem om det befinder
+sig i det primære eller det sekundære domæne.  Det tertiære domæner
+har sin helt egen diskretisering), derfor er det vigtigt at
+cellestørrelsen er lille omkring de steder hvor der sker meget.  Det
+vil især sig ved overfladen, omkring drænet, samt til dels lige over
+horizontgrænserne.  Dette skal afvægtes mod beregningstid, som stiger
+hutigt med antallet af celler. Der bør altid være inddelinger ved
+horizontgrændserne, således at hver celle holder sig indenfor en
+horizont.
+
+\subsection{Pesticider og kolloidfaciliteret transport}
+
+Sorptions- og nedbrydningsegenskaber for pesticider er primært taget
+fra tabel 6.2 i \citet{lindhardt2001}.  En simpel beskrivelse af dette
+kunne være
 \begin{verbatim}
   (defchemical Metamitron herbicide
     (cite "lindhardt2001")
@@ -51,6 +99,100 @@ sammenfald med observationer.  Annette Rosenbom oplyser at Glyphosat
 bør bruge en Kf (Freundlich --Per) parameter da bindingen er kemisk.
 Carsten Petersen at den i hvert fald ikke bør bruge en ``OC''
 parameter, da den binder til ler.
+
+For kolloidfaciliteret transport er vi nødt til at skelne mellem
+forskellige former pesticidet kan optræde i, opløst, bundet til
+jormatriced, eller bundet til kolloider.  Vi definerer først en fælles
+beskrivelse for alle former, hvor vi placerer pesticidets
+nedbrydningsrate, som vi altså antager er den samme i alle tre former,
+igen på grund af mangel på bedre data.
+\begin{verbatim}
+(defchemical Glyphosate-base herbicide
+  "Base parameterization for all Glyphosate forms."
+  (cite lindhardt2001)
+  (decompose_halftime 16 [d]))
+\end{verbatim}
+Her bruger vi nedbrydningsraten fra \citet{lindhardt2001} for alle
+pesticider.  Hvis man i Daisy log filerne beder om 'Glyphosate-base'
+vil man få oplysninger om stoffet i alle tre former.
+
+Udfra den fælles beskrivelse definerer vi de tre former, først den
+frie form
+\begin{verbatim}
+(defchemical Glyphosate Glyphosate-base
+  "Dissolved glyphosate."
+  (adsorption none))
+\end{verbatim}
+hvor \verb|(adsorption none)| angiver at denne form kan transportes
+frit med jordvandet.  Vi giver denne form det ``rene'' navn
+(Glyphosate) da det er den form som stoffet ankommer i når det
+udsprøjtes på marken.  Dernæst den form der er bundet til jormatricen.
+\begin{verbatim}
+(defchemical Glyphosate-immobile Glyphosate-base
+  "Glyphosate sorbed to immobile soil."
+  (adsorption full))
+\end{verbatim}
+hvor \verb|(adsorption full)| sikrer at stoffet ikke bliver
+transporteret i denne form.  Til sidst angives defineres den
+kolloidbunde form
+\begin{verbatim}
+(defchemical Glyphosate-colloid Glyphosate-base
+  "Glyphosate sorbed to colloids."
+  (adsorption none)
+  ;; Same diffusion coefficient as other colloids.
+  (diffusion_coefficient 4.6e-6 [cm^2/s]))
+\end{verbatim}
+Her angives at denne form transporteres med vandet, men at
+transportegenskaberne er de samme som for kolloider.
+
+Dernæst defineres en $K_d$ ud fra enten $K_{\mbox{oc}}$ eller
+$K_{\mbox{clay}}$.  For glyphosat anvender vi en $K_{\mbox{clay}}$ værdi
+fra \citet{gjettermann2009}, for de øvrige pesticider anvender vi
+$K_{\mbox{oc}}$ fra \citet{lindhardt2001}.
+\begin{verbatim}
+(defnumber K_Glyphosate K_equilibrium
+  "Adsorption for Glyphosate to immobile soil."
+  (cite gjettermann2009)
+  (K_clay 4192 [l/kg]))
+\end{verbatim}
+
+Sorption til jormatrix kan nu angives som
+\begin{verbatim}
+(defreaction Glyphosate-immobile-sorption equilibrium
+  "Sorption equilibrium between dissolved and immobile Glyphosate."
+  (A Glyphosate-immobile)
+  (B Glyphosate)
+  (equilibrium linear (K K_Glyphosate))
+  (k_AB 5.0 [d^-1])                   ;Desorption rate.
+  (k_BA 5.0 [d^-1]))                  ;Sorption rate.
+\end{verbatim}
+Sorptions- og desorptionsraterne er hverken baseret på eksperimenter
+eller liutteraturstudier, men valgt for at se en effekt.
+
+Sorption til kollider er tilsvarende:
+\begin{verbatim}
+(defreaction Glyphosate-colloid-sorption equilibrium
+  "Sorption equilibrium between dissolved and colloid-bound Glyphosate."
+  (colloid colloid)
+  (primary true)
+  (secondary true)
+  (surface true)
+  (A Glyphosate-colloid)
+  (B Glyphosate)
+  (k_AB 5.0 [d^-1])                   ;Desorption rate.
+  (k_BA 5.0 [d^-1])                   ;Sorption rate.
+  (equilibrium linear (K (K_Glyphosate (soil_enrichment_factor 100000 [])))))
+\end{verbatim}
+Vi angive her navnet på det kolloid som vores opløste glyphosat skal
+søge ligevægt med (\texttt{colloid}), samt at ligevægten skal ske i
+hele jordmatricen, samt på jordoverfladen (\texttt{primary},
+\texttt{secondary} og \texttt{surface}) Til ligevægten tilfører vi
+\verb|soil_enrichment_factor|, som indikerer at glyphosat her vil
+100000 gange hellere sætte sig på et kolloid, end på jordmatricen.
+Igen en parameter der udelukkende er valgt for at se effekten.
+
+Beskrivelsen af kolloider og pesticider kan findes i filen
+\texttt{colloid-bound.dai}.
 
 \subsection{Forvaltning}
 
@@ -65,7 +207,7 @@ Daisy uden organisk stof, som angives således:
   (Chemistry multi (combine Silstrup))
   (OrganicMatter none)
 \end{verbatim}
-Parameteren \texttt{combine}i \texttt{Chemistry} skulle have
+Parameteren \texttt{combine} i \texttt{Chemistry} skulle have
 inkluderet \texttt{N} hvis Daisy skulle holde regnskab med NO$_3^-$ og
 NH$_4^+$ i jorden.  \verb|(OrganicMatter none)| betyder at Daisy ikke
 vil holde rede på det organiske stof i jorden, tilført organisk stof i
@@ -127,7 +269,8 @@ Eksempel:
 \section{Silstrup}
 
 En oversigt over Silstrup forsøgsområde kan ses på figur~15, side 30 i
-\citet{vap2009}.
+\citet{vap2009}.  Daisy opsætning for Silstrup kan findes i
+filen \texttt{silstrup.dai}.
 
 \subsection{Vejr}
 
@@ -308,7 +451,7 @@ Vi regner denne (offset) parameter for at være den primære
 kalibreringsparameter for at få mængde og periode for dræn til at
 passe med målingerne.  I Daisy ser det sådan ud:
 \begin{verbatim}
-    (Groundwater file "dk-silstrup.gwt" (offset 5 [cm]))
+    (Groundwater file "dk-silstrup.gwt" (offset 20 [cm]))
 \end{verbatim}
 Simuleret og observeret (uden offset) grundvandstand kan ses på
 figur~\ref{fig:silstrup-gw}.
@@ -382,6 +525,16 @@ mellemrum.  I Daisy 1D kan det angives som:
 \begin{verbatim}
   (Tertiary pipes (L 18 [m]) (pipe_position -110.0 [cm])))
 \end{verbatim}
+I Daisy 2D skal man også specificere en position på x aksen.  Vi
+modellerer almindeligvis området dækkende fra drænet (venstre side, x
+= 0 cm) til midt imellem to dræn (højre side, x = 9 m).  Den numeriske
+celle der indeholder drænpunktet vil udgøre drænet i modellen.  For at
+undgå at drænpunktet falder på kanten af en cell, vælger vi x = 1 cm i
+stedet for 0 cm.
+\begin{verbatim}
+  (drain (-110 [cm] 1 [cm]))
+\end{verbatim}
+
 Drænafstrømning er vist i figur~\ref{fig:silstrup-drain}.
 \begin{figure}[htbp]
   \begin{center}
@@ -445,7 +598,8 @@ figur~\ref{fig:silstrup-acc}.
 \section{Estrup}
 
 En oversigt over Estrup forsøgsområde kan ses på figur~21, side 42 i
-\citet{vap2009}.
+\citet{vap2009}.  Daisy opsætning for Estrup kan findes i filen
+\texttt{estrup.dai}.
 
 \subsection{Vejr}
 
@@ -590,7 +744,7 @@ oplyst er variabel, ned til 200 cm.  Vi har valgt 150 cm.
 
 Grundvandsstand taget fra P1 i filter 4.5 til 5 meters dybde.
 Simuleret og observeret (uden offset) grundvandstand kan ses på
-figur~\ref{fig:estrup-gw}.
+figur~\ref{fig:estrup-gw}.  The early measurements are manual and from 
 \begin{figure}[htbp]
   \begin{center}
     \includegraphics[width=\columnwidth]{fig/estrup-gw}
@@ -686,6 +840,43 @@ figur~\ref{fig:estrup-acc}.
   \caption{Accumulated drain flow of Bromide and selected pesticides.}
   \label{fig:estrup-acc}
 \end{figure}
+
+\section{Kalibrering}
+
+\subsection{Vand og bromid}
+
+Vand og bromid kan med fordel kalibreres på plads med 1D simuleringer,
+da 1D modellen (der bygger på \citet{hooghoudt}, med drænkorrektion
+fra \citet{molenwesseling}) giver et godt match med den fulde 2D
+\citep{mollerup2010}.
+
+Den primære kalibreringsparameter for vand er \texttt{offset}, det der
+lægges til grundvandsmålingerne.  Denne parameter kan bruges til at få
+enten drænperiode eller drænmængde på plads.  Ofte kan man ikke få
+begge ting på plads samtidig, da drænperioden kan forlænges af
+heterogenitet, hvor kun dele af drænarealet bidrager.
+
+Efter kalibrering af vand fik vi for meget bromid (ca. det dobbelte af
+målingerne), hvilket er overraskende da vi normalt undervurderer
+stoftransporten.  Jeg har ingen god forklaring på dette.
+
+\subsection{Kolloider}
+
+Der kom praktisk taget ingen pesticider i drænsimuleringerne med en 1D
+opsætning uden bioporer, hvilket er forventeligt.  Desværre gav en 2D
+opsætning med bioporer og kolloidfacilteret transport samme resultat.
+
+Måske kan forklaringen ses i kolloidudvaskningen, figur~\ref{fig:colloids}?
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=\columnwidth]{fig/silstrup-colloid}\\
+    \includegraphics[width=\columnwidth]{fig/estrup-colloid}
+  \end{center}
+  \caption{Kolloider.}
+  \label{fig:colloids}
+\end{figure}
+
+Pløjesål
 
 \addcontentsline{toc}{section}{\numberline{}References}
 \bibliography{../../txt/daisy}
