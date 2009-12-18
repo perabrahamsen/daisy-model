@@ -81,15 +81,17 @@ struct BooleanNumbers : public Boolean
               || new_dim == Attribute::Fraction ())
             new_dim = blank;
           if (new_dim != dim)
-            if (dim == Attribute::Unknown ())
-              dim = new_dim;
-            else if (new_dim != Attribute::Unknown ())
-              {
-                msg.error ("I don't know how to compare [" + dim + "] with ["
-                           + new_dim + "]");
+            {
+              if (dim == Attribute::Unknown ())
                 dim = new_dim;
-                ok = false;
-              }
+              else if (new_dim != Attribute::Unknown ())
+                {
+                  msg.error ("I don't know how to compare [" + dim + "] with ["
+                             + new_dim + "]");
+                  dim = new_dim;
+                  ok = false;
+                }
+            }
         }
     return ok;
   }

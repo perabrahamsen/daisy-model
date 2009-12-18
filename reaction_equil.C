@@ -115,16 +115,18 @@ struct ReactionEquilibrium : public Reaction
       { 
         scope.set_cell (c);
         if (colloid)
-          if (domain == ScopeSoil::primary)
-            scope.set_dry_bulk_density (colloid->M_primary (c));
-          else
-            {
-              daisy_assert (domain == ScopeSoil::secondary);
-              const double M_total = colloid->M_total (c);
-              const double M_primary = colloid->M_primary (c);
-              const double M_secondary = M_total - M_primary;
-              scope.set_dry_bulk_density (M_secondary);
-            }
+          {
+            if (domain == ScopeSoil::primary)
+              scope.set_dry_bulk_density (colloid->M_primary (c));
+            else
+              {
+                daisy_assert (domain == ScopeSoil::secondary);
+                const double M_total = colloid->M_total (c);
+                const double M_primary = colloid->M_primary (c);
+                const double M_secondary = M_total - M_primary;
+                scope.set_dry_bulk_density (M_secondary);
+              }
+          }
                                       
         // What we have.
         const double has_A = A.M_primary (c);

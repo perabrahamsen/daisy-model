@@ -1,6 +1,36 @@
+2009-12-18  Per Abrahamsen  <per.abrahamsen@gmail.com>
+
+	* organic_std.C (partition): 
+
+	* boolean_number.C (struct BooleanNumbers): 
+
+	* select.C (initialize): Added explicit braces for gcc 4.3 warning.
+	* fetch.C (initialize): Ditto.
+	* root_system.C (water_uptake): Ditto.
+	* log_all.C (insert_active, open_derived_type, open): Ditto.
+	* om.C (get_initial_C_per_N): Ditto.
+	* parser_file.C (convert): Ditto.
+	* units.C (can_convert, can_convert): Ditto.
+	* reaction_equil.C (tick_domain): Ditto.
+	* cdaisy.C (daisy_scope_number_name): Ditto.
+	* scope_soil.C (number): Ditto.
+
+	* lexer_table.C: (get_entry): Qualify 'strchr'.
+
+	* printer_file.C (print_entry): Explicit parentheses.
+
+	* gnuplot_base.C (interactive): Device should not be a string
+	literal.
+
+	* surface.h: Include <memory>.
+ 
+
 2009-12-18  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* path.C, lexer_data.C: Include <cstdlib>
+	* lexer_table.C: Include <ctring>
 	* macro.h: Include <memory>
+	* chemical_std.C (update_C): Fix duplicate name.
 	Reported by Xujun Han.
 
 	* librarian.C, librarian.h (Declare::~Builder): Defined.

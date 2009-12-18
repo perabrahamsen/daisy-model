@@ -319,13 +319,15 @@ struct NumberOperands : public Number
     symbol found = unspecified;
     for (size_t i = 0; i < operands.size (); i++)
       if (known (operands[i]->dimension (scope)))
-        if (found == unspecified)
-          found = operands[i]->dimension (scope);
-        else
-          {
-            if (operands[i]->dimension (scope) != found)
-              return Attribute::Unknown ();
-          }
+        {
+          if (found == unspecified)
+            found = operands[i]->dimension (scope);
+          else
+            {
+              if (operands[i]->dimension (scope) != found)
+                return Attribute::Unknown ();
+            }
+        }
     
     return found != unspecified ? found : Attribute::Unknown ();
   }

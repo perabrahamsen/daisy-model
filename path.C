@@ -38,6 +38,7 @@ extern "C" int mkdir(const char *pathname, int mode);
 
 #include <fstream>
 #include <sstream>
+#include <cstdlib>
 
 #if defined (__unix) 
 #define DIRECTORY_SEPARATOR "/"

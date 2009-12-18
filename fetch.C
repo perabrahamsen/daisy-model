@@ -143,18 +143,20 @@ Fetch::initialize (std::vector<Select*>& select, Treelog& msg)
       Treelog::Open nest (msg, select[j]->tag ());
 
       if (this->tag == select[j]->tag ())
-        if (found)
-          msg.warning ("Duplicate tag ignored");
-        else
-          {	
-            select[j]->add_dest (this);
-            this->select_dimension = select[j]->dimension ();
-            this->type = ((select[j]->handle != Handle::current)
-                              && !select[j]->accumulate)
-              ? Fetch::Flux 
-              : Fetch::NewContent;
-            found = true;
-          }
+        {
+          if (found)
+            msg.warning ("Duplicate tag ignored");
+          else
+            {	
+              select[j]->add_dest (this);
+              this->select_dimension = select[j]->dimension ();
+              this->type = ((select[j]->handle != Handle::current)
+                                && !select[j]->accumulate)
+                ? Fetch::Flux 
+                : Fetch::NewContent;
+              found = true;
+            }
+        }
     }
   if (!found)
     msg.warning ("No tag found");

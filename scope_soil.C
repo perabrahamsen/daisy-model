@@ -159,21 +159,25 @@ ScopeSoil::number (const symbol tag) const
   daisy_assert (cell >= 0);
 
   if (tag == rho_b)
-    if (dry_bulk_density > 0.0)
-      return dry_bulk_density;
-    else if (domain == secondary)
-      return 0.0;             // No soil in secondary domain.
-    else
-      return geo.content_cell_or_hood (soil, &Soil::dry_bulk_density, cell);
+    {
+      if (dry_bulk_density > 0.0)
+        return dry_bulk_density;
+      else if (domain == secondary)
+        return 0.0;             // No soil in secondary domain.
+      else
+        return geo.content_cell_or_hood (soil, &Soil::dry_bulk_density, cell);
+    }
   if (tag == clay)
     return geo.content_cell_or_hood (soil, &Soil::clay, cell);
   if (tag == humus)
     return geo.content_cell_or_hood (soil, &Soil::humus, cell);
   if (tag == h)
-    if (old_water)
-      return geo.content_cell_or_hood (soil_water, &SoilWater::h_old, cell);
-    else 
-      return geo.content_cell_or_hood (soil_water, &SoilWater::h, cell);
+    {
+      if (old_water)
+        return geo.content_cell_or_hood (soil_water, &SoilWater::h_old, cell);
+      else 
+        return geo.content_cell_or_hood (soil_water, &SoilWater::h, cell);
+    }
   if (tag == Theta)
     {
       double water;

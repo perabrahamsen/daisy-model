@@ -2080,10 +2080,12 @@ Setting additional pool to zero");
 	msg.debug (table_string.str ());
     }
   if (print_equations)
-    if (debug_to_screen)
-      msg.message (equation_string.str ());
-    else
-      msg.debug (equation_string.str ());
+    {
+      if (debug_to_screen)
+        msg.message (equation_string.str ());
+      else
+        msg.debug (equation_string.str ());
+    }
   if (error_found)
     {
       if (!print_equations)

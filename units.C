@@ -306,10 +306,12 @@ Units::can_convert (const symbol from, const symbol to) const
 
   // Defined?
   if (!has_unit(from) || !has_unit (to))
-    if (!allow_old ())
-      return false;
-    else
-      return Oldunits::can_convert (from, to);
+    {
+      if (!allow_old ())
+        return false;
+      else
+        return Oldunits::can_convert (from, to);
+    }
   
   const Unit& from_unit = get_unit (from);
   const Unit& to_unit = get_unit (to);
@@ -332,10 +334,12 @@ Units::can_convert (const symbol from, const symbol to,
 
   // Defined?
   if (!has_unit(from) || !has_unit (to))
-    if (!allow_old ())
-      return false;
-    else
-      return Oldunits::can_convert (from, to, value);
+    {
+      if (!allow_old ())
+        return false;
+      else
+        return Oldunits::can_convert (from, to, value);
+    }
   
   const Unit& from_unit = get_unit (from);
   const Unit& to_unit = get_unit (to);

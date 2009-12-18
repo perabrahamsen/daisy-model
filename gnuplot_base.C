@@ -77,7 +77,7 @@ GnuplotBase::plot_header (std::ostream& out) const
 
 bool 
 GnuplotBase::interactive () const
-{ return device == "screen" || device == "windows" || "device" == "x11"; }
+{ return device == "screen" || device == "windows" || device == "x11"; }
 
 symbol
 GnuplotBase::file2device (const symbol file_s)

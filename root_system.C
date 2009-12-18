@@ -123,20 +123,22 @@ RootSystem::water_uptake (const Units& units, double Ept_,
                                                   soil, soil_water, dt);
 
       if (next < total)
-        // We are past the top of the curve.
-        if (step <= min_step)
-          // We cannot go any closer to the top, skip it.
-          {
-            h_x = h_wp;
-            total = potential_water_uptake (h_x, geo, soil, soil_water, dt);
-            break;
-          }
-        else
-          // Try again a little close.
-          {
-            step /= 2;
-            continue;
-          }
+        {
+          // We are past the top of the curve.
+          if (step <= min_step)
+            // We cannot go any closer to the top, skip it.
+            {
+              h_x = h_wp;
+              total = potential_water_uptake (h_x, geo, soil, soil_water, dt);
+              break;
+            }
+          else
+            // Try again a little close.
+            {
+              step /= 2;
+              continue;
+            }
+        }
       total = next;
       h_x = h_next;
       step *= 2;
@@ -154,27 +156,28 @@ RootSystem::water_uptake (const Units& units, double Ept_,
                                                   soil, soil_water, dt);
 
       if (next < Ept)
-        // We went too far.
-        if (step <= min_step)
-          {
-            // We can't get any closer.
-            daisy_assert (next <= total);
-            if (next >= Ept)
-              {
-                // total = next;
-                h_x = h_next;
-              }
-            else
+        {
+          // We went too far.
+          if (step <= min_step)
+            {
+              // We can't get any closer.
+              daisy_assert (next <= total);
+              if (next >= Ept)
+                {
+                  // total = next;
+                  h_x = h_next;
+                }
+              else
 
-              break;
-          }
-        else
-          // Try again a little closer.
-          {
-            step /= 2;
-            continue;
-          }
-
+                break;
+            }
+          else
+            // Try again a little closer.
+            {
+              step /= 2;
+              continue;
+            }
+        }
       total = next;
       h_x = h_next;
       step *= 2;

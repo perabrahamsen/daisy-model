@@ -31,6 +31,7 @@
 #include "vcheck.h"
 #include "path.h"
 #include <sstream>
+#include <cstring>
 
 class LexerTable::Filter
 {
@@ -252,7 +253,7 @@ LexerTable::get_entry () const
   while (lex->good ())
     {
       int c = lex->peek ();
-      if (strchr (field_term, c))
+      if (std::strchr (field_term, c))
 	break;
       entry += int2char (lex->get ());
     }

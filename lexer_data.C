@@ -25,6 +25,7 @@
 #include "time.h"
 #include "mathlib.h"
 #include <ctype.h>
+#include <cstdlib>
 
 std::string
 LexerData::get_word ()
@@ -83,7 +84,7 @@ LexerData::get_cardinal ()
       error ("Integer expected");
       return -42;
     }
-  return atoi (str.c_str ());
+  return std::atoi (str.c_str ());
 }
 
 void 

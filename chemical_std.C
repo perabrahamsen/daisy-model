@@ -183,7 +183,7 @@ struct ChemicalStandard : public Chemical
   void release_surface_colloids (double surface_release);
 
   // Management.
-  void update_C (const Soil& soil, const SoilWater& soil);
+  void update_C (const Soil&, const SoilWater&);
   void deposit (const double amount, const double dt); // [g/m^2]
   void spray (const double amount, const double dt); // [g/m^2]
   void dissipate (const double amount, const double dt); // [g/m^2]

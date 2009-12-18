@@ -81,10 +81,12 @@ LogAll::insert_active ()
        i++)
     {
       if ((*i)->is_active)
-	if (depth == (*i)->last_index)
-	  leafs.push_back (*i);
-	else
-	  interiors.push_back (*i);
+        {
+          if (depth == (*i)->last_index)
+            leafs.push_back (*i);
+          else
+            interiors.push_back (*i);
+        }
     }
 }
 
@@ -175,10 +177,12 @@ LogAll::open_derived_type (const symbol key, const char *const component)
        i != old.end (); 
        i++)
     if ((*i)->open (ancestors, depth))
-      if ((*i)->last_index == depth)
-	leafs.push_back (*i);
-      else
-	interiors.push_back (*i);
+      {
+        if ((*i)->last_index == depth)
+          leafs.push_back (*i);
+        else
+          interiors.push_back (*i);
+      }
 }
 
 void 
@@ -200,10 +204,12 @@ LogAll::open (const symbol name)
        i != old.end (); 
        i++)
     if ((*i)->open (name, depth))
-      if ((*i)->last_index == depth)
-	leafs.push_back (*i);
-      else
-	interiors.push_back (*i);
+      {
+        if ((*i)->last_index == depth)
+          leafs.push_back (*i);
+        else
+          interiors.push_back (*i);
+      }
 }
 
 void 

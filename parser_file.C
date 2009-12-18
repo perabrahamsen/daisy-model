@@ -422,10 +422,12 @@ ParserFile::Implementation::convert (double value,
   try
     {
       if (syntax == Attribute::None () || syntax == Attribute::Fraction ())
-	if (read == "")
-	  return value;
-	else
-	  return metalib ().units ().convert (symbol (read), symbol (""), value);
+        {
+          if (read == "")
+            return value;
+          else
+            return metalib ().units ().convert (symbol (read), symbol (""), value);
+        }
       return metalib ().units ().convert (symbol (read), symbol (syntax), value);
     }
   catch (const std::string& message)

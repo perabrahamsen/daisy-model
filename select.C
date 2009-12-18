@@ -627,10 +627,12 @@ Select::initialize (const Units& units, const Volume&,
 
   // Attempt to find convertion with original dimension.
   if (impl->spec.get ())
-    if (units.can_convert (spec_dim, impl->dimension))
-      impl->spec_conv = &units.get_convertion (spec_dim, impl->dimension);
-    else
-      impl->spec_conv = special_convert (units, spec_dim, impl->dimension);
+    {
+      if (units.can_convert (spec_dim, impl->dimension))
+        impl->spec_conv = &units.get_convertion (spec_dim, impl->dimension);
+      else
+        impl->spec_conv = special_convert (units, spec_dim, impl->dimension);
+    }
 
   // Replace '&' with timestep.
   std::string new_dim;

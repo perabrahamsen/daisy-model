@@ -370,7 +370,7 @@ PrinterFile::Implementation::print_entry (const Frame& frame,
                   : NULL;
 		if (i > 0)
 		  out << "\n" << std::string (indent, ' ');
-                if (other && me.subset (metalib, *other)
+                if ((other && me.subset (metalib, *other))
                     || !is_complex_object (me, library))
 		  print_object (me, library, other, indent);
 		else 

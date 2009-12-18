@@ -21,6 +21,7 @@
 
 
 #include "uzmodel.h"
+#include <memory>
 
 class Frame;
 class FrameSubmodel;

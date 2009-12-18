@@ -687,10 +687,12 @@ daisy_scope_number_name (const Scope *const scope, const unsigned int index)
     {
       const symbol name = *i;
       if (scope->lookup (name) == Attribute::Number)
-        if (count == index)
-          return name.name ().c_str ();
-        else
-          count++;
+        {
+          if (count == index)
+            return name.name ().c_str ();
+          else
+            count++;
+        }
     }
   daisy_notreached ();
 }

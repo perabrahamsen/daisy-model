@@ -418,10 +418,12 @@ double
 OM::get_initial_C_per_N (const Frame& al)
 {
   if (al.check ("initial_C_per_N"))
-    if (al.number ("initial_C_per_N") < 0.0)
-      return OM::Unspecified;
-    else
-      return al.number ("initial_C_per_N");
+    {
+      if (al.number ("initial_C_per_N") < 0.0)
+        return OM::Unspecified;
+      else
+        return al.number ("initial_C_per_N");
+    }
   if (al.check ("C_per_N"))
     {
       const std::vector<double>& C_per_N = al.number_sequence ("C_per_N");
