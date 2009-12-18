@@ -1079,7 +1079,7 @@ double RTSAFE_DT(void (*funcd)(double tsurf,double tair,double e_pa,double srad,
   (*funcd)(x2,tair,e_pa,srad,relsun,kh,r_aa,r_ac,temp_0,z_sz,LAI,rrsc_pm,
            &fh,&df);
   if((fl>0.0 && fh>0.0)||(fl<0.0 && fh<0.0))
-    perror("root must be bracketed in rtsafe");
+    daisy_warning("root must be bracketed in rtsafe");
 
   if (fl==0.0) return x1;
   if (fh==0.0) return x2;
@@ -1123,7 +1123,7 @@ double RTSAFE_DT(void (*funcd)(double tsurf,double tair,double e_pa,double srad,
       else
         xh=rts;
     } // end for
-  perror("maximum number of iterations exceeded in rtsafe");
+  daisy_warning("maximum number of iterations exceeded in rtsafe");
 
   return 0.0;
 

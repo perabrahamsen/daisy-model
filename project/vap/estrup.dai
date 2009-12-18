@@ -55,7 +55,7 @@
   (Groundwater file "dk-estrup.gwt"
                ;; GWT is measured at top of terrain.
                ;; Offset is calibrated based on drainage measurments.
-               (offset 20 [cm]))
+               (offset 22 [cm]))
   (Chemistry Estrup)
   (OrganicMatter none)
   (Soil (horizons ( -27.00 Estrup_Ap)
@@ -371,16 +371,20 @@
          "Hydraulic C1 Estrup"
          "Hydraulic C2 Estrup"
          horizontal
+         ;; First measurement 2000-05-26.
+         (drain (begin 2000 05 26))
+         (drain-acc (begin 2000 05 26))
+         (colloids (begin 2000 05 26))
          ;; First application: Bromide 2000-05-22
          ;; Last application: Glyphosate 2000-10-13
-         (est-drainmass (begin 2000 05 01) (chemical Bromide))
-         (drainmass-sim (begin 2000 05 01)(chemical Dimethoate))
-         (drainmass-sim (begin 2000 05 01)(chemical Fenpropimorph))
-         (est-drainmass (begin 2000 05 01) (chemical Glyphosate))
-         (est-drainmass-acc (begin 2000 05 01) (chemical Bromide))
-         (drainmass-acc-sim (begin 2000 05 01) (chemical Dimethoate))
-         (drainmass-acc-sim (begin 2000 05 01) (chemical Fenpropimorph))
-         (est-drainmass-acc (begin 2000 05 01) (chemical Glyphosate))
+         (est-drainmass (begin 2000 05 26) (chemical Bromide))
+         (drainmass-sim (begin 2000 05 26)(chemical Dimethoate))
+         (drainmass-sim (begin 2000 05 26)(chemical Fenpropimorph))
+         (est-drainmass (begin 2000 05 26) (chemical Glyphosate))
+         (est-drainmass-acc (begin 2000 05 26) (chemical Bromide))
+         (drainmass-acc-sim (begin 2000 05 26) (chemical Dimethoate))
+         (drainmass-acc-sim (begin 2000 05 26) (chemical Fenpropimorph))
+         (est-drainmass-acc (begin 2000 05 26) (chemical Glyphosate))
          ))
 
 ;;; estrup.dai ends here.

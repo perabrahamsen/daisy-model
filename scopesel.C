@@ -60,13 +60,15 @@ public:
         const Scope& scope = output.scope (i);
 
         if (scope.title () == name)
-          if (found < 0)
-            found = i;
-          else
-            {
-              msg.error ("Duplicate scope: '" + name.name () + "'");
-              return NULL;
-            }
+          {
+            if (found < 0)
+              found = i;
+            else
+              {
+                msg.error ("Duplicate scope: '" + name.name () + "'");
+                return NULL;
+              }
+          }
       }
     if (found < 0)
       return NULL;

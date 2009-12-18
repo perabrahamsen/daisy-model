@@ -73,8 +73,8 @@ bisection (double min_x, double max_x, T& f, std::ostream *const dbg = NULL)
 }
 
 template<class F, class D>
-double
-Newton (double guess, F& f, D& d, std::ostream *const dbg = NULL)
+double // GCC 4.4 don't like D being a reference when called with a function.
+Newton (double guess, F& f, D d, std::ostream *const dbg = NULL)
 {
   // Value for initial guess.
   double value = f (guess);

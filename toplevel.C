@@ -39,6 +39,7 @@
 
 #include <sstream>
 #include <ctime>
+#include <cstring>
 
 #include <boost/noncopyable.hpp>
 
@@ -503,7 +504,7 @@ Toplevel::command_line (int& argc, char**& argv)
       const std::string arg = argv[1];
       int last = arg.rfind ("\\");
       if (last == std::string::npos)
-        last == arg.find (":");
+        last = arg.find (":");
       daisy_assert (last != std::string::npos);
       const std::string dir = arg.substr (0, last);
       impl->metalib.path ().set_directory (dir);

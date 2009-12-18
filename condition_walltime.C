@@ -25,6 +25,7 @@
 #include "block_model.h"
 #include "librarian.h"
 #include "frame.h"
+#include <ctime>
 
 struct ConditionPeriodic : public Condition
 {

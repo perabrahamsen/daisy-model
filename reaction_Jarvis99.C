@@ -202,6 +202,9 @@ ReactionJarvis99::initialize (const Units&, const Geometry& geo,
 
       // Brubaker et at, 1992
       Mmax = 0.362 * clay - 0.00518;
+      std::ostringstream tmp;
+      tmp << "Mmax = " << Mmax;
+      msg.debug (tmp.str ());
       if (Mmax <= 0.0)
         { 
           msg.warning ("Too little clay to initialize Mmax, using 0.01");

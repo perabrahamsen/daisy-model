@@ -1,8 +1,6 @@
-2009-12-18  Per Abrahamsen  <per.abrahamsen@gmail.com>
+2009-12-18  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* organic_std.C (partition): 
-
-	* boolean_number.C (struct BooleanNumbers): 
+	* toplevel.C (command_line): Bug fix.
 
 	* select.C (initialize): Added explicit braces for gcc 4.3 warning.
 	* fetch.C (initialize): Ditto.
@@ -14,6 +12,8 @@
 	* reaction_equil.C (tick_domain): Ditto.
 	* cdaisy.C (daisy_scope_number_name): Ditto.
 	* scope_soil.C (number): Ditto.
+	* organic_std.C (partition): Ditto.
+	* boolean_number.C: Ditto.
 
 	* lexer_table.C: (get_entry): Qualify 'strchr'.
 
@@ -22,13 +22,13 @@
 	* gnuplot_base.C (interactive): Device should not be a string
 	literal.
 
-	* surface.h: Include <memory>.
- 
-
 2009-12-18  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* svat_pmsw.C (RTSAFE_DT): Avoid calling perror.
+	* surface.h: Include <memory>.
+	* iterative.h (Newton): Avoid having D as a reference.
 	* path.C, lexer_data.C: Include <cstdlib>
-	* lexer_table.C: Include <ctring>
+	* lexer_table.C, toplevel.C: Include <cstring>
 	* macro.h: Include <memory>
 	* chemical_std.C (update_C): Fix duplicate name.
 	Reported by Xujun Han.
