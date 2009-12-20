@@ -58,7 +58,7 @@ main (int argc, char* argv[])
   toplevel = daisy_daisy_create ();
   assert (toplevel);
 
-  /* Parse thecommand line. */
+  /* Parse the command line. */
   daisy_daisy_parse_command_line (toplevel, argc, argv);
   if (daisy_daisy_done (toplevel))
     {                           /* We might be done now. */
