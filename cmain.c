@@ -41,11 +41,11 @@ static const int one_column_a_time = 0;
 int 
 main (int argc, char* argv[])
 {
-  printf ("Daisy version %s\n", daisy_version ());
-
   /* Declarations. */
   daisy_daisy* toplevel;
   const daisy_scope* scope = NULL;
+
+  printf ("Daisy version %s\n", daisy_version ());
 
   /* We need exactly one argument. */
   if (argc != 2)
@@ -87,7 +87,7 @@ main (int argc, char* argv[])
     daisy_daisy_start (toplevel);
     exit_on_failure (toplevel);
 
-    // Find a scope named 'check'.
+    /* Find a scope named 'check'. */
     
     if (daisy_daisy_scope_extern_size (toplevel) < 1)
       printf ("No scope found\n");
@@ -115,7 +115,7 @@ main (int argc, char* argv[])
             daisy_daisy_tick_after (toplevel);
           }
 	else
-          // Just do all everything at once.
+          /* Just do all everything at once. */
           daisy_daisy_tick (toplevel);
 
         exit_on_failure (toplevel);

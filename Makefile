@@ -228,7 +228,7 @@ ifeq ($(COMPILER),gcc)
 #  -Wunreachable-code: triggered by header files
 #  -Wextra: Triggers dllexport/inline: -Wno-attributes is not in GCC 3
 	COMPILE = $(GCC) -ansi -pedantic $(WARNING) $(DEBUG) $(OSFLAGS) $(BOOSTINC) $(GTESTINC) $(GUIINCLUDE) 
-	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
+	CCOMPILE = $(COMPILE)
 	CPPLIB = -lstdc++
 endif
 ifeq ($(COMPILER),sun)
@@ -674,10 +674,10 @@ qdaisy${EXE}:	$(QTOBJECTS) daisy.so
 
 # Create the C main executable.
 #
-cdaisy${EXE}:  cmain${OBJ} $(DAISYDYN)
-	gcc -o $@ $^ 
+cdaisy${EXE}:  cmain${OBJ} daisy.dll
+	$(LINK)$@ $^ $(CPPLIB) $(MATHLIB)
 
-ddaisy${EXE}:  main${OBJ} $(DAISYDYN) $(GUIOBJECTS) 
+ddaisy${EXE}:  main${OBJ} daisy.dll $(GUIOBJECTS) 
 	$(LINK)$@ $^ $(GUILIB) $(CPPLIB) $(MATHLIB)
 
 cdaisy-mshe${EXE}:  cmain-mshe${OBJ} daisy.so
