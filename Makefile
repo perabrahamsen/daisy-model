@@ -1603,6 +1603,10 @@ cdaisy${OBJ}: cdaisy.C scope.h attribute.h symbol.h block_model.h \
   version.h chemical.h assertion.h frame_submodel.h filepos.h
 nrutil${OBJ}: nrutil.C
 version${OBJ}: version.C
+hydraulic_MACRO${OBJ}: hydraulic_MACRO.C hydraulic.h model_derived.h \
+  model_logable.h model.h symbol.h block_model.h block_nested.h block.h \
+  scope.h attribute.h treelog.h frame_model.h frame.h plf.h mathlib.h \
+  assertion.h check.h librarian.h
 program_cpedata${OBJ}: program_cpedata.C program.h model.h symbol.h run.h \
   lexer_table.h block_model.h block_nested.h block.h scope.h attribute.h \
   treelog.h frame_model.h frame.h librarian.h assertion.h time.h \
