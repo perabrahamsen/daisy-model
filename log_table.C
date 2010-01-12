@@ -180,6 +180,10 @@ LogTable::summarize (Treelog& msg)
       tmp << "LOGFILE: " << file  << "\n";
       tmp << "VOLUME: " << volume->one_line_description () << "\n";
       tmp << "TIME: " << begin.print () << " to " << end.print ();
+      for (size_t i = 0; i < parameters.size (); i++)
+        if (parameters[i].first != "*")
+          tmp << "\n" << parameters[i].first << ": " << parameters[i].second;
+
       msg.message (tmp.str ());
       const Timestep step = end - begin;
       for (size_t i = 0; i < summary.size (); i++)

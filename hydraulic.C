@@ -303,4 +303,8 @@ static struct HydraulicInit : public DeclareComponent
 This component is responsible for specifying the soils hydraulic\n\
 properties.")
   { }
+  void load_frame (Frame& frame) const
+  { Model::load_model (frame); }
 } Hydraulic_init;
+
+// hydraulic.C ends here.

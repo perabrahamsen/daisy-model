@@ -156,7 +156,7 @@ ScopeSoil::check (const symbol tag) const
 double
 ScopeSoil::number (const symbol tag) const
 {
-  daisy_assert (cell >= 0);
+  daisy_assert (geo.cell_is_valid (cell));
 
   if (tag == rho_b)
     {

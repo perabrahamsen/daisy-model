@@ -21,7 +21,7 @@ MAKEFLAGS =
 
 # HOSTTYPE is not defined in the native win32 Emacs.
 #
- ifeq ($(OS),Windows_NT)
+ifeq ($(OS),Windows_NT)
 #	HOSTTYPE = cygwin
 	HOSTTYPE = mingw
 #	HOSTTYPE = win32
@@ -29,7 +29,7 @@ endif
 
 # HOSTTYPE .
 #
- ifeq ($(HOSTTYPE),i486-linux)
+ifeq ($(HOSTTYPE),i486-linux)
 	HOSTTYPE = i386-linux
 endif
 
@@ -378,7 +378,7 @@ NOLINK = -c
 # 
 
 LATER = tertiary_instant.C 
-MODELS = program_cpedata.C tertiary_pipes.C \
+MODELS = hydraulic_MACRO.C program_cpedata.C tertiary_pipes.C \
 	reaction_boundrel.C log_regress.C reaction_Morgan98.C \
 	reaction_Styczen88.C program_GP2D.C svat_ssoc.C reaction_Jarvis99.C \
 	reaction_filter.C seed_LAI.C seed_release.C \

@@ -59,6 +59,7 @@ void
 GnuplotBase::plot_header (std::ostream& out) const
 { 
   // Header.
+  out << "reset\n";
   if (file != "screen")
     out << "set output " << quote (file) << "\n";
   else

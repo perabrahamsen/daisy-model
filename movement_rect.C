@@ -51,6 +51,8 @@ struct MovementRect : public MovementSolute
   Geometry& geometry () const;
 
   // Failures.
+  std::set<symbol> seen;
+  void report (const symbol error, Treelog& msg);
   void summarize (Treelog& msg) const;
 
   // Drains
@@ -103,6 +105,20 @@ struct MovementRect : public MovementSolute
 Geometry& 
 MovementRect::geometry () const
 { return *geo; }
+
+void
+MovementRect::report (const symbol error, Treelog& msg)
+{
+  if (seen.find (error) != seen.end ())
+    msg.debug ("UZ problem: " + error);
+  else 
+    {
+      seen.insert (error);
+      msg.message ("UZ problem: " + error);
+      msg.message ("\
+Further messages of this will only be shown in the daisy.log file.");
+    }
+}
 
 void 
 MovementRect::summarize (Treelog& msg) const
@@ -275,13 +291,10 @@ MovementRect::tick (const Soil& soil, SoilWater& soil_water,
           return;
         }
       catch (const char* error)
-        {
-          msg.debug (std::string ("UZ problem: ") + error);
-        }
+        { report (error, msg); }
       catch (const std::string& error)
-        {
-          msg.debug (std::string ("UZ trouble: ") + error);
-        }
+        { report (error, msg); }
+
       tertiary->implicit ().set_state (old_tertiary); // For small timesteps.
       tertiary->deactivate (3); // Don't try tertiary right after reserve.
       water_failure (i);

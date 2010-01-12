@@ -833,7 +833,8 @@ BioporeMatrix::matrix_solute (const Geometry& geo, const double dt,
   const double new_content
     = std::accumulate (new_array.begin (), new_array.end (), 0.0);
   const double growth = total_in - total_out;
-  if (!balance (old_content, new_content, growth))
+  if (!balance (old_content, new_content, growth)
+      && !approximate (new_content + total_out, old_content + total_in))
     {
       const double error = old_content + growth - new_content;
       std::ostringstream tmp;

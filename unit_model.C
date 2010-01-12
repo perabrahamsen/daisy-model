@@ -490,6 +490,15 @@ Connvert to SI base units by multiplying with a factor.")
     add ("mg/ha/h", p_m * u_g / u_ha / u_h,
          -2, 1, -1, 0, 0, 0, 0,
          "Pesticide application.");
+    add ("ug/ha/d", p_u * u_g / u_ha / u_d,
+         -2, 1, -1, 0, 0, 0, 0,
+         "Pesticide application.");
+    add ("ug/ha/h", p_u * u_g / u_ha / u_h,
+         -2, 1, -1, 0, 0, 0, 0,
+         "Pesticide application.");
+    add ("g/ha/d", u_g / u_ha / u_d,
+         -2, 1, -1, 0, 0, 0, 0,
+         "Pesticide application.");
     add ("kg N/ha/h", p_k * u_g / u_ha / u_h,
          -2, 1, -1, 0, 0, 0, 0,
          "Field scale application and removal of nitrogen.");

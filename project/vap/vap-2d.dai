@@ -44,7 +44,7 @@
            (density (plf x (range [m^-2])
                            (domain [cm])
                            (points (20 0)
-             	 (30 15))))))      
+                                   (30 15))))))      
            
 (defbiopore "drain_30cm"
    (drain  (height_start -30 [cm])

@@ -116,7 +116,7 @@ MacroStandard::tick (const Geometry1D& geo,
                      Treelog& msg)
 { 
   // Check input.
-  daisy_assert (last > first);
+  daisy_assert (last >= first);
   daisy_assert (last < geo.cell_size ()); 
   daisy_assert (h.size () == geo.cell_size ());
   daisy_assert (Theta.size () == geo.cell_size ());

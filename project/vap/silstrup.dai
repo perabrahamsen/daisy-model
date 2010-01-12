@@ -11,25 +11,55 @@
   (clay 22.45 [%]) (silt 27.7 [%])(sand 49.85 [%])
   (humus (C2OM (C 1.798 [%]))) (dry_bulk_density 1.48 [g/cm^3])
   (hydraulic M_vG
-             (Theta_sat 44 [%]) (Theta_res 0 [%])
-             (n 1.1 []) (K_sat 306 [mm/h])
+             (Theta_sat 39.2719 [%]) (Theta_res 0 [%])
+             (n 1.1 []) (K_at_h -10 0.1 [mm/h])
              (l 0.5 []) (alpha 0.01 [cm^-1])))
+
+(defhorizon Silstrup_Ap_MACRO Silstrup_Ap
+  (hydraulic MACRO
+             (Theta_b 39 [%]) (Theta_res 0 [%])
+             (n 1.1 []) (K_b 0.1 [mm/h])
+             (l 0.5 []) (alpha 0.01 [cm^-1])
+             (Theta_sat 44 [%]) (K_sat 306 [mm/h]) (h_b -10 [cm]) (n_ma 3 [])))
+
+(defhorizon Silstrup_Ap_surface Silstrup_Ap
+  (hydraulic original
+             ;; 50%
+             (K_at_h -10 0.05 [mm/h])))
 
 (defhorizon Silstrup_B FAO3
   (clay 27.97 [%]) (silt 26.17 [%]) (sand 45.86 [%])
   (humus (C2OM (C 0.47 [%]))) (dry_bulk_density 1.61 [g/cm^3])
   (hydraulic M_vG
-             (Theta_sat 39 [%]) (Theta_res 0 [%])
-             (n 1.13 []) (K_sat 36 [mm/h])
+             (Theta_sat 38.383 [%]) (Theta_res 0 [%])
+             (n 1.13 []) (K_at_h -10 0.1 [mm/h])
              (l 0.5 []) (alpha 0.012 [cm^-1])))
+
+(defhorizon Silstrup_B_MACRO Silstrup_B
+  (hydraulic MACRO
+             (Theta_b 38 [%]) (Theta_res 0 [%])
+             (n 1.13 []) (K_b 0.1 [mm/h])
+             (l 0.5 []) (alpha 0.012 [cm^-1])
+             (Theta_sat 39 [%]) (K_sat 36 [mm/h]) (h_b -10 [cm]) (n_ma 3 [])))
+
+(defhorizon Silstrup_B_plow_pan Silstrup_B
+  ;; 10% of original.
+  (hydraulic original (K_at_h -10 0.01 [mm/h])))
 
 (defhorizon Silstrup_C FAO3
   (clay 26.28 [%]) (silt 20.86 [%]) (sand 52.86 [%])
   (humus (C2OM (C 0.116 [%]))) (dry_bulk_density 1.75 [g/cm^3])
   (hydraulic M_vG
-             (Theta_sat 34 [%]) (Theta_res 0 [%])
-             (n 1.1 []) (K_sat 19 [mm/h])
+             (Theta_sat 33.2791 [%]) (Theta_res 0 [%])
+             (n 1.1 []) (K_at_h -10 0.1 [mm/h])
              (l 0.5 []) (alpha 0.012 [cm^-1])))
+
+(defhorizon Silstrup_C_MACRO Silstrup_C
+  (hydraulic MACRO
+             (Theta_b 33 [%]) (Theta_res 0 [%])
+             (n 1.1 []) (K_b 0.1 [mm/h])
+             (l 0.5 []) (alpha 0.012 [cm^-1])
+             (Theta_sat 34 [%]) (K_sat 19 [mm/h]) (h_b -10 [cm]) (n_ma 3 [])))
 
 (defcolumn Silstrup default
   ;; 1D
@@ -39,22 +69,33 @@
   ;;                     (pipe_position -110.0 [cm])))
   ;; 2D
   (Movement Rorrende
-            (Geometry (zplus -2 -5 -10 -20 -25 -31
+            (Tertiary (biopores 
+                       (use_small_timesteps false)
+                       (classes ("matrix_0cm" (height_end -31 [cm])) 
+                                ("matrix_2cm")
+                                ("drain_2cm")
+                                ("matrix_30cm" (height_start -35 [cm]))
+                                ("drain_30cm" (height_start -35 [cm])))))
+            ;;(matrix_water (Mollerup (K_average pressure (h_lim -5 [cm])))
+            ;;              &old)
+            (Geometry (zplus -1.5 -3 -5 -10 -20 -25 -31
                              -35 -39
                              -50 -75 -100 -113 
-                             -120 -180 -220 -300 -400 -500 [cm])
+                             -120 -150 -200 -275 -350 -425 -500 [cm])
                       (xplus 10 25 50 100 150 200 300 400 600 900 [cm])))
   (Groundwater file "dk-silstrup.gwt"
                ;; GWT is measured at top of terrain.
                ;; Offset is calibrated based on drainage measurments.
-               (offset 20 [cm]))
+               ;; 20 cm too low
+               (offset 25 [cm]))
   (Chemistry Silstrup)
   (OrganicMatter none)
-  (Soil (horizons ( -31.00 Silstrup_Ap)
-                  ( -39.00 "Rorrende Bplow layer")
-                  (-113.00 Silstrup_B)
-                  (-500.00 Silstrup_C))
-        (MaxRootingDepth 40 [cm])))
+  (Soil (horizons ;; (  -3.00 [cm] Silstrup_Ap_surface)
+                  ( -31.00 [cm] Silstrup_Ap)
+                  ( -39.00 [cm] Silstrup_B_plow_pan)
+                  (-113.00 [cm] Silstrup_B)
+                  (-500.00 [cm] Silstrup_C))
+        (MaxRootingDepth 50 [cm])))
 
 ;; Management.
 
@@ -186,6 +227,81 @@
          
 ;; Output
 
+(deflog "Silstrup Drain" column
+  (column "Silstrup")
+  (where "log/Silstrup-drain.dlf")
+  (when hourly)
+  (entries (number (tag "Surface water")
+                   (description "\
+Flux of water from surface to drain through biopores, bypassing the matrix.")
+                   (path column "${column}" Movement "*" 
+                         Tertiary biopores classes drain infiltration)
+                   (spec biopore drain infiltration)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (interval (tag "Ap03 water")
+                     (from 0 [cm])
+                     (to -3 [cm])
+                     (path column "${column}" SoilWater S_drain)
+                     (spec fixed SoilWater S_drain)
+                     (handle sum)
+                     (dimension "mm/&"))
+           (interval (tag "Ap water")
+                     (from -3 [cm])
+                     (to -31 [cm])
+                     (path column "${column}" SoilWater S_drain)
+                     (spec fixed SoilWater S_drain)
+                     (handle sum)
+                     (dimension "mm/&"))
+           (interval (tag "Bplow water")
+                     (from -31 [cm])
+                     (to -39 [cm])
+                     (path column "${column}" SoilWater S_drain)
+                     (spec fixed SoilWater S_drain)
+                     (handle sum)
+                     (dimension "mm/&"))
+           (interval (tag "B50 water")
+                     (from -39 [cm])
+                     (to -50 [cm])
+                     (path column "${column}" SoilWater S_drain)
+                     (spec fixed SoilWater S_drain)
+                     (handle sum)
+                     (dimension "mm/&"))
+           (number (tag "Surface water tertiary")
+                   (path column "${column}" Movement "*" 
+                         Tertiary biopores classes matrix infiltration)
+                   (spec biopore matrix infiltration)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (interval (tag "Ap03 water tertiary")
+                     (from 0 [cm])
+                     (to -3 [cm])
+                     (path column "${column}" SoilWater S_p)
+                     (spec fixed SoilWater S_p)
+                     (handle sum)
+                     (dimension "mm/&"))
+           (interval (tag "Ap water tertiary")
+                     (from -3 [cm])
+                     (to -31 [cm])
+                     (path column "${column}" SoilWater S_p)
+                     (spec fixed SoilWater S_p)
+                     (handle sum)
+                     (dimension "mm/&"))
+           (interval (tag "Bplow water tertiary")
+                     (from -31 [cm])
+                     (to -39 [cm])
+                     (path column "${column}" SoilWater S_p)
+                     (spec fixed SoilWater S_p)
+                     (handle sum)
+                     (dimension "mm/&"))
+           (interval (tag "B50 water tertiary")
+                     (from -39 [cm])
+                     (to -50 [cm])
+                     (path column "${column}" SoilWater S_p)
+                     (spec fixed SoilWater S_p)
+                     (handle sum)
+                     (dimension "mm/&"))))
+
 (deflog "Silstrup Content" "VAP Content"
   (where "log/Silstrup-content.dlf")
   (when daily)
@@ -206,6 +322,15 @@
                     (tag "SW110cm")
                     (dimension "%")
                     (spec fixed SoilWater Theta))
+           (flux_bottom (path column "${column}" Chemistry "*"
+                              trace Metamitron J_matrix)
+                        (to -150 [cm])
+                        (spec chemical default J_matrix)
+                        (handle current)
+                        (negate true)
+                        (tag "Metamitron leak 150")
+                        (dimension "ug/ha/&"))
+           
            ))
 
 ;; Program
@@ -229,24 +354,37 @@
           ("Field chemical"  (when weekly)
            (chemical "Metamitron-base")
            (where "log/${station}-field-Metamitron-weekly.dlf"))
+          ("Silstrup Drain")
           ("Silstrup Content")))
 
 ;; Plots
 
-(defxysource "Retension Ap Silstrup GEUS" "Retension GEUS" 
+(defxysource "Retention Ap Silstrup Daisy" "Retention Daisy" 
   (y (convert (soil_Theta (horizon "Silstrup_Ap")
                           (top_soil true)
                           (h x))
-              [])))
+              [%])))
 
-(defxysource "Retension Ap Silstrup HYPRES" "Retension HYPRES"
+(defxysource "Retention Ap Silstrup MACRO" "Retention MACRO" 
+  (y (convert (soil_Theta (horizon "Silstrup_Ap_MACRO")
+                          (top_soil true)
+                          (h x))
+              [%])))
+
+(defxysource "Retention Ap Silstrup HYPRES" "Retention HYPRES"
   (y (convert (soil_Theta (horizon ("Silstrup_Ap" (hydraulic hypres)))
                           (top_soil true)
                           (h x))
-              [])))
+              [%])))
 
-(defxysource "Conductivity Ap Silstrup GEUS" "Conductivity GEUS" 
+(defxysource "Conductivity Ap Silstrup Daisy" "Conductivity Daisy" 
   (y (convert (soil_K (horizon "Silstrup_Ap")
+                      (top_soil true)
+                      (h x))
+              [cm/d])))
+
+(defxysource "Conductivity Ap Silstrup MACRO" "Conductivity MACRO" 
+  (y (convert (soil_K (horizon "Silstrup_Ap_MACRO")
                       (top_soil true)
                       (h x))
               [cm/d])))
@@ -257,27 +395,44 @@
                       (h x))
               [cm/d])))
 
-(defgnuplot "Hydraulic Ap Silstrup" "Hydraulic All"
+(defgnuplot "Retention Ap Silstrup" "Retention All"
   (hor "Ap")
-  (source "Retension Ap Silstrup HYPRES"
-          "Retension Ap Silstrup GEUS"
-          "Conductivity Ap Silstrup HYPRES"
-          "Conductivity Ap Silstrup GEUS"))
+  (source "Retention Ap Silstrup HYPRES"
+          "Retention Ap Silstrup Daisy"
+          "Retention Ap Silstrup MACRO"))
 
-(defxysource "Retension B Silstrup GEUS" "Retension GEUS" 
+(defgnuplot "Conductivity Ap Silstrup" "Conductivity All"
+  (hor "Ap")
+  (source "Conductivity Ap Silstrup HYPRES"
+          "Conductivity Ap Silstrup Daisy"
+          "Conductivity Ap Silstrup MACRO"))
+
+(defxysource "Retention B Silstrup Daisy" "Retention Daisy" 
   (y (convert (soil_Theta (horizon "Silstrup_B")
                           (top_soil false)
                           (h x))
-              [])))
+              [%])))
 
-(defxysource "Retension B Silstrup HYPRES" "Retension HYPRES"
+(defxysource "Retention B Silstrup MACRO" "Retention MACRO" 
+  (y (convert (soil_Theta (horizon "Silstrup_B_MACRO")
+                          (top_soil false)
+                          (h x))
+              [%])))
+
+(defxysource "Retention B Silstrup HYPRES" "Retention HYPRES"
   (y (convert (soil_Theta (horizon ("Silstrup_B" (hydraulic hypres)))
                           (top_soil false)
                           (h x))
-              [])))
+              [%])))
 
-(defxysource "Conductivity B Silstrup GEUS" "Conductivity GEUS" 
+(defxysource "Conductivity B Silstrup Daisy" "Conductivity Daisy" 
   (y (convert (soil_K (horizon "Silstrup_B")
+                      (top_soil false)
+                      (h x))
+              [cm/d])))
+
+(defxysource "Conductivity B Silstrup MACRO" "Conductivity MACRO" 
+  (y (convert (soil_K (horizon "Silstrup_B_MACRO")
                       (top_soil false)
                       (h x))
               [cm/d])))
@@ -288,27 +443,44 @@
                       (h x))
               [cm/d])))
 
-(defgnuplot "Hydraulic B Silstrup" "Hydraulic All"
+(defgnuplot "Retention B Silstrup" "Retention All"
   (hor "B")
-  (source "Retension B Silstrup HYPRES"
-          "Retension B Silstrup GEUS"
-          "Conductivity B Silstrup HYPRES"
-          "Conductivity B Silstrup GEUS"))
+  (source "Retention B Silstrup HYPRES"
+          "Retention B Silstrup Daisy"
+          "Retention B Silstrup MACRO"))
 
-(defxysource "Retension C Silstrup GEUS" "Retension GEUS" 
+(defgnuplot "Conductivity B Silstrup" "Conductivity All"
+  (hor "B")
+  (source "Conductivity B Silstrup HYPRES"
+          "Conductivity B Silstrup Daisy"
+          "Conductivity B Silstrup MACRO"))
+
+(defxysource "Retention C Silstrup Daisy" "Retention Daisy" 
   (y (convert (soil_Theta (horizon "Silstrup_C")
                           (top_soil false)
                           (h x))
-              [])))
+              [%])))
 
-(defxysource "Retension C Silstrup HYPRES" "Retension HYPRES"
+(defxysource "Retention C Silstrup MACRO" "Retention MACRO" 
+  (y (convert (soil_Theta (horizon "Silstrup_C_MACRO")
+                          (top_soil false)
+                          (h x))
+              [%])))
+
+(defxysource "Retention C Silstrup HYPRES" "Retention HYPRES"
   (y (convert (soil_Theta (horizon ("Silstrup_C" (hydraulic hypres)))
                           (top_soil false)
                           (h x))
-              [])))
+              [%])))
 
-(defxysource "Conductivity C Silstrup GEUS" "Conductivity GEUS" 
+(defxysource "Conductivity C Silstrup Daisy" "Conductivity Daisy" 
   (y (convert (soil_K (horizon "Silstrup_C")
+                      (top_soil false)
+                      (h x))
+              [cm/d])))
+
+(defxysource "Conductivity C Silstrup MACRO" "Conductivity MACRO" 
+  (y (convert (soil_K (horizon "Silstrup_C_MACRO")
                       (top_soil false)
                       (h x))
               [cm/d])))
@@ -319,12 +491,17 @@
                       (h x))
               [cm/d])))
 
-(defgnuplot "Hydraulic C Silstrup" "Hydraulic All"
+(defgnuplot "Retention C Silstrup" "Retention All"
   (hor "C")
-  (source "Retension C Silstrup HYPRES"
-          "Retension C Silstrup GEUS"
-          "Conductivity C Silstrup HYPRES"
-          "Conductivity C Silstrup GEUS"))
+  (source "Retention C Silstrup HYPRES"
+          "Retention C Silstrup Daisy"
+          "Retention C Silstrup MACRO"))
+
+(defgnuplot "Conductivity C Silstrup" "Conductivity All"
+  (hor "C")
+  (source "Conductivity C Silstrup HYPRES"
+          "Conductivity C Silstrup Daisy"
+          "Conductivity C Silstrup MACRO"))
 
 (defgnuplot sil-drainmass drainmass (area 1.69 [ha]))
 (defgnuplot sil-drainmass-acc drainmass-acc (area 1.69 [ha]))
@@ -332,12 +509,23 @@
 (defgnuplot Silstrup Station
   (station Silstrup)
   (graph &old 
-         "Hydraulic Ap Silstrup"
-         "Hydraulic B Silstrup"
-         "Hydraulic C Silstrup"
+         "Retention Ap Silstrup"
+         "Conductivity Ap Silstrup"
+         "Retention B Silstrup"
+         "Conductivity B Silstrup"
+         "Retention C Silstrup"
+         "Conductivity C Silstrup"
          (horizontal (source &old 
                              (column (file "log/${station}-content.dlf")
                                      (tag "Metamitron"))))
+         (leak150 (source &old 
+                          (column (file "log/${station}-content.dlf")
+                                  (tag "Metamitron leak 150"))))
+         (leak150acc (source &old 
+                             (column (file "log/${station}-content.dlf")
+                                     (accumulate true)
+                                     (timestep d)
+                                     (tag "Metamitron leak 150"))))
          (theta (depth "SW060cm"))
          (theta (depth "SW110cm"))
          ;; First measurement 2000-04-29

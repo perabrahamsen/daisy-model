@@ -11,6 +11,17 @@
 \pagestyle{fancy}
 \rhead{\today}
 
+\newcommand{\horfig}[2]{
+\begin{figure}[htbp] 
+  \includegraphics[width=0.5\columnwidth]{fig/#1-#2-Theta}\includegraphics[width=0.5\columnwidth]{fig/#1-#2-K}
+  \caption{Hydrauliske egenskaber for #1 #2.  MACRO angiver den
+    oprindelige parameterisering, Daisy den modificerede
+    parameterisering, og HYPRES refererer til parametre estimeret med
+    pedotransferfunktionen beskrevet i \citet{hypres}.}
+  \label{fig:#1-#2}
+\end{figure}
+}
+
 \begin{document}
 
 \section*{Daisy simulation for Silstrup og Estrup}
@@ -58,10 +69,11 @@ enkelte vap områder indgår de sammen med diskretiseringen i
 beskrivelsen af den enkelte søjle, for eksempel.
 \begin{verbatim}
   (Movement Rorrende
-            (Geometry (zplus -2 -10 -25 -31
-                             -50 -100 -113 
-                             -120 -180 -300 -500 [cm])
-                      (xplus 10 25 50 100 200 400 900 [cm])))
+            (Geometry (zplus -2 -5 -10 -20 -25 -31
+                             -35 -39
+                             -50 -75 -100 -113 
+                             -120 -180 -220 -300 -400 -500 [cm])
+                      (xplus 10 25 50 100 150 200 300 400 600 900 [cm])))
 \end{verbatim}
 
 Diskretiseringen er et grid bestemt af vandrette og lodrette
@@ -298,7 +310,7 @@ udregnet fra referencefordampning med en afgrødefaktor afhængig af det
 aktuelle simulerede bladsække.  Aktuel fordampning er yderligere
 begrænset af jordens evne til at levere vand, med det aktuelle
 simulerede rodnet.  En oversigt over udvalgte data kan ses på
-figur~\ref{fig:silstrup-weather}.
+figur~\ref{fig:Silstrup-weather}.
 \begin{figure}[htbp]
   \begin{center}
     \includegraphics[width=\columnwidth]{fig/silstrup-weather}
@@ -306,7 +318,7 @@ figur~\ref{fig:silstrup-weather}.
   \caption{Akkumuleret nedbør og fordampning, samt timeværdier for
     temperatur for målestationen i Silstrup.  Potentiel og aktuel
     fordamppning er identiske når der ikke er vandstress.}
-  \label{fig:silstrup-weather}
+  \label{fig:Silstrup-weather}
 \end{figure}
 
 Derudover er der en række data som knytter sig til selve
@@ -349,76 +361,74 @@ ser det således ud:
 \subsection{Jord}
 
 Jordopsætning er baseret på jordfysiske parametre fra GEUS opsætning
-af MACRO.  Der er anvendt tre jordhorizonter.
+af MACRO.  MACRO bruger en bimodal variant af Mualem -- van Genuchten
+hydrauliske model.  Da løsningen af vandtransport i det tertiære
+domæne (bioporer) i Daisy er afkoblet fra løsningen i matrix domænet,
+har vi valgt kun at bruge de parametere som dækker den ``rene'' udgave
+af Mualem -- van Genuchten.  For Silstrup er der defineret tre
+jordhorizonter.
 
 \subsubsection{Ap}
 
 Daisy opsætning for Ap horizonten følger, med de hydrauliske
-egenskaber afbilledet på figur~\ref{fig:silstrup-Ap}.
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=\columnwidth]{fig/silstrup-Ap}
-  \end{center}
-  \caption{Hydrauliske egenskaber for Silstrup Ap.  GEUS med de af
-    GEUS anvendte parametre, HYPRES refererer til parametre estimeret
-    med pedotransferfunktion.}
-  \label{fig:silstrup-Ap}
-\end{figure}
+egenskaber afbilledet på figur~\ref{fig:Silstrup-Ap}.
+\horfig{Silstrup}{Ap}
 \begin{verbatim}
 (defhorizon Silstrup_Ap FAO3
   (clay 22.45 [%]) (silt 27.7 [%])(sand 49.85 [%])
   (humus (C2OM (C 1.798 [%]))) (dry_bulk_density 1.48 [g/cm^3])
   (hydraulic M_vG
-             (Theta_sat 44 [%]) (Theta_res 0 [%])
-             (n 1.1 []) (K_sat 306 [mm/h])
+             (Theta_sat 39 [%]) (Theta_res 0 [%])
+             (n 1.1 []) (K_at_h -10 0.1 [mm/h])
              (l 0.5 []) (alpha 0.01 [cm^-1])))
 \end{verbatim}
 
 \subsubsection{B}
 
 Daisy opsætning for B horizonten følger, med de hydrauliske
-egenskaber afbilledet på figur~\ref{fig:silstrup-B}.
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=\columnwidth]{fig/silstrup-B}
-  \end{center}
-  \caption{Hydrauliske egenskaber for Silstrup B.  GEUS med de af
-    GEUS anvendte parametre, HYPRES referere til parametre estimeret
-    med pedotransferfunktion.}
-  \label{fig:silstrup-B}
-\end{figure}
+egenskaber afbilledet på figur~\ref{fig:Silstrup-B}.
+\horfig{Silstrup}{B}
 \begin{verbatim}
 (defhorizon Silstrup_B FAO3
   (clay 27.97 [%]) (silt 26.17 [%]) (sand 45.86 [%])
   (humus (C2OM (C 0.47 [%]))) (dry_bulk_density 1.61 [g/cm^3])
   (hydraulic M_vG
-             (Theta_sat 39 [%]) (Theta_res 0 [%])
-             (n 1.13 []) (K_sat 36 [mm/h])
+             (Theta_sat 38 [%]) (Theta_res 0 [%])
+             (n 1.13 []) (K_at_h -10 0.1 [mm/h])
              (l 0.5 []) (alpha 0.012 [cm^-1])))
 \end{verbatim}
 
 \subsubsection{C}
 
 Daisy opsætning for C horizonten følger, med de hydrauliske
-egenskaber afbilledet på figur~\ref{fig:silstrup-C}.
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=\columnwidth]{fig/silstrup-C}
-  \end{center}
-  \caption{Hydrauliske egenskaber for Silstrup C.  GEUS med de af
-    GEUS anvendte parametre, HYPRES referere til parametre estimeret
-    med pedotransferfunktion.}
-  \label{fig:silstrup-C}
-\end{figure}
+egenskaber afbilledet på figur~\ref{fig:Silstrup-C}.
+\horfig{Silstrup}{C}
 \begin{verbatim}
 (defhorizon Silstrup_C FAO3
   (clay 26.28 [%]) (silt 20.86 [%]) (sand 52.86 [%])
   (humus (C2OM (C 0.116 [%]))) (dry_bulk_density 1.75 [g/cm^3])
   (hydraulic M_vG
-             (Theta_sat 34 [%]) (Theta_res 0 [%])
-             (n 1.1 []) (K_sat 19 [mm/h])
+             (Theta_sat 33 [%]) (Theta_res 0 [%])
+             (n 1.1 []) (K_at_h -10 0.1 [mm/h])
              (l 0.5 []) (alpha 0.012 [cm^-1])))
 \end{verbatim}
+
+\subsubsection{Yderligere jordlag}
+
+Vi tilføjer to ekstra jordlag der hverken er forsøgt målt, eller brugt
+i MACRO opsætningen, men som erfarinsmæssigt optræder på behandlet
+jord.  Disse jordlag er meget vigtige for at få aktiveret bioporer i
+Daisy.  Det første er et tyndt overfladelag, der er vanskeligt
+gennemtrængeligt.  Her vælger vi at gøre ledningsevnen til en
+tiendedel af resten af Ap horisonten.
+\begin{verbatim}
+(defhorizon Silstrup_Ap_surface Silstrup_Ap
+  (hydraulic original
+             ;; 10%
+             (K_at_h -10 0.01 [mm/h])))
+\end{verbatim}
+Den anden horisont er en pløjesål i toppen af B horizonten.  Her har
+vi valgt at anvende opsætnigen af pløjesålen fra Rørrende.
 
 \subsubsection{Profil}
 Alle ovenstående tal er fra GEUS.  MACRO bruger organisk kulstof som
@@ -431,10 +441,12 @@ eksistere alligevel.
 Jorprofilen angives sammen med den maksimale roddybde, som GEUS har
 oplyst til 50 cm.
 \begin{verbatim}
-  (Soil (horizons ( -31.00 Silstrup_Ap)
-                  (-113.00 Silstrup_B)
-                  (-500.00 Silstrup_C))
-        (MaxRootingDepth 50 [cm]))
+  (Soil (horizons (  -3.00 [cm] Silstrup_Ap_surface)
+                  ( -31.00 [cm] Silstrup_Ap)
+                  ( -39.00 [cm] "Rorrende Bplow layer")
+                  (-113.00 [cm] Silstrup_B)
+                  (-500.00 [cm] Silstrup_C))
+        (MaxRootingDepth 50 [cm])))
 \end{verbatim}
 
 \subsection{Grundvand}
@@ -454,13 +466,13 @@ passe med målingerne.  I Daisy ser det sådan ud:
     (Groundwater file "dk-silstrup.gwt" (offset 20 [cm]))
 \end{verbatim}
 Simuleret og observeret (uden offset) grundvandstand kan ses på
-figur~\ref{fig:silstrup-gw}.
+figur~\ref{fig:Silstrup-gw}.
 \begin{figure}[htbp]
   \begin{center}
     \includegraphics[width=\columnwidth]{fig/silstrup-gw}
   \end{center}
   \caption{Grundvandsstand for Silstrup.}
-  \label{fig:silstrup-gw}
+  \label{fig:Silstrup-gw}
 \end{figure}
 Den simulerede grundvandsstand bygger på antagelse om at den nederste
 umættede numeriske celle er i ligevægt med grundvandet.
@@ -470,7 +482,7 @@ umættede numeriske celle er i ligevægt med grundvandet.
 Jordvand er målt med TDR to steder (S1 og S2) samt i tre dybder (25,
 60 og 110 cm under jordoverfladen).  Vi har fået data fra S1, der er
 placeret i bunden af arealet.  Resultaterne er vist på
-figur~\ref{fig:silstrup-theta}.
+figur~\ref{fig:Silstrup-theta}.
 \begin{figure}[htbp]
   \begin{center}
     \includegraphics[width=\columnwidth]{fig/silstrup-theta-SW025cm}\\
@@ -478,7 +490,7 @@ figur~\ref{fig:silstrup-theta}.
     \includegraphics[width=\columnwidth]{fig/silstrup-theta-SW110cm}
   \end{center}
   \caption{Jordvand for målepunkt S1 i Silstrup.}
-  \label{fig:silstrup-theta}
+  \label{fig:Silstrup-theta}
 \end{figure}
 Umiddelbart kan man se at der tilsyneladende er dårlig overensstemmelse
 mellem porøsister ved S1 og den porøsitet der er målt for jorden som
@@ -495,13 +507,13 @@ Der er målt bromid med sugekopper ved S1 og S2 i 1 og 2 meters dybde,
 vi har fået data fra S1 i en meters dybde.  Da variationen mellem S1
 og S2 vist i \citet{vap2009} er stor på trods af at de to målepunkter
 ligger tæt, har vi valgt ikke at kalibrere efter disse punktdata, vist
-på figur~\ref{fig:silstrup-sc-bromide}.
+på figur~\ref{fig:Silstrup-sc-bromide}.
 \begin{figure}[htbp]
   \begin{center}
     \includegraphics[width=\columnwidth]{fig/silstrup-sc-bromide}
   \end{center}
   \caption{Bromid i jorden i en meters dybde ved S1 i Silstrup.}
-  \label{fig:silstrup-sc-bromide}
+  \label{fig:Silstrup-sc-bromide}
 \end{figure}
 
 Der er desuden målt på pesticider i to vandrette skærme beliggende i
@@ -509,13 +521,13 @@ Der er desuden målt på pesticider i to vandrette skærme beliggende i
 problemet med heterogenitet ved at integrere over et stort område.
 Ingen af disse målinger har dog vist koncentrationer over
 detektionsgrænsen.  De simulerede værdier kan ses på
-figur~\ref{fig:silstrup-horizontal}.
+figur~\ref{fig:Silstrup-horizontal}.
 \begin{figure}[htbp]
   \begin{center}
     \includegraphics[width=\columnwidth]{fig/silstrup-horizontal}
   \end{center}
   \caption{Pesticider i jorden i 3,5 meters dybde i Silstrup.}
-  \label{fig:silstrup-horizontal}
+  \label{fig:Silstrup-horizontal}
 \end{figure}
 
 \subsection{Dræn og drænvand}
@@ -535,22 +547,22 @@ stedet for 0 cm.
   (drain (-110 [cm] 1 [cm]))
 \end{verbatim}
 
-Drænafstrømning er vist i figur~\ref{fig:silstrup-drain}.
+Drænafstrømning er vist i figur~\ref{fig:Silstrup-drain}.
 \begin{figure}[htbp]
   \begin{center}
     \includegraphics[width=\columnwidth]{fig/silstrup-drain}
   \end{center}
   \caption{Drænafstrøming i Silstrup.}
-  \label{fig:silstrup-drain}
+  \label{fig:Silstrup-drain}
 \end{figure}
-Akkumuleret drænafstrømning er vist i figur~\ref{fig:silstrup-drain-acc}
+Akkumuleret drænafstrømning er vist i figur~\ref{fig:Silstrup-drain-acc}
 sammen med perkolation og nettonedbør.
 \begin{figure}[htbp]
   \begin{center}
     \includegraphics[width=\columnwidth]{fig/silstrup-drain-acc}
   \end{center}
   \caption{Akkumuleret drænafstrømning i Silstrup.}
-  \label{fig:silstrup-drain-acc}
+  \label{fig:Silstrup-drain-acc}
 \end{figure}
 
 \subsection{Drænkoncentrationer}
@@ -568,7 +580,7 @@ Fenpropimorph har været over detektionsgrænsen.  Når Daisy kører uden
 makroporer, sker der ingen udvaskning af pesticider.
 
 Sammenligning af ugentlige udvaskninger kan ses på
-figur~\ref{fig:silstrup-weekly}.
+figur~\ref{fig:Silstrup-weekly}.
 \begin{figure}[htbp]
   \begin{center}
     \includegraphics[width=\columnwidth]{fig/silstrup-Bromide-weekly}\\
@@ -578,11 +590,11 @@ figur~\ref{fig:silstrup-weekly}.
     \includegraphics[width=\columnwidth]{fig/silstrup-Metamitron-weekly}
   \end{center}
   \caption{Weekly drain flow of Bromide and selected pesticides.}
-  \label{fig:silstrup-weekly}
+  \label{fig:Silstrup-weekly}
 \end{figure}
 GEUS tal er gjort arealrelative ved at dividere med drænarealet for
 Silstrup. Den akkumulerede udvaskning kan ses på
-figur~\ref{fig:silstrup-acc}.
+figur~\ref{fig:Silstrup-acc}.
 \begin{figure}[htbp]
   \begin{center}
     \includegraphics[width=\columnwidth]{fig/silstrup-Bromide-acc}\\
@@ -592,7 +604,44 @@ figur~\ref{fig:silstrup-acc}.
     \includegraphics[width=\columnwidth]{fig/silstrup-Metamitron-acc}
   \end{center}
   \caption{Accumulated drain flow of Bromide and selected pesticides.}
-  \label{fig:silstrup-acc}
+  \label{fig:Silstrup-acc}
+\end{figure}
+
+På figur~\ref{fig:Silstrup-leak150} ses simuleret udvaskningen ved 150
+cm dybde.  Det er 30 cm under de dybeste bioporer i opsætningen, og
+giver derfor et bud på hvor langt stofferne kan komme uden hjælp fra
+bioporer.
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=\columnwidth]{fig/silstrup-leak150}\\
+    \includegraphics[width=\columnwidth]{fig/silstrup-leak150acc}
+  \end{center}
+  \caption{Simuleret udvaskning i 150 cm, 30 cm under bioporer.}
+  \label{fig:Silstrup-leak150}
+\end{figure}
+\subsection{Bioporer og kolloider}
+
+Udvaskning af kolloider, sam udveksling af vand mellem bioporer og
+matrix kan ses på figur~\ref{fig:Silstrup-biopore}.  Der er tale om
+netto-udveksling, hvor bidrag fra matrix til bioporer tæller positivt,
+og bidrag fra bioporer til matrix tæller negativt.  Vi har valgt at se
+på fem forskellige lag. 1) Vand der ryger direkte fra overfladen til
+bioporer (Above surface).  2) Udveksling i de øverste 3 cm (Top soil).
+3) udveksling i resten af Ap horizonten (Ap).  Udveksling i pløjesålen
+(Plow pan). Udveksling under pløjesålen, ned til 50 cm (B50).  Der
+skelnes mellem bioporer som ender i matrix, og bioporer som ender
+direkte i dræn.
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=\columnwidth]{fig/silstrup-colloid}\\
+    \includegraphics[width=\columnwidth]{fig/silstrup-biopore}\\
+    \includegraphics[width=\columnwidth]{fig/silstrup-biopore-acc}\\
+    \includegraphics[width=\columnwidth]{fig/silstrup-biopore-drain}\\
+    \includegraphics[width=\columnwidth]{fig/silstrup-biopore-drain-acc}
+  \end{center}
+  \caption{Kolloider i drænvand, samt bioporeaktivitet i 5 forskellige
+    jordlag.}
+  \label{fig:Silstrup-biopore}
 \end{figure}
 
 \section{Estrup}
@@ -614,7 +663,7 @@ omkringstående timer.  De generelle oplysninger om stationen er udfydt
 som for Silstrup.
 
 En oversigt over udvalgte data kan ses på
-figur~\ref{fig:estrup-weather}.
+figur~\ref{fig:Estrup-weather}.
 \begin{figure}[htbp]
   \begin{center}
     \includegraphics[width=\columnwidth]{fig/estrup-weather}
@@ -622,7 +671,7 @@ figur~\ref{fig:estrup-weather}.
   \caption{Akkumuleret nedbør og fordampning, samt timeværdier for
     temperatur for målestationen i Estrup.  Potentiel og aktuel
     fordamppning er identiske når der ikke er vandstress.}
-  \label{fig:estrup-weather}
+  \label{fig:Estrup-weather}
 \end{figure}
 
 \subsection{Jord}
@@ -633,93 +682,71 @@ af MACRO.  Der er anvendt fire jordhorizonter.
 \subsubsection{Ap}
 
 Daisy opsætning for Ap horizonten følger, med de hydrauliske
-egenskaber afbilledet på figur~\ref{fig:estrup-Ap}.
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=\columnwidth]{fig/estrup-Ap}
-  \end{center}
-  \caption{Hydrauliske egenskaber for Estrup Ap.  GEUS med de af
-    GEUS anvendte parametre, HYPRES refererer til parametre estimeret
-    med pedotransferfunktion.}
-  \label{fig:estrup-Ap}
-\end{figure}
+egenskaber afbilledet på figur~\ref{fig:Estrup-Ap}.
+\horfig{Estrup}{Ap}
 \begin{verbatim}
-  (defhorizon Estrup_Ap FAO3
-    (clay 14.6 [%]) (silt 23.33 [%])(sand 62.07 [%])
-    (humus (C2OM (C 3.248 [%]))) (dry_bulk_density 1.51 [g/cm^3])
-    (hydraulic M_vG
-               (Theta_sat 41 [%]) (Theta_res 0.0 [%])
-               (n 1.16 []) (K_sat 238 [mm/h])
-               (l 0.5 []) (alpha 0.02 [cm^-1])))
+(defhorizon Estrup_Ap FAO3
+  (clay 14.6 [%]) (silt 23.33 [%])(sand 62.07 [%])
+  (humus (C2OM (C 3.248 [%]))) (dry_bulk_density 1.51 [g/cm^3])
+  (hydraulic M_vG
+             (Theta_sat 41 [%]) (Theta_res 0.0 [%])
+             (n 1.16 []) (K_at_h -5 [cm] 0.1 [mm/h])
+             (l 0.5 []) (alpha 0.02 [cm^-1])))
 \end{verbatim}
 
 \subsubsection{B}
 
 Daisy opsætning for B horizonten følger, med de hydrauliske
-egenskaber afbilledet på figur~\ref{fig:estrup-B}.
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=\columnwidth]{fig/estrup-B}
-  \end{center}
-  \caption{Hydrauliske egenskaber for Estrup B.  GEUS med de af
-    GEUS anvendte parametre, HYPRES referere til parametre estimeret
-    med pedotransferfunktion.}
-  \label{fig:estrup-B}
-\end{figure}
+egenskaber afbilledet på figur~\ref{fig:Estrup-B}.
+\horfig{Estrup}{B}
 \begin{verbatim}
-  (defhorizon Estrup_B FAO3
-    (clay 21.7 [%]) (silt 17.87 [%])(sand 60.43 [%])
-    (humus (C2OM (C 0.812 [%]))) (dry_bulk_density 1.68 [g/cm^3])
-    (hydraulic M_vG
-               (Theta_sat 37 [%]) (Theta_res 0.0 [%])
-               (n 1.14 []) (K_sat 10 [mm/h])
-               (l 0.5 []) (alpha 0.01 [cm^-1])))
+(defhorizon Estrup_B FAO3
+  (clay 21.7 [%]) (silt 17.87 [%])(sand 60.43 [%])
+  (humus (C2OM (C 0.812 [%]))) (dry_bulk_density 1.68 [g/cm^3])
+  (hydraulic M_vG
+             (Theta_sat 37 [%]) (Theta_res 0.0 [%])
+             (n 1.14 []) (K_at_h -15 [cm] 0.3 [mm/h])
+             (l 0.5 []) (alpha 0.01 [cm^-1])))
 \end{verbatim}
 
 \subsubsection{C1}
 
 Daisy opsætning for C1 horizonten følger, med de hydrauliske
-egenskaber afbilledet på figur~\ref{fig:estrup-C1}.
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=\columnwidth]{fig/estrup-C1}
-  \end{center}
-  \caption{Hydrauliske egenskaber for Estrup C1.  GEUS med de af
-    GEUS anvendte parametre, HYPRES referere til parametre estimeret
-    med pedotransferfunktion.}
-  \label{fig:estrup-C1}
-\end{figure}
+egenskaber afbilledet på figur~\ref{fig:Estrup-C1}.
+\horfig{Estrup}{C1}
 \begin{verbatim}
-  (defhorizon Estrup_C1 FAO3
-    (clay 26.75 [%]) (silt 14.23 [%])(sand 59.02 [%])
-    (humus (C2OM (C 0.203 [%]))) (dry_bulk_density 1.73 [g/cm^3])
-    (hydraulic M_vG
-               (Theta_sat 34 [%]) (Theta_res 0.0 [%])
-               (n 1.1 []) (K_sat 12 [mm/h])
-               (l 0.5 []) (alpha 0.01 [cm^-1])))
+(defhorizon Estrup_C1 FAO3
+  (clay 26.75 [%]) (silt 14.23 [%])(sand 59.02 [%])
+  (humus (C2OM (C 0.203 [%]))) (dry_bulk_density 1.73 [g/cm^3])
+  (hydraulic M_vG
+             (Theta_sat 34 [%]) (Theta_res 0.0 [%])
+             (n 1.1 []) (K_at_h -12 [cm] 0.3 [mm/h])
+             (l 0.5 []) (alpha 0.01 [cm^-1])))
 \end{verbatim}
 
 \subsubsection{C2}
 
 Daisy opsætning for C2 horizonten følger, med de hydrauliske
-egenskaber afbilledet på figur~\ref{fig:estrup-C2}.
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=\columnwidth]{fig/estrup-C2}
-  \end{center}
-  \caption{Hydrauliske egenskaber for Estrup C2.  GEUS med de af
-    GEUS anvendte parametre, HYPRES referere til parametre estimeret
-    med pedotransferfunktion.}
-  \label{fig:estrup-C2}
-\end{figure}
+egenskaber afbilledet på figur~\ref{fig:Estrup-C2}.
+\horfig{Estrup}{C2}
 \begin{verbatim}
-  (defhorizon Estrup_C2 FAO3
-    (clay 25.7 [%]) (silt 22.2 [%])(sand 52.1 [%])
-    (humus (C2OM (C 0.233 [%]))) (dry_bulk_density 1.64 [g/cm^3])
-    (hydraulic M_vG
-               (Theta_sat 40 [%]) (Theta_res 0.0 [%])
-               (n 1.1 []) (K_sat 0.5 [mm/h])
-               (l 0.5 []) (alpha 0.005 [cm^-1])))
+(defhorizon Estrup_C2 FAO3
+  (clay 25.7 [%]) (silt 22.2 [%])(sand 52.1 [%])
+  (humus (C2OM (C 0.233 [%]))) (dry_bulk_density 1.64 [g/cm^3])
+  (hydraulic M_vG
+             (Theta_sat 40 [%]) (Theta_res 0.0 [%])
+             (n 1.1 []) (K_at_h -10 [cm] 0.16 [mm/h])
+             (l 0.5 []) (alpha 0.005 [cm^-1])))
+\end{verbatim}
+
+\subsubsection{Yderligere jordlag}
+
+Som ved Silstrup tilføjer vi to ekstra jordlag.
+\begin{verbatim}
+(defhorizon Estrup_Ap_surface Estrup_Ap
+  (hydraulic original
+             ;; 10%
+             (K_at_h -5 [cm] 0.01 [mm/h])))
 \end{verbatim}
 
 \subsubsection{Profil}
@@ -733,60 +760,62 @@ eksistere alligevel.
 Jorprofilen angives sammen med den maksimale roddybde, som GEUS har
 oplyst er variabel, ned til 200 cm.  Vi har valgt 150 cm.
 \begin{verbatim}
-  (Soil (horizons ( -27.00 Estrup_Ap)
+  (Soil (horizons (  -3.00 Estrup_Ap_surface)
+                  ( -27.00 Estrup_Ap)
+                  ( -35.00 "Rorrende Bplow layer")
                   ( -55.00 Estrup_B)
                   (-105.00 Estrup_C1)
                   (-500.00 Estrup_C2))
-        (MaxRootingDepth 150 [cm]))
+        (MaxRootingDepth 150 [cm])))
 \end{verbatim}
 
 \subsection{Grundvand}
 
 Grundvandsstand taget fra P1 i filter 4.5 til 5 meters dybde.
 Simuleret og observeret (uden offset) grundvandstand kan ses på
-figur~\ref{fig:estrup-gw}.  The early measurements are manual and from 
+figur~\ref{fig:Estrup-gw}.  The early measurements are manual and from 
 \begin{figure}[htbp]
   \begin{center}
     \includegraphics[width=\columnwidth]{fig/estrup-gw}
   \end{center}
   \caption{Grundvandsstand for Estrup.}
-  \label{fig:estrup-gw}
+  \label{fig:Estrup-gw}
 \end{figure}
 
 \subsection{Jordvand}
 
 Jordvandsmålinger er fra S1. Resultaterne er vist på
-figur~\ref{fig:estrup-theta}.
+figur~\ref{fig:Estrup-theta}.
 \begin{figure}[htbp]
   \begin{center}
     \includegraphics[width=\columnwidth]{fig/estrup-theta-SW025cm}
   \end{center}
   \caption{Jordvand for målepunkt S1 i Estrup.}
-  \label{fig:estrup-theta}
+  \label{fig:Estrup-theta}
 \end{figure}
 
 \subsection{Sugekopper}
 
 Data for sugekopper er fra S1 og S2, og en meters dybde, og vist på
-figur~\ref{fig:estrup-sc-bromide}.
+figur~\ref{fig:Estrup-sc-bromide}.
 \begin{figure}[htbp]
   \begin{center}
     \includegraphics[width=\columnwidth]{fig/estrup-sc-bromide}
   \end{center}
   \caption{Bromid i jorden i en meters dybde ved S1 i Estrup.}
-  \label{fig:estrup-sc-bromide}
+  \label{fig:Estrup-sc-bromide}
 \end{figure}
 
 Der er desuden målt på pesticider i en vandrette skærm beliggende i
 3,5 meters dybde.  Ingen af disse målinger har dog vist
 koncentrationer over detektionsgrænsen.  De simulerede værdier kan ses
-på figur~\ref{fig:estrup-horizontal}.
+på figur~\ref{fig:Estrup-horizontal}.
 \begin{figure}[htbp]
   \begin{center}
     \includegraphics[width=\columnwidth]{fig/estrup-horizontal}
   \end{center}
   \caption{Pesticider i jorden i 3,5 meters dybde i Estrup.}
-  \label{fig:estrup-horizontal}
+  \label{fig:Estrup-horizontal}
 \end{figure}
 
 \subsection{Dræn og drænvand}
@@ -794,29 +823,29 @@ på figur~\ref{fig:estrup-horizontal}.
 Dræn er placeret 1.10 meter under jordoverfladen, og med variabel
 afstand (mellem 9 og 20 meter).  Den typiske afstand er dog ca. 13
 meter, hvilket er blevet brugt i Daisy opsætningen.
-Drænafstrømning er vist i figur~\ref{fig:estrup-drain}.
+Drænafstrømning er vist i figur~\ref{fig:Estrup-drain}.
 \begin{figure}[htbp]
   \begin{center}
     \includegraphics[width=\columnwidth]{fig/estrup-drain}
   \end{center}
   \caption{Drænafstrøming i Estrup.}
-  \label{fig:estrup-drain}
+  \label{fig:Estrup-drain}
 \end{figure}
-Akkumuleret drænafstrømning er vist i figur~\ref{fig:estrup-drain-acc}
+Akkumuleret drænafstrømning er vist i figur~\ref{fig:Estrup-drain-acc}
 sammen med perkolation og nettonedbør.
 \begin{figure}[htbp]
   \begin{center}
     \includegraphics[width=\columnwidth]{fig/estrup-drain-acc}
   \end{center}
   \caption{Akkumuleret drænafstrømning i Estrup.}
-  \label{fig:estrup-drain-acc}
+  \label{fig:Estrup-drain-acc}
 \end{figure}
 
 \subsection{Drænkoncentrationer}
 
 Ingen målinger af Dimethoate eller Fenpropimorph var oevr
 detektionsgrænsen.  Sammenligning af ugentlige udvaskninger kan ses på
-figur~\ref{fig:estrup-weekly}.
+figur~\ref{fig:Estrup-weekly}.
 \begin{figure}[htbp]
   \begin{center}
     \includegraphics[width=\columnwidth]{fig/estrup-Bromide-weekly}\\
@@ -825,11 +854,11 @@ figur~\ref{fig:estrup-weekly}.
     \includegraphics[width=\columnwidth]{fig/estrup-Glyphosate-weekly}\\
   \end{center}
   \caption{Weekly drain flow of Bromide and selected pesticides.}
-  \label{fig:estrup-weekly}
+  \label{fig:Estrup-weekly}
 \end{figure}
 GEUS tal er gjort arealrelative ved at dividere med drænarealet for
 Estrup. Den akkumulerede udvaskning kan ses på
-figur~\ref{fig:estrup-acc}.
+figur~\ref{fig:Estrup-acc}.
 \begin{figure}[htbp]
   \begin{center}
     \includegraphics[width=\columnwidth]{fig/estrup-Bromide-acc}\\
@@ -838,7 +867,45 @@ figur~\ref{fig:estrup-acc}.
     \includegraphics[width=\columnwidth]{fig/estrup-Glyphosate-acc}\\
   \end{center}
   \caption{Accumulated drain flow of Bromide and selected pesticides.}
-  \label{fig:estrup-acc}
+  \label{fig:Estrup-acc}
+\end{figure}
+
+På figur~\ref{fig:Estrup-leak150} ses simuleret udvaskningen ved 150
+cm dybde.  Det er 30 cm under de dybeste bioporer i opsætningen, og
+giver derfor et bud på hvor langt stofferne kan komme uden hjælp fra
+bioporer.
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=\columnwidth]{fig/estrup-leak150}\\
+    \includegraphics[width=\columnwidth]{fig/estrup-leak150acc}
+  \end{center}
+  \caption{Simuleret udvaskning i 150 cm, 30 cm under bioporer.}
+  \label{fig:Estrup-leak150}
+\end{figure}
+
+\subsection{Bioporer og kolloider}
+
+Udvaskning af kolloider, sam udveksling af vand mellem bioporer og
+matrix kan ses på figur~\ref{fig:Estrup-biopore}.  Der er tale om
+netto-udveksling, hvor bidrag fra matrix til bioporer tæller positivt,
+og bidrag fra bioporer til matrix tæller negativt.  Vi har valgt at se
+på fem forskellige lag. 1) Vand der ryger direkte fra overfladen til
+bioporer (Above surface).  2) Udveksling i de øverste 3 cm (Top soil).
+3) udveksling i resten af Ap horizonten (Ap).  Udveksling i pløjesålen
+(Plow pan). Udveksling under pløjesålen, ned til 50 cm (B50).  Der
+skelnes mellem bioporer som ender i matrix, og bioporer som ender
+direkte i dræn.
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=\columnwidth]{fig/estrup-colloid}\\
+    \includegraphics[width=\columnwidth]{fig/estrup-biopore}\\
+    \includegraphics[width=\columnwidth]{fig/estrup-biopore-acc}\\
+    \includegraphics[width=\columnwidth]{fig/estrup-biopore-drain}\\
+    \includegraphics[width=\columnwidth]{fig/estrup-biopore-drain-acc}
+  \end{center}
+  \caption{Kolloider i drænvand, samt bioporeaktivitet i 5 forskellige
+    jordlag.}
+  \label{fig:Estrup-biopore}
 \end{figure}
 
 \section{Kalibrering}
@@ -854,30 +921,7 @@ Den primære kalibreringsparameter for vand er \texttt{offset}, det der
 lægges til grundvandsmålingerne.  Denne parameter kan bruges til at få
 enten drænperiode eller drænmængde på plads.  Ofte kan man ikke få
 begge ting på plads samtidig, da drænperioden kan forlænges af
-heterogenitet, hvor kun dele af drænarealet bidrager.
-
-Efter kalibrering af vand fik vi for meget bromid (ca. det dobbelte af
-målingerne), hvilket er overraskende da vi normalt undervurderer
-stoftransporten.  Jeg har ingen god forklaring på dette.
-
-\subsection{Kolloider}
-
-Der kom praktisk taget ingen pesticider i drænsimuleringerne med en 1D
-opsætning uden bioporer, hvilket er forventeligt.  Desværre gav en 2D
-opsætning med bioporer og kolloidfacilteret transport samme resultat.
-
-Måske kan forklaringen ses i kolloidudvaskningen, figur~\ref{fig:colloids}?
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=\columnwidth]{fig/silstrup-colloid}\\
-    \includegraphics[width=\columnwidth]{fig/estrup-colloid}
-  \end{center}
-  \caption{Kolloider.}
-  \label{fig:colloids}
-\end{figure}
-
-For at få flere kolloider i silstrup prøvede at indsætte en pløjesål
-(fra Rørrende).  Det hjalp ikke.
+heterogenitet, hvor kun dele af drænarealet bidrager.  
 
 \addcontentsline{toc}{section}{\numberline{}References}
 \bibliography{../../txt/daisy}

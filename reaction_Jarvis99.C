@@ -176,23 +176,6 @@ ReactionJarvis99::initialize (const Units&, const Geometry& geo,
   daisy_assert (zi > 0.0);
 
   // Find average dry bulk density for top cells.
-#if 0
-  const std::vector<size_t>& edge_above = geo.cell_edges (Geometry::cell_above);
-  const size_t edge_above_size = edge_above.size ();
-  double total_area = 0.0;
-  rho_b = 0.0;
-  for (size_t i = 0; i < edge_above_size; i++)
-    {
-      const size_t edge = edge_above[i];
-      const size_t cell = geo.edge_other (edge, Geometry::cell_above);
-      // We weight them according to horizontal area.
-      const double area = geo.edge_area (edge) * geo.edge_sin_angle (edge);
-      total_area += area;
-      rho_b += soil.dry_bulk_density (cell) * area;
-    }
-  daisy_assert (total_area > 0.0);
-  rho_b /= total_area;
-#endif
   rho_b = geo.content_hood (soil, &Soil::dry_bulk_density, 
                             Geometry::cell_above);
   if (Mmax < 0.0)

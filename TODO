@@ -1,12 +1,16 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* VAP data 
+* VAP kørsel
 
-** estrup skal have offset lidt op
+** Opsætning
 
-** hvorfor er bromid så høj?
+*** Få bioporeklasser til at passe
 
-** Hvorfor kommer der så få kolloider?
+*** Kør uden overfladehorizont.
+
+** Se på resultat
+
+** Ret tekst til (tag højde for ny MACRO/Daisy retention kurve)
 
 * Artikler
 
@@ -23,7 +27,7 @@ SHA: Vent på Seyed artikel.
 * Agricultural Water Management
 
 5-6 pages, SAFIR, end of year
-1
+
 Framework for testing stomata models
 Integrating ABA production in the root zone (Fulai + Finn/Bo)
 

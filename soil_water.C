@@ -70,7 +70,7 @@ void
 SoilWater::drain (const std::vector<double>& v)
 {
   daisy_assert (S_sum_.size () == v.size ());
-  daisy_assert (S_root_.size () == v.size ());
+  daisy_assert (S_drain_.size () == v.size ());
   for (unsigned i = 0; i < v.size (); i++)
     {
       if (v[i] < -1e-8)

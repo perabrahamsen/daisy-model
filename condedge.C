@@ -235,9 +235,10 @@ struct CondedgePressure : public Condedge
       }
 
     // Gravity assisted downflow in large pores.
-    if (h_top_old > h_bottom && K_top > K_bottom)
+    if (h_top_old > h_bottom 
+        && h_top_old > h_lim
+        && K_top > K_bottom)
       {
-        daisy_assert (h_top_old > h_lim);
         const double K_lim = soil.K (c_bottom, h_lim, h_bottom_ice, T_bottom);
         const double K_harm_lim =  2.0 * K_lim * K_top / (K_lim + K_top);
         return std::max (K_harm_lim, K_harmonic);

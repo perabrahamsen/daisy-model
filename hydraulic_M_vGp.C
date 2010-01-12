@@ -163,15 +163,12 @@ change near maropores.\n\
 \n\
 p_m = (1/(-h X + 1))^f; h > h_m\n\
 p_m = (1/(-h_m X + 1))^f; h <= h_m\n\
-X = 1 cm^-1\n\
-\n\
-This function is described in ``Soil hydraulic properties near\n\
-saturation, an improved model'' by Boergesen et. al, submitted to\n\
-Water Resources Research 2003.")
+X = 1 cm^-1")
   { }
   void load_frame (Frame& frame) const
   { 
     Hydraulic::load_Theta_res (frame);
+    frame.set_strings ("cite", "MvGp");
     frame.declare ("K_sat", "cm/h", Check::non_negative (), Attribute::OptionalConst,
                 "Water conductivity of saturated soil.");
     frame.declare ("alpha", "cm^-1", Attribute::Const,

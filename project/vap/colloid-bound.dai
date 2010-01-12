@@ -4,7 +4,7 @@
 
 (defchemical "Bromide" common
   (diffusion_coefficient 2.0e-5 [cm^2/s])
-  (crop_uptake_reflection_factor 1 [])
+  (crop_uptake_reflection_factor 0.5 [])
   (canopy_dissipation_rate 0 [h^-1])
   (decompose_rate 0 [h^-1])
   (C_below const 0 [g/cm^3]))
@@ -128,6 +128,7 @@ carbon part of the 'K' factor.")
   (reaction Fenpropimorph-immobile-sorption
             Fenpropimorph-filter 
             Fenpropimorph-colloid-generation
+            Fenpropimorph-colloid-sorption
             ))
 
 ;;; Dimethoate
@@ -192,6 +193,7 @@ carbon part of the 'K' factor.")
   (reaction Dimethoate-immobile-sorption
             Dimethoate-filter 
             Dimethoate-colloid-generation
+            Dimethoate-colloid-sorption
             ))
 
 ;;; Glyphosate
@@ -257,7 +259,7 @@ carbon part of the 'K' factor.")
   (reaction Glyphosate-immobile-sorption
             Glyphosate-filter 
             Glyphosate-colloid-generation
-            ))
+            Glyphosate-colloid-sorption))
 
 ;;; Metamitron
 
@@ -321,7 +323,7 @@ carbon part of the 'K' factor.")
   (reaction Metamitron-immobile-sorption
             Metamitron-filter 
             Metamitron-colloid-generation
-            ))
+            Metamitron-colloid-sorption))
 
 (defsummary "Colloid bound sorption" balance
   "Balance between soil, colloid and solute forms."

@@ -653,8 +653,10 @@ Select::initialize (const Units& units, const Volume&,
   // Attempt to find convertion with new dimension.
   if (impl->spec.get () && !impl->spec_conv)
     {
-      if (units.can_convert (spec_dim, symbol (hour_dim)))
-        impl->spec_conv = &units.get_convertion (spec_dim, symbol (hour_dim));
+      // We must convert to hour_dim instead of new_dim, as the code
+      // already accumulate the values.
+      if (units.can_convert (spec_dim, hour_dim))
+        impl->spec_conv = &units.get_convertion (spec_dim, hour_dim);
     }
 
   // Use new dimension.
