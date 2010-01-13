@@ -22,7 +22,7 @@
            (density (plf x (range [m^-2])
                            (domain [cm])
                            (points (20 0)
-                                   (30 45))))))       
+                                   (30 23))))))       
            ; 5% af 190
                    
 (defbiopore "drain_2cm"
@@ -33,7 +33,7 @@
            (pipe_position -112.5 [cm])
            (density (plf x (range [m^-2])
                            (domain [cm])
-                           (points (20 45)
+                           (points (20 23)
                                    (30 0))))))
           ;; 5% af 190
 
@@ -44,7 +44,7 @@
            (density (plf x (range [m^-2])
                            (domain [cm])
                            (points (20 0)
-                                   (30 15))))))      
+                                   (30 7))))))      
            
 (defbiopore "drain_30cm"
    (drain  (height_start -30 [cm])
@@ -53,7 +53,7 @@
            (pipe_position -112.5 [cm])
            (density (plf x (range [m^-2])
                            (domain [cm])
-                           (points (20 15)
+                           (points (20 7)
                                    (30 0))))))
 
 (defmovement Rorrende rectangle

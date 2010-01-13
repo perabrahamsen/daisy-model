@@ -12,7 +12,9 @@
   (humus (C2OM (C 1.798 [%]))) (dry_bulk_density 1.48 [g/cm^3])
   (hydraulic MACRO
              (Theta_b 39 [%]) (Theta_res 0 [%])
-             (n 1.1 []) (K_b 0.1 [mm/h])
+             (n 1.1 []) 
+             ;; (K_b 0.1 [mm/h])
+             (K_b 1 [mm/h])
              (l 0.5 []) (alpha 0.01 [cm^-1])
              (Theta_sat 44 [%]) (K_sat 306 [mm/h]) (h_b -10 [cm]) (n_ma 3 [])))
 

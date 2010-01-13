@@ -1,6 +1,8 @@
 ;;; VAP simulations.
 
-(description "makroporer ikke til top, glyphosat colloid virker?")
+(declare ver String "Version number")
+
+(description "Høj ledningsevne i Ap horizonter (K_b 1.0 [mm/h]) i Silstrup og (K_b 0.5 [mm/h]) i Estrup.")
 
 (input file "tillage.dai")
 (input file "crop.dai")
