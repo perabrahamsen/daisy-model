@@ -98,7 +98,8 @@ struct BioporeMatrix : public Biopore
   void get_solute (IM&) const;
 
   // Simulation.
-  double capacity (const Geometry& geo, size_t e, const double dt /* [h] */)
+  double infiltration_capacity (const Geometry& geo, size_t e,
+                                const double dt /* [h] */)
     /* [cm] */ const;
   void infiltrate (const Geometry&, size_t e, double amount /* [cm] */,
                    double dt /* [h] */);
@@ -235,8 +236,13 @@ BioporeMatrix::get_solute (IM& im) const
 }
 
 double 
-BioporeMatrix::capacity (const Geometry& geo, size_t e, const double dt) const 
+BioporeMatrix::infiltration_capacity (const Geometry& geo, size_t e,
+                                      const double dt) const 
 {
+  // Any macropores that reach the surface.
+  if (height_start < 0.0)
+    return 0.0;
+
   // Maximum based on infiltration rate.
   const double max_infiltration // [cm/h]
     = max_infiltration_rate (geo, e) * dt; 

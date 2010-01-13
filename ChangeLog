@@ -1,3 +1,10 @@
+2010-01-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* biopore_drain.C, biopore_matrix.C, tertiary_biopores.C (capacity):
+	(infiltration_capacity): Renamed, no infiltration capacity for
+	biopores that does not reach the surface.
+	* tertiary_biopores.C (infiltrate): Update caller.
+
 2010-01-11  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* scope_soil.C (number): Adjust assertion to allow external cells.

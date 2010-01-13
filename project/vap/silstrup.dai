@@ -7,59 +7,56 @@
 
 ;; Soil 
 
-(defhorizon Silstrup_Ap FAO3
+(defhorizon Silstrup_Ap_MACRO FAO3
   (clay 22.45 [%]) (silt 27.7 [%])(sand 49.85 [%])
   (humus (C2OM (C 1.798 [%]))) (dry_bulk_density 1.48 [g/cm^3])
-  (hydraulic M_vG
-             (Theta_sat 39.2719 [%]) (Theta_res 0 [%])
-             (n 1.1 []) (K_at_h -10 0.1 [mm/h])
-             (l 0.5 []) (alpha 0.01 [cm^-1])))
-
-(defhorizon Silstrup_Ap_MACRO Silstrup_Ap
   (hydraulic MACRO
              (Theta_b 39 [%]) (Theta_res 0 [%])
              (n 1.1 []) (K_b 0.1 [mm/h])
              (l 0.5 []) (alpha 0.01 [cm^-1])
              (Theta_sat 44 [%]) (K_sat 306 [mm/h]) (h_b -10 [cm]) (n_ma 3 [])))
 
+(defhorizon Silstrup_Ap Silstrup_Ap_MACRO
+  (hydraulic original
+             (enable_Theta_macro false)
+             (enable_K_macro false)))
+
 (defhorizon Silstrup_Ap_surface Silstrup_Ap
   (hydraulic original
              ;; 50%
-             (K_at_h -10 0.05 [mm/h])))
+             (K_b 0.05 [mm/h])))
 
-(defhorizon Silstrup_B FAO3
+(defhorizon Silstrup_B_MACRO FAO3
   (clay 27.97 [%]) (silt 26.17 [%]) (sand 45.86 [%])
   (humus (C2OM (C 0.47 [%]))) (dry_bulk_density 1.61 [g/cm^3])
-  (hydraulic M_vG
-             (Theta_sat 38.383 [%]) (Theta_res 0 [%])
-             (n 1.13 []) (K_at_h -10 0.1 [mm/h])
-             (l 0.5 []) (alpha 0.012 [cm^-1])))
-
-(defhorizon Silstrup_B_MACRO Silstrup_B
   (hydraulic MACRO
              (Theta_b 38 [%]) (Theta_res 0 [%])
              (n 1.13 []) (K_b 0.1 [mm/h])
              (l 0.5 []) (alpha 0.012 [cm^-1])
              (Theta_sat 39 [%]) (K_sat 36 [mm/h]) (h_b -10 [cm]) (n_ma 3 [])))
 
+(defhorizon Silstrup_B Silstrup_B_MACRO
+  (hydraulic original
+             (enable_Theta_macro false)
+             (enable_K_macro false)))
+
 (defhorizon Silstrup_B_plow_pan Silstrup_B
   ;; 10% of original.
-  (hydraulic original (K_at_h -10 0.01 [mm/h])))
+  (hydraulic original (K_b 0.01 [mm/h])))
 
-(defhorizon Silstrup_C FAO3
+(defhorizon Silstrup_C_MACRO FAO3
   (clay 26.28 [%]) (silt 20.86 [%]) (sand 52.86 [%])
   (humus (C2OM (C 0.116 [%]))) (dry_bulk_density 1.75 [g/cm^3])
-  (hydraulic M_vG
-             (Theta_sat 33.2791 [%]) (Theta_res 0 [%])
-             (n 1.1 []) (K_at_h -10 0.1 [mm/h])
-             (l 0.5 []) (alpha 0.012 [cm^-1])))
-
-(defhorizon Silstrup_C_MACRO Silstrup_C
   (hydraulic MACRO
              (Theta_b 33 [%]) (Theta_res 0 [%])
              (n 1.1 []) (K_b 0.1 [mm/h])
              (l 0.5 []) (alpha 0.012 [cm^-1])
              (Theta_sat 34 [%]) (K_sat 19 [mm/h]) (h_b -10 [cm]) (n_ma 3 [])))
+
+(defhorizon Silstrup_C Silstrup_C_MACRO
+  (hydraulic original
+             (enable_Theta_macro false)
+             (enable_K_macro false)))
 
 (defcolumn Silstrup default
   ;; 1D
@@ -505,6 +502,15 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
 
 (defgnuplot sil-drainmass drainmass (area 1.69 [ha]))
 (defgnuplot sil-drainmass-acc drainmass-acc (area 1.69 [ha]))
+
+(defgnuplot Silstrup-hydraulics Station
+  (station Silstrup)
+  (graph "Retention Ap Silstrup"
+         "Conductivity Ap Silstrup"
+         "Retention B Silstrup"
+         "Conductivity B Silstrup"
+         "Retention C Silstrup"
+         "Conductivity C Silstrup"))
 
 (defgnuplot Silstrup Station
   (station Silstrup)

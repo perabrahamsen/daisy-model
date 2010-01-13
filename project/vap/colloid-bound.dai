@@ -91,8 +91,8 @@ carbon part of the 'K' factor.")
   (A Fenpropimorph-immobile)
   (B Fenpropimorph)
   (equilibrium linear (K K_Fenpropimorph))
-  (k_AB 5.0 [d^-1])                   ;Desorption rate.
-  (k_BA 5.0 [d^-1]))                  ;Sorption rate.
+  (k_AB 5.0 [h^-1])                   ;Desorption rate.
+  (k_BA 5.0 [h^-1]))                  ;Sorption rate.
 
 (defchemical Fenpropimorph-colloid Fenpropimorph-base
   "Fenpropimorph sorbed to colloids."
@@ -107,8 +107,8 @@ carbon part of the 'K' factor.")
   (secondary true)
   (surface true)
   (A Fenpropimorph-colloid)
-  (k_AB 5.0 [d^-1])                   ;Desorption rate.
-  (k_BA 5.0 [d^-1])                   ;Sorption rate.
+  (k_AB 5.0 [h^-1])                   ;Desorption rate.
+  (k_BA 5.0 [h^-1])                   ;Sorption rate.
   (equilibrium linear (K (K_Fenpropimorph (soil_enrichment_factor 100000 [])))))
 
 (defreaction Fenpropimorph-filter colloid-filter
@@ -156,8 +156,8 @@ carbon part of the 'K' factor.")
   (A Dimethoate-immobile)
   (B Dimethoate)
   (equilibrium linear (K K_Dimethoate))
-  (k_AB 5.0 [d^-1])                   ;Desorption rate.
-  (k_BA 5.0 [d^-1]))                  ;Sorption rate.
+  (k_AB 5.0 [h^-1])                   ;Desorption rate.
+  (k_BA 5.0 [h^-1]))                  ;Sorption rate.
 
 (defchemical Dimethoate-colloid Dimethoate-base
   "Dimethoate sorbed to colloids."
@@ -172,8 +172,8 @@ carbon part of the 'K' factor.")
   (secondary true)
   (surface true)
   (A Dimethoate-colloid)
-  (k_AB 5.0 [d^-1])                   ;Desorption rate.
-  (k_BA 5.0 [d^-1])                   ;Sorption rate.
+  (k_AB 5.0 [h^-1])                   ;Desorption rate.
+  (k_BA 5.0 [h^-1])                   ;Sorption rate.
   (equilibrium linear (K (K_Dimethoate (soil_enrichment_factor 100000 [])))))
 
 (defreaction Dimethoate-filter colloid-filter
@@ -221,8 +221,8 @@ carbon part of the 'K' factor.")
   (A Glyphosate-immobile)
   (B Glyphosate)
   (equilibrium linear (K K_Glyphosate))
-  (k_AB 5.0 [d^-1])                   ;Desorption rate.
-  (k_BA 5.0 [d^-1]))                  ;Sorption rate.
+  (k_AB 5.0 [h^-1])                   ;Desorption rate.
+  (k_BA 5.0 [h^-1]))                  ;Sorption rate.
 
 (defchemical Glyphosate-colloid Glyphosate-base
   "Glyphosate sorbed to colloids."
@@ -230,16 +230,15 @@ carbon part of the 'K' factor.")
   ;; Same diffusion coefficient as other colloids.
   (diffusion_coefficient 4.6e-6 [cm^2/s]))
 
-(defreaction Glyphosate-colloid-sorption equilibrium
+(defreaction Glyphosate-colloid-sorption Glyphosate-immobile-sorption
   "Sorption equilibrium between dissolved and colloid-bound Glyphosate."
   (colloid colloid)
   (primary true)
   (secondary true)
   (surface true)
   (A Glyphosate-colloid)
-  (B Glyphosate-colloid)
-  (k_AB 5.0 [d^-1])                   ;Desorption rate.
-  (k_BA 5.0 [d^-1])                   ;Sorption rate.
+  (k_AB 5.0 [h^-1])                   ;Desorption rate.
+  (k_BA 5.0 [h^-1])                   ;Sorption rate.
   (equilibrium linear (K (K_Glyphosate (soil_enrichment_factor 100000 [])))))
 
 (defreaction Glyphosate-filter colloid-filter
@@ -286,8 +285,8 @@ carbon part of the 'K' factor.")
   (A Metamitron-immobile)
   (B Metamitron)
   (equilibrium linear (K K_Metamitron))
-  (k_AB 5.0 [d^-1])                   ;Desorption rate.
-  (k_BA 5.0 [d^-1]))                  ;Sorption rate.
+  (k_AB 5.0 [h^-1])                   ;Desorption rate.
+  (k_BA 5.0 [h^-1]))                  ;Sorption rate.
 
 (defchemical Metamitron-colloid Metamitron-base
   "Metamitron sorbed to colloids."
@@ -302,8 +301,8 @@ carbon part of the 'K' factor.")
   (secondary true)
   (surface true)
   (A Metamitron-colloid)
-  (k_AB 5.0 [d^-1])                   ;Desorption rate.
-  (k_BA 5.0 [d^-1])                   ;Sorption rate.
+  (k_AB 5.0 [h^-1])                   ;Desorption rate.
+  (k_BA 5.0 [h^-1])                   ;Sorption rate.
   (equilibrium linear (K (K_Metamitron (soil_enrichment_factor 100000 [])))))
 
 (defreaction Metamitron-filter colloid-filter

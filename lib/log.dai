@@ -1448,6 +1448,7 @@ sum of all chemicals will be logged."
            (interval (path column "${column}" Chemistry "*" 
                            trace "${chemical}" S_decompose)
                      (tag "Decompose")
+                     (negate true)
                      (handle sum)
                      (dimension "g/ha/&")
                      (spec chemical default S_decompose))

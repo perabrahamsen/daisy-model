@@ -1,10 +1,12 @@
 ;;; VAP simulations.
 
+(description "makroporer ikke til top, glyphosat colloid virker?")
+
 (input file "tillage.dai")
 (input file "crop.dai")
 (input file "fertilizer.dai")
 (input file "chemistry.dai")
-(input file "log-std.dai")
+(input file "log.dai")
 
 (input file "colloid-bound.dai")
 
@@ -143,7 +145,9 @@
           ("Field water" (when daily)
            (where "log/${station}-field-water-daily.dlf"))
           ("Field water" (when hourly) 
-           (where "log/${station}-field-water-hourly.dlf"))))
+           (where "log/${station}-field-water-hourly.dlf"))
+          ("Surface water" (when hourly)
+           (where "log/${station}-surface-water.dlf"))))
 
 ;; Plots
 
@@ -546,15 +550,17 @@
 (input file "silstrup.dai")
 (input file "estrup.dai")
 
+(defprogram plothydro gnuplot
+  (graph Silstrup-hydraulics
+         Estrup-hydraulics
+         ))
+         
 (defprogram plotall gnuplot
   (graph Silstrup
          Estrup
          ))
          
-(run batch
-     (run Silstrup
-          Estrup 
-          plotall
-          ))
+(run batch (run Estrup Silstrup plotall))
+;; (run plothydro)
 
 ;;; vap.dai ends here.

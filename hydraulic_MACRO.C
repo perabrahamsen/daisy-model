@@ -52,15 +52,21 @@ class HydraulicMACRO : public Hydraulic
   const double Se_b;
   const double K_x_b;
   const double Theta_sat_fict; // Fictional Theta_sat for micropores.
+  const double pF_b;
 
   // Macropore conductivity.
   const double n_ma;
+
+  // Choose which to use.
+  const bool enable_Theta_macro;
+  const bool enable_K_macro;
 
   // Use.
 public:
   double Theta_micro (double h) const;
   double Theta (double h) const;
   double K (double h) const;
+  double Cw2_micro (double h) const;
   double Cw2 (double h) const;
   double h (double Theta) const;
   double M (double h) const;
@@ -74,7 +80,9 @@ private:
   {
     Hydraulic::initialize (texture, rho_b, top_soil, msg);
     std::stringstream tmp;
-    tmp << "Theta_sat_fict = " << Theta_sat_fict;
+    tmp << "Theta_sat_fict = " << Theta_sat_fict << " []";
+    if (!enable_K_macro)
+      tmp << "\nK_sat_fict = " << K (0.0) << " [cm/h]";
     msg.debug (tmp.str ());
   }
 public:
@@ -93,7 +101,7 @@ HydraulicMACRO::Theta (const double h) const
 {
   // Micropores only.
   const double Theta_mi = Theta_micro (h);
-  if (h < h_b)
+  if (h < h_b || !enable_Theta_macro)
     return Theta_mi;
 
   // Scale macropores.
@@ -103,14 +111,14 @@ HydraulicMACRO::Theta (const double h) const
 double 
 HydraulicMACRO::K (const double h) const
 {
-  if (h >= 0.0)
+  if (h >= 0.0 && enable_K_macro)
     return K_sat;
 
-  const double Se_h = Se (h);
+  const double Se_h = Se (std::min (h, 0.0));
   const double K_mi = K_b * pow (Se_h / Se_b, l)
     * pow ((1.0 - pow (1.0 - pow (Se_h, 1.0/m), m)) / K_x_b, 2.0);
   
-  if (h < h_b)
+  if (h < h_b || !enable_K_macro)
     return K_mi;
 
   const double K_ma = (K_sat - K_b) * std::pow (S_ma (h), n_ma);
@@ -119,13 +127,32 @@ HydraulicMACRO::K (const double h) const
 }
 
 double 
+HydraulicMACRO::Cw2_micro (const double h) const
+{
+  return - (  (Theta_sat_fict - Theta_res)
+	      * (m * (  pow (1.0 / (1.0 + pow (a * h, n)), m - 1.0)
+                        * (n * (pow (a * h, n - 1.0) * a))))
+	      / pow (1.0 + pow(a * h, n), 2.0));
+}
+
+double 
 HydraulicMACRO::Cw2 (const double h) const
 {
+  // Macropores?
+  if (enable_Theta_macro)
+    {
+      if (h < h_b)
+        return Cw2_micro (h);
+      static const double ln10 = std::log (10.0);
+      if (h < -1.0)
+        return (Theta_sat - Theta_b) / (h * ln10);
+      
+      return 0.0;
+    }
+  
+  // Micropores only.
   if (h < 0.0)
-    return - (  (Theta_sat_fict - Theta_res)
-	      * (m * (  pow (1.0 / (1.0 + pow (a * h, n)), m - 1.0)
-		      * (n * (pow (a * h, n - 1.0) * a))))
-	      / pow (1.0 + pow(a * h, n), 2.0));
+    return Cw2_micro (h);
   else
     return 0.0;
 }
@@ -134,12 +161,19 @@ double
 HydraulicMACRO::h (const double Theta) const
 {
   daisy_assert (Theta_res <= Theta);
-  if (Theta < Theta_sat_fict)
-    return pow (pow (Theta_res / (Theta_res - Theta_sat_fict) 
-                     + Theta / (Theta_sat_fict - Theta_res), -1.0 / m)
-                - 1.0, 1.0 / n) / a;
-  else
-    return 0.0;
+  if (Theta < Theta_b || !enable_Theta_macro)
+    {
+      if (Theta < Theta_sat_fict)
+        return pow (pow (Theta_res / (Theta_res - Theta_sat_fict) 
+                         + Theta / (Theta_sat_fict - Theta_res), -1.0 / m)
+                    - 1.0, 1.0 / n) / a;
+      else
+        return 0.0;
+    }
+  
+  // Theta = Theta_b + (Theta_sat - Theta_b) * (1.0 - pF / pF_b);
+  const double pF = pF_b * (Theta - Theta_sat) / (Theta_b - Theta_sat);
+  return pF2h (pF);
 }
 
 double 
@@ -163,7 +197,6 @@ HydraulicMACRO::S_ma (double h) const
     return 1.0;
 
   const double pF = h2pF (h);
-  const double pF_b = h2pF (h_b);
   // Scale linearly between.
   const double S = 1.0 - pF / pF_b;
   daisy_assert (S >= 0.0);
@@ -191,16 +224,24 @@ HydraulicMACRO::HydraulicMACRO (const BlockModel& al)
     Se_b (Se (h_b)),
     K_x_b (1.0 - std::pow (1.0 - std::pow (Se_b, 1.0/m), m)),
     Theta_sat_fict (Theta_res + (Theta_b - Theta_res) / Se_b),
-    n_ma (al.number ("n_ma"))
+    pF_b (h2pF (h_b)),
+    n_ma (al.number ("n_ma")),
+    enable_Theta_macro (al.flag ("enable_Theta_macro")),
+    enable_K_macro (al.flag ("enable_K_macro"))
 { 
   daisy_approximate (Theta_micro (h_b), Theta_b);
   daisy_approximate (Theta (h_b), Theta_b);
   daisy_approximate (h_b, h (Theta_b));
-  daisy_approximate (K_sat, K (0.0));
+  if (enable_K_macro)
+    daisy_approximate (K_sat, K (0.0));
+    
   daisy_assert (Theta_sat_fict <= Theta_sat);
   daisy_assert (Theta_sat_fict >= Theta_b);
   daisy_approximate (Theta_sat_fict, Theta_micro (0.0));
-  daisy_approximate (Theta_sat, Theta (0.0));
+  if (enable_Theta_macro)
+    daisy_approximate (Theta_sat, Theta (0.0));
+  else
+    daisy_approximate (Theta_sat_fict, Theta (0.0));
   daisy_approximate (1.0, S_ma (0.0));
   daisy_approximate (1.0, 1.0 + S_ma (h_b));
 }
@@ -244,6 +285,12 @@ Water content at boundary point.");
 Water conductivity at boundary point.");
     frame.declare ("n_ma", Attribute::None (), Attribute::Const,
                    "Macropore size distribution factor.");
+    frame.declare_boolean ("enable_K_macro", Attribute::Const, "\
+Include contribution from macropores in conductivity curve.");
+    frame.set ("enable_K_macro", true);
+    frame.declare_boolean ("enable_Theta_macro", Attribute::Const, "\
+Include contribution from macropores in retention curve.");
+    frame.set ("enable_Theta_macro", true);
   }
 } hydraulicMACRO_syntax;
 

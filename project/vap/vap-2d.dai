@@ -63,28 +63,12 @@
 ;;;                (v+h))
   (drain (-110 [cm] 1 [cm]))
   (Tertiary (biopores 
-             (use_small_timesteps false)
+             ;; (use_small_timesteps false)
+             (pond_max 5 [mm])
              (classes ("matrix_0cm") 
                       ("matrix_2cm")
                       ("drain_2cm")
                       ("matrix_30cm")
                       ("drain_30cm")))))
-
-(defhorizon "Rorrende Bplow layer" USDA3
-  (description "25-33 cm Petersen et al (2004)")
-  (clay 0.148)(silt 0.214)(sand 0.638) (humus 0.016)
-  (dry_bulk_density 1.70 [g/cm^3])
-  (anisotropy 12)
-  (hydraulic M_vG (Theta_res 0.00)
-                  (Theta_sat 0.339353)
-                  (alpha 0.0465371)
-                  (n 1.19395)
-                  ;;(K_sat 0.000925 [cm/h])
-                  ;;(K_sat 0.00925 [cm/h])
-                  (K_sat 0.0925 [cm/h])
-                  (l -2.92948))
-  (secondary_domain pressure 
-                  (h_lim 1.2 [pF])
-                  (alpha 0.01 [h^-1])))                
 
 ;;; vap-2d.dai

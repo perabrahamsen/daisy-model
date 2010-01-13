@@ -89,7 +89,7 @@ struct TertiaryBiopores : public Tertiary, public Tertsmall
   int deactivate_steps;         // Number of timesteps tertiary is deactivated.
   
   // Infiltration.
-  double capacity (const Geometry&, size_t e, double dt); // Max flux.
+  double infiltration_capacity (const Geometry&, size_t e, double dt);
   void infiltrate (const Geometry&, size_t e, double amount, double dt);
   void clear ();
 
@@ -166,12 +166,12 @@ TertiaryBiopores::set_state (const Anystate& state)
 }
 
 double
-TertiaryBiopores::capacity (const Geometry& geo, size_t e, const double dt)
+TertiaryBiopores::infiltration_capacity (const Geometry& geo, size_t e, const double dt)
 {
   double sum = 0.0; 
   const size_t classes_size = classes.size ();
   for (size_t b = 0; b < classes_size; b++)
-    sum += classes[b]->capacity (geo, e, dt);
+    sum += classes[b]->infiltration_capacity (geo, e, dt);
   return sum;
 }
 
@@ -186,7 +186,7 @@ TertiaryBiopores::infiltrate (const Geometry& geo, const size_t e,
   double total_density = 0.0;
   const size_t classes_size = classes.size ();
   for (size_t b = 0; b < classes_size; b++)
-    total_density += classes[b]->density (cell);
+    total_density += classes[b]->top_density (cell);
   
   // We divide the water relative to the biopore density.  However,
   // some biopores may not be able to contain their share of the
@@ -207,7 +207,7 @@ TertiaryBiopores::infiltrate (const Geometry& geo, const size_t e,
         return;
 
       Biopore& biopore = *(*i);
-      const double density = biopore.density (cell);
+      const double density = biopore.top_density (cell);
       if (!std::isnormal (density))
         {
           // No macropores here.
@@ -217,7 +217,7 @@ TertiaryBiopores::infiltrate (const Geometry& geo, const size_t e,
 
       daisy_assert (total_density > 0.0);
       const double share = amount * density / total_density;
-      const double capacity = biopore.capacity (geo, e, dt);
+      const double capacity = biopore.infiltration_capacity (geo, e, dt);
       if (capacity <= share)
         {
           // Insuffient space, fill it up.  
@@ -246,7 +246,7 @@ TertiaryBiopores::infiltrate (const Geometry& geo, const size_t e,
        i++)
     {
       Biopore& biopore = *(*i);
-      const double density = biopore.density (cell);
+      const double density = biopore.top_density (cell);
       if (!std::isnormal (density))
         // No macropores here.
         continue;
@@ -297,8 +297,9 @@ TertiaryBiopores::tick (const Units&, const Geometry& geo, const Soil& soil,
             = geo.cell_is_internal (geo.edge_to (edge)) ? 1.0 : -1.0;
           const double max_surface 
             = in_sign * surface.q_top (geo, edge, dt) * dt;
-          const double flux_in = std::min (capacity (geo, edge, dt), 
-                                           max_surface) / dt;
+          const double flux_in
+            = std::min (infiltration_capacity (geo, edge, dt), 
+                        max_surface) / dt;
           q_tertiary[edge] = in_sign * flux_in;
         }
     }
@@ -520,14 +521,14 @@ TertiaryBiopores::solute (const Geometry& geo, const SoilWater& soil_water,
       double total_density = 0.0;
       const size_t classes_size = classes.size ();
       for (size_t b = 0; b < classes_size; b++)
-        total_density += classes[b]->density (cell);
+        total_density += classes[b]->top_density (cell);
       daisy_assert (total_density > 0.0);
 
       // Give each class its share.
       for (size_t b = 0; b < classes.size (); b++)
         {
           Biopore& biopore = *classes[b];
-          const double density = biopore.density (cell);
+          const double density = biopore.top_density (cell);
           const double share = total_in * density / total_density;
           biopore.solute_infiltrate (chem, geo, edge, share, dt);
         }

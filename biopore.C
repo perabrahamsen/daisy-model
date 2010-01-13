@@ -105,6 +105,15 @@ Biopore::solute_infiltrate (const symbol chem,
                                  amount / total_area / dt);
 }
 
+double 
+Biopore::top_density (const size_t c) const
+{
+  if (height_start < 0.0)
+    return 0.0;
+  
+  return density (c);
+}
+
 void 
 Biopore::clear ()
 { 

@@ -79,9 +79,12 @@ protected:
 public:
   virtual double total_water () const = 0;
   virtual void get_solute (IM& im) const = 0;
+protected:
   double density (const size_t c) const
   { return density_cell[c]; }
-  virtual double capacity (const Geometry&, size_t e, double dt) 
+public:
+  double top_density (const size_t c) const;
+  virtual double infiltration_capacity (const Geometry&, size_t e, double dt) 
     /* [cm] */ const = 0;
   virtual void infiltrate (const Geometry&, size_t e,
                            double amount /* [cm] */, double dt /* [h] */);
