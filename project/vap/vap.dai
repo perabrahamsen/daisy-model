@@ -1,6 +1,8 @@
 ;;; VAP simulations.
 
-(declare ver String "Version number")
+(description "vap001
+Høj K_b i Ap i begge marker.
+Fix bioporeinfiltration i daisy.exe.")
 
 (description "Høj ledningsevne i Ap horizonter (K_b 1.0 [mm/h]) i Silstrup og (K_b 0.5 [mm/h]) i Estrup.")
 

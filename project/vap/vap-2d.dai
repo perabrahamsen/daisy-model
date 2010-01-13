@@ -64,7 +64,7 @@
   (drain (-110 [cm] 1 [cm]))
   (Tertiary (biopores 
              ;; (use_small_timesteps false)
-             (pond_max 5 [mm])
+             ;; (pond_max 5 [mm])
              (classes ("matrix_0cm") 
                       ("matrix_2cm")
                       ("drain_2cm")
