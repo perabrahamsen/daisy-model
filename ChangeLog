@@ -1,5 +1,8 @@
 2010-01-13  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* biopore.C, biopore.h (top_density): New function.
+	* tertiary_biopores.C (infiltrate, solute): Use it.
+
 	* biopore_drain.C, biopore_matrix.C, tertiary_biopores.C (capacity):
 	(infiltration_capacity): Renamed, no infiltration capacity for
 	biopores that does not reach the surface.
