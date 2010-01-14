@@ -550,6 +550,7 @@ MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
                         const double dt,
                         const Scope& scope, Treelog& msg)
 {
+  daisy_assert (std::isfinite (J_above));
   const size_t cell_size = geometry ().cell_size ();
 
   // Source term transfered from secondary to primary domain.
