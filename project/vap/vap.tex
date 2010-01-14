@@ -62,14 +62,17 @@ filen \texttt{vap.dai}.
 \subsection{Kolloider, bioporer og diskretisering}
 
 Vi har ikke fået nogen data om bioporer eller kolloider for de berørte
-arealer, og har derfor valgt at bruge data fra agrovand projektet.
-Disse kan findes i opsætningsfilen \texttt{vap-2d.dai}.  I
-opæstningsfilerne for de enkelte vap områder indgår de sammen med
-diskretiseringen i beskrivelsen af den enkelte søjle, for eksempel:
+arealer.  For bioporer har vi valgt at bruge optælling fra Rørrende
+\citep{habekost1} fra dette projekt. Disse kan findes i
+opsætningsfilen \texttt{vap-2d.dai}.  For kolloider har vi valgt at
+bruge en opsætning baseret på data fra agrovand projektet, som kan
+findes i filen \texttt{colloid-bound.dai} sammen med definition af
+pesticider.  I opæstningsfilerne for de enkelte vap områder indgår de
+sammen med diskretiseringen i beskrivelsen af den enkelte søjle, for
+eksempel:
 \begin{verbatim}
   (Movement Rorrende
             (Tertiary (biopores 
-                       (use_small_timesteps false)
                        (classes ("matrix_0cm" (height_end -31 [cm])) 
                                 ("matrix_2cm")
                                 ("drain_2cm")

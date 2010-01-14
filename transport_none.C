@@ -26,6 +26,7 @@
 #include "submodeler.h"
 #include "memutils.h"
 #include "librarian.h"
+#include "mathlib.h"
 #include <sstream>
 
 struct TransportNone : public Transport
@@ -81,6 +82,7 @@ TransportNone::flow (const Geometry& geo,
       const size_t edge = (*i).first;
       const double flow = (*i).second;
       J[edge] = flow;
+      daisy_assert (std::isfinite (J[edge]));
 
       const double amount = flow * geo.edge_area (edge) * dt;
 

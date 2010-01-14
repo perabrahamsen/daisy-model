@@ -187,6 +187,8 @@ TransportConvection::flow (const Geometry& geo,
           if (geo.cell_is_internal (to))
             M[to] += value / geo.cell_volume (to);
 
+          daisy_assert (std::isfinite (J[e]));
+          daisy_assert (std::isfinite (dJ[e]));
           J[e] += dJ[e] * ddt / dt;
         }
 

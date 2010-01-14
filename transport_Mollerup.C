@@ -748,6 +748,7 @@ TransportMollerup::forced_flux (const Geometry& geo,
     {
       const size_t edge = (*i).first;
       const double flux = (*i).second;
+      daisy_assert (std::isfinite (flux));
 
       const int from = geo.edge_from (edge);
       const int to = geo.edge_to (edge);
@@ -804,7 +805,7 @@ TransportMollerup::fluxes (const GeometryRect& geo,
               : 1.0 - upstream_weight;
             dJ[e] = q_edge[e] * (alpha * C[from] + (1.0-alpha) * C[to]);
             //mmo1 dJ[e] = 0.0;
-
+            daisy_assert (std::isfinite (dJ[e]));
             //--- Diffusive part - xx_zz --- 
             //const double gradient = geo.edge_area_per_length (e) *
             //  (C[to] - C[from]);
@@ -812,6 +813,7 @@ TransportMollerup::fluxes (const GeometryRect& geo,
               / geo.edge_length (e);
 
             dJ[e] -= ThetaD_xx_zz[e]*gradient;  //xx_zz diffusion
+            daisy_assert (std::isfinite (dJ[e]));
                       
             //--- Diffusive part - xz_zx ---
             const std::vector<int>& corners = geo.edge_corners (e);
@@ -863,6 +865,7 @@ TransportMollerup::fluxes (const GeometryRect& geo,
               : Sum_C_B / 4.0;
            
             dJ[e] += magnitude * (C_B-C_A) * sign;
+            daisy_assert (std::isfinite (dJ[e]));
           }
           break;
 
@@ -873,6 +876,7 @@ TransportMollerup::fluxes (const GeometryRect& geo,
             daisy_assert (f != J_forced.end ());
             daisy_assert ((*f).first == e);
             const double J_force = (*f).second;
+            daisy_assert (std::isfinite (J_force));
             dJ[e] = J_force;
           }
           break;
@@ -885,6 +889,7 @@ TransportMollerup::fluxes (const GeometryRect& geo,
             daisy_assert ((*f).first == e);
             const double C_other = (*f).second;
             dJ[e] = q_edge[e] * C_other; 
+            daisy_assert (std::isfinite (dJ[e]));
           }
           break;
           
@@ -894,6 +899,7 @@ TransportMollerup::fluxes (const GeometryRect& geo,
             daisy_assert (cell >= 0);
             daisy_assert (cell < C.size ());
             dJ[e] = q_edge[e] * C[cell];
+            daisy_assert (std::isfinite (dJ[e]));
           }
           break;
           
@@ -907,6 +913,7 @@ TransportMollerup::fluxes (const GeometryRect& geo,
               = geo.cell_is_internal (geo.edge_to (e)) ? 1.0 : -1.0;
 
             dJ[e] = -in_sign * B_dir_vec (cell) / geo.edge_area (e); 
+            daisy_assert (std::isfinite (dJ[e]));
 
             /*
             //Advective transport
@@ -1316,8 +1323,11 @@ TransportMollerup::flow (const Geometry& geo_base,
               C_gamma, J_forced, C_border, B_dir_vec, dJ); 
             
       for (int e=0; e<edge_size; e++)
-        J[e] += dJ[e] * ddt/dt;
-            
+        {
+          daisy_assert (std::isfinite (J[e]));
+          daisy_assert (std::isfinite (dJ[e]));
+          J[e] += dJ[e] * ddt/dt;
+        } 
       //Update Theta and QTheta
       Theta_cell_n = Theta_cell_np1;
       QTheta_mat_n = QTheta_mat_np1;

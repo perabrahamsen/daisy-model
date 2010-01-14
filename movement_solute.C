@@ -622,8 +622,13 @@ MovementSolute::solute (const Soil& soil, const SoilWater& soil_water,
   // Fully adsorbed primary transport.
   if (chemical.adsorption ().full ())
     {
-      daisy_assert (iszero (J_above));
       Treelog::Open nest (msg, "solid " + matrix_solid->library_id ());
+      if (!iszero (J_above))
+        {
+          std::ostringstream tmp;
+          tmp << "J_above = " << J_above << ", expected 0 for full sorbtion";
+          msg.error (tmp.str ());
+        }
       primary_transport (geometry (), soil, soil_water,
                          *matrix_solid, J_primary, C_border,
                          chemical, S_extra, dt, scope, msg);
