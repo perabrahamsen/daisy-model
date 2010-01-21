@@ -2,17 +2,43 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 * VAP kørsel
 
-** Opsætning
+** commit reference setup
 
-*** Glyphosat adsorption
+** check that it works
 
-*** Ingen makroporer til top
+** dokumenter ændringer
 
-*** Check surface balance
+** 1D 2-søjle setup
 
-** Se på resultat
+** test: disable desorption fra kolloider
 
-** Ret tekst til (tag højde for ny MACRO/Daisy retention kurve)
+** test: SEF=1000
+
+** ret leak150 (sæt bromid i sin egen graf)
+
+* Mikkel 
+
+** Commit ændringer til agrovand
+
+** USB stick med al relevant materialle
+
+** Læg dokumentation under versionskontrol (numeric + figs)
+
+* 2D roots
+
+** beskriv dataset
+
+** vælg data
+
+** udtræk data
+
+** lav opsætning
+
+** kør opsætning
+
+** grafer og tabeller med resultater
+
+** diskussion
 
 * Artikler
 

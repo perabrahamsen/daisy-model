@@ -1860,7 +1860,8 @@ groundwater_extern${OBJ}: groundwater_extern.C groundwater.h model_derived.h \
 transport_none${OBJ}: transport_none.C transport.h model.h symbol.h \
   geometry.h attribute.h soil.h adsorption.h model_derived.h \
   model_logable.h submodeler.h block_submodel.h block_nested.h block.h \
-  scope.h treelog.h frame_submodel.h frame.h memutils.h librarian.h
+  scope.h treelog.h frame_submodel.h frame.h memutils.h librarian.h \
+  mathlib.h assertion.h
 uzrect_Mollerup${OBJ}: uzrect_Mollerup.C uzrect.h model_framed.h \
   model_logable.h model.h symbol.h geometry_rect.h geometry_vert.h \
   geometry.h attribute.h soil.h soil_water.h soil_heat.h groundwater.h \

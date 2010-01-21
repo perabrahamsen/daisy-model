@@ -802,7 +802,12 @@ TransportMollerup::fluxes (const GeometryRect& geo,
             //--- Advective part ---
             const double alpha = (q_edge[e] >= 0) 
               ? upstream_weight 
-              : 1.0 - upstream_weight;
+              : 1.0 - upstream_weight; 
+            daisy_assert (std::isfinite (q_edge[e]));
+            daisy_assert (std::isfinite (alpha));
+            if (!std::isfinite (C[from]))
+              throw "Non-finite solution";
+            daisy_assert (std::isfinite (C[to]));
             dJ[e] = q_edge[e] * (alpha * C[from] + (1.0-alpha) * C[to]);
             //mmo1 dJ[e] = 0.0;
             daisy_assert (std::isfinite (dJ[e]));
@@ -1313,7 +1318,7 @@ TransportMollerup::flow (const Geometry& geo_base,
       ublas::vector<double> C_nm1 = C_n; //save results from old small timestep for flux est.
             
       solver->solve (A, b, C_n); // Solve A C_n = b with regard to C_n.
-      
+
       //Update fluxes 
       ublas::vector<double> C_gamma (cell_size);
       C_gamma = gamma * C_nm1 + (1-gamma) * C_n;

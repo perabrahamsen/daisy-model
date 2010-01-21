@@ -87,6 +87,7 @@ void
 Biopore::infiltrate (const Geometry& geo, size_t e,
                      const double amount, const double dt)
 {
+  daisy_assert (std::isfinite (amount));
   const double edge_area = geo.edge_area (e);
   const double total_area = geo.surface_area ();
   const double edge_flux = amount / dt;
@@ -100,6 +101,7 @@ Biopore::solute_infiltrate (const symbol chem,
                             const double amount /* [g] */, 
                             const double dt)
 {
+  daisy_assert (std::isfinite (amount));
   const double total_area = geo.surface_area ();
   solute_infiltration.add_value (chem, solute_infiltration.unit (), 
                                  amount / total_area / dt);

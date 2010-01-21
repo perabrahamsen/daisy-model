@@ -690,8 +690,9 @@ Maximum height of ponding before spilling into biopores.\n\
 After macropores are activated pond will have this height.");
     frame.set ("pond_max", 0.05);
     frame.declare_boolean ("use_small_timesteps", Attribute::Const,
-                "True iff the sink is allowed to change within a timestep.");
-    frame.set ("use_small_timesteps", true);
+                "True iff the sink is allowed to change within a timestep.\n\
+This is only supported by the 'Mollerup' model.");
+    frame.set ("use_small_timesteps", false);
     frame.declare_boolean ("active", Attribute::OptionalState,
                 Attribute::SoilCells, "Active biopores in cells.");
     frame.declare ("water_volume", "cm^3", Attribute::LogOnly, "Water volume.");    

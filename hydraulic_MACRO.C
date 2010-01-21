@@ -52,6 +52,7 @@ class HydraulicMACRO : public Hydraulic
   const double Se_b;
   const double K_x_b;
   const double Theta_sat_fict; // Fictional Theta_sat for micropores.
+  const double K_sat_fict;     // Fictional K_sat for micropores.
   const double pF_b;
 
   // Macropore conductivity.
@@ -65,6 +66,8 @@ class HydraulicMACRO : public Hydraulic
 public:
   double Theta_micro (double h) const;
   double Theta (double h) const;
+  double K_micro (double h) const;
+  double K_fict (double h) const;
   double K (double h) const;
   double Cw2_micro (double h) const;
   double Cw2 (double h) const;
@@ -81,8 +84,7 @@ private:
     Hydraulic::initialize (texture, rho_b, top_soil, msg);
     std::stringstream tmp;
     tmp << "Theta_sat_fict = " << Theta_sat_fict << " []";
-    if (!enable_K_macro)
-      tmp << "\nK_sat_fict = " << K (0.0) << " [cm/h]";
+    tmp << "\nK_sat_fict = " << K_sat_fict << " [cm/h]";
     msg.debug (tmp.str ());
   }
 public:
@@ -108,16 +110,35 @@ HydraulicMACRO::Theta (const double h) const
   return Theta_b + (Theta_sat - Theta_b) * S_ma (h);
 }
 
+double
+HydraulicMACRO::K_micro (const double h) const
+{
+  const double Se_h = Se (std::min (h, 0.0));
+  const double K_mi = K_b * pow (Se_h / Se_b, l)
+    * pow ((1.0 - pow (1.0 - pow (Se_h, 1.0/m), m)) / K_x_b, 2.0);
+  return K_mi;
+}
+
+double 
+HydraulicMACRO::K_fict (const double h) const
+{
+  if (h < 0.0)
+    {
+      const double Se_h = Se (h);
+      return K_sat_fict * pow (Se_h, l)
+	* pow (1.0 - pow (1.0 - pow (Se_h, 1.0/m), m), 2.0);
+    }
+  else
+    return K_sat_fict;
+}
+
 double 
 HydraulicMACRO::K (const double h) const
 {
   if (h >= 0.0 && enable_K_macro)
     return K_sat;
 
-  const double Se_h = Se (std::min (h, 0.0));
-  const double K_mi = K_b * pow (Se_h / Se_b, l)
-    * pow ((1.0 - pow (1.0 - pow (Se_h, 1.0/m), m)) / K_x_b, 2.0);
-  
+  const double K_mi = K_micro (h);
   if (h < h_b || !enable_K_macro)
     return K_mi;
 
@@ -224,6 +245,7 @@ HydraulicMACRO::HydraulicMACRO (const BlockModel& al)
     Se_b (Se (h_b)),
     K_x_b (1.0 - std::pow (1.0 - std::pow (Se_b, 1.0/m), m)),
     Theta_sat_fict (Theta_res + (Theta_b - Theta_res) / Se_b),
+    K_sat_fict (K_micro (0.0)),
     pF_b (h2pF (h_b)),
     n_ma (al.number ("n_ma")),
     enable_Theta_macro (al.flag ("enable_Theta_macro")),
@@ -234,7 +256,10 @@ HydraulicMACRO::HydraulicMACRO (const BlockModel& al)
   daisy_approximate (h_b, h (Theta_b));
   if (enable_K_macro)
     daisy_approximate (K_sat, K (0.0));
-    
+  else
+    daisy_approximate (K_sat_fict, K (0.0));
+  daisy_approximate (K_micro (-1000.0), K_fict (-1000.0));
+  daisy_approximate (K_micro (-10.0), K_fict (-10.0));
   daisy_assert (Theta_sat_fict <= Theta_sat);
   daisy_assert (Theta_sat_fict >= Theta_b);
   daisy_approximate (Theta_sat_fict, Theta_micro (0.0));

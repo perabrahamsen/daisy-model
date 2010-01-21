@@ -584,8 +584,7 @@ UZRichard::richard (Treelog& msg,
 
   // Check upper boundary.
   daisy_assert (top_type == Surface::soil
-                || approximate (h_top,
-                                available_water - top_water));
+                || balance (h_top, available_water, top_water));
 
   // We know flux on upper border, use mass preservation to
   // calculate flux below given the change in water content.

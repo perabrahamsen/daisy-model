@@ -101,6 +101,7 @@ struct BioporeMatrix : public Biopore
   double infiltration_capacity (const Geometry& geo, size_t e,
                                 const double dt /* [h] */)
     /* [cm] */ const;
+
   void infiltrate (const Geometry&, size_t e, double amount /* [cm] */,
                    double dt /* [h] */);
   void solute_infiltrate (const symbol chem, 
