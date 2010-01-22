@@ -40,7 +40,7 @@ Tertiary::library_id () const
 }
 
 Tertiary::Tertiary (const BlockModel& al)
-  : ModelFramed (al)
+  : ModelDerived (al.type_name ())
 { }
 
 Tertiary::~Tertiary ()

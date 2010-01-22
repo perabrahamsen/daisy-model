@@ -74,29 +74,6 @@
              (enable_K_macro false)))
 
 (defcolumn Estrup default
-  ;; 1D
-  ;; (Movement original 
-  ;;           (Tertiary pipes
-  ;;                     (L 13 [m])
-  ;;                     (pipe_position -110.0 [cm])))
-  ;; 2D
-  (Movement Rorrende
-            (Tertiary (biopores 
-                       (use_small_timesteps false)
-                       (pond_max 5 [mm])
-                       (classes ("matrix_0cm" (height_end -27 [cm])) 
-                                ("matrix_2cm")
-                                ("drain_2cm")
-                                ("matrix_30cm" (height_start -30 [cm]))
-                                ("drain_30cm" (height_start -30 [cm])))))
-            ;;(matrix_water (Mollerup (K_average pressure (h_lim -5 [cm])))
-            ;;              &old)
-            (Geometry (zplus -1.5 -3
-                             -5 -10 -20 -25 -27 
-                             -30 -35 -40 -50 
-                             -70 -90 -105 
-                             -115 -150 -200 -275 -350 -425 -500 [cm])
-                      (xplus 10 25 50 100 150 200 300 400 500 650 [cm])))
   (Groundwater file "dk-estrup.gwt"
                ;; GWT is measured at top of terrain.
                ;; Offset is calibrated based on drainage measurments.
@@ -111,6 +88,27 @@
                   (-105.00 Estrup_C1)
                   (-500.00 Estrup_C2))
         (MaxRootingDepth 150 [cm])))
+
+(defcolumn Estrup-1D Estrup
+  (Movement original 
+            (Drain Hooghoudt
+                   (L 13 [m])
+                   (pipe_position -110.0 [cm]))))
+
+(defcolumn Estrup-2D Estrup
+  (Movement Rorrende-2D
+            (Tertiary (VAP
+                       (classes ("matrix_0cm" (height_end -27 [cm])) 
+                                ("matrix_2cm")
+                                ("drain_2cm")
+                                ("matrix_30cm" (height_start -30 [cm]))
+                                ("drain_30cm" (height_start -30 [cm])))))
+            (Geometry (zplus -1.5 -3
+                             -5 -10 -20 -25 -27 
+                             -30 -35 -40 -50 
+                             -70 -90 -105 
+                             -115 -150 -200 -275 -350 -425 -500 [cm])
+                      (xplus 10 25 50 100 150 200 300 400 500 650 [cm]))))
 
 ;; Management.
 
@@ -345,7 +343,6 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
 (defprogram Estrup VAP
   "Simulation for the Estrup PLAP station."
   (station "Estrup")
-  (column Estrup)
   (manager Estrup)
   (weather default "dk-estrup-hourly.dwf"
            (PrecipScale 1.41 1.42 1.35 1.24 1.13 1.11
@@ -357,6 +354,12 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
   (output &old
           ("Estrup Drain")
           ("Estrup Content")))
+
+(defprogram Estrup-1D Estrup
+  (column Estrup-1D))
+
+(defprogram Estrup-2D Estrup
+  (column Estrup-2D))
 
 ;; Plots
 

@@ -314,7 +314,7 @@ static struct ReactionEquilibriumSyntax : public DeclareModel
                           Attribute::OptionalConst, Attribute::Singleton,
                           "Tranformation rate from soil component 'B' to 'A'.\n\
 By default, this is identical to 'k_AB'.");
-    frame.declare ("susrface_AB", "g/cm^2/h", Attribute::LogOnly, "\
+    frame.declare ("surface_AB", "g/cm^2/h", Attribute::LogOnly, "\
 Converted from A to B on surface this timestep (may be negative).");
     frame.declare ("S_AB", "g/cm^3/h", Attribute::LogOnly, Attribute::SoilCells, "\
 Converted from A to B in soil this timestep (may be negative).");

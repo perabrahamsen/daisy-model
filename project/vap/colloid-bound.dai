@@ -480,7 +480,7 @@ carbon part of the 'K' factor.")
                            F_primary)
                      (handle sum)
                      (dimension "${unit}/&")
-                     (spec reaction filter F_primary))
+                     (spec reaction filter_velocity F_primary))
            (interval (tag "Colloid-Filter-Secondary")
                      (path column "${column}" 
                            Chemistry multi combine "${chemistry}"

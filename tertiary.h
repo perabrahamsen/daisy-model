@@ -23,7 +23,7 @@
 #ifndef TERTIARY_H
 #define TERTIARY_H
 
-#include "model_framed.h"
+#include "model_derived.h"
 #include <map>
 
 class BlockModel;
@@ -40,7 +40,7 @@ class Tertsmall;
 class Units;
 class Groundwater;
 
-class Tertiary : public ModelFramed
+class Tertiary : public ModelDerived
 {
   // Identity.
 public:

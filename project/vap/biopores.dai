@@ -1,4 +1,4 @@
-;;; vap-2d.dai -- 2D specific information for VAP setups
+;;; biopores.dai -- 2D specific information for VAP setups
 
 (defbiopore common matrix
   (R_primary 1 [h])
@@ -56,11 +56,4 @@
                            (points (20 7)
                                    (30 0))))))
 
-(defmovement Rorrende rectangle
-;;;  (matrix_solute Mollerup convection none)
-  (matrix_water (Mollerup (max_time_step_reductions 6)
-                          (max_number_of_small_time_steps 100000))
-                (v+h))
-  (drain (-110 [cm] 1 [cm])))
-
-;;; vap-2d.dai
+;;; biopores.dai

@@ -1,4 +1,4 @@
-// tertiary_pipes.C --- Pipe drainage.
+// drain_hooghoudt.C --- Pipe drainage.
 // 
 // Copyright 2008 and 2009 Per Abrahamsen and KU.
 //
@@ -19,8 +19,7 @@
 
 #define BUILD_DLL
 
-#include "tertiary.h"
-#include "tertsmall.h"
+#include "drain.h"
 #include "geometry.h"
 #include "soil.h"
 #include "soil_water.h"
@@ -35,7 +34,7 @@
 #include "draineqd.h"
 
 
-struct TertiaryPipes : public Tertiary
+struct DrainHooghoudt : public Drain
 {
   // Parameters
   std::auto_ptr<const Draineqd> eq_depth; 
@@ -51,22 +50,9 @@ struct TertiaryPipes : public Tertiary
   double DrainFlow;             // Drain flow [cm/h]
   std::vector<double> S;        // Pipe drainage. [cm^3/cm^3/h]
 
-  // Identity.
-  bool has_macropores ()
-  { return false; }
-
-  // Simulation.
-  void deactivate (const int)
-  { }
-  void tick (const Units&, const Geometry& geo, const Soil& soil, 
-             const SoilHeat& soil_heat, const double dt, 
-             SoilWater& soil_water, Surface& surface, Treelog& msg);
-  Tertsmall& implicit ()
-  { return Tertsmall::none (); }
-  void solute (const Geometry&, const SoilWater&, 
-               const std::map<size_t, double>&,
-               const double, Chemical&, Treelog&)
-  { }
+  void tick (const Geometry& geo, const Soil& soil, 
+             const SoilHeat& soil_heat, const Surface& surface, 
+             const double dt, SoilWater& soil_water, Treelog& msg);
   void output (Log&) const;
   
   // Helpers.
@@ -77,20 +63,17 @@ struct TertiaryPipes : public Tertiary
                                const Soil&, const SoilHeat&);
     
   // Create and Destroy.
-public:
-  bool initialize (const Units&, 
-                   const Geometry&, const Soil&, const Scope& parent_scope, 
-                   const Groundwater&, Treelog& msg);
-  bool check (const Geometry&, Treelog&) const
+  void initialize (const Geometry&, Treelog& msg);
+  bool check (Treelog&) const
   { return true; }
-  TertiaryPipes (const BlockModel& al);
+  DrainHooghoudt (const BlockModel& al);
 };
 
 void 
-TertiaryPipes::tick (const Units&, const Geometry& geo, const Soil& soil, 
-                     const SoilHeat& soil_heat, const double, 
-                     SoilWater& soil_water, Surface& surface,
-                     Treelog&)
+DrainHooghoudt::tick (const Geometry& geo, const Soil& soil, 
+                      const SoilHeat& soil_heat, const Surface& surface, 
+                      const double, SoilWater& soil_water, 
+                      Treelog&)
 {
   const size_t cell_size = geo.cell_size ();
 
@@ -137,7 +120,7 @@ TertiaryPipes::tick (const Units&, const Geometry& geo, const Soil& soil,
 }
 
 void 
-TertiaryPipes::output (Log& log) const
+DrainHooghoudt::output (Log& log) const
 {
   output_variable (height, log);
   output_variable (DrainFlow, log);
@@ -146,9 +129,9 @@ TertiaryPipes::output (Log& log) const
 }
 
 double
-TertiaryPipes::K_to_pipes (const unsigned int i, 
-                           const Soil& soil, 
-                           const SoilHeat& soil_heat) const
+DrainHooghoudt::K_to_pipes (const unsigned int i, 
+                            const Soil& soil, 
+                            const SoilHeat& soil_heat) const
 {
   if (K_to_pipes_ < 0)
     return soil.K (i, 0.0, 0.0, soil_heat.T (i))
@@ -158,7 +141,7 @@ TertiaryPipes::K_to_pipes (const unsigned int i,
 
 
 double
-TertiaryPipes::EquilibriumDrainFlow (const Geometry& geo,
+DrainHooghoudt::EquilibriumDrainFlow (const Geometry& geo,
                                      const Soil& soil, 
                                      const SoilHeat& soil_heat)
 {
@@ -295,19 +278,15 @@ TertiaryPipes::EquilibriumDrainFlow (const Geometry& geo,
 
 
 
-bool 
-TertiaryPipes::initialize (const Units&,
-                           const Geometry& geo, const Soil&,
-                           const Scope&, const Groundwater&, 
-                           Treelog&)
+void
+DrainHooghoudt::initialize (const Geometry& geo, Treelog&)
 {
   const size_t cell_size = geo.cell_size ();
   S.insert (S.end (), cell_size, 0.0);
-  return true;
 }
 
-TertiaryPipes::TertiaryPipes (const BlockModel& al)
-  : Tertiary (al),
+DrainHooghoudt::DrainHooghoudt (const BlockModel& al)
+  : Drain (al),
     eq_depth (Librarian::build_item<Draineqd> (al, "eq_depth")),
     L (al.number ("L")),
     rad (al.number ("rad")),
@@ -317,16 +296,17 @@ TertiaryPipes::TertiaryPipes (const BlockModel& al)
     height (al.number ("height", pipe_position))
 { }
 
-static struct TertiaryPipesSyntax : DeclareModel
+static struct DrainHooghoudtSyntax : DeclareModel
 {
   Model* make (const BlockModel& al) const
-  { return new TertiaryPipes (al); }
+  { return new DrainHooghoudt (al); }
 
-  TertiaryPipesSyntax ()
-    : DeclareModel (Tertiary::component, "pipes", "Pipe drainage.")
+  DrainHooghoudtSyntax ()
+    : DeclareModel (Drain::component, "Hooghoudt", "Pipe drainage.")
   { }
   void load_frame (Frame& frame) const
   {
+    frame.set_strings ("cite", "hooghoudt");
     frame.declare_object ("eq_depth", Draineqd::component,
                           Attribute::Const, Attribute::Singleton, "\
 Model for calculating equivalent depth for drains.");
@@ -358,6 +338,6 @@ anisotropy of the horizon.");
     frame.declare ("S", "cm^3/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                    "Pipe drainage.");
   }
-} TertiaryPipes_syntax;
+} DrainHooghoudt_syntax;
 
-// tertiary_pipes.C ends here.
+// drain_Hooghoudt.C ends here.

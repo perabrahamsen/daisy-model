@@ -1,20 +1,38 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* Tutorial
+
+Opdater
+
+* Agrovand
+
+** Prøv uden dræncelle, overlad til bioporer.
+
 * VAP kørsel
 
-** commit reference setup
+** ne: vap-001: reference
 
-** check that it works
+** se: vap-002: best bet
 
-** dokumenter ændringer
+* VAP 
+
+** Test om vap-002 er bedre end vap-001
+
+I så fald, commit den
 
 ** 1D 2-søjle setup
 
-** test: disable desorption fra kolloider
-
-** test: SEF=1000
+*** Multiple Tertiary
 
 ** ret leak150 (sæt bromid i sin egen graf)
+
+** differentiate "filter" og "sorption" o  colloid bound log
+
+*** DONE for subsoil.
+
+*** We need sorbtion and generate log for surface
+
+*** New balances
 
 * Mikkel 
 

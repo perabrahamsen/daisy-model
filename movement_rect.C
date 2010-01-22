@@ -322,7 +322,7 @@ MovementRect::MovementRect (const BlockModel& al)
   : MovementSolute (al),
     geo (submodel<GeometryRect> (al, "Geometry")),
     drain_position (map_construct_const<Point> 
-                    (al.submodel_sequence ("drain"))),
+                    (al.submodel_sequence ("drainpoints"))),
     matrix_water (Librarian::build_vector<UZRect> (al, "matrix_water")),
     heatrect (Librarian::build_item<Heatrect> (al, "heat")),
     T_bottom (-42.42e42)
@@ -361,10 +361,10 @@ static struct MovementRectSyntax : DeclareModel
     frame.declare_submodule ("Geometry", Attribute::Const,
                           "Discretization of the soil.",
                           GeometryRect::load_syntax);
-    frame.declare_submodule_sequence ("drain", Attribute::Const,
+    frame.declare_submodule_sequence ("drainpoints", Attribute::Const,
 				   "Location of cells with drain pipes.",
 				   MovementRect::Point::load_syntax);
-    frame.set_empty ("drain");
+    frame.set_empty ("drainpoints");
     frame.declare_object ("matrix_water", UZRect::component, 
                        Attribute::Const, Attribute::Variable,
                        "Matrix water transport models.\n\

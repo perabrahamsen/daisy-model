@@ -1,4 +1,4 @@
-;;; VAP simulations.
+;;; vap-common.dai --- VAP simulations.
 
 (description "reference 002")
 
@@ -9,6 +9,7 @@
 (input file "log.dai")
 
 (input file "colloid-bound.dai")
+(input file "biopores.dai")
 
 ;; Soil 
 
@@ -19,6 +20,20 @@
   (declare C_in_humus Number [] "C fraction in humus.")
   (C_in_humus 0.587 [])
   (value (/ C C_in_humus)))
+
+;; Movement.
+
+(defmovement Rorrende-2D rectangle
+  (matrix_solute Mollerup convection none)
+  (matrix_water (Mollerup (max_time_step_reductions 6)
+                          (max_number_of_small_time_steps 100000)
+                          ;; (K_average pressure (h_lim -5 [cm]))
+                          )
+                (v+h))
+  (drainpoints (-110 [cm] 1 [cm])))
+
+(deftertiary VAP biopores
+  (pond_max 5 [mm]))
 
 ;; Output
 
@@ -54,9 +69,9 @@
                     (dimension "%")
                     (spec fixed SoilWater Theta))
            (number (path column "${column}" Movement vertical
-                         Tertiary pipes height)
+                         Drain Hooghoudt height)
                    (tag "GWT")
-                   (spec tertiary pipes height))
+                   (spec drain Hooghoudt height))
            (flux_bottom (path column "${column}" Chemistry "*"
                               trace Bromide J_matrix)
                         (spec chemical default J_matrix)
@@ -546,7 +561,6 @@
 
 ;; Sites
 
-(input file "vap-2d.dai")
 (input file "silstrup.dai")
 (input file "estrup.dai")
 
@@ -560,7 +574,4 @@
          Estrup
          ))
          
-(run batch (run Estrup Silstrup plotall))
-;; (run plothydro)
-
-;;; vap.dai ends here.
+;;; vap-common.dai ends here.

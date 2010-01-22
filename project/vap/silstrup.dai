@@ -61,28 +61,6 @@
              (enable_K_macro false)))
 
 (defcolumn Silstrup default
-  ;; 1D
-  ;; (Movement original 
-  ;;           (Tertiary pipes
-  ;;                     (L 18 [m])
-  ;;                     (pipe_position -110.0 [cm])))
-  ;; 2D
-  (Movement Rorrende
-            (Tertiary (biopores 
-                       (use_small_timesteps false)
-                       (pond_max 5 [mm])
-                       (classes ("matrix_0cm" (height_end -31 [cm])) 
-                                ("matrix_2cm")
-                                ("drain_2cm")
-                                ("matrix_30cm" (height_start -35 [cm]))
-                                ("drain_30cm" (height_start -35 [cm])))))
-            ;;(matrix_water (Mollerup (K_average pressure (h_lim -5 [cm])))
-            ;;              &old)
-            (Geometry (zplus -1.5 -3 -5 -10 -20 -25 -31
-                             -35 -39
-                             -50 -75 -100 -113 
-                             -120 -150 -200 -275 -350 -425 -500 [cm])
-                      (xplus 10 25 50 100 150 200 300 400 600 900 [cm])))
   (Groundwater file "dk-silstrup.gwt"
                ;; GWT is measured at top of terrain.
                ;; Offset is calibrated based on drainage measurments.
@@ -96,6 +74,26 @@
                   (-113.00 [cm] Silstrup_B)
                   (-500.00 [cm] Silstrup_C))
         (MaxRootingDepth 50 [cm])))
+
+(defcolumn Silstrup-1D Silstrup
+  (Movement original 
+            (Drain Hooghoudt
+                   (L 18 [m])
+                   (pipe_position -110.0 [cm]))))
+
+(defcolumn Silstrup-2D Silstrup
+  (Movement Rorrende-2D
+            (Tertiary (VAP
+                       (classes ("matrix_0cm" (height_end -31 [cm])) 
+                                ("matrix_2cm")
+                                ("drain_2cm")
+                                ("matrix_30cm" (height_start -35 [cm]))
+                                ("drain_30cm" (height_start -35 [cm])))))
+            (Geometry (zplus -1.5 -3 -5 -10 -20 -25 -31
+                             -35 -39
+                             -50 -75 -100 -113 
+                             -120 -150 -200 -275 -350 -425 -500 [cm])
+                      (xplus 10 25 50 100 150 200 300 400 600 900 [cm]))))
 
 ;; Management.
 
@@ -356,6 +354,12 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
            (where "log/${station}-field-Metamitron-weekly.dlf"))
           ("Silstrup Drain")
           ("Silstrup Content")))
+
+(defprogram Silstrup-1D Silstrup
+  (column Silstrup-1D))
+
+(defprogram Silstrup-2D Silstrup
+  (column Silstrup-2D))
 
 ;; Plots
 

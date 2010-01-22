@@ -780,7 +780,7 @@ A numerical solution to Richard's Equation.")
   {
     frame.declare_integer ("debug", Attribute::Const, "\
 Print additional debug messages, higher numbers means more messages.");
-    frame.set ("debug", 1);
+    frame.set ("debug", 0);
     frame.declare_integer ("max_time_step_reductions", Attribute::Const, "\
 Number of times we may reduce the time step before giving up");
     frame.set ("max_time_step_reductions", 4);

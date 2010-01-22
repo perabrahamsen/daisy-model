@@ -1,3 +1,18 @@
+2010-01-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* tertiary.C, tertiary.h: Derive from 'ModelDerived' instead of
+	'ModelFramed'.
+	* movement.C (output_base): Adjust.
+
+	* drain_Hooghoudt.C: Renamed from 'tertiaty_pipes.C'.
+	* drain.h, drain.C: New component.
+	* Makefile (COMPONENTS, MODELS): Adjusted.
+	* movement.C, movement.h: Support it.
+
+	* movement_rect.C (drainpoints): Renamed from 'drain'
+
+	* movement.C, movement.h (Tertiary): Made it a vector.
+
 2010-01-13  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* biopore.C, biopore.h (top_density): New function.

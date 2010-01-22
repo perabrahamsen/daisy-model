@@ -24,6 +24,7 @@
 #include "block_model.h"
 #include "librarian.h"
 #include "tertiary.h"
+#include "drain.h"
 #include "log.h"
 #include "treelog.h"
 #include "assertion.h"
@@ -117,7 +118,10 @@ Movement::tick_tertiary (const Units& units,
                          const Geometry& geo, const Soil& soil, 
                          const SoilHeat& soil_heat, const double dt, 
                          SoilWater& soil_water, Surface& surface, Treelog& msg)
-{ tertiary->tick (units, geo, soil, soil_heat, dt, soil_water, surface, msg); }
+{ 
+  tertiary->tick (units, geo, soil, soil_heat, dt, soil_water, surface, msg); 
+  drain->tick (geo, soil, soil_heat, surface, dt, soil_water, msg);
+}
 
 void
 Movement::clear ()
@@ -131,7 +135,8 @@ Movement::output_base (Log& log) const
 { 
   output_variable (water_failure_level, log);
   output_variable (solute_failure_level, log);
-  output_object (tertiary, "Tertiary", log);
+  output_derived (tertiary, "Tertiary", log);
+  output_derived (drain, "Drain", log);
 }
 
 bool 
@@ -142,6 +147,11 @@ Movement::check (Treelog& msg) const
   {
     Treelog::Open nest (msg, "Tertiary");
     if (!tertiary->check (geometry (), msg))
+      ok = false;
+  }
+  {
+    Treelog::Open nest (msg, "Drain");
+    if (!drain->check (msg))
       ok = false;
   }
 
@@ -163,6 +173,8 @@ Movement::initialize (const Units& units,
                              soil, scope, groundwater, msg))
     ok = false;
   
+  drain->initialize (geometry (), msg);
+  
   initialize_derived (soil, groundwater, tertiary->has_macropores (), msg);
 
   return ok;
@@ -172,7 +184,8 @@ Movement::Movement (const BlockModel& al)
   : ModelDerived (al.type_name ()),
     water_failure_level (-1),
     solute_failure_level (-1),
-    tertiary (Librarian::build_item<Tertiary> (al, "Tertiary"))
+    tertiary (Librarian::build_item<Tertiary> (al, "Tertiary")),
+    drain (Librarian::build_item<Drain> (al, "Drain"))
 { }
 
 Movement::~Movement ()
@@ -183,8 +196,12 @@ static struct MovementInit : public DeclareComponent
   void load_frame (Frame& frame) const
   {
     frame.declare_object ("Tertiary", Tertiary::component, 
-                       Attribute::OptionalState, Attribute::Singleton, "\
+                          Attribute::State, Attribute::Singleton, "\
 Tertiary (that is, non-matrix) transport method.");
+    frame.declare_object ("Drain", Drain::component, 
+                          Attribute::State, Attribute::Singleton, "\
+Drainage.");
+    frame.set ("Drain", "none");
     frame.declare_integer ("water_failure_level", Attribute::LogOnly, "\
 The number of the last water transport model to fail.\n\
 It is -1 if the first model succeded, and 0 if the first model failed but\n\
