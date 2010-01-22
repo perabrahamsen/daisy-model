@@ -58,17 +58,9 @@
 
 (defmovement Rorrende rectangle
 ;;;  (matrix_solute Mollerup convection none)
-;;;  (matrix_water (Mollerup (max_time_step_reductions 16)
-;;;                          (max_number_of_small_time_steps 1000000))
-;;;                (v+h))
-  (drain (-110 [cm] 1 [cm]))
-  (Tertiary (biopores 
-             ;; (use_small_timesteps false)
-             ;; (pond_max 5 [mm])
-             (classes ("matrix_0cm") 
-                      ("matrix_2cm")
-                      ("drain_2cm")
-                      ("matrix_30cm")
-                      ("drain_30cm")))))
+  (matrix_water (Mollerup (max_time_step_reductions 6)
+                          (max_number_of_small_time_steps 100000))
+                (v+h))
+  (drain (-110 [cm] 1 [cm])))
 
 ;;; vap-2d.dai

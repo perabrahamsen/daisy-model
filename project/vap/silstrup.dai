@@ -70,6 +70,7 @@
   (Movement Rorrende
             (Tertiary (biopores 
                        (use_small_timesteps false)
+                       (pond_max 5 [mm])
                        (classes ("matrix_0cm" (height_end -31 [cm])) 
                                 ("matrix_2cm")
                                 ("drain_2cm")
@@ -85,8 +86,8 @@
   (Groundwater file "dk-silstrup.gwt"
                ;; GWT is measured at top of terrain.
                ;; Offset is calibrated based on drainage measurments.
-               ;; 20 cm too low
-               (offset 25 [cm]))
+               ;; 25 cm too low
+               (offset 30 [cm]))
   (Chemistry Silstrup)
   (OrganicMatter none)
   (Soil (horizons ;; (  -3.00 [cm] Silstrup_Ap_surface)

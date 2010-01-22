@@ -83,6 +83,7 @@
   (Movement Rorrende
             (Tertiary (biopores 
                        (use_small_timesteps false)
+                       (pond_max 5 [mm])
                        (classes ("matrix_0cm" (height_end -27 [cm])) 
                                 ("matrix_2cm")
                                 ("drain_2cm")
@@ -99,8 +100,8 @@
   (Groundwater file "dk-estrup.gwt"
                ;; GWT is measured at top of terrain.
                ;; Offset is calibrated based on drainage measurments.
-               ;; 30 cm is too high
-               (offset 20 [cm]))
+               ;; 20 cm is too high
+               (offset 15 [cm]))
   (Chemistry Estrup)
   (OrganicMatter none)
   (Soil (horizons ;; (  -3.00 Estrup_Ap_surface)

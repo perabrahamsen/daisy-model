@@ -1,6 +1,11 @@
 ;;; VAP simulations.
 
-(description "reference setup 001")
+(description "vap-002
+Try harder to get Mollerup to work.
+SEF=1000
+K_AB = 0 for colloids
+pond_max = 5mm
+adjusted offsets")
 
 (input file "tillage.dai")
 (input file "crop.dai")

@@ -107,9 +107,9 @@ carbon part of the 'K' factor.")
   (secondary true)
   (surface true)
   (A Fenpropimorph-colloid)
-  (k_AB 0.05 [h^-1])                   ;Desorption rate.
+  (k_AB 0.00 [h^-1])                   ;Desorption rate.
   (k_BA 0.05 [h^-1])                   ;Sorption rate.
-  (equilibrium linear (K (K_Fenpropimorph (soil_enrichment_factor 100 [])))))
+  (equilibrium linear (K (K_Fenpropimorph (soil_enrichment_factor 1000 [])))))
 
 (defreaction Fenpropimorph-filter colloid-filter
   "Filtration of colloid-bound fenpropimorph in the soil matrix."
@@ -172,9 +172,9 @@ carbon part of the 'K' factor.")
   (secondary true)
   (surface true)
   (A Dimethoate-colloid)
-  (k_AB 0.05 [h^-1])                   ;Desorption rate.
+  (k_AB 0.00 [h^-1])                   ;Desorption rate.
   (k_BA 0.05 [h^-1])                   ;Sorption rate.
-  (equilibrium linear (K (K_Dimethoate (soil_enrichment_factor 100 [])))))
+  (equilibrium linear (K (K_Dimethoate (soil_enrichment_factor 1000 [])))))
 
 (defreaction Dimethoate-filter colloid-filter
   "Filtration of colloid-bound dimethoate in the soil matrix."
@@ -237,9 +237,9 @@ carbon part of the 'K' factor.")
   (secondary true)
   (surface true)
   (A Glyphosate-colloid)
-  (k_AB 0.05 [h^-1])                   ;Desorption rate.
+  (k_AB 0.00 [h^-1])                   ;Desorption rate.
   (k_BA 0.05 [h^-1])                   ;Sorption rate.
-  (equilibrium linear (K (K_Glyphosate (soil_enrichment_factor 100 [])))))
+  (equilibrium linear (K (K_Glyphosate (soil_enrichment_factor 1000 [])))))
 
 (defreaction Glyphosate-filter colloid-filter
   "Filtration of colloid-bound glyphosate in the soil matrix."
@@ -301,9 +301,9 @@ carbon part of the 'K' factor.")
   (secondary true)
   (surface true)
   (A Metamitron-colloid)
-  (k_AB 0.05 [h^-1])                   ;Desorption rate.
+  (k_AB 0.00 [h^-1])                   ;Desorption rate.
   (k_BA 0.05 [h^-1])                   ;Sorption rate.
-  (equilibrium linear (K (K_Metamitron (soil_enrichment_factor 100 [])))))
+  (equilibrium linear (K (K_Metamitron (soil_enrichment_factor 1000 [])))))
 
 (defreaction Metamitron-filter colloid-filter
   "Filtration of colloid-bound metamitron in the soil matrix."
