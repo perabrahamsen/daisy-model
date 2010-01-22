@@ -31,4 +31,4 @@
   (decompose_halftime 14 [d])
   (adsorption linear (K_OC 207 [l/kg])))
 
-;;; end chem-1d.dai
+;;; chem-1d.dai ends here.

@@ -88,6 +88,7 @@ carbon part of the 'K' factor.")
 
 (defreaction Fenpropimorph-immobile-sorption equilibrium
   "Sorption equilibrium between dissolved and immobile Fenpropimorph."
+  (surface true)
   (A Fenpropimorph-immobile)
   (B Fenpropimorph)
   (equilibrium linear (K K_Fenpropimorph))
@@ -153,6 +154,7 @@ carbon part of the 'K' factor.")
 
 (defreaction Dimethoate-immobile-sorption equilibrium
   "Sorption equilibrium between dissolved and immobile Dimethoate."
+  (surface true)
   (A Dimethoate-immobile)
   (B Dimethoate)
   (equilibrium linear (K K_Dimethoate))
@@ -218,6 +220,7 @@ carbon part of the 'K' factor.")
 
 (defreaction Glyphosate-immobile-sorption equilibrium
   "Sorption equilibrium between dissolved and immobile Glyphosate."
+  (surface true)
   (A Glyphosate-immobile)
   (B Glyphosate)
   (equilibrium linear (K K_Glyphosate))
@@ -282,6 +285,7 @@ carbon part of the 'K' factor.")
 
 (defreaction Metamitron-immobile-sorption equilibrium
   "Sorption equilibrium between dissolved and immobile Metamitron."
+  (surface true)
   (A Metamitron-immobile)
   (B Metamitron)
   (equilibrium linear (K K_Metamitron))
@@ -328,8 +332,8 @@ carbon part of the 'K' factor.")
   "Balance between soil, colloid and solute forms."
   (precision 3)
   (require_top true)
-  (input "Solute-Sorption")
-  (output "Soil-Sorption" "Colloid-Sorption")
+  (input "Solute-Transform")
+  (output "Soil-Transform" "Colloid-Transform")
   (content))
 
 (defsummary "Colloid bound" balance
@@ -351,6 +355,9 @@ carbon part of the 'K' factor.")
   "Information about a chemical that can be bound to colloids."
 
   ;; Parameters.
+  (declare chemistry string
+           "Name of chemistry handling transformations.")
+  (chemistry identity (value "${chemical}"))
   (declare solute string
 	   "Name of dissolved form of the chemical.")
   (solute identity (value "${chemical}"))
@@ -431,23 +438,57 @@ carbon part of the 'K' factor.")
                    (spec chemical default surface_storage))
            (interval (path column "${column}" Chemistry "*" 
                            trace "${solute}" S_transform)
-                     (tag "Solute-Sorption")
+                     (tag "Solute-Transform")
                      (handle sum)
                      (negate true)
                      (dimension "${unit}/&")
                      (spec chemical default S_transform))
            (interval (path column "${column}" Chemistry "*" 
                            trace "${colloid}" S_transform)
-                     (tag "Colloid-Sorption")
+                     (tag "Colloid-Transform")
                      (handle sum)
                      (dimension "${unit}/&")
                      (spec chemical default S_transform))
            (interval (path column "${column}" Chemistry "*" 
                            trace "${soil}" S_transform)
-                     (tag "Soil-Sorption")
+                     (tag "Soil-Transform")
                      (handle sum)
                      (dimension "${unit}/&")
                      (spec chemical default S_transform))
+           (interval (tag "Soil-Sorption")
+                     (path column "${column}" 
+                           Chemistry multi combine "${chemistry}"
+                           reaction "${chemical}-immobile-sorption"
+                           S_AB)
+                     (handle sum)
+                     (negate true)
+                     (dimension "${unit}/&")
+                     (spec reaction equilibrium S_AB))
+           (interval (tag "Colloid-Sorption")
+                     (path column "${column}" 
+                           Chemistry multi combine "${chemistry}"
+                           reaction "${chemical}-colloid-sorption"
+                           S_AB)
+                     (handle sum)
+                     (negate true)
+                     (dimension "${unit}/&")
+                     (spec reaction equilibrium S_AB))
+           (interval (tag "Colloid-Filter-Primary")
+                     (path column "${column}" 
+                           Chemistry multi combine "${chemistry}"
+                           reaction "${chemical}-filter"
+                           F_primary)
+                     (handle sum)
+                     (dimension "${unit}/&")
+                     (spec reaction filter F_primary))
+           (interval (tag "Colloid-Filter-Secondary")
+                     (path column "${column}" 
+                           Chemistry multi combine "${chemistry}"
+                           reaction "${chemical}-filter"
+                           F_secondary)
+                     (handle sum)
+                     (dimension "${unit}/&")
+                     (spec reaction filter_velocity F_secondary))
            (interval (path column "${column}" Chemistry "*" 
                            trace "${solute}" S_decompose)
                      (tag "Solute-Decompose")

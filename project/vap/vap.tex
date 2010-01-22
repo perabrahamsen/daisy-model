@@ -955,6 +955,31 @@ A4.4 og figur A4.5 i \citet{vap2005}.  For Silstrup mente vi der var
 belæg for at sætte $K_b$ til 1 mm/h (op fra 0,1 mm/h brugt af GEUS),
 og for Estrup satte vi $K_b$ til 0,5 mm/h (op fra 0,1 mm/h).
 
+\begin{verbatim}
+Vi leger med:
+
+column
+  movement 
+    Mollerup
+      hvor mange gange vi prøver
+
+  tertiary biopores
+    pond_max
+
+  soil
+    horizons
+      om vi har overfladehorizont med eller ej
+
+  groundwater
+    offset
+
+chemicals
+  colloid bound 
+    soil_enrichment_factor
+    k_BA
+
+\end{verbatim}
+
 \addcontentsline{toc}{section}{\numberline{}References}
 \bibliography{../../txt/daisy}
 
