@@ -95,6 +95,30 @@
                              -120 -150 -200 -275 -350 -425 -500 [cm])
                       (xplus 10 25 50 100 150 200 300 400 600 900 [cm]))))
 
+(defcolumn Silstrup-1C-Drain Silstrup
+  (area 20 [cm^2])
+  (Movement original 
+            (Tertiary (VAP 
+                       (classes ("matrix_0cm" (height_end -31 [cm])) 
+                                ("drain_2cm" (density 23 [m^-2]))
+                                ("drain_30cm" 
+                                 (density 7 [m^-2])
+                                 (height_start -35 [cm])))))))
+
+(defcolumn Silstrup-1C-Center Silstrup
+  (area 880 [cm^2])
+  (Movement original 
+            (Drain Hooghoudt
+                   (L 18 [m])
+                   (x 9 [m])
+                   (pipe_position -110.0 [cm]))
+            (Tertiary (VAP 
+                       (classes ("matrix_0cm" (height_end -31 [cm]))
+                                ("matrix_2cm" (density 23 [m^-2]))
+                                ("matrix_30cm" 
+                                 (density 7 [m^-2])
+                                 (height_start -35 [cm])))))))
+
 ;; Management.
 
 (defaction Silstrup activity
@@ -360,6 +384,12 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
 
 (defprogram Silstrup-2D Silstrup
   (column Silstrup-2D))
+
+(defprogram Silstrup-1C Silstrup
+  (column Silstrup-1C-Center))
+
+(defprogram Silstrup-2C Silstrup
+  (column Silstrup-1C-Drain Silstrup-1C-Center))
 
 ;; Plots
 

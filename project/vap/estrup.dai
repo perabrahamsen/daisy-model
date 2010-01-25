@@ -110,6 +110,28 @@
                              -115 -150 -200 -275 -350 -425 -500 [cm])
                       (xplus 10 25 50 100 150 200 300 400 500 650 [cm]))))
 
+(defcolumn Estrup-1C-Drain Estrup
+  (Movement original 
+            (Tertiary (VAP 
+                       (classes ("matrix_0cm" (height_end -27 [cm])) 
+                                ("drain_2cm" (density 23 [m^-2]))
+                                ("drain_30cm" 
+                                 (density 7 [m^-2])
+                                 (height_start -30 [cm])))))))
+
+(defcolumn Estrup-1C-Center Estrup
+  (Movement original 
+            (Drain Hooghoudt
+                   (L 13 [m])
+                   (x 650 [cm])
+                   (pipe_position -110.0 [cm]))
+            (Tertiary (VAP 
+                       (classes ("matrix_0cm" (height_end -27 [cm]))
+                                ("matrix_2cm" (density 23 [m^-2]))
+                                ("matrix_30cm" 
+                                 (density 7 [m^-2])
+                                 (height_start -30 [cm])))))))
+
 ;; Management.
 
 (defaction Estrup activity
@@ -360,6 +382,12 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
 
 (defprogram Estrup-2D Estrup
   (column Estrup-2D))
+
+(defprogram Estrup-1C Estrup
+  (column Estrup-1C-Center))
+
+(defprogram Estrup-2C Estrup
+  (column Estrup-1C-Drain Estrup-1C-Center))
 
 ;; Plots
 

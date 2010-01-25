@@ -1068,12 +1068,13 @@ ProgramDocument::print_model (const symbol name, const Library& library,
 			     current_component + "-" + name);
       format->index (name);
       format->text ("A `" + type + "' parameterization ");
+      format->see_page ("model", current_component + "-" + type);
       const Filepos& pos = frame.own_position ();
       if (pos != Filepos::none ())
-	format->text ("defined in `" + pos.filename () + "'.\n");
+	format->text (" defined in `" + pos.filename () + "'.\n");
       else
 	{
-	  format->text ("build into ");
+	  format->text (" build into ");
 	  format->special ("daisy");
 	  format->text (".\n");
 	}

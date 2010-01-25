@@ -1,28 +1,28 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* Kursus
+
+** Generer log beskrivelser
+
+* VAP kørsel
+
+estrup-2c er 1c lige nu
+
+Test 2C kørsel
+
 * Tutorial
 
 Opdater
 
 * Agrovand
 
-** Prøv uden dræncelle, overlad til bioporer.
+** Prøv uden dræncelle, overlad til drænbioporer.
 
-* VAP kørsel
-
-** ne: vap-001: reference
-
-** se: vap-002: best bet
+** Evt prøv med drænbioporer der ikke når ned i dræncellen.
 
 * VAP 
 
-** Test om vap-002 er bedre end vap-001
-
-I så fald, commit den
-
 ** 1D 2-søjle setup
-
-*** Multiple Tertiary
 
 ** ret leak150 (sæt bromid i sin egen graf)
 
@@ -41,6 +41,8 @@ I så fald, commit den
 ** USB stick med al relevant materialle
 
 ** Læg dokumentation under versionskontrol (numeric + figs)
+
+* Make "chemistry multi" model obsolete by making column Chemistry a list 
 
 * 2D roots
 

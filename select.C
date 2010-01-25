@@ -120,11 +120,10 @@ struct Select::Implementation
   double convert (double) const; // - || -
   const symbol tag;             // Name of this entry.
   symbol dimension;             // Physical dimension of this entry.
-  const symbol description;
+  const symbol documentation;
 
   // Create and Destroy.
   bool check (symbol spec_dim, Treelog& err) const;
-  static symbol find_description (const Metalib&, const Frame&);
   static Number* get_expr (const BlockModel& al);
   Implementation (const BlockModel&);
   ~Implementation ();
@@ -357,16 +356,6 @@ Select::Implementation::check (const symbol spec_dim, Treelog& err) const
   return ok;
 }
   
-symbol
-Select::Implementation::find_description (const Metalib& metalib, 
-                                          const Frame& al)
-{
-  const Library& library = metalib.library (Select::component);
-  if (library.has_interesting_description (al))
-    return al.description ();
-  return "";
-}
-
 Number*
 Select::Implementation::get_expr (const BlockModel& al)
 {
@@ -464,7 +453,7 @@ Select::Implementation::Implementation (const BlockModel& al)
     tag (Select::select_get_tag (al.frame ())),
     dimension (al.check ("dimension")
                ? al.name ("dimension") : Attribute::Unknown ()),
-    description (find_description (al.metalib (), al.frame ()))
+    documentation (al.name ("documentation", Attribute::None ()))
 { }
   
 Select::Implementation::~Implementation ()
@@ -477,8 +466,8 @@ Select::convert (double value) const
 symbol
 Select::get_description () const
 {
-  if (impl->description != "")
-    return impl->description;
+  if (impl->documentation != Attribute::None ())
+    return impl->documentation;
   if (impl->spec.get ())
     {
       std::string d = impl->spec->description ().name ();
@@ -486,7 +475,7 @@ Select::get_description () const
         d += " (reversed)";
       return d;
     }
-  return description;
+  return Attribute::None ();
 }
 
 int
@@ -566,10 +555,10 @@ Select::document (Format& format) const
   format.text ("[");
   format.bold (dimension ().name ());
   format.text ("]");
-  if (impl->description != "")
+  if (impl->documentation != Attribute::None ())
     {
       format.hard_linebreak ();
-      format.text (impl->description.name ());
+      format.text (impl->documentation);
       format.soft_linebreak ();
     }
   else if (impl->spec.get ())
@@ -748,6 +737,8 @@ Set the 'handle' parameter instead.");
   {
     Model::load_model (frame);
     frame.add_check (check_alist);
+    frame.declare_string ("documentation", Attribute::OptionalConst, "\
+Documentation for this entry.");
     frame.declare_string ("tag", Attribute::OptionalConst,
                    "Tag to identify the column.\n\
 These will be printed in the first line of the log file.\n\

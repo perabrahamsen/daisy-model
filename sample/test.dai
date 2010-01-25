@@ -26,16 +26,14 @@
 
 ;; We build the column from the horizons.
 (defcolumn Andeby default
-  "The B.And farm, Andeby, 2002."
+  "Data collected by F.Guf at the B.And farm, Andeby, 2002."
   (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
+        (border -1 [m])
         (MaxRootingDepth 60.0 [cm]))
   (OrganicMatter original
                  (init (input 1400 [kg C/ha/y])
                        (root 480 [kg C/ha/y])
                        (end -20 [cm])))
-  ;; Measured numbers for groundwater table can be read from a file, like this:
-  ;; (Groundwater file "example.gwt")
-  ;; But here we assume free drainage.
   (Groundwater deep))
 
 ;; Use it.

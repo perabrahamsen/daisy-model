@@ -259,7 +259,8 @@ LogSelect::document_entries (Format& format, const Metalib& metalib,
   const FrameModel& frame = log_lib.model (name);
 
   // We need a type.
-  if (frame.type_name () == Attribute::None ())
+  const symbol parent = frame.base_name ();
+  if (parent == Attribute::None ())
     {
       msg.warning ("bug: Orphan log parameterisation.");
       return;
@@ -267,7 +268,7 @@ LogSelect::document_entries (Format& format, const Metalib& metalib,
 
   // Check if this log parameterizations adds something compared to
   // its parent. 
-  const symbol parent = frame.type_name ();
+  daisy_assert (parent != name);
   if (log_lib.check (parent)
       && frame.subset (metalib, log_lib.model (parent), "entries"))
     // If not, don't document the entries.

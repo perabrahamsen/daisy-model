@@ -1,3 +1,11 @@
+2010-01-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log_select.C (document_entries): Use base_name instead of type_name.
+
+	* select.C (documentation): Use this field to explcitly document
+	select entries.
+	* lib/log.dai, lib/log-std.dai: Update.
+
 2010-01-22  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* tertiary.C, tertiary.h: Derive from 'ModelDerived' instead of

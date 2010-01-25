@@ -10,11 +10,14 @@
   ;; 20% in the top meter, 10% the 50 cm below that. 
   (SoilWater (initial_Theta (-100 [cm] 20 [%])
                             (-150 [cm] 0.1 [])))
-  ;; Here we initialise total NO3-N content relative to dry soil mass.
-  (SoilNO3 (initial_Ms (-30 [cm] 10 [ppm])
-                       (-70 [cm] 5  [ppm])))
-  ;; Here we initialise NH4-N content in water. 
-  (SoilNH4 (initial_C (-100 [cm] 1 [ppm]))))
+  (Chemistry multi
+             ;; Here we initialise total NO3-N content relative to dry
+             ;; soil mass.
+             (combine (N (trace (NO3 (initial_Ms (-30 [cm] 10 [ppm])
+                                                 (-70 [cm] 5  [ppm])))
+                                ;; Here we initialise NH4-N content in
+                                ;; water.
+                                (NH4 (initial_C (-100 [cm] 1 [ppm]))))))))
 
 ;; Note that Ms specifies the total content in both water and soil,
 ;; while C only specifies the content in the liquid phase.  The
@@ -36,7 +39,11 @@
   ;; volume.  The volumen include soil, water and air.  This is most
   ;; useful if you know the total content, as neither the dry bulk
   ;; density or soil water content affect it.
-  (SoilNO3 (initial_M (-100 [cm] 50 [g/cm^3])))
+  (Chemistry multi
+             ;; Here we initialise total NO3-N content relative to dry
+             ;; soil mass.
+             (combine (N (trace (NO3 (initial_M (-100 [cm] 50 [g/cm^3])))
+                                (NH4)))))
   ;; Finally we initialize the soil heat.  This is rarely used.
   (SoilHeat (initial_T (-100 [cm] 1 [dg C]))))
 

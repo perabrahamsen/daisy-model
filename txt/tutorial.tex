@@ -1,8 +1,8 @@
 %%% tutorial.tex -- A tutorial for the Daisy crop/soil system.
 
-%\documentclass[a4paper,11pt]{article}
+\documentclass[a4paper]{article}
 %\usepackage{a4}
-\documentclass[11pt]{article}
+%\documentclass[11pt]{article}
 \usepackage{hyperref}
 
 \bibliographystyle{apalike}
@@ -46,58 +46,11 @@ Per Abrahamsen, \today{}.
 \section{Retrieving and installing the files}
 \label{sec:install}
 
-We start by retrieving the files.  With a web browser, go to the
-address~\url{http://www.dina.kvl.dk/~daisy/}, the home page of the
-\daisy{} project.  From there, you should download the following
-items:
-\begin{description}
-\item[Daisy Description] For information about the mathematical and
-  physical models in \daisy{}.
-\item[Daisy Tutorial] You already got this, but if you are reading
-  this from an old printout, you might want to get a newer version.
-\item[Daisy Program Reference Manual] Sooner or later, you will need
-  the reference manual.  I suggest that you get the \textsc{pdf}
-  version (see under the ``Distribution'' header), which is both
-  properly formatted (unlike the \textsc{html} version), easy to
-  browse, and easy to print.
-\item[command line executable] Download the version for the platform
-  you use.  If you don't know what I mean by this, you are most likely
-  using ``win32''.
-\item[parameter library] This is a zip file containing containing
-  standard parameterizations of e.g.\ crops.  You will need this.  You
-  will also need a program to unzip the file, download it from a place
-  like \url{http://www.tucows.com/} if you haven't already got it.
-  Search for unzip.  Windows XP already knows how to unzip a file,
-  just open it.
-\item[sample parameterizations] This is another zip file containing
-  parameterizations that are not intended to use as-is, but to serve
-  as inspiration for your own setup files.
-\item[weather file] The weather file contains observations from the KVL
-  research station in Taastrup, Denmark.  Most likely, you will
-  eventually want weather data from closer to home, but this file will
-  get you started.
-\item[log file viewer] \Daisy{} stores the results of its simulations
-  in log files (with the extension \texttt{.dlf}).
-  \texttt{ShowDaisyOutput.exe} is a win32 program that will show the
-  content of these log files graphically, it can even animate some of
-  the data.
-\end{description}
-
-W suggest you create a \texttt{daisy} directory near the root, for
-example (under MS Windows\footnote{Unix users can use
-  ``\texttt{$\tilde{ }$/daisy}})``\texttt{C:$\backslash$daisy}'', with
-the subdirectories ``bin'' (for the \texttt{.exe} files), ``doc'' (for
-the \texttt{.doc} and \texttt{.pdf} files), ``lib'' (for the files in
-\texttt{daisy-lib.zip} and ``sample'' (for the files in
-\texttt{daisy-sample.zip}).
-
-MS Windows users should then install and configure TextPad as
-described on the \daisy{} home page, and open the \texttt{test.dai}
-file in the \texttt{sample} directory.  You can now start \daisy{}
-from the \texttt{Tools} menu.  If you do that, you will get a window
-with error messages, basically telling you that \daisy{} could not
-find the files it need.  In section~\ref{sec:daisypath} you will find
-information about how to tell \daisy{} where the files are.
+We start by installing Daisy.  With a web browser, go to the
+address~\url{http://code.google.com/p/daisy-model/}, the home page of
+the \daisy{} project.  Follow the ``getting started'' link that is at
+the beginning of the main text of the page.  Follow the instructions
+on that page.
 
 \section{Example}
 
@@ -268,28 +221,31 @@ Now we have described two horizons, we can describe a column.
   (defcolumn Andeby default
     "Data collected by F.Guf at the B.And farm, Andeby, 2002."
     (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
-          (border 1 [m])
+          (border -1 [m])
           (MaxRootingDepth 60.0 [cm]))
-    (OrganicMatter  (init (input 1400 [kg C/ha/y])
-                          (root 480 [kg C/ha/y])
-                          (end -20 [cm])))
+    (OrganicMatter original
+                   (init (input 1400 [kg C/ha/y])
+                         (root 480 [kg C/ha/y])
+                         (end -20 [cm])))
     (Groundwater deep))
 \end{verbatim}
 
 Here, we name the column \texttt{Andeby}, and use the \texttt{default}
-model for \daisy{} columns\footnote{An alternative at this point would
-  be to use the \texttt{inorganic} column model, which does not
-  perform any calculations regarding organic matter, thus saving
-  time.}.  The string following the \texttt{default} again serves as a
-description, and this timw we use it to note who collected the data,
-from where, and when.
+model for \daisy{} columns.  The string following the \texttt{default}
+again serves as a description, and this time we use it to note who
+collected the data, from where, and when.
 
 In \daisy{}, a column consists of many separate subsystems.  Most of
 these have default values, and does thus not need to be specified.
-However, we need a description of the soil, we need an estimate of the
-quality (lability) of the humus, and we need to tell \daisy{} where
-the groundwater is.  See section~\ref{sec:column} for examples of
-other subsystems.
+However, we need a description of the soil, and we need to tell
+\daisy{} where the groundwater is.  Daisy \emph{does} contain default
+values for organic matter, but these are not very useful.  Here we
+specify that we should use the original\footnote{An alternative at
+  this point would be to use the \texttt{none} model, which does not
+  perform any calculations regarding organic matter, thus saving
+  time.} model for organic matter, bit change the initialization.
+
+See section~\ref{sec:column} for examples of other subsystems.
 
 \subsubsection{Soil}
 \label{ex:soil}
@@ -317,7 +273,7 @@ specify the dimension as \verb|[m]| knows how to convert.
 
 We specify a numerical border at one meter.
 \begin{verbatim}
-          (border 1 [m])
+          (border -1 [m])
 \end{verbatim}
 The \texttt{border} parameter is optional, but when you are interested
 in results for a particular interval, you should specify numerical
@@ -326,10 +282,11 @@ results.  There are automatically numeric borders between the horizons.
 
 The other mandatory soil parameter is \texttt{MaxRootingDepth}.  This
 is a soil imposed barrier for the roots, they will not penetrate below
-that depth.  To make writing \daisy{} setup files fun, as well as to
-keep you alert, this number is specified as positive depth, unlike the
-layer endpoints which were specified as negative heights.  \Daisy{}
-will tell you if you get it wrong.
+that depth.  This doesn't mean plant root will penetrate down to that
+depth, it depends on the crop.  To make writing \daisy{} setup files
+fun, as well as to keep you alert, this number is specified as
+positive depth, unlike the layer endpoints which were specified as
+negative heights.  \Daisy{} will tell you if you get it wrong.
 
 \subsubsection{Organic Matter}
 \label{ex:om}
@@ -356,7 +313,8 @@ period we are simulating.  We specify the past input level with the
 following lines.
 
 \begin{verbatim}
-    (OrganicMatter (init (input 1400 [kg C/ha/y])
+    (OrganicMatter original
+                   (init (input 1400 [kg C/ha/y])
                          (root 480 [kg C/ha/y])
                          (end -20 [cm])))
 \end{verbatim}
@@ -582,8 +540,10 @@ simulation is should save for later processing.
 \begin{verbatim}
   ;; Create these log files.
   (output harvest
-          ("N Balance" (when monthly)
-                       (from 0 [m]) (to -1 [m]))
+          ("Field nitrogen" (when monthly))
+          ("Soil nitrogen" (when daily) (from 0 [m]) (to -1 [m]))
+          ("Field water" (when monthly))
+          ("Soil water" (when daily) (from 0 [m]) (to -1 [m]))
           ("Crop Production"
            (crop "Spring Barley")
            (where "sbarley.dlf"))
@@ -602,22 +562,23 @@ editor or load it into a spreadsheet.  The \texttt{harvest.dlf} file,
 in particular, is best viewed as plain text.  See
 section~\ref{sec:plot} for more information about how to view the results.
 
-Our next log model, \texttt{N~Balance}, will write enough information
-about the nitrogen content of the soil to calculate a balance, in a
-file name \texttt{n\_balance.dlf}.  By default, it will write this
-information once a day, but by specifying \texttt{monthly} we reduce
-this to once a month.  We also specify the soil layer to log to be the
-top meter of the soil.  By default, it will log the nitrogen content
-of all the soil down to and including the last numeric layer.
+Our next log model, \texttt{Field nitrogen}, will write enough
+information about the nitrogen content of the field to calculate a
+balance, in a file name \verb|field_nitrogen.dlf|.  By default, it
+will write this information once a day, but by specifying
+\texttt{monthly} we reduce this to once a month.  \texttt{Soil
+  nitrogen} is similar, but contain information for creating a
+nitrogen balance for a soil layer, rather than for the entire field.
+We specify the soil layer to log to be the top meter of the soil.
+q\texttt{Field water} and \texttt{Soil water} contain balances for
+water instead of nitrogen, but are otherwise similar.
 
 We have two crops simultaneously on the soil.  By default,
 \texttt{Crop~Production} will add the content of both crops together,
-and log it in a \texttt{crop\_prod.dlf} file.  The weird looking
-
+and log it in a \texttt{crop\_prod.dlf} file.  The 
 \begin{verbatim}
            (crop "Spring Barley")
-\end{verbatim}%$
-
+\end{verbatim}
 line tells \daisy{} to only log information about the spring barley,
 and by specifying a \texttt{where} parameter we tell it to store the
 information in a file named \texttt{sbarley.dlf} instead.
@@ -631,15 +592,11 @@ August the 7'th, 1987.  This file will be named
 \texttt{checkpoint-1987-8-7+6.dai}.  As the extension hints, this is
 not a log file, but a setup file containing all information about the
 current state of the simulation.  In fact, you can restart the
-simulation by typing
-\begin{verbatim}
-  daisy checkpoint-1987-8-7+6.dai
-\end{verbatim}
-You can also browse it with a text editor to get detailed information
-about the state of the simulation at that point in time.
+simulation by using the generated file instead of the original setup
+file.  You can also browse it with a text editor to get detailed
+information about the state of the simulation at that point in time.
 
 See section~\ref{sec:output} for more information about log models.
-
 
 \section{Weather}
 \label{sec:weather}
@@ -791,7 +748,7 @@ this, for two reasons.
 \end{enumerate}
 The simulated background mineralization can be found by looking at the
 change in the organic nitrogen content (the \texttt{SOM} column in the
-\texttt{"N Balance"} log).
+\texttt{"Soil nitrogen"} log).
 
 If you measure how much nitrogen is removed by harvest, you can adjust
 the \texttt{background\_mineralization} parameter until the simulation
@@ -933,13 +890,17 @@ route to the groundwater.
 Here is an example where we specify macropores:
 \begin{verbatim}
   (defcolumn Andeby default
-    (SoilWater (macro default
-                      (height_start 0 [cm])
-                      (height_end -200 [cm])
-                      (distribution (-200 1) (-80 0.1) (0 0))
-                      (pressure_initiate -5 [cm])
-                      (pressure_end -30 [cm])
-                      (pond_max 0.5 [mm])))
+    (Movement original 
+              (Tertiary old
+                        (macro default
+                               (height_start 0 [cm])
+                               (height_end -200 [cm])
+                               (distribution (-200 1) 
+                                             ( -80 0.1) 
+                                                (0 0))
+                               (pressure_initiate -5 [cm])
+                               (pressure_end -30 [cm])
+                               (pond_max 0.5 [mm]))))
     ;; Other parameters...
 \end{verbatim}
 
@@ -971,44 +932,29 @@ ponding, 10\% of the ponded water would have entered the matrix at 80
 cm depth, and all the ponded water would have entered the matrix at 2
 meters depth.
 
-\subsubsection{Log models}
-
-The following log models are useful when dealing with macropores:
-\begin{description}
-\item[\texttt{Preferential Water Flux}] The preferential water flux
-  between all numeric soil layers.  File: \texttt{pref\_flux.dlf}.
-\item[\texttt{Preferential NO3 Transport}] The preferential nitrogen
-  transport between all numeric soil layers.  File:
-  \texttt{pref\_NO3.dlf}.
-\item[\texttt{Preferential NH4 Transport}] The preferential ammonium
-  transport between all numeric soil layers.  File:
-  \texttt{pref\_NH4.dlf}.
-\end{description}
-See section~\ref{sec:output} for more information about log models. 
-
 \subsection{Evapotranspiration}
 \label{sec:bioclimate}
 
-By default, Makkink is used for finding the reference
-evapotranspiration.  It is a simple model, but adequate for simple
-simulations.  It is specified as
+By default, Daisy will choose the best model calculaing the reference
+evapotranspiration based on the available data in the weather file.
+You can overwrite this with the \texttt{pet} parameter.
+
+The least demanding model in terms of access to weather data is
+Makking.  It is specified as
 \begin{verbatim}
   (defcolumn Andeby default
     (Bioclimate default (pet makkink))
     ;; Other parameters...
 \end{verbatim}
-except that you don't have to, since it is default.
 
 Sometimes you have access to reference evapotranspiration data in the
-weather file, in order to make \daisy{} use these you should specify
+weather file, in order to make \daisy{} use these you could specify
 pet like
 \begin{verbatim}
     (Bioclimate default (pet weather))
 \end{verbatim}
-\textbf{Important:}  If you specify reference evapotranspiration in
-the weather file, but leave out the above line in the \daisy{} setup
-file, \daisy{} will ignore the data in the weather file, and continue
-to use Makkink for reference evapotranspiration.
+except Daisy will automatically use the provided data for reference
+evaporation when when found in the weather file.
 
 \Daisy{} also support the more advanced model Penman-Monteith
 \begin{verbatim}

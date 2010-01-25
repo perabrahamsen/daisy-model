@@ -83,28 +83,28 @@
   (when hourly)
   (summary "Field water balance")
   (entries (number (tag "Precipitation")
-		   (description "\
+		   (documentation "\
 Total amount of water entering the system as rain and snow.")
                    (path weather "*" precipitation)
                    (spec weather base precipitation)
                    (handle sum)
                    (dimension "mm/&"))
            (number (tag "Irrigation")
-		   (description "\
+		   (documentation "\
 Total amount of water added to the system from irrigation.")
                    (path column "${column}" Bioclimate "*" irrigation_total)
                    (spec bioclimate default irrigation_total)
                    (handle sum)
                    (dimension "mm/&"))
            (number (tag "Potential evapotranspiration")
-		   (description "\
+		   (documentation "\
 There is energy enough to evaporate this amount of water.")
                    (path column "${column}" Bioclimate "*" total_ep)
                    (spec bioclimate default total_ep)            
                    (handle sum)
                    (dimension "mm/&"))
            (number (tag "Actual evapotranspiration")
-		   (description "\
+		   (documentation "\
 Amount of water removed by evaporation and transpiration.
 
 The evaporation part covers water evaporated from the soil surface,
@@ -119,7 +119,7 @@ evapotranspiration when the available water is insufficient.")
                    (handle sum)
                    (dimension "mm/&"))
            (flux_bottom (tag "Matrix percolation")
-			(description "\
+			(documentation "\
 This is the amount of water leaving the system through the soil bottom.
 It can be negative if there are cabilary raise.")
                         (path column "${column}" SoilWater q)
@@ -128,7 +128,7 @@ It can be negative if there are cabilary raise.")
                         (negate true)
                         (dimension "mm/&"))
            (interval (tag "Soil drain flow")
-		     (description "\
+		     (documentation "\
 Amount of water leaving the system to drain pipes.
 
 Note that the total amount of water in the drain pipes may be higher
@@ -140,7 +140,7 @@ from the soil interval being logged is counted here.")
                      (handle sum)
                      (dimension "mm/&"))
            (number (tag "Surface drain flow")
-                   (description "\
+                   (documentation "\
 Flux of water from surface to drain through biopores, bypassing the matrix.")
                    (path column "${column}" Movement "*" 
                          Tertiary biopores classes drain infiltration)
@@ -148,7 +148,7 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
                    (handle sum)
                    (dimension "mm/&"))
            (number (tag "Runoff")
-		   (description "\
+		   (documentation "\
 Amount of water running of the surface.
 
 This is intended to simulate water runoff from a surface with a slop.
@@ -159,7 +159,7 @@ nowhere go to.  For typical setups, this value will be zero.")
                    (handle sum)
                    (dimension "mm/&"))
            (number (tag "Tertiary water")
-                   (description "\
+                   (documentation "\
 Total amount of water in the biopores.
 
 Note the the biopore system does not keep track of where the
@@ -171,13 +171,13 @@ total amount, even if you otherwise only log part of the soil.")
                    (handle current)
                    (dimension "mm"))
            (interval (tag "Soil water")
-		     (description "\
+		     (documentation "\
 Total water content of the soil.")
                      (path column "${column}" SoilWater Theta)
                      (spec fixed SoilWater Theta)
                      (dimension "mm"))
            (number (tag "Surface water")
-		   (description "Total water stored on the surface.
+		   (documentation "Total water stored on the surface.
 This includes the snow pack, intercepted water, ponding, and water in
 the litter layer.")
                    (path column "${column}" surface_water) 
@@ -198,7 +198,7 @@ the litter layer.")
   (when hourly)
   (summary "Soil water balance")
   (entries (flux_top (tag "Matrix infiltration")
-                     (description "\
+                     (documentation "\
 Amount of water entering the soil through the matrix system.
 
 This is the normal infiltration channel.")
@@ -208,7 +208,7 @@ This is the normal infiltration channel.")
                      (negate true)
                      (dimension "mm/&"))
            (flux_bottom (tag "Matrix percolation")
-                     (description "\
+                     (documentation "\
 Amount of water leaving the soil through the matrix system.
 
 This is the normal percolation channel.")
@@ -218,7 +218,7 @@ This is the normal percolation channel.")
                         (negate true)
                         (dimension "mm/&"))
            (interval (tag "Subsoil irrigation")
-                     (description "\
+                     (documentation "\
 mount of water incorporated directly into the soil.
 
 his include both subsoil irrigation and any water in fertilizer
@@ -229,7 +229,7 @@ irectly incorporated into the soil.")
                      (negate true)
                      (dimension "mm/&"))
            (interval (tag "Tertiary")
-                     (description "\
+                     (documentation "\
 Net amount of water leaving the soil matrix to the biopores.
 
 This may be zero if the same amount of water enters and leaves the interval.")
@@ -238,7 +238,7 @@ This may be zero if the same amount of water enters and leaves the interval.")
                      (handle sum)
                      (dimension "mm/&"))
            (interval (tag "Drain flow")
-                     (description "\
+                     (documentation "\
 Water in the soil interval that flows to the drain pipes.
 
 Note that water flow to the drain pipes from all soil layers, both
@@ -255,7 +255,7 @@ is not 'pipe', this amount will be zero.")
                      (handle sum)
                      (dimension "mm/&"))
            (interval (tag "Root extraction")
-                     (description "\
+                     (documentation "\
 Water in the soil interval extracted by the roots.
 
 This number will be equal to the transpiration if the soil interval
@@ -265,7 +265,7 @@ being logged includes the entire root zone.")
                      (handle sum)
                      (dimension "mm/&"))
            (interval (tag "Freezing")
-                     (description "\
+                     (documentation "\
 Water in the soil interval turned into ice.
 
 This number will be zero unless the 'enable_ice' SoilHeat parameter
@@ -275,7 +275,7 @@ has been set.")
                      (handle sum)
                      (dimension "mm/&"))
            (interval (tag "Tillage")
-                     (description "\
+                     (documentation "\
 Net amount of water being added to the soil interval by tillage operations.
 
 This number will be zero if the soil interval includes the all the
@@ -287,7 +287,7 @@ the tillage operation.")
                      (handle sum)
                      (dimension "mm/&"))
            (interval (tag "Soil water")
-                     (description "\
+                     (documentation "\
 The total amount of water in the soil interval")
                      (path column "${column}" SoilWater Theta)
                      (spec fixed SoilWater Theta)
@@ -426,6 +426,8 @@ The total amount of water in the soil interval")
                          solute_infiltration NH4 value)
                    (spec biopore drain solute_infiltration value)
                    (tag "NH4-Surface-Drain")
+                   (documentation "\
+Amount moving directly from surface to drain, bypassing the soil matrix.")
                    (handle sum)
                    (dimension "${unit}/&"))
            (number (path column "${column}"
@@ -534,6 +536,8 @@ The total amount of water in the soil interval")
                          solute_infiltration NO3 value)
                    (spec biopore drain solute_infiltration value)
                    (tag "NO3-Surface-Drain")
+                   (documentation "\
+Amount moving directly from surface to drain, bypassing the soil matrix.")
                    (handle sum)
                    (dimension "${unit}/&"))
            (number (path column "${column}"
@@ -940,6 +944,8 @@ The total amount of water in the soil interval")
                          solute_infiltration "${chemical}" value)
                    (spec biopore drain solute_infiltration value)
                    (tag "Surface-Drain")
+                   (documentation "\
+Amount moving directly from surface to drain, bypassing the soil matrix.")
                    (handle sum)
                    (dimension "${unit}/&"))
            (interval (path column "${column}" Chemistry "*" 

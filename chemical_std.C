@@ -637,6 +637,7 @@ ChemicalStandard::mix (const Geometry& geo,
   const double removed = surface_storage * penetration;
   surface_tillage += removed / dt;
   surface_storage -= removed;
+  daisy_assert (surface_storage >= 0.0);
   surface_solute *= (1.0 - penetration);
   surface_immobile *= (1.0 - penetration);
   daisy_approximate (surface_storage, surface_solute + surface_immobile);
@@ -715,6 +716,20 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
   surface_decompose = surface_storage * surface_decompose_rate; 
   surface_storage += (surface_in + surface_transform 
                       - surface_runoff - surface_decompose) * dt;
+  if (surface_storage < 0.0)
+    {
+      std::ostringstream tmp;
+      tmp << "Storage: " << surface_storage 
+          << "; In: " << surface_in * dt 
+          << "; Transform (source): " << surface_transform * dt
+          << "; Runoff: " << surface_runoff * dt 
+          << "; Decompose:" << surface_decompose * dt << "\n";
+      surface_decompose += surface_storage / dt;
+      surface_storage = 0.0;
+      tmp << "Adjusted decompose = " << surface_decompose * dt
+          << "; Storage = 0";
+      msg.warning (tmp.str ());
+    }
 
   // Mass balance.
   const double new_storage = snow_storage + canopy_storage;
@@ -746,6 +761,7 @@ ChemicalStandard::tick_surface (const double pond /* [cm] */,
 
   // Find total concentration in mixing layer.
   const double m2_per_cm2 = 0.01 * 0.01 ; // [m^2/cm^2]
+  daisy_assert (surface_storage >= 0.0);
   const double M = surface_storage * m2_per_cm2 / z_mixing; // [g/cm^3]
   daisy_assert (M >= 0.0);
   const double Theta_pond = std::max (pond, 0.0) / z_mixing; // []
@@ -924,7 +940,7 @@ ChemicalStandard::mixture (const Geometry& geo,
 {
   daisy_approximate (surface_storage, surface_solute + surface_immobile);
   // Make sure we have something to mix.
-  if (pond < 1e-6 || R_mixing < 1e-99)
+  if (pond < 1e-6 || R_mixing < 1e-99 || adsorption_->full ())
     {
       surface_mixture = 0.0;
       return;
@@ -938,9 +954,11 @@ ChemicalStandard::mixture (const Geometry& geo,
   const double storage_conc = surface_solute / pond;// [g/m^2/mm]
   
   surface_mixture // [g/m^2/h]
-    = std::min (surface_storage / dt, (storage_conc - soil_conc) / R_mixing);
+    = bound (0.0, (storage_conc - soil_conc) / R_mixing, surface_solute / dt);
   surface_storage -= surface_mixture * dt;
+  daisy_assert (surface_storage >= 0.0);
   surface_solute -= surface_mixture * dt;
+  daisy_assert (surface_solute >= 0.0);
   daisy_approximate (surface_storage, surface_solute + surface_immobile);
 }
 
@@ -963,6 +981,8 @@ ChemicalStandard::infiltrate (const double rate, const double dt)
       surface_out = surface_solute / dt;
       surface_solute = 0.0;
     }
+  daisy_assert (surface_immobile >= 0.0);
+  daisy_assert (surface_solute >= 0.0);
   surface_storage = surface_immobile + surface_solute;
 }
 
