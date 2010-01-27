@@ -16,26 +16,26 @@
 \begin{document}
 \sloppy
 
-\section*{\Daisy{} Tutorial}
+\section*{Daisy Tutorial}
 
 \begin{abstract}
-  Welcome to the \daisy{} tutorial.  This document is intended to
-  teach the use of \daisy{} by example.  It is not by any stretch of
-  the imagination a reference to all the features of \daisy{}, for
+  Welcome to the Daisy tutorial.  This document is intended to
+  teach the use of Daisy by example.  It is not by any stretch of
+  the imagination a reference to all the features of Daisy, for
   that see~\cite{dina81}.  It also does not attempt to explain the
-  mathematical and physical models implemented by the \daisy{}
+  mathematical and physical models implemented by the Daisy
   software, for that see~\cite{daisy-def} and~\cite{daisy-new}.
   
-  I hope that you will able to get started with \daisy{} from these
+  I hope that you will able to get started with Daisy from these
   examples, and when you need to go beyond will be familiar enough
-  with the system to make good use of the reference manual.  \Daisy{}
+  with the system to make good use of the reference manual.  Daisy
   has an amazing number of adjustable dials and wheels, only a tiny
   fraction of which are explained here.  However, they are all at
   least mentioned in the reference manual, which is mostly
   automatically generated from the \texttt{daisy} executable itself.
   
   If you have questions or suggestions to either the manual or the
-  \daisy{} system itself, feel free to contact the authors at
+  Daisy system itself, feel free to contact the authors at
   \href{mailto:daisy@dina.kvl.dk}{\texttt{$<$daisy@dina.kvl.dk$>$}}.
 \end{abstract}
 
@@ -48,17 +48,17 @@ Per Abrahamsen, \today{}.
 
 We start by installing Daisy.  With a web browser, go to the
 address~\url{http://code.google.com/p/daisy-model/}, the home page of
-the \daisy{} project.  Follow the ``getting started'' link that is at
+the Daisy project.  Follow the ``getting started'' link that is at
 the beginning of the main text of the page.  Follow the instructions
 on that page.
 
 \section{Example}
 
 The \texttt{test.dai} file contains all the information about the
-simulation.  We call such a file a \daisy{} setup file, or a
+simulation.  We call such a file a Daisy setup file, or a
 \texttt{.dai} file for short.  By convention, we give such files the
-\texttt{.dai} extension, even though \daisy{} doesn't care.  Teaching
-you to write \daisy{} setup files is the main purpose of this
+\texttt{.dai} extension, even though Daisy doesn't care.  Teaching
+you to write Daisy setup files is the main purpose of this
 tutorial.
 
 First, let's examine line by line the content of the \texttt{test.dai}
@@ -72,7 +72,7 @@ lines are
 \end{verbatim}
 
 Semicolons are used for comments, everything from the semicolon to the
-end of the line is ignored by \daisy{}.  This can (and should!) be
+end of the line is ignored by Daisy.  This can (and should!) be
 used to put information about the simulation there for the person
 reading the file.  That person may very well be you, who some month
 (or years) later have forgotten about the purpose of this particular
@@ -80,7 +80,7 @@ simulation.
 
 For the same reason, providing a description as above is also a good
 idea.  The description will be written to the log files produced by
-\daisy{}, allowing you to later see what log files come from what
+Daisy, allowing you to later see what log files come from what
 simulation.
 
 \subsection{Input files}
@@ -93,18 +93,18 @@ simulation.
   (input file "log.dai")
 \end{verbatim}
 
-Here, we tell \daisy{} to read three additional files:
+Here, we tell Daisy to read three additional files:
 \texttt{tillage.dai} containing descriptions of various standard
 tillage operations, such as plowing and seed bed preparation;
 \texttt{crop.dai} which contains descriptions of crops like spring
-barley or rye; and \texttt{log.dai} with directives for \daisy{} to
+barley or rye; and \texttt{log.dai} with directives for Daisy to
 produce files with information about various aspects of the
 simulation, such as the nitrogen or water balance.  You can read more
 about input files in section~\ref{sec:files}.
 
 \subsection{Weather}
 
-\Daisy{} need to know what the weather is during the simulation.  This
+Daisy need to know what the weather is during the simulation.  This
 is usually read from a file.
 
 \begin{verbatim}
@@ -112,7 +112,7 @@ is usually read from a file.
   (weather default "weather.dwf")
 \end{verbatim}
 
-Here we specify where \daisy{} should find the weather data.  \Daisy{}
+Here we specify where Daisy should find the weather data.  Daisy
 can read weather data in several different formats, the
 \texttt{default} format is \texttt{.dwf}, short for \emph{D}aisy
 \emph{W}eather \emph{F}ormat.  The format is specified in an appendix
@@ -122,7 +122,7 @@ can read weather data in several different formats, the
 \label{sec:ex-hor}
 
 Now we get to main part of the simulation, namely the soil profile, or
-\emph{column}.  In \daisy{}, the column is a one dimensional
+\emph{column}.  In Daisy, the column is a one dimensional
 description of an agricultural system, with the weather at the top and
 the groundwater at the bottom.  Before coming to that, we need to
 define two horizons.  A horizon is a vertical layer of soil with
@@ -171,10 +171,10 @@ them as fractions or percentage or whatever, as you wish.
 
 The \texttt{C\_per\_N} parameter is the C/N ratio of the humus.  This
 affects the background mineralization, a high C/N ratio will lead to
-lowr mineralization.  If you do not have any idea what the C/N ration
+lower mineralization.  If you do not have any idea what the C/N ration
 for your soil is, leave out this parameter.
 
-The \texttt{dry\_bulk\_density} is, as the name implies, the densisty
+The \texttt{dry\_bulk\_density} is, as the name implies, the density
 of the dry soil.  It affects the hydraulic properties of the soil and
 the total humus content.  If you haven't measured this value, you can
 use a different function for estimating the hydraulic properties, by
@@ -184,16 +184,16 @@ replacing it with
 \end{verbatim}
 This pedotransfer function has been developed in America, and does not
 require knowledge of the dry bulk density.  Even if you know the dry
-bulk density, using \texttt{Cosby\_et\_al} might be a better choise
+bulk density, using \texttt{Cosby\_et\_al} might be a better choice
 for simulation in that continent.  The default pedotransfer function,
 \texttt{hypres}, has been developed based on European (especially
 North German) soil measurements.
 
 The texture parameters all end with a \verb|[]|.  This is the
 dimension surrounded by square brackets.  Since fractions are
-dimnesionsless, there is nothing in the brackets.  The two last
+dimensionless, there is nothing in the brackets.  The two last
 parameters have the dimension $g C/g N$ and $g/cm^3$.  It is good idea
-always to specify the dimension, as this will allow \daisy{} to check
+always to specify the dimension, as this will allow Daisy to check
 that dimension really is what you think it is.  Misunderstandings
 about dimensions are a very common source of errors.  The next horizon
 is simpler.
@@ -205,7 +205,7 @@ is simpler.
 \end{verbatim}
 
 Here, instead of \texttt{FAO3}, we write \texttt{Ap}.  This is the
-name of the horizon we just defined, and will cause \daisy{} to reuse
+name of the horizon we just defined, and will cause Daisy to reuse
 the parameter values in the new horizon named \texttt{C} we define
 here.  In particular, we give it the same texture as the \texttt{Ap}
 horizon.  However, since the horizon is intended to describe lower
@@ -231,14 +231,14 @@ Now we have described two horizons, we can describe a column.
 \end{verbatim}
 
 Here, we name the column \texttt{Andeby}, and use the \texttt{default}
-model for \daisy{} columns.  The string following the \texttt{default}
+model for Daisy columns.  The string following the \texttt{default}
 again serves as a description, and this time we use it to note who
 collected the data, from where, and when.
 
-In \daisy{}, a column consists of many separate subsystems.  Most of
+In Daisy, a column consists of many separate subsystems.  Most of
 these have default values, and does thus not need to be specified.
 However, we need a description of the soil, and we need to tell
-\daisy{} where the groundwater is.  Daisy \emph{does} contain default
+Daisy where the groundwater is.  Daisy \emph{does} contain default
 values for organic matter, but these are not very useful.  Here we
 specify that we should use the original\footnote{An alternative at
   this point would be to use the \texttt{none} model, which does not
@@ -268,7 +268,7 @@ meter.
 
 You may note that we specify the depth in \verb|[cm]| for the first
 depth, and \verb|[m]| for the next.  If you don't specify a dimension,
-\daisy{} will expect numbers to be in centimeters, however if you
+Daisy will expect numbers to be in centimeters, however if you
 specify the dimension as \verb|[m]| knows how to convert.  
 
 We specify a numerical border at one meter.
@@ -283,15 +283,15 @@ results.  There are automatically numeric borders between the horizons.
 The other mandatory soil parameter is \texttt{MaxRootingDepth}.  This
 is a soil imposed barrier for the roots, they will not penetrate below
 that depth.  This doesn't mean plant root will penetrate down to that
-depth, it depends on the crop.  To make writing \daisy{} setup files
+depth, it depends on the crop.  To make writing Daisy setup files
 fun, as well as to keep you alert, this number is specified as
 positive depth, unlike the layer endpoints which were specified as
-negative heights.  \Daisy{} will tell you if you get it wrong.
+negative heights.  Daisy will tell you if you get it wrong.
 
 \subsubsection{Organic Matter}
 \label{ex:om}
 
-Knowing the humus content of the soil is not enough, \daisy{} need know
+Knowing the humus content of the soil is not enough, Daisy need know
 the quality of the organic matter as well.  The quality (or lability)
 of the organic matter affect how much background mineralization you
 can expect, which is an important part of the total nitrogen balance.
@@ -320,12 +320,12 @@ following lines.
 \end{verbatim}
 
 Here we specify that we want to initialize the organic matter
-subsystem from the carbon input.  The first line tells \daisy{} that the
+subsystem from the carbon input.  The first line tells Daisy that the
 total yearly carbon input is 1400 kg/ha.  The second line specify that
 out of these 1400 kg, the 480 kg are dead roots.  The third line gives
 the depth of the plowing layer, here 20 cm.  The reason we need the
 two later values (\texttt{root} and \texttt{end}) is that we need to
-know how the carbon input is distributed vertically.  \Daisy{} will
+know how the carbon input is distributed vertically.  Daisy will
 assume most input is distributed evenly in the plowing layer, but that
 some of the roots will reach all the way down to the depth specified
 by \texttt{MaxRootingDepth}.
@@ -338,7 +338,7 @@ of the organic matter further.
 \label{ex:groundwater}
 
 After specifying the soil and organic matter composition, we must tell
-\daisy{} the location of the groundwater.  Here, we specify that the
+Daisy the location of the groundwater.  Here, we specify that the
 groundwater is located so deep that it does not directly affect the
 simulation.  Other options include a constant groundwater table, field
 drainage, and a variable groundwater table specified in a file.  See
@@ -347,7 +347,7 @@ section~\ref{sec:groundwater} for examples.
 \subsubsection{Using it}
 
 We have now specified a column, and given it the name \texttt{Andeby}.
-Now we just need to tell \daisy{} to use this column for the
+Now we just need to tell Daisy to use this column for the
 simulation.
 
 \begin{verbatim}
@@ -357,7 +357,7 @@ simulation.
 
 \subsection{Time}
 
-After specifying the most complex \daisy{} parameter, the column, we
+After specifying the most complex Daisy parameter, the column, we
 relax with the simplest parameter.
 
 \begin{verbatim}
@@ -371,10 +371,10 @@ numbers given are year, month, day and hour in that sequence.
 \subsection{Management}
 \label{sec:ex-man}
 
-Back to the complex stuff.  \Daisy{} now knows about the piece of land
+Back to the complex stuff.  Daisy now knows about the piece of land
 we want to simulate, the weather during the simulation, and when we
 start.  However, since this is an agricultural system, we also need to
-tell \daisy{} about the what management operations the farmer perform
+tell Daisy about the what management operations the farmer perform
 during the simulation.
 
 How to approach this problem depends on whether we are simulating a
@@ -533,7 +533,7 @@ simulation.
 \subsection{Output}
 \label{ex:output}
 
-Now \daisy{} know everything it needs to know in order to run the
+Now Daisy know everything it needs to know in order to run the
 simulation.  We just need to tell it what information about the
 simulation is should save for later processing.
 
@@ -579,15 +579,15 @@ and log it in a \texttt{crop\_prod.dlf} file.  The
 \begin{verbatim}
            (crop "Spring Barley")
 \end{verbatim}
-line tells \daisy{} to only log information about the spring barley,
+line tells Daisy to only log information about the spring barley,
 and by specifying a \texttt{where} parameter we tell it to store the
 information in a file named \texttt{sbarley.dlf} instead.
 
 Note that writing these log files tend to be much slower than actually
-running the simulation, to the more information you tell \daisy{} to
+running the simulation, to the more information you tell Daisy to
 log, the slower the simulation will run.
 
-Finally, we tell \daisy{} To create a checkpoint file at 6:00~AM,
+Finally, we tell Daisy To create a checkpoint file at 6:00~AM,
 August the 7'th, 1987.  This file will be named
 \texttt{checkpoint-1987-8-7+6.dai}.  As the extension hints, this is
 not a log file, but a setup file containing all information about the
@@ -604,7 +604,7 @@ See section~\ref{sec:output} for more information about log models.
 It is common not to have sufficient weather data, either because there
 is no access to data from a nearby weather station, or because you are
 running a predictive simulating, and the data isn't available yet.
-\Daisy{} has two features for handling such cases with available
+Daisy has two features for handling such cases with available
 data.  
 
 \subsection{Scaled precipitation}
@@ -660,7 +660,7 @@ various subsystems of the column.
 \subsection{Carbon Input}
 \label{sec:om}
 
-You can use \daisy{} to estimate the carbon input used daisy{} for
+You can use Daisy to estimate the carbon input used daisy{} for
 organic matter initialization (see section~\ref{ex:om}) with the
 following steps.
 \begin{enumerate}
@@ -697,12 +697,12 @@ for the real simulation.
 \subsection{Background mineralization}
 \label{sec:background}
 
-Having \daisy{} estimate the organic matter quality is a poor
+Having Daisy estimate the organic matter quality is a poor
 substitution for measuring it.  While measuring it directly is hard,
 it is possible to measure the background mineralization indirectly. 
 
 The background mineralization is here defined as the difference
-between the netto mineralization and the amount of added organically
+between the net mineralization and the amount of added organically
 bound nitrogen.  The number can be both positive and negative.  A
 positive number means that we get more nitrogen from mineralization
 than we add to the system.  This nitrogen must come from the humus
@@ -715,10 +715,10 @@ this
 \begin{verbatim}
   Background mineralization: 4.8127 [kg N/ha/y].
 \end{verbatim}
-near the beginning.  This specifies that \daisy{} expects 5 kg N/ha to
+near the beginning.  This specifies that Daisy expects 5 kg N/ha to
 be released from the humus every year for the current setup.  By
 adding the parameter \texttt{background\_mineralization} to the
-organic matter initialization, we tell \daisy{} to attempt to
+organic matter initialization, we tell Daisy to attempt to
 initialize the system differently, to produce the specified level of
 background mineralization.
 
@@ -730,8 +730,8 @@ background mineralization.
 \end{verbatim}
 
 Here, we specify that with the given input levels, we want 30 kg N/ha
-to be released from the humus every year.  It is not certain \daisy{}
-will be able to fulfil that though, there are a number of sanity
+to be released from the humus every year.  It is not certain Daisy
+will be able to fulfill that though, there are a number of sanity
 checks build in which will limit the background mineralization can be
 generated.  You can find the expected background mineralization in the
 beginning of the \texttt{daisy.log} file as before.  And the
@@ -761,17 +761,17 @@ you should have an unfertilized field, but if you do fertilize it must
 be less than the crop is capable of taking up.
 
 It is possible to calibrate the background mineralization from dry
-matter harvest nubers, but only if you are sure the crop growth has
+matter harvest numbers, but only if you are sure the crop growth has
 been nitrogen limited.
 
 \subsection{Hydraulic properties}
 \label{sec:hydraulic}
 
-In section~\ref{sec:ex-hor}, we let \daisy{} guess the hydraulic
+In section~\ref{sec:ex-hor}, we let Daisy guess the hydraulic
 properties from the texture.  This kind of estimates (wild guessing)
 are unreliable at best, and since the hydraulic properties are the key
 most other aspects of the simulation depend on, getting them right
-should be a priority.  \Daisy{} supports a number of models for
+should be a priority.  Daisy supports a number of models for
 hydraulic properties, the most important are listed here, more can be
 found in the reference manual~\cite{dina81}.
 
@@ -872,7 +872,7 @@ towards the pipe.
 \label{sec:aquitard}
 
 For some soils the groundwater table can fall into the aquitard on dry
-years.  For this reason, \daisy{} will automatically add an extra
+years.  For this reason, Daisy will automatically add an extra
 horizon below the bottom horizon you specified.  This will affect
 logging, if you don't want to log the aquitard horizon you must
 explicitly set the \texttt{to} parameter.
@@ -880,7 +880,7 @@ explicitly set the \texttt{to} parameter.
 \subsection{Macropores}
 \label{sec:macro}
 
-By default, \daisy{} will only calculate water flow through the
+By default, Daisy will only calculate water flow through the
 matrix, not through macropores.  This is usually adequate, since the
 vast amount of water travel through the matrix.  However, when
 calculating leaching of nitrogen and especially pesticides, water flow
@@ -935,7 +935,7 @@ meters depth.
 \subsection{Evapotranspiration}
 \label{sec:bioclimate}
 
-By default, Daisy will choose the best model calculaing the reference
+By default, Daisy will choose the best model calculating the reference
 evapotranspiration based on the available data in the weather file.
 You can overwrite this with the \texttt{pet} parameter.
 
@@ -948,15 +948,15 @@ Makking.  It is specified as
 \end{verbatim}
 
 Sometimes you have access to reference evapotranspiration data in the
-weather file, in order to make \daisy{} use these you could specify
+weather file, in order to make Daisy use these you could specify
 pet like
 \begin{verbatim}
     (Bioclimate default (pet weather))
 \end{verbatim}
 except Daisy will automatically use the provided data for reference
-evaporation when when found in the weather file.
+evaporation when found in the weather file.
 
-\Daisy{} also support the more advanced model Penman-Monteith
+Daisy also support the more advanced model Penman-Monteith
 \begin{verbatim}
     (Bioclimate default (pet PM))
 \end{verbatim}
@@ -966,7 +966,7 @@ missing of poor quality, the simple Makkink are more robust.
 
 It is possible to use Penman-Monteith together with
 Shuttleworth-Wallace for the most accurate model of the bioclimate
-supported by \daisy{}.  Enable it with
+supported by Daisy.  Enable it with
 \begin{verbatim}
     (Bioclimate default (pet PM) (svat PMSW))
 \end{verbatim}
@@ -1012,7 +1012,7 @@ to 1.2 at flowering (DS 1.0), and then fall towards 1.0 at ripeness (DS
 
 \subsection{Discretization}
 
-Internally, \daisy{} divides the soil into a number of discrete layers.
+Internally, Daisy divides the soil into a number of discrete layers.
 During the simulation, it will keep track of the content (water, heat,
 nitrogen, etc.) of each layer, and the flows between the layers. A
 fine discretization causes more exact results, but slows down the
@@ -1054,7 +1054,7 @@ applies.
 \subsection{Initialization of soil content}
 \label{sec:init}
 
-\Daisy{} will be default initialize the content of the soil with
+Daisy will be default initialize the content of the soil with
 ``reasonable'' values, which are most likely wrong.  So if you have
 actual measurements you should use those instead.  
 
@@ -1063,7 +1063,7 @@ actual measurements you should use those instead.
 You can initialize the soil water content or the soil water potential,
 but not both.  The ``other one'' will be automatically initialized
 from the values you provided, and the soils hydraulic properties
-(section~\ref{sec:hydraulic}).  To specify intial water content, use
+(section~\ref{sec:hydraulic}).  To specify initial water content, use
 this: 
 \begin{verbatim}
   (defcolumn Andeby default
@@ -1073,7 +1073,7 @@ this:
 \end{verbatim}
 Here we specify that there are 20\% water in the first meter, and
 10\% water in the next 50 cm.  The empty dimension \verb|[]| means
-``fraction''.  Here we divided the soil in two layers, but yopu can
+``fraction''.  Here we divided the soil in two layers, but you can
 divide it into as many layers as you want.  
 
 Soil water pressure is initialized like this:
@@ -1090,35 +1090,43 @@ units.
 There are three different ways to specify mineral nitrogen in the
 soil.  The first is per dry soil mater.  
 \begin{verbatim}
-  (defcolumn Andeby default
-    (SoilNO3 (initial_Ms (-30 [cm] 10 [ppm])
-                         (-70 [cm] 5  [ppm])))
+  (defcolumn JB1_init_hypres JB1_hypres 
+    (Chemistry multi
+               (combine (N (trace (NO3 (initial_Ms (-30 [cm] 10 [ppm])
+                                                   (-70 [cm] 5  [ppm])))
+                                  (NH4)))))
     ;; More parameters...
 \end{verbatim}
 Here we specify the weight of nitrate nitrogen (i.e.\ we ignore the
 weight of the oxygen atoms) in the system (both soil and water), as a
 fraction of the dry soil weight.  The idea is that you first extract
-the nitrate fra a measured soil sample, then weight it, compensate for
+the nitrate from a measured soil sample, then weight it, compensate for
 the oxygen, dry the soil sample, and weight that.  That will give you
 the nitrate nitrogen fraction of the soil.  
 
 The second method is per soil water.
 \begin{verbatim}
-  (defcolumn Andeby default 
-    (SoilNH4 (initial_C (-100 [cm] 1 [ppm]))))
+  (defcolumn JB1_init_hypres JB1_hypres 
+    (Chemistry multi
+               (combine (N (trace (NO3)
+                                  (NH4 (initial_C (-100 [cm] 1 [ppm])))))))
     ;; More parameters...
 \end{verbatim}
 Here the idea is that we extract a sample of water from the soil, and
 measure the ammonium nitrogen concentration in that sample.  This will
 \emph{not} give you the total amount of ammonium nitrate in the soil,
-as some of is is adsorbed to the soil.  That fraction will be found be
+as some of is adsorbed to the soil.  That fraction will be found be
 assuming the adsorbed and solved phases are in equilibrium.
 
-The third method is to specify the total content per volumne, counting
+The third method is to specify the total content per volume, counting
 both soil, water and air. This number give a content that is
 independent of the dry bulk matter density and the water content. 
 \begin{verbatim}
-    (SoilNO3 (initial_M (-100 [cm] 50 [g/cm^3])))
+  (defcolumn JB1_init_Cosby JB1_Cosby
+    (Chemistry multi
+               (combine (N (trace (NO3 (initial_M (-100 [cm] 50 [g/cm^3])))
+                                  (NH4)))))
+    ;; More parameters...
 \end{verbatim}
 
 \subsubsection{Soil temperature}
@@ -1218,7 +1226,7 @@ management for 20 years in two lines.
 This is how I in general recommend writing management specifications.
 Break it down into management specifications for individual crops,
 then combine the crops into rotations.  To make sure the initial state
-of \daisy{} is reasonable, it is a good idea to run at least one
+of Daisy is reasonable, it is a good idea to run at least one
 rotation before the period you are interested in simulating.  
 
 In the next sections I will
@@ -1271,7 +1279,7 @@ simulation, this might be OK, we can then discard the results and
 investigate what went wrong.  However, if we are simulating a 30 year
 period, it will be highly annoying to have to rerun because a single
 year had an unusually later winter or wet spring.  For the sake of
-such long simulations, it is a good idea to get get in the habit of
+such long simulations, it is a good idea to get in the habit of
 adding timeouts to such conditions.
 
 \subsection{Sowing and Harvesting}
@@ -1327,7 +1335,7 @@ Therefore, we start by defining two simpler actions.
   (defaction cut_grass activity
     (wait (or (crop_ds_after "Grass" 0.7 [])
               (crop_dm_over "Grass" 4000 [kg DM/ha] (height 10.0 [cm]))))
-    (harvest "Grass" (stub 10.0 [cm])))
+    (cut "Grass" (stub 10.0 [cm])))
 \end{verbatim}
 Here, we define a \texttt{cut\_grass} operation which wait for the
 grass to grow old or big enough, and then cut it.
@@ -1476,7 +1484,7 @@ fractions.
 It is possible to specify other parameters such as the turnover rate
 and efficiency for the organic fertilizer, but these require
 specialized knowledge of both the fertilizer itself, and the organic
-matter model in \daisy{} (see~\cite{daisy-new}).
+matter model in Daisy (see~\cite{daisy-new}).
 
 \subsubsection{First and Second Year Utilization}
 
@@ -1500,7 +1508,7 @@ To use this information, we can write the following
   (fertilize ("Andeby Pig Slurry")
              (equivalent_weight 100.0 [kg N/ha]))
 \end{verbatim}
-in our management specification.  We let \daisy{} calculate the amount
+in our management specification.  We let Daisy calculate the amount
 of wet weight to apply, to get a first year utilization of 100 kg
 N/ha.  Note that \texttt{equivalent\_weight} is outside the
 parentheses around the \texttt{"Andeby Pig Slurry"}, unlike
@@ -1516,7 +1524,7 @@ one harvest operation (usually the first) the next year have the form
              (minimum_weight 50.0 [kg N/ha])
              (equivalent_weight 150.0 [kg N/ha]))
 \end{verbatim}
-The \texttt{second\_year\_compensation} directive means that \daisy{}
+The \texttt{second\_year\_compensation} directive means that Daisy
 should subtract any second year effect accumulated from fertilizations
 the previous year from \texttt{equivalent\_weight} before calculating
 the amount of fertilizer to apply.  By specifying
@@ -1549,8 +1557,8 @@ as well, in that case you must also specify the
 \subsubsection{Incorporation}
 
 By default, fertilizer will be applied directly on the soil surface.
-There, organic fertilizer will be incorporated gardually by bioloical
-means (earth worms and the like), or suddenly by machanical means,
+There, organic fertilizer will be incorporated gradually by biological
+means (earth worms and the like), or suddenly by mechanical means,
 i.e.\ by a tillage operation.  Inorganic fertilizer will penetrate the
 soil along with the rain or irrigation water.
 
@@ -1630,7 +1638,7 @@ wait for the date, as here
 However, when writing generic crop managements as in
 section~\ref{sec:crop-man}, we can't use that technique.  It might
 rain the first two weeks of July for all we know, which will make
-irrigating rather wasteful.  \Daisy{} therefore provides ways to test
+irrigating rather wasteful.  Daisy therefore provides ways to test
 for the soil water content.
 \begin{verbatim}
   (wait (not (soil_water_pressure_above (height -30.0 [cm])
@@ -1674,7 +1682,7 @@ like this:
 \end{verbatim}
 
 Here, we define a management action named \texttt{irrigate\_30}, which
-consists of waiting for the the soil to dry out, and then irrigating
+consists of waiting for the soil to dry out, and then irrigating
 with 30 mm.  Our management specification says that as long as we are
 managing our spring barley (as defined in \texttt{sbarley}), we will
 repeatedly run \texttt{irrigate\_30}, that is, wait for the soil to
@@ -1703,7 +1711,7 @@ irrigation.
 \end{verbatim}
 
 If there are limits on the total amount of water we are allowed to use
-for irrigation, we can limit the macimal number of times we irrigate,
+for irrigation, we can limit the maximal number of times we irrigate,
 like below.
 \begin{verbatim}
   (manager activity
@@ -1716,9 +1724,9 @@ Here, we will at most irrigate four times.
 \subsection{Pesticides}
 \label{sec:pesticides}
 
-Pesticides have no effect in \daisy{} (i.e. \daisy{} crops are immune
+Pesticides have no effect in Daisy (i.e. Daisy crops are immune
 to everything, and weeds are something that happens to other models).
-Nonetheless, \daisy{} allows you to apply them to the field.  \Daisy{}
+Nonetheless, Daisy allows you to apply them to the field.  Daisy
 will then keep track on them, as the are transported with the water
 through the system, or are removed from the system by either
 decomposition, root uptake, or leaching to the groundwater.
@@ -1742,18 +1750,19 @@ You can easily introduce new pesticides by specifying a few
 parameters.  The parameters may not be that easy to obtain, though.
 Here is an example:
 \begin{verbatim}
-  (defchemical Atrazine default
-    "From a FAO sponsored field experiment near Andeby, 2002."
-    (canopy_dissipation_rate 8e-3 [h^-1])
-    (canopy_washoff_coefficient 1.0 [])
-    (crop_uptake_reflection_factor 0.8 [])
-    (decompose_rate 7e-5 [h^-1])
-    (diffusion_coefficient 8e-6 [cm^2/s])
-    (solute (adsorption linear (K_clay 7 [cm^3/g]))))
+(defchemical Atrazine default
+  "From a FAO sponsored field experiment near Andeby, 2002."
+  (canopy_dissipation_rate 0.0083 [h^-1])
+  (canopy_washoff_coefficient 1.0 [])
+  (crop_uptake_reflection_factor 0.8 [])
+  (diffusion_coefficient 4.6e-6 [cm^2/s])
+  (decompose_rate 7e-5 [h^-1])
+  (diffusion_coefficient 8e-6 [cm^2/s])
+  (adsorption linear (K_clay 7 [cm^3/g])))
 \end{verbatim}
 As we have seen before, in the first line we \emph{def}ine a new
 \emph{chemical} name \emph{Atrazine}, using the \emph{default} (and
-currently only) model for chemicals in \daisy{}.  In the second line,
+currently only) model for chemicals in Daisy.  In the second line,
 we put some information about this chemical so we will know later
 where these numbers come from.
 
@@ -1772,12 +1781,12 @@ fraction of the pesticide dissipate from the canopy each hour, while
 \linebreak{}\texttt{canopy\_washoff\_coefficient} is a measure of how
 the pesticide disolve in the intercepted water.  If you set it 0.0 is
 does not disolve at all, and will never be washed off.  If you set it
-to 1.0 it will be fully disolved, and thus follow any water that fall
+to 1.0 it will be fully dissolved, and thus follow any water that fall
 off the canopy.
 
 \subsubsection{Soil Surface and Root Uptake}
 
-Down on the soil surface, \daisy{} will pretend that the pesticide is
+Down on the soil surface, Daisy will pretend that the pesticide is
 immediately fully dissolved in any water that hits the soil surface,
 and follow the water when it enters the soil.  Nothing else will
 happen to the pesticides when on the soil surface.  Pesticides in the
@@ -1817,7 +1826,7 @@ factors, listed here:
   is for. 
 \item[\texttt{decompose\_lag\_increment}] Some pesticides require
   specialized organisms to decompose, which may take some time to
-  appear.  \Daisy{} therefore keep track of a time lag variable for
+  appear.  Daisy therefore keep track of a time lag variable for
   each pesticide, which starts at zero.  When it reaches one,
   decomposition begins.  You can set this parameter to specify the
   hourly increment, as a function of the concentration in the soil.
@@ -1831,14 +1840,14 @@ factors.
 
 The pesticide in the soil can be transported with convection and
 diffusion.  Set \texttt{diffusion\_coefficient} to specify the later.
-Finally, the pesticide may adsorb to the soil.  \Daisy{} have a number
+Finally, the pesticide may adsorb to the soil.  Daisy have a number
 of advanced models for adsorption, but for pesticides it is usually
-adequate to either disable adsorption \texttt{(adsorbtion none)}, or
+adequate to either disable adsorption \texttt{(adsorption none)}, or
 use a simple linear correspondence between adsorbed and dissolved
 matter, $A = K \rho C$, where $A$ is the amount of adsorbed matter,
 $K$ is a pesticide and soil specific parameter, $\rho$ is the bulk
 density of the soil, and $C$ is the amount of dissolved matter.  In
-\daisy{}, we have split $K$ into a \texttt{K\_clay} parameter which is
+Daisy, we have split $K$ into a \texttt{K\_clay} parameter which is
 multiplied with the clay fraction of the soil, and a \texttt{K\_OC}
 parameter which is multiplied with the humus fraction of the soil.
 
@@ -1848,22 +1857,24 @@ parameter which is multiplied with the humus fraction of the soil.
 
 Here are some log models that are useful when dealing with pesticides:
 \begin{description}
-\item[\texttt{Surface Chemicals}] Summary information about chemicals
-  on the soil surface. File: \texttt{surface\_chemicals.dlf}.
-\item[\texttt{Soil Chemical}] Summary information about chemicals in
-  the soil.  File: \texttt{soil\_chemical.dlf}. 
-\item[\texttt{Chemical}] Amount of chemicals in each numeric soil
-  layer.  Note that nothing will appear in the log file until the
-  chemichals have entered the soil.  Not even zeros.  File:
-  \texttt{chemical.dlf}.
+\item[\texttt{Field chemical}] Enough information to crate a balance
+  for the chemical for the whole field, including what may be present
+  on the surface and in the biopores. File:
+  \texttt{field\_chemicals.dlf}.
+\item[\texttt{Soil chemical}] Enough information to create a balance
+  for a specific soil interval, only including what is present in the
+  soil matrix, but not biopores or soil surface. File:
+  \texttt{soil\_chemicals.dlf}.
 \end{description}
 
-In general, you will get the sum of all chemicals.  To log the content
-of a specific pesticide, such as `Atrazine', specify the
-\emph{\texttt{chemical}} parameter, as in:
+The \texttt{chemical} parameter tell Daisy what pesticide to log, as
+in:
 \begin{verbatim}
-    ("Soil Chemical" (chemical Atrazine))
-\end{verbatim}%$
+    ("Soil chemical" (chemical Atrazine))
+\end{verbatim}
+Specifying this will change the default filename, so for example
+instead \texttt{field\_chemicals.dlf} you will get
+\texttt{field\_Atrazine.dlf}.
 
 \section{Log Files}
 \label{sec:output}
@@ -1887,27 +1898,27 @@ as \texttt{Soil Temperature}, will log the content of a single state
 variable for each of these layers.  Other log models will log many
 state variables by integrating the content of the variable in for all
 layers in some interval, or for flux variables, use the values at the
-top or bottom of the interval.  \texttt{N Balance} is an example of
-such a log model.  You can control what interval to summarize by
+top or bottom of the interval.  \texttt{Soil nitrogen} is an example
+of such a log model.  You can control what interval to summarize by
 setting the \texttt{from} and \texttt{to} parameters.
 
 We use all of them in this example:
 \begin{verbatim}
-  (output ("N Balance" (when monthly)
-                       (where "nitrogen-balance.dlf")
-                       (from 0 [m]) (to -1 [m])))
+  (output ("Soil nitrogen" (when monthly)
+                           (where "nitrogen-balance.dlf")
+                           (from 0 [m]) (to -1 [m])))
 \end{verbatim}
 
 \subsection{Activating output}
 \label{sec:actout}
 
 Since writing a log file tend to be as slow as running the
-simulation itself, and if you specify many log files \daisy{} will
+simulation itself, and if you specify many log files Daisy will
 become very slow indeed.  It also depend on the log file, as a general
 rule, large log files are much more time consuming than small log
 files.  So don't ask for hourly values of daily or even monthly values
 will do.  But the `harvest' log model is nearly free.  And if you are
-using \daisy{} interactively, don't specify a log file just because
+using Daisy interactively, don't specify a log file just because
 you \emph{may} need the information.  If you later discover that you
 need the information in that log file, you can rerun the simulation
 specifying log file only.
@@ -1929,55 +1940,14 @@ in management.  To limit the period in both ends, you can use
 which will give you log files containing data from the hydraulic year
 1997. 
 
-\subsection{Log models}
-\label{sec:log-models}
-
-Here are some useful log models, you can find more in the
-\texttt{log.dai} file, and scattered around this manual.
-\begin{description}
-\item[\texttt{Total Soil Content}] Information about the water, carbon
-  and nitrogen content of the soil.  File: \texttt{soil\_content.dlf}.
-\item[\texttt{Soil NO3 Concentration}] Amount of nitrate in all
-  numeric soil layers.  This include both the nitrogen and oxygen
-  atoms of the nitrate.  File: \texttt{soil\_NO3.dlf}.
-\item[\texttt{Soil NO3-N Concentration}] Amount of nitrate nitrogen in
-  all numeric soil layers.  This include only nitrogen atoms of the
-  nitrate.  File: \texttt{soil\_NO3-N.dlf}.
-\item[\texttt{Soil Temperature}] Temperature in all numeric soil
-  layers. File: \texttt{soil\_temperature.dlf}.
-\item[\texttt{Soil Water Potential}] Water potential in all numeric
-  soil layers.  File: \texttt{soil\_water\_potential.dlf}.
-\item[\texttt{Soil Water Sink}] The water sink in all numeric soil
-  layers.  The water sink is an aggregate of root uptake, preferential
-  flow, flow to drain pipes, and subsoil irrigation.  File:
-  \texttt{soil\_water\_sink.dlf}.
-\item[\texttt{Matrix Water Flux}] The matrix water flux between all
-  numeric soil layers.  File: \texttt{matrix\_water\_flux.dlf}.
-\item[\texttt{Surface Water Balance}] Enough information to create a
-  water balance for the soil surface.  File:
-  \texttt{surface\_water\_balance.dlf}.
-\item[\texttt{Root Zone Water Balance}] Enough information to create a
-  water balance for the root zone.  File:
-  \texttt{root\_zone\_water\_balance.dlf}. 
-\item[\texttt{N Balance}] Enough information to create a balance for
-  the soil nitrogen.  File: \texttt{N\_balance.dlf}.
-\item[\texttt{Carbon Balance}] Enough information to create a balance for
-  the soil carbon.  File: \texttt{C\_bal.dlf}.
-\item[\texttt{Soil Heat Balance}] All available information about the
-  soil heat subsystem.  File: \texttt{soil\_heat\_balance.dlf}.
-\item[\texttt{Snow}] All available information about the snow
-  subsystem.  File: \texttt{snow.dlf}.
-% TODO: \item[\texttt{}]   File: \texttt{}.
-\end{description}
-
 \section{Plotting simulation results}
 \label{sec:plot}
 
-The \texttt{.dlf} files produced by \daisy{} are text files with (by
-default) tab seperated columns, and can be viewed by any text editor,
-or by most spreadsheets.  There also exist a specialiced program,
-\texttt{ShowDaisyOutput}, to display the results, and \Daisy{} has a
-build in fascility to covert the \texttt{.dlf} files (as well as the
+The \texttt{.dlf} files produced by Daisy are text files with (by
+default) tab separated columns, and can be viewed by any text editor,
+or by most spreadsheets.  There also exist a specialized program,
+\texttt{ShowDaisyOutput}, to display the results, and Daisy has a
+build in facility to covert the \texttt{.dlf} files (as well as the
 related weather \texttt{(.dwf)} files and data files \texttt{.ddf}
 with measurements) into commands to the general plot program
 \texttt{gnuplot}. 
@@ -1985,22 +1955,22 @@ with measurements) into commands to the general plot program
 
 \subsection{Spreadsheets}
 
-Note that \daisy{} uses US style numbers, that is decimal point rather
+Note that Daisy uses US style numbers, that is decimal point rather
 than decimal comma.  If the numbers looks weird in your spreadsheet,
 check how they look in a text editor like notepad.  If the numbers are
 different, you may need to change the settings of the program to
-accept american style numbers.  In MS Windows, you can change the
+accept American style numbers.  In MS Windows, you can change the
 number style from the control panel (Start $\rightarrow$ Control panel
 $\rightarrow$ International).
 
-For Excel, the easiest way to open \daisy{} log files are either to
+For Excel, the easiest way to open Daisy log files are either to
 drag them into a shortcut to Excel, or to associate the \texttt{.dlf}
 files with Excel (right click on the file, and use ``Open with'' to
 open the file with Excel).
 
 \subsection{ShowDaisyOutput}
 
-The ShowDaisyOutput can be fetched from the \daisy{} homepage.  It
+The ShowDaisyOutput can be fetched from the Daisy homepage.  It
 only works under MS Windows.  It is very good for a fast overview of
 the results, you simply drag the \texttt{.dlf} file to the
 ShowDaisyOutput icon, and the program will display the first
@@ -2014,19 +1984,24 @@ For some log files, ShowDaisyOutput can display the data as a soil
 profile with depth at the y-axes and value at the x-axes.  You can
 then animate the data to see changes in time.
 
-There is no printing fascilities in ShowDaisyOutput, use on of the
+There is no printing facilities in ShowDaisyOutput, use on of the
 other options for that. 
 
 \subsection{Generating gnuplot commands from Daisy}
 \label{sec:gnuplot-daisy}
 
-The \emph{gnuplot} program build into \daisy{} allows you to create
-command files for external \texttt{gnuplot} or \texttt{wgnuplot.exe}
-to create plots in encapsulated postscript (\texttt{*.eps}), Acrobat
-Reader PDF (\texttt{*.pdf}), LaTeX (\texttt{*.tex}) format or be shown
-directly in a window.  The data to be plotted can be read from
-\daisy{} log files (\texttt{*.dlf}), \daisy{} weather files
-(\texttt{*.dwf}) or the \daisy{} data files (\texttt{*.ddf}).
+The \emph{gnuplot} program build into Daisy allows you to create a
+command file (name \texttt{daisy.gnuplot}) for the external
+\texttt{gnuplot} (or \texttt{wgnuplot.exe}) tool, to create plots in
+encapsulated postscript (\texttt{*.eps}), Acrobat Reader PDF
+(\texttt{*.pdf}), LaTeX (\texttt{*.tex}) format or be shown directly
+in a window.  The data to be plotted can be read from Daisy log
+files (\texttt{*.dlf}), Daisy weather files (\texttt{*.dwf}) or the
+Daisy data files (\texttt{*.ddf}).
+
+The gnuplot homepage are at \url{http://www.gnuplot.info/} where you
+can find versions of the program for most platforms.  You need at
+least version 4.0 of gnuplot.
 
 \subsection{Simple example}
 
@@ -2099,7 +2074,7 @@ This example defines a gnuplot graph called ``another test''.
   90 degrees.  You can also set fonts and font sizes, ask for
   monochrome plots, and many other things.
 \item We ask to get the legend in the South-East corner, instead of
-  letting \daisy{} find the corner farthest away from an data.  
+  letting Daisy find the corner farthest away from an data.  
 \item We use different titles and different names for the dimensions
   for the 'harvest.dlf' data, and we plot them with points instead of
   lines.  By default Daisy use points for `\texttt{*.ddf}' files, and
@@ -2107,7 +2082,7 @@ This example defines a gnuplot graph called ``another test''.
 \item We only get WLeaf data from `\texttt{crop-prod.dlf}' that are
   from days with length 10 or 8, and from September or October.
 \item We use the first and second style for plotting WLeaf and WSOrg
-  from `\texttt{crop\_prod.dlf}', instead of letting \daisy{} find the
+  from `\texttt{crop\_prod.dlf}', instead of letting Daisy find the
   next available style.  This means they have the same style as the
   corresponding data from `\texttt{harvest.dlf}', except that they are
   plotted as lines instead of points.
@@ -2116,7 +2091,7 @@ In order to actually plot the graphs we have defined, we define a
 gnuplot program called ``Andeby Graphs''.  This program will generate
 command in the ``\texttt{kurt.gnuplot}'' file to plot three graphs.
 First the graph we just defined named ``another\_test'' with no output
-file sepcified, meaning the graph will be shown on the screen.  Then
+file specified, meaning the graph will be shown on the screen.  Then
 the program generates commands for plotting the original test graph in
 a file called ``\texttt{test.eps}'', and then the new graph in the
 file ``\texttt{another-test.eps}''.
@@ -2158,9 +2133,9 @@ You can convert dimensions with \texttt{(convert \textit{expr}
 \begin{verbatim}
   (expr (convert WSOrg [g DM/m^2]))
 \end{verbatim}
-\Daisy{} is in general unable to calculate the dimensions of the result
-of some arithementic expression, except in the most simple cases (like
-\texttt{+}).  You can tell \daisy{} the dimension with \texttt{(dim \textit{expr} \textit{dim})}, like
+Daisy is in general unable to calculate the dimensions of the result
+of some arithmetic expression, except in the most simple cases (like
+\texttt{+}).  You can tell Daisy the dimension with \texttt{(dim \textit{expr} \textit{dim})}, like
 \begin{verbatim}
   (expr (dim (* WSOrg (const 2.0 [])) [Mg DM/ha]))
 \end{verbatim}
@@ -2169,7 +2144,7 @@ value, only the dimension.
 
 \subsection{Daisy Data Files (\texttt{*.ddf})}
 
-Th `\texttt{*.ddf}' files are intended for measured data.  The data
+The `\texttt{*.ddf}' files are intended for measured data.  The data
 are by default plotted as points, and with the same styles as data
 sources in the same sequence from `\texttt{*.dlf}' and
 `\texttt{*.dwf}' files.  The idea is that you want to compare measured
@@ -2180,7 +2155,7 @@ The format is:
   ddf-0.0 You can insert a description after the seven first letters.
   # Here you can add comments, here.
   # As long as they begin with a '#'.
-  # After a line of hyphens, tab seperated data should be listed.
+  # After a line of hyphens, tab separated data should be listed.
   # The two first lines are tags and dimensions, like for '*.dlf' files.
   ------
   Date           Height
@@ -2188,23 +2163,12 @@ The format is:
   2005-09-24T01  20
   2005-09-24T07  21
 \end{verbatim}
-You can either seperate year/month/mday/hour columns, as in the dlf
+You can either separate year/month/mday/hour columns, as in the dlf
 and dwf files, or a single Date column, with the format
 `\texttt{yyyy-mm-ddThh}' (which happens to be an ISO standard).
 
 If you don't have a dimension line, you must specify the dimension
 with the \texttt{original} keyword for each source.
-
-\subsection{\texttt{wgnuplot.exe}}
-
-The \daisy{} home page at \url{http://www.dina.kvl.dk/~daisy/} has a
-link to a MS Windows binary for gnuplot.  You can execute the gnuplot
-commands by dragging the \texttt{daisy.gnuplot} file to the
-\texttt{wgnuplot.exe} binary.  If you open the application before
-dragging, you will be able to see any error messages that may be
-produced. The gnuplot homepage are at \url{http://www.gnuplot.info/}
-where you can find Unix and Mac versions of the program.  You need at
-least version 4.0 of gnuplot.
 
 \section{Organizing Your Parameterizations}
 \label{sec:files}
@@ -2216,21 +2180,20 @@ parameterizations will be generically useful, that is, useful in many
 different simulations.  My advice is that you from the start create a
 \emph{library} of such parameterizations, for later use.  This library
 should be kept separate from both the standard library that comes with
-\daisy{}, and from the files that are specific to your current
+Daisy, and from the files that are specific to your current
 simulation.  By separate, I mean that you should keep the files in
 three or more different directories.
 \begin{itemize}
-\item A directory containing the parameterization files distributed by
-  \textsc{kvl}, i.e.\ the content of \texttt{daisy-lib.zip}.  You
-  should never change these files, and never add new files yourself.
-  If you want to add anything there, send your additions to
+\item The \texttt{lib} and \texttt{sample} directories distributed
+  with Daisy.  You should never change these files, and never add new
+  files yourself.  If you want to add anything there, send your
+  additions to
   \href{mailto:daisy@dina.kvl.dk}{\texttt{$<$daisy@dina.kvl.dk$>$}},
   and let me do it.  The advantage of this is that it will be easy to
-  upgrade your \daisy{} installation when a new and improved version
+  upgrade your Daisy installation when a new and improved version
   with new and improved features, and new and improved bugs, arrives.
-  You just delete the old content of the directory, and install the
-  new files instead.  Or better, rename the old directory so you can
-  backup in case anything is horrible wrong with the new version.
+  These files are closely tied to the version of Daisy they are
+  distributed with.
 \item A directory containing files with those parameterizations that
   are not specific to a single simulation.  In that directory you can
   organize the parameterizations by locations (e.g.\ put all horizon
@@ -2248,7 +2211,7 @@ From experience, such an organization saves time in the long run.
 
 A related hint for your own parameterizations: Don't copy, derive.
 For example, if you want a slightly different grass than the one
-provided by the standard \daisy{} library, don't just copy the
+provided by the standard Daisy library, don't just copy the
 definition from \texttt{grass.dai} and edit the parameter you want to
 change.  And certainly don't change the \texttt{grass.dai} directly.
 Instead, create a derived parameterization as we did in
@@ -2262,7 +2225,7 @@ section~\ref{sec:bioclimate}:
 The advantage of doing it this way twofold.  First, if we fix or
 improve the grass parameterization in \texttt{grass.dai}, you will
 derived version will automatically get the improvements when you
-install the updated \daisy{} version.  Furthermore, we may make
+install the updated Daisy version.  Furthermore, we may make
 changes to the default crop model that requires corresponding changes
 to the parameterizations.  Of course, we do that for the standard
 parameterizations right away.  But if you have made a copy of the
@@ -2272,48 +2235,37 @@ parameterizations, it will break when you install the new version.
 \label{sec:daisypath}
 
 Now that you have followed my advice, and spread your files over three
-directories, how do we tell \daisy{} where to find it?  Well, \daisy{}
+directories, how do we tell Daisy where to find it?  Well, Daisy
 uses two sources to find the files:
 \begin{itemize}
 \item A \emph{path} containing information about which directories to
   look, and
 \item the \emph{current directory}, which is also the place it will
-  put any log files. 
+  put any log files.  If ``\texttt{.}'' is included in the path, Daisy
+  will also look for input files here.
 \end{itemize}
 
-The preferred way to tell \daisy{} what path to use is through the
-\textsc{daisypath} environment variable.  Unfortunately, how to set
-this depend on what operating system you are using.  Under Unix
-(including Linux), it has the same syntax as the \textsc{path}
-environment variable, and is set the same place, i.e.\ your
-\texttt{.bashrc} or \texttt{.cshrc} file, depending on your shell. 
-
-On MS Windows, it still have the same syntax as
-\textsc{path}\footnote{With the disclaimer that the syntax for
-  \textsc{path} is different on Unix and MS Windows.}, and is set the
-same way.  If you are one of the rare MS Windows users who know how to
-do that, go ahead and do it.  It does depend on which exact version of
-MS Windows you use, though.  
-
-In \cite{dina81} there are some examples of how to set
-\textsc{daisypath} on various systems.  However, you may prefer the
-alternative of putting this information in the setup files themselves.
-Insert
+By default, Daisy will look for files in the current directory, as
+well as in the directories distributed with Daisy (if you have used
+the MS Windows installer).  You can overwrite this with the
+\texttt{DAISYHOME} or \texttt{DAISYPATH} environment variable, or by
+specifying path explicitly in the setup file like this:
 \begin{verbatim}
   ;; Search file files these places.
-  (path "." "c:/My Files/daisy/lib/" "c:/Program Files/daisy/lib/")
+  (path "." "c:/My Files/daisy/lib/" &old)
 \end{verbatim}
-assuming you installed the \daisy{} standard parameter files
-in\linebreak[4] ``\verb|c:\Program Files\daisy\lib|'' and your own
-parameter files in\linebreak[4] ``\verb|c:\My Files\daisy\lib|''.
 Note that ``\texttt{.}'' means ``look in the current directory'' and
 that you should use forward slashes (\verb|/|) instead of backslashes
-(\verb|\|) in the path names. % \verb|\|
+(\verb|\|) in the path names.  The special keyword \verb|&old| means
+the old value for path.  This means that Daisy will first look for
+files in the current directory, then in \verb|C:\My Files\daisy\lib|,
+and finally where it would have looked if you hadn't specified
+anything
 
-If you start \daisy{} from the command line, as in
-section~\ref{sec:install}, the current directory will be the directory
-where you run the command.  However, you can also specify it
-explicitly in the setup file, like this:
+If you start Daisy from TextPad after following the instructions on
+the home page, the current directory will be the same directory as the
+active file in TextPad.  However, you can also specify it explicitly
+in the setup file, like this:
 \begin{verbatim}
   ;; Run program here.
   (directory "c:/My Files/Andeby/sim01")
@@ -2325,12 +2277,11 @@ program somewhere silly.
 
 The reason I recommend the \textsc{daisypath} route, is that the setup
 files become location independent.  That is, if you send it to someone
-else who have installed \daisy{} in another location, he can still run
+else who have installed Daisy in another location, he can still run
 the setup file unchanged.  If you specify \texttt{path} in the setup
 file, he has to change one line.  If you specify \texttt{directory},
-he has to change two lines.  What I don't recommend is neither
-specifying \textsc{daisypath}, nor setting \texttt{path}, but using
-absolute file names.  E.g.
+he has to change two lines.  What I don't recommend is using absolute
+file names.  E.g.
 \begin{verbatim}
   (input file "c:/Program Files/daisy/lib/fertilizer.dai")
 \end{verbatim}
@@ -2376,7 +2327,7 @@ under temperate conditions, for example for potato farming in Denmark,
 where ridging provide better growing conditions in the soil,
 especially with regard to heat.
 
-In \daisy{}, ridges only affects the flow of soil and surface water,
+In Daisy, ridges only affects the flow of soil and surface water,
 and a hard-to-penetrate crust is assumed, making it less relevant to
 Danish potato farming.
 
@@ -2403,7 +2354,7 @@ uniform hydraulic properties throughout the ridge.
 To remove the ridges, specify any other tillage operation.
 
 Technically, the ridge operation creates a special subsystem within
-\daisy{} where water flow sideways into the ridge wall or down through
+Daisy where water flow sideways into the ridge wall or down through
 the ridge bottom.  You can log this subsystem with the following log
 parameterization:
 \begin{description}
@@ -2416,7 +2367,7 @@ parameterization:
 
 You can force the CAI to have a specific value for part of the year.
 This is useful if you have measured the total CAI and want Daisy to
-use those values for photosyntheses and transpiration (and
+use those values for photosynthesis and transpiration (and
 interception capacity).  Here is an example:
 \begin{verbatim}
   (defcolumn Andeby default
@@ -2430,17 +2381,17 @@ interception capacity).  Here is an example:
 \end{verbatim}
 The code above should be read: In 1987 we start using forced CAI day
 100 where it is 2.0 and end forced CAI in day 200 where it is 5.0.  We
-use liniear interpolation between these two points, so in day 150 it
+use linear interpolation between these two points, so in day 150 it
 will be 4.0.  Before day 100 and after day 200 we use the simulated
 CAI values.  In 1988 we start day 100 at CAI 0.0, increase linearly to
 1.5 day 150, and from there again linearly to 5.0 day 200, where we
 switch back to using simulated CAI\@.  All other years we use simulated
 LAI.
 
-Only paramterizations of the \texttt{default} crop model will be
+Only parameterizations of the \texttt{default} crop model will be
 affected by the \texttt{ForcedLAI} attribute.
 
-If there are mulitple crops, the forced CAI will be distributed among
+If there are multiple crops, the forced CAI will be distributed among
 them corresponding to the relative size of their simulated CAI\@.  When
 forced CAI is active, this is the only use of the simulated CAI\@.  
 
@@ -2477,7 +2428,7 @@ simulated CAI\@.  By default, it will log the sum of all crops, set
 (input file "log.dai")
 
 ;; Weather data.
-(weather default "weather.dwf")
+(weather default "dk-taastrup.dwf")
 
 ;; We have some very sandy soil.
 (defhorizon Ap FAO3
@@ -2495,23 +2446,22 @@ simulated CAI\@.  By default, it will log the sum of all crops, set
 
 ;; We build the column from the horizons.
 (defcolumn Andeby default
-  "The B.And farm, Andeby, 2002."
+  "Data collected by F.Guf at the B.And farm, Andeby, 2002."
   (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
-        (border 1 [m])
+        (border -1 [m])
         (MaxRootingDepth 60.0 [cm]))
-  (OrganicMatter (init (input 1400 [kg C/ha/y])
+  (OrganicMatter original
+                 (init (input 1400 [kg C/ha/y])
                        (root 480 [kg C/ha/y])
                        (end -20 [cm])))
-  ;; Measured numbers for groundwater table can be read from a file, like this:
-  ;; (Groundwater file "example.gwt")
-  ;; But here we assume free drainage.
   (Groundwater deep))
 
 ;; Use it.
 (column Andeby)
 
-;; Simulation start date.
+;; Simulation start and stop dates.
 (time 1986 12 1 1)
+(stop 1988 4 1 1)
 
 (manager activity
   (wait (at 1987 3 20 1))
@@ -2530,16 +2480,16 @@ simulated CAI\@.  By default, it will log the sum of all crops, set
   (fertilize (mineral (weight 80.0 [kg N/ha])
                       (NH4_fraction 0.5 [])))
   (wait (at 1987 10 10 1))
-  (harvest "Grass"
-           (stub 8.0 [cm])              ;Leave 8 cm stub.
-           (stem 1.00 []))             ;Harvest everything above stub.
-  (wait (at 1988 4 1 1))
-  (stop))
+  (cut "Grass"
+       (stub 8.0 [cm])              ;Leave 8 cm stub.
+       (stem 1.00 [])))             ;Harvest everything above stub.
 
 ;; Create these log files.
 (output harvest
-        ("N Balance" (when monthly)
-                     (from 0 [m]) (to -1 [m]))
+        ("Field nitrogen" (when monthly))
+        ("Soil nitrogen" (when daily) (from 0 [m]) (to -1 [m]))
+        ("Field water" (when monthly))
+        ("Soil water" (when daily) (from 0 [m]) (to -1 [m]))
         ("Crop Production"
          (crop "Spring Barley")
          (where "sbarley.dlf"))
@@ -2547,7 +2497,6 @@ simulated CAI\@.  By default, it will log the sum of all crops, set
 
 ;;; test.dai ends here.
 \end{verbatim}
-%$
 
 \section{Bibliography}
 \bibliography{daisy}

@@ -135,16 +135,13 @@ HydraulicMACRO::K_fict (const double h) const
 double 
 HydraulicMACRO::K (const double h) const
 {
-  if (h >= 0.0 && enable_K_macro)
+  if (h < h_b || !enable_K_macro)
+    return K_micro (h);
+  
+  if (h >= 0.0)
     return K_sat;
 
-  const double K_mi = K_micro (h);
-  if (h < h_b || !enable_K_macro)
-    return K_mi;
-
-  const double K_ma = (K_sat - K_b) * std::pow (S_ma (h), n_ma);
-  
-  return K_mi + K_ma;
+  return (K_sat - K_b) * std::pow (S_ma (h), n_ma) + K_b;
 }
 
 double 

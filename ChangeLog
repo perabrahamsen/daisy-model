@@ -1,3 +1,10 @@
+2010-01-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* program_document.C (print_component): Special treatment of
+	"component".
+
+	* select_content.C: Change to work when loging multiple columns.
+
 2010-01-25  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* log_select.C (document_entries): Use base_name instead of type_name.

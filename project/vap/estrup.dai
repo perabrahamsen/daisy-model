@@ -10,6 +10,7 @@
 (defhorizon Estrup_Ap_MACRO FAO3
   (clay 14.6 [%]) (silt 23.33 [%])(sand 62.07 [%])
   (humus (C2OM (C 3.248 [%]))) (dry_bulk_density 1.51 [g/cm^3])
+  (anisotropy 2)
   (hydraulic MACRO 
              (Theta_b 36 [%]) (Theta_res 0.0 [%])
              (n 1.16 []) 
@@ -31,6 +32,7 @@
 (defhorizon Estrup_B_MACRO FAO3
   (clay 21.7 [%]) (silt 17.87 [%])(sand 60.43 [%])
   (humus (C2OM (C 0.812 [%]))) (dry_bulk_density 1.68 [g/cm^3])
+  (anisotropy 2)
   (hydraulic MACRO
              (Theta_b 35 [%]) (Theta_res 0.0 [%])
              (n 1.14 []) (K_b 0.3 [mm/h]) (l 0.5 []) (alpha 0.01 [cm^-1])
@@ -43,11 +45,13 @@
 
 (defhorizon Estrup_B_plow_pan Estrup_B
   ;; 10% of B.
+  (anisotropy 12)
   (hydraulic original (K_b 0.03 [mm/h])))
 
 (defhorizon Estrup_C1_MACRO FAO3
   (clay 26.75 [%]) (silt 14.23 [%])(sand 59.02 [%])
   (humus (C2OM (C 0.203 [%]))) (dry_bulk_density 1.73 [g/cm^3])
+  (anisotropy 2)
   (hydraulic MACRO
              (Theta_b 32 [%]) (Theta_res 0.0 [%])
              (n 1.1 []) (K_b 0.3 [mm/h])
@@ -62,6 +66,7 @@
 (defhorizon Estrup_C2_MACRO FAO3
   (clay 25.7 [%]) (silt 22.2 [%])(sand 52.1 [%])
   (humus (C2OM (C 0.233 [%]))) (dry_bulk_density 1.64 [g/cm^3])
+  (anisotropy 2)
   (hydraulic MACRO
              (Theta_b 39 [%]) (Theta_res 0.0 [%])
              (n 1.1 []) (K_b 0.16 [mm/h])
@@ -111,6 +116,7 @@
                       (xplus 10 25 50 100 150 200 300 400 500 650 [cm]))))
 
 (defcolumn Estrup-1C-Drain Estrup
+  (area 20 [cm^2])
   (Movement original 
             (Tertiary (VAP 
                        (classes ("matrix_0cm" (height_end -27 [cm])) 
@@ -120,10 +126,11 @@
                                  (height_start -30 [cm])))))))
 
 (defcolumn Estrup-1C-Center Estrup
+  (area 630 [cm^2])
   (Movement original 
             (Drain Hooghoudt
                    (L 13 [m])
-                   (x 650 [cm])
+                   (x 325 [cm])
                    (pipe_position -110.0 [cm]))
             (Tertiary (VAP 
                        (classes ("matrix_0cm" (height_end -27 [cm]))
@@ -383,8 +390,11 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
 (defprogram Estrup-2D Estrup
   (column Estrup-2D))
 
-(defprogram Estrup-1C Estrup
+(defprogram Estrup-1C-Center Estrup
   (column Estrup-1C-Center))
+
+(defprogram Estrup-1C-Drain Estrup
+  (column Estrup-1C-Drain))
 
 (defprogram Estrup-2C Estrup
   (column Estrup-1C-Drain Estrup-1C-Center))

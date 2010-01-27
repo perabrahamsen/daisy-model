@@ -78,7 +78,19 @@
   (content "Soil water" "Surface water" "Tertiary water"))
 
 (deflog "Field water" column
-  "Information about water input, output and content for the system."
+  "Information about water input, output and content for the system.
+
+The intended use of this log is large scale water balance, for
+example reservoir management. It provide information about how
+much water is in the field (down to a specified depth), where it
+is located in the field (surface, soil matrix or in biopores), as
+well as the sources, sinks and amounts of water entering or
+leaving the system.  It does not provide information about
+internal translocation of water between surface, soil matrix and
+biopores, use see the 'Soil water' log instead for that.
+
+For the balances of this log to work, you must include the entire
+root zone, as well as the biopore zone."
   (where "${colfid}field_water.dlf")
   (when hourly)
   (summary "Field water balance")
@@ -185,7 +197,13 @@ the litter layer.")
                    (dimension "mm"))))
 
 (defsummary "Soil water balance" balance
-  "Water balance for the soil."
+  "Water balance for the soil matrix.
+
+The intended use of this log is small scale water management, for
+example irrigation optimization.  Above ground water and water in
+biopores is considered external to the system.  The balances
+provided by the log will work on any subset of the soil that
+matches the discretization."
   (precision 1)
   (input "Matrix infiltration" "Subsoil irrigation" "Tillage")
   (output "Matrix percolation" "Tertiary" "Drain flow"
@@ -351,7 +369,21 @@ The total amount of water in the soil interval")
   (content "Org_N-Surface" "Org_N-Soil"))
 
 (deflog "Field nitrogen" column
-  "Nitrogen input, output, transformation and content for the system."
+  "Nitrogen input, output, transformation and content for the system.
+
+The intended use of this log is large scale nitrogen balance, for
+example reservoir management. It provide information about how
+much nitrogen is in the field (down to a specified depth), where
+it is located in the field (surface, soil matrix or in biopores),
+what form is cas (crop, soil organic matter, NO3 or NH4) as well
+as the sources, sinks and amounts of nitrogen entering or leaving
+the system, and transformation between the four forms.  It does
+not provide information about internal translocation of nitrogen
+between surface, soil matrix and biopores, use see the 'Soil
+nitrogen' log instead for that.
+
+For the balances of this log to work, you must include the entire
+root zone, as well as the biopore zone."
   (declare unit String "Base unit.")
   (unit "kg N/ha")
   (where "${colfid}field_nitrogen.dlf")
@@ -363,11 +395,15 @@ The total amount of water in the soil interval")
 			 Chemistry "*" trace NH4 spray)
                    (spec chemical default spray)
 		   (handle sum)
+                   (documentation "\
+NH4-fertilizer added above the soil surface.")
                    (tag "NH4-Surface-Fertilizer")
                    (dimension "${unit}/&"))
            (interval (path column "${column}"
 			   Chemistry "*" trace NH4 S_external)
                      (spec chemical default S_external)
+                     (documentation "\
+NH4-fertilizer incorporated into the soil.")
                      (tag "NH4-Soil-Fertilizer")
                      (handle sum)
                      (dimension "${unit}/&"))
@@ -375,23 +411,36 @@ The total amount of water in the soil interval")
 			 Chemistry "*" trace NH4 canopy_dissipate)
                    (spec chemical default canopy_dissipate)
                    (handle sum)
+                   (documentation "\
+NH4-fertilizer lost during the application.")
                    (tag "NH4-Volatilization")
                    (dimension "${unit}/&"))
            (number (path column "${column}" 
 			 Chemistry "*" trace NH4 deposit)
                    (spec chemical default deposit)
                    (handle sum)
+                   (documentation "\
+NH4 added to the soil surface as atmospheric deposition.")
                    (tag "NH4-Deposit")
                    (dimension "${unit}/&"))
            (number (path column "${column}" 
 			 Chemistry "*" trace NH4 top_storage)
                    (spec chemical default top_storage)
+                   (documentation "\
+Total NH4 stored above the soil surface (on leaves, in ponded water, etc.).")
                    (tag "NH4-Surface")
                    (dimension "${unit}"))
            (number (path column "${column}" 
 			 Chemistry "*" trace NH4 top_loss)
                    (spec chemical default top_loss)
                    (handle sum)
+                   (documentation "\
+Loss of NH4 stored above surface.
+
+This includes various sources that are usually rare or small,
+such as surface runoff, NH4 on leaves removed at harvest, and
+chemical transformations.  It does not include volatilization or
+infiltration.")
                    (tag "NH4-Surface-Loss")
                    (dimension "${unit}/&"))
            (flux_bottom (path column "${column}"
@@ -399,24 +448,28 @@ The total amount of water in the soil interval")
                         (spec chemical default J_matrix)
                         (handle sum)
                         (negate true)
+                        (documentation "\
+Loss from leaching below the specified depth.  
+This can be negative in case of cabilary rise.")
                         (tag "NH4-Leak-Matrix")
                         (dimension "${unit}/&"))
            (number (path column "${column}" Movement "*" 
                          Tertiary biopores solute_storage NH4 value)
                    (spec tertiary biopores solute_storage value)
+                   (documentation "\
+NH4 stored in biopores.")
                    (tag "NH4-Tertiary")
                    (dimension "${unit}")
                    (handle current))
            (interval (path column "${column}"
-                           Chemistry "*" trace NH4 S_tertiary)
-                     (spec chemical default S_tertiary)
-                     (handle sum)
-                     (negate true)
-                     (tag "NH4-Soil-Tertiary")
-                     (dimension "${unit}/&"))
-           (interval (path column "${column}"
 			   Chemistry "*" trace NH4 S_drain)
                      (spec chemical default S_drain)
+                     (documentation "\
+Loss of NH4 from the soil matrix to drain pipes.
+
+This include both loss directly from the soil matrix to the
+drain, and loss from the soil matrix to biopores that are
+connected to the drainage system.")
                      (tag "NH4-Soil-Drain")
                      (handle sum)
                      (negate true)
@@ -425,81 +478,123 @@ The total amount of water in the soil interval")
                          Tertiary biopores classes drain 
                          solute_infiltration NH4 value)
                    (spec biopore drain solute_infiltration value)
-                   (tag "NH4-Surface-Drain")
                    (documentation "\
-Amount moving directly from surface to drain, bypassing the soil matrix.")
+Loss of NH4 from above soil surface to drain pipes through biopores.
+This loss bypasses the soil matrix entirely.")
+                   (tag "NH4-Surface-Drain")
                    (handle sum)
                    (dimension "${unit}/&"))
            (number (path column "${column}"
 			 Vegetation crops crops "*" Root NH4Upt)
                    (spec fixed RootSystem NH4Upt)
+                   (documentation "\
+Loss of NH4 from the soil matrix to the crop.")
                    (tag "NH4-Crop")
                    (handle sum)
                    (dimension "${unit}/&"))
 	   (interval (path column "${column}" Chemistry "*"
 			   combine "N" reaction nitrification NH4)
+                     (documentation "\
+Loss of NH4 from the soil matrix due to nitrification.")
                      (tag "NH4-Nitrification")
                      (handle sum)
                      (dimension "${unit}/&")
                      (spec reaction nitrification NH4))
 	   (interval (path column "${column}" Chemistry "*"
                            combine "N" reaction nitrification NO3)
+                     (documentation "\
+Gain of NO3 in the soil matrix due to nitrification.")
                      (tag "NO3-Nitrification")
                      (handle sum)
                      (dimension "${unit}/&")
                      (spec reaction nitrification NO3))
 	   (interval (path column "${column}" Chemistry "*"
                            combine "N" reaction nitrification N2O)
+                     (documentation "\
+N2O production in the soil matrix due to nitrification.
+
+The N2O produced is assumed to escape to the atmosphere, and will
+not be traced by the model.")
                      (tag "N2O-Nitrification")
                      (handle sum)
                      (dimension "${unit}/&")
                      (spec reaction nitrification N2O))
            (interval (path column "${column}" OrganicMatter "*" NH4_source)
                      (spec organic default NH4_source)
+                     (documentation "\
+NH4 produced in the soil matrix by mineralization of organic matter.")
                      (tag "NH4-Mineralization")
                      (handle sum)
                      (dimension "${unit}/&"))
            (interval (path column "${column}"
 			   Chemistry "*" trace NH4 M)
                      (spec chemical default M)
+                     (documentation "\
+NH4 stored in the soil matrix.")
                      (tag "NH4-Soil")
                      (dimension "${unit}"))
            (interval (path column "${column}"
 			   Chemistry "*" trace NH4 M_error)
                      (spec chemical default M_error)
+                     (documentation "\
+NH4 borrowed from the future. 
+
+This can be non-zero if the processes that remove NH4 from some
+place in the soil are fast compared to the timestep.  If this
+happens, you should rerun the simulation withh a shorter
+timestep. Or readjust the system to slow down those processes
+that remove NH4.")
                      (tag "NH4-Error")
                      (dimension "${unit}"))
            (number (path column "${column}" 
 			 Chemistry "*" trace NO3 spray)
                    (spec chemical default spray)
 		   (handle sum)
+                   (documentation "\
+NO3-fertilizer added above the soil surface.")
                    (tag "NO3-Surface-Fertilizer")
                    (dimension "${unit}/&"))
            (interval (path column "${column}"
 			   Chemistry "*" trace NO3 S_external)
                      (spec chemical default S_external)
+                     (documentation "\
+NO3-fertilizer incorporated into the soil.")
                      (tag "NO3-Soil-Fertilizer")
                      (handle sum)
                      (dimension "${unit}/&"))
            (number (path column "${column}" Chemistry "*" trace NO3 deposit)
                    (spec chemical default deposit)
                    (handle sum)
+                   (documentation "\
+NO3 added to the soil surface as atmospheric deposition.")
                    (tag "NO3-Deposit")
                    (dimension "${unit}/&"))
            (number (path column "${column}" 
 			 Chemistry "*" trace NO3 top_storage)
                    (spec chemical default top_storage)
+                   (documentation "\
+Total NO3 stored above the soil surface (on leaves, in ponded water, etc.).")
                    (tag "NO3-Surface")
                    (dimension "${unit}"))
            (number (path column "${column}" 
 			 Chemistry "*" trace NO3 top_loss)
                    (spec chemical default top_loss)
                    (handle sum)
+                   (documentation "\
+Loss of NO3 stored above surface.
+
+This includes various sources that are usually rare or small,
+such as surface runoff, NO3 on leaves removed at harvest, and
+chemical transformations.  It does not include volatilization or
+infiltration.")
                    (tag "NO3-Surface-Loss")
                    (dimension "${unit}/&"))
            (flux_bottom (path column "${column}" Chemistry "*"
                               trace NO3 J_matrix)
                         (spec chemical default J_matrix)
+                        (documentation "\
+Loss from leaching below the specified depth.  
+This can be negative in case of cabilary rise.")
                         (tag "NO3-Leak-Matrix")
                         (handle sum)
                         (negate true)
@@ -507,6 +602,8 @@ Amount moving directly from surface to drain, bypassing the soil matrix.")
            (number (path column "${column}" Movement "*" 
                          Tertiary biopores solute_storage NO3 value)
                    (spec tertiary biopores solute_storage value)
+                   (documentation "\
+NO3 stored in biopores.")
                    (tag "NO3-Tertiary")
                    (dimension "${unit}")
                    (handle current))
@@ -515,11 +612,23 @@ Amount moving directly from surface to drain, bypassing the soil matrix.")
                      (spec chemical default J_tertiary)
                      (handle sum)
                      (negate true)
+                     (documentation "\
+Infiltration of NO3 from surface to biopores.")
                      (tag "NO3-Surface-Tertiary")
                      (dimension "${unit}/&"))
            (interval (path column "${column}" Chemistry "*"
                            trace NO3 S_tertiary)
                      (spec chemical default S_tertiary)
+                     (documentation "\
+Net movement of NO3 from soil matrix to biopores.
+
+This will be negative if more NO3 moves out of the biopores than
+into the biopores in the specified soil interval.  A common case
+where this happens is when NO3 enter the biopores from the soil
+surface.
+
+NO3 that enter biopores connected to drain is not included here,
+but are part of NO3-Soil-Drain.")
                      (tag "NO3-Soil-Tertiary")
                      (handle sum)
                      (negate true)
@@ -527,6 +636,12 @@ Amount moving directly from surface to drain, bypassing the soil matrix.")
            (interval (path column "${column}"
 			   Chemistry "*" trace NO3 S_drain)
                      (spec chemical default S_drain)
+                     (documentation "\
+NO3 lost from the soil matrix to drain.
+
+Biopores connected to drain pipes are considered part of the
+drain, so NO3 lost from the soil matrix to such biopores are
+included here.")
                      (tag "NO3-Soil-Drain")
                      (handle sum)
                      (negate true)
@@ -543,11 +658,15 @@ Amount moving directly from surface to drain, bypassing the soil matrix.")
            (number (path column "${column}"
 			 Vegetation crops crops "*" Root NO3Upt)
                    (spec fixed RootSystem NO3Upt)
+                   (documentation "\
+NO3 uptake by crops.")
                    (tag "NO3-Crop")
                    (handle sum)
                    (dimension "${unit}/&"))       ;g/m^2 -> ${unit}
 	   (interval (path column "${column}" Chemistry "*"
                            combine "N" reaction denitrification converted)
+                     (documentation "\
+Loss of NO3 due to denitrification.")
                      (tag "Denitrification")
                      (handle sum)
                      (dimension "${unit}/&")
@@ -555,63 +674,102 @@ Amount moving directly from surface to drain, bypassing the soil matrix.")
 
            (interval (path column "${column}" OrganicMatter "*" NO3_source)
                      (spec organic default NO3_source)
+                     (documentation "\
+NO3 immobilized as a result of organic matter turnover.")
                      (tag "NO3-Immobilization")
                      (negate true)
                      (handle sum)
                      (dimension "${unit}/&"))
            (interval (tag "NO3-Soil")
+                     (documentation "\
+NO3 content of the soil matrix.")
                      (path column "${column}" Chemistry "*" trace NO3 M)
                      (spec chemical default M)
                      (dimension "${unit}"))
            (interval (tag "NO3-Error")
+                     (documentation "\
+NO3 borrowed to avoid negative values in the soil matrix.
+
+If this is not zero, you likely have some processes that consume
+NO3 too fast compared to the timestep used by Daisy.")
                      (path column "${column}" Chemistry "*" trace NO3 M_error)
                      (spec chemical default M_error)
                      (dimension "${unit}"))
            (number (path column "${column}"
 			 Vegetation crops crops "*" CrpN Fixated)
+                   (documentation "\
+Atmospheric nitrogen fixated by the crop.")
                    (spec fixed CrpN Fixated)
                    (handle sum)
                    (dimension "${unit}/&"))
            (number (path column "${column}" OrganicMatter "*" fertilized_N)
                    (spec organic default fertilized_N)
                    (handle sum)
+                   (documentation "\
+Organically bound nitrogen supplied by fertilizers.")
                    (tag "Org_N-Fertilizer")
                    (dimension "${unit}/&"))
            (number (path column "${column}" seed_N)
                    (spec column default seed_N)
                    (handle sum)
+                   (documentation "\
+Nitrogen supplied in seeds when sowing.")
                    (tag "Seed_N")
                    (dimension "${unit}/&"))
            (number (path column "${column}" harvest_N)
                    (spec column default harvest_N)
                    (handle sum)
+                   (documentation "\
+Nitrogen removed as part of the harvest.")
                    (tag "Harvest_N")
                    (dimension "${unit}/&"))
            (number (path column "${column}" residuals_N_top)
                    (spec column default residuals_N_top)
                    (handle sum)
+                   (documentation "\
+Above ground plant residuals.
+
+This includes both exfoiliation during crop growth, and any above
+ground residuals left after harvest.")
                    (tag "Residuals_N_top")
                    (dimension "${unit}/&"))
            (number (path column "${column}" residuals_N_root)
                    (spec column default residuals_N_root)
                    (handle sum)
+                   (documentation "\
+Below ground plant residuals.
+
+This includes root death and rhizodeposition during plant growth,
+as well as the roots left after harvest.")
                    (tag "Residuals_N_root")
                    (dimension "${unit}/&"))
            (number (tag "Org_N-Surface")
+                     (documentation "\
+Nitrogen content of organic material on the soil surface.
+
+This does not include nitrogen in the crop.")
                    (path column "${column}"
 			 OrganicMatter "*" am "*" om "*" top_N)
                    (spec AOM component top_N)
                    (dimension "${unit}"))
            (interval (tag "Org_N-Soil")
+                     (documentation "\
+Nitrogen content of organic material below the soil surface.
+
+This does not include nitrogen in living roots.")
                      (path column "${column}" OrganicMatter "*" total_N)
                      (spec organic default total_N)
                      (dimension "${unit}"))
            (number (tag "Crop")
+                     (documentation "\
+.")
                    (path column "${column}" Vegetation crops crops "*"
                          Prod NCrop)
                    (spec fixed Production NCrop)
                    (dimension "${unit}"))
            (number (tag "Dead leaves")
+                     (documentation "\
+.")
                    (path column "${column}" Vegetation crops crops "*"
                          Prod NDead)
                    (spec fixed Production NDead)
@@ -756,7 +914,13 @@ Amount moving directly from surface to drain, bypassing the soil matrix.")
            (interval (path column "${column}"
                            Chemistry "*" trace NH4 S_tertiary)
                      (tag "NH4-Tertiary")
-                     (negate true)
+                     (documentation "\
+Net movement of NH4 from soil matrix to biopores.
+
+This will be negative if more NH4 moves out of the biopores than
+into the biopores in the specified soil interval.  A common case
+where this happens is when NH4 enter the biopores from the soil
+surface.")                     (negate true)
                      (handle sum)
                      (dimension "${unit}/&")
                      (spec chemical default S_tertiary))

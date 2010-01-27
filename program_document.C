@@ -1067,6 +1067,7 @@ ProgramDocument::print_model (const symbol name, const Library& library,
       Format::Section dummy (*format, "section", name, "model", 
 			     current_component + "-" + name);
       format->index (name);
+      
       format->text ("A `" + type + "' parameterization ");
       format->see_page ("model", current_component + "-" + type);
       const Filepos& pos = frame.own_position ();
@@ -1208,13 +1209,27 @@ ProgramDocument::print_component (const Library& library, Treelog& msg)
 
   print_users (xref.components[name]);
 
+  // Print own entries.
+  static const symbol root_name ("component");
+  daisy_assert (library.check (root_name));
+  std::set<symbol> my_entries;
+  own_entries (metalib, library, root_name, my_entries);
+  if (my_entries.size () > 0.0)
+    {
+      const FrameModel& frame = library.model (root_name);
+      print_sample (root_name, library);
+      print_submodel_entries (root_name, 0, frame, my_entries, 
+			      name);
+    }
+
   // For all members...
   std::vector<symbol> entries;
   library.entries (entries);
   ModelCompare model_compare (library);
   sort (entries.begin (), entries.end (), model_compare);
   for (unsigned int i = 0; i < entries.size (); i++)
-    print_model (entries[i], library, msg);
+    if (entries[i] != root_name)
+      print_model (entries[i], library, msg);
 
   static const symbol Daisy_symbol ("Daisy");
   current_component = Daisy_symbol;

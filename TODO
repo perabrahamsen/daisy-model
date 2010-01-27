@@ -1,18 +1,16 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
+* tutorial adsorption
+
 * Kursus
 
 ** Generer log beskrivelser
 
+** Send tutorial og log kapitel til SH
+
 * VAP kørsel
 
-estrup-2c er 1c lige nu
-
-Test 2C kørsel
-
-* Tutorial
-
-Opdater
+anisotropi; x = 1/4; silstrup-2c
 
 * Agrovand
 
@@ -24,8 +22,6 @@ Opdater
 
 ** 1D 2-søjle setup
 
-** ret leak150 (sæt bromid i sin egen graf)
-
 ** differentiate "filter" og "sorption" o  colloid bound log
 
 *** DONE for subsoil.
@@ -33,6 +29,11 @@ Opdater
 *** We need sorbtion and generate log for surface
 
 *** New balances
+
+
+* biopore log
+
+** adskild "in" og "ud" 
 
 * Mikkel 
 

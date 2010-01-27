@@ -1,7 +1,5 @@
 ;;; vap-common.dai --- VAP simulations.
 
-(description "reference 002")
-
 (input file "tillage.dai")
 (input file "crop.dai")
 (input file "fertilizer.dai")
@@ -288,43 +286,73 @@
                   (tag "S2")
                   (style 3))))
 
-(defgnuplot leak150 plottime
+(defgnuplot leak150common plottime
   ;; (device "pdf size 12cm, 4cm")
   ;; First application (either site) 2000-05-22.
+  (extra &old
+         "set lmargin 6"
+         "set rmargin 5")
   (begin 2000 05 01)
   (where "fig/${station}-leak150.pdf")
-  (title "Leak 150 cm")
+  (title "Pesticide leaching")
   (source (column (file "log/${station}-content.dlf")
-                  (tag "Bromide leak 150"))
+                  (tag "Dimethoate leak 150")
+                  (title "Dimethoate"))
           (column (file "log/${station}-content.dlf")
-                  (tag "Dimethoate leak 150"))
+                  (tag "Fenpropimorph leak 150")
+                  (title "Fenpropimorph"))
           (column (file "log/${station}-content.dlf")
-                  (tag "Fenpropimorph leak 150"))
-          (column (file "log/${station}-content.dlf")
-                  (tag "Glyphosate leak 150"))))
+                  (tag "Glyphosate leak 150")
+                  (title "Glyphosate"))))
 
-(defgnuplot leak150acc plottime
-  ;; (device "pdf size 12cm, 4cm")
-  ;; First application (either site) 2000-05-22.
-  (begin 2000 05 01)
-  (where "fig/${station}-leak150acc.pdf")
-  (title "Leak 150 cm")
+(defgnuplot leak150 leak150common
+  (extra &old [set format x ""])
+  (where "fig/${station}-leak150.pdf")
+  (title "Pesticide leaching")
   (source (column (file "log/${station}-content.dlf")
-                  (accumulate true)
-                  (timestep d)
+                  (tag "Dimethoate leak 150")
+                  (title "Dimethoate"))
+          (column (file "log/${station}-content.dlf")
+                  (tag "Fenpropimorph leak 150")
+                  (title "Fenpropimorph"))
+          (column (file "log/${station}-content.dlf")
+                  (tag "Glyphosate leak 150")
+                  (title "Glyphosate"))))
+
+
+(defgnuplot leak150bromide leak150common
+  (extra &old [set format x ""])
+  (where "fig/${station}-leak150bromide.pdf")
+  (title "Bromide")
+  (legend none)
+  (source (column (file "log/${station}-content.dlf")
                   (tag "Bromide leak 150"))
           (column (file "log/${station}-content.dlf")
                   (accumulate true)
                   (timestep d)
-                  (tag "Dimethoate leak 150"))
+                  (tag "Bromide leak 150"))))
+
+
+(defgnuplot leak150acc leak150common
+  (extra &old
+         "set xtics rotate")
+  (where "fig/${station}-leak150acc.pdf")
+  (title "Accumulated")
+  (source (column (file "log/${station}-content.dlf")
+                  (accumulate true)
+                  (timestep d)
+                  (tag "Dimethoate leak 150")
+                  (title "Dimethoate"))
           (column (file "log/${station}-content.dlf")
                   (accumulate true)
                   (timestep d)
-                  (tag "Fenpropimorph leak 150"))
+                  (tag "Fenpropimorph leak 150")
+                  (title "Fenpropimorph"))
           (column (file "log/${station}-content.dlf")
                   (accumulate true)
                   (timestep d)
-                  (tag "Glyphosate leak 150"))))
+                  (tag "Glyphosate leak 150")
+                  (title "Glyphosate"))))
 
 (defgnuplot horizontal plottime
   ;; (device "pdf size 12cm, 4cm")
@@ -554,6 +582,7 @@
   (graph weather gw
          (theta (depth "SW025cm"))
          sc-bromide 
+         leak150bromide
          drain drain-acc
          biopore biopore-acc biopore-drain biopore-drain-acc
          colloids

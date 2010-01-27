@@ -60,9 +60,9 @@
   (fertilize (mineral (weight 80.0 [kg N/ha])
                       (NH4_fraction 0.5 [])))
   (wait (at 1987 10 10 1))
-  (harvest "Grass"
-           (stub 8.0 [cm])              ;Leave 8 cm stub.
-           (stem 1.00 [])))             ;Harvest everything above stub.
+  (cut "Grass"
+       (stub 8.0 [cm])              ;Leave 8 cm stub.
+       (stem 1.00 [])))             ;Harvest everything above stub.
 
 ;; Create these log files.
 (output harvest

@@ -34,54 +34,83 @@
 
 struct SelectContent : public SelectValue
 {
-  // Content.
+  // Parameters.
   const bool has_z;
   const double z;
   const bool has_x;
   const double x;
   const bool has_y;
   const double y;
-  const Column* old_column;
-  std::vector<size_t> cell;     // Cells at height.
-  std::vector<double> weight;   // Relative volume for cell.
+  
+  // Column cache.
+  struct colweight
+  {
+    std::vector<size_t> cell;     // Cells at height.
+    std::vector<double> weight;   // Relative volume for cell.
+  };
+  typedef std::map<const Column*, colweight> colcache_t;
+  colcache_t colcache;
+  colcache_t::const_iterator active;
 
   // Output routines.
   void set_column (const Column& column, Treelog&)
   { 
-    if (&column != old_column)
-      {
-        old_column = &column;
-        const Geometry& geo = column.get_geometry ();
+    // Same as old?
+    if (&column == active->first)
+      // Do nothing.
+      return;
 
-        cell.erase (cell.begin (), cell.end ());
-        double total_volume = 0.0;
-        const size_t cell_size = geo.cell_size ();
-        for (size_t i = 0; i < cell_size; i++)
-	  {
-	    bool include_cell = true;
-	    if (has_z && !geo.contain_z (i, z))
-	      include_cell = false;
-	    else if (has_x && !geo.contain_x (i, x))
-	      include_cell = false;
-	    else if (has_y && !geo.contain_y (i, y))
-	      include_cell = false;
-	    
-	    if (include_cell)
-	      {
-		const double volume = geo.cell_volume (i);
-		total_volume += volume;
-		weight.push_back (volume);
-		cell.push_back (i);
-	      }
-	  }
-        daisy_assert (total_volume > 0.0 || cell.size () == 0);
-        for (size_t i = 0; i < cell.size (); i++)
-          weight[i] /= total_volume;
+    // Already created?
+    const colcache_t::const_iterator look = colcache.find (&column);
+    if (look != colcache.end ())
+      {
+        // Make it active.
+        active = look;
+        return;
       }
+    
+    // Create a new entry.
+    colweight entry;
+    std::vector<size_t>& cell = entry.cell; 
+    std::vector<double>& weight = entry.weight;    
+    
+    const Geometry& geo = column.get_geometry ();
+    double total_volume = 0.0;
+    const size_t cell_size = geo.cell_size ();
+    for (size_t i = 0; i < cell_size; i++)
+      {
+        bool include_cell = true;
+        if (has_z && !geo.contain_z (i, z))
+          include_cell = false;
+        else if (has_x && !geo.contain_x (i, x))
+          include_cell = false;
+        else if (has_y && !geo.contain_y (i, y))
+          include_cell = false;
+
+        if (include_cell)
+          {
+            const double volume = geo.cell_volume (i);
+            total_volume += volume;
+            weight.push_back (volume);
+            cell.push_back (i);
+          }
+      }
+    daisy_assert (total_volume > 0.0 || cell.size () == 0);
+    for (size_t i = 0; i < cell.size (); i++)
+      weight[i] /= total_volume;
+
+    // Make it official.
+    colcache[&column] = entry;
+    active = colcache.find (&column);
+    daisy_assert (active != colcache.end ());
   }
 
   void output_array (const std::vector<double>& array)
   { 
+    daisy_assert (active != colcache.end ());
+    const std::vector<size_t>& cell = active->second.cell; 
+    const std::vector<double>& weight = active->second.weight;    
+
     const size_t cell_size = cell.size ();
     if (cell_size < 1)
       // No matching cells => missing value.
@@ -102,7 +131,7 @@ struct SelectContent : public SelectValue
       x (al.number ("x", -42.42e42)),
       has_y (al.check ("y")),
       y (al.number ("y", -42.42e42)),
-      old_column (NULL)
+      active (colcache.end ())
   { }
 };
 

@@ -10,6 +10,7 @@
 (defhorizon Silstrup_Ap_MACRO FAO3
   (clay 22.45 [%]) (silt 27.7 [%])(sand 49.85 [%])
   (humus (C2OM (C 1.798 [%]))) (dry_bulk_density 1.48 [g/cm^3])
+  (anisotropy 2)
   (hydraulic MACRO
              (Theta_b 39 [%]) (Theta_res 0 [%])
              (n 1.1 []) 
@@ -31,6 +32,7 @@
 (defhorizon Silstrup_B_MACRO FAO3
   (clay 27.97 [%]) (silt 26.17 [%]) (sand 45.86 [%])
   (humus (C2OM (C 0.47 [%]))) (dry_bulk_density 1.61 [g/cm^3])
+  (anisotropy 2)
   (hydraulic MACRO
              (Theta_b 38 [%]) (Theta_res 0 [%])
              (n 1.13 []) (K_b 0.1 [mm/h])
@@ -49,6 +51,7 @@
 (defhorizon Silstrup_C_MACRO FAO3
   (clay 26.28 [%]) (silt 20.86 [%]) (sand 52.86 [%])
   (humus (C2OM (C 0.116 [%]))) (dry_bulk_density 1.75 [g/cm^3])
+  (anisotropy 2)
   (hydraulic MACRO
              (Theta_b 33 [%]) (Theta_res 0 [%])
              (n 1.1 []) (K_b 0.1 [mm/h])
@@ -64,8 +67,8 @@
   (Groundwater file "dk-silstrup.gwt"
                ;; GWT is measured at top of terrain.
                ;; Offset is calibrated based on drainage measurments.
-               ;; 25 cm too low
-               (offset 30 [cm]))
+               ;; 30 cm too low
+               (offset 60 [cm]))
   (Chemistry Silstrup)
   (OrganicMatter none)
   (Soil (horizons ;; (  -3.00 [cm] Silstrup_Ap_surface)
@@ -110,7 +113,7 @@
   (Movement original 
             (Drain Hooghoudt
                    (L 18 [m])
-                   (x 9 [m])
+                   (x 4.5 [m])
                    (pipe_position -110.0 [cm]))
             (Tertiary (VAP 
                        (classes ("matrix_0cm" (height_end -31 [cm]))
@@ -385,8 +388,11 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
 (defprogram Silstrup-2D Silstrup
   (column Silstrup-2D))
 
-(defprogram Silstrup-1C Silstrup
+(defprogram Silstrup-1C-Center Silstrup
   (column Silstrup-1C-Center))
+
+(defprogram Silstrup-1C-Drain Silstrup
+  (column Silstrup-1C-Drain))
 
 (defprogram Silstrup-2C Silstrup
   (column Silstrup-1C-Drain Silstrup-1C-Center))
@@ -563,12 +569,14 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
                                      (tag "Metamitron"))))
          (leak150 (source &old 
                           (column (file "log/${station}-content.dlf")
-                                  (tag "Metamitron leak 150"))))
+                                  (tag "Metamitron leak 150")
+                                  (title "Metamitron"))))
          (leak150acc (source &old 
                              (column (file "log/${station}-content.dlf")
                                      (accumulate true)
                                      (timestep d)
-                                     (tag "Metamitron leak 150"))))
+                                     (tag "Metamitron leak 150")
+                                     (title "Metamitron"))))
          (theta (depth "SW060cm"))
          (theta (depth "SW110cm"))
          ;; First measurement 2000-04-29
