@@ -31,7 +31,8 @@
   (drainpoints (-110 [cm] 1 [cm])))
 
 (deftertiary VAP biopores
-  (pond_max 5 [mm]))
+  ;; (pond_max 5 [mm])
+  )
 
 ;; Output
 
