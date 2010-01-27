@@ -1,0 +1,16 @@
+;;; vap.dai --- Run the VAP simulations
+
+(description "reference 004
+som 003 men med pond_max = default
+estrup offset = 0
+")
+
+(input file "vap-common.dai")
+
+;;(run batch (run Estrup-2D Silstrup-2D plotall))
+(run batch (run Estrup-2C Silstrup-2C plotall))
+;;(run batch (run plotall))
+;;(run batch (run Estrup-1C-Drain Silstrup-1C-Drain plotall))
+;; (run plothydro)
+
+;;; vap.dai ends here.
