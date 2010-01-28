@@ -60,7 +60,7 @@
   (anisotropy 12)
   (hydraulic original (K_b 0.03 [mm/h])))
 
-(defhorizon Estrup_C1_MACRO VAP_C
+(defhorizon Estrup_C1_base VAP_C
   (clay 26.75 [%]) (silt 14.23 [%])(sand 59.02 [%])
   (humus (C2OM (C 0.203 [%]))) (dry_bulk_density 1.73 [g/cm^3])
   (anisotropy 2)

@@ -60,7 +60,7 @@
   ;; 10% of original.
   (hydraulic original (K_b 0.01 [mm/h])))
 
-(defhorizon Silstrup_C_MACRO VAP_C
+(defhorizon Silstrup_C_base VAP_C
   (clay 26.28 [%]) (silt 20.86 [%]) (sand 52.86 [%])
   (humus (C2OM (C 0.116 [%]))) (dry_bulk_density 1.75 [g/cm^3])
   (anisotropy 2)
@@ -70,7 +70,7 @@
              (l 0.5 []) (alpha 0.012 [cm^-1])
              (Theta_sat 34 [%]) (K_sat 19 [mm/h]) (h_b -10 [cm]) (n_ma 3 [])))
 
-(defhorizon Silstrup_C Silstrup_C_MACRO
+(defhorizon Silstrup_C Silstrup_C_base
   (hydraulic original
              (enable_Theta_macro false)
              (enable_K_macro false)))
