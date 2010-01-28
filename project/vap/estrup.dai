@@ -7,7 +7,7 @@
 
 ;; Soil 
 
-(defhorizon Estrup_Ap_MACRO VAP_Ap
+(defhorizon Estrup_Ap_base VAP_Ap
   (clay 14.6 [%]) (silt 23.33 [%])(sand 62.07 [%])
   (humus (C2OM (C 3.248 [%]))) (dry_bulk_density 1.51 [g/cm^3])
   (anisotropy 2)
@@ -19,17 +19,23 @@
              (l 0.5 []) (alpha 0.02 [cm^-1])
              (Theta_sat 41 [%]) (K_sat 238 [mm/h]) (h_b -5 [cm]) (n_ma 4 [])))
   
-(defhorizon Estrup_Ap Estrup_Ap_MACRO
+(defhorizon Estrup_Ap Estrup_Ap_base
   (hydraulic original
              (enable_Theta_macro false)
              (enable_K_macro false)))
+
+(defhorizon Estrup_Ap_hypres Estrup_Ap_base
+  (hydraulic hypres))
+
+(defhorizon Estrup_Ap_MACRO Estrup_Ap_base
+  (secondary_domain none))
 
 (defhorizon Estrup_Ap_surface Estrup_Ap
   (hydraulic original
              ;; 50%
              (K_b 0.05 [mm/h])))
 
-(defhorizon Estrup_B_MACRO VAP_B
+(defhorizon Estrup_B_base VAP_B
   (clay 21.7 [%]) (silt 17.87 [%])(sand 60.43 [%])
   (humus (C2OM (C 0.812 [%]))) (dry_bulk_density 1.68 [g/cm^3])
   (anisotropy 2)
@@ -38,10 +44,16 @@
              (n 1.14 []) (K_b 0.3 [mm/h]) (l 0.5 []) (alpha 0.01 [cm^-1])
              (Theta_sat 37 [%]) (K_sat 10 [mm/h]) (h_b -15 [cm]) (n_ma 4 [])))
 
-(defhorizon Estrup_B Estrup_B_MACRO
+(defhorizon Estrup_B Estrup_B_base
   (hydraulic original
              (enable_Theta_macro false)
              (enable_K_macro false)))
+
+(defhorizon Estrup_B_hypres Estrup_B_base
+  (hydraulic hypres))
+
+(defhorizon Estrup_B_MACRO Estrup_B_base
+  (secondary_domain none))
 
 (defhorizon Estrup_B_plow_pan Estrup_B
   ;; 10% of B.
@@ -58,12 +70,18 @@
              (l 0.5 []) (alpha 0.01 [cm^-1])
              (Theta_sat 34 [%]) (K_sat 12 [mm/h]) (h_b -12 [cm]) (n_ma 4 [])))
 
-(defhorizon Estrup_C1 Estrup_C1_MACRO
+(defhorizon Estrup_C1 Estrup_C1_base
   (hydraulic original
              (enable_Theta_macro false)
              (enable_K_macro false)))
 
-(defhorizon Estrup_C2_MACRO VAP_C
+(defhorizon Estrup_C1_hypres Estrup_C1_base
+  (hydraulic hypres))
+
+(defhorizon Estrup_C1_MACRO Estrup_C1_base
+  (secondary_domain none))
+
+(defhorizon Estrup_C2_base VAP_C
   (clay 25.7 [%]) (silt 22.2 [%])(sand 52.1 [%])
   (humus (C2OM (C 0.233 [%]))) (dry_bulk_density 1.64 [g/cm^3])
   (anisotropy 2)
@@ -73,16 +91,22 @@
              (l 0.5 []) (alpha 0.005 [cm^-1])
              (Theta_sat 40 [%]) (K_sat 0.5 [mm/h]) (h_b -10 [cm]) (n_ma 4 [])))
 
-(defhorizon Estrup_C2 Estrup_C2_MACRO
+(defhorizon Estrup_C2 Estrup_C2_base
   (hydraulic original
              (enable_Theta_macro false)
              (enable_K_macro false)))
+
+(defhorizon Estrup_C2_hypres Estrup_C2_base
+  (hydraulic hypres))
+
+(defhorizon Estrup_C2_MACRO Estrup_C2_base
+  (secondary_domain none))
 
 (defcolumn Estrup default
   (Groundwater file "dk-estrup.gwt"
                ;; GWT is measured at top of terrain.
                ;; Offset is calibrated based on drainage measurments.
-               ;; 15 cm is too high
+               ;; 20 cm is too high
                (offset 0 [cm]))
   (Chemistry Estrup)
   (OrganicMatter none)
@@ -414,7 +438,7 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
               [%])))
 
 (defxysource "Retention Ap Estrup HYPRES" "Retention HYPRES"
-  (y (convert (soil_Theta (horizon ("Estrup_Ap" (hydraulic hypres)))
+  (y (convert (soil_Theta (horizon "Estrup_Ap_hypres")
                           (top_soil true)
                           (h x))
               [%])))
@@ -432,7 +456,7 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
               [cm/d])))
 
 (defxysource "Conductivity Ap Estrup HYPRES" "Conductivity HYPRES"
-  (y (convert (soil_K (horizon ("Estrup_Ap" (hydraulic hypres)))
+  (y (convert (soil_K (horizon "Estrup_Ap_hypres")
                       (top_soil true)
                       (h x))
               [cm/d])))
@@ -462,7 +486,7 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
               [%])))
 
 (defxysource "Retention B Estrup HYPRES" "Retention HYPRES"
-  (y (convert (soil_Theta (horizon ("Estrup_B" (hydraulic hypres)))
+  (y (convert (soil_Theta (horizon "Estrup_B_hypres")
                           (top_soil false)
                           (h x))
               [%])))
@@ -480,7 +504,7 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
               [cm/d])))
 
 (defxysource "Conductivity B Estrup HYPRES" "Conductivity HYPRES"
-  (y (convert (soil_K (horizon ("Estrup_B" (hydraulic hypres)))
+  (y (convert (soil_K (horizon "Estrup_B_hypres")
                       (top_soil false)
                       (h x))
               [cm/d])))
@@ -510,7 +534,7 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
               [%])))
 
 (defxysource "Retention C1 Estrup HYPRES" "Retention HYPRES"
-  (y (convert (soil_Theta (horizon ("Estrup_C1" (hydraulic hypres)))
+  (y (convert (soil_Theta (horizon "Estrup_C1_hypres")
                           (top_soil false)
                           (h x))
               [%])))
@@ -528,7 +552,7 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
               [cm/d])))
 
 (defxysource "Conductivity C1 Estrup HYPRES" "Conductivity HYPRES"
-  (y (convert (soil_K (horizon ("Estrup_C1" (hydraulic hypres)))
+  (y (convert (soil_K (horizon "Estrup_C1_hypres")
                       (top_soil false)
                       (h x))
               [cm/d])))
@@ -558,7 +582,7 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
               [%])))
 
 (defxysource "Retention C2 Estrup HYPRES" "Retention HYPRES"
-  (y (convert (soil_Theta (horizon ("Estrup_C2" (hydraulic hypres)))
+  (y (convert (soil_Theta (horizon "Estrup_C2_hypres")
                           (top_soil false)
                           (h x))
               [%])))
@@ -576,7 +600,7 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
               [cm/d])))
 
 (defxysource "Conductivity C2 Estrup HYPRES" "Conductivity HYPRES"
-  (y (convert (soil_K (horizon ("Estrup_C2" (hydraulic hypres)))
+  (y (convert (soil_K (horizon "Estrup_C2_hypres")
                       (top_soil false)
                       (h x))
               [cm/d])))

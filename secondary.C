@@ -25,7 +25,6 @@
 #include "librarian.h"
 #include "assertion.h"
 #include "frame.h"
-#include "soil.h"
 #include "check.h"
 #include "water.h"
 #include <cmath>
@@ -77,10 +76,10 @@ washed out with fast moving new water.")
 
 struct SecondaryNone : public Secondary
 {
-  double h_lim (const size_t, const Soil&) const 
+  double h_lim () const 
   // Pressure act. secondary domain. [cm]
   { return 0.0; }
-  double K (const size_t, const Soil&, const double h) const 
+  double K (const double h) const 
   // Conductivity in sec. dom. [cm/h]
   { return 0.0; }
   double alpha () const         // Exchange rate between domain [h^-1]
@@ -148,12 +147,12 @@ struct SecondaryPressure : public SecondaryAlpha
   const double h_lim_;
   const double K_;
 
-  double h_lim (const size_t, const Soil&) const
+  double h_lim () const
   // The value of the 'h_lim' parameter.
   { return h_lim_; }
-  double K (const size_t cell, const Soil& soil, const double h) const
+  double K (const double h) const
   { 
-    if (h < h_lim (cell, soil))
+    if (h < h_lim ())
       return 0.0;
     else
       return K_; 
@@ -197,11 +196,11 @@ struct SecondaryCracks : public SecondaryAlpha
   const double K_crack;              // [cm/h]
   const double h_crack;              // [cm]
 
-  double h_lim (const size_t, const Soil&) const 
+  double h_lim () const 
   { return h_crack; }
-  double K (const size_t cell, const Soil& soil, const double h) const
+  double K (const double h) const
   { 
-    if (h < h_lim (cell, soil))
+    if (h < h_lim ())
       return 0.0;
     else
       return K_crack; 

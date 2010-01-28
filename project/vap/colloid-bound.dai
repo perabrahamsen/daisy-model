@@ -22,8 +22,8 @@
 (defreaction colloid-filter filter_velocity
   "Filtration of colloids in the soil matrix."
   (cite "mcgechan2002")
-  (fc_primary 40 [m^-1])              ;Filter coefficient primary domain.
-  (fc_secondary 20 [m^-1])            ;Ditto for secondary domain.
+  (fc_primary 80 [m^-1])              ;Filter coefficient primary domain.
+  (fc_secondary 40 [m^-1])            ;Ditto for secondary domain.
   (mobile colloid))
 
 (defreaction colloid-generation colgen_Jarvis99

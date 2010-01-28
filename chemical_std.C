@@ -1852,6 +1852,16 @@ Plants eat this stuff.")
   }
 } ChemicalNutrient_syntax;
 
+static struct ChemicalNitrogenSyntax : public DeclareParam
+{
+  ChemicalNitrogenSyntax ()
+    : DeclareParam (Chemical::component, "N", "nutrient", "\
+Non-organic nitrogen.")
+  { }
+  void load_frame (Frame&) const
+  { }
+} ChemicalNitrogen_syntax;
+
 static struct InitialNO3Syntax : public DeclareParam
 { 
   InitialNO3Syntax ()
@@ -1869,7 +1879,7 @@ Initial NO3 concentration in soil water.")
 static struct ChemicalNO3Syntax : public DeclareParam
 { 
   ChemicalNO3Syntax ()
-    : DeclareParam (Chemical::component, "NO3", "nutrient", "\
+    : DeclareParam (Chemical::component, "NO3", "N", "\
 Nitrate-N.")
   { }
   void load_frame (Frame& frame) const
@@ -1910,7 +1920,7 @@ Initial NH4 concentration in soil water.")
 static struct ChemicalNH4Syntax : public DeclareParam
 { 
   ChemicalNH4Syntax ()
-    : DeclareParam (Chemical::component, "NH4", "nutrient", "\
+    : DeclareParam (Chemical::component, "NH4", "N", "\
 Ammonium-N.")
   { }
   void load_frame (Frame& frame) const

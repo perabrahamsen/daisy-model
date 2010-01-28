@@ -1,10 +1,14 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* 
+* Standard log
 
-78, 50-150
+** NO3 og NH4 skal nedarve fra N (eller N-Min)
 
 * Foulum
+
+** Læs forslag.
+
+Snak med SH.
 
 ** JRJ
 
@@ -18,13 +22,21 @@ Præcis hvad er synergien med SIFA?
 
 * VAP kørsel
 
-** nw vap-004 pond_max=default, estrup offset = 0
+** nw vap-008 som 007, men med sprækker
 
-** ne vap-005 estrup offset = 5
+** ne vap-009 som 008, men estrup offset = 0, silstrup offset = 0
 
-** se vap-006 estrup offset = 10, fc = 4 m^-1
+fc=80, 40
 
-** sw vap-007 fc = 40 m^-1
+** se vap-010 som 008, men med fc=80, 40
+
+** sw vap-011 som 007, men 
+
+med collid desorption estrup offset = 20, silstrup offset = 30
+
+** Ny ref
+
+estrup offset=0, silstrup offset=0
 
 * Kursus
 

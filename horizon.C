@@ -228,6 +228,15 @@ const Secondary&
 Horizon::secondary_domain () const
 { return *impl->secondary;}
 
+double 
+Horizon::K (const double h /* [cm] */)          // [cm/h]
+{
+  const double K_primary = hydraulic->K (h); 
+  const Secondary& secondary = horizon.secondary_domain ();
+  const double K_secondary = secondary.K (h);
+  return std::max (K_primary, K_secondary);
+}
+
 bool
 Horizon::has_attribute (const symbol name) const
 { return impl->attributes.find (name) != impl->attributes.end (); }

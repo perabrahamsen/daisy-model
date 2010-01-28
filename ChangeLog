@@ -1,3 +1,14 @@
+2010-01-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* chemical_std.C (N): New nutrient parameterization.
+	(NO3, NH4): Derive from 'N'.
+
+	* secondary.C, secondary.h (K, h_lim): No longer take soil or cell
+	arguments.
+	* horizon.C, horizon.h (K): New function.
+	* number_soil.C (NumberSoilK::value): Use it.
+	* soil.C (K): Update caller.
+
 2010-01-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* program_document.C (print_component): Special treatment of

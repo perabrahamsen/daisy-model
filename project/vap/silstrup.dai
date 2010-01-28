@@ -7,7 +7,7 @@
 
 ;; Soil 
 
-(defhorizon Silstrup_Ap_MACRO VAP_Ap
+(defhorizon Silstrup_Ap_base VAP_Ap
   (clay 22.45 [%]) (silt 27.7 [%])(sand 49.85 [%])
   (humus (C2OM (C 1.798 [%]))) (dry_bulk_density 1.48 [g/cm^3])
   (anisotropy 2)
@@ -19,17 +19,23 @@
              (l 0.5 []) (alpha 0.01 [cm^-1])
              (Theta_sat 44 [%]) (K_sat 306 [mm/h]) (h_b -10 [cm]) (n_ma 3 [])))
 
-(defhorizon Silstrup_Ap Silstrup_Ap_MACRO
+(defhorizon Silstrup_Ap Silstrup_Ap_base
   (hydraulic original
              (enable_Theta_macro false)
              (enable_K_macro false)))
+
+(defhorizon Silstrup_Ap_hypres Silstrup_Ap_base
+  (hydraulic hypres))
+
+(defhorizon Silstrup_Ap_MACRO Silstrup_Ap_base
+  (secondary_domain none))
 
 (defhorizon Silstrup_Ap_surface Silstrup_Ap
   (hydraulic original
              ;; 50%
              (K_b 0.05 [mm/h])))
 
-(defhorizon Silstrup_B_MACRO VAP_B
+(defhorizon Silstrup_B_base VAP_B
   (clay 27.97 [%]) (silt 26.17 [%]) (sand 45.86 [%])
   (humus (C2OM (C 0.47 [%]))) (dry_bulk_density 1.61 [g/cm^3])
   (anisotropy 2)
@@ -39,10 +45,16 @@
              (l 0.5 []) (alpha 0.012 [cm^-1])
              (Theta_sat 39 [%]) (K_sat 36 [mm/h]) (h_b -10 [cm]) (n_ma 3 [])))
 
-(defhorizon Silstrup_B Silstrup_B_MACRO
+(defhorizon Silstrup_B Silstrup_B_base
   (hydraulic original
              (enable_Theta_macro false)
              (enable_K_macro false)))
+
+(defhorizon Silstrup_B_hypres Silstrup_B_base
+  (hydraulic hypres))
+
+(defhorizon Silstrup_B_MACRO Silstrup_B_base
+  (secondary_domain none))
 
 (defhorizon Silstrup_B_plow_pan Silstrup_B
   ;; 10% of original.
@@ -63,12 +75,18 @@
              (enable_Theta_macro false)
              (enable_K_macro false)))
 
+(defhorizon Silstrup_C_hypres Silstrup_C_base
+  (hydraulic hypres))
+
+(defhorizon Silstrup_C_MACRO Silstrup_C_base
+  (secondary_domain none))
+
 (defcolumn Silstrup default
   (Groundwater file "dk-silstrup.gwt"
                ;; GWT is measured at top of terrain.
                ;; Offset is calibrated based on drainage measurments.
-               ;; 30 cm too low
-               (offset 60 [cm]))
+               ;; 30 cm too high
+               (offset 0 [cm]))
   (Chemistry Silstrup)
   (OrganicMatter none)
   (Soil (horizons ;; (  -3.00 [cm] Silstrup_Ap_surface)
@@ -412,7 +430,7 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
               [%])))
 
 (defxysource "Retention Ap Silstrup HYPRES" "Retention HYPRES"
-  (y (convert (soil_Theta (horizon ("Silstrup_Ap" (hydraulic hypres)))
+  (y (convert (soil_Theta (horizon ("Silstrup_Ap_hypres"))
                           (top_soil true)
                           (h x))
               [%])))
@@ -430,7 +448,7 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
               [cm/d])))
 
 (defxysource "Conductivity Ap Silstrup HYPRES" "Conductivity HYPRES"
-  (y (convert (soil_K (horizon ("Silstrup_Ap" (hydraulic hypres)))
+  (y (convert (soil_K (horizon ("Silstrup_Ap_hypres"))
                       (top_soil true)
                       (h x))
               [cm/d])))
@@ -460,7 +478,7 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
               [%])))
 
 (defxysource "Retention B Silstrup HYPRES" "Retention HYPRES"
-  (y (convert (soil_Theta (horizon ("Silstrup_B" (hydraulic hypres)))
+  (y (convert (soil_Theta (horizon ("Silstrup_B_hypres"))
                           (top_soil false)
                           (h x))
               [%])))
@@ -478,7 +496,7 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
               [cm/d])))
 
 (defxysource "Conductivity B Silstrup HYPRES" "Conductivity HYPRES"
-  (y (convert (soil_K (horizon ("Silstrup_B" (hydraulic hypres)))
+  (y (convert (soil_K (horizon ("Silstrup_B_hypres"))
                       (top_soil false)
                       (h x))
               [cm/d])))
@@ -508,7 +526,7 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
               [%])))
 
 (defxysource "Retention C Silstrup HYPRES" "Retention HYPRES"
-  (y (convert (soil_Theta (horizon ("Silstrup_C" (hydraulic hypres)))
+  (y (convert (soil_Theta (horizon ("Silstrup_C_hypres"))
                           (top_soil false)
                           (h x))
               [%])))
@@ -526,7 +544,7 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
               [cm/d])))
 
 (defxysource "Conductivity C Silstrup HYPRES" "Conductivity HYPRES"
-  (y (convert (soil_K (horizon ("Silstrup_C" (hydraulic hypres)))
+  (y (convert (soil_K (horizon ("Silstrup_C_hypres"))
                       (top_soil false)
                       (h x))
               [cm/d])))

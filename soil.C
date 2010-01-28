@@ -208,12 +208,7 @@ Soil::K (size_t i, double h, double h_ice, double T) const
 
   const double T_factor = viscosity_factor (T);
   const double h_water = std::min (h, h_ice);
-  const Horizon& horizon = *horizon_[i];
-  const double K_primary = horizon.hydraulic->K (h_water); 
-  const Secondary& secondary = horizon.secondary_domain ();
-  const double K_secondary = secondary.K (i, *this, h_water);
-  const double K_total = std::max (K_primary, K_secondary);
-  return K_total * T_factor;
+  return horizon[i]->K (h_water) * T_factor;
 }
 
 double 

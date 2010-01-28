@@ -930,7 +930,7 @@ direkte i dræn.
   \caption{Kolloider i drænvand, samt bioporeaktivitet i 5 forskellige
     jordlag.}
   \label{fig:Estrup-biopore}
-\end{figure}
+b\end{figure}
 
 \section{Kalibrering}
 
@@ -957,6 +957,34 @@ A4.4 og figur A4.5 i \citet{vap2005}.  For Silstrup mente vi der var
 belæg for at sætte $K_b$ til 1 mm/h (op fra 0,1 mm/h brugt af GEUS),
 og for Estrup satte vi $K_b$ til 0,5 mm/h (op fra 0,1 mm/h).
 
+\subsection{Sprækker og Mobilt/Immobilt vand}
+
+I \citet{habekost1} anslået at et sprækkeapertur mellem 50 og 150
+$\my$m er relavnt.  I \citet{jorgensen1998} er en værdi på 78 $\my$m
+anvendt efter kalibrering, så den anvender vi her som udgangspunkt.
+Begge kilder er nået frem en tæthed på 10 cm, hvilket vi så også vil
+bruge.  Stof i Daisy der er placeret i sprækker bevæger sig hurtigere
+end stof i de små porer.  Parameteren \emph{alpha} bestemmer hvor
+hurtigt stof udveksles mellem de to domæner.  Værdien er tager fra
+Rørrendegård opsætningen.  Vi har valgt at have et egentligt
+sprækkesystem i B og C horizonterne.  I Ap horizonten opdeler vi 
+\begin{verbatim}
+(defhorizon VAP_Ap FAO3
+  (secondary_domain pressure 
+                    (h_lim 1.2 [pF])
+                    (alpha 0.01 [h^-1])))
+
+(defhorizon VAP_B FAO3
+  (secondary_domain cracks
+                    (aperture 78 [um])
+                    (density 10 [m^-1])
+                    (alpha 0.01 [h^-1])))
+
+(defhorizon VAP_C VAP_B)
+\end{verbatim}
+
+
+
 \begin{verbatim}
 Vi leger med:
 
@@ -977,6 +1005,8 @@ column
       om vi har overfladehorizont med eller ej
       plow pan anisotropy
       andre anisotropier
+      sprækker
+        alpha, Ap vs B & C
 
   groundwater
     offset

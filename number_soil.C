@@ -313,9 +313,9 @@ struct NumberSoilK : public NumberByTension
   // Simulation.
   double value (const Scope& scope) const
   { 
-    return horizon->hydraulic->K (units.convert (h->dimension (scope), 
-                                                  Units::cm (), 
-                                                  h->value (scope)));
+    return horizon->K (units.convert (h->dimension (scope), 
+                                      Units::cm (), 
+                                      h->value (scope)));
   }
   symbol dimension (const Scope&) const 
   { return units.cm_per_h (); }
