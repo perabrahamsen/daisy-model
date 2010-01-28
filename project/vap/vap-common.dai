@@ -19,6 +19,20 @@
   (C_in_humus 0.587 [])
   (value (/ C C_in_humus)))
 
+(defhorizon VAP_Ap FAO3
+  (secondary_domain pressure 
+                    (h_lim 1.2 [pF])
+                    (alpha 0.01 [h^-1]))
+
+(defhorizon VAP_B FAO3
+  (secondary_domain cracks
+                    (aperture 78 [um])
+                    (density 10 [m^-1])
+                    (alpha 0.01 [h^-1])))
+
+
+(defhorizon VAP_C VAP_B)
+
 ;; Movement.
 
 (defmovement Rorrende-2D rectangle

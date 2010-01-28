@@ -7,7 +7,7 @@
 
 ;; Soil 
 
-(defhorizon Silstrup_Ap_MACRO FAO3
+(defhorizon Silstrup_Ap_MACRO VAP_Ap
   (clay 22.45 [%]) (silt 27.7 [%])(sand 49.85 [%])
   (humus (C2OM (C 1.798 [%]))) (dry_bulk_density 1.48 [g/cm^3])
   (anisotropy 2)
@@ -29,7 +29,7 @@
              ;; 50%
              (K_b 0.05 [mm/h])))
 
-(defhorizon Silstrup_B_MACRO FAO3
+(defhorizon Silstrup_B_MACRO VAP_B
   (clay 27.97 [%]) (silt 26.17 [%]) (sand 45.86 [%])
   (humus (C2OM (C 0.47 [%]))) (dry_bulk_density 1.61 [g/cm^3])
   (anisotropy 2)
@@ -48,7 +48,7 @@
   ;; 10% of original.
   (hydraulic original (K_b 0.01 [mm/h])))
 
-(defhorizon Silstrup_C_MACRO FAO3
+(defhorizon Silstrup_C_MACRO VAP_C
   (clay 26.28 [%]) (silt 20.86 [%]) (sand 52.86 [%])
   (humus (C2OM (C 0.116 [%]))) (dry_bulk_density 1.75 [g/cm^3])
   (anisotropy 2)

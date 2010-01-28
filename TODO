@@ -1,16 +1,36 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* tutorial adsorption
+* 
+
+78, 50-150
+
+* Foulum
+
+** JRJ
+
+Hvad kan og vil vejledere i Ghana?
+
+De bør være med til at definere Ph.D. projekterne.
+
+Har de kvalificerede Ph.D. studerende?
+
+Præcis hvad er synergien med SIFA?
+
+* VAP kørsel
+
+** nw vap-004 pond_max=default, estrup offset = 0
+
+** ne vap-005 estrup offset = 5
+
+** se vap-006 estrup offset = 10, fc = 4 m^-1
+
+** sw vap-007 fc = 40 m^-1
 
 * Kursus
 
 ** Generer log beskrivelser
 
 ** Send tutorial og log kapitel til SH
-
-* VAP kørsel
-
-anisotropi; x = 1/4; silstrup-2c
 
 * Agrovand
 
@@ -20,8 +40,6 @@ anisotropi; x = 1/4; silstrup-2c
 
 * VAP 
 
-** 1D 2-søjle setup
-
 ** differentiate "filter" og "sorption" o  colloid bound log
 
 *** DONE for subsoil.
@@ -30,12 +48,11 @@ anisotropi; x = 1/4; silstrup-2c
 
 *** New balances
 
-
 * biopore log
 
 ** adskild "in" og "ud" 
 
-* Mikkel 
+* Mikkel
 
 ** Commit ændringer til agrovand
 

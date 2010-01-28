@@ -7,7 +7,7 @@
 
 ;; Soil 
 
-(defhorizon Estrup_Ap_MACRO FAO3
+(defhorizon Estrup_Ap_MACRO VAP_Ap
   (clay 14.6 [%]) (silt 23.33 [%])(sand 62.07 [%])
   (humus (C2OM (C 3.248 [%]))) (dry_bulk_density 1.51 [g/cm^3])
   (anisotropy 2)
@@ -29,7 +29,7 @@
              ;; 50%
              (K_b 0.05 [mm/h])))
 
-(defhorizon Estrup_B_MACRO FAO3
+(defhorizon Estrup_B_MACRO VAP_B
   (clay 21.7 [%]) (silt 17.87 [%])(sand 60.43 [%])
   (humus (C2OM (C 0.812 [%]))) (dry_bulk_density 1.68 [g/cm^3])
   (anisotropy 2)
@@ -48,7 +48,7 @@
   (anisotropy 12)
   (hydraulic original (K_b 0.03 [mm/h])))
 
-(defhorizon Estrup_C1_MACRO FAO3
+(defhorizon Estrup_C1_MACRO VAP_C
   (clay 26.75 [%]) (silt 14.23 [%])(sand 59.02 [%])
   (humus (C2OM (C 0.203 [%]))) (dry_bulk_density 1.73 [g/cm^3])
   (anisotropy 2)
@@ -63,7 +63,7 @@
              (enable_Theta_macro false)
              (enable_K_macro false)))
 
-(defhorizon Estrup_C2_MACRO FAO3
+(defhorizon Estrup_C2_MACRO VAP_C
   (clay 25.7 [%]) (silt 22.2 [%])(sand 52.1 [%])
   (humus (C2OM (C 0.233 [%]))) (dry_bulk_density 1.64 [g/cm^3])
   (anisotropy 2)
