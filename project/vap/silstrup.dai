@@ -85,8 +85,8 @@
   (Groundwater file "dk-silstrup.gwt"
                ;; GWT is measured at top of terrain.
                ;; Offset is calibrated based on drainage measurments.
-               ;; 30 cm too high
-               (offset 0 [cm]))
+               ;; 30 cm too high, 0 cm is too low
+               (offset 15 [cm]))
   (Chemistry Silstrup)
   (OrganicMatter none)
   (Soil (horizons ;; (  -3.00 [cm] Silstrup_Ap_surface)

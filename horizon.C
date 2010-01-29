@@ -229,11 +229,10 @@ Horizon::secondary_domain () const
 { return *impl->secondary;}
 
 double 
-Horizon::K (const double h /* [cm] */)          // [cm/h]
+Horizon::K (const double h /* [cm] */) const         // [cm/h]
 {
   const double K_primary = hydraulic->K (h); 
-  const Secondary& secondary = horizon.secondary_domain ();
-  const double K_secondary = secondary.K (h);
+  const double K_secondary = secondary_domain ().K (h);
   return std::max (K_primary, K_secondary);
 }
 

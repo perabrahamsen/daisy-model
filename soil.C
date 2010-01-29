@@ -208,7 +208,7 @@ Soil::K (size_t i, double h, double h_ice, double T) const
 
   const double T_factor = viscosity_factor (T);
   const double h_water = std::min (h, h_ice);
-  return horizon[i]->K (h_water) * T_factor;
+  return horizon_[i]->K (h_water) * T_factor;
 }
 
 double 
@@ -259,7 +259,7 @@ Soil::set_porosity (size_t i, double Theta)
 
 double              // Activation pressure for secondary domain. [cm] 
 Soil::h_secondary (size_t i) const
-{ return horizon_[i]->secondary_domain ().h_lim (i, *this); }
+{ return horizon_[i]->secondary_domain ().h_lim (); }
 
 double  // Exchange rate between primary and secondary water.  [h^-1] 
 Soil::alpha (size_t i) const

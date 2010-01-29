@@ -56,7 +56,7 @@ public:
   double heat_conductivity (double Theta, double Ice) const; // [erg/cm/h/dg C]
   double heat_capacity (double Theta, double Ice) const; // [erg/cm^3/dg C]
   const Secondary& secondary_domain () const;
-  double K (souble h /* [cm] */);          // [cm/h]
+  double K (double h /* [cm] */) const;          // [cm/h]
 
   // Texture.
 public:
