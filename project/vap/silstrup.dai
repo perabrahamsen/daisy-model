@@ -25,7 +25,7 @@
              (enable_K_macro false)))
 
 (defhorizon Silstrup_Ap_hypres Silstrup_Ap_base
-  (hydraulic hypres))
+  (hydraulic hypres) (secondary_domain none))
 
 (defhorizon Silstrup_Ap_MACRO Silstrup_Ap_base
   (secondary_domain none))
@@ -51,7 +51,7 @@
              (enable_K_macro false)))
 
 (defhorizon Silstrup_B_hypres Silstrup_B_base
-  (hydraulic hypres))
+  (hydraulic hypres) (secondary_domain none))
 
 (defhorizon Silstrup_B_MACRO Silstrup_B_base
   (secondary_domain none))
@@ -76,7 +76,7 @@
              (enable_K_macro false)))
 
 (defhorizon Silstrup_C_hypres Silstrup_C_base
-  (hydraulic hypres))
+  (hydraulic hypres) (secondary_domain none))
 
 (defhorizon Silstrup_C_MACRO Silstrup_C_base
   (secondary_domain none))
