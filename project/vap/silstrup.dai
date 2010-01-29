@@ -10,7 +10,6 @@
 (defhorizon Silstrup_Ap_base VAP_Ap
   (clay 22.45 [%]) (silt 27.7 [%])(sand 49.85 [%])
   (humus (C2OM (C 1.798 [%]))) (dry_bulk_density 1.48 [g/cm^3])
-  (anisotropy 2)
   (hydraulic MACRO
              (Theta_b 39 [%]) (Theta_res 0 [%])
              (n 1.1 []) 
@@ -38,7 +37,6 @@
 (defhorizon Silstrup_B_base VAP_B
   (clay 27.97 [%]) (silt 26.17 [%]) (sand 45.86 [%])
   (humus (C2OM (C 0.47 [%]))) (dry_bulk_density 1.61 [g/cm^3])
-  (anisotropy 2)
   (hydraulic MACRO
              (Theta_b 38 [%]) (Theta_res 0 [%])
              (n 1.13 []) (K_b 0.1 [mm/h])
@@ -58,12 +56,12 @@
 
 (defhorizon Silstrup_B_plow_pan Silstrup_B
   ;; 10% of original.
+  (secondary_domain vap_nocracks)
   (hydraulic original (K_b 0.01 [mm/h])))
 
 (defhorizon Silstrup_C_base VAP_C
   (clay 26.28 [%]) (silt 20.86 [%]) (sand 52.86 [%])
   (humus (C2OM (C 0.116 [%]))) (dry_bulk_density 1.75 [g/cm^3])
-  (anisotropy 2)
   (hydraulic MACRO
              (Theta_b 33 [%]) (Theta_res 0 [%])
              (n 1.1 []) (K_b 0.1 [mm/h])
@@ -81,19 +79,23 @@
 (defhorizon Silstrup_C_MACRO Silstrup_C_base
   (secondary_domain none))
 
+(defhorizon Silstrup_C_Nocracks Silstrup_C
+  (secondary_domain vap_nocracks))
+
 (defcolumn Silstrup default
   (Groundwater file "dk-silstrup.gwt"
                ;; GWT is measured at top of terrain.
                ;; Offset is calibrated based on drainage measurments.
-               ;; 30 cm too high, 0 cm is too low
-               (offset 15 [cm]))
+               ;;  cm too high,  cm is too low
+               (offset 0 [cm]))
   (Chemistry Silstrup)
   (OrganicMatter none)
   (Soil (horizons ;; (  -3.00 [cm] Silstrup_Ap_surface)
                   ( -31.00 [cm] Silstrup_Ap)
                   ( -39.00 [cm] Silstrup_B_plow_pan)
                   (-113.00 [cm] Silstrup_B)
-                  (-500.00 [cm] Silstrup_C))
+                  (-350.00 [cm] Silstrup_C)
+                  (-500.00 [cm] Silstrup_C_Nocracks))
         (MaxRootingDepth 50 [cm])))
 
 (defcolumn Silstrup-1D Silstrup

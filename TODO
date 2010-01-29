@@ -28,21 +28,16 @@ Præcis hvad er synergien med SIFA?
 
 * VAP kørsel
 
-** nw vap-008 som 007, men med sprækker
+** 
 
-** ne vap-012 som 008, men estrup offset = 0, silstrup offset = 0
+Prøv uden sprækker i silstrup under 3.5 m
 
-fc=80, 40
+Prøv et "sprækkeløst" lag i Estrup fra 1.05 til 2 m?, men ikke i
+drængrøften
 
-** se vap-010 som 008, men med fc=80, 40
+Uedn sprækker i pløjesål
 
-** sw vap-011 som 007, men 
-
-med collid desorption estrup offset = 20, silstrup offset = 30
-
-** Ny ref
-
-estrup offset=0, silstrup offset=0
+Fjern anisotropy
 
 * Kursus
 

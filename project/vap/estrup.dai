@@ -10,7 +10,6 @@
 (defhorizon Estrup_Ap_base VAP_Ap
   (clay 14.6 [%]) (silt 23.33 [%])(sand 62.07 [%])
   (humus (C2OM (C 3.248 [%]))) (dry_bulk_density 1.51 [g/cm^3])
-  (anisotropy 2)
   (hydraulic MACRO 
              (Theta_b 36 [%]) (Theta_res 0.0 [%])
              (n 1.16 []) 
@@ -38,7 +37,6 @@
 (defhorizon Estrup_B_base VAP_B
   (clay 21.7 [%]) (silt 17.87 [%])(sand 60.43 [%])
   (humus (C2OM (C 0.812 [%]))) (dry_bulk_density 1.68 [g/cm^3])
-  (anisotropy 2)
   (hydraulic MACRO
              (Theta_b 35 [%]) (Theta_res 0.0 [%])
              (n 1.14 []) (K_b 0.3 [mm/h]) (l 0.5 []) (alpha 0.01 [cm^-1])
@@ -57,13 +55,11 @@
 
 (defhorizon Estrup_B_plow_pan Estrup_B
   ;; 10% of B.
-  (anisotropy 12)
   (hydraulic original (K_b 0.03 [mm/h])))
 
 (defhorizon Estrup_C1_base VAP_C
   (clay 26.75 [%]) (silt 14.23 [%])(sand 59.02 [%])
   (humus (C2OM (C 0.203 [%]))) (dry_bulk_density 1.73 [g/cm^3])
-  (anisotropy 2)
   (hydraulic MACRO
              (Theta_b 32 [%]) (Theta_res 0.0 [%])
              (n 1.1 []) (K_b 0.3 [mm/h])
@@ -84,7 +80,6 @@
 (defhorizon Estrup_C2_base VAP_C
   (clay 25.7 [%]) (silt 22.2 [%])(sand 52.1 [%])
   (humus (C2OM (C 0.233 [%]))) (dry_bulk_density 1.64 [g/cm^3])
-  (anisotropy 2)
   (hydraulic MACRO
              (Theta_b 39 [%]) (Theta_res 0.0 [%])
              (n 1.1 []) (K_b 0.16 [mm/h])
@@ -102,13 +97,15 @@
 (defhorizon Estrup_C2_MACRO Estrup_C2_base
   (secondary_domain none))
 
+(defhorizon Estrup_C2_Nocracks Estrup_C2
+  (secondary_domain vap_nocracks))
+
 (defcolumn Estrup default
   (Groundwater file "dk-estrup.gwt"
                ;; GWT is measured at top of terrain.
                ;; Offset is calibrated based on drainage measurments.
-               ;; 0 cm is too high
-               ;; -20
-               (offset -20 [cm]))
+               ;;  cm is too high, cm is too low
+               (offset 0 [cm]))
   (Chemistry Estrup)
   (OrganicMatter none)
   (Soil (horizons ;; (  -3.00 Estrup_Ap_surface)
@@ -116,6 +113,7 @@
                   ( -35.00 Estrup_B_plow_pan)
                   ( -55.00 Estrup_B)
                   (-105.00 Estrup_C1)
+                  (-200.00 Estrup_C2_Nocracks)
                   (-500.00 Estrup_C2))
         (MaxRootingDepth 150 [cm])))
 
@@ -594,6 +592,12 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
                       (h x))
               [cm/d])))
 
+(defxysource "Conductivity C2 Estrup Nocracks" "Conductivity Nocracks" 
+  (y (convert (soil_K (horizon "Estrup_C2_Nocracks")
+                      (top_soil false)
+                      (h x))
+              [cm/d])))
+
 (defxysource "Conductivity C2 Estrup MACRO" "Conductivity MACRO" 
   (y (convert (soil_K (horizon "Estrup_C2_MACRO")
                       (top_soil false)
@@ -616,7 +620,8 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
   (hor "C2")
   (source "Conductivity C2 Estrup HYPRES"
           "Conductivity C2 Estrup Daisy"
-          "Conductivity C2 Estrup MACRO"))
+          "Conductivity C2 Estrup MACRO"
+          "Conductivity C2 Estrup Nocracks"))
 
 (defgnuplot est-drainmass drainmass (area 1.26 [ha]))
 (defgnuplot est-drainmass-acc drainmass-acc (area 1.26 [ha]))
