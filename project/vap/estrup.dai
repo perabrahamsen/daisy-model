@@ -25,7 +25,7 @@
              (enable_K_macro false)))
 
 (defhorizon Estrup_Ap_hypres Estrup_Ap_base
-  (hydraulic hypres))
+  (hydraulic hypres) (secondary_domain none))
 
 (defhorizon Estrup_Ap_MACRO Estrup_Ap_base
   (secondary_domain none))
@@ -50,7 +50,7 @@
              (enable_K_macro false)))
 
 (defhorizon Estrup_B_hypres Estrup_B_base
-  (hydraulic hypres))
+  (hydraulic hypres) (secondary_domain none))
 
 (defhorizon Estrup_B_MACRO Estrup_B_base
   (secondary_domain none))
@@ -76,7 +76,7 @@
              (enable_K_macro false)))
 
 (defhorizon Estrup_C1_hypres Estrup_C1_base
-  (hydraulic hypres))
+  (hydraulic hypres) (secondary_domain none))
 
 (defhorizon Estrup_C1_MACRO Estrup_C1_base
   (secondary_domain none))
@@ -97,7 +97,7 @@
              (enable_K_macro false)))
 
 (defhorizon Estrup_C2_hypres Estrup_C2_base
-  (hydraulic hypres))
+  (hydraulic hypres) (secondary_domain none))
 
 (defhorizon Estrup_C2_MACRO Estrup_C2_base
   (secondary_domain none))
