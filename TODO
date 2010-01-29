@@ -4,6 +4,12 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 ** NO3 og NH4 skal nedarve fra N (eller N-Min)
 
+Field nitrogen skal ikke skelne mellem NO3 og NH4
+
+** Field water skal have "interne" strømme med
+
+** Skeln mellen sink og source for bioporer.
+
 * Foulum
 
 ** Læs forslag.
