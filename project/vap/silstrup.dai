@@ -87,7 +87,7 @@
                ;; GWT is measured at top of terrain.
                ;; Offset is calibrated based on drainage measurments.
                ;;  cm too high,  cm is too low
-               (offset 0 [cm]))
+               (offset 40 [cm]))
   (Chemistry Silstrup)
   (OrganicMatter none)
   (Soil (horizons ;; (  -3.00 [cm] Silstrup_Ap_surface)

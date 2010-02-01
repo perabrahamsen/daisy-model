@@ -28,16 +28,35 @@ Præcis hvad er synergien med SIFA?
 
 * VAP kørsel
 
-** 
+** nw 13
 
-Prøv uden sprækker i silstrup under 3.5 m
+40, -10
 
-Prøv et "sprækkeløst" lag i Estrup fra 1.05 til 2 m?, men ikke i
-drængrøften
+** ne 14
 
-Uedn sprækker i pløjesål
+50, -20
 
-Fjern anisotropy
+** sw 15
+
+60, -30
+
+** se 16
+
+70, -40
+
+* VAP 
+
+** differentiate "filter" og "sorption" o  colloid bound log
+
+** colloid bound log
+
+*** Field
+
+Indhold: colloid, soil, solute mængder
+
+flukse mellem de tre grupper
+
+input, nedbrydning, dræn, leach
 
 * Kursus
 
@@ -51,10 +70,6 @@ Fjern anisotropy
 
 ** Evt prøv med drænbioporer der ikke når ned i dræncellen.
 
-* VAP 
-
-** differentiate "filter" og "sorption" o  colloid bound log
-
 *** DONE for subsoil.
 
 *** We need sorbtion and generate log for surface
@@ -64,14 +79,6 @@ Fjern anisotropy
 * biopore log
 
 ** adskild "in" og "ud" 
-
-* Mikkel
-
-** Commit ændringer til agrovand
-
-** USB stick med al relevant materialle
-
-** Læg dokumentation under versionskontrol (numeric + figs)
 
 * Make "chemistry multi" model obsolete by making column Chemistry a list 
 
