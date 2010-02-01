@@ -128,6 +128,10 @@
   "Simulation for the PLAP stations."
   (declare station String "Name of station")
   (output (harvest (where "log/${station}-harvest.dlf"))
+          ("Chemical Content" (chemical "Glyphosate")
+           (where "log/${station}-content-Glyphosate.dlf"))
+          ("Chemical Concentration" (chemical "Glyphosate")
+           (where "log/${station}-conc-Glyphosate.dlf"))
           ("Colloid bound" (chemical "Glyphosate")
            (where "log/${station}-bound-Glyphosate.dlf"))
           ("Soil chemical" (chemical colloid)

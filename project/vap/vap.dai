@@ -1,9 +1,7 @@
 ;;; vap.dai --- Run the VAP simulations
 
 (description "reference 14
-Nye horizonter uden sprækker.
-Ingen anisotropi.
-offset=40,-10")
+Reenabled colloid desorption")
 
 (input file "vap-common.dai")
 

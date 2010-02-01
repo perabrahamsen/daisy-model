@@ -372,17 +372,19 @@ SoilWater::tick_after (const Geometry& geo,
       // Find average K.
       double K_edge = 0.0;
       double K_lim = 0.0;
+      
+      // K may be discontinious at h_lim in case of cracks.
+      const double h_fudge = 0.01;
 
       // Contributions from target.
       const int to = geo.edge_to (e);
       if (geo.cell_is_internal (to))
         {
-          
           if (iszero (Theta_secondary_old (to)) || 
               iszero (Theta_secondary (to)))
             continue;
           K_edge += 0.5 * (K_old[to] + K_cell (to));
-          const double h_lim = soil.h_secondary (to);
+          const double h_lim = soil.h_secondary (to) - h_fudge;
           K_lim += soil.K (to, h_lim, h_ice (to), soil_heat.T (to));
         }
       
@@ -395,7 +397,8 @@ SoilWater::tick_after (const Geometry& geo,
               iszero (Theta_secondary (from)))
             continue;
           K_edge += 0.5 * (K_old[from] + K_cell (from));
-          const double h_lim = soil.h_secondary (from);
+          
+          const double h_lim = soil.h_secondary (from) - h_fudge;
           K_lim += soil.K (from, h_lim, h_ice (from), soil_heat.T (from));
         }
       

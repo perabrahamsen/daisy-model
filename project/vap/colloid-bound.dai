@@ -109,7 +109,7 @@ carbon part of the 'K' factor.")
   (secondary true)
   (surface true)
   (A Fenpropimorph-colloid)
-  (k_AB 0.00 [h^-1])                   ;Desorption rate.
+  (k_AB 0.05 [h^-1])                   ;Desorption rate.
   (k_BA 0.05 [h^-1])                   ;Sorption rate.
   (equilibrium linear (K (K_Fenpropimorph (soil_enrichment_factor 10000 [])))))
 
@@ -175,7 +175,7 @@ carbon part of the 'K' factor.")
   (secondary true)
   (surface true)
   (A Dimethoate-colloid)
-  (k_AB 0.00 [h^-1])                   ;Desorption rate.
+  (k_AB 0.05 [h^-1])                   ;Desorption rate.
   (k_BA 0.05 [h^-1])                   ;Sorption rate.
   (equilibrium linear (K (K_Dimethoate (soil_enrichment_factor 10000 [])))))
 
@@ -242,7 +242,7 @@ carbon part of the 'K' factor.")
   (secondary true)
   (surface true)
   (A Glyphosate-colloid)
-  (k_AB 0.00 [h^-1])                   ;Desorption rate.
+  (k_AB 0.05 [h^-1])                   ;Desorption rate.
   (k_BA 0.05 [h^-1])                   ;Sorption rate.
   (equilibrium linear (K (K_Glyphosate (soil_enrichment_factor 10000 [])))))
 
@@ -307,7 +307,7 @@ carbon part of the 'K' factor.")
   (secondary true)
   (surface true)
   (A Metamitron-colloid)
-  (k_AB 0.00 [h^-1])                   ;Desorption rate.
+  (k_AB 0.05 [h^-1])                   ;Desorption rate.
   (k_BA 0.05 [h^-1])                   ;Sorption rate.
   (equilibrium linear (K (K_Metamitron (soil_enrichment_factor 10000 [])))))
 
