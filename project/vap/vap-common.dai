@@ -85,9 +85,9 @@
                     (dimension "%")
                     (spec fixed SoilWater Theta))
            (number (path column "${column}" Movement vertical
-                         Drain Hooghoudt height)
+                         Drain lateral height)
                    (tag "GWT")
-                   (spec drain Hooghoudt height))
+                   (spec drain lateral height))
            (flux_bottom (path column "${column}" Chemistry "*"
                               trace Bromide J_matrix)
                         (spec chemical default J_matrix)
@@ -128,9 +128,9 @@
   "Simulation for the PLAP stations."
   (declare station String "Name of station")
   (output (harvest (where "log/${station}-harvest.dlf"))
-          ("Chemical Content" (chemical "Glyphosate")
+          ("Chemical Content" (chemical "Glyphosate-base")
            (where "log/${station}-content-Glyphosate.dlf"))
-          ("Chemical Concentration" (chemical "Glyphosate")
+          ("Chemical Concentration" (chemical "Glyphosate-base")
            (where "log/${station}-conc-Glyphosate.dlf"))
           ("Colloid bound" (chemical "Glyphosate")
            (where "log/${station}-bound-Glyphosate.dlf"))

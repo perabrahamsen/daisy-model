@@ -1,4 +1,4 @@
-// drain_hooghoudt.C --- Pipe drainage.
+// drain_lateral.C --- Pipe drainage.
 // 
 // Copyright 2008 and 2009 Per Abrahamsen and KU.
 //
@@ -34,7 +34,7 @@
 #include "draineqd.h"
 
 
-struct DrainHooghoudt : public Drain
+struct DrainLateral : public Drain
 {
   // Parameters
   std::auto_ptr<const Draineqd> eq_depth; 
@@ -66,11 +66,11 @@ struct DrainHooghoudt : public Drain
   void initialize (const Geometry&, Treelog& msg);
   bool check (Treelog&) const
   { return true; }
-  DrainHooghoudt (const BlockModel& al);
+  DrainLateral (const BlockModel& al);
 };
 
 void 
-DrainHooghoudt::tick (const Geometry& geo, const Soil& soil, 
+DrainLateral::tick (const Geometry& geo, const Soil& soil, 
                       const SoilHeat& soil_heat, const Surface& surface, 
                       const double, SoilWater& soil_water, 
                       Treelog&)
@@ -120,7 +120,7 @@ DrainHooghoudt::tick (const Geometry& geo, const Soil& soil,
 }
 
 void 
-DrainHooghoudt::output (Log& log) const
+DrainLateral::output (Log& log) const
 {
   output_variable (height, log);
   output_variable (DrainFlow, log);
@@ -129,7 +129,7 @@ DrainHooghoudt::output (Log& log) const
 }
 
 double
-DrainHooghoudt::K_to_pipes (const unsigned int i, 
+DrainLateral::K_to_pipes (const unsigned int i, 
                             const Soil& soil, 
                             const SoilHeat& soil_heat) const
 {
@@ -141,7 +141,7 @@ DrainHooghoudt::K_to_pipes (const unsigned int i,
 
 
 double
-DrainHooghoudt::EquilibriumDrainFlow (const Geometry& geo,
+DrainLateral::EquilibriumDrainFlow (const Geometry& geo,
                                      const Soil& soil, 
                                      const SoilHeat& soil_heat)
 {
@@ -279,13 +279,13 @@ DrainHooghoudt::EquilibriumDrainFlow (const Geometry& geo,
 
 
 void
-DrainHooghoudt::initialize (const Geometry& geo, Treelog&)
+DrainLateral::initialize (const Geometry& geo, Treelog&)
 {
   const size_t cell_size = geo.cell_size ();
   S.insert (S.end (), cell_size, 0.0);
 }
 
-DrainHooghoudt::DrainHooghoudt (const BlockModel& al)
+DrainLateral::DrainLateral (const BlockModel& al)
   : Drain (al),
     eq_depth (Librarian::build_item<Draineqd> (al, "eq_depth")),
     L (al.number ("L")),
@@ -296,13 +296,13 @@ DrainHooghoudt::DrainHooghoudt (const BlockModel& al)
     height (al.number ("height", pipe_position))
 { }
 
-static struct DrainHooghoudtSyntax : DeclareModel
+static struct DrainLateralSyntax : DeclareModel
 {
   Model* make (const BlockModel& al) const
-  { return new DrainHooghoudt (al); }
+  { return new DrainLateral (al); }
 
-  DrainHooghoudtSyntax ()
-    : DeclareModel (Drain::component, "Hooghoudt", "Pipe drainage.")
+  DrainLateralSyntax ()
+    : DeclareModel (Drain::component, "lateral", "Pipe drainage.")
   { }
   void load_frame (Frame& frame) const
   {
@@ -338,6 +338,6 @@ anisotropy of the horizon.");
     frame.declare ("S", "cm^3/cm^3/h", Attribute::LogOnly, Attribute::SoilCells,
                    "Pipe drainage.");
   }
-} DrainHooghoudt_syntax;
+} DrainLateral_syntax;
 
-// drain_Hooghoudt.C ends here.
+// drain_Lateral.C ends here.

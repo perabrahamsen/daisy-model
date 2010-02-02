@@ -1,14 +1,12 @@
 TODO --- things that needs to be done with Daisy -*- org -*-
 
-* Standard log
+NEWS
 
-** NO3 og NH4 skal nedarve fra N (eller N-Min)
+Ny Daisy
 
-Field nitrogen skal ikke skelne mellem NO3 og NH4
+Log
 
-** Field water skal have "interne" strømme med
-
-** Skeln mellen sink og source for bioporer.
+Tutorial
 
 * Foulum
 
@@ -26,7 +24,15 @@ Har de kvalificerede Ph.D. studerende?
 
 Præcis hvad er synergien med SIFA?
 
+Udstyr (250k) rejser 100k
+
 * VAP 
+
+** vap-nw
+
+soil_water q_secondary should now work with cracks.
+
+Se om kolloider bliver filtreret i det sekundære domæne nu.
 
 ** colloid bound log
 
@@ -37,6 +43,16 @@ Indhold: colloid, soil, solute mængder
 flukse mellem de tre grupper
 
 input, nedbrydning, dræn, leach
+
+* Standard log
+
+** NO3 og NH4 skal nedarve fra N (eller N-Min)
+
+Field nitrogen skal ikke skelne mellem NO3 og NH4
+
+** Field water skal have "interne" strømme med
+
+** Skeln mellen sink og source for bioporer.
 
 * Kursus
 

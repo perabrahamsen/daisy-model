@@ -2376,7 +2376,7 @@ sum of all chemicals will be logged."
   (when hourly)
   (entries ;; Year Month MDay Hour
            (number (path column "${column}" Groundwater "*" height)
-                   (tag "column")
+                   (tag "table")
                    (dimension "cm"))
            (number (path column "${column}" Groundwater "*" h_aquifer)
                    (dimension "cm"))
@@ -2392,23 +2392,26 @@ sum of all chemicals will be logged."
 			   Chemistry "*" trace NH4 S_drain)
                      (tag "NH4-Drain")
                      (handle sum)
-                     (dimension "kg N/ha/&")
-                     (factor -1e5))      ;g/cm^2 -> kg N/ha
+                     (negate true)
+                     (dimension "kg N/ha/&"))
            (flux_bottom (path column "${column}" 
 			      Chemistry "*" trace NH4 J_matrix)
 			(spec chemical default J_matrix)
                         (tag "NH4-Perc-Matrix")
                         (handle sum)
+                        (negate true)
                         (dimension "kg N/ha/&"))
            (interval (path column "${column}" Chemistry "*" trace NO3 S_drain)
 		     (spec chemical default S_drain)
                      (tag "NO3-Drain")
                      (handle sum)
+                     (negate true)
                      (dimension "kg N/ha/&"))
            (flux_bottom (path column "${column}" Chemistry "*" trace NO3 J_matrix)
 			(spec chemical default J_matrix)
                         (tag "NO3-Perc-Matrix")
                         (handle sum)
+                        (negate true)
                         (dimension "kg N/ha/&"))))
 
 (deflog Bioincorporation column

@@ -119,7 +119,7 @@
 
 (defcolumn Estrup-1D Estrup
   (Movement original 
-            (Drain Hooghoudt
+            (Drain lateral
                    (L 13 [m])
                    (pipe_position -110.0 [cm]))))
 
@@ -151,7 +151,7 @@
 (defcolumn Estrup-1C-Center Estrup
   (area 630 [cm^2])
   (Movement original 
-            (Drain Hooghoudt
+            (Drain lateral
                    (L 13 [m])
                    (x 325 [cm])
                    (pipe_position -110.0 [cm]))

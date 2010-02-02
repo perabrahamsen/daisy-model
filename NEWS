@@ -8,9 +8,15 @@ release.
 
 * 4.75
 
+** The 'Field nitrogen' log model simplified.
+
+NO3 and NH4 are now combined as "mineral nitrogen".  Also,
+documentation has improved.
+
 ** The 'Jarvis99' colloid generation reaction can now depend on tillage.
 
-The new 'Mmax_tillage_factor' allows tillage age to affect Mmax.
+The new 'Mmax_tillage_factor' allows tillage age to affect Mmax.  The
+'tillage_replenish_all' parameter set Ms to Mmax after tillage.
 
 ** New 'pressure' model for finding average conductivity.
 

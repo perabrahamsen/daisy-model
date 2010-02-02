@@ -257,7 +257,7 @@ Colloid generation emulating the MACRO model.")
     frame.set ("rainergy", "Brown87");
     frame.declare_boolean ("tillage_replenish_all", Attribute::Const, "\
 Set Ms = Mmax after tillage.");
-    frame.set ("tillage_replenish_all", true);
+    frame.set ("tillage_replenish_all", false);
     frame.declare ("Mmax", "g/g", Check::non_negative (), 
                    Attribute::OptionalConst, "\
 Maximum amount of detachable particles.\n\

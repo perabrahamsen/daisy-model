@@ -100,7 +100,7 @@
 
 (defcolumn Silstrup-1D Silstrup
   (Movement original 
-            (Drain Hooghoudt
+            (Drain lateral
                    (L 18 [m])
                    (pipe_position -110.0 [cm]))))
 
@@ -131,7 +131,7 @@
 (defcolumn Silstrup-1C-Center Silstrup
   (area 880 [cm^2])
   (Movement original 
-            (Drain Hooghoudt
+            (Drain lateral
                    (L 18 [m])
                    (x 4.5 [m])
                    (pipe_position -110.0 [cm]))

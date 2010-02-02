@@ -1,3 +1,16 @@
+2010-02-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* drain_lateral.C: Renamed from 'drain_Hooghoudt.C'.
+	* Makefile (MODELS): Adjusted.
+
+2010-02-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log-std.dai ("Field nitrogen"): Don't distinguish between
+	NO3 and NH4.
+
+	* soil_water.C (tick_after): Introduce h_fudge to compensate
+	discontinour conductivity curve.
+
 2010-01-28  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* chemical_std.C (N): New nutrient parameterization.
