@@ -326,8 +326,7 @@ The total amount of water in the soil interval")
           "Surface-Loss"
           "Harvest")
   (content "Min-Surface" "Min-Soil" "Biopores"
-	   "Org-Surface" "Org-Soil" "Crop" "Dead leaves"
-           "Error"))
+	   "Org-Surface" "Org-Soil" "Crop" "Dead leaves"))
 
 (defsummary "Field mineral nitrogen balance" balance
   "Mineral balance for the complete system."
@@ -339,7 +338,7 @@ The total amount of water in the soil interval")
           "Soil-Drain" "Surface-Drain" 
           "Surface-Loss" "Crop-Uptake"
           "N2O-Nitrification" "Denitrification")
-  (content "Min-Surface" "Min-Soil" "Biopores" "Error"))
+  (content "Min-Surface" "Min-Soil" "Biopores"))
 
 (defsummary "Field crop nitrogen balance" balance
   "Crop nitrogen balance for the complete system."

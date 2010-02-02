@@ -28,11 +28,17 @@ Udstyr (250k) rejser 100k
 
 * VAP 
 
-** vap-nw
+** vap-ne
 
 soil_water q_secondary should now work with cracks.
 
 Se om kolloider bliver filtreret i det sekundære domæne nu.
+
+** vap-nw
+
+glyphosate cont and conc
+
+** prøv to niveauer af glyphosat binding
 
 ** colloid bound log
 

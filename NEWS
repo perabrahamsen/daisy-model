@@ -8,6 +8,10 @@ release.
 
 * 4.75
 
+** Bug fixes.
+
+** Improvements to the reference manual and updates to the tutorial.
+
 ** The 'Field nitrogen' log model simplified.
 
 NO3 and NH4 are now combined as "mineral nitrogen".  Also,
