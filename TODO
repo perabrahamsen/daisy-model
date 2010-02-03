@@ -4,33 +4,25 @@ TODO --- things that needs to be done with Daisy -*- org -*-
 
 ** vap-ne
 
-soil_water q_secondary should now work with cracks.
-
-Se om kolloider bliver filtreret i det sekundære domæne nu.
+S:W K 10:1, k 1:10
 
 ** vap-nw
 
-glyphosate cont and conc
+S:W K 1:1, k 1:10
 
-** prøv to niveauer af glyphosat binding
+** vap-se
 
-** colloid bound log
+S:W K 10:1, k 1:100
 
-*** Field
+** vap-sw
 
-Indhold: colloid, soil, solute mængder
-
-flukse mellem de tre grupper
-
-input, nedbrydning, dræn, leach
+S:W K 100:1, k 1:10
 
 * Standard log
 
-** NO3 og NH4 skal nedarve fra N (eller N-Min)
-
-Field nitrogen skal ikke skelne mellem NO3 og NH4
-
 ** Field water skal have "interne" strømme med
+
+Samme med Field nitrogen?
 
 ** Skeln mellen sink og source for bioporer.
 
