@@ -214,18 +214,35 @@ carbon part of the 'K' factor.")
   "Glyphosate sorbed to immobile soil."
   (adsorption full))
 
+(defchemical Glyphosate-immobile-strong Glyphosate-immobile)
+(defchemical Glyphosate-immobile-weak Glyphosate-immobile)
+
 (defnumber K_Glyphosate K_equilibrium
   "Adsorption for Glyphosate to immobile soil."
   (cite gjettermann2009)
   ;; (K_clay 4192 [l/kg])
   (Kd 503 [l/kg]))
 
+(defnumber K_Glyphosate-strong K_Glyphosate
+  (Kd 463 [l/kg]))
+
+(defnumber K_Glyphosate-weak K_Glyphosate
+  (Kd 40 [l/kg]))
+
 (defreaction Glyphosate-immobile-sorption equilibrium
   "Sorption equilibrium between dissolved and immobile Glyphosate."
   (surface true)
-  (A Glyphosate-immobile)
-  (B Glyphosate)
-  (equilibrium linear (K K_Glyphosate))
+  (B Glyphosate))
+
+(defreaction Glyphosate-immobile-sorption-strong Glyphosate-immobile-sorption
+  (A Glyphosate-immobile-strong)
+  (equilibrium linear (K K_Glyphosate-strong))
+  (k_AB 0.005 [h^-1])                   ;Desorption rate.
+  (k_BA 0.005 [h^-1]))                  ;Sorption rate.
+
+(defreaction Glyphosate-immobile-sorption-weak Glyphosate-immobile-sorption
+  (A Glyphosate-immobile-weak)
+  (equilibrium linear (K K_Glyphosate-weak))
   (k_AB 0.05 [h^-1])                   ;Desorption rate.
   (k_BA 0.05 [h^-1]))                  ;Sorption rate.
 
@@ -235,7 +252,7 @@ carbon part of the 'K' factor.")
   ;; Same diffusion coefficient as other colloids.
   (diffusion_coefficient 4.6e-6 [cm^2/s]))
 
-(defreaction Glyphosate-colloid-sorption Glyphosate-immobile-sorption
+(defreaction Glyphosate-colloid-sorption Glyphosate-immobile-sorption-weak
   "Sorption equilibrium between dissolved and colloid-bound Glyphosate."
   (colloid colloid)
   (primary true)
@@ -249,7 +266,7 @@ carbon part of the 'K' factor.")
 (defreaction Glyphosate-filter colloid-filter
   "Filtration of colloid-bound glyphosate in the soil matrix."
   (mobile Glyphosate-colloid)
-  (immobile Glyphosate-immobile))
+  (immobile Glyphosate-immobile-weak))
 
 (defreaction Glyphosate-colloid-generation bound_release
   "Release immobile Glyphosate as colloids in mixing layer."
@@ -257,12 +274,21 @@ carbon part of the 'K' factor.")
   (immobile Glyphosate-immobile)
   (bound Glyphosate-colloid))
 
+(defreaction Glyphosate-colloid-generation-strong Glyphosate-colloid-generation 
+  (immobile Glyphosate-immobile-strong))
+
+(defreaction Glyphosate-colloid-generation-weak Glyphosate-colloid-generation 
+  (immobile Glyphosate-immobile-weak))
+
 (defchemistry Glyphosate default
   "Glyphosate in both immobile, solute and colloid form."
-  (trace Glyphosate Glyphosate-immobile Glyphosate-colloid)
-  (reaction Glyphosate-immobile-sorption
+  (trace Glyphosate Glyphosate-immobile-strong Glyphosate-immobile-weak
+         Glyphosate-colloid)
+  (reaction Glyphosate-immobile-sorption-strong
+            Glyphosate-immobile-sorption-weak
             Glyphosate-filter 
-            Glyphosate-colloid-generation
+            Glyphosate-colloid-generation-strong
+            Glyphosate-colloid-generation-weak
             Glyphosate-colloid-sorption))
 
 ;;; Metamitron
@@ -583,5 +609,18 @@ carbon part of the 'K' factor.")
                      (dimension "${unit}")
                      (spec chemical default M_error))
            ))
+
+(deflog "Colloid bound2" "Colloid bound"
+  (entries &old 
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${soil}-strong" M)
+                     (tag "Strong-Matrix")
+                     (dimension "${unit}")
+                     (spec chemical default M))
+           (interval (path column "${column}" Chemistry "*" 
+                           trace "${soil}-weak" M)
+                     (tag "Weak-Matrix")
+                     (dimension "${unit}")
+                     (spec chemical default M))))
 
 ;;; colloid-bound.dai ends here.

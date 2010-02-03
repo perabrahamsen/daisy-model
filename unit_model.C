@@ -539,7 +539,7 @@ Connvert to SI base units by multiplying with a factor.")
     add ("ng/cm^3", p_n * u_g / p_c_3,
          -3, 1, 0, 0, 0, 0, 0,
          "Low solute concentration.");
-    add ("ug/m^3", p_k * u_g, -3, 1, 0, 0, 0, 0, 0,
+    add ("ug/m^3", p_u * u_g, -3, 1, 0, 0, 0, 0, 0,
          "Mass per volume.");
     add ("mg/l", p_m * u_g / u_l, -3, 1, 0, 0, 0, 0, 0,
          "Concentration.");
