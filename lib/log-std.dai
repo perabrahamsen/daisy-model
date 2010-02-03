@@ -536,15 +536,6 @@ Loss of NO3 due to denitrification.")
                      (handle sum)
                      (dimension "${unit}/&")
                      (spec reaction denitrification converted))
-
-           (interval (path column "${column}" OrganicMatter "*" NO3_source)
-                     (spec organic default NO3_source)
-                     (documentation "\
-NO3 immobilized as a result of organic matter turnover.")
-                     (tag "NO3-Immobilization")
-                     (negate true)
-                     (handle sum)
-                     (dimension "${unit}/&"))
            (number (path column "${column}"
 			 Vegetation crops crops "*" CrpN Fixated)
                    (documentation "\
