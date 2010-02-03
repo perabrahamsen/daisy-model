@@ -1,0 +1,19 @@
+;;; log-old.dai --- Old crop parameterizations.
+;;
+;; This file contains crop parameterizations we no longer want to
+;; present to new users, but nonetheles may still be in use by old
+;; setups.
+;;
+;; Use it if fixing the setups is too much work.
+
+(input file "wwheat-old.dai")
+(input file "sbarley-old.dai")
+(input file "wbarley-old.dai")
+(input file "srape-old.dai")
+(input file "wrape-old.dai")
+(input file "pea-old.dai")
+(input file "grass-old.dai")
+(input file "potato-old.dai")
+(input file "beet-old.dai")
+
+;;; crop-old.dai ends here.

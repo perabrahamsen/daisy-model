@@ -1,0 +1,204 @@
+;;; ror-soil.dai -- soil for Agrovand experiments.
+
+(defhorizon "Overflade Ap" USDA3
+  (description "0-3 cm")
+  (clay 0.107)(silt 0.222)(sand 0.671)(humus 0.03)
+  (dry_bulk_density 1.49 [g/cm^3])
+  (hydraulic M_vG (Theta_res 0.00)
+                  (Theta_sat 0.395489)
+                  (alpha 0.04769)
+                  (n 1.2656)
+                  (K_sat 0.173704 [cm/h])
+                  ;;(K_sat 1.73704 [cm/h])
+                  (l -2.05473))
+  (secondary_domain pressure 
+                  (h_lim 1.2 [pF])
+                  (alpha 0.01 [h^-1])))
+
+(defhorizon "Rorrende Ap" USDA3
+  (description "3-25 cm")
+  (clay 0.107)(silt 0.222)(sand 0.671)(humus 0.03)
+  (dry_bulk_density 1.49 [g/cm^3])
+  (hydraulic M_vG (Theta_res 0.00)
+                  (Theta_sat 0.395489)
+                  (alpha 0.04769)
+                  (n 1.2656)
+                  (K_sat 1.73704 [cm/h])
+                  (l -2.05473))
+  (secondary_domain pressure 
+                  (h_lim 1.2 [pF])
+                  (alpha 0.01 [h^-1])))
+  
+(defhorizon "Rorrende Bplow layer" USDA3
+  (description "25-33 cm Petersen et al (2004)")
+  (clay 0.148)(silt 0.214)(sand 0.638) (humus 0.016)
+  (dry_bulk_density 1.70 [g/cm^3])
+  (anisotropy 12)
+  (hydraulic M_vG (Theta_res 0.00)
+                  (Theta_sat 0.339353)
+                  (alpha 0.0465371)
+                  (n 1.19395)
+                  ;;(K_sat 0.000925 [cm/h])
+                  ;;(K_sat 0.00925 [cm/h])
+                  (K_sat 0.0925 [cm/h])
+                  (l -2.92948))
+  (secondary_domain pressure 
+                  (h_lim 1.2 [pF])
+                  (alpha 0.01 [h^-1])))                
+
+(defhorizon "Rorrende Bt" USDA3
+  (description "33-120 cm")
+  (clay 0.222)(silt 0.195)(sand 0.583)(humus 0.016)
+  (dry_bulk_density 1.65 [g/cm^3])
+  ;(anisotropy 0.025)
+  ;(hydraulic M_vGp (Theta_res 0.0)
+  ;                 (Theta_sat 0.356969)
+  ;                 (alpha 0.0565146)
+  ;                 (n 1.14768)
+  ;                 (K_sat 15800 [cm/d])
+  ;                 (l -1)
+  ;                 (f 1.9 )
+  ;                 (h_m -3))
+    (hydraulic M_vG (Theta_res 0.0)
+                  (l -4.0323)
+                  (n 1.14768)
+                  (alpha 0.0565146)
+                  ;;(K_sat 0.537042 [cm/h])
+                  (K_sat 0.268521 [cm/h])
+                  (Theta_sat 0.356969))
+    (secondary_domain pressure 
+                  (h_lim 1.2 [pF])
+                  (alpha 0.01 [h^-1])))  
+                                          
+(defhorizon "Rorrende C" USDA3
+  (description "120-200 cm")
+  (clay 0.207)(silt 0.235)(sand 0.558) (humus 0.01)
+  (dry_bulk_density 1.69 [g/cm^3])
+  ;;(anisotropy 10)
+  (hydraulic M_vG (Theta_res 0.000)
+                  (Theta_sat 0.348314)
+                  (alpha 0.0476257)
+                  (n 1.15336)  
+                  ;;(K_sat 0.54407 [cm/h])
+                  (K_sat 1.50000 [cm/h])
+                  (l -3.60322))
+  (secondary_domain pressure 
+                  (h_lim 1.2 [pF])
+                  (alpha 0.01 [h^-1]))) 
+
+(defhorizon "Drain_canyon" ISSS4
+  (clay 0.213)(silt 0.190)(coarse_sand 0.244)(fine_sand  0.339)(humus 0.014)
+  (normalize true)
+  (dry_bulk_density 1.65 [g/cm^3])
+  (hydraulic M_vG (Theta_res 0.00)
+                  (Theta_sat 0.36384)
+                  (alpha 0.0351307)
+                  (n 1.14609)
+                  (K_sat 0.526775 [cm/h])
+                  (l -3.62743))
+  (secondary_domain pressure 
+                  (h_lim 1.2 [pF])
+                  (alpha 0.01 [h^-1])))
+                  
+(defbiopore common matrix
+  (R_primary 1 [h])
+  (R_secondary 0.01 [h])
+  (allow_upward_flow true))
+
+
+(defbiopore "matrix_0cm"
+   (common (height_start 0 [cm])
+           (height_end -25 [cm])
+           ;;(density 179 [m^-2])
+           ;;; ca 95% af 190 [m^-2]
+           (density 100 [m^-2])
+           (diameter 2 [mm])))
+           
+(defbiopore "matrix_2cm"
+   (common ;;(height_start  -1.5 [cm])
+           (height_start 0 [cm])
+           (height_end -120 [cm])
+           (diameter 4 [mm])
+           (density (plf x (range [m^-2])
+                           (domain [cm])
+                           (points (20 0)
+                                   (30 45))))))       
+           ; 5% af 190
+                   
+(defbiopore "drain_2cm"
+   (drain  ;;(height_start -1.5 [cm])
+           (height_start 0 [cm])
+           (height_end -115 [cm])
+           (diameter 4 [mm])
+           (pipe_position -112.5 [cm])
+           (density (plf x (range [m^-2])
+                           (domain [cm])
+                           (points (20 45)
+                                   (30 0))))))
+          ;; 5% af 190
+
+(defbiopore "matrix_30cm"
+   (common (height_start -30 [cm])
+           (height_end -120 [cm])
+           (diameter 4 [mm])
+           (density (plf x (range [m^-2])
+                           (domain [cm])
+                           (points (20 0)
+             	 (30 15))))))      
+           
+(defbiopore "drain_30cm"
+   (drain  (height_start -30 [cm])
+           (height_end -115 [cm])
+           (diameter 4 [mm])
+           (pipe_position -112.5 [cm])
+           (density (plf x (range [m^-2])
+                           (domain [cm])
+                           (points (20 15)
+                                   (30 0))))))
+
+(defcolumn Rorrende default
+  "This is a Rorrende soil with pipe drains."
+  (OrganicMatter none)
+  (Chemistry multi (combine Bromide colloids Pendimethalin Ioxynil))
+  (Soil (MaxRootingDepth 150 [cm])
+        (horizons (-3.00 "Overflade Ap")
+                  (-25.00 "Rorrende Ap")
+                  (-33.00 "Rorrende Bplow layer")
+                  (-120 "Rorrende Bt")
+                  (-200 "Rorrende C"))
+        (zones ((box  (top finite -33 [cm]) (bottom finite -115 [cm])
+                       (left finite 0 [cm]) (right finite 25 [cm]))
+                        Drain_canyon)))
+  (Movement rectangle
+        (matrix_solute Mollerup convection none)
+        (matrix_water (Mollerup (max_time_step_reductions 16)
+                                (max_number_of_small_time_steps 1000000))
+                      (v+h))
+        (drain (-112.5 [cm] 1 [cm]))
+        (Geometry 
+             ;;(zplus -1.5 -3 -5 -9 -13 -20 -25 -30 -35 -40 -50 -60 -75 -100 -110 -115 -120 -130 -140 -160 -180 -190 -200)
+               (zplus -1.5 -3 -5 -7 -9 -11 -13 -15 -17 -19 -21 -23 -25 -27 -29 -31 -33 -35 -37 -41 -45 -50 -55 -65 -75
+                      -90 -105 -120 -140 -160 -180 -200)                    
+               (xplus 5 10 15 25 35 40 50 75 125 200 275 350 450 550 650 800 [cm]))
+        (Tertiary (biopores 
+                     (use_small_timesteps false)
+                     (classes ("matrix_0cm") 
+                              ("matrix_2cm")
+                              ("drain_2cm")
+                              ("matrix_30cm")
+                              ("drain_30cm"))))))
+
+
+(defcolumn Rorrende_aq Rorrende
+  "Rorrende soil with an aquitart bottom."
+  (Groundwater aquitard
+        ;(K_aquitard 0.0100744 [cm/h]) ;0.7196*0.014 linear interp corresponds to mean temp (7.8 grad)
+        (K_aquitard 0.050 [cm/h])
+        (Z_aquitard 200 [cm])
+        (pressure_table (file "Rorrende_88.gwt"))))
+
+(defcolumn Rorrende_fd Rorrende
+  "Rorrende soil with free drainiage."
+  (Groundwater deep))
+
+;; ror-soil.dai ends here.

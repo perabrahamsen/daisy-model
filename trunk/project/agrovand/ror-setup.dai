@@ -1,0 +1,91 @@
+;;; ror-setup.dai main setup file for Agrovand simulations.
+
+(input file "rorrendechemicals.dai") 	
+
+
+(input file "ror-soil.dai")
+(input file "ror-manager.dai")
+(input file "ror-log.dai")                
+
+(defprogram Rorrende Daisy
+  "Main Daisy setup for Agrovand project."
+
+  ;; Hourly weather data.
+  (weather default "Rorrende.dwf"
+           (missing_years ((1997 1997) (1998 1998)))
+           (PrecipScale 1.41 1.42 1.35 1.24 1.13 1.11
+                        1.10 1.10 1.11 1.14 1.23 1.37 []))
+  ;; Only relative area count.
+  (column (Rorrende_aq (area 1.0 [ha]))
+          (Rorrende_fd (area 2.0 [ha])))
+  
+  ;; Field management.
+  (manager "Agrovand_management")
+  
+  ;; Begining and end of simulation.
+  (time 1997 6 1)
+  (stop 2001 2 20) ;; End of third draining season.
+
+  ;; Keep us updated.
+  (print_time periodic)
+
+  ;; And tell us what happened.
+  (output harvest
+
+          ;; The following log model are used by the gnuplot graphs.
+          ("Sample water content 2" (column Rorrende_aq))
+          ("Infiltration" (column Rorrende_aq))
+          ("Ponding depth" (column Rorrende_aq))
+          ("Rorrende all chemicals")
+          ("Chemical 25" (chemical Bromide))
+      
+          ;; Log models below are optional. 
+          ("Field water" (column Rorrende_aq))
+          ("Field water" (column Rorrende_fd))        
+          ("Chemical Concentration" 
+             (chemical Bromide) 
+             (column Rorrende_aq)
+             (when daily)
+             (where "SWC_Bromide.dlf"))
+          ("Tertiary water sink drain")
+          
+          ;; ("Chemical Concentration" 
+          ;;  (chemical Pendimethalin-base) 
+          ;;  ;;(when hourly)
+          ;;  (when daily)
+          ;;  (where "SWC_Pendimethalin.dlf"))  
+          ;; ("Chemical Concentration" 
+          ;;  (chemical Ioxynil-base) 
+          ;;  ;;(when hourly)
+          ;;  (when daily)
+          ;;  (where "SWC_Ioxynil.dlf"))                                                      
+          ;;("Chemical Content" 
+          ;;          (chemical colloid) 
+          ;;          (when hourly)
+          ;;          (where "colloid_content.dlf"))   
+          ;;("Failure")   ;;log problems with water movement model
+          ;;("Crop Production")
+          ;;("Field chemical" (chemical colloid))
+          ;;("Chemical Content" (chemical colloid)
+          ;;          (where "M-colloids.dlf"))
+          ;;("Colloids")
+          ;;("Field chemical" (chemical Pendimethalin))
+          ;;("Field chemical" (chemical Pendimethalin-immobile))
+          ;;("Field chemical" (chemical Pendimethalin-colloid))
+          ;;("Soil chemical" (chemical Pendimethalin))
+          ;;("Soil chemical" (chemical Pendimethalin-immobile))
+          ;;("Soil chemical" (chemical Pendimethalin-colloid))
+          ;;("Colloid bound" (chemical Pendimethalin))   
+          
+          ;;("Field chemical" (chemical Ioxynil))
+          ;;("Field chemical" (chemical Ioxynil-immobile))
+          ;;("Field chemical" (chemical Ioxynil-colloid))
+          ;;("Soil chemical" (chemical Ioxynil))
+          ;;("Soil chemical" (chemical Ioxynil-immobile))
+          ;;("Soil chemical" (chemical Ioxynil-colloid))
+          ;;("Colloid bound" (chemical Ioxynil))
+          ;; ("Soil water")
+          )
+) 
+
+;; ror-setup.dai ends here.

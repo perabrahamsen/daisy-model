@@ -1,0 +1,41 @@
+\documentclass[a4paper,11pt,twoside]{article}
+\usepackage{a4}
+\usepackage[T1]{fontenc}
+\usepackage[latin1]{inputenc}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{natbib}
+\usepackage{graphicx}
+\input{macro}
+
+\begin{document}
+
+Three models for colloid generation.
+\begin{enumerate}
+\item Impulse based. \cite{styczen88}
+\item\label{morgan} Energy based, with unlimited potential
+  storage. \cite{EUROSEM}
+\item\label{jarvis} Energy based, with limited storage. \cite{macro-colloid}
+\end{enumerate}
+
+Two models for kinetic energy i rain, used by colloid generation
+model~\ref{morgan} and~\ref{jarvis}.
+\begin{enumerate}
+\item Ignoring canopy, default for colloid generation
+  model~\ref{jarvis}. \cite{Brown87}
+\item Including canopy, default for colloid generation
+  model~\ref{morgan}. \cite{EUROSEM}
+\end{enumerate}
+
+Three models for the dampening factor of ponding, used by all three
+colloid generation models.
+\begin{enumerate}
+\item One based on canopy height alone. \cite{EUROSEM}
+\item One based on both canopy height and droplet size. \cite{Park82}
+\item No dampening.
+\end{enumerate}
+
+\bibliographystyle{elsart-harv}
+\bibliography{daisy}
+
+\end{document}

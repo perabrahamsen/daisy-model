@@ -1,0 +1,84 @@
+; Sander Bruun keyword syntax file for Daisy
+; Daisy inputfile programming language
+; Copyright (C) 2001, Sander Bruun
+; last edit 2001/03/02
+
+C=1
+
+[Syntax]
+Namespace1 = 6
+IgnoreCase = Yes
+InitKeyWordChars = A-Za-z*$'
+KeyWordChars = -A-Za-z0-9*:_
+BracketChars = ()
+OperatorChars = -+*/^=<>
+PreprocStart =
+SyntaxStart =
+SyntaxEnd =
+CommentStart = ;|
+CommentEnd = |;
+CommentStartAlt =
+CommentEndAlt =
+SingleComment = ;
+SingleCommentCol =
+SingleCommentAlt =
+SingleCommentColAlt =
+StringStart = "
+StringEnd = "
+StringAlt =
+StringEsc = \
+CharStart =
+CharEnd =
+CharEsc = \
+
+; ///////////////////////////
+; standard daisy functions
+; ///////////////////////////
+[Keywords 1]
+action
+adsorption
+am
+average
+bioclimate
+chemical
+column
+condition
+crop
+document
+groundwater
+horizon
+hydraulic
+log
+macro
+mactrans
+net_rediation
+nitrification
+parser
+pet
+printer
+pt
+select
+tortuosity
+transport
+uzmodel
+weather
+
+[Keywords 5]
+Chemicals
+Daisy
+Denitrification
+Harvest
+IM
+OM
+OrganicMatter
+Snow
+Soil
+SoilChemical
+SoilChemicals
+SoilHeat
+SoilNH4
+SoilNO3
+SoilWater
+Surface
+Vegetation
+

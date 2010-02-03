@@ -1,0 +1,39 @@
+;Mikkel Mollerup, KVL
+;for AArhus County, 2004/2005
+;$Revision 1.0, 2005/16/11: "LeafPhot" -> "LeafPhot original"
+;
+;Documentation in "Parameteriseringer af grønsager til Daisy, 2005"
+ 
+
+
+(defcrop "Early white cabbage - transplanted" "White cabbage - transplanted"
+ 
+  (description "For AArhus County - Samsoe Project")
+  
+  (Devel original (defined_until_ds 2.0) 		  	  							
+      (DSRate1 0.013) 							       		  
+      (TempEff1 (0.0 0.0) (3.0 0.0) (13 1.0) (18.0 1.0) (26 0.0)) 	    	 	   
+      (PhotEff1 (0 0.0) (8 1.0) (16 1.0) (24.0 0.8)))
+      
+  (LeafPhot original (Fm 6.5)			    						      
+      (Qeff 0.048) 
+      (TempEff (0  0.01) (10 1.00) (20 1.00)	   		
+               (25 0.80) (35 0.01)))              
+           
+
+  (Seed LAI     (DSLAI05 0.15)   		        )
+  (Canopy 
+      (SpLAI  0.018)						
+      (SpSOrgAI 0.0018))
+            
+  (Partit     
+     (Root (0.00 0.30) (0.15 0.15) (0.30 0.15) (0.50 0.10) 
+           (0.75 0.10) (1.00 0.10) (1.10 0.10))
+     (Leaf (0.00 0.80) (0.15 0.65) (0.30 0.50) (0.50 0.30) 
+           (0.75 0.20) (1.00 0.10) (1.10 0.10))
+     (Stem (0.00 0.20) (0.15 0.35) (0.30 0.25) (0.50 0.25) 
+           (0.75 0.15) (1.00 0.10) (1.10 0.10))
+     (RSR  (0.00 0.50) (1.00 0.25)))  
+)
+  
+
