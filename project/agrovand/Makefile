@@ -38,7 +38,7 @@ DATA = rain.ddf \
 	pendimethalin.ddf theta_12cm.ddf theta_16cm.ddf theta_20cm.ddf \
 	theta_24cm.ddf theta_36cm.ddf theta_4cm.ddf theta_60cm.ddf theta_8cm.ddf
 
-OTHER = test-cpe.dai ror-mmo.dai ror-pa.dai plotstuff-9899.dai
+OTHER = ror-mmo.dai ror-pa.dai plotstuff-9899.dai
 
 DOC = plotstuff.tex plotstuff-9899.tex
 
