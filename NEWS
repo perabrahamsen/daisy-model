@@ -8,9 +8,24 @@ release.
 
 * 4.75
 
-** Bug fixes.
+** New Drain parameter
 
-** Improvements to the reference manual and updates to the tutorial.
+You can now specify drainage independent on groundwater model.
+
+(defcolumn Example default
+  (Movement original 
+            (Drain lateral
+                   (L 18 [m])
+                   (pipe_position -110.0 [cm])))
+  (Groundwater aquitard
+               (K_aquitard 0.050 [cm/h])
+               (Z_aquitard 200 [cm])
+               (pressure_table (file "Rorrende_88.gwt"))))
+
+This will eventually replace the old 'pipe' groundwater model.  The
+parameters have the same names, but those pertaining to the lower
+boundary are in 'Groundwater aquitard', and those pertaining to the
+drain pipes are in 'Drain lateral'.
 
 ** The 'Field nitrogen' log model simplified.
 
@@ -35,6 +50,10 @@ Water stress effect is now part of the stomatacon models, rather than
 a seperate parameter of the Farquhar photosynthesis model.  And the
 water stress parameters have been renamed to beta and delta (from k
 and l), to match convetional names.
+
+** Improvements to the reference manual and updates to the tutorial.
+
+** Bug fixes.
 
 * 4.74
 

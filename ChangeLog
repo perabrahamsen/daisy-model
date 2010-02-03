@@ -1,3 +1,11 @@
+2010-02-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.75 released.
+
+2010-02-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.75 released.
+
 2010-02-02  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* drain_lateral.C: Renamed from 'drain_Hooghoudt.C'.
@@ -49,8 +57,6 @@
 	* movement.C, movement.h: Support it.
 
 	* movement_rect.C (drainpoints): Renamed from 'drain'
-
-	* movement.C, movement.h (Tertiary): Made it a vector.
 
 2010-01-13  Per Abrahamsen  <abraham@dina.kvl.dk>
 
