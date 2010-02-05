@@ -988,10 +988,15 @@ they decompose.")
   { }
 } AM_init;
 
-static struct AMMineralSyntax : public DeclareBase
+static struct AMMineralSyntax : public DeclareModel
 {
+  Model* make (const BlockModel&) const
+  { 
+    // We never use this directly, onlu the frame.
+    daisy_notreached (); 
+  }
   AMMineralSyntax ()
-    : DeclareBase (AM::component, "mineral", "Mineral fertilizer.")
+    : DeclareModel (AM::component, "mineral", "Mineral fertilizer.")
   { }
   void load_frame (Frame& frame) const
   {

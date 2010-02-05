@@ -175,18 +175,19 @@ Format::Section::~Section ()
   format.section_close (); 
 }
 
-Format::Document::Document (Format& f)
-  : format (f)
+Format::Document::Document (Format& f, const symbol w, const symbol desc)
+  : format (f),
+    where (w)
 { 
   daisy_assert (format.nest.empty ());
   format.push ("document");
-  format.document_open (); 
+  format.document_open (where, desc); 
 }
 
 Format::Document::~Document ()
 { 
   format.pop ("document");
-  format.document_close (); 
+  format.document_close (where); 
   daisy_assert (format.nest.empty ());
 }
 

@@ -12,7 +12,8 @@ PRESENTATIONS = esa-2004.tex
 NOTES = 2DDaisy.txt forced_LAI.txt
 FUTURE = 
 
-TEXT = $(LIBS) $(FIGS) $(DOCS) $(PRESENTATIONS) $(NOTES) $(FUTURE) Makefile
+TEXT = stdlog.dai \
+	$(LIBS) $(FIGS) $(DOCS) $(PRESENTATIONS) $(NOTES) $(FUTURE) Makefile
 
 REMOVE = crop-lai.tex
 
@@ -42,7 +43,7 @@ reference.pdf: reference.tex components.tex $(LIBS)
 	pdflatex reference.tex < /dev/null
 
 components.tex:	$(DAISYEXE)
-	$(DAISYEXE) -nw all.dai -p document
+	$(DAISYEXE) all.dai -p document
 
 exercises.ps:	exercises.dvi 
 	dvips -f exercises.dvi > exercises.ps
@@ -57,15 +58,18 @@ exercises.pdf:reference.pdf tutorial.pdf exercises.tex $(LIBS)
 	bibtex exercises
 	pdflatex exercises.tex < /dev/null
 
+stdlog.tex: stdlog.dai $(DAISYEXE)
+	$(DAISYEXE) stdlog.dai
+
 tutorial.ps:	tutorial.dvi
 	dvips -f tutorial.dvi > tutorial.ps
 
-tutorial.dvi:reference.dvi tutorial.tex $(LIBS)
+tutorial.dvi:reference.dvi tutorial.tex stdlog.tex $(LIBS)
 	latex tutorial.tex < /dev/null
 	bibtex tutorial
 	latex tutorial.tex < /dev/null
 
-tutorial.pdf:	reference.pdf tutorial.tex $(LIBS)
+tutorial.pdf:	reference.pdf tutorial.tex stdlog.tex $(LIBS)
 	pdflatex tutorial.tex < /dev/null
 	bibtex tutorial
 	pdflatex tutorial.tex < /dev/null

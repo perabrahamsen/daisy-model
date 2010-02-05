@@ -306,6 +306,14 @@ Frame::Implementation::check (const Metalib& metalib, const Frame& frame,
 {
   bool ok = true;
 
+  const FrameModel* model = dynamic_cast<const FrameModel*> (&frame);
+  if (model && !model->buildable ())
+    {
+      msg.error ("'" + frame.type_name () 
+                 + "' is a base model, for internal use only");
+      ok = false;
+    }
+
   for (type_map::const_iterator i = types.begin ();
        i != types.end ();
        i++)

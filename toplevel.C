@@ -90,6 +90,11 @@ Toplevel::Implementation::run_program (const std::string& name_str)
           msg.error (program_name + ": '" + name + "' unknown program");
           throw EXIT_FAILURE;
         }
+      if (!library.model (name).check (metalib, msg))
+        {
+          msg.error (program_name + ": '" + name + "' not runable");
+          throw EXIT_FAILURE;
+        }
       program.reset (Librarian::build_stock<Program> (metalib, msg, name,
                                                       "Command line"));
       if (!program.get ())

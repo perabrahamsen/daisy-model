@@ -103,7 +103,7 @@ model (\ref{model:crop-default}) is sufficiently generic to be able to
 describe crops ranging from grass to potatoes, but it takes lot of
 parameters to do so.  This is why Daisy comes with already
 parameterized versions of the model, with names like ``Grass'' and
-x``Potato''.
+``Potato''.
 
 All in all, this gives a three layered hierarchy, with library
 components in top.  For each library component, there can be one or
@@ -132,7 +132,7 @@ This can mean one of two things.  Sometimes the model will be able to
 infer the value of one variable (or parameter) from the values of
 other variables or parameters.  For example, the `default' chemical
 model (section~\ref{model:chemical-default}) has both an `M' state variable,
-indicating the total chemical content in the soil, and a `C' state
+ indicating the total chemical content in the soil, and a `C' state
 variable, indicating the chemical concentration in the soil water.
 Given one of these, and information about the amount of water in the
 soil, the `default' chemical component is able to calculate the other.
@@ -171,7 +171,7 @@ and the most specialized (complete) parameterizations at the bottom.
 
 A model can also support a second kind of variables, namely \emph{log
   variables}.  Log variables are computed during the simulation, but
-are not part of the model state, i.e.\ they are nor stored between
+are not part of the model state, i.e.\ they are not stored between
 time steps.  This also means that it makes no sense to initialize
 them, so they cannot appear in a parameterization of the model.
 However, log variables and state variables can be written to output

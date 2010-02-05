@@ -48,8 +48,9 @@ struct FormatLaTeX : public Format
 		     const symbol scope, 
 		     const symbol label);
   void section_close ();
-  void document_open ();
-  void document_close ();
+  void document_open (const symbol where, const symbol desc);
+  void document_close (const symbol where);
+  void version ();
 
   // Use.
   void text (const symbol text);

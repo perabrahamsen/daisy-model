@@ -46,11 +46,13 @@ struct ProgramDocument : public Program
   // Content.
   const Metalib& metalib;
   XRef xref;
+  const symbol where;
   std::ofstream out;
   std::auto_ptr<Format> format;
   const bool print_parameterizations;
   // remember this for models.
   symbol current_component;
+  static const symbol root_name;
 
   // LaTeX functions.
   void print_description (const symbol description);
@@ -132,13 +134,17 @@ struct ProgramDocument : public Program
     : Program (al),
       metalib (al.metalib ()),
       xref (metalib),
-      out (al.name ("where").name ().c_str ()),
+      where (al.name ("where")),
+      out (where.name ().c_str ()),
       format (Librarian::build_item<Format> (al, "format")),
       print_parameterizations (al.flag ("print_parameterizations"))
   { }
   ~ProgramDocument ()
   { }
 };
+
+const symbol 
+ProgramDocument::root_name ("component");
 
 void
 ProgramDocument::print_string (const symbol name)
@@ -494,7 +500,10 @@ ProgramDocument::print_users (const XRef::Users& users)
       for (unsigned int j = 0; j < path.size (); j++)
 	format->text (" " + path[j]);
       format->text (" ");
-      format->see_page ("model", component + "-" + model);
+      if (model == root_name)
+        format->see_page ("component", component);
+      else
+        format->see_page ("model", component + "-" + model);
     }
 
   for (std::set<XRef::SubmodelUser>::const_iterator i 
@@ -1059,16 +1068,20 @@ ProgramDocument::print_model (const symbol name, const Library& library,
   const FrameModel& frame = library.model (name);
 
   const XRef::ModelUsed used (library.name (), name);
-  const symbol type = frame.base_name ();
-  if (type != Attribute::None ())
-    {
-      // This is a parameterization.
-      format->soft_linebreak ();
-      Format::Section dummy (*format, "section", name, "model", 
-			     current_component + "-" + name);
-      format->index (name);
+
+  format->soft_linebreak ();
+  Format::Section dummy (*format, "section", name, "model", 
+                         current_component + "-" + name);
+  format->index (name);
       
-      format->text ("A `" + type + "' parameterization ");
+  const symbol type = frame.base_name ();
+  if (type != root_name)
+    {
+      format->text ("A `" + type + "' ");
+      if (frame.buildable ())
+        format->text ("model ");
+      else
+        format->text ("base model ");
       format->see_page ("model", current_component + "-" + type);
       const Filepos& pos = frame.own_position ();
       if (pos != Filepos::none ())
@@ -1079,51 +1092,32 @@ ProgramDocument::print_model (const symbol name, const Library& library,
 	  format->special ("daisy");
 	  format->text (".\n");
 	}
-
-      if (library.has_interesting_description (frame))
-        format->frame_description (frame);
-
-      print_users (xref.models[used]);
-      std::set<symbol> entries;
-      own_entries (metalib, library, name, entries, true);
-      if (entries.size () > 0)
-        print_submodel_entries (name, 0, 
-                                frame, entries, 
-                                library.name ());
-
-      const std::vector<Library::doc_fun>& doc_funs = library.doc_funs ();
-      for (size_t i = 0; i < doc_funs.size ();i++)
-	{
-	  format->soft_linebreak ();
-	  doc_funs[i](*format, metalib, msg, name);
-	}
-      if (print_parameterizations)
-	{
-	  std::ostringstream tmp;
-	  PrinterFile printer (metalib, tmp);
-	  printer.print_parameterization (library.name (), name, false);
-	  format->soft_linebreak ();
-	  format->verbatim (tmp.str ());
-	}
     }
-  else
+     
+  if (library.has_interesting_description (frame))
+    format->frame_description (frame);
+
+  print_users (xref.models[used]);
+  std::set<symbol> entries;
+  own_entries (metalib, library, name, entries, true);
+  if (entries.size () > 0)
+    print_submodel_entries (name, 0, 
+                            frame, entries, 
+                            library.name ());
+
+  const std::vector<Library::doc_fun>& doc_funs = library.doc_funs ();
+  for (size_t i = 0; i < doc_funs.size ();i++)
     {
       format->soft_linebreak ();
-      Format::Section dummy (*format, "section", name, "model",
-			     current_component + "-" + name);
-      format->index (name);
-
-      // Print description, if any.
-      format->frame_description (frame);
-
-      print_users (xref.models[used]);
-      print_sample (name, library);
-      
-      // Print own entries.
-      std::set<symbol> entries;
-      own_entries (metalib, library, name, entries);
-      print_submodel_entries (name, 0, frame, entries, 
-			      library.name ());
+      doc_funs[i](*format, metalib, msg, name);
+    }
+  if (print_parameterizations)
+    {
+      std::ostringstream tmp;
+      PrinterFile printer (metalib, tmp);
+      printer.print_parameterization (library.name (), name, false);
+      format->soft_linebreak ();
+      format->verbatim (tmp.str ());
     }
 }
 
@@ -1168,6 +1162,11 @@ public:
     if (a == b)
       return false;
 
+    if (!library.check (a))
+      return false;
+    if (!library.check (b))
+      return false;
+
     // One may be a derivative of the other.  Sort base first.
     if (library.is_derived_from (a, b))
       return false;
@@ -1210,7 +1209,6 @@ ProgramDocument::print_component (const Library& library, Treelog& msg)
   print_users (xref.components[name]);
 
   // Print own entries.
-  static const symbol root_name ("component");
   daisy_assert (library.check (root_name));
   std::set<symbol> my_entries;
   own_entries (metalib, library, root_name, my_entries);
@@ -1238,7 +1236,7 @@ ProgramDocument::print_component (const Library& library, Treelog& msg)
 void
 ProgramDocument::print_document (Treelog& msg)
 {
-  Format::Document dummy (*format);
+  Format::Document dummy (*format, where, "Description of Daisy components");
 
   // For all components...
   std::vector<symbol> entries;
@@ -1263,6 +1261,9 @@ standard parameterizations for the model.");
       const symbol description = Librarian::submodel_description (name);
       print_fixed (name, frame, description);
   }
+  
+  // Daisy version.
+  format->version ();
 }
 
 static struct ProgramDocumentSyntax : public DeclareModel
@@ -1287,5 +1288,128 @@ Generate the components part of the reference manual.")
     frame.set ("print_parameterizations", false);
   }
 } ProgramDocument_syntax;
+
+struct ProgramDocmodel : public Program
+{
+  // Content.
+  const Metalib& metalib;
+  const symbol where;
+  std::ofstream out;
+  std::auto_ptr<Format> format;
+  const std::vector<symbol> models;
+  const symbol current_component;
+
+  void print_model (symbol name, const Library& library, Treelog&);
+
+  // Print it.
+  void print_document (Treelog&);
+
+  // Program.
+  bool run (Treelog& msg)
+  {
+    format->initialize (out);
+    print_document (msg); 
+    return true;
+  }
+
+  // Create and Destroy.
+  void initialize (Metalib&, Block&)
+  { };
+  bool check (Treelog&)
+  { return true; }
+  ProgramDocmodel (const BlockModel& al)
+    : Program (al),
+      metalib (al.metalib ()),
+      where (al.name ("where")),
+      out (where.name ().c_str ()),
+      format (Librarian::build_item<Format> (al, "format")),
+      models (al.name_sequence ("models")),
+      current_component (al.name ("component"))
+  { }
+  ~ProgramDocmodel ()
+  { }
+};
+
+void
+ProgramDocmodel::print_model (const symbol name, const Library& library,
+                              Treelog& msg)
+{
+  const FrameModel& frame = library.model (name);
+
+  format->soft_linebreak ();
+  Format::Section dummy (*format, "subsection", name, "model", 
+                         current_component + "-" + name);
+      
+  const symbol type = frame.base_name ();
+  static const symbol root_name ("component");
+  if (type != root_name)
+    {
+      format->text ("A `" + type + "' ");
+      if (frame.buildable ())
+        format->text ("model ");
+      else
+        format->text ("base model ");
+      const Filepos& pos = frame.own_position ();
+      if (pos != Filepos::none ())
+	format->text (" defined in `" + pos.filename () + "'.\n");
+      else
+	{
+	  format->text (" build into ");
+	  format->special ("daisy");
+	  format->text (".\n");
+	}
+    }
+     
+  if (library.has_interesting_description (frame))
+    format->frame_description (frame);
+
+  const std::vector<Library::doc_fun>& doc_funs = library.doc_funs ();
+  for (size_t i = 0; i < doc_funs.size ();i++)
+    {
+      format->soft_linebreak ();
+      doc_funs[i](*format, metalib, msg, name);
+    }
+}
+
+void
+ProgramDocmodel::print_document (Treelog& msg)
+{
+  Format::Document dummy (*format, where, "Daisy models");
+
+  const Library& library = metalib.library (current_component);
+
+  // For all members...
+  std::vector<symbol> entries = models;
+  ModelCompare model_compare (library);
+  sort (entries.begin (), entries.end (), model_compare);
+  for (size_t i = 0; i < entries.size (); i++)
+    if (library.check (entries[i]))
+      print_model (entries[i], library, msg);
+    else
+      msg.error ("'" + entries[i] + "': no such model");
+}
+
+static struct ProgramDocmodelSyntax : public DeclareModel
+{
+  Model* make (const BlockModel& al) const
+  { return new ProgramDocmodel (al); }
+  ProgramDocmodelSyntax ()
+    : DeclareModel (Program::component, "docmodel", "\
+Document specific models.")
+  { }
+  void load_frame (Frame& frame) const
+  {
+    frame.declare_string ("where", Attribute::Const, 
+                "Name of file to store results in.");
+    frame.declare_object ("format", Format::component, 
+                       Attribute::Const, Attribute::Singleton,
+                       "Text format used for the document.");
+    frame.set ("format", "LaTeX");
+    frame.declare_string ("models", Attribute::Const, Attribute::Variable,
+                          "Models to document.");
+    frame.declare_string ("component", Attribute::Const, 
+                          "Component to find the models in.");
+  }
+} ProgramDocmodel_syntax;
 
 // program_document.C ends here.

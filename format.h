@@ -179,22 +179,23 @@ public:
 
   // Document.
 private:
-  virtual void document_open () = 0;
-  virtual void document_close () = 0;
+  virtual void document_open (const symbol where, const symbol desc) = 0;
+  virtual void document_close (const symbol where) = 0;
 public:
-  class Document
+  class Document : private boost::noncopyable
   {
   private:
     Format& format;
-    Document (const Document&);
+    const symbol where;
   public:
-    Document (Format&);
+    Document (Format&, const symbol where, const symbol desc);
     ~Document ();  
   };
   friend class Document;
 
   // Use.
 public:
+  virtual void version () = 0;
   virtual void text (const symbol text) = 0;
   virtual void bold (const symbol text) = 0;
   virtual void italic (const symbol text) = 0;
