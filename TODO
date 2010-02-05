@@ -18,6 +18,12 @@ S:W K 10:1, k 1:100
 
 S:W K 100:1, k 1:10
 
+** vap-c
+
+S:W K 10:1, k 1:10
+
+2D!
+
 * Standard log
 
 ** Field water skal have "interne" strømme med
