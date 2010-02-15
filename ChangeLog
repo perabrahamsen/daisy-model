@@ -1,3 +1,11 @@
+2010-02-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 4.77 released.
+
+2010-02-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* unit_model.C (pF): Bug fix.
+
 2010-02-04  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* program_document.C: Fix references to "component".

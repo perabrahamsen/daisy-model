@@ -665,7 +665,7 @@ struct UnitpF : public MUnit
   double to_base (double value) const
   { return pF2h (value) * 100.0 /* Pa/cm */; }
   double to_native (double value) const
-  { return h2pF (value * 100.0) /* cm/pa */; }
+  { return h2pF (value / 100.0) /* cm/pa */; }
   bool in_native (double value) const
   { return value >= 0.0; }
   bool in_base (double value) const
