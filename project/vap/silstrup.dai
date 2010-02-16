@@ -568,6 +568,7 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
 
 (defgnuplot Silstrup-hydraulics Station
   (station Silstrup)
+  (area 1.69 [ha])
   (graph "Retention Ap Silstrup"
          "Conductivity Ap Silstrup"
          "Retention B Silstrup"
@@ -577,6 +578,7 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
 
 (defgnuplot Silstrup Station
   (station Silstrup)
+  (area 1.69 [ha])
   (graph &old 
          "Retention Ap Silstrup"
          "Conductivity Ap Silstrup"

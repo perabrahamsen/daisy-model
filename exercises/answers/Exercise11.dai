@@ -6,9 +6,9 @@
 (directory "/tmp")
 ;;  Setting search path for library-files 
 ;; (path "." "C:/Daisy/Lib" "C:/Daisy/Weather")
-(path "/home/user_2/abraham/daisy/exercises/answers" 
-      "/home/user_2/abraham/daisy/exercises" 
-      "/home/user_2/abraham/daisy/lib")
+(path &old
+      "C:/cygwin/home/abraham/daisy/exercises/answers" 
+      "C:/cygwin/home/abraham/daisy/exercises")
 
 ;; Including external library-files
 (input file "tillage.dai")
@@ -96,16 +96,16 @@
 (defam E11_slurry_base organic
   (description "Exercise 11")
   (volatilization 0.15)
-  (om ((initial_fraction 0.79)
+  (om (component (initial_fraction 0.79)
        (turnover_halftime 150 [d])
        (efficiency 0.60 0.60)
        (fractions 0.0 1.0 0.0))
-      (;(initial_fraction 0.21)
+      (component ;(initial_fraction 0.21)
        (C_per_N 5)
        (turnover_halftime 15 [d])
        (efficiency 0.60 0.60)
        (fractions 0.0 1.0 0.0))
-      ((initial_fraction 0.00)
+      (component (initial_fraction 0.00)
        (C_per_N 11)
        (turnover_rate 1.0)
        (efficiency 1.0)
@@ -191,7 +191,7 @@
   (wait_mm_dd 12 31) stop
 )
 ;; Selecting output files
-(output Harvest
+(output harvest
         "Crop Production"
 ;;      Water balance 0-100 cm  
         ("Root Zone Water Balance" (to -100 [cm])(when daily)

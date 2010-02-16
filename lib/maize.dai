@@ -84,6 +84,7 @@
       (NfSOrgCnc (1.057 0.0140)  (1.244 0.010) (2.00 0.010))))
 
 (defcrop "Pioneer Maize" default
+  (cite "vries-maize")
    (Devel default (EmrTSum  100)
       (DS_Emr   0.01)
       (DSRate1  0.0265)

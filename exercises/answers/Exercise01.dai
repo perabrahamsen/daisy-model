@@ -5,6 +5,9 @@
 (directory "C:/DaisySim/Exercise/01")
 ;;  Setting search path for library-files 
 ;;(path "." "C:/Daisy/Lib" "C:/Daisy/Weather")
+(path &old
+      "C:/cygwin/home/abraham/daisy/exercises/answers" 
+      "C:/cygwin/home/abraham/daisy/exercises")
 
 ;; Including external library-files
 (input file "tillage.dai")
@@ -78,7 +81,7 @@
   (wait_mm_dd 1 1) stop
 )
 ;; Selecting output files
-(output Harvest
+(output harvest
         "Crop Production"
 ;;      Water balance 0-100 cm  
         ("Root Zone Water Balance" (to -100 [cm])(when daily)

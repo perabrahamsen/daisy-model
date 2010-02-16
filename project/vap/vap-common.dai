@@ -604,7 +604,6 @@
 (defgnuplot Station multi
   (declare station String "Name of station to plot.")
   (declare area Number [ha] "Area to plot.")
-  (area 1.69 [ha])
   (graph weather gw
          (theta (depth "SW025cm"))
          sc-bromide 

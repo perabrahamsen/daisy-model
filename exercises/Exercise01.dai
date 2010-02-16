@@ -76,7 +76,7 @@
   (wait_mm_dd 12 31) stop
 )
 ;; Selecting output files
-(output Harvest
+(output harvest
         "Crop Production"
 ;;      Water balance 0-100 cm  
         ("Root Zone Water Balance" (to -100 [cm])(when daily)

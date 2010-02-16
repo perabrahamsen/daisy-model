@@ -35,9 +35,9 @@ Note: lines, all starting with `Note:'.
 # Fixed deposit values.
 
 NH4WetDep: 0.9 ppm
-NH4DryDep: 2.2 kgN/year
+NH4DryDep: 2.2 kgN/ha/year
 NO3WetDep: 0.6 ppm
-NO3DryDep: 1.1 kgN/year
+NO3DryDep: 1.1 kgN/ha/year
 
 # Temperature averages
 

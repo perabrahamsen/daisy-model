@@ -38,27 +38,25 @@ Også "state of the art" og "impact" og andre afsnit
 
 * VAP 
 
-** vap-ne
-
-S:W K 10:1, k 1:10
-
 ** vap-nw
 
-S:W K 1:1, k 1:10
+1C-Drain 10:1
 
-** vap-se
+** vap-ne
 
-S:W K 10:1, k 1:100
+1C-Center 10:1
 
 ** vap-sw
 
-S:W K 100:1, k 1:10
+1C-Drain 100:1
+
+** vap-se
+
+1C-Center 100:1
+
 
 ** vap-c
 
-S:W K 10:1, k 1:10
-
-2D!
 
 * Standard log
 

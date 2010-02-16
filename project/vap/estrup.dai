@@ -628,6 +628,7 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
 
 (defgnuplot Estrup-hydraulics Station
   (station Estrup)
+  (area 1.26 [ha])
   (graph "Retention Ap Estrup"
          "Conductivity Ap Estrup"
          "Retention B Estrup"
@@ -639,6 +640,7 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
 
 (defgnuplot Estrup Station
   (station Estrup)
+  (area 1.26 [ha])
   (graph &old
          "Retention Ap Estrup"
          "Conductivity Ap Estrup"

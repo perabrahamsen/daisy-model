@@ -2,9 +2,13 @@
 ;;  Daisy writes a Daisy.log-file during execution. 
 ;;  This log-file contains any error messages
 ;;  If the working directory is set correctly the log-file will be found here
-(directory "C:/DaisySim/Exercise/06")
+;;(directory "C:/DaisySim/Exercise/06")
+(directory "/tmp")
 ;;  Setting search path for library-files 
 ;;(path "." "C:/Daisy/Lib" "C:/Daisy/Weather")
+(path &old
+      "C:/cygwin/home/abraham/daisy/exercises/answers" 
+      "C:/cygwin/home/abraham/daisy/exercises")
 
 ;; Including external library-files
 (input file "tillage.dai")
@@ -69,7 +73,7 @@
           (horizons (  -30 [cm] "Ap F.S.L.")
                     (  -80 [cm] "B F.S.L.")
                     ( -220 [cm] "C F.S.L.")))
-     (OrganicMatter (init (input 3000 [kg C/ha/y])))
+     (OrganicMatter original (init (input 3000 [kg C/ha/y])))
      (Groundwater pipe (pipe_position -1.1 [m])(L 18 [m])(h_aquifer 2.00 [m])
           (Z_aquitard 2.00 [m])(K_aquitard 0.0015 [cm/h]))
 )
@@ -139,7 +143,7 @@
 )
 
 ;; Selecting output files
-(output Harvest
+(output harvest
         "Crop Production"
 ;;      Water balance 0-100 cm  
         ("Root Zone Water Balance" (to -100 [cm])(when daily)
