@@ -7,6 +7,7 @@ strong/weak glyphosat adsorption")
 
 (defgnuplot Silstrup-zoom Station
   (station Silstrup)
+  (area 1.69 [ha])
   (graph (drain (begin 2001 10 25) (end 2001 11 01))
          (drain-acc (begin 2001 10 25) (end 2001 11 01))
          (biopore  (begin 2001 10 25) (end 2001 11 01))
@@ -19,7 +20,7 @@ strong/weak glyphosat adsorption")
   (graph Silstrup-zoom))
          
 
-(run Silstrup-1C-Drain plotzoom)
+(run batch (run Silstrup-1C-Drain plotzoom))
 
 ;;(run batch (run Estrup-2D Silstrup-2D plotall))
 ;;(run batch (run Estrup-2C Silstrup-2C plotall))
