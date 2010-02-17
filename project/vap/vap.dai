@@ -19,7 +19,7 @@ strong/weak glyphosat adsorption")
   (graph Silstrup-zoom))
          
 
-(run plotzoom)
+(run Silstrup-1C-Drain plotzoom)
 
 ;;(run batch (run Estrup-2D Silstrup-2D plotall))
 ;;(run batch (run Estrup-2C Silstrup-2C plotall))
