@@ -42,7 +42,8 @@ strong/weak glyphosat adsorption")
 
 ;;(run batch (run Estrup-2D Silstrup-2D plotall))
 ;;(run batch (run Estrup-2C Silstrup-2C plotall))
-(run batch (run plotall))
+(run batch (run Silstrup-2C plotall))
+;;(run batch (run plotall))
 ;; (run batch (run Estrup-1C-Drain Silstrup-1C-Drain plotall))
 ;; (run plothydro)
 
