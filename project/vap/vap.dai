@@ -20,11 +20,29 @@ strong/weak glyphosat adsorption")
   (graph Silstrup-zoom))
          
 
-(run batch (run Silstrup-1C-Drain plotzoom))
+;; (run batch (run Silstrup-1C-Drain plotzoom))
+
+(defgnuplot Silstrup-full Station
+  (station Silstrup)
+  (area 1.69 [ha])
+  (graph (drain ); 2001 10 25) (end 2001 11 01))
+         (drain-acc ); 2001 10 25) (end 2001 11 01))
+         (biopore  ); 2001 10 25) (end 2001 11 01))
+         (biopore-acc ); 2001 10 25) (end 2001 11 01))
+         (biopore-drain  ); 2001 10 25) (end 2001 11 01))
+         (biopore-drain-acc ); 2001 10 25) (end 2001 11 01))
+         (colloids ); 2001 10 25) (end 2001 11 01))
+         ))
+
+(defprogram plotfull gnuplot
+  (graph Silstrup-full))
+
+;;(run batch (run Silstrup-1C-Drain plotzoom))
+;; (run batch (run plotfull))
 
 ;;(run batch (run Estrup-2D Silstrup-2D plotall))
 ;;(run batch (run Estrup-2C Silstrup-2C plotall))
-;;(run batch (run plotall))
+(run batch (run plotall))
 ;; (run batch (run Estrup-1C-Drain Silstrup-1C-Drain plotall))
 ;; (run plothydro)
 

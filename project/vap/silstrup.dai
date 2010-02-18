@@ -30,9 +30,15 @@
   (secondary_domain none))
 
 (defhorizon Silstrup_Ap_surface Silstrup_Ap
-  (hydraulic original
-             ;; 50%
-             (K_b 0.05 [mm/h])))
+  (hydraulic M_vG_compact
+             (Theta_sat 0.392719 [])
+             (ref_n 1.1 []) 
+             (ref_K_sat 2.25027 [cm/h])
+             (mod_alpha (0 1) (1 1))
+             (mod_n  (0 1) (1 1))
+             (mod_K_sat  (0.3 0.001) (0.392719 1))
+             (Theta_res 0 [%])
+             (ref_alpha 0.01 [cm^-1])))
 
 (defhorizon Silstrup_B_base VAP_B
   (clay 27.97 [%]) (silt 26.17 [%]) (sand 45.86 [%])
@@ -90,7 +96,7 @@
                (offset 40 [cm]))
   (Chemistry Silstrup)
   (OrganicMatter none)
-  (Soil (horizons ;; (  -3.00 [cm] Silstrup_Ap_surface)
+  (Soil (horizons (  -3.00 [cm] Silstrup_Ap_surface)
                   ( -31.00 [cm] Silstrup_Ap)
                   ( -39.00 [cm] Silstrup_B_plow_pan)
                   (-113.00 [cm] Silstrup_B)
@@ -244,12 +250,14 @@
     ;; Harvest of spring barley. ;; Stubbleheight 12 cm, 
     ;; grain yield 74.77 hkg/ha 85% DM, straw yield 28.62 hkg/ha 100% DM
     (harvest "Spring Barley" (stub 12 [cm]))
+    (set_porosity (depth -1 [cm]) (porosity 0.3))
   (wait (at 2001 10 25))
      ;; Roundup Bio (glyphosate) - weeds - 4.0 l/ha			
      ;; 360 g/l * 4.0 l/ha = 1440 g/ha
     (spray Glyphosate 1440 [g/ha])
   (wait (at 2001 12 18))
     (plowing (depth -22 [cm]))
+    (set_porosity (depth -1 [cm]) (porosity 0.392719))
   (wait (at 2002 04 03))
     (seed_bed_preparation -3 [cm])
   (wait (at 2002 04 17))	
