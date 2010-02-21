@@ -1,6 +1,12 @@
 ;;; ror-setup.dai main setup file for Agrovand simulations.
 
 (input file "rorrendechemicals.dai") 	
+;;(input file "rorrendechemicals_2.dai") 
+;;(input file "rorrendechemicals_3.dai") 
+;;(input file "rorrendechemicals_4.dai") 
+;;(input file "rorrendechemicals_5.dai") 
+;;(input file "rorrendechemicals_6.dai") 
+;;(input file "rorrendechemicals_7.dai") 
 
 
 (input file "ror-soil.dai")
