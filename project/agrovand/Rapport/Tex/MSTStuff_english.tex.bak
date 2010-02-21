@@ -1,0 +1,2464 @@
+%%January 20- 2002
+%\documentclass[wrr]{agu2001}
+\documentclass{report}
+
+
+%\usepackage{natbibDK}
+\usepackage{natbib}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[dvips]{graphicx}
+\usepackage[T1]{fontenc}        %for danish letters
+\usepackage[latin1]{inputenc}   %for danish letters
+
+
+%%---------------------- For verification -----------------------------%%
+\newcommand{\erf}{\operatorname{erf}}                   %new function names
+\newcommand{\erfc}{\operatorname{erfc}}                 %new function names
+\newcommand{\inverfc}{\operatorname{inverfc}}           %new function names
+\newcommand{\inerfc}{\operatorname{i^nerfc}}            %repeated int of erfc
+\newcommand{\imoneerfc}{\operatorname{i^{-1}efc}}       %repeated int erfc
+\newcommand{\inmoneerfc}{\operatorname{i^{n-1}erfc}}
+\newcommand{\izeroerfc}{\operatorname{i^0erfc}}
+\newcommand{\ierfc}{\operatorname{ierfc}}
+%%---------------------------------------------------------------------%%
+
+
+\begin{document}
+
+%% ------------------------------------------------------------------------ %%
+%
+%  TITLE
+%
+%% ------------------------------------------------------------------------ %%
+
+
+
+\title{Formler til Milj\ostyrrelsen}
+
+%% ------------------------------------------------------------------------ %%
+%
+%  AUTHORS AND AFFILIATIONS
+%
+%% ------------------------------------------------------------------------ %%
+
+\author{Mikkel Mollerup}
+
+
+\chapter{Water movement}
+
+The soil water, $\theta$ is in the model divided into 3 parts:
+%
+\begin{equation}
+\theta = \theta_1 + \theta_2 + \theta_3
+\label{eq:threedomains}
+\end{equation}
+
+The third domain is made for describing the macroporous flow
+whereas the primary and secondary domain are representing the
+water in the soil matrix
+%
+\begin{equation}
+\theta_{\text{m}} = \theta_1 + \theta_2
+\end{equation}
+%
+where $\theta_{\text{m}}$ is volumetric water content in the
+matrix domain.  The division of the matrix domain into 2
+subdomains is solely made for a better description of solute
+movement - see more in chapter \ref{chp:Solute_movement}.
+
+
+\section{Richards' Equation}
+
+The water flow in porous media can be described with the formula
+of Richard. The equation is derived here. The water flux density
+vector, $\mathbf{q}_{\text{m}}$ can be calculated by the
+Darcy´s law. For a two-dimensional vertical transect it yields:
+%
+\begin{equation}
+\mathbf{q}_{\text{m}}=-\mathbf{K}(\psi)\nabla(\psi + z) \label{eq:darcy}
+\end{equation}
+where $\mathbf{K}(\psi)$ is the hydraulic conductivity tensor,
+$\psi$ is the potential head. The x-axis is chosen in horizontal
+direction and the z-axis is positive upwards. The conductivity
+tensor can be expressed as:
+\begin{equation}
+\mathbf{K}=\begin{bmatrix} K_{xx} & K_{xz} \\ K_{zx} & K_{zz}
+ \end{bmatrix}
+\end{equation}
+For a model with rectangular cells we have chosen that the
+ principal directions of the anisotropic medium are parallel to
+ the $x$- and $z$-axis, i.e.
+\begin{equation}
+\mathbf{K}=\begin{bmatrix} K_{xx} & 0 \\ 0 & K_{zz}
+ \end{bmatrix}
+\label{eq:Kmatrix}
+\end{equation}
+The mass balance for the system gives
+\begin{equation}
+\frac{\partial \theta_{\text{m}}}{\partial t}=-\nabla \cdot \mathbf{q}_{\text{m}}
+-\Gamma_{\text{wm}} \label{eq:continuity}
+\end{equation}
+where $\theta_{\text{m}}$ is the volumetric water content and
+$\Gamma_{\text{wm}}$ is the sink term for water. The partial
+differential equation can be developed by combining Darcy´s law,
+equation (\ref{eq:darcy}) and the mass balance, equation
+(\ref{eq:continuity}), thus
+\begin{equation}
+\frac{\partial \theta_{\text{m}}}{\partial t}=\nabla \cdot
+\left(\mathbf{K}(\psi)\nabla (\psi + z)\right) - \Gamma_{\text{wm}}
+\label{eq:richards}
+\end{equation}
+This is known as Richard's equation. For the modeling is assumed
+that the soil-water retention is without hysteresis, i.e. there is a
+unique relation between the matrix pressure potential and the water
+content.
+
+To solve Richard's equation it is necessary to specify initial and
+boundary conditions. The boundary conditions specify a combination
+of $\psi$ and its derivative on the boundary. Furthermore it is
+possible to use different forms of flux (Neumann) and predescribed
+pressure (Dirichlet) boundary conditions. The problem to be solved
+for determining the water movement can be summarized to
+%%% with moustages %%%
+\begin{equation}
+\begin{cases}
+\frac{\partial \theta_{\text{m}}}{\partial t}=\nabla \cdot
+\left(\mathbf{K}(\psi)\nabla (\psi + z) \right)-\Gamma_{\text{wm}} & \text{in}\  \Omega \\
+\mathbf{\bar{n}} \cdot \left(\mathbf{K}(\psi)\nabla (\psi + z)
+\right)=
+-q_{\text{m}} & \text{on}\ \partial \Omega^{N} \\
+\psi=\psi_0 & \text{on}\ \partial \Omega^{D}
+\end{cases}
+\label{eq:watermovement}
+\end{equation}
+%%%%%%%%%%%%%%%%%%%%%%%
+%%% without moustages %%%
+%\begin{eqnarray}
+%&& \frac{\partial \theta}{\partial t}=\nabla \cdot
+%\left(\mathbf{K}(\psi)\nabla (\psi + z) \right)-\Gamma \ \text{in}\  \Omega  \nonumber \\
+%&&\mathbf{\bar{n}} \cdot \left(\mathbf{K}(\psi)\nabla (\psi + z)
+%\right)=
+%-q \ \text{on}\ \partial \Omega^{N} \nonumber \\
+%&&\psi=\psi_0 \ \text{on}\ \partial \Omega^{D}
+%\label{eq:watermovement}
+%\end{eqnarray}
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+where $\mathbf{\bar{n}}$ is the outward unit normal, and
+$q_{\text{m}}$ is the magnitude of the outward flow from the
+domain. $\psi_0$ is the predescribed pressure at the boundary.
+$\Omega$ is the soil domain. $\partial\Omega^{N}$ and
+$\partial\Omega^{D}$ are part of the boundary of $\Omega$ with
+Neumann and Dirichlet boundaries, respectively such that
+$\partial\Omega=\partial\Omega^{N} \cup
+\partial\Omega^{D}$. Each of $\partial\Omega^{N}$ and
+$\partial\Omega^{D}$ are not necessarily one continuous curve piece.
+A special case of the Neumann boundary conditions is often applied
+for the lower boundary condition, viz. it is assumed that the flow
+it is only driven by gravity (gravity boundary condition), i.e.
+$\partial \psi/
+\partial x= \partial \psi/ \partial z=0$ which gives
+\begin{equation}
+q_{\text{m}}=\mathbf{\bar{n}} \cdot \begin{bmatrix}0 \\ K_{zz}
+\end{bmatrix}
+\end{equation}
+Another often used boundary condition is the seepage boundary
+condition for atmospheric boundaries. If a seepage face does not
+develop, the boundary acts as no flow. If a seepage face occurs we
+have a Dirichlet boundary condition with $\psi=0$ and allow water to
+flow out of the domain. The condition can for instance be applied in
+connection with estuaries or streams.
+
+
+\section{Macropore flow}
+
+In the concept all macropores are vertical oriented. The macropore
+(tertiary) domain in the model contains a number of user specified
+macropore clases. In a macropores class all the macropores have
+the same physical properties such as length. Each of the classes are
+characterized by distribution in the horizontal plane, radius of the
+pores and depth where the macropores start and ends.  Also the
+pressures where the water starts and stops moving from the matrix
+to the macropore domain must be known. The macropores are also
+characterized by resistance for transferring water from a filled
+macropore to the matrix domain. The macropores can either end in
+the soil matrix or in a drain. When the macropores ends in a drain,
+matrix water which flows intro the macropore is instantaneously
+moved to the drain, and as consequence can macropores
+connected with drains newer be filled, and water can not be moved
+from the macropore to the matrix. The pressures where the water
+starts and stops moving from the matrix to the macropore domain
+must be known and the values are common for all the classes.\\
+
+
+\subsection{Macropore interaction with matrix water}
+
+
+The condition for macroporous flow to initiate and water move from
+the matrix to macropores in a macropores class is that the matrix
+pressure exceeds a certain value $\psi_{\text{initiate}}$.
+%and that water is not present in the macropore from the considered
+%class at the current location, i.e.
+%
+%\begin{equation}
+%\psi \geq \psi_{\text{c}}  \text{ and } \theta_{\text{3, c}} > 0
+%\end{equation}
+%
+%where $\theta_{\text{3, c}}$ is the volumetric water content in
+%the macropores in macropore class c at given location. \\
+\begin{equation}
+\psi \geq \psi_{\text{initiate}}
+\end{equation}
+
+When water is transferred from the matrix to the macroporous
+domain, the water is instantaneously moved to the top of the
+current water level in the macropores. If the whole macropore is
+empty, the incoming water is moved instantaneous to the bottom
+of the macropore or alternatively to the drain (if the macropore
+ends in a drain).\\
+%
+%The water transfer from the matrix domain to the macroporous
+%domain terminates if the matrix pressure is below a certain level or
+%if the macropore is filled with water at the current location, i.e.
+%%
+%\begin{equation}
+%\psi < \psi_{\text{c}} \text{ or }  \theta_{\text{3, c}} > 0
+%\end{equation}
+
+The water transfer from the matrix domain to the macroporous
+domain terminates if the matrix pressure is below a certain level, i.e.
+%
+\begin{equation}
+\psi < \psi_{\text{terminate}}
+\end{equation}
+%
+In a location where the macropore class is filled with water, water is
+transferred from the macropore to the matrix domain if
+%
+\begin{equation}
+\psi_{\text{3, c}} > \psi
+\end{equation}
+%
+where $\psi_{\text{3, c}}$ is the pressure potential in the
+macropore.\\
+
+The quantification of the water movement toward a macropore is
+based on a relatively simple approach, very similar to theory of
+water the movement in a confined aquifer towards a well. For a
+confined aquifer of thickness $D$ the stationary solution for water
+movement towards a well is
+%
+\begin{equation}
+Q = \frac{2\pi K D (s_{\text{well}} - s)}{\ln( \frac{r}{r_\text{well}})}
+\label{eq:well}
+\end{equation}
+%
+where $K$ is the (saturated) hydraulic conductivity,
+$r_{\text{well}}$ is the radius of the well, $s_{\text{well}}$ is
+the drawdown at the wall of well and $s$ is the drawdown at the
+distance $r$ from the center of the well.\\
+
+If  the macropores are equidistant placed, the density in the
+horizontal plane $M_{\text{c}}$ can be approximated as:
+%
+\begin{equation}
+M_{\text{c}} \approx  \frac{1}{\pi r_{\text{c, mean}}^2}
+\label{eq:density}
+\end{equation}
+%
+where $2r_{\text{c, mean}}$ is the mean distance between the
+macropores.\\
+
+In a small time step, the flow towards a macropore is considered as
+stationary and at the distance $r_\text{c, mean}$, the pressure in
+the current time step is considered as unaffected of the macropore,
+i.e. no pressure drawdown. Thus the flow to a piece of a single
+macropore with the height, $\Delta z$ can be approximated as
+
+%\begin{equation}
+%Q_{\text{c, macro}} =
+% \frac{2\pi K_{xx}(\psi) \Delta z (\psi-\psi_{\text{3, c}})}
+% {\ln(\frac{r_{\text{c, mean}}}{r_{\text{c, macro}}})}
+%\label{eq:tosinglemacropore}
+%\end{equation}
+\begin{equation}
+Q_{\text{c, macro}} =
+ \frac{2\pi K(\psi) \Delta z (\psi-\psi_{\text{3, c}})}
+ {\ln(\frac{r_{\text{c, mean}}}{r_{\text{c, macro}}})}
+\label{eq:tosinglemacropore}
+\end{equation}
+%
+where $\psi_{\text{3, c}}$ is the pressure potential in the
+macropores and $r_{\text{c, macro}}$ is the radius of the
+macropore and $K(\psi)$ is the hydraulic conductivity.  Preventing
+that the hydraulic conductivity is very high in fractured media the
+$K(\psi)$ is computed as
+%
+\begin{equation}
+K(\psi) = \min (K_{xx}(\psi)  ,K_{xx}({\psi_{\text{initiate}}})) = K_{xx}(\min(\psi, \psi_{\text{initiate}}))
+\end{equation}
+%
+where $K_{xx}$ is the conductivity in the $x$-direction (see
+equation (\ref{eq:Kmatrix})). It is assumed that the flow towards
+the macropores is horizontal. Using equation (\ref{eq:density}) the
+sink term can be calculated
+%
+\begin{equation}
+\Gamma_{\text{wm, c}} =
+\frac{M_{\text{c}} Q_{\text{c, macro}}}{\Delta z} = \frac{-4\pi M_{\text{c}}
+K_{xx}(\psi)(\psi-\psi_{\text{3, c}})}{\ln(\pi M_{\text{c}}
+r_{\text{c, macro}}^2)} \label{eq:tomacropores}
+\end{equation}
+
+For flow from the macropore domain into the matrix domain are
+the calculations made in a similar manner, but instead of using the
+conductivity is a resistance,  $R_{\text{c, macro}}$ for flow out
+from the macropores introduced.
+%
+\begin{equation}
+\Gamma_{\text{wm, c}}
+= \frac{-4\pi M_{\text{c}} (\psi-\psi_{\text{3, c}})}
+{R_{\text{c, macro}}\ln(\pi M_{\text{c}} r_{\text{c, macro}}^2)}
+\label{eq:frommacropores}
+\end{equation}
+
+The pressure at a given position in the macropore depends on the
+water level in the macropore
+%
+\begin{equation}
+\psi_{\text{3, c}} = z_{\text{c, macro}} - z
+\label{eq:macropressure}
+\end{equation}
+%
+where $z_{\text{c, macro}}$ is the water level en the macropore.
+If the macropore is empty is $z_{\text{c, macro}} = z_{\text{c,
+bottom}}$ where $z_{\text{c, bottom}}$ is the $z$-coordinate
+of the bottom of the macropore. As a consequence of equation
+(\ref{eq:macropressure}), we have for macropores which ends in
+drains:
+%
+\begin{equation}
+\psi_{\text{3, c}}
+ = z_{\text{drain}} - z
+\end{equation}
+%
+where $z_{\text{drain}}$ is the $z$-coordinate of the drain. \\
+
+All the considerations above are for the transfer of water between a
+macropore class and the matrix. To calculate the total transfer
+between the macropores and the matrix it is necessary to sum up
+the contributions from each of the macropore classes. Thus the sink
+the macropores contributes to in the maxtrix flow is
+%
+\begin{equation}
+\Gamma_{\text{wm, macro}} = \sum_{c=1}^{NC}
+\Gamma_{\text{wm, c}}
+\label{eq:sinktotalmacropores}
+\end{equation}
+%
+where $NC$ is the number of macropore classes.
+
+\subsection{Macropore interaction with surface water}
+
+When the surface is ponded, water can directly enter the
+macropores without first entering the soil matrix. The rate is
+calculated very roughly and based on Poisseuilles law
+\citep[e.g.][]{Hillel}. In the assumption made here only gravity
+drives the flow. The vertical flow in a macropore can be computed
+as:
+%
+\begin{equation}
+Q_{\text{infiltration}} = \frac{\pi r_{\text{c, macro}}^4  \rho_w g (l + H_{\text{pond}})}{8 l \mu}
+\approx \frac{\pi \rho_w g r_{\text{c, macro}}^4}{8 \mu}
+\label{eq:Poiseuille}
+\end{equation}
+%
+where $\mu$ is the dynamic viscosity, $\rho_w$ the density of
+water, $g$ the gravitational acceleration, $l$ the distance from the
+surface to the water level in the macropore class (or the bottom of
+the macropore if it is empty) and $H_{\text{pond}}$ is the
+ponding depth. The infiltration rate into the macropore class is:
+%
+\begin{equation}
+i_{\text{c, macro}}= \frac{\pi M_{\text{c}} \rho_w g r_{\text{c, macro}}^4}{8 \mu}
+\end{equation}
+
+The total infiltration into macropores is the sum of the infiltration
+into the different macropore classes
+%
+\begin{equation}
+i_{\text{macro}} = \sum_{c=1}^{NC} i_{\text{c, macro}}
+\end{equation}
+%
+In the numerical model in a timestep of size  $\Delta t $ the
+implemented routine allows no more water for infiltration than
+present at the surface on the start of the timestep. Furthermore
+there can not infiltrate more water into a macropore class as there
+is space for in the start of the timestep. If all water is infiltrated in
+the timestep, the water is distributed between the classes
+proportional to the area density, $M_{\text{c}}$ of the classes.
+
+
+
+\section{Finite Volume Method}
+
+\subsection{Mesh}
+
+In Daisy2D, the domain, $\Omega$ is divided into $N$
+non-overlapping polygons, also denoted control volumes or cells. In
+Daisy2D it should be possible to choose between grids consisting of
+only rectangular cells or meshes consisting of trapezoids with two
+vertical faces. Figure \ref{fig:grid_rect} shows a grid only consisting
+of rectangular cells. The domain $\Omega$ in the figure is in divided
+into 3 subdomains, each consisting of a number of cells. Each
+subdomain is characterized by different hydraulic properties. The
+grid shown in figure \ref{fig:grid_trapz} consists of trapezoids
+(where most of them also are rectangles). Only in the proximity of
+the drainpipe (see figure \ref{fig:grid_trapz_part}), the cells are not
+rectangular.
+
+\begin{figure}[h]
+\includegraphics[width=\hsize]{grid_rect.eps}
+\caption{Example of grid consisting of rectangular cells.}
+\label{fig:grid_rect}
+\end{figure}
+
+\begin{figure}[h]
+%produced with
+%C:\MATLAB2007b\work\Matlab2006b_work\Daisy2D_V5
+%geom=geometrydata
+\includegraphics[width=\hsize]{grid_trapz.eps}
+\caption{Example of grid consisting of trapezoids.}
+\label{fig:grid_trapz}
+\end{figure}
+
+\begin{figure}[h]
+\includegraphics[width=\hsize]{grid_trapz_part.eps}
+\caption{Close picture of grid near the drain pipe.}
+\label{fig:grid_trapz_part}
+\end{figure}
+
+
+The quadrilateral (rectangular or trapezoid) cells are denoted $Q_i$
+where $i=1,2,\cdots, N$. $|Q_i|$ denotes the area of $Q_i$, and
+$\partial Q_i$ is the boundary of $Q_i$ i.e. the edges (or faces) of
+$Q_i$. All internal edges $e_{ij}$ are labeled by indices, $i$ and
+$j$ of the adjacent cells that shares face. The grid is constructed
+such that only whole faces are shared ($e_{ij}=Q_i \cap Q_j$). The
+length of $e_{ij}$ is $|e_{ij}|$ and the unit normal vector pointing
+from $Q_i $into $Q_j$ and orthogonal to $e_{ij}$ is denoted
+$\bar{\mathbf{n}}_{ij}$. $\sigma_i$ contains cell indices of cells
+sharing faces with cell $i$. $\sigma_i'$ contain indices of cell
+faces of cell $i$ which are placed on $\partial \Omega$, i.e. it is
+not shared with another cell.  $\sigma_i'$ is divided into two
+subsets, $\sigma_{i}'^{D}$ and $\sigma_{i}'^{N}$ of boundary cell
+faces with a Dirichlet and Neumann boundary condition, respectively.
+
+
+
+\subsection{Cell mass-balances}
+
+Richards equation is integrated over control volume (here a cell),
+$Q_i$. By applying the divergence theorem by Green-Gauss, we
+obtain
+\begin{equation}
+\int_{Q_i} \frac{\partial \theta_{\text{m}}}{\partial t} d \Omega =
+\int_{\partial Q_i} \left(\mathbf{K}(\psi)\nabla (\psi + z)
+\right)\cdot \mathbf{\bar{n}} dl - \int_{Q_i} \Gamma_{\text{wm}} d\Omega
+\label{eq:integratet}
+\end{equation}
+%
+where $\mathbf{\bar{n}}$ is the outwarded unit normal and
+$\partial Q_i$ the boundary of $Q_i$. The cell averages of
+$\theta_{\text{m}}$ and $\psi$ are denoted  $\theta_i$ and
+$\psi_i$. $\theta_i$ and $\psi_i$, $i=1, 2, \cdots N$ where $N$ is
+the number of cells that are collected in the vectors
+$\boldsymbol{\theta}$ and $\boldsymbol{\psi}$. Discretization  of
+equation (\ref{eq:integratet}) based on a grid consisting of
+quadrilaterals yield
+
+\begin{equation}
+|Q_{i}|\left(\frac{d \theta_{\text{m}}}{dt} \right)_i = \sum_{j \in \sigma_i} D_{ij}(\boldsymbol{\psi})
+ + \sum_{j \in \sigma_i} G_{ij}(\boldsymbol{\psi})
+ + \sum_{j' \in \sigma_{i}'} B_{ij'}(\boldsymbol{\psi})
+ - S_{i}(\boldsymbol{\psi})
+\label{eq:discretised}
+\end{equation}
+%
+where:
+%
+\begin{itemize}
+\item $D_{ij}(\boldsymbol{\psi})$ describe the diffusive transport
+between internal borders \item $G_{ij}(\boldsymbol{\psi})$
+describe the gravitational transport between internal boundaries
+\item $B_{ij'}(\boldsymbol{\psi})$ describe flux for external
+boundaries $j'\in \sigma_{i}'$
+\item $S_{i}(\boldsymbol{\psi})$ is the integrated sink term (point and area distributed sinks) in the cell. \\
+\end{itemize}
+
+The diffusive transport from cell $i$ to cell $j$ can be
+calculated as
+%
+\begin{equation}
+D_{ij}(\boldsymbol{\psi})=|e_{ij}|(\mathbf{K}(\boldsymbol{\psi})\cdot (\nabla \psi)_{ij})\cdot \mathbf{\bar{n}}_{ij}
+\label{eq:diffusitive}
+\end{equation}
+%
+For evaluating equation (\ref{eq:diffusitive}) it is necessary to
+estimate the gradient $(\nabla \psi)_{ij}$. $(\nabla \psi)_{ij}$ is
+evaluated by a different method for meshes with rectangular cells
+than for the more general and complicated case with meshes
+consisting of trapezoid cells. The gravitational transport from cell $i$
+to cell $j$ can be calculated as
+%
+\begin{equation}
+G_{ij}(\boldsymbol{\psi})=|e_{ij}|(\mathbf{K}(\boldsymbol{\psi})\cdot([0\ 1]^T))\cdot \mathbf{\bar{n}}_{ij}
+\label{eq:gravitational}
+\end{equation}
+
+The boundary flux term is split into the contribution from boundaries
+with Neumann and Dirichlet condition respectively:
+%
+\begin{equation}
+ \sum_{j' \in \sigma_{i}'} B_{ij'}(\boldsymbol{\psi}) = \sum_{j' \in \sigma_{i}'^N}
+ B_{ij'}^{N}(\boldsymbol{\psi}) + \sum_{j' \in \sigma_{i}'^D} B_{ij'}^{D}(\boldsymbol{\psi})
+\end{equation}
+%
+For the boundaries with Neumann conditions we have
+%
+\begin{equation}
+B_{ij'}^{N}(\boldsymbol{\psi})= -q_{\text{m,}ij'}|e_{ij'}|
+\end{equation}
+%
+where $q_{\text{m,}ij'}$ is the size of the Darcy flux,
+perpendicular to the cell face and positive for flux out from cell $i$.
+The easiest way to implement Dirichlet boundary conditions is
+simply to force $\psi_i$ to the value that $\psi$ has on the face
+with Dirichlet conditions. Conflicts can arise if cell $i$ has more than
+one face with a Dirichlet condition. Instead, the Dirichlet boundary
+condition is implemented as if the midpoint of the Dirichlet face was
+a neighbor cell. Similar to an interior cell face, a diffusive and a
+gravitational contribution can be calculated:
+%
+\begin{equation}
+B_{ij'}^{D}(\boldsymbol{\psi}) = D_{ij'}^{D}(\boldsymbol{\psi}) +
+G_{ij'}^{D}(\boldsymbol{\psi})
+\end{equation}
+%
+where
+%
+\begin{eqnarray}
+D_{ij'}^{D}(\boldsymbol{\psi})=|e_{ij'}|(\mathbf{K}(\psi_i)\cdot
+(\nabla \psi)_{ij'})\cdot \mathbf{\bar{n}}_{ij'} \\
+G_{ij'}^{D}(\boldsymbol{\psi})=|e_{ij'}|(\mathbf{K}(\psi_i)\cdot([0\
+1]^T))\cdot \mathbf{\bar{n}}_{ij'}
+\end{eqnarray}
+%
+where the pressure associated with cell $i$ has been used for
+calculating the hydraulic conductivity. The sink term used in equation
+(\ref{eq:continuity}) can be divided into two parts
+%
+\begin{equation}
+\Gamma_{\text{w1}}=\Gamma_{\text{wma}}+\Gamma_{\text{wmp}} \delta(x_p-x)\delta(z_p-z)
+\end{equation}
+%
+where $\Gamma_{\text{wma}}$ is the contribution from a area
+distributed sink and $\Gamma_{\text{wma}}$ is the contribution
+from a point sink. $(x_p,z_p)$ are the coordinates of the point sink
+which shall be placed in the interior of a cell(not on the cell faces).
+$\delta$ is the Dirac delta function. Thus, the contribution from the
+sink terms to a cell yields
+%
+\begin{equation}
+S_{i}(\boldsymbol{\psi}) = \Gamma_{\text{wma}} |Q_i| + \Gamma_{\text{wmp}}
+\end{equation}
+%
+Area distributed sinks are typically extraction from roots or (in
+Daisy2D) water flow between the soil matrix and macro pore
+domain. The point sinks can be tile drains or drip irrigation systems
+(point sources). Both $\Gamma_{\text{wma}}$ and
+$\Gamma_{\text{wmp}}$ can be dependent on the solution
+($\psi$).
+
+
+
+\subsection{Rectangular cells}
+
+For the situation with a mesh consisting of rectangular cells, only
+matrix pressure in the four neighbor cells (see figure
+\ref{fig:meshrect_nswe}) are applied for calculating the fluxes
+through the faces of the cell (five point stencil). In the present
+section we will only evaluate the gradient for the "eastern" cell
+face of cell $i$. The theory can easily be applied for the 3
+remaining directions.
+%
+\begin{figure}[h]
+\includegraphics[width=\hsize]{meshrect_nswe.eps}
+\caption{Cell $i$ and the neighbor cells it share faces with.}
+\label{fig:meshrect_nswe}
+\end{figure}
+%
+The distances necessary for evaluating the flux from a cell to the
+cell placed east of the cell are shown in figure
+\ref{fig:meshrect_gradient}.
+
+\begin{figure}
+\includegraphics[width=\hsize]{meshrect_gradient.eps}
+\caption{Distances used for calculation of flux between cell $i$
+and its "eastern" neighbor.} \label{fig:meshrect_gradient}
+\end{figure}
+
+The value of $\psi$ in the midpoint of the eastern cell ($\psi_E$)
+can be expressed by a Taylor expansion of the value of $\psi$ at
+the midpoint of the cell face:
+
+\begin{equation}
+\psi_E = \psi(x+\delta x^+)=\sum_{k=0}^{m}  \frac{1}{k!} \left(\frac{d^k \psi}{dx^k}\right)_f (\delta x^+)^k  + R^+
+\end{equation}
+%
+where $m$ is the order of the Taylor expansion and $R^+$ is the
+Lagrange remainder. Similar can $\psi_i$ be computed
+%
+\begin{equation}
+\psi_i = \psi(x-\delta x^-)=\sum_{k=0}^{m}  \frac{1}{k!} \left(\frac{d^k \psi}{dx^k}\right)_f (-\delta x^-)^k  + R^-
+\end{equation}
+%
+It can be assumed that $R^+ - (-1)^{m+1}R^- \approx 0$. Thus if a
+Taylor expansion of first order ($m=1$) is chosen we get
+%
+\begin{equation}
+\left( \frac{d \psi}{dx} \right)_f (\delta x^+ +\delta x^-)\approx \psi_E-\psi_i
+\end{equation}
+%
+If a higher order Taylor expansion is chosen we get
+%
+\begin{equation}
+\left( \frac{d \psi}{dx} \right)_f (\delta x^+ +\delta x^-)\approx \psi_E-\psi_i - \epsilon_{Ei}
+\end{equation}
+%
+where the correction term can be calculated as
+%
+\begin{equation}
+\epsilon_{Ei} \approx \sum_{k=2}^{m}  \frac{1}{k!} \left(\frac{d^k
+\psi}{dx^k}\right)_f \left[ (\delta x^+)^k - (-\delta x^-)^k \right]
+\end{equation}
+
+It can be seen that a second order precision is obtained with $m=1$
+and $\delta x^+=\delta x^-$. $m=1$ is chosen for the relative simple
+model for rectangular cells. The width and height of cell $i$ are
+denoted $(\Delta x)_i$ and $(\Delta z)_i$ respectively, thus $\delta
+x^{-}= \frac{(\Delta x)_i}{2}$, $\delta x^{+}= \frac{(\Delta
+x)_E}{2}$ and $|e_{iE}|=(\Delta z)_i= (\Delta z)_E$. The outwarded
+unit normal,
+ $\mathbf{\bar{n}}_{iE}=[1\ 0]^T$. By applying equation (\ref{eq:diffusitive}),
+ the diffusive transport through the cell eastern face is:
+%
+\begin{equation}
+D_{iE}(\boldsymbol{\psi})=(K_{xx})_{iE} \frac{2(\Delta
+z)_i}{(\Delta x)_E+(\Delta x)_i}\left(\phi_E-\phi_i \right)
+\end{equation}
+%
+The gravitational transport from cell $i$ to cell $E$ is:
+%
+\begin{equation}
+G_{iE}(\boldsymbol{\psi})= 0
+\end{equation}
+%
+If the eastern cell face of cell $i$ belongs to the boundary of
+$\Omega$ (no eastern neighbor), $B_{iE'}$ shall be calculated. If
+the cell face has a Neumann boundary condition we have
+%
+\begin{equation}
+B_{iE'}^N(\boldsymbol{\psi}) = -q_{iE'} (\Delta z)_i
+\end{equation}
+%
+where $q_{iE'}$ is the magnitude of the flux transported out from
+through the cell face. If the cell face have a Dirichlet boundary
+condition:
+%
+\begin{equation}
+D_{iE'}^{D}(\boldsymbol{\psi})=(K_{xx})_{i} \frac{2(\Delta z)_i}
+{(\Delta x)_i}\left(\psi_{E'}-\psi_{i} \right)
+\end{equation}
+%
+where $\psi_{E'}$ is the value of $\psi$ in the midpoint on the
+eastern cell face of cell $i$. The gravitational part gives:
+%
+\begin{equation}
+G_{iE'}^D(\boldsymbol{\psi})= 0
+\end{equation}
+
+
+
+\subsection{Trapezoid cells - not finished yet!}
+
+
+\subsubsection{Linear reconstruction}
+
+
+\begin{equation}
+\hat{\psi}(\mathbf{x},t)=\psi_i(t)+\eta_i(\boldsymbol{\psi})\cdot(\mathbf{x}-\mathbf{x}_i), \ \ \mathbf{x} \in Q_i, \ t>0
+\end{equation}
+
+Divergence theorem:
+
+Triangles:
+\begin{equation}
+\overline{\nabla \psi} \approx \sum \psi_j \mathbf{n}_j A_j \approx
+\frac{1}{2|T_i|}\mathbf{R}\left[\psi_{\alpha}(\mathbf{x}_{\beta}-\mathbf{x}_{\gamma})
++\psi_{\beta}(\mathbf{x}_{\gamma}-\mathbf{x}_{\alpha})
++\psi_{\gamma}(\mathbf{x}_{\alpha}-\mathbf{x}_{\beta})\right]
+\end{equation}
+
+Quadrilaterals:
+\begin{equation}
+\overline{\nabla \psi} \approx \sum \psi_j \mathbf{n}_j A_j \approx
+\frac{1}{2|Q_i|}\mathbf{R}\left[(\psi_{\alpha}-\psi_{\gamma})(\mathbf{x}_{\beta}-\mathbf{x}_{\delta})
++(\psi_{\beta}-\psi_{\delta})(\mathbf{x}_{\gamma}-\mathbf{x}_{\alpha})\right]
+\end{equation}
+
+where
+
+\begin{equation}
+\mathbf{R}=\begin{bmatrix} 0 & 1 \\ -1 & 0 \end{bmatrix}
+\end{equation}
+
+
+\subsection{Conductivity at cell faces}
+
+The conductivity at the cell faces between adjacent cells (as used in
+equations (\ref{eq:diffusitive})) are in Daisy calculated by either the
+arithmetic, geometric or harmonic mean. For steady state flow
+speaks physical arguments for applying the harmonic mean:
+%
+\begin{equation}
+\frac{1}{K_{ij}} = \frac{1}{2}\left[
+\frac{1}{K(\psi_i)}+\frac{1}{K(\psi_j)}\right]
+\end{equation}
+%
+Simulation have shown that using the harmonic average can have
+the effect that water practically not can be transported in some
+cases with sharp gradients in the pressure potentials which can
+occurs in situations with evaporation and layered soil. Of that
+reason is the arithmetic mean chosen as default:
+%
+\begin{equation}
+K_{ij} = \frac{1}{2} \left[ K(\psi_i) + K(\psi_j) \right]
+\end{equation}
+
+
+
+\subsection{Upper boundary condition}
+
+The upper boundary condition describes how much of the applied water
+and surface water that infiltrates into the soil. For instance if
+the rate of the applied water exceeds the amount of water that can
+infiltrate into the soil, (the infiltrability) water is stored on
+the surface.
+
+In the start of each of the iterations, within the time step, the
+infiltrability is calculated using Darcy's law (based on the
+pressure at surface in the last time step and the pressure in the
+surface cell.) If the amount of available water (surface water +
+applied water in the current time step) exceeds the amount of water
+that can infiltrate into the soil as calculated with the
+infiltrability, a Dirichlet (pressure) boundary condition is
+applied. If the amount of water which can infiltrate into the soil,
+as calculated with the infiltrability exceeds the amount of
+available water then a Neumann (flux) boundary condition is applied.
+The upper boundary can at a given time consists of parts with
+Dirichlet and parts with Neumann condition.
+
+
+%------------------- New -------------------------%
+\subsubsection{Surface flow} %Maybe
+
+In order to take care of the surface water in simulations with a
+rectangular soil domain, a very simple surface flow module is
+developed.\\
+
+In Daisy2D the surface flow model is executed after each time step.
+In a later version more physical based model can be included, for
+instance a solver of the Saint-Venant equations \citep[see for
+example][]{Chow}. In the present \textit{0D} model is the surface
+water distributed so the resulting water level is equal for the whole
+surface. The water over a predefined level (detention storage) is
+removed.
+%------------------- New -------------------------%
+
+
+
+
+
+%-------------------- Old -------------------------%
+%\subsubsection{Surface flow} %Maybe
+%
+%In order to take care of the surface water in simulations with a
+%rectangular soil domain, a surface flow module is developed. It is
+%possible to choose between some relatively simple models for the
+%surface water distribution. In all the models, surface water below a
+%certain user defined level (detention storage) representing smaller
+%ponds, is not moved by surface flow. Common for all the models is
+%that surface water not are added or removed through the eastern and
+%western boundaries. The total amount of surface water can only
+%change by application of water and/or infiltration.
+%
+%In Daisy2D the surface flow model is executed after each time step.
+%In a later version more physical based model can be included, for
+%instance a solver of the Saint-Venant equations.
+%
+%For slightly monotonically sloping surfaces can the Negative and the
+%\textit{Positive} models be applied. In the \textit{Negative} model
+%is the slope of the surface negative, i.e. the water tends to move
+%from the left to the right. In the \textit{Positive} model is the
+%slope of the surface positive. For horizontal surfaces can the
+%\textit{None}, \textit{Compare} and the \textit{0D} model be
+%applied.
+%
+%\paragraph{Negative}
+%
+%The surface water in this model tends to move from the left to the
+%right. Each iteration starts with the most left cell, then the second
+%from the left, then the third and so on. For a given cell, the water
+%level is compared to the cell to the right and if the water level in the
+%left cell is highest, the water level in the two cells is equaled and the
+%water is conserved. The only violation to this rule is that the water
+%in the detention storage not is moved. The iteration procedure ends
+%when the exchanges of water between cells are below a certain
+%(very low) level. In figure \ref{fig:surface_negative} is the effect of
+%the \textit{Negative} surface model shown.
+%
+%\begin{figure}[h]
+%\includegraphics[width=\hsize]{surface_negative.eps}
+%\caption{Surface water movement with the \textit{Negative} model
+%with $\Delta x=10$ cm. The left graph shows the surface water
+%distribution before the redistribution and the right the
+%distribution after. The brown and blue color represents surface
+%water below and above the detention storage level, respectively.}
+%\label{fig:surface_negative}
+%\end{figure}
+%
+%
+%
+%\paragraph{Positive}
+%
+%The model is the reverse of the \textit{Negative model}, i.e. the
+%water tends to move from the right to the left. In figure
+%\ref{fig:surface_positive} is the effect of the \textit{Positive}
+%surface model shown.
+%
+%\begin{figure}[h]
+%\includegraphics[width=\hsize]{surface_positive.eps}
+%\caption{Surface water movement with the \textit{Positive} model
+%with $\Delta x=10$ cm. The left graph shows the surface water
+%distribution before the redistribution and the right the
+%distribution after. The brown and blue color represents surface
+%water below and above the detention storage level, respectively.}
+%\label{fig:surface_positive}
+%\end{figure}
+%
+%
+%\paragraph{None}
+%
+%In this (none-)model, the surface water is not moved by surface
+%flow. The model corresponds to the \textit{0D} model with
+%infinitelyAdvectio large detention storage. In figure
+%\ref{fig:surface_none} is the effect of the \textit{None} surface
+%model shown.
+%
+%\begin{figure}[h]
+%\includegraphics[width=\hsize]{surface_none.eps}
+%\caption{Surface water movement with the \textit{None} model with
+%$\Delta x=10$ cm. The left graph shows the surface water
+%distribution before the redistribution and the right the
+%distribution after. The brown and blue color represents surface
+%water below and above the detention storage level, respectively.}
+%\label{fig:surface_none}
+%\end{figure}
+%
+%
+%\paragraph{Compare}
+%
+%In the \textit{Compare} model, the differences between the
+%surface water level in neighboring cells are calculated, but only for
+%neighboring cells where at least one of the cells have a water level
+%higher than the detention storage. The water in the two cells are
+%then equaled (with water conservation), but still under the rule that
+%no water leaves the detention storage. In figure
+%\ref{fig:surface_compare} is the effect of the \textit{Compare}
+%surface model shown.
+%
+%\begin{figure}[h]
+%\includegraphics[width=\hsize]{surface_compare.eps}
+%\caption{Surface water movement with the \textit{Compare} model with
+%$\Delta x=10$ cm. The left graph shows the surface water
+%distribution before the redistribution and the right the
+%distribution after. The brown and blue color represents surface
+%water below and above the detention storage level, respectively.}
+%\label{fig:surface_compare}
+%\end{figure}
+%
+%\paragraph{0D}
+%
+%Inside each iteration, all the surface water above the detention
+%storage level are distributed equally at the surface. In figure
+%\ref{fig:surface_0D} is the effect of the \textit{0D} surface model
+%shown.
+%
+%\begin{figure}[h]
+%\includegraphics[width=\hsize]{surface_0D.eps}
+%\caption{Surface water movement with the \textit{OD} model with
+%$\Delta x=10$ cm. The left graph shows the surface water
+%distribution before the redistribution and the right the
+%distribution after. The brown and blue color represents surface
+%water below and above the detention storage level, respectively.}
+%\label{fig:surface_0D}
+%\end{figure}
+%-------------------- Old -------------------------%
+
+
+
+
+\subsection{Aquitard boundary condition}
+
+As in the existing one-dimensional Daisy it is possible to simulate the
+existence of an aquitard below the lower boundary of the soil
+domain. The aquitard is described by a thickness, a hydraulic
+conductivity and the pressure potential in the aquifer just below the
+bottom of the aquitard.
+
+In start of the iteration loop, inside each time step, the flow
+across the lower boundary is estimated using Darcy´s law where the
+pressure in the boundary cells and the properties of the aquitard
+are required. The aquitard is then implemented as a Neumann boundary
+condition.
+
+
+
+\subsection{Tile drains}
+
+It is possible to simulate a (user defined) number of tile drains.
+Tile drains removes water when the matrix pressure potential in the
+soil around the drain is positive. The actual pressure in a drain
+pipe depends on position in the drain system, the hydraulic radius,
+etc, etc. An often applied simplification codes for variably
+saturated flow is to regard the pressure in the drain pipe as
+atmospheric. When the soil in the drain point is unsaturated
+($\psi<0$) the solution corresponds to the solution for an undrained
+soil. If the soil is saturated ($\psi>0$) the drains removes water
+from the soil matrix hence $\psi=0$.
+
+In the numerical model, the drain pipe is described as a point. The
+drain points shall be placed in the interior of a cell and cannot be
+placed at cell edges.
+
+For obtaining a numerical stable solution it is in the beginning of
+a new iteration in the time step tested if the mean value of the
+matrix pressure in the drain cell and its eastern and western
+neighbors (if they exists) exceeds 0. If the mean value is positive
+the pressure in the drain cell is forced to zero. After each time
+step a mass balance for each of the drain cells is made to calculate
+the amount of drained water.
+
+Test simulations show that the code both is able to turn on the
+drain when the soil is getting wetter and turn of the drain when the
+soil is getting drier. Figure \ref{fig:drainaqui} shows the results
+from a simulation with an aquitard boundary condition and a drain.
+The upper boundary has a no flux condition, thus the only supply of
+water is through the aquitard. As it can be observed, the matrix
+pressure potential in the drain is 0.
+
+
+\begin{figure}[h]
+\includegraphics[width=\hsize]{drainaqui.eps}
+\caption{Matrix pressure potential in a drained soil. The drain is
+indicated with a dot. The lower boundary is formed by an aquitard
+condition.} \label{fig:drainaqui}
+\end{figure}
+
+
+
+\subsection{Drip irrigation}
+
+
+\subsection{Iteration scheme}
+
+Equation (\ref{eq:discretised}) describes how the matrix pressure
+potential in a given cell depends on the matrix pressure potential in
+the neighboring cells. By assembling equation (\ref{eq:discretised})
+for $i=1,\,2\,\cdots N$, the problem can be written as a ordinary
+differential equation (ODE) on the form:
+%
+\begin{equation}
+\mathbf{Q}\frac{d\boldsymbol{\theta}}{dt}=
+\mathbf{E}(\boldsymbol{\psi})\boldsymbol{\psi}+\mathbf{F}(\boldsymbol{\psi})
+\end{equation}
+%
+where $\mathbf{Q}$ is a diagonal matrix with $Q(i,i)=|Q_i|$ and
+$\theta_{\text{m}}=\theta_{\text{m}}(\psi)$.
+$\mathbf{E}(\boldsymbol{\psi})\boldsymbol{\psi}$ is the
+assembly of $D_{ij}$ and $D_{ij'}^{D}$ and $G_{ij}$,
+$G_{ij'}^D$, $B_{ij'}^{N}$ and $S_i$ are assembled in
+$\mathbf{F}(\boldsymbol{\psi})$. The equation is solved in the
+time domain using the backward Euler method:
+%
+\begin{equation}
+\mathbf{Q}\frac{\boldsymbol{\theta}^{n+1,m+1}-\boldsymbol{\theta}^{n}}{\Delta t}
+=\mathbf{E}(\boldsymbol{\psi}^{n+1,m})\boldsymbol{\psi}^{n+1,m}+\mathbf{F}(\boldsymbol{\psi}^{n+1,m})
+\end{equation}
+
+In order to get rid of $\theta_{\text{m}}$ at iteration step
+$m+1$, the mixed formulation by \citet{Celia} is applied. In the
+mixed formulation, the water content at time step $n+1$ and
+iteration step $m+1$ is approximated by a Taylor expansion:
+%
+\begin{equation}\begin{split}
+\theta_{\text{m}}^{n+1,m+1}&=\theta_{\text{m}}^{n+1,m}
++\frac{d\theta_{\text{m}}}{d\psi}\mid^{n+1,m}(\psi^{n+1,m+1}-\psi^{n+1,m})\\
+&=\theta_{\text{m}}^{n+1,m} +C^{n+1,m}(\psi^{n+1,m+1}-\psi^{n+1,m})
+\label{eq:taylor}
+\end{split}\end{equation}
+%
+where $C=\partial \theta_{\text{m}}/\partial \psi$ is the specific
+water capacity function. The time derivative of
+$\theta_{\text{m}}$ can then be approximated as:
+%
+\begin{equation}\begin{split}
+\frac{\partial \theta_{\text{m}}}{\partial t}&\approx
+\frac{\theta_{\text{m}}^{n+1,m+1}-\theta_{\text{m}}^{n}}{\Delta
+  t}=\frac{\theta_{\text{m}}^{n+1,m+1}-\theta_{\text{m}}^{n+1,m}}{\Delta
+  t}+\frac{\theta_{\text{m}}^{n+1,m}-\theta_{\text{m}}^{n}}{\Delta t}\\ & \approx C^{n+1,m}
+\frac{\psi^{n+1,m+1}-\psi^{n+1,m}}{\Delta
+  t}+\frac{\theta_{\text{m}}^{n+1,m}-\theta_{\text{m}}^{n}}{\Delta t}
+\end{split}\end{equation}
+%
+Thus, the iterative scheme is
+%
+\begin{eqnarray}
+\left( \frac{1}{\Delta t} \mathbf{QC}(\boldsymbol{\psi}^{n+1,m})-\mathbf{E}(\boldsymbol{\psi}^{n+1,m}) \right)
+\boldsymbol{\psi}^{n+1,m+1} = && \nonumber \\
+\mathbf{F}(\boldsymbol{\psi}^{n+1,m}) + \frac{1}{\Delta t} \mathbf{QC}(\boldsymbol{\psi}^{n+1,m}) \boldsymbol{\psi}^{n+1,m}
++\frac{1}{\Delta t} \mathbf{Q}\left( \boldsymbol{\theta}^{n}-\boldsymbol{\theta}^{n+1,m} \right)
+\label{eq:matrix}
+\end{eqnarray}
+%
+where $\mathbf{C}$ is a diagonal matrix with $C(i,i)=C_i$. \\
+\\
+In the MATLAB-prototype it is possible to choose simulations with a
+constantly or dynamically size of the time steps, $\Delta t$. For
+the last choice, the size of $\Delta t$ depends on how difficult it
+is to obtain a solution. A procedure based on same principles is
+described in detail in \citet{Mollerupphd}. In Daisy2D the current
+Daisy method will be applied.
+
+
+\subsection{Matrix solution technique}
+
+
+In the prototype, for solving the large matrix system of the type
+$\mathbf{Ax}=\mathbf{b}$ (see equation (\ref{eq:matrix})), the
+MATLAB backslash operator (also called leftdivision) is used. For
+description of the applied sparse matrix solver is refereed to
+\citet{Mollerupphd}.
+
+
+\subsection{Hydraulic properties}
+
+In the Daisy2D it shall be possible to choose between the existing
+models for the soil hydraulic properties in Daisy. In the prototype,
+the retention characteristics are described with the model by
+\citet{vanGenuchten}:
+%%% with moustages %%%
+\begin{equation}
+\theta_{\text{m}}=\begin{cases} \theta_{r} +
+\frac{\theta_s-\theta_r}{[1+|\alpha \psi|^n]^m} & \text{for
+  $\psi<0$}\\
+\theta_{s} &\text{for $\psi \geq 0 $} \end{cases}
+\end{equation}
+%%%%%%%%%%%%%%%%%%%%%
+%%% without moustages %%%
+%\begin{eqnarray}
+% \theta= \theta_{r} + \frac{\theta_s-\theta_r}{[1+|\alpha
+%\psi|^n]^m} && \text{for
+%  $\psi<0$} \nonumber \\
+% \theta= \theta_{s} && \text{for $\psi \geq 0 $}
+%\end{eqnarray}
+%%%%%%%%%%%%%%%%%%%%%%
+where $\alpha$, $n$ and $m$ are empirical parameters,
+$\theta_s$ and $\theta_r$ are the saturated and the residual water
+content, respectively. By combination with the hydraulic conductivity
+model by \citet{Mualem} and choosing $m=1-1/n$, the hydraulic
+conductivity can be calculated as
+%
+\begin{equation}
+K=K_sS_{e}^{1/2}[1-(1-S_{e}^{1/m})^m]^2
+\end{equation}
+%
+where $K_s$ is the hydraulic conductivity at saturation and $S_e$ is
+the effective saturation defined as
+\begin{equation}
+S_e=\frac{\theta_{\text{m}}-\theta_r}{\theta_s-\theta_r}
+\end{equation}
+%
+The retention model by van Genuchten has been adapted to a large
+class of soils.
+
+
+\subsection{Ridge - not for first report!}
+
+For describing the geometry and producing the finite element mesh
+is the general FEM-code, \citet{FEMLAB} used. In the actual case
+the two-dimensional geometry described using a so called geometry
+m-file. Of geometrical reasons only the half of a ridge is
+described. The soil profile is divided into 7 strata or subdomains
+with different soil properties which are described elsewhere in
+the paper. The ridge with the different subdomains is plotted in
+figure XXX. The ridge height can be described with a sine
+function:
+%
+\begin{equation}
+f(x)=A \left[ 1+sin\left(-\frac{\pi}{2}+2\frac{\pi x}{W}\right)
+\right], \ \ \ 0 \leq x \leq W/2
+\end{equation}
+%
+where $W$ is the width of the ridge and $A$ is the amplitude of the
+sine wave which is the same as half of the ridge height. The curve
+only describes half a ridge that will be used for the modeling.
+
+
+\section{Verification}
+
+The FVM-code is verified by comparing solutions obtained by FVM with
+quasi-analytical solutions for one-dimensional infiltration by
+Philip.
+
+
+\subsection{Infiltration Model of Philip}
+
+
+\citet{Philip} showed that the infiltration depth as function of time
+and saturation can be written as a power series in
+$t^{\frac{1}{2}}$. The coefficients are then functions of soil
+water content, $\theta_{\text{m}}$. From the expression for the
+infiltration depth, as function of water content and time, it is
+relatively easy to derive that the cumulative infiltration, also can be
+written as a power series in $t^{\frac{1}{2}}$. The assumptions
+for the theory, is a one-dimensional vertical flow into a
+homogenous soil semi-infinite soil column, initially with uniform
+water content. The cumulative infiltration is expressed as
+%
+\begin{equation}
+I=\sum_{n=1}^{+\infty}A_n t^{\frac{n}{2}}
+\label{eq:Philip}
+\end{equation}
+%
+where $A_1=S$ is the often refereed sorptivity as defined in
+\citet{PhilipAdv}. The coefficients are found by solving a set of
+successive integro-differential equations. One drawback of the
+power series theory is that the theory only describes the
+infiltration process well for short to intermediate times. The
+power series is "practical convergent" for $t<t_{\text{grav}}$.
+Where $t_{\text{grav}}$ is the characteristic time of the
+infiltration process
+%
+\begin{equation}
+t_{\text{grav}}=\left(\frac{S}{K_0-K_i} \right)^2
+\label{eq:tgrav}
+\end{equation}
+%
+where $K_i=K(\theta_i)$ and $K_0=K(\theta_0)$ is the hydraulic
+conductivity corresponding to the initial water content,
+$\theta_i$ and the water content at the soil surface, $\theta_0$.
+For ponded conditions at the
+soil surface we have $K_0=K_s$. \\
+\\
+The soil parametrization, which is applied for the test simulations,
+is the G.E. silt loam \citep{vanGenuchten} where $K_s=4.96$ cm/day,
+$\theta_s=0.396\ \text{cm}^3/\text{cm}^3$, $\theta_r=0.131\
+\text{cm}^3/\text{cm}^3$, $\alpha=0.00423\ \text{cm}^{-1}$ and
+$n=2.06$. \\
+
+
+A constant size of $\Delta t$= 1/60 day has been applied in the FVM
+test simulations. For all simulations the initial condition is
+$h_i$=-200 cm, corresponding to $\theta_i=0.332\
+\text{cm}^3/\text{cm}^3$ is chosen.
+
+
+\subsubsection{Vertical falling-head infiltration}
+
+Initially, it was shown that the power series solution can be
+applied for non-saturated or just saturated conditions at the soil
+surface \citep[see][]{PhilipTrans,Philip,PhilipAus}. \citet{Philip6}
+later expanded the theory to cover ponding situations with constant
+positive pressure at the soil surface. Later it was shown
+\citep[][]{Mollerup} that the power series solution also can be
+applied for a falling-head condition, where the ponding depth is
+dependent on the amount of infiltrated water. The pressure at the
+soil surface is then
+%
+\begin{equation}
+H=H_0-I
+\end{equation}
+%
+where $H_0$=20 cm is the initial ponding depth.\\
+\\
+In the FVM simulations, both the vertical and horizontal
+discretisation, $\Delta z=\Delta x$ is 1 cm. The lower boundary was
+placed at $z=600$ cm with a free drainage (gravity flow) condition.
+For the scenario is $t_{\text{grav}}$=3.34 days and the time at
+which the pond empties, $t_p=$2.6022 days is computed by applying
+the iteration procedure as proposed in \citet{Mollerup}. In
+FVM-simulation, the pond empties at approximately $t=$2.5833 days.
+I.e. $t_p$ is approximately 0.7\% higher for the power series
+solution than for the similar FVM results obtained with a rather
+rough discretization in time. Minor errors can be expected in the
+power series solution as only the first 4 terms are calculated. For
+constant-head simulation the first 6 terms are calculated.
+\citet{Philip} found that normally only first two or three terms are
+necessary for a for practical use sufficient correct solutions.
+
+In figure \ref{fig:VerificFH}, the wetting profiles as calculated by
+applying FVM and the power series theory are shown. The wetting
+profiles are shown for $t=1/5,\, 2/5,\, 3/5,\, 4/5$ and $1\cdot
+t_{\text{p}}$. As it can be observed, the solutions are almost
+identical except for $t=t_{\text{p}}$ (2.6022 days) where the
+effects of the slightly earlier emptying ponded water in the FVM
+simulation instantly effects the water content profiles.
+
+
+\begin{figure}
+\includegraphics[width=\hsize]{VerificFH.eps}
+\caption{Analytical and FVM solution for vertical falling head infiltration. The solution is shown for
+$t=1/5,\, 2/5,\, 3/5,\, 4/5$ and $1\cdot t_{\text{p}}$.}
+\label{fig:VerificFH}
+\end{figure}
+
+
+\subsubsection{Horizontal constant-head infiltration}
+
+For also insuring that horizontal flows are simulated correctly a
+simulation with a horizontal oriented column is made. For the FVM
+simulation, the column has height of 1 cell and a width of 800 cells
+with $\Delta x=\Delta z=$1 cm. The left boundary condition is $H=$20
+cm and the initial condition is $h_n=$-200 cm. Vertical
+constant-head infiltration can analytically be calculated as:
+%
+\begin{equation}
+I=A_1 \sqrt(t)
+\label{eq:horizontal}
+\end{equation}
+%
+where $A_1$ is identical to the $A_1$ calculated for vertical
+infiltration with constant-head (and falling-head) conditions.
+Contrary to vertical infiltration, equation (\ref{eq:horizontal}) is
+applicable also for longer periods. Figure \ref{fig:VerificHor} shows
+the water content profiles at $t=1/5,\, 2/5,\, 3/5,\, 4/5$ and
+$1\cdot t_{\text{grav}}$. as calculated with FVM and the power
+series theory. As it can be seen are the solutions almost identical.
+
+\begin{figure}
+\includegraphics[width=\hsize]{VerificHor.eps}
+\caption{Analytical and FVM solution for horizontal infiltration. The solution is shown for
+$t=1/5,\, 2/5,\, 3/5,\, 4/5$ and $1\cdot t_{\text{grav}}$.}
+\label{fig:VerificHor}
+\end{figure}
+
+
+\subsection{Vertical constant-head infiltration in a wide column}
+
+Until now all the verification simulations are made for a grid
+consisting of only 1 cell in the direction perpendicular to the flow
+direction. Also the size of the cells was equal. In the wide column
+experiment the cell height varies with the depth. The soil column
+consists of 3 horizons (A, B and C). The A-horizon is 25 cm depth
+with $\Delta z=$1 cm, the B-horizon is 75 cm depth with $\Delta z=$3
+cm, and the C-horizon is 400 cm depth with $\Delta z=$8 cm. The soil
+column have a width of 200 cm with $\Delta x=$20 cm. Figure
+\ref{fig:Mesh} shows the mesh and figure \ref{fig:MeshPart} shows a
+upper part of the mesh.
+
+
+\begin{figure}
+\includegraphics[width=\hsize]{Mesh.eps}
+\caption{Mesh for the wide column simulation.}
+ \label{fig:Mesh}
+\end{figure}
+
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=\hsize]{MeshPart.eps}
+\caption{Upper left part of mesh used for the wide column
+simulation.}
+ \label{fig:MeshPart}
+\end{center}
+\end{figure}
+
+
+In the simulation is the ponding depth constantly $H=20$ cm. Figure
+\ref{fig:VerificRect} shows the water content after 1 day. As it can
+be observed, the water do not vary with the x-coordinate for a given
+depth, i.e. there is no indication of unintended exchange of water
+between internal vertical cell boundaries. Also here (not shown)
+comparisons with a power series solution shown fine agreement
+
+\begin{figure}
+\includegraphics[width=\hsize]{watercontent24h.eps}
+\caption{Water distribution after 1 day in the wide column
+simulation.}
+ \label{fig:VerificRect}
+\end{figure}
+
+
+
+
+\subsection{Other simulations}
+
+Also a simulation with a Neumann (flux) condition at the upper
+boundary and a simulation with a non-zero sink term have been
+conducted. The simulations showed mass-balances with negligible
+errors.
+
+
+
+\chapter{Solute movement}\index{solute movement}\label{chp:Solute_movement}
+
+\section{2-domain matrix transport}\index{2-domain_matrix_transport}
+
+For describing the solute movement, the soil matrix as solved by
+Richard' equation (equation (\ref{eq:richards})) the water is divided
+into two domains, a primary and a secondary domain:
+%
+\begin{equation}
+\theta_{\text{m}}= \theta_{\text{1}} + \theta_{\text{2}}
+\end{equation}
+%
+where $\theta_{\text{1}}$ and $\theta_{\text{2}}$ are the
+water content in the primary and the secondary domain,
+respectively. The primary part representing the flow in the smallest
+pores is always filled first. When the matrix water content,
+$\theta_{\text{m}}$ exceeds a certain limit,
+$\theta_{\text{lim}}$ the secondary domain start to be filled, i.e
+$\theta_{\text{lim}}$ is maximum value of $\theta_{\text{1}}$.
+Thus, the primary part of $\theta_{\text{m}}$ can be expressed
+as
+%
+%\begin{equation}
+%\theta_{\text{1}}=
+%\begin{cases}
+%\theta_{\text{m}} & \text{for\ } \theta_{\text{m}} < \theta_{\text{lim}} \\
+%\theta_{\text{lim}} & \text{for\ } \theta_{\text{m}} \geq \theta_{\text{lim}}
+%\end{cases}
+%\end{equation}
+%
+\begin{equation}
+\theta_{\text{1}}=\min(\theta_{\text{m}},\theta_{\text{lim}})
+\end{equation}
+%
+The secondary domain representing the flow in the largest pores is
+emptied first. The secondary part of $\theta_{\text{m}}$ can then
+expressed as
+%
+%\begin{equation}
+%\theta_{\text{2}}=
+%\begin{cases}
+% 0 & \text{for\ } \theta_{\text{m}} < \theta_{\text{lim}} \\
+%\theta_{\text{m}} -\theta_{\text{lim}} & \text{for\ } \theta_{\text{m}} \geq \theta_{\text{lim}}
+%\end{cases}
+%\end{equation}
+%
+\begin{equation}
+\theta_{\text{2}} = \max(0,\theta_{\text{m}} -\theta_{\text{lim}})
+\end{equation}
+%
+The fluxes as computed  by Darcys equation are divided into two; a
+part representing the fluxes in the primary domain,
+$\mathbf{q}_{\text{1}}$ and a part representing the fluxes in the
+secondary domain, $\mathbf{q}_{\text{2}}$:
+%
+\begin{equation}
+\mathbf{q}_{\text{m}} = \mathbf{q}_{\text{1}}  + \mathbf{q}_{\text{2}}
+\end{equation}
+%
+Similarly is the hydraulic conductivity matrix divided into a primary
+and a secondary part.
+%
+\begin{equation}
+\mathbf{K}_{\text{m}} = \mathbf{K}_{\text{1}} + \mathbf{K}_{\text{2}}
+\end{equation}
+%
+where $\mathbf{K}_{\text{1}}$ can be calculated
+%
+\begin{equation}
+\mathbf{K}_{\text{1}} = \mathbf{K}(\theta_{\text{1}})
+\end{equation}
+%
+i.e. using the hydraulic conductivity function as used for the water
+movement computations, but with $\theta_{\text{1}}$ instead of
+$\theta$. Thus $\mathbf{K}_{\text{2}}$ can be calculated as:
+%
+\begin{equation}
+\mathbf{K}_{\text{2}} =
+\begin{cases}
+\mathbf{0}  & \text{for\ }
+\theta_{\text{2}} = 0 \\
+\mathbf{K}(\theta_{\text{m}}) -
+\mathbf{K}(\theta_{\text{lim}}) & \text{for\ } \theta_{\text{2}}
+\geq 0
+\end{cases}
+\end{equation}
+%
+As a consequence of Darcy's equation can the fluxes
+$\mathbf{q}_{\text{1}}$ and $\mathbf{q}_{\text{2}}$ be
+calculated as
+%
+\begin{equation}
+\mathbf{q}_{\text{1}} =
+\frac{\|\mathbf{K}_{\text{1}}\|_2}{\|\mathbf{K}\|_2}\mathbf{q}
+\end{equation}
+%
+\begin{equation}
+\mathbf{q}_{\text{2}} =
+\frac{\|\mathbf{K}_{\text{2}}\|_2}{\|\mathbf{K}\|_2}\mathbf{q}
+\end{equation}
+%
+The associated Darcy velocity can be calculated as
+$\mathbf{v}_{\text{1}}=\mathbf{q}_{\text{1}}/\theta_{\text{1}}$
+and
+$\mathbf{v}_{\text{2}}=\mathbf{q}_{\text{2}}/\theta_{\text{2}}$.
+It should be remarked that when there is water in the secondary
+domain is the associated velocity, $\mathbf{v}_{\text{2}}$ often
+considerably larger than $\mathbf{v}_{\text{1}}$.\\
+\\
+The solute concentration is similarly divided into a part associated
+with the primary water, $C_{\text{1}}$ and a part associated with
+the secondary water, $C_{\text{2}}$. The exchange of solutes
+between the primary and the secondary domain is driven by the
+concentration differences. The transfer of solutes from the primary
+domain to the secondary domain can be regarded as a sink in the
+primary domain, $\Gamma_{\text{s1} \rightarrow \text{s2}}$ or
+a source in the secondary domain, $-\Gamma_{\text{s2}
+\rightarrow \text{s1}}$
+%
+\begin{equation}
+\Gamma_{\text{s1} \rightarrow \text{s2}} =
+- \Gamma_{\text{s2} \rightarrow \text{s1}} =
+\begin{cases}
+\alpha_{\text{1} \rightarrow \text{2}} (C_{\text{1}} -
+C_{\text{2}}) & \text{for\ } C_{\text{1}} \geq C_{\text{2}} \\
+\alpha_{\text{2} \rightarrow \text{1}} (C_{\text{1}} -
+C_{\text{2}}) & \text{for\ } C_{\text{1}} < C_{\text{2}}
+\end{cases}
+\label{eq:sink_primary_secondary}
+\end{equation}
+%
+The rates for moving solutes from $C_{\text{1}}$ to
+$C_{\text{2}}$, $\alpha_{\text{1} \rightarrow \text{2}}$ is not
+necessarily equal to the rate for moving solute from
+$C_{\text{2}}$ to $C_{\text{1}}$, $\alpha_{\text{2}
+\rightarrow \text{1}}$.
+%
+XXXX Soren er der noget fornuftigt at sige her ? XXXX
+
+
+The mass balance\index{mass balance!solute movement} for the
+solute can be expressed as:
+%
+\begin{eqnarray}
+\frac{\partial (\rho_b C_a)}{\partial t} + \frac{\partial
+(\theta_{\text{1}}
+  C_{\text{1}})}{\partial t} + \frac{\partial (\theta_{\text{2}}
+  C_{\text{2}})}{\partial t} + \frac{\partial (\theta_{\text{mp}}
+  C_{\text{mp}})}{\partial t} \nonumber \\ =-\nabla \cdot \mathbf{j}_{\text{1}} -
+  \nabla \cdot \mathbf{j}_{\text{2}} - \nabla
+  \cdot \mathbf{j}_{\text{mp}} - \Gamma_{\text{s}}
+\label{eq:solmassbal_tot}
+\end{eqnarray}
+%
+where $\rho_b$ is the soil bulk density and $C_a$ is the
+concentration in the adsorbed phase\index{adsorption}.
+$\theta_{\text{mp}}$ is the volumetric water content in the
+macropore domain and $C_{\text{mp}}$ is the concentration.
+$\mathbf{j}_{\text{1}}$, $\mathbf{j}_{\text{2}}$ and
+$\mathbf{j}_{\text{mp}}$ are the fluxes in the the primary,
+secondary and macroporous domain. $\Gamma_{\text{s}}$ is
+the net sink term of the solute.
+
+
+
+\section{Solute movement in the primary domain: Advection-dispersion equation}\index{advection-dispersion
+  equation}
+
+Three physical processes can contribute to movement of solutes in
+the primary part of the soil water:
+%
+\begin{itemize}
+\item advection\index{advection}
+\item molecular diffusion\index{molecular
+    diffusion}\index{diffusion!molecular}
+\item hydrodynamic dispersion\index{hydrodynamic
+    dispersion}\index{dispersion!hydrodynamic} (only in connection
+  with advection)
+\end{itemize}
+
+Advection\index{advection} (or bulk flow\index{bulk flow}) is the
+process where the dissolved chemical moves with the soil solution.
+The flux of solute can be described as:
+%
+\begin{equation}
+\mathbf{j}_{\text{1}}=\mathbf{q}_{\text{1}}C_{\text{1}}
+\end{equation}
+%
+The Molecular diffusion is a result of the Brownian
+motion\index{Brownian motion} (random walk)\index{random
+  walk} of the molecules. A process related to the movement of the
+water is the hydrodynamic dispersion, which is a consequence of the
+fact that flow is not uniform, because the flow paths move around
+obstacles and air, but also because of variation in pore size and
+the non-uniform velocity distribution inside the pores.
+Mathematically the hydrodynamical dispersion process can be
+described as a diffusion process. The movement by diffusion like
+processes can be expressed as:
+%
+\begin{equation}
+\mathbf{j}_{\text{1}}=-\theta_{\text{1}} \mathbf{D}\nabla C_{\text{1}}, \ \ \ \
+\mathbf{D}=\begin{bmatrix}
+D_{xx} & D_{xz}\\
+D_{zx} & D_{zz}
+\end{bmatrix}
+\end{equation}
+%
+where $\mathbf{D}$ is the dispersion tensor\index{dispersion!tensor}
+(or matrix). The consequence is that the solute tries to move from
+areas with high concentration to areas with lower concentration. The
+elements in $\mathbf{D}$ are often calculated as:
+%
+\begin{equation}
+\begin{split}
+&D_{xx}=\alpha_L\frac{v_{\text{1},x}^{2}}{|\mathbf{v}_{\text{1}}|}+\alpha_T\frac{v_{\text{1},z}^{2}}
+{|\mathbf{v}_{\text{1}}|}+D^* \\
+&D_{zz}=\alpha_L\frac{v_{\text{1},z}^{2}}{|\mathbf{v}_{\text{1}}|}+\alpha_T\frac{v_{\text{1},x}^{2}}
+{|\mathbf{v}_{\text{1}}|}+D^* \\
+&D_{xz}=D_{zx}=(\alpha_L-\alpha_T)\frac{v_{\text{1},x}v_{\text{1},z}}{|\mathbf{v}_{\text{1}}|}
+\end{split}
+\end{equation}
+%
+where $D^*$ is the molecular diffusion. The rest of the terms are
+arising from the hydrodynamic dispersion. $\alpha_L$ is called the
+longitudinal dispersion\index{dispersion!longitudinal} and
+$\alpha_T$ the transversal
+dispersion\index{dispersion!transversal}. The calculation of the
+dispersion tensor is based on $\mathbf{v}_{\text{1}}$ and not
+$\mathbf{v}=\mathbf{q}/\theta$.\\
+\\
+The molecular diffusion can be calculated as:
+%
+\begin{equation}
+D^*=\tau D_0
+\end{equation}
+%
+where $D_0$ is the diffusion coefficient\index{diffusion!coefficient}
+for the solute in free water and $\tau$ is the tortuosity
+factor\index{tortousity factor}. As an example
+\cite{Millington}\index{Millington \& Quirk} suggested:
+%
+\begin{equation}
+\tau=\frac{\theta_{\text{1}}^{7/3}}{\theta_s} \label{eq:Millington}
+\end{equation}
+%
+Also here, the value is based on  $\theta_{\text{1}}$ and not the
+the total matrix water content $\theta_{\text{m}}$. If we are
+using equation (\ref{eq:Millington}) and expressing the mean
+velocity in the pores associated with solute movement by
+$\mathbf{q}_{\text{1}}$ and $\theta_{\text{1}}$, the
+elements of $\theta_{\text{1}}\mathbf{D}$ can be expressed
+as:
+%
+\begin{equation}
+\begin{split}
+&\theta_{\text{1}}
+D_{xx}=\alpha_L\frac{q_{\text{1},x}^{2}}{|\mathbf{q}_{\text{1}}|}
++\alpha_T\frac{q_{\text{1},z}^{2}}
+{|\mathbf{q}_{\text{1}}|}+D_0\frac{\theta_{\text{1}}^{10/3}}{\theta_s} \\
+&\theta_{\text{1}}
+D_{zz}=\alpha_L\frac{q_{\text{1},z}^{2}}{|\mathbf{q}_{\text{1}}|}
++\alpha_T\frac{q_{\text{1},x}^{2}}
+{|\mathbf{q}_{\text{1}}|}+D_0\frac{\theta_{\text{1}}^{10/3}}{\theta_s} \\
+&\theta_{\text{1}} D_{xz}=\theta_{\text{1}}
+  D_{zx}=(\alpha_L-\alpha_T)\frac{q_{\text{1},x}q_{\text{1},z}}{|\mathbf{q}_{\text{1}}|}
+\end{split}
+\label{eq:thetad}
+\end{equation}
+%
+The solute movement can be expressed as a sum of the advection
+and the diffusion process:
+%
+\begin{equation}
+\mathbf{j}_{\text{1}}=\theta_{\text{1}} C_{\text{1}}\mathbf{v}_{\text{1}}
+-\theta_{\text{1}}\mathbf{D}\nabla C_{\text{1}}=C_{\text{1}}
+\mathbf{q}_{\text{1}}-\theta_{\text{1}}\mathbf{D}\nabla C_{\text{1}}
+\label{eq:soltransport}
+\end{equation}
+%
+The mass balance of dissolved solutes in the primary domain yields:
+%
+\begin{equation}
+\frac{\partial (\theta_{\text{1}} C_{\text{1}})} {\partial t}
+   =-\nabla \cdot \mathbf{j}_{\text{1}} - \Gamma_{\text{s1}}
+\label{eq:solmassbal_1}
+\end{equation}
+%
+where $\Gamma_{\text{s1}}$ is the sink term which remove
+solutes from the primary water domain. The removed (or added)
+solute can be absorbed, moved to the secondary domain
+($\Gamma_{\text{s1}} $ as expressed by equation
+(\ref{eq:sink_primary_secondary}) or the macropore domain or be
+subject to chemical or biological reduction.\\
+\\
+The boundary conditions to the equation specifies a combination of
+$C_{\text{1}}$ and its derivative on the boundary. Also here, the
+\textit{Dirichlet} boundary condition\index{Dirichlet boundary
+  condition}\index{boundary condition!Dirichlet} (specified
+concentration) and the \textit{Neumann boundary
+  condition}\index{Neumann boundary condition}\index{boundary
+  condition!Neumann}, where the flux through the boundary is
+specified, are common. The Dirichlet boundary condition is:
+%
+\begin{equation}
+C_{\text{1}}=C_{\text{1,0}} \label{eq:Dirichlet_sol}
+\end{equation}
+%
+where $C_{\text{1,0}}$ is the predescribed concentration. The
+Neumann boundary condition is:
+%
+\begin{equation}
+ \mathbf{\bar{n}}\cdot (C_{\text{1}}\mathbf{q}_{\text{1}}-\theta_{\text{1}}\mathbf{D}\nabla
+ C_{\text{1}})=\mathbf{\bar{n}}\cdot \mathbf{j}_{\text{1}}=j_{\text{1}}
+\label{eq:Neumann_sol}
+\end{equation}
+%
+where $j_{\text{1}}$ is the size of the flux, positive for outward
+flux. As boundary condition for the ingoing flow
+$j_{\text{1}}=\mathbf{\bar{n}}\cdot\mathbf{q}_{\text{1}}C_{\text{1,0}}=q_{\text{1}}C_{\text{1,0}}$
+is often used where $C_{\text{1,0}}$ is the concentration of the
+flow. As lower boundary condition is
+$j_{\text{1}}=\mathbf{\bar{n}}\cdot\mathbf{q}_{\text{1}}C_{\text{1}}=q_{\text{1}}C_{\text{1}}$
+often used. In both cases it is assumed that the diffusion crossing
+the
+border is zero.\\
+\\
+Summarized, the problem to be solved for determination of the
+concentration of solute in $\Omega$ is:
+%
+\begin{equation}
+\begin{cases}
+ \theta_{\text{1}} \frac{\partial C_{\text{1}}}{\partial t} + C_{\text{1}} \frac{\partial
+  \theta_{\text{1}}}{\partial t} =  -\nabla \cdot(C_{\text{1}}
+  \mathbf{q}_{\text{1}}-\theta_{\text{1}}
+  \mathbf{D}\nabla C_{\text{1}})- \Gamma_{\text{s1}} &
+  \text{in} \ \Omega \\
+ \mathbf{\bar{n}}\cdot (C_{\text{1}}\mathbf{q}_{\text{1}}-\theta_{\text{1}}\mathbf{D}\nabla C_{\text{1}})=j_{\text{1}} &
+  \text{on}\  \partial\Omega_1 \\
+ C_{\text{1}}=C_{\text{1,0}} & \text{on}\ \partial\Omega_2
+\end{cases}
+\label{eq:solutemovement}
+\end{equation}
+%
+where $\partial \Omega_1$ is the part of the boundary with Neumann
+condition, and $\partial \Omega_2$ is the part of the boundary with
+Dirichlet boundary conditions. Also here it is not necessary that
+$\partial \Omega_1$ and $\partial \Omega_2$, respectively, are
+coherent.
+
+
+
+\section{Numerical solution}
+
+The basic principles behind the finite volume modeling of the solute
+transport are very similar to the numerical solution of the water
+movement equation (Richards' equation). But there are some
+differences. One of the major differences is that the advection
+diffusion equation is considered as linear inside each timestep. I.e.
+the coefficients in the equation in each of the timesteps are
+independent of the concentrations in the current timestep. This
+simplification can be done when the size of the sources are
+dependent only on the concentrations in the previous timestep.
+Similar are adsorption added as sink/source term. Thus different
+from the water movement simulation, the Picard iterations loop
+used inside each timestep can be avoided.
+
+
+
+\subsection{Stabilization methods}
+
+There are often a lot of numerical problems involved with the
+solving of the convection diffusion problem especially when the
+problems are dominated by convection. The numerical solutions have
+often unexpected oscillations in that situation. There have been
+developed a lot of more or less complicated methods to reduce the
+problems. Three of the methods are \textit{upstream weighting},
+\textit{streamline diffusion}, and \textit{timestep reduction}.
+
+
+
+\subsubsection{Upstream weighting}
+
+When steep concentration fronts occur, numerical oscillations can
+raise. A method to stabilize the system is to apply upstream
+weighting for the advective solute movement. For advective
+transport between two cells is the concentration at the face
+between the cells normally calculated as the average concentration
+of the two cells. For fully upstream weighting is the concentration at
+the cell face equal to the upstream concentration. \\
+\\
+In Daisy2D it is possible to set a parameter,  $0\leq \alpha \leq 1$
+where $\alpha=1$ corresponds to a fully upstream weighting and
+$\alpha=0.5$ corresponds to setting the cell face concentration to
+the average concentration of the two cells. It is not recommended to
+apply an $\alpha<0.5$.
+
+
+\subsubsection{$\text{P}_{\text{e}}$ and $\text{C}_{\text{r}}$ numbers}
+
+There are two different numbers which are important for the
+stability. The \textit{Peclet number}:
+%
+\begin{equation}
+\text{P}_{\text{e}}=v_{\text{1}}\Delta x/D
+\label{eq:Peclet}
+\end{equation}
+%
+where $v$ is the velocity, $\Delta x$ is the space increment and $D$
+is the diffusion coefficient (including molecular diffusion and
+hydrodynamic dispersion). The \textit{Courant number} is defined as:
+%
+\begin{equation}
+\text{C}_{\text{r}}=v_{\text{1}}\Delta t/\Delta x
+\label{eq:Courant}
+\end{equation}
+%
+Theoretical stability investigations are rather complicated, especially
+in a two or three-dimensional space with heterogeneous soil. Most
+of the theoretical stability considerations are done for
+one-dimensional flow with uniform velocity. The classical constraints
+for stability for the standard Crank-Nicholson-Galerkin (Finite
+Element Method) is $\text{P}_{\text{e}}\leq 2$ and
+$\text{C}_{\text{r}} \leq 1$, \cite{Perrochet}.\\
+\\
+It can easily be concluded that keeping the Courant number lower
+than one is just a question of sufficiently small timesteps. But is it
+possible to make a mesh which under all circumstances prevents
+that the Peclet number raises over 2?. The Peclet number for
+the flow in the x-direction is:
+%
+\begin{equation}
+\begin{split}
+(\text{P}_{\text{e}})_x&=\frac{q_{\text{1},x} \Delta x}{\theta_{\text{1}} D_{xx}}
+= \frac{q_{\text{1},x} \Delta x}{\alpha_L
+  \frac{q_{\text{1},x}q_{\text{1},x}}{|\mathbf{q}|}+\alpha_T\frac{q_{\text{1},z}q_{\text{1},z}}{|\mathbf{q}|}+D_0\frac{\theta_{\text{1}}^{10/3}}{\theta_s}}\\
+& <\frac{q_{\text{1},x} \Delta x}{\alpha_T\frac{q_{\text{1},x}q_{\text{1},x}+q_{\text{1},z}q_{\text{1},z}}{|\mathbf{q}_{\text{1}}|}}
+  = \frac{q_{\text{1},x} \Delta x}{\alpha_T |\mathbf{q}_{\text{1}}|} \leq \frac{\Delta x}{\alpha_T}
+\end{split}
+\end{equation}
+%
+where it is assumed that $\alpha_L \geq  \alpha_T$. The same
+procedure can of course be used to evaluate
+$(\text{P}_{\text{e}})_z$. It can then be concluded that the
+maximum Peclet number is lower than $\Delta x /\alpha_T$. If the
+longitudinal dispersivity is 5 cm and the transversal is 1/10 of the
+longitudinal and the maximum allowed $\text{P}_{\text{e}}$ is 2
+can it be concluded that the maximum side length of the elements
+shall be approximately 1 cm. This will result in a very fine
+mesh.\\
+\\
+Besides the upstream weighting method it is possible to choose
+between 2 stabilizing methods:
+%
+\begin{enumerate}
+\item Introducing extra diffusion in the streamline direction so
+    $\text{P}_{\text{e}}\text{C}_{\text{r}}\leq\gamma$.
+    Where $\gamma$ is the performance index. \item Varying the
+    size of $\Delta t$ so
+    $\text{P}_{\text{e}}\text{C}_{\text{r}}\leq\gamma$.
+\end{enumerate}
+
+It is of course also possible to deselect any stabilizing methods. The
+last stabilizing method is straight forward, but the first deserves its
+own subsection:
+
+\subsubsection{Streamline diffusion}
+
+For practical situation are there often stability so long
+$\text{P}_{\text{e}}\text{C}_{\text{r}}\leq
+ \gamma$ where $2\leq \gamma \leq 10$ \citep[][]{Perrochet}  which under all
+ circumstances is less restrictive than keeping both $\text{P}_{\text{e}}\leq 2$ and
+ $\text{C}_{\text{r}}\leq 1$. $\gamma$ is called the \textit{performance index}.\\
+\\
+In the streamline diffusion is according to \cite{Perrochet} added
+some additional longitudinal dispersion to prevent that
+$\text{P}_{\text{e}}\text{C}_{\text{r}}$ raises over the
+chosen performance index. The additional longitudinal dispersion,
+$\bar{\alpha}_L$ is calculated as:
+%
+\begin{equation}
+\bar{\alpha}_L=\begin{cases} \frac{|\mathbf{v}_{\text{1}}|\Delta
+    t}{\gamma}-\alpha_L-\frac{D^{*}}{|\mathbf{v}_{\text{1}}|}, & \text{for} \ \alpha_L +
+    \frac{D^{*}}{|\mathbf{v}_{\text{1}}|} < \frac{|\mathbf{v}_{\text{1}}|\Delta t}{\gamma}
+ \\ 0, & \text{for} \ \alpha_L +
+    \frac{D^{*}}{|\mathbf{v}_{\text{1}}|} \geq \frac{|\mathbf{v}_{\text{1}}|\Delta
+    t}{\gamma}\end{cases}
+\end{equation}
+
+
+\subsubsection{Stability tests}
+
+To investigate the stability of the numerical model is a simple system
+ modeled. The situation here is a one-dimensional column, horizontal
+ column with steady-state water flow with pore velocity $v$. There
+ is no secondary  water, $\theta_{\text{2}}$ thus $v_{\text{1}}=v$.
+ The diffusion, $D$ (both molecular diffusion and hydrodynamic
+dispersion) is given. For the present test is the solute
+non-adsorping. For a scenario with linear adsorping (constant
+retardation factor) the adsorption have a stabilizing effect, thus for
+linear adsorping solutes the model is expected to be more stable.
+The advection-dispersion equation in one dimension can be written
+as:
+%
+\begin{equation}
+\frac{\partial C_{\text{1}}}{\partial t}=D\frac{\partial^2C_{\text{1}}}{\partial
+  x^2}-v\frac{\partial C_{\text{1}}}{\partial x}
+\end{equation}
+%
+where $v=q/\theta$. The initial condition is a zero concentration in
+the whole column:
+%
+\begin{equation}
+C_{\text{1}}(x,0)=0
+\end{equation}
+%
+At the left boundary is the solute flux constant.
+%
+\begin{equation}
+\left(-D\frac{\partial C_{\text{1}}}{\partial x}+vC_{\text{1}} \right)\bigg\vert_{x=0}
+=vC_{\text{1,0}}
+\end{equation}
+
+The solution can then according to \cite{Genuchtenanalytical} be
+written as:
+%
+\begin{equation}
+\begin{split}
+C\text{1}(x,t) = &\frac{1}{2} C_{\text{1,0}}  \erfc\left
+  [\frac{x-vt}{2(Dt)^{1/2}}\right]+\left(\frac{v^2t}{\pi
+  D}\right)\exp\left[-\frac{(x-vt)^2}{4Dt}\right ] \\
+&-  \frac{1}{2} C_{\text{1,0}} (1+\frac{vx}{D}+\frac{v^2t}{D})\exp(vx/D)\erfc\left[\frac{x+vt}{2(Dt)^{1/2}}\right]
+\end{split}
+\end{equation}
+
+
+For the simulations is made a water flow situation with steady state
+flow with the chosen pore water velocity $v=1$ cm/hour.
+$C_{\text{1,0}}$ is for the simplicity chosen to 1 and $D=0.05$
+cm$^2$/hour. For the Daisy simulations is the virtual soil column
+10 cm wide and 1 cm high. On the domain is generated a regular
+mesh with 100 equally large elements, each with $\Delta x=0.1$
+cm. With $\Delta t$ chosen to 1 hour are
+$\text{C}_{\text{r}}=10$ and $\text{P}_{\text{e}}=2$, i.e.
+$\text{P}_{\text{e}}\text{C}_{\text{r}}=20$. The numerical
+parameter, $\omega$ is set to 1/2, i.e. a
+Crank-Nicholson scheme.\\
+\\
+In figure \ref{fig:Stab_Upstream} is the analytical solution
+compared with numerical solutions with and without upstream
+weighting corresponding to $\alpha=1$ and $\alpha=0.5$,
+respectively. Streamline diffusion and timestep reduction has not
+been applied. As it can be observed, are the wiggles significantly
+smaller when applying upstream weighting. The only drawback
+seems to be slightly more numerical diffusion compared with the
+numerical solution for $\alpha=0.5$.
+%
+\begin{figure}[htbp]  %here-top-bottom-page
+\includegraphics[width=\hsize]{Stab_Upstream.eps}
+\caption{Analytical solution compared with numerical solution with regular weighting ($\alpha=0.5$)
+and upstream weighting ($\alpha=1.0$). The solutions are shown as concentration as function of x after
+simulation of 4 hours. For the actual case are $v=1$ cm/hour, $D=0.05$ cm$^2$/hour. For the numerical
+simulations are $\Delta t=$ 1 hour and $\Delta x = 0.1$ cm, i.e. $\text{P}_{\text{e}}=2$ and $\text{C}_{\text{r}}=10$.}
+\label{fig:Stab_Upstream}
+\end{figure}
+%
+In the following cases upstream weighting has not been applied
+($\alpha=0.5$).\\
+\\
+In figure \ref{fig:Stab_Methods} is the analytical solution shown.
+Besides is the numerical solution shown for the cases: no
+stabilization, timestep reduction and streamline diffusion. For both
+the timestep reduction and streamline diffusion method is the
+performance index, $\gamma=10$ chosen. For the simulation
+without any stabilization are the wiggles significant. The wiggles are
+smaller for the simulation with streamline diffusion. By comparing
+with the analytical solution can the additional diffusion be observed.
+The additional diffusions effectively reduced the
+$\text{P}_{\text{e}}$-number from 20 to 10. The remaining
+graph shows the simulation with the timestep reduction stabilizing
+method where the size of $\Delta t$ is changed so
+$\text{P}_{\text{e}}\text{C}_{\text{r}}\leq10$. Here the size
+of the timestep is reduced from $\Delta t=1$ hour (no stabilization)
+to 0.5 hour. Effectively the $\text{C}_{\text{r}}$-number is
+reduced from 10 to 5, i.e. for the computation is used 2 times so
+many timesteps (or approximately 2 times so long CPU-time).
+Compared with the numerical solution without stabilization are
+wiggles reduced, but have also smaller
+wavelength.\\
+\\
+
+\begin{figure}[htbp]  %here-top-bottom-page
+\includegraphics[width=\hsize]{Stab_Methods.eps}
+\caption{Analytical solution compared with different numerical solutions. The
+solutions are shown as concentration as function of x after
+simulation of 4 hours. For the numerical solution without
+stabilization are $\text{P}_{\text{e}}=2$ and $\text{C}_{\text{r}}=10$.}
+ \label{fig:Stab_Methods}
+\end{figure}
+
+In figure \ref{fig:Stab_TimeStepRed} is the analytical and numerical
+solutions shown. The numerical solutions are computed using
+different performances indexes. The performance index, $\gamma$ is
+changed applying timestep reduction. It can be observed that the
+wiggles are significant for $\gamma=10$, but for $\gamma=5$ (and
+lower) the size of the wiggles seems to be acceptable for most
+purposes.
+
+
+\begin{figure}[htbp]  %here-top-bottom-page
+\includegraphics[width=\hsize]{Stab_TimeStepRed.eps}
+\caption{Analytical solution compared with different numerical
+solutions obtained using timestep reduction with varying performance
+index. For the simulation are $v=1$ cm/hour and $D=0.05$
+cm$^2$/hour. For the numerical simulations is $\Delta x=$ 0.1 cm and
+$\Delta t$  is ranging from 1/10 hour ($\gamma=2$) to 1/2 hour
+($\gamma=10$).} \label{fig:Stab_TimeStepRed}
+\end{figure}
+
+In figure \ref{fig:Stab_StreamDiff} is the analytical solution
+shown. Also the numerical solutions for varying performances indexes
+are shown. The performance index, $\gamma$  is changed applying
+streamline diffusion. The wiggles are reduced when using a low value
+of $\gamma$, but compared with the analytical solution, the
+steepness of the front is reduced dramatically.
+
+
+\begin{figure}[htbp]  %here-top-bottom-page
+\includegraphics[width=\hsize]{Stab_StreamDiff.eps}
+\caption{Analytical solution compared with numerical solutions
+obtained using streamline diffusion with varying performance
+index. For the analytical solution are $v=1$ cm/hour and
+$D=0.05$ cm$^2$/hour. For the numerical simulations are
+$\Delta x=$ 0.1 cm and $\Delta t=$ 1 hour.}
+\label{fig:Stab_StreamDiff}
+\end{figure}
+
+
+
+\subsection{Upper boundary condition}
+
+The upper boundary condition describes the movement of solute
+applied at the surface that moves into the soil. It also describes the
+movement of solutes out from the domain if the water is flowing
+out at the upper boundary.\\
+
+If the soil surface not is ponded, the flux into the soil is moved by
+advection into the domain, with the water. If the surface is ponded
+with water containing a solute, the solute is also moved solely by
+advection. A little more accurate description could have been
+obtained if the boundary condition was implemented as a Dirichlet
+condition which also allowed the solute to be moved by dispersion
+and diffusion into the soil. It is assessed that the error is
+insignificant.\\
+\\
+When the water moving out of the domain. No solute is following the
+water. This is for most solutes a good boundary condition - at least
+for evaporation processes. For a situation with liquid water is
+leaving the soil through the upper boundary the description is not
+appropriate, but at present Daisy is not intended for that kind of
+scenarios. Summarized the upper boundary condition can be expressed
+as:
+%
+\begin{equation}
+\left(-\theta_{\text{1}} D_{zz} \frac{\partial C_{\text{1}}}{\partial z}
++q_zC_{\text{1}} \right) \bigg \vert_{z=z_{\text{surf}}}
+=\begin{cases} q_{\text{out}}C_{\text{surf}}, &
+  q_{\text{out}} < 0  \\ 0, & q_{\text{out}} > 0 \end{cases}
+\end{equation}
+%
+where $z_{\text{surf}}$ is the $z$-coordinate of the soil surface,
+$q_z$ is the flow (positive upwards) and $q_{\text{out}}$ is the
+flux out of the domain (negative for flux into the domain).
+$C_{\text{surf}}$ is the concentration of the surface water. \\
+\\
+Numerically all the types of upper boundary conditions is
+implemented as explicit Neumann conditions, i.e. the solute
+movement over the boundary is independent of the solute
+concentrations in the domain.
+
+
+
+\subsection{Lower boundary condition}
+
+The lower boundary condition describes the movement of solute
+through the lower boundary. If the water has a free drainage
+condition, there is a flux condition for the solute when the solute
+is moved out of the domain by advection. If there is specified a
+groundwater table or aquitard boundary condition, i.e. pressure
+(Dirichlet) conditions for the water flow, also the solute movement
+have a Dirichlet condition with a specified concentration at the
+boundary. For a specified steady-state water flux (mostly used for
+testing purposes), it is possible both to chose specified
+concentration (Dirichlet) and flux boundary conditions. \\
+\\
+Numerically the Neumann boundary conditions is implemented, either
+implicit or explicit - implicit when the water flux is outwarded
+from the lower boundary and the concentration associated with the
+flux is given by the concentration inside the domain - explicit when
+the water moves into the domain and the associated concentration
+is the concentration outside the domain. \\
+\\
+The Dirichlet boundary condition is implemented as an explicit
+Neumann boundary condition. Based on the solution in the previous
+timestep the flux is calculated with the given concentration on the
+boundary. The method is different from the method used for the
+water movement, but prevents an extra iteration loop inside each
+timestep with following increased computational times. In the water
+movement simulations, the iteration loop was under all
+circumstances necessary since the equation is non-linear. But with
+very large concentration gradients (and following large movement
+by diffusion and dispersion processes) and small cells at the
+boundary some numerically problems can occur. To prevent this
+kind of instability, the size of the timesteps can be lowered if also
+timestep reduction is chosen as stabilizing method to prevent to
+high $\text{P}_{\text{e}}\text{C}_{\text{r}}$-numbers. If
+timestep reduction is chosen, the timestep is reduced so:
+
+\begin{itemize}
+\item  For diffusion into the cell, only half of the volume of the
+    concentration difference between border and cell can be transported by
+    diffusion over the boundary into the cell in a timestep.
+\item For diffusion out from the cell, only half of the volume of
+    the concentration difference between cell and border can be
+    transported by diffusion over the boundary out from the cell in
+    a timestep.
+ \end{itemize}
+
+To prevent to large computational times, the timestep can not be
+lower than a chosen a minimum value. If the instabilities are high
+and produce negative concentrations at the cells at the boundary,
+the computations in the timestep are repeated and the solute is only
+moved by advection over the boundary. This can happen if the minimum
+value of the size of the timesteps is chosen to high.
+
+
+
+\subsection{Verification: One-dimensional flow with retardation and degradation}
+
+There are developed a lot of analytical solutions for the
+one-dimensional convective-dispersive equation, see for example
+\cite{Genuchtenanalytical}. The equations are developed for
+situations where the diffusion is constant and the water flow is
+steady state (i.e. $\partial \theta_{\text{1}} / \partial t=0$ and
+constant $\mathbf{q}$). The secondary water content,
+$\theta_{\text{2}}=0$ and all the adsorption processes are going
+through the primary water to the sorped phase. These conditions are
+seldom fulfilled in the 'real life' where both the water content and the
+flux are time-dependent. For testing the solute transport model is a
+situations with steady state water movement simulated.\\
+\\
+If the adsorption process is very fast, the amount of adsorbed
+solute can be expressed with a adsorption
+isotherm\index{adsorption!isotherm} which is a relationship
+between adsorbed ($C_a$) and dissolved concentration,
+$C_{\text{1}}$. The bulk density is assumed to be constant through
+time. The two first terms of the left hand side of equation
+(\ref{eq:solmassbal_tot}) can be rewritten as:
+%
+\begin{equation}
+\begin{split}
+&\rho_b\frac{\partial C_a}{\partial t}+\frac{\partial
+  (C_{\text{1}}\theta_{\text{1}})}{\partial t}=\rho_b\frac{\partial C_a}{\partial
+  C_{\text{1}}}\cdot \frac{\partial C_{\text{1}}}{\partial t}
++\theta_{\text{1}} \frac{\partial C_{\text{1}}}{\partial t}+ C_{\text{1}}\frac{\partial
+  \theta_{\text{1}}}{\partial t} = \\
+&\theta_{\text{1}} R \frac{\partial C_{\text{1}}}{\partial t} + C_{\text{1}} \frac{\partial
+  \theta_{\text{1}}}{\partial t}
+\end{split}
+\label{eq:retardation}
+\end{equation}
+%
+where $R$ often in the literature is called the \textit{Retardation
+  factor}\index{retardation factor}:
+%
+\begin{equation}
+R=\frac{\rho_b}{\theta_{\text{1}}} \cdot \frac{\partial C_a}{\partial
+C_{\text{1}}}+1 \label{eq:retardationfactor}
+\end{equation}
+%
+The most simple adsorption isotherm is the linear adsorption where
+$C_a=K_dC_{\text{1}}$ and as a consequence
+$R=1+\frac{\rho_bK_d}{\theta_{\text{1}}}$. \\
+\\
+
+Zero or first order kinetics are included in the model. In zero order
+kinetics\index{kinetics!zero order}, the velocity of the reaction is
+independent of the concentration and in 1.st order
+kinetics\index{kinetics!first order} the reaction velocity is
+proportional to the concentration. Thus the advection dispersion
+equation yields:
+%
+\begin{equation}
+\begin{split}
+ R\theta_{\text{1}} \frac{\partial C_{\text{1}}}{\partial t} +& C_{\text{1}} \frac{\partial
+  \theta_{\text{1}}}{\partial t} =  -\nabla \cdot(C_{\text{1}}
+  \mathbf{q}_{\text{1}}-\theta_{\text{1}} \mathbf{D}\nabla C_{\text{1}})- \theta_{\text{1}} \mu_l C_{\text{1}} +
+  \rho_b \mu_s
+\label{eq:advdisp}
+\end{split}
+\end{equation}
+%
+where the second last term represents a first order production in
+the liquid phase.  $\mu_l$ is the rate constant. An often-used term
+is the half-life\index{degradation!half-life}. In a batch experiment
+the half-life is the time required for the mass of reacting materiel to
+decrease to half the original mass. The reaction half-life can be
+calculated as $t_{1/2}=ln(2)/\mu_l$. The equation can be used for
+many chemical processes, and for radioactive
+decay\index{radioactive decay}. The last term on the right hand
+side of equation (\ref{eq:advdisp}) represents a zero order
+removal from the solid to the liquid phase. $\mu_s$ is the rate
+constant for the zero order process. In \cite{Genuchtenanalytical}
+is considered a one-dimensional case with degradation of both zero
+and first order. The governing differential equation can then be
+expressed as:
+%
+\begin{equation}
+R\frac{\partial C_{\text{1}}}{\partial t}=D\frac{\partial^2C_{\text{1}}}{\partial
+  x^2}-v\frac{\partial C_{\text{1}}}{\partial x}-\mu C_{\text{1}} +\gamma
+\end{equation}
+%
+where $\mu$ is the rate constant for first order decay in the liquid
+and $\gamma$ represents the similar rate constant for zero-order
+production in the liquid phase. For the simulation, the initial condition
+is
+%
+\begin{equation}
+C\text{1}(x,0)=C_{\text{1,i}}
+\end{equation}
+%
+and the upper boundary condition is
+%
+\begin{equation}
+\left(-D\frac{\partial C_{\text{1}}}{\partial x}+vC_{\text{1}}\right)\bigg\vert_{x=0}
+=\begin{cases} vC_{\text{1,0}}, &
+  0<t\leq t_0 \\ 0, & t>t_0 \end{cases}
+\end{equation}
+%
+The solution is
+%
+\begin{equation}
+\begin{small}
+C_{\text{1}}=\begin{cases}\frac{\gamma}{\mu}+ (C_{\text{1,i}}-\frac{\gamma}{\mu})A(x,t)+(C_{\text{1,0}}-\frac{\gamma}{\mu})B(x,t), 0<t\leq t_0 \\
+\frac{\gamma}{\mu} + (C_{\text{1,i}}-\frac{\gamma}{\mu})A(x,t)+(C_{\text{1,0}}-\frac{\gamma}{\mu})B(x,t)-C_{\text{1,0}}B(x,t-t_0), t>t_0
+\end{cases}
+\end{small}
+\end{equation}
+%
+where $A(x,t)$ and $B(x,t)$ can be calculated as
+%
+\begin{equation}
+\begin{split}
+A(x,t) & =\exp(-\mu t/R)\cdot \\
+& \bigg\{ 1-\frac{1}{2}\erfc\left[\frac{Rx-vt}{2(DRt)^{1/2}}\right]
+-\left(\frac{v^2t}{\pi
+    DR}\right)^{1/2}\exp\left[-\frac{(Rx-vt)^2}{4DRt}\right] \\ &
++\frac{1}{2}\left(1+\frac{vx}{D}+\frac{v^2t}{DR}\right)\exp(vx/D)\erfc\left[\frac{Rx+vt}{2(DRt)^{1/2}}\right]
+\bigg\}
+\end{split}
+\end{equation}
+%
+\begin{equation}
+\begin{split}
+B(x,t)=&\frac{v}{v+u}\exp\left[\frac{(v-u)x}{2D}\right]\erfc\left[\frac{Rx-ut}{2(DRt)^{1/2}}\right]
++\\
+&
+\frac{v}{v-u}\exp\left[\frac{(v+u)x}{2D}\right]\erfc\left[\frac{Rx+ut}{2(DRt)^{1/2}}\right]
++\\ &
+ \frac{v^2}{2\mu D}\exp\left[\frac{vx}{D}-\frac{\mu
+     t}{R}\right]\erfc\left[\frac{Rx+vt}{2(DRt)^{1/2}}\right]
+\end{split}
+\end{equation}
+%
+with
+%
+\begin{equation}
+u=v \sqrt{1+\frac{4\mu D}{v^2}}
+\end{equation}
+
+For comparing the analytical solution with the Daisy solution is
+chosen an situation with $v=10$ cm/day, $D=5$ cm$^2$/hour,
+$\gamma=0.2$ hour $^{-1}$ and $\mu=0.5$ hour $^{-1}$. For
+the simulation is $\Delta x$=1 cm. The length of the timesteps,
+$\Delta t$ is 1/10 day. In figure \ref{fig:solanalyt} is the Daisy
+solution compared with the above described analytical solution. As it
+can be seen are the solutions in practise coincident.
+
+\begin{figure}[h!]  %here-top-bottom-page
+\begin{center}
+\includegraphics[width=\hsize]{test_chem1d.eps}
+\caption{Comparison between analytical and Daisy simulation of a
+process with adsorption, zero order production and first order degradation.}
+\label{fig:solanalyt}
+\end{center}
+\end{figure}
+
+
+\section{Solute movement in the secondary domain: Advection}\index{advection}
+
+
+The heterogeneities are normally relatively small in the secondary domain.
+And when $\theta_{\text{2}} \neq 0$ are the movement by advection
+relatively large compared to the movement by molecular diffusion.
+As a consequence is diffusion-like processes (diffusion and dispersion)
+ in the secondary domain negligible. Thus the solute movement is modeled
+ as a purely advection process:
+%
+\begin{equation}
+\mathbf{j}_{\text{2}}=\mathbf{q}_{\text{2}}C_{\text{2}}
+\end{equation}
+%
+The mass balance of dissolved solutes in the secondary domain yields:
+%
+\begin{equation}
+\frac{\partial (\theta_{\text{2}} C_{\text{2}})} {\partial t}
+   =-\nabla \cdot \mathbf{j}_{\text{2}} - \Gamma_{\text{s2}}
+\label{eq:solmassbal_2}
+\end{equation}
+%
+where $\Gamma_{\text{s2}}$ is the sink term which remove
+solutes from the secondary water domain. The removed (or added)
+solute can be absorbed, moved to the primary domain
+($\Gamma_{\text{s1}} $ as expressed by equation
+(\ref{eq:sink_primary_secondary}) or to the macropore domain or be
+subject to chemical or biological reduction.
+
+
+
+
+\chapter{Heat transfer}\index{Heat transfer}
+
+\section{Theory}
+
+Two physical processes can contribute to heat transfer movement
+in the matrix part (non macroporous part) of soil:
+%
+\begin{itemize}
+\item conduction\index{conduction}
+\item convection\index{convection}
+\end{itemize}
+%
+Mathematical the transport can be expressed as:
+%
+\begin{equation}
+\mathbf{q}_{h} = - K_{H} \nabla T + C_{w} \rho_{w} T \mathbf{q}_{\text{m}}
+\label{eq:heatflux}
+\end{equation}
+%
+where $T$ is the temperature, $K_{H}$ is the thermal
+conductivity, $C_w$ the specific heat storage of water,
+$\rho_{w}$ the density of water and $\mathbf{q}_{\text{m}}$
+is the water flux vector for matrix flux. Both $K_{H}$ and $C_w$
+are calculated as in the existing 1D Daisy \\
+\\
+The conservation of heat \index{conservation!heat transfer} can be
+expressed as
+%
+\begin{equation}
+\frac{\partial H}{\partial t} = -\nabla \cdot  \mathbf{q}_h \ + S_{h} = \nabla \cdot \left(
+K_{H} \nabla T - C_{w}  \rho_{w} T \mathbf{q}_{\text{m}}  \right) + S_{h}
+\label{eq:heatcons}
+\end{equation}
+%
+where $H$ is the heat content of the soil, $t$ the time and
+$S_{h}$ is a heat source. If water is added to the domain by drip
+irrigation with an amount of $S_i$ the associated added heat is
+$C_w \rho_w S_i T_i$ where $T_i$ is the temperature of the
+irrigation water which at the moment is the same as $T$, i.e.
+$T_i=T$. For water removed from the soil with a rate of $S_w $,
+the corresponding amount of heat is $C_w \rho_w S_w T$. In the
+model heat can also be added directly without exchanging water. \\
+\\
+The left hand side of equation (\ref{eq:heatcons}) can be written
+as
+%
+\begin{equation}
+\frac{\partial H}{\partial t} = \frac{\partial (C_s T)}{\partial t} =
+C_s \frac{\partial T}{\partial t} + T \frac{\partial C_s}{\partial t}
+\end{equation}
+%
+where $C_s$ is the specific heat capacity of the soil (including water).\\
+\\
+The boundary conditions specifies a combination of the the
+temperature and its derivative on the boundaries. Actual in form of
+specified heat flux $K_{H} \nabla T - C_{w} \rho_{w} T
+\mathbf{q}_{\text{m}}$ (\textit{Neumann boundary condition})
+or specified temperature $T_0$ (\textit{Dirichlet boundary
+condition}). Summarized, the problem to be solved for
+determination of the temperatures in $\Omega$ is:
+%
+\begin{equation}
+\begin{cases}
+C_s \frac{\partial T}{\partial t} + T \frac{\partial C_s}{\partial t}
+ = \nabla \cdot \left(K_{H} \nabla T - C_{w}  \rho_{w} T \mathbf{q}_{\text{m}}  \right) + S_{h}  &
+  \text{in} \ \Omega \\
+ \mathbf{\bar{n}} \cdot (C_{w} \rho_{w} T \mathbf{q}_{\text{m}} - K_{H} \nabla T)=q_{h} &
+  \text{on}\  \partial\Omega_1 \\
+ T=T_{0} & \text{on}\ \partial\Omega_2
+\end{cases}
+\label{eq:heattransfer}
+\end{equation}
+%
+where $\partial \Omega_1$ is the part of the boundary with
+Neumann condition, and $\partial \Omega_2$ is the part of the
+boundary with Dirichlet boundary conditions. Also here it is not
+necessary that $\partial \Omega_1$ and $\partial \Omega_2$,
+respectively, are coherent. $\mathbf{\bar{n}} $ is the outwarded
+unit normal to the boundary and $q_h$ is the size of the heat
+movement out of the boundary.
+
+
+\section{Numerical solution of Heat transfer equation}
+
+The basic principles behind the finite volume modeling of the heat
+transfer is almost equal to the numerical solution of the equation for
+the solute movement (advection-dispersion equation).\\
+\\
+But there are some differences. In Dasisy2D is made the
+assumption that the thermal conductivity is equal in all direction.
+This makes the implementation easier than the advection-dispersion
+equation where the hydrodynamic dispersion are dependent on the
+direction. Furthermore the heat movement by conduction is so
+dominant over the movement caused by convection that numerical
+instabilities under normal conditions not is expected. Thus different
+from the implementation of the advection-dispersion equation there
+is not implemented made any stabilizing methods, except for the
+boundary conditions (see later).\\
+\\
+The partial differential equation (PDE) describing the heat transfer
+(see equation (\ref{eq:heattransfer})) is considered linear inside
+each timestep where the values from the beginning of the timestep
+is used. For frost/thaw processes both the conductivity for heat and
+the heat capacity is temperature dependent. But the changes during
+a typical timestep very small. Following are the errors, considering
+the PDE linear for each timestep small. As a consequence of the
+quasi linearity are Picard iterations inside each timestep avoided.
+
+
+\subsection{Upper boundary conditions}
+
+The upper boundary condition describes the transfer of heat energy
+between the atmosphere and the soil.\\
+
+In Daisy is the upper boundary condition  of Dirichlet type, i.e the
+surface is forced to have a specific temperature. Except when snow
+is covering the surface the soil temperature is approximated with
+the air temperature. For snow covered surfaces are the soil
+temperature estimated as in the existing Daisy. \\
+
+%----- old but complicated method sometimes unstable --------%
+%In Daisy2D it is possible to choose between two different methods
+%for implementing the boundary condition. The simple is to set the
+%temperature in the nodal points in the upper boundary cells. Then is
+%the specified temperature given a half cell lower than wanted.
+%Another method is doing as in the Dirichlet boundary conditions for
+%solute movement. Here the temperature is given exactly at the
+%surface, but of stability reasons it is some times necessary to divide
+%the timestep into smaller timesteps after the following rule
+%
+%\begin{itemize}
+%\item  For conduction into the cell, only half of the amount of
+%    heat energy corresponding to the temperature difference
+%    between border and center (nodal point) for the cell can be
+%    transferred by conduction over the boundary into the cell in a
+%    single timestep.
+%\item For conduction out from the cell, only half of the amount of
+%    heat energy corresponding to the temperature difference
+%    between cell border and center (nodal point) for the cell can be
+%    transferred by conduction over the boundary out from the cell
+%    in a single timestep.
+% \end{itemize}
+%---------------------------------------------------------------%
+%
+At first the upper boundary was implemented in a similar manner as
+used for the Dirichlet boundary conditions for solute movement. For
+the heat simulations,  the temperature is with the method given
+exactly at the boundaries. But with the relatively large timesteps
+intended to be used in the heat simulations the method is
+sometimes unstable.\\
+\\
+Instead a more simple and stable method is applied. In the
+implementation, the boundary temperature is set in the the nodal
+points in the upper boundary cells. Then the specified temperature is
+given a half cell lower than wanted. The tradeoff compared to the
+other method is small since the uncertainties in the heat simulations
+are under all circumstances large. And reducing the CPU-costs by
+using large timesteps when possible is important.
+
+
+
+\subsection{Lower boundary condition}
+
+The lower boundary condition describes the transfer of heat energy
+through the lower boundary. It is possible to choose between 2
+boundary conditions: A flux conditions where no energy is
+transferred through the boundary or as in Daisy 1D a forced
+temperature with a annual oscillation. \\
+\\
+The forced temperature is implemented in a similar manner as for
+the upper boundary condition. For a no fluxcondition nothing has to
+be done.
+
+
+
+
+%%------------------- For later use ------------------------%%
+%\include{femtheory_MST}
+%\include{verification_MST}
+%%----------------------------------------------------------%%
+
+
+
+%\section{Referencer}
+%
+%
+%Liste med referencer:\\
+%\\
+%
+%\begin{itemize}
+%\item \citep{Mollerupphd}\\
+%\item \cite{Philip} \\
+%\item \cite{PhilipTrans,PhilipAus}
+%\end{itemize}
+
+
+
+
+% ------------------------------------------------------------------------ %%
+%
+%  REFERENCE LIST AND TEXT CITATIONS
+%
+%% ------------------------------------------------------------------------ %%
+
+
+%\bibliographystyle{natbibDK}
+\bibliographystyle{natbib}
+\bibliography{MST}
+
+
+\end{document}

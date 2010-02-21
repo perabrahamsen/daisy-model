@@ -1,0 +1,85 @@
+\begin{thebibliography}{}
+
+\bibitem[Austin og Prendergast(1997)]{Austin}
+Austin, N.~R. og Prendergast, J.~B. (1997).
+\newblock Use of kinematic wave theory to model irrigation on cracking soil.
+\newblock {\em Irrig. Sci.}, {\bf 18}, 1--10.
+
+\bibitem[Celia {\em et~al.}(1990)]{Celia}
+Celia, M.~A., Bouloutas, E.~T., og Zarba, R.~L. (1990).
+\newblock A general mass-conservative numerical solution for the unsaturated
+  flow equation.
+\newblock {\em Water Resour. Res.}, {\bf 26}(7), 1483--1496.
+
+\bibitem[FEMLAB(1998)]{FEMLAB}
+FEMLAB (1998).
+\newblock {\em FEMLAB reference manual}.
+\newblock Computer Solutions Europe AB, Bj{\"o}rnn{\"a}sv{\"a}gen 21, S-113 47
+  Stockholm, Sweden.
+
+\bibitem[Maheswari(1997)]{Maheshwari}
+Maheswari, B. (1997).
+\newblock Interrelations among physical and hydraulic paramaters of
+  non-cracking soils.
+\newblock {\em J. Agric. Engng. Res.}, {\bf 68}, 297--309.
+
+\bibitem[Mbagwu(1995)]{Mbagwu1}
+Mbagwu, J. (1995).
+\newblock Testing the goodness of fit of infiltration models for highly
+  permeable soils under different tropical soil management systems.
+\newblock {\em Soil Tillage Res.}, {\bf 34}, 199--205.
+
+\bibitem[Mbagwu(1997)]{Mbagwu2}
+Mbagwu, J. (1997).
+\newblock Quasi-steady infiltration rates of highly permeable tropical moist
+  savannah soils in relation to landuse and pore size distribution.
+\newblock {\em Soil Technol.}, {\bf 11}, 185--195.
+
+\bibitem[Mollerup(2001)]{Mollerupphd}
+Mollerup, M. (2001).
+\newblock {\em Numerical Modelling of Water and Solute Movement in Tilled
+  Topsoil}.
+\newblock Ph.D. thesis, The Royal Veterinary and Agricultural University,
+  T{\aa}strup, Denmark.
+
+\bibitem[Mualem(1976)]{Mualem}
+Mualem, Y. (1976).
+\newblock A new model for predicting the hydraulic conductivity of unsaturated
+  porous media.
+\newblock {\em Water Resour. Res.}, {\bf 12}(3), 513--522.
+
+\bibitem[Philip(1955)]{PhilipTrans}
+Philip, J.~R. (1955).
+\newblock Numerical solution of equations of the diffusion type with
+  diffusivity concentration-dependent.
+\newblock {\em Transaction of the Faraday Society}, {\bf 51}(7), 885--892.
+
+\bibitem[Philip(1957a)]{PhilipAus}
+Philip, J.~R. (1957a).
+\newblock Numerical solution of equations of the diffusion type with
+  diffusivity concentration-dependent. {II}.
+\newblock {\em Australian Journal of Physics}, {\bf 10}, 29--42.
+
+\bibitem[Philip(1957b)]{Philip}
+Philip, J.~R. (1957b).
+\newblock The theory of infiltration: 1. the infiltration equation and its
+  solution.
+\newblock {\em Soil Sci.}, {\bf 83}, 345--357.
+
+\bibitem[Philip(1969)]{PhilipAdv}
+Philip, J.~R. (1969).
+\newblock Theory of infiltration.
+\newblock {\em Advances in hydroscience}, pages 215--296.
+
+\bibitem[Valiantzas {\em et~al.}(2001)]{Valiantzas}
+Valiantzas, J., Aggelides, S., og Sassalou, A. (2001).
+\newblock Furrow infiltration estimation from time to a single advance point.
+\newblock {\em Agric. Water Manage.}, {\bf 52}, 17--32.
+
+\bibitem[van Genuchten(1980)]{vanGenuchten}
+van Genuchten, M.~T. (1980).
+\newblock A closed-form equation for predicting the hydraulic conductivity of
+  unsaturated soils.
+\newblock {\em Soil Sci.}, {\bf 44}.
+
+\end{thebibliography}

@@ -1,0 +1,636 @@
+
+@Book{Abbott,
+  author =    {M. B. Abbott and D. R. Basco},
+  title =     {Computational Fluid Dynamics: an introduction for engineers},
+  publisher = {Longman Scientific \& Technical},
+  year =      1989,
+  address =   {Longman House, Burnt Mill, Harlow, Essex CM20 2JE, England},
+}
+
+@Book{Abramowitz,
+  editor =   {Milton Abramowitz and Irene A. Stegun},
+  title =    {Handbook of mathematical functions with formulas,
+                  graphs, and mathematical tables},
+  publisher =    {Dover Publications, Inc.},
+  year =     {1970},
+  address =  {180 Varick Street, New York, N.Y. 10014},
+  edition =  {9th},
+  month =    {November}
+}
+
+@Article{Adeoye,
+  author =   {K. B. Adeoye},
+  title =    {Water movement studies in a ferroginous tropical
+                  soil at {S}amaru, {N}igeria. {I} determination of
+                  hydraulic properties},
+  journal =  {Niger. J. Soil Sci.},
+  year =     1983,
+  volume =   4,
+  pages =    {53--68}
+}
+
+@TechReport{Adeoyerep,
+  author =       {K. B. Adeoye},
+  title =        {Effect of cultural practices on water intake
+                     characteristics of a sandy loam soil},
+  institution =  {Department of Soil Science, Faculty of Agriculture,
+                     Ahmadu Bello University},
+  year =         {1986},
+  address =      {Zaria, Nigeria},
+}
+
+@Book{Asmar,
+  author =    {Nakhl\'{e} Asmar},
+  title =     {Partial differential equations and boundary value problems},
+  publisher = {Prentice Hall, Inc.},
+  year =      {2000},
+  address =   {Upper Saddle River, New Jersey 07458},
+}
+
+@Book{Atkinson,
+  author =      {K. E. Atkinson},
+  title =       {An introduction to numerical analysis},
+  publisher =   {Wiley},
+  year =        {1988},
+  address =     {New York},
+  edition =     {2nd}
+}
+
+@ARTICLE{Austin,
+  AUTHOR =       {Nicholas R. Austin and J. Bernard Prendergast},
+  TITLE =        {Use of kinematic wave theory to model irrigation on cracking soil},
+  JOURNAL =      {Irrig. Sci.},
+  YEAR =         {1997},
+  volume =       {18},
+  pages =        {1--10},
+}
+
+@Article{Bank,
+  author =   {Randolph E. Bank and Kent Smith},
+  title =    {Mesh smoothening using a posteriori error estimates},
+  journal =  {SIAM J. Numer. Anal.},
+  year =     {1997},
+  volume =   {34},
+  number =   {3},
+  pages =    {979--997},
+  month =    {June},
+}
+
+@Book{BarkerTingleff,
+  author =       {Vincent Allan Barker and Ole Tingleff},
+  title =        {H{\ae}fte 57 - Numerisk l{\o}sning af ikke-line{\ae}re ligninger},
+  publisher =    {Numerisk Institut, Danmarks Tekniske Universitet},
+  year =         {1991},
+  address =      {Lyngby, Denmark}
+}
+
+@Article{Benjamin,
+  author =   {J. G. Benjamin and A. D. Blaylock and H.J. Brown and R. M. Cruse},
+  title =    {Ridge tillage effects on simulated water and heat transport},
+  journal =  {Soil Tillage Res.},
+  year =     {1990},
+  volume =   {18},
+  pages =    {167--180},
+}
+
+@Article{Black-Scholes,
+  author =   {F. Black and M. Scholes},
+  title =    {The pricing of Options and Corporate Liabilities},
+  journal =      {Journal of Political Economy},
+  year =     {1973},
+  volume =   {81},
+  pages =    {637--659},
+}
+
+@Book{Carslaw,
+  author =   {H. S. Carslaw and J. C. Jaeger},
+  title =    {Conduction of heat in  solids},
+  publisher =    {Oxford University Press},
+  year =     1959,
+  address =      {Ely House, London W},
+  edition =      {2nd},
+}
+
+@Article{Celia,
+  author =   {Michael A. Celia and Efthimios. T. Bouloutas and Rebecca L. Zarba},
+  title =    {A General Mass-Conservative Numerical Solution for the Unsaturated Flow Equation},
+  journal =  {Water Resour. Res.},
+  year =     {1990},
+  volume =   {26},
+  number =   {7},
+  month =    {July},
+  pages =    {1483--1496},
+}
+
+@Book{DCAM,
+  author =    {Vincent Allan Barker and David Silvester},
+  editor =    {Per Chritian Hansen},
+  title =     {Iterative and Finite Element Multigrid Methods},
+  publisher = {Danish Center for Applied Mathematics and Mechanics, Technical University of Denmark},
+  year =      {1998},
+}
+
+@BOOK{Dennis,
+  AUTHOR =       {J. E. Dennis and Robert B. Schnabel},
+  TITLE =        {Numerical methods for unconstrained optimization and nonlinear equations},
+  PUBLISHER =    {Prentice-Hall, Inc.},
+  YEAR =         {1983},
+  series =       {Prentice Hall series in computational mathematics},
+}
+
+@TechReport{Feddes,
+  author =   {R. A. Feddes and P. Kowalik and S. P. Neuman and E. Bresler},
+  title =    {Finite difference and finite element simulation of field water uptake by plants},
+  institution =  {Institute for land and water management research},
+  year =     {1976},
+  address =      {Instituut voor cultuurtechniek en waterhuishouding, Marijkeweg 11, Postbus 35, Wageningen, The Netherlands},
+}
+
+@Book{FEMLAB,
+  author =    {FEMLAB},
+  title =     {FEMLAB reference manual},
+  publisher = {Computer Solutions Europe AB},
+  year =      {1998},
+  address =   {Bj{\"o}rnn{\"a}sv{\"a}gen 21, S-113 47 Stockholm, Sweden},
+  month =     {July},
+}
+
+@Book{Gardner,
+  author =   {W. A. Jury and W. R. Gardner and W. H. Gardner},
+  title =    {Soil Physics},
+  publisher =    {John Wiley \& Sons, Inc.},
+  year =     {1991},
+  edition =  {5th}
+}
+
+
+@Article{Gerke,
+  author =   {H. H. Gerke and M. T. van Genuchten},
+  title =    {A Dual-Porosity Model for Simulating the Preferential Movement of Water and Solutes in Structured Porous Media},
+  journal =  {Water Resour. Res.},
+  year =     {1993},
+  pages =    {305--319},
+}
+
+@PhdThesis{Gregersen,
+  author =   {Jan Gregersen},
+  title =    {Experimental and numerical investigation of two-dimensional unsaturated flow in layered soils},
+  school =   {Technical Univ. of Denmark},
+  year =     1995,
+  address =  {Lyngby, Denmark},
+}
+
+@Article{Griffith,
+  author =   {D. R. Griffith and S. D. Parsons and J. V. Mannering},
+  title =    {Mechanics and adaptability of ridge-planting for corn and soya bean},
+  journal =  {Soil Tillage Res.},
+  year =     {1990},
+  pages =    {113--126},
+}
+
+@Book{Harremoes,
+  author =   {Poul Harremo{\"e}s and Mogens Henze and Erik Arvin and Eli Dahi },
+  title =    {Teoretisk Vandhygiejne},
+  publisher =    {Polyteknisk Forlag},
+  year =     {1994},
+  address =      {Polyteknisk Forlag, Anker Engelundsvej 1, 2800 Lyngby},
+}
+
+@Article{Haverkamp,
+  author =   {R. Haverkamp and M. Vauclin and J. Tauma and  P. J. Wierenga and G. Vachaud},
+  title =    {A comparison of numerical simulation models for one-dimensional infiltration},
+  journal =  {Soil Sci. Soc. Am. J.},
+  year =     {1977},
+  volume =   {41},
+  pages =    {285--294},
+}
+
+@Book{HEJ,
+  author =    {Helge Elbr{\o}nd Jensen},
+  ALTeditor = {},
+  title =     {Matematisk Analyse},
+  publisher = {Matematisk Institut, Danmarks Tekniske H{\o}jskole},
+  year =      {1988},
+  volume =    {3},
+}
+
+@Book{Hillel,
+  author =     {Daniel Hillel},
+  title =      {Environmental Soil Physics},
+  publisher =  {Academic Press},
+  year =       {1998},
+  address =    {London, UK},
+}
+
+@Article{Huyakorn1,
+  author =   {P. S. Hyakorn and S. D. Thomas and B. M. Thompson},
+  title =    {Techniques for Making Finite-Elements Competitive in Modelling Flow in Variably Saturated Porous Media},
+  journal =  {Water Resour. Res.},
+  year =     {1984},
+  volume =   {20},
+  number =   {8},
+  pages =    {1099-1115},
+}
+
+@Article{Huyakorn2,
+  author =   {Peter S. Huyakorn and Everett P. Springer and Varut Guvanasen and Terry D. Wadsworth},
+  title =    {A Three-Dimensional Finite-Element Model for Simulating Water Flow in Variably Saturated Porous Media},
+  journal =  {Water Resour. Res.},
+  year =     {1986},
+  volume =   {22},
+  number =   {13},
+  pages =    {1790-1808},
+}
+
+@TechReport{HYDRUS,
+  author =      {J. {\^S}im{\.u}nek and K. Huang and M. Th. van Genuchten},
+  title =       {The {HYDRUS} Code for Simulating the One-Dimensional Movement of Water, Heat and Muliple Solutes in Variably-Saturated Media},
+  institution = {U. S. Salinity Laboratory},
+  year =        {1998},
+  month =       {May},
+}
+
+@Book{Iserles,
+  author =   {Arieh Iserles},
+  title =    {A First Course in the Numerical Analysis of Differential Equations},
+  publisher =    {The Press syndicate of the University of Cambridge},
+  year =     {1997},
+  address =      {The Edinburgh Building, Cambridge CB2 2KU, United Kingdom},
+}
+
+@Article{Jensen,
+  author =   {Jens Rauns{\o} Jensen},
+  title =    {Stratification and neutron probe meassurement in the topsoil of a ridged Savanna soil},
+  journal =  {Soil Sci.},
+  year =     {1993},
+  volume =   {156},
+  number =   {1},
+}
+
+@PhdThesis{JensenSim,
+  author =   {Karsten H{\o}gh Jensen},
+  title =    {Simulation of water flow in the unsaturated zone including the root zone},
+  school =   {Institute of Hydrodynamics and Hydraulic Engineering, Technical University of Denmark},
+  year =     {1983},
+  address =  {Lyngby, Denmark}
+}
+
+@Article{Lal,
+  author =   {R. Lal},
+  title =    {Ridge-tillage},
+  journal =  {Soil Tillage Res.},
+  year =     1990,
+  number =   18,
+  pages =    {107--111}
+}
+
+@ARTICLE{Lehmann,
+  AUTHOR =       {F. Lehmann and P. Ackerer},
+  TITLE =        {Comparison of Iterative Methods for Improved Solutions of the Fluid Flow Equation in Partially Saturated Media},
+  JOURNAL =      {Transport in Porous Media},
+  YEAR =         {1998},
+  volume =       {31},
+  pages =        {275--292},
+}
+
+@Article{Loague,
+  author =   {K. Loague and R. E. Green},
+  title =    {Statistical and graphical methods for evaluating solute transport models: overview and application},
+  journal =  {J. Contam. Hydrol.},
+  year =     {1991},
+   number =  {7},
+  pages =    {51--73},
+ }
+
+@ARTICLE{Maheshwari,
+  AUTHOR =       {B.L. Maheswari},
+  TITLE =        {Interrelations Among Physical and Hydraulic paramaters of Non-Cracking Soils},
+  JOURNAL =      {J. Agric. Engng. Res.},
+  YEAR =         {1997},
+  volume =       {68},
+  pages =        {297--309},
+}
+
+@Book{MATLABfuncref,
+  editor =   {The Mathworks},
+  title =    {MATLAB function reference},
+  year =     {1999},
+  volume =   {1},
+  month =    {January},
+}
+
+@ARTICLE{Mbagwu1,
+  AUTHOR =       {J.S.C. Mbagwu},
+  TITLE =        {Testing the goodness of fit of infiltration models for highly permeable
+    soils under different tropical soil management systems},
+  JOURNAL =      {Soil Tillage Res.},
+  YEAR =         {1995},
+  volume =       {34},
+  pages =        {199--205},
+}
+
+@ARTICLE{Mbagwu2,
+  AUTHOR =       {J.S.C. Mbagwu},
+  TITLE =        {Quasi-steady infiltration rates of highly permeable tropical moist
+        savannah soils in relation to landuse and pore size distribution},
+  JOURNAL =      {Soil Technol.},
+  YEAR =         {1997},
+  volume =       {11},
+  pages =        {185--195},
+}
+
+@Article{Millington,
+  author =   {R. J. Millington and J. P. Quirk},
+  title =    {Permeability of porous solids},
+  journal =      {Trans. Faraday Soc.},
+  year =     {1961},
+  volume =   {57},
+  pages =    {1200--1207},
+}
+
+@ARTICLE{Mollerup,
+  AUTHOR =       {M. Mollerup and S. Hansen},
+  TITLE =        {Power series solution for falling-head ponded infiltration},
+  JOURNAL =      {Water Resour. Res.},
+  YEAR =         {2007},
+  volume =       {43},
+  note =         {{W}03425, doi:10.1029/2006{WR}004928},
+}
+
+@ARTICLE{Mollerup2,
+  AUTHOR =       {M. Mollerup},
+  TITLE =        {Philip's infiltration equation for variable-head poded infiltration},
+  JOURNAL =      {J. Hydrol.},
+  YEAR =         {2007},
+  volume =       {347},
+  pages =       {173--176},
+  note =         {doi:10.1016/j.jhydrol.2007.09.015},
+  doi =          {10.1016/j.jhydrol.2007.09.015},
+}
+
+@PhdThesis{Mollerupphd,
+  author =   {Mikkel Mollerup},
+  title =    {Numerical Modelling of Water and Solute Movement in Tilled Topsoil},
+  school =   {The Royal Veterinary and Agricultural University},
+  year =     {2001},
+  address =  {T{\aa}strup, Denmark},
+  month =    {December},
+}
+
+@Article{Mualem,
+  author =   {Yechezkel Mualem},
+  title =    {A New Model for Predicting the Hydraulic Conductivity of Unsaturated Porous Media},
+  journal =  {Water Resour. Res.},
+  year =     {1976},
+  volume =   {12},
+  number =   {3},
+  pages =    {513--522},
+}
+
+@Article{Neuman,
+  author =   {Shlomo P. Neuman},
+  title =    {Saturated-Unsaturated Seepage By Finite Elements},
+  journal =      {Journal of the Hydraulics Division},
+  year =     1973,
+  month =    {December},
+  pages =    {2233--2250},
+}
+
+@Article{Nobel,
+  author =       {Riksbank},
+  title =    {Press {R}elease -{T}he {S}veriges {R}iksbank ({B}ank of {S}weden) {P}rize in {E}conomic {S}ciences in {M}emory of {A}lfred {N}obel},
+  journal =      {Press release, http://www.nobel.se/economics/leureates/1997/press.html},
+  month =    {October},
+  year =     {1997},
+}
+
+@Article{Noborio1,
+  author =   {K. Noborio and K. J. McInnes and J. L Heimman},
+  title =    {Two-Dimensional Model for Water, Heat, and solute Transport in Furrow-Irrigated Soil: I. Theory},
+  journal =  {Soil Sci. Soc. Am. J.},
+  year =     {1996},
+  volume =   {60},
+  pages =    {1001--1009},
+}
+
+@Article{Noborio2,
+  author =   {K. Noborio and K. J. McInnes and J. L Heimman},
+  title =    {Two-Dimensional Model for Water, Heat, and solute Transport in Furrow-Irrigated Soil: {II}. Field Evaluation},
+  journal =  {Soil Sci. Soc. Am. J.},
+  year =     {1996},
+  volume =   {60},
+  pages =    {1010--1021},
+}
+
+@Book{Numerisk,
+  author =       {Hans Bruun Nielsen and Kaj Madsen},
+  title =    {H{\ae}fte 23 - L{\o}sning af line{\ae}re ligningssystemer},
+  publisher =    {Numerisk Institut},
+  year =     {1972},
+  month =    {August},
+}
+
+@ARTICLE{Paniconi1,
+  AUTHOR =       {C. Paniconi and A. A. Aldama and E. F. Wood},
+  TITLE =        {Numerical Evaluatrion of Iterative and Noniterative Methods for the Solution of the Nonlinear Richards Equation},
+  JOURNAL =      {Water Resour. Res.},
+  YEAR =         {1991},
+  volume =       {27},
+  number =       {6},
+  pages =        {1147--1163},
+  month =        {June},
+}
+
+@ARTICLE{Paniconi2,
+  AUTHOR =       {C. Paniconi and M. Putti},
+  TITLE =        {A comparison of Picard and Newton iteration in the numerical solution of variably saturated flow problems},
+  JOURNAL =      {Water Resour. Res.},
+  YEAR =         {1994},
+  volume =       {30},
+  number =       {12},
+  pages =        {3357--3374},
+  month =        {December},
+}
+
+@Article{Perrochet,
+  author =   {Pierre Perrochet and Dominique B\'{e}rod},
+  title =    {Stability of the standard {C}rank-{N}icolson Scheme applied to the diffuion-convection equation: some new insights},
+  journal =      {Water Resources Research},
+  year =     {1993},
+  volume =   {29},
+  number =   {9},
+  pages =    {3291--3297},
+  month =    {September},
+}
+
+@Article{Philip,
+  author =   {J. R. Philip},
+  title =    {The theory of infiltration: 1. The infiltration equation and its solution},
+  journal =  {Soil Sci.},
+  year =     1957,
+  volume =   83,
+  pages =    {345--357}
+}
+@Article{Philip6,
+  author =   {J. R. Philip},
+  title =    {The theory of infiltration: 6. Effect of water depth over soil},
+  journal =  {Soil Sci.},
+  year =     {1958},
+  volume =   {85},
+  pages =    {278--286},
+}
+@Article{PhilipAdv,
+  author =   {J. R. Philip},
+  title =    {Theory of infiltration},
+  journal =  {Advances in hydroscience},
+  year =     {1969},
+   pages =   {215--296},
+}
+@Article{PhilipAus,
+  author =   {J. R. Philip},
+  title =    {Numerical solution of equations of the diffusion type with diffusivity concentration-dependent. {II}},
+  journal =  {Australian Journal of Physics},
+  year =     {1957},
+   volume =  {10},
+   pages =   {29--42},
+ }
+
+@Article{PhilipTrans,
+  author =   {J. R. Philip},
+  title =    {Numerical Solution of equations of the diffusion type with diffusivity concentration-dependent.},
+  journal =  {Transaction of the Faraday Society},
+  year =     {1955},
+  volume =   {51},
+  number =   {7},
+  pages =    {885--892},
+}
+
+@Article{Philipinf,
+  author =   {J. R. Philip},
+  title =    {The theory of infiltration: 2 The profile of infinity},
+  journal =  {Soil Sci.},
+  year =     {1957},
+  volume =   {83},
+  number =   {6},
+  pages =    {435--448},
+}
+
+@Book{Quarteroni,
+  author =   {Alfio Quarteroni and Riccardo Sacco and Fausto Saleri},
+  title =    {Numerical Mathematics},
+  publisher =    {Springer},
+  year =     {2000},
+  series =   {Texts in Applied Mathematics},
+  address =      {Springer Verlag New York, Inc., 175 Fifth Avenue New York, NY 10010, USA},
+}
+
+@TechReport{RETC,
+  author =       {M. Th. van Genuchten and F. J. Leij and S. R. Yates},
+  title =        {The {RETC} Code for Quantifying the Hydraulic Functions of Unsaturated Soils},
+  institution =  {United States Environmental Protection Agency},
+  year =         {1991},
+  address =      {Washington, DC},
+  month =        {December},
+}
+
+@Book{Richter,
+  author =   {O. Richter and B. Diekkr{\"u}ger and P. N{\"o}rtersheuser},
+  title =    {Environmental Fate Modelling of Pesticides},
+  publisher =    {VCH Verlagsgesellschaft mbH},
+  year =     {1996},
+  address =      {D-69451 Weinheim, Federal Republic of Germany},
+}
+
+@TechReport{SASA,
+  author =       {Jens Rauns{\o} Jensen and Ruben Bernhard and S{\o}ren Hansen},
+  title =        {Calibration of {TDR} and {NMM} for soil moisture meassurement in the topsoil},
+  institution =  {The Royal Veterinay and Agricultural University},
+  year =         {1999},
+  address =      {Copenhagen, Denmark},
+}
+
+@Article{Shan,
+  author =   {Chao Shan and Iraj Javandel},
+  title =    {Analytical solutions for solute transport in a vertical aquifer section},
+  journal =      {Journal of contaminant hydrology},
+  year =     {1997},
+  volume =   {27},
+  pages =    {63--82},
+}
+
+@Book{Segerlind,
+  author =    {L. J. Segerlind},
+  title =     {Applied finite element analysis},
+  publisher = {John Wiley and sons},
+  year =      1984,
+  address=    {New york},
+}
+
+@Book{Spitz,
+  author =   {Karlheinz Spitz and Joanna Moreno},
+  ALTeditor =    {},
+  title =    {A practical guide to groundwater and solute transport modelling},
+  publisher =    {John Wiley \& Sons},
+  year =     {1996},
+}
+
+@Article{Tabuada1,
+  author =   {M. A. Tabuada and Z. J. C. Rego and G. Vachaud and L. S. Pereria},
+  title =    {Modelling of furrow irrigation. {A}dvance with two-dimensional infiltration},
+  journal =  {Agric. Water Manage.},
+  year =     {1995},
+  number =   {28},
+  pages =    {201--221},
+}
+
+@Article{Tabuada2,
+  author =   {M. A. Tabuada and Z. J. C. Rego and G. Vachaud and L. S. Pereria},
+  title =    {Two-dimensional infiltration under furrow irrigation: modelling, its validation and applications},
+  journal =  {Agric. Water Manage.},
+  year =     {1995},
+  volume =   {27},
+  pages =    {105--123},
+}
+
+@Book{Trottenberg,
+  author =   {U. Trottenberg and C. W. Oosterlee and A. Sch{\"u}ller},
+  title =    {Multigrid},
+  publisher =    {Academic Press},
+  year =     {2001},
+  address =      {Harcourt Place, 32, Jamestown Road, London NW1 7BY, UK},
+}
+
+@Article{Wood,
+  author =   {W. L. Wood and A. Calver},
+  title =    {Lumped Versus Distributed Mass Matrices in the Finite Element Solution of Subsurface Flow},
+  journal =  {Water Resour. Res.},
+  year =     {1990},
+  volume =   {26},
+  number =   {5},
+  pages =    {819--825},
+}
+
+@ARTICLE{Valiantzas,
+  AUTHOR =       {J.D. Valiantzas and S. Aggelides and A. Sassalou},
+  TITLE =        {Furrow infiltration estimation from time to a single advance point},
+  JOURNAL =      {Agric. Water Manage.},
+  YEAR =         {2001},
+  volume =       {52},
+  pages =        {17--32},
+}
+
+
+@Article{vanGenuchten,
+  author =   {M. Th. van Genuchten},
+  title =    {A Closed-form Equation for Predicting the Hydraulic Conductivity of Unsaturated Soils},
+  journal =  {Soil Sci.},
+  year =     {1980},
+  volume =   {44},
+}
+
+@Book{Genuchtenanalytical,
+  author =    {M. Th. van Genuchten and W-J. Alves},
+  title =     {Analytical Solutions of the one-dimensional convective-dispersive solute transport equation},
+  publisher = {United States Department of Agriculture},
+  year =      {1982},
+   }
