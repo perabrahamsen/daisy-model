@@ -61,13 +61,14 @@ carbon part of the 'K' factor.")
 (defreaction colloid-generation colgen_Jarvis99
   "Release of colloids in soil surface from heavy rain."
   ;;(Mmax 0.165 [g/g])                    ;Max detachable.
-  (Mmax 0.075 [g/g])                    ;Max detachable.
+  (Mmax 0.075 [g/g])                      ;Max detachable.
   ;;(kd 15.0 [g/J])                       ;Detachment rate coefficient.
-  (kd 7.5 [g/J])                       ;Detachment rate coefficient.
+  (kd 7.5 [g/J])                          ;Detachment rate coefficient.
   ;;(kr 0.1 [g/m^2/h])                    ;Replenishment rate coefficient.
-  (kr 0.05 [g/m^2/h])                    ;Replenishment rate coefficient.
+  (kr 0.05 [g/m^2/h])                     ;Replenishment rate coefficient.
   ;;(zi 0.1 [cm])                         ;Surface layer thickness.
-  (zi 0.05 [cm])                         ;Surface layer thickness.
+  (zi 0.05 [cm])                        ;Surface layer thickness.
+  ;;;;;(zi 0.11176 [cm])    
   (colloid colloid))
 
 (defchemistry colloids default
@@ -106,8 +107,6 @@ carbon part of the 'K' factor.")
 (defchemical Pendimethalin-immobile Pendimethalin-base
   "Pendimethalin sorbed to immobile soil."
   (adsorption full))
-
-
 
 (defnumber K_Pendimethalin K_equilibrium
   "Adsorption for Pendimethalin to immobile soil."
@@ -153,6 +152,7 @@ carbon part of the 'K' factor.")
   "Pendimethalin in both immobile, solute and colloid form."
   (trace Pendimethalin Pendimethalin-immobile Pendimethalin-colloid)
   (reaction Pendimethalin-immobile-sorption
+            Pendimethalin-colloid-sorption
             Pendimethalin-filter 
             Pendimethalin-colloid-generation
             ))
@@ -217,6 +217,7 @@ carbon part of the 'K' factor.")
   "Ioxynil in both immobile, solute and colloid form."
   (trace Ioxynil Ioxynil-immobile Ioxynil-colloid)
   (reaction Ioxynil-immobile-sorption
+            Ioxynil-colloid-sorption
             Ioxynil-filter 
             Ioxynil-colloid-generation
             ))
@@ -228,4 +229,30 @@ carbon part of the 'K' factor.")
 ;;; Use in column.
 ;; "colloids" must be listed before bound pesticides.
 ;; (Chemistry original (combine &old colloids Pendimethalin-colloid))
+
+(defsummary "Colloid bound sorption" balance
+  "Balance between soil, colloid and solute forms."
+  (precision 3)
+  (require_top true)
+  (input "Solute-Sorption")
+  (output "Soil-Sorption" "Colloid-Sorption")
+  (content))
+
+(defsummary "Colloid bound" balance
+  "Balance for all forms of chemical."
+  (precision 3)
+  (require_top true)
+  (input "Solute-Spray" "Soil-Spray")
+  (output  "Solute-Surface-Loss" "Colloid-Surface-Loss" "Soil-Surface-Loss" 
+           "Solute-Surface-Drain" "Colloid-Surface-Drain"
+           "Solute-Decompose" "Colloid-Decompose" "Soil-Decompose"
+           "Solute-Leak" "Colloid-Leak"
+           "Solute-Drain" "Colloid-Drain")
+  (content "Solute-Surface" "Colloid-Surface" "Soil-Surface"
+           "Solute-Tertiary" "Colloid-Tertiary"
+           "Solute-Matrix" "Colloid-Matrix" "Soil-Matrix"
+           "Solute-Error" "Colloid-Error" "Soil-Error"))
+
+
+
 
