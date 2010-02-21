@@ -1,0 +1,12 @@
+dlf-0.0 -- Chemical Concentration (defined in 'log.dai').
+
+VERSION: 4.74
+LOGFILE: SWC_Bromide.dlf
+RUN: Wed Nov 04 14:38:07 2009
+
+COLUMN: *
+CHEMICAL: Bromide
+INTERVAL: box none
+
+LOG: Concentration in water of chemicals in each numeric soil layer.  
+
