@@ -36,6 +36,12 @@
 
 (defhorizon VAP_C VAP_B)
 
+(defcolumn VAP default
+  "Shared parameters for VAP fields."
+  (OrganicMatter original)
+  (Vegetation crops (litter_water_holding_capacity 2.5 [L/kg])))
+  
+
 ;; Movement.
 
 (defmovement Rorrende-2D rectangle
@@ -120,6 +126,11 @@
                         (negate true)
                         (tag "Glyphosate leak 150")
                         (dimension "ug/ha/&"))
+           (number (path column "${column}" OrganicMatter default top_DM)
+                   (spec organic default top_DM))
+           (number (path column "${column}" Bioclimate default litter_water_storage)
+                   (spec bioclimate default litter_water_storage))
+
            ))
 
 ;; Program

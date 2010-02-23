@@ -88,14 +88,13 @@
 (defhorizon Silstrup_C_Nocracks Silstrup_C
   (secondary_domain vap_nocracks))
 
-(defcolumn Silstrup default
+(defcolumn Silstrup VAP
   (Groundwater file "dk-silstrup.gwt"
                ;; GWT is measured at top of terrain.
                ;; Offset is calibrated based on drainage measurments.
                ;;  cm too high,  cm is too low
                (offset 40 [cm]))
   (Chemistry Silstrup)
-  (OrganicMatter none)
   (Soil (horizons (  -3.00 [cm] Silstrup_Ap_surface)
                   ( -31.00 [cm] Silstrup_Ap)
                   ( -39.00 [cm] Silstrup_B_plow_pan)
@@ -249,7 +248,7 @@
   (wait (at 2001 09 05))
     ;; Harvest of spring barley. ;; Stubbleheight 12 cm, 
     ;; grain yield 74.77 hkg/ha 85% DM, straw yield 28.62 hkg/ha 100% DM
-    (harvest "Spring Barley" (stub 12 [cm]))
+    (harvest "Spring Barley" (stub 12 [cm]) (leaf 0.3 []) (stem 0.3 []))
     (set_porosity (depth -1 [cm]) (porosity 0.3))
   (wait (at 2001 10 25))
      ;; Roundup Bio (glyphosate) - weeds - 4.0 l/ha			
