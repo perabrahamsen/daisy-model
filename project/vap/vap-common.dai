@@ -38,7 +38,8 @@
 
 (defcolumn VAP default
   "Shared parameters for VAP fields."
-  (OrganicMatter original)
+  (OrganicMatter original
+                 (Bioincorporation (C_per_N_factor (25 1) (50 0.1) (60 0.01))))
   (Vegetation crops (litter_water_holding_capacity 2.5 [L/kg])))
   
 
