@@ -38,16 +38,6 @@ Chemistry::library_id () const
   return id;
 }
 
-bool
-Chemistry::require (const symbol chem, Treelog& msg) const
-{
-  if (know (chem))
-    return true;
-  
-  msg.error ("Required chemical '" + chem.name () + "' not found");
-  return false;
-}
-
 void 
 Chemistry::deposit (const IM& im, double dt, Treelog& msg)
 { 

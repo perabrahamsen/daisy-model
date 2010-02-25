@@ -1,12 +1,29 @@
+2010-02-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* litter.h, litter.C: Made it a component.
+	* Makefile (MODELS, SUBMODELS): Adjusted.
+	* column_std.C (Litter): New parameter.
+	* vegetation_crops.C, vegetation_permanent.C, vegetation.h:
+	Removed litter.
+	* bioclimate.h, bioclimate_std.C: Adjusted.
+
+	* chemistry.C, removed (require): Removed.
+	* organic_std.C (check): Update caller.
+	(tick): Assume unlimted NH4 and NO4 if not tracked.
+
 2010-02-24  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* unit_model.C: Fix several units.
+
+	* chemical_std.C: Keep track of chemicals in litter.
+	* chemical.h, chemistry.h, chemistry_std.C, chemistry_multi.C:
+	* bioclimate.h, bioclimate_std.C, column_std.C: Adjusted.
 
 2010-02-23  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* log_harvest.C (match): Fix dimensions.
 
-	* vegetation_crops.C (litter_vapor_flux_factor, litter_water_capacity): 
+	* vegetation_crops.C (litter_vapor_flux_factor, litter_water_capacity):
 	New parameters.
 
 2010-02-22  Per Abrahamsen  <abraham@dina.kvl.dk>
@@ -18,6 +35,8 @@
 2010-02-16  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.78 released.
+
+	* exercises: Fix answers.
 
 2010-02-15  Per Abrahamsen  <abraham@dina.kvl.dk>
 

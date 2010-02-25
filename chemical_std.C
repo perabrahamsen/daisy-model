@@ -729,7 +729,7 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
   litter_storage -= litter_out * dt;
 
   // Surface
-  surface_in = litter_out;
+  surface_in = litter_out + litter_bypass;
   surface_runoff = surface_storage * surface_runoff_rate; 
   surface_decompose = surface_storage * surface_decompose_rate; 
   surface_storage += (surface_in + surface_transform 

@@ -53,7 +53,6 @@ protected:
 
   // Query.
 public:
-  bool require (const symbol chem, Treelog&) const;
   virtual bool know (symbol chem) const = 0;
   virtual bool ignored (symbol chem) const = 0;
   virtual Chemical& find (symbol chem) = 0;

@@ -41,6 +41,7 @@
 #include "raddist.h"
 #include "svat.h"
 #include "vegetation.h"
+#include "litter.h"
 #include "time.h"
 #include "units.h"
 #include "check.h"
@@ -138,13 +139,15 @@ struct BioclimateStandard : public Bioclimate
 
   void WaterDistribution (const Units&, const Time&,
                           Surface& surface, const Weather& weather, 
-                          Vegetation& vegetation, const Movement&,
+                          Vegetation& vegetation, const Litter& litter, 
+                          const Movement&,
                           const Geometry&, const Soil& soil,
                           const SoilWater& soil_water, const SoilHeat&, 
                           double dt, Treelog&);
 
   // Radiation.
-  static double albedo (const Vegetation& crops, const Surface& surface, 
+  static double albedo (const Vegetation& crops, const Litter& litter,
+                        const Surface& surface, 
                         const Geometry&, const Soil&, const SoilWater&);
   std::auto_ptr<Raddist> raddist;// Radiation distribution model.
   const double min_sin_beta_;     // Sinus to lowest sun angle for some models.
@@ -187,7 +190,8 @@ struct BioclimateStandard : public Bioclimate
 
   // Simulation
   void tick (const Units&, const Time&, Surface&, const Weather&, 
-             Vegetation&, const Movement&, const Geometry&,
+             Vegetation&, const Litter& litter, 
+             const Movement&, const Geometry&,
              const Soil&, SoilWater&, const SoilHeat&, Chemistry&, 
              double dt, Treelog&);
   void output (Log&) const;
@@ -548,22 +552,23 @@ BioclimateStandard::CanopyStructure (const Vegetation& vegetation)
 }
 
 double 
-BioclimateStandard::albedo (const Vegetation& crops, const Surface& surface, 
+BioclimateStandard::albedo (const Vegetation& crops, const Litter& litter,
+                            const Surface& surface, 
                             const Geometry& geo,
                             const Soil& soil, const SoilWater& soil_water)
 {
-  const double litter_albedo = crops.litter_albedo ();
-  const double surface_albedo = (litter_albedo < 0.0) 
-    ? surface.albedo (geo, soil, soil_water)
-    : litter_albedo;
+  const double surface_albedo = surface.albedo (geo, soil, soil_water);
+  const double litter_albedo = litter.albedo ();
+  const double litter_cover = litter.cover ();
 
-  const double LAI = crops.LAI ();
-  if (LAI <= 0.0)
-    return surface_albedo;
+  // Find albedo below crops.
+  const double below_albedo = (litter_albedo < 0.0)
+    ? surface_albedo
+    : litter_albedo * litter_cover + surface_albedo * (1.0 - litter_cover);
 
   const double crop_cover = crops.cover ();
   return crops.albedo () * crop_cover
-    + surface_albedo * (1.0 - crop_cover);
+    + below_albedo * (1.0 - crop_cover);
 }
 
 void 
@@ -621,6 +626,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
                                        const Time& time, Surface& surface,
                                        const Weather& weather, 
                                        Vegetation& vegetation,
+                                       const Litter& litter,
                                        const Movement& movement,
                                        const Geometry& geo,
                                        const Soil& soil, 
@@ -649,7 +655,8 @@ BioclimateStandard::WaterDistribution (const Units& units,
   const double AirTemperature = weather.air_temperature ();//[dg C]
   const double VaporPressure = weather.vapor_pressure ();
   const double Si = weather.global_radiation ();
-  const double Albedo = albedo (vegetation, surface, geo, soil, soil_water);
+  const double Albedo = albedo (vegetation, litter, surface, 
+                                geo, soil, soil_water);
   net_radiation->tick (Cloudiness, AirTemperature, VaporPressure, Si, Albedo,
                        msg);
   const double Rn = net_radiation->net_radiation ();
@@ -701,6 +708,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
       snow_water_out = 0.0;
     }
   snow_water_out_temperature = snow.temperature ();
+  const double below_snow_ep = total_ep_ - snow_ea_;
 
   // 3 Water intercepted on canopy
 
@@ -708,7 +716,9 @@ BioclimateStandard::WaterDistribution (const Units& units,
   daisy_assert (canopy_water_capacity >= 0.0);
   
   daisy_assert (snow_ea_ <= total_ep_);
-  canopy_ep = (total_ep_ - snow_ea_) * cover ();
+  canopy_ep = below_snow_ep * cover ();
+  const double below_canopy_ep = below_snow_ep - canopy_ep;
+
   daisy_assert (canopy_ep >= 0.0);
   if (snow_water_out < 0.0)
     {
@@ -730,7 +740,8 @@ BioclimateStandard::WaterDistribution (const Units& units,
   else
     canopy_water_temperature = air_temperature;
 
-  canopy_ea_ = std::min (canopy_ep, canopy_water_storage / dt + canopy_water_in);
+  canopy_ea_ = std::min (canopy_ep, 
+                         canopy_water_storage / dt + canopy_water_in);
   daisy_assert (canopy_ea_ >= 0.0);
   total_ea_ += canopy_ea_;
   daisy_assert (total_ea_ >= 0.0);
@@ -755,7 +766,9 @@ BioclimateStandard::WaterDistribution (const Units& units,
 
   // 4 Water intercepted by litter
 
-  litter_ep = (total_ep_ - snow_ea_) * (1.0 - cover ());
+  const double litter_cover = litter.cover ();
+  litter_ep = below_canopy_ep * litter_cover;
+
   daisy_assert (snow_ea_ <= total_ep_);
   if (litter_ep < 0.0)
     {
@@ -768,15 +781,20 @@ BioclimateStandard::WaterDistribution (const Units& units,
       litter_ep = 0.0;
     }
 
-  litter_water_in 
-    = canopy_water_out + canopy_water_bypass + irrigation_surface;
-
+  const double water_below_canopy
+    = canopy_water_out + canopy_water_bypass + irrigation_surface; 
+  const double water_below_canopy_temperature 
+    = (  canopy_water_bypass * snow_water_out_temperature
+       + canopy_water_out * canopy_water_temperature
+       + irrigation_surface * irrigation_surface_temperature)
+    / water_below_canopy;
+  litter_water_in = water_below_canopy * litter_cover;
+  const double litter_water_bypass = water_below_canopy - litter_water_in;
+  
   if (litter_water_in > 0.01)
     litter_water_temperature 
       = (litter_water_storage * air_temperature
-         + canopy_water_bypass * snow_water_out_temperature * dt
-         + canopy_water_out * canopy_water_temperature* dt
-         + irrigation_surface * irrigation_surface_temperature * dt)
+         + litter_water_in * dt * water_below_canopy_temperature)
       / (litter_water_in * dt + litter_water_storage);
   else
     litter_water_temperature = air_temperature;
@@ -788,7 +806,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
   total_ea_ += litter_ea;
   daisy_assert (total_ea_ >= 0.0);
   
-  const double litter_water_capacity = vegetation.litter_water_capacity ();
+  const double litter_water_capacity = litter.water_capacity ();
   litter_water_storage += (litter_water_in - litter_ea) * dt;
   if (litter_water_storage < 0.0)
     {
@@ -816,7 +834,8 @@ BioclimateStandard::WaterDistribution (const Units& units,
 
   // 5 Ponding
 
-  pond_ep = (litter_ep - litter_ea) * vegetation.litter_vapor_flux_factor();
+  pond_ep = (litter_ep - litter_ea) * litter.vapor_flux_factor()
+    + below_canopy_ep * (1.0 - litter_cover);
   daisy_assert (litter_ea <= litter_ep);
   if (pond_ep < 0.0)
     {
@@ -824,15 +843,20 @@ BioclimateStandard::WaterDistribution (const Units& units,
       tmp << "BUG:\npond_ep = " << pond_ep << "\n"
           << "litter_ep = " << litter_ep << "\n"
           << "litter_ea = " << litter_ea << "\n"
-          << "litter_factor = " << vegetation.litter_vapor_flux_factor ();
+          << "litter_factor = " << litter.vapor_flux_factor ();
       msg.error (tmp.str ());
       pond_ep = 0.0;
     }
+  
+  const double pond_in = litter_water_out + litter_water_bypass;
+  const double pond_in_temperature = (pond_in > 0.01)
+    ? ((litter_water_out * litter_water_temperature
+        + litter_water_bypass * water_below_canopy_temperature) / pond_in)
+    : air_temperature;
 
   const double soil_T 
     = geo.content_hood (soil_heat, &SoilHeat::T, Geometry::cell_above);
-  surface.tick (msg, pond_ep, 
-                litter_water_out, litter_water_temperature, 
+  surface.tick (msg, pond_ep, pond_in, pond_in_temperature, 
                 geo, soil, soil_water, soil_T, dt);
   pond_ea_ = surface.evap_pond (dt, msg);
   daisy_assert (pond_ea_ >= 0.0);
@@ -1023,7 +1047,8 @@ BioclimateStandard::WaterDistribution (const Units& units,
 void 
 BioclimateStandard::tick (const Units& units, const Time& time, 
                           Surface& surface, const Weather& weather,  
-                          Vegetation& vegetation, const Movement& movement,
+                          Vegetation& vegetation, const Litter& litter,
+                          const Movement& movement,
                           const Geometry& geo, const Soil& soil, 
                           SoilWater& soil_water, const SoilHeat& soil_heat,
                           Chemistry& chemistry,
@@ -1059,7 +1084,7 @@ BioclimateStandard::tick (const Units& units, const Time& time,
   RadiationDistribution (vegetation, sin_beta_, msg);
 
   // Distribute water among canopy, snow, and soil.
-  WaterDistribution (units, time, surface, weather, vegetation, 
+  WaterDistribution (units, time, surface, weather, vegetation, litter,
                      movement, geo, soil, soil_water, soil_heat, dt, msg);
 
   // Convert wind speed to field conditions.

@@ -965,7 +965,8 @@ This is usually zero.")
                     (output "Harvest" "Dissipate" "Surface Decompose" "Runoff"
                             "Soil Decompose" "Leak-Matrix"
                             "Surface-Drain" "Soil-Drain" "Uptake")
-                    (content "Snow" "Canopy" "Surface" "Soil"  "Tertiary"
+                    (content "Snow" "Canopy" "Litter" "Surface"
+                             "Soil" "Tertiary"
                              ;; "Error"
                              )))
   (when hourly)
@@ -1119,6 +1120,14 @@ Amount stored in on the canopy.")
                    (handle current)
                    (dimension "${unit}")
                    (spec chemical default canopy_storage))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         litter_storage)
+                   (documentation "\
+Amount stored in the surface litter (mulch, residuals, fertilizer).")
+                   (tag Litter)
+                   (handle current)
+                   (dimension "${unit}")
+                   (spec chemical default litter_storage))
            (number (path column "${column}" Chemistry "*" trace "${chemical}"
                          surface_storage)
                    (documentation "\

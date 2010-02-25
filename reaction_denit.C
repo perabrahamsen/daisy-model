@@ -38,6 +38,7 @@
 #include "check.h"
 #include "mathlib.h"
 #include "frame.h"
+#include "treelog.h"
 
 struct ReactionDenit : public Reaction
 {
@@ -153,9 +154,11 @@ ReactionDenit::check (const Units&, const Geometry&,
                       const Chemistry& chemistry, Treelog& msg) const
 { 
   bool ok = true;
-  if (!chemistry.require (Chemical::NO3 (), msg))
-    ok = false;
-
+  if (!chemistry.know (Chemical::NO3 ()))
+    {
+      msg.error ("Denitrification requires NO3 to be tracked");
+      ok = false;
+    }
   return ok;
 }
 

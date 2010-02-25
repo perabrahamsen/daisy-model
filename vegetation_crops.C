@@ -60,13 +60,6 @@ struct VegetationCrops : public Vegetation
     ForcedLAI (const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>& als);
   } forced_LAI;
 
-  // Litter;
-  const double litter_water_capacity_; // Max water in litter DM [L/kg]
-  const PLF litter_vapor_flux_factor_;        // Ep-reduction [kg DM/m^2] -> []
-  const double litter_specific_AI;            // Spec. litter area [m^2/kg DM]
-  const double litter_extinction_coefficent;  // Beers law for cover []
-  double litter_DM;             // DM on top of surface [kg DM/m^2]
-
   // Canopy structure.
   double shared_light_fraction_; // Light not reserved a specific crop.
   double LAI_;			// Total LAI of all crops on this column [0-]
@@ -219,19 +212,6 @@ struct VegetationCrops : public Vegetation
             double& seed_N /* kg/ha/h */, double& seed_C /* kg/ha/h */,
             const Time&, double dt, Treelog&);
   void output (Log&) const;
-
-  double litter_cover () const
-  { 
-    const double litter_AI = litter_DM * litter_specific_AI; 
-    const double cover =  1.0 - exp (- litter_AI * litter_extinction_coefficent);
-    return cover;
-  }
-  double litter_vapor_flux_factor () const
-  { return litter_vapor_flux_factor_ (litter_DM); }
-  double litter_water_capacity () const
-  { return litter_DM * litter_water_capacity_; }
-  double litter_albedo () const
-  { return -1.0; }
 
   // Create and destroy.
   void initialize (const Metalib& metalib, 
@@ -489,9 +469,6 @@ VegetationCrops::tick (const Metalib& metalib,
 
   // Reset canopy structure.
   reset_canopy_structure (msg);
-
-  // Update litter;
-  litter_DM = organic_matter.top_DM () * 10 /* [g/cm^2] -> [kg/m^2] */;
 }
 
 void 
@@ -917,8 +894,6 @@ VegetationCrops::initialize (const Metalib& metalib,
                           units, geo, organic_matter, SoilLimit, time, msg);
 
   reset_canopy_structure (msg);
-
-  litter_DM = organic_matter.top_DM () * 10 /* [g/cm^2] -> [kg/m^2] */;
 }
 
 bool 
@@ -945,11 +920,6 @@ VegetationCrops::VegetationCrops (const BlockModel& al)
     crops (build_crops (al, "crops")),
     // deque, so we can't use build_vector.
     forced_LAI (al.submodel_sequence ("ForcedLAI")),
-    litter_water_capacity_ (al.number ("litter_water_capacity")),
-    litter_vapor_flux_factor_ (al.plf ("litter_vapor_flux_factor")),
-    litter_specific_AI (al.number ("litter_specific_AI")),
-    litter_extinction_coefficent (al.number ("litter_extinction_coefficent")),
-    litter_DM (-42.42e42),
     shared_light_fraction_ (1.0),
     LAI_ (0.0),
     height_ (0.0),
@@ -1004,20 +974,6 @@ emerged.  If no crops have emerged on the field, it will be ignored.",
                        Attribute::State, Attribute::Variable,
                        "List of crops growing in the field");
     frame.set_empty ("crops");
-    frame.declare ("litter_water_capacity", "L/kg", Attribute::Const, "\
-Water holding capacity of litter dry matter.");
-    frame.set ("litter_water_capacity", 0.0);
-    frame.declare ("litter_vapor_flux_factor", "Mg DM/ha", Attribute::None (), 
-                   Attribute::Const, "\
-reduction of soil evaporation as a function of litter.");
-    frame.set ("litter_vapor_flux_factor", PLF::always_1 ());
-    frame.declare ("litter_specific_AI", "m^2/kg DM", Attribute::Const, "\
-Area covered per litter mass.");
-    frame.set ("litter_specific_AI", 38.0);
-    frame.declare ("litter_extinction_coefficent", 
-                   Attribute::None (), Attribute::Const, "\
-Beer's law extinction coefficient for litter.");
-    frame.set ("litter_extinction_coefficent", 0.6);
   }
 } VegetationCrops_syntax;
 

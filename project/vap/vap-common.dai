@@ -40,12 +40,7 @@
   "Shared parameters for VAP fields."
   (OrganicMatter original
                  (Bioincorporation (C_per_N_factor (25 1) (50 0.1) (60 0.01))))
-  (Vegetation crops 
-              (litter_water_capacity 2.5 [L/kg])
-              (litter_vapor_flux_factor (0 [Mg DM/ha] 1.0)
-                                        (3 [Mg DM/ha] 0.8)
-                                        (6 [Mg DM/ha] 0.6))
-              ))
+  (Litter Millet))
   
 
 ;; Movement.

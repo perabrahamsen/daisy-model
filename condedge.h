@@ -27,7 +27,6 @@
 
 #include <memory>
 
-class BlockModel;
 class Soil;
 class Geometry;
 

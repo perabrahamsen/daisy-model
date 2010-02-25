@@ -24,7 +24,6 @@
 #include "plf.h"
 #include "mathlib.h"
 #include "log.h"
-#include "litter.h"
 #include "root_system.h"
 #include "canopy_simple.h"
 #include "time.h"
@@ -80,9 +79,6 @@ struct VegetationPermanent : public Vegetation
 
   // Radiation.
   const double albedo_;		// Another reflection factor.
-
-  // Litter.
-  Litter litter;
 
   // Queries.
   double rs_min () const	// Minimum transpiration resistance.
@@ -199,15 +195,6 @@ struct VegetationPermanent : public Vegetation
             double&, double&, const Time&, double, Treelog&)
   { throw "Can't sow on permanent vegetation"; }
   void output (Log&) const;
-
-  double litter_cover () const
-  { return 1.0; }
-  double litter_vapor_flux_factor () const
-  { return litter.vapor_flux_factor; }
-  double litter_water_capacity () const
-  { return litter.interception_capacity; }
-  double litter_albedo () const
-  { return litter.albedo; }
 
   // Create and destroy.
   void initialize (const Metalib& metalib, 
@@ -418,8 +405,7 @@ VegetationPermanent::VegetationPermanent (const BlockModel& al)
     litter_am (al.model_sequence ("litter_am")),
     root_system (submodel<RootSystem> (al, "Root")),
     WRoot (al.number ("root_DM") * 100.0), // [Mg DM / ha] -> [g DM / m^2]
-    albedo_ (al.number ("Albedo")),
-    litter (al.submodel ("Litter"))
+    albedo_ (al.number ("Albedo"))
 {
   canopy.Height = al.number ("Height");
 }
@@ -480,8 +466,6 @@ Litter AOM parameters.");
     frame.declare ("Albedo", Attribute::None (), Check::positive (), Attribute::Const, 
 		"Reflection factor.");
     frame.set ("Albedo", 0.2);
-    frame.declare_submodule("Litter", Attribute::State, "Dead stuff.",
-			 Litter::load_syntax);
   }
 } VegetationPermanent_syntax;
 

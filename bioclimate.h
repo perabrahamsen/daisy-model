@@ -29,6 +29,7 @@
 class Surface;
 class Weather;
 class Vegetation;
+class Litter;
 class Movement; 
 class Geometry;
 class Soil;
@@ -53,7 +54,7 @@ public:
 public:
   virtual void tick (const Units&, 
                      const Time&, Surface&, const Weather&, Vegetation&, 
-                     const Movement&, const Geometry&,
+                     const Litter& litter, const Movement&, const Geometry&,
 		     const Soil&, SoilWater&, const SoilHeat&, 
 		     Chemistry&, double dt, Treelog&) = 0;
   virtual double get_intercepted_water () const = 0; // [mm]

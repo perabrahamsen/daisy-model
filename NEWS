@@ -6,6 +6,43 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 4.79
+
+** New 'Litter' column parameter.
+
+The 'litter' component has three possible values.
+
+*** 'none' (default)
+
+Crop residuals and organic fertilizers have no effect on water and
+solutes on the surface.
+
+*** 'permanent'
+
+A permanent litter layer is assumed, it covers the entire surface, can
+store water and solutes, and may affect albedo and surface
+evaporation.  It does not change over time.  This replaces the
+'Litter' parameter of the permanent vegetation model.
+
+*** 'residue'
+
+The dry matter weight of organic matter on the surface determine the
+fraction of the surface covered by litter, as well as the water
+holding capacity of the litter pack.  Albedo and surface evaporation
+is affected on the part of the surface covered by litter.
+
+Two build-in parameterizations are available, namely 'Millet' and
+'Maize'.
+
+** You can now simulate organic matter without mineral nitrogen.
+
+The default organic matter model will assume unlimted NO3 and NH4 if
+the chemistry module is not tracking those.
+
+* 4.78
+
+** Fix answers to exercises.
+
 * 4.77
 
 ** Bug fixes and cleanup

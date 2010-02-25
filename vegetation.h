@@ -160,12 +160,6 @@ public:
                     const Time&, double dt, Treelog& msg) = 0;
   virtual void output (Log&) const;
   
-  // Litter
-  virtual double litter_cover () const = 0;
-  virtual double litter_vapor_flux_factor () const = 0;
-  virtual double litter_water_capacity () const = 0;  
-  virtual double litter_albedo () const = 0;  
-
   // Create and Destroy.
 public:
   virtual void initialize (const Metalib& metalib, 

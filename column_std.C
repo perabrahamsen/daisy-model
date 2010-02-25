@@ -31,6 +31,7 @@
 #include "soil.h"
 #include "soil_water.h"
 #include "vegetation.h"
+#include "litter.h"
 #include "bioclimate.h"
 #include "weather.h"
 #include "chemistry.h"
@@ -65,6 +66,7 @@ struct ColumnStandard : public Column
   std::auto_ptr<Groundwater> groundwater;
   std::auto_ptr<Weather> weather;
   std::auto_ptr<Vegetation> vegetation;
+  std::auto_ptr<Litter> litter;
   std::auto_ptr<Bioclimate> bioclimate;
   Surface surface;
   Geometry& geometry;
@@ -448,6 +450,7 @@ ColumnStandard::add_residuals (std::vector<AM*>& residuals)
        residual != residuals.end ();
        residual++)
     organic_matter->add (*(*residual));
+  litter->update (organic_matter->top_DM ());
 }
 
 void 
@@ -470,7 +473,7 @@ ColumnStandard::mix (const Metalib& metalib, const double from, const double to,
   surface.unridge ();
   organic_matter->mix (geometry, *soil, *soil_water, from, to, penetration, 
                        time, dt);
-
+  litter->update (organic_matter->top_DM ());
   // Reset tillage age.
   for (size_t i = 0; i < tillage_age.size (); i++)
     {
@@ -645,7 +648,7 @@ ColumnStandard::tick (const Metalib& metalib, const Time& time, const double dt,
   // Early calculation.
   const double old_pond = bioclimate->get_snow_storage () + surface.ponding ();
   bioclimate->tick (units, time, surface, my_weather, 
-                    *vegetation, *movement,
+                    *vegetation, *litter, *movement,
                     geometry, *soil, *soil_water, *soil_heat, *chemistry,
                     dt, msg);
   vegetation->tick (metalib, time, *bioclimate, geometry, *soil, 
@@ -660,7 +663,7 @@ ColumnStandard::tick (const Metalib& metalib, const Time& time, const double dt,
                        tillage_top, surface,
                        bioclimate->snow_leak_rate (dt), vegetation->cover (),
                        bioclimate->canopy_leak_rate (dt),
-                       vegetation->litter_cover (),
+                       litter->cover (),
                        bioclimate->litter_leak_rate (dt), 
                        surface.runoff_rate (dt),
                        old_pond,
@@ -679,7 +682,7 @@ ColumnStandard::tick (const Metalib& metalib, const Time& time, const double dt,
   // Turnover.
   organic_matter->tick (geometry, *soil_water, *soil_heat, tillage_age,
                         *chemistry, dt, msg);
-  
+  litter->update (organic_matter->top_DM ());
   // Transport.
   groundwater->tick (units, geometry, *soil, *soil_water, 
                      surface.ponding () * 0.1, 
@@ -894,6 +897,7 @@ ColumnStandard::ColumnStandard (const BlockModel& al)
              ? Librarian::build_item<Weather> (al, "weather")
              : NULL), 
     vegetation (Librarian::build_item<Vegetation> (al, "Vegetation")),
+    litter (Librarian::build_item<Litter> (al, "Litter")),
     bioclimate (Librarian::build_item<Bioclimate> (al, "Bioclimate")),
     surface (al.submodel ("Surface")),
     geometry (movement->geometry ()),
@@ -989,7 +993,8 @@ ColumnStandard::initialize (const Block& block,
                               T_avg, msg);
   vegetation->initialize (block.metalib (), 
                           units, time, geometry, *soil, *organic_matter, msg);
-  
+  litter->initialize (organic_matter->top_DM ());
+
   // Soil conductivity and capacity logs.
   soil_heat->tick_after (geometry.cell_size (), *soil, *soil_water, msg);
 
@@ -1039,6 +1044,10 @@ the simulation.  If unspecified, used global weather.");
                           Attribute::State, Attribute::Singleton,
                           "The crops on the field.");
     frame.set ("Vegetation", "crops");
+    frame.declare_object ("Litter", Litter::component,
+                          Attribute::State, Attribute::Singleton,
+                          "The litter layer below the canopy.");
+    frame.set ("Litter", "none");
 
     frame.declare_object ("Bioclimate", Bioclimate::component, 
                           Attribute::State, Attribute::Singleton,

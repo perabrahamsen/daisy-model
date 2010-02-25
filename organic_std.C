@@ -852,10 +852,10 @@ OrganicStandard::check (const Units& units, const Geometry& geo,
   Treelog::Open nest (msg, "OrganicStandard");
   bool ok = true;
   
-  if (!chemistry.require (Chemical::NO3 (), msg))
-    /* ok = false */;
-  if (!chemistry.require (Chemical::NH4 (), msg))
-    /* ok = false */;
+  if (!chemistry.know (Chemical::NO3 ()))
+    msg.warning ("NO3 not tracked, assuming unlimited supply");
+  if (!chemistry.know (Chemical::NH4 ()))
+    msg.warning ("NH4 not tracked, assuming unlimited supply");
 
   for (size_t i = 0; i < am.size (); i++)
     if (!am[i]->check (msg))
@@ -1133,10 +1133,10 @@ OrganicStandard::tick (const Geometry& geo,
         continue;
       const double NH4 = soil_NH4 
         ? soil_NH4->M_primary (i) * K_NH4
-        : 0.0;
+        : 1.0;                  // Practically unlimited 1 [g/cm^3]
       const double NO3 = soil_NO3
         ? soil_NO3->M_primary (i) * K_NO3
-        : 0.0;
+        : 1.0;                  // Practically unlimited 1 [g/cm^3]
 
       N_soil[i] = NH4 + NO3;
       N_used[i] = 0.0;
@@ -2647,7 +2647,7 @@ OrganicStandard::top_DM () const
   double result = 0.0;
   for (int i = 0; i < am.size (); i++)
     result += am[i]-> top_DM ();
-  return result; 
+  return result * 10; // [g DM/cm^2] -> [kg DM/m^2]
 }
 
 double

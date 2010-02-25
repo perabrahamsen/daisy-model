@@ -22,21 +22,32 @@
 #ifndef LITTER_H
 #define LITTER_H
 
-class Frame;
-class FrameSubmodel;
+#include "model.h"
+#include "symbol.h"
 
-class Litter
+class BlockModel;
+
+class Litter : public Model
 {
   // Content.
 public:
-  const double vapor_flux_factor;
-  const double interception_capacity;
-  const double albedo;
+  static const char *const component;
+  symbol library_id () const;
+
+  // Simulation.
+public:
+  virtual void update (double top_DM /* [kg DM/m^2] */) = 0;
+  virtual double cover () const = 0; // Fraction of surface covered [0-1]
+  virtual double vapor_flux_factor () const = 0; // Affect on soil evap. []
+  virtual double water_capacity () const = 0;    // Max water content [mm]
+  virtual double albedo () const = 0;  // Light reflection factor []
 
   // Create and Destroy.
 public:
-  static void load_syntax (Frame&);
-  Litter (const FrameSubmodel&);
+  virtual void initialize (double top_DM /* [kg DM/m^2] */) = 0;
+protected:
+  Litter ();
+public:
   ~Litter ();
 };
 

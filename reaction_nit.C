@@ -32,6 +32,7 @@
 #include "assertion.h"
 #include "librarian.h"
 #include "frame.h"
+#include "treelog.h"
 
 struct ReactionNitrification : public Reaction
 {
@@ -109,10 +110,16 @@ ReactionNitrification::check (const Units&, const Geometry&,
 			      const Chemistry& chemistry, Treelog& msg) const
 { 
   bool ok = true;
-  if (!chemistry.require (Chemical::NO3 (), msg))
-    ok = false;
-  if (!chemistry.require (Chemical::NH4 (), msg))
-    ok = false;
+  if (!chemistry.know (Chemical::NO3 ()))
+    {
+      msg.error ("Nitrification requires NO3 to be tracked");
+      ok = false;
+    }
+  if (!chemistry.know (Chemical::NH4 ()))
+    {
+      msg.error ("Nitrification requires NH4 to be tracked");
+      ok = false;
+    }
 
   return ok;
 }
