@@ -1288,7 +1288,7 @@ sum of all chemicals will be logged."
                     (output canopy_harvest canopy_dissipate
 			    surface_decompose 
                             surface_runoff surface_out surface_mixture 
-                            surface_tillage)
+                            litter_tillage surface_tillage)
                     (content snow_storage canopy_storage litter_storage
                              surface_solute surface_immobile)))
   (when hourly)
@@ -1378,6 +1378,11 @@ sum of all chemicals will be logged."
                    (handle sum)
                    (dimension "g/ha/&")
                    (spec chemical default surface_mixture))
+           (number (path column "${column}" Chemistry "*" trace "${chemical}"
+                         litter_tillage)
+                   (handle sum)
+                   (dimension "g/ha/&")
+                   (spec chemical default litter_tillage))
            (number (path column "${column}" Chemistry "*" trace "${chemical}"
                          surface_tillage)
                    (handle sum)
