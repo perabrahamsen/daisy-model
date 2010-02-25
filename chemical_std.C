@@ -84,6 +84,7 @@ struct ChemicalStandard : public Chemical
   double harvest_;
   double residuals;
   double surface_tillage;
+  double litter_tillage;
 
   // Surface state and log.
   double snow_storage;
@@ -441,6 +442,7 @@ ChemicalStandard::clear ()
   harvest_ = 0.0;
   residuals = 0.0;
   surface_tillage = 0.0;
+  litter_tillage = 0.0;
   surface_transform = 0.0;
   surface_release = 0.0;
   std::fill (S_secondary_.begin (), S_secondary_.end (), 0.0);
@@ -640,13 +642,17 @@ ChemicalStandard::mix (const Geometry& geo,
   daisy_approximate (surface_storage, surface_solute + surface_immobile);
   daisy_assert (penetration <= 1.0);
   daisy_assert (penetration >= 0.0);
-  const double removed = surface_storage * penetration;
-  surface_tillage += removed / dt;
-  surface_storage -= removed;
+  const double surface_removed = surface_storage * penetration;
+  surface_tillage += surface_removed / dt;
+  surface_storage -= surface_removed;
   daisy_assert (surface_storage >= 0.0);
   surface_solute *= (1.0 - penetration);
   surface_immobile *= (1.0 - penetration);
   daisy_approximate (surface_storage, surface_solute + surface_immobile);
+  const double litter_removed = litter_storage * penetration;
+  litter_tillage += litter_removed / dt;
+  litter_storage -= litter_removed;
+  const double removed = surface_removed + litter_removed;
 
   // Add to soil.
   const double m2_per_cm2 = 0.01 * 0.01;
@@ -1098,6 +1104,7 @@ ChemicalStandard::output (Log& log) const
   output_value (deposit_, "deposit", log);
   output_value (spray_, "spray", log);
   output_variable (surface_tillage, log);
+  output_variable (litter_tillage, log);
 
   // Surface.
   output_variable (snow_storage, log);
@@ -1454,6 +1461,7 @@ ChemicalStandard::ChemicalStandard (const BlockModel& al)
     harvest_ (0.0),
     residuals (0.0),
     surface_tillage (0.0),
+    litter_tillage (0.0),
     snow_storage (al.number ("snow_storage")),
     snow_in (0.0),
     snow_out (0.0),
@@ -1747,6 +1755,8 @@ with 'none' adsorption and one with 'full' adsorption, and an\n\
                    "Amount currently being applied.");
     frame.declare ("surface_tillage", "g/m^2/h", Attribute::LogOnly, 
                    "Amount removed from surface due to tillage operations.");
+    frame.declare ("litter_tillage", "g/m^2/h", Attribute::LogOnly, 
+                   "Amount removed from litter due to tillage operations.");
 
     // Surface variables.
     frame.declare ("snow_storage", "g/m^2", Attribute::State, 
