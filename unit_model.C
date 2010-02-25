@@ -290,13 +290,13 @@ Connvert to SI base units by multiplying with a factor.")
          "Percent.");
     add ("ppm", p_u, 0, 0, 0, 0, 0, 0, 0,
          "Part per million.");
-    add ("mg/g", 0.001, 0, 0, 0, 0, 0, 0, 0,
+    add ("mg/g", p_m, 0, 0, 0, 0, 0, 0, 0,
          "Milligram per gram.");
-    add ("g/kg", 1000.0, 0, 0, 0, 0, 0, 0, 0,
+    add ("g/kg", 1.0 / p_k, 0, 0, 0, 0, 0, 0, 0,
          "Gram per kilogram.");
-    add ("m^3/cm^3", 1e-6, 0, 0, 0, 0, 0, 0, 0,
+    add ("m^3/cm^3", 1.0 / p_c_3, 0, 0, 0, 0, 0, 0, 0,
          "Kilo.");
-    add ("mg N/kg dry soil", 1e-6, 0, 0, 0, 0, 0, 0, 0,
+    add ("mg N/kg dry soil", p_u / p_k, 0, 0, 0, 0, 0, 0, 0,
          "Nitrogen concentration in dry soil.");
     add ("cm^3/cm^3", p_c_3 / p_c_3,
          0, 0, 0, 0, 0, 0, 0,
@@ -314,6 +314,8 @@ Connvert to SI base units by multiplying with a factor.")
          "Millimeter.");
     add ("um", p_u, 1, 0, 0, 0, 0, 0, 0,
          "Micrometer.");
+    add ("l/ha", u_l / u_ha, 1, 0, 0, 0, 0, 0, 0,
+         "Liter per hectar.");
 
     add ("m^2", 1.0, 2, 0, 0, 0, 0, 0, 0,
          "Square meter.");
@@ -338,7 +340,7 @@ Connvert to SI base units by multiplying with a factor.")
          "Per aquare meter.");
     add ("cm^-2", 1.0 / p_c_2, -2, 0, 0, 0, 0, 0, 0,
          "Per aquare centimeter.");
-
+    
     // Mass.
     add ("kg", p_k * u_g, 0, 1, 0, 0, 0, 0, 0,
          "Kilogram.");
@@ -397,6 +399,8 @@ Connvert to SI base units by multiplying with a factor.")
     add ("cm/d", p_c / u_d, 
          1, 0, -1, 0, 0, 0, 0,
          "Soil water movement.");
+    add ("l/ha/h", u_l / u_ha / u_h, 1, 0, -1, 0, 0, 0, 0,
+         "Liter per hectar per hour.");
 
     // Mass per length.
     add ("kg/m", 1e0, -1, 1, 0, 0, 0, 0, 0,
@@ -454,6 +458,12 @@ Connvert to SI base units by multiplying with a factor.")
     add ("t/ha", p_M * u_g / u_ha, 
          -2, 1, 0, 0, 0, 0, 0,
          "Ton per hectar.");
+    add ("g DM/cm^2", u_g / p_c_2, 
+         -2, 1, 0, 0, 0, 0, 0,
+         "Gram dry matter per square centimeter.");
+    add ("kg DM/ha", p_k * u_g / u_ha, 
+         -2, 1, 0, 0, 0, 0, 0,
+         "Kilogram dry matter per hectar.");
     add ("Mg DM/ha", p_M * u_g / u_ha, 
          -2, 1, 0, 0, 0, 0, 0,
          "Ton dry matter per hectar.");

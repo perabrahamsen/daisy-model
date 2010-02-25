@@ -49,7 +49,7 @@ Litter::~Litter ()
 { }
 
 static DeclareSubmodel 
-lutter_submodel (Litter::load_syntax, "Litter", "\
+litter_submodel (Litter::load_syntax, "Litter", "\
 Properties of litter below permanent vegetation.");
 
 // litter.C ends here.

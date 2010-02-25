@@ -40,7 +40,12 @@
   "Shared parameters for VAP fields."
   (OrganicMatter original
                  (Bioincorporation (C_per_N_factor (25 1) (50 0.1) (60 0.01))))
-  (Vegetation crops (litter_water_holding_capacity 2.5 [L/kg])))
+  (Vegetation crops 
+              (litter_water_capacity 2.5 [L/kg])
+              (litter_vapor_flux_factor (0 [Mg DM/ha] 1.0)
+                                        (3 [Mg DM/ha] 0.8)
+                                        (6 [Mg DM/ha] 0.6))
+              ))
   
 
 ;; Movement.
@@ -128,10 +133,25 @@
                         (tag "Glyphosate leak 150")
                         (dimension "ug/ha/&"))
            (number (path column "${column}" OrganicMatter default top_DM)
-                   (spec organic default top_DM))
+                   (spec organic default top_DM)
+                   (dimension [Mg DM/ha]))
            (number (path column "${column}" Bioclimate default litter_water_storage)
                    (spec bioclimate default litter_water_storage))
-
+           (number (path column "${column}" Chemistry "*"
+                         trace Glyphosate-base litter_storage)
+                   (spec chemical Glyphosate-base litter_storage)
+                   (dimension [g/ha]))
+           (number (path column "${column}" Chemistry "*"
+                         trace Glyphosate-base litter_in)
+                   (spec chemical Glyphosate-base litter_in)
+                   (handle sum)
+                   (dimension [g/ha/h]))
+           (number (path column "${column}" Chemistry "*"
+                         trace Glyphosate-base litter_out)
+                   (spec chemical Glyphosate-base litter_out)
+                   (handle sum)
+                   (dimension [g/ha/h]))
+                   
            ))
 
 ;; Program

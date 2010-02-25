@@ -96,6 +96,10 @@ struct ChemicalStandard : public Chemical
   double canopy_harvest;
   double canopy_out;
 
+  double litter_storage;
+  double litter_in;
+  double litter_out;
+
   double surface_storage;
   double surface_solute;
   double surface_immobile;
@@ -199,8 +203,10 @@ struct ChemicalStandard : public Chemical
   
   // Simulation.
   void tick_top (const double snow_leak_rate, // [h^-1]
-                 const double cover, // [],
+                 const double canopy_cover, // [],
                  const double canopy_leak_rate, // [h^-1]
+                 const double litter_cover, // [],
+                 const double litter_leak_rate,
                  const double surface_runoff_rate, // [h^-1]
                  const double dt, // [h]
                  Treelog& msg);
@@ -665,15 +671,17 @@ ChemicalStandard::swap (const Geometry& geo,
 
 void 
 ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
-                            const double cover, // [],
+                            const double canopy_cover, // [],
                             const double canopy_leak_rate, // [h^-1]
+                            const double litter_cover, // [],
+                            const double litter_leak_rate, // [h^-1]
                             const double surface_runoff_rate, // [h^-1]
                             const double dt, // [h]
                             Treelog& msg)
 {
   TREELOG_MODEL (msg);
 
-  const double old_storage = snow_storage + canopy_storage;
+  const double old_storage = snow_storage + canopy_storage + litter_storage;
 
   // Snow pack
   snow_in = spray_ + deposit_;
@@ -683,7 +691,8 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
   snow_storage -= snow_out * dt;
 
   // Canopy.
-  canopy_in = snow_out * cover;
+  canopy_in = snow_out * canopy_cover;
+  const double canopy_bypass = snow_out - canopy_in;
   canopy_harvest = harvest_;
   canopy_storage += (canopy_in - canopy_harvest - residuals) * dt;
 
@@ -710,8 +719,17 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
   canopy_in += dissipate_;
   canopy_dissipate += dissipate_;
 
+  // Litter
+  const double below_canopy = canopy_out + canopy_bypass;
+  litter_in = (canopy_out - residuals + canopy_bypass) * litter_cover
+    + residuals;
+  const double litter_bypass = below_canopy - litter_in;
+  litter_storage += litter_in * dt;
+  litter_out = litter_storage * litter_leak_rate;
+  litter_storage -= litter_out * dt;
+
   // Surface
-  surface_in = canopy_out + (snow_out - canopy_in);
+  surface_in = litter_out;
   surface_runoff = surface_storage * surface_runoff_rate; 
   surface_decompose = surface_storage * surface_decompose_rate; 
   surface_storage += (surface_in + surface_transform 
@@ -732,7 +750,7 @@ ChemicalStandard::tick_top (const double snow_leak_rate, // [h^-1]
     }
 
   // Mass balance.
-  const double new_storage = snow_storage + canopy_storage;
+  const double new_storage = snow_storage + canopy_storage + litter_storage;
   const double input = spray_ + deposit_;
   const double output = surface_in + canopy_harvest + canopy_dissipate;
   if (!approximate (new_storage, old_storage + (input - output) * dt)
@@ -1090,6 +1108,9 @@ ChemicalStandard::output (Log& log) const
   output_variable (canopy_dissipate, log);
   output_variable (canopy_harvest, log);
   output_variable (canopy_out, log);
+  output_variable (litter_storage, log);
+  output_variable (litter_in, log);
+  output_variable (litter_out, log);
   output_variable (surface_storage, log);
   output_variable (surface_solute, log);
   output_variable (surface_immobile, log);
@@ -1100,7 +1121,8 @@ ChemicalStandard::output (Log& log) const
   output_variable (surface_release, log);
   output_variable (surface_mixture, log);
   output_variable (surface_out, log);
-  output_value (snow_storage + canopy_storage + surface_storage,
+  output_value (snow_storage + canopy_storage 
+                + litter_storage + surface_storage,
                 "top_storage", log);
   output_value (canopy_dissipate + canopy_harvest + surface_runoff 
                 + surface_decompose - surface_transform,
@@ -1440,6 +1462,9 @@ ChemicalStandard::ChemicalStandard (const BlockModel& al)
     canopy_dissipate (0.0),
     canopy_harvest (0.0),
     canopy_out (0.0),
+    litter_storage (al.number ("litter_storage")),
+    litter_in (0.0),
+    litter_out (0.0),
     surface_storage (al.number ("surface_storage")),
     surface_solute (0.0),
     surface_immobile (surface_storage),
@@ -1728,7 +1753,7 @@ with 'none' adsorption and one with 'full' adsorption, and an\n\
                    "Stored in the snow pack.");
     frame.set ("snow_storage", 0.0);
     frame.declare ("snow_in", "g/m^2/h", Attribute::LogOnly, 
-                   "Entering snow pack..");
+                   "Entering snow pack.");
     frame.declare ("snow_out", "g/m^2/h", Attribute::LogOnly, 
                    "Leaking from snow pack.");
 
@@ -1743,6 +1768,14 @@ with 'none' adsorption and one with 'full' adsorption, and an\n\
                    "Falling through or off the canopy.");
     frame.declare ("canopy_harvest", "g/m^2/h", Attribute::LogOnly, 
                    "Amount removed with crop harvest.");
+
+    frame.declare ("litter_storage", "g/m^2", Attribute::State, 
+                   "Stored in the litter (mulch, surface residuals).");
+    frame.set ("litter_storage", 0.0);
+    frame.declare ("litter_in", "g/m^2/h", Attribute::LogOnly, 
+                   "Entering litter .");
+    frame.declare ("litter_out", "g/m^2/h", Attribute::LogOnly, 
+                   "Leaking from litter.");
 
     frame.declare ("surface_storage", "g/m^2", Attribute::State, 
                    "Stored on the soil surface.\n\
@@ -1777,8 +1810,8 @@ into colloid bound chemicals will use it.  For this to work, the reactions\n\
 that set the variable must be listed before the reactions that us it.\n\
 \n\
 Note that the value is relative to the current timestep.");
-    frame.declare ("top_storage", "g/m^2", Attribute::LogOnly, 
-                   "Som of above ground (surface, snow, canopy) storage.");
+    frame.declare ("top_storage", "g/m^2", Attribute::LogOnly, "\
+Sum of above ground (surface, liter, snow, canopy) storage.");
     frame.declare ("top_loss", "g/m^2/h", Attribute::LogOnly, "\
 Amount lost from the system from the surface.\n                         \
 This includes runoff, canopy dissipation and harvest, but not soil\n    \

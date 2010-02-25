@@ -72,8 +72,10 @@ struct ChemistryStandard : public Chemistry
                  const double tillage_age /* [d] */,
                  const Surface&,
                  const double snow_leak_rate, // [h^-1]
-                 const double cover, // [],
+                 const double canopy_cover, // [],
                  const double canopy_leak_rate, // [h^-1]
+                 const double litter_cover, // [],
+                 const double litter_leak_rate, // [h^-1]
                  const double surface_runoff_rate, // [h^-1]
                  const double surface_water /* [mm] */,
                  const double total_rain /* [mm/h] */,
@@ -236,8 +238,10 @@ ChemistryStandard::tick_top (const Units& units, const Geometry& geo,
                              const double tillage_age /* [d] */,
                              const Surface& surface,
                              const double snow_leak_rate, // [h^-1]
-                             const double cover, // [],
+                             const double canopy_cover, // [],
                              const double canopy_leak_rate, // [h^-1]
+                             const double litter_cover, // [],
+                             const double litter_leak_rate, // [h^-1]
                              const double surface_runoff_rate, // [h^-1]
                              const double surface_water /* [mm] */,
                              const double total_rain /* [mm/h] */,
@@ -252,7 +256,8 @@ ChemistryStandard::tick_top (const Units& units, const Geometry& geo,
     {
       reactions[r]->tick_top  (tillage_age, 
                                total_rain, direct_rain, canopy_drip, 
-                               cover, h_veg, surface_water, chemistry, dt, msg);
+                               canopy_cover, h_veg, surface_water, chemistry, 
+                               dt, msg);
       reactions[r]->tick_surface  (units, geo, soil, soil_water, soil_heat,
                                    surface, chemistry,  dt, msg);
     }
@@ -262,7 +267,8 @@ ChemistryStandard::tick_top (const Units& units, const Geometry& geo,
   const double pond_rain = std::max (surface.ponding (), 0.0);
   for (size_t c = 0; c < chemicals.size (); c++)
     {
-      chemicals[c]->tick_top (snow_leak_rate, cover, canopy_leak_rate, 
+      chemicals[c]->tick_top (snow_leak_rate, canopy_cover, canopy_leak_rate, 
+                              litter_cover, litter_leak_rate, 
                               surface_runoff_rate, dt, msg);
       chemicals[c]->tick_surface (pond_rain,
                                   geo, soil, soil_water, z_mixing, msg);

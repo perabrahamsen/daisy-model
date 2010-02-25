@@ -73,11 +73,11 @@ struct LogHarvest : public Log
     if (print_dimension)
       {
 	out << "\t\t\t\t"
-	    << "\tt/ha\tt/ha\tt/ha\tt/ha";
+	    << "\tMg DM/ha\tMg DM/ha\tMg DM/ha\tMg DM/ha";
 	if (print_N)
-	  out << "\tkg/ha\tkg/ha\tkg/ha\tkg/ha";
+	  out << "\tkg N/ha\tkg N/ha\tkg N/ha\tkg N/ha";
 	if (print_C)
-	  out << "\tkg/ha\tkg/ha\tkg/ha\tkg/ha";
+	  out << "\tkg C/ha\tkg C/ha\tkg C/ha\tkg C/ha";
 	out << "\td\td\tkg/m^3\n";
 	print_dimension = false;
       }

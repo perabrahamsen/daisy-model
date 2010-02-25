@@ -3,7 +3,11 @@
 ;; Chemistry
 
 (defchemistry Silstrup multi
-  (combine colloids Bromide Dimethoate Fenpropimorph Glyphosate Metamitron))
+  (combine colloids 
+           Bromide Dimethoate Fenpropimorph 
+           Glyphosate 
+           Metamitron
+           ))
 
 ;; Soil 
 
@@ -253,7 +257,8 @@
   (wait (at 2001 10 25))
      ;; Roundup Bio (glyphosate) - weeds - 4.0 l/ha			
      ;; 360 g/l * 4.0 l/ha = 1440 g/ha
-    (spray Glyphosate 1440 [g/ha])
+     ;;(spray Glyphosate 1440 [g/ha])
+     (irrigate_overhead 4.0 [l/ha/h] (solute (Glyphosate 360 [g/kg])))
   (wait (at 2001 12 18))
     (plowing (depth -22 [cm]))
     (set_porosity (depth -1 [cm]) (porosity 0.392719))
@@ -356,7 +361,7 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
 
 (deflog "Silstrup Content" "VAP Content"
   (where "log/Silstrup-content.dlf")
-  (when daily)
+  ;; (when hourly)
   (entries &old 
            (content (z -3.5 [m])
                     (path column "${column}" Chemistry "*" 

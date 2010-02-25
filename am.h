@@ -78,6 +78,7 @@ public:
   void add_surface (const Geometry&,	// Add dead roots.
                     double C, double N, 
                     const std::vector<double>& density);
+  double top_DM () const;	// [g DM/cm^2]
   double top_C () const;	// [g C/cm^2]
   double top_N () const;	// [g N/cm^2]
   void multiply_top (double fraction);

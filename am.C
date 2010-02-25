@@ -68,6 +68,7 @@ struct AM::Implementation
   Time creation;		// When it was created.
   const symbol name;		// What is was.
   const std::vector<AOM*> om;		// Organic matter pool.
+  const double total_C_fraction;        // Fraction of C in DM.
 
   // Use this if a living crop is adding to this AM.
   struct Lock;
@@ -106,13 +107,15 @@ struct AM::Implementation
   void add_surface (const Geometry&,	// Add dead roots.
                     double C, double N, 
                     const std::vector<double>& density);
+  double top_DM () const;
   double top_C () const;
   double top_N () const;
   void multiply_top (double fraction);
 
   // Create and Destroy.
   Implementation (bool initialized, 
-                  const Time& c, symbol n, const std::vector<AOM*>& o);
+                  const Time& c, symbol n, const std::vector<AOM*>& o, 
+                  double tcf);
   ~Implementation ();
 };
 
@@ -401,6 +404,10 @@ AM::Implementation::add_surface (const Geometry& geo,
 }
 
 double
+AM::Implementation::top_DM () const
+{ return top_C () / total_C_fraction; }
+
+double
 AM::Implementation::top_C () const
 { 
   double total = 0.0;
@@ -572,11 +579,13 @@ AM::Implementation::pour (std::vector<double>& cc, std::vector<double>& nn)
 
 AM::Implementation::Implementation (const bool i,
                                     const Time& c, const symbol n,
-				    const std::vector<AOM*>& o)
+				    const std::vector<AOM*>& o,
+                                    const double tcf)
   : initialized (i),
     creation (c),
     name (n),
     om (o),
+    total_C_fraction (tcf),
     lock (NULL)
 { }
 
@@ -666,6 +675,10 @@ AM::add_surface (const Geometry& geo,
                  double C, double N, 
                  const std::vector<double>& density)
 { impl->add_surface (geo, C, N, density); }
+
+double
+AM::top_DM () const
+{ return impl->top_DM (); }
 
 double
 AM::top_C () const
@@ -953,7 +966,8 @@ AM::AM (const BlockModel& al)
 	   ? Time (al.submodel ("creation"))
 	   : Time (1, 1, 1, 1),
            al.check ("name") ? al.name ("name") : al.type_name (),
-	   Librarian::build_vector<AOM> (al, "om")))
+	   Librarian::build_vector<AOM> (al, "om"),
+           al.number ("total_C_fraction", 0.4)))
 {
   if (al.check ("lock"))
     impl->lock = new AM::Implementation::Lock (al.submodel ("lock"));

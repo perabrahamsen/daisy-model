@@ -89,7 +89,7 @@ Number::check_dim (const Units& units,
   if (units.can_convert (has, want))
     return true;
 
-  msg.error ("Cannot convert [" + has + "] to [" + want + "]");
+  msg.error ("Cannot convert from [" + has + "] to [" + want + "]");
   return false;
 }
 

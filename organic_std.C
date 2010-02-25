@@ -236,6 +236,7 @@ struct OrganicStandard : public OrganicMatter
                   const Soil&, const SoilWater&, const SoilHeat&, Treelog&);
   const std::vector<DOM*>& fetch_dom () const;
   void output (Log&) const;
+  double top_DM () const;           // [g DM/cm^2]
   double CO2 (size_t i) const;	// [g C/cm³]
   double CO2_fast (size_t i) const;	// [g C/cm³]
   void mix (const Geometry&, const Soil&, const SoilWater&,
@@ -758,6 +759,7 @@ OrganicStandard::output (Log& log) const
     }
   output_value (CO2_fast_, "CO2_fast", log);
   output_variable (top_CO2, log);
+  output_lazy (top_DM (), "top_DM", log);
   static const symbol total_N_symbol ("total_N");
   static const symbol total_C_symbol ("total_C");
   static const symbol humus_symbol ("humus");
@@ -851,9 +853,9 @@ OrganicStandard::check (const Units& units, const Geometry& geo,
   bool ok = true;
   
   if (!chemistry.require (Chemical::NO3 (), msg))
-    ok = false;
+    /* ok = false */;
   if (!chemistry.require (Chemical::NH4 (), msg))
-    ok = false;
+    /* ok = false */;
 
   for (size_t i = 0; i < am.size (); i++)
     if (!am[i]->check (msg))
@@ -1090,8 +1092,12 @@ OrganicStandard::tick (const Geometry& geo,
                        const double dt,
                        Treelog& msg)
 {
-  Chemical& soil_NO3 = chemistry.find (Chemical::NO3 ());
-  Chemical& soil_NH4 = chemistry.find (Chemical::NH4 ());
+  Chemical *const soil_NO3 = chemistry.know (Chemical::NO3 ())
+    ? &chemistry.find (Chemical::NO3 ())
+    : NULL;
+  Chemical *const soil_NH4 = chemistry.know (Chemical::NH4 ())
+    ? &chemistry.find (Chemical::NH4 ())
+    : NULL;
 
   const double old_N = total_N (geo);
   const double old_C = total_C (geo);
@@ -1125,8 +1131,12 @@ OrganicStandard::tick (const Geometry& geo,
     {
       if (!active_[i])
         continue;
-      const double NH4 = soil_NH4.M_primary (i) * K_NH4;
-      const double NO3 = soil_NO3.M_primary (i) * K_NO3;
+      const double NH4 = soil_NH4 
+        ? soil_NH4->M_primary (i) * K_NH4
+        : 0.0;
+      const double NO3 = soil_NO3
+        ? soil_NO3->M_primary (i) * K_NO3
+        : 0.0;
 
       N_soil[i] = NH4 + NO3;
       N_used[i] = 0.0;
@@ -1208,7 +1218,9 @@ OrganicStandard::tick (const Geometry& geo,
       if (!active_[i])
         continue;
       
-      const double NH4 = soil_NH4.M_primary (i) * K_NH4;
+      const double NH4 = soil_NH4 
+        ? soil_NH4->M_primary (i) * K_NH4
+        : 0.0;
       daisy_assert (NH4 >= 0.0);
 
       if (N_used[i] > NH4)
@@ -1226,8 +1238,10 @@ OrganicStandard::tick (const Geometry& geo,
     }
   
   // Update soil solutes.
-  soil_NO3.add_to_transform_source (NO3_source);
-  soil_NH4.add_to_transform_source (NH4_source);
+  if (soil_NO3)
+    soil_NO3->add_to_transform_source (NO3_source);
+  if (soil_NH4)
+    soil_NH4->add_to_transform_source (NH4_source);
 
   // Biological incorporation.
   const double soil_T 
@@ -2627,6 +2641,15 @@ const std::vector<DOM*>&
 OrganicStandard::fetch_dom () const
 { return dom; }
 
+double 
+OrganicStandard::top_DM () const
+{
+  double result = 0.0;
+  for (int i = 0; i < am.size (); i++)
+    result += am[i]-> top_DM ();
+  return result; 
+}
+
 double
 OrganicStandard::CO2 (size_t i) const
 { return CO2_slow_[i] + CO2_fast_[i];
@@ -2693,9 +2716,6 @@ static bool
 check_alist (const Metalib&, const Frame& al, Treelog& err)
 {
   bool ok = true;
-
-  if (al.check ("active_groundwater"))
-    err.warning ("The 'active_groundwater' parameter is ignored.");
 
   const std::vector<boost::shared_ptr<const FrameModel>/**/>& am_alist = al.model_sequence ("am");
   const std::vector<boost::shared_ptr<const FrameModel>/**/>& smb_alist = al.model_sequence ("smb");
@@ -2952,8 +2972,6 @@ Organic carbon content of this layer.");
     frame.declare_boolean ("active_underground", Attribute::Const, "\
 Set this flag to turn on mineralization below the root zone.");
     frame.set ("active_underground", false);
-    frame.declare_boolean ("active_groundwater", Attribute::OptionalConst, "\
-IGNORED: Use 'water_factor' to disable mineralization.");
     frame.declare ("K_NH4", "h^-1", Check::fraction (), Attribute::Const, 
                "Maximal immobilization rate for ammonium.");
     frame.set ("K_NH4", 0.020833); // 0.5 / 24.
@@ -2999,7 +3017,9 @@ This is a negative number.");
 Turnover rate above which pools will contribute to 'CO2_fast'.");
     frame.set ("CO2_threshold", 1e-4); // SMB2 and default AOM pools.
     frame.declare ("top_CO2", "g CO_2-C/cm^2/h", Attribute::LogOnly,
-               "CO2 evolution at surface.");
+                   "CO2 evolution at surface.");
+    frame.declare ("top_DM", "g DM/cm^2", Attribute::LogOnly,
+                   "Added organic dry matter on top of surface.");
     frame.declare_object ("am", AM::component, 
                       Attribute::State, Attribute::Variable, 
                       "Added organic matter pools.");

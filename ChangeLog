@@ -1,3 +1,20 @@
+2010-02-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* unit_model.C: Fix several units.
+
+2010-02-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log_harvest.C (match): Fix dimensions.
+
+	* vegetation_crops.C (litter_vapor_flux_factor, litter_water_capacity): 
+	New parameters.
+
+2010-02-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* organic_std.C (top_DM): New log variable.
+	* organic_matter.h, organic_none.C, am.h, am.C: Export it.
+	* organic_std.C (active_groundwater): Removed obsolete parameter.
+
 2010-02-16  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 4.78 released.

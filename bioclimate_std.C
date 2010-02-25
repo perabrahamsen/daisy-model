@@ -324,10 +324,10 @@ struct BioclimateStandard : public Bioclimate
   }
   double canopy_leak_rate (const double dt) const
   {
-    if (canopy_water_storage < 1e-5)
-      return 1.0 / dt;
     if (canopy_water_out < 1e-8)
       return 0.0;
+    if (canopy_water_storage < 0.01 * canopy_water_out * dt)
+      return 1.0 / dt;
     const double canopy_water_old
       = canopy_water_storage + canopy_water_out * dt;
     
@@ -335,6 +335,17 @@ struct BioclimateStandard : public Bioclimate
   }
   double canopy_leak () const                     // [mm/h]
   { return canopy_water_out; }
+  double litter_leak_rate (const double dt) const
+  {
+    if (litter_water_out < 1e-8)
+      return 0.0;
+    if (litter_water_storage < 0.01 * litter_water_out * dt)
+      return 1.0 / dt;
+    const double litter_water_old
+      = litter_water_storage + litter_water_out * dt;
+    
+    return litter_water_out / litter_water_old;
+  }
 
   // Create.
   void initialize (const Block&, const Weather&);

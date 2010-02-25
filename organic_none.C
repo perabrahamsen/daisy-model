@@ -53,6 +53,8 @@ struct OrganicNone : public OrganicMatter
   }
   void output (Log&) const
   { }
+  double top_DM () const
+  { return 0.0; }
   double CO2 (size_t) const	// [g C/cm³]
   { return 0.0; }
   double CO2_fast (size_t) const	// [g C/cm³]

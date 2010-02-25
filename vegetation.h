@@ -161,6 +161,7 @@ public:
   virtual void output (Log&) const;
   
   // Litter
+  virtual double litter_cover () const = 0;
   virtual double litter_vapor_flux_factor () const = 0;
   virtual double litter_water_capacity () const = 0;  
   virtual double litter_albedo () const = 0;  

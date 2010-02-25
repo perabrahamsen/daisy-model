@@ -122,8 +122,10 @@ public:
   // Simulation.
 public:
   virtual void tick_top (double snow_leak_rate /* [h^-1] */,
-                         double cover /* [] */,
+                         double canopy_cover /* [] */,
                          double canopy_leak_rate /* [h^-1] */,
+                         double litter_cover /* [] */,
+                         double litter_leak_rate /* [h^-1] */,
                          double surface_runoff_rate /* [h^-1] */,
                          double dt /* [h] */,
                          Treelog&) = 0;
