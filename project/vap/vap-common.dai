@@ -39,7 +39,8 @@
 (defcolumn VAP default
   "Shared parameters for VAP fields."
   (OrganicMatter original
-                 (Bioincorporation (C_per_N_factor (25 1) (50 0.1) (60 0.01))))
+                 ;;(Bioincorporation (C_per_N_factor (25 1) (50 0.1) (60 0.01)))
+                 )
   (Litter Millet))
   
 
@@ -52,7 +53,8 @@
                           ;; (K_average pressure (h_lim -5 [cm]))
                           )
                 (v+h))
-  (drainpoints (-110 [cm] 1 [cm])))
+  ;; (drainpoints (-110 [cm] 1 [cm]))
+  )
 
 (deftertiary VAP biopores
   ;; (pond_max 5 [mm])

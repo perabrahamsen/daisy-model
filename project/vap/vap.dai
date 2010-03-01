@@ -20,7 +20,7 @@
          
 
 ;; (run batch (run Silstrup-1C-Drain plotzoom))
-;; (run batch (run Silstrup-1C-Drain (plotall (graph Silstrup))))
+;;(run batch (run Silstrup-2C (plotall (graph Silstrup))))
 
 (defgnuplot Silstrup-full Station
   (station Silstrup)
@@ -40,9 +40,9 @@
 ;;(run batch (run Silstrup-1C-Drain plotzoom))
 ;; (run batch (run plotfull))
 
-;;(run batch (run Estrup-2D Silstrup-2D plotall))
+(run batch (run Estrup-2D Silstrup-2D plotall))
 ;;(run batch (run Estrup-2C Silstrup-2C plotall))
-(run batch (run Silstrup-2C plotall))
+;;(run batch (run Silstrup-2C plotall))
 ;;(run batch (run plotall))
 ;; (run batch (run Estrup-1C-Drain Silstrup-1C-Drain plotall))
 ;; (run plothydro)
