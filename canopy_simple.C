@@ -64,11 +64,15 @@ CanopySimple::load_syntax (Frame& frame)
   frame.declare ("EpFac", Attribute::None (), Attribute::Const,
 	      "Potential evapotranspiration factor.");
   frame.set ("EpFac", 1.15);
+  frame.set_cited ("EpFac", 1.20, "\
+See figure 4 in the cited paper.\n\
+\n\
+With a bare soil factor of 0.6 a combined Kc of 1.15 is reached at LAI=5.",
+                   "kjaersgaard2008crop");
+
   frame.declare ("EpFacDS", "DS", Attribute::None (), Attribute::Const,
 	      "DS dependent potential evapotranspiration factor.");
-  PLF EpFacDS;
-  EpFacDS.add (1.0, 1.0);
-  frame.set ("EpFacDS", EpFacDS);
+  frame.set ("EpFacDS", PLF::always_1 ());
   frame.declare ("rs_max", "s/m", Attribute::Const,
 	      "Maximum transpiration resistance.");
   frame.set ("rs_max", 1.0e5);

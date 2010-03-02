@@ -652,12 +652,12 @@ BioclimateStandard::WaterDistribution (const Units& units,
 
   // Net Radiation.
   const double Cloudiness = weather.cloudiness ();
-  const double AirTemperature = weather.air_temperature ();//[dg C]
+  const double air_temperature = weather.air_temperature ();//[dg C]
   const double VaporPressure = weather.vapor_pressure ();
   const double Si = weather.global_radiation ();
   const double Albedo = albedo (vegetation, litter, surface, 
                                 geo, soil, soil_water);
-  net_radiation->tick (Cloudiness, AirTemperature, VaporPressure, Si, Albedo,
+  net_radiation->tick (Cloudiness, air_temperature, VaporPressure, Si, Albedo,
                        msg);
   const double Rn = net_radiation->net_radiation ();
 
@@ -676,8 +676,7 @@ BioclimateStandard::WaterDistribution (const Units& units,
   // Already set by manager.
 
   // 1.3 Weather.
-  double rain = weather.rain ();
-  double air_temperature = weather.air_temperature ();
+  const double rain = weather.rain ();
 
   // 2 Snow Pack
 
@@ -784,10 +783,12 @@ BioclimateStandard::WaterDistribution (const Units& units,
   const double water_below_canopy
     = canopy_water_out + canopy_water_bypass + irrigation_surface; 
   const double water_below_canopy_temperature 
-    = (  canopy_water_bypass * snow_water_out_temperature
-       + canopy_water_out * canopy_water_temperature
-       + irrigation_surface * irrigation_surface_temperature)
-    / water_below_canopy;
+    = water_below_canopy > 0.01
+    ? ((canopy_water_bypass * snow_water_out_temperature
+        + canopy_water_out * canopy_water_temperature
+        + irrigation_surface * irrigation_surface_temperature)
+       / water_below_canopy)
+    : air_temperature;
   litter_water_in = water_below_canopy * litter_cover;
   const double litter_water_bypass = water_below_canopy - litter_water_in;
   

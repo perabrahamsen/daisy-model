@@ -236,7 +236,7 @@ struct OrganicStandard : public OrganicMatter
                   const Soil&, const SoilWater&, const SoilHeat&, Treelog&);
   const std::vector<DOM*>& fetch_dom () const;
   void output (Log&) const;
-  double top_DM () const;           // [g DM/cm^2]
+  double top_DM () const;           // [kg DM/m^2]
   double CO2 (size_t i) const;	// [g C/cm³]
   double CO2_fast (size_t i) const;	// [g C/cm³]
   void mix (const Geometry&, const Soil&, const SoilWater&,
@@ -3018,7 +3018,7 @@ Turnover rate above which pools will contribute to 'CO2_fast'.");
     frame.set ("CO2_threshold", 1e-4); // SMB2 and default AOM pools.
     frame.declare ("top_CO2", "g CO_2-C/cm^2/h", Attribute::LogOnly,
                    "CO2 evolution at surface.");
-    frame.declare ("top_DM", "g DM/cm^2", Attribute::LogOnly,
+    frame.declare ("top_DM", "kg DM/m^2", Attribute::LogOnly,
                    "Added organic dry matter on top of surface.");
     frame.declare_object ("am", AM::component, 
                       Attribute::State, Attribute::Variable, 

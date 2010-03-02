@@ -401,8 +401,8 @@ Flux of water from surface to drain through biopores, bypassing the matrix.")
                         1.10 1.10 1.11 1.14 1.23 1.37 []))
   
   (time 1999 9 1)
-  ;; (stop 2002 3 10)
-  (stop 2000 8 1)
+  (stop 2002 3 10)
+  ;;(stop 2000 8 1)
 
 
   (output &old

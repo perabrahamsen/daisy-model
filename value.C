@@ -29,6 +29,17 @@ int
 Value::size () const
 { return Attribute::Singleton; }
 
+const std::vector<symbol>& 
+Value::cite () const
+{ 
+  static const std::vector<symbol> empty;
+  return empty;
+}
+
+symbol
+Value::description () const
+{ return Attribute::None (); }
+
 double 
 Value::number () const
 { daisy_notreached (); }
@@ -118,6 +129,26 @@ ValueNumber::number () const
 ValueNumber::ValueNumber (double v)
   : Value (),
     value (v)
+{ }
+
+symbol
+ValueNumberDescription::description () const
+{ return desc; }
+
+ValueNumberDescription::ValueNumberDescription (const double v, 
+                                                const symbol description)
+  : ValueNumber (v),
+    desc (description)
+{ }
+
+const std::vector<symbol>& 
+ValueNumberCite::cite () const
+{ return citations; }
+
+ValueNumberCite::ValueNumberCite (const double v, const symbol d, 
+                                  const std::vector<symbol>& c)
+  : ValueNumberDescription (v, d),
+    citations (c)
 { }
 
 double 

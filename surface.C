@@ -530,7 +530,12 @@ Surface::load_syntax (Frame& frame)
 	      Attribute::Const,
 	      "Convertion of reference evapotranspiration to\n\
 potential evaporation for bare soil.");
-  frame.set ("EpFactor", 1.0);
+  frame.set_cited ("EpFactor", 0.6, "\
+See figure 4 in the cited paper.\n\
+\n\
+The autumn value can be lower, due to muching.  With a crop factor of\n\
+1.2 a combined Kc of 1.15 is reached at LAI=5.",
+                   "kjaersgaard2008crop");
   frame.declare ("albedo_dry", Attribute::None (), Check::non_negative (),
 	      Attribute::Const,
 	      "Albedo of dry soil (pF >= 3)");

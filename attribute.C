@@ -24,6 +24,32 @@
 
 #include "attribute.h"
 #include "assertion.h"
+#include <sstream>
+
+symbol 
+Attribute::size_name (const int size)
+{
+  switch (size)
+    {
+    case Singleton:
+      return "singleton";
+    case Variable:
+      return "variable";
+    case CanopyCells:
+      return "canopy cells";
+    case CanopyEdges:
+      return "canopy edges";
+    case SoilCells:
+      return "soil cells";
+    case SoilEdges:
+      return "soil edges";
+    case Unspecified:
+      return "unspecified";
+    }
+  std::ostringstream tmp;
+  tmp << "[" << size << "]";
+  return tmp.str ();
+}
 
 // Each attribute should have an associated type.
 

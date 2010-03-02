@@ -50,6 +50,7 @@ namespace Attribute
   const int SoilCells = -3213;
   const int SoilEdges = -3214;
   const int Unspecified = -666;
+  symbol size_name (int);
 
   // Size is not known at compile time.
   inline bool flexible_size (const int size)

@@ -377,12 +377,8 @@ FormatLaTeX::see_page (const symbol scope, const symbol id)
 }
 
 void
-FormatLaTeX::frame_description (const Frame& frame)
+FormatLaTeX::cite (const std::vector<symbol>& cite)
 {
-  Format::frame_description (frame);
-  if (!frame.check ("cite"))
-    return;
-  std::vector<symbol> cite = frame.name_sequence ("cite");
   if (cite.size () < 1)
     return;
   out () << "See also \\cite{" << cite[0];
@@ -390,6 +386,15 @@ FormatLaTeX::frame_description (const Frame& frame)
     out () << "," << cite[i];
   out () << "}";
   soft_linebreak ();
+}
+
+void
+FormatLaTeX::frame_description (const Frame& frame)
+{
+  Format::frame_description (frame);
+  if (!frame.check ("cite"))
+    return;
+  cite (frame.name_sequence ("cite"));
 }
 
 FormatLaTeX::FormatLaTeX (const BlockModel& al)

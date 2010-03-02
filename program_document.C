@@ -457,6 +457,16 @@ ProgramDocument::print_entry_value (const symbol name,
 	    daisy_notreached ();
 	  }
 
+      const symbol description = frame.value_description (name);
+      if (description != Attribute::None ())
+        {
+          format->hard_linebreak ();
+          format->text ("Value description: ");
+          format->text (description);
+          format->text (" ");
+          format->cite (frame.value_cite (name));
+        }
+
       if (print_default_value)
 	{
 	  std::ostringstream tmp;
@@ -464,7 +474,7 @@ ProgramDocument::print_entry_value (const symbol name,
 	  printer.print_entry (frame, name);
 	  format->soft_linebreak ();
 	  format->verbatim (tmp.str ());
-	  format->text ("Description:");
+	  format->text ("Parameter description:");
 	}
     }
 }

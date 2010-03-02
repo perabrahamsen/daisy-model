@@ -314,6 +314,7 @@ Frame::Implementation::check (const Metalib& metalib, const Frame& frame,
       ok = false;
     }
 
+  bool has_reference = false;
   for (type_map::const_iterator i = types.begin ();
        i != types.end ();
        i++)
@@ -321,7 +322,7 @@ Frame::Implementation::check (const Metalib& metalib, const Frame& frame,
       const symbol key = (*i).first;
       const Type& type = *(*i).second;
       if (frame.is_reference (key))
-        continue;
+        has_reference = true;
       else if (!check (metalib, frame, type, key, msg))
         ok = false;
     }
@@ -329,9 +330,10 @@ Frame::Implementation::check (const Metalib& metalib, const Frame& frame,
   if (!ok)
     return false;
 
-  for (size_t j = 0; j < checker.size (); j++)
-    if (!checker[j] (metalib, frame, msg))
-      return false;
+  if (!has_reference)
+    for (size_t j = 0; j < checker.size (); j++)
+      if (!checker[j] (metalib, frame, msg))
+        return false;
 
   return true;
 }
@@ -1057,6 +1059,29 @@ Frame::value_size (const symbol key) const
   return -1;
 }
 
+symbol 
+Frame::value_description (const symbol key) const
+{
+  if (impl->has_value (key))
+    return impl->get_value (key).description ();
+  if (parent ())
+    return parent ()->value_description (key);
+
+  return Attribute::None ();
+}
+
+const std::vector<symbol>& 
+Frame::value_cite (const symbol key) const
+{
+  if (impl->has_value (key))
+    return impl->get_value (key).cite ();
+  if (parent ())
+    return parent ()->value_cite (key);
+  
+  static const std::vector<symbol> empty;
+  return empty;
+}
+
 void
 Frame::set_reference (const symbol key, const symbol val)
 { 
@@ -1543,6 +1568,30 @@ Frame::set_empty (const symbol key)
     default:
       daisy_notreached ();
     }
+}
+
+void 
+Frame::set_described (const symbol key, const double value, const symbol desc)
+{ 
+  verify (key, Attribute::Number);
+  impl->set_value (key, new ValueNumberDescription (value, desc));
+}
+
+void 
+Frame::set_cited (const symbol key, double const value, const symbol desc,
+                  const std::vector<symbol>& citations)
+{
+  verify (key, Attribute::Number);
+  impl->set_value (key, new ValueNumberCite (value, desc, citations));
+}
+
+void 
+Frame::set_cited (symbol key, double value, symbol desc,
+                  symbol citation)
+{
+  std::vector<symbol> citations;
+  citations.push_back (citation);
+  set_cited (key, value, desc, citations);
 }
 
 Frame::Frame (const Frame& old)

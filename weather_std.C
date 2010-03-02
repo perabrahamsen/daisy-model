@@ -1098,7 +1098,7 @@ WeatherStandard::initialize (const Time& time, Treelog& msg)
 		val = units.convert (dim, Units::mm (), val);
 	      else
 		lex->error ("Unknown dimension");
-	      if (val < 0.0 || val > 3000.0)
+	      if (val < 0.01 || val > 3000.0)
 		lex->error ("Unreasonable value");
 	      deposition.precipitation = val;
 	    }

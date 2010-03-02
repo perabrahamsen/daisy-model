@@ -423,6 +423,8 @@ Connvert to SI base units by multiplying with a factor.")
          "Crop scale pesticide per area.");
     add ("g/m^2", u_g, -2, 1, 0, 0, 0, 0, 0,
          "Crop scale mass per area.");
+    add ("kg DM/m^2", p_k * u_g, -2, 1, 0, 0, 0, 0, 0,
+         "Base mass per area.");
     add ("g DM/m^2", u_g, -2, 1, 0, 0, 0, 0, 0,
          "Crop scale dry matter per area.");
     add ("g/cm^2", u_g / p_c_2, -2, 1, 0, 0, 0, 0, 0,

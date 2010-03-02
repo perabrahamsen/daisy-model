@@ -1,3 +1,18 @@
+2010-03-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* weather_std.C (PAverage): Don't allow zero.
+
+2010-02-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* surface.C (EpFactor): Same.
+	* canopy_simple.C (EpFac): Change and document default value.
+
+	* frame.h, frame.C, value.h, value.C: Values can now have
+	descriptions and citations.
+	* format_LaTeX.C, format_LaTeX.h, format.h (cite): New function.
+	(see_page): Use it.
+	* program_document.C (print_entry_value): Document values.
+
 2010-02-25  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* litter.h, litter.C: Made it a component.

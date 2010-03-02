@@ -246,6 +246,8 @@ class EXPORT Frame : public WScope
   // Is the element 'key' in this alist a subset of the other entry.
   bool subset (const Metalib&, const Frame& other, symbol key) const;
   int value_size (symbol key) const;
+  symbol value_description (symbol key) const;
+  const std::vector<symbol>& value_cite (symbol key) const;
 
   // References.
  public:
@@ -306,6 +308,11 @@ class EXPORT Frame : public WScope
             const std::vector<boost::shared_ptr<const FrameSubmodel>/**/>&);
   void set (symbol, const std::vector<boost::shared_ptr<const PLF>/**/>&);
   void set_empty (symbol);
+  void set_described (symbol key, double value, symbol desc);
+  void set_cited (symbol key, double value, symbol desc,
+                  const std::vector<symbol>& citations);
+  void set_cited (symbol key, double value, symbol desc,
+                  symbol citation);
 
   // Create and Destroy.
  protected:

@@ -35,6 +35,8 @@ class Value : public boost::noncopyable
 {
 public:
   virtual int size () const;
+  virtual const std::vector<symbol>& cite () const;
+  virtual symbol description () const;
   virtual double number () const;
   virtual symbol name () const;
   virtual bool flag () const;
@@ -62,6 +64,23 @@ class ValueNumber : public Value
   double number () const;
 public:
   ValueNumber (const double v);
+};
+
+class ValueNumberDescription : public ValueNumber
+{
+  const symbol desc;
+  symbol description () const;
+public:
+  ValueNumberDescription (const double v, const symbol description);
+};
+
+class ValueNumberCite : public ValueNumberDescription
+{
+  const std::vector<symbol> citations;
+  const std::vector<symbol>& cite () const;
+public:
+  ValueNumberCite (const double v, const symbol d, 
+                   const std::vector<symbol>& c);
 };
 
 class ValueReference : public Value

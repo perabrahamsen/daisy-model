@@ -71,6 +71,7 @@ struct FormatLaTeX : public Format
   void see (const symbol type,
 	    const symbol scope, const symbol id);
   void see_page (const symbol scope, const symbol id);
+  void cite (const std::vector<symbol>& cite);
   void frame_description (const Frame& frame);
 
   // Create and Destroy.

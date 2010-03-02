@@ -8,7 +8,19 @@ release.
 
 * 4.79
 
-** New 'Litter' column parameter.
+** Potential evaporation changes.
+
+The default value of the Surface parameter 'EpFactor' has been
+adjusted to 0.6 from 1.0.  The default value for the crop parameter
+'EpFac' has been adjusted to 1.20, which mean that a full canopy
+(LAI=5) will continue to have a Kc close to 1.15.  But for Danish
+conditions, spring and autumn evaporation will be signficantly lower.
+
+This reflect measurements in Kjaersgaard et al, 2008 and other places.
+Autumn Ep will likely still be too high, unless you activate the new
+Litter parameter described below.
+
+** New 'Litter' parameter in the default colmun model.
 
 The 'litter' component has three possible values.
 

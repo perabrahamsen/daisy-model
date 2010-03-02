@@ -173,63 +173,49 @@ Block::expand_reference (const symbol key) const
       error ("Value of '" + key + "' refers to itself");
       throw "Reference loop";
     }
-  if (lookup (var) == frame ().lookup (key)
-      && (find_frame (var).type_size (var) == frame ().type_size (key)
-          || (frame ().type_size (key) == Attribute::Variable
-              && (find_frame (var).type_size (var) 
-                  != Attribute::Singleton))))
-    return var;
+  const Attribute::type var_type = lookup (var);
+  const Attribute::type key_type = frame ().lookup (key);
+  if (var_type != key_type)
+    {
+      std::ostringstream tmp;
+      tmp << "Value of '" << key << "' is $" << var
+          << ", which is a " << Attribute::type_name (var_type)
+          << ", should be " << Attribute::type_name (key_type);
+      error (tmp.str ());
+      throw "Reference type mismatch";
+    }
+  const int var_size = find_frame (var).type_size (var);
+  const int key_size = frame ().type_size (key);
+  if (var_size != key_size
+      && (key_size != Attribute::Variable
+          || var_size == Attribute::Singleton))
+      // Matching dimension.
+    {
+      std::ostringstream tmp;
+      tmp << "Value of '" << key << "' is $" << var
+          << ", a " << Attribute::size_name (var_size)
+          << ", should be " << Attribute::size_name (key_size);
+      error (tmp.str ());
+      throw "Reference size mismatch";
+    }
 
-  std::ostringstream tmp;
-  tmp << "Value of '" << key << "' is $" << var
-      << ", which is a " << Attribute::type_name (lookup (var));
-  switch (find_frame (var).type_size (var))
+  if (var_type == Attribute::Number)
     {
-    case Attribute::Singleton:
-      break;
-    case Attribute::CanopyCells:
-      tmp << " canopy intervals";
-      break;
-    case Attribute::CanopyEdges:
-      tmp << " canopy boundaries";
-      break;
-    case Attribute::SoilCells:
-      tmp << " soil cells";
-      break;
-    case Attribute::SoilEdges:
-      tmp << " soil edges";
-      break;
-    case Attribute::Variable:
-      tmp << " sequence";
-      break;
-    default:
-      tmp << "[" << find_frame (var).type_size (var) << "]";
+      daisy_assert (key_type == Attribute::Number);
+      
+      const symbol var_dim = find_frame (var).dimension (var);
+      const symbol key_dim = frame ().dimension (key);
+
+      if (var_dim != key_dim)
+        {
+          std::ostringstream tmp;
+          tmp << "Value of '" << key << "' is $" << var
+              << ", which is a " << var_dim << ", should be " << key_dim;
+          error (tmp.str ());
+          throw "Reference unit mismatch";
+        }
     }
-  tmp << ", should be a " << Attribute::type_name (frame ().lookup (key));
-  switch (frame ().type_size (key))
-    {
-    case Attribute::Singleton:
-      break;
-    case Attribute::CanopyCells:
-      tmp << " canopy intervals";
-      break;
-    case Attribute::CanopyEdges:
-      tmp << " canopy boundaries";
-      break;
-    case Attribute::SoilCells:
-      tmp << " soil cells";
-      break;
-    case Attribute::SoilEdges:
-      tmp << " soil edges";
-      break;
-    case Attribute::Variable:
-      tmp << " sequence";
-      break;
-    default:
-      tmp << "[" << frame ().type_size (key) << "]";
-    }
-  error (tmp.str ());
-  throw ("Bad reference");
+  return var;
 }
 
 const Units& 
